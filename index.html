@@ -256,7 +256,29 @@ async function startVoice(){ try{
 }catch{ toast('Mic bị chặn'); } }
 function stopVoice(){ mic.on=false; voiceBtn.textContent='🎙️'; try{ mic.stream?.getTracks().forEach(t=>t.stop()); }catch{} mic.stream=mic.src=mic.analyser=mic.data=null; }
 voiceBtn?.addEventListener('click', ()=>{ mic.on ? stopVoice() : startVoice(); sfxTick(); });
+<script>
+// ... giữ nguyên các đoạn trên của mày ...
 
+// === BỔ SUNG 2 HÀM NÀY ===
+function targetSpawn(){
+  // khoảng thời gian spawn ống (ms), càng về sau càng nhanh nhưng không dưới mốc min
+  const d = DIFFS[diff];
+  const base = d.spawnEvery;     // ví dụ 1700ms
+  const min  = d.spawnMin;       // ví dụ 1100ms
+  const byScore = base - state.score * d.scoreSpawnFactor;
+  return Math.max(min, byScore);
+}
+
+function gapHeight(){
+  // chiều cao khe hở giữa 2 ống, giảm dần theo điểm nhưng không dưới mốc min
+  const d = DIFFS[diff];
+  const base = d.gapBase;        // ví dụ 220
+  const min  = d.gapMin;         // ví dụ 170
+  const byScore = base - state.score * d.scoreGapFactor;
+  return Math.max(min, byScore) * dpr;  // dùng đơn vị pixel theo DPR
+}
+
+// ... phía dưới mới tới // ===== Loop =====
 // ===== Loop =====
 let last=performance.now();
 function loop(now){
