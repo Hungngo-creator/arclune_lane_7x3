@@ -182,5 +182,10 @@
     ctx.arcTo(x,y,x+w,y,r);
     ctx.closePath();
   }
+    <script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js");
+  }
+</script>
   </script></body>
 </html>
