@@ -101,9 +101,7 @@ const SKINS={
   gold:{player:'#facc15',pipe:'#22c55e',edge:'rgba(0,0,0,.15)',skyTop:'#0ea5e9',skyBot:'#0f172a',ground:'rgba(255,255,255,.08)'},
   pink:{player:'#fb7185',pipe:'#34d399',edge:'rgba(0,0,0,.15)',skyTop:'#ec4899',skyBot:'#312e81',ground:'rgba(255,255,255,.10)'},
   cyan:{player:'#22d3ee',pipe:'#10b981',edge:'rgba(0,0,0,.15)',skyTop:'#06b6d4',skyBot:'#0f172a',ground:'rgba(255,255,255,.08)'}
-};
-
-// ===== Difficulty =====
+};// ===== Difficulty =====
 const DIFFS={
   easy:{speed:180,gravity:900,jumpV:-240,spawnEvery:1800,spawnMin:1200,gapBase:260,gapMin:200,scoreSpawnFactor:6,scoreGapFactor:1.2},
   normal:{speed:200,gravity:950,jumpV:-280,spawnEvery:1700,spawnMin:1100,gapBase:220,gapMin:170,scoreSpawnFactor:8,scoreGapFactor:1.4},
@@ -256,8 +254,6 @@ async function startVoice(){ try{
 }catch{ toast('Mic bị chặn'); } }
 function stopVoice(){ mic.on=false; voiceBtn.textContent='🎙️'; try{ mic.stream?.getTracks().forEach(t=>t.stop()); }catch{} mic.stream=mic.src=mic.analyser=mic.data=null; }
 voiceBtn?.addEventListener('click', ()=>{ mic.on ? stopVoice() : startVoice(); sfxTick(); });
-<script>
-// ... giữ nguyên các đoạn trên của mày ...
 
 // === BỔ SUNG 2 HÀM NÀY ===
 function targetSpawn(){
