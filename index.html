@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tap‑to‑Fly — v2 (Difficulty + Sound)</title>
+  <title>Tap‑to‑Fly — v3 (Pause + Skins)</title>
   <link rel="manifest" href="manifest.json">
   <style>
     :root { color-scheme: dark light; }
@@ -13,12 +13,14 @@
     .card{width:100%;max-width:900px;aspect-ratio:16/9;border-radius:18px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.4);position:relative;border:1px solid rgba(255,255,255,.08)}
     canvas{display:block;width:100%;height:100%;background:#0f172a;touch-action:manipulation}
     .hud{position:absolute;inset:0;pointer-events:none;display:flex;align-items:flex-start;justify-content:space-between;padding:10px}
-    .pill{background:rgba(255,255,255,.12);backdrop-filter:blur(8px);padding:6px 10px;border-radius:14px;font-size:12px}
-    .note{position:absolute;left:12px;bottom:10px;color:#ffffffb3;font-size:12px}
-    /* Toolbar clickable */
-    .toolbar{position:absolute;left:12px;bottom:44px;display:flex;gap:8px;flex-wrap:wrap;pointer-events:auto;z-index:20}
-    .btn{padding:6px 10px;border-radius:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:12px}
-    .btn.active{background:rgba(14,165,233,.85);border-color:rgba(255,255,255,.35)}
+    .pill{background:rgba(255,255,255,.12);backdrop-filter:blur(8px);padding:6px 10px;border-radius:14px;font-size:12px}/* Toolbar clickable */
+.toolbar{position:absolute;left:12px;bottom:44px;display:flex;gap:8px;flex-wrap:wrap;pointer-events:auto;z-index:20}
+.btn{padding:6px 10px;border-radius:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:12px}
+.btn.active{background:rgba(14,165,233,.85);border-color:rgba(255,255,255,.35)}
+.btn.skin{width:auto;display:flex;align-items:center;gap:6px}
+.dot{width:12px;height:12px;border-radius:999px;border:1px solid rgba(255,255,255,.6)}
+.note{position:absolute;left:12px;bottom:10px;color:#ffffffb3;font-size:12px}
+
   </style>
 </head>
 <body>
@@ -26,17 +28,21 @@
     <div class="card">
       <canvas id="game"></canvas>
       <div class="hud">
-        <div class="pill">Space/↑ hoặc chạm = bay</div>
+        <div class="pill">Space/↑ hoặc chạm = bay • P = pause</div>
         <div class="pill">R = chơi lại</div>
       </div>
-      <!-- Difficulty + Sound toolbar -->
+      <!-- Difficulty + Pause + Sound + Skins toolbar -->
       <div class="toolbar" id="toolbar">
-        <button class="btn diff active" data-diff="easy">Easy</button>
+        <button class="btn diff" data-diff="easy">Easy</button>
         <button class="btn diff" data-diff="normal">Normal</button>
         <button class="btn diff" data-diff="hard">Hard</button>
+        <button class="btn" id="pauseBtn" title="Tạm dừng">⏸️</button>
         <button class="btn" id="soundBtn" title="Bật/tắt âm">🔊</button>
+        <button class="btn skin" data-skin="gold"><span class="dot" style="background:#facc15"></span>Gold</button>
+        <button class="btn skin" data-skin="pink"><span class="dot" style="background:#fb7185"></span>Pink</button>
+        <button class="btn skin" data-skin="cyan"><span class="dot" style="background:#22d3ee"></span>Cyan</button>
       </div>
-      <div class="note">HTML5 Canvas (1 file). Có 3 mức độ + âm thanh.</div>
+      <div class="note">HTML5 Canvas (1 file). Có 3 mức độ • pause • skin • âm thanh.</div>
     </div>
   </div>  <script>
   // ===== Canvas + DPR resize =====
@@ -54,47 +60,64 @@
   }
   window.addEventListener('resize', fit); fit();
 
+  // ===== Palettes (skins) =====
+  const SKINS = {
+    gold: {
+      player:'#facc15', pipe:'#22c55e', edge:'rgba(0,0,0,.15)',
+      skyTop:'#0ea5e9', skyBot:'#0f172a', ground:'rgba(255,255,255,.08)'
+    },
+    pink: {
+      player:'#fb7185', pipe:'#34d399', edge:'rgba(0,0,0,.15)',
+      skyTop:'#ec4899', skyBot:'#312e81', ground:'rgba(255,255,255,.10)'
+    },
+    cyan: {
+      player:'#22d3ee', pipe:'#10b981', edge:'rgba(0,0,0,.15)',
+      skyTop:'#06b6d4', skyBot:'#0f172a', ground:'rgba(255,255,255,.08)'
+    }
+  };
+
   // ===== Difficulty presets =====
   const DIFFS = {
-    easy:   { speed:180, gravity:900, jumpV:-240, spawnEvery:1800, spawnMin:1200, gapBase:260, gapMin:200, scoreSpawnFactor:6,  scoreGapFactor:1.2 },
-    normal: { speed:200, gravity:950, jumpV:-280, spawnEvery:1700, spawnMin:1100, gapBase:220, gapMin:170, scoreSpawnFactor:8,  scoreGapFactor:1.4 },
-    hard:   { speed:230, gravity:1000,jumpV:-320, spawnEvery:1600, spawnMin:1000, gapBase:190, gapMin:150, scoreSpawnFactor:10, scoreGapFactor:1.8 }
+    easy:   { speed:180, gravity:900,  jumpV:-240, spawnEvery:1800, spawnMin:1200, gapBase:260, gapMin:200, scoreSpawnFactor:6,  scoreGapFactor:1.2 },
+    normal: { speed:200, gravity:950,  jumpV:-280, spawnEvery:1700, spawnMin:1100, gapBase:220, gapMin:170, scoreSpawnFactor:8,  scoreGapFactor:1.4 },
+    hard:   { speed:230, gravity:1000, jumpV:-320, spawnEvery:1600, spawnMin:1000, gapBase:190, gapMin:150, scoreSpawnFactor:10, scoreGapFactor:1.8 }
   };
-  let diff = 'easy';
 
-  // ===== Game state =====
-  const state = { status: 'menu', score: 0, best: 0 };
-  const player = { x: 120, y: (canvas.height/dpr)*0.5, vy: 0, size: 20 };
+  // ===== Persistent settings =====
+  let diff = localStorage.getItem('tapfly.diff') || 'easy';
+  let skin = localStorage.getItem('tapfly.skin') || 'gold';
+  const state = { status:'menu', score:0, best: +(localStorage.getItem('tapfly.best')||0) };
+  const player = { x:120, y:(canvas.height/dpr)*0.5, vy:0, size:20 };
   const pipes = [];
-  let speed = DIFFS[diff].speed;      // px/s (sẽ set lại mỗi lần reset)
-  let gravity = DIFFS[diff].gravity;  // px/s^2
-  let jumpV = DIFFS[diff].jumpV;      // px/s impulse
-  let spawnMs = 0;
+  let speed, gravity, jumpV, spawnMs = 0;
 
   function applyDiff() {
     const d = DIFFS[diff];
-    speed = d.speed;
-    gravity = d.gravity;
-    jumpV = d.jumpV;
-    // cập nhật nút active
+    speed = d.speed; gravity = d.gravity; jumpV = d.jumpV;
     document.querySelectorAll('.btn.diff').forEach(b => b.classList.toggle('active', b.dataset.diff === diff));
+    localStorage.setItem('tapfly.diff', diff);
+  }
+  function applySkin() {
+    document.querySelectorAll('.btn.skin').forEach(b => b.classList.toggle('active', b.dataset.skin === skin));
+    localStorage.setItem('tapfly.skin', skin);
   }
 
-  function reset() {
-    state.score = 0;
-    player.x = 120;
-    player.y = (canvas.height/dpr)*0.45;
-    player.vy = 0;
-    pipes.length = 0;
-    spawnMs = 0;
-    applyDiff(); // áp dụng tốc độ/nhảy theo độ khó hiện tại
+  function reset(){
+    state.score = 0; spawnMs = 0; pipes.length = 0;
+    player.x = 120; player.y = (canvas.height/dpr)*0.45; player.vy = 0;
+    applyDiff(); applySkin();
   }
-  function start(){ reset(); state.status='playing'; }
-  function over(){ state.status='gameover'; state.best = Math.max(state.best, state.score); sfxHit(); }
+  function start(){ reset(); state.status = 'playing'; }
+  function over(){
+    state.status = 'gameover';
+    if (state.score > state.best) { state.best = state.score; localStorage.setItem('tapfly.best', state.best); }
+    sfxHit();
+  }
   function flap(){
-    ensureAudio(); // audio unlock trên mobile khi chạm lần đầu
+    ensureAudio();
     if (state.status==='menu') { start(); sfxFlap(); }
     else if (state.status==='playing') { player.vy = jumpV; sfxFlap(); }
+    else if (state.status==='paused') { state.status='playing'; sfxTick(); }
     else if (state.status==='gameover') { reset(); state.status='playing'; sfxFlap(); }
   }
 
@@ -102,18 +125,25 @@
   document.addEventListener('keydown', (e)=>{
     if (e.code==='Space' || e.code==='ArrowUp') { e.preventDefault(); flap(); }
     if (e.code==='KeyR') { reset(); state.status='playing'; }
-    if (e.code==='Digit1' || e.code==='KeyE') { diff='easy'; reset(); }
-    if (e.code==='Digit2' || e.code==='KeyN') { diff='normal'; reset(); }
-    if (e.code==='Digit3' || e.code==='KeyH') { diff='hard'; reset(); }
+    if (e.code==='Digit1' || e.code==='KeyE') { diff='easy'; reset(); sfxTick(); }
+    if (e.code==='Digit2' || e.code==='KeyN') { diff='normal'; reset(); sfxTick(); }
+    if (e.code==='Digit3' || e.code==='KeyH') { diff='hard'; reset(); sfxTick(); }
+    if (e.code==='KeyP') { togglePause(); }
   }, {passive:false});
   canvas.addEventListener('pointerdown', (e)=>{ e.preventDefault(); flap(); }, {passive:false});
 
   // Toolbar buttons
-  document.querySelectorAll('.btn.diff').forEach(btn => {
-    btn.addEventListener('click', ()=>{ diff = btn.dataset.diff; reset(); sfxTick(); });
-  });
+  document.querySelectorAll('.btn.diff').forEach(btn => btn.addEventListener('click', ()=>{ diff = btn.dataset.diff; reset(); sfxTick(); }));
+  document.querySelectorAll('.btn.skin').forEach(btn => btn.addEventListener('click', ()=>{ skin = btn.dataset.skin; applySkin(); sfxTick(); }));
 
-  // Sound toggle
+  // Pause / Sound
+  const pauseBtn = document.getElementById('pauseBtn');
+  function togglePause(){
+    if (state.status==='playing'){ state.status='paused'; pauseBtn.textContent='▶️'; sfxTick(); }
+    else if (state.status==='paused'){ state.status='playing'; pauseBtn.textContent='⏸️'; sfxTick(); }
+  }
+  pauseBtn?.addEventListener('click', togglePause);
+
   const soundBtn = document.getElementById('soundBtn');
   let muted = false;
   soundBtn?.addEventListener('click', ()=>{ muted = !muted; soundBtn.textContent = muted ? '🔇' : '🔊'; sfxTick(); });
@@ -121,10 +151,7 @@
   // ===== Audio (tiny WebAudio beeps) =====
   let ac = null;
   function ensureAudio(){
-    if (!ac) {
-      const AC = window.AudioContext || window.webkitAudioContext;
-      if (AC) ac = new AC();
-    }
+    if (!ac) { const AC = window.AudioContext || window.webkitAudioContext; if (AC) ac = new AC(); }
     if (ac && ac.state === 'suspended') ac.resume();
   }
   function beep(freq=600, dur=0.06, vol=0.03, type='sine'){
@@ -197,28 +224,29 @@
     const W = canvas.width, H = canvas.height;
     ctx.clearRect(0,0,W,H);
 
-    // sky gradient
+    // sky gradient by skin
+    const pal = SKINS[skin] || SKINS.gold;
     const g = ctx.createLinearGradient(0,0,0,H);
-    g.addColorStop(0, '#0ea5e9'); g.addColorStop(1, '#0f172a');
+    g.addColorStop(0, pal.skyTop); g.addColorStop(1, pal.skyBot);
     ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
 
     // ground stripe
-    ctx.fillStyle = 'rgba(255,255,255,.08)';
+    ctx.fillStyle = pal.ground;
     ctx.fillRect(0, H-24*dpr, W, 24*dpr);
 
     // pipes
     for (const p of pipes){
-      ctx.fillStyle = '#22c55e';
+      ctx.fillStyle = pal.pipe;
       ctx.fillRect(p.x, 0, p.w, p.gapY);
       ctx.fillRect(p.x, p.gapY + p.gapH, p.w, H - (p.gapY + p.gapH));
-      ctx.fillStyle = 'rgba(0,0,0,.15)';
+      ctx.fillStyle = pal.edge;
       ctx.fillRect(p.x + p.w - 6*dpr, 0, 6*dpr, H);
     }
 
     // player cube
     ctx.save();
     ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = 16*dpr;
-    ctx.fillStyle = '#facc15';
+    ctx.fillStyle = pal.player;
     const s = player.size*dpr, x = player.x*dpr, y = player.y*dpr;
     roundRect(ctx, x, y, s, s, 6*dpr); ctx.fill();
     ctx.restore();
@@ -231,10 +259,10 @@
     ctx.fillStyle = 'rgba(255,255,255,.7)';
     ctx.fillText('Best: ' + state.best, 16*dpr, 40*dpr);
 
-    // overlays
+    // overlays for menu/paused/gameover
     if (state.status!=='playing'){
-      const title = state.status==='menu' ? 'Tap‑to‑Fly' : 'Game Over';
-      const subt  = state.status==='menu' ? 'Chạm/Space để bắt đầu' : 'Chạm/Space để chơi lại';
+      const title = state.status==='menu' ? 'Tap‑to‑Fly' : (state.status==='paused' ? 'Paused' : 'Game Over');
+      const subt  = state.status==='menu' ? 'Chạm/Space để bắt đầu' : (state.status==='paused' ? 'Chạm/P để tiếp tục' : 'Chạm/Space để chơi lại');
       ctx.textAlign='center'; ctx.textBaseline='middle';
       ctx.fillStyle='rgba(0,0,0,.35)';
       ctx.fillRect(W/2 - 220*dpr, H/2 - 80*dpr, 440*dpr, 160*dpr);
@@ -257,6 +285,9 @@
     ctx.arcTo(x,y,x+w,y,r);
     ctx.closePath();
   }
+  // init UI selections
+  applyDiff(); applySkin(); document.querySelector(`.btn.diff[data-diff="${diff}"]`)?.classList.add('active');
+  document.querySelector(`.btn.skin[data-skin="${skin}"]`)?.classList.add('active');
   </script>  <script>
     // Service worker PWA (giữ nguyên)
     if ("serviceWorker" in navigator) {
