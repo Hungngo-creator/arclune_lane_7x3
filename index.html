@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tap‑to‑Fly — v3 (Pause + Skins)</title>
+  <title>Tap‑to‑Fly — v4 (Currency + Shop)</title>
   <link rel="manifest" href="manifest.json">
   <style>
     :root { color-scheme: dark light; }
@@ -21,6 +21,15 @@
 .dot{width:12px;height:12px;border-radius:999px;border:1px solid rgba(255,255,255,.6)}
 .note{position:absolute;left:12px;bottom:10px;color:#ffffffb3;font-size:12px}
 
+/* Shop overlay */
+.shop{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:30}
+.shop .panel{width:min(560px,90%);max-height:80%;overflow:auto;background:rgba(15,23,42,.95);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:16px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dashed rgba(255,255,255,.12)}
+.row:last-child{border-bottom:0}
+.price{opacity:.85}
+.title{font-weight:600}
+.actions{display:flex;gap:8px}
+
   </style>
 </head>
 <body>
@@ -31,7 +40,7 @@
         <div class="pill">Space/↑ hoặc chạm = bay • P = pause</div>
         <div class="pill">R = chơi lại</div>
       </div>
-      <!-- Difficulty + Pause + Sound + Skins toolbar -->
+      <!-- Toolbar -->
       <div class="toolbar" id="toolbar">
         <button class="btn diff" data-diff="easy">Easy</button>
         <button class="btn diff" data-diff="normal">Normal</button>
@@ -41,9 +50,21 @@
         <button class="btn skin" data-skin="gold"><span class="dot" style="background:#facc15"></span>Gold</button>
         <button class="btn skin" data-skin="pink"><span class="dot" style="background:#fb7185"></span>Pink</button>
         <button class="btn skin" data-skin="cyan"><span class="dot" style="background:#22d3ee"></span>Cyan</button>
+        <button class="btn" id="shopBtn">Shop</button>
+        <div class="btn" id="coinsPill">Feathers: 0</div>
       </div>
-      <div class="note">HTML5 Canvas (1 file). Có 3 mức độ • pause • skin • âm thanh.</div>
+      <div class="note">v4: Coins + Shop + Skins + Pause + Sound.</div><!-- Shop Overlay -->
+  <div class="shop" id="shop">
+    <div class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-weight:700">Shop</div>
+        <button class="btn" id="closeShop">Đóng</button>
+      </div>
+      <div id="shopList"></div>
     </div>
+  </div>
+</div>
+
   </div>  <script>
   // ===== Canvas + DPR resize =====
   const canvas = document.getElementById('game');
@@ -62,18 +83,9 @@
 
   // ===== Palettes (skins) =====
   const SKINS = {
-    gold: {
-      player:'#facc15', pipe:'#22c55e', edge:'rgba(0,0,0,.15)',
-      skyTop:'#0ea5e9', skyBot:'#0f172a', ground:'rgba(255,255,255,.08)'
-    },
-    pink: {
-      player:'#fb7185', pipe:'#34d399', edge:'rgba(0,0,0,.15)',
-      skyTop:'#ec4899', skyBot:'#312e81', ground:'rgba(255,255,255,.10)'
-    },
-    cyan: {
-      player:'#22d3ee', pipe:'#10b981', edge:'rgba(0,0,0,.15)',
-      skyTop:'#06b6d4', skyBot:'#0f172a', ground:'rgba(255,255,255,.08)'
-    }
+    gold: { player:'#facc15', pipe:'#22c55e', edge:'rgba(0,0,0,.15)', skyTop:'#0ea5e9', skyBot:'#0f172a', ground:'rgba(255,255,255,.08)' },
+    pink: { player:'#fb7185', pipe:'#34d399', edge:'rgba(0,0,0,.15)', skyTop:'#ec4899', skyBot:'#312e81', ground:'rgba(255,255,255,.10)' },
+    cyan: { player:'#22d3ee', pipe:'#10b981', edge:'rgba(0,0,0,.15)', skyTop:'#06b6d4', skyBot:'#0f172a', ground:'rgba(255,255,255,.08)' }
   };
 
   // ===== Difficulty presets =====
@@ -83,12 +95,35 @@
     hard:   { speed:230, gravity:1000, jumpV:-320, spawnEvery:1600, spawnMin:1000, gapBase:190, gapMin:150, scoreSpawnFactor:10, scoreGapFactor:1.8 }
   };
 
-  // ===== Persistent settings =====
+  // ===== Currency & Inventory =====
+  const CURRENCY_NAME = 'Feathers';
+  let coins = +(localStorage.getItem('tapfly.coins')||0);
+  let owned = JSON.parse(localStorage.getItem('tapfly.owned')||'{}'); // { "skin.pink": true, "trail.spark": true }
   let diff = localStorage.getItem('tapfly.diff') || 'easy';
   let skin = localStorage.getItem('tapfly.skin') || 'gold';
+
+  // Daily bonus
+  const today = new Date().toDateString();
+  const lastDay = localStorage.getItem('tapfly.day');
+  if (lastDay !== today){ coins += 20; localStorage.setItem('tapfly.day', today); saveCoins(); toast('+20 daily'); }
+
+  // Shop data (cosmetics + simple trail)
+  const SHOP = [
+    { id:'skin.pink',  type:'skin',  label:'Skin: Pink',  price:150, apply:()=>{ skin='pink'; applySkin(); } },
+    { id:'skin.cyan',  type:'skin',  label:'Skin: Cyan',  price:150, apply:()=>{ skin='cyan'; applySkin(); } },
+    { id:'trail.spark',type:'trail', label:'Trail: Spark',price:180, apply:()=>{ trailEnabled = true; } }
+  ];
+
+  function saveCoins(){ localStorage.setItem('tapfly.coins', coins); updateCoinsPill(); }
+  function saveOwned(){ localStorage.setItem('tapfly.owned', JSON.stringify(owned)); }
+
+  // ===== Game state =====
   const state = { status:'menu', score:0, best: +(localStorage.getItem('tapfly.best')||0) };
   const player = { x:120, y:(canvas.height/dpr)*0.5, vy:0, size:20 };
   const pipes = [];
+  const pickups = []; // coins in tunnel {x,y,r,taken}
+  const trail = [];   // last positions for spark trail
+  let trailEnabled = !!owned['trail.spark'];
   let speed, gravity, jumpV, spawnMs = 0;
 
   function applyDiff() {
@@ -101,11 +136,12 @@
     document.querySelectorAll('.btn.skin').forEach(b => b.classList.toggle('active', b.dataset.skin === skin));
     localStorage.setItem('tapfly.skin', skin);
   }
+  function updateCoinsPill(){ const el = document.getElementById('coinsPill'); if (el) el.textContent = `${CURRENCY_NAME}: ${coins}`; }
 
   function reset(){
-    state.score = 0; spawnMs = 0; pipes.length = 0;
+    state.score = 0; spawnMs = 0; pipes.length = 0; pickups.length = 0; trail.length = 0;
     player.x = 120; player.y = (canvas.height/dpr)*0.45; player.vy = 0;
-    applyDiff(); applySkin();
+    applyDiff(); applySkin(); updateCoinsPill();
   }
   function start(){ reset(); state.status = 'playing'; }
   function over(){
@@ -136,162 +172,148 @@
   document.querySelectorAll('.btn.diff').forEach(btn => btn.addEventListener('click', ()=>{ diff = btn.dataset.diff; reset(); sfxTick(); }));
   document.querySelectorAll('.btn.skin').forEach(btn => btn.addEventListener('click', ()=>{ skin = btn.dataset.skin; applySkin(); sfxTick(); }));
 
-  // Pause / Sound
+  // Pause / Sound / Shop
   const pauseBtn = document.getElementById('pauseBtn');
-  function togglePause(){
-    if (state.status==='playing'){ state.status='paused'; pauseBtn.textContent='▶️'; sfxTick(); }
-    else if (state.status==='paused'){ state.status='playing'; pauseBtn.textContent='⏸️'; sfxTick(); }
-  }
+  function togglePause(){ if (state.status==='playing'){ state.status='paused'; pauseBtn.textContent='▶️'; sfxTick(); } else if (state.status==='paused'){ state.status='playing'; pauseBtn.textContent='⏸️'; sfxTick(); }}
   pauseBtn?.addEventListener('click', togglePause);
+  const soundBtn = document.getElementById('soundBtn'); let muted = false; soundBtn?.addEventListener('click', ()=>{ muted = !muted; soundBtn.textContent = muted ? '🔇' : '🔊'; sfxTick(); });
+  const shop = document.getElementById('shop');
+  const shopBtn = document.getElementById('shopBtn');
+  const closeShop = document.getElementById('closeShop');
+  shopBtn?.addEventListener('click', ()=>{ renderShop(); shop.style.display='flex'; sfxTick(); });
+  closeShop?.addEventListener('click', ()=>{ shop.style.display='none'; sfxTick(); });
 
-  const soundBtn = document.getElementById('soundBtn');
-  let muted = false;
-  soundBtn?.addEventListener('click', ()=>{ muted = !muted; soundBtn.textContent = muted ? '🔇' : '🔊'; sfxTick(); });
+  function renderShop(){
+    const list = document.getElementById('shopList');
+    list.innerHTML = '';
+    SHOP.forEach(item => {
+      const ownedFlag = !!owned[item.id];
+      const row = document.createElement('div'); row.className = 'row';
+      const left = document.createElement('div');
+      left.innerHTML = `<div class="title">${item.label}</div><div class="price">${CURRENCY_NAME}: ${item.price}</div>`;
+      const actions = document.createElement('div'); actions.className = 'actions';
+      const buy = document.createElement('button'); buy.className = 'btn';
+      buy.textContent = ownedFlag ? 'Đã mua' : `Mua`;
+      buy.disabled = ownedFlag || (coins < item.price);
+      buy.addEventListener('click', ()=>{ if (coins >= item.price){ coins -= item.price; saveCoins(); owned[item.id] = true; saveOwned(); renderShop(); sfxScore(); toast('Đã mua: ' + item.label); } });
+      actions.appendChild(buy);
+      if (item.type==='skin'){
+        const equip = document.createElement('button'); equip.className='btn'; equip.textContent='Trang bị'; equip.disabled = !ownedFlag;
+        equip.addEventListener('click', ()=>{ item.apply(); saveOwned(); renderShop(); toast('Skin: ' + item.label.replace('Skin: ','') ); });
+        actions.appendChild(equip);
+      }
+      if (item.type==='trail'){
+        const toggle = document.createElement('button'); toggle.className='btn'; toggle.textContent='Bật trail'; toggle.disabled = !ownedFlag;
+        toggle.addEventListener('click', ()=>{ item.apply(); saveOwned(); renderShop(); toast('Trail ON'); });
+        actions.appendChild(toggle);
+      }
+      row.appendChild(left); row.appendChild(actions); list.appendChild(row);
+    });
+    updateCoinsPill();
+  }
 
   // ===== Audio (tiny WebAudio beeps) =====
-  let ac = null;
-  function ensureAudio(){
-    if (!ac) { const AC = window.AudioContext || window.webkitAudioContext; if (AC) ac = new AC(); }
-    if (ac && ac.state === 'suspended') ac.resume();
-  }
-  function beep(freq=600, dur=0.06, vol=0.03, type='sine'){
-    if (muted || !ac) return;
-    const o = ac.createOscillator(); const g = ac.createGain();
-    o.frequency.value = freq; o.type = type;
-    const now = ac.currentTime; g.gain.value = vol; g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
-    o.connect(g).connect(ac.destination); o.start(now); o.stop(now + dur);
-  }
+  let ac = null; function ensureAudio(){ if (!ac) { const AC = window.AudioContext || window.webkitAudioContext; if (AC) ac = new AC(); } if (ac && ac.state === 'suspended') ac.resume(); }
+  function beep(freq=600, dur=0.06, vol=0.03, type='sine'){ if (muted || !ac) return; const o = ac.createOscillator(); const g = ac.createGain(); o.frequency.value = freq; o.type = type; const now = ac.currentTime; g.gain.value = vol; g.gain.exponentialRampToValueAtTime(0.0001, now + dur); o.connect(g).connect(ac.destination); o.start(now); o.stop(now + dur); }
   const sfxFlap = ()=>beep(660, .05, .03, 'square');
   const sfxScore= ()=>beep(980, .07, .035, 'triangle');
   const sfxHit  = ()=>beep(180, .12, .045, 'sawtooth');
   const sfxTick = ()=>beep(520, .04, .025, 'sine');
+  const sfxCoin = ()=>beep(1200,.05,.035,'triangle');
 
   // ===== Helpers per-difficulty =====
-  function targetSpawn(){
-    const d = DIFFS[diff];
-    const reduce = Math.min(d.spawnEvery - d.spawnMin, state.score * d.scoreSpawnFactor);
-    return Math.max(d.spawnMin, d.spawnEvery - reduce);
-  }
-  function gapHeight(){
-    const d = DIFFS[diff];
-    const reduce = Math.min(d.gapBase - d.gapMin, state.score * d.scoreGapFactor);
-    return Math.max(d.gapMin, d.gapBase - reduce);
-  }
+  function targetSpawn(){ const d = DIFFS[diff]; const reduce = Math.min(d.spawnEvery - d.spawnMin, state.score * d.scoreSpawnFactor); return Math.max(d.spawnMin, d.spawnEvery - reduce); }
+  function gapHeight(){ const d = DIFFS[diff]; const reduce = Math.min(d.gapBase - d.gapMin, state.score * d.scoreGapFactor); return Math.max(d.gapMin, d.gapBase - reduce); }
 
   // ===== Main loop =====
   let last = performance.now();
   function loop(now){
     let dt = (now - last) / 1000; if (dt>0.033) dt = 0.033; last = now;
 
-    // Update
     if (state.status==='playing'){
       // physics
-      player.vy += gravity * dt;
-      player.y  += player.vy * dt;
+      player.vy += gravity * dt; player.y  += player.vy * dt;
 
-      // pipes scroll
+      // world scroll
       const scroll = speed * dt;
       for (const p of pipes) p.x -= scroll;
+      for (const c of pickups) c.x -= scroll;
       while (pipes.length && pipes[0].x + pipes[0].w < 0) pipes.shift();
+      while (pickups.length && pickups[0].x + pickups[0].r < 0) pickups.shift();
 
-      // spawn pipe pairs
-      spawnMs += dt*1000;
-      const target = targetSpawn();
+      // spawn pipes (+ maybe coin)
+      spawnMs += dt*1000; const target = targetSpawn();
       if (spawnMs >= target){
         spawnMs = 0;
         const gapH = gapHeight();
-        const margin = 40*dpr;
-        const gapY = Math.random() * (canvas.height - gapH - margin*2) + margin;
-        pipes.push({ x: canvas.width + 20*dpr, w: 64*dpr, gapY, gapH, passed:false });
+        const margin = 40*dpr; const gapY = Math.random() * (canvas.height - gapH - margin*2) + margin;
+        const pipe = { x: canvas.width + 20*dpr, w: 64*dpr, gapY, gapH, passed:false };
+        pipes.push(pipe);
+        // chance spawn coin in gap center
+        if (Math.random() < 0.35){ pickups.push({ x: pipe.x + pipe.w + 36*dpr, y: gapY + gapH/2, r: 10*dpr, taken:false }); }
       }
 
-      // scoring + accel
-      for (const p of pipes){
-        if (!p.passed && p.x + p.w < player.x*dpr){ p.passed = true; state.score++; speed = Math.min(420, speed+2); sfxScore(); }
-      }
+      // scoring + accel + coins per pipe
+      for (const p of pipes){ if (!p.passed && p.x + p.w < player.x*dpr){ p.passed = true; state.score++; speed = Math.min(420, speed+2); coins += 1; saveCoins(); sfxScore(); } }
 
-      // collisions
+      // collisions pipes
       const s = player.size * dpr; const px = player.x*dpr; const py = player.y*dpr;
       if (py + s > canvas.height || py < 0) over();
-      for (const p of pipes){
-        const inX = px + s > p.x && px < p.x + p.w;
-        const hitTop = py < p.gapY; const hitBot = py + s > p.gapY + p.gapH;
-        if (inX && (hitTop || hitBot)) { over(); break; }
-      }
+      for (const p of pipes){ const inX = px + s > p.x && px < p.x + p.w; const hitTop = py < p.gapY; const hitBot = py + s > p.gapY + p.gapH; if (inX && (hitTop || hitBot)) { over(); break; } }
+
+      // collect pickups (circle collision)
+      for (const c of pickups){ if (!c.taken){ const cx = c.x, cy = c.y, cr = c.r; const pcx = px + s/2, pcy = py + s/2; const dx = pcx - cx, dy = pcy - cy; if (dx*dx + dy*dy <= (cr + s*0.5)*(cr + s*0.5)){ c.taken = true; coins += 5; saveCoins(); sfxCoin(); } }}
+
+      // trail
+      if (trailEnabled){ trail.push({ x:px + s/2, y:py + s/2, a:1 }); if (trail.length>14) trail.shift(); for (const t of trail) t.a = Math.max(0, t.a - dt*2); }
     }
 
     // Draw
-    const W = canvas.width, H = canvas.height;
-    ctx.clearRect(0,0,W,H);
+    const W = canvas.width, H = canvas.height; ctx.clearRect(0,0,W,H);
 
     // sky gradient by skin
-    const pal = SKINS[skin] || SKINS.gold;
-    const g = ctx.createLinearGradient(0,0,0,H);
-    g.addColorStop(0, pal.skyTop); g.addColorStop(1, pal.skyBot);
-    ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+    const pal = SKINS[skin] || SKINS.gold; const g = ctx.createLinearGradient(0,0,0,H); g.addColorStop(0, pal.skyTop); g.addColorStop(1, pal.skyBot); ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
 
     // ground stripe
-    ctx.fillStyle = pal.ground;
-    ctx.fillRect(0, H-24*dpr, W, 24*dpr);
+    ctx.fillStyle = pal.ground; ctx.fillRect(0, H-24*dpr, W, 24*dpr);
+
+    // pickups (coins)
+    for (const c of pickups){ if (!c.taken){ ctx.save(); ctx.shadowColor='rgba(255,215,0,.35)'; ctx.shadowBlur = 16*dpr; ctx.fillStyle = '#fde047'; ctx.beginPath(); ctx.arc(c.x, c.y, c.r, 0, Math.PI*2); ctx.fill(); ctx.restore(); ctx.fillStyle='rgba(0,0,0,.25)'; ctx.fillRect(c.x + c.r - 4*dpr, c.y - c.r, 4*dpr, c.r*2); }}
 
     // pipes
-    for (const p of pipes){
-      ctx.fillStyle = pal.pipe;
-      ctx.fillRect(p.x, 0, p.w, p.gapY);
-      ctx.fillRect(p.x, p.gapY + p.gapH, p.w, H - (p.gapY + p.gapH));
-      ctx.fillStyle = pal.edge;
-      ctx.fillRect(p.x + p.w - 6*dpr, 0, 6*dpr, H);
-    }
+    for (const p of pipes){ ctx.fillStyle = pal.pipe; ctx.fillRect(p.x, 0, p.w, p.gapY); ctx.fillRect(p.x, p.gapY + p.gapH, p.w, H - (p.gapY + p.gapH)); ctx.fillStyle = pal.edge; ctx.fillRect(p.x + p.w - 6*dpr, 0, 6*dpr, H); }
 
-    // player cube
-    ctx.save();
-    ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = 16*dpr;
-    ctx.fillStyle = pal.player;
-    const s = player.size*dpr, x = player.x*dpr, y = player.y*dpr;
-    roundRect(ctx, x, y, s, s, 6*dpr); ctx.fill();
-    ctx.restore();
+    // trail draw
+    if (trailEnabled){ for (const t of trail){ ctx.globalAlpha = t.a; ctx.fillStyle = pal.player; ctx.beginPath(); ctx.arc(t.x, t.y, 6*dpr*(0.5+t.a*0.5), 0, Math.PI*2); ctx.fill(); } ctx.globalAlpha = 1; }
 
-    // score text
-    ctx.fillStyle = '#fff';
-    ctx.font = (24*dpr) + 'px ui-sans-serif,system-ui,-apple-system';
-    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-    ctx.fillText('Score: ' + state.score, 16*dpr, 12*dpr);
-    ctx.fillStyle = 'rgba(255,255,255,.7)';
-    ctx.fillText('Best: ' + state.best, 16*dpr, 40*dpr);
+    // player
+    ctx.save(); ctx.shadowColor='rgba(0,0,0,.35)'; ctx.shadowBlur = 16*dpr; ctx.fillStyle = pal.player; const s = player.size*dpr, x = player.x*dpr, y = player.y*dpr; roundRect(ctx, x, y, s, s, 6*dpr); ctx.fill(); ctx.restore();
 
-    // overlays for menu/paused/gameover
+    // texts
+    ctx.fillStyle = '#fff'; ctx.font = (24*dpr) + 'px ui-sans-serif,system-ui,-apple-system'; ctx.textAlign = 'left'; ctx.textBaseline = 'top'; ctx.fillText('Score: ' + state.score, 16*dpr, 12*dpr); ctx.fillStyle = 'rgba(255,255,255,.7)'; ctx.fillText('Best: ' + state.best, 16*dpr, 40*dpr);
+    // right side coins
+    ctx.textAlign = 'right'; ctx.fillStyle = '#fff'; ctx.fillText(CURRENCY_NAME+': '+coins, W - 16*dpr, 12*dpr);
+
+    // overlays
     if (state.status!=='playing'){
       const title = state.status==='menu' ? 'Tap‑to‑Fly' : (state.status==='paused' ? 'Paused' : 'Game Over');
       const subt  = state.status==='menu' ? 'Chạm/Space để bắt đầu' : (state.status==='paused' ? 'Chạm/P để tiếp tục' : 'Chạm/Space để chơi lại');
-      ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.fillStyle='rgba(0,0,0,.35)';
-      ctx.fillRect(W/2 - 220*dpr, H/2 - 80*dpr, 440*dpr, 160*dpr);
-      ctx.fillStyle='#fff';
-      ctx.font = (36*dpr)+'px ui-sans-serif,system-ui'; ctx.fillText(title, W/2, H/2 - 18*dpr);
-      ctx.font = (18*dpr)+'px ui-sans-serif,system-ui'; ctx.fillText(subt,  W/2, H/2 + 22*dpr);
+      ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillStyle='rgba(0,0,0,.35)'; ctx.fillRect(W/2 - 220*dpr, H/2 - 80*dpr, 440*dpr, 160*dpr); ctx.fillStyle='#fff'; ctx.font = (36*dpr)+'px ui-sans-serif,system-ui'; ctx.fillText(title, W/2, H/2 - 18*dpr); ctx.font = (18*dpr)+'px ui-sans-serif,system-ui'; ctx.fillText(subt,  W/2, H/2 + 22*dpr);
     }
 
     requestAnimationFrame(loop);
   }
   requestAnimationFrame(loop);
 
-  function roundRect(ctx,x,y,w,h,r){
-    r = Math.min(r, w/2, h/2);
-    ctx.beginPath();
-    ctx.moveTo(x+r,y);
-    ctx.arcTo(x+w,y,x+w,y+h,r);
-    ctx.arcTo(x+w,y+h,x,y+h,r);
-    ctx.arcTo(x,y+h,x,y,r);
-    ctx.arcTo(x,y,x+w,y,r);
-    ctx.closePath();
-  }
+  function roundRect(ctx,x,y,w,h,r){ r = Math.min(r, w/2, h/2); ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+
   // init UI selections
-  applyDiff(); applySkin(); document.querySelector(`.btn.diff[data-diff="${diff}"]`)?.classList.add('active');
-  document.querySelector(`.btn.skin[data-skin="${skin}"]`)?.classList.add('active');
+  applyDiff(); applySkin(); updateCoinsPill(); document.querySelector(`.btn.diff[data-diff="${diff}"]`)?.classList.add('active'); document.querySelector(`.btn.skin[data-skin="${skin}"]`)?.classList.add('active');
+
+  // tiny toast
+  function toast(msg){ try{ const el = document.createElement('div'); el.textContent = msg; el.style.position='absolute'; el.style.right='12px'; el.style.bottom='12px'; el.style.background='rgba(255,255,255,.12)'; el.style.border='1px solid rgba(255,255,255,.25)'; el.style.padding='8px 10px'; el.style.borderRadius='10px'; el.style.pointerEvents='none'; el.style.zIndex='40'; document.querySelector('.card').appendChild(el); setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .4s'; setTimeout(()=>el.remove(), 400); }, 900); }catch(_){} }
   </script>  <script>
-    // Service worker PWA (giữ nguyên)
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("sw.js");
-    }
+    // Service worker PWA
+    if ("serviceWorker" in navigator) { navigator.serviceWorker.register("sw.js"); }
   </script></body>
 </html>
