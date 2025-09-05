@@ -1,5 +1,5 @@
 // bump version để ép cập nhật
-const CACHE = "tapfly-v8";
+const CACHE = "tapfly-v11";
 const ASSETS = ["./", "./index.html", "./manifest.json"];
 
 self.addEventListener("install", e => {
