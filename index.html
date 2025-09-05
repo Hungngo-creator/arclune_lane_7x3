@@ -109,9 +109,9 @@
 
   // Shop data (cosmetics + simple trail)
   const SHOP = [
-    { id:'skin.pink',  type:'skin',  label:'Skin: Pink',  price:150, apply:()=>{ skin='pink'; applySkin(); } },
-    { id:'skin.cyan',  type:'skin',  label:'Skin: Cyan',  price:150, apply:()=>{ skin='cyan'; applySkin(); } },
-    { id:'trail.spark',type:'trail', label:'Trail: Spark',price:180, apply:()=>{ trailEnabled = true; } }
+    { id:'skin.pink',  type:'skin',  label:'Skin: Pink',  price:80, apply:()=>{ skin='pink'; applySkin(); } },
+    { id:'skin.cyan',  type:'skin',  label:'Skin: Cyan',  price:80, apply:()=>{ skin='cyan'; applySkin(); } },
+    { id:'trail.spark',type:'trail', label:'Trail: Spark',price:120, apply:()=>{ trailEnabled = true; } }
   ];
 
   function saveCoins(){ localStorage.setItem('tapfly.coins', coins); updateCoinsPill(); }
