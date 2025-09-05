@@ -1,0 +1,185 @@
+<!doctype html>
+
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tap‑to‑Fly — Canvas Starter</title>
+  <style>
+    :root { color-scheme: dark light; }
+    html,body{margin:0;padding:0;background:#0f172a;color:#fff;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    .wrap{min-height:100vh;display:grid;place-items:center;padding:16px}
+    .card{width:100%;max-width:900px;aspect-ratio:16/9;border-radius:18px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.4);position:relative;border:1px solid rgba(255,255,255,.08)}
+    canvas{display:block;width:100%;height:100%;background:#0f172a;touch-action:manipulation}
+    .hud{position:absolute;inset:0;pointer-events:none;display:flex;align-items:flex-start;justify-content:space-between;padding:10px}
+    .pill{background:rgba(255,255,255,.12);backdrop-filter:blur(8px);padding:6px 10px;border-radius:14px;font-size:12px}
+    .note{position:absolute;left:12px;bottom:10px;color:#ffffffb3;font-size:12px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <canvas id="game"></canvas>
+      <div class="hud">
+        <div class="pill">Space/↑ hoặc chạm = bay</div>
+        <div class="pill">R = chơi lại</div>
+      </div>
+      <div class="note">HTML5 Canvas (1 file). Không thư viện.</div>
+    </div>
+  </div>  <script>
+  // ===== Canvas + DPR resize =====
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+  let dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+  function fit() {
+    dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+    const w = Math.min(window.innerWidth - 32, 900); // padding 16px mỗi bên
+    const h = Math.floor(w * 9/16);
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    canvas.width = Math.floor(w * dpr);
+    canvas.height = Math.floor(h * dpr);
+  }
+  window.addEventListener('resize', fit); fit();
+
+  // ===== Game state =====
+  const state = { status: 'menu', score: 0, best: 0 };
+  const player = { x: 120, y: (canvas.height/dpr)*0.5, vy: 0, size: 20 };
+  const pipes = [];
+  let speed = 220;      // px/s
+  const gravity = 980;  // px/s^2
+  const jumpV = -360;   // px/s impulse
+  let spawnMs = 0;
+
+  function reset() {
+    state.score = 0;
+    player.x = 120;
+    player.y = (canvas.height/dpr)*0.45;
+    player.vy = 0;
+    pipes.length = 0;
+    speed = 220;
+    spawnMs = 0;
+  }
+  function start(){ reset(); state.status='playing'; }
+  function over(){ state.status='gameover'; state.best = Math.max(state.best, state.score); }
+  function flap(){
+    if (state.status==='menu') start();
+    else if (state.status==='playing') player.vy = jumpV;
+    else if (state.status==='gameover') { reset(); state.status='playing'; }
+  }
+
+  // ===== Input =====
+  document.addEventListener('keydown', (e)=>{
+    if (e.code==='Space' || e.code==='ArrowUp') { e.preventDefault(); flap(); }
+    if (e.code==='KeyR') { reset(); state.status='playing'; }
+  }, {passive:false});
+  canvas.addEventListener('pointerdown', (e)=>{ e.preventDefault(); flap(); }, {passive:false});
+
+  // ===== Main loop =====
+  let last = performance.now();
+  function loop(now){
+    let dt = (now - last) / 1000; if (dt>0.033) dt = 0.033; last = now;
+
+    // Update
+    if (state.status==='playing'){
+      // physics
+      player.vy += gravity * dt;
+      player.y  += player.vy * dt;
+
+      // pipes scroll
+      const scroll = speed * dt;
+      for (const p of pipes) p.x -= scroll;
+      while (pipes.length && pipes[0].x + pipes[0].w < 0) pipes.shift();
+
+      // spawn pipe pairs
+      spawnMs += dt*1000;
+      const target = Math.max(900, 1600 - Math.min(800, state.score*10));
+      if (spawnMs >= target){
+        spawnMs = 0;
+        const gapH = Math.max(120, 180 - Math.min(100, state.score*2));
+        const margin = 40*dpr;
+        const gapY = Math.random() * (canvas.height - gapH - margin*2) + margin;
+        pipes.push({ x: canvas.width + 20*dpr, w: 64*dpr, gapY, gapH, passed:false });
+      }
+
+      // scoring + accel
+      for (const p of pipes){
+        if (!p.passed && p.x + p.w < player.x*dpr){ p.passed = true; state.score++; speed = Math.min(420, speed+2); }
+      }
+
+      // collisions
+      const s = player.size * dpr; const px = player.x*dpr; const py = player.y*dpr;
+      if (py + s > canvas.height || py < 0) over();
+      for (const p of pipes){
+        const inX = px + s > p.x && px < p.x + p.w;
+        const hitTop = py < p.gapY; const hitBot = py + s > p.gapY + p.gapH;
+        if (inX && (hitTop || hitBot)) { over(); break; }
+      }
+    }
+
+    // Draw
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0,0,W,H);
+
+    // sky gradient
+    const g = ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0, '#0ea5e9'); g.addColorStop(1, '#0f172a');
+    ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+
+    // ground stripe
+    ctx.fillStyle = 'rgba(255,255,255,.08)';
+    ctx.fillRect(0, H-24*dpr, W, 24*dpr);
+
+    // pipes
+    for (const p of pipes){
+      ctx.fillStyle = '#22c55e';
+      ctx.fillRect(p.x, 0, p.w, p.gapY);
+      ctx.fillRect(p.x, p.gapY + p.gapH, p.w, H - (p.gapY + p.gapH));
+      ctx.fillStyle = 'rgba(0,0,0,.15)';
+      ctx.fillRect(p.x + p.w - 6*dpr, 0, 6*dpr, H);
+    }
+
+    // player cube
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = 16*dpr;
+    ctx.fillStyle = '#facc15';
+    const s = player.size*dpr, x = player.x*dpr, y = player.y*dpr;
+    roundRect(ctx, x, y, s, s, 6*dpr); ctx.fill();
+    ctx.restore();
+
+    // score text
+    ctx.fillStyle = '#fff';
+    ctx.font = (24*dpr) + 'px ui-sans-serif,system-ui,-apple-system';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    ctx.fillText('Score: ' + state.score, 16*dpr, 12*dpr);
+    ctx.fillStyle = 'rgba(255,255,255,.7)';
+    ctx.fillText('Best: ' + state.best, 16*dpr, 40*dpr);
+
+    // overlays
+    if (state.status!=='playing'){
+      const title = state.status==='menu' ? 'Tap‑to‑Fly' : 'Game Over';
+      const subt  = state.status==='menu' ? 'Chạm/Space để bắt đầu' : 'Chạm/Space để chơi lại';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillStyle='rgba(0,0,0,.35)';
+      ctx.fillRect(W/2 - 220*dpr, H/2 - 80*dpr, 440*dpr, 160*dpr);
+      ctx.fillStyle='#fff';
+      ctx.font = (36*dpr)+'px ui-sans-serif,system-ui'; ctx.fillText(title, W/2, H/2 - 18*dpr);
+      ctx.font = (18*dpr)+'px ui-sans-serif,system-ui'; ctx.fillText(subt,  W/2, H/2 + 22*dpr);
+    }
+
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  function roundRect(ctx,x,y,w,h,r){
+    r = Math.min(r, w/2, h/2);
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+  }
+  </script></body>
+</html>
