@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tap‑to‑Fly — Canvas Starter</title>
+  <title>Tap‑to‑Fly — v2 (Difficulty + Sound)</title>
   <link rel="manifest" href="manifest.json">
   <style>
     :root { color-scheme: dark light; }
@@ -15,6 +15,10 @@
     .hud{position:absolute;inset:0;pointer-events:none;display:flex;align-items:flex-start;justify-content:space-between;padding:10px}
     .pill{background:rgba(255,255,255,.12);backdrop-filter:blur(8px);padding:6px 10px;border-radius:14px;font-size:12px}
     .note{position:absolute;left:12px;bottom:10px;color:#ffffffb3;font-size:12px}
+    /* Toolbar clickable */
+    .toolbar{position:absolute;left:12px;bottom:44px;display:flex;gap:8px;flex-wrap:wrap;pointer-events:auto;z-index:20}
+    .btn{padding:6px 10px;border-radius:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:12px}
+    .btn.active{background:rgba(14,165,233,.85);border-color:rgba(255,255,255,.35)}
   </style>
 </head>
 <body>
@@ -25,7 +29,14 @@
         <div class="pill">Space/↑ hoặc chạm = bay</div>
         <div class="pill">R = chơi lại</div>
       </div>
-      <div class="note">HTML5 Canvas (1 file). Không thư viện.</div>
+      <!-- Difficulty + Sound toolbar -->
+      <div class="toolbar" id="toolbar">
+        <button class="btn diff active" data-diff="easy">Easy</button>
+        <button class="btn diff" data-diff="normal">Normal</button>
+        <button class="btn diff" data-diff="hard">Hard</button>
+        <button class="btn" id="soundBtn" title="Bật/tắt âm">🔊</button>
+      </div>
+      <div class="note">HTML5 Canvas (1 file). Có 3 mức độ + âm thanh.</div>
     </div>
   </div>  <script>
   // ===== Canvas + DPR resize =====
@@ -43,14 +54,31 @@
   }
   window.addEventListener('resize', fit); fit();
 
+  // ===== Difficulty presets =====
+  const DIFFS = {
+    easy:   { speed:180, gravity:900, jumpV:-240, spawnEvery:1800, spawnMin:1200, gapBase:260, gapMin:200, scoreSpawnFactor:6,  scoreGapFactor:1.2 },
+    normal: { speed:200, gravity:950, jumpV:-280, spawnEvery:1700, spawnMin:1100, gapBase:220, gapMin:170, scoreSpawnFactor:8,  scoreGapFactor:1.4 },
+    hard:   { speed:230, gravity:1000,jumpV:-320, spawnEvery:1600, spawnMin:1000, gapBase:190, gapMin:150, scoreSpawnFactor:10, scoreGapFactor:1.8 }
+  };
+  let diff = 'easy';
+
   // ===== Game state =====
   const state = { status: 'menu', score: 0, best: 0 };
   const player = { x: 120, y: (canvas.height/dpr)*0.5, vy: 0, size: 20 };
   const pipes = [];
-  let speed = 180;      // px/s
-  const gravity = 900;  // px/s^2
-  const jumpV = -240;   // px/s impulse
+  let speed = DIFFS[diff].speed;      // px/s (sẽ set lại mỗi lần reset)
+  let gravity = DIFFS[diff].gravity;  // px/s^2
+  let jumpV = DIFFS[diff].jumpV;      // px/s impulse
   let spawnMs = 0;
+
+  function applyDiff() {
+    const d = DIFFS[diff];
+    speed = d.speed;
+    gravity = d.gravity;
+    jumpV = d.jumpV;
+    // cập nhật nút active
+    document.querySelectorAll('.btn.diff').forEach(b => b.classList.toggle('active', b.dataset.diff === diff));
+  }
 
   function reset() {
     state.score = 0;
@@ -58,23 +86,70 @@
     player.y = (canvas.height/dpr)*0.45;
     player.vy = 0;
     pipes.length = 0;
-    speed = 220;
     spawnMs = 0;
+    applyDiff(); // áp dụng tốc độ/nhảy theo độ khó hiện tại
   }
   function start(){ reset(); state.status='playing'; }
-  function over(){ state.status='gameover'; state.best = Math.max(state.best, state.score); }
+  function over(){ state.status='gameover'; state.best = Math.max(state.best, state.score); sfxHit(); }
   function flap(){
-    if (state.status==='menu') start();
-    else if (state.status==='playing') player.vy = jumpV;
-    else if (state.status==='gameover') { reset(); state.status='playing'; }
+    ensureAudio(); // audio unlock trên mobile khi chạm lần đầu
+    if (state.status==='menu') { start(); sfxFlap(); }
+    else if (state.status==='playing') { player.vy = jumpV; sfxFlap(); }
+    else if (state.status==='gameover') { reset(); state.status='playing'; sfxFlap(); }
   }
 
   // ===== Input =====
   document.addEventListener('keydown', (e)=>{
     if (e.code==='Space' || e.code==='ArrowUp') { e.preventDefault(); flap(); }
     if (e.code==='KeyR') { reset(); state.status='playing'; }
+    if (e.code==='Digit1' || e.code==='KeyE') { diff='easy'; reset(); }
+    if (e.code==='Digit2' || e.code==='KeyN') { diff='normal'; reset(); }
+    if (e.code==='Digit3' || e.code==='KeyH') { diff='hard'; reset(); }
   }, {passive:false});
   canvas.addEventListener('pointerdown', (e)=>{ e.preventDefault(); flap(); }, {passive:false});
+
+  // Toolbar buttons
+  document.querySelectorAll('.btn.diff').forEach(btn => {
+    btn.addEventListener('click', ()=>{ diff = btn.dataset.diff; reset(); sfxTick(); });
+  });
+
+  // Sound toggle
+  const soundBtn = document.getElementById('soundBtn');
+  let muted = false;
+  soundBtn?.addEventListener('click', ()=>{ muted = !muted; soundBtn.textContent = muted ? '🔇' : '🔊'; sfxTick(); });
+
+  // ===== Audio (tiny WebAudio beeps) =====
+  let ac = null;
+  function ensureAudio(){
+    if (!ac) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) ac = new AC();
+    }
+    if (ac && ac.state === 'suspended') ac.resume();
+  }
+  function beep(freq=600, dur=0.06, vol=0.03, type='sine'){
+    if (muted || !ac) return;
+    const o = ac.createOscillator(); const g = ac.createGain();
+    o.frequency.value = freq; o.type = type;
+    const now = ac.currentTime; g.gain.value = vol; g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+    o.connect(g).connect(ac.destination); o.start(now); o.stop(now + dur);
+  }
+  const sfxFlap = ()=>beep(660, .05, .03, 'square');
+  const sfxScore= ()=>beep(980, .07, .035, 'triangle');
+  const sfxHit  = ()=>beep(180, .12, .045, 'sawtooth');
+  const sfxTick = ()=>beep(520, .04, .025, 'sine');
+
+  // ===== Helpers per-difficulty =====
+  function targetSpawn(){
+    const d = DIFFS[diff];
+    const reduce = Math.min(d.spawnEvery - d.spawnMin, state.score * d.scoreSpawnFactor);
+    return Math.max(d.spawnMin, d.spawnEvery - reduce);
+  }
+  function gapHeight(){
+    const d = DIFFS[diff];
+    const reduce = Math.min(d.gapBase - d.gapMin, state.score * d.scoreGapFactor);
+    return Math.max(d.gapMin, d.gapBase - reduce);
+  }
 
   // ===== Main loop =====
   let last = performance.now();
@@ -94,10 +169,10 @@
 
       // spawn pipe pairs
       spawnMs += dt*1000;
-      const target = Math.max(900, 1600 - Math.min(800, state.score*10));
+      const target = targetSpawn();
       if (spawnMs >= target){
         spawnMs = 0;
-        const gapH = Math.max(120, 180 - Math.min(100, state.score*2));
+        const gapH = gapHeight();
         const margin = 40*dpr;
         const gapY = Math.random() * (canvas.height - gapH - margin*2) + margin;
         pipes.push({ x: canvas.width + 20*dpr, w: 64*dpr, gapY, gapH, passed:false });
@@ -105,7 +180,7 @@
 
       // scoring + accel
       for (const p of pipes){
-        if (!p.passed && p.x + p.w < player.x*dpr){ p.passed = true; state.score++; speed = Math.min(420, speed+2); }
+        if (!p.passed && p.x + p.w < player.x*dpr){ p.passed = true; state.score++; speed = Math.min(420, speed+2); sfxScore(); }
       }
 
       // collisions
@@ -182,11 +257,10 @@
     ctx.arcTo(x,y,x+w,y,r);
     ctx.closePath();
   }
-</script>
-<script>
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js");
-  }
-</script>
-</body>
+  </script>  <script>
+    // Service worker PWA (giữ nguyên)
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("sw.js");
+    }
+  </script></body>
 </html>
