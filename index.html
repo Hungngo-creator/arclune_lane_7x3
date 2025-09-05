@@ -1,1 +1,96 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tap-to-Fly — v5 (Currency + Shop + Voice)</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    :root { color-scheme: dark light; }
+html,body{margin:0;padding:0;background:#0f172a;color:#fff;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    .wrap{min-height:100vh;display:grid;place-items:center;padding:16px}
+ .card{width:100%;max-width:900px;aspect-ratio:16/9;border-radius:18px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.4);position:relative;border:1px solid rgba(255,255,255,.08)}
+canvas{display:block;width:100%;height:100%;background:#0f172a;touch-action:manipulation}
+    .hud{position:absolute;inset:0;pointer-events:none;display:flex;align-items:flex-start;justify-content:space-between;padding:10px}
+    .pill{background:rgba(255,255,255,.12);backdrop-filter:blur(8px);padding:6px 10px;border-radius:14px;font-size:12px}
 
+    /* Toolbar clickable */
+    .toolbar{position:absolute;left:12px;bottom:44px;display:flex;gap:8px;flex-wrap:wrap;pointer-events:auto;z-index:20}
+    .btn{padding:6px 10px;border-radius:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:12px}
+    .btn.active{background:rgba(14,165,233,.85);border-color:rgba(255,255,255,.35)}
+    .btn.locked{ opacity:.45; filter:grayscale(60%); border-style:dashed }
+    .btn.locked::after{ content:" 🔒"; font-size:12px; opacity:.85 }
+    .btn.skin{width:auto;display:flex;align-items:center;gap:6px}
+    .dot{width:12px;height:12px;border-radius:999px;border:1px solid rgba(255,255,255,.6)}
+    .note{position:absolute;left:12px;bottom:10px;color:#ffffffb3;font-size:12px}
+
+    /* Shop overlay */
+    .shop{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:30}
+    .shop .panel{width:min(560px,90%);max-height:80%;overflow:auto;background:rgba(15,23,42,.95);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:16px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+    .row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dashed rgba(255,255,255,.12)}
+    .row:last-child{border-bottom:0}
+    .price{opacity:.85}
+    .title{font-weight:600}
+    .actions{display:flex;gap:8px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <canvas id="game"></canvas>
+      <div class="hud">
+        <div class="pill">Space/↑ hoặc chạm = bay • P = pause</div>
+        <div class="pill">R = chơi lại</div>
+      </div>
+       <!-- Toolbar -->
+      <div class="toolbar" id="toolbar">
+        <button class="btn diff" data-diff="easy">Easy</button>
+        <button class="btn diff" data-diff="normal">Normal</button>
+        <button class="btn diff" data-diff="hard">Hard</button>
+        <button class="btn" id="pauseBtn" title="Tạm dừng">⏸️</button>
+        <button class="btn" id="soundBtn" title="Bật/tắt âm">🔊</button>
+        <button class="btn" id="voiceBtn" title="La để bay">🎙️</button>
+        <button class="btn skin" data-skin="gold"><span class="dot" style="background:#facc15"></span>Gold</button>
+        <button class="btn skin" data-skin="pink"><span class="dot" style="background:#fb7185"></span>Pink</button>
+        <button class="btn skin" data-skin="cyan"><span class="dot" style="background:#22d3ee"></span>Cyan</button>
+        <button class="btn" id="shopBtn">Shop</button>
+        <div class="btn" id="coinsPill">Feathers: 0</div>
+      </div>
+
+      <div class="note">v5: Coins + Shop + Skins + Pause + Sound + Voice.</div>
+
+      <!-- Shop Overlay -->
+      <div class="shop" id="shop">
+        <div class="panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div style="font-weight:700">Shop</div>
+            <button class="btn" id="closeShop">Đóng</button>
+          </div>
+          <div id="shopList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // ===== Canvas + DPR resize =====
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+  let dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+  function fit() {
+    dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+    const w = Math.min(window.innerWidth - 32, 900);
+    const h = Math.floor(w * 9/16);
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    canvas.width = Math.floor(w * dpr);
+    canvas.height = Math.floor(h * dpr);
+  }
+  window.addEventListener('resize', fit); fit();
+
+  // ===== Palettes (skins) =====
+  const SKINS = {
+    gold: { player:'#facc15', pipe:'#22c55e', edge:'rgba(0,0,0,.15)', skyTop:'#0ea5e9', skyBot:'#0f172a', ground:'rgba(255,255,255,.08)' },
+    pink: { player:'#fb7185', pipe:'#34d399', edge:'rgba(0,0,0,.15)', skyTop:'#ec4899', skyBot:'#312e81', ground:'rgba(255,255,255,.10)' },
+    cyan: { player:'#22d3ee', pipe:'#10b981', edge:'rgba(0,0,0,.15)', skyTop:'#06b6d4', skyBot:'#0f172a', ground:'rgba(255,255,255,.08)' }
+  };
