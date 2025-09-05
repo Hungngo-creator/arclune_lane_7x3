@@ -16,7 +16,8 @@
     .pill{background:rgba(255,255,255,.12);backdrop-filter:blur(8px);padding:6px 10px;border-radius:14px;font-size:12px}/* Toolbar clickable */
 .toolbar{position:absolute;left:12px;bottom:44px;display:flex;gap:8px;flex-wrap:wrap;pointer-events:auto;z-index:20}
 .btn{padding:6px 10px;border-radius:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:12px}
-.btn.active{background:rgba(14,165,233,.85);border-color:rgba(255,255,255,.35)}
+.btn.active{background:rgba(14,165,233,.85);border-color:rgba(255,255,255,.35)} .btn.locked{ opacity:.45; filter:grayscale(60%); border-style:dashed }
+.btn.locked::after{ content:" 🔒"; font-size:12px; opacity:.85 }
 .btn.skin{width:auto;display:flex;align-items:center;gap:6px}
 .dot{width:12px;height:12px;border-radius:999px;border:1px solid rgba(255,255,255,.6)}
 .note{position:absolute;left:12px;bottom:10px;color:#ffffffb3;font-size:12px}
