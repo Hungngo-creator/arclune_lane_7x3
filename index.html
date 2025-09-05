@@ -60,7 +60,7 @@
         <button class="btn" id="pauseBtn" title="Tạm dừng">⏸️</button>
         <button class="btn" id="soundBtn" title="Bật/tắt âm">🔊</button>
         <button class="btn" id="voiceBtn" title="La để bay">🎙️</button>
-        <button class="btn skin" data-skin="gold"><span class="dot" style="background:#facc15"></span>Gold</button>
+      <button class="btn skin" data-skin="gold"><span class="dot" style="background:#facc15"></span>Gold</button>
         <button class="btn skin" data-skin="pink"><span class="dot" style="background:#fb7185"></span>Pink</button>
         <button class="btn skin" data-skin="cyan"><span class="dot" style="background:#22d3ee"></span>Cyan</button>
         <button class="btn" id="shopBtn">Shop</button>
@@ -84,9 +84,7 @@
       </div>
     </div>
   </div>
-
-  <!-- PHẦN B (JS) – DÁN NGAY TRÊN </body></html> -->
-  <script>
+<script>
 // ===== Canvas & DPR =====
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
@@ -126,7 +124,7 @@ if(!ownsSkin(skin)) skin='gold';
 const today = new Date().toDateString(); const lastDay = localStorage.getItem('tapfly.day');
 if (lastDay !== today){ coins += 20; localStorage.setItem('tapfly.day', today); saveCoins(); toast('+20 daily'); }
 
-// Shop data (đủ để demo glow; có thể thêm món khác sau)
+// Shop data (đủ để glow; thêm món sau)
 const SHOP=[
   {id:'skin.pink', type:'skin',  label:'Skin: Pink',  price:120, apply:()=>{skin='pink'; applySkin();}},
   {id:'skin.cyan', type:'skin',  label:'Skin: Cyan',  price:120, apply:()=>{skin='cyan'; applySkin();}},
