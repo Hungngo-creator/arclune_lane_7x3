@@ -287,4 +287,40 @@ function loop(now){
   if(trailEnabled){ for(const t of trail){ ctx.globalAlpha=t.a; ctx.fillStyle=pal.player; ctx.beginPath(); ctx.arc(t.x,t.y,6*dpr*(0.5+t.a*0.5),0,Math.PI*2); ctx.fill(); } ctx.globalAlpha=1; }
 
   // player
-  
+  ctx.save(); ctx.shadowColor='rgba(0,0,0,.35)'; ctx.shadowBlur=16*dpr; ctx.fillStyle=pal.player; const s=player.size*dpr, x=player.x*dpr, y=player.y*dpr; roundRect(ctx,x,y,s,s,6*dpr); ctx.fill(); ctx.restore();
+
+  // HUD texts
+  ctx.fillStyle='#fff'; ctx.font=(24*dpr)+'px ui-sans-serif,system-ui'; ctx.textAlign='left'; ctx.textBaseline='top'; ctx.fillText('Score: '+state.score, 16*dpr, 12*dpr); ctx.fillStyle='rgba(255,255,255,.7)'; ctx.fillText('Best: '+state.best, 16*dpr, 40*dpr);
+  ctx.textAlign='right'; ctx.fillStyle='#fff'; ctx.fillText(CURRENCY_NAME+': '+coins, W-16*dpr, 12*dpr);
+  // status icons
+  let yLine = 40*dpr; ctx.textAlign='right'; ctx.fillStyle='rgba(255,255,255,.85)';
+  if(state.shield>0 || state.hitGrace>0){ ctx.fillText('🛡️', W-16*dpr, yLine); yLine += 26*dpr; }
+  if(state.magnet>0){ ctx.fillText('🧲 '+Math.ceil(state.magnet)+'s', W-16*dpr, yLine); yLine += 26*dpr; }
+
+  if(state.status!=='playing'){
+    const title = state.status==='menu'?'Tap‑to‑Fly':(state.status==='paused'?'Paused':'Game Over');
+    const subt  = state.status==='menu'?'Chạm/Space để bắt đầu':(state.status==='paused'?'Chạm/P để tiếp tục':'Chạm/Space để chơi lại');
+    ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillStyle='rgba(0,0,0,.35)'; ctx.fillRect(W/2-220*dpr, H/2-80*dpr, 440*dpr, 160*dpr); ctx.fillStyle='#fff'; ctx.font=(36*dpr)+'px ui-sans-serif,system-ui'; ctx.fillText(title, W/2, H/2-18*dpr); ctx.font=(18*dpr)+'px ui-sans-serif,system-ui'; ctx.fillText(subt, W/2, H/2+22*dpr);
+  }
+
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+function roundRect(ctx,x,y,w,h,r){ r=Math.min(r,w/2,h/2); ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+
+// Init selections
+applyDiff(); applySkin(); updateCoinsPill();
+document.querySelector(`.btn.diff[data-diff="${diff}"]`)?.classList.add('active');
+document.querySelector(`.btn.skin[data-skin="${skin}"]`)?.classList.add('active');
+updateSkinButtons();
+
+// Toast helper
+function toast(msg){ try{ const el=document.createElement('div'); el.textContent=msg; el.style.position='absolute'; el.style.right='12px'; el.style.bottom='12px'; el.style.background='rgba(255,255,255,.12)'; el.style.border='1px solid rgba(255,255,255,.25)'; el.style.padding='8px 10px'; el.style.borderRadius='10px'; el.style.pointerEvents='none'; el.style.zIndex='40'; document.querySelector('.card').appendChild(el); setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .4s'; setTimeout(()=>el.remove(),400); }, 900); }catch(_){} }
+</script>
+<script>
+// PWA SW
+if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js'); }
+</script>
+</body>
+</html>
