@@ -47,9 +47,9 @@
   const state = { status: 'menu', score: 0, best: 0 };
   const player = { x: 120, y: (canvas.height/dpr)*0.5, vy: 0, size: 20 };
   const pipes = [];
-  let speed = 220;      // px/s
-  const gravity = 980;  // px/s^2
-  const jumpV = -360;   // px/s impulse
+  let speed = 180;      // px/s
+  const gravity = 900;  // px/s^2
+  const jumpV = -240;   // px/s impulse
   let spawnMs = 0;
 
   function reset() {
