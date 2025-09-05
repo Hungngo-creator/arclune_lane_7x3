@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tap-to-Fly — v8 (Daily+Meter+Vibrate+ShopGlow)</title>
+  <title>Tap-to-Fly — v11 (Pulse Pipes + Neon + Shield/Magnet)</title>
   <link rel="manifest" href="manifest.json">
   <style>
     :root { color-scheme: dark light; }
@@ -60,9 +60,12 @@
         <button class="btn" id="pauseBtn" title="Tạm dừng">⏸️</button>
         <button class="btn" id="soundBtn" title="Bật/tắt âm">🔊</button>
         <button class="btn" id="voiceBtn" title="La để bay">🎙️</button>
-      <button class="btn skin" data-skin="gold"><span class="dot" style="background:#facc15"></span>Gold</button>
+
+        <button class="btn skin" data-skin="gold"><span class="dot" style="background:#facc15"></span>Gold</button>
         <button class="btn skin" data-skin="pink"><span class="dot" style="background:#fb7185"></span>Pink</button>
         <button class="btn skin" data-skin="cyan"><span class="dot" style="background:#22d3ee"></span>Cyan</button>
+        <button class="btn skin" data-skin="neon"><span class="dot" style="background:#a78bfa"></span>Neon</button>
+
         <button class="btn" id="shopBtn">Shop</button>
         <div class="btn" id="coinsPill">Feathers: 0</div>
       </div>
@@ -70,7 +73,7 @@
       <!-- Mic meter -->
       <div class="micMeter" id="micMeter" aria-hidden="true"><div class="fill" id="micFill"></div></div>
 
-      <div class="note">v8: Daily Goal + Mic meter + Vibrate + Shop glow.</div>
+      <div class="note">v11: Pulse pipes + Neon + Shield/Magnet • Daily + Mic + Rung + Shop glow.</div>
 
       <!-- Shop Overlay -->
       <div class="shop" id="shop">
@@ -84,7 +87,7 @@
       </div>
     </div>
   </div>
-<script>
+  <script>
 // ===== Canvas & DPR =====
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
@@ -96,44 +99,54 @@ function fit(){ dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
 }
 addEventListener('resize', fit); fit();
 
-// ===== Skins =====
+// ===== Skins (có Neon) =====
 const SKINS={
   gold:{player:'#facc15',pipe:'#22c55e',edge:'rgba(0,0,0,.15)',skyTop:'#0ea5e9',skyBot:'#0f172a',ground:'rgba(255,255,255,.08)'},
   pink:{player:'#fb7185',pipe:'#34d399',edge:'rgba(0,0,0,.15)',skyTop:'#ec4899',skyBot:'#312e81',ground:'rgba(255,255,255,.10)'},
-  cyan:{player:'#22d3ee',pipe:'#10b981',edge:'rgba(0,0,0,.15)',skyTop:'#06b6d4',skyBot:'#0f172a',ground:'rgba(255,255,255,.08)'}
-};// ===== Difficulty =====
-const DIFFS={
-  easy:{speed:180,gravity:900,jumpV:-240,spawnEvery:1800,spawnMin:1200,gapBase:260,gapMin:200,scoreSpawnFactor:6,scoreGapFactor:1.2},
-  normal:{speed:200,gravity:950,jumpV:-280,spawnEvery:1700,spawnMin:1100,gapBase:220,gapMin:170,scoreSpawnFactor:8,scoreGapFactor:1.4},
-  hard:{speed:230,gravity:1000,jumpV:-320,spawnEvery:1600,spawnMin:1000,gapBase:190,gapMin:150,scoreSpawnFactor:10,scoreGapFactor:1.8}
+  cyan:{player:'#22d3ee',pipe:'#10b981',edge:'rgba(0,0,0,.15)',skyTop:'#06b6d4',skyBot:'#0f172a',ground:'rgba(255,255,255,.08)'},
+  neon:{player:'#a78bfa',pipe:'#22d3ee',edge:'rgba(0,0,0,.18)',skyTop:'#1f2937',skyBot:'#0b1020',ground:'rgba(255,255,255,.10)'}
 };
 
-// ===== Currency & Owned =====
+// ===== Difficulty (đã siết) =====
+const DIFFS={
+  easy:  {speed:180, gravity:900,  jumpV:-240, spawnEvery:1650, spawnMin:1050, gapBase:230, gapMin:180, scoreSpawnFactor:6,  scoreGapFactor:1.3},
+  normal:{speed:200, gravity:950,  jumpV:-280, spawnEvery:1550, spawnMin: 950, gapBase:205, gapMin:160, scoreSpawnFactor:8,  scoreGapFactor:1.5},
+  hard:  {speed:230, gravity:1000, jumpV:-320, spawnEvery:1450, spawnMin: 900, gapBase:180, gapMin:140, scoreSpawnFactor:10, scoreGapFactor:1.8}
+};
+
+// ===== Currency & Owned & Inventory =====
 const CURRENCY_NAME='Feathers';
 let coins=+(localStorage.getItem('tapfly.coins')||0);
-let owned=JSON.parse(localStorage.getItem('tapfly.owned')||'{}');
+let owned=JSON.parse(localStorage.getItem('tapfly.owned')||'{}');       // skins/trail
+let inv  = JSON.parse(localStorage.getItem('tapfly.inv')  || '{"shield":0,"magnet":0}'); // consumables
+let next = JSON.parse(localStorage.getItem('tapfly.next') || '{"shield":false,"magnet":false}'); // dùng ván sau
 let diff=localStorage.getItem('tapfly.diff')||'easy';
 let skin=localStorage.getItem('tapfly.skin')||'gold';
+
+function saveCoins(){ localStorage.setItem('tapfly.coins', coins); updateCoinsPill(); updateShopGlow(); }
+function saveOwned(){ localStorage.setItem('tapfly.owned', JSON.stringify(owned)); }
+function saveInv(){ localStorage.setItem('tapfly.inv', JSON.stringify(inv)); }
+function saveNext(){ localStorage.setItem('tapfly.next', JSON.stringify(next)); }
+
 function ownsSkin(id){return id==='gold'||!!owned['skin.'+id];}
 function updateSkinButtons(){document.querySelectorAll('.btn.skin').forEach(b=>b.classList.toggle('locked',!ownsSkin(b.dataset.skin))); }
 if(!ownsSkin(skin)) skin='gold';
+
+// Toast (dùng sớm)
+function toast(msg){ try{ const el=document.createElement('div'); el.textContent=msg;
+  el.style.position='absolute'; el.style.right='12px'; el.style.bottom='12px';
+  el.style.background='rgba(255,255,255,.12)'; el.style.border='1px solid rgba(255,255,255,.25)';
+  el.style.padding='8px 10px'; el.style.borderRadius='10px'; el.style.pointerEvents='none'; el.style.zIndex='40';
+  document.querySelector('.card').appendChild(el); setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .4s'; setTimeout(()=>el.remove(), 400); }, 900);
+}catch{} }
 
 // Daily bonus on open
 const today = new Date().toDateString(); const lastDay = localStorage.getItem('tapfly.day');
 if (lastDay !== today){ coins += 20; localStorage.setItem('tapfly.day', today); saveCoins(); toast('+20 daily'); }
 
-// Shop data (đủ để glow; thêm món sau)
-const SHOP=[
-  {id:'skin.pink', type:'skin',  label:'Skin: Pink',  price:120, apply:()=>{skin='pink'; applySkin();}},
-  {id:'skin.cyan', type:'skin',  label:'Skin: Cyan',  price:120, apply:()=>{skin='cyan'; applySkin();}},
-  {id:'trail.spark',type:'trail', label:'Trail: Spark',price:120, apply:()=>{trailEnabled=true;}}
-];
-
-function saveCoins(){ localStorage.setItem('tapfly.coins', coins); updateCoinsPill(); updateShopGlow(); }
-function saveOwned(){ localStorage.setItem('tapfly.owned', JSON.stringify(owned)); }
-
-// Shop glow nếu đủ tiền món rẻ nhất chưa sở hữu
-function cheapestNeeded(){ let best=Infinity; for(const it of SHOP){ if(!owned[it.id]) best=Math.min(best,it.price); } return best; }
+// Shop glow nếu đủ tiền món rẻ nhất chưa sở hữu (skin/trail)
+const SHOP=[]; // sẽ fill ở dưới
+function cheapestNeeded(){ let best=Infinity; for(const it of SHOP){ if((it.type==='skin'||it.type==='trail') && !owned[it.id]) best=Math.min(best,it.price); } return best; }
 function updateShopGlow(){ const need=cheapestNeeded();
   if(!isFinite(need)) { shopBtn?.classList.remove('glow'); return; }
   if(coins>=need) shopBtn?.classList.add('glow'); else shopBtn?.classList.remove('glow');
@@ -153,6 +166,8 @@ const state={status:'menu',score:0,best:+(localStorage.getItem('tapfly.best')||0
 const player={x:120,y:(canvas.height/dpr)*0.5,vy:0,size:20};
 const pipes=[], pickups=[], trail=[]; let trailEnabled=!!owned['trail.spark'];
 let speed,gravity,jumpV,spawnMs=0;
+// Power-ups
+let shield=0, shieldGrace=0, magnetT=0;
 
 function applyDiff(){const d=DIFFS[diff]; speed=d.speed; gravity=d.gravity; jumpV=d.jumpV;
   document.querySelectorAll('.btn.diff').forEach(b=>b.classList.toggle('active',b.dataset.diff===diff));
@@ -164,9 +179,14 @@ function applySkin(){ document.querySelectorAll('.btn.skin').forEach(b=>b.classL
 function updateCoinsPill(){ const el=document.getElementById('coinsPill'); if(el) el.textContent=`${CURRENCY_NAME}: ${coins}`; }
 
 function reset(){ state.score=0; spawnMs=0; pipes.length=0; pickups.length=0; trail.length=0;
-  player.x=120; player.y=(canvas.height/dpr)*0.45; player.vy=0; applyDiff(); applySkin(); updateCoinsPill();
+  player.x=120; player.y=(canvas.height/dpr)*0.45; player.vy=0; shield=0; shieldGrace=0; magnetT=0;
+  applyDiff(); applySkin(); updateCoinsPill();
 }
-function start(){ reset(); state.status='playing'; }
+function start(){ reset(); state.status='playing';
+  // auto apply consumables đã chọn
+  if(next.shield && inv.shield>0){ shield=1; inv.shield--; saveInv(); next.shield=false; saveNext(); toast('🛡️ Shield ON'); }
+  if(next.magnet && inv.magnet>0){ magnetT=6; inv.magnet--; saveInv(); next.magnet=false; saveNext(); toast('🧲 Magnet 6s'); }
+}
 function over(){ state.status='gameover';
   if(state.score>state.best){ state.best=state.score; localStorage.setItem('tapfly.best', state.best); }
   if(!daily.done && state.score>=daily.goal) completeDaily();
@@ -205,25 +225,68 @@ pauseBtn?.addEventListener('click', togglePause);
 const soundBtn=document.getElementById('soundBtn'); let muted=false;
 soundBtn?.addEventListener('click', ()=>{ muted=!muted; soundBtn.textContent = muted?'🔇':'🔊'; sfxTick(); });
 
-// Shop UI
+// ===== Shop items (skins + consumables + trail) =====
 const shop=document.getElementById('shop'); const shopBtn=document.getElementById('shopBtn'); const closeShop=document.getElementById('closeShop');
+const SHOP_ITEMS=[
+  {id:'skin.pink',   type:'skin',   label:'Skin: Pink',   price:120, apply:()=>{skin='pink';  applySkin();}},
+  {id:'skin.cyan',   type:'skin',   label:'Skin: Cyan',   price:120, apply:()=>{skin='cyan';  applySkin();}},
+  {id:'skin.neon',   type:'skin',   label:'Skin: Neon',   price:150, apply:()=>{skin='neon';  applySkin();}},
+  {id:'cons.shield', type:'consum', label:'Shield x1',    price:25,  onBuy:()=>{inv.shield++; saveInv();}},
+  {id:'cons.magnet', type:'consum', label:'Magnet 6s',    price:20,  onBuy:()=>{inv.magnet++; saveInv();}},
+  {id:'trail.spark', type:'trail',  label:'Trail: Spark', price:120, apply:()=>{trailEnabled=true;}}
+];
+SHOP.push(...SHOP_ITEMS);
+
 shopBtn?.addEventListener('click', ()=>{ renderShop(); shop.style.display='flex'; sfxTick(); });
 closeShop?.addEventListener('click', ()=>{ shop.style.display='none'; sfxTick(); });
 
 function renderShop(){
   const list=document.getElementById('shopList'); list.innerHTML='';
-  SHOP.forEach(item=>{
-    const ownedFlag=!!owned[item.id];
+  SHOP_ITEMS.forEach(item=>{
+    const ownedFlag = (item.type==='skin'||item.type==='trail') ? !!owned[item.id] : false;
     const row=document.createElement('div'); row.className='row';
-    const left=document.createElement('div'); left.innerHTML=`<div class="title">${item.label}</div><div class="price">${CURRENCY_NAME}: ${item.price}</div>`;
+
+    let sub = `${CURRENCY_NAME}: ${item.price}`;
+    if(item.type==='consum') sub += ` • Tồn: ${item.id==='cons.shield'?inv.shield:inv.magnet}`;
+
+    const left=document.createElement('div');
+    left.innerHTML=`<div class="title">${item.label}</div><div class="price">${sub}</div>`;
+
     const actions=document.createElement('div'); actions.className='actions';
-    const buy=document.createElement('button'); buy.className='btn'; buy.textContent=ownedFlag?'Đã mua':'Mua'; buy.disabled = ownedFlag || (coins < item.price);
-    buy.addEventListener('click', ()=>{ if(coins>=item.price){ coins-=item.price; saveCoins(); owned[item.id]=true; saveOwned(); renderShop(); updateSkinButtons(); sfxScore(); toast('Đã mua: '+item.label); }});
+
+    // nút Mua
+    const buy=document.createElement('button'); buy.className='btn';
+    buy.textContent = (item.type==='consum') ? 'Mua x1' : (ownedFlag?'Đã mua':'Mua');
+    buy.disabled = (item.type==='consum') ? (coins < item.price) : (ownedFlag || coins < item.price);
+    buy.addEventListener('click', ()=>{
+      if(coins < item.price) return;
+      coins -= item.price; saveCoins();
+      if(item.type==='consum'){ item.onBuy(); toast('Đã mua: '+item.label); }
+      else { owned[item.id]=true; saveOwned(); item.apply?.(); updateSkinButtons(); toast('Đã mua: '+item.label); }
+      renderShop(); sfxScore();
+    });
     actions.appendChild(buy);
-    if(item.type==='skin'){ const equip=document.createElement('button'); equip.className='btn'; equip.textContent='Trang bị'; equip.disabled=!ownedFlag;
-      equip.addEventListener('click', ()=>{ item.apply(); saveOwned(); renderShop(); toast('Skin đã trang bị'); }); actions.appendChild(equip); }
-    if(item.type==='trail'){ const toggle=document.createElement('button'); toggle.className='btn'; toggle.textContent='Bật trail'; toggle.disabled=!ownedFlag;
-      toggle.addEventListener('click', ()=>{ item.apply(); saveOwned(); renderShop(); toast('Trail ON'); }); actions.appendChild(toggle); }
+
+    // equip / toggle
+    if(item.type==='skin'){
+      const equip=document.createElement('button'); equip.className='btn'; equip.textContent='Trang bị'; equip.disabled=!ownedFlag;
+      equip.addEventListener('click', ()=>{ item.apply(); saveOwned(); renderShop(); toast('Skin đã trang bị'); });
+      actions.appendChild(equip);
+    }
+    if(item.type==='trail'){
+      const toggle=document.createElement('button'); toggle.className='btn'; toggle.textContent='Bật trail'; toggle.disabled=!ownedFlag;
+      toggle.addEventListener('click', ()=>{ item.apply(); saveOwned(); renderShop(); toast('Trail ON'); });
+      actions.appendChild(toggle);
+    }
+    if(item.type==='consum'){
+      const id = item.id==='cons.shield' ? 'shield' : 'magnet';
+      const btnNext=document.createElement('button'); btnNext.className='btn';
+      btnNext.textContent = (next[id]?'Bỏ trang bị':'Trang bị ván sau');
+      btnNext.disabled = (id==='shield'?inv.shield:inv.magnet) <= 0 && !next[id];
+      btnNext.addEventListener('click', ()=>{ next[id] = !next[id]; saveNext(); renderShop(); toast((next[id]?'Sẽ dùng: ':'Bỏ dùng: ')+item.label); });
+      actions.appendChild(btnNext);
+    }
+
     row.appendChild(left); row.appendChild(actions); list.appendChild(row);
   });
   updateCoinsPill(); updateShopGlow();
@@ -255,26 +318,29 @@ async function startVoice(){ try{
 function stopVoice(){ mic.on=false; voiceBtn.textContent='🎙️'; try{ mic.stream?.getTracks().forEach(t=>t.stop()); }catch{} mic.stream=mic.src=mic.analyser=mic.data=null; }
 voiceBtn?.addEventListener('click', ()=>{ mic.on ? stopVoice() : startVoice(); sfxTick(); });
 
-// === BỔ SUNG 2 HÀM NÀY ===
+// Khởi tạo nhỏ
+applyDiff(); applySkin(); updateCoinsPill(); updateShopGlow();
+document.querySelector(`.btn.diff[data-diff="${diff}"]`)?.classList.add('active');
+document.querySelector(`.btn.skin[data-skin="${skin}"]`)?.classList.add('active');
+updateSkinButtons();
+  </script>
+  <script>
+// ===== Spawn & Gap helpers =====
 function targetSpawn(){
-  // khoảng thời gian spawn ống (ms), càng về sau càng nhanh nhưng không dưới mốc min
   const d = DIFFS[diff];
-  const base = d.spawnEvery;     // ví dụ 1700ms
-  const min  = d.spawnMin;       // ví dụ 1100ms
-  const byScore = base - state.score * d.scoreSpawnFactor;
-  return Math.max(min, byScore);
+  return Math.max(d.spawnMin, d.spawnEvery - state.score * d.scoreSpawnFactor);
 }
-
 function gapHeight(){
-  // chiều cao khe hở giữa 2 ống, giảm dần theo điểm nhưng không dưới mốc min
   const d = DIFFS[diff];
-  const base = d.gapBase;        // ví dụ 220
-  const min  = d.gapMin;         // ví dụ 170
-  const byScore = base - state.score * d.scoreGapFactor;
-  return Math.max(min, byScore) * dpr;  // dùng đơn vị pixel theo DPR
+  return Math.max(d.gapMin, d.gapBase - state.score * d.scoreGapFactor) * dpr;
+}
+// khe hiện tại có “thụt ra–vào”
+function currentGapH(p){
+  if(!p.pulseAmp) return p.gapH;
+  const osc = 0.5 + 0.5*Math.sin(p.phase);
+  return Math.max(p.gapMin, p.gapH - p.pulseAmp*osc);
 }
 
-// ... phía dưới mới tới // ===== Loop =====
 // ===== Loop =====
 let last=performance.now();
 function loop(now){
@@ -284,7 +350,7 @@ function loop(now){
     // physics
     player.vy += gravity*dt; player.y += player.vy*dt;
 
-    // voice impulse
+    // mic impulse
     if(mic.on && mic.analyser){
       mic.analyser.getFloatTimeDomainData(mic.data);
       let sum=0; for(let i=0;i<mic.data.length;i++){ const s=mic.data[i]; sum+=s*s; }
@@ -294,16 +360,26 @@ function loop(now){
       if(amp>0.02){ const scale = 0.6 + Math.min(1,amp)*1.1; player.vy = jumpV * scale; }
     }
 
-    // scroll
-    const scroll=speed*dt; for(const p of pipes) p.x -= scroll; for(const c of pickups) c.x -= scroll;
+    // scroll + pulse phase
+    const scroll=speed*dt;
+    for(const p of pipes){ p.x -= scroll; if(p.pulseAmp>0) p.phase += p.pulseSpd * dt; }
+    for(const c of pickups){ c.x -= scroll; }
     while(pipes.length && pipes[0].x + pipes[0].w < 0) pipes.shift();
     while(pickups.length && pickups[0].x + pickups[0].r < 0) pickups.shift();
 
     // spawn
     spawnMs += dt*1000; const target = targetSpawn();
-    if(spawnMs >= target){ spawnMs=0; const gapH=gapHeight();
+    if(spawnMs >= target){
+      spawnMs=0; const gapH=gapHeight();
       const margin=40*dpr; const gapY=Math.random()*(canvas.height-gapH-margin*2)+margin;
-      const pipe={x:canvas.width+20*dpr,w:64*dpr,gapY,gapH,passed:false}; pipes.push(pipe);
+      const pipe={
+        x:canvas.width+20*dpr, w:64*dpr, gapY, gapH,
+        gapMin: DIFFS[diff].gapMin * dpr,
+        pulseAmp: (Math.random()<0.55) ? Math.min(60*dpr, gapH - DIFFS[diff].gapMin*dpr) : 0,
+        pulseSpd: 1.2 + Math.random()*0.8, phase: 0,
+        passed:false
+      };
+      pipes.push(pipe);
       if(Math.random()<0.35){ pickups.push({x:pipe.x+pipe.w+36*dpr,y:gapY+gapH/2,r:10*dpr,taken:false}); }
     }
 
@@ -312,20 +388,30 @@ function loop(now){
       p.passed=true; state.score++; speed=Math.min(420, speed+2); coins += 1; saveCoins(); sfxScore();
     } }
 
+    // timers
+    if(shieldGrace>0) shieldGrace -= dt;
+    if(magnetT>0) magnetT -= dt;
+
     // collisions
     const s=player.size*dpr, px=player.x*dpr, py=player.y*dpr;
     if(py + s > canvas.height || py < 0) over();
     for(const p of pipes){
       const inX=px + s > p.x && px < p.x + p.w;
-      const hitTop=py < p.gapY; const hitBot=py + s > p.gapY + p.gapH;
-      if(inX && (hitTop || hitBot)){ over(); break; }
+      const gH = currentGapH(p);
+      const hitTop=py < p.gapY; const hitBot=py + s > p.gapY + gH;
+      if(inX && (hitTop || hitBot)){
+        if(shield>0){ shield=0; shieldGrace=0.7; sfxTick(); navigator.vibrate?.(50); continue; }
+        if(shieldGrace>0){ continue; }
+        over(); break;
+      }
     }
 
-    // collect coins
+    // collect coins (magnet tăng bán kính)
     for(const c of pickups){ if(!c.taken){
       const cx=c.x, cy=c.y, cr=c.r; const pcx=px+s/2, pcy=py+s/2;
       const dx=pcx-cx, dy=pcy-cy;
-      if(dx*dx + dy*dy <= (cr + s*0.5)*(cr + s*0.5)){ c.taken=true; coins+=5; saveCoins(); sfxCoin(); }
+      const extra = magnetT>0 ? 140*dpr : 0;
+      if(dx*dx + dy*dy <= (cr + s*0.5 + extra)*(cr + s*0.5 + extra)){ c.taken=true; coins+=5; saveCoins(); sfxCoin(); }
     } }
 
     // trail
@@ -340,8 +426,14 @@ function loop(now){
   // pickups
   for(const c of pickups){ if(!c.taken){ ctx.save(); ctx.shadowColor='rgba(255,215,0,.35)'; ctx.shadowBlur=16*dpr; ctx.fillStyle='#fde047'; ctx.beginPath(); ctx.arc(c.x,c.y,c.r,0,Math.PI*2); ctx.fill(); ctx.restore(); ctx.fillStyle='rgba(0,0,0,.25)'; ctx.fillRect(c.x+c.r-4*dpr, c.y-c.r, 4*dpr, c.r*2); } }
 
-  // pipes
-  for(const p of pipes){ ctx.fillStyle=pal.pipe; ctx.fillRect(p.x,0,p.w,p.gapY); ctx.fillRect(p.x,p.gapY+p.gapH,p.w,H-(p.gapY+p.gapH)); ctx.fillStyle=pal.edge; ctx.fillRect(p.x+p.w-6*dpr,0,6*dpr,H); }
+  // pipes (dùng khe hiện tại)
+  for(const p of pipes){
+    const gH = currentGapH(p);
+    ctx.fillStyle=pal.pipe;
+    ctx.fillRect(p.x,0,p.w,p.gapY);
+    ctx.fillRect(p.x,p.gapY+gH,p.w,H-(p.gapY+gH));
+    ctx.fillStyle=pal.edge; ctx.fillRect(p.x+p.w-6*dpr,0,6*dpr,H);
+  }
 
   // trail
   if(trailEnabled){ for(const t of trail){ ctx.globalAlpha=t.a; ctx.fillStyle=pal.player; ctx.beginPath(); ctx.arc(t.x,t.y,6*dpr*(0.5+t.a*0.5),0,Math.PI*2); ctx.fill(); } ctx.globalAlpha=1; }
@@ -357,6 +449,9 @@ function loop(now){
   ctx.fillStyle='#c7d2fe'; ctx.fillText('Daily: '+ Math.min(state.score, daily.goal) + '/' + daily.goal + (daily.done?' ✓':''), 16*dpr, 68*dpr);
 
   ctx.textAlign='right'; ctx.fillStyle='#fff'; ctx.fillText(CURRENCY_NAME+': '+coins, W-16*dpr, 12*dpr);
+  let hudY = 40*dpr;
+  if(shield>0 || shieldGrace>0){ ctx.fillText('🛡️', W-16*dpr, hudY); hudY += 22*dpr; }
+  if(magnetT>0){ ctx.fillText('🧲 '+magnetT.toFixed(1)+'s', W-16*dpr, hudY); }
 
   if(state.status!=='playing'){
     const title = state.status==='menu'?'Tap-to-Fly':(state.status==='paused'?'Paused':'Game Over');
@@ -380,24 +475,10 @@ function loop(now){
 requestAnimationFrame(loop);
 
 function roundRect(ctx,x,y,w,h,r){ r=Math.min(r,w/2,h/2); ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
-
-// Init
-applyDiff(); applySkin(); updateCoinsPill(); updateShopGlow();
-document.querySelector(`.btn.diff[data-diff="${diff}"]`)?.classList.add('active');
-document.querySelector(`.btn.skin[data-skin="${skin}"]`)?.classList.add('active');
-updateSkinButtons();
-
-// Toast
-function toast(msg){ try{ const el=document.createElement('div'); el.textContent=msg;
-  el.style.position='absolute'; el.style.right='12px'; el.style.bottom='12px';
-  el.style.background='rgba(255,255,255,.12)'; el.style.border='1px solid rgba(255,255,255,.25)';
-  el.style.padding='8px 10px'; el.style.borderRadius='10px'; el.style.pointerEvents='none'; el.style.zIndex='40';
-  document.querySelector('.card').appendChild(el); setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .4s'; setTimeout(()=>el.remove(), 400); }, 900);
-}catch{} }
 </script>
 
 <script>
-// SW
+// SW (bump cache trong sw.js)
 if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js'); }
 </script>
 </body>
