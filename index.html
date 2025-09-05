@@ -373,7 +373,7 @@ function loop(now){
       spawnMs=0; const gapH=gapHeight();
       const margin=40*dpr; const gapY=Math.random()*(canvas.height-gapH-margin*2)+margin;
       const pipe={
-        x:canvas.width+10*dpr, w:100*dpr, gapY, gapH,
+        x:canvas.width+10*dpr, w:30*dpr, gapY, gapH,
         gapMin: DIFFS[diff].gapMin * dpr,
         pulseAmp: (Math.random()<0.55) ? Math.min(60*dpr, gapH - DIFFS[diff].gapMin*dpr) : 0,
         pulseSpd: 1.2 + Math.random()*0.8, phase: 0,
