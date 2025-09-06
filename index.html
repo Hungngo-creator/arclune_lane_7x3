@@ -299,8 +299,8 @@ const player={x:120,y:(canvas.height/dpr)*0.5,vy:0,size:22};
 const pipes=[], pickups=[], trail=[]; let trailEnabled=!!owned['trail.spark'];
 let speed,gravity,jumpV,spawnMs=0;
 let shield=0, shieldGrace=0, magnetT=0;
-let gravityMul=1, slowFactor=1, skillReadyAt=0;
-
+let gravityMul=1, slowFactor=1, skillReadyAt=0, phaseUntil=0, slowUntil=0;
+  
 // Helpers
 function ownsSkin(id){return id==='gold'||!!owned['skin.'+id];}
 function updateSkinButtons(){document.querySelectorAll('.btn.skin').forEach(b=>b.classList.toggle('locked',!ownsSkin(b.dataset.skin))); }
@@ -445,6 +445,7 @@ function loop(now){
       if(amp>0.02){ const scale = 0.6 + Math.min(1,amp)*1.1; player.vy = jumpV * scale; }
     }
 
+    slowFactor = (now < slowUntil) ? 0.65 : 1;
     const scroll=speed*slowFactor*dt;
     for(const p of pipes){ p.x -= scroll; if(p.pulseAmp>0) p.phase += p.pulseSpd * dt; }
     for(const c of pickups){ c.x -= scroll; }
@@ -478,7 +479,7 @@ function loop(now){
       const inX=px + s > p.x && px < p.x + p.w;
       const gH = currentGapH(p);
       const hitTop=py < p.gapY; const hitBot=py + s > p.gapY + gH;
-      if(inX && (hitTop || hitBot)){
+      if(inX && (hitTop || hitBot) && now >= phaseUntil){
         if(shield>0){ shield=0; shieldGrace=0.7; sfxTick(); navigator.vibrate?.(50); continue; }
         if(shieldGrace>0){ continue; }
         over(); break;
