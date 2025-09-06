@@ -233,21 +233,55 @@ const CLASSES = {
   aqua: {
     name:'Aqua', color:'#22d3ee', price:0,
     desc:'Rơi mềm (−6% gravity). ⚡ Jet: bơm lực bay mạnh. CD 5s.',
-    cd:3500,
-    passiveInit(){ gravityMul = 0.85; },
+    cd:5000,
+    passiveInit(){ gravityMul = 0.94; },
     canUse(){ return performance.now() >= skillReadyAt; },
     use(){
       if(!this.canUse() || state.status!=='playing') return;
-      player.vy = jumpV * 1.4;  // Jet
+      player.vy = jumpV * 1.6;                // lực Jet
       skillReadyAt = performance.now() + this.cd;
       sfxFlap(); toast('JET!'); navigator.vibrate?.(18);
     }
   },
-  phase:{name:'Phase', color:'#a78bfa', price:150, desc:'(Sắp có) Ghost 0.8s, CD 11s.'},
-  tempo:{name:'Tempo', color:'#60a5fa', price:150, desc:'(Sắp có) Slow 35% 2s, CD 12s.'},
-  gauss:{name:'Gauss', color:'#06b6d4', price:150, desc:'(Sắp có) Magnet Pulse, CD 12s.'}
+  phase: {
+    name:'Phase', color:'#a78bfa', price:150,
+    desc:'Ghost 0.8s (xuyên ống). CD 11s.',
+    cd:11000,
+    passiveInit(){},
+    use(){
+      if(state.status!=='playing' || performance.now()<skillReadyAt) return;
+      phaseUntil = performance.now() + 800;   // 0.8s vô định hình
+      skillReadyAt = performance.now() + this.cd;
+      toast('PHASE!'); navigator.vibrate?.(20);
+    }
+  },
+  tempo: {
+    name:'Tempo', color:'#60a5fa', price:150,
+    desc:'Làm chậm 2s (65% tốc). CD 12s.',
+    cd:12000,
+    passiveInit(){},
+    use(){
+      if(state.status!=='playing' || performance.now()<skillReadyAt) return;
+      slowUntil = performance.now() + 2000;   // 2s slow
+      slowFactor = 0.65;
+      skillReadyAt = performance.now() + this.cd;
+      toast('SLOW!'); navigator.vibrate?.(16);
+    }
+  },
+  gauss: {
+    name:'Gauss', color:'#06b6d4', price:150,
+    desc:'Magnet Pulse 4s. CD 12s.',
+    cd:12000,
+    passiveInit(){},
+    use(){
+      if(state.status!=='playing' || performance.now()<skillReadyAt) return;
+      magnetT = Math.max(magnetT, 4);         // hút coin 4s
+      skillReadyAt = performance.now() + this.cd;
+      toast('MAGNET!'); navigator.vibrate?.(16);
+    }
+  }
 };
-
+  
 // Daily
 const DAILY_REWARD = 30;
 const today = new Date().toDateString(); const lastDay = localStorage.getItem('tapfly.day');
