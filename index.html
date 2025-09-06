@@ -473,6 +473,8 @@ function loop(now){
   if(trailEnabled){ for(const t of trail){ ctx.globalAlpha=t.a; ctx.fillStyle=trailStyle==='comet'?'#a78bfa':pal.player; ctx.beginPath(); ctx.arc(t.x,t.y,6*dpr*(0.5+t.a*0.5),0,Math.PI*2); ctx.fill(); } ctx.globalAlpha=1; }
   drawSlime(ctx,player.x*dpr,player.y*dpr,player.size*dpr,pal.player);
 
+  if (mazeActive) { renderMazeOverlay(W, H); }
+  
   // Maze render overlay
 
   function renderMazeOverlay(W,H){
@@ -666,8 +668,68 @@ function ellipsePath(ctx,x,y,rx,ry,r){r=Math.min(r,rx,ry);ctx.moveTo(x-rx+r,y-ry
   }
 
   pipes.length=0; pickups.length=0; spawnMs=0;
-  toast('MAZE! Dạng lưới, ◀ ▶ + nhảy để lụm 3 key');
-                     }
+  toast('MAZE! Dạng lưới, ◀ ▶ + nhảy để lụm 3 key');}
+
+// DOM tường
+const wallL = document.getElementById('wallL');
+const wallR = document.getElementById('wallR');
+function setWallWidth(leftPx, rightPx){
+  wallL.style.width  = Math.max(0, leftPx|0)  + 'px';
+  wallR.style.width  = Math.max(0, rightPx|0) + 'px';
+}
+
+// Cập nhật “trail maze”: khép tường chậm, đi trái/phải, ăn key, tính hit
+function updateMaze(dt, now){
+  // khép tường (chậm + có giới hạn trong khoảng trung tâm)
+  const Ltarget = canvas.width * 0.34;
+  const Rtarget = canvas.width * 0.66;
+  maze.leftX  = Math.min(maze.leftX  + maze.speed*dt, Ltarget);
+  maze.rightX = Math.max(maze.rightX - maze.speed*dt, Rtarget);
+  setWallWidth(maze.leftX, canvas.width - maze.rightX);
+
+  // điều khiển trái/phải
+  const moveSpd = 220; // px/giây (theo toạ độ không nhân dpr)
+  player.x += moveX * moveSpd * dt;
+  const L = (maze.leftX / dpr)  + player.size*0.6;
+  const R = (maze.rightX / dpr) - player.size*0.6;
+  player.x = Math.max(L, Math.min(R, player.x));
+
+  // va chạm chướng ngại (o là rect theo toạ độ canvas px)
+  const s  = player.size*dpr, px = player.x*dpr, py = player.y*dpr;
+  const cx = px + s*0.5, cy = py + s*0.5, cr = s*0.5;
+  let hit = false;
+  for(const o of maze.obs){
+    const nx = Math.max(o.x, Math.min(cx, o.x+o.w));
+    const ny = Math.max(o.y, Math.min(cy, o.y+o.h));
+    const dx=cx-nx, dy=cy-ny;
+    if(dx*dx+dy*dy <= cr*cr){ hit = true; break; }
+  }
+  if(hit && now-(maze.lastHitAt||0) > 220){
+    maze.lastHitAt = now;
+    if(shield>0){ shield=0; shieldGrace=0.7; sfxTick(); navigator.vibrate?.(40); }
+    else{
+      mazeHits++;
+      navigator.vibrate?.(60);
+      maze.speed *= maze.accel; // mỗi lần đụng tường khép nhanh hơn
+      if(mazeHits >= mazeHitsMax){ over(); return; }
+      toast(`Maze hit ${mazeHits}/${mazeHitsMax}`);
+    }
+  }
+
+  // nhặt key (3 cái)
+  for(const k of maze.keys){
+    if(!k.taken){
+      const dx=cx-k.x, dy=cy-k.y;
+      if(dx*dx+dy*dy <= (cr + k.r)**2){ k.taken=true; coins+=10; saveCoins(); sfxCoin(); }
+    }
+  }
+  if(maze.keys.every(k=>k.taken)){
+    // clear maze và tiếp tục game
+    mazeActive=false; mazeTriggered=false; setWallWidth(0,0);
+    pipes.length=0; pickups.length=0; spawnMs=0; // cho scroll tiếp tục mượt
+    toast('Maze clear!'); navigator.vibrate?.([40,40,40]);
+  }
+}
 
 // Classes overlay + Toast + SW
 function renderClasses(){
