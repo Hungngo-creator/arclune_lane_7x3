@@ -517,7 +517,9 @@ function loop(now){
 
   ctx.textAlign='right'; ctx.fillStyle='#fff'; ctx.fillText(CURRENCY_NAME+': '+coins, W-16*dpr, 12*dpr);
   let hudY = 40*dpr;
-  if(shield>0 || shieldGrace>0){ ctx.fillText('🛡️', W-16*dpr, hudY); hudY += 22*dpr; }
+  if(shield>0 || shieldGrace>0){ ctx.fillText('🛡️', W-16*dpr, hudY); hudY += 22*dpr; } 
+  if (now < phaseUntil){ ctx.fillText('👻', W-16*dpr, hudY); hudY += 22*dpr; }
+if (now < slowUntil){ ctx.fillText('⏳', W-16*dpr, hudY); hudY += 22*dpr; }
   if(magnetT>0){ ctx.fillText('🧲 '+magnetT.toFixed(1)+'s', W-16*dpr, hudY); }
 
   if(state.status!=='playing'){
