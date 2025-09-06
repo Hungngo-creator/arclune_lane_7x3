@@ -1,5 +1,5 @@
 // bump version để ép cập nhật
-const CACHE = "tapfly-v14";
+const CACHE = "Tap-to-Fly — Slime & Classes v14";
 const ASSETS = ["./", "./index.html", "./manifest.json"];
 
 self.addEventListener("install", e => {
