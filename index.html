@@ -3,43 +3,45 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tap-to-Fly — v12 (Pulse Pipes + Neon + Shield/Magnet)</title>
+  <title>Tap-to-Fly — Slime & Classes</title>
   <link rel="manifest" href="manifest.json">
   <style>
     :root { color-scheme: dark light; }
     html,body{margin:0;padding:0;background:#0f172a;color:#fff;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
     .wrap{min-height:100vh;display:grid;place-items:center;padding:16px}
     .card{width:100%;max-width:900px;aspect-ratio:16/9;border-radius:18px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.4);position:relative;border:1px solid rgba(255,255,255,.08)}
-    canvas{display:block;width:100%;height:100%;background:#0f172a;touch-action:manipulation}
+    canvas{display:block;width:100%;height:100%;background:#0b1020;touch-action:manipulation}
+
     .hud{position:absolute;inset:0;pointer-events:none;display:flex;align-items:flex-start;justify-content:space-between;padding:10px}
     .pill{background:rgba(255,255,255,.12);backdrop-filter:blur(8px);padding:6px 10px;border-radius:14px;font-size:12px}
 
-    /* Toolbar */
     .toolbar{position:absolute;left:12px;bottom:44px;display:flex;gap:8px;flex-wrap:wrap;pointer-events:auto;z-index:20}
     .btn{padding:6px 10px;border-radius:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:12px}
     .btn.active{background:rgba(14,165,233,.85);border-color:rgba(255,255,255,.35)}
     .btn.locked{opacity:.45;filter:grayscale(60%);border-style:dashed}
     .btn.locked::after{content:" 🔒";font-size:12px;opacity:.85}
-    .btn.skin{width:auto;display:flex;align-items:center;gap:6px}
+    .btn.skin{display:flex;align-items:center;gap:6px}
     .dot{width:12px;height:12px;border-radius:999px;border:1px solid rgba(255,255,255,.6)}
     .note{position:absolute;left:12px;bottom:10px;color:#ffffffb3;font-size:12px}
 
-    /* Shop overlay */
-    .shop{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:30}
-    .shop .panel{width:min(560px,90%);max-height:80%;overflow:auto;background:rgba(15,23,42,.95);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:16px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+    .iconBtn{width:36px;height:28px;display:inline-grid;place-items:center}
+
+    .micMeter{position:absolute;right:12px;bottom:12px;width:96px;height:8px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);pointer-events:none}
+    .micMeter .fill{height:100%;width:0%;border-radius:inherit;background:#22d3ee}
+
+    .overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:30}
+    .panel{width:min(560px,90%);max-height:80%;overflow:auto;background:rgba(15,23,42,.96);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:16px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
     .row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dashed rgba(255,255,255,.12)}
     .row:last-child{border-bottom:0}
     .price{opacity:.85}
     .title{font-weight:600}
     .actions{display:flex;gap:8px}
 
-    /* Shop glow khi đủ tiền món rẻ nhất chưa sở hữu */
     .glow{animation:glow 1.2s ease-in-out infinite alternate}
     @keyframes glow{from{box-shadow:0 0 0 rgba(250,204,21,0)}to{box-shadow:0 0 22px rgba(250,204,21,.65);transform:translateY(-1px)}}
 
-    /* Mic level meter */
-    .micMeter{position:absolute;right:12px;bottom:12px;width:96px;height:8px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);pointer-events:none}
-    .micMeter .fill{height:100%;width:0%;border-radius:inherit;background:#22d3ee}
+    .cdRing{position:absolute;bottom:44px;left:calc(12px + 44px + 8px);width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,.25);display:grid;place-items:center;pointer-events:none}
+    .cdRing span{font-size:11px;opacity:.9}
   </style>
 </head>
 <body>
@@ -48,18 +50,21 @@
       <canvas id="game"></canvas>
 
       <div class="hud">
-        <div class="pill">Space/↑ hoặc chạm = bay • P = pause • 🎙️ = la để bay</div>
+        <div class="pill">Space/↑ hoặc chạm = bay • P = pause • ⚡ = kĩ năng • 🎙️ = la để bay</div>
         <div class="pill">R = chơi lại</div>
       </div>
 
-      <!-- Toolbar -->
       <div class="toolbar" id="toolbar">
         <button class="btn diff" data-diff="easy">Easy</button>
         <button class="btn diff" data-diff="normal">Normal</button>
         <button class="btn diff" data-diff="hard">Hard</button>
-        <button class="btn" id="pauseBtn" title="Tạm dừng">⏸️</button>
-        <button class="btn" id="soundBtn" title="Bật/tắt âm">🔊</button>
-        <button class="btn" id="voiceBtn" title="La để bay">🎙️</button>
+
+        <button class="btn iconBtn" id="pauseBtn" title="Tạm dừng">⏸️</button>
+        <button class="btn iconBtn" id="soundBtn" title="Âm">🔊</button>
+        <button class="btn iconBtn" id="voiceBtn" title="La để bay">🎙️</button>
+        <button class="btn iconBtn" id="skillBtn" title="Kĩ năng">⚡</button>
+
+        <button class="btn" id="classBtn">Class: Aqua</button>
 
         <button class="btn skin" data-skin="gold"><span class="dot" style="background:#facc15"></span>Gold</button>
         <button class="btn skin" data-skin="pink"><span class="dot" style="background:#fb7185"></span>Pink</button>
@@ -70,13 +75,12 @@
         <div class="btn" id="coinsPill">Feathers: 0</div>
       </div>
 
-      <!-- Mic meter -->
+      <div class="cdRing" id="cdRing" aria-hidden="true"><span></span></div>
       <div class="micMeter" id="micMeter" aria-hidden="true"><div class="fill" id="micFill"></div></div>
+      <div class="note">Slime + Classes (Aqua/Jet) • Daily + Mic + Shield/Magnet + Pulse pipes.</div>
 
-      <div class="note">v11: Pulse pipes + Neon + Shield/Magnet • Daily + Mic + Rung + Shop glow.</div>
-
-      <!-- Shop Overlay -->
-      <div class="shop" id="shop">
+      <!-- Shop -->
+      <div class="overlay" id="shop">
         <div class="panel">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
             <div style="font-weight:700">Shop</div>
@@ -85,6 +89,19 @@
           <div id="shopList"></div>
         </div>
       </div>
+
+      <!-- Classes -->
+      <div class="overlay" id="classes">
+        <div class="panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div style="font-weight:700">Classes</div>
+            <button class="btn" id="closeClasses">Đóng</button>
+          </div>
+          <div id="classInfo" class="price" style="margin-bottom:8px"></div>
+          <div id="classList"></div>
+        </div>
+      </div>
+
     </div>
   </div>
   <script>
@@ -99,135 +116,46 @@ function fit(){ dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
 }
 addEventListener('resize', fit); fit();
 
-// ===== Skins (có Neon) =====
+// ===== Palettes =====
 const SKINS={
-  gold:{player:'#facc15',pipe:'#22c55e',edge:'rgba(0,0,0,.15)',skyTop:'#0ea5e9',skyBot:'#0f172a',ground:'rgba(255,255,255,.08)'},
+  gold:{player:'#facc15',pipe:'#22c55e',edge:'rgba(0,0,0,.15)',skyTop:'#0ea5e9',skyBot:'#0b1020',ground:'rgba(255,255,255,.08)'},
   pink:{player:'#fb7185',pipe:'#34d399',edge:'rgba(0,0,0,.15)',skyTop:'#ec4899',skyBot:'#312e81',ground:'rgba(255,255,255,.10)'},
-  cyan:{player:'#22d3ee',pipe:'#10b981',edge:'rgba(0,0,0,.15)',skyTop:'#06b6d4',skyBot:'#0f172a',ground:'rgba(255,255,255,.08)'},
+  cyan:{player:'#22d3ee',pipe:'#10b981',edge:'rgba(0,0,0,.15)',skyTop:'#06b6d4',skyBot:'#0b1020',ground:'rgba(255,255,255,.08)'},
   neon:{player:'#a78bfa',pipe:'#22d3ee',edge:'rgba(0,0,0,.18)',skyTop:'#1f2937',skyBot:'#0b1020',ground:'rgba(255,255,255,.10)'}
 };
 
-// ===== Difficulty (đã siết) =====
+// ===== Difficulty =====
 const DIFFS={
   easy:  {speed:200, gravity:800,  jumpV:-240, spawnEvery:1500, spawnMin: 950, gapBase:200, gapMin:140, scoreSpawnFactor:5,  scoreGapFactor:1.3},
   normal:{speed:220, gravity:900,  jumpV:-280, spawnEvery:1400, spawnMin: 850, gapBase:180, gapMin:120, scoreSpawnFactor:8,  scoreGapFactor:1.5},
   hard:  {speed:240, gravity:1000, jumpV:-320, spawnEvery:1300, spawnMin: 750, gapBase:160, gapMin:100, scoreSpawnFactor:11, scoreGapFactor:1.8}
 };
 
-// ===== Currency & Owned & Inventory =====
+// ===== Currency & storage =====
 const CURRENCY_NAME='Feathers';
 let coins=+(localStorage.getItem('tapfly.coins')||0);
-let owned=JSON.parse(localStorage.getItem('tapfly.owned')||'{}');       // skins/trail
-let inv  = JSON.parse(localStorage.getItem('tapfly.inv')  || '{"shield":0,"magnet":0}'); // consumables
-let next = JSON.parse(localStorage.getItem('tapfly.next') || '{"shield":false,"magnet":false}'); // dùng ván sau
+let owned=JSON.parse(localStorage.getItem('tapfly.owned')||'{}');                 // skins/trail
+let inv  = JSON.parse(localStorage.getItem('tapfly.inv')  || '{"shield":0,"magnet":0}');
+let next = JSON.parse(localStorage.getItem('tapfly.next') || '{"shield":false,"magnet":false}');
 let diff=localStorage.getItem('tapfly.diff')||'easy';
 let skin=localStorage.getItem('tapfly.skin')||'gold';
 
-function saveCoins(){ localStorage.setItem('tapfly.coins', coins); updateCoinsPill(); updateShopGlow(); }
-function saveOwned(){ localStorage.setItem('tapfly.owned', JSON.stringify(owned)); }
-function saveInv(){ localStorage.setItem('tapfly.inv', JSON.stringify(inv)); }
-function saveNext(){ localStorage.setItem('tapfly.next', JSON.stringify(next)); }
+// ===== Classes & progress =====
+let classesOwned=JSON.parse(localStorage.getItem('tapfly.classes')||'{"aqua":true}');
+let classId=localStorage.getItem('tapfly.class')||'aqua';
+let classUnlocked=localStorage.getItem('tapfly.classesUnlocked')==='1';
+let classCore=+(localStorage.getItem('tapfly.classCore')||0);
 
-function ownsSkin(id){return id==='gold'||!!owned['skin.'+id];}
-function updateSkinButtons(){document.querySelectorAll('.btn.skin').forEach(b=>b.classList.toggle('locked',!ownsSkin(b.dataset.skin))); }
-if(!ownsSkin(skin)) skin='gold';
+function save(k,v){ localStorage.setItem(k, typeof v==='string'?v:JSON.stringify(v)); }
+function saveCoins(){ save('tapfly.coins', coins); updateCoinsPill(); updateShopGlow(); }
+function saveOwned(){ save('tapfly.owned', owned); }
+function saveInv(){ save('tapfly.inv', inv); }
+function saveNext(){ save('tapfly.next', next); }
+function saveClasses(){ save('tapfly.classes', classesOwned); save('tapfly.class', classId); }
 
-// Toast (dùng sớm)
-function toast(msg){ try{ const el=document.createElement('div'); el.textContent=msg;
-  el.style.position='absolute'; el.style.right='12px'; el.style.bottom='12px';
-  el.style.background='rgba(255,255,255,.12)'; el.style.border='1px solid rgba(255,255,255,.25)';
-  el.style.padding='8px 10px'; el.style.borderRadius='10px'; el.style.pointerEvents='none'; el.style.zIndex='40';
-  document.querySelector('.card').appendChild(el); setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .4s'; setTimeout(()=>el.remove(), 400); }, 900);
-}catch{} }
-
-// Daily bonus on open
-const today = new Date().toDateString(); const lastDay = localStorage.getItem('tapfly.day');
-if (lastDay !== today){ coins += 20; localStorage.setItem('tapfly.day', today); saveCoins(); toast('+20 daily'); }
-
-// Shop glow nếu đủ tiền món rẻ nhất chưa sở hữu (skin/trail)
-const SHOP=[]; // sẽ fill ở dưới
-function cheapestNeeded(){ let best=Infinity; for(const it of SHOP){ if((it.type==='skin'||it.type==='trail') && !owned[it.id]) best=Math.min(best,it.price); } return best; }
-function updateShopGlow(){ const need=cheapestNeeded();
-  if(!isFinite(need)) { shopBtn?.classList.remove('glow'); return; }
-  if(coins>=need) shopBtn?.classList.add('glow'); else shopBtn?.classList.remove('glow');
-}
-
-// ===== Daily Goal =====
-const DAILY_REWARD = 30;
-function seededGoal(dateStr){ let h=0; for(let i=0;i<dateStr.length;i++){ h=(h*31 + dateStr.charCodeAt(i))>>>0; } return 12 + (h % 11); } // 12..22
-const dayKey = new Date().toISOString().slice(0,10);
-let daily = JSON.parse(localStorage.getItem('tapfly.daily')||'{}');
-if(daily.date !== dayKey){ daily = {date:dayKey, goal: seededGoal(dayKey), done:false}; localStorage.setItem('tapfly.daily', JSON.stringify(daily)); }
-function completeDaily(){ if(!daily.done){ daily.done=true; localStorage.setItem('tapfly.daily', JSON.stringify(daily));
-  coins += DAILY_REWARD; saveCoins(); toast(`Daily +${DAILY_REWARD}F`); navigator.vibrate?.([60,60,60]); } }
-
-// ===== Game State =====
-const state={status:'menu',score:0,best:+(localStorage.getItem('tapfly.best')||0)};
-const player={x:120,y:(canvas.height/dpr)*0.5,vy:0,size:20};
-const pipes=[], pickups=[], trail=[]; let trailEnabled=!!owned['trail.spark'];
-let speed,gravity,jumpV,spawnMs=0;
-// Power-ups
-let shield=0, shieldGrace=0, magnetT=0;
-
-function applyDiff(){const d=DIFFS[diff]; speed=d.speed; gravity=d.gravity; jumpV=d.jumpV;
-  document.querySelectorAll('.btn.diff').forEach(b=>b.classList.toggle('active',b.dataset.diff===diff));
-  localStorage.setItem('tapfly.diff', diff);
-}
-function applySkin(){ document.querySelectorAll('.btn.skin').forEach(b=>b.classList.toggle('active', b.dataset.skin===skin));
-  localStorage.setItem('tapfly.skin', skin); updateSkinButtons();
-}
-function updateCoinsPill(){ const el=document.getElementById('coinsPill'); if(el) el.textContent=`${CURRENCY_NAME}: ${coins}`; }
-
-function reset(){ state.score=0; spawnMs=0; pipes.length=0; pickups.length=0; trail.length=0;
-  player.x=120; player.y=(canvas.height/dpr)*0.45; player.vy=0; shield=0; shieldGrace=0; magnetT=0;
-  applyDiff(); applySkin(); updateCoinsPill();
-}
-function start(){ reset(); state.status='playing';
-  // auto apply consumables đã chọn
-  if(next.shield && inv.shield>0){ shield=1; inv.shield--; saveInv(); next.shield=false; saveNext(); toast('🛡️ Shield ON'); }
-  if(next.magnet && inv.magnet>0){ magnetT=6; inv.magnet--; saveInv(); next.magnet=false; saveNext(); toast('🧲 Magnet 6s'); }
-}
-function over(){ state.status='gameover';
-  if(state.score>state.best){ state.best=state.score; localStorage.setItem('tapfly.best', state.best); }
-  if(!daily.done && state.score>=daily.goal) completeDaily();
-  sfxHit(); navigator.vibrate?.(60);
-}
-function flap(){ ensureAudio();
-  if(state.status==='menu'){ start(); sfxFlap(); }
-  else if(state.status==='playing'){ player.vy = jumpV; sfxFlap(); }
-  else if(state.status==='paused'){ state.status='playing'; sfxTick(); }
-  else if(state.status==='gameover'){ reset(); state.status='playing'; sfxFlap(); }
-}
-
-// ===== Input =====
-addEventListener('keydown', e=>{
-  if(e.code==='Space'||e.code==='ArrowUp'){ e.preventDefault(); flap(); }
-  if(e.code==='KeyR'){ reset(); state.status='playing'; }
-  if(e.code==='Digit1'||e.code==='KeyE'){ diff='easy'; reset(); sfxTick(); }
-  if(e.code==='Digit2'||e.code==='KeyN'){ diff='normal'; reset(); sfxTick(); }
-  if(e.code==='Digit3'||e.code==='KeyH'){ diff='hard'; reset(); sfxTick(); }
-  if(e.code==='KeyP'){ togglePause(); }
-},{passive:false});
-canvas.addEventListener('pointerdown', e=>{ e.preventDefault(); flap(); }, {passive:false});
-
-document.querySelectorAll('.btn.diff').forEach(btn=> btn.addEventListener('click', ()=>{ diff=btn.dataset.diff; reset(); sfxTick(); }));
-document.querySelectorAll('.btn.skin').forEach(btn=> btn.addEventListener('click', ()=>{
-  const id=btn.dataset.skin; if(!ownsSkin(id)){ shopBtn?.click(); sfxTick(); return; }
-  skin=id; applySkin(); sfxTick();
-}));
-
-// Pause / Sound / Shop
-const pauseBtn=document.getElementById('pauseBtn');
-function togglePause(){ if(state.status==='playing'){ state.status='paused'; pauseBtn.textContent='▶️'; sfxTick(); }
-  else if(state.status==='paused'){ state.status='playing'; pauseBtn.textContent='⏸️'; sfxTick(); } }
-pauseBtn?.addEventListener('click', togglePause);
-
-const soundBtn=document.getElementById('soundBtn'); let muted=false;
-soundBtn?.addEventListener('click', ()=>{ muted=!muted; soundBtn.textContent = muted?'🔇':'🔊'; sfxTick(); });
-
-// ===== Shop items (skins + consumables + trail) =====
+// ===== Shop items =====
 const shop=document.getElementById('shop'); const shopBtn=document.getElementById('shopBtn'); const closeShop=document.getElementById('closeShop');
-const SHOP_ITEMS=[
+const SHOP=[
   {id:'skin.pink',   type:'skin',   label:'Skin: Pink',   price:120, apply:()=>{skin='pink';  applySkin();}},
   {id:'skin.cyan',   type:'skin',   label:'Skin: Cyan',   price:120, apply:()=>{skin='cyan';  applySkin();}},
   {id:'skin.neon',   type:'skin',   label:'Skin: Neon',   price:150, apply:()=>{skin='neon';  applySkin();}},
@@ -235,26 +163,21 @@ const SHOP_ITEMS=[
   {id:'cons.magnet', type:'consum', label:'Magnet 6s',    price:20,  onBuy:()=>{inv.magnet++; saveInv();}},
   {id:'trail.spark', type:'trail',  label:'Trail: Spark', price:120, apply:()=>{trailEnabled=true;}}
 ];
-SHOP.push(...SHOP_ITEMS);
+function cheapestNeeded(){ let best=Infinity; for(const it of SHOP){ if((it.type==='skin'||it.type==='trail') && !owned[it.id]) best=Math.min(best,it.price); } return best; }
+function updateShopGlow(){ const need=cheapestNeeded(); if(!isFinite(need)) { shopBtn?.classList.remove('glow'); return; } if(coins>=need) shopBtn?.classList.add('glow'); else shopBtn?.classList.remove('glow'); }
 
 shopBtn?.addEventListener('click', ()=>{ renderShop(); shop.style.display='flex'; sfxTick(); });
 closeShop?.addEventListener('click', ()=>{ shop.style.display='none'; sfxTick(); });
 
 function renderShop(){
   const list=document.getElementById('shopList'); list.innerHTML='';
-  SHOP_ITEMS.forEach(item=>{
+  SHOP.forEach(item=>{
     const ownedFlag = (item.type==='skin'||item.type==='trail') ? !!owned[item.id] : false;
     const row=document.createElement('div'); row.className='row';
-
     let sub = `${CURRENCY_NAME}: ${item.price}`;
     if(item.type==='consum') sub += ` • Tồn: ${item.id==='cons.shield'?inv.shield:inv.magnet}`;
-
-    const left=document.createElement('div');
-    left.innerHTML=`<div class="title">${item.label}</div><div class="price">${sub}</div>`;
-
+    const left=document.createElement('div'); left.innerHTML=`<div class="title">${item.label}</div><div class="price">${sub}</div>`;
     const actions=document.createElement('div'); actions.className='actions';
-
-    // nút Mua
     const buy=document.createElement('button'); buy.className='btn';
     buy.textContent = (item.type==='consum') ? 'Mua x1' : (ownedFlag?'Đã mua':'Mua');
     buy.disabled = (item.type==='consum') ? (coins < item.price) : (ownedFlag || coins < item.price);
@@ -267,7 +190,6 @@ function renderShop(){
     });
     actions.appendChild(buy);
 
-    // equip / toggle
     if(item.type==='skin'){
       const equip=document.createElement('button'); equip.className='btn'; equip.textContent='Trang bị'; equip.disabled=!ownedFlag;
       equip.addEventListener('click', ()=>{ item.apply(); saveOwned(); renderShop(); toast('Skin đã trang bị'); });
@@ -286,11 +208,125 @@ function renderShop(){
       btnNext.addEventListener('click', ()=>{ next[id] = !next[id]; saveNext(); renderShop(); toast((next[id]?'Sẽ dùng: ':'Bỏ dùng: ')+item.label); });
       actions.appendChild(btnNext);
     }
-
     row.appendChild(left); row.appendChild(actions); list.appendChild(row);
   });
   updateCoinsPill(); updateShopGlow();
 }
+
+// ===== Classes registry =====
+const CLASSES = {
+  aqua: {
+    name:'Aqua', color:'#22d3ee', price:0,
+    desc:'Rơi mềm (−6% gravity). ⚡ Jet: bơm lực bay mạnh. CD 5s.',
+    cd:5000,
+    passiveInit(){ gravityMul = 0.94; },
+    canUse(){ return performance.now() >= skillReadyAt; },
+    use(){
+      if(!this.canUse() || state.status!=='playing') return;
+      player.vy = jumpV * 1.6;  // Jet
+      skillReadyAt = performance.now() + this.cd;
+      sfxFlap(); toast('JET!');
+      navigator.vibrate?.(18);
+    }
+  },
+  // placeholders (chưa kích hoạt)
+  phase:{name:'Phase', color:'#a78bfa', price:150, desc:'(Sắp có) Ghost 0.8s, CD 11s.'},
+  tempo:{name:'Tempo', color:'#60a5fa', price:150, desc:'(Sắp có) Slow 35% 2s, CD 12s.'},
+  gauss:{name:'Gauss', color:'#06b6d4', price:150, desc:'(Sắp có) Magnet Pulse, CD 12s.'}
+};
+
+// ===== Daily goal & bonus =====
+const DAILY_REWARD = 30;
+const today = new Date().toDateString(); const lastDay = localStorage.getItem('tapfly.day');
+if (lastDay !== today){ coins += 20; localStorage.setItem('tapfly.day', today); saveCoins(); toast('+20 daily'); }
+function seededGoal(dateStr){ let h=0; for(let i=0;i<dateStr.length;i++){ h=(h*31 + dateStr.charCodeAt(i))>>>0; } return 12 + (h % 11); }
+const dayKey = new Date().toISOString().slice(0,10);
+let daily = JSON.parse(localStorage.getItem('tapfly.daily')||'{}');
+if(daily.date !== dayKey){ daily = {date:dayKey, goal: seededGoal(dayKey), done:false}; localStorage.setItem('tapfly.daily', JSON.stringify(daily)); }
+function completeDaily(){ if(!daily.done){ daily.done=true; localStorage.setItem('tapfly.daily', JSON.stringify(daily));
+  coins += DAILY_REWARD; saveCoins(); toast(`Daily +${DAILY_REWARD}F`); navigator.vibrate?.([60,60,60]); } }
+
+// ===== State =====
+const state={status:'menu',score:0,best:+(localStorage.getItem('tapfly.best')||0)};
+const player={x:120,y:(canvas.height/dpr)*0.5,vy:0,size:22};
+const pipes=[], pickups=[], trail=[]; let trailEnabled=!!owned['trail.spark'];
+let speed,gravity,jumpV,spawnMs=0;
+// power-ups
+let shield=0, shieldGrace=0, magnetT=0;
+// class/skill runtime
+let gravityMul=1, slowFactor=1, skillReadyAt=0;
+
+// ===== Helpers =====
+function ownsSkin(id){return id==='gold'||!!owned['skin.'+id];}
+function updateSkinButtons(){document.querySelectorAll('.btn.skin').forEach(b=>b.classList.toggle('locked',!ownsSkin(b.dataset.skin))); }
+if(!ownsSkin(skin)) skin='gold';
+
+function applyDiff(){const d=DIFFS[diff]; speed=d.speed; gravity=d.gravity; jumpV=d.jumpV;
+  document.querySelectorAll('.btn.diff').forEach(b=>b.classList.toggle('active',b.dataset.diff===diff));
+  save('tapfly.diff', diff);
+}
+function applySkin(){ document.querySelectorAll('.btn.skin').forEach(b=>b.classList.toggle('active', b.dataset.skin===skin));
+  save('tapfly.skin', skin); updateSkinButtons();
+}
+function updateCoinsPill(){ const el=document.getElementById('coinsPill'); if(el) el.textContent=`${CURRENCY_NAME}: ${coins}`; }
+function updateClassUI(){
+  const b=document.getElementById('classBtn'); const c=CLASSES[classId]; if(b&&c) b.textContent='Class: '+c.name;
+}
+function reset(){
+  state.score=0; spawnMs=0; pipes.length=0; pickups.length=0; trail.length=0;
+  player.x=120; player.y=(canvas.height/dpr)*0.45; player.vy=0;
+  shield=0; shieldGrace=0; magnetT=0;
+  gravityMul=1; slowFactor=1; skillReadyAt=0;
+  applyDiff(); applySkin(); updateCoinsPill(); updateClassUI();
+  CLASSES[classId]?.passiveInit?.();
+}
+function start(){ reset(); state.status='playing';
+  if(next.shield && inv.shield>0){ shield=1; inv.shield--; saveInv(); next.shield=false; saveNext(); toast('🛡️ Shield ON'); }
+  if(next.magnet && inv.magnet>0){ magnetT=6; inv.magnet--; saveInv(); next.magnet=false; saveNext(); toast('🧲 Magnet 6s'); }
+}
+function over(){ state.status='gameover';
+  if(state.score>state.best){ state.best=state.score; localStorage.setItem('tapfly.best', state.best); }
+  if(!daily.done && state.score>=daily.goal) completeDaily();
+  // milestone mở Classes
+  if(!classUnlocked && state.score>=30){ classUnlocked=true; save('tapfly.classesUnlocked','1'); classCore+=1; save('tapfly.classCore', classCore); toast('🎓 Mở Classes! +1 Class Core'); }
+  sfxHit(); navigator.vibrate?.(60);
+}
+function flap(){ ensureAudio();
+  if(state.status==='menu'){ start(); sfxFlap(); }
+  else if(state.status==='playing'){ player.vy = jumpV; sfxFlap(); }
+  else if(state.status==='paused'){ state.status='playing'; sfxTick(); }
+  else if(state.status==='gameover'){ reset(); state.status='playing'; sfxFlap(); }
+}
+
+// ===== Input =====
+addEventListener('keydown', e=>{
+  if(e.code==='Space'||e.code==='ArrowUp'){ e.preventDefault(); flap(); }
+  if(e.code==='KeyR'){ reset(); state.status='playing'; }
+  if(e.code==='Digit1'||e.code==='KeyE'){ diff='easy'; reset(); sfxTick(); }
+  if(e.code==='Digit2'||e.code==='KeyN'){ diff='normal'; reset(); sfxTick(); }
+  if(e.code==='Digit3'||e.code==='KeyH'){ diff='hard'; reset(); sfxTick(); }
+  if(e.code==='KeyP'){ togglePause(); }
+  if(e.code==='KeyF'||e.code==='KeyX'){ castSkill(); } // phím nhanh cho skill
+},{passive:false});
+canvas.addEventListener('pointerdown', e=>{ e.preventDefault(); flap(); }, {passive:false});
+
+document.querySelectorAll('.btn.diff').forEach(btn=> btn.addEventListener('click', ()=>{ diff=btn.dataset.diff; reset(); sfxTick(); }));
+document.querySelectorAll('.btn.skin').forEach(btn=> btn.addEventListener('click', ()=>{
+  const id=btn.dataset.skin; if(!ownsSkin(id)){ shopBtn?.click(); sfxTick(); return; }
+  skin=id; applySkin(); sfxTick();
+}));
+
+const pauseBtn=document.getElementById('pauseBtn');
+function togglePause(){ if(state.status==='playing'){ state.status='paused'; pauseBtn.textContent='▶️'; sfxTick(); }
+  else if(state.status==='paused'){ state.status='playing'; pauseBtn.textContent='⏸️'; sfxTick(); } }
+pauseBtn?.addEventListener('click', togglePause);
+
+const soundBtn=document.getElementById('soundBtn'); let muted=false;
+soundBtn?.addEventListener('click', ()=>{ muted=!muted; soundBtn.textContent = muted?'🔇':'🔊'; sfxTick(); });
+
+const classBtn=document.getElementById('classBtn'); const classesOverlay=document.getElementById('classes');
+classBtn?.addEventListener('click', ()=>{ renderClasses(); classesOverlay.style.display='flex'; sfxTick(); });
+document.getElementById('closeClasses')?.addEventListener('click', ()=>{ classesOverlay.style.display='none'; sfxTick(); });
 
 // ===== AUDIO =====
 let ac=null; function ensureAudio(){ if(!ac){ const AC=window.AudioContext||window.webkitAudioContext; if(AC) ac=new AC(); }
@@ -318,28 +354,28 @@ async function startVoice(){ try{
 function stopVoice(){ mic.on=false; voiceBtn.textContent='🎙️'; try{ mic.stream?.getTracks().forEach(t=>t.stop()); }catch{} mic.stream=mic.src=mic.analyser=mic.data=null; }
 voiceBtn?.addEventListener('click', ()=>{ mic.on ? stopVoice() : startVoice(); sfxTick(); });
 
-// Khởi tạo nhỏ
-applyDiff(); applySkin(); updateCoinsPill(); updateShopGlow();
+// UI skill
+const skillBtn=document.getElementById('skillBtn'); const cdRing=document.getElementById('cdRing');
+skillBtn?.addEventListener('click', castSkill);
+function castSkill(){ const cls=CLASSES[classId]; if(!cls||!cls.use) return; cls.use(); }
+function updateSkillUI(){
+  const now=performance.now(); const left=Math.max(0, skillReadyAt - now);
+  skillBtn.disabled = left>0 || state.status!=='playing';
+  cdRing.style.display = left>0 ? 'grid' : 'none';
+  cdRing.querySelector('span').textContent = left>0 ? (left/1000).toFixed(1) : '';
+}
+
+// Khởi tạo
+applyDiff(); applySkin(); updateCoinsPill(); updateShopGlow(); updateClassUI(); CLASSES[classId]?.passiveInit?.();
 document.querySelector(`.btn.diff[data-diff="${diff}"]`)?.classList.add('active');
 document.querySelector(`.btn.skin[data-skin="${skin}"]`)?.classList.add('active');
 updateSkinButtons();
   </script>
   <script>
-// ===== Spawn & Gap helpers =====
-function targetSpawn(){
-  const d = DIFFS[diff];
-  return Math.max(d.spawnMin, d.spawnEvery - state.score * d.scoreSpawnFactor);
-}
-function gapHeight(){
-  const d = DIFFS[diff];
-  return Math.max(d.gapMin, d.gapBase - state.score * d.scoreGapFactor) * dpr;
-}
-// khe hiện tại có “thụt ra–vào”
-function currentGapH(p){
-  if(!p.pulseAmp) return p.gapH;
-  const osc = 0.5 + 0.5*Math.sin(p.phase);
-  return Math.max(p.gapMin, p.gapH - p.pulseAmp*osc);
-}
+// ===== Spawn helpers =====
+function targetSpawn(){ const d=DIFFS[diff]; return Math.max(d.spawnMin, d.spawnEvery - state.score*d.scoreSpawnFactor); }
+function gapHeight(){ const d=DIFFS[diff]; return Math.max(d.gapMin, d.gapBase - state.score*d.scoreGapFactor) * dpr; }
+function currentGapH(p){ if(!p.pulseAmp) return p.gapH; const osc=0.5+0.5*Math.sin(p.phase); return Math.max(p.gapMin, p.gapH - p.pulseAmp*osc); }
 
 // ===== Loop =====
 let last=performance.now();
@@ -347,8 +383,9 @@ function loop(now){
   let dt=(now-last)/1000; if(dt>0.033) dt=0.033; last=now;
 
   if(state.status==='playing'){
-    // physics
-    player.vy += gravity*dt; player.y += player.vy*dt;
+    // physics (dùng gravityMul & slowFactor nếu sau này có Timewarp)
+    player.vy += gravity*gravityMul*dt;
+    player.y += player.vy*dt;
 
     // mic impulse
     if(mic.on && mic.analyser){
@@ -360,8 +397,8 @@ function loop(now){
       if(amp>0.02){ const scale = 0.6 + Math.min(1,amp)*1.1; player.vy = jumpV * scale; }
     }
 
-    // scroll + pulse phase
-    const scroll=speed*dt;
+    // scroll
+    const scroll=speed*slowFactor*dt;
     for(const p of pipes){ p.x -= scroll; if(p.pulseAmp>0) p.phase += p.pulseSpd * dt; }
     for(const c of pickups){ c.x -= scroll; }
     while(pipes.length && pipes[0].x + pipes[0].w < 0) pipes.shift();
@@ -370,17 +407,16 @@ function loop(now){
     // spawn
     spawnMs += dt*1000; const target = targetSpawn();
     if(spawnMs >= target){
-      spawnMs=0; const gapH=gapHeight();
-      const margin=40*dpr; const gapY=Math.random()*(canvas.height-gapH-margin*2)+margin;
+      spawnMs=0; const gH=gapHeight();
+      const margin=40*dpr; const gapY=Math.random()*(canvas.height-gH-margin*2)+margin;
       const pipe={
-        x:canvas.width+20*dpr, w:80*dpr, gapY, gapH,
+        x:canvas.width+20*dpr, w:85*dpr, gapY, gapH:gH,
         gapMin: DIFFS[diff].gapMin * dpr,
-        pulseAmp: (Math.random()<1) ? Math.min(60*dpr, gapH - DIFFS[diff].gapMin*dpr) : 0,
-        pulseSpd: 1.2 + Math.random()*0.8, phase: 0,
-        passed:false
+        pulseAmp: (Math.random()<1.2) ? Math.min(60*dpr, gH - DIFFS[diff].gapMin*dpr) : 0,
+        pulseSpd: 1.2 + Math.random()*0.8, phase: 0, passed:false
       };
       pipes.push(pipe);
-      if(Math.random()<0.35){ pickups.push({x:pipe.x+pipe.w+36*dpr,y:gapY+gapH/2,r:10*dpr,taken:false}); }
+      if(Math.random()<0.35){ pickups.push({x:pipe.x+pipe.w+36*dpr,y:gapY+gH/2,r:10*dpr,taken:false}); }
     }
 
     // score & accel
@@ -406,41 +442,36 @@ function loop(now){
       }
     }
 
-    // collect coins (magnet tăng bán kính)
+    // collect coins (+magnet radius)
     for(const c of pickups){ if(!c.taken){
       const cx=c.x, cy=c.y, cr=c.r; const pcx=px+s/2, pcy=py+s/2;
-      const dx=pcx-cx, dy=pcy-cy;
-      const extra = magnetT>0 ? 140*dpr : 0;
+      const dx=pcx-cx, dy=pcy-cy; const extra = magnetT>0 ? 140*dpr : 0;
       if(dx*dx + dy*dy <= (cr + s*0.5 + extra)*(cr + s*0.5 + extra)){ c.taken=true; coins+=5; saveCoins(); sfxCoin(); }
     } }
-
-    // trail
-    if(trailEnabled){ trail.push({x:px+s/2,y:py+s/2,a:1}); if(trail.length>14) trail.shift(); for(const t of trail) t.a=Math.max(0, t.a - dt*2); }
   }
 
   // draw
   const W=canvas.width, H=canvas.height; ctx.clearRect(0,0,W,H);
-  const pal = SKINS[skin] || SKINS.gold; const g = ctx.createLinearGradient(0,0,0,H); g.addColorStop(0, pal.skyTop); g.addColorStop(1, pal.skyBot); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  const pal = SKINS[skin] || SKINS.gold; const bg = ctx.createLinearGradient(0,0,0,H); bg.addColorStop(0, pal.skyTop); bg.addColorStop(1, pal.skyBot); ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
   ctx.fillStyle=pal.ground; ctx.fillRect(0,H-24*dpr,W,24*dpr);
 
   // pickups
   for(const c of pickups){ if(!c.taken){ ctx.save(); ctx.shadowColor='rgba(255,215,0,.35)'; ctx.shadowBlur=16*dpr; ctx.fillStyle='#fde047'; ctx.beginPath(); ctx.arc(c.x,c.y,c.r,0,Math.PI*2); ctx.fill(); ctx.restore(); ctx.fillStyle='rgba(0,0,0,.25)'; ctx.fillRect(c.x+c.r-4*dpr, c.y-c.r, 4*dpr, c.r*2); } }
 
-  // pipes (dùng khe hiện tại)
+  // pipes
   for(const p of pipes){
     const gH = currentGapH(p);
     ctx.fillStyle=pal.pipe;
     ctx.fillRect(p.x,0,p.w,p.gapY);
     ctx.fillRect(p.x,p.gapY+gH,p.w,H-(p.gapY+gH));
-    ctx.fillStyle=pal.edge; ctx.fillRect(p.x+p.w-6*dpr,0,6*dpr,H);
+    const EDGE=4*dpr; ctx.fillStyle=pal.edge; ctx.fillRect(p.x+p.w-EDGE,0,EDGE,H);
   }
 
   // trail
   if(trailEnabled){ for(const t of trail){ ctx.globalAlpha=t.a; ctx.fillStyle=pal.player; ctx.beginPath(); ctx.arc(t.x,t.y,6*dpr*(0.5+t.a*0.5),0,Math.PI*2); ctx.fill(); } ctx.globalAlpha=1; }
 
-  // player
-  ctx.save(); ctx.shadowColor='rgba(0,0,0,.35)'; ctx.shadowBlur=16*dpr; ctx.fillStyle=pal.player;
-  const s=player.size*dpr, x=player.x*dpr, y=player.y*dpr; roundRect(ctx,x,y,s,s,6*dpr); ctx.fill(); ctx.restore();
+  // slime
+  drawSlime(ctx, player.x*dpr, player.y*dpr, player.size*dpr, pal.player);
 
   // HUD
   ctx.fillStyle='#fff'; ctx.font=(24*dpr)+'px ui-sans-serif,system-ui'; ctx.textAlign='left'; ctx.textBaseline='top';
@@ -466,20 +497,95 @@ function loop(now){
     }
   }
 
-  // mic meter
+  // mic & skill UI updates
   const bar=document.getElementById('micFill'); const meter=document.getElementById('micMeter');
   if(bar){ const w = Math.max(0, Math.min(1, mic.level*2.4)); bar.style.width = (w*100).toFixed(0)+'%'; meter.style.opacity = mic.on ? '1' : '0.5'; }
+  updateSkillUI();
 
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
 
-function roundRect(ctx,x,y,w,h,r){ r=Math.min(r,w/2,h/2); ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
-</script>
+// ===== Draw slime =====
+function drawSlime(ctx, x, y, s, color){
+  // squash & stretch theo vận tốc
+  const t = Math.max(-0.35, Math.min(0.35, -player.vy/900));
+  const rx = s*(0.72 + (-t)*0.30);
+  const ry = s*(0.72 + ( t)*0.45);
 
+  // thân
+  const grd = ctx.createRadialGradient(x-rx*0.3, y-ry*0.4, s*0.1, x, y, Math.max(rx,ry));
+  grd.addColorStop(0, 'rgba(255,255,255,.35)');
+  grd.addColorStop(1, color);
+  ctx.save();
+  ctx.shadowColor='rgba(0,0,0,.35)'; ctx.shadowBlur=16*dpr;
+  ctx.beginPath(); ellipsePath(ctx, x, y, rx, ry, 10*dpr); ctx.fillStyle=grd; ctx.fill(); ctx.restore();
+
+  // mắt
+  ctx.fillStyle='#000'; const eyeX = x + rx*0.22; const eyeY = y - ry*0.10;
+  ctx.beginPath(); ctx.arc(eyeX, eyeY, s*0.10, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(eyeX- s*0.03, eyeY- s*0.03, s*0.04, 0, Math.PI*2); ctx.fill();
+
+  // trail điểm sáng
+  trail.push({x:x,y:y,a:0.75}); if(trail.length>12) trail.shift(); for(const t of trail) t.a=Math.max(0, t.a - 0.04);
+}
+function ellipsePath(ctx,x,y,rx,ry,r){
+  r=Math.min(r,rx,ry);
+  ctx.moveTo(x-rx+r, y-ry);
+  ctx.arcTo(x+rx, y-ry, x+rx, y+ry, r);
+  ctx.arcTo(x+rx, y+ry, x-rx, y+ry, r);
+  ctx.arcTo(x-rx, y+ry, x-rx, y-ry, r);
+  ctx.arcTo(x-rx, y-ry, x+rx, y-ry, r);
+}
 <script>
-// SW (bump cache trong sw.js)
+// ===== Classes overlay render =====
+function renderClasses(){
+  const info=document.getElementById('classInfo');
+  info.textContent = classUnlocked ? `Bạn có ${classCore} Class Core. Mở khoá 1 class miễn phí hoặc dùng Feathers.` :
+                                     `Cần đạt ≥30 ống để mở mục Classes (sau khi Game Over).`;
+  const list=document.getElementById('classList'); list.innerHTML='';
+
+  for(const id of Object.keys(CLASSES)){
+    const c = CLASSES[id];
+    const row=document.createElement('div'); row.className='row';
+    const left=document.createElement('div');
+    const ownedFlag=!!classesOwned[id];
+    const price = (c.price||0);
+    let sub = ownedFlag?'Đã sở hữu':(price>0?`${CURRENCY_NAME}: ${price}`:'Miễn phí');
+    left.innerHTML = `<div class="title">${c.name}</div><div class="price">${sub} • ${c.desc||''}</div>`;
+
+    const actions=document.createElement('div'); actions.className='actions';
+    const buy=document.createElement('button'); buy.className='btn';
+    buy.textContent = ownedFlag?'Sở hữu':'Mua';
+    buy.disabled = ownedFlag || (!classUnlocked) || (classCore<=0 && coins<price);
+    buy.addEventListener('click', ()=>{
+      if(ownedFlag || !classUnlocked) return;
+      if(classCore>0){ classCore--; save('tapfly.classCore', classCore); }
+      else { if(coins<price) return; coins-=price; saveCoins(); }
+      classesOwned[id]=true; saveClasses(); renderClasses(); toast('Mở: '+c.name);
+    });
+    actions.appendChild(buy);
+
+    const equip=document.createElement('button'); equip.className='btn';
+    equip.textContent = 'Chọn';
+    equip.disabled = !ownedFlag;
+    equip.addEventListener('click', ()=>{ classId=id; saveClasses(); updateClassUI(); toast('Class: '+c.name); });
+    actions.appendChild(equip);
+
+    row.appendChild(left); row.appendChild(actions); list.appendChild(row);
+  }
+}
+
+// ===== Toast =====
+function toast(msg){ try{ const el=document.createElement('div'); el.textContent=msg;
+  el.style.position='absolute'; el.style.right='12px'; el.style.bottom='12px';
+  el.style.background='rgba(255,255,255,.12)'; el.style.border='1px solid rgba(255,255,255,.25)';
+  el.style.padding='8px 10px'; el.style.borderRadius='10px'; el.style.pointerEvents='none'; el.style.zIndex='40';
+  document.querySelector('.card').appendChild(el); setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .4s'; setTimeout(()=>el.remove(), 400); }, 900);
+}catch{} }
+
+// ===== Service Worker =====
 if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js'); }
 </script>
 </body>
-</html>
+</html>                                                                                                        </script>
