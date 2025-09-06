@@ -254,6 +254,16 @@ let trailEnabled=true; let trailStyle='soft';
 let speed,gravity,jumpV,spawnMs=0;
 let shield=0,shieldGrace=0,magnetT=0;
 let gravityMul=1,slowFactor=1,skillReadyAt=0,phaseUntil=0,slowUntil=0;
+    // ===== MAZE SCHEDULE & SCALING =====
+const MAZE_SCORES = [16, 30, 60, 70, 80, 90, 99];
+let nextMazeIdx = 0;                      // reset() sẽ gán lại = 0
+const MAZE_BASE_SPEED = 14 * dpr;         // speed gốc đang dùng trong code hiện tại
+const MAZE_BASE_MULT  = 1.5;              // mốc 16: +50%
+function mazeScale(idx){                  // idx=0 tại mốc 16
+  const f = Math.pow(1.05, idx);          // +5% mỗi maze
+  return { speed: MAZE_BASE_SPEED * MAZE_BASE_MULT * f,  // ép tường
+           complex: f };                                  // độ phức tạp mê cung
+}
 
 // Maze runtime (giảm tốc tường như yêu cầu)
 let mazeActive=false,mazeTriggered=false,mazeHits=0,mazeHitsMax=6,mazeFade=0;
@@ -545,131 +555,105 @@ function drawSlime(ctx,x,y,s,color){
 function ellipsePath(ctx,x,y,rx,ry,r){r=Math.min(r,rx,ry);ctx.moveTo(x-rx+r,y-ry);ctx.arcTo(x+rx,y-ry,x+rx,y+ry,r);ctx.arcTo(x+rx,y+ry,x-rx,y+ry,r);ctx.arcTo(x-rx,y+ry,x-rx,y-ry,r);ctx.arcTo(x-rx,y-ry,x+rx,y-ry,r);}
 
 // ===== Maze (same logic, tường chậm hơn) =====
-  function startMaze(){
-  mazeTriggered=true; mazeActive=true; mazeHits=0; maze.keys.length=0; maze.obs.length=0;
-  trailStyle='comet'; trailEnabled=true;
+function startMaze(idx = nextMazeIdx-1){
+  mazeTriggered = true; mazeActive = true;
+  maze.keys = []; maze.obs = []; trailStyle='comet'; trailEnabled=true;
 
-  // tường khép chậm lại
-  maze.leftX=0; maze.rightX=canvas.width; maze.speed=14*dpr; 
+  // reset tường
+  maze.leftX = 0; maze.rightX = canvas.width;
   setWallWidth(0,0);
 
-  // ====== Maze kiểu lưới: tường dày, hành lang rộng, ít phức tạp ======
-  const W=canvas.width, H=canvas.height;
+  // hệ số theo level
+  const S = mazeScale(idx);
+  maze.speed   = S.speed;     // ép tường nhanh/chậm
+  maze.complex = S.complex;   // phức tạp mê cung
 
-  // vùng chơi chiếm ~ 78% chiều rộng/60% chiều cao, canh giữa
+  // ==== Generator mê cung dạng lưới (ít ngoằn, tường dày, hành lang rộng) ====
+  const W=canvas.width, H=canvas.height;
   const PADX=W*0.11, PADY=H*0.20, AREA_W=W-PADX*2, AREA_H=H-PADY*2;
 
-  // số ô: ít để dễ (ngang 8–10 cột, dọc 5–6 hàng)
-  const COLS=9, ROWS=6;
+  const COLS = Math.max(8, Math.round(9 * S.complex));
+  const ROWS = Math.max(5, Math.round(6 * (0.95 + 0.05*S.complex)));
 
-  // kích thước 1 ô & độ dày tường
   const CELL_W = Math.floor(AREA_W / COLS);
   const CELL_H = Math.floor(AREA_H / ROWS);
-  const WALL   = Math.floor(18 * dpr);                 // tường dày hơn
-  const COR_W  = CELL_W;                               // hành lang = cell
-  const COR_H  = CELL_H;
+  const WALL   = Math.floor(18 * dpr);
+  const COR_W  = CELL_W, COR_H = CELL_H;
 
-  // lưới tường: 1 = có tường, 0 = đục
-  const vert = Array.from({length:ROWS}, ()=>Array(COLS+1).fill(1));   // tường dọc giữa các cell
-  const horiz= Array.from({length:ROWS+1},()=>Array(COLS).fill(1));    // tường ngang
+  const vert = Array.from({length:ROWS}, ()=>Array(COLS+1).fill(1));
+  const horiz= Array.from({length:ROWS+1},()=>Array(COLS).fill(1));
 
-  // carve bằng DFS (độ phức tạp thấp: ưu tiên đi thẳng)
   const seen=Array.from({length:ROWS},()=>Array(COLS).fill(false));
   const stack=[[0,0]]; seen[0][0]=true;
   function neigh(x,y){
-    const ns=[];
-    if(y>0) ns.push([x,y-1,'up']);
-    if(x<COLS-1) ns.push([x+1,y,'right']);
-    if(y<ROWS-1) ns.push([x,y+1,'down']);
-    if(x>0) ns.push([x-1,y,'left']);
-    // nhẹ tay random để đường ít ngoằn ngoèo
-    for(let i=ns.length-1;i>0;i--){const j=(Math.random()* (i+1))|0; [ns[i],ns[j]]=[ns[j],ns[i]];}
+    const ns=[]; if(y>0)ns.push([x,y-1,'up']); if(x<COLS-1)ns.push([x+1,y,'right']);
+    if(y<ROWS-1)ns.push([x,y+1,'down']); if(x>0)ns.push([x-1,y,'left']);
+    for(let i=ns.length-1;i>0;i--){const j=(Math.random()*(i+1))|0; [ns[i],ns[j]]=[ns[j],ns[i]];}
     return ns.filter(([nx,ny])=>!seen[ny][nx]);
   }
   while(stack.length){
-    const [x,y]=stack[stack.length-1];
-    const cand=neigh(x,y);
-    if(cand.length===0){ stack.pop(); continue; }
+    const [x,y]=stack[stack.length-1], cand=neigh(x,y);
+    if(!cand.length){ stack.pop(); continue; }
     const [nx,ny,dir]=cand[0];
-    // đục tường giữa (x,y) và (nx,ny)
-    if(dir==='right') vert[y][x+1]=0;
-    if(dir==='left')  vert[y][x]=0;
-    if(dir==='down')  horiz[y+1][x]=0;
-    if(dir==='up')    horiz[y][x]=0;
+    if(dir==='right') vert[y][x+1]=0; if(dir==='left') vert[y][x]=0;
+    if(dir==='down')  horiz[y+1][x]=0; if(dir==='up')   horiz[y][x]=0;
     seen[ny][nx]=true; stack.push([nx,ny]);
   }
 
-  // Làm “ít phức tạp”: mở thêm vài lỗ ngẫu nhiên
-  for(let k=0;k<Math.floor(COLS*ROWS*0.12);k++){
-    const x=(Math.random()*COLS)|0, y=(Math.random()*ROWS)|0;
-    if(Math.random()<0.5) vert[y][(Math.random()*(COLS+1))|0]=0; else horiz[(Math.random()*(ROWS+1))|0][x]=0;
+  // Lỗ phụ: càng phức tạp thì càng ÍT lỗ → khó hơn
+  const extra = Math.max(0, 0.10 / S.complex - 0.02);
+  const extraCount = Math.floor(COLS*ROWS*extra);
+  for(let k=0;k<extraCount;k++){
+    if(Math.random()<0.5){ const y=(Math.random()*ROWS)|0, x=(Math.random()*(COLS+1))|0; vert[y][x]=0; }
+    else{ const y=(Math.random()*(ROWS+1))|0, x=(Math.random()*COLS)|0; horiz[y][x]=0; }
   }
 
-  // biên ngoài luôn kín (viền)
+  // viền kín
   for(let x=0;x<COLS;x++){ horiz[0][x]=1; horiz[ROWS][x]=1; }
   for(let y=0;y<ROWS;y++){ vert[y][0]=1;  vert[y][COLS]=1; }
 
-  // Convert tường lưới => hình chữ nhật (o.x,y,w,h) để engine va chạm dùng
   const baseX=PADX, baseY=PADY;
-  // tường ngang
+  // ngang
   for(let y=0;y<=ROWS;y++){
-    let run=0, x0=0;
+    let run=0,x0=0;
     for(let x=0;x<COLS;x++){
-      const w = horiz[y][x];
-      if(w){ if(run===0) x0=x; run++; }
-      else if(run){ 
-        const rx = baseX + x0*COR_W - WALL/2;
-        const ry = baseY + y*COR_H - WALL/2;
-        const rw = run*COR_W + WALL;
-        maze.obs.push({x:rx, y:ry, w:rw, h:WALL});
-        run=0;
-      }
-    }
-    if(run){
-      const rx = baseX + x0*COR_W - WALL/2;
-      const ry = baseY + y*COR_H - WALL/2;
-      const rw = run*COR_W + WALL;
-      maze.obs.push({x:rx, y:ry, w:rw, h:WALL});
-    }
-  }
-  // tường dọc
-  for(let x=0;x<=COLS;x++){
-    let run=0, y0=0;
-    for(let y=0;y<ROWS;y++){
-      const v = vert[y][x];
-      if(v){ if(run===0) y0=y; run++; }
+      const w=horiz[y][x];
+      if(w){ if(!run)x0=x; run++; }
       else if(run){
-        const rx = baseX + x*COR_W - WALL/2;
-        const ry = baseY + y0*COR_H - WALL/2;
-        const rh = run*COR_H + WALL;
-        maze.obs.push({x:rx, y:ry, w:WALL, h:rh});
-        run=0;
+        const rx=baseX+x0*COR_W - WALL/2, ry=baseY+y*COR_H - WALL/2, rw=run*COR_W + WALL;
+        maze.obs.push({x:rx,y:ry,w:rw,h:WALL}); run=0;
       }
     }
-    if(run){
-      const rx = baseX + x*COR_W - WALL/2;
-      const ry = baseY + y0*COR_H - WALL/2;
-      const rh = run*COR_H + WALL;
-      maze.obs.push({x:rx, y:ry, w:WALL, h:rh});
+    if(run){ const rx=baseX+x0*COR_W - WALL/2, ry=baseY+y*COR_H - WALL/2, rw=run*COR_W + WALL;
+      maze.obs.push({x:rx,y:ry,w:rw,h:WALL}); }
+  }
+  // dọc
+  for(let x=0;x<=COLS;x++){
+    let run=0,y0=0;
+    for(let y=0;y<ROWS;y++){
+      const v=vert[y][x];
+      if(v){ if(!run)y0=y; run++; }
+      else if(run){
+        const rx=baseX+x*COR_W - WALL/2, ry=baseY+y0*COR_H - WALL/2, rh=run*COR_H + WALL;
+        maze.obs.push({x:rx,y:ry,w:WALL,h:rh}); run=0;
+      }
     }
+    if(run){ const rx=baseX+x*COR_W - WALL/2, ry=baseY+y0*COR_H - WALL/2, rh=run*COR_H + WALL;
+      maze.obs.push({x:rx,y:ry,w:WALL,h:rh}); }
   }
 
-  // đặt 3 key ở những cell xa điểm đầu cho dễ thấy
-  const cells=[];
-  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++)cells.push([x,y]);
-  cells.sort((a,b)=> (b[0]+b[1])-(a[0]+a[1]) ); // xa góc (0,0) hơn lên trước
+  // 3 key
+  const cells=[]; for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++)cells.push([x,y]);
+  cells.sort((a,b)=>(b[0]+b[1])-(a[0]+a[1]));
   for(let i=0,k=0;i<cells.length && k<3;i++){
-    const [cx,cy]=cells[i];
-    // bỏ viền 1 ô cho rộng
-    if(cx<1||cy<1||cx>COLS-2||cy>ROWS-2) continue;
-    const kx = baseX + cx*COR_W + COR_W*0.5;
-    const ky = baseY + cy*COR_H + COR_H*0.5;
-    maze.keys.push({x:kx, y:ky, r:12*dpr, taken:false}); k++;
+    const [cx,cy]=cells[i]; if(cx<1||cy<1||cx>COLS-2||cy>ROWS-2) continue;
+    const kx=baseX+cx*COR_W+COR_W*.5, ky=baseY+cy*COR_H+COR_H*.5;
+    maze.keys.push({x:kx,y:ky,r:12*dpr,taken:false}); k++;
   }
 
-  pipes.length=0; pickups.length=0; spawnMs=0;
-  toast('MAZE! Dạng lưới, ◀ ▶ + nhảy để lụm 3 key');}
-
+  toast(`Maze #${idx+1}`);
+    }
+    
 // DOM tường
 const wallL = document.getElementById('wallL');
 const wallR = document.getElementById('wallR');
