@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tap-to-Fly — Slime & Classes v14</title>
+  <title>Tap-to-Fly — Slime + Classes + Maze</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0f172a">
   <style>
@@ -44,7 +44,7 @@
     .cdRing{position:absolute;bottom:44px;left:calc(12px + 44px + 8px);width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,.25);display:grid;place-items:center;pointer-events:none}
     .cdRing span{font-size:11px;opacity:.9}
 
-    /* Big skill button on the left */
+    /* Nút ⚡ to bên trái */
     .skillBig{
       position:absolute; left:10px; top:50%; transform:translateY(-50%);
       width:96px; height:96px; border-radius:999px; z-index:25;
@@ -57,6 +57,20 @@
     @media (max-width:420px){
       .skillBig{ width:84px; height:84px; font-size:36px; left:8px; }
     }
+
+    /* Nút trái/phải cho Maze */
+    .lrPad{position:absolute;inset:0;display:none;pointer-events:none;z-index:26}
+    .lrPad .pad{position:absolute;bottom:16px;width:36%;height:30%;max-width:280px;border-radius:18px;border:2px solid rgba(255,255,255,.18);
+      background:rgba(255,255,255,.08);display:grid;place-items:center;font-size:26px;pointer-events:auto;user-select:none}
+    .lrPad .pad:active{transform:scale(.98)}
+    .lrPad .left{left:16px}
+    .lrPad .right{right:16px}
+
+    /* Vẽ tường mép màn (màu cyan) khi Maze */
+    .mazeWall { position:absolute; top:0; bottom:0; width:0; background:linear-gradient(0deg, rgba(34,211,238,.25), rgba(34,211,238,.08)); z-index:24; pointer-events:none; }
+    #wallL{ left:0 }
+    #wallR{ right:0 }
+
   </style>
 </head>
 <body>
@@ -65,7 +79,7 @@
       <canvas id="game"></canvas>
 
       <div class="hud">
-        <div class="pill">Space/↑ hoặc chạm = bay • P = pause • ⚡ = kĩ năng • 🎙️ = la để bay</div>
+        <div class="pill">Chạm/Space = bay • P = pause • ⚡ = kĩ năng • 🎙️ = mic • ◀ ▶ = trái/phải (chỉ khi Maze)</div>
         <div class="pill">R = chơi lại</div>
       </div>
 
@@ -94,8 +108,17 @@
 
       <div class="cdRing" id="cdRing" aria-hidden="true"><span></span></div>
       <button id="skillBig" class="skillBig" title="Kĩ năng"><span id="skillBigLabel">⚡</span></button>
+
+      <div class="lrPad" id="lrPad" aria-hidden="true">
+        <button class="pad left"  id="btnLeft">◀</button>
+        <button class="pad right" id="btnRight">▶</button>
+      </div>
+
+      <div id="wallL" class="mazeWall"></div>
+      <div id="wallR" class="mazeWall"></div>
+
       <div class="micMeter" id="micMeter" aria-hidden="true"><div class="fill" id="micFill"></div></div>
-      <div class="note">Slime + Classes (Aqua/Jet) • Daily + Mic + Shield/Magnet + Pulse pipes.</div>
+      <div class="note">Slime + Classes + Trail + Maze Event @35.</div>
 
       <!-- Shop -->
       <div class="overlay" id="shop">
@@ -122,7 +145,7 @@
 
     </div>
   </div>
-<script>
+  <script>
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 let dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
@@ -143,12 +166,12 @@ const SKINS={
 
 // Difficulty
 const DIFFS={
-  easy:  {speed:200, gravity:750,  jumpV:-240, spawnEvery:1650, spawnMin: 1050, gapBase:180, gapMin:160, scoreSpawnFactor:6,  scoreGapFactor:1.3},
-  normal:{speed:220, gravity:850,  jumpV:-280, spawnEvery:1550, spawnMin: 950, gapBase:160, gapMin:140, scoreSpawnFactor:8,  scoreGapFactor:1.5},
-  hard:  {speed:240, gravity:950, jumpV:-320, spawnEvery:1450, spawnMin: 850, gapBase:140, gapMin:120, scoreSpawnFactor:10, scoreGapFactor:1.8}
+  easy:  {speed:180, gravity:900,  jumpV:-240, spawnEvery:1650, spawnMin:1050, gapBase:230, gapMin:180, scoreSpawnFactor:6,  scoreGapFactor:1.3, hits:6},
+  normal:{speed:200, gravity:950,  jumpV:-280, spawnEvery:1550, spawnMin: 950, gapBase:205, gapMin:160, scoreSpawnFactor:8,  scoreGapFactor:1.5, hits:4},
+  hard:  {speed:230, gravity:1000, jumpV:-320, spawnEvery:1450, spawnMin: 900, gapBase:180, gapMin:140, scoreSpawnFactor:10, scoreGapFactor:1.8, hits:2}
 };
 
-// Storage
+// Currency & storage
 const CURRENCY_NAME='Feathers';
 let coins=+(localStorage.getItem('tapfly.coins')||0);
 let owned=JSON.parse(localStorage.getItem('tapfly.owned')||'{}');
@@ -156,8 +179,8 @@ let inv  = JSON.parse(localStorage.getItem('tapfly.inv')  || '{"shield":0,"magne
 let next = JSON.parse(localStorage.getItem('tapfly.next') || '{"shield":false,"magnet":false}');
 let diff=localStorage.getItem('tapfly.diff')||'easy';
 let skin=localStorage.getItem('tapfly.skin')||'gold';
-  
-  // Background theme + clock
+
+// BG theme + clock
 let bgTheme = localStorage.getItem('tapfly.bg') || 'aurora';
 let timeSec = 0;
 const BGs = ['aurora', 'city', 'mount'];
@@ -165,7 +188,7 @@ function setBG(t){ bgTheme = t; localStorage.setItem('tapfly.bg', t);
   const label = t==='aurora'?'Aurora':(t==='city'?'City':'Mount');
   document.getElementById('bgBtn')?.replaceChildren('BG: '+label);
 }
-setBG(bgTheme); // set lần đầu
+setBG(bgTheme);
 
 // Classes
 let classesOwned=JSON.parse(localStorage.getItem('tapfly.classes')||'{"aqua":true}');
@@ -173,6 +196,7 @@ let classId=localStorage.getItem('tapfly.class')||'aqua';
 let classUnlocked=localStorage.getItem('tapfly.classesUnlocked')==='1';
 let classCore=+(localStorage.getItem('tapfly.classCore')||0);
 
+// Save helpers
 function save(k,v){ localStorage.setItem(k, typeof v==='string'?v:JSON.stringify(v)); }
 function saveCoins(){ save('tapfly.coins', coins); updateCoinsPill(); updateShopGlow(); }
 function saveOwned(){ save('tapfly.owned', owned); }
@@ -186,9 +210,9 @@ const SHOP=[
   {id:'skin.pink',   type:'skin',   label:'Skin: Pink',   price:120, apply:()=>{skin='pink';  applySkin();}},
   {id:'skin.cyan',   type:'skin',   label:'Skin: Cyan',   price:120, apply:()=>{skin='cyan';  applySkin();}},
   {id:'skin.neon',   type:'skin',   label:'Skin: Neon',   price:150, apply:()=>{skin='neon';  applySkin();}},
+  {id:'trail.comet', type:'trail',  label:'Trail: Comet', price:140, apply:()=>{trailStyle='comet'; trailEnabled=true;}},
   {id:'cons.shield', type:'consum', label:'Shield x1',    price:25,  onBuy:()=>{inv.shield++; saveInv();}},
-  {id:'cons.magnet', type:'consum', label:'Magnet 6s',    price:20,  onBuy:()=>{inv.magnet++; saveInv();}},
-  {id:'trail.spark', type:'trail',  label:'Trail: Spark', price:120, apply:()=>{trailEnabled=true;}}
+  {id:'cons.magnet', type:'consum', label:'Magnet 6s',    price:20,  onBuy:()=>{inv.magnet++; saveInv();}}
 ];
 function cheapestNeeded(){ let best=Infinity; for(const it of SHOP){ if((it.type==='skin'||it.type==='trail') && !owned[it.id]) best=Math.min(best,it.price); } return best; }
 function updateShopGlow(){ const need=cheapestNeeded(); if(!isFinite(need)) { shopBtn?.classList.remove('glow'); return; } if(coins>=need) shopBtn?.classList.add('glow'); else shopBtn?.classList.remove('glow'); }
@@ -217,15 +241,10 @@ function renderShop(){
     });
     actions.appendChild(buy);
 
-    if(item.type==='skin'){
+    if(item.type==='skin' || item.type==='trail'){
       const equip=document.createElement('button'); equip.className='btn'; equip.textContent='Trang bị'; equip.disabled=!ownedFlag;
-      equip.addEventListener('click', ()=>{ item.apply(); saveOwned(); renderShop(); toast('Skin đã trang bị'); });
+      equip.addEventListener('click', ()=>{ item.apply(); saveOwned(); renderShop(); toast('Trang bị xong'); });
       actions.appendChild(equip);
-    }
-    if(item.type==='trail'){
-      const toggle=document.createElement('button'); toggle.className='btn'; toggle.textContent='Bật trail'; toggle.disabled=!ownedFlag;
-      toggle.addEventListener('click', ()=>{ item.apply(); saveOwned(); renderShop(); toast('Trail ON'); });
-      actions.appendChild(toggle);
     }
     if(item.type==='consum'){
       const id = item.id==='cons.shield' ? 'shield' : 'magnet';
@@ -240,7 +259,7 @@ function renderShop(){
   updateCoinsPill(); updateShopGlow();
 }
 
-// Classes registry
+// Classes
 const CLASSES = {
   aqua: {
     name:'Aqua', color:'#22d3ee', price:0,
@@ -250,7 +269,7 @@ const CLASSES = {
     canUse(){ return performance.now() >= skillReadyAt; },
     use(){
       if(!this.canUse() || state.status!=='playing') return;
-      player.vy = jumpV * 1.6;                // lực Jet
+      player.vy = jumpV * 1.6;
       skillReadyAt = performance.now() + this.cd;
       sfxFlap(); toast('JET!'); navigator.vibrate?.(18);
     }
@@ -262,7 +281,7 @@ const CLASSES = {
     passiveInit(){},
     use(){
       if(state.status!=='playing' || performance.now()<skillReadyAt) return;
-      phaseUntil = performance.now() + 800;   // 0.8s vô định hình
+      phaseUntil = performance.now() + 800;
       skillReadyAt = performance.now() + this.cd;
       toast('PHASE!'); navigator.vibrate?.(20);
     }
@@ -274,8 +293,7 @@ const CLASSES = {
     passiveInit(){},
     use(){
       if(state.status!=='playing' || performance.now()<skillReadyAt) return;
-      slowUntil = performance.now() + 2000;   // 2s slow
-      slowFactor = 0.65;
+      slowUntil = performance.now() + 2000;   // set trong loop
       skillReadyAt = performance.now() + this.cd;
       toast('SLOW!'); navigator.vibrate?.(16);
     }
@@ -287,13 +305,13 @@ const CLASSES = {
     passiveInit(){},
     use(){
       if(state.status!=='playing' || performance.now()<skillReadyAt) return;
-      magnetT = Math.max(magnetT, 4);         // hút coin 4s
+      magnetT = Math.max(magnetT, 4);
       skillReadyAt = performance.now() + this.cd;
       toast('MAGNET!'); navigator.vibrate?.(16);
     }
   }
 };
-  
+
 // Daily
 const DAILY_REWARD = 30;
 const today = new Date().toDateString(); const lastDay = localStorage.getItem('tapfly.day');
@@ -308,17 +326,25 @@ function completeDaily(){ if(!daily.done){ daily.done=true; localStorage.setItem
 // State
 const state={status:'menu',score:0,best:+(localStorage.getItem('tapfly.best')||0)};
 const player={x:120,y:(canvas.height/dpr)*0.5,vy:0,size:22};
-const pipes=[], pickups=[], trail=[]; let trailEnabled=!!owned['trail.spark'];
+const pipes=[], pickups=[], trail=[]; let trailEnabled=!!owned['trail.comet'] || true; // mặc định có trail nhẹ
+let trailStyle = (owned['trail.comet']?'comet':'soft');
 let speed,gravity,jumpV,spawnMs=0;
+// power-ups
 let shield=0, shieldGrace=0, magnetT=0;
+// class/skill runtime
 let gravityMul=1, slowFactor=1, skillReadyAt=0, phaseUntil=0, slowUntil=0;
-  
+
+// MAZE runtime
+let mazeActive=false, mazeTriggered=false, mazeHits=0, mazeHitsMax=6, mazeFade=0;
+let moveX=0; // -1..1 từ nút trái/phải
+const maze={ leftX:0, rightX:canvas.width, speed:24*dpr, accel:1.15, keys:[], obs:[] };
+
 // Helpers
 function ownsSkin(id){return id==='gold'||!!owned['skin.'+id];}
 function updateSkinButtons(){document.querySelectorAll('.btn.skin').forEach(b=>b.classList.toggle('locked',!ownsSkin(b.dataset.skin))); }
 if(!ownsSkin(skin)) skin='gold';
 
-function applyDiff(){const d=DIFFS[diff]; speed=d.speed; gravity=d.gravity; jumpV=d.jumpV;
+function applyDiff(){const d=DIFFS[diff]; speed=d.speed; gravity=d.gravity; jumpV=d.jumpV; mazeHitsMax=d.hits;
   document.querySelectorAll('.btn.diff').forEach(b=>b.classList.toggle('active',b.dataset.diff===diff));
   save('tapfly.diff', diff);
 }
@@ -332,7 +358,10 @@ function reset(){
   state.score=0; spawnMs=0; pipes.length=0; pickups.length=0; trail.length=0;
   player.x=120; player.y=(canvas.height/dpr)*0.45; player.vy=0;
   shield=0; shieldGrace=0; magnetT=0;
-  gravityMul=1; slowFactor=1; skillReadyAt=0;
+  gravityMul=1; slowFactor=1; skillReadyAt=0; phaseUntil=0; slowUntil=0;
+  mazeActive=false; mazeTriggered=false; mazeHits=0; mazeFade=0; maze.keys.length=0; maze.obs.length=0;
+  document.getElementById('lrPad').style.display='none';
+  setWallWidth(0); // ẩn tường
   applyDiff(); applySkin(); updateCoinsPill(); updateClassUI();
   CLASSES[classId]?.passiveInit?.();
 }
@@ -362,7 +391,12 @@ addEventListener('keydown', e=>{
   if(e.code==='Digit3'||e.code==='KeyH'){ diff='hard'; reset(); sfxTick(); }
   if(e.code==='KeyP'){ togglePause(); }
   if(e.code==='KeyF'||e.code==='KeyX'){ castSkill(); }
+  if(e.code==='ArrowLeft'||e.code==='KeyA'){ moveX=-1; }
+  if(e.code==='ArrowRight'||e.code==='KeyD'){ moveX= 1; }
 },{passive:false});
+addEventListener('keyup', e=>{
+  if(['ArrowLeft','KeyA','ArrowRight','KeyD'].includes(e.code)) moveX=0;
+});
 canvas.addEventListener('pointerdown', e=>{ e.preventDefault(); flap(); }, {passive:false});
 
 document.querySelectorAll('.btn.diff').forEach(btn=> btn.addEventListener('click', ()=>{ diff=btn.dataset.diff; reset(); sfxTick(); }));
@@ -398,7 +432,7 @@ const sfxHit=()=>beep(180,.12,.045,'sawtooth');
 const sfxTick=()=>beep(520,.04,.025,'sine');
 const sfxCoin=()=>{ navigator.vibrate?.(12); beep(1200,.05,.035,'triangle'); };
 
-  // BGM đơn giản
+// BGM đơn giản
 let musicOn=false, bgmTimer=null, bpm=96;
 function playNote(freq=440,dur=0.2,vol=0.02,type='sine'){
   if(muted||!ac) return;
@@ -432,7 +466,7 @@ document.getElementById('musicBtn')?.addEventListener('click', ()=>{
 
 // Voice (mic)
 const voiceBtn=document.getElementById('voiceBtn');
-let mic={on:false,stream:null,src:null,analyser:null,data:null,level:0,thr:0.06};
+let mic={on:false,stream:null,src:null,analyser:null,data:null,level:0,thr:0.07};
 async function startVoice(){ try{
   ensureAudio(); const stream=await navigator.mediaDevices.getUserMedia({ audio:{ echoCancellation:true, noiseSuppression:true, autoGainControl:true }});
   mic.stream=stream; mic.src=ac.createMediaStreamSource(stream); mic.analyser=ac.createAnalyser(); mic.analyser.fftSize=1024; mic.data=new Float32Array(mic.analyser.fftSize);
@@ -440,13 +474,7 @@ async function startVoice(){ try{
 }catch{ toast('Mic bị chặn'); } }
 function stopVoice(){ mic.on=false; voiceBtn.textContent='🎙️'; try{ mic.stream?.getTracks().forEach(t=>t.stop()); }catch{} mic.stream=mic.src=mic.analyser=mic.data=null; }
 voiceBtn?.addEventListener('click', ()=>{ mic.on ? stopVoice() : startVoice(); sfxTick(); });
-// đổi theme nền
-document.getElementById('bgBtn')?.addEventListener('click', ()=>{
-  const i = BGs.indexOf(bgTheme);
-  setBG(BGs[(i+1)%BGs.length]);
-  sfxTick();
-});
-  
+
 // Skill UI
 const skillBtn=document.getElementById('skillBtn'); const cdRing=document.getElementById('cdRing');
 skillBtn?.addEventListener('click', castSkill);
@@ -467,25 +495,44 @@ function updateSkillUI(){
   }
 }
 
-// Init
+// BG theme switch
+document.getElementById('bgBtn')?.addEventListener('click', ()=>{
+  const i = BGs.indexOf(bgTheme); setBG(BGs[(i+1)%BGs.length]); sfxTick();
+});
+
+// On-screen left/right
+const lrPad=document.getElementById('lrPad');
+document.getElementById('btnLeft')?.addEventListener('pointerdown', ()=>{ moveX=-1; });
+document.getElementById('btnRight')?.addEventListener('pointerdown', ()=>{ moveX= 1; });
+['btnLeft','btnRight'].forEach(id=>{
+  const el=document.getElementById(id);
+  el?.addEventListener('pointerup', ()=>{ moveX=0; });
+  el?.addEventListener('pointerleave', ()=>{ moveX=0; });
+});
+
+// Init base UI
 applyDiff(); applySkin(); updateCoinsPill(); updateShopGlow(); updateClassUI(); CLASSES[classId]?.passiveInit?.();
 document.querySelector(`.btn.diff[data-diff="${diff}"]`)?.classList.add('active');
 document.querySelector(`.btn.skin[data-skin="${skin}"]`)?.classList.add('active');
 updateSkinButtons();
-</script>
-<script>
+  </script>
+  <script>
+// Spawn helpers
 function targetSpawn(){ const d=DIFFS[diff]; return Math.max(d.spawnMin, d.spawnEvery - state.score*d.scoreSpawnFactor); }
 function gapHeight(){ const d=DIFFS[diff]; return Math.max(d.gapMin, d.gapBase - state.score*d.scoreGapFactor) * dpr; }
 function currentGapH(p){ if(!p.pulseAmp) return p.gapH; const osc=0.5+0.5*Math.sin(p.phase); return Math.max(p.gapMin, p.gapH - p.pulseAmp*osc); }
 
 let last=performance.now();
 function loop(now){
-  let dt=(now-last)/1000; if(dt>0.033) dt=0.033; last=now; timeSec += dt;
+  let dt=(now-last)/1000; if(dt>0.033) dt=0.033; last=now;
+  timeSec += dt;
 
   if(state.status==='playing'){
+    // physics chung
     player.vy += gravity*gravityMul*dt;
-    player.y += player.vy*dt;
+    player.y  += player.vy*dt;
 
+    // voice
     if(mic.on && mic.analyser){
       mic.analyser.getFloatTimeDomainData(mic.data);
       let sum=0; for(let i=0;i<mic.data.length;i++){ const s=mic.data[i]; sum+=s*s; }
@@ -495,72 +542,98 @@ function loop(now){
       if(amp>0.02){ const scale = 0.6 + Math.min(1,amp)*1.1; player.vy = jumpV * scale; }
     }
 
-    slowFactor = (now < slowUntil) ? 0.65 : 1;
-    const scroll=speed*slowFactor*dt;
-    for(const p of pipes){ p.x -= scroll; if(p.pulseAmp>0) p.phase += p.pulseSpd * dt; }
-    for(const c of pickups){ c.x -= scroll; }
-    while(pipes.length && pipes[0].x + pipes[0].w < 0) pipes.shift();
-    while(pickups.length && pickups[0].x + pickups[0].r < 0) pickups.shift();
+    // Nếu đang Maze → update riêng, bỏ phần scroll/spawn ống
+    if(mazeActive){
+      updateMaze(dt, now);
+    }else{
+      // slow (Tempo)
+      slowFactor = (now < slowUntil) ? 0.65 : 1;
 
-    spawnMs += dt*1000; const target = targetSpawn();
-    if(spawnMs >= target){
-      spawnMs=0; const gH=gapHeight();
-      const margin=40*dpr; const gapY=Math.random()*(canvas.height-gH-margin*2)+margin;
-      const pipe={
-        x:canvas.width+20*dpr, w:80*dpr, gapY, gapH:gH,
-        gapMin: DIFFS[diff].gapMin * dpr,
-        pulseAmp: (Math.random()<1.3) ? Math.min(60*dpr, gH - DIFFS[diff].gapMin*dpr) : 0,
-        pulseSpd: 1.2 + Math.random()*0.8, phase: 0, passed:false
-      };
-      pipes.push(pipe);
-      if(Math.random()<0.35){ pickups.push({x:pipe.x+pipe.w+36*dpr,y:gapY+gH/2,r:10*dpr,taken:false}); }
-    }
+      const scroll=speed*slowFactor*dt;
+      for(const p of pipes){ p.x -= scroll; if(p.pulseAmp>0) p.phase += (1.2 + Math.random()*0.0) * dt; }
+      for(const c of pickups){ c.x -= scroll; }
+      while(pipes.length && pipes[0].x + pipes[0].w < 0) pipes.shift();
+      while(pickups.length && pickups[0].x + pickups[0].r < 0) pickups.shift();
 
-    for(const p of pipes){ if(!p.passed && p.x + p.w < player.x*dpr){
-      p.passed=true; state.score++; speed=Math.min(420, speed+2); coins += 1; saveCoins(); sfxScore();
-    } }
-
-    if(shieldGrace>0) shieldGrace -= dt;
-    if(magnetT>0) magnetT -= dt;
-
-    const s=player.size*dpr, px=player.x*dpr, py=player.y*dpr;
-    if(py + s > canvas.height || py < 0) over();
-    for(const p of pipes){
-      const inX=px + s > p.x && px < p.x + p.w;
-      const gH = currentGapH(p);
-      const hitTop=py < p.gapY; const hitBot=py + s > p.gapY + gH;
-      if(inX && (hitTop || hitBot) && now >= phaseUntil){
-        if(shield>0){ shield=0; shieldGrace=0.7; sfxTick(); navigator.vibrate?.(50); continue; }
-        if(shieldGrace>0){ continue; }
-        over(); break;
+      // spawn ống + coin
+      spawnMs += dt*1000; const target = targetSpawn();
+      if(spawnMs >= target){
+        spawnMs=0; const gH=gapHeight();
+        const margin=40*dpr; const gapY=Math.random()*(canvas.height-gH-margin*2)+margin;
+        const pipe={
+          x:canvas.width+20*dpr, w:64*dpr, gapY, gapH:gH,
+          gapMin: DIFFS[diff].gapMin * dpr,
+          pulseAmp: (Math.random()<0.55) ? Math.min(60*dpr, gH - DIFFS[diff].gapMin*dpr) : 0,
+          phase: 0, passed:false
+        };
+        pipes.push(pipe);
+        if(Math.random()<0.35){ pickups.push({x:pipe.x+pipe.w+36*dpr,y:gapY+gH/2,r:10*dpr,taken:false}); }
       }
-    }
 
-    for(const c of pickups){ if(!c.taken){
-      const cx=c.x, cy=c.y, cr=c.r; const pcx=px+s/2, pcy=py+s/2;
-      const dx=pcx-cx, dy=pcy-cy; const extra = magnetT>0 ? 140*dpr : 0;
-      if(dx*dx + dy*dy <= (cr + s*0.5 + extra)*(cr + s*0.5 + extra)){ c.taken=true; coins+=5; saveCoins(); sfxCoin(); }
-    } }
+      // score & speed up
+      for(const p of pipes){ if(!p.passed && p.x + p.w < player.x*dpr){
+        p.passed=true; state.score++; coins += 1; saveCoins(); sfxScore();
+        speed=Math.min(420, speed + (state.score<=5?1:2)); // êm 5 ống đầu
+        if(state.score>=35 && !mazeTriggered){ startMaze(); } // KÍCH HOẠT MAZE
+      } }
+
+      // timers
+      if(shieldGrace>0) shieldGrace -= dt;
+      if(magnetT>0) magnetT -= dt;
+
+      // va chạm ống/biên
+      const s=player.size*dpr, px=player.x*dpr, py=player.y*dpr;
+      if(py + s > canvas.height || py < 0) over();
+      for(const p of pipes){
+        const inX=px + s > p.x && px < p.x + p.w;
+        const gH = currentGapH(p);
+        const hitTop=py < p.gapY; const hitBot=py + s > p.gapY + gH;
+        if(inX && (hitTop || hitBot) && now >= phaseUntil){
+          if(shield>0){ shield=0; shieldGrace=0.7; sfxTick(); navigator.vibrate?.(50); continue; }
+          if(shieldGrace>0){ continue; }
+          over(); break;
+        }
+      }
+
+      // nhặt coin
+      for(const c of pickups){ if(!c.taken){
+        const cx=c.x, cy=c.y, cr=c.r; const pcx=px+s/2, pcy=py+s/2;
+        const dx=pcx-cx, dy=pcy-cy; const extra = magnetT>0 ? 140*dpr : 0;
+        if(dx*dx + dy*dy <= (cr + s*0.5 + extra)*(cr + s*0.5 + extra)){ c.taken=true; coins+=5; saveCoins(); sfxCoin(); }
+      } }
+    }
   }
 
-  const W=canvas.width, H=canvas.height; ctx.clearRect(0,0,W,H);
+  // ======= DRAW =======
+  const W=canvas.width, H=canvas.height;
   const pal = SKINS[skin] || SKINS.gold;
-drawBackground(ctx, W, H, timeSec, pal, bgTheme);
+  drawBackground(ctx, W, H, timeSec, pal, bgTheme);
 
-  for(const c of pickups){ if(!c.taken){ ctx.save(); ctx.shadowColor='rgba(255,215,0,.35)'; ctx.shadowBlur=16*dpr; ctx.fillStyle='#fde047'; ctx.beginPath(); ctx.arc(c.x,c.y,c.r,0,Math.PI*2); ctx.fill(); ctx.restore(); ctx.fillStyle='rgba(0,0,0,.25)'; ctx.fillRect(c.x+c.r-4*dpr, c.y-c.r, 4*dpr, c.r*2); } }
+  // nếu đang FADE sau maze → chỉ vẽ player/HUD
+  let skipWorld = (mazeFade>0);
 
-  for(const p of pipes){
+  // pickups
+  if(!skipWorld){ for(const c of pickups){ if(!c.taken){ ctx.save(); ctx.shadowColor='rgba(255,215,0,.35)'; ctx.shadowBlur=16*dpr; ctx.fillStyle='#fde047'; ctx.beginPath(); ctx.arc(c.x,c.y,c.r,0,Math.PI*2); ctx.fill(); ctx.restore(); ctx.fillStyle='rgba(0,0,0,.25)'; ctx.fillRect(c.x+c.r-4*dpr, c.y-c.r, 4*dpr, c.r*2); } } }
+
+  // pipes
+  if(!skipWorld){ for(const p of pipes){
     const gH = currentGapH(p);
     ctx.fillStyle=pal.pipe;
     ctx.fillRect(p.x,0,p.w,p.gapY);
     ctx.fillRect(p.x,p.gapY+gH,p.w,H-(p.gapY+gH));
     const EDGE=4*dpr; ctx.fillStyle=pal.edge; ctx.fillRect(p.x+p.w-EDGE,0,EDGE,H);
-  }
+  } }
 
-  if(trailEnabled){ for(const t of trail){ ctx.globalAlpha=t.a; ctx.fillStyle=pal.player; ctx.beginPath(); ctx.arc(t.x,t.y,6*dpr*(0.5+t.a*0.5),0,Math.PI*2); ctx.fill(); } ctx.globalAlpha=1; }
+  // trail
+  if(trailEnabled){ for(const t of trail){ ctx.globalAlpha=t.a; ctx.fillStyle=trailStyle==='comet'?'#a78bfa':pal.player; ctx.beginPath(); ctx.arc(t.x,t.y,6*dpr*(0.5+t.a*0.5),0,Math.PI*2); ctx.fill(); } ctx.globalAlpha=1; }
 
+  // slime
   drawSlime(ctx, player.x*dpr, player.y*dpr, player.size*dpr, pal.player);
 
+  // MAZE vẽ phần maze/walls/keys nếu đang hoạt động
+  if(mazeActive){ renderMazeOverlay(W,H); }
+
+  // HUD
   ctx.fillStyle='#fff'; ctx.font=(24*dpr)+'px ui-sans-serif,system-ui'; ctx.textAlign='left'; ctx.textBaseline='top';
   ctx.fillText('Score: '+state.score, 16*dpr, 12*dpr);
   ctx.fillStyle='rgba(255,255,255,.7)'; ctx.fillText('Best: '+state.best, 16*dpr, 40*dpr);
@@ -568,11 +641,20 @@ drawBackground(ctx, W, H, timeSec, pal, bgTheme);
 
   ctx.textAlign='right'; ctx.fillStyle='#fff'; ctx.fillText(CURRENCY_NAME+': '+coins, W-16*dpr, 12*dpr);
   let hudY = 40*dpr;
-  if(shield>0 || shieldGrace>0){ ctx.fillText('🛡️', W-16*dpr, hudY); hudY += 22*dpr; } 
+  if(shield>0 || shieldGrace>0){ ctx.fillText('🛡️', W-16*dpr, hudY); hudY += 22*dpr; }
   if (now < phaseUntil){ ctx.fillText('👻', W-16*dpr, hudY); hudY += 22*dpr; }
-if (now < slowUntil){ ctx.fillText('⏳', W-16*dpr, hudY); hudY += 22*dpr; }
-  if(magnetT>0){ ctx.fillText('🧲 '+magnetT.toFixed(1)+'s', W-16*dpr, hudY); }
+  if (now < slowUntil){ ctx.fillText('⏳', W-16*dpr, hudY); hudY += 22*dpr; }
+  if(magnetT>0){ ctx.fillText('🧲 '+magnetT.toFixed(1)+'s', W-16*dpr, hudY); hudY += 22*dpr; }
 
+  // Maze HUD (keys & hits)
+  if(mazeActive){
+    ctx.textAlign='center'; ctx.fillStyle='#22d3ee';
+    ctx.fillText('KEYS: '+(3-maze.keys.filter(k=>k.taken).length)+'/3', W/2, 12*dpr);
+    ctx.fillStyle= (mazeHits>=mazeHitsMax-1)?'#fca5a5':'#e5e7eb';
+    ctx.fillText('HITS: '+mazeHits+'/'+mazeHitsMax, W/2, 40*dpr);
+  }
+
+  // menu/pause/gameover text
   if(state.status!=='playing'){
     const title = state.status==='menu'?'Tap-to-Fly':(state.status==='paused'?'Paused':'Game Over');
     const subt  = state.status==='menu'?'Chạm/Space để bắt đầu':(state.status==='paused'?'Chạm/P để tiếp tục':'Chạm/Space để chơi lại');
@@ -580,22 +662,22 @@ if (now < slowUntil){ ctx.fillText('⏳', W-16*dpr, hudY); hudY += 22*dpr; }
     ctx.fillStyle='rgba(0,0,0,.35)'; ctx.fillRect(W/2-220*dpr, H/2-80*dpr, 440*dpr, 160*dpr);
     ctx.fillStyle='#fff'; ctx.font=(36*dpr)+'px ui-sans-serif,system-ui'; ctx.fillText(title, W/2, H/2-18*dpr);
     ctx.font=(18*dpr)+'px ui-sans-serif,system-ui'; ctx.fillText(subt, W/2, H/2+22*dpr);
-    if(state.status==='gameover' && !daily.done && state.score>=daily.goal){
-      ctx.font=(16*dpr)+'px ui-sans-serif,system-ui'; ctx.fillStyle='#bbf7d0';
-      ctx.fillText(`Daily đạt mục tiêu! +${DAILY_REWARD}F`, W/2, H/2+52*dpr);
-    }
   }
 
+  // mic & skill UI updates
   const bar=document.getElementById('micFill'); const meter=document.getElementById('micMeter');
   if(bar){ const w = Math.max(0, Math.min(1, mic.level*2.4)); bar.style.width = (w*100).toFixed(0)+'%'; meter.style.opacity = mic.on ? '1' : '0.5'; }
   updateSkillUI();
+
+  // fade sau maze: 3s
+  if(mazeFade>0){ mazeFade -= dt; if(mazeFade<=0){ mazeFade=0; } }
 
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
 
+// Draw background
 function drawBackground(ctx, W, H, t, pal, theme){
-  // bầu trời
   const g=ctx.createLinearGradient(0,0,0,H);
   g.addColorStop(0, pal.skyTop); g.addColorStop(1, pal.skyBot);
   ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
@@ -615,8 +697,7 @@ function drawBackground(ctx, W, H, t, pal, theme){
       ctx.fill();
     }
     ctx.restore();
-  }else if(theme==='city'){
-    // sao nhấp nháy
+  } else if(theme==='city'){
     ctx.save(); ctx.globalAlpha=0.7;
     for(let i=0;i<60;i++){
       const x=((i*127)%W + (t*10))%W, y=(i*53)%(H*0.55);
@@ -624,7 +705,6 @@ function drawBackground(ctx, W, H, t, pal, theme){
       ctx.fillRect(x,y,2*dpr,2*dpr);
     }
     ctx.restore();
-    // skyline
     const base=H*0.75, sp=12; let xoff=-((t*sp)%W);
     ctx.fillStyle='rgba(0,0,0,.35)';
     while(xoff<W){
@@ -632,7 +712,7 @@ function drawBackground(ctx, W, H, t, pal, theme){
       ctx.fillRect(xoff, base-h, w, h);
       xoff += w + 10*dpr;
     }
-  }else{ // 'mount'
+  } else {
     drawHills(0.20,60,'rgba(0,0,0,.18)');
     drawHills(0.35,90,'rgba(0,0,0,.25)');
     drawHills(0.55,120,'rgba(0,0,0,.35)');
@@ -646,28 +726,27 @@ function drawBackground(ctx, W, H, t, pal, theme){
       ctx.lineTo(W,H); ctx.closePath(); ctx.fill();
     }
   }
-  // nền đất
   ctx.fillStyle=pal.ground; ctx.fillRect(0,H-24*dpr,W,24*dpr);
 }
 
-// Draw slime
+// Slime + trail
 function drawSlime(ctx, x, y, s, color){
   const t = Math.max(-0.35, Math.min(0.35, -player.vy/900));
   const rx = s*(0.72 + (-t)*0.30);
   const ry = s*(0.72 + ( t)*0.45);
-
   const grd = ctx.createRadialGradient(x-rx*0.3, y-ry*0.4, s*0.1, x, y, Math.max(rx,ry));
-  grd.addColorStop(0, 'rgba(255,255,255,.35)');
-  grd.addColorStop(1, color);
-  ctx.save();
-  ctx.shadowColor='rgba(0,0,0,.35)'; ctx.shadowBlur=16*dpr;
+  grd.addColorStop(0, 'rgba(255,255,255,.35)'); grd.addColorStop(1, color);
+  ctx.save(); ctx.shadowColor='rgba(0,0,0,.35)'; ctx.shadowBlur=16*dpr;
   ctx.beginPath(); ellipsePath(ctx, x, y, rx, ry, 10*dpr); ctx.fillStyle=grd; ctx.fill(); ctx.restore();
 
   ctx.fillStyle='#000'; const eyeX = x + rx*0.22; const eyeY = y - ry*0.10;
   ctx.beginPath(); ctx.arc(eyeX, eyeY, s*0.10, 0, Math.PI*2); ctx.fill();
   ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(eyeX- s*0.03, eyeY- s*0.03, s*0.04, 0, Math.PI*2); ctx.fill();
 
-  trail.push({x:x,y:y,a:0.75}); if(trail.length>12) trail.shift(); for(const t of trail) t.a=Math.max(0, t.a - 0.04);
+  // trail
+  trail.push({x:x,y:y,a: trailStyle==='comet'?0.9:0.75});
+  if(trail.length>(trailStyle==='comet'?18:12)) trail.shift();
+  for(const t of trail) t.a=Math.max(0, t.a - (trailStyle==='comet'?0.035:0.045));
 }
 function ellipsePath(ctx,x,y,rx,ry,r){
   r=Math.min(r,rx,ry);
@@ -677,8 +756,112 @@ function ellipsePath(ctx,x,y,rx,ry,r){
   ctx.arcTo(x-rx, y+ry, x-rx, y-ry, r);
   ctx.arcTo(x-rx, y-ry, x+rx, y-ry, r);
 }
-</script>
-<script>
+  </script>
+  <script>
+// === MAZE functions ===
+function startMaze(){
+  mazeTriggered=true; mazeActive=true; mazeHits=0; maze.keys.length=0; maze.obs.length=0;
+  // bật trail mạnh
+  trailStyle='comet'; trailEnabled=true;
+  // bật nút trái/phải + reset walls
+  document.getElementById('lrPad').style.display='block';
+  maze.leftX=0; maze.rightX=canvas.width; maze.speed=24*dpr;
+  setWallWidth(0);
+
+  // clear world hiện tại (khỏi rối)
+  pipes.length=0; pickups.length=0; spawnMs=0;
+
+  // đặt 3 key trong vùng trung tâm
+  const W=canvas.width, H=canvas.height;
+  for(let i=0;i<3;i++){
+    const kx = W*0.35 + Math.random()*W*0.30;
+    const ky = H*0.25 + Math.random()*H*0.50;
+    maze.keys.push({x:kx, y:ky, r:12*dpr, taken:false});
+  }
+  // sinh chướng ngại vật chữ nhật nhẹ
+  for(let i=0;i<9;i++){
+    const rw = (60+Math.random()*90)*dpr, rh=(24+Math.random()*60)*dpr;
+    const rx = W*0.25 + Math.random()*W*0.50;
+    const ry = H*0.20 + Math.random()*H*0.60;
+    maze.obs.push({x:rx,y:ry,w:rw,h:rh});
+  }
+  toast('MAZE! Lụm 3 key ◀ ▶');
+}
+function updateMaze(dt, now){
+  // di chuyển ngang
+  player.x += moveX * 200 * dt;
+  // clamp theo tường
+  const gapL = maze.leftX + 8*dpr, gapR = maze.rightX - 8*dpr;
+  const px = Math.max(gapL/dpr + player.size*0.5, Math.min(gapR/dpr - player.size*0.5, player.x));
+  player.x = px;
+
+  // walls ép vào
+  maze.leftX += maze.speed*dt;
+  maze.rightX -= maze.speed*dt;
+  setWallWidth(Math.max(0, maze.leftX), Math.max(0, canvas.width - maze.rightX));
+
+  // va chạm obs (circle-rect)
+  const s=player.size*dpr, cx=player.x*dpr, cy=player.y*dpr;
+  for(const o of maze.obs){
+    if(circleRectHit(cx,cy,s*0.9, o.x,o.y,o.w,o.h)){
+      // đẩy nhẹ ra trên va chạm
+      player.vy = Math.min(player.vy, jumpV*0.6);
+      mazeHits++; maze.speed *= maze.accel; sfxHit(); navigator.vibrate?.(30);
+      // xóa 1 phần obs nhỏ để không kẹt
+      o.w*=0.9; o.h*=0.9;
+      break;
+    }
+  }
+
+  // key
+  for(const k of maze.keys){
+    if(!k.taken && (cx-k.x)**2 + (cy-k.y)**2 <= (s*0.5 + k.r)**2){
+      k.taken=true; coins+=8; saveCoins(); sfxCoin();
+    }
+  }
+  const got = maze.keys.filter(k=>k.taken).length;
+
+  // thua vì bị kẹp (tường chạm nhau ~ nhỏ hơn slime)
+  if( (maze.rightX - maze.leftX) < (player.size*1.2*dpr) || mazeHits>=mazeHitsMax ){
+    // đóng nhanh để "kẹp chết"
+    maze.leftX = Math.min(maze.rightX, maze.leftX + 400*dpr*dt);
+    maze.rightX = Math.max(maze.leftX, maze.rightX - 400*dpr*dt);
+    setWallWidth(maze.leftX, canvas.width - maze.rightX);
+    if((maze.rightX - maze.leftX) <= player.size*0.8*dpr){ over(); }
+    return;
+  }
+
+  // thắng khi đủ 3 key
+  if(got>=3){
+    mazeActive=false; mazeFade=3; // 3s làm mờ, clear
+    document.getElementById('lrPad').style.display='none';
+    setWallWidth(0);
+    toast('CLEAR! +3s');
+  }
+}
+function renderMazeOverlay(W,H){
+  // keys
+  for(const k of maze.keys){ if(!k.taken){
+    ctx.save(); ctx.shadowColor='rgba(34,211,238,.45)'; ctx.shadowBlur=14*dpr; ctx.fillStyle='#22d3ee';
+    ctx.beginPath(); ctx.arc(k.x,k.y,k.r,0,Math.PI*2); ctx.fill(); ctx.restore();
+    ctx.fillStyle='rgba(0,0,0,.25)'; ctx.fillRect(k.x+k.r-3*dpr, k.y-k.r, 3*dpr, k.r*2);
+  } }
+  // obstacles
+  ctx.fillStyle='rgba(34,197,94,.22)';
+  maze.obs.forEach(o=>{ ctx.fillRect(o.x, o.y, o.w, o.h); });
+}
+function setWallWidth(leftW=0, rightW=0){
+  const wl=document.getElementById('wallL'), wr=document.getElementById('wallR');
+  wl.style.width = (leftW|0)+'px';
+  wr.style.width = (rightW|0)+'px';
+}
+function circleRectHit(cx,cy,cr, rx,ry,rw,rh){
+  const closestX = Math.max(rx, Math.min(cx, rx+rw));
+  const closestY = Math.max(ry, Math.min(cy, ry+rh));
+  const dx=cx-closestX, dy=cy-closestY; return (dx*dx + dy*dy) <= cr*cr;
+}
+
+// === Classes overlay ===
 function renderClasses(){
   const info=document.getElementById('classInfo');
   info.textContent = classUnlocked ? `Bạn có ${classCore} Class Core. Mở khoá 1 class miễn phí hoặc dùng Feathers.` :
@@ -716,6 +899,7 @@ function renderClasses(){
   }
 }
 
+// Toast
 function toast(msg){ try{ const el=document.createElement('div'); el.textContent=msg;
   el.style.position='absolute'; el.style.right='12px'; el.style.bottom='12px';
   el.style.background='rgba(255,255,255,.12)'; el.style.border='1px solid rgba(255,255,255,.25)';
@@ -723,6 +907,7 @@ function toast(msg){ try{ const el=document.createElement('div'); el.textContent
   document.querySelector('.card').appendChild(el); setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .4s'; setTimeout(()=>el.remove(), 400); }, 900);
 }catch{} }
 
+// Service Worker
 if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js'); }
 </script>
 </body>
