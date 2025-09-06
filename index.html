@@ -326,6 +326,25 @@ addEventListener('keydown',e=>{
   if(e.code==='ArrowRight'||e.code==='KeyD'){moveX=1;}
 },{passive:false});
 addEventListener('keyup',e=>{if(['ArrowLeft','KeyA','ArrowRight','KeyD'].includes(e.code))moveX=0;});
+  
+// TAP anywhere on canvas/card to flap (trừ khi bấm vào UI)
+const card = document.querySelector('.card');
+
+function tapHandler(e){
+  // Không cướp click của các nút UI bên trái/toolbar/overlay
+  if (e.target.closest('.toolbar, .leftCol, .overlay')) return;
+  flap();
+}
+
+// Phủ cả canvas lẫn card để chắc ăn trên mobile
+canvas.addEventListener('pointerdown', tapHandler, {passive:true});
+card.addEventListener('pointerdown', tapHandler, {passive:true});
+
+// Fallback cho trình duyệt không có PointerEvent
+canvas.addEventListener('touchstart', tapHandler, {passive:true});
+card.addEventListener('touchstart', tapHandler, {passive:true});
+card.addEventListener('click', (e)=>{ if(!e.target.closest('.toolbar, .leftCol, .overlay')) flap(); });
+  
 document.getElementById('btnLeft')?.addEventListener('pointerdown',()=>{moveX=-1;});
 document.getElementById('btnRight')?.addEventListener('pointerdown',()=>{moveX=1;});
 ['btnLeft','btnRight'].forEach(id=>{const el=document.getElementById(id);el?.addEventListener('pointerup',()=>{moveX=0;});el?.addEventListener('pointerleave',()=>{moveX=0;});});
