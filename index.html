@@ -3,8 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tap-to-Fly — Slime & Classes</title>
+  <title>Tap-to-Fly — Slime & Classes v14</title>
   <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a">
   <style>
     :root { color-scheme: dark light; }
     html,body{margin:0;padding:0;background:#0f172a;color:#fff;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
@@ -42,6 +43,20 @@
 
     .cdRing{position:absolute;bottom:44px;left:calc(12px + 44px + 8px);width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,.25);display:grid;place-items:center;pointer-events:none}
     .cdRing span{font-size:11px;opacity:.9}
+
+    /* Big skill button on the left */
+    .skillBig{
+      position:absolute; left:10px; top:50%; transform:translateY(-50%);
+      width:96px; height:96px; border-radius:999px; z-index:25;
+      display:grid; place-items:center; font-size:40px; line-height:1;
+      background:rgba(14,165,233,.22); border:2px solid rgba(255,255,255,.25);
+      box-shadow:0 10px 30px rgba(0,0,0,.45);
+    }
+    .skillBig.disabled{ opacity:.5; filter:grayscale(.2) }
+    .skillBig span{ pointer-events:none }
+    @media (max-width:420px){
+      .skillBig{ width:84px; height:84px; font-size:36px; left:8px; }
+    }
   </style>
 </head>
 <body>
@@ -76,6 +91,7 @@
       </div>
 
       <div class="cdRing" id="cdRing" aria-hidden="true"><span></span></div>
+      <button id="skillBig" class="skillBig" title="Kĩ năng"><span id="skillBigLabel">⚡</span></button>
       <div class="micMeter" id="micMeter" aria-hidden="true"><div class="fill" id="micFill"></div></div>
       <div class="note">Slime + Classes (Aqua/Jet) • Daily + Mic + Shield/Magnet + Pulse pipes.</div>
 
@@ -104,8 +120,7 @@
 
     </div>
   </div>
-  <script>
-// ===== Canvas & DPR =====
+<script>
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 let dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
@@ -116,7 +131,7 @@ function fit(){ dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
 }
 addEventListener('resize', fit); fit();
 
-// ===== Palettes =====
+// Palettes
 const SKINS={
   gold:{player:'#facc15',pipe:'#22c55e',edge:'rgba(0,0,0,.15)',skyTop:'#0ea5e9',skyBot:'#0b1020',ground:'rgba(255,255,255,.08)'},
   pink:{player:'#fb7185',pipe:'#34d399',edge:'rgba(0,0,0,.15)',skyTop:'#ec4899',skyBot:'#312e81',ground:'rgba(255,255,255,.10)'},
@@ -124,23 +139,23 @@ const SKINS={
   neon:{player:'#a78bfa',pipe:'#22d3ee',edge:'rgba(0,0,0,.18)',skyTop:'#1f2937',skyBot:'#0b1020',ground:'rgba(255,255,255,.10)'}
 };
 
-// ===== Difficulty =====
+// Difficulty
 const DIFFS={
   easy:  {speed:200, gravity:800,  jumpV:-240, spawnEvery:1550, spawnMin: 980, gapBase:200, gapMin:140, scoreSpawnFactor:5,  scoreGapFactor:1.3},
   normal:{speed:220, gravity:900,  jumpV:-280, spawnEvery:1450, spawnMin: 880, gapBase:180, gapMin:120, scoreSpawnFactor:8,  scoreGapFactor:1.5},
-  hard:  {speed:240, gravity:1000, jumpV:-320, spawnEvery:1350, spawnMin: 780, gapBase:160, gapMin:100, scoreSpawnFactor:11, scoreGapFactor:1.8}
+    hard:  {speed:240, gravity:1000, jumpV:-320, spawnEvery:1350, spawnMin: 780, gapBase:160, gapMin:100, scoreSpawnFactor:11, scoreGapFactor:1.8}
 };
 
-// ===== Currency & storage =====
+// Storage
 const CURRENCY_NAME='Feathers';
 let coins=+(localStorage.getItem('tapfly.coins')||0);
-let owned=JSON.parse(localStorage.getItem('tapfly.owned')||'{}');                 // skins/trail
+let owned=JSON.parse(localStorage.getItem('tapfly.owned')||'{}');
 let inv  = JSON.parse(localStorage.getItem('tapfly.inv')  || '{"shield":0,"magnet":0}');
 let next = JSON.parse(localStorage.getItem('tapfly.next') || '{"shield":false,"magnet":false}');
 let diff=localStorage.getItem('tapfly.diff')||'easy';
 let skin=localStorage.getItem('tapfly.skin')||'gold';
 
-// ===== Classes & progress =====
+// Classes
 let classesOwned=JSON.parse(localStorage.getItem('tapfly.classes')||'{"aqua":true}');
 let classId=localStorage.getItem('tapfly.class')||'aqua';
 let classUnlocked=localStorage.getItem('tapfly.classesUnlocked')==='1';
@@ -153,7 +168,7 @@ function saveInv(){ save('tapfly.inv', inv); }
 function saveNext(){ save('tapfly.next', next); }
 function saveClasses(){ save('tapfly.classes', classesOwned); save('tapfly.class', classId); }
 
-// ===== Shop items =====
+// Shop
 const shop=document.getElementById('shop'); const shopBtn=document.getElementById('shopBtn'); const closeShop=document.getElementById('closeShop');
 const SHOP=[
   {id:'skin.pink',   type:'skin',   label:'Skin: Pink',   price:120, apply:()=>{skin='pink';  applySkin();}},
@@ -213,7 +228,7 @@ function renderShop(){
   updateCoinsPill(); updateShopGlow();
 }
 
-// ===== Classes registry =====
+// Classes registry
 const CLASSES = {
   aqua: {
     name:'Aqua', color:'#22d3ee', price:0,
@@ -225,17 +240,15 @@ const CLASSES = {
       if(!this.canUse() || state.status!=='playing') return;
       player.vy = jumpV * 1.6;  // Jet
       skillReadyAt = performance.now() + this.cd;
-      sfxFlap(); toast('JET!');
-      navigator.vibrate?.(18);
+      sfxFlap(); toast('JET!'); navigator.vibrate?.(18);
     }
   },
-  // placeholders (chưa kích hoạt)
   phase:{name:'Phase', color:'#a78bfa', price:150, desc:'(Sắp có) Ghost 0.8s, CD 11s.'},
   tempo:{name:'Tempo', color:'#60a5fa', price:150, desc:'(Sắp có) Slow 35% 2s, CD 12s.'},
   gauss:{name:'Gauss', color:'#06b6d4', price:150, desc:'(Sắp có) Magnet Pulse, CD 12s.'}
 };
 
-// ===== Daily goal & bonus =====
+// Daily
 const DAILY_REWARD = 30;
 const today = new Date().toDateString(); const lastDay = localStorage.getItem('tapfly.day');
 if (lastDay !== today){ coins += 20; localStorage.setItem('tapfly.day', today); saveCoins(); toast('+20 daily'); }
@@ -246,17 +259,15 @@ if(daily.date !== dayKey){ daily = {date:dayKey, goal: seededGoal(dayKey), done:
 function completeDaily(){ if(!daily.done){ daily.done=true; localStorage.setItem('tapfly.daily', JSON.stringify(daily));
   coins += DAILY_REWARD; saveCoins(); toast(`Daily +${DAILY_REWARD}F`); navigator.vibrate?.([60,60,60]); } }
 
-// ===== State =====
+// State
 const state={status:'menu',score:0,best:+(localStorage.getItem('tapfly.best')||0)};
 const player={x:120,y:(canvas.height/dpr)*0.5,vy:0,size:22};
 const pipes=[], pickups=[], trail=[]; let trailEnabled=!!owned['trail.spark'];
 let speed,gravity,jumpV,spawnMs=0;
-// power-ups
 let shield=0, shieldGrace=0, magnetT=0;
-// class/skill runtime
 let gravityMul=1, slowFactor=1, skillReadyAt=0;
 
-// ===== Helpers =====
+// Helpers
 function ownsSkin(id){return id==='gold'||!!owned['skin.'+id];}
 function updateSkinButtons(){document.querySelectorAll('.btn.skin').forEach(b=>b.classList.toggle('locked',!ownsSkin(b.dataset.skin))); }
 if(!ownsSkin(skin)) skin='gold';
@@ -269,9 +280,8 @@ function applySkin(){ document.querySelectorAll('.btn.skin').forEach(b=>b.classL
   save('tapfly.skin', skin); updateSkinButtons();
 }
 function updateCoinsPill(){ const el=document.getElementById('coinsPill'); if(el) el.textContent=`${CURRENCY_NAME}: ${coins}`; }
-function updateClassUI(){
-  const b=document.getElementById('classBtn'); const c=CLASSES[classId]; if(b&&c) b.textContent='Class: '+c.name;
-}
+function updateClassUI(){ const b=document.getElementById('classBtn'); const c=CLASSES[classId]; if(b&&c) b.textContent='Class: '+c.name; }
+
 function reset(){
   state.score=0; spawnMs=0; pipes.length=0; pickups.length=0; trail.length=0;
   player.x=120; player.y=(canvas.height/dpr)*0.45; player.vy=0;
@@ -287,7 +297,6 @@ function start(){ reset(); state.status='playing';
 function over(){ state.status='gameover';
   if(state.score>state.best){ state.best=state.score; localStorage.setItem('tapfly.best', state.best); }
   if(!daily.done && state.score>=daily.goal) completeDaily();
-  // milestone mở Classes
   if(!classUnlocked && state.score>=30){ classUnlocked=true; save('tapfly.classesUnlocked','1'); classCore+=1; save('tapfly.classCore', classCore); toast('🎓 Mở Classes! +1 Class Core'); }
   sfxHit(); navigator.vibrate?.(60);
 }
@@ -298,7 +307,7 @@ function flap(){ ensureAudio();
   else if(state.status==='gameover'){ reset(); state.status='playing'; sfxFlap(); }
 }
 
-// ===== Input =====
+// Input
 addEventListener('keydown', e=>{
   if(e.code==='Space'||e.code==='ArrowUp'){ e.preventDefault(); flap(); }
   if(e.code==='KeyR'){ reset(); state.status='playing'; }
@@ -306,7 +315,7 @@ addEventListener('keydown', e=>{
   if(e.code==='Digit2'||e.code==='KeyN'){ diff='normal'; reset(); sfxTick(); }
   if(e.code==='Digit3'||e.code==='KeyH'){ diff='hard'; reset(); sfxTick(); }
   if(e.code==='KeyP'){ togglePause(); }
-  if(e.code==='KeyF'||e.code==='KeyX'){ castSkill(); } // phím nhanh cho skill
+  if(e.code==='KeyF'||e.code==='KeyX'){ castSkill(); }
 },{passive:false});
 canvas.addEventListener('pointerdown', e=>{ e.preventDefault(); flap(); }, {passive:false});
 
@@ -328,7 +337,7 @@ const classBtn=document.getElementById('classBtn'); const classesOverlay=documen
 classBtn?.addEventListener('click', ()=>{ renderClasses(); classesOverlay.style.display='flex'; sfxTick(); });
 document.getElementById('closeClasses')?.addEventListener('click', ()=>{ classesOverlay.style.display='none'; sfxTick(); });
 
-// ===== AUDIO =====
+// Audio
 let ac=null; function ensureAudio(){ if(!ac){ const AC=window.AudioContext||window.webkitAudioContext; if(AC) ac=new AC(); }
   if(ac&&ac.state==='suspended') ac.resume();
 }
@@ -343,7 +352,7 @@ const sfxHit=()=>beep(180,.12,.045,'sawtooth');
 const sfxTick=()=>beep(520,.04,.025,'sine');
 const sfxCoin=()=>{ navigator.vibrate?.(12); beep(1200,.05,.035,'triangle'); };
 
-// ===== Voice (mic) =====
+// Voice (mic)
 const voiceBtn=document.getElementById('voiceBtn');
 let mic={on:false,stream:null,src:null,analyser:null,data:null,level:0,thr:0.06};
 async function startVoice(){ try{
@@ -354,40 +363,45 @@ async function startVoice(){ try{
 function stopVoice(){ mic.on=false; voiceBtn.textContent='🎙️'; try{ mic.stream?.getTracks().forEach(t=>t.stop()); }catch{} mic.stream=mic.src=mic.analyser=mic.data=null; }
 voiceBtn?.addEventListener('click', ()=>{ mic.on ? stopVoice() : startVoice(); sfxTick(); });
 
-// UI skill
+// Skill UI
 const skillBtn=document.getElementById('skillBtn'); const cdRing=document.getElementById('cdRing');
 skillBtn?.addEventListener('click', castSkill);
+const skillBig = document.getElementById('skillBig');
+skillBig?.addEventListener('click', castSkill);
 function castSkill(){ const cls=CLASSES[classId]; if(!cls||!cls.use) return; cls.use(); }
 function updateSkillUI(){
   const now=performance.now(); const left=Math.max(0, skillReadyAt - now);
   skillBtn.disabled = left>0 || state.status!=='playing';
   cdRing.style.display = left>0 ? 'grid' : 'none';
   cdRing.querySelector('span').textContent = left>0 ? (left/1000).toFixed(1) : '';
+  if (skillBig){
+    const disabled = (left>0 || state.status!=='playing');
+    skillBig.disabled = disabled;
+    skillBig.classList.toggle('disabled', disabled);
+    const lbl = document.getElementById('skillBigLabel');
+    lbl.textContent = left>0 ? (left/1000).toFixed(1) : '⚡';
+  }
 }
 
-// Khởi tạo
+// Init
 applyDiff(); applySkin(); updateCoinsPill(); updateShopGlow(); updateClassUI(); CLASSES[classId]?.passiveInit?.();
 document.querySelector(`.btn.diff[data-diff="${diff}"]`)?.classList.add('active');
 document.querySelector(`.btn.skin[data-skin="${skin}"]`)?.classList.add('active');
 updateSkinButtons();
-  </script>
-  <script>
-// ===== Spawn helpers =====
+</script>
+<script>
 function targetSpawn(){ const d=DIFFS[diff]; return Math.max(d.spawnMin, d.spawnEvery - state.score*d.scoreSpawnFactor); }
 function gapHeight(){ const d=DIFFS[diff]; return Math.max(d.gapMin, d.gapBase - state.score*d.scoreGapFactor) * dpr; }
 function currentGapH(p){ if(!p.pulseAmp) return p.gapH; const osc=0.5+0.5*Math.sin(p.phase); return Math.max(p.gapMin, p.gapH - p.pulseAmp*osc); }
 
-// ===== Loop =====
 let last=performance.now();
 function loop(now){
   let dt=(now-last)/1000; if(dt>0.033) dt=0.033; last=now;
 
   if(state.status==='playing'){
-    // physics (dùng gravityMul & slowFactor nếu sau này có Timewarp)
     player.vy += gravity*gravityMul*dt;
     player.y += player.vy*dt;
 
-    // mic impulse
     if(mic.on && mic.analyser){
       mic.analyser.getFloatTimeDomainData(mic.data);
       let sum=0; for(let i=0;i<mic.data.length;i++){ const s=mic.data[i]; sum+=s*s; }
@@ -397,38 +411,33 @@ function loop(now){
       if(amp>0.02){ const scale = 0.6 + Math.min(1,amp)*1.1; player.vy = jumpV * scale; }
     }
 
-    // scroll
     const scroll=speed*slowFactor*dt;
     for(const p of pipes){ p.x -= scroll; if(p.pulseAmp>0) p.phase += p.pulseSpd * dt; }
     for(const c of pickups){ c.x -= scroll; }
     while(pipes.length && pipes[0].x + pipes[0].w < 0) pipes.shift();
     while(pickups.length && pickups[0].x + pickups[0].r < 0) pickups.shift();
 
-    // spawn
     spawnMs += dt*1000; const target = targetSpawn();
     if(spawnMs >= target){
       spawnMs=0; const gH=gapHeight();
       const margin=40*dpr; const gapY=Math.random()*(canvas.height-gH-margin*2)+margin;
       const pipe={
-        x:canvas.width+20*dpr, w:85*dpr, gapY, gapH:gH,
+        x:canvas.width+20*dpr, w:80*dpr, gapY, gapH:gH,
         gapMin: DIFFS[diff].gapMin * dpr,
-        pulseAmp: (Math.random()<1.2) ? Math.min(60*dpr, gH - DIFFS[diff].gapMin*dpr) : 0,
+        pulseAmp: (Math.random()<1.3) ? Math.min(60*dpr, gH - DIFFS[diff].gapMin*dpr) : 0,
         pulseSpd: 1.2 + Math.random()*0.8, phase: 0, passed:false
       };
       pipes.push(pipe);
       if(Math.random()<0.35){ pickups.push({x:pipe.x+pipe.w+36*dpr,y:gapY+gH/2,r:10*dpr,taken:false}); }
     }
 
-    // score & accel
     for(const p of pipes){ if(!p.passed && p.x + p.w < player.x*dpr){
       p.passed=true; state.score++; speed=Math.min(420, speed+2); coins += 1; saveCoins(); sfxScore();
     } }
 
-    // timers
     if(shieldGrace>0) shieldGrace -= dt;
     if(magnetT>0) magnetT -= dt;
 
-    // collisions
     const s=player.size*dpr, px=player.x*dpr, py=player.y*dpr;
     if(py + s > canvas.height || py < 0) over();
     for(const p of pipes){
@@ -442,7 +451,6 @@ function loop(now){
       }
     }
 
-    // collect coins (+magnet radius)
     for(const c of pickups){ if(!c.taken){
       const cx=c.x, cy=c.y, cr=c.r; const pcx=px+s/2, pcy=py+s/2;
       const dx=pcx-cx, dy=pcy-cy; const extra = magnetT>0 ? 140*dpr : 0;
@@ -450,15 +458,12 @@ function loop(now){
     } }
   }
 
-  // draw
   const W=canvas.width, H=canvas.height; ctx.clearRect(0,0,W,H);
   const pal = SKINS[skin] || SKINS.gold; const bg = ctx.createLinearGradient(0,0,0,H); bg.addColorStop(0, pal.skyTop); bg.addColorStop(1, pal.skyBot); ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
   ctx.fillStyle=pal.ground; ctx.fillRect(0,H-24*dpr,W,24*dpr);
 
-  // pickups
   for(const c of pickups){ if(!c.taken){ ctx.save(); ctx.shadowColor='rgba(255,215,0,.35)'; ctx.shadowBlur=16*dpr; ctx.fillStyle='#fde047'; ctx.beginPath(); ctx.arc(c.x,c.y,c.r,0,Math.PI*2); ctx.fill(); ctx.restore(); ctx.fillStyle='rgba(0,0,0,.25)'; ctx.fillRect(c.x+c.r-4*dpr, c.y-c.r, 4*dpr, c.r*2); } }
 
-  // pipes
   for(const p of pipes){
     const gH = currentGapH(p);
     ctx.fillStyle=pal.pipe;
@@ -467,13 +472,10 @@ function loop(now){
     const EDGE=4*dpr; ctx.fillStyle=pal.edge; ctx.fillRect(p.x+p.w-EDGE,0,EDGE,H);
   }
 
-  // trail
   if(trailEnabled){ for(const t of trail){ ctx.globalAlpha=t.a; ctx.fillStyle=pal.player; ctx.beginPath(); ctx.arc(t.x,t.y,6*dpr*(0.5+t.a*0.5),0,Math.PI*2); ctx.fill(); } ctx.globalAlpha=1; }
 
-  // slime
   drawSlime(ctx, player.x*dpr, player.y*dpr, player.size*dpr, pal.player);
 
-  // HUD
   ctx.fillStyle='#fff'; ctx.font=(24*dpr)+'px ui-sans-serif,system-ui'; ctx.textAlign='left'; ctx.textBaseline='top';
   ctx.fillText('Score: '+state.score, 16*dpr, 12*dpr);
   ctx.fillStyle='rgba(255,255,255,.7)'; ctx.fillText('Best: '+state.best, 16*dpr, 40*dpr);
@@ -497,7 +499,6 @@ function loop(now){
     }
   }
 
-  // mic & skill UI updates
   const bar=document.getElementById('micFill'); const meter=document.getElementById('micMeter');
   if(bar){ const w = Math.max(0, Math.min(1, mic.level*2.4)); bar.style.width = (w*100).toFixed(0)+'%'; meter.style.opacity = mic.on ? '1' : '0.5'; }
   updateSkillUI();
@@ -506,14 +507,12 @@ function loop(now){
 }
 requestAnimationFrame(loop);
 
-// ===== Draw slime =====
+// Draw slime
 function drawSlime(ctx, x, y, s, color){
-  // squash & stretch theo vận tốc
   const t = Math.max(-0.35, Math.min(0.35, -player.vy/900));
   const rx = s*(0.72 + (-t)*0.30);
   const ry = s*(0.72 + ( t)*0.45);
 
-  // thân
   const grd = ctx.createRadialGradient(x-rx*0.3, y-ry*0.4, s*0.1, x, y, Math.max(rx,ry));
   grd.addColorStop(0, 'rgba(255,255,255,.35)');
   grd.addColorStop(1, color);
@@ -521,12 +520,10 @@ function drawSlime(ctx, x, y, s, color){
   ctx.shadowColor='rgba(0,0,0,.35)'; ctx.shadowBlur=16*dpr;
   ctx.beginPath(); ellipsePath(ctx, x, y, rx, ry, 10*dpr); ctx.fillStyle=grd; ctx.fill(); ctx.restore();
 
-  // mắt
   ctx.fillStyle='#000'; const eyeX = x + rx*0.22; const eyeY = y - ry*0.10;
   ctx.beginPath(); ctx.arc(eyeX, eyeY, s*0.10, 0, Math.PI*2); ctx.fill();
   ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(eyeX- s*0.03, eyeY- s*0.03, s*0.04, 0, Math.PI*2); ctx.fill();
 
-  // trail điểm sáng
   trail.push({x:x,y:y,a:0.75}); if(trail.length>12) trail.shift(); for(const t of trail) t.a=Math.max(0, t.a - 0.04);
 }
 function ellipsePath(ctx,x,y,rx,ry,r){
@@ -537,9 +534,8 @@ function ellipsePath(ctx,x,y,rx,ry,r){
   ctx.arcTo(x-rx, y+ry, x-rx, y-ry, r);
   ctx.arcTo(x-rx, y-ry, x+rx, y-ry, r);
 }
-  </script>
+</script>
 <script>
-// ===== Classes overlay render =====
 function renderClasses(){
   const info=document.getElementById('classInfo');
   info.textContent = classUnlocked ? `Bạn có ${classCore} Class Core. Mở khoá 1 class miễn phí hoặc dùng Feathers.` :
@@ -561,7 +557,7 @@ function renderClasses(){
     buy.disabled = ownedFlag || (!classUnlocked) || (classCore<=0 && coins<price);
     buy.addEventListener('click', ()=>{
       if(ownedFlag || !classUnlocked) return;
-      if(classCore>0){ classCore--; save('tapfly.classCore', classCore); }
+      if(classCore>0){ classCore--; localStorage.setItem('tapfly.classCore', classCore); }
       else { if(coins<price) return; coins-=price; saveCoins(); }
       classesOwned[id]=true; saveClasses(); renderClasses(); toast('Mở: '+c.name);
     });
@@ -577,7 +573,6 @@ function renderClasses(){
   }
 }
 
-// ===== Toast =====
 function toast(msg){ try{ const el=document.createElement('div'); el.textContent=msg;
   el.style.position='absolute'; el.style.right='12px'; el.style.bottom='12px';
   el.style.background='rgba(255,255,255,.12)'; el.style.border='1px solid rgba(255,255,255,.25)';
@@ -585,8 +580,7 @@ function toast(msg){ try{ const el=document.createElement('div'); el.textContent
   document.querySelector('.card').appendChild(el); setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .4s'; setTimeout(()=>el.remove(), 400); }, 900);
 }catch{} }
 
-// ===== Service Worker =====
 if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js'); }
 </script>
 </body>
-</html>                                                                                                        </script>
+</html>
