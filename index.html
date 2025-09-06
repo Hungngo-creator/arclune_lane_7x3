@@ -104,8 +104,7 @@
       <div id="wallR" class="mazeWall"></div>
 
       <div class="micMeter" id="micMeter" aria-hidden="true"><div class="fill" id="micFill"></div></div>
-      <div class="note">Wave1: Rift @49 (riêng file) • Maze@35 dịu tường • Resume@49.</div>
-
+      <div class="note">Wave1: Rift @49 (riêng file) • Maze@20 dịu tường • Resume@49.</div>
       <!-- Shop -->
       <div class="overlay" id="shop">
         <div class="panel">
@@ -425,7 +424,7 @@ function loop(now){
       // score & speed, triggers
       for(const p of pipes){ if(!p.passed && p.x+p.w<player.x*dpr){ p.passed=true; state.score++; coins+=1; saveCoins(); sfxScore();
         speed=Math.min(420,speed+(state.score<=5?1:2));
-        if(state.score>=35 && !mazeTriggered){ startMaze(); }
+        if(state.score>=16 && !mazeTriggered){ startMaze(); }
       } }
 
       if(shieldGrace>0)shieldGrace-=dt; if(magnetT>0)magnetT-=dt;
