@@ -154,6 +154,16 @@ let inv  = JSON.parse(localStorage.getItem('tapfly.inv')  || '{"shield":0,"magne
 let next = JSON.parse(localStorage.getItem('tapfly.next') || '{"shield":false,"magnet":false}');
 let diff=localStorage.getItem('tapfly.diff')||'easy';
 let skin=localStorage.getItem('tapfly.skin')||'gold';
+  
+  // Background theme + clock
+let bgTheme = localStorage.getItem('tapfly.bg') || 'aurora';
+let timeSec = 0;
+const BGs = ['aurora', 'city', 'mount'];
+function setBG(t){ bgTheme = t; localStorage.setItem('tapfly.bg', t);
+  const label = t==='aurora'?'Aurora':(t==='city'?'City':'Mount');
+  document.getElementById('bgBtn')?.replaceChildren('BG: '+label);
+}
+setBG(bgTheme); // set lần đầu
 
 // Classes
 let classesOwned=JSON.parse(localStorage.getItem('tapfly.classes')||'{"aqua":true}');
