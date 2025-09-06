@@ -87,6 +87,8 @@
         <button class="btn skin" data-skin="neon"><span class="dot" style="background:#a78bfa"></span>Neon</button>
 
         <button class="btn" id="shopBtn">Shop</button>
+        <button class="btn" id="bgBtn">BG: Aurora</button>
+        <button class="btn iconBtn" id="musicBtn" title="Nhạc">♪</button>
         <div class="btn" id="coinsPill">Feathers: 0</div>
       </div>
 
@@ -396,6 +398,38 @@ const sfxHit=()=>beep(180,.12,.045,'sawtooth');
 const sfxTick=()=>beep(520,.04,.025,'sine');
 const sfxCoin=()=>{ navigator.vibrate?.(12); beep(1200,.05,.035,'triangle'); };
 
+  // BGM đơn giản
+let musicOn=false, bgmTimer=null, bpm=96;
+function playNote(freq=440,dur=0.2,vol=0.02,type='sine'){
+  if(muted||!ac) return;
+  const o=ac.createOscillator(), g=ac.createGain(); const now=ac.currentTime;
+  o.type=type; o.frequency.value=freq; g.gain.value=vol;
+  g.gain.setValueAtTime(vol, now);
+  g.gain.exponentialRampToValueAtTime(0.0001, now+dur);
+  o.connect(g).connect(ac.destination); o.start(now); o.stop(now+dur);
+}
+function startBGM(){
+  if(bgmTimer) return; ensureAudio(); musicOn=true;
+  const step=60/bpm; let i=0;
+  bgmTimer=setInterval(()=>{
+    if(muted) return;
+    if(i%4===0) playNote(90,.10,.035,'sine');     // kick
+    if(i%8===4) playNote(180,.08,.02,'triangle'); // snare
+    const bass=[110,110,98,98,110,110,147,147][i%8];
+    playNote(bass,.22,.02,'sawtooth');            // bass
+    if(i%2===0){ playNote(440,.6,.008,'triangle'); playNote(550,.6,.006,'triangle'); } // pad
+    i=(i+1)%16;
+  }, step*1000);
+  document.getElementById('musicBtn')?.replaceChildren('♪ ON');
+}
+function stopBGM(){
+  if(bgmTimer){ clearInterval(bgmTimer); bgmTimer=null; }
+  musicOn=false; document.getElementById('musicBtn')?.replaceChildren('♪');
+}
+document.getElementById('musicBtn')?.addEventListener('click', ()=>{
+  if(!musicOn) startBGM(); else stopBGM(); sfxTick();
+});
+
 // Voice (mic)
 const voiceBtn=document.getElementById('voiceBtn');
 let mic={on:false,stream:null,src:null,analyser:null,data:null,level:0,thr:0.06};
@@ -406,7 +440,13 @@ async function startVoice(){ try{
 }catch{ toast('Mic bị chặn'); } }
 function stopVoice(){ mic.on=false; voiceBtn.textContent='🎙️'; try{ mic.stream?.getTracks().forEach(t=>t.stop()); }catch{} mic.stream=mic.src=mic.analyser=mic.data=null; }
 voiceBtn?.addEventListener('click', ()=>{ mic.on ? stopVoice() : startVoice(); sfxTick(); });
-
+// đổi theme nền
+document.getElementById('bgBtn')?.addEventListener('click', ()=>{
+  const i = BGs.indexOf(bgTheme);
+  setBG(BGs[(i+1)%BGs.length]);
+  sfxTick();
+});
+  
 // Skill UI
 const skillBtn=document.getElementById('skillBtn'); const cdRing=document.getElementById('cdRing');
 skillBtn?.addEventListener('click', castSkill);
@@ -440,7 +480,7 @@ function currentGapH(p){ if(!p.pulseAmp) return p.gapH; const osc=0.5+0.5*Math.s
 
 let last=performance.now();
 function loop(now){
-  let dt=(now-last)/1000; if(dt>0.033) dt=0.033; last=now;
+  let dt=(now-last)/1000; if(dt>0.033) dt=0.033; last=now; timeSec += dt;
 
   if(state.status==='playing'){
     player.vy += gravity*gravityMul*dt;
@@ -504,8 +544,8 @@ function loop(now){
   }
 
   const W=canvas.width, H=canvas.height; ctx.clearRect(0,0,W,H);
-  const pal = SKINS[skin] || SKINS.gold; const bg = ctx.createLinearGradient(0,0,0,H); bg.addColorStop(0, pal.skyTop); bg.addColorStop(1, pal.skyBot); ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
-  ctx.fillStyle=pal.ground; ctx.fillRect(0,H-24*dpr,W,24*dpr);
+  const pal = SKINS[skin] || SKINS.gold;
+drawBackground(ctx, W, H, timeSec, pal, bgTheme);
 
   for(const c of pickups){ if(!c.taken){ ctx.save(); ctx.shadowColor='rgba(255,215,0,.35)'; ctx.shadowBlur=16*dpr; ctx.fillStyle='#fde047'; ctx.beginPath(); ctx.arc(c.x,c.y,c.r,0,Math.PI*2); ctx.fill(); ctx.restore(); ctx.fillStyle='rgba(0,0,0,.25)'; ctx.fillRect(c.x+c.r-4*dpr, c.y-c.r, 4*dpr, c.r*2); } }
 
@@ -553,6 +593,62 @@ if (now < slowUntil){ ctx.fillText('⏳', W-16*dpr, hudY); hudY += 22*dpr; }
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
+
+function drawBackground(ctx, W, H, t, pal, theme){
+  // bầu trời
+  const g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0, pal.skyTop); g.addColorStop(1, pal.skyBot);
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+
+  if(theme==='aurora'){
+    ctx.save(); ctx.globalCompositeOperation='screen';
+    for(let i=0;i<3;i++){
+      const amp=(20+i*10)*dpr, y0=H*0.35+Math.sin(t*0.4+i)*30*dpr;
+      ctx.beginPath();
+      for(let x=0;x<=W;x+=6*dpr){
+        const w=0.004+i*0.0007;
+        const y=y0+Math.sin(x*w+t*0.8+i)*amp*0.6+Math.sin(x*w*0.6-t*0.5)*amp*0.4;
+        if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
+      ctx.fillStyle=i===0?'rgba(167,139,250,.18)':i===1?'rgba(34,211,238,.15)':'rgba(125,211,252,.12)';
+      ctx.fill();
+    }
+    ctx.restore();
+  }else if(theme==='city'){
+    // sao nhấp nháy
+    ctx.save(); ctx.globalAlpha=0.7;
+    for(let i=0;i<60;i++){
+      const x=((i*127)%W + (t*10))%W, y=(i*53)%(H*0.55);
+      ctx.fillStyle='rgba(255,255,255,'+(0.3+0.7*((i*37+t*3)%2<1?1:0.5))+')';
+      ctx.fillRect(x,y,2*dpr,2*dpr);
+    }
+    ctx.restore();
+    // skyline
+    const base=H*0.75, sp=12; let xoff=-((t*sp)%W);
+    ctx.fillStyle='rgba(0,0,0,.35)';
+    while(xoff<W){
+      const w=(30+((xoff*13)&31))*dpr, h=(60+((xoff*7)&63))*dpr;
+      ctx.fillRect(xoff, base-h, w, h);
+      xoff += w + 10*dpr;
+    }
+  }else{ // 'mount'
+    drawHills(0.20,60,'rgba(0,0,0,.18)');
+    drawHills(0.35,90,'rgba(0,0,0,.25)');
+    drawHills(0.55,120,'rgba(0,0,0,.35)');
+    function drawHills(speed,amp,color){
+      ctx.fillStyle=color; ctx.beginPath(); ctx.moveTo(0,H);
+      for(let x=0;x<=W;x+=6*dpr){
+        const y=H*0.75+Math.sin((x*0.003+t*speed))*amp*dpr*0.25
+               +Math.sin((x*0.0014-t*speed*0.6))*amp*dpr*0.15;
+        ctx.lineTo(x,y);
+      }
+      ctx.lineTo(W,H); ctx.closePath(); ctx.fill();
+    }
+  }
+  // nền đất
+  ctx.fillStyle=pal.ground; ctx.fillRect(0,H-24*dpr,W,24*dpr);
+}
 
 // Draw slime
 function drawSlime(ctx, x, y, s, color){
