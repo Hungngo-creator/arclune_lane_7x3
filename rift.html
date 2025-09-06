@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Rift — Mini Maze (Wave1)</title>
+<meta name="theme-color" content="#0f172a">
+<style>
+  html,body{margin:0;padding:0;background:#0b1020;color:#fff;font-family:ui-sans-serif,system-ui}
+  .wrap{min-height:100vh;display:grid;place-items:center;padding:16px}
+  .card{width:100%;max-width:900px;aspect-ratio:16/9;border-radius:18px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.4);position:relative;border:1px solid rgba(255,255,255,.08)}
+  canvas{display:block;width:100%;height:100%;background:#0a0f1e}
+
+  .leftCol{position:absolute;left:10px;top:50%;transform:translateY(-50%);z-index:25;display:flex;flex-direction:column;gap:10px;align-items:center}
+  .dpad{display:grid;grid-template-columns:68px 68px;grid-template-rows:52px 52px 52px;gap:8px}
+  .pad{width:68px;height:52px;border-radius:12px;border:2px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);display:grid;place-items:center;font-size:22px}
+  .up{grid-column:1/3} .down{grid-column:1/3}
+  .pad:active{transform:scale(.98)}
+
+  .hud{position:absolute;inset:0;pointer-events:none;display:flex;align-items:flex-start;justify-content:space-between;padding:10px}
+  .pill{background:rgba(255,255,255,.12);backdrop-filter:blur(8px);padding:6px 10px;border-radius:14px;font-size:12px}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <canvas id="cv"></canvas>
+      <div class="hud">
+        <div class="pill">Rift mini-maze • ▲ ▼ ◀ ▶ để di chuyển • Tìm EXIT để trở lại</div>
+        <div class="pill">Thoát rift: lưu Resume@50 cho Tap-to-Fly</div>
+      </div>
+      <div class="leftCol">
+        <div class="dpad">
+          <button class="pad up"    id="btnUp">▲</button>
+          <button class="pad left"  id="btnLeft">◀</button>
+          <button class="pad right" id="btnRight">▶</button>
+          <button class="pad down"  id="btnDown">▼</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+const cv=document.getElementById('cv'), cx=cv.getContext('2d');
+let dpr=Math.max(1,Math.min(2,window.devicePixelRatio||1));
+function fit(){ dpr=Math.max(1,Math.min(2,window.devicePixelRatio||1)); const w=Math.min(window.innerWidth-32,900), h=Math.floor(w*9/16); cv.style.width=w+'px'; cv.style.height=h+'px'; cv.width=Math.floor(w*dpr); cv.height=Math.floor(h*dpr); }
+addEventListener('resize',fit); fit();
+
+const TILE=22*dpr; const COLS=24, ROWS=24; // Wave1 nhỏ gọn
+const map=Array.from({length:ROWS},()=>Array(COLS).fill(1)); // 1=wall,0=path
+let start={x:1,y:1}, exits=[];
+function carveMaze(){
+  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++) map[y][x]=1;
+  function inb(x,y){return x>0&&y>0&&x<COLS-1&&y<ROWS-1}
+  function neighbors(x,y){return [[x+2,y],[x-2,y],[x,y+2],[x,y-2]].filter(([a,b])=>inb(a,b))}
+  const stack=[]; let x=1,y=1; map[y][x]=0; stack.push([x,y]);
+  while(stack.length){
+    const [cx0,cy0]=stack[stack.length-1]; const ns=neighbors(cx0,cy0).filter(([a,b])=>map[b][a]===1);
+    if(ns.length){
+      const [nx,ny]=ns[(Math.random()*ns.length)|0]; map[(ny+cy0)/2][(nx+cx0)/2]=0; map[ny][nx]=0; stack.push([nx,ny]);
+    }else stack.pop();
+  }
+  start={x:1,y:1};
+  // đặt 1 exit mặc định (Wave1): góc xa
+  exits=[{x:COLS-2,y:ROWS-2}];
+}
+carveMaze();
+
+const player={x:start.x,y:start.y,px:0,py:0,speed:5}; // 5 tiles/s
+let input={up:0,down:0,left:0,right:0};
+function worldToScreen(x,y){ const camX=player.x, camY=player.y; const W=cv.width,H=cv.height; const offX=W/2 - camX*TILE, offY=H/2 - camY*TILE; return {sx:x*TILE+offX, sy:y*TILE+offY}; }
+  </script>
+  <script>
+function setBtn(id,flag,val){const el=document.getElementById(id); el?.addEventListener('pointerdown',()=>{input[flag]=1;}); el?.addEventListener('pointerup',()=>{input[flag]=0;}); el?.addEventListener('pointerleave',()=>{input[flag]=0;});}
+setBtn('btnUp','up'); setBtn('btnDown','down'); setBtn('btnLeft','left'); setBtn('btnRight','right');
+addEventListener('keydown',e=>{if(e.code==='ArrowUp'||e.code==='KeyW')input.up=1; if(e.code==='ArrowDown'||e.code==='KeyS')input.down=1; if(e.code==='ArrowLeft'||e.code==='KeyA')input.left=1; if(e.code==='ArrowRight'||e.code==='KeyD')input.right=1;});
+addEventListener('keyup',e=>{if(e.code==='ArrowUp'||e.code==='KeyW')input.up=0; if(e.code==='ArrowDown'||e.code==='KeyS')input.down=0; if(e.code==='ArrowLeft'||e.code==='KeyA')input.left=0; if(e.code==='ArrowRight'||e.code==='KeyD')input.right=0;});
+
+let last=performance.now();
+function loop(now){
+  let dt=(now-last)/1000; if(dt>0.033)dt=0.033; last=now;
+
+  // di chuyển (tile-based với lerp nhẹ)
+  const vx=input.right-input.left, vy=input.down-input.up;
+  player.px += vx*player.speed*dt; player.py += vy*player.speed*dt;
+  // chặn tường
+  const tx=Math.max(0,Math.min(COLS-1,Math.round(player.px))), ty=Math.max(0,Math.min(ROWS-1,Math.round(player.py)));
+  if(map[ty] && map[ty][tx]===0){ player.x=player.px; player.y=player.py; } else { player.px=player.x; player.py=player.y; }
+
+  draw();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+function draw(){
+  const W=cv.width,H=cv.height; cx.clearRect(0,0,W,H);
+  // Fog-of-war radius
+  const R=6; // 6 tiles
+  const camX=player.x, camY=player.y; const offX=W/2 - camX*TILE, offY=H/2 - camY*TILE;
+
+  // tiles
+  for(let y=0;y<ROWS;y++){
+    for(let x=0;x<COLS;x++){
+      const dx=Math.abs(x-camX), dy=Math.abs(y-camY);
+      if(dx>R+1||dy>R+1) continue; // culled
+      const {sx,sy}=worldToScreen(x,y);
+      if(map[y][x]===1){ cx.fillStyle='rgba(15,23,42,.9)'; cx.fillRect(sx,sy,TILE,TILE); }
+      else { cx.fillStyle='rgba(34,197,94,.12)'; cx.fillRect(sx,sy,TILE,TILE); }
+    }
+  }
+
+  // exit tile
+  const ex=exits[0]; const {sx:exs,sy:eys}=worldToScreen(ex.x,ex.y);
+  cx.fillStyle='rgba(34,211,238,.35)'; cx.fillRect(exs,eys,TILE,TILE);
+  cx.strokeStyle='#22d3ee'; cx.lineWidth=2*dpr; cx.strokeRect(exs,eys,TILE,TILE);
+
+  // player (slime top-down)
+  const {sx,sy}=worldToScreen(player.x,player.y);
+  cx.fillStyle='#22d3ee'; cx.beginPath(); cx.arc(sx+TILE/2,sy+TILE/2,TILE*0.35,0,Math.PI*2); cx.fill();
+  cx.fillStyle='#000'; cx.beginPath(); cx.arc(sx+TILE*0.58,sy+TILE*0.42,TILE*0.08,0,Math.PI*2); cx.fill();
+
+  // vignette FOV
+  const grd=cx.createRadialGradient(W/2,H/2,TILE*R*0.85,W/2,H/2,TILE*R*1.25);
+  grd.addColorStop(0,'rgba(0,0,0,0)'); grd.addColorStop(1,'rgba(0,0,0,0.65)');
+  cx.fillStyle=grd; cx.fillRect(0,0,W,H);
+
+  // check exit
+  if(Math.round(player.x)===ex.x && Math.round(player.y)===ex.y){
+    // thành công: set resume@50 rồi quay lại index
+    localStorage.setItem('tapfly.returnToScore','50');
+    location.href='index.html?back=rift';
+  }
+}
+  </script>
+  </body>
+</html>
