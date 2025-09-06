@@ -249,6 +249,43 @@ function completeDaily(){if(!daily.done){daily.done=true;localStorage.setItem('t
 // State
 const state={status:'menu',score:0,best:+(localStorage.getItem('tapfly.best')||0)};
 const player={x:120,y:(canvas.height/dpr)*0.5,vy:0,size:22};
+    // ==== MAZE PHYSICS (platformer) ====
+player.onGround = false;
+let prevX = 0, prevY = 0;
+
+// tách va chạm theo trục cho cảm giác "đi trên nền"
+function resolveCircleRect_SepAxis(px, py, pr, vx, vy, dt, rect){
+  // 1) resolve theo Y trước (nền/trần)
+  let yNext = py + vy*dt;
+  let xNow  = px;
+  // kiểm tra overlap sau khi đi Y
+  const nxY = Math.max(rect.x, Math.min(xNow, rect.x+rect.w));
+  const nyY = Math.max(rect.y, Math.min(yNext, rect.y+rect.h));
+  const dyY = yNext - nyY, dxY = xNow - nxY;
+  if (dxY*dxY + dyY*dyY <= pr*pr){
+    if (vy > 0){ // rơi xuống nền
+      yNext = rect.y - pr; vy = 0; player.onGround = true;
+    } else if (vy < 0){ // chạm trần
+      yNext = rect.y + rect.h + pr; vy = 0;
+    }
+  }
+
+  // 2) resolve theo X (tường trái/phải)
+  let xNext = xNow + vx*dt;
+  const nxX = Math.max(rect.x, Math.min(xNext, rect.x+rect.w));
+  const nyX = Math.max(rect.y, Math.min(yNext, rect.y+rect.h));
+  const dxX = xNext - nxX, dyX = yNext - nyX;
+  if (dxX*dxX + dyX*dyX <= pr*pr){
+    if (vx > 0){ // đâm tường phải
+      xNext = rect.x - pr; 
+    } else if (vx < 0){ // đâm tường trái
+      xNext = rect.x + rect.w + pr;
+    }
+    vx = 0;
+  }
+
+  return {x:xNext, y:yNext, vx, vy};
+}
 const pipes=[],pickups=[],trail=[],portals=[];
 let trailEnabled=true; let trailStyle='soft';
 let speed,gravity,jumpV,spawnMs=0;
@@ -670,51 +707,65 @@ function setWallWidth(leftPx, rightPx){
 // Cập nhật “trail maze”: khép tường chậm, đi trái/phải, ăn key, tính hit
 
   function updateMaze(dt, now){
-  // ép tường
+  // khép "mê vụ" hai bên
   const Ltarget = canvas.width * 0.34;
   const Rtarget = canvas.width * 0.66;
   maze.leftX  = Math.min(maze.leftX  + maze.speed*dt, Ltarget);
   maze.rightX = Math.max(maze.rightX - maze.speed*dt, Rtarget);
   setWallWidth(maze.leftX, canvas.width - maze.rightX);
 
-  // điều khiển trái/phải + clamp theo tường
-  const moveSpd = 220;
-  player.x += moveX * moveSpd * dt;
+  // vận tốc theo input (trái/phải); nhảy vẫn dùng flap() ở ngoài
+  const moveSpd = 220;  // px/s
+  const vx = moveX * moveSpd;
+  // gravity + y đã cộng ở đầu loop(), ở đây chỉ đọc lại player.vy
+  let vy = player.vy;
+
+  // clamp theo “mê vụ” hai bên (không cho vượt mép)
   const L = (maze.leftX / dpr)  + player.size*0.6;
   const R = (maze.rightX / dpr) - player.size*0.6;
-  player.x = Math.max(L, Math.min(R, player.x));
 
-  // va chạm tường: KHÔNG chết, chỉ rung + tăng nhẹ tốc độ ép tường
-  const s=player.size*dpr, px=player.x*dpr, py=player.y*dpr, cx=px+s*.5, cy=py+s*.5, cr=s*.5;
-  let hit=false;
+  // trước khi resolve, lưu prev
+  prevX = player.x; prevY = player.y; player.onGround = false;
+
+  // bán kính va chạm
+  const pr = player.size*dpr*0.5;
+
+  // chạy resolve với từng tường chữ nhật
+  let px = player.x*dpr, py = player.y*dpr;
+  let rx = px, ry = py;
+  let rvx = vx*dpr, rvy = vy*dpr;
+
   for(const o of maze.obs){
-    const nx = Math.max(o.x, Math.min(cx, o.x+o.w));
-    const ny = Math.max(o.y, Math.min(cy, o.y+o.h));
-    const dx=cx-nx, dy=cy-ny;
-    if(dx*dx+dy*dy <= cr*cr){ hit=true; break; }
-  }
-  if(hit && now-(maze.lastHitAt||0) > 220){
-    maze.lastHitAt = now;
-    navigator.vibrate?.(50);
-    maze.speed *= 1.04; // tăng nhẹ mỗi lần đụng
-    sfxTick();
+    const res = resolveCircleRect_SepAxis(rx, ry, pr, rvx, rvy, dt, o);
+    rx = res.x; ry = res.y; rvx = res.vx; rvy = res.vy;
   }
 
-  // ăn key
+  // cập nhật lại vị trí/velocity sau resolve
+  player.x = Math.max(L, Math.min(R, rx/dpr));
+  player.y = ry/dpr;
+  // nếu rơi xuống nền thì vy đã 0 trong resolve; phản ánh lại
+  if (Math.abs(rvy) < 0.0001) player.vy = 0;
+
+  // ăn key: tăng tốc mê vụ mỗi key
+  const s=player.size*dpr, cx=player.x*dpr+s*0.5, cy=player.y*dpr+s*0.5, cr=s*0.5;
   for(const k of maze.keys){
     if(!k.taken){
       const dx=cx-k.x, dy=cy-k.y;
-      if(dx*dx+dy*dy <= (cr + k.r)**2){ k.taken=true; coins+=10; saveCoins(); sfxCoin(); }
+      if(dx*dx+dy*dy <= (cr + k.r)**2){
+        k.taken=true; coins+=10; saveCoins(); sfxCoin();
+        // tăng tốc "mê vụ" +12% mỗi key để có cảm giác bị dí
+        maze.speed *= 1.12;
+      }
     }
   }
 
-  // đủ 3 key → clear maze
+  // đủ 3 key → clear
   if(maze.keys.every(k=>k.taken)){
     mazeActive=false; mazeTriggered=false; setWallWidth(0,0);
     pipes.length=0; pickups.length=0; spawnMs=0;
     toast('Maze clear!'); navigator.vibrate?.([40,40,40]);
   }
-    }
+  }
 
 // Classes overlay + Toast + SW
 function renderClasses(){
