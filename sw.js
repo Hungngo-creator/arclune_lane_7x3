@@ -1,5 +1,5 @@
 // bump version để ép cập nhật
-const CACHE = "Tap-to-Fly — Wave1 (Rift @49)";
+const CACHE = "Tap-to-Fly — Wave1 (Rift @49) v2";
 const ASSETS = ["./", "./index.html", "./manifest.json"];
 
 self.addEventListener("install", e => {
