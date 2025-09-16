@@ -35,6 +35,19 @@ export function startSummonBar(doc, options){
 
 const host = doc.getElementById('cards');
 host.innerHTML = '';
+  host.addEventListener('click', (event) => {
+  const btn = event.target.closest('button.card');
+  if (!btn || btn.disabled || !host.contains(btn)) return;
+
+  const deck = getDeck() || [];
+  const targetId = btn.dataset.id;
+  if (!targetId) return;
+  const card = deck.find((c) => `${c.id}` === targetId);
+  if (!card || !canAfford(card)) return;
+
+  onPick(card);
+  [...host.children].forEach((node) => node.classList.toggle('active', node === btn));
+});
 
 // C2: đồng bộ cỡ ô cost theo bề rộng sân (7 cột), lấy số từ CFG.UI
 const _GAP = CFG.UI?.CARD_GAP ?? 12;     // khớp CSS khoảng cách
@@ -127,13 +140,6 @@ function makeBtn(c){
   const ok = canAfford(c);
   btn.disabled = !ok;
   btn.classList.toggle('disabled', !ok);  // chỉ để CSS quyết định độ sáng
-
-// trong makeBtn(c) ở ui.js
-btn.addEventListener('click', ()=>{
-  if (!canAfford(c)) return;
-  onPick(c); // giao cho main quyết định selectedId
-  [...host.children].forEach(x => x.classList.toggle('active', x===btn));
-});
 
   return btn;
 }
