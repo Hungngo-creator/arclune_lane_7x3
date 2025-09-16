@@ -1,7 +1,6 @@
 // v0.7.3
 import { slotToCell } from './engine.js';
 import { Statuses } from './statuses.js';
-import { basicAttack } from './combat.js';
 import { doBasicWithFollowups } from './combat.js';
 import { CFG } from './config.js';
 import { makeInstanceStats, initialRageFor } from './meta.js';
