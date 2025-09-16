@@ -70,12 +70,7 @@ function debounce(fn, wait){
       timer = null;
     }
   };
-  debounced.flush = (...args)=>{
-    if (timer){
-      clearTimeout(timer);
-      timer = null;
-      }
-  };
+
   debounced.flush = (...args)=>{
     if (timer){
       clearTimeout(timer);
