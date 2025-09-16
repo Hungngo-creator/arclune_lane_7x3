@@ -1,0 +1,216 @@
+//ver 0.7.2
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Arclune — v0.7.2</title>
+  <style>
+    :root{
+      --bg:#0d1216; --panel:#121a22; --chip:#0f1820; --ink:#e6f2ff;
+      --ally:#1e2b36; --enemy:#2a1c22; --mid:#1c222a; --line:#24303c;
+   --brand:#2f495c; --ok:#4caf50; --warn:#ffe066;
+      /* MÀU COST (mới) */
+      --cost-fill:#7dd3fc;   /* màu phần đã nạp (sáng hơn) */
+      --cost-rest:#34526b;   /* màu phần còn lại (đỡ tối) */
+     --chip-bg:#0f1e2b;     /* nền chip tròn sáng hơn một chút */
+     --chip-glow:rgba(125,211,252,.45); --card
+     --card-bg:#10263a; --card-border:#355a80;
+  --card-bg-on:#163d59;        /* nền khi đủ cost (sáng hơn) */
+  --card-border-on:#67add8;    /* viền khi đủ cost */
+  --card-cost:#eaf7ff;         /* màu số thường */
+  --card-cost-on:#ffffff;      /* màu số khi đủ cost (sáng) */
+  --card-cost-dim:#b9cde1;     /* số khi disable */
+   --card-disabled-opacity:.5;
+ 
+     /* Card (ô cost) sáng hơn */
+      --card-bg:#10263a;
+     --card-border:#355a80;
+     --card-cost:#eaf7ff;
+   --card-cost-dim:#b9cde1;
+    }
+    
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,Segoe UI,Roboto,Helvetica,Arial}
+    #top{display:flex;gap:16px;flex-wrap:wrap;padding:16px 16px 8px}
+    .chip{background:var(--chip);border:1px solid var(--line);border-radius:12px;padding:10px 14px;display:inline-flex;gap:8px;align-items:center}
+    .chip b{font-weight:700}
+    
+.costSlot{
+  position:relative;
+  width:var(--cell); height:var(--cell);
+  background:#111a22; border:2px solid #1b2732; border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+}
+.costSlot .cost{
+  position:absolute; bottom:4px; right:6px;
+  font-size:14px; font-weight:700;
+  background:rgba(0,0,0,.5); padding:2px 6px; border-radius:6px;
+}
+.costSlot.active{ outline:2px solid var(--ok); }
+.costSlot.disabled{ opacity:.45; }
+
+/* (đã bỏ HUD cũ: #costBar/#costFill) */
+    #boardWrap{background:var(--panel);border-top:1px solid #0b1218;border-bottom:1px solid #0b1218;border-radius:12px;margin:0 16px;padding:16px}
+    canvas{display:block;width:100%;height:auto}
+    #hint{padding:12px 20px 6px}
+    
+      /* === Cost bar kiểu ô (mới) === */
+#cards{
+  display: grid;
+  grid-template-columns: repeat(4, var(--cell,72px));
+  gap: 12px;
+  place-content: center;
+  margin: 12px auto 0;
+}
+
+#cards .card{
+  width: var(--cell,72px);
+  aspect-ratio: 1 / 1;          /* vuông đúng như ô sân */
+  border-radius: 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  position: relative;
+  box-shadow: 0 0 0 2px rgba(255,255,255,.06) inset;
+}
+
+#cards .card.active{
+  outline: 2px solid #57ffa0;   /* khi đang chọn */
+  outline-offset: -2px;
+}
+
+#cards .card .cost{
+  position: absolute;
+  right: 8px;
+  bottom: 6px;
+  font-weight: 800;
+  font-size: 15px;
+color: var(--card-cost);
+ text-shadow: 0 0 6px rgba(125,211,252,.28);
+ }
+
+/* Styling thống nhất khi KHÔNG đủ cost (có attr disabled hoặc class .disabled) */
+#cards .card.disabled,
+#cards .card:disabled{
+  opacity: var(--card-disabled-opacity) !important;
+  filter: none;
+}
+#cards .card.disabled .cost,
+#cards .card:disabled .cost{
+  color: inherit;       /* số mờ đồng bộ theo opacity của card */
+  text-shadow: none;
+}
+/* ĐỦ cost (không disabled) → sáng rõ */
+#cards .card:not(.disabled):not(:disabled){
+  background: var(--card-bg-on);
+ border-color: var(--card-border-on);
+  box-shadow:
+    0 0 0 2px rgba(125,211,252,.10) inset,
+    0 4px 18px rgba(125,211,252,.12);
+}
+#cards .card:not(.disabled):not(:disabled) .cost{
+  color: var(--card-cost-on);
+  text-shadow: 0 0 10px rgba(125,211,252,.45);
+}
+
+/* Đang chọn + đủ cost → nổi bật hơn 1 nấc */
+#cards .card.active:not(.disabled):not(:disabled){
+  outline: 2px solid #57ffa0;
+  outline-offset: -2px;
+  box-shadow:
+    0 0 0 2px rgba(87,255,160,.25),
+    0 6px 22px rgba(87,255,160,.22),
+   0 0 0 2px rgba(125,211,252,.12) inset;
+}
+
+/* Bottom HUD layout */
+.hud-bottom{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;      /* timer nằm giữa */
+  gap:16px;
+  margin-top:8px;
+  position:relative;
+}
+
+/* Timer chip – nằm giữa hàng dưới */
+.chip{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:600;
+  line-height:1;
+  user-select:none;
+  -webkit-user-select:none;}
+.chip-timer{
+  min-width:108px;
+  padding:10px 14px;
+  border-radius:14px;
+  background:#0e1620;
+  box-shadow: inset 0 0 0 1px #1e293b;
+  text-align:center;
+  }
+
+/* Cost chip – tròn, có vòng ring tiến trình n/30 */
+.chip-cost{
+  position:absolute;
+  right:16px;     /* sát bên phải dưới canvas */
+  bottom:0;
+  width:48px; height:48px;
+  border-radius:9999px;
+  background:var(--chip-bg);
+  box-shadow: inset 0 0 0 1px #284055;
+ }
+#costNow{
+  position:absolute; inset:0;
+  display:grid; place-items:center;
+  font-size:16px; font-weight:700;
+}
+#costRing{
+  position:absolute; inset:-2px;
+  border-radius:50%;
+  /* Vòng tròn mảnh xung quanh: lớp 1 tạo “lỗ” ở giữa, lớp 2 là tiến trình */
+  background:
+    radial-gradient(closest-side, var(--chip-bg) 72%, transparent 73% 100%),
+    conic-gradient(var(--cost-fill) var(--deg,0deg), var(--cost-rest) 0);
+}
+/* Max cap = 30 thì sáng hơn một chút */
+.chip-cost.full{
+ box-shadow: inset 0 0 0 2px var(--cost-fill), 0 0 14px var(--chip-glow);
+  filter: brightness(1.12);
+}
+
+  </style>
+</head>
+<body>
+
+<style>
+  /* Giữ kích thước canvas; không override layout #cards của HUD mới */
+ #board { width: 92vw; height: auto; max-width: 1200px; }
+</style>
+
+<div id="boardWrap">
+  <canvas id="board"></canvas>
+</div>
+
+<!-- Bottom HUD (mới) – đặt NGOÀI canvas -->
+<div id="bottomHUD" class="hud-bottom">
+  <!-- Timer ở giữa -->
+  <div id="timer" class="chip chip-timer">04:00</div>
+
+  <!-- Ô cost tròn bên phải – chỉ số, không “/30” -->
+  <div id="costChip" class="chip chip-cost">
+    <div id="costRing"></div>
+    <div id="costNow">0</div>
+  </div>
+</div>
+
+  <div id="cards"></div>
+<script nomodule>
+  alert('Trình duyệt này không hỗ trợ ES modules. Hãy mở qua một HTTP server.');
+</script>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
