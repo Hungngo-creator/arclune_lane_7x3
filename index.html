@@ -23,12 +23,24 @@
   --card-cost-dim:#b9cde1;     /* số khi disable */
    --card-disabled-opacity:.5;
     }
-    
+    chip{
+      background:var(--chip);
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px 14px;
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      justify-content:center;
+      font-weight:600;
+      line-height:1;
+      user-select:none;
+      -webkit-user-select:none;
+    }
+    .chip b{font-weight:700}
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,Segoe UI,Roboto,Helvetica,Arial}
     #top{display:flex;gap:16px;flex-wrap:wrap;padding:16px 16px 8px}
-    .chip{background:var(--chip);border:1px solid var(--line);border-radius:12px;padding:10px 14px;display:inline-flex;gap:8px;align-items:center}
-    .chip b{font-weight:700}
     
 .costSlot{
   position:relative;
@@ -130,14 +142,6 @@ color: var(--card-cost);
 }
 
 /* Timer chip – nằm giữa hàng dưới */
-.chip{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:600;
-  line-height:1;
-  user-select:none;
-  -webkit-user-select:none;}
 .chip-timer{
   min-width:108px;
   padding:10px 14px;
