@@ -40,16 +40,81 @@ host.innerHTML = '';
 const _GAP = CFG.UI?.CARD_GAP ?? 12;     // khớp CSS khoảng cách
 const _MIN = CFG.UI?.CARD_MIN ?? 40;     // cỡ tối thiểu
 const boardEl = doc.getElementById('board'); // cache DOM
-function syncCardSize(){
+function debounce(fn, wait){
+  let timer = null;
+  function debounced(...args){
+    if (timer){
+      clearTimeout(timer);
+    }
+    timer = setTimeout(()=>{
+      timer = null;
+      fn.apply(this, args);
+    }, wait);
+  }
+  debounced.cancel = ()=>{
+    if (timer){
+      clearTimeout(timer);
+      timer = null;
+    }
+  };
+  debounced.flush = (...args)=>{
+    if (timer){
+      clearTimeout(timer);
+      timer = null;
+      }
+  };
+  debounced.flush = (...args)=>{
+    if (timer){
+      clearTimeout(timer);
+      timer = null;
+    }
+    fn.apply(this, args);
+  };
+  return debounced;
+}
+
+const syncCardSize = debounce(()=>{
   if (!boardEl) return;
   const w = boardEl.clientWidth || boardEl.getBoundingClientRect().width || 0;
   
   // 7 cột -> 6 khoảng cách
   const cell = Math.max(_MIN, Math.floor((w - _GAP*6)/7));
   host.style.setProperty('--cell', `${cell}px`);
+  }, 60);
+
+syncCardSize.flush();
+
+let cleanupResize = ()=>{};
+if (boardEl && typeof ResizeObserver === 'function'){
+  const observer = new ResizeObserver(()=> syncCardSize());
+  observer.observe(boardEl);
+  cleanupResize = ()=>{
+    observer.disconnect();
+    syncCardSize.cancel();
+  };
+} else {
+  const handleResize = ()=> syncCardSize();
+  window.addEventListener('resize', handleResize);
+  cleanupResize = ()=>{
+    window.removeEventListener('resize', handleResize);
+    syncCardSize.cancel();
+  };
 }
-syncCardSize();
-window.addEventListener('resize', syncCardSize);
+
+let removalObserver = null;
+if (host && typeof MutationObserver === 'function'){
+  const target = doc.body || doc.documentElement;
+  if (target){
+    removalObserver = new MutationObserver(()=>{
+      if (!host.isConnected){
+        cleanupResize();
+        removalObserver.disconnect();
+        removalObserver = null;
+      }
+    });
+    removalObserver.observe(target, { childList: true, subtree: true });
+  }
+}
 // mỗi thẻ cost là 1 ô vuông, chỉ hiện cost
 function makeBtn(c){
   const btn = doc.createElement('button');
