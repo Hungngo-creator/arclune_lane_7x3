@@ -326,7 +326,8 @@ if (deltaSec > 0) {
 }
 
     // Bước lượt theo nhịp demo
-    if (now - CLOCK.lastTurnStepMs >= CLOCK.turnEveryMs){
+    const busyUntil = Game.turn?.busyUntil ?? 0;
+    if (now >= busyUntil && now - CLOCK.lastTurnStepMs >= CLOCK.turnEveryMs){
       CLOCK.lastTurnStepMs = now;
   stepTurn(Game, {
   performUlt,               // dùng ult (có immediate summon)
