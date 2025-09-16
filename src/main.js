@@ -50,11 +50,49 @@ const Game = {
 // --- Enemy AI state (deck-4, cost riêng) ---
 Game.ai = {
  cost: 0, costCap: CFG.COST_CAP, summoned: 0, summonLimit: CFG.SUMMON_LIMIT,
- unitsAll: UNITS, usedUnitIds: new Set(), deck: [], selectedId: null,
+  unitsAll: UNITS, usedUnitIds: new Set(), deck: [], selectedId: null,
   lastThinkMs: 0
 };
 Game.meta = Meta;
 
+let drawFrameHandle = null;
+let drawPending = false;
+let drawPaused = false;
+
+function cancelScheduledDraw(){
+  if (drawFrameHandle !== null){
+    cancelAnimationFrame(drawFrameHandle);
+    drawFrameHandle = null;
+  }
+  drawPending = false;
+}
+
+function scheduleDraw(){
+  if (drawPaused) return;
+  if (drawPending) return;
+  if (!canvas || !ctx) return;
+  drawPending = true;
+  drawFrameHandle = requestAnimationFrame(()=>{
+    drawFrameHandle = null;
+    drawPending = false;
+    if (drawPaused) return;
+    try {
+      draw();
+    } catch (err) {
+      console.error('[draw]', err);
+    }
+    if (Game?.vfx && Game.vfx.length) scheduleDraw();
+  });
+}
+
+function setDrawPaused(paused){
+  drawPaused = !!paused;
+  if (drawPaused){
+    cancelScheduledDraw();
+  } else {
+    scheduleDraw();
+  }
+}
 // Master clock theo timestamp – tránh drift giữa nhiều interval
 const CLOCK = {
   startMs: performance.now(),
@@ -279,13 +317,8 @@ Game.tokens.forEach(t=>{
 Game.tokens.forEach(t => { if (!t.iid) t.iid = nextIid(); });
 
   hud.update(Game);
-  draw();
+scheduleDraw();
   Game._inited = true;   // đánh dấu thành công
-// Loop vẽ riêng cho VFX ~60fps (không đụng logic)
-(function rafLoop(){
-  try { draw(); } catch(_) {}
-  requestAnimationFrame(rafLoop);
-})();
   // 3) Master clock + cost + timer + bước lượt (Sparse Cursor)
   setInterval(()=>{
     const now = performance.now();
@@ -336,7 +369,7 @@ if (deltaSec > 0) {
   doActionOrSkip            // để creep basic ngay trong chain
 });
 cleanupDead(performance.now());
-draw();
+scheduleDraw();
 aiMaybeAct(Game, 'board');
     }
   }, 250);
@@ -409,10 +442,9 @@ Game.cost = Math.max(0, Game.cost - card.cost);
     refillDeck();
     selectFirstAffordable();
     Game.ui.bar.render();
-    draw();
+    scheduleDraw();
   });
-
-  window.addEventListener('resize', ()=>{ resize(); draw(); });
+window.addEventListener('resize', ()=>{ resize(); scheduleDraw(); });
 }
 
 /* ---------- Deck logic ---------- */
@@ -492,3 +524,7 @@ const p = cellCenterObliqueLocal(Game.grid, t.cx, t.cy, CAM_PRESET);
 }
 /* ---------- Chạy ---------- */
 init();
+document.addEventListener('visibilitychange', ()=>{
+  setDrawPaused(document.hidden);
+});
+setDrawPaused(document.hidden);
