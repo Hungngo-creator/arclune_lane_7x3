@@ -43,7 +43,7 @@ const Game = {
   deck3: [],                    // mảng 3 unit
   selectedId: null,
   ui: { bar: null },
-  turn: { phase: 'ally', last: { ally: 0, enemy: 0 }, cycle: 0 },
+  turn: { phase: 'ally', last: { ally: 0, enemy: 0 }, cycle: 0, busyUntil: 0 },
     queued: { ally: new Map(), enemy: new Map() },
   actionChain: []
 };
