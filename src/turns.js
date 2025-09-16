@@ -64,25 +64,39 @@ export function tickMinionTTL(Game, side){
 
 // hành động 1 unit (ưu tiên ult nếu đủ nộ & không bị chặn)
 export function doActionOrSkip(Game, unit, { performUlt }){
-  if (!unit || !unit.alive) return;
+  const ensureBusyReset = () => {
+    if (!Game || !Game.turn) return;
+    const now = performance.now();
+    if (!Number.isFinite(Game.turn.busyUntil) || Game.turn.busyUntil < now) {
+      Game.turn.busyUntil = now;
+    }
+  };
+
+  if (!unit || !unit.alive) {
+    ensureBusyReset();
+    return;
+  }
   const meta = Game.meta.get(unit.id);
 
   Statuses.onTurnStart(unit, {});
 
-  if (!Statuses.canAct(unit)) { 
-    Statuses.onTurnEnd(unit, {}); 
-    return; 
+  if (!Statuses.canAct(unit)) {
+    Statuses.onTurnEnd(unit, {});
+    ensureBusyReset();
+    return;
   }
 
   if (meta && (unit.rage|0) >= 100 && !Statuses.blocks(unit,'ult')){
     try { performUlt(unit); } catch(e){ console.error('[performUlt]', e); unit.rage = 0; }
     Statuses.onTurnEnd(unit, {});
+    ensureBusyReset();
     return;
   }
 
   const cap = (meta && typeof meta.followupCap === 'number') ? (meta.followupCap|0) : (CFG.FOLLOWUP_CAP_DEFAULT|0);
  doBasicWithFollowups(Game, unit, cap);
   Statuses.onTurnEnd(unit, {});
+  ensureBusyReset();
 }
 
 // Bước con trỏ lượt (sparse-cursor) đúng đặc tả
