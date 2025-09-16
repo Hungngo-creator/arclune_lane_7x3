@@ -171,8 +171,6 @@ function render(){
   b.style.opacity = ''; // xóa mọi inline opacity cũ nếu còn
     b.classList.toggle('active', getSelectedId() === c.id);
 
-    // click = chọn thẻ
-    b.onclick = ()=> onPick(c);
   }
 }
 return { render };}
