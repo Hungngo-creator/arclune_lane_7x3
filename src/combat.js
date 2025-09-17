@@ -1,4 +1,4 @@
-//v0.7.9
+//v0.8
 import { Statuses, hookOnLethalDamage } from './statuses.js';
 import { vfxAddTracer, vfxAddHit, vfxAddMelee } from './vfx.js';
 import { slotToCell, cellReserved } from './engine.js';
@@ -132,35 +132,7 @@ export function basicAttack(Game, unit){
   const fallback = pickTarget(Game, unit);
 
   // Sau đó cho Statuses có quyền điều phối (taunt/allure…), nếu trả về null thì bỏ lượt
- const tgt = Statuses.resolveTarget(unit, pool, { attackType:'basic' }) ?? fallback;
-   if (!tgt) return;
-at.js
-+12
--2
-
-@@ -49,52 +49,62 @@ export function computeDamage(attacker, target, type='physical'){
-    const cut = 1 - (target.arm||0);
-    return Math.max(1, Math.floor(raw * cut));
-  }
-}
-
-export function applyDamage(target, amount){
-  if (!Number.isFinite(target.hpMax)) return;
-  target.hp = Math.max(0, Math.min(target.hpMax, (target.hp|0) - (amount|0)));
-  if (target.hp <= 0){
-    if (target.alive !== false && !target.deadAt) target.deadAt = performance.now();
-    target.alive = false;
-  }
-}
-
-export function basicAttack(Game, unit){
-  const foe = unit.side === 'ally' ? 'enemy' : 'ally';
-  const pool = Game.tokens.filter(t => t.side===foe && t.alive);
-  if (!pool.length) return;
-
-  // Đầu tiên chọn theo “trước mắt/ganh gần” như cũ
-  const fallback = pickTarget(Game, unit);
-
+ 
   const tgt = Statuses.resolveTarget(unit, pool, { attackType:'basic' }) ?? fallback;
   if (!tgt) return;
 
@@ -173,17 +145,17 @@ export function basicAttack(Game, unit){
   emitPassiveEvent(Game, unit, 'onBasicHit', passiveCtx);
  
 // VFX: tất cả basic đều step-in/out (1.8s), không dùng tracer
-const meleeDur = 1800;
-const meleeStartMs = performance.now();
-let meleeTriggered = false;
-try {
-  vfxAddMelee(Game, unit, tgt, { dur: meleeDur });
-  meleeTriggered = true;
-} catch(_){}
-if (meleeTriggered && Game?.turn) {
-  const prevBusy = Number.isFinite(Game.turn.busyUntil) ? Game.turn.busyUntil : 0;
-  Game.turn.busyUntil = Math.max(prevBusy, meleeStartMs + meleeDur);
-}
+  const meleeDur = 1800;
+  const meleeStartMs = performance.now();
+  let meleeTriggered = false;
+  try {
+    vfxAddMelee(Game, unit, tgt, { dur: meleeDur });
+    meleeTriggered = true;
+  } catch(_) {}
+  if (meleeTriggered && Game?.turn) {
+    const prevBusy = Number.isFinite(Game.turn.busyUntil) ? Game.turn.busyUntil : 0;
+    Game.turn.busyUntil = Math.max(prevBusy, meleeStartMs + meleeDur);
+  }
   // Tính raw và modifiers trước giáp
   const dtype = 'physical';
   const rawBase = Math.max(1, Math.floor(unit.atk||0));
@@ -201,13 +173,13 @@ if (meleeTriggered && Game?.turn) {
   dmg = Math.max(0, Math.floor(dmg * pre.inMul));
 
 // Khiên hấp thụ
-   const abs = Statuses.absorbShield(tgt, dmg, { dtype });
- 
-   // Trừ HP phần còn lại
-   applyDamage(tgt, abs.remain);
- // VFX: hit ring tại target
- try { vfxAddHit(Game, tgt); } catch(_){}
+  const abs = Statuses.absorbShield(tgt, dmg, { dtype });
 
+  // Trừ HP phần còn lại
+  applyDamage(tgt, abs.remain);
+
+  // VFX: hit ring tại target
+  try { vfxAddHit(Game, tgt); } catch(_) {}
   // “Bất Khuất” (undying) — chết còn 1 HP (one-shot)
   if (tgt.hp <= 0) hookOnLethalDamage(tgt);
 const dealt = Math.max(0, Math.min(dmg, (abs.remain||0)));
