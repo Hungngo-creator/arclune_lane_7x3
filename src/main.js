@@ -51,7 +51,7 @@ const Game = {
 Game.ai = {
  cost: 0, costCap: CFG.COST_CAP, summoned: 0, summonLimit: CFG.SUMMON_LIMIT,
   unitsAll: UNITS, usedUnitIds: new Set(), deck: [], selectedId: null,
-  lastThinkMs: 0
+  lastThinkMs: 0, lastDecision: null
 };
 Game.meta = Meta;
 
