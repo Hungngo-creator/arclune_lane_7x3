@@ -106,7 +106,8 @@ const syncCardSize = debounce(()=>{
   const cell = Math.max(_MIN, Math.floor((w - _GAP*6)/7));
   if (host){
     host.style.setProperty('--cell', `${cell}px`);
-  }
+  } 
+}, 120);
 syncCardSize.flush();
 
 let cleanupResize = ()=>{};
