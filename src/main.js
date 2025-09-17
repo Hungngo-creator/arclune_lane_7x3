@@ -22,6 +22,7 @@ import {
 import { getUnitArt } from './art.js';
 import { initHUD, startSummonBar } from './ui.js';
 import { vfxDraw, vfxAddSpawn, vfxAddHit, vfxAddMelee } from './vfx.js';
+import { gameEvents, TURN_START, TURN_END, ACTION_START, ACTION_END } from './events.js';
 /** @type {HTMLCanvasElement|null} */ let canvas = null;
 /** @type {CanvasRenderingContext2D|null} */ let ctx = null;
 /** @type {{update:(g:any)=>void}|null} */ let hud = null;   // ← THÊM
@@ -47,7 +48,8 @@ const Game = {
   ui: { bar: null },
   turn: { phase: 'ally', last: { ally: 0, enemy: 0 }, cycle: 0, busyUntil: 0 },
     queued: { ally: new Map(), enemy: new Map() },
-  actionChain: []
+  actionChain: [],
+  events: gameEvents
 };
 // --- Enemy AI state (deck-4, cost riêng) ---
 Game.ai = {
@@ -56,6 +58,33 @@ Game.ai = {
   lastThinkMs: 0, lastDecision: null
 };
 Game.meta = Meta;
+
+if (CFG?.DEBUG?.LOG_EVENTS) {
+  const logEvent = (type) => (ev)=>{
+    const detail = ev?.detail || {};
+    const unit = detail.unit;
+    const info = {
+      side: detail.side ?? null,
+      slot: detail.slot ?? null,
+      cycle: detail.cycle ?? null,
+      phase: detail.phase ?? null,
+      unit: unit?.id || unit?.name || null,
+      action: detail.action || null,
+      skipped: detail.skipped || false,
+      reason: detail.reason || null,
+      processedChain: detail.processedChain ?? null
+    };
+    console.debug(`[events] ${type}`, info);
+  };
+  const types = [TURN_START, TURN_END, ACTION_START, ACTION_END];
+  for (const type of types){
+    try {
+      gameEvents.addEventListener(type, logEvent(type));
+    } catch (err) {
+      console.error('[events]', err);
+    }
+  }
+}
 
 let drawFrameHandle = null;
 let drawPending = false;
@@ -780,3 +809,5 @@ document.addEventListener('visibilitychange', ()=>{
   setDrawPaused(document.hidden);
 });
 setDrawPaused(document.hidden);
+
+export { gameEvents, emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END } from './events.js';
