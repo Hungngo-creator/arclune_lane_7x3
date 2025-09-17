@@ -5,6 +5,8 @@ import { doBasicWithFollowups } from './combat.js';
 import { CFG } from './config.js';
 import { makeInstanceStats, initialRageFor } from './meta.js';
 import { vfxAddSpawn } from './vfx.js';
+import { getUnitArt } from './art.js';
+import { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } from './passives.js';
 
 // local helper
 const tokensAlive = (Game) => Game.tokens.filter(t => t.alive);
@@ -31,15 +33,27 @@ export function spawnQueuedIfDue(Game, side, slot, { allocIid }){
 
   m.delete(slot);
 
+  const meta = Game.meta && typeof Game.meta.get === 'function' ? Game.meta.get(p.unitId) : null;
+  const kit = meta?.kit;
   const obj = {
     id: p.unitId, name: p.name, color: p.color || '#a9f58c',
     cx: p.cx, cy: p.cy, side: p.side, alive: true,
     rage: initialRageFor(p.unitId, { isLeader:false, revive: !!p.revive, reviveSpec: p.revived })
   };
   Object.assign(obj, makeInstanceStats(p.unitId));
+  obj.statuses = [];
+  obj.baseStats = {
+    atk: obj.atk,
+    res: obj.res,
+    wil: obj.wil
+  };
   obj.iid = allocIid();
+  obj.art = getUnitArt(p.unitId);
+  obj.color = obj.color || obj.art?.palette?.primary || '#a9f58c';
+  prepareUnitForPassives(obj);
   Game.tokens.push(obj);
-try { vfxAddSpawn(Game, p.cx, p.cy, p.side); } catch(_){}
+applyOnSpawnEffects(Game, obj, kit?.onSpawn);
+  try { vfxAddSpawn(Game, p.cx, p.cy, p.side); } catch(_){}
    return true;
 }
 
@@ -76,6 +90,8 @@ export function doActionOrSkip(Game, unit, { performUlt }){
     return;
   }
   const meta = Game.meta.get(unit.id);
+  emitPassiveEvent(Game, unit, 'onTurnStart', {});
+  
 
   Statuses.onTurnStart(unit, {});
 
@@ -86,7 +102,15 @@ export function doActionOrSkip(Game, unit, { performUlt }){
   }
 
   if (meta && (unit.rage|0) >= 100 && !Statuses.blocks(unit,'ult')){
-    try { performUlt(unit); } catch(e){ console.error('[performUlt]', e); unit.rage = 0; }
+    let ultOk = false;
+    try {
+      performUlt(unit);
+      ultOk = true;
+    } catch(e){
+      console.error('[performUlt]', e);
+      unit.rage = 0;
+    }
+    if (ultOk) emitPassiveEvent(Game, unit, 'onUltCast', {});
     Statuses.onTurnEnd(unit, {});
     ensureBusyReset();
     return;
@@ -94,6 +118,7 @@ export function doActionOrSkip(Game, unit, { performUlt }){
 
   const cap = (meta && typeof meta.followupCap === 'number') ? (meta.followupCap|0) : (CFG.FOLLOWUP_CAP_DEFAULT|0);
  doBasicWithFollowups(Game, unit, cap);
+  emitPassiveEvent(Game, unit, 'onActionEnd', {});
   Statuses.onTurnEnd(unit, {});
   ensureBusyReset();
 }
