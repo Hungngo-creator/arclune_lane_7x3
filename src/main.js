@@ -6,7 +6,7 @@ import { Statuses } from './statuses.js';
 import { CFG, CAM } from './config.js';
 import { UNITS } from './units.js';
 import { Meta, makeInstanceStats, initialRageFor } from './meta.js';
-import { basicAttack } from './combat.js';
+import { basicAttack, pickTarget, dealAbilityDamage, healUnit, grantShield, applyDamage } from './combat.js';
 import {
   ROSTER, ROSTER_MAP,
   CLASS_BASE, RANK_MULT,
@@ -19,7 +19,7 @@ import {
   cellOccupied, spawnLeaders, pickRandom, slotIndex, slotToCell, cellReserved, ORDER_ENEMY, 
 } from './engine.js';
 import { initHUD, startSummonBar } from './ui.js';
-import { vfxDraw, vfxAddSpawn } from './vfx.js';
+import { vfxDraw, vfxAddSpawn, vfxAddHit, vfxAddMelee } from './vfx.js';
 /** @type {HTMLCanvasElement|null} */ let canvas = null;
 /** @type {CanvasRenderingContext2D|null} */ let ctx = null;
 /** @type {{update:(g:any)=>void}|null} */ let hud = null;   // ← THÊM
@@ -210,6 +210,14 @@ function removeOldestMinions(masterIid, count){
     if (idx >= 0) Game.tokens.splice(idx,1);
   }
 }
+function extendBusy(duration){
+  if (!Game || !Game.turn) return;
+  const now = performance.now();
+  const prev = Number.isFinite(Game.turn.busyUntil) ? Game.turn.busyUntil : now;
+  const dur = Math.max(0, duration|0);
+  Game.turn.busyUntil = Math.max(prev, now + dur);
+}
+
 // Thực thi Ult: Summoner -> Immediate Summon theo meta; class khác: trừ nộ
 function performUlt(unit){
   const meta = Game.meta.get(unit.id);
@@ -225,40 +233,217 @@ function performUlt(unit){
       // chỉ giữ slot trống thực sự (không active/queued)
       .filter(s => {
         const { cx, cy } = slotToCell(unit.side, s);
-return !cellReserved(tokensAlive(), Game.queued, cx, cy);
+     return !cellReserved(tokensAlive(), Game.queued, cx, cy);
       })
       .sort((a,b)=> a-b);
 
     // spawn tối đa “count”
     const need = Math.min(u.count || 0, cand.length);
-    if (need > 0){
-      // Limit & replace
-      const limit = Number.isFinite(u.limit) ? u.limit : Infinity;
-      const have  = getMinionsOf(unit.iid).length;
-      const over  = Math.max(0, have + need - limit);
-      if (over > 0 && (u.replace === 'oldest')) removeOldestMinions(unit.iid, over);
+    
+      if (need > 0){
+        // Limit & replace
+        const limit = Number.isFinite(u.limit) ? u.limit : Infinity;
+        const have  = getMinionsOf(unit.iid).length;
+        const over  = Math.max(0, have + need - limit);
+        if (over > 0 && (u.replace === 'oldest')) removeOldestMinions(unit.iid, over);
 
-      // Tính thừa hưởng stat 1 lần
-const inheritStats = creepStatsFromInherit(unit, u.inherit);
+        // Tính thừa hưởng stat 1 lần
+        const inheritStats = creepStatsFromInherit(unit, u.inherit);
 
-      // Enqueue theo slot tăng dần
-      for (let i=0;i<need;i++){
-        const s = cand[i];
-        enqueueImmediate(Game, {
-          by: unit.id, side: unit.side, slot: s,
-          unit: {
-            id: `${unit.id}_minion`, name: 'Creep', color: '#ffd27d',
-            isMinion: true, ownerIid: unit.iid,
-            bornSerial: _BORN++,
-            ttlTurns: u.ttl || 3,
-            ...inheritStats
-          }
-        });
+        // Enqueue theo slot tăng dần
+        for (let i=0;i<need;i++){
+          const s = cand[i];
+          enqueueImmediate(Game, {
+            by: unit.id, side: unit.side, slot: s,
+            unit: {
+              id: `${unit.id}_minion`, name: 'Creep', color: '#ffd27d',
+              isMinion: true, ownerIid: unit.iid,
+              bornSerial: _BORN++,
+              ttlTurns: u.ttl || 3,
+              ...inheritStats
+            }
+          });
       }
     }
     unit.rage = 0; // đã dùng ult
     return;
   }
+  if (!u){ unit.rage = Math.max(0, unit.rage - 100); return; }
+
+  const foeSide = unit.side === 'ally' ? 'enemy' : 'ally';
+  let busyMs = 900;
+
+  switch(u.type){
+    case 'drain': {
+      const foes = tokensAlive().filter(t => t.side === foeSide);
+      if (!foes.length) break;
+      const scale = typeof u.power === 'number' ? u.power : 1.2;
+      let totalDrain = 0;
+      for (const tgt of foes){
+        if (!tgt.alive) continue;
+        const base = Math.max(1, Math.round((unit.wil || 0) * scale));
+        const { dealt } = dealAbilityDamage(Game, unit, tgt, {
+          base,
+          dtype: 'arcane',
+          attackType: 'skill'
+        });
+        totalDrain += dealt;
+      }
+      if (totalDrain > 0){
+        const { overheal } = healUnit(unit, totalDrain);
+        if (overheal > 0) grantShield(unit, overheal);
+      }
+      busyMs = 1400;
+      break;
+    }
+
+    case 'strikeLaneMid': {
+      const primary = pickTarget(Game, unit);
+      if (!primary) break;
+      const laneX = primary.cx;
+      const laneTargets = tokensAlive().filter(t => t.side === foeSide && t.cx === laneX);
+      const hits = Math.max(1, (u.hits|0) || 1);
+      const scale = typeof u.scale === 'number' ? u.scale : 0.9;
+      const meleeDur = 1600;
+      try { vfxAddMelee(Game, unit, primary, { dur: meleeDur }); } catch(_){}
+      busyMs = Math.max(busyMs, meleeDur);
+      for (const enemy of laneTargets){
+        if (!enemy.alive) continue;
+        for (let h=0; h<hits; h++){
+          if (!enemy.alive) break;
+          let base = Math.max(1, Math.round((unit.atk || 0) * scale));
+          if (u.bonusVsLeader && (enemy.id === 'leaderA' || enemy.id === 'leaderB')){
+            base = Math.round(base * (1 + u.bonusVsLeader));
+          }
+          dealAbilityDamage(Game, unit, enemy, {
+            base,
+            dtype: 'arcane',
+            attackType: u.tagAsBasic ? 'basic' : 'skill',
+            defPen: u.penRES ?? 0
+          });
+        }
+      }
+      break;
+    }
+
+    case 'selfBuff': {
+      const tradePct = Math.max(0, Math.min(0.9, u.selfHPTrade ?? 0));
+      const pay = Math.round((unit.hpMax || 0) * tradePct);
+      const maxPay = Math.max(0, Math.min(pay, Math.max(0, (unit.hp || 0) - 1)));
+      if (maxPay > 0) applyDamage(unit, maxPay);
+      const reduce = Math.max(0, u.reduceDmg ?? 0);
+      if (reduce > 0){
+        Statuses.add(unit, Statuses.make.damageCut({ pct: reduce, turns: u.turns || 1 }));
+      }
+      try { vfxAddHit(Game, unit); } catch(_){}
+      busyMs = 800;
+      break;
+    }
+
+    case 'sleep': {
+      const foes = tokensAlive().filter(t => t.side === foeSide);
+      if (!foes.length) break;
+      const take = Math.max(1, Math.min(foes.length, (u.targets|0) || foes.length));
+      foes.sort((a,b)=>{
+        const da = Math.abs(a.cx - unit.cx) + Math.abs(a.cy - unit.cy);
+        const db = Math.abs(b.cx - unit.cx) + Math.abs(b.cy - unit.cy);
+        return da - db;
+      });
+      for (let i=0; i<take; i++){
+        const tgt = foes[i];
+        Statuses.add(tgt, Statuses.make.sleep({ turns: u.turns || 1 }));
+        try { vfxAddHit(Game, tgt); } catch(_){}
+      }
+      busyMs = 1000;
+      break;
+    }
+
+    case 'revive': {
+      const fallen = Game.tokens.filter(t => t.side === unit.side && !t.alive);
+      if (!fallen.length) break;
+      fallen.sort((a,b)=> (b.deadAt||0) - (a.deadAt||0));
+      const take = Math.max(1, Math.min(fallen.length, (u.targets|0) || 1));
+      for (let i=0; i<take; i++){
+        const ally = fallen[i];
+        ally.alive = true;
+        ally.deadAt = 0;
+        ally.hp = 0;
+        Statuses.purge(ally);
+        const hpPct = Math.max(0, Math.min(1, u.revived?.hpPct ?? 0.5));
+        const healAmt = Math.max(1, Math.round((ally.hpMax || 0) * hpPct));
+        healUnit(ally, healAmt);
+        ally.rage = Math.max(0, u.revived?.rage ?? 0);
+        if (u.revived?.lockSkillsTurns){
+          Statuses.add(ally, Statuses.make.silence({ turns: u.revived.lockSkillsTurns }));
+        }
+        try { vfxAddSpawn(Game, ally.cx, ally.cy, ally.side); } catch(_){}
+      }
+      busyMs = 1500;
+      break;
+    }
+
+    case 'equalizeHP': {
+      let allies = tokensAlive().filter(t => t.side === unit.side);
+      if (!allies.length) break;
+      allies.sort((a,b)=>{
+        const ra = (a.hpMax || 1) ? (a.hp || 0) / a.hpMax : 0;
+        const rb = (b.hpMax || 1) ? (b.hp || 0) / b.hpMax : 0;
+        return ra - rb;
+      });
+      const count = Math.max(1, Math.min(allies.length, (u.allies|0) || allies.length));
+      const selected = allies.slice(0, count);
+      if (u.healLeader){
+        const leaderId = unit.side === 'ally' ? 'leaderA' : 'leaderB';
+        const leader = Game.tokens.find(t => t.id === leaderId && t.alive);
+        if (leader && !selected.includes(leader)) selected.push(leader);
+      }
+      if (!selected.length) break;
+      const ratio = selected.reduce((acc, t) => {
+        const r = (t.hpMax || 1) ? (t.hp || 0) / t.hpMax : 0;
+        return Math.max(acc, r);
+      }, 0);
+      for (const tgt of selected){
+        const goal = Math.min(tgt.hpMax || 0, Math.round((tgt.hpMax || 0) * ratio));
+        if (goal > (tgt.hp || 0)){
+          healUnit(tgt, goal - (tgt.hp || 0));
+          try { vfxAddHit(Game, tgt); } catch(_){}
+        }
+      }
+      busyMs = 1000;
+      break;
+    }
+
+    case 'haste': {
+      const targets = new Set();
+      targets.add(unit);
+      const extraAllies = (()=>{
+        if (typeof u.targets === 'number') return Math.max(0, (u.targets|0) - 1);
+        if (typeof u.targets === 'string'){
+          const m = u.targets.match(/(\d+)/);
+          if (m && m[1]) return Math.max(0, parseInt(m[1], 10));
+        }
+        return 0;
+      })();
+      const others = tokensAlive().filter(t => t.side === unit.side && t !== unit);
+      others.sort((a,b)=> (a.spd||0) - (b.spd||0));
+      for (const ally of others){
+        if (targets.size >= extraAllies + 1) break;
+        targets.add(ally);
+      }
+      const pct = u.attackSpeed ?? 0.1;
+      for (const tgt of targets){
+        Statuses.add(tgt, Statuses.make.haste({ pct, turns: u.turns || 1 }));
+        try { vfxAddHit(Game, tgt); } catch(_){}
+      }
+      busyMs = 900;
+      break;
+    }
+
+    default:
+      break;
+  }
+
+  extendBusy(busyMs);
   unit.rage = Math.max(0, unit.rage - 100);
 }
 const tokensAlive = () => Game.tokens.filter(t => t.alive);
