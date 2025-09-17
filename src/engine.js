@@ -1,4 +1,5 @@
 import { TOKEN_STYLE, CHIBI, CFG } from './config.js';
+import { getUnitArt } from './art.js';
 //v0.7.3
 /* ---------- Grid ---------- */
 export function makeGrid(canvas, cols, rows){
@@ -68,8 +69,8 @@ export function cellReserved(tokens, queued, cx, cy){
 
 export function spawnLeaders(tokens, g){
   // Ally leader ở (0,1), Enemy leader ở (6,1)
-  tokens.push({ id:'leaderA', name:'Uyên', color:'#6cc8ff', cx:0, cy:1, side:'ally', alive:true });
-  tokens.push({ id:'leaderB', name:'Địch', color:'#ff9aa0', cx:g.cols-1, cy:1, side:'enemy', alive:true });
+  tokens.push({ id:'leaderA', name:'Uyên', color:'#6cc8ff', cx:0, cy:1, side:'ally', alive:true, art: getUnitArt('leaderA') });
+  tokens.push({ id:'leaderB', name:'Địch', color:'#ff9aa0', cx:g.cols-1, cy:1, side:'enemy', alive:true, art: getUnitArt('leaderB') });
 }
 
 /* ---------- Helper ---------- */
@@ -237,6 +238,165 @@ function drawChibi(ctx, x, y, r, facing = 1, color = '#a9f58c') {
 
   ctx.restore();
 }
+
+const SPRITE_CACHE = new Map();
+export const ART_SPRITE_EVENT = 'unit-art:sprite-loaded';
+
+function ensureTokenArt(token){
+  if (!token) return null;
+  if (!token.art) token.art = getUnitArt(token.id);
+  return token.art;
+}
+
+function ensureSpriteLoaded(art){
+  if (!art || !art.sprite || typeof Image === 'undefined') return null;
+  let entry = SPRITE_CACHE.get(art.sprite);
+  if (!entry){
+    const img = new Image();
+    entry = { status: 'loading', img };
+    if ('decoding' in img) img.decoding = 'async';
+    img.onload = ()=>{
+      entry.status = 'ready';
+      if (typeof window !== 'undefined'){
+        try {
+          window.dispatchEvent(new Event(ART_SPRITE_EVENT));
+        } catch(_){}
+      }
+    };
+    img.onerror = ()=>{ entry.status = 'error'; };
+    img.src = art.sprite;
+    SPRITE_CACHE.set(art.sprite, entry);
+  }
+  return entry;
+}
+
+function drawStylizedShape(ctx, width, height, anchor, art){
+  const palette = art?.palette || {};
+  const primary = palette.primary || '#86c4ff';
+  const secondary = palette.secondary || '#1f3242';
+  const accent = palette.accent || '#d2f4ff';
+  const outline = palette.outline || 'rgba(0,0,0,0.55)';
+  const top = -height * anchor;
+  const bottom = height - height * anchor;
+  const halfW = width / 2;
+  const shape = art?.shape || 'sentinel';
+  const gradient = ctx.createLinearGradient(0, top, 0, bottom);
+  gradient.addColorStop(0, primary);
+  gradient.addColorStop(1, secondary);
+
+  ctx.save();
+  ctx.beginPath();
+  switch(shape){
+    case 'wing': {
+      ctx.moveTo(-halfW * 0.92, bottom * 0.35);
+      ctx.quadraticCurveTo(-halfW * 1.05, top + height * 0.1, 0, top);
+      ctx.quadraticCurveTo(halfW * 1.05, top + height * 0.2, halfW * 0.9, bottom * 0.4);
+      ctx.quadraticCurveTo(halfW * 0.45, bottom * 0.92, 0, bottom);
+      ctx.quadraticCurveTo(-halfW * 0.4, bottom * 0.86, -halfW * 0.92, bottom * 0.35);
+      break;
+    }
+    case 'rune': {
+      ctx.moveTo(0, top);
+      ctx.lineTo(halfW, top + height * 0.42);
+      ctx.lineTo(0, bottom);
+      ctx.lineTo(-halfW, top + height * 0.42);
+      break;
+    }
+    case 'bloom': {
+      ctx.moveTo(0, top);
+      ctx.bezierCurveTo(halfW * 0.8, top + height * 0.05, halfW * 1.05, top + height * 0.45, halfW * 0.78, bottom * 0.38);
+      ctx.bezierCurveTo(halfW * 0.68, bottom * 0.92, halfW * 0.2, bottom, 0, bottom);
+      ctx.bezierCurveTo(-halfW * 0.2, bottom, -halfW * 0.68, bottom * 0.92, -halfW * 0.78, bottom * 0.38);
+      ctx.bezierCurveTo(-halfW * 1.05, top + height * 0.45, -halfW * 0.8, top + height * 0.05, 0, top);
+      break;
+    }
+    case 'pike': {
+      ctx.moveTo(0, top);
+      ctx.lineTo(halfW * 0.92, top + height * 0.32);
+      ctx.lineTo(halfW * 0.52, bottom);
+      ctx.lineTo(-halfW * 0.52, bottom);
+      ctx.lineTo(-halfW * 0.92, top + height * 0.32);
+      break;
+    }
+    case 'shield':
+    case 'sentinel':
+    default: {
+      ctx.moveTo(0, top);
+      ctx.bezierCurveTo(halfW, top + height * 0.22, halfW * 0.85, bottom * 0.16, 0, bottom);
+      ctx.bezierCurveTo(-halfW * 0.85, bottom * 0.16, -halfW, top + height * 0.22, 0, top);
+      break;
+    }
+  }
+  ctx.closePath();
+  ctx.fillStyle = gradient;
+  ctx.fill();
+  ctx.lineWidth = Math.max(2, width * 0.06);
+  ctx.strokeStyle = outline;
+  ctx.stroke();
+
+  ctx.globalAlpha = 0.35;
+  ctx.fillStyle = accent;
+  ctx.beginPath();
+  ctx.moveTo(-halfW * 0.58, top + height * 0.22);
+  ctx.quadraticCurveTo(0, top + height * 0.05, halfW * 0.58, top + height * 0.22);
+  ctx.quadraticCurveTo(halfW * 0.2, top + height * 0.32, 0, top + height * 0.28);
+  ctx.quadraticCurveTo(-halfW * 0.2, top + height * 0.32, -halfW * 0.58, top + height * 0.22);
+  ctx.fill();
+  ctx.restore();
+}
+
+function roundedRectPath(ctx, x, y, w, h, radius){
+  const r = Math.min(radius, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function formatName(text){
+  if (!text) return '';
+  const str = String(text);
+  if (str.length <= 16) return str;
+  return `${str.slice(0, 15)}…`;
+}
+
+function drawNameplate(ctx, text, x, y, r, art){
+  if (!text) return;
+  const layout = art?.layout || {};
+  const fontSize = Math.max(11, Math.floor(r * (layout.labelFont || 0.7)));
+  const padX = Math.max(8, Math.floor(fontSize * 0.6));
+  const padY = Math.max(4, Math.floor(fontSize * 0.35));
+  ctx.save();
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.font = `${fontSize}px 'Be Vietnam Pro', 'Inter', system-ui`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const metrics = ctx.measureText(text);
+  const width = Math.ceil(metrics.width + padX * 2);
+  const height = Math.ceil(fontSize + padY * 2);
+  const radius = Math.max(4, Math.floor(height / 2));
+  const boxX = Math.round(x - width / 2);
+  const boxY = Math.round(y - height / 2);
+  roundedRectPath(ctx, boxX, boxY, width, height, radius);
+  ctx.fillStyle = art?.label?.bg || 'rgba(12,20,30,0.82)';
+  ctx.fill();
+  if (art?.label?.stroke){
+    ctx.strokeStyle = art.label.stroke;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+  ctx.fillStyle = art?.label?.text || '#f4f8ff';
+  ctx.fillText(text, x, boxY + height / 2);
+  ctx.restore();
+  }
 export function drawTokensOblique(ctx, g, tokens, cam){
   const C = cam || { rowGapRatio: 0.62, topScale: 0.80, depthScale: 0.94 };
   ctx.textAlign = 'center';
@@ -252,32 +412,50 @@ export function drawTokensOblique(ctx, g, tokens, cam){
     return ya === yb ? a.cx - b.cx : ya - yb;
   });
     for (const t of sorted){
-  if (!t.alive) continue; // chết là thôi vẽ ngay
-  const p = _cellCenterOblique(g, t.cx, t.cy, C);
+    if (!t.alive) continue; // chết là thôi vẽ ngay
+    const p = _cellCenterOblique(g, t.cx, t.cy, C);
     const depth = g.rows - 1 - t.cy;
     const scale = Math.pow(k, depth);
     const r = Math.max(6, Math.floor(baseR * scale));
-
     const facing = (t.side === 'ally') ? 1 : -1;
+      
+const art = ensureTokenArt(t) || getUnitArt(t.id);
+    const layout = art?.layout || {};
+    const spriteHeightMult = layout.spriteHeight || 2.4;
+    const spriteAspect = layout.spriteAspect || 0.78;
+    const spriteHeight = r * spriteHeightMult * (art?.size ?? 1);
+    const spriteWidth = spriteHeight * spriteAspect;
+    const anchor = layout.anchor ?? 0.78;
+    const hasRichArt = !!(art && (art.sprite || art.shape));
 
-    if (TOKEN_STYLE === 'chibi') {
-      // vẽ người que + kiếm
-      drawChibi(ctx, p.x, p.y, r, facing, t.color || '#9adcf0');
-
-      // tên (nhỏ, mờ – đặt trên đầu 1.4×r)
+    if (hasRichArt){
+      const spriteEntry = ensureSpriteLoaded(art);
+      const spriteReady = spriteEntry && spriteEntry.status === 'ready';
       ctx.save();
-      ctx.globalAlpha = CHIBI.nameAlpha;
-      ctx.fillStyle = CFG.COLORS.tokenText;
-      ctx.font = `${Math.floor(r*0.9)}px system-ui`;
-      ctx.fillText(t.name || t.id, p.x, p.y - r * 1.4);
+      ctx.translate(p.x, p.y);
+      if (facing === -1 && art?.mirror !== false) ctx.scale(-1, 1);
+      ctx.shadowColor = art?.glow || art?.shadow || 'rgba(0,0,0,0.35)';
+      ctx.shadowBlur = Math.max(6, r * 0.7);
+      ctx.shadowOffsetY = Math.max(2, r * 0.2);
+      if (spriteReady){
+        ctx.drawImage(spriteEntry.img, -spriteWidth/2, -spriteHeight*anchor, spriteWidth, spriteHeight);
+      } else {
+        drawStylizedShape(ctx, spriteWidth, spriteHeight, anchor, art);
+      }
       ctx.restore();
+      } else if (TOKEN_STYLE === 'chibi') {
+      drawChibi(ctx, p.x, p.y, r, facing, t.color || '#9adcf0');
     } else {
-      // fallback: đĩa tròn cũ (giữ lại nếu cần so sánh)
-      ctx.fillStyle = t.color;
-      ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI*2); ctx.fill();
-      ctx.fillStyle = CFG.COLORS.tokenText;
-      ctx.font = `${Math.floor(r*0.9)}px system-ui`;
-      ctx.fillText(t.name, p.x, p.y);
+      ctx.fillStyle = t.color || '#9adcf0';
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, r, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    if (art?.label !== false){
+      const name = formatName(t.name || t.id);
+      const offset = layout.labelOffset ?? 1.2;
+      drawNameplate(ctx, name, p.x, p.y + r * offset, r, art);
     }
   }
 }
