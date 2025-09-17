@@ -1,6 +1,7 @@
-// v0.7.2
+// v0.7.3
 import { slotToCell, cellReserved } from './engine.js';
 import { vfxAddSpawn } from './vfx.js';
+import { getUnitArt } from './art.js';
 // local helper
 const tokensAlive = (Game) => Game.tokens.filter(t => t.alive);
 
@@ -38,15 +39,16 @@ export function processActionChain(Game, side, baseSlot, hooks){
 
     // spawn creep immediate
     const extra = item.unit || {};
+    const art = getUnitArt(extra.id || 'minion');
     Game.tokens.push({
       id: extra.id || 'creep', name: extra.name || 'Creep',
-      color: extra.color || '#ffd27d',
+      color: extra.color || art?.palette?.primary || '#ffd27d',
       cx, cy, side, alive:true,
       isMinion: !!extra.isMinion,
       ownerIid: extra.ownerIid,
       bornSerial: extra.bornSerial,
       ttlTurns: extra.ttlTurns,
-      hpMax: extra.hpMax, hp: extra.hp, atk: extra.atk
+      hpMax: extra.hpMax, hp: extra.hp, atk: extra.atk, art
     });
     try { vfxAddSpawn(Game, cx, cy, side); } catch(_){}
     // gắn instance id
