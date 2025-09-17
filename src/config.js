@@ -1,4 +1,4 @@
-// config.js v0.7.4
+// config.js v0.7.5
 export const CFG = {
   GRID_COLS: 7,
   GRID_ROWS: 3,
@@ -11,7 +11,15 @@ FOLLOWUP_CAP_DEFAULT: 2,
 
   // === AI tuning ===
   AI: {
-    WEIGHTS: { pressure: 0.50, safety: 0.22, eta: 0.18, summon: 0.10 },
+    WEIGHTS: {
+      pressure: 0.42,
+      safety: 0.20,
+      eta: 0.16,
+      summon: 0.08,
+      kitInstant: 0.06,
+      kitDefense: 0.04,
+      kitRevive: 0.04
+    },
     ROW_CROWDING_PENALTY: 0.85,
     ROLE: {
       Tanker:   { front: 0.08, back: -0.04 },
@@ -21,7 +29,7 @@ FOLLOWUP_CAP_DEFAULT: 2,
       Assassin: { front: 0.03, back: -0.03 },
       Support:  { front:-0.02, back:  0.03 },
       Summoner: { front: 0.00, back:  0.04, summonBoost: 0.05 }
-    }
+    }, DEBUG: { KEEP_TOP: 6 }
   },
 
   // === UI constants (C2) ===
