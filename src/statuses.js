@@ -265,6 +265,8 @@ export const Statuses = {
 
     // 19) Mê hoặc — không thể bị target bằng đòn đánh thường
     allure:    ({turns=1}={}) => ({ id:'allure', kind:'buff', tag:'avoid-basic', dur:turns, tick:'turn' }),
+ // 20) Thần tốc: +% SPD
+    haste:     ({pct=0.10, turns=1}={}) => ({ id:'haste', kind:'buff', tag:'stat', power:pct, dur:turns, tick:'turn' }),
   },
 };
 
