@@ -1,5 +1,6 @@
 //v0.7.1
 import { CFG } from './config.js';
+import { gameEvents, TURN_START, TURN_END, ACTION_END } from './events.js';
 
 export function initHUD(doc){
   const costNow  = doc.getElementById('costNow');   // số cost hiện tại
@@ -23,6 +24,16 @@ export function initHUD(doc){
       costChip.classList.toggle('full', now >= cap);
      }
    }
+  const handleGameEvent = (ev)=>{
+    const state = ev?.detail?.game;
+    if (state) update(state);
+  };
+  if (gameEvents && typeof gameEvents.addEventListener === 'function'){
+    const types = [TURN_START, TURN_END, ACTION_END];
+    for (const type of types){
+      gameEvents.addEventListener(type, handleGameEvent);
+    }
+  }
    return { update };
  }
 /* ---------- Summon Bar (deck-size = 4) ---------- */
@@ -168,4 +179,13 @@ function render(){
 
   }
 }
-return { render };}
+if (gameEvents && typeof gameEvents.addEventListener === 'function'){
+    const rerender = ()=> render();
+    const types = [TURN_START, TURN_END, ACTION_END];
+    for (const type of types){
+      gameEvents.addEventListener(type, rerender);
+    }
+  }
+
+  return { render };
+}
