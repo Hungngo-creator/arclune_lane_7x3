@@ -122,6 +122,12 @@ export const Statuses = {
     if (this.has(unit,'fear')){
       out.SPD = (out.SPD ?? 0) * 0.9;
     }
+      // 20) Thần tốc: +% SPD
+    const haste = this.get(unit,'haste');
+    if (haste){
+      const boost = 1 + clamp01(haste.power ?? 0.1);
+      out.SPD = (out.SPD ?? 0) * boost;
+    }
     return out;
   },
 
