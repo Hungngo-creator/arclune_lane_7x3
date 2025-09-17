@@ -131,8 +131,7 @@ if (typeof window !== 'undefined'){
 const CLOCK = {
   startMs: performance.now(),
   lastTimerRemain: 240,
-  lastCostCreditedSec: 0
- , turnEveryMs: 600,
+  lastCostCreditedSec: 0, turnEveryMs: 600,
   lastTurnStepMs: performance.now()
 };
 
