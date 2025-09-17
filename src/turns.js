@@ -1,5 +1,5 @@
 // v0.7.4
-import { slotToCell } from './engine.js';
+import { slotToCell, slotIndex } from './engine.js';
 import { Statuses } from './statuses.js';
 import { doBasicWithFollowups } from './combat.js';
 import { CFG } from './config.js';
@@ -7,6 +7,7 @@ import { makeInstanceStats, initialRageFor } from './meta.js';
 import { vfxAddSpawn } from './vfx.js';
 import { getUnitArt } from './art.js';
 import { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } from './passives.js';
+import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END } from './events.js';
 
 // local helper
 const tokensAlive = (Game) => Game.tokens.filter(t => t.alive);
@@ -84,20 +85,37 @@ export function doActionOrSkip(Game, unit, { performUlt }){
       Game.turn.busyUntil = now;
     }
   };
-
+  const slot = unit ? slotIndex(unit.side, unit.cx, unit.cy) : null;
+  const baseDetail = {
+    game: Game,
+    unit: unit || null,
+    side: unit?.side ?? null,
+    slot,
+    phase: Game?.turn?.phase ?? null,
+    cycle: Game?.turn?.cycle ?? null,
+    action: null,
+    skipped: false,
+    reason: null
+  };
+  const finishAction = (extra)=>{
+    emitGameEvent(ACTION_END, { ...baseDetail, ...extra });
+  };
   if (!unit || !unit.alive) {
+    emitGameEvent(ACTION_START, baseDetail);
     ensureBusyReset();
+    finishAction({ skipped: true, reason: 'missingUnit' });
     return;
   }
   const meta = Game.meta.get(unit.id);
   emitPassiveEvent(Game, unit, 'onTurnStart', {});
-  
 
   Statuses.onTurnStart(unit, {});
+  emitGameEvent(ACTION_START, baseDetail);
 
   if (!Statuses.canAct(unit)) {
     Statuses.onTurnEnd(unit, {});
     ensureBusyReset();
+    finishAction({ skipped: true, reason: 'status' });
     return;
   }
 
@@ -113,6 +131,7 @@ export function doActionOrSkip(Game, unit, { performUlt }){
     if (ultOk) emitPassiveEvent(Game, unit, 'onUltCast', {});
     Statuses.onTurnEnd(unit, {});
     ensureBusyReset();
+    finishAction({ action: 'ult', ultOk });
     return;
   }
 
@@ -121,6 +140,7 @@ export function doActionOrSkip(Game, unit, { performUlt }){
   emitPassiveEvent(Game, unit, 'onActionEnd', {});
   Statuses.onTurnEnd(unit, {});
   ensureBusyReset();
+  finishAction({ action: 'basic' });
 }
 
 // Bước con trỏ lượt (sparse-cursor) đúng đặc tả
@@ -139,15 +159,36 @@ export function stepTurn(Game, hooks){
     let actor = getActiveAt(Game, side, s);
     if (!actor && spawned) actor = getActiveAt(Game, side, s);
 
+    let turnDetail = null;
+    let maxSlot = null;
     if (actor){
-      doActionOrSkip(Game, actor, hooks);
+      turnDetail = {
+        game: Game,
+        side,
+        slot: s,
+        unit: actor,
+        cycle: Game?.turn?.cycle ?? null,
+        phase: Game?.turn?.phase ?? null,
+        spawned: !!spawned,
+        processedChain: null
+      };
+      emitGameEvent(TURN_START, turnDetail);
     }
+try {
+      if (actor){
+        doActionOrSkip(Game, actor, hooks);
+      }
 
-    // xử lý Immediate chain (creep hành động ngay theo slot tăng dần)
-    const maxSlot = hooks.processActionChain(Game, side, s, hooks);
-    Game.turn.last[side] = Math.max(s, maxSlot ?? s);
-    found = s;
-    break;
+      // xử lý Immediate chain (creep hành động ngay theo slot tăng dần)
+      maxSlot = hooks.processActionChain(Game, side, s, hooks);
+      Game.turn.last[side] = Math.max(s, maxSlot ?? s);
+      found = s;
+      break;
+    } finally {
+      if (turnDetail){
+        emitGameEvent(TURN_END, { ...turnDetail, processedChain: maxSlot ?? null });
+      }
+}
   }
 
   if (found !== null) return; // đã đi 1 bước trong phe hiện tại
