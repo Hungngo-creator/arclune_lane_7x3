@@ -16,8 +16,10 @@ import {
   makeGrid, drawGridOblique,
   drawTokensOblique, drawQueuedOblique,
   hitToCellOblique, projectCellOblique,
-  cellOccupied, spawnLeaders, pickRandom, slotIndex, slotToCell, cellReserved, ORDER_ENEMY, 
+  cellOccupied, spawnLeaders, pickRandom, slotIndex, slotToCell, cellReserved, ORDER_ENEMY,
+  ART_SPRITE_EVENT,
 } from './engine.js';
+import { getUnitArt } from './art.js';
 import { initHUD, startSummonBar } from './ui.js';
 import { vfxDraw, vfxAddSpawn, vfxAddHit, vfxAddMelee } from './vfx.js';
 /** @type {HTMLCanvasElement|null} */ let canvas = null;
@@ -92,6 +94,9 @@ function setDrawPaused(paused){
   } else {
     scheduleDraw();
   }
+}
+if (typeof window !== 'undefined'){
+  window.addEventListener(ART_SPRITE_EVENT, ()=>{ scheduleDraw(); });
 }
 // Master clock theo timestamp – tránh drift giữa nhiều interval
 const CLOCK = {
@@ -609,10 +614,12 @@ const spawnCycle =
   (Game.turn.phase === 'ally' && slot > (Game.turn.last.ally || 0))
     ? Game.turn.cycle
     : Game.turn.cycle + 1; 
+    const pendingArt = getUnitArt(card.id);
    const pending = {
     unitId: card.id, name: card.name, side:'ally',
      cx: cell.cx, cy: cell.cy, slot, spawnCycle,
-     color:'#a9f58c' // dùng tạm cho debug/render sau
+     color: pendingArt?.palette?.primary || '#a9f58c',
+     art: pendingArt
    };
    Game.queued.ally.set(slot, pending);
 
@@ -690,21 +697,81 @@ function cellCenterObliqueLocal(g, cx, cy, C){
   return { x, y, scale };
 }
 
+function roundedRectPathUI(ctx, x, y, w, h, radius){
+  const r = Math.min(radius, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function lightenColor(color, amount){
+  if (typeof color !== 'string') return color;
+  if (!color.startsWith('#')) return color;
+  let hex = color.slice(1);
+  if (hex.length === 3){
+    hex = hex.split('').map(ch => ch + ch).join('');
+  }
+  if (hex.length !== 6) return color;
+  const r = parseInt(hex.slice(0, 2), 16);
+  const g = parseInt(hex.slice(2, 4), 16);
+  const b = parseInt(hex.slice(4, 6), 16);
+  const mix = (c)=> Math.min(255, Math.round(c + (255 - c) * amount));
+  return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
+}
+
 function drawHPBars(){
   if (!ctx || !Game.grid) return;
+  const baseR = Math.floor(Game.grid.tile * 0.36);
   for (const t of Game.tokens){
     if (!t.alive || !Number.isFinite(t.hpMax)) continue;
 const p = cellCenterObliqueLocal(Game.grid, t.cx, t.cy, CAM_PRESET);
-
-    const w = Math.max(28, Math.floor(Game.grid.tile * 0.6 * (p.scale||1)));
-    const h = 6, x = Math.floor(p.x - w/2), y = Math.floor(p.y - Game.grid.tile*0.45 * (p.scale||1));
-    const ratio = Math.max(0, Math.min(1, (t.hp||0) / (t.hpMax||1)));
-    // viền
-    ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fillRect(x-1, y-1, w+2, h+2);
-    // nền
-    ctx.fillStyle = '#23313d'; ctx.fillRect(x, y, w, h);
-    // máu
-    ctx.fillStyle = '#7dd3fc'; ctx.fillRect(x, y, Math.floor(w * ratio), h);
+    const art = t.art || getUnitArt(t.id);
+    const layout = art?.layout || {};
+    const r = Math.max(6, Math.floor(baseR * (p.scale || 1)));
+    const barWidth = Math.max(28, Math.floor(r * (layout.hpWidth ?? 2.4)));
+    const barHeight = Math.max(5, Math.floor(r * (layout.hpHeight ?? 0.42)));
+    const offset = layout.hpOffset ?? 1.46;
+    const x = Math.round(p.x - barWidth / 2);
+    const y = Math.round(p.y + r * offset - barHeight / 2);
+    const ratio = Math.max(0, Math.min(1, (t.hp || 0) / (t.hpMax || 1)));
+    const bgColor = art?.hpBar?.bg || 'rgba(9,14,21,0.74)';
+    const fillColor = art?.hpBar?.fill || '#6ff0c0';
+    const borderColor = art?.hpBar?.border || 'rgba(0,0,0,0.55)';
+    const radius = Math.max(2, Math.floor(barHeight / 2));
+    ctx.save();
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    roundedRectPathUI(ctx, x, y, barWidth, barHeight, radius);
+    ctx.fillStyle = bgColor;
+    ctx.fill();
+    if (borderColor && borderColor !== 'none'){
+      ctx.strokeStyle = borderColor;
+      ctx.lineWidth = Math.max(1, Math.floor(barHeight * 0.18));
+      ctx.stroke();
+    }
+    const inset = Math.max(1, Math.floor(barHeight * 0.25));
+    const innerHeight = Math.max(1, barHeight - inset * 2);
+    const innerRadius = Math.max(1, radius - inset);
+    const innerWidth = Math.max(0, barWidth - inset * 2);
+    const filledWidth = Math.round(innerWidth * ratio);
+    if (filledWidth > 0){
+      roundedRectPathUI(ctx, x + inset, y + inset, filledWidth, innerHeight, innerRadius);
+      const grad = ctx.createLinearGradient(x, y + inset, x, y + inset + innerHeight);
+      const topFill = lightenColor(fillColor, 0.25);
+      grad.addColorStop(0, topFill);
+      grad.addColorStop(1, fillColor);
+      ctx.fillStyle = grad;
+      ctx.fill();
+    }
+    ctx.restore();
   }
 }
 /* ---------- Chạy ---------- */
