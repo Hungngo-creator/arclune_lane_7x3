@@ -125,7 +125,7 @@ export function grantShield(target, amount){
  
 export function basicAttack(Game, unit){
   const foe = unit.side === 'ally' ? 'enemy' : 'ally';
-  const pool = Game.tokens.filter(t => t.side===foe && t.alive);
+  const pool = Game.tokens.filter(t => t.side === foe && t.alive);
   if (!pool.length) return;
 
   // Đầu tiên chọn theo “trước mắt/ganh gần” như cũ
@@ -133,7 +133,7 @@ export function basicAttack(Game, unit){
 
   // Sau đó cho Statuses có quyền điều phối (taunt/allure…), nếu trả về null thì bỏ lượt
  
-  const tgt = Statuses.resolveTarget(unit, pool, { attackType:'basic' }) ?? fallback;
+  const tgt = Statuses.resolveTarget(unit, pool, { attackType: 'basic' }) ?? fallback;
   if (!tgt) return;
 
   const passiveCtx = {
@@ -144,54 +144,57 @@ export function basicAttack(Game, unit){
   };
   emitPassiveEvent(Game, unit, 'onBasicHit', passiveCtx);
  
-// VFX: tất cả basic đều step-in/out (1.8s), không dùng tracer
+   // VFX: tất cả basic đều step-in/out (1.8s), không dùng tracer
   const meleeDur = 1800;
   const meleeStartMs = performance.now();
   let meleeTriggered = false;
   try {
     vfxAddMelee(Game, unit, tgt, { dur: meleeDur });
     meleeTriggered = true;
-  } catch(_) {}
+  } catch (_) {}
   if (meleeTriggered && Game?.turn) {
     const prevBusy = Number.isFinite(Game.turn.busyUntil) ? Game.turn.busyUntil : 0;
     Game.turn.busyUntil = Math.max(prevBusy, meleeStartMs + meleeDur);
   }
+ 
   // Tính raw và modifiers trước giáp
   const dtype = 'physical';
-  const rawBase = Math.max(1, Math.floor(unit.atk||0));
-  const modBase = Math.max(1, Math.floor(rawBase * (passiveCtx.damage?.baseMul ?? 1) + (passiveCtx.damage?.flatAdd ?? 0)));
-  const pre = Statuses.beforeDamage(unit, tgt, { dtype, base: modBase, attackType:'basic' });
-
+  const rawBase = Math.max(1, Math.floor(unit.atk || 0));
+  const modBase = Math.max(
+    1,
+    Math.floor(rawBase * (passiveCtx.damage?.baseMul ?? 1) + (passiveCtx.damage?.flatAdd ?? 0))
+  );
+  const pre = Statuses.beforeDamage(unit, tgt, { dtype, base: modBase, attackType: 'basic' });
   // OutMul (buff/debuff output)
   let dmg = Math.max(1, Math.floor(pre.base * pre.outMul));
 
   // Giáp/kháng có xuyên giáp (defPen)
-  const def = Math.max(0, (tgt.arm||0) * (1 - (pre.defPen||0))); // dtype === 'physical'
+  const def = Math.max(0, (tgt.arm ||0) * (1 - (pre.defPen ||0))); // dtype === 'physical'
   dmg = Math.max(0, Math.floor(dmg * (1 - def)));
 
   // InMul (giảm/tăng dmg nhận vào, stealth=0%)
   dmg = Math.max(0, Math.floor(dmg * pre.inMul));
 
-// Khiên hấp thụ
+  // Khiên hấp thụ
   const abs = Statuses.absorbShield(tgt, dmg, { dtype });
 
   // Trừ HP phần còn lại
   applyDamage(tgt, abs.remain);
 
   // VFX: hit ring tại target
-  try { vfxAddHit(Game, tgt); } catch(_) {}
+  try { vfxAddHit(Game, tgt); } catch (_) {}
   // “Bất Khuất” (undying) — chết còn 1 HP (one-shot)
   if (tgt.hp <= 0) hookOnLethalDamage(tgt);
-const dealt = Math.max(0, Math.min(dmg, (abs.remain||0)));
+const dealt = Math.max(0, Math.min(dmg, abs.remain || 0));
   // Hậu quả sau đòn: phản dmg, độc theo dealt, execute ≤10%…
   Statuses.afterDamage(unit, tgt, { dealt, absorbed: abs.absorbed, dtype });
 
   if (Array.isArray(passiveCtx.afterHit) && passiveCtx.afterHit.length){
     const afterCtx = { target: tgt, owner: unit, result: { dealt, absorbed: abs.absorbed } };
-    for (const fn of passiveCtx.afterHit){
+    for (const fn of passiveCtx.afterHit) {
       try {
         fn(afterCtx);
-      } catch(err){
+      } catch (err){
         console.error('[passive afterHit]', err);
       }
     }
