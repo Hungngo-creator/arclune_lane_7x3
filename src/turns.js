@@ -1,4 +1,4 @@
-// v0.7.3
+// v0.7.4
 import { slotToCell } from './engine.js';
 import { Statuses } from './statuses.js';
 import { doBasicWithFollowups } from './combat.js';
