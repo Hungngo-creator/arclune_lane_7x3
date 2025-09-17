@@ -1,0 +1,25 @@
+Tạo skill mới dựa trên các pháp tắc đã có, có thể chọn loại đạo/pháp tắc/quy tắc để ngộ đạo và nhận được kĩ năng/ pháp tắc tương ứng để tạo kỹ năng mới. 
+Áp dụng hệ thống tu luyện từ khai nguyên đến siêu thoát vào game và thêm content tương ứng với cảnh giới. Mỗi cảnh giới có đặc trưng khác nhau nên tăng chỉ số sẽ không giống nhau, tăng spd mỗi lần nâng 1 đại cảnh giới.
+Kĩ năng có thể thu được từ công pháp. Áp dụng hệ thống nguyên linh + luyện đan vào game.
+Có nên thêm hệ thống tiền tệ nguyên tinh vào game? Game là một thế giới to lớn với nhiều vị diện, người chơi chỉ có thể tương tác 2d với vị trí địa lý.
+Tu luyện kiếm lưu có thể học được kĩ năng.
+Tạo kỹ năng cần các dòng phụ, dòng phụ có chỉ số khác nhau và giá khác nhau, cần buget để cân bằng, tạo kĩ năng có các nhánh chính là: tấn công, phòng thủ, hỗ trợ, nội tại.
+Đấu trường: để player xếp deck sẵn, AI sẽ dùng deck đó để đánh với AI dùng deck xếp sẵn khác, mỗi mùa 7 ngày.
+Ares: pvp online realtime.
+Thử thách: tham gia các màn pve với nhân vật cố định và dùng chúng hoàn thành thử thách để nhận quà.
+Vành Nứt Thế Giới: tham gia pve với các boss siêu khó để nhận quà.
+Gacha: các nhân vật N/R/SR/SSR/UR/PRIME
+Tạo rank budget để đánh giá một nhân vật và cho ra 1 rank chính xác của nhân vật đó dựa vào: độ bẩn, phá game của nhân vật, set nhanh hay chậm, skill quay ngược hay tăng tốc time, phân tích giá trị một nhân vật một cách tổng thể (lâu dài, từ sum đến hết trận và lập tức, vừa sum có thể làm gì), rank Budget cần có yếu tố cộng và trừ, cap 25 điểm thôi, cần một mốc điểm để cân nhắc rank, điểm cao rank cao.
+
+Gán class hợp lý cho nhân vật, tạo cost budget dựa vào rank, độ thực dụng, sức mạnh tổng thể và vài yếu tố khác.
+
+Tạo công thức tính sát thương, cần tính sát thương trước rồi mới áp các buff và debuff vào.
+
+Tạo công thức tính chỉ số dựa vào điểm đặc trưng của nhân vật, ( cap theo rank, các điểm cần không quá cao nhưng cũng phản ánh đặc trưng của nhân vật và class của họ) + điểm của class rồi x với hệ số rank.
+
+Tạo thêm vài leader nam lẫn nữ.
+
+
+
+
+
