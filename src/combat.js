@@ -3,6 +3,7 @@ import { Statuses, hookOnLethalDamage } from './statuses.js';
 import { vfxAddTracer, vfxAddHit, vfxAddMelee } from './vfx.js';
 import { slotToCell, cellReserved } from './engine.js';
 import { vfxAddSpawn } from './vfx.js';
+import { emitPassiveEvent } from './passives.js';
 export function pickTarget(Game, attacker){
  const foe = attacker.side === 'ally' ? 'enemy' : 'ally';
  const pool = Game.tokens.filter(t => t.side === foe && t.alive);
@@ -59,7 +60,69 @@ export function applyDamage(target, amount){
     target.alive = false;
   }
 }
+export function dealAbilityDamage(Game, attacker, target, opts = {}){
+  if (!attacker || !target || !target.alive) return { dealt: 0, absorbed: 0, total: 0 };
 
+  const dtype = opts.dtype || 'physical';
+  const attackType = opts.attackType || 'skill';
+  const baseDefault = dtype === 'arcane'
+    ? Math.max(0, Math.floor(attacker.wil || 0))
+    : Math.max(0, Math.floor(attacker.atk || 0));
+  const base = Math.max(0, opts.base != null ? Math.floor(opts.base) : baseDefault);
+
+  const pre = Statuses.beforeDamage(attacker, target, { dtype, base, attackType });
+
+  const combinedPen = Math.max(0, Math.min(1, Math.max(pre.defPen || 0, opts.defPen || 0)));
+ const defStat = dtype === 'arcane' ? (target.res || 0) : (target.arm || 0);
+
+  let dmg = Math.max(0, Math.floor(pre.base * pre.outMul));
+  if (pre.ignoreAll) {
+    dmg = 0;
+  } else {
+    const effectiveDef = Math.max(0, defStat * (1 - combinedPen));
+    dmg = Math.max(0, Math.floor(dmg * (1 - effectiveDef)));
+    dmg = Math.max(0, Math.floor(dmg * pre.inMul));
+  }
+
+  const abs = Statuses.absorbShield(target, dmg, { dtype });
+  const remain = Math.max(0, abs.remain);
+
+  if (remain > 0) applyDamage(target, remain);
+if (target.hp <= 0) hookOnLethalDamage(target);
+
+  Statuses.afterDamage(attacker, target, { dealt: remain, absorbed: abs.absorbed, dtype });
+
+  if (Game) {
+    try { vfxAddHit(Game, target); } catch (_) {}
+  }
+
+  return { dealt: remain, absorbed: abs.absorbed, total: dmg };
+}
+
+export function healUnit(target, amount){
+  if (!target || !Number.isFinite(target.hpMax)) return { healed: 0, overheal: 0 };
+  const amt = Math.max(0, Math.floor(amount ?? 0));
+if (amt <= 0) return { healed: 0, overheal: 0 };
+  const before = Math.max(0, target.hp || 0);
+  const healCap = Math.max(0, target.hpMax - before);
+  const healed = Math.min(amt, healCap);
+  target.hp = before + healed;
+  return { healed, overheal: Math.max(0, amt - healed) };
+}
+
+export function grantShield(target, amount){
+  if (!target) return 0;
+  const amt = Math.max(0, Math.floor(amount ?? 0));
+  if (amt <= 0) return 0;
+  const cur = Statuses.get(target, 'shield');
+  if (cur) {
+    cur.amount = (cur.amount || 0) + amt;
+   } else {
+    Statuses.add(target, { id: 'shield', kind: 'buff', tag: 'shield', amount: amt });
+  }
+  return amt;
+}
+ 
 export function basicAttack(Game, unit){
   const foe = unit.side === 'ally' ? 'enemy' : 'ally';
   const pool = Game.tokens.filter(t => t.side===foe && t.alive);
@@ -98,9 +161,17 @@ export function basicAttack(Game, unit){
   // Đầu tiên chọn theo “trước mắt/ganh gần” như cũ
   const fallback = pickTarget(Game, unit);
 
-  // Sau đó cho Statuses có quyền điều phối (taunt/allure…), nếu trả về null thì bỏ lượt
- const tgt = Statuses.resolveTarget(unit, pool, { attackType:'basic' }) ?? fallback;
-   if (!tgt) return;
+  const tgt = Statuses.resolveTarget(unit, pool, { attackType:'basic' }) ?? fallback;
+  if (!tgt) return;
+
+  const passiveCtx = {
+    target: tgt,
+    damage: { baseMul: 1, flatAdd: 0 },
+    afterHit: [],
+    log: Game?.passiveLog
+  };
+  emitPassiveEvent(Game, unit, 'onBasicHit', passiveCtx);
+ 
 // VFX: tất cả basic đều step-in/out (1.8s), không dùng tracer
 const meleeDur = 1800;
 const meleeStartMs = performance.now();
@@ -116,7 +187,8 @@ if (meleeTriggered && Game?.turn) {
   // Tính raw và modifiers trước giáp
   const dtype = 'physical';
   const rawBase = Math.max(1, Math.floor(unit.atk||0));
-  const pre = Statuses.beforeDamage(unit, tgt, { dtype, base: rawBase, attackType:'basic' });
+  const modBase = Math.max(1, Math.floor(rawBase * (passiveCtx.damage?.baseMul ?? 1) + (passiveCtx.damage?.flatAdd ?? 0)));
+  const pre = Statuses.beforeDamage(unit, tgt, { dtype, base: modBase, attackType:'basic' });
 
   // OutMul (buff/debuff output)
   let dmg = Math.max(1, Math.floor(pre.base * pre.outMul));
@@ -138,9 +210,20 @@ if (meleeTriggered && Game?.turn) {
 
   // “Bất Khuất” (undying) — chết còn 1 HP (one-shot)
   if (tgt.hp <= 0) hookOnLethalDamage(tgt);
-
+const dealt = Math.max(0, Math.min(dmg, (abs.remain||0)));
   // Hậu quả sau đòn: phản dmg, độc theo dealt, execute ≤10%…
-  Statuses.afterDamage(unit, tgt, { dealt: Math.max(0, Math.min(dmg, (abs.remain||0))), absorbed: abs.absorbed, dtype });
+  Statuses.afterDamage(unit, tgt, { dealt, absorbed: abs.absorbed, dtype });
+
+  if (Array.isArray(passiveCtx.afterHit) && passiveCtx.afterHit.length){
+    const afterCtx = { target: tgt, owner: unit, result: { dealt, absorbed: abs.absorbed } };
+    for (const fn of passiveCtx.afterHit){
+      try {
+        fn(afterCtx);
+      } catch(err){
+        console.error('[passive afterHit]', err);
+      }
+    }
+  }
 }
  
 // Helper: basic + follow-ups trong cùng turn-step.
