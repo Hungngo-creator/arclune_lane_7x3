@@ -803,10 +803,15 @@ const p = cellCenterObliqueLocal(Game.grid, t.cx, t.cy, CAM_PRESET);
   }
 }
 /* ---------- Chạy ---------- */
-init();
-document.addEventListener('visibilitychange', ()=>{
+let _booted = false;
+export function startGame(){
+  if (_booted) return;
+  _booted = true;
+  init();
+  document.addEventListener('visibilitychange', ()=>{
+    setDrawPaused(document.hidden);
+  });
   setDrawPaused(document.hidden);
-});
-setDrawPaused(document.hidden);
+}
 
 export { gameEvents, emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END } from './events.js';
