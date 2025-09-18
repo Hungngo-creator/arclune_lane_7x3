@@ -3567,5 +3567,398 @@ __define('./turns.js', (exports, module, __require) => {
     if (found !== null) return; // đã đi 1 bước trong phe hiện tại
 
     // không còn slot nào trong phe này → kết thúc phase & chuyển phe
-    const finishedSide
+    const finishedSide= side;
+    if (finishedSide === 'ally'){
+      Game.turn.phase = 'enemy';
+      Game.turn.last.enemy = 0;
+    } else {
+      Game.turn.phase = 'ally';
+      Game.turn.last.ally = 0;
+      Game.turn.cycle += 1;
+    }
+    // minion của phe vừa xong phase bị trừ TTL
+    tickMinionTTL(Game, finishedSide);
+  }
+
+  exports.getActiveAt = getActiveAt;
+  exports.hasActorThisCycle = hasActorThisCycle;
+  exports.spawnQueuedIfDue = spawnQueuedIfDue;
+  exports.tickMinionTTL = tickMinionTTL;
+  exports.doActionOrSkip = doActionOrSkip;
+  exports.stepTurn = stepTurn;
+});
+__define('./ui.js', (exports, module, __require) => {
+  //v0.7.1
+  const __dep0 = __require('./config.js');
+  const CFG = __dep0.CFG;
+  const __dep1 = __require('./events.js');
+  const gameEvents = __dep1.gameEvents;
+  const TURN_START = __dep1.TURN_START;
+  const TURN_END = __dep1.TURN_END;
+  const ACTION_END = __dep1.ACTION_END;
+
+  function initHUD(doc){
+    const costNow  = doc.getElementById('costNow');   // số cost hiện tại
+   const costRing = doc.getElementById('costRing');  // vòng tròn tiến trình
+   const costChip = doc.getElementById('costChip');  // chip bao ngoài
+    function update(Game){
+      if (!Game) return;
+
+      const cap = Game.costCap ?? CFG.COST_CAP ?? 30;
+      const now = Math.floor(Game.cost ?? 0);
+      const ratio = Math.max(0, Math.min(1, now / cap));
+
+      if (costNow) costNow.textContent = now;
+      // Vòng tròn tiến trình n/30
+      if (costRing){
+         const deg = (ratio * 360).toFixed(1) + 'deg';
+         costRing.style.setProperty('--deg', deg);
+       }
+      // Khi max cap, làm chip sáng hơn
+      if (costChip){
+        costChip.classList.toggle('full', now >= cap);
+       }
+     }
+    const handleGameEvent = (ev)=>{
+      const state = ev?.detail?.game;
+      if (state) update(state);
+    };
+    if (gameEvents && typeof gameEvents.addEventListener === 'function'){
+      const types = [TURN_START, TURN_END, ACTION_END];
+      for (const type of types){
+        gameEvents.addEventListener(type, handleGameEvent);
+      }
+    }
+     return { update };
+   }
+  /* ---------- Summon Bar (deck-size = 4) ---------- */
+  function startSummonBar(doc, options){
+    options = options || {};
+    const onPick = options.onPick || (()=>{});
+    const canAfford = options.canAfford || (()=>true);
+    const getDeck = options.getDeck || (()=>[]);
+    const getSelectedId = options.getSelectedId || (()=>null);
+
+  const host = doc.getElementById('cards');
+    if (!host){
+      return { render: ()=>{} };
+    }
+
+    if (host){
+      host.innerHTML = '';
+      host.addEventListener('click', (event) => {
+        const btn = event.target.closest('button.card');
+        if (!btn || btn.disabled || !host.contains(btn)) return;
+
+        const deck = getDeck() || [];
+        const targetId = btn.dataset.id;
+        if (!targetId) return;
+        const card = deck.find((c) => `${c.id}` === targetId);
+        if (!card || !canAfford(card)) return;
+
+        onPick(card);
+        [...host.children].forEach((node) => node.classList.toggle('active', node === btn));
+      });
+    }
+
+  // C2: đồng bộ cỡ ô cost theo bề rộng sân (7 cột), lấy số từ CFG.UI
+  const _GAP = CFG.UI?.CARD_GAP ?? 12;     // khớp CSS khoảng cách
+  const _MIN = CFG.UI?.CARD_MIN ?? 40;     // cỡ tối thiểu
+  const boardEl = doc.getElementById('board'); // cache DOM
+  function debounce(fn, wait){
+    let timer = null;
+    function debounced(...args){
+      if (timer){
+        clearTimeout(timer);
+      }
+      timer = setTimeout(()=>{
+        timer = null;
+        fn.apply(this, args);
+      }, wait);
+    }
+    debounced.cancel = ()=>{
+      if (timer){
+        clearTimeout(timer);
+        timer = null;
+      }
+    };
+
+    debounced.flush = (...args)=>{
+      if (timer){
+        clearTimeout(timer);
+        timer = null;
+      }
+      fn.apply(this, args);
+    };
+    return debounced;
+  }
+
+  const syncCardSize = debounce(()=>{
+    if (!boardEl) return;
+    const w = boardEl.clientWidth || boardEl.getBoundingClientRect().width || 0;
+    
+    // 7 cột -> 6 khoảng cách
+    const cell = Math.max(_MIN, Math.floor((w - _GAP*6)/7));
+    if (host){
+      host.style.setProperty('--cell', `${cell}px`);
+    } 
+  }, 120);
+  syncCardSize.flush();
+
+  let cleanupResize = ()=>{};
+  if (boardEl && typeof ResizeObserver === 'function'){
+    const observer = new ResizeObserver(()=> syncCardSize());
+    observer.observe(boardEl);
+    cleanupResize = ()=>{
+      observer.disconnect();
+      syncCardSize.cancel();
+    };
+  } else {
+    const handleResize = ()=> syncCardSize();
+    window.addEventListener('resize', handleResize);
+    cleanupResize = ()=>{
+      window.removeEventListener('resize', handleResize);
+      syncCardSize.cancel();
+    };
+  }
+
+  let removalObserver = null;
+  if (host && typeof MutationObserver === 'function'){
+    const target = doc.body || doc.documentElement;
+    if (target){
+      removalObserver = new MutationObserver(()=>{
+        if (!host.isConnected){
+          cleanupResize();
+          removalObserver.disconnect();
+          removalObserver = null;
+        }
+      });
+      removalObserver.observe(target, { childList: true, subtree: true });
+    }
+  }
+  // mỗi thẻ cost là 1 ô vuông, chỉ hiện cost
+  function makeBtn(c){
+    const btn = doc.createElement('button');
+    btn.className = 'card';
+    btn.dataset.id = c.id;
+    // chỉ hiện cost, không hiện tên
+    btn.innerHTML = `<span class="cost">${c.cost}</span>`;
+
+    // trạng thái đủ/thiếu cost
+    const ok = canAfford(c);
+    btn.disabled = !ok;
+    btn.classList.toggle('disabled', !ok);  // chỉ để CSS quyết định độ sáng
+
+    return btn;
+  }
+  let btns = []; // sẽ chứa đúng 3 button được tạo bằng makeBtn
+
+  function render(){
+    const deck = getDeck();              // luôn gồm tối đa 3 thẻ hiện hành
+    // đảm bảo đủ số nút (tạo mới bằng makeBtn – chỉ hiện cost)
+    while (btns.length < deck.length){
+      const btn = makeBtn(deck[btns.length]);
+      host.appendChild(btn);
+      btns.push(btn);
+    }
+    // cập nhật trạng thái từng nút theo deck hiện tại
+    for (let i = 0; i < btns.length; i++){
+      const b = btns[i];
+      const c = deck[i];
+      if (!c){ b.hidden = true; continue; }
+      b.hidden = false;
+      b.dataset.id = c.id;
+
+      // cập nhật cost (giữ UI “chỉ cost”)
+      const span = b.querySelector('.cost');
+      if (span) span.textContent = c.cost;
+
+    const afford = canAfford(c);
+    b.disabled = !afford;
+    b.classList.toggle('disabled', !afford); // để CSS điều khiển độ sáng
+    b.style.opacity = ''; // xóa mọi inline opacity cũ nếu còn
+      b.classList.toggle('active', getSelectedId() === c.id);
+
+    }
+  }
+  if (gameEvents && typeof gameEvents.addEventListener === 'function'){
+      const rerender = ()=> render();
+      const types = [TURN_START, TURN_END, ACTION_END];
+      for (const type of types){
+        gameEvents.addEventListener(type, rerender);
+      }
+    }
+
+    return { render };
+  }
+
+  exports.initHUD = initHUD;
+  exports.startSummonBar = startSummonBar;
+});
+__define('./units.js', (exports, module, __require) => {
+  // ver v.0.7
+
+  const UNITS = [
+    { id: 'phe',          name: 'Phệ',             cost: 20 },
+    { id: 'kiemtruongda', name: 'Kiếm Trường Dạ',  cost: 16 },
+    { id: 'loithienanh',  name: 'Lôi Thiên Ảnh',   cost: 18 },
+    { id: 'laky',         name: 'La Kỳ',           cost: 14 },
+    { id: 'kydieu',       name: 'Kỳ Diêu',         cost: 12 },
+    { id: 'doanminh',     name: 'Doãn Minh',       cost: 12 },
+    { id: 'tranquat',     name: 'Trần Quát',       cost: 10 },
+    { id: 'linhgac',      name: 'Lính Gác',        cost:  8 }
+  ];
+
+  exports.UNITS = UNITS;
+});
+__define('./vfx.js', (exports, module, __require) => {
+  // 0.6 vfx.js
+  // VFX layer: spawn pop, hit ring, ranged tracer, melee step-in/out
+  // Không thay đổi logic combat/turn — chỉ vẽ đè.
+  // Durations: spawn 500ms, hit 380ms, tracer 400ms, melee 1200ms.
+
+  const __dep0 = __require('./engine.js');
+  const projectCellOblique = __dep0.projectCellOblique;
+  const __dep1 = __require('./config.js');
+  const CFG = __dep1.CFG;
+  const CHIBI = __dep1.CHIBI;
+
+  const now = () => performance.now();
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const easeInOut = (t) => (1 - Math.cos(Math.PI * Math.max(0, Math.min(1, t)))) * 0.5;
+
+  function pool(Game) {
+    if (!Game.vfx) Game.vfx = [];
+    return Game.vfx;
+  }
+
+  /* ------------------- Adders ------------------- */
+  function vfxAddSpawn(Game, cx, cy, side) {
+    pool(Game).push({ type: 'spawn', t0: now(), dur: 500, cx, cy, side });
+  }
+
+  function vfxAddHit(Game, target, opts = {}) {
+    pool(Game).push({ type: 'hit', t0: now(), dur: 380, ref: target, ...opts });
+  }
+
+  function vfxAddTracer(Game, attacker, target, opts = {}) {
+    pool(Game).push({ type: 'tracer', t0: now(), dur: opts.dur || 400, refA: attacker, refB: target });
+  }
+
+  function vfxAddMelee(Game, attacker, target, { dur = 1800 } = {}) {
+    // Overlay step-in/out (không di chuyển token thật)
+    pool(Game).push({ type: 'melee', t0: now(), dur, refA: attacker, refB: target });
+  }
+  function drawChibiOverlay(ctx, x, y, r, facing, color) {
+    const lw = Math.max(CHIBI.line, Math.floor(r*0.28));
+    const hr = Math.max(3, Math.floor(r*CHIBI.headR));
+    const torso = r*CHIBI.torso, arm=r*CHIBI.arm, leg=r*CHIBI.leg, wep=r*CHIBI.weapon;
+
+    ctx.save(); ctx.translate(x,y); ctx.lineCap='round'; ctx.lineJoin='round';
+    ctx.strokeStyle = color; ctx.lineWidth = lw;
+
+    // đầu
+    ctx.beginPath(); ctx.arc(0, -torso-hr, hr, 0, Math.PI*2); ctx.stroke();
+    // thân
+    ctx.beginPath(); ctx.moveTo(0, -torso); ctx.lineTo(0, 0); ctx.stroke();
+    // tay (tay trước cầm kiếm theo hướng facing)
+    ctx.beginPath();
+    ctx.moveTo(0, -torso*0.6); ctx.lineTo(-arm*0.8, -torso*0.2);
+    ctx.moveTo(0, -torso*0.6); ctx.lineTo( arm*0.8*facing, -torso*0.2);
+    ctx.stroke();
+    // chân
+    ctx.beginPath();
+    ctx.moveTo(0, 0); ctx.lineTo(-leg*0.6, leg*0.9);
+    ctx.moveTo(0, 0); ctx.lineTo( leg*0.6, leg*0.9);
+    ctx.stroke();
+    // kiếm
+    const hx = arm*0.8*facing, hy = -torso*0.2;
+    ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(hx + wep*facing, hy); ctx.stroke();
+
+    ctx.restore();
+  }
+  /* ------------------- Drawer ------------------- */
+  function vfxDraw(ctx, Game, cam) {
+    const list = pool(Game);
+    if (!list.length || !Game.grid) return;
+
+    const keep = [];
+    for (const e of list) {
+      const t = (now() - e.t0) / e.dur;
+      const done = t >= 1;
+      const tt = Math.max(0, Math.min(1, t));
+
+      if (e.type === 'spawn') {
+        const p = projectCellOblique(Game.grid, e.cx, e.cy, cam);
+        const r0 = Math.max(8, Math.floor(Game.grid.tile * 0.22 * p.scale));
+        const r = r0 + Math.floor(r0 * 1.8 * tt);
+        ctx.save();
+        ctx.globalAlpha = 1 - tt;
+        ctx.strokeStyle = e.side === 'ally' ? '#9ef0a4' : '#ffb4c0';
+        ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.stroke();
+        ctx.restore();
+      }
+
+      else if (e.type === 'hit') {
+        const ref = e.ref && Game.tokens.find(tk => tk === e.ref || (tk.iid && e.ref.iid && tk.iid === e.ref.iid));
+        if (ref) {
+          const p = projectCellOblique(Game.grid, ref.cx, ref.cy, cam);
+          const r = Math.floor(Game.grid.tile * 0.25 * (0.6 + 1.1 * tt) * p.scale);
+          ctx.save();
+          ctx.globalAlpha = 0.9 * (1 - tt);
+          ctx.strokeStyle = '#e6f2ff';
+          ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.stroke();
+          ctx.restore();
+        }
+      }
+      else if (e.type === 'tracer') {
+    // disabled: không vẽ “đường trắng” nữa
+  }
+      else if (e.type === 'melee') {
+    const A = e.refA, B = e.refB;
+    if (A && B && A.alive && B.alive) {
+      const pa = projectCellOblique(Game.grid, A.cx, A.cy, cam);
+      const pb = projectCellOblique(Game.grid, B.cx, B.cy, cam);
+
+      // Đi vào ~40%, dừng ngắn, rồi lùi về (easeInOut) – không chạm hẳn mục tiêu để đỡ che
+      const tN = Math.max(0, Math.min(1, (now() - e.t0) / e.dur));
+      const k = easeInOut(tN) * 0.88;
+      const mx = lerp(pa.x, pb.x, k);
+      const my = lerp(pa.y, pb.y, k);
+
+      // scale theo chiều sâu (khớp render token)
+      const depth = Game.grid.rows - 1 - A.cy;
+      const kDepth = (cam?.depthScale ?? 0.94);
+      const r = Math.max(6, Math.floor(Game.grid.tile * 0.36 * Math.pow(kDepth, depth)));
+
+      const facing = (A.side === 'ally') ? 1 : -1;
+      const color  = A.color || (A.side === 'ally' ? '#9adcf0' : '#ffb4c0');
+
+      ctx.save();
+      ctx.globalAlpha = 0.95;
+      drawChibiOverlay(ctx, mx, my, r, facing, color);
+      ctx.restore();
+    }
+  }
+
+      if (!done) keep.push(e);
+    }
+    Game.vfx = keep;
+  }
+
+  exports.vfxAddSpawn = vfxAddSpawn;
+  exports.vfxAddHit = vfxAddHit;
+  exports.vfxAddTracer = vfxAddTracer;
+  exports.vfxAddMelee = vfxAddMelee;
+  exports.vfxDraw = vfxDraw;
+});
+try {
+  __require('./entry.js');
+} catch (err) {
+  console.error('Failed to bootstrap Arclune bundle:', err);
+  throw err;
+}
+  
         
