@@ -1295,5 +1295,531 @@ __define('./engine.js', (exports, module, __require) => {
     ctx.moveTo(0, -torso * 0.6);
     ctx.lineTo(arm * 0.8 * facing, -torso * 0.2);     // tay cầm kiếm
     ctx.stroke();
-    
+
+    // chân
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(-leg * 0.6, leg * 0.9);
+    ctx.moveTo(0, 0);
+    ctx.lineTo(leg * 0.6, leg * 0.9);
+    ctx.stroke();
+
+    // kiếm
+    const hx = arm * 0.8 * facing, hy = -torso * 0.2;
+    ctx.beginPath();
+    ctx.moveTo(hx, hy);
+    ctx.lineTo(hx + wep * facing, hy);
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  const SPRITE_CACHE = new Map();
+  const ART_SPRITE_EVENT = 'unit-art:sprite-loaded';
+
+  function ensureTokenArt(token){
+    if (!token) return null;
+    if (!token.art) token.art = getUnitArt(token.id);
+    return token.art;
+  }
+
+  function ensureSpriteLoaded(art){
+    if (!art || !art.sprite || typeof Image === 'undefined') return null;
+    let entry = SPRITE_CACHE.get(art.sprite);
+    if (!entry){
+      const img = new Image();
+      entry = { status: 'loading', img };
+      if ('decoding' in img) img.decoding = 'async';
+      img.onload = ()=>{
+        entry.status = 'ready';
+        if (typeof window !== 'undefined'){
+          try {
+            window.dispatchEvent(new Event(ART_SPRITE_EVENT));
+          } catch(_){}
+        }
+      };
+      img.onerror = ()=>{ entry.status = 'error'; };
+      img.src = art.sprite;
+      SPRITE_CACHE.set(art.sprite, entry);
+    }
+    return entry;
+  }
+
+  function drawStylizedShape(ctx, width, height, anchor, art){
+    const palette = art?.palette || {};
+    const primary = palette.primary || '#86c4ff';
+    const secondary = palette.secondary || '#1f3242';
+    const accent = palette.accent || '#d2f4ff';
+    const outline = palette.outline || 'rgba(0,0,0,0.55)';
+    const top = -height * anchor;
+    const bottom = height - height * anchor;
+    const halfW = width / 2;
+    const shape = art?.shape || 'sentinel';
+    const gradient = ctx.createLinearGradient(0, top, 0, bottom);
+    gradient.addColorStop(0, primary);
+    gradient.addColorStop(1, secondary);
+
+    ctx.save();
+    ctx.beginPath();
+    switch(shape){
+      case 'wing': {
+        ctx.moveTo(-halfW * 0.92, bottom * 0.35);
+        ctx.quadraticCurveTo(-halfW * 1.05, top + height * 0.1, 0, top);
+        ctx.quadraticCurveTo(halfW * 1.05, top + height * 0.2, halfW * 0.9, bottom * 0.4);
+        ctx.quadraticCurveTo(halfW * 0.45, bottom * 0.92, 0, bottom);
+        ctx.quadraticCurveTo(-halfW * 0.4, bottom * 0.86, -halfW * 0.92, bottom * 0.35);
+        break;
+      }
+      case 'rune': {
+        ctx.moveTo(0, top);
+        ctx.lineTo(halfW, top + height * 0.42);
+        ctx.lineTo(0, bottom);
+        ctx.lineTo(-halfW, top + height * 0.42);
+        break;
+      }
+      case 'bloom': {
+        ctx.moveTo(0, top);
+        ctx.bezierCurveTo(halfW * 0.8, top + height * 0.05, halfW * 1.05, top + height * 0.45, halfW * 0.78, bottom * 0.38);
+        ctx.bezierCurveTo(halfW * 0.68, bottom * 0.92, halfW * 0.2, bottom, 0, bottom);
+        ctx.bezierCurveTo(-halfW * 0.2, bottom, -halfW * 0.68, bottom * 0.92, -halfW * 0.78, bottom * 0.38);
+        ctx.bezierCurveTo(-halfW * 1.05, top + height * 0.45, -halfW * 0.8, top + height * 0.05, 0, top);
+        break;
+      }
+      case 'pike': {
+        ctx.moveTo(0, top);
+        ctx.lineTo(halfW * 0.92, top + height * 0.32);
+        ctx.lineTo(halfW * 0.52, bottom);
+        ctx.lineTo(-halfW * 0.52, bottom);
+        ctx.lineTo(-halfW * 0.92, top + height * 0.32);
+        break;
+      }
+      case 'shield':
+      case 'sentinel':
+      default: {
+        ctx.moveTo(0, top);
+        ctx.bezierCurveTo(halfW, top + height * 0.22, halfW * 0.85, bottom * 0.16, 0, bottom);
+        ctx.bezierCurveTo(-halfW * 0.85, bottom * 0.16, -halfW, top + height * 0.22, 0, top);
+        break;
+      }
+    }
+    ctx.closePath();
+    ctx.fillStyle = gradient;
+    ctx.fill();
+    ctx.lineWidth = Math.max(2, width * 0.06);
+    ctx.strokeStyle = outline;
+    ctx.stroke();
+
+    ctx.globalAlpha = 0.35;
+    ctx.fillStyle = accent;
+    ctx.beginPath();
+    ctx.moveTo(-halfW * 0.58, top + height * 0.22);
+    ctx.quadraticCurveTo(0, top + height * 0.05, halfW * 0.58, top + height * 0.22);
+    ctx.quadraticCurveTo(halfW * 0.2, top + height * 0.32, 0, top + height * 0.28);
+    ctx.quadraticCurveTo(-halfW * 0.2, top + height * 0.32, -halfW * 0.58, top + height * 0.22);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function roundedRectPath(ctx, x, y, w, h, radius){
+    const r = Math.min(radius, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  function formatName(text){
+    if (!text) return '';
+    const str = String(text);
+    if (str.length <= 16) return str;
+    return `${str.slice(0, 15)}…`;
+  }
+
+  function drawNameplate(ctx, text, x, y, r, art){
+    if (!text) return;
+    const layout = art?.layout || {};
+    const fontSize = Math.max(11, Math.floor(r * (layout.labelFont || 0.7)));
+    const padX = Math.max(8, Math.floor(fontSize * 0.6));
+    const padY = Math.max(4, Math.floor(fontSize * 0.35));
+    ctx.save();
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.font = `${fontSize}px 'Be Vietnam Pro', 'Inter', system-ui`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const metrics = ctx.measureText(text);
+    const width = Math.ceil(metrics.width + padX * 2);
+    const height = Math.ceil(fontSize + padY * 2);
+    const radius = Math.max(4, Math.floor(height / 2));
+    const boxX = Math.round(x - width / 2);
+    const boxY = Math.round(y - height / 2);
+    roundedRectPath(ctx, boxX, boxY, width, height, radius);
+    ctx.fillStyle = art?.label?.bg || 'rgba(12,20,30,0.82)';
+    ctx.fill();
+    if (art?.label?.stroke){
+      ctx.strokeStyle = art.label.stroke;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+    ctx.fillStyle = art?.label?.text || '#f4f8ff';
+    ctx.fillText(text, x, boxY + height / 2);
+    ctx.restore();
+    }
+  function drawTokensOblique(ctx, g, tokens, cam){
+    const C = cam || { rowGapRatio: 0.62, topScale: 0.80, depthScale: 0.94 };
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    const baseR = Math.floor(g.tile * 0.36);
+    const k = C.depthScale ?? 0.94; // scale theo chiều sâu
+
+    // Vẽ xa trước – gần sau theo tung độ tâm-ô
+    const sorted = tokens.slice().sort((a,b)=>{
+      const ya = _cellCenterOblique(g, a.cx, a.cy, C).y;
+      const yb = _cellCenterOblique(g, b.cx, b.cy, C).y;
+      return ya === yb ? a.cx - b.cx : ya - yb;
+    });
+      for (const t of sorted){
+      if (!t.alive) continue; // chết là thôi vẽ ngay
+      const p = _cellCenterOblique(g, t.cx, t.cy, C);
+      const depth = g.rows - 1 - t.cy;
+      const scale = Math.pow(k, depth);
+      const r = Math.max(6, Math.floor(baseR * scale));
+      const facing = (t.side === 'ally') ? 1 : -1;
+        
+  const art = ensureTokenArt(t) || getUnitArt(t.id);
+      const layout = art?.layout || {};
+      const spriteHeightMult = layout.spriteHeight || 2.4;
+      const spriteAspect = layout.spriteAspect || 0.78;
+      const spriteHeight = r * spriteHeightMult * (art?.size ?? 1);
+      const spriteWidth = spriteHeight * spriteAspect;
+      const anchor = layout.anchor ?? 0.78;
+      const hasRichArt = !!(art && (art.sprite || art.shape));
+
+      if (hasRichArt){
+        const spriteEntry = ensureSpriteLoaded(art);
+        const spriteReady = spriteEntry && spriteEntry.status === 'ready';
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        if (facing === -1 && art?.mirror !== false) ctx.scale(-1, 1);
+        ctx.shadowColor = art?.glow || art?.shadow || 'rgba(0,0,0,0.35)';
+        ctx.shadowBlur = Math.max(6, r * 0.7);
+        ctx.shadowOffsetY = Math.max(2, r * 0.2);
+        if (spriteReady){
+          ctx.drawImage(spriteEntry.img, -spriteWidth/2, -spriteHeight*anchor, spriteWidth, spriteHeight);
+        } else {
+          drawStylizedShape(ctx, spriteWidth, spriteHeight, anchor, art);
+        }
+        ctx.restore();
+        } else if (TOKEN_STYLE === 'chibi') {
+        drawChibi(ctx, p.x, p.y, r, facing, t.color || '#9adcf0');
+      } else {
+        ctx.fillStyle = t.color || '#9adcf0';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, r, 0, Math.PI*2);
+        ctx.fill();
+      }
+
+      if (art?.label !== false){
+        const name = formatName(t.name || t.id);
+        const offset = layout.labelOffset ?? 1.2;
+        drawNameplate(ctx, name, p.x, p.y + r * offset, r, art);
+      }
+    }
+  }
+   
+  // (W2-J2) Vẽ “Chờ Lượt” – silhouette mờ/tối, chỉ hiển thị theo flag DEBUG
+  function drawQueuedOblique(ctx, g, queued, cam){
+   if (!queued) return;
+   const C = cam || { rowGapRatio: 0.62, topScale: 0.80, depthScale: 0.94 };
+   const baseR = Math.floor(g.tile * 0.36);
+   const k = C.depthScale ?? 0.94;
+
+   function drawSide(map, side){
+    if (!map) return;
+     // Ally thấy theo SHOW_QUEUED; enemy ẩn trừ khi bật SHOW_QUEUED_ENEMY
+    if (side === 'ally'  && !(CFG.DEBUG?.SHOW_QUEUED)) return;
+     if (side === 'enemy' && !(CFG.DEBUG?.SHOW_QUEUED_ENEMY)) return;
+     for (const p of map.values()){
+      const c = _cellCenterOblique(g, p.cx, p.cy, C);
+      const depth = g.rows - 1 - p.cy;
+      const r = Math.max(6, Math.floor(baseR * Math.pow(k, depth)));
+       ctx.save();
+       ctx.globalAlpha = 0.5;          // mờ/tối
+      ctx.fillStyle = p.color || '#5b6a78';
+       ctx.beginPath(); ctx.arc(c.x, c.y, r, 0, Math.PI*2); ctx.fill();
+        ctx.restore();
+      }
+   }
+    drawSide(queued.ally,  'ally');
+    drawSide(queued.enemy, 'enemy');
+  }
+
+  /* ---------- TURN/ZONE HELPERS (W1-J1) ---------- */
+  const SIDE = { ALLY: 'ally', ENEMY: 'enemy' };
+
+  // Trả về chỉ số lượt 1..9 của ô (cx,cy) theo phe
+  function slotIndex(side, cx, cy){
+    if (side === SIDE.ALLY || side === 'ally'){
+     // Ally: c=2 → 1..3 (trên→dưới), c=1 → 4..6, c=0 → 7..9
+      return (CFG.ALLY_COLS - 1 - cx) * 3 + (cy + 1);
+   } else {
+     // Enemy: c=4 → 1..3 (dưới→trên), c=5 → 4..6, c=6 → 7..9
+     const enemyStart = CFG.GRID_COLS - CFG.ENEMY_COLS; // 7-3=4
+     const colIndex = cx - enemyStart;                   // 0..2
+     return colIndex * 3 + (3 - cy);
+    }
+  }
+
+  // Ngược lại: từ slot (1..9) suy ra (cx,cy) theo phe
+  function slotToCell(side, slot){
+   const s = Math.max(1, Math.min(9, slot|0));
+   const colIndex = Math.floor((s - 1) / 3); // 0..2 (gần mid → xa)
+    const rowIndex = (s - 1) % 3;             // 0..2
+   if (side === SIDE.ALLY || side === 'ally'){
+     const cx = (CFG.ALLY_COLS - 1) - colIndex; // 2,1,0
+     const cy = rowIndex;                       // 0..2 (trên→dưới)
+    return { cx, cy };
+    } else {
+      const enemyStart = CFG.GRID_COLS - CFG.ENEMY_COLS; // 4
+     const cx = enemyStart + colIndex;                  // 4,5,6
+      const cy = 2 - rowIndex;                           // 2,1,0 (dưới→trên)
+     return { cx, cy };
+   }
+  }
+
+  // Gán nhãn “mã vùng” cho AI/AoE (A1..A9 | E1..E9) hoặc mã số tileId
+  function zoneCode(side, cx, cy, { numeric=false } = {}){
+    const slot = slotIndex(side, cx, cy);
+    if (numeric) return (side === SIDE.ALLY || side === 'ally' ? 0 : 1) * 16 + slot;
+   const pfx = (side === SIDE.ALLY || side === 'ally') ? 'A' : 'E';
+    return pfx + String(slot);
+  }
+
+  // Bảng tra cứu thuận tiện (chưa dùng nhưng hữu ích cho AI/visual debug)
+  const ORDER_ALLY  = Array.from({length:9}, (_,i)=> slotToCell(SIDE.ALLY,  i+1));
+  const ORDER_ENEMY = Array.from({length:9}, (_,i)=> slotToCell(SIDE.ENEMY, i+1));
+
+  exports.pick3Random = pick3Random;
+  exports.ART_SPRITE_EVENT = ART_SPRITE_EVENT;
+  exports.SIDE = SIDE;
+  exports.ORDER_ALLY = ORDER_ALLY;
+  exports.ORDER_ENEMY = ORDER_ENEMY;
+  exports.makeGrid = makeGrid;
+  exports.hitToCell = hitToCell;
+  exports.drawTokens = drawTokens;
+  exports.cellOccupied = cellOccupied;
+  exports.cellReserved = cellReserved;
+  exports.spawnLeaders = spawnLeaders;
+  exports.pickRandom = pickRandom;
+  exports.drawGridOblique = drawGridOblique;
+  exports.hitToCellOblique = hitToCellOblique;
+  exports.projectCellOblique = projectCellOblique;
+  exports.drawTokensOblique = drawTokensOblique;
+  exports.drawQueuedOblique = drawQueuedOblique;
+  exports.slotIndex = slotIndex;
+  exports.slotToCell = slotToCell;
+  exports.zoneCode = zoneCode;
+});
+__define('./entry.js', (exports, module, __require) => {
+  const __dep0 = __require('./main.js');
+  const startGame = __dep0.startGame;
+
+  const SUCCESS_EVENT = 'arclune:loaded';
+
+  function dispatchLoaded(){
+    try {
+      window.dispatchEvent(new Event(SUCCESS_EVENT));
+    } catch (err) {
+      console.warn('Unable to dispatch load event', err);
+    }
+  }
+
+  function ensureRenderer(){
+    if (typeof window.arcluneRenderMessage === 'function'){
+      return window.arcluneRenderMessage;
+    }
+    return (options = {}) => {
+      const { title = 'Arclune', body = '' } = options;
+      const wrapper = document.createElement('div');
+      wrapper.style.maxWidth = '640px';
+      wrapper.style.margin = '48px auto';
+      wrapper.style.padding = '32px';
+      wrapper.style.background = 'rgba(12,18,24,0.85)';
+      wrapper.style.border = '1px solid #2a3a4a';
+      wrapper.style.borderRadius = '16px';
+      wrapper.style.textAlign = 'center';
+      wrapper.style.lineHeight = '1.6';
+      wrapper.innerHTML = `
+        <h2 style="margin-top:0;color:#ffe066;">${title}</h2>
+        ${body}
+      `;
+      document.body.innerHTML = '';
+      document.body.appendChild(wrapper);
+    };
+  }
+
+  function showFileProtocolWarning(renderMessage){
+    const body = `
+      <p>Vui lòng khởi chạy Arclune thông qua một HTTP server thay vì mở trực tiếp từ ổ đĩa.</p>
+      <p>Ví dụ: chạy <code>npx serve</code> hoặc bất kỳ server tĩnh nào khác rồi truy cập qua <code>http://localhost:*</code>.</p>
+    `;
+    renderMessage({
+      title: 'Không thể chạy từ file://',
+      body
+    });
+  }
+
+  function showFatalError(error, renderMessage){
+    const detail = error && typeof error === 'object' && 'message' in error
+      ? String(error.message)
+      : String(error || 'Lỗi không xác định.');
+    renderMessage({
+      title: 'Không thể khởi động Arclune',
+      body: `<p>${detail}</p>`
+    });
+  }
+
+  (function bootstrap(){
+    const renderMessage = ensureRenderer();
+    const protocol = window?.location?.protocol;
+    if (protocol === 'file:'){
+      showFileProtocolWarning(renderMessage);
+      dispatchLoaded();
+      return;
+    }
+    try {
+      startGame();
+      dispatchLoaded();
+    } catch (error) {
+      console.error('Arclune failed to start', error);
+      if (typeof window.arcluneShowFatal === 'function'){
+        window.arcluneShowFatal(error);
+      } else {
+        showFatalError(error, renderMessage);
+      }
+    }
+  })();
+
+});
+__define('./events.js', (exports, module, __require) => {
+  // events.js
+  const HAS_EVENT_TARGET = typeof EventTarget === 'function';
+
+  class SimpleEventTarget {
+    constructor(){
+      this._map = new Map();
+    }
+    addEventListener(type, handler){
+      if (!type || typeof handler !== 'function') return;
+      const list = this._map.get(type) || [];
+      list.push(handler);
+      this._map.set(type, list);
+    }
+    removeEventListener(type, handler){
+      if (!type || typeof handler !== 'function') return;
+      const list = this._map.get(type);
+      if (!list || !list.length) return;
+      const idx = list.indexOf(handler);
+      if (idx >= 0){
+        list.splice(idx, 1);
+        if (!list.length) this._map.delete(type);
+        else this._map.set(type, list);
+      }
+    }
+    dispatchEvent(event){
+      if (!event || !event.type) return false;
+      const list = this._map.get(event.type);
+      if (!list || !list.length) return true;
+      for (const handler of [...list]){
+        try {
+          handler.call(this, event);
+        } catch (err) {
+          console.error('[events]', err);
+        }
+      }
+      return true;
+    }
+  }
+
+  function makeEventTarget(){
+    return HAS_EVENT_TARGET ? new EventTarget() : new SimpleEventTarget();
+  }
+
+  function makeEvent(type, detail){
+    if (typeof CustomEvent === 'function'){
+      return new CustomEvent(type, { detail });
+    }
+    if (typeof Event === 'function'){
+      const ev = new Event(type);
+      ev.detail = detail;
+      return ev;
+    }
+    return { type, detail };
+  }
+
+  const TURN_START = 'turn:start';
+  const TURN_END = 'turn:end';
+  const ACTION_START = 'action:start';
+  const ACTION_END = 'action:end';
+
+  const gameEvents = makeEventTarget();
+
+  function emitGameEvent(type, detail){
+    if (!type || !gameEvents) return false;
+    const event = makeEvent(type, detail);
+    try {
+      if (typeof gameEvents.dispatchEvent === 'function'){
+        return gameEvents.dispatchEvent(event);
+      }
+      if (typeof gameEvents.emit === 'function'){
+        gameEvents.emit(type, detail);
+        return true;
+      }
+    } catch (err) {
+      console.error('[events]', err);
+    }
+    return false;
+  }
+
+  exports.TURN_START = TURN_START;
+  exports.TURN_END = TURN_END;
+  exports.ACTION_START = ACTION_START;
+  exports.ACTION_END = ACTION_END;
+  exports.gameEvents = gameEvents;
+  exports.emitGameEvent = emitGameEvent;
+});
+__define('./main.js', (exports, module, __require) => {
+  //v0.7.6
+  const __dep1 = __require('./turns.js');
+  const stepTurn = __dep1.stepTurn;
+  const doActionOrSkip = __dep1.doActionOrSkip;
+  const __dep2 = __require('./summon.js');
+  const enqueueImmediate = __dep2.enqueueImmediate;
+  const processActionChain = __dep2.processActionChain;
+  const __dep3 = __require('./ai.js');
+  const refillDeckEnemy = __dep3.refillDeckEnemy;
+  const aiMaybeAct = __dep3.aiMaybeAct;
+  const __dep4 = __require('./statuses.js');
+  const Statuses = __dep4.Statuses;
+  const __dep5 = __require('./config.js');
+  const CFG = __dep5.CFG;
+  const CAM = __dep5.CAM;
+  const __dep6 = __require('./units.js');
+  const UNITS = __dep6.UNITS;
+  const __dep7 = __require('./meta.js');
+  const Meta = __dep7.Meta;
+  const makeInstanceStats = __dep7.makeInstanceStats;
+  const initialRageFor = __dep7.initialRageFor;
+  const __dep8 = __require('./combat.js');
+  const basicAttack = __dep8.basicAttack;
+  const pickTarget = __dep8.pickTarget;
+  const dealAbilityDamage
         
