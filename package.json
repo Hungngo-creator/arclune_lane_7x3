@@ -1,0 +1,12 @@
+{
+  "name": "arclune_lane_7x3",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
