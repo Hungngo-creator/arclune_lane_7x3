@@ -908,4 +908,392 @@ __define('./combat.js', (exports, module, __require) => {
       vfxAddMelee(Game, unit, tgt, { dur: meleeDur });
       meleeTriggered = true;
     } catch (_) {}
+    if (meleeTriggered && Game?.turn) {
+      const prevBusy = Number.isFinite(Game.turn.busyUntil) ? Game.turn.busyUntil : 0;
+      Game.turn.busyUntil = Math.max(prevBusy, meleeStartMs + meleeDur);
+    }
+   
+    // Tính raw và modifiers trước giáp
+    const dtype = 'physical';
+    const rawBase = Math.max(1, Math.floor(unit.atk || 0));
+    const modBase = Math.max(
+      1,
+      Math.floor(rawBase * (passiveCtx.damage?.baseMul ?? 1) + (passiveCtx.damage?.flatAdd ?? 0))
+    );
+    const pre = Statuses.beforeDamage(unit, tgt, { dtype, base: modBase, attackType: 'basic' });
+    // OutMul (buff/debuff output)
+    let dmg = Math.max(1, Math.floor(pre.base * pre.outMul));
+
+    // Giáp/kháng có xuyên giáp (defPen)
+    const def = Math.max(0, (tgt.arm ||0) * (1 - (pre.defPen ||0))); // dtype === 'physical'
+    dmg = Math.max(0, Math.floor(dmg * (1 - def)));
+
+    // InMul (giảm/tăng dmg nhận vào, stealth=0%)
+    dmg = Math.max(0, Math.floor(dmg * pre.inMul));
+
+    // Khiên hấp thụ
+    const abs = Statuses.absorbShield(tgt, dmg, { dtype });
+
+    // Trừ HP phần còn lại
+    applyDamage(tgt, abs.remain);
+
+    // VFX: hit ring tại target
+    try { vfxAddHit(Game, tgt); } catch (_) {}
+    // “Bất Khuất” (undying) — chết còn 1 HP (one-shot)
+    if (tgt.hp <= 0) hookOnLethalDamage(tgt);
+  const dealt = Math.max(0, Math.min(dmg, abs.remain || 0));
+    // Hậu quả sau đòn: phản dmg, độc theo dealt, execute ≤10%…
+    Statuses.afterDamage(unit, tgt, { dealt, absorbed: abs.absorbed, dtype });
+
+    if (Array.isArray(passiveCtx.afterHit) && passiveCtx.afterHit.length){
+      const afterCtx = { target: tgt, owner: unit, result: { dealt, absorbed: abs.absorbed } };
+      for (const fn of passiveCtx.afterHit) {
+        try {
+          fn(afterCtx);
+        } catch (err){
+          console.error('[passive afterHit]', err);
+        }
+      }
+    }
+  }
+   
+  // Helper: basic + follow-ups trong cùng turn-step.
+  // cap = số follow-up (không tính đòn thường). Không đẩy con trỏ lượt.
+  function doBasicWithFollowups(Game, unit, cap = 2){
+    try {
+     // Đòn đánh thường đầu tiên
+     basicAttack(Game, unit);
+     // Đòn phụ
+     const n = Math.max(0, cap|0);
+    for (let i=0; i<n; i++){
+       if (!unit || !unit.alive) break;
+        basicAttack(Game, unit);
+     }
+    } catch(e){
+      console.error('[doBasicWithFollowups]', e);
+    }
+  }
+
+  exports.pickTarget = pickTarget;
+  exports.computeDamage = computeDamage;
+  exports.applyDamage = applyDamage;
+  exports.dealAbilityDamage = dealAbilityDamage;
+  exports.healUnit = healUnit;
+  exports.grantShield = grantShield;
+  exports.basicAttack = basicAttack;
+  exports.doBasicWithFollowups = doBasicWithFollowups;
+});
+__define('./config.js', (exports, module, __require) => {
+  // config.js v0.7.5
+  const CFG = {
+    GRID_COLS: 7,
+    GRID_ROWS: 3,
+    ALLY_COLS: 3,
+    ENEMY_COLS: 3,
+    COST_CAP: 30,
+    SUMMON_LIMIT: 10,
+   HAND_SIZE: 4,
+  FOLLOWUP_CAP_DEFAULT: 2,
+
+    // === AI tuning ===
+    AI: {
+      WEIGHTS: {
+        pressure: 0.42,
+        safety: 0.20,
+        eta: 0.16,
+        summon: 0.08,
+        kitInstant: 0.06,
+        kitDefense: 0.04,
+        kitRevive: 0.04
+      },
+      ROW_CROWDING_PENALTY: 0.85,
+      ROLE: {
+        Tanker:   { front: 0.08, back: -0.04 },
+        Warrior:  { front: 0.04, back:  0.00 },
+        Ranger:   { front:-0.03, back:  0.06 },
+        Mage:     { front:-0.02, back:  0.05 },
+        Assassin: { front: 0.03, back: -0.03 },
+        Support:  { front:-0.02, back:  0.03 },
+        Summoner: { front: 0.00, back:  0.04, summonBoost: 0.05 }
+      }, DEBUG: { KEEP_TOP: 6 }
+    },
+
+    // === UI constants (C2) ===
+    UI: {                           // <-- bỏ dấu phẩy ở đầu
+      PAD: 12,
+      BOARD_MAX_W: 900,
+      BOARD_MIN_H: 220,
+      BOARD_H_RATIO: 3/7,
+      CARD_GAP: 12,
+      CARD_MIN: 40
+    },                              // <-- thêm dấu phẩy ở đây
+  // === Debug flags (W0-J1) ===
+   DEBUG: {
+     SHOW_QUEUED: true,        // vẽ unit "Chờ Lượt" cho phe mình (ally) khi có
+     SHOW_QUEUED_ENEMY: false  // kẻ địch không thấy (đúng design)
+   },
+    COLORS: {
+      ally: '#1e2b36',
+      enemy: '#2a1c22',
+      mid:  '#1c222a',
+      line: '#24303c',
+      tokenText: '#0d1216'
+    },
+
+    CAMERA: 'landscape_oblique'
+  };
+
+  // Camera presets (giữ nguyên)
+  const CAM = {
+    landscape_oblique: { rowGapRatio: 0.62, topScale: 0.80, depthScale: 0.94 },
+    portrait_leader45: { rowGapRatio: 0.72, topScale: 0.86, depthScale: 0.96 }
+  };
+  // === Token render style ===
+  const TOKEN_STYLE = 'chibi'; // 'chibi' | 'disk'
+
+  // Proportions cho chibi (tính theo bán kính cơ sở r)
+  const CHIBI = {
+    // đường đậm hơn + tỉ lệ chibi mập mạp (đầu to, tay chân ngắn)
+    line: 3,
+    headR: 0.52,   // đầu to hơn
+    torso: 0.70,   // thân ngắn hơn
+    arm: 0.58,     // tay ngắn hơn
+    leg: 0.68,     // chân ngắn hơn
+    weapon: 0.78,  // vũ khí ngắn hơn để cân đối
+    nameAlpha: 0.7
+  };
+
+  exports.CFG = CFG;
+  exports.CAM = CAM;
+  exports.TOKEN_STYLE = TOKEN_STYLE;
+  exports.CHIBI = CHIBI;
+});
+__define('./engine.js', (exports, module, __require) => {
+  const __dep0 = __require('./config.js');
+  const TOKEN_STYLE = __dep0.TOKEN_STYLE;
+  const CHIBI = __dep0.CHIBI;
+  const CFG = __dep0.CFG;
+  const __dep1 = __require('./art.js');
+  const getUnitArt = __dep1.getUnitArt;
+  //v0.7.3
+  /* ---------- Grid ---------- */
+  function makeGrid(canvas, cols, rows){
+    const pad = CFG.UI?.PAD ?? 12;
+    const w = Math.min(window.innerWidth - pad*2, CFG.UI?.BOARD_MAX_W ?? 900);
+    const h = Math.max(
+      Math.floor(w * (CFG.UI?.BOARD_H_RATIO ?? (3/7))),
+      CFG.UI?.BOARD_MIN_H ?? 220
+    );
+    canvas.width = w; canvas.height = h;
+
+    const usableW = w - pad * 2;
+    const usableH = h - pad * 2;
+
+    const tile = Math.floor(Math.min(usableW / cols, usableH / rows));
+
+    const ox = Math.floor((w - tile*cols)/2);
+    const oy = Math.floor((h - tile*rows)/2);
+    return { cols, rows, tile, ox, oy, w, h, pad };
+  }
+
+  function hitToCell(g, px, py){
+    const cx = Math.floor((px - g.ox) / g.tile);
+    const cy = Math.floor((py - g.oy) / g.tile);
+    if (cx<0 || cy<0 || cx>=g.cols || cy>=g.rows) return null;
+    return { cx, cy };
+  }
+
+  /* ---------- Tokens ---------- */
+  function drawTokens(ctx, g, tokens){
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    const fs = Math.floor(g.tile*0.28);
+
+    tokens.forEach(t=>{
+      const {x,y} = cellCenter(g, t.cx, t.cy);
+      const r = Math.floor(g.tile*0.36);
+      ctx.fillStyle = t.color; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle = CFG.COLORS.tokenText; ctx.font = `${fs}px system-ui`;
+      ctx.fillText(t.name, x, y);
+    });
+  }
+
+  function cellOccupied(tokens, cx, cy){
+    return tokens.some(t => t.cx === cx && t.cy === cy);
+  }
+
+  // queued: { ally:Map(slot→PendingUnit), enemy:Map(...) }
+  function cellReserved(tokens, queued, cx, cy){
+    // 1) Active đang đứng
+    if (cellOccupied(tokens, cx, cy)) return true;
+    // 2) Queued (đã trừ cost, đang mờ)
+    if (queued){
+      const checkQ = (m)=> {
+        if (!m || typeof m.values !== 'function') return false;
+        for (const p of m.values()){
+        if (!p) continue;
+          if (p.cx === cx && p.cy === cy) return true;
+        }
+        return false;
+      };
+      if (checkQ(queued.ally))  return true;
+      if (checkQ(queued.enemy)) return true;
+    }
+    return false;
+  }
+
+  function spawnLeaders(tokens, g){
+    // Ally leader ở (0,1), Enemy leader ở (6,1)
+    tokens.push({ id:'leaderA', name:'Uyên', color:'#6cc8ff', cx:0, cy:1, side:'ally', alive:true, art: getUnitArt('leaderA') });
+    tokens.push({ id:'leaderB', name:'Địch', color:'#ff9aa0', cx:g.cols-1, cy:1, side:'enemy', alive:true, art: getUnitArt('leaderB') });
+  }
+
+  /* ---------- Helper ---------- */
+  function pickRandom(pool, excludeSet, n = 4){
+    const remain = pool.filter(u => !excludeSet.has(u.id));
+    for (let i=remain.length-1;i>0;i--){
+     const j = (Math.random()*(i+1))|0; const t = remain[i]; remain[i]=remain[j]; remain[j]=t;
+   }
+   return remain.slice(0, n);
+  }
+  // Giữ alias cũ (nếu có file nào khác còn import)
+  const pick3Random = (pool, ex) => pickRandom(pool, ex, 3);
+  // === Grid nghiêng kiểu hình thang (không bị crop) ===
+
+  // Biên trái/phải của một "đường hàng" r (cho phép số thực)
+  // r = 0 là đỉnh trên, r = g.rows là đáy
+  function _rowLR(g, r, C){
+    const colsW = g.tile * g.cols;
+    const topScale = C.topScale ?? 0.80;           // 0.75..0.90
+    const pinch = (1 - topScale) * colsW;          // lượng "bóp" ở đỉnh
+    const t = r / g.rows;                           // 0..1 từ trên xuống dưới
+    const width = colsW - pinch * (1 - t);         // càng lên trên càng hẹp
+    const left  = g.ox + (colsW - width) / 2;      // cân giữa
+    const right = left + width;
+    return { left, right };
+  }
+
+  function drawGridOblique(ctx, g, cam, opts = {}){
+    const C = cam || { rowGapRatio:0.62, topScale:0.80, depthScale:0.94 };
+    const colors = Object.assign({}, CFG.COLORS, opts.colors||{});
+    const rowGap = (C.rowGapRatio ?? 0.62) * g.tile;
+
+    ctx.clearRect(0, 0, g.w, g.h);
+
+    for (let cy=0; cy<g.rows; cy++){
+      const yTop = g.oy + cy*rowGap;
+      const yBot = g.oy + (cy+1)*rowGap;
+      const LRt = _rowLR(g, cy,   C);
+      const LRb = _rowLR(g, cy+1, C);
+
+      for (let cx=0; cx<g.cols; cx++){
+        // chia đều theo tỉ lệ trên mỗi cạnh
+        const xtL = LRt.left +  (cx    / g.cols) * (LRt.right - LRt.left);
+        const xtR = LRt.left +  ((cx+1)/ g.cols) * (LRt.right - LRt.left);
+        const xbL = LRb.left +  (cx    / g.cols) * (LRb.right - LRb.left);
+        const xbR = LRb.left +  ((cx+1)/ g.cols) * (LRb.right - LRb.left);
+
+        // màu theo phe
+        let fill;
+        if (cx < CFG.ALLY_COLS) fill = colors.ally;
+        else if (cx >= g.cols - CFG.ENEMY_COLS) fill = colors.enemy;
+        else fill = colors.mid;
+
+        ctx.beginPath();
+        ctx.moveTo(xtL, yTop);   // TL
+        ctx.lineTo(xtR, yTop);   // TR
+        ctx.lineTo(xbR, yBot);   // BR
+        ctx.lineTo(xbL, yBot);   // BL
+        ctx.closePath();
+        ctx.fillStyle = fill; ctx.fill();
+        ctx.strokeStyle = colors.line; ctx.lineWidth = 1; ctx.stroke();
+      }
+    }
+  }
+
+  // Hit-test ngược theo hình thang
+  function hitToCellOblique(g, px, py, cam){
+    const C = cam || { rowGapRatio:0.62, topScale:0.80 };
+    const rowGap = (C.rowGapRatio ?? 0.62) * g.tile;
+
+    const r = (py - g.oy) / rowGap;           // chỉ số hàng dạng thực
+    if (r < 0 || r >= g.rows) return null;
+
+    const LR = _rowLR(g, r, C);
+    const u = (px - LR.left) / (LR.right - LR.left);  // 0..1 trên bề ngang tại hàng r
+    if (u < 0 || u >= 1) return null;
+
+    const cx = Math.floor(u * g.cols);
+    const cy = Math.floor(r);
+    return { cx, cy };
+  }
+  // Bốn đỉnh của ô (cx,cy) trong lưới hình thang + tâm ô
+  function _cellQuadOblique(g, cx, cy, C){
+    const rowGap = (C.rowGapRatio ?? 0.62) * g.tile;
+    const yTop = g.oy + cy * rowGap;
+    const yBot = yTop + rowGap;
+    const LRt = _rowLR(g, cy,   C);
+    const LRb = _rowLR(g, cy+1, C);
+
+    const xtL = LRt.left +  (cx    / g.cols) * (LRt.right - LRt.left);
+    const xtR = LRt.left +  ((cx+1)/ g.cols) * (LRt.right - LRt.left);
+    const xbL = LRb.left +  (cx    / g.cols) * (LRb.right - LRb.left);
+    const xbR = LRb.left +  ((cx+1)/ g.cols) * (LRb.right - LRb.left);
+    return { xtL, xtR, xbL, xbR, yTop, yBot };
+  }
+
+  function _cellCenterOblique(g, cx, cy, C){
+    const q = _cellQuadOblique(g, cx, cy, C);
+    const x = (q.xtL + q.xtR + q.xbL + q.xbR) / 4;
+    const y = (q.yTop + q.yBot) / 2;
+    return { x, y };
+  }
+
+  // --- Optional oblique rendering (non-breaking) ---
+  function projectCellOblique(g, cx, cy, cam){
+    const rowGap = (cam?.rowGapRatio ?? 0.62) * g.tile;
+    const skew   = (cam?.skewXPerRow ?? 0.28) * g.tile;
+    const k      =  (cam?.depthScale  ?? 0.94);
+    // cy: 0=trên (xa), 2=dưới (gần)
+    const depth  = (g.rows - 1 - cy);
+    const scale  = Math.pow(k, depth);
+    const x = g.ox + (cx + 0.5) * g.tile + cy * skew;
+    const y = g.oy + (cy + 0.5) * rowGap;
+    return { x, y, scale };
+  }
+  function drawChibi(ctx, x, y, r, facing = 1, color = '#a9f58c') {
+    const lw = Math.max(CHIBI.line, Math.floor(r * 0.28));
+    const hr = Math.max(3, Math.floor(r * CHIBI.headR));
+    const torso = r * CHIBI.torso;
+    const arm = r * CHIBI.arm;
+    const leg = r * CHIBI.leg;
+    const wep = r * CHIBI.weapon;
+
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = lw;
+
+    // đầu
+    ctx.beginPath();
+    ctx.arc(0, -torso - hr, hr, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // thân
+    ctx.beginPath();
+    ctx.moveTo(0, -torso);
+    ctx.lineTo(0, 0);
+    ctx.stroke();
+
+    // tay
+    ctx.beginPath();
+    ctx.moveTo(0, -torso * 0.6);
+    ctx.lineTo(-arm * 0.8, -torso * 0.2);             // tay sau
+    ctx.moveTo(0, -torso * 0.6);
+    ctx.lineTo(arm * 0.8 * facing, -torso * 0.2);     // tay cầm kiếm
+    ctx.stroke();
     
+        
