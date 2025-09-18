@@ -211,8 +211,7 @@ color: var(--card-cost);
   alert('Trình duyệt này không hỗ trợ ES modules. Hãy mở qua một HTTP server.');
 </script>
   <script type="module">
-    const protocol = window.location.protocol;
-    if (protocol === 'file:') {
+    const renderBlockingMessage = (html) => {
       const message = document.createElement('div');
       message.style.maxWidth = '640px';
       message.style.margin = '48px auto';
@@ -222,15 +221,29 @@ color: var(--card-cost);
       message.style.borderRadius = '16px';
       message.style.textAlign = 'center';
       message.style.lineHeight = '1.6';
-      message.innerHTML = `
+      message. innerHTML = html;
+      message.innerHTML = html;
+      document.body.innerHTML = '';
+      document.body.appendChild(message);
+    };
+
+    const protocol = window.location.protocol;
+    if (protocol === 'file:') {
+      renderBlockingMessage(`
         <h2 style="margin-top:0;color:#ffe066;">Không thể chạy từ file://</h2>
         <p>Vui lòng khởi chạy Arclune thông qua một HTTP server thay vì mở trực tiếp từ ổ đĩa.</p>
         <p>Ví dụ: chạy <code>npx serve</code> hoặc bất kỳ server tĩnh nào khác rồi truy cập qua <code>http://localhost:*</code>.</p>
       `;
-      document.body.innerHTML = '';
-      document.body.appendChild(message);
+      `);
     } else {
-      import('./src/main.js');
+      import('./src/main.js').catch((error) => {
+        console.error('Không thể tải module chính:', error);
+        renderBlockingMessage(`
+          <h2 style="margin-top:0;color:#ffe066;">Không thể tải trò chơi</h2>
+          <p>Đã xảy ra lỗi khi tải Arclune. Vui lòng tải lại trang hoặc thử lại sau.</p>
+          <p>Nếu lỗi tiếp diễn, hãy kiểm tra bảng điều khiển trình duyệt để biết thêm chi tiết.</p>
+        `);
+      });
     }
   </script>
 </body>
