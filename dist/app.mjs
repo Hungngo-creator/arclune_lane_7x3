@@ -2299,5 +2299,534 @@ __define('./main.js', (exports, module, __require) => {
           return 0;
         })();
         const others = tokensAlive().filter(t => t.side === unit.side && t !== unit);
-        
+        others.sort((a,b)=> (a.spd||0) - (b.spd||0));
+        for (const ally of others){
+          if (targets.size >= extraAllies + 1) break;
+          targets.add(ally);
+        }
+        const pct = u.attackSpeed ?? 0.1;
+        for (const tgt of targets){
+          Statuses.add(tgt, Statuses.make.haste({ pct, turns: u.turns || 1 }));
+          try { vfxAddHit(Game, tgt); } catch(_){}
+        }
+        busyMs = 900;
+        break;
+      }
+
+      default:
+        break;
+    }
+
+    extendBusy(busyMs);
+    unit.rage = Math.max(0, unit.rage - 100);
+  }
+  const tokensAlive = () => Game.tokens.filter(t => t.alive);
+  // Giảm TTL minion của 1 phe sau khi phe đó kết thúc phase
+  function tickMinionTTL(side){
+    // gom những minion hết hạn để xoá sau vòng lặp
+    const toRemove = [];
+    for (const t of Game.tokens){
+      if (!t.alive) continue;
+      if (t.side !== side) continue;
+      if (!t.isMinion) continue;
+      if (!Number.isFinite(t.ttlTurns)) continue;
+
+      t.ttlTurns -= 1;
+      if (t.ttlTurns <= 0) toRemove.push(t);
+    }
+    // xoá ra khỏi tokens để không còn được vẽ/đi lượt
+    for (const t of toRemove){
+      t.alive = false;
+      const idx = Game.tokens.indexOf(t);
+      if (idx >= 0) Game.tokens.splice(idx, 1);
+    }
+  }
+
+  function init(){ 
+    // Guard: nếu đã init rồi thì thoát
+  if (Game._inited) return;
+    // 1) Canvas + ctx + HUD
+    const boardEl = /** @type {HTMLCanvasElement} */ (document.getElementById('board'));
+    if (!boardEl) return;
+    canvas = boardEl;
+    ctx = /** @type {CanvasRenderingContext2D} */ (boardEl.getContext('2d'));
+
+    hud = initHUD(document);
+
+    // 2) Bắt đầu trận
+    resize();
+    spawnLeaders(Game.tokens, Game.grid);
+
+  Game.tokens.forEach(t=>{
+   if (t.id === 'leaderA' || t.id === 'leaderB'){
+     vfxAddSpawn(Game, t.cx, t.cy, t.side);
+   }
+  });
+    // Gán chỉ số mặc định cho 2 leader (vì không nằm trong catalog)
+  Game.tokens.forEach(t=>{
+    if (!t.iid) t.iid = nextIid();
+    if (t.id === 'leaderA' || t.id === 'leaderB'){
+      Object.assign(t, {
+        hpMax: 1600, hp: 1600, arm: 0.12, res: 0.12, atk: 40, wil: 30,
+        aeMax: 0, ae: 0, rage: 0
+      });
+    }
+  });
+    // gán iid cho leader vừa spawn từ engine
+  Game.tokens.forEach(t => { if (!t.iid) t.iid = nextIid(); });
+
+    hud.update(Game);
+  scheduleDraw();
+    Game._inited = true;   // đánh dấu thành công
+    // 3) Master clock + cost + timer + bước lượt (Sparse Cursor)
+    setInterval(()=>{
+      const now = performance.now();
+      const elapsedSec = Math.floor((now - CLOCK.startMs) / 1000);
+
+      // Timer 04:00
+      const remain = Math.max(0, 240 - elapsedSec);
+      if (remain !== CLOCK.lastTimerRemain){
+        CLOCK.lastTimerRemain = remain;
+        const mm = String(Math.floor(remain/60)).padStart(2,'0');
+        const ss = String(remain%60).padStart(2,'0');
+        const tEl = document.getElementById('timer');
+        if (tEl) tEl.textContent = `${mm}:${ss}`;
+      }
+
+  // Cost +1/s cho CẢ HAI phe dùng chung deltaSec (không cướp mốc của nhau)
+  const deltaSec = elapsedSec - CLOCK.lastCostCreditedSec;
+  if (deltaSec > 0) {
+    // Ally
+    if (Game.cost < Game.costCap) {
+      Game.cost = Math.min(Game.costCap, Game.cost + deltaSec);
+    }
+    // Enemy AI
+    if (Game.ai.cost < Game.ai.costCap) {
+      Game.ai.cost = Math.min(Game.ai.costCap, Game.ai.cost + deltaSec);
+    }
+
+    // Ghi mốc sau khi cộng cho cả hai
+    CLOCK.lastCostCreditedSec = elapsedSec;
+
+    // Cập nhật HUD & auto-pick phe ta
+    hud.update(Game);
+    if (!Game.selectedId) selectFirstAffordable();
+    if (Game.ui?.bar) Game.ui.bar.render();
+
+    // Cho AI suy nghĩ ngay khi cost đổi
+    aiMaybeAct(Game, 'cost');
+  }
+
+      // Bước lượt theo nhịp demo
+      const busyUntil = Game.turn?.busyUntil ?? 0;
+      if (now >= busyUntil && now - CLOCK.lastTurnStepMs >= CLOCK.turnEveryMs){
+        CLOCK.lastTurnStepMs = now;
+    stepTurn(Game, {
+    performUlt,               // dùng ult (có immediate summon)
+    processActionChain,       // xử lý creep hành động ngay
+    allocIid: nextIid,        // gán iid cho token/minion
+    doActionOrSkip            // để creep basic ngay trong chain
+  });
+  cleanupDead(performance.now());
+  scheduleDraw();
+  aiMaybeAct(Game, 'board');
+      }
+    }, 250);
+    
+    function selectFirstAffordable(){
+    const deck = Game.deck3 || [];
+    const i = deck.findIndex(c => Game.cost >= c.cost);
+    Game.selectedId = i >= 0 ? deck[i].id : null;
+  }
+  // 4) Deck-3 lần đầu
+    refillDeck();
+    selectFirstAffordable();
+   // 4b) Enemy deck lần đầu
+  refillDeckEnemy(Game);
+    // 5) Summon bar (B2): đưa vào Game.ui.bar
+    Game.ui.bar = startSummonBar(document, {
+      onPick: (c)=>{
+        Game.selectedId = c.id;
+        Game.ui.bar.render();
+      },
+      canAfford: (c)=> Game.cost >= c.cost,
+      getDeck: ()=> Game.deck3,
+      getSelectedId: ()=> Game.selectedId
+    });
+    Game.ui.bar.render();
+
+    // 6) Click canvas để summon
+    canvas.addEventListener('click', (ev)=>{
+      const rect = canvas.getBoundingClientRect();
+      const p = { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
+      const cell = hitToCellOblique(Game.grid, p.x, p.y, CAM_PRESET);
+      if (!cell) return;
+
+      // chỉ 3 cột trái
+      if (cell.cx >= CFG.ALLY_COLS) return;
+
+      // phải có thẻ được chọn
+      const card = Game.deck3.find(u => u.id === Game.selectedId);
+      if (!card) return;
+
+  // ô trống (active) + đủ cost + còn lượt
+    // chặn cả ô đã có unit ACTIVE hoặc đang QUEUED (Chờ Lượt)
+   if (cellReserved(tokensAlive(), Game.queued, cell.cx, cell.cy)) return;
+      if (Game.cost < card.cost) return;
+      if (Game.summoned >= Game.summonLimit) return;
+      
+      const slot = slotIndex('ally', cell.cx, cell.cy);
+     // Nếu slot này đã có pending thì bỏ (tránh đặt chồng)
+     if (Game.queued.ally.has(slot)) return;
+
+  const spawnCycle =
+    (Game.turn.phase === 'ally' && slot > (Game.turn.last.ally || 0))
+      ? Game.turn.cycle
+      : Game.turn.cycle + 1; 
+      const pendingArt = getUnitArt(card.id);
+     const pending = {
+      unitId: card.id, name: card.name, side:'ally',
+       cx: cell.cx, cy: cell.cy, slot, spawnCycle,
+       color: pendingArt?.palette?.primary || '#a9f58c',
+       art: pendingArt
+     };
+     Game.queued.ally.set(slot, pending);
+
+  Game.cost = Math.max(0, Game.cost - card.cost);
+     hud.update(Game);                 // cập nhật HUD ngay, không đợi tick
+       Game.summoned += 1;
+       Game.usedUnitIds.add(card.id);
+
+      // Bỏ thẻ khỏi deck và bổ sung thẻ mới
+      Game.deck3 = Game.deck3.filter(u => u.id !== card.id);
+      Game.selectedId = null;
+      refillDeck();
+      selectFirstAffordable();
+      Game.ui.bar.render();
+      scheduleDraw();
+    });
+  window.addEventListener('resize', ()=>{ resize(); scheduleDraw(); });
+  }
+
+  /* ---------- Deck logic ---------- */
+  function refillDeck(){
+
+    const need = HAND_SIZE - Game.deck3.length;
+    if (need <= 0) return;
+
+    const exclude = new Set([
+      ...Game.usedUnitIds,
+      ...Game.deck3.map(u=>u.id)
+    ]);
+    const more = pickRandom(Game.unitsAll, exclude).slice(0, need);
+    Game.deck3.push(...more);
+  }
+
+  /* ---------- Vẽ ---------- */
+  function resize(){
+    if (!canvas) return;                                  // guard
+    Game.grid = makeGrid(canvas, CFG.GRID_COLS, CFG.GRID_ROWS);
+  }
+  function draw(){
+    if (!ctx || !canvas || !Game.grid) return;            // guard
+    drawGridOblique(ctx, Game.grid, CAM_PRESET);
+    drawQueuedOblique(ctx, Game.grid, Game.queued, CAM_PRESET);
+    drawTokensOblique(ctx, Game.grid, Game.tokens, CAM_PRESET);
+  vfxDraw(ctx, Game, CAM_PRESET);
+   drawHPBars();
+  }
+  function cellCenterObliqueLocal(g, cx, cy, C){
+    const colsW = g.tile * g.cols;
+    const topScale = (C?.topScale ?? 0.80);
+    const rowGap = (C?.rowGapRatio ?? 0.62) * g.tile;
+
+    function rowLR(r){
+      const pinch = (1 - topScale) * colsW;
+      const t = r / g.rows;
+      const width = colsW - pinch * (1 - t);
+      const left  = g.ox + (colsW - width) / 2;
+      const right = left + width;
+      return { left, right };
+    }
+    const yTop = g.oy + cy * rowGap;
+    const yBot = yTop + rowGap;
+    const LRt = rowLR(cy);
+    const LRb = rowLR(cy + 1);
+
+    const xtL = LRt.left +  (cx    / g.cols) * (LRt.right - LRt.left);
+    const xtR = LRt.left +  ((cx+1)/ g.cols) * (LRt.right - LRt.left);
+    const xbL = LRb.left +  (cx    / g.cols) * (LRb.right - LRb.left);
+    const xbR = LRb.left +  ((cx+1)/ g.cols) * (LRb.right - LRb.left);
+
+    const x = (xtL + xtR + xbL + xbR) / 4;
+    const y = (yTop + yBot) / 2;
+
+    const k = (C?.depthScale ?? 0.94);
+    const scale = Math.pow(k, g.rows - 1 - cy);
+    return { x, y, scale };
+  }
+
+  function roundedRectPathUI(ctx, x, y, w, h, radius){
+    const r = Math.min(radius, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  function lightenColor(color, amount){
+    if (typeof color !== 'string') return color;
+    if (!color.startsWith('#')) return color;
+    let hex = color.slice(1);
+    if (hex.length === 3){
+      hex = hex.split('').map(ch => ch + ch).join('');
+    }
+    if (hex.length !== 6) return color;
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    const mix = (c)=> Math.min(255, Math.round(c + (255 - c) * amount));
+    return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
+  }
+
+  function drawHPBars(){
+    if (!ctx || !Game.grid) return;
+    const baseR = Math.floor(Game.grid.tile * 0.36);
+    for (const t of Game.tokens){
+      if (!t.alive || !Number.isFinite(t.hpMax)) continue;
+  const p = cellCenterObliqueLocal(Game.grid, t.cx, t.cy, CAM_PRESET);
+      const art = t.art || getUnitArt(t.id);
+      const layout = art?.layout || {};
+      const r = Math.max(6, Math.floor(baseR * (p.scale || 1)));
+      const barWidth = Math.max(28, Math.floor(r * (layout.hpWidth ?? 2.4)));
+      const barHeight = Math.max(5, Math.floor(r * (layout.hpHeight ?? 0.42)));
+      const offset = layout.hpOffset ?? 1.46;
+      const x = Math.round(p.x - barWidth / 2);
+      const y = Math.round(p.y + r * offset - barHeight / 2);
+      const ratio = Math.max(0, Math.min(1, (t.hp || 0) / (t.hpMax || 1)));
+      const bgColor = art?.hpBar?.bg || 'rgba(9,14,21,0.74)';
+      const fillColor = art?.hpBar?.fill || '#6ff0c0';
+      const borderColor = art?.hpBar?.border || 'rgba(0,0,0,0.55)';
+      const radius = Math.max(2, Math.floor(barHeight / 2));
+      ctx.save();
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      roundedRectPathUI(ctx, x, y, barWidth, barHeight, radius);
+      ctx.fillStyle = bgColor;
+      ctx.fill();
+      if (borderColor && borderColor !== 'none'){
+        ctx.strokeStyle = borderColor;
+        ctx.lineWidth = Math.max(1, Math.floor(barHeight * 0.18));
+        ctx.stroke();
+      }
+      const inset = Math.max(1, Math.floor(barHeight * 0.25));
+      const innerHeight = Math.max(1, barHeight - inset * 2);
+      const innerRadius = Math.max(1, radius - inset);
+      const innerWidth = Math.max(0, barWidth - inset * 2);
+      const filledWidth = Math.round(innerWidth * ratio);
+      if (filledWidth > 0){
+        roundedRectPathUI(ctx, x + inset, y + inset, filledWidth, innerHeight, innerRadius);
+        const grad = ctx.createLinearGradient(x, y + inset, x, y + inset + innerHeight);
+        const topFill = lightenColor(fillColor, 0.25);
+        grad.addColorStop(0, topFill);
+        grad.addColorStop(1, fillColor);
+        ctx.fillStyle = grad;
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+  }
+  /* ---------- Chạy ---------- */
+  let _booted = false;
+  function startGame(){
+    if (_booted) return;
+    _booted = true;
+    init();
+    document.addEventListener('visibilitychange', ()=>{
+      setDrawPaused(document.hidden);
+    });
+    setDrawPaused(document.hidden);
+  }
+
+  const __reexport0 = __require('./events.js');
+
+  exports.gameEvents = __reexport0.gameEvents;
+  exports.emitGameEvent = __reexport0.emitGameEvent;
+  exports.TURN_START = __reexport0.TURN_START;
+  exports.TURN_END = __reexport0.TURN_END;
+  exports.ACTION_START = __reexport0.ACTION_START;
+  exports.ACTION_END = __reexport0.ACTION_END;
+  exports.startGame = startGame;
+});
+__define('./meta.js', (exports, module, __require) => {
+  //v0.7
+  // meta.js — gom lookup + stat khởi tạo + nộ khởi điểm
+  const __dep0 = __require('./catalog.js');
+  const CLASS_BASE = __dep0.CLASS_BASE;
+  const getMetaById = __dep0.getMetaById;
+  const _isSummoner = __dep0.isSummoner;
+  const applyRankAndMods = __dep0.applyRankAndMods;
+
+  // Dùng trực tiếp catalog cho tra cứu
+  const Meta = {
+    get: getMetaById,
+    classOf(id){ return this.get(id)?.class ?? null; },
+    rankOf(id){  return this.get(id)?.rank  ?? null; },
+    kit(id){     return this.get(id)?.kit   ?? null; },
+    // chỉ coi là Summoner khi ult.type='summon'
+    isSummoner(id){
+      const m = this.get(id);
+      return !!(m && m.class === 'Summoner' && m.kit?.ult?.type === 'summon');
+    }
+  };
+
+  // Tạo chỉ số instance theo class+rank+mods (SPD không nhân theo rank)
+  function makeInstanceStats(unitId){
+    const m = Meta.get(unitId);
+    if (!m) return {};
+    const fin = applyRankAndMods(CLASS_BASE[m.class], m.rank, m.mods);
+    return {
+      hpMax: fin.HP|0, hp: fin.HP|0,
+      atk: fin.ATK|0, wil: fin.WIL|0,
+      arm: fin.ARM||0, res: fin.RES||0,
+      agi: fin.AGI|0, per: fin.PER|0,
+      spd: fin.SPD||1,
+      aeMax: fin.AEmax|0, ae: 0, aeRegen: fin.AEregen||0
+    };
+  }
+
+  // Nộ khi vào sân (trừ leader). Revive: theo spec của skill.
+  function initialRageFor(unitId, opts = {}){
+    const onSpawn = Meta.kit(unitId)?.onSpawn;
+    if (!onSpawn) return 0;
+    if (onSpawn.exceptLeader && opts.isLeader) return 0;
+    if (opts.revive) return Math.max(0, opts.reviveSpec?.rage ?? 0);
+    return onSpawn.rage ?? 0;
+  }
+
+  exports.Meta = Meta;
+  exports.makeInstanceStats = makeInstanceStats;
+  exports.initialRageFor = initialRageFor;
+});
+__define('./passives.js', (exports, module, __require) => {
+  // passives.js — passive event dispatch & helpers v0.7
+  const __dep0 = __require('./statuses.js');
+  const Statuses = __dep0.Statuses;
+  const hookOnLethalDamage = __dep0.hookOnLethalDamage;
+
+  const clamp01 = (x) => Math.max(0, Math.min(1, x));
+
+  function ensureStatusContainer(unit){
+    if (!unit) return;
+    if (!Array.isArray(unit.statuses)) unit.statuses = [];
+  }
+
+  function stacksOf(unit, id){
+    const s = Statuses.get(unit, id);
+    return s ? (s.stacks || 0) : 0;
+  }
+
+  function ensureStatBuff(unit, id, { attr, mode='percent', amount=0, purgeable=true }){
+    ensureStatusContainer(unit);
+    let st = Statuses.get(unit, id);
+    if (!st){
+      st = Statuses.add(unit, {
+        id,
+        kind: 'buff',
+        tag: 'stat',
+        attr,
+        mode,
+        amount,
+        purgeable,
+        stacks: 0
+      });
+    }
+    st.attr = attr;
+    st.mode = mode;
+    st.amount = amount;
+    st.purgeable = purgeable;
+    return st;
+  }
+
+  function applyStatStacks(st, stacks, { maxStacks = null } = {}){
+    if (!st) return;
+    let next = Math.max(0, stacks|0);
+    if (typeof maxStacks === 'number'){ next = Math.min(next, maxStacks); }
+    st.stacks = next;
+  }
+
+  function recomputeFromStatuses(unit){
+    if (!unit || !unit.baseStats) return;
+    ensureStatusContainer(unit);
+    const base = unit.baseStats;
+    const percent = { atk:0, res:0, wil:0 };
+    const flat    = { atk:0, res:0, wil:0 };
+    for (const st of unit.statuses){
+      if (!st || !st.attr || !st.mode) continue;
+  const stacks = st.stacks == null ? 1 : st.stacks;
+      const amount = (st.amount ?? st.power ?? 0) * stacks;
+      if (!Number.isFinite(amount)) continue;
+      if (st.mode === 'percent'){
+        percent[st.attr] = (percent[st.attr] || 0) + amount;
+      } else if (st.mode === 'flat'){
+        flat[st.attr] = (flat[st.attr] || 0) + amount;
+      }
+    }
+
+    if (base.atk != null){
+      const pct = 1 + (percent.atk || 0);
+      const flatAdd = flat.atk || 0;
+      unit.atk = Math.max(0, Math.round(base.atk * pct + flatAdd));
+    }
+  if (base.wil != null){
+      const pct = 1 + (percent.wil || 0);
+      const flatAdd = flat.wil || 0;
+      unit.wil = Math.max(0, Math.round(base.wil * pct + flatAdd));
+    }
+    if (base.res != null){
+      const pct = 1 + (percent.res || 0);
+      const flatAdd = flat.res || 0;
+      const raw = base.res * pct + flatAdd;
+      unit.res = clamp01(raw);
+    }
+  }
+
+  function healTeam(Game, unit, pct){
+    if (!Game || !unit) return;
+    if (!Number.isFinite(pct) || pct <= 0) return;
+    const allies = (Game.tokens || []).filter(t => t.side === unit.side && t.alive);
+    for (const ally of allies){
+      if (!Number.isFinite(ally.hpMax)) continue;
+      const heal = Math.max(0, Math.round((ally.hpMax || 0) * pct));
+      if (heal <= 0) continue;
+      ally.hp = Math.min(ally.hpMax, (ally.hp ?? ally.hpMax) + heal);
+    }
+  }
+
+  const EFFECTS = {
+    placeMark({ Game, unit, passive, ctx }){
+      if (!ctx || !ctx.target) return;
+      const params = passive?.params || {};
+      const ttl = Number.isFinite(params.ttlTurns) ? params.ttlTurns : 3;
+      const stacksToExplode = Math.max(1, params.stacksToExplode || 3);
+      const dmgMul = params.dmgFromWIL ?? 0.5;
+      const purgeable = params.purgeable !== false;
+      if (!Array.isArray(ctx.afterHit)) ctx.afterHit = [];
+      ctx.afterHit.push((afterCtx = {}) => {
+        const target = afterCtx.target || ctx.target;
+        if (!target || !target.alive) return;
+        ensureStatusContainer(target);
+        let st = Statuses.get(target, passive.id);
+        if (!st){
+          st = Statuses.add(target, {
+            id: passive.id,
+            kind: 'debuff',
+            tag: 'mark
         
