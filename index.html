@@ -207,44 +207,42 @@ color: var(--card-cost);
 </div>
 
   <div id="cards"></div>
-  <script nomodule>
-  alert('Trình duyệt này không hỗ trợ ES modules. Hãy mở qua một HTTP server.');
-</script>
-  <script type="module">
-    const renderBlockingMessage = (html) => {
-      const message = document.createElement('div');
-      message.style.maxWidth = '640px';
-      message.style.margin = '48px auto';
-      message.style.padding = '32px';
-      message.style.background = 'rgba(12,18,24,0.85)';
-      message.style.border = '1px solid #2a3a4a';
-      message.style.borderRadius = '16px';
-      message.style.textAlign = 'center';
-      message.style.lineHeight = '1.6';
-      message. innerHTML = html;
-      message.innerHTML = html;
-      document.body.innerHTML = '';
-      document.body.appendChild(message);
-    };
-
-    const protocol = window.location.protocol;
-    if (protocol === 'file:') {
-      renderBlockingMessage(`
-        <h2 style="margin-top:0;color:#ffe066;">Không thể chạy từ file://</h2>
-        <p>Vui lòng khởi chạy Arclune thông qua một HTTP server thay vì mở trực tiếp từ ổ đĩa.</p>
-        <p>Ví dụ: chạy <code>npx serve</code> hoặc bất kỳ server tĩnh nào khác rồi truy cập qua <code>http://localhost:*</code>.</p>
-      `;
-      `);
-    } else {
-      import('./src/main.js').catch((error) => {
-        console.error('Không thể tải module chính:', error);
-        renderBlockingMessage(`
-          <h2 style="margin-top:0;color:#ffe066;">Không thể tải trò chơi</h2>
-          <p>Đã xảy ra lỗi khi tải Arclune. Vui lòng tải lại trang hoặc thử lại sau.</p>
-          <p>Nếu lỗi tiếp diễn, hãy kiểm tra bảng điều khiển trình duyệt để biết thêm chi tiết.</p>
-        `);
-      });
-    }
+  <script>
+    (function(){
+      const baseStyles = {
+        maxWidth: '640px',
+        margin: '48px auto',
+        padding: '32px',
+        background: 'rgba(12,18,24,0.85)',
+        border: '1px solid #2a3a4a',
+        borderRadius: '16px',
+        textAlign: 'center',
+        lineHeight: '1.6'
+      };
+      window.arcluneRenderMessage = function renderMessage({ title = 'Arclune', body = '' } = {}){
+        const message = document.createElement('div');
+        Object.assign(message.style, baseStyles);
+        message.innerHTML = `
+          <h2 style="margin-top:0;color:#ffe066;">${title}</h2>
+          ${body}
+        `;
+        document.body.innerHTML = '';
+        document.body.appendChild(message);
+      };
+      window.arcluneShowFatal = function showFatal(detail){
+        const text = detail && typeof detail === 'object' && 'message' in detail
+          ? String(detail.message)
+          : String(detail || 'Không rõ lỗi.');
+        window.arcluneRenderMessage({
+          title: 'Không thể tải Arclune',
+          body: `<p>${text}</p>`
+        });
+      };
+    })();
   </script>
+  <script nomodule>
+   alert('Trình duyệt này không hỗ trợ ES modules. Hãy mở qua một HTTP server.');
+  </script>
+  <script type="module" src="./dist/app.mjs" onerror="window.arcluneShowFatal && window.arcluneShowFatal(event?.message || 'Không thể tải gói Arclune.');"></script>
 </body>
 </html>
