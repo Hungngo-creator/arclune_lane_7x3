@@ -45,7 +45,7 @@ __define('./ai.js', (exports, module, __require) => {
   }
 
   function debugConfig(){
-     const cfg =(function (_temp){ return _temp == null ? void 0 : _temp.DEBUG; })(CFG.AI) || {};
+      const cfg =(function (_temp){ return _temp == null ? void 0 : _temp.DEBUG; })(CFG.AI) || {};
     const keepTopRaw =(function (){ var _temp = (function (){ var _temp = cfg.keepTop; return _temp != null ? _temp : cfg.KEEP_TOP; })(); return _temp != null ? _temp : DEFAULT_DEBUG_KEEP; })();
     const keepTopNum = Number(keepTopRaw);
     return {
@@ -54,10 +54,10 @@ __define('./ai.js', (exports, module, __require) => {
   }
 
   function detectKitTraits(meta){
-    const ult = meta?.kit?.ult || {};
+    const ult =(function (_temp){ return _temp == null ? void 0 : _temp.ult; })((function (_temp){ return _temp == null ? void 0 : _temp.kit; })(meta)) || {};
     const tags = Array.isArray(ult.tags) ? ult.tags : [];
     const hasInstant = !!(ult.instant || ult.cast === 'instant' || ult.immediate === true
-      || (meta?.class === 'Summoner' && ult.type === 'summon'));
+      || ((function (_temp){ return _temp == null ? void 0 : _temp.class; })(meta) === 'Summoner' && ult.type === 'summon'));
     const hasDefBuff = typeof ult.reduceDmg === 'number'
       || typeof ult.shield === 'number'
       || typeof ult.barrier === 'number'
