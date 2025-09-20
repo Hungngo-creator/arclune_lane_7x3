@@ -70,12 +70,12 @@ __define('./ai.js', (exports, module, __require) => {
   function exportCandidateDebug(entry){
     if (!entry) return null;
     return {
-      cardId: entry.card?.id,
-      cardName: entry.card?.name,
-      cost: entry.card?.cost,
-      slot: entry.cell?.s,
-      cx: entry.cell?.cx,
-      cy: entry.cell?.cy,
+      cardId:(function (_temp){ return _temp == null ? void 0 : _temp.id; })(entry.card),
+      cardName:(function (_temp){ return _temp == null ? void 0 : _temp.name; })(entry.card),
+      cost:(function (_temp){ return _temp == null ? void 0 : _temp.cost; })(entry.card),
+      slot:(function (_temp){ return _temp == null ? void 0 : _temp.s; })(entry.cell),
+      cx:(function (_temp){ return _temp == null ? void 0 : _temp.cx; })(entry.cell),
+      cy:(function (_temp){ return _temp == null ? void 0 : _temp.cy; })(entry.cell),
       score: entry.score,
       baseScore: entry.baseScore,
       contributions: entry.contributions,
@@ -87,7 +87,7 @@ __define('./ai.js', (exports, module, __require) => {
 
   // luôn giữ deck-4 của địch đầy
   function refillDeckEnemy(Game){
-    const handSize = CFG.HAND_SIZE ?? 4;
+    const handSize =(function (){ var _temp = CFG.HAND_SIZE; return _temp != null ? _temp : 4; })();
     const need = handSize - Game.ai.deck.length;
     if (need <= 0) return;
     const exclude = new Set([...Game.ai.usedUnitIds, ...Game.ai.deck.map(u=>u.id)]);
