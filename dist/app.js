@@ -448,7 +448,7 @@ __define('./art.js', (exports, module, __require) => {
     const body = `
       <defs>
         <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="${palette.primary || '#ffd37a'}"/>
+          <stop offset="0%" stop-color="${palette.primary || '#ffd37a'}"/>
           <stop offset="100%" stop-color="${palette.secondary || '#5b2f12'}"/>
         </linearGradient>
       </defs>
@@ -3567,7 +3567,7 @@ __define('./turns.js', (exports, module, __require) => {
     if (found !== null) return; // đã đi 1 bước trong phe hiện tại
 
     // không còn slot nào trong phe này → kết thúc phase & chuyển phe
-    const finishedSide= side;
+    const finishedSide = side;
     if (finishedSide === 'ally'){
       Game.turn.phase = 'enemy';
       Game.turn.last.enemy = 0;
@@ -3960,5 +3960,3 @@ try {
   console.error('Failed to bootstrap Arclune bundle:', err);
   throw err;
 }
-  
-        
