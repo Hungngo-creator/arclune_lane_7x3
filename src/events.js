@@ -38,7 +38,30 @@ class SimpleEventTarget {
 }
 
 function makeEventTarget(){
-  return HAS_EVENT_TARGET ? new EventTarget() : new SimpleEventTarget();
+  if (!HAS_EVENT_TARGET) return new SimpleEventTarget();
+  try {
+    const target = new EventTarget();
+    const probeType = '__probe__';
+    let handled = false;
+    const handler = () => { handled = true; };
+    if (typeof target.addEventListener === 'function'){
+      target.addEventListener(probeType, handler);
+      try {
+        const probeEvent = typeof Event === 'function' ? new Event(probeType) : { type: probeType };
+        if (typeof target.dispatchEvent === 'function'){
+          target.dispatchEvent(probeEvent);
+        }
+      } finally {
+        if (typeof target.removeEventListener === 'function'){
+          target.removeEventListener(probeType, handler);
+        }
+      }
+    }
+    if (handled) return target;
+  } catch (err) {
+    console.warn('[events] Falling back to SimpleEventTarget:', err);
+  }
+  return new SimpleEventTarget();
 }
 
 function makeEvent(type, detail){
