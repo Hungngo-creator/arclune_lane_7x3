@@ -177,7 +177,7 @@ async function build(){
   parts.push('}');
 
   const output = parts.join('\n') + '\n';
-  await fs.writeFile(path.join(DIST_DIR, 'app.mjs'), output, 'utf8');
+  await fs.writeFile(path.join(DIST_DIR, 'app.js'), output, 'utf8');
 }
 
 build().catch((err) => {
