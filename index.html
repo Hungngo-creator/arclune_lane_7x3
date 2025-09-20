@@ -240,9 +240,6 @@ color: var(--card-cost);
       };
     })();
   </script>
-  <script nomodule>
-   alert('Trình duyệt này không hỗ trợ ES modules. Hãy mở qua một HTTP server.');
-  </script>
-  <script type="module" src="./dist/app.js" onerror="window.arcluneShowFatal && window.arcluneShowFatal(event?.message || 'Không thể tải gói Arclune.');"></script>
+<script src="./dist/app.js" defer onerror="window.arcluneShowFatal && window.arcluneShowFatal(event?.message || 'Không thể tải gói Arclune.');"></script>
 </body>
 </html>
