@@ -36,7 +36,7 @@ __define('./ai.js', (exports, module, __require) => {
   const DEFAULT_DEBUG_KEEP = 6;
 
   function mergedWeights(){
-    const cfg = CFG.AI?.WEIGHTS || {};
+    const cfg =(function (_temp){ return _temp == null ? void 0 : _temp.WEIGHTS; })(CFG.AI) || {};
     const out = { ...DEFAULT_WEIGHTS };
     for (const [key, val] of Object.entries(cfg)){
       if (typeof val === 'number' && Number.isFinite(val)) out[key] = val;
@@ -45,8 +45,8 @@ __define('./ai.js', (exports, module, __require) => {
   }
 
   function debugConfig(){
-    const cfg = CFG.AI?.DEBUG || {};
-    const keepTopRaw = cfg.keepTop ?? cfg.KEEP_TOP ?? DEFAULT_DEBUG_KEEP;
+     const cfg =(function (_temp){ return _temp == null ? void 0 : _temp.DEBUG; })(CFG.AI) || {};
+    const keepTopRaw =(function (){ var _temp = (function (){ var _temp = cfg.keepTop; return _temp != null ? _temp : cfg.KEEP_TOP; })(); return _temp != null ? _temp : DEFAULT_DEBUG_KEEP; })();
     const keepTopNum = Number(keepTopRaw);
     return {
       keepTop: Math.max(0, Math.floor(Number.isFinite(keepTopNum) ? keepTopNum : DEFAULT_DEBUG_KEEP))
