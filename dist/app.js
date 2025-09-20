@@ -1666,11 +1666,24 @@ __define('./entry.js', (exports, module, __require) => {
     };
   }
 
-  function showFileProtocolWarning(renderMessage){
+  function resolveErrorMessage(error, fallback = 'Lỗi không xác định.'){
+    if (error && typeof error === 'object' && 'message' in error){
+      return String(error.message);
+    }
+    const value = typeof error === 'undefined' || error === null ? '' : String(error);
+    return value.trim() ? value : fallback;
+  }
+
+  function showFileProtocolWarning(renderMessage, error){
+    const detail = typeof error === 'undefined' ? '' : resolveErrorMessage(error);
+    const detailMarkup = detail
+      ? `<p style="margin-top:16px;"><small>Lỗi gốc: ${detail}</small></p>`
+      : '';
     const body = `
       <p>Vui lòng khởi chạy Arclune thông qua một HTTP server thay vì mở trực tiếp từ ổ đĩa.</p>
       <p>Ví dụ: chạy <code>npx serve</code> hoặc bất kỳ server tĩnh nào khác rồi truy cập qua <code>http://localhost:*</code>.</p>
-    `;
+      ${detailMarkup}
+      `;
     renderMessage({
       title: 'Không thể chạy từ file://',
       body
@@ -1678,9 +1691,7 @@ __define('./entry.js', (exports, module, __require) => {
   }
 
   function showFatalError(error, renderMessage){
-    const detail = error && typeof error === 'object' && 'message' in error
-      ? String(error.message)
-      : String(error || 'Lỗi không xác định.');
+    const detail = resolveErrorMessage(error);
     renderMessage({
       title: 'Không thể khởi động Arclune',
       body: `<p>${detail}</p>`
@@ -1690,11 +1701,7 @@ __define('./entry.js', (exports, module, __require) => {
   (function bootstrap(){
     const renderMessage = ensureRenderer();
     const protocol = window?.location?.protocol;
-    if (protocol === 'file:'){
-      showFileProtocolWarning(renderMessage);
-      dispatchLoaded();
-      return;
-    }
+    const isFileProtocol = protocol === 'file:';
     try {
       startGame();
       dispatchLoaded();
@@ -1702,6 +1709,8 @@ __define('./entry.js', (exports, module, __require) => {
       console.error('Arclune failed to start', error);
       if (typeof window.arcluneShowFatal === 'function'){
         window.arcluneShowFatal(error);
+        } else if (isFileProtocol) {
+        showFileProtocolWarning(renderMessage, error);
       } else {
         showFatalError(error, renderMessage);
       }
