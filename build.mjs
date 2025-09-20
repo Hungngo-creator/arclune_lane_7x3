@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
-
+import esbuild from 'esbuild';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SRC_DIR = path.join(__dirname, 'src');
 const DIST_DIR = path.join(__dirname, 'dist');
@@ -177,7 +177,11 @@ async function build(){
   parts.push('}');
 
   const output = parts.join('\n') + '\n';
-  await fs.writeFile(path.join(DIST_DIR, 'app.js'), output, 'utf8');
+  const { code: transpiled } = await esbuild.transform(output, {
+    loader: 'js',
+    target: ['es2017']
+  });
+  await fs.writeFile(path.join(DIST_DIR, 'app.js'), transpiled, 'utf8');
 }
 
 build().catch((err) => {
