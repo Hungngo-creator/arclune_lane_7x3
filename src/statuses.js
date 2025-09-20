@@ -1,17 +1,4 @@
 // statuses.js — Hệ trạng thái/effect data-driven v0.7
-// Dùng ES module. Không phụ thuộc code ngoài.
-// Cách dùng chính:
-// - Statuses.add(unit, Statuses.make.stun({turns:2}))
-// - if (!Statuses.canAct(unit)) { Statuses.onTurnEnd(unit, ctx); return; }
-// - target = Statuses.resolveTarget(attacker, candidates, {attackType:'basic'}) ?? fallback
-//   - const pre = Statuses.beforeDamage(attacker, target, {dtype:'phys', base:raw});
-//   - let dmg = pre.base * pre.outMul; // trước giáp
-//   - // áp xuyên giáp pre.defPen vào công thức của mày rồi tính giảm giáp…
-//   - dmg = dmg * pre.inMul; // giảm/tăng sát thương đến từ target (damageCut/invulnerable…)
-//   - const abs = Statuses.absorbShield(target, dmg, {dtype:'any'});
-//   - apply hp -= abs.remain;  // abs.absorbed là lượng vào khiên
-//   - Statuses.afterDamage(attacker, target, {dealt:abs.remain, absorbed:abs.absorbed, dtype:'phys'});
-
 const byId = (u) => (u && u.statuses) || (u.statuses = []);
 
 // ===== Utilities
