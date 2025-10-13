@@ -1076,11 +1076,10 @@ __define('./engine.js', (exports, module, __require) => {
   //v0.7.3
   /* ---------- Grid ---------- */
   function makeGrid(canvas, cols, rows){
-    const pad = CFG.UI?.PAD ?? 12;
-    const w = Math.min(window.innerWidth - pad*2, CFG.UI?.BOARD_MAX_W ?? 900);
+    const pad =(function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.PAD; })(CFG.UI); return _temp != null ? _temp : 12; })();
+    const w = Math.min(window.innerWidth - pad*2,(function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.BOARD_MAX_W; })(CFG.UI); return _temp != null ? _temp : 900; })());
     const h = Math.max(
-      Math.floor(w * (CFG.UI?.BOARD_H_RATIO ?? (3/7))),
-      CFG.UI?.BOARD_MIN_H ?? 220
+      Math.floor(w * ((function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.BOARD_H_RATIO; })(CFG.UI); return _temp != null ? _temp : (3/7); })())),(function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.BOARD_MIN_H; })(CFG.UI); return _temp != null ? _temp : 220; })()
     );
     canvas.width = w; canvas.height = h;
 
@@ -1162,7 +1161,7 @@ __define('./engine.js', (exports, module, __require) => {
   // r = 0 là đỉnh trên, r = g.rows là đáy
   function _rowLR(g, r, C){
     const colsW = g.tile * g.cols;
-    const topScale = C.topScale ?? 0.80;           // 0.75..0.90
+    const topScale =(function (){ var _temp = C.topScale; return _temp != null ? _temp : 0.80; })();           // 0.75..0.90
     const pinch = (1 - topScale) * colsW;          // lượng "bóp" ở đỉnh
     const t = r / g.rows;                           // 0..1 từ trên xuống dưới
     const width = colsW - pinch * (1 - t);         // càng lên trên càng hẹp
@@ -1174,7 +1173,7 @@ __define('./engine.js', (exports, module, __require) => {
   function drawGridOblique(ctx, g, cam, opts = {}){
     const C = cam || { rowGapRatio:0.62, topScale:0.80, depthScale:0.94 };
     const colors = Object.assign({}, CFG.COLORS, opts.colors||{});
-    const rowGap = (C.rowGapRatio ?? 0.62) * g.tile;
+    const rowGap = ((function (){ var _temp = C.rowGapRatio; return _temp != null ? _temp : 0.62; })()) * g.tile;
 
     ctx.clearRect(0, 0, g.w, g.h);
 
@@ -1212,7 +1211,7 @@ __define('./engine.js', (exports, module, __require) => {
   // Hit-test ngược theo hình thang
   function hitToCellOblique(g, px, py, cam){
     const C = cam || { rowGapRatio:0.62, topScale:0.80 };
-    const rowGap = (C.rowGapRatio ?? 0.62) * g.tile;
+    const rowGap = ((function (){ var _temp = C.rowGapRatio; return _temp != null ? _temp : 0.62; })()) * g.tile;
 
     const r = (py - g.oy) / rowGap;           // chỉ số hàng dạng thực
     if (r < 0 || r >= g.rows) return null;
@@ -1227,7 +1226,7 @@ __define('./engine.js', (exports, module, __require) => {
   }
   // Bốn đỉnh của ô (cx,cy) trong lưới hình thang + tâm ô
   function _cellQuadOblique(g, cx, cy, C){
-    const rowGap = (C.rowGapRatio ?? 0.62) * g.tile;
+    const rowGap = ((function (){ var _temp = C.rowGapRatio; return _temp != null ? _temp : 0.62; })()) * g.tile;
     const yTop = g.oy + cy * rowGap;
     const yBot = yTop + rowGap;
     const LRt = _rowLR(g, cy,   C);
@@ -1249,9 +1248,9 @@ __define('./engine.js', (exports, module, __require) => {
 
   // --- Optional oblique rendering (non-breaking) ---
   function projectCellOblique(g, cx, cy, cam){
-    const rowGap = (cam?.rowGapRatio ?? 0.62) * g.tile;
-    const skew   = (cam?.skewXPerRow ?? 0.28) * g.tile;
-    const k      =  (cam?.depthScale  ?? 0.94);
+    const rowGap = ((function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.rowGapRatio; })(cam); return _temp != null ? _temp : 0.62; })()) * g.tile;
+    const skew   = ((function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.skewXPerRow; })(cam); return _temp != null ? _temp : 0.28; })()) * g.tile;
+    const k      =  ((function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.depthScale; })(cam); return _temp != null ? _temp : 0.94; })());
     // cy: 0=trên (xa), 2=dưới (gần)
     const depth  = (g.rows - 1 - cy);
     const scale  = Math.pow(k, depth);
@@ -1344,7 +1343,7 @@ __define('./engine.js', (exports, module, __require) => {
   }
 
   function drawStylizedShape(ctx, width, height, anchor, art){
-    const palette = art?.palette || {};
+    const palette =(function (_temp){ return _temp == null ? void 0 : _temp.palette; })(art) || {};
     const primary = palette.primary || '#86c4ff';
     const secondary = palette.secondary || '#1f3242';
     const accent = palette.accent || '#d2f4ff';
@@ -1352,7 +1351,7 @@ __define('./engine.js', (exports, module, __require) => {
     const top = -height * anchor;
     const bottom = height - height * anchor;
     const halfW = width / 2;
-    const shape = art?.shape || 'sentinel';
+    const shape =(function (_temp){ return _temp == null ? void 0 : _temp.shape; })(art) || 'sentinel';
     const gradient = ctx.createLinearGradient(0, top, 0, bottom);
     gradient.addColorStop(0, primary);
     gradient.addColorStop(1, secondary);
@@ -1442,7 +1441,7 @@ __define('./engine.js', (exports, module, __require) => {
 
   function drawNameplate(ctx, text, x, y, r, art){
     if (!text) return;
-    const layout = art?.layout || {};
+    const layout =(function (_temp){ return _temp == null ? void 0 : _temp.layout; })(art) || {};
     const fontSize = Math.max(11, Math.floor(r * (layout.labelFont || 0.7)));
     const padX = Math.max(8, Math.floor(fontSize * 0.6));
     const padY = Math.max(4, Math.floor(fontSize * 0.35));
@@ -1459,9 +1458,9 @@ __define('./engine.js', (exports, module, __require) => {
     const boxX = Math.round(x - width / 2);
     const boxY = Math.round(y - height / 2);
     roundedRectPath(ctx, boxX, boxY, width, height, radius);
-    ctx.fillStyle = art?.label?.bg || 'rgba(12,20,30,0.82)';
+    ctx.fillStyle =(function (_temp){ return _temp == null ? void 0 : _temp.bg; })((function (_temp){ return _temp == null ? void 0 : _temp.label; })(art)) || 'rgba(12,20,30,0.82)';
     ctx.fill();
-    if (art?.label?.stroke){
+    if ((function (_temp){ return _temp == null ? void 0 : _temp.stroke; })((function (_temp){ return _temp == null ? void 0 : _temp.label; })(art))){
       ctx.strokeStyle = art.label.stroke;
       ctx.lineWidth = 1;
       ctx.stroke();
