@@ -519,7 +519,7 @@ __define('./art.js', (exports, module, __require) => {
       shape: opts.shape || pattern,
       size: opts.size ?? 1,
       shadow: opts.shadow ?? 'rgba(0,0,0,0.35)',
-      glow: opts.glow ?? palette.accent || '#8cf6ff',
+      glow: opts.glow ?? palette.accent ?? '#8cf6ff',
       mirror: opts.mirror ?? true,
       layout,
       label,
@@ -1673,8 +1673,9 @@ __define('./entry.js', (exports, module, __require) => {
     const value = typeof error === 'undefined' || error === null ? '' : String(error);
     return value.trim() ? value : fallback;
   }
-    function showFatalError(error, renderMessage, { isFileProtocol } = {}){
-    const detail = resolveErrorMessage(error);
+    function showFatalError(error, renderMessage, options){
+      const { isFileProtocol = false } = options || {};
+      const detail = resolveErrorMessage(error);
       const advice = isFileProtocol
       ? '<p><small>Arclune đang chạy trực tiếp từ ổ đĩa (<code>file://</code>). Nếu gặp lỗi tải tài nguyên, hãy thử mở thông qua một HTTP server tĩnh.</small></p>'
       : '';
@@ -1796,6 +1797,11 @@ __define('./events.js', (exports, module, __require) => {
     const event = makeEvent(type, detail);
     try {
       if (typeof gameEvents.dispatchEvent === 'function'){
+        if (typeof Event === 'function' && event && !(event instanceof Event)){
+          const nativeEvent = new Event(type);
+          nativeEvent.detail = detail;
+          return gameEvents.dispatchEvent(nativeEvent);
+        }
         return gameEvents.dispatchEvent(event);
       }
       if (typeof gameEvents.emit === 'function'){
