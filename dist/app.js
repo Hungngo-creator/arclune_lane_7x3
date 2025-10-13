@@ -894,7 +894,7 @@ __define('./combat.js', (exports, module, __require) => {
       target: tgt,
       damage: { baseMul: 1, flatAdd: 0 },
       afterHit: [],
-      log: Game?.passiveLog
+      log:(function (_temp){ return _temp == null ? void 0 : _temp.passiveLog; })(Game)
     };
     emitPassiveEvent(Game, unit, 'onBasicHit', passiveCtx);
    
@@ -906,7 +906,7 @@ __define('./combat.js', (exports, module, __require) => {
       vfxAddMelee(Game, unit, tgt, { dur: meleeDur });
       meleeTriggered = true;
     } catch (_) {}
-    if (meleeTriggered && Game?.turn) {
+    if (meleeTriggered &&(function (_temp){ return _temp == null ? void 0 : _temp.turn; })(Game)) {
       const prevBusy = Number.isFinite(Game.turn.busyUntil) ? Game.turn.busyUntil : 0;
       Game.turn.busyUntil = Math.max(prevBusy, meleeStartMs + meleeDur);
     }
@@ -916,7 +916,7 @@ __define('./combat.js', (exports, module, __require) => {
     const rawBase = Math.max(1, Math.floor(unit.atk || 0));
     const modBase = Math.max(
       1,
-      Math.floor(rawBase * (passiveCtx.damage?.baseMul ?? 1) + (passiveCtx.damage?.flatAdd ?? 0))
+      Math.floor(rawBase * ((function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.baseMul; })(passiveCtx.damage); return _temp != null ? _temp : 1; })()) + ((function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.flatAdd; })(passiveCtx.damage); return _temp != null ? _temp : 0; })()))
     );
     const pre = Statuses.beforeDamage(unit, tgt, { dtype, base: modBase, attackType: 'basic' });
     // OutMul (buff/debuff output)
