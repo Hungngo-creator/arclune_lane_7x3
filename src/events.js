@@ -1,6 +1,42 @@
 // events.js
 const HAS_EVENT_TARGET = typeof EventTarget === 'function';
 
+function createNativeEvent(type, detail){
+  if (!type) return null;
+  if (typeof CustomEvent === 'function'){
+    try {
+      return new CustomEvent(type, { detail });
+    } catch (_) {
+      // ignore and fall through
+    }
+  }
+  if (typeof Event === 'function'){
+    try {
+      const ev = new Event(type);
+      try {
+        ev.detail = detail;
+      } catch (_) {
+        // ignore assignment failures (readonly in some browsers)
+      }
+      return ev;
+    } catch (_) {
+      // ignore and fall through
+    }
+  }
+  if (typeof document === 'object' && document && typeof document.createEvent === 'function'){
+    try {
+      const ev = document.createEvent('Event');
+      if (typeof ev.initEvent === 'function'){
+        ev.initEvent(type, false, false);
+      }
+      ev.detail = detail;
+      return ev;
+    } catch (_) {
+      // ignore and fall through
+    }
+  }
+  return null;
+}
 class SimpleEventTarget {
   constructor(){
     this._map = new Map();
@@ -47,7 +83,7 @@ function makeEventTarget(){
     if (typeof target.addEventListener === 'function'){
       target.addEventListener(probeType, handler);
       try {
-        const probeEvent = typeof Event === 'function' ? new Event(probeType) : { type: probeType };
+        const probeEvent = createNativeEvent(probeType) || { type: probeType };
         if (typeof target.dispatchEvent === 'function'){
           target.dispatchEvent(probeEvent);
         }
@@ -65,15 +101,7 @@ function makeEventTarget(){
 }
 
 function makeEvent(type, detail){
-  if (typeof CustomEvent === 'function'){
-    return new CustomEvent(type, { detail });
-  }
-  if (typeof Event === 'function'){
-    const ev = new Event(type);
-    ev.detail = detail;
-    return ev;
-  }
-  return { type, detail };
+  return createNativeEvent(type, detail) || { type, detail };
 }
 
 export const TURN_START = 'turn:start';
@@ -88,12 +116,11 @@ export function emitGameEvent(type, detail){
   const event = makeEvent(type, detail);
   try {
     if (typeof gameEvents.dispatchEvent === 'function'){
-      if (typeof Event === 'function' && event && !(event instanceof Event)){
-        const nativeEvent = new Event(type);
-        nativeEvent.detail = detail;
-        return gameEvents.dispatchEvent(nativeEvent);
+      let toDispatch = event;
+      if (typeof Event === 'function' && event && typeof event === 'object' && !(event instanceof Event)){
+        toDispatch = createNativeEvent(type, detail) || event;
       }
-      return gameEvents.dispatchEvent(event);
+      return gameEvents.dispatchEvent(toDispatch);
     }
     if (typeof gameEvents.emit === 'function'){
       gameEvents.emit(type, detail);
