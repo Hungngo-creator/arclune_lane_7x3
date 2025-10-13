@@ -188,12 +188,12 @@ __define('./ai.js', (exports, module, __require) => {
     }
     const n = ours + queued;
     if (n >= 3) return 0.70;
-    if (n === 2) return (CFG.AI?.ROW_CROWDING_PENALTY ?? 0.85);
+    if (n === 2) return ((function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.ROW_CROWDING_PENALTY; })(CFG.AI); return _temp != null ? _temp : 0.85; })());
     return 1.0;
   }
   function roleBias(className, cx){
     const front = (cx <= (CFG.GRID_COLS - CFG.ENEMY_COLS)); // cột 4–5 là "front" phía địch
-    const R = CFG.AI?.ROLE?.[className] || {};
+    const R =(function (_temp){ return _temp == null ? void 0 : _temp[className]; })((function (_temp){ return _temp == null ? void 0 : _temp.ROLE; })(CFG.AI)) || {};
     let f = 1.0;
     if (front && typeof R.front === 'number') f *= (1 + R.front);
     if (!front && typeof R.back  === 'number') f *= (1 + R.back);
