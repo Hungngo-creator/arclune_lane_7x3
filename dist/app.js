@@ -140,7 +140,7 @@ __define('./ai.js', (exports, module, __require) => {
   }
   function summonerFeasibility(Game, unitId, baseSlot){
     const meta = Game.meta.get(unitId);
-    if (!meta || meta.class !== 'Summoner' || meta?.kit?.ult?.type !== 'summon') return 1.0;
+    if (!meta || meta.class !== 'Summoner' ||(function (_temp){ return _temp == null ? void 0 : _temp.type; })((function (_temp){ return _temp == null ? void 0 : _temp.ult; })((function (_temp){ return _temp == null ? void 0 : _temp.kit; })(meta))) !== 'summon') return 1.0;
     const u = meta.kit.ult;
     const cand = getPatternSlots(u.pattern || 'verticalNeighbors', baseSlot)
       .filter(Boolean)
@@ -154,9 +154,9 @@ __define('./ai.js', (exports, module, __require) => {
   function candidateBlocked(Game, entry, aliveTokens){
     if (!entry) return 'invalid';
     const alive = aliveTokens || tokensAlive(Game);
-    const slot = entry.cell?.s;
-    const cx = entry.cell?.cx;
-    const cy = entry.cell?.cy;
+    const slot =(function (_temp){ return _temp == null ? void 0 : _temp.s; })(entry.cell);
+    const cx =(function (_temp){ return _temp == null ? void 0 : _temp.cx; })(entry.cell);
+    const cy =(function (_temp){ return _temp == null ? void 0 : _temp.cy; })(entry.cell);
     if (!Number.isFinite(slot) || !Number.isFinite(cx) || !Number.isFinite(cy)) return 'invalid';
     if ((function (_temp){ return _temp == null ? void 0 : _temp.has; })((function (_temp){ return _temp == null ? void 0 : _temp.enemy; })(Game.queued))(slot)) return 'slotQueued';
     if (cellReserved(alive, Game.queued, cx, cy)) return 'cellReserved';
