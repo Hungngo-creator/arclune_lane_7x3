@@ -887,7 +887,7 @@ __define('./combat.js', (exports, module, __require) => {
 
     // Sau đó cho Statuses có quyền điều phối (taunt/allure…), nếu trả về null thì bỏ lượt
    
-    const tgt = Statuses.resolveTarget(unit, pool, { attackType: 'basic' }) ?? fallback;
+    const amt = Math.max(0, Math.floor((function (){ var _temp = amount; return _temp != null ? _temp : 0; })()));
     if (!tgt) return;
 
     const passiveCtx = {
