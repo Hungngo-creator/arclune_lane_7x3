@@ -855,7 +855,7 @@ __define('./combat.js', (exports, module, __require) => {
 
   function healUnit(target, amount){
     if (!target || !Number.isFinite(target.hpMax)) return { healed: 0, overheal: 0 };
-    const amt = Math.max(0, Math.floor(amount ?? 0));
+    const amt = Math.max(0, Math.floor((function (){ var _temp = amount; return _temp != null ? _temp : 0; })()));
   if (amt <= 0) return { healed: 0, overheal: 0 };
     const before = Math.max(0, target.hp || 0);
     const healCap = Math.max(0, target.hpMax - before);
@@ -866,7 +866,7 @@ __define('./combat.js', (exports, module, __require) => {
 
   function grantShield(target, amount){
     if (!target) return 0;
-    const amt = Math.max(0, Math.floor(amount ?? 0));
+    const amt = Math.max(0, Math.floor((function (){ var _temp = amount; return _temp != null ? _temp : 0; })()));
     if (amt <= 0) return 0;
     const cur = Statuses.get(target, 'shield');
     if (cur) {
