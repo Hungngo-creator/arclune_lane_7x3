@@ -41,28 +41,14 @@ function resolveErrorMessage(error, fallback = 'Lỗi không xác định.'){
   const value = typeof error === 'undefined' || error === null ? '' : String(error);
   return value.trim() ? value : fallback;
 }
-
-function showFileProtocolWarning(renderMessage, error){
-  const detail = typeof error === 'undefined' ? '' : resolveErrorMessage(error);
-  const detailMarkup = detail
-    ? `<p style="margin-top:16px;"><small>Lỗi gốc: ${detail}</small></p>`
-    : '';
-  const body = `
-    <p>Vui lòng khởi chạy Arclune thông qua một HTTP server thay vì mở trực tiếp từ ổ đĩa.</p>
-    <p>Ví dụ: chạy <code>npx serve</code> hoặc bất kỳ server tĩnh nào khác rồi truy cập qua <code>http://localhost:*</code>.</p>
-    ${detailMarkup}
-  `;
-  renderMessage({
-    title: 'Không thể chạy từ file://',
-    body
-  });
-}
-
-function showFatalError(error, renderMessage){
+  function showFatalError(error, renderMessage, { isFileProtocol } = {}){
   const detail = resolveErrorMessage(error);
+    const advice = isFileProtocol
+    ? '<p><small>Arclune đang chạy trực tiếp từ ổ đĩa (<code>file://</code>). Nếu gặp lỗi tải tài nguyên, hãy thử mở thông qua một HTTP server tĩnh.</small></p>'
+    : '';
   renderMessage({
     title: 'Không thể khởi động Arclune',
-    body: `<p>${detail}</p>`
+    body: `<p>${detail}</p>${advice}`
   });
 }
 
@@ -71,16 +57,17 @@ function showFatalError(error, renderMessage){
   const protocol = window?.location?.protocol;
   const isFileProtocol = protocol === 'file:';
   try {
+    if (isFileProtocol){
+      console.warn('Đang chạy Arclune trực tiếp từ file://. Một số trình duyệt có thể chặn tài nguyên liên quan.');
+    }
     startGame();
     dispatchLoaded();
   } catch (error) {
     console.error('Arclune failed to start', error);
     if (typeof window.arcluneShowFatal === 'function'){
       window.arcluneShowFatal(error);
-      } else if (isFileProtocol) {
-      showFileProtocolWarning(renderMessage, error);
     } else {
-      showFatalError(error, renderMessage);
+      showFatalError(error, renderMessage, { isFileProtocol });
     }
   }
 })();
