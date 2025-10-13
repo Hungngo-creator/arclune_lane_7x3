@@ -2636,9 +2636,9 @@ __define('./main.js', (exports, module, __require) => {
       const x = Math.round(p.x - barWidth / 2);
       const y = Math.round(p.y + r * offset - barHeight / 2);
       const ratio = Math.max(0, Math.min(1, (t.hp || 0) / (t.hpMax || 1)));
-      const bgColor = art?.hpBar?.bg || 'rgba(9,14,21,0.74)';
-      const fillColor = art?.hpBar?.fill || '#6ff0c0';
-      const borderColor = art?.hpBar?.border || 'rgba(0,0,0,0.55)';
+      const bgColor =(function (_temp){ return _temp == null ? void 0 : _temp.bg; })((function (_temp){ return _temp == null ? void 0 : _temp.hpBar; })(art)) || 'rgba(9,14,21,0.74)';
+      const fillColor =(function (_temp){ return _temp == null ? void 0 : _temp.fill; })((function (_temp){ return _temp == null ? void 0 : _temp.hpBar; })(art)) || '#6ff0c0';
+      const borderColor =(function (_temp){ return _temp == null ? void 0 : _temp.border; })((function (_temp){ return _temp == null ? void 0 : _temp.hpBar; })(art)) || 'rgba(0,0,0,0.55)';
       const radius = Math.max(2, Math.floor(barHeight / 2));
       ctx.save();
       ctx.shadowColor = 'transparent';
@@ -2702,14 +2702,13 @@ __define('./meta.js', (exports, module, __require) => {
   // Dùng trực tiếp catalog cho tra cứu
   const Meta = {
     get: getMetaById,
-    classOf(id){ return this.get(id)?.class ?? null; },
-    rankOf(id){  return this.get(id)?.rank  ?? null; },
-    kit(id){     return this.get(id)?.kit   ?? null; },
+    classOf(id){(function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.class; })(return this.get(id)); return _temp != null ? _temp : null; })(); },
+    rankOf(id){(function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.rank; })(return this.get(id)); return _temp != null ? _temp : null; })(); },
+    kit(id){(function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.kit; })(return this.get(id)); return _temp != null ? _temp : null; })(); },
     // chỉ coi là Summoner khi ult.type='summon'
     isSummoner(id){
       const m = this.get(id);
-      return !!(m && m.class === 'Summoner' && m.kit?.ult?.type === 'summon');
-    }
+      return !!(m && m.class === 'Summoner' &&(function (_temp){ return _temp == null ? void 0 : _temp.type; })((function (_temp){ return _temp == null ? void 0 : _temp.ult; })(m.kit)) === 'summon');
   };
 
   // Tạo chỉ số instance theo class+rank+mods (SPD không nhân theo rank)
@@ -2729,11 +2728,10 @@ __define('./meta.js', (exports, module, __require) => {
 
   // Nộ khi vào sân (trừ leader). Revive: theo spec của skill.
   function initialRageFor(unitId, opts = {}){
-    const onSpawn = Meta.kit(unitId)?.onSpawn;
+    const onSpawn =(function (_temp){ return _temp == null ? void 0 : _temp.onSpawn; })(Meta.kit(unitId));
     if (!onSpawn) return 0;
     if (onSpawn.exceptLeader && opts.isLeader) return 0;
-    if (opts.revive) return Math.max(0, opts.reviveSpec?.rage ?? 0);
-    return onSpawn.rage ?? 0;
+    if (opts.revive) return Math.max(0,(function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.rage; })(opts.reviveSpec); return _temp != null ? _temp : 0; })());(function (){ var _temp = return onSpawn.rage; return _temp != null ? _temp : 0; })();
   }
 
   exports.Meta = Meta;
@@ -2796,7 +2794,7 @@ __define('./passives.js', (exports, module, __require) => {
     for (const st of unit.statuses){
       if (!st || !st.attr || !st.mode) continue;
   const stacks = st.stacks == null ? 1 : st.stacks;
-      const amount = (st.amount ?? st.power ?? 0) * stacks;
+      const amount = ((function (){ var _temp = (function (){ var _temp = st.amount; return _temp != null ? _temp : st.power; })(); return _temp != null ? _temp : 0; })()) * stacks;
       if (!Number.isFinite(amount)) continue;
       if (st.mode === 'percent'){
         percent[st.attr] = (percent[st.attr] || 0) + amount;
@@ -2831,17 +2829,17 @@ __define('./passives.js', (exports, module, __require) => {
       if (!Number.isFinite(ally.hpMax)) continue;
       const heal = Math.max(0, Math.round((ally.hpMax || 0) * pct));
       if (heal <= 0) continue;
-      ally.hp = Math.min(ally.hpMax, (ally.hp ?? ally.hpMax) + heal);
+      ally.hp = Math.min(ally.hpMax, ((function (){ var _temp = ally.hp; return _temp != null ? _temp : ally.hpMax; })()) + heal);
     }
   }
 
   const EFFECTS = {
     placeMark({ Game, unit, passive, ctx }){
       if (!ctx || !ctx.target) return;
-      const params = passive?.params || {};
+      const params =(function (_temp){ return _temp == null ? void 0 : _temp.params; })(passive) || {};
       const ttl = Number.isFinite(params.ttlTurns) ? params.ttlTurns : 3;
       const stacksToExplode = Math.max(1, params.stacksToExplode || 3);
-      const dmgMul = params.dmgFromWIL ?? 0.5;
+      const dmgMul =(function (){ var _temp = params.dmgFromWIL; return _temp != null ? _temp : 0.5; })();
       const purgeable = params.purgeable !== false;
       if (!Array.isArray(ctx.afterHit)) ctx.afterHit = [];
       ctx.afterHit.push((afterCtx = {}) => {
