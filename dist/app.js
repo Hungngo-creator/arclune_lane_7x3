@@ -158,11 +158,11 @@ __define('./ai.js', (exports, module, __require) => {
     const cx = entry.cell?.cx;
     const cy = entry.cell?.cy;
     if (!Number.isFinite(slot) || !Number.isFinite(cx) || !Number.isFinite(cy)) return 'invalid';
-    if (Game.queued?.enemy?.has(slot)) return 'slotQueued';
+    if ((function (_temp){ return _temp == null ? void 0 : _temp.has; })((function (_temp){ return _temp == null ? void 0 : _temp.enemy; })(Game.queued))(slot)) return 'slotQueued';
     if (cellReserved(alive, Game.queued, cx, cy)) return 'cellReserved';
 
     const meta = entry.meta;
-    if (meta && meta.class === 'Summoner' && meta?.kit?.ult?.type === 'summon'){
+    if (meta && meta.class === 'Summoner' &&(function (_temp){ return _temp == null ? void 0 : _temp.type; })((function (_temp){ return _temp == null ? void 0 : _temp.ult; })((function (_temp){ return _temp == null ? void 0 : _temp.kit; })(meta))) === 'summon'){
       const ult = meta.kit.ult || {};
       const patternSlots = getPatternSlots(ult.pattern || 'verticalNeighbors', slot).filter(Boolean);
       if (patternSlots.length){
