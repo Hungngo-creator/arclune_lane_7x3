@@ -2893,9 +2893,9 @@ __define('./passives.js', (exports, module, __require) => {
       const params =(function (_temp){ return _temp == null ? void 0 : _temp.params; })(passive) || {};
       const hpMax = unit.hpMax || 0;
       const hpPct = hpMax > 0 ? (unit.hp || 0) / hpMax : 0;
-      const threshold = params.ifHPgt ?? 0.5;
-      const resBuff = params.RES ?? 0;
-      const wilBuff = params.elseWIL ?? 0;
+      const threshold =(function (){ var _temp = params.ifHPgt; return _temp != null ? _temp : 0.5; })();
+      const resBuff =(function (){ var _temp = params.RES; return _temp != null ? _temp : 0; })();
+      const wilBuff =(function (){ var _temp = params.elseWIL; return _temp != null ? _temp : 0; })();
       if (hpPct > threshold){
         const st = ensureStatBuff(unit, `${passive.id}_res`, { attr:'res', mode:'percent', amount: resBuff, purgeable: params.purgeable !== false });
         applyStatStacks(st, 1);
@@ -2910,8 +2910,8 @@ __define('./passives.js', (exports, module, __require) => {
 
     gainRESPct({ Game, unit, passive }){
       if (!unit) return;
-      const params = passive?.params || {};
-      const st = ensureStatBuff(unit, passive.id, { attr:'res', mode:'percent', amount: params.amount ?? 0, purgeable: params.purgeable !== false });
+      const params =(function (_temp){ return _temp == null ? void 0 : _temp.params; })(passive) || {};
+      const st = ensureStatBuff(unit, passive.id, { attr:'res', mode:'percent', amount:(function (){ var _temp = params.amount; return _temp != null ? _temp : 0; })(), purgeable: params.purgeable !== false });
       const stackable = params.stack !== false;
       const count = stackable ? (st.stacks || 0) + 1 : 1;
       applyStatStacks(st, count, { maxStacks: params.maxStacks });
@@ -2920,8 +2920,8 @@ __define('./passives.js', (exports, module, __require) => {
 
     gainBonus({ Game, unit, passive, ctx }){
       if (!unit || !ctx) return;
-      const params = passive?.params || {};
-      const perMinion = params.perMinion ?? 0;
+      const params =(function (_temp){ return _temp == null ? void 0 : _temp.params; })(passive) || {};
+      const perMinion =(function (){ var _temp = params.perMinion; return _temp != null ? _temp : 0; })();
       const ownerIid = unit.iid;
       const minions = (Game.tokens || []).filter(t => t && t.alive && t.isMinion && t.ownerIid === ownerIid).length;
       const st = ensureStatBuff(unit, passive.id, { attr:'atk', mode:'percent', amount: 0, purgeable: params.purgeable !== false });
@@ -2932,15 +2932,15 @@ __define('./passives.js', (exports, module, __require) => {
       recomputeFromStatuses(unit);
       if (ctx.damage){
         const bonusPct = perMinion * minions;
-        ctx.damage.baseMul = (ctx.damage.baseMul ?? 1) * (1 + bonusPct);
+        ctx.damage.baseMul = ((function (){ var _temp = ctx.damage.baseMul; return _temp != null ? _temp : 1; })()) * (1 + bonusPct);
       }
     },
 
     resPerSleeping({ Game, unit, passive }){
       if (!Game || !unit) return;
-      const params = passive?.params || {};
+      const params =(function (_temp){ return _temp == null ? void 0 : _temp.params; })(passive) || {};
       const foes = (Game.tokens || []).filter(t => t && t.alive && t.side !== unit.side && Statuses.has(t, 'sleep'));
-      const st = ensureStatBuff(unit, passive.id, { attr:'res', mode:'percent', amount: params.perTarget ?? 0, purgeable: params.purgeable !== false });
+      const st = ensureStatBuff(unit, passive.id, { attr:'res', mode:'percent', amount:(function (){ var _temp = params.perTarget; return _temp != null ? _temp : 0; })(), purgeable: params.purgeable !== false });
       applyStatStacks(st, foes.length, { maxStacks: params.maxStacks });
       recomputeFromStatuses(unit);
     }
@@ -2957,14 +2957,14 @@ __define('./passives.js', (exports, module, __require) => {
   function emitPassiveEvent(Game, unit, when, ctx = {}){
     if (!Game || !unit) return;
     const meta = Game.meta && typeof Game.meta.get === 'function' ? Game.meta.get(unit.id) : null;
-    const kit = meta?.kit;
+    const kit =(function (_temp){ return _temp == null ? void 0 : _temp.kit; })(meta);
     if (!kit || !Array.isArray(kit.passives)) return;
     ctx.meta = meta;
     ctx.kit = kit;
     for (const passive of kit.passives){
       if (!passive || passive.when !== when) continue;
       let handler = EFFECT_MAP[passive.effect];
-      if (passive.effect === 'gainRES%' && passive?.params?.perTarget != null){
+      if (passive.effect === 'gainRES%' &&(function (_temp){ return _temp == null ? void 0 : _temp.perTarget; })((function (_temp){ return _temp == null ? void 0 : _temp.params; })(passive)) != null){
         handler = EFFECTS.resPerSleeping;
       }
       if (typeof handler !== 'function') continue;
