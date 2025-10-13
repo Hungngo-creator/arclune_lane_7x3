@@ -1704,11 +1704,9 @@ __define('./entry.js', (exports, module, __require) => {
     } catch (error) {
       console.error('Arclune failed to start', error);
       if (typeof window.arcluneShowFatal === 'function'){
-        window.arcluneShowFatal(error);
-        } else if (isFileProtocol) {
-        showFileProtocolWarning(renderMessage, error);
+        window.arcluneShowFatal(error);    
       } else {
-        showFatalError(error, renderMessage);
+        showFatalError(error, renderMessage, { isFileProtocol });
       }
     }
   })();
@@ -1896,7 +1894,7 @@ __define('./main.js', (exports, module, __require) => {
   /** @type {CanvasRenderingContext2D|null} */ let ctx = null;
   /** @type {{update:(g:any)=>void}|null} */ let hud = null;   // ← THÊM
   const CAM_PRESET = CAM[CFG.CAMERA] || CAM.landscape_oblique;
-  const HAND_SIZE  = CFG.HAND_SIZE ?? 4;
+  const HAND_SIZE  =(function (){ var _temp = CFG.HAND_SIZE; return _temp != null ? _temp : 4; })();
 
   // --- Instance counters (để gắn id cho token/minion) ---
   let _IID = 1;
@@ -1928,20 +1926,20 @@ __define('./main.js', (exports, module, __require) => {
   };
   Game.meta = Meta;
 
-  if (CFG?.DEBUG?.LOG_EVENTS) {
+  if ((function (_temp){ return _temp == null ? void 0 : _temp.LOG_EVENTS; })((function (_temp){ return _temp == null ? void 0 : _temp.DEBUG; })(CFG))) {
     const logEvent = (type) => (ev)=>{
-      const detail = ev?.detail || {};
+      const detail =(function (_temp){ return _temp == null ? void 0 : _temp.detail; })(ev) || {};
       const unit = detail.unit;
       const info = {
-        side: detail.side ?? null,
-        slot: detail.slot ?? null,
-        cycle: detail.cycle ?? null,
-        phase: detail.phase ?? null,
-        unit: unit?.id || unit?.name || null,
+        side:(function (){ var _temp = detail.side; return _temp != null ? _temp : null; })(),
+        slot:(function (){ var _temp = detail.slot; return _temp != null ? _temp : null; })(),
+        cycle:(function (){ var _temp = detail.cycle; return _temp != null ? _temp : null; })(),
+        phase:(function (){ var _temp = detail.phase; return _temp != null ? _temp : null; })(),
+        unit:(function (_temp){ return _temp == null ? void 0 : _temp.id; })(unit) ||(function (_temp){ return _temp == null ? void 0 : _temp.name; })(unit) || null,
         action: detail.action || null,
         skipped: detail.skipped || false,
         reason: detail.reason || null,
-        processedChain: detail.processedChain ?? null
+        processedChain:(function (){ var _temp = detail.processedChain; return _temp != null ? _temp : null; })()
       };
       console.debug(`[events] ${type}`, info);
     };
@@ -1981,7 +1979,7 @@ __define('./main.js', (exports, module, __require) => {
       } catch (err) {
         console.error('[draw]', err);
       }
-      if (Game?.vfx && Game.vfx.length) scheduleDraw();
+      if ((function (_temp){ return _temp == null ? void 0 : _temp.vfx; })(Game) && Game.vfx.length) scheduleDraw();
     });
   }
 
@@ -2059,7 +2057,7 @@ __define('./main.js', (exports, module, __require) => {
 
   function summonerFeasibility(unitId, baseSlot){
    const meta = Game.meta.get(unitId);
-   if (!meta || meta.class !== 'Summoner' || meta?.kit?.ult?.type !== 'summon') return 1.0;
+   if (!meta || meta.class !== 'Summoner' ||(function (_temp){ return _temp == null ? void 0 : _temp.type; })((function (_temp){ return _temp == null ? void 0 : _temp.ult; })((function (_temp){ return _temp == null ? void 0 : _temp.kit; })(meta))) !== 'summon') return 1.0;
    const u = meta.kit.ult;
    const cand = getPatternSlots(u.pattern || 'verticalNeighbors', baseSlot)
   .filter(Boolean)
@@ -2093,8 +2091,8 @@ __define('./main.js', (exports, module, __require) => {
 
   // LẤY TỪ INSTANCE đang đứng trên sân (đúng spec: thừa hưởng % chỉ số hiện tại của chủ)
   function creepStatsFromInherit(masterUnit, inherit){
-    const hpMax = Math.round((masterUnit?.hpMax || 0) * (inherit?.HP  || 0));
-    const atk   = Math.round((masterUnit?.atk   || 0) * (inherit?.ATK || 0));
+     const hpMax = Math.round(((function (_temp){ return _temp == null ? void 0 : _temp.hpMax; })(masterUnit) || 0) * ((function (_temp){ return _temp == null ? void 0 : _temp.HP; })(inherit)  || 0));
+    const atk   = Math.round(((function (_temp){ return _temp == null ? void 0 : _temp.atk; })(masterUnit)   || 0) * ((function (_temp){ return _temp == null ? void 0 : _temp.ATK; })(inherit) || 0));
      return { hpMax, hp: hpMax, atk };
   }
 
@@ -2128,8 +2126,8 @@ __define('./main.js', (exports, module, __require) => {
     const slot = slotIndex(unit.side, unit.cx, unit.cy);
 
     // Chỉ Summoner có ult 'summon' mới Immediate
-    const u = meta.kit?.ult;
-    if (meta.class === 'Summoner' && u?.type === 'summon'){
+    const u =(function (_temp){ return _temp == null ? void 0 : _temp.ult; })(meta.kit);
+    if (meta.class === 'Summoner' &&(function (_temp){ return _temp == null ? void 0 : _temp.type; })(u) === 'summon'){
       const cand = getPatternSlots(u.pattern || 'verticalNeighbors', slot)
         .filter(Boolean)
         // chỉ giữ slot trống thực sự (không active/queued)
@@ -2221,7 +2219,7 @@ __define('./main.js', (exports, module, __require) => {
               base,
               dtype: 'arcane',
               attackType: u.tagAsBasic ? 'basic' : 'skill',
-              defPen: u.penRES ?? 0
+              defPen:(function (){ var _temp = u.penRES; return _temp != null ? _temp : 0; })()
             });
           }
         }
@@ -2229,11 +2227,11 @@ __define('./main.js', (exports, module, __require) => {
       }
 
       case 'selfBuff': {
-        const tradePct = Math.max(0, Math.min(0.9, u.selfHPTrade ?? 0));
+        const tradePct = Math.max(0, Math.min(0.9,(function (){ var _temp = u.selfHPTrade; return _temp != null ? _temp : 0; })()));
         const pay = Math.round((unit.hpMax || 0) * tradePct);
         const maxPay = Math.max(0, Math.min(pay, Math.max(0, (unit.hp || 0) - 1)));
         if (maxPay > 0) applyDamage(unit, maxPay);
-        const reduce = Math.max(0, u.reduceDmg ?? 0);
+        const reduce = Math.max(0,(function (){ var _temp = u.reduceDmg; return _temp != null ? _temp : 0; })());
         if (reduce > 0){
           Statuses.add(unit, Statuses.make.damageCut({ pct: reduce, turns: u.turns || 1 }));
         }
@@ -2271,11 +2269,11 @@ __define('./main.js', (exports, module, __require) => {
           ally.deadAt = 0;
           ally.hp = 0;
           Statuses.purge(ally);
-          const hpPct = Math.max(0, Math.min(1, u.revived?.hpPct ?? 0.5));
+          const hpPct = Math.max(0, Math.min(1,(function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.hpPct; })(u.revived); return _temp != null ? _temp : 0.5; })()));
           const healAmt = Math.max(1, Math.round((ally.hpMax || 0) * hpPct));
           healUnit(ally, healAmt);
-          ally.rage = Math.max(0, u.revived?.rage ?? 0);
-          if (u.revived?.lockSkillsTurns){
+          ally.rage = Math.max(0,(function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.rage; })(u.revived); return _temp != null ? _temp : 0; })());
+          if ((function (_temp){ return _temp == null ? void 0 : _temp.lockSkillsTurns; })(u.revived)){
             Statuses.add(ally, Statuses.make.silence({ turns: u.revived.lockSkillsTurns }));
           }
           try { vfxAddSpawn(Game, ally.cx, ally.cy, ally.side); } catch(_){}
@@ -2332,7 +2330,7 @@ __define('./main.js', (exports, module, __require) => {
           if (targets.size >= extraAllies + 1) break;
           targets.add(ally);
         }
-        const pct = u.attackSpeed ?? 0.1;
+        const pct =(function (){ var _temp = u.attackSpeed; return _temp != null ? _temp : 0.1; })();
         for (const tgt of targets){
           Statuses.add(tgt, Statuses.make.haste({ pct, turns: u.turns || 1 }));
           try { vfxAddHit(Game, tgt); } catch(_){}
@@ -2439,14 +2437,13 @@ __define('./main.js', (exports, module, __require) => {
     // Cập nhật HUD & auto-pick phe ta
     hud.update(Game);
     if (!Game.selectedId) selectFirstAffordable();
-    if (Game.ui?.bar) Game.ui.bar.render();
-
+    if ((function (_temp){ return _temp == null ? void 0 : _temp.bar; })(Game.ui)) Game.ui.bar.render();
     // Cho AI suy nghĩ ngay khi cost đổi
     aiMaybeAct(Game, 'cost');
   }
 
       // Bước lượt theo nhịp demo
-      const busyUntil = Game.turn?.busyUntil ?? 0;
+      const busyUntil =(function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.busyUntil; })(Game.turn); return _temp != null ? _temp : 0; })();
       if (now >= busyUntil && now - CLOCK.lastTurnStepMs >= CLOCK.turnEveryMs){
         CLOCK.lastTurnStepMs = now;
     stepTurn(Game, {
@@ -2515,7 +2512,7 @@ __define('./main.js', (exports, module, __require) => {
      const pending = {
       unitId: card.id, name: card.name, side:'ally',
        cx: cell.cx, cy: cell.cy, slot, spawnCycle,
-       color: pendingArt?.palette?.primary || '#a9f58c',
+       color:(function (_temp){ return _temp == null ? void 0 : _temp.primary; })((function (_temp){ return _temp == null ? void 0 : _temp.palette; })(pendingArt)) || '#a9f58c',
        art: pendingArt
      };
      Game.queued.ally.set(slot, pending);
@@ -2565,8 +2562,8 @@ __define('./main.js', (exports, module, __require) => {
   }
   function cellCenterObliqueLocal(g, cx, cy, C){
     const colsW = g.tile * g.cols;
-    const topScale = (C?.topScale ?? 0.80);
-    const rowGap = (C?.rowGapRatio ?? 0.62) * g.tile;
+    const topScale = ((function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.topScale; })(C); return _temp != null ? _temp : 0.80; })());
+    const rowGap = ((function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.rowGapRatio; })(C); return _temp != null ? _temp : 0.62; })()) * g.tile;
 
     function rowLR(r){
       const pinch = (1 - topScale) * colsW;
@@ -2589,7 +2586,7 @@ __define('./main.js', (exports, module, __require) => {
     const x = (xtL + xtR + xbL + xbR) / 4;
     const y = (yTop + yBot) / 2;
 
-    const k = (C?.depthScale ?? 0.94);
+    const k = ((function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.depthScale; })(C); return _temp != null ? _temp : 0.94; })());
     const scale = Math.pow(k, g.rows - 1 - cy);
     return { x, y, scale };
   }
@@ -2631,11 +2628,11 @@ __define('./main.js', (exports, module, __require) => {
       if (!t.alive || !Number.isFinite(t.hpMax)) continue;
   const p = cellCenterObliqueLocal(Game.grid, t.cx, t.cy, CAM_PRESET);
       const art = t.art || getUnitArt(t.id);
-      const layout = art?.layout || {};
+      const layout =(function (_temp){ return _temp == null ? void 0 : _temp.layout; })(art) || {};
       const r = Math.max(6, Math.floor(baseR * (p.scale || 1)));
-      const barWidth = Math.max(28, Math.floor(r * (layout.hpWidth ?? 2.4)));
-      const barHeight = Math.max(5, Math.floor(r * (layout.hpHeight ?? 0.42)));
-      const offset = layout.hpOffset ?? 1.46;
+      const barWidth = Math.max(28, Math.floor(r * ((function (){ var _temp = layout.hpWidth; return _temp != null ? _temp : 2.4; })())));
+      const barHeight = Math.max(5, Math.floor(r * ((function (){ var _temp = layout.hpHeight; return _temp != null ? _temp : 0.42; })())));
+      const offset =(function (){ var _temp = layout.hpOffset; return _temp != null ? _temp : 1.46; })();
       const x = Math.round(p.x - barWidth / 2);
       const y = Math.round(p.y + r * offset - barHeight / 2);
       const ratio = Math.max(0, Math.min(1, (t.hp || 0) / (t.hpMax || 1)));
