@@ -517,10 +517,10 @@ __define('./art.js', (exports, module, __require) => {
       sprite,
       palette,
       shape: opts.shape || pattern,
-      size: opts.size ?? 1,
-      shadow: opts.shadow ?? 'rgba(0,0,0,0.35)',
-      glow: opts.glow ?? palette.accent || '#8cf6ff',
-      mirror: opts.mirror ?? true,
+      size:(function (){ var _temp = opts.size; return _temp != null ? _temp : 1; })(),
+      shadow:(function (){ var _temp = opts.shadow; return _temp != null ? _temp : 'rgba(0,0,0,0.35)'; })(),
+      glow:(function (){ var _temp = opts.glow; return _temp != null ? _temp : palette.accent || '#8cf6ff'; })(),
+      mirror:(function (){ var _temp = opts.mirror; return _temp != null ? _temp : true; })(),
       layout,
       label,
       hpBar
@@ -606,9 +606,7 @@ __define('./art.js', (exports, module, __require) => {
   }
 
   function getPalette(id){
-    const art = getUnitArt(id);
-    return art?.palette || basePalettes.default;
-  }
+    const art = getUnitArt(id);(function (_temp){ return _temp == null ? void 0 : _temp.palette; })(return art) || basePalettes.default;
 
   exports.UNIT_ART = UNIT_ART;
   exports.getUnitArt = getUnitArt;
