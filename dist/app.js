@@ -630,7 +630,7 @@ __define('./catalog.js', (exports, module, __require) => {
 
   // 3) Helper: áp rank & mod (mods không áp vào SPD)
   function applyRankAndMods(base, rank, mods = {}){
-    const m = RANK_MULT[rank] ?? 1;
+    const m =(function (){ var _temp = RANK_MULT[rank]; return _temp != null ? _temp : 1; })();
     const out = { ...base };
     for (const k of Object.keys(base)){
       if (k === 'SPD') { // SPD không nhân theo bậc
@@ -731,7 +731,7 @@ __define('./catalog.js', (exports, module, __require) => {
   const getMetaById = (id) => ROSTER_MAP.get(id);
   const isSummoner = (id) => {
     const m = getMetaById(id);
-    return !!(m && m.class === 'Summoner' && m.kit?.ult?.type === 'summon');
+     return !!(m && m.class === 'Summoner' &&(function (_temp){ return _temp == null ? void 0 : _temp.type; })((function (_temp){ return _temp == null ? void 0 : _temp.ult; })(m.kit)) === 'summon');
   };
 
   exports.RANK_MULT = RANK_MULT;
