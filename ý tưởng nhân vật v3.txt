@@ -230,7 +230,7 @@ Kĩ năng 2:
 Đánh thường: chưởng 2 chưởng phép từ xa, mỗi chưởng gây sát thương = n% wil + x % atk cho 1 mục tiêu ngẫu nhiên.
 
 Ult: mô tả: bước đến tương lai, rời khỏi hiện tại.
-Triệu hồi 1 cách cổng không gian, đem theo 4 cost hiện có trong cost bar, bước vào và biến mất khỏi sàn đấu hiện tại, 3 turn sau sẽ xuất hiện ngẫu nhiên ở 1 vị trí của sân đồng minh và trao lại 6 cost cho deck bar (lãi 2 cost), nhận hiệu ứng "Bảo Hộ Thời Gian": trong 3 turn. Bảo Hộ Thời Gian: +10% Hp/arm/res, -20% AGI, - 10% wil. ( Nếu trong sân không có bất kì chỗ trống nào, đợi thêm 3 turn rồi xuất hiện, trả lại 9 cost thay vì 6 cost) //max cost mãi là 30 trừ phi có nhân vật khác làm tăng max cost trong tương lai//
+Triệu hồi 1 cách cổng không gian, đem theo 5 cost hiện có trong cost bar, bước vào và biến mất khỏi sàn đấu hiện tại, 3 turn sau sẽ xuất hiện ngẫu nhiên ở 1 vị trí của sân đồng minh và trao lại 7 cost cho deck bar (lãi 2 cost), nhận hiệu ứng "Bảo Hộ Thời Gian": trong 3 turn. Bảo Hộ Thời Gian: +10% Hp/arm/res, -20% AGI, - 10% wil. ( Nếu trong sân không có bất kì chỗ trống nào, đợi thêm 3 turn rồi xuất hiện, trả lại 9 cost thay vì 6 cost) //max cost mãi là 30 trừ phi có nhân vật khác làm tăng max cost trong tương lai//
 
 17) Tàn Thần Ma Binh.
 Mô tả lore: một vị tàn thần đoạt xá khí linh của một thanh ma binh chờ đợi cơ hội trả thù. Về cơ bản là một thanh ma kiếm, có một linh hồn là tàn thần sống trong thanh kiếm đó nhưng chui ra ngoài để cầm kiếm.
@@ -273,7 +273,7 @@ Ult: bắn 3 mũi tên, mỗi mũi gây sát thương = 150% sát thương của
 
 20)
 Mô tả: một kiếm tu xuất kiếm nhanh như gió.
-Nội tại: tăng 2% spd sau mỗi lần tấn công/gây sát thương, stack tối đa 100 stack. Các stack không thể xoá, cướp.
+Nội tại: tăng 2% spd sau mỗi lần tấn công/gây sát thương, stack tối đa 100 stack. Các stack không thể xoá, cướp. Phá vỡ cap follow up, cap là 3 thay vì 2 như các nhân vật khác.
 (Đánh tăng spd, tăng spd xong lại dễ đánh follow up nên dễ tăng spd hơn từ nội tại, tuần hoàn tốt)
 
 Kĩ năng 1: trừ 5% max spd, chém kiếm khí từ xa gây sát thương ngẫu nhiên lên 3 kẻ địch (chỉ chém 3 chém, không  follow up vì không tính là đòn đánh thường, vẫn áp dụng nội tại) mỗi chém gây sát thương = 130% đòn đánh thường, 30 aether.
@@ -282,7 +282,74 @@ Kĩ năng 3: đánh 1 đòn đánh thường lên 1 kẻ địch, gây 180% sát
 
 Ult: tấn công 1 kẻ địch bằng 3 đòn đánh thường. (1 đòn đánh thường tính cả follow up)
 
-B. Các char dùng trong pve vẫn áp dụng rank như những char dành cho player nhưng vào pve +10% 10 chỉ số trước mới áp dụng nội tại nếu là char boss. Chúng sẽ dùng hệ thống AI tự sum và deck/cost như player chứ không có cố định như pve trong các game khác. Các char pve không sẽ không có kĩ năng để dễ phân biệt đâu là char pve cốt truyện không dành cho player đâu là char dành cho player gacha, vì không có kĩ năng nên đánh thường, nội tại và ult của chúng sẽ mạnh hơn char cho player gacha 1 chút:
+21) tên: chưa có, class: summoner.
+Nội tại: Pháp Tướng mỗi trận chỉ có thể ngưng tụ 3 lần, giới hạn tồn tại cùng lúc là 1. Khi dung hợp với pháp tướng, đòn đánh thường của pháp tướng gây thêm sát thương = 1% max hp của kẻ thù, follow up không áp dụng gây thêm 1% sát thương này.
+Đánh thường: gây sát thương = n% atk + x%hp lên 1 mục tiêu.
+
+Kĩ năng 1: dung hợp với pháp tướng, mọi chỉ số của Pháp Tướng thừa hưởng từ chủ từ 170% lên 230%, chủ sẽ nhập vào vị trí của pháp tướng, -30% max aether.
+
+Kĩ năng 2: điều khiển pháp tướng đến gần kẻ địch, phát nổ và gây 300% wil + atk lên hàng đầu tiên (ô 1/2/3), 30 aether. (Nếu đã dung hợp với pháp tướng mà dùng chiêu này thì pháp tướng sẽ biến mất, chủ sẽ xuất hiện ở vị trí của pháp tướng và cần ngương tụ pháp tướng từ đầu).
+
+Ult: Triệu hồi Pháp Tướng, một pháp tướng có ngoại hình giống ngoại hình của nhân vật này nhưng mờ hơn và to hơn 10% hắn sẽ xuất hiện sau lưng hắn, Pháp Tướng có 170% mọi chỉ số của chủ, không có ult hay kỹ năng, chỉ đánh thường = 150% wil và atk của pháp tướng, tồn lại không giới hạn turn, pháp tướng luôn có một đòn follow up = 80% sát thương từ đòn đánh thường của bản thân Pháp Tướng.
+ 
+Chú thích: Các nhân vật thuộc bậc Prime đều là thần, thần là duy nhất, mọi nhân vật Prime đều không thể hồi sinh, không nhận bất kỳ buff hay debuff, kĩ năng/đánh thường/nội tại/ult đều không thể cướp, xoá bỏ, lãng quên hay sao chép.
+
+22) Hoá thân của Ký Ức Chi Chủ, Prime.
+Cost: 22, chỉ ra sân được 1 lần, sau khi chết không thể hồi sinh 
+Mô tả: một hoá thân của Tiên Thiên Thần—Ký Ức Chi Chủ,  không có mặt cụ thể mà là 1 đoàn mê vụ mơ hồ.
+Nội tại: Quên Lãng: mọi đòn tấn công lên mục tiêu sẽ làm mục tiêu quên ult (10%) hoặc 1 kỹ năng (80%) (10% còn lại là nội tại Quên Lãng này không áp dụng) của mình trong 1 turn, nhân vật này không nhận buff và debuff. Mọi nội tại/kĩ năng/ult của nhân vật này không thể cướp, sao chép, xoá bỏ hoặc lãng quên.
+
+Đánh thường: gây sát thương = n% wil và atk lên 1 mục tiêu ngẫu nhiên. (Tức là tấn công từ xa 1 mục tiêu enemy ngẫu nhiên đang đứng trên sân).
+
+Kĩ năng 1: Triệu hồi ý chí của bản tôn là Chủ Thể Thần Ký Ức giáng lâm, tăng sát thương của ult thêm 50% (từ 100% đến 200% lên 150% đến 300%), bản tôn Thần Ký Ức sẽ và chỉ rời đi khi hoá thân sửa dụng 1 ult thành công. 30% max aether (dù aether hiện tại có đầy hay không thì cũng giảm 30% max aether).
+
+Ult: Gây sát thương ngẫu nhiên từ 100% đến 180% wil và atk lên toàn bộ kẻ thù, áp dụng nội tại.
+
+23) Hoá thân của Nữ Thần Sinh Mệnh, Prime.
+Cost: 22, chỉ ra sân được 1 lần, sau khi chết không thể hồi sinh 
+Mô tả: một hoá thân của vị hậu thiên thần Nữ Thần Sinh Mệnh, không có mặt cụ thể mà là 1 đoàn mê vụ mơ hồ.
+
+Nội tại: mỗi kẻ địch nhận sát thương từ Nữ Thần Sinh Mệnh sẽ mất 1% max hp và nữ thần nhận 1% max hp đó. Khi ra sân cho Leader đồng minh và bản thân 1 hiệu ứng Bất Khuất.
+
+Kĩ năng 1: Giảm 5% max hp, gây sát thương AOE toàn sân = 100% chỉ số wil và atk. 20 aether.
+
+Kĩ năng 2: 
+
+Ult: giảm 5% max hp, gây sát thương = 200% wil và atk lên toàn sân của kẻ địch, áp dụng nội tại.
+
+24) Hoá thân của Thần Chết, Prime.
+Cost: 22, chỉ ra sân được 1 lần, sau khi chết không thể hồi sinh 
+Mô tả: một hoá thân của tiên thiên thần-Thần Chết, không có mặt cụ thể mà là 1 đoàn mê vụ mơ hồ.
+
+Nội tại: Thẩm phán của Thần Chết: nhận 1 hiệu ứng tàn sát khi ra sân, không nhận sát thương vật lý (ATK), không thể bị xoá hay lãng quên, cướp hoặc sao chép mà luôn áp dụng vì hắn là hoá thân của Thần Chết.
+
+25) 
+
+Ult: chọn một kẻ địch ngẫu nhiên sau đó thả xúc xắc, điểm là số lẻ thì kẻ địch đó ngủ trong 1 turn, điểm là số chẳn thì tăng 5% max hp cho bản thân.
+
+26) Ma Đế Hắc Long
+Nội tại: +5% res, arm và Wil khi vào trận, mọi đòn đánh gây hiệu ứng Tâm Ma lên mục tiêu. Mỗi 2 turn sẽ tự giảm 1 stack debuff trên bản thân.
+Tâm ma: giảm 2% RES và PER của mục tiêu. 
+
+Kĩ năng 1: gây sát thương aoe bằng 80% sát thương đòn đánh thường lên 3 kẻ địch ngẫu nhiên, áp dụng tâm ma, 30 aether.
+
+Kĩ năng 2: hấp thụ toàn bộ tâm ma từ những kẻ dính hiệu ứng  này, +2% res và per/mỗi stack tâm ma hấp thụ, 20 aether.
+Kĩ năng 3
+Ult: gầm thét, gây sát thương AOE lên 4 kẻ địch ngẫu nhiên = 200% sát thương từ đòn đánh thường lên mỗi kẻ địch, áp dụng Tâm Ma.
+
+27) Tịch Diệt Long Hoàng
+Mô tả: một con rồng được tạo ra và cuồng tín tín ngưỡng Tịch Diệt Chi Chủ, cho rằng Tịch Diệt là vĩ đại, hắn muốn Tịch Diệt mọi thứ.
+Nội tại: Tịch Diệt Ban Ân: ngươi được Tịch Diệt Chi Chủ ban ân: + 5% wil và atk khi vào trận, mọi đòn đánh bỏ qua 10% res và arm của mục tiêu.
+
+Ult: gây aoe lên 3 kẻ địch ngẫu nhiên, gây sát thương = 230% đòn đánh thường lên mỗi kẻ địch, áp dụng Tịch Diệt Ban Ân.
+28) Hư Vô Ma Chủ
+29) Hỗn Độn Ma Long
+30) Hoá thân của Hư Chủ
+Ult: 
+31) Song Sinh Tịnh Đế Liên, nữ.
+Nội tại: Sau 3 turn triệu hồi một bản thân khác, cùng hưởng mọi chỉ số, debuff/buff, mỗi lần triệu hồi bản thân mới, tất cả bản thân sẽ được +10% mọi chỉ số, triệu hồi tối đa 9 bản thân trong trận. Hp của tất cả bản thân liên kết với nhau, khi 1 bản thân nhận sát thương thì sẽ chia đều sát thương đó cho tất cả bản thân. Khi trong sân đầy ô thì tất cả bản thân cũ sẽ hợp nhất, cộng dồn tất cả chỉ số của các bản thân chưa hợp nhất vào bản thân đã hợp nhất, xoá mọi buff và debuff.
+
+B. Char pve: Các char dùng trong pve vẫn áp dụng rank như những char dành cho player nhưng vào pve +10% 10 chỉ số trước mới áp dụng nội tại nếu là char boss. Chúng sẽ dùng hệ thống AI tự sum và deck/cost như player chứ không có cố định như pve trong các game khác. Các char pve không sẽ không có kĩ năng để dễ phân biệt đâu là char pve cốt truyện không dành cho player đâu là char dành cho player gacha, vì không có kĩ năng nên đánh thường, nội tại và ult của chúng sẽ mạnh hơn char cho player gacha 1 chút:
 
 1) Boss: Mathew:
 Mô tả: Một nhà khoa học điên thích thí nghiệm trên người, hắn có những khối cơ bắp phình to trông phi nhân loại và hắn cho rằng đây là thí nghiệm thành công.
@@ -336,6 +403,20 @@ Nội tại: +10% mọi chỉ số khi vào trận, mỗi khi tấn công 1 kẻ
 
 Đánh thường: gây sát thương = 100% atk + 100% wil lên một mục tiêu, gây 1 debuff ngẫu nhiên từ bể debuff lên mục tiêu đó.
 Ult: sau lưng mọc ra 3 xúc tu máy, tấn công ngẫu nhiên 3 mục tiêu địch (phe player), mỗi xúc tu gây 250% sát thương từ đòn đánh thường và áp dụng nội tại bắt cóc.
+
+C. Leader
+0) Uyên: hiện có trong tệp "các lưu ý...txt"
+1) Linesetter
+2) Sinh Mệnh Chi Chủ (khác với Nữ Thần Sinh Mệnh), nam
+Nội tại: Sinh Mệnh Cội Nguồn: mỗi đồng minh đứng trên sân sau khi thực thi turn được hồi hp = 2% max hp của leader này (áp dụng với leader này luôn), luôn hoạt động, không thể cướp, xoá bỏ, lãng quên hay sao chép.
+
+3) Nguyền Rủa Chi Chủ, nam
+Nội tại: hiệu quả hồi phục (hồi hp và aether) của kẻ địch trên sân giảm 30%.
+Nguyền Rủa: kẻ thù nhận sát thương bởi leader này nhận 1 debuff ngẫu nhiên từ bể debuff. 
+
+4) Bóng Tối Chi Chủ, nữ.
+Nội tại: mọi sát thương gây ra gây hiệu ứng sợ hãi và mù lên kẻ địch và hồi hp cho bản thân = 10% mọi sát thương bản thân gây ra.
+Bóng Tối Vĩnh Hằng: gây sát thương aoe toàn sân = 250% sát thương đòn đánh thường, áp dụng nội tại.
 
 ------
 

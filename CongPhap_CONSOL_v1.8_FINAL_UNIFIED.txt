@@ -1,0 +1,3893 @@
+ARCLUNE · ADDENDUM · CÔNG PHÁP (CONSOL) — v1.8 · FINAL UNIFIED
+
+DocMeta: {"doc_id": "AR.CONGPHAP.CONSOL", "version": "1.8-FINAL", "unified_from": ["Arclune_Addendum_CongPhap_CONSOL_v1_8_UNIFIED_MASTER.pdf", "Arclune_Addendum_CongPhap_CONSOL_v1_8_ALL_IN_ONE.pdf"], "anchors": ["CONSOL.LAW.HGTS", "CONSOL.HG.FEES", "CONSOL.TS.CLOCK", "CONSOL.WEAPONRY", "CONSOL.NHAN", "CONSOL.PHYS"], "note": "Bản này chứa 100% nội dung của hai tệp nguồn (Master trước, All-in-One sau)."}
+
+Thứ tự:
+
+1) UNIFIED_MASTER (chuẩn mạch chính, mới nhất)
+
+2) ALL_IN_ONE (annex đầy đủ, kèm mọi phần mở rộng)
+
+Gợi ý sử dụng: đọc phần 1 để tra cứu nhanh; phần 2 để đối chiếu & lấy chi tiết bổ sung.
+
+ARCLUNE · ADDENDUM · CÔNG PHÁP (CONSOL) —
+v1.0 (Rebuild)
+
+DocMeta: {"doc_id":"AR.TECH.CONGPHAP.CONSOL","version":"1.0"}
+
+HOÀNG GIAI — Khai Nguyên / Trúc Cơ / Ngưng Đan
+
+01) Hô Tức Nguyên Chu — HG–hạ/trung/thượng
+
+Cụm cảnh giới: Khai Nguyên→Trúc Cơ→Ngưng Đan
+
+Hệ: mộc–sinh · Quỹ tích: phổi→đan điền→đốc
+
+Ấn yêu cầu: An Tức Ấn · Cost: ngực ấm; thở sâu · SE: buồn ngủ nửa canh
+
+Synergy: Hô Hấp; Tịnh Sơn Lâm
+
+Lore: Bài thở thợ mỏ CGQ.
+
+02) Cương Da Mộc Cốt — HG–hạ/trung/thượng
+
+Cụm cảnh giới: Khai Nguyên→Trúc Cơ→Ngưng Đan
+
+Hệ: kim–mộc · Quỹ tích: tứ chi↔đốc
+
+Ấn yêu cầu: Cốt Ấn · Cost: da ran rát · SE: khớp kêu rắc
+
+Synergy: Thể tu; Sa Mạc
+
+Lore: Phường rèn truyền xuống.
+
+03) Lưu Ảnh Bộ — HG–trung/thượng
+
+Cụm cảnh giới: Trúc Cơ→Ngưng Đan
+
+Hệ: ảnh–phong · Quỹ tích: thận→bàng quang→đốc
+
+Ấn yêu cầu: Ảnh Ấn · Cost: lưng nhẹ · SE: chóng mặt
+
+Synergy: Kiếm Thiên
+
+Lore: Bộ pháp từ trộm miếu.
+
+04) Tiểu Chu Thiên Dẫn Khí — HG–hạ/trung
+
+Cụm cảnh giới: Khai Nguyên→Trúc Cơ
+
+Hệ: aether · Quỹ tích: nhâm↔đốc
+
+Ấn yêu cầu: Dẫn Ấn · Cost: bụng ấm · SE: ngứa mạch
+
+Synergy: Luyện đan nhập môn
+
+Lore: Bia đá rêu phủ.
+
+05) Thủy Tức Tĩnh Tâm — HG–hạ/trung
+
+Cụm cảnh giới: Khai Nguyên→Trúc Cơ
+
+Hệ: thủy–tịnh · Quỹ tích: phế→thận
+
+Ấn yêu cầu: Tịnh Ấn · Cost: gáy mát · SE: lạnh lòng tạm
+
+Synergy: Âm Quốc
+
+Lore: Qua đêm trong mộ lạnh.
+
+06) Phong Chỉ Chỉ Huyệt — HG–thượng
+
+Cụm cảnh giới: Ngưng Đan
+
+Hệ: phong–kim · Quỹ tích: thủ thiếu dương—tam tiêu
+
+Ấn yêu cầu: Chỉ Ấn · Cost: đầu ngón tê · SE: căng cổ tay
+
+Synergy: Sát thủ
+
+Lore: Sổ tay dính rượu.
+
+HUYỀN GIAI — Kết Đan / Đúc Phách / Luyện Hồn
+
+07) Huyết Ngưng Cân Ấn — HyG–hạ/trung/thượng
+
+Cụm cảnh giới: Kết Đan→Đúc Phách→Luyện Hồn
+
+Hệ: huyết–kim · Quỹ tích: Tâm→Can→Đan điền
+
+Ấn yêu cầu: Ngưng Cân Ấn · Cost: mặt nóng · SE: khô cổ
+
+Synergy: Hoàng Sa Kim Tàng
+
+Lore: Từng bị gán tà.
+
+08) Tịnh Tâm Mộc Chu — HyG–hạ/trung/thượng
+
+Cụm cảnh giới: Kết Đan→Đúc Phách→Luyện Hồn
+
+Hệ: tịnh–hồn · Quỹ tích: ấn đường↔tâm cung
+
+Ấn yêu cầu: Tịnh Ấn · Cost: gáy lạnh · SE: cảm xúc phẳng
+
+Synergy: Âm Quốc
+
+Lore: Khóa ‘sợ’ trước kiếp.
+
+09) Bách Mạch Hoàn Chu — HyG–hạ/trung
+
+Cụm cảnh giới: Kết Đan→Đúc Phách
+
+Hệ: aether–mạch · Quỹ tích: 12 chính mạch
+
+Ấn yêu cầu: Hoàn Ấn · Cost: ngứa mạch · SE: tẩu hỏa
+
+Synergy: Luyện dài ngày
+
+Lore: Gõ mõ ba năm.
+
+10) Kim Linh Bì Hộ — HyG–trung/thượng
+
+Cụm cảnh giới: Đúc Phách→Luyện Hồn
+
+Hệ: kim–thổ · Quỹ tích: bì phu—tấu lý
+
+Ấn yêu cầu: Kim Ấn · Cost: da căng · SE: mất xúc giác
+
+Synergy: Vệ sĩ cung đình
+
+Lore: Thợ giáp CGQ.
+
+11) Hỏa Táo Truyền Thân — HyG–trung/thượng
+
+Cụm cảnh giới: Đúc Phách→Luyện Hồn
+
+Hệ: hỏa–phong · Quỹ tích: đốc—đảm
+
+Ấn yêu cầu: Táo Ấn · Cost: ngực bùng · SE: rút hơi
+
+Synergy: Sa mạc
+
+Lore: Vũ điệu chiến.
+
+12) Minh Hồn Trai Luyện — HyG–thượng
+
+Cụm cảnh giới: Luyện Hồn
+
+Hệ: hồn–tịnh · Quỹ tích: mệnh môn—ấn đường
+
+Ấn yêu cầu: Minh Ấn · Cost: trán mát · SE: đầu ê ẩm
+
+Synergy: Phá mê—tróc linh
+
+Lore: ‘Nhìn’ lối U Giới.
+
+ĐỊA GIAI — Thánh Nhân / Thánh Hoàng / Thánh Tôn
+
+13) Triều Nguyệt Vô Tâm Kinh — ĐG–hạ/trung/thượng
+
+Cụm cảnh giới: Thánh Nhân→Thánh Hoàng→Thánh Tôn
+
+Hệ: nguyệt–thủy–hồn · Quỹ tích: Thái dương↔Thái âm
+
+Ấn yêu cầu: Vô Tâm Ấn · Cost: mờ sương · SE: cô lập cảm xúc
+
+Synergy: Hải Nhãn Triều Tinh
+
+Lore: ‘Minh Đế giả’ xóa danh.
+
+14) Ảnh Kiếm Thất Tuyệt — ĐG–hạ/trung/thượng
+
+Cụm cảnh giới: Thánh Nhân→Thánh Hoàng→Thánh Tôn
+
+Hệ: kiếm–ảnh · Quỹ tích: đốc—đởm—thủ dương minh
+
+Ấn yêu cầu: Ảnh Ấn · Cost: rút khí tay · SE: run ngón
+
+Synergy: Kiếm Thiên
+
+Lore: Chiêu 4 thất lạc.
+
+15) Long Tức Hóa Cân — ĐG–trung/thượng
+
+Cụm cảnh giới: Thánh Hoàng→Thánh Tôn
+
+Hệ: long–kim—mộc · Quỹ tích: tủy sống—cân mạc
+
+Ấn yêu cầu: Long Ấn · Cost: lưng nóng · SE: choáng nhẹ
+
+Synergy: Thể tu
+
+Lore: Nghe ‘rồng gầm’ trong lò.
+
+16) Huyền Phong Tích Ấn Trận — ĐG–trung/thượng
+
+Cụm cảnh giới: Thánh Hoàng→Thánh Tôn
+
+Hệ: phong–trận · Quỹ tích: đốc—ba tiêu—ngoại mạch
+
+Ấn yêu cầu: Phong Ấn + Trận Ấn · Cost: tóc dựng · SE: rối mạch
+
+Synergy: Đèo gió
+
+Lore: Từ vận tiêu leo gió.
+
+17) Kim Huyết Đoạn Kiếp — ĐG–thượng
+
+Cụm cảnh giới: Thánh Tôn
+
+Hệ: kim–huyết · Quỹ tích: Tâm→Đởm
+
+Ấn yêu cầu: Đoạn Ấn · Cost: tim đau · SE: dội nhân quả nhẹ
+
+Synergy: Phá trần—đột phá
+
+Lore: Hy sinh mở đường.
+
+18) Tịnh Liên Hộ Thần — ĐG–hạ/trung
+
+Cụm cảnh giới: Thánh Nhân→Thánh Hoàng
+
+Hệ: tịnh–liên · Quỹ tích: Ấn đường—tâm cung—mệnh môn
+
+Ấn yêu cầu: Hộ Thần Ấn · Cost: đầu mát · SE: ngủ sâu
+
+Synergy: Đầm liên
+
+Lore: Ít mộng xấu.
+
+THIÊN GIAI — Bán Thần
+
+19) Đế Liên Hợp Chú — Thiên–hạ/trung/thượng
+
+Cụm cảnh giới: Bán Thần
+
+Hệ: tịnh–sinh–liên · Quỹ tích: Liên tâm—mạch thủy
+
+Ấn yêu cầu: Liên Tâm Ấn + Liên Tử · Cost: vi-trích PDU/TL · SE: mệt sâu
+
+Synergy: Đầm liên
+
+Lore: Phàm/Thánh ép dùng ‘tắt đèn’.
+
+20) Cựu Danh Chi Cấm — Thiên–thượng
+
+Cụm cảnh giới: Bán Thần→Thần
+
+Hệ: danh—nhân quả · Quỹ tích: ấn đường—hầu
+
+Ấn yêu cầu: Trấn Danh Ấn · Cost: hao ‘danh khí’ · SE: dội nhân quả
+
+Synergy: Miếu Danh
+
+Lore: Lãng Quên ăn mất phần lớn.
+
+21) Triều Tức Phản Luật — Thiên–trung/thượng
+
+Cụm cảnh giới: Bán Thần
+
+Hệ: thủy—luật · Quỹ tích: mạng thủy—đốc
+
+Ấn yêu cầu: Phản Ấn + Định Ấn · Cost: tai ù · SE: rối cân bằng
+
+Synergy: Hải Miễu
+
+Lore: Thống kê ‘con nước’.
+
+22) Hư Quang Mộng Ấn — Thiên–trung
+
+Cụm cảnh giới: Bán Thần
+
+Hệ: quang—mộng · Quỹ tích: ấn đường—thái âm
+
+Ấn yêu cầu: Mộng Ấn + Quang Ấn · Cost: trán mát · SE: mơ dở
+
+Synergy: Tịnh Lưu Ảnh
+
+Lore: Cầu nối ảo–thực.
+
+23) Kim Tàng Thần Hộ — Thiên–hạ/trung
+
+Cụm cảnh giới: Bán Thần
+
+Hệ: kim—hộ · Quỹ tích: bì phu—tấu lý—đốc
+
+Ấn yêu cầu: Kim Hộ Ấn + Pháp Kim Mộc · Cost: da nặng · SE: khó ‘nghe khí’
+
+Synergy: Sa Mạc; CGQ giáp
+
+Lore: Áo kim ‘ăn’ aether.
+
+24) Song Hàn Song Viêm Hợp Thức — Thiên–trung/thượng
+
+Cụm cảnh giới: Bán Thần
+
+Hệ: băng—hỏa (âm–dương) · Quỹ tích: nhâm↔đốc
+
+Ấn yêu cầu: Lưỡng Cực Ấn + Song Thạch · Cost: nóng lạnh xen kẽ · SE: sốc nhiệt/bỏng
+lạnh
+
+Synergy: Vành Nứt Tây Bắc
+
+Lore: Khoáng linh ‘thiên viêm hàn tủy’.
+
+ARCLUNE · ADDENDUM · CÔNG PHÁP (CONSOL) —
+v1.1 (Rebuild · Expanded)
+
+DocMeta: {"doc_id":"AR.TECH.CONGPHAP.CONSOL","version":"1.1","extends":"v1.0_Rebuild","anchors
+":["CP.ADD.MAP","CP.ADD.TA","CP.SCORE.SYN"]} Bổ sung 8 kỹ pháp (đặc thù từng Map + tà đạo) và
+nhúng "Synergy Score" (0–2) cho Map/Path, để chọn cảnh "爽文" mượt hơn. Giai giữ nguyên: Hoàng
+(KN/TC/ND) · Huyền (KĐ/ĐP/LH) · Địa (TN/TH/TT) · Thiên (Bán Thần).
+
+[[ANCHOR: CP.SCORE.SYN]] Synergy Score (0–2)
+
+0 = không hợp (chỉ dùng khi bí, hoặc làm "phản nghề"); 1 = hợp mức thường (dùng ổn); 2
+= khớp cảnh/bản đồ cực mạnh (đề xuất "đánh mặt"). Cách đọc: "Synergy (Map / Path)"
+liệt kê vài Map/Path tiêu biểu + điểm; Map/Path khác mặc định 0–1 tuỳ diễn.
+
+[[ANCHOR: CP.ADD.MAP]] I) Kỹ pháp đặc thù theo Map
+
+01) Kiếm Vân Lôi Truy — ĐG–hạ/trung (Kiếm Thiên)
+
+Cụm cảnh giới: Thánh Nhân→Thánh Hoàng
+
+Hệ: lôi–kiếm–vân · Quỹ tích: đốc→đởm→phế (kéo khí, dắt sấm)
+
+Ấn yêu cầu: Lôi Ấn + Ảnh Ấn · Cost: cẳng tay tê điện; phổi nóng nhẹ · SE: tê ngón nếu
+spam
+
+Synergy (Map): Kiếm Thiên=2; Tịnh Sơn Lâm=1
+
+Synergy (Path): Kiếm tu=2; Pháp tu=1
+
+Lore: Truyền rằng cầu sấm ở rìa Thần Quốc Kiếm từng nứt làm đôi, một kiếm khách bắt sét mà đúc ra
+chiêu này.
+
+Scene Hook: Trời mưa, sấm xa: main “chạm mây” — đường gươm kéo một vệt sét mảnh, chẻ cờ phe
+đối thủ, +hả hê đám đông.
+
+02) Triều Tức Thân Hành — HyG–trung (Hải Miễu)
+
+Cụm cảnh giới: Đúc Phách
+
+Hệ: thủy–thân pháp · Quỹ tích: thận→bàng quang→túc thiếu âm (bước triều)
+
+Ấn yêu cầu: Triều Ấn · Cost: hai ống chân mát, nhịp thở hoà sóng · SE: chóng mặt nhẹ nếu
+lệch nhịp triều
+
+Synergy (Map): Hải Miễu=2; Âm Quốc=1
+
+Synergy (Path): Thân pháp=2; Pháp tu=1
+
+Lore: Ngư dân truyền khẩu thành pháp, dựa nhịp con nước ‘đi giữa chỗ ướt’ không bắn tung tóe.
+
+Scene Hook: Đường bờ trơn, main “đi khô” xuyên đám đông, địch trượt chân; +tò mò, +hâm mộ khán
+giả.
+
+03) Sa Ẩn Kim Phách — HyG–thượng (Sa Mạc Vô Tận)
+
+Cụm cảnh giới: Luyện Hồn
+
+Hệ: sa–kim–ẩn · Quỹ tích: tỳ→vị→bì phu (vùi—lộ)
+
+Ấn yêu cầu: Kim Ấn + Ẩn Ấn · Cost: da nặng, hô hấp khô · SE: mất linh mẫn xúc giác tạm
+
+Synergy (Map): Sa Mạc Vô Tận=2; CGQ=1
+
+Synergy (Path): Thể tu=2; Trận tu=1
+
+Lore: Từ thói quen chôn người để tránh bão cát, thợ giáp cải biên thành “ẩn trong sa”.
+
+Scene Hook: Main nói xong một câu chọc tức, lún mất nửa bắp chân, kẻ địch đâm hụt; +phẫn nộ, +hả
+hê đám vây xem.
+
+04) Nguyệt Khuyết Chiếu Hồn — HyG–thượng (Âm Quốc)
+
+Cụm cảnh giới: Luyện Hồn
+
+Hệ: nguyệt–hồn · Quỹ tích: ấn đường→tâm cung (cung khuyết)
+
+Ấn yêu cầu: Nguyệt Ấn · Cost: trán lạnh; tâm phẳng · SE: mơ sáng quá mức, đau đầu nhẹ
+
+Synergy (Map): Âm Quốc=2; U Giới=1
+
+Synergy (Path): Hồn tu=2; Pháp tu=1
+
+Lore: Khắc trên tấm gương vỡ ở mộ sâu: ‘trăng khuyết soi người, phần nào sáng phần ấy đau’.
+
+Scene Hook: Hỏi cung giữa chợ: main không đánh, chỉ nhìn; đối thủ tự nói hớ — crowd +tò mò +sợ hãi.
+
+05) Mộc Tức Hấp Linh — HG–thượng (Tịnh Sơn Lâm)
+
+Cụm cảnh giới: Ngưng Đan
+
+Hệ: mộc–sinh–tức · Quỹ tích: phế→đan điền→can (hít xanh)
+
+Ấn yêu cầu: Sinh Ấn · Cost: ngực mát; mũi như ngửi lá tươi · SE: buồn ngủ nhẹ
+
+Synergy (Map): Tịnh Sơn Lâm=2; TTLÂ=1
+
+Synergy (Path): Pháp tu=1; Thể tu=1
+
+Lore: Một đạo sĩ ẩn cư dùng cách thở ‘ăn lá’ mà khỏi bệnh hàn từ trong xương.
+
+Scene Hook: Giữa rừng, main hít một hơi, khí mặt hiền; crowd tự an tâm — +tò mò, +tôn kính nhẹ.
+
+06) Cơ Biểu Ứng Chấn — HyG–trung (Cơ Giới Quốc)
+
+Cụm cảnh giới: Đúc Phách
+
+Hệ: kim–trận–cơ · Quỹ tích: đốc→tam tiêu→ngoại mạch (đồng bộ rung)
+
+Ấn yêu cầu: Cơ Ấn + Trận Ấn · Cost: da nổi gai, xương sườn rung đều · SE: tê tay nếu
+‘chấn’ quá lâu
+
+Synergy (Map): Cơ Giới Quốc=2; Sa Mạc Vô Tận=1
+
+Synergy (Path): Trận tu=2; Cơ khí đạo=2
+
+Lore: Do tổ thợ CGQ chế để ‘đỡ giật’ khi vận hành giáp, sau được tu sĩ mượn dùng.
+
+Scene Hook: Main chạm vai — giáp đối phương ‘lệch pha’, tự khóa khớp; +kinh ngạc, +hả hê đám thợ.
+
+[[ANCHOR: CP.ADD.TA]] II) Tà đạo — Thế lực & kỹ pháp
+
+Ba thế lực tà đạo tiêu điểm (dùng làm mồi xung đột). Mỗi phái kèm 1 kỹ pháp “đinh”.
+
+• Vong Bì Hội — tu ‘da’ để đổi mệnh; ép trẻ mồ côi/thiếu nữ luyện phần da đến cảnh giới
+rồi lột rèn giáp. Một thanh ‘Danh Kiếm Hoạ Bì’ từng phệ chủ của họ.
+
+07) Thiểm Bì Hoán Hình — HyG–thượng (tà)
+
+Cụm cảnh giới: Luyện Hồn
+
+Hệ: mộc–da–hồn · Quỹ tích: bì phu→tấu lý→ấn đường
+
+Ấn yêu cầu: Ngoại Hóa Ấn + Bì Mộc · Cost: đau da lan; ngứa tủy · SE: nứt mạch nếu vượt
+giai
+
+Synergy (Map): TTLÂ=1; đô hội=1
+
+Synergy (Path): Hồn tu=1; Sát thủ=1
+
+Lore: Bí pháp ‘lướt da’ để đổi hơi thở/diện mạo trong 7 khắc — lạm dụng sẽ ‘rụng da’ từng mảng.
+
+Scene Hook: Main vạch trần kẻ mạo danh: xé một góc ‘da’, mùi tanh bốc — crowd +kinh tởm +sợ, địch
+vỡ trận.
+
+• Huyết Ông Giáo — nuôi bầy ‘ông máu’; tế máu trẻ để nuôi chúa tổ; kết tổ dưới mộ lạnh.
+
+08) Huyết Ổ Phân Tức — ĐG–hạ (tà)
+
+Cụm cảnh giới: Thánh Nhân
+
+Hệ: huyết–ôn trùng · Quỹ tích: tâm→can→tỳ (tách bầy)
+
+Ấn yêu cầu: Huyết Ấn + Ổ Ấn · Cost: ngứa mạch; tim đập nhanh · SE: nhiễm trùng linh khí
+
+Synergy (Map): Âm Quốc=1; U Giới=1
+
+Synergy (Path): Pháp tu=1; Độc tu=2
+
+Lore: Tổ sư từng ‘thả bầy’ phá vỡ vòng vây quân hộ thành — cả hai phe đều khiếp sợ.
+
+Scene Hook: Phố đông; main dùng tịnh pháp khóa bầy — phản công đúng khoảnh khắc bầy ‘rút ổ’;
++thán phục.
+
+• Táng Cốt Lô — luyện xương trong lò muối nóng; dùng tro cốt làm ‘mộc’ luyện giáp phù.
+
+09) Táng Cốt Viêm Lô — ĐG–trung (tà)
+
+Cụm cảnh giới: Thánh Hoàng
+
+Hệ: hỏa–cốt · Quỹ tích: đốc→tủy sống→đan điền (đốt—kết)
+
+Ấn yêu cầu: Viêm Ấn + Cốt Ấn · Cost: xương rát; ngực khét · SE: giòn xương tạm thời
+
+Synergy (Map): Sa Mạc Vô Tận=1; CGQ=1
+
+Synergy (Path): Thể tu=2; Luyện khí=1
+
+Lore: Đồn rằng lò của họ cháy bằng ‘tro người thiện’, đồ ra lò bền… nhưng bị nguyền.
+
+Scene Hook: Đấu trường; main gõ một nhịp ‘lệch lò’ cho địch — găng tay nứt, crowd +sướng +ghê sợ.
+
+Ghi chú dùng khi viết:
+
+• Dùng kỹ pháp có Synergy=2 với Map/Path của cảnh để tối đa ‘爽文’: tốc độ áp đảo/màn
+khoe kỹ vừa đủ. • Các kỹ pháp tà đạo luôn kèm cái giá (SE) — show qua chi tiết cơ
+thể/mùi/âm thanh thay vì nói.”
+
+ARCLUNE · ADDENDUM · CÔNG PHÁP (CONSOL) —
+v1.2 ANNEX (Thiên giai · Map Exclusives)
+
+DocMeta: {"doc_id":"AR.TECH.CONGPHAP.CONSOL.ANNEX","version":"1.2","extends":"v1.1_Rebuild_Ex
+panded","anchors":["CP.ADD.THIEN.MAP","CP.SCORE.SYN"],"note":"Thiên giai độc quyền theo Map;
+Synergy=2."} Ghi chú: Các kỹ pháp dưới đây mặc định Synergy (Map) = 2 tại Map ghi danh, dùng để
+dựng cảnh '爽文' áp đảo. Path đi kèm cũng được cân theo 0–2 (ưu tiên 2).
+
+[[ANCHOR: CP.ADD.THIEN.MAP]] I) Thiên giai — kỹ pháp độc
+quyền theo Map
+
+01) Lôi Tâm Kiếm Giáng — Thiên–trung/thượng (độc quyền Kiếm Thiên)
+
+Cụm cảnh giới: Bán Thần
+
+Hệ: lôi–kiếm · Quỹ tích: đốc→đởm→phế (tụ lôi nơi lòng kiếm)
+
+Ấn yêu cầu: Lôi Ấn + Ảnh Ấn + Kiếm Ấn · Cost: vi-trích TL/PDU; cẳng tay tê điện · SE: tê
+liệt ngón tạm thời, khó hồi khí mũi kiếm
+
+Synergy (Map): Kiếm Thiên=2
+
+Synergy (Path): Kiếm tu=2; Pháp tu=1
+
+Lore: Thệ ước lôi đình cổ của cụm Thần Quốc Kiếm — một đời kiếm chủ dựng gươm giữa bão mà đúc
+chiêu này.
+
+Scene Hook: Trời nổi sấm: main chém ngang — sấm bị dắt thành ‘sợi’ bọc lưỡi; cờ phe địch rách, crowd
++hò hét +hả hê.
+
+02) Triều Vương Đảo Cực — Thiên–thượng (độc quyền Hải Miễu)
+
+Cụm cảnh giới: Bán Thần
+
+Hệ: thủy–luật · Quỹ tích: mạng thủy—đốc (đảo nhịp con nước)
+
+Ấn yêu cầu: Triều Ấn + Phản Ấn + Định Ấn · Cost: tai ù; bụng cuộn theo sóng · SE: say
+sóng—chóng mặt kéo dài nếu nền yếu
+
+Synergy (Map): Hải Miễu=2
+
+Synergy (Path): Thân pháp=2; Pháp tu=2
+
+Lore: Biên niên hải miếu chép: ‘người biết đảo cực, nước sẽ nghe’ — nhưng kẻ yếu thì nước dìm trước.
+
+Scene Hook: Bến cá đông: main ‘đổi chiều thủy mạch’ — thuyền địch xoay ngang; crowd +tò mò +kinh
+hô, địch mất thăng bằng.
+
+03) Tịch Mộc Thần Tức — Thiên–trung (độc quyền Tịnh Sơn Lâm)
+
+Cụm cảnh giới: Bán Thần
+
+Hệ: mộc–sinh–tịnh · Quỹ tích: phế→đan điền→can (hít xanh qua lâm mạch)
+
+Ấn yêu cầu: Tịch Ấn + Sinh Ấn · Cost: ngực mát; da thoảng mùi lá · SE: buồn ngủ sâu, có
+thể ‘ngủ đứng’ một khắc
+
+Synergy (Map): Tịnh Sơn Lâm=2
+
+Synergy (Path): Pháp tu=2; Hồn tu=1
+
+Lore: Từ một am cổ: thở cùng rừng, mượn lâm mạch bồi chân khí; cấm dùng ở rừng ‘ố bẩn’.
+
+Scene Hook: Giữa rừng tranh đấu: main hít một hơi, sương lá tụ quanh vai — đối thủ ra tay mà thấy…
+‘không nỡ’.
+
+04) Hoang Sa Kim Trận Quy — Thiên–trung (độc quyền Sa Mạc Vô Tận)
+
+Cụm cảnh giới: Bán Thần
+
+Hệ: kim–thổ–phong · Quỹ tích: đốc→ba tiêu→ngoại mạch (vẽ trận trên cát)
+
+Ấn yêu cầu: Kim Ấn + Sa Ấn + Trận Ấn · Cost: da khô rạn; cổ họng cháy · SE: mất nước
+nhanh; mắt rát gió
+
+Synergy (Map): Sa Mạc Vô Tận=2
+
+Synergy (Path): Trận tu=2; Thể tu=1
+
+Lore: Đạo trận của các đoàn vận tiêu: ‘vẽ một quỹ, gió nghe theo’ — thất truyền vì nhiều người chết
+khát khi luyện.
+
+Scene Hook: Bụi mù mịt: main gõ ba nhịp, cát tự cuộn thành miệng ‘quy’; địch bước nhầm — bị cát ‘giữ
+chân’.
+
+05) Cơ Luân Hợp Tấu — Thiên–trung (độc quyền Cơ Giới Quốc)
+
+Cụm cảnh giới: Bán Thần
+
+Hệ: kim–trận–cơ–aether · Quỹ tích: đốc→tam tiêu→ngoại mạch (đồng bộ dao động giáp)
+
+Ấn yêu cầu: Cơ Ấn + Luân Ấn · Cost: da nổi gai; xương ngực rung theo nhịp máy · SE: lệch
+pha sẽ ‘khóa khớp’ bản thân
+
+Synergy (Map): Cơ Giới Quốc=2
+
+Synergy (Path): Trận tu=2; Cơ khí đạo=2
+
+Lore: Kết tinh của ‘dàn nhạc máy’ CGQ: khi máy và người cùng một nhịp, giáp trở thành ‘thân ngoài’.
+
+Scene Hook: Xưởng ồn ào: main chạm cổ tay — nhịp máy và nhịp thở khớp; giáp tăng lực, địch giật
+mình; crowd thợ +hò reo.
+
+06) Nguyệt Mệnh Quy Ảnh — Thiên–thượng (độc quyền Âm Quốc)
+
+Cụm cảnh giới: Bán Thần
+
+Hệ: nguyệt–hồn–nhân quả · Quỹ tích: ấn đường→tâm cung→mệnh môn (quy ảnh)
+
+Ấn yêu cầu: Mệnh Ấn + Nguyệt Ấn + Ảnh Ấn · Cost: trán lạnh; tim chậm như chuông đêm
+· SE: dội nhân quả; mộng sáng đến khó ngủ lại
+
+Synergy (Map): Âm Quốc=2
+
+Synergy (Path): Hồn tu=2; Pháp tu=1
+
+Lore: Truyền từ gương tế nguyệt: ‘mượn bóng mà đổi mệnh—một đêm thôi, rồi trả’.
+
+Scene Hook: Vấn cung giữa mộ: main gọi ‘bóng mệnh’ chiếu lên tường; đối thủ tự nhìn thấy hậu
+quả—đánh rơi khí thế.
+
+ARCLUNE · ADDENDUM · CÔNG PHÁP (CONSOL) —
+v1.3 ANNEX (U Giới + Thần Vực · Thiên mệnh)
+
+DocMeta: {"doc_id":"AR.TECH.CONGPHAP.CONSOL.ANNEX","version":"1.3","extends":"v1.2_ANNEX_Thi
+en_Map_Exclusives", "anchors":["CP.THIEN.UGIOI","CP.THIEN.THANVUC","CP.THIEN.THIENMENH","CAS
+T.THIENMENH.ANTI2"]} Bổ sung 2 kỹ pháp Thiên giai (độc quyền Map) cho U Giới & Thần Vực
+(Synergy=2); giới thiệu ma công Thiên mệnh (không/thời gian); và thẻ nhân vật Thiên mệnh Đại Phản
+Phái mới (địa bàn Kiếm Thiên).
+
+[[ANCHOR: CP.THIEN.UGIOI]] I) Thiên giai — U Giới (Synergy=2)
+
+01) U Minh Thập Ảnh Chưởng — Thiên–trung (độc quyền U Giới)
+
+Cụm cảnh giới: Bán Thần
+
+Hệ: u–hồn–tử · Quỹ tích: ấn đường→tâm cung→mệnh môn (mười ấn—mười bóng)
+
+Ấn yêu cầu: U Ấn + Ảnh Ấn · Cost: trán lạnh; tim trầm xuống · SE: đầu ê ẩm nếu dồn đủ
+10 ấn
+
+Synergy (Map): U Giới=2
+
+Synergy (Path): Hồn tu=2; Sát đạo=2
+
+Lore: Tuyệt kỹ Minh Quân đời đầu: mỗi ‘ảnh’ là một ấn quyết tử vong; đủ mười thì thân–hồn đều tuyệt.
+
+Scene Hook: Khói âm phủ lên; mười bóng tay chồng khít ngực địch; tiếng kèn đưa ma khởi — crowd
+câm lặng.
+
+[[ANCHOR: CP.THIEN.THANVUC]] II) Thiên giai — Thần Vực
+(Synergy=2)
+
+02) Thần Quyết Vạn Lực Ấn — Thiên–thượng (độc quyền Thần Vực)
+
+Cụm cảnh giới: Bán Thần
+
+Hệ: thần–lực–ấn · Quỹ tích: đốc→đởm→ngoại mạch (khắc vạn ấn)
+
+Ấn yêu cầu: Thần Ấn (liên tiếp) · Cost: hao TL/PDU theo cấp số · SE: cánh tay cứng đờ; khó
+hô hấp sâu
+
+Synergy (Map): Thần Vực=2
+
+Synergy (Path): Lực đạo=2; Thần thuật=2
+
+Lore: Mảnh ‘Quyết thư Thần đạo’: tích đủ vạn ấn mở ‘Vạn Lực Hợp Nhất’, chấn áp toàn trường.
+
+Scene Hook: Bầu trời nứt, thần quang rọi thẳng — đối thủ quỳ rạp như bị vạn núi đè.
+
+[[ANCHOR: CP.THIEN.THIENMENH]] III) Thiên mệnh ma công
+(Không/Thời gian)
+
+A) Thiên Mệnh Phệ Nguyên Kinh — (nhắc ngắn) dùng ‘Thiên Mệnh Ma Bình’ thôn phệ
+máu, thịt, linh hồn và khí vận, hoá thành Phệ Nguyên Lực để nâng cấp/đột bộc. Synergy
+Map: +1 Âm Quốc, +1 U Giới; Path: Ma tu=2, Hồn tu=1.
+
+B) Thiên Mệnh Lậu Khắc Ma Kinh — (Không/Thời) · Thiên giai
+
+Pháp bảo lõi: Lậu Khắc Ma Sa (đồng hồ cát đen); cát là ‘thời sa’, khung là ‘không gông’.
+
+Hiệu ứng: ① Định Thì (đóng băng vi–khoảnh khắc quanh mục tiêu; dùng để ‘cướp nhịp’),
+② Vị Dịch (dịch vị trí nhỏ trong không), ③ Trích Ảnh (rút ‘bóng thời gian’ của một chiêu
+vừa thấy để tái lập 1 lần).
+
+Cost: vi–trích TL/PDU + ‘thời tổn’ (tóc bạc, trí nhớ sứt mẻ nếu lạm). SE: dội ‘thời tuyến’:
+chóng mặt, lẫn mốc thời gian, mất cảm giác nóng–lạnh tạm.
+
+Synergy (Map): Kiếm Thiên=2 (kiếm đạo dễ ‘bắt nhịp’), Âm Quốc=1. Synergy (Path):
+Kiếm tu=2; Trận tu=1; Hồn tu=1.
+
+Khắc chế/Khắc bị: bị khóa bởi Định Tâm/Định Niệm, Tịnh Liên Hộ Thần, Nguyệt Mệnh Quy Ảnh. Khắc
+chế các đối thủ phụ thuộc ‘nhịp’ (ví dụ giáp CGQ lệch pha).
+
+Lore: Chép từ một tháp đồng thờ ‘giờ rỉ’; người đầu luyện mất tên trong gia phả — chỉ còn ‘kẻ đi lệch
+mùa’.
+
+Scene hook: Main vừa ngã, sa đen đổ ngược — khoảng khắc thu lại; đòn buốt gáy của địch biến thành
+‘lỡ tay’. Crowd nổ +sốc.
+
+[[ANCHOR: CAST.THIENMENH.ANTI2]] IV) Thiên mệnh Đại Phản
+Phái (2) — Kiếm Thiên
+
+Họ tên: Kiếm Lăng Hư Trường Dạ — ngoại hiệu: ‘Trường Dạ Kiếm Chủ’.
+
+Địa bàn: Kiếm Thiên (cụm Thần Quốc Kiếm). Vị cách: Thiên mệnh Đại Phản Phái (khác).
+
+Tính cách: kiêu ngạo, lạnh, giữ lời; ẩn nhẫn lâu, thích đỉnh đấu đỉnh, ‘đánh kẻ thắng’ để
+lấy danh lớn nhất.
+
+Quy ước: Kiếm Ước — không can thiệp ‘khí vận chi chiến’ giữa main và đối thủ mang
+Thiên Mệnh Phệ Nguyên Kinh; chỉ thách người thắng.
+
+Kỹ pháp chữ ký: Lôi Tâm Kiếm Giáng (Thiên–trung/thượng, Map: Kiếm Thiên=2) + Thiên
+Mệnh Lậu Khắc Ma Kinh (mức ‘vị dịch’ tinh vi để kiếm không sai nhịp).
+
+Động cơ: ‘Danh chỉ có một đỉnh’. Hắn tin: danh phải đo bằng việc hạ kẻ vừa đội thiên
+mệnh — ‘khi đó, thiên mệnh sẽ phải gọi tên ta’.
+
+Hook mở truyện: bóng kiếm dựng trên đài mưa; hắn quay lưng nói một câu: ‘Hai ngươi phân thắng đi.
+Kẻ sống bước lên đài — ta mượn danh của hắn.’ Crowd +sợ +phẫn nộ +tò mò.
+
+ARCLUNE · ADDENDUM · CÔNG PHÁP
+(CONSOL) — WEAPONRY
+
+DocMeta: {"anchor":"WEAP.ODD8","title":"8 Đại Dị Năng Vũ Khí", "note":"Nhúng đầy
+đủ bộ vũ khí dị năng cấp thần vào CONSOL v1.4 (giữ nguyên toàn bộ nội dung trước
+đó)."}
+
+Mục này được thêm vào sau phần ANNEX để tiện tra khi dàn cảnh.
+• Synergy Map/Path dùng thang 0–2 như phần Công Pháp.
+• Vũ khí cấp thần có ràng buộc nhân quả: cẩn trọng khi đưa vào đô hội.
+
+ARCLUNE · ADDENDUM · 8 ĐẠI DỊ NĂNG VŨ KHÍ — v1.0
+
+DocMeta: {"doc_id":"AR.WEAPON.ODD8","version":"1.0","anchors":["ODD8.SET","ODD8.1","ODD8.2","
+ODD8.3","ODD8.4","ODD8.5","ODD8.6","ODD8.7","ODD8.8"], "synergy_scale":"0–2","note":"Nguyên
+liệu cấp thần. Phần lớn bị luật nhân quả theo dõi; dùng sai dễ phệ chủ."}
+
+I. Bát Cốt Đoản — Đoản đao (Set · 8 chiếc)
+
+Khởi nguyên: Đúc từ 8 xương sườn của một vị Hậu Thiên Thần đã tàn danh.
+
+Vật liệu: Mỗi chiếc là một khúc sườn; sống đao là tủy hóa kim.
+
+Đặc tính: Mỗi đoản giữ một ‘cơ quan’/‘mạch’: Tâm (nhiệt sát), Phế (phong tức), Can
+(độc—giải), Tỳ (trầm trọng), Thận (ẩn tức), Đởm (sợ—phách), Vị (thực linh), Tam Tiêu
+(khuếch tán). Có thể ‘xâu chuỗi’ thành một tuyệt sát một khắc.
+
+Yếu quyết gắn bó (Ấn): Cần Chỉ Ấn + Tâm Ấn; ai thiếu ‘tâm cố’ sẽ bị ‘đao ăn lại’.
+
+Cost: Uống huyết nóng để mở ‘nhịp’ — mỗi lần dùng hao khí huyết 1–2 thành. · SE: Lệch
+tâm → run tay, đao quay đầu ‘tự ăn’.
+
+Synergy (Map): Kiếm Thiên=1; Âm Quốc=1; đô hội=1
+
+Synergy (Path): Sát đạo=2; Thân thủ=1
+
+Lore: Tương truyền là ‘nhạc cụ’ của một đội đồ tể thần. Khi diễn đúng thứ tự, tám nốt thành một bản
+chém.
+
+Hook: Cảnh chợ hẹp: xoay cổ tay, tám đoản thoát tay theo chuỗi — địch chỉ thấy dao ‘đến trước gió’.
+
+II. Thập Tự Giá Huyết Tế — Trượng/Thập tự (Kết giới di động)
+
+Khởi nguyên: Rèn từ xương sống và khớp đốt của một Hậu Thiên Thần từng tu Huyết đạo.
+
+Vật liệu: Cột sống (trục), mấu gai (đinh), tủy hóa thành ‘mạch hút’.
+
+Đặc tính: Dựng thành thập tự, mở Huyết Kết, thôn phệ máu—thịt—oán; biến thành ‘huyết
+quyển’ đè tâm.
+
+Yếu quyết gắn bó (Ấn): Huyết Ấn + Định Ấn. Kẻ dùng phải giữ ‘giới’, không thì ‘kết’ ăn
+ngược.
+
+Cost: Đốt máu (tối đa 3 thành) mở vòng; nạp VNT để cố định kết giới. · SE: Chóng mặt, tim
+loạn; nhân quả ‘hút ngược’ nếu giết lầm người vô tội.
+
+Synergy (Map): Âm Quốc=2; U Giới=2; đô hội=0
+
+Synergy (Path): Huyết đạo=2; Trận tu=1
+
+Lore: Một giáo phái từng dựng nó giữa ngõ tối — sáng ra thấy bờ tường ‘đã no’.
+
+Hook: Đối thủ đông: dựng thập tự, vòng huyết tăng; crowd chạy tán — +sợ hãi, +hoảng loạn cho UI hệ
+thống.
+
+III. Thanh Dao Trảm Danh — Đao bản rộng
+
+Khởi nguyên: Phôi lấy từ xương vai một thần bị ‘xóa danh’ ở Miếu Danh.
+
+Vật liệu: Bản đao màu hồ xanh; rìa mỏng như lá mía.
+
+Đặc tính: Chém ‘tên’, cắt tạm quan hệ nhân quả của mục tiêu với một vật/luật trong 3
+khắc.
+
+Yếu quyết gắn bó (Ấn): Danh Ấn (biết tên thật) + Trấn Danh Ấn.
+
+Cost: Hao ‘danh khí’ người dùng; cần lễ rửa bằng Danh Lộ. · SE: Ớn lạnh gáy; nếu ‘gọi sai
+tên’ đao sẽ không nghe, phản lực bật ngược.
+
+Synergy (Map): Miếu Danh=2; Kiếm Thiên=1
+
+Synergy (Path): Kiếm/Đao tu=2; Pháp tu=1
+
+Lore: Được treo trong miếu đến mục rữa; người rút nó phải trả ‘một tên’ mình từng mang.
+
+Hook: Đấu trí: main gọi đúng tên bí mật của địch, chặt ‘duyên’ với pháp khí hắn — khoảnh khắc ‘trần
+truồng’.
+
+IV. Không Mâu Liêm — Móc câu + xích (dị không)
+
+Khởi nguyên: Móc rèn từ nanh, xích chuỗi từ đốt sống của một Tiên Thiên Thần chân đốt
+(Hư Không Trùng).
+
+Vật liệu: Móc ăn ‘khe không’, xích bò qua ‘lằn thời’.
+
+Đặc tính: Kéo điểm yếu ở ‘bản đồ khác’ của cùng cơ thể; xuyên giáp; giật về hiện tại.
+
+Yếu quyết gắn bó (Ấn): Không Ấn + Thì Ấn.
+
+Cost: Hao TL/PDU; để lại ‘sẹo không’ — địa hình quanh điểm kéo rạn nứt. · SE: Lạc tuyến
+thời gian ngắn; say không—thời, mắt mờ ‘song ảnh’.
+
+Synergy (Map): Kiếm Thiên=2; U Giới=1
+
+Synergy (Path): Kiếm tu=2; Sát đạo=1; Trận tu=1
+
+Lore: Xích từng buộc ‘chuông rỗng’; mỗi kéo vang như tiếng cắn của hư không.
+
+Hook: Đối thủ phòng kín: ném móc vào ‘bóng’ trên tường — kẻ địch bị giật khỏi chỗ ẩn y như cá mắc
+câu.
+
+V. Song Bì Chướng — Áo/Choàng (bảo cụ phòng hộ)
+
+Khởi nguyên: May từ da của hai Tiên Thiên Thần (một ‘tĩnh’, một ‘động’).
+
+Vật liệu: Mặt ngoài trơn như gương, mặt trong như rừng vân tay.
+
+Đặc tính: Trượt luật nhẹ (giảm 3 thành sát thương trong 7 khắc), mô phỏng hơi thở người
+khác.
+
+Yếu quyết gắn bó (Ấn): Bì Ấn + Ẩn Ấn.
+
+Cost: Ăn ‘da cũ’ của chủ để ‘nhớ mùi’; cần hiến tế định kỳ. · SE: Ngứa tủy; nếu mặc quá lâu,
+áo ‘chọn’ hơi thở mới — chủ cũ bị ‘quên’.
+
+Synergy (Map): đô hội=2; TTLÂ=1
+
+Synergy (Path): Ẩn hành=2; Hộ thể=1
+
+Lore: Sản phẩm ‘Vong Bì Hội’ thời hoàng kim; áo này thuộc hàng ‘chọn chủ’.
+
+Hook: Điệp vụ: đi giữa đám đông, áo đổi ‘mùi’ thành lính gác — crowd chỉ thấy ‘người quen’.
+
+VI. Huyết Bì Kết Thư — Thư chú (kết luật)
+
+Khởi nguyên: Bìa là da thuộc; trang là nhiều lớp thịt phẳng; mực là máu của một Hậu Thiên
+Thần tu Kết thuật.
+
+Vật liệu: Trang sống, chữ mọc thêm khi cho uống máu ‘đúng danh’.
+
+Đặc tính: Ghi—Khóa—Sang (copy) một kỹ pháp nhìn thấy (1 lần/đêm); đọc sai ‘luật’ dễ mất
+trí đoạn.
+
+Yếu quyết gắn bó (Ấn): Định Ấn + Danh Ấn.
+
+Cost: Uống HNT/TNT để ‘giữ chữ’; hiến một giọt ‘danh huyết’. · SE: Đau đầu; rơi mất một ký
+ức cũ để chứa ‘chữ mới’.
+
+Synergy (Map): Âm Quốc=2; U Giới=1
+
+Synergy (Path): Pháp tu=2; Hồn tu=1
+
+Lore: Người viết đầu tiên được gọi ‘Thư Nhân’; ngày cuối cùng hắn không nhớ tên mình.
+
+Hook: Main lật trang, chữ tự mọc thành bộ pháp kẻ địch vừa dùng — copy ngay một lần lật kèo.
+
+VII. Thần Ngẫu — Khôi lỗi (thần xác luyện chế)
+
+Khởi nguyên: Xác của một thần bị rút điển — đóng ấn tạo ‘ý giả’.
+
+Vật liệu: Khớp nối bằng xương thần, ruột thay bằng phù tuyến.
+
+Đặc tính: Cường chế mang ‘một mảnh’ thần lực: lao—đỡ—giữ; nghe lệnh bằng Ấn.
+
+Yếu quyết gắn bó (Ấn): Ngẫu Ấn + Định Ấn.
+
+Cost: Nạp BTN/ThN; chủ ‘chia’ 1–2 thành thần lực để khởi động. · SE: Phệ chủ nếu lệnh mâu
+thuẫn; bùng ‘ý cũ’ của thần, loạn trường.
+
+Synergy (Map): CGQ=2; Sa Mạc=1
+
+Synergy (Path): Lực đạo=2; Trận tu=1
+
+Lore: Một xưởng từng nuôi ba ‘ngẫu’ canh cổng; đêm mưa, cả ba quay đầu cùng lúc nhìn về bắc.
+
+Hook: Vây bắt: thả ngẫu chắn ngõ, main nói ‘giữ’ — cả con phố bỗng thành mê cung cơ bắp.
+
+VIII. Huyễn Nhãn Mộng Tỉnh Cảnh — Gương (huyễn/mộng)
+
+Khởi nguyên: Mặt gương từ màng thủy tinh thể của một Hậu Thiên Thần tu Huyễn đạo;
+khung từ xương của một thần tu Mộng đạo.
+
+Vật liệu: Bề mặt nuốt ánh; soi ra ‘danh thật’ và ‘giấc mơ đang mang’.
+
+Đặc tính: Bật ‘Mộng Lộ’: mở lối đi ngắn qua cõi mộng; phản ‘đòn đã thấy’ một lần.
+
+Yếu quyết gắn bó (Ấn): Ảnh Ấn + Mộng Ấn.
+
+Cost: Nạp LH (linh hồn lực) qua Tịnh/Âm Đan; dễ rò ký ức người soi. · SE: Mộng váng; ngủ
+mệt sau dùng; ‘lẫn mộng’ nếu ở U lâu.
+
+Synergy (Map): Âm Quốc=2; U Giới=2
+
+Synergy (Path): Hồn tu=2; Pháp tu=1
+
+Lore: Gương từng là ‘mắt’ của một vị thần canh mộng; mở đúng góc sẽ thấy ‘đêm cũ’.
+
+Hook: Đàm phán nguy: đặt gương giữa bàn — đối thủ tự thấy ‘giấc thua’ của mình, đổi thái độ tức khắc.
+
+Cảnh báo luật/nhân quả:
+
+• Đa số khí cụ trên để lại ‘vết rạch luật’ ở hiện trường; thần chức/địa thần có thể lần vết. • Dùng trong
+đô hội dễ tạo dị tượng — nên bọc bằng Trận Ẩn Danh. • Vũ khí mang ‘danh’ lớn: cho ăn danh để ‘nuôi
+ngoan’, không thì sẽ ‘phệ chủ’.
+
+ARCLUNE · ADDENDUM · CÔNG PHÁP
+(CONSOL) — NHÃN ĐẠO
+
+DocMeta: {"anchor":"NHAN","title":"Nhãn Đạo (Eye Arts)","note":"Nhúng đầy đủ
+addendum NHÃN ĐẠO v1.0 vào sau WEAPONRY; giữ nguyên toàn bộ nội dung trước
+đó."}
+
+Phần này gồm: cơ chế Huyết Mạch, ngân sách buff 12 thành/nhãn, 10 loại Nhãn + kỹ
+năng riêng, tổ chức săn–mổ–gắn, tỷ suất xuất hiện, và quy trình thay huyết mạch an
+toàn.
+
+ARCLUNE · ADDENDUM · NHÃN ĐẠO — v1.0
+
+DocMeta: {"doc_id":"AR.BIO.EYE","version":"1.0",
+"anchors":["NHAN.SET","NHAN.BAL","NHAN.TYPES","NHAN.ORG","NHAN.RATE","NHAN.THEFT"],
+"rules":"Nhãn không xung đột Lò Hạch/Thể Chất; yêu cầu Huyết Mạch tương ứng; có thể bị cướp
+(mổ/gắn + tế huyết). Tổng buff/nhãn = 12 thành (≈120%)."}
+
+[[ANCHOR: NHAN.SET]] I) Khởi nguyên & cơ chế
+
+• Khởi nguyên huyết mạch: ‘Nhãn’ là dị cơ quan tinh thần–sinh học hình thành do dòng
+Huyết Mạch cư trú lâu dài gần đạo tương ứng (nguyệt, lôi, không, thời...). Không đồng nhất
+với Thể Chất: thể chất là nền, nhãn là khóa chuyên.
+
+• Thức tỉnh: kích bởi địa hình tương hợp, ấn nhẹ, hoặc đột biến cảm ngộ. Trẻ sinh ra đôi khi
+có ‘mục quang’ dị sắc (dị tượng sinh).
+
+• Không xung đột: nhãn cộng hưởng Lò Hạch/Thể Chất nhưng không thay thế. Nhãn có thể
+bị cướp; thể chất thì hòa vào thân, không cướp được.
+
+[[ANCHOR: NHAN.BAL]] II) Ngân sách buff (nội bộ) — mỗi nhãn ≈
+12 thành
+
+• Khung buff: Sát thương tương quan +2–4 thành; Tầm nhìn +2–4; Tốc độ đọc +1–3; Tuổi
+thọ +1–3; Phản ứng +1–3. Tổng mỗi nhãn ≈ 12 thành. Khi viết truyện chỉ mô tả ‘cảm giác’,
+tránh hiển thị %.
+
+[[ANCHOR: NHAN.TYPES]] III) Danh mục Nhãn (10 mẫu)
+
+Nguyệt Kính Nhãn
+
+Huyết mạch: Chi nguyệt âm; huyết ‘lạnh’ giàu tịnh tính.
+
+Kích thức tỉnh: đêm rằm trước gương; Ảnh/Nguyệt Ấn nhẹ.
+
+Phân bổ buff (≈12 thành): Dmg (âm/nguyệt) +3; Tầm nhìn +3; Đọc +2; Thọ +2; Phản ứng
++2 = 12
+
+Kỹ năng riêng: ‘Minh Ảnh’: soi ‘bóng mệnh’ — lộ đồ vật/ý đồ bị che 3 khắc.
+
+Cost/SE: nạp Âm Đan · nhức thái dương khi gặp ánh dương trực diện
+
+Synergy (Map): Âm Quốc=2; U Giới=1
+
+Synergy (Path): Hồn tu=2; Pháp tu=1
+
+Lore: Gác đền nguyệt truyền một mắt ‘thấy lời chưa nói’.
+
+Scene hook: Đàm phán: mở kính — đối thủ tự thấy ‘bóng phản bội’ của mình.
+
+Lôi Minh Nhãn
+
+Huyết mạch: Huyết lôi; tim đập nhanh ‘theo mây’.
+
+Kích thức tỉnh: đứng bão; Lôi Ấn.
+
+Phân bổ buff (≈12 thành): Dmg (lôi) +4; Tầm nhìn +2; Đọc +1; Thọ +2; Phản ứng +3 = 12
+
+Kỹ năng riêng: ‘Chỉ Tốc’: tăng nhịp thần kinh — phản ứng quá người thường 1–2 nhịp.
+
+Cost/SE: vi-trích PDU · tay run nhẹ sau dùng dài
+
+Synergy (Map): Kiếm Thiên=2; Hải Miễu bão=1
+
+Synergy (Path): Kiếm/Thân pháp=2
+
+Lore: Tộc ghi ‘đã bị sét gọi tên’ ba đời liền.
+
+Scene hook: Cảnh đấu: tia nhỏ lóe trong mắt, thân đã đến sau lưng địch.
+
+Không Tước Nhãn
+
+Huyết mạch: Dòng địa nứt; trẻ sinh mắt ‘rìa mờ’.
+
+Kích thức tỉnh: thiền vết nứt; Không Ấn.
+
+Phân bổ buff (≈12 thành): Dmg (không) +3; Tầm nhìn +3; Đọc +1; Thọ +2; Phản ứng +3 =
+12
+
+Kỹ năng riêng: ‘Bước Lệch’: dịch nửa bước (vi-dịch) không tạo tiếng.
+
+Cost/SE: hao TL/PDU · hoa mắt song ảnh
+
+Synergy (Map): Kiếm Thiên=2; CGQ=1
+
+Synergy (Path): Kiếm/Trận=2
+
+Lore: Kể rằng họ ‘đi tắt qua bóng tường’.
+
+Scene hook: Ám sát: chớp mắt, vị trí đã lệch; đòn địch ‘đi vào chỗ bỏ’.
+
+Thời Lậu Nhãn
+
+Huyết mạch: Huyết ‘đồng rỉ’; tháp chuông là tổ vật.
+
+Kích thức tỉnh: đếm ngược hơi thở; Thì Ấn.
+
+Phân bổ buff (≈12 thành): Dmg (thời) +2; Tầm nhìn +2; Đọc +3; Thọ +3; Phản ứng +2 =
+12
+
+Kỹ năng riêng: ‘Vi Phản’: tua ngược vi–khắc gần mắt (1 lần/trận) để ‘thấy lại’ quỹ tích.
+
+Cost/SE: hao trí nhớ tạm · đau thái dương; lẫn mốc thời gian
+
+Synergy (Map): Âm Quốc=1; Kiếm Thiên=1
+
+Synergy (Path): Pháp/Hồn=2
+
+Lore: Người giữ giờ của miếu, nói trước nửa câu.
+
+Scene hook: Giải trận: nhìn lại 1 khắc trước — nơi bày ‘khe hở’.
+
+Huyết Quyết Nhãn
+
+Huyết mạch: Huyết nóng; huyết đạo mạnh.
+
+Kích thức tỉnh: Huyết Ấn; tế một giọt lên mi tâm.
+
+Phân bổ buff (≈12 thành): Dmg (huyết) +4; Tầm nhìn +2; Đọc +1; Thọ +2; Phản ứng +3 =
+12
+
+Kỹ năng riêng: ‘Huyết Tầm’: khóa mục tiêu có ‘họ hàng huyết’ trong vòng vài dặm.
+
+Cost/SE: đốt huyết 1 thành · tâm đập loạn khi gặp huyết ‘đồng tông’
+
+Synergy (Map): Âm Quốc=2
+
+Synergy (Path): Huyết/Trận=2
+
+Lore: Tông họ ‘mất tích’ vì bị săn để lấy mắt.
+
+Scene hook: Truy sát: nhìn vạch chỉ tay — biết máu nào ‘người nhà’ của kẻ địch.
+
+Liên Sinh Nhãn
+
+Huyết mạch: Huyết mộc; uống sương lá đời đời.
+
+Kích thức tỉnh: Tịch Ấn; ngồi ‘thở xanh’.
+
+Phân bổ buff (≈12 thành): Dmg (mộc/sinh) +2; Tầm nhìn +3; Đọc +2; Thọ +3; Phản ứng
++2 = 12
+
+Kỹ năng riêng: ‘Sinh Sôi’: kích tái sinh mô nông (cầm máu, khép da nhanh).
+
+Cost/SE: tiêu hao HNT · buồn ngủ ngắn; ngứa quanh vết lành
+
+Synergy (Map): Tịnh Sơn Lâm=2
+
+Synergy (Path): Dược/Pháp=2
+
+Lore: Người mang mắt này hiếm khi để lại sẹo.
+
+Scene hook: Giữa loạn: vết cắt khép khi còn chạy — crowd ngỡ ‘bất tử’.
+
+Sa Kim Nhãn
+
+Huyết mạch: Huyết sa mặn; bụi cát là ‘muối mắt’.
+
+Kích thức tỉnh: Sa Ấn; vẽ quỹ trên cát.
+
+Phân bổ buff (≈12 thành): Dmg (kim/thổ) +4; Tầm nhìn +3; Đọc +1; Thọ +2; Phản ứng +2
+= 12
+
+Kỹ năng riêng: ‘Sa Quyển Nhãn’: nhìn đâu, cát xoáy đó; mù tạm kẻ địch hướng nhìn.
+
+Cost/SE: khô mắt · khát dữ nếu lạm
+
+Synergy (Map): Sa Mạc=2
+
+Synergy (Path): Trận/Thể=2
+
+Lore: Caravan giữ ‘mắt vàng’ làm bảo vật.
+
+Scene hook: Phục kích: main liếc — bức tường cát trùm kín cung thủ.
+
+Triều Hải Nhãn
+
+Huyết mạch: Huyết mạch thở theo nước; nghe ‘nhịp con triều’.
+
+Kích thức tỉnh: Triều Ấn; thiền bờ đá.
+
+Phân bổ buff (≈12 thành): Dmg (thủy) +3; Tầm nhìn +3; Đọc +2; Thọ +2; Phản ứng +2 =
+12
+
+Kỹ năng riêng: ‘Đảo Cực Thị’: đảo ‘đà’ của nước trong 3 khắc (phủ thủy sương mỏng).
+
+Cost/SE: hao PDU nhẹ · say sóng nội tạng
+
+Synergy (Map): Hải Miễu=2
+
+Synergy (Path): Thân/Pháp thủy=2
+
+Lore: Thợ cá giữ ‘mắt triều’ làm gia bảo.
+
+Scene hook: Đấu bến: một cái nhìn, nước trong thùng ‘chạy ngược’, địch trượt chân.
+
+Huyễn Mộng Nhãn
+
+Huyết mạch: Huyết mộng; canh mộ—canh mơ.
+
+Kích thức tỉnh: Mộng Ấn; ngủ ngồi.
+
+Phân bổ buff (≈12 thành): Dmg (huyễn/mộng) +2; Tầm nhìn +4; Đọc +2; Thọ +2; Phản ứng
++2 = 12
+
+Kỹ năng riêng: ‘Mộng Phản’: phản một ảo thuật nhìn thấy trong 3 khắc vừa qua.
+
+Cost/SE: tiêu hao LH · mộng váng; lẫn ranh thực–mơ
+
+Synergy (Map): Âm Quốc=2; U Giới=2
+
+Synergy (Path): Hồn/Pháp=2
+
+Lore: Nhiều kẻ tự ‘mơ chết’ khi nhìn lâu vào mắt này.
+
+Scene hook: Hội đường: nhà ảo thuật tự ăn đòn của mình — crowd nổ cười.
+
+Danh Ấn Nhãn
+
+Huyết mạch: Dòng miếu danh; nhiều ‘tên’ trong gia phả.
+
+Kích thức tỉnh: Danh Ấn; rửa mắt bằng ‘Danh Lộ’.
+
+Phân bổ buff (≈12 thành): Dmg (danh/nhân quả) +3; Tầm nhìn +2; Đọc +3; Thọ +2; Phản
+ứng +2 = 12
+
+Kỹ năng riêng: ‘Khai Danh’: đọc ‘tên thật’ của một vật/chiêu nhỏ, làm nó lộ sơ hở 1 khắc.
+
+Cost/SE: hao ‘danh khí’ · rát họng; khàn tiếng sau niệm
+
+Synergy (Map): Miếu Danh=2
+
+Synergy (Path): Pháp/Nghi thức=2
+
+Lore: Có người mất tên, chỉ còn mắt.
+
+Scene hook: Chém ‘tên’ trận — đường gió trong trận rối tung.
+
+[[ANCHOR: NHAN.ORG]] IV) Gia tộc & tổ chức
+
+• Nguyệt Tịnh Đường (Âm Quốc): tông môn ‘giữ gương’, chuyên Nguyệt Kính Nhãn; quy củ
+nặng, ghét Huyết đạo.
+
+• Lôi Trụ Kiếm Tông (Kiếm Thiên): clan rèn kiếm bằng bão, sở hữu Lôi Minh Nhãn; câu cửa
+miệng: ‘đánh kẻ thắng’.
+
+• Hội Thâu Mục (hắc thị): tổ chức săn—mổ—gắn Nhãn; có ‘thầy thợ’ chuyên cấy tủy thay
+huyết mạch.
+
+• Miếu Danh Đăng Bộ (đô hội): thư khố lưu ‘tên thật’ để kiểm tra Danh Ấn Nhãn; cho thuê
+danh—nguy hiểm.
+
+[[ANCHOR: NHAN.RATE]] V) Tỷ suất xuất hiện (đề nghị cân truyện)
+
+Trong 100.000.000 dân: ~0,05% mang dấu Huyết Mạch tương thích (~50.000). Trong số đó
+~10% thức tỉnh (~5.000). ~10% của nhóm thức tỉnh đạt cao phẩm (~500).
+
+→ Đủ hiếm để bị tranh đoạt, đủ nhiều để tồn tại thị trường đen, clan & chính sách map.
+
+[[ANCHOR: NHAN.THEFT]] VI) Cướp—mổ—gắn & thay huyết mạch
+
+• Cướp: gây mê—định ấn—mổ lấy Nhãn; tỉ lệ thành công 60–80% nếu cùng hệ, < 40% khác
+hệ. Sai quy trình: Nhãn hóa bột/‘đui vĩnh viễn’.
+
+• Thay huyết mạch: rút máu cũ (50–70%); cấy tủy tương thích; tế ấn ba ngày. Nguy cơ
+‘phản huyết’ 20–30%.
+
+• Khóa sử dụng: Nhãn chỉ hoạt động khi Huyết Mạch khớp ≥ 70% (xét theo tế ấn). Dân
+thường không phù hợp thì chỉ ‘đeo đẹp’.
+
+• Luật & nhân quả: miếu—đình có thể truy ‘đường cắt’; dùng trong đô hội dễ để lại dấu cướp.
+
+ARCLUNE · ADDENDUM · CÔNG PHÁP
+(CONSOL) — THỂ CHẤT TƯƠNG QUAN
+
+DocMeta: {"anchor":"PHYS","title":"Thể Chất Tương Quan","note":"Nhúng đầy đủ
+addendum THỂ CHẤT v1.0 vào sau NHÃN ĐẠO; giữ nguyên toàn bộ nội dung trước
+đó."}
+
+Phần này gồm: nguồn gốc di truyền thích nghi, ngân sách buff (~15 thành) cân bằng
+giữa học tập/tu luyện/sát thương/kháng/thọ, và danh mục thể chất mẫu kèm Synergy
+Map/Path.
+
+ARCLUNE · ADDENDUM · THỂ CHẤT TƯƠNG QUAN —
+v1.0
+
+DocMeta:
+{"doc_id":"AR.BIO.PHYS","version":"1.0","anchors":["PHYS.SET","PHYS.BALANCE","PHYS.LIST"],
+"rules":"Không xung đột Lò Hạch; tổng buff cân bằng giữa các thể chất; dùng ‘thành’ (1 thành = 10%)
+trong nội bộ; khi viết truyện mô tả bằng cảm giác."}
+
+[[ANCHOR: PHYS.SET]] I) Nguồn gốc & biểu hiện
+
+• Khởi nguyên di truyền thích nghi: tổ tiên cư trú hàng vạn–hàng chục vạn năm trong vùng
+Aether có thuộc tính mạnh → sinh ra Thể Chất tương quan. Ví dụ vùng băng cực → ‘Băng
+Hàn Cốt’.
+
+• Dị tượng sinh: trẻ ra đời thường có điềm: sương đọng, tia lửa, tiếng kim gõ, hương lá…
+‘Gần đạo nào’ thì dị tượng nghiêng về đạo đó.
+
+• Thức tỉnh: dễ kích bởi địa hình tương hợp, ấn quyết nhẹ, hoặc cảm ngộ trong nguy. Không
+mâu thuẫn với Lò Hạch — thể chất là ‘nền sinh học’, lò hạch là ‘động cơ’.
+
+[[ANCHOR: PHYS.BALANCE]] II) Cân bằng & ngân sách buff (nội
+bộ)
+
+• Thang buff quy ước (nội bộ): Học tập +2–5 thành; Tu luyện +3–6 thành; Sát thương tương
+quan +2–5 thành; Kháng sát thương tương quan +1–3 thành; Tuổi thọ +0.5–2 thành.
+
+• Ngân sách tổng: mỗi thể chất phân bổ tối đa ~15 thành (≈150%), cộng dồn giữa các
+hạng mục để đảm bảo không có thể chất ‘trùm tuyệt đối’. Nếu một mảng thấp → mảng
+khác được bù cao để thực chiến cân bằng.
+
+• Thi triển: khi viết chương dùng mô tả cảm giác (‘học nhanh’, ‘hít một hơi đã ấm’, ‘đòn lạnh ăn sâu’) —
+tránh hiển thị % trực tiếp.
+
+[[ANCHOR: PHYS.LIST]] III) Danh mục thể chất (mẫu) — kèm
+Synergy Map/Path
+
+Băng Hàn Cốt
+
+Nguồn gốc: Dòng tộc sống ở vực băng—gió bấc (cực đông) nhiều thế kỷ.
+
+Dị tượng sinh: ơi lạnh đọng sương trên tóc trẻ; da mát như băng.
+
+Kích thức tỉnh: đứng giữa hàn phong; hít ‘khí trắng’; ấn ‘Hàn Ấn’ nhẹ.
+
+Phân bổ buff (≈15 thành): Học +2; Tu +3; Dmg (băng) +5; Kháng (băng) +3; Thọ +2 = 15
+
+Synergy (Map): Tuyết vực=2; Sa Mạc=0; Âm Quốc=1
+
+Synergy (Path): Pháp tu=2; Thể tu=1
+
+Ấn liên hệ: Hàn Ấn; Tịnh Ấn
+
+Lore: Người băng ít bệnh nóng; truyền rằng xương họ ‘hát’ khi tuyết rơi lớn.
+
+Scene hook: Đòn chém của địch ‘đóng băng’ chuôi kiếm; crowd rít lên ‘lạnh thấu tay’.
+
+Liệt Viêm Tủy
+
+Nguồn gốc: Đời đời gần mạch hỏa, lò rèn lớn, dung nham nứt.
+
+Dị tượng sinh: môi đỏ, hơi nóng; nôi nằm gần lò vẫn ngủ yên.
+
+Kích thức tỉnh: nhập hỏa đường; hấp ‘khí đỏ’; ấn ‘Táo Ấn’.
+
+Phân bổ buff (≈15 thành): Học +2; Tu +4; Dmg (hỏa) +5; Kháng (hỏa) +2; Thọ +2 = 15
+
+Synergy (Map): Sa Mạc=2; CGQ lò=1; Tịnh Lâm=0
+
+Synergy (Path): Thể tu=2; Pháp hỏa=2
+
+Ấn liên hệ: Táo Ấn; Hỏa Ấn
+
+Lore: Họ rèn kiếm bằng tay trần một khắc; mồ hôi sôi nhỏ giọt thành muối đỏ.
+
+Scene hook: Chạm đất, lửa bùng từ vết nẻ; crowd lùi ― +sợ, +tò mò.
+
+Lôi Tâm Chỉ
+
+Nguồn gốc: Đỉnh đồi sấm, cây cổ thụ cháy đen là sân chơi tổ tiên.
+
+Dị tượng sinh: tiếng tim đập như trống; điện ‘vờn tóc’.
+
+Kích thức tỉnh: đứng giữa bão; ấn ‘Lôi Ấn’; nghe ‘nhịp trời’.
+
+Phân bổ buff (≈15 thành): Học +3; Tu +3; Dmg (lôi) +4; Kháng (lôi) +3; Thọ +2 = 15
+
+Synergy (Map): Kiếm Thiên=2; Hải Miễu bão=1
+
+Synergy (Path): Kiếm tu=2; Thân pháp=1
+
+Ấn liên hệ: Lôi Ấn; Ảnh Ấn
+
+Lore: Danh sách ‘trúng sét mà sống’ trong tộc dài bất tận.
+
+Scene hook: Lôi gói quanh mũi kiếm; crowd ‘ồ’ thành tiếng — UI +hâm mộ.
+
+Thủy Triều Mạch
+
+Nguồn gốc: Đời đời ở bờ triều; nhà xây theo ‘hơi thở’ con nước.
+
+Dị tượng sinh: tiếng thở trẻ trùng với tiếng sóng; tay mềm mát.
+
+Kích thức tỉnh: thiền trước miếu triều; ấn ‘Triều Ấn’.
+
+Phân bổ buff (≈15 thành): Học +2; Tu +5; Dmg (thủy) +3; Kháng (thủy) +3; Thọ +2 = 15
+
+Synergy (Map): Hải Miễu=2; Sa Mạc=0
+
+Synergy (Path): Thân pháp=2; Pháp thủy=2
+
+Ấn liên hệ: Triều Ấn; Định Ấn
+
+Lore: Tổ phổ ghi ‘đi theo nước thì sống’; trái nước thì ‘chết hụt’.
+
+Scene hook: Main đảo cực dòng chảy trong chén trà — bàn đối thủ rung theo.
+
+Mộc Sinh Hồn
+
+Nguồn gốc: Sống giữa rừng tịnh; uống sương lá; chôn nhau gốc cây cổ.
+
+Dị tượng sinh: mùi lá thoang thoảng; tóc mọc nhanh; vết thương ‘ngứa lành’.
+
+Kích thức tỉnh: ngồi ‘thở xanh’ vào can—phế; ‘Tịch Ấn’.
+
+Phân bổ buff (≈15 thành): Học +4; Tu +3; Dmg (mộc/sinh) +2; Kháng (độc) +3; Thọ +3 =
+15
+
+Synergy (Map): Tịnh Sơn Lâm=2; đô hội=0
+
+Synergy (Path): Pháp tu=2; Dược đạo=1
+
+Ấn liên hệ: Tịch Ấn; Sinh Ấn
+
+Lore: Rừng chọn người; người chọn cây ‘kết bạn’ cả đời.
+
+Scene hook: Giữa đô hội phủi tay, bụi cây ven đường xanh rì che mắt đám giữ cổng.
+
+Sa Kim Phách
+
+Nguồn gốc: Sa mạc gió cát; ăn muối phèn từ nhỏ; ngủ nghe cát chảy.
+
+Dị tượng sinh: da rám, mắt nheo ‘nghe gió’ bằng lông mày.
+
+Kích thức tỉnh: vẽ quỹ trên cát; ‘Kim Ấn + Sa Ấn’.
+
+Phân bổ buff (≈15 thành): Học +2; Tu +3; Dmg (kim/thổ) +5; Kháng (phong/sát) +3; Thọ
++2 = 15
+
+Synergy (Map): Sa Mạc Vô Tận=2
+
+Synergy (Path): Trận tu=2; Thể tu=1
+
+Ấn liên hệ: Kim Ấn; Sa Ấn; Trận Ấn
+
+Lore: Mồ hôi mằn mặn ‘giữ nước’ cho da; người ngoài khát còn họ cười.
+
+Scene hook: Cát cuộn như rùa; bước chân địch ‘chìm’ một nhịp — đủ chết.
+
+Nguyệt Ảnh Tâm
+
+Nguồn gốc: Miếu nguyệt sau mộ; đời đời canh đèn gương.
+
+Dị tượng sinh: tròng mắt phản sáng; ngủ tỉnh giữa đêm trăng.
+
+Kích thức tỉnh: mặc nguyệt quang; ‘Nguyệt Ấn’.
+
+Phân bổ buff (≈15 thành): Học +4; Tu +3; Dmg (âm/nguyệt) +3; Kháng (hồn) +3; Thọ +2
+= 15
+
+Synergy (Map): Âm Quốc=2; U Giới=1
+
+Synergy (Path): Hồn tu=2; Pháp tu=1
+
+Ấn liên hệ: Nguyệt Ấn; Ảnh Ấn
+
+Lore: Có ‘bóng mệnh’ đi sau lưng khi trăng rằm.
+
+Scene hook: Dựng gương tường, bóng địch ‘tách’ nửa bước rồi lùi lại — mất vía.
+
+Nhật Dương Huy
+
+Nguồn gốc: Đỉnh nắng; ruộng bậc thang hướng đông; lễ ‘phơi gươm’.
+
+Dị tượng sinh: da rám rỡ; mạch đập sáng khi sớm.
+
+Kích thức tỉnh: tắm nắng sáng; ‘Dương Ấn’.
+
+Phân bổ buff (≈15 thành): Học +3; Tu +3; Dmg (dương/quang) +5; Kháng (âm/lạnh) +2;
+Thọ +2 = 15
+
+Synergy (Map): Kiếm Thiên=1; Sa Mạc=1; Tịnh Lâm=0
+
+Synergy (Path): Kiếm/Đao tu=2; Thể tu=1
+
+Ấn liên hệ: Dương Ấn; Quang Ấn
+
+Lore: Họ rọi gươm vào nắng để ‘cho kiếm uống sớm’.
+
+Scene hook: Chém xuống, ánh đao lấn bóng — địch ‘hết chỗ nấp’.
+
+Không Tước Ảnh
+
+Nguồn gốc: Cư dân địa nứt; hầm ‘lọt gió’; trẻ chơi đuổi bóng giữa khe.
+
+Dị tượng sinh: bóng đứa trẻ mỏng như giấy; bước không gây tiếng.
+
+Kích thức tỉnh: thiền ‘vị dịch’ nửa bước; ‘Không Ấn’.
+
+Phân bổ buff (≈15 thành): Học +2; Tu +4; Dmg (không) +4; Kháng (trận) +3; Thọ +2 = 15
+
+Synergy (Map): Kiếm Thiên=2; CGQ=1
+
+Synergy (Path): Kiếm tu=2; Trận tu=1
+
+Ấn liên hệ: Không Ấn; Ảnh Ấn
+
+Lore: Vết rạn tường ‘đi theo’ người có thể chất này.
+
+Scene hook: Main biến mất nửa nhịp — xuất hiện sau lưng, tiếng áo chưa kịp về.
+
+Thời Lậu Mệnh
+
+Nguồn gốc: Làng ‘đồng rỉ’; tháp chuông sai giờ; mùa đến lệch.
+
+Dị tượng sinh: đồng hồ quanh trẻ chết máy khi bế qua.
+
+Kích thức tỉnh: đếm hơi thở đếm ngược; ‘Thì Ấn’.
+
+Phân bổ buff (≈15 thành): Học +5; Tu +2; Dmg (thời) +3; Kháng (khống chế) +3; Thọ +2 =
+15
+
+Synergy (Map): Âm Quốc=1; Kiếm Thiên=1
+
+Synergy (Path): Pháp tu=2; Kiếm tu=1
+
+Ấn liên hệ: Thì Ấn; Định Ấn
+
+Lore: Họ ‘nhớ trước’ một chút; kể chuyện tương lai như chuyện cũ.
+
+Scene hook: Giữa combat, kêu ‘dừng một hơi’ — địch chớp mắt xong đã muộn.
+
+Danh Ấn Căn
+
+Nguồn gốc: Dòng khắc danh miếu; mỗi đời dâng một ‘tên’.
+
+Dị tượng sinh: trẻ gọi tên vật rất sớm; đồ vật ‘nghe’.
+
+Kích thức tỉnh: lễ ‘trả tên cũ’; ‘Danh Ấn’.
+
+Phân bổ buff (≈15 thành): Học +4; Tu +3; Dmg (danh) +3; Kháng (nhân quả) +3; Thọ +2 =
+15
+
+Synergy (Map): Miếu Danh=2
+
+Synergy (Path): Pháp tu=2; Nghi thức=1
+
+Ấn liên hệ: Danh Ấn; Trấn Danh Ấn
+
+Lore: Họ có nhiều tên — và tất cả đều đúng.
+
+Scene hook: Main gọi ‘tên thật’ của trận pháp — quỹ đạo tự rối.
+
+Huyễn Mộng Nhãn
+
+Nguồn gốc: Canh mộng tổ nghiệp; chăn ‘mơ’ hơn chăn người.
+
+Dị tượng sinh: tròng mắt như có sương; hay nói mê đúng giờ.
+
+Kích thức tỉnh: ngủ ngồi; ‘Mộng Ấn’.
+
+Phân bổ buff (≈15 thành): Học +5; Tu +3; Dmg (huyễn/mộng) +2; Kháng (gian cảnh) +3;
+Thọ +2 = 15
+
+Synergy (Map): Âm Quốc=2; U Giới=2
+
+Synergy (Path): Hồn tu=2; Pháp tu=1
+
+Ấn liên hệ: Mộng Ấn; Ảnh Ấn
+
+Lore: Vài người trong tộc chưa từng khóc — chỉ ‘thở dài trong mơ’.
+
+Scene hook: Đàm phán: đối phương tự bước vào ‘giấc mình thua’, ký tên cái rụp.
+
+Ghi chú triển khai:
+
+• Khi dựng cảnh, ưu tiên đưa nhân vật đến địa hình tương hợp để Synergy Map=2. • Buff thể chất cộng
+với lợi thế Lò Hạch nhưng không thay thế — cảm giác ‘mở khóa nền’ trước khi ‘nạp nhiên liệu’. • Nếu
+muốn chống-chọi, dùng vũ khí/đan/ấn có ‘khắc hệ’ hoặc đưa ra khỏi địa hình tương hợp.
+
+CONSOL v1.8 — Overlay: Hư Giới & Tiểu Thế Giới (Combat Law)
+
+DocMeta: {"anchors": ["CONSOL.LAW.HGTS", "CONSOL.HG.FEES", "CONSOL.TS.CLOCK"]}
+
+DocMeta: {'anchors':['CONSOL.LAW.HGTS','CONSOL.HG.FEES','CONSOL.TS.CLOCK']}
+
+— OVERLAY (dùng khi tra chiến): Hư Giới & Tiểu Thế Giới —
+
+Hư Giới (HG):
+
+• Cấm Lĩnh Vực. Bị hạ gục = log out; 1 ngày/người tối đa 3 lần KO (quá giới hạn → tổn thương ý thức).
+
+• Vào HG theo Danh Ảnh: Đồng (không vào), Bạc (trả phí), Vàng (3 lượt miễn phí/ngày), Kim (5 lượt miễn phí/ngày).
+
+• Phí/lần (non-member): Ngoại biên ≈ 3 HNT • Đô hội ≈ 6 HNT • CGQ/Thủ phủ ≈ 9 HNT.
+
+• Kỷ luật ẩn danh: lộ danh trái phép ⇒ cấm 1 mùa + trừ Danh Điểm + ghi Miếu bạ (ảnh hưởng ưu tiên & phí).
+
+• Vật phẩm thật không mang vào; kỹ–pháp mô phỏng theo hiểu biết (cảm ngộ sau trận vẫn giữ).
+
+Tiểu Thế Giới (TS):
+
+• Bậc TS-n ⇒ giãn thời gian (n+1)× so với thế giới thực (TS1=2× … TS9=10×).
+
+• TS-7 trở lên có giám sát của Miếu Danh; ‘tội giới’ bị treo thưởng và phong tỏa.
+
+• Cổng trận cự ly ngắn: tốn VNT; vùng chết Trận Võng phổ biến trong TS.
+
+Ghi chú dùng khi dàn cảnh:
+
+• Ở HG ưu tiên ‘爽文’ — trang bức, combo, UI đếm cảm xúc theo crowd.
+
+• Ở TS ưu tiên mưu & luật địa hình; tránh spam tỷ lệ % — tả cảm giác / thành số.
+
+ARCLUNE · ADDENDUM · CÔNG PHÁP (CONSOL) —
+v1.0 (Rebuild)
+
+DocMeta: {"doc_id":"AR.TECH.CONGPHAP.CONSOL","version":"1.0"}
+
+HOÀNG GIAI — Khai Nguyên / Trúc Cơ / Ngưng Đan
+
+01) Hô Tức Nguyên Chu — HG–hạ/trung/thượng
+
+Cụm cảnh giới: Khai Nguyên→Trúc Cơ→Ngưng Đan
+
+Hệ: mộc–sinh · Quỹ tích: phổi→đan điền→đốc
+
+Ấn yêu cầu: An Tức Ấn · Cost: ngực ấm; thở sâu · SE: buồn ngủ nửa canh
+
+Synergy: Hô Hấp; Tịnh Sơn Lâm
+
+Lore: Bài thở thợ mỏ CGQ.
+
+02) Cương Da Mộc Cốt — HG–hạ/trung/thượng
+
+Cụm cảnh giới: Khai Nguyên→Trúc Cơ→Ngưng Đan
+
+Hệ: kim–mộc · Quỹ tích: tứ chi↔đốc
+
+Ấn yêu cầu: Cốt Ấn · Cost: da ran rát · SE: khớp kêu rắc
+
+Synergy: Thể tu; Sa Mạc
+
+Lore: Phường rèn truyền xuống.
+
+03) Lưu Ảnh Bộ — HG–trung/thượng
+
+Cụm cảnh giới: Trúc Cơ→Ngưng Đan
+
+Hệ: ảnh–phong · Quỹ tích: thận→bàng quang→đốc
+
+Ấn yêu cầu: Ảnh Ấn · Cost: lưng nhẹ · SE: chóng mặt
+
+Synergy: Kiếm Thiên
+
+Lore: Bộ pháp từ trộm miếu.
+
+04) Tiểu Chu Thiên Dẫn Khí — HG–hạ/trung
+
+Cụm cảnh giới: Khai Nguyên→Trúc Cơ
+
+Hệ: aether · Quỹ tích: nhâm↔đốc
+
+Ấn yêu cầu: Dẫn Ấn · Cost: bụng ấm · SE: ngứa mạch
+
+Synergy: Luyện đan nhập môn
+
+Lore: Bia đá rêu phủ.
+
+05) Thủy Tức Tĩnh Tâm — HG–hạ/trung
+
+Cụm cảnh giới: Khai Nguyên→Trúc Cơ
+
+Hệ: thủy–tịnh · Quỹ tích: phế→thận
+
+Ấn yêu cầu: Tịnh Ấn · Cost: gáy mát · SE: lạnh lòng tạm
+
+Synergy: Âm Quốc
+
+Lore: Qua đêm trong mộ lạnh.
+
+06) Phong Chỉ Chỉ Huyệt — HG–thượng
+
+Cụm cảnh giới: Ngưng Đan
+
+Hệ: phong–kim · Quỹ tích: thủ thiếu dương—tam tiêu
+
+Ấn yêu cầu: Chỉ Ấn · Cost: đầu ngón tê · SE: căng cổ tay
+
+Synergy: Sát thủ
+
+Lore: Sổ tay dính rượu.
+
+HUYỀN GIAI — Kết Đan / Đúc Phách / Luyện Hồn
+
+07) Huyết Ngưng Cân Ấn — HyG–hạ/trung/thượng
+
+Cụm cảnh giới: Kết Đan→Đúc Phách→Luyện Hồn
+
+Hệ: huyết–kim · Quỹ tích: Tâm→Can→Đan điền
+
+Ấn yêu cầu: Ngưng Cân Ấn · Cost: mặt nóng · SE: khô cổ
+
+Synergy: Hoàng Sa Kim Tàng
+
+Lore: Từng bị gán tà.
+
+08) Tịnh Tâm Mộc Chu — HyG–hạ/trung/thượng
+
+Cụm cảnh giới: Kết Đan→Đúc Phách→Luyện Hồn
+
+Hệ: tịnh–hồn · Quỹ tích: ấn đường↔tâm cung
+
+Ấn yêu cầu: Tịnh Ấn · Cost: gáy lạnh · SE: cảm xúc phẳng
+
+Synergy: Âm Quốc
+
+Lore: Khóa ‘sợ’ trước kiếp.
+
+09) Bách Mạch Hoàn Chu — HyG–hạ/trung
+
+Cụm cảnh giới: Kết Đan→Đúc Phách
+
+Hệ: aether–mạch · Quỹ tích: 12 chính mạch
+
+Ấn yêu cầu: Hoàn Ấn · Cost: ngứa mạch · SE: tẩu hỏa
+
+Synergy: Luyện dài ngày
+
+Lore: Gõ mõ ba năm.
+
+10) Kim Linh Bì Hộ — HyG–trung/thượng
+
+Cụm cảnh giới: Đúc Phách→Luyện Hồn
+
+Hệ: kim–thổ · Quỹ tích: bì phu—tấu lý
+
+Ấn yêu cầu: Kim Ấn · Cost: da căng · SE: mất xúc giác
+
+Synergy: Vệ sĩ cung đình
+
+Lore: Thợ giáp CGQ.
+
+11) Hỏa Táo Truyền Thân — HyG–trung/thượng
+
+Cụm cảnh giới: Đúc Phách→Luyện Hồn
+
+Hệ: hỏa–phong · Quỹ tích: đốc—đảm
+
+Ấn yêu cầu: Táo Ấn · Cost: ngực bùng · SE: rút hơi
+
+Synergy: Sa mạc
+
+Lore: Vũ điệu chiến.
+
+12) Minh Hồn Trai Luyện — HyG–thượng
+
+Cụm cảnh giới: Luyện Hồn
+
+Hệ: hồn–tịnh · Quỹ tích: mệnh môn—ấn đường
+
+Ấn yêu cầu: Minh Ấn · Cost: trán mát · SE: đầu ê ẩm
+
+Synergy: Phá mê—tróc linh
+
+Lore: ‘Nhìn’ lối U Giới.
+
+ĐỊA GIAI — Thánh Nhân / Thánh Hoàng / Thánh Tôn
+
+13) Triều Nguyệt Vô Tâm Kinh — ĐG–hạ/trung/thượng
+
+Cụm cảnh giới: Thánh Nhân→Thánh Hoàng→Thánh Tôn
+
+Hệ: nguyệt–thủy–hồn · Quỹ tích: Thái dương↔Thái âm
+
+Ấn yêu cầu: Vô Tâm Ấn · Cost: mờ sương · SE: cô lập cảm xúc
+
+Synergy: Hải Nhãn Triều Tinh
+
+Lore: ‘Minh Đế giả’ xóa danh.
+
+14) Ảnh Kiếm Thất Tuyệt — ĐG–hạ/trung/thượng
+
+Cụm cảnh giới: Thánh Nhân→Thánh Hoàng→Thánh Tôn
+
+Hệ: kiếm–ảnh · Quỹ tích: đốc—đởm—thủ dương minh
+
+Ấn yêu cầu: Ảnh Ấn · Cost: rút khí tay · SE: run ngón
+
+Synergy: Kiếm Thiên
+
+Lore: Chiêu 4 thất lạc.
+
+15) Long Tức Hóa Cân — ĐG–trung/thượng
+
+Cụm cảnh giới: Thánh Hoàng→Thánh Tôn
+
+Hệ: long–kim—mộc · Quỹ tích: tủy sống—cân mạc
+
+Ấn yêu cầu: Long Ấn · Cost: lưng nóng · SE: choáng nhẹ
+
+Synergy: Thể tu
+
+Lore: Nghe ‘rồng gầm’ trong lò.
+
+16) Huyền Phong Tích Ấn Trận — ĐG–trung/thượng
+
+Cụm cảnh giới: Thánh Hoàng→Thánh Tôn
+
+Hệ: phong–trận · Quỹ tích: đốc—ba tiêu—ngoại mạch
+
+Ấn yêu cầu: Phong Ấn + Trận Ấn · Cost: tóc dựng · SE: rối mạch
+
+Synergy: Đèo gió
+
+Lore: Từ vận tiêu leo gió.
+
+17) Kim Huyết Đoạn Kiếp — ĐG–thượng
+
+Cụm cảnh giới: Thánh Tôn
+
+Hệ: kim–huyết · Quỹ tích: Tâm→Đởm
+
+Ấn yêu cầu: Đoạn Ấn · Cost: tim đau · SE: dội nhân quả nhẹ
+
+Synergy: Phá trần—đột phá
+
+Lore: Hy sinh mở đường.
+
+18) Tịnh Liên Hộ Thần — ĐG–hạ/trung
+
+Cụm cảnh giới: Thánh Nhân→Thánh Hoàng
+
+Hệ: tịnh–liên · Quỹ tích: Ấn đường—tâm cung—mệnh môn
+
+Ấn yêu cầu: Hộ Thần Ấn · Cost: đầu mát · SE: ngủ sâu
+
+Synergy: Đầm liên
+
+Lore: Ít mộng xấu.
+
+THIÊN GIAI — Bán Thần
+
+19) Đế Liên Hợp Chú — Thiên–hạ/trung/thượng
+
+Cụm cảnh giới: Bán Thần
+
+Hệ: tịnh–sinh–liên · Quỹ tích: Liên tâm—mạch thủy
+
+Ấn yêu cầu: Liên Tâm Ấn + Liên Tử · Cost: vi-trích PDU/TL · SE: mệt sâu
+
+Synergy: Đầm liên
+
+Lore: Phàm/Thánh ép dùng ‘tắt đèn’.
+
+20) Cựu Danh Chi Cấm — Thiên–thượng
+
+Cụm cảnh giới: Bán Thần→Thần
+
+Hệ: danh—nhân quả · Quỹ tích: ấn đường—hầu
+
+Ấn yêu cầu: Trấn Danh Ấn · Cost: hao ‘danh khí’ · SE: dội nhân quả
+
+Synergy: Miếu Danh
+
+Lore: Lãng Quên ăn mất phần lớn.
+
+21) Triều Tức Phản Luật — Thiên–trung/thượng
+
+Cụm cảnh giới: Bán Thần
+
+Hệ: thủy—luật · Quỹ tích: mạng thủy—đốc
+
+Ấn yêu cầu: Phản Ấn + Định Ấn · Cost: tai ù · SE: rối cân bằng
+
+Synergy: Hải Miễu
+
+Lore: Thống kê ‘con nước’.
+
+22) Hư Quang Mộng Ấn — Thiên–trung
+
+Cụm cảnh giới: Bán Thần
+
+Hệ: quang—mộng · Quỹ tích: ấn đường—thái âm
+
+Ấn yêu cầu: Mộng Ấn + Quang Ấn · Cost: trán mát · SE: mơ dở
+
+Synergy: Tịnh Lưu Ảnh
+
+Lore: Cầu nối ảo–thực.
+
+23) Kim Tàng Thần Hộ — Thiên–hạ/trung
+
+Cụm cảnh giới: Bán Thần
+
+Hệ: kim—hộ · Quỹ tích: bì phu—tấu lý—đốc
+
+Ấn yêu cầu: Kim Hộ Ấn + Pháp Kim Mộc · Cost: da nặng · SE: khó ‘nghe khí’
+
+Synergy: Sa Mạc; CGQ giáp
+
+Lore: Áo kim ‘ăn’ aether.
+
+24) Song Hàn Song Viêm Hợp Thức — Thiên–trung/thượng
+
+Cụm cảnh giới: Bán Thần
+
+Hệ: băng—hỏa (âm–dương) · Quỹ tích: nhâm↔đốc
+
+Ấn yêu cầu: Lưỡng Cực Ấn + Song Thạch · Cost: nóng lạnh xen kẽ · SE: sốc nhiệt/bỏng
+lạnh
+
+Synergy: Vành Nứt Tây Bắc
+
+Lore: Khoáng linh ‘thiên viêm hàn tủy’.
+
+ARCLUNE · ADDENDUM · CÔNG PHÁP (CONSOL) —
+v1.1 (Rebuild · Expanded)
+
+DocMeta: {"doc_id":"AR.TECH.CONGPHAP.CONSOL","version":"1.1","extends":"v1.0_Rebuild","anchors
+":["CP.ADD.MAP","CP.ADD.TA","CP.SCORE.SYN"]} Bổ sung 8 kỹ pháp (đặc thù từng Map + tà đạo) và
+nhúng "Synergy Score" (0–2) cho Map/Path, để chọn cảnh "爽文" mượt hơn. Giai giữ nguyên: Hoàng
+(KN/TC/ND) · Huyền (KĐ/ĐP/LH) · Địa (TN/TH/TT) · Thiên (Bán Thần).
+
+[[ANCHOR: CP.SCORE.SYN]] Synergy Score (0–2)
+
+0 = không hợp (chỉ dùng khi bí, hoặc làm "phản nghề"); 1 = hợp mức thường (dùng ổn); 2
+= khớp cảnh/bản đồ cực mạnh (đề xuất "đánh mặt"). Cách đọc: "Synergy (Map / Path)"
+liệt kê vài Map/Path tiêu biểu + điểm; Map/Path khác mặc định 0–1 tuỳ diễn.
+
+[[ANCHOR: CP.ADD.MAP]] I) Kỹ pháp đặc thù theo Map
+
+01) Kiếm Vân Lôi Truy — ĐG–hạ/trung (Kiếm Thiên)
+
+Cụm cảnh giới: Thánh Nhân→Thánh Hoàng
+
+Hệ: lôi–kiếm–vân · Quỹ tích: đốc→đởm→phế (kéo khí, dắt sấm)
+
+Ấn yêu cầu: Lôi Ấn + Ảnh Ấn · Cost: cẳng tay tê điện; phổi nóng nhẹ · SE: tê ngón nếu
+spam
+
+Synergy (Map): Kiếm Thiên=2; Tịnh Sơn Lâm=1
+
+Synergy (Path): Kiếm tu=2; Pháp tu=1
+
+Lore: Truyền rằng cầu sấm ở rìa Thần Quốc Kiếm từng nứt làm đôi, một kiếm khách bắt sét mà đúc ra
+chiêu này.
+
+Scene Hook: Trời mưa, sấm xa: main “chạm mây” — đường gươm kéo một vệt sét mảnh, chẻ cờ phe
+đối thủ, +hả hê đám đông.
+
+02) Triều Tức Thân Hành — HyG–trung (Hải Miễu)
+
+Cụm cảnh giới: Đúc Phách
+
+Hệ: thủy–thân pháp · Quỹ tích: thận→bàng quang→túc thiếu âm (bước triều)
+
+Ấn yêu cầu: Triều Ấn · Cost: hai ống chân mát, nhịp thở hoà sóng · SE: chóng mặt nhẹ nếu
+lệch nhịp triều
+
+Synergy (Map): Hải Miễu=2; Âm Quốc=1
+
+Synergy (Path): Thân pháp=2; Pháp tu=1
+
+Lore: Ngư dân truyền khẩu thành pháp, dựa nhịp con nước ‘đi giữa chỗ ướt’ không bắn tung tóe.
+
+Scene Hook: Đường bờ trơn, main “đi khô” xuyên đám đông, địch trượt chân; +tò mò, +hâm mộ khán
+giả.
+
+03) Sa Ẩn Kim Phách — HyG–thượng (Sa Mạc Vô Tận)
+
+Cụm cảnh giới: Luyện Hồn
+
+Hệ: sa–kim–ẩn · Quỹ tích: tỳ→vị→bì phu (vùi—lộ)
+
+Ấn yêu cầu: Kim Ấn + Ẩn Ấn · Cost: da nặng, hô hấp khô · SE: mất linh mẫn xúc giác tạm
+
+Synergy (Map): Sa Mạc Vô Tận=2; CGQ=1
+
+Synergy (Path): Thể tu=2; Trận tu=1
+
+Lore: Từ thói quen chôn người để tránh bão cát, thợ giáp cải biên thành “ẩn trong sa”.
+
+Scene Hook: Main nói xong một câu chọc tức, lún mất nửa bắp chân, kẻ địch đâm hụt; +phẫn nộ, +hả
+hê đám vây xem.
+
+04) Nguyệt Khuyết Chiếu Hồn — HyG–thượng (Âm Quốc)
+
+Cụm cảnh giới: Luyện Hồn
+
+Hệ: nguyệt–hồn · Quỹ tích: ấn đường→tâm cung (cung khuyết)
+
+Ấn yêu cầu: Nguyệt Ấn · Cost: trán lạnh; tâm phẳng · SE: mơ sáng quá mức, đau đầu nhẹ
+
+Synergy (Map): Âm Quốc=2; U Giới=1
+
+Synergy (Path): Hồn tu=2; Pháp tu=1
+
+Lore: Khắc trên tấm gương vỡ ở mộ sâu: ‘trăng khuyết soi người, phần nào sáng phần ấy đau’.
+
+Scene Hook: Hỏi cung giữa chợ: main không đánh, chỉ nhìn; đối thủ tự nói hớ — crowd +tò mò +sợ hãi.
+
+05) Mộc Tức Hấp Linh — HG–thượng (Tịnh Sơn Lâm)
+
+Cụm cảnh giới: Ngưng Đan
+
+Hệ: mộc–sinh–tức · Quỹ tích: phế→đan điền→can (hít xanh)
+
+Ấn yêu cầu: Sinh Ấn · Cost: ngực mát; mũi như ngửi lá tươi · SE: buồn ngủ nhẹ
+
+Synergy (Map): Tịnh Sơn Lâm=2; TTLÂ=1
+
+Synergy (Path): Pháp tu=1; Thể tu=1
+
+Lore: Một đạo sĩ ẩn cư dùng cách thở ‘ăn lá’ mà khỏi bệnh hàn từ trong xương.
+
+Scene Hook: Giữa rừng, main hít một hơi, khí mặt hiền; crowd tự an tâm — +tò mò, +tôn kính nhẹ.
+
+06) Cơ Biểu Ứng Chấn — HyG–trung (Cơ Giới Quốc)
+
+Cụm cảnh giới: Đúc Phách
+
+Hệ: kim–trận–cơ · Quỹ tích: đốc→tam tiêu→ngoại mạch (đồng bộ rung)
+
+Ấn yêu cầu: Cơ Ấn + Trận Ấn · Cost: da nổi gai, xương sườn rung đều · SE: tê tay nếu
+‘chấn’ quá lâu
+
+Synergy (Map): Cơ Giới Quốc=2; Sa Mạc Vô Tận=1
+
+Synergy (Path): Trận tu=2; Cơ khí đạo=2
+
+Lore: Do tổ thợ CGQ chế để ‘đỡ giật’ khi vận hành giáp, sau được tu sĩ mượn dùng.
+
+Scene Hook: Main chạm vai — giáp đối phương ‘lệch pha’, tự khóa khớp; +kinh ngạc, +hả hê đám thợ.
+
+[[ANCHOR: CP.ADD.TA]] II) Tà đạo — Thế lực & kỹ pháp
+
+Ba thế lực tà đạo tiêu điểm (dùng làm mồi xung đột). Mỗi phái kèm 1 kỹ pháp “đinh”.
+
+• Vong Bì Hội — tu ‘da’ để đổi mệnh; ép trẻ mồ côi/thiếu nữ luyện phần da đến cảnh giới
+rồi lột rèn giáp. Một thanh ‘Danh Kiếm Hoạ Bì’ từng phệ chủ của họ.
+
+07) Thiểm Bì Hoán Hình — HyG–thượng (tà)
+
+Cụm cảnh giới: Luyện Hồn
+
+Hệ: mộc–da–hồn · Quỹ tích: bì phu→tấu lý→ấn đường
+
+Ấn yêu cầu: Ngoại Hóa Ấn + Bì Mộc · Cost: đau da lan; ngứa tủy · SE: nứt mạch nếu vượt
+giai
+
+Synergy (Map): TTLÂ=1; đô hội=1
+
+Synergy (Path): Hồn tu=1; Sát thủ=1
+
+Lore: Bí pháp ‘lướt da’ để đổi hơi thở/diện mạo trong 7 khắc — lạm dụng sẽ ‘rụng da’ từng mảng.
+
+Scene Hook: Main vạch trần kẻ mạo danh: xé một góc ‘da’, mùi tanh bốc — crowd +kinh tởm +sợ, địch
+vỡ trận.
+
+• Huyết Ông Giáo — nuôi bầy ‘ông máu’; tế máu trẻ để nuôi chúa tổ; kết tổ dưới mộ lạnh.
+
+08) Huyết Ổ Phân Tức — ĐG–hạ (tà)
+
+Cụm cảnh giới: Thánh Nhân
+
+Hệ: huyết–ôn trùng · Quỹ tích: tâm→can→tỳ (tách bầy)
+
+Ấn yêu cầu: Huyết Ấn + Ổ Ấn · Cost: ngứa mạch; tim đập nhanh · SE: nhiễm trùng linh khí
+
+Synergy (Map): Âm Quốc=1; U Giới=1
+
+Synergy (Path): Pháp tu=1; Độc tu=2
+
+Lore: Tổ sư từng ‘thả bầy’ phá vỡ vòng vây quân hộ thành — cả hai phe đều khiếp sợ.
+
+Scene Hook: Phố đông; main dùng tịnh pháp khóa bầy — phản công đúng khoảnh khắc bầy ‘rút ổ’;
++thán phục.
+
+• Táng Cốt Lô — luyện xương trong lò muối nóng; dùng tro cốt làm ‘mộc’ luyện giáp phù.
+
+09) Táng Cốt Viêm Lô — ĐG–trung (tà)
+
+Cụm cảnh giới: Thánh Hoàng
+
+Hệ: hỏa–cốt · Quỹ tích: đốc→tủy sống→đan điền (đốt—kết)
+
+Ấn yêu cầu: Viêm Ấn + Cốt Ấn · Cost: xương rát; ngực khét · SE: giòn xương tạm thời
+
+Synergy (Map): Sa Mạc Vô Tận=1; CGQ=1
+
+Synergy (Path): Thể tu=2; Luyện khí=1
+
+Lore: Đồn rằng lò của họ cháy bằng ‘tro người thiện’, đồ ra lò bền… nhưng bị nguyền.
+
+Scene Hook: Đấu trường; main gõ một nhịp ‘lệch lò’ cho địch — găng tay nứt, crowd +sướng +ghê sợ.
+
+Ghi chú dùng khi viết:
+
+• Dùng kỹ pháp có Synergy=2 với Map/Path của cảnh để tối đa ‘爽文’: tốc độ áp đảo/màn
+khoe kỹ vừa đủ. • Các kỹ pháp tà đạo luôn kèm cái giá (SE) — show qua chi tiết cơ
+thể/mùi/âm thanh thay vì nói.”
+
+ARCLUNE · ADDENDUM · CÔNG PHÁP (CONSOL) —
+v1.2 ANNEX (Thiên giai · Map Exclusives)
+
+DocMeta: {"doc_id":"AR.TECH.CONGPHAP.CONSOL.ANNEX","version":"1.2","extends":"v1.1_Rebuild_Ex
+panded","anchors":["CP.ADD.THIEN.MAP","CP.SCORE.SYN"],"note":"Thiên giai độc quyền theo Map;
+Synergy=2."} Ghi chú: Các kỹ pháp dưới đây mặc định Synergy (Map) = 2 tại Map ghi danh, dùng để
+dựng cảnh '爽文' áp đảo. Path đi kèm cũng được cân theo 0–2 (ưu tiên 2).
+
+[[ANCHOR: CP.ADD.THIEN.MAP]] I) Thiên giai — kỹ pháp độc
+quyền theo Map
+
+01) Lôi Tâm Kiếm Giáng — Thiên–trung/thượng (độc quyền Kiếm Thiên)
+
+Cụm cảnh giới: Bán Thần
+
+Hệ: lôi–kiếm · Quỹ tích: đốc→đởm→phế (tụ lôi nơi lòng kiếm)
+
+Ấn yêu cầu: Lôi Ấn + Ảnh Ấn + Kiếm Ấn · Cost: vi-trích TL/PDU; cẳng tay tê điện · SE: tê
+liệt ngón tạm thời, khó hồi khí mũi kiếm
+
+Synergy (Map): Kiếm Thiên=2
+
+Synergy (Path): Kiếm tu=2; Pháp tu=1
+
+Lore: Thệ ước lôi đình cổ của cụm Thần Quốc Kiếm — một đời kiếm chủ dựng gươm giữa bão mà đúc
+chiêu này.
+
+Scene Hook: Trời nổi sấm: main chém ngang — sấm bị dắt thành ‘sợi’ bọc lưỡi; cờ phe địch rách, crowd
++hò hét +hả hê.
+
+02) Triều Vương Đảo Cực — Thiên–thượng (độc quyền Hải Miễu)
+
+Cụm cảnh giới: Bán Thần
+
+Hệ: thủy–luật · Quỹ tích: mạng thủy—đốc (đảo nhịp con nước)
+
+Ấn yêu cầu: Triều Ấn + Phản Ấn + Định Ấn · Cost: tai ù; bụng cuộn theo sóng · SE: say
+sóng—chóng mặt kéo dài nếu nền yếu
+
+Synergy (Map): Hải Miễu=2
+
+Synergy (Path): Thân pháp=2; Pháp tu=2
+
+Lore: Biên niên hải miếu chép: ‘người biết đảo cực, nước sẽ nghe’ — nhưng kẻ yếu thì nước dìm trước.
+
+Scene Hook: Bến cá đông: main ‘đổi chiều thủy mạch’ — thuyền địch xoay ngang; crowd +tò mò +kinh
+hô, địch mất thăng bằng.
+
+03) Tịch Mộc Thần Tức — Thiên–trung (độc quyền Tịnh Sơn Lâm)
+
+Cụm cảnh giới: Bán Thần
+
+Hệ: mộc–sinh–tịnh · Quỹ tích: phế→đan điền→can (hít xanh qua lâm mạch)
+
+Ấn yêu cầu: Tịch Ấn + Sinh Ấn · Cost: ngực mát; da thoảng mùi lá · SE: buồn ngủ sâu, có
+thể ‘ngủ đứng’ một khắc
+
+Synergy (Map): Tịnh Sơn Lâm=2
+
+Synergy (Path): Pháp tu=2; Hồn tu=1
+
+Lore: Từ một am cổ: thở cùng rừng, mượn lâm mạch bồi chân khí; cấm dùng ở rừng ‘ố bẩn’.
+
+Scene Hook: Giữa rừng tranh đấu: main hít một hơi, sương lá tụ quanh vai — đối thủ ra tay mà thấy…
+‘không nỡ’.
+
+04) Hoang Sa Kim Trận Quy — Thiên–trung (độc quyền Sa Mạc Vô Tận)
+
+Cụm cảnh giới: Bán Thần
+
+Hệ: kim–thổ–phong · Quỹ tích: đốc→ba tiêu→ngoại mạch (vẽ trận trên cát)
+
+Ấn yêu cầu: Kim Ấn + Sa Ấn + Trận Ấn · Cost: da khô rạn; cổ họng cháy · SE: mất nước
+nhanh; mắt rát gió
+
+Synergy (Map): Sa Mạc Vô Tận=2
+
+Synergy (Path): Trận tu=2; Thể tu=1
+
+Lore: Đạo trận của các đoàn vận tiêu: ‘vẽ một quỹ, gió nghe theo’ — thất truyền vì nhiều người chết
+khát khi luyện.
+
+Scene Hook: Bụi mù mịt: main gõ ba nhịp, cát tự cuộn thành miệng ‘quy’; địch bước nhầm — bị cát ‘giữ
+chân’.
+
+05) Cơ Luân Hợp Tấu — Thiên–trung (độc quyền Cơ Giới Quốc)
+
+Cụm cảnh giới: Bán Thần
+
+Hệ: kim–trận–cơ–aether · Quỹ tích: đốc→tam tiêu→ngoại mạch (đồng bộ dao động giáp)
+
+Ấn yêu cầu: Cơ Ấn + Luân Ấn · Cost: da nổi gai; xương ngực rung theo nhịp máy · SE: lệch
+pha sẽ ‘khóa khớp’ bản thân
+
+Synergy (Map): Cơ Giới Quốc=2
+
+Synergy (Path): Trận tu=2; Cơ khí đạo=2
+
+Lore: Kết tinh của ‘dàn nhạc máy’ CGQ: khi máy và người cùng một nhịp, giáp trở thành ‘thân ngoài’.
+
+Scene Hook: Xưởng ồn ào: main chạm cổ tay — nhịp máy và nhịp thở khớp; giáp tăng lực, địch giật
+mình; crowd thợ +hò reo.
+
+06) Nguyệt Mệnh Quy Ảnh — Thiên–thượng (độc quyền Âm Quốc)
+
+Cụm cảnh giới: Bán Thần
+
+Hệ: nguyệt–hồn–nhân quả · Quỹ tích: ấn đường→tâm cung→mệnh môn (quy ảnh)
+
+Ấn yêu cầu: Mệnh Ấn + Nguyệt Ấn + Ảnh Ấn · Cost: trán lạnh; tim chậm như chuông đêm
+· SE: dội nhân quả; mộng sáng đến khó ngủ lại
+
+Synergy (Map): Âm Quốc=2
+
+Synergy (Path): Hồn tu=2; Pháp tu=1
+
+Lore: Truyền từ gương tế nguyệt: ‘mượn bóng mà đổi mệnh—một đêm thôi, rồi trả’.
+
+Scene Hook: Vấn cung giữa mộ: main gọi ‘bóng mệnh’ chiếu lên tường; đối thủ tự nhìn thấy hậu
+quả—đánh rơi khí thế.
+
+ARCLUNE · ADDENDUM · CÔNG PHÁP (CONSOL) —
+v1.3 ANNEX (U Giới + Thần Vực · Thiên mệnh)
+
+DocMeta: {"doc_id":"AR.TECH.CONGPHAP.CONSOL.ANNEX","version":"1.3","extends":"v1.2_ANNEX_Thi
+en_Map_Exclusives", "anchors":["CP.THIEN.UGIOI","CP.THIEN.THANVUC","CP.THIEN.THIENMENH","CAS
+T.THIENMENH.ANTI2"]} Bổ sung 2 kỹ pháp Thiên giai (độc quyền Map) cho U Giới & Thần Vực
+(Synergy=2); giới thiệu ma công Thiên mệnh (không/thời gian); và thẻ nhân vật Thiên mệnh Đại Phản
+Phái mới (địa bàn Kiếm Thiên).
+
+[[ANCHOR: CP.THIEN.UGIOI]] I) Thiên giai — U Giới (Synergy=2)
+
+01) U Minh Thập Ảnh Chưởng — Thiên–trung (độc quyền U Giới)
+
+Cụm cảnh giới: Bán Thần
+
+Hệ: u–hồn–tử · Quỹ tích: ấn đường→tâm cung→mệnh môn (mười ấn—mười bóng)
+
+Ấn yêu cầu: U Ấn + Ảnh Ấn · Cost: trán lạnh; tim trầm xuống · SE: đầu ê ẩm nếu dồn đủ
+10 ấn
+
+Synergy (Map): U Giới=2
+
+Synergy (Path): Hồn tu=2; Sát đạo=2
+
+Lore: Tuyệt kỹ Minh Quân đời đầu: mỗi ‘ảnh’ là một ấn quyết tử vong; đủ mười thì thân–hồn đều tuyệt.
+
+Scene Hook: Khói âm phủ lên; mười bóng tay chồng khít ngực địch; tiếng kèn đưa ma khởi — crowd
+câm lặng.
+
+[[ANCHOR: CP.THIEN.THANVUC]] II) Thiên giai — Thần Vực
+(Synergy=2)
+
+02) Thần Quyết Vạn Lực Ấn — Thiên–thượng (độc quyền Thần Vực)
+
+Cụm cảnh giới: Bán Thần
+
+Hệ: thần–lực–ấn · Quỹ tích: đốc→đởm→ngoại mạch (khắc vạn ấn)
+
+Ấn yêu cầu: Thần Ấn (liên tiếp) · Cost: hao TL/PDU theo cấp số · SE: cánh tay cứng đờ; khó
+hô hấp sâu
+
+Synergy (Map): Thần Vực=2
+
+Synergy (Path): Lực đạo=2; Thần thuật=2
+
+Lore: Mảnh ‘Quyết thư Thần đạo’: tích đủ vạn ấn mở ‘Vạn Lực Hợp Nhất’, chấn áp toàn trường.
+
+Scene Hook: Bầu trời nứt, thần quang rọi thẳng — đối thủ quỳ rạp như bị vạn núi đè.
+
+[[ANCHOR: CP.THIEN.THIENMENH]] III) Thiên mệnh ma công
+(Không/Thời gian)
+
+A) Thiên Mệnh Phệ Nguyên Kinh — (nhắc ngắn) dùng ‘Thiên Mệnh Ma Bình’ thôn phệ
+máu, thịt, linh hồn và khí vận, hoá thành Phệ Nguyên Lực để nâng cấp/đột bộc. Synergy
+Map: +1 Âm Quốc, +1 U Giới; Path: Ma tu=2, Hồn tu=1.
+
+B) Thiên Mệnh Lậu Khắc Ma Kinh — (Không/Thời) · Thiên giai
+
+Pháp bảo lõi: Lậu Khắc Ma Sa (đồng hồ cát đen); cát là ‘thời sa’, khung là ‘không gông’.
+
+Hiệu ứng: ① Định Thì (đóng băng vi–khoảnh khắc quanh mục tiêu; dùng để ‘cướp nhịp’),
+② Vị Dịch (dịch vị trí nhỏ trong không), ③ Trích Ảnh (rút ‘bóng thời gian’ của một chiêu
+vừa thấy để tái lập 1 lần).
+
+Cost: vi–trích TL/PDU + ‘thời tổn’ (tóc bạc, trí nhớ sứt mẻ nếu lạm). SE: dội ‘thời tuyến’:
+chóng mặt, lẫn mốc thời gian, mất cảm giác nóng–lạnh tạm.
+
+Synergy (Map): Kiếm Thiên=2 (kiếm đạo dễ ‘bắt nhịp’), Âm Quốc=1. Synergy (Path):
+Kiếm tu=2; Trận tu=1; Hồn tu=1.
+
+Khắc chế/Khắc bị: bị khóa bởi Định Tâm/Định Niệm, Tịnh Liên Hộ Thần, Nguyệt Mệnh Quy Ảnh. Khắc
+chế các đối thủ phụ thuộc ‘nhịp’ (ví dụ giáp CGQ lệch pha).
+
+Lore: Chép từ một tháp đồng thờ ‘giờ rỉ’; người đầu luyện mất tên trong gia phả — chỉ còn ‘kẻ đi lệch
+mùa’.
+
+Scene hook: Main vừa ngã, sa đen đổ ngược — khoảng khắc thu lại; đòn buốt gáy của địch biến thành
+‘lỡ tay’. Crowd nổ +sốc.
+
+[[ANCHOR: CAST.THIENMENH.ANTI2]] IV) Thiên mệnh Đại Phản
+Phái (2) — Kiếm Thiên
+
+Họ tên: Kiếm Lăng Hư Trường Dạ — ngoại hiệu: ‘Trường Dạ Kiếm Chủ’.
+
+Địa bàn: Kiếm Thiên (cụm Thần Quốc Kiếm). Vị cách: Thiên mệnh Đại Phản Phái (khác).
+
+Tính cách: kiêu ngạo, lạnh, giữ lời; ẩn nhẫn lâu, thích đỉnh đấu đỉnh, ‘đánh kẻ thắng’ để
+lấy danh lớn nhất.
+
+Quy ước: Kiếm Ước — không can thiệp ‘khí vận chi chiến’ giữa main và đối thủ mang
+Thiên Mệnh Phệ Nguyên Kinh; chỉ thách người thắng.
+
+Kỹ pháp chữ ký: Lôi Tâm Kiếm Giáng (Thiên–trung/thượng, Map: Kiếm Thiên=2) + Thiên
+Mệnh Lậu Khắc Ma Kinh (mức ‘vị dịch’ tinh vi để kiếm không sai nhịp).
+
+Động cơ: ‘Danh chỉ có một đỉnh’. Hắn tin: danh phải đo bằng việc hạ kẻ vừa đội thiên
+mệnh — ‘khi đó, thiên mệnh sẽ phải gọi tên ta’.
+
+Hook mở truyện: bóng kiếm dựng trên đài mưa; hắn quay lưng nói một câu: ‘Hai ngươi phân thắng đi.
+Kẻ sống bước lên đài — ta mượn danh của hắn.’ Crowd +sợ +phẫn nộ +tò mò.
+
+ARCLUNE · ADDENDUM · CÔNG PHÁP
+(CONSOL) — WEAPONRY
+
+DocMeta: {"anchor":"WEAP.ODD8","title":"8 Đại Dị Năng Vũ Khí", "note":"Nhúng đầy
+đủ bộ vũ khí dị năng cấp thần vào CONSOL v1.4 (giữ nguyên toàn bộ nội dung trước
+đó)."}
+
+Mục này được thêm vào sau phần ANNEX để tiện tra khi dàn cảnh.
+• Synergy Map/Path dùng thang 0–2 như phần Công Pháp.
+• Vũ khí cấp thần có ràng buộc nhân quả: cẩn trọng khi đưa vào đô hội.
+
+ARCLUNE · ADDENDUM · 8 ĐẠI DỊ NĂNG VŨ KHÍ — v1.0
+
+DocMeta: {"doc_id":"AR.WEAPON.ODD8","version":"1.0","anchors":["ODD8.SET","ODD8.1","ODD8.2","
+ODD8.3","ODD8.4","ODD8.5","ODD8.6","ODD8.7","ODD8.8"], "synergy_scale":"0–2","note":"Nguyên
+liệu cấp thần. Phần lớn bị luật nhân quả theo dõi; dùng sai dễ phệ chủ."}
+
+I. Bát Cốt Đoản — Đoản đao (Set · 8 chiếc)
+
+Khởi nguyên: Đúc từ 8 xương sườn của một vị Hậu Thiên Thần đã tàn danh.
+
+Vật liệu: Mỗi chiếc là một khúc sườn; sống đao là tủy hóa kim.
+
+Đặc tính: Mỗi đoản giữ một ‘cơ quan’/‘mạch’: Tâm (nhiệt sát), Phế (phong tức), Can
+(độc—giải), Tỳ (trầm trọng), Thận (ẩn tức), Đởm (sợ—phách), Vị (thực linh), Tam Tiêu
+(khuếch tán). Có thể ‘xâu chuỗi’ thành một tuyệt sát một khắc.
+
+Yếu quyết gắn bó (Ấn): Cần Chỉ Ấn + Tâm Ấn; ai thiếu ‘tâm cố’ sẽ bị ‘đao ăn lại’.
+
+Cost: Uống huyết nóng để mở ‘nhịp’ — mỗi lần dùng hao khí huyết 1–2 thành. · SE: Lệch
+tâm → run tay, đao quay đầu ‘tự ăn’.
+
+Synergy (Map): Kiếm Thiên=1; Âm Quốc=1; đô hội=1
+
+Synergy (Path): Sát đạo=2; Thân thủ=1
+
+Lore: Tương truyền là ‘nhạc cụ’ của một đội đồ tể thần. Khi diễn đúng thứ tự, tám nốt thành một bản
+chém.
+
+Hook: Cảnh chợ hẹp: xoay cổ tay, tám đoản thoát tay theo chuỗi — địch chỉ thấy dao ‘đến trước gió’.
+
+II. Thập Tự Giá Huyết Tế — Trượng/Thập tự (Kết giới di động)
+
+Khởi nguyên: Rèn từ xương sống và khớp đốt của một Hậu Thiên Thần từng tu Huyết đạo.
+
+Vật liệu: Cột sống (trục), mấu gai (đinh), tủy hóa thành ‘mạch hút’.
+
+Đặc tính: Dựng thành thập tự, mở Huyết Kết, thôn phệ máu—thịt—oán; biến thành ‘huyết
+quyển’ đè tâm.
+
+Yếu quyết gắn bó (Ấn): Huyết Ấn + Định Ấn. Kẻ dùng phải giữ ‘giới’, không thì ‘kết’ ăn
+ngược.
+
+Cost: Đốt máu (tối đa 3 thành) mở vòng; nạp VNT để cố định kết giới. · SE: Chóng mặt, tim
+loạn; nhân quả ‘hút ngược’ nếu giết lầm người vô tội.
+
+Synergy (Map): Âm Quốc=2; U Giới=2; đô hội=0
+
+Synergy (Path): Huyết đạo=2; Trận tu=1
+
+Lore: Một giáo phái từng dựng nó giữa ngõ tối — sáng ra thấy bờ tường ‘đã no’.
+
+Hook: Đối thủ đông: dựng thập tự, vòng huyết tăng; crowd chạy tán — +sợ hãi, +hoảng loạn cho UI hệ
+thống.
+
+III. Thanh Dao Trảm Danh — Đao bản rộng
+
+Khởi nguyên: Phôi lấy từ xương vai một thần bị ‘xóa danh’ ở Miếu Danh.
+
+Vật liệu: Bản đao màu hồ xanh; rìa mỏng như lá mía.
+
+Đặc tính: Chém ‘tên’, cắt tạm quan hệ nhân quả của mục tiêu với một vật/luật trong 3
+khắc.
+
+Yếu quyết gắn bó (Ấn): Danh Ấn (biết tên thật) + Trấn Danh Ấn.
+
+Cost: Hao ‘danh khí’ người dùng; cần lễ rửa bằng Danh Lộ. · SE: Ớn lạnh gáy; nếu ‘gọi sai
+tên’ đao sẽ không nghe, phản lực bật ngược.
+
+Synergy (Map): Miếu Danh=2; Kiếm Thiên=1
+
+Synergy (Path): Kiếm/Đao tu=2; Pháp tu=1
+
+Lore: Được treo trong miếu đến mục rữa; người rút nó phải trả ‘một tên’ mình từng mang.
+
+Hook: Đấu trí: main gọi đúng tên bí mật của địch, chặt ‘duyên’ với pháp khí hắn — khoảnh khắc ‘trần
+truồng’.
+
+IV. Không Mâu Liêm — Móc câu + xích (dị không)
+
+Khởi nguyên: Móc rèn từ nanh, xích chuỗi từ đốt sống của một Tiên Thiên Thần chân đốt
+(Hư Không Trùng).
+
+Vật liệu: Móc ăn ‘khe không’, xích bò qua ‘lằn thời’.
+
+Đặc tính: Kéo điểm yếu ở ‘bản đồ khác’ của cùng cơ thể; xuyên giáp; giật về hiện tại.
+
+Yếu quyết gắn bó (Ấn): Không Ấn + Thì Ấn.
+
+Cost: Hao TL/PDU; để lại ‘sẹo không’ — địa hình quanh điểm kéo rạn nứt. · SE: Lạc tuyến
+thời gian ngắn; say không—thời, mắt mờ ‘song ảnh’.
+
+Synergy (Map): Kiếm Thiên=2; U Giới=1
+
+Synergy (Path): Kiếm tu=2; Sát đạo=1; Trận tu=1
+
+Lore: Xích từng buộc ‘chuông rỗng’; mỗi kéo vang như tiếng cắn của hư không.
+
+Hook: Đối thủ phòng kín: ném móc vào ‘bóng’ trên tường — kẻ địch bị giật khỏi chỗ ẩn y như cá mắc
+câu.
+
+V. Song Bì Chướng — Áo/Choàng (bảo cụ phòng hộ)
+
+Khởi nguyên: May từ da của hai Tiên Thiên Thần (một ‘tĩnh’, một ‘động’).
+
+Vật liệu: Mặt ngoài trơn như gương, mặt trong như rừng vân tay.
+
+Đặc tính: Trượt luật nhẹ (giảm 3 thành sát thương trong 7 khắc), mô phỏng hơi thở người
+khác.
+
+Yếu quyết gắn bó (Ấn): Bì Ấn + Ẩn Ấn.
+
+Cost: Ăn ‘da cũ’ của chủ để ‘nhớ mùi’; cần hiến tế định kỳ. · SE: Ngứa tủy; nếu mặc quá lâu,
+áo ‘chọn’ hơi thở mới — chủ cũ bị ‘quên’.
+
+Synergy (Map): đô hội=2; TTLÂ=1
+
+Synergy (Path): Ẩn hành=2; Hộ thể=1
+
+Lore: Sản phẩm ‘Vong Bì Hội’ thời hoàng kim; áo này thuộc hàng ‘chọn chủ’.
+
+Hook: Điệp vụ: đi giữa đám đông, áo đổi ‘mùi’ thành lính gác — crowd chỉ thấy ‘người quen’.
+
+VI. Huyết Bì Kết Thư — Thư chú (kết luật)
+
+Khởi nguyên: Bìa là da thuộc; trang là nhiều lớp thịt phẳng; mực là máu của một Hậu Thiên
+Thần tu Kết thuật.
+
+Vật liệu: Trang sống, chữ mọc thêm khi cho uống máu ‘đúng danh’.
+
+Đặc tính: Ghi—Khóa—Sang (copy) một kỹ pháp nhìn thấy (1 lần/đêm); đọc sai ‘luật’ dễ mất
+trí đoạn.
+
+Yếu quyết gắn bó (Ấn): Định Ấn + Danh Ấn.
+
+Cost: Uống HNT/TNT để ‘giữ chữ’; hiến một giọt ‘danh huyết’. · SE: Đau đầu; rơi mất một ký
+ức cũ để chứa ‘chữ mới’.
+
+Synergy (Map): Âm Quốc=2; U Giới=1
+
+Synergy (Path): Pháp tu=2; Hồn tu=1
+
+Lore: Người viết đầu tiên được gọi ‘Thư Nhân’; ngày cuối cùng hắn không nhớ tên mình.
+
+Hook: Main lật trang, chữ tự mọc thành bộ pháp kẻ địch vừa dùng — copy ngay một lần lật kèo.
+
+VII. Thần Ngẫu — Khôi lỗi (thần xác luyện chế)
+
+Khởi nguyên: Xác của một thần bị rút điển — đóng ấn tạo ‘ý giả’.
+
+Vật liệu: Khớp nối bằng xương thần, ruột thay bằng phù tuyến.
+
+Đặc tính: Cường chế mang ‘một mảnh’ thần lực: lao—đỡ—giữ; nghe lệnh bằng Ấn.
+
+Yếu quyết gắn bó (Ấn): Ngẫu Ấn + Định Ấn.
+
+Cost: Nạp BTN/ThN; chủ ‘chia’ 1–2 thành thần lực để khởi động. · SE: Phệ chủ nếu lệnh mâu
+thuẫn; bùng ‘ý cũ’ của thần, loạn trường.
+
+Synergy (Map): CGQ=2; Sa Mạc=1
+
+Synergy (Path): Lực đạo=2; Trận tu=1
+
+Lore: Một xưởng từng nuôi ba ‘ngẫu’ canh cổng; đêm mưa, cả ba quay đầu cùng lúc nhìn về bắc.
+
+Hook: Vây bắt: thả ngẫu chắn ngõ, main nói ‘giữ’ — cả con phố bỗng thành mê cung cơ bắp.
+
+VIII. Huyễn Nhãn Mộng Tỉnh Cảnh — Gương (huyễn/mộng)
+
+Khởi nguyên: Mặt gương từ màng thủy tinh thể của một Hậu Thiên Thần tu Huyễn đạo;
+khung từ xương của một thần tu Mộng đạo.
+
+Vật liệu: Bề mặt nuốt ánh; soi ra ‘danh thật’ và ‘giấc mơ đang mang’.
+
+Đặc tính: Bật ‘Mộng Lộ’: mở lối đi ngắn qua cõi mộng; phản ‘đòn đã thấy’ một lần.
+
+Yếu quyết gắn bó (Ấn): Ảnh Ấn + Mộng Ấn.
+
+Cost: Nạp LH (linh hồn lực) qua Tịnh/Âm Đan; dễ rò ký ức người soi. · SE: Mộng váng; ngủ
+mệt sau dùng; ‘lẫn mộng’ nếu ở U lâu.
+
+Synergy (Map): Âm Quốc=2; U Giới=2
+
+Synergy (Path): Hồn tu=2; Pháp tu=1
+
+Lore: Gương từng là ‘mắt’ của một vị thần canh mộng; mở đúng góc sẽ thấy ‘đêm cũ’.
+
+Hook: Đàm phán nguy: đặt gương giữa bàn — đối thủ tự thấy ‘giấc thua’ của mình, đổi thái độ tức khắc.
+
+Cảnh báo luật/nhân quả:
+
+• Đa số khí cụ trên để lại ‘vết rạch luật’ ở hiện trường; thần chức/địa thần có thể lần vết. • Dùng trong
+đô hội dễ tạo dị tượng — nên bọc bằng Trận Ẩn Danh. • Vũ khí mang ‘danh’ lớn: cho ăn danh để ‘nuôi
+ngoan’, không thì sẽ ‘phệ chủ’.
+
+ARCLUNE · ADDENDUM · CÔNG PHÁP
+(CONSOL) — NHÃN ĐẠO
+
+DocMeta: {"anchor":"NHAN","title":"Nhãn Đạo (Eye Arts)","note":"Nhúng đầy đủ
+addendum NHÃN ĐẠO v1.0 vào sau WEAPONRY; giữ nguyên toàn bộ nội dung trước
+đó."}
+
+Phần này gồm: cơ chế Huyết Mạch, ngân sách buff 12 thành/nhãn, 10 loại Nhãn + kỹ
+năng riêng, tổ chức săn–mổ–gắn, tỷ suất xuất hiện, và quy trình thay huyết mạch an
+toàn.
+
+ARCLUNE · ADDENDUM · NHÃN ĐẠO — v1.0
+
+DocMeta: {"doc_id":"AR.BIO.EYE","version":"1.0",
+"anchors":["NHAN.SET","NHAN.BAL","NHAN.TYPES","NHAN.ORG","NHAN.RATE","NHAN.THEFT"],
+"rules":"Nhãn không xung đột Lò Hạch/Thể Chất; yêu cầu Huyết Mạch tương ứng; có thể bị cướp
+(mổ/gắn + tế huyết). Tổng buff/nhãn = 12 thành (≈120%)."}
+
+[[ANCHOR: NHAN.SET]] I) Khởi nguyên & cơ chế
+
+• Khởi nguyên huyết mạch: ‘Nhãn’ là dị cơ quan tinh thần–sinh học hình thành do dòng
+Huyết Mạch cư trú lâu dài gần đạo tương ứng (nguyệt, lôi, không, thời...). Không đồng nhất
+với Thể Chất: thể chất là nền, nhãn là khóa chuyên.
+
+• Thức tỉnh: kích bởi địa hình tương hợp, ấn nhẹ, hoặc đột biến cảm ngộ. Trẻ sinh ra đôi khi
+có ‘mục quang’ dị sắc (dị tượng sinh).
+
+• Không xung đột: nhãn cộng hưởng Lò Hạch/Thể Chất nhưng không thay thế. Nhãn có thể
+bị cướp; thể chất thì hòa vào thân, không cướp được.
+
+[[ANCHOR: NHAN.BAL]] II) Ngân sách buff (nội bộ) — mỗi nhãn ≈
+12 thành
+
+• Khung buff: Sát thương tương quan +2–4 thành; Tầm nhìn +2–4; Tốc độ đọc +1–3; Tuổi
+thọ +1–3; Phản ứng +1–3. Tổng mỗi nhãn ≈ 12 thành. Khi viết truyện chỉ mô tả ‘cảm giác’,
+tránh hiển thị %.
+
+[[ANCHOR: NHAN.TYPES]] III) Danh mục Nhãn (10 mẫu)
+
+Nguyệt Kính Nhãn
+
+Huyết mạch: Chi nguyệt âm; huyết ‘lạnh’ giàu tịnh tính.
+
+Kích thức tỉnh: đêm rằm trước gương; Ảnh/Nguyệt Ấn nhẹ.
+
+Phân bổ buff (≈12 thành): Dmg (âm/nguyệt) +3; Tầm nhìn +3; Đọc +2; Thọ +2; Phản ứng
++2 = 12
+
+Kỹ năng riêng: ‘Minh Ảnh’: soi ‘bóng mệnh’ — lộ đồ vật/ý đồ bị che 3 khắc.
+
+Cost/SE: nạp Âm Đan · nhức thái dương khi gặp ánh dương trực diện
+
+Synergy (Map): Âm Quốc=2; U Giới=1
+
+Synergy (Path): Hồn tu=2; Pháp tu=1
+
+Lore: Gác đền nguyệt truyền một mắt ‘thấy lời chưa nói’.
+
+Scene hook: Đàm phán: mở kính — đối thủ tự thấy ‘bóng phản bội’ của mình.
+
+Lôi Minh Nhãn
+
+Huyết mạch: Huyết lôi; tim đập nhanh ‘theo mây’.
+
+Kích thức tỉnh: đứng bão; Lôi Ấn.
+
+Phân bổ buff (≈12 thành): Dmg (lôi) +4; Tầm nhìn +2; Đọc +1; Thọ +2; Phản ứng +3 = 12
+
+Kỹ năng riêng: ‘Chỉ Tốc’: tăng nhịp thần kinh — phản ứng quá người thường 1–2 nhịp.
+
+Cost/SE: vi-trích PDU · tay run nhẹ sau dùng dài
+
+Synergy (Map): Kiếm Thiên=2; Hải Miễu bão=1
+
+Synergy (Path): Kiếm/Thân pháp=2
+
+Lore: Tộc ghi ‘đã bị sét gọi tên’ ba đời liền.
+
+Scene hook: Cảnh đấu: tia nhỏ lóe trong mắt, thân đã đến sau lưng địch.
+
+Không Tước Nhãn
+
+Huyết mạch: Dòng địa nứt; trẻ sinh mắt ‘rìa mờ’.
+
+Kích thức tỉnh: thiền vết nứt; Không Ấn.
+
+Phân bổ buff (≈12 thành): Dmg (không) +3; Tầm nhìn +3; Đọc +1; Thọ +2; Phản ứng +3 =
+12
+
+Kỹ năng riêng: ‘Bước Lệch’: dịch nửa bước (vi-dịch) không tạo tiếng.
+
+Cost/SE: hao TL/PDU · hoa mắt song ảnh
+
+Synergy (Map): Kiếm Thiên=2; CGQ=1
+
+Synergy (Path): Kiếm/Trận=2
+
+Lore: Kể rằng họ ‘đi tắt qua bóng tường’.
+
+Scene hook: Ám sát: chớp mắt, vị trí đã lệch; đòn địch ‘đi vào chỗ bỏ’.
+
+Thời Lậu Nhãn
+
+Huyết mạch: Huyết ‘đồng rỉ’; tháp chuông là tổ vật.
+
+Kích thức tỉnh: đếm ngược hơi thở; Thì Ấn.
+
+Phân bổ buff (≈12 thành): Dmg (thời) +2; Tầm nhìn +2; Đọc +3; Thọ +3; Phản ứng +2 =
+12
+
+Kỹ năng riêng: ‘Vi Phản’: tua ngược vi–khắc gần mắt (1 lần/trận) để ‘thấy lại’ quỹ tích.
+
+Cost/SE: hao trí nhớ tạm · đau thái dương; lẫn mốc thời gian
+
+Synergy (Map): Âm Quốc=1; Kiếm Thiên=1
+
+Synergy (Path): Pháp/Hồn=2
+
+Lore: Người giữ giờ của miếu, nói trước nửa câu.
+
+Scene hook: Giải trận: nhìn lại 1 khắc trước — nơi bày ‘khe hở’.
+
+Huyết Quyết Nhãn
+
+Huyết mạch: Huyết nóng; huyết đạo mạnh.
+
+Kích thức tỉnh: Huyết Ấn; tế một giọt lên mi tâm.
+
+Phân bổ buff (≈12 thành): Dmg (huyết) +4; Tầm nhìn +2; Đọc +1; Thọ +2; Phản ứng +3 =
+12
+
+Kỹ năng riêng: ‘Huyết Tầm’: khóa mục tiêu có ‘họ hàng huyết’ trong vòng vài dặm.
+
+Cost/SE: đốt huyết 1 thành · tâm đập loạn khi gặp huyết ‘đồng tông’
+
+Synergy (Map): Âm Quốc=2
+
+Synergy (Path): Huyết/Trận=2
+
+Lore: Tông họ ‘mất tích’ vì bị săn để lấy mắt.
+
+Scene hook: Truy sát: nhìn vạch chỉ tay — biết máu nào ‘người nhà’ của kẻ địch.
+
+Liên Sinh Nhãn
+
+Huyết mạch: Huyết mộc; uống sương lá đời đời.
+
+Kích thức tỉnh: Tịch Ấn; ngồi ‘thở xanh’.
+
+Phân bổ buff (≈12 thành): Dmg (mộc/sinh) +2; Tầm nhìn +3; Đọc +2; Thọ +3; Phản ứng
++2 = 12
+
+Kỹ năng riêng: ‘Sinh Sôi’: kích tái sinh mô nông (cầm máu, khép da nhanh).
+
+Cost/SE: tiêu hao HNT · buồn ngủ ngắn; ngứa quanh vết lành
+
+Synergy (Map): Tịnh Sơn Lâm=2
+
+Synergy (Path): Dược/Pháp=2
+
+Lore: Người mang mắt này hiếm khi để lại sẹo.
+
+Scene hook: Giữa loạn: vết cắt khép khi còn chạy — crowd ngỡ ‘bất tử’.
+
+Sa Kim Nhãn
+
+Huyết mạch: Huyết sa mặn; bụi cát là ‘muối mắt’.
+
+Kích thức tỉnh: Sa Ấn; vẽ quỹ trên cát.
+
+Phân bổ buff (≈12 thành): Dmg (kim/thổ) +4; Tầm nhìn +3; Đọc +1; Thọ +2; Phản ứng +2
+= 12
+
+Kỹ năng riêng: ‘Sa Quyển Nhãn’: nhìn đâu, cát xoáy đó; mù tạm kẻ địch hướng nhìn.
+
+Cost/SE: khô mắt · khát dữ nếu lạm
+
+Synergy (Map): Sa Mạc=2
+
+Synergy (Path): Trận/Thể=2
+
+Lore: Caravan giữ ‘mắt vàng’ làm bảo vật.
+
+Scene hook: Phục kích: main liếc — bức tường cát trùm kín cung thủ.
+
+Triều Hải Nhãn
+
+Huyết mạch: Huyết mạch thở theo nước; nghe ‘nhịp con triều’.
+
+Kích thức tỉnh: Triều Ấn; thiền bờ đá.
+
+Phân bổ buff (≈12 thành): Dmg (thủy) +3; Tầm nhìn +3; Đọc +2; Thọ +2; Phản ứng +2 =
+12
+
+Kỹ năng riêng: ‘Đảo Cực Thị’: đảo ‘đà’ của nước trong 3 khắc (phủ thủy sương mỏng).
+
+Cost/SE: hao PDU nhẹ · say sóng nội tạng
+
+Synergy (Map): Hải Miễu=2
+
+Synergy (Path): Thân/Pháp thủy=2
+
+Lore: Thợ cá giữ ‘mắt triều’ làm gia bảo.
+
+Scene hook: Đấu bến: một cái nhìn, nước trong thùng ‘chạy ngược’, địch trượt chân.
+
+Huyễn Mộng Nhãn
+
+Huyết mạch: Huyết mộng; canh mộ—canh mơ.
+
+Kích thức tỉnh: Mộng Ấn; ngủ ngồi.
+
+Phân bổ buff (≈12 thành): Dmg (huyễn/mộng) +2; Tầm nhìn +4; Đọc +2; Thọ +2; Phản ứng
++2 = 12
+
+Kỹ năng riêng: ‘Mộng Phản’: phản một ảo thuật nhìn thấy trong 3 khắc vừa qua.
+
+Cost/SE: tiêu hao LH · mộng váng; lẫn ranh thực–mơ
+
+Synergy (Map): Âm Quốc=2; U Giới=2
+
+Synergy (Path): Hồn/Pháp=2
+
+Lore: Nhiều kẻ tự ‘mơ chết’ khi nhìn lâu vào mắt này.
+
+Scene hook: Hội đường: nhà ảo thuật tự ăn đòn của mình — crowd nổ cười.
+
+Danh Ấn Nhãn
+
+Huyết mạch: Dòng miếu danh; nhiều ‘tên’ trong gia phả.
+
+Kích thức tỉnh: Danh Ấn; rửa mắt bằng ‘Danh Lộ’.
+
+Phân bổ buff (≈12 thành): Dmg (danh/nhân quả) +3; Tầm nhìn +2; Đọc +3; Thọ +2; Phản
+ứng +2 = 12
+
+Kỹ năng riêng: ‘Khai Danh’: đọc ‘tên thật’ của một vật/chiêu nhỏ, làm nó lộ sơ hở 1 khắc.
+
+Cost/SE: hao ‘danh khí’ · rát họng; khàn tiếng sau niệm
+
+Synergy (Map): Miếu Danh=2
+
+Synergy (Path): Pháp/Nghi thức=2
+
+Lore: Có người mất tên, chỉ còn mắt.
+
+Scene hook: Chém ‘tên’ trận — đường gió trong trận rối tung.
+
+[[ANCHOR: NHAN.ORG]] IV) Gia tộc & tổ chức
+
+• Nguyệt Tịnh Đường (Âm Quốc): tông môn ‘giữ gương’, chuyên Nguyệt Kính Nhãn; quy củ
+nặng, ghét Huyết đạo.
+
+• Lôi Trụ Kiếm Tông (Kiếm Thiên): clan rèn kiếm bằng bão, sở hữu Lôi Minh Nhãn; câu cửa
+miệng: ‘đánh kẻ thắng’.
+
+• Hội Thâu Mục (hắc thị): tổ chức săn—mổ—gắn Nhãn; có ‘thầy thợ’ chuyên cấy tủy thay
+huyết mạch.
+
+• Miếu Danh Đăng Bộ (đô hội): thư khố lưu ‘tên thật’ để kiểm tra Danh Ấn Nhãn; cho thuê
+danh—nguy hiểm.
+
+[[ANCHOR: NHAN.RATE]] V) Tỷ suất xuất hiện (đề nghị cân truyện)
+
+Trong 100.000.000 dân: ~0,05% mang dấu Huyết Mạch tương thích (~50.000). Trong số đó
+~10% thức tỉnh (~5.000). ~10% của nhóm thức tỉnh đạt cao phẩm (~500).
+
+→ Đủ hiếm để bị tranh đoạt, đủ nhiều để tồn tại thị trường đen, clan & chính sách map.
+
+[[ANCHOR: NHAN.THEFT]] VI) Cướp—mổ—gắn & thay huyết mạch
+
+• Cướp: gây mê—định ấn—mổ lấy Nhãn; tỉ lệ thành công 60–80% nếu cùng hệ, < 40% khác
+hệ. Sai quy trình: Nhãn hóa bột/‘đui vĩnh viễn’.
+
+• Thay huyết mạch: rút máu cũ (50–70%); cấy tủy tương thích; tế ấn ba ngày. Nguy cơ
+‘phản huyết’ 20–30%.
+
+• Khóa sử dụng: Nhãn chỉ hoạt động khi Huyết Mạch khớp ≥ 70% (xét theo tế ấn). Dân
+thường không phù hợp thì chỉ ‘đeo đẹp’.
+
+• Luật & nhân quả: miếu—đình có thể truy ‘đường cắt’; dùng trong đô hội dễ để lại dấu cướp.
+
+ARCLUNE · ADDENDUM · CÔNG PHÁP
+(CONSOL) — THỂ CHẤT TƯƠNG QUAN
+
+DocMeta: {"anchor":"PHYS","title":"Thể Chất Tương Quan","note":"Nhúng đầy đủ
+addendum THỂ CHẤT v1.0 vào sau NHÃN ĐẠO; giữ nguyên toàn bộ nội dung trước
+đó."}
+
+Phần này gồm: nguồn gốc di truyền thích nghi, ngân sách buff (~15 thành) cân bằng
+giữa học tập/tu luyện/sát thương/kháng/thọ, và danh mục thể chất mẫu kèm Synergy
+Map/Path.
+
+ARCLUNE · ADDENDUM · THỂ CHẤT TƯƠNG QUAN —
+v1.0
+
+DocMeta:
+{"doc_id":"AR.BIO.PHYS","version":"1.0","anchors":["PHYS.SET","PHYS.BALANCE","PHYS.LIST"],
+"rules":"Không xung đột Lò Hạch; tổng buff cân bằng giữa các thể chất; dùng ‘thành’ (1 thành = 10%)
+trong nội bộ; khi viết truyện mô tả bằng cảm giác."}
+
+[[ANCHOR: PHYS.SET]] I) Nguồn gốc & biểu hiện
+
+• Khởi nguyên di truyền thích nghi: tổ tiên cư trú hàng vạn–hàng chục vạn năm trong vùng
+Aether có thuộc tính mạnh → sinh ra Thể Chất tương quan. Ví dụ vùng băng cực → ‘Băng
+Hàn Cốt’.
+
+• Dị tượng sinh: trẻ ra đời thường có điềm: sương đọng, tia lửa, tiếng kim gõ, hương lá…
+‘Gần đạo nào’ thì dị tượng nghiêng về đạo đó.
+
+• Thức tỉnh: dễ kích bởi địa hình tương hợp, ấn quyết nhẹ, hoặc cảm ngộ trong nguy. Không
+mâu thuẫn với Lò Hạch — thể chất là ‘nền sinh học’, lò hạch là ‘động cơ’.
+
+[[ANCHOR: PHYS.BALANCE]] II) Cân bằng & ngân sách buff (nội
+bộ)
+
+• Thang buff quy ước (nội bộ): Học tập +2–5 thành; Tu luyện +3–6 thành; Sát thương tương
+quan +2–5 thành; Kháng sát thương tương quan +1–3 thành; Tuổi thọ +0.5–2 thành.
+
+• Ngân sách tổng: mỗi thể chất phân bổ tối đa ~15 thành (≈150%), cộng dồn giữa các
+hạng mục để đảm bảo không có thể chất ‘trùm tuyệt đối’. Nếu một mảng thấp → mảng
+khác được bù cao để thực chiến cân bằng.
+
+• Thi triển: khi viết chương dùng mô tả cảm giác (‘học nhanh’, ‘hít một hơi đã ấm’, ‘đòn lạnh ăn sâu’) —
+tránh hiển thị % trực tiếp.
+
+[[ANCHOR: PHYS.LIST]] III) Danh mục thể chất (mẫu) — kèm
+Synergy Map/Path
+
+Băng Hàn Cốt
+
+Nguồn gốc: Dòng tộc sống ở vực băng—gió bấc (cực đông) nhiều thế kỷ.
+
+Dị tượng sinh: ơi lạnh đọng sương trên tóc trẻ; da mát như băng.
+
+Kích thức tỉnh: đứng giữa hàn phong; hít ‘khí trắng’; ấn ‘Hàn Ấn’ nhẹ.
+
+Phân bổ buff (≈15 thành): Học +2; Tu +3; Dmg (băng) +5; Kháng (băng) +3; Thọ +2 = 15
+
+Synergy (Map): Tuyết vực=2; Sa Mạc=0; Âm Quốc=1
+
+Synergy (Path): Pháp tu=2; Thể tu=1
+
+Ấn liên hệ: Hàn Ấn; Tịnh Ấn
+
+Lore: Người băng ít bệnh nóng; truyền rằng xương họ ‘hát’ khi tuyết rơi lớn.
+
+Scene hook: Đòn chém của địch ‘đóng băng’ chuôi kiếm; crowd rít lên ‘lạnh thấu tay’.
+
+Liệt Viêm Tủy
+
+Nguồn gốc: Đời đời gần mạch hỏa, lò rèn lớn, dung nham nứt.
+
+Dị tượng sinh: môi đỏ, hơi nóng; nôi nằm gần lò vẫn ngủ yên.
+
+Kích thức tỉnh: nhập hỏa đường; hấp ‘khí đỏ’; ấn ‘Táo Ấn’.
+
+Phân bổ buff (≈15 thành): Học +2; Tu +4; Dmg (hỏa) +5; Kháng (hỏa) +2; Thọ +2 = 15
+
+Synergy (Map): Sa Mạc=2; CGQ lò=1; Tịnh Lâm=0
+
+Synergy (Path): Thể tu=2; Pháp hỏa=2
+
+Ấn liên hệ: Táo Ấn; Hỏa Ấn
+
+Lore: Họ rèn kiếm bằng tay trần một khắc; mồ hôi sôi nhỏ giọt thành muối đỏ.
+
+Scene hook: Chạm đất, lửa bùng từ vết nẻ; crowd lùi ― +sợ, +tò mò.
+
+Lôi Tâm Chỉ
+
+Nguồn gốc: Đỉnh đồi sấm, cây cổ thụ cháy đen là sân chơi tổ tiên.
+
+Dị tượng sinh: tiếng tim đập như trống; điện ‘vờn tóc’.
+
+Kích thức tỉnh: đứng giữa bão; ấn ‘Lôi Ấn’; nghe ‘nhịp trời’.
+
+Phân bổ buff (≈15 thành): Học +3; Tu +3; Dmg (lôi) +4; Kháng (lôi) +3; Thọ +2 = 15
+
+Synergy (Map): Kiếm Thiên=2; Hải Miễu bão=1
+
+Synergy (Path): Kiếm tu=2; Thân pháp=1
+
+Ấn liên hệ: Lôi Ấn; Ảnh Ấn
+
+Lore: Danh sách ‘trúng sét mà sống’ trong tộc dài bất tận.
+
+Scene hook: Lôi gói quanh mũi kiếm; crowd ‘ồ’ thành tiếng — UI +hâm mộ.
+
+Thủy Triều Mạch
+
+Nguồn gốc: Đời đời ở bờ triều; nhà xây theo ‘hơi thở’ con nước.
+
+Dị tượng sinh: tiếng thở trẻ trùng với tiếng sóng; tay mềm mát.
+
+Kích thức tỉnh: thiền trước miếu triều; ấn ‘Triều Ấn’.
+
+Phân bổ buff (≈15 thành): Học +2; Tu +5; Dmg (thủy) +3; Kháng (thủy) +3; Thọ +2 = 15
+
+Synergy (Map): Hải Miễu=2; Sa Mạc=0
+
+Synergy (Path): Thân pháp=2; Pháp thủy=2
+
+Ấn liên hệ: Triều Ấn; Định Ấn
+
+Lore: Tổ phổ ghi ‘đi theo nước thì sống’; trái nước thì ‘chết hụt’.
+
+Scene hook: Main đảo cực dòng chảy trong chén trà — bàn đối thủ rung theo.
+
+Mộc Sinh Hồn
+
+Nguồn gốc: Sống giữa rừng tịnh; uống sương lá; chôn nhau gốc cây cổ.
+
+Dị tượng sinh: mùi lá thoang thoảng; tóc mọc nhanh; vết thương ‘ngứa lành’.
+
+Kích thức tỉnh: ngồi ‘thở xanh’ vào can—phế; ‘Tịch Ấn’.
+
+Phân bổ buff (≈15 thành): Học +4; Tu +3; Dmg (mộc/sinh) +2; Kháng (độc) +3; Thọ +3 =
+15
+
+Synergy (Map): Tịnh Sơn Lâm=2; đô hội=0
+
+Synergy (Path): Pháp tu=2; Dược đạo=1
+
+Ấn liên hệ: Tịch Ấn; Sinh Ấn
+
+Lore: Rừng chọn người; người chọn cây ‘kết bạn’ cả đời.
+
+Scene hook: Giữa đô hội phủi tay, bụi cây ven đường xanh rì che mắt đám giữ cổng.
+
+Sa Kim Phách
+
+Nguồn gốc: Sa mạc gió cát; ăn muối phèn từ nhỏ; ngủ nghe cát chảy.
+
+Dị tượng sinh: da rám, mắt nheo ‘nghe gió’ bằng lông mày.
+
+Kích thức tỉnh: vẽ quỹ trên cát; ‘Kim Ấn + Sa Ấn’.
+
+Phân bổ buff (≈15 thành): Học +2; Tu +3; Dmg (kim/thổ) +5; Kháng (phong/sát) +3; Thọ
++2 = 15
+
+Synergy (Map): Sa Mạc Vô Tận=2
+
+Synergy (Path): Trận tu=2; Thể tu=1
+
+Ấn liên hệ: Kim Ấn; Sa Ấn; Trận Ấn
+
+Lore: Mồ hôi mằn mặn ‘giữ nước’ cho da; người ngoài khát còn họ cười.
+
+Scene hook: Cát cuộn như rùa; bước chân địch ‘chìm’ một nhịp — đủ chết.
+
+Nguyệt Ảnh Tâm
+
+Nguồn gốc: Miếu nguyệt sau mộ; đời đời canh đèn gương.
+
+Dị tượng sinh: tròng mắt phản sáng; ngủ tỉnh giữa đêm trăng.
+
+Kích thức tỉnh: mặc nguyệt quang; ‘Nguyệt Ấn’.
+
+Phân bổ buff (≈15 thành): Học +4; Tu +3; Dmg (âm/nguyệt) +3; Kháng (hồn) +3; Thọ +2
+= 15
+
+Synergy (Map): Âm Quốc=2; U Giới=1
+
+Synergy (Path): Hồn tu=2; Pháp tu=1
+
+Ấn liên hệ: Nguyệt Ấn; Ảnh Ấn
+
+Lore: Có ‘bóng mệnh’ đi sau lưng khi trăng rằm.
+
+Scene hook: Dựng gương tường, bóng địch ‘tách’ nửa bước rồi lùi lại — mất vía.
+
+Nhật Dương Huy
+
+Nguồn gốc: Đỉnh nắng; ruộng bậc thang hướng đông; lễ ‘phơi gươm’.
+
+Dị tượng sinh: da rám rỡ; mạch đập sáng khi sớm.
+
+Kích thức tỉnh: tắm nắng sáng; ‘Dương Ấn’.
+
+Phân bổ buff (≈15 thành): Học +3; Tu +3; Dmg (dương/quang) +5; Kháng (âm/lạnh) +2;
+Thọ +2 = 15
+
+Synergy (Map): Kiếm Thiên=1; Sa Mạc=1; Tịnh Lâm=0
+
+Synergy (Path): Kiếm/Đao tu=2; Thể tu=1
+
+Ấn liên hệ: Dương Ấn; Quang Ấn
+
+Lore: Họ rọi gươm vào nắng để ‘cho kiếm uống sớm’.
+
+Scene hook: Chém xuống, ánh đao lấn bóng — địch ‘hết chỗ nấp’.
+
+Không Tước Ảnh
+
+Nguồn gốc: Cư dân địa nứt; hầm ‘lọt gió’; trẻ chơi đuổi bóng giữa khe.
+
+Dị tượng sinh: bóng đứa trẻ mỏng như giấy; bước không gây tiếng.
+
+Kích thức tỉnh: thiền ‘vị dịch’ nửa bước; ‘Không Ấn’.
+
+Phân bổ buff (≈15 thành): Học +2; Tu +4; Dmg (không) +4; Kháng (trận) +3; Thọ +2 = 15
+
+Synergy (Map): Kiếm Thiên=2; CGQ=1
+
+Synergy (Path): Kiếm tu=2; Trận tu=1
+
+Ấn liên hệ: Không Ấn; Ảnh Ấn
+
+Lore: Vết rạn tường ‘đi theo’ người có thể chất này.
+
+Scene hook: Main biến mất nửa nhịp — xuất hiện sau lưng, tiếng áo chưa kịp về.
+
+Thời Lậu Mệnh
+
+Nguồn gốc: Làng ‘đồng rỉ’; tháp chuông sai giờ; mùa đến lệch.
+
+Dị tượng sinh: đồng hồ quanh trẻ chết máy khi bế qua.
+
+Kích thức tỉnh: đếm hơi thở đếm ngược; ‘Thì Ấn’.
+
+Phân bổ buff (≈15 thành): Học +5; Tu +2; Dmg (thời) +3; Kháng (khống chế) +3; Thọ +2 =
+15
+
+Synergy (Map): Âm Quốc=1; Kiếm Thiên=1
+
+Synergy (Path): Pháp tu=2; Kiếm tu=1
+
+Ấn liên hệ: Thì Ấn; Định Ấn
+
+Lore: Họ ‘nhớ trước’ một chút; kể chuyện tương lai như chuyện cũ.
+
+Scene hook: Giữa combat, kêu ‘dừng một hơi’ — địch chớp mắt xong đã muộn.
+
+Danh Ấn Căn
+
+Nguồn gốc: Dòng khắc danh miếu; mỗi đời dâng một ‘tên’.
+
+Dị tượng sinh: trẻ gọi tên vật rất sớm; đồ vật ‘nghe’.
+
+Kích thức tỉnh: lễ ‘trả tên cũ’; ‘Danh Ấn’.
+
+Phân bổ buff (≈15 thành): Học +4; Tu +3; Dmg (danh) +3; Kháng (nhân quả) +3; Thọ +2 =
+15
+
+Synergy (Map): Miếu Danh=2
+
+Synergy (Path): Pháp tu=2; Nghi thức=1
+
+Ấn liên hệ: Danh Ấn; Trấn Danh Ấn
+
+Lore: Họ có nhiều tên — và tất cả đều đúng.
+
+Scene hook: Main gọi ‘tên thật’ của trận pháp — quỹ đạo tự rối.
+
+Huyễn Mộng Nhãn
+
+Nguồn gốc: Canh mộng tổ nghiệp; chăn ‘mơ’ hơn chăn người.
+
+Dị tượng sinh: tròng mắt như có sương; hay nói mê đúng giờ.
+
+Kích thức tỉnh: ngủ ngồi; ‘Mộng Ấn’.
+
+Phân bổ buff (≈15 thành): Học +5; Tu +3; Dmg (huyễn/mộng) +2; Kháng (gian cảnh) +3;
+Thọ +2 = 15
+
+Synergy (Map): Âm Quốc=2; U Giới=2
+
+Synergy (Path): Hồn tu=2; Pháp tu=1
+
+Ấn liên hệ: Mộng Ấn; Ảnh Ấn
+
+Lore: Vài người trong tộc chưa từng khóc — chỉ ‘thở dài trong mơ’.
+
+Scene hook: Đàm phán: đối phương tự bước vào ‘giấc mình thua’, ký tên cái rụp.
+
+Ghi chú triển khai:
+
+• Khi dựng cảnh, ưu tiên đưa nhân vật đến địa hình tương hợp để Synergy Map=2. • Buff thể chất cộng
+với lợi thế Lò Hạch nhưng không thay thế — cảm giác ‘mở khóa nền’ trước khi ‘nạp nhiên liệu’. • Nếu
+muốn chống-chọi, dùng vũ khí/đan/ấn có ‘khắc hệ’ hoặc đưa ra khỏi địa hình tương hợp.
+
+ARCLUNE · ADDENDUM · CÔNG PHÁP
+(CONSOL) — ALCH (Kinh Tế & Đan Dược)
+
+DocMeta: {"anchor":"ALCH","title":"Kinh Tế & Đan Dược", "note":"Hợp nhất v0.8
+UNIFIED (Kinh tế–đan dược) vào CONSOL sau PHYS; giữ nguyên toàn bộ nội dung
+cũ."}
+
+Mục gồm: tiền tệ (VNT/HNT/ThNT/BTN/ThN), tỷ giá map-tier, kho đan dược
+(phàm→thánh→thần), nguyên liệu & luyện chế, cùng hook sang nguyên linh.
+
+ 5 siêu nguyên linh & làm rõ Song Sinh Tịnh Đế Liên
+
+100 VNT = 1 HNT; 1 VNT = 200 500 Vàng (dao  ng theo map/crowd).
+
+2) So sánh nhanh với Song Sinh Tịnh Đế Liên (SSTĐL)
+
+ SSTĐL chu kì 3×3000 năm
+
+ARCLUNE — Addendum — Kinh tế & Đan dược
+(DELUXE v0.3)
+
+DocMeta: [[ANCHOR: RM.ECON.DRUGS]] · Reader-Mode VN · Build 2025-08-15 12:40
+
+Bản v0.3 bổ sung **Nguyên linh theo phẩm + chủ dược**, đặt lại **tên nhị phẩm**
+thanh nhã hơn, và đặc tả **Song Sinh Tịnh Đế Liên** (chu kỳ 3×3000 năm, lộ trình
+2→10 đóa → độ kiếp → hoá hình).
+
+[[ANCHOR: RM.ECON.CURRENCY]] A) Tóm lược tiền tệ năng lượng
+& phàm (kế thừa v0.2)
+
+• **VNT**: 100 VNT = 1 Hạ Nguyên; **1 VNT ≈ 200–500 Vàng** (TC). Đổi vụn → thỏi
+**hao 1–2 thành**.
+• Tiền phàm: 1000 đồng = 100 bạch kim = 10 vàng = 1 bí ngân. Đồ phàm định giá
+bằng tiền phàm; dịch vụ tu/hàng aether định giá bằng VNT/Nguyên tinh.
+
+[[ANCHOR: RM.DAN.HERBS]] B) Nguyên linh theo phẩm & đan
+dược tương ứng
+
+**Nhất phẩm (1)**
+
+(cid:127) • **Hồi Nguyên Thảo** — chủ dược luyện **Tàng Nguyên Hoàn** (nhất phẩm).
+
+Tính ôn, kéo khí mượt; thường mọc ở rìa rừng TSL/ven suối.
+
+(cid:127) • **Huyết Linh Thảo** — chủ dược luyện **Cốt Tủy Đan** (nhất phẩm). Tính nhiệt,
+
+mạnh gân; hay mọc nơi đất đỏ/quặng sắt (CGQ/LC ven ngoài).
+
+(cid:127) • **Tịnh Linh Thảo** — chủ dược luyện **Thanh Phong Tán** (nhất phẩm). Tính
+
+thanh, dọn nhiễu; gặp ở sườn núi ẩm, chỗ rêu trắng.
+
+**Nhị phẩm (2) — đặt lại tên (tránh “Thảo + Vương”)**
+
+Đổi cách gọi **thanh nhã** theo bộ phận/chất **(Diệp/ Căn/ Lộ)**:
+(cid:127) • **Hồi Nguyên Diệp** (thay cho “Hồi Nguyên Thảo Vương”) — chủ dược **Tàng
+
+Nguyên Hoàn (nhị phẩm)**. Lá dày sẫm, gân dọc rõ.
+
+(cid:127) • **Huyết Linh Căn** (thay cho “Huyết Linh Thảo Vương”) — chủ dược **Cốt Tủy
+
+Đan (nhị phẩm)**. Rễ đỏ như mạch, cắt rỉ máu nhạt.
+
+(cid:127) • **Tịnh Linh Lộ** (thay cho “Tịnh Linh Thảo Vương”) — chủ dược **Thanh Phong
+
+Tán (nhị phẩm)**. Thu sương đầu canh tư, mùi mát như gạo mới.
+
+**Ghi chú luyện đan (áp dụng chung):**
+
+(cid:127) • **Tu vi người luyện phải tương xứng phẩm đan**; **Ngưng Đan** không thể
+
+luyện **Tứ phẩm**.
+
+(cid:127) • **Thánh đan (7–9)**: tối thiểu **Thánh nhân nhất trọng**.
+(cid:127) • Công thức có **1–2 chủ dược** (nguyên linh đúng màu aether) + **3–9 phụ
+
+dược** để ổn định/đẩy dẫn.
+
+(cid:127) • Lò: pháp đỉnh/án trận/giàn cơ giới — miễn **giữ nhịp** & **hợp màu** map.
+
+[[ANCHOR: RM.HERB.SONGSINHLIEN]] C) Song Sinh Tịnh Đế Liên
+— từ Thất phẩm đến Thập sinh
+
+**Mô tả:** Liên mộc hệ **tịnh/sinh**, xuất hiện ở đầm lầy sâu, rừng ẩm có aether
+mộc/sinh mệnh** dày. **Trời sinh Thất phẩm**. Khi sinh ra liền có **dị tượng** (ánh
+thanh bạch, chuông bùn).
+
+**Chu kỳ 3×3000 năm:**
+
+(cid:127) 1) **3000 năm** → **ra hoa (2 đoá)** — khởi điểm “Song Sinh”.
+(cid:127) 2) **+3000 năm** → **kết hạt** (2 tổ liên tử).
+(cid:127) 3) **+3000 năm** → **hạt chín**. **Nếu không bị hái**, cây **tự tái hấp thu**
+
+toàn bộ → **mọc thêm 1 đoá** (tăng +1).
+
+(cid:127) → Từ **2 đoá → 10 đoá** cần **8 chu kỳ × 9000 năm = 72.000 năm** (tính từ mốc
+
+2 đoá). Tổng từ lúc sinh đến 10 đoá: **≈ 75.000 năm**.
+
+**Quy tắc tiến phẩm & tu vi:**
+
+(cid:127) • Mỗi lần **tăng đoá** → **tu vi bản thể tăng tương ứng** (không theo “chu kỳ
+
+nguyên linh tiêu chuẩn”).
+
+(cid:127) • Tới **10 đoá** → **độ kiếp**. Qua kiếp → **hóa hình**.
+(cid:127) • **Hóa hình**: mỗi **đoá** hóa thành **1 người** → **10 người** cùng nguồn:
+
+**cộng hưởng buff/debuff, chia sẻ một phần nghĩ suy**.
+
+(cid:127) • **Tu đến Bán Thần** vẫn **ngưng tụ thần cách & đột phá** được như thường.
+Đặc biệt có thể **hợp nhất** (hợp thần quốc/thần cách/tu vi) vì “vốn là một”.
+(cid:127) • Sau hóa hình, **khởi lại ở Thất phẩm** (thánh) để **tu tốc độ rất nhanh** (bản
+
+chất tương đương “10 phẩm nguyên linh”).
+
+**Về “lò hạch” của nguyên linh:**
+
+Theo chuẩn Arclune: **nguyên linh không có lò hạch**; **bản thể chính là lò**. Do đó
+**không gán cấp lò hạch** cho Tịnh Đế Liên. Khi miêu tả, có thể nói **“sánh ngang
+thượng cấp/thần cấp lò hạch”** theo **cảm giác** (dùng “thành”), không dùng %.
+
+**Chế đan liên quan (Thánh → Thần):**
+
+(cid:127) • **Liên Tâm** (nhân/tâm của hoa): chủ dược **Hộ Thần** (thánh) — phục hồi linh
+
+hồn sạch mà êm.
+
+(cid:127) • **Thanh Liên Lộ** (sương trên đế): chủ dược **An Thần** (thánh) — mở khe cảm
+
+ngộ, ít lệ thuộc.
+
+(cid:127) • **Đế Liên Tử** (hạt chín): phối **Phá Cảnh Đan (thánh)** — chỉ tăng xác suất;
+
+cưỡng quá dễ lưu tật.
+
+(cid:127) • **Tịnh Đế Tâm** + **PDU** (thần lực) + án trận hợp màu → có thể luyện **Thần
+đan** (hiếm). **Dược lực tối đa** khi dùng **toàn bộ bản thể** (ác nghiệp nặng).
+
+**Nguy cơ & luật:**
+
+(cid:127) • **Bí mật**: càng nhiều đoá, **dị tượng mạnh** → dễ bị phát hiện. Lõi/đô hội có
+
+**Ấn trật tự** ngăn săn trộm.
+
+(cid:127) • **Săn nguyên linh hóa hình** là **trọng tội**; vùng biên có “vùng mờ” nhưng dễ
+
+dính **điều phối Địa thần**.
+
+(cid:127) • **Hái hạt** giữa chu kỳ → **mất cơ hội tăng đoá** ở lần đó; cây vào chu kỳ mới
+
+(chậm thêm 9000 năm).
+
+**Gợi ý câu văn (cắm thẳng vào truyện):**
+
+(cid:127) • “Đầm sâu thở mùi lá ướt; **hai đoá** đứng đối, thân sen sáng như giữ đèn — chỗ
+
+này **có Ấn**, nói khẽ thôi.”
+
+(cid:127) • “Hắn không dám chạm **liên tử**; chỉ khều giọt **Thanh Liên Lộ** lên nắp bình,
+
+mùi mát như gạo mới, đầu óc bớt ồn.”
+
+(cid:127) • “Người áo đen lắc bình **Đế Liên Tử**, cười nhỏ: ‘đổi được **năm thỏi Hạ
+
+Nguyên**, cũng đáng’ — chuông hiên bỗng rung một tiếng.”
+
+ARCLUNE — Addendum — Kinh tế & Đan dược
+(DELUXE v0.4)
+
+DocMeta: [[ANCHOR: RM.ECON.DRUGS]] · Reader-Mode VN · Build 2025-08-15 12:50
+
+Bản v0.4 bổ sung: (i) **sản vật** của **Song Sinh Tịnh Đế Liên**
+(rễ/củ/giọt/hạt/hoa/lá/thân) với **đơn tương ứng**; (ii) bảng **ánh xạ tu vi** nếu khởi
+ở **TT1 trọng** khi tăng 3→10 đoá; (iii) **5 siêu nguyên linh** mới, có địa bàn &
+công dụng đan/luyện.
+
+[[ANCHOR: RM.REF]] A) Tham chiếu nhanh (từ v0.3)
+
+• VNT: 100 VNT = 1 Hạ Nguyên; tại TC: 1 VNT ≈ 200–500 Vàng; đổi vụn→thỏi hao
+1–2 thành.
+• Thang đan: **Phàm (0–6)** · **Thánh (7–9)** · **Thần**; luyện đan yêu cầu **tu vi
+tối thiểu tương xứng**; Thánh đan ≥ **Thánh nhân nhất trọng**; Thần đan cần
+**PDU + Nguyên linh 10 phẩm**.
+
+[[ANCHOR: RM.HERB.SONGSINHLIEN.PROD]] B) Song Sinh Tịnh Đế
+Liên — sản vật & đơn dược tương ứng
+
+Bộ phận
+
+Mô tả/thu hoạch
+
+Đơn dược / Ứng dụng
+
+Ghi chú & side-effect
+
+Rễ tơ
+
+Rễ mảnh dưới bùn, mùi thanh tanh
+
+Lạnh nhẹ bàn chân; dùng quá tay → tê bì ngón
+
+• **Mạch Ấn Hoàn** (ổn định ấn)
+• Cao dán trị chuột rút
+
+Củ sen (ngó)
+
+Đốt to, ruột xốp trắng
+
+• **Cốt Trạch Canh** (súp phối **Cốt Tủy Đan** tăng độ êm)
+• Bổ thân lâu ngày
+
+No nhanh; ăn nhiều → nặng bụng **nửa thành**
+
+Giọt sương trên lá (**Thanh Liên Lộ**)
+
+Hứng vào canh tư; tinh khiết• **An Thần** (thánh)
+
+Dễ nghiện nhẹ; nghỉ 3 ngày giữa mỗi 10 ngày dùng
+
+• Pha **Dẫn Khí Hoàn** cho nhịp hô hấp mượt
+
+Hạt sen (**Đế Liên Tử**)
+
+Chỉ lấy khi **chín**; xanh bạc• Phối **Phá Cảnh Đan** (thánh) → tăng xác suất đột phá (nhẹ)
+
+Cưỡng quá dễ lưu tật; miêu tả bằng cảm giác
+
+Hoa sen
+
+Cánh dày, hương trong
+
+• **Tịnh Ý Hương** (đốt nhẹ trước cảm ngộ)
+• Phối **Hộ Thần**
+
+Khói nhiều → khô mắt **một chút**
+
+Lá sen
+
+Phiến rộng, gân đều
+
+• **Tĩnh Tức Cao** (đắp trán giảm dao động tâm)
+• Làm nền **án tĩnh**
+
+Dễ để lại vệt xanh trên da tạm thời
+
+Thân sen
+
+Xanh giòn, nhiều mạch khí • **Dẫn Khí Tụy** (tán uống trước luyện thở)
+• Gia vị ấm bụng
+
+Uống vội → hắt hơi; nên nhấp chậm
+
+**Lưu ý đạo đức/pháp luật:** Săn **nguyên linh hóa hình** là **trọng tội**; ở vùng
+biên có “vùng mờ” nhưng dễ dính **điều phối Địa thần**.
+
+[[ANCHOR: RM.HERB.SUPER]] D) 5 siêu nguyên linh khác (địa bàn ·
+sản vật · đơn dược)
+
+**Thiên Viêm Hàn Tủy Song Thạch**
+
+Khoáng linh song thuộc tính **hỏa + băng**; vết nứt đỏ lam xen kẽ; gặp ở rìa **Vành
+Nứt**/động băng **BTB** sát mạch dung nham.
+Ứng dụng:
+(cid:127) • **Song Tức Đan**: bộc phát ngắn nhưng ổn định (ít rỗng gối).
+(cid:127) • **Ngưng Tủy Cao**: chữa viêm khớp lạnh-hàn cho luyện thể.
+
+Ghi chú: Dùng sai ‘màu’ → sốc nhiệt; nên ủ cùng muối đen SMVT 3 canh.
+
+**Hư Quang Tự Tụ Tùng**
+
+Mộc linh phát quang mờ; chỉ mọc ở **TTLẢ** gần di tích; đêm thấy vòng quang.
+Ứng dụng:
+(cid:127) • **Hộ Thần (quang mộc)**: trấn mộng rách.
+(cid:127) • **Quang Ấn Hoàn**: qua cổng di tích bậc 1-2.
+
+Ghi chú: Chặt bừa dễ bị ‘ám’; nên xin Ấn trấn danh trước khi lấy cành.
+
+**Minh Mộc Nguyệt Thai**
+
+Mộc linh âm nguyệt, phồng như thai; gặp ở **Âm Quốc** trong mộ sâu có giếng trời.
+Ứng dụng:
+(cid:127) • **Nguyệt Thai Tán**: phục hồi hồn thai nhẹ.
+(cid:127) • **Tịnh Hồn Hoàn**: dọn tạp âm cảm ứng.
+
+Ghi chú: Kỵ nắng gắt; đem ra ngoài phải bọc vải mát, kẻo ‘khóc’.
+
+**Hải Nhãn Triều Tinh**
+
+Khoáng linh như mắt biển; ở **Hải Miễu** dưới hốc xoáy; khi triều lên phát sáng.
+Ứng dụng:
+(cid:127) • **Định Ấn Ngọc**: neo ấn cá nhân khi vượt bão.
+(cid:127) • **Triều Tức Đan**: điều nhịp thở sâu, hợp **Hô Hấp**.
+
+Ghi chú: Lấy sai con nước bị hút; nên đi cùng người biết ‘đếm sóng’.
+
+**Hoàng Sa Kim Tàng**
+
+Sa linh kim; **SMVT**; hạt vàng lẫn cát biết ‘chui’ theo gió.
+Ứng dụng:
+(cid:127) • **Kim Gân Tán**: gia cứng gân, hợp luyện kiếm.
+(cid:127) • **Pháp Kim Mộc**: phủ lưỡi đao, tăng ‘ăn’ aether.
+
+Ghi chú: Dễ cấn tay; đeo bao vải mịn, tránh xước mạch khí.
+
+ARCLUNE — Addendum — Kinh tế & Đan dược
+(DELUXE v0.5)
+
+DocMeta: [[ANCHOR: RM.ECON.DRUGS]] · Reader-Mode VN · Build 2025-08-15 12:53
+
+Bản v0.5 (đề nghị #2): Mở rộng **phẩm 3–6** cho ba hệ **Hồi Nguyên / Huyết Linh /
+Tịnh Linh** với naming thanh nhã (**Hoa / Quả / Tâm / Tinh**), mỗi mục kèm habitat,
+đơn dược chính và side-effect để cắm thẳng vào truyện.
+
+[[ANCHOR: RM.DAN.NAMING]] A) Khóa đặt tên (nhị–lục phẩm)
+
+• **Nhị phẩm**: dùng **Diệp / Căn / Lộ** (đã chốt v0.3). • **Tam–Lục phẩm**: dùng
+**Hoa / Quả / Tâm / Tinh** theo độ cô kết dược tính.
+
+[[ANCHOR: RM.DAN.FAM.HN]] B) Hồi Nguyên hệ — phục hồi aether
+mượt
+
+Màu mát, kéo khí êm, hợp **Hô Hấp (Passive)**.
+Đơn trục chính: Tàng Nguyên Hoàn (1→6) + các biến thể êm hơi
+
+Phẩm Tên nguyên linh
+
+Habitat (gợi ý)
+
+Đơn chính (cấp)
+
+Side-effect (miêu tả)
+
+3
+
+4
+
+5
+
+6
+
+Hồi Nguyên Hoa
+
+TSL bìa rừng, suối nông có sương
+
+Tàng Nguyên Hoàn (tam) · **Hồi Tức Đan** (hỗ trợ Hô Hấp, kéo hơi dài hơn)
+
+ấm ngực, dễ buồn ngủ nhẹ
+
+Hồi Nguyên Quả
+
+TSL sâu hơn, đất ẩm rêu trắngTàng Nguyên Hoàn (tứ) · **Dưỡng Mạch Thang** (canh ấm dưỡng mạch)
+
+no nhanh, cổ hơi khô
+
+Hồi Nguyên Tâm
+
+Gốc già, lõi cứng ánh xanh Tàng Nguyên Hoàn (ngũ) · **Tích Nguyên Đan** (tạm ‘gửi’ aether, dùng sau)
+
+dễ phụ thuộc nếu lạm dụng
+
+Hồi Nguyên Tinh
+
+Khe đá mù sương, khí cô đặcTàng Nguyên Hoàn (lục) · **Ngưng Hà Hoàn** (ổn định nhịp hấp thu)
+
+chân tay tê nhẹ nửa canh
+
+[[ANCHOR: RM.DAN.FAM.HL]] C) Huyết Linh hệ — thân cường, gân
+cốt dày
+
+Màu nóng, đẩy cơ – hợp luyện thể/đao kiếm.
+Đơn trục chính: Cốt Tủy Đan (1→6) + hỗ trợ tẩm/quán xương
+
+Phẩm Tên nguyên linh
+
+Habitat (gợi ý)
+
+Đơn chính (cấp)
+
+Side-effect (miêu tả)
+
+3
+
+4
+
+5
+
+6
+
+Huyết Linh Hoa
+
+Đất đỏ, gần quặng sắt (CGQ ngoại vi)
+
+Cốt Tủy Đan (tam) · **Huyết Nhiệt Hoàn** (kích cơ nhanh)
+
+đỏ mặt, nóng người
+
+Huyết Linh Quả
+
+Sườn đồi khô, nắng gắt
+
+Cốt Tủy Đan (tứ) · **Huyết Trì Tán** (ngâm thuốc luyện thể)
+
+tim gõ nhanh nửa canh
+
+Huyết Linh Tâm
+
+Lớp đất sâu gần mạch kim Cốt Tủy Đan (ngũ) · **Tủy Sinh Đan** (vá vi chấn thương)
+
+khó chịu ở xương ống
+
+Huyết Linh Tinh
+
+Hang khô ấm, ít gió
+
+Cốt Tủy Đan (lục) · **Kim Cốt Đan** (cứng xương)
+
+giòn lực nếu không dưỡng ẩm đủ
+
+[[ANCHOR: RM.DAN.FAM.TL]] D) Tịnh Linh hệ — an thần, dọn nhiễu
+
+Màu thanh, mở khe cảm ngộ — hợp tĩnh tọa, làm sạch UI.
+Đơn trục chính: Thanh Phong Tán (1→6) + phụ hương định ý
+
+Phẩm Tên nguyên linh
+
+Habitat (gợi ý)
+
+Đơn chính (cấp)
+
+Side-effect (miêu tả)
+
+3
+
+4
+
+5
+
+6
+
+Tịnh Linh Hoa
+
+Sườn núi ẩm, mây sáng
+
+Thanh Phong Tán (tam) · **Định Thần Hương** (đốt nhẹ trước nhập tĩnh)
+
+mắt khô nhẹ nếu phòng kín
+
+Tịnh Linh Quả
+
+Thung lũng gió yên
+
+Thanh Phong Tán (tứ) · **Minh Khiếu Hoàn** (sáng trí, lọc nhiễu)
+
+lạnh gáy, dễ mơ trong
+
+Tịnh Linh Tâm
+
+Khe đá có chuông nước
+
+Thanh Phong Tán (ngũ) · **Tâm Hồ Đan** (giữ mặt hồ phẳng)
+
+cảm xúc phẳng bớt nửa thành
+
+Tịnh Linh Tinh
+
+Hang tối có giọt đều
+
+dễ lạnh người, cần áo choàng
+Thanh Phong Tán (lục) · **Không Minh Đan** (xóa rìa tạp ý)
+
+[[ANCHOR: RM.DAN.RULES]] E) Luật dùng khi viết (nhắc lại ngắn)
+
+(cid:127) • **Không nâng cấp/Thức tỉnh giữa combat**; cut-scene cảm ngộ chỉ chạy khi an
+
+toàn.
+
+(cid:127) • **Tu vi người luyện phải >= phẩm đan**; **Thánh đan (7–9)**: ≥ **Thánh nhân
+
+nhất trọng**; **Thần đan**: cần **PDU + nguyên linh 10 phẩm**.
+
+(cid:127) • Diễn đạt bằng **thành** (1 thành = 10%); tránh bảng số.
+(cid:127) • Khi quy đổi **VNT/Hạ Nguyên ↔ tiền phàm**: luôn có **phí** 1–2 **thành**, trượt
+
+theo map & crowd.
+
+ARCLUNE — Addendum — Kinh tế & Đan dược
+(DELUXE) — PATCH v0.6
+
+DocMeta: [[ANCHOR: RM.HERB.SONGSINHLIEN.REALM]] · Patch khung **Thánh Nhân →
+Thánh Hoàng → Thánh Tôn** cho Song Sinh Tịnh Đế Liên · Build 2025-08-15 13:09
+
+**Chuẩn master:** Thánh Tam Bộ = **Thánh Nhân (TN) → Thánh Hoàng (TH) →
+Thánh Tôn (TT)**; mỗi bộ 1–9 trọng.
+**Rule tăng cấp của Song Sinh Tịnh Đế Liên (SSTĐL):** mỗi chu kỳ 9000 năm có 3
+tick 3000 năm (mỗi tick +1 “vi”) + lúc ngưng tụ thêm 1 đoá (+1 “vi”) ⇒ **mỗi thêm
+1 đoá = +4 vi = +1 trọng**. Hai đoá đầu có hao phí hợp mạch nên hiệu lực **+3
+trọng/đoá**.
+
+**Bảng ánh xạ (khởi ở TN1, trời sinh 2 đoá):**
+
+Số đoá sau ngưngTăng/đoá (trọng)Cộng dồn (trọng)Cảnh giới đạt được
+
+Ghi chú
+
+2 (trời sinh)
+
+3
+
+4
+
+5
+
+6
+
+7
+
+8
+
+9
+
+—
+
++3
+
++3
+
++4
+
++4
+
++4
+
++4
+
++4
+
+0
+
+3
+
+6
+
+10
+
+14
+
+18
+
+22
+
+26
+
+Thánh Nhân 1
+
+gốc hệ song sinh
+
+Thánh Nhân 4
+
+trừ hao hợp mạch
+
+Thánh Nhân 7
+
+ổn mạch dần
+
+Thánh Hoàng 2
+
+vượt TN9 → TH2
+
+Thánh Hoàng 6
+
+leo đều
+
+Thánh Tôn 1
+
+Thánh Tôn 5
+
+Thánh Tôn 9
+
+vượt TH9 → TT1
+
+leo đều trong TT
+
+chạm trần TT
+
+10
+
+(+4 rồi **độ kiếp**)—
+
+Hóa hình (10 thân)
+
+reset hiển lộ về **Thất phẩm (thánh)**, tu cực nhanh
+
+**Dùng khi viết:** hai đoá đầu ‘điềm đạm tăng ba bậc’; từ đoá thứ năm trở đi ‘mỗi
+đoá vượt bốn bậc’. Lúc nhảy bộ (TN→TH; TH→TT) nên tả **đổi tên luật** của đầm:
+gân lá đổi họ, mạch bùn khóa lại — mất **một bước** để “gọi đúng tên” của mình.
+
+ARCLUNE — Addendum — Kinh tế & Đan dược (DELUXE) ·
+v0.7b (PATCHED)
+
+DocMeta: [[ANCHOR: AR.ECON.DRUGS]] · Không gắn vào RM bundle · Font: DejaVuSans
+
+0) Mục tiêu patch
+
+• Nhúng 5 siêu nguyên linh + phân bậc tư chất (không ngang hàng với Song Sinh Tịnh Đế
+Liên). • Bổ sung sản vật & đơn dược của Song Sinh Tịnh Đế Liên. • Bảng ánh xạ tu vi theo
+số đoá hoa (chuẩn TN→TH→TT). • Tiền tệ: Vụn Nguyên Tinh (VNT), Hạ Nguyên (HNT), cùng
+khuyến nghị dùng “thành” thay vì % khi mô tả.
+
+1) Khái niệm & thang tư chất
+
+Song Sinh Tịnh Đế Liên (SSTĐL): ngoại lệ duy nhất đạt đỉnh tư chất hữu sinh, có cơ chế
+tăng đoá → hoá hình → hợp nhất.
+Siêu nguyên linh (5 loại mới): tư chất < SSTĐL một bậc; đỉnh cao ở Bát–Cửu phẩm theo
+map; không có cơ chế tăng đoá; vẫn chịu bias map & khí vận.
+Khi miêu tả nên dùng “thành”: 1 thành = 10%; ví dụ: ‘đổi vụn → thỏi hao một đến hai
+thành’.
+
+2) So sánh nhanh với Song Sinh Tịnh Đế Liên (SSTĐL)
+
+Tiêu chí
+
+SSTĐL
+
+5 siêu nguyên linh (patch)
+
+Khởi điểm
+
+Trời sinh Thất phẩm (2 đóa); luôn có dị tượngBát–Cửu phẩm (map phụ thuộc); KHÔNG cơ chế đóa
+
+Tiến phẩm bản thể
+
+Theo chu kỳ 3×3000 năm + tăng đoá
+
+Theo môi trường & chăm sóc; không có mốc ‘đóa’
+
+Hoá hình
+
+10 đóa → độ kiếp → hóa hình 10 thân
+
+Không hoá hình; chỉ tăng phẩm mộc tốc
+
+Cộng hưởng
+
+10 thân cộng hưởng buff/debuff; có thể hợp nhất
+
+Không có ‘10 thân’; hiệu ứng đơn thể
+
+3) Song Sinh Tịnh Đế Liên — sản vật & đơn dược
+
+Bộ phận
+
+Rễ tơ
+
+Mô tả
+
+Đơn dược / Ứng dụng
+
+Ghi chú
+
+Rễ mảnh dưới bùn, mùi thanh tanh
+
+Mạch Ấn Hoàn (ổn định ấn); Cao dán trị chuột rút
+
+Lạnh nhẹ bàn chân; dùng quá tay → tê bì ngón
+
+Củ sen (ngó)
+
+Đốt to, ruột xốp trắng
+
+Cốt Trạch Canh (súp phối Cốt Tủy Đan tăng êm); bổ thân lâu ngày
+
+No nhanh; ăn nhiều → nặng bụng nửa thành
+
+Giọt sương (Thanh Liên Lộ)
+
+Hứng canh tư; tinh khiết An Thần (thánh); pha Dẫn Khí Hoàn cho nhịp thở mượt
+
+Dễ nghiện nhẹ; nghỉ 3 ngày mỗi 10 ngày dùng
+
+Hạt (Đế Liên Tử)
+
+Chỉ lấy khi chín; xanh bạcPhối Phá Cảnh Đan (thánh) → tăng xác suất đột phá (nhẹ)
+
+Cưỡng quá dễ lưu tật; tả bằng cảm giác
+
+Hoa sen
+
+Lá sen
+
+Cánh dày, hương trong
+
+Tịnh Ý Hương (đốt nhẹ trước cảm ngộ); phối Hộ Thần
+
+Khói nhiều → khô mắt một chút
+
+Phiến rộng, gân đều
+
+Tĩnh Tức Cao (đắp trán giảm dao động tâm); làm nền án tĩnh
+
+Dễ để lại vệt xanh trên da tạm thời
+
+Thân sen
+
+Xanh giòn, nhiều mạch khíDẫn Khí Tụy (tán uống trước luyện thở); gia vị ấm bụng
+
+Uống vội → hắt hơi; nên nhấp chậm
+
+4) Ánh xạ tu vi theo số đoá (giả định khởi ở TN1)
+
+Số đoá sau ngưng
+
+Tăng/đoá (trọng) Cộng dồn (trọng)Cảnh giới đạt được
+
+Ghi chú
+
+2 (trời sinh)
+
+3
+
+4
+
+—
+
++3
+
++3
+
+0
+
+3
+
+6
+
+Thánh Nhân 1
+
+Thánh Nhân 4
+
+Thánh Nhân 7
+
+Gốc hệ song sinh
+
+Trừ hao hợp mạch
+
+Ổn mạch dần
+
+(cid:127)
+(cid:127)
+(cid:127)
+5
+
+6
+
+7
+
+8
+
+9
+
+10 (+ độ kiếp)
+
++4
+
++4
+
++4
+
++4
+
++4
+
+—
+
+10
+
+14
+
+18
+
+22
+
+26
+
+—
+
+Thánh Hoàng 2
+
+Vượt TN9 → TH2
+
+Thánh Hoàng 6
+
+Leo đều
+
+Thánh Tôn 1
+
+Thánh Tôn 5
+
+Thánh Tôn 9
+
+Vượt TH9 → TT1
+
+Leo trong TT
+
+Chạm trần TT
+
+Hóa hình (10 thân)
+
+Reset hiển lộ về Thất phẩm (thánh), tu cực nhanh
+
+5) Năm siêu nguyên linh (địa bàn · sản vật · ứng dụng)
+
+• Thiên Viêm Hàn Tủy Song Thạch (VN/BTB)
+
+Khoáng linh song hỏa+băng; vết nứt đỏ lam; rìa Vành Nứt/động băng Băng Tây Bác.
+Ứng dụng: Song Tức Đan (bộc phát ngắn ổn định); Ngưng Tủy Cao (khớp lạnh-hàn).
+Ghi chú: Dùng sai ‘màu’ → sốc nhiệt; ủ cùng muối đen SMVT 3 canh.
+
+• Hư Quang Tự Tụ Tùng (TTLẢ)
+
+Mộc linh phát quang mờ; gần di tích Tịnh Lưu Ảnh; đêm thấy vòng quang.
+Ứng dụng: Hộ Thần (quang mộc) — trấn mộng rách; Quang Ấn Hoàn — qua cổng di tích
+bậc 1–2.
+Ghi chú: Nên xin Ấn trấn danh trước khi lấy cành; tránh ‘ám’.
+
+• Minh Mộc Nguyệt Thai (Âm Quốc)
+
+Mộc linh âm nguyệt, phồng như thai; trong mộ sâu có giếng trời.
+Ứng dụng: Nguyệt Thai Tán; Tịnh Hồn Hoàn.
+Ghi chú: Kỵ nắng gắt; bọc vải mát khi mang ra ngoài.
+
+• Hải Nhãn Triều Tinh (Hải Miễu)
+
+Khoáng linh như mắt biển ở hốc xoáy; triều lên phát quang.
+Ứng dụng: Định Ấn Ngọc (neo ấn cá nhân khi vượt bão); Triều Tức Đan (hợp kỹ năng Hô
+Hấp).
+Ghi chú: Đi đúng con nước; đi cùng người biết ‘đếm sóng’.
+
+• Hoàng Sa Kim Tàng (SMVT)
+
+Sa linh kim; hạt vàng lẫn cát biết ‘chui’ theo gió.
+Ứng dụng: Kim Gân Tán (gia cứng gân); Pháp Kim Mộc (phủ lưỡi đao).
+Ghi chú: Đeo bao vải mịn; tránh xước mạch khí.
+
+6) Tiền tệ & đổi chéo
+
+• VNT: 100 VNT = 1 Hạ Nguyên (HNT). Tỷ giá mềm: 1 VNT ≈ 200–500 Vàng (dao động theo
+crowd & thuế map). Đổi vụn → thỏi hao 1–2 thành. • Tiền phàm: 1000 đồng = 100 bạch
+kim = 10 vàng = 1 bí ngân. Hàng aether định giá bằng VNT/HNT; đồ phàm định giá bằng
+tiền phàm.
+
+
