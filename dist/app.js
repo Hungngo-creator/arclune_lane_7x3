@@ -45,7 +45,7 @@ __define('./ai.js', (exports, module, __require) => {
   }
 
   function debugConfig(){
-      const cfg =(function (_temp){ return _temp == null ? void 0 : _temp.DEBUG; })(CFG.AI) || {};
+    const cfg =(function (_temp){ return _temp == null ? void 0 : _temp.DEBUG; })(CFG.AI) || {};
     const keepTopRaw =(function (){ var _temp = (function (){ var _temp = cfg.keepTop; return _temp != null ? _temp : cfg.KEEP_TOP; })(); return _temp != null ? _temp : DEFAULT_DEBUG_KEEP; })();
     const keepTopNum = Number(keepTopRaw);
     return {
@@ -182,7 +182,7 @@ __define('./ai.js', (exports, module, __require) => {
   function rowCrowdingFactor(Game, cy){
     const ours = tokensAlive(Game).filter(t => t.side==='enemy' && t.cy===cy).length;
     let queued = 0;
-    const m = Game.queued?.enemy;
+    const m =(function (_temp){ return _temp == null ? void 0 : _temp.enemy; })(Game.queued);
     if (m && typeof m.values === 'function'){
       for (const p of m.values()) { if (p && p.cy === cy) queued++; }
     }
