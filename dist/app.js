@@ -3006,19 +3006,6 @@ __define('./passives.js', (exports, module, __require) => {
 });
 __define('./statuses.js', (exports, module, __require) => {
   // statuses.js — Hệ trạng thái/effect data-driven v0.7
-  // Dùng ES module. Không phụ thuộc code ngoài.
-  // Cách dùng chính:
-  // - Statuses.add(unit, Statuses.make.stun({turns:2}))
-  // - if (!Statuses.canAct(unit)) { Statuses.onTurnEnd(unit, ctx); return; }
-  // - target = Statuses.resolveTarget(attacker, candidates, {attackType:'basic'}) ?? fallback
-  //   - const pre = Statuses.beforeDamage(attacker, target, {dtype:'phys', base:raw});
-  //   - let dmg = pre.base * pre.outMul; // trước giáp
-  //   - // áp xuyên giáp pre.defPen vào công thức của mày rồi tính giảm giáp…
-  //   - dmg = dmg * pre.inMul; // giảm/tăng sát thương đến từ target (damageCut/invulnerable…)
-  //   - const abs = Statuses.absorbShield(target, dmg, {dtype:'any'});
-  //   - apply hp -= abs.remain;  // abs.absorbed là lượng vào khiên
-  //   - Statuses.afterDamage(attacker, target, {dealt:abs.remain, absorbed:abs.absorbed, dtype:'phys'});
-
   const byId = (u) => (u && u.statuses) || (u.statuses = []);
 
   // ===== Utilities
@@ -3046,7 +3033,7 @@ __define('./statuses.js', (exports, module, __require) => {
         }
         if (st.dur != null) cur.dur = st.dur;            // refresh thời lượng
         if (st.power != null) cur.power = st.power;      // replace nếu mạnh hơn (tuỳ loại)
-        if (st.amount != null) cur.amount = (cur.amount ?? 0) + (st.amount ?? 0); // shield cộng dồn
+        if (st.amount != null) cur.amount = ((function (){ var _temp = cur.amount; return _temp != null ? _temp : 0; })()) + ((function (){ var _temp = st.amount; return _temp != null ? _temp : 0; })()); // shield cộng dồn
         return cur;
       }
       const copy = { ...st };
@@ -3075,7 +3062,7 @@ __define('./statuses.js', (exports, module, __require) => {
       if (bleed){
         const lost = Math.round(unit.hpMax * 0.05);
         unit.hp = Math.max(0, unit.hp - lost);
-        if (ctx?.log) ctx.log.push({t:'bleed', who:unit.name, lost});
+        if ((function (_temp){ return _temp == null ? void 0 : _temp.log; })(ctx)) ctx.log.push({t:'bleed', who:unit.name, lost});
         _dec(unit, bleed);
       }
       // Các status có dur tính theo lượt của chính unit sẽ giảm ở đây
@@ -3122,18 +3109,18 @@ __define('./statuses.js', (exports, module, __require) => {
       let out = { ...base };
       // 11) Chóng mặt: -10% SPD & AGI
       if (this.has(unit,'daze')){
-        out.SPD = (out.SPD ?? 0) * 0.9;
-        out.AGI = (out.AGI ?? 0) * 0.9;
+       out.SPD = ((function (){ var _temp = out.SPD; return _temp != null ? _temp : 0; })()) * 0.9;
+        out.AGI = ((function (){ var _temp = out.AGI; return _temp != null ? _temp : 0; })()) * 0.9;
       }
       // 14) Sợ hãi: -10% SPD
       if (this.has(unit,'fear')){
-        out.SPD = (out.SPD ?? 0) * 0.9;
+        out.SPD = ((function (){ var _temp = out.SPD; return _temp != null ? _temp : 0; })()) * 0.9;
       }
         // 20) Thần tốc: +% SPD
       const haste = this.get(unit,'haste');
       if (haste){
-        const boost = 1 + clamp01(haste.power ?? 0.1);
-        out.SPD = (out.SPD ?? 0) * boost;
+        const boost = 1 + clamp01((function (){ var _temp = haste.power; return _temp != null ? _temp : 0.1; })());
+        out.SPD = ((function (){ var _temp = out.SPD; return _temp != null ? _temp : 0; })()) * boost;
       }
       return out;
     },
@@ -3159,12 +3146,12 @@ __define('./statuses.js', (exports, module, __require) => {
 
       // 5) Giảm sát thương nhận vào n%
       const cut = this.get(target,'dmgCut');
-      if (cut) inMul *= (1 - clamp01(cut.power ?? 0));
+      if (cut) inMul *= (1 - clamp01((function (){ var _temp = cut.power; return _temp != null ? _temp : 0; })()));
       // 15) Tàng hình: miễn 100% sát thương trong 1 turn
       if (this.has(target,'stealth')) { inMul = 0; ignoreAll = true; }
       // 10) Xuyên giáp: bỏ qua 10% ARM/RES
       const pierce = this.get(attacker,'pierce');
-      if (pierce) defPen = Math.max(defPen, clamp01(pierce.power ?? 0.10));
+      if (pierce) defPen = Math.max(defPen, clamp01((function (){ var _temp = pierce.power; return _temp != null ? _temp : 0.10; })()));
       // 1) Stun/Sleep: không tác động sát thương, chỉ chặn hành động → xử ở canAct()
 
       return { ...ctx, outMul, inMul, defPen, ignoreAll };
@@ -3173,7 +3160,8 @@ __define('./statuses.js', (exports, module, __require) => {
     // Khiên hấp thụ sát thương (8)
     absorbShield(target, dmg, ctx={dtype:'any'}){
       const s = this.get(target,'shield');
-      if (!s || (s.amount ?? 0) <= 0) return { remain: dmg, absorbed: 0, broke:false };
+      if (!s || ((function (){ var _temp = s.amount; return _temp != null ? _temp : 0; })()) <= 0) return { remain: dmg, absorbed: 0, broke:false };
+      let left =(function (){ var _temp = s.amount; return _temp != null ? _temp : 0; })();
       let left = s.amount ?? 0;
       const absorbed = Math.min(left, dmg);
       left -= absorbed;
@@ -3189,7 +3177,7 @@ __define('./statuses.js', (exports, module, __require) => {
       // 3) Phản sát thương: attacker nhận n% sát thương cuối cùng
       const reflect = this.get(target, 'reflect');
       if (reflect && dealt > 0){
-        const back = Math.round(dealt * clamp01(reflect.power ?? 0));
+        const back = Math.round(dealt * clamp01((function (){ var _temp = reflect.power; return _temp != null ? _temp : 0; })()));
         attacker.hp = Math.max(0, attacker.hp - back);
         // không phản khi stealth target đang miễn sát thương (dealt=0 thì như nhau)
       }
@@ -3197,7 +3185,7 @@ __define('./statuses.js', (exports, module, __require) => {
       // 16) Độc (venom): khi attacker có hiệu ứng, mỗi đòn sẽ gây thêm n% sát thương đã gây ra
       const venom = this.get(attacker, 'venom');
       if (venom && dealt > 0){
-        const extra = Math.round(dealt * clamp01(venom.power ?? 0));
+        const extra = Math.round(dealt * clamp01((function (){ var _temp = venom.power; return _temp != null ? _temp : 0; })()));
         target.hp = Math.max(0, target.hp - extra);
       }
 
@@ -3237,7 +3225,7 @@ __define('./statuses.js', (exports, module, __require) => {
 
       // 8) Khiên (không giới hạn turn, tự hết khi cạn)
       shield:    ({pct=0.2, amount=0, of='self'}={}) => ({ id:'shield', kind:'buff', tag:'shield',
-                      amount: amount ?? 0, // nên set = Math.round(unit.hpMax * pct) khi add()
+                      amount:(function (){ var _temp = amount; return _temp != null ? _temp : 0; })(), // nên set = Math.round(unit.hpMax * pct) khi add()
                       power:pct, tick:null }),
 
       // 9) Hưng phấn (+10% output)
@@ -3315,7 +3303,7 @@ __define('./summon.js', (exports, module, __require) => {
   function enqueueImmediate(Game, req){
     if (req.by){
       const mm = Game.meta.get(req.by);
-      const ok = !!(mm && mm.class === 'Summoner' && mm.kit?.ult?.type === 'summon');
+      const ok = !!(mm && mm.class === 'Summoner' &&(function (_temp){ return _temp == null ? void 0 : _temp.type; })((function (_temp){ return _temp == null ? void 0 : _temp.ult; })(mm.kit)) === 'summon');
       if (!ok) return false;
     }
     const { cx, cy } = slotToCell(req.side, req.slot);
@@ -3332,12 +3320,12 @@ __define('./summon.js', (exports, module, __require) => {
   // xử lý toàn bộ chain của 1 phe sau khi actor vừa hành động
   // trả về slot lớn nhất đã hành động trong chain (để cập nhật turn.last)
   function processActionChain(Game, side, baseSlot, hooks){
-    const list = Game.actionChain.filter(x => x.side === side);
+    const list = Game.actionChain.filter(x => x.side === side);(function (){ var _temp = if (!list.length) return baseSlot; return _temp != null ? _temp : null; })();
     if (!list.length) return baseSlot ?? null;
 
     list.sort((a,b)=> a.slot - b.slot);
 
-    let maxSlot = baseSlot ?? 0;
+    let maxSlot =(function (){ var _temp = baseSlot; return _temp != null ? _temp : 0; })();
     for (const item of list){
       const { cx, cy } = slotToCell(side, item.slot);
       if (cellReserved(tokensAlive(Game), Game.queued, cx, cy)) continue;
