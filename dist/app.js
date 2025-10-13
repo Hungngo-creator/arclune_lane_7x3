@@ -733,7 +733,7 @@ __define('./catalog.js', (exports, module, __require) => {
   const getMetaById = (id) => ROSTER_MAP.get(id);
   const isSummoner = (id) => {
     const m = getMetaById(id);
-     return !!(m && m.class === 'Summoner' && m.kit?.ult?.type === 'summon');
+    return !!(m && m.class === 'Summoner' && m.kit?.ult?.type === 'summon');
   };
 
   exports.RANK_MULT = RANK_MULT;
@@ -896,7 +896,7 @@ __define('./combat.js', (exports, module, __require) => {
       target: tgt,
       damage: { baseMul: 1, flatAdd: 0 },
       afterHit: [],
-          log: Game?.passiveLog
+    log: Game?.passiveLog
     };
     emitPassiveEvent(Game, unit, 'onBasicHit', passiveCtx);
    
@@ -1527,7 +1527,7 @@ __define('./engine.js', (exports, module, __require) => {
         ctx.fill();
       }
         
-        if (art?.label !== false){
+      if (art?.label !== false){
         const name = formatName(t.name || t.id);
         const offset = layout.labelOffset ?? 1.2;
         drawNameplate(ctx, name, p.x, p.y + r * offset, r, art);
@@ -1673,9 +1673,9 @@ __define('./entry.js', (exports, module, __require) => {
     const value = typeof error === 'undefined' || error === null ? '' : String(error);
     return value.trim() ? value : fallback;
   }
-    function showFatalError(error, renderMessage, options){
-      const { isFileProtocol = false } = options || {};
-      const detail = resolveErrorMessage(error);
+   function showFatalError(error, renderMessage, options){
+  const { isFileProtocol = false } = options || {};
+  const detail = resolveErrorMessage(error);
       const advice = isFileProtocol
       ? '<p><small>Arclune đang chạy trực tiếp từ ổ đĩa (<code>file://</code>). Nếu gặp lỗi tải tài nguyên, hãy thử mở thông qua một HTTP server tĩnh.</small></p>'
       : '';
@@ -1699,7 +1699,7 @@ __define('./entry.js', (exports, module, __require) => {
       console.error('Arclune failed to start', error);
       if (typeof window.arcluneShowFatal === 'function'){
         window.arcluneShowFatal(error);
-       } else {
+      } else {
         showFatalError(error, renderMessage, { isFileProtocol });
       }
     }
@@ -1709,7 +1709,43 @@ __define('./entry.js', (exports, module, __require) => {
 __define('./events.js', (exports, module, __require) => {
   // events.js
   const HAS_EVENT_TARGET = typeof EventTarget === 'function';
-
+function createNativeEvent(type, detail){
+    if (!type) return null;
+    if (typeof CustomEvent === 'function'){
+      try {
+        return new CustomEvent(type, { detail });
+      } catch (_) {
+        // ignore and fall through
+      }
+    }
+    if (typeof Event === 'function'){
+      try {
+        const ev = new Event(type);
+        try {
+          ev.detail = detail;
+        } catch (_) {
+          // ignore assignment failures (readonly in some browsers)
+        }
+        return ev;
+      } catch (_) {
+        // ignore and fall through
+      }
+    }
+    if (typeof document === 'object' && document && typeof document.createEvent === 'function'){
+      try {
+        const ev = document.createEvent('Event');
+        if (typeof ev.initEvent === 'function'){
+          ev.initEvent(type, false, false);
+        }
+        ev.detail = detail;
+        return ev;
+      } catch (_) {
+        // ignore and fall through
+      }
+    }
+    return null;
+  }
+  
   class SimpleEventTarget {
     constructor(){
       this._map = new Map();
@@ -1756,7 +1792,7 @@ __define('./events.js', (exports, module, __require) => {
       if (typeof target.addEventListener === 'function'){
         target.addEventListener(probeType, handler);
         try {
-          const probeEvent = typeof Event === 'function' ? new Event(probeType) : { type: probeType };
+          const probeEvent = createNativeEvent(probeType) || { type: probeType };
           if (typeof target.dispatchEvent === 'function'){
             target.dispatchEvent(probeEvent);
           }
@@ -1774,15 +1810,7 @@ __define('./events.js', (exports, module, __require) => {
   }
 
   function makeEvent(type, detail){
-    if (typeof CustomEvent === 'function'){
-      return new CustomEvent(type, { detail });
-    }
-    if (typeof Event === 'function'){
-      const ev = new Event(type);
-      ev.detail = detail;
-      return ev;
-    }
-    return { type, detail };
+    return createNativeEvent(type, detail) || { type, detail };
   }
 
   const TURN_START = 'turn:start';
@@ -1797,12 +1825,11 @@ __define('./events.js', (exports, module, __require) => {
     const event = makeEvent(type, detail);
     try {
       if (typeof gameEvents.dispatchEvent === 'function'){
-        if (typeof Event === 'function' && event && !(event instanceof Event)){
-          const nativeEvent = new Event(type);
-          nativeEvent.detail = detail;
-          return gameEvents.dispatchEvent(nativeEvent);
+        let toDispatch = event;
+        if (typeof Event === 'function' && event && typeof event === 'object' && !(event instanceof Event)){
+          toDispatch = createNativeEvent(type, detail) || event;
         }
-        return gameEvents.dispatchEvent(event);
+        return gameEvents.dispatchEvent(toDispatch);
       }
       if (typeof gameEvents.emit === 'function'){
         gameEvents.emit(type, detail);
@@ -1930,7 +1957,7 @@ __define('./main.js', (exports, module, __require) => {
       const detail = ev?.detail || {};
       const unit = detail.unit;
       const info = {
-      side: detail.side ?? null,
+       side: detail.side ?? null,
         slot: detail.slot ?? null,
         cycle: detail.cycle ?? null,
         phase: detail.phase ?? null,
@@ -3116,7 +3143,7 @@ __define('./statuses.js', (exports, module, __require) => {
       }
       // 14) Sợ hãi: -10% SPD
       if (this.has(unit,'fear')){
-         out.SPD = (out.SPD ?? 0) * 0.9;
+       out.SPD = (out.SPD ?? 0) * 0.9;
       }
         // 20) Thần tốc: +% SPD
       const haste = this.get(unit,'haste');
@@ -3322,10 +3349,10 @@ __define('./summon.js', (exports, module, __require) => {
   // trả về slot lớn nhất đã hành động trong chain (để cập nhật turn.last)
   function processActionChain(Game, side, baseSlot, hooks){
     const list = Game.actionChain.filter(x => x.side === side);
-     if (!list.length) return baseSlot ?? null;
+    if (!list.length) return baseSlot ?? null;
 
-    
     list.sort((a,b)=> a.slot - b.slot);
+    
     let maxSlot = baseSlot ?? 0;
     for (const item of list){
       const { cx, cy } = slotToCell(side, item.slot);
@@ -3353,7 +3380,7 @@ __define('./summon.js', (exports, module, __require) => {
       // (nếu về sau cần hạn chế further — thêm flags trong meta.creep)
       // gọi lại doActionOrSkip để dùng chung status/ult-guard (creep thường không có ult)
       const creep = Game.tokens.find(t => t.alive && t.side===side && t.cx===cx && t.cy===cy);
-    if (creep) hooks.doActionOrSkip?.(Game, creep, hooks);
+      if (creep) hooks.doActionOrSkip?.(Game, creep, hooks);
     
       if (item.slot > maxSlot) maxSlot = item.slot;
     }
@@ -3418,8 +3445,8 @@ __define('./turns.js', (exports, module, __require) => {
     if (p.spawnCycle > Game.turn.cycle) return false;
 
     m.delete(slot);
-    const meta = Game.meta && typeof Game.meta.get === 'function' ? Game.meta.get(p.unitId) : null;
     
+    const meta = Game.meta && typeof Game.meta.get === 'function' ? Game.meta.get(p.unitId) : null;
     const kit = meta?.kit;
     const obj = {
       id: p.unitId, name: p.name, color: p.color || '#a9f58c',
@@ -3610,26 +3637,28 @@ __define('./ui.js', (exports, module, __require) => {
   const ACTION_END = __dep1.ACTION_END;
 
   function initHUD(doc){
-    const costNow  = doc.getElementById('costNow');   // số cost hiện tại
+   const costNow  = doc.getElementById('costNow');   // số cost hiện tại
    const costRing = doc.getElementById('costRing');  // vòng tròn tiến trình
    const costChip = doc.getElementById('costChip');  // chip bao ngoài
     function update(Game){
       if (!Game) return;
       
-const cap = Game.costCap ?? CFG.COST_CAP ?? 30;
-      const now = Math.floor(Game.cost ?? 0);
+const capRaw = Game.costCap ?? CFG.COST_CAP ?? 30;
+      const cap = Number.isFinite(capRaw) && capRaw > 0 ? capRaw : 1;
+      const now = Math.max(0, Math.floor(Game.cost ?? 0));
+      const ratio = Math.max(0, Math.min(1, now / cap));
 
       if (costNow) costNow.textContent = now;
       // Vòng tròn tiến trình n/30
       if (costRing){
-         const deg = (ratio * 360).toFixed(1) + 'deg';
-         costRing.style.setProperty('--deg', deg);
-       }
+       const deg = (ratio * 360).toFixed(1) + 'deg';
+       costRing.style.setProperty('--deg', deg);
+      }
       // Khi max cap, làm chip sáng hơn
       if (costChip){
         costChip.classList.toggle('full', now >= cap);
-       }
-     }
+      }
+   }
     const handleGameEvent = (ev)=>{
       const state = ev?.detail?.game;
       if (state) update(state);
@@ -3640,8 +3669,8 @@ const cap = Game.costCap ?? CFG.COST_CAP ?? 30;
         gameEvents.addEventListener(type, handleGameEvent);
       }
     }
-     return { update };
-   }
+    return { update };
+  }
   /* ---------- Summon Bar (deck-size = 4) ---------- */
   function startSummonBar(doc, options){
     options = options || {};
@@ -3650,7 +3679,7 @@ const cap = Game.costCap ?? CFG.COST_CAP ?? 30;
     const getDeck = options.getDeck || (()=>[]);
     const getSelectedId = options.getSelectedId || (()=>null);
 
-  const host = doc.getElementById('cards');
+   const host = doc.getElementById('cards');
     if (!host){
       return { render: ()=>{} };
     }
@@ -3673,124 +3702,125 @@ const cap = Game.costCap ?? CFG.COST_CAP ?? 30;
     }
 
   // C2: đồng bộ cỡ ô cost theo bề rộng sân (7 cột), lấy số từ CFG.UI
-  const _GAP = (CFG.UI?.CARD_GAP) ?? 12;     // khớp CSS khoảng cách
-  const _MIN = (CFG.UI?.CARD_MIN) ?? 40;     // cỡ tối thiểu
-  const boardEl = doc.getElementById('board'); // cache DOM
+    const _GAP = (CFG.UI?.CARD_GAP) ?? 12;     // khớp CSS khoảng cách
+    const _MIN = (CFG.UI?.CARD_MIN) ?? 40;     // cỡ tối thiểu
+    const boardEl = doc.getElementById('board'); // cache DOM
+
   function debounce(fn, wait){
-    let timer = null;
-    function debounced(...args){
-      if (timer){
-        clearTimeout(timer);
+      let timer = null;
+      function debounced(...args){
+        if (timer){
+          clearTimeout(timer);
+        }
+        timer = setTimeout(()=>{
+          timer = null;
+          fn.apply(this, args);
+        }, wait);
       }
-      timer = setTimeout(()=>{
-        timer = null;
-        fn.apply(this, args);
-      }, wait);
+      debounced.cancel = ()=>{
+        if (timer){
+          clearTimeout(timer);
+          timer = null;
+        }
+      };
+
+  debounced.flush = (...args)=>{
+        if (timer){
+          clearTimeout(timer);
+          timer = null;
+      }
+    fn.apply(this, args);
+      };
+      return debounced;
     }
-    debounced.cancel = ()=>{
-      if (timer){
-        clearTimeout(timer);
-        timer = null;
+const syncCardSize = debounce(()=>{
+      if (!boardEl) return;
+      const w = boardEl.clientWidth || boardEl.getBoundingClientRect().width || 0;
+      // 7 cột -> 6 khoảng cách
+      const cell = Math.max(_MIN, Math.floor((w - _GAP * 6) / 7));
+      if (host){
+        host.style.setProperty('--cell', `${cell}px`);
       }
-    };
-
-    debounced.flush = (...args)=>{
-      if (timer){
-        clearTimeout(timer);
-        timer = null;
-      }
-      fn.apply(this, args);
-    };
-    return debounced;
-  }
-
-  const syncCardSize = debounce(()=>{
-    if (!boardEl) return;
-    const w = boardEl.clientWidth || boardEl.getBoundingClientRect().width || 0;
-    
-    // 7 cột -> 6 khoảng cách
-    const cell = Math.max(_MIN, Math.floor((w - _GAP*6)/7));
-    if (host){
-      host.style.setProperty('--cell', `${cell}px`);
-    } 
-  }, 120);
-  syncCardSize.flush();
+    }, 120);
+    syncCardSize.flush();
 
   let cleanupResize = ()=>{};
-  if (boardEl && typeof ResizeObserver === 'function'){
-    const observer = new ResizeObserver(()=> syncCardSize());
-    observer.observe(boardEl);
-    cleanupResize = ()=>{
-      observer.disconnect();
-      syncCardSize.cancel();
-    };
-  } else {
-    const handleResize = ()=> syncCardSize();
-    window.addEventListener('resize', handleResize);
-    cleanupResize = ()=>{
-      window.removeEventListener('resize', handleResize);
-      syncCardSize.cancel();
-    };
-  }
+    if (boardEl && typeof ResizeObserver === 'function'){
+      const observer = new ResizeObserver(()=> syncCardSize());
+      observer.observe(boardEl);
+      cleanupResize = ()=>{
+        observer.disconnect();
+        syncCardSize.cancel();
+      };
+    } else {
+      const handleResize = ()=> syncCardSize();
+      window.addEventListener('resize', handleResize);
+      cleanupResize = ()=>{
+        window.removeEventListener('resize', handleResize);
+        syncCardSize.cancel();
+      };
+    }
+let removalObserver = null;
+    if (host && typeof MutationObserver === 'function'){
+      const target = doc.body || doc.documentElement;
+      if (target){
+        removalObserver = new MutationObserver(()=>{
+          if (!host.isConnected){
+            cleanupResize();
+            removalObserver.disconnect();
+            removalObserver = null;
+          }
+        });
+        removalObserver.observe(target, { childList: true, subtree: true });
+      }
+    }
 
-  let removalObserver = null;
-  if (host && typeof MutationObserver === 'function'){
-    const target = doc.body || doc.documentElement;
-    if (target){
-      removalObserver = new MutationObserver(()=>{
-        if (!host.isConnected){
-          cleanupResize();
-          removalObserver.disconnect();
-          removalObserver = null;
+    // mỗi thẻ cost là 1 ô vuông, chỉ hiện cost
+    function makeBtn(c){
+      const btn = doc.createElement('button');
+      btn.className = 'card';
+      btn.dataset.id = c.id;
+      // chỉ hiện cost, không hiện tên
+      btn.innerHTML = `<span class="cost">${c.cost}</span>`;
+
+      // trạng thái đủ/thiếu cost
+      const ok = canAfford(c);
+      btn.disabled = !ok;
+      btn.classList.toggle('disabled', !ok);  // chỉ để CSS quyết định độ sáng
+
+      return btn;
+    }
+    let btns = []; // sẽ chứa đúng 3 button được tạo bằng makeBtn
+
+    function render(){
+      const deck = getDeck();              // luôn gồm tối đa 3 thẻ hiện hành
+      // đảm bảo đủ số nút (tạo mới bằng makeBtn – chỉ hiện cost)
+      while (btns.length < deck.length){
+        const btn = makeBtn(deck[btns.length]);
+        host.appendChild(btn);
+        btns.push(btn);
+      }
+      // cập nhật trạng thái từng nút theo deck hiện tại
+      for (let i = 0; i < btns.length; i++){
+        const b = btns[i];
+        const c = deck[i];
+        if (!c){
+          b.hidden = true;
+          continue;
         }
-      });
-      removalObserver.observe(target, { childList: true, subtree: true });
-    }
-  }
-  // mỗi thẻ cost là 1 ô vuông, chỉ hiện cost
-  function makeBtn(c){
-    const btn = doc.createElement('button');
-    btn.className = 'card';
-    btn.dataset.id = c.id;
-    // chỉ hiện cost, không hiện tên
-    btn.innerHTML = `<span class="cost">${c.cost}</span>`;
+        b.hidden = false;
+        b.dataset.id = c.id;
 
-    // trạng thái đủ/thiếu cost
-    const ok = canAfford(c);
-    btn.disabled = !ok;
-    btn.classList.toggle('disabled', !ok);  // chỉ để CSS quyết định độ sáng
+// cập nhật cost (giữ UI “chỉ cost”)
+        const span = b.querySelector('.cost');
+        if (span) span.textContent = c.cost;
 
-    return btn;
-  }
-  let btns = []; // sẽ chứa đúng 3 button được tạo bằng makeBtn
-
-  function render(){
-    const deck = getDeck();              // luôn gồm tối đa 3 thẻ hiện hành
-    // đảm bảo đủ số nút (tạo mới bằng makeBtn – chỉ hiện cost)
-    while (btns.length < deck.length){
-      const btn = makeBtn(deck[btns.length]);
-      host.appendChild(btn);
-      btns.push(btn);
-    }
-    // cập nhật trạng thái từng nút theo deck hiện tại
-    for (let i = 0; i < btns.length; i++){
-      const b = btns[i];
-      const c = deck[i];
-      if (!c){ b.hidden = true; continue; }
-      b.hidden = false;
-      b.dataset.id = c.id;
-
-      // cập nhật cost (giữ UI “chỉ cost”)
-      const span = b.querySelector('.cost');
-      if (span) span.textContent = c.cost;
-
-    const afford = canAfford(c);
-    b.disabled = !afford;
-    b.classList.toggle('disabled', !afford); // để CSS điều khiển độ sáng
-    b.style.opacity = ''; // xóa mọi inline opacity cũ nếu còn
-      b.classList.toggle('active', getSelectedId() === c.id);
-
-    }
+        const afford = canAfford(c);
+        b.disabled = !afford;
+        b.classList.toggle('disabled', !afford); // để CSS điều khiển độ sáng
+        b.style.opacity = ''; // xóa mọi inline opacity cũ nếu còn
+        b.classList.toggle('active', getSelectedId() === c.id);
+      }
   }
   if (gameEvents && typeof gameEvents.addEventListener === 'function'){
       const rerender = ()=> render();
