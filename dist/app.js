@@ -2863,7 +2863,7 @@ __define('./passives.js', (exports, module, __require) => {
         if (st.stacks < stacksToExplode) return;
 
         Statuses.remove(target, passive.id);
-        const amount = Math.max(1, Math.round((unit?.wil || 0) * dmgMul));
+        const amount = Math.max(1, Math.round(((function (_temp){ return _temp == null ? void 0 : _temp.wil; })(unit) || 0) * dmgMul));
         target.hp = Math.max(0, (target.hp || 0) - amount);
         if (target.hp <= 0){
           if (!hookOnLethalDamage(target)){
@@ -2872,15 +2872,15 @@ __define('./passives.js', (exports, module, __require) => {
           }
         }
         if (ctx && Array.isArray(ctx.log)){
-          ctx.log.push({ t: passive.id, source: unit?.name, target: target?.name, dmg: amount });
+          ctx.log.push({ t: passive.id, source:(function (_temp){ return _temp == null ? void 0 : _temp.name; })(unit), target:(function (_temp){ return _temp == null ? void 0 : _temp.name; })(target), dmg: amount });
         }
       });
     },
 
     gainATKPercent({ unit, passive }){
       if (!unit) return;
-      const params = passive?.params || {};
-      const amount = params.amount ?? 0;
+      const params =(function (_temp){ return _temp == null ? void 0 : _temp.params; })(passive) || {};
+      const amount =(function (){ var _temp = params.amount; return _temp != null ? _temp : 0; })();
       const stackable = params.stack !== false;
       const st = ensureStatBuff(unit, passive.id, { attr:'atk', mode:'percent', amount, purgeable: params.purgeable !== false });
       const nextStacks = stackable ? (st.stacks || 0) + 1 : 1;
@@ -2890,7 +2890,7 @@ __define('./passives.js', (exports, module, __require) => {
 
     conditionalBuff({ unit, passive, ctx }){
       if (!unit) return;
-      const params = passive?.params || {};
+      const params =(function (_temp){ return _temp == null ? void 0 : _temp.params; })(passive) || {};
       const hpMax = unit.hpMax || 0;
       const hpPct = hpMax > 0 ? (unit.hp || 0) / hpMax : 0;
       const threshold = params.ifHPgt ?? 0.5;
