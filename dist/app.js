@@ -1465,7 +1465,7 @@ __define('./engine.js', (exports, module, __require) => {
       ctx.lineWidth = 1;
       ctx.stroke();
     }
-    ctx.fillStyle = art?.label?.text || '#f4f8ff';
+    ctx.fillStyle =(function (_temp){ return _temp == null ? void 0 : _temp.text; })((function (_temp){ return _temp == null ? void 0 : _temp.label; })(art)) || '#f4f8ff';
     ctx.fillText(text, x, boxY + height / 2);
     ctx.restore();
     }
@@ -1475,7 +1475,7 @@ __define('./engine.js', (exports, module, __require) => {
     ctx.textBaseline = 'middle';
 
     const baseR = Math.floor(g.tile * 0.36);
-    const k = C.depthScale ?? 0.94; // scale theo chiều sâu
+    const k =(function (){ var _temp = C.depthScale; return _temp != null ? _temp : 0.94; })(); // scale theo chiều sâu
 
     // Vẽ xa trước – gần sau theo tung độ tâm-ô
     const sorted = tokens.slice().sort((a,b)=>{
@@ -1492,12 +1492,12 @@ __define('./engine.js', (exports, module, __require) => {
       const facing = (t.side === 'ally') ? 1 : -1;
         
   const art = ensureTokenArt(t) || getUnitArt(t.id);
-      const layout = art?.layout || {};
+      const layout =(function (_temp){ return _temp == null ? void 0 : _temp.layout; })(art) || {};
       const spriteHeightMult = layout.spriteHeight || 2.4;
       const spriteAspect = layout.spriteAspect || 0.78;
-      const spriteHeight = r * spriteHeightMult * (art?.size ?? 1);
+      const spriteHeight = r * spriteHeightMult * ((function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.size; })(art); return _temp != null ? _temp : 1; })());
       const spriteWidth = spriteHeight * spriteAspect;
-      const anchor = layout.anchor ?? 0.78;
+      const anchor =(function (){ var _temp = layout.anchor; return _temp != null ? _temp : 0.78; })();
       const hasRichArt = !!(art && (art.sprite || art.shape));
 
       if (hasRichArt){
@@ -1505,8 +1505,8 @@ __define('./engine.js', (exports, module, __require) => {
         const spriteReady = spriteEntry && spriteEntry.status === 'ready';
         ctx.save();
         ctx.translate(p.x, p.y);
-        if (facing === -1 && art?.mirror !== false) ctx.scale(-1, 1);
-        ctx.shadowColor = art?.glow || art?.shadow || 'rgba(0,0,0,0.35)';
+        if (facing === -1 &&(function (_temp){ return _temp == null ? void 0 : _temp.mirror; })(art) !== false) ctx.scale(-1, 1);
+        ctx.shadowColor =(function (_temp){ return _temp == null ? void 0 : _temp.glow; })(art) ||(function (_temp){ return _temp == null ? void 0 : _temp.shadow; })(art) || 'rgba(0,0,0,0.35)';
         ctx.shadowBlur = Math.max(6, r * 0.7);
         ctx.shadowOffsetY = Math.max(2, r * 0.2);
         if (spriteReady){
@@ -1523,10 +1523,9 @@ __define('./engine.js', (exports, module, __require) => {
         ctx.arc(p.x, p.y, r, 0, Math.PI*2);
         ctx.fill();
       }
-
-      if (art?.label !== false){
+        if ((function (_temp){ return _temp == null ? void 0 : _temp.label; })(art) !== false){
         const name = formatName(t.name || t.id);
-        const offset = layout.labelOffset ?? 1.2;
+        const offset =(function (){ var _temp = layout.labelOffset; return _temp != null ? _temp : 1.2; })();
         drawNameplate(ctx, name, p.x, p.y + r * offset, r, art);
       }
     }
