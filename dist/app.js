@@ -3321,8 +3321,6 @@ __define('./summon.js', (exports, module, __require) => {
   // trả về slot lớn nhất đã hành động trong chain (để cập nhật turn.last)
   function processActionChain(Game, side, baseSlot, hooks){
     const list = Game.actionChain.filter(x => x.side === side);(function (){ var _temp = if (!list.length) return baseSlot; return _temp != null ? _temp : null; })();
-    if (!list.length) return baseSlot ?? null;
-
     list.sort((a,b)=> a.slot - b.slot);
 
     let maxSlot =(function (){ var _temp = baseSlot; return _temp != null ? _temp : 0; })();
@@ -3335,7 +3333,7 @@ __define('./summon.js', (exports, module, __require) => {
       const art = getUnitArt(extra.id || 'minion');
       Game.tokens.push({
         id: extra.id || 'creep', name: extra.name || 'Creep',
-        color: extra.color || art?.palette?.primary || '#ffd27d',
+        color: extra.color ||(function (_temp){ return _temp == null ? void 0 : _temp.primary; })((function (_temp){ return _temp == null ? void 0 : _temp.palette; })(art)) || '#ffd27d',
         cx, cy, side, alive:true,
         isMinion: !!extra.isMinion,
         ownerIid: extra.ownerIid,
@@ -3346,14 +3344,12 @@ __define('./summon.js', (exports, module, __require) => {
       try { vfxAddSpawn(Game, cx, cy, side); } catch(_){}
       // gắn instance id
       const spawned = Game.tokens[Game.tokens.length - 1];
-      spawned.iid = hooks.allocIid?.() ?? (spawned.iid||0);
+      spawned.iid =(function (){ var _temp = (function (_obj){ var _func = _obj.allocIid; return _func == null ? void 0 : _func.call(_obj); })(hooks); return _temp != null ? _temp : (spawned.iid||0); })();
 
       // creep hành động NGAY trong chain (1 lượt), chỉ basic theo spec creep cơ bản
       // (nếu về sau cần hạn chế further — thêm flags trong meta.creep)
       // gọi lại doActionOrSkip để dùng chung status/ult-guard (creep thường không có ult)
-      const creep = Game.tokens.find(t => t.alive && t.side===side && t.cx===cx && t.cy===cy);
-      if (creep) hooks.doActionOrSkip?.(Game, creep, hooks);
-
+      const creep = Game.tokens.find(t => t.alive && t.side===side && t.cx===cx && t.cy===cy);(function (_obj){ var _func = _obj.doActionOrSkip; return _func == null ? void 0 : _func.call(_obj, Game, creep, hooks); })(if (creep) hooks);
       if (item.slot > maxSlot) maxSlot = item.slot;
     }
 
@@ -3419,7 +3415,7 @@ __define('./turns.js', (exports, module, __require) => {
     m.delete(slot);
 
     const meta = Game.meta && typeof Game.meta.get === 'function' ? Game.meta.get(p.unitId) : null;
-    const kit = meta?.kit;
+    const kit =(function (_temp){ return _temp == null ? void 0 : _temp.kit; })(meta);
     const obj = {
       id: p.unitId, name: p.name, color: p.color || '#a9f58c',
       cx: p.cx, cy: p.cy, side: p.side, alive: true,
@@ -3434,10 +3430,10 @@ __define('./turns.js', (exports, module, __require) => {
     };
     obj.iid = allocIid();
     obj.art = getUnitArt(p.unitId);
-    obj.color = obj.color || obj.art?.palette?.primary || '#a9f58c';
+    obj.color = obj.color ||(function (_temp){ return _temp == null ? void 0 : _temp.primary; })((function (_temp){ return _temp == null ? void 0 : _temp.palette; })(obj.art)) || '#a9f58c';
     prepareUnitForPassives(obj);
     Game.tokens.push(obj);
-  applyOnSpawnEffects(Game, obj, kit?.onSpawn);
+  applyOnSpawnEffects(Game, obj,(function (_temp){ return _temp == null ? void 0 : _temp.onSpawn; })(kit));
     try { vfxAddSpawn(Game, p.cx, p.cy, p.side); } catch(_){}
      return true;
   }
@@ -3473,10 +3469,10 @@ __define('./turns.js', (exports, module, __require) => {
     const baseDetail = {
       game: Game,
       unit: unit || null,
-      side: unit?.side ?? null,
+      side:(function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.side; })(unit); return _temp != null ? _temp : null; })(),
       slot,
-      phase: Game?.turn?.phase ?? null,
-      cycle: Game?.turn?.cycle ?? null,
+      phase:(function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.phase; })((function (_temp){ return _temp == null ? void 0 : _temp.turn; })(Game)); return _temp != null ? _temp : null; })(),
+      cycle:(function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.cycle; })((function (_temp){ return _temp == null ? void 0 : _temp.turn; })(Game)); return _temp != null ? _temp : null; })(),
       action: null,
       skipped: false,
       reason: null
@@ -3551,8 +3547,8 @@ __define('./turns.js', (exports, module, __require) => {
           side,
           slot: s,
           unit: actor,
-          cycle: Game?.turn?.cycle ?? null,
-          phase: Game?.turn?.phase ?? null,
+          cycle:(function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.cycle; })((function (_temp){ return _temp == null ? void 0 : _temp.turn; })(Game)); return _temp != null ? _temp : null; })(),
+          phase:(function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.phase; })((function (_temp){ return _temp == null ? void 0 : _temp.turn; })(Game)); return _temp != null ? _temp : null; })(),
           spawned: !!spawned,
           processedChain: null
         };
@@ -3565,12 +3561,12 @@ __define('./turns.js', (exports, module, __require) => {
 
         // xử lý Immediate chain (creep hành động ngay theo slot tăng dần)
         maxSlot = hooks.processActionChain(Game, side, s, hooks);
-        Game.turn.last[side] = Math.max(s, maxSlot ?? s);
+        Game.turn.last[side] = Math.max(s,(function (){ var _temp = maxSlot; return _temp != null ? _temp : s; })());
         found = s;
         break;
       } finally {
         if (turnDetail){
-          emitGameEvent(TURN_END, { ...turnDetail, processedChain: maxSlot ?? null });
+          emitGameEvent(TURN_END, { ...turnDetail, processedChain:(function (){ var _temp = maxSlot; return _temp != null ? _temp : null; })()});
         }
   }
     }
@@ -3614,9 +3610,8 @@ __define('./ui.js', (exports, module, __require) => {
    const costChip = doc.getElementById('costChip');  // chip bao ngoài
     function update(Game){
       if (!Game) return;
-
-      const cap = Game.costCap ?? CFG.COST_CAP ?? 30;
-      const now = Math.floor(Game.cost ?? 0);
+const cap =(function (){ var _temp = (function (){ var _temp = Game.costCap; return _temp != null ? _temp : CFG.COST_CAP; })(); return _temp != null ? _temp : 30; })();
+      const now = Math.floor((function (){ var _temp = Game.cost; return _temp != null ? _temp : 0; })());
       const ratio = Math.max(0, Math.min(1, now / cap));
 
       if (costNow) costNow.textContent = now;
@@ -3631,7 +3626,7 @@ __define('./ui.js', (exports, module, __require) => {
        }
      }
     const handleGameEvent = (ev)=>{
-      const state = ev?.detail?.game;
+      const state =(function (_temp){ return _temp == null ? void 0 : _temp.game; })((function (_temp){ return _temp == null ? void 0 : _temp.detail; })(ev));
       if (state) update(state);
     };
     if (gameEvents && typeof gameEvents.addEventListener === 'function'){
@@ -3673,8 +3668,8 @@ __define('./ui.js', (exports, module, __require) => {
     }
 
   // C2: đồng bộ cỡ ô cost theo bề rộng sân (7 cột), lấy số từ CFG.UI
-  const _GAP = CFG.UI?.CARD_GAP ?? 12;     // khớp CSS khoảng cách
-  const _MIN = CFG.UI?.CARD_MIN ?? 40;     // cỡ tối thiểu
+  const _GAP =(function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.CARD_GAP; })(CFG.UI); return _temp != null ? _temp : 12; })();     // khớp CSS khoảng cách
+  const _MIN =(function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.CARD_MIN; })(CFG.UI); return _temp != null ? _temp : 40; })();     // cỡ tối thiểu
   const boardEl = doc.getElementById('board'); // cache DOM
   function debounce(fn, wait){
     let timer = null;
@@ -3941,7 +3936,7 @@ __define('./vfx.js', (exports, module, __require) => {
 
       // scale theo chiều sâu (khớp render token)
       const depth = Game.grid.rows - 1 - A.cy;
-      const kDepth = (cam?.depthScale ?? 0.94);
+      const kDepth = ((function (){ var _temp = (function (_temp){ return _temp == null ? void 0 : _temp.depthScale; })(cam); return _temp != null ? _temp : 0.94; })());
       const r = Math.max(6, Math.floor(Game.grid.tile * 0.36 * Math.pow(kDepth, depth)));
 
       const facing = (A.side === 'ally') ? 1 : -1;
