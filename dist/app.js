@@ -271,18 +271,18 @@ __define('./ai.js', (exports, module, __require) => {
         const kitReviveScore  = kitTraits.hasRevive ? s : 0;
 
         const contributions = {
-          pressure: (weights.pressure ?? 0) * p,
-          safety: (weights.safety ?? 0) * s,
-          eta: (weights.eta ?? 0) * e,
-          summon: (weights.summon ?? 0) * sf,
-          kitInstant: (weights.kitInstant ?? 0) * kitInstantScore,
-          kitDefense: (weights.kitDefense ?? 0) * kitDefenseScore,
-          kitRevive: (weights.kitRevive ?? 0) * kitReviveScore
+          pressure: ((function (){ var _temp = weights.pressure; return _temp != null ? _temp : 0; })()) * p,
+          safety: ((function (){ var _temp = weights.safety; return _temp != null ? _temp : 0; })()) * s,
+          eta: ((function (){ var _temp = weights.eta; return _temp != null ? _temp : 0; })()) * e,
+          summon: ((function (){ var _temp = weights.summon; return _temp != null ? _temp : 0; })()) * sf,
+          kitInstant: ((function (){ var _temp = weights.kitInstant; return _temp != null ? _temp : 0; })()) * kitInstantScore,
+          kitDefense: ((function (){ var _temp = weights.kitDefense; return _temp != null ? _temp : 0; })()) * kitDefenseScore,
+          kitRevive: ((function (){ var _temp = weights.kitRevive; return _temp != null ? _temp : 0; })()) * kitReviveScore
         };
 
         const baseScore = Object.values(contributions).reduce((acc, val) => acc + val, 0);
         const rowFactor = rowCrowdingFactor(Game, cell.cy);
-        const roleFactor = roleBias(meta?.class, cell.cx);
+        const roleFactor = roleBias((function (_temp){ return _temp == null ? void 0 : _temp.class; })(meta), cell.cx);
         const finalScore = baseScore * rowFactor * roleFactor;
 
         evaluations.push({
