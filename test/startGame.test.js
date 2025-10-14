@@ -257,6 +257,9 @@ function createCanvasContext() {
     save() {},
     restore() {},
     clearRect() {},
+    setTransform() {},
+    resetTransform() {},
+    scale() {},
     createLinearGradient() {
       return { addColorStop() {} };
     },
@@ -430,7 +433,8 @@ function createWindow() {
         handler.call(this, event);
       }
     },
-    location: { protocol: 'http:' }
+    location: { protocol: 'http:' },
+    devicePixelRatio: 1
   };
 }
 
