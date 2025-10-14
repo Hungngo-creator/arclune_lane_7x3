@@ -48,7 +48,9 @@ export function processActionChain(Game, side, baseSlot, hooks){
       ownerIid: extra.ownerIid,
       bornSerial: extra.bornSerial,
       ttlTurns: extra.ttlTurns,
-      hpMax: extra.hpMax, hp: extra.hp, atk: extra.atk, art
+      hpMax: extra.hpMax, hp: extra.hp, atk: extra.atk,
+      art,
+      skinKey: art?.skinKey
     });
     try { vfxAddSpawn(Game, cx, cy, side); } catch(_){}
     // gắn instance id

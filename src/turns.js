@@ -50,6 +50,7 @@ export function spawnQueuedIfDue(Game, side, slot, { allocIid }){
   };
   obj.iid = allocIid();
   obj.art = getUnitArt(p.unitId);
+  obj.skinKey = obj.art?.skinKey;
   obj.color = obj.color || obj.art?.palette?.primary || '#a9f58c';
   prepareUnitForPassives(obj);
   Game.tokens.push(obj);

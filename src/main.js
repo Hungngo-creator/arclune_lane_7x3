@@ -20,7 +20,7 @@ import {
   ART_SPRITE_EVENT,
 } from './engine.js';
 import { drawEnvironmentProps } from './background.js';
-import { getUnitArt } from './art.js';
+import { getUnitArt, setUnitSkin } from './art.js';
 import { initHUD, startSummonBar } from './ui.js';
 import { vfxDraw, vfxAddSpawn, vfxAddHit, vfxAddMelee } from './vfx.js';
 import { drawBattlefieldScene } from './scene.js';
@@ -120,6 +120,40 @@ function scheduleDraw(){
   });
 }
 
+function refreshQueuedArtFor(unitId){
+  const apply = (map)=>{
+    if (!map || typeof map.values !== 'function') return;
+    for (const pending of map.values()){
+      if (!pending || pending.unitId !== unitId) continue;
+      const updated = getUnitArt(unitId);
+      pending.art = updated;
+      pending.skinKey = updated?.skinKey;
+      if (!pending.color && updated?.palette?.primary){
+        pending.color = updated.palette.primary;
+      }
+    }
+  };
+  apply(Game.queued?.ally);
+  apply(Game.queued?.enemy);
+}
+
+Game.setUnitSkin = (unitId, skinKey)=>{
+  const ok = setUnitSkin(unitId, skinKey);
+  if (!ok) return false;
+  for (const token of Game.tokens){
+    if (!token || token.id !== unitId) continue;
+    const art = getUnitArt(unitId);
+    token.art = art;
+    token.skinKey = art?.skinKey;
+    if (!token.color && art?.palette?.primary){
+      token.color = art.palette.primary;
+    }
+  }
+  refreshQueuedArtFor(unitId);
+  scheduleDraw();
+  return true;
+};
+
 function setDrawPaused(paused){
   drawPaused = !!paused;
   if (drawPaused){
@@ -130,6 +164,9 @@ function setDrawPaused(paused){
 }
 if (typeof window !== 'undefined'){
   window.addEventListener(ART_SPRITE_EVENT, ()=>{ scheduleDraw(); });
+  try {
+    window.arcluneSetUnitSkin = Game.setUnitSkin;
+  } catch (_){}
 }
 // Master clock theo timestamp – tránh drift giữa nhiều interval
 const CLOCK = {
@@ -651,7 +688,8 @@ const spawnCycle =
     unitId: card.id, name: card.name, side:'ally',
      cx: cell.cx, cy: cell.cy, slot, spawnCycle,
      color: pendingArt?.palette?.primary || '#a9f58c',
-     art: pendingArt
+     art: pendingArt,
+     skinKey: pendingArt?.skinKey
    };
    Game.queued.ally.set(slot, pending);
 
@@ -771,7 +809,7 @@ function drawHPBars(){
   for (const t of Game.tokens){
     if (!t.alive || !Number.isFinite(t.hpMax)) continue;
 const p = cellCenterObliqueLocal(Game.grid, t.cx, t.cy, CAM_PRESET);
-    const art = t.art || getUnitArt(t.id);
+    const art = t.art || getUnitArt(t.id, { skinKey: t.skinKey });
     const layout = art?.layout || {};
     const r = Math.max(6, Math.floor(baseR * (p.scale || 1)));
     const barWidth = Math.max(28, Math.floor(r * (layout.hpWidth ?? 2.4)));

@@ -1,5 +1,5 @@
 import { TOKEN_STYLE, CHIBI, CFG } from './config.js';
-import { getUnitArt } from './art.js';
+import { getUnitArt, getUnitSkin } from './art.js';
 //v0.7.3
 /* ---------- Grid ---------- */
 export function makeGrid(canvas, cols, rows){
@@ -69,8 +69,10 @@ export function cellReserved(tokens, queued, cx, cy){
 
 export function spawnLeaders(tokens, g){
   // Ally leader ở (0,1), Enemy leader ở (6,1)
-  tokens.push({ id:'leaderA', name:'Uyên', color:'#6cc8ff', cx:0, cy:1, side:'ally', alive:true, art: getUnitArt('leaderA') });
-  tokens.push({ id:'leaderB', name:'Địch', color:'#ff9aa0', cx:g.cols-1, cy:1, side:'enemy', alive:true, art: getUnitArt('leaderB') });
+  const artAlly = getUnitArt('leaderA');
+  const artEnemy = getUnitArt('leaderB');
+  tokens.push({ id:'leaderA', name:'Uyên', color:'#6cc8ff', cx:0, cy:1, side:'ally', alive:true, art: artAlly, skinKey: artAlly?.skinKey });
+  tokens.push({ id:'leaderB', name:'Địch', color:'#ff9aa0', cx:g.cols-1, cy:1, side:'enemy', alive:true, art: artEnemy, skinKey: artEnemy?.skinKey });
 }
 
 /* ---------- Helper ---------- */
@@ -242,16 +244,25 @@ export const ART_SPRITE_EVENT = 'unit-art:sprite-loaded';
 
 function ensureTokenArt(token){
   if (!token) return null;
-  if (!token.art) token.art = getUnitArt(token.id);
+  const desiredSkin = getUnitSkin(token.id);
+  if (!token.art || token.skinKey !== desiredSkin){
+    const art = getUnitArt(token.id, { skinKey: desiredSkin });
+    token.art = art;
+    token.skinKey = art?.skinKey ?? desiredSkin ?? null;
+  }
   return token.art;
 }
 
 export function ensureSpriteLoaded(art){
   if (!art || !art.sprite || typeof Image === 'undefined') return null;
-  let entry = SPRITE_CACHE.get(art.sprite);
+  const descriptor = typeof art.sprite === 'string' ? { src: art.sprite } : art.sprite;
+  if (!descriptor || !descriptor.src) return null;
+  const skinId = descriptor.skinId ?? art.skinKey ?? null;
+  const key = descriptor.cacheKey || `${descriptor.src}::${skinId ?? ''}`;
+  let entry = SPRITE_CACHE.get(key);
   if (!entry){
     const img = new Image();
-    entry = { status: 'loading', img };
+    entry = { status: 'loading', img, key, src: descriptor.src, skinId };
     if ('decoding' in img) img.decoding = 'async';
     img.onload = ()=>{
       entry.status = 'ready';
@@ -261,9 +272,11 @@ export function ensureSpriteLoaded(art){
         } catch(_){}
       }
     };
-    img.onerror = ()=>{ entry.status = 'error'; };
-    img.src = art.sprite;
-    SPRITE_CACHE.set(art.sprite, entry);
+    img.onerror = ()=>{
+      entry.status = 'error';
+    };
+    img.src = descriptor.src;
+    SPRITE_CACHE.set(key, entry);
   }
   return entry;
 }
@@ -417,24 +430,32 @@ export function drawTokensOblique(ctx, g, tokens, cam){
     const r = Math.max(6, Math.floor(baseR * scale));
     const facing = (t.side === 'ally') ? 1 : -1;
       
-const art = ensureTokenArt(t) || getUnitArt(t.id);
+    const art = ensureTokenArt(t);
     const layout = art?.layout || {};
+    const spriteCfg = art?.sprite || {};
     const spriteHeightMult = layout.spriteHeight || 2.4;
-    const spriteAspect = layout.spriteAspect || 0.78;
-    const spriteHeight = r * spriteHeightMult * ((art?.size) ?? 1);
+    const spriteScale = Number.isFinite(spriteCfg.scale) ? spriteCfg.scale : 1;
+    const spriteHeight = r * spriteHeightMult * ((art?.size) ?? 1) * spriteScale;
+    const spriteAspect = (Number.isFinite(spriteCfg.aspect) ? spriteCfg.aspect : null) || layout.spriteAspect || 0.78;
     const spriteWidth = spriteHeight * spriteAspect;
-    const anchor = layout.anchor ?? 0.78;
-    const hasRichArt = !!(art && (art.sprite || art.shape));
+    const anchor = Number.isFinite(spriteCfg.anchor) ? spriteCfg.anchor : (layout.anchor ?? 0.78);
+    const hasRichArt = !!(art && ((spriteCfg && spriteCfg.src) || art.shape));
 
     if (hasRichArt){
       const spriteEntry = ensureSpriteLoaded(art);
-      const spriteReady = spriteEntry && spriteEntry.status === 'ready';
+      const spriteReady = spriteEntry && spriteEntry.status === 'ready' && spriteEntry.img;
       ctx.save();
       ctx.translate(p.x, p.y);
       if (facing === -1 && art?.mirror !== false) ctx.scale(-1, 1);
-      ctx.shadowColor = art?.glow || art?.shadow || 'rgba(0,0,0,0.35)';
-      ctx.shadowBlur = Math.max(6, r * 0.7);
-      ctx.shadowOffsetY = Math.max(2, r * 0.2);
+      const shadow = spriteCfg?.shadow;
+      const shadowColor = shadow?.color || art?.glow || art?.shadow || 'rgba(0,0,0,0.35)';
+      const shadowBlur = Number.isFinite(shadow?.blur) ? shadow.blur : Math.max(6, r * 0.7);
+      const shadowOffsetX = Number.isFinite(shadow?.offsetX) ? shadow.offsetX : 0;
+      const shadowOffsetY = Number.isFinite(shadow?.offsetY) ? shadow.offsetY : Math.max(2, r * 0.2);
+      ctx.shadowColor = shadowColor;
+      ctx.shadowBlur = shadowBlur;
+      ctx.shadowOffsetX = shadowOffsetX;
+      ctx.shadowOffsetY = shadowOffsetY;
       if (spriteReady){
         ctx.drawImage(spriteEntry.img, -spriteWidth/2, -spriteHeight*anchor, spriteWidth, spriteHeight);
       } else {

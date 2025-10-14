@@ -133,9 +133,116 @@ function merge(target, source){
   return Object.assign({}, target, source || {});
 }
 
+const UNIT_SKIN_SELECTION = new Map();
+
+function getBaseArt(id){
+  if (!id) return UNIT_ART.default;
+  if (UNIT_ART[id]) return UNIT_ART[id];
+  if (id.endsWith('_minion')){
+    const base = id.replace(/_minion$/, '');
+    if (UNIT_ART[`${base}_minion`]) return UNIT_ART[`${base}_minion`];
+    if (UNIT_ART.minion) return UNIT_ART.minion;
+  }
+  return UNIT_ART.default;
+}
+
+function resolveSkinKey(id, baseArt, explicit){
+  if (!baseArt) return null;
+  if (explicit && baseArt.skins && baseArt.skins[explicit]) return explicit;
+  const override = UNIT_SKIN_SELECTION.get(id);
+  if (override && baseArt.skins && baseArt.skins[override]) return override;
+  if (baseArt.defaultSkin && baseArt.skins && baseArt.skins[baseArt.defaultSkin]) return baseArt.defaultSkin;
+  const keys = baseArt.skins ? Object.keys(baseArt.skins) : [];
+  return keys[0] || null;
+}
+
+function instantiateArt(id, baseArt, skinKey){
+  if (!baseArt) return null;
+  const art = {
+    ...baseArt,
+    layout: baseArt.layout ? { ...baseArt.layout } : undefined,
+    label: baseArt.label ? { ...baseArt.label } : undefined,
+    hpBar: baseArt.hpBar ? { ...baseArt.hpBar } : undefined
+  };
+  const spriteDef = (skinKey && baseArt.skins && baseArt.skins[skinKey]) ? baseArt.skins[skinKey] : null;
+  if (spriteDef){
+    art.sprite = {
+      ...spriteDef,
+      key: skinKey,
+      skinId: spriteDef.skinId || skinKey
+    };
+  } else {
+    art.sprite = null;
+  }
+  art.skinKey = skinKey || null;
+  return art;
+}
+
+export function setUnitSkin(unitId, skinKey){
+  if (!unitId) return false;
+  const baseArt = getBaseArt(unitId);
+  if (!baseArt || !baseArt.skins) return false;
+  if (!skinKey){
+    UNIT_SKIN_SELECTION.delete(unitId);
+    return true;
+  }
+  if (baseArt.skins[skinKey]){
+    UNIT_SKIN_SELECTION.set(unitId, skinKey);
+    return true;
+  }
+  return false;
+}
+
+export function getUnitSkin(unitId){
+  const baseArt = getBaseArt(unitId);
+  if (!baseArt) return null;
+  const override = UNIT_SKIN_SELECTION.get(unitId);
+  if (override && baseArt.skins && baseArt.skins[override]) return override;
+  if (baseArt.defaultSkin && baseArt.skins && baseArt.skins[baseArt.defaultSkin]) return baseArt.defaultSkin;
+  const keys = baseArt.skins ? Object.keys(baseArt.skins) : [];
+  return keys[0] || null;
+}
+
+function normalizeShadow(shadow, fallback){
+  if (shadow === null) return null;
+  const base = {
+    color: 'rgba(0,0,0,0.35)',
+    blur: 18,
+    offsetX: 0,
+    offsetY: 10
+  };
+  if (typeof fallback === 'string') base.color = fallback;
+  if (typeof shadow === 'string'){ return { ...base, color: shadow }; }
+  if (shadow && typeof shadow === 'object'){
+    return {
+      color: shadow.color ?? base.color,
+      blur: Number.isFinite(shadow.blur) ? shadow.blur : base.blur,
+      offsetX: Number.isFinite(shadow.offsetX) ? shadow.offsetX : base.offsetX,
+      offsetY: Number.isFinite(shadow.offsetY) ? shadow.offsetY : base.offsetY
+    };
+  }
+  return { ...base, color: fallback || base.color };
+}
+
+function normalizeSpriteEntry(conf, { anchor, shadow }){
+  if (!conf) return null;
+  const input = typeof conf === 'string' ? { src: conf } : conf;
+  const src = input.src || input.url || null;
+  if (!src) return null;
+  const normalizedShadow = normalizeShadow(input.shadow, shadow);
+  return {
+    src,
+    anchor: Number.isFinite(input.anchor) ? input.anchor : anchor,
+    scale: Number.isFinite(input.scale) ? input.scale : 1,
+    aspect: Number.isFinite(input.aspect) ? input.aspect : null,
+    shadow: normalizedShadow,
+    skinId: input.skinId || input.key || input.id || null,
+    cacheKey: input.cacheKey || null
+  };
+}
+
 function makeArt(pattern, palette, opts = {}){
   const spriteFactory = opts.spriteFactory || SPRITES[pattern];
-  const sprite = opts.sprite === null ? null : (opts.sprite || (spriteFactory ? spriteFactory(palette) : null));
   const layout = merge({
     anchor: 0.78,
     labelOffset: 1.18,
@@ -156,12 +263,39 @@ function makeArt(pattern, palette, opts = {}){
     fill: palette.accent || '#6ff0c0',
     border: 'rgba(0,0,0,0.55)'
   }, opts.hpBar);
+  const shadow = opts.shadow ?? 'rgba(0,0,0,0.35)';
+
+  const defaultSkinKey = opts.defaultSkin || 'default';
+  const skinsInput = opts.skins || (opts.sprite ? { [defaultSkinKey]: opts.sprite } : null);
+  const normalizedSkins = {};
+  const anchor = layout.anchor ?? 0.78;
+  if (skinsInput){
+    for (const [key, conf] of Object.entries(skinsInput)){
+      const normalized = normalizeSpriteEntry(conf, { anchor, shadow });
+      if (!normalized) continue;
+      normalized.key = key;
+      if (!normalized.skinId) normalized.skinId = key;
+      normalizedSkins[key] = normalized;
+    }
+  } else if (opts.sprite !== null && spriteFactory){
+    const generated = normalizeSpriteEntry({ src: spriteFactory(palette) }, { anchor, shadow });
+    if (generated){
+      generated.key = defaultSkinKey;
+      if (!generated.skinId) generated.skinId = defaultSkinKey;
+      normalizedSkins[defaultSkinKey] = generated;
+    }
+  }
+
+  const preferredKey = normalizedSkins[defaultSkinKey] ? defaultSkinKey : Object.keys(normalizedSkins)[0] || defaultSkinKey;
+
   return {
-    sprite,
+    sprite: normalizedSkins[preferredKey] || null,
+    skins: normalizedSkins,
+    defaultSkin: preferredKey,
     palette,
     shape: opts.shape || pattern,
     size: opts.size ?? 1,
-    shadow: opts.shadow ?? 'rgba(0,0,0,0.35)',
+    shadow,
     glow: opts.glow ?? palette.accent ?? '#8cf6ff',
     mirror: opts.mirror ?? true,
     layout,
@@ -187,65 +321,183 @@ const basePalettes = {
 
 export const UNIT_ART = {
   default: makeArt('sentinel', basePalettes.default, {
-    layout: { labelOffset: 1.1, hpOffset: 1.38 }
+    layout: { labelOffset: 1.1, hpOffset: 1.38, spriteAspect: 0.8 },
+    skins: {
+      default: {
+        src: './dist/assets/units/default/default.svg',
+        anchor: 0.86,
+        scale: 1.02,
+        aspect: 0.8,
+        shadow: { color: 'rgba(18,28,38,0.55)', blur: 22, offsetY: 10 }
+      }
+    }
   }),
   leaderA: makeArt('shield', basePalettes.leaderA, {
-    layout: { labelOffset: 1.24, hpOffset: 1.52, hpWidth: 2.6 },
+    layout: { labelOffset: 1.24, hpOffset: 1.52, hpWidth: 2.6, spriteAspect: 0.8 },
     label: { text: '#e5f6ff', bg: 'rgba(12,30,44,0.88)' },
-    hpBar: { fill: '#6ff0c0' }
+    hpBar: { fill: '#6ff0c0' },
+    skins: {
+      default: {
+        src: './dist/assets/units/leaderA/default.svg',
+        anchor: 0.86,
+        scale: 1.08,
+        aspect: 0.8,
+        shadow: { color: 'rgba(20,62,84,0.6)', blur: 26, offsetY: 12 }
+      },
+      ascendant: {
+        src: './dist/assets/units/leaderA/ascendant.svg',
+        anchor: 0.86,
+        scale: 1.08,
+        aspect: 0.8,
+        shadow: { color: 'rgba(26,112,138,0.58)', blur: 28, offsetY: 12 }
+      }
+    }
   }),
   leaderB: makeArt('wing', basePalettes.leaderB, {
-    layout: { labelOffset: 1.3, hpOffset: 1.58, hpWidth: 2.6 },
+    layout: { labelOffset: 1.3, hpOffset: 1.58, hpWidth: 2.6, spriteAspect: 0.8 },
     label: { text: '#ffe6ec', bg: 'rgba(46,16,24,0.88)' },
-    hpBar: { fill: '#ff9aa0' }
+    hpBar: { fill: '#ff9aa0' },
+    skins: {
+      default: {
+        src: './dist/assets/units/leaderB/default.svg',
+        anchor: 0.88,
+        scale: 1.12,
+        aspect: 0.8,
+        shadow: { color: 'rgba(58,16,28,0.6)', blur: 28, offsetY: 12 }
+      },
+      nightfall: {
+        src: './dist/assets/units/leaderB/nightfall.svg',
+        anchor: 0.88,
+        scale: 1.12,
+        aspect: 0.8,
+        shadow: { color: 'rgba(48,12,44,0.6)', blur: 30, offsetY: 14 }
+      }
+    }
   }),
   phe: makeArt('rune', basePalettes.phe, {
-    layout: { labelOffset: 1.2, hpOffset: 1.48 },
-    hpBar: { fill: '#c19bff' }
+    layout: { labelOffset: 1.2, hpOffset: 1.48, spriteAspect: 0.8 },
+    hpBar: { fill: '#c19bff' },
+    skins: {
+      default: {
+        src: './dist/assets/units/phe/default.svg',
+        anchor: 0.86,
+        scale: 1.04,
+        aspect: 0.8,
+        shadow: { color: 'rgba(34,20,68,0.55)', blur: 22, offsetY: 10 }
+      }
+    }
   }),
   kiemtruongda: makeArt('pike', basePalettes.kiem, {
-    layout: { labelOffset: 1.22, hpOffset: 1.5 },
-    hpBar: { fill: '#ffd37a' }
+    layout: { labelOffset: 1.22, hpOffset: 1.5, spriteAspect: 0.8 },
+    hpBar: { fill: '#ffd37a' },
+    skins: {
+      default: {
+        src: './dist/assets/units/kiemtruongda/default.svg',
+        anchor: 0.86,
+        scale: 1.06,
+        aspect: 0.8,
+        shadow: { color: 'rgba(64,32,14,0.58)', blur: 24, offsetY: 12 }
+      }
+    }
   }),
   loithienanh: makeArt('sentinel', basePalettes.loithien, {
-    layout: { labelOffset: 1.18, hpOffset: 1.46 },
-    hpBar: { fill: '#80f2ff' }
+    layout: { labelOffset: 1.18, hpOffset: 1.46, spriteAspect: 0.8 },
+    hpBar: { fill: '#80f2ff' },
+    skins: {
+      default: {
+        src: './dist/assets/units/loithienanh/default.svg',
+        anchor: 0.88,
+        scale: 1.08,
+        aspect: 0.8,
+        shadow: { color: 'rgba(22,52,70,0.55)', blur: 26, offsetY: 12 }
+      }
+    }
   }),
   laky: makeArt('bloom', basePalettes.laky, {
-    layout: { labelOffset: 1.18, hpOffset: 1.44 },
-    hpBar: { fill: '#ffb8e9' }
+    layout: { labelOffset: 1.18, hpOffset: 1.44, spriteAspect: 0.8 },
+    hpBar: { fill: '#ffb8e9' },
+    skins: {
+      default: {
+        src: './dist/assets/units/laky/default.svg',
+        anchor: 0.9,
+        scale: 1.12,
+        aspect: 0.8,
+        shadow: { color: 'rgba(86,34,82,0.55)', blur: 28, offsetY: 12 }
+      }
+    }
   }),
   kydieu: makeArt('rune', basePalettes.kydieu, {
-    layout: { labelOffset: 1.16, hpOffset: 1.42 },
-    hpBar: { fill: '#9af5d2' }
+    layout: { labelOffset: 1.16, hpOffset: 1.42, spriteAspect: 0.8 },
+    hpBar: { fill: '#9af5d2' },
+    skins: {
+      default: {
+        src: './dist/assets/units/kydieu/default.svg',
+        anchor: 0.86,
+        scale: 1.04,
+        aspect: 0.8,
+        shadow: { color: 'rgba(28,78,70,0.55)', blur: 22, offsetY: 10 }
+      }
+    }
   }),
   doanminh: makeArt('pike', basePalettes.doanminh, {
-    layout: { labelOffset: 1.26, hpOffset: 1.54 },
-    hpBar: { fill: '#ffe6a5' }
+    layout: { labelOffset: 1.26, hpOffset: 1.54, spriteAspect: 0.8 },
+    hpBar: { fill: '#ffe6a5' },
+    skins: {
+      default: {
+        src: './dist/assets/units/doanminh/default.svg',
+        anchor: 0.86,
+        scale: 1.08,
+        aspect: 0.8,
+        shadow: { color: 'rgba(52,36,14,0.58)', blur: 24, offsetY: 12 }
+      }
+    }
   }),
   tranquat: makeArt('rune', basePalettes.tranquat, {
-    layout: { labelOffset: 1.18, hpOffset: 1.46 },
-    hpBar: { fill: '#7fe9ff' }
+    layout: { labelOffset: 1.18, hpOffset: 1.46, spriteAspect: 0.8 },
+    hpBar: { fill: '#7fe9ff' },
+    skins: {
+      default: {
+        src: './dist/assets/units/tranquat/default.svg',
+        anchor: 0.86,
+        scale: 1.04,
+        aspect: 0.8,
+        shadow: { color: 'rgba(26,60,88,0.55)', blur: 22, offsetY: 10 }
+      }
+    }
   }),
   linhgac: makeArt('sentinel', basePalettes.linhgac, {
-    layout: { labelOffset: 1.16, hpOffset: 1.42 },
-    hpBar: { fill: '#a9d6ff' }
+    layout: { labelOffset: 1.16, hpOffset: 1.42, spriteAspect: 0.8 },
+    hpBar: { fill: '#a9d6ff' },
+    skins: {
+      default: {
+        src: './dist/assets/units/linhgac/default.svg',
+        anchor: 0.88,
+        scale: 1.06,
+        aspect: 0.8,
+        shadow: { color: 'rgba(32,54,76,0.55)', blur: 24, offsetY: 12 }
+      }
+    }
   }),
   minion: makeArt('pike', basePalettes.minion, {
-    layout: { labelOffset: 1.08, hpOffset: 1.32, hpWidth: 2.1, hpHeight: 0.38 },
+    layout: { labelOffset: 1.08, hpOffset: 1.32, hpWidth: 2.1, hpHeight: 0.38, spriteAspect: 0.8 },
     label: { text: '#fff1d0' },
-    hpBar: { fill: '#ffd27d' }
+    hpBar: { fill: '#ffd27d' },
+    skins: {
+      default: {
+        src: './dist/assets/units/minion/default.svg',
+        anchor: 0.84,
+        scale: 1,
+        aspect: 0.8,
+        shadow: { color: 'rgba(58,42,20,0.58)', blur: 20, offsetY: 10 }
+      }
+    }
   })
 };
 
-export function getUnitArt(id){
-  if (!id) return UNIT_ART.default;
-  if (UNIT_ART[id]) return UNIT_ART[id];
-  if (id.endsWith('_minion')){
-    const base = id.replace(/_minion$/, '');
-    return UNIT_ART[`${base}_minion`] || UNIT_ART.minion || UNIT_ART.default;
-  }
-  return UNIT_ART.default;
+export function getUnitArt(id, opts = {}){
+  const baseArt = getBaseArt(id);
+  const skinKey = resolveSkinKey(id, baseArt, opts.skinKey);
+  return instantiateArt(id, baseArt, skinKey);
 }
 
 export function getPalette(id){
