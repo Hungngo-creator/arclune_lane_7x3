@@ -644,7 +644,7 @@ __define('./art.js', (exports, module, __require) => {
     }
 
     const preferredKey = normalizedSkins[defaultSkinKey] ? defaultSkinKey : Object.keys(normalizedSkins)[0] || defaultSkinKey;
-    
+ 
     return {
       sprite: normalizedSkins[preferredKey] || null,
       skins: normalizedSkins,
@@ -688,7 +688,7 @@ __define('./art.js', (exports, module, __require) => {
           shadow: { color: 'rgba(18,28,38,0.55)', blur: 22, offsetY: 10 }
         }
       }
-  }),
+    }),
     leaderA: makeArt('shield', basePalettes.leaderA, {
       layout: { labelOffset: 1.24, hpOffset: 1.52, hpWidth: 2.6, spriteAspect: 0.8 },
       label: { text: '#e5f6ff', bg: 'rgba(12,30,44,0.88)' },
@@ -1648,21 +1648,39 @@ __define('./engine.js', (exports, module, __require) => {
   /* ---------- Grid ---------- */
   function makeGrid(canvas, cols, rows){
     const pad = (CFG.UI?.PAD) ?? 12;
-  const w = Math.min(window.innerWidth - pad*2, (CFG.UI?.BOARD_MAX_W) ?? 900);
+    const w = Math.min(window.innerWidth - pad*2, (CFG.UI?.BOARD_MAX_W) ?? 900);
     const h = Math.max(
       Math.floor(w * ((CFG.UI?.BOARD_H_RATIO) ?? (3/7))),
       (CFG.UI?.BOARD_MIN_H) ?? 220
     );
-    canvas.width = w; canvas.height = h;
+    
+const dprRaw = (typeof window !== 'undefined' && Number.isFinite(window.devicePixelRatio))
+      ? window.devicePixelRatio
+      : 1;
+    const dpr = dprRaw > 0 ? dprRaw : 1;
 
-    const usableW = w - pad * 2;
-    const usableH = h - pad * 2;
+    const displayW = w;
+    const displayH = h;
+    const pixelW = Math.round(displayW * dpr);
+    const pixelH = Math.round(displayH * dpr);
+
+    if (canvas){
+      if (canvas.style){
+        canvas.style.width = `${displayW}px`;
+        canvas.style.height = `${displayH}px`;
+      }
+      if (canvas.width !== pixelW) canvas.width = pixelW;
+      if (canvas.height !== pixelH) canvas.height = pixelH;
+    }
+
+    const usableW = displayW - pad * 2;
+    const usableH = displayH - pad * 2;
 
     const tile = Math.floor(Math.min(usableW / cols, usableH / rows));
 
-    const ox = Math.floor((w - tile*cols)/2);
-    const oy = Math.floor((h - tile*rows)/2);
-    return { cols, rows, tile, ox, oy, w, h, pad };
+    const ox = Math.floor((displayW - tile*cols)/2);
+    const oy = Math.floor((displayH - tile*rows)/2);
+    return { cols, rows, tile, ox, oy, w: displayW, h: displayH, pad, dpr };
   }
 
   function hitToCell(g, px, py){
@@ -2386,7 +2404,7 @@ __define('./events.js', (exports, module, __require) => {
         target.addEventListener(probeType, handler);
         try {
           if (typeof target.dispatchEvent === 'function' && isRealEvent){
-            target.dispatchEvent(probeEvent);
+          target.dispatchEvent(probeEvent);
           }
         } finally {
           if (typeof target.removeEventListener === 'function'){
@@ -2416,7 +2434,7 @@ __define('./events.js', (exports, module, __require) => {
         if (nativeEvent){
           return gameEvents.dispatchEvent(nativeEvent);
         }
-                if (gameEvents instanceof SimpleEventTarget){
+        if (gameEvents instanceof SimpleEventTarget){
           return gameEvents.dispatchEvent({ type, detail });
         }
         return false;
@@ -2518,7 +2536,7 @@ __define('./main.js', (exports, module, __require) => {
   /** @type {{update:(g:any)=>void}|null} */ let hud = null;   // ← THÊM
   const CAM_PRESET = CAM[CFG.CAMERA] || CAM.landscape_oblique;
   const HAND_SIZE  = CFG.HAND_SIZE ?? 4;
-  
+
   ensureNestedModuleSupport();
 
   // --- Instance counters (để gắn id cho token/minion) ---
@@ -3217,10 +3235,29 @@ __define('./main.js', (exports, module, __require) => {
   function resize(){
     if (!canvas) return;                                  // guard
     Game.grid = makeGrid(canvas, CFG.GRID_COLS, CFG.GRID_ROWS);
+    if (ctx && Game.grid){
+      const scale = Number.isFinite(Game.grid.dpr) && Game.grid.dpr > 0
+        ? Game.grid.dpr
+        : ((typeof window !== 'undefined' && Number.isFinite(window.devicePixelRatio) && window.devicePixelRatio > 0)
+          ? window.devicePixelRatio
+          : 1);
+      if (typeof ctx.setTransform === 'function'){
+        ctx.setTransform(scale, 0, 0, scale, 0, 0);
+      } else {
+        if (typeof ctx.resetTransform === 'function'){
+          ctx.resetTransform();
+        }
+        if (typeof ctx.scale === 'function'){
+          ctx.scale(scale, scale);
+        }
+      }
+    }
   }
   function draw(){
     if (!ctx || !canvas || !Game.grid) return;            // guard
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const clearW = Game.grid.w ?? canvas.width;
+    const clearH = Game.grid.h ?? canvas.height;
+    ctx.clearRect(0, 0, clearW, clearH);
     const sceneCfg = CFG.SCENE || {};
     const themeKey = Game.sceneTheme || sceneCfg.CURRENT_THEME || sceneCfg.DEFAULT_THEME;
     const theme = (sceneCfg.THEMES && themeKey) ? sceneCfg.THEMES[themeKey] : null;
@@ -3349,7 +3386,7 @@ __define('./main.js', (exports, module, __require) => {
     setDrawPaused(document.hidden);
   }
 
-function startGame(){
+  function startGame(){
     if (_booted || _booting) return;
     _booting = true;
     try {
@@ -3372,7 +3409,7 @@ function startGame(){
       _booting = false;
     }
   }
-  
+
   const __reexport0 = __require('./events.js');
 
   exports.gameEvents = __reexport0.gameEvents;
