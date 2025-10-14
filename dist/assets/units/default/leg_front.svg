@@ -1,15 +1,5 @@
- (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
-diff --git a/dist/assets/units/default/leg_front.svg b/dist/assets/units/default/leg_front.svg
-new file mode 100644
-index 0000000000000000000000000000000000000000..c0ba0a09a3aba78bd46680e8a9446f0aa9086b62
---- /dev/null
-+++ b/dist/assets/units/default/leg_front.svg
-@@ -0,0 +1,5 @@
-+<?xml version="1.0" encoding="UTF-8"?>
-+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240">
-+      <path d="M110 120 C116 150 124 190 118 214 C110 230 94 228 90 212 C86 194 88 150 94 122 Z" fill="#1d2b38" stroke="#223548" stroke-width="4" />
-+    
-+</svg>
- 
-EOF
-)
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240">
+      <path d="M110 120 C116 150 124 190 118 214 C110 230 94 228 90 212 C86 194 88 150 94 122 Z" fill="#1d2b38" stroke="#223548" stroke-width="4" />
+   
+</svg>
