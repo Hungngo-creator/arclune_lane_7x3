@@ -25,11 +25,14 @@ import { initHUD, startSummonBar } from './ui.js';
 import { vfxDraw, vfxAddSpawn, vfxAddHit, vfxAddMelee } from './vfx.js';
 import { drawBattlefieldScene } from './scene.js';
 import { gameEvents, TURN_START, TURN_END, ACTION_START, ACTION_END } from './events.js';
+import { ensureNestedModuleSupport } from './utils/dummy.js';
 /** @type {HTMLCanvasElement|null} */ let canvas = null;
 /** @type {CanvasRenderingContext2D|null} */ let ctx = null;
 /** @type {{update:(g:any)=>void}|null} */ let hud = null;   // ← THÊM
 const CAM_PRESET = CAM[CFG.CAMERA] || CAM.landscape_oblique;
 const HAND_SIZE  = CFG.HAND_SIZE ?? 4;
+
+ensureNestedModuleSupport();
 
 // --- Instance counters (để gắn id cho token/minion) ---
 let _IID = 1;
