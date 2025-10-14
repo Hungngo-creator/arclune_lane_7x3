@@ -1,23 +1,97 @@
-Tạo skill mới dựa trên các pháp tắc đã có, có thể chọn loại đạo/pháp tắc/quy tắc để ngộ đạo và nhận được kĩ năng/ pháp tắc tương ứng để tạo kỹ năng mới. 
-Áp dụng hệ thống tu luyện từ khai nguyên đến siêu thoát vào game và thêm content tương ứng với cảnh giới. Mỗi cảnh giới có đặc trưng khác nhau nên tăng chỉ số sẽ không giống nhau, tăng spd mỗi lần nâng 1 đại cảnh giới.
+1. Tạo skill mới dựa trên các pháp tắc đã có, có thể chọn loại đạo/pháp tắc/quy tắc để ngộ đạo và nhận được kĩ năng/ pháp tắc tương ứng để tạo kỹ năng mới.
 Kĩ năng có thể thu được từ công pháp. Áp dụng hệ thống nguyên linh + luyện đan vào game.
-Có nên thêm hệ thống tiền tệ nguyên tinh vào game? Game là một thế giới to lớn với nhiều vị diện, người chơi chỉ có thể tương tác 2d với vị trí địa lý.
 Tu luyện kiếm lưu có thể học được kĩ năng.
-Tạo kỹ năng cần các dòng phụ, dòng phụ có chỉ số khác nhau và giá khác nhau, cần buget để cân bằng, tạo kĩ năng có các nhánh chính là: tấn công, phòng thủ, hỗ trợ, nội tại.
-Đấu trường: để player xếp deck sẵn, AI sẽ dùng deck đó để đánh với AI dùng deck xếp sẵn khác, mỗi mùa 7 ngày.
-Ares: pvp online realtime.
-Thử thách: tham gia các màn pve với nhân vật cố định và dùng chúng hoàn thành thử thách để nhận quà.
-Vành Nứt Thế Giới: tham gia pve với các boss siêu khó để nhận quà.
-Gacha: các nhân vật N/R/SR/SSR/UR/PRIME
-Tạo rank budget để đánh giá một nhân vật và cho ra 1 rank chính xác của nhân vật đó dựa vào: độ bẩn, phá game của nhân vật, set nhanh hay chậm, skill quay ngược hay tăng tốc time, phân tích giá trị một nhân vật một cách tổng thể (lâu dài, từ sum đến hết trận và lập tức, vừa sum có thể làm gì), rank Budget cần có yếu tố cộng và trừ, cap 25 điểm thôi, cần một mốc điểm để cân nhắc rank, điểm cao rank cao.
+Tạo kỹ năng cần các dòng phụ, dòng phụ có chỉ số khác nhau và giá khác nhau, cần buget để cân bằng, tạo kĩ năng có các nhánh chính là: tấn công, phòng thủ, hỗ trợ, nội tại
 
+2. Áp dụng hệ thống tu luyện từ khai nguyên đến bán thần vào game và thêm content tương ứng với cảnh giới. Mỗi cảnh giới có đặc trưng khác nhau nên tăng chỉ số sẽ không giống nhau, tăng spd mỗi lần nâng 1 đại cảnh giới.
+
+3. Có nên thêm hệ thống tiền tệ nguyên tinh vào game? Game là một thế giới to lớn với nhiều vị diện, người chơi chỉ có thể tương tác 2d với vị trí địa lý.
+
+4. Đấu trường: để player xếp deck sẵn, AI sẽ dùng deck đó để đánh với AI dùng deck xếp sẵn khác, mỗi mùa 7 ngày.
+
+5. Ares: pvp online realtime.
+
+6. Thử thách: tham gia các màn pve với nhân vật cố định và dùng chúng hoàn thành thử thách để nhận quà.
+
+7. Vành Nứt Thế Giới: tham gia pve với các boss siêu khó để nhận quà.
+
+8.Gacha: các nhân vật N/R/SR/SSR/UR/PRIME
+
+9. Tạo rank budget để đánh giá một nhân vật và cho ra 1 rank chính xác của nhân vật đó dựa vào: độ bẩn, phá game của nhân vật, set nhanh hay chậm, skill quay ngược hay tăng tốc time, biến hình theo giai đoạn, độ rộng tương tác, buff/debuff, phân tích giá trị một nhân vật một cách tổng thể (lâu dài, từ sum đến hết trận và lập tức, vừa sum có thể làm gì), rank Budget cần có yếu tố cộng và trừ, cap 25 điểm thôi, cần một mốc điểm để cân nhắc rank, điểm cao rank cao. Áp dụng logic tương tự + rank của nhân vật và thêm vài thứ để tạo cost budget.
 Gán class hợp lý cho nhân vật, tạo cost budget dựa vào rank, độ thực dụng, sức mạnh tổng thể và vài yếu tố khác.
 
-Tạo công thức tính sát thương, cần tính sát thương trước rồi mới áp các buff và debuff vào.
+10. Tạo công thức tính sát thương, cần tính sát thương trước rồi mới áp các buff và debuff vào.
 
 Tạo công thức tính chỉ số dựa vào điểm đặc trưng của nhân vật, ( cap theo rank, các điểm cần không quá cao nhưng cũng phản ánh đặc trưng của nhân vật và class của họ) + điểm của class rồi x với hệ số rank.
 
 Tạo thêm vài leader nam lẫn nữ.
+
+11. Mode kiểu như cờ tỷ phú, 1 trận 4 player, cần tiền cược để vào game, kẻ thắng cuối cùng sẽ hưởng tất cả tiền cược hoặc theo % tổng tiền cược, mức tiền cược sẽ là cố định, có mức free nữa. Nhân vật của player có hp, nếu 2 nhân vật đứng cùng ô thì sẽ đánh nhau, gây sát thương cho nhau bằng xúc xắc chung mà không phải trận đấu riêng, bàn cờ cần thật thú vị.
+
+12. Thêm hệ thống lv và thưởng chỉ số vào game, lv không cần quá nhiều, bối cảnh game là tu tiên nên cần dựa theo hệ thống lv đã chia sẵn từ trước gồm 15 đại cảnh giới: Khai Nguyên, Trúc Cơ, Ngưng Đan, Kết Đan, Đúc Phách, Luyện Hồn, Thánh Nhân, Thánh Hoàng, Thánh Tôn, Bán Thần, Hạ Vị Thần, Trung Vị Thần, Thượng Vị Thần, Chí Cao, Siêu Thoát. Trước tiên triển khai từ Khai Nguyên đến Bán Thần, các cảnh giới sau phức tạp và cần content nhiều nên để sau. Mỗi đại cảnh giới trừ đúc phách và luyện hồn có 9 tiểu cảnh giới là nhất trọng đến cửu trọng, Đúc Phách có 7 tiểu cảnh giới và Luyện Hồn chỉ có 3 tiểu cảnh giới, đương nhiên là cũng rất khó khăn.
+
+13. Game không có guild mà có tông môn, player cần kinh doanh tông môn của mình, bắt đầu với tông môn tàn tạ và 2 npc, tông môn chấp nhận player lẫn npc. Tông môn có Trấn Yêu Tháp, trong đó có vô số quái vật để player đi đánh, Tàng kinh các để gacha công pháp hoặc đổi công pháp, Đan Phong để luyện đan, Tu luyện phòng để cho nhân vật tu luyện lên lv, linh mạch có thể nâng cấp để nâng mức độ khí aether trong không khí để tăng tốc độ tu luyện, Khí Các để luyện vũ khí cho các nhân vật hoặc gacha. Bí Cảnh để player chọn nhân vật để họ tự động tham gia bí cảnh và nhận mảnh nhân vật của bản thân nhân vật đó.
+
+14. Game có hệ thống công pháp, mỗi nhân vật đều có công pháp riêng của bản thân và cần tu luyện để mở khoá kỹ năng, đan dược để player cho nhân vật ăn để lấy chỉ số thưởng riêng.
+
+15. Bản đồ thế giới là bản đồ 2D, có các địa điểm khác nhau để player đi cốt truyện và luyện cấp.
+
+16. Mỗi nhân vật bắt đầu ở bậc của bản thân và 1 sao, có thể tích mảnh nhân vật để tăng sao của nhân vật đó, mọi nhân vật  chỉ có thể nâng cấp sao của bản thân qua mảnh nhân vật hoặc cốt truyện đặc biệt nếu có. Khi gacha ra 1 nhân vật đã có thì sẽ nhận được 60 mảnh nhân vật của nhân vật đó. Để lên sao cần tích đủ số mảnh cần thiết, 1 lên 2 sao là 60 mảnh nhân vật, 2 lên 3 sao là 60 mảnh nhân vật, 3 lên 4 là 90, 4 lên 5 là 90 và 5 lên 6 là 120, mỗi khi nâng sao nhân vật sẽ mở khoá khả năng content mới và kĩ năng mới, nâng cấp nội tại, ult. Mảnh nhân vật là có thể dùng để đổi mảnh của nhân vật khác cùng bậc hoặc bậc cao hơn theo tỉ lệ nhât định.
+
+17. Khung chat để player trò chuyện.
+
+19. Gacha nhân vật luôn sẽ có bảo hiểm, banner char ssr thì 60 lần quay nhất định ra 1 ssr. Banner UR thì 70 lần quay nhất định ra 1 char UR, banner Prime thì là 80 lần quay nhất định ra char Prime, 3 bậc khác nhau sẽ có vé khác nhau và banner UR sau 50 lần quay sẽ ra 1 char SSR, đảm bảo giá trị tiền tệ để mua vé quay và đạt bảo hiểm ra ssr của banner ssr và ur và ur không kém quá xa.
+Banner Prime quay 40 lần nhất định ra char ssr, 60 lần nhất định ra char ur, đảm bảo giá trị tiền tệ để mua vé quay và đạt bảo hiểm ra ssr, ur và prime  của banner ssr, ur và prime không kém quá xa. Kiểu giá vé banner  prime hơn vé banner ur 20%, vé banner ur lại hơn vé banner ssr 20% có hợp lý không? Tao muốn game f2p.
+
+Logic tương tự áp dụng với gacha công pháp và gacha vũ khí.
+
+20. Hệ thống thành tựu, thưởng tiền tệ game hoặc quà đặc biệt để khích lệ player.
+
+21. Tiền tệ: Vụn Nguyên Tinh, Hạ/Trung/Thượng Nguyên Tinh, Thần Tinh. Players có thể chuyển đổi tiền tệ linh hoạt với tỉ lệ là 100:1, 100000 VNT=1000HNT=100TNT=10ThNT=1TT
+Tông môn vận hành cần tiền tệ, đi đường cần tiền, gacha hoặc mua pháp khí và công pháp cũng cần, đan dược cũng cần tiền, gacha nhân vật càng cần tiền tệ, mua skin cho char cũng cần mà tao nghĩ lại đã có pháp khí, vũ khí, pháp bảo để mặc thì char nào mặc quần áo nào sẽ hiện cho player thấy luôn, char mới sum về sẽ mặc định có trang phục cơ bản, cho char mặc quần áo nào thì player sẽ thấy char mặc quần áo đó, có nút không mặc áo quần mà chỉ mặc đồ lót để tăng hứng thú cho player.
+
+22. Chợ đen: nơi người chơi bán các vật phẩm cho nhau, sẽ bị  game thu thuế % theo bậc của vật phẩm.
+
+23. Game nên có cốt truyện đồng nhất, duy nhất để player chơi trước có thể khám phá và lấy các vật phẩm bí mật, egg, boss dã ngoại di chuyển ngẫu nhiên, ai đang ở gần bu lại đánh, player có thể để lại cơ duyên hoặc giấu vật phẩm để player khác tìm và khi mở sever mới sẽ reset để player sever dựa vào kiến thức từ sever cũng để nhanh lấy vật phẩm ? hay mỗi player có cốt truyện cố định giống nhau?
+
+24. Vũ khí cũng có rank và sao + mảnh vũ khí như nhân vật.
+
+25. Khai Nguyên nhất lên nhị trọng cần 10 exp, nhị lên tam thanh exp về 0 và cần 20 exp, 3 lên 4 là 35, 4 lên 5 là 50, 5 lên 6 là 65, 6 lên 7 là 85, 7 lên 8 là 105, 8 lên 9 là 125 exp, từ cửu trọng đại cảnh giới Khai Nguyên đột phá đến đại cảnh giới Trúc Cơ nhất trọng cần vật phẩm là Trúc Cơ đan từ cốt truyện pve. Các đại cảnh giới sau sẽ thảo luận sau.
+
+26. Các kiến trúc trong tông môn cần tham gia cốt truyện pve và điều kiện nhất định để mở khoá toàn bộ chức năng.
+
+27. Shop của dev, do dev bán vật phẩm cho player và thu tiền thật qua chuyển khoản ngân hàng.
+
+28. Sự kiện, event giới hạn thời gian cho player.
+
+29. Tăng sự đa dạng vật phẩm để chợ đen và tiền tệ game có giá trị trong mắt player, nếu có thì sẽ có buôn bán acc, giao dịch tiền game đổi tiền mặt thì game mới có thể hoạt động lâu dài.
+
+30. Mở hoạt động mua vé số bằng tiền tệ trong game, player chỉ cần tốn số tiền game nhỏ để có cơ hội trúng thưởng, 50% số tiền game mua vé số sẽ chảy về ví của dev, nói chung đối dev chả có ý nghĩa gì nhưng đây là cần thiết để đảm bảo giá trị của tiền tệ trong game, 50% còn lại sẽ dành để thưởng cho các giải thưởng sổ số trong game.
+
+31. Tao còn ao ước biến game thành nft game luôn cơ mà chắc là không thể nào.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
