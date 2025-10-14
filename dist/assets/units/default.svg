@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 200">
+  <defs>
+    <linearGradient id="tran-rune" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#89f5ff"/>
+      <stop offset="100%" stop-color="#1a3651"/>
+    </linearGradient>
+    <radialGradient id="tran-glow" cx="50%" cy="42%" r="60%">
+      <stop offset="0%" stop-color="#d0fbff" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#89f5ff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M80 16 L142 82 L80 188 L18 82 Z" fill="url(#tran-rune)" stroke="#223e58" stroke-width="6"/>
+    <path d="M80 40 L116 82 L80 144 L44 82 Z" fill="#d0fbff" fill-opacity="0.32"/>
+    <path d="M80 64 L96 82 L80 120 L64 82 Z" fill="#d0fbff" fill-opacity="0.6"/>
+    <circle cx="80" cy="78" r="18" fill="url(#tran-glow)"/>
+  </g>
+</svg>
