@@ -289,7 +289,7 @@ function createCanvasElement() {
     height: 360,
     style: {},
     addEventListener(type, handler) {
-      (listeners[type] ?? = []).push(handler);
+      (listeners[type] ??= []).push(handler);
     },
     removeEventListener(type, handler) {
       const arr = listeners[type];
@@ -513,6 +513,8 @@ async function compileModuleScripts() {
 
   const mainSource = await fs.readFile(path.join(SRC_DIR, 'main.js'), 'utf8');
   await addModule('./main.js', mainSource);
+  const dummySource = await fs.readFile(path.join(SRC_DIR, 'utils', 'dummy.js'), 'utf8');
+  await addModule('./utils/dummy.js', dummySource);
   return scripts;
 }
 
