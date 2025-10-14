@@ -83,6 +83,47 @@ FOLLOWUP_CAP_DEFAULT: 2,
     }
   },
 
+CURRENT_BACKGROUND: 'daylight',
+  BACKGROUNDS: {
+    daylight: {
+      props: [
+        {
+          type: 'stone-obelisk',
+          cell: { cx: -0.8, cy: -0.2 },
+          offset: { x: -0.35, y: -0.08 },
+          scale: 1.02,
+          alpha: 0.94
+        },
+        {
+          type: 'stone-obelisk',
+          cell: { cx: 6.8, cy: -0.25 },
+          offset: { x: 0.32, y: -0.1 },
+          scale: 1.02,
+          alpha: 0.94,
+          flip: -1
+        },
+        {
+          type: 'sun-banner',
+          cell: { cx: -1.05, cy: 2.24 },
+          depth: 0.15,
+          offset: { x: -0.28, y: 0.38 },
+          sortBias: 18,
+          scale: 1.08,
+          alpha: 0.96
+        },
+        {
+          type: 'sun-banner',
+          cell: { cx: 7.05, cy: 2.28 },
+          depth: 0.15,
+          offset: { x: 0.28, y: 0.38 },
+          sortBias: 18,
+          scale: 1.08,
+          alpha: 0.96,
+          flip: -1
+        }
+      ]
+    }
+  },
   CAMERA: 'landscape_oblique'
 };
 

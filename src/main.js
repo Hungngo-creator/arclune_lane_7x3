@@ -19,6 +19,7 @@ import {
   cellOccupied, spawnLeaders, pickRandom, slotIndex, slotToCell, cellReserved, ORDER_ENEMY,
   ART_SPRITE_EVENT,
 } from './engine.js';
+import { drawEnvironmentProps } from './background.js';
 import { getUnitArt } from './art.js';
 import { initHUD, startSummonBar } from './ui.js';
 import { vfxDraw, vfxAddSpawn, vfxAddHit, vfxAddMelee } from './vfx.js';
@@ -48,10 +49,11 @@ const Game = {
   selectedId: null,
   ui: { bar: null },
   turn: { phase: 'ally', last: { ally: 0, enemy: 0 }, cycle: 0, busyUntil: 0 },
-    queued: { ally: new Map(), enemy: new Map() },
+ queued: { ally: new Map(), enemy: new Map() },
   actionChain: [],
   events: gameEvents,
-  sceneTheme: (CFG.SCENE?.CURRENT_THEME) || (CFG.SCENE?.DEFAULT_THEME)
+  sceneTheme: (CFG.SCENE?.CURRENT_THEME) || (CFG.SCENE?.DEFAULT_THEME),
+  backgroundKey: CFG.CURRENT_BACKGROUND || CFG.SCENE?.CURRENT_BACKGROUND || (CFG.SCENE?.CURRENT_THEME) || (CFG.SCENE?.DEFAULT_THEME)
 };
 // --- Enemy AI state (deck-4, cost riêng) ---
 Game.ai = {
@@ -695,6 +697,7 @@ function draw(){
   const themeKey = Game.sceneTheme || sceneCfg.CURRENT_THEME || sceneCfg.DEFAULT_THEME;
   const theme = (sceneCfg.THEMES && themeKey) ? sceneCfg.THEMES[themeKey] : null;
   drawBattlefieldScene(ctx, Game.grid, theme);
+  drawEnvironmentProps(ctx, Game.grid, CAM_PRESET, Game.backgroundKey);
   drawGridOblique(ctx, Game.grid, CAM_PRESET);
   drawQueuedOblique(ctx, Game.grid, Game.queued, CAM_PRESET);
   drawTokensOblique(ctx, Game.grid, Game.tokens, CAM_PRESET);

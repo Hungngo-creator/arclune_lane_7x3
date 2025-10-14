@@ -246,7 +246,7 @@ function ensureTokenArt(token){
   return token.art;
 }
 
-function ensureSpriteLoaded(art){
+export function ensureSpriteLoaded(art){
   if (!art || !art.sprite || typeof Image === 'undefined') return null;
   let entry = SPRITE_CACHE.get(art.sprite);
   if (!entry){
