@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 200">
+  <defs>
+    <radialGradient id="laky-bloom" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#ffc9ec"/>
+      <stop offset="100%" stop-color="#7c336a"/>
+    </radialGradient>
+    <radialGradient id="laky-core" cx="50%" cy="45%" r="45%">
+      <stop offset="0%" stop-color="#ffeef9" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#ffc9ec" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M80 12 C110 14 138 32 150 60 C164 88 166 120 152 146 C132 176 100 188 70 186 C40 180 18 160 12 130 C8 96 22 58 46 34 C58 20 70 14 80 12 Z" fill="url(#laky-bloom)" stroke="#5a214b" stroke-width="6"/>
+    <path d="M80 32 C104 34 126 52 134 78 C140 112 124 148 96 164 C72 172 46 162 36 138 C28 104 42 62 64 40 C70 34 74 32 80 32 Z" fill="#ffeef9" fill-opacity="0.3"/>
+    <circle cx="82" cy="72" r="24" fill="url(#laky-core)"/>
+  </g>
+</svg>
