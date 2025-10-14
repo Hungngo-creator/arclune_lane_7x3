@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 200">
+  <defs>
+    <linearGradient id="minion-plate" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffd27d"/>
+      <stop offset="100%" stop-color="#5a3a17"/>
+    </linearGradient>
+    <radialGradient id="minion-glow" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#fff4cc" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#ffd27d" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M80 8 L132 70 L108 168 L80 188 L52 168 L28 70 Z" fill="url(#minion-plate)" stroke="#452b0f" stroke-width="6"/>
+    <path d="M80 34 L116 74 L96 136 L80 152 L64 136 L44 74 Z" fill="#fff4cc" fill-opacity="0.32"/>
+    <path d="M80 60 L94 84 L86 120 L80 128 L74 120 L66 84 Z" fill="#fff4cc" fill-opacity="0.55"/>
+    <circle cx="80" cy="52" r="20" fill="url(#minion-glow)"/>
+  </g>
+</svg>
