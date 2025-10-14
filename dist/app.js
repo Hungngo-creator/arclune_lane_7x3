@@ -896,7 +896,7 @@ __define('./combat.js', (exports, module, __require) => {
       target: tgt,
       damage: { baseMul: 1, flatAdd: 0 },
       afterHit: [],
-    log: Game?.passiveLog
+     log: Game?.passiveLog
     };
     emitPassiveEvent(Game, unit, 'onBasicHit', passiveCtx);
    
@@ -1040,6 +1040,35 @@ __define('./config.js', (exports, module, __require) => {
       tokenText: '#0d1216'
     },
 
+SCENE: {
+      DEFAULT_THEME: 'daylight',
+      CURRENT_THEME: 'daylight',
+      THEMES: {
+        daylight: {
+          sky: {
+            top: '#1b2434',
+            mid: '#2f455e',
+            bottom: '#55759a',
+            glow: 'rgba(255, 236, 205, 0.35)'
+          },
+          horizon: {
+            color: '#f4d9ad',
+            glow: 'rgba(255, 236, 205, 0.55)',
+            height: 0.22,
+            thickness: 0.9
+          },
+          ground: {
+            top: '#312724',
+            accent: '#3f302c',
+            bottom: '#181210',
+            highlight: '#6c5344',
+            parallax: 0.12,
+            topScale: 0.9,
+            bottomScale: 1.45
+          }
+        }
+      }
+    },
     CAMERA: 'landscape_oblique'
   };
 
@@ -1177,10 +1206,7 @@ __define('./engine.js', (exports, module, __require) => {
     const C = cam || { rowGapRatio:0.62, topScale:0.80, depthScale:0.94 };
     const colors = Object.assign({}, CFG.COLORS, opts.colors||{});
     const rowGap = (C.rowGapRatio ?? 0.62) * g.tile;
-
-    ctx.clearRect(0, 0, g.w, g.h);
-
-    for (let cy=0; cy<g.rows; cy++){
+   for (let cy=0; cy<g.rows; cy++){
       const yTop = g.oy + cy*rowGap;
       const yBot = g.oy + (cy+1)*rowGap;
       const LRt = _rowLR(g, cy,   C);
@@ -1673,9 +1699,9 @@ __define('./entry.js', (exports, module, __require) => {
     const value = typeof error === 'undefined' || error === null ? '' : String(error);
     return value.trim() ? value : fallback;
   }
-   function showFatalError(error, renderMessage, options){
-  const { isFileProtocol = false } = options || {};
-  const detail = resolveErrorMessage(error);
+ function showFatalError(error, renderMessage, options){
+ const { isFileProtocol = false } = options || {};
+    const detail = resolveErrorMessage(error);
       const advice = isFileProtocol
       ? '<p><small>Arclune đang chạy trực tiếp từ ổ đĩa (<code>file://</code>). Nếu gặp lỗi tải tài nguyên, hãy thử mở thông qua một HTTP server tĩnh.</small></p>'
       : '';
@@ -1709,6 +1735,7 @@ __define('./entry.js', (exports, module, __require) => {
 __define('./events.js', (exports, module, __require) => {
   // events.js
   const HAS_EVENT_TARGET = typeof EventTarget === 'function';
+
 function createNativeEvent(type, detail){
     if (!type) return null;
     if (typeof CustomEvent === 'function'){
@@ -1745,8 +1772,7 @@ function createNativeEvent(type, detail){
     }
     return null;
   }
-  
-  class SimpleEventTarget {
+   class SimpleEventTarget {
     constructor(){
       this._map = new Map();
     }
@@ -1910,12 +1936,14 @@ __define('./main.js', (exports, module, __require) => {
   const vfxAddSpawn = __dep13.vfxAddSpawn;
   const vfxAddHit = __dep13.vfxAddHit;
   const vfxAddMelee = __dep13.vfxAddMelee;
-  const __dep14 = __require('./events.js');
-  const gameEvents = __dep14.gameEvents;
-  const TURN_START = __dep14.TURN_START;
-  const TURN_END = __dep14.TURN_END;
-  const ACTION_START = __dep14.ACTION_START;
-  const ACTION_END = __dep14.ACTION_END;
+    const __dep14 = __require('./scene.js');
+  const drawBattlefieldScene = __dep14.drawBattlefieldScene;
+  const __dep15 = __require('./events.js');
+  const gameEvents = __dep15.gameEvents;
+  const TURN_START = __dep15.TURN_START;
+  const TURN_END = __dep15.TURN_END;
+  const ACTION_START = __dep15.ACTION_START;
+  const ACTION_END = __dep15.ACTION_END;
   /** @type {HTMLCanvasElement|null} */ let canvas = null;
   /** @type {CanvasRenderingContext2D|null} */ let ctx = null;
   /** @type {{update:(g:any)=>void}|null} */ let hud = null;   // ← THÊM
@@ -1942,7 +1970,8 @@ __define('./main.js', (exports, module, __require) => {
     turn: { phase: 'ally', last: { ally: 0, enemy: 0 }, cycle: 0, busyUntil: 0 },
       queued: { ally: new Map(), enemy: new Map() },
     actionChain: [],
-    events: gameEvents
+    events: gameEvents,
+    sceneTheme: (CFG.SCENE?.CURRENT_THEME) || (CFG.SCENE?.DEFAULT_THEME)
   };
   // --- Enemy AI state (deck-4, cost riêng) ---
   Game.ai = {
@@ -1957,7 +1986,7 @@ __define('./main.js', (exports, module, __require) => {
       const detail = ev?.detail || {};
       const unit = detail.unit;
       const info = {
-       side: detail.side ?? null,
+        side: detail.side ?? null,
         slot: detail.slot ?? null,
         cycle: detail.cycle ?? null,
         phase: detail.phase ?? null,
@@ -2581,11 +2610,16 @@ __define('./main.js', (exports, module, __require) => {
   }
   function draw(){
     if (!ctx || !canvas || !Game.grid) return;            // guard
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const sceneCfg = CFG.SCENE || {};
+    const themeKey = Game.sceneTheme || sceneCfg.CURRENT_THEME || sceneCfg.DEFAULT_THEME;
+    const theme = (sceneCfg.THEMES && themeKey) ? sceneCfg.THEMES[themeKey] : null;
+    drawBattlefieldScene(ctx, Game.grid, theme);
     drawGridOblique(ctx, Game.grid, CAM_PRESET);
     drawQueuedOblique(ctx, Game.grid, Game.queued, CAM_PRESET);
     drawTokensOblique(ctx, Game.grid, Game.tokens, CAM_PRESET);
-  vfxDraw(ctx, Game, CAM_PRESET);
-   drawHPBars();
+    vfxDraw(ctx, Game, CAM_PRESET);
+    drawHPBars();
   }
   function cellCenterObliqueLocal(g, cx, cy, C){
     const colsW = g.tile * g.cols;
@@ -3033,6 +3067,178 @@ __define('./passives.js', (exports, module, __require) => {
   exports.applyOnSpawnEffects = applyOnSpawnEffects;
   exports.prepareUnitForPassives = prepareUnitForPassives;
 });
+__define('./scene.js', (exports, module, __require) => {
+  const DEFAULT_THEME = {
+    sky: {
+      top: '#1b2434',
+      mid: '#2f455e',
+      bottom: '#55759a',
+      glow: 'rgba(255, 236, 205, 0.35)'
+    },
+    horizon: {
+      color: '#f4d9ad',
+      glow: 'rgba(255, 236, 205, 0.55)',
+      height: 0.22,
+      thickness: 0.9
+    },
+    ground: {
+      top: '#312724',
+      accent: '#3f302c',
+      bottom: '#181210',
+      highlight: '#6c5344',
+      parallax: 0.12,
+      topScale: 0.9,
+      bottomScale: 1.45
+    }
+  };
+
+  function mergeTheme(theme){
+    if (!theme) return DEFAULT_THEME;
+    return {
+      sky: { ...DEFAULT_THEME.sky, ...(theme.sky || {}) },
+      horizon: { ...DEFAULT_THEME.horizon, ...(theme.horizon || {}) },
+      ground: { ...DEFAULT_THEME.ground, ...(theme.ground || {}) }
+    };
+  }
+
+  function hexToRgb(hex){
+    if (typeof hex !== 'string') return null;
+    let value = hex.trim();
+    if (!value.startsWith('#')) return null;
+    value = value.slice(1);
+    if (value.length === 3){
+      value = value.split('').map(ch => ch + ch).join('');
+    }
+    if (value.length !== 6) return null;
+    const num = Number.parseInt(value, 16);
+    if (Number.isNaN(num)) return null;
+    return {
+      r: (num >> 16) & 0xff,
+      g: (num >> 8) & 0xff,
+      b: num & 0xff
+    };
+  }
+
+  function mixHex(a, b, t){
+    const ca = hexToRgb(a);
+    const cb = hexToRgb(b);
+    if (!ca || !cb) return t < 0.5 ? (a || b) : (b || a);
+    const mix = (x, y)=> Math.round(x + (y - x) * t);
+    const r = mix(ca.r, cb.r);
+    const g = mix(ca.g, cb.g);
+    const bVal = mix(ca.b, cb.b);
+    return `rgb(${r}, ${g}, ${bVal})`;
+  }
+
+  function drawBattlefieldScene(ctx, g, theme){
+    if (!ctx || !g) return;
+    const t = mergeTheme(theme);
+    const w = g.w ?? ctx.canvas.width;
+    const h = g.h ?? ctx.canvas.height;
+    const boardTop = g.oy;
+    const boardHeight = g.tile * g.rows;
+    const boardBottom = boardTop + boardHeight;
+    const centerX = g.ox + (g.tile * g.cols) / 2;
+
+    ctx.save();
+
+    // --- Sky gradient ---
+    const skyGradient = ctx.createLinearGradient(0, 0, 0, boardBottom);
+    skyGradient.addColorStop(0, t.sky.top);
+    skyGradient.addColorStop(0.55, t.sky.mid);
+    skyGradient.addColorStop(1, t.sky.bottom);
+    ctx.fillStyle = skyGradient;
+    ctx.fillRect(0, 0, w, boardBottom);
+
+    // extend sky color below the board in case the canvas is taller
+    if (boardBottom < h){
+      ctx.fillStyle = t.sky.bottom;
+      ctx.fillRect(0, boardBottom, w, h - boardBottom);
+    }
+
+    // --- Horizon glow band ---
+    const horizonY = boardTop + Math.min(Math.max(t.horizon.height, 0), 1) * boardHeight;
+    const glowHeight = Math.max(4, g.tile * t.horizon.thickness);
+    const glowGradient = ctx.createLinearGradient(0, horizonY - glowHeight, 0, horizonY + glowHeight);
+    glowGradient.addColorStop(0, 'rgba(0,0,0,0)');
+    glowGradient.addColorStop(0.45, t.horizon.glow);
+    glowGradient.addColorStop(0.55, t.horizon.glow);
+    glowGradient.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = glowGradient;
+    ctx.fillRect(0, Math.max(0, horizonY - glowHeight), w, glowHeight * 2);
+
+    // Horizon line
+    ctx.strokeStyle = t.horizon.color;
+    ctx.lineWidth = Math.max(1, g.tile * 0.05);
+    ctx.beginPath();
+    ctx.moveTo(g.ox - g.tile, horizonY);
+    ctx.lineTo(g.ox + g.tile * g.cols + g.tile, horizonY);
+    ctx.stroke();
+
+    // --- Ground base ---
+    const groundTopWidth = g.tile * g.cols * t.ground.topScale;
+    const groundBottomWidth = g.tile * g.cols * t.ground.bottomScale;
+    const groundTop = boardTop + g.tile * 0.35;
+    const groundBottom = h;
+    const groundGradient = ctx.createLinearGradient(0, groundTop, 0, groundBottom);
+    groundGradient.addColorStop(0, t.ground.top);
+    groundGradient.addColorStop(0.45, t.ground.accent);
+    groundGradient.addColorStop(1, t.ground.bottom);
+
+    ctx.fillStyle = groundGradient;
+    ctx.beginPath();
+    ctx.moveTo(centerX - groundTopWidth / 2, groundTop);
+    ctx.lineTo(centerX + groundTopWidth / 2, groundTop);
+    ctx.lineTo(centerX + groundBottomWidth / 2, groundBottom);
+    ctx.lineTo(centerX - groundBottomWidth / 2, groundBottom);
+    ctx.closePath();
+    ctx.fill();
+
+    // --- Parallax stripes ---
+    const layerCount = Math.max(4, g.rows * 2);
+    const parallaxStrength = t.ground.parallax * g.tile;
+    for (let i = 0; i < layerCount; i++){
+      const t0 = i / layerCount;
+      const t1 = (i + 1) / layerCount;
+      const width0 = groundTopWidth + (groundBottomWidth - groundTopWidth) * t0;
+      const width1 = groundTopWidth + (groundBottomWidth - groundTopWidth) * t1;
+      const shift0 = (t0 - 0.5) * parallaxStrength;
+      const shift1 = (t1 - 0.5) * parallaxStrength;
+      const y0 = groundTop + (groundBottom - groundTop) * t0;
+      const y1 = groundTop + (groundBottom - groundTop) * t1;
+      const shade = mixHex(t.ground.highlight, t.ground.bottom, Math.pow(t0, 1.2));
+
+      ctx.globalAlpha = 0.28;
+      ctx.fillStyle = shade;
+      ctx.beginPath();
+      ctx.moveTo(centerX - width0 / 2 + shift0, y0);
+      ctx.lineTo(centerX + width0 / 2 + shift0, y0);
+      ctx.lineTo(centerX + width1 / 2 + shift1, y1);
+      ctx.lineTo(centerX - width1 / 2 + shift1, y1);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // subtle rim light near the board edge
+    const rimGradient = ctx.createLinearGradient(0, boardBottom - g.tile * 0.4, 0, boardBottom + g.tile);
+    rimGradient.addColorStop(0, 'rgba(255,255,255,0.25)');
+    rimGradient.addColorStop(0.4, 'rgba(255,255,255,0.08)');
+    rimGradient.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = rimGradient;
+    ctx.beginPath();
+    ctx.moveTo(centerX - groundTopWidth / 2, boardBottom - g.tile * 0.4);
+    ctx.lineTo(centerX + groundTopWidth / 2, boardBottom - g.tile * 0.4);
+    ctx.lineTo(centerX + groundTopWidth / 2, boardBottom + g.tile);
+    ctx.lineTo(centerX - groundTopWidth / 2, boardBottom + g.tile);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  exports.drawBattlefieldScene = drawBattlefieldScene;
+});
 __define('./statuses.js', (exports, module, __require) => {
   // statuses.js — Hệ trạng thái/effect data-driven v0.7
   const byId = (u) => (u && u.statuses) || (u.statuses = []);
@@ -3143,7 +3349,7 @@ __define('./statuses.js', (exports, module, __require) => {
       }
       // 14) Sợ hãi: -10% SPD
       if (this.has(unit,'fear')){
-       out.SPD = (out.SPD ?? 0) * 0.9;
+        out.SPD = (out.SPD ?? 0) * 0.9;
       }
         // 20) Thần tốc: +% SPD
       const haste = this.get(unit,'haste');
@@ -3637,13 +3843,13 @@ __define('./ui.js', (exports, module, __require) => {
   const ACTION_END = __dep1.ACTION_END;
 
   function initHUD(doc){
-   const costNow  = doc.getElementById('costNow');   // số cost hiện tại
-   const costRing = doc.getElementById('costRing');  // vòng tròn tiến trình
-   const costChip = doc.getElementById('costChip');  // chip bao ngoài
+    const costNow  = doc.getElementById('costNow');   // số cost hiện tại
+    const costRing = doc.getElementById('costRing');  // vòng tròn tiến trình
+    const costChip = doc.getElementById('costChip');  // chip bao ngoài
     function update(Game){
       if (!Game) return;
       
-const capRaw = Game.costCap ?? CFG.COST_CAP ?? 30;
+    const capRaw = Game.costCap ?? CFG.COST_CAP ?? 30;
       const cap = Number.isFinite(capRaw) && capRaw > 0 ? capRaw : 1;
       const now = Math.max(0, Math.floor(Game.cost ?? 0));
       const ratio = Math.max(0, Math.min(1, now / cap));
@@ -3653,7 +3859,7 @@ const capRaw = Game.costCap ?? CFG.COST_CAP ?? 30;
       if (costRing){
        const deg = (ratio * 360).toFixed(1) + 'deg';
        costRing.style.setProperty('--deg', deg);
-      }
+       }
       // Khi max cap, làm chip sáng hơn
       if (costChip){
         costChip.classList.toggle('full', now >= cap);
@@ -3669,8 +3875,8 @@ const capRaw = Game.costCap ?? CFG.COST_CAP ?? 30;
         gameEvents.addEventListener(type, handleGameEvent);
       }
     }
-    return { update };
-  }
+   return { update };
+   }
   /* ---------- Summon Bar (deck-size = 4) ---------- */
   function startSummonBar(doc, options){
     options = options || {};
@@ -3679,7 +3885,7 @@ const capRaw = Game.costCap ?? CFG.COST_CAP ?? 30;
     const getDeck = options.getDeck || (()=>[]);
     const getSelectedId = options.getSelectedId || (()=>null);
 
-   const host = doc.getElementById('cards');
+    const host = doc.getElementById('cards');
     if (!host){
       return { render: ()=>{} };
     }
@@ -3706,7 +3912,7 @@ const capRaw = Game.costCap ?? CFG.COST_CAP ?? 30;
     const _MIN = (CFG.UI?.CARD_MIN) ?? 40;     // cỡ tối thiểu
     const boardEl = doc.getElementById('board'); // cache DOM
 
-  function debounce(fn, wait){
+    function debounce(fn, wait){
       let timer = null;
       function debounced(...args){
         if (timer){
@@ -3724,18 +3930,19 @@ const capRaw = Game.costCap ?? CFG.COST_CAP ?? 30;
         }
       };
 
-  debounced.flush = (...args)=>{
+      debounced.flush = (...args)=>{
         if (timer){
           clearTimeout(timer);
           timer = null;
-      }
-    fn.apply(this, args);
+        }
+      fn.apply(this, args);
       };
       return debounced;
     }
-const syncCardSize = debounce(()=>{
+   const syncCardSize = debounce(()=>{
       if (!boardEl) return;
       const w = boardEl.clientWidth || boardEl.getBoundingClientRect().width || 0;
+      
       // 7 cột -> 6 khoảng cách
       const cell = Math.max(_MIN, Math.floor((w - _GAP * 6) / 7));
       if (host){
@@ -3744,7 +3951,7 @@ const syncCardSize = debounce(()=>{
     }, 120);
     syncCardSize.flush();
 
-  let cleanupResize = ()=>{};
+    let cleanupResize = ()=>{};
     if (boardEl && typeof ResizeObserver === 'function'){
       const observer = new ResizeObserver(()=> syncCardSize());
       observer.observe(boardEl);
@@ -3761,6 +3968,7 @@ const syncCardSize = debounce(()=>{
       };
     }
 let removalObserver = null;
+
     if (host && typeof MutationObserver === 'function'){
       const target = doc.body || doc.documentElement;
       if (target){
@@ -3772,8 +3980,8 @@ let removalObserver = null;
           }
         });
         removalObserver.observe(target, { childList: true, subtree: true });
-      }
-    }
+     }
+   }
 
     // mỗi thẻ cost là 1 ô vuông, chỉ hiện cost
     function makeBtn(c){
@@ -3783,13 +3991,12 @@ let removalObserver = null;
       // chỉ hiện cost, không hiện tên
       btn.innerHTML = `<span class="cost">${c.cost}</span>`;
 
-      // trạng thái đủ/thiếu cost
+   // trạng thái đủ/thiếu cost
       const ok = canAfford(c);
       btn.disabled = !ok;
       btn.classList.toggle('disabled', !ok);  // chỉ để CSS quyết định độ sáng
-
-      return btn;
-    }
+     return btn;
+    }  
     let btns = []; // sẽ chứa đúng 3 button được tạo bằng makeBtn
 
     function render(){
@@ -3811,7 +4018,7 @@ let removalObserver = null;
         b.hidden = false;
         b.dataset.id = c.id;
 
-// cập nhật cost (giữ UI “chỉ cost”)
+   // cập nhật cost (giữ UI “chỉ cost”)
         const span = b.querySelector('.cost');
         if (span) span.textContent = c.cost;
 
@@ -3821,8 +4028,8 @@ let removalObserver = null;
         b.style.opacity = ''; // xóa mọi inline opacity cũ nếu còn
         b.classList.toggle('active', getSelectedId() === c.id);
       }
-  }
-  if (gameEvents && typeof gameEvents.addEventListener === 'function'){
+    }
+    if (gameEvents && typeof gameEvents.addEventListener === 'function'){
       const rerender = ()=> render();
       const types = [TURN_START, TURN_END, ACTION_END];
       for (const type of types){
