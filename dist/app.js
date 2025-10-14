@@ -2401,10 +2401,6 @@ __define('./events.js', (exports, module, __require) => {
     return new SimpleEventTarget();
   }
 
-  function makeEvent(type, detail){
-    return createNativeEvent(type, detail) || { type, detail };
-  }
-
   const TURN_START = 'turn:start';
   const TURN_END = 'turn:end';
   const ACTION_START = 'action:start';
@@ -2414,14 +2410,16 @@ __define('./events.js', (exports, module, __require) => {
 
   function emitGameEvent(type, detail){
     if (!type || !gameEvents) return false;
-    const event = makeEvent(type, detail);
     try {
       if (typeof gameEvents.dispatchEvent === 'function'){
-        let toDispatch = event;
-        if (typeof Event === 'function' && event && typeof event === 'object' && !(event instanceof Event)){
-          toDispatch = createNativeEvent(type, detail) || event;
+        const nativeEvent = createNativeEvent(type, detail);
+        if (nativeEvent){
+          return gameEvents.dispatchEvent(nativeEvent);
         }
-        return gameEvents.dispatchEvent(toDispatch);
+                if (gameEvents instanceof SimpleEventTarget){
+          return gameEvents.dispatchEvent({ type, detail });
+        }
+        return false;
       }
       if (typeof gameEvents.emit === 'function'){
         gameEvents.emit(type, detail);
