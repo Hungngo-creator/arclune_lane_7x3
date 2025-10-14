@@ -185,7 +185,8 @@ async function build(){
   const output = parts.join('\n') + '\n';
   const { code: transpiled } = await esbuild.transform(output, {
     loader: 'js',
-    target: ['es2017']
+  // Target modern runtimes; ES2023 is now the minimum supported JavaScript version.
+    target: ['es2023']
   });
   await fs.writeFile(path.join(DIST_DIR, 'app.js'), transpiled, 'utf8');
 }
