@@ -75,17 +75,20 @@ class SimpleEventTarget {
 
 function makeEventTarget(){
   if (!HAS_EVENT_TARGET) return new SimpleEventTarget();
+  const probeType = '__probe__';
+  const probeEvent = createNativeEvent(probeType);
+  const hasEventConstructor = typeof Event === 'function';
+  const isRealEvent = !!probeEvent && (!hasEventConstructor || probeEvent instanceof Event);
+  if (!isRealEvent) return new SimpleEventTarget();
   try {
     const target = new EventTarget();
-    const probeType = '__probe__';
     let handled = false;
     const handler = () => { handled = true; };
     if (typeof target.addEventListener === 'function'){
       target.addEventListener(probeType, handler);
       try {
-        const probeEvent = createNativeEvent(probeType) || { type: probeType };
-        if (typeof target.dispatchEvent === 'function'){
-          target.dispatchEvent(probeEvent);
+        if (typeof target.dispatchEvent === 'function' && isRealEvent){
+         target.dispatchEvent(probeEvent);
         }
       } finally {
         if (typeof target.removeEventListener === 'function'){
@@ -120,7 +123,7 @@ export function emitGameEvent(type, detail){
       if (typeof Event === 'function' && event && typeof event === 'object' && !(event instanceof Event)){
         toDispatch = createNativeEvent(type, detail) || event;
       }
-      return gameEvents.dispatchEvent(toDispatch);
+      return gameEvents.dispatchEvent (toDispatch);
     }
     if (typeof gameEvents.emit === 'function'){
       gameEvents.emit(type, detail);
