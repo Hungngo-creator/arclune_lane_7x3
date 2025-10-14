@@ -1,0 +1,18 @@
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/dist/assets/units/default/head.svg b/dist/assets/units/default/head.svg
+new file mode 100644
+index 0000000000000000000000000000000000000000..e96222b7906d1bfa5b75d7bb5499ab73ad49045a
+--- /dev/null
++++ b/dist/assets/units/default/head.svg
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240">
++      <circle cx="100" cy="58" r="44" fill="#7fa6c0" stroke="#223548" stroke-width="5" />
++      <ellipse cx="86" cy="52" rx="12" ry="16" fill="#d6f2ff" opacity="0.6" />
++      <ellipse cx="118" cy="52" rx="12" ry="16" fill="#d6f2ff" opacity="0.6" />
++      <path d="M76 76 Q100 88 124 76" stroke="#223548" stroke-width="5" stroke-linecap="round" fill="none" />
++    
++</svg>
+ 
+EOF
+)
