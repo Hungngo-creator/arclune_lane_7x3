@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="140" height="200" viewBox="0 0 140 200">
+  <defs>
+    <linearGradient id="banner-cloth" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffe7a6"/>
+      <stop offset="40%" stop-color="#f7b04c"/>
+      <stop offset="100%" stop-color="#d46a32"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" fill-rule="evenodd">
+    <path fill="#3a2a1b" d="M64 16h12v176H64z"/>
+    <path fill="#c47a3b" d="M48 12h44l8-8H40z"/>
+    <path fill="#d38f45" d="M48 24h44v116l-22-12-22 12z"/>
+    <path fill="url(#banner-cloth)" stroke="#5a2a12" stroke-width="4" d="M48 32h44v108l-22-12-22 12z"/>
+    <circle fill="#fcefd6" stroke="#7a3c1a" stroke-width="3" cx="70" cy="80" r="20"/>
+    <path fill="#7a3c1a" d="M70 52l6 14h-12zM70 108l-6-14h12zM98 80l-14 6V74zM42 80l14-6v12z"/>
+    <path fill="#f7cd7a" opacity=".4" d="M48 36h44L92 68H48z"/>
+  </g>
+</svg>
