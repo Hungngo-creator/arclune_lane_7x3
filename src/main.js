@@ -22,6 +22,7 @@ import {
 import { getUnitArt } from './art.js';
 import { initHUD, startSummonBar } from './ui.js';
 import { vfxDraw, vfxAddSpawn, vfxAddHit, vfxAddMelee } from './vfx.js';
+import { drawBattlefieldScene } from './scene.js';
 import { gameEvents, TURN_START, TURN_END, ACTION_START, ACTION_END } from './events.js';
 /** @type {HTMLCanvasElement|null} */ let canvas = null;
 /** @type {CanvasRenderingContext2D|null} */ let ctx = null;
@@ -49,7 +50,8 @@ const Game = {
   turn: { phase: 'ally', last: { ally: 0, enemy: 0 }, cycle: 0, busyUntil: 0 },
     queued: { ally: new Map(), enemy: new Map() },
   actionChain: [],
-  events: gameEvents
+  events: gameEvents,
+  sceneTheme: (CFG.SCENE?.CURRENT_THEME) || (CFG.SCENE?.DEFAULT_THEME)
 };
 // --- Enemy AI state (deck-4, cost riêng) ---
 Game.ai = {
@@ -688,11 +690,16 @@ function resize(){
 }
 function draw(){
   if (!ctx || !canvas || !Game.grid) return;            // guard
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const sceneCfg = CFG.SCENE || {};
+  const themeKey = Game.sceneTheme || sceneCfg.CURRENT_THEME || sceneCfg.DEFAULT_THEME;
+  const theme = (sceneCfg.THEMES && themeKey) ? sceneCfg.THEMES[themeKey] : null;
+  drawBattlefieldScene(ctx, Game.grid, theme);
   drawGridOblique(ctx, Game.grid, CAM_PRESET);
   drawQueuedOblique(ctx, Game.grid, Game.queued, CAM_PRESET);
   drawTokensOblique(ctx, Game.grid, Game.tokens, CAM_PRESET);
-vfxDraw(ctx, Game, CAM_PRESET);
- drawHPBars();
+  vfxDraw(ctx, Game, CAM_PRESET);
+  drawHPBars();
 }
 function cellCenterObliqueLocal(g, cx, cy, C){
   const colsW = g.tile * g.cols;

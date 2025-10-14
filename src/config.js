@@ -53,6 +53,35 @@ FOLLOWUP_CAP_DEFAULT: 2,
     line: '#24303c',
     tokenText: '#0d1216'
   },
+  SCENE: {
+    DEFAULT_THEME: 'daylight',
+    CURRENT_THEME: 'daylight',
+    THEMES: {
+      daylight: {
+        sky: {
+          top: '#1b2434',
+          mid: '#2f455e',
+          bottom: '#55759a',
+          glow: 'rgba(255, 236, 205, 0.35)'
+        },
+        horizon: {
+          color: '#f4d9ad',
+          glow: 'rgba(255, 236, 205, 0.55)',
+          height: 0.22,
+          thickness: 0.9
+        },
+        ground: {
+          top: '#312724',
+          accent: '#3f302c',
+          bottom: '#181210',
+          highlight: '#6c5344',
+          parallax: 0.12,
+          topScale: 0.9,
+          bottomScale: 1.45
+        }
+      }
+    }
+  },
 
   CAMERA: 'landscape_oblique'
 };

@@ -103,8 +103,6 @@ export function drawGridOblique(ctx, g, cam, opts = {}){
   const colors = Object.assign({}, CFG.COLORS, opts.colors||{});
   const rowGap = (C.rowGapRatio ?? 0.62) * g.tile;
 
-  ctx.clearRect(0, 0, g.w, g.h);
-
   for (let cy=0; cy<g.rows; cy++){
     const yTop = g.oy + cy*rowGap;
     const yBot = g.oy + (cy+1)*rowGap;
