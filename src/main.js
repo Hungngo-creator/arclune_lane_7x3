@@ -730,10 +730,29 @@ function refillDeck(){
 function resize(){
   if (!canvas) return;                                  // guard
   Game.grid = makeGrid(canvas, CFG.GRID_COLS, CFG.GRID_ROWS);
+  if (ctx && Game.grid){
+    const scale = Number.isFinite(Game.grid.dpr) && Game.grid.dpr > 0
+      ? Game.grid.dpr
+      : ((typeof window !== 'undefined' && Number.isFinite(window.devicePixelRatio) && window.devicePixelRatio > 0)
+        ? window.devicePixelRatio
+        : 1);
+    if (typeof ctx.setTransform === 'function'){
+      ctx.setTransform(scale, 0, 0, scale, 0, 0);
+    } else {
+      if (typeof ctx.resetTransform === 'function'){
+        ctx.resetTransform();
+      }
+      if (typeof ctx.scale === 'function'){
+        ctx.scale(scale, scale);
+      }
+    }
+  }
 }
 function draw(){
   if (!ctx || !canvas || !Game.grid) return;            // guard
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const clearW = Game.grid.w ?? canvas.width;
+  const clearH = Game.grid.h ?? canvas.height;
+  ctx.clearRect(0, 0, clearW, clearH);
   const sceneCfg = CFG.SCENE || {};
   const themeKey = Game.sceneTheme || sceneCfg.CURRENT_THEME || sceneCfg.DEFAULT_THEME;
   const theme = (sceneCfg.THEMES && themeKey) ? sceneCfg.THEMES[themeKey] : null;

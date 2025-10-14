@@ -4,21 +4,39 @@ import { getUnitArt, getUnitSkin } from './art.js';
 /* ---------- Grid ---------- */
 export function makeGrid(canvas, cols, rows){
   const pad = (CFG.UI?.PAD) ?? 12;
-const w = Math.min(window.innerWidth - pad*2, (CFG.UI?.BOARD_MAX_W) ?? 900);
+  const w = Math.min(window.innerWidth - pad*2, (CFG.UI?.BOARD_MAX_W) ?? 900);
   const h = Math.max(
     Math.floor(w * ((CFG.UI?.BOARD_H_RATIO) ?? (3/7))),
     (CFG.UI?.BOARD_MIN_H) ?? 220
   );
-  canvas.width = w; canvas.height = h;
 
-  const usableW = w - pad * 2;
-  const usableH = h - pad * 2;
+const dprRaw = (typeof window !== 'undefined' && Number.isFinite(window.devicePixelRatio))
+    ? window.devicePixelRatio
+    : 1;
+  const dpr = dprRaw > 0 ? dprRaw : 1;
+
+  const displayW = w;
+  const displayH = h;
+  const pixelW = Math.round(displayW * dpr);
+  const pixelH = Math.round(displayH * dpr);
+
+  if (canvas){
+    if (canvas.style){
+      canvas.style.width = `${displayW}px`;
+      canvas.style.height = `${displayH}px`;
+    }
+    if (canvas.width !== pixelW) canvas.width = pixelW;
+    if (canvas.height !== pixelH) canvas.height = pixelH;
+  }
+
+  const usableW = displayW - pad * 2;
+  const usableH = displayH - pad * 2;
 
   const tile = Math.floor(Math.min(usableW / cols, usableH / rows));
 
-  const ox = Math.floor((w - tile*cols)/2);
-  const oy = Math.floor((h - tile*rows)/2);
-  return { cols, rows, tile, ox, oy, w, h, pad };
+  const ox = Math.floor((displayW - tile*cols)/2);
+  const oy = Math.floor((displayH - tile*rows)/2);
+  return { cols, rows, tile, ox, oy, w: displayW, h: displayH, pad, dpr };
 }
 
 export function hitToCell(g, px, py){
