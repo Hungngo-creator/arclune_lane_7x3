@@ -852,14 +852,35 @@ const p = cellCenterObliqueLocal(Game.grid, t.cx, t.cy, CAM_PRESET);
 }
 /* ---------- Chạy ---------- */
 let _booted = false;
-export function startGame(){
-  if (_booted) return;
-  _booted = true;
-  init();
-  document.addEventListener('visibilitychange', ()=>{
-    setDrawPaused(document.hidden);
-  });
+let _booting = false;
+let _visibilityListenerBound = false;
+function handleVisibilityChange(){
+  if (typeof document === 'undefined') return;
   setDrawPaused(document.hidden);
+}
+
+export function startGame(){
+  if (_booted || _booting) return;
+  _booting = true;
+  try {
+    init();
+    if (!Game._inited){
+      return;
+    }
+    _booted = true;
+    if (!_visibilityListenerBound && typeof document !== 'undefined' && typeof document.addEventListener === 'function'){
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      _visibilityListenerBound = true;
+    }
+    if (typeof document !== 'undefined'){
+      setDrawPaused(document.hidden);
+    }
+  } catch (err) {
+    _booted = false;
+    throw err;
+  } finally {
+    _booting = false;
+  }
 }
 
 export { gameEvents, emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END } from './events.js';
