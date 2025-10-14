@@ -1,3 +1,4 @@
+A) ý tưởng và mong muốn
 1. Tạo skill mới dựa trên các pháp tắc đã có, có thể chọn loại đạo/pháp tắc/quy tắc để ngộ đạo và nhận được kĩ năng/ pháp tắc tương ứng để tạo kỹ năng mới.
 Kĩ năng có thể thu được từ công pháp. Áp dụng hệ thống nguyên linh + luyện đan vào game.
 Tu luyện kiếm lưu có thể học được kĩ năng.
@@ -43,7 +44,7 @@ Tạo thêm vài leader nam lẫn nữ.
 19. Gacha nhân vật luôn sẽ có bảo hiểm, banner char ssr thì 60 lần quay nhất định ra 1 ssr. Banner UR thì 70 lần quay nhất định ra 1 char UR, banner Prime thì là 80 lần quay nhất định ra char Prime, 3 bậc khác nhau sẽ có vé khác nhau và banner UR sau 50 lần quay sẽ ra 1 char SSR, đảm bảo giá trị tiền tệ để mua vé quay và đạt bảo hiểm ra ssr của banner ssr và ur và ur không kém quá xa.
 Banner Prime quay 40 lần nhất định ra char ssr, 60 lần nhất định ra char ur, đảm bảo giá trị tiền tệ để mua vé quay và đạt bảo hiểm ra ssr, ur và prime  của banner ssr, ur và prime không kém quá xa. Kiểu giá vé banner  prime hơn vé banner ur 20%, vé banner ur lại hơn vé banner ssr 20% có hợp lý không? Tao muốn game f2p.
 
-Logic tương tự áp dụng với gacha công pháp và gacha vũ khí.
+Logic tương tự áp dụng với gacha công pháp và gacha vũ khí cùng sủng thú.
 
 20. Hệ thống thành tựu, thưởng tiền tệ game hoặc quà đặc biệt để khích lệ player.
 
@@ -70,9 +71,68 @@ Tông môn vận hành cần tiền tệ, đi đường cần tiền, gacha ho�
 
 31. Tao còn ao ước biến game thành nft game luôn cơ mà chắc là không thể nào.
 
+32. Tao muốn sắp xếp sao cho khi player vào game sẽ thấy được 1 nhân vật game đứng nhìn họ, chạm vào thì nhân vật đó sẽ nói những câu thoại của bản thân, nếu là nữ thì khi chạm vào ngực hay vùng kín thì sẽ có phản ứng khác nhau tùy theo tính cách, nam cũng vậy, tùy theo giới tính của player chọn.
 
+33. Sủng thú: buff tốc độ tu luyện, tăng exp nhận được tùy theo rank của sủng thú, sủng thú không có trang bị, công pháp, class và không thể ăn đan dược nhưng có thể tăng sao và có kỹ năng cùng lv. Áp dụng logic banner ở số 19.
 
+34. Đấu thú trường: chế độ pve (hay pvp?), người chơi để sủng thú chiến đấu pve với sủng thú của player khác (AI đánh, người chơi không thể can thiệp) người chơi thắng:
+Thắng 1 trận lên bậc đồng 1, 3 lên đồng 2, 6 lên đồng 3.
+Thắng 10 trận lên bạc 1, 14 lên bạc 2, 18 lên bạc 3.
+Thắng 23 trận lên vàng 1, 28 lên vàng 2, 33 lên vàng 3.
+Thắng 39 trận lên bạch kim 1, 45 bạch kim 2, 51 bk 3.
+Thắng 58 trận lên kim cương 1, 65 lên kc 2, 72 lên kc 3.
+Thắng 80 trận lên bậc thầy 1, 88 lên bt 2, 96 lên bậc thầy 3.
+Thắng 105 trận lên bá chủ 1, 114 lên bc 2, 123 lên bá chủ 3.
+Thắng 133 trận lên thách đấu 1, 143 lên td 2, 153 lên td 3.
+Thắng 164 trận lên tối cao 1, 175 tối cao 2, 186 tối cao 3.
+Top 1 kẻ có số trận thắng nhiều nhất sẽ đạt rank đấu thần, nếu có thể đứng đến cuối mùa đấu thú trường sẽ nhận một phần thưởng đặc biệt từ game.
+Top 2 đến top 4 kẻ có số trận thắng nhiều nhất sẽ đạt rank đấu vương, nếu có thể đứng đến cuối mùa đấu thú trường sẽ nhận một phần thưởng đặc biệt từ game. Mọi bậc đều có thưởng, cập nhật sau khi cập nhật tiền tệ vào game.
 
+35. Thành tựu: phần thưởng thành tựu sẽ bổ sung sau.
+Thú Vương: đạt 500 trận thắng trong một mùa đấu thú trường.
+Bách Thú Vương: đạt 1000 trận thắng trong một mùa đấu thú trường.
+Vạn Thú Vương: đạt 10000 trận thắng trong một mùa đấu thú trường.
+Kẻ may mắn: gacha ra 3 nhân vật ssr trong 1 lần gacha 10 lần liên tiếp.
+Cha của Kẻ may mắn: gacha ra 4 nhân vật ssr hoặc 2 nhân vật ur trong 1 lần gacha 10 lần liên tiếp.
+Đố ngươi đụng được ta!: không nhận bất kỳ sát thương nào tính từ khi triệu hồi nhân vật thứ 2 lên sân đến hết trận đấu pvp. Chỉ áp dụng cho leader.
+Tiểu Cường: nhận 3 lần sát thương khi hp dưới 3% mà vẫn còn sống trong một trận pvp. Chỉ áp dụng cho leader.
+Đen đủi: gacha nhưng nhận bảo hiểm mới nhận được nhân vật ssr 3 lần liên tiếp.
+Trào phúng: leader đồng minh khiêu khích kẻ địch trong 5 turn liên tiếp.
+Đoàn diệt: leader hoặc đơn vị kẻ địch tiêu diệt toàn bộ đồng minh trên chiến trường trong 1 turn. Chỉ tính khi pvp real time.
+Quét sạch: leader hoặc đơn vị đồng minh tiêu diệt toàn bộ kẻ thù trên chiến trường trong 1 turn. Chỉ tính khi pvp real time.
+Mê ngủ: leader hoặc đồng minh ngủ trong 5 turn liên tiếp, chỉ tính khi pvp real time.
+Ngươi thật là ích kỷ a: bị tấn công 300 lần nhưng không bị đánh bại trong chế độ đấu thú trường khi đạt rank đấu thần.
+
+36. Deck chỉ chứa tối đa là 10 nhân vật hoặc sủng thú.
+
+B) ý tưởng về các mode
+1. Chiến Dịch: PvE cốt truyện + bản đồ 2D để đi nhiệm vụ; mở rộng sang hệ thống tu luyện 15 đại cảnh giới, drop vật phẩm đột phá và mở khoá kiến trúc tông môn.
+
+2. Thử Thách: Màn PvE với đội hình cố định, phần thưởng đặc biệt.
+
+3. Đấu Trường (PvE deck vs deck): AI dùng deck đã xếp; triển khai theo mùa 7 ngày, dùng lại logic combat nhưng bổ sung hệ thống phần thưởng và bảng xếp hạng.
+
+4. Ares (PvP realtime): Chỗ để sau, hiển thị “Coming soon” nhưng gắn hook tới hệ thống networking khi sẵn sàng.
+
+5. Tông Môn: Giao diện quản lý Trấn Yêu Tháp, Tàng Kinh Các, Đan Phong, Tu Luyện Phòng… liên kết tiến trình PvE và kinh tế nguyên tinh.
+
+6. Gacha: Phân tab Nhân Vật / Công Pháp / Vũ Khí / Sủng Thú với cơ chế pity theo từng banner, tiêu tốn tiền tệ khác nhau.
+
+7. Bộ Sưu Tập: Hiển thị hồ sơ nhân vật và sủng thú, công pháp, rank budget, sao, class; dùng dữ liệu từ “ý tưởng nhân vật v3”.
+
+8. Chợ Đen & Shop Dev: Giao dịch vật phẩm giữa người chơi, thuế theo bậc; shop tiền thật.
+
+9. Sự Kiện & Vé số: Event giới hạn thời gian, mua vé số bằng tiền tệ trong game.
+
+10. Chat & Xã hội: Khung chat realtime + thông báo cộng đồng.
+
+11. Đấu Thú Trường:
+
+C) ý tưởng vật phẩm
+1. Loa nhỏ: thông báo 1 đoạn tin nhắn toàn sever 1 lần.
+   Loa vừa: thông báo 1 đoạn tin nhắn toàn sever 2 lần, mỗi lần cách nhau 1 phút.
+   Loa lớn: thông báo 1 đoạn tin nhắn toàn sever 3 lần, mỗi lần cách nhau 2 phút.
+2. 
 
 
 
