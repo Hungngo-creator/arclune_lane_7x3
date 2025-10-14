@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 200">
+  <defs>
+    <linearGradient id="linh-plate" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#9ec4ff"/>
+      <stop offset="100%" stop-color="#2a3f5c"/>
+    </linearGradient>
+    <radialGradient id="linh-glow" cx="50%" cy="38%" r="60%">
+      <stop offset="0%" stop-color="#e4f1ff" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#9ec4ff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M80 10 C116 18 144 50 150 94 C156 138 134 176 96 188 C64 194 36 178 22 156 C10 134 8 96 16 64 C32 32 52 18 80 10 Z" fill="url(#linh-plate)" stroke="#24364c" stroke-width="6"/>
+    <path d="M80 32 C110 40 132 70 132 104 C132 140 110 170 80 176 C52 172 34 142 34 108 C32 72 50 40 80 32 Z" fill="#e4f1ff" fill-opacity="0.32"/>
+    <circle cx="80" cy="74" r="20" fill="url(#linh-glow)"/>
+  </g>
+</svg>
