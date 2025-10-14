@@ -34,7 +34,10 @@ Pháp sư: Ult AOE theo hàng; có execute khi mục tiêu < ngưỡng %HP: R 3%
 Hỗ trợ: Ult hồi máu toàn đội/đơn/ngẫu nhiên 1 đến 3 mục tiêu + thanh AE hoặc hồi sinh ngẫu nhiên (từ SR ↑, CD dài). Basic có 2 kiểu: heal-tick không gây dmg hoặc dmg nhẹ + heal 20% dmg cho đồng minh gần nhất (chọn theo thiết kế từng tướng).
 
 Chiến sĩ: Ult multi-hit lane, thêm Block tạm thời; Active: chém 2-3 hit hoặc buff ATK+Block.
-Còn class summon nhưng tao quên chỉ số và mô tả rồi, tự tìm lại nhé. Mà các mô tả này chỉ là đại khái, một nhân vật có bao nhiêu đặc điểm mô tả thì còn tùy vào bậc của nhân vật đó. Bậc và Class là khác nhau. Các mô tả này không phải lúc nào cũng áp dụng, một nhân vật không thể bị trói buộc 100% với các mô tả.
+
+Summoner/Triệu hồi:
+Ranger/cung thủ:
+Bậc và Class là khác nhau. Các mô tả này không phải lúc nào cũng áp dụng, một nhân vật không thể bị trói buộc 100% với các mô tả.
 
 3) B, Class & cân bằng (cùng bậc):
 
@@ -49,6 +52,8 @@ Hỗ trợ (buff/heal/khống): AEmax/regen cao, DPS thấp.
 Chiến sĩ (đấu sĩ): ATK/ARM khá, đa dụng (vật lý/phép).
 
 Triệu Hồi (summoner): AEmax/regen cao, WIL khá, HP/ARM vừa; sức mạnh tính cả quân được gọi.
+
+Cung thủ:
 
 Base lv1 theo class (trước khi nhân theo bậc; RNG = tầm theo class):
 
@@ -73,7 +78,7 @@ Chiến trường 7×3 ngang, đồng minh trái, địch phải.
 
 Leader luôn có mặt; thua khi HP leader = 0; 4' hết giờ → so %HP leader.
 
-Cost: +1/s, cap 30, phải triệu hồi để tiếp tục tích; mỗi leader tối đa 10 lần triệu hồi trong trận, không có giới hạn về hồi sinh đồng minh đã ra trận.
+Cost: +1/s, cap 30, phải triệu hồi để tiếp tục tích; không có giới hạn về hồi sinh đồng minh đã ra trận.
 
 Auto-đánh theo hàng, chọn skill thì thi triển, không chọn thì normal attack, tích nộ và auto dùng ult khi đầy (trừ leader vì có 3 lựa chọn).
 
@@ -85,11 +90,11 @@ VFX placeholder: chibi có quần áo/vũ khí; nền sân có texture.
 
 6) Leader:
 Mặc định: luôn có trên sân, không tốn cost, có thanh Nộ riêng.
-Cơ chế “Ult chọn 1 trong 3": khi đầy nộ (≥ RageMax hoac du no de dung ult), sáng 3 nút; bấm 1 cái thì 2 cái tắt cho tới khi nộ lại đầy. Mọi ultimate chủ động của leader muốn dùng cần tích tổi thiểu 100 nộ để sử dụng, 1 turn chỉ được dùng 1 ult. Vào trận với 0 nộ/rage base.
+Cơ chế “Ult chọn 1 trong 3": khi đầy nộ (≥ RageMax hoặc đủ nộ để dùng ult), sáng 3 nút; bấm 1 cái thì 2 cái tắt cho tới khi nộ lại đầy. Mọi ultimate chủ động của leader muốn dùng cần tích tổi thiểu 100 nộ để sử dụng, 1 turn chỉ được dùng 1 ult. Vào trận với 0 nộ/rage base.
 
 1. Uyên.
 Rage base: 100
-Nội tại: mỗi lần triệu hồi 1 đồng minh lên sân (chiến trường) Uyên được + 5 nộ/lần, tác dụng kể cả đồng minh được hồi sinh (tối đa 5 lần/trận cho cong no tu hoi sinh), vật triệu hồi của đồng minh không tính, nội tại luôn hoạt động suốt trận đấu và không thể bị xoá.
+Nội tại: mỗi lần triệu hồi 1 đồng minh lên sân (chiến trường) Uyên được + 5 nộ/lần, tác dụng kể cả đồng minh được hồi sinh (tối đa 5 lần/trận cho cộng nộ từ hồi sinh), vật triệu hồi của đồng minh không tính, nội tại luôn hoạt động suốt trận đấu và không thể bị xoá, cướp, sao chép hay lãng quên.
 
 3 skill chủ động, chỉ được chọn 1 kill khi đầy nộ:
 
@@ -97,14 +102,14 @@ A. Thiên Mệnh Gia Phúc (tiêu 100 nộ) Nhận ngẫu nhiên 1 trong 3 buff:
 
 Huyết Khí Tăng Tốc: +3 nộ mỗi đòn đánh (áp dụng đến hết trận, không thể xoá). Giới hạn tối đa 10 stack.
 
-Lệnh Bạt Phong: +30% tốc đánh cho toàn đội trong 3 turn.
+Lệnh Bạt Phong: +25% tốc đánh cho toàn đội trong 3 turn.
 
 Định Mạch: +10% Max HP cho bản thân (áp dụng đến hết trận, không thể xoá). Tối đa 10 stack. Ví dụ: lần 1 +10% max hp hiện có, lần 2 +10% max hp hiện có lúc đó, các lần tiếp theo cũng vậy, 100hp +10% = 110hp, 110hp +10% = 121hp, 121hp +10% = 133.1 hp, cứ thế mà tính tới, dĩ nhiên chỉ là ví dụ cho dễ hình dung.
 
-B. Tàng Nộ Thượng Hạn (tiêu 40% nộ hiện tại) Giữ lại 60%, tăng RageMax ×1.3. Ví dụ: 100-130 (còn 60/130); lần 2: 130-169 (còn 78/169) cứ thế tính tới, hồi phục hp = 5% max hp. Khi đạt mốc 3/6/9 lần thì mỗi mốc + 10% max hp.
+B. Tàng Nộ Thượng Hạn (tiêu 40% nộ hiện tại) Giữ lại 60%, tăng RageMax ×1.3. Ví dụ: 100-130 (còn 60/130); lần 2: 130-169 (còn 78/169) cứ thế tính tới, hồi phục hp = 5% max hp. Khi đạt mốc 3/6/10 lần thì mỗi mốc + 5% max hp.
 Giới hạn kích hoạt tối đa là 10 lần.
 
-C. Song Diệt Ấn (tiêu 100 nộ) Gây sát thương toàn bộ địch: 0.6 ATK + 0.6-WIL (hybrid), xuyên 10% ARM & 10% RES.
+C. Song Diệt Ấn (tiêu 100 nộ) Gây sát thương toàn bộ địch: = 50% max hp bản thân + 60% ATK + 60% WIL (hybrid), xuyên 10% ARM & 10% RES.
 
 Synergy: mỗi stack từ ult Chủ động B +5% dmg cho ult chủ động C (tối đa +35%).
 
