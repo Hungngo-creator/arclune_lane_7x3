@@ -20,13 +20,19 @@ function resolveImport(fromId, specifier){
 }
 
 async function listSourceFiles(){
-  const entries = await fs.readdir(SRC_DIR, { withFileTypes: true });
   const files = [];
-  for (const entry of entries){
-    if (entry.isFile() && entry.name.endsWith('.js')){
-      files.push(path.join(SRC_DIR, entry.name));
+  async function walk(dir){
+    const entries = await fs.readdir(dir, { withFileTypes: true });
+    for (const entry of entries){
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()){
+        await walk(fullPath);
+      } else if (entry.isFile() && entry.name.endsWith('.js')){
+        files.push(fullPath);
+      }
     }
   }
+  await walk(SRC_DIR);
   return files.sort();
 }
 
