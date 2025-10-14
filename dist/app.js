@@ -614,6 +614,251 @@ __define('./art.js', (exports, module, __require) => {
   exports.getUnitArt = getUnitArt;
   exports.getPalette = getPalette;
 });
+__define('./background.js', (exports, module, __require) => {
+  const __dep0 = __require('./config.js');
+  const CFG = __dep0.CFG;
+  const __dep1 = __require('./engine.js');
+  const projectCellOblique = __dep1.projectCellOblique;
+  const ensureSpriteLoaded = __dep1.ensureSpriteLoaded;
+
+  const ENVIRONMENT_PROP_TYPES = {
+    'stone-obelisk': {
+      asset: 'dist/assets/environment/stone-obelisk.svg',
+      size: { w: 120, h: 220 },
+      anchor: { x: 0.5, y: 1 },
+      baseLift: 0.52,
+      fallback: { shape: 'obelisk' },
+      palette: {
+        primary: '#d6e2fb',
+        secondary: '#7d8ba9',
+        accent: '#f7fbff',
+        shadow: '#2c3346',
+        outline: 'rgba(16,20,32,0.78)'
+      }
+    },
+    'sun-banner': {
+      asset: 'dist/assets/environment/sun-banner.svg',
+      size: { w: 140, h: 200 },
+      anchor: { x: 0.5, y: 1 },
+      baseLift: 0.56,
+      fallback: { shape: 'banner' },
+      palette: {
+        primary: '#ffe3a6',
+        secondary: '#d47b3a',
+        accent: '#fff4d1',
+        shadow: '#6d3218',
+        outline: 'rgba(46,23,11,0.78)'
+      }
+    }
+  };
+
+  function resolveBackground(backgroundKey){
+    const backgrounds = CFG.BACKGROUNDS || {};
+    if (!backgrounds || typeof backgrounds !== 'object') return null;
+    if (backgroundKey && backgrounds[backgroundKey]){
+      return { key: backgroundKey, config: backgrounds[backgroundKey] };
+    }
+    const preferred = CFG.CURRENT_BACKGROUND || CFG.SCENE?.CURRENT_BACKGROUND;
+    if (preferred && backgrounds[preferred]){
+      return { key: preferred, config: backgrounds[preferred] };
+    }
+    const themeKey = CFG.SCENE?.CURRENT_THEME || CFG.SCENE?.DEFAULT_THEME;
+    if (themeKey && backgrounds[themeKey]){
+      return { key: themeKey, config: backgrounds[themeKey] };
+    }
+    const fallbackKey = Object.keys(backgrounds)[0];
+    if (fallbackKey){
+      return { key: fallbackKey, config: backgrounds[fallbackKey] };
+    }
+    return null;
+  }
+
+  function normalizePropConfig(propCfg){
+    if (!propCfg) return null;
+    const typeId = propCfg.type || propCfg.kind;
+    const typeDef = typeId ? ENVIRONMENT_PROP_TYPES[typeId] : null;
+    const anchor = {
+      x: propCfg.anchor?.x ?? typeDef?.anchor?.x ?? 0.5,
+      y: propCfg.anchor?.y ?? typeDef?.anchor?.y ?? 1
+    };
+    const size = {
+      w: propCfg.size?.w ?? typeDef?.size?.w ?? 120,
+      h: propCfg.size?.h ?? typeDef?.size?.h ?? 180
+    };
+    const palette = {
+      ...(typeDef?.palette || {}),
+      ...(propCfg.palette || {})
+    };
+    return {
+      type: typeId,
+      asset: propCfg.asset ?? typeDef?.asset ?? null,
+      fallback: propCfg.fallback ?? typeDef?.fallback ?? null,
+      palette,
+      anchor,
+      size,
+      cell: {
+        cx: propCfg.cx ?? propCfg.cell?.cx ?? 0,
+        cy: propCfg.cy ?? propCfg.cell?.cy ?? 0
+      },
+      depth: propCfg.depth ?? propCfg.cell?.depth ?? 0,
+      baseLift: propCfg.baseLift ?? typeDef?.baseLift ?? 0.5,
+      offset: {
+        x: propCfg.offset?.x ?? 0,
+        y: propCfg.offset?.y ?? 0
+      },
+      pixelOffset: {
+        x: propCfg.pixelOffset?.x ?? 0,
+        y: propCfg.pixelOffset?.y ?? 0
+      },
+      scale: propCfg.scale ?? 1,
+      alpha: propCfg.alpha ?? 1,
+      flip: propCfg.flip ?? 1,
+      sortBias: propCfg.sortBias ?? 0
+    };
+  }
+
+  function drawFallback(ctx, width, height, anchor, palette, fallback){
+    const primary = palette?.primary || '#ccd7ec';
+    const secondary = palette?.secondary || '#7b86a1';
+    const accent = palette?.accent || '#f4f7ff';
+    const shadow = palette?.shadow || 'rgba(18,22,34,0.65)';
+    const outline = palette?.outline || 'rgba(12,18,28,0.9)';
+    const top = -height * (anchor?.y ?? 1);
+    const bottom = top + height;
+    const halfW = width / 2;
+    ctx.save();
+    ctx.beginPath();
+    switch(fallback?.shape){
+      case 'banner': {
+        ctx.moveTo(-halfW * 0.65, top + height * 0.08);
+        ctx.lineTo(halfW * 0.65, top + height * 0.08);
+        ctx.lineTo(halfW * 0.65, bottom - height * 0.35);
+        ctx.lineTo(0, bottom);
+        ctx.lineTo(-halfW * 0.65, bottom - height * 0.35);
+        ctx.closePath();
+        ctx.fillStyle = primary;
+        ctx.fill();
+        ctx.strokeStyle = outline;
+        ctx.lineWidth = Math.max(2, width * 0.05);
+        ctx.stroke();
+        ctx.fillStyle = secondary;
+        ctx.fillRect(-halfW * 0.65, top + height * 0.02, halfW * 1.3, height * 0.12);
+        ctx.fillStyle = accent;
+        ctx.beginPath();
+        ctx.arc(0, top + height * 0.38, width * 0.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = shadow;
+        ctx.lineWidth = Math.max(2, width * 0.04);
+        ctx.stroke();
+        break;
+      }
+      case 'obelisk':
+      default: {
+        ctx.moveTo(0, top);
+        ctx.lineTo(halfW * 0.7, top + height * 0.12);
+        ctx.lineTo(halfW * 0.54, bottom);
+        ctx.lineTo(-halfW * 0.54, bottom);
+        ctx.lineTo(-halfW * 0.7, top + height * 0.12);
+        ctx.closePath();
+        const grad = ctx.createLinearGradient(0, top, 0, bottom);
+        grad.addColorStop(0, primary);
+        grad.addColorStop(1, secondary);
+        ctx.fillStyle = grad;
+        ctx.fill();
+        ctx.strokeStyle = outline;
+        ctx.lineWidth = Math.max(2, width * 0.05);
+        ctx.stroke();
+        ctx.globalAlpha = 0.35;
+        ctx.fillStyle = accent;
+        ctx.beginPath();
+        ctx.moveTo(-halfW * 0.25, top + height * 0.22);
+        ctx.lineTo(-halfW * 0.12, top + height * 0.08);
+        ctx.lineTo(halfW * 0.18, top + height * 0.18);
+        ctx.lineTo(halfW * 0.12, top + height * 0.34);
+        ctx.closePath();
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        ctx.strokeStyle = shadow;
+        ctx.beginPath();
+        ctx.moveTo(-halfW * 0.38, top + height * 0.16);
+        ctx.lineTo(-halfW * 0.24, bottom - height * 0.08);
+        ctx.stroke();
+        break;
+      }
+    }
+    ctx.restore();
+  }
+
+  function drawEnvironmentProps(ctx, g, cam, backgroundKey){
+    if (!ctx || !g) return;
+    const resolved = resolveBackground(backgroundKey);
+    if (!resolved) return;
+    const { config } = resolved;
+    if (!config || config.enabled === false) return;
+    const props = Array.isArray(config.props) ? config.props : [];
+    if (!props.length) return;
+
+    const rowGap = ((cam?.rowGapRatio) ?? 0.62) * g.tile;
+    const drawables = [];
+    for (const rawProp of props){
+      const prop = normalizePropConfig(rawProp);
+      if (!prop) continue;
+      const cx = prop.cell.cx;
+      const cy = prop.cell.cy + prop.depth;
+      const projection = projectCellOblique(g, cx, cy, cam);
+      const scale = projection.scale * prop.scale;
+      const px = projection.x + prop.offset.x * g.tile + prop.pixelOffset.x;
+      const pyBase = projection.y + (prop.baseLift ?? 0.5) * rowGap + prop.offset.y * rowGap + prop.pixelOffset.y;
+      const spriteEntry = prop.asset ? ensureSpriteLoaded({ sprite: prop.asset }) : null;
+      drawables.push({
+        prop,
+        x: px,
+        y: pyBase,
+        scale,
+        spriteEntry,
+        sortY: projection.y + prop.sortBias
+      });
+    }
+
+    drawables.sort((a, b)=> a.sortY - b.sortY);
+
+    for (const item of drawables){
+      const { prop } = item;
+      let width = prop.size.w * item.scale;
+      let height = prop.size.h * item.scale;
+      const spriteEntry = item.spriteEntry;
+      if (spriteEntry && spriteEntry.status === 'ready' && spriteEntry.img){
+        const naturalW = spriteEntry.img.naturalWidth || prop.size.w;
+        const naturalH = spriteEntry.img.naturalHeight || prop.size.h;
+        width = naturalW * item.scale;
+        height = naturalH * item.scale;
+      }
+      ctx.save();
+      ctx.globalAlpha = prop.alpha;
+      ctx.translate(item.x, item.y);
+      if (prop.flip === -1){
+        ctx.scale(-1, 1);
+      }
+      const drawX = -width * (prop.anchor.x ?? 0.5);
+      const drawY = -height * (prop.anchor.y ?? 1);
+      if (spriteEntry && spriteEntry.status === 'ready' && spriteEntry.img){
+        ctx.drawImage(spriteEntry.img, drawX, drawY, width, height);
+      } else {
+        drawFallback(ctx, width, height, prop.anchor, prop.palette, prop.fallback);
+      }
+      ctx.restore();
+    }
+  }
+
+  function getEnvironmentBackground(backgroundKey){
+    const resolved = resolveBackground(backgroundKey);
+    return resolved ? resolved.config : null;
+  }
+
+  exports.ENVIRONMENT_PROP_TYPES = ENVIRONMENT_PROP_TYPES;
+  exports.drawEnvironmentProps = drawEnvironmentProps;
+  exports.getEnvironmentBackground = getEnvironmentBackground;
+});
 __define('./catalog.js', (exports, module, __require) => {
   //v0.7
   // 1) Rank multiplier (đơn giản) — áp lên TẤT CẢ stat trừ SPD
@@ -896,7 +1141,7 @@ __define('./combat.js', (exports, module, __require) => {
       target: tgt,
       damage: { baseMul: 1, flatAdd: 0 },
       afterHit: [],
-     log: Game?.passiveLog
+      log: Game?.passiveLog
     };
     emitPassiveEvent(Game, unit, 'onBasicHit', passiveCtx);
    
@@ -1039,8 +1284,7 @@ __define('./config.js', (exports, module, __require) => {
       line: '#24303c',
       tokenText: '#0d1216'
     },
-
-SCENE: {
+    SCENE: {
       DEFAULT_THEME: 'daylight',
       CURRENT_THEME: 'daylight',
       THEMES: {
@@ -1069,6 +1313,49 @@ SCENE: {
         }
       }
     },
+    
+    CURRENT_BACKGROUND: 'daylight',
+    BACKGROUNDS: {
+      daylight: {
+        props: [
+          {
+            type: 'stone-obelisk',
+            cell: { cx: -0.8, cy: -0.2 },
+            offset: { x: -0.35, y: -0.08 },
+            scale: 1.02,
+            alpha: 0.94
+          },
+          {
+            type: 'stone-obelisk',
+            cell: { cx: 6.8, cy: -0.25 },
+            offset: { x: 0.32, y: -0.1 },
+            scale: 1.02,
+            alpha: 0.94,
+            flip: -1
+          },
+          {
+            type: 'sun-banner',
+            cell: { cx: -1.05, cy: 2.24 },
+            depth: 0.15,
+            offset: { x: -0.28, y: 0.38 },
+            sortBias: 18,
+            scale: 1.08,
+            alpha: 0.96
+          },
+          {
+            type: 'sun-banner',
+            cell: { cx: 7.05, cy: 2.28 },
+            depth: 0.15,
+            offset: { x: 0.28, y: 0.38 },
+            sortBias: 18,
+            scale: 1.08,
+            alpha: 0.96,
+            flip: -1
+          }
+        ]
+      }
+    },
+    
     CAMERA: 'landscape_oblique'
   };
 
@@ -1206,7 +1493,8 @@ __define('./engine.js', (exports, module, __require) => {
     const C = cam || { rowGapRatio:0.62, topScale:0.80, depthScale:0.94 };
     const colors = Object.assign({}, CFG.COLORS, opts.colors||{});
     const rowGap = (C.rowGapRatio ?? 0.62) * g.tile;
-   for (let cy=0; cy<g.rows; cy++){
+    
+    for (let cy=0; cy<g.rows; cy++){
       const yTop = g.oy + cy*rowGap;
       const yBot = g.oy + (cy+1)*rowGap;
       const LRt = _rowLR(g, cy,   C);
@@ -1648,6 +1936,7 @@ __define('./engine.js', (exports, module, __require) => {
   exports.drawGridOblique = drawGridOblique;
   exports.hitToCellOblique = hitToCellOblique;
   exports.projectCellOblique = projectCellOblique;
+  exports.ensureSpriteLoaded = ensureSpriteLoaded;
   exports.drawTokensOblique = drawTokensOblique;
   exports.drawQueuedOblique = drawQueuedOblique;
   exports.slotIndex = slotIndex;
@@ -1699,9 +1988,9 @@ __define('./entry.js', (exports, module, __require) => {
     const value = typeof error === 'undefined' || error === null ? '' : String(error);
     return value.trim() ? value : fallback;
   }
- function showFatalError(error, renderMessage, options){
- const { isFileProtocol = false } = options || {};
-    const detail = resolveErrorMessage(error);
+  function showFatalError(error, renderMessage, options){
+    const { isFileProtocol = false } = options || {};
+  const detail = resolveErrorMessage(error);
       const advice = isFileProtocol
       ? '<p><small>Arclune đang chạy trực tiếp từ ổ đĩa (<code>file://</code>). Nếu gặp lỗi tải tài nguyên, hãy thử mở thông qua một HTTP server tĩnh.</small></p>'
       : '';
@@ -1736,7 +2025,7 @@ __define('./events.js', (exports, module, __require) => {
   // events.js
   const HAS_EVENT_TARGET = typeof EventTarget === 'function';
 
-function createNativeEvent(type, detail){
+ function createNativeEvent(type, detail){
     if (!type) return null;
     if (typeof CustomEvent === 'function'){
       try {
@@ -1772,7 +2061,7 @@ function createNativeEvent(type, detail){
     }
     return null;
   }
-   class SimpleEventTarget {
+  class SimpleEventTarget {
     constructor(){
       this._map = new Map();
     }
@@ -1926,24 +2215,26 @@ __define('./main.js', (exports, module, __require) => {
   const cellReserved = __dep10.cellReserved;
   const ORDER_ENEMY = __dep10.ORDER_ENEMY;
   const ART_SPRITE_EVENT = __dep10.ART_SPRITE_EVENT;
-  const __dep11 = __require('./art.js');
-  const getUnitArt = __dep11.getUnitArt;
-  const __dep12 = __require('./ui.js');
-  const initHUD = __dep12.initHUD;
-  const startSummonBar = __dep12.startSummonBar;
-  const __dep13 = __require('./vfx.js');
-  const vfxDraw = __dep13.vfxDraw;
-  const vfxAddSpawn = __dep13.vfxAddSpawn;
-  const vfxAddHit = __dep13.vfxAddHit;
-  const vfxAddMelee = __dep13.vfxAddMelee;
-    const __dep14 = __require('./scene.js');
-  const drawBattlefieldScene = __dep14.drawBattlefieldScene;
-  const __dep15 = __require('./events.js');
-  const gameEvents = __dep15.gameEvents;
-  const TURN_START = __dep15.TURN_START;
-  const TURN_END = __dep15.TURN_END;
-  const ACTION_START = __dep15.ACTION_START;
-  const ACTION_END = __dep15.ACTION_END;
+  const __dep11 = __require('./background.js');
+  const drawEnvironmentProps = __dep11.drawEnvironmentProps;
+  const __dep12 = __require('./art.js');
+  const getUnitArt = __dep12.getUnitArt;
+  const __dep13 = __require('./ui.js');
+  const initHUD = __dep13.initHUD;
+  const startSummonBar = __dep13.startSummonBar;
+  const __dep14 = __require('./vfx.js');
+  const vfxDraw = __dep14.vfxDraw;
+  const vfxAddSpawn = __dep14.vfxAddSpawn;
+  const vfxAddHit = __dep14.vfxAddHit;
+  const vfxAddMelee = __dep14.vfxAddMelee;
+  const __dep15 = __require('./scene.js');
+  const drawBattlefieldScene = __dep15.drawBattlefieldScene;
+  const __dep16 = __require('./events.js');
+  const gameEvents = __dep16.gameEvents;
+  const TURN_START = __dep16.TURN_START;
+  const TURN_END = __dep16.TURN_END;
+  const ACTION_START = __dep16.ACTION_START;
+  const ACTION_END = __dep16.ACTION_END;
   /** @type {HTMLCanvasElement|null} */ let canvas = null;
   /** @type {CanvasRenderingContext2D|null} */ let ctx = null;
   /** @type {{update:(g:any)=>void}|null} */ let hud = null;   // ← THÊM
@@ -1968,10 +2259,11 @@ __define('./main.js', (exports, module, __require) => {
     selectedId: null,
     ui: { bar: null },
     turn: { phase: 'ally', last: { ally: 0, enemy: 0 }, cycle: 0, busyUntil: 0 },
-      queued: { ally: new Map(), enemy: new Map() },
+   queued: { ally: new Map(), enemy: new Map() },
     actionChain: [],
     events: gameEvents,
-    sceneTheme: (CFG.SCENE?.CURRENT_THEME) || (CFG.SCENE?.DEFAULT_THEME)
+    sceneTheme: (CFG.SCENE?.CURRENT_THEME) || (CFG.SCENE?.DEFAULT_THEME),
+    backgroundKey: CFG.CURRENT_BACKGROUND || CFG.SCENE?.CURRENT_BACKGROUND || (CFG.SCENE?.CURRENT_THEME) || (CFG.SCENE?.DEFAULT_THEME)
   };
   // --- Enemy AI state (deck-4, cost riêng) ---
   Game.ai = {
@@ -2615,6 +2907,7 @@ __define('./main.js', (exports, module, __require) => {
     const themeKey = Game.sceneTheme || sceneCfg.CURRENT_THEME || sceneCfg.DEFAULT_THEME;
     const theme = (sceneCfg.THEMES && themeKey) ? sceneCfg.THEMES[themeKey] : null;
     drawBattlefieldScene(ctx, Game.grid, theme);
+    drawEnvironmentProps(ctx, Game.grid, CAM_PRESET, Game.backgroundKey);
     drawGridOblique(ctx, Game.grid, CAM_PRESET);
     drawQueuedOblique(ctx, Game.grid, Game.queued, CAM_PRESET);
     drawTokensOblique(ctx, Game.grid, Game.tokens, CAM_PRESET);
@@ -3236,7 +3529,6 @@ __define('./scene.js', (exports, module, __require) => {
 
     ctx.restore();
   }
-
   exports.drawBattlefieldScene = drawBattlefieldScene;
 });
 __define('./statuses.js', (exports, module, __require) => {
@@ -3859,7 +4151,7 @@ __define('./ui.js', (exports, module, __require) => {
       if (costRing){
        const deg = (ratio * 360).toFixed(1) + 'deg';
        costRing.style.setProperty('--deg', deg);
-       }
+      }
       // Khi max cap, làm chip sáng hơn
       if (costChip){
         costChip.classList.toggle('full', now >= cap);
@@ -3935,11 +4227,11 @@ __define('./ui.js', (exports, module, __require) => {
           clearTimeout(timer);
           timer = null;
         }
-      fn.apply(this, args);
+       fn.apply(this, args);
       };
       return debounced;
     }
-   const syncCardSize = debounce(()=>{
+    const syncCardSize = debounce(()=>{
       if (!boardEl) return;
       const w = boardEl.clientWidth || boardEl.getBoundingClientRect().width || 0;
       
@@ -3967,7 +4259,7 @@ __define('./ui.js', (exports, module, __require) => {
         syncCardSize.cancel();
       };
     }
-let removalObserver = null;
+  let removalObserver = null;
 
     if (host && typeof MutationObserver === 'function'){
       const target = doc.body || doc.documentElement;
@@ -3980,8 +4272,8 @@ let removalObserver = null;
           }
         });
         removalObserver.observe(target, { childList: true, subtree: true });
-     }
-   }
+      }
+ }
 
     // mỗi thẻ cost là 1 ô vuông, chỉ hiện cost
     function makeBtn(c){
@@ -3991,13 +4283,13 @@ let removalObserver = null;
       // chỉ hiện cost, không hiện tên
       btn.innerHTML = `<span class="cost">${c.cost}</span>`;
 
-   // trạng thái đủ/thiếu cost
+  // trạng thái đủ/thiếu cost
       const ok = canAfford(c);
       btn.disabled = !ok;
       btn.classList.toggle('disabled', !ok);  // chỉ để CSS quyết định độ sáng
-     return btn;
-    }  
-    let btns = []; // sẽ chứa đúng 3 button được tạo bằng makeBtn
+   return btn;
+    }
+  let btns = []; // sẽ chứa đúng 3 button được tạo bằng makeBtn
 
     function render(){
       const deck = getDeck();              // luôn gồm tối đa 3 thẻ hiện hành
@@ -4018,7 +4310,7 @@ let removalObserver = null;
         b.hidden = false;
         b.dataset.id = c.id;
 
-   // cập nhật cost (giữ UI “chỉ cost”)
+      // cập nhật cost (giữ UI “chỉ cost”)
         const span = b.querySelector('.cost');
         if (span) span.textContent = c.cost;
 
