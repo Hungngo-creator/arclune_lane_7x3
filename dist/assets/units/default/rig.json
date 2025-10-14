@@ -1,0 +1,425 @@
+diff --git a/dist/assets/units/default/rig.json b/dist/assets/units/default/rig.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..b87ada1f3d2cd74a843fbdaea0089ae08ba2b9f4
+--- /dev/null
++++ b/dist/assets/units/default/rig.json
+@@ -0,0 +1,417 @@
++{
++  "version": 1,
++  "meta": {
++    "canvas": [
++      200,
++      240
++    ],
++    "anchor": 0.86,
++    "defaultClip": "idle"
++  },
++  "parts": {
++    "frame": {
++      "src": "./frame.svg",
++      "position": [
++        100,
++        170
++      ],
++      "pivot": [
++        0.5,
++        0.9
++      ],
++      "z": 0,
++      "base": {
++        "opacity": 0.45
++      }
++    },
++    "leg_back": {
++      "src": "./leg_back.svg",
++      "position": [
++        94,
++        204
++      ],
++      "pivot": [
++        0.5,
++        0.92
++      ],
++      "z": 1
++    },
++    "leg_front": {
++      "src": "./leg_front.svg",
++      "position": [
++        106,
++        204
++      ],
++      "pivot": [
++        0.5,
++        0.92
++      ],
++      "z": 2
++    },
++    "torso": {
++      "src": "./torso.svg",
++      "position": [
++        100,
++        150
++      ],
++      "pivot": [
++        0.5,
++        0.9
++      ],
++      "z": 3
++    },
++    "arm_back": {
++      "src": "./arm_back.svg",
++      "position": [
++        74,
++        132
++      ],
++      "pivot": [
++        0.18,
++        0.12
++      ],
++      "z": 4
++    },
++    "arm_front": {
++      "src": "./arm_front.svg",
++      "position": [
++        126,
++        132
++      ],
++      "pivot": [
++        0.82,
++        0.12
++      ],
++      "z": 6
++    },
++    "weapon": {
++      "src": "./weapon.svg",
++      "position": [
++        140,
++        120
++      ],
++      "pivot": [
++        0.12,
++        0.18
++      ],
++      "z": 5,
++      "base": {
++        "rotation": -8
++      }
++    },
++    "head": {
++      "src": "./head.svg",
++      "position": [
++        100,
++        80
++      ],
++      "pivot": [
++        0.5,
++        0.65
++      ],
++      "z": 7
++    }
++  },
++  "clips": {
++    "idle": {
++      "loop": true,
++      "frames": [
++        {
++          "time": 0,
++          "pose": {
++            "head": {
++              "offset": [
++                0,
++                -4
++              ]
++            },
++            "torso": {
++              "offset": [
++                0,
++                0
++              ]
++            },
++            "arm_front": {
++              "rotation": 8,
++              "offset": [
++                6,
++                -2
++              ]
++            },
++            "arm_back": {
++              "rotation": -6,
++              "offset": [
++                -4,
++                -1
++              ]
++            },
++            "weapon": {
++              "rotation": -16,
++              "offset": [
++                12,
++                2
++              ]
++            }
++          }
++        },
++        {
++          "time": 600,
++          "pose": {
++            "head": {
++              "offset": [
++                0,
++                0
++              ]
++            },
++            "torso": {
++              "offset": [
++                0,
++                2
++              ]
++            },
++            "arm_front": {
++              "rotation": -4,
++              "offset": [
++                2,
++                0
++              ]
++            },
++            "arm_back": {
++              "rotation": 4,
++              "offset": [
++                -2,
++                0
++              ]
++            },
++            "weapon": {
++              "rotation": -4,
++              "offset": [
++                8,
++                -2
++              ]
++            }
++          }
++        }
++      ]
++    },
++    "attack": {
++      "loop": false,
++      "duration": 900,
++      "frames": [
++        {
++          "time": 0,
++          "pose": {
++            "torso": {
++              "offset": [
++                0,
++                0
++              ]
++            },
++            "arm_front": {
++              "rotation": -24,
++              "offset": [
++                10,
++                -6
++              ]
++            },
++            "arm_back": {
++              "rotation": -10,
++              "offset": [
++                -6,
++                -2
++              ]
++            },
++            "weapon": {
++              "rotation": -70,
++              "offset": [
++                36,
++                -20
++              ]
++            },
++            "head": {
++              "offset": [
++                0,
++                -6
++              ]
++            }
++          }
++        },
++        {
++          "time": 420,
++          "pose": {
++            "torso": {
++              "offset": [
++                16,
++                -10
++              ]
++            },
++            "arm_front": {
++              "rotation": 24,
++              "offset": [
++                -18,
++                10
++              ]
++            },
++            "arm_back": {
++              "rotation": 12,
++              "offset": [
++                2,
++                0
++              ]
++            },
++            "weapon": {
++              "rotation": 28,
++              "offset": [
++                -18,
++                14
++              ]
++            },
++            "head": {
++              "offset": [
++                -4,
++                -12
++              ]
++            }
++          }
++        },
++        {
++          "time": 900,
++          "pose": {
++            "torso": {
++              "offset": [
++                0,
++                0
++              ]
++            },
++            "arm_front": {
++              "rotation": 0,
++              "offset": [
++                0,
++                0
++              ]
++            },
++            "arm_back": {
++              "rotation": 0,
++              "offset": [
++                0,
++                0
++              ]
++            },
++            "weapon": {
++              "rotation": -16,
++              "offset": [
++                10,
++                -2
++              ]
++            },
++            "head": {
++              "offset": [
++                0,
++                -4
++              ]
++            }
++          }
++        }
++      ]
++    },
++    "skill": {
++      "loop": false,
++      "duration": 1200,
++      "frames": [
++        {
++          "time": 0,
++          "pose": {
++            "frame": {
++              "opacity": 0.2
++            },
++            "torso": {
++              "offset": [
++                0,
++                0
++              ],
++              "scale": [
++                1,
++                1
++              ]
++            },
++            "head": {
++              "offset": [
++                0,
++                -6
++              ]
++            },
++            "weapon": {
++              "rotation": -24,
++              "offset": [
++                12,
++                -6
++              ]
++            }
++          }
++        },
++        {
++          "time": 520,
++          "pose": {
++            "frame": {
++              "opacity": 0.85
++            },
++            "torso": {
++              "offset": [
++                0,
++                -18
++              ],
++              "scale": [
++                1.08,
++                1.08
++              ]
++            },
++            "head": {
++              "offset": [
++                0,
++                -24
++              ]
++            },
++            "weapon": {
++              "rotation": -110,
++              "offset": [
++                48,
++                -32
++              ]
++            }
++          }
++        },
++        {
++          "time": 1200,
++          "pose": {
++            "frame": {
++              "opacity": 0.3
++            },
++            "torso": {
++              "offset": [
++                0,
++                -6
++              ],
++              "scale": [
++                1.02,
++                1.02
++              ]
++            },
++            "head": {
++              "offset": [
++                0,
++                -18
++              ]
++            },
++            "weapon": {
++              "rotation": -32,
++              "offset": [
++                16,
++                -12
++              ]
++            }
++          }
++        }
++      ]
++    }
++  }
++}
+\ No newline at end of file
+  
