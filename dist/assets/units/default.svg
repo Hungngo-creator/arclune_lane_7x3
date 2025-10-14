@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 200">
+  <defs>
+    <linearGradient id="phe-rune" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#a884ff"/>
+      <stop offset="100%" stop-color="#2b1954"/>
+    </linearGradient>
+    <radialGradient id="phe-core" cx="50%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#f1ddff" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#a884ff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M80 16 L142 76 L80 184 L18 76 Z" fill="url(#phe-rune)" stroke="#23133f" stroke-width="6"/>
+    <path d="M80 40 L118 76 L80 148 L42 76 Z" fill="#f1ddff" fill-opacity="0.28"/>
+    <path d="M80 60 L96 76 L80 112 L64 76 Z" fill="#f1ddff" fill-opacity="0.58"/>
+    <circle cx="80" cy="70" r="18" fill="url(#phe-core)"/>
+  </g>
+</svg>
