@@ -1,0 +1,22 @@
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/dist/assets/units/default/frame.svg b/dist/assets/units/default/frame.svg
+new file mode 100644
+index 0000000000000000000000000000000000000000..0965ead1cff8d6adae9bd384ac87fb9f50727196
+--- /dev/null
++++ b/dist/assets/units/default/frame.svg
+@@ -0,0 +1,12 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240">
++      <defs>
++        <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
++          <stop offset="0%" stop-color="#d6f2ff" stop-opacity="0.15" />
++          <stop offset="100%" stop-color="#7fa6c0" stop-opacity="0.55" />
++        </linearGradient>
++      </defs>
++      <rect x="10" y="10" width="180" height="220" rx="26" ry="30" fill="url(#grad)" stroke="#223548" stroke-width="4" opacity="0.4" />
++      <rect x="22" y="28" width="156" height="192" rx="20" ry="24" fill="rgba(10,16,22,0.25)" stroke="#223548" stroke-width="3" opacity="0.55" />
++    
++</svg>
+ 
+EOF
+)
