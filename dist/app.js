@@ -490,7 +490,7 @@ __define('./art.js', (exports, module, __require) => {
     return Object.assign({}, target, source || {});
   }
 
-const UNIT_SKIN_SELECTION = new Map();
+  const UNIT_SKIN_SELECTION = new Map();
 
   function getBaseArt(id){
     if (!id) return UNIT_ART.default;
@@ -644,6 +644,7 @@ const UNIT_SKIN_SELECTION = new Map();
     }
 
     const preferredKey = normalizedSkins[defaultSkinKey] ? defaultSkinKey : Object.keys(normalizedSkins)[0] || defaultSkinKey;
+    
     return {
       sprite: normalizedSkins[preferredKey] || null,
       skins: normalizedSkins,
@@ -687,7 +688,7 @@ const UNIT_SKIN_SELECTION = new Map();
           shadow: { color: 'rgba(18,28,38,0.55)', blur: 22, offsetY: 10 }
         }
       }
-     }),
+  }),
     leaderA: makeArt('shield', basePalettes.leaderA, {
       layout: { labelOffset: 1.24, hpOffset: 1.52, hpWidth: 2.6, spriteAspect: 0.8 },
       label: { text: '#e5f6ff', bg: 'rgba(12,30,44,0.88)' },
@@ -1565,8 +1566,8 @@ __define('./config.js', (exports, module, __require) => {
         }
       }
     },
-    
- CURRENT_BACKGROUND: 'daylight',
+
+  CURRENT_BACKGROUND: 'daylight',
     BACKGROUNDS: {
       daylight: {
         props: [
@@ -1656,7 +1657,7 @@ __define('./engine.js', (exports, module, __require) => {
 
     const usableW = w - pad * 2;
     const usableH = h - pad * 2;
-    
+
     const tile = Math.floor(Math.min(usableW / cols, usableH / rows));
 
     const ox = Math.floor((w - tile*cols)/2);
@@ -1747,7 +1748,7 @@ __define('./engine.js', (exports, module, __require) => {
     const C = cam || { rowGapRatio:0.62, topScale:0.80, depthScale:0.94 };
     const colors = Object.assign({}, CFG.COLORS, opts.colors||{});
     const rowGap = (C.rowGapRatio ?? 0.62) * g.tile;
-    
+
     for (let cy=0; cy<g.rows; cy++){
       const yTop = g.oy + cy*rowGap;
       const yBot = g.oy + (cy+1)*rowGap;
@@ -1911,7 +1912,7 @@ __define('./engine.js', (exports, module, __require) => {
         entry.status = 'ready';
         if (typeof window !== 'undefined'){
           try {
-           window.dispatchEvent(new Event(ART_SPRITE_EVENT));
+            window.dispatchEvent(new Event(ART_SPRITE_EVENT));
           } catch(_){}
         }
       };
@@ -2079,7 +2080,7 @@ __define('./engine.js', (exports, module, __require) => {
       const spriteHeightMult = layout.spriteHeight || 2.4;
       const spriteScale = Number.isFinite(spriteCfg.scale) ? spriteCfg.scale : 1;
       const spriteHeight = r * spriteHeightMult * ((art?.size) ?? 1) * spriteScale;
-      const spriteAspect = (Number.isFinite(spriteCfg.aspect) ? spriteCfg.aspect : null) || layout.spriteAspect || 0.78; spriteHeightMult * ((art?.size) ?? 1);
+      const spriteAspect = (Number.isFinite(spriteCfg.aspect) ? spriteCfg.aspect : null) || layout.spriteAspect || 0.78;
       const spriteWidth = spriteHeight * spriteAspect;
       const anchor = Number.isFinite(spriteCfg.anchor) ? spriteCfg.anchor : (layout.anchor ?? 0.78);
       const hasRichArt = !!(art && ((spriteCfg && spriteCfg.src) || art.shape));
@@ -2113,7 +2114,7 @@ __define('./engine.js', (exports, module, __require) => {
         ctx.arc(p.x, p.y, r, 0, Math.PI*2);
         ctx.fill();
       }
-        
+
       if (art?.label !== false){
         const name = formatName(t.name || t.id);
         const offset = layout.labelOffset ?? 1.2;
@@ -2372,16 +2373,19 @@ __define('./events.js', (exports, module, __require) => {
 
   function makeEventTarget(){
     if (!HAS_EVENT_TARGET) return new SimpleEventTarget();
+    const probeType = '__probe__';
+    const probeEvent = createNativeEvent(probeType);
+    const hasEventConstructor = typeof Event === 'function';
+    const isRealEvent = !!probeEvent && (!hasEventConstructor || probeEvent instanceof Event);
+    if (!isRealEvent) return new SimpleEventTarget();
     try {
       const target = new EventTarget();
-      const probeType = '__probe__';
       let handled = false;
       const handler = () => { handled = true; };
       if (typeof target.addEventListener === 'function'){
         target.addEventListener(probeType, handler);
         try {
-          const probeEvent = createNativeEvent(probeType) || { type: probeType };
-          if (typeof target.dispatchEvent === 'function'){
+          if (typeof target.dispatchEvent === 'function' && isRealEvent){
             target.dispatchEvent(probeEvent);
           }
         } finally {
@@ -2509,11 +2513,15 @@ __define('./main.js', (exports, module, __require) => {
   const TURN_END = __dep16.TURN_END;
   const ACTION_START = __dep16.ACTION_START;
   const ACTION_END = __dep16.ACTION_END;
+  const __dep17 = __require('./utils/dummy.js');
+  const ensureNestedModuleSupport = __dep17.ensureNestedModuleSupport;
   /** @type {HTMLCanvasElement|null} */ let canvas = null;
   /** @type {CanvasRenderingContext2D|null} */ let ctx = null;
   /** @type {{update:(g:any)=>void}|null} */ let hud = null;   // ← THÊM
   const CAM_PRESET = CAM[CFG.CAMERA] || CAM.landscape_oblique;
   const HAND_SIZE  = CFG.HAND_SIZE ?? 4;
+  
+  ensureNestedModuleSupport();
 
   // --- Instance counters (để gắn id cho token/minion) ---
   let _IID = 1;
@@ -3096,7 +3104,7 @@ __define('./main.js', (exports, module, __require) => {
     hud.update(Game);
     if (!Game.selectedId) selectFirstAffordable();
     if (Game.ui?.bar) Game.ui.bar.render();
-    
+
     // Cho AI suy nghĩ ngay khi cost đổi
     aiMaybeAct(Game, 'cost');
   }
@@ -3336,16 +3344,37 @@ __define('./main.js', (exports, module, __require) => {
   }
   /* ---------- Chạy ---------- */
   let _booted = false;
-  function startGame(){
-    if (_booted) return;
-    _booted = true;
-    init();
-    document.addEventListener('visibilitychange', ()=>{
-      setDrawPaused(document.hidden);
-    });
+  let _booting = false;
+  let _visibilityListenerBound = false;
+  function handleVisibilityChange(){
+    if (typeof document === 'undefined') return;
     setDrawPaused(document.hidden);
   }
 
+function startGame(){
+    if (_booted || _booting) return;
+    _booting = true;
+    try {
+      init();
+      if (!Game._inited){
+        return;
+      }
+      _booted = true;
+      if (!_visibilityListenerBound && typeof document !== 'undefined' && typeof document.addEventListener === 'function'){
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        _visibilityListenerBound = true;
+      }
+      if (typeof document !== 'undefined'){
+        setDrawPaused(document.hidden);
+      }
+    } catch (err) {
+      _booted = false;
+      throw err;
+    } finally {
+      _booting = false;
+    }
+  }
+  
   const __reexport0 = __require('./events.js');
 
   exports.gameEvents = __reexport0.gameEvents;
@@ -4162,7 +4191,7 @@ __define('./summon.js', (exports, module, __require) => {
     if (!list.length) return baseSlot ?? null;
 
     list.sort((a,b)=> a.slot - b.slot);
-  
+
     let maxSlot = baseSlot ?? 0;
     for (const item of list){
       const { cx, cy } = slotToCell(side, item.slot);
@@ -4193,7 +4222,7 @@ __define('./summon.js', (exports, module, __require) => {
       // gọi lại doActionOrSkip để dùng chung status/ult-guard (creep thường không có ult)
       const creep = Game.tokens.find(t => t.alive && t.side===side && t.cx===cx && t.cy===cy);
       if (creep) hooks.doActionOrSkip?.(Game, creep, hooks);
-  
+
       if (item.slot > maxSlot) maxSlot = item.slot;
     }
 
@@ -4257,7 +4286,7 @@ __define('./turns.js', (exports, module, __require) => {
     if (p.spawnCycle > Game.turn.cycle) return false;
 
     m.delete(slot);
-  
+
     const meta = Game.meta && typeof Game.meta.get === 'function' ? Game.meta.get(p.unitId) : null;
     const kit = meta?.kit;
     const obj = {
@@ -4455,8 +4484,8 @@ __define('./ui.js', (exports, module, __require) => {
     const costChip = doc.getElementById('costChip');  // chip bao ngoài
     function update(Game){
       if (!Game) return;
-    
-     const capRaw = Game.costCap ?? CFG.COST_CAP ?? 30;
+
+      const capRaw = Game.costCap ?? CFG.COST_CAP ?? 30;
       const cap = Number.isFinite(capRaw) && capRaw > 0 ? capRaw : 1;
       const now = Math.max(0, Math.floor(Game.cost ?? 0));
       const ratio = Math.max(0, Math.min(1, now / cap));
@@ -4470,7 +4499,7 @@ __define('./ui.js', (exports, module, __require) => {
       // Khi max cap, làm chip sáng hơn
       if (costChip){
         costChip.classList.toggle('full', now >= cap);
-     }
+      }
    }
     const handleGameEvent = (ev)=>{
       const state = ev?.detail?.game;
@@ -4549,7 +4578,7 @@ __define('./ui.js', (exports, module, __require) => {
     const syncCardSize = debounce(()=>{
       if (!boardEl) return;
       const w = boardEl.clientWidth || boardEl.getBoundingClientRect().width || 0;
-    
+
       // 7 cột -> 6 khoảng cách
       const cell = Math.max(_MIN, Math.floor((w - _GAP * 6) / 7));
       if (host){
@@ -4574,7 +4603,7 @@ __define('./ui.js', (exports, module, __require) => {
         syncCardSize.cancel();
       };
     }
-    
+
   let removalObserver = null;
     if (host && typeof MutationObserver === 'function'){
       const target = doc.body || doc.documentElement;
@@ -4614,7 +4643,7 @@ __define('./ui.js', (exports, module, __require) => {
         host.appendChild(btn);
         btns.push(btn);
       }
-       // cập nhật trạng thái từng nút theo deck hiện tại
+      // cập nhật trạng thái từng nút theo deck hiện tại
       for (let i = 0; i < btns.length; i++){
         const b = btns[i];
         const c = deck[i];
@@ -4625,7 +4654,7 @@ __define('./ui.js', (exports, module, __require) => {
         b.hidden = false;
         b.dataset.id = c.id;
 
-      // cập nhật cost (giữ UI “chỉ cost”)
+        // cập nhật cost (giữ UI “chỉ cost”)
         const span = b.querySelector('.cost');
         if (span) span.textContent = c.cost;
 
@@ -4665,6 +4694,13 @@ __define('./units.js', (exports, module, __require) => {
   ];
 
   exports.UNITS = UNITS;
+});
+__define('./utils/dummy.js', (exports, module, __require) => {
+  function ensureNestedModuleSupport(){
+    return true;
+  }
+
+  exports.ensureNestedModuleSupport = ensureNestedModuleSupport;
 });
 __define('./vfx.js', (exports, module, __require) => {
   // 0.6 vfx.js
