@@ -110,8 +110,8 @@ N = 0.50        # WIL 50%
 X = 0.50        # ATK 50%
 powMul = k      # hệ số skill/ult (basic thường = 1.0)
 
-base_phys = X * ATK * powMul
-base_mag  = N * WIL * powMul
+base_phys = X * ATK_eff * powMul
+base_mag  = N * WIL_eff * powMul
 
 # Pipeline pseudocode (trước khi bước 2 tính giáp/kháng)
 | Step | Input                              | Output/ghi chú |
@@ -120,7 +120,7 @@ base_mag  = N * WIL * powMul
 | B    | WIL_base, Σflat_WIL, Σ%_WIL        | WIL_eff (stat_eff) |
 | C    | ARM_base, Σflat_ARM, Σ%_ARM        | ARM_eff_prePen (stat_eff) |
 | D    | RES_base, Σflat_RES, Σ%_RES        | RES_eff_prePen (stat_eff) |
-| E    | powMul, ATK_eff, WIL_eff           | base_phys/base_mag |
+| E    | powMul, ATK_eff, WIL_eff           | base_phys/base_mag (dùng ATK_eff/WIL_eff đã cộng buff) |
 | F    | defPen_ARM/RES, ignore%            | ARM_eff/RES_eff sau xuyên |
 
 # 2) Giáp/kháng + xuyên (áp RIÊNG từng nửa)
