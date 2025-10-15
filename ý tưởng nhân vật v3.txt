@@ -29,22 +29,25 @@ AEregen_turn = AEregen_base + WIL_final * regen_wil_coef[class]
 | Mage            | 0.55           | Hồi AE mạnh nhất vì đòn phép dùng AE liên tục. |
 
 # Cập nhật AE mỗi lượt
-AE_{t+1} = clamp( (AE_t - cost_skill + AEregen_turn + Σflat) * (1 + Σ%) )
+AE_{t+1} = clamp( AE_t - cost_skill + (AEregen_turn + Σflat) * (1 + Σ%) )
 Thứ tự áp dụng:
 1. Trừ cost_skill.
-2. Cộng hiệu ứng hồi phục cố định (AEregen_turn + Σflat).
-3. Nhân toàn bộ với hệ số phần trăm (1 + Σ%).
-4. Sau cùng mới clamp theo 0 ≤ AE ≤ AEmax_final.
+2. Gom phần hồi cố định (AEregen_turn + Σflat).
+3. Nhân riêng phần hồi phục này với hệ số phần trăm: (AEregen_turn + Σflat) * (1 + Σ%).
+4. Cộng phần hồi đã nhân vào AE_t - cost_skill.
+5. Sau cùng mới clamp theo 0 ≤ AE ≤ AEmax_final.
 
 # AE buff quick-reference
 | Loại hiệu ứng                | Mô tả                               | Biến cần điền |
 |-----------------------------|--------------------------------------|---------------|
 | +20 AE ngay                 | Thêm 20 AE tức thời                 | Σflat += 20   |
 | +40 AE cuối turn            | Hồi 40 AE ở bước Σflat cuối lượt    | Σflat += 40   |
-| +15% AE regen 2 turn        | Nhân +15% trên tổng hồi 2 lượt      | Σ% += 0.15    |
+| +15% AE regen 2 turn        | Buff +15% lên tổng phần hồi (AEregen_turn + Σflat) trong 2 lượt | Σ% += 0.15    |
 | +30% AEmax 1 turn           | Tăng trần AE tạm thời               | AEmax_final *= 1.30 (tạm) |
 | -10 AE khi bị đánh          | Trừ AE tức thời từ debuff kẻ địch   | Σflat -= 10   |
-| -20% AE regen 1 turn        | Giảm phần trăm hồi AE lượt kế tiếp  | Σ% -= 0.20    |
+| -20% AE regen 1 turn        | Debuff -20% chỉ tác động lên phần hồi (AEregen_turn + Σflat) ở lượt kế | Σ% -= 0.20    |
+
+Ví dụ: Nếu AE_t = 60, cost_skill = 25, AEregen_turn = 12, buff +5 AE cố định (Σflat = +5) và +20% regen (Σ% = +0.20) thì phần hồi = (12 + 5) * 1.20 = 20.4. AE_{t+1} = clamp(60 - 25 + 20.4) = clamp(55.4), sau đó làm tròn theo quy tắc engine nếu cần.
 
 # HP Regeneration & Healing
 HPregen_base = ( CLASS_BASE[class].HPregen + TP[HPregen] * Δ_HPregen ) * RANK_MULT[rank]
