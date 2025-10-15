@@ -2327,6 +2327,8 @@ __define('./engine.js', (exports, module, __require) => {
 __define('./entry.js', (exports, module, __require) => {
   const __dep0 = __require('./app/shell.js');
   const createAppShell = __dep0.createAppShell;
+  const __dep1 = __require('./screens/main-menu/view.js');
+  const renderMainMenuView = __dep1.renderMainMenuView;
 
   const SUCCESS_EVENT = 'arclune:loaded';
   const SCREEN_MAIN_MENU = 'main-menu';
@@ -2339,44 +2341,91 @@ __define('./entry.js', (exports, module, __require) => {
     return import(id);
   }
 
-  const MODE_DEFINITIONS = {
-    campaign: {
+  const RAW_MODE_CONFIG = [
+    {
       key: 'campaign',
-      label: 'Chiến Dịch',
-      type: 'pve',
-      description: 'Trải nghiệm tuyến cốt truyện PvE cổ điển.',
-      loader: () => loadBundledModule('./modes/pve/session.js')
+            screenId: SCREEN_PVE,
+      title: 'Chiến Dịch',
+      description: 'Cốt Truyện .',
+          type: 'pve',
+      icon: '🛡️',
+      tags: ['PvE'],
+      loader: () => loadBundledModule('./modes/pve/session.js'),
+      params: { modeKey: 'campaign' }
     },
-    challenge: {
+   {
       key: 'challenge',
-      label: 'Thử Thách',
-      type: 'pve',
+      screenId: SCREEN_PVE,
+      title: 'Thử Thách',
       description: 'Các kịch bản đặc biệt để thử nghiệm đội hình.',
-      loader: () => loadBundledModule('./modes/pve/session.js')
-    },
-    arena: {
-      key: 'arena',
-      label: 'Đấu Trường',
       type: 'pve',
+      icon: '⚙️',
+      tags: ['PvE'],
+      loader: () => loadBundledModule('./modes/pve/session.js'),
+      params: { modeKey: 'challenge' }
+    },
+   {
+      key: 'arena',
+      screenId: SCREEN_PVE,
+      title: 'Đấu Trường',
       description: 'PvE nhịp độ cao với quân đoàn bất tận.',
-      loader: () => loadBundledModule('./modes/pve/session.js')
+      type: 'pve',
+      icon: '🏟️',
+      tags: ['PvE'],
+      loader: () => loadBundledModule('./modes/pve/session.js'),
+      params: { modeKey: 'arena' }
     },
-    ares: {
+   {
       key: 'ares',
-      label: 'Ares',
-      type: 'coming-soon',
+      screenId: SCREEN_MAIN_MENU,
+      title: 'Ares',
       description: 'PvP theo thời gian thực – đang phát triển.',
-      loader: () => loadBundledModule('./modes/coming-soon.stub.js')
-    },
-    tongmon: {
-      key: 'tongmon',
-      label: 'Tông Môn',
       type: 'coming-soon',
+      icon: '⚔️',
+      tags: ['PvP', 'Coming soon'],
+      loader: () => loadBundledModule('./modes/coming-soon.stub.js'),
+      params: null
+    },
+  {
+      key: 'tongmon',
+      screenId: SCREEN_MAIN_MENU,
+      title: 'Tông Môn',
       description: 'Xây dựng môn phái & quản lý tài nguyên – sắp ra mắt.',
-      loader: () => loadBundledModule('./modes/coming-soon.stub.js')
+      type: 'coming-soon',
+      icon: '🏯',
+      tags: ['Kinh tế nguyên tinh', 'Coming soon'],
+      loader: () => loadBundledModule('./modes/coming-soon.stub.js'),
+      params: null
     }
-  };
 
+  ];
+
+  const MODE_DEFINITIONS = RAW_MODE_CONFIG.reduce((acc, mode) => {
+    acc[mode.key] = {
+      key: mode.key,
+      label: mode.title,
+      type: mode.type,
+      description: mode.description,
+      loader: mode.loader,
+      screenId: mode.screenId,
+      icon: mode.icon,
+      tags: Array.isArray(mode.tags) ? [...mode.tags] : [],
+      status: mode.type === 'coming-soon' ? 'coming-soon' : 'available'
+    };
+    return acc;
+  }, {});
+
+  const MODE_METADATA = RAW_MODE_CONFIG.map(mode => ({
+    key: mode.key,
+    id: mode.screenId,
+    title: mode.title,
+    description: mode.description,
+    icon: mode.icon,
+    tags: Array.isArray(mode.tags) ? [...mode.tags] : [],
+    status: mode.type === 'coming-soon' ? 'coming-soon' : 'available',
+    params: mode.params ? { ...mode.params } : (mode.type === 'pve' ? { modeKey: mode.key } : null)
+  }));
+  
   const MENU_SECTIONS = [
     { title: 'PvE', modeKeys: ['campaign', 'challenge', 'arena'] },
     { title: 'Khám phá', modeKeys: ['ares', 'tongmon'] }
@@ -2388,6 +2437,7 @@ __define('./entry.js', (exports, module, __require) => {
   let pveRenderToken = 0;
   const bootstrapOptions = { isFileProtocol: false };
   let renderMessageRef = null;
+  let mainMenuView = null;
 
   function dispatchLoaded(){
     try {
@@ -2486,56 +2536,37 @@ __define('./entry.js', (exports, module, __require) => {
     activeModal = modal;
   }
 
-  function renderMainMenu(onSelectMode){
-    if (!rootElement) return;
+  function renderMainMenuScreen(){
+    if (!rootElement || !shellInstance) return;
     dismissModal();
     rootElement.classList.remove('app--pve');
-    const sections = MENU_SECTIONS.map(section => {
-      const buttons = section.modeKeys
-        .map(modeKey => MODE_DEFINITIONS[modeKey])
-        .filter(Boolean)
-        .map(def => {
-          const comingSoon = def.type !== 'pve';
-          const hint = def.description ? `<small>${def.description}</small>` : '';
-          return `
-            <button class="main-menu__button" data-mode="${def.key}"${comingSoon ? ' data-coming-soon="true"' : ''}>
-              ${def.label}
-              ${hint}
-            </button>
-          `;
-        })
-        .join('');
-      return `
-        <section>
-          <h4 class="main-menu__section-title">${section.title}</h4>
-          <div class="main-menu__grid">${buttons}</div>
-        </section>
-      `;
-    }).join('');
 
-    rootElement.innerHTML = `
-      <div class="main-menu">
-        <h1 class="main-menu__title">Arclune</h1>
-        <p class="main-menu__subtitle">Chọn chế độ để bắt đầu.</p>
-        <div class="main-menu__sections">${sections}</div>
-      </div>
-    `;
-
-    const buttons = rootElement.querySelectorAll('[data-mode]');
-    buttons.forEach(btn => {
-      btn.addEventListener('click', event => {
-        event.preventDefault();
-        const modeKey = btn.getAttribute('data-mode');
-        if (typeof onSelectMode === 'function'){
-          onSelectMode(modeKey);
-        }
-      });
+if (mainMenuView && typeof mainMenuView.destroy === 'function'){
+      mainMenuView.destroy();
+      mainMenuView = null;
+    }
+    const sections = MENU_SECTIONS.map(section => ({
+      title: section.title,
+      modeKeys: Array.isArray(section.modeKeys) ? [...section.modeKeys] : []
+    }));
+    mainMenuView = renderMainMenuView({
+      root: rootElement,
+      shell: shellInstance,
+      sections,
+      metadata: MODE_METADATA,
+      playerGender: bootstrapOptions.playerGender || 'neutral',
+      onShowComingSoon: mode => {
+        const def = mode?.key ? MODE_DEFINITIONS[mode.key] : null;
+        const label = def?.label || mode?.title || mode?.label || '';
+        showComingSoonModal(label);
+      }
     });
   }
 
   function renderPveLayout(options){
     if (!rootElement) return null;
     dismissModal();
+    rootElement.classList.remove('app--main-menu');
     rootElement.classList.add('app--pve');
     rootElement.innerHTML = '';
     const container = document.createElement('div');
@@ -2583,36 +2614,6 @@ __define('./entry.js', (exports, module, __require) => {
       }
     }
     shellInstance.setActiveSession(null);
-  }
-
-  function handleModeSelect(modeKey){
-    const definition = getModeDefinition(modeKey);
-    if (!definition){
-      showComingSoonModal('Tính năng đang phát triển');
-      return;
-    }
-    if (definition.type === 'pve'){
-      shellInstance.enterScreen(SCREEN_PVE, { modeKey: definition.key });
-      return;
-    }
-    definition.loader().then(module => {
-      if (isComingSoonModule(module)){
-        showComingSoonModal(definition.label);
-        return;
-      }
-      showComingSoonModal(definition.label);
-    }).catch(error => {
-      if (isMissingModuleError(error)){
-        showComingSoonModal(definition.label);
-        return;
-      }
-      console.error('Failed to load mode', error);
-      if (renderMessageRef){
-        showFatalError(error, renderMessageRef, bootstrapOptions);
-      } else if (typeof window.arcluneShowFatal === 'function'){
-        window.arcluneShowFatal(error);
-      }
-    });
   }
 
   async function mountPveScreen(params){
@@ -2701,14 +2702,18 @@ __define('./entry.js', (exports, module, __require) => {
       let lastParams = null;
 
       shellInstance.onChange(state => {
-        if (state.screen === SCREEN_MAIN_MENU){
+        if (lastScreen !== SCREEN_MAIN_MENU || state.screenParams !== lastParams){
           if (lastScreen !== SCREEN_MAIN_MENU){
             lastScreen = SCREEN_MAIN_MENU;
-            lastParams = null;
+            lastParams = state.screenParams;
             pveRenderToken += 1;
-            renderMainMenu(handleModeSelect);
+            renderMainMenuScreen();
           }
         } else if (state.screen === SCREEN_PVE){
+          if (mainMenuView && typeof mainMenuView.destroy === 'function'){
+            mainMenuView.destroy();
+            mainMenuView = null;
+          }
           if (lastScreen !== SCREEN_PVE || state.screenParams !== lastParams){
             lastScreen = SCREEN_PVE;
             lastParams = state.screenParams;
@@ -2719,6 +2724,9 @@ __define('./entry.js', (exports, module, __require) => {
               }
             });
           }
+        } else if (mainMenuView && typeof mainMenuView.destroy === 'function'){
+          mainMenuView.destroy();
+          mainMenuView = null;
         }
       });
       
@@ -3006,6 +3014,7 @@ __define('./modes/coming-soon.stub.js', (exports, module, __require) => {
   const __defaultExport = {
     comingSoon
   };
+  
   exports.comingSoon = comingSoon;
   exports.describe = describe;
   exports.default = __defaultExport;
@@ -3851,7 +3860,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     const deck = Array.isArray(Game.deck3) ? Game.deck3 : [];
     if (!deck.length){
       Game.selectedId = null;
-       return;
+     return;
     }
 
     const affordable = deck.find(card => {
@@ -3860,9 +3869,9 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
       return card.cost <= Game.cost;
     });
 
-     const chosen = affordable || deck[0] || null;
+   const chosen = affordable || deck[0] || null;
     Game.selectedId = chosen ? chosen.id : null;
-   }
+  }
 
   /* ---------- Deck logic ---------- */
   function refillDeck(){
@@ -4654,6 +4663,810 @@ __define('./scene.js', (exports, module, __require) => {
   }
   exports.drawBattlefieldScene = drawBattlefieldScene;
 });
+__define('./screens/main-menu/dialogues.js', (exports, module, __require) => {
+  const __dep0 = __require('./art.js');
+  const getUnitArt = __dep0.getUnitArt;
+
+  const HERO_DEFAULT_ID = 'leaderA';
+
+  const HERO_LIBRARY = {
+    leaderA: {
+      id: 'leaderA',
+      name: 'Uyên',
+      title: 'Hộ Độn Tuyến Đầu',
+      faction: 'Đoàn Thủ Hộ Lam Quang',
+      role: 'Kỵ sĩ phòng tuyến',
+      portrait: 'leaderA',
+      motto: 'Giữ vững ánh lam, bảo hộ tuyến đầu.',
+      hotspots: [
+        {
+          key: 'sigil',
+          label: 'Ấn Tịnh Quang',
+          description: 'Điều chỉnh giáp hộ thân – cực kỳ nhạy cảm.',
+          cue: 'sensitive',
+          type: 'sensitive'
+        }
+      ],
+      dialogues: {
+        intro: {
+          male: [
+            { text: 'Huynh đến đúng lúc, đội trinh sát đang chờ hiệu lệnh.', tone: 'greeting' },
+            { text: 'Sương sớm thuận lợi cho một trận phản công, huynh thấy sao?', tone: 'greeting' }
+          ],
+          female: [
+            { text: 'Tỷ về rồi à? Học viện chắc nhớ tỷ lắm.', tone: 'greeting' },
+            { text: 'Đại tỷ đến rồi, đội hình lập tức trật tự hơn hẳn.', tone: 'greeting' }
+          ],
+          neutral: [
+            { text: 'Ngày mới, chiến tuyến mới. Ta luôn sẵn sàng.', tone: 'greeting' },
+            { text: 'Chúng ta hành quân khi ánh lam còn phủ cả mặt đất.', tone: 'greeting' }
+          ]
+        },
+        hover: {
+          male: [
+            { text: 'Yên tâm, áo giáp đã được gia cố. Chỉ cần huynh ra hiệu.', tone: 'focus' },
+            { text: 'Huynh cứ nói, Uyên sẽ nghe.', tone: 'focus' }
+          ],
+          female: [
+            { text: 'Tỷ định thay đổi đội hình à? Uyên sẽ thích ứng ngay.', tone: 'focus' },
+            { text: 'Đừng quên khởi động, tỷ nhé. Giáp lam khá nặng đó.', tone: 'gentle' }
+          ],
+          neutral: [
+            { text: 'Tôi đang nghe chỉ huy. Có nhiệm vụ mới không?', tone: 'focus' }
+          ]
+        },
+        tap: {
+          male: [
+            { text: 'Cho Uyên tọa độ, huynh sẽ thấy tuyến đầu mở ra.', tone: 'motivate' },
+            { text: 'Một mệnh lệnh thôi, huynh.', tone: 'motivate' }
+          ],
+          female: [
+            { text: 'Uyên ổn cả, tỷ cứ tập trung chỉ huy.', tone: 'motivate' },
+            { text: 'Chúng ta sẽ thắng gọn, tỷ tin chứ?', tone: 'motivate' }
+          ],
+          neutral: [
+            { text: 'Chỉ cần hiệu lệnh, tôi sẽ dẫn đầu ngay.', tone: 'motivate' },
+            { text: 'Cả đội đang nhìn vào chỉ huy đấy.', tone: 'motivate' }
+          ]
+        },
+        sensitive: {
+          male: [
+            { text: 'Ấy! Đừng chạm vào ấn Tịnh Quang, dễ kích hoạt giáp hộ thân đó!', tone: 'warning' },
+            { text: 'Huynh nghịch thế là bộ giáp khóa cứng mất!', tone: 'warning' }
+          ],
+          female: [
+            { text: 'Khoan! Tỷ mà chạm nữa là cơ chế an toàn tự đóng lại đấy!', tone: 'warning' },
+            { text: 'Ấn ấy nối trực tiếp với mạch nguyên tinh, nhạy lắm!', tone: 'warning' }
+          ],
+          neutral: [
+            { text: 'Phần ấn điều khiển cực nhạy, xin đừng động vào.', tone: 'warning' },
+            { text: 'Chạm mạnh là hệ thống phòng ngự lập tức kích hoạt đấy!', tone: 'warning' }
+          ]
+        },
+        idle: {
+          male: [
+            { text: 'Bầu trời trong như vậy, chắc chắn là điềm tốt.', tone: 'calm' }
+          ],
+          female: [
+            { text: 'Uyên sẽ kiểm tra lại dây khóa. Tỷ cứ yên tâm.', tone: 'calm' }
+          ],
+          neutral: [
+            { text: 'Một hơi thở sâu trước trận chiến luôn giúp tinh thần vững hơn.', tone: 'calm' }
+          ]
+        }
+      }
+    },
+    default: {
+      id: HERO_DEFAULT_ID,
+      name: 'Chiến binh Arclune',
+      title: 'Hộ vệ tiền tuyến',
+      faction: 'Arclune',
+      role: 'Đa năng',
+      portrait: HERO_DEFAULT_ID,
+      motto: 'Vì ánh sáng Arclune.',
+      hotspots: [
+        {
+          key: 'sigil',
+          label: 'Phù hiệu chiến',
+          description: 'Điểm neo năng lượng cần tránh va chạm.',
+          cue: 'sensitive',
+          type: 'sensitive'
+        }
+      ],
+      dialogues: {
+        intro: {
+          neutral: [
+            { text: 'Sẵn sàng cho mọi nhiệm vụ.', tone: 'greeting' }
+          ]
+        },
+        hover: {
+          neutral: [
+            { text: 'Đợi lệnh từ chỉ huy.', tone: 'focus' }
+          ]
+        },
+        tap: {
+          neutral: [
+            { text: 'Tiến lên vì Arclune!', tone: 'motivate' }
+          ]
+        },
+        sensitive: {
+          neutral: [
+            { text: 'Điểm đó nhạy cảm đấy, xin nhẹ tay.', tone: 'warning' }
+          ]
+        },
+        idle: {
+          neutral: [
+            { text: 'Luôn giữ trạng thái chiến đấu.', tone: 'calm' }
+          ]
+        }
+      }
+    }
+  };
+
+  const GENDER_MAP = {
+    male: 'male',
+    m: 'male',
+    nam: 'male',
+    anh: 'male',
+    huynh: 'male',
+    female: 'female',
+    f: 'female',
+    nu: 'female',
+    chi: 'female',
+    ty: 'female',
+    undefined: 'neutral',
+    null: 'neutral'
+  };
+
+  const CUE_LABELS = {
+    intro: 'Chào hỏi',
+    hover: 'Phản hồi',
+    tap: 'Hiệu lệnh',
+    sensitive: 'Cảnh báo',
+    idle: 'Độc thoại'
+  };
+
+  const CUE_TONES = {
+    greeting: 'greeting',
+    focus: 'focus',
+    gentle: 'gentle',
+    motivate: 'motivate',
+    warning: 'warning',
+    calm: 'calm'
+  };
+
+  const TONE_TO_CUE = {
+    intro: 'greeting',
+    hover: 'focus',
+    tap: 'motivate',
+    sensitive: 'warning',
+    idle: 'calm'
+  };
+
+  function normalizeGender(value){
+    if (typeof value === 'string'){
+      const key = value.trim().toLowerCase();
+      if (key in GENDER_MAP) return GENDER_MAP[key];
+    }
+    return 'neutral';
+  }
+
+  function ensureArray(value){
+    if (!value) return [];
+    return Array.isArray(value) ? value : [value];
+  }
+
+  function pickLine(pool){
+    const list = ensureArray(pool).filter(Boolean);
+    if (!list.length) return null;
+    const index = Math.floor(Math.random() * list.length);
+    const item = list[index];
+    if (item && typeof item === 'object'){ return { text: item.text || '', tone: item.tone || null, label: item.label || null }; }
+    return { text: String(item || ''), tone: null, label: null };
+  }
+
+  function inferTone(cue){
+    return CUE_TONES[cue] || TONE_TO_CUE[cue] || 'calm';
+  }
+
+  function inferLabel(cue){
+    return CUE_LABELS[cue] || 'Tương tác';
+  }
+
+  function getHeroProfile(heroId = HERO_DEFAULT_ID){
+    const profile = HERO_LIBRARY[heroId] || HERO_LIBRARY.default;
+    const art = getUnitArt(profile.portrait || heroId || HERO_DEFAULT_ID) || null;
+    return {
+      id: profile.id,
+      name: profile.name,
+      title: profile.title,
+      faction: profile.faction,
+      role: profile.role,
+      motto: profile.motto,
+      portrait: profile.portrait || heroId || HERO_DEFAULT_ID,
+      hotspots: (profile.hotspots || []).map(item => ({ ...item })),
+      art
+    };
+  }
+
+  function getHeroHotspots(heroId = HERO_DEFAULT_ID){
+    const profile = HERO_LIBRARY[heroId] || HERO_LIBRARY.default;
+    return (profile.hotspots || []).map(item => ({ ...item }));
+  }
+
+  function getHeroDialogue(heroId, cue, options = {}){
+    const targetCue = cue || 'intro';
+    const gender = normalizeGender(options.gender);
+    const zone = options.zone || null;
+    const profile = HERO_LIBRARY[heroId] || HERO_LIBRARY.default;
+    const fallback = HERO_LIBRARY.default;
+    const table = profile.dialogues?.[targetCue] || fallback.dialogues?.[targetCue] || null;
+    const pool = table ? (table[gender] || table.neutral || table.default || null) : null;
+    const picked = pickLine(pool);
+    const text = picked?.text?.trim() ? picked.text.trim() : '...';
+    const tone = picked?.tone || inferTone(targetCue);
+    const label = picked?.label || inferLabel(targetCue);
+    return {
+      heroId: profile.id,
+      cue: targetCue,
+      zone,
+      text,
+      tone,
+      label
+    };
+  }
+
+  function listAvailableHeroes(){
+    return Object.keys(HERO_LIBRARY).filter(key => key !== 'default');
+  }
+
+  exports.HERO_DEFAULT_ID = HERO_DEFAULT_ID;
+  exports.getHeroProfile = getHeroProfile;
+  exports.getHeroHotspots = getHeroHotspots;
+  exports.getHeroDialogue = getHeroDialogue;
+  exports.listAvailableHeroes = listAvailableHeroes;
+});
+__define('./screens/main-menu/view.js', (exports, module, __require) => {
+  const __dep0 = __require('./screens/main-menu/dialogues.js');
+  const getHeroDialogue = __dep0.getHeroDialogue;
+  const getHeroHotspots = __dep0.getHeroHotspots;
+  const getHeroProfile = __dep0.getHeroProfile;
+  const HERO_DEFAULT_ID = __dep0.HERO_DEFAULT_ID;
+
+  const STYLE_ID = 'main-menu-view-style';
+
+  const TONE_ICONS = {
+    greeting: '✨',
+    focus: '🎯',
+    gentle: '🌬️',
+    motivate: '🔥',
+    warning: '⚠️',
+    calm: '🌙'
+  };
+
+  const TAG_CLASS_MAP = new Map([
+    ['PvE', 'mode-tag--pve'],
+    ['PvP', 'mode-tag--pvp'],
+    ['Coming soon', 'mode-tag--coming'],
+    ['Kinh tế nguyên tinh', 'mode-tag--economy']
+  ]);
+
+  const SIDE_SLOTS = [
+    {
+      key: 'event',
+      label: 'Sự kiện',
+      title: 'Thông báo chiến dịch',
+      description: 'Kênh sự kiện sẽ cập nhật tại đây. Tham gia để nhận nguyên tinh và danh vọng.'
+    },
+    {
+      key: 'lottery',
+      label: 'Vé số',
+      title: 'Vé số Nguyên Tinh',
+      description: 'Vé số tuần vẫn đang hoàn thiện. Giữ nguyên tinh để tham gia khi mở bán.'
+    },
+    {
+      key: 'gacha',
+      label: 'Gacha',
+      title: 'Banner trạm tiếp tế',
+      description: 'Quầy triệu hồi tướng chủ lực sẽ hiển thị banner ở vị trí này.'
+    },
+    {
+      key: 'chat',
+      label: 'Chat',
+      title: 'Kênh quân đoàn',
+      description: 'Xem nhanh tin nhắn gần nhất từ đội. Chức năng chat đang được kết nối.'
+    }
+  ];
+
+  function ensureStyles(){
+    if (document.getElementById(STYLE_ID)) return;
+    const style = document.createElement('style');
+    style.id = STYLE_ID;
+    style.textContent = `
+      .app--main-menu{padding:32px 16px 64px;}
+      .main-menu-v2{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:32px;color:inherit;}
+      .main-menu-v2__header{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-end;justify-content:space-between;}
+      .main-menu-v2__brand{display:flex;flex-direction:column;gap:10px;max-width:520px;}
+      .main-menu-v2__title{margin:0;font-size:44px;letter-spacing:.08em;text-transform:uppercase;}
+      .main-menu-v2__subtitle{margin:0;color:#9cbcd9;line-height:1.6;font-size:17px;}
+      .main-menu-v2__meta{display:flex;gap:12px;flex-wrap:wrap;}
+      .main-menu-v2__meta-chip{padding:8px 16px;border-radius:999px;border:1px solid rgba(125,211,252,.32);background:rgba(18,28,38,.68);letter-spacing:.12em;font-size:12px;text-transform:uppercase;color:#aee4ff;}
+      .main-menu-v2__layout{display:grid;grid-template-columns:minmax(0,3fr) minmax(240px,1fr);gap:32px;align-items:start;}
+      .main-menu-v2__primary{display:flex;flex-direction:column;gap:32px;}
+      .hero-section{display:flex;flex-direction:column;gap:16px;}
+      .hero-panel{position:relative;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);border-radius:26px;overflow:hidden;border:1px solid rgba(125,211,252,.32);background:linear-gradient(135deg,var(--hero-secondary,rgba(20,32,44,.92)),rgba(12,20,28,.75));box-shadow:0 32px 68px rgba(3,8,16,.55);min-height:340px;transition:box-shadow .3s ease,border-color .3s ease;}
+      .hero-panel::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 18% 24%,rgba(255,255,255,.18),transparent 58%);opacity:.6;pointer-events:none;}
+            .hero-panel__info{position:relative;z-index:2;padding:32px;display:flex;flex-direction:column;gap:18px;background:linear-gradient(180deg,rgba(12,18,24,.85),rgba(12,18,24,.35));}
+      .hero-panel__identity{display:flex;flex-direction:column;gap:6px;}
+      .hero-panel__role{margin:0;font-size:13px;text-transform:uppercase;letter-spacing:.16em;color:rgba(174,228,255,.68);}
+      .hero-panel__name{margin:0;font-size:26px;letter-spacing:.06em;}
+      .hero-panel__motto{margin:0;font-size:14px;color:#9cbcd9;line-height:1.6;}
+      .hero-dialogue{position:relative;background:rgba(12,24,34,.88);border:1px solid rgba(125,211,252,.28);border-radius:18px;padding:18px 22px;box-shadow:0 18px 42px rgba(6,10,16,.55);display:flex;flex-direction:column;gap:10px;min-height:96px;}
+      .hero-dialogue__tone{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;display:flex;align-items:center;gap:6px;}
+      .hero-dialogue__tone[data-tone="warning"]{color:#ffe066;}
+      .hero-dialogue__tone[data-tone="motivate"]{color:#9fffe0;}
+      .hero-dialogue__tone[data-tone="greeting"]{color:#aee4ff;}
+      .hero-dialogue__tone[data-tone="gentle"]{color:#ffc9ec;}
+      .hero-dialogue__tone[data-tone="focus"]{color:#7dd3fc;}
+      .hero-dialogue__tone[data-tone="calm"]{color:#9cbcd9;}
+      .hero-dialogue__text{margin:0;font-size:16px;line-height:1.6;color:#e6f2ff;}
+      .hero-panel__canvas{position:relative;z-index:1;border:none;outline:none;background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(9,15,21,.72));display:flex;align-items:flex-end;justify-content:center;cursor:pointer;overflow:hidden;padding:24px;min-height:340px;}
+      .hero-panel__canvas img{width:92%;max-width:420px;height:auto;filter:drop-shadow(0 24px 48px rgba(0,0,0,.6));transition:transform .3s ease,filter .3s ease;}
+      .hero-panel__glow{position:absolute;bottom:-38%;left:50%;transform:translateX(-50%);width:160%;height:160%;background:radial-gradient(circle,var(--hero-accent,rgba(125,211,252,.65)) 0%,transparent 65%);opacity:.45;transition:opacity .3s ease,transform .3s ease;pointer-events:none;}
+      .hero-panel.is-hovered{border-color:rgba(125,211,252,.5);box-shadow:0 36px 72px rgba(6,12,20,.65);}
+      .hero-panel.is-hovered .hero-panel__canvas img{transform:translateY(-8px) scale(1.04);filter:drop-shadow(0 28px 52px rgba(0,0,0,.7));}
+      .hero-panel.is-hovered .hero-panel__glow{opacity:.72;}
+      .hero-panel.is-pressed .hero-panel__canvas img{transform:translateY(2px) scale(.98);}
+      .hero-panel--alert{animation:hero-alert .8s ease;}
+      @keyframes hero-alert{0%{box-shadow:0 34px 76px rgba(40,10,10,.65);}40%{box-shadow:0 20px 56px rgba(120,40,20,.55);}100%{box-shadow:0 32px 68px rgba(3,8,16,.55);}}
+      .hero-panel__hotspot{position:absolute;border:1px dashed rgba(255,255,255,.42);background:rgba(125,211,252,.16);backdrop-filter:blur(2px);border-radius:50%;width:30%;height:30%;top:24%;right:18%;opacity:0;transform:scale(.9);transition:opacity .2s ease,transform .2s ease,border-color .2s ease;background-clip:padding-box;}
+      .hero-panel__hotspot span{position:absolute;bottom:-36px;left:50%;transform:translateX(-50%);background:rgba(8,16,24,.92);padding:6px 12px;border-radius:12px;border:1px solid rgba(125,211,252,.4);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#c8e7ff;white-space:nowrap;opacity:0;transition:opacity .2s ease,transform .2s ease;pointer-events:none;}
+      .hero-panel.is-hovered .hero-panel__hotspot,.hero-panel__hotspot:focus-visible,.hero-panel__hotspot:hover{opacity:1;transform:scale(1);}
+      .hero-panel__hotspot:hover span,.hero-panel__hotspot:focus-visible span{opacity:1;transform:translate(-50%,-6px);}
+      .hero-panel__hotspot:focus-visible{outline:2px solid var(--hero-accent,#7dd3fc);outline-offset:4px;}
+      .main-menu-modes{display:flex;flex-direction:column;gap:24px;}
+      .main-menu-modes__title{margin:0;font-size:24px;letter-spacing:.1em;text-transform:uppercase;color:#aee4ff;}
+      .mode-section{display:flex;flex-direction:column;gap:18px;}
+      .mode-section__name{margin:0;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
+      .mode-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}
+      .mode-card{position:relative;display:flex;flex-direction:column;gap:12px;align-items:flex-start;padding:24px;border-radius:20px;border:1px solid rgba(125,211,252,.24);background:linear-gradient(150deg,rgba(16,26,36,.92),rgba(18,30,42,.65));color:inherit;cursor:pointer;transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;}
+      .mode-card:hover{transform:translateY(-4px);box-shadow:0 20px 44px rgba(6,12,18,.55);border-color:rgba(125,211,252,.46);}
+      .mode-card:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:4px;}
+      .mode-card__icon{font-size:28px;line-height:1;filter:drop-shadow(0 0 10px rgba(125,211,252,.26));}
+      .mode-card__title{margin:0;font-size:18px;letter-spacing:.06em;text-transform:uppercase;}
+      .mode-card__desc{margin:0;color:#9cbcd9;font-size:14px;line-height:1.6;}
+      .mode-card__tags{display:flex;gap:8px;flex-wrap:wrap;}
+      .mode-tag{padding:6px 12px;border-radius:999px;border:1px solid rgba(125,211,252,.25);background:rgba(12,22,32,.82);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#aee4ff;}
+      .mode-tag--pve{color:#a8ffd9;border-color:rgba(117,255,208,.35);background:rgba(10,26,22,.82);}
+      .mode-tag--pvp{color:#ff9aa0;border-color:rgba(255,154,160,.35);background:rgba(38,18,24,.82);}
+      .mode-tag--coming{color:#ffe066;border-color:rgba(255,224,102,.35);background:rgba(36,26,12,.82);}
+      .mode-tag--economy{color:#ffd9a1;border-color:rgba(255,195,128,.35);background:rgba(36,24,12,.82);}
+      .mode-card__status{position:absolute;top:18px;right:18px;padding:6px 12px;border-radius:999px;border:1px solid rgba(255,224,102,.42);background:rgba(36,26,12,.78);color:#ffe066;font-size:11px;letter-spacing:.16em;text-transform:uppercase;}
+      .mode-card--coming{border-style:dashed;opacity:.88;}
+      .main-menu-sidebar{display:flex;flex-direction:column;gap:16px;}
+      .sidebar-slot{position:relative;padding:20px 22px;border-radius:18px;border:1px solid rgba(125,211,252,.18);background:rgba(12,20,28,.82);overflow:hidden;display:flex;flex-direction:column;gap:8px;min-height:104px;}
+      .sidebar-slot::after{content:'';position:absolute;inset:auto -40% -60% 50%;transform:translateX(-50%);width:140%;height:120%;background:radial-gradient(circle,rgba(125,211,252,.18),transparent 70%);opacity:.4;pointer-events:none;}
+      .sidebar-slot__label{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#7da0c7;}
+      .sidebar-slot__title{margin:0;font-size:16px;letter-spacing:.04em;}
+      .sidebar-slot__desc{margin:0;font-size:13px;color:#9cbcd9;line-height:1.5;}
+      @media(max-width:1080px){.hero-panel{grid-template-columns:1fr;}.hero-panel__canvas{min-height:300px;}}
+      @media(max-width:960px){.main-menu-v2__layout{grid-template-columns:1fr;}.main-menu-sidebar{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;}}
+      @media(max-width:640px){.main-menu-v2{gap:24px;}.hero-panel__info{padding:24px;}.hero-panel__canvas{padding:20px;}.main-menu-v2__title{font-size:36px;}.mode-card{padding:20px;}}
+    `;
+    document.head.appendChild(style);
+  }
+
+  function applyPalette(element, profile){
+    const palette = profile?.art?.palette || {};
+    if (!element) return;
+    if (palette.primary) element.style.setProperty('--hero-primary', palette.primary);
+    if (palette.secondary) element.style.setProperty('--hero-secondary', palette.secondary);
+    if (palette.accent) element.style.setProperty('--hero-accent', palette.accent);
+    if (palette.outline) element.style.setProperty('--hero-outline', palette.outline);
+  }
+
+  function createModeCard(mode, shell, onShowComingSoon, addCleanup){
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'mode-card';
+    button.dataset.mode = mode.key;
+    if (mode.status === 'coming-soon'){
+      button.classList.add('mode-card--coming');
+      button.setAttribute('aria-describedby', `${mode.key}-status`);
+      button.setAttribute('aria-disabled', 'true');
+    }
+
+    const icon = document.createElement('span');
+    icon.className = 'mode-card__icon';
+    icon.textContent = mode.icon || '◆';
+    button.appendChild(icon);
+
+    const title = document.createElement('h3');
+    title.className = 'mode-card__title';
+    title.textContent = mode.title || mode.label || mode.key;
+    button.appendChild(title);
+
+    if (mode.description){
+      const desc = document.createElement('p');
+      desc.className = 'mode-card__desc';
+      desc.textContent = mode.description;
+      button.appendChild(desc);
+    }
+
+    const tags = document.createElement('div');
+    tags.className = 'mode-card__tags';
+    (mode.tags || []).forEach(tag => {
+      const chip = document.createElement('span');
+      chip.className = 'mode-tag';
+      chip.textContent = tag;
+      const mapped = TAG_CLASS_MAP.get(tag);
+      if (mapped) chip.classList.add(mapped);
+      tags.appendChild(chip);
+    });
+    if (tags.childElementCount > 0){
+      button.appendChild(tags);
+    }
+
+    if (mode.status === 'coming-soon'){
+      const status = document.createElement('span');
+      status.id = `${mode.key}-status`;
+      status.className = 'mode-card__status';
+      status.textContent = 'Coming soon';
+      button.appendChild(status);
+    }
+
+    const handleClick = event => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (!shell || typeof shell.enterScreen !== 'function') return;
+      if (mode.status === 'coming-soon'){
+        if (typeof onShowComingSoon === 'function'){
+          onShowComingSoon(mode);
+        }
+        shell.enterScreen(mode.id || 'main-menu', mode.params || null);
+        return;
+      }
+      shell.enterScreen(mode.id || 'main-menu', mode.params || null);
+    };
+    button.addEventListener('click', handleClick);
+    addCleanup(() => button.removeEventListener('click', handleClick));
+    return button;
+  }
+
+  function createModesSection(options){
+    const { sections = [], metadata = [], shell, onShowComingSoon, addCleanup } = options;
+    const sectionEl = document.createElement('section');
+    sectionEl.className = 'main-menu-modes';
+
+    const title = document.createElement('h2');
+    title.className = 'main-menu-modes__title';
+    title.textContent = 'Chế độ tác chiến';
+    sectionEl.appendChild(title);
+
+    const metaByKey = new Map();
+    metadata.forEach(mode => {
+      metaByKey.set(mode.key, mode);
+    });
+
+    sections.forEach(group => {
+      const groupEl = document.createElement('div');
+      groupEl.className = 'mode-section';
+
+      const heading = document.createElement('h3');
+      heading.className = 'mode-section__name';
+      heading.textContent = group.title || 'Danh mục';
+      groupEl.appendChild(heading);
+
+      const grid = document.createElement('div');
+      grid.className = 'mode-grid';
+
+      (group.modeKeys || []).forEach(key => {
+        const mode = metaByKey.get(key);
+        if (!mode) return;
+        const card = createModeCard(mode, shell, onShowComingSoon, addCleanup);
+        grid.appendChild(card);
+      });
+
+      groupEl.appendChild(grid);
+      sectionEl.appendChild(groupEl);
+    });
+
+    return sectionEl;
+  }
+
+  function cueTone(tone){
+    return TONE_ICONS[tone] ? { icon: TONE_ICONS[tone], tone } : { icon: '✦', tone: tone || 'calm' };
+  }
+
+  function createHeroSection(options){
+    const { heroId = HERO_DEFAULT_ID, playerGender = 'neutral', addCleanup } = options;
+    const profile = getHeroProfile(heroId);
+    const heroSection = document.createElement('section');
+    heroSection.className = 'hero-section';
+
+    const panel = document.createElement('div');
+    panel.className = 'hero-panel';
+      applyPalette(panel, profile);
+    heroSection.appendChild(panel);
+
+    const info = document.createElement('div');
+    info.className = 'hero-panel__info';
+
+    const dialogue = document.createElement('div');
+    dialogue.className = 'hero-dialogue';
+
+    const toneEl = document.createElement('div');
+    toneEl.className = 'hero-dialogue__tone';
+    dialogue.appendChild(toneEl);
+
+    const textEl = document.createElement('p');
+    textEl.className = 'hero-dialogue__text';
+    dialogue.appendChild(textEl);
+
+    info.appendChild(dialogue);
+
+    const identity = document.createElement('div');
+    identity.className = 'hero-panel__identity';
+    const role = document.createElement('p');
+    role.className = 'hero-panel__role';
+    role.textContent = `${profile.faction || 'Arclune'} — ${profile.role || 'Tiên phong'}`;
+    const name = document.createElement('h2');
+    name.className = 'hero-panel__name';
+    name.textContent = profile.name || 'Anh hùng';
+    identity.appendChild(role);
+    identity.appendChild(name);
+    if (profile.title){
+      const title = document.createElement('p');
+      title.className = 'hero-panel__motto';
+      title.textContent = profile.title;
+      identity.appendChild(title);
+    }
+    if (profile.motto){
+      const motto = document.createElement('p');
+      motto.className = 'hero-panel__motto';
+      motto.textContent = profile.motto;
+      identity.appendChild(motto);
+    }
+    info.appendChild(identity);
+
+    panel.appendChild(info);
+
+    const canvas = document.createElement('button');
+    canvas.type = 'button';
+    canvas.className = 'hero-panel__canvas';
+    canvas.setAttribute('aria-label', `Tương tác với ${profile.name || 'nhân vật chính'}`);
+
+    if (profile.art?.sprite?.src){
+      const img = document.createElement('img');
+      img.src = profile.art.sprite.src;
+      img.alt = profile.name || 'Anh hùng Arclune';
+      canvas.appendChild(img);
+    }
+
+    const glow = document.createElement('div');
+    glow.className = 'hero-panel__glow';
+    canvas.appendChild(glow);
+
+    const hotspots = getHeroHotspots(profile.id);
+    hotspots.forEach(spot => {
+      const hotspotBtn = document.createElement('button');
+      hotspotBtn.type = 'button';
+      hotspotBtn.className = 'hero-panel__hotspot';
+      hotspotBtn.dataset.cue = spot.cue || 'sensitive';
+      hotspotBtn.dataset.zone = spot.key;
+      hotspotBtn.setAttribute('aria-label', spot.label || 'Điểm tương tác đặc biệt');
+      const label = document.createElement('span');
+      label.textContent = spot.label || 'Tương tác';
+      hotspotBtn.appendChild(label);
+      const handleClick = event => {
+        event.preventDefault();
+        event.stopPropagation();
+        showDialogue(spot.cue || 'sensitive', { zone: spot.key });
+        panel.classList.add('hero-panel--alert');
+        setTimeout(() => panel.classList.remove('hero-panel--alert'), 620);
+      };
+      const handleHover = () => {
+        panel.classList.add('is-hovered');
+      };
+      const handleLeave = () => {
+        panel.classList.remove('is-hovered');
+      };
+      hotspotBtn.addEventListener('click', handleClick);
+      hotspotBtn.addEventListener('mouseenter', handleHover);
+      hotspotBtn.addEventListener('focus', handleHover);
+      hotspotBtn.addEventListener('mouseleave', handleLeave);
+      hotspotBtn.addEventListener('blur', handleLeave);
+      addCleanup(() => {
+        hotspotBtn.removeEventListener('click', handleClick);
+        hotspotBtn.removeEventListener('mouseenter', handleHover);
+        hotspotBtn.removeEventListener('focus', handleHover);
+        hotspotBtn.removeEventListener('mouseleave', handleLeave);
+        hotspotBtn.removeEventListener('blur', handleLeave);
+      });
+      canvas.appendChild(hotspotBtn);
+    });
+
+    panel.appendChild(canvas);
+
+    const updateTone = (tone, label) => {
+      const { icon, tone: normalizedTone } = cueTone(tone);
+      toneEl.dataset.tone = normalizedTone;
+      toneEl.textContent = `${icon} ${label || ''}`.trim();
+    };
+
+    const showDialogue = (cue, extra = {}) => {
+      const dialogueData = getHeroDialogue(profile.id, cue, { gender: playerGender, zone: extra.zone });
+      textEl.textContent = dialogueData.text;
+      updateTone(dialogueData.tone, dialogueData.label);
+    };
+
+    const handleEnter = () => {
+      panel.classList.add('is-hovered');
+      showDialogue('hover');
+    };
+    const handleLeave = () => {
+      panel.classList.remove('is-hovered');
+      showDialogue('idle');
+    };
+    const handleClick = event => {
+      event.preventDefault();
+      panel.classList.add('is-pressed');
+      showDialogue('tap');
+      setTimeout(() => panel.classList.remove('is-pressed'), 220);
+    };
+    const handleKey = event => {
+      if (event.key === 'Enter' || event.key === ' '){
+        event.preventDefault();
+        handleClick(event);
+      }
+    };
+
+    canvas.addEventListener('mouseenter', handleEnter);
+    canvas.addEventListener('focus', handleEnter);
+    canvas.addEventListener('mouseleave', handleLeave);
+    canvas.addEventListener('blur', handleLeave);
+    canvas.addEventListener('click', handleClick);
+    canvas.addEventListener('keydown', handleKey);
+    addCleanup(() => {
+      canvas.removeEventListener('mouseenter', handleEnter);
+      canvas.removeEventListener('focus', handleEnter);
+      canvas.removeEventListener('mouseleave', handleLeave);
+      canvas.removeEventListener('blur', handleLeave);
+      canvas.removeEventListener('click', handleClick);
+      canvas.removeEventListener('keydown', handleKey);
+    });
+
+    showDialogue('intro');
+
+    heroSection.appendChild(panel);
+    return heroSection;
+  }
+
+  function createSidebar(){
+    const aside = document.createElement('aside');
+    aside.className = 'main-menu-sidebar';
+    SIDE_SLOTS.forEach(slot => {
+      const card = document.createElement('div');
+      card.className = 'sidebar-slot';
+      card.dataset.slot = slot.key;
+
+      const label = document.createElement('span');
+      label.className = 'sidebar-slot__label';
+      label.textContent = slot.label;
+
+      const title = document.createElement('h4');
+      title.className = 'sidebar-slot__title';
+      title.textContent = slot.title;
+
+      const desc = document.createElement('p');
+      desc.className = 'sidebar-slot__desc';
+      desc.textContent = slot.description;
+
+      card.appendChild(label);
+      card.appendChild(title);
+      card.appendChild(desc);
+      aside.appendChild(card);
+    });
+    return aside;
+  }
+
+  function createHeader(){
+    const header = document.createElement('header');
+    header.className = 'main-menu-v2__header';
+
+    const brand = document.createElement('div');
+    brand.className = 'main-menu-v2__brand';
+
+    const title = document.createElement('h1');
+    title.className = 'main-menu-v2__title';
+    title.textContent = 'Arclune';
+    const subtitle = document.createElement('p');
+    subtitle.className = 'main-menu-v2__subtitle';
+    subtitle.textContent = 'Chiến thuật sân 7x3. Chọn chế độ để khởi động đội hình, tương tác với hộ vệ để nghe lời nhắc nhở.';
+
+    brand.appendChild(title);
+    brand.appendChild(subtitle);
+
+    const meta = document.createElement('div');
+    meta.className = 'main-menu-v2__meta';
+
+    const chipAlpha = document.createElement('span');
+    chipAlpha.className = 'main-menu-v2__meta-chip';
+    chipAlpha.textContent = 'Alpha preview';
+    const chipBuild = document.createElement('span');
+    chipBuild.className = 'main-menu-v2__meta-chip';
+    chipBuild.textContent = 'v0.7.4';
+
+    meta.appendChild(chipAlpha);
+    meta.appendChild(chipBuild);
+
+    header.appendChild(brand);
+    header.appendChild(meta);
+    return header;
+  }
+
+  function renderMainMenuView(options = {}){
+    const { root, shell, sections = [], metadata = [], heroId = HERO_DEFAULT_ID, playerGender = 'neutral', onShowComingSoon } = options;
+    if (!root) return null;
+    ensureStyles();
+    root.innerHTML = '';
+    root.classList.remove('app--pve');
+    root.classList.add('app--main-menu');
+
+    const cleanups = [];
+    const addCleanup = fn => {
+      if (typeof fn === 'function') cleanups.push(fn);
+    };
+
+    const container = document.createElement('div');
+    container.className = 'main-menu-v2';
+
+    const header = createHeader();
+    container.appendChild(header);
+
+    const layout = document.createElement('div');
+    layout.className = 'main-menu-v2__layout';
+    container.appendChild(layout);
+
+    const primary = document.createElement('div');
+    primary.className = 'main-menu-v2__primary';
+    const hero = createHeroSection({ heroId, playerGender, addCleanup });
+    primary.appendChild(hero);
+    const modes = createModesSection({ sections, metadata, shell, onShowComingSoon, addCleanup });
+    primary.appendChild(modes);
+
+    const sidebar = createSidebar();
+
+    layout.appendChild(primary);
+    layout.appendChild(sidebar);
+
+    root.appendChild(container);
+
+    return {
+      destroy(){
+        cleanups.forEach(fn => {
+          try {
+            fn();
+          } catch (err) {
+            console.error('[main-menu] cleanup failed', err);
+          }
+        });
+        cleanups.length = 0;
+        if (container.parentNode === root){
+          root.removeChild(container);
+        }
+        root.classList.remove('app--main-menu');
+      }
+    };
+  }
+
+
+
+  exports.renderMainMenuView = renderMainMenuView;
+  exports.default = renderMainMenuView;
+  module.exports.default = exports.default;
+});
+
 __define('./statuses.js', (exports, module, __require) => {
   // statuses.js — Hệ trạng thái/effect data-driven v0.7
   const byId = (u) => (u && u.statuses) || (u.statuses = []);
