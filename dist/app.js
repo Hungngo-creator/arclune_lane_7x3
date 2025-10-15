@@ -354,6 +354,92 @@ __define('./ai.js', (exports, module, __require) => {
   exports.queueEnemyAt = queueEnemyAt;
   exports.aiMaybeAct = aiMaybeAct;
 });
+__define('./app/shell.js', (exports, module, __require) => {
+  const DEFAULT_SCREEN = 'main-menu';
+
+  function cloneState(state){
+    return {
+      screen: state.screen,
+      activeSession: state.activeSession,
+      screenParams: state.screenParams
+    };
+  }
+
+  function createAppShell(options = {}){
+    const state = {
+      screen: options.screen || DEFAULT_SCREEN,
+      activeSession: options.activeSession || null,
+      screenParams: options.screenParams || null
+    };
+    const listeners = new Set();
+
+    function notify(){
+      const snapshot = cloneState(state);
+      for (const fn of listeners){
+        try {
+          fn(snapshot);
+        } catch (err) {
+          console.error('[shell] listener error', err);
+        }
+      }
+    }
+
+    function setScreen(nextScreen, params){
+      const target = nextScreen || DEFAULT_SCREEN;
+      let changed = false;
+      if (state.screen !== target){
+        state.screen = target;
+        changed = true;
+      }
+      const normalizedParams = params || null;
+      if (state.screenParams !== normalizedParams){
+        state.screenParams = normalizedParams;
+        changed = true;
+      }
+      if (changed) notify();
+    }
+
+    function setSession(nextSession){
+      if (state.activeSession === nextSession) return;
+      state.activeSession = nextSession || null;
+      notify();
+    }
+
+    function subscribe(handler){
+      if (typeof handler !== 'function') return ()=>{};
+      listeners.add(handler);
+      try {
+        handler(cloneState(state));
+      } catch (err) {
+        console.error('[shell] listener error', err);
+      }
+      return ()=>{
+        listeners.delete(handler);
+      };
+    }
+
+    return {
+      enterScreen(key, params){
+        setScreen(key, params);
+      },
+      setActiveSession(session){
+        setSession(session);
+      },
+      clearActiveSession(){
+        if (!state.activeSession) return;
+        state.activeSession = null;
+        notify();
+      },
+      getState(){
+        return cloneState(state);
+      },
+      onChange: subscribe
+    };
+  }
+
+  export default createAppShell;
+  exports.createAppShell = createAppShell;
+});
 __define('./art.js', (exports, module, __require) => {
   // v0.7.7 – Unit art catalog
 
@@ -644,7 +730,7 @@ __define('./art.js', (exports, module, __require) => {
     }
 
     const preferredKey = normalizedSkins[defaultSkinKey] ? defaultSkinKey : Object.keys(normalizedSkins)[0] || defaultSkinKey;
- 
+
     return {
       sprite: normalizedSkins[preferredKey] || null,
       skins: normalizedSkins,
@@ -1653,8 +1739,8 @@ __define('./engine.js', (exports, module, __require) => {
       Math.floor(w * ((CFG.UI?.BOARD_H_RATIO) ?? (3/7))),
       (CFG.UI?.BOARD_MIN_H) ?? 220
     );
-    
-const dprRaw = (typeof window !== 'undefined' && Number.isFinite(window.devicePixelRatio))
+
+  const dprRaw = (typeof window !== 'undefined' && Number.isFinite(window.devicePixelRatio))
       ? window.devicePixelRatio
       : 1;
     const dpr = dprRaw > 0 ? dprRaw : 1;
@@ -2236,10 +2322,62 @@ const dprRaw = (typeof window !== 'undefined' && Number.isFinite(window.devicePi
   exports.zoneCode = zoneCode;
 });
 __define('./entry.js', (exports, module, __require) => {
-  const __dep0 = __require('./main.js');
-  const startGame = __dep0.startGame;
+  const __dep0 = __require('./app/shell.js');
+  const createAppShell = __dep0.createAppShell;
 
   const SUCCESS_EVENT = 'arclune:loaded';
+  const SCREEN_MAIN_MENU = 'main-menu';
+  const SCREEN_PVE = 'pve-session';
+
+  const MODE_DEFINITIONS = {
+    campaign: {
+      key: 'campaign',
+      label: 'Chiến Dịch',
+      type: 'pve',
+      description: 'Trải nghiệm tuyến cốt truyện PvE cổ điển.',
+      loader: () => import('./modes/pve/session.js')
+    },
+    challenge: {
+      key: 'challenge',
+      label: 'Thử Thách',
+      type: 'pve',
+      description: 'Các kịch bản đặc biệt để thử nghiệm đội hình.',
+      loader: () => import('./modes/pve/session.js')
+    },
+    arena: {
+      key: 'arena',
+      label: 'Đấu Trường',
+      type: 'pve',
+      description: 'PvE nhịp độ cao với quân đoàn bất tận.',
+      loader: () => import('./modes/pve/session.js')
+    },
+    ares: {
+      key: 'ares',
+      label: 'Ares',
+      type: 'coming-soon',
+      description: 'PvP theo thời gian thực – đang phát triển.',
+      loader: () => import('./modes/coming-soon.stub.js')
+    },
+    tongmon: {
+      key: 'tongmon',
+      label: 'Tông Môn',
+      type: 'coming-soon',
+      description: 'Xây dựng môn phái & quản lý tài nguyên – sắp ra mắt.',
+      loader: () => import('./modes/coming-soon.stub.js')
+    }
+  };
+
+  const MENU_SECTIONS = [
+    { title: 'PvE', modeKeys: ['campaign', 'challenge', 'arena'] },
+    { title: 'Khám phá', modeKeys: ['ares', 'tongmon'] }
+  ];
+
+  let activeModal = null;
+  let shellInstance = null;
+  let rootElement = null;
+  let pveRenderToken = 0;
+  const bootstrapOptions = { isFileProtocol: false };
+  let renderMessageRef = null;
 
   function dispatchLoaded(){
     try {
@@ -2280,16 +2418,258 @@ __define('./entry.js', (exports, module, __require) => {
     const value = typeof error === 'undefined' || error === null ? '' : String(error);
     return value.trim() ? value : fallback;
   }
+
   function showFatalError(error, renderMessage, options){
-    const { isFileProtocol = false } = options || {};
-  const detail = resolveErrorMessage(error);
-      const advice = isFileProtocol
+   const { isFileProtocol = false } = options || {};
+    const detail = resolveErrorMessage(error);
+    const advice = isFileProtocol
       ? '<p><small>Arclune đang chạy trực tiếp từ ổ đĩa (<code>file://</code>). Nếu gặp lỗi tải tài nguyên, hãy thử mở thông qua một HTTP server tĩnh.</small></p>'
       : '';
     renderMessage({
       title: 'Không thể khởi động Arclune',
       body: `<p>${detail}</p>${advice}`
     });
+  }
+
+  function isMissingModuleError(error){
+    if (!error || typeof error !== 'object') return false;
+    if ('code' in error && error.code === 'MODULE_NOT_FOUND') return true;
+    const message = typeof error.message === 'string' ? error.message : '';
+    return /Cannot find module/i.test(message) || /module(\s|-)not(\s|-)found/i.test(message);
+  }
+
+  function isComingSoonModule(module){
+    if (!module) return true;
+    if (module.comingSoon) return true;
+    if (module.default && module.default.comingSoon) return true;
+    return false;
+  }
+
+  function dismissModal(){
+    if (activeModal && typeof activeModal.remove === 'function'){
+      activeModal.remove();
+    }
+    activeModal = null;
+  }
+
+  function showComingSoonModal(label){
+    dismissModal();
+    if (!rootElement) return;
+    const modal = document.createElement('div');
+    modal.className = 'app-modal';
+    modal.innerHTML = `
+      <div class="app-modal__dialog">
+        <h3 class="app-modal__title">Coming soon</h3>
+        <p class="app-modal__body">${label ? `Chế độ <b>${label}</b> đang được hoàn thiện.` : 'Tính năng đang được phát triển.'}</p>
+        <div class="app-modal__actions">
+          <button type="button" class="app-modal__button" data-action="close">Đã hiểu</button>
+        </div>
+      </div>
+    `;
+    const closeButton = modal.querySelector('[data-action="close"]');
+    if (closeButton){
+      closeButton.addEventListener('click', ()=>{
+        dismissModal();
+      });
+    }
+    rootElement.appendChild(modal);
+    activeModal = modal;
+  }
+
+  function renderMainMenu(onSelectMode){
+    if (!rootElement) return;
+    dismissModal();
+    rootElement.classList.remove('app--pve');
+    const sections = MENU_SECTIONS.map(section => {
+      const buttons = section.modeKeys
+        .map(modeKey => MODE_DEFINITIONS[modeKey])
+        .filter(Boolean)
+        .map(def => {
+          const comingSoon = def.type !== 'pve';
+          const hint = def.description ? `<small>${def.description}</small>` : '';
+          return `
+            <button class="main-menu__button" data-mode="${def.key}"${comingSoon ? ' data-coming-soon="true"' : ''}>
+              ${def.label}
+              ${hint}
+            </button>
+          `;
+        })
+        .join('');
+      return `
+        <section>
+          <h4 class="main-menu__section-title">${section.title}</h4>
+          <div class="main-menu__grid">${buttons}</div>
+        </section>
+      `;
+    }).join('');
+
+    rootElement.innerHTML = `
+      <div class="main-menu">
+        <h1 class="main-menu__title">Arclune</h1>
+        <p class="main-menu__subtitle">Chọn chế độ để bắt đầu.</p>
+        <div class="main-menu__sections">${sections}</div>
+      </div>
+    `;
+
+    const buttons = rootElement.querySelectorAll('[data-mode]');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', event => {
+        event.preventDefault();
+        const modeKey = btn.getAttribute('data-mode');
+        if (typeof onSelectMode === 'function'){
+          onSelectMode(modeKey);
+        }
+      });
+    });
+  }
+
+  function renderPveLayout(options){
+    if (!rootElement) return null;
+    dismissModal();
+    rootElement.classList.add('app--pve');
+    rootElement.innerHTML = '';
+    const container = document.createElement('div');
+    container.className = 'pve-screen';
+    container.setAttribute('data-mode', options?.modeKey || 'pve');
+    container.innerHTML = `
+      <div class="pve-toolbar">
+        <h2 class="pve-toolbar__title">${options?.title || 'PvE'}</h2>
+        <div class="pve-toolbar__actions">
+          <button type="button" class="pve-toolbar__button" data-action="exit">Thoát</button>
+        </div>
+      </div>
+      <div id="boardWrap">
+        <canvas id="board"></canvas>
+      </div>
+      <div id="bottomHUD" class="hud-bottom">
+        <div id="timer" class="chip chip-timer">04:00</div>
+        <div id="costChip" class="chip chip-cost">
+          <div id="costRing"></div>
+          <div id="costNow">0</div>
+        </div>
+      </div>
+      <div id="cards"></div>
+    `;
+    rootElement.appendChild(container);
+    const exitButton = container.querySelector('[data-action="exit"]');
+    if (exitButton && typeof options?.onExit === 'function'){
+      exitButton.addEventListener('click', options.onExit);
+    }
+    return container;
+  }
+
+  function getModeDefinition(modeKey){
+    return MODE_DEFINITIONS[modeKey] || null;
+  }
+
+  function teardownActiveSession(){
+    if (!shellInstance) return;
+    const current = shellInstance.getState()?.activeSession;
+    if (current && typeof current.stop === 'function'){
+      try {
+        current.stop();
+      } catch (err) {
+        console.warn('[pve] stop session failed', err);
+      }
+    }
+    shellInstance.setActiveSession(null);
+  }
+
+  function handleModeSelect(modeKey){
+    const definition = getModeDefinition(modeKey);
+    if (!definition){
+      showComingSoonModal('Tính năng đang phát triển');
+      return;
+    }
+    if (definition.type === 'pve'){
+      shellInstance.enterScreen(SCREEN_PVE, { modeKey: definition.key });
+      return;
+    }
+    definition.loader().then(module => {
+      if (isComingSoonModule(module)){
+        showComingSoonModal(definition.label);
+        return;
+      }
+      showComingSoonModal(definition.label);
+    }).catch(error => {
+      if (isMissingModuleError(error)){
+        showComingSoonModal(definition.label);
+        return;
+      }
+      console.error('Failed to load mode', error);
+      if (renderMessageRef){
+        showFatalError(error, renderMessageRef, bootstrapOptions);
+      } else if (typeof window.arcluneShowFatal === 'function'){
+        window.arcluneShowFatal(error);
+      }
+    });
+  }
+
+  async function mountPveScreen(params){
+    const token = ++pveRenderToken;
+    teardownActiveSession();
+    const modeKey = params?.modeKey && MODE_DEFINITIONS[params.modeKey] ? params.modeKey : 'campaign';
+    const definition = MODE_DEFINITIONS[modeKey] || MODE_DEFINITIONS.campaign;
+    if (rootElement){
+      rootElement.classList.add('app--pve');
+      rootElement.innerHTML = `<div class="app-loading">Đang tải ${definition.label}...</div>`;
+    }
+    let module;
+    try {
+      module = await definition.loader();
+    } catch (error) {
+      if (token !== pveRenderToken) return;
+      if (isMissingModuleError(error)){
+        showComingSoonModal(definition.label);
+        shellInstance.enterScreen(SCREEN_MAIN_MENU);
+        return;
+      }
+      throw error;
+    }
+    if (token !== pveRenderToken) return;
+    if (isComingSoonModule(module)){
+      showComingSoonModal(definition.label);
+      shellInstance.enterScreen(SCREEN_MAIN_MENU);
+      return;
+    }
+    const createPveSession = typeof module.createPveSession === 'function'
+      ? module.createPveSession
+      : (module.default && typeof module.default.createPveSession === 'function'
+        ? module.default.createPveSession
+        : null);
+    if (typeof createPveSession !== 'function'){
+      throw new Error('PvE module missing createPveSession().');
+    }
+    const container = renderPveLayout({
+      title: definition.label,
+      modeKey: definition.key,
+      onExit: ()=>{
+        const state = shellInstance.getState();
+        const session = state?.activeSession;
+        if (session && typeof session.stop === 'function'){
+          try {
+            session.stop();
+          } catch (err) {
+            console.warn('[pve] stop session failed', err);
+          }
+        }
+        shellInstance.setActiveSession(null);
+        shellInstance.enterScreen(SCREEN_MAIN_MENU);
+      }
+    });
+    if (!container){
+      throw new Error('Không thể dựng giao diện PvE.');
+    }
+    const session = createPveSession(container);
+    shellInstance.setActiveSession(session);
+    if (typeof session.start === 'function'){
+      try {
+        session.start({ ...(params?.sessionConfig || {}), root: container });
+      } catch (err) {
+        shellInstance.setActiveSession(null);
+        throw err;
+      }
+    }
   }
 
   (function bootstrap(){
@@ -2300,7 +2680,38 @@ __define('./entry.js', (exports, module, __require) => {
       if (isFileProtocol){
         console.warn('Đang chạy Arclune trực tiếp từ file://. Một số trình duyệt có thể chặn tài nguyên liên quan.');
       }
-      startGame();
+      rootElement = document.getElementById('appRoot');
+      if (!rootElement){
+        throw new Error('Không tìm thấy phần tử #appRoot.');
+      }
+      shellInstance = createAppShell();
+      renderMessageRef = renderMessage;
+      bootstrapOptions.isFileProtocol = isFileProtocol;
+      let lastScreen = null;
+      let lastParams = null;
+
+      shellInstance.onChange(state => {
+        if (state.screen === SCREEN_MAIN_MENU){
+          if (lastScreen !== SCREEN_MAIN_MENU){
+            lastScreen = SCREEN_MAIN_MENU;
+            lastParams = null;
+            pveRenderToken += 1;
+            renderMainMenu(handleModeSelect);
+          }
+        } else if (state.screen === SCREEN_PVE){
+          if (lastScreen !== SCREEN_PVE || state.screenParams !== lastParams){
+            lastScreen = SCREEN_PVE;
+            lastParams = state.screenParams;
+            mountPveScreen(state.screenParams || {}).catch(error => {
+              console.error('Arclune failed to start PvE session', error);
+              if (renderMessageRef){
+                showFatalError(error, renderMessageRef, bootstrapOptions);
+              }
+            });
+          }
+        }
+      });
+      
       dispatchLoaded();
     } catch (error) {
       console.error('Arclune failed to start', error);
@@ -2404,7 +2815,7 @@ __define('./events.js', (exports, module, __require) => {
         target.addEventListener(probeType, handler);
         try {
           if (typeof target.dispatchEvent === 'function' && isRealEvent){
-          target.dispatchEvent(probeEvent);
+           target.dispatchEvent(probeEvent);
           }
         } finally {
           if (typeof target.removeEventListener === 'function'){
@@ -2457,6 +2868,138 @@ __define('./events.js', (exports, module, __require) => {
   exports.emitGameEvent = emitGameEvent;
 });
 __define('./main.js', (exports, module, __require) => {
+  const __dep1 = __require('./modes/pve/session.js');
+  const createPveSession = __dep1.createPveSession;
+  const __dep2 = __require('./utils/dummy.js');
+  const ensureNestedModuleSupport = __dep2.ensureNestedModuleSupport;
+  const __reexport0 = __require('./events.js');
+
+  let currentSession = null;
+
+  function resolveRoot(config){
+    if (!config) return (typeof document !== 'undefined') ? document : null;
+    if (config.root) return config.root;
+    if (config.rootEl) return config.rootEl;
+    if (config.element) return config.element;
+    return (typeof document !== 'undefined') ? document : null;
+  }
+
+  function startGame(options = {}){
+    ensureNestedModuleSupport();
+    const { root, rootEl, element, ...rest } = options || {};
+    const rootTarget = resolveRoot({ root, rootEl, element });
+    const initialConfig = { ...rest };
+    if (!currentSession){
+      currentSession = createPveSession(rootTarget, initialConfig);
+  }
+    const startConfig = { ...initialConfig };
+    if (rootTarget && rootTarget !== resolveRoot({})){
+      startConfig.root = rootTarget;
+  }
+    return currentSession.start(startConfig);
+  }
+
+  function stopGame(){
+    if (!currentSession) return;
+    currentSession.stop();
+  }
+
+  function updateGameConfig(config = {}){
+    if (!currentSession) return;
+    currentSession.updateConfig(config);
+  }
+
+  function getCurrentSession(){
+    return currentSession;
+  }
+
+  function setUnitSkin(unitId, skinKey){
+    if (!currentSession) return false;
+    return currentSession.setUnitSkin(unitId, skinKey);
+  }
+
+  function onGameEvent(type, handler){
+    if (!currentSession) return ()=>{};
+    return currentSession.onEvent(type, handler);
+  }
+
+  exports.gameEvents = __reexport0.gameEvents;
+  exports.emitGameEvent = __reexport0.emitGameEvent;
+  exports.TURN_START = __reexport0.TURN_START;
+  exports.TURN_END = __reexport0.TURN_END;
+  exports.ACTION_START = __reexport0.ACTION_START;
+  exports.ACTION_END = __reexport0.ACTION_END;
+  exports.startGame = startGame;
+  exports.stopGame = stopGame;
+  exports.updateGameConfig = updateGameConfig;
+  exports.getCurrentSession = getCurrentSession;
+  exports.setUnitSkin = setUnitSkin;
+  exports.onGameEvent = onGameEvent;
+});
+__define('./meta.js', (exports, module, __require) => {
+  //v0.7
+  // meta.js — gom lookup + stat khởi tạo + nộ khởi điểm
+  const __dep0 = __require('./catalog.js');
+  const CLASS_BASE = __dep0.CLASS_BASE;
+  const getMetaById = __dep0.getMetaById;
+  const _isSummoner = __dep0.isSummoner;
+  const applyRankAndMods = __dep0.applyRankAndMods;
+
+  // Dùng trực tiếp catalog cho tra cứu
+  const Meta = {
+    get: getMetaById,
+    classOf(id){ return (this.get(id)?.class) ?? null; },
+    rankOf(id){  return (this.get(id)?.rank)  ?? null; },
+    kit(id){     return (this.get(id)?.kit)   ?? null; },
+    // chỉ coi là Summoner khi ult.type='summon'
+    isSummoner(id){
+      const m = this.get(id);
+      return !!(m && m.class === 'Summoner' && m.kit?.ult?.type === 'summon');
+    }
+  };
+
+  // Tạo chỉ số instance theo class+rank+mods (SPD không nhân theo rank)
+  function makeInstanceStats(unitId){
+    const m = Meta.get(unitId);
+    if (!m) return {};
+    const fin = applyRankAndMods(CLASS_BASE[m.class], m.rank, m.mods);
+    return {
+      hpMax: fin.HP|0, hp: fin.HP|0,
+      atk: fin.ATK|0, wil: fin.WIL|0,
+      arm: fin.ARM||0, res: fin.RES||0,
+      agi: fin.AGI|0, per: fin.PER|0,
+      spd: fin.SPD||1,
+      aeMax: fin.AEmax|0, ae: 0, aeRegen: fin.AEregen||0
+    };
+  }
+
+  // Nộ khi vào sân (trừ leader). Revive: theo spec của skill.
+  function initialRageFor(unitId, opts = {}){
+    const onSpawn = Meta.kit(unitId)?.onSpawn;
+    if (!onSpawn) return 0;
+    if (onSpawn.exceptLeader && opts.isLeader) return 0;
+    if (opts.revive) return Math.max(0, (opts.reviveSpec?.rage) ?? 0);
+    return onSpawn.rage ?? 0;
+  }
+
+  exports.Meta = Meta;
+  exports.makeInstanceStats = makeInstanceStats;
+  exports.initialRageFor = initialRageFor;
+});
+__define('./modes/coming-soon.stub.js', (exports, module, __require) => {
+  const comingSoon = true;
+
+  function describe(){
+    return 'coming-soon';
+  }
+
+  export default {
+    comingSoon
+  };
+  exports.comingSoon = comingSoon;
+  exports.describe = describe;
+});
+__define('./modes/pve/session.js', (exports, module, __require) => {
   //v0.7.6
   const __dep1 = __require('./turns.js');
   const stepTurn = __dep1.stepTurn;
@@ -2544,32 +3087,97 @@ __define('./main.js', (exports, module, __require) => {
   let _BORN = 1;
   const nextIid = ()=> _IID++;
 
-  const Game = {
-    grid: null,
-    tokens: [],
-    cost: 0, costCap: CFG.COST_CAP,
-    summoned: 0, summonLimit: CFG.SUMMON_LIMIT,
+  let Game = null;
+  let tickIntervalId = null;
+  let resizeHandler = null;
+  let canvasClickHandler = null;
+  let artSpriteHandler = null;
+  let visibilityHandlerBound = false;
+  let winRef = null;
+  let docRef = null;
+  let rootElement = null;
+  let storedConfig = {};
+  let running = false;
 
-    // deck-3 + quản lý “độc nhất”
-    unitsAll: UNITS,
-    usedUnitIds: new Set(),       // những unit đã ra sân
-    deck3: [],                    // mảng 3 unit
-    selectedId: null,
-    ui: { bar: null },
-    turn: { phase: 'ally', last: { ally: 0, enemy: 0 }, cycle: 0, busyUntil: 0 },
-   queued: { ally: new Map(), enemy: new Map() },
-    actionChain: [],
-    events: gameEvents,
-    sceneTheme: (CFG.SCENE?.CURRENT_THEME) || (CFG.SCENE?.DEFAULT_THEME),
-    backgroundKey: CFG.CURRENT_BACKGROUND || CFG.SCENE?.CURRENT_BACKGROUND || (CFG.SCENE?.CURRENT_THEME) || (CFG.SCENE?.DEFAULT_THEME)
-  };
-  // --- Enemy AI state (deck-4, cost riêng) ---
-  Game.ai = {
-   cost: 0, costCap: CFG.COST_CAP, summoned: 0, summonLimit: CFG.SUMMON_LIMIT,
-    unitsAll: UNITS, usedUnitIds: new Set(), deck: [], selectedId: null,
-    lastThinkMs: 0, lastDecision: null
-  };
-  Game.meta = Meta;
+  function normalizeConfig(input = {}){
+    const out = { ...input };
+    const scene = input.scene || {};
+    if (typeof out.sceneTheme === 'undefined' && typeof scene.theme !== 'undefined'){
+      out.sceneTheme = scene.theme;
+    }
+    if (typeof out.backgroundKey === 'undefined'){
+      if (typeof scene.backgroundKey !== 'undefined') out.backgroundKey = scene.backgroundKey;
+      else if (typeof scene.background !== 'undefined') out.backgroundKey = scene.background;
+    }
+    delete out.scene;
+    return out;
+  }
+
+  function createGameState(options = {}){
+    options = normalizeConfig(options);
+    const sceneTheme = options.sceneTheme
+      ?? CFG.SCENE?.CURRENT_THEME
+      ?? CFG.SCENE?.DEFAULT_THEME;
+    const backgroundKey = options.backgroundKey
+      ?? CFG.CURRENT_BACKGROUND
+      ?? CFG.SCENE?.CURRENT_BACKGROUND
+      ?? CFG.SCENE?.CURRENT_THEME
+      ?? CFG.SCENE?.DEFAULT_THEME;
+
+    const allyUnits = Array.isArray(options.deck) && options.deck.length
+      ? options.deck
+      : UNITS;
+    const enemyPreset = options.aiPreset || {};
+    const enemyUnits = Array.isArray(enemyPreset.deck) && enemyPreset.deck.length
+      ? enemyPreset.deck
+      : (Array.isArray(enemyPreset.unitsAll) && enemyPreset.unitsAll.length ? enemyPreset.unitsAll : UNITS);
+
+    const game = {
+      grid: null,
+      tokens: [],
+      cost: 0,
+      costCap: Number.isFinite(options.costCap) ? options.costCap : CFG.COST_CAP,
+      summoned: 0,
+      summonLimit: Number.isFinite(options.summonLimit) ? options.summonLimit : CFG.SUMMON_LIMIT,
+
+      // deck-3 + quản lý “độc nhất”
+      unitsAll: allyUnits,
+      usedUnitIds: new Set(),       // những unit đã ra sân
+      deck3: [],                    // mảng 3 unit
+      selectedId: null,
+      ui: { bar: null },
+      turn: { phase: 'ally', last: { ally: 0, enemy: 0 }, cycle: 0, busyUntil: 0 },
+      queued: { ally: new Map(), enemy: new Map() },
+      actionChain: [],
+      events: gameEvents,
+      sceneTheme,
+      backgroundKey
+    };
+
+    game.ai = {
+      cost: 0,
+      costCap: Number.isFinite(enemyPreset.costCap) ? enemyPreset.costCap : (enemyPreset.costCap ?? CFG.COST_CAP),
+      summoned: 0,
+      summonLimit: Number.isFinite(enemyPreset.summonLimit) ? enemyPreset.summonLimit : (enemyPreset.summonLimit ?? CFG.SUMMON_LIMIT),
+      unitsAll: enemyUnits,
+      usedUnitIds: new Set(),
+      deck: Array.isArray(enemyPreset.startingDeck) ? enemyPreset.startingDeck.slice() : [],
+      selectedId: null,
+      lastThinkMs: 0,
+      lastDecision: null
+    };
+
+    game.meta = Meta;
+    return game;
+  }
+
+  function resetSessionState(options = {}){
+    storedConfig = normalizeConfig({ ...storedConfig, ...options });
+    Game = createGameState(storedConfig);
+    _IID = 1;
+    _BORN = 1;
+    CLOCK = createClock();
+  }
 
   if (CFG?.DEBUG?.LOG_EVENTS) {
     const logEvent = (type) => (ev)=>{
@@ -2645,7 +3253,8 @@ __define('./main.js', (exports, module, __require) => {
     apply(Game.queued?.enemy);
   }
 
-  Game.setUnitSkin = (unitId, skinKey)=>{
+  function setUnitSkinForSession(unitId, skinKey){
+    if (!Game) return false;
     const ok = setUnitSkin(unitId, skinKey);
     if (!ok) return false;
     for (const token of Game.tokens){
@@ -2660,7 +3269,7 @@ __define('./main.js', (exports, module, __require) => {
     refreshQueuedArtFor(unitId);
     scheduleDraw();
     return true;
-  };
+  }
 
   function setDrawPaused(paused){
     drawPaused = !!paused;
@@ -2670,19 +3279,31 @@ __define('./main.js', (exports, module, __require) => {
       scheduleDraw();
     }
   }
-  if (typeof window !== 'undefined'){
-    window.addEventListener(ART_SPRITE_EVENT, ()=>{ scheduleDraw(); });
-    try {
-      window.arcluneSetUnitSkin = Game.setUnitSkin;
-    } catch (_){}
+  function bindArtSpriteListener(){
+    if (!winRef || typeof winRef.addEventListener !== 'function') return;
+    if (artSpriteHandler) return;
+    artSpriteHandler = ()=>{ scheduleDraw(); };
+    winRef.addEventListener(ART_SPRITE_EVENT, artSpriteHandler);
+  }
+
+  function unbindArtSpriteListener(){
+    if (!winRef || !artSpriteHandler || typeof winRef.removeEventListener !== 'function') return;
+    winRef.removeEventListener(ART_SPRITE_EVENT, artSpriteHandler);
+    artSpriteHandler = null;
   }
   // Master clock theo timestamp – tránh drift giữa nhiều interval
-  const CLOCK = {
-    startMs: performance.now(),
-    lastTimerRemain: 240,
-    lastCostCreditedSec: 0, turnEveryMs: 600,
-    lastTurnStepMs: performance.now()
-  };
+  let CLOCK = null;
+
+  function createClock(){
+    const now = performance.now();
+    return {
+      startMs: now,
+      lastTimerRemain: 240,
+      lastCostCreditedSec: 0,
+      turnEveryMs: 600,
+      lastTurnStepMs: now
+    };
+  }
 
   // Xác chết chờ vanish (để sau này thay bằng dead-animation)
   const DEATH_VANISH_MS = 900;
@@ -3028,7 +3649,7 @@ __define('./main.js', (exports, module, __require) => {
     extendBusy(busyMs);
     unit.rage = Math.max(0, unit.rage - 100);
   }
-  const tokensAlive = () => Game.tokens.filter(t => t.alive);
+  const tokensAlive = () => (Game?.tokens || []).filter(t => t.alive);
   // Giảm TTL minion của 1 phe sau khi phe đó kết thúc phase
   function tickMinionTTL(side){
     // gom những minion hết hạn để xoá sau vòng lặp
@@ -3050,109 +3671,100 @@ __define('./main.js', (exports, module, __require) => {
     }
   }
 
-  function init(){ 
-    // Guard: nếu đã init rồi thì thoát
-  if (Game._inited) return;
-    // 1) Canvas + ctx + HUD
-    const boardEl = /** @type {HTMLCanvasElement} */ (document.getElementById('board'));
+  function init(){
+    if (Game?._inited) return;
+    const doc = docRef || (typeof document !== 'undefined' ? document : null);
+    if (!doc) return;
+    const boardEl = /** @type {HTMLCanvasElement} */ (doc.getElementById('board'));
     if (!boardEl) return;
     canvas = boardEl;
     ctx = /** @type {CanvasRenderingContext2D} */ (boardEl.getContext('2d'));
 
-    hud = initHUD(document);
+    hud = initHUD(doc);
 
-    // 2) Bắt đầu trận
     resize();
     spawnLeaders(Game.tokens, Game.grid);
 
-  Game.tokens.forEach(t=>{
-   if (t.id === 'leaderA' || t.id === 'leaderB'){
-     vfxAddSpawn(Game, t.cx, t.cy, t.side);
-   }
-  });
-    // Gán chỉ số mặc định cho 2 leader (vì không nằm trong catalog)
-  Game.tokens.forEach(t=>{
-    if (!t.iid) t.iid = nextIid();
-    if (t.id === 'leaderA' || t.id === 'leaderB'){
-      Object.assign(t, {
-        hpMax: 1600, hp: 1600, arm: 0.12, res: 0.12, atk: 40, wil: 30,
-        aeMax: 0, ae: 0, rage: 0
-      });
-    }
-  });
-    // gán iid cho leader vừa spawn từ engine
-  Game.tokens.forEach(t => { if (!t.iid) t.iid = nextIid(); });
+    Game.tokens.forEach(t=>{
+      if (t.id === 'leaderA' || t.id === 'leaderB'){
+        vfxAddSpawn(Game, t.cx, t.cy, t.side);
+      }
+    });
+    Game.tokens.forEach(t=>{
+      if (!t.iid) t.iid = nextIid();
+      if (t.id === 'leaderA' || t.id === 'leaderB'){
+        Object.assign(t, {
+          hpMax: 1600, hp: 1600, arm: 0.12, res: 0.12, atk: 40, wil: 30,
+          aeMax: 0, ae: 0, rage: 0
+        });
+      }
+    });
+    Game.tokens.forEach(t => { if (!t.iid) t.iid = nextIid(); });
 
     hud.update(Game);
-  scheduleDraw();
-    Game._inited = true;   // đánh dấu thành công
-    // 3) Master clock + cost + timer + bước lượt (Sparse Cursor)
-    setInterval(()=>{
+    scheduleDraw();
+    Game._inited = true;
+
+    const updateTimerAndCost = ()=>{
+      if (!CLOCK) return;
       const now = performance.now();
       const elapsedSec = Math.floor((now - CLOCK.startMs) / 1000);
 
-      // Timer 04:00
       const remain = Math.max(0, 240 - elapsedSec);
       if (remain !== CLOCK.lastTimerRemain){
         CLOCK.lastTimerRemain = remain;
         const mm = String(Math.floor(remain/60)).padStart(2,'0');
         const ss = String(remain%60).padStart(2,'0');
-        const tEl = document.getElementById('timer');
+        const tEl = doc.getElementById('timer');
         if (tEl) tEl.textContent = `${mm}:${ss}`;
       }
 
-  // Cost +1/s cho CẢ HAI phe dùng chung deltaSec (không cướp mốc của nhau)
-  const deltaSec = elapsedSec - CLOCK.lastCostCreditedSec;
-  if (deltaSec > 0) {
-    // Ally
-    if (Game.cost < Game.costCap) {
-      Game.cost = Math.min(Game.costCap, Game.cost + deltaSec);
-    }
-    // Enemy AI
-    if (Game.ai.cost < Game.ai.costCap) {
-      Game.ai.cost = Math.min(Game.ai.costCap, Game.ai.cost + deltaSec);
-    }
+      const deltaSec = elapsedSec - CLOCK.lastCostCreditedSec;
+      if (deltaSec > 0) {
+        if (Game.cost < Game.costCap) {
+          Game.cost = Math.min(Game.costCap, Game.cost + deltaSec);
+        }
+        if (Game.ai.cost < Game.ai.costCap) {
+          Game.ai.cost = Math.min(Game.ai.costCap, Game.ai.cost + deltaSec);
+        }
 
-    // Ghi mốc sau khi cộng cho cả hai
-    CLOCK.lastCostCreditedSec = elapsedSec;
+        CLOCK.lastCostCreditedSec = elapsedSec;
 
-    // Cập nhật HUD & auto-pick phe ta
-    hud.update(Game);
-    if (!Game.selectedId) selectFirstAffordable();
-    if (Game.ui?.bar) Game.ui.bar.render();
+        hud.update(Game);
+        if (!Game.selectedId) selectFirstAffordable();
+        if (Game.ui?.bar) Game.ui.bar.render();
+        aiMaybeAct(Game, 'cost');
+      }
 
-    // Cho AI suy nghĩ ngay khi cost đổi
-    aiMaybeAct(Game, 'cost');
-  }
-
-      // Bước lượt theo nhịp demo
       const busyUntil = (Game.turn?.busyUntil) ?? 0;
       if (now >= busyUntil && now - CLOCK.lastTurnStepMs >= CLOCK.turnEveryMs){
         CLOCK.lastTurnStepMs = now;
-    stepTurn(Game, {
-    performUlt,               // dùng ult (có immediate summon)
-    processActionChain,       // xử lý creep hành động ngay
-    allocIid: nextIid,        // gán iid cho token/minion
-    doActionOrSkip            // để creep basic ngay trong chain
-  });
-  cleanupDead(performance.now());
-  scheduleDraw();
-  aiMaybeAct(Game, 'board');
+        stepTurn(Game, {
+          performUlt,
+          processActionChain,
+          allocIid: nextIid,
+          doActionOrSkip
+        });
+        cleanupDead(performance.now());
+        scheduleDraw();
+        aiMaybeAct(Game, 'board');
       }
-    }, 250);
-    
+    };
+
+    if (tickIntervalId){
+      clearInterval(tickIntervalId);
+      tickIntervalId = null;
+    }
+    tickIntervalId = setInterval(updateTimerAndCost, 250);
+
     function selectFirstAffordable(){
-    const deck = Game.deck3 || [];
-    const i = deck.findIndex(c => Game.cost >= c.cost);
-    Game.selectedId = i >= 0 ? deck[i].id : null;
-  }
   // 4) Deck-3 lần đầu
     refillDeck();
     selectFirstAffordable();
-   // 4b) Enemy deck lần đầu
+  // 4b) Enemy deck lần đầu
   refillDeckEnemy(Game);
     // 5) Summon bar (B2): đưa vào Game.ui.bar
-    Game.ui.bar = startSummonBar(document, {
+    Game.ui.bar = startSummonBar(doc, {
       onPick: (c)=>{
         Game.selectedId = c.id;
         Game.ui.bar.render();
@@ -3164,7 +3776,11 @@ __define('./main.js', (exports, module, __require) => {
     Game.ui.bar.render();
 
     // 6) Click canvas để summon
-    canvas.addEventListener('click', (ev)=>{
+    if (canvasClickHandler){
+      canvas.removeEventListener('click', canvasClickHandler);
+      canvasClickHandler = null;
+    }
+    canvasClickHandler = (ev)=>{
       const rect = canvas.getBoundingClientRect();
       const p = { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
       const cell = hitToCellOblique(Game.grid, p.x, p.y, CAM_PRESET);
@@ -3213,8 +3829,17 @@ __define('./main.js', (exports, module, __require) => {
       selectFirstAffordable();
       Game.ui.bar.render();
       scheduleDraw();
-    });
-  window.addEventListener('resize', ()=>{ resize(); scheduleDraw(); });
+    };
+    canvas.addEventListener('click', canvasClickHandler);
+
+    if (resizeHandler && winRef && typeof winRef.removeEventListener === 'function'){
+      winRef.removeEventListener('resize', resizeHandler);
+      resizeHandler = null;
+    }
+    resizeHandler = ()=>{ resize(); scheduleDraw(); };
+    if (winRef && typeof winRef.addEventListener === 'function'){
+      winRef.addEventListener('resize', resizeHandler);
+    }
   }
 
   /* ---------- Deck logic ---------- */
@@ -3236,19 +3861,20 @@ __define('./main.js', (exports, module, __require) => {
     if (!canvas) return;                                  // guard
     Game.grid = makeGrid(canvas, CFG.GRID_COLS, CFG.GRID_ROWS);
     if (ctx && Game.grid){
-      const scale = Number.isFinite(Game.grid.dpr) && Game.grid.dpr > 0
+      const view = winRef || (typeof window !== 'undefined' ? window : null);
+      const dpr = Number.isFinite(Game.grid.dpr) && Game.grid.dpr > 0
         ? Game.grid.dpr
-        : ((typeof window !== 'undefined' && Number.isFinite(window.devicePixelRatio) && window.devicePixelRatio > 0)
-          ? window.devicePixelRatio
+        : (Number.isFinite(view?.devicePixelRatio) && (view?.devicePixelRatio || 0) > 0
+          ? view.devicePixelRatio
           : 1);
       if (typeof ctx.setTransform === 'function'){
-        ctx.setTransform(scale, 0, 0, scale, 0, 0);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       } else {
         if (typeof ctx.resetTransform === 'function'){
           ctx.resetTransform();
         }
         if (typeof ctx.scale === 'function'){
-          ctx.scale(scale, scale);
+          ctx.scale(dpr, dpr);
         }
       }
     }
@@ -3378,36 +4004,185 @@ __define('./main.js', (exports, module, __require) => {
     }
   }
   /* ---------- Chạy ---------- */
-  let _booted = false;
-  let _booting = false;
-  let _visibilityListenerBound = false;
   function handleVisibilityChange(){
-    if (typeof document === 'undefined') return;
-    setDrawPaused(document.hidden);
+    if (!docRef) return;
+    setDrawPaused(!!docRef.hidden);
   }
 
-  function startGame(){
-    if (_booted || _booting) return;
-    _booting = true;
+  function bindVisibility(){
+    if (visibilityHandlerBound) return;
+    const doc = docRef;
+    if (!doc || typeof doc.addEventListener !== 'function') return;
+    doc.addEventListener('visibilitychange', handleVisibilityChange);
+    visibilityHandlerBound = true;
+  }
+
+  function unbindVisibility(){
+    if (!visibilityHandlerBound) return;
+    const doc = docRef;
+    if (doc && typeof doc.removeEventListener === 'function'){
+      doc.removeEventListener('visibilitychange', handleVisibilityChange);
+    }
+    visibilityHandlerBound = false;
+  }
+
+  function configureRoot(root){
+    rootElement = root || null;
+    if (rootElement && rootElement.ownerDocument){
+      docRef = rootElement.ownerDocument;
+    } else if (rootElement && rootElement.nodeType === 9){
+      docRef = rootElement;
+    } else {
+      docRef = typeof document !== 'undefined' ? document : null;
+    }
+    winRef = docRef?.defaultView ?? (typeof window !== 'undefined' ? window : null);
+  }
+
+  function clearSessionTimers(){
+    if (tickIntervalId){
+      clearInterval(tickIntervalId);
+      tickIntervalId = null;
+    }
+    cancelScheduledDraw();
+  }
+
+  function clearSessionListeners(){
+    if (canvas && canvasClickHandler && typeof canvas.removeEventListener === 'function'){
+      canvas.removeEventListener('click', canvasClickHandler);
+    }
+    canvasClickHandler = null;
+    if (resizeHandler && winRef && typeof winRef.removeEventListener === 'function'){
+      winRef.removeEventListener('resize', resizeHandler);
+    }
+    resizeHandler = null;
+    unbindArtSpriteListener();
+    unbindVisibility();
+  }
+
+  function resetDomRefs(){
+    canvas = null;
+    ctx = null;
+    hud = null;
+  }
+
+  function stopSession(){
+    clearSessionTimers();
+    clearSessionListeners();
+    if (Game){
+      if (Game.queued?.ally?.clear) Game.queued.ally.clear();
+      if (Game.queued?.enemy?.clear) Game.queued.enemy.clear();
+      if (Array.isArray(Game.tokens)) Game.tokens.length = 0;
+      if (Array.isArray(Game.deck3)) Game.deck3.length = 0;
+      if (Game.usedUnitIds?.clear) Game.usedUnitIds.clear();
+      if (Game.ai){
+        Game.ai.deck = Array.isArray(Game.ai.deck) ? [] : Game.ai.deck;
+        if (Game.ai.usedUnitIds?.clear) Game.ai.usedUnitIds.clear();
+        Game.ai.selectedId = null;
+        Game.ai.cost = 0;
+        Game.ai.summoned = 0;
+      }
+      Game.cost = 0;
+      Game.summoned = 0;
+      Game.selectedId = null;
+      Game._inited = false;
+    }
+    resetDomRefs();
+    CLOCK = null;
+    Game = null;
+    running = false;
+  }
+
+  function bindSession(){
+    bindArtSpriteListener();
+    bindVisibility();
+    if (docRef){
+      setDrawPaused(!!docRef.hidden);
+    } else {
+      setDrawPaused(false);
+    }
+  }
+
+  function startSession(config = {}){
+    configureRoot(rootElement);
+    const overrides = normalizeConfig(config);
+    if (running) stopSession();
+    resetSessionState(overrides);
+    resetDomRefs();
+    running = true;
     try {
       init();
-      if (!Game._inited){
-        return;
+      if (!Game || !Game._inited){
+        throw new Error('Unable to initialise PvE session');
       }
-      _booted = true;
-      if (!_visibilityListenerBound && typeof document !== 'undefined' && typeof document.addEventListener === 'function'){
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-        _visibilityListenerBound = true;
-      }
-      if (typeof document !== 'undefined'){
-        setDrawPaused(document.hidden);
-      }
+      bindSession();
+      return Game;
     } catch (err) {
-      _booted = false;
+      running = false;
+      stopSession();
       throw err;
-    } finally {
-      _booting = false;
     }
+  }
+
+  function applyConfigToRunningGame(cfg){
+    if (!Game) return;
+    if (typeof cfg.sceneTheme !== 'undefined') Game.sceneTheme = cfg.sceneTheme;
+    if (typeof cfg.backgroundKey !== 'undefined') Game.backgroundKey = cfg.backgroundKey;
+    if (Array.isArray(cfg.deck) && cfg.deck.length) Game.unitsAll = cfg.deck;
+    if (cfg.aiPreset){
+      const preset = cfg.aiPreset || {};
+      if (Array.isArray(preset.deck) && preset.deck.length){
+        Game.ai.unitsAll = preset.deck;
+      } else if (Array.isArray(preset.unitsAll) && preset.unitsAll.length){
+        Game.ai.unitsAll = preset.unitsAll;
+      }
+      if (Number.isFinite(preset.costCap)) Game.ai.costCap = preset.costCap;
+      if (Number.isFinite(preset.summonLimit)) Game.ai.summonLimit = preset.summonLimit;
+    }
+  }
+
+  function updateSessionConfig(next = {}){
+    const normalized = normalizeConfig(next);
+    storedConfig = normalizeConfig({ ...storedConfig, ...normalized });
+    applyConfigToRunningGame(normalized);
+  }
+
+  function onSessionEvent(type, handler){
+    if (!type || typeof handler !== 'function') return ()=>{};
+    if (!gameEvents || typeof gameEvents.addEventListener !== 'function') return ()=>{};
+    gameEvents.addEventListener(type, handler);
+    return ()=>{
+      if (typeof gameEvents.removeEventListener === 'function'){
+        gameEvents.removeEventListener(type, handler);
+      }
+    };
+  }
+
+  function createPveSession(rootEl, options = {}){
+    storedConfig = normalizeConfig(options || {});
+    configureRoot(rootEl);
+    return {
+      start(startConfig = {}){
+        if (startConfig && (startConfig.root || startConfig.rootEl)) {
+          const r = startConfig.root || startConfig.rootEl;
+          const rest = { ...startConfig };
+          delete rest.root;
+          delete rest.rootEl;
+          configureRoot(r);
+          return startSession(rest);
+        }
+        return startSession(startConfig);
+      },
+      stop(){
+        stopSession();
+      },
+      updateConfig(next = {}){
+        updateSessionConfig(next);
+      },
+      setUnitSkin(unitId, skinKey){
+        return setUnitSkinForSession(unitId, skinKey);
+      },
+      onEvent: onSessionEvent
+    };
   }
 
   const __reexport0 = __require('./events.js');
@@ -3418,57 +4193,7 @@ __define('./main.js', (exports, module, __require) => {
   exports.TURN_END = __reexport0.TURN_END;
   exports.ACTION_START = __reexport0.ACTION_START;
   exports.ACTION_END = __reexport0.ACTION_END;
-  exports.startGame = startGame;
-});
-__define('./meta.js', (exports, module, __require) => {
-  //v0.7
-  // meta.js — gom lookup + stat khởi tạo + nộ khởi điểm
-  const __dep0 = __require('./catalog.js');
-  const CLASS_BASE = __dep0.CLASS_BASE;
-  const getMetaById = __dep0.getMetaById;
-  const _isSummoner = __dep0.isSummoner;
-  const applyRankAndMods = __dep0.applyRankAndMods;
-
-  // Dùng trực tiếp catalog cho tra cứu
-  const Meta = {
-    get: getMetaById,
-    classOf(id){ return (this.get(id)?.class) ?? null; },
-    rankOf(id){  return (this.get(id)?.rank)  ?? null; },
-    kit(id){     return (this.get(id)?.kit)   ?? null; },
-    // chỉ coi là Summoner khi ult.type='summon'
-    isSummoner(id){
-      const m = this.get(id);
-      return !!(m && m.class === 'Summoner' && m.kit?.ult?.type === 'summon');
-    }
-  };
-
-  // Tạo chỉ số instance theo class+rank+mods (SPD không nhân theo rank)
-  function makeInstanceStats(unitId){
-    const m = Meta.get(unitId);
-    if (!m) return {};
-    const fin = applyRankAndMods(CLASS_BASE[m.class], m.rank, m.mods);
-    return {
-      hpMax: fin.HP|0, hp: fin.HP|0,
-      atk: fin.ATK|0, wil: fin.WIL|0,
-      arm: fin.ARM||0, res: fin.RES||0,
-      agi: fin.AGI|0, per: fin.PER|0,
-      spd: fin.SPD||1,
-      aeMax: fin.AEmax|0, ae: 0, aeRegen: fin.AEregen||0
-    };
-  }
-
-  // Nộ khi vào sân (trừ leader). Revive: theo spec của skill.
-  function initialRageFor(unitId, opts = {}){
-    const onSpawn = Meta.kit(unitId)?.onSpawn;
-    if (!onSpawn) return 0;
-    if (onSpawn.exceptLeader && opts.isLeader) return 0;
-    if (opts.revive) return Math.max(0, (opts.reviveSpec?.rage) ?? 0);
-    return onSpawn.rage ?? 0;
-  }
-
-  exports.Meta = Meta;
-  exports.makeInstanceStats = makeInstanceStats;
-  exports.initialRageFor = initialRageFor;
+  exports.createPveSession = createPveSession;
 });
 __define('./passives.js', (exports, module, __require) => {
   // passives.js — passive event dispatch & helpers v0.7
