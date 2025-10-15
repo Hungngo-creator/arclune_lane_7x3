@@ -1,6 +1,6 @@
 import { createAppShell } from './app/shell.js';
 import { renderMainMenuView } from './screens/main-menu/view.js';
-import { MODES, MODE_STATUS, getMenuSections } from './data/modes.js';
+import { MODES, MODE_GROUPS, MODE_STATUS, getMenuSections } from './data/modes.js';
 
 const SUCCESS_EVENT = 'arclune:loaded';
 const SCREEN_MAIN_MENU = 'main-menu';
@@ -23,7 +23,7 @@ const MODE_DEFINITIONS = MODES.reduce((acc, mode) => {
     ? { ...shell.defaultParams }
     : null;
 
-acc[mode.id] = {
+  acc[mode.id] = {
     key: mode.id,
     label: mode.title,
     type: mode.type,
@@ -49,16 +49,48 @@ const MODE_METADATA = MODES.map(mode => {
     icon: mode.icon,
     tags: Array.isArray(mode.tags) ? [...mode.tags] : [],
     status: mode.status,
-    params: definition?.params || null
+    params: definition?.params || null,
+    parentId: mode.parentId || null
   };
 });
 
+const MODE_GROUP_METADATA = MODE_GROUPS.map(group => {
+  const childModeIds = Array.isArray(group.childModeIds) ? [...group.childModeIds] : [];
+  const childStatuses = childModeIds.reduce((acc, childId) => {
+    const child = MODES.find(mode => mode.id === childId);
+    if (child){
+      acc.add(child.status);
+    }
+    return acc;
+  }, new Set());
+  let status = MODE_STATUS.PLANNED;
+  if (childStatuses.has(MODE_STATUS.AVAILABLE)){
+    status = MODE_STATUS.AVAILABLE;
+  } else if (childStatuses.has(MODE_STATUS.COMING_SOON)){
+    status = MODE_STATUS.COMING_SOON;
+  } else if (childStatuses.size > 0){
+    status = Array.from(childStatuses)[0];
+  }
+  return {
+    key: group.id,
+    id: SCREEN_MAIN_MENU,
+    title: group.title,
+    description: group.shortDescription,
+    icon: group.icon,
+    tags: Array.isArray(group.tags) ? [...group.tags] : [],
+    status,
+    params: null,
+    parentId: null,
+    isGroup: true,
+    childModeIds
+  };
+});
+
+const CARD_METADATA = [...MODE_METADATA, ...MODE_GROUP_METADATA];
+
 const MENU_SECTIONS = getMenuSections({
   includeStatuses: [MODE_STATUS.AVAILABLE, MODE_STATUS.COMING_SOON]
-}).map(section => ({
-  title: section.title,
-  modeKeys: section.modeIds
-}));
+});
 
 let activeModal = null;
 let shellInstance = null;
@@ -175,14 +207,20 @@ function renderMainMenuScreen(){
     mainMenuView = null;
   }
   const sections = MENU_SECTIONS.map(section => ({
+    id: section.id,
     title: section.title,
-    modeKeys: Array.isArray(section.modeKeys) ? [...section.modeKeys] : []
+    entries: (section.entries || []).map(entry => ({
+      id: entry.id,
+      type: entry.type,
+      cardId: entry.cardId,
+      childModeIds: Array.isArray(entry.childModeIds) ? [...entry.childModeIds] : []
+    }))
   }));
   mainMenuView = renderMainMenuView({
     root: rootElement,
     shell: shellInstance,
     sections,
-    metadata: MODE_METADATA,
+    metadata: CARD_METADATA,
     playerGender: bootstrapOptions.playerGender || 'neutral',
     onShowComingSoon: mode => {
       const def = mode?.key ? MODE_DEFINITIONS[mode.key] : null;
