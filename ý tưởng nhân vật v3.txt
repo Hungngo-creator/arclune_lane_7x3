@@ -38,10 +38,10 @@ Trong đó WIL_eff được tính bằng công thức stat_eff (gom Σflat/Σ% t
 
 # Cập nhật AE mỗi lượt
 AE_{t+1} = clamp( AE_t - cost_skill + ΔAE_instant + (AEregen_turn + Σflat) * (1 + Σ%) )
-Trong đó ΔAE_instant gom mọi hiệu ứng cộng/trừ AE xảy ra tức thời ngay sau khi trừ cost (ví dụ "+20 AE ngay", "-10 AE khi bị đánh").
+Trong đó ΔAE_instant gom mọi hiệu ứng cộng/trừ AE xảy ra tức thời ngay sau khi trừ cost (ví dụ "+20 AE ngay", "-10 AE khi bị đánh")  và KHÔNG bị nhân với bất kỳ Σ% nào.
 Thứ tự áp dụng:
 1. Trừ cost_skill.
-2. Áp ΔAE_instant ngay lập tức (cộng/trừ vào AE_t - cost_skill). Các hiệu ứng instant nhiều nguồn thì cộng đại số trước.
+2. Áp ΔAE_instant ngay lập tức (cộng/trừ vào AE_t - cost_skill). Các hiệu ứng instant nhiều nguồn thì cộng đại số trước  và giữ nguyên giá trị gốc (không nhân Σ%).
 3. Gom phần hồi cố định cuối lượt (AEregen_turn + Σflat) – chưa nhân %.
 4. Nhân riêng phần hồi phục này với hệ số phần trăm: (AEregen_turn + Σflat) * (1 + Σ%).
 5. Cộng phần hồi đã nhân vào AE_t - cost_skill + ΔAE_instant.
@@ -51,16 +51,28 @@ Thứ tự áp dụng:
 | Loại hiệu ứng                | Mô tả                               | ΔAE_instant | Σflat | Σ%   | Biến khác |
 |-----------------------------|--------------------------------------|-------------|-------|------|-----------|
 | +20 AE ngay                 | Thêm 20 AE tức thời                 | += 20       | —     | —    | —         |
+| -10 AE khi bị đánh          | Trừ AE tức thời từ debuff kẻ địch   | -= 10       | —     | —    | —         |
 | +40 AE cuối turn            | Hồi 40 AE ở bước Σflat cuối lượt    | —           | += 40 | —    | —         |
 | +15% AE regen 2 turn        | Buff +15% lên tổng phần hồi (AEregen_turn + Σflat) trong 2 lượt | — | — | += 0.15 | — |
 | +10% WIL 1 turn             | Buff % WIL → tăng WIL_eff trong AEregen_turn | — | —     | —    | Σ%_WIL += 0.10 |
 | +30% AEmax 1 turn           | Tăng trần AE tạm thời               | —           | —     | —    | Σ%_AEmax += 0.30 |
-| -10 AE khi bị đánh          | Trừ AE tức thời từ debuff kẻ địch   | -= 10       | —     | —    | —         |
 | -20% AE regen 1 turn        | Debuff -20% chỉ tác động lên phần hồi (AEregen_turn + Σflat) ở lượt kế | — | — | -= 0.20 | — |
 
 Ghi chú: dấu "—" nghĩa là hiệu ứng không tác động lên biến tương ứng.
 
+Các dòng cộng/trừ AE tức thời luôn ghi vào ΔAE_instant và không chịu ảnh hưởng của Σ%; các hiệu ứng hồi cuối lượt tích lũy vào Σflat rồi mới nhân (1 + Σ%).
+
 Ví dụ trình tự lượt: Ranger có AE_t = 50, dùng skill tốn cost_skill = 30, đang chịu debuff "-10 AE khi bị đánh" (ΔAE_instant -= 10) và được buff "Hồi 40 AE cuối turn" (Σflat += 40) cùng "+20% AE regen" (Σ% += 0.20). Sau khi trừ cost còn 20 AE, áp ΔAE_instant → 10 AE. Phần hồi cố định cuối lượt = AEregen_turn (giả sử 18) + Σflat (40) = 58, nhân buff phần trăm → 58 * 1.20 = 69.6. AE cuối lượt = clamp(10 + 69.6) = clamp(79.6).
+
+Ví dụ trình tự mới (bước chi tiết): Summoner hạng UR có AE_t = 90 và AEregen_turn = 32.
+• Bước 1 – Trừ cost: dùng kỹ năng tốn cost_skill = 45 ⇒ AE tạm thời = 45.
+• Bước 2 – Gom ΔAE_instant: cùng lượt đó nhận buff đồng minh "Nạp 25 AE ngay" và ăn debuff kẻ địch "-15 AE tức thì" ⇒ ΔAE_instant = +25 - 15 = +10 (không nhân Σ%). AE sau bước này = 45 + 10 = 55.
+• Bước 3 – Gom Σflat: unit vẫn còn hiệu ứng "Hồi 20 AE cuối lượt" và "Hồi thêm 8 AE từ pet" ⇒ Σflat = +28.
+• Bước 4 – Nhân phần trăm: đang chịu debuff "-30% AE regen" ⇒ Σ% = -0.30. Phần hồi cuối lượt = (AEregen_turn + Σflat) * (1 + Σ%) = (32 + 28) * 0.70 = 42.0.
+• Bước 5 – Cộng hồi cuối lượt: AE = 55 + 42.0 = 97.0.
+• Bước 6 – Clamp theo trần: AEmax_final hiện tại là 110 nên AE_{t+1} = clamp(97.0) = 97 (sau khi làm tròn theo luật engine nếu cần).
+
+Ví dụ này thể hiện rõ thứ tự mới: ΔAE_instant áp ngay sau cost và không bị Σ% tác động, còn hồi cuối lượt gom vào Σflat rồi mới nhân phần trăm.
 
 Ví dụ: Ranger hạng SSR, TP[WIL] = 24 nên WIL_base = (16 + 24) * 1.30 = 52. Đang không đầu tư TP vào AEregen (TP[AEregen] = 0) nên AEregen_base = 7.0 * 1.30 = 9.1. Nhận buff +12 WIL cố định và +20% WIL (Σflat_WIL = +12, Σ%_WIL = +0.20) ⇒ WIL_eff = (52 + 12) * 1.20 = 76.8. Với regen_wil_coef của Ranger = 0.45, AEregen_turn = 9.1 + 76.8 * 0.45 = 43.66 (~43.7). Giả sử AE_t = 60, cost_skill = 25, đang chịu debuff "-10 AE khi bị đánh" (ΔAE_instant -= 10), buff thêm +5 AE cố định cuối lượt (Σflat = +5) và +20% regen (Σ% = +0.20). Sau cost và debuff còn 25 AE; phần hồi = (43.66 + 5) * 1.20 ≈ 58.39. AE_{t+1} = clamp(25 + 58.39) ≈ clamp(83.39), sau đó làm tròn theo quy tắc engine nếu cần.
 
