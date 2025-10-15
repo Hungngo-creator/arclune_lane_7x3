@@ -9,21 +9,24 @@
     :root{
       --bg:#0d1216; --panel:#121a22; --chip:#0f1820; --ink:#e6f2ff;
       --ally:#1e2b36; --enemy:#2a1c22; --mid:#1c222a; --line:#24303c;
-   --brand:#2f495c; --ok:#4caf50; --warn:#ffe066;
+      --brand:#2f495c; --ok:#4caf50; --warn:#ffe066;
       /* MÀU COST (mới) */
-      --cost-fill:#7dd3fc;   /* màu phần đã nạp (sáng hơn) */
-      --cost-rest:#34526b;   /* màu phần còn lại (đỡ tối) */
-     --chip-bg:#0f1e2b;     /* nền chip tròn sáng hơn một chút */
-     --chip-glow:rgba(125,211,252,.45);
-     --card-bg:#10263a;        /* Card (ô cost) sáng hơn */
-    --card-bg-on:#163b52;     /* Card (ô cost) khi đủ cost */
-     --card-border:#355a80;
-  --card-border-on:#67add8;    /* viền khi đủ cost */
-  --card-cost:#eaf7ff;         /* màu số thường */
-  --card-cost-on:#ffffff;      /* màu số khi đủ cost (sáng) */
-  --card-cost-dim:#b9cde1;     /* số khi disable */
-   --card-disabled-opacity:.5;
+            --cost-fill:#7dd3fc;
+      --cost-rest:#34526b;
+      --chip-bg:#0f1e2b;
+      --chip-glow:rgba(125,211,252,.45);
+      --card-bg:#10263a;
+      --card-bg-on:#163b52;
+      --card-border:#355a80;
+      --card-border-on:#67add8;
+      --card-cost:#eaf7ff;
+      --card-cost-on:#ffffff;
+      --card-cost-dim:#b9cde1;
+      --card-disabled-opacity:.5;
     }
+        *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,Segoe UI,Roboto,Helvetica,Arial;min-height:100vh;}
+    #appRoot{min-height:100vh;padding:32px 16px 64px;}
     .chip{
       background:var(--chip);
       border:1px solid var(--line);
@@ -39,175 +42,63 @@
       -webkit-user-select:none;
     }
     .chip b{font-weight:700}
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,Segoe UI,Roboto,Helvetica,Arial}
-    #top{display:flex;gap:16px;flex-wrap:wrap;padding:16px 16px 8px}
+
+.main-menu{max-width:640px;margin:0 auto;padding:32px 24px 64px;text-align:center;background:rgba(15,24,32,.35);border:1px solid rgba(46,64,86,.45);border-radius:20px;box-shadow:0 18px 48px rgba(0,0,0,.35);}
+    .main-menu__title{margin:0 0 8px;font-size:36px;letter-spacing:.08em;text-transform:uppercase;}
+    .main-menu__subtitle{margin:0 0 32px;color:#b7c9d9;font-size:18px;}
+    .main-menu__sections{display:grid;gap:32px;}
+    .main-menu__section-title{margin:0 0 16px;text-transform:uppercase;letter-spacing:.12em;color:#7da0c7;font-size:14px;}
+    .main-menu__grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));}
+    .main-menu__button{padding:18px 16px;border-radius:16px;border:1px solid rgba(94,134,174,.32);background:rgba(18,28,38,.72);color:inherit;font-size:16px;font-weight:600;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;background-image:linear-gradient(145deg,rgba(52,82,107,.65),rgba(18,28,38,.1));}
+    .main-menu__button:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(17,25,35,.45);border-color:rgba(125,211,252,.38);}
+    .main-menu__button:focus{outline:2px solid rgba(125,211,252,.65);outline-offset:2px;}
+    .main-menu__button[data-coming-soon="true"]{border-style:dashed;border-color:rgba(125,211,252,.28);opacity:.82;}
+    .main-menu__button small{display:block;margin-top:6px;font-size:13px;color:#96b4d4;font-weight:500;}
+
+    .app-loading{max-width:520px;margin:120px auto;text-align:center;color:#b7c9d9;font-size:18px;line-height:1.6;}
+
+    .app--pve{padding:16px 0 56px;}
+    .pve-screen{max-width:1200px;margin:0 auto;padding:0 16px;}
+    .pve-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px;}
+    .pve-toolbar__title{margin:0;font-size:24px;letter-spacing:.04em;text-transform:uppercase;}
+    .pve-toolbar__actions{display:flex;gap:12px;}
+    .pve-toolbar__button{padding:10px 16px;border-radius:12px;border:1px solid rgba(125,211,252,.28);background:rgba(15,24,32,.72);color:inherit;font-weight:600;cursor:pointer;transition:background .18s ease,transform .18s ease;}
+    .pve-toolbar__button:hover{transform:translateY(-1px);background:rgba(20,30,40,.9);}
+
+.app--pve #boardWrap{background:var(--panel);border-top:1px solid #0b1218;border-bottom:1px solid #0b1218;border-radius:12px;margin:0 0 12px;padding:16px;}
+    .app--pve canvas{display:block;width:100%;height:auto;}
+    .app--pve #board{width:92vw;height:auto;max-width:1200px;}
+    .app--pve #bottomHUD{width:100%;display:flex;align-items:center;justify-content:center;gap:16px;margin-top:8px;position:relative;}
+    .app--pve #cards{display:grid;grid-template-columns:repeat(4,var(--cell,72px));gap:12px;place-content:center;margin:12px auto 0;}
+    .app--pve #cards .card{width:var(--cell,72px);aspect-ratio:1/1;border-radius:12px;background:var(--card-bg);border:1px solid var(--card-border);position:relative;box-shadow:0 0 0 2px rgba(255,255,255,.06) inset;}
+    .app--pve #cards .card.active{outline:2px solid #57ffa0;outline-offset:-2px;}
+    .app--pve #cards .card .cost{position:absolute;right:8px;bottom:6px;font-weight:800;font-size:15px;color:var(--card-cost);text-shadow:0 0 6px rgba(125,211,252,.28);}
+    .app--pve #cards .card.disabled,
+    .app--pve #cards .card:disabled{opacity:var(--card-disabled-opacity)!important;filter:none;}
+    .app--pve #cards .card.disabled .cost,
+    .app--pve #cards .card:disabled .cost{color:inherit;text-shadow:none;}
+    .app--pve #cards .card:not(.disabled):not(:disabled){background:var(--card-bg-on);border-color:var(--card-border-on);box-shadow:0 0 0 2px rgba(125,211,252,.10) inset,0 4px 18px rgba(125,211,252,.12);}
+    .app--pve #cards .card:not(.disabled):not(:disabled) .cost{color:var(--card-cost-on);text-shadow:0 0 10px rgba(125,211,252,.45);}
+    .app--pve #cards .card.active:not(.disabled):not(:disabled){outline:2px solid #57ffa0;outline-offset:-2px;box-shadow:0 0 0 2px rgba(87,255,160,.25),0 6px 22px rgba(87,255,160,.22),0 0 0 2px rgba(125,211,252,.12) inset;}
+    .app--pve .hud-bottom{width:100%;display:flex;align-items:center;justify-content:center;gap:16px;margin-top:8px;position:relative;}
+    .app--pve .chip-timer{min-width:108px;padding:10px 14px;border-radius:14px;background:#0e1620;box-shadow:inset 0 0 0 1px #1e293b;text-align:center;}
+    .app--pve .chip-cost{position:absolute;right:16px;bottom:0;width:48px;height:48px;border-radius:9999px;background:var(--chip-bg);box-shadow:inset 0 0 0 1px #284055;}
+    .app--pve #costNow{position:absolute;inset:0;display:grid;place-items:center;font-size:16px;font-weight:700;}
+    .app--pve #costRing{position:absolute;inset:-2px;border-radius:50%;background:radial-gradient(closest-side,var(--chip-bg) 72%,transparent 73% 100%),conic-gradient(var(--cost-fill) var(--deg,0deg),var(--cost-rest) 0);}
+    .app--pve .chip-cost.full{box-shadow:inset 0 0 0 2px var(--cost-fill),0 0 14px var(--chip-glow);filter:brightness(1.12);}
     
-.costSlot{
-  position:relative;
-  width:var(--cell); height:var(--cell);
-  background:#111a22; border:2px solid #1b2732; border-radius:12px;
-  display:flex; align-items:center; justify-content:center;
-  overflow:hidden;
-}
-.costSlot .cost{
-  position:absolute; bottom:4px; right:6px;
-  font-size:14px; font-weight:700;
-  background:rgba(0,0,0,.5); padding:2px 6px; border-radius:6px;
-}
-.costSlot.active{ outline:2px solid var(--ok); }
-.costSlot.disabled{ opacity:.45; }
-
-/* (đã bỏ HUD cũ: #costBar/#costFill) */
-    #boardWrap{background:var(--panel);border-top:1px solid #0b1218;border-bottom:1px solid #0b1218;border-radius:12px;margin:0 16px;padding:16px}
-    canvas{display:block;width:100%;height:auto}
-    #hint{padding:12px 20px 6px}
-    
-      /* === Cost bar kiểu ô (mới) === */
-#cards{
-  display: grid;
-  grid-template-columns: repeat(4, var(--cell,72px));
-  gap: 12px;
-  place-content: center;
-  margin: 12px auto 0;
-}
-
-#cards .card{
-  width: var(--cell,72px);
-  aspect-ratio: 1 / 1;          /* vuông đúng như ô sân */
-  border-radius: 12px;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  position: relative;
-  box-shadow: 0 0 0 2px rgba(255,255,255,.06) inset;
-}
-
-#cards .card.active{
-  outline: 2px solid #57ffa0;   /* khi đang chọn */
-  outline-offset: -2px;
-}
-
-#cards .card .cost{
-  position: absolute;
-  right: 8px;
-  bottom: 6px;
-  font-weight: 800;
-  font-size: 15px;
-color: var(--card-cost);
- text-shadow: 0 0 6px rgba(125,211,252,.28);
- }
-
-/* Styling thống nhất khi KHÔNG đủ cost (có attr disabled hoặc class .disabled) */
-#cards .card.disabled,
-#cards .card:disabled{
-  opacity: var(--card-disabled-opacity) !important;
-  filter: none;
-}
-#cards .card.disabled .cost,
-#cards .card:disabled .cost{
-  color: inherit;       /* số mờ đồng bộ theo opacity của card */
-  text-shadow: none;
-}
-/* ĐỦ cost (không disabled) → sáng rõ */
-#cards .card:not(.disabled):not(:disabled){
-  background: var(--card-bg-on);
- border-color: var(--card-border-on);
-  box-shadow:
-    0 0 0 2px rgba(125,211,252,.10) inset,
-    0 4px 18px rgba(125,211,252,.12);
-}
-#cards .card:not(.disabled):not(:disabled) .cost{
-  color: var(--card-cost-on);
-  text-shadow: 0 0 10px rgba(125,211,252,.45);
-}
-
-/* Đang chọn + đủ cost → nổi bật hơn 1 nấc */
-#cards .card.active:not(.disabled):not(:disabled){
-  outline: 2px solid #57ffa0;
-  outline-offset: -2px;
-  box-shadow:
-    0 0 0 2px rgba(87,255,160,.25),
-    0 6px 22px rgba(87,255,160,.22),
-   0 0 0 2px rgba(125,211,252,.12) inset;
-}
-
-/* Bottom HUD layout */
-.hud-bottom{
-  width:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;      /* timer nằm giữa */
-  gap:16px;
-  margin-top:8px;
-  position:relative;
-}
-
-/* Timer chip – nằm giữa hàng dưới */
-.chip-timer{
-  min-width:108px;
-  padding:10px 14px;
-  border-radius:14px;
-  background:#0e1620;
-  box-shadow: inset 0 0 0 1px #1e293b;
-  text-align:center;
-  }
-
-/* Cost chip – tròn, có vòng ring tiến trình n/30 */
-.chip-cost{
-  position:absolute;
-  right:16px;     /* sát bên phải dưới canvas */
-  bottom:0;
-  width:48px; height:48px;
-  border-radius:9999px;
-  background:var(--chip-bg);
-  box-shadow: inset 0 0 0 1px #284055;
- }
-#costNow{
-  position:absolute; inset:0;
-  display:grid; place-items:center;
-  font-size:16px; font-weight:700;
-}
-#costRing{
-  position:absolute; inset:-2px;
-  border-radius:50%;
-  /* Vòng tròn mảnh xung quanh: lớp 1 tạo “lỗ” ở giữa, lớp 2 là tiến trình */
-  background:
-    radial-gradient(closest-side, var(--chip-bg) 72%, transparent 73% 100%),
-    conic-gradient(var(--cost-fill) var(--deg,0deg), var(--cost-rest) 0);
-}
-/* Max cap = 30 thì sáng hơn một chút */
-.chip-cost.full{
- box-shadow: inset 0 0 0 2px var(--cost-fill), 0 0 14px var(--chip-glow);
-  filter: brightness(1.12);
-}
-
+    .app-modal{position:fixed;inset:0;background:rgba(4,10,16,.78);display:grid;place-items:center;padding:24px;z-index:1000;}
+    .app-modal__dialog{background:rgba(12,18,24,.95);border:1px solid #2a3a4a;border-radius:16px;padding:32px;max-width:420px;width:100%;text-align:center;box-shadow:0 28px 64px rgba(3,6,10,.65);}
+    .app-modal__title{margin:0 0 12px;font-size:24px;color:#ffe066;letter-spacing:.08em;text-transform:uppercase;}
+    .app-modal__body{margin:0;color:#c6d8eb;line-height:1.6;}
+    .app-modal__actions{margin-top:28px;}
+    .app-modal__button{padding:10px 18px;border-radius:12px;border:1px solid rgba(125,211,252,.45);background:rgba(16,28,40,.9);color:inherit;font-weight:600;cursor:pointer;}
+    .app-modal__button:hover{background:rgba(24,36,48,.95);}
   </style>
 </head>
 <body>
-
-<style>
-  /* Giữ kích thước canvas; không override layout #cards của HUD mới */
- #board { width: 92vw; height: auto; max-width: 1200px; }
-</style>
-
-<div id="boardWrap">
-  <canvas id="board"></canvas>
-</div>
-
-<!-- Bottom HUD (mới) – đặt NGOÀI canvas -->
-<div id="bottomHUD" class="hud-bottom">
-  <!-- Timer ở giữa -->
-  <div id="timer" class="chip chip-timer">04:00</div>
-
-  <!-- Ô cost tròn bên phải – chỉ số, không “/30” -->
-  <div id="costChip" class="chip chip-cost">
-    <div id="costRing"></div>
-    <div id="costNow">0</div>
-  </div>
-</div>
-
-  <div id="cards"></div>
-  <script>
+<div id="appRoot" class="app-shell"></div>
+<script>
     (function(){
       const baseStyles = {
         maxWidth: '640px',
@@ -240,6 +131,6 @@ color: var(--card-cost);
       };
     })();
   </script>
-<script src="./dist/app.js" defer onerror="window.arcluneShowFatal && window.arcluneShowFatal(event?.message || 'Không thể tải gói Arclune.');"></script>
+  <script src="./dist/app.js" defer onerror="window.arcluneShowFatal && window.arcluneShowFatal(event?.message || 'Không thể tải gói Arclune.');"></script>
 </body>
 </html>
