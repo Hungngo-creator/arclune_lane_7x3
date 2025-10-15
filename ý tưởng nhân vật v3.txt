@@ -23,13 +23,15 @@ regen_wil_coef xác định mức độ mỗi class chuyển WIL thành hồi ae
 AEregen_turn = AEregen_base + WIL_eff * regen_wil_coef[class]
 Trong đó WIL_eff được tính bằng công thức stat_eff (gom Σflat/Σ% trên WIL rồi mới clamp), nên mọi buff/debuff WIL đều phản ánh trực tiếp vào AE regen.
 
-| Class archetype | regen_wil_coef | Ghi chú |
-|-----------------|----------------|---------|
-| Guardian        | 0.30           | Tanker chú trọng trụ vững, hồi AE ở mức vừa. |
-| Warrior         | 0.35           | Hybrid cân bằng sát thương – kỹ năng. |
-| Duelist         | 0.40           | Cần AE ổn định để giữ chuỗi kỹ năng. |
-| Ranger          | 0.45           | Chi phí kỹ năng cao, phụ thuộc WIL để duy trì. |
-| Mage            | 0.55           | Hồi AE mạnh nhất vì đòn phép dùng AE liên tục. |
+| Class    | regen_wil_coef | Ghi chú |
+|----------|----------------|---------|
+| Tanker   | 0.30           | Tập trung phòng thủ, hồi AE ở mức vừa. |
+| Warrior  | 0.35           | Hybrid cân bằng sát thương – kỹ năng. |
+| Assassin | 0.40           | Cần AE ổn định để duy trì chuỗi burst. |
+| Ranger   | 0.45           | Chi phí kỹ năng cao, phụ thuộc WIL để duy trì. |
+| Support  | 0.50           | Phải luân phiên buff/heal nên cần regen mạnh. |
+| Summoner | 0.52           | Dùng AE cho triệu hồi/quân phụ, cần nguồn regen cao. |
+| Mage     | 0.55           | Hồi AE mạnh nhất vì đòn phép dùng AE liên tục. |
 
 # Cập nhật AE mỗi lượt
 AE_{t+1} = clamp( AE_t - cost_skill + (AEregen_turn + Σflat) * (1 + Σ%) )
