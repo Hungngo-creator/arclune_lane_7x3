@@ -5,7 +5,9 @@ TP[stat]                  # phân bổ điểm đặc trưng của từng char
 
 # Quy đổi 1 TP → stat
 Δ_HP=+20, Δ_ATK=+1, Δ_WIL=+1, Δ_ARM=+0.01, Δ_RES=+0.01,
-Δ_AGI=+1, Δ_PER=+1, Δ_AEmax=+10, Δ_AEregen=+0.05
+Δ_AGI=+1, Δ_PER=+1, Δ_AEmax=+10, Δ_AEregen=+0.05,
+Δ_HPregen=+2  (chuẩn regen/turn)
+# TP có thể dồn cho HPregen để tăng hồi máu nền (mỗi TP = +2 regen trước khi nhân theo rank).
 
 # Final stats
 Final[S≠SPD] = ( CLASS_BASE[class][S] + TP[S] * Δ_S ) * RANK_MULT[rank]
