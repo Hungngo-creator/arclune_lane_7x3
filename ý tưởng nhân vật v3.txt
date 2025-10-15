@@ -46,6 +46,28 @@ Thứ tự áp dụng:
 | -10 AE khi bị đánh          | Trừ AE tức thời từ debuff kẻ địch   | Σflat -= 10   |
 | -20% AE regen 1 turn        | Giảm phần trăm hồi AE lượt kế tiếp  | Σ% -= 0.20    |
 
+# HP Regeneration & Healing
+HPregen_base = ( CLASS_BASE[class].HPregen + TP[HPregen] * Δ_HPregen ) * RANK_MULT[rank]
+HPregen_turn = ( HPregen_base + Σflat ) * ( 1 + Σ% )
+# Σflat và Σ% gom toàn bộ buff/debuff theo lượt (VD: buff regen 50 HP cố định → Σflat += 50; buff +20% regen → Σ% += 0.20).
+
+• Regen theo hành động (action-based): mỗi hiệu ứng ghi rõ trigger và giá trị, ví dụ "hồi 1% max HP sau khi thực thi turn" → actionRegen = targetMaxHP * 0.01. Tổng regen lượt = actionRegen (tích lũy trong lượt) + HPregen_turn ở cuối lượt; chúng không nhân lẫn nhau, chỉ cộng đại số rồi clamp theo HP/giáp máu.
+
+• Heal trực tiếp (instant heal):
+  heal_raw = targetMaxHP * % + ATK/WIL * coef + bonus_flat
+  heal_final = applyHealCaps( heal_raw )
+  Khi vượt HP tối đa, overflow → overshield/giáp máu theo luật kỹ năng. Ví dụ Ult "Phệ": nếu heal_final vượt HP tối đa 1200 của caster, phần dư chuyển thành Giáp Máu (overshield) tối đa = 30% targetMaxHP; các bảng mô tả cần nêu rõ tỉ lệ overflow này.
+
+• Ghi chú: regen cuối lượt vẫn trigger dù unit đã đầy máu (thêm overshield nếu kỹ năng cho phép). Action-based regen chỉ cộng sau khi action kết thúc; nếu unit bị hạ trước cuối lượt sẽ không nhận phần HPregen_turn.
+
+| Loại hiệu ứng       | Diễn giải trong skill text                    | Công thức/biến sử dụng             |
+|---------------------|-----------------------------------------------|------------------------------------|
+| Regen mỗi lượt      | "Hồi 80 HP mỗi cuối lượt"                    | HPregen_turn với Σflat/Σ%          |
+| Regen theo hành động| "Hồi 1% max HP sau khi hành động"            | actionRegen (cộng trước clamp)     |
+| Leech % damage      | "Hồi 20% sát thương gây ra"                  | heal_raw += damageDealt * leech%   |
+| Instant heal        | "Hồi 25% max HP + 50% WIL"                   | công thức heal trực tiếp (ở trên)  |
+| Overshield riêng    | "Tạo giáp máu = 15% heal dư"                 | overflow → overshield (skill rule) |
+
 # 1) Cơ sở mỗi hit (basic/skill)
 N = 0.50        # WIL 50%
 X = 0.50        # ATK 50%
