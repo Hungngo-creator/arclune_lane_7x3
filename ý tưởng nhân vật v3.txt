@@ -6,7 +6,7 @@ TP[stat]                  # phân bổ điểm đặc trưng của từng char
 # Quy đổi 1 TP → stat
 Δ_HP=+20, Δ_ATK=+1, Δ_WIL=+1, Δ_ARM=+0.01, Δ_RES=+0.01,
 Δ_AGI=+1, Δ_PER=+1, Δ_AEmax=+10, Δ_AEregen=+0.5,
-Δ_HPregen=+2  (chuẩn regen/turn)
+Δ_HPregen=+2  (chuẩn regen/turn; Δ_AEregen tính theo AE/turn trước khi nhân rank)
 # TP có thể dồn cho HPregen để tăng hồi máu nền (mỗi TP = +2 regen trước khi nhân theo rank).
 
 # Final stats
@@ -17,7 +17,9 @@ Final[SPD]   =   CLASS_BASE[class][SPD]              # SPD không nhân RANK_MUL
 AEmax_base    = ( CLASS_BASE[class].AEmax   + TP[AEmax]   * Δ_AEmax )   * RANK_MULT[rank]
 AEmax_final   = clamp( ( AEmax_base + Σflat_AEmax ) * ( 1 + Σ%_AEmax ), AE_floor=0, AE_cap )
 AEregen_base  = ( CLASS_BASE[class].AEregen + TP[AEregen] * Δ_AEregen ) * RANK_MULT[rank]
-# AEregen dùng chung thang đo với ví dụ (chính xác tới 0.1): CLASS_BASE đã nhân ×10 so với phiên bản cũ.
+# AEregen dùng chung thang đo với ví dụ (đơn vị AE/turn, chính xác tới 0.1): CLASS_BASE đã nhân ×10 so với phiên bản cũ.
+# Đối chiếu: CLASS_BASE.Ranger.AEregen = 7.0 AE/turn (theo catalog.js & "các lưu ý về chỉ số, bậc, class v0.3.txt").
+# Sau khi nhân hệ số rank, ví dụ Ranger hạng SSR (1.30) có AEregen_base = 7.0 × 1.30 = 9.1 AE/turn.
 # Nhắc lại: SPD không nhân hệ số RANK_MULT như các chỉ số khác; chỉ lấy trực tiếp từ CLASS_BASE.
 # Σflat_AEmax và Σ%_AEmax gom mọi buff/debuff tác động lên trần AE; AE_cap do nhóm cân bằng ấn định (vd 150% AEmax_base) để tránh vượt trần quá mức.
 
@@ -62,7 +64,11 @@ Ghi chú: dấu "—" nghĩa là hiệu ứng không tác động lên biến t�
 
 Các dòng cộng/trừ AE tức thời luôn ghi vào ΔAE_instant và không chịu ảnh hưởng của Σ%; các hiệu ứng hồi cuối lượt tích lũy vào Σflat rồi mới nhân (1 + Σ%).
 
-Ví dụ trình tự lượt: Ranger có AE_t = 50, dùng skill tốn cost_skill = 30, đang chịu debuff "-10 AE khi bị đánh" (ΔAE_instant -= 10) và được buff "Hồi 40 AE cuối turn" (Σflat += 40) cùng "+20% AE regen" (Σ% += 0.20). Sau khi trừ cost còn 20 AE, áp ΔAE_instant → 10 AE. Phần hồi cố định cuối lượt = AEregen_turn (giả sử 18) + Σflat (40) = 58, nhân buff phần trăm → 58 * 1.20 = 69.6. AE cuối lượt = clamp(10 + 69.6) = clamp(79.6).
+Ví dụ trình tự lượt: Ranger hạng SSR (RANK_MULT = 1.30) có AE_t = 50, TP[AEregen] = 0 nên AEregen_base = 7.0 × 1.30 = 9.1 AE/turn.
+Giả sử unit đang bị debuff WIL khiến WIL_eff chỉ còn 20 ⇒ AEregen_turn = 9.1 + 20 × 0.45 ≈ 18.1 (làm tròn → 18 AE/turn).
+Dùng skill tốn cost_skill = 30, chịu debuff "-10 AE khi bị đánh" (ΔAE_instant -= 10) và được buff "Hồi 40 AE cuối turn" (Σflat += 40)
+cùng "+20% AE regen" (Σ% += 0.20). Sau khi trừ cost còn 20 AE, áp ΔAE_instant → 10 AE. Phần hồi cố định cuối lượt = AEregen_turn (18)
++ Σflat (40) = 58, nhân buff phần trăm → 58 × 1.20 = 69.6. AE cuối lượt = clamp(10 + 69.6) = clamp(79.6).
 
 Ví dụ trình tự mới (bước chi tiết): Summoner hạng UR có AE_t = 90 và AEregen_turn = 32.
 • Bước 1 – Trừ cost: dùng kỹ năng tốn cost_skill = 45 ⇒ AE tạm thời = 45.
