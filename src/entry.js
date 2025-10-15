@@ -1,5 +1,6 @@
 import { createAppShell } from './app/shell.js';
 import { renderMainMenuView } from './screens/main-menu/view.js';
+import { MODES, MODE_STATUS, getMenuSections } from './data/modes.js';
 
 const SUCCESS_EVENT = 'arclune:loaded';
 const SCREEN_MAIN_MENU = 'main-menu';
@@ -12,94 +13,52 @@ function loadBundledModule(id){
   return import(id);
 }
 
-const RAW_MODE_CONFIG = [
-  {
-    key: 'campaign',
-    screenId: SCREEN_PVE,
-    title: 'Chiến Dịch',
-    description: 'Cốt Truyện .',
-        type: 'pve',
-    icon: '🛡️',
-    tags: ['PvE'],
-    loader: () => loadBundledModule('./modes/pve/session.js'),
-    params: { modeKey: 'campaign' }
-  },
-  {
-    key: 'challenge',
-    screenId: SCREEN_PVE,
-    title: 'Thử Thách',
-    description: 'Các kịch bản đặc biệt để thử nghiệm đội hình.',
-    type: 'pve',
-    icon: '⚙️',
-    tags: ['PvE'],
-    loader: () => loadBundledModule('./modes/pve/session.js'),
-    params: { modeKey: 'challenge' }
-  },
-  {
-    key: 'arena',
-    screenId: SCREEN_PVE,
-    title: 'Đấu Trường',
-    description: 'PvE nhịp độ cao với quân đoàn bất tận.',
-    type: 'pve',
-    icon: '🏟️',
-    tags: ['PvE'],
-    loader: () => loadBundledModule('./modes/pve/session.js'),
-    params: { modeKey: 'arena' }
-  },
- {
-    key: 'ares',
-    screenId: SCREEN_MAIN_MENU,
-    title: 'Ares',
-    description: 'PvP theo thời gian thực – đang phát triển.',
-    type: 'coming-soon',
-    icon: '⚔️',
-    tags: ['PvP', 'Coming soon'],
-    loader: () => loadBundledModule('./modes/coming-soon.stub.js'),
-    params: null
-  },
- {
-    key: 'tongmon',
-    screenId: SCREEN_MAIN_MENU,
-    title: 'Tông Môn',
-    description: 'Xây dựng môn phái & quản lý tài nguyên – sắp ra mắt.',
-    type: 'coming-soon',
-    icon: '🏯',
-    tags: ['Kinh tế nguyên tinh', 'Coming soon'],
-    loader: () => loadBundledModule('./modes/coming-soon.stub.js'),
-    params: null
-  }
-];
+const MODE_DEFINITIONS = MODES.reduce((acc, mode) => {
+  const shell = mode.shell || {};
+  const screenId = shell.screenId || SCREEN_MAIN_MENU;
+  const moduleId = mode.status === MODE_STATUS.AVAILABLE && shell.moduleId
+    ? shell.moduleId
+    : (shell.fallbackModuleId || './modes/coming-soon.stub.js');
+  const params = mode.status === MODE_STATUS.AVAILABLE && shell.defaultParams
+    ? { ...shell.defaultParams }
+    : null;
 
-const MODE_DEFINITIONS = RAW_MODE_CONFIG.reduce((acc, mode) => {
-  acc[mode.key] = {
-    key: mode.key,
+acc[mode.id] = {
+    key: mode.id,
     label: mode.title,
     type: mode.type,
-    description: mode.description,
-    loader: mode.loader,
-    screenId: mode.screenId,
+    description: mode.shortDescription,
+    loader: () => loadBundledModule(moduleId),
+    screenId,
     icon: mode.icon,
     tags: Array.isArray(mode.tags) ? [...mode.tags] : [],
-    status: mode.type === 'coming-soon' ? 'coming-soon' : 'available'
+    status: mode.status,
+    unlockNotes: mode.unlockNotes || '',
+    params
   };
   return acc;
 }, {});
 
-const MODE_METADATA = RAW_MODE_CONFIG.map(mode => ({
-  key: mode.key,
-  id: mode.screenId,
-  title: mode.title,
-  description: mode.description,
-  icon: mode.icon,
-  tags: Array.isArray(mode.tags) ? [...mode.tags] : [],
-  status: mode.type === 'coming-soon' ? 'coming-soon' : 'available',
-  params: mode.params ? { ...mode.params } : (mode.type === 'pve' ? { modeKey: mode.key } : null)
-}));
+const MODE_METADATA = MODES.map(mode => {
+  const definition = MODE_DEFINITIONS[mode.id];
+  return {
+    key: mode.id,
+    id: definition?.screenId || SCREEN_MAIN_MENU,
+    title: mode.title,
+    description: mode.shortDescription,
+    icon: mode.icon,
+    tags: Array.isArray(mode.tags) ? [...mode.tags] : [],
+    status: mode.status,
+    params: definition?.params || null
+  };
+});
 
-const MENU_SECTIONS = [
-  { title: 'PvE', modeKeys: ['campaign', 'challenge', 'arena'] },
-  { title: 'Khám phá', modeKeys: ['ares', 'tongmon'] }
-];
+const MENU_SECTIONS = getMenuSections({
+  includeStatuses: [MODE_STATUS.AVAILABLE, MODE_STATUS.COMING_SOON]
+}).map(section => ({
+  title: section.title,
+  modeKeys: section.modeIds
+}));
 
 let activeModal = null;
 let shellInstance = null;
