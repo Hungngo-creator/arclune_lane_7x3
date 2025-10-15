@@ -199,10 +199,10 @@ const exportDefaultNamedFunctionRegex = /export\s+default\s+function\s+([A-Za-z0
     .filter((item, index, arr) => index === arr.findIndex((it) => it.alias === item.alias))
     .map(({ alias, expr }) => `exports.${alias} = ${expr};`);
     
-    if (exportsAssignments.some((item) => item.alias === 'default')){
-    footerLines.push('module.exports = exports.default;');
-  }
-
+if (exportsAssignments.some((item) => item.alias === 'default')){
+    footerLines.push('module.exports.default = exports.default;');
+}
+  
   const transformed = footerLines.length
     ? `${code}\n${footerLines.join('\n')}`
     : code;
