@@ -657,6 +657,81 @@ function init(){
   scheduleDraw();
   Game._inited = true;
 
+  refillDeck();
+  refillDeckEnemy(Game);
+
+  Game.ui.bar = startSummonBar(doc, {
+    onPick: (c)=>{
+      Game.selectedId = c.id;
+      Game.ui.bar.render();
+    },
+    canAfford: (c)=> Game.cost >= c.cost,
+    getDeck: ()=> Game.deck3,
+    getSelectedId: ()=> Game.selectedId
+  });
+
+  selectFirstAffordable();
+  Game.ui.bar.render();
+
+  if (canvasClickHandler){
+    canvas.removeEventListener('click', canvasClickHandler);
+    canvasClickHandler = null;
+  }
+  canvasClickHandler = (ev)=>{
+    const rect = canvas.getBoundingClientRect();
+    const p = { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
+    const cell = hitToCellOblique(Game.grid, p.x, p.y, CAM_PRESET);
+    if (!cell) return;
+
+    if (cell.cx >= CFG.ALLY_COLS) return;
+
+    const card = Game.deck3.find(u => u.id === Game.selectedId);
+    if (!card) return;
+
+    if (cellReserved(tokensAlive(), Game.queued, cell.cx, cell.cy)) return;
+    if (Game.cost < card.cost) return;
+    if (Game.summoned >= Game.summonLimit) return;
+
+    const slot = slotIndex('ally', cell.cx, cell.cy);
+    if (Game.queued.ally.has(slot)) return;
+
+    const spawnCycle =
+      (Game.turn.phase === 'ally' && slot > (Game.turn.last.ally || 0))
+        ? Game.turn.cycle
+        : Game.turn.cycle + 1;
+    const pendingArt = getUnitArt(card.id);
+    const pending = {
+      unitId: card.id, name: card.name, side:'ally',
+      cx: cell.cx, cy: cell.cy, slot, spawnCycle,
+      color: pendingArt?.palette?.primary || '#a9f58c',
+      art: pendingArt,
+      skinKey: pendingArt?.skinKey
+    };
+    Game.queued.ally.set(slot, pending);
+
+    Game.cost = Math.max(0, Game.cost - card.cost);
+    hud.update(Game);
+    Game.summoned += 1;
+    Game.usedUnitIds.add(card.id);
+
+    Game.deck3 = Game.deck3.filter(u => u.id !== card.id);
+    Game.selectedId = null;
+    refillDeck();
+    selectFirstAffordable();
+    Game.ui.bar.render();
+    scheduleDraw();
+  };
+  canvas.addEventListener('click', canvasClickHandler);
+
+  if (resizeHandler && winRef && typeof winRef.removeEventListener === 'function'){
+    winRef.removeEventListener('resize', resizeHandler);
+    resizeHandler = null;
+  }
+  resizeHandler = ()=>{ resize(); scheduleDraw(); };
+  if (winRef && typeof winRef.addEventListener === 'function'){
+    winRef.addEventListener('resize', resizeHandler);
+  }
+
   const updateTimerAndCost = ()=>{
     if (!CLOCK) return;
     const now = performance.now();
@@ -709,89 +784,23 @@ function init(){
   }
   tickIntervalId = setInterval(updateTimerAndCost, 250);
 
-  function selectFirstAffordable(){
-// 4) Deck-3 lần đầu
-  refillDeck();
-  selectFirstAffordable();
-// 4b) Enemy deck lần đầu
-refillDeckEnemy(Game);
-  // 5) Summon bar (B2): đưa vào Game.ui.bar
-  Game.ui.bar = startSummonBar(doc, {
-    onPick: (c)=>{
-      Game.selectedId = c.id;
-      Game.ui.bar.render();
-    },
-    canAfford: (c)=> Game.cost >= c.cost,
-    getDeck: ()=> Game.deck3,
-    getSelectedId: ()=> Game.selectedId
-  });
-  Game.ui.bar.render();
+function selectFirstAffordable(){
+  if (!Game) return;
 
-  // 6) Click canvas để summon
-  if (canvasClickHandler){
-    canvas.removeEventListener('click', canvasClickHandler);
-    canvasClickHandler = null;
-  }
-  canvasClickHandler = (ev)=>{
-    const rect = canvas.getBoundingClientRect();
-    const p = { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
-    const cell = hitToCellOblique(Game.grid, p.x, p.y, CAM_PRESET);
-    if (!cell) return;
-
-    // chỉ 3 cột trái
-    if (cell.cx >= CFG.ALLY_COLS) return;
-
-    // phải có thẻ được chọn
-    const card = Game.deck3.find(u => u.id === Game.selectedId);
-    if (!card) return;
-
-// ô trống (active) + đủ cost + còn lượt
-  // chặn cả ô đã có unit ACTIVE hoặc đang QUEUED (Chờ Lượt)
- if (cellReserved(tokensAlive(), Game.queued, cell.cx, cell.cy)) return;
-    if (Game.cost < card.cost) return;
-    if (Game.summoned >= Game.summonLimit) return;
-    
-    const slot = slotIndex('ally', cell.cx, cell.cy);
-   // Nếu slot này đã có pending thì bỏ (tránh đặt chồng)
-   if (Game.queued.ally.has(slot)) return;
-
-const spawnCycle =
-  (Game.turn.phase === 'ally' && slot > (Game.turn.last.ally || 0))
-    ? Game.turn.cycle
-    : Game.turn.cycle + 1; 
-    const pendingArt = getUnitArt(card.id);
-   const pending = {
-    unitId: card.id, name: card.name, side:'ally',
-     cx: cell.cx, cy: cell.cy, slot, spawnCycle,
-     color: pendingArt?.palette?.primary || '#a9f58c',
-     art: pendingArt,
-     skinKey: pendingArt?.skinKey
-   };
-   Game.queued.ally.set(slot, pending);
-
-Game.cost = Math.max(0, Game.cost - card.cost);
-   hud.update(Game);                 // cập nhật HUD ngay, không đợi tick
-     Game.summoned += 1;
-     Game.usedUnitIds.add(card.id);
-
-    // Bỏ thẻ khỏi deck và bổ sung thẻ mới
-    Game.deck3 = Game.deck3.filter(u => u.id !== card.id);
+  const deck = Array.isArray(Game.deck3) ? Game.deck3 : [];
+  if (!deck.length){
     Game.selectedId = null;
-    refillDeck();
-    selectFirstAffordable();
-    Game.ui.bar.render();
-    scheduleDraw();
-  };
-  canvas.addEventListener('click', canvasClickHandler);
+    return;
+  }
 
-  if (resizeHandler && winRef && typeof winRef.removeEventListener === 'function'){
-    winRef.removeEventListener('resize', resizeHandler);
-    resizeHandler = null;
-  }
-  resizeHandler = ()=>{ resize(); scheduleDraw(); };
-  if (winRef && typeof winRef.addEventListener === 'function'){
-    winRef.addEventListener('resize', resizeHandler);
-  }
+  const affordable = deck.find(card => {
+    if (!card) return false;
+    if (!Number.isFinite(card.cost)) return true;
+    return card.cost <= Game.cost;
+  });
+
+  const chosen = affordable || deck[0] || null;
+  Game.selectedId = chosen ? chosen.id : null;
 }
 
 /* ---------- Deck logic ---------- */
