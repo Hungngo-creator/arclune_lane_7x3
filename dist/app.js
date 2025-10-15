@@ -1746,6 +1746,18 @@ __define('./data/modes.js', (exports, module, __require) => {
     { id: 'economy', title: 'Kinh tế & Hạ tầng' }
   ];
 
+  const MODE_GROUPS = [
+    {
+      id: 'arena-hub',
+      title: 'Đấu Trường',
+      shortDescription: 'Lựa chọn giữa đấu trường PvE và PvP, cả hai đều xoay quanh mùa giải 7 ngày với bảng xếp hạng phần thưởng.',
+      icon: '🏟️',
+      tags: ['PvE', 'PvP'],
+      menuSections: ['core-pve', 'competitive'],
+      childModeIds: ['arena', 'beast-arena']
+    }
+  ];
+  
   const MODES = [
     {
       id: 'campaign',
@@ -1789,6 +1801,7 @@ __define('./data/modes.js', (exports, module, __require) => {
       unlockNotes: 'Yêu cầu chuẩn bị deck xếp sẵn; tham chiến theo mùa 7 ngày để nhận thưởng và leo bảng.',
       tags: ['PvE'],
       menuSections: ['core-pve', 'competitive'],
+      parentId: 'arena-hub',
       shell: {
         screenId: 'pve-session',
         moduleId: './modes/pve/session.js',
@@ -1910,6 +1923,7 @@ __define('./data/modes.js', (exports, module, __require) => {
       unlockNotes: 'Yêu cầu sở hữu sủng thú và tham gia mùa giải để leo hạng, nhận thưởng ở mọi bậc và phần thưởng đặc biệt cho top.',
       tags: ['PvP', 'Coming soon'],
       menuSections: ['competitive'],
+      parentId: 'arena-hub',
       shell: {
         screenId: 'main-menu',
         fallbackModuleId: './modes/coming-soon.stub.js'
@@ -1952,17 +1966,58 @@ __define('./data/modes.js', (exports, module, __require) => {
 
   function getMenuSections(options = {}){
     const { includeStatuses } = options;
+    const includeSet = Array.isArray(includeStatuses) && includeStatuses.length > 0
+      ? new Set(includeStatuses)
+      : null;
+
+    const filterChildModeIds = (childIds = []) => {
+      return childIds.filter(childId => {
+        const mode = MODE_INDEX[childId];
+        if (!mode) return false;
+        if (includeSet && !includeSet.has(mode.status)) return false;
+        return true;
+      });
+    };
+    
     return MENU_SECTION_DEFINITIONS.map(section => {
-      const modes = listModesForSection(section.id, { includeStatuses });
+      const entries = [];
+
+      MODE_GROUPS.forEach(group => {
+        if (!group.menuSections || !group.menuSections.includes(section.id)) return;
+        const childModeIds = filterChildModeIds(group.childModeIds);
+        if (childModeIds.length === 0) return;
+        entries.push({
+          id: group.id,
+          type: 'group',
+          cardId: group.id,
+          childModeIds
+        });
+      });
+
+      const standaloneModes = listModesForSection(section.id, { includeStatuses })
+        .filter(mode => !mode.parentId);
+
+      standaloneModes.forEach(mode => {
+        entries.push({
+          id: mode.id,
+          type: 'mode',
+          cardId: mode.id,
+          childModeIds: [mode.id]
+        });
+      });
+
+      if (entries.length === 0) return null;
+      
       return {
         id: section.id,
         title: section.title,
-        modeIds: modes.map(mode => mode.id)
+        entries
       };
-    }).filter(section => section.modeIds.length > 0);
+    }).filter(Boolean);
   }
 
   exports.MODES = MODES;
+  exports.MODE_GROUPS = MODE_GROUPS;
   exports.MODE_TYPES = MODE_TYPES;
   exports.MODE_STATUS = MODE_STATUS;
   exports.MENU_SECTION_DEFINITIONS = MENU_SECTION_DEFINITIONS;
@@ -2577,8 +2632,9 @@ __define('./entry.js', (exports, module, __require) => {
   const createAppShell = __dep0.createAppShell;
   const __dep1 = __require('./screens/main-menu/view.js');
   const renderMainMenuView = __dep1.renderMainMenuView;
-    const __dep2 = __require('./data/modes.js');
+  const __dep2 = __require('./data/modes.js');
   const MODES = __dep2.MODES;
+  const MODE_GROUPS = __dep2.MODE_GROUPS;
   const MODE_STATUS = __dep2.MODE_STATUS;
   const getMenuSections = __dep2.getMenuSections;
 
@@ -2619,7 +2675,7 @@ __define('./entry.js', (exports, module, __require) => {
     return acc;
   }, {});
 
-const MODE_METADATA = MODES.map(mode => {
+  const MODE_METADATA = MODES.map(mode => {
     const definition = MODE_DEFINITIONS[mode.id];
     return {
       key: mode.id,
@@ -2629,16 +2685,48 @@ const MODE_METADATA = MODES.map(mode => {
       icon: mode.icon,
       tags: Array.isArray(mode.tags) ? [...mode.tags] : [],
       status: mode.status,
-      params: definition?.params || null
+            params: definition?.params || null,
+      parentId: mode.parentId || null
     };
   });
 
+  const MODE_GROUP_METADATA = MODE_GROUPS.map(group => {
+    const childModeIds = Array.isArray(group.childModeIds) ? [...group.childModeIds] : [];
+    const childStatuses = childModeIds.reduce((acc, childId) => {
+      const child = MODES.find(mode => mode.id === childId);
+      if (child){
+        acc.add(child.status);
+      }
+      return acc;
+    }, new Set());
+    let status = MODE_STATUS.PLANNED;
+    if (childStatuses.has(MODE_STATUS.AVAILABLE)){
+      status = MODE_STATUS.AVAILABLE;
+    } else if (childStatuses.has(MODE_STATUS.COMING_SOON)){
+      status = MODE_STATUS.COMING_SOON;
+    } else if (childStatuses.size > 0){
+      status = Array.from(childStatuses)[0];
+    }
+    return {
+      key: group.id,
+      id: SCREEN_MAIN_MENU,
+      title: group.title,
+      description: group.shortDescription,
+      icon: group.icon,
+      tags: Array.isArray(group.tags) ? [...group.tags] : [],
+      status,
+      params: null,
+      parentId: null,
+      isGroup: true,
+      childModeIds
+    };
+  });
+
+  const CARD_METADATA = [...MODE_METADATA, ...MODE_GROUP_METADATA];
+  
   const MENU_SECTIONS = getMenuSections({
     includeStatuses: [MODE_STATUS.AVAILABLE, MODE_STATUS.COMING_SOON]
-  }).map(section => ({
-    title: section.title,
-    modeKeys: section.modeIds
-  }));
+  });
 
   let activeModal = null;
   let shellInstance = null;
@@ -2755,14 +2843,20 @@ const MODE_METADATA = MODES.map(mode => {
       mainMenuView = null;
     }
     const sections = MENU_SECTIONS.map(section => ({
+      id: section.id,
       title: section.title,
-      modeKeys: Array.isArray(section.modeKeys) ? [...section.modeKeys] : []
+      entries: (section.entries || []).map(entry => ({
+        id: entry.id,
+        type: entry.type,
+        cardId: entry.cardId,
+        childModeIds: Array.isArray(entry.childModeIds) ? [...entry.childModeIds] : []
+      }))
     }));
     mainMenuView = renderMainMenuView({
       root: rootElement,
       shell: shellInstance,
       sections,
-      metadata: MODE_METADATA,
+      metadata: CARD_METADATA,
       playerGender: bootstrapOptions.playerGender || 'neutral',
       onShowComingSoon: mode => {
         const def = mode?.key ? MODE_DEFINITIONS[mode.key] : null;
@@ -5252,6 +5346,24 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
       .mode-tag--economy{color:#ffd9a1;border-color:rgba(255,195,128,.35);background:rgba(36,24,12,.82);}
       .mode-card__status{position:absolute;top:18px;right:18px;padding:6px 12px;border-radius:999px;border:1px solid rgba(255,224,102,.42);background:rgba(36,26,12,.78);color:#ffe066;font-size:11px;letter-spacing:.16em;text-transform:uppercase;}
       .mode-card--coming{border-style:dashed;opacity:.88;}
+      .mode-card--group{position:relative;cursor:pointer;z-index:1;}
+      .mode-card--group:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:4px;}
+      .mode-card--group.is-open{z-index:5;}
+      .mode-card__group-caret{position:absolute;top:22px;right:20px;font-size:14px;opacity:.65;transition:transform .2s ease,opacity .2s ease;}
+      .mode-card--group:hover .mode-card__group-caret{opacity:.9;}
+      .mode-card--group.is-open .mode-card__group-caret{transform:rotate(180deg);}
+      .mode-card__group-popover{position:absolute;left:0;right:0;top:calc(100% + 12px);display:none;flex-direction:column;gap:12px;padding:16px;border-radius:18px;border:1px solid rgba(125,211,252,.32);background:rgba(12,20,30,.95);box-shadow:0 28px 52px rgba(6,12,20,.6);z-index:10;}
+      .mode-card--group.is-open .mode-card__group-popover{display:flex;}
+      .mode-card__child{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:14px;border:1px solid rgba(125,211,252,.18);background:rgba(12,22,32,.9);color:inherit;cursor:pointer;text-align:left;transition:border-color .2s ease,background .2s ease,transform .2s ease;}
+      .mode-card__child:hover{border-color:rgba(125,211,252,.42);background:rgba(16,30,44,.95);transform:translateY(-2px);}
+      .mode-card__child:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:3px;}
+      .mode-card__child-icon{font-size:20px;line-height:1;}
+      .mode-card__child-body{display:flex;flex-direction:column;gap:4px;align-items:flex-start;}
+      .mode-card__child-title{font-size:13px;letter-spacing:.12em;text-transform:uppercase;}
+      .mode-card__child-status{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#7da0c7;}
+      .mode-card__child-desc{font-size:12px;color:#9cbcd9;line-height:1.4;}
+      .mode-card__child--coming{opacity:.9;}
+      .mode-card__child--coming .mode-card__child-status{color:#ffe066;}
       .main-menu-sidebar{display:flex;flex-direction:column;gap:16px;}
       .sidebar-slot{position:relative;padding:20px 22px;border-radius:18px;border:1px solid rgba(125,211,252,.18);background:rgba(12,20,28,.82);overflow:hidden;display:flex;flex-direction:column;gap:8px;min-height:104px;}
       .sidebar-slot::after{content:'';position:absolute;inset:auto -40% -60% 50%;transform:translateX(-50%);width:140%;height:120%;background:radial-gradient(circle,rgba(125,211,252,.18),transparent 70%);opacity:.4;pointer-events:none;}
@@ -5274,32 +5386,28 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
     if (palette.outline) element.style.setProperty('--hero-outline', palette.outline);
   }
 
-  function createModeCard(mode, shell, onShowComingSoon, addCleanup){
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'mode-card';
-    button.dataset.mode = mode.key;
-    if (mode.status === 'coming-soon'){
-      button.classList.add('mode-card--coming');
-      button.setAttribute('aria-describedby', `${mode.key}-status`);
-      button.setAttribute('aria-disabled', 'true');
-    }
+  function buildModeCardBase(element, mode, options = {}){
+    if (!element || !mode) return null;
+    const { extraClasses = [], showStatus = true } = options;
+    element.classList.add('mode-card');
+    extraClasses.forEach(cls => element.classList.add(cls));
+    element.dataset.mode = mode.key;
 
     const icon = document.createElement('span');
     icon.className = 'mode-card__icon';
     icon.textContent = mode.icon || '◆';
-    button.appendChild(icon);
+    element.appendChild(icon);
 
     const title = document.createElement('h3');
     title.className = 'mode-card__title';
     title.textContent = mode.title || mode.label || mode.key;
-    button.appendChild(title);
+    element.appendChild(title);
 
     if (mode.description){
       const desc = document.createElement('p');
       desc.className = 'mode-card__desc';
       desc.textContent = mode.description;
-      button.appendChild(desc);
+      element.appendChild(desc);
     }
 
     const tags = document.createElement('div');
@@ -5313,20 +5421,42 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
       tags.appendChild(chip);
     });
     if (tags.childElementCount > 0){
-      button.appendChild(tags);
+      element.appendChild(tags);
     }
 
-    if (mode.status === 'coming-soon'){
-      const status = document.createElement('span');
-      status.id = `${mode.key}-status`;
-      status.className = 'mode-card__status';
-      status.textContent = 'Coming soon';
-      button.appendChild(status);
+    let statusEl = null;
+    if (showStatus && mode.status === 'coming-soon'){
+      element.classList.add('mode-card--coming');
+      element.setAttribute('aria-describedby', `${mode.key}-status`);
+      element.setAttribute('aria-disabled', 'true');
+      statusEl = document.createElement('span');
+      statusEl.id = `${mode.key}-status`;
+      statusEl.className = 'mode-card__status';
+      statusEl.textContent = 'Coming soon';
+      element.appendChild(statusEl);
     }
 
+  return { statusEl };
+  }
+
+  function createModeCard(mode, shell, onShowComingSoon, addCleanup, options = {}){
+    const button = document.createElement('button');
+    button.type = 'button';
+    const extraClasses = Array.isArray(options.extraClasses)
+      ? options.extraClasses
+      : (options.extraClass ? [options.extraClass] : []);
+    buildModeCardBase(button, mode, {
+      extraClasses,
+      showStatus: options.showStatus !== false
+    });
+    
     const handleClick = event => {
       event.preventDefault();
       event.stopPropagation();
+      if (typeof options.onPrimaryAction === 'function'){
+        options.onPrimaryAction({ mode, event, element: button });
+        return;
+      }
       if (!shell || typeof shell.enterScreen !== 'function') return;
       if (mode.status === 'coming-soon'){
         if (typeof onShowComingSoon === 'function'){
@@ -5339,7 +5469,173 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
     };
     button.addEventListener('click', handleClick);
     addCleanup(() => button.removeEventListener('click', handleClick));
+    if (typeof options.afterCreate === 'function'){
+      options.afterCreate(button);
+    }
+
     return button;
+  }
+
+  function createModeGroupCard(group, childModes, shell, onShowComingSoon, addCleanup){
+    const wrapper = document.createElement('div');
+    buildModeCardBase(wrapper, group, { extraClasses: ['mode-card--group'], showStatus: false });
+    wrapper.setAttribute('role', 'button');
+    wrapper.setAttribute('aria-haspopup', 'true');
+    wrapper.setAttribute('aria-expanded', 'false');
+    if (group.title){
+      wrapper.setAttribute('aria-label', `Chọn chế độ trong ${group.title}`);
+    }
+    wrapper.tabIndex = 0;
+
+    const caret = document.createElement('span');
+    caret.className = 'mode-card__group-caret';
+    caret.setAttribute('aria-hidden', 'true');
+    caret.textContent = '▾';
+    wrapper.appendChild(caret);
+
+    const popover = document.createElement('div');
+    popover.className = 'mode-card__group-popover';
+    popover.setAttribute('role', 'menu');
+    wrapper.appendChild(popover);
+
+    let isOpen = false;
+    let documentListenerActive = false;
+
+    const handleDocumentClick = event => {
+      if (!wrapper.contains(event.target)){
+        close();
+      }
+    };
+
+    const bindOutsideClick = () => {
+      if (documentListenerActive) return;
+      document.addEventListener('click', handleDocumentClick);
+      documentListenerActive = true;
+    };
+
+    const unbindOutsideClick = () => {
+      if (!documentListenerActive) return;
+      document.removeEventListener('click', handleDocumentClick);
+      documentListenerActive = false;
+    };
+
+    const open = () => {
+      if (isOpen) return;
+      isOpen = true;
+      wrapper.classList.add('is-open');
+      wrapper.setAttribute('aria-expanded', 'true');
+      setTimeout(bindOutsideClick, 0);
+    };
+
+    const close = () => {
+      if (!isOpen) return;
+      isOpen = false;
+      wrapper.classList.remove('is-open');
+      wrapper.setAttribute('aria-expanded', 'false');
+      unbindOutsideClick();
+    };
+
+    const toggle = () => {
+      if (isOpen){
+        close();
+      } else {
+        open();
+      }
+    };
+
+    const handleToggle = event => {
+      event.preventDefault();
+      event.stopPropagation();
+      toggle();
+    };
+
+    const handleKeydown = event => {
+      if (event.key === 'Enter' || event.key === ' '){
+        event.preventDefault();
+        toggle();
+        return;
+      }
+      if (event.key === 'Escape' && isOpen){
+        event.preventDefault();
+        close();
+        wrapper.focus({ preventScroll: true });
+      }
+    };
+
+    const handleFocusOut = event => {
+      if (!isOpen) return;
+      if (!wrapper.contains(event.relatedTarget)){
+        close();
+      }
+    };
+
+    wrapper.addEventListener('click', handleToggle);
+    wrapper.addEventListener('keydown', handleKeydown);
+    wrapper.addEventListener('focusout', handleFocusOut);
+
+    addCleanup(() => {
+      wrapper.removeEventListener('click', handleToggle);
+      wrapper.removeEventListener('keydown', handleKeydown);
+      wrapper.removeEventListener('focusout', handleFocusOut);
+      unbindOutsideClick();
+    });
+
+    childModes.forEach(child => {
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'mode-card__child';
+      item.dataset.mode = child.key;
+      item.setAttribute('role', 'menuitem');
+      if (child.status === 'coming-soon'){
+        item.classList.add('mode-card__child--coming');
+      }
+
+      const icon = document.createElement('span');
+      icon.className = 'mode-card__child-icon';
+      icon.textContent = child.icon || '◆';
+      item.appendChild(icon);
+
+      const body = document.createElement('span');
+      body.className = 'mode-card__child-body';
+
+      const title = document.createElement('span');
+      title.className = 'mode-card__child-title';
+      title.textContent = child.title || child.label || child.key;
+      body.appendChild(title);
+
+      const status = document.createElement('span');
+      status.className = 'mode-card__child-status';
+      status.textContent = child.status === 'coming-soon' ? 'Coming soon' : 'Sẵn sàng';
+      body.appendChild(status);
+
+      if (child.description){
+        const desc = document.createElement('span');
+        desc.className = 'mode-card__child-desc';
+        desc.textContent = child.description;
+        body.appendChild(desc);
+      }
+
+      item.appendChild(body);
+
+      const handleSelect = event => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!shell || typeof shell.enterScreen !== 'function') return;
+        if (child.status === 'coming-soon' && typeof onShowComingSoon === 'function'){
+          onShowComingSoon(child);
+        }
+        shell.enterScreen(child.id || 'main-menu', child.params || null);
+        close();
+        wrapper.focus({ preventScroll: true });
+      };
+
+      item.addEventListener('click', handleSelect);
+      addCleanup(() => item.removeEventListener('click', handleSelect));
+
+      popover.appendChild(item);
+    });
+
+    return wrapper;
   }
 
   function createModesSection(options){
@@ -5357,27 +5653,40 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
       metaByKey.set(mode.key, mode);
     });
 
-    sections.forEach(group => {
-      const groupEl = document.createElement('div');
-      groupEl.className = 'mode-section';
+    sections.forEach(section => {
+      const sectionGroup = document.createElement('div');
+      sectionGroup.className = 'mode-section';
 
       const heading = document.createElement('h3');
       heading.className = 'mode-section__name';
-      heading.textContent = group.title || 'Danh mục';
-      groupEl.appendChild(heading);
+      heading.textContent = section.title || 'Danh mục';
+      sectionGroup.appendChild(heading);
 
       const grid = document.createElement('div');
       grid.className = 'mode-grid';
 
-      (group.modeKeys || []).forEach(key => {
-        const mode = metaByKey.get(key);
-        if (!mode) return;
-        const card = createModeCard(mode, shell, onShowComingSoon, addCleanup);
+      (section.entries || []).forEach(entry => {
+        const cardKey = entry.cardId || entry.id;
+        if (!cardKey) return;
+        const cardMeta = metaByKey.get(cardKey);
+        if (!cardMeta) return;
+
+        if (entry.type === 'group'){
+          const childMetas = (entry.childModeIds || [])
+            .map(childId => metaByKey.get(childId))
+            .filter(Boolean);
+          if (childMetas.length === 0) return;
+          const groupCard = createModeGroupCard(cardMeta, childMetas, shell, onShowComingSoon, addCleanup);
+          grid.appendChild(groupCard);
+          return;
+        }
+
+        const card = createModeCard(cardMeta, shell, onShowComingSoon, addCleanup);
         grid.appendChild(card);
       });
 
-      groupEl.appendChild(grid);
-      sectionEl.appendChild(groupEl);
+      sectionGroup.appendChild(grid);
+      sectionEl.appendChild(sectionGroup);
     });
 
     return sectionEl;
