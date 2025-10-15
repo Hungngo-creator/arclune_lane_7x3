@@ -2344,7 +2344,7 @@ __define('./entry.js', (exports, module, __require) => {
   const RAW_MODE_CONFIG = [
     {
       key: 'campaign',
-            screenId: SCREEN_PVE,
+      screenId: SCREEN_PVE,
       title: 'Chiến Dịch',
       description: 'Cốt Truyện .',
           type: 'pve',
@@ -2353,7 +2353,7 @@ __define('./entry.js', (exports, module, __require) => {
       loader: () => loadBundledModule('./modes/pve/session.js'),
       params: { modeKey: 'campaign' }
     },
-   {
+    {
       key: 'challenge',
       screenId: SCREEN_PVE,
       title: 'Thử Thách',
@@ -2364,7 +2364,7 @@ __define('./entry.js', (exports, module, __require) => {
       loader: () => loadBundledModule('./modes/pve/session.js'),
       params: { modeKey: 'challenge' }
     },
-   {
+    {
       key: 'arena',
       screenId: SCREEN_PVE,
       title: 'Đấu Trường',
@@ -2386,7 +2386,7 @@ __define('./entry.js', (exports, module, __require) => {
       loader: () => loadBundledModule('./modes/coming-soon.stub.js'),
       params: null
     },
-  {
+   {
       key: 'tongmon',
       screenId: SCREEN_MAIN_MENU,
       title: 'Tông Môn',
@@ -2397,8 +2397,7 @@ __define('./entry.js', (exports, module, __require) => {
       loader: () => loadBundledModule('./modes/coming-soon.stub.js'),
       params: null
     }
-
-  ];
+];
 
   const MODE_DEFINITIONS = RAW_MODE_CONFIG.reduce((acc, mode) => {
     acc[mode.key] = {
@@ -2425,7 +2424,7 @@ __define('./entry.js', (exports, module, __require) => {
     status: mode.type === 'coming-soon' ? 'coming-soon' : 'available',
     params: mode.params ? { ...mode.params } : (mode.type === 'pve' ? { modeKey: mode.key } : null)
   }));
-  
+
   const MENU_SECTIONS = [
     { title: 'PvE', modeKeys: ['campaign', 'challenge', 'arena'] },
     { title: 'Khám phá', modeKeys: ['ares', 'tongmon'] }
@@ -2541,7 +2540,7 @@ __define('./entry.js', (exports, module, __require) => {
     dismissModal();
     rootElement.classList.remove('app--pve');
 
-if (mainMenuView && typeof mainMenuView.destroy === 'function'){
+   if (mainMenuView && typeof mainMenuView.destroy === 'function'){
       mainMenuView.destroy();
       mainMenuView = null;
     }
@@ -2702,7 +2701,7 @@ if (mainMenuView && typeof mainMenuView.destroy === 'function'){
       let lastParams = null;
 
       shellInstance.onChange(state => {
-        if (lastScreen !== SCREEN_MAIN_MENU || state.screenParams !== lastParams){
+        if (state.screen === SCREEN_MAIN_MENU && (lastScreen !== SCREEN_MAIN_MENU || state.screenParams !== lastParams)){
           if (lastScreen !== SCREEN_MAIN_MENU){
             lastScreen = SCREEN_MAIN_MENU;
             lastParams = state.screenParams;
@@ -2714,7 +2713,7 @@ if (mainMenuView && typeof mainMenuView.destroy === 'function'){
             mainMenuView.destroy();
             mainMenuView = null;
           }
-          if (lastScreen !== SCREEN_PVE || state.screenParams !== lastParams){
+          if (lastScreen !== SCREEN_PVE){
             lastScreen = SCREEN_PVE;
             lastParams = state.screenParams;
             mountPveScreen(state.screenParams || {}).catch(error => {
@@ -3014,7 +3013,7 @@ __define('./modes/coming-soon.stub.js', (exports, module, __require) => {
   const __defaultExport = {
     comingSoon
   };
-  
+
   exports.comingSoon = comingSoon;
   exports.describe = describe;
   exports.default = __defaultExport;
@@ -3860,7 +3859,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     const deck = Array.isArray(Game.deck3) ? Game.deck3 : [];
     if (!deck.length){
       Game.selectedId = null;
-     return;
+      return;
     }
 
     const affordable = deck.find(card => {
@@ -3869,7 +3868,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
       return card.cost <= Game.cost;
     });
 
-   const chosen = affordable || deck[0] || null;
+    const chosen = affordable || deck[0] || null;
     Game.selectedId = chosen ? chosen.id : null;
   }
 
@@ -4996,7 +4995,7 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
       .hero-section{display:flex;flex-direction:column;gap:16px;}
       .hero-panel{position:relative;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);border-radius:26px;overflow:hidden;border:1px solid rgba(125,211,252,.32);background:linear-gradient(135deg,var(--hero-secondary,rgba(20,32,44,.92)),rgba(12,20,28,.75));box-shadow:0 32px 68px rgba(3,8,16,.55);min-height:340px;transition:box-shadow .3s ease,border-color .3s ease;}
       .hero-panel::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 18% 24%,rgba(255,255,255,.18),transparent 58%);opacity:.6;pointer-events:none;}
-            .hero-panel__info{position:relative;z-index:2;padding:32px;display:flex;flex-direction:column;gap:18px;background:linear-gradient(180deg,rgba(12,18,24,.85),rgba(12,18,24,.35));}
+      .hero-panel__info{position:relative;z-index:2;padding:32px;display:flex;flex-direction:column;gap:18px;background:linear-gradient(180deg,rgba(12,18,24,.85),rgba(12,18,24,.35));}
       .hero-panel__identity{display:flex;flex-direction:column;gap:6px;}
       .hero-panel__role{margin:0;font-size:13px;text-transform:uppercase;letter-spacing:.16em;color:rgba(174,228,255,.68);}
       .hero-panel__name{margin:0;font-size:26px;letter-spacing:.06em;}
@@ -5466,7 +5465,6 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
   exports.default = renderMainMenuView;
   module.exports.default = exports.default;
 });
-
 __define('./statuses.js', (exports, module, __require) => {
   // statuses.js — Hệ trạng thái/effect data-driven v0.7
   const byId = (u) => (u && u.statuses) || (u.statuses = []);
