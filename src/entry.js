@@ -372,7 +372,7 @@ async function mountPveScreen(params){
     let lastParams = null;
 
     shellInstance.onChange(state => {
-      if (lastScreen !== SCREEN_MAIN_MENU || state.screenParams !== lastParams){
+      if (state.screen === SCREEN_MAIN_MENU && (lastScreen !== SCREEN_MAIN_MENU || state.screenParams !== lastParams)){
         if (lastScreen !== SCREEN_MAIN_MENU){
           lastScreen = SCREEN_MAIN_MENU;
           lastParams = state.screenParams;
@@ -380,11 +380,11 @@ async function mountPveScreen(params){
           renderMainMenuScreen();
         }
       } else if (state.screen === SCREEN_PVE){
-       if (mainMenuView && typeof mainMenuView.destroy === 'function'){
+        if (mainMenuView && typeof mainMenuView.destroy === 'function'){
           mainMenuView.destroy();
           mainMenuView = null;
         }
-        if (lastScreen !== SCREEN_PVE || state.screenParams !== lastParams){
+        if (lastScreen !== SCREEN_PVE){
           lastScreen = SCREEN_PVE;
           lastParams = state.screenParams;
           mountPveScreen(state.screenParams || {}).catch(error => {
