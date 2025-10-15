@@ -16,6 +16,18 @@ const MENU_SECTION_DEFINITIONS = [
   { id: 'economy', title: 'Kinh tế & Hạ tầng' }
 ];
 
+const MODE_GROUPS = [
+  {
+    id: 'arena-hub',
+    title: 'Đấu Trường',
+    shortDescription: 'Lựa chọn giữa đấu trường PvE và PvP, cả hai đều xoay quanh mùa giải 7 ngày với bảng xếp hạng phần thưởng.',
+    icon: '🏟️',
+    tags: ['PvE', 'PvP'],
+    menuSections: ['core-pve', 'competitive'],
+    childModeIds: ['arena', 'beast-arena']
+  }
+];
+
 const MODES = [
   {
     id: 'campaign',
@@ -59,6 +71,7 @@ const MODES = [
     unlockNotes: 'Yêu cầu chuẩn bị deck xếp sẵn; tham chiến theo mùa 7 ngày để nhận thưởng và leo bảng.',
     tags: ['PvE'],
     menuSections: ['core-pve', 'competitive'],
+    parentId: 'arena-hub',
     shell: {
       screenId: 'pve-session',
       moduleId: './modes/pve/session.js',
@@ -180,6 +193,7 @@ const MODES = [
     unlockNotes: 'Yêu cầu sở hữu sủng thú và tham gia mùa giải để leo hạng, nhận thưởng ở mọi bậc và phần thưởng đặc biệt cho top.',
     tags: ['PvP', 'Coming soon'],
     menuSections: ['competitive'],
+    parentId: 'arena-hub',
     shell: {
       screenId: 'main-menu',
       fallbackModuleId: './modes/coming-soon.stub.js'
@@ -222,18 +236,58 @@ function listModesForSection(sectionId, options = {}){
 
 function getMenuSections(options = {}){
   const { includeStatuses } = options;
+  const includeSet = Array.isArray(includeStatuses) && includeStatuses.length > 0
+    ? new Set(includeStatuses)
+    : null;
+
+  const filterChildModeIds = (childIds = []) => {
+    return childIds.filter(childId => {
+      const mode = MODE_INDEX[childId];
+      if (!mode) return false;
+      if (includeSet && !includeSet.has(mode.status)) return false;
+      return true;
+    });
+  };
   return MENU_SECTION_DEFINITIONS.map(section => {
-    const modes = listModesForSection(section.id, { includeStatuses });
+    const entries = [];
+
+    MODE_GROUPS.forEach(group => {
+      if (!group.menuSections || !group.menuSections.includes(section.id)) return;
+      const childModeIds = filterChildModeIds(group.childModeIds);
+      if (childModeIds.length === 0) return;
+      entries.push({
+        id: group.id,
+        type: 'group',
+        cardId: group.id,
+        childModeIds
+      });
+    });
+
+    const standaloneModes = listModesForSection(section.id, { includeStatuses })
+      .filter(mode => !mode.parentId);
+
+    standaloneModes.forEach(mode => {
+      entries.push({
+        id: mode.id,
+        type: 'mode',
+        cardId: mode.id,
+        childModeIds: [mode.id]
+      });
+    });
+
+    if (entries.length === 0) return null;
+    
     return {
       id: section.id,
       title: section.title,
-      modeIds: modes.map(mode => mode.id)
+      entries
     };
-  }).filter(section => section.modeIds.length > 0);
+   }).filter(Boolean);
 }
 
 export {
   MODES,
+  MODE_GROUPS,
   MODE_TYPES,
   MODE_STATUS,
   MENU_SECTION_DEFINITIONS,
