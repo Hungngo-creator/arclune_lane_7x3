@@ -783,6 +783,7 @@ function init(){
     tickIntervalId = null;
   }
   tickIntervalId = setInterval(updateTimerAndCost, 250);
+}
 
 function selectFirstAffordable(){
   if (!Game) return;
