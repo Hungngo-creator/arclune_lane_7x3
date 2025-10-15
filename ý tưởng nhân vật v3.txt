@@ -11,6 +11,41 @@ TP[stat]                  # phân bổ điểm đặc trưng của từng char
 Final[S≠SPD] = ( CLASS_BASE[class][S] + TP[S] * Δ_S ) * RANK_MULT[rank]
 Final[SPD]   =   CLASS_BASE[class][SPD]              # SPD không nhân RANK_MULT
 
+# Aether Resource
+AEmax_final   = ( CLASS_BASE[class].AEmax   + TP[AEmax]   * Δ_AEmax )   * RANK_MULT[rank]
+AEregen_base  = ( CLASS_BASE[class].AEregen + TP[AEregen] * Δ_AEregen ) * RANK_MULT[rank]
+# Nhắc lại: SPD không nhân hệ số RANK_MULT như các chỉ số khác; chỉ lấy trực tiếp từ CLASS_BASE.
+
+# Khí Aether hồi theo WIL
+regen_wil_coef xác định mức độ mỗi class chuyển WIL thành hồi aether theo lượt:
+AEregen_turn = AEregen_base + WIL_final * regen_wil_coef[class]
+
+| Class archetype | regen_wil_coef | Ghi chú |
+|-----------------|----------------|---------|
+| Guardian        | 0.30           | Tanker chú trọng trụ vững, hồi AE ở mức vừa. |
+| Warrior         | 0.35           | Hybrid cân bằng sát thương – kỹ năng. |
+| Duelist         | 0.40           | Cần AE ổn định để giữ chuỗi kỹ năng. |
+| Ranger          | 0.45           | Chi phí kỹ năng cao, phụ thuộc WIL để duy trì. |
+| Mage            | 0.55           | Hồi AE mạnh nhất vì đòn phép dùng AE liên tục. |
+
+# Cập nhật AE mỗi lượt
+AE_{t+1} = clamp( (AE_t - cost_skill + AEregen_turn + Σflat) * (1 + Σ%) )
+Thứ tự áp dụng:
+1. Trừ cost_skill.
+2. Cộng hiệu ứng hồi phục cố định (AEregen_turn + Σflat).
+3. Nhân toàn bộ với hệ số phần trăm (1 + Σ%).
+4. Sau cùng mới clamp theo 0 ≤ AE ≤ AEmax_final.
+
+# AE buff quick-reference
+| Loại hiệu ứng                | Mô tả                               | Biến cần điền |
+|-----------------------------|--------------------------------------|---------------|
+| +20 AE ngay                 | Thêm 20 AE tức thời                 | Σflat += 20   |
+| +40 AE cuối turn            | Hồi 40 AE ở bước Σflat cuối lượt    | Σflat += 40   |
+| +15% AE regen 2 turn        | Nhân +15% trên tổng hồi 2 lượt      | Σ% += 0.15    |
+| +30% AEmax 1 turn           | Tăng trần AE tạm thời               | AEmax_final *= 1.30 (tạm) |
+| -10 AE khi bị đánh          | Trừ AE tức thời từ debuff kẻ địch   | Σflat -= 10   |
+| -20% AE regen 1 turn        | Giảm phần trăm hồi AE lượt kế tiếp  | Σ% -= 0.20    |
+
 # 1) Cơ sở mỗi hit (basic/skill)
 N = 0.50        # WIL 50%
 X = 0.50        # ATK 50%
