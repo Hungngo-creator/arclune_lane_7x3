@@ -57,6 +57,29 @@ function createImportReplacement(specifiers, moduleVar){
 function transformModule(code, id){
   const exportsAssignments = [];
   const usedAliases = new Set();
+  const registerExport = (alias, expr) => {
+    const existingIndex = exportsAssignments.findIndex((item) => item.alias === alias);
+    if (existingIndex >= 0){
+      exportsAssignments[existingIndex] = { alias, expr };
+    } else {
+      usedAliases.add(alias);
+      exportsAssignments.push({ alias, expr });
+    }
+  };
+  const ensureDefaultExport = (expr) => {
+    registerExport('default', expr);
+  };
+  const generateDefaultLocal = () => {
+    const base = '__defaultExport';
+    let candidate = base;
+    let counter = 0;
+    const hasName = (name) => new RegExp(`\\b${name}\\b`).test(code);
+    while (hasName(candidate)){
+      candidate = `${base}${++counter}`;
+    }
+    return candidate;
+  };
+  let defaultLocalName = null;
   let depIndex = 0;
   const reExportRegex = /export\s*{([\s\S]*?)}\s*from\s*['\"](.+?)['\"];?/g;
   code = code.replace(reExportRegex, (match, spec, source) => {
@@ -122,9 +145,63 @@ function transformModule(code, id){
     return `function ${name}`;
   });
 
+const exportDefaultNamedFunctionRegex = /export\s+default\s+function\s+([A-Za-z0-9_$]+)/g;
+  code = code.replace(exportDefaultNamedFunctionRegex, (match, name) => {
+    ensureDefaultExport(name);
+    return `function ${name}`;
+  });
+
+  const exportDefaultAnonFunctionRegex = /export\s+default\s+function(\s*\()/g;
+  code = code.replace(exportDefaultAnonFunctionRegex, (match, afterParen) => {
+    if (!defaultLocalName){
+      defaultLocalName = generateDefaultLocal();
+    }
+    const local = defaultLocalName;
+    ensureDefaultExport(local);
+    return `function ${local}${afterParen}`;
+  });
+
+  const exportDefaultNamedClassRegex = /export\s+default\s+class\s+([A-Za-z0-9_$]+)/g;
+  code = code.replace(exportDefaultNamedClassRegex, (match, name) => {
+    ensureDefaultExport(name);
+    return `class ${name}`;
+  });
+
+  const exportDefaultAnonClassRegex = /export\s+default\s+class\b/g;
+  code = code.replace(exportDefaultAnonClassRegex, () => {
+    if (!defaultLocalName){
+      defaultLocalName = generateDefaultLocal();
+    }
+    const local = defaultLocalName;
+    ensureDefaultExport(local);
+    return `class ${local}`;
+  });
+
+  const exportDefaultRegex = /export\s+default\s+([\s\S]*?);/g;
+  code = code.replace(exportDefaultRegex, (match, expr) => {
+    const trimmed = expr.trim();
+    if (!trimmed){
+      return '';
+    }
+    if (/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(trimmed)){
+      ensureDefaultExport(trimmed);
+      return '';
+    }
+    if (!defaultLocalName){
+      defaultLocalName = generateDefaultLocal();
+    }
+    const local = defaultLocalName;
+    ensureDefaultExport(local);
+    return `const ${local} = ${trimmed};`;
+  });
+
   const footerLines = exportsAssignments
     .filter((item, index, arr) => index === arr.findIndex((it) => it.alias === item.alias))
     .map(({ alias, expr }) => `exports.${alias} = ${expr};`);
+    
+    if (exportsAssignments.some((item) => item.alias === 'default')){
+    footerLines.push('module.exports = exports.default;');
+  }
 
   const transformed = footerLines.length
     ? `${code}\n${footerLines.join('\n')}`
