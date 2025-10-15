@@ -103,8 +103,9 @@ RES_eff_prePen = stat_eff áp cho RES_base của target
 | +200 ATK cố định 2 turn                 | attacker.Σflat_ATK += 200      | Gom với stat_base trước nhân %. | Buff cố định +200 điểm ATK. |
 | -10% RES mục tiêu                       | target.Σ%_RES -= 0.10          | Ảnh hưởng RES_eff_prePen. | Hiển thị -10% RES → nội bộ dùng -0.10. |
 | -0.12 RES cố định mục tiêu              | target.Σflat_RES -= 0.12       | Áp trước clamp của stat_eff RES. | Buff cố định -0.12 RES ≈ -12% khi so với RES dạng thập phân. |
-| xuyên 30% RES từ ult                    | defPen_RES += 0.30             | Dùng ở bước xuyên sau stat_eff. | Hiển thị xuyên 30% RES → nội bộ dùng 0.30. |
-| Kiếm Trường Dạ bỏ qua 5% ARM/RES        | defPen_ARM += 0.05; defPen_RES += 0.05 | Chỉ áp sau khi có ARM_eff_prePen/RES_eff_prePen. | Hiển thị bỏ qua 5% giáp/kháng → nội bộ dùng 0.05. |
+| xuyên 30% RES từ ult                    | target.defPen_RES += 0.30       | Dùng ở bước xuyên sau stat_eff. | defPen_% cộng dồn rồi nhân (1 - ΣdefPen). |
+| Bỏ qua 30% ARM (không phải debuff trực tiếp) | target.ignore%_ARM += 0.30       | Áp ở bước xuyên, trừ trước khi nhân defPen. | Ignore% cộng dồn và clamp theo ARM_eff_prePen. |
+| Kiếm Trường Dạ bỏ qua 5% ARM/RES        | target.ignore%_ARM += 0.05; target.ignore%_RES += 0.05 | Chỉ áp sau khi có ARM_eff_prePen/RES_eff_prePen. | Là hiệu ứng bỏ qua → gom vào ignore thay vì defPen/stat_eff. |
 | +25% tổng sát thương gây ra             | ΣdealBonus += 0.25              | Chỉ dùng ở dealMul_final. | Hiển thị +25% tổng sát thương → nội bộ dùng 0.25. |
 | -15% tổng sát thương nhận vào (target)  | ΣrecvReduce += 0.15             | Áp ở recvMul_final (đã trừ khỏi 1). | Hiển thị -15% sát thương nhận vào → nội bộ dùng 0.15.      |
 
@@ -124,11 +125,16 @@ base_mag  = N * WIL_eff * powMul
 | C    | ARM_base, Σflat_ARM, Σ%_ARM        | ARM_eff_prePen (stat_eff) |
 | D    | RES_base, Σflat_RES, Σ%_RES        | RES_eff_prePen (stat_eff) |
 | E    | powMul, ATK_eff, WIL_eff           | base_phys/base_mag (dùng ATK_eff/WIL_eff đã cộng buff) |
-| F    | defPen_ARM/RES, ignore%            | ARM_eff/RES_eff sau xuyên |
+| F    | defPen_ARM/RES, ignore_flat_ARM/RES, ignore%_ARM/RES | ARM_eff/RES_eff sau xuyên |
 
 # 2) Giáp/kháng + xuyên (áp RIÊNG từng nửa)
-ARM_eff = max(0, ARM_eff_prePen * (1 - defPen_ARM))
-RES_eff = max(0, RES_eff_prePen * (1 - defPen_RES))
+ΣdefPen_ARM/RES cộng dồn tuyến tính (ví dụ 15% + 20% = 35%), sau đó áp chung qua hệ số (1 - ΣdefPen). Các ignore_flat cộng trực tiếp vào nhau, còn ignore% cộng tuyến tính rồi nhân với ARM_eff_prePen/RES_eff_prePen để đổi sang giá trị tuyệt đối trước khi clamp. defPen_ARM/RES, ignore%_ARM/RES và ignore_flat_ARM/RES trong công thức dưới đây đều là tổng sau khi cộng dồn mọi nguồn.
+ignore_ARM = clamp( ARM_eff_prePen * ignore%_ARM + ignore_flat_ARM, 0, ARM_eff_prePen )
+ignore_RES = clamp( RES_eff_prePen * ignore%_RES + ignore_flat_RES, 0, RES_eff_prePen )
+ARM_eff = max(0, (ARM_eff_prePen - ignore_ARM) * (1 - defPen_ARM))
+RES_eff = max(0, (RES_eff_prePen - ignore_RES) * (1 - defPen_RES))
+
+Nếu có hiệu ứng bỏ qua tuyệt đối (ignore% = 1.0 hoặc ignore_flat ≥ ARM_eff_prePen), clamp bảo đảm ARM_eff/RES_eff không âm. Ví dụ: target có ARM_eff_prePen = 0.45, nhận ignore%_ARM = 1.00 → ignore_ARM = clamp(0.45, 0, 0.45) = 0.45, defPen_ARM = 0 nên ARM_eff = max(0, (0.45 - 0.45) * 1) = 0; sát thương vật lý bỏ qua hoàn toàn giáp mà không tạo giá trị âm. Tương tự, ignore%_RES = 1.00 sẽ bảo đảm RES_eff = 0 trước khi sang bước dealMul/recvMul.
 
 phys_after = floor( base_phys * (1 - ARM_eff) )
 mag_after  = floor( base_mag  * (1 - RES_eff) )
