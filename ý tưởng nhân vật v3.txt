@@ -20,7 +20,8 @@ AEregen_base  = ( CLASS_BASE[class].AEregen + TP[AEregen] * Δ_AEregen ) * RANK_
 
 # Khí Aether hồi theo WIL
 regen_wil_coef xác định mức độ mỗi class chuyển WIL thành hồi aether theo lượt:
-AEregen_turn = AEregen_base + WIL_final * regen_wil_coef[class]
+AEregen_turn = AEregen_base + WIL_eff * regen_wil_coef[class]
+Trong đó WIL_eff được tính bằng công thức stat_eff (gom Σflat/Σ% trên WIL rồi mới clamp), nên mọi buff/debuff WIL đều phản ánh trực tiếp vào AE regen.
 
 | Class archetype | regen_wil_coef | Ghi chú |
 |-----------------|----------------|---------|
@@ -45,11 +46,12 @@ Thứ tự áp dụng:
 | +20 AE ngay                 | Thêm 20 AE tức thời                 | Σflat += 20   |
 | +40 AE cuối turn            | Hồi 40 AE ở bước Σflat cuối lượt    | Σflat += 40   |
 | +15% AE regen 2 turn        | Buff +15% lên tổng phần hồi (AEregen_turn + Σflat) trong 2 lượt | Σ% += 0.15    |
+| +10% WIL 1 turn             | Buff % WIL → tăng WIL_eff trong AEregen_turn | Σ%_WIL += 0.10 |
 | +30% AEmax 1 turn           | Tăng trần AE tạm thời               | AEmax_final *= 1.30 (tạm) |
 | -10 AE khi bị đánh          | Trừ AE tức thời từ debuff kẻ địch   | Σflat -= 10   |
 | -20% AE regen 1 turn        | Debuff -20% chỉ tác động lên phần hồi (AEregen_turn + Σflat) ở lượt kế | Σ% -= 0.20    |
 
-Ví dụ: Nếu AE_t = 60, cost_skill = 25, AEregen_turn = 12, buff +5 AE cố định (Σflat = +5) và +20% regen (Σ% = +0.20) thì phần hồi = (12 + 5) * 1.20 = 20.4. AE_{t+1} = clamp(60 - 25 + 20.4) = clamp(55.4), sau đó làm tròn theo quy tắc engine nếu cần.
+Ví dụ: Ranger có WIL_base = 48, nhận buff +12 WIL cố định và +20% WIL (Σflat_WIL = +12, Σ%_WIL = +0.20). Khi đó WIL_eff = (48 + 12) * 1.20 = 72. AEregen_base của Ranger (sau rank) là 7.2 nên AEregen_turn = 7.2 + 72 * 0.45 = 39.6. Nếu AE_t = 60, cost_skill = 25, buff thêm +5 AE cố định (Σflat = +5) và +20% regen (Σ% = +0.20) thì phần hồi = (39.6 + 5) * 1.20 = 53.52. AE_{t+1} = clamp(60 - 25 + 53.52) = clamp(88.52), sau đó làm tròn theo quy tắc engine nếu cần.
 
 # HP Regeneration & Healing
 HPregen_base = ( CLASS_BASE[class].HPregen + TP[HPregen] * Δ_HPregen ) * RANK_MULT[rank]
