@@ -437,8 +437,11 @@ __define('./app/shell.js', (exports, module, __require) => {
     };
   }
 
-  export default createAppShell;
+
+
   exports.createAppShell = createAppShell;
+  exports.default = createAppShell;
+  module.exports = exports.default;
 });
 __define('./art.js', (exports, module, __require) => {
   // v0.7.7 – Unit art catalog
@@ -2329,41 +2332,48 @@ __define('./entry.js', (exports, module, __require) => {
   const SCREEN_MAIN_MENU = 'main-menu';
   const SCREEN_PVE = 'pve-session';
 
+    function loadBundledModule(id){
+    if (typeof __require === 'function'){
+      return Promise.resolve().then(() => __require(id));
+    }
+    return import(id);
+  }
+
   const MODE_DEFINITIONS = {
     campaign: {
       key: 'campaign',
       label: 'Chiến Dịch',
       type: 'pve',
       description: 'Trải nghiệm tuyến cốt truyện PvE cổ điển.',
-      loader: () => import('./modes/pve/session.js')
+      loader: () => loadBundledModule('./modes/pve/session.js')
     },
     challenge: {
       key: 'challenge',
       label: 'Thử Thách',
       type: 'pve',
       description: 'Các kịch bản đặc biệt để thử nghiệm đội hình.',
-      loader: () => import('./modes/pve/session.js')
+      loader: () => loadBundledModule('./modes/pve/session.js')
     },
     arena: {
       key: 'arena',
       label: 'Đấu Trường',
       type: 'pve',
       description: 'PvE nhịp độ cao với quân đoàn bất tận.',
-      loader: () => import('./modes/pve/session.js')
+      loader: () => loadBundledModule('./modes/pve/session.js')
     },
     ares: {
       key: 'ares',
       label: 'Ares',
       type: 'coming-soon',
       description: 'PvP theo thời gian thực – đang phát triển.',
-      loader: () => import('./modes/coming-soon.stub.js')
+      loader: () => loadBundledModule('./modes/coming-soon.stub.js')
     },
     tongmon: {
       key: 'tongmon',
       label: 'Tông Môn',
       type: 'coming-soon',
       description: 'Xây dựng môn phái & quản lý tài nguyên – sắp ra mắt.',
-      loader: () => import('./modes/coming-soon.stub.js')
+      loader: () => loadBundledModule('./modes/coming-soon.stub.js')
     }
   };
 
@@ -2993,11 +3003,13 @@ __define('./modes/coming-soon.stub.js', (exports, module, __require) => {
     return 'coming-soon';
   }
 
-  export default {
+  const __defaultExport = {
     comingSoon
   };
   exports.comingSoon = comingSoon;
   exports.describe = describe;
+  exports.default = __defaultExport;
+  module.exports = exports.default;
 });
 __define('./modes/pve/session.js', (exports, module, __require) => {
   //v0.7.6
@@ -3831,10 +3843,10 @@ refillDeck();
       tickIntervalId = null;
     }
     tickIntervalId = setInterval(updateTimerAndCost, 250);
+  }
 
     function selectFirstAffordable(){
-
-  if (!Game) return;
+      if (!Game) return;
 
       const deck = Array.isArray(Game.deck3) ? Game.deck3 : [];
       if (!deck.length){
