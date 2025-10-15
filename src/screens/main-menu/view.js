@@ -116,8 +116,10 @@ function ensureStyles(){
     .mode-card__group-caret{position:absolute;top:22px;right:20px;font-size:14px;opacity:.65;transition:transform .2s ease,opacity .2s ease;}
     .mode-card--group:hover .mode-card__group-caret{opacity:.9;}
     .mode-card--group.is-open .mode-card__group-caret{transform:rotate(180deg);}
-    .mode-card__group-popover{position:absolute;left:0;right:0;top:calc(100% + 12px);display:none;flex-direction:column;gap:12px;padding:16px;border-radius:18px;border:1px solid rgba(125,211,252,.32);background:rgba(12,20,30,.95);box-shadow:0 28px 52px rgba(6,12,20,.6);z-index:10;}
-    .mode-card--group.is-open .mode-card__group-popover{display:flex;}
+    .mode-card__group-info{display:flex;flex-direction:column;gap:12px;width:100%;}
+    .mode-card__group-children{display:none;width:100%;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;}
+    .mode-card--group.is-open .mode-card__group-children{display:grid;}
+    .mode-card--group.is-open .mode-card__group-info{display:none;}
     .mode-card__child{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:14px;border:1px solid rgba(125,211,252,.18);background:rgba(12,22,32,.9);color:inherit;cursor:pointer;text-align:left;transition:border-color .2s ease,background .2s ease,transform .2s ease;}
     .mode-card__child:hover{border-color:rgba(125,211,252,.42);background:rgba(16,30,44,.95);transform:translateY(-2px);}
     .mode-card__child:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:3px;}
@@ -242,7 +244,10 @@ function createModeCard(mode, shell, onShowComingSoon, addCleanup, options = {})
 
 function createModeGroupCard(group, childModes, shell, onShowComingSoon, addCleanup){
   const wrapper = document.createElement('div');
-  buildModeCardBase(wrapper, group, { extraClasses: ['mode-card--group'], showStatus: false });
+  const groupClasses = Array.isArray(group.extraClasses)
+    ? ['mode-card--group', ...group.extraClasses]
+    : ['mode-card--group'];
+  buildModeCardBase(wrapper, group, { extraClasses: groupClasses, showStatus: false });
   wrapper.setAttribute('role', 'button');
   wrapper.setAttribute('aria-haspopup', 'true');
   wrapper.setAttribute('aria-expanded', 'false');
@@ -250,6 +255,17 @@ function createModeGroupCard(group, childModes, shell, onShowComingSoon, addClea
     wrapper.setAttribute('aria-label', `Chọn chế độ trong ${group.title}`);
   }
   wrapper.tabIndex = 0;
+  
+  const infoBlock = document.createElement('div');
+  infoBlock.className = 'mode-card__group-info';
+  infoBlock.setAttribute('aria-hidden', 'false');
+  const existingIcon = wrapper.querySelector('.mode-card__icon');
+  const existingTitle = wrapper.querySelector('.mode-card__title');
+  const existingDesc = wrapper.querySelector('.mode-card__desc');
+  if (existingIcon) infoBlock.appendChild(existingIcon);
+  if (existingTitle) infoBlock.appendChild(existingTitle);
+  if (existingDesc) infoBlock.appendChild(existingDesc);
+  wrapper.insertBefore(infoBlock, wrapper.firstChild);
 
   const caret = document.createElement('span');
   caret.className = 'mode-card__group-caret';
@@ -257,10 +273,12 @@ function createModeGroupCard(group, childModes, shell, onShowComingSoon, addClea
   caret.textContent = '▾';
   wrapper.appendChild(caret);
 
-  const popover = document.createElement('div');
-  popover.className = 'mode-card__group-popover';
-  popover.setAttribute('role', 'menu');
-  wrapper.appendChild(popover);
+  const childrenGrid = document.createElement('div');
+  childrenGrid.className = 'mode-card__group-children';
+  childrenGrid.setAttribute('role', 'menu');
+  childrenGrid.setAttribute('aria-hidden', 'true');
+  childrenGrid.hidden = true;
+  wrapper.appendChild(childrenGrid);
 
   let isOpen = false;
   let documentListenerActive = false;
@@ -288,6 +306,10 @@ function createModeGroupCard(group, childModes, shell, onShowComingSoon, addClea
     isOpen = true;
     wrapper.classList.add('is-open');
     wrapper.setAttribute('aria-expanded', 'true');
+    infoBlock.hidden = true;
+    infoBlock.setAttribute('aria-hidden', 'true');
+    childrenGrid.hidden = false;
+    childrenGrid.setAttribute('aria-hidden', 'false');
     setTimeout(bindOutsideClick, 0);
   };
 
@@ -296,6 +318,10 @@ function createModeGroupCard(group, childModes, shell, onShowComingSoon, addClea
     isOpen = false;
     wrapper.classList.remove('is-open');
     wrapper.setAttribute('aria-expanded', 'false');
+    infoBlock.hidden = false;
+    infoBlock.setAttribute('aria-hidden', 'false');
+    childrenGrid.hidden = true;
+    childrenGrid.setAttribute('aria-hidden', 'true');
     unbindOutsideClick();
   };
 
@@ -396,7 +422,7 @@ function createModeGroupCard(group, childModes, shell, onShowComingSoon, addClea
     item.addEventListener('click', handleSelect);
     addCleanup(() => item.removeEventListener('click', handleSelect));
 
-    popover.appendChild(item);
+    childrenGrid.appendChild(item);
   });
 
   return wrapper;
