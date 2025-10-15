@@ -92,16 +92,16 @@ RES_eff_prePen = stat_eff áp cho RES_base của target
 # Buff xuyên giáp/kháng (ví dụ Kiếm Trường Dạ bỏ qua 5% ARM/RES) chỉ áp sau khi đã có ARM_eff_prePen/RES_eff_prePen → tạo ARM_eff/RES_eff.
 
 # Bảng gán biến buff sát thương
-| Hiệu ứng mô tả                           | Pipeline biến cần ghi          | Ghi chú |
-|-----------------------------------------|--------------------------------|--------|
-| +30% ATK 3 turn                         | attacker.Σ%_ATK += 0.30        | Áp vào bước stat_eff của ATK_eff. |
-| +200 ATK cố định 2 turn                 | attacker.Σflat_ATK += 200      | Gom với stat_base trước nhân %. |
-| -10% RES mục tiêu                       | target.Σ%_RES -= 0.10          | Ảnh hưởng RES_eff_prePen. |
-| -120 RES cố định mục tiêu               | target.Σflat_RES -= 120        | Áp trước clamp của stat_eff RES. |
-| xuyên 30% RES từ ult                    | defPen_RES += 0.30             | Dùng ở bước xuyên sau stat_eff. |
-| Kiếm Trường Dạ bỏ qua 5% ARM/RES        | defPen_ARM += 0.05; defPen_RES += 0.05 | Chỉ áp sau khi có ARM_eff_prePen/RES_eff_prePen. |
-| +25% tổng sát thương gây ra             | ΣdealBonus += 0.25              | Chỉ dùng ở dealMul_final. |
-| -15% tổng sát thương nhận vào (target)  | ΣrecvReduce += 0.15             | Áp ở recvMul_final (đã trừ khỏi 1). |
+| Hiệu ứng mô tả                           | Pipeline biến cần ghi          | Ghi chú | Giải thích |
+|-----------------------------------------|--------------------------------|--------|------------|
+| +30% ATK 3 turn                         | attacker.Σ%_ATK += 0.30        | Áp vào bước stat_eff của ATK_eff. | Hiển thị +30% ATK → nội bộ dùng 0.30. |
+| +200 ATK cố định 2 turn                 | attacker.Σflat_ATK += 200      | Gom với stat_base trước nhân %. | Buff cố định +200 điểm ATK. |
+| -10% RES mục tiêu                       | target.Σ%_RES -= 0.10          | Ảnh hưởng RES_eff_prePen. | Hiển thị -10% RES → nội bộ dùng -0.10. |
+| -0.12 RES cố định mục tiêu              | target.Σflat_RES -= 0.12       | Áp trước clamp của stat_eff RES. | Buff cố định -0.12 RES ≈ -12% khi so với RES dạng thập phân. |
+| xuyên 30% RES từ ult                    | defPen_RES += 0.30             | Dùng ở bước xuyên sau stat_eff. | Hiển thị xuyên 30% RES → nội bộ dùng 0.30. |
+| Kiếm Trường Dạ bỏ qua 5% ARM/RES        | defPen_ARM += 0.05; defPen_RES += 0.05 | Chỉ áp sau khi có ARM_eff_prePen/RES_eff_prePen. | Hiển thị bỏ qua 5% giáp/kháng → nội bộ dùng 0.05. |
+| +25% tổng sát thương gây ra             | ΣdealBonus += 0.25              | Chỉ dùng ở dealMul_final. | Hiển thị +25% tổng sát thương → nội bộ dùng 0.25. |
+| -15% tổng sát thương nhận vào (target)  | ΣrecvReduce += 0.15             | Áp ở recvMul_final (đã trừ khỏi 1). | Hiển thị -15% sát thương nhận vào → nội bộ dùng 0.15.      |
 
 # 1) Cơ sở mỗi hit (basic/skill)
 N = 0.50        # WIL 50%
