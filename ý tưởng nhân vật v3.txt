@@ -55,6 +55,7 @@ Ví dụ: Nếu AE_t = 60, cost_skill = 25, AEregen_turn = 12, buff +5 AE cố �
 HPregen_base = ( CLASS_BASE[class].HPregen + TP[HPregen] * Δ_HPregen ) * RANK_MULT[rank]
 HPregen_turn = ( HPregen_base + Σflat ) * ( 1 + Σ% )
 # Σflat và Σ% gom toàn bộ buff/debuff theo lượt (VD: buff regen 50 HP cố định → Σflat += 50; buff +20% regen → Σ% += 0.20).
+# Nguồn chỉ số HPregen gốc: CLASS_BASE trong catalog.js (và bảng “Base lv1 theo class” ở tài liệu cân bằng chỉ số).
 
 • Regen theo hành động (action-based): mỗi hiệu ứng ghi rõ trigger và giá trị, ví dụ "hồi 1% max HP sau khi thực thi turn" → actionRegen = targetMaxHP * 0.01. Tổng regen lượt = actionRegen (tích lũy trong lượt) + HPregen_turn ở cuối lượt; chúng không nhân lẫn nhau, chỉ cộng đại số rồi clamp theo HP/giáp máu.
 
@@ -144,7 +145,7 @@ DISPLAY_DIVISOR = 10
 shownDamage = round(raw / DISPLAY_DIVISOR)
 shownHP     = round(HP_engine / DISPLAY_DIVISOR)
 
-[TP]   TP=22 → ATK+8, WIL+6, AGI+4, PER+4 (ví dụ)
+[TP]   TP=24 → ATK+8, WIL+6, AGI+4, PER+4, HPregen+2 (tăng +4 regen cơ bản)
 [Basic] Hybrid 50/50 (thuần thì set N/X = 0/100 hoặc 100/0)
 [Skill] k = 1.5  # 150% basic → áp TRƯỚC giáp/kháng
 [Dealt] +30% on total   # áp SAU giáp/kháng, TRƯỚC khiên (ước lượng cap: -50%..+100%)
