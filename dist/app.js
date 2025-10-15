@@ -441,7 +441,7 @@ __define('./app/shell.js', (exports, module, __require) => {
 
   exports.createAppShell = createAppShell;
   exports.default = createAppShell;
-  module.exports = exports.default;
+  module.exports.default = exports.default;
 });
 __define('./art.js', (exports, module, __require) => {
   // v0.7.7 – Unit art catalog
@@ -2332,7 +2332,7 @@ __define('./entry.js', (exports, module, __require) => {
   const SCREEN_MAIN_MENU = 'main-menu';
   const SCREEN_PVE = 'pve-session';
 
-    function loadBundledModule(id){
+  function loadBundledModule(id){
     if (typeof __require === 'function'){
       return Promise.resolve().then(() => __require(id));
     }
@@ -3009,7 +3009,7 @@ __define('./modes/coming-soon.stub.js', (exports, module, __require) => {
   exports.comingSoon = comingSoon;
   exports.describe = describe;
   exports.default = __defaultExport;
-  module.exports = exports.default;
+  module.exports.default = exports.default;
 });
 __define('./modes/pve/session.js', (exports, module, __require) => {
   //v0.7.6
@@ -3717,7 +3717,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     scheduleDraw();
     Game._inited = true;
 
-refillDeck();
+    refillDeck();
     refillDeckEnemy(Game);
 
     Game.ui.bar = startSummonBar(doc, {
@@ -3845,24 +3845,24 @@ refillDeck();
     tickIntervalId = setInterval(updateTimerAndCost, 250);
   }
 
-    function selectFirstAffordable(){
-      if (!Game) return;
+  function selectFirstAffordable(){
+    if (!Game) return;
 
-      const deck = Array.isArray(Game.deck3) ? Game.deck3 : [];
-      if (!deck.length){
-        Game.selectedId = null;
-        return;
-      }
-
-      const affordable = deck.find(card => {
-        if (!card) return false;
-        if (!Number.isFinite(card.cost)) return true;
-        return card.cost <= Game.cost;
-      });
-
-      const chosen = affordable || deck[0] || null;
-      Game.selectedId = chosen ? chosen.id : null;
+    const deck = Array.isArray(Game.deck3) ? Game.deck3 : [];
+    if (!deck.length){
+      Game.selectedId = null;
+       return;
     }
+
+    const affordable = deck.find(card => {
+      if (!card) return false;
+      if (!Number.isFinite(card.cost)) return true;
+      return card.cost <= Game.cost;
+    });
+
+     const chosen = affordable || deck[0] || null;
+    Game.selectedId = chosen ? chosen.id : null;
+   }
 
   /* ---------- Deck logic ---------- */
   function refillDeck(){
