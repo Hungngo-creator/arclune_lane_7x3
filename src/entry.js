@@ -1,4 +1,5 @@
 import { createAppShell } from './app/shell.js';
+import { renderMainMenuView } from './screens/main-menu/view.js';
 
 const SUCCESS_EVENT = 'arclune:loaded';
 const SCREEN_MAIN_MENU = 'main-menu';
@@ -11,43 +12,89 @@ function loadBundledModule(id){
   return import(id);
 }
 
-const MODE_DEFINITIONS = {
-  campaign: {
+const RAW_MODE_CONFIG = [
+  {
     key: 'campaign',
-    label: 'Chiến Dịch',
-    type: 'pve',
-    description: 'Trải nghiệm tuyến cốt truyện PvE cổ điển.',
-    loader: () => loadBundledModule('./modes/pve/session.js')
+    screenId: SCREEN_PVE,
+    title: 'Chiến Dịch',
+    description: 'Cốt Truyện .',
+        type: 'pve',
+    icon: '🛡️',
+    tags: ['PvE'],
+    loader: () => loadBundledModule('./modes/pve/session.js'),
+    params: { modeKey: 'campaign' }
   },
-  challenge: {
+  {
     key: 'challenge',
-    label: 'Thử Thách',
-    type: 'pve',
+    screenId: SCREEN_PVE,
+    title: 'Thử Thách',
     description: 'Các kịch bản đặc biệt để thử nghiệm đội hình.',
-    loader: () => loadBundledModule('./modes/pve/session.js')
-  },
-  arena: {
-    key: 'arena',
-    label: 'Đấu Trường',
     type: 'pve',
+    icon: '⚙️',
+    tags: ['PvE'],
+    loader: () => loadBundledModule('./modes/pve/session.js'),
+    params: { modeKey: 'challenge' }
+  },
+  {
+    key: 'arena',
+    screenId: SCREEN_PVE,
+    title: 'Đấu Trường',
     description: 'PvE nhịp độ cao với quân đoàn bất tận.',
-    loader: () => loadBundledModule('./modes/pve/session.js')
+    type: 'pve',
+    icon: '🏟️',
+    tags: ['PvE'],
+    loader: () => loadBundledModule('./modes/pve/session.js'),
+    params: { modeKey: 'arena' }
   },
-  ares: {
+ {
     key: 'ares',
-    label: 'Ares',
-    type: 'coming-soon',
+    screenId: SCREEN_MAIN_MENU,
+    title: 'Ares',
     description: 'PvP theo thời gian thực – đang phát triển.',
-    loader: () => loadBundledModule('./modes/coming-soon.stub.js')
-  },
-  tongmon: {
-    key: 'tongmon',
-    label: 'Tông Môn',
     type: 'coming-soon',
+    icon: '⚔️',
+    tags: ['PvP', 'Coming soon'],
+    loader: () => loadBundledModule('./modes/coming-soon.stub.js'),
+    params: null
+  },
+ {
+    key: 'tongmon',
+    screenId: SCREEN_MAIN_MENU,
+    title: 'Tông Môn',
     description: 'Xây dựng môn phái & quản lý tài nguyên – sắp ra mắt.',
-    loader: () => loadBundledModule('./modes/coming-soon.stub.js')
+    type: 'coming-soon',
+    icon: '🏯',
+    tags: ['Kinh tế nguyên tinh', 'Coming soon'],
+    loader: () => loadBundledModule('./modes/coming-soon.stub.js'),
+    params: null
   }
-};
+];
+
+const MODE_DEFINITIONS = RAW_MODE_CONFIG.reduce((acc, mode) => {
+  acc[mode.key] = {
+    key: mode.key,
+    label: mode.title,
+    type: mode.type,
+    description: mode.description,
+    loader: mode.loader,
+    screenId: mode.screenId,
+    icon: mode.icon,
+    tags: Array.isArray(mode.tags) ? [...mode.tags] : [],
+    status: mode.type === 'coming-soon' ? 'coming-soon' : 'available'
+  };
+  return acc;
+}, {});
+
+const MODE_METADATA = RAW_MODE_CONFIG.map(mode => ({
+  key: mode.key,
+  id: mode.screenId,
+  title: mode.title,
+  description: mode.description,
+  icon: mode.icon,
+  tags: Array.isArray(mode.tags) ? [...mode.tags] : [],
+  status: mode.type === 'coming-soon' ? 'coming-soon' : 'available',
+  params: mode.params ? { ...mode.params } : (mode.type === 'pve' ? { modeKey: mode.key } : null)
+}));
 
 const MENU_SECTIONS = [
   { title: 'PvE', modeKeys: ['campaign', 'challenge', 'arena'] },
@@ -60,6 +107,7 @@ let rootElement = null;
 let pveRenderToken = 0;
 const bootstrapOptions = { isFileProtocol: false };
 let renderMessageRef = null;
+let mainMenuView = null;
 
 function dispatchLoaded(){
   try {
@@ -158,56 +206,37 @@ function showComingSoonModal(label){
   activeModal = modal;
 }
 
-function renderMainMenu(onSelectMode){
-  if (!rootElement) return;
+function renderMainMenuScreen(){
+  if (!rootElement || !shellInstance) return;
   dismissModal();
   rootElement.classList.remove('app--pve');
-  const sections = MENU_SECTIONS.map(section => {
-    const buttons = section.modeKeys
-      .map(modeKey => MODE_DEFINITIONS[modeKey])
-      .filter(Boolean)
-      .map(def => {
-        const comingSoon = def.type !== 'pve';
-        const hint = def.description ? `<small>${def.description}</small>` : '';
-        return `
-          <button class="main-menu__button" data-mode="${def.key}"${comingSoon ? ' data-coming-soon="true"' : ''}>
-            ${def.label}
-            ${hint}
-          </button>
-        `;
-      })
-      .join('');
-    return `
-      <section>
-        <h4 class="main-menu__section-title">${section.title}</h4>
-        <div class="main-menu__grid">${buttons}</div>
-      </section>
-    `;
-  }).join('');
 
-  rootElement.innerHTML = `
-    <div class="main-menu">
-      <h1 class="main-menu__title">Arclune</h1>
-      <p class="main-menu__subtitle">Chọn chế độ để bắt đầu.</p>
-      <div class="main-menu__sections">${sections}</div>
-    </div>
-  `;
-
-  const buttons = rootElement.querySelectorAll('[data-mode]');
-  buttons.forEach(btn => {
-    btn.addEventListener('click', event => {
-      event.preventDefault();
-      const modeKey = btn.getAttribute('data-mode');
-      if (typeof onSelectMode === 'function'){
-        onSelectMode(modeKey);
-      }
-    });
+  if (mainMenuView && typeof mainMenuView.destroy === 'function'){
+    mainMenuView.destroy();
+    mainMenuView = null;
+  }
+  const sections = MENU_SECTIONS.map(section => ({
+    title: section.title,
+    modeKeys: Array.isArray(section.modeKeys) ? [...section.modeKeys] : []
+  }));
+  mainMenuView = renderMainMenuView({
+    root: rootElement,
+    shell: shellInstance,
+    sections,
+    metadata: MODE_METADATA,
+    playerGender: bootstrapOptions.playerGender || 'neutral',
+    onShowComingSoon: mode => {
+      const def = mode?.key ? MODE_DEFINITIONS[mode.key] : null;
+      const label = def?.label || mode?.title || mode?.label || '';
+      showComingSoonModal(label);
+    }
   });
 }
 
 function renderPveLayout(options){
   if (!rootElement) return null;
   dismissModal();
+  rootElement.classList.remove('app--main-menu');
   rootElement.classList.add('app--pve');
   rootElement.innerHTML = '';
   const container = document.createElement('div');
@@ -255,36 +284,6 @@ function teardownActiveSession(){
     }
   }
   shellInstance.setActiveSession(null);
-}
-
-function handleModeSelect(modeKey){
-  const definition = getModeDefinition(modeKey);
-  if (!definition){
-    showComingSoonModal('Tính năng đang phát triển');
-    return;
-  }
-  if (definition.type === 'pve'){
-    shellInstance.enterScreen(SCREEN_PVE, { modeKey: definition.key });
-    return;
-  }
-  definition.loader().then(module => {
-    if (isComingSoonModule(module)){
-      showComingSoonModal(definition.label);
-      return;
-    }
-    showComingSoonModal(definition.label);
-  }).catch(error => {
-    if (isMissingModuleError(error)){
-      showComingSoonModal(definition.label);
-      return;
-    }
-    console.error('Failed to load mode', error);
-    if (renderMessageRef){
-      showFatalError(error, renderMessageRef, bootstrapOptions);
-    } else if (typeof window.arcluneShowFatal === 'function'){
-      window.arcluneShowFatal(error);
-    }
-  });
 }
 
 async function mountPveScreen(params){
@@ -373,14 +372,18 @@ async function mountPveScreen(params){
     let lastParams = null;
 
     shellInstance.onChange(state => {
-      if (state.screen === SCREEN_MAIN_MENU){
+      if (lastScreen !== SCREEN_MAIN_MENU || state.screenParams !== lastParams){
         if (lastScreen !== SCREEN_MAIN_MENU){
           lastScreen = SCREEN_MAIN_MENU;
-          lastParams = null;
+          lastParams = state.screenParams;
           pveRenderToken += 1;
-          renderMainMenu(handleModeSelect);
+          renderMainMenuScreen();
         }
       } else if (state.screen === SCREEN_PVE){
+       if (mainMenuView && typeof mainMenuView.destroy === 'function'){
+          mainMenuView.destroy();
+          mainMenuView = null;
+        }
         if (lastScreen !== SCREEN_PVE || state.screenParams !== lastParams){
           lastScreen = SCREEN_PVE;
           lastParams = state.screenParams;
@@ -391,6 +394,9 @@ async function mountPveScreen(params){
             }
           });
         }
+      } else if (mainMenuView && typeof mainMenuView.destroy === 'function'){
+        mainMenuView.destroy();
+        mainMenuView = null;
       }
     });
     
