@@ -438,6 +438,7 @@ __define('./app/shell.js', (exports, module, __require) => {
   }
 
   export default createAppShell;
+  
   exports.createAppShell = createAppShell;
 });
 __define('./art.js', (exports, module, __require) => {
@@ -2996,6 +2997,7 @@ __define('./modes/coming-soon.stub.js', (exports, module, __require) => {
   export default {
     comingSoon
   };
+  
   exports.comingSoon = comingSoon;
   exports.describe = describe;
 });
