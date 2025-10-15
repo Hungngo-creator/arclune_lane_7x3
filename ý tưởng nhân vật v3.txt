@@ -52,6 +52,7 @@ shownHP     = round(HP_engine / DISPLAY_DIVISOR)
 [Taken] -20% on total   # cap DR ~75%, vuln ~+75%
 [Follow-up] F=2 (mặc định) | #20 F=3
 
+Lưu ý: các công thức trên chưa hoàn thiện và chỉ mang tính tham khảo, cần bổ sung đầy đủ hơn.
 
 Lưu ý: char trong mục A là dành cho player, vào gacha trong tương lai, mục B là những char trong cốt truyện pve, không dành cho player và sẽ không gacha trong tương lai.
 A. Các char cho player gacha.
@@ -222,7 +223,7 @@ Trong 2 turn đó đòn đánh thường của bản thân Lính Gác + 5% tổn
 15) Kẻ Sao Chép
 Mô tả: hắn sao chép mọi thứ có thể thấy và không thể thấy.
 
-Nội tại: bắt đầu với Sao Chép Gia cấp 1: chỉ có thể đánh dấu mục tiêu "hợp lệ" bằng đòn đánh thường. Tăng 10% HP khi vào trận. Max nộ chỉ có 70 thay vì 100 (vì khi đơn vị đạt max nộ sẽ dùng ult nên max nộ thấp sẽ dùng ult nhanh hơn, đây là buff). Kĩ năng/ult/nội tại/đánh thường đã sao chép sẽ không mất khi kẻ bị sao chép chết. Khi sao chép kĩ năng vượt quá max ô kĩ năng thì kĩ năng cũ sẽ bị xoá và thay thế = skill mới.
+Nội tại: bắt đầu với Sao Chép Gia cấp 1: chỉ có thể đánh dấu mục tiêu "hợp lệ" bằng đòn đánh thường. Tăng 10% HP khi vào trận. Max nộ chỉ có 70 thay vì 100 (vì khi đơn vị đạt max nộ sẽ dùng ult nên max nộ thấp sẽ dùng ult nhanh hơn, đây là buff). Kĩ năng/ult/nội tại/đánh thường đã sao chép sẽ không mất khi kẻ bị sao chép chết. Khi sao chép kĩ năng vượt quá max ô kĩ năng thì kĩ năng cũ sẽ bị xoá và thay thế = skill mới. Nhân vật này miễn dịch với sao chép.
  
 Kĩ năng 1: Xoá bỏ kĩ năng 1 này, tăng max ô kĩ năng từ 3 lên 4, + 10% arm/res/hp của bản thân, 25 aether.
 Kĩ năng 2 và 3 (4 ô kĩ năng nếu dùng kĩ năng 1) là trống không để kế thừa từ kẻ bị sao chép.
@@ -367,38 +368,100 @@ Ult: tấn công 3 kẻ thù ngẫu nhiên, mỗi kẻ thù nhận 1 nhát chém
 
 Đánh thường: gây sát thương = 100% wil và atk lên 1 mục tiêu
 
-25) 
+25) Vũ Mặc
 
-Ult: chọn một kẻ địch ngẫu nhiên sau đó thả xúc xắc, điểm là số lẻ thì kẻ địch đó ngủ trong 1 turn, điểm là số chẳn thì tăng 5% max hp cho bản thân.
+Nội tại: mỗi 2 turn nhận 1 buff ngẫu nhiên trong bể buff hiện có trong 1 turn, hết 1 turn buff cần đợi 2 turn nữa mới được nhận buff, tức là nhận buff 1 turn, hêt 1 turn đợi thêm 2 turn, turn tiếp theo kể từ lúc hết 2 turn sẽ nhận buff, lặp lại đến khi chết.
+Đánh thường: gây sát thương = x% wil và atk lên 1 mục tiêu
+
+Kĩ năng 1: quăng mạnh xúc xắc lên 1 kẻ địch gây sát thương = 130% đòn đánh thường, có 30% tỉ lệ xúc xắc nảy ngẫu nhiên lên một kẻ địch khác gây sát thương = 50% sát thương gây ra lên kẻ địch đầu tiên, có 20% tỉ lệ xúc xắc nảy ngẫu nhiên lên một kẻ địch khác gây sát thương = 50% sát thương gây ra lên kẻ địch đầu tiên nếu lần nảy 30% tỉ lệ thành công, 25 aether.
+
+Kĩ năng 2: quăng cục xúc xắc lên ô ở trước mặt, xúc xắc biến lớn, hưởng hp = 50% max hp của Vũ Mặc và nhận hiệu ứng khiêu khích trong 3 turn. 25 aether.
+
+Kĩ năng 3: nhận 1 buff ngẫu nhiên trong các buff sau:
+- tăng hp regen và hiệu ứng hồi hp nhận được lên 200% trong 3 turn.
+- tăng 20% res và arm trong 3 turn.
+- tăng 20% atk và wil trong 2 turn.
+25 aether, kĩ năng này có cool down là 3 turn, dùng kỹ năng được tính 1 1 turn trong cooldown này.
+
+Ult: chọn một kẻ địch ngẫu nhiên sau đó thả xúc xắc, điểm là số lẻ thì kẻ địch đó ngủ trong 1 turn, điểm là số chẳn thì tăng 10% max hp cho bản thân.
 
 26) Ma Đế Hắc Long
-Nội tại: +5% res, arm và Wil khi vào trận, mọi đòn đánh gây hiệu ứng Tâm Ma lên mục tiêu. Mỗi 2 turn sẽ tự giảm 1 stack debuff trên bản thân.
-Tâm ma: giảm 2% RES và PER của mục tiêu. 
+Nội tại: +5% res, arm và Wil khi vào trận, mọi đòn đánh gây sát thương gây hiệu ứng Tâm Ma lên mục tiêu.
+Mỗi 2 turn sẽ tự giảm 1 stack debuff trên bản thân ma đế hắc long, +40% hp regen khi vào trận.
+Tâm ma: giảm 5% RES và PER của mục tiêu. Nội tại này không thể lãng quên hoặc sao chép.
 
-Kĩ năng 1: gây sát thương aoe bằng 80% sát thương đòn đánh thường lên 3 kẻ địch ngẫu nhiên, áp dụng tâm ma, 30 aether.
+Đánh thường: gây sát thương = n% wil và x% atk lên 1 mục tiêu
 
-Kĩ năng 2: hấp thụ toàn bộ tâm ma từ những kẻ dính hiệu ứng  này, +2% res và per/mỗi stack tâm ma hấp thụ, 20 aether.
-Kĩ năng 3
-Ult: gầm thét, gây sát thương AOE lên 4 kẻ địch ngẫu nhiên = 200% sát thương từ đòn đánh thường lên mỗi kẻ địch, áp dụng Tâm Ma.
+Kĩ năng 1: gây sát thương bằng 120% sát thương đòn đánh thường lên 3 kẻ địch ngẫu nhiên, áp dụng tâm ma, 30 aether.
+
+Kĩ năng 2: hấp thụ toàn bộ tâm ma từ những kẻ dính hiệu ứng  này, +5% res và per của bản thân dựa trên res và per hiện có khi dùng kĩ năng này/mỗi stack tâm ma hấp thụ, hiệu ứng + từ kĩ năng này áp dụng đến hết trận đấu, áp dụng kể cả khi nhân vật này chết và được hồi sinh, 20 aether.
+Kĩ năng 3: tăng 500% hp regen của bản thân trong 3 turn. 25 aether 
+
+Ult: gầm thét, gây sát thương AOE lên 3 kẻ địch ngẫu nhiên = 230% sát thương từ đòn đánh thường lên mỗi kẻ địch, áp dụng Tâm Ma.
 
 27) Tịch Diệt Long Hoàng
 Mô tả: một con rồng được tạo ra và cuồng tín tín ngưỡng Tịch Diệt Chi Chủ, cho rằng Tịch Diệt là vĩ đại, hắn muốn Tịch Diệt mọi thứ.
-Nội tại: Tịch Diệt Ban Ân: ngươi được Tịch Diệt Chi Chủ ban ân: + 5% wil và atk khi vào trận, mọi đòn đánh bỏ qua 10% res và arm của mục tiêu.
+Nội tại: nhận 1 hiệu ứng tàn sát khi ra sân, khi tàn sát 1 mục tiêu thành công thì hiệu ứng tàn sát sẽ biến mất, nội tại này chỉ hoạt động 1 lần trong trận.
 
-Ult: gây aoe lên 3 kẻ địch ngẫu nhiên, gây sát thương = 230% đòn đánh thường lên mỗi kẻ địch, áp dụng Tịch Diệt Ban Ân.
+Tịch Diệt Ban Ân: ngươi được Tịch Diệt Chi Chủ ban ân: + 10% wil và atk khi vào trận, mọi đòn đánh /kĩ năng/ult bỏ qua 10% res và arm của mục tiêu. Nếu có đồng minh là Tịch Diệt Chi Chủ trên sân + 10% wil và atk.
+
+Đánh thường: gây sát thương = n% wil và atk lên 1 mục tiêu
+
+Kĩ năng 1: Tăng 180% hiệu ứng hồi phục hp nhận được từ mọi nguồn trong 3 turn, 25 aether.
+Kĩ năng 2: tăng 25% max hp, nếu chết và được hồi sinh thì hiệu ứng từ kỹ năng này vẫn áp dụng, giới hạn dùng 1 lần/trận, 25 aether.
+Kĩ năng 3: tấn công 3 kẻ địch ngẫu nhiên gây sát thương=130% đòn đánh thường lên mỗi kẻ địch, 25 aether.
+
+Ult: gây aoe lên 3 kẻ địch ngẫu nhiên, gây sát thương = 230% đòn đánh thường lên mỗi kẻ địch, áp dụng bỏ qua 10% res và arm của mục tiêu từ Tịch Diệt Ban Ân.
+
 28) Hư Vô Ma Chủ
-29) Hỗn Độn Ma Long
-30) Hoá thân của Hư Chủ
-Ult: 
-31) Song Sinh Tịnh Đế Liên, nữ.
-Nội tại: Sau 3 turn triệu hồi một bản thân khác, cùng hưởng mọi chỉ số, debuff/buff, mỗi lần triệu hồi bản thân mới, tất cả bản thân sẽ được +10% mọi chỉ số, triệu hồi tối đa 9 bản thân trong trận. Hp của tất cả bản thân liên kết với nhau, khi 1 bản thân nhận sát thương thì sẽ chia đều sát thương đó cho tất cả bản thân. Khi trong sân đầy ô thì tất cả bản thân cũ sẽ hợp nhất, cộng dồn tất cả chỉ số của các bản thân chưa hợp nhất vào bản thân đã hợp nhất, xoá mọi buff và debuff.
+Nội tại: mỗi khi bị tấn công có 20% tỉ lệ Hư Hoá.
+Hư Hoá: bỏ qua và không nhận sát thương khi bị tấn công, nếu phán định thành công thì bề ngoài, vfx của nhân vật này sẽ trở nên mờ nhạt, hư ảo, khi đòn tấn công kết thúc thì nhân vật này sẽ ngưng thực.
+Mỗi khi kích hoạt Hư Hoá thành công 5 lần (trong 1 trận đấu), tăng tỉ lệ Hư Hoá lên 10%, tối đa là 100% tỉ lệ kích hoạt Hư Hoá. (Nhân vật này cần kích hoạt hư hoá 40 lần để trở nên bất bại). Nếu nhân vật này kích hoạt 40 lần Hư Hoá trong 1 trận đấu thì sau 3 turn kể từ khi đạt 100% tỉ lệ Hư Hoá sẽ nhận trạng thái Hư Vô Đồng Hoá.
+Hư Vô Đồng Hoá: có thể tấn công nhưng không gây bất kỳ sát thương nào (nếu khó thì có thể set sát thương gây ra là 1), không thể bị chỉ định mà chỉ đơn thuần chiếm vị trí ô đồng minh vì không thể chết, không thể nhận buff hay debuff.
 
-B. Char pve: Các char dùng trong pve vẫn áp dụng rank như những char dành cho player nhưng vào pve +10% 10 chỉ số trước mới áp dụng nội tại nếu là char boss. Chúng sẽ dùng hệ thống AI tự sum và deck/cost như player chứ không có cố định như pve trong các game khác. Các char pve không sẽ không có kĩ năng để dễ phân biệt đâu là char pve cốt truyện không dành cho player đâu là char dành cho player gacha, vì không có kĩ năng nên đánh thường, nội tại và ult của chúng sẽ mạnh hơn char cho player gacha 1 chút:
+Kĩ năng 1: -10% tỉ lệ Hư Hoá từ nội tại, nhận hiệu ứng khiêu khích trong 3 turn, 25 aether.
+Kĩ năng 2: -10% tỉ lệ Hư Hoá từ nội tại, gây sát thương = 230% đánh thường theo hàng dọc 2 ô, ví dụ ô 1 và 4 hoặc 5 và 8 hoặc 6 và 9, 15 aether.
+Kĩ năng 3: chỉ có thể dùng khi ở trạng thái Hư Vô Đồng Hoá, bản thân biến mất và trở lại deck, player có thể triệu hồi nhân vật này ra sân, bắt đầu từ đầu.
+
+Ult: gây sát thương = 300% đòn đánh thường lên 1 mục tiêu
+
+29) Hỗn Độn Ma Long
+Mô tả: sinh vật cao quý sinh ra từ hỗn độn.
+Nội tại: mọi kỹ năng gây sát thương của Hỗn Độn Ma Long bỏ qua 50% res và arm của kẻ địch bị tấn công, không stack, không thể sao chép, lãng quên, cướp đoạt hay xoá bỏ nội tại này.
+
+Kĩ năng 1: gây sát thương lên 3 kẻ địch, mỗi kẻ nhận sát thương =130% đánh thường Hỗn Độn Ma Long lên bản thân, 25 aether.
+Kĩ năng 2: mọi kẻ thù gây sát thương lên Hỗn Độn Ma Long nhận debuff bỏ qua 50% res và arm từ nội tại trong 1 turn sau khi nhân vật đó gây sát thương lên Hỗn Độn Ma Long, không stack. Kỹ năng này chỉ có thể kích hoạt 1 lần/trận, hoạt động kể cả khi Hỗn Độn Ma Long chết và được hồi sinh, 30 aether.
+Kĩ năng 3: giảm 20% sát thương nhận vào và áp dụng hiệu ứng khiêu khích lên bản thân trong 3 turn, 20 aether.
+
+Ult: gây sát thương ngẫu nhiên lên 4 kẻ thù trên sân, mỗi kẻ bị tấn công nhận sát thương = 20% đòn đánh thường của Hỗn Độn Ma Long.
+
+Đánh thường: gây sát thương = n% wil và atk lên 1 mục tiêu.
+
+30) Hoá thân của Hư Chủ, Prime
+Mô tả: Hư Vô Đồng Hoá không làm khó được hắn. Sinh ra từ Hư Vô, ý thức của Hư Vô.
+Nội tại: mọi sát thương nhận vào giảm 70%, hoạt động trong 1 turn, 1 turn hồi chiêu và tự kích hoạt lần nữa. Kích hoạt khi vào sân.
+Không thể hồi sinh, không nhận bất kỳ buff hay debuff, kĩ năng/đánh thường/nội tại/ult đều không thể cướp, xoá bỏ, lãng quên hay sao chép.
+
+Kĩ năng 1: tặng trạng thái Hư Vô Chúc Phúc trong 1 turn cho leader đồng minh, trở lại deck, bắt đầu lại từ đầu nếu player thanh toán cost cho nhân vật này ra sân, kĩ năng này không cost.
+Hư Vô Chúc Phúc: không thể nhận bất kỳ sát thương nào trong 1 turn, không thể bị chỉ định bởi bất kỳ kỹ năng/ult/đánh thường và khi tấn công nhân vật khác sẽ gây 1 sát thương.
+
+Kĩ năng 2: áp dụng Hư Vô Chúc Phúc lên 2 kẻ thù ngẫu nhiên trong 2 turn, ưu tiên mục tiêu có hp cao nhất và mục tiêu có attack/wil cao nhất nếu mục tiêu của kỹ năng này có hiệu ứng khiêu khích thì khiêu khích sẽ biến mất, 20 aether. (Vì đặc tính không thể bị chỉ định của Hư Vô Chúc Phúc nên đây là kĩ năng hiệu quả để vô hiệu hoá kẻ thù). Hồi chiêu 1 turn.
+
+Kĩ năng 3: gây sát thương = 200% đánh thường lên 3 kẻ địch ngẫu nhiên, 25 aether.
+
+Ult: tăng 5% wil và atk mỗi lần dùng ult thành công, không giới hạn stack và bị reset khi dùng kỹ năng 1.
+Áp dụng Hư Vô Chúc Phúc lên tất cả kẻ thù trên sân từ leader địch trong 1 turn.
+
+Đánh thường: gây sát thương = 100% wil và atk lên 1 mục tiêu
+
+31) 
+
+B. Char pve: Các char dùng trong pve vẫn áp dụng rank như những char dành cho player nhưng vào pve +10% 10 chỉ số trước mới áp dụng nội tại nếu là char boss. Chúng sẽ dùng hệ thống AI tự sum và deck/cost như player chứ không có cố định như pve trong các game khác. Các char pve không sẽ không có kĩ năng để dễ phân biệt đâu là char pve cốt truyện không dành cho player đâu là char dành cho player gacha, vì không có kĩ năng nên đánh thường, nội tại và ult của chúng sẽ mạnh hơn char cho player gacha 1 chút, chúng không có rank cố định mà rank sẽ linh hoạt tùy theo màn pve:
 
 1) Boss: Mathew:
 Mô tả: Một nhà khoa học điên thích thí nghiệm trên người, hắn có những khối cơ bắp phình to trông phi nhân loại và hắn cho rằng đây là thí nghiệm thành công.
 
-Nội tại: + 5% 10 chỉ số/1 char đối địch (tức là phe player) trên chiến trường, tổng tăng là 40% (leader không tính) ( gặp boss này càng gọi người thì hắn sẽ càng mạnh, trừ phi gọi người đều là những char mạnh không thì khó áp đảo hắn), tự hồi 1% max hp/turn sau mỗi lần thực thi turn. Khi dưới 30% hp sẽ + 10% 10 chỉ số.
+Nội tại: + 5% 10 chỉ số/1 char đối địch (tức là phe player) trên chiến trường, tổng tăng là 40% (leader không tính) ( gặp boss này càng gọi người thì hắn sẽ càng mạnh, trừ phi gọi người đều là những char mạnh không thì khó áp đảo hắn), tự hồi 2% max hp/turn sau mỗi lần thực thi turn. Khi dưới 30% hp sẽ + 10% 10 chỉ số.
 
 Đánh thường: gây sát thương = 100% atk + 100% wil lên một mục tiêu, gây 1 debuff ngẫu nhiên từ bể debuff lên mục tiêu đó.
 
@@ -461,6 +524,20 @@ Nguyền Rủa: kẻ thù nhận sát thương bởi leader này nhận 1 debuff
 4) Bóng Tối Chi Chủ, nữ.
 Nội tại: mọi sát thương gây ra gây hiệu ứng sợ hãi và mù lên kẻ địch và hồi hp cho bản thân = 10% mọi sát thương bản thân gây ra.
 Bóng Tối Vĩnh Hằng: gây sát thương aoe toàn sân = 250% sát thương đòn đánh thường, áp dụng nội tại.
+
+5) Song Sinh Tịnh Đế Liên, nữ. Leader. Tuân theo hệ thống rank và lv như những nhân vật khác trong mục A.
+Mô tả: một đoá sen hoá hình, đánh từ xa.
+
+Nội tại: Sau 3 turn triệu hồi một bản thân khác, cùng hưởng mọi chỉ số, debuff/buff, mỗi lần triệu hồi bản thân mới, tất cả bản thân sẽ được +10% mọi chỉ số, triệu hồi tối đa 9 bản thân trong trận. Hp của tất cả bản thân liên kết với nhau, khi 1 bản thân nhận sát thương thì sẽ chia đều sát thương đó cho tất cả bản thân. Khi trong sân đầy ô thì tất cả bản thân cũ sẽ hợp nhất, cộng dồn tất cả chỉ số của các bản thân chưa hợp nhất vào bản thân đã hợp nhất, xoá mọi buff và debuff. Nếu 1 bản thân chết thì trừ hiệu ứng +10% mọi chỉ số từ nội tại.
+
+Ult: player cần chọn thủ công 1 trong 3, 3 ult này cần được đặt tên.
+1. Tự bạo 1 Bản Thân, gây sát thương= 300% atk/wil lên toàn bộ kẻ thù có mặt trên sân, giới hạn dùng tối đa 8 lần/trận.
+
+2. Tất cả Bản Thân sẽ bắt đầu nở hoa sen, hạt sen sẽ chín trong 3 turn, khi hạt sen chín, tất cả bản thân tăng 10% res và arm/mỗi hạt sen chín. Nếu trong quá trình này có Bản Thân chết thì lượng hạt sen nở sẽ giảm. Trong quá trình nở sen vẫn tấn công, dùng kĩ năng, đánh thường, né/chặn/phản đòn như bình thường.
+
+3. Chưởng 1 chưởng, Gây sát thương hàng dọc (ô 2/5/8, xem ảnh giải thích về lượt đánh trong repo để hiểu rõ) mỗi kẻ địch đứng trên hàng dọc này nhận sát thương = 230% đánh thường của bản thân nhân vật này.
+
+Đánh thường: gây sát thương = 100% wil và atk lên 1 mục tiêu
 
 ------
 
