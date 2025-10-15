@@ -14,9 +14,11 @@ Final[S≠SPD] = ( CLASS_BASE[class][S] + TP[S] * Δ_S ) * RANK_MULT[rank]
 Final[SPD]   =   CLASS_BASE[class][SPD]              # SPD không nhân RANK_MULT
 
 # Aether Resource
-AEmax_final   = ( CLASS_BASE[class].AEmax   + TP[AEmax]   * Δ_AEmax )   * RANK_MULT[rank]
+AEmax_base    = ( CLASS_BASE[class].AEmax   + TP[AEmax]   * Δ_AEmax )   * RANK_MULT[rank]
+AEmax_final   = clamp( ( AEmax_base + Σflat_AEmax ) * ( 1 + Σ%_AEmax ), AE_floor=0, AE_cap )
 AEregen_base  = ( CLASS_BASE[class].AEregen + TP[AEregen] * Δ_AEregen ) * RANK_MULT[rank]
 # Nhắc lại: SPD không nhân hệ số RANK_MULT như các chỉ số khác; chỉ lấy trực tiếp từ CLASS_BASE.
+# Σflat_AEmax và Σ%_AEmax gom mọi buff/debuff tác động lên trần AE; AE_cap do nhóm cân bằng ấn định (vd 150% AEmax_base) để tránh vượt trần quá mức.
 
 # Khí Aether hồi theo WIL
 regen_wil_coef xác định mức độ mỗi class chuyển WIL thành hồi aether theo lượt:
@@ -49,7 +51,7 @@ Thứ tự áp dụng:
 | +40 AE cuối turn            | Hồi 40 AE ở bước Σflat cuối lượt    | Σflat += 40   |
 | +15% AE regen 2 turn        | Buff +15% lên tổng phần hồi (AEregen_turn + Σflat) trong 2 lượt | Σ% += 0.15    |
 | +10% WIL 1 turn             | Buff % WIL → tăng WIL_eff trong AEregen_turn | Σ%_WIL += 0.10 |
-| +30% AEmax 1 turn           | Tăng trần AE tạm thời               | AEmax_final *= 1.30 (tạm) |
+| +30% AEmax 1 turn           | Tăng trần AE tạm thời               | Σ%_AEmax += 0.30 |
 | -10 AE khi bị đánh          | Trừ AE tức thời từ debuff kẻ địch   | Σflat -= 10   |
 | -20% AE regen 1 turn        | Debuff -20% chỉ tác động lên phần hồi (AEregen_turn + Σflat) ở lượt kế | Σ% -= 0.20    |
 
@@ -57,7 +59,8 @@ Ví dụ: Ranger có WIL_base = 48, nhận buff +12 WIL cố định và +20% WI
 
 # HP Regeneration & Healing
 HPregen_base = ( CLASS_BASE[class].HPregen + TP[HPregen] * Δ_HPregen ) * RANK_MULT[rank]
-HPregen_turn = ( HPregen_base + Σflat ) * ( 1 + Σ% )
+HPregen_turn = clamp( ( HPregen_base + Σflat ) * ( 1 + Σ% ), 0, targetMaxHP * regen_cap )
+# regen_cap mặc định = 0.30 (tối đa 30% máu tối đa mỗi lượt); có thể tùy chỉnh theo mode/kỹ năng nếu cần nới trần.
 # Σflat và Σ% gom toàn bộ buff/debuff theo lượt (VD: buff regen 50 HP cố định → Σflat += 50; buff +20% regen → Σ% += 0.20).
 # Nguồn chỉ số HPregen gốc: CLASS_BASE trong catalog.js (và bảng “Base lv1 theo class” ở tài liệu cân bằng chỉ số).
 
