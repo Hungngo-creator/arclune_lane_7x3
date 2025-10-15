@@ -1727,6 +1727,252 @@ __define('./config.js', (exports, module, __require) => {
   exports.TOKEN_STYLE = TOKEN_STYLE;
   exports.CHIBI = CHIBI;
 });
+__define('./data/modes.js', (exports, module, __require) => {
+  const MODE_TYPES = Object.freeze({
+    PVE: 'PvE',
+    PVP: 'PvP',
+    ECONOMY: 'Kinh tế'
+  });
+
+  const MODE_STATUS = Object.freeze({
+    AVAILABLE: 'available',
+    COMING_SOON: 'coming-soon',
+    PLANNED: 'planned'
+  });
+
+  const MENU_SECTION_DEFINITIONS = [
+    { id: 'core-pve', title: 'PvE' },
+    { id: 'competitive', title: 'Cạnh tranh' },
+    { id: 'economy', title: 'Kinh tế & Hạ tầng' }
+  ];
+
+  const MODES = [
+    {
+      id: 'campaign',
+      title: 'Chiến Dịch',
+      type: MODE_TYPES.PVE,
+      status: MODE_STATUS.AVAILABLE,
+      icon: '🛡️',
+      shortDescription: 'PvE cốt truyện trên bản đồ 2D để đi nhiệm vụ, nhặt vật phẩm đột phá và mở khóa kiến trúc tông môn.',
+      unlockNotes: 'Mở từ đầu; tiến trình mở rộng sang hệ tu luyện 15 đại cảnh giới và tái thiết các kiến trúc tông môn.',
+      tags: ['PvE'],
+      menuSections: ['core-pve'],
+      shell: {
+        screenId: 'pve-session',
+        moduleId: './modes/pve/session.js',
+        defaultParams: { modeKey: 'campaign' }
+      }
+    },
+    {
+      id: 'challenge',
+      title: 'Thử Thách',
+      type: MODE_TYPES.PVE,
+      status: MODE_STATUS.AVAILABLE,
+      icon: '🎯',
+      shortDescription: 'Các màn PvE với đội hình cố định cùng phần thưởng đặc biệt dành cho người vượt qua.',
+      unlockNotes: 'Có sẵn để thử sức với các đội hình cố định và nhận phần thưởng thử thách đặc biệt.',
+      tags: ['PvE'],
+      menuSections: ['core-pve'],
+      shell: {
+        screenId: 'pve-session',
+        moduleId: './modes/pve/session.js',
+        defaultParams: { modeKey: 'challenge' }
+      }
+    },
+    {
+      id: 'arena',
+      title: 'Đấu Trường',
+      type: MODE_TYPES.PVE,
+      status: MODE_STATUS.AVAILABLE,
+      icon: '🏟️',
+      shortDescription: 'Deck PvE đối đầu deck do AI điều khiển, xoay vòng mùa giải 7 ngày với bảng xếp hạng phần thưởng.',
+      unlockNotes: 'Yêu cầu chuẩn bị deck xếp sẵn; tham chiến theo mùa 7 ngày để nhận thưởng và leo bảng.',
+      tags: ['PvE'],
+      menuSections: ['core-pve', 'competitive'],
+      shell: {
+        screenId: 'pve-session',
+        moduleId: './modes/pve/session.js',
+        defaultParams: { modeKey: 'arena' }
+      }
+    },
+    {
+      id: 'ares',
+      title: 'Ares',
+      type: MODE_TYPES.PVP,
+      status: MODE_STATUS.COMING_SOON,
+      icon: '⚔️',
+      shortDescription: 'PvP thời gian thực, hiển thị "Coming soon" cho tới khi hạ tầng networking hoàn tất.',
+      unlockNotes: 'Chờ kết nối hệ thống PvP online realtime trước khi mở cho người chơi.',
+      tags: ['PvP', 'Coming soon'],
+      menuSections: ['competitive'],
+      shell: {
+        screenId: 'main-menu',
+        fallbackModuleId: './modes/coming-soon.stub.js'
+      }
+    },
+    {
+      id: 'tongmon',
+      title: 'Tông Môn',
+      type: MODE_TYPES.ECONOMY,
+      status: MODE_STATUS.COMING_SOON,
+      icon: '🏯',
+      shortDescription: 'Quản lý Trấn Yêu Tháp, Tàng Kinh Các, Đan Phong và Tu Luyện Phòng gắn với kinh tế nguyên tinh.',
+      unlockNotes: 'Mở khi người chơi tái thiết tông môn tàn tạ, liên kết tiến trình PvE và dòng nguyên tinh.',
+      tags: ['Kinh tế nguyên tinh', 'Coming soon'],
+      menuSections: ['economy'],
+      shell: {
+        screenId: 'main-menu',
+        fallbackModuleId: './modes/coming-soon.stub.js'
+      }
+    },
+    {
+      id: 'gacha',
+      title: 'Gacha',
+      type: MODE_TYPES.ECONOMY,
+      status: MODE_STATUS.COMING_SOON,
+      icon: '🎲',
+      shortDescription: 'Quầy gacha phân tab Nhân Vật, Công Pháp, Vũ Khí, Sủng Thú với pity riêng và chi phí tiền tệ khác nhau.',
+      unlockNotes: 'Kích hoạt cùng các banner pity, tiêu tốn những loại tiền tệ và vé gacha tương ứng.',
+      tags: ['Kinh tế nguyên tinh', 'Coming soon'],
+      menuSections: ['economy'],
+      shell: {
+        screenId: 'main-menu',
+        fallbackModuleId: './modes/coming-soon.stub.js'
+      }
+    },
+    {
+      id: 'collection',
+      title: 'Bộ Sưu Tập',
+      type: MODE_TYPES.ECONOMY,
+      status: MODE_STATUS.COMING_SOON,
+      icon: '📚',
+      shortDescription: 'Hiển thị hồ sơ nhân vật, sủng thú, công pháp, rank budget, sao và class từ dữ liệu tổng hợp.',
+      unlockNotes: 'Mở khi người chơi bắt đầu thu thập nhân vật và sủng thú để theo dõi tiến trình nâng sao và rank budget.',
+      tags: ['Kinh tế nguyên tinh', 'Coming soon'],
+      menuSections: ['economy'],
+      shell: {
+        screenId: 'main-menu',
+        fallbackModuleId: './modes/coming-soon.stub.js'
+      }
+    },
+    {
+      id: 'market',
+      title: 'Chợ Đen & Shop Dev',
+      type: MODE_TYPES.ECONOMY,
+      status: MODE_STATUS.COMING_SOON,
+      icon: '💰',
+      shortDescription: 'Trao đổi vật phẩm giữa người chơi kèm thuế theo bậc và shop dev bán vật phẩm bằng tiền thật.',
+      unlockNotes: 'Mở khi nền kinh tế ổn định để người chơi giao dịch, đồng thời kích hoạt kênh shop của dev.',
+      tags: ['Kinh tế nguyên tinh', 'Coming soon'],
+      menuSections: ['economy'],
+      shell: {
+        screenId: 'main-menu',
+        fallbackModuleId: './modes/coming-soon.stub.js'
+      }
+    },
+    {
+      id: 'events',
+      title: 'Sự Kiện & Vé Số',
+      type: MODE_TYPES.ECONOMY,
+      status: MODE_STATUS.COMING_SOON,
+      icon: '🎟️',
+      shortDescription: 'Event giới hạn thời gian kết hợp vé số dùng tiền tệ trong game, chia thưởng và doanh thu theo tỉ lệ.',
+      unlockNotes: 'Kích hoạt theo lịch sự kiện; vé số thu 50% tiền cho dev và 50% đưa vào quỹ giải thưởng.',
+      tags: ['Kinh tế nguyên tinh', 'Coming soon'],
+      menuSections: ['economy'],
+      shell: {
+        screenId: 'main-menu',
+        fallbackModuleId: './modes/coming-soon.stub.js'
+      }
+    },
+    {
+      id: 'social',
+      title: 'Chat & Xã hội',
+      type: MODE_TYPES.ECONOMY,
+      status: MODE_STATUS.COMING_SOON,
+      icon: '💬',
+      shortDescription: 'Khung chat realtime cùng kênh thông báo cộng đồng để người chơi tương tác.',
+      unlockNotes: 'Mở khi hệ thống chat realtime hoàn thiện để player trò chuyện và nhận thông báo.',
+      tags: ['Coming soon'],
+      menuSections: ['economy'],
+      shell: {
+        screenId: 'main-menu',
+        fallbackModuleId: './modes/coming-soon.stub.js'
+      }
+    },
+    {
+      id: 'beast-arena',
+      title: 'Đấu Thú Trường',
+      type: MODE_TYPES.PVP,
+      status: MODE_STATUS.COMING_SOON,
+      icon: '🐾',
+      shortDescription: 'Đưa sủng thú chiến đấu tự động để leo hệ thống rank từ Đồng tới Đấu Thần theo số trận thắng.',
+      unlockNotes: 'Yêu cầu sở hữu sủng thú và tham gia mùa giải để leo hạng, nhận thưởng ở mọi bậc và phần thưởng đặc biệt cho top.',
+      tags: ['PvP', 'Coming soon'],
+      menuSections: ['competitive'],
+      shell: {
+        screenId: 'main-menu',
+        fallbackModuleId: './modes/coming-soon.stub.js'
+      }
+    }
+  ];
+
+  const MODE_INDEX = MODES.reduce((acc, mode) => {
+    acc[mode.id] = mode;
+    return acc;
+  }, {});
+
+  function getModeById(id){
+    return id ? MODE_INDEX[id] || null : null;
+  }
+
+  function listModesByType(type, options = {}){
+    const { includeStatuses } = options;
+    return MODES.filter(mode => {
+      if (type && mode.type !== type) return false;
+      if (Array.isArray(includeStatuses) && includeStatuses.length > 0){
+        return includeStatuses.includes(mode.status);
+      }
+      return true;
+    });
+  }
+
+  function listModesForSection(sectionId, options = {}){
+    const { includeStatuses } = options;
+    return MODES.filter(mode => {
+      if (!mode.menuSections || !mode.menuSections.includes(sectionId)){
+        return false;
+      }
+      if (Array.isArray(includeStatuses) && includeStatuses.length > 0){
+        return includeStatuses.includes(mode.status);
+      }
+      return true;
+    });
+  }
+
+  function getMenuSections(options = {}){
+    const { includeStatuses } = options;
+    return MENU_SECTION_DEFINITIONS.map(section => {
+      const modes = listModesForSection(section.id, { includeStatuses });
+      return {
+        id: section.id,
+        title: section.title,
+        modeIds: modes.map(mode => mode.id)
+      };
+    }).filter(section => section.modeIds.length > 0);
+  }
+
+  exports.MODES = MODES;
+  exports.MODE_TYPES = MODE_TYPES;
+  exports.MODE_STATUS = MODE_STATUS;
+  exports.MENU_SECTION_DEFINITIONS = MENU_SECTION_DEFINITIONS;
+  exports.MODE_INDEX = MODE_INDEX;
+  exports.getModeById = getModeById;
+  exports.listModesByType = listModesByType;
+  exports.listModesForSection = listModesForSection;
+  exports.getMenuSections = getMenuSections;
+
+});
 __define('./engine.js', (exports, module, __require) => {
   const __dep0 = __require('./config.js');
   const TOKEN_STYLE = __dep0.TOKEN_STYLE;
@@ -2331,6 +2577,10 @@ __define('./entry.js', (exports, module, __require) => {
   const createAppShell = __dep0.createAppShell;
   const __dep1 = __require('./screens/main-menu/view.js');
   const renderMainMenuView = __dep1.renderMainMenuView;
+    const __dep2 = __require('./data/modes.js');
+  const MODES = __dep2.MODES;
+  const MODE_STATUS = __dep2.MODE_STATUS;
+  const getMenuSections = __dep2.getMenuSections;
 
   const SUCCESS_EVENT = 'arclune:loaded';
   const SCREEN_MAIN_MENU = 'main-menu';
@@ -2343,94 +2593,52 @@ __define('./entry.js', (exports, module, __require) => {
     return import(id);
   }
 
-  const RAW_MODE_CONFIG = [
-    {
-      key: 'campaign',
-      screenId: SCREEN_PVE,
-      title: 'Chiến Dịch',
-      description: 'Cốt Truyện .',
-          type: 'pve',
-      icon: '🛡️',
-      tags: ['PvE'],
-      loader: () => loadBundledModule('./modes/pve/session.js'),
-      params: { modeKey: 'campaign' }
-    },
-    {
-      key: 'challenge',
-      screenId: SCREEN_PVE,
-      title: 'Thử Thách',
-      description: 'Các kịch bản đặc biệt để thử nghiệm đội hình.',
-      type: 'pve',
-      icon: '⚙️',
-      tags: ['PvE'],
-      loader: () => loadBundledModule('./modes/pve/session.js'),
-      params: { modeKey: 'challenge' }
-    },
-    {
-      key: 'arena',
-      screenId: SCREEN_PVE,
-      title: 'Đấu Trường',
-      description: 'PvE nhịp độ cao với quân đoàn bất tận.',
-      type: 'pve',
-      icon: '🏟️',
-      tags: ['PvE'],
-      loader: () => loadBundledModule('./modes/pve/session.js'),
-      params: { modeKey: 'arena' }
-    },
-   {
-      key: 'ares',
-      screenId: SCREEN_MAIN_MENU,
-      title: 'Ares',
-      description: 'PvP theo thời gian thực – đang phát triển.',
-      type: 'coming-soon',
-      icon: '⚔️',
-      tags: ['PvP', 'Coming soon'],
-      loader: () => loadBundledModule('./modes/coming-soon.stub.js'),
-      params: null
-    },
-   {
-      key: 'tongmon',
-      screenId: SCREEN_MAIN_MENU,
-      title: 'Tông Môn',
-      description: 'Xây dựng môn phái & quản lý tài nguyên – sắp ra mắt.',
-      type: 'coming-soon',
-      icon: '🏯',
-      tags: ['Kinh tế nguyên tinh', 'Coming soon'],
-      loader: () => loadBundledModule('./modes/coming-soon.stub.js'),
-      params: null
-    }
-];
+  const MODE_DEFINITIONS = MODES.reduce((acc, mode) => {
+    const shell = mode.shell || {};
+    const screenId = shell.screenId || SCREEN_MAIN_MENU;
+    const moduleId = mode.status === MODE_STATUS.AVAILABLE && shell.moduleId
+      ? shell.moduleId
+      : (shell.fallbackModuleId || './modes/coming-soon.stub.js');
+    const params = mode.status === MODE_STATUS.AVAILABLE && shell.defaultParams
+      ? { ...shell.defaultParams }
+      : null;
 
-  const MODE_DEFINITIONS = RAW_MODE_CONFIG.reduce((acc, mode) => {
-    acc[mode.key] = {
-      key: mode.key,
+  acc[mode.id] = {
+      key: mode.id,
       label: mode.title,
       type: mode.type,
-      description: mode.description,
-      loader: mode.loader,
-      screenId: mode.screenId,
+      description: mode.shortDescription,
+      loader: () => loadBundledModule(moduleId),
+      screenId,
       icon: mode.icon,
       tags: Array.isArray(mode.tags) ? [...mode.tags] : [],
-      status: mode.type === 'coming-soon' ? 'coming-soon' : 'available'
+      status: mode.status,
+      unlockNotes: mode.unlockNotes || '',
+      params
     };
     return acc;
   }, {});
 
-  const MODE_METADATA = RAW_MODE_CONFIG.map(mode => ({
-    key: mode.key,
-    id: mode.screenId,
-    title: mode.title,
-    description: mode.description,
-    icon: mode.icon,
-    tags: Array.isArray(mode.tags) ? [...mode.tags] : [],
-    status: mode.type === 'coming-soon' ? 'coming-soon' : 'available',
-    params: mode.params ? { ...mode.params } : (mode.type === 'pve' ? { modeKey: mode.key } : null)
-  }));
+const MODE_METADATA = MODES.map(mode => {
+    const definition = MODE_DEFINITIONS[mode.id];
+    return {
+      key: mode.id,
+      id: definition?.screenId || SCREEN_MAIN_MENU,
+      title: mode.title,
+      description: mode.shortDescription,
+      icon: mode.icon,
+      tags: Array.isArray(mode.tags) ? [...mode.tags] : [],
+      status: mode.status,
+      params: definition?.params || null
+    };
+  });
 
-  const MENU_SECTIONS = [
-    { title: 'PvE', modeKeys: ['campaign', 'challenge', 'arena'] },
-    { title: 'Khám phá', modeKeys: ['ares', 'tongmon'] }
-  ];
+  const MENU_SECTIONS = getMenuSections({
+    includeStatuses: [MODE_STATUS.AVAILABLE, MODE_STATUS.COMING_SOON]
+  }).map(section => ({
+    title: section.title,
+    modeKeys: section.modeIds
+  }));
 
   let activeModal = null;
   let shellInstance = null;
@@ -2542,7 +2750,7 @@ __define('./entry.js', (exports, module, __require) => {
     dismissModal();
     rootElement.classList.remove('app--pve');
 
-   if (mainMenuView && typeof mainMenuView.destroy === 'function'){
+    if (mainMenuView && typeof mainMenuView.destroy === 'function'){
       mainMenuView.destroy();
       mainMenuView = null;
     }
