@@ -68,6 +68,33 @@ HPregen_turn = ( HPregen_base + Σflat ) * ( 1 + Σ% )
 | Instant heal        | "Hồi 25% max HP + 50% WIL"                   | công thức heal trực tiếp (ở trên)  |
 | Overshield riêng    | "Tạo giáp máu = 15% heal dư"                 | overflow → overshield (skill rule) |
 
+# Damage Pipeline
+1. Gom toàn bộ buff/debuff stat → tính ATK_eff/WIL_eff/ARM_eff/RES_eff bằng công thức stat_eff.
+2. Tính base_phys/base_mag từ ATK_eff/WIL_eff và powMul.
+3. Áp xuyên giáp/kháng (defPen, ignore) trên ARM_eff/RES_eff.
+4. Áp dealMul_final và recvMul_final.
+5. Chuyển sát thương sang khiên rồi HP.
+
+# Stat consolidation (ATK/WIL/ARM/RES)
+stat_eff = clamp((stat_base + Σflat) * (1 + Σ%), floor, cap)
+ATK_eff = stat_eff áp cho ATK_base của attacker
+WIL_eff = stat_eff áp cho WIL_base của attacker
+ARM_eff_prePen = stat_eff áp cho ARM_base của target
+RES_eff_prePen = stat_eff áp cho RES_base của target
+# Buff xuyên giáp/kháng (ví dụ Kiếm Trường Dạ bỏ qua 5% ARM/RES) chỉ áp sau khi đã có ARM_eff_prePen/RES_eff_prePen → tạo ARM_eff/RES_eff.
+
+# Bảng gán biến buff sát thương
+| Hiệu ứng mô tả                           | Pipeline biến cần ghi          | Ghi chú |
+|-----------------------------------------|--------------------------------|--------|
+| +30% ATK 3 turn                         | attacker.Σ%_ATK += 0.30        | Áp vào bước stat_eff của ATK_eff. |
+| +200 ATK cố định 2 turn                 | attacker.Σflat_ATK += 200      | Gom với stat_base trước nhân %. |
+| -10% RES mục tiêu                       | target.Σ%_RES -= 0.10          | Ảnh hưởng RES_eff_prePen. |
+| -120 RES cố định mục tiêu               | target.Σflat_RES -= 120        | Áp trước clamp của stat_eff RES. |
+| xuyên 30% RES từ ult                    | defPen_RES += 0.30             | Dùng ở bước xuyên sau stat_eff. |
+| Kiếm Trường Dạ bỏ qua 5% ARM/RES        | defPen_ARM += 0.05; defPen_RES += 0.05 | Chỉ áp sau khi có ARM_eff_prePen/RES_eff_prePen. |
+| +25% tổng sát thương gây ra             | ΣdealBonus += 0.25              | Chỉ dùng ở dealMul_final. |
+| -15% tổng sát thương nhận vào (target)  | ΣrecvReduce += 0.15             | Áp ở recvMul_final (đã trừ khỏi 1). |
+
 # 1) Cơ sở mỗi hit (basic/skill)
 N = 0.50        # WIL 50%
 X = 0.50        # ATK 50%
@@ -76,9 +103,19 @@ powMul = k      # hệ số skill/ult (basic thường = 1.0)
 base_phys = X * ATK * powMul
 base_mag  = N * WIL * powMul
 
+# Pipeline pseudocode (trước khi bước 2 tính giáp/kháng)
+| Step | Input                              | Output/ghi chú |
+|------|------------------------------------|----------------|
+| A    | ATK_base, Σflat_ATK, Σ%_ATK        | ATK_eff (stat_eff) |
+| B    | WIL_base, Σflat_WIL, Σ%_WIL        | WIL_eff (stat_eff) |
+| C    | ARM_base, Σflat_ARM, Σ%_ARM        | ARM_eff_prePen (stat_eff) |
+| D    | RES_base, Σflat_RES, Σ%_RES        | RES_eff_prePen (stat_eff) |
+| E    | powMul, ATK_eff, WIL_eff           | base_phys/base_mag |
+| F    | defPen_ARM/RES, ignore%            | ARM_eff/RES_eff sau xuyên |
+
 # 2) Giáp/kháng + xuyên (áp RIÊNG từng nửa)
-ARM_eff = max(0, ARM * (1 - defPen))
-RES_eff = max(0, RES * (1 - defPen))
+ARM_eff = max(0, ARM_eff_prePen * (1 - defPen_ARM))
+RES_eff = max(0, RES_eff_prePen * (1 - defPen_RES))
 
 phys_after = floor( base_phys * (1 - ARM_eff) )
 mag_after  = floor( base_mag  * (1 - RES_eff) )
@@ -86,8 +123,8 @@ mag_after  = floor( base_mag  * (1 - RES_eff) )
 total_after_def = phys_after + mag_after
 
 # 3) “% gây trên TỔNG” của attacker + “% nhận trên TỔNG” của target
-dealMul_final = clamp( 1 + ΣdealBonus,                 0.50, 2.00 )   # -50%..+100%
-recvMul_final = clamp( (1 - ΣrecvReduce) * (1+Σvuln),  0.25, 1.75 )   # -75%..+75%
+dealMul_final = clamp( 1 + ΣdealBonus,                 0.50, 2.00 )   # -50%..+100%; chỉ gom buff tổng sát thương còn lại, KHÔNG lặp lại buff stat đã áp ở stat_eff.
+recvMul_final = clamp( (1 - ΣrecvReduce) * (1+Σvuln),  0.25, 1.75 )   # -75%..+75%; chỉ cho hiệu ứng giảm/ tăng sát thương sau phòng thủ, tránh double-count với stat.
 
 raw = floor( total_after_def * dealMul_final * recvMul_final )
 
