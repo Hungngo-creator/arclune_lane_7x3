@@ -52,6 +52,7 @@ let rootElement = null;
 let storedConfig = {};
 let running = false;
 let sceneCache = null;
+const hpBarGradientCache = new Map();
 
 function stableStringify(value, seen = new WeakSet()){
   if (value === null) return 'null';
@@ -1002,6 +1003,7 @@ function resize(){
     || prevGrid.rows !== g.rows
     || prevGrid.tile !== g.tile;
   if (gridChanged){
+    hpBarGradientCache.clear();
     invalidateSceneCache();
   }
 }
@@ -1087,12 +1089,41 @@ function lightenColor(color, amount){
   return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
 }
 
+function normalizeHpBarCacheKey(fillColor, innerHeight, innerRadius, startY){
+  const color = typeof fillColor === 'string' ? fillColor.trim().toLowerCase() : String(fillColor ?? '');
+  const height = Number.isFinite(innerHeight) ? Math.max(0, Math.round(innerHeight)) : 0;
+  const radius = Number.isFinite(innerRadius) ? Math.max(0, Math.round(innerRadius)) : 0;
+  const start = Number.isFinite(startY) ? Math.round(startY * 100) / 100 : 0;
+  return `${color}|h:${height}|r:${radius}|y:${start}`;
+}
+
+function ensureHpBarGradient(fillColor, innerHeight, innerRadius, startY, x){
+  const key = normalizeHpBarCacheKey(fillColor, innerHeight, innerRadius, startY);
+  const cached = hpBarGradientCache.get(key);
+  if (cached) return cached;
+  if (!ctx || !Number.isFinite(innerHeight) || innerHeight <= 0){
+    hpBarGradientCache.set(key, fillColor);
+    return fillColor;
+  }
+  const startYSafe = Number.isFinite(startY) ? startY : 0;
+  const gradient = ctx.createLinearGradient(x, startYSafe, x, startYSafe + innerHeight);
+  if (!gradient){
+    hpBarGradientCache.set(key, fillColor);
+    return fillColor;
+  }
+  const topFill = lightenColor(fillColor, 0.25);
+  gradient.addColorStop(0, topFill);
+  gradient.addColorStop(1, fillColor);
+  hpBarGradientCache.set(key, gradient);
+  return gradient;
+}
+
 function drawHPBars(){
   if (!ctx || !Game.grid) return;
   const baseR = Math.floor(Game.grid.tile * 0.36);
   for (const t of Game.tokens){
     if (!t.alive || !Number.isFinite(t.hpMax)) continue;
-const p = cellCenterObliqueLocal(Game.grid, t.cx, t.cy, CAM_PRESET);
+  const p = cellCenterObliqueLocal(Game.grid, t.cx, t.cy, CAM_PRESET);
     const art = t.art || getUnitArt(t.id, { skinKey: t.skinKey });
     const layout = art?.layout || {};
     const r = Math.max(6, Math.floor(baseR * (p.scale || 1)));
@@ -1123,13 +1154,15 @@ const p = cellCenterObliqueLocal(Game.grid, t.cx, t.cy, CAM_PRESET);
     const innerWidth = Math.max(0, barWidth - inset * 2);
     const filledWidth = Math.round(innerWidth * ratio);
     if (filledWidth > 0){
-      roundedRectPathUI(ctx, x + inset, y + inset, filledWidth, innerHeight, innerRadius);
-      const grad = ctx.createLinearGradient(x, y + inset, x, y + inset + innerHeight);
-      const topFill = lightenColor(fillColor, 0.25);
-      grad.addColorStop(0, topFill);
-      grad.addColorStop(1, fillColor);
-      ctx.fillStyle = grad;
+      const gradientY = y + inset;
+      const gradientX = x + inset;
+      const fillStyle = ensureHpBarGradient(fillColor, innerHeight, innerRadius, gradientY, gradientX);
+      ctx.save();
+      ctx.translate(gradientX, gradientY);
+      roundedRectPathUI(ctx, 0, 0, filledWidth, innerHeight, innerRadius);
+      ctx.fillStyle = fillStyle;
       ctx.fill();
+      ctx.restore();
     }
     ctx.restore();
   }
@@ -1204,6 +1237,7 @@ function resetDomRefs(){
   canvas = null;
   ctx = null;
   hud = null;
+  hpBarGradientCache.clear();
   invalidateSceneCache();
 }
 
