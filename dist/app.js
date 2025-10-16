@@ -2726,7 +2726,7 @@ __define('./engine.js', (exports, module, __require) => {
       }
     }
   }
-   
+  });
   // (W2-J2) Vẽ “Chờ Lượt” – silhouette mờ/tối, chỉ hiển thị theo flag DEBUG
   function drawQueuedOblique(ctx, g, queued, cam){
    if (!queued) return;
