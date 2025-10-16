@@ -638,7 +638,8 @@ function createSidebar({ shell, addCleanup } = {}){
   aside.className = 'main-menu-sidebar';
   const announcements = getAllSidebarAnnouncements();
 
-  const attachTooltipHandlers = (element, { slotKey, entry }) => {
+  const attachTooltipHandlers = (element, opts = {}) => {
+    const { slotKey, entry } = opts;
     if (!entry || !shell || typeof shell.showTooltip !== 'function') return;
     const showTooltip = () => {
       shell.showTooltip({
