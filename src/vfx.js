@@ -17,7 +17,13 @@ function pool(Game) {
 
 /* ------------------- Adders ------------------- */
 export function vfxAddSpawn(Game, cx, cy, side) {
-  pool(Game).push({ type: 'spawn', t0: now(), dur: 500, cx, cy, side });
+  const hit = { type: 'hit', t0: now(), dur: 380, ref: target, ...opts };
+  if (target) {
+    if (target.iid != null && hit.iid == null) hit.iid = target.iid;
+    if (typeof target.cx === 'number' && hit.cx == null) hit.cx = target.cx;
+    if (typeof target.cy === 'number' && hit.cy == null) hit.cy = target.cy;
+  }
+  pool(Game).push(hit);
 }
 
 export function vfxAddHit(Game, target, opts = {}) {
@@ -84,9 +90,14 @@ export function vfxDraw(ctx, Game, cam) {
     }
 
     else if (e.type === 'hit') {
-      const ref = e.ref && Game.tokens.find(tk => tk === e.ref || (tk.iid && e.ref.iid && tk.iid === e.ref.iid));
-      if (ref) {
-        const p = projectCellOblique(Game.grid, ref.cx, ref.cy, cam);
+      const ref = e.ref;
+      if (ref && typeof ref.cx === 'number' && typeof ref.cy === 'number') {
+        e.cx = ref.cx;
+        e.cy = ref.cy;
+      }
+
+      if (typeof e.cx === 'number' && typeof e.cy === 'number') {
+        const p = projectCellOblique(Game.grid, e.cx, e.cy, cam);
         const r = Math.floor(Game.grid.tile * 0.25 * (0.6 + 1.1 * tt) * p.scale);
         ctx.save();
         ctx.globalAlpha = 0.9 * (1 - tt);
