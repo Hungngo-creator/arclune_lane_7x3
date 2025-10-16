@@ -19,7 +19,7 @@ import {
   cellOccupied, spawnLeaders, pickRandom, slotIndex, slotToCell, cellReserved, ORDER_ENEMY,
   ART_SPRITE_EVENT,
 } from '../../engine.js';
-import { drawEnvironmentProps } from '../../background.js';
+import { drawEnvironmentProps, getEnvironmentBackground } from '../../background.js';
 import { getUnitArt, setUnitSkin } from '../../art.js';
 import { initHUD, startSummonBar } from '../../ui.js';
 import { vfxDraw, vfxAddSpawn, vfxAddHit, vfxAddMelee } from '../../vfx.js';
@@ -52,6 +52,39 @@ let rootElement = null;
 let storedConfig = {};
 let running = false;
 let sceneCache = null;
+
+function stableStringify(value, seen = new WeakSet()){
+  if (value === null) return 'null';
+  const type = typeof value;
+  if (type === 'undefined') return 'undefined';
+  if (type === 'number' || type === 'boolean' || type === 'bigint') return String(value);
+  if (type === 'string') return JSON.stringify(value);
+  if (type === 'symbol') return value.toString();
+  if (type === 'function') return `[Function:${value.name || 'anonymous'}]`;
+  if (Array.isArray(value)){
+    return `[${value.map(entry => stableStringify(entry, seen)).join(',')}]`;
+  }
+  if (type === 'object'){
+    if (seen.has(value)) return '"[Circular]"';
+    seen.add(value);
+    const keys = Object.keys(value).sort();
+    const entries = keys.map(key => `${JSON.stringify(key)}:${stableStringify(value[key], seen)}`);
+    seen.delete(value);
+    return `{${entries.join(',')}}`;
+  }
+  return String(value);
+}
+
+function computeBackgroundSignature(backgroundKey){
+  const config = getEnvironmentBackground(backgroundKey);
+  if (!config) return `${backgroundKey || 'no-key'}:no-config`;
+  try {
+    return `${backgroundKey || 'no-key'}:${stableStringify(config)}`;
+  } catch (_) {
+    const props = Array.isArray(config.props) ? config.props.length : 0;
+    return `${backgroundKey || 'no-key'}:props:${props}`;
+  }
+}
 
 function normalizeConfig(input = {}){
   const out = { ...input };
@@ -219,6 +252,7 @@ function ensureSceneCache(){
   const themeKey = Game.sceneTheme || sceneCfg.CURRENT_THEME || sceneCfg.DEFAULT_THEME;
   const theme = (sceneCfg.THEMES && themeKey) ? sceneCfg.THEMES[themeKey] : null;
   const backgroundKey = Game.backgroundKey;
+  const backgroundSignature = computeBackgroundSignature(backgroundKey);
   const dpr = grid.dpr ?? 1;
   const cssWidth = grid.w ?? (canvas ? canvas.width / dpr : 0);
   const cssHeight = grid.h ?? (canvas ? canvas.height / dpr : 0);
@@ -230,6 +264,7 @@ function ensureSceneCache(){
   if (!sceneCache) needsRebuild = true;
   else if (sceneCache.pixelWidth !== pixelWidth || sceneCache.pixelHeight !== pixelHeight) needsRebuild = true;
   else if (sceneCache.themeKey !== themeKey || sceneCache.backgroundKey !== backgroundKey) needsRebuild = true;
+  else if (sceneCache.backgroundSignature !== backgroundSignature) needsRebuild = true;
   else if (sceneCache.dpr !== dpr) needsRebuild = true;
 
   if (!needsRebuild) return sceneCache;
@@ -268,6 +303,7 @@ function ensureSceneCache(){
     cssHeight,
     themeKey,
     backgroundKey,
+    backgroundSignature,
     dpr
   };
   return sceneCache;
