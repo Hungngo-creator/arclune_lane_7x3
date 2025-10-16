@@ -629,10 +629,10 @@ export function slotIndex(side, cx, cy){
    // Ally: c=2 → 1..3 (trên→dưới), c=1 → 4..6, c=0 → 7..9
     return (CFG.ALLY_COLS - 1 - cx) * 3 + (cy + 1);
  } else {
-   // Enemy: c=4 → 1..3 (dưới→trên), c=5 → 4..6, c=6 → 7..9
+// Enemy: c=4 → 1..3 (trên→dưới), c=5 → 4..6, c=6 → 7..9
    const enemyStart = CFG.GRID_COLS - CFG.ENEMY_COLS; // 7-3=4
    const colIndex = cx - enemyStart;                   // 0..2
-   return colIndex * 3 + (3 - cy);
+   return colIndex * 3 + (cy + 1);
   }
 }
 
@@ -648,8 +648,7 @@ export function slotToCell(side, slot){
   } else {
     const enemyStart = CFG.GRID_COLS - CFG.ENEMY_COLS; // 4
    const cx = enemyStart + colIndex;                  // 4,5,6
-    const cy = 2 - rowIndex;                           // 2,1,0 (dưới→trên)
-   return { cx, cy };
+   const cy = rowIndex;                               // 0..2 (trên→dưới)
  }
 }
 
