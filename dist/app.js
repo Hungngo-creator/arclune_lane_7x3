@@ -6950,7 +6950,8 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
     return heroSection;
   }
 
-  function createSidebar({ shell, addCleanup } = {}){
+  function createSidebar(options = {}){
+    const { shell = null, addCleanup = null } = options;
     const aside = document.createElement('aside');
     aside.className = 'main-menu-sidebar';
     const announcements = getAllSidebarAnnouncements();
