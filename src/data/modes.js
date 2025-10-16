@@ -1,3 +1,12 @@
+import { getLotterySplit, getPityConfig, getShopTaxRate } from './economy.js';
+
+const SSR_PITY = getPityConfig('SSR');
+const UR_PITY = getPityConfig('UR');
+const PRIME_PITY = getPityConfig('PRIME');
+const LOTTERY_SPLIT = getLotterySplit();
+const BASE_TAX_RATE = getShopTaxRate('N');
+const TOP_TAX_RATE = getShopTaxRate('PRIME');
+
 const MODE_TYPES = Object.freeze({
   PVE: 'PvE',
   PVP: 'PvP',
@@ -117,8 +126,8 @@ const MODES = [
     type: MODE_TYPES.ECONOMY,
     status: MODE_STATUS.COMING_SOON,
     icon: '🎲',
-    shortDescription: 'Quầy gacha phân tab Nhân Vật, Công Pháp, Vũ Khí, Sủng Thú với pity riêng và chi phí tiền tệ khác nhau.',
-    unlockNotes: 'Kích hoạt cùng các banner pity, tiêu tốn những loại tiền tệ và vé gacha tương ứng.',
+    shortDescription: `Quầy gacha phân tab Nhân Vật, Công Pháp, Vũ Khí, Sủng Thú với bảo hiểm ${SSR_PITY?.hardPity || 60}/${UR_PITY?.hardPity || 70}/${PRIME_PITY?.hardPity || 80} lượt cho các banner SSR/UR/Prime.`,
+    unlockNotes: `Banner UR bảo hiểm SSR ở lượt ${UR_PITY?.softGuarantees?.[0]?.pull || 50}; banner Prime lần lượt bảo hiểm SSR/UR ở ${PRIME_PITY?.softGuarantees?.map(rule => rule.pull).join('/') || '40/60'} và Prime ở ${PRIME_PITY?.hardPity || 80}.`,
     tags: ['Kinh tế nguyên tinh', 'Coming soon'],
     menuSections: ['economy'],
     shell: {
@@ -147,7 +156,7 @@ const MODES = [
     type: MODE_TYPES.ECONOMY,
     status: MODE_STATUS.COMING_SOON,
     icon: '💰',
-    shortDescription: 'Trao đổi vật phẩm giữa người chơi kèm thuế theo bậc và shop dev bán vật phẩm bằng tiền thật.',
+    shortDescription: `Trao đổi vật phẩm giữa người chơi với thuế theo bậc từ ${Math.round((BASE_TAX_RATE || 0) * 100)}% tới ${Math.round((TOP_TAX_RATE || 0) * 100)}% cùng shop dev bán vật phẩm bằng tiền thật.`,
     unlockNotes: 'Mở khi nền kinh tế ổn định để người chơi giao dịch, đồng thời kích hoạt kênh shop của dev.',
     tags: ['Kinh tế nguyên tinh', 'Coming soon'],
     menuSections: ['economy'],
@@ -162,8 +171,8 @@ const MODES = [
     type: MODE_TYPES.ECONOMY,
     status: MODE_STATUS.COMING_SOON,
     icon: '🎟️',
-    shortDescription: 'Event giới hạn thời gian kết hợp vé số dùng tiền tệ trong game, chia thưởng và doanh thu theo tỉ lệ.',
-    unlockNotes: 'Kích hoạt theo lịch sự kiện; vé số thu 50% tiền cho dev và 50% đưa vào quỹ giải thưởng.',
+    shortDescription: 'Event giới hạn thời gian kết hợp vé số dùng tiền tệ trong game với cơ chế chia doanh thu rõ ràng.',
+    unlockNotes: `Vé số chuyển ${Math.round((LOTTERY_SPLIT.devVault || 0) * 100)}% cho quỹ vận hành và ${Math.round((LOTTERY_SPLIT.prizePool || 0) * 100)}% vào quỹ giải thưởng, kích hoạt theo lịch sự kiện.`,
     tags: ['Kinh tế nguyên tinh', 'Coming soon'],
     menuSections: ['economy'],
     shell: {
