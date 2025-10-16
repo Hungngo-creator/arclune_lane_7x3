@@ -1452,7 +1452,9 @@ __define('./combat.js', (exports, module, __require) => {
     const s1 = Math.max(1, Math.min(3, (r|0) + 1)); // 1|2|3 (gần midline)
     seq.push(s1, s1 + 3, s1 + 6);        // 1→4→7 / 2→5→8 / 3→6→9
     for (const s of seq){
-      const { cx, cy } = slotToCell(targetSide, s);
+      const cell = slotToCell(targetSide, s);
+      if (!cell) continue;
+      const { cx, cy } = cell;
       const tgt = pool.find(t => t.cx === cx && t.cy === cy);
       if (tgt) return tgt;
    }
@@ -3294,7 +3296,8 @@ __define('./engine.js', (exports, module, __require) => {
       const enemyStart = CFG.GRID_COLS - CFG.ENEMY_COLS; // 4
      const cx = enemyStart + colIndex;                  // 4,5,6
      const cy = rowIndex;                               // 0..2 (trên→dưới)
-   }
+   return { cx, cy };
+    }
   }
 
   // Gán nhãn “mã vùng” cho AI/AoE (A1..A9 | E1..E9) hoặc mã số tileId
