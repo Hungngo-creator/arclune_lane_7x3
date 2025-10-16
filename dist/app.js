@@ -1438,6 +1438,8 @@ __define('./combat.js', (exports, module, __require) => {
   const vfxAddSpawn = __dep3.vfxAddSpawn;
   const __dep4 = __require('./passives.js');
   const emitPassiveEvent = __dep4.emitPassiveEvent;
+  const __dep5 = __require('./config.js');
+  const CFG = __dep5.CFG;
   function pickTarget(Game, attacker){
    const foe = attacker.side === 'ally' ? 'enemy' : 'ally';
    const pool = Game.tokens.filter(t => t.side === foe && t.alive);
@@ -1565,8 +1567,8 @@ __define('./combat.js', (exports, module, __require) => {
     };
     emitPassiveEvent(Game, unit, 'onBasicHit', passiveCtx);
    
-     // VFX: tất cả basic đều step-in/out (1.8s), không dùng tracer
-    const meleeDur = 1800;
+  // VFX: tất cả basic đều step-in/out (1.1s), không dùng tracer
+    const meleeDur = CFG?.ANIMATION?.meleeDurationMs ?? 1100;
     const meleeStartMs = performance.now();
     let meleeTriggered = false;
     try {
@@ -1691,7 +1693,11 @@ __define('./config.js', (exports, module, __require) => {
       MAX_DPR: 2.5,
       CARD_GAP: 12,
       CARD_MIN: 40
-    },                              // <-- thêm dấu phẩy ở đây
+    },
+    ANIMATION: {
+      turnIntervalMs: 480,
+      meleeDurationMs: 1100
+    },
   // === Debug flags (W0-J1) ===
    DEBUG: {
      SHOW_QUEUED: true,        // vẽ unit "Chờ Lượt" cho phe mình (ally) khi có
@@ -4462,7 +4468,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
       startMs: now,
       lastTimerRemain: 240,
       lastCostCreditedSec: 0,
-      turnEveryMs: 600,
+      turnEveryMs: CFG?.ANIMATION?.turnIntervalMs ?? 600,
       lastTurnStepMs: now
     };
   }
@@ -4617,7 +4623,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
         const laneTargets = tokensAlive().filter(t => t.side === foeSide && t.cx === laneX);
         const hits = Math.max(1, (u.hits|0) || 1);
         const scale = typeof u.scale === 'number' ? u.scale : 0.9;
-        const meleeDur = 1600;
+        const meleeDur = CFG?.ANIMATION?.meleeDurationMs ?? 1100;
         try { vfxAddMelee(Game, unit, primary, { dur: meleeDur }); } catch(_){}
         busyMs = Math.max(busyMs, meleeDur);
         for (const enemy of laneTargets){
@@ -7870,7 +7876,7 @@ __define('./vfx.js', (exports, module, __require) => {
   // 0.6 vfx.js
   // VFX layer: spawn pop, hit ring, ranged tracer, melee step-in/out
   // Không thay đổi logic combat/turn — chỉ vẽ đè.
-  // Durations: spawn 500ms, hit 380ms, tracer 400ms, melee 1200ms.
+  // Durations: spawn 500ms, hit 380ms, tracer 400ms, melee 1100ms.
 
   const __dep0 = __require('./engine.js');
   const projectCellOblique = __dep0.projectCellOblique;
@@ -7900,7 +7906,7 @@ __define('./vfx.js', (exports, module, __require) => {
     pool(Game).push({ type: 'tracer', t0: now(), dur: opts.dur || 400, refA: attacker, refB: target });
   }
 
-  function vfxAddMelee(Game, attacker, target, { dur = 1800 } = {}) {
+  function vfxAddMelee(Game, attacker, target, { dur = CFG?.ANIMATION?.meleeDurationMs ?? 1100 } = {}) {
     // Overlay step-in/out (không di chuyển token thật)
     pool(Game).push({ type: 'melee', t0: now(), dur, refA: attacker, refB: target });
   }
