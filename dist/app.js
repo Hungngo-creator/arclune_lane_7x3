@@ -438,7 +438,6 @@ __define('./app/shell.js', (exports, module, __require) => {
   }
 
 
-
   exports.createAppShell = createAppShell;
   exports.default = createAppShell;
   module.exports.default = exports.default;
@@ -2305,7 +2304,6 @@ __define('./data/modes.js', (exports, module, __require) => {
   exports.listModesForSection = listModesForSection;
   exports.getMenuSections = getMenuSections;
 });
-
 __define('./data/roster-preview.js', (exports, module, __require) => {
   const __dep0 = __require('./catalog.js');
   const CLASS_BASE = __dep0.CLASS_BASE;
@@ -2477,7 +2475,6 @@ __define('./data/roster-preview.js', (exports, module, __require) => {
   const ROSTER_PREVIEWS = buildRosterPreviews(ROSTER_TP_ALLOCATIONS);
   const ROSTER_PREVIEW_ROWS = buildPreviewRows(ROSTER_PREVIEWS);
   const STAT_KEYS = [...STAT_ORDER];
-
   exports.TP_DELTA = TP_DELTA;
   exports.ROSTER_TP_ALLOCATIONS = ROSTER_TP_ALLOCATIONS;
   exports.ROSTER_PREVIEWS = ROSTER_PREVIEWS;
@@ -5803,7 +5800,6 @@ __define('./scene.js', (exports, module, __require) => {
 
     ctx.restore();
   }
-
   exports.invalidateBattlefieldSceneCache = invalidateBattlefieldSceneCache;
   exports.getCachedBattlefieldScene = getCachedBattlefieldScene;
   exports.drawBattlefieldScene = drawBattlefieldScene;
@@ -6064,7 +6060,6 @@ __define('./screens/main-menu/dialogues.js', (exports, module, __require) => {
   function listAvailableHeroes(){
     return Object.keys(HERO_LIBRARY).filter(key => key !== 'default');
   }
-
   exports.HERO_DEFAULT_ID = HERO_DEFAULT_ID;
   exports.getHeroProfile = getHeroProfile;
   exports.getHeroHotspots = getHeroHotspots;
