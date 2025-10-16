@@ -388,7 +388,7 @@ function createClock(){
     startMs: now,
     lastTimerRemain: 240,
     lastCostCreditedSec: 0,
-    turnEveryMs: 600,
+    turnEveryMs: CFG?.ANIMATION?.turnIntervalMs ?? 600,
     lastTurnStepMs: now
   };
 }
@@ -543,7 +543,7 @@ function performUlt(unit){
       const laneTargets = tokensAlive().filter(t => t.side === foeSide && t.cx === laneX);
       const hits = Math.max(1, (u.hits|0) || 1);
       const scale = typeof u.scale === 'number' ? u.scale : 0.9;
-      const meleeDur = 1600;
+      const meleeDur = CFG?.ANIMATION?.meleeDurationMs ?? 1100;
       try { vfxAddMelee(Game, unit, primary, { dur: meleeDur }); } catch(_){}
       busyMs = Math.max(busyMs, meleeDur);
       for (const enemy of laneTargets){
