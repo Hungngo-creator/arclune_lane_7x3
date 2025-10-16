@@ -263,6 +263,66 @@ function drawChibi(ctx, x, y, r, facing = 1, color = '#a9f58c') {
 const SPRITE_CACHE = new Map();
 export const ART_SPRITE_EVENT = 'unit-art:sprite-loaded';
 
+const TOKEN_PROJECTION_CACHE = new WeakMap();
+const TOKEN_VISUAL_CACHE = new Map();
+
+function contextSignature(g, cam){
+  const C = cam || {};
+  return [
+    g.cols, g.rows, g.tile, g.ox, g.oy,
+    C.rowGapRatio ?? 0.62,
+    C.skewXPerRow ?? 0.28,
+    C.depthScale ?? 0.94
+  ].join('|');
+}
+
+function getTokenProjection(token, g, cam, sig){
+  if (!token) return null;
+  let entry = TOKEN_PROJECTION_CACHE.get(token);
+  if (!entry || entry.cx !== token.cx || entry.cy !== token.cy || entry.sig !== sig){
+    const projection = projectCellOblique(g, token.cx, token.cy, cam);
+    entry = {
+      cx: token.cx,
+      cy: token.cy,
+      sig,
+      projection
+    };
+    TOKEN_PROJECTION_CACHE.set(token, entry);
+  }
+  return entry.projection;
+}
+
+function clearTokenCaches(token){
+  if (!token) return;
+  TOKEN_PROJECTION_CACHE.delete(token);
+  const skinKey = token.skinKey ?? null;
+  const cacheKey = `${token.id ?? '__anon__'}::${skinKey ?? ''}`;
+  TOKEN_VISUAL_CACHE.delete(cacheKey);
+}
+
+function getTokenVisual(token, art){
+  if (!token) return { spriteEntry: null, shadowCfg: null };
+  const skinKey = art?.skinKey ?? token.skinKey ?? null;
+  const cacheKey = `${token.id ?? '__anon__'}::${skinKey ?? ''}`;
+  const spriteCfg = art?.sprite || {};
+  const descriptor = typeof spriteCfg === 'string' ? { src: spriteCfg } : spriteCfg;
+  const spriteSrc = descriptor?.src ?? null;
+  const spriteKey = descriptor?.cacheKey || (spriteSrc ? `${spriteSrc}::${descriptor?.skinId ?? skinKey ?? ''}` : null);
+
+  let entry = TOKEN_VISUAL_CACHE.get(cacheKey);
+  if (!entry || entry.spriteKey !== spriteKey){
+    const spriteEntry = spriteSrc ? ensureSpriteLoaded(art) : null;
+    const shadowCfg = descriptor?.shadow ?? art?.shadow ?? null;
+    entry = {
+      spriteKey,
+      spriteEntry,
+      shadowCfg
+    };
+    TOKEN_VISUAL_CACHE.set(cacheKey, entry);
+  }
+  return entry;
+}
+
 function ensureTokenArt(token){
   if (!token) return null;
   const desiredSkin = getUnitSkin(token.id);
@@ -435,25 +495,33 @@ export function drawTokensOblique(ctx, g, tokens, cam){
   ctx.textBaseline = 'middle';
 
   const baseR = Math.floor(g.tile * 0.36);
-  const k = C.depthScale ?? 0.94; // scale theo chiều sâu
+  const sig = contextSignature(g, C);
 
-  // Vẽ xa trước – gần sau theo tung độ tâm-ô
-  const sorted = tokens.slice().sort((a,b)=>{
-    const ya = _cellCenterOblique(g, a.cx, a.cy, C).y;
-    const yb = _cellCenterOblique(g, b.cx, b.cy, C).y;
-    return ya === yb ? a.cx - b.cx : ya - yb;
-  });
-    for (const t of sorted){
-    if (!t.alive) continue; // chết là thôi vẽ ngay
-    const p = _cellCenterOblique(g, t.cx, t.cy, C);
-    const depth = g.rows - 1 - t.cy;
-    const scale = Math.pow(k, depth);
+const alive = [];
+  for (const token of tokens){
+    if (!token || !token.alive){
+      if (token && !token.alive) clearTokenCaches(token);
+      continue;
+    }
+    const projection = getTokenProjection(token, g, C, sig);
+    if (!projection) continue;
+    alive.push({ token, projection });
+  }
+
+  alive.sort((a, b)=>{
+    const ya = a.projection.y;
+    const yb = b.projection.y;
+    if (ya === yb) return a.token.cx - b.token.cx;
+    return ya - yb;
+    for (const { token: t, projection: p } of alive){
+    const scale = p.scale ?? 1;
     const r = Math.max(6, Math.floor(baseR * scale));
     const facing = (t.side === 'ally') ? 1 : -1;
-      
+
     const art = ensureTokenArt(t);
     const layout = art?.layout || {};
-    const spriteCfg = art?.sprite || {};
+    const spriteCfgRaw = art?.sprite;
+    const spriteCfg = typeof spriteCfgRaw === 'string' ? { src: spriteCfgRaw } : (spriteCfgRaw || {});
     const spriteHeightMult = layout.spriteHeight || 2.4;
     const spriteScale = Number.isFinite(spriteCfg.scale) ? spriteCfg.scale : 1;
     const spriteHeight = r * spriteHeightMult * ((art?.size) ?? 1) * spriteScale;
@@ -463,16 +531,16 @@ export function drawTokensOblique(ctx, g, tokens, cam){
     const hasRichArt = !!(art && ((spriteCfg && spriteCfg.src) || art.shape));
 
     if (hasRichArt){
-      const spriteEntry = ensureSpriteLoaded(art);
+      const { spriteEntry, shadowCfg } = getTokenVisual(t, art);
       const spriteReady = spriteEntry && spriteEntry.status === 'ready' && spriteEntry.img;
       ctx.save();
       ctx.translate(p.x, p.y);
       if (facing === -1 && art?.mirror !== false) ctx.scale(-1, 1);
-      const shadow = spriteCfg?.shadow;
-      const shadowColor = shadow?.color || art?.glow || art?.shadow || 'rgba(0,0,0,0.35)';
-      const shadowBlur = Number.isFinite(shadow?.blur) ? shadow.blur : Math.max(6, r * 0.7);
-      const shadowOffsetX = Number.isFinite(shadow?.offsetX) ? shadow.offsetX : 0;
-      const shadowOffsetY = Number.isFinite(shadow?.offsetY) ? shadow.offsetY : Math.max(2, r * 0.2);
+      const shadow = shadowCfg || {};
+      const shadowColor = shadow.color || art?.glow || art?.shadow || 'rgba(0,0,0,0.35)';
+      const shadowBlur = Number.isFinite(shadow.blur) ? shadow.blur : Math.max(6, r * 0.7);
+      const shadowOffsetX = Number.isFinite(shadow.offsetX) ? shadow.offsetX : 0;
+      const shadowOffsetY = Number.isFinite(shadow.offsetY) ? shadow.offsetY : Math.max(2, r * 0.2);
       ctx.shadowColor = shadowColor;
       ctx.shadowBlur = shadowBlur;
       ctx.shadowOffsetX = shadowOffsetX;
@@ -485,7 +553,7 @@ export function drawTokensOblique(ctx, g, tokens, cam){
       ctx.restore();
       } else if (TOKEN_STYLE === 'chibi') {
       drawChibi(ctx, p.x, p.y, r, facing, t.color || '#9adcf0');
-    } else {
+  } else {
       ctx.fillStyle = t.color || '#9adcf0';
       ctx.beginPath();
       ctx.arc(p.x, p.y, r, 0, Math.PI*2);
