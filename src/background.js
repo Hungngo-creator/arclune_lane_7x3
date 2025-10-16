@@ -1,6 +1,60 @@
 import { CFG } from './config.js';
 import { projectCellOblique, ensureSpriteLoaded } from './engine.js';
 
+const BACKGROUND_PROP_CACHE = new WeakMap();
+
+function stableStringify(value, seen = new WeakSet()){
+  if (value === null) return 'null';
+  const type = typeof value;
+  if (type === 'undefined') return 'undefined';
+  if (type === 'number' || type === 'boolean') return String(value);
+  if (type === 'string') return JSON.stringify(value);
+  if (type === 'symbol') return value.toString();
+  if (type === 'function') return `[Function:${value.name || 'anonymous'}]`;
+  if (Array.isArray(value)){
+    return `[${value.map(v => stableStringify(v, seen)).join(',')}]`;
+  }
+  if (type === 'object'){
+    if (seen.has(value)) return '"[Circular]"';
+    seen.add(value);
+    const keys = Object.keys(value).sort();
+    const entries = keys.map(key => `${JSON.stringify(key)}:${stableStringify(value[key], seen)}`);
+    seen.delete(value);
+    return `{${entries.join(',')}}`;
+  }
+  return String(value);
+}
+
+function computePropsSignature(props){
+  if (!Array.isArray(props) || !props.length) return 'len:0';
+  try {
+    return stableStringify(props);
+  } catch(_){
+    return `len:${props.length}`;
+  }
+}
+
+function getBoardSignature(g, cam){
+  if (!g) return 'no-grid';
+  const baseParts = [
+    g.cols,
+    g.rows,
+    g.tile,
+    g.ox,
+    g.oy,
+    g.w,
+    g.h,
+    g.pad,
+    g.dpr
+  ];
+  const camParts = [
+    cam?.rowGapRatio ?? 'rg',
+    cam?.skewXPerRow ?? 'sk',
+    cam?.depthScale ?? 'ds'
+  ];
+  return [...baseParts, ...camParts].join('|');
+}
+
 export const ENVIRONMENT_PROP_TYPES = {
   'stone-obelisk': {
     asset: 'dist/assets/environment/stone-obelisk.svg',
@@ -97,6 +151,64 @@ function normalizePropConfig(propCfg){
   };
 }
 
+function getBackgroundPropCache(config){
+  if (!config) return null;
+  const props = Array.isArray(config.props) ? config.props : [];
+  const signature = computePropsSignature(props);
+  let cache = BACKGROUND_PROP_CACHE.get(config);
+  if (!cache || cache.signature !== signature){
+    const normalizedProps = [];
+    for (const rawProp of props){
+      const prop = normalizePropConfig(rawProp);
+      if (!prop) continue;
+      const cyWithDepth = prop.cell.cy + (prop.depth ?? 0);
+      const spriteEntry = prop.asset ? ensureSpriteLoaded({ sprite: prop.asset }) : null;
+      normalizedProps.push({
+        prop,
+        base: {
+          cx: prop.cell.cx,
+          cyWithDepth
+        },
+        spriteEntry
+      });
+    }
+    cache = {
+      signature,
+      normalizedProps,
+      boardStates: new Map()
+    };
+    BACKGROUND_PROP_CACHE.set(config, cache);
+  }
+  return cache;
+}
+
+function buildBoardState(normalizedProps, g, cam){
+  if (!g) return null;
+  const rowGap = ((cam?.rowGapRatio) ?? 0.62) * g.tile;
+  const drawables = [];
+  for (const entry of normalizedProps){
+    if (!entry?.prop) continue;
+    const { prop, base } = entry;
+    const projection = projectCellOblique(g, base.cx, base.cyWithDepth, cam);
+    const scale = projection.scale * prop.scale;
+    const spriteEntry = entry.spriteEntry || (prop.asset ? ensureSpriteLoaded({ sprite: prop.asset }) : null);
+    entry.spriteEntry = spriteEntry;
+    drawables.push({
+      prop,
+      x: projection.x + prop.offset.x * g.tile + prop.pixelOffset.x,
+      y: projection.y + (prop.baseLift ?? 0.5) * rowGap + prop.offset.y * rowGap + prop.pixelOffset.y,
+      scale,
+      spriteEntry,
+      sortY: projection.y + prop.sortBias
+    });
+  }
+  drawables.sort((a, b) => a.sortY - b.sortY);
+  return {
+    signature: getBoardSignature(g, cam),
+    drawables
+  };
+}
+
 function drawFallback(ctx, width, height, anchor, palette, fallback){
   const primary = palette?.primary || '#ccd7ec';
   const secondary = palette?.secondary || '#7b86a1';
@@ -175,34 +287,19 @@ export function drawEnvironmentProps(ctx, g, cam, backgroundKey){
   if (!resolved) return;
   const { config } = resolved;
   if (!config || config.enabled === false) return;
-  const props = Array.isArray(config.props) ? config.props : [];
-  if (!props.length) return;
+  const cache = getBackgroundPropCache(config);
+  const normalizedProps = cache?.normalizedProps;
+  if (!normalizedProps || !normalizedProps.length) return;
 
-  const rowGap = ((cam?.rowGapRatio) ?? 0.62) * g.tile;
-  const drawables = [];
-  for (const rawProp of props){
-    const prop = normalizePropConfig(rawProp);
-    if (!prop) continue;
-    const cx = prop.cell.cx;
-    const cy = prop.cell.cy + prop.depth;
-    const projection = projectCellOblique(g, cx, cy, cam);
-    const scale = projection.scale * prop.scale;
-    const px = projection.x + prop.offset.x * g.tile + prop.pixelOffset.x;
-    const pyBase = projection.y + (prop.baseLift ?? 0.5) * rowGap + prop.offset.y * rowGap + prop.pixelOffset.y;
-    const spriteEntry = prop.asset ? ensureSpriteLoaded({ sprite: prop.asset }) : null;
-    drawables.push({
-      prop,
-      x: px,
-      y: pyBase,
-      scale,
-      spriteEntry,
-      sortY: projection.y + prop.sortBias
-    });
+  const boardSignature = getBoardSignature(g, cam);
+  let boardState = cache.boardStates.get(boardSignature);
+  if (!boardState){
+    boardState = buildBoardState(normalizedProps, g, cam);
+    if (!boardState) return;
+    cache.boardStates.set(boardSignature, boardState);
   }
 
-  drawables.sort((a, b)=> a.sortY - b.sortY);
-
-  for (const item of drawables){
+  for (const item of boardState.drawables){
     const { prop } = item;
     let width = prop.size.w * item.scale;
     let height = prop.size.h * item.scale;
