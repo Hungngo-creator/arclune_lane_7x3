@@ -95,11 +95,12 @@ __define('./ai.js', (exports, module, __require) => {
     Game.ai.deck.push(...more);
   }
 
-  function listEmptyEnemySlots(Game){
+  function listEmptyEnemySlots(Game, aliveTokens){
+    const alive = Array.isArray(aliveTokens) ? aliveTokens : tokensAlive(Game);
     const out = [];
     for (let s = 1; s <= 9; s++){
       const { cx, cy } = slotToCell('enemy', s);
-      if (!cellReserved(tokensAlive(Game), Game.queued, cx, cy)) out.push({ s, cx, cy });
+      if (!cellReserved(alive, Game.queued, cx, cy)) out.push({ s, cx, cy });
     }
     return out;
   }
@@ -112,9 +113,9 @@ __define('./ai.js', (exports, module, __require) => {
     const dist = Math.abs(cx - 0) + Math.abs(cy - 1);
     return 1 - Math.min(1, dist / 7);
   }
-  function safetyScore(Game, cx, cy){
-    const foes = tokensAlive(Game).filter(t => t.side === 'ally');
-    const sameRow = foes.filter(t => t.cy === cy);
+  function safetyScore(Game, cx, cy, allyTokens){
+    const foesSource = Array.isArray(allyTokens) ? allyTokens : tokensAlive(Game).filter(t => t.side === 'ally');
+    const sameRow = foesSource.filter(t => t.cy === cy);
     const near = sameRow.filter(t => Math.abs(t.cx - cx) <= 1).length;
     const far  = sameRow.length - near;
     return Math.max(0, Math.min(1, 1 - (near*0.6 + far*0.2)/3));
@@ -138,15 +139,16 @@ __define('./ai.js', (exports, module, __require) => {
       default: return [];
     }
   }
-  function summonerFeasibility(Game, unitId, baseSlot){
+  function summonerFeasibility(Game, unitId, baseSlot, aliveTokens){
     const meta = Game.meta.get(unitId);
     if (!meta || meta.class !== 'Summoner' || meta?.kit?.ult?.type !== 'summon') return 1.0;
     const u = meta.kit.ult;
+    const alive = Array.isArray(aliveTokens) ? aliveTokens : tokensAlive(Game);
     const cand = getPatternSlots(u.pattern || 'verticalNeighbors', baseSlot)
       .filter(Boolean)
       .filter(s => {
         const { cx, cy } = slotToCell('enemy', s);
-        return !cellReserved(tokensAlive(Game), Game.queued, cx, cy);
+        return !cellReserved(alive, Game.queued, cx, cy);
       });
     const need = Math.max(1, u.count || 1);
     return Math.min(1, cand.length / need);
@@ -179,8 +181,9 @@ __define('./ai.js', (exports, module, __require) => {
     return null;
   }
 
-  function rowCrowdingFactor(Game, cy){
-    const ours = tokensAlive(Game).filter(t => t.side==='enemy' && t.cy===cy).length;
+  function rowCrowdingFactor(Game, cy, enemyTokens){
+    const ours = (Array.isArray(enemyTokens) ? enemyTokens : tokensAlive(Game).filter(t => t.side==='enemy'))
+      .filter(t => t.cy===cy).length;
     let queued = 0;
     const m = Game.queued?.enemy;
     if (m && typeof m.values === 'function'){
@@ -200,10 +203,11 @@ __define('./ai.js', (exports, module, __require) => {
     return f;
   }
 
-  function queueEnemyAt(Game, card, slot, cx, cy){
+  function queueEnemyAt(Game, card, slot, cx, cy, aliveTokens){
     if (Game.ai.cost < card.cost) return false;
     if (Game.ai.summoned >= Game.ai.summonLimit) return false;
-    if (cellReserved(tokensAlive(Game), Game.queued, cx, cy)) return false;
+    const alive = Array.isArray(aliveTokens) ? aliveTokens : tokensAlive(Game);
+    if (cellReserved(alive, Game.queued, cx, cy)) return false;
     if (Game.queued.enemy.has(slot)) return false;
 
     const spawnCycle = (Game.turn.phase === 'enemy' && slot > (Game.turn.last.enemy||0))
@@ -240,8 +244,12 @@ __define('./ai.js', (exports, module, __require) => {
       };
       Game.ai.lastThinkMs = now;
       return;
-    }
-    const cells = listEmptyEnemySlots(Game);
+   }
+    const alive = tokensAlive(Game);
+    const aliveAllies = alive.filter(t => t.side === 'ally');
+    const aliveEnemies = alive.filter(t => t.side === 'enemy');
+
+    const cells = listEmptyEnemySlots(Game, alive);
       if (!cells.length) {
       Game.ai.lastDecision = {
         reason,
@@ -262,9 +270,9 @@ __define('./ai.js', (exports, module, __require) => {
       for (const cell of cells){
 
         const p  = pressureScore(cell.cx, cell.cy);
-        const s  = safetyScore(Game, cell.cx, cell.cy);
+        const s  = safetyScore(Game, cell.cx, cell.cy, aliveAllies);
         const e  = etaScoreEnemy(Game, cell.s);
-        const sf = summonerFeasibility(Game, card.id, cell.s);
+        const sf = summonerFeasibility(Game, card.id, cell.s, alive);
 
         const kitInstantScore = kitTraits.hasInstant ? e : 0;
         const kitDefenseScore = kitTraits.hasDefBuff ? (1 - s) : 0;
@@ -281,7 +289,7 @@ __define('./ai.js', (exports, module, __require) => {
         };
 
         const baseScore = Object.values(contributions).reduce((acc, val) => acc + val, 0);
-        const rowFactor = rowCrowdingFactor(Game, cell.cy);
+        const rowFactor = rowCrowdingFactor(Game, cell.cy, aliveEnemies);
         const roleFactor = roleBias(meta?.class, cell.cx);
         const finalScore = baseScore * rowFactor * roleFactor;
 
@@ -320,7 +328,6 @@ __define('./ai.js', (exports, module, __require) => {
 
     evaluations.sort((a, b) => (b.score - a.score));
 
-    const alive = tokensAlive(Game);
     let chosen = null;
     for (const entry of evaluations){
       const blocked = candidateBlocked(Game, entry, alive);
@@ -328,7 +335,7 @@ __define('./ai.js', (exports, module, __require) => {
         entry.blockedReason = blocked;
         continue;
       }
-      const ok = queueEnemyAt(Game, entry.card, entry.cell.s, entry.cell.cx, entry.cell.cy);
+      const ok = queueEnemyAt(Game, entry.card, entry.cell.s, entry.cell.cx, entry.cell.cy, alive);
       if (ok){
         chosen = entry;
         break;
@@ -1004,7 +1011,7 @@ __define('./background.js', (exports, module, __require) => {
     ];
     const camParts = [
       cam?.rowGapRatio ?? 'rg',
-      cam?.skewXPerRow ?? 'sk',
+      cam?.topScale ?? 'ts',
       cam?.depthScale ?? 'ds'
     ];
     return [...baseParts, ...camParts].join('|');
@@ -2844,14 +2851,12 @@ __define('./engine.js', (exports, module, __require) => {
 
   // --- Optional oblique rendering (non-breaking) ---
   function projectCellOblique(g, cx, cy, cam){
-    const rowGap = ((cam?.rowGapRatio) ?? 0.62) * g.tile;
-    const skew   = ((cam?.skewXPerRow) ?? 0.28) * g.tile;
-    const k      =  ((cam?.depthScale)  ?? 0.94);
+    const C = cam || {};
+    const { x, y } = _cellCenterOblique(g, cx, cy, C);
+    const k      =  (C.depthScale ?? 0.94);
     // cy: 0=trên (xa), 2=dưới (gần)
     const depth  = (g.rows - 1 - cy);
     const scale  = Math.pow(k, depth);
-    const x = g.ox + (cx + 0.5) * g.tile + cy * skew;
-    const y = g.oy + (cy + 0.5) * rowGap;
     return { x, y, scale };
   }
   function drawChibi(ctx, x, y, r, facing = 1, color = '#a9f58c') {
@@ -2918,7 +2923,7 @@ __define('./engine.js', (exports, module, __require) => {
     return [
       g.cols, g.rows, g.tile, g.ox, g.oy,
       C.rowGapRatio ?? 0.62,
-      C.skewXPerRow ?? 0.28,
+      C.topScale ?? 0.80,
       C.depthScale ?? 0.94
     ].join('|');
   }
