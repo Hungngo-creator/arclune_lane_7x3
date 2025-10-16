@@ -22,6 +22,106 @@ const DEFAULT_THEME = {
   }
 };
 
+const battlefieldSceneCache = new Map();
+
+function normalizeDimension(value){
+  if (!Number.isFinite(value)) return 0;
+  return value;
+}
+
+function createOffscreenCanvas(pixelWidth, pixelHeight){
+  const safeW = Math.max(1, Math.floor(pixelWidth || 0));
+  const safeH = Math.max(1, Math.floor(pixelHeight || 0));
+  if (!safeW || !safeH) return null;
+  if (typeof OffscreenCanvas === 'function'){
+    try {
+      return new OffscreenCanvas(safeW, safeH);
+    } catch (_) {}
+  }
+  if (typeof document !== 'undefined' && typeof document.createElement === 'function'){
+    const canvas = document.createElement('canvas');
+    canvas.width = safeW;
+    canvas.height = safeH;
+    return canvas;
+  }
+  return null;
+}
+
+function themeSignature(theme){
+  try {
+    const merged = mergeTheme(theme);
+    return JSON.stringify(merged);
+  } catch (_) {
+    return 'default-theme';
+  }
+}
+
+function gridSignature(g, cssWidth, cssHeight, dpr){
+  if (!g) return 'no-grid';
+  const parts = [
+    `cols:${g.cols ?? 'na'}`,
+    `rows:${g.rows ?? 'na'}`,
+    `tile:${Math.round(g.tile ?? 0)}`,
+    `ox:${Math.round(g.ox ?? 0)}`,
+    `oy:${Math.round(g.oy ?? 0)}`,
+    `w:${Math.round(cssWidth ?? 0)}`,
+    `h:${Math.round(cssHeight ?? 0)}`,
+    `dpr:${Number.isFinite(dpr) ? dpr : 'na'}`
+  ];
+  return parts.join('|');
+}
+
+export function invalidateBattlefieldSceneCache(){
+  battlefieldSceneCache.clear();
+}
+
+export function getCachedBattlefieldScene(g, theme, options = {}){
+  if (!g) return null;
+  const cssWidth = normalizeDimension(options.width ?? g.w);
+  const cssHeight = normalizeDimension(options.height ?? g.h);
+  const dpr = Number.isFinite(options.dpr) ? options.dpr : (Number.isFinite(g.dpr) ? g.dpr : 1);
+  if (!cssWidth || !cssHeight) return null;
+  const pixelWidth = Math.max(1, Math.round(cssWidth * dpr));
+  const pixelHeight = Math.max(1, Math.round(cssHeight * dpr));
+  const gridKey = gridSignature(g, cssWidth, cssHeight, dpr);
+  const themeKey = themeSignature(theme);
+  const cacheKey = `${gridKey}::${themeKey}`;
+  const existing = battlefieldSceneCache.get(cacheKey);
+  if (existing && existing.pixelWidth === pixelWidth && existing.pixelHeight === pixelHeight){
+    return existing;
+  }
+
+  const offscreen = createOffscreenCanvas(pixelWidth, pixelHeight);
+  if (!offscreen) return null;
+  const offCtx = offscreen.getContext('2d');
+  if (!offCtx) return null;
+
+  if (typeof offCtx.resetTransform === 'function') offCtx.resetTransform();
+  else if (typeof offCtx.setTransform === 'function') offCtx.setTransform(1, 0, 0, 1, 0, 0);
+
+  offCtx.clearRect(0, 0, pixelWidth, pixelHeight);
+
+  if (typeof offCtx.setTransform === 'function') offCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  else if (dpr !== 1 && typeof offCtx.scale === 'function') offCtx.scale(dpr, dpr);
+
+  const gridForDraw = { ...g, w: cssWidth, h: cssHeight, dpr };
+  drawBattlefieldScene(offCtx, gridForDraw, theme);
+
+  const entry = {
+    canvas: offscreen,
+    pixelWidth,
+    pixelHeight,
+    cssWidth,
+    cssHeight,
+    dpr,
+    gridKey,
+    themeKey,
+    cacheKey
+  };
+  battlefieldSceneCache.set(cacheKey, entry);
+  return entry;
+}
+
 function mergeTheme(theme){
   if (!theme) return DEFAULT_THEME;
   return {
