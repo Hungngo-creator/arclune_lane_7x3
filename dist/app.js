@@ -1742,22 +1742,22 @@ __define('./data/modes.js', (exports, module, __require) => {
 
   const MENU_SECTION_DEFINITIONS = [
     { id: 'core-pve', title: 'PvE' },
-    { id: 'competitive', title: 'Cạnh tranh' },
     { id: 'economy', title: 'Kinh tế & Hạ tầng' }
   ];
 
   const MODE_GROUPS = [
     {
       id: 'arena-hub',
-      title: 'Đấu Trường',
-      shortDescription: 'Lựa chọn giữa đấu trường PvE và PvP, cả hai đều xoay quanh mùa giải 7 ngày với bảng xếp hạng phần thưởng.',
+      title: 'Chiến Trường',
+      shortDescription: 'Tụ điểm tổng hợp các hoạt động chiến đấu luân phiên để người chơi bước vào chiến dịch, thử thách và mùa giải.',
       icon: '🏟️',
       tags: ['PvE', 'PvP'],
-      menuSections: ['core-pve', 'competitive'],
-      childModeIds: ['arena', 'beast-arena']
+      menuSections: ['core-pve'],
+      childModeIds: ['arena', 'beast-arena', 'ares', 'challenge', 'campaign'],
+      extraClasses: ['mode-card--wide']
     }
   ];
-  
+ 
   const MODES = [
     {
       id: 'campaign',
@@ -1769,6 +1769,7 @@ __define('./data/modes.js', (exports, module, __require) => {
       unlockNotes: 'Mở từ đầu; tiến trình mở rộng sang hệ tu luyện 15 đại cảnh giới và tái thiết các kiến trúc tông môn.',
       tags: ['PvE'],
       menuSections: ['core-pve'],
+      parentId: 'arena-hub',
       shell: {
         screenId: 'pve-session',
         moduleId: './modes/pve/session.js',
@@ -1785,6 +1786,7 @@ __define('./data/modes.js', (exports, module, __require) => {
       unlockNotes: 'Có sẵn để thử sức với các đội hình cố định và nhận phần thưởng thử thách đặc biệt.',
       tags: ['PvE'],
       menuSections: ['core-pve'],
+      parentId: 'arena-hub',
       shell: {
         screenId: 'pve-session',
         moduleId: './modes/pve/session.js',
@@ -1800,7 +1802,7 @@ __define('./data/modes.js', (exports, module, __require) => {
       shortDescription: 'Deck PvE đối đầu deck do AI điều khiển, xoay vòng mùa giải 7 ngày với bảng xếp hạng phần thưởng.',
       unlockNotes: 'Yêu cầu chuẩn bị deck xếp sẵn; tham chiến theo mùa 7 ngày để nhận thưởng và leo bảng.',
       tags: ['PvE'],
-      menuSections: ['core-pve', 'competitive'],
+      menuSections: ['core-pve'],
       parentId: 'arena-hub',
       shell: {
         screenId: 'pve-session',
@@ -1817,7 +1819,8 @@ __define('./data/modes.js', (exports, module, __require) => {
       shortDescription: 'PvP thời gian thực, hiển thị "Coming soon" cho tới khi hạ tầng networking hoàn tất.',
       unlockNotes: 'Chờ kết nối hệ thống PvP online realtime trước khi mở cho người chơi.',
       tags: ['PvP', 'Coming soon'],
-      menuSections: ['competitive'],
+      menuSections: ['core-pve'],
+      parentId: 'arena-hub',
       shell: {
         screenId: 'main-menu',
         fallbackModuleId: './modes/coming-soon.stub.js'
@@ -1922,7 +1925,7 @@ __define('./data/modes.js', (exports, module, __require) => {
       shortDescription: 'Đưa sủng thú chiến đấu tự động để leo hệ thống rank từ Đồng tới Đấu Thần theo số trận thắng.',
       unlockNotes: 'Yêu cầu sở hữu sủng thú và tham gia mùa giải để leo hạng, nhận thưởng ở mọi bậc và phần thưởng đặc biệt cho top.',
       tags: ['PvP', 'Coming soon'],
-      menuSections: ['competitive'],
+      menuSections: ['core-pve'],
       parentId: 'arena-hub',
       shell: {
         screenId: 'main-menu',
@@ -1978,7 +1981,6 @@ __define('./data/modes.js', (exports, module, __require) => {
         return true;
       });
     };
-    
     return MENU_SECTION_DEFINITIONS.map(section => {
       const entries = [];
 
@@ -2013,7 +2015,7 @@ __define('./data/modes.js', (exports, module, __require) => {
         title: section.title,
         entries
       };
-    }).filter(Boolean);
+      }).filter(Boolean);
   }
 
   exports.MODES = MODES;
@@ -2026,7 +2028,6 @@ __define('./data/modes.js', (exports, module, __require) => {
   exports.listModesByType = listModesByType;
   exports.listModesForSection = listModesForSection;
   exports.getMenuSections = getMenuSections;
-
 });
 __define('./engine.js', (exports, module, __require) => {
   const __dep0 = __require('./config.js');
@@ -2659,7 +2660,7 @@ __define('./entry.js', (exports, module, __require) => {
       ? { ...shell.defaultParams }
       : null;
 
-  acc[mode.id] = {
+   acc[mode.id] = {
       key: mode.id,
       label: mode.title,
       type: mode.type,
@@ -2685,7 +2686,7 @@ __define('./entry.js', (exports, module, __require) => {
       icon: mode.icon,
       tags: Array.isArray(mode.tags) ? [...mode.tags] : [],
       status: mode.status,
-            params: definition?.params || null,
+      params: definition?.params || null,
       parentId: mode.parentId || null
     };
   });
@@ -2718,12 +2719,13 @@ __define('./entry.js', (exports, module, __require) => {
       params: null,
       parentId: null,
       isGroup: true,
-      childModeIds
+      childModeIds,
+      extraClasses: Array.isArray(group.extraClasses) ? [...group.extraClasses] : []
     };
   });
 
   const CARD_METADATA = [...MODE_METADATA, ...MODE_GROUP_METADATA];
-  
+
   const MENU_SECTIONS = getMenuSections({
     includeStatuses: [MODE_STATUS.AVAILABLE, MODE_STATUS.COMING_SOON]
   });
@@ -5282,10 +5284,14 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
   ];
 
   function ensureStyles(){
-    if (document.getElementById(STYLE_ID)) return;
-    const style = document.createElement('style');
-    style.id = STYLE_ID;
-    style.textContent = `
+    let style = document.getElementById(STYLE_ID);
+    if (!style || style.tagName.toLowerCase() !== 'style'){
+      style = document.createElement('style');
+      style.id = STYLE_ID;
+      document.head.appendChild(style);
+    }
+
+    const css = `
       .app--main-menu{padding:32px 16px 64px;}
       .main-menu-v2{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:32px;color:inherit;}
       .main-menu-v2__header{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-end;justify-content:space-between;}
@@ -5352,8 +5358,10 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
       .mode-card__group-caret{position:absolute;top:22px;right:20px;font-size:14px;opacity:.65;transition:transform .2s ease,opacity .2s ease;}
       .mode-card--group:hover .mode-card__group-caret{opacity:.9;}
       .mode-card--group.is-open .mode-card__group-caret{transform:rotate(180deg);}
-      .mode-card__group-popover{position:absolute;left:0;right:0;top:calc(100% + 12px);display:none;flex-direction:column;gap:12px;padding:16px;border-radius:18px;border:1px solid rgba(125,211,252,.32);background:rgba(12,20,30,.95);box-shadow:0 28px 52px rgba(6,12,20,.6);z-index:10;}
-      .mode-card--group.is-open .mode-card__group-popover{display:flex;}
+      .mode-card__group-info{display:flex;flex-direction:column;gap:12px;width:100%;}
+      .mode-card__group-children{display:none;width:100%;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;}
+      .mode-card--group.is-open .mode-card__group-children{display:grid;}
+      .mode-card--group.is-open .mode-card__group-info{display:none;}
       .mode-card__child{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:14px;border:1px solid rgba(125,211,252,.18);background:rgba(12,22,32,.9);color:inherit;cursor:pointer;text-align:left;transition:border-color .2s ease,background .2s ease,transform .2s ease;}
       .mode-card__child:hover{border-color:rgba(125,211,252,.42);background:rgba(16,30,44,.95);transform:translateY(-2px);}
       .mode-card__child:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:3px;}
@@ -5374,7 +5382,10 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
       @media(max-width:960px){.main-menu-v2__layout{grid-template-columns:1fr;}.main-menu-sidebar{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;}}
       @media(max-width:640px){.main-menu-v2{gap:24px;}.hero-panel__info{padding:24px;}.hero-panel__canvas{padding:20px;}.main-menu-v2__title{font-size:36px;}.mode-card{padding:20px;}}
     `;
-    document.head.appendChild(style);
+    
+    if (style.textContent !== css){
+      style.textContent = css;
+    }
   }
 
   function applyPalette(element, profile){
@@ -5436,7 +5447,7 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
       element.appendChild(statusEl);
     }
 
-  return { statusEl };
+    return { statusEl };
   }
 
   function createModeCard(mode, shell, onShowComingSoon, addCleanup, options = {}){
@@ -5449,7 +5460,7 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
       extraClasses,
       showStatus: options.showStatus !== false
     });
-    
+
     const handleClick = event => {
       event.preventDefault();
       event.stopPropagation();
@@ -5478,7 +5489,10 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
 
   function createModeGroupCard(group, childModes, shell, onShowComingSoon, addCleanup){
     const wrapper = document.createElement('div');
-    buildModeCardBase(wrapper, group, { extraClasses: ['mode-card--group'], showStatus: false });
+    const groupClasses = Array.isArray(group.extraClasses)
+      ? ['mode-card--group', ...group.extraClasses]
+      : ['mode-card--group'];
+    buildModeCardBase(wrapper, group, { extraClasses: groupClasses, showStatus: false });
     wrapper.setAttribute('role', 'button');
     wrapper.setAttribute('aria-haspopup', 'true');
     wrapper.setAttribute('aria-expanded', 'false');
@@ -5486,6 +5500,17 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
       wrapper.setAttribute('aria-label', `Chọn chế độ trong ${group.title}`);
     }
     wrapper.tabIndex = 0;
+    
+    const infoBlock = document.createElement('div');
+    infoBlock.className = 'mode-card__group-info';
+    infoBlock.setAttribute('aria-hidden', 'false');
+    const existingIcon = wrapper.querySelector('.mode-card__icon');
+    const existingTitle = wrapper.querySelector('.mode-card__title');
+    const existingDesc = wrapper.querySelector('.mode-card__desc');
+    if (existingIcon) infoBlock.appendChild(existingIcon);
+    if (existingTitle) infoBlock.appendChild(existingTitle);
+    if (existingDesc) infoBlock.appendChild(existingDesc);
+    wrapper.insertBefore(infoBlock, wrapper.firstChild);
 
     const caret = document.createElement('span');
     caret.className = 'mode-card__group-caret';
@@ -5493,10 +5518,12 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
     caret.textContent = '▾';
     wrapper.appendChild(caret);
 
-    const popover = document.createElement('div');
-    popover.className = 'mode-card__group-popover';
-    popover.setAttribute('role', 'menu');
-    wrapper.appendChild(popover);
+    const childrenGrid = document.createElement('div');
+    childrenGrid.className = 'mode-card__group-children';
+    childrenGrid.setAttribute('role', 'menu');
+    childrenGrid.setAttribute('aria-hidden', 'true');
+    childrenGrid.hidden = true;
+    wrapper.appendChild(childrenGrid);
 
     let isOpen = false;
     let documentListenerActive = false;
@@ -5524,6 +5551,10 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
       isOpen = true;
       wrapper.classList.add('is-open');
       wrapper.setAttribute('aria-expanded', 'true');
+      infoBlock.hidden = true;
+      infoBlock.setAttribute('aria-hidden', 'true');
+      childrenGrid.hidden = false;
+      childrenGrid.setAttribute('aria-hidden', 'false');
       setTimeout(bindOutsideClick, 0);
     };
 
@@ -5532,6 +5563,10 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
       isOpen = false;
       wrapper.classList.remove('is-open');
       wrapper.setAttribute('aria-expanded', 'false');
+      infoBlock.hidden = false;
+      infoBlock.setAttribute('aria-hidden', 'false');
+      childrenGrid.hidden = true;
+      childrenGrid.setAttribute('aria-hidden', 'true');
       unbindOutsideClick();
     };
 
@@ -5632,7 +5667,7 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
       item.addEventListener('click', handleSelect);
       addCleanup(() => item.removeEventListener('click', handleSelect));
 
-      popover.appendChild(item);
+      childrenGrid.appendChild(item);
     });
 
     return wrapper;
