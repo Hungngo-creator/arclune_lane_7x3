@@ -2672,6 +2672,7 @@ __define('./engine.js', (exports, module, __require) => {
       const yb = b.projection.y;
       if (ya === yb) return a.token.cx - b.token.cx;
       return ya - yb;
+    });
   for (const { token: t, projection: p } of alive){
       const scale = p.scale ?? 1;
       const r = Math.max(6, Math.floor(baseR * scale));
