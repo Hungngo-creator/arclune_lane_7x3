@@ -476,6 +476,9 @@ function formatName(text){
   return `${str.slice(0, 15)}…`;
 }
 
+const nameplateMetricsCache = new Map();
+let nameplateCacheFontSignature = '';
+
 function drawNameplate(ctx, text, x, y, r, art){
   if (!text) return;
   const layout = art?.layout || {};
@@ -485,12 +488,25 @@ function drawNameplate(ctx, text, x, y, r, art){
   ctx.save();
   ctx.shadowColor = 'transparent';
   ctx.shadowBlur = 0;
-  ctx.font = `${fontSize}px 'Be Vietnam Pro', 'Inter', system-ui`;
+  const font = `${fontSize}px 'Be Vietnam Pro', 'Inter', system-ui`;
+  ctx.font = font;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  const metrics = ctx.measureText(text);
-  const width = Math.ceil(metrics.width + padX * 2);
-  const height = Math.ceil(fontSize + padY * 2);
+  if (font !== nameplateCacheFontSignature){
+    nameplateMetricsCache.clear();
+    nameplateCacheFontSignature = font;
+  }
+  const key = `${fontSize}|${text}`;
+  let cached = nameplateMetricsCache.get(key);
+  if (!cached){
+    const metrics = ctx.measureText(text);
+    cached = {
+      width: Math.ceil(metrics.width + padX * 2),
+      height: Math.ceil(fontSize + padY * 2)
+    };
+    nameplateMetricsCache.set(key, cached);
+  }
+  const { width, height } = cached;
   const radius = Math.max(4, Math.floor(height / 2));
   const boxX = Math.round(x - width / 2);
   const boxY = Math.round(y - height / 2);
