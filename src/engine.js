@@ -197,14 +197,12 @@ function _cellCenterOblique(g, cx, cy, C){
 
 // --- Optional oblique rendering (non-breaking) ---
 export function projectCellOblique(g, cx, cy, cam){
-  const rowGap = ((cam?.rowGapRatio) ?? 0.62) * g.tile;
-  const skew   = ((cam?.skewXPerRow) ?? 0.28) * g.tile;
-  const k      =  ((cam?.depthScale)  ?? 0.94);
+  const C = cam || {};
+  const { x, y } = _cellCenterOblique(g, cx, cy, C);
+  const k      =  (C.depthScale ?? 0.94);
   // cy: 0=trên (xa), 2=dưới (gần)
   const depth  = (g.rows - 1 - cy);
   const scale  = Math.pow(k, depth);
-  const x = g.ox + (cx + 0.5) * g.tile + cy * skew;
-  const y = g.oy + (cy + 0.5) * rowGap;
   return { x, y, scale };
 }
 function drawChibi(ctx, x, y, r, facing = 1, color = '#a9f58c') {
@@ -271,7 +269,7 @@ function contextSignature(g, cam){
   return [
     g.cols, g.rows, g.tile, g.ox, g.oy,
     C.rowGapRatio ?? 0.62,
-    C.skewXPerRow ?? 0.28,
+    C.topScale ?? 0.80,
     C.depthScale ?? 0.94
   ].join('|');
 }

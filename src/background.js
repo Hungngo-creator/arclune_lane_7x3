@@ -49,7 +49,7 @@ function getBoardSignature(g, cam){
   ];
   const camParts = [
     cam?.rowGapRatio ?? 'rg',
-    cam?.skewXPerRow ?? 'sk',
+    cam?.topScale ?? 'ts',
     cam?.depthScale ?? 'ds'
   ];
   return [...baseParts, ...camParts].join('|');

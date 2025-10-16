@@ -75,11 +75,12 @@ export function refillDeckEnemy(Game){
   Game.ai.deck.push(...more);
 }
 
-function listEmptyEnemySlots(Game){
+function listEmptyEnemySlots(Game, aliveTokens){
+  const alive = Array.isArray(aliveTokens) ? aliveTokens : tokensAlive(Game);
   const out = [];
   for (let s = 1; s <= 9; s++){
     const { cx, cy } = slotToCell('enemy', s);
-    if (!cellReserved(tokensAlive(Game), Game.queued, cx, cy)) out.push({ s, cx, cy });
+    if (!cellReserved(alive, Game.queued, cx, cy)) out.push({ s, cx, cy });
   }
   return out;
 }
@@ -92,9 +93,9 @@ function pressureScore(cx, cy){
   const dist = Math.abs(cx - 0) + Math.abs(cy - 1);
   return 1 - Math.min(1, dist / 7);
 }
-function safetyScore(Game, cx, cy){
-  const foes = tokensAlive(Game).filter(t => t.side === 'ally');
-  const sameRow = foes.filter(t => t.cy === cy);
+function safetyScore(Game, cx, cy, allyTokens){
+  const foesSource = Array.isArray(allyTokens) ? allyTokens : tokensAlive(Game).filter(t => t.side === 'ally');
+  const sameRow = foesSource.filter(t => t.cy === cy);
   const near = sameRow.filter(t => Math.abs(t.cx - cx) <= 1).length;
   const far  = sameRow.length - near;
   return Math.max(0, Math.min(1, 1 - (near*0.6 + far*0.2)/3));
@@ -118,15 +119,16 @@ function getPatternSlots(pattern, baseSlot){
     default: return [];
   }
 }
-function summonerFeasibility(Game, unitId, baseSlot){
+function summonerFeasibility(Game, unitId, baseSlot, aliveTokens){
   const meta = Game.meta.get(unitId);
   if (!meta || meta.class !== 'Summoner' || meta?.kit?.ult?.type !== 'summon') return 1.0;
   const u = meta.kit.ult;
+  const alive = Array.isArray(aliveTokens) ? aliveTokens : tokensAlive(Game);
   const cand = getPatternSlots(u.pattern || 'verticalNeighbors', baseSlot)
     .filter(Boolean)
     .filter(s => {
       const { cx, cy } = slotToCell('enemy', s);
-      return !cellReserved(tokensAlive(Game), Game.queued, cx, cy);
+      return !cellReserved(alive, Game.queued, cx, cy);
     });
   const need = Math.max(1, u.count || 1);
   return Math.min(1, cand.length / need);
@@ -159,8 +161,9 @@ function candidateBlocked(Game, entry, aliveTokens){
   return null;
 }
 
-function rowCrowdingFactor(Game, cy){
-  const ours = tokensAlive(Game).filter(t => t.side==='enemy' && t.cy===cy).length;
+function rowCrowdingFactor(Game, cy, enemyTokens){
+  const ours = (Array.isArray(enemyTokens) ? enemyTokens : tokensAlive(Game).filter(t => t.side==='enemy'))
+    .filter(t => t.cy===cy).length;
   let queued = 0;
   const m = Game.queued?.enemy;
   if (m && typeof m.values === 'function'){
@@ -180,10 +183,11 @@ function roleBias(className, cx){
   return f;
 }
 
-export function queueEnemyAt(Game, card, slot, cx, cy){
+export function queueEnemyAt(Game, card, slot, cx, cy, aliveTokens){
   if (Game.ai.cost < card.cost) return false;
   if (Game.ai.summoned >= Game.ai.summonLimit) return false;
-  if (cellReserved(tokensAlive(Game), Game.queued, cx, cy)) return false;
+  const alive = Array.isArray(aliveTokens) ? aliveTokens : tokensAlive(Game);
+  if (cellReserved(alive, Game.queued, cx, cy)) return false;
   if (Game.queued.enemy.has(slot)) return false;
 
   const spawnCycle = (Game.turn.phase === 'enemy' && slot > (Game.turn.last.enemy||0))
@@ -220,8 +224,12 @@ export function aiMaybeAct(Game, reason){
     };
     Game.ai.lastThinkMs = now;
     return;
-  }
-  const cells = listEmptyEnemySlots(Game);
+ }
+  const alive = tokensAlive(Game);
+  const aliveAllies = alive.filter(t => t.side === 'ally');
+  const aliveEnemies = alive.filter(t => t.side === 'enemy');
+
+  const cells = listEmptyEnemySlots(Game, alive);
     if (!cells.length) {
     Game.ai.lastDecision = {
       reason,
@@ -242,9 +250,9 @@ export function aiMaybeAct(Game, reason){
     for (const cell of cells){
 
       const p  = pressureScore(cell.cx, cell.cy);
-      const s  = safetyScore(Game, cell.cx, cell.cy);
+      const s  = safetyScore(Game, cell.cx, cell.cy, aliveAllies);
       const e  = etaScoreEnemy(Game, cell.s);
-      const sf = summonerFeasibility(Game, card.id, cell.s);
+      const sf = summonerFeasibility(Game, card.id, cell.s, alive);
 
       const kitInstantScore = kitTraits.hasInstant ? e : 0;
       const kitDefenseScore = kitTraits.hasDefBuff ? (1 - s) : 0;
@@ -261,7 +269,7 @@ export function aiMaybeAct(Game, reason){
       };
 
       const baseScore = Object.values(contributions).reduce((acc, val) => acc + val, 0);
-      const rowFactor = rowCrowdingFactor(Game, cell.cy);
+      const rowFactor = rowCrowdingFactor(Game, cell.cy, aliveEnemies);
       const roleFactor = roleBias(meta?.class, cell.cx);
       const finalScore = baseScore * rowFactor * roleFactor;
 
@@ -300,7 +308,6 @@ export function aiMaybeAct(Game, reason){
 
   evaluations.sort((a, b) => (b.score - a.score));
 
-  const alive = tokensAlive(Game);
   let chosen = null;
   for (const entry of evaluations){
     const blocked = candidateBlocked(Game, entry, alive);
@@ -308,7 +315,7 @@ export function aiMaybeAct(Game, reason){
       entry.blockedReason = blocked;
       continue;
     }
-    const ok = queueEnemyAt(Game, entry.card, entry.cell.s, entry.cell.cx, entry.cell.cy);
+    const ok = queueEnemyAt(Game, entry.card, entry.cell.s, entry.cell.cx, entry.cell.cy, alive);
     if (ok){
       chosen = entry;
       break;
