@@ -1698,10 +1698,14 @@ __define('./config.js', (exports, module, __require) => {
       meleeDurationMs: 1100
     },
   // === Debug flags (W0-J1) ===
-   DEBUG: {
+    DEBUG: {
      SHOW_QUEUED: true,        // vẽ unit "Chờ Lượt" cho phe mình (ally) khi có
      SHOW_QUEUED_ENEMY: false  // kẻ địch không thấy (đúng design)
    },
+   PERFORMANCE: {
+      LOW_POWER_SHADOWS: false,        // true: luôn tắt bóng đổ để tiết kiệm
+      SHADOW_DISABLE_THRESHOLD: 16     // ≥ số token này thì bỏ bóng để giữ FPS
+    },
     COLORS: {
       ally: '#1e2b36',
       enemy: '#2a1c22',
@@ -3191,6 +3195,11 @@ __define('./engine.js', (exports, module, __require) => {
       if (ya === yb) return a.token.cx - b.token.cx;
       return ya - yb;
     });
+    const perfCfg = CFG?.PERFORMANCE || {};
+    const shadowThreshold = Number.isFinite(perfCfg.SHADOW_DISABLE_THRESHOLD)
+      ? perfCfg.SHADOW_DISABLE_THRESHOLD
+      : null;
+    const reduceShadows = !!(perfCfg.LOW_POWER_SHADOWS) || (shadowThreshold !== null && alive.length >= shadowThreshold);
    for (const { token: t, projection: p } of alive){
       const scale = p.scale ?? 1;
       const r = Math.max(6, Math.floor(baseR * scale));
@@ -3215,10 +3224,24 @@ __define('./engine.js', (exports, module, __require) => {
         ctx.translate(p.x, p.y);
         if (facing === -1 && art?.mirror !== false) ctx.scale(-1, 1);
         const shadow = shadowCfg || {};
-        const shadowColor = shadow.color || art?.glow || art?.shadow || 'rgba(0,0,0,0.35)';
-        const shadowBlur = Number.isFinite(shadow.blur) ? shadow.blur : Math.max(6, r * 0.7);
-        const shadowOffsetX = Number.isFinite(shadow.offsetX) ? shadow.offsetX : 0;
-        const shadowOffsetY = Number.isFinite(shadow.offsetY) ? shadow.offsetY : Math.max(2, r * 0.2);
+        let shadowColor = shadow.color || art?.glow || art?.shadow || 'rgba(0,0,0,0.35)';
+        let shadowBlur = Number.isFinite(shadow.blur) ? shadow.blur : Math.max(6, r * 0.7);
+        let shadowOffsetX = Number.isFinite(shadow.offsetX) ? shadow.offsetX : 0;
+        let shadowOffsetY = Number.isFinite(shadow.offsetY) ? shadow.offsetY : Math.max(2, r * 0.2);
+        if (reduceShadows){
+          const cheap = perfCfg?.LOW_SHADOW_PRESET;
+          if (cheap === 'soft'){ // giữ chút bóng nhẹ nhàng
+            shadowColor = 'rgba(0, 0, 0, 0.18)';
+            shadowBlur = Math.min(6, shadowBlur * 0.4);
+            shadowOffsetX = 0;
+            shadowOffsetY = Math.min(4, Math.max(1, shadowOffsetY * 0.4));
+          } else {
+            shadowColor = 'transparent';
+            shadowBlur = 0;
+            shadowOffsetX = 0;
+            shadowOffsetY = 0;
+          }
+        }
         ctx.shadowColor = shadowColor;
         ctx.shadowBlur = shadowBlur;
         ctx.shadowOffsetX = shadowOffsetX;
