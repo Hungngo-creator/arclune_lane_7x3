@@ -23,7 +23,7 @@ import { drawEnvironmentProps, getEnvironmentBackground } from '../../background
 import { getUnitArt, setUnitSkin } from '../../art.js';
 import { initHUD, startSummonBar } from '../../ui.js';
 import { vfxDraw, vfxAddSpawn, vfxAddHit, vfxAddMelee } from '../../vfx.js';
-import { drawBattlefieldScene } from '../../scene.js';
+import { drawBattlefieldScene, getCachedBattlefieldScene } from '../../scene.js';
 import { gameEvents, TURN_START, TURN_END, ACTION_START, ACTION_END } from '../../events.js';
 import { ensureNestedModuleSupport } from '../../utils/dummy.js';
 /** @type {HTMLCanvasElement|null} */ let canvas = null;
@@ -261,13 +261,21 @@ function ensureSceneCache(){
   const pixelWidth = Math.max(1, Math.round(cssWidth * dpr));
   const pixelHeight = Math.max(1, Math.round(cssHeight * dpr));
 
+  const baseScene = getCachedBattlefieldScene(grid, theme, { width: cssWidth, height: cssHeight, dpr });
+  const baseKey = baseScene?.cacheKey;
+  if (!baseScene){
+    sceneCache = null;
+    return null;
+  }
+  
   let needsRebuild = false;
   if (!sceneCache) needsRebuild = true;
   else if (sceneCache.pixelWidth !== pixelWidth || sceneCache.pixelHeight !== pixelHeight) needsRebuild = true;
   else if (sceneCache.themeKey !== themeKey || sceneCache.backgroundKey !== backgroundKey) needsRebuild = true;
   else if (sceneCache.backgroundSignature !== backgroundSignature) needsRebuild = true;
   else if (sceneCache.dpr !== dpr) needsRebuild = true;
-
+  else if (sceneCache.baseKey !== baseKey) needsRebuild = true;
+  
   if (!needsRebuild) return sceneCache;
 
   const offscreen = createSceneCacheCanvas(pixelWidth, pixelHeight);
@@ -282,6 +290,13 @@ function ensureSceneCache(){
   }
   cacheCtx.clearRect(0, 0, pixelWidth, pixelHeight);
 
+  try {
+    cacheCtx.drawImage(baseScene.canvas, 0, 0);
+  } catch (err) {
+    console.error('[scene-cache:base]', err);
+    return null;
+  }
+  
   if (typeof cacheCtx.setTransform === 'function'){
     cacheCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
   } else if (dpr !== 1 && typeof cacheCtx.scale === 'function'){
@@ -289,7 +304,6 @@ function ensureSceneCache(){
   }
 
   try {
-    drawBattlefieldScene(cacheCtx, grid, theme);
     drawEnvironmentProps(cacheCtx, grid, CAM_PRESET, backgroundKey);
   } catch (err) {
     console.error('[scene-cache]', err);
@@ -305,7 +319,7 @@ function ensureSceneCache(){
     themeKey,
     backgroundKey,
     backgroundSignature,
-    dpr
+    dpr, baseKey
   };
   return sceneCache;
 }
