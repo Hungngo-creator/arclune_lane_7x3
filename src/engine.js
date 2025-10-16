@@ -10,10 +10,13 @@ export function makeGrid(canvas, cols, rows){
     (CFG.UI?.BOARD_MIN_H) ?? 220
   );
 
-const dprRaw = (typeof window !== 'undefined' && Number.isFinite(window.devicePixelRatio))
+const maxDprCfg = CFG.UI?.MAX_DPR;
+  const maxDpr = Number.isFinite(maxDprCfg) && maxDprCfg > 0 ? maxDprCfg : 3;
+  const dprRaw = (typeof window !== 'undefined' && Number.isFinite(window.devicePixelRatio))
     ? window.devicePixelRatio
     : 1;
-  const dpr = dprRaw > 0 ? dprRaw : 1;
+  const dprSafe = dprRaw > 0 ? dprRaw : 1;
+  const dpr = Math.min(maxDpr, dprSafe);
 
   const displayW = w;
   const displayH = h;
