@@ -944,17 +944,10 @@ __define('./art.js', (exports, module, __require) => {
     const skinKey = resolveSkinKey(id, baseArt, opts.skinKey);
     return instantiateArt(id, baseArt, skinKey);
   }
-
-  function getPalette(id){
-    const art = getUnitArt(id);
-    return art?.palette || basePalettes.default;
-  }
-
   exports.UNIT_ART = UNIT_ART;
   exports.setUnitSkin = setUnitSkin;
   exports.getUnitSkin = getUnitSkin;
   exports.getUnitArt = getUnitArt;
-  exports.getPalette = getPalette;
 });
 __define('./background.js', (exports, module, __require) => {
   const __dep0 = __require('./config.js');
@@ -1480,19 +1473,6 @@ __define('./combat.js', (exports, module, __require) => {
    })[0] || null;
   }
 
-  function computeDamage(attacker, target, type='physical'){
-    const atk = attacker.atk||0, wil = attacker.wil||0;
-    if (type==='arcane'){
-      const raw = Math.max(1, Math.floor(wil));
-      const cut = 1 - (target.res||0);
-      return Math.max(1, Math.floor(raw * cut));
-    } else {
-      const raw = Math.max(1, Math.floor(atk));
-      const cut = 1 - (target.arm||0);
-      return Math.max(1, Math.floor(raw * cut));
-    }
-  }
-
   function applyDamage(target, amount){
     if (!Number.isFinite(target.hpMax)) return;
     target.hp = Math.max(0, Math.min(target.hpMax, (target.hp|0) - (amount|0)));
@@ -1660,7 +1640,6 @@ __define('./combat.js', (exports, module, __require) => {
   }
 
   exports.pickTarget = pickTarget;
-  exports.computeDamage = computeDamage;
   exports.applyDamage = applyDamage;
   exports.dealAbilityDamage = dealAbilityDamage;
   exports.healUnit = healUnit;
@@ -2036,21 +2015,6 @@ __define('./data/modes.js', (exports, module, __require) => {
     return acc;
   }, {});
 
-  function getModeById(id){
-    return id ? MODE_INDEX[id] || null : null;
-  }
-
-  function listModesByType(type, options = {}){
-    const { includeStatuses } = options;
-    return MODES.filter(mode => {
-      if (type && mode.type !== type) return false;
-      if (Array.isArray(includeStatuses) && includeStatuses.length > 0){
-        return includeStatuses.includes(mode.status);
-      }
-      return true;
-    });
-  }
-
   function listModesForSection(sectionId, options = {}){
     const { includeStatuses } = options;
     return MODES.filter(mode => {
@@ -2121,8 +2085,6 @@ __define('./data/modes.js', (exports, module, __require) => {
   exports.MODE_STATUS = MODE_STATUS;
   exports.MENU_SECTION_DEFINITIONS = MENU_SECTION_DEFINITIONS;
   exports.MODE_INDEX = MODE_INDEX;
-  exports.getModeById = getModeById;
-  exports.listModesByType = listModesByType;
   exports.listModesForSection = listModesForSection;
   exports.getMenuSections = getMenuSections;
 });
@@ -3097,10 +3059,6 @@ __define('./entry.js', (exports, module, __require) => {
     return container;
   }
 
-  function getModeDefinition(modeKey){
-    return MODE_DEFINITIONS[modeKey] || null;
-  }
-
   function teardownActiveSession(){
     if (!shellInstance) return;
     const current = shellInstance.getState()?.activeSession;
@@ -3505,15 +3463,10 @@ __define('./meta.js', (exports, module, __require) => {
 __define('./modes/coming-soon.stub.js', (exports, module, __require) => {
   const comingSoon = true;
 
-  function describe(){
-    return 'coming-soon';
-  }
-
   const __defaultExport = {
     comingSoon
   };
   exports.comingSoon = comingSoon;
-  exports.describe = describe;
   exports.default = __defaultExport;
   module.exports.default = exports.default;
 });
@@ -3974,59 +3927,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     }
     Game.tokens = keep;
   }
-  /* ---------- META-GATED HELPERS (W4-J4) ---------- */
-  function neighborSlotsVertical(slot){
-    const res = [];
-    const row = (slot - 1) % 3;      // 0=trên,1=giữa,2=dưới
-    if (row > 0) res.push(slot - 1); // phía trên
-    if (row < 2) res.push(slot + 1); // phía dưới
-    return res;
-  }
-   
-  // Liệt kê ô trống hợp lệ của phe enemy theo thứ tự 1→9 (sớm→muộn)
-  function listEmptyEnemySlots(){
-   const out = [];
-   for (let s = 1; s <= 9; s++){
-     const { cx, cy } = slotToCell('enemy', s);
-      if (!cellReserved(tokensAlive(), Game.queued, cx, cy)) out.push({ s, cx, cy });
-    }
-   return out;
-  }
-  // ETA score: ra trong chu kỳ hiện tại = 1.0; phải đợi chu kỳ sau = 0.5
-  function etaScoreEnemy(slot){
-   const last = Game.turn.last.enemy || 0;
-   if (Game.turn.phase === 'enemy' && slot > last) return 1.0;
-   return 0.5;
-  }
-  // Áp lực lên leader đối phương (ally leader ở cx=0,cy=1) – gần hơn = điểm cao
-  function pressureScore(cx, cy){
-   const dist = Math.abs(cx - 0) + Math.abs(cy - 1);
-   return 1 - Math.min(1, dist / 7); // 0..1
-  }
 
-  // Độ an toàn sơ bộ: ít đồng minh (phe ta) cùng hàng, ít bị kẹp cự ly ngắn
-  function safetyScore(cx, cy){
-    const foes = tokensAlive().filter(t => t.side === 'ally');
-    const sameRow = foes.filter(t => t.cy === cy);
-    const near = sameRow.filter(t => Math.abs(t.cx - cx) <= 1).length;
-   const far  = sameRow.length - near;
-   // nhiều địch ở gần -> nguy hiểm (điểm thấp)
-   return Math.max(0, Math.min(1, 1 - (near*0.6 + far*0.2)/3));
-  }
-
-  function summonerFeasibility(unitId, baseSlot){
-   const meta = Game.meta.get(unitId);
-   if (!meta || meta.class !== 'Summoner' || meta?.kit?.ult?.type !== 'summon') return 1.0;
-   const u = meta.kit.ult;
-   const cand = getPatternSlots(u.pattern || 'verticalNeighbors', baseSlot)
-  .filter(Boolean)
-    .filter(s => {
-     const { cx, cy } = slotToCell('enemy', s);
-      return !cellReserved(tokensAlive(), Game.queued, cx, cy);
-    });
-   const need = Math.max(1, u.count || 1);
-    return Math.min(1, cand.length / need);
-  }
   // --- Summon helpers (W4-J5) ---
   function getPatternSlots(pattern, baseSlot){
     switch(pattern){
@@ -6568,7 +6469,6 @@ __define('./statuses.js', (exports, module, __require) => {
   function _dec(u, s){
     if (typeof s.dur === 'number') { s.dur -= 1; if (s.dur <= 0) Statuses.remove(u, s.id); }
   }
-  function _sum(arr, sel){ return arr.reduce((a,b)=>a + (sel ? sel(b) : b), 0); }
 
   // ===== Public API
   const Statuses = {
@@ -6822,18 +6722,8 @@ __define('./statuses.js', (exports, module, __require) => {
     return false;
   }
 
-  // ===== Helper: thêm khiên theo % HPmax (tiện dụng)
-  function grantShieldByPct(unit, pct){
-    const add = Math.max(1, Math.round((unit.hpMax || 0) * pct));
-    const cur = Statuses.get(unit, 'shield');
-    if (cur) cur.amount = (cur.amount || 0) + add;
-    else Statuses.add(unit, {id:'shield', kind:'buff', tag:'shield', amount:add});
-    return add;
-  }
-
   exports.Statuses = Statuses;
   exports.hookOnLethalDamage = hookOnLethalDamage;
-  exports.grantShieldByPct = grantShieldByPct;
 });
 __define('./summon.js', (exports, module, __require) => {
   // v0.7.3
