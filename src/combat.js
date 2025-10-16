@@ -17,7 +17,9 @@ export function pickTarget(Game, attacker){
   const s1 = Math.max(1, Math.min(3, (r|0) + 1)); // 1|2|3 (gần midline)
   seq.push(s1, s1 + 3, s1 + 6);        // 1→4→7 / 2→5→8 / 3→6→9
   for (const s of seq){
-    const { cx, cy } = slotToCell(targetSide, s);
+    const cell = slotToCell(targetSide, s);
+    if (!cell) continue;
+    const { cx, cy } = cell;
     const tgt = pool.find(t => t.cx === cx && t.cy === cy);
     if (tgt) return tgt;
  }

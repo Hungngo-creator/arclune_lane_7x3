@@ -649,7 +649,8 @@ export function slotToCell(side, slot){
     const enemyStart = CFG.GRID_COLS - CFG.ENEMY_COLS; // 4
    const cx = enemyStart + colIndex;                  // 4,5,6
    const cy = rowIndex;                               // 0..2 (trên→dưới)
- }
+ return { cx, cy };
+  }
 }
 
 // Gán nhãn “mã vùng” cho AI/AoE (A1..A9 | E1..E9) hoặc mã số tileId
