@@ -260,7 +260,7 @@ function ensureSceneCache(){
   if (!cssWidth || !cssHeight) return null;
   const pixelWidth = Math.max(1, Math.round(cssWidth * dpr));
   const pixelHeight = Math.max(1, Math.round(cssHeight * dpr));
-
+  
   const baseScene = getCachedBattlefieldScene(grid, theme, { width: cssWidth, height: cssHeight, dpr });
   const baseKey = baseScene?.cacheKey;
   if (!baseScene){
@@ -275,7 +275,7 @@ function ensureSceneCache(){
   else if (sceneCache.backgroundSignature !== backgroundSignature) needsRebuild = true;
   else if (sceneCache.dpr !== dpr) needsRebuild = true;
   else if (sceneCache.baseKey !== baseKey) needsRebuild = true;
-  
+
   if (!needsRebuild) return sceneCache;
 
   const offscreen = createSceneCacheCanvas(pixelWidth, pixelHeight);
@@ -289,7 +289,7 @@ function ensureSceneCache(){
     cacheCtx.setTransform(1, 0, 0, 1, 0, 0);
   }
   cacheCtx.clearRect(0, 0, pixelWidth, pixelHeight);
-
+  
   try {
     cacheCtx.drawImage(baseScene.canvas, 0, 0);
   } catch (err) {
@@ -406,59 +406,7 @@ function cleanupDead(now){
   }
   Game.tokens = keep;
 }
-/* ---------- META-GATED HELPERS (W4-J4) ---------- */
-function neighborSlotsVertical(slot){
-  const res = [];
-  const row = (slot - 1) % 3;      // 0=trên,1=giữa,2=dưới
-  if (row > 0) res.push(slot - 1); // phía trên
-  if (row < 2) res.push(slot + 1); // phía dưới
-  return res;
-}
- 
-// Liệt kê ô trống hợp lệ của phe enemy theo thứ tự 1→9 (sớm→muộn)
-function listEmptyEnemySlots(){
- const out = [];
- for (let s = 1; s <= 9; s++){
-   const { cx, cy } = slotToCell('enemy', s);
-    if (!cellReserved(tokensAlive(), Game.queued, cx, cy)) out.push({ s, cx, cy });
-  }
- return out;
-}
-// ETA score: ra trong chu kỳ hiện tại = 1.0; phải đợi chu kỳ sau = 0.5
-function etaScoreEnemy(slot){
- const last = Game.turn.last.enemy || 0;
- if (Game.turn.phase === 'enemy' && slot > last) return 1.0;
- return 0.5;
-}
-// Áp lực lên leader đối phương (ally leader ở cx=0,cy=1) – gần hơn = điểm cao
-function pressureScore(cx, cy){
- const dist = Math.abs(cx - 0) + Math.abs(cy - 1);
- return 1 - Math.min(1, dist / 7); // 0..1
-}
 
-// Độ an toàn sơ bộ: ít đồng minh (phe ta) cùng hàng, ít bị kẹp cự ly ngắn
-function safetyScore(cx, cy){
-  const foes = tokensAlive().filter(t => t.side === 'ally');
-  const sameRow = foes.filter(t => t.cy === cy);
-  const near = sameRow.filter(t => Math.abs(t.cx - cx) <= 1).length;
- const far  = sameRow.length - near;
- // nhiều địch ở gần -> nguy hiểm (điểm thấp)
- return Math.max(0, Math.min(1, 1 - (near*0.6 + far*0.2)/3));
-}
-
-function summonerFeasibility(unitId, baseSlot){
- const meta = Game.meta.get(unitId);
- if (!meta || meta.class !== 'Summoner' || meta?.kit?.ult?.type !== 'summon') return 1.0;
- const u = meta.kit.ult;
- const cand = getPatternSlots(u.pattern || 'verticalNeighbors', baseSlot)
-.filter(Boolean)
-  .filter(s => {
-   const { cx, cy } = slotToCell('enemy', s);
-    return !cellReserved(tokensAlive(), Game.queued, cx, cy);
-  });
- const need = Math.max(1, u.count || 1);
-  return Math.min(1, cand.length / need);
-}
 // --- Summon helpers (W4-J5) ---
 function getPatternSlots(pattern, baseSlot){
   switch(pattern){
