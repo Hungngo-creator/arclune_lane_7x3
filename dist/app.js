@@ -8052,12 +8052,13 @@ __define('./vfx.js', (exports, module, __require) => {
 
       else if (e.type === 'hit') {
         const ref = e.ref;
-        if (ref && typeof ref.cx === 'number' && typeof ref.cy === 'number') {
-          e.cx = ref.cx;
-          e.cy = ref.cy;
+        if (ref) {
+          const { cx, cy } = ref;
+          if (Number.isFinite(cx)) e.cx = cx;
+          if (Number.isFinite(cy)) e.cy = cy;
         }
 
-        if (typeof e.cx === 'number' && typeof e.cy === 'number') {
+        if (Number.isFinite(e.cx) && Number.isFinite(e.cy)) {
           const p = projectCellOblique(Game.grid, e.cx, e.cy, cam);
           const r = Math.floor(Game.grid.tile * 0.25 * (0.6 + 1.1 * tt) * p.scale);
           ctx.save();
