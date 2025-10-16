@@ -4604,12 +4604,13 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     // Chỉ Summoner có ult 'summon' mới Immediate
     const u = meta.kit?.ult;
     if (meta.class === 'Summoner' && u?.type === 'summon'){
+      const aliveNow = tokensAlive();
       const cand = getPatternSlots(u.pattern || 'verticalNeighbors', slot)
         .filter(Boolean)
         // chỉ giữ slot trống thực sự (không active/queued)
         .filter(s => {
           const { cx, cy } = slotToCell(unit.side, s);
-       return !cellReserved(tokensAlive(), Game.queued, cx, cy);
+          return !cellReserved(aliveNow, Game.queued, cx, cy);
         })
         .sort((a,b)=> a-b);
 
@@ -4651,7 +4652,8 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
 
     switch(u.type){
       case 'drain': {
-        const foes = tokensAlive().filter(t => t.side === foeSide);
+        const aliveNow = tokensAlive();
+        const foes = aliveNow.filter(t => t.side === foeSide);
         if (!foes.length) break;
         const scale = typeof u.power === 'number' ? u.power : 1.2;
         let totalDrain = 0;
@@ -4677,7 +4679,8 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
         const primary = pickTarget(Game, unit);
         if (!primary) break;
         const laneX = primary.cx;
-        const laneTargets = tokensAlive().filter(t => t.side === foeSide && t.cx === laneX);
+        const aliveNow = tokensAlive();
+        const laneTargets = aliveNow.filter(t => t.side === foeSide && t.cx === laneX);
         const hits = Math.max(1, (u.hits|0) || 1);
         const scale = typeof u.scale === 'number' ? u.scale : 0.9;
         const meleeDur = CFG?.ANIMATION?.meleeDurationMs ?? 1100;
@@ -4717,7 +4720,8 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
       }
 
       case 'sleep': {
-        const foes = tokensAlive().filter(t => t.side === foeSide);
+        const aliveNow = tokensAlive();
+        const foes = aliveNow.filter(t => t.side === foeSide);
         if (!foes.length) break;
         const take = Math.max(1, Math.min(foes.length, (u.targets|0) || foes.length));
         foes.sort((a,b)=>{
@@ -4759,7 +4763,8 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
       }
 
       case 'equalizeHP': {
-        let allies = tokensAlive().filter(t => t.side === unit.side);
+        const aliveNow = tokensAlive();
+        let allies = aliveNow.filter(t => t.side === unit.side);
         if (!allies.length) break;
         allies.sort((a,b)=>{
           const ra = (a.hpMax || 1) ? (a.hp || 0) / a.hpMax : 0;
@@ -4800,7 +4805,8 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
           }
           return 0;
         })();
-        const others = tokensAlive().filter(t => t.side === unit.side && t !== unit);
+        const aliveNow = tokensAlive();
+        const others = aliveNow.filter(t => t.side === unit.side && t !== unit);
         others.sort((a,b)=> (a.spd||0) - (b.spd||0));
         for (const ally of others){
           if (targets.size >= extraAllies + 1) break;
