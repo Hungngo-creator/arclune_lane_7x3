@@ -39,19 +39,6 @@ export function pickTarget(Game, attacker){
  })[0] || null;
 }
 
-export function computeDamage(attacker, target, type='physical'){
-  const atk = attacker.atk||0, wil = attacker.wil||0;
-  if (type==='arcane'){
-    const raw = Math.max(1, Math.floor(wil));
-    const cut = 1 - (target.res||0);
-    return Math.max(1, Math.floor(raw * cut));
-  } else {
-    const raw = Math.max(1, Math.floor(atk));
-    const cut = 1 - (target.arm||0);
-    return Math.max(1, Math.floor(raw * cut));
-  }
-}
-
 export function applyDamage(target, amount){
   if (!Number.isFinite(target.hpMax)) return;
   target.hp = Math.max(0, Math.min(target.hpMax, (target.hp|0) - (amount|0)));

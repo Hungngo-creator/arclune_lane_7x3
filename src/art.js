@@ -499,8 +499,3 @@ export function getUnitArt(id, opts = {}){
   const skinKey = resolveSkinKey(id, baseArt, opts.skinKey);
   return instantiateArt(id, baseArt, skinKey);
 }
-
-export function getPalette(id){
-  const art = getUnitArt(id);
-  return art?.palette || basePalettes.default;
-}

@@ -82,7 +82,8 @@ const MODE_GROUP_METADATA = MODE_GROUPS.map(group => {
     params: null,
     parentId: null,
     isGroup: true,
-    childModeIds
+    childModeIds,
+    extraClasses: Array.isArray(group.extraClasses) ? [...group.extraClasses] : []
   };
 });
 
@@ -264,10 +265,6 @@ function renderPveLayout(options){
     exitButton.addEventListener('click', options.onExit);
   }
   return container;
-}
-
-function getModeDefinition(modeKey){
-  return MODE_DEFINITIONS[modeKey] || null;
 }
 
 function teardownActiveSession(){

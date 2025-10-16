@@ -11,7 +11,6 @@ function clamp01(x){ return x < 0 ? 0 : (x > 1 ? 1 : x); }
 function _dec(u, s){
   if (typeof s.dur === 'number') { s.dur -= 1; if (s.dur <= 0) Statuses.remove(u, s.id); }
 }
-function _sum(arr, sel){ return arr.reduce((a,b)=>a + (sel ? sel(b) : b), 0); }
 
 // ===== Public API
 export const Statuses = {
@@ -263,13 +262,4 @@ export function hookOnLethalDamage(target){
   if (!s) return false;
   if (target.hp <= 0){ target.hp = 1; Statuses.remove(target, 'undying'); return true; }
   return false;
-}
-
-// ===== Helper: thêm khiên theo % HPmax (tiện dụng)
-export function grantShieldByPct(unit, pct){
-  const add = Math.max(1, Math.round((unit.hpMax || 0) * pct));
-  const cur = Statuses.get(unit, 'shield');
-  if (cur) cur.amount = (cur.amount || 0) + add;
-  else Statuses.add(unit, {id:'shield', kind:'buff', tag:'shield', amount:add});
-  return add;
 }
