@@ -2007,7 +2007,6 @@ __define('./data/economy.js', (exports, module, __require) => {
   exports.getShopTaxRate = getShopTaxRate;
   exports.LOTTERY_SPLIT = LOTTERY_SPLIT;
   exports.getLotterySplit = getLotterySplit;
-
 });
 __define('./data/modes.js', (exports, module, __require) => {
   const __dep0 = __require('./data/economy.js');
@@ -2021,6 +2020,7 @@ __define('./data/modes.js', (exports, module, __require) => {
   const LOTTERY_SPLIT = getLotterySplit();
   const BASE_TAX_RATE = getShopTaxRate('N');
   const TOP_TAX_RATE = getShopTaxRate('PRIME');
+
   const MODE_TYPES = Object.freeze({
     PVE: 'PvE',
     PVP: 'PvP',
@@ -2304,6 +2304,191 @@ __define('./data/modes.js', (exports, module, __require) => {
   exports.MODE_INDEX = MODE_INDEX;
   exports.listModesForSection = listModesForSection;
   exports.getMenuSections = getMenuSections;
+});
+
+__define('./data/roster-preview.js', (exports, module, __require) => {
+  const __dep0 = __require('./catalog.js');
+  const CLASS_BASE = __dep0.CLASS_BASE;
+  const RANK_MULT = __dep0.RANK_MULT;
+  const ROSTER = __dep0.ROSTER;
+
+  // Talent Point (TP) deltas documented in "ý tưởng nhân vật v3.txt".
+  const TP_DELTA = Object.freeze({
+    HP: 20,
+    ATK: 1,
+    WIL: 1,
+    ARM: 0.01,
+    RES: 0.01,
+    AGI: 1,
+    PER: 1,
+    AEmax: 10,
+    AEregen: 0.5,
+    HPregen: 2
+  });
+
+  const STAT_ORDER = [
+    'HP',
+    'ATK',
+    'WIL',
+    'ARM',
+    'RES',
+    'AGI',
+    'PER',
+    'SPD',
+    'AEmax',
+    'AEregen',
+    'HPregen'
+  ];
+
+  const PRECISION = {
+    ARM: 100,
+    RES: 100,
+    SPD: 100,
+    AEregen: 10
+  };
+
+  function roundStat(stat, value) {
+    const precision = PRECISION[stat] ?? 1;
+    return Math.round(value * precision) / precision;
+  }
+
+  function roundTpValue(value) {
+    return Math.round(value * 1e6) / 1e6;
+  }
+
+  function sanitizeTpAllocation(tpAlloc = {}) {
+    const clean = {};
+    for (const [stat, value] of Object.entries(tpAlloc)) {
+      if (!TP_DELTA[stat]) continue;
+      const rounded = roundTpValue(value ?? 0);
+      if (rounded !== 0) {
+        clean[stat] = rounded;
+      }
+    }
+    return clean;
+  }
+
+  function applyTpToBase(base, tpAlloc = {}) {
+    const cleanTp = sanitizeTpAllocation(tpAlloc);
+    const out = {};
+    for (const [stat, baseValue] of Object.entries(base)) {
+      const delta = TP_DELTA[stat];
+      if (delta) {
+        const tp = cleanTp[stat] ?? 0;
+        out[stat] = baseValue + delta * tp;
+      } else {
+        out[stat] = baseValue;
+      }
+    }
+    return out;
+  }
+
+  function applyRankMultiplier(preRank, rank) {
+    const multiplier = RANK_MULT[rank] ?? 1;
+    const out = {};
+    for (const [stat, value] of Object.entries(preRank)) {
+      if (stat === 'SPD') {
+        out[stat] = roundStat(stat, value);
+        continue;
+      }
+      out[stat] = roundStat(stat, value * multiplier);
+    }
+    return out;
+  }
+
+  function computeFinalStats(className, rank, tpAlloc = {}) {
+    const base = CLASS_BASE[className];
+    if (!base) {
+      throw new Error(`Unknown class "${className}"`);
+    }
+    const preRank = applyTpToBase(base, tpAlloc);
+    return applyRankMultiplier(preRank, rank);
+  }
+
+  function deriveTpFromMods(base, mods = {}) {
+    if (!mods) return {};
+    const tp = {};
+    for (const [stat, modValue] of Object.entries(mods)) {
+      if (!TP_DELTA[stat]) continue;
+      const baseValue = base[stat];
+      if (typeof baseValue !== 'number') continue;
+      const raw = (baseValue * (modValue ?? 0)) / TP_DELTA[stat];
+      const rounded = roundTpValue(raw);
+      if (rounded !== 0) {
+        tp[stat] = rounded;
+      }
+    }
+    return tp;
+  }
+
+  function totalTp(tpAlloc = {}) {
+    return roundTpValue(
+      Object.values(tpAlloc).reduce((sum, value) => sum + value, 0)
+    );
+  }
+
+  function buildRosterPreviews(tpAllocations = undefined) {
+    const result = {};
+    for (const unit of ROSTER) {
+      const base = CLASS_BASE[unit.class];
+      if (!base) continue;
+      const derivedTp = tpAllocations?.[unit.id] ?? deriveTpFromMods(base, unit.mods);
+      const cleanTp = sanitizeTpAllocation(derivedTp);
+      const preRank = applyTpToBase(base, cleanTp);
+      const final = applyRankMultiplier(preRank, unit.rank);
+      result[unit.id] = {
+        id: unit.id,
+        name: unit.name,
+        class: unit.class,
+        rank: unit.rank,
+        rankMultiplier: RANK_MULT[unit.rank] ?? 1,
+        tp: cleanTp,
+        totalTP: totalTp(cleanTp),
+        preRank,
+        final
+      };
+    }
+    return result;
+  }
+
+  function buildPreviewRows(previews, statsOrder = STAT_ORDER) {
+    return statsOrder.map((stat) => ({
+      stat,
+      values: ROSTER.map((unit) => {
+        const preview = previews[unit.id];
+        return {
+          id: unit.id,
+          name: unit.name,
+          value: preview?.final?.[stat] ?? null,
+          preRank: preview?.preRank?.[stat] ?? null,
+          tp: preview?.tp?.[stat] ?? 0
+        };
+      })
+    }));
+  }
+
+  const ROSTER_TP_ALLOCATIONS = Object.fromEntries(
+    ROSTER.map((unit) => {
+      const base = CLASS_BASE[unit.class];
+      return [unit.id, deriveTpFromMods(base, unit.mods)];
+    })
+  );
+
+  const ROSTER_PREVIEWS = buildRosterPreviews(ROSTER_TP_ALLOCATIONS);
+  const ROSTER_PREVIEW_ROWS = buildPreviewRows(ROSTER_PREVIEWS);
+  const STAT_KEYS = [...STAT_ORDER];
+
+  exports.TP_DELTA = TP_DELTA;
+  exports.ROSTER_TP_ALLOCATIONS = ROSTER_TP_ALLOCATIONS;
+  exports.ROSTER_PREVIEWS = ROSTER_PREVIEWS;
+  exports.ROSTER_PREVIEW_ROWS = ROSTER_PREVIEW_ROWS;
+  exports.STAT_KEYS = STAT_KEYS;
+  exports.applyTpToBase = applyTpToBase;
+  exports.applyRankMultiplier = applyRankMultiplier;
+  exports.computeFinalStats = computeFinalStats;
+  exports.deriveTpFromMods = deriveTpFromMods;
+  exports.buildRosterPreviews = buildRosterPreviews;
+  exports.buildPreviewRows = buildPreviewRows;
 });
 __define('./engine.js', (exports, module, __require) => {
   const __dep0 = __require('./config.js');
@@ -5916,10 +6101,10 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
     ['Kinh tế nguyên tinh', 'mode-tag--economy']
   ]);
 
- const LOTTERY_SPLIT = getLotterySplit();
-   const LOTTERY_DEV_PERCENT = Math.round((LOTTERY_SPLIT.devVault || 0) * 100);
-   const LOTTERY_PRIZE_PERCENT = Math.round((LOTTERY_SPLIT.prizePool || 0) * 100);
-   const TT_CONVERSION_CHAIN = [
+  const LOTTERY_SPLIT = getLotterySplit();
+  const LOTTERY_DEV_PERCENT = Math.round((LOTTERY_SPLIT.devVault || 0) * 100);
+  const LOTTERY_PRIZE_PERCENT = Math.round((LOTTERY_SPLIT.prizePool || 0) * 100);
+  const TT_CONVERSION_CHAIN = [
     formatBalance(1, CURRENCY_IDS.TT),
     formatBalance(convertCurrency(1, CURRENCY_IDS.TT, CURRENCY_IDS.THNT), CURRENCY_IDS.THNT),
     formatBalance(convertCurrency(1, CURRENCY_IDS.TT, CURRENCY_IDS.TNT), CURRENCY_IDS.TNT),
