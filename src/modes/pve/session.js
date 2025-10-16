@@ -50,6 +50,7 @@ let docRef = null;
 let rootElement = null;
 let storedConfig = {};
 let running = false;
+let sceneCache = null;
 
 function normalizeConfig(input = {}){
   const out = { ...input };
@@ -129,6 +130,7 @@ function resetSessionState(options = {}){
   _IID = 1;
   _BORN = 1;
   CLOCK = createClock();
+  invalidateSceneCache();
 }
 
 if (CFG?.DEBUG?.LOG_EVENTS) {
@@ -188,6 +190,88 @@ function scheduleDraw(){
   });
 }
 
+function invalidateSceneCache(){
+  sceneCache = null;
+}
+
+function createSceneCacheCanvas(pixelWidth, pixelHeight){
+  if (!Number.isFinite(pixelWidth) || !Number.isFinite(pixelHeight)) return null;
+  const safeW = Math.max(1, Math.floor(pixelWidth));
+  const safeH = Math.max(1, Math.floor(pixelHeight));
+  if (typeof OffscreenCanvas === 'function'){
+    try {
+      return new OffscreenCanvas(safeW, safeH);
+    } catch (_) {}
+  }
+  const doc = docRef || (typeof document !== 'undefined' ? document : null);
+  if (!doc || typeof doc.createElement !== 'function') return null;
+  const offscreen = doc.createElement('canvas');
+  offscreen.width = safeW;
+  offscreen.height = safeH;
+  return offscreen;
+}
+
+function ensureSceneCache(){
+  if (!Game || !Game.grid) return null;
+  const grid = Game.grid;
+  const sceneCfg = CFG.SCENE || {};
+  const themeKey = Game.sceneTheme || sceneCfg.CURRENT_THEME || sceneCfg.DEFAULT_THEME;
+  const theme = (sceneCfg.THEMES && themeKey) ? sceneCfg.THEMES[themeKey] : null;
+  const backgroundKey = Game.backgroundKey;
+  const dpr = grid.dpr ?? 1;
+  const cssWidth = grid.w ?? (canvas ? canvas.width / dpr : 0);
+  const cssHeight = grid.h ?? (canvas ? canvas.height / dpr : 0);
+  if (!cssWidth || !cssHeight) return null;
+  const pixelWidth = Math.max(1, Math.round(cssWidth * dpr));
+  const pixelHeight = Math.max(1, Math.round(cssHeight * dpr));
+
+  let needsRebuild = false;
+  if (!sceneCache) needsRebuild = true;
+  else if (sceneCache.pixelWidth !== pixelWidth || sceneCache.pixelHeight !== pixelHeight) needsRebuild = true;
+  else if (sceneCache.themeKey !== themeKey || sceneCache.backgroundKey !== backgroundKey) needsRebuild = true;
+  else if (sceneCache.dpr !== dpr) needsRebuild = true;
+
+  if (!needsRebuild) return sceneCache;
+
+  const offscreen = createSceneCacheCanvas(pixelWidth, pixelHeight);
+  if (!offscreen) return null;
+  const cacheCtx = offscreen.getContext('2d');
+  if (!cacheCtx) return null;
+
+  if (typeof cacheCtx.resetTransform === 'function'){
+    cacheCtx.resetTransform();
+  } else if (typeof cacheCtx.setTransform === 'function'){
+    cacheCtx.setTransform(1, 0, 0, 1, 0, 0);
+  }
+  cacheCtx.clearRect(0, 0, pixelWidth, pixelHeight);
+
+  if (typeof cacheCtx.setTransform === 'function'){
+    cacheCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  } else if (dpr !== 1 && typeof cacheCtx.scale === 'function'){
+    cacheCtx.scale(dpr, dpr);
+  }
+
+  try {
+    drawBattlefieldScene(cacheCtx, grid, theme);
+    drawEnvironmentProps(cacheCtx, grid, CAM_PRESET, backgroundKey);
+  } catch (err) {
+    console.error('[scene-cache]', err);
+    return null;
+  }
+
+  sceneCache = {
+    canvas: offscreen,
+    pixelWidth,
+    pixelHeight,
+    cssWidth,
+    cssHeight,
+    themeKey,
+    backgroundKey,
+    dpr
+  };
+  return sceneCache;
+}
+
 function refreshQueuedArtFor(unitId){
   const apply = (map)=>{
     if (!map || typeof map.values !== 'function') return;
@@ -234,7 +318,7 @@ function setDrawPaused(paused){
 function bindArtSpriteListener(){
   if (!winRef || typeof winRef.addEventListener !== 'function') return;
   if (artSpriteHandler) return;
-  artSpriteHandler = ()=>{ scheduleDraw(); };
+  artSpriteHandler = ()=>{ invalidateSceneCache(); scheduleDraw(); };
   winRef.addEventListener(ART_SPRITE_EVENT, artSpriteHandler);
 }
 
@@ -821,6 +905,14 @@ function refillDeck(){
 /* ---------- Vẽ ---------- */
 function resize(){
   if (!canvas) return;                                  // guard
+  const prevGrid = Game?.grid ? {
+    w: Game.grid.w,
+    h: Game.grid.h,
+    dpr: Game.grid.dpr,
+    cols: Game.grid.cols,
+    rows: Game.grid.rows,
+    tile: Game.grid.tile
+  } : null;
   Game.grid = makeGrid(canvas, CFG.GRID_COLS, CFG.GRID_ROWS);
   if (ctx && Game.grid){
     const maxDprCfg = CFG.UI?.MAX_DPR;
@@ -845,17 +937,33 @@ function resize(){
       }
     }
   }
+  const g = Game.grid;
+  const gridChanged = !prevGrid
+    || prevGrid.w !== g.w
+    || prevGrid.h !== g.h
+    || prevGrid.dpr !== g.dpr
+    || prevGrid.cols !== g.cols
+    || prevGrid.rows !== g.rows
+    || prevGrid.tile !== g.tile;
+  if (gridChanged){
+    invalidateSceneCache();
+  }
 }
 function draw(){
   if (!ctx || !canvas || !Game.grid) return;            // guard
   const clearW = Game.grid.w ?? canvas.width;
   const clearH = Game.grid.h ?? canvas.height;
   ctx.clearRect(0, 0, clearW, clearH);
-  const sceneCfg = CFG.SCENE || {};
-  const themeKey = Game.sceneTheme || sceneCfg.CURRENT_THEME || sceneCfg.DEFAULT_THEME;
-  const theme = (sceneCfg.THEMES && themeKey) ? sceneCfg.THEMES[themeKey] : null;
-  drawBattlefieldScene(ctx, Game.grid, theme);
-  drawEnvironmentProps(ctx, Game.grid, CAM_PRESET, Game.backgroundKey);
+  const cache = ensureSceneCache();
+  if (cache && cache.canvas){
+    ctx.drawImage(cache.canvas, 0, 0, cache.pixelWidth, cache.pixelHeight, 0, 0, cache.cssWidth, cache.cssHeight);
+  } else {
+    const sceneCfg = CFG.SCENE || {};
+    const themeKey = Game.sceneTheme || sceneCfg.CURRENT_THEME || sceneCfg.DEFAULT_THEME;
+    const theme = (sceneCfg.THEMES && themeKey) ? sceneCfg.THEMES[themeKey] : null;
+    drawBattlefieldScene(ctx, Game.grid, theme);
+    drawEnvironmentProps(ctx, Game.grid, CAM_PRESET, Game.backgroundKey);
+  }
   drawGridOblique(ctx, Game.grid, CAM_PRESET);
   drawQueuedOblique(ctx, Game.grid, Game.queued, CAM_PRESET);
   drawTokensOblique(ctx, Game.grid, Game.tokens, CAM_PRESET);
@@ -1030,6 +1138,7 @@ function resetDomRefs(){
   canvas = null;
   ctx = null;
   hud = null;
+  invalidateSceneCache();
 }
 
 function stopSession(){
@@ -1057,6 +1166,7 @@ function stopSession(){
   CLOCK = null;
   Game = null;
   running = false;
+  invalidateSceneCache();
 }
 
 function bindSession(){
@@ -1092,8 +1202,15 @@ function startSession(config = {}){
 
 function applyConfigToRunningGame(cfg){
   if (!Game) return;
-  if (typeof cfg.sceneTheme !== 'undefined') Game.sceneTheme = cfg.sceneTheme;
-  if (typeof cfg.backgroundKey !== 'undefined') Game.backgroundKey = cfg.backgroundKey;
+  let sceneChanged = false;
+  if (typeof cfg.sceneTheme !== 'undefined'){
+    if (Game.sceneTheme !== cfg.sceneTheme) sceneChanged = true;
+    Game.sceneTheme = cfg.sceneTheme;
+  }
+  if (typeof cfg.backgroundKey !== 'undefined'){
+    if (Game.backgroundKey !== cfg.backgroundKey) sceneChanged = true;
+    Game.backgroundKey = cfg.backgroundKey;
+  }
   if (Array.isArray(cfg.deck) && cfg.deck.length) Game.unitsAll = cfg.deck;
   if (cfg.aiPreset){
     const preset = cfg.aiPreset || {};
@@ -1104,6 +1221,10 @@ function applyConfigToRunningGame(cfg){
     }
     if (Number.isFinite(preset.costCap)) Game.ai.costCap = preset.costCap;
     if (Number.isFinite(preset.summonLimit)) Game.ai.summonLimit = preset.summonLimit;
+  }
+  if (sceneChanged){
+    invalidateSceneCache();
+    scheduleDraw();
   }
 }
 
