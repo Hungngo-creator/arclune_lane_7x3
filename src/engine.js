@@ -537,6 +537,11 @@ const alive = [];
     if (ya === yb) return a.token.cx - b.token.cx;
     return ya - yb;
   });
+  const perfCfg = CFG?.PERFORMANCE || {};
+  const shadowThreshold = Number.isFinite(perfCfg.SHADOW_DISABLE_THRESHOLD)
+    ? perfCfg.SHADOW_DISABLE_THRESHOLD
+    : null;
+  const reduceShadows = !!(perfCfg.LOW_POWER_SHADOWS) || (shadowThreshold !== null && alive.length >= shadowThreshold);
  for (const { token: t, projection: p } of alive){
     const scale = p.scale ?? 1;
     const r = Math.max(6, Math.floor(baseR * scale));
@@ -561,10 +566,24 @@ const alive = [];
       ctx.translate(p.x, p.y);
       if (facing === -1 && art?.mirror !== false) ctx.scale(-1, 1);
       const shadow = shadowCfg || {};
-      const shadowColor = shadow.color || art?.glow || art?.shadow || 'rgba(0,0,0,0.35)';
-      const shadowBlur = Number.isFinite(shadow.blur) ? shadow.blur : Math.max(6, r * 0.7);
-      const shadowOffsetX = Number.isFinite(shadow.offsetX) ? shadow.offsetX : 0;
-      const shadowOffsetY = Number.isFinite(shadow.offsetY) ? shadow.offsetY : Math.max(2, r * 0.2);
+      let shadowColor = shadow.color || art?.glow || art?.shadow || 'rgba(0,0,0,0.35)';
+      let shadowBlur = Number.isFinite(shadow.blur) ? shadow.blur : Math.max(6, r * 0.7);
+      let shadowOffsetX = Number.isFinite(shadow.offsetX) ? shadow.offsetX : 0;
+      let shadowOffsetY = Number.isFinite(shadow.offsetY) ? shadow.offsetY : Math.max(2, r * 0.2);
+      if (reduceShadows){
+        const cheap = perfCfg?.LOW_SHADOW_PRESET;
+        if (cheap === 'soft'){ // giữ chút bóng nhẹ nhàng
+          shadowColor = 'rgba(0, 0, 0, 0.18)';
+          shadowBlur = Math.min(6, shadowBlur * 0.4);
+          shadowOffsetX = 0;
+          shadowOffsetY = Math.min(4, Math.max(1, shadowOffsetY * 0.4));
+        } else {
+          shadowColor = 'transparent';
+          shadowBlur = 0;
+          shadowOffsetX = 0;
+          shadowOffsetY = 0;
+        }
+      }
       ctx.shadowColor = shadowColor;
       ctx.shadowBlur = shadowBlur;
       ctx.shadowOffsetX = shadowOffsetX;

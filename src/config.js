@@ -47,10 +47,14 @@ FOLLOWUP_CAP_DEFAULT: 2,
     meleeDurationMs: 1100
   },
 // === Debug flags (W0-J1) ===
- DEBUG: {
+  DEBUG: {
    SHOW_QUEUED: true,        // vẽ unit "Chờ Lượt" cho phe mình (ally) khi có
    SHOW_QUEUED_ENEMY: false  // kẻ địch không thấy (đúng design)
  },
+ PERFORMANCE: {
+    LOW_POWER_SHADOWS: false,        // true: luôn tắt bóng đổ để tiết kiệm
+    SHADOW_DISABLE_THRESHOLD: 16     // ≥ số token này thì bỏ bóng để giữ FPS
+  },
   COLORS: {
     ally: '#1e2b36',
     enemy: '#2a1c22',
