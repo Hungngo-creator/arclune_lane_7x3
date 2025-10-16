@@ -40,7 +40,8 @@ let _BORN = 1;
 const nextIid = ()=> _IID++;
 
 let Game = null;
-let tickIntervalId = null;
+let tickLoopHandle = null;
+let tickLoopUsesTimeout = false;
 let resizeHandler = null;
 let canvasClickHandler = null;
 let artSpriteHandler = null;
@@ -816,9 +817,9 @@ function init(){
     winRef.addEventListener('resize', resizeHandler);
   }
 
-  const updateTimerAndCost = ()=>{
+  const updateTimerAndCost = (timestamp)=>{
     if (!CLOCK) return;
-    const now = performance.now();
+    const now = Number.isFinite(timestamp) ? timestamp : performance.now();
     const elapsedSec = Math.floor((now - CLOCK.startMs) / 1000);
 
     const remain = Math.max(0, 240 - elapsedSec);
@@ -856,17 +857,36 @@ function init(){
         allocIid: nextIid,
         doActionOrSkip
       });
-      cleanupDead(performance.now());
+      cleanupDead(now);
       scheduleDraw();
       aiMaybeAct(Game, 'board');
     }
   };
 
-  if (tickIntervalId){
-    clearInterval(tickIntervalId);
-    tickIntervalId = null;
+  const runTickLoop = (timestamp)=>{
+    tickLoopHandle = null;
+    updateTimerAndCost(timestamp);
+    if (!running || !CLOCK) return;
+    scheduleTickLoop();
+  };
+
+  function scheduleTickLoop(){
+    if (!running || !CLOCK) return;
+    if (tickLoopHandle !== null) return;
+    const raf = (winRef && typeof winRef.requestAnimationFrame === 'function')
+      ? winRef.requestAnimationFrame.bind(winRef)
+      : (typeof requestAnimationFrame === 'function' ? requestAnimationFrame : null);
+    if (raf){
+      tickLoopUsesTimeout = false;
+      tickLoopHandle = raf(runTickLoop);
+    } else {
+      tickLoopUsesTimeout = true;
+      tickLoopHandle = setTimeout(()=> runTickLoop(performance.now()), 16);
+    }
   }
-  tickIntervalId = setInterval(updateTimerAndCost, 250);
+  
+  updateTimerAndCost(performance.now());
+  scheduleTickLoop();
 }
 
 function selectFirstAffordable(){
@@ -1114,9 +1134,19 @@ function configureRoot(root){
 }
 
 function clearSessionTimers(){
-  if (tickIntervalId){
-    clearInterval(tickIntervalId);
-    tickIntervalId = null;
+  if (tickLoopHandle !== null){
+    if (tickLoopUsesTimeout){
+      clearTimeout(tickLoopHandle);
+    } else {
+      const cancel = (winRef && typeof winRef.cancelAnimationFrame === 'function')
+        ? winRef.cancelAnimationFrame.bind(winRef)
+        : (typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : null);
+      if (cancel){
+        cancel(tickLoopHandle);
+      }
+    }
+    tickLoopHandle = null;
+    tickLoopUsesTimeout = false;
   }
   cancelScheduledDraw();
 }
