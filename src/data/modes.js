@@ -12,19 +12,19 @@ const MODE_STATUS = Object.freeze({
 
 const MENU_SECTION_DEFINITIONS = [
   { id: 'core-pve', title: 'PvE' },
-  { id: 'competitive', title: 'Cạnh tranh' },
   { id: 'economy', title: 'Kinh tế & Hạ tầng' }
 ];
 
 const MODE_GROUPS = [
   {
     id: 'arena-hub',
-    title: 'Đấu Trường',
-    shortDescription: 'Lựa chọn giữa đấu trường PvE và PvP, cả hai đều xoay quanh mùa giải 7 ngày với bảng xếp hạng phần thưởng.',
+    title: 'Chiến Trường',
+    shortDescription: 'Tụ điểm tổng hợp các hoạt động chiến đấu luân phiên để người chơi bước vào chiến dịch, thử thách và mùa giải.',
     icon: '🏟️',
     tags: ['PvE', 'PvP'],
-    menuSections: ['core-pve', 'competitive'],
-    childModeIds: ['arena', 'beast-arena']
+    menuSections: ['core-pve'],
+    childModeIds: ['arena', 'beast-arena', 'ares', 'challenge', 'campaign'],
+    extraClasses: ['mode-card--wide']
   }
 ];
 
@@ -39,6 +39,7 @@ const MODES = [
     unlockNotes: 'Mở từ đầu; tiến trình mở rộng sang hệ tu luyện 15 đại cảnh giới và tái thiết các kiến trúc tông môn.',
     tags: ['PvE'],
     menuSections: ['core-pve'],
+    parentId: 'arena-hub',
     shell: {
       screenId: 'pve-session',
       moduleId: './modes/pve/session.js',
@@ -55,6 +56,7 @@ const MODES = [
     unlockNotes: 'Có sẵn để thử sức với các đội hình cố định và nhận phần thưởng thử thách đặc biệt.',
     tags: ['PvE'],
     menuSections: ['core-pve'],
+    parentId: 'arena-hub',
     shell: {
       screenId: 'pve-session',
       moduleId: './modes/pve/session.js',
@@ -70,7 +72,7 @@ const MODES = [
     shortDescription: 'Deck PvE đối đầu deck do AI điều khiển, xoay vòng mùa giải 7 ngày với bảng xếp hạng phần thưởng.',
     unlockNotes: 'Yêu cầu chuẩn bị deck xếp sẵn; tham chiến theo mùa 7 ngày để nhận thưởng và leo bảng.',
     tags: ['PvE'],
-    menuSections: ['core-pve', 'competitive'],
+    menuSections: ['core-pve'],
     parentId: 'arena-hub',
     shell: {
       screenId: 'pve-session',
@@ -87,7 +89,8 @@ const MODES = [
     shortDescription: 'PvP thời gian thực, hiển thị "Coming soon" cho tới khi hạ tầng networking hoàn tất.',
     unlockNotes: 'Chờ kết nối hệ thống PvP online realtime trước khi mở cho người chơi.',
     tags: ['PvP', 'Coming soon'],
-    menuSections: ['competitive'],
+    menuSections: ['core-pve'],
+    parentId: 'arena-hub',
     shell: {
       screenId: 'main-menu',
       fallbackModuleId: './modes/coming-soon.stub.js'
@@ -192,7 +195,7 @@ const MODES = [
     shortDescription: 'Đưa sủng thú chiến đấu tự động để leo hệ thống rank từ Đồng tới Đấu Thần theo số trận thắng.',
     unlockNotes: 'Yêu cầu sở hữu sủng thú và tham gia mùa giải để leo hạng, nhận thưởng ở mọi bậc và phần thưởng đặc biệt cho top.',
     tags: ['PvP', 'Coming soon'],
-    menuSections: ['competitive'],
+    menuSections: ['core-pve'],
     parentId: 'arena-hub',
     shell: {
       screenId: 'main-menu',
@@ -205,21 +208,6 @@ const MODE_INDEX = MODES.reduce((acc, mode) => {
   acc[mode.id] = mode;
   return acc;
 }, {});
-
-function getModeById(id){
-  return id ? MODE_INDEX[id] || null : null;
-}
-
-function listModesByType(type, options = {}){
-  const { includeStatuses } = options;
-  return MODES.filter(mode => {
-    if (type && mode.type !== type) return false;
-    if (Array.isArray(includeStatuses) && includeStatuses.length > 0){
-      return includeStatuses.includes(mode.status);
-    }
-    return true;
-  });
-}
 
 function listModesForSection(sectionId, options = {}){
   const { includeStatuses } = options;
@@ -292,8 +280,6 @@ export {
   MODE_STATUS,
   MENU_SECTION_DEFINITIONS,
   MODE_INDEX,
-  getModeById,
-  listModesByType,
   listModesForSection,
   getMenuSections
 };
