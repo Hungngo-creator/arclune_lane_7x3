@@ -823,12 +823,17 @@ function resize(){
   if (!canvas) return;                                  // guard
   Game.grid = makeGrid(canvas, CFG.GRID_COLS, CFG.GRID_ROWS);
   if (ctx && Game.grid){
+    const maxDprCfg = CFG.UI?.MAX_DPR;
+    const maxDpr = Number.isFinite(maxDprCfg) && maxDprCfg > 0 ? maxDprCfg : 3;
     const view = winRef || (typeof window !== 'undefined' ? window : null);
-    const dpr = Number.isFinite(Game.grid.dpr) && Game.grid.dpr > 0
-      ? Game.grid.dpr
-      : (Number.isFinite(view?.devicePixelRatio) && (view?.devicePixelRatio || 0) > 0
-        ? view.devicePixelRatio
-        : 1);
+    const viewDprRaw = Number.isFinite(view?.devicePixelRatio) && (view?.devicePixelRatio || 0) > 0
+      ? view.devicePixelRatio
+      : 1;
+    const fallbackDpr = Math.min(maxDpr, viewDprRaw);
+    const gridDpr = Number.isFinite(Game.grid.dpr) && Game.grid.dpr > 0
+      ? Math.min(maxDpr, Game.grid.dpr)
+      : fallbackDpr;
+    const dpr = gridDpr;
     if (typeof ctx.setTransform === 'function'){
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     } else {
