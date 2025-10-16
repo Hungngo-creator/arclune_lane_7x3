@@ -14,7 +14,7 @@ units.js – 8 unit cho deck (id/name/cost) — không chứa chỉ số.
 
 meta.js – Meta (dựa trên catalog.js), makeInstanceStats(), initialRageFor().
 
-combat.js – basicAttack/pickTarget/computeDamage/applyDamage (đủ test turn).
+combat.js – basicAttack/pickTarget/applyDamage/dealAbilityDamage (đủ test turn).
 
 main.js – Game{…}, sparse-cursor turn loop, queue chờ lượt, immediate summon, vẽ token & HP bar chuẩn.
 
