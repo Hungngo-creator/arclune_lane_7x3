@@ -8052,11 +8052,30 @@ __define('./vfx.js', (exports, module, __require) => {
       }
 
       else if (e.type === 'hit') {
-        const ref = e.ref;
-        if (ref) {
-          const { cx, cy } = ref;
-          if (Number.isFinite(cx)) e.cx = cx;
-          if (Number.isFinite(cy)) e.cy = cy;
+        const tokens = Array.isArray(Game?.tokens) ? Game.tokens : null;
+        const updateFromToken = (token) => {
+          if (!token) return;
+          if (token.iid != null && e.iid == null) e.iid = token.iid;
+          if (Number.isFinite(token.cx)) e.cx = token.cx;
+          if (Number.isFinite(token.cy)) e.cy = token.cy;
+        };
+
+        let ref = e.ref;
+        updateFromToken(ref);
+
+        if ((!Number.isFinite(e.cx) || !Number.isFinite(e.cy)) && tokens) {
+          const iid = ref?.iid ?? e.iid;
+          let live = null;
+          if (iid != null) {
+            live = tokens.find(t => t.iid === iid);
+          } else if (ref?.id != null) {
+            live = tokens.find(t => t.id === ref.id);
+          }
+
+          if (live) {
+            e.ref = ref = live;
+            updateFromToken(live);
+          }
         }
 
         if (Number.isFinite(e.cx) && Number.isFinite(e.cy)) {
