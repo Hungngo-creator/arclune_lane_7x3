@@ -46,10 +46,14 @@ const SIDE_SLOTS = [
 ];
 
 function ensureStyles(){
-  if (document.getElementById(STYLE_ID)) return;
-  const style = document.createElement('style');
-  style.id = STYLE_ID;
-  style.textContent = `
+  let style = document.getElementById(STYLE_ID);
+  if (!style || style.tagName.toLowerCase() !== 'style'){
+    style = document.createElement('style');
+    style.id = STYLE_ID;
+    document.head.appendChild(style);
+  }
+
+  const css = `
     .app--main-menu{padding:32px 16px 64px;}
     .main-menu-v2{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:32px;color:inherit;}
     .main-menu-v2__header{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-end;justify-content:space-between;}
@@ -140,7 +144,10 @@ function ensureStyles(){
     @media(max-width:960px){.main-menu-v2__layout{grid-template-columns:1fr;}.main-menu-sidebar{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;}}
     @media(max-width:640px){.main-menu-v2{gap:24px;}.hero-panel__info{padding:24px;}.hero-panel__canvas{padding:20px;}.main-menu-v2__title{font-size:36px;}.mode-card{padding:20px;}}
   `;
-  document.head.appendChild(style);
+  
+  if (style.textContent !== css){
+    style.textContent = css;
+  }
 }
 
 function applyPalette(element, profile){
