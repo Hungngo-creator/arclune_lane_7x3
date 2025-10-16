@@ -3585,6 +3585,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
   const vfxAddMelee = __dep14.vfxAddMelee;
   const __dep15 = __require('./scene.js');
   const drawBattlefieldScene = __dep15.drawBattlefieldScene;
+  const getCachedBattlefieldScene = __dep15.getCachedBattlefieldScene;
   const __dep16 = __require('./events.js');
   const gameEvents = __dep16.gameEvents;
   const TURN_START = __dep16.TURN_START;
@@ -3827,13 +3828,21 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     if (!cssWidth || !cssHeight) return null;
     const pixelWidth = Math.max(1, Math.round(cssWidth * dpr));
     const pixelHeight = Math.max(1, Math.round(cssHeight * dpr));
-
+    
+    const baseScene = getCachedBattlefieldScene(grid, theme, { width: cssWidth, height: cssHeight, dpr });
+    const baseKey = baseScene?.cacheKey;
+    if (!baseScene){
+      sceneCache = null;
+      return null;
+    }
+    
     let needsRebuild = false;
     if (!sceneCache) needsRebuild = true;
     else if (sceneCache.pixelWidth !== pixelWidth || sceneCache.pixelHeight !== pixelHeight) needsRebuild = true;
     else if (sceneCache.themeKey !== themeKey || sceneCache.backgroundKey !== backgroundKey) needsRebuild = true;
     else if (sceneCache.backgroundSignature !== backgroundSignature) needsRebuild = true;
     else if (sceneCache.dpr !== dpr) needsRebuild = true;
+    else if (sceneCache.baseKey !== baseKey) needsRebuild = true;
 
     if (!needsRebuild) return sceneCache;
 
@@ -3848,7 +3857,14 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
       cacheCtx.setTransform(1, 0, 0, 1, 0, 0);
     }
     cacheCtx.clearRect(0, 0, pixelWidth, pixelHeight);
-
+    
+    try {
+      cacheCtx.drawImage(baseScene.canvas, 0, 0);
+    } catch (err) {
+      console.error('[scene-cache:base]', err);
+      return null;
+    }
+    
     if (typeof cacheCtx.setTransform === 'function'){
       cacheCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     } else if (dpr !== 1 && typeof cacheCtx.scale === 'function'){
@@ -3856,7 +3872,6 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     }
 
     try {
-      drawBattlefieldScene(cacheCtx, grid, theme);
       drawEnvironmentProps(cacheCtx, grid, CAM_PRESET, backgroundKey);
     } catch (err) {
       console.error('[scene-cache]', err);
@@ -3872,7 +3887,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
       themeKey,
       backgroundKey,
       backgroundSignature,
-      dpr
+      dpr, baseKey
     };
     return sceneCache;
   }
@@ -5241,6 +5256,106 @@ __define('./scene.js', (exports, module, __require) => {
     }
   };
 
+  const battlefieldSceneCache = new Map();
+
+  function normalizeDimension(value){
+    if (!Number.isFinite(value)) return 0;
+    return value;
+  }
+
+  function createOffscreenCanvas(pixelWidth, pixelHeight){
+    const safeW = Math.max(1, Math.floor(pixelWidth || 0));
+    const safeH = Math.max(1, Math.floor(pixelHeight || 0));
+    if (!safeW || !safeH) return null;
+    if (typeof OffscreenCanvas === 'function'){
+      try {
+        return new OffscreenCanvas(safeW, safeH);
+      } catch (_) {}
+    }
+    if (typeof document !== 'undefined' && typeof document.createElement === 'function'){
+      const canvas = document.createElement('canvas');
+      canvas.width = safeW;
+      canvas.height = safeH;
+      return canvas;
+    }
+    return null;
+  }
+
+  function themeSignature(theme){
+    try {
+      const merged = mergeTheme(theme);
+      return JSON.stringify(merged);
+    } catch (_) {
+      return 'default-theme';
+    }
+  }
+
+  function gridSignature(g, cssWidth, cssHeight, dpr){
+    if (!g) return 'no-grid';
+    const parts = [
+      `cols:${g.cols ?? 'na'}`,
+      `rows:${g.rows ?? 'na'}`,
+      `tile:${Math.round(g.tile ?? 0)}`,
+      `ox:${Math.round(g.ox ?? 0)}`,
+      `oy:${Math.round(g.oy ?? 0)}`,
+      `w:${Math.round(cssWidth ?? 0)}`,
+      `h:${Math.round(cssHeight ?? 0)}`,
+      `dpr:${Number.isFinite(dpr) ? dpr : 'na'}`
+    ];
+    return parts.join('|');
+  }
+
+  function invalidateBattlefieldSceneCache(){
+    battlefieldSceneCache.clear();
+  }
+
+  function getCachedBattlefieldScene(g, theme, options = {}){
+    if (!g) return null;
+    const cssWidth = normalizeDimension(options.width ?? g.w);
+    const cssHeight = normalizeDimension(options.height ?? g.h);
+    const dpr = Number.isFinite(options.dpr) ? options.dpr : (Number.isFinite(g.dpr) ? g.dpr : 1);
+    if (!cssWidth || !cssHeight) return null;
+    const pixelWidth = Math.max(1, Math.round(cssWidth * dpr));
+    const pixelHeight = Math.max(1, Math.round(cssHeight * dpr));
+    const gridKey = gridSignature(g, cssWidth, cssHeight, dpr);
+    const themeKey = themeSignature(theme);
+    const cacheKey = `${gridKey}::${themeKey}`;
+    const existing = battlefieldSceneCache.get(cacheKey);
+    if (existing && existing.pixelWidth === pixelWidth && existing.pixelHeight === pixelHeight){
+      return existing;
+    }
+
+    const offscreen = createOffscreenCanvas(pixelWidth, pixelHeight);
+    if (!offscreen) return null;
+    const offCtx = offscreen.getContext('2d');
+    if (!offCtx) return null;
+
+    if (typeof offCtx.resetTransform === 'function') offCtx.resetTransform();
+    else if (typeof offCtx.setTransform === 'function') offCtx.setTransform(1, 0, 0, 1, 0, 0);
+
+    offCtx.clearRect(0, 0, pixelWidth, pixelHeight);
+
+    if (typeof offCtx.setTransform === 'function') offCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    else if (dpr !== 1 && typeof offCtx.scale === 'function') offCtx.scale(dpr, dpr);
+
+    const gridForDraw = { ...g, w: cssWidth, h: cssHeight, dpr };
+    drawBattlefieldScene(offCtx, gridForDraw, theme);
+
+    const entry = {
+      canvas: offscreen,
+      pixelWidth,
+      pixelHeight,
+      cssWidth,
+      cssHeight,
+      dpr,
+      gridKey,
+      themeKey,
+      cacheKey
+    };
+    battlefieldSceneCache.set(cacheKey, entry);
+    return entry;
+  }
+
   function mergeTheme(theme){
     if (!theme) return DEFAULT_THEME;
     return {
@@ -5385,6 +5500,8 @@ __define('./scene.js', (exports, module, __require) => {
 
     ctx.restore();
   }
+  exports.invalidateBattlefieldSceneCache = invalidateBattlefieldSceneCache;
+  exports.getCachedBattlefieldScene = getCachedBattlefieldScene;
   exports.drawBattlefieldScene = drawBattlefieldScene;
 });
 __define('./screens/main-menu/dialogues.js', (exports, module, __require) => {
