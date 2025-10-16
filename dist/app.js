@@ -2672,8 +2672,7 @@ __define('./engine.js', (exports, module, __require) => {
       const yb = b.projection.y;
       if (ya === yb) return a.token.cx - b.token.cx;
       return ya - yb;
-    });
-      for (const { token: t, projection: p } of alive){
+  for (const { token: t, projection: p } of alive){
       const scale = p.scale ?? 1;
       const r = Math.max(6, Math.floor(baseR * scale));
       const facing = (t.side === 'ally') ? 1 : -1;
@@ -2727,7 +2726,6 @@ __define('./engine.js', (exports, module, __require) => {
       }
     }
   }
-  });
   // (W2-J2) Vẽ “Chờ Lượt” – silhouette mờ/tối, chỉ hiển thị theo flag DEBUG
   function drawQueuedOblique(ctx, g, queued, cam){
    if (!queued) return;
