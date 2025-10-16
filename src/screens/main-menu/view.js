@@ -1,4 +1,5 @@
 import { getHeroDialogue, getHeroHotspots, getHeroProfile, HERO_DEFAULT_ID } from './dialogues.js';
+import { CURRENCY_IDS, convertCurrency, formatBalance, getLotterySplit } from '../../data/economy.js';
 
 const STYLE_ID = 'main-menu-view-style';
 
@@ -18,6 +19,17 @@ const TAG_CLASS_MAP = new Map([
   ['Kinh tế nguyên tinh', 'mode-tag--economy']
 ]);
 
+const LOTTERY_SPLIT = getLotterySplit();
+const LOTTERY_DEV_PERCENT = Math.round((LOTTERY_SPLIT.devVault || 0) * 100);
+const LOTTERY_PRIZE_PERCENT = Math.round((LOTTERY_SPLIT.prizePool || 0) * 100);
+const TT_CONVERSION_CHAIN = [
+  formatBalance(1, CURRENCY_IDS.TT),
+  formatBalance(convertCurrency(1, CURRENCY_IDS.TT, CURRENCY_IDS.THNT), CURRENCY_IDS.THNT),
+  formatBalance(convertCurrency(1, CURRENCY_IDS.TT, CURRENCY_IDS.TNT), CURRENCY_IDS.TNT),
+  formatBalance(convertCurrency(1, CURRENCY_IDS.TT, CURRENCY_IDS.HNT), CURRENCY_IDS.HNT),
+  formatBalance(convertCurrency(1, CURRENCY_IDS.TT, CURRENCY_IDS.VNT), CURRENCY_IDS.VNT)
+].join(' = ');
+
 const SIDE_SLOTS = [
   {
     key: 'event',
@@ -29,7 +41,7 @@ const SIDE_SLOTS = [
     key: 'lottery',
     label: 'Vé số',
     title: 'Vé số Nguyên Tinh',
-    description: 'Vé số tuần vẫn đang hoàn thiện. Giữ nguyên tinh để tham gia khi mở bán.'
+    description: `Vé số tuần sẽ chia ${LOTTERY_PRIZE_PERCENT}% vào quỹ thưởng, ${LOTTERY_DEV_PERCENT}% hỗ trợ vận hành. Chuỗi quy đổi: ${TT_CONVERSION_CHAIN}.`
   },
   {
     key: 'gacha',
