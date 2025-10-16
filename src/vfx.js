@@ -1,7 +1,7 @@
 // 0.6 vfx.js
 // VFX layer: spawn pop, hit ring, ranged tracer, melee step-in/out
 // Không thay đổi logic combat/turn — chỉ vẽ đè.
-// Durations: spawn 500ms, hit 380ms, tracer 400ms, melee 1200ms.
+// Durations: spawn 500ms, hit 380ms, tracer 400ms, melee 1100ms.
 
 import { projectCellOblique } from './engine.js';
 import { CFG, CHIBI } from './config.js';
@@ -28,7 +28,7 @@ export function vfxAddTracer(Game, attacker, target, opts = {}) {
   pool(Game).push({ type: 'tracer', t0: now(), dur: opts.dur || 400, refA: attacker, refB: target });
 }
 
-export function vfxAddMelee(Game, attacker, target, { dur = 1800 } = {}) {
+export function vfxAddMelee(Game, attacker, target, { dur = CFG?.ANIMATION?.meleeDurationMs ?? 1100 } = {}) {
   // Overlay step-in/out (không di chuyển token thật)
   pool(Game).push({ type: 'melee', t0: now(), dur, refA: attacker, refB: target });
 }

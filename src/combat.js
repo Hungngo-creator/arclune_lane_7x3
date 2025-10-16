@@ -4,6 +4,7 @@ import { vfxAddTracer, vfxAddHit, vfxAddMelee } from './vfx.js';
 import { slotToCell, cellReserved } from './engine.js';
 import { vfxAddSpawn } from './vfx.js';
 import { emitPassiveEvent } from './passives.js';
+import { CFG } from './config.js';
 export function pickTarget(Game, attacker){
  const foe = attacker.side === 'ally' ? 'enemy' : 'ally';
  const pool = Game.tokens.filter(t => t.side === foe && t.alive);
@@ -131,8 +132,8 @@ export function basicAttack(Game, unit){
   };
   emitPassiveEvent(Game, unit, 'onBasicHit', passiveCtx);
  
-   // VFX: tất cả basic đều step-in/out (1.8s), không dùng tracer
-  const meleeDur = 1800;
+// VFX: tất cả basic đều step-in/out (1.1s), không dùng tracer
+  const meleeDur = CFG?.ANIMATION?.meleeDurationMs ?? 1100;
   const meleeStartMs = performance.now();
   let meleeTriggered = false;
   try {

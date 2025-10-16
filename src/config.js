@@ -41,7 +41,11 @@ FOLLOWUP_CAP_DEFAULT: 2,
     MAX_DPR: 2.5,
     CARD_GAP: 12,
     CARD_MIN: 40
-  },                              // <-- thêm dấu phẩy ở đây
+  },
+  ANIMATION: {
+    turnIntervalMs: 480,
+    meleeDurationMs: 1100
+  },
 // === Debug flags (W0-J1) ===
  DEBUG: {
    SHOW_QUEUED: true,        // vẽ unit "Chờ Lượt" cho phe mình (ally) khi có
