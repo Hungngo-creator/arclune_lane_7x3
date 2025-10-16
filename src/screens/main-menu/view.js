@@ -1,5 +1,5 @@
 import { getHeroDialogue, getHeroHotspots, getHeroProfile, HERO_DEFAULT_ID } from './dialogues.js';
-import { CURRENCY_IDS, convertCurrency, formatBalance, getLotterySplit } from '../../data/economy.js';
+import { getAllSidebarAnnouncements } from '../../data/announcements.js';
 
 const STYLE_ID = 'main-menu-view-style';
 
@@ -18,44 +18,6 @@ const TAG_CLASS_MAP = new Map([
   ['Coming soon', 'mode-tag--coming'],
   ['Kinh tế nguyên tinh', 'mode-tag--economy']
 ]);
-
-const LOTTERY_SPLIT = getLotterySplit();
-const LOTTERY_DEV_PERCENT = Math.round((LOTTERY_SPLIT.devVault || 0) * 100);
-const LOTTERY_PRIZE_PERCENT = Math.round((LOTTERY_SPLIT.prizePool || 0) * 100);
-const TT_CONVERSION_CHAIN = [
-  formatBalance(1, CURRENCY_IDS.TT),
-  formatBalance(convertCurrency(1, CURRENCY_IDS.TT, CURRENCY_IDS.THNT), CURRENCY_IDS.THNT),
-  formatBalance(convertCurrency(1, CURRENCY_IDS.TT, CURRENCY_IDS.TNT), CURRENCY_IDS.TNT),
-  formatBalance(convertCurrency(1, CURRENCY_IDS.TT, CURRENCY_IDS.HNT), CURRENCY_IDS.HNT),
-  formatBalance(convertCurrency(1, CURRENCY_IDS.TT, CURRENCY_IDS.VNT), CURRENCY_IDS.VNT)
-].join(' = ');
-
-const SIDE_SLOTS = [
-  {
-    key: 'event',
-    label: 'Sự kiện',
-    title: 'Thông báo chiến dịch',
-    description: 'Kênh sự kiện sẽ cập nhật tại đây. Tham gia để nhận nguyên tinh và danh vọng.'
-  },
-  {
-    key: 'lottery',
-    label: 'Vé số',
-    title: 'Vé số Nguyên Tinh',
-    description: `Vé số tuần sẽ chia ${LOTTERY_PRIZE_PERCENT}% vào quỹ thưởng, ${LOTTERY_DEV_PERCENT}% hỗ trợ vận hành. Chuỗi quy đổi: ${TT_CONVERSION_CHAIN}.`
-  },
-  {
-    key: 'gacha',
-    label: 'Gacha',
-    title: 'Banner trạm tiếp tế',
-    description: 'Quầy triệu hồi tướng chủ lực sẽ hiển thị banner ở vị trí này.'
-  },
-  {
-    key: 'chat',
-    label: 'Chat',
-    title: 'Kênh quân đoàn',
-    description: 'Xem nhanh tin nhắn gần nhất từ đội. Chức năng chat đang được kết nối.'
-  }
-];
 
 function ensureStyles(){
   let style = document.getElementById(STYLE_ID);
@@ -152,6 +114,8 @@ function ensureStyles(){
     .sidebar-slot__label{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#7da0c7;}
     .sidebar-slot__title{margin:0;font-size:16px;letter-spacing:.04em;}
     .sidebar-slot__desc{margin:0;font-size:13px;color:#9cbcd9;line-height:1.5;}
+    .sidebar-slot__reward{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#ffe066;}
+    .sidebar-slot:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:4px;}
     @media(max-width:1080px){.hero-panel{grid-template-columns:1fr;}.hero-panel__canvas{min-height:300px;}}
     @media(max-width:960px){.main-menu-v2__layout{grid-template-columns:1fr;}.main-menu-sidebar{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;}}
     @media(max-width:640px){.main-menu-v2{gap:24px;}.hero-panel__info{padding:24px;}.hero-panel__canvas{padding:20px;}.main-menu-v2__title{font-size:36px;}.mode-card{padding:20px;}}
@@ -669,31 +633,93 @@ function createHeroSection(options){
   return heroSection;
 }
 
-function createSidebar(){
+function createSidebar({ shell, addCleanup } = {}){
   const aside = document.createElement('aside');
   aside.className = 'main-menu-sidebar';
-  SIDE_SLOTS.forEach(slot => {
+  const announcements = getAllSidebarAnnouncements();
+
+  const attachTooltipHandlers = (element, { slotKey, entry }) => {
+    if (!entry || !shell || typeof shell.showTooltip !== 'function') return;
+    const showTooltip = () => {
+      shell.showTooltip({
+        id: entry.id,
+        slot: slotKey,
+        title: entry.title,
+        description: entry.tooltip,
+        reward: entry.rewardCallout,
+        translationKey: entry.translationKey || null,
+        startAt: entry.startAt || null,
+        endAt: entry.endAt || null
+      });
+    };
+    const hideTooltip = () => {
+      if (typeof shell.hideTooltip === 'function'){
+        shell.hideTooltip({ id: entry.id, slot: slotKey });
+      }
+    };
+
+    element.addEventListener('mouseenter', showTooltip);
+    element.addEventListener('mouseleave', hideTooltip);
+    element.addEventListener('focus', showTooltip);
+    element.addEventListener('blur', hideTooltip);
+
+    if (typeof addCleanup === 'function'){
+      addCleanup(() => {
+        element.removeEventListener('mouseenter', showTooltip);
+        element.removeEventListener('mouseleave', hideTooltip);
+        element.removeEventListener('focus', showTooltip);
+        element.removeEventListener('blur', hideTooltip);
+      });
+    }
+  };
+
+    announcements.forEach(item => {
+    const { key, label, entry } = item;
+    if (!entry) return;
     const card = document.createElement('div');
     card.className = 'sidebar-slot';
-    card.dataset.slot = slot.key;
+    card.dataset.slot = key;
+    if (entry.id) card.dataset.entryId = entry.id;
+    if (entry.translationKey) card.dataset.translationKey = entry.translationKey;
+    if (entry.startAt) card.dataset.startAt = entry.startAt;
+    if (entry.endAt) card.dataset.endAt = entry.endAt;
+    card.tabIndex = 0;
 
-    const label = document.createElement('span');
-    label.className = 'sidebar-slot__label';
-    label.textContent = slot.label;
+    const labelEl = document.createElement('span');
+    labelEl.className = 'sidebar-slot__label';
+    labelEl.textContent = label;
 
-    const title = document.createElement('h4');
-    title.className = 'sidebar-slot__title';
-    title.textContent = slot.title;
+    const titleEl = document.createElement('h4');
+    titleEl.className = 'sidebar-slot__title';
+    titleEl.textContent = entry.title;
 
-    const desc = document.createElement('p');
-    desc.className = 'sidebar-slot__desc';
-    desc.textContent = slot.description;
+    const descEl = document.createElement('p');
+    descEl.className = 'sidebar-slot__desc';
+    descEl.textContent = entry.shortDescription;
 
-    card.appendChild(label);
-    card.appendChild(title);
-    card.appendChild(desc);
+    card.appendChild(labelEl);
+    card.appendChild(titleEl);
+    card.appendChild(descEl);
+
+    if (entry.rewardCallout){
+      const rewardEl = document.createElement('span');
+      rewardEl.className = 'sidebar-slot__reward';
+      rewardEl.textContent = entry.rewardCallout;
+      card.appendChild(rewardEl);
+    }
+
+    const tooltipText = [entry.tooltip, entry.rewardCallout].filter(Boolean).join('\n\n');
+    const hasCustomTooltip = Boolean(shell && typeof shell.showTooltip === 'function');
+    if (tooltipText && !hasCustomTooltip){
+      card.setAttribute('title', tooltipText);
+    } else {
+      card.removeAttribute('title');
+    }
+
+    attachTooltipHandlers(card, { slotKey: key, entry });
     aside.appendChild(card);
   });
+
   return aside;
 }
 
@@ -762,7 +788,7 @@ export function renderMainMenuView(options = {}){
   const modes = createModesSection({ sections, metadata, shell, onShowComingSoon, addCleanup });
   primary.appendChild(modes);
 
-  const sidebar = createSidebar();
+  const sidebar = createSidebar({ shell, addCleanup });
 
   layout.appendChild(primary);
   layout.appendChild(sidebar);
