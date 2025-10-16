@@ -276,8 +276,21 @@ function contextSignature(g, cam){
   ].join('|');
 }
 
+function warnInvalidToken(context, token){
+  if (!CFG.DEBUG) return;
+  try {
+    console.warn(`[engine] ${context}: expected token object but received`, token);
+  } catch(_){}
+}
+
 function getTokenProjection(token, g, cam, sig){
-  if (!token) return null;
+  if (!token){
+    return null;
+  }
+  if (typeof token !== 'object' || token === null){
+    warnInvalidToken('getTokenProjection', token);
+    return null;
+  }
   let entry = TOKEN_PROJECTION_CACHE.get(token);
   if (!entry || entry.cx !== token.cx || entry.cy !== token.cy || entry.sig !== sig){
     const projection = projectCellOblique(g, token.cx, token.cy, cam);
@@ -293,7 +306,13 @@ function getTokenProjection(token, g, cam, sig){
 }
 
 function clearTokenCaches(token){
-  if (!token) return;
+  if (!token){
+    return;
+  }
+  if (typeof token !== 'object' || token === null){
+    warnInvalidToken('clearTokenCaches', token);
+    return;
+  }
   TOKEN_PROJECTION_CACHE.delete(token);
   const skinKey = token.skinKey ?? null;
   const cacheKey = `${token.id ?? '__anon__'}::${skinKey ?? ''}`;
@@ -500,7 +519,13 @@ export function drawTokensOblique(ctx, g, tokens, cam){
 const alive = [];
   for (const token of tokens){
     if (!token || !token.alive){
-      if (token && !token.alive) clearTokenCaches(token);
+      if (token && !token.alive){
+        if (typeof token === 'object' && token !== null){
+          clearTokenCaches(token);
+        } else {
+          warnInvalidToken('drawTokensOblique', token);
+        }
+      }
       continue;
     }
     const projection = getTokenProjection(token, g, C, sig);
