@@ -1448,25 +1448,15 @@ __define('./combat.js', (exports, module, __require) => {
     // 1) “Trước mắt”: cùng hàng, ưu tiên cột sát midline → xa dần
    const r = attacker.cy;                 // 0=top,1=mid,2=bot
     const seq = [];
-    if (attacker.side === 'ally'){
-    // enemy: cột 4 là 1..3 (dưới→trên) ⇒ slot hàng r là (3 - r)
-     const s1 = 3 - r;                    // 1|2|3 (gần midline)
-    seq.push(s1, s1 + 3, s1 + 6);        // 2→5→8 (hàng mid) / 1→4→7 / 3→6→9
+    const targetSide = attacker.side === 'ally' ? 'enemy' : 'ally';
+    const s1 = Math.max(1, Math.min(3, (r|0) + 1)); // 1|2|3 (gần midline)
+    seq.push(s1, s1 + 3, s1 + 6);        // 1→4→7 / 2→5→8 / 3→6→9
     for (const s of seq){
-      const { cx, cy } = slotToCell('enemy', s);
+      const { cx, cy } = slotToCell(targetSide, s);
       const tgt = pool.find(t => t.cx === cx && t.cy === cy);
       if (tgt) return tgt;
    }
-   } else {
-     // ally: cột 2 là 1..3 (trên→dưới) ⇒ slot hàng r là (r + 1)
-    const s1 = r + 1;                    // 1|2|3 (gần midline phía ally)
-     seq.push(s1, s1 + 3, s1 + 6);        // 2→5→8 ... theo chiều đối xứng
-      for (const s of seq){
-       const { cx, cy } = slotToCell('ally', s);
-      const tgt = pool.find(t => t.cx === cx && t.cy === cy);
-     if (tgt) return tgt;
-   } 
-   }
+
    // 2) Fallback: không có ai “trước mắt” ⇒ đánh đơn vị gần nhất
    return pool.sort((a,b)=>{
      const da = Math.abs(a.cx - attacker.cx) + Math.abs(a.cy - attacker.cy);
@@ -3284,10 +3274,10 @@ __define('./engine.js', (exports, module, __require) => {
      // Ally: c=2 → 1..3 (trên→dưới), c=1 → 4..6, c=0 → 7..9
       return (CFG.ALLY_COLS - 1 - cx) * 3 + (cy + 1);
    } else {
-     // Enemy: c=4 → 1..3 (dưới→trên), c=5 → 4..6, c=6 → 7..9
+  // Enemy: c=4 → 1..3 (trên→dưới), c=5 → 4..6, c=6 → 7..9
      const enemyStart = CFG.GRID_COLS - CFG.ENEMY_COLS; // 7-3=4
      const colIndex = cx - enemyStart;                   // 0..2
-     return colIndex * 3 + (3 - cy);
+     return colIndex * 3 + (cy + 1);
     }
   }
 
@@ -3303,8 +3293,7 @@ __define('./engine.js', (exports, module, __require) => {
     } else {
       const enemyStart = CFG.GRID_COLS - CFG.ENEMY_COLS; // 4
      const cx = enemyStart + colIndex;                  // 4,5,6
-      const cy = 2 - rowIndex;                           // 2,1,0 (dưới→trên)
-     return { cx, cy };
+     const cy = rowIndex;                               // 0..2 (trên→dưới)
    }
   }
 
