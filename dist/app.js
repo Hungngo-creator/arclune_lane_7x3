@@ -4169,6 +4169,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
   let running = false;
   let sceneCache = null;
   const hpBarGradientCache = new Map();
+  const backgroundSignatureCache = new Map();
 
   function stableStringify(value, seen = new WeakSet()){
     if (value === null) return 'null';
@@ -4192,15 +4193,34 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     return String(value);
   }
 
+  function normalizeBackgroundCacheKey(backgroundKey){
+    return `key:${backgroundKey ?? '__no-key__'}`;
+  }
+
+  function clearBackgroundSignatureCache(){
+    backgroundSignatureCache.clear();
+  }
+
   function computeBackgroundSignature(backgroundKey){
+    const cacheKey = normalizeBackgroundCacheKey(backgroundKey);
     const config = getEnvironmentBackground(backgroundKey);
-    if (!config) return `${backgroundKey || 'no-key'}:no-config`;
+    if (!config){
+      backgroundSignatureCache.delete(cacheKey);
+      return `${backgroundKey || 'no-key'}:no-config`;
+    }
+    const cached = backgroundSignatureCache.get(cacheKey);
+    if (cached && cached.config === config){
+      return cached.signature;
+    }
+    let signature;
     try {
       return `${backgroundKey || 'no-key'}:${stableStringify(config)}`;
     } catch (_) {
       const props = Array.isArray(config.props) ? config.props.length : 0;
-      return `${backgroundKey || 'no-key'}:props:${props}`;
+      signature = `${backgroundKey || 'no-key'}:${stableStringify(config)}`;
     }
+    backgroundSignatureCache.set(cacheKey, { config, signature });
+    return signature;
   }
 
   function normalizeConfig(input = {}){
@@ -4343,6 +4363,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
 
   function invalidateSceneCache(){
     sceneCache = null;
+    clearBackgroundSignatureCache();
   }
 
   function createSceneCacheCanvas(pixelWidth, pixelHeight){
@@ -5013,13 +5034,30 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
       return;
     }
 
-    const affordable = deck.find(card => {
-      if (!card) return false;
-      if (!Number.isFinite(card.cost)) return true;
-      return card.cost <= Game.cost;
-    });
+    let cheapestAffordable = null;
+    let cheapestAffordableCost = Infinity;
+    let cheapestOverall = null;
+    let cheapestOverallCost = Infinity;
 
-    const chosen = affordable || deck[0] || null;
+    for (const card of deck){
+      if (!card) continue;
+
+      const hasFiniteCost = Number.isFinite(card.cost);
+      const cardCost = hasFiniteCost ? card.cost : 0;
+
+      if (cardCost < cheapestOverallCost){
+        cheapestOverall = card;
+        cheapestOverallCost = cardCost;
+      }
+
+      const affordable = !hasFiniteCost || card.cost <= Game.cost;
+      if (affordable && cardCost < cheapestAffordableCost){
+        cheapestAffordable = card;
+        cheapestAffordableCost = cardCost;
+      }
+    }
+
+    const chosen = (cheapestAffordable || cheapestOverall) ?? null;
     Game.selectedId = chosen ? chosen.id : null;
   }
 
@@ -5386,7 +5424,10 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
       Game.sceneTheme = cfg.sceneTheme;
     }
     if (typeof cfg.backgroundKey !== 'undefined'){
-      if (Game.backgroundKey !== cfg.backgroundKey) sceneChanged = true;
+      if (Game.backgroundKey !== cfg.backgroundKey){
+        sceneChanged = true;
+        clearBackgroundSignatureCache();
+      }
       Game.backgroundKey = cfg.backgroundKey;
     }
     if (Array.isArray(cfg.deck) && cfg.deck.length) Game.unitsAll = cfg.deck;
