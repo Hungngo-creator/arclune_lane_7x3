@@ -38,6 +38,7 @@ FOLLOWUP_CAP_DEFAULT: 2,
     BOARD_MAX_W: 900,
     BOARD_MIN_H: 220,
     BOARD_H_RATIO: 3/7,
+    MAX_DPR: 2.5,
     CARD_GAP: 12,
     CARD_MIN: 40
   },                              // <-- thêm dấu phẩy ở đây
