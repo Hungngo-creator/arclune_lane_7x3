@@ -26,6 +26,7 @@ import { vfxDraw, vfxAddSpawn, vfxAddHit, vfxAddMelee } from '../../vfx.js';
 import { drawBattlefieldScene, getCachedBattlefieldScene } from '../../scene.js';
 import { gameEvents, TURN_START, TURN_END, ACTION_START, ACTION_END } from '../../events.js';
 import { ensureNestedModuleSupport } from '../../utils/dummy.js';
+import { safeNow } from '../../utils/time.js';
 /** @type {HTMLCanvasElement|null} */ let canvas = null;
 /** @type {CanvasRenderingContext2D|null} */ let ctx = null;
 /** @type {{update:(g:any)=>void}|null} */ let hud = null;   // ← THÊM
@@ -34,22 +35,7 @@ const HAND_SIZE  = CFG.HAND_SIZE ?? 4;
 
 ensureNestedModuleSupport();
 
-const getNow = (()=>{
-  if (typeof performance !== 'undefined' && typeof performance.now === 'function'){
-    return () => performance.now();
-  }
-  let offset = Date.now();
-  let last = 0;
-  return () => {
-    const current = Date.now() - offset;
-    if (current > last){
-      last = current;
-    } else {
-      last += 1;
-    }
-    return last;
-  };
-})();
+const getNow = () => safeNow();
 
 // --- Instance counters (để gắn id cho token/minion) ---
 let _IID = 1;
