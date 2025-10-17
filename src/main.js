@@ -31,6 +31,7 @@ export function startGame(options = {}){
 export function stopGame(){
   if (!currentSession) return;
   currentSession.stop();
+  currentSession = null;
 }
 
 export function updateGameConfig(config = {}){
