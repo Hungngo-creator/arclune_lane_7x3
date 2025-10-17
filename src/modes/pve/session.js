@@ -129,6 +129,7 @@ function normalizeConfig(input = {}){
 
 function createGameState(options = {}){
   options = normalizeConfig(options);
+  const modeKey = typeof options.modeKey === 'string' ? options.modeKey : null;
   const sceneTheme = options.sceneTheme
     ?? CFG.SCENE?.CURRENT_THEME
     ?? CFG.SCENE?.DEFAULT_THEME;
@@ -147,6 +148,7 @@ function createGameState(options = {}){
     : (Array.isArray(enemyPreset.unitsAll) && enemyPreset.unitsAll.length ? enemyPreset.unitsAll : UNITS);
 
   const game = {
+    modeKey,
     grid: null,
     tokens: [],
     cost: 0,
@@ -1388,6 +1390,9 @@ function applyConfigToRunningGame(cfg){
     }
     Game.backgroundKey = cfg.backgroundKey;
   }
+  if (typeof cfg.modeKey !== 'undefined'){
+    Game.modeKey = typeof cfg.modeKey === 'string' ? cfg.modeKey : (cfg.modeKey || null);
+  }
   if (Array.isArray(cfg.deck) && cfg.deck.length) Game.unitsAll = cfg.deck;
   if (cfg.aiPreset){
     const preset = cfg.aiPreset || {};
@@ -1423,7 +1428,8 @@ function onSessionEvent(type, handler){
 }
 
 export function createPveSession(rootEl, options = {}){
-  storedConfig = normalizeConfig(options || {});
+  const normalized = normalizeConfig(options || {});
+  storedConfig = { ...normalized };
   configureRoot(rootEl);
   return {
     start(startConfig = {}){
@@ -1451,4 +1457,11 @@ export function createPveSession(rootEl, options = {}){
 }
 
 export const __backgroundSignatureCache = backgroundSignatureCache;
+export function __getStoredConfig(){
+  return storedConfig ? { ...storedConfig } : {};
+}
+
+export function __getActiveGame(){
+  return Game;
+}
 export { gameEvents, emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END } from '../../events.js';
