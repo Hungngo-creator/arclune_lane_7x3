@@ -1,6 +1,9 @@
 // ai.js v0.7.6
 import { pickRandom, slotToCell, cellReserved } from './engine.js';
 import { CFG } from './config.js';
+import { safeNow as sharedSafeNow } from './utils/time.js';
+
+const safeNow = () => sharedSafeNow();
 
 const tokensAlive = (Game) => Game.tokens.filter(t => t.alive);
 const DEFAULT_WEIGHTS = Object.freeze({
@@ -207,7 +210,7 @@ export function queueEnemyAt(Game, card, slot, cx, cy, aliveTokens){
 }
 
 export function aiMaybeAct(Game, reason){
-  const now = performance.now();
+  const now = safeNow();
   if (now - (Game.ai.lastThinkMs||0) < 120) return;
   const weights = mergedWeights();
   const dbgCfg = debugConfig();

@@ -5,6 +5,7 @@ import { slotToCell, cellReserved } from './engine.js';
 import { vfxAddSpawn } from './vfx.js';
 import { emitPassiveEvent } from './passives.js';
 import { CFG } from './config.js';
+import { safeNow } from './utils/time.js';
 export function pickTarget(Game, attacker){
  const foe = attacker.side === 'ally' ? 'enemy' : 'ally';
  const pool = Game.tokens.filter(t => t.side === foe && t.alive);
@@ -36,7 +37,7 @@ export function applyDamage(target, amount){
   if (!Number.isFinite(target.hpMax)) return;
   target.hp = Math.max(0, Math.min(target.hpMax, (target.hp|0) - (amount|0)));
   if (target.hp <= 0){
-    if (target.alive !== false && !target.deadAt) target.deadAt = performance.now();
+  if (target.alive !== false && !target.deadAt) target.deadAt = safeNow();
     target.alive = false;
   }
 }
@@ -126,7 +127,7 @@ export function basicAttack(Game, unit){
  
 // VFX: tất cả basic đều step-in/out (1.1s), không dùng tracer
   const meleeDur = CFG?.ANIMATION?.meleeDurationMs ?? 1100;
-  const meleeStartMs = performance.now();
+  const meleeStartMs = safeNow();
   let meleeTriggered = false;
   try {
     vfxAddMelee(Game, unit, tgt, { dur: meleeDur });

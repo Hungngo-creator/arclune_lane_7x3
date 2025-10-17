@@ -1,5 +1,6 @@
 // passives.js — passive event dispatch & helpers v0.7
 import { Statuses, hookOnLethalDamage } from './statuses.js';
+import { safeNow } from './utils/time.js';
 
 const clamp01 = (x) => Math.max(0, Math.min(1, x));
 
@@ -125,7 +126,7 @@ const EFFECTS = {
       if (target.hp <= 0){
         if (!hookOnLethalDamage(target)){
           target.alive = false;
-          if (!target.deadAt) target.deadAt = performance.now();
+          if (!target.deadAt) target.deadAt = safeNow();
         }
       }
       if (ctx && Array.isArray(ctx.log)){

@@ -8,6 +8,7 @@ import { vfxAddSpawn } from './vfx.js';
 import { getUnitArt } from './art.js';
 import { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } from './passives.js';
 import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END } from './events.js';
+import { safeNow } from './utils/time.js';
 
 // local helper
 const tokensAlive = (Game) => Game.tokens.filter(t => t.alive);
@@ -81,7 +82,7 @@ export function tickMinionTTL(Game, side){
 export function doActionOrSkip(Game, unit, { performUlt }){
   const ensureBusyReset = () => {
     if (!Game || !Game.turn) return;
-    const now = performance.now();
+    const now = safeNow();
     if (!Number.isFinite(Game.turn.busyUntil) || Game.turn.busyUntil < now) {
       Game.turn.busyUntil = now;
     }

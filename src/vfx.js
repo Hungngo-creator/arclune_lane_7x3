@@ -5,8 +5,9 @@
 
 import { projectCellOblique } from './engine.js';
 import { CFG, CHIBI } from './config.js';
+import { safeNow } from './utils/time.js';
 
-const now = () => performance.now();
+const now = () => safeNow();
 const lerp = (a, b, t) => a + (b - a) * t;
 const easeInOut = (t) => (1 - Math.cos(Math.PI * Math.max(0, Math.min(1, t)))) * 0.5;
 const isFiniteCoord = (value) => Number.isFinite(value);
