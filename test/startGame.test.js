@@ -98,7 +98,7 @@ const stubModules = new Map([
     let initHudCalls = 0;
     export function initHUD(doc, root) {
       initHudCalls += 1;
-      return { update() {} };
+      return { update() {}, cleanup() {} };
     }
     export function startSummonBar(doc, options, root) {
       return { render() {} };
