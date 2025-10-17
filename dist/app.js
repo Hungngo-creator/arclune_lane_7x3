@@ -21,6 +21,10 @@ __define('./ai.js', (exports, module, __require) => {
   const cellReserved = __dep0.cellReserved;
   const __dep1 = __require('./config.js');
   const CFG = __dep1.CFG;
+  const __dep2 = __require('./utils/time.js');
+  const sharedSafeNow = __dep2.safeNow;
+
+  const safeNow = () => sharedSafeNow();
 
   const tokensAlive = (Game) => Game.tokens.filter(t => t.alive);
   const DEFAULT_WEIGHTS = Object.freeze({
@@ -227,7 +231,7 @@ __define('./ai.js', (exports, module, __require) => {
   }
 
   function aiMaybeAct(Game, reason){
-    const now = performance.now();
+    const now = safeNow();
     if (now - (Game.ai.lastThinkMs||0) < 120) return;
     const weights = mergedWeights();
     const dbgCfg = debugConfig();
@@ -1447,6 +1451,8 @@ __define('./combat.js', (exports, module, __require) => {
   const emitPassiveEvent = __dep4.emitPassiveEvent;
   const __dep5 = __require('./config.js');
   const CFG = __dep5.CFG;
+  const __dep6 = __require('./utils/time.js');
+  const safeNow = __dep6.safeNow;
   function pickTarget(Game, attacker){
    const foe = attacker.side === 'ally' ? 'enemy' : 'ally';
    const pool = Game.tokens.filter(t => t.side === foe && t.alive);
@@ -1478,7 +1484,7 @@ __define('./combat.js', (exports, module, __require) => {
     if (!Number.isFinite(target.hpMax)) return;
     target.hp = Math.max(0, Math.min(target.hpMax, (target.hp|0) - (amount|0)));
     if (target.hp <= 0){
-      if (target.alive !== false && !target.deadAt) target.deadAt = performance.now();
+    if (target.alive !== false && !target.deadAt) target.deadAt = safeNow();
       target.alive = false;
     }
   }
@@ -1568,7 +1574,7 @@ __define('./combat.js', (exports, module, __require) => {
    
   // VFX: tất cả basic đều step-in/out (1.1s), không dùng tracer
     const meleeDur = CFG?.ANIMATION?.meleeDurationMs ?? 1100;
-    const meleeStartMs = performance.now();
+    const meleeStartMs = safeNow();
     let meleeTriggered = false;
     try {
       vfxAddMelee(Game, unit, tgt, { dur: meleeDur });
@@ -4142,6 +4148,8 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
   const ACTION_END = __dep16.ACTION_END;
   const __dep17 = __require('./utils/dummy.js');
   const ensureNestedModuleSupport = __dep17.ensureNestedModuleSupport;
+  const __dep18 = __require('./utils/time.js');
+  const safeNow = __dep18.safeNow;
   /** @type {HTMLCanvasElement|null} */ let canvas = null;
   /** @type {CanvasRenderingContext2D|null} */ let ctx = null;
   /** @type {{update:(g:any)=>void}|null} */ let hud = null;   // ← THÊM
@@ -4150,22 +4158,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
 
   ensureNestedModuleSupport();
 
-  const getNow = (()=>{
-    if (typeof performance !== 'undefined' && typeof performance.now === 'function'){
-      return () => performance.now();
-    }
-    let offset = Date.now();
-    let last = 0;
-    return () => {
-      const current = Date.now() - offset;
-      if (current > last){
-        last = current;
-      } else {
-        last += 1;
-      }
-      return last;
-    };
-  })();
+  const getNow = () => safeNow();
 
   // --- Instance counters (để gắn id cho token/minion) ---
   let _IID = 1;
@@ -5578,6 +5571,8 @@ __define('./passives.js', (exports, module, __require) => {
   const __dep0 = __require('./statuses.js');
   const Statuses = __dep0.Statuses;
   const hookOnLethalDamage = __dep0.hookOnLethalDamage;
+  const __dep1 = __require('./utils/time.js');
+  const safeNow = __dep1.safeNow;
 
   const clamp01 = (x) => Math.max(0, Math.min(1, x));
 
@@ -5703,7 +5698,7 @@ __define('./passives.js', (exports, module, __require) => {
         if (target.hp <= 0){
           if (!hookOnLethalDamage(target)){
             target.alive = false;
-            if (!target.deadAt) target.deadAt = performance.now();
+            if (!target.deadAt) target.deadAt = safeNow();
           }
         }
         if (ctx && Array.isArray(ctx.log)){
@@ -7583,6 +7578,8 @@ __define('./turns.js', (exports, module, __require) => {
   const TURN_END = __dep8.TURN_END;
   const ACTION_START = __dep8.ACTION_START;
   const ACTION_END = __dep8.ACTION_END;
+  const __dep9 = __require('./utils/time.js');
+  const safeNow = __dep9.safeNow;
 
   // local helper
   const tokensAlive = (Game) => Game.tokens.filter(t => t.alive);
@@ -7656,7 +7653,7 @@ __define('./turns.js', (exports, module, __require) => {
   function doActionOrSkip(Game, unit, { performUlt }){
     const ensureBusyReset = () => {
       if (!Game || !Game.turn) return;
-      const now = performance.now();
+      const now = safeNow();
       if (!Number.isFinite(Game.turn.busyUntil) || Game.turn.busyUntil < now) {
         Game.turn.busyUntil = now;
       }
@@ -8048,6 +8045,23 @@ __define('./utils/dummy.js', (exports, module, __require) => {
 
   exports.ensureNestedModuleSupport = ensureNestedModuleSupport;
 });
+__define('./utils/time.js', (exports, module, __require) => {
+  const perf = typeof globalThis !== 'undefined' ? globalThis.performance : undefined;
+  const hasPerfNow = !!(perf && typeof perf.now === 'function');
+  let lastFallbackNow = 0;
+
+  function safeNow(){
+    if (hasPerfNow) return perf.now();
+    const current = Date.now();
+    if (current <= lastFallbackNow) {
+      lastFallbackNow += 1;
+      return lastFallbackNow;
+    }
+    lastFallbackNow = current;
+    return current;
+  }
+  exports.safeNow = safeNow;
+});
 __define('./vfx.js', (exports, module, __require) => {
   // 0.6 vfx.js
   // VFX layer: spawn pop, hit ring, ranged tracer, melee step-in/out
@@ -8059,8 +8073,10 @@ __define('./vfx.js', (exports, module, __require) => {
   const __dep1 = __require('./config.js');
   const CFG = __dep1.CFG;
   const CHIBI = __dep1.CHIBI;
+  const __dep2 = __require('./utils/time.js');
+  const safeNow = __dep2.safeNow;
 
-  const now = () => performance.now();
+  const now = () => safeNow();
   const lerp = (a, b, t) => a + (b - a) * t;
   const easeInOut = (t) => (1 - Math.cos(Math.PI * Math.max(0, Math.min(1, t)))) * 0.5;
   const isFiniteCoord = (value) => Number.isFinite(value);
