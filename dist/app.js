@@ -7769,7 +7769,7 @@ __define('./ui.js', (exports, module, __require) => {
       const now = Math.max(0, Math.floor(Game.cost ?? 0));
       const ratio = Math.max(0, Math.min(1, now / cap));
 
-      if (costNow) costNow.textContent = now;
+      if (costNow) costNow.textContent = String(now);
       // Vòng tròn tiến trình n/30
       if (costRing){
        const deg = (ratio * 360).toFixed(1) + 'deg';
@@ -7951,7 +7951,7 @@ __define('./ui.js', (exports, module, __require) => {
 
         // cập nhật cost (giữ UI “chỉ cost”)
         const span = b.querySelector('.cost');
-        if (span) span.textContent = c.cost;
+        if (span) span.textContent = String(c.cost);
 
         const afford = canAfford(c);
         b.disabled = !afford;
