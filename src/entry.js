@@ -285,6 +285,24 @@ async function mountPveScreen(params){
   teardownActiveSession();
   const modeKey = params?.modeKey && MODE_DEFINITIONS[params.modeKey] ? params.modeKey : 'campaign';
   const definition = MODE_DEFINITIONS[modeKey] || MODE_DEFINITIONS.campaign;
+  const rawParams = (params && typeof params === 'object') ? params : {};
+  const defaultParams = (definition?.params && typeof definition.params === 'object') ? definition.params : {};
+  const mergedParams = { ...defaultParams, ...rawParams };
+  const hasSessionConfig = Object.prototype.hasOwnProperty.call(mergedParams, 'sessionConfig');
+  const sessionConfigValue = hasSessionConfig && mergedParams.sessionConfig && typeof mergedParams.sessionConfig === 'object'
+    ? { ...mergedParams.sessionConfig }
+    : mergedParams.sessionConfig;
+  const createSessionOptions = {
+    ...mergedParams,
+    ...(hasSessionConfig ? { sessionConfig: sessionConfigValue } : {})
+  };
+  const startSessionOverrides = (sessionConfigValue && typeof sessionConfigValue === 'object')
+    ? sessionConfigValue
+    : {};
+  const startSessionOptions = {
+    ...createSessionOptions,
+    ...startSessionOverrides
+  };
   if (rootElement){
     rootElement.classList.add('app--pve');
     rootElement.innerHTML = `<div class="app-loading">Đang tải ${definition.label}...</div>`;
@@ -335,7 +353,7 @@ async function mountPveScreen(params){
   if (!container){
     throw new Error('Không thể dựng giao diện PvE.');
   }
-  const session = createPveSession(container);
+  const session = createPveSession(container, createSessionOptions);
   shellInstance.setActiveSession(session);
   if (typeof session.start === 'function'){
     const scheduleRetry = (callback) => {
@@ -348,8 +366,22 @@ async function mountPveScreen(params){
     const MAX_BOARD_RETRIES = 30;
     const startSessionSafely = () => {
       if (token !== pveRenderToken) return;
+      const extractStartConfig = (source) => {
+        if (!source || typeof source !== 'object') return null;
+        const payload = source.sessionConfig && typeof source.sessionConfig === 'object'
+          ? source.sessionConfig
+          : source;
+        return { ...payload };
+      };
+      const definitionConfig = extractStartConfig(definition?.params);
+      const incomingConfig = extractStartConfig(params);
+      const startConfig = {
+        ...(definitionConfig || {}),
+        ...(incomingConfig || {}),
+        root: container
+      };
       try {
-        const result = session.start({ ...(params?.sessionConfig || {}), root: container });
+        const result = session.start(startConfig);
         if (!result){
           handleMissingBoard();
         }
