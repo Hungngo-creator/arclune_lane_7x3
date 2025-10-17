@@ -139,15 +139,16 @@ const MODES = [
     id: 'collection',
     title: 'Bộ Sưu Tập',
     type: MODE_TYPES.ECONOMY,
-    status: MODE_STATUS.COMING_SOON,
+    status: MODE_STATUS.AVAILABLE,
     icon: '📚',
     shortDescription: 'Hiển thị hồ sơ nhân vật, sủng thú, công pháp, rank budget, sao và class từ dữ liệu tổng hợp.',
     unlockNotes: 'Mở khi người chơi bắt đầu thu thập nhân vật và sủng thú để theo dõi tiến trình nâng sao và rank budget.',
-    tags: ['Kinh tế nguyên tinh', 'Coming soon'],
+    tags: ['Kinh tế nguyên tinh'],
     menuSections: ['economy'],
     shell: {
-      screenId: 'main-menu',
-      fallbackModuleId: './modes/coming-soon.stub.js'
+      screenId: 'collection',
+      moduleId: './screens/collection/index.js',
+      defaultParams: null
     }
   },
   {
