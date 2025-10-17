@@ -19,9 +19,13 @@ export function startGame(options = {}){
   const initialConfig = { ...rest };
   if (!currentSession){
     currentSession = createPveSession(rootTarget, initialConfig);
-}
-const startConfig = { ...initialConfig, root: rootTarget };
-  return currentSession.start(startConfig);
+  }
+  const startConfig = { ...initialConfig, root: rootTarget };
+  const session = currentSession.start(startConfig);
+  if (!session){
+    throw new Error('PvE board markup not found; render the layout before calling startGame');
+  }
+  return session;
 }
 
 export function stopGame(){
