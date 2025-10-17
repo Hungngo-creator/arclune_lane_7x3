@@ -96,11 +96,11 @@ const stubModules = new Map([
   `],
   ['./ui.js', `
     let initHudCalls = 0;
-    export function initHUD() {
+    export function initHUD(doc, root) {
       initHudCalls += 1;
       return { update() {} };
     }
-    export function startSummonBar() {
+    export function startSummonBar(doc, options, root) {
       return { render() {} };
     }
     export function __getInitHudCalls() {
@@ -517,6 +517,8 @@ async function compileModuleScripts() {
 
   const mainSource = await fs.readFile(path.join(SRC_DIR, 'main.js'), 'utf8');
   await addModule('./main.js', mainSource);
+  const sessionSource = await fs.readFile(path.join(SRC_DIR, 'modes', 'pve', 'session.js'), 'utf8');
+  await addModule('./modes/pve/session.js', sessionSource);
   const dummySource = await fs.readFile(path.join(SRC_DIR, 'utils', 'dummy.js'), 'utf8');
   await addModule('./utils/dummy.js', dummySource);
   return scripts;
