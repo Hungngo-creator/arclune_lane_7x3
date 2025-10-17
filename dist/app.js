@@ -3796,7 +3796,7 @@ __define('./entry.js', (exports, module, __require) => {
 
     let module;
     try {
-      module = await import('./screens/collection/index.js');
+      module = await loadBundledModule('./screens/collection/index.js');
     } catch (error) {
       if (token !== collectionRenderToken) return;
       throw error;
