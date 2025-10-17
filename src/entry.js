@@ -349,7 +349,10 @@ async function mountPveScreen(params){
     const startSessionSafely = () => {
       if (token !== pveRenderToken) return;
       try {
-        session.start({ ...(params?.sessionConfig || {}), root: container });
+        const result = session.start({ ...(params?.sessionConfig || {}), root: container });
+        if (!result){
+          handleMissingBoard();
+        }
       } catch (err) {
         shellInstance.setActiveSession(null);
         throw err;
