@@ -22,7 +22,7 @@ export function initHUD(doc, root){
     const now = Math.max(0, Math.floor(Game.cost ?? 0));
     const ratio = Math.max(0, Math.min(1, now / cap));
 
-    if (costNow) costNow.textContent = now;
+    if (costNow) costNow.textContent = String(now);
     // Vòng tròn tiến trình n/30
     if (costRing){
      const deg = (ratio * 360).toFixed(1) + 'deg';
@@ -204,7 +204,7 @@ let btns = []; // sẽ chứa đúng 3 button được tạo bằng makeBtn
 
       // cập nhật cost (giữ UI “chỉ cost”)
       const span = b.querySelector('.cost');
-      if (span) span.textContent = c.cost;
+      if (span) span.textContent = String(c.cost);
 
       const afford = canAfford(c);
       b.disabled = !afford;
