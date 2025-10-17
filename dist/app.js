@@ -3550,6 +3550,25 @@ __define('./entry.js', (exports, module, __require) => {
     if (!error || typeof error !== 'object') return false;
     if ('code' in error && error.code === 'MODULE_NOT_FOUND') return true;
     const message = typeof error.message === 'string' ? error.message : '';
+    const name = typeof error.name === 'string' ? error.name : '';
+    if (name === 'TypeError'){
+      const typeErrorImportPatterns = [
+        /Failed to fetch dynamically imported module/i,
+        /dynamically imported module/i,
+        /Importing a module script failed/i,
+        /Failed to resolve module specifier/i,
+        /Module script load failed/i,
+        /MIME type/i
+      ];
+      if (typeErrorImportPatterns.some(pattern => pattern.test(message))){
+        return true;
+      }
+    }
+    if (error && error.cause && error.cause !== error && typeof error.cause === 'object'){
+      if (isMissingModuleError(error.cause)){
+        return true;
+      }
+    }
     return /Cannot find module/i.test(message) || /module(\s|-)not(\s|-)found/i.test(message);
   }
 
