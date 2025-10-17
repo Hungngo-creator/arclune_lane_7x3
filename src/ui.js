@@ -37,14 +37,26 @@ export function initHUD(doc, root){
     const state = ev?.detail?.game;
     if (state) update(state);
   };
+  let cleanedUp = false;
+  const cleanup = ()=>{
+    if (cleanedUp) return;
+    cleanedUp = true;
+    if (gameEvents && typeof gameEvents.removeEventListener === 'function'){
+      const types = [TURN_START, TURN_END, ACTION_END];
+      for (const type of types){
+        gameEvents.removeEventListener(type, handleGameEvent);
+      }
+    }
+  };
+
   if (gameEvents && typeof gameEvents.addEventListener === 'function'){
     const types = [TURN_START, TURN_END, ACTION_END];
     for (const type of types){
       gameEvents.addEventListener(type, handleGameEvent);
     }
   }
- return { update };
- }
+ return { update, cleanup };
+}
 /* ---------- Summon Bar (deck-size = 4) ---------- */
 export function startSummonBar(doc, options, root){
   options = options || {};
