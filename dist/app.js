@@ -4855,14 +4855,16 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     const doc = docRef || (typeof document !== 'undefined' ? document : null);
     if (!doc) return;
     const root = rootElement || null;
-    const queryFromRoot = (selector)=>{
-      if (root && typeof root.querySelector === 'function'){
-        return root.querySelector(selector);
-      }
-      return null;
-    };
-    const boardEl = /** @type {HTMLCanvasElement|null} */ (queryFromRoot('#board') || doc.getElementById('board'));
-    if (!boardEl) return;
+    const boardFromRoot = (root && typeof root.querySelector === 'function')
+      ? root.querySelector('#board')
+      : null;
+    const boardFromDocument = (typeof doc.querySelector === 'function')
+      ? doc.querySelector('#board')
+      : (typeof doc.getElementById === 'function' ? doc.getElementById('board') : null);
+    const boardEl = /** @type {HTMLCanvasElement|null} */ (boardFromRoot || boardFromDocument);
+    if (!boardEl){
+      throw new Error('PvE session board canvas (#board) not found in the provided root or document.');
+    }
     canvas = boardEl;
     ctx = /** @type {CanvasRenderingContext2D} */ (boardEl.getContext('2d'));
 
