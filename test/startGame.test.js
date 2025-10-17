@@ -141,6 +141,9 @@ const stubModules = new Map([
     export const ACTION_START = 'ACTION_START';
     export const ACTION_END = 'ACTION_END';
     export function emitGameEvent() {}
+      `],
+  ['./utils/time.js', `
+    export function safeNow() { return 0; }
   `]
 ]);
 
@@ -503,6 +506,13 @@ function createSandbox(boardFlag) {
   return { sandbox, documentStub };
 }
 
+function getListenerCount(target, type) {
+  const registry = target?._listeners;
+  if (!registry) return 0;
+  const listeners = registry[type];
+  return Array.isArray(listeners) ? listeners.length : 0;
+}
+
 async function compileModuleScripts() {
   const scripts = new Map();
   const addModule = async (id, source) => {
@@ -574,18 +584,76 @@ test('startGame retries initialization after DOM becomes ready', async () => {
   const uiModule = localRequire('./ui.js');
   const getInitHudCalls = uiModule.__getInitHudCalls;
 
-  assert.equal(getInitHudCalls(), 0);
-  assert.strictEqual((documentStub._listeners.visibilitychange || []).length, 0);
+  assert.strictEqual(getInitHudCalls(), 0);
+  assert.strictEqual(getListenerCount(documentStub, 'visibilitychange'), 0);
 
-  startGame();
-  assert.equal(getInitHudCalls(), 0);
-  assert.strictEqual((documentStub._listeners.visibilitychange || []).length, 0);
+  const firstAttempt = startGame();
+  assert.strictEqual(firstAttempt, null);
+  assert.strictEqual(getInitHudCalls(), 0);
+  assert.strictEqual(getListenerCount(documentStub, 'visibilitychange'), 0);
+
+  const secondAttempt = startGame();
+  assert.strictEqual(secondAttempt, null);
+  assert.strictEqual(getInitHudCalls(), 0);
+  assert.strictEqual(getListenerCount(documentStub, 'visibilitychange'), 0);
 
   boardFlag.value = true;
-  startGame();
-  assert.equal(getInitHudCalls(), 1);
-  assert.strictEqual((documentStub._listeners.visibilitychange || []).length, 1);
+  
+  const successfulGame = startGame();
+  assert.ok(successfulGame && successfulGame._inited);
+  assert.strictEqual(getInitHudCalls(), 1);
+  assert.strictEqual(getListenerCount(documentStub, 'visibilitychange'), 1);
 
-  startGame();
-  assert.equal(getInitHudCalls(), 1);
+  const restartedGame = startGame();
+  assert.ok(restartedGame && restartedGame._inited);
+  assert.notStrictEqual(restartedGame, successfulGame);
+  assert.strictEqual(getInitHudCalls(), 2);
+  assert.strictEqual(getListenerCount(documentStub, 'visibilitychange'), 1);
+});
+
+test('startGame initialises using provided root when document lacks #board', async () => {
+  const boardFlag = { value: false };
+  const { startGame, documentStub, require: localRequire } = await loadMainModule(boardFlag);
+  const uiModule = localRequire('./ui.js');
+  const getInitHudCalls = uiModule.__getInitHudCalls;
+
+  const rootCanvas = createCanvasElement();
+  const rootReady = { value: false };
+  const root = {
+    ownerDocument: documentStub,
+    querySelector(selector) {
+      if (selector === '#board' && rootReady.value) {
+        return rootCanvas;
+      }
+      return null;
+    },
+    contains() {
+      return true;
+    }
+  };
+
+  const initialResult = startGame({ root });
+  assert.strictEqual(initialResult, null);
+  assert.strictEqual(getInitHudCalls(), 0);
+  assert.strictEqual(getListenerCount(documentStub, 'visibilitychange'), 0);
+  assert.strictEqual(documentStub.getElementById('board'), null);
+
+  const repeatBeforeReady = startGame({ root });
+  assert.strictEqual(repeatBeforeReady, null);
+  assert.strictEqual(getInitHudCalls(), 0);
+  assert.strictEqual(getListenerCount(documentStub, 'visibilitychange'), 0);
+
+  rootReady.value = true;
+
+  const game = startGame({ root });
+  assert.ok(game && game._inited);
+  assert.strictEqual(getInitHudCalls(), 1);
+  assert.strictEqual(getListenerCount(documentStub, 'visibilitychange'), 1);
+  assert.strictEqual(documentStub.getElementById('board'), null);
+
+  const restarted = startGame({ root });
+  assert.ok(restarted && restarted._inited);
+  assert.notStrictEqual(restarted, game);
+  assert.strictEqual(getInitHudCalls(), 2);
+  assert.strictEqual(getListenerCount(documentStub, 'visibilitychange'), 1);
 });
