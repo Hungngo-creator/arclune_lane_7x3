@@ -405,12 +405,14 @@ async function mountPveScreen(params){
     let lastParams = null;
 
     shellInstance.onChange(state => {
-      if (state.screen === SCREEN_MAIN_MENU && (lastScreen !== SCREEN_MAIN_MENU || state.screenParams !== lastParams)){
-        if (lastScreen !== SCREEN_MAIN_MENU){
+      if (state.screen === SCREEN_MAIN_MENU){
+        const screenChanged = lastScreen !== SCREEN_MAIN_MENU;
+        const paramsChanged = state.screenParams !== lastParams;
+        if (screenChanged || paramsChanged){
           lastScreen = SCREEN_MAIN_MENU;
-          lastParams = state.screenParams;
           pveRenderToken += 1;
           renderMainMenuScreen();
+          lastParams = state.screenParams;
         }
       } else if (state.screen === SCREEN_PVE){
         if (mainMenuView && typeof mainMenuView.destroy === 'function'){
