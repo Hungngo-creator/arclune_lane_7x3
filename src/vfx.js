@@ -25,13 +25,8 @@ function pool(Game) {
 
 /* ------------------- Adders ------------------- */
 export function vfxAddSpawn(Game, cx, cy, side) {
-  const hit = { type: 'hit', t0: now(), dur: 380, ref: target, ...opts };
-  if (target) {
-    if (target.iid != null && hit.iid == null) hit.iid = target.iid;
-    if (typeof target.cx === 'number' && hit.cx == null) hit.cx = target.cx;
-    if (typeof target.cy === 'number' && hit.cy == null) hit.cy = target.cy;
-  }
-  pool(Game).push(hit);
+  const spawn = { type: 'spawn', t0: now(), dur: 500, cx, cy, side };
+  pool(Game).push(spawn);
 }
 
 export function vfxAddHit(Game, target, opts = {}) {
