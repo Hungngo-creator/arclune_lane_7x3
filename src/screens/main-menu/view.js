@@ -639,9 +639,8 @@ function createSidebar(options = {}){
   aside.className = 'main-menu-sidebar';
   const announcements = getAllSidebarAnnouncements();
 
-  const attachTooltipHandlers = (element, opts = {}) => {
-    const { slotKey, entry } = opts;
-    if (!entry || !shell || typeof shell.showTooltip !== 'function') return;
+  const attachTooltipHandlers = (element, { slotKey, entry } = {}) => {
+    if (!element || !entry || !shell || typeof shell.showTooltip !== 'function') return;
     const showTooltip = () => {
       shell.showTooltip({
         id: entry.id,
