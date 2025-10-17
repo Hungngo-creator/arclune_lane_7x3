@@ -72,7 +72,12 @@ export function startSummonBar(doc, options, root){
   if (host){
     host.innerHTML = '';
     host.addEventListener('click', (event) => {
-      const btn = event.target.closest('button.card');
+      const target = event.target instanceof Element
+        ? event.target
+        : event.currentTarget instanceof Element
+          ? event.currentTarget
+          : null;
+      const btn = target ? target.closest('button.card') : null;
       if (!btn || btn.disabled || !host.contains(btn)) return;
 
       const deck = getDeck() || [];
