@@ -738,12 +738,19 @@ function init(){
   if (Game?._inited) return;
   const doc = docRef || (typeof document !== 'undefined' ? document : null);
   if (!doc) return;
-  const boardEl = /** @type {HTMLCanvasElement} */ (doc.getElementById('board'));
+  const root = rootElement || null;
+  const queryFromRoot = (selector)=>{
+    if (root && typeof root.querySelector === 'function'){
+      return root.querySelector(selector);
+    }
+    return null;
+  };
+  const boardEl = /** @type {HTMLCanvasElement|null} */ (queryFromRoot('#board') || doc.getElementById('board'));
   if (!boardEl) return;
   canvas = boardEl;
   ctx = /** @type {CanvasRenderingContext2D} */ (boardEl.getContext('2d'));
 
-  hud = initHUD(doc);
+  hud = initHUD(doc, root);
 
   resize();
   spawnLeaders(Game.tokens, Game.grid);
@@ -779,7 +786,7 @@ function init(){
     canAfford: (c)=> Game.cost >= c.cost,
     getDeck: ()=> Game.deck3,
     getSelectedId: ()=> Game.selectedId
-  });
+  }, root);
 
   selectFirstAffordable();
   Game.ui.bar.render();
@@ -853,7 +860,7 @@ function init(){
       CLOCK.lastTimerRemain = remain;
       const mm = String(Math.floor(remain/60)).padStart(2,'0');
       const ss = String(remain%60).padStart(2,'0');
-      const tEl = doc.getElementById('timer');
+      const tEl = /** @type {HTMLElement|null} */ (queryFromRoot('#timer') || doc.getElementById('timer'));
       if (tEl) tEl.textContent = `${mm}:${ss}`;
     }
 
