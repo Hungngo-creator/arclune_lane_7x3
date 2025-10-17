@@ -3812,7 +3812,9 @@ __define('./entry.js', (exports, module, __require) => {
             mainMenuView.destroy();
             mainMenuView = null;
           }
-          if (lastScreen !== SCREEN_PVE){
+          const screenChanged = lastScreen !== SCREEN_PVE;
+          const paramsChanged = state.screenParams !== lastParams;
+          if (screenChanged || paramsChanged){
             lastScreen = SCREEN_PVE;
             lastParams = state.screenParams;
             mountPveScreen(state.screenParams || {}).catch(error => {
