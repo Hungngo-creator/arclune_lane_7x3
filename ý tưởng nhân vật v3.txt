@@ -517,15 +517,15 @@ Kĩ năng 2: quăng cục xúc xắc lên ô ở trước mặt, xúc xắc bi�
 
 Kĩ năng 3: nhận 1 buff ngẫu nhiên trong các buff sau:
 - tăng hp regen và hiệu ứng hồi hp nhận được lên 200% trong 3 turn.
-- tăng 20% res và arm trong 3 turn.
+- tăng 17% res và arm trong 3 turn.
 - tăng 20% atk và wil trong 2 turn.
-25 aether, kĩ năng này có cool down là 3 turn, dùng kỹ năng được tính 1 1 turn trong cooldown này.
+25 aether, kĩ năng này có cool down là 3 turn, dùng kỹ năng được tính 1 turn trong cooldown này.
 
 Ult: chọn một kẻ địch ngẫu nhiên sau đó thả xúc xắc, điểm là số lẻ thì kẻ địch đó ngủ trong 1 turn, điểm là số chẳn thì tăng 10% max hp cho bản thân.
 
 26) Ma Đế Hắc Long
 Nội tại: +5% res, arm và Wil khi vào trận, mọi đòn đánh gây sát thương gây hiệu ứng Tâm Ma lên mục tiêu.
-Mỗi 2 turn sẽ tự giảm 1 stack debuff trên bản thân ma đế hắc long, +40% hp regen khi vào trận.
+Mỗi 2 turn sẽ tự giảm 1 stack debuff trên bản thân ma đế hắc long, +35% hp regen khi vào trận.
 Tâm ma: giảm 5% RES và PER của mục tiêu. Nội tại này không thể lãng quên hoặc sao chép.
 
 Đánh thường: gây sát thương = n% wil và x% atk lên 1 mục tiêu
@@ -552,9 +552,9 @@ Kĩ năng 3: tấn công 3 kẻ địch ngẫu nhiên gây sát thương=130% đ
 Ult: gây aoe lên 3 kẻ địch ngẫu nhiên, gây sát thương = 230% đòn đánh thường lên mỗi kẻ địch, áp dụng bỏ qua 10% res và arm của mục tiêu từ Tịch Diệt Ban Ân.
 
 28) Hư Vô Ma Chủ
-Nội tại: mỗi khi bị tấn công có 20% tỉ lệ Hư Hoá.
+Nội tại: mỗi khi bị tấn công/nhận sát thương có 20% tỉ lệ Hư Hoá.
 Hư Hoá: bỏ qua và không nhận sát thương khi bị tấn công, nếu phán định thành công thì bề ngoài, vfx của nhân vật này sẽ trở nên mờ nhạt, hư ảo, khi đòn tấn công kết thúc thì nhân vật này sẽ ngưng thực.
-Mỗi khi kích hoạt Hư Hoá thành công 5 lần (trong 1 trận đấu), tăng tỉ lệ Hư Hoá lên 10%, tối đa là 100% tỉ lệ kích hoạt Hư Hoá. (Nhân vật này cần kích hoạt hư hoá 40 lần để trở nên bất bại). Nếu nhân vật này kích hoạt 40 lần Hư Hoá trong 1 trận đấu thì sau 3 turn kể từ khi đạt 100% tỉ lệ Hư Hoá sẽ nhận trạng thái Hư Vô Đồng Hoá.
+Mỗi khi kích hoạt Hư Hoá thành công 5 lần (trong 1 trận đấu), tăng tỉ lệ Hư Hoá lên 5%, tối đa là 100% tỉ lệ kích hoạt Hư Hoá. (Nhân vật này cần kích hoạt hư hoá 40 lần để trở nên bất bại nếu không dùng kĩ năng giảm % Hư Hoá). Nếu nhân vật này kích hoạt 40 lần Hư Hoá trong 1 trận đấu thì sau 3 turn kể từ khi đạt 100% tỉ lệ Hư Hoá sẽ nhận trạng thái Hư Vô Đồng Hoá.
 Hư Vô Đồng Hoá: có thể tấn công nhưng không gây bất kỳ sát thương nào (nếu khó thì có thể set sát thương gây ra là 1), không thể bị chỉ định mà chỉ đơn thuần chiếm vị trí ô đồng minh vì không thể chết, không thể nhận buff hay debuff.
 
 Kĩ năng 1: -10% tỉ lệ Hư Hoá từ nội tại, nhận hiệu ứng khiêu khích trong 3 turn, 25 aether.
@@ -567,7 +567,7 @@ Ult: gây sát thương = 300% đòn đánh thường lên 1 mục tiêu
 Mô tả: sinh vật cao quý sinh ra từ hỗn độn.
 Nội tại: mọi kỹ năng gây sát thương của Hỗn Độn Ma Long bỏ qua 50% res và arm của kẻ địch bị tấn công, không stack, không thể sao chép, lãng quên, cướp đoạt hay xoá bỏ nội tại này.
 
-Kĩ năng 1: gây sát thương lên 3 kẻ địch, mỗi kẻ nhận sát thương =130% đánh thường Hỗn Độn Ma Long lên bản thân, 25 aether.
+Kĩ năng 1: gây sát thương lên 3 kẻ địch, mỗi kẻ nhận sát thương =110% đánh thường Hỗn Độn Ma Long lên bản thân, 25 aether.
 Kĩ năng 2: mọi kẻ thù gây sát thương lên Hỗn Độn Ma Long nhận debuff bỏ qua 50% res và arm từ nội tại trong 1 turn sau khi nhân vật đó gây sát thương lên Hỗn Độn Ma Long, không stack. Kỹ năng này chỉ có thể kích hoạt 1 lần/trận, hoạt động kể cả khi Hỗn Độn Ma Long chết và được hồi sinh, 30 aether.
 Kĩ năng 3: giảm 20% sát thương nhận vào và áp dụng hiệu ứng khiêu khích lên bản thân trong 3 turn, 20 aether.
 
