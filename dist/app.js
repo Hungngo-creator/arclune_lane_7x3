@@ -4332,13 +4332,24 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
   }
 
   let drawFrameHandle = null;
+  let drawFrameUsesTimeout = false;
   let drawPending = false;
   let drawPaused = false;
 
   function cancelScheduledDraw(){
     if (drawFrameHandle !== null){
-      cancelAnimationFrame(drawFrameHandle);
+      if (drawFrameUsesTimeout){
+        clearTimeout(drawFrameHandle);
+      } else {
+        const cancel = (winRef && typeof winRef.cancelAnimationFrame === 'function')
+          ? winRef.cancelAnimationFrame.bind(winRef)
+          : (typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : null);
+        if (typeof cancel === 'function'){
+          cancel(drawFrameHandle);
+        }
+      }
       drawFrameHandle = null;
+      drawFrameUsesTimeout = false;
     }
     drawPending = false;
   }
@@ -4348,17 +4359,38 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     if (drawPending) return;
     if (!canvas || !ctx) return;
     drawPending = true;
-    drawFrameHandle = requestAnimationFrame(()=>{
-      drawFrameHandle = null;
-      drawPending = false;
-      if (drawPaused) return;
-      try {
-        draw();
-      } catch (err) {
-        console.error('[draw]', err);
-      }
-      if (Game?.vfx && Game.vfx.length) scheduleDraw();
-    });
+    const raf = (winRef && typeof winRef.requestAnimationFrame === 'function')
+      ? winRef.requestAnimationFrame.bind(winRef)
+      : (typeof requestAnimationFrame === 'function' ? requestAnimationFrame : null);
+    if (raf){
+      drawFrameUsesTimeout = false;
+      drawFrameHandle = raf(()=>{
+        drawFrameHandle = null;
+        drawFrameUsesTimeout = false;
+        drawPending = false;
+        if (drawPaused) return;
+        try {
+          draw();
+        } catch (err) {
+          console.error('[draw]', err);
+        }
+        if (Game?.vfx && Game.vfx.length) scheduleDraw();
+      });
+    } else {
+      drawFrameUsesTimeout = true;
+      drawFrameHandle = setTimeout(()=>{
+        drawFrameHandle = null;
+        drawFrameUsesTimeout = false;
+        drawPending = false;
+        if (drawPaused) return;
+        try {
+          draw();
+        } catch (err) {
+          console.error('[draw]', err);
+        }
+        if (Game?.vfx && Game.vfx.length) scheduleDraw();
+      }, 16);
+    }
   }
 
   function invalidateSceneCache(){
