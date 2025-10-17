@@ -338,11 +338,50 @@ async function mountPveScreen(params){
   const session = createPveSession(container);
   shellInstance.setActiveSession(session);
   if (typeof session.start === 'function'){
-    try {
-      session.start({ ...(params?.sessionConfig || {}), root: container });
-    } catch (err) {
+    const scheduleRetry = (callback) => {
+      if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function'){
+        window.requestAnimationFrame(callback);
+      } else {
+        setTimeout(callback, 0);
+      }
+    };
+    const MAX_BOARD_RETRIES = 30;
+    const startSessionSafely = () => {
+      if (token !== pveRenderToken) return;
+      try {
+        session.start({ ...(params?.sessionConfig || {}), root: container });
+      } catch (err) {
+        shellInstance.setActiveSession(null);
+        throw err;
+      }
+    };
+    const handleMissingBoard = () => {
+      if (typeof window !== 'undefined' && typeof window.alert === 'function'){
+        window.alert('Không thể tải bàn chơi PvE. Đang quay lại menu chính.');
+      } else {
+        console.warn('Không thể tải bàn chơi PvE. Đang quay lại menu chính.');
+      }
       shellInstance.setActiveSession(null);
-      throw err;
+      shellInstance.enterScreen(SCREEN_MAIN_MENU);
+    };
+    const attemptStart = (attempt = 0) => {
+      if (token !== pveRenderToken) return;
+      const boardElement = container.querySelector('#board');
+      if (boardElement){
+        startSessionSafely();
+        return;
+      }
+      if (attempt >= MAX_BOARD_RETRIES){
+        handleMissingBoard();
+        return;
+      }
+      scheduleRetry(() => attemptStart(attempt + 1));
+    };
+    const initialBoard = container.querySelector('#board');
+    if (initialBoard){
+      startSessionSafely();
+    } else {
+      attemptStart();
     }
   }
 }
