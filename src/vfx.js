@@ -9,6 +9,13 @@ import { CFG, CHIBI } from './config.js';
 const now = () => performance.now();
 const lerp = (a, b, t) => a + (b - a) * t;
 const easeInOut = (t) => (1 - Math.cos(Math.PI * Math.max(0, Math.min(1, t)))) * 0.5;
+const isFiniteCoord = (value) => Number.isFinite(value);
+const hasFinitePoint = (obj) => obj && isFiniteCoord(obj.cx) && isFiniteCoord(obj.cy);
+const warnInvalidArc = (label, data) => {
+  if (typeof console !== 'undefined' && console?.warn) {
+    console.warn(`[vfxDraw] Skipping ${label} arc due to invalid geometry`, data);
+  }
+};
 
 function pool(Game) {
   if (!Game.vfx) Game.vfx = [];
@@ -78,15 +85,21 @@ export function vfxDraw(ctx, Game, cam) {
     const tt = Math.max(0, Math.min(1, t));
 
     if (e.type === 'spawn') {
-      const p = projectCellOblique(Game.grid, e.cx, e.cy, cam);
-      const r0 = Math.max(8, Math.floor(Game.grid.tile * 0.22 * p.scale));
-      const r = r0 + Math.floor(r0 * 1.8 * tt);
-      ctx.save();
-      ctx.globalAlpha = 1 - tt;
-      ctx.strokeStyle = e.side === 'ally' ? '#9ef0a4' : '#ffb4c0';
-      ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.stroke();
-      ctx.restore();
+      if (hasFinitePoint(e)) {
+        const p = projectCellOblique(Game.grid, e.cx, e.cy, cam);
+        const r0 = Math.max(8, Math.floor(Game.grid.tile * 0.22 * p.scale));
+        const r = r0 + Math.floor(r0 * 1.8 * tt);
+        if (isFiniteCoord(p.x) && isFiniteCoord(p.y) && isFiniteCoord(r) && r > 0) {
+          ctx.save();
+          ctx.globalAlpha = 1 - tt;
+          ctx.strokeStyle = e.side === 'ally' ? '#9ef0a4' : '#ffb4c0';
+          ctx.lineWidth = 3;
+          ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.stroke();
+          ctx.restore();
+        } else {
+          warnInvalidArc('spawn', { x: p?.x, y: p?.y, r });
+        }
+      }
     }
 
     else if (e.type === 'hit') {
@@ -94,37 +107,49 @@ export function vfxDraw(ctx, Game, cam) {
       const updateFromToken = (token) => {
         if (!token) return;
         if (token.iid != null && e.iid == null) e.iid = token.iid;
-        if (Number.isFinite(token.cx)) e.cx = token.cx;
-        if (Number.isFinite(token.cy)) e.cy = token.cy;
+        if (isFiniteCoord(token.cx)) e.cx = token.cx;
+        if (isFiniteCoord(token.cy)) e.cy = token.cy;
       };
 
-      let ref = e.ref;
-      updateFromToken(ref);
+      const initialRef = hasFinitePoint(e.ref) ? e.ref : null;
+      updateFromToken(initialRef);
 
-      if ((!Number.isFinite(e.cx) || !Number.isFinite(e.cy)) && tokens) {
-        const iid = ref?.iid ?? e.iid;
-        let live = null;
-        if (iid != null) {
-          live = tokens.find(t => t.iid === iid);
-        } else if (ref?.id != null) {
-          live = tokens.find(t => t.id === ref.id);
+      const lookupLiveToken = () => {
+        if (!tokens) return null;
+        if (e.iid != null) {
+          return tokens.find(t => t && t.iid === e.iid);
         }
+      const ref = e.ref;
+        if (ref?.iid != null) {
+          return tokens.find(t => t && t.iid === ref.iid);
+        }
+        if (ref?.id != null) {
+          return tokens.find(t => t && t.id === ref.id);
+        }
+        return null;
+      };
 
+        if ((!hasFinitePoint(e) || !initialRef) && tokens) {
+        const live = lookupLiveToken();
         if (live) {
-          e.ref = ref = live;
+          e.ref = live;
           updateFromToken(live);
         }
       }
 
-      if (Number.isFinite(e.cx) && Number.isFinite(e.cy)) {
+      if (hasFinitePoint(e)) {
         const p = projectCellOblique(Game.grid, e.cx, e.cy, cam);
         const r = Math.floor(Game.grid.tile * 0.25 * (0.6 + 1.1 * tt) * p.scale);
-        ctx.save();
-        ctx.globalAlpha = 0.9 * (1 - tt);
-        ctx.strokeStyle = '#e6f2ff';
-        ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.stroke();
-        ctx.restore();
+        if (isFiniteCoord(p.x) && isFiniteCoord(p.y) && isFiniteCoord(r) && r > 0) {
+          ctx.save();
+          ctx.globalAlpha = 0.9 * (1 - tt);
+          ctx.strokeStyle = '#e6f2ff';
+          ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.stroke();
+          ctx.restore();
+        } else {
+          warnInvalidArc('hit', { x: p?.x, y: p?.y, r });
+        }
       }
     }
     else if (e.type === 'tracer') {
@@ -132,7 +157,7 @@ export function vfxDraw(ctx, Game, cam) {
 }
     else if (e.type === 'melee') {
   const A = e.refA, B = e.refB;
-  if (A && B && A.alive && B.alive) {
+  if (A && B && A.alive && B.alive && hasFinitePoint(A) && hasFinitePoint(B)) {
     const pa = projectCellOblique(Game.grid, A.cx, A.cy, cam);
     const pb = projectCellOblique(Game.grid, B.cx, B.cy, cam);
 
