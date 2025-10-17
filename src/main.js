@@ -20,10 +20,7 @@ export function startGame(options = {}){
   if (!currentSession){
     currentSession = createPveSession(rootTarget, initialConfig);
 }
-  const startConfig = { ...initialConfig };
-  if (rootTarget && rootTarget !== resolveRoot({})){
-    startConfig.root = rootTarget;
-}
+const startConfig = { ...initialConfig, root: rootTarget };
   return currentSession.start(startConfig);
 }
 
