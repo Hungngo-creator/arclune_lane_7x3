@@ -770,9 +770,9 @@ function tickMinionTTL(side){
 }
 
 function init(){
-  if (Game?._inited) return;
+  if (Game?._inited) return true;
   const doc = docRef || (typeof document !== 'undefined' ? document : null);
-  if (!doc) return;
+  if (!doc) return false;
   const root = rootElement || null;
   const boardFromRoot = (root && typeof root.querySelector === 'function')
     ? root.querySelector('#board')
@@ -782,7 +782,7 @@ function init(){
     : (typeof doc.getElementById === 'function' ? doc.getElementById('board') : null);
   const boardEl = /** @type {HTMLCanvasElement|null} */ (boardFromRoot || boardFromDocument);
   if (!boardEl){
-    throw new Error('PvE session board canvas (#board) not found in the provided root or document.');
+    return false;
   }
   canvas = boardEl;
   ctx = /** @type {CanvasRenderingContext2D} */ (boardEl.getContext('2d'));
@@ -964,6 +964,7 @@ function init(){
   }
   updateTimerAndCost(getNow());
   scheduleTickLoop();
+  return true;
 }
 
 function selectFirstAffordable(){
@@ -1344,7 +1345,11 @@ function startSession(config = {}){
   resetDomRefs();
   running = true;
   try {
-    init();
+    const initialised = init();
+    if (!initialised){
+      stopSession();
+      return null;
+    }
     if (!Game || !Game._inited){
       throw new Error('Unable to initialise PvE session');
     }
