@@ -4192,7 +4192,8 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
   const safeNow = __dep18.safeNow;
   /** @type {HTMLCanvasElement|null} */ let canvas = null;
   /** @type {CanvasRenderingContext2D|null} */ let ctx = null;
-  /** @type {{update:(g:any)=>void}|null} */ let hud = null;   // ← THÊM
+  /** @type {{update:(g:any)=>void, cleanup?:()=>void}|null} */ let hud = null;   // ← THÊM
+  /** @type {(() => void)|null} */ let hudCleanup = null;
   const CAM_PRESET = CAM[CFG.CAMERA] || CAM.landscape_oblique;
   const HAND_SIZE  = CFG.HAND_SIZE ?? 4;
 
@@ -4951,9 +4952,13 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     }
     canvas = boardEl;
     ctx = /** @type {CanvasRenderingContext2D} */ (boardEl.getContext('2d'));
-
+    
+    if (typeof hudCleanup === 'function'){
+      hudCleanup();
+      hudCleanup = null;
+    }
     hud = initHUD(doc, root);
-
+    hudCleanup = (hud && typeof hud.cleanup === 'function') ? hud.cleanup : null;
     resize();
     spawnLeaders(Game.tokens, Game.grid);
 
@@ -5448,6 +5453,10 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
       canvas.removeEventListener('click', canvasClickHandler);
     }
     canvasClickHandler = null;
+    if (typeof hudCleanup === 'function'){
+      hudCleanup();
+    }
+    hudCleanup = null;
     if (resizeHandler && winRef && typeof winRef.removeEventListener === 'function'){
       winRef.removeEventListener('resize', resizeHandler);
     }
@@ -5460,6 +5469,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     canvas = null;
     ctx = null;
     hud = null;
+    hudCleanup = null;
     hpBarGradientCache.clear();
     invalidateSceneCache();
   }
@@ -7883,14 +7893,26 @@ __define('./ui.js', (exports, module, __require) => {
       const state = ev?.detail?.game;
       if (state) update(state);
     };
+    let cleanedUp = false;
+    const cleanup = ()=>{
+      if (cleanedUp) return;
+      cleanedUp = true;
+      if (gameEvents && typeof gameEvents.removeEventListener === 'function'){
+        const types = [TURN_START, TURN_END, ACTION_END];
+        for (const type of types){
+          gameEvents.removeEventListener(type, handleGameEvent);
+        }
+      }
+    };
+
     if (gameEvents && typeof gameEvents.addEventListener === 'function'){
       const types = [TURN_START, TURN_END, ACTION_END];
       for (const type of types){
         gameEvents.addEventListener(type, handleGameEvent);
       }
     }
-   return { update };
-   }
+   return { update, cleanup };
+  }
   /* ---------- Summon Bar (deck-size = 4) ---------- */
   function startSummonBar(doc, options, root){
     options = options || {};
