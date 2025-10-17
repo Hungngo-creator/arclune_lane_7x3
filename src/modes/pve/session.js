@@ -84,11 +84,11 @@ function normalizeBackgroundCacheKey(backgroundKey){
   return `key:${backgroundKey ?? '__no-key__'}`;
 }
 
-function clearBackgroundSignatureCache(){
+export function clearBackgroundSignatureCache(){
   backgroundSignatureCache.clear();
 }
 
-function computeBackgroundSignature(backgroundKey){
+export function computeBackgroundSignature(backgroundKey){
   const cacheKey = normalizeBackgroundCacheKey(backgroundKey);
   const config = getEnvironmentBackground(backgroundKey);
   if (!config){
@@ -101,10 +101,12 @@ function computeBackgroundSignature(backgroundKey){
   }
   let signature;
   try {
-    return `${backgroundKey || 'no-key'}:${stableStringify(config)}`;
-  } catch (_) {
-    const props = Array.isArray(config.props) ? config.props.length : 0;
     signature = `${backgroundKey || 'no-key'}:${stableStringify(config)}`;
+  } catch (_) {
+    const keyPart = config?.key ?? '';
+    const themePart = config?.theme ?? '';
+    const propsLength = Array.isArray(config?.props) ? config.props.length : 0;
+    signature = `${backgroundKey || 'no-key'}:fallback:${String(keyPart)}:${String(themePart)}:${propsLength}`;
   }
   backgroundSignatureCache.set(cacheKey, { config, signature });
   return signature;
@@ -1438,4 +1440,5 @@ export function createPveSession(rootEl, options = {}){
   };
 }
 
+export const __backgroundSignatureCache = backgroundSignatureCache;
 export { gameEvents, emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END } from '../../events.js';
