@@ -6509,25 +6509,71 @@ __define('./scene.js', (exports, module, __require) => {
   exports.drawBattlefieldScene = drawBattlefieldScene;
 });
 __define('./screens/collection/index.js', (exports, module, __require) => {
-  const STYLE_ID = 'collection-screen-style';
+  const __dep1 = __require('./screens/collection/view.js');
+  const renderCollectionView = __dep1.renderCollectionView;
 
-  const FEATURE_SECTIONS = [
-    {
-      icon: '👥',
-      title: 'Nhân vật & Sủng thú',
-      description: 'Theo dõi tiến trình thu thập, cấp sao và class của toàn bộ roster.'
-    },
-    {
-      icon: '📜',
-      title: 'Công pháp & Vũ khí',
-      description: 'Tổng hợp công pháp, vũ khí cùng cấp độ thức tỉnh và mốc đột phá.'
-    },
-    {
-      icon: '🏅',
-      title: 'Thành tựu & Phẩm cấp',
-      description: 'Lưu trữ thành tựu, huy chương và chỉ số rank budget để so sánh.'
+  function mergeParams(base, override){
+    if (!base && !override) return null;
+    if (!base) return typeof override === 'object' ? { ...override } : override;
+    if (!override) return typeof base === 'object' ? { ...base } : base;
+    if (typeof base === 'object' && typeof override === 'object' && !Array.isArray(base) && !Array.isArray(override)){
+      return { ...base, ...override };
     }
+  return override;
+  }
+
+  function renderCollectionScreen(options = {}){
+    const { root, shell, definition, params } = options;
+    if (!root){
+      throw new Error('renderCollectionScreen cần một phần tử root hợp lệ.');
+    }
+
+  const defParams = definition?.params || null;
+    const mergedPlayerState = mergeParams(defParams?.playerState || null, params?.playerState || null) || {};
+    const rosterSource = mergeParams(defParams?.roster || null, params?.roster || null) || null;
+    const currencies = mergeParams(defParams?.currencies || null, params?.currencies || null)
+      || mergedPlayerState?.currencies
+      || null;
+
+    return renderCollectionView({
+      root,
+      shell,
+      playerState: mergedPlayerState,
+      roster: rosterSource,
+      currencies
+    });
+  }
+
+  const __reexport0 = __require('./screens/collection/view.js');
+
+  const __defaultExport = { renderCollectionScreen };
+  exports.renderCollectionView = __reexport0.renderCollectionView;
+  exports.renderCollectionScreen = renderCollectionScreen;
+  exports.default = __defaultExport;
+  module.exports.default = exports.default;
+});
+__define('./screens/collection/view.js', (exports, module, __require) => {
+  const __dep0 = __require('./catalog.js');
+  const ROSTER = __dep0.ROSTER;
+  const __dep1 = __require('./units.js');
+  const UNITS = __dep1.UNITS;
+  const __dep2 = __require('./art.js');
+  const getUnitArt = __dep2.getUnitArt;
+  const __dep3 = __require('./data/economy.js');
+  const listCurrencies = __dep3.listCurrencies;
+
+  const STYLE_ID = 'collection-view-style-v2';
+
+  const TAB_DEFINITIONS = [
+    { key: 'awakening', label: 'Thức Tỉnh', hint: 'Theo dõi mốc thức tỉnh, sao và điểm đột phá của nhân vật đã sở hữu.' },
+    { key: 'skills', label: 'Kĩ Năng', hint: 'Mở lớp phủ mô tả kỹ năng, chuỗi nâng cấp và yêu cầu nguyên liệu.' },
+    { key: 'arts', label: 'Công Pháp & Trang Bị', hint: 'Liệt kê công pháp, pháp khí và trang bị đang trang bị cho nhân vật.' },
+    { key: 'skins', label: 'Skin', hint: 'Quản lý skin đã mở khóa và áp dụng bảng phối màu yêu thích.' },
+    { key: 'voice', label: 'Giọng Nói', hint: 'Nghe thử voice line, thiết lập voice pack và gợi ý mở khóa.' }
   ];
+
+  const currencyCatalog = listCurrencies();
+  const currencyFormatter = new Intl.NumberFormat('vi-VN');
 
   function ensureStyles(){
     if (typeof document === 'undefined') return;
@@ -6540,25 +6586,73 @@ __define('./screens/collection/index.js', (exports, module, __require) => {
 
     const css = `
       .app--collection{padding:32px 16px 64px;}
-      .collection-screen{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:32px;color:inherit;}
-      .collection-screen__header{display:flex;flex-direction:column;gap:16px;}
-      .collection-screen__back{align-self:flex-start;padding:10px 18px;border-radius:999px;border:1px solid rgba(125,211,252,.32);background:rgba(18,28,38,.72);color:#aee4ff;letter-spacing:.08em;text-transform:uppercase;font-size:12px;cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;}
-      .collection-screen__back:hover{transform:translateY(-2px);border-color:rgba(174,228,255,.52);box-shadow:0 12px 26px rgba(6,12,20,.45);}
-      .collection-screen__back:focus-visible{outline:2px solid rgba(174,228,255,.75);outline-offset:3px;}
-      .collection-screen__title{margin:0;font-size:36px;letter-spacing:.08em;text-transform:uppercase;}
-      .collection-screen__subtitle{margin:0;color:#9cbcd9;font-size:16px;line-height:1.6;max-width:680px;}
-      .collection-screen__content{display:flex;flex-direction:column;gap:28px;}
-      .collection-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
-      .collection-summary__card{padding:20px;border-radius:18px;border:1px solid rgba(125,211,252,.22);background:linear-gradient(150deg,rgba(16,26,36,.9),rgba(18,30,42,.62));display:flex;flex-direction:column;gap:8px;}
-      .collection-summary__icon{font-size:28px;line-height:1;}
-      .collection-summary__title{margin:0;font-size:16px;letter-spacing:.06em;text-transform:uppercase;}
-      .collection-summary__desc{margin:0;color:#9cbcd9;font-size:13px;line-height:1.6;}
-      .collection-empty{padding:24px;border-radius:18px;border:1px dashed rgba(125,211,252,.28);background:rgba(12,20,28,.72);display:flex;flex-direction:column;gap:12px;align-items:flex-start;}
-      .collection-empty__title{margin:0;font-size:15px;letter-spacing:.08em;text-transform:uppercase;color:#aee4ff;}
-      .collection-empty__body{margin:0;color:#9cbcd9;font-size:13px;line-height:1.6;}
-      @media(max-width:640px){
-        .collection-screen__title{font-size:30px;}
-        .collection-summary{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));}
+      .collection-view{max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:28px;color:inherit;}
+      .collection-view__header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px;}
+      .collection-view__title-group{display:flex;align-items:center;gap:12px;}
+      .collection-view__back{padding:10px 18px;border-radius:999px;border:1px solid rgba(125,211,252,.32);background:rgba(16,26,36,.78);color:#aee4ff;letter-spacing:.08em;text-transform:uppercase;font-size:12px;cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;}
+      .collection-view__back:hover{transform:translateY(-2px);border-color:rgba(174,228,255,.52);box-shadow:0 12px 26px rgba(6,12,20,.45);}
+      .collection-view__back:focus-visible{outline:2px solid rgba(174,228,255,.75);outline-offset:3px;}
+      .collection-view__title{margin:0;font-size:36px;letter-spacing:.08em;text-transform:uppercase;}
+      .collection-view__wallet{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:flex-end;}
+      .collection-wallet__item{min-width:130px;padding:10px 14px;border-radius:14px;border:1px solid rgba(125,211,252,.22);background:rgba(12,20,28,.82);display:flex;flex-direction:column;gap:4px;}
+      .collection-wallet__name{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;margin:0;}
+      .collection-wallet__balance{font-size:16px;margin:0;color:#e6f2ff;}
+      .collection-view__layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,2fr) minmax(0,1fr);gap:24px;align-items:stretch;}
+      .collection-roster{border-radius:24px;border:1px solid rgba(125,211,252,.2);background:linear-gradient(160deg,rgba(12,22,32,.94),rgba(6,14,22,.78));padding:20px;display:flex;flex-direction:column;gap:12px;overflow:hidden;}
+      .collection-roster__list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;max-height:560px;overflow:auto;padding-right:4px;}
+      .collection-roster__entry{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:14px;border:1px solid transparent;background:rgba(12,20,28,.72);color:inherit;cursor:pointer;transition:transform .18s ease,border-color .18s ease,background .18s ease;}
+      .collection-roster__entry:hover{transform:translateY(-2px);border-color:rgba(125,211,252,.35);background:rgba(16,26,36,.9);}
+      .collection-roster__entry:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:3px;}
+      .collection-roster__entry.is-selected{border-color:rgba(125,211,252,.55);background:rgba(18,30,42,.95);box-shadow:0 16px 36px rgba(6,12,20,.45);}
+      .collection-roster__avatar{width:54px;height:54px;border-radius:16px;background:rgba(24,34,44,.85);overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;}
+      .collection-roster__avatar img{width:64px;height:64px;object-fit:contain;filter:drop-shadow(0 8px 16px rgba(0,0,0,.55));}
+      .collection-roster__meta{display:flex;flex-direction:column;gap:4px;flex:1;}
+      .collection-roster__name{margin:0;font-size:15px;letter-spacing:.04em;}
+      .collection-roster__tag{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
+      .collection-roster__cost{padding:6px 10px;border-radius:12px;background:rgba(36,18,12,.72);color:#ffd9a1;font-size:12px;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:6px;}
+      .collection-roster__cost.is-highlighted{background:rgba(255,184,108,.9);color:#1e1206;box-shadow:0 10px 24px rgba(255,184,108,.45);}
+      .collection-stage{position:relative;border-radius:28px;border:1px solid rgba(125,211,252,.24);background:linear-gradient(150deg,rgba(16,24,34,.92),rgba(10,16,26,.72));padding:28px;display:flex;flex-direction:column;gap:18px;overflow:hidden;min-height:420px;}
+      .collection-stage__art{flex:1;display:flex;align-items:flex-end;justify-content:center;position:relative;}
+      .collection-stage__sprite{width:82%;max-width:420px;height:auto;filter:drop-shadow(0 32px 60px rgba(0,0,0,.6));transition:transform .3s ease,filter .3s ease;}
+      .collection-stage__info{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;}
+      .collection-stage__identity{display:flex;flex-direction:column;gap:6px;}
+      .collection-stage__name{margin:0;font-size:26px;letter-spacing:.06em;}
+      .collection-stage__tags{display:flex;gap:10px;flex-wrap:wrap;}
+      .collection-stage__tag{padding:6px 12px;border-radius:999px;border:1px solid rgba(125,211,252,.28);background:rgba(12,22,32,.78);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#aee4ff;}
+      .collection-stage__cost{padding:8px 16px;border-radius:999px;background:rgba(36,18,12,.82);color:#ffd9a1;font-size:13px;letter-spacing:.14em;text-transform:uppercase;border:1px solid rgba(255,184,108,.32);}
+      .collection-stage__status{margin:0;color:#9cbcd9;font-size:14px;line-height:1.6;}
+      .collection-tabs{border-radius:24px;border:1px solid rgba(125,211,252,.2);background:rgba(12,20,28,.9);padding:20px;display:flex;flex-direction:column;gap:12px;}
+      .collection-tabs__title{margin:0 0 8px;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
+      .collection-tabs__button{width:100%;padding:12px 14px;border-radius:14px;border:1px solid rgba(125,211,252,.18);background:rgba(8,16,24,.82);color:inherit;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:14px;transition:transform .18s ease,border-color .18s ease,background .18s ease;}
+      .collection-tabs__button:hover{transform:translateX(4px);border-color:rgba(125,211,252,.42);background:rgba(16,26,36,.92);}
+      .collection-tabs__button:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:3px;}
+      .collection-tabs__button.is-active{border-color:rgba(125,211,252,.55);background:rgba(18,30,42,.96);box-shadow:0 16px 36px rgba(6,12,20,.42);}
+      .collection-tabs__hint{font-size:11px;color:#7da0c7;letter-spacing:.08em;text-transform:uppercase;}
+      .collection-skill-overlay{position:absolute;top:15%;left:15%;width:70%;min-height:70%;padding:24px;border-radius:22px;border:1px solid rgba(125,211,252,.45);background:rgba(8,16,26,.92);box-shadow:0 42px 96px rgba(3,6,12,.75);display:flex;flex-direction:column;gap:18px;opacity:0;pointer-events:none;transition:opacity .24s ease,transform .24s ease;transform:translateY(12px);backdrop-filter:blur(6px);}
+      .collection-skill-overlay.is-open{opacity:1;pointer-events:auto;transform:translateY(0);}
+      .collection-skill-overlay__header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;}
+      .collection-skill-overlay__title{margin:0;font-size:22px;letter-spacing:.06em;}
+      .collection-skill-overlay__close{padding:8px 12px;border-radius:12px;border:1px solid rgba(125,211,252,.28);background:rgba(16,24,34,.85);color:#aee4ff;font-size:12px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:transform .16s ease,border-color .16s ease;}
+      .collection-skill-overlay__close:hover{transform:translateY(-2px);border-color:rgba(174,228,255,.48);}
+      .collection-skill-overlay__close:focus-visible{outline:2px solid rgba(174,228,255,.75);outline-offset:3px;}
+      .collection-skill-overlay__content{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:24px;flex:1;}
+      .collection-skill-overlay__visual{border-radius:18px;background:rgba(12,22,32,.88);border:1px solid rgba(125,211,252,.24);display:flex;align-items:center;justify-content:center;padding:18px;}
+      .collection-skill-overlay__visual img{width:100%;max-width:320px;height:auto;filter:drop-shadow(0 24px 48px rgba(0,0,0,.6));}
+      .collection-skill-overlay__details{display:flex;flex-direction:column;gap:12px;}
+      .collection-skill-overlay__subtitle{margin:0;color:#9cbcd9;font-size:14px;line-height:1.6;}
+      .collection-skill-overlay__items{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+      .collection-skill-overlay__item{height:72px;border-radius:16px;border:1px dashed rgba(125,211,252,.35);background:rgba(10,18,28,.78);display:flex;align-items:center;justify-content:center;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
+      .collection-skill-overlay__action{align-self:flex-start;padding:12px 18px;border-radius:14px;border:1px solid rgba(255,184,108,.45);background:rgba(255,184,108,.12);color:#ffd9a1;font-size:13px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:transform .18s ease,background .18s ease;}
+      .collection-skill-overlay__action:hover{transform:translateY(-2px);background:rgba(255,184,108,.24);}
+      .collection-skill-overlay__action:focus-visible{outline:2px solid rgba(255,184,108,.65);outline-offset:3px;}
+      @media(max-width:1080px){
+        .collection-view__layout{grid-template-columns:1fr;}
+        .collection-skill-overlay{position:fixed;top:50%;left:50%;transform:translate(-50%,calc(-50% + 12px));width:88vw;min-height:0;}
+        .collection-skill-overlay.is-open{transform:translate(-50%,-50%);}
+      }
+      @media(max-width:720px){
+        .collection-view__title{font-size:30px;}
+        .collection-skill-overlay__content{grid-template-columns:1fr;}
       }
     `;
 
@@ -6567,191 +6661,556 @@ __define('./screens/collection/index.js', (exports, module, __require) => {
     }
   }
 
-  function cloneValue(value){
-    if (!value || typeof value !== 'object'){
-      return value;
+  function cloneRoster(input){
+    if (!Array.isArray(input) || input.length === 0){
+      return ROSTER.map(unit => ({ ...unit }));
     }
-    if (Array.isArray(value)){
-      return value.slice();
-    }
-    return { ...value };
+    return input.map(entry => ({ ...entry }));
   }
 
-  function renderCollectionScreen(options = {}){
-    const { root, shell, definition, params } = options;
-    if (!root || typeof root !== 'object'){
-      throw new Error('renderCollectionScreen cần một phần tử root hợp lệ.');
+  function buildRosterWithCost(rosterSource){
+    const costs = new Map(UNITS.map(unit => [unit.id, unit.cost]));
+    return rosterSource.map(entry => ({
+      ...entry,
+      cost: Number.isFinite(entry.cost) ? entry.cost : (costs.get(entry.id) ?? null)
+    }));
+  }
+
+  function resolveCurrencyBalance(currencyId, providedCurrencies, playerState){
+    const tryExtract = candidate => {
+      if (candidate == null) return null;
+      if (typeof candidate === 'number' && Number.isFinite(candidate)) return candidate;
+      if (typeof candidate === 'string' && candidate.trim() !== '' && !Number.isNaN(Number(candidate))){
+        return Number(candidate);
+      }
+      if (typeof candidate === 'object'){
+        if (Number.isFinite(candidate.balance)) return candidate.balance;
+        if (Number.isFinite(candidate.amount)) return candidate.amount;
+        if (Number.isFinite(candidate.value)) return candidate.value;
+      }
+      return null;
+    };
+
+    const inspectContainer = container => {
+      if (!container) return null;
+      if (Array.isArray(container)){
+        for (const entry of container){
+          if (!entry) continue;
+          const id = entry.id || entry.currencyId || entry.key;
+          if (id === currencyId){
+            const extracted = tryExtract(entry.balance ?? entry.amount ?? entry.value ?? entry.total ?? entry);
+            if (extracted != null) return extracted;
+          }
+        }
+        return null;
+      }
+      if (typeof container === 'object'){
+        if (currencyId in container){
+          const extracted = tryExtract(container[currencyId]);
+          if (extracted != null) return extracted;
+        }
+        if (container.balances && currencyId in container.balances){
+          const extracted = tryExtract(container.balances[currencyId]);
+          if (extracted != null) return extracted;
+        }
+      }
+      return null;
+    };
+
+    const fromProvided = inspectContainer(providedCurrencies);
+    if (fromProvided != null) return fromProvided;
+    const fromState = inspectContainer(playerState?.currencies);
+    if (fromState != null) return fromState;
+    return 0;
+  }
+
+  function describeUlt(unit){
+    const ult = unit?.kit?.ult;
+    if (!ult) return 'Nâng cấp giúp tăng hệ số sát thương, phạm vi hoặc hiệu ứng khống chế tùy bộ kỹ năng.';
+    const parts = [];
+    if (ult.type){
+      parts.push(`Loại: ${ult.type}`);
+    }
+    if (typeof ult.hits === 'number'){
+      parts.push(`${ult.hits} hit`);
+    }
+    if (ult.aoe){
+      parts.push(`Phạm vi: ${ult.aoe}`);
+    }
+    if (ult.turns){
+      parts.push(`Hiệu lực ${ult.turns} lượt`);
+    }
+    if (ult.notes){
+      parts.push(ult.notes);
+    }
+    return parts.length > 0
+      ? `Nâng cấp cường hóa tuyệt kỹ (${parts.join(' • ')}).`
+      : 'Nâng cấp giúp tăng hiệu quả tuyệt kỹ hiện tại.';
+  }
+
+  function describeUpgrade(unit){
+    const passives = unit?.kit?.passives;
+    if (!Array.isArray(passives) || passives.length === 0){
+      return 'Đầu tư nâng cấp sẽ mở thêm node thiên phú, gia tăng hiệu quả hỗ trợ và sát thương.';
+    }
+    const highlights = passives.slice(0, 2).map(passive => passive?.id ? passive.id : 'passive');
+    return `Đầu tư nguyên liệu để mở ${highlights.join(' & ')} cùng các biến thể nâng cấp.`;
+  }
+
+  function renderCollectionView(options = {}){
+    const { root, shell, playerState = {}, roster, currencies } = options;
+    if (!root){
+      throw new Error('renderCollectionView cần một phần tử root hợp lệ.');
     }
 
     ensureStyles();
-
-    if (root.classList){
-      root.classList.add('app--collection');
-    }
     if (typeof root.innerHTML === 'string'){
       root.innerHTML = '';
     }
-
-    const cleanup = [];
-    const container = typeof document !== 'undefined' ? document.createElement('div') : { appendChild() {} };
-    if (container){
-      container.className = 'collection-screen';
+    if (root.classList){
+      root.classList.add('app--collection');
     }
 
-    const header = typeof document !== 'undefined' ? document.createElement('header') : null;
-    if (header){
-      header.className = 'collection-screen__header';
+    const cleanups = [];
+    const addCleanup = fn => {
+      if (typeof fn === 'function') cleanups.push(fn);
+    };
+
+    const container = document.createElement('div');
+    container.className = 'collection-view';
+
+    const header = document.createElement('header');
+    header.className = 'collection-view__header';
+
+    const titleGroup = document.createElement('div');
+    titleGroup.className = 'collection-view__title-group';
+
+    const backButton = document.createElement('button');
+    backButton.type = 'button';
+    backButton.className = 'collection-view__back';
+    backButton.textContent = '← Trở về menu chính';
+    const handleBack = () => {
+      if (shell && typeof shell.enterScreen === 'function'){
+        shell.enterScreen('main-menu');
+      }
+    };
+    backButton.addEventListener('click', handleBack);
+    addCleanup(() => backButton.removeEventListener('click', handleBack));
+
+    const title = document.createElement('h1');
+    title.className = 'collection-view__title';
+    title.textContent = 'Bộ Sưu Tập';
+
+    titleGroup.appendChild(backButton);
+    titleGroup.appendChild(title);
+
+    const wallet = document.createElement('div');
+    wallet.className = 'collection-view__wallet';
+
+    for (const currency of currencyCatalog){
+      const item = document.createElement('article');
+      item.className = 'collection-wallet__item';
+
+      const name = document.createElement('h2');
+      name.className = 'collection-wallet__name';
+      name.textContent = currency.shortName || currency.name || currency.id;
+      item.appendChild(name);
+
+      const balance = document.createElement('p');
+      balance.className = 'collection-wallet__balance';
+      const value = resolveCurrencyBalance(currency.id, currencies, playerState);
+      balance.textContent = `${currencyFormatter.format(value)} ${currency.suffix || currency.id}`;
+      item.appendChild(balance);
+
+      wallet.appendChild(item);
     }
 
-    const backButton = typeof document !== 'undefined' ? document.createElement('button') : null;
-    if (backButton){
-      backButton.type = 'button';
-      backButton.className = 'collection-screen__back';
-      backButton.textContent = '← Trở về menu chính';
-      const handleBack = () => {
+    header.appendChild(titleGroup);
+    header.appendChild(wallet);
+
+    container.appendChild(header);
+
+    const layout = document.createElement('div');
+    layout.className = 'collection-view__layout';
+
+    const rosterPanel = document.createElement('section');
+    rosterPanel.className = 'collection-roster';
+
+    const rosterList = document.createElement('ul');
+    rosterList.className = 'collection-roster__list';
+
+    const rosterSource = buildRosterWithCost(cloneRoster(roster));
+    const rosterEntries = new Map();
+
+    for (const unit of rosterSource){
+      const item = document.createElement('li');
+
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'collection-roster__entry';
+      button.dataset.unitId = unit.id;
+
+      const avatar = document.createElement('div');
+      avatar.className = 'collection-roster__avatar';
+      const art = getUnitArt(unit.id);
+      if (art?.sprite?.src){
+        const img = document.createElement('img');
+        img.src = art.sprite.src;
+        img.alt = unit.name || unit.id;
+        avatar.appendChild(img);
+      } else {
+        const fallback = document.createElement('span');
+        fallback.textContent = '—';
+        avatar.appendChild(fallback);
+      }
+
+      const meta = document.createElement('div');
+      meta.className = 'collection-roster__meta';
+
+      const name = document.createElement('p');
+      name.className = 'collection-roster__name';
+      name.textContent = unit.name || unit.id;
+
+      const tag = document.createElement('span');
+      tag.className = 'collection-roster__tag';
+      tag.textContent = [unit.rank, unit.class].filter(Boolean).join(' • ');
+
+      const cost = document.createElement('span');
+      cost.className = 'collection-roster__cost';
+      const costValue = Number.isFinite(unit.cost) ? unit.cost : '—';
+      cost.textContent = `Cost ${costValue}`;
+
+      meta.appendChild(name);
+      meta.appendChild(tag);
+
+      button.appendChild(avatar);
+      button.appendChild(meta);
+      button.appendChild(cost);
+
+      const handleSelect = () => {
+        selectUnit(unit.id);
+      };
+      button.addEventListener('click', handleSelect);
+      addCleanup(() => button.removeEventListener('click', handleSelect));
+
+      item.appendChild(button);
+      rosterList.appendChild(item);
+
+      rosterEntries.set(unit.id, { button, costEl: cost, meta: unit });
+    }
+
+    rosterPanel.appendChild(rosterList);
+
+    const stage = document.createElement('section');
+    stage.className = 'collection-stage';
+
+    const stageInfo = document.createElement('div');
+    stageInfo.className = 'collection-stage__info';
+
+    const identity = document.createElement('div');
+    identity.className = 'collection-stage__identity';
+
+    const stageName = document.createElement('h2');
+    stageName.className = 'collection-stage__name';
+    stageName.textContent = 'Chưa chọn nhân vật';
+
+    const stageTags = document.createElement('div');
+    stageTags.className = 'collection-stage__tags';
+
+    const stageCost = document.createElement('div');
+    stageCost.className = 'collection-stage__cost';
+    stageCost.textContent = 'Cost —';
+
+    identity.appendChild(stageName);
+    identity.appendChild(stageTags);
+
+    stageInfo.appendChild(identity);
+    stageInfo.appendChild(stageCost);
+
+    const stageArt = document.createElement('div');
+    stageArt.className = 'collection-stage__art';
+
+    const stageSprite = document.createElement('img');
+    stageSprite.className = 'collection-stage__sprite';
+    stageSprite.alt = '';
+    stageSprite.style.opacity = '0';
+
+    stageArt.appendChild(stageSprite);
+
+    const stageStatus = document.createElement('p');
+    stageStatus.className = 'collection-stage__status';
+    stageStatus.textContent = 'Chọn một nhân vật để xem chi tiết và tab chức năng.';
+
+    const overlay = document.createElement('div');
+    overlay.className = 'collection-skill-overlay';
+
+    const overlayHeader = document.createElement('div');
+    overlayHeader.className = 'collection-skill-overlay__header';
+
+    const overlayTitle = document.createElement('h3');
+    overlayTitle.className = 'collection-skill-overlay__title';
+    overlayTitle.textContent = 'Kĩ năng';
+
+    const overlayClose = document.createElement('button');
+    overlayClose.type = 'button';
+    overlayClose.className = 'collection-skill-overlay__close';
+    overlayClose.textContent = 'Đóng';
+
+    const closeOverlay = () => {
+      overlay.classList.remove('is-open');
+      setActiveTab('awakening');
+    };
+    overlayClose.addEventListener('click', closeOverlay);
+    addCleanup(() => overlayClose.removeEventListener('click', closeOverlay));
+
+    overlayHeader.appendChild(overlayTitle);
+    overlayHeader.appendChild(overlayClose);
+
+    const overlayContent = document.createElement('div');
+    overlayContent.className = 'collection-skill-overlay__content';
+
+    const overlayVisual = document.createElement('div');
+    overlayVisual.className = 'collection-skill-overlay__visual';
+
+    const overlaySprite = document.createElement('img');
+    overlaySprite.alt = '';
+    overlayVisual.appendChild(overlaySprite);
+
+    const overlayDetails = document.createElement('div');
+    overlayDetails.className = 'collection-skill-overlay__details';
+
+    const overlaySubtitle = document.createElement('p');
+    overlaySubtitle.className = 'collection-skill-overlay__subtitle';
+    overlaySubtitle.textContent = 'Chọn nhân vật để xem mô tả kỹ năng.';
+
+    const overlayUpgrade = document.createElement('p');
+    overlayUpgrade.className = 'collection-skill-overlay__subtitle';
+    overlayUpgrade.textContent = '';
+
+    const overlayItems = document.createElement('div');
+    overlayItems.className = 'collection-skill-overlay__items';
+
+    for (let i = 0; i < 3; i += 1){
+      const slot = document.createElement('div');
+      slot.className = 'collection-skill-overlay__item';
+      slot.textContent = 'Vật phẩm';
+      overlayItems.appendChild(slot);
+    }
+
+    const overlayAction = document.createElement('button');
+    overlayAction.type = 'button';
+    overlayAction.className = 'collection-skill-overlay__action';
+    overlayAction.textContent = 'Nâng cấp';
+
+    const handleUpgrade = () => {
+      // Future hook: trigger upgrade flow
+    };
+    overlayAction.addEventListener('click', handleUpgrade);
+    addCleanup(() => overlayAction.removeEventListener('click', handleUpgrade));
+
+    overlayDetails.appendChild(overlaySubtitle);
+    overlayDetails.appendChild(overlayUpgrade);
+    overlayDetails.appendChild(overlayItems);
+    overlayDetails.appendChild(overlayAction);
+
+    overlayContent.appendChild(overlayVisual);
+    overlayContent.appendChild(overlayDetails);
+
+    overlay.appendChild(overlayHeader);
+    overlay.appendChild(overlayContent);
+
+    stage.appendChild(stageInfo);
+    stage.appendChild(stageArt);
+    stage.appendChild(stageStatus);
+    stage.appendChild(overlay);
+
+    const tabs = document.createElement('aside');
+    tabs.className = 'collection-tabs';
+
+    const tabsTitle = document.createElement('h2');
+    tabsTitle.className = 'collection-tabs__title';
+    tabsTitle.textContent = 'Danh sách tab';
+    tabs.appendChild(tabsTitle);
+
+    const tabButtons = new Map();
+    let activeTab = 'awakening';
+
+    const setActiveTab = key => {
+      activeTab = key;
+      for (const [tabKey, button] of tabButtons){
+        if (!button) continue;
+        if (tabKey === key){
+          button.classList.add('is-active');
+        } else {
+          button.classList.remove('is-active');
+        }
+      }
+      const definition = TAB_DEFINITIONS.find(tab => tab.key === key);
+      stageStatus.textContent = definition?.hint || 'Khung thông tin chức năng.';
+      if (key === 'skills'){
+        overlay.classList.add('is-open');
+      } else {
+        overlay.classList.remove('is-open');
+      }
+    };
+
+    const handleTabClick = key => {
+      if (key === 'close'){
         if (shell && typeof shell.enterScreen === 'function'){
           shell.enterScreen('main-menu');
         }
-      };
-      backButton.addEventListener('click', handleBack);
-      cleanup.push(() => backButton.removeEventListener('click', handleBack));
-      header.appendChild(backButton);
+        return;
+      }
+      setActiveTab(key);
+    };
+
+    for (const tab of TAB_DEFINITIONS){
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'collection-tabs__button';
+      button.dataset.tabKey = tab.key;
+
+      const label = document.createElement('span');
+      label.textContent = tab.label;
+      button.appendChild(label);
+
+      const hint = document.createElement('span');
+      hint.className = 'collection-tabs__hint';
+      hint.textContent = '→';
+      button.appendChild(hint);
+
+      const clickHandler = () => handleTabClick(tab.key);
+      button.addEventListener('click', clickHandler);
+      addCleanup(() => button.removeEventListener('click', clickHandler));
+
+      tabButtons.set(tab.key, button);
+      tabs.appendChild(button);
     }
 
-    const title = typeof document !== 'undefined' ? document.createElement('h1') : null;
-    if (title){
-      title.className = 'collection-screen__title';
-      title.textContent = definition?.label || 'Bộ Sưu Tập';
-      header.appendChild(title);
-    }
+    const exitButton = document.createElement('button');
+    exitButton.type = 'button';
+    exitButton.className = 'collection-tabs__button';
+    exitButton.dataset.tabKey = 'close';
+    exitButton.innerHTML = '<span>Thoát</span><span class="collection-tabs__hint">↩</span>';
+    const handleExit = () => {
+      if (shell && typeof shell.enterScreen === 'function'){
+        shell.enterScreen('main-menu');
+      }
+    };
+    exitButton.addEventListener('click', handleExit);
+    addCleanup(() => exitButton.removeEventListener('click', handleExit));
+    tabs.appendChild(exitButton);
 
-    const subtitle = typeof document !== 'undefined' ? document.createElement('p') : null;
-    if (subtitle){
-      subtitle.className = 'collection-screen__subtitle';
-      subtitle.textContent = definition?.description || 'Kho dữ liệu tập trung giúp bạn quản lý nhân vật, công pháp và tài nguyên đã mở khóa.';
-      header.appendChild(subtitle);
-    }
+    layout.appendChild(rosterPanel);
+    layout.appendChild(stage);
+    layout.appendChild(tabs);
 
-    if (header){
-      container.appendChild(header);
-    }
-
-    const content = typeof document !== 'undefined' ? document.createElement('div') : null;
-    if (content){
-      content.className = 'collection-screen__content';
-    }
-
-    const summary = typeof document !== 'undefined' ? document.createElement('section') : null;
-    if (summary){
-      summary.className = 'collection-summary';
-
-      FEATURE_SECTIONS.forEach(feature => {
-        const card = document.createElement('article');
-        card.className = 'collection-summary__card';
-
-        const icon = document.createElement('span');
-        icon.className = 'collection-summary__icon';
-        icon.textContent = feature.icon || '◆';
-        card.appendChild(icon);
-
-        const cardTitle = document.createElement('h2');
-        cardTitle.className = 'collection-summary__title';
-        cardTitle.textContent = feature.title;
-        card.appendChild(cardTitle);
-
-        const desc = document.createElement('p');
-        desc.className = 'collection-summary__desc';
-        desc.textContent = feature.description;
-        card.appendChild(desc);
-
-        summary.appendChild(card);
-      });
-    }
-
-    if (summary && content){
-      content.appendChild(summary);
-    }
-
-    const emptyState = typeof document !== 'undefined' ? document.createElement('section') : null;
-    if (emptyState){
-      emptyState.className = 'collection-empty';
-
-      const emptyTitle = document.createElement('h3');
-      emptyTitle.className = 'collection-empty__title';
-      emptyTitle.textContent = 'Dữ liệu sẽ đồng bộ từ chiến dịch';
-      emptyState.appendChild(emptyTitle);
-
-      const mergedParams = mergeParams(definition?.params, params);
-      const emptyBody = document.createElement('p');
-      emptyBody.className = 'collection-empty__body';
-      emptyBody.textContent = mergedParams?.hint
-        ? mergedParams.hint
-        : 'Tiến hành các hoạt động PvE và kinh tế để mở khóa mục lục bộ sưu tập.';
-      emptyState.appendChild(emptyBody);
-
-      content.appendChild(emptyState);
-    }
-
-    if (content){
-      container.appendChild(content);
-    }
+    container.appendChild(layout);
 
     if (root.appendChild){
       root.appendChild(container);
     }
 
+    const selectUnit = unitId => {
+      if (!unitId || !rosterEntries.has(unitId)) return;
+      for (const [id, entry] of rosterEntries){
+        if (!entry?.button) continue;
+        if (id === unitId){
+          entry.button.classList.add('is-selected');
+          if (entry.costEl){
+            entry.costEl.classList.add('is-highlighted');
+          }
+        } else {
+          entry.button.classList.remove('is-selected');
+          if (entry.costEl){
+            entry.costEl.classList.remove('is-highlighted');
+          }
+        }
+      }
+
+      const unit = rosterEntries.get(unitId)?.meta || null;
+      stageName.textContent = unit?.name || unitId;
+
+      while (stageTags.firstChild){
+        stageTags.removeChild(stageTags.firstChild);
+      }
+      if (unit?.rank){
+        const rankTag = document.createElement('span');
+        rankTag.className = 'collection-stage__tag';
+        rankTag.textContent = `Rank ${unit.rank}`;
+        stageTags.appendChild(rankTag);
+      }
+      if (unit?.class){
+        const classTag = document.createElement('span');
+        classTag.className = 'collection-stage__tag';
+        classTag.textContent = unit.class;
+        stageTags.appendChild(classTag);
+      }
+
+      const costValue = Number.isFinite(unit?.cost) ? unit.cost : '—';
+      stageCost.textContent = `Cost ${costValue}`;
+
+      const art = getUnitArt(unitId);
+      if (art?.sprite?.src){
+        stageSprite.src = art.sprite.src;
+        stageSprite.alt = unit?.name || unitId;
+        stageSprite.style.opacity = '1';
+        overlaySprite.src = art.sprite.src;
+        overlaySprite.alt = unit?.name || unitId;
+      } else {
+        stageSprite.removeAttribute('src');
+        stageSprite.alt = '';
+        stageSprite.style.opacity = '0';
+        overlaySprite.removeAttribute('src');
+        overlaySprite.alt = '';
+      }
+
+      overlayTitle.textContent = unit?.name ? `Kĩ năng · ${unit.name}` : 'Kĩ năng';
+      overlaySubtitle.textContent = describeUlt(unit);
+      overlayUpgrade.textContent = describeUpgrade(unit);
+
+      if (activeTab === 'skills'){
+        overlay.classList.add('is-open');
+      }
+    };
+
+    const observer = new MutationObserver(() => {
+      // placeholder to keep overlay in DOM order if needed
+    });
+    observer.observe(stage, { childList: true });
+    addCleanup(() => observer.disconnect());
+
+    if (rosterEntries.size > 0){
+      const [firstId] = rosterEntries.keys();
+      if (firstId){
+        selectUnit(firstId);
+      }
+    }
+
+    setActiveTab(activeTab);
+
     return {
       destroy(){
-        cleanup.forEach(fn => {
+        for (const fn of cleanups.splice(0, cleanups.length)){
           try {
             fn();
-          } catch (err) {
-            console.error('[collection] cleanup error', err);
+          } catch (error) {
+            console.error('[collection] cleanup error', error);
           }
-        });
-        if (root && root.classList){
-          root.classList.remove('app--collection');
         }
-        if (root && root.contains && container){
-          try {
-            root.removeChild(container);
-          } catch (err) {
-            console.error('[collection] remove container failed', err);
-          }
+        if (container.parentNode === root){
+          root.removeChild(container);
+        }
+        if (root.classList){
+          root.classList.remove('app--collection');
         }
       }
     };
   }
 
-  function mergeParams(defaultParams, incomingParams){
-    const base = cloneValue(defaultParams);
-    const incoming = cloneValue(incomingParams);
 
-    if (base && typeof base === 'object' && !Array.isArray(base)){
-      if (incoming && typeof incoming === 'object' && !Array.isArray(incoming)){
-        return { ...base, ...incoming };
-      }
-      return base;
-    }
-
-    if (incoming && typeof incoming === 'object' && !Array.isArray(incoming)){
-      return incoming;
-    }
-
-    if (typeof incoming !== 'undefined' && incoming !== null){
-      return incoming;
-    }
-
-    if (typeof base !== 'undefined' && base !== null){
-      return base;
-    }
-
-    return null;
-  }
-
-  const __defaultExport = { renderCollectionScreen };
-  exports.renderCollectionScreen = renderCollectionScreen;
-  exports.default = __defaultExport;
+  exports.renderCollectionView = renderCollectionView;
+  exports.default = renderCollectionView;
   module.exports.default = exports.default;
 });
 __define('./screens/main-menu/dialogues.js', (exports, module, __require) => {
