@@ -5,6 +5,8 @@ import { MODES, MODE_GROUPS, MODE_STATUS, getMenuSections } from './data/modes.j
 const SUCCESS_EVENT = 'arclune:loaded';
 const SCREEN_MAIN_MENU = 'main-menu';
 const SCREEN_PVE = 'pve-session';
+const SCREEN_COLLECTION = 'collection';
+const APP_SCREEN_CLASSES = [`app--${SCREEN_MAIN_MENU}`, `app--${SCREEN_PVE}`, `app--${SCREEN_COLLECTION}`];
 
 function loadBundledModule(id){
   if (typeof __require === 'function'){
@@ -38,6 +40,13 @@ const MODE_DEFINITIONS = MODES.reduce((acc, mode) => {
   };
   return acc;
 }, {});
+
+const SCREEN_DEFINITION_LOOKUP = Object.values(MODE_DEFINITIONS).reduce((map, definition) => {
+  if (definition && definition.screenId && !map.has(definition.screenId)){
+    map.set(definition.screenId, definition);
+  }
+  return map;
+}, new Map());
 
 const MODE_METADATA = MODES.map(mode => {
   const definition = MODE_DEFINITIONS[mode.id];
@@ -100,6 +109,9 @@ let pveRenderToken = 0;
 const bootstrapOptions = { isFileProtocol: false };
 let renderMessageRef = null;
 let mainMenuView = null;
+let customScreenController = null;
+let customScreenId = null;
+let customScreenToken = 0;
 
 function dispatchLoaded(){
   try {
@@ -193,6 +205,154 @@ function dismissModal(){
   activeModal = null;
 }
 
+function clearAppScreenClasses(){
+  if (!rootElement || !rootElement.classList) return;
+  APP_SCREEN_CLASSES.forEach(cls => rootElement.classList.remove(cls));
+}
+
+function destroyCustomScreen(force = false){
+  const hasActiveScreen = !!(customScreenController || customScreenId);
+  if (!force && !hasActiveScreen){
+    return;
+  }
+  if (customScreenController && typeof customScreenController.destroy === 'function'){
+    try {
+      customScreenController.destroy();
+    } catch (err) {
+      console.error('[screen] cleanup error', err);
+    }
+  }
+  customScreenController = null;
+  customScreenId = null;
+  if (!rootElement) return;
+  if (rootElement.classList){
+    APP_SCREEN_CLASSES.forEach(cls => rootElement.classList.remove(cls));
+  }
+  if (typeof rootElement.innerHTML === 'string'){
+    rootElement.innerHTML = '';
+  }
+}
+
+function cloneParamValue(value){
+  if (!value || typeof value !== 'object'){
+    return value;
+  }
+  if (Array.isArray(value)){
+    return [...value];
+  }
+return { ...value };
+}
+
+function mergeDefinitionParams(definition, params){
+  const baseValue = typeof definition?.params !== 'undefined'
+    ? cloneParamValue(definition.params)
+    : undefined;
+  const incomingValue = typeof params !== 'undefined'
+    ? cloneParamValue(params)
+    : undefined;
+  const baseIsObject = baseValue && typeof baseValue === 'object' && !Array.isArray(baseValue);
+  const incomingIsObject = incomingValue && typeof incomingValue === 'object' && !Array.isArray(incomingValue);
+
+  if (baseIsObject || incomingIsObject){
+    return {
+      ...(baseIsObject ? baseValue : {}),
+      ...(incomingIsObject ? incomingValue : {})
+    };
+  }
+
+  if (typeof incomingValue !== 'undefined'){
+    return incomingValue;
+  }
+
+  if (typeof baseValue !== 'undefined'){
+    return baseValue;
+  }
+
+  return null;
+}
+
+function resolveScreenRenderer(module){
+  if (!module) return null;
+  if (typeof module.renderCollectionScreen === 'function') return module.renderCollectionScreen;
+  if (typeof module.renderScreen === 'function') return module.renderScreen;
+  if (typeof module.default === 'function') return module.default;
+  if (module.default){
+    if (typeof module.default.renderCollectionScreen === 'function') return module.default.renderCollectionScreen;
+    if (typeof module.default.renderScreen === 'function') return module.default.renderScreen;
+  }
+  return null;
+}
+
+function getDefinitionByScreen(screenId){
+  return SCREEN_DEFINITION_LOOKUP.get(screenId) || null;
+}
+
+async function mountModeScreen(screenId, params){
+  const token = ++customScreenToken;
+  destroyCustomScreen(true);
+  dismissModal();
+  if (!rootElement || !shellInstance) return;
+
+  const definition = getDefinitionByScreen(screenId);
+  if (!definition){
+    console.warn(`[screen] Không tìm thấy định nghĩa cho màn hình ${screenId}.`);
+    shellInstance.enterScreen(SCREEN_MAIN_MENU);
+    return;
+  }
+
+  const mergedParams = mergeDefinitionParams(definition, params);
+  
+  clearAppScreenClasses();
+  if (rootElement.classList){
+    rootElement.classList.add(`app--${screenId}`);
+  }
+  if (typeof rootElement.innerHTML === 'string'){
+    const label = definition.label || 'màn hình';
+    rootElement.innerHTML = `<div class="app-loading">Đang tải ${label}...</div>`;
+  }
+
+  let module;
+  try {
+    module = await definition.loader();
+  } catch (error) {
+    if (token !== customScreenToken) return;
+    if (isMissingModuleError(error)){
+      showComingSoonModal(definition.label);
+      shellInstance.enterScreen(SCREEN_MAIN_MENU);
+      return;
+    }
+    throw error;
+  }
+
+  if (token !== customScreenToken) return;
+
+  if (isComingSoonModule(module)){
+    showComingSoonModal(definition.label);
+    shellInstance.enterScreen(SCREEN_MAIN_MENU);
+    return;
+  }
+
+  const renderer = resolveScreenRenderer(module);
+  if (typeof renderer !== 'function'){
+    throw new Error(`Module màn hình ${screenId} không cung cấp hàm render hợp lệ.`);
+  }
+
+  if (typeof rootElement.innerHTML === 'string'){
+    rootElement.innerHTML = '';
+  }
+
+  const controller = renderer({
+    root: rootElement,
+    shell: shellInstance,
+    definition,
+    params: mergedParams,
+    screenId
+  }) || null;
+
+  customScreenController = controller;
+  customScreenId = screenId;
+}
+
 function showComingSoonModal(label){
   dismissModal();
   if (!rootElement) return;
@@ -220,7 +380,10 @@ function showComingSoonModal(label){
 function renderMainMenuScreen(){
   if (!rootElement || !shellInstance) return;
   dismissModal();
-  rootElement.classList.remove('app--pve');
+  clearAppScreenClasses();
+  if (rootElement.classList){
+    rootElement.classList.add('app--main-menu');
+  }
 
   if (mainMenuView && typeof mainMenuView.destroy === 'function'){
     mainMenuView.destroy();
@@ -253,8 +416,10 @@ function renderMainMenuScreen(){
 function renderPveLayout(options){
   if (!rootElement) return null;
   dismissModal();
-  rootElement.classList.remove('app--main-menu');
-  rootElement.classList.add('app--pve');
+  clearAppScreenClasses();
+  if (rootElement.classList){
+    rootElement.classList.add('app--pve');
+  }
   rootElement.innerHTML = '';
   const container = document.createElement('div');
   container.className = 'pve-screen';
@@ -338,7 +503,10 @@ async function mountPveScreen(params){
     ...mergedStartConfig
   };
   if (rootElement){
-    rootElement.classList.add('app--pve');
+    clearAppScreenClasses();
+    if (rootElement.classList){
+      rootElement.classList.add('app--pve');
+    }
     rootElement.innerHTML = `<div class="app-loading">Đang tải ${definition.label}...</div>`;
   }
   let module;
@@ -461,36 +629,56 @@ async function mountPveScreen(params){
     let lastParams = null;
 
     shellInstance.onChange(state => {
-      if (state.screen === SCREEN_MAIN_MENU){
-        const screenChanged = lastScreen !== SCREEN_MAIN_MENU;
-        const paramsChanged = state.screenParams !== lastParams;
-        if (screenChanged || paramsChanged){
-          lastScreen = SCREEN_MAIN_MENU;
-          pveRenderToken += 1;
-          renderMainMenuScreen();
-          lastParams = state.screenParams;
-        }
-      } else if (state.screen === SCREEN_PVE){
+      const nextScreen = state.screen;
+      const nextParams = state.screenParams;
+      const screenChanged = nextScreen !== lastScreen;
+      const paramsChanged = nextParams !== lastParams;
+
+      if (!screenChanged && !paramsChanged){
+        return;
+      }
+
+      if (nextScreen === SCREEN_MAIN_MENU){
+        customScreenToken += 1;
+        destroyCustomScreen();
+        lastScreen = SCREEN_MAIN_MENU;
+        lastParams = nextParams;
+        pveRenderToken += 1;
+        renderMainMenuScreen();
+        return;
+      }
+
+      if (nextScreen === SCREEN_PVE){
+        customScreenToken += 1;
+        destroyCustomScreen();
         if (mainMenuView && typeof mainMenuView.destroy === 'function'){
           mainMenuView.destroy();
           mainMenuView = null;
         }
-        const screenChanged = lastScreen !== SCREEN_PVE;
-        const paramsChanged = state.screenParams !== lastParams;
-        if (screenChanged || paramsChanged){
-          lastScreen = SCREEN_PVE;
-          lastParams = state.screenParams;
-          mountPveScreen(state.screenParams || {}).catch(error => {
-            console.error('Arclune failed to start PvE session', error);
-            if (renderMessageRef){
-              showFatalError(error, renderMessageRef, bootstrapOptions);
-            }
-          });
-        }
-      } else if (mainMenuView && typeof mainMenuView.destroy === 'function'){
+        lastScreen = SCREEN_PVE;
+        lastParams = nextParams;
+        mountPveScreen(nextParams || {}).catch(error => {
+          console.error('Arclune failed to start PvE session', error);
+          if (renderMessageRef){
+            showFatalError(error, renderMessageRef, bootstrapOptions);
+          }
+        });
+        return;
+      }
+
+      if (mainMenuView && typeof mainMenuView.destroy === 'function'){
         mainMenuView.destroy();
         mainMenuView = null;
       }
+      
+      lastScreen = nextScreen;
+      lastParams = nextParams;
+      mountModeScreen(nextScreen, nextParams || null).catch(error => {
+        console.error(`Arclune failed to load screen ${nextScreen}`, error);
+        if (renderMessageRef){
+          showFatalError(error, renderMessageRef, bootstrapOptions);
+        }
+      });
     });
     
     dispatchLoaded();
