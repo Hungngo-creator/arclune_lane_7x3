@@ -4150,6 +4150,23 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
 
   ensureNestedModuleSupport();
 
+  const getNow = (()=>{
+    if (typeof performance !== 'undefined' && typeof performance.now === 'function'){
+      return () => performance.now();
+    }
+    let offset = Date.now();
+    let last = 0;
+    return () => {
+      const current = Date.now() - offset;
+      if (current > last){
+        last = current;
+      } else {
+        last += 1;
+      }
+      return last;
+    };
+  })();
+
   // --- Instance counters (để gắn id cho token/minion) ---
   let _IID = 1;
   let _BORN = 1;
@@ -4552,7 +4569,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
   let CLOCK = null;
 
   function createClock(){
-    const now = performance.now();
+    const now = getNow();
     return {
       startMs: now,
       lastTimerRemain: 240,
@@ -4620,7 +4637,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
   }
   function extendBusy(duration){
     if (!Game || !Game.turn) return;
-    const now = performance.now();
+    const now = getNow();
     const prev = Number.isFinite(Game.turn.busyUntil) ? Game.turn.busyUntil : now;
     const dur = Math.max(0, duration|0);
     Game.turn.busyUntil = Math.max(prev, now + dur);
@@ -5010,7 +5027,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     
     const updateTimerAndCost = (timestamp)=>{
       if (!CLOCK) return;
-      const now = Number.isFinite(timestamp) ? timestamp : performance.now();
+      const now = Number.isFinite(timestamp) ? timestamp : getNow();
       const elapsedSec = Math.floor((now - CLOCK.startMs) / 1000);
 
       const remain = Math.max(0, 240 - elapsedSec);
@@ -5072,11 +5089,10 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
         tickLoopHandle = raf(runTickLoop);
       } else {
         tickLoopUsesTimeout = true;
-        tickLoopHandle = setTimeout(()=> runTickLoop(performance.now()), 16);
+        tickLoopHandle = setTimeout(()=> runTickLoop(getNow()), 16);
       }
     }
-    
-    updateTimerAndCost(performance.now());
+    updateTimerAndCost(getNow());
     scheduleTickLoop();
   }
 
