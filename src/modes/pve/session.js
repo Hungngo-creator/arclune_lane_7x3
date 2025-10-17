@@ -852,6 +852,14 @@ function init(){
     winRef.addEventListener('resize', resizeHandler);
   }
 
+  const queryFromRoot = (selector)=>{
+    if (root && typeof root.querySelector === 'function'){
+      const el = root.querySelector(selector);
+      if (el) return el;
+    }
+    return null;
+  };
+  
   const updateTimerAndCost = (timestamp)=>{
     if (!CLOCK) return;
     const now = Number.isFinite(timestamp) ? timestamp : performance.now();
