@@ -3967,10 +3967,7 @@ __define('./main.js', (exports, module, __require) => {
     if (!currentSession){
       currentSession = createPveSession(rootTarget, initialConfig);
   }
-    const startConfig = { ...initialConfig };
-    if (rootTarget && rootTarget !== resolveRoot({})){
-      startConfig.root = rootTarget;
-  }
+  const startConfig = { ...initialConfig, root: rootTarget };
     return currentSession.start(startConfig);
   }
 
@@ -4893,9 +4890,9 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
   }
 
   function init(){
-    if (Game?._inited) return;
+    if (Game?._inited) return true;
     const doc = docRef || (typeof document !== 'undefined' ? document : null);
-    if (!doc) return;
+    if (!doc) return false;
     const root = rootElement || null;
     const boardFromRoot = (root && typeof root.querySelector === 'function')
       ? root.querySelector('#board')
@@ -4905,7 +4902,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
       : (typeof doc.getElementById === 'function' ? doc.getElementById('board') : null);
     const boardEl = /** @type {HTMLCanvasElement|null} */ (boardFromRoot || boardFromDocument);
     if (!boardEl){
-      throw new Error('PvE session board canvas (#board) not found in the provided root or document.');
+      return false;
     }
     canvas = boardEl;
     ctx = /** @type {CanvasRenderingContext2D} */ (boardEl.getContext('2d'));
@@ -5087,6 +5084,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     }
     updateTimerAndCost(getNow());
     scheduleTickLoop();
+    return true;
   }
 
   function selectFirstAffordable(){
@@ -5467,7 +5465,11 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     resetDomRefs();
     running = true;
     try {
-      init();
+      const initialised = init();
+      if (!initialised){
+        stopSession();
+        return null;
+      }
       if (!Game || !Game._inited){
         throw new Error('Unable to initialise PvE session');
       }
