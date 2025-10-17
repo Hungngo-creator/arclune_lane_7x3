@@ -3506,6 +3506,8 @@ __define('./entry.js', (exports, module, __require) => {
   let customScreenController = null;
   let customScreenId = null;
   let customScreenToken = 0;
+  let collectionView = null;
+  let collectionRenderToken = 0;
 
   function dispatchLoaded(){
     try {
@@ -3625,6 +3627,17 @@ __define('./entry.js', (exports, module, __require) => {
     if (typeof rootElement.innerHTML === 'string'){
       rootElement.innerHTML = '';
     }
+  }
+
+  function destroyCollectionView(){
+    if (collectionView && typeof collectionView.destroy === 'function'){
+      try {
+        collectionView.destroy();
+      } catch (err) {
+        console.error('[collection] cleanup error', err);
+      }
+    }
+    collectionView = null;
   }
 
   function cloneParamValue(value){
@@ -3769,6 +3782,40 @@ __define('./entry.js', (exports, module, __require) => {
     }
     rootElement.appendChild(modal);
     activeModal = modal;
+  }
+
+  async function renderCollectionScreen(params){
+    if (!rootElement || !shellInstance) return;
+    const token = ++collectionRenderToken;
+    dismissModal();
+    clearAppScreenClasses();
+    destroyCollectionView();
+    if (typeof rootElement.innerHTML === 'string'){
+      rootElement.innerHTML = '<div class="app-loading">Đang tải bộ sưu tập...</div>';
+    }
+
+    let module;
+    try {
+      module = await import('./screens/collection/index.js');
+    } catch (error) {
+      if (token !== collectionRenderToken) return;
+      throw error;
+    }
+
+    if (token !== collectionRenderToken) return;
+
+    const render = module?.renderCollectionScreen || module?.default?.renderCollectionScreen;
+    if (typeof render !== 'function'){
+      throw new Error('Module bộ sưu tập không cung cấp hàm render hợp lệ.');
+    }
+
+    const definition = getDefinitionByScreen(SCREEN_COLLECTION);
+    collectionView = render({
+      root: rootElement,
+      shell: shellInstance,
+      definition,
+      params: params || null
+    }) || null;
   }
 
   function renderMainMenuScreen(){
@@ -4035,6 +4082,8 @@ __define('./entry.js', (exports, module, __require) => {
         if (nextScreen === SCREEN_MAIN_MENU){
           customScreenToken += 1;
           destroyCustomScreen();
+          collectionRenderToken += 1;
+          destroyCollectionView();
           lastScreen = SCREEN_MAIN_MENU;
           lastParams = nextParams;
           pveRenderToken += 1;
@@ -4042,9 +4091,32 @@ __define('./entry.js', (exports, module, __require) => {
           return;
         }
 
+  if (nextScreen === SCREEN_COLLECTION){
+          customScreenToken += 1;
+          destroyCustomScreen();
+          collectionRenderToken += 1;
+          destroyCollectionView();
+          if (mainMenuView && typeof mainMenuView.destroy === 'function'){
+            mainMenuView.destroy();
+            mainMenuView = null;
+          }
+          lastScreen = SCREEN_COLLECTION;
+          lastParams = nextParams;
+          pveRenderToken += 1;
+          renderCollectionScreen(nextParams || null).catch(error => {
+            console.error('Arclune failed to load collection screen', error);
+            if (renderMessageRef){
+              showFatalError(error, renderMessageRef, bootstrapOptions);
+            }
+          });
+          return;
+        }
+
         if (nextScreen === SCREEN_PVE){
           customScreenToken += 1;
           destroyCustomScreen();
+          collectionRenderToken += 1;
+          destroyCollectionView();
           if (mainMenuView && typeof mainMenuView.destroy === 'function'){
             mainMenuView.destroy();
             mainMenuView = null;
@@ -4064,7 +4136,10 @@ __define('./entry.js', (exports, module, __require) => {
           mainMenuView.destroy();
           mainMenuView = null;
         }
-        
+
+  collectionRenderToken += 1;
+        destroyCollectionView();
+
         lastScreen = nextScreen;
         lastParams = nextParams;
         mountModeScreen(nextScreen, nextParams || null).catch(error => {
