@@ -3675,9 +3675,42 @@ __define('./entry.js', (exports, module, __require) => {
 
   async function mountPveScreen(params){
     const token = ++pveRenderToken;
+    const extractStartConfig = (source) => {
+      if (!source || typeof source !== 'object') return null;
+      const payload = source.sessionConfig && typeof source.sessionConfig === 'object'
+        ? source.sessionConfig
+        : source;
+      return { ...payload };
+    };
     teardownActiveSession();
     const modeKey = params?.modeKey && MODE_DEFINITIONS[params.modeKey] ? params.modeKey : 'campaign';
     const definition = MODE_DEFINITIONS[modeKey] || MODE_DEFINITIONS.campaign;
+    const rawParams = (params && typeof params === 'object') ? params : {};
+    const defaultParams = (definition?.params && typeof definition.params === 'object') ? definition.params : {};
+    const mergedParams = { ...defaultParams, ...rawParams };
+    const definitionConfig = extractStartConfig(definition?.params);
+    const incomingConfig = extractStartConfig(params);
+    const mergedStartConfig = {
+      ...(definitionConfig || {}),
+      ...(incomingConfig || {})
+    };
+    const hasSessionConfig = Object.prototype.hasOwnProperty.call(mergedParams, 'sessionConfig');
+    const sessionConfigValue = hasSessionConfig && mergedParams.sessionConfig && typeof mergedParams.sessionConfig === 'object'
+      ? { ...mergedParams.sessionConfig }
+      : mergedParams.sessionConfig;
+      const hasSessionConfigObject = hasSessionConfig && sessionConfigValue && typeof sessionConfigValue === 'object';
+    const { sessionConfig: _ignoredSessionConfig, ...restMergedParams } = mergedParams;
+    const createSessionOptions = {
+      ...restMergedParams,
+      ...mergedStartConfig,
+      ...(hasSessionConfig ? {
+        sessionConfig: hasSessionConfigObject ? { ...mergedStartConfig } : sessionConfigValue
+      } : {})
+    };
+    const startSessionOptions = {
+      ...restMergedParams,
+      ...mergedStartConfig
+    };
     if (rootElement){
       rootElement.classList.add('app--pve');
       rootElement.innerHTML = `<div class="app-loading">Đang tải ${definition.label}...</div>`;
@@ -3728,7 +3761,7 @@ __define('./entry.js', (exports, module, __require) => {
     if (!container){
       throw new Error('Không thể dựng giao diện PvE.');
     }
-    const session = createPveSession(container);
+    const session = createPveSession(container, createSessionOptions);
     shellInstance.setActiveSession(session);
     if (typeof session.start === 'function'){
       const scheduleRetry = (callback) => {
@@ -3741,20 +3774,7 @@ __define('./entry.js', (exports, module, __require) => {
       const MAX_BOARD_RETRIES = 30;
       const startSessionSafely = () => {
         if (token !== pveRenderToken) return;
-        const extractStartConfig = (source) => {
-          if (!source || typeof source !== 'object') return null;
-          const payload = source.sessionConfig && typeof source.sessionConfig === 'object'
-            ? source.sessionConfig
-            : source;
-          return { ...payload };
-        };
-        const definitionConfig = extractStartConfig(definition?.params);
-        const incomingConfig = extractStartConfig(params);
-        const startConfig = {
-          ...(definitionConfig || {}),
-          ...(incomingConfig || {}),
-          root: container
-        };
+        const startConfig = { ...startSessionOptions, root: container };
         try {
           const result = session.start(startConfig);
           if (!result){
@@ -4038,6 +4058,7 @@ __define('./main.js', (exports, module, __require) => {
   function stopGame(){
     if (!currentSession) return;
     currentSession.stop();
+    currentSession = null;
   }
 
   function updateGameConfig(config = {}){
@@ -4313,6 +4334,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
 
   function createGameState(options = {}){
     options = normalizeConfig(options);
+    const modeKey = typeof options.modeKey === 'string' ? options.modeKey : null;
     const sceneTheme = options.sceneTheme
       ?? CFG.SCENE?.CURRENT_THEME
       ?? CFG.SCENE?.DEFAULT_THEME;
@@ -4331,6 +4353,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
       : (Array.isArray(enemyPreset.unitsAll) && enemyPreset.unitsAll.length ? enemyPreset.unitsAll : UNITS);
 
     const game = {
+      modeKey,
       grid: null,
       tokens: [],
       cost: 0,
@@ -5572,6 +5595,9 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
       }
       Game.backgroundKey = cfg.backgroundKey;
     }
+    if (typeof cfg.modeKey !== 'undefined'){
+      Game.modeKey = typeof cfg.modeKey === 'string' ? cfg.modeKey : (cfg.modeKey || null);
+    }
     if (Array.isArray(cfg.deck) && cfg.deck.length) Game.unitsAll = cfg.deck;
     if (cfg.aiPreset){
       const preset = cfg.aiPreset || {};
@@ -5607,7 +5633,8 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
   }
 
   function createPveSession(rootEl, options = {}){
-    storedConfig = normalizeConfig(options || {});
+    const normalized = normalizeConfig(options || {});
+    storedConfig = { ...normalized };
     configureRoot(rootEl);
     return {
       start(startConfig = {}){
@@ -5635,6 +5662,13 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
   }
 
   const __backgroundSignatureCache = backgroundSignatureCache;
+  function __getStoredConfig(){
+    return storedConfig ? { ...storedConfig } : {};
+  }
+
+  function __getActiveGame(){
+    return Game;
+  }
   const __reexport0 = __require('./events.js');
 
   exports.gameEvents = __reexport0.gameEvents;
@@ -5647,6 +5681,8 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
   exports.clearBackgroundSignatureCache = clearBackgroundSignatureCache;
   exports.computeBackgroundSignature = computeBackgroundSignature;
   exports.createPveSession = createPveSession;
+  exports.__getStoredConfig = __getStoredConfig;
+  exports.__getActiveGame = __getActiveGame;
 });
 __define('./passives.js', (exports, module, __require) => {
   // passives.js — passive event dispatch & helpers v0.7
