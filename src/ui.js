@@ -2,10 +2,18 @@
 import { CFG } from './config.js';
 import { gameEvents, TURN_START, TURN_END, ACTION_END } from './events.js';
 
-export function initHUD(doc){
-  const costNow  = doc.getElementById('costNow');   // số cost hiện tại
-  const costRing = doc.getElementById('costRing');  // vòng tròn tiến trình
-  const costChip = doc.getElementById('costChip');  // chip bao ngoài
+export function initHUD(doc, root){
+  const queryFromRoot = (id)=>{
+    if (root && typeof root.querySelector === 'function'){
+      const el = root.querySelector(`#${id}`);
+      if (el) return el;
+    }
+    return null;
+  };
+
+  const costNow  = /** @type {HTMLElement|null} */ (queryFromRoot('costNow')  || doc.getElementById('costNow'));   // số cost hiện tại
+  const costRing = /** @type {HTMLElement|null} */ (queryFromRoot('costRing') || doc.getElementById('costRing'));  // vòng tròn tiến trình
+  const costChip = /** @type {HTMLElement|null} */ (queryFromRoot('costChip') || doc.getElementById('costChip'));  // chip bao ngoài
   function update(Game){
     if (!Game) return;
 
@@ -38,14 +46,25 @@ export function initHUD(doc){
  return { update };
  }
 /* ---------- Summon Bar (deck-size = 4) ---------- */
-export function startSummonBar(doc, options){
+export function startSummonBar(doc, options, root){
   options = options || {};
   const onPick = options.onPick || (()=>{});
   const canAfford = options.canAfford || (()=>true);
   const getDeck = options.getDeck || (()=>[]);
   const getSelectedId = options.getSelectedId || (()=>null);
 
-  const host = doc.getElementById('cards');
+  const queryFromRoot = (selector, id)=>{
+    if (root && typeof root.querySelector === 'function'){
+      const el = root.querySelector(selector);
+      if (el) return el;
+    }
+    if (id && typeof doc.getElementById === 'function'){
+      return doc.getElementById(id);
+    }
+    return null;
+  };
+
+  const host = /** @type {HTMLElement|null} */ (queryFromRoot('#cards', 'cards'));
   if (!host){
     return { render: ()=>{} };
   }
@@ -70,7 +89,7 @@ export function startSummonBar(doc, options){
 // C2: đồng bộ cỡ ô cost theo bề rộng sân (7 cột), lấy số từ CFG.UI
   const _GAP = (CFG.UI?.CARD_GAP) ?? 12;     // khớp CSS khoảng cách
   const _MIN = (CFG.UI?.CARD_MIN) ?? 40;     // cỡ tối thiểu
-  const boardEl = doc.getElementById('board'); // cache DOM
+  const boardEl = /** @type {HTMLElement|null} */ (queryFromRoot('#board', 'board')); // cache DOM
 
   function debounce(fn, wait){
     let timer = null;
