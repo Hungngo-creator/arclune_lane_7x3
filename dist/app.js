@@ -3741,8 +3741,22 @@ __define('./entry.js', (exports, module, __require) => {
       const MAX_BOARD_RETRIES = 30;
       const startSessionSafely = () => {
         if (token !== pveRenderToken) return;
+        const extractStartConfig = (source) => {
+          if (!source || typeof source !== 'object') return null;
+          const payload = source.sessionConfig && typeof source.sessionConfig === 'object'
+            ? source.sessionConfig
+            : source;
+          return { ...payload };
+        };
+        const definitionConfig = extractStartConfig(definition?.params);
+        const incomingConfig = extractStartConfig(params);
+        const startConfig = {
+          ...(definitionConfig || {}),
+          ...(incomingConfig || {}),
+          root: container
+        };
         try {
-          const result = session.start({ ...(params?.sessionConfig || {}), root: container });
+          const result = session.start(startConfig);
           if (!result){
             handleMissingBoard();
           }
@@ -4012,9 +4026,13 @@ __define('./main.js', (exports, module, __require) => {
     const initialConfig = { ...rest };
     if (!currentSession){
       currentSession = createPveSession(rootTarget, initialConfig);
-  }
-  const startConfig = { ...initialConfig, root: rootTarget };
-    return currentSession.start(startConfig);
+    }
+    const startConfig = { ...initialConfig, root: rootTarget };
+    const session = currentSession.start(startConfig);
+    if (!session){
+      throw new Error('PvE board markup not found; render the layout before calling startGame');
+    }
+    return session;
   }
 
   function stopGame(){
