@@ -6973,8 +6973,11 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
     aside.className = 'main-menu-sidebar';
     const announcements = getAllSidebarAnnouncements();
 
-    const attachTooltipHandlers = (element, { slotKey, entry } = {}) => {
-      if (!element || !entry || !shell || typeof shell.showTooltip !== 'function') return;
+    const attachTooltipHandlers = (element, info) => {
+      if (!element) return;
+      const { slotKey, entry } = info || {};
+      if (!slotKey || !entry) return;
+      if (!shell || typeof shell.showTooltip !== 'function') return;
       const showTooltip = () => {
         shell.showTooltip({
           id: entry.id,
