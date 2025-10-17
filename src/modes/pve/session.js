@@ -29,7 +29,8 @@ import { ensureNestedModuleSupport } from '../../utils/dummy.js';
 import { safeNow } from '../../utils/time.js';
 /** @type {HTMLCanvasElement|null} */ let canvas = null;
 /** @type {CanvasRenderingContext2D|null} */ let ctx = null;
-/** @type {{update:(g:any)=>void}|null} */ let hud = null;   // ← THÊM
+/** @type {{update:(g:any)=>void, cleanup?:()=>void}|null} */ let hud = null;   // ← THÊM
+/** @type {(() => void)|null} */ let hudCleanup = null;
 const CAM_PRESET = CAM[CFG.CAMERA] || CAM.landscape_oblique;
 const HAND_SIZE  = CFG.HAND_SIZE ?? 4;
 
@@ -788,9 +789,13 @@ function init(){
   }
   canvas = boardEl;
   ctx = /** @type {CanvasRenderingContext2D} */ (boardEl.getContext('2d'));
-
+  
+  if (typeof hudCleanup === 'function'){
+    hudCleanup();
+    hudCleanup = null;
+  }
   hud = initHUD(doc, root);
-
+  hudCleanup = (hud && typeof hud.cleanup === 'function') ? hud.cleanup : null;
   resize();
   spawnLeaders(Game.tokens, Game.grid);
 
@@ -1285,6 +1290,10 @@ function clearSessionListeners(){
     canvas.removeEventListener('click', canvasClickHandler);
   }
   canvasClickHandler = null;
+  if (typeof hudCleanup === 'function'){
+    hudCleanup();
+  }
+  hudCleanup = null;
   if (resizeHandler && winRef && typeof winRef.removeEventListener === 'function'){
     winRef.removeEventListener('resize', resizeHandler);
   }
@@ -1297,6 +1306,7 @@ function resetDomRefs(){
   canvas = null;
   ctx = null;
   hud = null;
+  hudCleanup = null;
   hpBarGradientCache.clear();
   invalidateSceneCache();
 }
