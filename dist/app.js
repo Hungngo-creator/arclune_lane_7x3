@@ -4264,10 +4264,12 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     }
     let signature;
     try {
-      return `${backgroundKey || 'no-key'}:${stableStringify(config)}`;
-    } catch (_) {
-      const props = Array.isArray(config.props) ? config.props.length : 0;
       signature = `${backgroundKey || 'no-key'}:${stableStringify(config)}`;
+    } catch (_) {
+      const keyPart = config?.key ?? '';
+      const themePart = config?.theme ?? '';
+      const propsLength = Array.isArray(config?.props) ? config.props.length : 0;
+      signature = `${backgroundKey || 'no-key'}:fallback:${String(keyPart)}:${String(themePart)}:${propsLength}`;
     }
     backgroundSignatureCache.set(cacheKey, { config, signature });
     return signature;
@@ -5601,6 +5603,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     };
   }
 
+  const __backgroundSignatureCache = backgroundSignatureCache;
   const __reexport0 = __require('./events.js');
 
   exports.gameEvents = __reexport0.gameEvents;
@@ -5609,6 +5612,9 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
   exports.TURN_END = __reexport0.TURN_END;
   exports.ACTION_START = __reexport0.ACTION_START;
   exports.ACTION_END = __reexport0.ACTION_END;
+  exports.__backgroundSignatureCache = __backgroundSignatureCache;
+  exports.clearBackgroundSignatureCache = clearBackgroundSignatureCache;
+  exports.computeBackgroundSignature = computeBackgroundSignature;
   exports.createPveSession = createPveSession;
 });
 __define('./passives.js', (exports, module, __require) => {
