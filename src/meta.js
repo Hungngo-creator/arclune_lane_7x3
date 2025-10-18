@@ -1,9 +1,10 @@
-//v0.7
+//v0.8
 // meta.js — gom lookup + stat khởi tạo + nộ khởi điểm
 import {
-  CLASS_BASE, getMetaById, isSummoner as _isSummoner,
+  CLASS_BASE, getMetaById,
   applyRankAndMods
 } from './catalog.js';
+import { kitSupportsSummon, extractOnSpawnRage } from './utils/kit.js';
 
 // Dùng trực tiếp catalog cho tra cứu
 export const Meta = {
@@ -11,10 +12,9 @@ export const Meta = {
   classOf(id){ return (this.get(id)?.class) ?? null; },
   rankOf(id){  return (this.get(id)?.rank)  ?? null; },
   kit(id){     return (this.get(id)?.kit)   ?? null; },
-  // chỉ coi là Summoner khi ult.type='summon'
   isSummoner(id){
     const m = this.get(id);
-    return !!(m && m.class === 'Summoner' && m.kit?.ult?.type === 'summon');
+    return !!(m && m.class === 'Summoner' && kitSupportsSummon(m));
   }
 };
 
@@ -37,7 +37,12 @@ export function makeInstanceStats(unitId){
 export function initialRageFor(unitId, opts = {}){
   const onSpawn = Meta.kit(unitId)?.onSpawn;
   if (!onSpawn) return 0;
-  if (onSpawn.exceptLeader && opts.isLeader) return 0;
+  if (onSpawn.exceptLeader && opts.isLeader) {
+    const leaderSpecific = extractOnSpawnRage(onSpawn, { ...opts, isLeader: true });
+    return Math.max(0, leaderSpecific ?? 0);
+  }
+  const amount = extractOnSpawnRage(onSpawn, opts);
+  if (amount != null) return Math.max(0, amount);
   if (opts.revive) return Math.max(0, (opts.reviveSpec?.rage) ?? 0);
-  return onSpawn.rage ?? 0;
+  return 0;
 }

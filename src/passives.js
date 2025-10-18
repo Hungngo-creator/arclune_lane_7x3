@@ -4,6 +4,46 @@ import { safeNow } from './utils/time.js';
 
 const clamp01 = (x) => Math.max(0, Math.min(1, x));
 
+const STAT_ALIAS = new Map([
+  ['atk', 'atk'],
+  ['attack', 'atk'],
+  ['wil', 'wil'],
+  ['will', 'wil'],
+  ['res', 'res'],
+  ['arm', 'arm'],
+  ['agi', 'agi'],
+  ['agility', 'agi'],
+  ['per', 'per'],
+  ['perception', 'per'],
+  ['hp', 'hp'],
+  ['hpmax', 'hpMax'],
+  ['maxhp', 'hpMax'],
+  ['hp_max', 'hpMax'],
+  ['hpmax%', 'hpMax'],
+  ['spd', 'spd'],
+  ['speed', 'spd'],
+  ['aemax', 'aeMax'],
+  ['ae_max', 'aeMax'],
+  ['aeregen', 'aeRegen'],
+  ['ae_regen', 'aeRegen'],
+  ['hpregen', 'hpRegen'],
+  ['hp_regen', 'hpRegen']
+]);
+
+const BASE_STAT_KEYS = ['atk','wil','res','arm','agi','per','hpMax','spd','aeMax','aeRegen','hpRegen'];
+
+function normalizeStatKey(stat){
+  if (typeof stat === 'string'){
+    const trimmed = stat.trim();
+    if (!trimmed) return null;
+    const canonical = trimmed.replace(/[%_\s]/g, '').toLowerCase();
+    return STAT_ALIAS.get(canonical) || trimmed;
+  }
+  return null;
+}
+
+const normalizeKey = (value) => (typeof value === 'string' ? value.trim().toLowerCase() : '');
+
 function ensureStatusContainer(unit){
   if (!unit) return;
   if (!Array.isArray(unit.statuses)) unit.statuses = [];
@@ -16,20 +56,21 @@ function stacksOf(unit, id){
 
 function ensureStatBuff(unit, id, { attr, mode='percent', amount=0, purgeable=true }){
   ensureStatusContainer(unit);
+  const statKey = normalizeStatKey(attr) || attr;
   let st = Statuses.get(unit, id);
   if (!st){
     st = Statuses.add(unit, {
       id,
       kind: 'buff',
       tag: 'stat',
-      attr,
+      attr: statKey,
       mode,
       amount,
       purgeable,
       stacks: 0
     });
   }
-  st.attr = attr;
+  st.attr = statKey;
   st.mode = mode;
   st.amount = amount;
   st.purgeable = purgeable;
@@ -43,55 +84,172 @@ function applyStatStacks(st, stacks, { maxStacks = null } = {}){
   st.stacks = next;
 }
 
-function recomputeFromStatuses(unit){
-  if (!unit || !unit.baseStats) return;
-  ensureStatusContainer(unit);
-  const base = unit.baseStats;
-  const percent = { atk:0, res:0, wil:0, arm:0 };
-  const flat    = { atk:0, res:0, wil:0, arm:0 };
-  for (const st of unit.statuses){
-    if (!st || !st.attr || !st.mode) continue;
-const stacks = st.stacks == null ? 1 : st.stacks;
-    const amount = (st.amount ?? st.power ?? 0) * stacks;
-    if (!Number.isFinite(amount)) continue;
-    if (st.mode === 'percent'){
-      percent[st.attr] = (percent[st.attr] || 0) + amount;
-    } else if (st.mode === 'flat'){
-      flat[st.attr] = (flat[st.attr] || 0) + amount;
+function applyStatMap(unit, passive, stats, options = {}){
+  if (!unit || !stats) return false;
+  const mode = options.mode === 'flat' ? 'flat' : 'percent';
+  const purgeable = options.purgeable !== false;
+  const stackable = options.stack !== false;
+  const stacks = Number.isFinite(options.stacks) ? options.stacks : 1;
+  const maxStacks = options.maxStacks;
+  const idPrefix = options.idPrefix || (passive?.id || 'stat');
+  let applied = false;
+  for (const [stat, value] of Object.entries(stats)){
+    if (!Number.isFinite(value)) continue;
+    const attr = normalizeStatKey(stat);
+    if (!attr) continue;
+    const st = ensureStatBuff(unit, `${idPrefix}_${attr}`, { attr, mode, amount: value, purgeable });
+    const nextStacks = stackable ? (st.stacks || 0) + stacks : stacks;
+    applyStatStacks(st, nextStacks, { maxStacks });
+    applied = true;
+  }
+  if (applied) recomputeFromStatuses(unit);
+  return applied;
+}
+
+function captureBaseStats(unit){
+  const out = {};
+  for (const key of BASE_STAT_KEYS){
+    const value = unit[key];
+    if (typeof value === 'number' && Number.isFinite(value)){
+      out[key] = value;
+    }
+  }
+  return out;
+}
+
+function hasLivingMinion(unit, Game){
+  if (!unit || !Game) return false;
+  return (Game.tokens || []).some(t => t && t.alive && t.isMinion && t.ownerIid === unit.iid);
+}
+
+function evaluateConditionObject(condition, { Game, unit, ctx, passive }){
+  if (!condition || typeof condition !== 'object') return true;
+  const hpMax = Number.isFinite(unit?.hpMax) ? unit.hpMax : Number.isFinite(unit?.baseStats?.hpMax) ? unit.baseStats.hpMax : 0;
+  const hpPct = hpMax > 0 ? ((unit?.hp ?? hpMax) / hpMax) : 0;
+  if (condition.selfHPAbove != null && hpPct <= condition.selfHPAbove) return false;
+  if (condition.selfHPBelow != null && hpPct >= condition.selfHPBelow) return false;
+  if (condition.hpAbove != null && hpPct <= condition.hpAbove) return false;
+  if (condition.hpBelow != null && hpPct >= condition.hpBelow) return false;
+
+  if (condition.requiresStatus){
+    const list = Array.isArray(condition.requiresStatus) ? condition.requiresStatus : [condition.requiresStatus];
+    for (const id of list){
+      if (!Statuses.has(unit, id)) return false;
     }
   }
 
-  if (base.atk != null){
-    const pct = 1 + (percent.atk || 0);
-    const flatAdd = flat.atk || 0;
-    unit.atk = Math.max(0, Math.round(base.atk * pct + flatAdd));
+  if (condition.targetHasStatus){
+    const target = ctx?.target;
+    if (!target) return false;
+    const list = Array.isArray(condition.targetHasStatus) ? condition.targetHasStatus : [condition.targetHasStatus];
+    for (const id of list){
+      if (!Statuses.has(target, id)) return false;
+    }
   }
- if (base.wil != null){
-    const pct = 1 + (percent.wil || 0);
-    const flatAdd = flat.wil || 0;
-    unit.wil = Math.max(0, Math.round(base.wil * pct + flatAdd));
+
+  if (condition.minMinions != null){
+    const tokens = Game?.tokens || [];
+    const count = tokens.filter(t => t && t.alive && t.isMinion && t.ownerIid === unit.iid).length;
+    if (count < condition.minMinions) return false;
   }
-  if (base.arm != null){
-    const pct = 1 + (percent.arm || 0);
-    const flatAdd = flat.arm || 0;
-    const raw = base.arm * pct + flatAdd;
-    unit.arm = clamp01(raw);
+
+  if (condition.maxStacks != null){
+    const stackId = condition.stackId || passive?.id;
+    if (stackId){
+      const st = Statuses.get(unit, stackId);
+      const stacks = st ? (st.stacks || 0) : 0;
+      if (stacks >= condition.maxStacks) return false;
+    }
   }
-  if (base.res != null){
-    const pct = 1 + (percent.res || 0);
-    const flatAdd = flat.res || 0;
-    const raw = base.res * pct + flatAdd;
-    unit.res = clamp01(raw);
+
+  return true;
+}
+
+function passiveConditionsOk({ Game, unit, passive, ctx }){
+  const conditions = passive?.conditions;
+  if (!conditions) return true;
+  const list = Array.isArray(conditions) ? conditions : [conditions];
+  for (const cond of list){
+    if (!cond) continue;
+    if (typeof cond === 'function'){
+      try {
+        if (!cond({ Game, unit, ctx, passive })) return false;
+      } catch (_) {
+        return false;
+      }
+      continue;
+    }
+    if (typeof cond === 'string'){
+      const key = cond.trim().toLowerCase();
+      if (key === 'hasminion' || key === 'requiresminion'){
+        if (!hasLivingMinion(unit, Game)) return false;
+      }
+      continue;
+    }
+    if (typeof cond === 'object'){
+      if (!evaluateConditionObject(cond, { Game, unit, ctx, passive })) return false;
+    }
+  }
+  return true;
+}
+
+function recomputeFromStatuses(unit){
+  if (!unit || !unit.baseStats) return;
+  ensureStatusContainer(unit);
+
+  const percent = new Map();
+  const flat = new Map();
+  for (const st of unit.statuses){
+    if (!st || !st.attr || !st.mode) continue;
+  const attr = normalizeStatKey(st.attr);
+    if (!attr) continue;
+    const stacks = st.stacks == null ? 1 : st.stacks;
+    const amount = (st.amount ?? st.power ?? 0) * stacks;
+    if (!Number.isFinite(amount)) continue;
+    const mode = st.mode === 'flat' ? 'flat' : 'percent';
+    const store = mode === 'flat' ? flat : percent;
+    const prev = store.get(attr) || 0;
+    store.set(attr, prev + amount);
+  }
+
+for (const [key, baseValue] of Object.entries(unit.baseStats)){
+    if (!Number.isFinite(baseValue)) continue;
+    const attr = normalizeStatKey(key) || key;
+    const pct = percent.get(attr) ?? percent.get(key) ?? 0;
+    const add = flat.get(attr) ?? flat.get(key) ?? 0;
+    let next = baseValue * (1 + pct) + add;
+
+    if (attr === 'arm' || attr === 'res'){
+      unit[attr] = clamp01(next);
+      continue;
+    }
+    if (attr === 'spd'){
+      unit[attr] = Math.max(0, Math.round(next * 100) / 100);
+      continue;
+    }
+    if (attr === 'hpMax' || attr === 'hp' || attr === 'aeMax'){
+      unit[attr] = Math.max(0, Math.round(next));
+      continue;
+    }
+    if (attr === 'aeRegen' || attr === 'hpRegen'){
+      unit[attr] = Math.max(0, Math.round(next * 100) / 100);
+      continue;
+    }
+    unit[attr] = Math.max(0, Math.round(next));
   }
 }
 
-function healTeam(Game, unit, pct){
+function healTeam(Game, unit, pct, opts = {}){
   if (!Game || !unit) return;
   if (!Number.isFinite(pct) || pct <= 0) return;
+  const mode = opts.mode || 'targetMax';
+  const casterHpMax = Number.isFinite(unit.hpMax) ? unit.hpMax : 0;
   const allies = (Game.tokens || []).filter(t => t.side === unit.side && t.alive);
   for (const ally of allies){
     if (!Number.isFinite(ally.hpMax)) continue;
-    const heal = Math.max(0, Math.round((ally.hpMax || 0) * pct));
+    const base = mode === 'casterMax' ? casterHpMax : (ally.hpMax || 0);
+    if (!Number.isFinite(base) || base <= 0) continue;
+    const heal = Math.max(0, Math.round(base * pct));
     if (heal <= 0) continue;
     ally.hp = Math.min(ally.hpMax, (ally.hp ?? ally.hpMax) + heal);
   }
@@ -145,22 +303,24 @@ const EFFECTS = {
     if (!unit) return;
     const params = passive?.params || {};
     const amount = params.amount ?? 0;
-    const stackable = params.stack !== false;
-    const st = ensureStatBuff(unit, passive.id, { attr:'atk', mode:'percent', amount, purgeable: params.purgeable !== false });
-    const nextStacks = stackable ? (st.stacks || 0) + 1 : 1;
-    applyStatStacks(st, nextStacks, { maxStacks: params.maxStacks });
-    recomputeFromStatuses(unit);
+    applyStatMap(unit, passive, { atk: amount }, {
+      mode: 'percent',
+      stack: params.stack !== false,
+      purgeable: params.purgeable !== false,
+      maxStacks: params.maxStacks
+    });
   },
 
-gainWILPercent({ unit, passive }){
+  gainWILPercent({ unit, passive }){
     if (!unit) return;
     const params = passive?.params || {};
     const amount = params.amount ?? 0;
-    const stackable = params.stack !== false;
-    const st = ensureStatBuff(unit, passive.id, { attr:'wil', mode:'percent', amount, purgeable: params.purgeable !== false });
-    const nextStacks = stackable ? (st.stacks || 0) + 1 : 1;
-    applyStatStacks(st, nextStacks, { maxStacks: params.maxStacks });
-    recomputeFromStatuses(unit);
+    applyStatMap(unit, passive, { wil: amount }, {
+      mode: 'percent',
+      stack: params.stack !== false,
+      purgeable: params.purgeable !== false,
+      maxStacks: params.maxStacks
+    });
   },
 
   conditionalBuff({ unit, passive, ctx }){
@@ -207,11 +367,53 @@ gainWILPercent({ unit, passive }){
   gainRESPct({ Game, unit, passive }){
     if (!unit) return;
     const params = passive?.params || {};
-    const st = ensureStatBuff(unit, passive.id, { attr:'res', mode:'percent', amount: params.amount ?? 0, purgeable: params.purgeable !== false });
-    const stackable = params.stack !== false;
-    const count = stackable ? (st.stacks || 0) + 1 : 1;
-    applyStatStacks(st, count, { maxStacks: params.maxStacks });
-    recomputeFromStatuses(unit);
+    const amount = params.amount ?? 0;
+    applyStatMap(unit, passive, { res: amount }, {
+      mode: 'percent',
+      stack: params.stack !== false,
+      purgeable: params.purgeable !== false,
+      maxStacks: params.maxStacks
+    });
+  },
+
+  gainStats({ unit, passive }){
+    if (!unit) return;
+    const params = passive?.params || {};
+    const modeRaw = params.mode || params.statMode || params.kind;
+    const mode = modeRaw === 'flat' ? 'flat' : 'percent';
+    let applied = false;
+    if (params.stats && typeof params.stats === 'object'){
+      applied = applyStatMap(unit, passive, params.stats, {
+        mode,
+        stack: params.stack !== false,
+        stacks: params.stacks,
+        purgeable: params.purgeable !== false,
+        maxStacks: params.maxStacks,
+        idPrefix: params.idPrefix || passive?.id
+      }) || applied;
+    }
+    if (params.flatStats && typeof params.flatStats === 'object'){
+      applied = applyStatMap(unit, passive, params.flatStats, {
+        mode: 'flat',
+        stack: params.stackFlat !== false,
+        stacks: params.stacksFlat ?? params.stacks,
+        purgeable: params.purgeable !== false,
+        maxStacks: params.maxStacksFlat ?? params.maxStacks,
+        idPrefix: `${passive?.id || 'stat'}_flat`
+      }) || applied;
+    }
+    if (!applied && params.attr != null && Number.isFinite(params.amount)){
+      const attr = normalizeStatKey(params.attr);
+      if (attr){
+        applyStatMap(unit, passive, { [attr]: params.amount }, {
+          mode,
+          stack: params.stack !== false,
+          stacks: params.stacks,
+          purgeable: params.purgeable !== false,
+          maxStacks: params.maxStacks
+        });
+      }
+    }
   },
 
   gainBonus({ Game, unit, passive, ctx }){
@@ -248,7 +450,11 @@ const EFFECT_MAP = {
   'gainWIL%': EFFECTS.gainWILPercent,
   conditionalBuff: EFFECTS.conditionalBuff,
   'gainRES%': EFFECTS.gainRESPct,
-  gainBonus: EFFECTS.gainBonus
+  gainBonus: EFFECTS.gainBonus,
+  gainStats: EFFECTS.gainStats,
+  'gainStats%': EFFECTS.gainStats,
+  statBuff: EFFECTS.gainStats,
+  statGain: EFFECTS.gainStats
 };
 
 export function emitPassiveEvent(Game, unit, when, ctx = {}){
@@ -260,28 +466,117 @@ export function emitPassiveEvent(Game, unit, when, ctx = {}){
   ctx.kit = kit;
   for (const passive of kit.passives){
     if (!passive || passive.when !== when) continue;
-    let handler = EFFECT_MAP[passive.effect];
-    if (passive.effect === 'gainRES%' && passive?.params?.perTarget != null){
+    const effectKey = typeof passive.effect === 'string'
+      ? passive.effect
+      : (passive.effect?.type || passive.effect?.kind || null);
+    let handler = effectKey ? EFFECT_MAP[effectKey] : EFFECT_MAP[passive.effect];
+    let effectivePassive = passive;
+
+    if (passive && typeof passive.effect === 'object' && passive.effect !== null){
+      const spec = passive.effect;
+      const type = spec.type || spec.kind;
+      if (type && EFFECT_MAP[type]) handler = EFFECT_MAP[type];
+      const mergedParams = {
+        ...(spec.params || {}),
+        ...(passive.params || {}),
+        ...(spec.stats ? { stats: spec.stats } : {}),
+        ...(spec.flatStats ? { flatStats: spec.flatStats } : {})
+      };
+      effectivePassive = { ...passive, params: mergedParams };
+      if (!handler && (mergedParams.stats || mergedParams.flatStats)){
+        handler = EFFECTS.gainStats;
+      }
+    } else if (!handler && passive?.params && (passive.params.stats || passive.params.flatStats)){
+      handler = EFFECTS.gainStats;
+    }
+
+    if (effectKey === 'gainRES%' && effectivePassive?.params?.perTarget != null){{
       handler = EFFECTS.resPerSleeping;
     }
     if (typeof handler !== 'function') continue;
-    handler({ Game, unit, passive, ctx });
+    if (!passiveConditionsOk({ Game, unit, passive: effectivePassive, ctx })) continue;
+    handler({ Game, unit, passive: effectivePassive, ctx });
   }
 }
 
 export function applyOnSpawnEffects(Game, unit, onSpawn = {}){
   if (!Game || !unit || !onSpawn) return;
   ensureStatusContainer(unit);
-  if (onSpawn.teamHealOnEntry){
-    healTeam(Game, unit, onSpawn.teamHealOnEntry);
+
+  const effects = [];
+  if (Array.isArray(onSpawn.effects)) effects.push(...onSpawn.effects);
+
+  if (Number.isFinite(onSpawn.teamHealOnEntry) && onSpawn.teamHealOnEntry > 0){
+    effects.push({ type: 'teamHeal', amount: onSpawn.teamHealOnEntry, mode: 'targetMax' });
   }
+  const casterHeal = onSpawn.teamHealPercentMaxHPOfCaster ?? onSpawn.teamHealPercentCasterMaxHP;
+  if (Number.isFinite(casterHeal) && casterHeal > 0){
+    effects.push({ type: 'teamHeal', amount: casterHeal, mode: 'casterMax' });
+  }
+
   if (Array.isArray(onSpawn.statuses)){
     for (const st of onSpawn.statuses){
       if (!st || typeof st !== 'object') continue;
-      Statuses.add(unit, st);
+      effects.push({ type: 'status', status: st });
     }
   }
-  if (typeof unit._recalcStats === 'function'){
+  if (Array.isArray(onSpawn.addStatuses)){
+    for (const st of onSpawn.addStatuses){
+      if (!st || typeof st !== 'object') continue;
+      effects.push({ type: 'status', status: st });
+    }
+  }
+  if (onSpawn.status && typeof onSpawn.status === 'object'){
+    effects.push({ type: 'status', status: onSpawn.status });
+  }
+
+  if (onSpawn.stats && typeof onSpawn.stats === 'object'){
+    effects.push({ type: 'stats', stats: onSpawn.stats, mode: onSpawn.statsMode || onSpawn.mode, purgeable: onSpawn.purgeable });
+  }
+  if (onSpawn.flatStats && typeof onSpawn.flatStats === 'object'){
+    effects.push({ type: 'stats', stats: onSpawn.flatStats, mode: 'flat', purgeable: onSpawn.purgeable, id: 'onSpawn_flat' });
+  }
+
+  let statsChanged = false;
+  for (const effect of effects){
+    if (!effect) continue;
+    const type = normalizeKey(effect.type || effect.kind || effect.effect);
+    if (type === 'teamheal'){
+      const amount = effect.amount ?? effect.value ?? effect.percent ?? 0;
+      if (!Number.isFinite(amount) || amount <= 0) continue;
+      const mode = effect.mode === 'casterMax' ? 'casterMax' : 'targetMax';
+      healTeam(Game, unit, amount, { mode });
+      continue;
+    }
+    if (type === 'status' || type === 'addstatus'){
+      if (effect.status && typeof effect.status === 'object'){
+        Statuses.add(unit, effect.status);
+      }
+      continue;
+    }
+    if (type === 'stats' || type === 'stat' || type === 'buff'){
+      const stats = effect.stats || effect.values;
+      if (!stats || typeof stats !== 'object') continue;
+      const applied = applyStatMap(unit, { id: effect.id || 'onSpawn' }, stats, {
+        mode: effect.mode === 'flat' ? 'flat' : (effect.statMode === 'flat' ? 'flat' : 'percent'),
+        stack: effect.stack !== false,
+        stacks: effect.stacks,
+        purgeable: effect.purgeable !== false,
+        maxStacks: effect.maxStacks,
+        idPrefix: effect.id || 'onSpawn'
+      });
+      statsChanged = applied || statsChanged;
+      continue;
+    }
+  }
+
+  if (statsChanged){
+    if (typeof unit._recalcStats === 'function'){
+      unit._recalcStats();
+    } else {
+      recomputeFromStatuses(unit);
+    }
+  } else if (typeof unit._recalcStats === 'function'){
     unit._recalcStats();
   } else {
     recomputeFromStatuses(unit);
@@ -291,6 +586,16 @@ export function applyOnSpawnEffects(Game, unit, onSpawn = {}){
 export function prepareUnitForPassives(unit){
   if (!unit) return;
   ensureStatusContainer(unit);
+  const captured = captureBaseStats(unit);
+  if (!unit.baseStats || typeof unit.baseStats !== 'object'){
+    unit.baseStats = { ...captured };
+  } else {
+    for (const [key, value] of Object.entries(captured)){
+      if (!Number.isFinite(unit.baseStats[key])){
+        unit.baseStats[key] = value;
+      }
+    }
+  }
   unit._recalcStats = () => recomputeFromStatuses(unit);
 }
 

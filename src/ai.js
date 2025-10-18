@@ -2,6 +2,7 @@
 import { pickRandom, slotToCell, cellReserved } from './engine.js';
 import { CFG } from './config.js';
 import { safeNow as sharedSafeNow } from './utils/time.js';
+import { detectUltBehavior, getSummonSpec, resolveSummonSlots } from './utils/kit.js';
 
 const safeNow = () => sharedSafeNow();
 
@@ -37,17 +38,13 @@ function debugConfig(){
 }
 
 function detectKitTraits(meta){
-  const ult = meta?.kit?.ult || {};
-  const tags = Array.isArray(ult.tags) ? ult.tags : [];
-  const hasInstant = !!(ult.instant || ult.cast === 'instant' || ult.immediate === true
-    || (meta?.class === 'Summoner' && ult.type === 'summon'));
-  const hasDefBuff = typeof ult.reduceDmg === 'number'
-    || typeof ult.shield === 'number'
-    || typeof ult.barrier === 'number'
-    || ult.type === 'selfBuff'
-    || tags.includes('defense');
-  const hasRevive = ult.type === 'revive' || ult.revive === true || typeof ult.revived === 'object';
-  return { hasInstant, hasDefBuff, hasRevive };
+  const analysis = detectUltBehavior(meta?.kit || meta || {});
+  const hasInstant = analysis.hasInstant || (meta?.class === 'Summoner' && !!analysis.summon);
+  return {
+    hasInstant: !!hasInstant,
+    hasDefBuff: !!analysis.hasDefensive,
+    hasRevive: !!analysis.hasRevive
+  };
 }
 
 function exportCandidateDebug(entry){
@@ -103,37 +100,20 @@ function safetyScore(Game, cx, cy, allyTokens){
   const far  = sameRow.length - near;
   return Math.max(0, Math.min(1, 1 - (near*0.6 + far*0.2)/3));
 }
-function getPatternSlots(pattern, baseSlot){
-  switch(pattern){
-    case 'verticalNeighbors': {
-      const row = (baseSlot - 1) % 3;
-      const v = [];
-      if (row > 0) v.push(baseSlot - 1);
-      if (row < 2) v.push(baseSlot + 1);
-      return v;
-    }
-    case 'rowNeighbors': {
-      const col = Math.floor((baseSlot - 1) / 3);
-      const row = (baseSlot - 1) % 3;
-      const left  = (col < 2) ? ((col + 1) * 3 + row + 1) : null;
-      const right = (col > 0) ? ((col - 1) * 3 + row + 1) : null;
-      return [right, left].filter(Boolean);
-    }
-    default: return [];
-  }
-}
 function summonerFeasibility(Game, unitId, baseSlot, aliveTokens){
   const meta = Game.meta.get(unitId);
-  if (!meta || meta.class !== 'Summoner' || meta?.kit?.ult?.type !== 'summon') return 1.0;
-  const u = meta.kit.ult;
+  if (!meta || meta.class !== 'Summoner') return 1.0;
+  const summonSpec = getSummonSpec(meta);
+  if (!summonSpec) return 1.0;
   const alive = Array.isArray(aliveTokens) ? aliveTokens : tokensAlive(Game);
-  const cand = getPatternSlots(u.pattern || 'verticalNeighbors', baseSlot)
+  const cand = resolveSummonSlots(summonSpec, baseSlot)
     .filter(Boolean)
     .filter(s => {
       const { cx, cy } = slotToCell('enemy', s);
       return !cellReserved(alive, Game.queued, cx, cy);
     });
-  const need = Math.max(1, u.count || 1);
+  const countRaw = Number(summonSpec.count);
+  const need = Math.max(1, Number.isFinite(countRaw) ? countRaw : 1);
   return Math.min(1, cand.length / need);
 }
 function candidateBlocked(Game, entry, aliveTokens){
@@ -147,18 +127,20 @@ function candidateBlocked(Game, entry, aliveTokens){
   if (cellReserved(alive, Game.queued, cx, cy)) return 'cellReserved';
 
   const meta = entry.meta;
-  if (meta && meta.class === 'Summoner' && meta?.kit?.ult?.type === 'summon'){
-    const ult = meta.kit.ult || {};
-    const patternSlots = getPatternSlots(ult.pattern || 'verticalNeighbors', slot).filter(Boolean);
-    if (patternSlots.length){
-      let available = 0;
-      for (const s of patternSlots){
-        const { cx: scx, cy: scy } = slotToCell('enemy', s);
-        if (!cellReserved(alive, Game.queued, scx, scy)) available += 1;
+  if (meta && meta.class === 'Summoner'){
+    const summonSpec = getSummonSpec(meta);
+    if (summonSpec){
+      const patternSlots = resolveSummonSlots(summonSpec, slot).filter(Boolean);
+      if (patternSlots.length){
+        let available = 0;
+        for (const s of patternSlots){
+          const { cx: scx, cy: scy } = slotToCell('enemy', s);
+          if (!cellReserved(alive, Game.queued, scx, scy)) available += 1;
+        }
+        const countRaw = Number(summonSpec.count);
+        const need = Math.min(patternSlots.length, Math.max(1, Number.isFinite(countRaw) ? countRaw : 1));
+        if (available < need) return 'summonBlocked';
       }
-      const countRaw = Number(ult.count);
-      const need = Math.min(patternSlots.length, Math.max(1, Number.isFinite(countRaw) ? countRaw : 1));
-      if (available < need) return 'summonBlocked';
     }
   }
   return null;

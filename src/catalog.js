@@ -1,5 +1,6 @@
 //v0.7
 // 1) Rank multiplier (đơn giản) — áp lên TẤT CẢ stat trừ SPD
+import { kitSupportsSummon } from './utils/kit.js';
 export const RANK_MULT = { N:0.60, R:0.80, SR:1.00, SSR:1.30, UR:1.60, Prime:2.00 };
 
 // 2) Class base (mốc lv1 để test). SPD không chịu rank multiplier.
@@ -31,7 +32,7 @@ export function applyRankAndMods(base, rank, mods = {}){
 
 // 4) Roster (dex/meta) — 8 nhân vật, ngân sách mod bằng nhau (~+20% tổng, không đụng SPD)
 //  - onSpawn.rage: 100 cho mọi unit từ deck (trừ leader). Revive không áp quy tắc này.
-//  - kit.ult.type: 'summon' chỉ dành cho class Summoner -> kích hoạt Immediate Summon (action-chain).
+//  - kit.traits.summon / kit.ult.summon đánh dấu Summoner -> kích hoạt Immediate Summon (action-chain).
 export const ROSTER = [
   {
     id: 'phe', name: 'Phệ', class: 'Mage', rank: 'Prime',
@@ -310,5 +311,5 @@ export const ROSTER_MAP = new Map(ROSTER.map(x => [x.id, x]));
 export const getMetaById = (id) => ROSTER_MAP.get(id);
 export const isSummoner = (id) => {
   const m = getMetaById(id);
-  return !!(m && m.class === 'Summoner' && m.kit?.ult?.type === 'summon');
+  return !!(m && m.class === 'Summoner' && kitSupportsSummon(m));
 };

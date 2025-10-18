@@ -2,6 +2,7 @@
 import { slotToCell, cellReserved } from './engine.js';
 import { vfxAddSpawn } from './vfx.js';
 import { getUnitArt } from './art.js';
+import { kitSupportsSummon } from './utils/kit.js';
 // local helper
 const tokensAlive = (Game) => Game.tokens.filter(t => t.alive);
 
@@ -10,7 +11,7 @@ const tokensAlive = (Game) => Game.tokens.filter(t => t.alive);
 export function enqueueImmediate(Game, req){
   if (req.by){
     const mm = Game.meta.get(req.by);
-    const ok = !!(mm && mm.class === 'Summoner' && mm.kit?.ult?.type === 'summon');
+    const ok = !!(mm && mm.class === 'Summoner' && kitSupportsSummon(mm));
     if (!ok) return false;
   }
   const { cx, cy } = slotToCell(req.side, req.slot);
