@@ -8092,7 +8092,7 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
     return facts;
   }
 
-  function renderAbilityCard(entry, { typeLabel } = {}){
+  function renderAbilityCard(entry, { typeLabel = null } = {}){
     const card = document.createElement('article');
     card.className = 'collection-skill-card';
 
