@@ -7804,6 +7804,7 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
       .collection-skill-overlay__close:hover{transform:translateY(-2px);border-color:rgba(174,228,255,.48);}
       .collection-skill-overlay__close:focus-visible{outline:2px solid rgba(174,228,255,.75);outline-offset:3px;}
       .collection-skill-overlay__content{display:grid;grid-template-columns:1fr;gap:24px;flex:1;overflow:auto;padding-right:8px;}
+      .collection-skill-overlay__content.has-detail{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);}
       .collection-skill-overlay__details{display:flex;flex-direction:column;gap:12px;}
       .collection-skill-overlay__subtitle{margin:0;color:#9cbcd9;font-size:14px;line-height:1.6;}
       .collection-skill-overlay__abilities{display:flex;flex-direction:column;gap:12px;overflow:visible;max-height:none;padding-right:2px;}
@@ -7818,6 +7819,22 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
       .collection-skill-card__meta{display:none !important;}
       .collection-skill-card__description{display:none !important;}
       .collection-skill-card__notes{display:none !important;}
+      .collection-skill-card.is-expanded{border-color:rgba(174,228,255,.6);box-shadow:0 22px 48px rgba(10,20,32,.52);background:rgba(16,28,40,.92);}
+      .collection-skill-detail{border-radius:18px;border:1px solid rgba(125,211,252,.28);background:rgba(10,20,30,.86);padding:20px;display:flex;flex-direction:column;gap:14px;color:#e6f2ff;opacity:0;transform:translateY(10px);transition:opacity .2s ease,transform .2s ease;pointer-events:none;min-height:0;}
+      .collection-skill-detail.is-active{opacity:1;transform:translateY(0);pointer-events:auto;}
+      .collection-skill-detail__header{display:flex;flex-direction:column;gap:6px;}
+      .collection-skill-detail__title{margin:0;font-size:20px;letter-spacing:.05em;}
+      .collection-skill-detail__badge{align-self:flex-start;padding:4px 10px;border-radius:12px;border:1px solid rgba(174,228,255,.32);background:rgba(16,28,40,.82);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#aee4ff;}
+      .collection-skill-detail__description{margin:0;color:#d7e7fb;font-size:14px;line-height:1.7;white-space:pre-line;}
+      .collection-skill-detail__facts{display:flex;flex-direction:column;gap:8px;}
+      .collection-skill-detail__fact{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:#cde1f5;background:rgba(12,24,36,.72);padding:10px 12px;border-radius:12px;border:1px solid rgba(125,211,252,.2);}
+      .collection-skill-detail__fact-icon{font-size:15px;line-height:1;}
+      .collection-skill-detail__fact-label{font-weight:600;letter-spacing:.04em;}
+      .collection-skill-detail__fact-value{font-size:13px;color:#e6f2ff;line-height:1.5;}
+      .collection-skill-detail__notes{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:12px;color:#a9c7e6;}
+      .collection-skill-detail__notes li{position:relative;padding-left:16px;}
+      .collection-skill-detail__notes li::before{content:'•';position:absolute;left:0;color:#7da0c7;}
+      .collection-skill-detail__empty{margin:0;color:#7da0c7;font-size:13px;line-height:1.6;}
       .collection-skill-card__empty{margin:0;color:#9cbcd9;font-size:13px;line-height:1.6;background:rgba(12,22,32,.88);border:1px dashed rgba(125,211,252,.28);border-radius:14px;padding:16px;text-align:center;}
       .collection-skill-overlay__notes{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:12px;color:#9cbcd9;}
       .collection-skill-overlay__notes li{position:relative;padding-left:16px;}
@@ -7826,6 +7843,8 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
         .collection-view__layout{grid-template-columns:1fr;}
         .collection-skill-overlay{position:fixed;top:50%;left:50%;transform:translate(-50%,calc(-50% + 12px));width:88vw;min-height:0;max-height:85vh;}
         .collection-skill-overlay.is-open{transform:translate(-50%,-50%);}
+        .collection-skill-overlay__content{grid-template-columns:1fr;}
+        .collection-skill-overlay__content.has-detail{grid-template-columns:1fr;}
       }
       @media(max-width:720px){
         .collection-view__title{font-size:30px;}
@@ -8132,7 +8151,7 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
     return facts;
   }
 
-  function renderAbilityCard(entry, { typeLabel = null } = {}){
+  function renderAbilityCard(entry, { typeLabel = null, unitId = null } = {}){
     const card = document.createElement('article');
     card.className = 'collection-skill-card';
 
@@ -8146,10 +8165,12 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
     
     const actions = document.createElement('div');
     actions.className = 'collection-skill-card__actions';
+    
+    const resolvedTypeLabel = typeLabel || labelForAbility(entry);
 
     const badge = document.createElement('span');
     badge.className = 'collection-skill-card__badge';
-    badge.textContent = typeLabel || labelForAbility(entry);
+    badge.textContent = resolvedTypeLabel;
     actions.appendChild(badge);
 
     const abilityId = entry?.id ?? entry?.abilityId ?? null;
@@ -8175,7 +8196,17 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
       : 'Chưa có mô tả chi tiết.';
     card.dataset.description = descriptionText;
 
-        if (Array.isArray(entry?.notes)){
+        if (resolvedTypeLabel){
+      card.dataset.typeLabel = resolvedTypeLabel;
+    }
+    if (unitId){
+      card.dataset.unitId = String(unitId);
+    }
+    if (abilityId != null){
+      card.dataset.abilityId = String(abilityId);
+    }
+
+    if (Array.isArray(entry?.notes)){
       const filteredNotes = entry.notes
         .map(note => (typeof note === 'string' ? note.trim() : ''))
         .filter(note => note.length > 0);
@@ -8188,6 +8219,19 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
     if (facts.length){
       card.dataset.meta = JSON.stringify(facts);
     }
+
+    card.addEventListener('click', event => {
+      if (event.target.closest('.collection-skill-card__upgrade')){
+        return;
+      }
+      const detail = {
+        unitId: unitId || card.dataset.unitId || null,
+        abilityId,
+        ability: entry,
+        typeLabel: resolvedTypeLabel
+      };
+      card.dispatchEvent(new CustomEvent('collection:toggle-skill-detail', { bubbles: true, detail }));
+    });
     return card;
   }
 
@@ -8419,12 +8463,54 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
     const overlayAbilities = document.createElement('div');
     overlayAbilities.className = 'collection-skill-overlay__abilities';
 
+  const overlayDetailPanel = document.createElement('aside');
+    overlayDetailPanel.className = 'collection-skill-detail';
+    overlayDetailPanel.setAttribute('aria-hidden', 'true');
+    overlayDetailPanel.hidden = true;
+
+    const detailHeader = document.createElement('div');
+    detailHeader.className = 'collection-skill-detail__header';
+
+    const detailTitle = document.createElement('h4');
+    detailTitle.className = 'collection-skill-detail__title';
+    detailTitle.textContent = 'Chi tiết kỹ năng';
+
+    const detailBadge = document.createElement('span');
+    detailBadge.className = 'collection-skill-detail__badge';
+    detailBadge.textContent = '';
+    detailBadge.style.display = 'none';
+
+    detailHeader.appendChild(detailTitle);
+    detailHeader.appendChild(detailBadge);
+
+    const detailDescription = document.createElement('p');
+    detailDescription.className = 'collection-skill-detail__description';
+    detailDescription.textContent = 'Chọn một kỹ năng ở danh sách bên trái để xem mô tả chi tiết.';
+
+    const detailFacts = document.createElement('div');
+    detailFacts.className = 'collection-skill-detail__facts';
+
+    const detailNotes = document.createElement('ul');
+    detailNotes.className = 'collection-skill-detail__notes';
+
+    const detailEmpty = document.createElement('p');
+    detailEmpty.className = 'collection-skill-detail__empty';
+    detailEmpty.textContent = 'Chưa có lưu ý bổ sung.';
+    detailEmpty.style.display = 'none';
+
+    overlayDetailPanel.appendChild(detailHeader);
+    overlayDetailPanel.appendChild(detailDescription);
+    overlayDetailPanel.appendChild(detailFacts);
+    overlayDetailPanel.appendChild(detailNotes);
+    overlayDetailPanel.appendChild(detailEmpty);
+
     overlayDetails.appendChild(overlaySubtitle);
     overlayDetails.appendChild(overlaySummary);
     overlayDetails.appendChild(overlayNotesList);
     overlayDetails.appendChild(overlayAbilities);
 
     overlayContent.appendChild(overlayDetails);
+    overlayContent.appendChild(overlayDetailPanel);
 
     overlay.appendChild(overlayHeader);
     overlay.appendChild(overlayContent);
@@ -8433,6 +8519,165 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
     stage.appendChild(stageArt);
     stage.appendChild(stageStatus);
     stage.appendChild(overlay);
+
+  let activeAbilityCard = null;
+
+    const clearSkillDetail = () => {
+      if (activeAbilityCard){
+        activeAbilityCard.classList.remove('is-expanded');
+        activeAbilityCard = null;
+      }
+      overlayDetailPanel.classList.remove('is-active');
+      overlayDetailPanel.setAttribute('aria-hidden', 'true');
+      overlayDetailPanel.hidden = true;
+      overlayContent.classList.remove('has-detail');
+      detailTitle.textContent = 'Chi tiết kỹ năng';
+      detailBadge.style.display = 'none';
+      detailBadge.textContent = '';
+      detailDescription.textContent = 'Chọn một kỹ năng ở danh sách bên trái để xem mô tả chi tiết.';
+      while (detailFacts.firstChild){
+        detailFacts.removeChild(detailFacts.firstChild);
+      }
+      while (detailNotes.firstChild){
+        detailNotes.removeChild(detailNotes.firstChild);
+      }
+      detailEmpty.style.display = 'none';
+    };
+
+    const populateSkillDetail = (card, payload) => {
+      if (!payload?.ability){
+        clearSkillDetail();
+        return;
+      }
+
+      if (activeAbilityCard && activeAbilityCard !== card){
+        activeAbilityCard.classList.remove('is-expanded');
+      }
+      if (activeAbilityCard === card && overlayDetailPanel.classList.contains('is-active')){
+        clearSkillDetail();
+        return;
+      }
+
+      activeAbilityCard = card;
+      activeAbilityCard.classList.add('is-expanded');
+
+      const ability = payload.ability;
+      const abilityName = ability?.name || 'Kĩ năng';
+      detailTitle.textContent = abilityName;
+
+      const typeLabel = payload.typeLabel || card.dataset.typeLabel || labelForAbility(ability);
+      if (typeLabel){
+        detailBadge.textContent = typeLabel;
+        detailBadge.style.display = '';
+      } else {
+        detailBadge.textContent = '';
+        detailBadge.style.display = 'none';
+      }
+
+      const description = ability?.description && String(ability.description).trim() !== ''
+        ? String(ability.description)
+        : card.dataset.description || 'Chưa có mô tả chi tiết.';
+      detailDescription.textContent = description;
+
+      while (detailFacts.firstChild){
+        detailFacts.removeChild(detailFacts.firstChild);
+      }
+      const facts = collectAbilityFacts(ability);
+      if (facts.length){
+        for (const fact of facts){
+          const item = document.createElement('div');
+          item.className = 'collection-skill-detail__fact';
+
+          if (fact.icon){
+            const iconEl = document.createElement('span');
+            iconEl.className = 'collection-skill-detail__fact-icon';
+            iconEl.textContent = fact.icon;
+            item.appendChild(iconEl);
+          }
+
+          const factBody = document.createElement('div');
+
+          if (fact.label){
+            const labelEl = document.createElement('div');
+            labelEl.className = 'collection-skill-detail__fact-label';
+            labelEl.textContent = fact.label;
+            factBody.appendChild(labelEl);
+          }
+
+          const valueEl = document.createElement('div');
+          valueEl.className = 'collection-skill-detail__fact-value';
+          valueEl.textContent = fact.value;
+          factBody.appendChild(valueEl);
+
+          if (fact.tooltip){
+            valueEl.title = fact.tooltip;
+          }
+
+          item.appendChild(factBody);
+          detailFacts.appendChild(item);
+        }
+      }
+
+      while (detailNotes.firstChild){
+        detailNotes.removeChild(detailNotes.firstChild);
+      }
+
+      const rawNotes = Array.isArray(ability?.notes) ? ability.notes : [];
+      let cardNotes = [];
+      if (card.dataset.notes){
+        try {
+          const parsed = JSON.parse(card.dataset.notes);
+          if (Array.isArray(parsed)){
+            cardNotes = parsed;
+          }
+        } catch (error) {
+          // bỏ qua lỗi parse và tiếp tục với danh sách rỗng
+        }
+      }
+      const mergedNotes = [...rawNotes, ...cardNotes]
+        .map(note => (typeof note === 'string' ? note.trim() : ''))
+        .filter((note, index, array) => note && array.indexOf(note) === index);
+
+      if (mergedNotes.length){
+        for (const note of mergedNotes){
+          const noteItem = document.createElement('li');
+          noteItem.textContent = note;
+          detailNotes.appendChild(noteItem);
+        }
+        detailEmpty.style.display = 'none';
+      } else {
+        detailEmpty.style.display = '';
+      }
+
+      overlayDetailPanel.hidden = false;
+      overlayDetailPanel.classList.add('is-active');
+      overlayDetailPanel.setAttribute('aria-hidden', 'false');
+      overlayContent.classList.add('has-detail');
+    };
+
+    const handleSkillDetailToggle = event => {
+      const card = event.target.closest('.collection-skill-card');
+      if (!card){
+        return;
+      }
+      populateSkillDetail(card, event.detail);
+    };
+
+    overlay.addEventListener('collection:toggle-skill-detail', handleSkillDetailToggle);
+    addCleanup(() => overlay.removeEventListener('collection:toggle-skill-detail', handleSkillDetailToggle));
+
+    const handleGlobalClick = event => {
+      if (overlayDetailPanel.hidden) return;
+      const target = event.target;
+      if (overlay.contains(target)){
+        if (target.closest('.collection-skill-detail')) return;
+        if (target.closest('.collection-skill-card')) return;
+      }
+      clearSkillDetail();
+    };
+
+    document.addEventListener('click', handleGlobalClick);
+    addCleanup(() => document.removeEventListener('click', handleGlobalClick));
 
     const tabs = document.createElement('aside');
     tabs.className = 'collection-tabs';
@@ -8461,6 +8706,7 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
         overlay.classList.add('is-open');
       } else {
         overlay.classList.remove('is-open');
+        clearSkillDetail();
       }
     };
 
@@ -8523,6 +8769,7 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
 
     const selectUnit = unitId => {
       if (!unitId || !rosterEntries.has(unitId)) return;
+      clearSkillDetail();
       for (const [id, entry] of rosterEntries){
         if (!entry?.button) continue;
         if (id === unitId){
@@ -8620,7 +8867,7 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
 
       if (abilityEntries.length){
         for (const ability of abilityEntries){
-          overlayAbilities.appendChild(renderAbilityCard(ability.entry, { typeLabel: ability.label }));
+          overlayAbilities.appendChild(renderAbilityCard(ability.entry, { typeLabel: ability.label, unitId }));
         }
       } else {
         const placeholder = document.createElement('p');
