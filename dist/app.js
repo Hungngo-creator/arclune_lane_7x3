@@ -1893,6 +1893,7 @@ __define('./config.js', (exports, module, __require) => {
       BOARD_MIN_H: 220,
       BOARD_H_RATIO: 3/7,
       MAX_DPR: 2.5,
+      MAX_PIXEL_AREA: 2_400_000,
       CARD_GAP: 12,
       CARD_MIN: 40
     },
@@ -1906,6 +1907,8 @@ __define('./config.js', (exports, module, __require) => {
      SHOW_QUEUED_ENEMY: false  // kẻ địch không thấy (đúng design)
    },
    PERFORMANCE: {
+     LOW_POWER_MODE: false,
+      LOW_POWER_DPR: 1.5,
       LOW_POWER_SHADOWS: false,        // true: luôn tắt bóng đổ để tiết kiệm
       SHADOW_DISABLE_THRESHOLD: 16     // ≥ số token này thì bỏ bóng để giữ FPS
     },
@@ -3488,12 +3491,41 @@ __define('./engine.js', (exports, module, __require) => {
       ? window.devicePixelRatio
       : 1;
     const dprSafe = dprRaw > 0 ? dprRaw : 1;
-    const dpr = Math.min(dprClamp, dprSafe);
+    const perfCfg = CFG.PERFORMANCE || {};
+    const lowPowerMode = !!perfCfg.LOW_POWER_MODE;
+    const lowPowerDprCfg = perfCfg.LOW_POWER_DPR;
+    const lowPowerDpr = Number.isFinite(lowPowerDprCfg) && lowPowerDprCfg > 0
+      ? Math.min(dprClamp, lowPowerDprCfg)
+      : 1.5;
+
+    let dpr = Math.min(dprClamp, dprSafe);
+    if (lowPowerMode){
+      dpr = Math.min(dpr, lowPowerDpr);
+    }
 
     const displayW = w;
     const displayH = h;
-    const pixelW = Math.round(displayW * dpr);
-    const pixelH = Math.round(displayH * dpr);
+    const maxPixelAreaCfg = CFG.UI?.MAX_PIXEL_AREA;
+    const pixelAreaLimit = Number.isFinite(maxPixelAreaCfg) && maxPixelAreaCfg > 0
+      ? maxPixelAreaCfg
+      : null;
+    if (pixelAreaLimit){
+      const cssArea = displayW * displayH;
+      if (cssArea > 0){
+        const maxDprByArea = Math.sqrt(pixelAreaLimit / cssArea);
+        if (Number.isFinite(maxDprByArea) && maxDprByArea > 0){
+          dpr = Math.min(dpr, maxDprByArea);
+        }
+      }
+    }
+
+    if (!Number.isFinite(dpr) || dpr <= 0){
+      dpr = 1;
+    }
+
+    const pixelW = Math.max(1, Math.round(displayW * dpr));
+    const pixelH = Math.max(1, Math.round(displayH * dpr));
+    const pixelArea = pixelW * pixelH;
 
     if (canvas){
       if (canvas.style){
@@ -3511,7 +3543,7 @@ __define('./engine.js', (exports, module, __require) => {
 
     const ox = Math.floor((displayW - tile*cols)/2);
     const oy = Math.floor((displayH - tile*rows)/2);
-    return { cols, rows, tile, ox, oy, w: displayW, h: displayH, pad, dpr };
+    return { cols, rows, tile, ox, oy, w: displayW, h: displayH, pad, dpr, pixelW, pixelH, pixelArea };
   }
 
   function hitToCell(g, px, py){
@@ -5677,13 +5709,13 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     const theme = (sceneCfg.THEMES && themeKey) ? sceneCfg.THEMES[themeKey] : null;
     const backgroundKey = Game.backgroundKey;
     const backgroundSignature = computeBackgroundSignature(backgroundKey);
-    const dpr = grid.dpr ?? 1;
+    const dpr = Number.isFinite(grid.dpr) && grid.dpr > 0 ? grid.dpr : 1;
     const cssWidth = grid.w ?? (canvas ? canvas.width / dpr : 0);
     const cssHeight = grid.h ?? (canvas ? canvas.height / dpr : 0);
     if (!cssWidth || !cssHeight) return null;
     const pixelWidth = Math.max(1, Math.round(cssWidth * dpr));
     const pixelHeight = Math.max(1, Math.round(cssHeight * dpr));
-    
+
     const baseScene = getCachedBattlefieldScene(grid, theme, { width: cssWidth, height: cssHeight, dpr });
     const baseKey = baseScene?.cacheKey;
     if (!baseScene){
@@ -7535,7 +7567,9 @@ __define('./scene.js', (exports, module, __require) => {
     if (!g) return null;
     const cssWidth = normalizeDimension(options.width ?? g.w);
     const cssHeight = normalizeDimension(options.height ?? g.h);
-    const dpr = Number.isFinite(options.dpr) ? options.dpr : (Number.isFinite(g.dpr) ? g.dpr : 1);
+    const dpr = Number.isFinite(options.dpr) && options.dpr > 0
+      ? options.dpr
+      : (Number.isFinite(g.dpr) && g.dpr > 0 ? g.dpr : 1);
     if (!cssWidth || !cssHeight) return null;
     const pixelWidth = Math.max(1, Math.round(cssWidth * dpr));
     const pixelHeight = Math.max(1, Math.round(cssHeight * dpr));
