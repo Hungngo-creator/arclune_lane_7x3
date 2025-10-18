@@ -39,6 +39,7 @@ FOLLOWUP_CAP_DEFAULT: 2,
     BOARD_MIN_H: 220,
     BOARD_H_RATIO: 3/7,
     MAX_DPR: 2.5,
+    MAX_PIXEL_AREA: 2_400_000,
     CARD_GAP: 12,
     CARD_MIN: 40
   },
@@ -52,6 +53,8 @@ FOLLOWUP_CAP_DEFAULT: 2,
    SHOW_QUEUED_ENEMY: false  // kẻ địch không thấy (đúng design)
  },
  PERFORMANCE: {
+   LOW_POWER_MODE: false,
+    LOW_POWER_DPR: 1.5,
     LOW_POWER_SHADOWS: false,        // true: luôn tắt bóng đổ để tiết kiệm
     SHADOW_DISABLE_THRESHOLD: 16     // ≥ số token này thì bỏ bóng để giữ FPS
   },

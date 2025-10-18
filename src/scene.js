@@ -79,7 +79,9 @@ export function getCachedBattlefieldScene(g, theme, options = {}){
   if (!g) return null;
   const cssWidth = normalizeDimension(options.width ?? g.w);
   const cssHeight = normalizeDimension(options.height ?? g.h);
-  const dpr = Number.isFinite(options.dpr) ? options.dpr : (Number.isFinite(g.dpr) ? g.dpr : 1);
+  const dpr = Number.isFinite(options.dpr) && options.dpr > 0
+    ? options.dpr
+    : (Number.isFinite(g.dpr) && g.dpr > 0 ? g.dpr : 1);
   if (!cssWidth || !cssHeight) return null;
   const pixelWidth = Math.max(1, Math.round(cssWidth * dpr));
   const pixelHeight = Math.max(1, Math.round(cssHeight * dpr));

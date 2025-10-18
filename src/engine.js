@@ -16,12 +16,41 @@ export function makeGrid(canvas, cols, rows){
     ? window.devicePixelRatio
     : 1;
   const dprSafe = dprRaw > 0 ? dprRaw : 1;
-  const dpr = Math.min(dprClamp, dprSafe);
+  const perfCfg = CFG.PERFORMANCE || {};
+  const lowPowerMode = !!perfCfg.LOW_POWER_MODE;
+  const lowPowerDprCfg = perfCfg.LOW_POWER_DPR;
+  const lowPowerDpr = Number.isFinite(lowPowerDprCfg) && lowPowerDprCfg > 0
+    ? Math.min(dprClamp, lowPowerDprCfg)
+    : 1.5;
+
+  let dpr = Math.min(dprClamp, dprSafe);
+  if (lowPowerMode){
+    dpr = Math.min(dpr, lowPowerDpr);
+  }
 
   const displayW = w;
   const displayH = h;
-  const pixelW = Math.round(displayW * dpr);
-  const pixelH = Math.round(displayH * dpr);
+  const maxPixelAreaCfg = CFG.UI?.MAX_PIXEL_AREA;
+  const pixelAreaLimit = Number.isFinite(maxPixelAreaCfg) && maxPixelAreaCfg > 0
+    ? maxPixelAreaCfg
+    : null;
+  if (pixelAreaLimit){
+    const cssArea = displayW * displayH;
+    if (cssArea > 0){
+      const maxDprByArea = Math.sqrt(pixelAreaLimit / cssArea);
+      if (Number.isFinite(maxDprByArea) && maxDprByArea > 0){
+        dpr = Math.min(dpr, maxDprByArea);
+      }
+    }
+  }
+
+  if (!Number.isFinite(dpr) || dpr <= 0){
+    dpr = 1;
+  }
+
+  const pixelW = Math.max(1, Math.round(displayW * dpr));
+  const pixelH = Math.max(1, Math.round(displayH * dpr));
+  const pixelArea = pixelW * pixelH;
 
   if (canvas){
     if (canvas.style){
@@ -39,7 +68,7 @@ export function makeGrid(canvas, cols, rows){
 
   const ox = Math.floor((displayW - tile*cols)/2);
   const oy = Math.floor((displayH - tile*rows)/2);
-  return { cols, rows, tile, ox, oy, w: displayW, h: displayH, pad, dpr };
+  return { cols, rows, tile, ox, oy, w: displayW, h: displayH, pad, dpr, pixelW, pixelH, pixelArea };
 }
 
 export function hitToCell(g, px, py){
