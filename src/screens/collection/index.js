@@ -32,6 +32,6 @@ const defParams = definition?.params || null;
   });
 }
 
-export { renderCollectionView } from './view.js';
+export { renderCollectionView };
 
 export default { renderCollectionScreen };
