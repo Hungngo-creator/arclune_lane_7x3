@@ -1,7 +1,7 @@
 //v0.7
 // 1) Rank multiplier (đơn giản) — áp lên TẤT CẢ stat trừ SPD
 import { kitSupportsSummon } from './utils/kit.js';
-export const RANK_MULT = { N:0.60, R:0.80, SR:1.00, SSR:1.30, UR:1.60, Prime:2.00 };
+export const RANK_MULT = { N:0.80, R:0.90, SR:1.05, SSR:1.25, UR:1.50, Prime:1.80 };
 
 // 2) Class base (mốc lv1 để test). SPD không chịu rank multiplier.
 export const CLASS_BASE = {
