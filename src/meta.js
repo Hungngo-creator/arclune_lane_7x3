@@ -29,7 +29,7 @@ export function makeInstanceStats(unitId){
     arm: fin.ARM||0, res: fin.RES||0,
     agi: fin.AGI|0, per: fin.PER|0,
     spd: fin.SPD||1,
-    aeMax: fin.AEmax|0, ae: 0, aeRegen: fin.AEregen||0
+    aeMax: fin.AEmax|0, ae: 0, aeRegen: fin.AEregen||0, hpRegen: fin.HPregen||0
   };
 }
 
