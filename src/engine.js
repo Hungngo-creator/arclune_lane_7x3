@@ -4,7 +4,21 @@ import { getUnitArt, getUnitSkin } from './art.js';
 /* ---------- Grid ---------- */
 export function makeGrid(canvas, cols, rows){
   const pad = (CFG.UI?.PAD) ?? 12;
-  const w = Math.min(window.innerWidth - pad*2, (CFG.UI?.BOARD_MAX_W) ?? 900);
+  let viewportW = null;
+  if (typeof window !== 'undefined'){
+    const { innerWidth, visualViewport } = window;
+    if (Number.isFinite(innerWidth)) viewportW = viewportW === null ? innerWidth : Math.min(viewportW, innerWidth);
+    const vvWidth = visualViewport?.width;
+    if (Number.isFinite(vvWidth)) viewportW = viewportW === null ? vvWidth : Math.min(viewportW, vvWidth);
+  }
+  if (typeof document !== 'undefined'){
+    const docWidth = document.documentElement?.clientWidth;
+    if (Number.isFinite(docWidth)) viewportW = viewportW === null ? docWidth : Math.min(viewportW, docWidth);
+  }
+  const boardMaxW = (CFG.UI?.BOARD_MAX_W) ?? 900;
+  const viewportSafeW = viewportW === null ? boardMaxW + pad * 2 : viewportW;
+  const availableW = Math.max(1, viewportSafeW - pad * 2);
+  const w = Math.min(availableW, boardMaxW);
   const h = Math.max(
     Math.floor(w * ((CFG.UI?.BOARD_H_RATIO) ?? (3/7))),
     (CFG.UI?.BOARD_MIN_H) ?? 220
@@ -46,6 +60,16 @@ export function makeGrid(canvas, cols, rows){
 
   if (!Number.isFinite(dpr) || dpr <= 0){
     dpr = 1;
+  }
+
+if (typeof window !== 'undefined'){
+    const vvScale = window.visualViewport?.scale;
+    if (Number.isFinite(vvScale) && vvScale > 0){
+      const scaledDpr = dpr * vvScale;
+      if (Number.isFinite(scaledDpr) && scaledDpr > 0){
+        dpr = Math.min(dpr, scaledDpr);
+      }
+    }
   }
 
   const pixelW = Math.max(1, Math.round(displayW * dpr));
