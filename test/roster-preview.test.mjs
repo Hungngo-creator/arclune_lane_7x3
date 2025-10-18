@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 
 import {
   CLASS_BASE,
+  RANK_MULT,
   ROSTER,
   applyRankAndMods
 } from '../src/catalog.js';
@@ -72,6 +73,15 @@ for (const row of ROSTER_PREVIEW_ROWS) {
       `Preview row mismatch for ${entry.id} stat ${row.stat}`
     );
   }
+}
+
+for (const unit of ROSTER) {
+  const preview = ROSTER_PREVIEWS[unit.id];
+  assert.strictEqual(
+    preview.rankMultiplier,
+    RANK_MULT[unit.rank],
+    `Rank multiplier mismatch for ${unit.id}`
+  );
 }
 
 console.log('roster-preview tests: OK');
