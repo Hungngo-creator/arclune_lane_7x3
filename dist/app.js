@@ -9967,6 +9967,9 @@ __define('./summon.js', (exports, module, __require) => {
   const getUnitArt = __dep2.getUnitArt;
   const __dep3 = __require('./utils/kit.js');
   const kitSupportsSummon = __dep3.kitSupportsSummon;
+  const __dep4 = __require('./passives.js');
+  const prepareUnitForPassives = __dep4.prepareUnitForPassives;
+  const applyOnSpawnEffects = __dep4.applyOnSpawnEffects;
   // local helper
   const tokensAlive = (Game) => Game.tokens.filter(t => t.alive);
 
@@ -10020,6 +10023,12 @@ __define('./summon.js', (exports, module, __require) => {
       try { vfxAddSpawn(Game, cx, cy, side); } catch(_){}
       // gắn instance id
       const spawned = Game.tokens[Game.tokens.length - 1];
+      if (spawned){
+        const meta = (extra.id && Game.meta && typeof Game.meta.get === 'function') ? Game.meta.get(extra.id) : null;
+        const kit = meta?.kit;
+        prepareUnitForPassives(spawned);
+        applyOnSpawnEffects(Game, spawned, kit?.onSpawn);
+      }
       spawned.iid = (hooks.allocIid?.()) ?? (spawned.iid || 0);
 
       // creep hành động NGAY trong chain (1 lượt), chỉ basic theo spec creep cơ bản
