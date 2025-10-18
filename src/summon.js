@@ -3,6 +3,7 @@ import { slotToCell, cellReserved } from './engine.js';
 import { vfxAddSpawn } from './vfx.js';
 import { getUnitArt } from './art.js';
 import { kitSupportsSummon } from './utils/kit.js';
+import { prepareUnitForPassives, applyOnSpawnEffects } from './passives.js';
 // local helper
 const tokensAlive = (Game) => Game.tokens.filter(t => t.alive);
 
@@ -56,6 +57,12 @@ export function processActionChain(Game, side, baseSlot, hooks){
     try { vfxAddSpawn(Game, cx, cy, side); } catch(_){}
     // gắn instance id
     const spawned = Game.tokens[Game.tokens.length - 1];
+    if (spawned){
+      const meta = (extra.id && Game.meta && typeof Game.meta.get === 'function') ? Game.meta.get(extra.id) : null;
+      const kit = meta?.kit;
+      prepareUnitForPassives(spawned);
+      applyOnSpawnEffects(Game, spawned, kit?.onSpawn);
+    }
     spawned.iid = (hooks.allocIid?.()) ?? (spawned.iid || 0);
 
     // creep hành động NGAY trong chain (1 lượt), chỉ basic theo spec creep cơ bản
