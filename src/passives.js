@@ -47,8 +47,8 @@ function recomputeFromStatuses(unit){
   if (!unit || !unit.baseStats) return;
   ensureStatusContainer(unit);
   const base = unit.baseStats;
-  const percent = { atk:0, res:0, wil:0 };
-  const flat    = { atk:0, res:0, wil:0 };
+  const percent = { atk:0, res:0, wil:0, arm:0 };
+  const flat    = { atk:0, res:0, wil:0, arm:0 };
   for (const st of unit.statuses){
     if (!st || !st.attr || !st.mode) continue;
 const stacks = st.stacks == null ? 1 : st.stacks;
@@ -66,10 +66,16 @@ const stacks = st.stacks == null ? 1 : st.stacks;
     const flatAdd = flat.atk || 0;
     unit.atk = Math.max(0, Math.round(base.atk * pct + flatAdd));
   }
-if (base.wil != null){
+ if (base.wil != null){
     const pct = 1 + (percent.wil || 0);
     const flatAdd = flat.wil || 0;
     unit.wil = Math.max(0, Math.round(base.wil * pct + flatAdd));
+  }
+  if (base.arm != null){
+    const pct = 1 + (percent.arm || 0);
+    const flatAdd = flat.arm || 0;
+    const raw = base.arm * pct + flatAdd;
+    unit.arm = clamp01(raw);
   }
   if (base.res != null){
     const pct = 1 + (percent.res || 0);
@@ -146,22 +152,54 @@ const EFFECTS = {
     recomputeFromStatuses(unit);
   },
 
+gainWILPercent({ unit, passive }){
+    if (!unit) return;
+    const params = passive?.params || {};
+    const amount = params.amount ?? 0;
+    const stackable = params.stack !== false;
+    const st = ensureStatBuff(unit, passive.id, { attr:'wil', mode:'percent', amount, purgeable: params.purgeable !== false });
+    const nextStacks = stackable ? (st.stacks || 0) + 1 : 1;
+    applyStatStacks(st, nextStacks, { maxStacks: params.maxStacks });
+    recomputeFromStatuses(unit);
+  },
+
   conditionalBuff({ unit, passive, ctx }){
     if (!unit) return;
     const params = passive?.params || {};
     const hpMax = unit.hpMax || 0;
     const hpPct = hpMax > 0 ? (unit.hp || 0) / hpMax : 0;
     const threshold = params.ifHPgt ?? 0.5;
-    const resBuff = params.RES ?? 0;
-    const wilBuff = params.elseWIL ?? 0;
+    const trueStats = {};
+    const falseStats = {};
+    if (params.RES != null) trueStats.res = params.RES;
+    if (params.ARM != null) trueStats.arm = params.ARM;
+    if (params.ATK != null) trueStats.atk = params.ATK;
+    if (params.WIL != null) trueStats.wil = params.WIL;
+    if (params.elseRES != null) falseStats.res = params.elseRES;
+    if (params.elseARM != null) falseStats.arm = params.elseARM;
+    if (params.elseATK != null) falseStats.atk = params.elseATK;
+    if (params.elseWIL != null) falseStats.wil = params.elseWIL;
+
+    const purgeable = params.purgeable !== false;
+    const applyStats = (stats, suffix) => {
+      for (const [stat, amount] of Object.entries(stats)){
+        const attr = stat.toLowerCase();
+        const st = ensureStatBuff(unit, `${passive.id}_${attr}`, { attr, mode:'percent', amount, purgeable });
+        applyStatStacks(st, 1);
+      }
+    };
+    const removeStats = (stats) => {
+      for (const stat of Object.keys(stats)){
+        Statuses.remove(unit, `${passive.id}_${stat.toLowerCase()}`);
+      }
+    };
+
     if (hpPct > threshold){
-      const st = ensureStatBuff(unit, `${passive.id}_res`, { attr:'res', mode:'percent', amount: resBuff, purgeable: params.purgeable !== false });
-      applyStatStacks(st, 1);
-      Statuses.remove(unit, `${passive.id}_wil`);
+      applyStats(trueStats);
+      removeStats(falseStats);
     } else {
-      const st = ensureStatBuff(unit, `${passive.id}_wil`, { attr:'wil', mode:'percent', amount: wilBuff, purgeable: params.purgeable !== false });
-      applyStatStacks(st, 1);
-      Statuses.remove(unit, `${passive.id}_res`);
+      applyStats(falseStats);
+      removeStats(trueStats);
     }
     recomputeFromStatuses(unit);
   },
@@ -207,6 +245,7 @@ const EFFECTS = {
 const EFFECT_MAP = {
   placeMark: EFFECTS.placeMark,
   'gainATK%': EFFECTS.gainATKPercent,
+  'gainWIL%': EFFECTS.gainWILPercent,
   conditionalBuff: EFFECTS.conditionalBuff,
   'gainRES%': EFFECTS.gainRESPct,
   gainBonus: EFFECTS.gainBonus

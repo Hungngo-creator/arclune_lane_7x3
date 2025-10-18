@@ -38,9 +38,46 @@ export const ROSTER = [
     mods: { WIL:+0.10, AEregen:+0.10 }, // 20% tổng
     kit: {
       onSpawn: { rage: 100, exceptLeader: true },
-      ult: { type: 'drain', aoe: 'allEnemies', notes: 'lifedrain->overheal->shield; không summon' },
+      basic: {
+        name: 'Đánh Thường',
+        tags: ['single-target', 'lifesteal', 'mark'],
+        lifesteal: 0.10,
+        mark: { id: 'mark_devour', maxStacks: 3, ttlTurns: 3 }
+      },
+      skills: [
+        { key: 'skill1', name: 'Song Huyết Cầu', cost: { aether: 25 }, hits: 2, countsAsBasic: true, targets: 'randomEnemies', notes: 'Mỗi hit làm mới thời hạn Phệ Ấn.' },
+        { key: 'skill2', name: 'Huyết Chướng', cost: { aether: 25 }, duration: 2, reduceDamage: 0.30, healPercentMaxHPPerTurn: 0.15, untargetable: true },
+        { key: 'skill3', name: 'Huyết Thệ', cost: { aether: 40 }, duration: 5, link: { sharePercent: 0.5, maxLinks: 1 } }
+      ],
+      ult: {
+        type: 'drain',
+        countsAsBasic: true,
+        aoe: 'allEnemies',
+        hpDrainPercentCurrent: 0.07,
+        damageScaleWIL: 0.80,
+        healSelfFromTotal: 0.40,
+        healAlliesFromTotal: 0.30,
+        overhealShieldCap: 1.0,
+        selfBuff: { stat: 'WIL', amount: 0.20, turns: 2 },
+        marksPerTarget: 1,
+        notes: 'Không thể né; mỗi mục tiêu nhận thêm 1 Phệ Ấn.'
+      },
+      talent: {
+        name: 'Phệ Ấn',
+        id: 'mark_devour',
+        maxStacks: 3,
+        ttlTurns: 3,
+        explosion: { scaleWIL: 0.50 },
+        blessing: { hpMax: 0.15, hpRegen: 0.50 }
+      },
+      technique: null,
       passives: [
-        { id:'mark_devour', when:'onBasicHit', effect:'placeMark', params:{ stacksToExplode:3, ttlTurns:3, dmgFromWIL:0.5, purgeable:false } }
+       { id:'mark_devour', name:'Phệ Ấn', when:'onBasicHit', effect:'placeMark', params:{ stacksToExplode:3, ttlTurns:3, dmgFromWIL:0.5, purgeable:false } }
+      ],
+      traits: [
+        { id: 'mark_cap', text: 'Phệ Ấn tối đa 3 tầng và tự kích nổ vào lượt của mục tiêu.' },
+        { id: 'overheal_cap', text: 'Hút máu dư chuyển thành Giáp Máu tối đa bằng 100% Máu tối đa.' },
+        { id: 'link_limit', text: 'Chỉ duy trì 1 liên kết Huyết Thệ cùng lúc.' }
       ]
     }
   },
@@ -49,8 +86,38 @@ export const ROSTER = [
     mods: { ATK:+0.12, PER:+0.08 },
     kit: {
       onSpawn: { rage: 100, exceptLeader: true },
-      ult: { type:'strikeLaneMid', hits:4, tagAsBasic:true, bonusVsLeader:0.20, penRES:0.30 },
-      passives: [{ id:'atk_on_ult', when:'onUltCast', effect:'gainATK%', params:{ amount:+0.10, duration:'perm', stack:true } }]
+      basic: {
+        name: 'Đánh Thường',
+        tags: ['single-target', 'armor-pierce'],
+        piercePercent: 0.05
+      },
+      skills: [
+        { key: 'skill1', name: 'Loạn Trảm Dạ Hành', cost: { aether: 25 }, countsAsBasic: true, targets: 'randomRow', damageMultiplier: 1.50 },
+        { key: 'skill2', name: 'Ngũ Kiếm Huyền Ấn', cost: { aether: 20 }, duration: 'battle', randomStance: ['Kiếm Sinh','Kiếm Ma','Kiếm Thổ','Kiếm Hỏa','Kiếm Hư'] },
+        { key: 'skill3', name: 'Kiếm Ý Tinh Luyện', cost: { aether: 25 }, delayTurns: 1, duration: 3, buffStats: { ATK: 0.20, WIL: 0.20 } }
+      ],
+      ult: {
+        type:'strikeLaneMid',
+        countsAsBasic: true,
+        hits:4,
+        penRES:0.30,
+        bonusVsLeader:0.20,
+        targets:'columnMid'
+      },
+      talent: {
+        name: 'Kiếm Tâm',
+        scaling: { stats: { ATK: 0.05, WIL: 0.05 }, basedOn: 'battleStart' }
+      },
+      technique: null,
+      passives: [
+        { id:'atk_on_ult', name:'Kiếm Tâm - ATK', when:'onUltCast', effect:'gainATK%', params:{ amount:+0.05, duration:'perm', stack:true, purgeable:false } },
+        { id:'wil_on_ult', name:'Kiếm Tâm - WIL', when:'onUltCast', effect:'gainWIL%', params:{ amount:+0.05, duration:'perm', stack:true, purgeable:false } }
+      ],
+      traits: [
+        { id:'stance_unique', text:'Ngũ Kiếm Huyền Ấn chỉ chọn 1 trạng thái cho tới hết trận.' },
+        { id:'refine_delay', text:'Kiếm Ý Tinh Luyện kích hoạt sau 1 lượt trì hoãn.' },
+        { id:'ult_scaling', text:'Mỗi lần dùng Vạn Kiếm Quy Tông cộng vĩnh viễn +5% ATK/WIL (không giới hạn).' }
+      ]
     }
   },
   {
@@ -58,9 +125,44 @@ export const ROSTER = [
     mods: { RES:+0.10, WIL:+0.10 },
     kit: {
       onSpawn: { rage: 100, exceptLeader: true },
-      ult: { type:'selfBuff', reduceDmg:0.35, turns:2, selfHPTrade:0.10 },
-      passives: [{ id:'swap_res_wil', when:'onTurnStart', effect:'conditionalBuff',
-                   params:{ ifHPgt:0.5, RES:+0.20, elseWIL:+0.20, purgeable:false } }]
+      basic: {
+        name: 'Đánh Thường',
+        hits: 2,
+        tags: ['multi-hit', 'spd-debuff'],
+        debuff: { stat: 'SPD', amount: -0.02, maxStacks: 5 }
+      },
+      skills: [
+        { key: 'skill1', name: 'Lôi Ảnh Tam Kích', cost: { aether: 25 }, hits: 3, countsAsBasic: true, targets: 'randomEnemies', bonusIfAdjacent: 0.10 },
+        { key: 'skill2', name: 'Ngũ Lôi Phệ Thân', cost: { aether: 35 }, hpTradePercent: 0.05, hits: 5, targets: 'randomEnemies' },
+        { key: 'skill3', name: 'Lôi Thể Bách Chiến', cost: { aether: 30 }, bonusMaxHPBase: 0.20, limitUses: 3 }
+      ],
+      ult: {
+        type:'hpTradeBurst',
+        countsAsBasic: true,
+        hpTradePercent: 0.15,
+        hits: 3,
+        damage: { percentTargetMaxHP: 0.07, bossPercent: 0.04, scaleWIL: 0.50 },
+        reduceDmg: 0.30,
+        duration: 2,
+        appliesDebuff: { stat: 'SPD', amount: -0.02, maxStacks: 5 },
+        notes: 'Không tự sát, tối thiểu còn 1 HP.'
+      },
+      talent: {
+        name: 'Song Thể Lôi Đạo',
+        conditional: {
+          ifHPAbove: 0.5,
+          stats: { ARM: 0.20, RES: 0.20 },
+          elseStats: { ATK: 0.20, WIL: 0.20 }
+        }
+      },
+      technique: null,
+      passives: [{ id:'swap_res_wil', name:'Song Thể Lôi Đạo', when:'onTurnStart', effect:'conditionalBuff',
+                   params:{ ifHPgt:0.5, RES:+0.20, ARM:+0.20, elseATK:+0.20, elseWIL:+0.20, purgeable:false } }],
+      traits: [
+        { id:'hp_trade_limits', text:'Mọi kỹ năng đốt máu không thể khiến Lôi Thiên Ảnh tự sát (tối thiểu còn 1 HP).' },
+        { id:'spd_burn', text:'Giảm SPD cộng dồn tối đa 5 tầng từ đòn đánh thường và tuyệt kỹ.' },
+        { id:'body_fortify_lock', text:'Lôi Thể Bách Chiến bị khoá vĩnh viễn sau 3 lần sử dụng.' }
+      ]
     }
   },
   {
@@ -68,8 +170,27 @@ export const ROSTER = [
     mods: { WIL:+0.10, PER:+0.10 },
     kit: {
       onSpawn: { rage: 100, exceptLeader: true },
-      ult: { type:'sleep', targets:3, turns:2 },
-      passives: [{ id:'res_per_sleeping_enemy', when:'onTurnStart', effect:'gainRES%', params:{ perTarget:+0.02, unlimited:true } }]
+      basic: {
+        name: 'Đánh Thường',
+        tags: ['single-target', 'sleep-setup'],
+        debuff: { id: 'me_hoac', stacks: 1, maxStacks: 4 }
+      },
+      skills: [
+        { key: 'skill1', name: 'Mộng Trảo', cost: { aether: 25 }, hits: 3, countsAsBasic: true, targets: 'randomEnemies' },
+        { key: 'skill2', name: 'Vạn Mộng Trận', cost: { aether: 35 }, hits: 5, countsAsBasic: true, targets: 'randomEnemies' },
+        { key: 'skill3', name: 'Mộng Giới Hộ Thân', cost: { aether: 20 }, duration: 3, reduceDamage: 0.20 }
+      ],
+      ult: { type:'sleep', targets:3, turns:2, bossModifier:0.5 },
+      talent: {
+        name: 'Mê Mộng Chú',
+        resPerSleeping: 0.02
+      },
+      technique: null,
+      passives: [{ id:'res_per_sleeping_enemy', name:'Mê Mộng Chú', when:'onTurnStart', effect:'gainRES%', params:{ perTarget:+0.02, unlimited:true } }],
+      traits: [
+        { id:'me_hoac_limit', text:'Tối đa 4 tầng Mê Hoặc, kích hoạt ngủ trong 1 lượt rồi đặt lại.' },
+        { id:'boss_sleep_half', text:'Boss PvE chỉ ngủ nửa thời gian (làm tròn xuống).' }
+      ]
     }
   },
   {
@@ -77,8 +198,26 @@ export const ROSTER = [
     mods: { WIL:+0.10, RES:+0.10 },
     kit: {
       onSpawn: { rage: 100, exceptLeader: true },
-      ult: { type:'revive', targets:1, revived:{ rage:0, lockSkillsTurns:1 } },
-      passives: [{ id:'res_stack_per_action', when:'onActionEnd', effect:'gainRES%', params:{ amount:+0.01, stack:true, purgeable:false } }]
+      basic: {
+        name: 'Đánh Thường',
+        tags: ['single-target']
+      },
+      skills: [
+        { key:'skill1', name:'Tế Lễ Phản Hồn', cost:{ aether:20 }, duration:3, selfRegenPercent:0.08 },
+        { key:'skill2', name:'Thí Thân Hộ Chủ', cost:{ aether:15 }, sacrifice:true, reviveDelayTurns:4, reviveReturn:{ hpPercent:0.5, ragePercent:0.5, aether:0 }, grantLeader:{ buff:'indomitability', stacks:1 } },
+        { key:'skill3', name:'Tế Vũ Tăng Bão', cost:{ aether:20 }, duration:4, rageGainBonus:0.50 }
+      ],
+      ult: { type:'revive', targets:1, revived:{ rage:0, lockSkillsTurns:1, hpPercent:0.15 } },
+      talent: {
+        name:'Phục Tế Khôi Minh',
+        perActionStacks:{ ARM:0.03, RES:0.03 }
+      },
+      technique: null,
+      passives: [{ id:'res_stack_per_action', name:'Phục Tế Khôi Minh', when:'onActionEnd', effect:'gainRES%', params:{ amount:+0.01, stack:true, purgeable:false } }],
+      traits: [
+        { id:'self_sacrifice_return', text:'Sau 4 lượt tự hiến, Kỳ Diêu hồi sinh với 50% HP, 50% nộ và 0 Aether; sân kín thì biến mất.' },
+        { id:'revive_lock', text:'Đồng minh do tuyệt kỹ hồi sinh bị khoá kỹ năng 1 lượt và nộ về 0.' }
+      ]
     }
   },
   {
@@ -86,7 +225,26 @@ export const ROSTER = [
     mods: { WIL:+0.10, AEmax:+0.10 },
     kit: {
       onSpawn: { rage: 100, exceptLeader: true, teamHealOnEntry:0.05 },
-      ult: { type:'equalizeHP', allies:3, healLeader:true }
+      basic: {
+        name: 'Đánh Thường',
+        tags: ['single-target']
+      },
+      skills: [
+        { key:'skill1', name:'Cán Cân Giáng Phạt', cost:{ aether:20 }, countsAsBasic:true, damageMultiplier:1.50 },
+        { key:'skill2', name:'Phán Xét Cứu Rỗi', cost:{ aether:15 }, healPercentCasterMaxHP:0.10, targets:3 },
+        { key:'skill3', name:'Cân Bằng Sinh Mệnh', cost:{ aether:15 }, bonusMaxHPBase:0.10, limitUses:5 }
+      ],
+      ult: { type:'equalizeHP', allies:3, healLeader:true, leaderHealPercentCasterMaxHP:0.10 },
+      talent: {
+        name:'Thăng Bình Pháp Lực',
+        onSpawnHealPercent:0.05
+      },
+      technique: null,
+      passives: [],
+      traits: [
+        { id:'hp_balance', text:'Cân bằng HP không vượt quá ngưỡng tối đa và bỏ qua Leader.' },
+        { id:'hp_gain_cap', text:'Cân Bằng Sinh Mệnh chỉ dùng tối đa 5 lần mỗi trận.' }
+      ]
     }
   },
   {
@@ -94,13 +252,28 @@ export const ROSTER = [
     mods: { ATK:+0.10, PER:+0.10 },
     kit: {
       onSpawn: { rage: 100, exceptLeader: true },
-      // Immediate Summon: 2 creep cùng CỘT (slot-1 & slot+1 nếu trống), hành động ngay theo slot tăng dần.
-      ult: { type:'summon',
-  pattern:'verticalNeighbors', count:2, ttl:3,
-  inherit:{ HP:0.50, ATK:0.50 }, limit:2, replace:'oldest',
-  creep:{ hasRage:false, canChain:false, basicOnly:true },
+basic: {
+        name: 'Đánh Thường',
+        tags: ['single-target']
       },
-      passives: [{ id:'basic_dmg_per_minion', when:'onBasicHit', effect:'gainBonus', params:{ perMinion:+0.02 } }]
+      skills: [
+        { key:'skill1', name:'Sai Khiển Tiểu Đệ', cost:{ aether:15 }, ordersMinions:2 },
+        { key:'skill2', name:'Khiên Mộc Dẫn Địch', cost:{ aether:20 }, duration:3, applyTauntToMinions:true },
+        { key:'skill3', name:'Tăng Cường Tòng Bộc', cost:{ aether:20 }, inheritBonus:{ HP:0.20, ATK:0.20, WIL:0.20 }, limitUses:5 }
+      ],
+      ult: { type:'summon', pattern:'verticalNeighbors', count:2, ttl:4, inherit:{ HP:0.50, ATK:0.50, WIL:0.50 }, limit:2, replace:'oldest', creep:{ hasRage:false, canChain:false, basicOnly:true } },
+      talent: {
+        name:'Đại Ca Đầu Đàn',
+        perMinionBasicBonus:0.15,
+        onMinionDeath:{ stats:{ ATK:0.05, WIL:0.05 }, maxStacks:3 }
+      },
+      technique: null,
+      passives: [{ id:'basic_dmg_per_minion', name:'Đại Ca Đầu Đàn', when:'onBasicHit', effect:'gainBonus', params:{ perMinion:+0.02 } }],
+      traits: [
+        { id:'summon_ttl', text:'Tiểu đệ tồn tại tối đa 4 lượt và không thể hồi sinh.' },
+        { id:'summon_limit', text:'Chỉ duy trì tối đa 2 tiểu đệ; triệu hồi mới thay thế đơn vị tồn tại lâu nhất.' },
+        { id:'boost_lock', text:'Tăng Cường Tòng Bộc khóa sau 5 lần sử dụng và chỉ ảnh hưởng tiểu đệ triệu hồi sau đó.' }
+      ]
     }
   },
   {
@@ -108,7 +281,26 @@ export const ROSTER = [
     mods: { ARM:+0.10, ATK:+0.10 },
     kit: {
       onSpawn: { rage: 100, exceptLeader: true },
-      ult: { type:'haste', targets:'self+2allies', attackSpeed:+0.20, turns:2 }
+      basic: {
+        name: 'Đánh Thường',
+        tags: ['single-target']
+      },
+      skills: [
+        { key:'skill1', name:'Trảm Cảnh Giới', cost:{ aether:20 }, countsAsBasic:true, damageMultiplier:1.50 },
+        { key:'skill2', name:'Thành Lũy Tạm Thời', cost:{ aether:15 }, duration:3, buffStats:{ RES:0.20, ARM:0.20 } },
+        { key:'skill3', name:'Kiên Cố Trường Kỳ', cost:{ aether:20 }, permanent:true, buffStats:{ RES:0.05, ARM:0.05 }, lowHPBonus:{ threshold:0.30, stats:{ RES:0.15, ARM:0.15 } } }
+      ],
+      ult: { type:'haste', targets:'self+2allies', attackSpeed:+0.20, turns:2, selfBasicBonus:0.05 },
+      talent: {
+        name:'Cảnh Giới Bất Biến',
+        onSpawnStats:{ AGI:0.05, ATK:0.05 }
+      },
+      technique: null,
+      passives: [],
+      traits: [
+        { id:'permanent_stack', text:'Kiên Cố Trường Kỳ cộng dồn vĩnh viễn, mạnh hơn khi HP < 30%.' },
+        { id:'ult_damage_bonus', text:'Trong thời gian Còi Tăng Tốc, đòn đánh thường gây thêm 5% sát thương.' }
+      ]
     }
   }
 ];
