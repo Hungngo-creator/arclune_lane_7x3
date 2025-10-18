@@ -15,6 +15,17 @@ export function createAppShell(options = {}){
     screenParams: options.screenParams || null
   };
   const listeners = new Set();
+  let errorHandler = typeof options.onError === 'function' ? options.onError : null;
+
+  function dispatchError(error, context){
+    console.error('[shell] listener error', error);
+    if (!errorHandler) return;
+    try {
+      errorHandler(error, context || null);
+    } catch (handlerError) {
+      console.error('[shell] error handler failure', handlerError);
+    }
+  }
 
   function notify(){
     const snapshot = cloneState(state);
@@ -22,7 +33,7 @@ export function createAppShell(options = {}){
       try {
         fn(snapshot);
       } catch (err) {
-        console.error('[shell] listener error', err);
+        dispatchError(err, { phase: 'notify', listener: fn });
       }
     }
   }
@@ -54,7 +65,7 @@ export function createAppShell(options = {}){
     try {
       handler(cloneState(state));
     } catch (err) {
-      console.error('[shell] listener error', err);
+      dispatchError(err, { phase: 'subscribe', listener: handler });
     }
     return ()=>{
       listeners.delete(handler);
@@ -76,7 +87,14 @@ export function createAppShell(options = {}){
     getState(){
       return cloneState(state);
     },
-    onChange: subscribe
+    onChange: subscribe,
+    setErrorHandler(handler){
+      if (typeof handler === 'function'){
+        errorHandler = handler;
+      } else {
+        errorHandler = null;
+      }
+    }
   };
 }
 
