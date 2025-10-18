@@ -1784,7 +1784,10 @@ __define('./combat.js', (exports, module, __require) => {
    
     // Tính raw và modifiers trước giáp
     const dtype = 'physical';
-    const rawBase = Math.max(1, Math.floor(unit.atk || 0));
+    const rawBase = Math.max(
+      1,
+      Math.floor((unit.atk || 0) + (unit.wil || 0))
+    );
     const modBase = Math.max(
       1,
       Math.floor(rawBase * ((passiveCtx.damage?.baseMul) ?? 1) + ((passiveCtx.damage?.flatAdd) ?? 0))
