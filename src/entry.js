@@ -669,8 +669,15 @@ async function mountPveScreen(params){
     if (!rootElement){
       throw new Error('Không tìm thấy phần tử #appRoot.');
     }
-    shellInstance = createAppShell();
     renderMessageRef = renderMessage;
+    const handleShellError = (error) => {
+      console.error('Arclune shell listener error', error);
+      const renderer = renderMessageRef || renderMessage;
+      if (renderer){
+        showFatalError(error, renderer, bootstrapOptions);
+      }
+    };
+    shellInstance = createAppShell({ onError: handleShellError });
     bootstrapOptions.isFileProtocol = isFileProtocol;
     let lastScreen = null;
     let lastParams = null;
