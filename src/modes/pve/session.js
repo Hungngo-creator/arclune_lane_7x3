@@ -367,13 +367,13 @@ function ensureSceneCache(){
   const theme = (sceneCfg.THEMES && themeKey) ? sceneCfg.THEMES[themeKey] : null;
   const backgroundKey = Game.backgroundKey;
   const backgroundSignature = computeBackgroundSignature(backgroundKey);
-  const dpr = grid.dpr ?? 1;
+  const dpr = Number.isFinite(grid.dpr) && grid.dpr > 0 ? grid.dpr : 1;
   const cssWidth = grid.w ?? (canvas ? canvas.width / dpr : 0);
   const cssHeight = grid.h ?? (canvas ? canvas.height / dpr : 0);
   if (!cssWidth || !cssHeight) return null;
   const pixelWidth = Math.max(1, Math.round(cssWidth * dpr));
   const pixelHeight = Math.max(1, Math.round(cssHeight * dpr));
-  
+
   const baseScene = getCachedBattlefieldScene(grid, theme, { width: cssWidth, height: cssHeight, dpr });
   const baseKey = baseScene?.cacheKey;
   if (!baseScene){
