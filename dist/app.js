@@ -2170,6 +2170,10 @@ __define('./data/announcements.js', (exports, module, __require) => {
   module.exports.default = exports.default;
 });
 __define('./data/economy.js', (exports, module, __require) => {
+  const __dep0 = __require('./utils/format.js');
+  const HAS_INTL_NUMBER_FORMAT = __dep0.HAS_INTL_NUMBER_FORMAT;
+  const createNumberFormatter = __dep0.createNumberFormatter;
+
   const CURRENCY_IDS = Object.freeze({
     VNT: 'VNT',
     HNT: 'HNT',
@@ -2244,20 +2248,22 @@ __define('./data/economy.js', (exports, module, __require) => {
     return valueInBase / to.ratioToBase;
   }
 
-  const FORMATTER_STANDARD = new Intl.NumberFormat('vi-VN', {
+  const FORMATTER_STANDARD = createNumberFormatter('vi-VN', {
     maximumFractionDigits: 0
   });
 
   let FORMATTER_COMPACT = FORMATTER_STANDARD;
   let HAS_COMPACT_FORMAT = false;
-  try {
-    FORMATTER_COMPACT = new Intl.NumberFormat('vi-VN', {
-      notation: 'compact',
-      maximumFractionDigits: 1
-    });
-    HAS_COMPACT_FORMAT = true;
-  } catch (error) {
-    FORMATTER_COMPACT = FORMATTER_STANDARD;
+  if (HAS_INTL_NUMBER_FORMAT){
+    try {
+      FORMATTER_COMPACT = createNumberFormatter('vi-VN', {
+        notation: 'compact',
+        maximumFractionDigits: 1
+      });
+      HAS_COMPACT_FORMAT = true;
+    } catch (error) {
+      FORMATTER_COMPACT = FORMATTER_STANDARD;
+    }
   }
 
   function formatBalance(value, currencyId, options = {}){
@@ -2293,12 +2299,14 @@ __define('./data/economy.js', (exports, module, __require) => {
 
     let formatter = shouldUseCompact ? FORMATTER_COMPACT : FORMATTER_STANDARD;
     if (typeof precision === 'number'){
-      const formatterNotation = shouldUseCompact ? 'compact' : 'standard';
-      formatter = new Intl.NumberFormat('vi-VN', {
-        notation: formatterNotation,
+      const formatterOptions = {
         maximumFractionDigits: precision,
         minimumFractionDigits: precision
-      });
+      };
+      if (shouldUseCompact && HAS_INTL_NUMBER_FORMAT){
+        formatterOptions.notation = 'compact';
+      }
+      formatter = createNumberFormatter('vi-VN', formatterOptions);
     }
 
     const formatted = formatter.format(amount);
@@ -7720,6 +7728,8 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
   const listCurrencies = __dep3.listCurrencies;
   const __dep4 = __require('./data/skills.js');
   const getSkillSet = __dep4.getSkillSet;
+  const __dep5 = __require('./utils/format.js');
+  const createNumberFormatter = __dep5.createNumberFormatter;
 
   const STYLE_ID = 'collection-view-style-v2';
 
@@ -7732,7 +7742,7 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
   ];
 
   const currencyCatalog = listCurrencies();
-  const currencyFormatter = new Intl.NumberFormat('vi-VN');
+  const currencyFormatter = createNumberFormatter('vi-VN');
 
   function ensureStyles(){
     if (typeof document === 'undefined') return;
@@ -10588,6 +10598,49 @@ __define('./utils/dummy.js', (exports, module, __require) => {
   }
 
   exports.ensureNestedModuleSupport = ensureNestedModuleSupport;
+});
+__define('./utils/format.js', (exports, module, __require) => {
+  const HAS_INTL_NUMBER_FORMAT = typeof Intl === 'object' && typeof Intl.NumberFormat === 'function';
+
+  function createNumberFormatter(locale, options){
+    if (HAS_INTL_NUMBER_FORMAT){
+      return new Intl.NumberFormat(locale, options);
+    }
+
+    const hasLocaleString = typeof Number.prototype.toLocaleString === 'function';
+
+    return {
+      format(value){
+        if (typeof value === 'number'){
+          if (hasLocaleString){
+            try {
+              return value.toLocaleString();
+            } catch (error) {
+              return String(value);
+            }
+          }
+          return String(value);
+        }
+
+        if (value == null){
+          return '';
+        }
+
+        if (hasLocaleString && typeof value?.toLocaleString === 'function'){
+          try {
+            return value.toLocaleString();
+          } catch (error) {
+            return String(value);
+          }
+        }
+
+        return String(value);
+      }
+    };
+  }
+
+  exports.HAS_INTL_NUMBER_FORMAT = HAS_INTL_NUMBER_FORMAT;
+  exports.createNumberFormatter = createNumberFormatter;
 });
 __define('./utils/kit.js', (exports, module, __require) => {
   const KNOWN_SUMMON_KEYS = ['summon', 'summoner', 'immediateSummon'];
