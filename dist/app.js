@@ -7674,8 +7674,8 @@ __define('./scene.js', (exports, module, __require) => {
   exports.drawBattlefieldScene = drawBattlefieldScene;
 });
 __define('./screens/collection/index.js', (exports, module, __require) => {
-  const __dep1 = __require('./screens/collection/view.js');
-  const renderCollectionView = __dep1.renderCollectionView;
+  const __dep0 = __require('./screens/collection/view.js');
+  const renderCollectionView = __dep0.renderCollectionView;
 
   function mergeParams(base, override){
     if (!base && !override) return null;
@@ -7709,10 +7709,9 @@ __define('./screens/collection/index.js', (exports, module, __require) => {
     });
   }
 
-  const __reexport0 = __require('./screens/collection/view.js');
+  exports.renderCollectionView = renderCollectionView;
 
   const __defaultExport = { renderCollectionScreen };
-  exports.renderCollectionView = __reexport0.renderCollectionView;
   exports.renderCollectionScreen = renderCollectionScreen;
   exports.default = __defaultExport;
   module.exports.default = exports.default;
