@@ -23,6 +23,10 @@ __define('./ai.js', (exports, module, __require) => {
   const CFG = __dep1.CFG;
   const __dep2 = __require('./utils/time.js');
   const sharedSafeNow = __dep2.safeNow;
+  const __dep3 = __require('./utils/kit.js');
+  const detectUltBehavior = __dep3.detectUltBehavior;
+  const getSummonSpec = __dep3.getSummonSpec;
+  const resolveSummonSlots = __dep3.resolveSummonSlots;
 
   const safeNow = () => sharedSafeNow();
 
@@ -58,17 +62,13 @@ __define('./ai.js', (exports, module, __require) => {
   }
 
   function detectKitTraits(meta){
-    const ult = meta?.kit?.ult || {};
-    const tags = Array.isArray(ult.tags) ? ult.tags : [];
-    const hasInstant = !!(ult.instant || ult.cast === 'instant' || ult.immediate === true
-      || (meta?.class === 'Summoner' && ult.type === 'summon'));
-    const hasDefBuff = typeof ult.reduceDmg === 'number'
-      || typeof ult.shield === 'number'
-      || typeof ult.barrier === 'number'
-      || ult.type === 'selfBuff'
-      || tags.includes('defense');
-    const hasRevive = ult.type === 'revive' || ult.revive === true || typeof ult.revived === 'object';
-    return { hasInstant, hasDefBuff, hasRevive };
+    const analysis = detectUltBehavior(meta?.kit || meta || {});
+    const hasInstant = analysis.hasInstant || (meta?.class === 'Summoner' && !!analysis.summon);
+    return {
+      hasInstant: !!hasInstant,
+      hasDefBuff: !!analysis.hasDefensive,
+      hasRevive: !!analysis.hasRevive
+    };
   }
 
   function exportCandidateDebug(entry){
@@ -124,37 +124,20 @@ __define('./ai.js', (exports, module, __require) => {
     const far  = sameRow.length - near;
     return Math.max(0, Math.min(1, 1 - (near*0.6 + far*0.2)/3));
   }
-  function getPatternSlots(pattern, baseSlot){
-    switch(pattern){
-      case 'verticalNeighbors': {
-        const row = (baseSlot - 1) % 3;
-        const v = [];
-        if (row > 0) v.push(baseSlot - 1);
-        if (row < 2) v.push(baseSlot + 1);
-        return v;
-      }
-      case 'rowNeighbors': {
-        const col = Math.floor((baseSlot - 1) / 3);
-        const row = (baseSlot - 1) % 3;
-        const left  = (col < 2) ? ((col + 1) * 3 + row + 1) : null;
-        const right = (col > 0) ? ((col - 1) * 3 + row + 1) : null;
-        return [right, left].filter(Boolean);
-      }
-      default: return [];
-    }
-  }
   function summonerFeasibility(Game, unitId, baseSlot, aliveTokens){
     const meta = Game.meta.get(unitId);
-    if (!meta || meta.class !== 'Summoner' || meta?.kit?.ult?.type !== 'summon') return 1.0;
-    const u = meta.kit.ult;
+    if (!meta || meta.class !== 'Summoner') return 1.0;
+    const summonSpec = getSummonSpec(meta);
+    if (!summonSpec) return 1.0;
     const alive = Array.isArray(aliveTokens) ? aliveTokens : tokensAlive(Game);
-    const cand = getPatternSlots(u.pattern || 'verticalNeighbors', baseSlot)
+    const cand = resolveSummonSlots(summonSpec, baseSlot)
       .filter(Boolean)
       .filter(s => {
         const { cx, cy } = slotToCell('enemy', s);
         return !cellReserved(alive, Game.queued, cx, cy);
       });
-    const need = Math.max(1, u.count || 1);
+    const countRaw = Number(summonSpec.count);
+    const need = Math.max(1, Number.isFinite(countRaw) ? countRaw : 1);
     return Math.min(1, cand.length / need);
   }
   function candidateBlocked(Game, entry, aliveTokens){
@@ -168,18 +151,20 @@ __define('./ai.js', (exports, module, __require) => {
     if (cellReserved(alive, Game.queued, cx, cy)) return 'cellReserved';
 
     const meta = entry.meta;
-    if (meta && meta.class === 'Summoner' && meta?.kit?.ult?.type === 'summon'){
-      const ult = meta.kit.ult || {};
-      const patternSlots = getPatternSlots(ult.pattern || 'verticalNeighbors', slot).filter(Boolean);
-      if (patternSlots.length){
-        let available = 0;
-        for (const s of patternSlots){
-          const { cx: scx, cy: scy } = slotToCell('enemy', s);
-          if (!cellReserved(alive, Game.queued, scx, scy)) available += 1;
+    if (meta && meta.class === 'Summoner'){
+      const summonSpec = getSummonSpec(meta);
+      if (summonSpec){
+        const patternSlots = resolveSummonSlots(summonSpec, slot).filter(Boolean);
+        if (patternSlots.length){
+          let available = 0;
+          for (const s of patternSlots){
+            const { cx: scx, cy: scy } = slotToCell('enemy', s);
+            if (!cellReserved(alive, Game.queued, scx, scy)) available += 1;
+          }
+          const countRaw = Number(summonSpec.count);
+          const need = Math.min(patternSlots.length, Math.max(1, Number.isFinite(countRaw) ? countRaw : 1));
+          if (available < need) return 'summonBlocked';
         }
-        const countRaw = Number(ult.count);
-        const need = Math.min(patternSlots.length, Math.max(1, Number.isFinite(countRaw) ? countRaw : 1));
-        if (available < need) return 'summonBlocked';
       }
     }
     return null;
@@ -1304,6 +1289,8 @@ __define('./background.js', (exports, module, __require) => {
 __define('./catalog.js', (exports, module, __require) => {
   //v0.7
   // 1) Rank multiplier (đơn giản) — áp lên TẤT CẢ stat trừ SPD
+  const __dep0 = __require('./utils/kit.js');
+  const kitSupportsSummon = __dep0.kitSupportsSummon;
   const RANK_MULT = { N:0.60, R:0.80, SR:1.00, SSR:1.30, UR:1.60, Prime:2.00 };
 
   // 2) Class base (mốc lv1 để test). SPD không chịu rank multiplier.
@@ -1335,7 +1322,7 @@ __define('./catalog.js', (exports, module, __require) => {
 
   // 4) Roster (dex/meta) — 8 nhân vật, ngân sách mod bằng nhau (~+20% tổng, không đụng SPD)
   //  - onSpawn.rage: 100 cho mọi unit từ deck (trừ leader). Revive không áp quy tắc này.
-  //  - kit.ult.type: 'summon' chỉ dành cho class Summoner -> kích hoạt Immediate Summon (action-chain).
+  //  - kit.traits.summon / kit.ult.summon đánh dấu Summoner -> kích hoạt Immediate Summon (action-chain).
   const ROSTER = [
     {
       id: 'phe', name: 'Phệ', class: 'Mage', rank: 'Prime',
@@ -1614,7 +1601,7 @@ __define('./catalog.js', (exports, module, __require) => {
   const getMetaById = (id) => ROSTER_MAP.get(id);
   const isSummoner = (id) => {
     const m = getMetaById(id);
-    return !!(m && m.class === 'Summoner' && m.kit?.ult?.type === 'summon');
+    return !!(m && m.class === 'Summoner' && kitSupportsSummon(m));
   };
 
   exports.RANK_MULT = RANK_MULT;
@@ -5161,13 +5148,15 @@ __define('./main.js', (exports, module, __require) => {
   exports.onGameEvent = onGameEvent;
 });
 __define('./meta.js', (exports, module, __require) => {
-  //v0.7
+  //v0.8
   // meta.js — gom lookup + stat khởi tạo + nộ khởi điểm
   const __dep0 = __require('./catalog.js');
   const CLASS_BASE = __dep0.CLASS_BASE;
   const getMetaById = __dep0.getMetaById;
-  const _isSummoner = __dep0.isSummoner;
   const applyRankAndMods = __dep0.applyRankAndMods;
+  const __dep1 = __require('./utils/kit.js');
+  const kitSupportsSummon = __dep1.kitSupportsSummon;
+  const extractOnSpawnRage = __dep1.extractOnSpawnRage;
 
   // Dùng trực tiếp catalog cho tra cứu
   const Meta = {
@@ -5175,10 +5164,9 @@ __define('./meta.js', (exports, module, __require) => {
     classOf(id){ return (this.get(id)?.class) ?? null; },
     rankOf(id){  return (this.get(id)?.rank)  ?? null; },
     kit(id){     return (this.get(id)?.kit)   ?? null; },
-    // chỉ coi là Summoner khi ult.type='summon'
     isSummoner(id){
       const m = this.get(id);
-      return !!(m && m.class === 'Summoner' && m.kit?.ult?.type === 'summon');
+      return !!(m && m.class === 'Summoner' && kitSupportsSummon(m));
     }
   };
 
@@ -5201,9 +5189,14 @@ __define('./meta.js', (exports, module, __require) => {
   function initialRageFor(unitId, opts = {}){
     const onSpawn = Meta.kit(unitId)?.onSpawn;
     if (!onSpawn) return 0;
-    if (onSpawn.exceptLeader && opts.isLeader) return 0;
+    if (onSpawn.exceptLeader && opts.isLeader) {
+      const leaderSpecific = extractOnSpawnRage(onSpawn, { ...opts, isLeader: true });
+      return Math.max(0, leaderSpecific ?? 0);
+    }
+    const amount = extractOnSpawnRage(onSpawn, opts);
+    if (amount != null) return Math.max(0, amount);
     if (opts.revive) return Math.max(0, (opts.reviveSpec?.rage) ?? 0);
-    return onSpawn.rage ?? 0;
+    return 0;
   }
 
   exports.Meta = Meta;
@@ -5299,6 +5292,9 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
   const ensureNestedModuleSupport = __dep17.ensureNestedModuleSupport;
   const __dep18 = __require('./utils/time.js');
   const safeNow = __dep18.safeNow;
+  const __dep19 = __require('./utils/kit.js');
+  const getSummonSpec = __dep19.getSummonSpec;
+  const resolveSummonSlots = __dep19.resolveSummonSlots;
   /** @type {HTMLCanvasElement|null} */ let canvas = null;
   /** @type {CanvasRenderingContext2D|null} */ let ctx = null;
   /** @type {{update:(g:any)=>void, cleanup?:()=>void}|null} */ let hud = null;   // ← THÊM
@@ -5740,32 +5736,21 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     Game.tokens = keep;
   }
 
-  // --- Summon helpers (W4-J5) ---
-  function getPatternSlots(pattern, baseSlot){
-    switch(pattern){
-      case 'verticalNeighbors': {
-        const row = (baseSlot - 1) % 3;
-        const v = [];
-        if (row > 0) v.push(baseSlot - 1);
-        if (row < 2) v.push(baseSlot + 1);
-        return v;
-      }
-      case 'rowNeighbors': { // dự phòng tương lai
-        const col = Math.floor((baseSlot - 1) / 3);
-        const row = (baseSlot - 1) % 3;
-        const left  = (col < 2) ? ((col + 1) * 3 + row + 1) : null;
-        const right = (col > 0) ? ((col - 1) * 3 + row + 1) : null;
-        return [right, left].filter(Boolean);
-      }
-      default: return [];
-    }
-  }
-
   // LẤY TỪ INSTANCE đang đứng trên sân (đúng spec: thừa hưởng % chỉ số hiện tại của chủ)
   function creepStatsFromInherit(masterUnit, inherit){
-    const hpMax = Math.round((masterUnit?.hpMax || 0) * (inherit?.HP  || 0));
-    const atk   = Math.round((masterUnit?.atk   || 0) * (inherit?.ATK || 0));
-     return { hpMax, hp: hpMax, atk };
+    if (!inherit || typeof inherit !== 'object') return {};
+    const hpMax = Math.round((masterUnit?.hpMax || 0) * ((inherit.HP ?? inherit.hp ?? inherit.HPMax ?? inherit.hpMax) || 0));
+    const atk   = Math.round((masterUnit?.atk   || 0) * ((inherit.ATK ?? inherit.atk) || 0));
+    const wil   = Math.round((masterUnit?.wil   || 0) * ((inherit.WIL ?? inherit.wil) || 0));
+    const res   = Math.round((masterUnit?.res   || 0) * ((inherit.RES ?? inherit.res) || 0));
+    const arm   = Math.round((masterUnit?.arm   || 0) * ((inherit.ARM ?? inherit.arm) || 0) * 100) / 100;
+    const stats = {};
+    if (hpMax > 0){ stats.hpMax = hpMax; stats.hp = hpMax; }
+    if (atk > 0) stats.atk = atk;
+    if (wil > 0) stats.wil = wil;
+    if (res > 0) stats.res = res;
+    if (arm > 0) stats.arm = Math.max(0, Math.min(1, arm));
+    return stats;
   }
 
   function getMinionsOf(masterIid){
@@ -5797,50 +5782,59 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
 
     const slot = slotIndex(unit.side, unit.cx, unit.cy);
 
-    // Chỉ Summoner có ult 'summon' mới Immediate
-    const u = meta.kit?.ult;
-    if (meta.class === 'Summoner' && u?.type === 'summon'){
+  const summonSpec = meta.class === 'Summoner' ? getSummonSpec(meta) : null;
+    if (meta.class === 'Summoner' && summonSpec){
       const aliveNow = tokensAlive();
-      const cand = getPatternSlots(u.pattern || 'verticalNeighbors', slot)
+      const patternSlots = resolveSummonSlots(summonSpec, slot)
         .filter(Boolean)
-        // chỉ giữ slot trống thực sự (không active/queued)
         .filter(s => {
           const { cx, cy } = slotToCell(unit.side, s);
           return !cellReserved(aliveNow, Game.queued, cx, cy);
         })
-        .sort((a,b)=> a-b);
+        .sort((a, b) => a - b);
 
-      // spawn tối đa “count”
-      const need = Math.min(u.count || 0, cand.length);
-      
-        if (need > 0){
-          // Limit & replace
-          const limit = Number.isFinite(u.limit) ? u.limit : Infinity;
-          const have  = getMinionsOf(unit.iid).length;
-          const over  = Math.max(0, have + need - limit);
-          if (over > 0 && (u.replace === 'oldest')) removeOldestMinions(unit.iid, over);
+      const countRaw = Number(summonSpec.count);
+      const desired = Number.isFinite(countRaw) ? countRaw : (patternSlots.length || 1);
+      const need = Math.min(patternSlots.length, Math.max(0, desired));
 
-          // Tính thừa hưởng stat 1 lần
-          const inheritStats = creepStatsFromInherit(unit, u.inherit);
+      if (need > 0){
+        const limit = Number.isFinite(summonSpec.limit) ? summonSpec.limit : Infinity;
+        const have  = getMinionsOf(unit.iid).length;
+        const over  = Math.max(0, have + need - limit);
+        const replacePolicy = typeof summonSpec.replace === 'string' ? summonSpec.replace.trim().toLowerCase() : null;
+        if (over > 0 && replacePolicy === 'oldest') removeOldestMinions(unit.iid, over);
 
-          // Enqueue theo slot tăng dần
-          for (let i=0;i<need;i++){
-            const s = cand[i];
-            enqueueImmediate(Game, {
-              by: unit.id, side: unit.side, slot: s,
-              unit: {
-                id: `${unit.id}_minion`, name: 'Creep', color: '#ffd27d',
-                isMinion: true, ownerIid: unit.iid,
-                bornSerial: _BORN++,
-                ttlTurns: u.ttl || 3,
-                ...inheritStats
-              }
-            });
+        const inheritStats = creepStatsFromInherit(unit, summonSpec.inherit);
+        const ttl = Number.isFinite(summonSpec.ttlTurns)
+          ? summonSpec.ttlTurns
+          : (Number.isFinite(summonSpec.ttl) ? summonSpec.ttl : null);
+
+        for (let i = 0; i < need; i++){
+          const s = patternSlots[i];
+          const base = summonSpec.creep || {};
+          const spawnTtl = Number.isFinite(base.ttlTurns) ? base.ttlTurns : ttl;
+          enqueueImmediate(Game, {
+            by: unit.id,
+            side: unit.side,
+            slot: s,
+            unit: {
+              id: base.id || `${unit.id}_minion`,
+              name: base.name || base.label || 'Creep',
+              color: base.color || '#ffd27d',
+              isMinion: base.isMinion !== false,
+              ownerIid: unit.iid,
+              bornSerial: _BORN++,
+              ttlTurns: Number.isFinite(spawnTtl) ? spawnTtl : 3,
+              ...inheritStats
+            }
+          });
         }
       }
-      unit.rage = 0; // đã dùng ult
+      unit.rage = 0;
       return;
     }
+
+    const u = meta.kit?.ult;
     if (!u){ unit.rage = Math.max(0, unit.rage - 100); return; }
 
     const foeSide = unit.side === 'ally' ? 'enemy' : 'ally';
@@ -6761,6 +6755,46 @@ __define('./passives.js', (exports, module, __require) => {
 
   const clamp01 = (x) => Math.max(0, Math.min(1, x));
 
+  const STAT_ALIAS = new Map([
+    ['atk', 'atk'],
+    ['attack', 'atk'],
+    ['wil', 'wil'],
+    ['will', 'wil'],
+    ['res', 'res'],
+    ['arm', 'arm'],
+    ['agi', 'agi'],
+    ['agility', 'agi'],
+    ['per', 'per'],
+    ['perception', 'per'],
+    ['hp', 'hp'],
+    ['hpmax', 'hpMax'],
+    ['maxhp', 'hpMax'],
+    ['hp_max', 'hpMax'],
+    ['hpmax%', 'hpMax'],
+    ['spd', 'spd'],
+    ['speed', 'spd'],
+    ['aemax', 'aeMax'],
+    ['ae_max', 'aeMax'],
+    ['aeregen', 'aeRegen'],
+    ['ae_regen', 'aeRegen'],
+    ['hpregen', 'hpRegen'],
+    ['hp_regen', 'hpRegen']
+  ]);
+
+  const BASE_STAT_KEYS = ['atk','wil','res','arm','agi','per','hpMax','spd','aeMax','aeRegen','hpRegen'];
+
+  function normalizeStatKey(stat){
+    if (typeof stat === 'string'){
+      const trimmed = stat.trim();
+      if (!trimmed) return null;
+      const canonical = trimmed.replace(/[%_\s]/g, '').toLowerCase();
+      return STAT_ALIAS.get(canonical) || trimmed;
+    }
+    return null;
+  }
+
+  const normalizeKey = (value) => (typeof value === 'string' ? value.trim().toLowerCase() : '');
+
   function ensureStatusContainer(unit){
     if (!unit) return;
     if (!Array.isArray(unit.statuses)) unit.statuses = [];
@@ -6773,20 +6807,21 @@ __define('./passives.js', (exports, module, __require) => {
 
   function ensureStatBuff(unit, id, { attr, mode='percent', amount=0, purgeable=true }){
     ensureStatusContainer(unit);
+    const statKey = normalizeStatKey(attr) || attr;
     let st = Statuses.get(unit, id);
     if (!st){
       st = Statuses.add(unit, {
         id,
         kind: 'buff',
         tag: 'stat',
-        attr,
+        attr: statKey,
         mode,
         amount,
         purgeable,
         stacks: 0
       });
     }
-    st.attr = attr;
+    st.attr = statKey;
     st.mode = mode;
     st.amount = amount;
     st.purgeable = purgeable;
@@ -6800,55 +6835,172 @@ __define('./passives.js', (exports, module, __require) => {
     st.stacks = next;
   }
 
-  function recomputeFromStatuses(unit){
-    if (!unit || !unit.baseStats) return;
-    ensureStatusContainer(unit);
-    const base = unit.baseStats;
-    const percent = { atk:0, res:0, wil:0, arm:0 };
-    const flat    = { atk:0, res:0, wil:0, arm:0 };
-    for (const st of unit.statuses){
-      if (!st || !st.attr || !st.mode) continue;
-  const stacks = st.stacks == null ? 1 : st.stacks;
-      const amount = (st.amount ?? st.power ?? 0) * stacks;
-      if (!Number.isFinite(amount)) continue;
-      if (st.mode === 'percent'){
-        percent[st.attr] = (percent[st.attr] || 0) + amount;
-      } else if (st.mode === 'flat'){
-        flat[st.attr] = (flat[st.attr] || 0) + amount;
+  function applyStatMap(unit, passive, stats, options = {}){
+    if (!unit || !stats) return false;
+    const mode = options.mode === 'flat' ? 'flat' : 'percent';
+    const purgeable = options.purgeable !== false;
+    const stackable = options.stack !== false;
+    const stacks = Number.isFinite(options.stacks) ? options.stacks : 1;
+    const maxStacks = options.maxStacks;
+    const idPrefix = options.idPrefix || (passive?.id || 'stat');
+    let applied = false;
+    for (const [stat, value] of Object.entries(stats)){
+      if (!Number.isFinite(value)) continue;
+      const attr = normalizeStatKey(stat);
+      if (!attr) continue;
+      const st = ensureStatBuff(unit, `${idPrefix}_${attr}`, { attr, mode, amount: value, purgeable });
+      const nextStacks = stackable ? (st.stacks || 0) + stacks : stacks;
+      applyStatStacks(st, nextStacks, { maxStacks });
+      applied = true;
+    }
+    if (applied) recomputeFromStatuses(unit);
+    return applied;
+  }
+
+  function captureBaseStats(unit){
+    const out = {};
+    for (const key of BASE_STAT_KEYS){
+      const value = unit[key];
+      if (typeof value === 'number' && Number.isFinite(value)){
+        out[key] = value;
+      }
+    }
+    return out;
+  }
+
+  function hasLivingMinion(unit, Game){
+    if (!unit || !Game) return false;
+    return (Game.tokens || []).some(t => t && t.alive && t.isMinion && t.ownerIid === unit.iid);
+  }
+
+  function evaluateConditionObject(condition, { Game, unit, ctx, passive }){
+    if (!condition || typeof condition !== 'object') return true;
+    const hpMax = Number.isFinite(unit?.hpMax) ? unit.hpMax : Number.isFinite(unit?.baseStats?.hpMax) ? unit.baseStats.hpMax : 0;
+    const hpPct = hpMax > 0 ? ((unit?.hp ?? hpMax) / hpMax) : 0;
+    if (condition.selfHPAbove != null && hpPct <= condition.selfHPAbove) return false;
+    if (condition.selfHPBelow != null && hpPct >= condition.selfHPBelow) return false;
+    if (condition.hpAbove != null && hpPct <= condition.hpAbove) return false;
+    if (condition.hpBelow != null && hpPct >= condition.hpBelow) return false;
+
+    if (condition.requiresStatus){
+      const list = Array.isArray(condition.requiresStatus) ? condition.requiresStatus : [condition.requiresStatus];
+      for (const id of list){
+        if (!Statuses.has(unit, id)) return false;
       }
     }
 
-    if (base.atk != null){
-      const pct = 1 + (percent.atk || 0);
-      const flatAdd = flat.atk || 0;
-      unit.atk = Math.max(0, Math.round(base.atk * pct + flatAdd));
+    if (condition.targetHasStatus){
+      const target = ctx?.target;
+      if (!target) return false;
+      const list = Array.isArray(condition.targetHasStatus) ? condition.targetHasStatus : [condition.targetHasStatus];
+      for (const id of list){
+        if (!Statuses.has(target, id)) return false;
+      }
     }
-   if (base.wil != null){
-      const pct = 1 + (percent.wil || 0);
-      const flatAdd = flat.wil || 0;
-      unit.wil = Math.max(0, Math.round(base.wil * pct + flatAdd));
+
+    if (condition.minMinions != null){
+      const tokens = Game?.tokens || [];
+      const count = tokens.filter(t => t && t.alive && t.isMinion && t.ownerIid === unit.iid).length;
+      if (count < condition.minMinions) return false;
     }
-    if (base.arm != null){
-      const pct = 1 + (percent.arm || 0);
-      const flatAdd = flat.arm || 0;
-      const raw = base.arm * pct + flatAdd;
-      unit.arm = clamp01(raw);
+
+    if (condition.maxStacks != null){
+      const stackId = condition.stackId || passive?.id;
+      if (stackId){
+        const st = Statuses.get(unit, stackId);
+        const stacks = st ? (st.stacks || 0) : 0;
+        if (stacks >= condition.maxStacks) return false;
+      }
     }
-    if (base.res != null){
-      const pct = 1 + (percent.res || 0);
-      const flatAdd = flat.res || 0;
-      const raw = base.res * pct + flatAdd;
-      unit.res = clamp01(raw);
+
+    return true;
+  }
+
+  function passiveConditionsOk({ Game, unit, passive, ctx }){
+    const conditions = passive?.conditions;
+    if (!conditions) return true;
+    const list = Array.isArray(conditions) ? conditions : [conditions];
+    for (const cond of list){
+      if (!cond) continue;
+      if (typeof cond === 'function'){
+        try {
+          if (!cond({ Game, unit, ctx, passive })) return false;
+        } catch (_) {
+          return false;
+        }
+        continue;
+      }
+      if (typeof cond === 'string'){
+        const key = cond.trim().toLowerCase();
+        if (key === 'hasminion' || key === 'requiresminion'){
+          if (!hasLivingMinion(unit, Game)) return false;
+        }
+        continue;
+      }
+      if (typeof cond === 'object'){
+        if (!evaluateConditionObject(cond, { Game, unit, ctx, passive })) return false;
+      }
+    }
+    return true;
+  }
+
+  function recomputeFromStatuses(unit){
+    if (!unit || !unit.baseStats) return;
+    ensureStatusContainer(unit);
+
+    const percent = new Map();
+    const flat = new Map();
+    for (const st of unit.statuses){
+      if (!st || !st.attr || !st.mode) continue;
+    const attr = normalizeStatKey(st.attr);
+      if (!attr) continue;
+      const stacks = st.stacks == null ? 1 : st.stacks;
+      const amount = (st.amount ?? st.power ?? 0) * stacks;
+      if (!Number.isFinite(amount)) continue;
+      const mode = st.mode === 'flat' ? 'flat' : 'percent';
+      const store = mode === 'flat' ? flat : percent;
+      const prev = store.get(attr) || 0;
+      store.set(attr, prev + amount);
+    }
+
+  for (const [key, baseValue] of Object.entries(unit.baseStats)){
+      if (!Number.isFinite(baseValue)) continue;
+      const attr = normalizeStatKey(key) || key;
+      const pct = percent.get(attr) ?? percent.get(key) ?? 0;
+      const add = flat.get(attr) ?? flat.get(key) ?? 0;
+      let next = baseValue * (1 + pct) + add;
+
+      if (attr === 'arm' || attr === 'res'){
+        unit[attr] = clamp01(next);
+        continue;
+      }
+      if (attr === 'spd'){
+        unit[attr] = Math.max(0, Math.round(next * 100) / 100);
+        continue;
+      }
+      if (attr === 'hpMax' || attr === 'hp' || attr === 'aeMax'){
+        unit[attr] = Math.max(0, Math.round(next));
+        continue;
+      }
+      if (attr === 'aeRegen' || attr === 'hpRegen'){
+        unit[attr] = Math.max(0, Math.round(next * 100) / 100);
+        continue;
+      }
+      unit[attr] = Math.max(0, Math.round(next));
     }
   }
 
-  function healTeam(Game, unit, pct){
+  function healTeam(Game, unit, pct, opts = {}){
     if (!Game || !unit) return;
     if (!Number.isFinite(pct) || pct <= 0) return;
+    const mode = opts.mode || 'targetMax';
+    const casterHpMax = Number.isFinite(unit.hpMax) ? unit.hpMax : 0;
     const allies = (Game.tokens || []).filter(t => t.side === unit.side && t.alive);
     for (const ally of allies){
       if (!Number.isFinite(ally.hpMax)) continue;
-      const heal = Math.max(0, Math.round((ally.hpMax || 0) * pct));
+      const base = mode === 'casterMax' ? casterHpMax : (ally.hpMax || 0);
+      if (!Number.isFinite(base) || base <= 0) continue;
+      const heal = Math.max(0, Math.round(base * pct));
       if (heal <= 0) continue;
       ally.hp = Math.min(ally.hpMax, (ally.hp ?? ally.hpMax) + heal);
     }
@@ -6902,22 +7054,24 @@ __define('./passives.js', (exports, module, __require) => {
       if (!unit) return;
       const params = passive?.params || {};
       const amount = params.amount ?? 0;
-      const stackable = params.stack !== false;
-      const st = ensureStatBuff(unit, passive.id, { attr:'atk', mode:'percent', amount, purgeable: params.purgeable !== false });
-      const nextStacks = stackable ? (st.stacks || 0) + 1 : 1;
-      applyStatStacks(st, nextStacks, { maxStacks: params.maxStacks });
-      recomputeFromStatuses(unit);
+      applyStatMap(unit, passive, { atk: amount }, {
+        mode: 'percent',
+        stack: params.stack !== false,
+        purgeable: params.purgeable !== false,
+        maxStacks: params.maxStacks
+      });
     },
 
-  gainWILPercent({ unit, passive }){
+    gainWILPercent({ unit, passive }){
       if (!unit) return;
       const params = passive?.params || {};
       const amount = params.amount ?? 0;
-      const stackable = params.stack !== false;
-      const st = ensureStatBuff(unit, passive.id, { attr:'wil', mode:'percent', amount, purgeable: params.purgeable !== false });
-      const nextStacks = stackable ? (st.stacks || 0) + 1 : 1;
-      applyStatStacks(st, nextStacks, { maxStacks: params.maxStacks });
-      recomputeFromStatuses(unit);
+      applyStatMap(unit, passive, { wil: amount }, {
+        mode: 'percent',
+        stack: params.stack !== false,
+        purgeable: params.purgeable !== false,
+        maxStacks: params.maxStacks
+      });
     },
 
     conditionalBuff({ unit, passive, ctx }){
@@ -6964,11 +7118,53 @@ __define('./passives.js', (exports, module, __require) => {
     gainRESPct({ Game, unit, passive }){
       if (!unit) return;
       const params = passive?.params || {};
-      const st = ensureStatBuff(unit, passive.id, { attr:'res', mode:'percent', amount: params.amount ?? 0, purgeable: params.purgeable !== false });
-      const stackable = params.stack !== false;
-      const count = stackable ? (st.stacks || 0) + 1 : 1;
-      applyStatStacks(st, count, { maxStacks: params.maxStacks });
-      recomputeFromStatuses(unit);
+      const amount = params.amount ?? 0;
+      applyStatMap(unit, passive, { res: amount }, {
+        mode: 'percent',
+        stack: params.stack !== false,
+        purgeable: params.purgeable !== false,
+        maxStacks: params.maxStacks
+      });
+    },
+
+    gainStats({ unit, passive }){
+      if (!unit) return;
+      const params = passive?.params || {};
+      const modeRaw = params.mode || params.statMode || params.kind;
+      const mode = modeRaw === 'flat' ? 'flat' : 'percent';
+      let applied = false;
+      if (params.stats && typeof params.stats === 'object'){
+        applied = applyStatMap(unit, passive, params.stats, {
+          mode,
+          stack: params.stack !== false,
+          stacks: params.stacks,
+          purgeable: params.purgeable !== false,
+          maxStacks: params.maxStacks,
+          idPrefix: params.idPrefix || passive?.id
+        }) || applied;
+      }
+      if (params.flatStats && typeof params.flatStats === 'object'){
+        applied = applyStatMap(unit, passive, params.flatStats, {
+          mode: 'flat',
+          stack: params.stackFlat !== false,
+          stacks: params.stacksFlat ?? params.stacks,
+          purgeable: params.purgeable !== false,
+          maxStacks: params.maxStacksFlat ?? params.maxStacks,
+          idPrefix: `${passive?.id || 'stat'}_flat`
+        }) || applied;
+      }
+      if (!applied && params.attr != null && Number.isFinite(params.amount)){
+        const attr = normalizeStatKey(params.attr);
+        if (attr){
+          applyStatMap(unit, passive, { [attr]: params.amount }, {
+            mode,
+            stack: params.stack !== false,
+            stacks: params.stacks,
+            purgeable: params.purgeable !== false,
+            maxStacks: params.maxStacks
+          });
+        }
+      }
     },
 
     gainBonus({ Game, unit, passive, ctx }){
@@ -7005,7 +7201,11 @@ __define('./passives.js', (exports, module, __require) => {
     'gainWIL%': EFFECTS.gainWILPercent,
     conditionalBuff: EFFECTS.conditionalBuff,
     'gainRES%': EFFECTS.gainRESPct,
-    gainBonus: EFFECTS.gainBonus
+    gainBonus: EFFECTS.gainBonus,
+    gainStats: EFFECTS.gainStats,
+    'gainStats%': EFFECTS.gainStats,
+    statBuff: EFFECTS.gainStats,
+    statGain: EFFECTS.gainStats
   };
 
   function emitPassiveEvent(Game, unit, when, ctx = {}){
@@ -7017,28 +7217,117 @@ __define('./passives.js', (exports, module, __require) => {
     ctx.kit = kit;
     for (const passive of kit.passives){
       if (!passive || passive.when !== when) continue;
-      let handler = EFFECT_MAP[passive.effect];
-      if (passive.effect === 'gainRES%' && passive?.params?.perTarget != null){
+      const effectKey = typeof passive.effect === 'string'
+        ? passive.effect
+        : (passive.effect?.type || passive.effect?.kind || null);
+      let handler = effectKey ? EFFECT_MAP[effectKey] : EFFECT_MAP[passive.effect];
+      let effectivePassive = passive;
+
+      if (passive && typeof passive.effect === 'object' && passive.effect !== null){
+        const spec = passive.effect;
+        const type = spec.type || spec.kind;
+        if (type && EFFECT_MAP[type]) handler = EFFECT_MAP[type];
+        const mergedParams = {
+          ...(spec.params || {}),
+          ...(passive.params || {}),
+          ...(spec.stats ? { stats: spec.stats } : {}),
+          ...(spec.flatStats ? { flatStats: spec.flatStats } : {})
+        };
+        effectivePassive = { ...passive, params: mergedParams };
+        if (!handler && (mergedParams.stats || mergedParams.flatStats)){
+          handler = EFFECTS.gainStats;
+        }
+      } else if (!handler && passive?.params && (passive.params.stats || passive.params.flatStats)){
+        handler = EFFECTS.gainStats;
+      }
+
+      if (effectKey === 'gainRES%' && effectivePassive?.params?.perTarget != null){{
         handler = EFFECTS.resPerSleeping;
       }
       if (typeof handler !== 'function') continue;
-      handler({ Game, unit, passive, ctx });
+      if (!passiveConditionsOk({ Game, unit, passive: effectivePassive, ctx })) continue;
+      handler({ Game, unit, passive: effectivePassive, ctx });
     }
   }
 
   function applyOnSpawnEffects(Game, unit, onSpawn = {}){
     if (!Game || !unit || !onSpawn) return;
     ensureStatusContainer(unit);
-    if (onSpawn.teamHealOnEntry){
-      healTeam(Game, unit, onSpawn.teamHealOnEntry);
+
+    const effects = [];
+    if (Array.isArray(onSpawn.effects)) effects.push(...onSpawn.effects);
+
+    if (Number.isFinite(onSpawn.teamHealOnEntry) && onSpawn.teamHealOnEntry > 0){
+      effects.push({ type: 'teamHeal', amount: onSpawn.teamHealOnEntry, mode: 'targetMax' });
     }
+    const casterHeal = onSpawn.teamHealPercentMaxHPOfCaster ?? onSpawn.teamHealPercentCasterMaxHP;
+    if (Number.isFinite(casterHeal) && casterHeal > 0){
+      effects.push({ type: 'teamHeal', amount: casterHeal, mode: 'casterMax' });
+    }
+
     if (Array.isArray(onSpawn.statuses)){
       for (const st of onSpawn.statuses){
         if (!st || typeof st !== 'object') continue;
-        Statuses.add(unit, st);
+        effects.push({ type: 'status', status: st });
       }
     }
-    if (typeof unit._recalcStats === 'function'){
+    if (Array.isArray(onSpawn.addStatuses)){
+      for (const st of onSpawn.addStatuses){
+        if (!st || typeof st !== 'object') continue;
+        effects.push({ type: 'status', status: st });
+      }
+    }
+    if (onSpawn.status && typeof onSpawn.status === 'object'){
+      effects.push({ type: 'status', status: onSpawn.status });
+    }
+
+    if (onSpawn.stats && typeof onSpawn.stats === 'object'){
+      effects.push({ type: 'stats', stats: onSpawn.stats, mode: onSpawn.statsMode || onSpawn.mode, purgeable: onSpawn.purgeable });
+    }
+    if (onSpawn.flatStats && typeof onSpawn.flatStats === 'object'){
+      effects.push({ type: 'stats', stats: onSpawn.flatStats, mode: 'flat', purgeable: onSpawn.purgeable, id: 'onSpawn_flat' });
+    }
+
+    let statsChanged = false;
+    for (const effect of effects){
+      if (!effect) continue;
+      const type = normalizeKey(effect.type || effect.kind || effect.effect);
+      if (type === 'teamheal'){
+        const amount = effect.amount ?? effect.value ?? effect.percent ?? 0;
+        if (!Number.isFinite(amount) || amount <= 0) continue;
+        const mode = effect.mode === 'casterMax' ? 'casterMax' : 'targetMax';
+        healTeam(Game, unit, amount, { mode });
+        continue;
+      }
+      if (type === 'status' || type === 'addstatus'){
+        if (effect.status && typeof effect.status === 'object'){
+          Statuses.add(unit, effect.status);
+        }
+        continue;
+      }
+      if (type === 'stats' || type === 'stat' || type === 'buff'){
+        const stats = effect.stats || effect.values;
+        if (!stats || typeof stats !== 'object') continue;
+        const applied = applyStatMap(unit, { id: effect.id || 'onSpawn' }, stats, {
+          mode: effect.mode === 'flat' ? 'flat' : (effect.statMode === 'flat' ? 'flat' : 'percent'),
+          stack: effect.stack !== false,
+          stacks: effect.stacks,
+          purgeable: effect.purgeable !== false,
+          maxStacks: effect.maxStacks,
+          idPrefix: effect.id || 'onSpawn'
+        });
+        statsChanged = applied || statsChanged;
+        continue;
+      }
+    }
+
+    if (statsChanged){
+      if (typeof unit._recalcStats === 'function'){
+        unit._recalcStats();
+      } else {
+        recomputeFromStatuses(unit);
+      }
+    } else if (typeof unit._recalcStats === 'function'){
       unit._recalcStats();
     } else {
       recomputeFromStatuses(unit);
@@ -7048,6 +7337,16 @@ __define('./passives.js', (exports, module, __require) => {
   function prepareUnitForPassives(unit){
     if (!unit) return;
     ensureStatusContainer(unit);
+    const captured = captureBaseStats(unit);
+    if (!unit.baseStats || typeof unit.baseStats !== 'object'){
+      unit.baseStats = { ...captured };
+    } else {
+      for (const [key, value] of Object.entries(captured)){
+        if (!Number.isFinite(unit.baseStats[key])){
+          unit.baseStats[key] = value;
+        }
+      }
+    }
     unit._recalcStats = () => recomputeFromStatuses(unit);
   }
 
@@ -7384,6 +7683,8 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
   const getUnitArt = __dep2.getUnitArt;
   const __dep3 = __require('./data/economy.js');
   const listCurrencies = __dep3.listCurrencies;
+  const __dep4 = __require('./data/skills.js');
+  const getSkillSet = __dep4.getSkillSet;
 
   const STYLE_ID = 'collection-view-style-v2';
 
@@ -7463,11 +7764,19 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
       .collection-skill-overlay__visual img{width:100%;max-width:320px;height:auto;filter:drop-shadow(0 24px 48px rgba(0,0,0,.6));}
       .collection-skill-overlay__details{display:flex;flex-direction:column;gap:12px;}
       .collection-skill-overlay__subtitle{margin:0;color:#9cbcd9;font-size:14px;line-height:1.6;}
-      .collection-skill-overlay__items{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
-      .collection-skill-overlay__item{height:72px;border-radius:16px;border:1px dashed rgba(125,211,252,.35);background:rgba(10,18,28,.78);display:flex;align-items:center;justify-content:center;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
-      .collection-skill-overlay__action{align-self:flex-start;padding:12px 18px;border-radius:14px;border:1px solid rgba(255,184,108,.45);background:rgba(255,184,108,.12);color:#ffd9a1;font-size:13px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:transform .18s ease,background .18s ease;}
-      .collection-skill-overlay__action:hover{transform:translateY(-2px);background:rgba(255,184,108,.24);}
-      .collection-skill-overlay__action:focus-visible{outline:2px solid rgba(255,184,108,.65);outline-offset:3px;}
+      .collection-skill-overlay__abilities{display:flex;flex-direction:column;gap:16px;overflow:auto;max-height:420px;padding-right:4px;}
+      .collection-skill-card{border-radius:16px;border:1px solid rgba(125,211,252,.24);background:rgba(12,22,32,.88);padding:16px;display:flex;flex-direction:column;gap:10px;}
+      .collection-skill-card__header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+      .collection-skill-card__title{margin:0;font-size:16px;letter-spacing:.04em;}
+      .collection-skill-card__badge{padding:4px 10px;border-radius:12px;border:1px solid rgba(125,211,252,.28);background:rgba(8,18,28,.82);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
+      .collection-skill-card__meta{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:8px;font-size:12px;color:#9cbcd9;}
+      .collection-skill-card__meta li{padding:4px 8px;border-radius:10px;background:rgba(16,26,36,.72);}
+      .collection-skill-card__description{margin:0;color:#e6f2ff;font-size:13px;line-height:1.6;}
+      .collection-skill-card__notes{margin:0;padding-left:18px;color:#9cbcd9;font-size:12px;line-height:1.5;display:flex;flex-direction:column;gap:4px;}
+      .collection-skill-card__empty{margin:0;color:#9cbcd9;font-size:13px;line-height:1.6;background:rgba(12,22,32,.88);border:1px dashed rgba(125,211,252,.28);border-radius:14px;padding:16px;text-align:center;}
+      .collection-skill-overlay__notes{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:12px;color:#9cbcd9;}
+      .collection-skill-overlay__notes li{position:relative;padding-left:16px;}
+      .collection-skill-overlay__notes li::before{content:'•';position:absolute;left:0;color:#7da0c7;}
       @media(max-width:1080px){
         .collection-view__layout{grid-template-columns:1fr;}
         .collection-skill-overlay{position:fixed;top:50%;left:50%;transform:translate(-50%,calc(-50% + 12px));width:88vw;min-height:0;}
@@ -7548,36 +7857,245 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
   }
 
   function describeUlt(unit){
-    const ult = unit?.kit?.ult;
-    if (!ult) return 'Nâng cấp giúp tăng hệ số sát thương, phạm vi hoặc hiệu ứng khống chế tùy bộ kỹ năng.';
-    const parts = [];
-    if (ult.type){
-      parts.push(`Loại: ${ult.type}`);
-    }
-    if (typeof ult.hits === 'number'){
-      parts.push(`${ult.hits} hit`);
-    }
-    if (ult.aoe){
-      parts.push(`Phạm vi: ${ult.aoe}`);
-    }
-    if (ult.turns){
-      parts.push(`Hiệu lực ${ult.turns} lượt`);
-    }
-    if (ult.notes){
-      parts.push(ult.notes);
-    }
-    return parts.length > 0
-      ? `Nâng cấp cường hóa tuyệt kỹ (${parts.join(' • ')}).`
-      : 'Nâng cấp giúp tăng hiệu quả tuyệt kỹ hiện tại.';
+    return unit?.name ? `Bộ kỹ năng của ${unit.name}.` : 'Chọn nhân vật để xem mô tả chi tiết.';
   }
 
-  function describeUpgrade(unit){
-    const passives = unit?.kit?.passives;
-    if (!Array.isArray(passives) || passives.length === 0){
-      return 'Đầu tư nâng cấp sẽ mở thêm node thiên phú, gia tăng hiệu quả hỗ trợ và sát thương.';
+  const TARGET_LABELS = {
+    single: 'Đơn mục tiêu',
+    singleTarget: 'Đơn mục tiêu',
+    randomEnemies: 'Địch ngẫu nhiên',
+    randomRow: 'Một hàng ngẫu nhiên',
+    randomColumn: 'Một cột ngẫu nhiên',
+    allEnemies: 'Toàn bộ địch',
+    allAllies: 'Toàn bộ đồng minh',
+    allies: 'Đồng minh',
+    self: 'Bản thân',
+    'self+2allies': 'Bản thân + 2 đồng minh'
+  };
+
+  const ABILITY_TYPE_LABELS = {
+    basic: 'Đánh thường',
+    active: 'Kĩ năng',
+    ultimate: 'Tuyệt kỹ',
+    talent: 'Thiên phú',
+    technique: 'Tuyệt học',
+    passive: 'Nội tại'
+  };
+
+  function formatResourceCost(cost){
+    if (!cost || typeof cost !== 'object') return 'Không tốn tài nguyên';
+    const parts = [];
+    for (const [key, value] of Object.entries(cost)){
+      if (!Number.isFinite(value)) continue;
+      const label = key === 'aether' ? 'Aether' : key.replace(/_/g, ' ');
+      parts.push(`${value} ${label}`);
     }
-    const highlights = passives.slice(0, 2).map(passive => passive?.id ? passive.id : 'passive');
-    return `Đầu tư nguyên liệu để mở ${highlights.join(' & ')} cùng các biến thể nâng cấp.`;
+    return parts.length ? parts.join(' + ') : 'Không tốn tài nguyên';
+  }
+
+  function formatDuration(duration){
+    if (!duration) return null;
+    if (typeof duration === 'number') return `Hiệu lực ${duration} lượt`;
+    if (typeof duration === 'string'){
+      return duration === 'battle' ? 'Hiệu lực tới hết trận' : null;
+    }
+    const parts = [];
+    if (duration.turns === 'battle'){
+      parts.push('Hiệu lực tới hết trận');
+    } else if (Number.isFinite(duration.turns)){
+      parts.push(`Hiệu lực ${duration.turns} lượt`);
+    }
+    if (duration.start === 'nextTurn'){
+      parts.push('Bắt đầu từ lượt kế tiếp');
+    }
+    if (Number.isFinite(duration.bossModifier) && Number.isFinite(duration.turns)){
+      const bossTurns = Math.max(1, Math.floor(duration.turns * duration.bossModifier));
+      parts.push(`Boss PvE: ${bossTurns} lượt`);
+    }
+    if (duration.affectedStat){
+      parts.push(`Ảnh hưởng: ${duration.affectedStat}`);
+    }
+    return parts.length ? parts.join(' · ') : null;
+  }
+
+  function formatTargetLabel(target){
+    if (target == null) return null;
+    if (typeof target === 'number'){
+      return `Nhắm tới ${target} mục tiêu`;
+    }
+    const key = target.toString();
+    return TARGET_LABELS[key] || key;
+  }
+
+  function formatSummonSummary(summon){
+    if (!summon || typeof summon !== 'object') return null;
+    const parts = [];
+    if (Number.isFinite(summon.count)){
+      parts.push(`Triệu hồi ${summon.count} đơn vị`);
+    } else {
+      parts.push('Triệu hồi đơn vị');
+    }
+    if (summon.placement || summon.pattern){
+      parts.push(`ô ${summon.placement || summon.pattern}`);
+    }
+    if (summon.limit != null){
+      parts.push(`giới hạn ${summon.limit}`);
+    }
+    const ttl = summon.ttlTurns ?? summon.ttl;
+    if (Number.isFinite(ttl) && ttl > 0){
+      parts.push(`tồn tại ${ttl} lượt`);
+    }
+    if (summon.replace){
+      parts.push(`thay ${summon.replace}`);
+    }
+    if (summon.inherit && typeof summon.inherit === 'object'){
+      const inheritParts = [];
+      for (const [stat, value] of Object.entries(summon.inherit)){
+        if (!Number.isFinite(value)) continue;
+        inheritParts.push(`${Math.round(value * 100)}% ${stat.toUpperCase()}`);
+      }
+      if (inheritParts.length){
+        parts.push(`kế thừa ${inheritParts.join(', ')}`);
+      }
+    }
+    return parts.join(' · ');
+  }
+
+  function formatReviveSummary(revive){
+    if (!revive || typeof revive !== 'object') return null;
+    const parts = [];
+    const targets = Number.isFinite(revive.targets) ? revive.targets : 1;
+    parts.push(`Hồi sinh ${targets} đồng minh`);
+    if (revive.priority){
+      parts.push(`ưu tiên ${revive.priority}`);
+    }
+    if (Number.isFinite(revive.hpPercent)){
+      parts.push(`HP ${Math.round(revive.hpPercent * 100)}%`);
+    }
+    if (Number.isFinite(revive.ragePercent)){
+      parts.push(`Nộ ${Math.round(revive.ragePercent * 100)}%`);
+    }
+    if (Number.isFinite(revive.lockSkillsTurns)){
+      parts.push(`Khoá kỹ năng ${revive.lockSkillsTurns} lượt`);
+    }
+    return parts.join(' · ');
+  }
+
+  function formatLinksSummary(links){
+    if (!links || typeof links !== 'object') return null;
+    const parts = [];
+    if (Number.isFinite(links.sharePercent)){
+      parts.push(`Chia ${Math.round(links.sharePercent * 100)}% sát thương`);
+    }
+    if (links.maxConcurrent != null){
+      parts.push(`tối đa ${links.maxConcurrent} mục tiêu`);
+    }
+    return parts.join(' · ');
+  }
+
+  function formatTagLabel(tag){
+    if (typeof tag !== 'string') return '';
+    return tag.replace(/-/g, ' ');
+  }
+
+  function labelForAbility(entry, fallback){
+    const type = entry?.type;
+    if (type && ABILITY_TYPE_LABELS[type]) return ABILITY_TYPE_LABELS[type];
+    return fallback || 'Kĩ năng';
+  }
+
+  function collectAbilityFacts(entry){
+    const facts = [];
+    if (entry?.cost && typeof entry.cost === 'object'){
+      const formattedCost = formatResourceCost(entry.cost);
+      if (formattedCost) facts.push(`Chi phí: ${formattedCost}`);
+    }
+    if (typeof entry?.hits === 'number' && entry.hits > 0){
+      facts.push(`${entry.hits} hit`);
+    }
+    const targetLabel = formatTargetLabel(entry?.targets ?? entry?.target);
+    if (targetLabel){
+      facts.push(`Mục tiêu: ${targetLabel}`);
+    }
+    const duration = formatDuration(entry?.duration);
+    if (duration){
+      facts.push(duration);
+    }
+    if (Number.isFinite(entry?.limitUses)){
+      facts.push(`Giới hạn: ${entry.limitUses} lần`);
+    }
+    if (entry?.lockout){
+      facts.push(`Khoá: ${entry.lockout === 'battle' ? 'đến hết trận' : entry.lockout}`);
+    }
+    if (Number.isFinite(entry?.maxStacks)){
+      facts.push(`Tối đa ${entry.maxStacks} tầng`);
+    }
+    if (Array.isArray(entry?.tags) && entry.tags.length){
+      facts.push(`Tag: ${entry.tags.map(formatTagLabel).join(', ')}`);
+    }
+    const summon = formatSummonSummary(entry?.summon);
+    if (summon){
+      facts.push(summon);
+    }
+    const revive = formatReviveSummary(entry?.revive);
+    if (revive){
+      facts.push(revive);
+    }
+    const links = formatLinksSummary(entry?.links);
+    if (links){
+      facts.push(`Liên kết: ${links}`);
+    }
+    return facts;
+  }
+
+  function renderAbilityCard(entry, { typeLabel } = {}){
+    const card = document.createElement('article');
+    card.className = 'collection-skill-card';
+
+    const header = document.createElement('header');
+    header.className = 'collection-skill-card__header';
+
+    const title = document.createElement('h4');
+    title.className = 'collection-skill-card__title';
+    title.textContent = entry?.name || 'Kĩ năng';
+    header.appendChild(title);
+
+    const badge = document.createElement('span');
+    badge.className = 'collection-skill-card__badge';
+    badge.textContent = typeLabel || labelForAbility(entry);
+    header.appendChild(badge);
+
+    card.appendChild(header);
+
+    const facts = collectAbilityFacts(entry);
+    if (facts.length){
+      const metaList = document.createElement('ul');
+      metaList.className = 'collection-skill-card__meta';
+      for (const fact of facts){
+        const item = document.createElement('li');
+        item.textContent = fact;
+        metaList.appendChild(item);
+      }
+      card.appendChild(metaList);
+    }
+
+    const desc = document.createElement('p');
+    desc.className = 'collection-skill-card__description';
+    desc.textContent = entry?.description || 'Chưa có mô tả chi tiết.';
+    card.appendChild(desc);
+
+    if (Array.isArray(entry?.notes) && entry.notes.length){
+      const notesList = document.createElement('ul');
+      notesList.className = 'collection-skill-card__notes';
+      for (const note of entry.notes){
+        if (!note) continue;
+        const li = document.createElement('li');
+        li.textContent = note;
+        notesList.appendChild(li);
+      }
+      card.appendChild(notesList);
+    }
+    return card;
   }
 
   function renderCollectionView(options = {}){
@@ -7806,35 +8324,20 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
     overlaySubtitle.className = 'collection-skill-overlay__subtitle';
     overlaySubtitle.textContent = 'Chọn nhân vật để xem mô tả kỹ năng.';
 
-    const overlayUpgrade = document.createElement('p');
-    overlayUpgrade.className = 'collection-skill-overlay__subtitle';
-    overlayUpgrade.textContent = '';
+    const overlaySummary = document.createElement('p');
+    overlaySummary.className = 'collection-skill-overlay__subtitle';
+    overlaySummary.textContent = '';
 
-    const overlayItems = document.createElement('div');
-    overlayItems.className = 'collection-skill-overlay__items';
-
-    for (let i = 0; i < 3; i += 1){
-      const slot = document.createElement('div');
-      slot.className = 'collection-skill-overlay__item';
-      slot.textContent = 'Vật phẩm';
-      overlayItems.appendChild(slot);
+    const overlayNotesList = document.createElement('ul');
+    overlayNotesList.className = 'collection-skill-overlay__notes';
     }
-
-    const overlayAction = document.createElement('button');
-    overlayAction.type = 'button';
-    overlayAction.className = 'collection-skill-overlay__action';
-    overlayAction.textContent = 'Nâng cấp';
-
-    const handleUpgrade = () => {
-      // Future hook: trigger upgrade flow
-    };
-    overlayAction.addEventListener('click', handleUpgrade);
-    addCleanup(() => overlayAction.removeEventListener('click', handleUpgrade));
+    const overlayAbilities = document.createElement('div');
+    overlayAbilities.className = 'collection-skill-overlay__abilities';
 
     overlayDetails.appendChild(overlaySubtitle);
-    overlayDetails.appendChild(overlayUpgrade);
-    overlayDetails.appendChild(overlayItems);
-    overlayDetails.appendChild(overlayAction);
+    overlayDetails.appendChild(overlaySummary);
+    overlayDetails.appendChild(overlayNotesList);
+    overlayDetails.appendChild(overlayAbilities);
 
     overlayContent.appendChild(overlayVisual);
     overlayContent.appendChild(overlayDetails);
@@ -7989,8 +8492,62 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
       }
 
       overlayTitle.textContent = unit?.name ? `Kĩ năng · ${unit.name}` : 'Kĩ năng';
+      
+      const skillSet = getSkillSet(unitId);
       overlaySubtitle.textContent = describeUlt(unit);
-      overlayUpgrade.textContent = describeUpgrade(unit);
+      const summaryNote = skillSet?.notes?.[0] ?? '';
+      overlaySummary.textContent = summaryNote;
+      overlaySummary.style.display = summaryNote ? '' : 'none';
+
+      while (overlayNotesList.firstChild){
+        overlayNotesList.removeChild(overlayNotesList.firstChild);
+      }
+      const extraNotes = Array.isArray(skillSet?.notes) ? skillSet.notes.slice(1) : [];
+      if (extraNotes.length){
+        overlayNotesList.style.display = '';
+        for (const note of extraNotes){
+          if (!note) continue;
+          const item = document.createElement('li');
+          item.textContent = note;
+          overlayNotesList.appendChild(item);
+        }
+      } else {
+        overlayNotesList.style.display = 'none';
+      }
+
+      while (overlayAbilities.firstChild){
+        overlayAbilities.removeChild(overlayAbilities.firstChild);
+      }
+      const abilityEntries = [];
+      if (skillSet?.basic){
+        abilityEntries.push({ entry: skillSet.basic, label: ABILITY_TYPE_LABELS.basic });
+      }
+      if (Array.isArray(skillSet?.skills)){
+        skillSet.skills.forEach((skill, index) => {
+          if (!skill) return;
+          abilityEntries.push({ entry: skill, label: `Kĩ năng ${index + 1}` });
+        });
+      }
+      if (skillSet?.ult){
+        abilityEntries.push({ entry: skillSet.ult, label: ABILITY_TYPE_LABELS.ultimate });
+      }
+      if (skillSet?.talent){
+        abilityEntries.push({ entry: skillSet.talent, label: ABILITY_TYPE_LABELS.talent });
+      }
+      if (skillSet?.technique){
+        abilityEntries.push({ entry: skillSet.technique, label: ABILITY_TYPE_LABELS.technique });
+      }
+
+      if (abilityEntries.length){
+        for (const ability of abilityEntries){
+          overlayAbilities.appendChild(renderAbilityCard(ability.entry, { typeLabel: ability.label }));
+        }
+      } else {
+        const placeholder = document.createElement('p');
+        placeholder.className = 'collection-skill-card__empty';
+        placeholder.textContent = 'Chưa có dữ liệu kỹ năng chi tiết cho nhân vật này.';
+        overlayAbilities.appendChild(placeholder);
+      }
 
       if (activeTab === 'skills'){
         overlay.classList.add('is-open');
@@ -9408,6 +9965,8 @@ __define('./summon.js', (exports, module, __require) => {
   const vfxAddSpawn = __dep1.vfxAddSpawn;
   const __dep2 = __require('./art.js');
   const getUnitArt = __dep2.getUnitArt;
+  const __dep3 = __require('./utils/kit.js');
+  const kitSupportsSummon = __dep3.kitSupportsSummon;
   // local helper
   const tokensAlive = (Game) => Game.tokens.filter(t => t.alive);
 
@@ -9416,7 +9975,7 @@ __define('./summon.js', (exports, module, __require) => {
   function enqueueImmediate(Game, req){
     if (req.by){
       const mm = Game.meta.get(req.by);
-      const ok = !!(mm && mm.class === 'Summoner' && mm.kit?.ult?.type === 'summon');
+      const ok = !!(mm && mm.class === 'Summoner' && kitSupportsSummon(mm));
       if (!ok) return false;
     }
     const { cx, cy } = slotToCell(req.side, req.slot);
@@ -9985,6 +10544,408 @@ __define('./utils/dummy.js', (exports, module, __require) => {
   }
 
   exports.ensureNestedModuleSupport = ensureNestedModuleSupport;
+});
+__define('./utils/kit.js', (exports, module, __require) => {
+  const KNOWN_SUMMON_KEYS = ['summon', 'summoner', 'immediateSummon'];
+  const KNOWN_REVIVE_KEYS = ['revive', 'reviver'];
+  const DEFENSIVE_TAGS = ['defense', 'defensive', 'protection', 'shield', 'barrier', 'support'];
+  const INSTANT_TAGS = ['instant', 'instant-cast', 'instantCast'];
+
+  function coerceKit(metaOrKit){
+    if (!metaOrKit) return null;
+    if (metaOrKit.kit) return metaOrKit.kit;
+    return metaOrKit;
+  }
+
+  function normalizeKey(key){
+    return typeof key === 'string' ? key.trim().toLowerCase() : '';
+  }
+
+  function readTrait(traits, key){
+    if (!traits) return null;
+    const target = normalizeKey(key);
+    if (!target) return null;
+
+    if (Array.isArray(traits)){
+      for (const entry of traits){
+        if (entry == null) continue;
+        if (typeof entry === 'string'){
+          if (normalizeKey(entry) === target) return true;
+          continue;
+        }
+        if (typeof entry === 'object'){
+          const id = normalizeKey(entry.id || entry.key || entry.type || entry.name);
+          if (id === target) return entry;
+          if (entry[target] != null) return entry[target];
+        }
+      }
+      return null;
+    }
+
+    if (typeof traits === 'object'){
+      for (const [k, value] of Object.entries(traits)){
+        if (normalizeKey(k) === target) return value;
+      }
+    }
+    return null;
+  }
+
+  function cloneShallow(value){
+    if (!value || typeof value !== 'object') return value ?? null;
+    if (Array.isArray(value)) return value.map(cloneShallow);
+    const out = { ...value };
+    for (const [k, v] of Object.entries(out)){
+      if (v && typeof v === 'object' && !Array.isArray(v)) out[k] = { ...v };
+      if (Array.isArray(v)) out[k] = v.map(cloneShallow);
+    }
+    return out;
+  }
+
+  function extractUltSummonFields(ult){
+    if (!ult || typeof ult !== 'object') return null;
+    const out = {};
+    let hasValue = false;
+    const assign = (key, value, clone = false) => {
+      if (value === undefined) return;
+      if (value === null) return;
+      out[key] = clone ? cloneShallow(value) : value;
+      hasValue = true;
+    };
+
+    const pattern = ult.pattern ?? ult.placement;
+    if (pattern !== undefined && pattern !== null) assign('pattern', pattern);
+    const count = ult.count ?? ult.summonCount;
+    if (count !== undefined && count !== null) assign('count', count);
+    const ttlTurns = ult.ttlTurns ?? ult.ttl;
+    if (ttlTurns !== undefined && ttlTurns !== null) assign('ttlTurns', ttlTurns);
+    const ttl = ult.ttl ?? ult.ttlTurns;
+    if (ttl !== undefined && ttl !== null) assign('ttl', ttl);
+    assign('inherit', ult.inherit, true);
+    const limit = ult.limit;
+    if (limit !== undefined && limit !== null) assign('limit', limit);
+    assign('replace', ult.replace);
+    assign('creep', ult.creep, true);
+
+    return hasValue ? out : null;
+  }
+
+  function applyUltSummonDefaults(spec, ult){
+    const fields = extractUltSummonFields(ult);
+    if (!fields) return spec;
+    const out = spec ?? {};
+    for (const [key, value] of Object.entries(fields)){
+      if (out[key] === undefined || out[key] === null){
+        out[key] = value;
+      }
+    }
+    return out;
+  }
+
+  function collectUltTags(metaOrKit){
+    const kit = coerceKit(metaOrKit);
+    const ult = kit?.ult;
+    const tags = new Set();
+    const add = (val) => {
+      if (typeof val === 'string' && val.trim() !== '') tags.add(val.trim());
+    };
+    const addMany = (vals) => {
+      if (!Array.isArray(vals)) return;
+      for (const val of vals){ add(val); }
+    };
+
+    if (!ult) return tags;
+    add(ult.type);
+    add(ult.kind);
+    add(ult.category);
+    addMany(ult.tags);
+
+    const metadata = ult.metadata || ult.meta || null;
+    if (metadata){
+      add(metadata.type);
+      add(metadata.kind);
+      add(metadata.category);
+      addMany(metadata.categories);
+      addMany(metadata.tags);
+      if (metadata.label) add(metadata.label);
+    }
+
+    const traitUlt = readTrait(kit?.traits, 'ult');
+    if (traitUlt){
+      if (typeof traitUlt === 'string') add(traitUlt);
+      if (Array.isArray(traitUlt)) addMany(traitUlt);
+      if (traitUlt && typeof traitUlt === 'object'){
+        add(traitUlt.type);
+        addMany(traitUlt.tags);
+        addMany(traitUlt.categories);
+        if (typeof traitUlt.label === 'string') add(traitUlt.label);
+      }
+    }
+
+    return tags;
+  }
+
+  function getSummonSpec(metaOrKit){
+    const kit = coerceKit(metaOrKit);
+    if (!kit) return null;
+
+    let spec = null;
+    for (const key of KNOWN_SUMMON_KEYS){
+      const trait = readTrait(kit.traits, key);
+      if (trait){
+        if (trait === true) {
+          spec = {};
+        } else if (typeof trait === 'object'){
+          spec = cloneShallow(trait);
+        } else if (typeof trait === 'number'){
+          spec = { count: trait };
+        } else {
+          spec = {};
+        }
+        break;
+      }
+    }
+
+    const ult = kit.ult || null;
+    if (!spec && ult){
+      if (ult.summon){
+        spec = cloneShallow(ult.summon);
+      } else if (ult.metadata?.summon){
+        spec = cloneShallow(ult.metadata.summon);
+      } else if (ult.meta?.summon){
+        spec = cloneShallow(ult.meta.summon);
+      }
+    }
+
+    const tags = collectUltTags(kit);
+    if (!spec && tags.has('summon')){
+      if (ult?.summon){
+        spec = cloneShallow(ult.summon);
+      }
+      spec = applyUltSummonDefaults(spec, ult);
+    }
+    if (ult && typeof ult.type === 'string' && ult.type.toLowerCase() === 'summon'){
+      spec = applyUltSummonDefaults(spec, ult);
+    }
+
+    if (!spec) return null;
+
+    const normalized = cloneShallow(spec) || {};
+    if (!normalized.pattern && typeof normalized.placement === 'string'){
+      normalized.pattern = normalized.placement;
+    }
+    if (!normalized.pattern && typeof normalized.patternKey === 'string'){
+      normalized.pattern = normalized.patternKey;
+    }
+    if (normalized.ttl == null && typeof normalized.ttlTurns === 'number'){
+      normalized.ttl = normalized.ttlTurns;
+    }
+    if (normalized.ttlTurns == null && typeof normalized.ttl === 'number'){
+      normalized.ttlTurns = normalized.ttl;
+    }
+    return normalized;
+  }
+
+  function getReviveSpec(metaOrKit){
+    const kit = coerceKit(metaOrKit);
+    if (!kit) return null;
+    for (const key of KNOWN_REVIVE_KEYS){
+      const trait = readTrait(kit.traits, key);
+      if (trait){
+        if (trait === true) return {};
+        if (typeof trait === 'object') return cloneShallow(trait);
+        return {};
+      }
+    }
+    const ult = kit.ult || null;
+    if (ult?.revive) return cloneShallow(ult.revive);
+    if (ult?.metadata?.revive) return cloneShallow(ult.metadata.revive);
+    if (collectUltTags(kit).has('revive')){
+      return cloneShallow(ult?.revive || {});
+    }
+    return null;
+  }
+
+  function kitSupportsSummon(metaOrKit){
+    return !!getSummonSpec(metaOrKit);
+  }
+
+  function kitUltHasTag(metaOrKit, tag){
+    if (!tag) return false;
+    const tags = collectUltTags(metaOrKit);
+    const target = normalizeKey(tag);
+    for (const t of tags){
+      if (normalizeKey(t) === target) return true;
+    }
+    return false;
+  }
+
+  function detectUltBehavior(metaOrKit){
+    const kit = coerceKit(metaOrKit);
+    const ult = kit?.ult;
+    const tags = collectUltTags(kit);
+    const metadata = ult?.metadata || ult?.meta || {};
+    const traits = kit?.traits || null;
+
+    const hasInstant = Boolean(
+      metadata.instant === true || metadata.instantCast === true || metadata.cast === 'instant'
+        || (ult && (ult.instant || ult.cast === 'instant' || ult.immediate === true))
+        || INSTANT_TAGS.some(tag => kitUltHasTag(kit, tag))
+        || readTrait(traits, 'instantUlt') === true || readTrait(traits, 'instantUltimate') === true
+    );
+
+    const hasDefensive = Boolean(
+      metadata.defensive === true || metadata.role === 'defensive'
+        || DEFENSIVE_TAGS.some(tag => kitUltHasTag(kit, tag))
+        || (ult && (typeof ult.reduceDamage === 'number' || typeof ult.shield === 'number' || typeof ult.barrier === 'number'
+          || Array.isArray(ult.shields) || Array.isArray(ult.buffs) && ult.buffs.some(b => normalizeKey(b.effect) === 'shield')))
+        || readTrait(traits, 'defensiveUlt') === true || readTrait(traits, 'guardianUlt') === true
+    );
+
+    const revive = getReviveSpec(kit);
+    const hasRevive = !!revive;
+
+    return {
+      tags: Array.from(tags),
+      hasInstant,
+      hasDefensive,
+      hasRevive,
+      revive,
+      summon: getSummonSpec(kit)
+    };
+  }
+
+  function extractRageFromEffects(onSpawn, opts){
+    const effects = Array.isArray(onSpawn?.effects) ? onSpawn.effects : [];
+    for (const effect of effects){
+      if (!effect) continue;
+      const type = normalizeKey(effect.type || effect.kind || effect.effect);
+      if (!type) continue;
+      if (type === 'setrage' || type === 'addrage' || type === 'giverage'){
+        if (opts.revive && normalizeKey(effect.phase || effect.stage || effect.when) === 'revive' && typeof effect.amount === 'number'){
+          return effect.amount;
+        }
+        if (opts.isLeader && normalizeKey(effect.target) === 'leader' && typeof effect.amount === 'number'){
+          return effect.amount;
+        }
+        if (!opts.isLeader && (effect.target == null || ['deck', 'nonleader', 'non-leader'].includes(normalizeKey(effect.target)))){
+          if (typeof effect.amount === 'number') return effect.amount;
+        }
+        if (typeof effect.value === 'number') return effect.value;
+        if (typeof effect.amount === 'number') return effect.amount;
+      }
+    }
+    return null;
+  }
+
+  function extractOnSpawnRage(onSpawn, opts = {}){
+    if (!onSpawn) return null;
+    const { isLeader = false, revive = false, reviveSpec = null } = opts;
+
+    if (revive && reviveSpec && typeof reviveSpec.rage === 'number'){
+      return Math.max(0, reviveSpec.rage);
+    }
+    if (revive){
+      const reviveCfg = onSpawn.revive || onSpawn.onRevive || onSpawn.revived || null;
+      if (reviveCfg && typeof reviveCfg.rage === 'number') return Math.max(0, reviveCfg.rage);
+    }
+
+    const fromEffects = extractRageFromEffects(onSpawn, opts);
+    if (fromEffects != null) return Math.max(0, fromEffects);
+
+    const rage = onSpawn.rage;
+    if (typeof rage === 'number') return Math.max(0, rage);
+    if (typeof rage === 'string' && rage.trim() !== ''){
+      const parsed = Number(rage);
+      if (!Number.isNaN(parsed)) return Math.max(0, parsed);
+    }
+    if (rage && typeof rage === 'object'){
+      if (revive && typeof rage.revive === 'number') return Math.max(0, rage.revive);
+      if (isLeader && typeof rage.leader === 'number') return Math.max(0, rage.leader);
+      if (!isLeader){
+        if (typeof rage.deck === 'number') return Math.max(0, rage.deck);
+        if (typeof rage.nonLeader === 'number') return Math.max(0, rage.nonLeader);
+      }
+      if (typeof rage.default === 'number') return Math.max(0, rage.default);
+      if (typeof rage.value === 'number') return Math.max(0, rage.value);
+    }
+
+    if (onSpawn.deck && typeof onSpawn.deck.rage === 'number' && !isLeader){
+      return Math.max(0, onSpawn.deck.rage);
+    }
+    if (onSpawn.default && typeof onSpawn.default.rage === 'number'){
+      return Math.max(0, onSpawn.default.rage);
+    }
+    if (revive && typeof onSpawn.reviveRage === 'number'){
+      return Math.max(0, onSpawn.reviveRage);
+    }
+    if (typeof onSpawn.defaultRage === 'number'){
+      return Math.max(0, onSpawn.defaultRage);
+    }
+    if (typeof onSpawn.rageOnSummon === 'number' && !isLeader){
+      return Math.max(0, onSpawn.rageOnSummon);
+    }
+    return null;
+  }
+
+  function verticalNeighbors(baseSlot){
+    const row = (baseSlot - 1) % 3;
+    const list = [];
+    if (row > 0) list.push(baseSlot - 1);
+    if (row < 2) list.push(baseSlot + 1);
+    return list;
+  }
+
+  function rowNeighbors(baseSlot){
+    const col = Math.floor((baseSlot - 1) / 3);
+    const row = (baseSlot - 1) % 3;
+    const left  = (col < 2) ? ((col + 1) * 3 + row + 1) : null;
+    const right = (col > 0) ? ((col - 1) * 3 + row + 1) : null;
+    return [right, left].filter(Boolean);
+  }
+
+  function resolveSummonSlots(spec, baseSlot){
+    if (!spec || !Number.isFinite(baseSlot)) return [];
+    if (Array.isArray(spec.slots) && spec.slots.length){
+      return spec.slots.filter(s => Number.isFinite(s)).map(s => s|0);
+    }
+
+    const patternRaw = spec.pattern || spec.placement || spec.shape || spec.area;
+    const pattern = normalizeKey(patternRaw);
+    if (!pattern){
+      return verticalNeighbors(baseSlot);
+    }
+
+    switch(pattern){
+      case 'verticalneighbors':
+      case 'columnneighbors':
+      case 'column':
+      case 'adjacentcolumn':
+        return verticalNeighbors(baseSlot);
+      case 'rowneighbors':
+      case 'horizontalneighbors':
+      case 'adjacentrow':
+        return rowNeighbors(baseSlot);
+      case 'adjacent':
+      case 'adjacentall':
+      case 'neighbors': {
+        const merged = [...verticalNeighbors(baseSlot), ...rowNeighbors(baseSlot)];
+        return Array.from(new Set(merged));
+      }
+      case 'self':
+        return [baseSlot];
+      default:
+        return verticalNeighbors(baseSlot);
+    }
+  }
+
+  exports.kitSupportsSummon = kitSupportsSummon;
+  exports.getSummonSpec = getSummonSpec;
+  exports.detectUltBehavior = detectUltBehavior;
+  exports.extractOnSpawnRage = extractOnSpawnRage;
+  exports.resolveSummonSlots = resolveSummonSlots;
+  exports.kitUltHasTag = kitUltHasTag;
+  exports.collectUltTags = collectUltTags;
+  exports.getReviveSpec = getReviveSpec;
 });
 __define('./utils/time.js', (exports, module, __require) => {
   const perf = typeof globalThis !== 'undefined' ? globalThis.performance : undefined;
