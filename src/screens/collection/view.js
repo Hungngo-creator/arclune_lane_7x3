@@ -2,6 +2,7 @@ import { ROSTER } from '../../catalog.js';
 import { UNITS } from '../../units.js';
 import { getUnitArt } from '../../art.js';
 import { listCurrencies } from '../../data/economy.js';
+import { getSkillSet } from '../../data/skills.js';
 
 const STYLE_ID = 'collection-view-style-v2';
 
@@ -81,11 +82,19 @@ function ensureStyles(){
     .collection-skill-overlay__visual img{width:100%;max-width:320px;height:auto;filter:drop-shadow(0 24px 48px rgba(0,0,0,.6));}
     .collection-skill-overlay__details{display:flex;flex-direction:column;gap:12px;}
     .collection-skill-overlay__subtitle{margin:0;color:#9cbcd9;font-size:14px;line-height:1.6;}
-    .collection-skill-overlay__items{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
-    .collection-skill-overlay__item{height:72px;border-radius:16px;border:1px dashed rgba(125,211,252,.35);background:rgba(10,18,28,.78);display:flex;align-items:center;justify-content:center;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
-    .collection-skill-overlay__action{align-self:flex-start;padding:12px 18px;border-radius:14px;border:1px solid rgba(255,184,108,.45);background:rgba(255,184,108,.12);color:#ffd9a1;font-size:13px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:transform .18s ease,background .18s ease;}
-    .collection-skill-overlay__action:hover{transform:translateY(-2px);background:rgba(255,184,108,.24);}
-    .collection-skill-overlay__action:focus-visible{outline:2px solid rgba(255,184,108,.65);outline-offset:3px;}
+    .collection-skill-overlay__abilities{display:flex;flex-direction:column;gap:16px;overflow:auto;max-height:420px;padding-right:4px;}
+    .collection-skill-card{border-radius:16px;border:1px solid rgba(125,211,252,.24);background:rgba(12,22,32,.88);padding:16px;display:flex;flex-direction:column;gap:10px;}
+    .collection-skill-card__header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+    .collection-skill-card__title{margin:0;font-size:16px;letter-spacing:.04em;}
+    .collection-skill-card__badge{padding:4px 10px;border-radius:12px;border:1px solid rgba(125,211,252,.28);background:rgba(8,18,28,.82);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
+    .collection-skill-card__meta{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:8px;font-size:12px;color:#9cbcd9;}
+    .collection-skill-card__meta li{padding:4px 8px;border-radius:10px;background:rgba(16,26,36,.72);}
+    .collection-skill-card__description{margin:0;color:#e6f2ff;font-size:13px;line-height:1.6;}
+    .collection-skill-card__notes{margin:0;padding-left:18px;color:#9cbcd9;font-size:12px;line-height:1.5;display:flex;flex-direction:column;gap:4px;}
+    .collection-skill-card__empty{margin:0;color:#9cbcd9;font-size:13px;line-height:1.6;background:rgba(12,22,32,.88);border:1px dashed rgba(125,211,252,.28);border-radius:14px;padding:16px;text-align:center;}
+    .collection-skill-overlay__notes{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:12px;color:#9cbcd9;}
+    .collection-skill-overlay__notes li{position:relative;padding-left:16px;}
+    .collection-skill-overlay__notes li::before{content:'•';position:absolute;left:0;color:#7da0c7;}
     @media(max-width:1080px){
       .collection-view__layout{grid-template-columns:1fr;}
       .collection-skill-overlay{position:fixed;top:50%;left:50%;transform:translate(-50%,calc(-50% + 12px));width:88vw;min-height:0;}
@@ -166,36 +175,245 @@ function resolveCurrencyBalance(currencyId, providedCurrencies, playerState){
 }
 
 function describeUlt(unit){
-  const ult = unit?.kit?.ult;
-  if (!ult) return 'Nâng cấp giúp tăng hệ số sát thương, phạm vi hoặc hiệu ứng khống chế tùy bộ kỹ năng.';
-  const parts = [];
-  if (ult.type){
-    parts.push(`Loại: ${ult.type}`);
-  }
-  if (typeof ult.hits === 'number'){
-    parts.push(`${ult.hits} hit`);
-  }
-  if (ult.aoe){
-    parts.push(`Phạm vi: ${ult.aoe}`);
-  }
-  if (ult.turns){
-    parts.push(`Hiệu lực ${ult.turns} lượt`);
-  }
-  if (ult.notes){
-    parts.push(ult.notes);
-  }
-  return parts.length > 0
-    ? `Nâng cấp cường hóa tuyệt kỹ (${parts.join(' • ')}).`
-    : 'Nâng cấp giúp tăng hiệu quả tuyệt kỹ hiện tại.';
+  return unit?.name ? `Bộ kỹ năng của ${unit.name}.` : 'Chọn nhân vật để xem mô tả chi tiết.';
 }
 
-function describeUpgrade(unit){
-  const passives = unit?.kit?.passives;
-  if (!Array.isArray(passives) || passives.length === 0){
-    return 'Đầu tư nâng cấp sẽ mở thêm node thiên phú, gia tăng hiệu quả hỗ trợ và sát thương.';
+const TARGET_LABELS = {
+  single: 'Đơn mục tiêu',
+  singleTarget: 'Đơn mục tiêu',
+  randomEnemies: 'Địch ngẫu nhiên',
+  randomRow: 'Một hàng ngẫu nhiên',
+  randomColumn: 'Một cột ngẫu nhiên',
+  allEnemies: 'Toàn bộ địch',
+  allAllies: 'Toàn bộ đồng minh',
+  allies: 'Đồng minh',
+  self: 'Bản thân',
+  'self+2allies': 'Bản thân + 2 đồng minh'
+};
+
+const ABILITY_TYPE_LABELS = {
+  basic: 'Đánh thường',
+  active: 'Kĩ năng',
+  ultimate: 'Tuyệt kỹ',
+  talent: 'Thiên phú',
+  technique: 'Tuyệt học',
+  passive: 'Nội tại'
+};
+
+function formatResourceCost(cost){
+  if (!cost || typeof cost !== 'object') return 'Không tốn tài nguyên';
+  const parts = [];
+  for (const [key, value] of Object.entries(cost)){
+    if (!Number.isFinite(value)) continue;
+    const label = key === 'aether' ? 'Aether' : key.replace(/_/g, ' ');
+    parts.push(`${value} ${label}`);
   }
-  const highlights = passives.slice(0, 2).map(passive => passive?.id ? passive.id : 'passive');
-  return `Đầu tư nguyên liệu để mở ${highlights.join(' & ')} cùng các biến thể nâng cấp.`;
+  return parts.length ? parts.join(' + ') : 'Không tốn tài nguyên';
+}
+
+function formatDuration(duration){
+  if (!duration) return null;
+  if (typeof duration === 'number') return `Hiệu lực ${duration} lượt`;
+  if (typeof duration === 'string'){
+    return duration === 'battle' ? 'Hiệu lực tới hết trận' : null;
+  }
+  const parts = [];
+  if (duration.turns === 'battle'){
+    parts.push('Hiệu lực tới hết trận');
+  } else if (Number.isFinite(duration.turns)){
+    parts.push(`Hiệu lực ${duration.turns} lượt`);
+  }
+  if (duration.start === 'nextTurn'){
+    parts.push('Bắt đầu từ lượt kế tiếp');
+  }
+  if (Number.isFinite(duration.bossModifier) && Number.isFinite(duration.turns)){
+    const bossTurns = Math.max(1, Math.floor(duration.turns * duration.bossModifier));
+    parts.push(`Boss PvE: ${bossTurns} lượt`);
+  }
+  if (duration.affectedStat){
+    parts.push(`Ảnh hưởng: ${duration.affectedStat}`);
+  }
+  return parts.length ? parts.join(' · ') : null;
+}
+
+function formatTargetLabel(target){
+  if (target == null) return null;
+  if (typeof target === 'number'){
+    return `Nhắm tới ${target} mục tiêu`;
+  }
+  const key = target.toString();
+  return TARGET_LABELS[key] || key;
+}
+
+function formatSummonSummary(summon){
+  if (!summon || typeof summon !== 'object') return null;
+  const parts = [];
+  if (Number.isFinite(summon.count)){
+    parts.push(`Triệu hồi ${summon.count} đơn vị`);
+  } else {
+    parts.push('Triệu hồi đơn vị');
+  }
+  if (summon.placement || summon.pattern){
+    parts.push(`ô ${summon.placement || summon.pattern}`);
+  }
+  if (summon.limit != null){
+    parts.push(`giới hạn ${summon.limit}`);
+  }
+  const ttl = summon.ttlTurns ?? summon.ttl;
+  if (Number.isFinite(ttl) && ttl > 0){
+    parts.push(`tồn tại ${ttl} lượt`);
+  }
+  if (summon.replace){
+    parts.push(`thay ${summon.replace}`);
+  }
+  if (summon.inherit && typeof summon.inherit === 'object'){
+    const inheritParts = [];
+    for (const [stat, value] of Object.entries(summon.inherit)){
+      if (!Number.isFinite(value)) continue;
+      inheritParts.push(`${Math.round(value * 100)}% ${stat.toUpperCase()}`);
+    }
+    if (inheritParts.length){
+      parts.push(`kế thừa ${inheritParts.join(', ')}`);
+    }
+  }
+  return parts.join(' · ');
+}
+
+function formatReviveSummary(revive){
+  if (!revive || typeof revive !== 'object') return null;
+  const parts = [];
+  const targets = Number.isFinite(revive.targets) ? revive.targets : 1;
+  parts.push(`Hồi sinh ${targets} đồng minh`);
+  if (revive.priority){
+    parts.push(`ưu tiên ${revive.priority}`);
+  }
+  if (Number.isFinite(revive.hpPercent)){
+    parts.push(`HP ${Math.round(revive.hpPercent * 100)}%`);
+  }
+  if (Number.isFinite(revive.ragePercent)){
+    parts.push(`Nộ ${Math.round(revive.ragePercent * 100)}%`);
+  }
+  if (Number.isFinite(revive.lockSkillsTurns)){
+    parts.push(`Khoá kỹ năng ${revive.lockSkillsTurns} lượt`);
+  }
+  return parts.join(' · ');
+}
+
+function formatLinksSummary(links){
+  if (!links || typeof links !== 'object') return null;
+  const parts = [];
+  if (Number.isFinite(links.sharePercent)){
+    parts.push(`Chia ${Math.round(links.sharePercent * 100)}% sát thương`);
+  }
+  if (links.maxConcurrent != null){
+    parts.push(`tối đa ${links.maxConcurrent} mục tiêu`);
+  }
+  return parts.join(' · ');
+}
+
+function formatTagLabel(tag){
+  if (typeof tag !== 'string') return '';
+  return tag.replace(/-/g, ' ');
+}
+
+function labelForAbility(entry, fallback){
+  const type = entry?.type;
+  if (type && ABILITY_TYPE_LABELS[type]) return ABILITY_TYPE_LABELS[type];
+  return fallback || 'Kĩ năng';
+}
+
+function collectAbilityFacts(entry){
+  const facts = [];
+  if (entry?.cost && typeof entry.cost === 'object'){
+    const formattedCost = formatResourceCost(entry.cost);
+    if (formattedCost) facts.push(`Chi phí: ${formattedCost}`);
+  }
+  if (typeof entry?.hits === 'number' && entry.hits > 0){
+    facts.push(`${entry.hits} hit`);
+  }
+  const targetLabel = formatTargetLabel(entry?.targets ?? entry?.target);
+  if (targetLabel){
+    facts.push(`Mục tiêu: ${targetLabel}`);
+  }
+  const duration = formatDuration(entry?.duration);
+  if (duration){
+    facts.push(duration);
+  }
+  if (Number.isFinite(entry?.limitUses)){
+    facts.push(`Giới hạn: ${entry.limitUses} lần`);
+  }
+  if (entry?.lockout){
+    facts.push(`Khoá: ${entry.lockout === 'battle' ? 'đến hết trận' : entry.lockout}`);
+  }
+  if (Number.isFinite(entry?.maxStacks)){
+    facts.push(`Tối đa ${entry.maxStacks} tầng`);
+  }
+  if (Array.isArray(entry?.tags) && entry.tags.length){
+    facts.push(`Tag: ${entry.tags.map(formatTagLabel).join(', ')}`);
+  }
+  const summon = formatSummonSummary(entry?.summon);
+  if (summon){
+    facts.push(summon);
+  }
+  const revive = formatReviveSummary(entry?.revive);
+  if (revive){
+    facts.push(revive);
+  }
+  const links = formatLinksSummary(entry?.links);
+  if (links){
+    facts.push(`Liên kết: ${links}`);
+  }
+  return facts;
+}
+
+function renderAbilityCard(entry, { typeLabel } = {}){
+  const card = document.createElement('article');
+  card.className = 'collection-skill-card';
+
+  const header = document.createElement('header');
+  header.className = 'collection-skill-card__header';
+
+  const title = document.createElement('h4');
+  title.className = 'collection-skill-card__title';
+  title.textContent = entry?.name || 'Kĩ năng';
+  header.appendChild(title);
+
+  const badge = document.createElement('span');
+  badge.className = 'collection-skill-card__badge';
+  badge.textContent = typeLabel || labelForAbility(entry);
+  header.appendChild(badge);
+
+  card.appendChild(header);
+
+  const facts = collectAbilityFacts(entry);
+  if (facts.length){
+    const metaList = document.createElement('ul');
+    metaList.className = 'collection-skill-card__meta';
+    for (const fact of facts){
+      const item = document.createElement('li');
+      item.textContent = fact;
+      metaList.appendChild(item);
+    }
+    card.appendChild(metaList);
+  }
+
+  const desc = document.createElement('p');
+  desc.className = 'collection-skill-card__description';
+  desc.textContent = entry?.description || 'Chưa có mô tả chi tiết.';
+  card.appendChild(desc);
+
+  if (Array.isArray(entry?.notes) && entry.notes.length){
+    const notesList = document.createElement('ul');
+    notesList.className = 'collection-skill-card__notes';
+    for (const note of entry.notes){
+      if (!note) continue;
+      const li = document.createElement('li');
+      li.textContent = note;
+      notesList.appendChild(li);
+    }
+    card.appendChild(notesList);
+  }
+  return card;
 }
 
 export function renderCollectionView(options = {}){
@@ -424,35 +642,20 @@ export function renderCollectionView(options = {}){
   overlaySubtitle.className = 'collection-skill-overlay__subtitle';
   overlaySubtitle.textContent = 'Chọn nhân vật để xem mô tả kỹ năng.';
 
-  const overlayUpgrade = document.createElement('p');
-  overlayUpgrade.className = 'collection-skill-overlay__subtitle';
-  overlayUpgrade.textContent = '';
+  const overlaySummary = document.createElement('p');
+  overlaySummary.className = 'collection-skill-overlay__subtitle';
+  overlaySummary.textContent = '';
 
-  const overlayItems = document.createElement('div');
-  overlayItems.className = 'collection-skill-overlay__items';
-
-  for (let i = 0; i < 3; i += 1){
-    const slot = document.createElement('div');
-    slot.className = 'collection-skill-overlay__item';
-    slot.textContent = 'Vật phẩm';
-    overlayItems.appendChild(slot);
+  const overlayNotesList = document.createElement('ul');
+  overlayNotesList.className = 'collection-skill-overlay__notes';
   }
-
-  const overlayAction = document.createElement('button');
-  overlayAction.type = 'button';
-  overlayAction.className = 'collection-skill-overlay__action';
-  overlayAction.textContent = 'Nâng cấp';
-
-  const handleUpgrade = () => {
-    // Future hook: trigger upgrade flow
-  };
-  overlayAction.addEventListener('click', handleUpgrade);
-  addCleanup(() => overlayAction.removeEventListener('click', handleUpgrade));
+  const overlayAbilities = document.createElement('div');
+  overlayAbilities.className = 'collection-skill-overlay__abilities';
 
   overlayDetails.appendChild(overlaySubtitle);
-  overlayDetails.appendChild(overlayUpgrade);
-  overlayDetails.appendChild(overlayItems);
-  overlayDetails.appendChild(overlayAction);
+  overlayDetails.appendChild(overlaySummary);
+  overlayDetails.appendChild(overlayNotesList);
+  overlayDetails.appendChild(overlayAbilities);
 
   overlayContent.appendChild(overlayVisual);
   overlayContent.appendChild(overlayDetails);
@@ -607,8 +810,62 @@ export function renderCollectionView(options = {}){
     }
 
     overlayTitle.textContent = unit?.name ? `Kĩ năng · ${unit.name}` : 'Kĩ năng';
+    
+    const skillSet = getSkillSet(unitId);
     overlaySubtitle.textContent = describeUlt(unit);
-    overlayUpgrade.textContent = describeUpgrade(unit);
+    const summaryNote = skillSet?.notes?.[0] ?? '';
+    overlaySummary.textContent = summaryNote;
+    overlaySummary.style.display = summaryNote ? '' : 'none';
+
+    while (overlayNotesList.firstChild){
+      overlayNotesList.removeChild(overlayNotesList.firstChild);
+    }
+    const extraNotes = Array.isArray(skillSet?.notes) ? skillSet.notes.slice(1) : [];
+    if (extraNotes.length){
+      overlayNotesList.style.display = '';
+      for (const note of extraNotes){
+        if (!note) continue;
+        const item = document.createElement('li');
+        item.textContent = note;
+        overlayNotesList.appendChild(item);
+      }
+    } else {
+      overlayNotesList.style.display = 'none';
+    }
+
+    while (overlayAbilities.firstChild){
+      overlayAbilities.removeChild(overlayAbilities.firstChild);
+    }
+    const abilityEntries = [];
+    if (skillSet?.basic){
+      abilityEntries.push({ entry: skillSet.basic, label: ABILITY_TYPE_LABELS.basic });
+    }
+    if (Array.isArray(skillSet?.skills)){
+      skillSet.skills.forEach((skill, index) => {
+        if (!skill) return;
+        abilityEntries.push({ entry: skill, label: `Kĩ năng ${index + 1}` });
+      });
+    }
+    if (skillSet?.ult){
+      abilityEntries.push({ entry: skillSet.ult, label: ABILITY_TYPE_LABELS.ultimate });
+    }
+    if (skillSet?.talent){
+      abilityEntries.push({ entry: skillSet.talent, label: ABILITY_TYPE_LABELS.talent });
+    }
+    if (skillSet?.technique){
+      abilityEntries.push({ entry: skillSet.technique, label: ABILITY_TYPE_LABELS.technique });
+    }
+
+    if (abilityEntries.length){
+      for (const ability of abilityEntries){
+        overlayAbilities.appendChild(renderAbilityCard(ability.entry, { typeLabel: ability.label }));
+      }
+    } else {
+      const placeholder = document.createElement('p');
+      placeholder.className = 'collection-skill-card__empty';
+      placeholder.textContent = 'Chưa có dữ liệu kỹ năng chi tiết cho nhân vật này.';
+      overlayAbilities.appendChild(placeholder);
+    }
 
     if (activeTab === 'skills'){
       overlay.classList.add('is-open');
