@@ -7806,19 +7806,23 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
       .collection-skill-overlay__content{display:grid;grid-template-columns:1fr;gap:24px;flex:1;overflow:auto;padding-right:8px;}
       .collection-skill-overlay__details{display:flex;flex-direction:column;gap:12px;}
       .collection-skill-overlay__subtitle{margin:0;color:#9cbcd9;font-size:14px;line-height:1.6;}
-      .collection-skill-overlay__abilities{display:flex;flex-direction:column;gap:16px;overflow:visible;max-height:none;padding-right:0;}
-      .collection-skill-card{border-radius:16px;border:1px solid rgba(125,211,252,.24);background:rgba(12,22,32,.88);padding:16px;display:flex;flex-direction:column;gap:10px;}
-      ..collection-skill-card__header{display:flex;align-items:center;gap:12px;}
-      .collection-skill-card__title{margin:0;font-size:16px;letter-spacing:.04em;flex:1;}
-      .collection-skill-card__actions{display:flex;align-items:center;gap:8px;margin-left:auto;}
-      .collection-skill-card__badge{padding:4px 10px;border-radius:12px;border:1px solid rgba(125,211,252,.28);background:rgba(8,18,28,.82);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
-      .collection-skill-card__upgrade{padding:6px 12px;border-radius:12px;border:1px solid rgba(174,228,255,.32);background:rgba(16,26,36,.88);color:#aee4ff;font-size:12px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;}
+      .collection-skill-overlay__abilities{display:flex;flex-direction:column;gap:12px;overflow:visible;max-height:none;padding-right:2px;}
+      .collection-skill-card{border-radius:16px;border:1px solid rgba(125,211,252,.24);background:rgba(12,22,32,.88);padding:12px;display:flex;flex-direction:column;gap:8px;}
+      .collection-skill-card__header{display:flex;align-items:center;gap:10px;}
+      .collection-skill-card__title{margin:0;font-size:15px;letter-spacing:.04em;flex:1;}
+      .collection-skill-card__actions{display:flex;align-items:center;gap:6px;margin-left:auto;}
+      .collection-skill-card__badge{padding:3px 8px;border-radius:12px;border:1px solid rgba(125,211,252,.28);background:rgba(8,18,28,.82);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
+      .collection-skill-card__upgrade{padding:5px 10px;border-radius:12px;border:1px solid rgba(174,228,255,.32);background:rgba(16,26,36,.88);color:#aee4ff;font-size:11px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;}
       .collection-skill-card__upgrade:hover{transform:translateY(-1px);border-color:rgba(174,228,255,.52);box-shadow:0 8px 18px rgba(6,12,20,.38);}
       .collection-skill-card__upgrade:focus-visible{outline:2px solid rgba(174,228,255,.75);outline-offset:3px;}
-      .collection-skill-card__meta{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:8px;font-size:12px;color:#9cbcd9;}
-      .collection-skill-card__meta li{padding:4px 8px;border-radius:10px;background:rgba(16,26,36,.72);}
-      .collection-skill-card__description{margin:0;color:#e6f2ff;font-size:13px;line-height:1.6;}
-      .collection-skill-card__notes{margin:0;padding-left:18px;color:#9cbcd9;font-size:12px;line-height:1.5;display:flex;flex-direction:column;gap:4px;}
+      .collection-skill-card__meta{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:6px 10px;font-size:11px;color:#9cbcd9;}
+      .collection-skill-card__meta li{padding:6px 8px;border-radius:10px;background:rgba(16,26,36,.72);display:flex;align-items:center;gap:8px;min-height:38px;}
+      .collection-skill-card__meta-icon{font-size:14px;line-height:1;}
+      .collection-skill-card__meta-text{display:flex;flex-direction:column;gap:2px;line-height:1.3;}
+      .collection-skill-card__meta-label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#cfe6ff;}
+      .collection-skill-card__meta-value{font-size:11px;color:#e6f2ff;}
+      .collection-skill-card__description{margin:0;color:#e6f2ff;font-size:12px;line-height:1.5;}
+      .collection-skill-card__notes{margin:0;padding-left:16px;color:#9cbcd9;font-size:11px;line-height:1.45;display:flex;flex-direction:column;gap:4px;}
       .collection-skill-card__empty{margin:0;color:#9cbcd9;font-size:13px;line-height:1.6;background:rgba(12,22,32,.88);border:1px dashed rgba(125,211,252,.28);border-radius:14px;padding:16px;text-align:center;}
       .collection-skill-overlay__notes{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:12px;color:#9cbcd9;}
       .collection-skill-overlay__notes li{position:relative;padding-left:16px;}
@@ -7830,6 +7834,13 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
       }
       @media(max-width:720px){
         .collection-view__title{font-size:30px;}
+        .collection-skill-overlay__abilities{gap:10px;}
+        .collection-skill-card{padding:10px;gap:6px;}
+        .collection-skill-card__title{font-size:14px;}
+        .collection-skill-card__meta{grid-template-columns:1fr;}
+        .collection-skill-card__meta li{min-height:34px;}
+        .collection-skill-card__description{font-size:11px;}
+        .collection-skill-card__notes{font-size:10px;}
       }
     `;
 
@@ -8051,45 +8062,78 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
 
   function collectAbilityFacts(entry){
     const facts = [];
+    const addFact = (icon, label, value, tooltip = null) => {
+      if (!value) return;
+      facts.push({
+        icon: icon || null,
+        label: label || null,
+        value,
+        tooltip: tooltip || null
+      });
+    };
+
     if (entry?.cost && typeof entry.cost === 'object'){
       const formattedCost = formatResourceCost(entry.cost);
-      if (formattedCost) facts.push(`Chi phí: ${formattedCost}`);
+      if (formattedCost){
+        addFact('💠', 'Chi phí', formattedCost);
+      }
     }
+
     if (typeof entry?.hits === 'number' && entry.hits > 0){
-      facts.push(`${entry.hits} hit`);
+      const displayHits = entry.hits === 1 ? '1 hit' : `${entry.hits} hit`;
+      addFact('✦', 'Số hit', displayHits);
     }
+
     const targetLabel = formatTargetLabel(entry?.targets ?? entry?.target);
     if (targetLabel){
-      facts.push(`Mục tiêu: ${targetLabel}`);
+      addFact('🎯', 'Mục tiêu', targetLabel);
     }
+
     const duration = formatDuration(entry?.duration);
     if (duration){
-      facts.push(duration);
+      const parts = duration.split(' · ');
+      const primary = parts.shift();
+      const tooltip = parts.length ? duration : null;
+      addFact('⏱', 'Hiệu lực', primary, tooltip);
     }
+
     if (Number.isFinite(entry?.limitUses)){
-      facts.push(`Giới hạn: ${entry.limitUses} lần`);
+      addFact('🔁', 'Giới hạn', `${entry.limitUses} lần`);
     }
+
     if (entry?.lockout){
-      facts.push(`Khoá: ${entry.lockout === 'battle' ? 'đến hết trận' : entry.lockout}`);
+      const label = entry.lockout === 'battle' ? 'đến hết trận' : entry.lockout;
+      addFact('🔒', 'Khoá', label);
     }
+
     if (Number.isFinite(entry?.maxStacks)){
-      facts.push(`Tối đa ${entry.maxStacks} tầng`);
+      addFact('📚', 'Tối đa tầng', `${entry.maxStacks}`);
     }
+
     if (Array.isArray(entry?.tags) && entry.tags.length){
-      facts.push(`Tag: ${entry.tags.map(formatTagLabel).join(', ')}`);
+      const resolvedTags = entry.tags.map(formatTagLabel).filter(Boolean);
+      if (resolvedTags.length){
+        const [firstTag, ...restTags] = resolvedTags;
+        const display = restTags.length ? `${firstTag} +${restTags.length}` : firstTag;
+        addFact('🏷️', 'Tag', display, resolvedTags.join(', '));
+      }
     }
+
     const summon = formatSummonSummary(entry?.summon);
     if (summon){
-      facts.push(summon);
+      addFact('🜂', 'Triệu hồi', summon);
     }
+
     const revive = formatReviveSummary(entry?.revive);
     if (revive){
-      facts.push(revive);
+      addFact('☯️', 'Hồi sinh', revive);
     }
+
     const links = formatLinksSummary(entry?.links);
     if (links){
-      facts.push(`Liên kết: ${links}`);
+      addFact('🔗', 'Liên kết', links);
     }
+
     return facts;
   }
 
@@ -8137,7 +8181,33 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
       metaList.className = 'collection-skill-card__meta';
       for (const fact of facts){
         const item = document.createElement('li');
-        item.textContent = fact;
+        if (fact.tooltip){
+          item.title = fact.tooltip;
+        }
+
+        if (fact.icon){
+          const iconSpan = document.createElement('span');
+          iconSpan.className = 'collection-skill-card__meta-icon';
+          iconSpan.textContent = fact.icon;
+          item.appendChild(iconSpan);
+        }
+
+        const textContainer = document.createElement('span');
+        textContainer.className = 'collection-skill-card__meta-text';
+
+        if (fact.label){
+          const labelSpan = document.createElement('span');
+          labelSpan.className = 'collection-skill-card__meta-label';
+          labelSpan.textContent = fact.label;
+          textContainer.appendChild(labelSpan);
+        }
+
+        const valueSpan = document.createElement('span');
+        valueSpan.className = 'collection-skill-card__meta-value';
+        valueSpan.textContent = fact.value;
+        textContainer.appendChild(valueSpan);
+
+        item.appendChild(textContainer);
         metaList.appendChild(item);
       }
       card.appendChild(metaList);
