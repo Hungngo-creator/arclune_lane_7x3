@@ -1,6 +1,6 @@
 # Inputs
 CLASS_BASE[class][stat]   # base theo class
-RANK_MULT[rank]           # N=0.6, R=0.8, SR=1.0, SSR=1.3, UR=1.6, Prime=2.0
+RANK_MULT[rank]           # N=0.8, R=0.9, SR=1.05, SSR=1.25, UR=1.5, Prime=1.8 (giảm chênh lệch cơ bản)
 TP[stat]                  # phân bổ điểm đặc trưng của từng char
 
 # Quy đổi 1 TP → stat

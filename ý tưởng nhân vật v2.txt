@@ -1,5 +1,4 @@
 Vì tệp ý tưởng nhân vật v3 quá lag nên tao đã tạo tệp này.
-Đề nghị: bậc Prime gây sát thương = 110% atk và wil; UR = 100% còn lại 90% wil và atk mày thấy thế nào? Nếu hạ % thấp hơn thì không ổn vì các nhân vật khác rank đã chênh lệnh sẵn do hệ số nhân theo rank rồi.
 A. Nhân vật gacha
 31 nằm ở ý tưởng nhân vật v3.txt
 32) Vũ Thiên
@@ -12,11 +11,11 @@ Kĩ năng 2:
 
 Ultimate: nhận 1 Thích Ứng, gây sát thương đơn mục tiêu = 300% đánh thường, áp Trầm Mặc lên mục tiêu trong 1 turn.
 
-Đánh thường: gây sát thương = % wil và atk lên 1 kẻ địch
+Đánh thường: gây sát thương = 100% wil và atk lên 1 kẻ địch
 33) Anna
 Nội tại: mỗi khi dùng ultimate + 5% max hp/wil/atk của bản thân, cộng dồn tối đa 5 lần.
 
-Đánh thường: gây sát thương = n% wil và atk lên 1 kẻ địch, hồi hp cho 1 đồng minh ngẫu nhiên = 3% max hp của Anna.
+Đánh thường: gây sát thương = 100% wil và atk lên 1 kẻ địch, hồi hp cho 1 đồng minh ngẫu nhiên = 3% max hp của Anna.
 
 Kĩ năng 1: + 20% res/arm trong 2 turn, 20 aether.
 Kĩ năng 2: - hp = 50% max hp, chuyển lượng hp bị trừ cho leader (không mất max hp), không thể dùng nếu hp hiện tại dưới 70% max hp, 25 aether.
@@ -27,15 +26,17 @@ Ultimate: hồi hp cho mọi đồng minh có mặt trên sân = 50% max hp + 20
 34) Lão Khất Cái
 Nội tại: không bị ảnh hưởng bởi hiệu ứng khiêu khích từ kẻ thù, +2% atk/wil/agi cho mỗi đồng minh hiện hữu trên sân trừ leader.
 
-Đánh thường: cầm gậy, bổ từ trên cao vào đầu mục tiêu gây sát thương = 70% atk và wil.
+Đánh thường: cầm gậy, bổ từ trên cao vào đầu mục tiêu gây sát thương = 100% atk và wil.
 
 Kĩ năng 1: chọt mạnh cây gậy vào bụng mục tiêu, gây 1 đòn đánh thường, kĩ năng này bỏ qua 15% res và arm của mục tiêu, 20 aether.
 Kĩ năng 2: khi bị đòn tấn công aoe cố định vị trí mà không phải ngẫu nhiên chọn mục tiêu đánh trúng có 30% tỉ lệ chạy khỏi ô đang đứng và đi đến ô gần nhất (trừ ô leader đứng), skill kích hoạt 1 lần dùng hết trận. Khi chạy thành công sẽ đứng luôn ở ô vừa chạy đến, nếu không có ô đồng minh nào trống thì không thể chạy, hoạt động đến hết trận kể cả chết rồi được hồi sinh vẫn hoạt động, kỹ năng dạng nội tại, 25 aether.
 Kĩ năng 3: loạn côn đánh ngẫu nhiên 3 mục tiêu, gây 3 đòn đánh thường, bỏ qua 20% res và arm của mục tiêu, 35 aether.
 
-Ultimate: gây sát thương = 250% đánh thường lên 1 mục tiêu, bỏ qua 10% res/arm của mục tiêu.1
+Ultimate: gây sát thương = 250% đánh thường lên 1 mục tiêu, bỏ qua 10% res/arm của mục tiêu.
 
+35) 
 
+Ultimate: gây sát thương=200% đánh thường lên toàn sân kẻ địch, áp dụng hiệu ứng Phản Hồi Phục lên kẻ chịu sát thương từ ultimate trong 1 turn kể từ lúc kẻ thù dính debuff này.
 
 B. Nhân vật npc pve không gacha.
 
@@ -44,7 +45,15 @@ C. Các hiệu ứng buff/debuff bổ sung nếu trong game chưa có hiệu ứ
 1) Trầm Mặc: nhân vật dính hiệu ứng này không thể dùng ultimate. Debuff
 2) Ăn Mòn: giảm 2% max hp của nhân vật dính hiệu ứng này. Debuff.
 3) Thích Ứng: debuff đầu tiên nhận khi đã nhận Thích Ứng sẽ không thể áp dụng lên nhân vật có thích ứng sau 2 turn. Thích Ứng giúp kẻ có buff này không nhận 1 debuff khi có thích ứng, nếu nhân vật có thích ứng và đã không nhận debuff chết thi sau khi hồi sinh sẽ mất hiệu ứng không nhận debuff tương quan từ Thích Ứng. Buff.
-4)
+4) Phản Hồi Phục: mọi hiệu ứng hồi phục trừ hp regen của bản thân sẽ được chuyển thành sát thương nhận vào, bỏ qua res và arm.
+5) 
+
+
+
+
+
+
+
 
 
 

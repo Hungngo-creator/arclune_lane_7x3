@@ -20,7 +20,7 @@ Mục tiêu: gom quy ước đã chốt từ cuộc thảo luận + “các lưu
 - 8 core: HP, ATK, ARM(DEF), RES, PER, AGI, SPD, WIL.
 - 2 Aether: AEmax, AEregen/s.
 - CDR (nếu dùng) có thể nằm riêng theo hệ kỹ năng; không bắt buộc luôn có.
-- Rank Multiplier (áp lên TẤT CẢ chỉ số trừ SPD): N:0.6, R:0.8, SR:1.0, SSR:1.3, UR:1.6, Prime:2.0.
+- Rank Multiplier (áp lên TẤT CẢ chỉ số trừ SPD): N:0.8, R:0.9, SR:1.05, SSR:1.25, UR:1.5, Prime:1.8. (đã điều chỉnh để giảm chênh lệch cơ bản giữa các bậc)
 - SPD KHÔNG nhân theo bậc và không đổi thứ tự hành động theo ô; SPD chỉ ảnh hưởng follow‑up trong chính lượt của ô đó.
 
 3) SPD = nhịp follow‑up (không chen turn)

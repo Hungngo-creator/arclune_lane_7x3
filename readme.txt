@@ -83,7 +83,7 @@ Nếu đang là lượt slot 3, bạn đặt thêm unit ở slot 5,6: sau slot 3
 
 Cân bằng stat
 
-Rank Mult (áp lên mọi stat trừ SPD): N 0.6, R 0.8, SR 1.0, SSR 1.3, UR 1.6, Prime 2.0.
+Rank Mult (áp lên mọi stat trừ SPD): N 0.8, R 0.9, SR 1.05, SSR 1.25, UR 1.5, Prime 1.8..
 
 7 class: Mage/Pháp Sư, Tanker, Ranger/Cung Thủ, Warrior/Chiến Binh, Summoner, Support/Hỗ Trợ, Assassin/Sát Thủ.
 Trong thảo luận có thể dùng en/vn đan xen.
@@ -146,7 +146,7 @@ nhân vật A: +10% WIL, +10% AEregen
 nhân vật B: +12% ATK, +8% PER
 
 nhân vật C: +10% RES, +10% WIL
-Tổng % mỗi tướng bằng nhau, chênh lệch sức mạnh đến từ CLASS_BASE × RANK_MULT (đã đủ tạo khác biệt theo bậc).
+Tổng % mỗi tướng bằng nhau, chênh lệch sức mạnh đến từ CLASS_BASE × RANK_MULT (chuỗi mới giúp giảm chênh lệch giữa các bậc nhưng vẫn giữ cảm giác lên hạng).
 Nhưng tính theo % hay chỉ số cụ thể sẽ ok hơn vì tương lai sẽ có hệ thống lv cho nhân vật và leader?
 
 1. Không có “pattern mặc định” cho Summoner,  ta ghi rõ pattern và số lượng creep trong kit.ult từng tướng.

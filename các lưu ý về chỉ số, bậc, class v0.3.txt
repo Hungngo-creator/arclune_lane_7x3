@@ -19,7 +19,7 @@ Nộ: 0-100 (auto dùng Ult khi đầy).
 
 2) Bậc (Rarity) multiplier
 
-Rank Multiplier (áp lên TẤT CẢ chỉ số trừ SPD): N:0.6, R:0.8, SR:1.0, SSR:1.3, UR:1.6, Prime:2.0.
+Rank Multiplier (áp lên TẤT CẢ chỉ số trừ SPD): N:0.8, R:0.9, SR:1.05, SSR:1.25, UR:1.5, Prime:1.8. (đã chỉnh để giảm chênh lệch cơ bản giữa các bậc)
 
 (Sau này khi có level: cộng tăng trưởng riêng từng class; giờ test lv1 nên chỉ cần basexrarity.)
 
