@@ -542,7 +542,7 @@ async function mountPveScreen(params){
     ...restMergedParams,
     ...mergedStartConfig,
     ...(hasSessionConfig ? {
-      sessionConfig: hasSessionConfigObject ? { ...mergedStartConfig } : sessionConfigValue
+      sessionConfig: hasSessionConfigObject ? { ...sessionConfigValue } : sessionConfigValue
     } : {})
   };
   const startSessionOptions = {
