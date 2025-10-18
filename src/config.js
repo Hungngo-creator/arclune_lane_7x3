@@ -55,8 +55,14 @@ FOLLOWUP_CAP_DEFAULT: 2,
  PERFORMANCE: {
    LOW_POWER_MODE: false,
     LOW_POWER_DPR: 1.5,
-    LOW_POWER_SHADOWS: false,        // true: luôn tắt bóng đổ để tiết kiệm
-    SHADOW_DISABLE_THRESHOLD: 16     // ≥ số token này thì bỏ bóng để giữ FPS
+    LOW_POWER_SHADOWS: false,        // true: luôn ưu tiên preset bóng rẻ tiền
+    LOW_SHADOW_PRESET: 'off',        // 'off' | 'medium' | 'soft' khi LOW_POWER_SHADOWS bật
+    SHADOW_MEDIUM_THRESHOLD: 8,      // ≥ số token này thì giảm blur thay vì tắt hẳn
+    SHADOW_DISABLE_THRESHOLD: 10,    // ≥ số token này thì chuyển sang preset rẻ nhất
+    MEDIUM_SHADOW_PRESET: 'medium',  // 'medium' | 'soft' | 'off' khi đạt ngưỡng medium
+    HIGH_LOAD_SHADOW_PRESET: 'off',  // preset áp dụng khi đạt ngưỡng disable
+    SHADOW_HIGH_DPR_CUTOFF: 1.8,     // DPI (dpr) cao hơn ngưỡng sẽ giảm bóng
+    HIGH_DPR_SHADOW_PRESET: 'medium' // preset cho màn hình dpr cao
   },
   COLORS: {
     ally: '#1e2b36',

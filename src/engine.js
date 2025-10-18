@@ -583,11 +583,37 @@ const alive = [];
     return ya - yb;
   });
   const perfCfg = CFG?.PERFORMANCE || {};
+  const normalizePreset = (value, fallback = null)=>{
+    if (value === 'off' || value === 'soft' || value === 'medium') return value;
+    return fallback;
+  };
+  const mediumThreshold = Number.isFinite(perfCfg.SHADOW_MEDIUM_THRESHOLD)
+    ? perfCfg.SHADOW_MEDIUM_THRESHOLD
+    : null;
   const shadowThreshold = Number.isFinite(perfCfg.SHADOW_DISABLE_THRESHOLD)
     ? perfCfg.SHADOW_DISABLE_THRESHOLD
     : null;
-  const reduceShadows = !!(perfCfg.LOW_POWER_SHADOWS) || (shadowThreshold !== null && alive.length >= shadowThreshold);
- for (const { token: t, projection: p } of alive){
+  const highDprCutoff = Number.isFinite(perfCfg.SHADOW_HIGH_DPR_CUTOFF)
+    ? perfCfg.SHADOW_HIGH_DPR_CUTOFF
+    : null;
+  const gridDpr = Number.isFinite(g?.dpr) ? g.dpr : null;
+
+  let shadowPreset = null;
+  if (perfCfg.LOW_POWER_SHADOWS){
+    shadowPreset = normalizePreset(perfCfg.LOW_SHADOW_PRESET, 'off');
+  } else {
+    if (!shadowPreset && highDprCutoff !== null && gridDpr !== null && gridDpr >= highDprCutoff){
+      shadowPreset = normalizePreset(perfCfg.HIGH_DPR_SHADOW_PRESET, 'off');
+    }
+    if (!shadowPreset && shadowThreshold !== null && alive.length >= shadowThreshold){
+      shadowPreset = normalizePreset(perfCfg.HIGH_LOAD_SHADOW_PRESET, normalizePreset(perfCfg.LOW_SHADOW_PRESET, 'off'));
+    }
+    if (!shadowPreset && mediumThreshold !== null && alive.length >= mediumThreshold){
+      shadowPreset = normalizePreset(perfCfg.MEDIUM_SHADOW_PRESET, 'medium');
+    }
+  }
+  const reduceShadows = !!shadowPreset;
+  for (const { token: t, projection: p } of alive){
     const scale = p.scale ?? 1;
     const r = Math.max(6, Math.floor(baseR * scale));
     const facing = (t.side === 'ally') ? 1 : -1;
@@ -616,12 +642,17 @@ const alive = [];
       let shadowOffsetX = Number.isFinite(shadow.offsetX) ? shadow.offsetX : 0;
       let shadowOffsetY = Number.isFinite(shadow.offsetY) ? shadow.offsetY : Math.max(2, r * 0.2);
       if (reduceShadows){
-        const cheap = perfCfg?.LOW_SHADOW_PRESET;
+        const cheap = shadowPreset;
         if (cheap === 'soft'){ // giữ chút bóng nhẹ nhàng
           shadowColor = 'rgba(0, 0, 0, 0.18)';
           shadowBlur = Math.min(6, shadowBlur * 0.4);
           shadowOffsetX = 0;
           shadowOffsetY = Math.min(4, Math.max(1, shadowOffsetY * 0.4));
+        } else if (cheap === 'medium'){
+          shadowColor = 'rgba(0, 0, 0, 0.24)';
+          shadowBlur = Math.min(10, Math.max(2, shadowBlur * 0.6));
+          shadowOffsetX = 0;
+          shadowOffsetY = Math.min(6, Math.max(1, shadowOffsetY * 0.6));
         } else {
           shadowColor = 'transparent';
           shadowBlur = 0;
