@@ -1,3 +1,5 @@
+import { HAS_INTL_NUMBER_FORMAT, createNumberFormatter } from '../utils/format.js';
+
 const CURRENCY_IDS = Object.freeze({
   VNT: 'VNT',
   HNT: 'HNT',
@@ -72,20 +74,22 @@ function convertCurrency(value, fromId, toId){
   return valueInBase / to.ratioToBase;
 }
 
-const FORMATTER_STANDARD = new Intl.NumberFormat('vi-VN', {
+const FORMATTER_STANDARD = createNumberFormatter('vi-VN', {
   maximumFractionDigits: 0
 });
 
 let FORMATTER_COMPACT = FORMATTER_STANDARD;
 let HAS_COMPACT_FORMAT = false;
-try {
-  FORMATTER_COMPACT = new Intl.NumberFormat('vi-VN', {
-    notation: 'compact',
-    maximumFractionDigits: 1
-  });
-  HAS_COMPACT_FORMAT = true;
-} catch (error) {
-  FORMATTER_COMPACT = FORMATTER_STANDARD;
+if (HAS_INTL_NUMBER_FORMAT){
+  try {
+    FORMATTER_COMPACT = createNumberFormatter('vi-VN', {
+      notation: 'compact',
+      maximumFractionDigits: 1
+    });
+    HAS_COMPACT_FORMAT = true;
+  } catch (error) {
+    FORMATTER_COMPACT = FORMATTER_STANDARD;
+  }
 }
 
 function formatBalance(value, currencyId, options = {}){
@@ -121,12 +125,14 @@ function formatBalance(value, currencyId, options = {}){
 
   let formatter = shouldUseCompact ? FORMATTER_COMPACT : FORMATTER_STANDARD;
   if (typeof precision === 'number'){
-    const formatterNotation = shouldUseCompact ? 'compact' : 'standard';
-    formatter = new Intl.NumberFormat('vi-VN', {
-      notation: formatterNotation,
+    const formatterOptions = {
       maximumFractionDigits: precision,
       minimumFractionDigits: precision
-    });
+    };
+    if (shouldUseCompact && HAS_INTL_NUMBER_FORMAT){
+      formatterOptions.notation = 'compact';
+    }
+    formatter = createNumberFormatter('vi-VN', formatterOptions);
   }
 
   const formatted = formatter.format(amount);
