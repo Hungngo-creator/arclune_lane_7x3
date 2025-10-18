@@ -8375,7 +8375,6 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
 
     const overlayNotesList = document.createElement('ul');
     overlayNotesList.className = 'collection-skill-overlay__notes';
-    }
     const overlayAbilities = document.createElement('div');
     overlayAbilities.className = 'collection-skill-overlay__abilities';
 
