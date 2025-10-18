@@ -1309,7 +1309,7 @@ __define('./catalog.js', (exports, module, __require) => {
   // 1) Rank multiplier (đơn giản) — áp lên TẤT CẢ stat trừ SPD
   const __dep0 = __require('./utils/kit.js');
   const kitSupportsSummon = __dep0.kitSupportsSummon;
-  const RANK_MULT = { N:0.60, R:0.80, SR:1.00, SSR:1.30, UR:1.60, Prime:2.00 };
+  const RANK_MULT = { N:0.80, R:0.90, SR:1.05, SSR:1.25, UR:1.50, Prime:1.80 };
 
   // 2) Class base (mốc lv1 để test). SPD không chịu rank multiplier.
   const CLASS_BASE = {
