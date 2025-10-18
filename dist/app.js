@@ -4717,7 +4717,7 @@ __define('./entry.js', (exports, module, __require) => {
       ...restMergedParams,
       ...mergedStartConfig,
       ...(hasSessionConfig ? {
-        sessionConfig: hasSessionConfigObject ? { ...mergedStartConfig } : sessionConfigValue
+        sessionConfig: hasSessionConfigObject ? { ...sessionConfigValue } : sessionConfigValue
       } : {})
     };
     const startSessionOptions = {
