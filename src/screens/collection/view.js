@@ -78,12 +78,10 @@ function ensureStyles(){
     .collection-skill-overlay__close{padding:8px 12px;border-radius:12px;border:1px solid rgba(125,211,252,.28);background:rgba(16,24,34,.85);color:#aee4ff;font-size:12px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:transform .16s ease,border-color .16s ease;}
     .collection-skill-overlay__close:hover{transform:translateY(-2px);border-color:rgba(174,228,255,.48);}
     .collection-skill-overlay__close:focus-visible{outline:2px solid rgba(174,228,255,.75);outline-offset:3px;}
-    .collection-skill-overlay__content{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:24px;flex:1;}
-    .collection-skill-overlay__visual{border-radius:18px;background:rgba(12,22,32,.88);border:1px solid rgba(125,211,252,.24);display:flex;align-items:center;justify-content:center;padding:18px;}
-    .collection-skill-overlay__visual img{width:100%;max-width:320px;height:auto;filter:drop-shadow(0 24px 48px rgba(0,0,0,.6));}
+    .collection-skill-overlay__content{display:grid;grid-template-columns:1fr;gap:24px;flex:1;}
     .collection-skill-overlay__details{display:flex;flex-direction:column;gap:12px;}
     .collection-skill-overlay__subtitle{margin:0;color:#9cbcd9;font-size:14px;line-height:1.6;}
-    .collection-skill-overlay__abilities{display:flex;flex-direction:column;gap:16px;overflow:auto;max-height:420px;padding-right:4px;}
+    .collection-skill-overlay__abilities{display:flex;flex-direction:column;gap:16px;overflow:visible;max-height:none;padding-right:0;}
     .collection-skill-card{border-radius:16px;border:1px solid rgba(125,211,252,.24);background:rgba(12,22,32,.88);padding:16px;display:flex;flex-direction:column;gap:10px;}
     .collection-skill-card__header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
     .collection-skill-card__title{margin:0;font-size:16px;letter-spacing:.04em;}
@@ -103,7 +101,6 @@ function ensureStyles(){
     }
     @media(max-width:720px){
       .collection-view__title{font-size:30px;}
-      .collection-skill-overlay__content{grid-template-columns:1fr;}
     }
   `;
 
@@ -629,13 +626,6 @@ export function renderCollectionView(options = {}){
   const overlayContent = document.createElement('div');
   overlayContent.className = 'collection-skill-overlay__content';
 
-  const overlayVisual = document.createElement('div');
-  overlayVisual.className = 'collection-skill-overlay__visual';
-
-  const overlaySprite = document.createElement('img');
-  overlaySprite.alt = '';
-  overlayVisual.appendChild(overlaySprite);
-
   const overlayDetails = document.createElement('div');
   overlayDetails.className = 'collection-skill-overlay__details';
 
@@ -657,7 +647,6 @@ export function renderCollectionView(options = {}){
   overlayDetails.appendChild(overlayNotesList);
   overlayDetails.appendChild(overlayAbilities);
 
-  overlayContent.appendChild(overlayVisual);
   overlayContent.appendChild(overlayDetails);
 
   overlay.appendChild(overlayHeader);
@@ -799,14 +788,10 @@ export function renderCollectionView(options = {}){
       stageSprite.src = art.sprite.src;
       stageSprite.alt = unit?.name || unitId;
       stageSprite.style.opacity = '1';
-      overlaySprite.src = art.sprite.src;
-      overlaySprite.alt = unit?.name || unitId;
     } else {
       stageSprite.removeAttribute('src');
       stageSprite.alt = '';
       stageSprite.style.opacity = '0';
-      overlaySprite.removeAttribute('src');
-      overlaySprite.alt = '';
     }
 
     overlayTitle.textContent = unit?.name ? `Kĩ năng · ${unit.name}` : 'Kĩ năng';
