@@ -65,11 +65,11 @@
     .pve-toolbar__button{padding:10px 16px;border-radius:12px;border:1px solid rgba(125,211,252,.28);background:rgba(15,24,32,.72);color:inherit;font-weight:600;cursor:pointer;transition:background .18s ease,transform .18s ease;}
     .pve-toolbar__button:hover{transform:translateY(-1px);background:rgba(20,30,40,.9);}
 
-.app--pve #boardWrap{background:var(--panel);border-top:1px solid #0b1218;border-bottom:1px solid #0b1218;border-radius:12px;margin:0 0 12px;padding:16px;}
+.app--pve #boardWrap{background:var(--panel);border-top:1px solid #0b1218;border-bottom:1px solid #0b1218;border-radius:12px;margin:0 auto 12px;padding:16px;display:flex;justify-content:center;width:fit-content;}
     .app--pve canvas{display:block;width:100%;height:auto;}
-    .app--pve #board{width:92vw;height:auto;max-width:1200px;}
+    .app--pve #board{height:auto;margin:0 auto;max-width:100%;}
     .app--pve #bottomHUD{width:100%;display:flex;align-items:center;justify-content:center;gap:16px;margin-top:8px;position:relative;}
-    .app--pve #cards{display:grid;grid-template-columns:repeat(4,var(--cell,72px));gap:12px;place-content:center;margin:12px auto 0;}
+    .app--pve #cards{display:grid;grid-template-columns:repeat(4,var(--cell,72px));gap:12px;place-content:center;margin:12px auto 0;width:fit-content;}
     .app--pve #cards .card{width:var(--cell,72px);aspect-ratio:1/1;border-radius:12px;background:var(--card-bg);border:1px solid var(--card-border);position:relative;box-shadow:0 0 0 2px rgba(255,255,255,.06) inset;}
     .app--pve #cards .card.active{outline:2px solid #57ffa0;outline-offset:-2px;}
     .app--pve #cards .card .cost{position:absolute;right:8px;bottom:6px;font-weight:800;font-size:15px;color:var(--card-cost);text-shadow:0 0 6px rgba(125,211,252,.28);}
