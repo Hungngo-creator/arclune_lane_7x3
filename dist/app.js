@@ -2778,8 +2778,16 @@ __define('./data/roster-preview.js', (exports, module, __require) => {
     return out;
   }
 
+  function getRankMultiplier(rank) {
+    const multiplier = RANK_MULT[rank];
+    if (multiplier === undefined) {
+      throw new Error(`Missing rank multiplier for "${rank}"`);
+    }
+    return multiplier;
+  }
+
   function applyRankMultiplier(preRank, rank) {
-    const multiplier = RANK_MULT[rank] ?? 1;
+    const multiplier = getRankMultiplier(rank);
     const out = {};
     for (const [stat, value] of Object.entries(preRank)) {
       if (stat === 'SPD') {
@@ -2830,13 +2838,14 @@ __define('./data/roster-preview.js', (exports, module, __require) => {
       const derivedTp = tpAllocations?.[unit.id] ?? deriveTpFromMods(base, unit.mods);
       const cleanTp = sanitizeTpAllocation(derivedTp);
       const preRank = applyTpToBase(base, cleanTp);
+      const multiplier = getRankMultiplier(unit.rank);
       const final = applyRankMultiplier(preRank, unit.rank);
       result[unit.id] = {
         id: unit.id,
         name: unit.name,
         class: unit.class,
         rank: unit.rank,
-        rankMultiplier: RANK_MULT[unit.rank] ?? 1,
+        rankMultiplier: multiplier,
         tp: cleanTp,
         totalTP: totalTp(cleanTp),
         preRank,
