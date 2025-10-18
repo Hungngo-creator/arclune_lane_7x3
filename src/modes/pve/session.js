@@ -48,6 +48,9 @@ let Game = null;
 let tickLoopHandle = null;
 let tickLoopUsesTimeout = false;
 let resizeHandler = null;
+let resizeSchedulerHandle = null;
+let resizeSchedulerUsesTimeout = false;
+let pendingResize = false;
 let canvasClickHandler = null;
 let artSpriteHandler = null;
 let visibilityHandlerBound = false;
@@ -283,6 +286,54 @@ function scheduleDraw(){
       }
       if (Game?.vfx && Game.vfx.length) scheduleDraw();
     }, 16);
+  }
+}
+
+function cancelScheduledResize(){
+  if (resizeSchedulerHandle !== null){
+    if (resizeSchedulerUsesTimeout){
+      clearTimeout(resizeSchedulerHandle);
+    } else {
+      const cancel = (winRef && typeof winRef.cancelAnimationFrame === 'function')
+        ? winRef.cancelAnimationFrame.bind(winRef)
+        : (typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : null);
+      if (typeof cancel === 'function'){
+        cancel(resizeSchedulerHandle);
+      }
+    }
+    resizeSchedulerHandle = null;
+    resizeSchedulerUsesTimeout = false;
+  }
+  pendingResize = false;
+}
+
+function flushScheduledResize(){
+  resizeSchedulerHandle = null;
+  resizeSchedulerUsesTimeout = false;
+  pendingResize = false;
+  try {
+    resize();
+    if (hud && typeof hud.update === 'function'){
+      hud.update(Game);
+    }
+    scheduleDraw();
+  } catch (err) {
+    console.error('[resize]', err);
+  }
+}
+
+function scheduleResize(){
+  if (pendingResize) return;
+  pendingResize = true;
+  const raf = (winRef && typeof winRef.requestAnimationFrame === 'function')
+    ? winRef.requestAnimationFrame.bind(winRef)
+    : (typeof requestAnimationFrame === 'function' ? requestAnimationFrame : null);
+  if (raf){
+    resizeSchedulerUsesTimeout = false;
+    resizeSchedulerHandle = raf(flushScheduledResize);
+  } else {
+    resizeSchedulerUsesTimeout = true;
+    resizeSchedulerHandle = setTimeout(flushScheduledResize, 32);
   }
 }
 
@@ -890,7 +941,7 @@ function init(){
     winRef.removeEventListener('resize', resizeHandler);
     resizeHandler = null;
   }
-  resizeHandler = ()=>{ resize(); scheduleDraw(); };
+  resizeHandler = ()=>{ scheduleResize(); };
   if (winRef && typeof winRef.addEventListener === 'function'){
     winRef.addEventListener('resize', resizeHandler);
   }
@@ -1284,6 +1335,7 @@ function clearSessionTimers(){
     tickLoopUsesTimeout = false;
   }
   cancelScheduledDraw();
+  cancelScheduledResize();
 }
 
 function clearSessionListeners(){
@@ -1299,6 +1351,7 @@ function clearSessionListeners(){
     winRef.removeEventListener('resize', resizeHandler);
   }
   resizeHandler = null;
+  cancelScheduledResize();
   unbindArtSpriteListener();
   unbindVisibility();
 }
