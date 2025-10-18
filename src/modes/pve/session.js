@@ -27,6 +27,7 @@ import { drawBattlefieldScene, getCachedBattlefieldScene } from '../../scene.js'
 import { gameEvents, TURN_START, TURN_END, ACTION_START, ACTION_END } from '../../events.js';
 import { ensureNestedModuleSupport } from '../../utils/dummy.js';
 import { safeNow } from '../../utils/time.js';
+import { getSummonSpec, resolveSummonSlots } from '../../utils/kit.js';
 /** @type {HTMLCanvasElement|null} */ let canvas = null;
 /** @type {CanvasRenderingContext2D|null} */ let ctx = null;
 /** @type {{update:(g:any)=>void, cleanup?:()=>void}|null} */ let hud = null;   // ← THÊM
@@ -468,32 +469,21 @@ function cleanupDead(now){
   Game.tokens = keep;
 }
 
-// --- Summon helpers (W4-J5) ---
-function getPatternSlots(pattern, baseSlot){
-  switch(pattern){
-    case 'verticalNeighbors': {
-      const row = (baseSlot - 1) % 3;
-      const v = [];
-      if (row > 0) v.push(baseSlot - 1);
-      if (row < 2) v.push(baseSlot + 1);
-      return v;
-    }
-    case 'rowNeighbors': { // dự phòng tương lai
-      const col = Math.floor((baseSlot - 1) / 3);
-      const row = (baseSlot - 1) % 3;
-      const left  = (col < 2) ? ((col + 1) * 3 + row + 1) : null;
-      const right = (col > 0) ? ((col - 1) * 3 + row + 1) : null;
-      return [right, left].filter(Boolean);
-    }
-    default: return [];
-  }
-}
-
 // LẤY TỪ INSTANCE đang đứng trên sân (đúng spec: thừa hưởng % chỉ số hiện tại của chủ)
 function creepStatsFromInherit(masterUnit, inherit){
-  const hpMax = Math.round((masterUnit?.hpMax || 0) * (inherit?.HP  || 0));
-  const atk   = Math.round((masterUnit?.atk   || 0) * (inherit?.ATK || 0));
-   return { hpMax, hp: hpMax, atk };
+  if (!inherit || typeof inherit !== 'object') return {};
+  const hpMax = Math.round((masterUnit?.hpMax || 0) * ((inherit.HP ?? inherit.hp ?? inherit.HPMax ?? inherit.hpMax) || 0));
+  const atk   = Math.round((masterUnit?.atk   || 0) * ((inherit.ATK ?? inherit.atk) || 0));
+  const wil   = Math.round((masterUnit?.wil   || 0) * ((inherit.WIL ?? inherit.wil) || 0));
+  const res   = Math.round((masterUnit?.res   || 0) * ((inherit.RES ?? inherit.res) || 0));
+  const arm   = Math.round((masterUnit?.arm   || 0) * ((inherit.ARM ?? inherit.arm) || 0) * 100) / 100;
+  const stats = {};
+  if (hpMax > 0){ stats.hpMax = hpMax; stats.hp = hpMax; }
+  if (atk > 0) stats.atk = atk;
+  if (wil > 0) stats.wil = wil;
+  if (res > 0) stats.res = res;
+  if (arm > 0) stats.arm = Math.max(0, Math.min(1, arm));
+  return stats;
 }
 
 function getMinionsOf(masterIid){
@@ -525,50 +515,59 @@ function performUlt(unit){
 
   const slot = slotIndex(unit.side, unit.cx, unit.cy);
 
-  // Chỉ Summoner có ult 'summon' mới Immediate
-  const u = meta.kit?.ult;
-  if (meta.class === 'Summoner' && u?.type === 'summon'){
+const summonSpec = meta.class === 'Summoner' ? getSummonSpec(meta) : null;
+  if (meta.class === 'Summoner' && summonSpec){
     const aliveNow = tokensAlive();
-    const cand = getPatternSlots(u.pattern || 'verticalNeighbors', slot)
+    const patternSlots = resolveSummonSlots(summonSpec, slot)
       .filter(Boolean)
-      // chỉ giữ slot trống thực sự (không active/queued)
       .filter(s => {
         const { cx, cy } = slotToCell(unit.side, s);
         return !cellReserved(aliveNow, Game.queued, cx, cy);
       })
-      .sort((a,b)=> a-b);
+      .sort((a, b) => a - b);
 
-    // spawn tối đa “count”
-    const need = Math.min(u.count || 0, cand.length);
-    
-      if (need > 0){
-        // Limit & replace
-        const limit = Number.isFinite(u.limit) ? u.limit : Infinity;
-        const have  = getMinionsOf(unit.iid).length;
-        const over  = Math.max(0, have + need - limit);
-        if (over > 0 && (u.replace === 'oldest')) removeOldestMinions(unit.iid, over);
+    const countRaw = Number(summonSpec.count);
+    const desired = Number.isFinite(countRaw) ? countRaw : (patternSlots.length || 1);
+    const need = Math.min(patternSlots.length, Math.max(0, desired));
 
-        // Tính thừa hưởng stat 1 lần
-        const inheritStats = creepStatsFromInherit(unit, u.inherit);
+    if (need > 0){
+      const limit = Number.isFinite(summonSpec.limit) ? summonSpec.limit : Infinity;
+      const have  = getMinionsOf(unit.iid).length;
+      const over  = Math.max(0, have + need - limit);
+      const replacePolicy = typeof summonSpec.replace === 'string' ? summonSpec.replace.trim().toLowerCase() : null;
+      if (over > 0 && replacePolicy === 'oldest') removeOldestMinions(unit.iid, over);
 
-        // Enqueue theo slot tăng dần
-        for (let i=0;i<need;i++){
-          const s = cand[i];
-          enqueueImmediate(Game, {
-            by: unit.id, side: unit.side, slot: s,
-            unit: {
-              id: `${unit.id}_minion`, name: 'Creep', color: '#ffd27d',
-              isMinion: true, ownerIid: unit.iid,
-              bornSerial: _BORN++,
-              ttlTurns: u.ttl || 3,
-              ...inheritStats
-            }
-          });
+      const inheritStats = creepStatsFromInherit(unit, summonSpec.inherit);
+      const ttl = Number.isFinite(summonSpec.ttlTurns)
+        ? summonSpec.ttlTurns
+        : (Number.isFinite(summonSpec.ttl) ? summonSpec.ttl : null);
+
+      for (let i = 0; i < need; i++){
+        const s = patternSlots[i];
+        const base = summonSpec.creep || {};
+        const spawnTtl = Number.isFinite(base.ttlTurns) ? base.ttlTurns : ttl;
+        enqueueImmediate(Game, {
+          by: unit.id,
+          side: unit.side,
+          slot: s,
+          unit: {
+            id: base.id || `${unit.id}_minion`,
+            name: base.name || base.label || 'Creep',
+            color: base.color || '#ffd27d',
+            isMinion: base.isMinion !== false,
+            ownerIid: unit.iid,
+            bornSerial: _BORN++,
+            ttlTurns: Number.isFinite(spawnTtl) ? spawnTtl : 3,
+            ...inheritStats
+          }
+        });
       }
     }
-    unit.rage = 0; // đã dùng ult
+    unit.rage = 0;
     return;
   }
+
+  const u = meta.kit?.ult;
   if (!u){ unit.rage = Math.max(0, unit.rage - 100); return; }
 
   const foeSide = unit.side === 'ally' ? 'enemy' : 'ally';
