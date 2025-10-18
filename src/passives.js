@@ -490,7 +490,7 @@ export function emitPassiveEvent(Game, unit, when, ctx = {}){
       handler = EFFECTS.gainStats;
     }
 
-    if (effectKey === 'gainRES%' && effectivePassive?.params?.perTarget != null){{
+    if (effectKey === 'gainRES%' && effectivePassive?.params?.perTarget != null){
       handler = EFFECTS.resPerSleeping;
     }
     if (typeof handler !== 'function') continue;
