@@ -82,22 +82,17 @@ function ensureStyles(){
     .collection-skill-overlay__details{display:flex;flex-direction:column;gap:12px;}
     .collection-skill-overlay__subtitle{margin:0;color:#9cbcd9;font-size:14px;line-height:1.6;}
     .collection-skill-overlay__abilities{display:flex;flex-direction:column;gap:12px;overflow:visible;max-height:none;padding-right:2px;}
-    .collection-skill-card{border-radius:16px;border:1px solid rgba(125,211,252,.24);background:rgba(12,22,32,.88);padding:12px;display:flex;flex-direction:column;gap:8px;}
-    .collection-skill-card__header{display:flex;align-items:center;gap:10px;}
-    .collection-skill-card__title{margin:0;font-size:15px;letter-spacing:.04em;flex:1;}
+    .collection-skill-card{border-radius:16px;border:1px solid rgba(125,211,252,.24);background:rgba(12,22,32,.88);padding:12px;display:flex;flex-direction:row;align-items:center;gap:12px;}
+    .collection-skill-card__header{display:flex;align-items:center;gap:10px;flex:1;min-width:0;}
+    .collection-skill-card__title{margin:0;font-size:15px;letter-spacing:.04em;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .collection-skill-card__actions{display:flex;align-items:center;gap:6px;margin-left:auto;}
     .collection-skill-card__badge{padding:3px 8px;border-radius:12px;border:1px solid rgba(125,211,252,.28);background:rgba(8,18,28,.82);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
     .collection-skill-card__upgrade{padding:5px 10px;border-radius:12px;border:1px solid rgba(174,228,255,.32);background:rgba(16,26,36,.88);color:#aee4ff;font-size:11px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;}
     .collection-skill-card__upgrade:hover{transform:translateY(-1px);border-color:rgba(174,228,255,.52);box-shadow:0 8px 18px rgba(6,12,20,.38);}
     .collection-skill-card__upgrade:focus-visible{outline:2px solid rgba(174,228,255,.75);outline-offset:3px;}
-    .collection-skill-card__meta{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:6px 10px;font-size:11px;color:#9cbcd9;}
-    .collection-skill-card__meta li{padding:6px 8px;border-radius:10px;background:rgba(16,26,36,.72);display:flex;align-items:center;gap:8px;min-height:38px;}
-    .collection-skill-card__meta-icon{font-size:14px;line-height:1;}
-    .collection-skill-card__meta-text{display:flex;flex-direction:column;gap:2px;line-height:1.3;}
-    .collection-skill-card__meta-label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#cfe6ff;}
-    .collection-skill-card__meta-value{font-size:11px;color:#e6f2ff;}
-    .collection-skill-card__description{margin:0;color:#e6f2ff;font-size:12px;line-height:1.5;}
-    .collection-skill-card__notes{margin:0;padding-left:16px;color:#9cbcd9;font-size:11px;line-height:1.45;display:flex;flex-direction:column;gap:4px;}
+    .collection-skill-card__meta{display:none !important;}
+    .collection-skill-card__description{display:none !important;}
+    .collection-skill-card__notes{display:none !important;}
     .collection-skill-card__empty{margin:0;color:#9cbcd9;font-size:13px;line-height:1.6;background:rgba(12,22,32,.88);border:1px dashed rgba(125,211,252,.28);border-radius:14px;padding:16px;text-align:center;}
     .collection-skill-overlay__notes{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:12px;color:#9cbcd9;}
     .collection-skill-overlay__notes li{position:relative;padding-left:16px;}
@@ -110,12 +105,12 @@ function ensureStyles(){
     @media(max-width:720px){
       .collection-view__title{font-size:30px;}
       .collection-skill-overlay__abilities{gap:10px;}
-      .collection-skill-card{padding:10px;gap:6px;}
-      .collection-skill-card__title{font-size:14px;}
-      .collection-skill-card__meta{grid-template-columns:1fr;}
-      .collection-skill-card__meta li{min-height:34px;}
-      .collection-skill-card__description{font-size:11px;}
-      .collection-skill-card__notes{font-size:10px;}
+      .collection-skill-card{padding:8px 12px;gap:8px;flex-wrap:wrap;align-items:flex-start;}
+      .collection-skill-card__header{flex-wrap:wrap;gap:8px;}
+      .collection-skill-card__title{font-size:14px;white-space:normal;}
+      .collection-skill-card__actions{width:100%;justify-content:flex-start;gap:8px;}
+      .collection-skill-card__badge{font-size:11px;}
+      .collection-skill-card__upgrade{font-size:11px;padding:6px 12px;}
     }
   `;
 
@@ -450,59 +445,23 @@ function renderAbilityCard(entry, { typeLabel = null } = {}){
 
   card.appendChild(header);
 
+  const descriptionText = entry?.description && String(entry.description).trim() !== ''
+    ? String(entry.description)
+    : 'Chưa có mô tả chi tiết.';
+  card.dataset.description = descriptionText;
+
+      if (Array.isArray(entry?.notes)){
+    const filteredNotes = entry.notes
+      .map(note => (typeof note === 'string' ? note.trim() : ''))
+      .filter(note => note.length > 0);
+    if (filteredNotes.length){
+      card.dataset.notes = JSON.stringify(filteredNotes);
+    }
+  }
+  
   const facts = collectAbilityFacts(entry);
   if (facts.length){
-    const metaList = document.createElement('ul');
-    metaList.className = 'collection-skill-card__meta';
-    for (const fact of facts){
-      const item = document.createElement('li');
-      if (fact.tooltip){
-        item.title = fact.tooltip;
-      }
-
-      if (fact.icon){
-        const iconSpan = document.createElement('span');
-        iconSpan.className = 'collection-skill-card__meta-icon';
-        iconSpan.textContent = fact.icon;
-        item.appendChild(iconSpan);
-      }
-
-      const textContainer = document.createElement('span');
-      textContainer.className = 'collection-skill-card__meta-text';
-
-      if (fact.label){
-        const labelSpan = document.createElement('span');
-        labelSpan.className = 'collection-skill-card__meta-label';
-        labelSpan.textContent = fact.label;
-        textContainer.appendChild(labelSpan);
-      }
-
-      const valueSpan = document.createElement('span');
-      valueSpan.className = 'collection-skill-card__meta-value';
-      valueSpan.textContent = fact.value;
-      textContainer.appendChild(valueSpan);
-
-      item.appendChild(textContainer);
-      metaList.appendChild(item);
-    }
-    card.appendChild(metaList);
-  }
-
-  const desc = document.createElement('p');
-  desc.className = 'collection-skill-card__description';
-  desc.textContent = entry?.description || 'Chưa có mô tả chi tiết.';
-  card.appendChild(desc);
-
-  if (Array.isArray(entry?.notes) && entry.notes.length){
-    const notesList = document.createElement('ul');
-    notesList.className = 'collection-skill-card__notes';
-    for (const note of entry.notes){
-      if (!note) continue;
-      const li = document.createElement('li');
-      li.textContent = note;
-      notesList.appendChild(li);
-    }
-    card.appendChild(notesList);
+    card.dataset.meta = JSON.stringify(facts);
   }
   return card;
 }
