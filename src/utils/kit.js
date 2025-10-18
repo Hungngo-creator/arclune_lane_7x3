@@ -53,6 +53,46 @@ function cloneShallow(value){
   return out;
 }
 
+function extractUltSummonFields(ult){
+  if (!ult || typeof ult !== 'object') return null;
+  const out = {};
+  let hasValue = false;
+  const assign = (key, value, clone = false) => {
+    if (value === undefined) return;
+    if (value === null) return;
+    out[key] = clone ? cloneShallow(value) : value;
+    hasValue = true;
+  };
+
+  const pattern = ult.pattern ?? ult.placement;
+  if (pattern !== undefined && pattern !== null) assign('pattern', pattern);
+  const count = ult.count ?? ult.summonCount;
+  if (count !== undefined && count !== null) assign('count', count);
+  const ttlTurns = ult.ttlTurns ?? ult.ttl;
+  if (ttlTurns !== undefined && ttlTurns !== null) assign('ttlTurns', ttlTurns);
+  const ttl = ult.ttl ?? ult.ttlTurns;
+  if (ttl !== undefined && ttl !== null) assign('ttl', ttl);
+  assign('inherit', ult.inherit, true);
+  const limit = ult.limit;
+  if (limit !== undefined && limit !== null) assign('limit', limit);
+  assign('replace', ult.replace);
+  assign('creep', ult.creep, true);
+
+  return hasValue ? out : null;
+}
+
+function applyUltSummonDefaults(spec, ult){
+  const fields = extractUltSummonFields(ult);
+  if (!fields) return spec;
+  const out = spec ?? {};
+  for (const [key, value] of Object.entries(fields)){
+    if (out[key] === undefined || out[key] === null){
+      out[key] = value;
+    }
+  }
+  return out;
+}
+
 function collectUltTags(metaOrKit){
   const kit = coerceKit(metaOrKit);
   const ult = kit?.ult;
@@ -130,19 +170,13 @@ function getSummonSpec(metaOrKit){
 
   const tags = collectUltTags(kit);
   if (!spec && tags.has('summon')){
-    spec = cloneShallow(ult?.summon || {});
+    if (ult?.summon){
+      spec = cloneShallow(ult.summon);
+    }
+    spec = applyUltSummonDefaults(spec, ult);
   }
-
-  if (!spec && ult && typeof ult.type === 'string' && ult.type.toLowerCase() === 'summon'){
-    spec = {
-      pattern: ult.pattern || ult.placement || null,
-      count: ult.count ?? ult.summonCount ?? null,
-      ttlTurns: ult.ttlTurns ?? ult.ttl ?? null,
-      inherit: cloneShallow(ult.inherit),
-      limit: ult.limit ?? null,
-      replace: ult.replace ?? null,
-      creep: cloneShallow(ult.creep)
-    };
+  if (ult && typeof ult.type === 'string' && ult.type.toLowerCase() === 'summon'){
+    spec = applyUltSummonDefaults(spec, ult);
   }
 
   if (!spec) return null;
