@@ -7765,7 +7765,7 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
       .collection-wallet__item{min-width:130px;padding:10px 14px;border-radius:14px;border:1px solid rgba(125,211,252,.22);background:rgba(12,20,28,.82);display:flex;flex-direction:column;gap:4px;}
       .collection-wallet__name{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;margin:0;}
       .collection-wallet__balance{font-size:16px;margin:0;color:#e6f2ff;}
-      .collection-view__layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,2fr) minmax(0,1fr);gap:24px;align-items:stretch;}
+      .collection-view__layout{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,3.2fr) minmax(0,1.4fr);gap:24px;align-items:stretch;}
       .collection-roster{border-radius:24px;border:1px solid rgba(125,211,252,.2);background:linear-gradient(160deg,rgba(12,22,32,.94),rgba(6,14,22,.78));padding:20px;display:flex;flex-direction:column;gap:12px;overflow:hidden;}
       .collection-roster__list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;max-height:560px;overflow:auto;padding-right:4px;}
       .collection-roster__entry{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:14px;border:1px solid transparent;background:rgba(12,20,28,.72);color:inherit;cursor:pointer;transition:transform .18s ease,border-color .18s ease,background .18s ease;}
@@ -7796,7 +7796,7 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
       .collection-tabs__button:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:3px;}
       .collection-tabs__button.is-active{border-color:rgba(125,211,252,.55);background:rgba(18,30,42,.96);box-shadow:0 16px 36px rgba(6,12,20,.42);}
       .collection-tabs__hint{font-size:11px;color:#7da0c7;letter-spacing:.08em;text-transform:uppercase;}
-      .collection-skill-overlay{position:absolute;top:15%;left:15%;width:70%;min-height:70%;padding:24px;border-radius:22px;border:1px solid rgba(125,211,252,.45);background:rgba(8,16,26,.92);box-shadow:0 42px 96px rgba(3,6,12,.75);display:flex;flex-direction:column;gap:18px;opacity:0;pointer-events:none;transition:opacity .24s ease,transform .24s ease;transform:translateY(12px);backdrop-filter:blur(6px);}
+      .collection-skill-overlay{position:absolute;top:15%;left:10%;width:82%;min-height:70%;padding:24px;border-radius:22px;border:1px solid rgba(125,211,252,.45);background:rgba(8,16,26,.92);box-shadow:0 42px 96px rgba(3,6,12,.75);display:flex;flex-direction:column;gap:18px;opacity:0;pointer-events:none;transition:opacity .24s ease,transform .24s ease;transform:translateY(12px);backdrop-filter:blur(6px);}
       .collection-skill-overlay.is-open{opacity:1;pointer-events:auto;transform:translateY(0);}
       .collection-skill-overlay__header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;}
       .collection-skill-overlay__title{margin:0;font-size:22px;letter-spacing:.06em;}
