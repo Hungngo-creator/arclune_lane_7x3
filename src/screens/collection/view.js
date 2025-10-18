@@ -3,6 +3,7 @@ import { UNITS } from '../../units.js';
 import { getUnitArt } from '../../art.js';
 import { listCurrencies } from '../../data/economy.js';
 import { getSkillSet } from '../../data/skills.js';
+import { createNumberFormatter } from '../../utils/format.js';
 
 const STYLE_ID = 'collection-view-style-v2';
 
@@ -15,7 +16,7 @@ const TAB_DEFINITIONS = [
 ];
 
 const currencyCatalog = listCurrencies();
-const currencyFormatter = new Intl.NumberFormat('vi-VN');
+const currencyFormatter = createNumberFormatter('vi-VN');
 
 function ensureStyles(){
   if (typeof document === 'undefined') return;
