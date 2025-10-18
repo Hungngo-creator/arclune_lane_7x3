@@ -2230,10 +2230,17 @@ __define('./data/economy.js', (exports, module, __require) => {
     maximumFractionDigits: 0
   });
 
-  const FORMATTER_COMPACT = new Intl.NumberFormat('vi-VN', {
-    notation: 'compact',
-    maximumFractionDigits: 1
-  });
+  let FORMATTER_COMPACT = FORMATTER_STANDARD;
+  let HAS_COMPACT_FORMAT = false;
+  try {
+    FORMATTER_COMPACT = new Intl.NumberFormat('vi-VN', {
+      notation: 'compact',
+      maximumFractionDigits: 1
+    });
+    HAS_COMPACT_FORMAT = true;
+  } catch (error) {
+    FORMATTER_COMPACT = FORMATTER_STANDARD;
+  }
 
   function formatBalance(value, currencyId, options = {}){
     const currency = getCurrency(currencyId);
@@ -2264,10 +2271,13 @@ __define('./data/economy.js', (exports, module, __require) => {
       }
     }
 
-    let formatter = notation === 'compact' ? FORMATTER_COMPACT : FORMATTER_STANDARD;
+    const shouldUseCompact = notation === 'compact' && HAS_COMPACT_FORMAT;
+
+    let formatter = shouldUseCompact ? FORMATTER_COMPACT : FORMATTER_STANDARD;
     if (typeof precision === 'number'){
+      const formatterNotation = shouldUseCompact ? 'compact' : 'standard';
       formatter = new Intl.NumberFormat('vi-VN', {
-        notation: notation === 'compact' ? 'compact' : 'standard',
+        notation: formatterNotation,
         maximumFractionDigits: precision,
         minimumFractionDigits: precision
       });
