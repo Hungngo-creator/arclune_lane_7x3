@@ -368,6 +368,17 @@ __define('./app/shell.js', (exports, module, __require) => {
       screenParams: options.screenParams || null
     };
     const listeners = new Set();
+    let errorHandler = typeof options.onError === 'function' ? options.onError : null;
+
+    function dispatchError(error, context){
+      console.error('[shell] listener error', error);
+      if (!errorHandler) return;
+      try {
+        errorHandler(error, context || null);
+      } catch (handlerError) {
+        console.error('[shell] error handler failure', handlerError);
+      }
+    }
 
     function notify(){
       const snapshot = cloneState(state);
@@ -375,7 +386,7 @@ __define('./app/shell.js', (exports, module, __require) => {
         try {
           fn(snapshot);
         } catch (err) {
-          console.error('[shell] listener error', err);
+          dispatchError(err, { phase: 'notify', listener: fn });
         }
       }
     }
@@ -407,7 +418,7 @@ __define('./app/shell.js', (exports, module, __require) => {
       try {
         handler(cloneState(state));
       } catch (err) {
-        console.error('[shell] listener error', err);
+        dispatchError(err, { phase: 'subscribe', listener: handler });
       }
       return ()=>{
         listeners.delete(handler);
@@ -429,7 +440,14 @@ __define('./app/shell.js', (exports, module, __require) => {
       getState(){
         return cloneState(state);
       },
-      onChange: subscribe
+      onChange: subscribe,
+      setErrorHandler(handler){
+        if (typeof handler === 'function'){
+          errorHandler = handler;
+        } else {
+          errorHandler = null;
+        }
+      }
     };
   }
 
@@ -4844,8 +4862,15 @@ __define('./entry.js', (exports, module, __require) => {
       if (!rootElement){
         throw new Error('Không tìm thấy phần tử #appRoot.');
       }
-      shellInstance = createAppShell();
       renderMessageRef = renderMessage;
+      const handleShellError = (error) => {
+        console.error('Arclune shell listener error', error);
+        const renderer = renderMessageRef || renderMessage;
+        if (renderer){
+          showFatalError(error, renderer, bootstrapOptions);
+        }
+      };
+      shellInstance = createAppShell({ onError: handleShellError });
       bootstrapOptions.isFileProtocol = isFileProtocol;
       let lastScreen = null;
       let lastParams = null;
