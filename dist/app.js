@@ -7808,9 +7808,13 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
       .collection-skill-overlay__subtitle{margin:0;color:#9cbcd9;font-size:14px;line-height:1.6;}
       .collection-skill-overlay__abilities{display:flex;flex-direction:column;gap:16px;overflow:visible;max-height:none;padding-right:0;}
       .collection-skill-card{border-radius:16px;border:1px solid rgba(125,211,252,.24);background:rgba(12,22,32,.88);padding:16px;display:flex;flex-direction:column;gap:10px;}
-      .collection-skill-card__header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
-      .collection-skill-card__title{margin:0;font-size:16px;letter-spacing:.04em;}
+      ..collection-skill-card__header{display:flex;align-items:center;gap:12px;}
+      .collection-skill-card__title{margin:0;font-size:16px;letter-spacing:.04em;flex:1;}
+      .collection-skill-card__actions{display:flex;align-items:center;gap:8px;margin-left:auto;}
       .collection-skill-card__badge{padding:4px 10px;border-radius:12px;border:1px solid rgba(125,211,252,.28);background:rgba(8,18,28,.82);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
+      .collection-skill-card__upgrade{padding:6px 12px;border-radius:12px;border:1px solid rgba(174,228,255,.32);background:rgba(16,26,36,.88);color:#aee4ff;font-size:12px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;}
+      .collection-skill-card__upgrade:hover{transform:translateY(-1px);border-color:rgba(174,228,255,.52);box-shadow:0 8px 18px rgba(6,12,20,.38);}
+      .collection-skill-card__upgrade:focus-visible{outline:2px solid rgba(174,228,255,.75);outline-offset:3px;}
       .collection-skill-card__meta{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:8px;font-size:12px;color:#9cbcd9;}
       .collection-skill-card__meta li{padding:4px 8px;border-radius:10px;background:rgba(16,26,36,.72);}
       .collection-skill-card__description{margin:0;color:#e6f2ff;font-size:13px;line-height:1.6;}
@@ -8100,11 +8104,30 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
     title.className = 'collection-skill-card__title';
     title.textContent = entry?.name || 'Kĩ năng';
     header.appendChild(title);
+    
+    const actions = document.createElement('div');
+    actions.className = 'collection-skill-card__actions';
 
     const badge = document.createElement('span');
     badge.className = 'collection-skill-card__badge';
     badge.textContent = typeLabel || labelForAbility(entry);
-    header.appendChild(badge);
+    actions.appendChild(badge);
+
+    const abilityId = entry?.id ?? entry?.abilityId ?? null;
+    const upgradeButton = document.createElement('button');
+    upgradeButton.type = 'button';
+    upgradeButton.className = 'collection-skill-card__upgrade';
+    upgradeButton.textContent = 'Nâng cấp';
+    if (abilityId != null){
+      upgradeButton.dataset.abilityId = String(abilityId);
+    }
+    upgradeButton.addEventListener('click', () => {
+      const detail = { abilityId, ability: entry };
+      card.dispatchEvent(new CustomEvent('collection:request-upgrade', { bubbles: true, detail }));
+    });
+    actions.appendChild(upgradeButton);
+
+    header.appendChild(actions);
 
     card.appendChild(header);
 
