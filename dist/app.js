@@ -10726,7 +10726,7 @@ __define('./utils/kit.js', (exports, module, __require) => {
     }
 
     const tags = collectUltTags(kit);
-    if (!spec && tags.has('summon')){
+    if (!spec && kitUltHasTag(kit, 'summon', tags)){
       if (ult?.summon){
         spec = cloneShallow(ult.summon);
       }
@@ -10768,7 +10768,7 @@ __define('./utils/kit.js', (exports, module, __require) => {
     const ult = kit.ult || null;
     if (ult?.revive) return cloneShallow(ult.revive);
     if (ult?.metadata?.revive) return cloneShallow(ult.metadata.revive);
-    if (collectUltTags(kit).has('revive')){
+    if (kitUltHasTag(kit, 'revive')){
       return cloneShallow(ult?.revive || {});
     }
     return null;
@@ -10778,9 +10778,9 @@ __define('./utils/kit.js', (exports, module, __require) => {
     return !!getSummonSpec(metaOrKit);
   }
 
-  function kitUltHasTag(metaOrKit, tag){
+  function kitUltHasTag(metaOrKit, tag, precomputedTags = null){
     if (!tag) return false;
-    const tags = collectUltTags(metaOrKit);
+    const tags = precomputedTags ?? collectUltTags(metaOrKit);
     const target = normalizeKey(tag);
     for (const t of tags){
       if (normalizeKey(t) === target) return true;
