@@ -5451,6 +5451,8 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
   let tickLoopHandle = null;
   let tickLoopUsesTimeout = false;
   let resizeHandler = null;
+  let visualViewportResizeHandler = null;
+  let visualViewportScrollHandler = null;
   let resizeSchedulerHandle = null;
   let resizeSchedulerUsesTimeout = false;
   let pendingResize = false;
@@ -6349,6 +6351,21 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
       winRef.addEventListener('resize', resizeHandler);
     }
 
+  const viewport = winRef?.visualViewport;
+    if (viewport && typeof viewport.addEventListener === 'function'){
+      if (visualViewportResizeHandler && typeof viewport.removeEventListener === 'function'){
+        viewport.removeEventListener('resize', visualViewportResizeHandler);
+      }
+      visualViewportResizeHandler = ()=>{ scheduleResize(); };
+      viewport.addEventListener('resize', visualViewportResizeHandler);
+
+      if (visualViewportScrollHandler && typeof viewport.removeEventListener === 'function'){
+        viewport.removeEventListener('scroll', visualViewportScrollHandler);
+      }
+      visualViewportScrollHandler = ()=>{ scheduleResize(); };
+      viewport.addEventListener('scroll', visualViewportScrollHandler);
+    }
+
     const queryFromRoot = (selector)=>{
       if (root && typeof root.querySelector === 'function'){
         const el = root.querySelector(selector);
@@ -6754,6 +6771,17 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
       winRef.removeEventListener('resize', resizeHandler);
     }
     resizeHandler = null;
+    const viewport = winRef?.visualViewport;
+    if (viewport && typeof viewport.removeEventListener === 'function'){
+      if (visualViewportResizeHandler){
+        viewport.removeEventListener('resize', visualViewportResizeHandler);
+      }
+      if (visualViewportScrollHandler){
+        viewport.removeEventListener('scroll', visualViewportScrollHandler);
+      }
+    }
+    visualViewportResizeHandler = null;
+    visualViewportScrollHandler = null;
     cancelScheduledResize();
     unbindArtSpriteListener();
     unbindVisibility();
