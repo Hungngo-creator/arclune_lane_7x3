@@ -54,7 +54,7 @@ const rawSkillSets = [
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
-      description: 'Gây sát thương theo n% WIL + x% ATK lên một mục tiêu và hồi lại cho bản thân 10% lượng sát thương vừa gây ra.'
+      description: 'Gây sát thương theo n% WIL + x% ATK lên một mục tiêu và hồi lại cho bản thân HP = 10% lượng sát thương vừa gây ra.'
     },
     skills: [
       {
@@ -90,7 +90,7 @@ const rawSkillSets = [
     talent: {
       name: 'Phệ Ấn',
       type: 'talent',
-      description: 'Mỗi đòn đánh thường trúng mục tiêu đặt 1 Phệ Ấn. Khi đủ 3 cộng dồn, Phệ Ấn tự kích nổ trong lượt của mục tiêu, gây sát thương bằng 50% WIL của Phệ. Dấu ấn tồn tại tối đa 3 lượt nếu không được làm mới. Không thể bị xoá bỏ, lãng quên hoặc cướp. Chúc Phúc Của Huyết Chủ cho Phệ khi vào trận +15% Máu tối đa và +50% hồi phục HP.'
+      description: 'Mỗi đòn đánh thường/skill/ultimate trúng mục tiêu đặt 1 Phệ Ấn. Khi đủ 3 cộng dồn, Phệ Ấn tự kích nổ trong lượt của mục tiêu, gây sát thương bằng 50% WIL của Phệ. Dấu ấn tồn tại tối đa 3 lượt nếu không được làm mới. Không thể bị xoá bỏ, lãng quên hoặc cướp. Chúc Phúc Của Huyết Chủ: Phệ khi vào trận +15% Máu tối đa và +50% HP regen.'
     },
     technique: null,
     notes: [
@@ -103,7 +103,7 @@ const rawSkillSets = [
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
-      description: 'Chém một mục tiêu bằng n% ATK + x% WIL, đồng thời áp dụng hiệu ứng Xuyên Giáp khiến đòn đánh bỏ qua 5% ARM và RES của mục tiêu. Hiệu ứng cộng dồn với tuyệt kỹ.'
+      description: 'Chém một mục tiêu bằng n% ATK + x% WIL, đồng thời áp dụng hiệu ứng Xuyên Giáp khiến đòn đánh bỏ qua 5% ARM và RES của mục tiêu. Hiệu ứng cộng dồn với skill/ultimate.'
     },
     skills: [
       {
@@ -118,7 +118,7 @@ const rawSkillSets = [
         name: 'Ngũ Kiếm Huyền Ấn',
         type: 'active',
         cost: { aether: 20 },
-        description: 'Kích hoạt ngẫu nhiên một trong năm kiếm trạng thái cho tới hết trận: Kiếm Sinh (hồi 5% tổng sát thương gây ra), Kiếm Ma (bỏ qua thêm 10% ARM/RES của mục tiêu), Kiếm Thổ (+5% ARM/RES bản thân), Kiếm Hỏa (+5% tổng sát thương gây ra), Kiếm Hư (+15% tỉ lệ tránh đòn đánh thường). Chỉ sở hữu một trạng thái kiếm mỗi trận.'
+        description: 'Kích hoạt ngẫu nhiên một trong năm kiếm trạng thái cho tới hết trận: Kiếm Sinh (hồi HP = 5% tổng sát thương gây ra), Kiếm Ma (bỏ qua thêm 10% ARM/RES của mục tiêu), Kiếm Thổ (+5% ARM/RES bản thân), Kiếm Hỏa (+5% tổng sát thương gây ra), Kiếm Hư (+15% tỉ lệ tránh đòn đánh thường). Chỉ sở hữu một trạng thái kiếm mỗi trận.'
       },
       {
         key: 'skill3',
@@ -126,7 +126,7 @@ const rawSkillSets = [
         type: 'active',
         cost: { aether: 25 },
         duration: '3 lượt (bắt đầu từ lượt kế tiếp)',
-        description: 'Cường hóa bản thân thêm 23% ATK/WIL hiện có. Hiệu ứng bắt đầu tính từ lượt kế tiếp sau khi thi triển.'
+        description: 'Cường hóa bản thân thêm 20% ATK/WIL hiện có. Hiệu ứng bắt đầu tính từ lượt kế tiếp sau khi thi triển.'
       }
     ],
     ult: {
@@ -306,7 +306,7 @@ const rawSkillSets = [
         key: 'skill2',
         name: 'Thí Thân Hộ Chủ',
         type: 'active',
-        cost: { aether: 10 },
+        cost: { aether: 15 },
         description: 'Hy sinh bản thân (HP về 0) để ban cho Leader một tầng Bất Khuất. Sau 4 lượt, Kỳ Diêu hồi sinh ngẫu nhiên trên sân với 0 Aether, 50% nộ tối đa và 50% HP tối đa. Nếu sân đã kín, cô biến mất vĩnh viễn và không thể hồi sinh.'
       },
       {
@@ -373,7 +373,7 @@ const rawSkillSets = [
     talent: {
       name: 'Đại Ca Đầu Đàn',
       type: 'talent',
-      description: 'Mỗi tiểu đệ hiện diện trên sân giúp Trần Quát nhận thêm 15% tổng sát thương đòn đánh thường. Khi một tiểu đệ bị kẻ thù hạ gục, Trần Quát nhận thêm 5% ATK/WIL (tối đa một lần).'
+      description: 'Mỗi tiểu đệ hiện diện trên sân giúp Trần Quát nhận thêm 15% tổng sát thương đòn đánh thường. Khi một tiểu đệ bị kẻ thù hạ gục, Trần Quát nhận thêm 5% ATK/WIL (tối đa 3 lần).'
     },
     technique: null,
     notes: [
@@ -478,5 +478,4 @@ export function validateSkillSetStructure(entry){
   if (!entry.unitId) return false;
   if (entry.skills && !Array.isArray(entry.skills)) return false;
   return true;
-      }
-    
+}
