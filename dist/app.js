@@ -9332,8 +9332,10 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
   const ROSTER = __dep0.ROSTER;
   const __dep1 = __require('./data/economy.js');
   const listCurrencies = __dep1.listCurrencies;
-  const __dep2 = __require('./utils/format.js');
-  const createNumberFormatter = __dep2.createNumberFormatter;
+  const __dep2 = __require('./data/skills.js');
+  const getSkillSet = __dep2.getSkillSet;
+  const __dep3 = __require('./utils/format.js');
+  const createNumberFormatter = __dep3.createNumberFormatter;
 
   const STYLE_ID = 'lineup-view-style-v1';
 
@@ -10348,6 +10350,7 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
       benchDetails.classList.remove('is-empty');
 
       const kit = unit.raw?.kit || null;
+      const skillSet = unit.id ? getSkillSet(unit.id) : null;
 
       const skills = Array.isArray(kit?.skills)
         ? kit.skills
@@ -10359,8 +10362,12 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
             .slice(0, 3)
         : [];
 
-      const hasUlt = Boolean(kit?.ult);
-      const ultName = hasUlt ? (kit.ult.name || kit.ult.id || 'Chưa đặt tên') : null;
+      const kitUlt = kit?.ult || null;
+      const skillSetUlt = skillSet?.ult || null;
+      const hasUlt = Boolean(kitUlt || skillSetUlt);
+      const ultName = hasUlt
+        ? (kitUlt?.name || skillSetUlt?.name || kitUlt?.id || 'Chưa đặt tên')
+        : null;
 
       if (!skills.length && !hasUlt){
         const fallback = document.createElement('p');
