@@ -9342,18 +9342,8 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
       .lineup-wallet__item{padding:8px 12px;border-radius:14px;border:1px solid rgba(125,211,252,.22);background:rgba(12,20,28,.82);display:flex;flex-direction:column;gap:4px;min-width:120px;}
       .lineup-wallet__name{margin:0;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
       .lineup-wallet__balance{margin:0;font-size:15px;color:#e6f2ff;}
-      .lineup-view__layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,2.9fr);gap:24px;align-items:start;}
-      .lineup-main-area{display:grid;grid-template-columns:minmax(0,2.2fr) minmax(280px,1fr);gap:24px;align-items:start;}
-      .lineup-selector{border-radius:24px;border:1px solid rgba(125,211,252,.22);background:rgba(10,18,28,.92);padding:20px;display:flex;flex-direction:column;gap:16px;}
-      .lineup-selector__title{margin:0;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
-      .lineup-selector__list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;}
-      .lineup-selector__entry{padding:12px 14px;border-radius:14px;border:1px solid rgba(125,211,252,.18);background:rgba(12,22,32,.82);display:flex;flex-direction:column;gap:6px;cursor:pointer;transition:transform .18s ease,border-color .18s ease,background .18s ease;color:inherit;text-align:left;}
-      .lineup-selector__entry:hover{transform:translateX(4px);border-color:rgba(125,211,252,.38);background:rgba(16,28,40,.92);}
-      .lineup-selector__entry:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:3px;}
-      .lineup-selector__entry.is-active{border-color:rgba(174,228,255,.6);background:rgba(18,30,44,.96);box-shadow:0 18px 42px rgba(6,12,20,.45);}
-      .lineup-selector__entry-title{margin:0;font-size:15px;letter-spacing:.06em;}
-      .lineup-selector__entry-meta{margin:0;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
-      .lineup-selector__entry-desc{margin:0;color:#9cbcd9;font-size:13px;line-height:1.6;}
+      .lineup-view__layout{display:grid;grid-template-columns:minmax(280px,1fr) minmax(0,3fr);gap:24px;align-items:start;}
+      .lineup-main-area{display:grid;grid-template-columns:minmax(0,1fr);gap:24px;align-items:start;}
       .lineup-main{display:flex;flex-direction:column;gap:20px;}
       .lineup-slots{border-radius:24px;border:1px solid rgba(125,211,252,.24);background:linear-gradient(160deg,rgba(12,20,30,.92),rgba(8,16,24,.78));padding:20px;display:flex;flex-direction:column;gap:14px;}
       .lineup-slots__title{margin:0;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
@@ -10067,25 +10057,6 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
     layout.className = 'lineup-view__layout';
     container.appendChild(layout);
 
-    const lineupSelector = document.createElement('aside');
-    lineupSelector.className = 'lineup-selector';
-    const selectorTitle = document.createElement('p');
-    selectorTitle.className = 'lineup-selector__title';
-    selectorTitle.textContent = 'Danh sách đội hình';
-    lineupSelector.appendChild(selectorTitle);
-    const selectorList = document.createElement('div');
-    selectorList.className = 'lineup-selector__list';
-    lineupSelector.appendChild(selectorList);
-    layout.appendChild(lineupSelector);
-
-    const mainArea = document.createElement('div');
-    mainArea.className = 'lineup-main-area';
-    layout.appendChild(mainArea);
-
-    const mainColumn = document.createElement('div');
-    mainColumn.className = 'lineup-main';
-    mainArea.appendChild(mainColumn);
-
     const leaderSection = document.createElement('section');
     leaderSection.className = 'lineup-leader';
     const leaderBadge = document.createElement('span');
@@ -10110,7 +10081,15 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
     const passiveGrid = document.createElement('div');
     passiveGrid.className = 'lineup-passives';
     leaderSection.appendChild(passiveGrid);
-    mainColumn.appendChild(leaderSection);
+    layout.appendChild(leaderSection);
+
+    const mainArea = document.createElement('div');
+    mainArea.className = 'lineup-main-area';
+    layout.appendChild(mainArea);
+
+    const mainColumn = document.createElement('div');
+    mainColumn.className = 'lineup-main';
+    mainArea.appendChild(mainColumn);
 
     const benchSection = document.createElement('section');
     benchSection.className = 'lineup-bench';
@@ -10194,37 +10173,6 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
         item.appendChild(value);
         walletEl.appendChild(item);
       }
-    }
-
-    function renderLineupSelector(){
-      selectorList.innerHTML = '';
-      state.lineupState.forEach((lineup, lineupId) => {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'lineup-selector__entry';
-        button.dataset.lineupId = lineupId;
-        button.setAttribute('aria-label', `Chọn ${lineup.name}`);
-        if (state.selectedLineupId === lineupId){
-          button.classList.add('is-active');
-        }
-        const title = document.createElement('p');
-        title.className = 'lineup-selector__entry-title';
-        title.textContent = lineup.name;
-        button.appendChild(title);
-        if (lineup.role){
-          const meta = document.createElement('p');
-          meta.className = 'lineup-selector__entry-meta';
-          meta.textContent = lineup.role;
-          button.appendChild(meta);
-        }
-        if (lineup.description){
-          const desc = document.createElement('p');
-          desc.className = 'lineup-selector__entry-desc';
-          desc.textContent = lineup.description;
-          button.appendChild(desc);
-        }
-        selectorList.appendChild(button);
-      });
     }
 
     function renderBench(){
@@ -10498,22 +10446,6 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
       lineup.leaderId = unitId;
       return { ok: true };
     }
-    function handleLineupSelect(event){
-      const button = event.target.closest('.lineup-selector__entry');
-      if (!button) return;
-      const lineupId = button.dataset.lineupId;
-      if (!lineupId || !state.lineupState.has(lineupId)) return;
-      state.selectedLineupId = lineupId;
-      state.selectedUnitId = null;
-      renderLineupSelector();
-      renderSlots();
-      renderBench();
-      renderLeader();
-      renderPassives();
-      renderFilters();
-      renderRoster();
-      setMessage(`Đang xem ${state.lineupState.get(lineupId).name}.`);
-    }
 
     function handleBenchInteraction(event){
       const benchEl = event.target.closest('.lineup-bench__cell');
@@ -10626,9 +10558,6 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
     backButton.addEventListener('click', handleBack);
     cleanup.push(() => backButton.removeEventListener('click', handleBack));
 
-    selectorList.addEventListener('click', handleLineupSelect);
-    cleanup.push(() => selectorList.removeEventListener('click', handleLineupSelect));
-
     benchGrid.addEventListener('click', handleBenchInteraction);
     cleanup.push(() => benchGrid.removeEventListener('click', handleBenchInteraction));
 
@@ -10676,7 +10605,6 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
     cleanup.push(() => document.removeEventListener('keydown', handleGlobalKey));
 
     refreshWallet();
-    renderLineupSelector();
     renderBench();
     renderLeader();
     renderPassives();
