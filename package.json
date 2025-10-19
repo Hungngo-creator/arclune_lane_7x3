@@ -3,13 +3,33 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build": "node build.mjs"
+    "build": "node build.mjs",
+    "start": "ts-node src/main.ts",
+    "test": "jest --runInBand"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
-    "esbuild": "file:tools/esbuild-stub"
+    "@types/jest": "^29.5.12",
+    "esbuild": "file:tools/esbuild-stub",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.0"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "moduleFileExtensions": [
+      "ts",
+      "js",
+      "json",
+      "node"
+    ],
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    }
   }
 }
