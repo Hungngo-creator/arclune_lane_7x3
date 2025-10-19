@@ -1120,7 +1120,9 @@ function renderBenchDetails(){
       } else {
         cellEl.removeAttribute('title');
       }
-      const codeText = hasContent ? getUnitCode(unit, cell.label || '') : '';
+      const codeText = (!cell.unitId && hasContent)
+        ? getUnitCode(unit, cell.label || '')
+        : '';
       const avatarEl = document.createElement('div');
       avatarEl.className = 'lineup-bench__avatar';
       const avatarSource = unit?.avatar || cell.meta?.avatar || null;
