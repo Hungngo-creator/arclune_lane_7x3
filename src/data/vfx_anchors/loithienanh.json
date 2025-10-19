@@ -1,0 +1,78 @@
+{
+  "unitId": "loithienanh",
+  "bodyAnchors": {
+    "root": { "x": 0.50, "y": 0.50 },
+    "head": { "x": 0.50, "y": 0.86 },
+    "chest": { "x": 0.50, "y": 0.68 },
+    "pelvis": { "x": 0.50, "y": 0.44 },
+    "right_fist": { "x": 0.66, "y": 0.58 },
+    "left_fist": { "x": 0.34, "y": 0.58 },
+    "right_elbow": { "x": 0.63, "y": 0.66 },
+    "left_elbow": { "x": 0.37, "y": 0.66 },
+    "right_foot": { "x": 0.60, "y": 0.10 },
+    "left_foot": { "x": 0.40, "y": 0.10 },
+    "back_core": { "x": 0.50, "y": 0.64 }
+  },
+  "vfxBindings": {
+    "basic_combo": {
+      "description": "Đòn đấm thường hai hit, ưu tiên tay phải sau đó tay trái.",
+      "anchors": [
+        { "id": "right_fist", "timing": "hit1", "radius": 0.12 },
+        { "id": "left_fist", "timing": "hit2", "radius": 0.11 }
+      ]
+    },
+    "loi_anh_tam_kich": {
+      "description": "Skill1 tung ba cú đấm lôi, tái sử dụng anchor tay phải cho tia hồ quang và tay trái khi chuyển mục tiêu.",
+      "anchors": [
+        { "id": "right_fist", "timing": "arc_spawn", "radius": 0.14 },
+        { "id": "left_fist", "timing": "follow_through", "radius": 0.12 }
+      ]
+    },
+    "ngu_loi_phe_than": {
+      "description": "Skill2 đốt máu phát lôi cầu quanh thân, xuất phát từ ngực lan ra 5 hướng.",
+      "anchors": [
+        { "id": "chest", "timing": "charge", "radius": 0.18 },
+        { "id": "right_fist", "timing": "launch_major", "radius": 0.14 },
+        { "id": "left_fist", "timing": "launch_minor", "radius": 0.13 }
+      ]
+    },
+    "loi_the_bach_chien": {
+      "description": "Skill3 dựng lớp bảo hộ bằng trường điện quấn quanh thân.",
+      "anchors": [
+        { "id": "chest", "timing": "shield_core", "radius": 0.22 },
+        { "id": "back_core", "timing": "shield_back", "radius": 0.24 }
+      ]
+    },
+    "huyet_hon_loi_quyet": {
+      "description": "Tuyệt kỹ bùng nổ lôi huyết: hút năng lượng ở ngực, nổ ra trước bụng và chân.",
+      "anchors": [
+        { "id": "chest", "timing": "charge_up", "radius": 0.20 },
+        { "id": "root", "timing": "burst_core", "radius": 0.26 },
+        { "id": "right_foot", "timing": "ground_crack", "radius": 0.15 },
+        { "id": "left_foot", "timing": "ground_crack", "radius": 0.15 }
+      ]
+    }
+  },
+  "ambientEffects": {
+    "lightning_scars": {
+      "description": "Hoa văn lôi văn chạy trên tay và ngực, phát sáng nhịp tim.",
+      "anchors": [
+        { "id": "right_elbow", "timing": "pulse", "radius": 0.10 },
+        { "id": "left_elbow", "timing": "pulse", "radius": 0.10 },
+        { "id": "chest", "timing": "pulse", "radius": 0.12 }
+      ]
+    },
+    "thermal_noise": {
+      "description": "Nhiễu nhiệt nhẹ trên toàn thân khi đứng yên.",
+      "anchors": [
+        { "id": "chest", "timing": "idle", "radius": 0.30 }
+      ]
+    },
+    "storm_backdrop": {
+      "description": "Hiệu ứng hậu cảnh vòng ấn lôi huyết và mây dông trong các cảnh ult.",
+      "anchors": [
+        { "id": "back_core", "timing": "ult_only", "radius": 0.35 }
+      ]
+    }
+  }
+}
