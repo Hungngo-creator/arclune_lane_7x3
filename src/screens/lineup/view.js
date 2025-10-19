@@ -56,8 +56,8 @@ function ensureStyles(){
     .lineup-bench{display:flex;flex-direction:column;gap:12px;min-height:100%;padding:0;border:none;background:none;}
     .lineup-bench__title{margin:0;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
     .lineup-bench__content{display:flex;flex-direction:column;gap:12px;flex:1;padding:0;border:none;background:none;}
-    .lineup-bench__grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));column-gap:8px;row-gap:10px;align-content:flex-start;flex:1;min-height:0;}
-    .lineup-bench__cell{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;background:none;border:none;padding:0;}
+    .lineup-bench__grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:6px;flex:1;min-height:0;}
+    .lineup-bench__cell{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;background:none;border:none;padding:0;}
     .lineup-bench__cell:focus{outline:none;}
     .lineup-bench__cell:focus-visible{outline:none;}
     .lineup-bench__cell:hover .lineup-bench__avatar,
@@ -865,7 +865,7 @@ export function renderLineupView(options = {}){
   benchSection.className = 'lineup-bench';
   const benchTitle = document.createElement('p');
   benchTitle.className = 'lineup-bench__title';
-  benchTitle.textContent = 'Dự bị / linh hoạt (10)';
+  benchTitle.textContent = 'Đội hình';
   benchSection.appendChild(benchTitle);
   const benchContent = document.createElement('div');
   benchContent.className = 'lineup-bench__content';
