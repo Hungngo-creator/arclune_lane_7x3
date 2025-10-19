@@ -70,10 +70,8 @@ function ensureStyles(){
     .lineup-bench__cell-code{margin:0;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#7da0c7;text-align:center;line-height:1.2;font-weight:600;}
     .lineup-bench__avatar{width:48px;height:48px;border-radius:14px;background:rgba(24,34,44,.82);display:flex;align-items:center;justify-content:center;font-size:18px;color:#aee4ff;margin:0;overflow:hidden;border:1px solid rgba(125,211,252,.2);transition:transform .16s ease,border-color .16s ease,background .16s ease,box-shadow .16s ease;}
     .lineup-bench__avatar img{width:100%;height:100%;object-fit:cover;}
-    .lineup-bench__details{border-radius:18px;border:1px solid rgba(125,211,252,.18);background:rgba(12,22,32,.78);padding:12px 14px;display:flex;flex-direction:column;gap:10px;align-self:flex-start;height:fit-content;overflow:auto;}
+    .lineup-bench__details{border-radius:18px;border:1px solid rgba(125,211,252,.18);background:rgba(12,22,32,.78);padding:12px 14px;display:flex;flex-direction:column;gap:12px;align-self:flex-start;height:fit-content;overflow:auto;}
     .lineup-bench__details.is-empty{opacity:0.85;}
-    .lineup-bench__details-title{margin:0;font-size:15px;color:#e6f2ff;line-height:1.5;}
-    .lineup-bench__details-power{margin:0;font-size:13px;color:#9cbcd9;}
     .lineup-bench__details-section{display:flex;flex-direction:column;gap:4px;}
     .lineup-bench__details-heading{margin:0;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#7da0c7;}
     .lineup-bench__details-text{margin:0;font-size:13px;color:#c8deff;line-height:1.5;}
@@ -1016,75 +1014,59 @@ function renderBenchDetails(){
 
     benchDetails.classList.remove('is-empty');
 
-    const title = document.createElement('h3');
-    title.className = 'lineup-bench__details-title';
-    title.textContent = unit.name;
-    benchDetails.appendChild(title);
-
-    if (unit.power != null){
-      const power = document.createElement('p');
-      power.className = 'lineup-bench__details-power';
-      power.textContent = `Chiến lực ${numberFormatter.format(unit.power)}`;
-      benchDetails.appendChild(power);
-    }
-
     const kit = unit.raw?.kit || null;
 
-    const talentName = kit?.talent?.name || kit?.talent?.id || null;
-    if (talentName){
-      const talentSection = document.createElement('div');
-      talentSection.className = 'lineup-bench__details-section';
-      const heading = document.createElement('p');
-      heading.className = 'lineup-bench__details-heading';
-      heading.textContent = 'Nội tại';
-      talentSection.appendChild(heading);
-      const text = document.createElement('p');
-      text.className = 'lineup-bench__details-text';
-      text.textContent = talentName;
-      talentSection.appendChild(text);
-      benchDetails.appendChild(talentSection);
-    }
+    const skills = Array.isArray(kit?.skills)
+      ? kit.skills
+          .filter(skill => {
+            const skillName = typeof skill?.name === 'string' ? skill.name.trim() : '';
+            const skillKey = typeof skill?.key === 'string' ? skill.key.trim() : '';
+            return skillName !== 'Đánh Thường' && skillKey !== 'Đánh Thường';
+          })
+          .slice(0, 3)
+      : [];
 
-    const skills = Array.isArray(kit?.skills) ? kit.skills.slice(0, 3) : [];
-    if (skills.length){
-      const skillSection = document.createElement('div');
-      skillSection.className = 'lineup-bench__details-section';
-      const heading = document.createElement('p');
-      heading.className = 'lineup-bench__details-heading';
-      heading.textContent = 'Kỹ năng';
-      skillSection.appendChild(heading);
-      const list = document.createElement('ul');
-      list.className = 'lineup-bench__details-list';
-      skills.forEach((skill, idx) => {
-        const item = document.createElement('li');
-        const name = skill?.name || skill?.key || `Kỹ năng #${idx + 1}`;
-        item.textContent = name;
-        list.appendChild(item);
-      });
-      skillSection.appendChild(list);
-      benchDetails.appendChild(skillSection);
-    }
+    const hasUlt = Boolean(kit?.ult);
+    const ultName = hasUlt ? (kit.ult.name || kit.ult.id || 'Chưa đặt tên') : null;
 
-    if (kit?.ult){
-      const ultSection = document.createElement('div');
-      ultSection.className = 'lineup-bench__details-section';
-      const heading = document.createElement('p');
-      heading.className = 'lineup-bench__details-heading';
-      heading.textContent = 'Tuyệt kỹ';
-      ultSection.appendChild(heading);
-      const text = document.createElement('p');
-      text.className = 'lineup-bench__details-text';
-      const ultName = kit.ult.name || kit.ult.id || 'Chưa đặt tên';
-      text.textContent = ultName;
-      ultSection.appendChild(text);
-      benchDetails.appendChild(ultSection);
-    }
-
-    if (unit.power == null && !talentName && !skills.length && !kit?.ult){
+    if (!skills.length && !hasUlt){
       const fallback = document.createElement('p');
       fallback.className = 'lineup-bench__details-empty';
       fallback.textContent = 'Chưa có dữ liệu chi tiết cho nhân vật này.';
       benchDetails.appendChild(fallback);
+    } else {
+      if (skills.length){
+        const skillSection = document.createElement('div');
+        skillSection.className = 'lineup-bench__details-section';
+        const heading = document.createElement('p');
+        heading.className = 'lineup-bench__details-heading';
+        heading.textContent = 'Kỹ năng';
+        skillSection.appendChild(heading);
+        const list = document.createElement('ul');
+        list.className = 'lineup-bench__details-list';
+        skills.forEach((skill, idx) => {
+          const item = document.createElement('li');
+          const name = skill?.name || skill?.key || `Kỹ năng #${idx + 1}`;
+          item.textContent = name;
+          list.appendChild(item);
+        });
+        skillSection.appendChild(list);
+        benchDetails.appendChild(skillSection);
+      }
+
+      if (hasUlt){
+        const ultSection = document.createElement('div');
+        ultSection.className = 'lineup-bench__details-section';
+        const heading = document.createElement('p');
+        heading.className = 'lineup-bench__details-heading';
+        heading.textContent = 'Tuyệt kỹ';
+        ultSection.appendChild(heading);
+        const text = document.createElement('p');
+        text.className = 'lineup-bench__details-text';
+        text.textContent = ultName;
+        ultSection.appendChild(text);
+        benchDetails.appendChild(ultSection);
+      }
     }
     
     syncBenchDetailsHeight();
