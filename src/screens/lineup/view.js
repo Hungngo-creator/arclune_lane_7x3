@@ -19,7 +19,7 @@ function ensureStyles(){
 
   const css = `
     .app--lineup{padding:32px 16px 72px;}
-    .lineup-view{max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:28px;color:inherit;}
+    .lineup-view{max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:28px;color:inherit;--lineup-bench-slot-size:64px;--lineup-bench-slot-gap:12px;}
     .lineup-view__header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px;}
     .lineup-view__actions{display:flex;flex-direction:column;align-items:flex-end;gap:12px;}
     .lineup-view__title-group{display:flex;flex-direction:column;gap:8px;}
@@ -56,8 +56,10 @@ function ensureStyles(){
     .lineup-bench{display:flex;flex-direction:column;gap:12px;min-height:100%;padding:0;border:none;background:none;}
     .lineup-bench__title{margin:0;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
     .lineup-bench__content{display:flex;flex-direction:column;gap:12px;flex:1;padding:0;border:none;background:none;}
-    .lineup-bench__grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:6px;flex:1;min-height:0;}
-    .lineup-bench__cell{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;background:none;border:none;padding:0;}
+   .lineup-bench__grid{display:flex;align-items:flex-start;justify-content:center;gap:var(--lineup-bench-slot-gap);flex:1;min-height:0;}
+    .lineup-bench__column{display:flex;flex-direction:column;gap:var(--lineup-bench-slot-gap);}
+    .lineup-bench__column:first-child{margin-left:calc(-1 * var(--lineup-bench-slot-size));}
+    .lineup-bench__cell{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;background:none;border:none;padding:0;width:var(--lineup-bench-slot-size);}
     .lineup-bench__cell:focus{outline:none;}
     .lineup-bench__cell:focus-visible{outline:none;}
     .lineup-bench__cell:hover .lineup-bench__avatar,
@@ -130,7 +132,7 @@ function ensureStyles(){
     .lineup-overlay__option-name{margin:0;font-size:14px;color:#e6f2ff;}
     .lineup-overlay__option-meta{margin:0;font-size:12px;color:#9cbcd9;}
     @media(max-width:1080px){.lineup-view__layout{grid-template-columns:1fr;}.lineup-main-area{grid-template-columns:1fr;}.lineup-leader{grid-template-columns:1fr;}.lineup-leader__badge{display:none;}}
-    @media(max-width:720px){.lineup-view__title{font-size:30px;}.lineup-view__header{flex-direction:column;align-items:flex-start;}.lineup-main-area{gap:18px;}.lineup-bench__grid{grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));}.lineup-slot__avatar{width:64px;height:64px;}.lineup-roster__list{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}}
+    @media(max-width:720px){.lineup-view__title{font-size:30px;}.lineup-view__header{flex-direction:column;align-items:flex-start;}.lineup-main-area{gap:18px;}.lineup-bench__grid{flex-wrap:wrap;}.lineup-slot__avatar{width:64px;height:64px;}.lineup-roster__list{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}}
   `;
 
   if (style.textContent !== css){
@@ -1093,6 +1095,14 @@ function renderBenchDetails(){
     if (!Number.isInteger(state.activeBenchIndex) || !lineup.bench[state.activeBenchIndex]){
       state.activeBenchIndex = null;
     }
+    
+    const columnCount = 5;
+    const columnEls = Array.from({ length: columnCount }, (_, idx) => {
+      const columnEl = document.createElement('div');
+      columnEl.className = 'lineup-bench__column';
+      benchGrid.appendChild(columnEl);
+      return columnEl;
+    });
 
     lineup.bench.forEach(cell => {
       const cellEl = document.createElement('button');
@@ -1138,7 +1148,9 @@ function renderBenchDetails(){
       if (state.activeBenchIndex === cell.index){
         cellEl.classList.add('is-active');
       }
-      benchGrid.appendChild(cellEl);
+      const columnIndex = cell.index % columnCount;
+      const targetColumn = columnEls[columnIndex] || columnEls[0];
+      targetColumn.appendChild(cellEl);
     });
     
     updateActiveBenchHighlight();
