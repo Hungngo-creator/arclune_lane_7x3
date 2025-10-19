@@ -1,5 +1,6 @@
 import { ROSTER } from '../../catalog.js';
 import { listCurrencies } from '../../data/economy.js';
+import { getSkillSet } from '../../data/skills.js';
 import { createNumberFormatter } from '../../utils/format.js';
 
 const STYLE_ID = 'lineup-view-style-v1';
@@ -1015,6 +1016,7 @@ function renderBenchDetails(){
     benchDetails.classList.remove('is-empty');
 
     const kit = unit.raw?.kit || null;
+    const skillSet = unit.id ? getSkillSet(unit.id) : null;
 
     const skills = Array.isArray(kit?.skills)
       ? kit.skills
@@ -1026,8 +1028,12 @@ function renderBenchDetails(){
           .slice(0, 3)
       : [];
 
-    const hasUlt = Boolean(kit?.ult);
-    const ultName = hasUlt ? (kit.ult.name || kit.ult.id || 'Chưa đặt tên') : null;
+    const kitUlt = kit?.ult || null;
+    const skillSetUlt = skillSet?.ult || null;
+    const hasUlt = Boolean(kitUlt || skillSetUlt);
+    const ultName = hasUlt
+      ? (kitUlt?.name || skillSetUlt?.name || kitUlt?.id || 'Chưa đặt tên')
+      : null;
 
     if (!skills.length && !hasUlt){
       const fallback = document.createElement('p');
