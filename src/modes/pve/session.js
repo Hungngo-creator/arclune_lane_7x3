@@ -22,7 +22,16 @@ import {
 import { drawEnvironmentProps, getEnvironmentBackground } from '../../background.js';
 import { getUnitArt, setUnitSkin } from '../../art.js';
 import { initHUD, startSummonBar } from '../../ui.js';
-import { vfxDraw, vfxAddSpawn, vfxAddHit, vfxAddMelee } from '../../vfx.js';
+import {
+  vfxDraw,
+  vfxAddSpawn,
+  vfxAddHit,
+  vfxAddMelee,
+  vfxAddLightningArc,
+  vfxAddBloodPulse,
+  vfxAddGroundBurst,
+  vfxAddShieldWrap
+} from '../../vfx.js';
 import { drawBattlefieldScene, getCachedBattlefieldScene } from '../../scene.js';
 import { gameEvents, TURN_START, TURN_END, ACTION_START, ACTION_END } from '../../events.js';
 import { ensureNestedModuleSupport } from '../../utils/dummy.js';
@@ -648,6 +657,181 @@ const summonSpec = meta.class === 'Summoner' ? getSummonSpec(meta) : null;
         if (overheal > 0) grantShield(unit, overheal);
       }
       busyMs = 1400;
+      break;
+    }
+
+case 'hpTradeBurst': {
+      const hpTradePctRaw = Number.isFinite(u.hpTradePercent) ? u.hpTradePercent : (u.hpTrade?.percentMaxHP ?? 0);
+      const hpTradePct = Math.max(0, Math.min(0.95, hpTradePctRaw || 0));
+      const hpMax = Number.isFinite(unit.hpMax) ? unit.hpMax : 0;
+      const currentHp = Number.isFinite(unit.hp) ? unit.hp : 0;
+      const desiredTrade = Math.round(hpMax * hpTradePct);
+      const maxLoss = Math.max(0, currentHp - 1);
+      const hpPayment = Math.max(0, Math.min(desiredTrade, maxLoss));
+      if (hpPayment > 0) applyDamage(unit, hpPayment);
+
+      const aliveNow = tokensAlive();
+      const foes = aliveNow.filter(t => t.side === foeSide && t.alive);
+
+      const hits = Math.max(1, (u.hits | 0) || 1);
+      const selected = [];
+      if (foes.length){
+        const primary = pickTarget(Game, unit);
+        if (primary){
+          selected.push(primary);
+        }
+        const pool = foes.filter(t => !selected.includes(t));
+        pool.sort((a, b) => {
+          const da = Math.abs(a.cx - unit.cx) + Math.abs(a.cy - unit.cy);
+          const db = Math.abs(b.cx - unit.cx) + Math.abs(b.cy - unit.cy);
+          return da - db;
+        });
+        for (const enemy of pool){
+          if (selected.length >= hits) break;
+          selected.push(enemy);
+        }
+        if (selected.length > hits) selected.length = hits;
+        if (!selected.length && foes.length){
+          selected.push(foes[0]);
+        }
+      }
+
+      const applyBusyFromVfx = (startedAt, duration) => {
+        if (!Number.isFinite(startedAt) || !Number.isFinite(duration)) return;
+        busyMs = Math.max(busyMs, duration);
+        if (Game?.turn){
+          const prev = Number.isFinite(Game.turn.busyUntil) ? Game.turn.busyUntil : startedAt;
+          Game.turn.busyUntil = Math.max(prev, startedAt + duration);
+        }
+      };
+
+      const bindingKey = 'huyet_hon_loi_quyet';
+
+      {
+        const startedAt = getNow();
+        try {
+          const dur = vfxAddBloodPulse(Game, unit, {
+            bindingKey,
+            timing: 'charge_up'
+          });
+          applyBusyFromVfx(startedAt, dur);
+        } catch (_) {}
+      }
+
+      const damageSpec = u.damage || {};
+      const dtype = damageSpec.type || 'arcane';
+      const attackType = u.countsAsBasic ? 'basic' : 'skill';
+      const wilScale = Number.isFinite(damageSpec.scaleWIL) ? damageSpec.scaleWIL : (damageSpec.scaleWil ?? 0);
+      const flatAdd = Number.isFinite(damageSpec.flat) ? damageSpec.flat : (damageSpec.flatAdd ?? 0);
+      const debuffSpec = u.appliesDebuff || null;
+      const debuffId = debuffSpec?.id || 'loithienanh_spd_burn';
+      const debuffAmount = Number.isFinite(debuffSpec?.amount)
+        ? debuffSpec.amount
+        : (Number.isFinite(debuffSpec?.amountPercent) ? debuffSpec.amountPercent : 0);
+      const debuffMaxStacks = Math.max(1, (debuffSpec?.maxStacks | 0) || 1);
+      const debuffDuration = Number.isFinite(debuffSpec?.turns)
+        ? debuffSpec.turns
+        : (Number.isFinite(u.duration) ? u.duration : (u.turns || 1));
+
+      for (const tgt of selected){
+        if (!tgt || !tgt.alive) continue;
+        const tgtRank = Game?.meta?.rankOf?.(tgt.id) || tgt?.rank || '';
+        const isBoss = typeof tgtRank === 'string' && tgtRank.toLowerCase() === 'boss';
+        const pctDefault = Number.isFinite(damageSpec.percentTargetMaxHP)
+          ? damageSpec.percentTargetMaxHP
+          : (Number.isFinite(damageSpec.basePercentMaxHPTarget) ? damageSpec.basePercentMaxHPTarget : 0);
+        const pct = isBoss
+          ? (Number.isFinite(damageSpec.bossPercent) ? damageSpec.bossPercent : pctDefault)
+          : pctDefault;
+        const baseFromPct = Math.round(Math.max(0, pct) * Math.max(0, tgt.hpMax || 0));
+        const baseFromWil = Math.round(Math.max(0, wilScale || 0) * Math.max(0, unit.wil || 0));
+        const baseFlat = Math.round(Math.max(0, flatAdd || 0));
+        const base = Math.max(1, baseFromPct + baseFromWil + baseFlat);
+        dealAbilityDamage(Game, unit, tgt, {
+          base,
+          dtype,
+          attackType,
+          defPen: Number.isFinite(damageSpec.defPen) ? damageSpec.defPen : (damageSpec.pen ?? 0)
+        });
+
+        {
+          const startedAt = getNow();
+          try {
+            const dur = vfxAddLightningArc(Game, unit, tgt, {
+              bindingKey,
+              timing: 'burst_core',
+              targetBindingKey: bindingKey,
+              targetTiming: 'burst_core'
+            });
+            applyBusyFromVfx(startedAt, dur);
+          } catch (_) {}
+        }
+
+        if (debuffAmount && tgt.alive){
+          const existing = Statuses.get(tgt, debuffId);
+          if (existing){
+            existing.stacks = Math.min(debuffMaxStacks, (existing.stacks || 1) + 1);
+            if (Number.isFinite(debuffDuration)) existing.dur = debuffDuration;
+          } else {
+            Statuses.add(tgt, {
+              id: debuffId,
+              kind: 'debuff',
+              tag: 'stat',
+              attr: 'spd',
+              mode: 'percent',
+              amount: debuffAmount,
+              stacks: 1,
+              maxStacks: debuffMaxStacks,
+              dur: Number.isFinite(debuffDuration) ? debuffDuration : undefined,
+              tick: 'turn'
+            });
+          }
+          if (typeof tgt._recalcStats === 'function') tgt._recalcStats();
+        }
+      }
+
+      {
+        const startedAt = getNow();
+        try {
+          const dur = vfxAddGroundBurst(Game, unit, {
+            bindingKey,
+            anchorId: 'right_foot',
+            timing: 'ground_crack'
+          });
+          applyBusyFromVfx(startedAt, dur);
+        } catch (_) {}
+      }
+
+      {
+        const startedAt = getNow();
+        try {
+          const dur = vfxAddGroundBurst(Game, unit, {
+            bindingKey,
+            anchorId: 'left_foot',
+            timing: 'ground_crack'
+          });
+          applyBusyFromVfx(startedAt, dur);
+        } catch (_) {}
+      }
+
+      {
+       const startedAt = getNow();
+        try {
+          const dur = vfxAddShieldWrap(Game, unit, {
+            bindingKey,
+            anchorId: 'root',
+            timing: 'burst_core'
+          });
+          applyBusyFromVfx(startedAt, dur);
+        } catch (_) {}
+      }
+
+      if (Number.isFinite(u.reduceDmg) && u.reduceDmg > 0){
+        const turns = Number.isFinite(u.duration) ? u.duration : (u.turns || 1);
+        Statuses.add(unit, Statuses.make.damageCut({ pct: u.reduceDmg, turns }));
+      }
+
+      busyMs = Math.max(busyMs, 1600);
       break;
     }
 
