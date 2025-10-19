@@ -3518,6 +3518,11 @@ __define('./data/skills.js', (exports, module, __require) => {
   exports.hasSkillSet = hasSkillSet;
   exports.validateSkillSetStructure = validateSkillSetStructure;
 });
+__define('./data/vfx_anchors/loithienanh.json', (exports, module, __require) => {
+  const data = JSON.parse('{"unitId":"loithienanh","bodyAnchors":{"root":{"x":0.5,"y":0.5},"head":{"x":0.5,"y":0.86},"chest":{"x":0.5,"y":0.68},"pelvis":{"x":0.5,"y":0.44},"right_fist":{"x":0.66,"y":0.58},"left_fist":{"x":0.34,"y":0.58},"right_elbow":{"x":0.63,"y":0.66},"left_elbow":{"x":0.37,"y":0.66},"right_foot":{"x":0.6,"y":0.1},"left_foot":{"x":0.4,"y":0.1},"back_core":{"x":0.5,"y":0.64}},"vfxBindings":{"basic_combo":{"description":"Đòn đấm thường hai hit, ưu tiên tay phải sau đó tay trái.","anchors":[{"id":"right_fist","timing":"hit1","radius":0.12},{"id":"left_fist","timing":"hit2","radius":0.11}]},"loi_anh_tam_kich":{"description":"Skill1 tung ba cú đấm lôi, tái sử dụng anchor tay phải cho tia hồ quang và tay trái khi chuyển mục tiêu.","anchors":[{"id":"right_fist","timing":"arc_spawn","radius":0.14},{"id":"left_fist","timing":"follow_through","radius":0.12}]},"ngu_loi_phe_than":{"description":"Skill2 đốt máu phát lôi cầu quanh thân, xuất phát từ ngực lan ra 5 hướng.","anchors":[{"id":"chest","timing":"charge","radius":0.18},{"id":"right_fist","timing":"launch_major","radius":0.14},{"id":"left_fist","timing":"launch_minor","radius":0.13}]},"loi_the_bach_chien":{"description":"Skill3 dựng lớp bảo hộ bằng trường điện quấn quanh thân.","anchors":[{"id":"chest","timing":"shield_core","radius":0.22},{"id":"back_core","timing":"shield_back","radius":0.24}]},"huyet_hon_loi_quyet":{"description":"Tuyệt kỹ bùng nổ lôi huyết: hút năng lượng ở ngực, nổ ra trước bụng và chân.","anchors":[{"id":"chest","timing":"charge_up","radius":0.2},{"id":"root","timing":"burst_core","radius":0.26},{"id":"right_foot","timing":"ground_crack","radius":0.15},{"id":"left_foot","timing":"ground_crack","radius":0.15}]}},"ambientEffects":{"lightning_scars":{"description":"Hoa văn lôi văn chạy trên tay và ngực, phát sáng nhịp tim.","anchors":[{"id":"right_elbow","timing":"pulse","radius":0.1},{"id":"left_elbow","timing":"pulse","radius":0.1},{"id":"chest","timing":"pulse","radius":0.12}]},"thermal_noise":{"description":"Nhiễu nhiệt nhẹ trên toàn thân khi đứng yên.","anchors":[{"id":"chest","timing":"idle","radius":0.3}]},"storm_backdrop":{"description":"Hiệu ứng hậu cảnh vòng ấn lôi huyết và mây dông trong các cảnh ult.","anchors":[{"id":"back_core","timing":"ult_only","radius":0.35}]}}}');
+  module.exports = data;
+  module.exports.default = data;
+});
 __define('./engine.js', (exports, module, __require) => {
   const __dep0 = __require('./config.js');
   const TOKEN_STYLE = __dep0.TOKEN_STYLE;
@@ -13392,7 +13397,7 @@ __define('./utils/time.js', (exports, module, __require) => {
   exports.safeNow = safeNow;
 });
 __define('./vfx.js', (exports, module, __require) => {
-  // 0.6 vfx.js
+  // 0.7 vfx.js
   // VFX layer: spawn pop, hit ring, ranged tracer, melee step-in/out
   // Không thay đổi logic combat/turn — chỉ vẽ đè.
   // Durations: spawn 500ms, hit 380ms, tracer 400ms, melee 1100ms.
@@ -13404,6 +13409,8 @@ __define('./vfx.js', (exports, module, __require) => {
   const CHIBI = __dep1.CHIBI;
   const __dep2 = __require('./utils/time.js');
   const safeNow = __dep2.safeNow;
+  const __dep3 = __require('./data/vfx_anchors/loithienanh.json');
+  const loithienanhAnchors = __dep3.default ?? __dep3;
 
   const now = () => safeNow();
   const lerp = (a, b, t) => a + (b - a) * t;
@@ -13415,6 +13422,271 @@ __define('./vfx.js', (exports, module, __require) => {
       console.warn(`[vfxDraw] Skipping ${label} arc due to invalid geometry`, data);
     }
   };
+
+  const DEFAULT_ANCHOR_ID = 'root';
+  const DEFAULT_ANCHOR_POINT = { x: 0.5, y: 0.5 };
+  const DEFAULT_ANCHOR_RADIUS = 0.2;
+  const UNIT_WIDTH_RATIO = 0.9;
+  const UNIT_HEIGHT_RATIO = 1.85;
+  const DEFAULT_SEGMENTS = 6;
+
+  const VFX_ANCHOR_CACHE = new Map();
+
+  function registerAnchorDataset(dataset) {
+    if (!dataset || typeof dataset !== 'object') return;
+    const unitId = dataset.unitId || null;
+    if (!unitId) return;
+    const entry = {
+      bodyAnchors: dataset.bodyAnchors || {},
+      vfxBindings: dataset.vfxBindings || {},
+      ambientEffects: dataset.ambientEffects || {}
+    };
+    VFX_ANCHOR_CACHE.set(unitId, entry);
+  }
+
+  registerAnchorDataset(loithienanhAnchors);
+
+  function getUnitAnchorDataset(unit) {
+    if (!unit) return null;
+    const id = unit.unitId || unit.id || unit.name || null;
+    if (!id) return null;
+    return VFX_ANCHOR_CACHE.get(id) || null;
+  }
+
+  function resolveBindingAnchor(unit, { anchorId, bindingKey, timing, ambientKey, radius }) {
+    const dataset = getUnitAnchorDataset(unit);
+    let picked = null;
+
+    if (bindingKey && dataset?.vfxBindings?.[bindingKey]?.anchors) {
+      const anchors = dataset.vfxBindings[bindingKey].anchors;
+      picked = anchors.find((item) => (timing && item.timing === timing) || (anchorId && item.id === anchorId)) || null;
+      if (!picked && timing) {
+        picked = anchors.find((item) => item.timing === timing) || null;
+      }
+      if (!picked && anchorId) {
+        picked = anchors.find((item) => item.id === anchorId) || null;
+      }
+    }
+
+    if (!picked && ambientKey && dataset?.ambientEffects?.[ambientKey]?.anchors) {
+      const anchors = dataset.ambientEffects[ambientKey].anchors;
+      picked = anchors.find((item) => (timing && item.timing === timing) || (anchorId && item.id === anchorId)) || null;
+      if (!picked && timing) {
+        picked = anchors.find((item) => item.timing === timing) || null;
+      }
+      if (!picked && anchorId) {
+        picked = anchors.find((item) => item.id === anchorId) || null;
+      }
+    }
+
+    const resolvedId = picked?.id || anchorId || DEFAULT_ANCHOR_ID;
+    const resolvedRadius = Number.isFinite(radius) ? radius : (Number.isFinite(picked?.radius) ? picked.radius : null);
+
+    return { id: resolvedId, radius: resolvedRadius };
+  }
+
+  function lookupBodyAnchor(unit, anchorId) {
+    const dataset = getUnitAnchorDataset(unit);
+    if (!dataset) return null;
+    const anchor = dataset.bodyAnchors?.[anchorId];
+    if (!anchor) return null;
+    const x = Number(anchor.x);
+    const y = Number(anchor.y);
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+    return { x, y };
+  }
+
+  function createRandomPattern(length = DEFAULT_SEGMENTS) {
+    const result = [];
+    for (let i = 0; i < length; i += 1) {
+      result.push(Math.random() * 2 - 1);
+    }
+    return result;
+  }
+
+  function computeAnchorCanvasPoint(Game, token, anchorId, radiusRatio, cam) {
+    if (!Game?.grid || !token || !hasFinitePoint(token)) return null;
+    const projection = projectCellOblique(Game.grid, token.cx, token.cy, cam);
+    if (!projection || !isFiniteCoord(projection.x) || !isFiniteCoord(projection.y) || !isFiniteCoord(projection.scale)) return null;
+
+    const anchor = lookupBodyAnchor(token, anchorId) || lookupBodyAnchor(token, DEFAULT_ANCHOR_ID) || DEFAULT_ANCHOR_POINT;
+    const ax = Number(anchor?.x);
+    const ay = Number(anchor?.y);
+    const validAnchor = Number.isFinite(ax) && Number.isFinite(ay);
+    const xRatio = validAnchor ? (ax - 0.5) : 0;
+    const yRatio = validAnchor ? (ay - 0.5) : 0;
+
+    const width = Game.grid.tile * UNIT_WIDTH_RATIO * projection.scale;
+    const height = Game.grid.tile * UNIT_HEIGHT_RATIO * projection.scale;
+    const px = projection.x + xRatio * width;
+    const py = projection.y - yRatio * height;
+
+    if (!isFiniteCoord(px) || !isFiniteCoord(py)) return null;
+
+    const rr = Number.isFinite(radiusRatio) ? radiusRatio : DEFAULT_ANCHOR_RADIUS;
+    const rPx = Math.max(2, Math.floor(rr * Game.grid.tile * projection.scale));
+    return { x: px, y: py, r: rPx, scale: projection.scale };
+  }
+
+  function drawLightningArc(ctx, start, end, event, progress) {
+    if (!start) return;
+    const segments = Math.max(2, event.segments || DEFAULT_SEGMENTS);
+    const color = event.color || '#7de5ff';
+    const alpha = (event.alpha ?? 0.9) * (1 - progress);
+    const thickness = Math.max(1, Math.floor((event.thickness ?? 2.4) * (start.scale ?? 1)));
+    const pattern = Array.isArray(event.pattern) && event.pattern.length ? event.pattern : createRandomPattern(segments - 1);
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = color;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = thickness;
+
+    if (end) {
+      const dx = end.x - start.x;
+      const dy = end.y - start.y;
+      const dist = Math.hypot(dx, dy) || 1;
+      const jitterFactor = (event.jitter ?? 0.22) * dist * (1 - progress * 0.6);
+      const nx = -dy / dist;
+      const ny = dx / dist;
+
+      ctx.beginPath();
+      ctx.moveTo(start.x, start.y);
+      for (let i = 1; i < segments; i += 1) {
+        const t = i / segments;
+        const noise = pattern[(i - 1) % pattern.length] || 0;
+        const offset = noise * jitterFactor;
+        const px = start.x + dx * t + nx * offset;
+        const py = start.y + dy * t + ny * offset;
+        ctx.lineTo(px, py);
+      }
+      ctx.lineTo(end.x, end.y);
+      ctx.stroke();
+    } else {
+      const rayCount = segments + 1;
+      const baseRadius = start.r * (event.rayScale ?? 2.4) * (1 + 0.2 * (1 - progress));
+      for (let i = 0; i < rayCount; i += 1) {
+        const seed = pattern[i % pattern.length] || 0;
+        const angle = (i / rayCount) * Math.PI * 2 + seed * 0.5;
+        const length = Math.max(start.r, baseRadius * (0.6 + Math.abs(seed)));
+        const ex = start.x + Math.cos(angle) * length;
+        const ey = start.y + Math.sin(angle) * length;
+        ctx.beginPath();
+        ctx.moveTo(start.x, start.y);
+        ctx.lineTo(ex, ey);
+        ctx.stroke();
+      }
+    }
+
+    if (event.glow !== false) {
+      ctx.globalAlpha = alpha * 0.6;
+      ctx.lineWidth = Math.max(thickness * 0.75, 1);
+      ctx.beginPath();
+      ctx.arc(start.x, start.y, Math.max(1, start.r * (event.glowScale ?? 1.1)), 0, Math.PI * 2);
+      ctx.stroke();
+      if (end) {
+        ctx.beginPath();
+        ctx.arc(end.x, end.y, Math.max(1, (end.r ?? start.r) * (event.glowScale ?? 1.1)), 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+
+  function drawBloodPulse(ctx, anchor, event, progress) {
+    if (!anchor) return;
+    const color = event.color || '#ff6b81';
+    const rings = Math.max(1, event.rings || 2);
+    const alpha = (event.alpha ?? 0.75) * (1 - progress);
+    const maxScale = event.maxScale ?? 3.4;
+    const growth = easeInOut(progress);
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = Math.max(1, Math.floor(anchor.r * 0.3));
+    for (let i = 0; i < rings; i += 1) {
+      const t = (i + 1) / rings;
+      const radius = anchor.r * lerp(1, maxScale, Math.pow(growth, 0.8) * t);
+      if (!isFiniteCoord(radius) || radius <= 0) continue;
+      ctx.beginPath();
+      ctx.arc(anchor.x, anchor.y, radius, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function drawShieldWrap(ctx, frontAnchor, backAnchor, event, progress) {
+    if (!frontAnchor) return;
+    const color = event.color || '#9bd8ff';
+    const alpha = (event.alpha ?? 0.6) * (1 - progress * 0.7);
+    const thickness = Math.max(2, Math.floor((event.thickness ?? 2.6) * (frontAnchor.scale ?? 1)));
+    const spanY = Math.max(frontAnchor.r * (event.heightScale ?? 3.4), 4);
+    const spanX = Math.max(frontAnchor.r * (event.widthScale ?? 2.6), 4);
+    const wobble = (event.wobble ?? 0.18) * Math.sin(progress * Math.PI * 2);
+
+    const centerX = frontAnchor.x;
+    const centerY = frontAnchor.y - wobble * spanY;
+    const gradientSpan = spanY * 0.35;
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = thickness;
+
+    ctx.beginPath();
+    ctx.ellipse(centerX, centerY, spanX, spanY, 0, 0, Math.PI * 2);
+    ctx.stroke();
+
+    if (backAnchor) {
+      ctx.globalAlpha = alpha * 0.55;
+      ctx.beginPath();
+      ctx.ellipse(backAnchor.x, backAnchor.y + wobble * spanY * 0.6, spanX * 1.1, spanY * 1.05, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    if (typeof ctx.createLinearGradient === 'function') {
+      ctx.globalAlpha = alpha * 0.35;
+      const gradient = ctx.createLinearGradient(centerX, centerY - gradientSpan, centerX, centerY + gradientSpan);
+      gradient.addColorStop(0, 'rgba(155, 216, 255, 0.0)');
+      gradient.addColorStop(0.5, color);
+      gradient.addColorStop(1, 'rgba(155, 216, 255, 0.0)');
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.ellipse(centerX, centerY, spanX, spanY, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function drawGroundBurst(ctx, anchor, event, progress) {
+    if (!anchor) return;
+    const color = event.color || '#ffa36e';
+    const alpha = (event.alpha ?? 0.7) * (1 - progress);
+    const shards = Math.max(3, event.shards || 5);
+    const spread = anchor.r * (event.spread ?? 3.2);
+    const lift = anchor.r * 0.4;
+    const growth = easeInOut(progress);
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = color;
+    for (let i = 0; i < shards; i += 1) {
+      const angle = (i / shards) * Math.PI * 2;
+      const distance = spread * (0.4 + growth * 0.6);
+      const px = anchor.x + Math.cos(angle) * distance;
+      const py = anchor.y + Math.sin(angle) * (distance * 0.35) + lift * (0.5 - growth);
+      if (!isFiniteCoord(px) || !isFiniteCoord(py)) continue;
+      ctx.beginPath();
+      ctx.moveTo(anchor.x, anchor.y);
+      ctx.lineTo(px, py);
+      ctx.lineTo(anchor.x + Math.cos(angle + 0.1) * (distance * 0.6), anchor.y + Math.sin(angle + 0.1) * (distance * 0.25));
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+  }
 
   function pool(Game) {
     if (!Game.vfx) Game.vfx = [];
@@ -13438,6 +13710,131 @@ __define('./vfx.js', (exports, module, __require) => {
   function vfxAddMelee(Game, attacker, target, { dur = CFG?.ANIMATION?.meleeDurationMs ?? 1100 } = {}) {
     // Overlay step-in/out (không di chuyển token thật)
     pool(Game).push({ type: 'melee', t0: now(), dur, refA: attacker, refB: target });
+  }
+
+  function makeLightningEvent(Game, source, target, opts = {}) {
+    const busyMs = Number.isFinite(opts.busyMs) ? opts.busyMs : 420;
+    const anchorA = resolveBindingAnchor(source, {
+      anchorId: opts.anchorId,
+      bindingKey: opts.bindingKey,
+      timing: opts.timing,
+      radius: opts.anchorRadius
+    });
+    const anchorB = target ? resolveBindingAnchor(target, {
+      anchorId: opts.targetAnchorId,
+      bindingKey: opts.targetBindingKey,
+      timing: opts.targetTiming,
+      radius: opts.targetRadius
+    }) : null;
+
+    pool(Game).push({
+      type: 'lightning_arc',
+      t0: now(),
+      dur: busyMs,
+      refA: source,
+      refB: target || null,
+      anchorA: anchorA.id,
+      anchorB: anchorB?.id || null,
+      radiusA: anchorA.radius,
+      radiusB: anchorB?.radius,
+      color: opts.color,
+      thickness: opts.thickness,
+      jitter: opts.jitter,
+      pattern: createRandomPattern(DEFAULT_SEGMENTS),
+      segments: opts.segments,
+      glow: opts.glow,
+      glowScale: opts.glowScale,
+      rayScale: opts.rayScale
+    });
+    return busyMs;
+  }
+
+  function vfxAddLightningArc(Game, source, target, opts = {}) {
+    return makeLightningEvent(Game, source, target, opts);
+  }
+
+  function vfxAddBloodPulse(Game, source, opts = {}) {
+    const busyMs = Number.isFinite(opts.busyMs) ? opts.busyMs : 560;
+    const anchor = resolveBindingAnchor(source, {
+      anchorId: opts.anchorId,
+      bindingKey: opts.bindingKey,
+      timing: opts.timing,
+      ambientKey: opts.ambientKey,
+      radius: opts.anchorRadius
+    });
+
+    pool(Game).push({
+      type: 'blood_pulse',
+      t0: now(),
+      dur: busyMs,
+      refA: source,
+      anchorA: anchor.id,
+      radiusA: anchor.radius,
+      color: opts.color,
+      rings: opts.rings,
+      maxScale: opts.maxScale,
+      alpha: opts.alpha
+    });
+    return busyMs;
+  }
+
+  function vfxAddShieldWrap(Game, source, opts = {}) {
+    const busyMs = Number.isFinite(opts.busyMs) ? opts.busyMs : 900;
+    const front = resolveBindingAnchor(source, {
+      anchorId: opts.anchorId,
+      bindingKey: opts.bindingKey,
+      timing: opts.timing,
+      radius: opts.anchorRadius
+    });
+    const wantsBack = opts.backAnchorId != null || opts.backTiming != null || Number.isFinite(opts.backRadius);
+    const back = wantsBack ? resolveBindingAnchor(source, {
+      anchorId: opts.backAnchorId,
+      bindingKey: opts.bindingKey,
+      timing: opts.backTiming,
+      radius: opts.backRadius
+    }) : null;
+
+    pool(Game).push({
+      type: 'shield_wrap',
+      t0: now(),
+      dur: busyMs,
+      refA: source,
+      anchorA: front.id,
+      anchorB: back?.id || null,
+      radiusA: front.radius,
+      radiusB: back?.radius,
+      color: opts.color,
+      alpha: opts.alpha,
+      thickness: opts.thickness,
+      heightScale: opts.heightScale,
+      widthScale: opts.widthScale,
+      wobble: opts.wobble
+    });
+    return busyMs;
+  }
+
+  function vfxAddGroundBurst(Game, source, opts = {}) {
+    const busyMs = Number.isFinite(opts.busyMs) ? opts.busyMs : 640;
+    const anchor = resolveBindingAnchor(source, {
+      anchorId: opts.anchorId,
+      bindingKey: opts.bindingKey,
+      timing: opts.timing,
+      radius: opts.anchorRadius
+    });
+
+    pool(Game).push({
+      type: 'ground_burst',
+      t0: now(),
+      dur: busyMs,
+      refA: source,
+      anchorA: anchor.id,
+      radiusA: anchor.radius,
+      color: opts.color,
+      shards: opts.shards,
+      spread: opts.spread,
+      alpha: opts.alpha
+    });
+    return busyMs;
   }
   function drawChibiOverlay(ctx, x, y, r, facing, color) {
     const lw = Math.max(CHIBI.line, Math.floor(r*0.28));
@@ -13576,6 +13973,41 @@ __define('./vfx.js', (exports, module, __require) => {
     }
   }
 
+  else if (e.type === 'lightning_arc') {
+        const start = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, e.radiusA, cam);
+        const end = e.refB ? computeAnchorCanvasPoint(Game, e.refB, e.anchorB, e.radiusB, cam) : null;
+        if (start && (!e.refB || end)) {
+          drawLightningArc(ctx, start, end, e, tt);
+        } else {
+          warnInvalidArc('lightning', { start, end });
+        }
+      }
+      else if (e.type === 'blood_pulse') {
+        const anchor = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, e.radiusA, cam);
+        if (anchor) {
+          drawBloodPulse(ctx, anchor, e, tt);
+        } else {
+          warnInvalidArc('blood_pulse', { anchor });
+        }
+      }
+      else if (e.type === 'shield_wrap') {
+        const front = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, e.radiusA, cam);
+        const back = e.anchorB ? computeAnchorCanvasPoint(Game, e.refA, e.anchorB, e.radiusB, cam) : null;
+        if (front) {
+          drawShieldWrap(ctx, front, back, e, tt);
+        } else {
+          warnInvalidArc('shield_wrap', { front, back });
+        }
+      }
+      else if (e.type === 'ground_burst') {
+        const anchor = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, e.radiusA, cam);
+        if (anchor) {
+          drawGroundBurst(ctx, anchor, e, tt);
+        } else {
+          warnInvalidArc('ground_burst', { anchor });
+        }
+      }
+
       if (!done) keep.push(e);
     }
     Game.vfx = keep;
@@ -13585,6 +14017,10 @@ __define('./vfx.js', (exports, module, __require) => {
   exports.vfxAddHit = vfxAddHit;
   exports.vfxAddTracer = vfxAddTracer;
   exports.vfxAddMelee = vfxAddMelee;
+  exports.vfxAddLightningArc = vfxAddLightningArc;
+  exports.vfxAddBloodPulse = vfxAddBloodPulse;
+  exports.vfxAddShieldWrap = vfxAddShieldWrap;
+  exports.vfxAddGroundBurst = vfxAddGroundBurst;
   exports.vfxDraw = vfxDraw;
 });
 try {
