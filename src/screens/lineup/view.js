@@ -56,9 +56,9 @@ function ensureStyles(){
     .lineup-bench{display:flex;flex-direction:column;gap:12px;min-height:100%;padding:0;border:none;background:none;}
     .lineup-bench__title{margin:0;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
     .lineup-bench__content{display:flex;flex-direction:column;gap:12px;flex:1;padding:0;border:none;background:none;}
-   .lineup-bench__grid{display:flex;align-items:flex-start;justify-content:center;gap:var(--lineup-bench-slot-gap);flex:1;min-height:0;}
+   .lineup-bench__grid{display:flex;align-items:flex-start;justify-content:flex-start;gap:var(--lineup-bench-slot-gap);flex:1;min-height:0;}
     .lineup-bench__column{display:flex;flex-direction:column;gap:var(--lineup-bench-slot-gap);}
-    .lineup-bench__column:first-child{margin-left:calc(-1 * var(--lineup-bench-slot-size));}
+    .lineup-bench__column:first-child{margin-left:0;}
     .lineup-bench__cell{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;background:none;border:none;padding:0;width:var(--lineup-bench-slot-size);}
     .lineup-bench__cell:focus{outline:none;}
     .lineup-bench__cell:focus-visible{outline:none;}
