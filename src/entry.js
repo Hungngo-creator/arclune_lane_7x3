@@ -6,7 +6,13 @@ const SUCCESS_EVENT = 'arclune:loaded';
 const SCREEN_MAIN_MENU = 'main-menu';
 const SCREEN_PVE = 'pve-session';
 const SCREEN_COLLECTION = 'collection';
-const APP_SCREEN_CLASSES = [`app--${SCREEN_MAIN_MENU}`, `app--${SCREEN_PVE}`, `app--${SCREEN_COLLECTION}`];
+const SCREEN_LINEUP = 'lineup';
+const APP_SCREEN_CLASSES = [
+  `app--${SCREEN_MAIN_MENU}`,
+  `app--${SCREEN_PVE}`,
+  `app--${SCREEN_COLLECTION}`,
+  `app--${SCREEN_LINEUP}`
+];
 
 function loadBundledModule(id){
   if (typeof __require === 'function'){
@@ -114,6 +120,8 @@ let customScreenId = null;
 let customScreenToken = 0;
 let collectionView = null;
 let collectionRenderToken = 0;
+let lineupView = null;
+let lineupRenderToken = 0;
 
 function dispatchLoaded(){
   try {
@@ -244,6 +252,17 @@ function destroyCollectionView(){
     }
   }
   collectionView = null;
+}
+
+function destroyLineupView(){
+  if (lineupView && typeof lineupView.destroy === 'function'){
+    try {
+      lineupView.destroy();
+    } catch (err) {
+      console.error('[lineup] cleanup error', err);
+    }
+  }
+  lineupView = null;
 }
 
 function cloneParamValue(value){
@@ -396,6 +415,11 @@ async function renderCollectionScreen(params){
   dismissModal();
   clearAppScreenClasses();
   destroyCollectionView();
+  lineupRenderToken += 1;
+  destroyLineupView();
+  if (rootElement.classList){
+    rootElement.classList.add('app--collection');
+  }
   if (typeof rootElement.innerHTML === 'string'){
     rootElement.innerHTML = '<div class="app-loading">Đang tải bộ sưu tập...</div>';
   }
@@ -424,6 +448,45 @@ async function renderCollectionScreen(params){
   }) || null;
 }
 
+async function renderLineupScreen(params){
+  if (!rootElement || !shellInstance) return;
+  const token = ++lineupRenderToken;
+  dismissModal();
+  clearAppScreenClasses();
+  destroyLineupView();
+  collectionRenderToken += 1;
+  destroyCollectionView();
+  if (rootElement.classList){
+    rootElement.classList.add('app--lineup');
+  }
+  if (typeof rootElement.innerHTML === 'string'){
+    rootElement.innerHTML = '<div class="app-loading">Đang tải đội hình...</div>';
+  }
+
+  let module;
+  try {
+    module = await loadBundledModule('./screens/lineup/index.js');
+  } catch (error) {
+    if (token !== lineupRenderToken) return;
+    throw error;
+  }
+
+  if (token !== lineupRenderToken) return;
+
+  const render = module?.renderLineupScreen || module?.default?.renderLineupScreen;
+  if (typeof render !== 'function'){
+    throw new Error('Module đội hình không cung cấp hàm render hợp lệ.');
+  }
+
+  const definition = getDefinitionByScreen(SCREEN_LINEUP);
+  lineupView = render({
+    root: rootElement,
+    shell: shellInstance,
+    definition,
+    params: params || null
+  }) || null;
+}
+
 function renderMainMenuScreen(){
   if (!rootElement || !shellInstance) return;
   dismissModal();
@@ -431,6 +494,9 @@ function renderMainMenuScreen(){
   if (rootElement.classList){
     rootElement.classList.add('app--main-menu');
   }
+
+lineupRenderToken += 1;
+  destroyLineupView();
 
   if (mainMenuView && typeof mainMenuView.destroy === 'function'){
     mainMenuView.destroy();
@@ -697,6 +763,8 @@ async function mountPveScreen(params){
         destroyCustomScreen();
         collectionRenderToken += 1;
         destroyCollectionView();
+        lineupRenderToken += 1;
+        destroyLineupView();
         lastScreen = SCREEN_MAIN_MENU;
         lastParams = nextParams;
         pveRenderToken += 1;
@@ -704,11 +772,13 @@ async function mountPveScreen(params){
         return;
       }
 
-if (nextScreen === SCREEN_COLLECTION){
+      if (nextScreen === SCREEN_COLLECTION){
         customScreenToken += 1;
         destroyCustomScreen();
         collectionRenderToken += 1;
         destroyCollectionView();
+        lineupRenderToken += 1;
+        destroyLineupView();
         if (mainMenuView && typeof mainMenuView.destroy === 'function'){
           mainMenuView.destroy();
           mainMenuView = null;
@@ -725,11 +795,36 @@ if (nextScreen === SCREEN_COLLECTION){
         return;
       }
 
+if (nextScreen === SCREEN_LINEUP){
+        customScreenToken += 1;
+        destroyCustomScreen();
+        collectionRenderToken += 1;
+        destroyCollectionView();
+        lineupRenderToken += 1;
+        destroyLineupView();
+        if (mainMenuView && typeof mainMenuView.destroy === 'function'){
+          mainMenuView.destroy();
+          mainMenuView = null;
+        }
+        lastScreen = SCREEN_LINEUP;
+        lastParams = nextParams;
+        pveRenderToken += 1;
+        renderLineupScreen(nextParams || null).catch(error => {
+          console.error('Arclune failed to load lineup screen', error);
+          if (renderMessageRef){
+            showFatalError(error, renderMessageRef, bootstrapOptions);
+          }
+        });
+        return;
+      }
+
       if (nextScreen === SCREEN_PVE){
         customScreenToken += 1;
         destroyCustomScreen();
         collectionRenderToken += 1;
         destroyCollectionView();
+        lineupRenderToken += 1;
+        destroyLineupView();
         if (mainMenuView && typeof mainMenuView.destroy === 'function'){
           mainMenuView.destroy();
           mainMenuView = null;
@@ -750,8 +845,10 @@ if (nextScreen === SCREEN_COLLECTION){
         mainMenuView = null;
       }
 
-collectionRenderToken += 1;
+      collectionRenderToken += 1;
       destroyCollectionView();
+      lineupRenderToken += 1;
+      destroyLineupView();
 
       lastScreen = nextScreen;
       lastParams = nextParams;
