@@ -27,8 +27,11 @@ async function listSourceFiles(){
       const fullPath = path.join(dir, entry.name);
       if (entry.isDirectory()){
         await walk(fullPath);
-      } else if (entry.isFile() && entry.name.endsWith('.js')){
-        files.push(fullPath);
+      } else if (entry.isFile()){
+        const ext = path.extname(entry.name);
+        if (ext === '.js' || ext === '.json'){
+          files.push(fullPath);
+        }
       }
     }
   }
@@ -36,13 +39,74 @@ async function listSourceFiles(){
   return files.sort();
 }
 
+function splitImportClause(clause){
+  let depth = 0;
+  for (let i = 0; i < clause.length; i += 1){
+    const ch = clause[i];
+    if (ch === '{'){
+      depth += 1;
+    } else if (ch === '}'){
+      depth = Math.max(0, depth - 1);
+    } else if (ch === ',' && depth === 0){
+      const head = clause.slice(0, i).trim();
+      const tail = clause.slice(i + 1).trim();
+      return { head, tail };
+    }
+  }
+  return { head: clause.trim(), tail: '' };
+}
+
+function parseNamedImports(block){
+  const trimmed = block.trim();
+  if (!trimmed.startsWith('{') || !trimmed.endsWith('}')){
+    throw new Error(`Unsupported import clause: ${block}`);
+  }
+  const inside = trimmed.slice(1, -1);
+  return inside
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .map((part) => {
+      const [importedRaw, localRaw] = part.split(/\s+as\s+/);
+      const imported = importedRaw.trim();
+      const local = (localRaw || importedRaw).trim();
+      return { imported, local };
+    });
+}
+
 function createImportReplacement(specifiers, moduleVar){
   const lines = [];
   const cleaned = specifiers.trim();
-  if (!cleaned.startsWith('{') || !cleaned.endsWith('}')){
+  if (!cleaned){
+    return lines;
+  }
+
+  let remaining = cleaned;
+
+  if (!remaining.startsWith('{') && !remaining.startsWith('*')){
+    const defaultMatch = remaining.match(/^([A-Za-z_$][A-Za-z0-9_$]*)/);
+    if (!defaultMatch){
+      throw new Error(`Unsupported import clause: ${specifiers}`);
+    }
+    const local = defaultMatch[1];
+    lines.push(`const ${local} = ${moduleVar}.default ?? ${moduleVar};`);
+    remaining = remaining.slice(defaultMatch[0].length).trim();
+    if (remaining.startsWith(',')){
+      remaining = remaining.slice(1).trim();
+    } else if (remaining.length){
+      throw new Error(`Unsupported import clause: ${specifiers}`);
+    }
+  }
+
+  if (!remaining){
+    return lines;
+  }
+
+  if (!remaining.startsWith('{') || !remaining.endsWith('}')){
     throw new Error(`Unsupported import clause: ${specifiers}`);
   }
-  const inside = cleaned.slice(1, -1);
+
+  const inside = remaining.slice(1, -1);
   const parts = inside.split(',').map((p) => p.trim()).filter(Boolean);
   for (const part of parts){
     if (!part) continue;
@@ -199,10 +263,10 @@ const exportDefaultNamedFunctionRegex = /export\s+default\s+function\s+([A-Za-z0
     .filter((item, index, arr) => index === arr.findIndex((it) => it.alias === item.alias))
     .map(({ alias, expr }) => `exports.${alias} = ${expr};`);
     
-if (exportsAssignments.some((item) => item.alias === 'default')){
+ if (exportsAssignments.some((item) => item.alias === 'default')){
     footerLines.push('module.exports.default = exports.default;');
-}
-  
+  }
+
   const transformed = footerLines.length
     ? `${code}\n${footerLines.join('\n')}`
     : code;
