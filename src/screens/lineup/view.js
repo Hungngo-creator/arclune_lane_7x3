@@ -55,13 +55,13 @@ function ensureStyles(){
     .lineup-slot__locked-note{margin:0;font-size:12px;color:#9cbcd9;line-height:1.5;}
     .lineup-bench{border-radius:24px;border:1px solid rgba(125,211,252,.25);background:rgba(10,18,28,.9);padding:14px 16px;display:flex;flex-direction:column;gap:16px;min-height:100%;}
     .lineup-bench__title{margin:0;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
-    .lineup-bench__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(96px,auto);grid-auto-flow:column;gap:16px;}
-    .lineup-bench__cell{padding:14px;border-radius:16px;border:1px solid rgba(125,211,252,.2);background:rgba(12,22,32,.84);display:flex;flex-direction:column;gap:10px;cursor:pointer;transition:transform .16s ease,border-color .16s ease,background .16s ease;height:100%;}
+    .lineup-bench__grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:12px;}
+    .lineup-bench__cell{padding:8px;border-radius:16px;border:1px solid rgba(125,211,252,.2);background:rgba(12,22,32,.84);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px;cursor:pointer;transition:transform .16s ease,border-color .16s ease,background .16s ease;aspect-ratio:1;}
     .lineup-bench__cell:hover{transform:translateY(-2px);border-color:rgba(125,211,252,.4);background:rgba(16,28,40,.9);}
     .lineup-bench__cell:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:3px;}
     .lineup-bench__cell.is-empty{opacity:0.65;}
-    .lineup-bench__name{margin:0;font-size:13px;color:#d0e7ff;line-height:1.4;}
-    .lineup-bench__avatar{width:56px;height:56px;border-radius:16px;background:rgba(24,34,44,.82);display:flex;align-items:center;justify-content:center;font-size:20px;color:#aee4ff;margin-bottom:4px;overflow:hidden;}
+    .lineup-bench__name{margin:0;font-size:13px;color:#d0e7ff;line-height:1.4;text-align:center;}
+    .lineup-bench__avatar{width:56px;height:56px;border-radius:16px;background:rgba(24,34,44,.82);display:flex;align-items:center;justify-content:center;font-size:20px;color:#aee4ff;margin-bottom:0;overflow:hidden;}
     .lineup-bench__avatar img{width:100%;height:100%;object-fit:cover;}
     .lineup-leader{border-radius:24px;border:1px solid rgba(255,209,132,.42);background:linear-gradient(150deg,rgba(36,26,12,.88),rgba(18,12,6,.92));padding:14px 16px;display:grid;grid-template-columns:minmax(0,120px) minmax(0,1fr);gap:12px;align-items:start;position:relative;overflow:hidden;}
     .lineup-leader__badge{position:absolute;top:12px;right:-18px;background:rgba(255,209,132,.16);color:#ffd184;padding:4px 26px;border-radius:999px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;transform:rotate(20deg);}
@@ -115,7 +115,7 @@ function ensureStyles(){
     .lineup-overlay__option-name{margin:0;font-size:14px;color:#e6f2ff;}
     .lineup-overlay__option-meta{margin:0;font-size:12px;color:#9cbcd9;}
     @media(max-width:1080px){.lineup-view__layout{grid-template-columns:1fr;}.lineup-main-area{grid-template-columns:1fr;}.lineup-leader{grid-template-columns:1fr;}.lineup-leader__badge{display:none;}}
-    @media(max-width:720px){.lineup-view__title{font-size:30px;}.lineup-view__header{flex-direction:column;align-items:flex-start;}.lineup-main-area{gap:18px;}.lineup-bench__grid{grid-template-columns:1fr;grid-auto-flow:row;}.lineup-slot__avatar{width:64px;height:64px;}.lineup-roster__list{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}}
+    @media(max-width:720px){.lineup-view__title{font-size:30px;}.lineup-view__header{flex-direction:column;align-items:flex-start;}.lineup-main-area{gap:18px;}.lineup-bench__grid{grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));}.lineup-slot__avatar{width:64px;height:64px;}.lineup-roster__list{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}}
   `;
 
   if (style.textContent !== css){
@@ -879,29 +879,29 @@ export function renderLineupView(options = {}){
       cellEl.className = 'lineup-bench__cell';
       cellEl.dataset.benchIndex = String(cell.index);
       cellEl.setAttribute('aria-label', `Ô dự bị ${cell.index + 1}`);
-      if (!cell.unitId && !cell.label){
+      const unit = cell.unitId ? rosterLookup.get(cell.unitId) : null;
+      const hasContent = Boolean(cell.unitId || cell.label);
+      if (!hasContent){
         cellEl.classList.add('is-empty');
       }
       const avatarEl = document.createElement('div');
       avatarEl.className = 'lineup-bench__avatar';
-      if (cell.unitId){
-        const unit = rosterLookup.get(cell.unitId);
-        renderAvatar(avatarEl, unit?.avatar || cell.meta?.avatar || null, unit?.name || cell.label || '');
-      } else {
-        renderAvatar(avatarEl, null, '');
-      }
+      const avatarSource = unit?.avatar || cell.meta?.avatar || null;
+      const avatarLabel = unit?.name || cell.label || '';
+      renderAvatar(avatarEl, avatarSource, avatarLabel);
       cellEl.appendChild(avatarEl);
-      const nameEl = document.createElement('p');
-      nameEl.className = 'lineup-bench__name';
-      if (cell.unitId){
-        const unit = rosterLookup.get(cell.unitId);
-        nameEl.textContent = unit?.name || cell.label || 'Đã gán';
+      let nameText = '';
+      if (unit){
+        nameText = unit?.name || cell.label || 'Đã gán';
       } else if (cell.label){
-        nameEl.textContent = cell.label;
-      } else {
-        nameEl.textContent = 'Trống';
+        nameText = cell.label;
       }
-      cellEl.appendChild(nameEl);
+      if (nameText){
+        const nameEl = document.createElement('p');
+        nameEl.className = 'lineup-bench__name';
+        nameEl.textContent = nameText;
+        cellEl.appendChild(nameEl);
+      }
       benchGrid.appendChild(cellEl);
     });
   }
