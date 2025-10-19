@@ -1,0 +1,3501 @@
+{
+  "version": "1.3.0",
+  "meta": {
+    "lastUpdated": "2025-10-19",
+    "author": "Arclune-Econ-Model",
+    "changelog": [
+      "Add pity/spark scope, dupe conversion, pool composition, currency rounding & payment policy, failure refund policy, and additional shop caps.",
+      "Add bannerSchedule, RNG policy, rate limiting, validation, telemetry, i18n, and token expiry.",
+      "Auto-generated changelog for 1.2.3 on 2025-10-19 10:16:37",
+      "Auto diff 1.2.4 → 1.2.6 on 2025-10-19 10:27:33: see file CHANGELOG_1.2.4_to_1.2.6.md"
+    ],
+    "environment": "prod",
+    "migration": {
+      "compatibleSince": "1.0.0",
+      "hardBreakAt": [],
+      "stepsHint": [
+        "Back up last-good config & verify signature",
+        "Validate against schema",
+        "Warm cache on CDN & check canary",
+        "Gradually increase rollout"
+      ]
+    },
+    "schemaUrl": "https://yourcdn/arclune/gacha.schema.json",
+    "configHash": "sha256:5dccb6beaf21bd22f6d6e28ba4026f90c678ea1d7f55eecc78648e385357f8d3",
+    "schemaVersion": "1.0",
+    "build": {
+      "versionCode": 113,
+      "channel": "prod"
+    },
+    "oddsDisclosureUrl": "https://yourcdn/arclune/odds",
+    "oddsHistory": {
+      "keepLast": 12
+    },
+    "signing": {
+      "alg": "EdDSA",
+      "kid": "prod-key-2025Q4",
+      "signature": "<JWS-compact-or-detached-signature>",
+      "signedFields": [
+        "version",
+        "gacha.rarityRatesBase",
+        "gacha.banners",
+        "gacha.scopes",
+        "gacha.softPityCaps",
+        "economy.conversion",
+        "shops",
+        "pricing"
+      ],
+      "rotation": {
+        "nextKid": "prod-key-2026Q1",
+        "rolloverStart": "2025-12-15T00:00:00+07:00",
+        "rolloverEnd": "2026-01-15T00:00:00+07:00"
+      },
+      "multiSig": {
+        "required": 2,
+        "signers": [
+          "econ_lead_key",
+          "ops_lead_key",
+          "security_lead_key"
+        ]
+      }
+    },
+    "auditTrail": [
+      {
+        "ts": "2025-10-19T00:00:00+07:00",
+        "actor": "system",
+        "change": "Upgrade to 1.2.1 with circuitBreakers, retryPolicy, queue, configServe cache headers, messagingTemplates, consent reminders, price bounds, gifting, extra security RL."
+      }
+    ],
+    "validFrom": "2025-10-20T00:00:00+07:00",
+    "validUntil": "2026-01-01T00:00:00+07:00",
+    "monotonicVersionGate": {
+      "enabled": true,
+      "rejectIfOlderThan": "1.2.0"
+    },
+    "schema": {
+      "id": "https://yourcdn/arclune/gacha.schema.json",
+      "minVersion": "1.1.8"
+    },
+    "changeControl": {
+      "requireSigned": true,
+      "approvers": [
+        "econ_lead",
+        "ops_lead",
+        "security_lead"
+      ],
+      "minApprovals": 2,
+      "ticketRequired": true,
+      "commitMessageFormat": "^\\[config\\]\\s.+$"
+    },
+    "previousVersion": "1.2.6",
+    "docs": {
+      "designNotes": "https://yourdocs/arclune/gacha/design",
+      "opsRunbook": "https://yourdocs/arclune/gacha/runbook",
+      "abGuide": "https://yourdocs/arclune/experiments/ab_guide"
+    },
+    "releaseNotes": {
+      "vi": "v1.2.7: cải thiện bảo mật mua hàng, tùy chọn giới hạn chi tiêu cá nhân, MOTD hiển thị diff thay đổi, và lịch sự kiện mẫu.",
+      "en": "v1.2.7: purchase security (HMAC), player self spend caps, diff-aware MOTD, and an event scheduler skeleton."
+    },
+    "profile": {
+      "mode": "pve_expanded",
+      "stripRecommendations": [
+        "liveOps.remoteOverrides",
+        "ops.blueGreen",
+        "ops.canary",
+        "ops.chaos",
+        "policy.complianceExport",
+        "featureFlags.abTesting",
+        "telemetry.anomaly",
+        "telemetry.evRollup"
+      ],
+      "notes": "Dành cho build PVE đơn sơ: vẫn giữ đầy đủ odds/tuning, bỏ các tính năng vận hành nặng khi chưa cần."
+    },
+    "commentHeaderEnabled": true,
+    "notes": "No file size limit concerns. Content can scale with assets up to GBs."
+  },
+  "economy": {
+    "currencies": {
+      "THANH_TINH": {
+        "code": "TT",
+        "name": "Thần Tinh",
+        "tier": 5,
+        "minUnit": 0.01
+      },
+      "THUONG": {
+        "code": "THUONG",
+        "name": "Thượng Nguyên Tinh",
+        "tier": 4,
+        "minUnit": 0.01
+      },
+      "TRUNG": {
+        "code": "TRUNG",
+        "name": "Trung Nguyên Tinh",
+        "tier": 3,
+        "minUnit": 1
+      },
+      "HA": {
+        "code": "HA",
+        "name": "Hạ Nguyên Tinh",
+        "tier": 2,
+        "minUnit": 1
+      },
+      "VUN": {
+        "code": "VUN",
+        "name": "Vụn Nguyên Tinh",
+        "tier": 1,
+        "minUnit": 1
+      }
+    },
+    "conversion": {
+      "downwardOnly": true,
+      "rates": {
+        "TT->THUONG": 10,
+        "THUONG->TRUNG": 10,
+        "TRUNG->HA": 10,
+        "HA->VUN": 10
+      },
+      "rounding": {
+        "mode": "floor",
+        "precision": {
+          "TT": 0.01,
+          "THUONG": 0.01,
+          "TRUNG": 1,
+          "HA": 1,
+          "VUN": 1
+        }
+      },
+      "feePercentDownward": 0.0,
+      "globalDailyMaxConversions": 50
+    },
+    "roles": {
+      "TT": "Premium tối thượng (Prime banner, spark, vật phẩm khóa tỉ lệ, vé chọn).",
+      "THUONG": "Mid-premium/tiến độ nhanh (UR banner, gói SSR/UR, reset endgame).",
+      "TRUNG": "Tiến độ cốt lõi (SSR banner, nâng cấp/luyện/craft trung-cao).",
+      "HA": "Vận hành hằng ngày (phí tham chiến/reroll phụ cấp thấp).",
+      "VUN": "Tiêu hao thường nhật (shop vụn, nâng đồ nhỏ, ghép nguyên liệu)."
+    },
+    "tuning": {
+      "sinksMultiplier": {
+        "fees": 1.0,
+        "reroll": 1.0,
+        "craft": 1.0
+      },
+      "rewardsMultiplier": {
+        "daily": 1.0,
+        "weekly": 1.0,
+        "event": 1.0
+      }
+    },
+    "exchangeLimits": {
+      "dailyCaps": {
+        "TT->THUONG": 20,
+        "THUONG->TRUNG": 200,
+        "TRUNG->HA": 2000,
+        "HA->VUN": 20000
+      },
+      "weeklyCaps": {
+        "TT->THUONG": 60,
+        "THUONG->TRUNG": 600
+      },
+      "enforce": true
+    },
+    "formatting": {
+      "symbols": {
+        "TT": "TT",
+        "THUONG": "Thượng",
+        "TRUNG": "Trung",
+        "HA": "Hạ",
+        "VUN": "Vụn"
+      },
+      "decimalPlaces": {
+        "TT": 2,
+        "THUONG": 2,
+        "TRUNG": 0,
+        "HA": 0,
+        "VUN": 0
+      }
+    },
+    "ttEquivalence": {
+      "THUONG": 0.1,
+      "TRUNG": 0.01,
+      "HA": 0.001,
+      "VUN": 0.0001
+    },
+    "priceBounds": {
+      "tickets": {
+        "Prime": {
+          "minTT": 0.18,
+          "maxTT": 0.25
+        },
+        "UR": {
+          "minTHUONG": 1.4,
+          "maxTHUONG": 2.0
+        }
+      },
+      "bundles10": {
+        "SSR": {
+          "minTHUONG": 9.0,
+          "maxTHUONG": 10.0
+        },
+        "UR": {
+          "minTHUONG": 13.5,
+          "maxTHUONG": 15.0,
+          "minTT": 2.0,
+          "maxTT": 2.2
+        },
+        "Prime": {
+          "minTT": 1.8,
+          "maxTT": 2.2
+        }
+      }
+    },
+    "vouchers": {
+      "enabled": true,
+      "types": [
+        {
+          "id": "VOUCHER_UR10",
+          "appliesToBanner": "UR",
+          "freePulls": 10,
+          "expiresDays": 7
+        },
+        {
+          "id": "VOUCHER_SSR10",
+          "appliesToBanner": "SSR",
+          "freePulls": 10,
+          "expiresDays": 7
+        }
+      ]
+    },
+    "walletSnapshots": {
+      "enabled": true,
+      "onEvents": [
+        "purchaseComplete",
+        "pullComplete",
+        "refundApplied"
+      ],
+      "retainDays": 30
+    }
+  },
+  "gacha": {
+    "rarityRatesBase": {
+      "Prime": 0.005,
+      "UR": 0.01,
+      "SSR": 0.02,
+      "SR": 0.12,
+      "R": 0.36,
+      "N": 0.485
+    },
+    "scopes": {
+      "pityScope": "byBannerType",
+      "sparkScope": "byBannerType"
+    },
+    "paymentPolicy": {
+      "allowMultipleCurrenciesPerBanner": true,
+      "autoBestValue": true,
+      "fallbackUseConversion": true
+    },
+    "dupeConversion": {
+      "Prime": {
+        "give": [
+          {
+            "type": "ITEM",
+            "id": "PrimeSoul",
+            "amount": 1
+          }
+        ],
+        "alt": [
+          {
+            "type": "SELECTOR_UR",
+            "amount": 1
+          }
+        ]
+      },
+      "UR": {
+        "give": [
+          {
+            "type": "ITEM",
+            "id": "URSoul",
+            "amount": 50
+          }
+        ],
+        "alt": [
+          {
+            "type": "CURRENCY",
+            "code": "THUONG",
+            "amount": 0.4
+          }
+        ]
+      },
+      "SSR": {
+        "give": [
+          {
+            "type": "ITEM",
+            "id": "SSRSoul",
+            "amount": 40
+          }
+        ],
+        "alt": [
+          {
+            "type": "CURRENCY",
+            "code": "TRUNG",
+            "amount": 30
+          }
+        ]
+      },
+      "SR": {
+        "give": [
+          {
+            "type": "ITEM",
+            "id": "SRSoul",
+            "amount": 10
+          }
+        ]
+      },
+      "R": {
+        "give": [
+          {
+            "type": "CURRENCY",
+            "code": "HA",
+            "amount": 20
+          }
+        ]
+      },
+      "N": {
+        "give": [
+          {
+            "type": "CURRENCY",
+            "code": "VUN",
+            "amount": 200
+          }
+        ]
+      }
+    },
+    "banners": {
+      "SSR": {
+        "pool": {
+          "rateUp": {
+            "rarity": "SSR",
+            "ids": [],
+            "weight": "equal"
+          },
+          "offPool": {
+            "SSR": [],
+            "SR": [],
+            "R": [],
+            "N": []
+          },
+          "rateUpWeights": {},
+          "sourceTags": {
+            "rateUp": {},
+            "offPool": {}
+          }
+        },
+        "costPerPull": [
+          {
+            "currency": "THUONG",
+            "amount": 1.0
+          },
+          {
+            "currency": "TRUNG",
+            "amount": 12.0
+          }
+        ],
+        "bundle10": [
+          {
+            "currency": "THUONG",
+            "amount": 9.5
+          },
+          {
+            "currency": "TRUNG",
+            "amount": 108.0
+          }
+        ],
+        "hardPity": 45,
+        "softPity": {
+          "startAtPull": 35,
+          "rampTargetRateAtPullMinus1": 0.4,
+          "interpolation": "linear"
+        },
+        "rateUpRule": {
+          "onHitRarity": "SSR",
+          "firstRollChanceRateUp": 0.5,
+          "guaranteeNextIfLose50_50": true
+        },
+        "spark": {
+          "byCurrency": {
+            "TT": 7.0
+          },
+          "byPulls": 150
+        },
+        "crossGuarantees": null
+      },
+      "UR": {
+        "pool": {
+          "rateUp": {
+            "rarity": "UR",
+            "ids": [],
+            "weight": "equal"
+          },
+          "offPool": {
+            "UR": [],
+            "SSR": [],
+            "SR": []
+          },
+          "rateUpWeights": {},
+          "sourceTags": {
+            "rateUp": {},
+            "offPool": {}
+          }
+        },
+        "costPerPull": [
+          {
+            "currency": "THUONG",
+            "amount": 1.5
+          },
+          {
+            "currency": "TT",
+            "amount": 0.22
+          }
+        ],
+        "bundle10": [
+          {
+            "currency": "THUONG",
+            "amount": 14.25
+          },
+          {
+            "currency": "TT",
+            "amount": 2.09
+          }
+        ],
+        "hardPity": 70,
+        "softPity": {
+          "startAtPull": 60,
+          "rampTargetRateAtPullMinus1": 0.3,
+          "interpolation": "linear"
+        },
+        "rateUpRule": {
+          "onHitRarity": "UR",
+          "firstRollChanceRateUp": 0.5,
+          "guaranteeNextIfLose50_50": true
+        },
+        "spark": {
+          "byCurrency": {
+            "TT": 15.5
+          },
+          "byPulls": 70
+        },
+        "crossGuarantees": null
+      },
+      "Prime": {
+        "pool": {
+          "rateUp": {
+            "rarity": "Prime",
+            "ids": [],
+            "weight": "equal"
+          },
+          "offPool": {
+            "Prime": [],
+            "UR": [],
+            "SSR": []
+          },
+          "rateUpWeights": {},
+          "sourceTags": {
+            "rateUp": {},
+            "offPool": {}
+          }
+        },
+        "costPerPull": [
+          {
+            "currency": "TT",
+            "amount": 0.2
+          }
+        ],
+        "bundle10": [
+          {
+            "currency": "TT",
+            "amount": 1.9
+          }
+        ],
+        "hardPity": 110,
+        "softPity": {
+          "startAtPull": 90,
+          "rampTargetRateAtPullMinus1": 0.2,
+          "interpolation": "linear"
+        },
+        "rateUpRule": {
+          "onHitRarity": "Prime",
+          "firstRollChanceRateUp": 0.5,
+          "guaranteeNextIfLose50_50": true
+        },
+        "spark": {
+          "byCurrency": {
+            "TT": 40.0
+          },
+          "byPulls": 110
+        },
+        "crossGuarantees": [
+          {
+            "pull": 70,
+            "guaranteeRarity": "UR"
+          },
+          {
+            "pull": 50,
+            "guaranteeRarity": "SSR"
+          }
+        ]
+      }
+    },
+    "antiFrustration": {
+      "minRarityEvery": [
+        {
+          "rarity": "SR",
+          "withinPulls": 20
+        }
+      ],
+      "carryOverRules": {
+        "carrySoftPityAcrossBanners": false,
+        "carryHardPityAcrossBanners": false
+      }
+    },
+    "failureRefundPolicy": {
+      "networkFailure": {
+        "refundCurrency": true,
+        "refundTickets": true,
+        "logSeedAndResult": true
+      },
+      "serverCrash": {
+        "refundCurrency": true,
+        "giveCompensation": [
+          {
+            "type": "CURRENCY",
+            "code": "THUONG",
+            "amount": 0.2
+          }
+        ]
+      }
+    },
+    "uiHints": {
+      "showLiveRateInSoftPity": true,
+      "showPityProgressInTT": true,
+      "tooltipExamples": [
+        "Tỉ lệ hiện tại Prime: 1.2% (soft pity).",
+        "Còn 0.88 TT (≈ 4 vé UR) tới UR bảo hiểm."
+      ]
+    },
+    "bannerSchedule": [
+      {
+        "bannerId": "UR_2025W43_LOI_THIEN_ANH",
+        "type": "UR",
+        "startsAt": "2025-10-20T00:00:00+07:00",
+        "endsAt": "2025-11-03T23:59:59+07:00",
+        "timezone": "Asia/Ho_Chi_Minh"
+      }
+    ],
+    "rng": {
+      "serverAuthoritative": true,
+      "seedLog": true,
+      "prng": "xoshiro128**",
+      "seedRecipe": {
+        "components": [
+          "serverTimeISO",
+          "userId",
+          "bannerId",
+          "pullIndex",
+          "requestId"
+        ],
+        "hash": "sha256",
+        "salt": "arclune_rng_v1"
+      }
+    },
+    "limits": {
+      "maxPullsPerMinute": 120,
+      "maxTTSpendPerDay": 8
+    },
+    "validation": {
+      "sumRatesMustBeOne": true,
+      "currencyRoundingMode": "floor",
+      "requireNonEmptyRateUpInProd": false,
+      "maxRateUpUnitsPerBanner": 3,
+      "poolUnitIdMustBeUnique": true,
+      "warnIfOffPoolTooLarge": {
+        "SSR": 100,
+        "UR": 60,
+        "Prime": 20
+      }
+    },
+    "blacklists": {
+      "offPoolUnitIds": []
+    },
+    "softPityCaps": {
+      "SSR": {
+        "maxEffectiveRate": 0.4
+      },
+      "UR": {
+        "maxEffectiveRate": 0.3
+      },
+      "Prime": {
+        "maxEffectiveRate": 0.2
+      },
+      "mode": "cap",
+      "notes": "cap: effectiveRate = min(rampRate, cap). additive: min(base + rampDelta, cap)"
+    },
+    "simulationDefaults": {
+      "iterations": 100000,
+      "seed": 12345,
+      "metrics": [
+        "avgPullsToHit",
+        "p99PullsToHit",
+        "costEV_TT"
+      ]
+    },
+    "cooldowns": {
+      "minSecondsBetweenPulls": 0.3,
+      "burst": {
+        "windowSeconds": 10,
+        "maxPulls": 300
+      }
+    },
+    "tenPullGuarantee": {
+      "enabled": true,
+      "rarity": "SR",
+      "appliesTo": [
+        "SSR",
+        "UR",
+        "Prime"
+      ]
+    },
+    "loyalty": {
+      "enabled": true,
+      "perBannerType": {
+        "UR": {
+          "everyPulls": 30,
+          "reward": [
+            {
+              "type": "ITEM",
+              "id": "URSoul",
+              "amount": 5
+            }
+          ]
+        },
+        "Prime": {
+          "everyPulls": 40,
+          "reward": [
+            {
+              "type": "ITEM",
+              "id": "PrimeSoul",
+              "amount": 1
+            }
+          ]
+        }
+      }
+    },
+    "dailyFreePulls": {
+      "SSR": 1,
+      "UR": 0,
+      "Prime": 0
+    },
+    "poolIntegrity": {
+      "SSR": {
+        "rateUpIdsHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "offPoolHash": "12926862c89d15069c14daaf9a3f42d91b58fe4dc646c5fb2be5910a7c48615a"
+      },
+      "UR": {
+        "rateUpIdsHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "offPoolHash": "36efdc52e70bc7100fc3fbff4cc580b78ce5a988fc2d047730bf4b39954b0d07"
+      },
+      "Prime": {
+        "rateUpIdsHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "offPoolHash": "ba0543cd886fae03d29354853aa8cdb7b55bfc65e2fc66f50fbd0abb437ebb2c"
+      }
+    },
+    "bundlePolicy": {
+      "discountPercent": 5.0,
+      "allowOverridePerBanner": true,
+      "validateBundlesAgainstPolicy": true,
+      "roundingMode": "floor"
+    },
+    "resolutionOrder": {
+      "steps": [
+        "maintenanceCheck",
+        "cooldownCheck",
+        "paymentAuth",
+        "applyCrossGuarantee",
+        "applyHardPity",
+        "applySoftPity",
+        "rollRarity",
+        "applyFocusPath",
+        "applyTargetPityToken",
+        "applyRateUpRule",
+        "resolveDupeConversion",
+        "grantRewards",
+        "telemetryLog"
+      ]
+    },
+    "poolSnapshots": {
+      "SSR": {
+        "timestamp": null,
+        "rateUpIds": [],
+        "offPoolCounts": {}
+      },
+      "UR": {
+        "timestamp": null,
+        "rateUpIds": [],
+        "offPoolCounts": {}
+      },
+      "Prime": {
+        "timestamp": null,
+        "rateUpIds": [],
+        "offPoolCounts": {}
+      }
+    },
+    "spark": {
+      "gracePeriodDaysAfterBannerEnd": 14
+    },
+    "targetPity": {
+      "UR": {
+        "afterURHitsWithoutCurrentRateUp": 2,
+        "grants": [
+          {
+            "type": "TOKEN",
+            "id": "TOKEN_GUAR_UR",
+            "amount": 1
+          }
+        ],
+        "note": "Token này khiến lần UR tiếp theo chắc chắn là unit rate-up hiện hành."
+      },
+      "Prime": {
+        "afterPrimeHitsWithoutCurrentRateUp": 1,
+        "grants": [
+          {
+            "type": "TOKEN",
+            "id": "TOKEN_GUAR_PRIME",
+            "amount": 1
+          }
+        ],
+        "note": "Token này khiến lần Prime tiếp theo chắc chắn là unit rate-up hiện hành."
+      },
+      "consumeRules": {
+        "enabled": true,
+        "checkOrder": [
+          "verifyBannerTypeMatches",
+          "verifyHasCurrentRateUp",
+          "verifyPlayerHasToken",
+          "applyGuarantee",
+          "consumeToken"
+        ],
+        "resolutionPriority": 45,
+        "whenToApply": "beforeRateUpRoll",
+        "consumeOn": [
+          "rarityHit"
+        ],
+        "carryOverAcrossBannersOfSameType": true,
+        "tokenExpiryDays": 90,
+        "tokens": {
+          "UR": {
+            "tokenId": "TOKEN_GUAR_UR",
+            "appliesTo": "UR",
+            "uiHintKey": "guarantee_ur_active",
+            "maxStack": 5
+          },
+          "Prime": {
+            "tokenId": "TOKEN_GUAR_PRIME",
+            "appliesTo": "Prime",
+            "uiHintKey": "guarantee_prime_active",
+            "maxStack": 3
+          }
+        }
+      }
+    },
+    "poolSnapshotsPolicy": {
+      "retainLast": 6
+    },
+    "duplicateProtection": {
+      "enabled": true,
+      "windowPulls": 20,
+      "maxRepeatsPerUnit": 1,
+      "appliesToRarities": [
+        "SSR",
+        "UR",
+        "Prime"
+      ]
+    },
+    "ownershipBias": {
+      "enabled": false,
+      "onlyForRarities": [
+        "SSR",
+        "UR"
+      ],
+      "newUnitBoostPct": 10,
+      "regionAllow": [
+        "VN",
+        "US",
+        "SG"
+      ],
+      "note": "Bật tính năng này cần kiểm tra pháp lý từng thị trường."
+    },
+    "focusPath": {
+      "enabled": true,
+      "perBannerType": {
+        "UR": {
+          "pointsOnURNonTarget": 1,
+          "threshold": 2,
+          "autoResetOnHit": true,
+          "allowReassignBetweenBannersOfSameType": true,
+          "uiHintKey": "focus_path_ur_active"
+        },
+        "Prime": {
+          "pointsOnPrimeNonTarget": 1,
+          "threshold": 1,
+          "autoResetOnHit": true,
+          "allowReassignBetweenBannersOfSameType": true,
+          "uiHintKey": "focus_path_prime_active"
+        }
+      }
+    },
+    "poolRules": {
+      "allowLimitedInOffPool": false,
+      "allowCollabInOffPool": false
+    },
+    "pityCarryoverPolicy": {
+      "carryAcrossSeasons": false,
+      "graceCarryDaysSameType": 7,
+      "note": "Nếu banner kế tiếp cùng loại (UR/Prime) mở trong 7 ngày, cho carry hard/soft pity."
+    },
+    "rateHistory": {
+      "enabled": true,
+      "keepLast": 20,
+      "include": [
+        "rarityRatesBase",
+        "banners.SSR.softPity",
+        "banners.UR.softPity",
+        "banners.Prime.softPity"
+      ],
+      "rollbackMarkers": {
+        "enabled": true,
+        "labelPrefix": "OPS_ROLLBACK_"
+      }
+    },
+    "unitRotationRules": {
+      "minDaysBetweenRateUps": {
+        "SSR": 28,
+        "UR": 56,
+        "Prime": 84
+      },
+      "maxRateUpsPerYear": {
+        "SSR": 3,
+        "UR": 2,
+        "Prime": 1
+      }
+    },
+    "sandboxPreview": {
+      "enabled": false,
+      "allowUserIds": [],
+      "notes": "Cho phép QA xem/roll với bộ tỉ lệ sandbox tách biệt; không ảnh hưởng prod."
+    },
+    "poolSeal": {
+      "verifyOnPublish": true,
+      "verifyOnFirstPull": true,
+      "mismatchAction": "freezeBannerAndAlert"
+    },
+    "bannerMetadata": {
+      "UR_2025W43_LOI_THIEN_ANH": {
+        "displayName": {
+          "vi": "UR — Lôi Thiên Ảnh",
+          "en": "UR — Loi Thien Anh"
+        },
+        "theme": "Lightning Vanguard",
+        "artVersion": "v3",
+        "units": [
+          "UNIT_UR_LOI_THIEN_ANH"
+        ]
+      }
+    },
+    "ownershipBiasRegionOff": [
+      "CN",
+      "KR"
+    ]
+  },
+  "rewards": {
+    "daily": {
+      "loginTT": 0.0,
+      "loginTHUONG": 0.6,
+      "tasks": [
+        {
+          "id": "daily_easy_1",
+          "THUONG": 0.03
+        },
+        {
+          "id": "daily_easy_2",
+          "THUONG": 0.03
+        },
+        {
+          "id": "daily_easy_3",
+          "THUONG": 0.03
+        },
+        {
+          "id": "daily_easy_4",
+          "THUONG": 0.03
+        },
+        {
+          "id": "daily_hard",
+          "THUONG": 0.12
+        }
+      ],
+      "otherCurrencies": [
+        {
+          "currency": "TRUNG",
+          "rangePerDay": [
+            30,
+            60
+          ]
+        },
+        {
+          "currency": "HA",
+          "rangePerDay": [
+            300,
+            600
+          ]
+        },
+        {
+          "currency": "VUN",
+          "rangePerDay": [
+            3000,
+            6000
+          ]
+        }
+      ]
+    },
+    "weekly": {
+      "totalTT": 0.0,
+      "totalTHUONG": 1.8,
+      "sources": [
+        {
+          "id": "expedition_tower",
+          "THUONG": 0.8
+        },
+        {
+          "id": "world_boss_pvp",
+          "THUONG": 0.6
+        },
+        {
+          "id": "activity_points",
+          "THUONG": 0.4
+        }
+      ],
+      "loginStreakDay7": {
+        "THUONG": 1.0,
+        "tickets": [
+          {
+            "banner": "SSR",
+            "count": 1
+          }
+        ]
+      }
+    },
+    "monthlyLogin28": [
+      {
+        "day": 7,
+        "TT": 0.5
+      },
+      {
+        "day": 14,
+        "TT": 1.0
+      },
+      {
+        "day": 21,
+        "TT": 1.0,
+        "tickets": [
+          {
+            "banner": "UR",
+            "count": 1
+          }
+        ]
+      },
+      {
+        "day": 28,
+        "TT": 2.0
+      }
+    ],
+    "eventSeason": {
+      "battlePassFree": {
+        "TT": 2.5,
+        "THUONGperWeek": 3.5
+      },
+      "bigFestivalsMonthlyTT": {
+        "min": 6.0,
+        "max": 10.0
+      },
+      "tokenExpiryDays": 30
+    }
+  },
+  "shops": {
+    "weeklyThUongShop": {
+      "rotatesWeekly": true,
+      "globalWeeklyPurchaseCap": {
+        "THUONG": 20
+      },
+      "items": [
+        {
+          "id": "ticket_UR",
+          "banner": "UR",
+          "limitPerWeek": 3,
+          "cost": [
+            {
+              "currency": "THUONG",
+              "amount": 1.5
+            }
+          ]
+        },
+        {
+          "id": "bundle10_SSR",
+          "banner": "SSR",
+          "limitPerWeek": 1,
+          "cost": [
+            {
+              "currency": "THUONG",
+              "amount": 9.0
+            }
+          ]
+        },
+        {
+          "id": "reset_endgame_1",
+          "limitPerWeek": 2,
+          "cost": [
+            {
+              "currency": "THUONG",
+              "amount": 0.5
+            }
+          ]
+        },
+        {
+          "id": "reset_endgame_2",
+          "limitPerWeek": 1,
+          "cost": [
+            {
+              "currency": "THUONG",
+              "amount": 1.0
+            }
+          ]
+        }
+      ]
+    },
+    "biweeklyTTShop": {
+      "rotatesEveryDays": 14,
+      "globalCyclePurchaseCap": {
+        "TT": 5.0
+      },
+      "items": [
+        {
+          "id": "bundle10_Prime",
+          "banner": "Prime",
+          "limitPerCycle": 2,
+          "cost": [
+            {
+              "currency": "TT",
+              "amount": 1.9
+            }
+          ]
+        },
+        {
+          "id": "ticket_select_SSR",
+          "limitPerCycle": 1,
+          "cost": [
+            {
+              "currency": "TT",
+              "amount": 1.2
+            }
+          ]
+        },
+        {
+          "id": "sigil_rate_boost",
+          "desc": "+50% rate-up trong 10 vé (banner đang xem)",
+          "limitPerCycle": 1,
+          "cost": [
+            {
+              "currency": "TT",
+              "amount": 0.8
+            }
+          ]
+        }
+      ]
+    },
+    "eventShop": {
+      "usesEventToken": true,
+      "allowTTTopUpIfShort": true,
+      "examples": [
+        {
+          "id": "event_skin_SR",
+          "token": 1200,
+          "altCostTT": 0.6
+        },
+        {
+          "id": "event_mat_box",
+          "token": 300,
+          "altCostTHUONG": 0.2
+        }
+      ]
+    },
+    "guardrails": {
+      "minTTPerPrimeTicket": 0.18,
+      "minTHUONGPerURTicket": 1.4
+    }
+  },
+  "sinks": {
+    "fees": [
+      {
+        "content": "tower_floor",
+        "currency": "HA",
+        "base": 20,
+        "perFloorDelta": 5
+      },
+      {
+        "content": "world_boss",
+        "currency": "TRUNG",
+        "base": 10,
+        "perTryDelta": 5
+      },
+      {
+        "content": "expedition",
+        "currency": "HA",
+        "base": 50
+      }
+    ],
+    "reroll": [
+      {
+        "slot": "substat_low",
+        "currency": "HA",
+        "amount": 30
+      },
+      {
+        "slot": "substat_mid",
+        "currency": "TRUNG",
+        "amount": 12
+      },
+      {
+        "slot": "substat_high",
+        "currency": "THUONG",
+        "amount": 0.2,
+        "dailyLimit": 5
+      }
+    ],
+    "craft": [
+      {
+        "id": "gear_epic",
+        "TRUNG": 80,
+        "HA": 800,
+        "rareShard": 2
+      },
+      {
+        "id": "core_upgrade_1",
+        "TRUNG": 60,
+        "HA": 600
+      },
+      {
+        "id": "core_upgrade_2",
+        "TRUNG": 120,
+        "HA": 1200,
+        "rareShard": 1
+      }
+    ],
+    "storageAndTeam": [
+      {
+        "id": "bag_slots_+10",
+        "TRUNG": 40,
+        "HA": 400
+      },
+      {
+        "id": "team_slot_unlock",
+        "TRUNG": 100,
+        "HA": 1000
+      }
+    ]
+  },
+  "telemetry": {
+    "enabled": true,
+    "sample": 1.0,
+    "fields": [
+      "userId",
+      "bannerType",
+      "pullIndex",
+      "effectiveRate",
+      "paidCurrency",
+      "paidAmount",
+      "resultRarity",
+      "resultUnitId"
+    ],
+    "webhooks": {
+      "primary": {
+        "url": "https://telemetry.yourgame.example/pulls",
+        "timeoutMs": 2000,
+        "retries": 3,
+        "backoff": "exp"
+      },
+      "backup": {
+        "url": "https://backup-telemetry.yourgame.example/pulls",
+        "timeoutMs": 2000,
+        "retries": 2,
+        "backoff": "exp"
+      }
+    },
+    "privacy": {
+      "consentRequired": true,
+      "consentVersion": "2025Q4",
+      "redactFields": [
+        "ip",
+        "deviceId"
+      ],
+      "pseudonymize": [
+        "userId"
+      ],
+      "dataResidency": {
+        "EU": "eu-west-1",
+        "US": "us-east-1",
+        "APAC": "ap-southeast-1"
+      }
+    },
+    "samplers": {
+      "pullEvents": 1.0,
+      "purchaseEvents": 1.0,
+      "pityStateSnapshots": 0.25
+    },
+    "partitions": {
+      "byBannerId": true,
+      "byBannerType": true
+    },
+    "dashboards": {
+      "grafana": {
+        "gacha": "dash_gacha_main",
+        "purchase": "dash_purchase_main"
+      },
+      "superset": {
+        "economy": "eco_overview"
+      }
+    },
+    "anomaly": {
+      "method": "ewma",
+      "alpha": 0.3,
+      "zThreshold": 3.0,
+      "watch": [
+        "primeDropPer1000",
+        "urDropPer1000",
+        "refundRatePct",
+        "apiErrorRatePct"
+      ]
+    },
+    "cohortSampling": {
+      "newUsersD7": 1.0,
+      "whales": 1.0,
+      "others": 0.5
+    },
+    "retentionDays": {
+      "pullEvents": 30,
+      "purchaseEvents": 365,
+      "pityStateSnapshots": 14
+    },
+    "incidentSamplingOverrides": {
+      "enabled": true,
+      "onIncidentBoost": {
+        "pullEvents": 1.0,
+        "purchaseEvents": 1.0,
+        "pityStateSnapshots": 1.0
+      }
+    },
+    "configDigestPost": {
+      "url": "https://ops.yourgame.example/config-digest",
+      "postFields": [
+        "meta.configHash",
+        "version",
+        "meta.previousVersion"
+      ]
+    },
+    "evRollup": {
+      "enabled": true,
+      "by": [
+        "bannerType",
+        "scenario"
+      ],
+      "fields": [
+        "EV_pulls",
+        "p90_pulls",
+        "p99_pulls",
+        "EV_TT"
+      ],
+      "postUrl": "https://telemetry.yourgame.example/ev-rollup"
+    },
+    "pve": {
+      "events": [
+        "stageStart",
+        "stageEnd",
+        "death",
+        "ultUsed"
+      ],
+      "postUrl": "https://telemetry.yourgame.example/pve"
+    }
+  },
+  "i18n": {
+    "default": "vi",
+    "supported": [
+      "vi",
+      "en"
+    ],
+    "stringsKeyPrefix": "gacha_ui",
+    "qa": {
+      "failBuildIfMissingKeys": true,
+      "fallbackLanguage": "en"
+    }
+  },
+  "featureFlags": {
+    "abTesting": {
+      "enabled": true,
+      "buckets": [
+        {
+          "id": "A_softPityDefault",
+          "ratio": 0.5,
+          "overrides": {}
+        },
+        {
+          "id": "B_softPitySteeper",
+          "ratio": 0.5,
+          "overrides": {
+            "gacha.banners.UR.softPity.rampTargetRateAtPullMinus1": 0.35,
+            "gacha.banners.Prime.softPity.rampTargetRateAtPullMinus1": 0.24
+          }
+        }
+      ],
+      "mutuallyExclusive": true,
+      "sumRatiosMustBeOne": true,
+      "randomizationUnit": "userId",
+      "exposureLog": {
+        "enabled": true,
+        "fields": [
+          "userId",
+          "bucketId",
+          "timestamp",
+          "clientVersion"
+        ]
+      },
+      "autoStopRules": {
+        "enabled": true,
+        "metrics": {
+          "refundRatePct": {
+            "gt": 1.0
+          },
+          "retentionD1DeltaPct": {
+            "lt": -3.0
+          }
+        },
+        "cooldownDaysBeforeRetry": 14
+      },
+      "stats": {
+        "minSamplePerBucket": 5000,
+        "minDurationHours": 24,
+        "confidenceMetric": "bayes_factor",
+        "stopIfBayesFactorGT": 10
+      }
+    },
+    "ui": {
+      "showExactRates": true,
+      "rateDecimals": 3,
+      "currencyDecimals": {
+        "TT": 2,
+        "THUONG": 2,
+        "TRUNG": 0,
+        "HA": 0,
+        "VUN": 0
+      }
+    }
+  },
+  "ops": {
+    "killSwitch": {
+      "banners": [],
+      "shops": []
+    },
+    "maintenance": {
+      "windows": [
+        {
+          "start": "2025-10-25T02:00:00+07:00",
+          "end": "2025-10-25T03:00:00+07:00",
+          "messageKey": "maint_generic"
+        }
+      ]
+    },
+    "idempotency": {
+      "requireRequestId": true,
+      "nonceTTLSeconds": 300
+    },
+    "purchaseLimits": {
+      "perAccount": {
+        "daily": {
+          "TT": 10,
+          "THUONG": 50
+        },
+        "weekly": {
+          "TT": 40,
+          "THUONG": 200
+        }
+      }
+    },
+    "dynamicNotices": [
+      {
+        "id": "prime_rate_info",
+        "active": true,
+        "messageKey": "notice_prime_rate_softpity"
+      }
+    ],
+    "sandbox": {
+      "enabled": false,
+      "acceptRealPayments": false,
+      "seed": 987654321
+    },
+    "shadowTest": {
+      "enabled": true,
+      "sample": 0.05
+    },
+    "maintenanceBehavior": {
+      "disableFreePullsDuringMaintenance": true,
+      "disableShopsDuringMaintenance": true
+    },
+    "txJournal": {
+      "retentionDays": 30,
+      "hashChain": true
+    },
+    "compensationMatrix": [
+      {
+        "minutes": 15,
+        "rewards": [
+          {
+            "type": "CURRENCY",
+            "code": "THUONG",
+            "amount": 0.2
+          }
+        ]
+      },
+      {
+        "minutes": 60,
+        "rewards": [
+          {
+            "type": "CURRENCY",
+            "code": "THUONG",
+            "amount": 0.5
+          },
+          {
+            "type": "TICKET",
+            "banner": "SSR",
+            "count": 1
+          }
+        ]
+      },
+      {
+        "minutes": 240,
+        "rewards": [
+          {
+            "type": "CURRENCY",
+            "code": "TT",
+            "amount": 0.5
+          },
+          {
+            "type": "TICKET",
+            "banner": "UR",
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "freezeWindows": [
+      {
+        "start": "2025-10-21T18:00:00+07:00",
+        "end": "2025-10-21T23:59:59+07:00",
+        "blocks": [
+          "bannerPublish",
+          "shopPriceChange"
+        ]
+      },
+      {
+        "start": "2025-10-22T00:00:00+07:00",
+        "end": "2025-10-22T23:59:59+07:00",
+        "blocks": [
+          "oddsChange",
+          "fxUpdate"
+        ]
+      }
+    ],
+    "canary": {
+      "enabled": true,
+      "percent": 0.05,
+      "fields": [
+        "rarityRatesBase",
+        "softPity",
+        "bundle10"
+      ]
+    },
+    "hardFailPolicy": {
+      "failIfRatesSumOutside": [
+        0.999,
+        1.001
+      ],
+      "failIfPrimeRateAbove": 0.02,
+      "failIfURRateAbove": 0.05,
+      "failIfSSRRateAbove": 0.1,
+      "blockIfEditedWithinHoursOfBannerStart": 24
+    },
+    "dr": {
+      "lastGoodConfigHash": "sha256:81eb82e7174a96a417dd173e9466c8420d768be8152e336c632d45979c7ab1c5",
+      "backups": [
+        {
+          "uri": "s3://arclune-config/prod/last-good.json",
+          "quorum": 2
+        },
+        {
+          "uri": "gs://arclune-config/prod/last-good.json",
+          "quorum": 2
+        }
+      ],
+      "restoreAction": "rollBackAndAnnounce"
+    },
+    "slo": {
+      "gachaAPI": {
+        "availabilityPct": 99.9,
+        "p95LatencyMs": 250
+      },
+      "configServe": {
+        "availabilityPct": 99.99,
+        "p95LatencyMs": 120
+      }
+    },
+    "circuitBreakers": {
+      "gachaAPI": {
+        "errorRatePctOpen": 2.0,
+        "p95LatencyMsOpen": 600,
+        "halfOpenAfterSeconds": 60,
+        "sampleWindowSeconds": 120
+      },
+      "purchaseAPI": {
+        "errorRatePctOpen": 1.0,
+        "p95LatencyMsOpen": 800,
+        "halfOpenAfterSeconds": 90,
+        "sampleWindowSeconds": 180
+      }
+    },
+    "queue": {
+      "gachaPull": {
+        "maxConcurrentPerUser": 1,
+        "fifo": true,
+        "timeoutMs": 4000
+      },
+      "purchase": {
+        "maxConcurrentPerUser": 1,
+        "fifo": true,
+        "timeoutMs": 6000
+      }
+    },
+    "health": {
+      "livenessPath": "/healthz",
+      "readinessPath": "/readyz"
+    },
+    "incidentPolicy": {
+      "severities": {
+        "SEV1": {
+          "ackMinutes": 5,
+          "fixHours": 2
+        },
+        "SEV2": {
+          "ackMinutes": 15,
+          "fixHours": 8
+        },
+        "SEV3": {
+          "ackMinutes": 60,
+          "fixHours": 48
+        }
+      },
+      "autoPageOn": [
+        "ratesSumViolation",
+        "apiErrorSpike",
+        "purchaseDoubleDebit"
+      ]
+    },
+    "motdOnConfigChange": {
+      "enabled": true,
+      "showForHours": 24,
+      "includeDiffSummary": true,
+      "maxDiffLines": 15,
+      "renderedChangelogUrl": "https://cdn.yourgame.example/changelogs/latest.html",
+      "showHashAndVersion": true
+    },
+    "configChangeWebhook": {
+      "url": "https://ops.yourgame.example/config-events",
+      "events": [
+        "published",
+        "rolled_back",
+        "expired",
+        "remote_override_applied"
+      ]
+    },
+    "configDiff": {
+      "webhook": "https://ops.yourgame.example/config-diff",
+      "includeSections": [
+        "gacha",
+        "economy",
+        "shops",
+        "pricing",
+        "featureFlags"
+      ]
+    },
+    "chaos": {
+      "enabled": false,
+      "faults": {
+        "gachaAPI": {
+          "latencyMs": 0,
+          "errorRatePct": 0.0
+        },
+        "purchaseAPI": {
+          "latencyMs": 0,
+          "errorRatePct": 0.0
+        }
+      },
+      "allowIn": [
+        "staging"
+      ],
+      "safeguardRequireHeader": "X-CHAOS-ALLOW"
+    },
+    "backups": {
+      "rotateKeepLast": 10,
+      "scheduleCron": "0 */6 * * *",
+      "destinations": [
+        {
+          "uri": "s3://arclune-config/prod/",
+          "encryptAtRest": true
+        },
+        {
+          "uri": "gs://arclune-config/prod/",
+          "encryptAtRest": true
+        }
+      ]
+    },
+    "compensationDedup": {
+      "idempotencyWindowHours": 72,
+      "keyComponents": [
+        "userId",
+        "incidentId",
+        "rewardHash"
+      ]
+    },
+    "canaryAutoPromote": {
+      "enabled": true,
+      "promoteIf": {
+        "errorRatePctLT": 0.5,
+        "p95LatencyMsLT": 250,
+        "evDriftPctLT": 10
+      },
+      "minCanaryDurationMinutes": 30
+    },
+    "blueGreen": {
+      "enabled": true,
+      "blueHash": "",
+      "greenHash": "",
+      "trafficSplit": {
+        "blue": 0.9,
+        "green": 0.1
+      }
+    },
+    "prComment": {
+      "enabled": true,
+      "includeSections": [
+        "gacha",
+        "economy",
+        "shops",
+        "pricing",
+        "featureFlags",
+        "security",
+        "ops"
+      ],
+      "redactKeys": [
+        "meta.signing.signature",
+        "security.purchase.receiptVerification"
+      ],
+      "format": "markdown",
+      "template": {
+        "markdown": [
+          "## Gacha Config Diff — ${fromVersion} → ${toVersion}",
+          "",
+          "### Highlights",
+          "${highlights}",
+          "",
+          "### Sections changed",
+          "${sectionsChanged}",
+          "",
+          "> Hash: ${configHash} • Author: ${author} • Build: ${build}"
+        ],
+        "placeholders": [
+          "fromVersion",
+          "toVersion",
+          "highlights",
+          "sectionsChanged",
+          "configHash",
+          "author",
+          "build"
+        ]
+      },
+      "ciHints": {
+        "requireApprovals": [
+          "econ_lead",
+          "ops_lead"
+        ],
+        "blockIfKeysChanged": [
+          "gacha.rarityRatesBase",
+          "gacha.banners.*.softPity",
+          "pricing.fxIndex"
+        ],
+        "postTo": "https://ci.yourgame.example/pr-comment"
+      }
+    },
+    "eventScheduler": {
+      "events": [
+        {
+          "id": "HALLOWEEN_2025",
+          "window": {
+            "start": "2025-10-28T00:00:00+07:00",
+            "end": "2025-11-03T23:59:59+07:00"
+          },
+          "affects": [
+            "shops.eventShop",
+            "rewards.eventSeason",
+            "liveOps.hotfixOverrides"
+          ],
+          "announceMOTD": true
+        }
+      ]
+    }
+  },
+  "pricing": {
+    "regions": [
+      {
+        "id": "VN",
+        "vatPct": 0,
+        "fx": "VND",
+        "packs": [
+          {
+            "id": "tt_5",
+            "tt": 5,
+            "price": 99000
+          },
+          {
+            "id": "tt_12",
+            "tt": 12,
+            "price": 199000
+          }
+        ]
+      },
+      {
+        "id": "US",
+        "vatPct": 0,
+        "fx": "USD",
+        "packs": [
+          {
+            "id": "tt_5",
+            "tt": 5,
+            "price": 4.99
+          },
+          {
+            "id": "tt_12",
+            "tt": 12,
+            "price": 9.99
+          }
+        ]
+      }
+    ],
+    "firstPurchaseBonus": {
+      "enabled": true,
+      "ttMultiplier": 2.0,
+      "appliesOncePerRegion": true
+    },
+    "bundles": [
+      {
+        "id": "starter_ur_pack",
+        "items": [
+          {
+            "type": "TICKET",
+            "banner": "UR",
+            "count": 10
+          },
+          {
+            "type": "CURRENCY",
+            "code": "THUONG",
+            "amount": 2.0
+          }
+        ],
+        "price": {
+          "VN": 149000,
+          "US": 6.99
+        },
+        "limitPerAccount": 1
+      }
+    ],
+    "fxIndex": {
+      "source": "ECB",
+      "updateIntervalHours": 24,
+      "maxDailyChangePct": 5,
+      "rounding": {
+        "VND": "nearest_1000",
+        "USD": "cent"
+      },
+      "minEffectiveTTperUSD": 1.0
+    }
+  },
+  "policy": {
+    "dataRetentionDays": 30,
+    "minorAccountRestricted": true,
+    "sparkExpiry": {
+      "mode": "carryToSameType",
+      "convertRateTT": 0.5
+    },
+    "userDataExport": {
+      "enabled": true,
+      "slaDays": 7
+    },
+    "minorRules": {
+      "hidePrimeBanner": true,
+      "dailySpendCaps": {
+        "TT": 2,
+        "THUONG": 10
+      }
+    },
+    "consentReminderDays": 180,
+    "minorUI": {
+      "hideOddsGraph": true,
+      "hideSpendStats": false
+    },
+    "refunds": {
+      "windowDays": 7,
+      "denyIfSpentTTOver": 2.0,
+      "chargebackAutoBanDays": 30
+    },
+    "parentalControls": {
+      "enabled": true,
+      "dailyPlaytimeMinutes": 120,
+      "curfewLocal": {
+        "start": "23:00",
+        "end": "06:00"
+      }
+    },
+    "dataRequests": {
+      "exportSlaDays": 7,
+      "deleteSlaDays": 30,
+      "contact": "privacy@yourgame.example"
+    },
+    "complianceExport": {
+      "enabled": true,
+      "format": "parquet",
+      "frequencyDays": 7,
+      "destination": "s3://arclune-compliance/auditor/",
+      "fields": [
+        "timestamp",
+        "userId_pseudo",
+        "bannerId",
+        "rarityRolled",
+        "rateAtRoll",
+        "pityBefore",
+        "pityAfter"
+      ]
+    },
+    "selfSpendCaps": {
+      "enabled": true,
+      "optIn": true,
+      "dailyTT": 3.0,
+      "weeklyTT": 10.0,
+      "cooldownDaysToChange": 7
+    },
+    "gdpr": {
+      "dsrQueue": {
+        "maxOpenRequestsPerUser": 1,
+        "slaDays": 30
+      },
+      "consentLogs": {
+        "retainDays": 365
+      }
+    }
+  },
+  "time": {
+    "serverTimezone": "Asia/Ho_Chi_Minh",
+    "dailyResetLocal": "04:00:00",
+    "weeklyResetLocal": {
+      "dow": "MON",
+      "time": "04:00:00"
+    },
+    "clockSkewToleranceSeconds": 45
+  },
+  "mail": {
+    "rewardMailExpiryDays": 14,
+    "claimAllBatchSize": 50,
+    "overflowToMailWhenInventoryFull": true
+  },
+  "promo": {
+    "giftCodes": {
+      "enabled": true,
+      "maxRedemptionsPerAccount": 5,
+      "cooldownHours": 24
+    },
+    "redeemThrottle": {
+      "perHour": 2,
+      "perDay": 5,
+      "cooldownSeconds": 120
+    }
+  },
+  "battlePass": {
+    "seasonId": "S1_2025Q4",
+    "durationDays": 56,
+    "freeTrack": {
+      "milestones": [
+        {
+          "points": 100,
+          "rewards": [
+            {
+              "type": "CURRENCY",
+              "code": "THUONG",
+              "amount": 0.5
+            }
+          ]
+        },
+        {
+          "points": 300,
+          "rewards": [
+            {
+              "type": "CURRENCY",
+              "code": "TT",
+              "amount": 0.5
+            }
+          ]
+        },
+        {
+          "points": 600,
+          "rewards": [
+            {
+              "type": "TICKET",
+              "banner": "UR",
+              "count": 1
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "accessibility": {
+    "colorBlindRarityPalette": {
+      "Prime": "#8E00FF",
+      "UR": "#005AB5",
+      "SSR": "#FF8000",
+      "SR": "#66C2A5",
+      "R": "#A6D854",
+      "N": "#CCCCCC"
+    },
+    "usePatternsForRarity": true,
+    "uiScale": {
+      "min": 0.8,
+      "max": 1.4,
+      "default": 1.0
+    },
+    "reducedAnimations": {
+      "enabled": true,
+      "affects": [
+        "gachaReveal",
+        "particleFX"
+      ]
+    },
+    "colorBlindModes": [
+      "off",
+      "deuteranopia",
+      "protanopia",
+      "tritanopia"
+    ]
+  },
+  "tickets": {
+    "registry": [
+      {
+        "id": "TIX_SSR",
+        "bannerType": "SSR",
+        "stackLimit": 9999
+      },
+      {
+        "id": "TIX_UR",
+        "bannerType": "UR",
+        "stackLimit": 9999
+      },
+      {
+        "id": "TIX_PRIME",
+        "bannerType": "Prime",
+        "stackLimit": 9999
+      },
+      {
+        "id": "TOKEN_GUAR_UR",
+        "stackLimit": 9999
+      },
+      {
+        "id": "TOKEN_GUAR_PRIME",
+        "stackLimit": 9999
+      }
+    ]
+  },
+  "inventory": {
+    "stackCaps": {
+      "PrimeSoul": 9999,
+      "URSoul": 99999,
+      "SSRSoul": 99999,
+      "SRSoul": 999999,
+      "HA": 9999999,
+      "VUN": 99999999
+    },
+    "overflowPolicy": "toMail",
+    "autoSellRates": null,
+    "tokenPolicy": {
+      "autoConsumeOnMatch": true,
+      "respectMinClientVersion": true,
+      "minClientVersion": "1.13.0",
+      "showExpiryBadge": true
+    }
+  },
+  "notice": "tệp này chỉ mang tính chất tham khảo, không cần áp dụng 100%",
+  "liveOps": {
+    "hotfixOverrides": [
+      {
+        "id": "HF_SOFTPITY_UR_+2pct",
+        "activeWindow": {
+          "start": "2025-10-22T00:00:00+07:00",
+          "end": "2025-10-22T23:59:59+07:00"
+        },
+        "overrides": {
+          "gacha.banners.UR.softPity.rampTargetRateAtPullMinus1": 0.32
+        }
+      }
+    ],
+    "remoteOverrides": {
+      "url": "https://config.yourgame.example/overrides/v1.json",
+      "precedence": "remoteOverrides > hotfixOverrides > baseConfig",
+      "cacheSeconds": 300,
+      "etag": "",
+      "allowlist": [
+        "gacha.banners.SSR.softPity",
+        "gacha.banners.UR.softPity",
+        "gacha.banners.Prime.softPity",
+        "economy.tuning",
+        "ui.dynamicStrings"
+      ]
+    }
+  },
+  "fraudRules": {
+    "velocity": {
+      "pullsPerMinuteWarn": 180,
+      "pullsPerMinuteBlock": 360,
+      "action": "flagAndThrottle"
+    },
+    "deviceMismatch": {
+      "enable": true,
+      "actionOnMismatch": "stepUpAuth"
+    },
+    "exchangeAbuse": {
+      "enabled": true,
+      "suspiciousIfChainLengthGE": 3,
+      "windowSeconds": 120,
+      "action": "flagAndHoldReview"
+    }
+  },
+  "client": {
+    "minVersion": "1.13.0",
+    "rollout": {
+      "phased": true,
+      "stages": [
+        {
+          "percent": 0.1,
+          "countries": [
+            "VN"
+          ],
+          "start": "2025-10-22T10:00:00+07:00"
+        },
+        {
+          "percent": 0.5,
+          "countries": [
+            "VN",
+            "SG",
+            "TH"
+          ],
+          "start": "2025-10-23T10:00:00+07:00"
+        },
+        {
+          "percent": 1.0,
+          "countries": [
+            "ALL"
+          ],
+          "start": "2025-10-24T10:00:00+07:00"
+        }
+      ]
+    },
+    "offlineMode": {
+      "allowPulls": false,
+      "allowViewPityState": true,
+      "cacheTTLSeconds": 120
+    }
+  },
+  "qa": {
+    "expectedEV": {
+      "SSR": {
+        "pullsNoPityEV": 50,
+        "hardPity": 45,
+        "tolerancePct": 15
+      },
+      "UR": {
+        "pullsNoPityEV": 100,
+        "hardPity": 70,
+        "tolerancePct": 15
+      },
+      "Prime": {
+        "pullsNoPityEV": 200,
+        "hardPity": 110,
+        "tolerancePct": 15
+      }
+    },
+    "alertThresholds": {
+      "evDriftPct": 20,
+      "softPityRateOvershootPct": 5
+    },
+    "unitIdRules": {
+      "regex": "^UNIT_[A-Z0-9_]+$",
+      "examples": [
+        "UNIT_UR_LOI_THIEN_ANH",
+        "UNIT_PRIME_MONG_YEM"
+      ]
+    },
+    "simulationScenarios": [
+      {
+        "name": "baseline_softpity",
+        "tokens": [],
+        "focusPath": false,
+        "pulls": 200000
+      },
+      {
+        "name": "with_focus_path",
+        "tokens": [],
+        "focusPath": true,
+        "pulls": 200000
+      },
+      {
+        "name": "with_guarantee_tokens",
+        "tokens": [
+          "TOKEN_GUAR_UR"
+        ],
+        "focusPath": false,
+        "pulls": 200000
+      }
+    ],
+    "nightlyOddsAudit": {
+      "enabled": true,
+      "minSamples": 10000,
+      "alertIfDriftPctGT": 10,
+      "alertWebhook": "https://ops.yourgame.example/odds-audit"
+    },
+    "testVectors": [
+      {
+        "seed": "tv1",
+        "userId": "U_TV1",
+        "banner": "UR",
+        "pulls": 10,
+        "expectedRaritySeq": [
+          "R",
+          "SR",
+          "R",
+          "R",
+          "SR",
+          "R",
+          "SSR",
+          "R",
+          "R",
+          "SR"
+        ]
+      },
+      {
+        "seed": "tv2",
+        "userId": "U_TV2",
+        "banner": "Prime",
+        "pulls": 5,
+        "expectedRaritySeq": [
+          "R",
+          "SR",
+          "UR",
+          "R",
+          "Prime"
+        ]
+      }
+    ],
+    "evBenchmarks": {
+      "currency": "TT",
+      "scenarios": [
+        {
+          "name": "baseline_softpity",
+          "banner": "UR",
+          "target": {
+            "EV_pulls": 95,
+            "p99_pulls": 160,
+            "EV_TT": 9.0
+          },
+          "tolerancePct": {
+            "EV": 15,
+            "p99": 10
+          }
+        },
+        {
+          "name": "focus_path_on",
+          "banner": "UR",
+          "target": {
+            "EV_pulls": 85,
+            "p99_pulls": 140,
+            "EV_TT": 8.2
+          },
+          "tolerancePct": {
+            "EV": 15,
+            "p99": 10
+          }
+        },
+        {
+          "name": "guarantee_token_on",
+          "banner": "UR",
+          "target": {
+            "EV_pulls": 88,
+            "p99_pulls": 145,
+            "EV_TT": 8.5
+          },
+          "tolerancePct": {
+            "EV": 15,
+            "p99": 10
+          }
+        },
+        {
+          "name": "baseline_softpity_prime",
+          "banner": "Prime",
+          "target": {
+            "EV_pulls": 190,
+            "p99_pulls": 260,
+            "EV_TT": 38.0
+          },
+          "tolerancePct": {
+            "EV": 15,
+            "p99": 10
+          }
+        }
+      ],
+      "alertWebhook": "https://ops.yourgame.example/ev-alerts"
+    }
+  },
+  "ui": {
+    "links": {
+      "probabilityDisclosure": "https://yourcdn/arclune/odds",
+      "terms": "https://yourcdn/arclune/terms",
+      "privacy": "https://yourcdn/arclune/privacy"
+    },
+    "hints": {
+      "showGuaranteeTokenBadge": true,
+      "showSparkGraceCountdown": true
+    },
+    "spendConfirms": {
+      "confirmIfTTSpendOver": 2.0,
+      "confirmIfPrimePullsMoreThan": 50,
+      "confirmAlwaysOnMinors": true
+    },
+    "messagingTemplates": {
+      "maint_generic": {
+        "vi": "Máy chủ đang bảo trì. Vui lòng quay lại sau.",
+        "en": "Servers under maintenance. Please come back later."
+      },
+      "compensation_mail_title": {
+        "vi": "Quà bù do gián đoạn",
+        "en": "Outage Compensation"
+      },
+      "confirm_large_spend": {
+        "vi": "Xác nhận giao dịch lớn",
+        "en": "Confirm Large Purchase"
+      }
+    },
+    "dynamicStrings": {
+      "vi": {
+        "pity_counter": "Còn {pulls} vé tới bảo hiểm {rarity}.",
+        "guarantee_token": "Có bảo chứng đang hoạt động cho {rarity}.",
+        "focus_path_ready": "Đường chọn mục tiêu đã sẵn sàng."
+      },
+      "en": {
+        "pity_counter": "{pulls} pulls until {rarity} pity.",
+        "guarantee_token": "Guarantee token is active for {rarity}.",
+        "focus_path_ready": "Focus Path is ready."
+      }
+    },
+    "disclosures": {
+      "vi": {
+        "odds_note": "Tỉ lệ có thể thay đổi khi soft pity tăng.",
+        "consent_text": "Bằng việc tiếp tục, bạn đồng ý với Chính sách quyền riêng tư."
+      },
+      "en": {
+        "odds_note": "Odds may change under soft pity ramp.",
+        "consent_text": "By continuing you agree to the Privacy Policy."
+      }
+    },
+    "costPreview": {
+      "showTtEquivalence": true,
+      "showPityOverlay": true,
+      "showFocusPathState": true
+    },
+    "gracefulDegradation": {
+      "lowEndModeAuto": true,
+      "criteria": {
+        "minRamGB": 3,
+        "gpuScoreMax": 2000
+      },
+      "effects": {
+        "disable3DReveal": true,
+        "useStaticBackgrounds": true,
+        "simplifyParticles": true
+      }
+    },
+    "spendInsights": {
+      "enabled": true,
+      "optIn": true,
+      "weeklyDigest": true,
+      "metrics": [
+        "ttSpent",
+        "pullsByBanner",
+        "pityProgress",
+        "sparkBalance"
+      ]
+    },
+    "reveal": {
+      "allowSkipAfterNPulls": 20,
+      "skipConfirm": true,
+      "rememberChoice": true
+    },
+    "mobile": {
+      "minTapTarget": 44,
+      "minFontPx": 12,
+      "cardDensity": "compact",
+      "listSnap": true
+    }
+  },
+  "kpiGuardrails": {
+    "maxPrimePer1000Pulls": 7,
+    "maxURPer1000Pulls": 20,
+    "minRevenueTTPerUserPerWeek": 0.5,
+    "alertWebhook": "https://ops.yourgame.example/alerts"
+  },
+  "regionalPolicy": {
+    "JP": {
+      "requireGachaHistoryPage": true,
+      "showOddsCumulativeAndPerStep": true
+    },
+    "CN": {
+      "showCumulativeOdds": true,
+      "banOwnershipBias": true
+    },
+    "KR": {
+      "requireVisiblePityCounter": true,
+      "requireOddsDisclosureLink": true,
+      "spendPopupAtTT": 5.0
+    },
+    "EU": {
+      "gdprCompliant": true,
+      "dataDeletionSLA_Days": 30
+    },
+    "US_CA": {
+      "ccpaCompliant": true
+    },
+    "CN_MINORS": {
+      "noDailyFreePulls": true,
+      "curfewLocal": {
+        "start": "22:00",
+        "end": "08:00"
+      }
+    }
+  },
+  "security": {
+    "balanceGuards": {
+      "noNegativeAfterTxn": true,
+      "doubleDebitProtection": true,
+      "currencyMismatchAbort": true
+    },
+    "purchase": {
+      "receiptVerification": {
+        "enabled": true,
+        "provider": "GooglePlay|AppStore|Steam"
+      },
+      "coolingOffMinutesAfterLargePurchase": 10,
+      "largePurchaseThresholdTT": 10.0,
+      "hmac": {
+        "enabled": true,
+        "alg": "HMAC-SHA256"
+      }
+    },
+    "rateLimits": {
+      "perIP": {
+        "windowSeconds": 60,
+        "maxRequests": 120
+      },
+      "perDevice": {
+        "windowSeconds": 60,
+        "maxRequests": 90
+      }
+    },
+    "purchaseUndoGrace": {
+      "allowCancelWithinSeconds": 5,
+      "serverHoldsResultUntilReveal": true,
+      "requireStableConnection": true
+    },
+    "captcha": {
+      "provider": "turnstile",
+      "enabled": true,
+      "triggerOn": {
+        "rateLimitHit": true,
+        "giftingSpike": true,
+        "highVelocityPulls": true
+      }
+    },
+    "deviceBinding": {
+      "enabled": true,
+      "maxDevicesPerDay": 2,
+      "stepUpAuthOnNewDevice": true
+    },
+    "session": {
+      "tokenTTLMinutes": 60,
+      "renewIfRemainingMinutesLT": 10,
+      "signAlg": "EdDSA",
+      "nonceLength": 16
+    },
+    "seedReplayProtection": {
+      "windowSeconds": 300,
+      "dedupeBy": [
+        "userId",
+        "bannerId",
+        "seedHash"
+      ]
+    },
+    "geoAnomaly": {
+      "enabled": true,
+      "impossibleTravelKmPerHour": 1500,
+      "action": "stepUpAuthAndFlag"
+    },
+    "deviceFingerprint": {
+      "enabled": true,
+      "minConfidence": 0.7,
+      "action": "throttleAndStepUp"
+    }
+  },
+  "integrity": {
+    "hashes": {
+      "rarityRatesBase": "f7562310c29f53470b11f23efa6846b304fc4e22c4ab5b10e399da9af0fef431",
+      "costs_SSR": "1a235970a4a26b62fc2c4ca163e9956450aaf19a3b1b2f783879a6ace556bf80",
+      "costs_UR": "3cdb7a7b8144637f261481d31098fb76624fdbbb2d3ffc1ad90f49bffd69c7ef",
+      "costs_Prime": "ab2ad68e56c94e228945406ac16b65a35536132ba7935189aaef20fd3f00d389",
+      "ops_core": "1f7e5085f431bb389b0209815a251b6e3141e3be7bce55bd2fb7623808013bdc",
+      "pricing_core": "0ad6af49c9a952640b9245ed7276ac79e1904006970e887ab5e1791dba38f7ed",
+      "abBuckets": "b8b6dd2bb3d1d8366542ff18d85a6e36c1ecf52194bd3f54403d257c5b53aaad",
+      "oddsCaps": "bd954fbac129dd4309afebfc1b8b8188582c08ab222474374448209e597930cb",
+      "security_core": "17be81877a91298164e18e5074af31b62e12aab505f329a65ae51d125107b7a2",
+      "ops_chaos": "9fddc4cdaed66732fd6ae0f34f5955ef1284c92e8420354a1b07c29b7890a053",
+      "gacha_rates_history": "f92935d532cc395d05b682d31702647f54877cf2852a263c7a94d338a8070b44",
+      "blueGreen": "3f4859f17dd026d0d4ccc2c7eaae8ad04e26e7e7ff75ef09b162c0cbf3794fa6",
+      "poolSeal": "503b05b668c6bfac45686f86ab9fa16270ab7936a9156db85401326663150f9a"
+    }
+  },
+  "api": {
+    "retryPolicy": {
+      "gachaPull": {
+        "retries": 2,
+        "backoff": "exponential",
+        "baseMs": 200,
+        "maxMs": 1500
+      },
+      "purchase": {
+        "retries": 2,
+        "backoff": "exponential",
+        "baseMs": 300,
+        "maxMs": 2000
+      }
+    },
+    "schemas": {
+      "pityState": "v1",
+      "pullResult": "v2",
+      "walletSnapshot": "v1"
+    },
+    "limits": {
+      "sandboxPreviewPullsPerUserPerDay": 100,
+      "sandboxPreviewRequiresAllowlist": true
+    }
+  },
+  "configServe": {
+    "cacheControl": "public, max-age=300, must-revalidate",
+    "staleWhileRevalidateSeconds": 30,
+    "eTagEnabled": true
+  },
+  "social": {
+    "gifting": {
+      "enabled": true,
+      "dailyGiftLimitTT": 2.0,
+      "requireFriendDays": 7,
+      "regionLock": [
+        "CN"
+      ],
+      "abuseDetection": {
+        "velocityGiftsPerDay": 5,
+        "flagOnSpikePct": 300
+      }
+    },
+    "giftingCooldownHours": 24,
+    "friendGraph": {
+      "minMutuals": 1,
+      "minDaysSinceAdd": 3
+    },
+    "noTradeItems": [
+      "TIX_SSR",
+      "TIX_UR",
+      "TIX_PRIME",
+      "TOKEN_GUAR_UR",
+      "TOKEN_GUAR_PRIME",
+      "PrimeSoul",
+      "URSoul",
+      "SSRSoul"
+    ],
+    "marketplace": {
+      "enabled": false
+    }
+  },
+  "promotions": {
+    "campaigns": [
+      {
+        "id": "WELCOME_BACK",
+        "eligibility": {
+          "lastLoginDaysGE": 14,
+          "accountAgeDaysGE": 7
+        },
+        "rewards": [
+          {
+            "type": "TICKET",
+            "banner": "SSR",
+            "count": 10
+          }
+        ]
+      },
+      {
+        "id": "FIRST_PURCHASE",
+        "eligibility": {
+          "hasPurchased": false
+        },
+        "rewards": [
+          {
+            "type": "CURRENCY",
+            "code": "TT",
+            "amount": 1.0
+          }
+        ]
+      }
+    ]
+  },
+  "ci": {
+    "validateSchema": true,
+    "runLinters": [
+      "raritySum=1.0",
+      "bundlePolicy=-5%",
+      "uniquePoolIds"
+    ],
+    "generateDiff": true,
+    "postPrComment": true,
+    "publishMotdOnMerge": true,
+    "failIf": {
+      "evDriftPctGT": 25,
+      "changedKeysRequireApproval": [
+        "gacha.rarityRatesBase",
+        "gacha.softPityCaps"
+      ]
+    }
+  },
+  "pve": {
+    "energy": {
+      "max": 60,
+      "regenPer5Min": 1,
+      "battleCost": 6
+    },
+    "enemyArchetypes": {
+      "GRUNT": {
+        "hpMul": 1.0,
+        "atkMul": 1.0,
+        "defMul": 1.0,
+        "speed": 1.0
+      },
+      "ELITE": {
+        "hpMul": 1.6,
+        "atkMul": 1.3,
+        "defMul": 1.2,
+        "speed": 1.0
+      },
+      "BOSS": {
+        "hpMul": 3.0,
+        "atkMul": 1.8,
+        "defMul": 1.4,
+        "speed": 0.9
+      }
+    },
+    "statScaling": {
+      "perLevelPct": {
+        "hp": 6,
+        "atk": 4,
+        "def": 4
+      },
+      "roleBonusPct": {
+        "TANKER": {
+          "hp": 15
+        },
+        "WARRIOR": {
+          "atk": 10
+        },
+        "SUPPORT": {
+          "def": 10
+        }
+      }
+    },
+    "damageFormula": {
+      "basic": "(ATK * (1 + skillLvl*0.05)) * (1 - DEF/(DEF+100))",
+      "ultimate": "(ATK*1.8 + flat) * (1 + crit*0.5) * (1 - DEF/(DEF+120))"
+    },
+    "missions": [
+      {
+        "id": "C1-1",
+        "name": {
+          "vi": "Sân Trường 1-1",
+          "en": "Schoolyard 1-1"
+        },
+        "enemy": {
+          "archetype": "GRUNT",
+          "level": 5
+        },
+        "rewards": {
+          "xp": 20,
+          "drops": [
+            {
+              "code": "VUN",
+              "amount": 200
+            },
+            {
+              "code": "TRUNG",
+              "amount": 5
+            }
+          ]
+        },
+        "energyCost": 6
+      },
+      {
+        "id": "C1-2",
+        "name": {
+          "vi": "Cổng Trường 1-2",
+          "en": "Gate 1-2"
+        },
+        "enemy": {
+          "archetype": "ELITE",
+          "level": 6
+        },
+        "rewards": {
+          "xp": 25,
+          "drops": [
+            {
+              "code": "VUN",
+              "amount": 260
+            },
+            {
+              "code": "TRUNG",
+              "amount": 6
+            }
+          ]
+        },
+        "energyCost": 6
+      },
+      {
+        "id": "C1-BOSS",
+        "name": {
+          "vi": "Khu Thực Nghiệm (Boss)",
+          "en": "Lab Annex (Boss)"
+        },
+        "enemy": {
+          "archetype": "BOSS",
+          "level": 8
+        },
+        "rewards": {
+          "xp": 40,
+          "drops": [
+            {
+              "code": "TRUNG",
+              "amount": 12
+            },
+            {
+              "code": "THUONG",
+              "amount": 0.4
+            }
+          ]
+        },
+        "energyCost": 8
+      }
+    ]
+  },
+  "progression": {
+    "unitLevelCap": 50,
+    "xpFormula": "ceil(35 * lvl^1.8)",
+    "ascensionBreakpoints": [
+      20,
+      30,
+      40
+    ],
+    "ascensionCosts": [
+      {
+        "level": 20,
+        "cost": [
+          {
+            "currency": "TRUNG",
+            "amount": 80
+          }
+        ]
+      },
+      {
+        "level": 30,
+        "cost": [
+          {
+            "currency": "TRUNG",
+            "amount": 140
+          },
+          {
+            "currency": "THUONG",
+            "amount": 1.0
+          }
+        ]
+      },
+      {
+        "level": 40,
+        "cost": [
+          {
+            "currency": "TRUNG",
+            "amount": 220
+          },
+          {
+            "currency": "THUONG",
+            "amount": 2.0
+          }
+        ]
+      }
+    ],
+    "skillUpgrade": {
+      "maxSkillLevel": 10,
+      "costPerLevel": [
+        {
+          "from": 1,
+          "to": 5,
+          "cost": [
+            {
+              "currency": "VUN",
+              "amount": 500
+            }
+          ]
+        },
+        {
+          "from": 6,
+          "to": 8,
+          "cost": [
+            {
+              "currency": "TRUNG",
+              "amount": 30
+            }
+          ]
+        },
+        {
+          "from": 9,
+          "to": 10,
+          "cost": [
+            {
+              "currency": "THUONG",
+              "amount": 0.8
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "lootTables": {
+    "C1_COMMON": [
+      {
+        "item": "VUN",
+        "amountRange": [
+          150,
+          250
+        ],
+        "weight": 70
+      },
+      {
+        "item": "TRUNG",
+        "amountRange": [
+          3,
+          6
+        ],
+        "weight": 25
+      },
+      {
+        "item": "THUONG",
+        "amountRange": [
+          0.2,
+          0.5
+        ],
+        "weight": 5
+      }
+    ]
+  },
+  "devSwitches": {
+    "enableDevMenu": true,
+    "skipBattle": false,
+    "godMode": false,
+    "verboseLogs": false
+  },
+  "storage": {
+    "localSaves": {
+      "slots": 3,
+      "autosaveOnBattleEnd": true
+    },
+    "schema": {
+      "version": 3,
+      "migrations": [
+        "v1_to_v2: add gear",
+        "v2_to_v3: add worldMap progress"
+      ]
+    },
+    "cloud": {
+      "enabled": false,
+      "provider": "S3|Firestore|SteamCloud"
+    }
+  },
+  "worldMap": {
+    "chapters": [
+      {
+        "id": "C1",
+        "name": {
+          "vi": "Khuôn Viên Trường",
+          "en": "Campus Grounds"
+        },
+        "recommendLv": 1,
+        "difficulties": {
+          "NORMAL": {
+            "hpMul": 1.0,
+            "atkMul": 1.0,
+            "dropMul": 1.0
+          },
+          "HARD": {
+            "hpMul": 1.6,
+            "atkMul": 1.4,
+            "dropMul": 1.2
+          },
+          "NIGHTMARE": {
+            "hpMul": 2.2,
+            "atkMul": 1.8,
+            "dropMul": 1.4
+          }
+        },
+        "stages": [
+          {
+            "id": "C1-1",
+            "nodeType": "BATTLE",
+            "enemy": {
+              "archetype": "GRUNT",
+              "level": 5
+            },
+            "rewardsTable": "C1_COMMON"
+          },
+          {
+            "id": "C1-2",
+            "nodeType": "BATTLE",
+            "enemy": {
+              "archetype": "ELITE",
+              "level": 6
+            },
+            "rewardsTable": "C1_COMMON"
+          },
+          {
+            "id": "C1-3",
+            "nodeType": "BATTLE",
+            "enemy": {
+              "archetype": "GRUNT",
+              "level": 7
+            },
+            "rewardsTable": "C1_COMMON"
+          },
+          {
+            "id": "C1-4",
+            "nodeType": "BATTLE",
+            "enemy": {
+              "archetype": "ELITE",
+              "level": 7
+            },
+            "rewardsTable": "C1_COMMON"
+          },
+          {
+            "id": "C1-BOSS",
+            "nodeType": "BOSS",
+            "enemy": {
+              "archetype": "BOSS",
+              "level": 8
+            },
+            "rewardsTable": "C1_COMMON"
+          }
+        ]
+      },
+      {
+        "id": "C2",
+        "name": {
+          "vi": "Phố Cổ",
+          "en": "Old Quarter"
+        },
+        "recommendLv": 10,
+        "difficulties": {
+          "NORMAL": {
+            "hpMul": 1.0,
+            "atkMul": 1.0,
+            "dropMul": 1.0
+          },
+          "HARD": {
+            "hpMul": 1.7,
+            "atkMul": 1.5,
+            "dropMul": 1.25
+          },
+          "NIGHTMARE": {
+            "hpMul": 2.4,
+            "atkMul": 2.0,
+            "dropMul": 1.5
+          }
+        },
+        "stages": [
+          {
+            "id": "C2-1",
+            "nodeType": "BATTLE",
+            "enemy": {
+              "archetype": "GRUNT",
+              "level": 12
+            },
+            "rewardsTable": "C1_COMMON"
+          },
+          {
+            "id": "C2-2",
+            "nodeType": "BATTLE",
+            "enemy": {
+              "archetype": "ELITE",
+              "level": 13
+            },
+            "rewardsTable": "C1_COMMON"
+          },
+          {
+            "id": "C2-3",
+            "nodeType": "EVENT",
+            "event": "TREASURE",
+            "desc": {
+              "vi": "Rương bí ẩn",
+              "en": "Secret Chest"
+            }
+          },
+          {
+            "id": "C2-BOSS",
+            "nodeType": "BOSS",
+            "enemy": {
+              "archetype": "BOSS",
+              "level": 15
+            },
+            "rewardsTable": "C1_COMMON"
+          }
+        ]
+      }
+    ]
+  },
+  "combat": {
+    "elements": [
+      "PHYSICAL",
+      "LIGHTNING",
+      "BLOOD",
+      "FROST"
+    ],
+    "elementMatrix": {
+      "LIGHTNING": {
+        "vs_FROST": 1.2,
+        "vs_BLOOD": 1.1
+      },
+      "FROST": {
+        "vs_LIGHTNING": 0.9
+      },
+      "BLOOD": {
+        "vs_PHYSICAL": 1.1
+      }
+    },
+    "statusEffects": {
+      "STUN": {
+        "durTurns": 1,
+        "resistKey": "stunRes"
+      },
+      "BLEED": {
+        "durTurns": 3,
+        "tick": "ATK*0.25",
+        "resistKey": "bleedRes"
+      },
+      "SHOCK": {
+        "durTurns": 2,
+        "bonusTakenPct": 10,
+        "resistKey": "shockRes"
+      },
+      "SLOW": {
+        "durTurns": 2,
+        "speedMul": 0.7,
+        "resistKey": "slowRes"
+      }
+    },
+    "turnOrder": {
+      "baseSpeed": 100,
+      "initiativeFormula": "speed * rand(0.9,1.1)"
+    },
+    "crit": {
+      "baseRate": 0.05,
+      "baseDmgMul": 1.5,
+      "ratePerLvl": 0.001
+    },
+    "dodge": {
+      "baseRate": 0.02,
+      "ratePerLvl": 0.0005
+    }
+  },
+  "ai": {
+    "behaviors": {
+      "AGGRESSIVE": {
+        "target": "lowestHP",
+        "skills": [
+          "basic",
+          "skill1",
+          "ult"
+        ],
+        "weights": [
+          0.6,
+          0.3,
+          0.1
+        ]
+      },
+      "DEFENSIVE": {
+        "target": "highestATK",
+        "skills": [
+          "basic",
+          "guard",
+          "skill1"
+        ],
+        "weights": [
+          0.5,
+          0.3,
+          0.2
+        ]
+      },
+      "CASTER": {
+        "target": "random",
+        "skills": [
+          "skill1",
+          "skill2",
+          "basic"
+        ],
+        "weights": [
+          0.5,
+          0.4,
+          0.1
+        ]
+      }
+    },
+    "assignments": {
+      "GRUNT": "AGGRESSIVE",
+      "ELITE": "CASTER",
+      "BOSS": "DEFENSIVE"
+    }
+  },
+  "items": {
+    "rarities": [
+      "Common",
+      "Rare",
+      "Epic",
+      "Legend"
+    ],
+    "slots": [
+      "Weapon",
+      "Armor",
+      "Relic"
+    ],
+    "baseStats": {
+      "Weapon": {
+        "ATK": 10
+      },
+      "Armor": {
+        "DEF": 8
+      },
+      "Relic": {
+        "HP": 50
+      }
+    },
+    "upgradeCosts": {
+      "Common": [
+        {
+          "currency": "VUN",
+          "amount": 200
+        }
+      ],
+      "Rare": [
+        {
+          "currency": "TRUNG",
+          "amount": 15
+        }
+      ],
+      "Epic": [
+        {
+          "currency": "THUONG",
+          "amount": 0.5
+        }
+      ],
+      "Legend": [
+        {
+          "currency": "THUONG",
+          "amount": 1.5
+        }
+      ]
+    },
+    "affixes": {
+      "ATK%": {
+        "min": 3,
+        "max": 12
+      },
+      "HP%": {
+        "min": 4,
+        "max": 15
+      },
+      "CRIT_RATE": {
+        "min": 1,
+        "max": 5
+      },
+      "CRIT_DMG%": {
+        "min": 5,
+        "max": 20
+      }
+    }
+  },
+  "crafting": {
+    "materials": [
+      "MAT_SHARD",
+      "MAT_CORE",
+      "MAT_SIGIL"
+    ],
+    "recipes": [
+      {
+        "id": "FORGE_WEAPON_R",
+        "cost": [
+          {
+            "currency": "TRUNG",
+            "amount": 30
+          },
+          {
+            "item": "MAT_SHARD",
+            "count": 20
+          }
+        ],
+        "result": {
+          "slot": "Weapon",
+          "rarity": "Rare"
+        }
+      },
+      {
+        "id": "FORGE_RELIC_E",
+        "cost": [
+          {
+            "currency": "THUONG",
+            "amount": 0.8
+          },
+          {
+            "item": "MAT_CORE",
+            "count": 5
+          }
+        ],
+        "result": {
+          "slot": "Relic",
+          "rarity": "Epic"
+        }
+      }
+    ]
+  },
+  "quests": {
+    "dailies": [
+      {
+        "id": "D_WIN3",
+        "desc": {
+          "vi": "Thắng 3 trận",
+          "en": "Win 3 battles"
+        },
+        "goal": 3,
+        "reward": [
+          {
+            "currency": "VUN",
+            "amount": 300
+          }
+        ]
+      },
+      {
+        "id": "D_USEULT",
+        "desc": {
+          "vi": "Dùng 1 Tuyệt kỹ",
+          "en": "Use 1 Ultimate"
+        },
+        "goal": 1,
+        "reward": [
+          {
+            "currency": "TRUNG",
+            "amount": 10
+          }
+        ]
+      }
+    ],
+    "weeklies": [
+      {
+        "id": "W_CLEAR_C1",
+        "desc": {
+          "vi": "Hoàn tất Chapter 1",
+          "en": "Clear Chapter 1"
+        },
+        "goal": 1,
+        "reward": [
+          {
+            "currency": "THUONG",
+            "amount": 0.6
+          }
+        ]
+      }
+    ]
+  },
+  "achievements": [
+    {
+      "id": "A_FIRST_BOSS",
+      "points": 10,
+      "desc": {
+        "vi": "Hạ boss đầu tiên",
+        "en": "Defeat your first boss"
+      }
+    },
+    {
+      "id": "A_GEAR_EPI",
+      "points": 15,
+      "desc": {
+        "vi": "Trang bị 1 món Epic",
+        "en": "Equip an Epic item"
+      }
+    }
+  ],
+  "characters": {
+    "UNIT_UR_LOI_THIEN_ANH": {
+      "rank": "UR",
+      "role": "TANKER",
+      "element": "LIGHTNING",
+      "baseStats": {
+        "HP": 900,
+        "ATK": 90,
+        "DEF": 110,
+        "speed": 95
+      },
+      "growthPerLvl": {
+        "HP": 28,
+        "ATK": 3.1,
+        "DEF": 3.9
+      },
+      "skills": [
+        {
+          "id": "basic",
+          "name": {
+            "vi": "Đánh Thường",
+            "en": "Strike"
+          },
+          "power": "ATK*0.9",
+          "tags": [
+            "basic"
+          ]
+        },
+        {
+          "id": "skill1",
+          "name": {
+            "vi": "Lôi Ảnh Tam Kích",
+            "en": "Thunder Triple"
+          },
+          "power": "ATK*1.2",
+          "extra": "apply SHOCK 2T"
+        },
+        {
+          "id": "ult",
+          "name": {
+            "vi": "Lôi Thế Bách Chiến",
+            "en": "Storm Aegis"
+          },
+          "power": "ATK*1.4",
+          "extra": "+DEF team 15% 2T"
+        }
+      ]
+    },
+    "UNIT_PRIME_PHE": {
+      "rank": "Prime",
+      "role": "MAGE",
+      "element": "BLOOD",
+      "baseStats": {
+        "HP": 700,
+        "ATK": 140,
+        "DEF": 70,
+        "speed": 100
+      },
+      "growthPerLvl": {
+        "HP": 22,
+        "ATK": 4.6,
+        "DEF": 2.2
+      },
+      "skills": [
+        {
+          "id": "basic",
+          "name": {
+            "vi": "Đâm",
+            "en": "Pierce"
+          },
+          "power": "ATK*1.0"
+        },
+        {
+          "id": "skill1",
+          "name": {
+            "vi": "Song Huyết Câu",
+            "en": "Twin Blood Hooks"
+          },
+          "power": "ATK*1.5",
+          "extra": "BLEED 3T"
+        },
+        {
+          "id": "ult",
+          "name": {
+            "vi": "Huyết Hồn Lôi Quyết",
+            "en": "Blood-Soul Judgement"
+          },
+          "power": "ATK*1.9",
+          "extra": "bonus vs SHOCK +20%"
+        }
+      ]
+    }
+  },
+  "audio": {
+    "mix": {
+      "musicVol": 0.5,
+      "sfxVol": 0.8,
+      "voiceVol": 0.9
+    },
+    "voicePacks": {
+      "UNIT_UR_LOI_THIEN_ANH": {
+        "intro": "vo/LA_intro.ogg",
+        "ult": "vo/LA_ult.ogg"
+      },
+      "UNIT_PRIME_PHE": {
+        "intro": "vo/PHE_intro.ogg",
+        "ult": "vo/PHE_ult.ogg"
+      }
+    }
+  },
+  "assets": {
+    "bundles": [
+      {
+        "id": "core_ui",
+        "files": [
+          "ui/atlas_core.png",
+          "ui/fonts/main.fnt"
+        ]
+      },
+      {
+        "id": "chars_pack1",
+        "files": [
+          "char/LA.sprite",
+          "char/PHE.sprite",
+          "char/common.spine"
+        ]
+      },
+      {
+        "id": "audio_base",
+        "files": [
+          "music/track1.ogg",
+          "sfx/hit1.ogg"
+        ]
+      }
+    ]
+  },
+  "performance": {
+    "tiers": {
+      "LOW": {
+        "fpsTarget": 30,
+        "resScale": 0.75,
+        "vfx": "low"
+      },
+      "MED": {
+        "fpsTarget": 60,
+        "resScale": 0.9,
+        "vfx": "med"
+      },
+      "HIGH": {
+        "fpsTarget": 60,
+        "resScale": 1.0,
+        "vfx": "high"
+      },
+      "ULTRA": {
+        "fpsTarget": 120,
+        "resScale": 1.0,
+        "vfx": "ultra"
+      }
+    },
+    "dynamicScaling": {
+      "enabled": true,
+      "minResScale": 0.7,
+      "maxResScale": 1.0,
+      "dropFpsThreshold": 55,
+      "recoverFpsThreshold": 58
+    }
+  },
+  "input": {
+    "mobile": {
+      "tap": "select",
+      "swipeLeft": "nextTarget",
+      "swipeRight": "prevTarget",
+      "longPress": "details"
+    },
+    "gamepad": {
+      "A": "confirm",
+      "B": "back",
+      "X": "skill1",
+      "Y": "ult",
+      "LB": "prevTarget",
+      "RB": "nextTarget"
+    }
+  },
+  "tutorials": [
+    {
+      "id": "TUT_INTRO",
+      "triggers": [
+        "firstLogin"
+      ],
+      "steps": [
+        "tapBattle",
+        "selectStage",
+        "winFirstBattle"
+      ]
+    },
+    {
+      "id": "TUT_GEAR",
+      "triggers": [
+        "equipFirstItem"
+      ],
+      "steps": [
+        "openCollection",
+        "equipWeapon"
+      ]
+    }
+  ],
+  "haptics": {
+    "enabled": true,
+    "events": {
+      "hitLight": "short",
+      "ultCast": "long"
+    }
+  }
+}
