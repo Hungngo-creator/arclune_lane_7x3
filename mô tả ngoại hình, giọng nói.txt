@@ -1,0 +1,115 @@
+1) mộng yểm.
+dựa trên bộ kỹ năng của Mộng Yểm (mê hoặc – ru ngủ – tạo ảo ảnh – kéo “Thế Giới Thứ Hai”), đây là mô tả nhân vật (chỉ 1 nhân vật, chỉ ngoại hình & giọng nói):
+
+# Mộng Yểm — Mô hình nhân vật (ngoại hình)
+
+* **Độ tuổi/khí chất nhìn thấy:** 20–25; dáng thanh mảnh, đường nét mềm, chuyển động nhẹ như đang mơ.
+* **Tỷ lệ cơ thể:** chiều cao trung bình, tay dài thanh, cổ hơi cao; dáng đi uyển chuyển, ít góc cạnh.
+* **Tông màu chủ đạo:** tím hồng mơ – xanh đêm – trắng sương. Ánh điểm nhấn: bạc ngà (như bụi mơ/ánh trăng).
+* **Tóc:** dài đến thắt lưng, hơi gợn sóng; màu đen ánh tím. Khi đứng yên, tóc có hạt sáng li ti trôi chậm như bụi mộng.
+* **Mắt:** to vừa, mí dài; mống mắt tím khói với vành sáng mỏng như vầng trăng. Khi “mê hoặc”, con ngươi xuất hiện vòng xoáy mờ.
+* **Trang phục:**
+
+  * Lớp trong là **đầm lụa mỏng** màu tím-nhạt, cắt xẻ lệch vai; chất liệu bán trong mờ nhưng kín đáo.
+  * Lớp ngoài **áo choàng voan** dài chạm gót, viền thêu họa tiết **mi mắt đang nhắm** và cánh bướm đêm tối giản. Mép vải có hạt thủy tinh nhỏ phản sáng.
+  * **Phụ kiện:** mặt nạ nửa mắt dạng hoa văn mi cong (để mở/đeo tùy trạng thái), vòng cổ dây mảnh có mặt đá tròn như “mặt trăng ngủ”.
+  * **Chân/giày:** sandal dây mảnh màu bạc ngà; móng tay sơn gradient hồng→tím khói.
+* **Biểu cảm/động tác đặc trưng:**
+
+  * Thường nheo mắt nửa khép, nhịp mi chậm.
+  * Ngón tay trỏ chạm nhẹ lên môi khi suy nghĩ.
+  * Khi né đòn (tỉ lệ bị đánh trúng thấp từ ảo ảnh): bóng hình “trễ khung” 0.2–0.3s, để lại vệt voan.
+* **Hiệu ứng thị giác gắn với trang phục (không phải chiêu):** quầng ánh **halo mỏng** sau đầu (rất mờ), chớp nhịp theo hơi thở; quanh gấu áo choàng có **bụi sáng** rơi chậm như phấn ngủ.
+
+### Trạng thái gợi ý theo kỹ năng
+
+* **Rơi vào ngủ say (tự phòng thủ):** mi mắt khép hẳn, áo choàng quấn sát người; nhịp thở thể hiện bằng biên độ halo tròn ở ngực/ vai; sắc tím đậm hơn, viền bạc sáng nhè nhẹ.
+* **Tạo ảo ảnh (khó bị đánh thường trúng):** xuất hiện 1–2 “bóng mờ lệch” bán trong suốt, lệch pha chuyển động nửa khung hình; mép áo choàng của bóng mờ bị “rã hạt” như cát ánh.
+* **“Thế Giới Thứ Hai” (ult, chỉ đổi cảnh quan/không gây dmg):** nền sân chuyển sang bảng màu **tím đêm + xanh lam sâu**, đường viền vật thể có **viền song ảnh**; sau lưng Mộng Yểm mở một vòng tròn mảnh như mặt gương nước, phản chiếu ngược ánh tím.
+
+---
+
+# Giọng nói & cách thoại
+
+* **Chất giọng:** nữ trung-trầm, ấm, hơi thở nhiều (breathy), tốc độ chậm hơn bình thường ~10–15%. Không sắc lạnh; mềm nhưng có lực thuyết phục.
+* **Ngữ điệu:** rơi cuối câu nhẹ; mỗi cụm 3–5 từ ngắt hơi rất ngắn như đang thì thầm trong mơ.
+* **Âm sắc phụ trợ:** khi kích hoạt hiệu ứng “mê hoặc”, thêm **layer thủy tinh nhỏ** (tinkle) ở cuối từ khóa; khi ru ngủ, nền có **hum** thấp như tiếng gió trong phòng.
+* **Câu thoại mẫu (ngắn, đúng khí chất):**
+
+  * Vào trận (thấp, mỉm cười): “Khép mi lại… mơ thôi.”
+  * Dùng ảo ảnh: “Bóng nào… mới là ta?”
+  * Ru ngủ đối thủ: “Ngủ một lát… rồi quên ta đi.”
+  * Bị tấn công nhưng bình thản: “Suỵt… đừng làm vỡ giấc.”
+  * Kích hoạt Thế Giới Thứ Hai: “Bẻ cong… bức màn mộng.”
+  * Thắng trận: “Giấc mơ đẹp… luôn đáng nhớ.”
+  * Thua/HP thấp: “Màn đêm… còn dài…”
+* **Nhịp thở/vi thanh (SFX giọng):** đầu câu có tiếng lấy hơi nhẹ “h”, cuối câu kéo hơi nhỏ “ɦ”; tránh thì thào quá mức để không mất rõ chữ.
+
+---
+
+## Tín hiệu âm – hình đi kèm giọng (không phải chiêu)
+
+* **Idle voice loop ngắn:** một tiếng ngân “hmm…” rất khẽ mỗi ~12–15s, trùng với hạt sáng rơi quanh áo choàng.
+* **Touch/hover (nếu có UI):** tiếng thủy tinh chạm cực nhỏ + hơi thở cười mũi “khẽ thôi…”.
+
+> Tóm lại: Mộng Yểm là hình tượng “mỹ nhân của màn ngủ” – mềm, mơ, thướt tha; màu tím khói – bạc ngà; ánh sáng như bụi mộng. Giọng thở nhẹ, nhịp chậm, câu ngắn mang tính ru, khớp với bộ kỹ năng mê hoặc/ru ngủ/ảo ảnh và cảnh “Thế Giới Thứ Hai”.
+
+2) Lôi Thiên Ảnh
+Ok, đây là mô tả **chỉ 1 nhân vật** tên **Lôi Thiên Ảnh** (nam, tu luyện thể, hào sảng – hay cười). Chỉ ngoại hình & giọng nói, không tạo ảnh:
+
+# Lôi Thiên Ảnh — Mô hình nhân vật (ngoại hình)
+
+* **Thần thái:** nam thanh niên 25–30, **cao to – cơ bắp nổi khối**, vai rộng, thân hình “vạm vỡ của người luyện thể”. Nụ cười sáng, hay cười đến mức mắt nheo nhẹ, khí chất **hoang dã mà thân thiện**.
+* **Làn da & vết tích:** da **ngăm đồng** (tông ấm), vài **sẹo mảnh** ở vai/bụng do khổ luyện. Trên cánh tay và ngực có **hoa văn lôi văn** (vệt sấm) mờ như mạch linh lực; khi khởi động lực, lôi văn **lóe xanh lam – trắng** theo nhịp tim.
+* **Tóc & mắt:** tóc đen than, **undercut** gọn hai bên; phần đỉnh **buộc thấp** hoặc thả tự nhiên, có vài lọn rối vì thường luyện ngoài trời. Mắt nâu sẫm; khi vận công, **đồng tử xuất hiện tia “lôi quang”** xanh trắng như sợi nứt của sấm.
+* **Tông màu chủ đạo:** **xanh lam điện → trắng sét** làm điểm sáng; nền **đen than/ghi thép**; điểm nhấn **đỏ huyết trầm** (ám chỉ “Huyết Hồn Lôi Quyết”).
+* **Trang phục:**
+
+  * **Áo giáp vai – ngực hở tay** bằng da tẩm kim loại mỏng, để lộ cơ tay (đúng kiểu luyện thể).
+  * **Đai lưng** gắn bùa lôi và mảnh vảy kim loại màu thép xanh; **khố vạt dài** rìa tua nhẹ, di chuyển tạo cảm giác gió bùng.
+  * **Hộ thủ lôi quyền** (gauntlet) ở hai tay: khớp ngón khắc trận văn, có **cuộn hồ quang nhỏ** lúc ra đòn.
+  * **Ủng** ngắn, đế dày, mép đế có vệt “cháy điện” mờ (gợi bước chân như sét giáng).
+  * Phụ kiện: **chuỗi hạt xương sét** (hạt đá trầm màu kèm đinh tán kim lam), bùa nhỏ hình **vân vũ** treo bên hông.
+* **Hiệu ứng thị giác gợi ý (thường trực, không phải chiêu):** trên da có **nhiễu sóng nhiệt rất nhẹ** như không khí rung; quanh hộ thủ đôi lúc **phát sinh tia tĩnh điện** lách tách. Khi cười lớn, **tia lửa li ti** chạy dọc lôi văn trên cổ.
+* **Dáng đứng & cử chỉ:** đứng **chân trụ vững**, ngực mở; hay **vỗ vai đồng đội** hoặc xoay cổ tay khởi động khớp phát tiếng “tách” điện; trước khi tấn công thường **nghiến đai tay** cho hồ quang rít khẽ.
+* **Biểu cảm theo kỹ năng (gắn với tính cách):**
+
+  * **Tăng lực ngắn hạn:** hít sâu, vai nở, mạch lôi văn **bừng sáng theo nhịp tim**, nụ cười tự tin “đến lượt ta!”.
+  * **Tự thiêu đốt HP để bùng nổ:** mạch lôi văn **nhuốm thêm ánh đỏ huyết**, hồ quang chuyển **xanh-trắng pha đỏ**; hơi thở nóng, mắt ánh quyết liệt nhưng **không mất vẻ hào sảng**.
+  * **Huyết Hồn Lôi Quyết (chỉ đổi hiệu ứng hình/khí):** sau lưng nổi **đồ hình lôi huyết** (vòng ấn màu đỏ trầm chạy tia xanh trắng), tóc và tua áo **bạt mạnh như gió dông**, mặt đất hằn **vết nứt sáng điện** dưới chân.
+
+---
+
+# Giọng nói & cách thoại
+
+* **Chất giọng:** **nam trung-trầm (baritone)**, dày, vang ngực; **độ ồn vui vẻ** tự nhiên (không gằn), có **độ “tia” sáng** ở đầu câu khi hứng chí (gợi âm sắc tia sét).
+* **Nhịp – tốc độ:** nói **nhanh vừa** (≈+5–10% so với bình thường) khi phấn khích; lúc trấn an đồng đội thì chậm lại, ấm và chắc.
+* **Cười:** **tiếng cười phóng khoáng**, khoẻ, có hơi “khục khục” cuối câu; đôi khi kèm **tiếng lách tách điện rất nhỏ** (SFX nền).
+* **Phát âm & thái độ:** rõ, dứt khoát, **không kéo hơi dài**; câu ngắn – **từ đơn lực** (đánh, đỡ, bùng!).
+* **Câu thoại mẫu (ngắn, đúng khí chất):**
+
+  * Vào trận (vui khoẻ): “Ha! Cho ta làm nóng người cái đã!”
+  * Tăng lực/khởi động lôi văn: “Nâng lửa… kéo sấm!”
+  * Tự đốt máu để bùng nổ: “Đổi chút máu… lấy tiếng sét!”
+  * Chặn đòn/đỡ cho đồng minh: “Vào sau lưng ta!”
+  * Tung tuyệt kỹ: “Huyết—Hồn—Lôi—Quyết!”
+  * Trêu địch sau cú đấm nặng: “Đứng vững thì… ta lại tới!”
+  * Khích lệ đồng đội: “Cứ lao lên! Sấm ở đây rồi!”
+* **SFX giọng kèm (nhẹ, không lấn át chữ):** mỗi khi nhấn từ “lôi/sét/bùng”, trộn **tầng âm crackle** cực nhỏ; khi hô chiêu, thêm **gió dông trầm** (low rumble) 1–2s.
+
+---
+
+## Tóm gọn hình tượng
+
+Một **võ tu luyện thể** cao lớn, nâu đồng, **lôi văn** trên da sáng theo nhịp lực; **hộ thủ lôi quyền** rít điện; phong thái **hào sảng – ưa cười – ưa đỡ đòn cho đồng đội**. Màu **xanh lam điện/ trắng sét** hòa với **đỏ huyết trầm** khi bùng nổ, giọng **baritone ấm – vang – phấn khích**.
+→ Phù hợp vai **tanker/luyện thể lôi hệ**: nhìn đã thấy “đỡ hộ – đấm như sét – cười át tiếng mưa”.
+
+
+
+
+
+
+
+
+
+
