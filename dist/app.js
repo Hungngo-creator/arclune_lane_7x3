@@ -8086,12 +8086,30 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
       .collection-view__layout{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,3.2fr) minmax(0,1.4fr);gap:24px;align-items:stretch;}
       .collection-roster{border-radius:24px;border:1px solid rgba(125,211,252,.2);background:linear-gradient(160deg,rgba(12,22,32,.94),rgba(6,14,22,.78));padding:20px;display:flex;flex-direction:column;gap:12px;overflow:hidden;}
       .collection-roster__list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;max-height:560px;overflow:auto;padding-right:4px;}
-      .collection-roster__entry{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:14px;border:1px solid transparent;background:rgba(12,20,28,.72);color:inherit;cursor:pointer;transition:transform .18s ease,border-color .18s ease,background .18s ease;}
-      .collection-roster__entry:hover{transform:translateY(-2px);border-color:rgba(125,211,252,.35);background:rgba(16,26,36,.9);}
+      .collection-roster__entry{--entry-bg:rgba(12,20,28,.72);--entry-bg-hover:rgba(16,26,36,.9);--entry-bg-selected:rgba(18,30,42,.95);--entry-border:transparent;--entry-border-hover:rgba(125,211,252,.35);--entry-border-selected:rgba(125,211,252,.55);--entry-shadow:none;--entry-shadow-selected:0 16px 36px rgba(6,12,20,.45);display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:14px;border:1px solid var(--entry-border);background:var(--entry-bg);color:inherit;cursor:pointer;transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease;}
+      .collection-roster__entry:hover{transform:translateY(-2px);border-color:var(--entry-border-hover);background:var(--entry-bg-hover);box-shadow:var(--entry-shadow-hover,var(--entry-shadow));}
       .collection-roster__entry:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:3px;}
-      .collection-roster__entry.is-selected{border-color:rgba(125,211,252,.55);background:rgba(18,30,42,.95);box-shadow:0 16px 36px rgba(6,12,20,.45);}
-      .collection-roster__avatar{width:54px;height:54px;border-radius:16px;background:rgba(24,34,44,.85);overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;}
-      .collection-roster__avatar img{width:64px;height:64px;object-fit:contain;filter:drop-shadow(0 8px 16px rgba(0,0,0,.55));}
+      .collection-roster__entry.is-selected{border-color:var(--entry-border-selected);background:var(--entry-bg-selected);box-shadow:var(--entry-shadow-selected);}
+      .collection-roster__entry[data-rank="S"]{--entry-bg:rgba(38,20,52,.78);--entry-bg-hover:rgba(48,26,68,.92);--entry-bg-selected:rgba(54,30,74,.96);--entry-border:rgba(255,180,255,.4);--entry-border-hover:rgba(255,204,255,.58);--entry-border-selected:rgba(255,228,255,.72);--entry-shadow:0 0 0 1px rgba(255,192,255,.2);--entry-shadow-hover:0 10px 26px rgba(150,66,188,.45);--entry-shadow-selected:0 18px 44px rgba(150,66,188,.6);}
+      .collection-roster__entry[data-rank="A"]{--entry-bg:rgba(30,40,58,.78);--entry-bg-hover:rgba(38,50,72,.92);--entry-bg-selected:rgba(44,58,84,.96);--entry-border:rgba(124,187,255,.35);--entry-border-hover:rgba(158,208,255,.52);--entry-border-selected:rgba(188,226,255,.7);--entry-shadow:0 0 0 1px rgba(140,200,255,.2);--entry-shadow-hover:0 10px 26px rgba(64,116,188,.42);--entry-shadow-selected:0 18px 44px rgba(64,116,188,.55);}
+      .collection-roster__entry[data-rank="B"]{--entry-bg:rgba(28,46,40,.78);--entry-bg-hover:rgba(34,58,50,.9);--entry-bg-selected:rgba(40,68,58,.95);--entry-border:rgba(120,224,185,.35);--entry-border-hover:rgba(146,236,204,.52);--entry-border-selected:rgba(176,246,220,.68);--entry-shadow:0 0 0 1px rgba(126,236,199,.18);--entry-shadow-hover:0 10px 24px rgba(42,126,110,.4);--entry-shadow-selected:0 18px 38px rgba(42,126,110,.52);}
+      .collection-roster__entry[data-rank="C"]{--entry-bg:rgba(46,46,28,.78);--entry-bg-hover:rgba(58,58,34,.9);--entry-bg-selected:rgba(68,68,40,.95);--entry-border:rgba(232,212,124,.32);--entry-border-hover:rgba(244,226,150,.48);--entry-border-selected:rgba(252,238,176,.64);--entry-shadow:0 0 0 1px rgba(240,224,150,.16);--entry-shadow-hover:0 10px 24px rgba(162,138,52,.38);--entry-shadow-selected:0 18px 36px rgba(162,138,52,.48);}
+      .collection-roster__entry[data-rank="D"]{--entry-bg:rgba(48,34,24,.78);--entry-bg-hover:rgba(60,42,30,.9);--entry-bg-selected:rgba(70,48,36,.95);--entry-border:rgba(255,170,108,.3);--entry-border-hover:rgba(255,188,138,.46);--entry-border-selected:rgba(255,208,170,.6);--entry-shadow:0 0 0 1px rgba(255,182,132,.14);--entry-shadow-hover:0 10px 22px rgba(168,88,42,.36);--entry-shadow-selected:0 18px 32px rgba(168,88,42,.45);}
+      .collection-roster__entry[data-rank="unknown"],
+      .collection-roster__entry:not([data-rank]){--entry-bg:rgba(12,20,28,.72);--entry-bg-hover:rgba(16,26,36,.9);--entry-bg-selected:rgba(18,30,42,.95);--entry-border:rgba(125,211,252,.2);--entry-border-hover:rgba(125,211,252,.35);--entry-border-selected:rgba(125,211,252,.55);--entry-shadow:none;--entry-shadow-hover:0 10px 20px rgba(6,12,20,.35);--entry-shadow-selected:0 16px 36px rgba(6,12,20,.45);}
+      .collection-roster__avatar{width:54px;height:54px;border-radius:16px;background:rgba(24,34,44,.85);overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;--aura-background:radial-gradient(circle at 50% 50%,rgba(174,228,255,.6),rgba(16,26,36,0));--aura-shadow:0 0 0 rgba(0,0,0,0);}
+      .collection-roster__entry[data-rank="S"] .collection-roster__avatar{--aura-background:radial-gradient(circle at 50% 45%,rgba(255,210,255,.9),rgba(120,24,160,0));--aura-shadow:0 0 22px rgba(214,118,255,.65);}
+      .collection-roster__entry[data-rank="A"] .collection-roster__avatar{--aura-background:radial-gradient(circle at 50% 45%,rgba(170,210,255,.85),rgba(32,68,160,0));--aura-shadow:0 0 20px rgba(104,162,255,.55);}
+      .collection-roster__entry[data-rank="B"] .collection-roster__avatar{--aura-background:radial-gradient(circle at 50% 45%,rgba(160,240,210,.85),rgba(16,94,72,0));--aura-shadow:0 0 18px rgba(92,206,162,.5);}
+      .collection-roster__entry[data-rank="C"] .collection-roster__avatar{--aura-background:radial-gradient(circle at 50% 45%,rgba(244,226,150,.82),rgba(120,94,20,0));--aura-shadow:0 0 16px rgba(204,172,68,.48);}
+      .collection-roster__entry[data-rank="D"] .collection-roster__avatar{--aura-background:radial-gradient(circle at 50% 45%,rgba(255,196,150,.8),rgba(122,52,14,0));--aura-shadow:0 0 14px rgba(202,108,52,.45);}
+      .collection-roster__entry[data-rank="unknown"] .collection-roster__avatar,
+      .collection-roster__entry:not([data-rank]) .collection-roster__avatar{--aura-background:radial-gradient(circle at 50% 45%,rgba(174,228,255,.6),rgba(16,26,36,0));--aura-shadow:0 0 12px rgba(6,12,20,.35);}
+      .collection-roster__aura{position:absolute;inset:-6px;border-radius:inherit;background:var(--aura-background);box-shadow:var(--aura-shadow);opacity:.92;pointer-events:none;filter:saturate(1.15);transition:opacity .2s ease,transform .2s ease;z-index:0;}
+      .collection-roster__entry:hover .collection-roster__aura{opacity:1;}
+      .collection-roster__entry.is-selected .collection-roster__aura{opacity:1;transform:scale(1.02);}
+      .collection-roster__avatar img{width:64px;height:64px;object-fit:contain;filter:drop-shadow(0 8px 16px rgba(0,0,0,.55));position:relative;z-index:1;}
+      .collection-roster__avatar span{position:relative;z-index:1;color:#aee4ff;font-weight:600;letter-spacing:.08em;}
       .collection-roster__meta{display:flex;flex-direction:column;gap:4px;flex:1;}
       .collection-roster__name{margin:0;font-size:15px;letter-spacing:.04em;}
       .collection-roster__tag{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
@@ -8645,9 +8663,13 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
       button.type = 'button';
       button.className = 'collection-roster__entry';
       button.dataset.unitId = unit.id;
+      button.dataset.rank = unit.rank || 'unknown';
 
       const avatar = document.createElement('div');
       avatar.className = 'collection-roster__avatar';
+      const aura = document.createElement('div');
+      aura.className = 'collection-roster__aura';
+      avatar.appendChild(aura);
       const art = getUnitArt(unit.id);
       if (art?.sprite?.src){
         const img = document.createElement('img');
