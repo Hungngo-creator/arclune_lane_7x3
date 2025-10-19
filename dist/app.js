@@ -9395,7 +9395,6 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
       .lineup-bench__cell:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:3px;}
       .lineup-bench__cell.is-empty{opacity:0.6;}
       .lineup-bench__cell-code{margin:0;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#7da0c7;text-align:center;line-height:1.2;font-weight:600;}
-      .lineup-bench__name{margin:0;font-size:11px;color:#9cbcd9;line-height:1.3;text-align:center;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
       .lineup-bench__avatar{width:48px;height:48px;border-radius:14px;background:rgba(24,34,44,.82);display:flex;align-items:center;justify-content:center;font-size:18px;color:#aee4ff;margin:0;overflow:hidden;}
       .lineup-bench__avatar img{width:100%;height:100%;object-fit:cover;}
       .lineup-leader{border-radius:24px;border:1px solid rgba(255,209,132,.42);background:linear-gradient(150deg,rgba(36,26,12,.88),rgba(18,12,6,.92));padding:14px 16px;display:grid;grid-template-columns:minmax(0,120px) minmax(0,1fr);gap:12px;align-items:start;position:relative;overflow:hidden;}
@@ -9530,7 +9529,14 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
     return { unitId: null, label: null };
   }
 
-  function formatBenchCodeCandidate(value){
+  function sanitizeCodeToken(token){
+    if (!token){
+      return '';
+    }
+    return token.replace(/[^A-Za-z0-9]/g, '');
+  }
+
+  function normalizeForCode(value){
     if (typeof value !== 'string'){
       return '';
     }
@@ -9538,47 +9544,51 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
     if (!trimmed){
       return '';
     }
-    const normalized = trimmed.replace(/\s+/g, ' ');
-    const ascii = normalized.normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
-    const cleaned = ascii.replace(/[^A-Za-z0-9]/g, '');
-    if (!normalized.includes(' ') && cleaned.length > 0 && cleaned.length <= 4){
-      return cleaned.toLocaleUpperCase('vi-VN');
-    }
-    const tokens = ascii.split(/[\s\-_/]+/).filter(Boolean);
-    let abbreviation = '';
-    if (tokens.length >= 2){
-      abbreviation = tokens.slice(0, 3).map(token => token[0] || '').join('');
-    }
-    if (!abbreviation){
-      abbreviation = cleaned.slice(0, 4);
-    }
-    abbreviation = abbreviation.replace(/[^A-Za-z0-9]/g, '');
-    return abbreviation ? abbreviation.toLocaleUpperCase('vi-VN') : '';
+    return trimmed.normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
   }
 
-  function deriveBenchCode(unit, cell){
-    if (!cell){
+  function extractCodeFromNormalized(normalized){
+    if (!normalized){
       return '';
     }
-    const sources = [
-      cell.meta?.code,
-      cell.meta?.shortCode,
-      cell.meta?.abbr,
-      cell.meta?.shortName,
-      unit?.code,
-      unit?.shortCode,
-      unit?.shortName,
-      cell.label,
-      unit?.name,
-      unit?.id
-    ];
-    for (const candidate of sources){
-      const result = formatBenchCodeCandidate(candidate);
-      if (result){
-        return result;
+    const tokens = normalized.split(/[\s\-_/]+/).filter(Boolean);
+    if (tokens.length >= 2){
+      const firstToken = sanitizeCodeToken(tokens[0]);
+      const lastToken = sanitizeCodeToken(tokens[tokens.length - 1]);
+      let letters = '';
+      if (firstToken){
+        letters += firstToken[0];
+      }
+      if (lastToken){
+        letters += lastToken[0];
+      }
+      if (tokens.length > 2 && letters.length < 3){
+        const extraToken = sanitizeCodeToken(tokens[1]);
+        if (extraToken){
+          letters += extraToken[0];
+        }
+      }
+      letters = letters.slice(0, 3);
+      if (letters){
+        return letters;
       }
     }
-    return '';
+    const cleaned = sanitizeCodeToken(normalized);
+    return cleaned.slice(0, 3);
+  }
+
+  function getUnitCode(unit, fallbackLabel){
+    const nameSource = normalizeForCode(
+      (typeof unit?.name === 'string' && unit.name.trim())
+        ? unit.name
+        : (typeof fallbackLabel === 'string' ? fallbackLabel : '')
+    );
+    let code = extractCodeFromNormalized(nameSource);
+    if (!code){
+      const fallbackId = normalizeForCode(unit?.id != null ? String(unit.id) : '');
+      code = extractCodeFromNormalized(fallbackId);
+    }
+    return code ? code.toLocaleUpperCase('vi-VN') : '';
   }
 
   function normalizeCost(cost, fallbackCurrencyId){
@@ -10267,13 +10277,23 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
         cellEl.type = 'button';
         cellEl.className = 'lineup-bench__cell';
         cellEl.dataset.benchIndex = String(cell.index);
-        cellEl.setAttribute('aria-label', `Ô dự bị ${cell.index + 1}`);
         const unit = cell.unitId ? rosterLookup.get(cell.unitId) : null;
         const hasContent = Boolean(cell.unitId || cell.label);
         if (!hasContent){
           cellEl.classList.add('is-empty');
         }
-        const codeText = hasContent ? deriveBenchCode(unit, cell) : '';
+        const displayName = unit?.name || cell.label || '';
+        let ariaLabel = `Ô dự bị ${cell.index + 1}`;
+        if (displayName){
+          ariaLabel += `: ${displayName}`;
+        }
+        cellEl.setAttribute('aria-label', ariaLabel);
+        if (displayName){
+          cellEl.title = displayName;
+        } else {
+          cellEl.removeAttribute('title');
+        }
+        const codeText = hasContent ? getUnitCode(unit, cell.label || '') : '';
         const avatarEl = document.createElement('div');
         avatarEl.className = 'lineup-bench__avatar';
         const avatarSource = unit?.avatar || cell.meta?.avatar || null;
@@ -10286,21 +10306,6 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
           cellEl.appendChild(codeEl);
         }
         cellEl.appendChild(avatarEl);
-        let nameText = '';
-        if (unit){
-          nameText = unit?.name || cell.label || 'Đã gán';
-        } else if (cell.label){
-          nameText = cell.label;
-        }
-        if (nameText){
-          cellEl.title = nameText;
-          const nameEl = document.createElement('p');
-          nameEl.className = 'lineup-bench__name';
-          nameEl.textContent = nameText;
-          cellEl.appendChild(nameEl);
-        } else {
-          cellEl.removeAttribute('title');
-        }
         benchGrid.appendChild(cellEl);
       });
     }
