@@ -45,3 +45,123 @@
 - **Hiệu ứng năng lượng**: sử dụng accent pha thêm `#9df0ff` để glow; vùng cháy ult overlay `#ff8055` → `#ffd4a8` nhưng giới hạn alpha ≤45% để không phá palette.
 - **Phụ kiện tóc & dây**: primary nhạt `#a8ddff` cho phần sáng, shadow dùng secondary + 20% black.
 - **Giày & găng**: base secondary, nhấn góc bằng `#244a63`, highlight `#8bd1ff` ở mép giáp.
+
+Mọi thông tin tiếp theo từ câu nói này chỉ mang tính THAM KHẢO, không cần áp dụng 100%:
+
+5) Quy ước đặt tên & ID lớp (machine-readable)
+
+Tiền tố nhân vật: LA_ (Lôi Thiên Ảnh).
+
+Layer IDs (trùng khớp tên node trong SVG):
+
+LA_WEAPON_FRONT, LA_ARM_FRONT, LA_TORSO, LA_HEAD, LA_HAIR_FRONT, LA_ARM_BACK, LA_LEG_FRONT, LA_LEG_BACK, LA_CAPE_FRONT, LA_CAPE_BACK, LA_WEAPON_BACK, LA_ACC_BACK, LA_FX_GLOW, LA_FX_HEAT, LA_FX_ULT.
+
+
+Class CSS cho shader/animation:
+
+.fx-glow (glow lôi văn), .fx-heat (nhiễu nhiệt), .fx-ult (overlay cháy đỏ).
+
+
+Quy ước anchor/pivot trong SVG: set transform-origin theo bảng pivot (x,y) đã ghi; thêm data-pivot="x,y" vào từng <g> để tool đọc.
+
+
+6) Trạng thái animation & thời lượng (60 FPS chuẩn)
+
+State	Frames	Thời lượng	Ghi chú
+
+idle	60	1.0s	Thở nhẹ, tóc/áo choàng sway nhỏ. .fx-glow fade 55→85%/2.5s loop.
+attack_a (đấm điện)	14	0.23s	Khóa cổ tay theo thương; add 1 follow-through 6f. Trigger VFX ở f7.
+attack_b (đâm thương)	18	0.30s	Camera shake nhẹ 2px ở f15–16.
+block	10	0.17s	Nâng gauntlet; rimlight tăng 20% trong 6f đầu.
+hit_react	8	0.13s	Lệch thân 3–5px, tắt glow 1 nhịp.
+charge (tăng lực)	24	0.40s	Lôi văn sáng dần; âm “crackle” nhỏ ở f12.
+ultimate	48	0.80s	Bật .fx-ult từ f10→f40 (alpha 0→45%→0). Vệt nứt điện dưới chân scale 0.9→1.15.
+entry	16	0.27s	Bước vào 1/3 thân, cape catch-up 4f.
+death	24	0.40s	Collapse gối; tắt mọi FX trong 6f cuối.
+
+
+> Chuẩn hoá easing: idle/charge = easeInOutSine, attack = cubic-bezier(0.2,0,0.1,1), block/hit = easeOutCubic.
+
+
+
+7) Ràng buộc rig (constraints)
+
+IK tay cầm thương: LA_WEAPON_FRONT là driver, ràng LA_WRIST_FRONT và LA_ELBOW_FRONT theo góc cán thương (giới hạn xoay cổ tay ±22°).
+
+Hinge gối & cổ chân: LA_KNEE_* chỉ xoay y, clamp ±18°, LA_ANKLE_* roll ±12°.
+
+Cape: 3 xương: cape_root (hông), cape_mid, cape_tip với spring 0.12, damping 0.18.
+
+Head look: yaw ±10°, pitch ±6° (không cắt tóc sau).
+
+
+8) Timeline sự kiện VFX/SFX (theo state)
+
+attack_a: f7 → emit fx_spark_small tại LA_WEAPON_FRONT.tip; âm elec_crackle_s volume 0.35.
+
+attack_b: f12 → fx_trail_lance (line gradient #8bd1ff→#c7f1ff, life 180ms).
+
+charge: f8→f24 tăng glow_intensity 0.6→1.0; loop hum nền -16dB.
+
+ultimate: f10 bật .fx-ult, f18 spawn fx_floor_crack (mask dưới chân), f40 tắt .fx-ult, phát thunder_hit -10dB.
+
+hit_react: f1 play hit_body -12dB; tạm tắt .fx-glow trong 6f.
+
+
+9) Xuất file & cấu trúc thư mục
+
+/art/characters/LA/
+  ├─ svg/
+  │   ├─ LA_base.svg                # layer & ID chuẩn
+  │   ├─ LA_fx_sheet.svg            # defs symbol cho fx: spark, trail, crack, halo
+  │   └─ LA_palette.json            # map màu & tokens
+  ├─ anim/
+  │   ├─ LA_idle.anim.json
+  │   ├─ LA_attack_a.anim.json
+  │   ├─ LA_attack_b.anim.json
+  │   ├─ LA_block.anim.json
+  │   ├─ LA_hit_react.anim.json
+  │   ├─ LA_charge.anim.json
+  │   ├─ LA_ultimate.anim.json
+  │   ├─ LA_entry.anim.json
+  │   └─ LA_death.anim.json
+  ├─ vfx/
+  │   ├─ fx_spark_small.json
+  │   ├─ fx_trail_lance.json
+  │   └─ fx_floor_crack.json
+  └─ meta/
+      └─ LA_runtime_meta.json       # xem mục 10
+
+Preset xuất PNG (nếu cần sprite): 4x scale (640×800), background alpha, quantize 256 màu cho mobile.
+
+LOD: LA_base_lite.svg bỏ .fx-heat & giảm path points ~30% cho low-end.
+
+
+10) LA_runtime_meta.json (mẫu)
+
+{
+  "id": "LA",
+  "hitbox": { "x": 58, "y": 70, "w": 40, "h": 110 },
+  "feet": { "x": 86, "y": 196 }, 
+  "attach_points": {
+    "weapon_tip": [132, 120],
+    "floor_crack": [86, 196]
+  },
+  "audio": {
+    "voice_print": "baritone_bright",
+    "sfx": { "crackle": "elec_crackle_s", "thunder": "thunder_hit" }
+  },
+  "states": ["idle","attack_a","attack_b","block","hit_react","charge","ultimate","entry","death"]
+}
+
+11) Checklist QA nhanh (trước khi đưa vào game)
+
+Không layer nào trùng ID; mọi <g> đều có data-pivot.
+
+Kiểm tra overdraw của .fx-ult (alpha ≤ 0.45, không “cháy” palette).
+
+Tóc/áo không xuyên vũ khí ở attack_b.
+
+Hitbox bao phủ thân trung tâm, không theo cape.
+
+Export thử idle 10 vòng → không drift vị trí chân.
