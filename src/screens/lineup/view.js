@@ -53,15 +53,17 @@ function ensureStyles(){
     .lineup-slot.is-locked{border-style:dashed;border-color:rgba(125,211,252,.35);background:rgba(12,22,34,.6);}
     .lineup-slot__cost{margin:0;font-size:12px;color:#ffd9a1;letter-spacing:.08em;text-transform:uppercase;}
     .lineup-slot__locked-note{margin:0;font-size:12px;color:#9cbcd9;line-height:1.5;}
-    .lineup-bench{border-radius:24px;border:1px solid rgba(125,211,252,.25);background:rgba(10,18,28,.9);padding:14px 16px;display:flex;flex-direction:column;gap:16px;min-height:100%;}
+    .lineup-bench{border-radius:24px;border:1px solid rgba(125,211,252,.25);background:rgba(10,18,28,.9);padding:14px 16px;display:flex;flex-direction:column;gap:12px;min-height:100%;}
     .lineup-bench__title{margin:0;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
-    .lineup-bench__grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:12px;}
-    .lineup-bench__cell{padding:8px;border-radius:16px;border:1px solid rgba(125,211,252,.2);background:rgba(12,22,32,.84);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px;cursor:pointer;transition:transform .16s ease,border-color .16s ease,background .16s ease;aspect-ratio:1;}
+    .lineup-bench__content{border-radius:18px;border:1px solid rgba(125,211,252,.18);background:rgba(12,22,32,.78);padding:10px 12px;display:flex;flex-direction:column;gap:8px;flex:1;}
+    .lineup-bench__grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:8px;align-content:space-between;flex:1;min-height:0;}
+    .lineup-bench__cell{padding:6px;border-radius:14px;border:1px solid rgba(125,211,252,.2);background:rgba(10,20,30,.9);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:8px;cursor:pointer;transition:transform .16s ease,border-color .16s ease,background .16s ease;aspect-ratio:1;}
     .lineup-bench__cell:hover{transform:translateY(-2px);border-color:rgba(125,211,252,.4);background:rgba(16,28,40,.9);}
     .lineup-bench__cell:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:3px;}
-    .lineup-bench__cell.is-empty{opacity:0.65;}
-    .lineup-bench__name{margin:0;font-size:13px;color:#d0e7ff;line-height:1.4;text-align:center;}
-    .lineup-bench__avatar{width:56px;height:56px;border-radius:16px;background:rgba(24,34,44,.82);display:flex;align-items:center;justify-content:center;font-size:20px;color:#aee4ff;margin-bottom:0;overflow:hidden;}
+    .lineup-bench__cell.is-empty{opacity:0.6;}
+    .lineup-bench__cell-code{margin:0;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#7da0c7;text-align:center;line-height:1.2;font-weight:600;}
+    .lineup-bench__name{margin:0;font-size:11px;color:#9cbcd9;line-height:1.3;text-align:center;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .lineup-bench__avatar{width:48px;height:48px;border-radius:14px;background:rgba(24,34,44,.82);display:flex;align-items:center;justify-content:center;font-size:18px;color:#aee4ff;margin:0;overflow:hidden;}
     .lineup-bench__avatar img{width:100%;height:100%;object-fit:cover;}
     .lineup-leader{border-radius:24px;border:1px solid rgba(255,209,132,.42);background:linear-gradient(150deg,rgba(36,26,12,.88),rgba(18,12,6,.92));padding:14px 16px;display:grid;grid-template-columns:minmax(0,120px) minmax(0,1fr);gap:12px;align-items:start;position:relative;overflow:hidden;}
     .lineup-leader__badge{position:absolute;top:12px;right:-18px;background:rgba(255,209,132,.16);color:#ffd184;padding:4px 26px;border-radius:999px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;transform:rotate(20deg);}
@@ -193,6 +195,57 @@ function normalizeAssignment(input, rosterIndex){
     }
   }
   return { unitId: null, label: null };
+}
+
+function formatBenchCodeCandidate(value){
+  if (typeof value !== 'string'){
+    return '';
+  }
+  const trimmed = value.trim();
+  if (!trimmed){
+    return '';
+  }
+  const normalized = trimmed.replace(/\s+/g, ' ');
+  const ascii = normalized.normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
+  const cleaned = ascii.replace(/[^A-Za-z0-9]/g, '');
+  if (!normalized.includes(' ') && cleaned.length > 0 && cleaned.length <= 4){
+    return cleaned.toLocaleUpperCase('vi-VN');
+  }
+  const tokens = ascii.split(/[\s\-_/]+/).filter(Boolean);
+  let abbreviation = '';
+  if (tokens.length >= 2){
+    abbreviation = tokens.slice(0, 3).map(token => token[0] || '').join('');
+  }
+  if (!abbreviation){
+    abbreviation = cleaned.slice(0, 4);
+  }
+  abbreviation = abbreviation.replace(/[^A-Za-z0-9]/g, '');
+  return abbreviation ? abbreviation.toLocaleUpperCase('vi-VN') : '';
+}
+
+function deriveBenchCode(unit, cell){
+  if (!cell){
+    return '';
+  }
+  const sources = [
+    cell.meta?.code,
+    cell.meta?.shortCode,
+    cell.meta?.abbr,
+    cell.meta?.shortName,
+    unit?.code,
+    unit?.shortCode,
+    unit?.shortName,
+    cell.label,
+    unit?.name,
+    unit?.id
+  ];
+  for (const candidate of sources){
+    const result = formatBenchCodeCandidate(candidate);
+    if (result){
+      return result;
+    }
+  }
+  return '';
 }
 
 function normalizeCost(cost, fallbackCurrencyId){
@@ -789,9 +842,12 @@ export function renderLineupView(options = {}){
   benchTitle.className = 'lineup-bench__title';
   benchTitle.textContent = 'Dự bị / linh hoạt (10)';
   benchSection.appendChild(benchTitle);
+  const benchContent = document.createElement('div');
+  benchContent.className = 'lineup-bench__content';
+  benchSection.appendChild(benchContent);
   const benchGrid = document.createElement('div');
   benchGrid.className = 'lineup-bench__grid';
-  benchSection.appendChild(benchGrid);
+  benchContent.appendChild(benchGrid);
   mainArea.appendChild(benchSection);
 
   const rosterSection = document.createElement('section');
@@ -884,11 +940,18 @@ export function renderLineupView(options = {}){
       if (!hasContent){
         cellEl.classList.add('is-empty');
       }
+      const codeText = hasContent ? deriveBenchCode(unit, cell) : '';
       const avatarEl = document.createElement('div');
       avatarEl.className = 'lineup-bench__avatar';
       const avatarSource = unit?.avatar || cell.meta?.avatar || null;
       const avatarLabel = unit?.name || cell.label || '';
       renderAvatar(avatarEl, avatarSource, avatarLabel);
+      if (codeText){
+        const codeEl = document.createElement('span');
+        codeEl.className = 'lineup-bench__cell-code';
+        codeEl.textContent = codeText;
+        cellEl.appendChild(codeEl);
+      }
       cellEl.appendChild(avatarEl);
       let nameText = '';
       if (unit){
@@ -897,10 +960,13 @@ export function renderLineupView(options = {}){
         nameText = cell.label;
       }
       if (nameText){
+        cellEl.title = nameText;
         const nameEl = document.createElement('p');
         nameEl.className = 'lineup-bench__name';
         nameEl.textContent = nameText;
         cellEl.appendChild(nameEl);
+      } else {
+        cellEl.removeAttribute('title');
       }
       benchGrid.appendChild(cellEl);
     });
