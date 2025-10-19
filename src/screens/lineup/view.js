@@ -53,7 +53,7 @@ function ensureStyles(){
     .lineup-slot.is-locked{border-style:dashed;border-color:rgba(125,211,252,.35);background:rgba(12,22,34,.6);}
     .lineup-slot__cost{margin:0;font-size:12px;color:#ffd9a1;letter-spacing:.08em;text-transform:uppercase;}
     .lineup-slot__locked-note{margin:0;font-size:12px;color:#9cbcd9;line-height:1.5;}
-    .lineup-bench{border-radius:24px;border:1px solid rgba(125,211,252,.25);background:rgba(10,18,28,.9);padding:24px;display:flex;flex-direction:column;gap:16px;min-height:100%;}
+    .lineup-bench{border-radius:24px;border:1px solid rgba(125,211,252,.25);background:rgba(10,18,28,.9);padding:14px 16px;display:flex;flex-direction:column;gap:16px;min-height:100%;}
     .lineup-bench__title{margin:0;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
     .lineup-bench__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(96px,auto);grid-auto-flow:column;gap:16px;}
     .lineup-bench__cell{padding:14px;border-radius:16px;border:1px solid rgba(125,211,252,.2);background:rgba(12,22,32,.84);display:flex;flex-direction:column;gap:10px;cursor:pointer;transition:transform .16s ease,border-color .16s ease,background .16s ease;height:100%;}
