@@ -9342,7 +9342,8 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
       .lineup-wallet__item{padding:8px 12px;border-radius:14px;border:1px solid rgba(125,211,252,.22);background:rgba(12,20,28,.82);display:flex;flex-direction:column;gap:4px;min-width:120px;}
       .lineup-wallet__name{margin:0;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
       .lineup-wallet__balance{margin:0;font-size:15px;color:#e6f2ff;}
-      .lineup-view__layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,2.85fr);gap:24px;align-items:start;}
+      .lineup-view__layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,2.9fr);gap:24px;align-items:start;}
+      .lineup-main-area{display:grid;grid-template-columns:minmax(0,2.2fr) minmax(280px,1fr);gap:24px;align-items:start;}
       .lineup-selector{border-radius:24px;border:1px solid rgba(125,211,252,.22);background:rgba(10,18,28,.92);padding:20px;display:flex;flex-direction:column;gap:16px;}
       .lineup-selector__title{margin:0;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
       .lineup-selector__list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;}
@@ -9370,10 +9371,10 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
       .lineup-slot.is-locked{border-style:dashed;border-color:rgba(125,211,252,.35);background:rgba(12,22,34,.6);}
       .lineup-slot__cost{margin:0;font-size:12px;color:#ffd9a1;letter-spacing:.08em;text-transform:uppercase;}
       .lineup-slot__locked-note{margin:0;font-size:12px;color:#9cbcd9;line-height:1.5;}
-      .lineup-bench{border-radius:24px;border:1px solid rgba(125,211,252,.2);background:rgba(10,18,28,.88);padding:20px;display:flex;flex-direction:column;gap:12px;}
+      .lineup-bench{border-radius:24px;border:1px solid rgba(125,211,252,.25);background:rgba(10,18,28,.9);padding:24px;display:flex;flex-direction:column;gap:16px;min-height:100%;}
       .lineup-bench__title{margin:0;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
-      .lineup-bench__grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:14px;}
-      .lineup-bench__cell{padding:12px;border-radius:14px;border:1px solid rgba(125,211,252,.18);background:rgba(12,22,32,.82);display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:transform .16s ease,border-color .16s ease,background .16s ease;}
+      .lineup-bench__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(96px,auto);grid-auto-flow:column;gap:16px;}
+      .lineup-bench__cell{padding:14px;border-radius:16px;border:1px solid rgba(125,211,252,.2);background:rgba(12,22,32,.84);display:flex;flex-direction:column;gap:10px;cursor:pointer;transition:transform .16s ease,border-color .16s ease,background .16s ease;height:100%;}
       .lineup-bench__cell:hover{transform:translateY(-2px);border-color:rgba(125,211,252,.4);background:rgba(16,28,40,.9);}
       .lineup-bench__cell:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:3px;}
       .lineup-bench__cell.is-empty{opacity:0.65;}
@@ -9431,8 +9432,8 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
       .lineup-overlay__option-avatar{width:48px;height:48px;border-radius:14px;background:rgba(24,34,44,.82);display:flex;align-items:center;justify-content:center;color:#aee4ff;font-size:18px;overflow:hidden;}
       .lineup-overlay__option-name{margin:0;font-size:14px;color:#e6f2ff;}
       .lineup-overlay__option-meta{margin:0;font-size:12px;color:#9cbcd9;}
-      @media(max-width:1080px){.lineup-view__layout{grid-template-columns:1fr;}.lineup-leader{grid-template-columns:1fr;}.lineup-leader__badge{display:none;}}
-      @media(max-width:720px){.lineup-view__title{font-size:30px;}.lineup-view__header{flex-direction:column;align-items:flex-start;}.lineup-slot__avatar{width:64px;height:64px;}.lineup-roster__list{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}}
+      @media(max-width:1080px){.lineup-view__layout{grid-template-columns:1fr;}.lineup-main-area{grid-template-columns:1fr;}.lineup-leader{grid-template-columns:1fr;}.lineup-leader__badge{display:none;}}
+      @media(max-width:720px){.lineup-view__title{font-size:30px;}.lineup-view__header{flex-direction:column;align-items:flex-start;}.lineup-main-area{gap:18px;}.lineup-bench__grid{grid-template-columns:1fr;grid-auto-flow:row;}.lineup-slot__avatar{width:64px;height:64px;}.lineup-roster__list{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}}
     `;
 
     if (style.textContent !== css){
@@ -10077,9 +10078,13 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
     lineupSelector.appendChild(selectorList);
     layout.appendChild(lineupSelector);
 
+    const mainArea = document.createElement('div');
+    mainArea.className = 'lineup-main-area';
+    layout.appendChild(mainArea);
+
     const mainColumn = document.createElement('div');
     mainColumn.className = 'lineup-main';
-    layout.appendChild(mainColumn);
+    mainArea.appendChild(mainColumn);
 
     const leaderSection = document.createElement('section');
     leaderSection.className = 'lineup-leader';
@@ -10107,7 +10112,7 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
     leaderSection.appendChild(passiveGrid);
     mainColumn.appendChild(leaderSection);
 
-  const benchSection = document.createElement('section');
+    const benchSection = document.createElement('section');
     benchSection.className = 'lineup-bench';
     const benchTitle = document.createElement('p');
     benchTitle.className = 'lineup-bench__title';
@@ -10116,7 +10121,7 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
     const benchGrid = document.createElement('div');
     benchGrid.className = 'lineup-bench__grid';
     benchSection.appendChild(benchGrid);
-    mainColumn.appendChild(benchSection);
+    mainArea.appendChild(benchSection);
 
     const rosterSection = document.createElement('section');
     rosterSection.className = 'lineup-roster';
