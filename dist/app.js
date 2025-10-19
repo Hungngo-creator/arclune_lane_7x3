@@ -1639,6 +1639,7 @@ __define('./combat.js', (exports, module, __require) => {
   const vfxAddTracer = __dep1.vfxAddTracer;
   const vfxAddHit = __dep1.vfxAddHit;
   const vfxAddMelee = __dep1.vfxAddMelee;
+  const vfxAddLightningArc = __dep1.vfxAddLightningArc;
   const __dep2 = __require('./engine.js');
   const slotToCell = __dep2.slotToCell;
   const cellReserved = __dep2.cellReserved;
@@ -1757,9 +1758,30 @@ __define('./combat.js', (exports, module, __require) => {
     const fallback = pickTarget(Game, unit);
 
     // Sau đó cho Statuses có quyền điều phối (taunt/allure…), nếu trả về null thì bỏ lượt
-   
+
     const tgt = Statuses.resolveTarget(unit, pool, { attackType: 'basic' }) ?? fallback;
     if (!tgt) return;
+
+  const isLoithienanh = unit?.id === 'loithienanh';
+
+    const updateTurnBusy = (startedAt, busyMs) => {
+      if (!Game?.turn) return;
+      if (!Number.isFinite(startedAt) || !Number.isFinite(busyMs)) return;
+      const prevBusy = Number.isFinite(Game.turn.busyUntil) ? Game.turn.busyUntil : 0;
+      Game.turn.busyUntil = Math.max(prevBusy, startedAt + busyMs);
+    };
+
+    const triggerLightningArc = timing => {
+      if (!isLoithienanh) return;
+      const arcStart = safeNow();
+      try {
+        const busyMs = vfxAddLightningArc(Game, unit, tgt, {
+          bindingKey: 'basic_combo',
+          timing
+        });
+        updateTurnBusy(arcStart, busyMs);
+      } catch (_) {}
+    };
 
     const passiveCtx = {
       target: tgt,
@@ -1804,9 +1826,11 @@ __define('./combat.js', (exports, module, __require) => {
     dmg = Math.max(0, Math.floor(dmg * pre.inMul));
 
     // Khiên hấp thụ
+    triggerLightningArc('hit1');
     const abs = Statuses.absorbShield(tgt, dmg, { dtype });
 
     // Trừ HP phần còn lại
+    triggerLightningArc('hit2');
     applyDamage(tgt, abs.remain);
 
     // VFX: hit ring tại target
