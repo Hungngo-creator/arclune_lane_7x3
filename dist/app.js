@@ -9403,7 +9403,7 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
       .lineup-bench__cell-code{margin:0;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#7da0c7;text-align:center;line-height:1.2;font-weight:600;}
       .lineup-bench__avatar{width:48px;height:48px;border-radius:14px;background:rgba(24,34,44,.82);display:flex;align-items:center;justify-content:center;font-size:18px;color:#aee4ff;margin:0;overflow:hidden;border:1px solid rgba(125,211,252,.2);transition:transform .16s ease,border-color .16s ease,background .16s ease,box-shadow .16s ease;}
       .lineup-bench__avatar img{width:100%;height:100%;object-fit:cover;}
-      .lineup-bench__details{border-radius:18px;border:1px solid rgba(125,211,252,.18);background:rgba(12,22,32,.78);padding:12px 14px;display:flex;flex-direction:column;gap:10px;align-self:flex-start;height:fit-content;max-height:220px;overflow:auto;}
+      .lineup-bench__details{border-radius:18px;border:1px solid rgba(125,211,252,.18);background:rgba(12,22,32,.78);padding:12px 14px;display:flex;flex-direction:column;gap:10px;align-self:flex-start;height:fit-content;overflow:auto;}
       .lineup-bench__details.is-empty{opacity:0.85;}
       .lineup-bench__details-title{margin:0;font-size:15px;color:#e6f2ff;line-height:1.5;}
       .lineup-bench__details-power{margin:0;font-size:13px;color:#9cbcd9;}
@@ -10211,6 +10211,19 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
     const benchDetails = document.createElement('aside');
     benchDetails.className = 'lineup-bench__details is-empty';
     benchContent.appendChild(benchDetails);
+
+    function syncBenchDetailsHeight(){
+      if (!benchDetails || !leaderSection || typeof leaderSection.getBoundingClientRect !== 'function'){
+        benchDetails.style.maxHeight = '';
+        return;
+      }
+      const rect = leaderSection.getBoundingClientRect();
+      if (rect && Number.isFinite(rect.height)){
+        benchDetails.style.maxHeight = `${rect.height}px`;
+      } else {
+        benchDetails.style.maxHeight = '';
+      }
+    }
     mainArea.appendChild(benchSection);
 
     const rosterSection = document.createElement('section');
@@ -10295,6 +10308,7 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
         empty.className = 'lineup-bench__details-empty';
         empty.textContent = 'Chưa có đội hình để hiển thị thông tin.';
         benchDetails.appendChild(empty);
+        syncBenchDetailsHeight();
         return;
       }
 
@@ -10305,6 +10319,7 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
         hint.className = 'lineup-bench__details-empty';
         hint.textContent = 'Chọn một ô dự bị để xem mô tả kỹ năng.';
         benchDetails.appendChild(hint);
+        syncBenchDetailsHeight();
         return;
       }
 
@@ -10315,6 +10330,7 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
         missing.className = 'lineup-bench__details-empty';
         missing.textContent = 'Không tìm thấy ô dự bị tương ứng.';
         benchDetails.appendChild(missing);
+        syncBenchDetailsHeight();
         return;
       }
 
@@ -10327,6 +10343,7 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
           ? `Ô dự bị được ghi chú "${cell.label}".`
           : 'Ô dự bị hiện đang trống.';
         benchDetails.appendChild(empty);
+        syncBenchDetailsHeight();
         return;
       }
 
@@ -10402,6 +10419,8 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
         fallback.textContent = 'Chưa có dữ liệu chi tiết cho nhân vật này.';
         benchDetails.appendChild(fallback);
       }
+      
+      syncBenchDetailsHeight();
     }
 
     function updateActiveBenchHighlight(){
@@ -10495,6 +10514,7 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
       if (!lineup){
         renderAvatar(leaderAvatar, null, '');
         leaderName.textContent = 'Chưa chọn leader';
+        syncBenchDetailsHeight();
         return;
       }
       if (lineup.leaderId){
@@ -10505,6 +10525,7 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
         renderAvatar(leaderAvatar, null, '');
         leaderName.textContent = 'Chưa chọn leader';
       }
+      syncBenchDetailsHeight();
     }
 
     function renderPassives(){
@@ -10848,6 +10869,25 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
       }
     }
     const cleanup = [];
+
+  let leaderObserver = null;
+    if (typeof ResizeObserver === 'function'){
+      leaderObserver = new ResizeObserver(() => {
+        syncBenchDetailsHeight();
+      });
+      leaderObserver.observe(leaderSection);
+      cleanup.push(() => {
+        if (leaderObserver){
+          leaderObserver.disconnect();
+        }
+      });
+    }
+
+    const handleWindowResize = () => syncBenchDetailsHeight();
+    if (typeof window !== 'undefined'){
+      window.addEventListener('resize', handleWindowResize);
+      cleanup.push(() => window.removeEventListener('resize', handleWindowResize));
+    }
 
     const handleBack = () => {
       if (shell && typeof shell.enterScreen === 'function'){
