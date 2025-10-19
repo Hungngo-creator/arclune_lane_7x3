@@ -288,6 +288,24 @@ async function build(){
   for (const file of files){
     const id = toModuleId(file);
     const raw = await fs.readFile(file, 'utf8');
+    const ext = path.extname(file);
+    if (ext === '.json'){
+      const normalizedJson = JSON.stringify(JSON.parse(raw));
+      const escaped = normalizedJson
+        .replace(/\\/g, '\\\\')
+        .replace(/'/g, "\\'")
+        .replace(/\r/g, '\\r')
+        .replace(/\n/g, '\\n')
+        .replace(/\u2028/g, '\\u2028')
+        .replace(/\u2029/g, '\\u2029');
+      const moduleCode = [
+        `const data = JSON.parse('${escaped}');`,
+        'module.exports = data;',
+        'module.exports.default = data;',
+      ].join('\n');
+      modules.push({ id, code: moduleCode });
+      continue;
+    }
     const transformed = transformModule(raw, id);
     modules.push({ id, code: transformed });
   }
