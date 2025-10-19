@@ -136,6 +136,39 @@ const MODES = [
     }
   },
   {
+    id: 'lineup',
+    title: 'Đội Hình',
+    type: MODE_TYPES.ECONOMY,
+    status: MODE_STATUS.AVAILABLE,
+    icon: '🧾',
+    shortDescription: 'Quản lý các đội hình đề xuất cho PvE, PvP thử nghiệm và hạ tầng kinh tế.',
+    unlockNotes: 'Mở khi người chơi hoàn tất hướng dẫn xây dựng đội hình đầu tiên trong phần Chiến Dịch.',
+    tags: ['Kinh tế nguyên tinh'],
+    menuSections: ['economy'],
+    shell: {
+      screenId: 'lineup',
+      moduleId: './screens/lineup/index.js',
+      defaultParams: {
+        shortDescription: 'Theo dõi đội hình đề xuất và cấu trúc tổ đội tối ưu cho từng mục tiêu.',
+        lineups: [
+          {
+            id: 'starter-balance',
+            title: 'Khởi đầu Cân bằng',
+            role: 'PvE cốt truyện',
+            description: 'Đội hình 3 DPS linh hoạt kèm 1 hỗ trợ buff và 1 tanker giữ aggro cho các màn đầu.',
+            members: [
+              'Thần Kiếm Lục Ảnh · DPS',
+              'Huyền Chân Đan Sư · Hỗ trợ',
+              'Thiên Khuyết Long Ẩn · DPS',
+              'Thánh Hộ Vệ Viêm Lân · Tank',
+              'Thái Âm Tuyết Hồ · DPS phụ'
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
     id: 'collection',
     title: 'Bộ Sưu Tập',
     type: MODE_TYPES.ECONOMY,
