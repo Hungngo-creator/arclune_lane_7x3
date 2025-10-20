@@ -223,6 +223,33 @@ function createGameState(options = {}){
     ? enemyPreset.deck
     : (Array.isArray(enemyPreset.unitsAll) && enemyPreset.unitsAll.length ? enemyPreset.unitsAll : UNITS);
 
+const requestedTurnMode = options.turnMode
+    ?? options.turn?.mode
+    ?? options.turnOrderMode
+    ?? options.turnOrder?.mode
+    ?? CFG?.turnOrder?.mode;
+  const useInterleaved = requestedTurnMode === 'interleaved_by_position';
+  const allyCols = Number.isFinite(CFG?.ALLY_COLS) ? Math.max(1, Math.floor(CFG.ALLY_COLS)) : 3;
+  const gridRows = Number.isFinite(CFG?.GRID_ROWS) ? Math.max(1, Math.floor(CFG.GRID_ROWS)) : 3;
+  const slotsPerSide = Math.max(1, allyCols * gridRows);
+
+  const buildTurnState = () => {
+    if (useInterleaved){
+      return {
+        mode: 'interleaved_by_position',
+        nextSide: 'ALLY',
+        lastPos: { ALLY: 0, ENEMY: 0 },
+        wrapCount: { ALLY: 0, ENEMY: 0 },
+        turnCount: 0,
+        slotCount: slotsPerSide,
+        cycle: 0,
+        busyUntil: 0
+      };
+    }
+    const { order, indexMap } = buildTurnOrder();
+    return { order, orderIndex: indexMap, cursor: 0, cycle: 0, busyUntil: 0 };
+  };
+
   const game = {
     modeKey,
     grid: null,
@@ -238,10 +265,7 @@ function createGameState(options = {}){
     deck3: [],                    // mảng 3 unit
     selectedId: null,
     ui: { bar: null },
-    turn: (()=>{
-      const { order, indexMap } = buildTurnOrder();
-      return { order, orderIndex: indexMap, cursor: 0, cycle: 0, busyUntil: 0 };
-    })(),
+    turn: buildTurnState(),
     queued: { ally: new Map(), enemy: new Map() },
     actionChain: [],
     events: gameEvents,
