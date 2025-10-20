@@ -12,26 +12,24 @@ FOLLOWUP_CAP_DEFAULT: 2,
   fury: {
     max: 100,
     ultCost: 100,
-    specialMax: {},
-    turn: {
-      startGain: 3,
-      cap: 40
+    specialMax: {
+      loithienanh: { max: 120, ultCost: 110 }
     },
-    skill: {
-      cap: 30
-    },
-    hit: {
-      cap: 20
+    caps: {
+      perTurn: 40,
+      perSkill: 30,
+      perHit: 20
     },
     gain: {
       turnStart: { amount: 3 },
-      basic: { single: 6, kill: 8, crit: 4 },
-      ability: { single: 5, aoe: 3, kill: 6, crit: 3, scaled: 0.02 },
-      damageTaken: { base: 2, scaled: 0.01 }
+      dealSingle: { base: 6, crit: 4, kill: 8, targetRatio: 10 },
+      dealAoePerTarget: { base: 3, perTarget: 3, crit: 3, kill: 6, targetRatio: 6 },
+      damageTaken: { base: 2, selfRatio: 18 }
     },
     drain: {
-      min: 10,
-      max: 30
+      perTargetBase: 10,
+      perTargetPct: 0.25,
+      skillTotalCap: 40
     }
   },
 

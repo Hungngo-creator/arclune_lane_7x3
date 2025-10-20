@@ -172,7 +172,12 @@ export const Statuses = {
       const back = Math.round(dealt * clamp01(reflect.power ?? 0));
       attacker.hp = Math.max(0, attacker.hp - back);
       if (back > 0){
-        gainFury(attacker, { type: 'damageTaken', dealt: back });
+        gainFury(attacker, {
+          type: 'damageTaken',
+          dealt: back,
+          selfMaxHp: Number.isFinite(attacker?.hpMax) ? attacker.hpMax : undefined,
+          damageTaken: back
+        });
         finishFuryHit(attacker);
       }
       // không phản khi stealth target đang miễn sát thương (dealt=0 thì như nhau)
@@ -184,7 +189,12 @@ export const Statuses = {
       const extra = Math.round(dealt * clamp01(venom.power ?? 0));
       target.hp = Math.max(0, target.hp - extra);
       if (extra > 0){
-        gainFury(target, { type: 'damageTaken', dealt: extra });
+        gainFury(target, {
+          type: 'damageTaken',
+          dealt: extra,
+          selfMaxHp: Number.isFinite(target?.hpMax) ? target.hpMax : undefined,
+          damageTaken: extra
+        });
         finishFuryHit(target);
       }
     }

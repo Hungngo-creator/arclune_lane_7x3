@@ -87,12 +87,16 @@ startFurySkill(attacker, { tag: opts.furyTag || opts.attackType || 'ability' });
     dealt,
     isAoE: !!opts.isAoE,
     isKill,
-    targetsHit: Number.isFinite(opts.targetsHit) ? opts.targetsHit : 1
+    isCrit: !!opts.isCrit,
+    targetsHit: Number.isFinite(opts.targetsHit) ? opts.targetsHit : 1,
+    targetMaxHp: Number.isFinite(target?.hpMax) ? target.hpMax : undefined
   });
   gainFury(target, {
     type: 'damageTaken',
     dealt,
-    isAoE: !!opts.isAoE
+    isAoE: !!opts.isAoE,
+    selfMaxHp: Number.isFinite(target?.hpMax) ? target.hpMax : undefined,
+    damageTaken: dealt
   });
   finishFuryHit(target);
   finishFuryHit(attacker);
@@ -223,11 +227,14 @@ const dealt = Math.max(0, Math.min(dmg, abs.remain || 0));
     type: 'basic',
     dealt,
     isKill,
-    targetsHit: 1
+    targetsHit: 1,
+    targetMaxHp: Number.isFinite(tgt?.hpMax) ? tgt.hpMax : undefined
   });
   gainFury(tgt, {
     type: 'damageTaken',
-    dealt
+    dealt,
+    selfMaxHp: Number.isFinite(tgt?.hpMax) ? tgt.hpMax : undefined,
+    damageTaken: dealt
   });
   finishFuryHit(tgt);
   finishFuryHit(unit);
