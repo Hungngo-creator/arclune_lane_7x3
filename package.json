@@ -6,8 +6,8 @@
     "build": "npm run build:prod",
     "build:dev": "node tools/generate-loithienanh-svg.mjs && node build.mjs --mode=development",
     "build:prod": "node tools/generate-loithienanh-svg.mjs && node build.mjs --mode=production",
-    "dev": "APP_ENTRY=${APP_ENTRY:-src/main.ts} tsx watch $APP_ENTRY",
-    "start": "NODE_ENV=${NODE_ENV:-production} APP_ENTRY=${APP_ENTRY:-src/main.ts} tsx $APP_ENTRY",
+    "dev": "APP_ENTRY=${APP_ENTRY:-src/main.js} tsx watch $APP_ENTRY",
+    "start": "NODE_ENV=${NODE_ENV:-production} APP_ENTRY=${APP_ENTRY:-src/main.js} tsx $APP_ENTRY",
     "test": "jest --runInBand",
     "typecheck": "tsc --noEmit"
   },
