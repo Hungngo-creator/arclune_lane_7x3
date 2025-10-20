@@ -15,12 +15,20 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@core/*": ["src/core/*"],
+      "@core/*": ["src/core/*", "src/*"],
       "@combat/*": ["src/combat/*"],
       "@data/*": ["src/data/*"],
       "@utils/*": ["src/utils/*"],
       "@screens/*": ["src/screens/*"],
-      "@modes/*": ["src/modes/*"]
+      "@modes/*": ["src/modes/*"],
+      "@app/*": ["src/app/*"],
+      "@ui/*": [
+        "src/ui/*",
+        "src/scene/*",
+        "src/background/*",
+        "src/vfx/*",
+        "src/art/*"
+      ]
     }
   },
   "include": ["src/**/*", "types/**/*"]
