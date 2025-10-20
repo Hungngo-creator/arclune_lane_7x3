@@ -21,7 +21,8 @@ async function loadTurnsHarness(overrides = {}){
     ["import { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } from './passives.js';", "const { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } = __deps['./passives.js'];"],
     ["import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } from './events.js';", "const { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } = __deps['./events.js'];"],
     ["import { safeNow } from './utils/time.js';", "const { safeNow } = __deps['./utils/time.js'];"],
-    ["import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } from './utils/fury.js';", "const { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } = __deps['./utils/fury.js'];"]
+    ["import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } from './utils/fury.js';", "const { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } = __deps['./utils/fury.js'];"],
+    ["import { nextTurnInterleaved } from './turns/interleaved.js';", "const { nextTurnInterleaved } = __deps['./turns/interleaved.js'];"]
   ]);
 
   for (const [needle, replacement] of replacements.entries()){
@@ -104,6 +105,30 @@ async function loadTurnsHarness(overrides = {}){
   };
 
   const deps = { ...defaultDeps, ...overrides };
+  deps['../engine.js'] = deps['../engine.js'] || deps['./engine.js'];
+  deps['../statuses.js'] = deps['../statuses.js'] || deps['./statuses.js'];
+
+  const interleavedPath = path.resolve(here, '../src/turns/interleaved.js');
+  let interleavedCode = await fs.readFile(interleavedPath, 'utf8');
+  const interleavedReplacements = new Map([
+    ["import { slotIndex } from '../engine.js';", "const { slotIndex } = __deps['../engine.js'];"],
+    ["import { Statuses } from '../statuses.js';", "const { Statuses } = __deps['../statuses.js'];"]
+  ]);
+  for (const [needle, replacement] of interleavedReplacements.entries()){
+    interleavedCode = interleavedCode.replace(needle, replacement);
+  }
+  interleavedCode = interleavedCode.replace(/export function /g, 'function ');
+  interleavedCode += '\nmodule.exports = { findNextOccupiedPos, nextTurnInterleaved };\n';
+  const interleavedContext = {
+    module: { exports: {} },
+    exports: {},
+    __deps: deps
+  };
+  vm.createContext(interleavedContext);
+  const interleavedScript = new vm.Script(interleavedCode, { filename: 'turns/interleaved.js' });
+  interleavedScript.runInContext(interleavedContext);
+  deps['./turns/interleaved.js'] = interleavedContext.module.exports;
+  deps['../turns/interleaved.js'] = interleavedContext.module.exports;
   const context = {
     module: { exports: {} },
     exports: {},
@@ -450,4 +475,235 @@ test('turn regen restores hp and ae each turn without exceeding max', async () =
       { hp: 100, ae: 40 }
     ]
   );
+});
+
+test('interleaved mode alternates positions across sides', async () => {
+  const harness = await loadTurnsHarness();
+  const { stepTurn, deps } = harness;
+  const slotToCell = deps['./engine.js'].slotToCell;
+
+  const allyFront = { id: 'allyFront', side: 'ally', alive: true, ...slotToCell('ally', 1) };
+  const allyBack = { id: 'allyBack', side: 'ally', alive: true, ...slotToCell('ally', 3) };
+  const enemyFront = { id: 'enemyFront', side: 'enemy', alive: true, ...slotToCell('enemy', 1) };
+  const enemyBack = { id: 'enemyBack', side: 'enemy', alive: true, ...slotToCell('enemy', 2) };
+
+  const Game = {
+    tokens: [allyFront, allyBack, enemyFront, enemyBack],
+    meta: new Map(),
+    queued: { ally: new Map(), enemy: new Map() },
+    turn: {
+      mode: 'interleaved_by_position',
+      nextSide: 'ALLY',
+      lastPos: { ALLY: 0, ENEMY: 0 },
+      wrapCount: { ALLY: 0, ENEMY: 0 },
+      turnCount: 0,
+      slotCount: 9,
+      cycle: 0,
+      busyUntil: 0
+    }
+  };
+
+  const actions = [];
+  const hooks = {
+    doActionOrSkip(_, unit){ actions.push(unit?.id ?? null); },
+    processActionChain(){ return null; }
+  };
+
+  for (let i = 0; i < 4; i += 1){
+    stepTurn(Game, hooks);
+  }
+
+  assert.deepStrictEqual(actions, ['allyFront', 'enemyFront', 'allyBack', 'enemyBack']);
+  assert.strictEqual(Game.turn.turnCount, 4);
+  assert.strictEqual(Game.turn.lastPos.ALLY, 3);
+  assert.strictEqual(Game.turn.lastPos.ENEMY, 2);
+});
+
+test('interleaved mode skips empty enemy side without stalling', async () => {
+  const harness = await loadTurnsHarness();
+  const { stepTurn, deps } = harness;
+  const slotToCell = deps['./engine.js'].slotToCell;
+
+  const allySolo = { id: 'allySolo', side: 'ally', alive: true, ...slotToCell('ally', 2) };
+
+  const Game = {
+    tokens: [allySolo],
+    meta: new Map(),
+    queued: { ally: new Map(), enemy: new Map() },
+    turn: {
+      mode: 'interleaved_by_position',
+      nextSide: 'ALLY',
+      lastPos: { ALLY: 0, ENEMY: 0 },
+      wrapCount: { ALLY: 0, ENEMY: 0 },
+      turnCount: 0,
+      slotCount: 9,
+      cycle: 0,
+      busyUntil: 0
+    }
+  };
+
+  const actions = [];
+  const hooks = {
+    doActionOrSkip(_, unit){ actions.push(unit?.id ?? null); },
+    processActionChain(){ return null; }
+  };
+
+  for (let i = 0; i < 3; i += 1){
+    stepTurn(Game, hooks);
+  }
+
+  assert.deepStrictEqual(actions, ['allySolo', 'allySolo', 'allySolo']);
+  assert(Game.turn.cycle >= 1);
+  assert.strictEqual(Game.turn.wrapCount.ALLY > 0, true);
+});
+
+test('summoned unit waits until next interleaved pass before acting', async () => {
+  const harness = await loadTurnsHarness();
+  const { stepTurn, deps } = harness;
+  const slotToCell = deps['./engine.js'].slotToCell;
+
+  const enemySlot = 2;
+  const enemyCell = slotToCell('enemy', enemySlot);
+
+  const Game = {
+    tokens: [],
+    meta: new Map([[ 'enemySummon', { kit: {} } ]]),
+    queued: { ally: new Map(), enemy: new Map() },
+    turn: {
+      mode: 'interleaved_by_position',
+      nextSide: 'ENEMY',
+      lastPos: { ALLY: 0, ENEMY: 0 },
+      wrapCount: { ALLY: 0, ENEMY: 0 },
+      turnCount: 0,
+      slotCount: 9,
+      cycle: 0,
+      busyUntil: 0
+    }
+  };
+
+  Game.queued.enemy.set(enemySlot, {
+    unitId: 'enemySummon',
+    name: 'Summoned',
+    side: 'enemy',
+    cx: enemyCell.cx,
+    cy: enemyCell.cy,
+    slot: enemySlot,
+    spawnCycle: 0,
+    source: 'deck'
+  });
+
+  const actions = [];
+  const ultCalls = [];
+  const hooks = {
+    doActionOrSkip(_, unit){ actions.push(unit?.id ?? null); },
+    processActionChain(){ return null; },
+    performUlt(unit){ ultCalls.push(unit?.id ?? null); }
+  };
+
+  stepTurn(Game, hooks);
+  assert.strictEqual(actions.length, 0);
+  assert.strictEqual(Game.tokens.length, 1);
+  assert.strictEqual(Game.queued.enemy.has(enemySlot), false);
+  assert.deepStrictEqual(ultCalls, ['enemySummon']);
+
+  stepTurn(Game, hooks);
+  assert.deepStrictEqual(actions, ['enemySummon']);
+  assert.strictEqual(Game.turn.lastPos.ENEMY, enemySlot);
+});
+
+test('stunned units are skipped by interleaved scan', async () => {
+  const harness = await loadTurnsHarness();
+  const { stepTurn, deps } = harness;
+  const slotToCell = deps['./engine.js'].slotToCell;
+
+  const stunnedIds = new Set(['enemyStun']);
+  deps['./statuses.js'].Statuses.canAct = (unit) => !stunnedIds.has(unit?.id);
+  deps['../statuses.js'].Statuses = deps['./statuses.js'].Statuses;
+
+  const allyUnit = { id: 'allyUnit', side: 'ally', alive: true, ...slotToCell('ally', 1) };
+  const enemyStun = { id: 'enemyStun', side: 'enemy', alive: true, ...slotToCell('enemy', 1) };
+  const enemyReady = { id: 'enemyReady', side: 'enemy', alive: true, ...slotToCell('enemy', 2) };
+
+  const Game = {
+    tokens: [allyUnit, enemyStun, enemyReady],
+    meta: new Map(),
+    queued: { ally: new Map(), enemy: new Map() },
+    turn: {
+      mode: 'interleaved_by_position',
+      nextSide: 'ALLY',
+      lastPos: { ALLY: 0, ENEMY: 0 },
+      wrapCount: { ALLY: 0, ENEMY: 0 },
+      turnCount: 0,
+      slotCount: 9,
+      cycle: 0,
+      busyUntil: 0
+    }
+  };
+
+  const actions = [];
+  const hooks = {
+    doActionOrSkip(_, unit){ actions.push(unit?.id ?? null); },
+    processActionChain(){ return null; }
+  };
+
+  for (let i = 0; i < 4; i += 1){
+    stepTurn(Game, hooks);
+  }
+
+  assert(actions.includes('enemyReady'));
+  assert.strictEqual(actions.includes('enemyStun'), false);
+});
+
+test('queued spawn is processed even when existing units cannot act', async () => {
+  const harness = await loadTurnsHarness();
+  const { stepTurn, deps } = harness;
+  const slotToCell = deps['./engine.js'].slotToCell;
+
+  const stunnedIds = new Set(['enemySleep']);
+  deps['./statuses.js'].Statuses.canAct = (unit) => !stunnedIds.has(unit?.id);
+  deps['../statuses.js'].Statuses = deps['./statuses.js'].Statuses;
+
+  const enemySleep = { id: 'enemySleep', side: 'enemy', alive: true, ...slotToCell('enemy', 1) };
+  const enemySlot = 3;
+  const enemyCell = slotToCell('enemy', enemySlot);
+
+  const Game = {
+    tokens: [enemySleep],
+    meta: new Map([[ 'enemyFresh', { kit: {} } ]]),
+    queued: { ally: new Map(), enemy: new Map() },
+    turn: {
+      mode: 'interleaved_by_position',
+      nextSide: 'ENEMY',
+      lastPos: { ALLY: 0, ENEMY: 0 },
+      wrapCount: { ALLY: 0, ENEMY: 0 },
+      turnCount: 0,
+      slotCount: 9,
+      cycle: 0,
+      busyUntil: 0
+    }
+  };
+
+  Game.queued.enemy.set(enemySlot, {
+    unitId: 'enemyFresh',
+    name: 'Fresh',
+    side: 'enemy',
+    cx: enemyCell.cx,
+    cy: enemyCell.cy,
+    slot: enemySlot,
+    spawnCycle: 0
+  });
+
+  const actions = [];
+  const hooks = {
+    doActionOrSkip(_, unit){ actions.push(unit?.id ?? null); },
+    processActionChain(){ return null; }
+  };
+
+  stepTurn(Game, hooks);
+  assert.strictEqual(actions.length, 0);
+  assert.strictEqual(Game.tokens.length, 2);
+  assert.strictEqual(Game.turn.lastPos.ENEMY, enemySlot);
+
+  stepTurn(Game, hooks);
+  assert.deepStrictEqual(actions, ['enemyFresh']);
 });
