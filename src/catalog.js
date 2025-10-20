@@ -1,10 +1,15 @@
-//v0.7
+// @ts-check
+//v0.8
 // 1) Rank multiplier (đơn giản) — áp lên TẤT CẢ stat trừ SPD
 import { kitSupportsSummon } from './utils/kit.js';
+
+/** @typedef {import('../types/game-entities').CatalogStatBlock} CatalogStatBlock */
+/** @typedef {import('../types/game-entities').RosterUnitDefinition} RosterUnitDefinition */
+
 export const RANK_MULT = { N:0.80, R:0.90, SR:1.05, SSR:1.25, UR:1.50, Prime:1.80 };
 
 // 2) Class base (mốc lv1 để test). SPD không chịu rank multiplier.
-export const CLASS_BASE = {
+export const CLASS_BASE = /** @satisfies Readonly<Record<string, CatalogStatBlock>> */ ({
   Mage:     { HP:360, ATK:28, WIL:30, ARM:0.08, RES:0.12, AGI:10, PER:12, SPD:1.00, AEmax:110, AEregen: 8.0, HPregen:14 },
   Tanker:   { HP:500, ATK:22, WIL:20, ARM:0.18, RES:0.14, AGI: 9, PER:10, SPD:0.95, AEmax: 60, AEregen: 4.0, HPregen:22 },
   Ranger:   { HP:360, ATK:35, WIL:16, ARM:0.08, RES:0.08, AGI:12, PER:14, SPD:1.20, AEmax: 75, AEregen: 7.0, HPregen:12 },
@@ -12,9 +17,15 @@ export const CLASS_BASE = {
   Summoner: { HP:330, ATK:22, WIL:26, ARM:0.08, RES:0.14, AGI:10, PER:10, SPD:1.05, AEmax: 90, AEregen: 8.5, HPregen:18 },
   Support:  { HP:380, ATK:24, WIL:24, ARM:0.10, RES:0.13, AGI:10, PER:11, SPD:1.00, AEmax:100, AEregen: 7.5, HPregen:20 },
   Assassin: { HP:320, ATK:36, WIL:16, ARM:0.06, RES:0.08, AGI:14, PER:16, SPD:1.25, AEmax: 65, AEregen: 6.0, HPregen:10 }
-};
+});
 
 // 3) Helper: áp rank & mod (mods không áp vào SPD)
+/**
+ * @param {CatalogStatBlock} base
+ * @param {keyof typeof RANK_MULT} rank
+ * @param {Partial<Record<keyof CatalogStatBlock, number>>} [mods]
+ * @returns {CatalogStatBlock}
+ */
 export function applyRankAndMods(base, rank, mods = {}){
   const m = RANK_MULT[rank] ?? 1;
   const out = { ...base };
@@ -33,7 +44,7 @@ export function applyRankAndMods(base, rank, mods = {}){
 // 4) Roster (dex/meta) — 8 nhân vật, ngân sách mod bằng nhau (~+20% tổng, không đụng SPD)
 //  - onSpawn.rage: 100 cho mọi unit từ deck (trừ leader). Revive không áp quy tắc này.
 //  - kit.traits.summon / kit.ult.summon đánh dấu Summoner -> kích hoạt Immediate Summon (action-chain).
-export const ROSTER = [
+export const ROSTER = /** @satisfies ReadonlyArray<RosterUnitDefinition> */ ([
   {
     id: 'phe', name: 'Phệ', class: 'Mage', rank: 'Prime',
     mods: { WIL:+0.10, AEregen:+0.10 }, // 20% tổng
@@ -304,7 +315,7 @@ basic: {
       ]
     }
   }
-];
+]);
 
 // 5) Map & helper tra cứu
 export const ROSTER_MAP = new Map(ROSTER.map(x => [x.id, x]));
