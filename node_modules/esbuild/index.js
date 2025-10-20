@@ -1,0 +1,8 @@
+function transform(code){
+  if (typeof code !== 'string'){
+    throw new TypeError('esbuild stub transform expects code string');
+  }
+  return Promise.resolve({ code, map: null, warnings: [] });
+}
+
+ module.exports = { transform };
