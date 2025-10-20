@@ -18,7 +18,14 @@ const ENTRY_ID = './entry.js';
 const SOURCE_EXTENSIONS = ['.js', '.ts', '.tsx', '.json'];
 const SCRIPT_EXTENSIONS = new Set(['.js', '.ts', '.tsx']);
 
-const MODE = process.env.NODE_ENV === 'production' ? 'production' : 'development';
+const args = process.argv.slice(2);
+const modeArg = args.find((arg) => arg.startsWith('--mode='));
+const argMode = modeArg ? modeArg.split('=')[1] : undefined;
+const normalizedMode = argMode && argMode.toLowerCase() === 'production' ? 'production' : argMode && argMode.toLowerCase() === 'development' ? 'development' : undefined;
+if (normalizedMode) {
+  process.env.NODE_ENV = normalizedMode;
+}
+const MODE = (normalizedMode ?? process.env.NODE_ENV) === 'production' ? 'production' : 'development';
 const ESBUILD_BASE_OPTIONS = {
   format: 'esm',
   target: ['es2023'],
