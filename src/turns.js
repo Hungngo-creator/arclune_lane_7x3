@@ -263,6 +263,7 @@ export function doActionOrSkip(Game, unit, { performUlt, turnContext } = {}){
 export function stepTurn(Game, hooks){
   const turn = Game?.turn;
   if (!turn) return;
+  if (Game?.battle?.over) return;
 
   if (turn.mode === 'interleaved_by_position'){
     let selection = nextTurnInterleaved(Game);
@@ -337,6 +338,15 @@ export function stepTurn(Game, hooks){
     }
 
     tickMinionTTL(Game, entry.side);
+    const ended = hooks.checkBattleEnd?.(Game, {
+      trigger: 'interleaved',
+      side: entry.side,
+      slot: entry.slot,
+      unit: active,
+      cycle,
+      timestamp: safeNow()
+    });
+    if (ended) return;
     return;
   }
 
@@ -410,6 +420,16 @@ export function stepTurn(Game, hooks){
     }
 
     tickMinionTTL(Game, entry.side);
+
+    const ended = hooks.checkBattleEnd?.(Game, {
+      trigger: 'sequential',
+      side: entry.side,
+      slot: entry.slot,
+      unit: active,
+      cycle,
+      timestamp: safeNow()
+    });
+    if (ended) return;
 
     advanceCursor();
     return;

@@ -1,6 +1,6 @@
 import { createPveSession } from './modes/pve/session.js';
 import { ensureNestedModuleSupport } from './utils/dummy.js';
-export { gameEvents, emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } from './events.js';
+export { gameEvents, emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN, BATTLE_END } from './events.js';
 
 let currentSession = null;
 
