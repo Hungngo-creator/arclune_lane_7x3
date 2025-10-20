@@ -5877,6 +5877,33 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
       ? enemyPreset.deck
       : (Array.isArray(enemyPreset.unitsAll) && enemyPreset.unitsAll.length ? enemyPreset.unitsAll : UNITS);
 
+  const requestedTurnMode = options.turnMode
+      ?? options.turn?.mode
+      ?? options.turnOrderMode
+      ?? options.turnOrder?.mode
+      ?? CFG?.turnOrder?.mode;
+    const useInterleaved = requestedTurnMode === 'interleaved_by_position';
+    const allyCols = Number.isFinite(CFG?.ALLY_COLS) ? Math.max(1, Math.floor(CFG.ALLY_COLS)) : 3;
+    const gridRows = Number.isFinite(CFG?.GRID_ROWS) ? Math.max(1, Math.floor(CFG.GRID_ROWS)) : 3;
+    const slotsPerSide = Math.max(1, allyCols * gridRows);
+
+    const buildTurnState = () => {
+      if (useInterleaved){
+        return {
+          mode: 'interleaved_by_position',
+          nextSide: 'ALLY',
+          lastPos: { ALLY: 0, ENEMY: 0 },
+          wrapCount: { ALLY: 0, ENEMY: 0 },
+          turnCount: 0,
+          slotCount: slotsPerSide,
+          cycle: 0,
+          busyUntil: 0
+        };
+      }
+      const { order, indexMap } = buildTurnOrder();
+      return { order, orderIndex: indexMap, cursor: 0, cycle: 0, busyUntil: 0 };
+    };
+
     const game = {
       modeKey,
       grid: null,
@@ -5892,10 +5919,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
       deck3: [],                    // mảng 3 unit
       selectedId: null,
       ui: { bar: null },
-      turn: (()=>{
-        const { order, indexMap } = buildTurnOrder();
-        return { order, orderIndex: indexMap, cursor: 0, cycle: 0, busyUntil: 0 };
-      })(),
+      turn: buildTurnState(),
       queued: { ally: new Map(), enemy: new Map() },
       actionChain: [],
       events: gameEvents,
@@ -13117,6 +13141,68 @@ __define('./turns.js', (exports, module, __require) => {
   // hooks = { performUlt, processActionChain, allocIid, doActionOrSkip }
   function stepTurn(Game, hooks){
     const turn = Game?.turn;
+    if (!turn) return;
+
+    if (turn.mode === 'interleaved_by_position'){
+      const selection = nextTurnInterleaved(Game);
+      if (!selection) return;
+
+      const entry = { side: selection.side, slot: selection.pos };
+      const { actor, spawned } = spawnQueuedIfDue(Game, entry, hooks);
+      let active = null;
+      if (actor && actor.alive){
+        active = actor;
+      } else if (selection.unit && selection.unit.alive){
+        active = selection.unit;
+      } else {
+        active = getActiveAt(Game, entry.side, entry.slot);
+      }
+
+      if (spawned && actor && actor.alive){
+        return;
+      }
+
+      if (!active || !active.alive){
+        return;
+      }
+
+      const cycle = Number.isFinite(Game?.turn?.cycle) ? Game.turn.cycle : 0;
+      const turnContext = {
+        side: entry.side,
+        slot: entry.slot,
+        orderIndex: -1,
+        orderLength: null,
+        cycle
+      };
+
+      const turnDetail = {
+        game: Game,
+        side: entry.side,
+        slot: entry.slot,
+        unit: active,
+        cycle,
+        phase: entry.side,
+        orderIndex: -1,
+        orderLength: null,
+        spawned: !!spawned,
+        processedChain: null
+      };
+
+      emitGameEvent(TURN_START, turnDetail);
+
+      try {
+        hooks.doActionOrSkip?.(Game, active, { performUlt: hooks.performUlt, turnContext });
+        const chainHooks = { ...hooks, getTurnOrderIndex };
+        const processed = hooks.processActionChain?.(Game, entry.side, entry.slot, chainHooks);
+        turnDetail.processedChain = processed ?? null;
+      } finally {
+        emitGameEvent(TURN_END, turnDetail);
+      }
+
+      tickMinionTTL(Game, entry.side);
+      return;
+    }
+
     const order = Array.isArray(turn?.order) ? turn.order : [];
     if (!order.length) return;
 
@@ -13150,15 +13236,15 @@ __define('./turns.js', (exports, module, __require) => {
       };
 
     const { actor, spawned } = spawnQueuedIfDue(Game, entry, hooks);
+      if (spawned && actor && actor.alive){
+        advanceCursor();
+        return;
+      }
+
       const active = actor && actor.alive ? actor : getActiveAt(Game, entry.side, entry.slot);
       const hasActive = !!(active && active.alive);
 
       if (!hasActive){
-        if (!spawned){
-          advanceCursor();
-          continue;
-        }
-        // fallback: spawned flag without a living unit, skip silently but preserve rotation
         advanceCursor();
         continue;
       }
@@ -13167,7 +13253,7 @@ __define('./turns.js', (exports, module, __require) => {
         game: Game,
         side: entry.side,
         slot: entry.slot,
-        unit: active || null,
+        unit: active,
         cycle,
         phase: entry.side,
         orderIndex: cursor,
@@ -13178,9 +13264,8 @@ __define('./turns.js', (exports, module, __require) => {
       emitGameEvent(TURN_START, turnDetail);
 
       try {
-        hooks.doActionOrSkip?.(Game, active || null, { performUlt: hooks.performUlt, turnContext });
-
-    const chainHooks = { ...hooks, getTurnOrderIndex };
+        hooks.doActionOrSkip?.(Game, active, { performUlt: hooks.performUlt, turnContext });
+        const chainHooks = { ...hooks, getTurnOrderIndex };
         const processed = hooks.processActionChain?.(Game, entry.side, entry.slot, chainHooks);
         turnDetail.processedChain = processed ?? null;
       } finally {
@@ -13189,9 +13274,9 @@ __define('./turns.js', (exports, module, __require) => {
 
       tickMinionTTL(Game, entry.side);
 
-    advanceCursor();
+      advanceCursor();
       return;
-     }
+    }
   }
   exports.getActiveAt = getActiveAt;
   exports.getTurnOrderIndex = getTurnOrderIndex;
@@ -13200,6 +13285,159 @@ __define('./turns.js', (exports, module, __require) => {
   exports.tickMinionTTL = tickMinionTTL;
   exports.doActionOrSkip = doActionOrSkip;
   exports.stepTurn = stepTurn;
+});
+__define('./turns/interleaved.js', (exports, module, __require) => {
+  // v0.7.7 interleaved helpers
+  const __dep0 = __require('./engine.js');
+  const slotIndex = __dep0.slotIndex;
+  const __dep1 = __require('./statuses.js');
+  const Statuses = __dep1.Statuses;
+
+  const SIDE_TO_LOWER = { ALLY: 'ally', ENEMY: 'enemy' };
+  const LOWER_TO_UPPER = { ally: 'ALLY', enemy: 'ENEMY' };
+  const DEFAULT_LAST_POS = { ALLY: 0, ENEMY: 0 };
+  const DEFAULT_WRAP_COUNT = { ALLY: 0, ENEMY: 0 };
+  const SLOT_CAP = 9;
+
+  function normalizeSide(side){
+    if (side === 'ENEMY') return 'ENEMY';
+    if (side === 'ALLY') return 'ALLY';
+    return LOWER_TO_UPPER[side] || 'ALLY';
+  }
+
+  function resolveSlotCount(turn){
+    const raw = Number.isFinite(turn?.slotCount) ? turn.slotCount : null;
+    if (Number.isFinite(raw) && raw > 0){
+      return Math.max(1, Math.min(SLOT_CAP, Math.floor(raw)));
+    }
+    return SLOT_CAP;
+  }
+
+  function ensureTurnState(turn){
+    if (!turn.lastPos || typeof turn.lastPos !== 'object'){
+      turn.lastPos = { ...DEFAULT_LAST_POS };
+    } else {
+      turn.lastPos.ALLY = Number.isFinite(turn.lastPos.ALLY) ? turn.lastPos.ALLY : 0;
+      turn.lastPos.ENEMY = Number.isFinite(turn.lastPos.ENEMY) ? turn.lastPos.ENEMY : 0;
+    }
+    if (!turn.wrapCount || typeof turn.wrapCount !== 'object'){
+      turn.wrapCount = { ...DEFAULT_WRAP_COUNT };
+    } else {
+      turn.wrapCount.ALLY = Number.isFinite(turn.wrapCount.ALLY) ? turn.wrapCount.ALLY : 0;
+      turn.wrapCount.ENEMY = Number.isFinite(turn.wrapCount.ENEMY) ? turn.wrapCount.ENEMY : 0;
+    }
+    if (!Number.isFinite(turn.turnCount)){
+      turn.turnCount = 0;
+    }
+  }
+
+  function buildSlotMap(tokens, sideLower){
+    const map = new Map();
+    if (!Array.isArray(tokens)) return map;
+    for (const unit of tokens){
+      if (!unit || !unit.alive) continue;
+      if (unit.side !== sideLower) continue;
+      const slot = slotIndex(sideLower, unit.cx, unit.cy);
+      if (!Number.isFinite(slot)) continue;
+      if (!map.has(slot)){
+        map.set(slot, unit);
+      }
+    }
+    return map;
+  }
+
+  function isQueueDue(state, sideLower, slot){
+    const queued = state?.queued?.[sideLower];
+    if (!queued || typeof queued.get !== 'function') return false;
+    const entry = queued.get(slot);
+    if (!entry) return false;
+    const cycle = Number.isFinite(state?.turn?.cycle) ? state.turn.cycle : 0;
+    return (entry.spawnCycle ?? 0) <= cycle;
+  }
+
+  function makeWrappedFlag(start, pos){
+    if (!Number.isFinite(start) || start <= 0) return false;
+    return pos <= start;
+  }
+
+  function findNextOccupiedPos(state, side, startPos = 0){
+    const turn = state?.turn || {};
+    const sideKey = normalizeSide(side);
+    const sideLower = SIDE_TO_LOWER[sideKey];
+    if (!sideLower) return null;
+
+    const slotCount = resolveSlotCount(turn);
+    const start = Number.isFinite(startPos) ? Math.max(0, Math.min(slotCount, Math.floor(startPos))) : 0;
+    const unitsBySlot = buildSlotMap(state?.tokens, sideLower);
+
+    for (let offset = 1; offset <= slotCount; offset += 1){
+      const pos = ((start + offset - 1) % slotCount) + 1;
+      const wrapped = makeWrappedFlag(start, pos);
+      const unit = unitsBySlot.get(pos) || null;
+      if (unit && unit.alive && Statuses.canAct(unit)){
+        return { pos, unit, wrapped, queued: isQueueDue(state, sideLower, pos) };
+      }
+      if (isQueueDue(state, sideLower, pos)){
+        return { pos, unit: null, wrapped, queued: true };
+      }
+    }
+
+    return null;
+  }
+
+  function nextTurnInterleaved(state){
+    const turn = state?.turn;
+    if (!state || !turn) return null;
+
+    ensureTurnState(turn);
+    const slotCount = resolveSlotCount(turn);
+    if (slotCount <= 0) return null;
+
+    const pickSide = (sideKey) => {
+      const last = Number.isFinite(turn.lastPos?.[sideKey]) ? turn.lastPos[sideKey] : 0;
+      const found = findNextOccupiedPos(state, sideKey, last);
+      if (!found) return null;
+      turn.lastPos[sideKey] = found.pos;
+      if (found.wrapped){
+        turn.wrapCount[sideKey] = (turn.wrapCount[sideKey] ?? 0) + 1;
+      }
+      const sideLower = SIDE_TO_LOWER[sideKey];
+      return {
+        side: sideLower,
+        pos: found.pos,
+        unit: found.unit || null,
+        unitId: found.unit?.id ?? null,
+        queued: !!found.queued,
+        wrapped: !!found.wrapped,
+        sideKey
+      };
+    };
+
+    const primarySide = normalizeSide(turn.nextSide);
+    const fallbackSide = primarySide === 'ALLY' ? 'ENEMY' : 'ALLY';
+
+    let selection = pickSide(primarySide);
+    if (!selection){
+      selection = pickSide(fallbackSide);
+      if (!selection){
+        turn.nextSide = fallbackSide;
+        return null;
+      }
+    }
+
+    turn.nextSide = selection.sideKey === 'ALLY' ? 'ENEMY' : 'ALLY';
+    turn.turnCount += 1;
+    const allyWrap = turn.wrapCount.ALLY ?? 0;
+    const enemyWrap = turn.wrapCount.ENEMY ?? 0;
+    const maxWrap = Math.max(allyWrap, enemyWrap);
+    if (!Number.isFinite(turn.cycle) || turn.cycle < maxWrap){
+      turn.cycle = maxWrap;
+    }
+
+    return selection;
+  }
+  exports.findNextOccupiedPos = findNextOccupiedPos;
+  exports.nextTurnInterleaved = nextTurnInterleaved;
 });
 __define('./ui.js', (exports, module, __require) => {
   //v0.7.1
