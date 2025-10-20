@@ -1,5 +1,15 @@
+// @ts-check
 import { ROSTER } from '../catalog.js';
 
+/** @typedef {import('../../types/game-entities').UnitId} UnitId */
+/** @typedef {import('../../types/game-entities').SkillSection} SkillSection */
+/** @typedef {import('../../types/game-entities').SkillEntry} SkillEntry */
+
+/**
+ * @template T
+ * @param {T} value
+ * @returns {T}
+ */
 function deepFreeze(value){
   if (Array.isArray(value)){
     value.forEach(deepFreeze);
@@ -12,6 +22,10 @@ function deepFreeze(value){
   return value;
 }
 
+/**
+ * @param {SkillSection | string | null | undefined} section
+ * @returns {SkillSection | null}
+ */
 function normalizeSection(section){
   if (!section) return null;
   if (typeof section === 'string'){
@@ -30,6 +44,10 @@ function normalizeSection(section){
   return normalized;
 }
 
+/**
+ * @param {SkillSection | null | undefined} entry
+ * @returns {SkillSection | null}
+ */
 function normalizeSkillEntry(entry){
   if (!entry) return null;
   const normalized = { ...entry };
@@ -48,7 +66,12 @@ function normalizeSkillEntry(entry){
   return normalized;
 }
 
-const rawSkillSets = [
+/**
+ * @typedef {Readonly<{ unitId: UnitId; basic?: SkillSection | string | null; skill?: SkillSection | null; skills?: ReadonlyArray<SkillSection>; ult?: SkillSection | string | null; talent?: SkillSection | string | null; technique?: SkillSection | string | null; notes?: ReadonlyArray<string> | string | null; }>}
+ * RawSkillSet
+ */
+
+const rawSkillSets = /** @satisfies ReadonlyArray<RawSkillSet> */ ([
   {
     unitId: 'phe',
     basic: {
@@ -532,11 +555,11 @@ const rawSkillSets = [
       'Còi Tăng Tốc ưu tiên đồng minh ngẫu nhiên; hiệu ứng có thể trùng lặp với các nguồn tăng tốc khác.'
     ]
   }
-];
+]);
 
-const SKILL_KEYS = ['basic', 'skill', 'skills', 'ult', 'talent', 'technique', 'notes'];
+const SKILL_KEYS = /** @satisfies ReadonlyArray<keyof SkillEntry | 'skill'> */ (['basic', 'skill', 'skills', 'ult', 'talent', 'technique', 'notes']);
 
-const skillSets = rawSkillSets.reduce((acc, entry) => {
+const skillSets = /** @type {Record<string, SkillEntry>} */ (rawSkillSets.reduce((acc, entry) => {
   const skills = Array.isArray(entry.skills) ? entry.skills.map(normalizeSkillEntry) : [];
   const skill = entry.skill ? normalizeSkillEntry(entry.skill) : (skills[0] ?? null);
   const normalized = {
@@ -552,25 +575,40 @@ const skillSets = rawSkillSets.reduce((acc, entry) => {
   deepFreeze(normalized);
   acc[entry.unitId] = normalized;
   return acc;
-}, {});
+}, {}));
 
 deepFreeze(skillSets);
 
 export { skillSets };
 
+/**
+ * @param {UnitId | null | undefined} unitId
+ * @returns {SkillEntry | null}
+ */
 export function getSkillSet(unitId){
   if (!unitId) return null;
   return skillSets[unitId] ?? null;
 }
 
+/** @returns {SkillEntry[]} */
 export function listSkillSets(){
-  return ROSTER.map(unit => skillSets[unit.id]).filter(Boolean);
+  return ROSTER
+    .map(unit => skillSets[unit.id])
+    .filter((entry): entry is SkillEntry => Boolean(entry));
 }
 
+/**
+ * @param {UnitId | null | undefined} unitId
+ * @returns {boolean}
+ */
 export function hasSkillSet(unitId){
   return unitId != null && Object.prototype.hasOwnProperty.call(skillSets, unitId);
 }
 
+/**
+ * @param {unknown} entry
+ * @returns {boolean}
+ */
 export function validateSkillSetStructure(entry){
   if (!entry || typeof entry !== 'object') return false;
   for (const key of SKILL_KEYS){

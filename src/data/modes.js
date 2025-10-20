@@ -1,10 +1,23 @@
+// @ts-check
 import { getLotterySplit, getPityConfig, getShopTaxRate } from './economy.js';
 
+/** @typedef {import('../../types/game-entities').ModeConfig} ModeConfig */
+/** @typedef {import('../../types/game-entities').ModeGroup} ModeGroup */
+/** @typedef {import('../../types/game-entities').MenuSectionDefinition} MenuSectionDefinition */
+/** @typedef {import('../../types/game-entities').PityConfiguration} PityConfiguration */
+/** @typedef {import('../../types/game-entities').LotterySplit} LotterySplit */
+
+/** @type {PityConfiguration | null} */
 const SSR_PITY = getPityConfig('SSR');
+/** @type {PityConfiguration | null} */
 const UR_PITY = getPityConfig('UR');
+/** @type {PityConfiguration | null} */
 const PRIME_PITY = getPityConfig('PRIME');
+/** @type {LotterySplit} */
 const LOTTERY_SPLIT = getLotterySplit();
+/** @type {number | null} */
 const BASE_TAX_RATE = getShopTaxRate('N');
+/** @type {number | null} */
 const TOP_TAX_RATE = getShopTaxRate('PRIME');
 
 const MODE_TYPES = Object.freeze({
@@ -19,12 +32,12 @@ const MODE_STATUS = Object.freeze({
   PLANNED: 'planned'
 });
 
-const MENU_SECTION_DEFINITIONS = [
+const MENU_SECTION_DEFINITIONS = /** @satisfies ReadonlyArray<MenuSectionDefinition> */ ([
   { id: 'core-pve', title: 'PvE' },
   { id: 'economy', title: 'Kinh tế & Hạ tầng' }
-];
+]);
 
-const MODE_GROUPS = [
+const MODE_GROUPS = /** @satisfies ReadonlyArray<ModeGroup> */ ([
   {
     id: 'arena-hub',
     title: 'Chiến Trường',
@@ -35,9 +48,9 @@ const MODE_GROUPS = [
     childModeIds: ['arena', 'beast-arena', 'ares', 'challenge', 'campaign'],
     extraClasses: ['mode-card--wide']
   }
-];
+]);
 
-const MODES = [
+const MODES = /** @satisfies ReadonlyArray<ModeConfig> */ ([
   {
     id: 'campaign',
     title: 'Chiến Dịch',
@@ -245,7 +258,7 @@ const MODES = [
       fallbackModuleId: './modes/coming-soon.stub.js'
     }
   }
-];
+]);
 
 const MODE_INDEX = MODES.reduce((acc, mode) => {
   acc[mode.id] = mode;

@@ -1,5 +1,10 @@
+// @ts-check
 import { CURRENCY_IDS, convertCurrency, formatBalance, getLotterySplit } from './economy.js';
 
+/** @typedef {import('../../types/game-entities').AnnouncementEntry} AnnouncementEntry */
+/** @typedef {import('../../types/game-entities').AnnouncementSlot} AnnouncementSlot */
+
+/** @type {import('../../types/game-entities').LotterySplit} */
 const LOTTERY_SPLIT = getLotterySplit();
 const LOTTERY_DEV_PERCENT = Math.round((LOTTERY_SPLIT.devVault || 0) * 100);
 const LOTTERY_PRIZE_PERCENT = Math.round((LOTTERY_SPLIT.prizePool || 0) * 100);
@@ -12,6 +17,10 @@ const TT_CONVERSION_CHAIN = [
   formatBalance(convertCurrency(1, CURRENCY_IDS.TT, CURRENCY_IDS.VNT), CURRENCY_IDS.VNT)
 ].join(' = ');
 
+/**
+ * @param {AnnouncementEntry | null | undefined} entry
+ * @param {Date} now
+ */
 function isEntryActive(entry, now){
   if (!entry) return false;
   if (!entry.startAt && !entry.endAt) return true;
@@ -22,7 +31,7 @@ function isEntryActive(entry, now){
   return true;
 }
 
-export const SIDE_SLOT_ANNOUNCEMENTS = [
+export const SIDE_SLOT_ANNOUNCEMENTS = /** @satisfies ReadonlyArray<AnnouncementSlot> */ ([
   {
     key: 'event',
     label: 'Sự kiện giới hạn',
@@ -117,8 +126,13 @@ export const SIDE_SLOT_ANNOUNCEMENTS = [
       }
     ]
   }
-];
+]);
 
+/**
+ * @param {string} slotKey
+ * @param {{ now?: Date }} [options]
+ * @returns {{ slot: AnnouncementSlot; entry: AnnouncementEntry } | null}
+ */
 export function selectAnnouncementEntry(slotKey, options = {}){
   const now = options.now instanceof Date ? options.now : new Date();
   const slot = SIDE_SLOT_ANNOUNCEMENTS.find(item => item.key === slotKey);
@@ -128,6 +142,10 @@ export function selectAnnouncementEntry(slotKey, options = {}){
   return { slot, entry };
 }
 
+/**
+ * @param {{ now?: Date }} [options]
+ * @returns {Array<{ key: AnnouncementSlot['key']; label: AnnouncementSlot['label']; entry: AnnouncementEntry | null }>}
+ */
 export function getAllSidebarAnnouncements(options = {}){
   const now = options.now instanceof Date ? options.now : new Date();
   return SIDE_SLOT_ANNOUNCEMENTS.map(slot => {

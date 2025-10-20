@@ -1,4 +1,10 @@
+// @ts-check
 import { HAS_INTL_NUMBER_FORMAT, createNumberFormatter } from '../utils/format.js';
+
+/** @typedef {import('../../types/game-entities').CurrencyDefinition} CurrencyDefinition */
+/** @typedef {import('../../types/game-entities').PityConfiguration} PityConfiguration */
+/** @typedef {import('../../types/game-entities').ShopTaxBracket} ShopTaxBracket */
+/** @typedef {import('../../types/game-entities').LotterySplit} LotterySplit */announcements.js
 
 const CURRENCY_IDS = Object.freeze({
   VNT: 'VNT',
@@ -8,7 +14,7 @@ const CURRENCY_IDS = Object.freeze({
   TT: 'TT'
 });
 
-const CURRENCIES = Object.freeze([
+const CURRENCIES = /** @satisfies ReadonlyArray<CurrencyDefinition> */ (Object.freeze([
   {
     id: CURRENCY_IDS.VNT,
     name: 'Vụn Nguyên Tinh',
@@ -49,21 +55,31 @@ const CURRENCIES = Object.freeze([
     ratioToBase: 100000,
     description: 'Đơn vị tối thượng cho các giao dịch Prime và quỹ dự trữ chiến lược.'
   }
-]);
+]));
 
-const CURRENCY_INDEX = CURRENCIES.reduce((acc, currency) => {
+const CURRENCY_INDEX = /** @type {Record<string, CurrencyDefinition>} */ (CURRENCIES.reduce((acc, currency) => {
   acc[currency.id] = currency;
   return acc;
-}, {});
+}, {}));
 
+/**
+ * @param {string} currencyId
+ * @returns {CurrencyDefinition | null}
+ */
 function getCurrency(currencyId){
-  return CURRENCY_INDEX[currencyId] || null;
+  return CURRENCY_INDEX[currencyId] ?? null;
 }
 
+/** @returns {CurrencyDefinition[]} */
 function listCurrencies(){
   return CURRENCIES.slice();
 }
 
+/**
+ * @param {number} value
+ * @param {string} fromId
+ * @param {string} toId
+ */
 function convertCurrency(value, fromId, toId){
   const from = getCurrency(fromId);
   const to = getCurrency(toId);
@@ -139,7 +155,7 @@ function formatBalance(value, currencyId, options = {}){
   return includeSuffix ? `${formatted} ${suffix}` : formatted;
 }
 
-const PITY_CONFIG = Object.freeze({
+const PITY_CONFIG = /** @satisfies Record<string, PityConfiguration> */ (Object.freeze({
   SSR: Object.freeze({
     tier: 'SSR',
     hardPity: 60,
@@ -160,44 +176,58 @@ const PITY_CONFIG = Object.freeze({
       { tier: 'UR', pull: 60 }
     ]
   })
-});
+}));
 
+/**
+ * @param {string} tier
+ * @returns {PityConfiguration | null}
+ */
 function getPityConfig(tier){
-  return PITY_CONFIG[tier] || null;
+  return PITY_CONFIG[tier] ?? null;
 }
 
+/** @returns {string[]} */
 function listPityTiers(){
   return Object.keys(PITY_CONFIG);
 }
 
-const SHOP_TAX_BRACKETS = Object.freeze([
+const SHOP_TAX_BRACKETS = /** @satisfies ReadonlyArray<ShopTaxBracket> */ (Object.freeze([
   { rank: 'N', label: 'Phổ thông (N)', rate: 0.05 },
   { rank: 'R', label: 'Hiếm (R)', rate: 0.08 },
   { rank: 'SR', label: 'Siêu hiếm (SR)', rate: 0.1 },
   { rank: 'SSR', label: 'Cực hiếm (SSR)', rate: 0.12 },
   { rank: 'UR', label: 'Siêu thực (UR)', rate: 0.15 },
   { rank: 'PRIME', label: 'Tối thượng (Prime)', rate: 0.18 }
-]);
+]));
 
-const SHOP_TAX_INDEX = SHOP_TAX_BRACKETS.reduce((acc, bracket) => {
+const SHOP_TAX_INDEX = /** @type {Record<string, ShopTaxBracket>} */ (SHOP_TAX_BRACKETS.reduce((acc, bracket) => {
   acc[bracket.rank] = bracket;
   return acc;
-}, {});
+}, {}));
 
+/**
+ * @param {string} rank
+ * @returns {ShopTaxBracket | null}
+ */
 function getShopTaxBracket(rank){
-  return SHOP_TAX_INDEX[rank] || null;
+  return SHOP_TAX_INDEX[rank] ?? null;
 }
 
+/**
+ * @param {string} rank
+ * @returns {number | null}
+ */
 function getShopTaxRate(rank){
   const bracket = getShopTaxBracket(rank);
   return bracket ? bracket.rate : null;
 }
 
-const LOTTERY_SPLIT = Object.freeze({
+const LOTTERY_SPLIT = /** @type {LotterySplit} */ (Object.freeze({
   devVault: 0.5,
   prizePool: 0.5
-});
+}));
 
+/** @returns {LotterySplit} */
 function getLotterySplit(){
   return LOTTERY_SPLIT;
 }
