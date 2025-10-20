@@ -5,11 +5,13 @@ import { kitSupportsSummon } from './utils/kit.js';
 
 /** @typedef {import('../types/game-entities').CatalogStatBlock} CatalogStatBlock */
 /** @typedef {import('../types/game-entities').RosterUnitDefinition} RosterUnitDefinition */
+/** @typedef {import('../types/game-entities').UnitId} UnitId */
 
 export const RANK_MULT = { N:0.80, R:0.90, SR:1.05, SSR:1.25, UR:1.50, Prime:1.80 };
 
 // 2) Class base (mốc lv1 để test). SPD không chịu rank multiplier.
-export const CLASS_BASE = /** @satisfies Readonly<Record<string, CatalogStatBlock>> */ ({
+/** @type {Readonly<Record<string, CatalogStatBlock>>} */
+export const CLASS_BASE = ({
   Mage:     { HP:360, ATK:28, WIL:30, ARM:0.08, RES:0.12, AGI:10, PER:12, SPD:1.00, AEmax:110, AEregen: 8.0, HPregen:14 },
   Tanker:   { HP:500, ATK:22, WIL:20, ARM:0.18, RES:0.14, AGI: 9, PER:10, SPD:0.95, AEmax: 60, AEregen: 4.0, HPregen:22 },
   Ranger:   { HP:360, ATK:35, WIL:16, ARM:0.08, RES:0.08, AGI:12, PER:14, SPD:1.20, AEmax: 75, AEregen: 7.0, HPregen:12 },
@@ -29,14 +31,16 @@ export const CLASS_BASE = /** @satisfies Readonly<Record<string, CatalogStatBloc
 export function applyRankAndMods(base, rank, mods = {}){
   const m = RANK_MULT[rank] ?? 1;
   const out = { ...base };
-  for (const k of Object.keys(base)){
-    const mod = 1 + (mods[k] || 0);
-    if (k === 'SPD') { // SPD không nhân theo bậc
-      out[k] = Math.round(base[k] * mod * 100) / 100;
+  const keys = /** @type {Array<keyof CatalogStatBlock>} */ (Object.keys(base));
+  for (const key of keys){
+    const baseValue = base[key] ?? 0;
+    const mod = 1 + (mods?.[key] ?? 0);
+    if (key === 'SPD') { // SPD không nhân theo bậc
+      out[key] = Math.round(baseValue * mod * 100) / 100;
       continue;
     }
-    const precision = (k === 'ARM' || k === 'RES') ? 100 : (k === 'AEregen' ? 10 : 1);
-    out[k] = Math.round(base[k] * mod * m * precision) / precision;
+    const precision = (key === 'ARM' || key === 'RES') ? 100 : (key === 'AEregen' ? 10 : 1);
+    out[key] = Math.round(baseValue * mod * m * precision) / precision;
   }
   return out;
 }
@@ -44,7 +48,8 @@ export function applyRankAndMods(base, rank, mods = {}){
 // 4) Roster (dex/meta) — 8 nhân vật, ngân sách mod bằng nhau (~+20% tổng, không đụng SPD)
 //  - onSpawn.rage: 100 cho mọi unit từ deck (trừ leader). Revive không áp quy tắc này.
 //  - kit.traits.summon / kit.ult.summon đánh dấu Summoner -> kích hoạt Immediate Summon (action-chain).
-export const ROSTER = /** @satisfies ReadonlyArray<RosterUnitDefinition> */ ([
+/** @type {ReadonlyArray<RosterUnitDefinition>} */
+export const ROSTER = ([
   {
     id: 'phe', name: 'Phệ', class: 'Mage', rank: 'Prime',
     mods: { WIL:+0.10, AEregen:+0.10 }, // 20% tổng
@@ -318,8 +323,18 @@ basic: {
 ]);
 
 // 5) Map & helper tra cứu
-export const ROSTER_MAP = new Map(ROSTER.map(x => [x.id, x]));
-export const getMetaById = (id) => ROSTER_MAP.get(id);
+export const ROSTER_MAP = new Map(ROSTER.map(entry => [entry.id, entry]));
+
+/**
+ * @param {UnitId | string | null | undefined} id
+ * @returns {RosterUnitDefinition | undefined}
+ */
+export const getMetaById = (id) => (id == null ? undefined : ROSTER_MAP.get(id));
+
+/**
+ * @param {UnitId | string | null | undefined} id
+ * @returns {boolean}
+ */
 export const isSummoner = (id) => {
   const m = getMetaById(id);
   return !!(m && m.class === 'Summoner' && kitSupportsSummon(m));
