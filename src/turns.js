@@ -10,6 +10,7 @@ import { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } from '.
 import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } from './events.js';
 import { safeNow } from './utils/time.js';
 import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } from './utils/fury.js';
+import { nextTurnInterleaved } from './turns/interleaved.js';
 
 // local helper
 const tokensAlive = (Game) => Game.tokens.filter(t => t.alive);
