@@ -1,15 +1,10 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "noEmit": true,
-    "types": ["node"]
+    "noEmit": true
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.js",
+    "src/data/skills.js",
     "types/**/*"
-  ],
-  "references": [
-    { "path": "./tsconfig.build.json" }
   ]
 }
