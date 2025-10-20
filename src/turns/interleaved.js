@@ -106,11 +106,24 @@ export function nextTurnInterleaved(state){
     const last = Number.isFinite(turn.lastPos?.[sideKey]) ? turn.lastPos[sideKey] : 0;
     const found = findNextOccupiedPos(state, sideKey, last);
     if (!found) return null;
+    const sideLower = SIDE_TO_LOWER[sideKey];
+    const isSpawnOnly = !found.unit && found.queued;
+    if (isSpawnOnly){
+      return {
+        side: sideLower,
+        pos: found.pos,
+        unit: null,
+        unitId: null,
+        queued: true,
+        wrapped: !!found.wrapped,
+        sideKey,
+        spawnOnly: true
+      };
+    }
     turn.lastPos[sideKey] = found.pos;
     if (found.wrapped){
       turn.wrapCount[sideKey] = (turn.wrapCount[sideKey] ?? 0) + 1;
     }
-    const sideLower = SIDE_TO_LOWER[sideKey];
     return {
       side: sideLower,
       pos: found.pos,
@@ -118,7 +131,8 @@ export function nextTurnInterleaved(state){
       unitId: found.unit?.id ?? null,
       queued: !!found.queued,
       wrapped: !!found.wrapped,
-      sideKey
+      sideKey,
+      spawnOnly: false
     };
   };
 
@@ -134,6 +148,10 @@ export function nextTurnInterleaved(state){
     }
   }
 
+  if (selection.spawnOnly){
+    return selection;
+  }
+
   turn.nextSide = selection.sideKey === 'ALLY' ? 'ENEMY' : 'ALLY';
   turn.turnCount += 1;
   const allyWrap = turn.wrapCount.ALLY ?? 0;
@@ -144,4 +162,4 @@ export function nextTurnInterleaved(state){
   }
 
   return selection;
-    }
+}
