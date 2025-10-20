@@ -7,6 +7,7 @@ import { CFG, CAM } from '../../config.js';
 import { UNITS } from '../../units.js';
 import { Meta, makeInstanceStats, initialRageFor } from '../../meta.js';
 import { basicAttack, pickTarget, dealAbilityDamage, healUnit, grantShield, applyDamage } from '../../combat.js';
+import { initializeFury, setFury, spendFury, resolveUltCost, gainFury, finishFuryHit } from '../../utils/fury.js';
 import {
   ROSTER, ROSTER_MAP,
   CLASS_BASE, RANK_MULT,
@@ -638,7 +639,7 @@ function extendBusy(duration){
 // Thực thi Ult: Summoner -> Immediate Summon theo meta; class khác: trừ nộ
 function performUlt(unit){
   const meta = Game.meta.get(unit.id);
-  if (!meta) { unit.rage = 0; return; }
+  if (!meta) { setFury(unit, 0); return; }
 
   const slot = slotIndex(unit.side, unit.cx, unit.cy);
 
@@ -690,12 +691,12 @@ const summonSpec = meta.class === 'Summoner' ? getSummonSpec(meta) : null;
         });
       }
     }
-    unit.rage = 0;
+    setFury(unit, 0);
     return;
   }
 
   const u = meta.kit?.ult;
-  if (!u){ unit.rage = Math.max(0, unit.rage - 100); return; }
+  if (!u){ spendFury(unit, resolveUltCost(unit)); return; }
 
   const foeSide = unit.side === 'ally' ? 'enemy' : 'ally';
   let busyMs = 900;
@@ -733,7 +734,11 @@ case 'hpTradeBurst': {
       const desiredTrade = Math.round(hpMax * hpTradePct);
       const maxLoss = Math.max(0, currentHp - 1);
       const hpPayment = Math.max(0, Math.min(desiredTrade, maxLoss));
-      if (hpPayment > 0) applyDamage(unit, hpPayment);
+      if (hpPayment > 0){
+        applyDamage(unit, hpPayment);
+        gainFury(unit, { type: 'damageTaken', dealt: hpPayment });
+        finishFuryHit(unit);
+      }
 
       const aliveNow = tokensAlive();
       const foes = aliveNow.filter(t => t.side === foeSide && t.alive);
@@ -934,7 +939,11 @@ case 'hpTradeBurst': {
       const tradePct = Math.max(0, Math.min(0.9, u.selfHPTrade ?? 0));
       const pay = Math.round((unit.hpMax || 0) * tradePct);
       const maxPay = Math.max(0, Math.min(pay, Math.max(0, (unit.hp || 0) - 1)));
-      if (maxPay > 0) applyDamage(unit, maxPay);
+      if (maxPay > 0){
+        applyDamage(unit, maxPay);
+        gainFury(unit, { type: 'damageTaken', dealt: maxPay });
+        finishFuryHit(unit);
+      }
       const reduce = Math.max(0, u.reduceDmg ?? 0);
       if (reduce > 0){
         Statuses.add(unit, Statuses.make.damageCut({ pct: reduce, turns: u.turns || 1 }));
@@ -977,7 +986,9 @@ case 'hpTradeBurst': {
         const hpPct = Math.max(0, Math.min(1, (u.revived?.hpPct) ?? 0.5));
         const healAmt = Math.max(1, Math.round((ally.hpMax || 0) * hpPct));
         healUnit(ally, healAmt);
-        ally.rage = Math.max(0, (u.revived?.rage) ?? 0);
+        if (ally){
+          setFury(ally, Math.max(0, (u.revived?.rage) ?? 0));
+        }
         if (u.revived?.lockSkillsTurns){
           Statuses.add(ally, Statuses.make.silence({ turns: u.revived.lockSkillsTurns }));
         }
@@ -1051,7 +1062,7 @@ case 'hpTradeBurst': {
   }
 
   extendBusy(busyMs);
-  unit.rage = Math.max(0, unit.rage - 100);
+  spendFury(unit, resolveUltCost(unit));
 }
 const tokensAlive = () => (Game?.tokens || []).filter(t => t.alive);
 // Giảm TTL minion của 1 phe sau khi phe đó kết thúc phase
@@ -1112,8 +1123,9 @@ function init(){
     if (t.id === 'leaderA' || t.id === 'leaderB'){
       Object.assign(t, {
         hpMax: 1600, hp: 1600, arm: 0.12, res: 0.12, atk: 40, wil: 30,
-        aeMax: 0, ae: 0, rage: 0
+        aeMax: 0, ae: 0
       });
+      initializeFury(t, t.id, 0);
     }
   });
   Game.tokens.forEach(t => { if (!t.iid) t.iid = nextIid(); });
