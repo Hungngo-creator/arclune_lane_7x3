@@ -9,7 +9,7 @@ import { getUnitArt } from './art.js';
 import { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } from './passives.js';
 import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END } from './events.js';
 import { safeNow } from './utils/time.js';
-import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury } from './utils/fury.js';
+import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } from './utils/fury.js';
 
 // local helper
 const tokensAlive = (Game) => Game.tokens.filter(t => t.alive);
@@ -52,7 +52,7 @@ export function predictSpawnCycle(Game, side, slot){
   return idx >= cursor ? currentCycle : currentCycle + 1;
 }
 
-export function spawnQueuedIfDue(Game, entry, { allocIid } = {}){
+export function spawnQueuedIfDue(Game, entry, { allocIid, performUlt } = {}){
   if (!entry) return { actor: null, spawned: false };
   const side = entry.side;
   const slot = entry.slot;
@@ -69,6 +69,8 @@ export function spawnQueuedIfDue(Game, entry, { allocIid } = {}){
   m.delete(slot);
 
   const meta = Game.meta && typeof Game.meta.get === 'function' ? Game.meta.get(p.unitId) : null;
+  const source = p.source || null;
+  const fromDeck = source === 'deck';
   const kit = meta?.kit;
   const initialFury = initialRageFor(p.unitId, { isLeader:false, revive: !!p.revive, reviveSpec: p.revived });
   const obj = {
@@ -87,11 +89,28 @@ export function spawnQueuedIfDue(Game, entry, { allocIid } = {}){
   obj.skinKey = obj.art?.skinKey;
   obj.color = obj.color || obj.art?.palette?.primary || '#a9f58c';
   initializeFury(obj, p.unitId, initialFury, CFG);
+  if (fromDeck){
+    setFury(obj, obj.furyMax);
+  }
   prepareUnitForPassives(obj);
   Game.tokens.push(obj);
   applyOnSpawnEffects(Game, obj, kit?.onSpawn);
   try { vfxAddSpawn(Game, p.cx, p.cy, p.side); } catch(_){}
    const actor = getActiveAt(Game, side, slot);
+  const isLeader = actor?.id === 'leaderA' || actor?.id === 'leaderB';
+  const canAutoUlt = fromDeck && !isLeader && actor && actor.alive && typeof performUlt === 'function';
+  if (canAutoUlt && !Statuses.blocks(actor, 'ult')){
+    let ultOk = false;
+    try {
+      performUlt(actor);
+      ultOk = true;
+    } catch (err){
+      console.error('[spawnQueuedIfDue.performUlt]', err);
+    }
+    if (ultOk){
+      clearFreshSummon(actor);
+    }
+  }
   return { actor: actor || null, spawned: true };
 }
 

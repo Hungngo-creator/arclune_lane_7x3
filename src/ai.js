@@ -178,7 +178,8 @@ export function queueEnemyAt(Game, card, slot, cx, cy, aliveTokens){
 
   Game.queued.enemy.set(slot, {
     unitId: card.id, name: card.name, side:'enemy',
-    cx, cy, slot, spawnCycle, color:'#ed9dad'
+    cx, cy, slot, spawnCycle, color:'#ed9dad',
+    source: 'deck'
   });
 
   Game.ai.cost = Math.max(0, Game.ai.cost - card.cost);
