@@ -13146,7 +13146,23 @@ __define('./turns.js', (exports, module, __require) => {
     if (!turn) return;
 
     if (turn.mode === 'interleaved_by_position'){
-      const selection = nextTurnInterleaved(Game);
+      let selection = nextTurnInterleaved(Game);
+      if (!selection) return;
+
+      let spawnLoopGuard = 0;
+      while (selection && selection.spawnOnly){
+        spawnLoopGuard += 1;
+        if (spawnLoopGuard > 12){
+          return;
+        }
+        const spawnEntry = { side: selection.side, slot: selection.pos };
+        const spawnResult = spawnQueuedIfDue(Game, spawnEntry, hooks);
+        if (!spawnResult.spawned){
+          return;
+        }
+        selection = nextTurnInterleaved(Game);
+        if (!selection) return;
+      }
       if (!selection) return;
 
       const entry = { side: selection.side, slot: selection.pos };
@@ -13399,11 +13415,24 @@ __define('./turns/interleaved.js', (exports, module, __require) => {
       const last = Number.isFinite(turn.lastPos?.[sideKey]) ? turn.lastPos[sideKey] : 0;
       const found = findNextOccupiedPos(state, sideKey, last);
       if (!found) return null;
+      const sideLower = SIDE_TO_LOWER[sideKey];
+      const isSpawnOnly = !found.unit && found.queued;
+      if (isSpawnOnly){
+        return {
+          side: sideLower,
+          pos: found.pos,
+          unit: null,
+          unitId: null,
+          queued: true,
+          wrapped: !!found.wrapped,
+          sideKey,
+          spawnOnly: true
+        };
+      }
       turn.lastPos[sideKey] = found.pos;
       if (found.wrapped){
         turn.wrapCount[sideKey] = (turn.wrapCount[sideKey] ?? 0) + 1;
       }
-      const sideLower = SIDE_TO_LOWER[sideKey];
       return {
         side: sideLower,
         pos: found.pos,
@@ -13411,7 +13440,8 @@ __define('./turns/interleaved.js', (exports, module, __require) => {
         unitId: found.unit?.id ?? null,
         queued: !!found.queued,
         wrapped: !!found.wrapped,
-        sideKey
+        sideKey,
+        spawnOnly: false
       };
     };
 
@@ -13425,6 +13455,10 @@ __define('./turns/interleaved.js', (exports, module, __require) => {
         turn.nextSide = fallbackSide;
         return null;
       }
+    }
+
+    if (selection.spawnOnly){
+      return selection;
     }
 
     turn.nextSide = selection.sideKey === 'ALLY' ? 'ENEMY' : 'ALLY';
