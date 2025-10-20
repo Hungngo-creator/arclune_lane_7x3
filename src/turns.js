@@ -262,7 +262,23 @@ export function stepTurn(Game, hooks){
   if (!turn) return;
 
   if (turn.mode === 'interleaved_by_position'){
-    const selection = nextTurnInterleaved(Game);
+    let selection = nextTurnInterleaved(Game);
+    if (!selection) return;
+
+    let spawnLoopGuard = 0;
+    while (selection && selection.spawnOnly){
+      spawnLoopGuard += 1;
+      if (spawnLoopGuard > 12){
+        return;
+      }
+      const spawnEntry = { side: selection.side, slot: selection.pos };
+      const spawnResult = spawnQueuedIfDue(Game, spawnEntry, hooks);
+      if (!spawnResult.spawned){
+        return;
+      }
+      selection = nextTurnInterleaved(Game);
+      if (!selection) return;
+    }
     if (!selection) return;
 
     const entry = { side: selection.side, slot: selection.pos };
