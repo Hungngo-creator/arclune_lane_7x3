@@ -31,7 +31,7 @@ function normalizeSection(section){
   if (typeof section === 'string'){
     return { name: '', description: section };
   }
-  const normalized = { ...section };
+  const normalized = /** @type {SkillSection} */ ({ ...section });
   if (Array.isArray(section.tags)){
     normalized.tags = [...section.tags];
   }
@@ -39,7 +39,8 @@ function normalizeSection(section){
     normalized.notes = [...section.notes];
   }
   if (section.notes && !Array.isArray(section.notes)){
-    normalized.notes = [section.notes];
+    const note = /** @type {string} */ (section.notes);
+    normalized.notes = [note];
   }
   return normalized;
 }
@@ -50,7 +51,7 @@ function normalizeSection(section){
  */
 function normalizeSkillEntry(entry){
   if (!entry) return null;
-  const normalized = { ...entry };
+  const normalized = /** @type {SkillSection} */ ({ ...entry });
   if (Array.isArray(entry.tags)){
     normalized.tags = [...entry.tags];
   }
@@ -61,17 +62,19 @@ function normalizeSkillEntry(entry){
     normalized.notes = [...entry.notes];
   }
   if (entry.notes && !Array.isArray(entry.notes)){
-    normalized.notes = [entry.notes];
+    const note = /** @type {string} */ (entry.notes);
+    normalized.notes = [note];
   }
   return normalized;
 }
 
 /**
- * @typedef {Readonly<{ unitId: UnitId; basic?: SkillSection | string | null; skill?: SkillSection | null; skills?: ReadonlyArray<SkillSection>; ult?: SkillSection | string | null; talent?: SkillSection | string | null; technique?: SkillSection | string | null; notes?: ReadonlyArray<string> | string | null; }>}
+  * @typedef {Readonly<{ unitId: UnitId; basic?: SkillSection | string | null; skill?: SkillSection | null; skills?: ReadonlyArray<SkillSection>; ult?: SkillSection | string | null; talent?: SkillSection | string | null; technique?: SkillSection | string | null; notes?: ReadonlyArray<string> | string | null; [extra: string]: unknown; }>}
  * RawSkillSet
  */
 
-const rawSkillSets = /** @satisfies ReadonlyArray<RawSkillSet> */ ([
+/** @type {ReadonlyArray<RawSkillSet>} */
+const rawSkillSets = ([
   {
     unitId: 'phe',
     basic: {
@@ -557,10 +560,13 @@ const rawSkillSets = /** @satisfies ReadonlyArray<RawSkillSet> */ ([
   }
 ]);
 
-const SKILL_KEYS = /** @satisfies ReadonlyArray<keyof SkillEntry | 'skill'> */ (['basic', 'skill', 'skills', 'ult', 'talent', 'technique', 'notes']);
+/** @type {ReadonlyArray<keyof SkillEntry | 'skill'>} */
+const SKILL_KEYS = (['basic', 'skill', 'skills', 'ult', 'talent', 'technique', 'notes']);
 
-const skillSets = /** @type {Record<string, SkillEntry>} */ (rawSkillSets.reduce((acc, entry) => {
-  const skills = Array.isArray(entry.skills) ? entry.skills.map(normalizeSkillEntry) : [];
+const skillSets = /** @type {Record<UnitId, SkillEntry>} */ (rawSkillSets.reduce((acc, entry) => {
+  const skills = Array.isArray(entry.skills)
+    ? entry.skills.map(normalizeSkillEntry).filter(isSkillSection)
+    : [];
   const skill = entry.skill ? normalizeSkillEntry(entry.skill) : (skills[0] ?? null);
   const normalized = {
     unitId: entry.unitId,
@@ -575,11 +581,27 @@ const skillSets = /** @type {Record<string, SkillEntry>} */ (rawSkillSets.reduce
   deepFreeze(normalized);
   acc[entry.unitId] = normalized;
   return acc;
-}, {}));
+}, /** @type {Record<UnitId, SkillEntry>} */ ({})));
 
 deepFreeze(skillSets);
 
 export { skillSets };
+
+/**
+ * @param {SkillEntry | null | undefined} entry
+ * @returns {entry is SkillEntry}
+ */
+function isSkillEntry(entry){
+  return Boolean(entry);
+}
+
+/**
+ * @param {SkillSection | null | undefined} entry
+ * @returns {entry is SkillSection}
+ */
+function isSkillSection(entry){
+  return Boolean(entry);
+}
 
 /**
  * @param {UnitId | null | undefined} unitId
@@ -594,7 +616,7 @@ export function getSkillSet(unitId){
 export function listSkillSets(){
   return ROSTER
     .map(unit => skillSets[unit.id])
-    .filter((entry): entry is SkillEntry => Boolean(entry));
+    .filter(isSkillEntry);
 }
 
 /**
@@ -611,12 +633,16 @@ export function hasSkillSet(unitId){
  */
 export function validateSkillSetStructure(entry){
   if (!entry || typeof entry !== 'object') return false;
+  const record = /** @type {Record<string, unknown>} */ (entry);
   for (const key of SKILL_KEYS){
     if (!(key in entry)){
       return false;
     }
   }
-  if (!entry.unitId) return false;
-  if (entry.skills && !Array.isArray(entry.skills)) return false;
+  if (!('unitId' in record) || !record.unitId) return false;
+  if ('skills' in record){
+    const skillsValue = record.skills;
+    if (skillsValue && !Array.isArray(skillsValue)) return false;
+  }
   return true;
 }
