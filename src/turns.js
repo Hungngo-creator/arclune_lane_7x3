@@ -4,15 +4,56 @@ import { Statuses } from './statuses.js';
 import { doBasicWithFollowups } from './combat.js';
 import { CFG } from './config.js';
 import { makeInstanceStats, initialRageFor } from './meta.js';
-import { vfxAddSpawn } from './vfx.js';
+import { vfxAddSpawn, vfxAddBloodPulse } from './vfx.js';
 import { getUnitArt } from './art.js';
 import { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } from './passives.js';
-import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END } from './events.js';
+import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } from './events.js';
 import { safeNow } from './utils/time.js';
 import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } from './utils/fury.js';
 
 // local helper
 const tokensAlive = (Game) => Game.tokens.filter(t => t.alive);
+
+function applyTurnRegen(Game, unit){
+  if (!unit || !unit.alive) return { hpDelta: 0, aeDelta: 0 };
+
+  const clampStat = (value, max) => {
+    if (!Number.isFinite(max)){
+      return Math.max(0, value);
+    }
+    const upper = Math.max(0, max);
+    return Math.max(0, Math.min(upper, value));
+  };
+
+  let hpDelta = 0;
+  if (Number.isFinite(unit.hp) || Number.isFinite(unit.hpMax) || Number.isFinite(unit.hpRegen)){
+    const currentHp = Number.isFinite(unit.hp) ? unit.hp : 0;
+    const regenHp = Number.isFinite(unit.hpRegen) ? unit.hpRegen : 0;
+    const afterHp = clampStat(currentHp + regenHp, unit.hpMax);
+    hpDelta = afterHp - currentHp;
+    unit.hp = afterHp;
+  }
+
+  let aeDelta = 0;
+  if (Number.isFinite(unit.ae) || Number.isFinite(unit.aeMax) || Number.isFinite(unit.aeRegen)){
+    const currentAe = Number.isFinite(unit.ae) ? unit.ae : 0;
+    const regenAe = Number.isFinite(unit.aeRegen) ? unit.aeRegen : 0;
+    const afterAe = clampStat(currentAe + regenAe, unit.aeMax);
+    aeDelta = afterAe - currentAe;
+    unit.ae = afterAe;
+  }
+
+  if (hpDelta !== 0 || aeDelta !== 0){
+    emitGameEvent(TURN_REGEN, { game: Game, unit, hpDelta, aeDelta });
+    if (hpDelta > 0){
+      try {
+        vfxAddBloodPulse(Game, unit, { color: '#7ef7c1', alpha: 0.65, maxScale: 2.4 });
+      } catch (_) {}
+    }
+  }
+
+  return { hpDelta, aeDelta };
+}
 
 // --- Active/Spawn helpers (từ main.js) ---
 const keyOf = (side, slot) => `${side}:${slot}`;
@@ -173,9 +214,9 @@ export function doActionOrSkip(Game, unit, { performUlt, turnContext } = {}){
   const meta = Game.meta.get(unit.id);
   emitPassiveEvent(Game, unit, 'onTurnStart', {});
 
-const turnStamp = `${side ?? ''}:${slot ?? ''}:${cycle ?? 0}`;
+ const turnStamp = `${side ?? ''}:${slot ?? ''}:${cycle ?? 0}`;
   startFuryTurn(unit, { turnStamp, startAmount: CFG?.fury?.turn?.startGain, grantStart: true });
-
+  applyTurnRegen(Game, unit);
   Statuses.onTurnStart(unit, {});
   emitGameEvent(ACTION_START, baseDetail);
 

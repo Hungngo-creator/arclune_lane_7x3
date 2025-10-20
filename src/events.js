@@ -107,6 +107,7 @@ export const TURN_START = 'turn:start';
 export const TURN_END = 'turn:end';
 export const ACTION_START = 'action:start';
 export const ACTION_END = 'action:end';
+export const TURN_REGEN = 'turn:regen';
 
 export const gameEvents = makeEventTarget();
 
