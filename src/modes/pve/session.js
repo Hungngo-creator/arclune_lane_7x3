@@ -1177,6 +1177,7 @@ function init(){
     const pending = {
       unitId: card.id, name: card.name, side:'ally',
       cx: cell.cx, cy: cell.cy, slot, spawnCycle,
+      source: 'deck',
       color: pendingArt?.palette?.primary || '#a9f58c',
       art: pendingArt,
       skinKey: pendingArt?.skinKey
