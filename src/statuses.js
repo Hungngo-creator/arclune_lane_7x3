@@ -1,19 +1,72 @@
+// @ts-check
 // statuses.js — Hệ trạng thái/effect data-driven v0.7
 import { gainFury, finishFuryHit } from './utils/fury.js';
-const byId = (u) => (u && u.statuses) || (u.statuses = []);
+/**
+ * @typedef {import('../types/game-entities').UnitToken} UnitToken
+ * @typedef {import('../types/game-entities').StatusEffect} StatusEffect
+ * @typedef {import('../types/game-entities').DamageContext} DamageContext
+ */
+
+/** @typedef {{ [key: string]: (spec?: Record<string, unknown>) => StatusEffect }} StatusFactory */
+
+/**
+ * @typedef {Object} ShieldResult
+ * @property {number} remain
+ * @property {number} absorbed
+ * @property {boolean} broke
+ */
+
+/**
+ * @typedef {Object} StatusService
+ * @property {(unit: UnitToken, st: StatusEffect) => StatusEffect} add
+ * @property {(unit: UnitToken, id: string) => void} remove
+ * @property {(unit: UnitToken, id: string) => boolean} has
+ * @property {(unit: UnitToken, id: string) => StatusEffect | null} get
+ * @property {(unit: UnitToken) => void} purge
+ * @property {(unit: UnitToken, id: string) => number} stacks
+ * @property {(unit: UnitToken, ctx?: Record<string, unknown>) => void} onTurnStart
+ * @property {(unit: UnitToken, ctx?: Record<string, unknown>) => void} onTurnEnd
+ * @property {(side: string, ctx?: Record<string, unknown>) => void} onPhaseStart
+ * @property {(side: string, ctx?: Record<string, unknown>) => void} onPhaseEnd
+ * @property {(unit: UnitToken) => boolean} canAct
+ * @property {(unit: UnitToken, what: string) => boolean} blocks
+ * @property {(attacker: UnitToken, candidates: UnitToken[], ctx?: { attackType?: string }) => UnitToken | null} resolveTarget
+ * @property {(unit: UnitToken, base: Record<string, number>) => Record<string, number>} modifyStats
+ * @property {(attacker: UnitToken, target: UnitToken, ctx?: DamageContext) => DamageContext} beforeDamage
+ * @property {(target: UnitToken, dmg: number, ctx?: Record<string, unknown>) => ShieldResult} absorbShield
+ * @property {(attacker: UnitToken, target: UnitToken, result?: { dealt?: number; absorbed?: number; dtype?: string }) => { dealt?: number; absorbed?: number; dtype?: string }} afterDamage
+ * @property {StatusFactory} make
+ */
+
+/**
+ * @param {UnitToken | null | undefined} u
+ * @returns {StatusEffect[]}
+ */
+const byId = (u) => (u && u.statuses) || (u && (u.statuses = [])) || [];
 
 // ===== Utilities
+/**
+ * @param {UnitToken | null | undefined} u
+ * @param {string} id
+ * @returns {[StatusEffect[], number, StatusEffect | null]}
+ */
 function _find(u, id) {
   const arr = byId(u);
   const i = arr.findIndex(s => s.id === id);
   return [arr, i, i >= 0 ? arr[i] : null];
 }
 function clamp01(x){ return x < 0 ? 0 : (x > 1 ? 1 : x); }
+/**
+ * @param {UnitToken} u
+ * @param {StatusEffect} s
+ * @returns {void}
+ */
 function _dec(u, s){
   if (typeof s.dur === 'number') { s.dur -= 1; if (s.dur <= 0) Statuses.remove(u, s.id); }
 }
 
 // ===== Public API
+/** @type {StatusService} */
 export const Statuses = {
   // ---- CRUD
   add(unit, st) {
@@ -276,6 +329,10 @@ export const Statuses = {
 };
 
 // ===== Special: hook chặn chết còn 1HP (18)
+/**
+ * @param {UnitToken} target
+ * @returns {boolean}
+ */
 export function hookOnLethalDamage(target){
   const s = Statuses.get(target, 'undying');
   if (!s) return false;

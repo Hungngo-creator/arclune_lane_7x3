@@ -1,4 +1,5 @@
-//v0.8
+// @ts-check
+//v0.9
 import { Statuses, hookOnLethalDamage } from './statuses.js';
 import { vfxAddTracer, vfxAddHit, vfxAddMelee, vfxAddLightningArc } from './vfx.js';
 import { slotToCell, cellReserved } from './engine.js';
@@ -7,6 +8,28 @@ import { emitPassiveEvent } from './passives.js';
 import { CFG } from './config.js';
 import { gainFury, startFurySkill, finishFuryHit } from './utils/fury.js';
 import { safeNow } from './utils/time.js';
+
+/**
+ * @typedef {import('../types/game-entities').SessionState} SessionState
+ * @typedef {import('../types/game-entities').UnitToken} UnitToken
+ */
+
+/**
+ * @typedef {Object} AbilityDamageOptions
+ * @property {number} [base]
+ * @property {number} [defPen]
+ * @property {string} [attackType]
+ * @property {string} [dtype]
+ * @property {string} [furyTag]
+ * @property {boolean} [isAoE]
+ * @property {boolean} [isCrit]
+ * @property {number} [targetsHit]
+ */
+/**
+ * @param {SessionState | { tokens: UnitToken[] }} Game
+ * @param {UnitToken} attacker
+ * @returns {UnitToken | null}
+ */
 export function pickTarget(Game, attacker){
  const foe = attacker.side === 'ally' ? 'enemy' : 'ally';
  const pool = Game.tokens.filter(t => t.side === foe && t.alive);
@@ -34,6 +57,11 @@ export function pickTarget(Game, attacker){
  })[0] || null;
 }
 
+/**
+ * @param {UnitToken} target
+ * @param {number} amount
+ * @returns {void}
+ */
 export function applyDamage(target, amount){
   if (!Number.isFinite(target.hpMax)) return;
   target.hp = Math.max(0, Math.min(target.hpMax, (target.hp|0) - (amount|0)));
@@ -42,6 +70,13 @@ export function applyDamage(target, amount){
     target.alive = false;
   }
 }
+/**
+ * @param {SessionState | null} Game
+ * @param {UnitToken | null | undefined} attacker
+ * @param {UnitToken | null | undefined} target
+ * @param {AbilityDamageOptions & Record<string, unknown>} [opts]
+ * @returns {{ dealt: number, absorbed: number, total: number }}
+ */
 export function dealAbilityDamage(Game, attacker, target, opts = {}){
   if (!attacker || !target || !target.alive) return { dealt: 0, absorbed: 0, total: 0 };
 
@@ -104,6 +139,11 @@ startFurySkill(attacker, { tag: opts.furyTag || opts.attackType || 'ability' });
   return { dealt: remain, absorbed: abs.absorbed, total: dmg };
 }
 
+/**
+ * @param {UnitToken | null | undefined} target
+ * @param {number} amount
+ * @returns {{ healed: number, overheal: number }}
+ */
 export function healUnit(target, amount){
   if (!target || !Number.isFinite(target.hpMax)) return { healed: 0, overheal: 0 };
   const amt = Math.max(0, Math.floor(amount ?? 0));
@@ -115,6 +155,11 @@ if (amt <= 0) return { healed: 0, overheal: 0 };
   return { healed, overheal: Math.max(0, amt - healed) };
 }
 
+/**
+ * @param {UnitToken | null | undefined} target
+ * @param {number} amount
+ * @returns {number}
+ */
 export function grantShield(target, amount){
   if (!target) return 0;
   const amt = Math.max(0, Math.floor(amount ?? 0));
@@ -127,7 +172,12 @@ export function grantShield(target, amount){
   }
   return amt;
 }
- 
+
+/**
+ * @param {SessionState} Game
+ * @param {UnitToken} unit
+ * @returns {void}
+ */
 export function basicAttack(Game, unit){
   const foe = unit.side === 'ally' ? 'enemy' : 'ally';
   const pool = Game.tokens.filter(t => t.side === foe && t.alive);
@@ -253,6 +303,12 @@ const dealt = Math.max(0, Math.min(dmg, abs.remain || 0));
  
 // Helper: basic + follow-ups trong cùng turn-step.
 // cap = số follow-up (không tính đòn thường). Không đẩy con trỏ lượt.
+/**
+ * @param {SessionState} Game
+ * @param {UnitToken} unit
+ * @param {number} [cap=2]
+ * @returns {void}
+ */
 export function doBasicWithFollowups(Game, unit, cap = 2){
   try {
    // Đòn đánh thường đầu tiên

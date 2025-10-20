@@ -1,9 +1,39 @@
+// @ts-check
 // passives.js — passive event dispatch & helpers v0.7
 import { Statuses, hookOnLethalDamage } from './statuses.js';
 import { safeNow } from './utils/time.js';
 
 const clamp01 = (x) => Math.max(0, Math.min(1, x));
 
+/**
+ * @typedef {import('../types/game-entities').SessionState} SessionState
+ * @typedef {import('../types/game-entities').UnitToken} UnitToken
+ * @typedef {import('../types/game-entities').StatusEffect} StatusEffect
+ */
+
+/**
+ * @typedef {Object} PassiveDefinition
+ * @property {string} id
+ * @property {string} [when]
+ * @property {string | { type?: string; kind?: string; params?: Record<string, unknown>; stats?: Record<string, number>; flatStats?: Record<string, number> }} [effect]
+ * @property {Record<string, unknown>} [params]
+ * @property {Record<string, unknown>} [condition]
+ * @property {Array<unknown> | unknown} [conditions]
+ */
+
+/**
+ * @typedef {Object} PassiveContext
+ * @property {SessionState | null | undefined} [Game]
+ * @property {UnitToken | null | undefined} [unit]
+ * @property {PassiveDefinition | null | undefined} [passive]
+ * @property {Record<string, unknown>} [ctx]
+ */
+
+/**
+ * @typedef {(args: { Game: SessionState | null; unit: UnitToken | null; passive: PassiveDefinition | null; ctx: Record<string, unknown> | undefined }) => void} PassiveEffectHandler
+ */
+
+/** @type {Map<string, string>} */
 const STAT_ALIAS = new Map([
   ['atk', 'atk'],
   ['attack', 'atk'],
@@ -30,8 +60,13 @@ const STAT_ALIAS = new Map([
   ['hp_regen', 'hpRegen']
 ]);
 
+/** @type {Array<keyof UnitToken>} */
 const BASE_STAT_KEYS = ['atk','wil','res','arm','agi','per','hpMax','spd','aeMax','aeRegen','hpRegen'];
 
+/**
+ * @param {string | null | undefined} stat
+ * @returns {string | null}
+ */
 function normalizeStatKey(stat){
   if (typeof stat === 'string'){
     const trimmed = stat.trim();
@@ -42,18 +77,37 @@ function normalizeStatKey(stat){
   return null;
 }
 
+/**
+ * @param {unknown} value
+ * @returns {string}
+ */
 const normalizeKey = (value) => (typeof value === 'string' ? value.trim().toLowerCase() : '');
 
+/**
+ * @param {UnitToken | null | undefined} unit
+ * @returns {void}
+ */
 function ensureStatusContainer(unit){
   if (!unit) return;
   if (!Array.isArray(unit.statuses)) unit.statuses = [];
 }
 
+/**
+ * @param {UnitToken | null | undefined} unit
+ * @param {string} id
+ * @returns {number}
+ */
 function stacksOf(unit, id){
   const s = Statuses.get(unit, id);
   return s ? (s.stacks || 0) : 0;
 }
 
+/**
+ * @param {UnitToken | null | undefined} unit
+ * @param {string} id
+ * @param {{ attr: string | null | undefined; mode?: 'percent' | 'flat'; amount?: number; purgeable?: boolean }} spec
+ * @returns {StatusEffect | null}
+ */
 function ensureStatBuff(unit, id, { attr, mode='percent', amount=0, purgeable=true }){
   ensureStatusContainer(unit);
   const statKey = normalizeStatKey(attr) || attr;
@@ -77,6 +131,12 @@ function ensureStatBuff(unit, id, { attr, mode='percent', amount=0, purgeable=tr
   return st;
 }
 
+/**
+ * @param {StatusEffect | null | undefined} st
+ * @param {number} stacks
+ * @param {{ maxStacks?: number | null }} [options]
+ * @returns {void}
+ */
 function applyStatStacks(st, stacks, { maxStacks = null } = {}){
   if (!st) return;
   let next = Math.max(0, stacks|0);
@@ -84,6 +144,13 @@ function applyStatStacks(st, stacks, { maxStacks = null } = {}){
   st.stacks = next;
 }
 
+/**
+ * @param {UnitToken | null | undefined} unit
+ * @param {PassiveDefinition | null | undefined} passive
+ * @param {Record<string, number>} stats
+ * @param {{ mode?: 'percent' | 'flat'; purgeable?: boolean; stack?: boolean; stacks?: number; maxStacks?: number | null; idPrefix?: string; stackFlat?: boolean }} [options]
+ * @returns {boolean}
+ */
 function applyStatMap(unit, passive, stats, options = {}){
   if (!unit || !stats) return false;
   const mode = options.mode === 'flat' ? 'flat' : 'percent';
@@ -106,10 +173,15 @@ function applyStatMap(unit, passive, stats, options = {}){
   return applied;
 }
 
+/**
+ * @param {UnitToken | null | undefined} unit
+ * @returns {Record<string, number>}
+ */
 function captureBaseStats(unit){
+  const src = unit ?? /** @type {UnitToken} */({});
   const out = {};
   for (const key of BASE_STAT_KEYS){
-    const value = unit[key];
+    const value = src[key];
     if (typeof value === 'number' && Number.isFinite(value)){
       out[key] = value;
     }
@@ -117,11 +189,21 @@ function captureBaseStats(unit){
   return out;
 }
 
+/**
+ * @param {UnitToken | null | undefined} unit
+ * @param {SessionState | null | undefined} Game
+ * @returns {boolean}
+ */
 function hasLivingMinion(unit, Game){
   if (!unit || !Game) return false;
   return (Game.tokens || []).some(t => t && t.alive && t.isMinion && t.ownerIid === unit.iid);
 }
 
+/**
+ * @param {Record<string, unknown> | null | undefined} condition
+ * @param {{ Game?: SessionState | null; unit?: UnitToken | null; ctx?: Record<string, unknown> | null; passive?: PassiveDefinition | null }} options
+ * @returns {boolean}
+ */
 function evaluateConditionObject(condition, { Game, unit, ctx, passive }){
   if (!condition || typeof condition !== 'object') return true;
   const hpMax = Number.isFinite(unit?.hpMax) ? unit.hpMax : Number.isFinite(unit?.baseStats?.hpMax) ? unit.baseStats.hpMax : 0;
@@ -165,6 +247,10 @@ function evaluateConditionObject(condition, { Game, unit, ctx, passive }){
   return true;
 }
 
+/**
+ * @param {{ Game?: SessionState | null; unit?: UnitToken | null; passive?: PassiveDefinition | null; ctx?: Record<string, unknown> | null }} args
+ * @returns {boolean}
+ */
 function passiveConditionsOk({ Game, unit, passive, ctx }){
   const conditions = passive?.conditions;
   if (!conditions) return true;
@@ -193,11 +279,17 @@ function passiveConditionsOk({ Game, unit, passive, ctx }){
   return true;
 }
 
+/**
+ * @param {UnitToken | null | undefined} unit
+ * @returns {void}
+ */
 function recomputeFromStatuses(unit){
   if (!unit || !unit.baseStats) return;
   ensureStatusContainer(unit);
 
+/** @type {Map<string, number>} */
   const percent = new Map();
+  /** @type {Map<string, number>} */
   const flat = new Map();
   for (const st of unit.statuses){
     if (!st || !st.attr || !st.mode) continue;
@@ -239,6 +331,13 @@ for (const [key, baseValue] of Object.entries(unit.baseStats)){
   }
 }
 
+/**
+ * @param {SessionState | null | undefined} Game
+ * @param {UnitToken | null | undefined} unit
+ * @param {number} pct
+ * @param {{ mode?: 'targetMax' | 'casterMax' }} [opts]
+ * @returns {void}
+ */
 function healTeam(Game, unit, pct, opts = {}){
   if (!Game || !unit) return;
   if (!Number.isFinite(pct) || pct <= 0) return;
@@ -255,6 +354,7 @@ function healTeam(Game, unit, pct, opts = {}){
   }
 }
 
+/** @type {Record<string, PassiveEffectHandler>} */
 const EFFECTS = {
   placeMark({ Game, unit, passive, ctx }){
     if (!ctx || !ctx.target) return;
@@ -444,6 +544,7 @@ const EFFECTS = {
   }
 };
 
+/** @type {Record<string, PassiveEffectHandler>} */
 const EFFECT_MAP = {
   placeMark: EFFECTS.placeMark,
   'gainATK%': EFFECTS.gainATKPercent,
@@ -457,6 +558,13 @@ const EFFECT_MAP = {
   statGain: EFFECTS.gainStats
 };
 
+/**
+ * @param {SessionState | null | undefined} Game
+ * @param {UnitToken | null | undefined} unit
+ * @param {string} when
+ * @param {Record<string, unknown>} [ctx]
+ * @returns {void}
+ */
 export function emitPassiveEvent(Game, unit, when, ctx = {}){
   if (!Game || !unit) return;
   const meta = Game.meta && typeof Game.meta.get === 'function' ? Game.meta.get(unit.id) : null;
@@ -495,10 +603,16 @@ export function emitPassiveEvent(Game, unit, when, ctx = {}){
     }
     if (typeof handler !== 'function') continue;
     if (!passiveConditionsOk({ Game, unit, passive: effectivePassive, ctx })) continue;
-    handler({ Game, unit, passive: effectivePassive, ctx });
+    handler({ Game: Game ?? null, unit: unit ?? null, passive: effectivePassive ?? null, ctx });
   }
 }
 
+/**
+ * @param {SessionState | null | undefined} Game
+ * @param {UnitToken | null | undefined} unit
+ * @param {Record<string, unknown>} [onSpawn]
+ * @returns {void}
+ */
 export function applyOnSpawnEffects(Game, unit, onSpawn = {}){
   if (!Game || !unit || !onSpawn) return;
   ensureStatusContainer(unit);
@@ -583,6 +697,10 @@ export function applyOnSpawnEffects(Game, unit, onSpawn = {}){
   }
 }
 
+/**
+ * @param {UnitToken | null | undefined} unit
+ * @returns {void}
+ */
 export function prepareUnitForPassives(unit){
   if (!unit) return;
   ensureStatusContainer(unit);

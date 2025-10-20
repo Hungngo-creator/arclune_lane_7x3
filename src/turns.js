@@ -1,3 +1,4 @@
+// @ts-check
 // v0.7.4
 import { slotToCell, slotIndex } from './engine.js';
 import { Statuses } from './statuses.js';
@@ -12,9 +13,39 @@ import { safeNow } from './utils/time.js';
 import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } from './utils/fury.js';
 import { nextTurnInterleaved } from './turns/interleaved.js';
 
-// local helper
+/**
+ * @typedef {import('../types/game-entities').SessionState} SessionState
+ * @typedef {import('../types/game-entities').UnitToken} UnitToken
+ * @typedef {import('../types/game-entities').QueuedSummonRequest} QueuedSummonRequest
+ * @typedef {import('../types/game-entities').QueuedSummonState} QueuedSummonState
+ * @typedef {import('../types/game-entities').SequentialTurnState} SequentialTurnState
+ */
+
+/**
+ * @typedef {Object} TurnHooks
+ * @property {(unit: UnitToken) => void} [performUlt]
+ * @property {() => number} [allocIid]
+ * @property {(Game: SessionState, side: string, slot: number, hooks: TurnHooks) => unknown} [processActionChain]
+ * @property {(Game: SessionState, info: Record<string, unknown>) => boolean | void} [checkBattleEnd]
+ * @property {(Game: SessionState, unit: UnitToken, options?: { performUlt?: TurnHooks['performUlt']; turnContext?: Record<string, unknown> }) => void} [doActionOrSkip]
+ * @property {typeof getTurnOrderIndex} [getTurnOrderIndex]
+ */
+
+/**
+ * @typedef {{ actor: UnitToken | null; spawned: boolean }} SpawnResult
+ */
+
+/**
+ * @param {SessionState} Game
+ * @returns {UnitToken[]}
+ */
 const tokensAlive = (Game) => Game.tokens.filter(t => t.alive);
 
+/**
+ * @param {SessionState} Game
+ * @param {UnitToken | null | undefined} unit
+ * @returns {{ hpDelta: number; aeDelta: number }}
+ */
 function applyTurnRegen(Game, unit){
   if (!unit || !unit.alive) return { hpDelta: 0, aeDelta: 0 };
 
@@ -57,13 +88,30 @@ function applyTurnRegen(Game, unit){
 }
 
 // --- Active/Spawn helpers (từ main.js) ---
+/**
+ * @param {string} side
+ * @param {number} slot
+ * @returns {string}
+ */
 const keyOf = (side, slot) => `${side}:${slot}`;
 
+/**
+ * @param {SessionState} Game
+ * @param {string} side
+ * @param {number} slot
+ * @returns {UnitToken | undefined}
+ */
 export function getActiveAt(Game, side, slot){
   const { cx, cy } = slotToCell(side, slot);
   return Game.tokens.find(t => t.side===side && t.cx===cx && t.cy===cy && t.alive);
 }
 
+/**
+ * @param {SessionState} Game
+ * @param {string} side
+ * @param {number} slot
+ * @returns {number}
+ */
 export function getTurnOrderIndex(Game, side, slot){
   const turn = Game?.turn;
   if (!turn) return -1;
@@ -80,6 +128,12 @@ export function getTurnOrderIndex(Game, side, slot){
   return idx;
 }
 
+/**
+ * @param {SessionState} Game
+ * @param {string} side
+ * @param {number} slot
+ * @returns {number}
+ */
 export function predictSpawnCycle(Game, side, slot){
   const turn = Game?.turn;
   if (!turn) return 0;
@@ -96,12 +150,18 @@ export function predictSpawnCycle(Game, side, slot){
   return idx >= cursor ? currentCycle : currentCycle + 1;
 }
 
+/**
+ * @param {SessionState} Game
+ * @param {{ side: string; slot: number } | null | undefined} entry
+ * @param {Pick<TurnHooks, 'allocIid' | 'performUlt'>} [hooks]
+ * @returns {SpawnResult}
+ */
 export function spawnQueuedIfDue(Game, entry, { allocIid, performUlt } = {}){
   if (!entry) return { actor: null, spawned: false };
   const side = entry.side;
   const slot = entry.slot;
   const active = getActiveAt(Game, side, slot);
-  const m = Game.queued?.[side];
+  const m = /** @type {Map<number, QueuedSummonRequest> | undefined} */ (Game.queued?.[side]);
   const p = m && m.get(slot);
   if (!p){
     return { actor: active || null, spawned: false };
@@ -159,6 +219,11 @@ export function spawnQueuedIfDue(Game, entry, { allocIid, performUlt } = {}){
 }
 
 // giảm TTL minion sau khi phe đó hoàn tất lượt của mình
+/**
+ * @param {SessionState} Game
+ * @param {string} side
+ * @returns {void}
+ */
 export function tickMinionTTL(Game, side){
   const toRemove = [];
   for (const t of Game.tokens){
@@ -177,6 +242,12 @@ export function tickMinionTTL(Game, side){
 }
 
 // hành động 1 unit (ưu tiên ult nếu đủ nộ & không bị chặn)
+/**
+ * @param {SessionState} Game
+ * @param {UnitToken | null | undefined} unit
+ * @param {{ performUlt?: TurnHooks['performUlt']; turnContext?: Record<string, unknown> }} [options]
+ * @returns {void}
+ */
 export function doActionOrSkip(Game, unit, { performUlt, turnContext } = {}){
   const ensureBusyReset = () => {
     if (!Game || !Game.turn) return;
@@ -260,6 +331,11 @@ export function doActionOrSkip(Game, unit, { performUlt, turnContext } = {}){
 
 // Bước con trỏ lượt (sparse-cursor) đúng đặc tả
 // hooks = { performUlt, processActionChain, allocIid, doActionOrSkip }
+/**
+ * @param {SessionState} Game
+ * @param {TurnHooks} hooks
+ * @returns {void}
+ */
 export function stepTurn(Game, hooks){
   const turn = Game?.turn;
   if (!turn) return;

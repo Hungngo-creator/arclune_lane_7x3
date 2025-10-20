@@ -1,7 +1,36 @@
 import { TOKEN_STYLE, CHIBI, CFG } from './config.js';
 import { getUnitArt, getUnitSkin } from './art.js';
-//v0.7.3
+// @ts-check
+//v0.7.4
+/**
+ * @typedef {import('../types/game-entities').UnitToken} UnitToken
+ * @typedef {import('../types/game-entities').QueuedSummonState} QueuedSummonState
+ * @typedef {import('../types/game-entities').QueuedSummonRequest} QueuedSummonRequest
+ * @typedef {import('../types/game-entities').Side} Side
+ */
+
+/**
+ * @typedef {Object} GridSpec
+ * @property {number} cols
+ * @property {number} rows
+ * @property {number} tile
+ * @property {number} ox
+ * @property {number} oy
+ * @property {number} w
+ * @property {number} h
+ * @property {number} pad
+ * @property {number} dpr
+ * @property {number} pixelW
+ * @property {number} pixelH
+ * @property {number} pixelArea
+ */
 /* ---------- Grid ---------- */
+/**
+ * @param {HTMLCanvasElement | null | undefined} canvas
+ * @param {number} cols
+ * @param {number} rows
+ * @returns {GridSpec}
+ */
 export function makeGrid(canvas, cols, rows){
   const pad = (CFG.UI?.PAD) ?? 12;
   let viewportW = null;
@@ -95,6 +124,12 @@ if (typeof window !== 'undefined'){
   return { cols, rows, tile, ox, oy, w: displayW, h: displayH, pad, dpr, pixelW, pixelH, pixelArea };
 }
 
+/**
+ * @param {GridSpec} g
+ * @param {number} px
+ * @param {number} py
+ * @returns {{cx: number, cy: number} | null}
+ */
 export function hitToCell(g, px, py){
   const cx = Math.floor((px - g.ox) / g.tile);
   const cy = Math.floor((py - g.oy) / g.tile);
@@ -103,6 +138,12 @@ export function hitToCell(g, px, py){
 }
 
 /* ---------- Tokens ---------- */
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {GridSpec} g
+ * @param {UnitToken[]} tokens
+ * @returns {void}
+ */
 export function drawTokens(ctx, g, tokens){
   ctx.textAlign='center';
   ctx.textBaseline='middle';
@@ -117,11 +158,24 @@ export function drawTokens(ctx, g, tokens){
   });
 }
 
+/**
+ * @param {UnitToken[]} tokens
+ * @param {number} cx
+ * @param {number} cy
+ * @returns {boolean}
+ */
 export function cellOccupied(tokens, cx, cy){
   return tokens.some(t => t.cx === cx && t.cy === cy);
 }
 
 // queued: { ally:Map(slot→PendingUnit), enemy:Map(...) }
+/**
+ * @param {UnitToken[]} tokens
+ * @param {QueuedSummonState | null | undefined} queued
+ * @param {number} cx
+ * @param {number} cy
+ * @returns {boolean}
+ */
 export function cellReserved(tokens, queued, cx, cy){
   // 1) Active đang đứng
   if (cellOccupied(tokens, cx, cy)) return true;
@@ -129,8 +183,8 @@ export function cellReserved(tokens, queued, cx, cy){
   if (queued){
     const checkQ = (m)=> {
       if (!m || typeof m.values !== 'function') return false;
-      for (const p of m.values()){
-      if (!p) continue;
+      for (const p of /** @type {Map<number, QueuedSummonRequest>} */(m).values()){
+        if (!p) continue;
         if (p.cx === cx && p.cy === cy) return true;
       }
       return false;
@@ -141,6 +195,11 @@ export function cellReserved(tokens, queued, cx, cy){
   return false;
 }
 
+/**
+ * @param {UnitToken[]} tokens
+ * @param {GridSpec} g
+ * @returns {void}
+ */
 export function spawnLeaders(tokens, g){
   // Ally leader ở (0,1), Enemy leader ở (6,1)
   const artAlly = getUnitArt('leaderA');
@@ -150,8 +209,24 @@ export function spawnLeaders(tokens, g){
 }
 
 /* ---------- Helper ---------- */
+/**
+ * @template T
+ * @param {T[]} pool
+ * @param {Set<string>} excludeSet
+ * @param {number} [n=4]
+ * @returns {T[]}
+ */
 export function pickRandom(pool, excludeSet, n = 4){
-  const remain = pool.filter(u => !excludeSet.has(u.id));
+  const remain = pool.filter(u => {
+    if (u && typeof u === 'object' && 'id' in u){
+      const id = /** @type {{ id?: string }} */ (u).id;
+      return !id || !excludeSet.has(String(id));
+    }
+    if (typeof u === 'string'){
+      return !excludeSet.has(u);
+    }
+    return true;
+  });
   for (let i=remain.length-1;i>0;i--){
    const j = (Math.random()*(i+1))|0; const t = remain[i]; remain[i]=remain[j]; remain[j]=t;
  }
@@ -311,10 +386,37 @@ function drawChibi(ctx, x, y, r, facing = 1, color = '#a9f58c') {
   ctx.restore();
 }
 
+/**
+ * @typedef {Object} SpriteCacheEntry
+ * @property {'loading' | 'ready' | 'error'} status
+ * @property {HTMLImageElement} img
+ * @property {string} key
+ * @property {string} src
+ * @property {string | null} skinId
+ */
+
+/**
+ * @typedef {Object} TokenProjectionEntry
+ * @property {number} cx
+ * @property {number} cy
+ * @property {string} sig
+ * @property {{ x: number, y: number, scale: number }} projection
+ */
+
+/**
+ * @typedef {Object} TokenVisualEntry
+ * @property {string | null} spriteKey
+ * @property {SpriteCacheEntry | null} spriteEntry
+ * @property {unknown} shadowCfg
+ */
+
+/** @type {Map<string, SpriteCacheEntry>} */
 const SPRITE_CACHE = new Map();
 export const ART_SPRITE_EVENT = 'unit-art:sprite-loaded';
 
+/** @type {WeakMap<UnitToken, TokenProjectionEntry>} */
 const TOKEN_PROJECTION_CACHE = new WeakMap();
+/** @type {Map<string, TokenVisualEntry>} */
 const TOKEN_VISUAL_CACHE = new Map();
 
 function contextSignature(g, cam){
@@ -711,6 +813,13 @@ const alive = [];
   }
 }
 // (W2-J2) Vẽ “Chờ Lượt” – silhouette mờ/tối, chỉ hiển thị theo flag DEBUG
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {GridSpec} g
+ * @param {QueuedSummonState | null | undefined} queued
+ * @param {{ rowGapRatio?: number, topScale?: number, depthScale?: number } | null | undefined} cam
+ * @returns {void}
+ */
 export function drawQueuedOblique(ctx, g, queued, cam){
  if (!queued) return;
  const C = cam || { rowGapRatio: 0.62, topScale: 0.80, depthScale: 0.94 };
@@ -722,7 +831,7 @@ export function drawQueuedOblique(ctx, g, queued, cam){
    // Ally thấy theo SHOW_QUEUED; enemy ẩn trừ khi bật SHOW_QUEUED_ENEMY
   if (side === 'ally'  && !(CFG.DEBUG?.SHOW_QUEUED)) return;
    if (side === 'enemy' && !(CFG.DEBUG?.SHOW_QUEUED_ENEMY)) return;
-   for (const p of map.values()){
+   for (const p of /** @type {Map<number, QueuedSummonRequest>} */(map).values()){
     const c = _cellCenterOblique(g, p.cx, p.cy, C);
     const depth = g.rows - 1 - p.cy;
     const r = Math.max(6, Math.floor(baseR * Math.pow(k, depth)));
@@ -738,9 +847,16 @@ export function drawQueuedOblique(ctx, g, queued, cam){
 }
 
 /* ---------- TURN/ZONE HELPERS (W1-J1) ---------- */
+/** @type {{ ALLY: Side, ENEMY: Side }} */
 export const SIDE = { ALLY: 'ally', ENEMY: 'enemy' };
 
 // Trả về chỉ số lượt 1..9 của ô (cx,cy) theo phe
+/**
+ * @param {Side | 'ALLY' | 'ENEMY'} side
+ * @param {number} cx
+ * @param {number} cy
+ * @returns {number}
+ */
 export function slotIndex(side, cx, cy){
   if (side === SIDE.ALLY || side === 'ally'){
    // Ally: c=2 → 1..3 (trên→dưới), c=1 → 4..6, c=0 → 7..9
@@ -754,6 +870,11 @@ export function slotIndex(side, cx, cy){
 }
 
 // Ngược lại: từ slot (1..9) suy ra (cx,cy) theo phe
+/**
+ * @param {Side | 'ALLY' | 'ENEMY'} side
+ * @param {number} slot
+ * @returns {{ cx: number, cy: number }}
+ */
 export function slotToCell(side, slot){
  const s = Math.max(1, Math.min(9, slot|0));
  const colIndex = Math.floor((s - 1) / 3); // 0..2 (gần mid → xa)
@@ -771,6 +892,13 @@ export function slotToCell(side, slot){
 }
 
 // Gán nhãn “mã vùng” cho AI/AoE (A1..A9 | E1..E9) hoặc mã số tileId
+/**
+ * @param {Side | 'ALLY' | 'ENEMY'} side
+ * @param {number} cx
+ * @param {number} cy
+ * @param {{ numeric?: boolean }} [options]
+ * @returns {string | number}
+ */
 export function zoneCode(side, cx, cy, { numeric=false } = {}){
   const slot = slotIndex(side, cx, cy);
   if (numeric) return (side === SIDE.ALLY || side === 'ally' ? 0 : 1) * 16 + slot;
@@ -779,5 +907,7 @@ export function zoneCode(side, cx, cy, { numeric=false } = {}){
 }
 
 // Bảng tra cứu thuận tiện (chưa dùng nhưng hữu ích cho AI/visual debug)
+/** @type {{ cx: number, cy: number }[]} */
 export const ORDER_ALLY  = Array.from({length:9}, (_,i)=> slotToCell(SIDE.ALLY,  i+1));
+/** @type {{ cx: number, cy: number }[]} */
 export const ORDER_ENEMY = Array.from({length:9}, (_,i)=> slotToCell(SIDE.ENEMY, i+1));

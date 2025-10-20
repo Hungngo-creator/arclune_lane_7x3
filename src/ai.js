@@ -1,3 +1,4 @@
+// @ts-check
 // ai.js v0.7.6
 import { pickRandom, slotToCell, cellReserved } from './engine.js';
 import { predictSpawnCycle } from './turns.js';
@@ -5,8 +6,27 @@ import { CFG } from './config.js';
 import { safeNow as sharedSafeNow } from './utils/time.js';
 import { detectUltBehavior, getSummonSpec, resolveSummonSlots } from './utils/kit.js';
 
+/**
+ * @typedef {import('../types/game-entities').SessionState} SessionState
+ * @typedef {import('../types/game-entities').UnitToken} UnitToken
+ * @typedef {import('../types/game-entities').UnitId} UnitId
+ * @typedef {import('../types/game-entities').QueuedSummonRequest} QueuedSummonRequest
+ */
+
+/**
+ * @typedef {{ id: UnitId; name?: string; cost: number }} DeckCard
+ */
+
+/**
+ * @typedef {{ card: DeckCard | null; cell: { s: number; cx: number; cy: number } | null; score: number; baseScore: number; contributions: Record<string, number>; raw: Record<string, number>; multipliers: Record<string, number>; blockedReason?: string | null; meta?: Record<string, unknown> | null }} CandidateEvaluation
+ */
+
 const safeNow = () => sharedSafeNow();
 
+/**
+ * @param {SessionState} Game
+ * @returns {UnitToken[]}
+ */
 const tokensAlive = (Game) => Game.tokens.filter(t => t.alive);
 const DEFAULT_WEIGHTS = Object.freeze({
   pressure: 0.42,
@@ -20,6 +40,9 @@ const DEFAULT_WEIGHTS = Object.freeze({
 
 const DEFAULT_DEBUG_KEEP = 6;
 
+/**
+ * @returns {Record<string, number>}
+ */
 function mergedWeights(){
   const cfg = CFG.AI?.WEIGHTS || {};
   const out = { ...DEFAULT_WEIGHTS };
@@ -29,6 +52,9 @@ function mergedWeights(){
   return out;
 }
 
+/**
+ * @returns {{ keepTop: number }}
+ */
 function debugConfig(){
   const cfg = CFG.AI?.DEBUG || {};
   const keepTopRaw = cfg.keepTop ?? cfg.KEEP_TOP ?? DEFAULT_DEBUG_KEEP;
@@ -38,6 +64,10 @@ function debugConfig(){
   };
 }
 
+/**
+ * @param {Record<string, unknown> | null | undefined} meta
+ * @returns {{ hasInstant: boolean; hasDefBuff: boolean; hasRevive: boolean }}
+ */
 function detectKitTraits(meta){
   const analysis = detectUltBehavior(meta?.kit || meta || {});
   const hasInstant = analysis.hasInstant || (meta?.class === 'Summoner' && !!analysis.summon);
@@ -48,6 +78,10 @@ function detectKitTraits(meta){
   };
 }
 
+/**
+ * @param {CandidateEvaluation | null | undefined} entry
+ * @returns {Record<string, unknown> | null}
+ */
 function exportCandidateDebug(entry){
   if (!entry) return null;
   return {
@@ -67,15 +101,25 @@ function exportCandidateDebug(entry){
 }
 
 // luôn giữ deck-4 của địch đầy
+/**
+ * @param {SessionState} Game
+ * @returns {void}
+ */
 export function refillDeckEnemy(Game){
   const handSize = CFG.HAND_SIZE ?? 4;
   const need = handSize - Game.ai.deck.length;
   if (need <= 0) return;
-  const exclude = new Set([...Game.ai.usedUnitIds, ...Game.ai.deck.map(u=>u.id)]);
+  /** @type {Set<UnitId>} */
+  const exclude = new Set([...(Game.ai.usedUnitIds ?? new Set()), ...Game.ai.deck.map(u=>u.id)]);
   const more = pickRandom(Game.ai.unitsAll, exclude, handSize).slice(0, need);
   Game.ai.deck.push(...more);
 }
 
+/**
+ * @param {SessionState} Game
+ * @param {UnitToken[] | null | undefined} aliveTokens
+ * @returns {{ s: number; cx: number; cy: number }[]}
+ */
 function listEmptyEnemySlots(Game, aliveTokens){
   const alive = Array.isArray(aliveTokens) ? aliveTokens : tokensAlive(Game);
   const out = [];
@@ -85,13 +129,30 @@ function listEmptyEnemySlots(Game, aliveTokens){
   }
   return out;
 }
+/**
+ * @param {SessionState} Game
+ * @param {number} slot
+ * @returns {number}
+ */
 function etaScoreEnemy(Game, slot){
   return predictSpawnCycle(Game, 'enemy', slot) === (Game.turn?.cycle ?? 0) ? 1.0 : 0.5;
 }
+/**
+ * @param {number} cx
+ * @param {number} cy
+ * @returns {number}
+ */
 function pressureScore(cx, cy){
   const dist = Math.abs(cx - 0) + Math.abs(cy - 1);
   return 1 - Math.min(1, dist / 7);
 }
+/**
+ * @param {SessionState} Game
+ * @param {number} cx
+ * @param {number} cy
+ * @param {UnitToken[] | null | undefined} allyTokens
+ * @returns {number}
+ */
 function safetyScore(Game, cx, cy, allyTokens){
   const foesSource = Array.isArray(allyTokens) ? allyTokens : tokensAlive(Game).filter(t => t.side === 'ally');
   const sameRow = foesSource.filter(t => t.cy === cy);
@@ -99,6 +160,13 @@ function safetyScore(Game, cx, cy, allyTokens){
   const far  = sameRow.length - near;
   return Math.max(0, Math.min(1, 1 - (near*0.6 + far*0.2)/3));
 }
+/**
+ * @param {SessionState} Game
+ * @param {UnitId} unitId
+ * @param {number} baseSlot
+ * @param {UnitToken[] | null | undefined} aliveTokens
+ * @returns {number}
+ */
 function summonerFeasibility(Game, unitId, baseSlot, aliveTokens){
   const meta = Game.meta.get(unitId);
   if (!meta || meta.class !== 'Summoner') return 1.0;
@@ -115,6 +183,12 @@ function summonerFeasibility(Game, unitId, baseSlot, aliveTokens){
   const need = Math.max(1, Number.isFinite(countRaw) ? countRaw : 1);
   return Math.min(1, cand.length / need);
 }
+/**
+ * @param {SessionState} Game
+ * @param {CandidateEvaluation | null | undefined} entry
+ * @param {UnitToken[] | null | undefined} aliveTokens
+ * @returns {string | null}
+ */
 function candidateBlocked(Game, entry, aliveTokens){
   if (!entry) return 'invalid';
   const alive = aliveTokens || tokensAlive(Game);
@@ -122,7 +196,8 @@ function candidateBlocked(Game, entry, aliveTokens){
   const cx = entry.cell?.cx;
   const cy = entry.cell?.cy;
   if (!Number.isFinite(slot) || !Number.isFinite(cx) || !Number.isFinite(cy)) return 'invalid';
-  if (Game.queued?.enemy?.has(slot)) return 'slotQueued';
+  const enemyQueue = /** @type {Map<number, QueuedSummonRequest> | undefined} */ (Game.queued?.enemy);
+  if (enemyQueue?.has(slot)) return 'slotQueued';
   if (cellReserved(alive, Game.queued, cx, cy)) return 'cellReserved';
 
   const meta = entry.meta;
@@ -145,11 +220,17 @@ function candidateBlocked(Game, entry, aliveTokens){
   return null;
 }
 
+/**
+ * @param {SessionState} Game
+ * @param {number} cy
+ * @param {UnitToken[] | null | undefined} enemyTokens
+ * @returns {number}
+ */
 function rowCrowdingFactor(Game, cy, enemyTokens){
   const ours = (Array.isArray(enemyTokens) ? enemyTokens : tokensAlive(Game).filter(t => t.side==='enemy'))
     .filter(t => t.cy===cy).length;
   let queued = 0;
-  const m = Game.queued?.enemy;
+  const m = /** @type {Map<number, QueuedSummonRequest> | undefined} */ (Game.queued?.enemy);
   if (m && typeof m.values === 'function'){
     for (const p of m.values()) { if (p && p.cy === cy) queued++; }
   }
@@ -158,6 +239,11 @@ function rowCrowdingFactor(Game, cy, enemyTokens){
   if (n === 2) return ((CFG.AI?.ROW_CROWDING_PENALTY) ?? 0.85);
   return 1.0;
 }
+/**
+ * @param {string | null | undefined} className
+ * @param {number} cx
+ * @returns {number}
+ */
 function roleBias(className, cx){
   const front = (cx <= (CFG.GRID_COLS - CFG.ENEMY_COLS)); // cột 4–5 là "front" phía địch
   const R = CFG.AI?.ROLE?.[className] || {};
@@ -167,16 +253,26 @@ function roleBias(className, cx){
   return f;
 }
 
+/**
+ * @param {SessionState} Game
+ * @param {DeckCard} card
+ * @param {number} slot
+ * @param {number} cx
+ * @param {number} cy
+ * @param {UnitToken[] | null | undefined} aliveTokens
+ * @returns {boolean}
+ */
 export function queueEnemyAt(Game, card, slot, cx, cy, aliveTokens){
   if (Game.ai.cost < card.cost) return false;
   if (Game.ai.summoned >= Game.ai.summonLimit) return false;
   const alive = Array.isArray(aliveTokens) ? aliveTokens : tokensAlive(Game);
   if (cellReserved(alive, Game.queued, cx, cy)) return false;
-  if (Game.queued.enemy.has(slot)) return false;
+  const queue = /** @type {Map<number, QueuedSummonRequest>} */ (Game.queued.enemy);
+  if (queue.has(slot)) return false;
 
   const spawnCycle = predictSpawnCycle(Game, 'enemy', slot);
 
-  Game.queued.enemy.set(slot, {
+  queue.set(slot, {
     unitId: card.id, name: card.name, side:'enemy',
     cx, cy, slot, spawnCycle, color:'#ed9dad',
     source: 'deck'
@@ -185,18 +281,25 @@ export function queueEnemyAt(Game, card, slot, cx, cy, aliveTokens){
   Game.ai.cost = Math.max(0, Game.ai.cost - card.cost);
   Game.ai.summoned += 1;
   Game.ai.usedUnitIds.add(card.id);
-  Game.ai.deck = Game.ai.deck.filter(u => u.id !== card.id);
+  const deck = /** @type {DeckCard[]} */ (Game.ai.deck);
+  Game.ai.deck = /** @type {typeof Game.ai.deck} */ (deck.filter(u => u.id !== card.id));
   refillDeckEnemy(Game);
   return true;
 }
 
+/**
+ * @param {SessionState} Game
+ * @param {string} reason
+ * @returns {void}
+ */
 export function aiMaybeAct(Game, reason){
   const now = safeNow();
   if (now - (Game.ai.lastThinkMs||0) < 120) return;
   const weights = mergedWeights();
   const dbgCfg = debugConfig();
 
-  const hand = Game.ai.deck.filter(c => Game.ai.cost >= c.cost);
+  const deck = /** @type {DeckCard[]} */ (Game.ai.deck);
+  const hand = deck.filter(c => Game.ai.cost >= c.cost);
   if (!hand.length) {
     Game.ai.lastDecision = {
       reason,
@@ -227,6 +330,7 @@ export function aiMaybeAct(Game, reason){
     return;
     }
 
+/** @type {CandidateEvaluation[]} */
   const evaluations = [];
   for (const card of hand){
     const meta = Game.meta.get(card.id);

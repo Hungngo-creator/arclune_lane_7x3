@@ -1,5 +1,11 @@
+// @ts-check
 // ver v.0.7
 
+/**
+ * @typedef {{ id: import('../types/game-entities').UnitId; name: string; cost: number }} UnitSummary
+ */
+
+/** @type {UnitSummary[]} */
 export const UNITS = [
   { id: 'phe',          name: 'Phệ',             cost: 20 },
   { id: 'kiemtruongda', name: 'Kiếm Trường Dạ',  cost: 16 },
