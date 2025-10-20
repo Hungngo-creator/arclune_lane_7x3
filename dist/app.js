@@ -12893,6 +12893,8 @@ __define('./turns.js', (exports, module, __require) => {
   const resolveUltCost = __dep10.resolveUltCost;
   const setFury = __dep10.setFury;
   const clearFreshSummon = __dep10.clearFreshSummon;
+  const __dep11 = __require('./turns/interleaved.js');
+  const nextTurnInterleaved = __dep11.nextTurnInterleaved;
 
   // local helper
   const tokensAlive = (Game) => Game.tokens.filter(t => t.alive);
