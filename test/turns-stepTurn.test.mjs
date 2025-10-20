@@ -572,7 +572,7 @@ test('interleaved mode skips empty enemy side without stalling', async () => {
   assert.strictEqual(Game.turn.wrapCount.ALLY > 0, true);
 });
 
-test('summoned unit waits until next interleaved pass before acting', async () => {
+test('summoned unit acts immediately when spawned into empty side', async () => {
   const harness = await loadTurnsHarness();
   const { stepTurn, deps } = harness;
   const slotToCell = deps['./engine.js'].slotToCell;
@@ -616,14 +616,87 @@ test('summoned unit waits until next interleaved pass before acting', async () =
   };
 
   stepTurn(Game, hooks);
-  assert.strictEqual(actions.length, 0);
+  assert.deepStrictEqual(actions, ['enemySummon']);
   assert.strictEqual(Game.tokens.length, 1);
   assert.strictEqual(Game.queued.enemy.has(enemySlot), false);
   assert.deepStrictEqual(ultCalls, ['enemySummon']);
+  assert.strictEqual(Game.turn.lastPos.ENEMY, enemySlot);
 
   stepTurn(Game, hooks);
-  assert.deepStrictEqual(actions, ['enemySummon']);
-  assert.strictEqual(Game.turn.lastPos.ENEMY, enemySlot);
+  assert.deepStrictEqual(actions, ['enemySummon', 'enemySummon']);
+});
+
+test('queued ally spawn keeps scan order after enemy turn', async () => {
+  const harness = await loadTurnsHarness();
+  const { stepTurn, deps } = harness;
+  const slotToCell = deps['./engine.js'].slotToCell;
+
+  const makeUnit = (id, side, slot) => ({ id, side, alive: true, ...slotToCell(side, slot) });
+
+  const allyUnits = [
+    makeUnit('allySlot3', 'ally', 3),
+    makeUnit('allySlot5', 'ally', 5),
+    makeUnit('allySlot8', 'ally', 8)
+  ];
+  const enemyUnits = [
+    makeUnit('enemySlot2', 'enemy', 2),
+    makeUnit('enemySlot4', 'enemy', 4),
+    makeUnit('enemySlot7', 'enemy', 7),
+    makeUnit('enemySlot8', 'enemy', 8)
+  ];
+
+  const spawnCell = slotToCell('ally', 2);
+
+  const Game = {
+    tokens: [...allyUnits, ...enemyUnits],
+    meta: new Map([[ 'allySpawn', { kit: {} } ]]),
+    queued: { ally: new Map(), enemy: new Map() },
+    turn: {
+      mode: 'interleaved_by_position',
+      nextSide: 'ALLY',
+      lastPos: { ALLY: 5, ENEMY: 4 },
+      wrapCount: { ALLY: 0, ENEMY: 0 },
+      turnCount: 6,
+      slotCount: 9,
+      cycle: 0,
+      busyUntil: 0
+    }
+  };
+
+  Game.queued.ally.set(2, {
+    unitId: 'allySpawn',
+    name: 'Queued Ally',
+    side: 'ally',
+    cx: spawnCell.cx,
+    cy: spawnCell.cy,
+    slot: 2,
+    spawnCycle: 0,
+    source: 'deck'
+  });
+
+  const actions = [];
+  const hooks = {
+    doActionOrSkip(_, unit, opts = {}){
+      const ctx = opts.turnContext || {};
+      actions.push({ id: unit?.id ?? null, side: ctx.side ?? null, slot: ctx.slot ?? null });
+    },
+    processActionChain(){ return null; }
+  };
+
+  stepTurn(Game, hooks);
+  stepTurn(Game, hooks);
+  stepTurn(Game, hooks);
+
+  const sequence = actions.map(({ side, slot }) => [side, slot]);
+  assert.deepStrictEqual(sequence, [
+    ['ally', 8],
+    ['enemy', 7],
+    ['ally', 2]
+  ]);
+
+  assert.strictEqual(actions[2]?.id, 'allySpawn');
+  assert.strictEqual(Game.turn.lastPos.ALLY, 2);
+  assert.strictEqual(Game.queued.ally.size, 0);
 });
 
 test('stunned units are skipped by interleaved scan', async () => {
@@ -715,10 +788,7 @@ test('queued spawn is processed even when existing units cannot act', async () =
   };
 
   stepTurn(Game, hooks);
-  assert.strictEqual(actions.length, 0);
+  assert.deepStrictEqual(actions, ['enemyFresh']);
   assert.strictEqual(Game.tokens.length, 2);
   assert.strictEqual(Game.turn.lastPos.ENEMY, enemySlot);
-
-  stepTurn(Game, hooks);
-  assert.deepStrictEqual(actions, ['enemyFresh']);
 });
