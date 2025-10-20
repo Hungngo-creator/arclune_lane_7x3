@@ -201,55 +201,76 @@ export function stepTurn(Game, hooks){
   const order = Array.isArray(turn?.order) ? turn.order : [];
   if (!order.length) return;
 
-  const cursor = Math.max(0, Math.min(order.length - 1, turn.cursor ?? 0));
-  const entry = order[cursor];
-  if (!entry){
-    Game.turn.cursor = (cursor + 1) % order.length;
-    if (Game.turn.cursor === 0) Game.turn.cycle = (Game.turn.cycle ?? 0) + 1;
-    return;
-  }
+  const orderLength = order.length;
+  let cursor = Math.max(0, Math.min(orderLength - 1, Number.isFinite(turn?.cursor) ? turn.cursor : 0));
+  let cycle = Number.isFinite(turn?.cycle) ? turn.cycle : 0;
 
-  const cycle = Game.turn.cycle ?? 0;
-  const turnContext = {
-    side: entry.side,
-    slot: entry.slot,
-    orderIndex: cursor,
-    orderLength: order.length,
-    cycle
+  const advanceCursor = () => {
+    const nextCursor = (cursor + 1) % orderLength;
+    Game.turn.cursor = nextCursor;
+    if (nextCursor === 0){
+      cycle += 1;
+    }
+    Game.turn.cycle = cycle;
+    cursor = nextCursor;
   };
+
+  for (let stepCount = 0; stepCount < orderLength; stepCount += 1){
+    const entry = order[cursor];
+    if (!entry){
+      advanceCursor();
+      continue;
+    }
+
+  const turnContext = {
+      side: entry.side,
+      slot: entry.slot,
+      orderIndex: cursor,
+      orderLength,
+      cycle
+    };
 
   const { actor, spawned } = spawnQueuedIfDue(Game, entry, hooks);
-  const active = actor && actor.alive ? actor : getActiveAt(Game, entry.side, entry.slot);
+    const active = actor && actor.alive ? actor : getActiveAt(Game, entry.side, entry.slot);
+    const hasActive = !!(active && active.alive);
 
-  const turnDetail = {
-    game: Game,
-    side: entry.side,
-    slot: entry.slot,
-    unit: active || null,
-    cycle,
-    phase: entry.side,
-    orderIndex: cursor,
-    orderLength: order.length,
-    spawned: !!spawned,
-    processedChain: null
-  };
-  emitGameEvent(TURN_START, turnDetail);
+    if (!hasActive){
+      if (!spawned){
+        advanceCursor();
+        continue;
+      }
+      // fallback: spawned flag without a living unit, skip silently but preserve rotation
+      advanceCursor();
+      continue;
+    }
 
-  try {
-    hooks.doActionOrSkip?.(Game, active || null, { performUlt: hooks.performUlt, turnContext });
+    const turnDetail = {
+      game: Game,
+      side: entry.side,
+      slot: entry.slot,
+      unit: active || null,
+      cycle,
+      phase: entry.side,
+      orderIndex: cursor,
+      orderLength,
+      spawned: !!spawned,
+      processedChain: null
+    };
+    emitGameEvent(TURN_START, turnDetail);
 
-    const chainHooks = { ...hooks, getTurnOrderIndex };
-    const processed = hooks.processActionChain?.(Game, entry.side, entry.slot, chainHooks);
-    turnDetail.processedChain = processed ?? null;
-  } finally {
-    emitGameEvent(TURN_END, turnDetail);
-  }
+    try {
+      hooks.doActionOrSkip?.(Game, active || null, { performUlt: hooks.performUlt, turnContext });
 
-  tickMinionTTL(Game, entry.side);
+  const chainHooks = { ...hooks, getTurnOrderIndex };
+      const processed = hooks.processActionChain?.(Game, entry.side, entry.slot, chainHooks);
+      turnDetail.processedChain = processed ?? null;
+    } finally {
+      emitGameEvent(TURN_END, turnDetail);
+    }
 
-  const nextCursor = (cursor + 1) % order.length;
-  Game.turn.cursor = nextCursor;
-  if (nextCursor === 0){
-    Game.turn.cycle = cycle + 1;
+    tickMinionTTL(Game, entry.side);
+
+  advanceCursor();
+    return;
    }
 }
