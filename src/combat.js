@@ -5,6 +5,7 @@ import { slotToCell, cellReserved } from './engine.js';
 import { vfxAddSpawn } from './vfx.js';
 import { emitPassiveEvent } from './passives.js';
 import { CFG } from './config.js';
+import { gainFury, startFurySkill, finishFuryHit } from './utils/fury.js';
 import { safeNow } from './utils/time.js';
 export function pickTarget(Game, attacker){
  const foe = attacker.side === 'ally' ? 'enemy' : 'ally';
@@ -44,6 +45,8 @@ export function applyDamage(target, amount){
 export function dealAbilityDamage(Game, attacker, target, opts = {}){
   if (!attacker || !target || !target.alive) return { dealt: 0, absorbed: 0, total: 0 };
 
+startFurySkill(attacker, { tag: opts.furyTag || opts.attackType || 'ability' });
+
   const dtype = opts.dtype || 'physical';
   const attackType = opts.attackType || 'skill';
   const baseDefault = dtype === 'arcane'
@@ -69,13 +72,30 @@ export function dealAbilityDamage(Game, attacker, target, opts = {}){
   const remain = Math.max(0, abs.remain);
 
   if (remain > 0) applyDamage(target, remain);
-if (target.hp <= 0) hookOnLethalDamage(target);
+  if (target.hp <= 0) hookOnLethalDamage(target);
 
   Statuses.afterDamage(attacker, target, { dealt: remain, absorbed: abs.absorbed, dtype });
 
   if (Game) {
     try { vfxAddHit(Game, target); } catch (_) {}
   }
+
+  const dealt = Math.max(0, remain);
+  const isKill = target.hp <= 0;
+  gainFury(attacker, {
+    type: attackType === 'basic' ? 'basic' : 'ability',
+    dealt,
+    isAoE: !!opts.isAoE,
+    isKill,
+    targetsHit: Number.isFinite(opts.targetsHit) ? opts.targetsHit : 1
+  });
+  gainFury(target, {
+    type: 'damageTaken',
+    dealt,
+    isAoE: !!opts.isAoE
+  });
+  finishFuryHit(target);
+  finishFuryHit(attacker);
 
   return { dealt: remain, absorbed: abs.absorbed, total: dmg };
 }
@@ -108,6 +128,8 @@ export function basicAttack(Game, unit){
   const foe = unit.side === 'ally' ? 'enemy' : 'ally';
   const pool = Game.tokens.filter(t => t.side === foe && t.alive);
   if (!pool.length) return;
+
+  startFurySkill(unit, { tag: 'basic' });
 
   // Đầu tiên chọn theo “trước mắt/ganh gần” như cũ
   const fallback = pickTarget(Game, unit);
@@ -195,6 +217,20 @@ const isLoithienanh = unit?.id === 'loithienanh';
 const dealt = Math.max(0, Math.min(dmg, abs.remain || 0));
   // Hậu quả sau đòn: phản dmg, độc theo dealt, execute ≤10%…
   Statuses.afterDamage(unit, tgt, { dealt, absorbed: abs.absorbed, dtype });
+
+  const isKill = tgt.hp <= 0;
+  gainFury(unit, {
+    type: 'basic',
+    dealt,
+    isKill,
+    targetsHit: 1
+  });
+  gainFury(tgt, {
+    type: 'damageTaken',
+    dealt
+  });
+  finishFuryHit(tgt);
+  finishFuryHit(unit);
 
   if (Array.isArray(passiveCtx.afterHit) && passiveCtx.afterHit.length){
     const afterCtx = { target: tgt, owner: unit, result: { dealt, absorbed: abs.absorbed } };

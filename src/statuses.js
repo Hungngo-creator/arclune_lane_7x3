@@ -1,4 +1,5 @@
 // statuses.js — Hệ trạng thái/effect data-driven v0.7
+import { gainFury, finishFuryHit } from './utils/fury.js';
 const byId = (u) => (u && u.statuses) || (u.statuses = []);
 
 // ===== Utilities
@@ -170,6 +171,10 @@ export const Statuses = {
     if (reflect && dealt > 0){
       const back = Math.round(dealt * clamp01(reflect.power ?? 0));
       attacker.hp = Math.max(0, attacker.hp - back);
+      if (back > 0){
+        gainFury(attacker, { type: 'damageTaken', dealt: back });
+        finishFuryHit(attacker);
+      }
       // không phản khi stealth target đang miễn sát thương (dealt=0 thì như nhau)
     }
 
@@ -178,6 +183,10 @@ export const Statuses = {
     if (venom && dealt > 0){
       const extra = Math.round(dealt * clamp01(venom.power ?? 0));
       target.hp = Math.max(0, target.hp - extra);
+      if (extra > 0){
+        gainFury(target, { type: 'damageTaken', dealt: extra });
+        finishFuryHit(target);
+      }
     }
 
     // 17) Tàn sát: nếu sau đòn còn ≤10% HPmax → xử tử

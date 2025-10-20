@@ -9,6 +9,7 @@ import { getUnitArt } from './art.js';
 import { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } from './passives.js';
 import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END } from './events.js';
 import { safeNow } from './utils/time.js';
+import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury } from './utils/fury.js';
 
 // local helper
 const tokensAlive = (Game) => Game.tokens.filter(t => t.alive);
@@ -69,10 +70,10 @@ export function spawnQueuedIfDue(Game, entry, { allocIid } = {}){
 
   const meta = Game.meta && typeof Game.meta.get === 'function' ? Game.meta.get(p.unitId) : null;
   const kit = meta?.kit;
+  const initialFury = initialRageFor(p.unitId, { isLeader:false, revive: !!p.revive, reviveSpec: p.revived });
   const obj = {
     id: p.unitId, name: p.name, color: p.color || '#a9f58c',
-    cx: p.cx, cy: p.cy, side: p.side, alive: true,
-    rage: initialRageFor(p.unitId, { isLeader:false, revive: !!p.revive, reviveSpec: p.revived })
+    cx: p.cx, cy: p.cy, side: p.side, alive: true
   };
   Object.assign(obj, makeInstanceStats(p.unitId));
   obj.statuses = [];
@@ -85,6 +86,7 @@ export function spawnQueuedIfDue(Game, entry, { allocIid } = {}){
   obj.art = getUnitArt(p.unitId);
   obj.skinKey = obj.art?.skinKey;
   obj.color = obj.color || obj.art?.palette?.primary || '#a9f58c';
+  initializeFury(obj, p.unitId, initialFury, CFG);
   prepareUnitForPassives(obj);
   Game.tokens.push(obj);
   applyOnSpawnEffects(Game, obj, kit?.onSpawn);
@@ -152,6 +154,9 @@ export function doActionOrSkip(Game, unit, { performUlt, turnContext } = {}){
   const meta = Game.meta.get(unit.id);
   emitPassiveEvent(Game, unit, 'onTurnStart', {});
 
+const turnStamp = `${side ?? ''}:${slot ?? ''}:${cycle ?? 0}`;
+  startFuryTurn(unit, { turnStamp, startAmount: CFG?.fury?.turn?.startGain, grantStart: true });
+
   Statuses.onTurnStart(unit, {});
   emitGameEvent(ACTION_START, baseDetail);
 
@@ -162,16 +167,19 @@ export function doActionOrSkip(Game, unit, { performUlt, turnContext } = {}){
     return;
   }
 
-  if (meta && (unit.rage|0) >= 100 && !Statuses.blocks(unit,'ult')){
-    let ultOk = false;
+  const ultCost = resolveUltCost(unit, CFG);
+  if (meta && (unit.fury|0) >= ultCost && !Statuses.blocks(unit,'ult')){
     try {
       performUlt(unit);
       ultOk = true;
     } catch(e){
       console.error('[performUlt]', e);
-      unit.rage = 0;
+      setFury(unit, 0);
     }
-    if (ultOk) emitPassiveEvent(Game, unit, 'onUltCast', {});
+    if (ultOk) {
+      spendFury(unit, ultCost, CFG);
+      emitPassiveEvent(Game, unit, 'onUltCast', {});
+    }
     Statuses.onTurnEnd(unit, {});
     ensureBusyReset();
     finishAction({ action: 'ult', ultOk });

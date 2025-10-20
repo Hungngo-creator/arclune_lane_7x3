@@ -9,6 +9,32 @@ export const CFG = {
   HAND_SIZE: 4,
 FOLLOWUP_CAP_DEFAULT: 2,
 
+  fury: {
+    max: 100,
+    ultCost: 100,
+    specialMax: {},
+    turn: {
+      startGain: 3,
+      cap: 40
+    },
+    skill: {
+      cap: 30
+    },
+    hit: {
+      cap: 20
+    },
+    gain: {
+      turnStart: { amount: 3 },
+      basic: { single: 6, kill: 8, crit: 4 },
+      ability: { single: 5, aoe: 3, kill: 6, crit: 3, scaled: 0.02 },
+      damageTaken: { base: 2, scaled: 0.01 }
+    },
+    drain: {
+      min: 10,
+      max: 30
+    }
+  },
+
 turnOrder: {
     pairScan: [1, 4, 7, 2, 5, 8, 3, 6, 9],
     sides: ['ally', 'enemy']
