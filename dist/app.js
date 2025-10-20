@@ -203,7 +203,8 @@ __define('./ai.js', (exports, module, __require) => {
 
     Game.queued.enemy.set(slot, {
       unitId: card.id, name: card.name, side:'enemy',
-      cx, cy, slot, spawnCycle, color:'#ed9dad'
+      cx, cy, slot, spawnCycle, color:'#ed9dad',
+      source: 'deck'
     });
 
     Game.ai.cost = Math.max(0, Game.ai.cost - card.cost);
@@ -6822,6 +6823,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
       const pending = {
         unitId: card.id, name: card.name, side:'ally',
         cx: cell.cx, cy: cell.cy, slot, spawnCycle,
+        source: 'deck',
         color: pendingArt?.palette?.primary || '#a9f58c',
         art: pendingArt,
         skinKey: pendingArt?.skinKey
@@ -12836,6 +12838,7 @@ __define('./turns.js', (exports, module, __require) => {
   const spendFury = __dep10.spendFury;
   const resolveUltCost = __dep10.resolveUltCost;
   const setFury = __dep10.setFury;
+  const clearFreshSummon = __dep10.clearFreshSummon;
 
   // local helper
   const tokensAlive = (Game) => Game.tokens.filter(t => t.alive);
@@ -12878,7 +12881,7 @@ __define('./turns.js', (exports, module, __require) => {
     return idx >= cursor ? currentCycle : currentCycle + 1;
   }
 
-  function spawnQueuedIfDue(Game, entry, { allocIid } = {}){
+  function spawnQueuedIfDue(Game, entry, { allocIid, performUlt } = {}){
     if (!entry) return { actor: null, spawned: false };
     const side = entry.side;
     const slot = entry.slot;
@@ -12895,6 +12898,8 @@ __define('./turns.js', (exports, module, __require) => {
     m.delete(slot);
 
     const meta = Game.meta && typeof Game.meta.get === 'function' ? Game.meta.get(p.unitId) : null;
+    const source = p.source || null;
+    const fromDeck = source === 'deck';
     const kit = meta?.kit;
     const initialFury = initialRageFor(p.unitId, { isLeader:false, revive: !!p.revive, reviveSpec: p.revived });
     const obj = {
@@ -12913,11 +12918,28 @@ __define('./turns.js', (exports, module, __require) => {
     obj.skinKey = obj.art?.skinKey;
     obj.color = obj.color || obj.art?.palette?.primary || '#a9f58c';
     initializeFury(obj, p.unitId, initialFury, CFG);
+    if (fromDeck){
+      setFury(obj, obj.furyMax);
+    }
     prepareUnitForPassives(obj);
     Game.tokens.push(obj);
     applyOnSpawnEffects(Game, obj, kit?.onSpawn);
     try { vfxAddSpawn(Game, p.cx, p.cy, p.side); } catch(_){}
      const actor = getActiveAt(Game, side, slot);
+    const isLeader = actor?.id === 'leaderA' || actor?.id === 'leaderB';
+    const canAutoUlt = fromDeck && !isLeader && actor && actor.alive && typeof performUlt === 'function';
+    if (canAutoUlt && !Statuses.blocks(actor, 'ult')){
+      let ultOk = false;
+      try {
+        performUlt(actor);
+        ultOk = true;
+      } catch (err){
+        console.error('[spawnQueuedIfDue.performUlt]', err);
+      }
+      if (ultOk){
+        clearFreshSummon(actor);
+      }
+    }
     return { actor: actor || null, spawned: true };
   }
 
