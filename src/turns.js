@@ -85,8 +85,10 @@ export function predictSpawnCycle(Game, side, slot){
   if (!turn) return 0;
   const order = Array.isArray(turn.order) ? turn.order : [];
   const orderLen = order.length;
-  const currentCycle = turn.cycle ?? 0;
-  if (!orderLen) return currentCycle + 1;
+  const currentCycle = Math.max(0, Number.isFinite(turn.cycle) ? turn.cycle : 0);
+  if (!orderLen){
+    return turn.mode === 'interleaved_by_position' ? currentCycle : currentCycle + 1;
+  }
   const idx = getTurnOrderIndex(Game, side, slot);
   if (idx < 0) return currentCycle + 1;
   const cursorRaw = Number.isFinite(turn.cursor) ? turn.cursor : 0;
