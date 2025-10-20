@@ -16,10 +16,10 @@ async function loadTurnsHarness(overrides = {}){
     ["import { doBasicWithFollowups } from './combat.js';", "const { doBasicWithFollowups } = __deps['./combat.js'];"],
     ["import { CFG } from './config.js';", "const { CFG } = __deps['./config.js'];"],
     ["import { makeInstanceStats, initialRageFor } from './meta.js';", "const { makeInstanceStats, initialRageFor } = __deps['./meta.js'];"],
-    ["import { vfxAddSpawn } from './vfx.js';", "const { vfxAddSpawn } = __deps['./vfx.js'];"],
+    ["import { vfxAddSpawn, vfxAddBloodPulse } from './vfx.js';", "const { vfxAddSpawn, vfxAddBloodPulse } = __deps['./vfx.js'];"],
     ["import { getUnitArt } from './art.js';", "const { getUnitArt } = __deps['./art.js'];"],
     ["import { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } from './passives.js';", "const { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } = __deps['./passives.js'];"],
-    ["import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END } from './events.js';", "const { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END } = __deps['./events.js'];"],
+    ["import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } from './events.js';", "const { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } = __deps['./events.js'];"],
     ["import { safeNow } from './utils/time.js';", "const { safeNow } = __deps['./utils/time.js'];"],
     ["import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } from './utils/fury.js';", "const { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } = __deps['./utils/fury.js'];"]
   ]);
@@ -30,7 +30,7 @@ async function loadTurnsHarness(overrides = {}){
 
   code = code.replace(/export function /g, 'function ');
   code = code.replace(/export const /g, 'const ');
-  code += '\nmodule.exports = { stepTurn, spawnQueuedIfDue, tickMinionTTL, getActiveAt, predictSpawnCycle };\n';
+  code += '\nmodule.exports = { stepTurn, spawnQueuedIfDue, tickMinionTTL, getActiveAt, predictSpawnCycle, doActionOrSkip };\n';
 
   const eventLog = [];
   const defaultDeps = {
@@ -69,7 +69,8 @@ async function loadTurnsHarness(overrides = {}){
       initialRageFor(){ return 0; }
     },
     './vfx.js': {
-      vfxAddSpawn(){ }
+      vfxAddSpawn(){ },
+      vfxAddBloodPulse(){ }
     },
     './art.js': {
       getUnitArt(){ return {}; }
@@ -86,7 +87,8 @@ async function loadTurnsHarness(overrides = {}){
       TURN_START: 'TURN_START',
       TURN_END: 'TURN_END',
       ACTION_START: 'ACTION_START',
-      ACTION_END: 'ACTION_END'
+      ACTION_END: 'ACTION_END',
+      TURN_REGEN: 'turn:regen'
     },
     './utils/time.js': {
       safeNow(){ return 0; }
@@ -363,4 +365,89 @@ test('revived spawn keeps provided resources without forced ultimate', async () 
   assert(!setCalls.includes(actor.furyMax));
   assert.strictEqual(ultCalls.length, 0);
   assert.strictEqual(actor._furyState?.freshSummon, true);
+});
+
+test('turn regen restores hp and ae each turn without exceeding max', async () => {
+  const harness = await loadTurnsHarness({
+    './statuses.js': {
+      Statuses: {
+        onTurnStart(){},
+        canAct(){ return false; },
+        onTurnEnd(){},
+        blocks(){ return false; }
+      }
+    },
+    './utils/fury.js': {
+      initializeFury(){},
+      startFuryTurn(){},
+      spendFury(){},
+      resolveUltCost(){ return 999; },
+      setFury(){},
+      clearFreshSummon(){ }
+    }
+  });
+
+  const { doActionOrSkip, deps, eventLog } = harness;
+  const statuses = deps['./statuses.js'].Statuses;
+  const startSnapshots = [];
+  statuses.onTurnStart = (unit) => {
+    startSnapshots.push({ hp: unit.hp, ae: unit.ae });
+  };
+
+  const unit = {
+    id: 'regenUnit',
+    name: 'Regen Unit',
+    side: 'ally',
+    alive: true,
+    cx: 0,
+    cy: 0,
+    hpMax: 100,
+    hp: 50,
+    hpRegen: 20,
+    aeMax: 40,
+    ae: 10,
+    aeRegen: 15
+  };
+
+  const Game = {
+    tokens: [unit],
+    meta: new Map([[unit.id, {}]]),
+    queued: { ally: new Map(), enemy: new Map() },
+    turn: {
+      order: [{ side: 'ally', slot: 1 }],
+      cursor: 0,
+      cycle: 0,
+      orderIndex: new Map(),
+      busyUntil: 0
+    }
+  };
+
+  const turnContext = { side: 'ally', slot: 1, orderIndex: 0, orderLength: 1, cycle: 0 };
+
+  for (let i = 0; i < 3; i += 1){
+    doActionOrSkip(Game, unit, { performUlt: () => {}, turnContext });
+  }
+
+  assert.equal(unit.hp, 100);
+  assert.equal(unit.ae, 40);
+
+  const regenEvents = eventLog.filter(ev => ev.type === deps['./events.js'].TURN_REGEN);
+  assert.equal(regenEvents.length, 3);
+  assert.deepStrictEqual(
+    regenEvents.map(ev => ({ hpDelta: ev.detail.hpDelta, aeDelta: ev.detail.aeDelta })),
+    [
+      { hpDelta: 20, aeDelta: 15 },
+      { hpDelta: 20, aeDelta: 15 },
+      { hpDelta: 10, aeDelta: 0 }
+    ]
+  );
+
+  assert.deepStrictEqual(
+    startSnapshots,
+    [
+      { hp: 70, ae: 25 },
+      { hp: 90, ae: 40 },
+      { hp: 100, ae: 40 }
+    ]
+  );
 });
