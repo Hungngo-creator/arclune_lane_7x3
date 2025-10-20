@@ -14,24 +14,56 @@ import { safeNow } from './utils/time.js';
 const tokensAlive = (Game) => Game.tokens.filter(t => t.alive);
 
 // --- Active/Spawn helpers (từ main.js) ---
+const keyOf = (side, slot) => `${side}:${slot}`;
+
 export function getActiveAt(Game, side, slot){
   const { cx, cy } = slotToCell(side, slot);
   return Game.tokens.find(t => t.side===side && t.cx===cx && t.cy===cy && t.alive);
 }
 
-export function hasActorThisCycle(Game, side, s){
-  const { cx, cy } = slotToCell(side, s);
-  const active = Game.tokens.some(t => t.side===side && t.cx===cx && t.cy===cy && t.alive);
-  if (active) return true;
-  const q = Game.queued[side] && Game.queued[side].get(s);
-  return !!(q && q.spawnCycle <= Game.turn.cycle);
+export function getTurnOrderIndex(Game, side, slot){
+  const turn = Game?.turn;
+  if (!turn) return -1;
+  const key = keyOf(side, slot);
+  if (turn.orderIndex instanceof Map && turn.orderIndex.has(key)){
+    const v = turn.orderIndex.get(key);
+    return typeof v === 'number' ? v : -1;
+  }
+  const order = Array.isArray(turn.order) ? turn.order : [];
+  const idx = order.findIndex(entry => entry && entry.side === side && entry.slot === slot);
+  if (turn.orderIndex instanceof Map && !turn.orderIndex.has(key) && idx >= 0){
+    turn.orderIndex.set(key, idx);
+  }
+  return idx;
 }
 
-export function spawnQueuedIfDue(Game, side, slot, { allocIid }){
-  const m = Game.queued[side];
+export function predictSpawnCycle(Game, side, slot){
+  const turn = Game?.turn;
+  if (!turn) return 0;
+  const order = Array.isArray(turn.order) ? turn.order : [];
+  const orderLen = order.length;
+  const currentCycle = turn.cycle ?? 0;
+  if (!orderLen) return currentCycle + 1;
+  const idx = getTurnOrderIndex(Game, side, slot);
+  if (idx < 0) return currentCycle + 1;
+  const cursorRaw = Number.isFinite(turn.cursor) ? turn.cursor : 0;
+  const cursor = Math.max(0, Math.min(orderLen - 1, cursorRaw));
+  return idx >= cursor ? currentCycle : currentCycle + 1;
+}
+
+export function spawnQueuedIfDue(Game, entry, { allocIid } = {}){
+  if (!entry) return { actor: null, spawned: false };
+  const side = entry.side;
+  const slot = entry.slot;
+  const active = getActiveAt(Game, side, slot);
+  const m = Game.queued?.[side];
   const p = m && m.get(slot);
-  if (!p) return false;
-  if (p.spawnCycle > Game.turn.cycle) return false;
+  if (!p){
+    return { actor: active || null, spawned: false };
+  }
+  if ((p.spawnCycle ?? 0) > (Game?.turn?.cycle ?? 0)){
+    return { actor: active || null, spawned: false };
+  }
 
   m.delete(slot);
 
@@ -49,18 +81,19 @@ export function spawnQueuedIfDue(Game, side, slot, { allocIid }){
     res: obj.res,
     wil: obj.wil
   };
-  obj.iid = allocIid();
+  obj.iid = typeof allocIid === 'function' ? allocIid() : obj.iid;
   obj.art = getUnitArt(p.unitId);
   obj.skinKey = obj.art?.skinKey;
   obj.color = obj.color || obj.art?.palette?.primary || '#a9f58c';
   prepareUnitForPassives(obj);
   Game.tokens.push(obj);
-applyOnSpawnEffects(Game, obj, kit?.onSpawn);
+  applyOnSpawnEffects(Game, obj, kit?.onSpawn);
   try { vfxAddSpawn(Game, p.cx, p.cy, p.side); } catch(_){}
-   return true;
+   const actor = getActiveAt(Game, side, slot);
+  return { actor: actor || null, spawned: true };
 }
 
-// giảm TTL minion sau khi 1 phe kết thúc phase
+// giảm TTL minion sau khi phe đó hoàn tất lượt của mình
 export function tickMinionTTL(Game, side){
   const toRemove = [];
   for (const t of Game.tokens){
@@ -79,7 +112,7 @@ export function tickMinionTTL(Game, side){
 }
 
 // hành động 1 unit (ưu tiên ult nếu đủ nộ & không bị chặn)
-export function doActionOrSkip(Game, unit, { performUlt }){
+export function doActionOrSkip(Game, unit, { performUlt, turnContext } = {}){
   const ensureBusyReset = () => {
     if (!Game || !Game.turn) return;
     const now = safeNow();
@@ -87,14 +120,22 @@ export function doActionOrSkip(Game, unit, { performUlt }){
       Game.turn.busyUntil = now;
     }
   };
-  const slot = unit ? slotIndex(unit.side, unit.cx, unit.cy) : null;
+  const slot = turnContext?.slot ?? (unit ? slotIndex(unit.side, unit.cx, unit.cy) : null);
+  const side = turnContext?.side ?? unit?.side ?? null;
+  const orderIndex = typeof turnContext?.orderIndex === 'number' ? turnContext.orderIndex : null;
+  const cycle = typeof turnContext?.cycle === 'number' ? turnContext.cycle : (Game?.turn?.cycle ?? null);
+  const orderLength = typeof turnContext?.orderLength === 'number'
+    ? turnContext.orderLength
+    : (Array.isArray(Game?.turn?.order) ? Game.turn.order.length : null);
   const baseDetail = {
     game: Game,
     unit: unit || null,
-    side: (unit?.side) ?? null,
+    side,
     slot,
-    phase: (Game?.turn?.phase) ?? null,
-    cycle: (Game?.turn?.cycle) ?? null,
+    phase: side,
+    cycle,
+    orderIndex,
+    orderLength,
     action: null,
     skipped: false,
     reason: null
@@ -138,7 +179,7 @@ export function doActionOrSkip(Game, unit, { performUlt }){
   }
 
   const cap = (meta && typeof meta.followupCap === 'number') ? (meta.followupCap|0) : (CFG.FOLLOWUP_CAP_DEFAULT|0);
- doBasicWithFollowups(Game, unit, cap);
+  doBasicWithFollowups(Game, unit, cap);
   emitPassiveEvent(Game, unit, 'onActionEnd', {});
   Statuses.onTurnEnd(unit, {});
   ensureBusyReset();
@@ -146,65 +187,61 @@ export function doActionOrSkip(Game, unit, { performUlt }){
 }
 
 // Bước con trỏ lượt (sparse-cursor) đúng đặc tả
-// hooks = { performUlt, processActionChain, allocIid }
+// hooks = { performUlt, processActionChain, allocIid, doActionOrSkip }
 export function stepTurn(Game, hooks){
-  const side = Game.turn.phase;
-  const last = Game.turn.last[side] || 0;
+  const turn = Game?.turn;
+  const order = Array.isArray(turn?.order) ? turn.order : [];
+  if (!order.length) return;
 
-  // tìm slot kế tiếp có actor/queued trong chu kỳ hiện tại
-  let found = null;
-  for (let s = last + 1; s <= 9; s++){
-    if (!hasActorThisCycle(Game, side, s)) continue;
-
-    // nếu có queued tới hạn → spawn trước khi hành động
-    const spawned = spawnQueuedIfDue(Game, side, s, hooks);
-    let actor = getActiveAt(Game, side, s);
-    if (!actor && spawned) actor = getActiveAt(Game, side, s);
-
-    let turnDetail = null;
-    let maxSlot = null;
-    if (actor){
-      turnDetail = {
-        game: Game,
-        side,
-        slot: s,
-        unit: actor,
-        cycle: (Game?.turn?.cycle) ?? null,
-        phase: (Game?.turn?.phase) ?? null,
-        spawned: !!spawned,
-        processedChain: null
-      };
-      emitGameEvent(TURN_START, turnDetail);
-    }
-try {
-      if (actor){
-        doActionOrSkip(Game, actor, hooks);
-      }
-
-      // xử lý Immediate chain (creep hành động ngay theo slot tăng dần)
-      maxSlot = hooks.processActionChain(Game, side, s, hooks);
-      Game.turn.last[side] = Math.max(s, maxSlot ?? s);
-      found = s;
-      break;
-    } finally {
-      if (turnDetail){
-        emitGameEvent(TURN_END, { ...turnDetail, processedChain: maxSlot ?? null });
-      }
-}
+  const cursor = Math.max(0, Math.min(order.length - 1, turn.cursor ?? 0));
+  const entry = order[cursor];
+  if (!entry){
+    Game.turn.cursor = (cursor + 1) % order.length;
+    if (Game.turn.cursor === 0) Game.turn.cycle = (Game.turn.cycle ?? 0) + 1;
+    return;
   }
 
-  if (found !== null) return; // đã đi 1 bước trong phe hiện tại
+  const cycle = Game.turn.cycle ?? 0;
+  const turnContext = {
+    side: entry.side,
+    slot: entry.slot,
+    orderIndex: cursor,
+    orderLength: order.length,
+    cycle
+  };
 
-  // không còn slot nào trong phe này → kết thúc phase & chuyển phe
-  const finishedSide = side;
-  if (finishedSide === 'ally'){
-    Game.turn.phase = 'enemy';
-    Game.turn.last.enemy = 0;
-  } else {
-    Game.turn.phase = 'ally';
-    Game.turn.last.ally = 0;
-    Game.turn.cycle += 1;
+  const { actor, spawned } = spawnQueuedIfDue(Game, entry, hooks);
+  const active = actor && actor.alive ? actor : getActiveAt(Game, entry.side, entry.slot);
+
+  const turnDetail = {
+    game: Game,
+    side: entry.side,
+    slot: entry.slot,
+    unit: active || null,
+    cycle,
+    phase: entry.side,
+    orderIndex: cursor,
+    orderLength: order.length,
+    spawned: !!spawned,
+    processedChain: null
+  };
+  emitGameEvent(TURN_START, turnDetail);
+
+  try {
+    hooks.doActionOrSkip?.(Game, active || null, { performUlt: hooks.performUlt, turnContext });
+
+    const chainHooks = { ...hooks, getTurnOrderIndex };
+    const processed = hooks.processActionChain?.(Game, entry.side, entry.slot, chainHooks);
+    turnDetail.processedChain = processed ?? null;
+  } finally {
+    emitGameEvent(TURN_END, turnDetail);
   }
-  // minion của phe vừa xong phase bị trừ TTL
-  tickMinionTTL(Game, finishedSide);
+
+  tickMinionTTL(Game, entry.side);
+
+  const nextCursor = (cursor + 1) % order.length;
+  Game.turn.cursor = nextCursor;
+  if (nextCursor === 0){
+    Game.turn.cycle = cycle + 1;
+   }
 }

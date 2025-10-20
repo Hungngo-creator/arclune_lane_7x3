@@ -27,7 +27,7 @@ export function enqueueImmediate(Game, req){
 }
 
 // xử lý toàn bộ chain của 1 phe sau khi actor vừa hành động
-// trả về slot lớn nhất đã hành động trong chain (để cập nhật turn.last)
+// trả về slot lớn nhất đã hành động trong chain để tiện logging
 export function processActionChain(Game, side, baseSlot, hooks){
   const list = Game.actionChain.filter(x => x.side === side);
   if (!list.length) return baseSlot ?? null;
@@ -69,7 +69,16 @@ export function processActionChain(Game, side, baseSlot, hooks){
     // (nếu về sau cần hạn chế further — thêm flags trong meta.creep)
     // gọi lại doActionOrSkip để dùng chung status/ult-guard (creep thường không có ult)
     const creep = Game.tokens.find(t => t.alive && t.side===side && t.cx===cx && t.cy===cy);
-    if (creep) hooks.doActionOrSkip?.(Game, creep, hooks);
+    if (creep){
+      const turnContext = {
+        side,
+        slot: item.slot,
+        orderIndex: hooks.getTurnOrderIndex?.(Game, side, item.slot) ?? -1,
+        orderLength: Array.isArray(Game.turn?.order) ? Game.turn.order.length : null,
+        cycle: Game.turn?.cycle ?? 0
+      };
+      hooks.doActionOrSkip?.(Game, creep, { performUlt: hooks.performUlt, turnContext });
+    }
 
     if (item.slot > maxSlot) maxSlot = item.slot;
   }

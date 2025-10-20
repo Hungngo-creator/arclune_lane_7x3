@@ -6,8 +6,13 @@ export const CFG = {
   ENEMY_COLS: 3,
   COST_CAP: 30,
   SUMMON_LIMIT: 10,
- HAND_SIZE: 4,
+  HAND_SIZE: 4,
 FOLLOWUP_CAP_DEFAULT: 2,
+
+turnOrder: {
+    pairScan: [1, 4, 7, 2, 5, 8, 3, 6, 9],
+    sides: ['ally', 'enemy']
+  },
 
   // === AI tuning ===
   AI: {

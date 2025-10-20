@@ -1,5 +1,6 @@
 // ai.js v0.7.6
 import { pickRandom, slotToCell, cellReserved } from './engine.js';
+import { predictSpawnCycle } from './turns.js';
 import { CFG } from './config.js';
 import { safeNow as sharedSafeNow } from './utils/time.js';
 import { detectUltBehavior, getSummonSpec, resolveSummonSlots } from './utils/kit.js';
@@ -85,9 +86,7 @@ function listEmptyEnemySlots(Game, aliveTokens){
   return out;
 }
 function etaScoreEnemy(Game, slot){
-  const last = Game.turn.last.enemy || 0;
-  if (Game.turn.phase === 'enemy' && slot > last) return 1.0;
-  return 0.5;
+  return predictSpawnCycle(Game, 'enemy', slot) === (Game.turn?.cycle ?? 0) ? 1.0 : 0.5;
 }
 function pressureScore(cx, cy){
   const dist = Math.abs(cx - 0) + Math.abs(cy - 1);
@@ -175,8 +174,7 @@ export function queueEnemyAt(Game, card, slot, cx, cy, aliveTokens){
   if (cellReserved(alive, Game.queued, cx, cy)) return false;
   if (Game.queued.enemy.has(slot)) return false;
 
-  const spawnCycle = (Game.turn.phase === 'enemy' && slot > (Game.turn.last.enemy||0))
-    ? Game.turn.cycle : Game.turn.cycle + 1;
+  const spawnCycle = predictSpawnCycle(Game, 'enemy', slot);
 
   Game.queued.enemy.set(slot, {
     unitId: card.id, name: card.name, side:'enemy',
