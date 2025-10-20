@@ -111,7 +111,9 @@ function readTrait(traits, key){
         const candidate = /** @type {KitTraitObject} */ (entry);
         const id = normalizeKey(candidate.id || candidate.key || candidate.type || candidate.name);
         if (id === target) return candidate;
-        if (candidate[target] != null) return /** @type {unknown} */ (candidate[target]);
+        if (candidate[target] != null){
+          return /** @type {boolean | KitTraitObject | string | number | null} */ (candidate[target]);
+        }
       }
     }
     return null;
@@ -119,7 +121,9 @@ function readTrait(traits, key){
 
   if (typeof traits === 'object'){
     for (const [k, value] of Object.entries(traits)){
-      if (normalizeKey(k) === target) return /** @type {unknown} */ (value);
+      if (normalizeKey(k) === target){
+        return /** @type {boolean | KitTraitObject | string | number | null} */ (value);
+      }
     }
   }
   return null;
@@ -133,10 +137,15 @@ function readTrait(traits, key){
 function cloneShallow(value){
   if (value == null || typeof value !== 'object') return (value ?? null);
   if (Array.isArray(value)) return /** @type {T | null} */ (value.map(cloneShallow));
-  const out = { ...value };
+  const out = /** @type {Record<string, unknown>} */ ({ ...value });
   for (const [k, v] of Object.entries(out)){
-    if (v && typeof v === 'object' && !Array.isArray(v)) out[k] = { ...v };
-    if (Array.isArray(v)) out[k] = v.map(cloneShallow);
+    if (Array.isArray(v)){
+      out[k] = v.map(cloneShallow);
+      continue;
+    }
+    if (v && typeof v === 'object'){
+      out[k] = cloneShallow(v);
+    }
   }
   return /** @type {T} */ (out);
 }
@@ -147,8 +156,7 @@ function cloneShallow(value){
  */
 function extractUltSummonFields(ult){
   if (!ult || typeof ult !== 'object') return null;
-  /** @type {Partial<NormalizedSummonSpec>} */
-  const out = {};
+const out = /** @type {Partial<NormalizedSummonSpec> & Record<string, unknown>} */ ({});
   let hasValue = false;
   /**
    * @param {keyof NormalizedSummonSpec} key
@@ -157,8 +165,11 @@ function extractUltSummonFields(ult){
    */
   const assign = (key, value, clone = false) => {
     if (value === undefined || value === null) return;
-    // @ts-expect-error: dynamic assignment for partial spec
-    out[key] = clone ? cloneShallow(value) : value;
+if (clone && value && typeof value === 'object'){
+      out[key] = Array.isArray(value) ? value.map(cloneShallow) : cloneShallow(value);
+    } else {
+      out[key] = value;
+    }
     hasValue = true;
   };
 
@@ -176,7 +187,7 @@ function extractUltSummonFields(ult){
   assign('replace', ult.replace);
   assign('creep', ult.creep, true);
 
-  return hasValue ? out : null;
+  return hasValue ? /** @type {Partial<NormalizedSummonSpec>} */ (out) : null;
 }
 
 /**
@@ -188,11 +199,11 @@ function applyUltSummonDefaults(spec, ult){
   const fields = extractUltSummonFields(ult);
   if (!fields) return spec ?? null;
   const out = spec ?? /** @type {SummonSpecLike} */ ({});
+  const target = /** @type {SummonSpecLike & Record<string, unknown>} */ (out);
   for (const [key, value] of Object.entries(fields)){
-    const current = /** @type {unknown} */ (out[key]);
+    const current = target[key];
     if (current === undefined || current === null){
-      // @ts-expect-error: dynamic assignment for partial spec
-      out[key] = value;
+target[key] = value;
     }
   }
   return out;
