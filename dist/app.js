@@ -1735,12 +1735,16 @@ __define('./combat.js', (exports, module, __require) => {
       dealt,
       isAoE: !!opts.isAoE,
       isKill,
-      targetsHit: Number.isFinite(opts.targetsHit) ? opts.targetsHit : 1
+      isCrit: !!opts.isCrit,
+      targetsHit: Number.isFinite(opts.targetsHit) ? opts.targetsHit : 1,
+      targetMaxHp: Number.isFinite(target?.hpMax) ? target.hpMax : undefined
     });
     gainFury(target, {
       type: 'damageTaken',
       dealt,
-      isAoE: !!opts.isAoE
+      isAoE: !!opts.isAoE,
+      selfMaxHp: Number.isFinite(target?.hpMax) ? target.hpMax : undefined,
+      damageTaken: dealt
     });
     finishFuryHit(target);
     finishFuryHit(attacker);
@@ -1871,11 +1875,14 @@ __define('./combat.js', (exports, module, __require) => {
       type: 'basic',
       dealt,
       isKill,
-      targetsHit: 1
+      targetsHit: 1,
+      targetMaxHp: Number.isFinite(tgt?.hpMax) ? tgt.hpMax : undefined
     });
     gainFury(tgt, {
       type: 'damageTaken',
-      dealt
+      dealt,
+      selfMaxHp: Number.isFinite(tgt?.hpMax) ? tgt.hpMax : undefined,
+      damageTaken: dealt
     });
     finishFuryHit(tgt);
     finishFuryHit(unit);
@@ -1932,26 +1939,24 @@ __define('./config.js', (exports, module, __require) => {
     fury: {
       max: 100,
       ultCost: 100,
-      specialMax: {},
-      turn: {
-        startGain: 3,
-        cap: 40
+      specialMax: {
+        loithienanh: { max: 120, ultCost: 110 }
       },
-      skill: {
-        cap: 30
-      },
-      hit: {
-        cap: 20
+      caps: {
+        perTurn: 40,
+        perSkill: 30,
+        perHit: 20
       },
       gain: {
         turnStart: { amount: 3 },
-        basic: { single: 6, kill: 8, crit: 4 },
-        ability: { single: 5, aoe: 3, kill: 6, crit: 3, scaled: 0.02 },
-        damageTaken: { base: 2, scaled: 0.01 }
+        dealSingle: { base: 6, crit: 4, kill: 8, targetRatio: 10 },
+        dealAoePerTarget: { base: 3, perTarget: 3, crit: 3, kill: 6, targetRatio: 6 },
+        damageTaken: { base: 2, selfRatio: 18 }
       },
       drain: {
-        min: 10,
-        max: 30
+        perTargetBase: 10,
+        perTargetPct: 0.25,
+        skillTotalCap: 40
       }
     },
 
@@ -5420,6 +5425,7 @@ __define('./events.js', (exports, module, __require) => {
   const TURN_END = 'turn:end';
   const ACTION_START = 'action:start';
   const ACTION_END = 'action:end';
+  const TURN_REGEN = 'turn:regen';
 
   const gameEvents = makeEventTarget();
 
@@ -5450,6 +5456,7 @@ __define('./events.js', (exports, module, __require) => {
   exports.TURN_END = TURN_END;
   exports.ACTION_START = ACTION_START;
   exports.ACTION_END = ACTION_END;
+  exports.TURN_REGEN = TURN_REGEN;
   exports.gameEvents = gameEvents;
   exports.emitGameEvent = emitGameEvent;
 });
@@ -5517,6 +5524,7 @@ __define('./main.js', (exports, module, __require) => {
   exports.TURN_END = __reexport0.TURN_END;
   exports.ACTION_START = __reexport0.ACTION_START;
   exports.ACTION_END = __reexport0.ACTION_END;
+  exports.TURN_REGEN = __reexport0.TURN_REGEN;
   exports.startGame = startGame;
   exports.stopGame = stopGame;
   exports.updateGameConfig = updateGameConfig;
@@ -6382,7 +6390,12 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
         const hpPayment = Math.max(0, Math.min(desiredTrade, maxLoss));
         if (hpPayment > 0){
           applyDamage(unit, hpPayment);
-          gainFury(unit, { type: 'damageTaken', dealt: hpPayment });
+          gainFury(unit, {
+            type: 'damageTaken',
+            dealt: hpPayment,
+            selfMaxHp: Number.isFinite(unit?.hpMax) ? unit.hpMax : undefined,
+            damageTaken: hpPayment
+          });
           finishFuryHit(unit);
         }
 
@@ -6587,7 +6600,12 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
         const maxPay = Math.max(0, Math.min(pay, Math.max(0, (unit.hp || 0) - 1)));
         if (maxPay > 0){
           applyDamage(unit, maxPay);
-          gainFury(unit, { type: 'damageTaken', dealt: maxPay });
+          gainFury(unit, {
+            type: 'damageTaken',
+            dealt: maxPay,
+            selfMaxHp: Number.isFinite(unit?.hpMax) ? unit.hpMax : undefined,
+            damageTaken: maxPay
+          });
           finishFuryHit(unit);
         }
         const reduce = Math.max(0, u.reduceDmg ?? 0);
@@ -7450,13 +7468,13 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     return Game;
   }
   const __reexport0 = __require('./events.js');
-
   exports.gameEvents = __reexport0.gameEvents;
   exports.emitGameEvent = __reexport0.emitGameEvent;
   exports.TURN_START = __reexport0.TURN_START;
   exports.TURN_END = __reexport0.TURN_END;
   exports.ACTION_START = __reexport0.ACTION_START;
   exports.ACTION_END = __reexport0.ACTION_END;
+  exports.TURN_REGEN = __reexport0.TURN_REGEN;
   exports.__backgroundSignatureCache = __backgroundSignatureCache;
   exports.clearBackgroundSignatureCache = clearBackgroundSignatureCache;
   exports.computeBackgroundSignature = computeBackgroundSignature;
@@ -12598,7 +12616,12 @@ __define('./statuses.js', (exports, module, __require) => {
         const back = Math.round(dealt * clamp01(reflect.power ?? 0));
         attacker.hp = Math.max(0, attacker.hp - back);
         if (back > 0){
-          gainFury(attacker, { type: 'damageTaken', dealt: back });
+          gainFury(attacker, {
+            type: 'damageTaken',
+            dealt: back,
+            selfMaxHp: Number.isFinite(attacker?.hpMax) ? attacker.hpMax : undefined,
+            damageTaken: back
+          });
           finishFuryHit(attacker);
         }
         // không phản khi stealth target đang miễn sát thương (dealt=0 thì như nhau)
@@ -12610,7 +12633,12 @@ __define('./statuses.js', (exports, module, __require) => {
         const extra = Math.round(dealt * clamp01(venom.power ?? 0));
         target.hp = Math.max(0, target.hp - extra);
         if (extra > 0){
-          gainFury(target, { type: 'damageTaken', dealt: extra });
+          gainFury(target, {
+            type: 'damageTaken',
+            dealt: extra,
+            selfMaxHp: Number.isFinite(target?.hpMax) ? target.hpMax : undefined,
+            damageTaken: extra
+          });
           finishFuryHit(target);
         }
       }
@@ -12818,6 +12846,7 @@ __define('./turns.js', (exports, module, __require) => {
   const initialRageFor = __dep4.initialRageFor;
   const __dep5 = __require('./vfx.js');
   const vfxAddSpawn = __dep5.vfxAddSpawn;
+  const vfxAddBloodPulse = __dep5.vfxAddBloodPulse;
   const __dep6 = __require('./art.js');
   const getUnitArt = __dep6.getUnitArt;
   const __dep7 = __require('./passives.js');
@@ -12830,6 +12859,7 @@ __define('./turns.js', (exports, module, __require) => {
   const TURN_END = __dep8.TURN_END;
   const ACTION_START = __dep8.ACTION_START;
   const ACTION_END = __dep8.ACTION_END;
+  const TURN_REGEN = __dep8.TURN_REGEN;
   const __dep9 = __require('./utils/time.js');
   const safeNow = __dep9.safeNow;
   const __dep10 = __require('./utils/fury.js');
@@ -12842,6 +12872,47 @@ __define('./turns.js', (exports, module, __require) => {
 
   // local helper
   const tokensAlive = (Game) => Game.tokens.filter(t => t.alive);
+
+  function applyTurnRegen(Game, unit){
+    if (!unit || !unit.alive) return { hpDelta: 0, aeDelta: 0 };
+
+    const clampStat = (value, max) => {
+      if (!Number.isFinite(max)){
+        return Math.max(0, value);
+      }
+      const upper = Math.max(0, max);
+      return Math.max(0, Math.min(upper, value));
+    };
+
+    let hpDelta = 0;
+    if (Number.isFinite(unit.hp) || Number.isFinite(unit.hpMax) || Number.isFinite(unit.hpRegen)){
+      const currentHp = Number.isFinite(unit.hp) ? unit.hp : 0;
+      const regenHp = Number.isFinite(unit.hpRegen) ? unit.hpRegen : 0;
+      const afterHp = clampStat(currentHp + regenHp, unit.hpMax);
+      hpDelta = afterHp - currentHp;
+      unit.hp = afterHp;
+    }
+
+    let aeDelta = 0;
+    if (Number.isFinite(unit.ae) || Number.isFinite(unit.aeMax) || Number.isFinite(unit.aeRegen)){
+      const currentAe = Number.isFinite(unit.ae) ? unit.ae : 0;
+      const regenAe = Number.isFinite(unit.aeRegen) ? unit.aeRegen : 0;
+      const afterAe = clampStat(currentAe + regenAe, unit.aeMax);
+      aeDelta = afterAe - currentAe;
+      unit.ae = afterAe;
+    }
+
+    if (hpDelta !== 0 || aeDelta !== 0){
+      emitGameEvent(TURN_REGEN, { game: Game, unit, hpDelta, aeDelta });
+      if (hpDelta > 0){
+        try {
+          vfxAddBloodPulse(Game, unit, { color: '#7ef7c1', alpha: 0.65, maxScale: 2.4 });
+        } catch (_) {}
+      }
+    }
+
+    return { hpDelta, aeDelta };
+  }
 
   // --- Active/Spawn helpers (từ main.js) ---
   const keyOf = (side, slot) => `${side}:${slot}`;
@@ -13002,9 +13073,9 @@ __define('./turns.js', (exports, module, __require) => {
     const meta = Game.meta.get(unit.id);
     emitPassiveEvent(Game, unit, 'onTurnStart', {});
 
-  const turnStamp = `${side ?? ''}:${slot ?? ''}:${cycle ?? 0}`;
+   const turnStamp = `${side ?? ''}:${slot ?? ''}:${cycle ?? 0}`;
     startFuryTurn(unit, { turnStamp, startAmount: CFG?.fury?.turn?.startGain, grantStart: true });
-
+    applyTurnRegen(Game, unit);
     Statuses.onTurnStart(unit, {});
     emitGameEvent(ACTION_START, baseDetail);
 
@@ -13490,6 +13561,8 @@ __define('./utils/fury.js', (exports, module, __require) => {
         turnGain: 0,
         skillGain: 0,
         hitGain: 0,
+        skillPerTargetGain: 0,
+        skillDrain: 0,
         turnStamp: null,
         skillTag: null,
         freshSummon: false,
@@ -13538,6 +13611,8 @@ __define('./utils/fury.js', (exports, module, __require) => {
       state.turnGain = 0;
       state.skillGain = 0;
       state.hitGain = 0;
+      state.skillPerTargetGain = 0;
+      state.skillDrain = 0;
       state.turnStamp = null;
       state.skillTag = null;
       state.freshSummon = true;
@@ -13573,6 +13648,7 @@ __define('./utils/fury.js', (exports, module, __require) => {
   function resolveTurnCap(cfg){
     const furyCfg = cfg?.fury || {};
     if (Number.isFinite(furyCfg.turnCap)) return furyCfg.turnCap;
+    if (Number.isFinite(furyCfg?.caps?.perTurn)) return furyCfg.caps.perTurn;
     if (Number.isFinite(furyCfg?.turn?.cap)) return furyCfg.turn.cap;
     return DEFAULT_TURN_CAP;
   }
@@ -13580,6 +13656,7 @@ __define('./utils/fury.js', (exports, module, __require) => {
   function resolveSkillCap(cfg){
     const furyCfg = cfg?.fury || {};
     if (Number.isFinite(furyCfg.skillCap)) return furyCfg.skillCap;
+    if (Number.isFinite(furyCfg?.caps?.perSkill)) return furyCfg.caps.perSkill;
     if (Number.isFinite(furyCfg?.skill?.cap)) return furyCfg.skill.cap;
     return DEFAULT_SKILL_CAP;
   }
@@ -13587,31 +13664,69 @@ __define('./utils/fury.js', (exports, module, __require) => {
   function resolveHitCap(cfg){
     const furyCfg = cfg?.fury || {};
     if (Number.isFinite(furyCfg.hitCap)) return furyCfg.hitCap;
+    if (Number.isFinite(furyCfg?.caps?.perHit)) return furyCfg.caps.perHit;
     if (Number.isFinite(furyCfg?.hit?.cap)) return furyCfg.hit.cap;
     return DEFAULT_HIT_CAP;
   }
 
-  function resolveGainAmount(spec = {}, cfg = CFG){
-    if (Number.isFinite(spec.amount)) return Math.floor(spec.amount);
+  function resolveGainAmount(spec = {}, cfg = CFG, state = null){
+    if (Number.isFinite(spec.amount)){
+      return { amount: Math.floor(spec.amount), perTarget: 0 };
+    }
     const furyCfg = cfg?.fury || {};
     const table = furyCfg.gain || {};
-    const key = spec.type || 'generic';
-    const mode = table[key] || {};
-    const single = Number.isFinite(mode.single) ? mode.single : (Number.isFinite(mode.base) ? mode.base : 0);
-    const aoeVal = Number.isFinite(mode.aoe) ? mode.aoe : single;
-    let base = spec.isAoE ? aoeVal : single;
-    if (spec.isCrit && Number.isFinite(mode.crit)) base += mode.crit;
-    if (spec.isKill && Number.isFinite(mode.kill)) base += mode.kill;
-    if (spec.targetsHit && Number.isFinite(mode.perTarget)) base += mode.perTarget * spec.targetsHit;
-    if (Number.isFinite(spec.dealt) && Number.isFinite(mode.scaled)){
-      base += Math.floor(Math.max(0, spec.dealt) * mode.scaled);
+    const type = spec.type || 'generic';
+
+    if (type === 'turnStart'){
+      const amount = Number.isFinite(table?.turnStart?.amount)
+        ? table.turnStart.amount
+        : (Number.isFinite(furyCfg?.turn?.startGain) ? furyCfg.turn.startGain : (furyCfg.startGain ?? 0));
+      return { amount: Math.floor(Math.max(0, amount)), perTarget: 0 };
     }
-    if (Number.isFinite(mode.min)) base = Math.max(mode.min, base);
-    if (Number.isFinite(mode.max)) base = Math.min(mode.max, base);
-    if (Number.isFinite(spec.bonus)) base += spec.bonus;
-    if (Number.isFinite(spec.multiplier)) base *= spec.multiplier;
-    return Math.floor(Math.max(0, base));
-  }
+
+    if (type === 'damageTaken'){
+      const mode = table.damageTaken || {};
+      let total = Number.isFinite(spec.base) ? spec.base : (Number.isFinite(mode.base) ? mode.base : 0);
+      const ratio = Number.isFinite(mode.selfRatio) ? mode.selfRatio : 0;
+      const taken = Number.isFinite(spec.damageTaken) ? spec.damageTaken : spec.dealt;
+      if (ratio && Number.isFinite(taken) && Number.isFinite(spec.selfMaxHp) && spec.selfMaxHp > 0){
+        total += Math.round((ratio * Math.max(0, taken)) / spec.selfMaxHp);
+      }
+      if (Number.isFinite(mode.min)) total = Math.max(mode.min, total);
+      if (Number.isFinite(mode.max)) total = Math.min(mode.max, total);
+      if (Number.isFinite(spec.bonus)) total += spec.bonus;
+      if (Number.isFinite(spec.multiplier)) total *= spec.multiplier;
+      return { amount: Math.floor(Math.max(0, total)), perTarget: 0 };
+    }
+
+    const isAoE = !!spec.isAoE || (Number.isFinite(spec.targetsHit) && spec.targetsHit > 1);
+    const mode = isAoE ? (table.dealAoePerTarget || {}) : (table.dealSingle || {});
+    let total = Number.isFinite(spec.base) ? spec.base : (Number.isFinite(mode.base) ? mode.base : 0);
+    if (spec.isCrit && Number.isFinite(mode.crit)) total += mode.crit;
+    if (spec.isKill && Number.isFinite(mode.kill)) total += mode.kill;
+
+    let perTargetApplied = 0;
+    if (Number.isFinite(spec.targetsHit) && spec.targetsHit > 0 && Number.isFinite(mode.perTarget)){
+      const desired = mode.perTarget * spec.targetsHit;
+      const used = state?.skillPerTargetGain ?? 0;
+      const room = Math.max(0, 12 - used);
+      const granted = Math.max(0, Math.min(desired, room));
+      total += granted;
+      perTargetApplied = granted;
+    }
+
+    const ratio = Number.isFinite(mode.targetRatio) ? mode.targetRatio : 0;
+    if (ratio && Number.isFinite(spec.dealt) && Number.isFinite(spec.targetMaxHp) && spec.targetMaxHp > 0){
+      total += Math.round((ratio * Math.max(0, spec.dealt)) / spec.targetMaxHp);
+    }
+
+     if (Number.isFinite(mode.min)) total = Math.max(mode.min, total);
+    if (Number.isFinite(mode.max)) total = Math.min(mode.max, total);
+    if (Number.isFinite(spec.bonus)) total += spec.bonus;
+    if (Number.isFinite(spec.multiplier)) total *= spec.multiplier;
+
+    return { amount: Math.floor(Math.max(0, total)), perTarget: perTargetApplied };
+    }
 
   function applyBonuses(unit, amount){
     if (!unit) return amount;
@@ -13632,11 +13747,14 @@ __define('./utils/fury.js', (exports, module, __require) => {
     state.skillGain = 0;
     state.hitGain = 0;
     state.skillTag = null;
+    state.skillPerTargetGain = 0;
+    state.skillDrain = 0;
     if (opts.grantStart !== false){
       const furyCfg = CFG?.fury || {};
-      const startAmount = Number.isFinite(opts.startAmount)
-        ? opts.startAmount
+      const baseStart = Number.isFinite(furyCfg?.gain?.turnStart?.amount)
+        ? furyCfg.gain.turnStart.amount
         : (Number.isFinite(furyCfg?.turn?.startGain) ? furyCfg.turn.startGain : (furyCfg.startGain ?? 3));
+      const startAmount = Number.isFinite(opts.startAmount) ? opts.startAmount : baseStart;
       if (startAmount > 0){
         gainFury(unit, { amount: startAmount, type: 'turnStart' });
       }
@@ -13651,6 +13769,8 @@ __define('./utils/fury.js', (exports, module, __require) => {
       state.skillTag = skillTag;
       state.skillGain = 0;
       state.hitGain = 0;
+      state.skillPerTargetGain = 0;
+      state.skillDrain = 0;
     }
   }
 
@@ -13664,10 +13784,10 @@ __define('./utils/fury.js', (exports, module, __require) => {
   function gainFury(unit, spec = {}, cfg = CFG){
     if (!unit) return 0;
     ensureAlias(unit);
-    const amountRaw = resolveGainAmount(spec, cfg);
-    if (amountRaw <= 0) return 0;
     const state = ensureState(unit);
     if (!state) return 0;
+    const { amount: desiredRaw, perTarget = 0 } = resolveGainAmount(spec, cfg, state);
+    if (desiredRaw <= 0) return 0;
     const turnCap = resolveTurnCap(cfg);
     const skillCap = resolveSkillCap(cfg);
     const hitCap = resolveHitCap(cfg);
@@ -13678,8 +13798,8 @@ __define('./utils/fury.js', (exports, module, __require) => {
     const room = Math.min(perTurnLeft, perSkillLeft, perHitLeft);
     if (room <= 0) return 0;
 
-    let amount = Math.min(amountRaw, room);
-    amount = applyBonuses(unit, amount);
+    const rawBeforeBonus = Math.min(desiredRaw, room);
+    let amount = applyBonuses(unit, rawBeforeBonus);
     if (amount <= 0) return 0;
 
     const max = Number.isFinite(unit.furyMax) ? unit.furyMax : resolveMaxFury(unit.id, cfg);
@@ -13691,6 +13811,13 @@ __define('./utils/fury.js', (exports, module, __require) => {
     state.turnGain += gained;
     state.skillGain += gained;
     state.hitGain += gained;
+    if (perTarget > 0 && rawBeforeBonus > 0){
+      const ratio = amount > 0 ? Math.min(1, gained / amount) : 0;
+      if (ratio > 0){
+        const applied = Math.min(perTarget, Math.round(perTarget * ratio));
+        state.skillPerTargetGain = Math.min(12, (state.skillPerTargetGain ?? 0) + applied);
+      }
+    }
     return gained;
   }
 
@@ -13708,24 +13835,45 @@ __define('./utils/fury.js', (exports, module, __require) => {
   function drainFury(source, target, opts = {}, cfg = CFG){
     if (!target) return 0;
     ensureAlias(target);
-    const state = ensureState(target);
-    if (state?.freshSummon){
-      state.freshSummon = false;
-      return 0;
-    }
+    const targetState = ensureState(target);
+    if (targetState?.freshSummon) return 0;
     const furyCfg = cfg?.fury || {};
     const drainCfg = furyCfg.drain || {};
-    const min = Number.isFinite(opts.min) ? opts.min : (Number.isFinite(drainCfg.min) ? drainCfg.min : 0);
-    const max = Number.isFinite(opts.max) ? opts.max : (Number.isFinite(drainCfg.max) ? drainCfg.max : null);
-    const base = Number.isFinite(opts.amount) ? opts.amount : (Number.isFinite(drainCfg.amount) ? drainCfg.amount : min);
-    let desired = Math.max(min, Math.floor(base));
-    if (Number.isFinite(max)) desired = Math.min(desired, max);
+    const base = Number.isFinite(opts.base)
+      ? opts.base
+      : (Number.isFinite(drainCfg.perTargetBase) ? drainCfg.perTargetBase : 0);
+    const percent = Number.isFinite(opts.percent)
+      ? opts.percent
+      : (Number.isFinite(drainCfg.perTargetPct) ? drainCfg.perTargetPct : 0);
+    const skillCap = Number.isFinite(opts.skillTotalCap)
+      ? opts.skillTotalCap
+      : (Number.isFinite(drainCfg.skillTotalCap) ? drainCfg.skillTotalCap : null);
+
+    const current = Math.max(0, Math.floor(target.fury ?? 0));
+    if (current <= 0) return 0;
+
+    let desired = Math.max(0, Math.floor(base));
+    if (percent) desired += Math.round(current * percent);
     if (desired <= 0) return 0;
-    const before = Math.floor(target.fury ?? 0);
-    const drained = Math.min(before, desired);
+    
+    let capRoom = desired;
+    let sourceState = null;
+    if (Number.isFinite(skillCap)){
+      sourceState = ensureState(source);
+      const used = sourceState ? (sourceState.skillDrain ?? 0) : 0;
+      capRoom = Math.max(0, Math.min(desired, skillCap - used));
+    }
+
+    const drained = Math.max(0, Math.min(current, capRoom));
     if (drained <= 0) return 0;
-    target.fury = before - drained;
+
+    target.fury = current - drained;
     target.rage = target.fury;
+    
+    if (sourceState && Number.isFinite(skillCap)){
+      sourceState.skillDrain = (sourceState.skillDrain ?? 0) + drained;
+    }
+
     return drained;
   }
 
