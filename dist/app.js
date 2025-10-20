@@ -13116,6 +13116,7 @@ __define('./turns.js', (exports, module, __require) => {
 
     const ultCost = resolveUltCost(unit, CFG);
     if (meta && (unit.fury|0) >= ultCost && !Statuses.blocks(unit,'ult')){
+      let ultOk = false;
       try {
         performUlt(unit);
         ultOk = true;
