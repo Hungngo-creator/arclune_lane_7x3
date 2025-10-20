@@ -1803,4 +1803,4 @@ export function __getStoredConfig(){
 export function __getActiveGame(){
   return Game;
 }
-export { gameEvents, emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END } from '../../events.js';
+export { gameEvents, emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } from '../../events.js';
