@@ -21,7 +21,7 @@ async function loadTurnsHarness(overrides = {}){
     ["import { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } from './passives.js';", "const { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } = __deps['./passives.js'];"],
     ["import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END } from './events.js';", "const { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END } = __deps['./events.js'];"],
     ["import { safeNow } from './utils/time.js';", "const { safeNow } = __deps['./utils/time.js'];"],
-    ["import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury } from './utils/fury.js';", "const { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury } = __deps['./utils/fury.js'];"]
+    ["import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } from './utils/fury.js';", "const { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } = __deps['./utils/fury.js'];"]
   ]);
 
   for (const [needle, replacement] of replacements.entries()){
@@ -96,7 +96,8 @@ async function loadTurnsHarness(overrides = {}){
       startFuryTurn(){ },
       spendFury(){ },
       resolveUltCost(){ return 0; },
-      setFury(){ }
+      setFury(){ },
+      clearFreshSummon(){ }
     }
   };
 
@@ -200,4 +201,166 @@ test('sparse turn order keeps alternating across cycles', async () => {
   assert.strictEqual(Game.turn.cycle, 1);
   assert.deepStrictEqual(turnStarts.map(detail => detail?.slot), [2, 7, 2, 7]);
   assert.deepStrictEqual(turnStarts.map(detail => detail?.cycle), [0, 0, 1, 1]);
+});
+
+test('deck spawn auto-casts ultimate and drains fury', async () => {
+  const setCalls = [];
+  const furyModule = {
+    initializeFury(unit, _unitId, initial = 0){
+      unit.furyMax = 40;
+      furyModule.setFury(unit, initial);
+      unit._furyState = { freshSummon: true };
+    },
+    startFuryTurn(){},
+    spendFury(unit, amount){
+      unit.fury = Math.max(0, (unit.fury ?? 0) - amount);
+    },
+    resolveUltCost(unit){
+      return unit?.furyMax ?? 0;
+    },
+    setFury(unit, value){
+      setCalls.push(value);
+      unit.fury = value;
+      return value;
+    },
+    clearFreshSummon(unit){
+      if (unit && unit._furyState){
+        unit._furyState.freshSummon = false;
+      }
+    }
+  };
+  const harness = await loadTurnsHarness({
+    './utils/fury.js': furyModule,
+    './statuses.js': {
+      Statuses: {
+        onTurnStart(){},
+        canAct(){ return true; },
+        onTurnEnd(){},
+        blocks(){ return false; }
+      }
+    }
+  });
+  const { spawnQueuedIfDue } = harness;
+  const Game = {
+    tokens: [],
+    meta: new Map([[ 'deckUnit', { kit: {} } ]]),
+    queued: { ally: new Map(), enemy: new Map() },
+    turn: { cycle: 0 }
+  };
+  Game.queued.ally.set(1, {
+    unitId: 'deckUnit',
+    name: 'Deck Unit',
+    side: 'ally',
+    cx: 0,
+    cy: 0,
+    slot: 1,
+    spawnCycle: 0,
+    source: 'deck'
+  });
+  const ultCalls = [];
+  const hooks = {
+    performUlt(unit){
+      ultCalls.push(unit);
+      furyModule.setFury(unit, 0);
+    }
+  };
+
+  const result = spawnQueuedIfDue(Game, { side: 'ally', slot: 1 }, hooks);
+  assert.strictEqual(result.spawned, true);
+  assert.strictEqual(Game.tokens.length, 1);
+  const actor = result.actor;
+  assert(actor);
+  assert.strictEqual(actor, Game.tokens[0]);
+  assert.strictEqual(actor.furyMax, 40);
+  assert.strictEqual(ultCalls.length, 1);
+  assert.strictEqual(ultCalls[0], actor);
+  assert.strictEqual(actor.fury, 0);
+  assert(setCalls.includes(actor.furyMax));
+  assert.strictEqual(actor._furyState?.freshSummon, false);
+});
+
+test('revived spawn keeps provided resources without forced ultimate', async () => {
+  const setCalls = [];
+  const furyModule = {
+    initializeFury(unit, _unitId, initial = 0){
+      unit.furyMax = 50;
+      furyModule.setFury(unit, initial);
+      unit._furyState = { freshSummon: true };
+    },
+    startFuryTurn(){},
+    spendFury(unit, amount){
+      unit.fury = Math.max(0, (unit.fury ?? 0) - amount);
+    },
+    resolveUltCost(unit){
+      return unit?.furyMax ?? 0;
+    },
+    setFury(unit, value){
+      setCalls.push(value);
+      unit.fury = value;
+      return value;
+    },
+    clearFreshSummon(unit){
+      if (unit && unit._furyState){
+        unit._furyState.freshSummon = false;
+      }
+    }
+  };
+  const harness = await loadTurnsHarness({
+    './utils/fury.js': furyModule,
+    './meta.js': {
+      makeInstanceStats(){
+        return { hpMax: 120, hp: 90 };
+      },
+      initialRageFor(_unitId, opts = {}){
+        if (opts.revive){
+          return opts.reviveSpec?.rage ?? 0;
+        }
+        return 0;
+      }
+    },
+    './statuses.js': {
+      Statuses: {
+        onTurnStart(){},
+        canAct(){ return true; },
+        onTurnEnd(){},
+        blocks(){ return false; }
+      }
+    }
+  });
+  const { spawnQueuedIfDue } = harness;
+  const Game = {
+    tokens: [],
+    meta: new Map([[ 'revivedUnit', { kit: {} } ]]),
+    queued: { ally: new Map(), enemy: new Map() },
+    turn: { cycle: 0 }
+  };
+  Game.queued.ally.set(4, {
+    unitId: 'revivedUnit',
+    name: 'Revived Unit',
+    side: 'ally',
+    cx: 1,
+    cy: 0,
+    slot: 4,
+    spawnCycle: 0,
+    source: 'revive',
+    revive: true,
+    revived: { rage: 25 }
+  });
+  const ultCalls = [];
+  const hooks = {
+    performUlt(unit){
+      ultCalls.push(unit);
+    }
+  };
+
+  const result = spawnQueuedIfDue(Game, { side: 'ally', slot: 4 }, hooks);
+  assert.strictEqual(result.spawned, true);
+  assert.strictEqual(Game.tokens.length, 1);
+  const actor = result.actor;
+  assert(actor);
+  assert.strictEqual(actor.furyMax, 50);
+  assert.strictEqual(actor.fury, 25);
+  assert(!setCalls.includes(actor.furyMax));
+  assert.strictEqual(ultCalls.length, 0);
+  assert.strictEqual(actor._furyState?.freshSummon, true);
 });
