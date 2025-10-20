@@ -1,4 +1,220 @@
+// @ts-check
+
 // config.js v0.7.5
+
+/**
+ * @typedef {import('../types/game-entities').Side} Side
+ */
+
+/**
+ * @typedef {object} FuryCaps
+ * @property {number} perTurn
+ * @property {number} perSkill
+ * @property {number} perHit
+ */
+
+/**
+ * @typedef {object} FuryGainEntry
+ * @property {number} base
+ * @property {number} [perTarget]
+ * @property {number} [crit]
+ * @property {number} [kill]
+ * @property {number} [targetRatio]
+ */
+
+/**
+ * @typedef {object} FuryConfig
+ * @property {number} max
+ * @property {number} ultCost
+ * @property {Record<string, { max: number; ultCost: number }>} specialMax
+ * @property {FuryCaps} caps
+ * @property {{
+ *   turnStart: { amount: number };
+ *   dealSingle: FuryGainEntry;
+ *   dealAoePerTarget: FuryGainEntry;
+ *   damageTaken: { base: number; selfRatio: number };
+ * }} gain
+ * @property {{ perTargetBase: number; perTargetPct: number; skillTotalCap: number }} drain
+ */
+
+/**
+ * @typedef {object} TurnOrderConfig
+ * @property {number[]} pairScan
+ * @property {Side[]} sides
+ */
+
+/**
+ * @typedef {object} AiWeights
+ * @property {number} pressure
+ * @property {number} safety
+ * @property {number} eta
+ * @property {number} summon
+ * @property {number} kitInstant
+ * @property {number} kitDefense
+ * @property {number} kitRevive
+ */
+
+/**
+ * @typedef {object} AiRoleWeight
+ * @property {number} front
+ * @property {number} back
+ * @property {number} [summonBoost]
+ */
+
+/**
+ * @typedef {object} AiConfig
+ * @property {AiWeights} WEIGHTS
+ * @property {number} ROW_CROWDING_PENALTY
+ * @property {Record<string, AiRoleWeight>} ROLE
+ * @property {{ KEEP_TOP: number }} DEBUG
+ */
+
+/**
+ * @typedef {object} AnimationConfig
+ * @property {number} turnIntervalMs
+ * @property {number} meleeDurationMs
+ */
+
+/**
+ * @typedef {object} UiConfig
+ * @property {number} PAD
+ * @property {number} BOARD_MAX_W
+ * @property {number} BOARD_MIN_H
+ * @property {number} BOARD_H_RATIO
+ * @property {number} MAX_DPR
+ * @property {number} MAX_PIXEL_AREA
+ * @property {number} CARD_GAP
+ * @property {number} CARD_MIN
+ */
+
+/**
+ * @typedef {object} DebugFlags
+ * @property {boolean} SHOW_QUEUED
+ * @property {boolean} SHOW_QUEUED_ENEMY
+ */
+
+/**
+ * @typedef {object} PerformanceConfig
+ * @property {boolean} LOW_POWER_MODE
+ * @property {number} LOW_POWER_DPR
+ * @property {boolean} LOW_POWER_SHADOWS
+ * @property {"off" | "medium" | "soft"} LOW_SHADOW_PRESET
+ * @property {number} SHADOW_MEDIUM_THRESHOLD
+ * @property {number} SHADOW_DISABLE_THRESHOLD
+ * @property {"off" | "medium" | "soft"} MEDIUM_SHADOW_PRESET
+ * @property {"off" | "medium" | "soft"} HIGH_LOAD_SHADOW_PRESET
+ * @property {number} SHADOW_HIGH_DPR_CUTOFF
+ * @property {"off" | "medium" | "soft"} HIGH_DPR_SHADOW_PRESET
+ */
+
+/**
+ * @typedef {object} ColorPalette
+ * @property {string} ally
+ * @property {string} enemy
+ * @property {string} mid
+ * @property {string} line
+ * @property {string} tokenText
+ */
+
+/**
+ * @typedef {object} SceneLayer
+ * @property {string} top
+ * @property {string} [mid]
+ * @property {string} [bottom]
+ * @property {string} [glow]
+ * @property {number} [height]
+ * @property {number} [thickness]
+ * @property {string} [color]
+ * @property {string} [accent]
+ * @property {number} [parallax]
+ * @property {number} [topScale]
+ * @property {number} [bottomScale]
+ * @property {string} [highlight]
+ */
+
+/**
+ * @typedef {object} SceneTheme
+ * @property {SceneLayer} sky
+ * @property {SceneLayer} horizon
+ * @property {SceneLayer} ground
+ */
+
+/**
+ * @typedef {object} SceneConfig
+ * @property {string} DEFAULT_THEME
+ * @property {string} CURRENT_THEME
+ * @property {Record<string, SceneTheme>} THEMES
+ */
+
+/**
+ * @typedef {object} BackgroundProp
+ * @property {string} type
+ * @property {{ cx: number; cy: number }} cell
+ * @property {{ x?: number; y?: number }} [offset]
+ * @property {number} [scale]
+ * @property {number} [alpha]
+ * @property {number} [depth]
+ * @property {number} [sortBias]
+ * @property {number} [flip]
+ */
+
+/**
+ * @typedef {object} BackgroundDefinition
+ * @property {BackgroundProp[]} props
+ */
+
+/**
+ * @typedef {object} WorldMapConfig
+ * @property {SceneConfig} SCENE
+ * @property {string} CURRENT_BACKGROUND
+ * @property {Record<string, BackgroundDefinition>} BACKGROUNDS
+ * @property {string} CAMERA
+ */
+
+/**
+ * @typedef {object} CombatTuning
+ * @property {number} GRID_COLS
+ * @property {number} GRID_ROWS
+ * @property {number} ALLY_COLS
+ * @property {number} ENEMY_COLS
+ * @property {number} COST_CAP
+ * @property {number} SUMMON_LIMIT
+ * @property {number} HAND_SIZE
+ * @property {number} FOLLOWUP_CAP_DEFAULT
+ * @property {FuryConfig} fury
+ * @property {TurnOrderConfig} turnOrder
+ * @property {AiConfig} AI
+ * @property {AnimationConfig} ANIMATION
+ */
+
+/**
+ * @typedef {CombatTuning & WorldMapConfig & {
+ *   UI: UiConfig;
+ *   DEBUG: DebugFlags;
+ *   PERFORMANCE: PerformanceConfig;
+ *   COLORS: ColorPalette;
+ * }} GameConfig
+ */
+
+/**
+ * @typedef {object} CameraPreset
+ * @property {number} rowGapRatio
+ * @property {number} topScale
+ * @property {number} depthScale
+ */
+
+/**
+ * @typedef {object} ChibiProportions
+ * @property {number} line
+ * @property {number} headR
+ * @property {number} torso
+ * @property {number} arm
+ * @property {number} leg
+ * @property {number} weapon
+ * @property {number} nameAlpha
+ */
+
+/** @type {GameConfig} */
 export const CFG = {
   GRID_COLS: 7,
   GRID_ROWS: 3,
@@ -7,7 +223,7 @@ export const CFG = {
   COST_CAP: 30,
   SUMMON_LIMIT: 10,
   HAND_SIZE: 4,
-FOLLOWUP_CAP_DEFAULT: 2,
+  FOLLOWUP_CAP_DEFAULT: 2,
 
   fury: {
     max: 100,
@@ -33,7 +249,7 @@ FOLLOWUP_CAP_DEFAULT: 2,
     }
   },
 
-turnOrder: {
+  turnOrder: {
     pairScan: [1, 4, 7, 2, 5, 8, 3, 6, 9],
     sides: ['ally', 'enemy']
   },
@@ -175,14 +391,17 @@ CURRENT_BACKGROUND: 'daylight',
 };
 
 // Camera presets (giữ nguyên)
+/** @type {Record<string, CameraPreset>} */
 export const CAM = {
   landscape_oblique: { rowGapRatio: 0.62, topScale: 0.80, depthScale: 0.94 },
   portrait_leader45: { rowGapRatio: 0.72, topScale: 0.86, depthScale: 0.96 }
 };
 // === Token render style ===
+/** @type {'chibi' | 'disk'} */
 export const TOKEN_STYLE = 'chibi'; // 'chibi' | 'disk'
 
 // Proportions cho chibi (tính theo bán kính cơ sở r)
+/** @type {ChibiProportions} */
 export const CHIBI = {
   // đường đậm hơn + tỉ lệ chibi mập mạp (đầu to, tay chân ngắn)
   line: 3,
