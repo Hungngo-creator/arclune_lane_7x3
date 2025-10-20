@@ -628,7 +628,7 @@ test('summoned unit acts immediately when spawned into empty side', async () => 
 
 test('queued ally spawn keeps scan order after enemy turn', async () => {
   const harness = await loadTurnsHarness();
-  const { stepTurn, deps } = harness;
+  const { stepTurn, deps, predictSpawnCycle } = harness;
   const slotToCell = deps['./engine.js'].slotToCell;
 
   const makeUnit = (id, side, slot) => ({ id, side, alive: true, ...slotToCell(side, slot) });
@@ -670,7 +670,7 @@ test('queued ally spawn keeps scan order after enemy turn', async () => {
     cx: spawnCell.cx,
     cy: spawnCell.cy,
     slot: 2,
-    spawnCycle: 0,
+    spawnCycle: predictSpawnCycle(Game, 'ally', 2),
     source: 'deck'
   });
 
