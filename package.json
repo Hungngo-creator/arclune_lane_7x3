@@ -23,18 +23,5 @@
     "ts-node": "^10.9.2",
     "tsx": "file:tools/tsx-stub",
     "typescript": "^5.4.0"
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node",
-    "moduleFileExtensions": [
-      "ts",
-      "js",
-      "json",
-      "node"
-    ],
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest"
-    }
   }
 }
