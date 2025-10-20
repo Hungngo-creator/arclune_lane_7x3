@@ -736,7 +736,12 @@ case 'hpTradeBurst': {
       const hpPayment = Math.max(0, Math.min(desiredTrade, maxLoss));
       if (hpPayment > 0){
         applyDamage(unit, hpPayment);
-        gainFury(unit, { type: 'damageTaken', dealt: hpPayment });
+        gainFury(unit, {
+          type: 'damageTaken',
+          dealt: hpPayment,
+          selfMaxHp: Number.isFinite(unit?.hpMax) ? unit.hpMax : undefined,
+          damageTaken: hpPayment
+        });
         finishFuryHit(unit);
       }
 
@@ -941,7 +946,12 @@ case 'hpTradeBurst': {
       const maxPay = Math.max(0, Math.min(pay, Math.max(0, (unit.hp || 0) - 1)));
       if (maxPay > 0){
         applyDamage(unit, maxPay);
-        gainFury(unit, { type: 'damageTaken', dealt: maxPay });
+        gainFury(unit, {
+          type: 'damageTaken',
+          dealt: maxPay,
+          selfMaxHp: Number.isFinite(unit?.hpMax) ? unit.hpMax : undefined,
+          damageTaken: maxPay
+        });
         finishFuryHit(unit);
       }
       const reduce = Math.max(0, u.reduceDmg ?? 0);
