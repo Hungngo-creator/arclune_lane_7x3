@@ -19,14 +19,16 @@ __define('./ai.js', (exports, module, __require) => {
   const pickRandom = __dep0.pickRandom;
   const slotToCell = __dep0.slotToCell;
   const cellReserved = __dep0.cellReserved;
-  const __dep1 = __require('./config.js');
-  const CFG = __dep1.CFG;
-  const __dep2 = __require('./utils/time.js');
-  const sharedSafeNow = __dep2.safeNow;
-  const __dep3 = __require('./utils/kit.js');
-  const detectUltBehavior = __dep3.detectUltBehavior;
-  const getSummonSpec = __dep3.getSummonSpec;
-  const resolveSummonSlots = __dep3.resolveSummonSlots;
+  const __dep1 = __require('./turns.js');
+  const predictSpawnCycle = __dep1.predictSpawnCycle;
+  const __dep2 = __require('./config.js');
+  const CFG = __dep2.CFG;
+  const __dep3 = __require('./utils/time.js');
+  const sharedSafeNow = __dep3.safeNow;
+  const __dep4 = __require('./utils/kit.js');
+  const detectUltBehavior = __dep4.detectUltBehavior;
+  const getSummonSpec = __dep4.getSummonSpec;
+  const resolveSummonSlots = __dep4.resolveSummonSlots;
 
   const safeNow = () => sharedSafeNow();
 
@@ -109,9 +111,7 @@ __define('./ai.js', (exports, module, __require) => {
     return out;
   }
   function etaScoreEnemy(Game, slot){
-    const last = Game.turn.last.enemy || 0;
-    if (Game.turn.phase === 'enemy' && slot > last) return 1.0;
-    return 0.5;
+    return predictSpawnCycle(Game, 'enemy', slot) === (Game.turn?.cycle ?? 0) ? 1.0 : 0.5;
   }
   function pressureScore(cx, cy){
     const dist = Math.abs(cx - 0) + Math.abs(cy - 1);
@@ -199,8 +199,7 @@ __define('./ai.js', (exports, module, __require) => {
     if (cellReserved(alive, Game.queued, cx, cy)) return false;
     if (Game.queued.enemy.has(slot)) return false;
 
-    const spawnCycle = (Game.turn.phase === 'enemy' && slot > (Game.turn.last.enemy||0))
-      ? Game.turn.cycle : Game.turn.cycle + 1;
+    const spawnCycle = predictSpawnCycle(Game, 'enemy', slot);
 
     Game.queued.enemy.set(slot, {
       unitId: card.id, name: card.name, side:'enemy',
@@ -1887,8 +1886,13 @@ __define('./config.js', (exports, module, __require) => {
     ENEMY_COLS: 3,
     COST_CAP: 30,
     SUMMON_LIMIT: 10,
-   HAND_SIZE: 4,
+    HAND_SIZE: 4,
   FOLLOWUP_CAP_DEFAULT: 2,
+
+  turnOrder: {
+      pairScan: [1, 4, 7, 2, 5, 8, 3, 6, 9],
+      sides: ['ally', 'enemy']
+    },
 
     // === AI tuning ===
     AI: {
@@ -5525,6 +5529,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
   const __dep1 = __require('./turns.js');
   const stepTurn = __dep1.stepTurn;
   const doActionOrSkip = __dep1.doActionOrSkip;
+  const predictSpawnCycle = __dep1.predictSpawnCycle;
   const __dep2 = __require('./summon.js');
   const enqueueImmediate = __dep2.enqueueImmediate;
   const processActionChain = __dep2.processActionChain;
@@ -5711,6 +5716,66 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     return out;
   }
 
+  function buildTurnOrder(){
+    const cfg = CFG.turnOrder || {};
+    const rawSides = Array.isArray(cfg.sides) ? cfg.sides : null;
+    const sides = (rawSides && rawSides.length) ? rawSides.filter(s => s === 'ally' || s === 'enemy') : ['ally', 'enemy'];
+    const order = [];
+    const addPair = (side, slot)=>{
+      if (side !== 'ally' && side !== 'enemy') return;
+      const num = Number(slot);
+      if (!Number.isFinite(num)) return;
+      const safeSlot = Math.max(1, Math.min(9, Math.round(num)));
+      order.push({ side, slot: safeSlot });
+    };
+    const appendSlots = (slot)=>{
+      for (const side of sides){
+        addPair(side, slot);
+      }
+    };
+
+    const scan = Array.isArray(cfg.pairScan) ? cfg.pairScan : null;
+    if (scan && scan.length){
+      for (const entry of scan){
+        if (typeof entry === 'number'){
+          appendSlots(entry);
+          continue;
+        }
+        if (Array.isArray(entry)){
+          if (entry.length === 2 && typeof entry[0] === 'string' && Number.isFinite(entry[1])){
+            addPair(entry[0] === 'enemy' ? 'enemy' : 'ally', entry[1]);
+          } else {
+            for (const val of entry){
+              if (typeof val === 'number') appendSlots(val);
+            }
+          }
+          continue;
+        }
+        if (entry && typeof entry === 'object'){
+          const slot = Number(entry.slot ?? entry.s ?? entry.index);
+          if (typeof entry.side === 'string' && Number.isFinite(slot)){
+            addPair(entry.side === 'enemy' ? 'enemy' : 'ally', slot);
+          } else if (Number.isFinite(slot)){
+            appendSlots(slot);
+          }
+        }
+      }
+    }
+
+    if (!order.length){
+      const fallback = [1,2,3,4,5,6,7,8,9];
+      for (const slot of fallback) appendSlots(slot);
+    }
+
+    const indexMap = new Map();
+    order.forEach((entry, idx)=>{
+      const key = `${entry.side}:${entry.slot}`;
+      if (!indexMap.has(key)) indexMap.set(key, idx);
+    });
+
+    return { order, indexMap };
+  }
+
   function createGameState(options = {}){
     options = normalizeConfig(options);
     const modeKey = typeof options.modeKey === 'string' ? options.modeKey : null;
@@ -5746,7 +5811,10 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
       deck3: [],                    // mảng 3 unit
       selectedId: null,
       ui: { bar: null },
-      turn: { phase: 'ally', last: { ally: 0, enemy: 0 }, cycle: 0, busyUntil: 0 },
+      turn: (()=>{
+        const { order, indexMap } = buildTurnOrder();
+        return { order, orderIndex: indexMap, cursor: 0, cycle: 0, busyUntil: 0 };
+      })(),
       queued: { ally: new Map(), enemy: new Map() },
       actionChain: [],
       events: gameEvents,
@@ -5788,6 +5856,8 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
         side: detail.side ?? null,
         slot: detail.slot ?? null,
         cycle: detail.cycle ?? null,
+        orderIndex: detail.orderIndex ?? null,
+        orderLength: detail.orderLength ?? null,
         phase: detail.phase ?? null,
         unit: unit?.id || unit?.name || null,
         action: detail.action || null,
@@ -6664,10 +6734,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
       const slot = slotIndex('ally', cell.cx, cell.cy);
       if (Game.queued.ally.has(slot)) return;
 
-      const spawnCycle =
-        (Game.turn.phase === 'ally' && slot > (Game.turn.last.ally || 0))
-          ? Game.turn.cycle
-          : Game.turn.cycle + 1;
+      const spawnCycle = predictSpawnCycle(Game, 'ally', slot);
       const pendingArt = getUnitArt(card.id);
       const pending = {
         unitId: card.id, name: card.name, side:'ally',
@@ -12576,7 +12643,7 @@ __define('./summon.js', (exports, module, __require) => {
   }
 
   // xử lý toàn bộ chain của 1 phe sau khi actor vừa hành động
-  // trả về slot lớn nhất đã hành động trong chain (để cập nhật turn.last)
+  // trả về slot lớn nhất đã hành động trong chain để tiện logging
   function processActionChain(Game, side, baseSlot, hooks){
     const list = Game.actionChain.filter(x => x.side === side);
     if (!list.length) return baseSlot ?? null;
@@ -12618,7 +12685,16 @@ __define('./summon.js', (exports, module, __require) => {
       // (nếu về sau cần hạn chế further — thêm flags trong meta.creep)
       // gọi lại doActionOrSkip để dùng chung status/ult-guard (creep thường không có ult)
       const creep = Game.tokens.find(t => t.alive && t.side===side && t.cx===cx && t.cy===cy);
-      if (creep) hooks.doActionOrSkip?.(Game, creep, hooks);
+      if (creep){
+        const turnContext = {
+          side,
+          slot: item.slot,
+          orderIndex: hooks.getTurnOrderIndex?.(Game, side, item.slot) ?? -1,
+          orderLength: Array.isArray(Game.turn?.order) ? Game.turn.order.length : null,
+          cycle: Game.turn?.cycle ?? 0
+        };
+        hooks.doActionOrSkip?.(Game, creep, { performUlt: hooks.performUlt, turnContext });
+      }
 
       if (item.slot > maxSlot) maxSlot = item.slot;
     }
@@ -12665,24 +12741,56 @@ __define('./turns.js', (exports, module, __require) => {
   const tokensAlive = (Game) => Game.tokens.filter(t => t.alive);
 
   // --- Active/Spawn helpers (từ main.js) ---
+  const keyOf = (side, slot) => `${side}:${slot}`;
+
   function getActiveAt(Game, side, slot){
     const { cx, cy } = slotToCell(side, slot);
     return Game.tokens.find(t => t.side===side && t.cx===cx && t.cy===cy && t.alive);
   }
 
-  function hasActorThisCycle(Game, side, s){
-    const { cx, cy } = slotToCell(side, s);
-    const active = Game.tokens.some(t => t.side===side && t.cx===cx && t.cy===cy && t.alive);
-    if (active) return true;
-    const q = Game.queued[side] && Game.queued[side].get(s);
-    return !!(q && q.spawnCycle <= Game.turn.cycle);
+  function getTurnOrderIndex(Game, side, slot){
+    const turn = Game?.turn;
+    if (!turn) return -1;
+    const key = keyOf(side, slot);
+    if (turn.orderIndex instanceof Map && turn.orderIndex.has(key)){
+      const v = turn.orderIndex.get(key);
+      return typeof v === 'number' ? v : -1;
+    }
+    const order = Array.isArray(turn.order) ? turn.order : [];
+    const idx = order.findIndex(entry => entry && entry.side === side && entry.slot === slot);
+    if (turn.orderIndex instanceof Map && !turn.orderIndex.has(key) && idx >= 0){
+      turn.orderIndex.set(key, idx);
+    }
+    return idx;
   }
 
-  function spawnQueuedIfDue(Game, side, slot, { allocIid }){
-    const m = Game.queued[side];
+  function predictSpawnCycle(Game, side, slot){
+    const turn = Game?.turn;
+    if (!turn) return 0;
+    const order = Array.isArray(turn.order) ? turn.order : [];
+    const orderLen = order.length;
+    const currentCycle = turn.cycle ?? 0;
+    if (!orderLen) return currentCycle + 1;
+    const idx = getTurnOrderIndex(Game, side, slot);
+    if (idx < 0) return currentCycle + 1;
+    const cursorRaw = Number.isFinite(turn.cursor) ? turn.cursor : 0;
+    const cursor = Math.max(0, Math.min(orderLen - 1, cursorRaw));
+    return idx >= cursor ? currentCycle : currentCycle + 1;
+  }
+
+  function spawnQueuedIfDue(Game, entry, { allocIid } = {}){
+    if (!entry) return { actor: null, spawned: false };
+    const side = entry.side;
+    const slot = entry.slot;
+    const active = getActiveAt(Game, side, slot);
+    const m = Game.queued?.[side];
     const p = m && m.get(slot);
-    if (!p) return false;
-    if (p.spawnCycle > Game.turn.cycle) return false;
+    if (!p){
+      return { actor: active || null, spawned: false };
+    }
+    if ((p.spawnCycle ?? 0) > (Game?.turn?.cycle ?? 0)){
+      return { actor: active || null, spawned: false };
+    }
 
     m.delete(slot);
 
@@ -12700,18 +12808,19 @@ __define('./turns.js', (exports, module, __require) => {
       res: obj.res,
       wil: obj.wil
     };
-    obj.iid = allocIid();
+    obj.iid = typeof allocIid === 'function' ? allocIid() : obj.iid;
     obj.art = getUnitArt(p.unitId);
     obj.skinKey = obj.art?.skinKey;
     obj.color = obj.color || obj.art?.palette?.primary || '#a9f58c';
     prepareUnitForPassives(obj);
     Game.tokens.push(obj);
-  applyOnSpawnEffects(Game, obj, kit?.onSpawn);
+    applyOnSpawnEffects(Game, obj, kit?.onSpawn);
     try { vfxAddSpawn(Game, p.cx, p.cy, p.side); } catch(_){}
-     return true;
+     const actor = getActiveAt(Game, side, slot);
+    return { actor: actor || null, spawned: true };
   }
 
-  // giảm TTL minion sau khi 1 phe kết thúc phase
+  // giảm TTL minion sau khi phe đó hoàn tất lượt của mình
   function tickMinionTTL(Game, side){
     const toRemove = [];
     for (const t of Game.tokens){
@@ -12730,7 +12839,7 @@ __define('./turns.js', (exports, module, __require) => {
   }
 
   // hành động 1 unit (ưu tiên ult nếu đủ nộ & không bị chặn)
-  function doActionOrSkip(Game, unit, { performUlt }){
+  function doActionOrSkip(Game, unit, { performUlt, turnContext } = {}){
     const ensureBusyReset = () => {
       if (!Game || !Game.turn) return;
       const now = safeNow();
@@ -12738,14 +12847,22 @@ __define('./turns.js', (exports, module, __require) => {
         Game.turn.busyUntil = now;
       }
     };
-    const slot = unit ? slotIndex(unit.side, unit.cx, unit.cy) : null;
+    const slot = turnContext?.slot ?? (unit ? slotIndex(unit.side, unit.cx, unit.cy) : null);
+    const side = turnContext?.side ?? unit?.side ?? null;
+    const orderIndex = typeof turnContext?.orderIndex === 'number' ? turnContext.orderIndex : null;
+    const cycle = typeof turnContext?.cycle === 'number' ? turnContext.cycle : (Game?.turn?.cycle ?? null);
+    const orderLength = typeof turnContext?.orderLength === 'number'
+      ? turnContext.orderLength
+      : (Array.isArray(Game?.turn?.order) ? Game.turn.order.length : null);
     const baseDetail = {
       game: Game,
       unit: unit || null,
-      side: (unit?.side) ?? null,
+      side,
       slot,
-      phase: (Game?.turn?.phase) ?? null,
-      cycle: (Game?.turn?.cycle) ?? null,
+      phase: side,
+      cycle,
+      orderIndex,
+      orderLength,
       action: null,
       skipped: false,
       reason: null
@@ -12789,7 +12906,7 @@ __define('./turns.js', (exports, module, __require) => {
     }
 
     const cap = (meta && typeof meta.followupCap === 'number') ? (meta.followupCap|0) : (CFG.FOLLOWUP_CAP_DEFAULT|0);
-   doBasicWithFollowups(Game, unit, cap);
+    doBasicWithFollowups(Game, unit, cap);
     emitPassiveEvent(Game, unit, 'onActionEnd', {});
     Statuses.onTurnEnd(unit, {});
     ensureBusyReset();
@@ -12797,71 +12914,67 @@ __define('./turns.js', (exports, module, __require) => {
   }
 
   // Bước con trỏ lượt (sparse-cursor) đúng đặc tả
-  // hooks = { performUlt, processActionChain, allocIid }
+  // hooks = { performUlt, processActionChain, allocIid, doActionOrSkip }
   function stepTurn(Game, hooks){
-    const side = Game.turn.phase;
-    const last = Game.turn.last[side] || 0;
+    const turn = Game?.turn;
+    const order = Array.isArray(turn?.order) ? turn.order : [];
+    if (!order.length) return;
 
-    // tìm slot kế tiếp có actor/queued trong chu kỳ hiện tại
-    let found = null;
-    for (let s = last + 1; s <= 9; s++){
-      if (!hasActorThisCycle(Game, side, s)) continue;
-
-      // nếu có queued tới hạn → spawn trước khi hành động
-      const spawned = spawnQueuedIfDue(Game, side, s, hooks);
-      let actor = getActiveAt(Game, side, s);
-      if (!actor && spawned) actor = getActiveAt(Game, side, s);
-
-      let turnDetail = null;
-      let maxSlot = null;
-      if (actor){
-        turnDetail = {
-          game: Game,
-          side,
-          slot: s,
-          unit: actor,
-          cycle: (Game?.turn?.cycle) ?? null,
-          phase: (Game?.turn?.phase) ?? null,
-          spawned: !!spawned,
-          processedChain: null
-        };
-        emitGameEvent(TURN_START, turnDetail);
-      }
-  try {
-        if (actor){
-          doActionOrSkip(Game, actor, hooks);
-        }
-
-        // xử lý Immediate chain (creep hành động ngay theo slot tăng dần)
-        maxSlot = hooks.processActionChain(Game, side, s, hooks);
-        Game.turn.last[side] = Math.max(s, maxSlot ?? s);
-        found = s;
-        break;
-      } finally {
-        if (turnDetail){
-          emitGameEvent(TURN_END, { ...turnDetail, processedChain: maxSlot ?? null });
-        }
-  }
+    const cursor = Math.max(0, Math.min(order.length - 1, turn.cursor ?? 0));
+    const entry = order[cursor];
+    if (!entry){
+      Game.turn.cursor = (cursor + 1) % order.length;
+      if (Game.turn.cursor === 0) Game.turn.cycle = (Game.turn.cycle ?? 0) + 1;
+      return;
     }
 
-    if (found !== null) return; // đã đi 1 bước trong phe hiện tại
+    const cycle = Game.turn.cycle ?? 0;
+    const turnContext = {
+      side: entry.side,
+      slot: entry.slot,
+      orderIndex: cursor,
+      orderLength: order.length,
+      cycle
+    };
 
-    // không còn slot nào trong phe này → kết thúc phase & chuyển phe
-    const finishedSide = side;
-    if (finishedSide === 'ally'){
-      Game.turn.phase = 'enemy';
-      Game.turn.last.enemy = 0;
-    } else {
-      Game.turn.phase = 'ally';
-      Game.turn.last.ally = 0;
-      Game.turn.cycle += 1;
+    const { actor, spawned } = spawnQueuedIfDue(Game, entry, hooks);
+    const active = actor && actor.alive ? actor : getActiveAt(Game, entry.side, entry.slot);
+
+    const turnDetail = {
+      game: Game,
+      side: entry.side,
+      slot: entry.slot,
+      unit: active || null,
+      cycle,
+      phase: entry.side,
+      orderIndex: cursor,
+      orderLength: order.length,
+      spawned: !!spawned,
+      processedChain: null
+    };
+    emitGameEvent(TURN_START, turnDetail);
+
+    try {
+      hooks.doActionOrSkip?.(Game, active || null, { performUlt: hooks.performUlt, turnContext });
+
+      const chainHooks = { ...hooks, getTurnOrderIndex };
+      const processed = hooks.processActionChain?.(Game, entry.side, entry.slot, chainHooks);
+      turnDetail.processedChain = processed ?? null;
+    } finally {
+      emitGameEvent(TURN_END, turnDetail);
     }
-    // minion của phe vừa xong phase bị trừ TTL
-    tickMinionTTL(Game, finishedSide);
-  }
 
+    tickMinionTTL(Game, entry.side);
+
+    const nextCursor = (cursor + 1) % order.length;
+    Game.turn.cursor = nextCursor;
+    if (nextCursor === 0){
+      Game.turn.cycle = cycle + 1;
+     }
+  }
   exports.getActiveAt = getActiveAt;
-  exports.hasActorThisCycle = hasActorThisCycle;
+  exports.getTurnOrderIndex = getTurnOrderIndex;
+  exports.predictSpawnCycle = predictSpawnCycle;
   exports.spawnQueuedIfDue = spawnQueuedIfDue;
   exports.tickMinionTTL = tickMinionTTL;
   exports.doActionOrSkip = doActionOrSkip;
