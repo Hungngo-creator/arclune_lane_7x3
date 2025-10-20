@@ -1,3 +1,4 @@
+// @ts-check
 //v0.7.6
 import { stepTurn, doActionOrSkip, predictSpawnCycle } from '../../turns.js';
 import { enqueueImmediate, processActionChain } from '../../summon.js';
@@ -38,6 +39,76 @@ import { gameEvents, TURN_START, TURN_END, ACTION_START, ACTION_END, BATTLE_END,
 import { ensureNestedModuleSupport } from '../../utils/dummy.js';
 import { safeNow } from '../../utils/time.js';
 import { getSummonSpec, resolveSummonSlots } from '../../utils/kit.js';
+
+/**
+ * @typedef {import('../../../types/game-entities').UnitToken} UnitToken
+ * @typedef {import('../../../types/game-entities').QueuedSummonState} QueuedSummonState
+ * @typedef {import('../../../types/game-entities').ActionChainEntry} ActionChainEntry
+ * @typedef {import('../../../types/game-entities').SessionState as CoreSessionState} CoreSessionState
+ * @typedef {import('../../../types/game-entities').TurnSnapshot} TurnSnapshot
+ */
+
+/**
+ * @typedef {Object} RewardRoll
+ * @property {string} id
+ * @property {number} weight
+ * @property {number} tier
+ * @property {Record<string, unknown>} [data]
+ */
+
+/**
+ * @typedef {Object} WaveState
+ * @property {number} index
+ * @property {ReadonlyArray<UnitToken>} units
+ * @property {'pending' | 'spawning' | 'active' | 'cleared'} status
+ * @property {number} spawnCycle
+ * @property {RewardRoll[]} rewards
+ */
+
+/**
+ * @typedef {Object} EncounterState
+ * @property {string} id
+ * @property {number} waveIndex
+ * @property {WaveState[]} waves
+ * @property {'idle' | 'running' | 'completed' | 'failed'} status
+ * @property {RewardRoll[]} pendingRewards
+ * @property {Record<string, unknown>} [metadata]
+ */
+
+/**
+ * @typedef {Object} SessionRuntimeState
+ * @property {EncounterState | null} encounter
+ * @property {WaveState | null} wave
+ * @property {RewardRoll[]} rewardQueue
+ */
+
+/**
+ * @typedef {CoreSessionState & { runtime: SessionRuntimeState, _inited?: boolean }} SessionState
+ */
+
+/**
+ * @typedef {Object} EnemyAIPreset
+ * @property {ReadonlyArray<string>=} deck
+ * @property {ReadonlyArray<string>=} unitsAll
+ * @property {number=} costCap
+ * @property {number=} summonLimit
+ * @property {ReadonlyArray<UnitToken>=} startingDeck
+ */
+
+/**
+ * @typedef {Object} CreateSessionOptions
+ * @property {string=} modeKey
+ * @property {string=} sceneTheme
+ * @property {string=} backgroundKey
+ * @property {ReadonlyArray<UnitToken>=} deck
+ * @property {EnemyAIPreset=} aiPreset
+ * @property {number=} costCap
+ * @property {number=} summonLimit
+ * @property {string=} turnMode
+ * @property {{ mode?: string }=} turn
+ * @property {string=} turnOrderMode
+ * @property {{ mode?: string }=} turnOrder
+ */
 /** @type {HTMLCanvasElement|null} */ let canvas = null;
 /** @type {CanvasRenderingContext2D|null} */ let ctx = null;
 /** @type {{update:(g:any)=>void, cleanup?:()=>void}|null} */ let hud = null;   // ← THÊM
@@ -54,6 +125,7 @@ let _IID = 1;
 let _BORN = 1;
 const nextIid = ()=> _IID++;
 
+/** @type {SessionState|null} */
 let Game = null;
 let tickLoopHandle = null;
 let tickLoopUsesTimeout = false;
@@ -69,6 +141,7 @@ let visibilityHandlerBound = false;
 let winRef = null;
 let docRef = null;
 let rootElement = null;
+/** @type {Record<string, unknown>} */
 let storedConfig = {};
 let running = false;
 let sceneCache = null;
@@ -203,7 +276,12 @@ function buildTurnOrder(){
   return { order, indexMap };
 }
 
-function createGameState(options = {}){
+/**
+ * Khởi tạo state PvE session dựa trên cấu hình.
+ * @param {CreateSessionOptions} [options]
+ * @returns {SessionState}
+ */
+function createSession(options = {}){
   options = normalizeConfig(options);
   const modeKey = typeof options.modeKey === 'string' ? options.modeKey : null;
   const sceneTheme = options.sceneTheme
@@ -250,6 +328,7 @@ const requestedTurnMode = options.turnMode
     return { order, orderIndex: indexMap, cursor: 0, cycle: 0, busyUntil: 0 };
   };
 
+/** @type {SessionState} */
   const game = {
     modeKey,
     grid: null,
@@ -276,10 +355,15 @@ const requestedTurnMode = options.turnMode
     ui: { bar: null },
     turn: buildTurnState(),
     queued: { ally: new Map(), enemy: new Map() },
-    actionChain: [],
+    actionChain: /** @type {ActionChainEntry[]} */ ([]),
     events: gameEvents,
     sceneTheme,
-    backgroundKey
+    backgroundKey,
+    runtime: {
+      encounter: null,
+      wave: null,
+      rewardQueue: []
+    }
   };
 
   game.ai = {
@@ -299,14 +383,96 @@ const requestedTurnMode = options.turnMode
   return game;
 }
 
+/**
+ * Cập nhật tiến trình encounter/wave của session.
+ * @param {SessionState} session
+ * @returns {EncounterState | null}
+ */
+function advanceSession(session){
+  if (!session?.runtime) return null;
+  const runtime = session.runtime;
+  const encounter = runtime.encounter;
+  if (!encounter){
+    runtime.wave = null;
+    return null;
+  }
+
+  encounter.pendingRewards = Array.isArray(encounter.pendingRewards)
+    ? encounter.pendingRewards
+    : [];
+
+  const waves = Array.isArray(encounter.waves) ? encounter.waves : [];
+  const index = Math.max(0, encounter.waveIndex | 0);
+  const wave = waves[index] ?? null;
+
+  if (!wave){
+    encounter.status = 'completed';
+    runtime.wave = null;
+    return encounter;
+  }
+
+  if (wave.status === 'pending'){
+    wave.status = 'spawning';
+    runtime.wave = wave;
+    encounter.status = encounter.status === 'idle' ? 'running' : encounter.status;
+  } else if (wave.status === 'spawning'){
+    wave.status = 'active';
+    runtime.wave = wave;
+    encounter.status = 'running';
+  } else if (wave.status === 'active'){
+    wave.status = 'cleared';
+    runtime.wave = null;
+    encounter.waveIndex = index + 1;
+    if (Array.isArray(wave.rewards) && wave.rewards.length){
+      encounter.pendingRewards.push(...wave.rewards);
+      runtime.rewardQueue.push(...wave.rewards);
+    }
+  } else if (wave.status === 'cleared'){
+    runtime.wave = null;
+    encounter.waveIndex = index + 1;
+  }
+
+  if (encounter.waveIndex >= waves.length){
+    encounter.status = 'completed';
+    runtime.wave = null;
+  }
+
+  return encounter;
+}
+
+/**
+ * Đánh dấu phần thưởng đã nhận cho session.
+ * @param {SessionState} session
+ * @param {RewardRoll} reward
+ * @returns {RewardRoll | null}
+ */
+function applyReward(session, reward){
+  if (!session?.runtime) return null;
+  const runtime = session.runtime;
+  if (!Array.isArray(runtime.rewardQueue)){
+    runtime.rewardQueue = [];
+  }
+  runtime.rewardQueue = runtime.rewardQueue.filter(r => r && r.id !== reward.id);
+  runtime.rewardQueue.push(reward);
+  if (runtime.encounter){
+    runtime.encounter.pendingRewards = Array.isArray(runtime.encounter.pendingRewards)
+      ? runtime.encounter.pendingRewards.filter(r => r && r.id !== reward.id)
+      : [];
+    runtime.encounter.pendingRewards.push(reward);
+  }
+  return reward;
+}
+
 function resetSessionState(options = {}){
   storedConfig = normalizeConfig({ ...storedConfig, ...options });
-  Game = createGameState(storedConfig);
+  Game = createSession(/** @type {CreateSessionOptions} */ (storedConfig));
   _IID = 1;
   _BORN = 1;
   CLOCK = createClock();
   invalidateSceneCache();
 }
+
+export { createSession, advanceSession, applyReward };
 
 if (CFG?.DEBUG?.LOG_EVENTS) {
   const logEvent = (type) => (ev)=>{
@@ -423,7 +589,7 @@ function flushScheduledResize(){
   pendingResize = false;
   try {
     resize();
-    if (hud && typeof hud.update === 'function'){
+    if (hud && typeof hud.update === 'function' && Game){
       hud.update(Game);
     }
     scheduleDraw();
@@ -568,7 +734,8 @@ function setUnitSkinForSession(unitId, skinKey){
   if (!Game) return false;
   const ok = setUnitSkin(unitId, skinKey);
   if (!ok) return false;
-  for (const token of Game.tokens){
+  const tokens = Game.tokens || [];
+  for (const token of tokens){
     if (!token || token.id !== unitId) continue;
     const art = getUnitArt(unitId);
     token.art = art;
@@ -619,8 +786,10 @@ function createClock(){
 // Xác chết chờ vanish (để sau này thay bằng dead-animation)
 const DEATH_VANISH_MS = 900;
 function cleanupDead(now){
+  if (!Game?.tokens) return;
+  const tokens = Game.tokens;
   const keep = [];
-  for (const t of Game.tokens){
+  for (const t of tokens){
     if (t.alive) { keep.push(t); continue; }
     const t0 = t.deadAt || 0;
     if (!t0) { keep.push(t); continue; }                 // phòng hờ
@@ -648,17 +817,19 @@ function creepStatsFromInherit(masterUnit, inherit){
 }
 
 function getMinionsOf(masterIid){
-  return Game.tokens.filter(t => t.isMinion && t.ownerIid === masterIid && t.alive);
+  return (Game?.tokens || []).filter(t => t.isMinion && t.ownerIid === masterIid && t.alive);
 }
 function removeOldestMinions(masterIid, count){
   if (count <= 0) return;
+  const tokens = Game?.tokens;
+  if (!tokens) return;
   const list = getMinionsOf(masterIid).sort((a,b)=> (a.bornSerial||0) - (b.bornSerial||0));
   for (let i=0;i<count && i<list.length;i++){
     const x = list[i];
     x.alive = false;
     // xoá khỏi mảng để khỏi vẽ/đụng lượt
-    const idx = Game.tokens.indexOf(x);
-    if (idx >= 0) Game.tokens.splice(idx,1);
+    const idx = tokens.indexOf(x);
+    if (idx >= 0) tokens.splice(idx,1);
   }
 }
 function extendBusy(duration){
@@ -671,19 +842,25 @@ function extendBusy(duration){
 
 // Thực thi Ult: Summoner -> Immediate Summon theo meta; class khác: trừ nộ
 function performUlt(unit){
-  const meta = Game.meta.get(unit.id);
+  if (!Game){
+    setFury(unit, 0);
+    return;
+  }
+  const metaGetter = Game.meta?.get;
+  const meta = typeof metaGetter === 'function' ? metaGetter.call(Game.meta, unit.id) : null;
   if (!meta) { setFury(unit, 0); return; }
 
   const slot = slotIndex(unit.side, unit.cx, unit.cy);
 
-const summonSpec = meta.class === 'Summoner' ? getSummonSpec(meta) : null;
+  const summonSpec = meta.class === 'Summoner' ? getSummonSpec(meta) : null;
   if (meta.class === 'Summoner' && summonSpec){
     const aliveNow = tokensAlive();
+    const queued = Game.queued || { ally: new Map(), enemy: new Map() };
     const patternSlots = resolveSummonSlots(summonSpec, slot)
       .filter(Boolean)
       .filter(s => {
         const { cx, cy } = slotToCell(unit.side, s);
-        return !cellReserved(aliveNow, Game.queued, cx, cy);
+        return !cellReserved(aliveNow, queued, cx, cy);
       })
       .sort((a, b) => a - b);
 
@@ -1016,7 +1193,8 @@ case 'hpTradeBurst': {
     }
 
     case 'revive': {
-      const fallen = Game.tokens.filter(t => t.side === unit.side && !t.alive);
+      const tokens = Game?.tokens || [];
+      const fallen = tokens.filter(t => t.side === unit.side && !t.alive);
       if (!fallen.length) break;
       fallen.sort((a,b)=> (b.deadAt||0) - (a.deadAt||0));
       const take = Math.max(1, Math.min(fallen.length, (u.targets|0) || 1));
@@ -1054,7 +1232,8 @@ case 'hpTradeBurst': {
       const selected = allies.slice(0, count);
       if (u.healLeader){
         const leaderId = unit.side === 'ally' ? 'leaderA' : 'leaderB';
-        const leader = Game.tokens.find(t => t.id === leaderId && t.alive);
+        const tokens = Game?.tokens || [];
+        const leader = tokens.find(t => t.id === leaderId && t.alive);
         if (leader && !selected.includes(leader)) selected.push(leader);
       }
       if (!selected.length) break;
@@ -1200,7 +1379,7 @@ function finalizeBattle(game, payload, context){
     running = false;
     clearSessionTimers();
     try {
-      if (hud && typeof hud.update === 'function') hud.update(Game);
+      if (hud && typeof hud.update === 'function' && Game) hud.update(Game);
     } catch (_) {}
     scheduleDraw();
   }
@@ -1270,8 +1449,10 @@ function checkBattleEnd(game, context = {}){
 // Giảm TTL minion của 1 phe sau khi phe đó kết thúc phase
 function tickMinionTTL(side){
   // gom những minion hết hạn để xoá sau vòng lặp
+  if (!Game?.tokens) return;
+  const tokens = Game.tokens;
   const toRemove = [];
-  for (const t of Game.tokens){
+  for (const t of tokens){
     if (!t.alive) continue;
     if (t.side !== side) continue;
     if (!t.isMinion) continue;
@@ -1283,13 +1464,14 @@ function tickMinionTTL(side){
   // xoá ra khỏi tokens để không còn được vẽ/đi lượt
   for (const t of toRemove){
     t.alive = false;
-    const idx = Game.tokens.indexOf(t);
-    if (idx >= 0) Game.tokens.splice(idx, 1);
+    const idx = tokens.indexOf(t);
+    if (idx >= 0) tokens.splice(idx, 1);
   }
 }
 
 function init(){
-  if (Game?._inited) return true;
+  if (!Game) return false;
+  if (Game._inited) return true;
   const doc = docRef || (typeof document !== 'undefined' ? document : null);
   if (!doc) return false;
   const root = rootElement || null;
@@ -1313,14 +1495,15 @@ function init(){
   hud = initHUD(doc, root);
   hudCleanup = (hud && typeof hud.cleanup === 'function') ? hud.cleanup : null;
   resize();
-  spawnLeaders(Game.tokens, Game.grid);
+  if (Game.grid) spawnLeaders(Game.tokens, Game.grid);
 
-  Game.tokens.forEach(t=>{
+  const tokens = Game.tokens || [];
+  tokens.forEach(t=>{
     if (t.id === 'leaderA' || t.id === 'leaderB'){
       vfxAddSpawn(Game, t.cx, t.cy, t.side);
     }
   });
-  Game.tokens.forEach(t=>{
+  tokens.forEach(t=>{
     if (!t.iid) t.iid = nextIid();
     if (t.id === 'leaderA' || t.id === 'leaderB'){
       Object.assign(t, {
@@ -1330,9 +1513,9 @@ function init(){
       initializeFury(t, t.id, 0);
     }
   });
-  Game.tokens.forEach(t => { if (!t.iid) t.iid = nextIid(); });
+  tokens.forEach(t => { if (!t.iid) t.iid = nextIid(); });
 
-  hud.update(Game);
+  if (hud && typeof hud.update === 'function' && Game) hud.update(Game);
   scheduleDraw();
   Game._inited = true;
 
@@ -1357,6 +1540,7 @@ function init(){
     canvasClickHandler = null;
   }
   canvasClickHandler = (ev)=>{
+    if (!Game.grid) return;
     const rect = canvas.getBoundingClientRect();
     const p = { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
     const cell = hitToCellOblique(Game.grid, p.x, p.y, CAM_PRESET);
@@ -1387,7 +1571,7 @@ function init(){
     Game.queued.ally.set(slot, pending);
 
     Game.cost = Math.max(0, Game.cost - card.cost);
-    hud.update(Game);
+    if (hud && typeof hud.update === 'function' && Game) hud.update(Game);
     Game.summoned += 1;
     Game.usedUnitIds.add(card.id);
 
@@ -1466,7 +1650,7 @@ const viewport = winRef?.visualViewport;
 
       CLOCK.lastCostCreditedSec = elapsedSec;
 
-      hud.update(Game);
+      if (hud && typeof hud.update === 'function' && Game) hud.update(Game);
       if (!Game.selectedId) selectFirstAffordable();
       if (Game.ui?.bar) Game.ui.bar.render();
       aiMaybeAct(Game, 'cost');
@@ -1559,6 +1743,7 @@ function selectFirstAffordable(){
 
 /* ---------- Deck logic ---------- */
 function refillDeck(){
+  if (!Game) return;
 
   const need = HAND_SIZE - Game.deck3.length;
   if (need <= 0) return;
@@ -1573,7 +1758,7 @@ function refillDeck(){
 
 /* ---------- Vẽ ---------- */
 function resize(){
-  if (!canvas) return;                                  // guard
+  if (!canvas || !Game) return;                         // guard
   const prevGrid = Game?.grid ? {
     w: Game.grid.w,
     h: Game.grid.h,
@@ -1620,9 +1805,9 @@ function resize(){
   }
 }
 function draw(){
-  if (!ctx || !canvas || !Game.grid) return;            // guard
-  const clearW = Game.grid.w ?? canvas.width;
-  const clearH = Game.grid.h ?? canvas.height;
+  if (!ctx || !canvas || !Game?.grid) return;           // guard
+  const clearW = Game.grid?.w ?? canvas.width;
+  const clearH = Game.grid?.h ?? canvas.height;
   ctx.clearRect(0, 0, clearW, clearH);
   const cache = ensureSceneCache();
   if (cache && cache.canvas){
@@ -1631,12 +1816,15 @@ function draw(){
     const sceneCfg = CFG.SCENE || {};
     const themeKey = Game.sceneTheme || sceneCfg.CURRENT_THEME || sceneCfg.DEFAULT_THEME;
     const theme = (sceneCfg.THEMES && themeKey) ? sceneCfg.THEMES[themeKey] : null;
-    drawBattlefieldScene(ctx, Game.grid, theme);
-    drawEnvironmentProps(ctx, Game.grid, CAM_PRESET, Game.backgroundKey);
+    if (Game.grid) drawBattlefieldScene(ctx, Game.grid, theme);
+    if (Game.grid) drawEnvironmentProps(ctx, Game.grid, CAM_PRESET, Game.backgroundKey);
   }
-  drawGridOblique(ctx, Game.grid, CAM_PRESET);
-  drawQueuedOblique(ctx, Game.grid, Game.queued, CAM_PRESET);
-  drawTokensOblique(ctx, Game.grid, Game.tokens, CAM_PRESET);
+  if (Game.grid){
+    drawGridOblique(ctx, Game.grid, CAM_PRESET);
+    drawQueuedOblique(ctx, Game.grid, Game.queued, CAM_PRESET);
+    const tokens = Game.tokens || [];
+    drawTokensOblique(ctx, Game.grid, tokens, CAM_PRESET);
+  }
   vfxDraw(ctx, Game, CAM_PRESET);
   drawHPBars();
 }
@@ -1731,11 +1919,12 @@ function ensureHpBarGradient(fillColor, innerHeight, innerRadius, startY, x){
 }
 
 function drawHPBars(){
-  if (!ctx || !Game.grid) return;
+  if (!ctx || !Game?.grid) return;
   const baseR = Math.floor(Game.grid.tile * 0.36);
-  for (const t of Game.tokens){
+  const tokens = Game.tokens || [];
+  for (const t of tokens){
     if (!t.alive || !Number.isFinite(t.hpMax)) continue;
-  const p = cellCenterObliqueLocal(Game.grid, t.cx, t.cy, CAM_PRESET);
+    const p = cellCenterObliqueLocal(Game.grid, t.cx, t.cy, CAM_PRESET);
     const art = t.art || getUnitArt(t.id, { skinKey: t.skinKey });
     const layout = art?.layout || {};
     const r = Math.max(6, Math.floor(baseR * (p.scale || 1)));
