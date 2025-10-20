@@ -59,7 +59,10 @@ export interface SkillDefinition {
   hits?: number;
   countsAsBasic?: boolean;
   targets?: string | number;
-  duration?: number | 'battle';
+  duration?: number | 'battle' | {
+    turns?: number | string;
+    [extra: string]: unknown;
+  };
   delayTurns?: number;
   reduceDamage?: number;
   bonusVsLeader?: number;
@@ -69,7 +72,7 @@ export interface SkillDefinition {
   debuff?: Record<string, unknown>;
   selfBuff?: Record<string, unknown>;
   link?: Record<string, unknown>;
-  notes?: string;
+  notes?: ReadonlyArray<string> | string | null;
   metadata?: Record<string, unknown>;
   [extra: string]: unknown;
 }
@@ -350,7 +353,7 @@ export interface MenuSectionDefinition {
 
 export interface SkillSection extends SkillDefinition {
   description?: string;
-  notes?: ReadonlyArray<string>;
+  notes?: ReadonlyArray<string> | string | null;
 }
 
 export interface SkillEntry {
