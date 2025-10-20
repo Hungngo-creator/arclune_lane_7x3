@@ -34,7 +34,7 @@ import {
   vfxAddShieldWrap
 } from '../../vfx.js';
 import { drawBattlefieldScene, getCachedBattlefieldScene } from '../../scene.js';
-import { gameEvents, TURN_START, TURN_END, ACTION_START, ACTION_END } from '../../events.js';
+import { gameEvents, TURN_START, TURN_END, ACTION_START, ACTION_END, BATTLE_END, emitGameEvent } from '../../events.js';
 import { ensureNestedModuleSupport } from '../../utils/dummy.js';
 import { safeNow } from '../../utils/time.js';
 import { getSummonSpec, resolveSummonSlots } from '../../utils/kit.js';
@@ -258,6 +258,15 @@ const requestedTurnMode = options.turnMode
     costCap: Number.isFinite(options.costCap) ? options.costCap : CFG.COST_CAP,
     summoned: 0,
     summonLimit: Number.isFinite(options.summonLimit) ? options.summonLimit : CFG.SUMMON_LIMIT,
+    battle: {
+      over: false,
+      winner: null,
+      reason: null,
+      detail: null,
+      finishedAt: 0,
+      result: null
+    },
+    result: null,
 
     // deck-3 + quản lý “độc nhất”
     unitsAll: allyUnits,
@@ -1099,6 +1108,165 @@ case 'hpTradeBurst': {
   spendFury(unit, resolveUltCost(unit));
 }
 const tokensAlive = () => (Game?.tokens || []).filter(t => t.alive);
+
+function ensureBattleState(game){
+  if (!game || typeof game !== 'object') return null;
+  if (!game.battle || typeof game.battle !== 'object'){
+    game.battle = {
+      over: false,
+      winner: null,
+      reason: null,
+      detail: null,
+      finishedAt: 0,
+      result: null
+    };
+  }
+  if (typeof game.result === 'undefined'){
+    game.result = null;
+  }
+  if (!Object.prototype.hasOwnProperty.call(game.battle, 'result')){
+    game.battle.result = null;
+  }
+  return game.battle;
+}
+
+function isUnitAlive(unit){
+  if (!unit) return false;
+  if (!unit.alive) return false;
+  if (Number.isFinite(unit.hp)){
+    return unit.hp > 0;
+  }
+  return true;
+}
+
+function getHpRatio(unit){
+  if (!unit) return 0;
+  const hp = Number.isFinite(unit.hp) ? unit.hp : 0;
+  const hpMax = Number.isFinite(unit.hpMax) ? unit.hpMax : 0;
+  if (hpMax > 0){
+    return Math.max(0, Math.min(1, hp / hpMax));
+  }
+  return hp > 0 ? 1 : 0;
+}
+
+function snapshotLeader(unit){
+  if (!unit) return null;
+  return {
+    id: unit.id || null,
+    side: unit.side || null,
+    alive: !!unit.alive,
+    hp: Number.isFinite(unit.hp) ? Math.max(0, unit.hp) : null,
+    hpMax: Number.isFinite(unit.hpMax) ? Math.max(0, unit.hpMax) : null
+  };
+}
+
+function isBossToken(game, token){
+  if (!token) return false;
+  if (token.isBoss) return true;
+  const rankRaw = typeof token.rank === 'string' && token.rank ? token.rank : (game?.meta?.rankOf?.(token.id) || '');
+  const rank = typeof rankRaw === 'string' ? rankRaw.toLowerCase() : '';
+  return rank === 'boss';
+}
+
+function isPvpMode(game){
+  const key = (game?.modeKey || '').toString().toLowerCase();
+  if (!key) return false;
+  if (key === 'ares') return true;
+  return key.includes('pvp');
+}
+
+function finalizeBattle(game, payload, context){
+  const battle = ensureBattleState(game);
+  if (!battle || battle.over) return battle?.result || null;
+  const finishedAt = Number.isFinite(payload?.finishedAt) ? payload.finishedAt : getNow();
+  const result = {
+    winner: payload?.winner ?? null,
+    reason: payload?.reason ?? null,
+    detail: payload?.detail ?? null,
+    finishedAt
+  };
+  battle.over = true;
+  battle.winner = result.winner;
+  battle.reason = result.reason;
+  battle.detail = result.detail;
+  battle.finishedAt = finishedAt;
+  battle.result = result;
+  game.result = result;
+  if (game.turn){
+    game.turn.completed = true;
+    game.turn.busyUntil = finishedAt;
+  }
+  if (game === Game){
+    running = false;
+    clearSessionTimers();
+    try {
+      if (hud && typeof hud.update === 'function') hud.update(Game);
+    } catch (_) {}
+    scheduleDraw();
+  }
+  emitGameEvent(BATTLE_END, { game, result, context });
+  return result;
+}
+
+function checkBattleEnd(game, context = {}){
+  if (!game) return null;
+  const battle = ensureBattleState(game);
+  if (!battle) return null;
+  if (battle.over) return battle.result || null;
+
+  const tokens = Array.isArray(game.tokens) ? game.tokens : [];
+  const leaderA = tokens.find(t => t && t.id === 'leaderA');
+  const leaderB = tokens.find(t => t && t.id === 'leaderB');
+  const leaderAAlive = isUnitAlive(leaderA);
+  const leaderBAlive = isUnitAlive(leaderB);
+
+  const contextDetail = context && typeof context === 'object' ? { ...context } : {};
+  const detail = {
+    context: contextDetail,
+    leaders: {
+      ally: snapshotLeader(leaderA),
+      enemy: snapshotLeader(leaderB)
+    }
+  };
+
+  let winner = null;
+  let reason = null;
+
+  if (!leaderAAlive || !leaderBAlive){
+    reason = 'leader_down';
+    if (leaderAAlive && !leaderBAlive) winner = 'ally';
+    else if (!leaderAAlive && leaderBAlive) winner = 'enemy';
+    else winner = 'draw';
+  } else if (contextDetail.trigger === 'timeout'){
+    reason = 'timeout';
+    const remain = Number.isFinite(contextDetail.remain) ? contextDetail.remain : 0;
+    if (isPvpMode(game)){
+      const allyRatio = getHpRatio(leaderA);
+      const enemyRatio = getHpRatio(leaderB);
+      detail.timeout = {
+        mode: 'pvp',
+        remain,
+        hpRatio: { ally: allyRatio, enemy: enemyRatio }
+      };
+      if (allyRatio > enemyRatio) winner = 'ally';
+      else if (enemyRatio > allyRatio) winner = 'enemy';
+      else winner = 'draw';
+    } else {
+      const bossAlive = tokens.some(t => t && t.alive && t.side === 'enemy' && isBossToken(game, t));
+      detail.timeout = {
+        mode: 'pve',
+        remain,
+        bossAlive
+      };
+      winner = bossAlive ? 'enemy' : 'ally';
+    }
+  }
+
+  if (!winner) return null;
+
+  const finishedAt = Number.isFinite(contextDetail.timestamp) ? contextDetail.timestamp : undefined;
+  return finalizeBattle(game, { winner, reason, detail, finishedAt }, contextDetail);
+}
 // Giảm TTL minion của 1 phe sau khi phe đó kết thúc phase
 function tickMinionTTL(side){
   // gom những minion hết hạn để xoá sau vòng lặp
@@ -1266,9 +1434,13 @@ const viewport = winRef?.visualViewport;
   
   const updateTimerAndCost = (timestamp)=>{
     if (!CLOCK) return;
+    if (!Game) return;
+    if (Game?.battle?.over) return;
+
     const now = Number.isFinite(timestamp) ? timestamp : getNow();
     const elapsedSec = Math.floor((now - CLOCK.startMs) / 1000);
 
+    const prevRemain = Number.isFinite(CLOCK.lastTimerRemain) ? CLOCK.lastTimerRemain : 0;
     const remain = Math.max(0, 240 - elapsedSec);
     if (remain !== CLOCK.lastTimerRemain){
       CLOCK.lastTimerRemain = remain;
@@ -1276,6 +1448,11 @@ const viewport = winRef?.visualViewport;
       const ss = String(remain%60).padStart(2,'0');
       const tEl = /** @type {HTMLElement|null} */ (queryFromRoot('#timer') || doc.getElementById('timer'));
       if (tEl) tEl.textContent = `${mm}:${ss}`;
+    }
+
+    if (remain <= 0 && prevRemain > 0){
+      const timeoutResult = checkBattleEnd(Game, { trigger: 'timeout', remain, timestamp: now });
+      if (timeoutResult) return;
     }
 
     const deltaSec = elapsedSec - CLOCK.lastCostCreditedSec;
@@ -1295,6 +1472,8 @@ const viewport = winRef?.visualViewport;
       aiMaybeAct(Game, 'cost');
     }
 
+  if (Game?.battle?.over) return;
+
     const busyUntil = (Game.turn?.busyUntil) ?? 0;
     if (now >= busyUntil && now - CLOCK.lastTurnStepMs >= CLOCK.turnEveryMs){
       CLOCK.lastTurnStepMs = now;
@@ -1302,9 +1481,15 @@ const viewport = winRef?.visualViewport;
         performUlt,
         processActionChain,
         allocIid: nextIid,
-        doActionOrSkip
+        doActionOrSkip,
+        checkBattleEnd
       });
       cleanupDead(now);
+      const postTurnResult = checkBattleEnd(Game, { trigger: 'post-turn', timestamp: now });
+      if (postTurnResult){
+        scheduleDraw();
+        return;
+      }
       scheduleDraw();
       aiMaybeAct(Game, 'board');
     }
@@ -1837,4 +2022,4 @@ export function __getStoredConfig(){
 export function __getActiveGame(){
   return Game;
 }
-export { gameEvents, emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } from '../../events.js';
+export { gameEvents, emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN, BATTLE_END } from '../../events.js';
