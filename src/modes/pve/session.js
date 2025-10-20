@@ -1,5 +1,5 @@
 //v0.7.6
-import { stepTurn, doActionOrSkip } from '../../turns.js';
+import { stepTurn, doActionOrSkip, predictSpawnCycle } from '../../turns.js';
 import { enqueueImmediate, processActionChain } from '../../summon.js';
 import { refillDeckEnemy, aiMaybeAct } from '../../ai.js';
 import { Statuses } from '../../statuses.js';
@@ -142,6 +142,66 @@ function normalizeConfig(input = {}){
   return out;
 }
 
+function buildTurnOrder(){
+  const cfg = CFG.turnOrder || {};
+  const rawSides = Array.isArray(cfg.sides) ? cfg.sides : null;
+  const sides = (rawSides && rawSides.length) ? rawSides.filter(s => s === 'ally' || s === 'enemy') : ['ally', 'enemy'];
+  const order = [];
+  const addPair = (side, slot)=>{
+    if (side !== 'ally' && side !== 'enemy') return;
+    const num = Number(slot);
+    if (!Number.isFinite(num)) return;
+    const safeSlot = Math.max(1, Math.min(9, Math.round(num)));
+    order.push({ side, slot: safeSlot });
+  };
+  const appendSlots = (slot)=>{
+    for (const side of sides){
+      addPair(side, slot);
+    }
+  };
+
+  const scan = Array.isArray(cfg.pairScan) ? cfg.pairScan : null;
+  if (scan && scan.length){
+    for (const entry of scan){
+      if (typeof entry === 'number'){
+        appendSlots(entry);
+        continue;
+      }
+      if (Array.isArray(entry)){
+        if (entry.length === 2 && typeof entry[0] === 'string' && Number.isFinite(entry[1])){
+          addPair(entry[0] === 'enemy' ? 'enemy' : 'ally', entry[1]);
+        } else {
+          for (const val of entry){
+            if (typeof val === 'number') appendSlots(val);
+          }
+        }
+        continue;
+      }
+      if (entry && typeof entry === 'object'){
+        const slot = Number(entry.slot ?? entry.s ?? entry.index);
+        if (typeof entry.side === 'string' && Number.isFinite(slot)){
+          addPair(entry.side === 'enemy' ? 'enemy' : 'ally', slot);
+        } else if (Number.isFinite(slot)){
+          appendSlots(slot);
+        }
+      }
+    }
+  }
+
+  if (!order.length){
+    const fallback = [1,2,3,4,5,6,7,8,9];
+    for (const slot of fallback) appendSlots(slot);
+  }
+
+  const indexMap = new Map();
+  order.forEach((entry, idx)=>{
+    const key = `${entry.side}:${entry.slot}`;
+    if (!indexMap.has(key)) indexMap.set(key, idx);
+  });
+
+  return { order, indexMap };
+}
+
 function createGameState(options = {}){
   options = normalizeConfig(options);
   const modeKey = typeof options.modeKey === 'string' ? options.modeKey : null;
@@ -177,7 +237,10 @@ function createGameState(options = {}){
     deck3: [],                    // mảng 3 unit
     selectedId: null,
     ui: { bar: null },
-    turn: { phase: 'ally', last: { ally: 0, enemy: 0 }, cycle: 0, busyUntil: 0 },
+    turn: (()=>{
+      const { order, indexMap } = buildTurnOrder();
+      return { order, orderIndex: indexMap, cursor: 0, cycle: 0, busyUntil: 0 };
+    })(),
     queued: { ally: new Map(), enemy: new Map() },
     actionChain: [],
     events: gameEvents,
@@ -219,6 +282,8 @@ if (CFG?.DEBUG?.LOG_EVENTS) {
       side: detail.side ?? null,
       slot: detail.slot ?? null,
       cycle: detail.cycle ?? null,
+      orderIndex: detail.orderIndex ?? null,
+      orderLength: detail.orderLength ?? null,
       phase: detail.phase ?? null,
       unit: unit?.id || unit?.name || null,
       action: detail.action || null,
@@ -1095,10 +1160,7 @@ function init(){
     const slot = slotIndex('ally', cell.cx, cell.cy);
     if (Game.queued.ally.has(slot)) return;
 
-    const spawnCycle =
-      (Game.turn.phase === 'ally' && slot > (Game.turn.last.ally || 0))
-        ? Game.turn.cycle
-        : Game.turn.cycle + 1;
+    const spawnCycle = predictSpawnCycle(Game, 'ally', slot);
     const pendingArt = getUnitArt(card.id);
     const pending = {
       unitId: card.id, name: card.name, side:'ally',
