@@ -22,7 +22,8 @@ async function loadTurnsHarness(overrides = {}){
     ["import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } from './events.js';", "const { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } = __deps['./events.js'];"],
     ["import { safeNow } from './utils/time.js';", "const { safeNow } = __deps['./utils/time.js'];"],
     ["import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } from './utils/fury.js';", "const { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } = __deps['./utils/fury.js'];"],
-    ["import { nextTurnInterleaved } from './turns/interleaved.js';", "const { nextTurnInterleaved } = __deps['./turns/interleaved.js'];"]
+    ["import { nextTurnInterleaved } from './turns/interleaved.js';", "const { nextTurnInterleaved } = __deps['./turns/interleaved.js'];"],
+    ['import { nextTurnInterleaved } from "./turns/interleaved.js";', "const { nextTurnInterleaved } = __deps['./turns/interleaved.js'];"]
   ]);
 
   for (const [needle, replacement] of replacements.entries()){
@@ -101,38 +102,52 @@ async function loadTurnsHarness(overrides = {}){
       resolveUltCost(){ return 0; },
       setFury(){ },
       clearFreshSummon(){ }
-    }
+},
+    './turns/interleaved.js': null
   };
 
   const deps = { ...defaultDeps, ...overrides };
   deps['../engine.js'] = deps['../engine.js'] || deps['./engine.js'];
   deps['../statuses.js'] = deps['../statuses.js'] || deps['./statuses.js'];
 
-  const interleavedPath = path.resolve(here, '../src/turns/interleaved.js');
-  let interleavedCode = await fs.readFile(interleavedPath, 'utf8');
-  const interleavedReplacements = new Map([
-    ["import { slotIndex } from '../engine.js';", "const { slotIndex } = __deps['../engine.js'];"],
-    ["import { Statuses } from '../statuses.js';", "const { Statuses } = __deps['../statuses.js'];"]
-  ]);
-  for (const [needle, replacement] of interleavedReplacements.entries()){
-    interleavedCode = interleavedCode.replace(needle, replacement);
+  const interleavedKey = './turns/interleaved.js';
+  const interleavedAltKey = '../turns/interleaved.js';
+  let interleavedModule = deps[interleavedKey] || deps[interleavedAltKey];
+  if (!interleavedModule){
+    const interleavedPath = path.resolve(here, '../src/turns/interleaved.js');
+    let interleavedCode = await fs.readFile(interleavedPath, 'utf8');
+    const interleavedReplacements = new Map([
+      ["import { slotIndex } from '../engine.js';", "const { slotIndex } = __deps['../engine.js'];"],
+      ["import { Statuses } from '../statuses.js';", "const { Statuses } = __deps['../statuses.js'];"]
+    ]);
+    for (const [needle, replacement] of interleavedReplacements.entries()){
+      interleavedCode = interleavedCode.replace(needle, replacement);
+    }
+    interleavedCode = interleavedCode.replace(/export function /g, 'function ');
+    interleavedCode += '\nmodule.exports = { findNextOccupiedPos, nextTurnInterleaved };\n';
+    const interleavedContext = {
+      module: { exports: {} },
+      exports: {},
+      __deps: deps
+    };
+    vm.createContext(interleavedContext);
+    const interleavedScript = new vm.Script(interleavedCode, { filename: 'turns/interleaved.js' });
+    interleavedScript.runInContext(interleavedContext);
+    interleavedModule = interleavedContext.module.exports;
   }
-  interleavedCode = interleavedCode.replace(/export function /g, 'function ');
-  interleavedCode += '\nmodule.exports = { findNextOccupiedPos, nextTurnInterleaved };\n';
-  const interleavedContext = {
-    module: { exports: {} },
-    exports: {},
-    __deps: deps
-  };
-  vm.createContext(interleavedContext);
-  const interleavedScript = new vm.Script(interleavedCode, { filename: 'turns/interleaved.js' });
-  interleavedScript.runInContext(interleavedContext);
-  deps['./turns/interleaved.js'] = interleavedContext.module.exports;
-  deps['../turns/interleaved.js'] = interleavedContext.module.exports;
+  if (!interleavedModule){
+    throw new Error('loadTurnsHarness: missing ./turns/interleaved.js dependency');
+  }
+  if (typeof interleavedModule.nextTurnInterleaved !== 'function'){
+    throw new Error('loadTurnsHarness: nextTurnInterleaved helper is unavailable');
+  }
+  deps[interleavedKey] = interleavedModule;
+  deps[interleavedAltKey] = interleavedModule;
   const context = {
     module: { exports: {} },
     exports: {},
-    __deps: deps
+    __deps: deps,
+    nextTurnInterleaved: interleavedModule.nextTurnInterleaved
   };
   vm.createContext(context);
   const script = new vm.Script(code, { filename: 'turns.js' });
