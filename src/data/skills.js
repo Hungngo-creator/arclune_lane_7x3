@@ -29,7 +29,7 @@ function deepFreeze(value){
 function normalizeSection(section){
   if (!section) return null;
   if (typeof section === 'string'){
-    return { name: '', description: section };
+    return /** @type {SkillSection} */ ({ name: '', description: section });
   }
   const normalized = /** @type {SkillSection} */ ({ ...section });
   if (Array.isArray(section.tags)){
@@ -37,8 +37,7 @@ function normalizeSection(section){
   }
   if (Array.isArray(section.notes)){
     normalized.notes = [...section.notes];
-  }
-  if (section.notes && !Array.isArray(section.notes)){
+  } else if (typeof section.notes === 'string'){
     const note = /** @type {string} */ (section.notes);
     normalized.notes = [note];
   }
