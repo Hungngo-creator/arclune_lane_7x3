@@ -1,11 +1,100 @@
 import fs from 'fs/promises';
+import fsSync from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import esbuild from 'esbuild';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+let esbuild;
+try {
+  const imported = await import('esbuild');
+  esbuild = imported?.default ?? imported;
+} catch (err) {
+  const fallback = await import('./tools/esbuild-stub/index.js');
+  esbuild = fallback?.default ?? fallback;
+  console.warn('Sử dụng esbuild fallback từ tools/esbuild-stub do không thể tải gói esbuild chuẩn:', err?.message || err);
+}
 const SRC_DIR = path.join(__dirname, 'src');
 const DIST_DIR = path.join(__dirname, 'dist');
 const ENTRY_ID = './entry.js';
+const SOURCE_EXTENSIONS = ['.js', '.ts', '.tsx', '.json'];
+const SCRIPT_EXTENSIONS = new Set(['.js', '.ts', '.tsx']);
+
+const MODE = process.env.NODE_ENV === 'production' ? 'production' : 'development';
+const ESBUILD_BASE_OPTIONS = {
+  format: 'esm',
+  target: ['es2023'],
+  sourcemap: MODE === 'production' ? false : true,
+  splitting: true,
+};
+
+const TS_CONFIG_PATH = path.join(__dirname, 'tsconfig.base.json');
+let TS_PATH_ALIASES = [];
+
+try {
+  const tsconfigRaw = await fs.readFile(TS_CONFIG_PATH, 'utf8');
+  const tsconfigJson = JSON.parse(tsconfigRaw);
+  const paths = tsconfigJson?.compilerOptions?.paths ?? {};
+  TS_PATH_ALIASES = Object.entries(paths).map(([key, targets]) => {
+    const hasWildcard = key.endsWith('/*');
+    const find = hasWildcard ? key.slice(0, -1) : key;
+    const replacements = (Array.isArray(targets) ? targets : [])
+      .map((target) => (hasWildcard && target.endsWith('/*') ? target.slice(0, -1) : target))
+      .map((target) => path.resolve(__dirname, target));
+    return { hasWildcard, find, replacements };
+  });
+} catch (err) {
+  console.warn('Không thể đọc tsconfig để thiết lập alias đường dẫn:', err);
+}
+
+function resolveAlias(specifier){
+  for (const { hasWildcard, find, replacements } of TS_PATH_ALIASES){
+    if (hasWildcard){
+      if (!specifier.startsWith(find)) continue;
+      const suffix = specifier.slice(find.length);
+      for (const replacement of replacements){
+        const candidate = path.join(replacement, suffix);
+        const resolved = resolveWithExtensions(candidate);
+        if (resolved){
+          return resolved;
+        }
+      }
+    } else if (specifier === find){
+      for (const replacement of replacements){
+        const resolved = resolveWithExtensions(replacement);
+        if (resolved){
+          return resolved;
+        }
+      }
+    }
+  }
+  return null;
+}
+
+function resolveWithExtensions(basePath){
+  if (!basePath) return null;
+  if (fsSync.existsSync(basePath)){
+    const stat = fsSync.statSync(basePath);
+    if (stat.isFile()){
+      return basePath;
+    }
+    if (stat.isDirectory()){
+      for (const ext of SOURCE_EXTENSIONS){
+        const indexCandidate = path.join(basePath, `index${ext}`);
+        if (fsSync.existsSync(indexCandidate) && fsSync.statSync(indexCandidate).isFile()){
+          return indexCandidate;
+        }
+      }
+    }
+  }
+  if (!path.extname(basePath)){
+    for (const ext of SOURCE_EXTENSIONS){
+      const candidate = `${basePath}${ext}`;
+      if (fsSync.existsSync(candidate) && fsSync.statSync(candidate).isFile()){
+        return candidate;
+      }
+    }
+  }
+  return fsSync.existsSync(basePath) ? basePath : null;
+}
 
 function toModuleId(filePath){
   const rel = path.relative(SRC_DIR, filePath);
@@ -14,9 +103,17 @@ function toModuleId(filePath){
 }
 
 function resolveImport(fromId, specifier){
+  const aliasResolved = resolveAlias(specifier);
+  if (aliasResolved){
+    return toModuleId(aliasResolved);
+  }
+
   const fromPath = path.join(SRC_DIR, fromId.slice(2));
-  const resolved = path.resolve(path.dirname(fromPath), specifier);
-  return toModuleId(resolved);
+  const baseResolved = specifier.startsWith('.')
+    ? path.resolve(path.dirname(fromPath), specifier)
+    : path.resolve(SRC_DIR, specifier);
+  const withExt = resolveWithExtensions(baseResolved);
+  return toModuleId(withExt || baseResolved);
 }
 
 async function listSourceFiles(){
@@ -29,7 +126,7 @@ async function listSourceFiles(){
         await walk(fullPath);
       } else if (entry.isFile()){
         const ext = path.extname(entry.name);
-        if (ext === '.js' || ext === '.json'){
+        if (SOURCE_EXTENSIONS.includes(ext)){
           files.push(fullPath);
         }
       }
@@ -306,7 +403,18 @@ async function build(){
       modules.push({ id, code: moduleCode });
       continue;
     }
-    const transformed = transformModule(raw, id);
+    let sourceCode = raw;
+    if (SCRIPT_EXTENSIONS.has(ext)){
+      const loader = ext === '.ts' ? 'ts' : ext === '.tsx' ? 'tsx' : 'js';
+      const { code } = await esbuild.transform(raw, {
+        loader,
+        format: ESBUILD_BASE_OPTIONS.format,
+        target: ESBUILD_BASE_OPTIONS.target,
+        sourcemap: ESBUILD_BASE_OPTIONS.sourcemap,
+      });
+      sourceCode = code;
+    }
+    const transformed = transformModule(sourceCode, id);
     modules.push({ id, code: transformed });
   }
 
@@ -344,8 +452,9 @@ async function build(){
   const output = parts.join('\n') + '\n';
   const { code: transpiled } = await esbuild.transform(output, {
     loader: 'js',
-  // Target modern runtimes; ES2023 is now the minimum supported JavaScript version.
-    target: ['es2023']
+format: ESBUILD_BASE_OPTIONS.format,
+    target: ESBUILD_BASE_OPTIONS.target,
+    sourcemap: ESBUILD_BASE_OPTIONS.sourcemap,
   });
   await fs.writeFile(path.join(DIST_DIR, 'app.js'), transpiled, 'utf8');
 }
