@@ -34,4 +34,4 @@ const defParams = definition?.params || null;
 
 export { renderCollectionView };
 
-export default { renderCollectionScreen };
+export { renderCollectionScreen };

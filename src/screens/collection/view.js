@@ -1215,4 +1215,4 @@ let activeAbilityCard = null;
   };
 }
 
-export default renderCollectionView;
+export { renderCollectionView };
