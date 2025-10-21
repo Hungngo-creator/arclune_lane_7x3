@@ -443,7 +443,12 @@ async function renderCollectionScreen(params){
 
   if (token !== collectionRenderToken) return;
 
-  const render = module?.renderCollectionScreen || module?.default?.renderCollectionScreen;
+  const render =
+    typeof module?.renderCollectionScreen === 'function'
+      ? module.renderCollectionScreen
+      : typeof module?.renderCollectionView === 'function'
+        ? module.renderCollectionView
+        : null;
   if (typeof render !== 'function'){
     throw new Error('Module bộ sưu tập không cung cấp hàm render hợp lệ.');
   }
