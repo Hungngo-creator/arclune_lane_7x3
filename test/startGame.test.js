@@ -8,7 +8,7 @@ const ROOT_DIR = path.resolve(__dirname, '..');
 const SRC_DIR = path.join(ROOT_DIR, 'src');
 
 const stubModules = new Map([
-  ['./turns.js', `
+  ['./turns.ts', `
     export function stepTurn() {}
     export function doActionOrSkip() {}
   `],
