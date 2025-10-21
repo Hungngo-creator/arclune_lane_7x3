@@ -336,16 +336,8 @@ function pickFunctionFromSource(source, preferredKeys = [], fallbackKeys = []){
 }
 
 function resolveModuleFunction(module, preferredKeys = [], fallbackKeys = []){
-  const directCandidate = pickFunctionFromSource(module, preferredKeys, fallbackKeys);
-  if (typeof directCandidate === 'function'){
-    return directCandidate;
-  }
-
-  if (module && typeof module === 'object' && 'default' in module){
-    return pickFunctionFromSource(module.default, preferredKeys, fallbackKeys);
-  }
-
-  return null;
+  const candidate = pickFunctionFromSource(module, preferredKeys, fallbackKeys);
+  return typeof candidate === 'function' ? candidate : null;
 }
 
 function resolveScreenRenderer(module){
