@@ -1,9 +1,9 @@
 // @ts-check
 import { ROSTER } from '../catalog.js';
 
-/** @typedef {import('../../types/game-entities').UnitId} UnitId */
-/** @typedef {import('../../types/game-entities').SkillSection} SkillSection */
-/** @typedef {import('../../types/game-entities').SkillEntry} SkillEntry */
+/** @typedef {import('@types/units').UnitId} UnitId */
+/** @typedef {import('@types/config').SkillSection} SkillSection */
+/** @typedef {import('@types/config').SkillEntry} SkillEntry */
 
 /**
  * @template T

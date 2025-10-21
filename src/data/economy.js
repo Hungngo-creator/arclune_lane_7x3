@@ -1,10 +1,10 @@
 // @ts-check
 import { HAS_INTL_NUMBER_FORMAT, createNumberFormatter } from '../utils/format.js';
 
-/** @typedef {import('../../types/game-entities').CurrencyDefinition} CurrencyDefinition */
-/** @typedef {import('../../types/game-entities').PityConfiguration} PityConfiguration */
-/** @typedef {import('../../types/game-entities').ShopTaxBracket} ShopTaxBracket */
-/** @typedef {import('../../types/game-entities').LotterySplit} LotterySplit */
+/** @typedef {import('@types/config').CurrencyDefinition} CurrencyDefinition */
+/** @typedef {import('@types/config').PityConfiguration} PityConfiguration */
+/** @typedef {import('@types/config').ShopTaxBracket} ShopTaxBracket */
+/** @typedef {import('@types/config').LotterySplit} LotterySplit */
 
 const CURRENCY_IDS = Object.freeze({
   VNT: 'VNT',

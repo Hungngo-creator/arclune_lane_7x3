@@ -1,10 +1,10 @@
 // @ts-check
 import { CURRENCY_IDS, convertCurrency, formatBalance, getLotterySplit } from './economy.js';
 
-/** @typedef {import('../../types/game-entities').AnnouncementEntry} AnnouncementEntry */
-/** @typedef {import('../../types/game-entities').AnnouncementSlot} AnnouncementSlot */
+/** @typedef {import('@types/config').AnnouncementEntry} AnnouncementEntry */
+/** @typedef {import('@types/config').AnnouncementSlot} AnnouncementSlot */
 
-/** @type {import('../../types/game-entities').LotterySplit} */
+/** @type {import('@types/config').LotterySplit} */
 const LOTTERY_SPLIT = getLotterySplit();
 const LOTTERY_DEV_PERCENT = Math.round((LOTTERY_SPLIT.devVault || 0) * 100);
 const LOTTERY_PRIZE_PERCENT = Math.round((LOTTERY_SPLIT.prizePool || 0) * 100);

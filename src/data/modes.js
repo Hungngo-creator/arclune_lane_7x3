@@ -1,11 +1,11 @@
 // @ts-check
 import { getLotterySplit, getPityConfig, getShopTaxRate } from './economy.js';
 
-/** @typedef {import('../../types/game-entities').ModeConfig} ModeConfig */
-/** @typedef {import('../../types/game-entities').ModeGroup} ModeGroup */
-/** @typedef {import('../../types/game-entities').MenuSectionDefinition} MenuSectionDefinition */
-/** @typedef {import('../../types/game-entities').PityConfiguration} PityConfiguration */
-/** @typedef {import('../../types/game-entities').LotterySplit} LotterySplit */
+/** @typedef {import('@types/config').ModeConfig} ModeConfig */
+/** @typedef {import('@types/config').ModeGroup} ModeGroup */
+/** @typedef {import('@types/config').MenuSectionDefinition} MenuSectionDefinition */
+/** @typedef {import('@types/config').PityConfiguration} PityConfiguration */
+/** @typedef {import('@types/config').LotterySplit} LotterySplit */
 
 /** @type {PityConfiguration | null} */
 const SSR_PITY = getPityConfig('SSR');
