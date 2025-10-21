@@ -1,6 +1,6 @@
 // @ts-check
 // v0.7.7 interleaved helpers
-import { slotIndex } from '../engine.js';
+import { slotIndex } from '../engine.ts';
 import { Statuses } from '../statuses.js';
 
 /**
