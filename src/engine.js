@@ -1,6 +1,6 @@
+// @ts-check
 import { TOKEN_STYLE, CHIBI, CFG } from './config.js';
 import { getUnitArt, getUnitSkin } from './art.js';
-// @ts-check
 //v0.7.4
 /**
  * @typedef {import('../types/game-entities').UnitToken} UnitToken
