@@ -1629,4 +1629,4 @@ let leaderObserver = null;
   };
 }
 
-export default { renderLineupView };
+export { renderLineupView };

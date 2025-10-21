@@ -53,6 +53,4 @@ export function renderLineupScreen(options = {}){
   });
 }
 
-export { renderLineupView };
-
-export default { renderLineupScreen };
+export { renderLineupScreen, renderLineupView };
