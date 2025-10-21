@@ -816,5 +816,3 @@ export function renderMainMenuView(options = {}){
     }
   };
 }
-
-export default renderMainMenuView;
