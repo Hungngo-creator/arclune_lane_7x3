@@ -487,7 +487,7 @@ async function renderLineupScreen(params){
 
   if (token !== lineupRenderToken) return;
 
-  const render = module?.renderLineupScreen || module?.default?.renderLineupScreen;
+  const render = module?.renderLineupScreen;
   if (typeof render !== 'function'){
     throw new Error('Module đội hình không cung cấp hàm render hợp lệ.');
   }
