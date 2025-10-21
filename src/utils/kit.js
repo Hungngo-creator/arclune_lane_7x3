@@ -484,7 +484,7 @@ function extractOnSpawnRage(onSpawn, opts = {}){
       if (typeof rageObj.nonLeader === 'number') return Math.max(0, rageObj.nonLeader);
     }
     if (typeof rageObj.default === 'number') return Math.max(0, rageObj.default);
-    if (typeof rageObj.value === 'number') return Math.max(0, rageObj.value);;
+    if (typeof rageObj.value === 'number') return Math.max(0, rageObj.value);
   }
 
   if (onSpawn.deck && typeof onSpawn.deck.rage === 'number' && !isLeader){
