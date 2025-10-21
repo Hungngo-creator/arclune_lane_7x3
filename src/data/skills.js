@@ -82,7 +82,7 @@ const rawSkillSets = ([
       tags: ['single-target', 'lifesteal', 'mark'],
       effects: {
         lifesteal: { percentOfDamage: 0.10 },
-        applyMark: { id: 'phe_mark', stacks: 1, maxStacks: 3, ttlTurns: 3, refreshOnHit: true }
+        applyMark: { id: 'mark_devour', stacks: 1, maxStacks: 3, ttlTurns: 3, refreshOnHit: true }
       },
       description: 'Gây sát thương theo n% WIL + x% ATK lên một mục tiêu, hồi lại 10% lượng sát thương gây ra và đặt 1 tầng Phệ Ấn lên mục tiêu (tối đa 3 tầng, làm mới thời gian tồn tại mỗi khi cộng dồn).'
     },
