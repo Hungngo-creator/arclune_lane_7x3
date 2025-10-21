@@ -153,3 +153,42 @@ export interface RosterUnitDefinition {
   kit: Record<string, unknown>;
   [extra: string]: unknown;
 }
+
+export interface CameraPreset {
+  rowGapRatio: number;
+  topScale: number;
+  depthScale: number;
+}
+
+export interface ChibiProportions {
+  line: number;
+  headR: number;
+  torso: number;
+  arm: number;
+  leg: number;
+  weapon: number;
+  nameAlpha: number;
+}
+
+export type {
+  GameConfig,
+  CombatTuning,
+  FuryConfig,
+  FuryGainEntry,
+  FuryCaps,
+  TurnOrderConfig,
+  AiConfig,
+  AiWeights,
+  AiRoleWeight,
+  AnimationConfig,
+  UiConfig,
+  DebugFlags,
+  PerformanceConfig,
+  ColorPalette,
+  SceneLayer,
+  SceneTheme,
+  SceneConfig,
+  BackgroundProp,
+  BackgroundDefinition,
+  WorldMapConfig,
+} from '../config/schema';
