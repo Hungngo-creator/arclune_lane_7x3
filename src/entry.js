@@ -15,10 +15,19 @@ const APP_SCREEN_CLASSES = [
 ];
 
 function loadBundledModule(id){
-  if (typeof __require === 'function'){
-    return Promise.resolve().then(() => __require(id));
-  }
-  return import(id);
+  const loader = typeof __require === 'function'
+    ? Promise.resolve().then(() => __require(id))
+    : import(id);
+
+  return Promise.resolve(loader).then(module => {
+    if (module && typeof module === 'object'){
+      const comingSoonFlag = module.comingSoon ?? module.COMING_SOON_MODULE?.comingSoon;
+      if (typeof comingSoonFlag !== 'undefined' && module.comingSoon !== comingSoonFlag){
+        return { ...module, comingSoon: comingSoonFlag };
+      }
+    }
+    return module;
+  });
 }
 
 const MODE_DEFINITIONS = MODES.reduce((acc, mode) => {
@@ -204,7 +213,7 @@ function isMissingModuleError(error){
 function isComingSoonModule(module){
   if (!module) return true;
   if (module.comingSoon) return true;
-  if (module.default && module.default.comingSoon) return true;
+  if (module.COMING_SOON_MODULE?.comingSoon) return true;
   return false;
 }
 
