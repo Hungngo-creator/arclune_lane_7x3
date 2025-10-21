@@ -1,6 +1,6 @@
 // @ts-check
 //v0.7.6
-import { stepTurn, doActionOrSkip, predictSpawnCycle } from '../../turns.js';
+import { stepTurn, doActionOrSkip, predictSpawnCycle } from '../../turns.ts';
 import { enqueueImmediate, processActionChain } from '../../summon.js';
 import { refillDeckEnemy, aiMaybeAct } from '../../ai.js';
 import { Statuses } from '../../statuses.js';
