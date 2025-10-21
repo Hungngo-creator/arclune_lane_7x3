@@ -1,5 +1,4 @@
 export const comingSoon = true;
-
-export default {
-  comingSoon
+export const COMING_SOON_MODULE = {
+  comingSoon,
 };
