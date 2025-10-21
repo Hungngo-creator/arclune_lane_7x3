@@ -157,5 +157,3 @@ export function getAllSidebarAnnouncements(options = {}){
     };
   }).filter(item => Boolean(item.entry));
 }
-
-export default SIDE_SLOT_ANNOUNCEMENTS;
