@@ -2,7 +2,7 @@
 // v0.7.4
 import { slotToCell, slotIndex } from './engine.ts';
 import { Statuses } from './statuses.js';
-import { doBasicWithFollowups } from './combat.js';
+import { doBasicWithFollowups } from './combat.ts';
 import { CFG } from './config.js';
 import { makeInstanceStats, initialRageFor } from './meta.js';
 import { vfxAddSpawn, vfxAddBloodPulse } from './vfx.js';
