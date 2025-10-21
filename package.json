@@ -15,6 +15,9 @@
   "author": "",
   "license": "ISC",
   "type": "commonjs",
+  "dependencies": {
+    "zod": "file:tools/zod-stub"
+  },
   "devDependencies": {
     "@types/jest": "^29.5.12",
     "esbuild": "file:tools/esbuild-stub",
