@@ -1,5 +1,5 @@
 // v0.7.3
-import { slotToCell, cellReserved } from './engine.js';
+import { slotToCell, cellReserved } from './engine.ts';
 import { vfxAddSpawn } from './vfx.js';
 import { getUnitArt } from './art.js';
 import { kitSupportsSummon } from './utils/kit.js';

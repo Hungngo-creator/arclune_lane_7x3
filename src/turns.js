@@ -1,6 +1,6 @@
 // @ts-check
 // v0.7.4
-import { slotToCell, slotIndex } from './engine.js';
+import { slotToCell, slotIndex } from './engine.ts';
 import { Statuses } from './statuses.js';
 import { doBasicWithFollowups } from './combat.js';
 import { CFG } from './config.js';

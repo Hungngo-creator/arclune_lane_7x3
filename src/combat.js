@@ -2,7 +2,7 @@
 //v0.9
 import { Statuses, hookOnLethalDamage } from './statuses.js';
 import { vfxAddTracer, vfxAddHit, vfxAddMelee, vfxAddLightningArc } from './vfx.js';
-import { slotToCell, cellReserved } from './engine.js';
+import { slotToCell, cellReserved } from './engine.ts';
 import { vfxAddSpawn } from './vfx.js';
 import { emitPassiveEvent } from './passives.js';
 import { CFG } from './config.js';

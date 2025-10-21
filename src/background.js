@@ -1,5 +1,5 @@
 import { CFG } from './config.js';
-import { projectCellOblique, ensureSpriteLoaded } from './engine.js';
+import { projectCellOblique, ensureSpriteLoaded } from './engine.ts';
 
 const BACKGROUND_PROP_CACHE = new WeakMap();
 

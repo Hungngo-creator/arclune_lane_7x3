@@ -1,6 +1,6 @@
 // @ts-check
 // ai.js v0.7.6
-import { pickRandom, slotToCell, cellReserved } from './engine.js';
+import { pickRandom, slotToCell, cellReserved } from './engine.ts';
 import { predictSpawnCycle } from './turns.js';
 import { CFG } from './config.js';
 import { safeNow as sharedSafeNow } from './utils/time.js';

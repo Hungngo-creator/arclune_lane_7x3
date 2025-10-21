@@ -3,11 +3,13 @@
 // Không thay đổi logic combat/turn — chỉ vẽ đè.
 // Durations: spawn 500ms, hit 380ms, tracer 400ms, melee 1100ms.
 
-import { projectCellOblique } from './engine.js';
+import { projectCellOblique } from './engine.ts';
 import { CFG, CHIBI } from './config.js';
 import { safeNow } from './utils/time.js';
 import loithienanhAnchors from './data/vfx_anchors/loithienanh.json';
 import { parseVfxAnchorDataset } from './data/vfx_anchors/schema';
+
+/** @typedef {import('@types/vfx').VfxAnchorDataset} VfxAnchorDataset */
 
 const now = () => safeNow();
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -27,6 +29,7 @@ const UNIT_WIDTH_RATIO = 0.9;
 const UNIT_HEIGHT_RATIO = 1.85;
 const DEFAULT_SEGMENTS = 6;
 
+/** @type {Map<string, VfxAnchorDataset>} */
 const VFX_ANCHOR_CACHE = new Map();
 
 function registerAnchorDataset(dataset) {
