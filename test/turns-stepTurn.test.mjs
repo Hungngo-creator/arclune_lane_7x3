@@ -4,16 +4,17 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
+import ts from 'typescript';
 
 async function loadTurnsHarness(overrides = {}){
   const here = path.dirname(fileURLToPath(import.meta.url));
-  const filePath = path.resolve(here, '../src/turns.js');
+  const filePath = path.resolve(here, '../src/turns.ts');
   let code = await fs.readFile(filePath, 'utf8');
 
   const replacements = new Map([
-    ["import { slotToCell, slotIndex } from './engine.js';", "const { slotToCell, slotIndex } = __deps['./engine.js'];"],
+    ["import { slotToCell, slotIndex } from './engine.ts';", "const { slotToCell, slotIndex } = __deps['./engine.js'];"],
     ["import { Statuses } from './statuses.js';", "const { Statuses } = __deps['./statuses.js'];"],
-    ["import { doBasicWithFollowups } from './combat.js';", "const { doBasicWithFollowups } = __deps['./combat.js'];"],
+    ["import { doBasicWithFollowups } from './combat.ts';", "const { doBasicWithFollowups } = __deps['./combat.js'];"],
     ["import { CFG } from './config.js';", "const { CFG } = __deps['./config.js'];"],
     ["import { makeInstanceStats, initialRageFor } from './meta.js';", "const { makeInstanceStats, initialRageFor } = __deps['./meta.js'];"],
     ["import { vfxAddSpawn, vfxAddBloodPulse } from './vfx.js';", "const { vfxAddSpawn, vfxAddBloodPulse } = __deps['./vfx.js'];"],
@@ -22,6 +23,10 @@ async function loadTurnsHarness(overrides = {}){
     ["import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } from './events.js';", "const { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } = __deps['./events.js'];"],
     ["import { safeNow } from './utils/time.js';", "const { safeNow } = __deps['./utils/time.js'];"],
     ["import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } from './utils/fury.js';", "const { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } = __deps['./utils/fury.js'];"],
+    ["import { nextTurnInterleaved } from './turns/interleaved.ts';", "const { nextTurnInterleaved } = __deps['./turns/interleaved.js'];"],
+    ['import { nextTurnInterleaved } from "./turns/interleaved.ts";', "const { nextTurnInterleaved } = __deps['./turns/interleaved.js'];"],
+    ["import { slotToCell, slotIndex } from './engine.js';", "const { slotToCell, slotIndex } = __deps['./engine.js'];"],
+    ["import { doBasicWithFollowups } from './combat.js';", "const { doBasicWithFollowups } = __deps['./combat.js'];"],
     ["import { nextTurnInterleaved } from './turns/interleaved.js';", "const { nextTurnInterleaved } = __deps['./turns/interleaved.js'];"],
     ['import { nextTurnInterleaved } from "./turns/interleaved.js";', "const { nextTurnInterleaved } = __deps['./turns/interleaved.js'];"]
   ]);
@@ -32,6 +37,16 @@ async function loadTurnsHarness(overrides = {}){
 
   code = code.replace(/export function /g, 'function ');
   code = code.replace(/export const /g, 'const ');
+  const transpiledMain = ts.transpileModule(code, {
+    compilerOptions: {
+      module: ts.ModuleKind.CommonJS,
+      target: ts.ScriptTarget.ES2020,
+      importsNotUsedAsValues: ts.ImportsNotUsedAsValues.Remove,
+      esModuleInterop: true
+    },
+    fileName: 'turns.ts'
+  });
+  code = transpiledMain.outputText;
   code += '\nmodule.exports = { stepTurn, spawnQueuedIfDue, tickMinionTTL, getActiveAt, predictSpawnCycle, doActionOrSkip };\n';
 
   const eventLog = [];
@@ -114,16 +129,27 @@ async function loadTurnsHarness(overrides = {}){
   const interleavedAltKey = '../turns/interleaved.js';
   let interleavedModule = deps[interleavedKey] || deps[interleavedAltKey];
   if (!interleavedModule){
-    const interleavedPath = path.resolve(here, '../src/turns/interleaved.js');
+    const interleavedPath = path.resolve(here, '../src/turns/interleaved.ts');
     let interleavedCode = await fs.readFile(interleavedPath, 'utf8');
     const interleavedReplacements = new Map([
-      ["import { slotIndex } from '../engine.js';", "const { slotIndex } = __deps['../engine.js'];"],
-      ["import { Statuses } from '../statuses.js';", "const { Statuses } = __deps['../statuses.js'];"]
+["import { slotIndex } from '../engine.ts';", "const { slotIndex } = __deps['../engine.js'];"],
+      ["import { Statuses } from '../statuses.js';", "const { Statuses } = __deps['../statuses.js'];"],
+      ["import { slotIndex } from '../engine.js';", "const { slotIndex } = __deps['../engine.js'];"]
     ]);
     for (const [needle, replacement] of interleavedReplacements.entries()){
       interleavedCode = interleavedCode.replace(needle, replacement);
     }
     interleavedCode = interleavedCode.replace(/export function /g, 'function ');
+    const transpiledInterleaved = ts.transpileModule(interleavedCode, {
+      compilerOptions: {
+        module: ts.ModuleKind.CommonJS,
+        target: ts.ScriptTarget.ES2020,
+        importsNotUsedAsValues: ts.ImportsNotUsedAsValues.Remove,
+        esModuleInterop: true
+      },
+      fileName: 'turns/interleaved.ts'
+    });
+    interleavedCode = transpiledInterleaved.outputText;
     interleavedCode += '\nmodule.exports = { findNextOccupiedPos, nextTurnInterleaved };\n';
     const interleavedContext = {
       module: { exports: {} },
@@ -150,7 +176,7 @@ async function loadTurnsHarness(overrides = {}){
     nextTurnInterleaved: interleavedModule.nextTurnInterleaved
   };
   vm.createContext(context);
-  const script = new vm.Script(code, { filename: 'turns.js' });
+  const script = new vm.Script(code, { filename: 'turns.ts' });
   script.runInContext(context);
   return { ...context.module.exports, deps, eventLog };
 }
