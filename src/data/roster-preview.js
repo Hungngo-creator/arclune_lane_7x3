@@ -4,7 +4,7 @@ import { CLASS_BASE, RANK_MULT, ROSTER } from '../catalog.js';
 /** @typedef {import('../../types/game-entities').CatalogStatBlock} CatalogStatBlock */
 /** @typedef {import('../../types/game-entities').RosterPreview} RosterPreview */
 /** @typedef {import('../../types/game-entities').RosterPreviewRow} RosterPreviewRow */
-/** @typedef {import('../../types/game-entities').RosterUnitDefinition} RosterUnitDefinition */announcements.js
+/** @typedef {import('../../types/game-entities').RosterUnitDefinition} RosterUnitDefinition */
 
 // Talent Point (TP) deltas documented in "ý tưởng nhân vật v3.txt".
 export const TP_DELTA = Object.freeze({

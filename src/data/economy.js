@@ -4,7 +4,7 @@ import { HAS_INTL_NUMBER_FORMAT, createNumberFormatter } from '../utils/format.j
 /** @typedef {import('../../types/game-entities').CurrencyDefinition} CurrencyDefinition */
 /** @typedef {import('../../types/game-entities').PityConfiguration} PityConfiguration */
 /** @typedef {import('../../types/game-entities').ShopTaxBracket} ShopTaxBracket */
-/** @typedef {import('../../types/game-entities').LotterySplit} LotterySplit */announcements.js
+/** @typedef {import('../../types/game-entities').LotterySplit} LotterySplit */
 
 const CURRENCY_IDS = Object.freeze({
   VNT: 'VNT',
