@@ -20,7 +20,7 @@ import {
   hitToCellOblique, projectCellOblique,
   cellOccupied, spawnLeaders, pickRandom, slotIndex, slotToCell, cellReserved, ORDER_ENEMY,
   ART_SPRITE_EVENT,
-} from '../../engine.js';
+} from '../../engine.ts';
 import { drawEnvironmentProps, getEnvironmentBackground } from '../../background.js';
 import { getUnitArt, setUnitSkin } from '../../art.js';
 import { initHUD, startSummonBar } from '../../ui.js';
