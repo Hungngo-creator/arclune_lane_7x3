@@ -1,3 +1,4 @@
+// @ts-check
 // events.js
 
 /**
@@ -5,6 +6,8 @@
  * @typedef {import('../types/game-entities').UnitToken} UnitToken
  * @typedef {import('../types/game-entities').BattleResult} BattleResult
  * @typedef {import('../types/game-entities').Side} Side
+ * * @typedef {import('../types/game-entities').ActionChainProcessedResult} ActionChainProcessedResult
+ * @typedef {import('../types/game-entities').BattleDetail} BattleDetail
  */
 
 /**
@@ -19,7 +22,7 @@
  * @property {number | null} orderIndex Chỉ số trong thứ tự lượt.
  * @property {number | null} orderLength Tổng số phần tử trong thứ tự lượt.
  * @property {boolean} spawned Đơn vị có vừa được triệu hồi trong lượt không.
- * @property {unknown} processedChain Thông tin chuỗi hành động đã xử lý (nếu có).
+  * @property {ActionChainProcessedResult} processedChain Thông tin chuỗi hành động đã xử lý (nếu có).
  */
 
 /**
@@ -53,7 +56,7 @@
  * @typedef {Object} BattleEndDetail
  * @property {SessionState} game Trạng thái phiên đấu đã kết thúc.
  * @property {BattleResult | null} result Kết quả trận đấu.
- * @property {Record<string, unknown> | null | undefined} context Ngữ cảnh kích hoạt kết thúc trận.
+  * @property {BattleDetail['context'] | null | undefined} context Ngữ cảnh kích hoạt kết thúc trận.
  */
 
 /**
@@ -74,7 +77,7 @@
 
 /**
  * @template {GameEvent} T
- * @typedef {(CustomEvent<EventPayloadMap[T]> & { detail: EventPayloadMap[T] }) | ({ type: T; detail: EventPayloadMap[T]; target?: unknown; currentTarget?: unknown })} GameEventDetail
+  * @typedef {(CustomEvent<EventPayloadMap[T]> & { detail: EventPayloadMap[T] }) | ({ type: T; detail: EventPayloadMap[T]; target?: EventTarget | SimpleEventTarget | null; currentTarget?: EventTarget | SimpleEventTarget | null })} GameEventDetail
  */
 const HAS_EVENT_TARGET = typeof EventTarget === 'function';
 

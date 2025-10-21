@@ -19,13 +19,14 @@ import { nextTurnInterleaved } from './turns/interleaved.js';
  * @typedef {import('../types/game-entities').QueuedSummonRequest} QueuedSummonRequest
  * @typedef {import('../types/game-entities').QueuedSummonState} QueuedSummonState
  * @typedef {import('../types/game-entities').SequentialTurnState} SequentialTurnState
+ * @typedef {import('../types/game-entities').ActionChainProcessedResult} ActionChainProcessedResult
  */
 
 /**
  * @typedef {Object} TurnHooks
  * @property {(unit: UnitToken) => void} [performUlt]
  * @property {() => number} [allocIid]
- * @property {(Game: SessionState, side: string, slot: number, hooks: TurnHooks) => unknown} [processActionChain]
+ * @property {(Game: SessionState, side: string, slot: number, hooks: TurnHooks) => ActionChainProcessedResult | undefined} [processActionChain]
  * @property {(Game: SessionState, info: Record<string, unknown>) => boolean | void} [checkBattleEnd]
  * @property {(Game: SessionState, unit: UnitToken, options?: { performUlt?: TurnHooks['performUlt']; turnContext?: Record<string, unknown> }) => void} [doActionOrSkip]
  * @property {typeof getTurnOrderIndex} [getTurnOrderIndex]
