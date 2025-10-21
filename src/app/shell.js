@@ -142,5 +142,3 @@ function setScreen(nextScreen, params){
   };
   return api;
 }
-
-export default createAppShell;
