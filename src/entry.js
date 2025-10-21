@@ -312,16 +312,48 @@ function mergeDefinitionParams(definition, params){
   return null;
 }
 
-function resolveScreenRenderer(module){
-  if (!module) return null;
-  if (typeof module.renderCollectionScreen === 'function') return module.renderCollectionScreen;
-  if (typeof module.renderScreen === 'function') return module.renderScreen;
-  if (typeof module.default === 'function') return module.default;
-  if (module.default){
-    if (typeof module.default.renderCollectionScreen === 'function') return module.default.renderCollectionScreen;
-    if (typeof module.default.renderScreen === 'function') return module.default.renderScreen;
+function pickFunctionFromSource(source, preferredKeys = [], fallbackKeys = []){
+  if (!source) return null;
+
+  if (typeof source === 'function'){
+    return source;
   }
+
+  if (source && typeof source === 'object'){
+    for (const key of preferredKeys){
+      if (typeof source[key] === 'function'){
+        return source[key];
+      }
+    }
+    for (const key of fallbackKeys){
+      if (typeof source[key] === 'function'){
+        return source[key];
+      }
+    }
+  }
+
   return null;
+}
+
+function resolveModuleFunction(module, preferredKeys = [], fallbackKeys = []){
+  const directCandidate = pickFunctionFromSource(module, preferredKeys, fallbackKeys);
+  if (typeof directCandidate === 'function'){
+    return directCandidate;
+  }
+
+  if (module && typeof module === 'object' && 'default' in module){
+    return pickFunctionFromSource(module.default, preferredKeys, fallbackKeys);
+  }
+
+  return null;
+}
+
+function resolveScreenRenderer(module){
+  return resolveModuleFunction(
+    module,
+    ['renderCollectionScreen', 'renderScreen'],
+    ['render']
+  );
 }
 
 function getDefinitionByScreen(screenId){
@@ -443,12 +475,11 @@ async function renderCollectionScreen(params){
 
   if (token !== collectionRenderToken) return;
 
-  const render =
-    typeof module?.renderCollectionScreen === 'function'
-      ? module.renderCollectionScreen
-      : typeof module?.renderCollectionView === 'function'
-        ? module.renderCollectionView
-        : null;
+  const render = resolveModuleFunction(
+    module,
+    ['renderCollectionScreen', 'renderCollectionView'],
+    ['render']
+  );
   if (typeof render !== 'function'){
     throw new Error('Module bộ sưu tập không cung cấp hàm render hợp lệ.');
   }
@@ -487,7 +518,11 @@ async function renderLineupScreen(params){
 
   if (token !== lineupRenderToken) return;
 
-  const render = module?.renderLineupScreen;
+  const render = resolveModuleFunction(
+    module,
+    ['renderLineupScreen'],
+    ['render']
+  );
   if (typeof render !== 'function'){
     throw new Error('Module đội hình không cung cấp hàm render hợp lệ.');
   }
@@ -654,11 +689,10 @@ async function mountPveScreen(params){
     shellInstance.enterScreen(SCREEN_MAIN_MENU);
     return;
   }
-  const createPveSession = typeof module.createPveSession === 'function'
-    ? module.createPveSession
-    : (module.default && typeof module.default.createPveSession === 'function'
-      ? module.default.createPveSession
-      : null);
+  const createPveSession = resolveModuleFunction(
+    module,
+    ['createPveSession']
+  );
   if (typeof createPveSession !== 'function'){
     throw new Error('PvE module missing createPveSession().');
   }
