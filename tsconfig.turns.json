@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "checkJs": false
+  },
+  "include": [
+    "src/turns.ts",
+    "src/turns/interleaved.ts",
+    "src/types/**/*",
+    "types/**/*"
+  ],
+  "exclude": [
+    "src/**/*.js"
+  ]
+}
