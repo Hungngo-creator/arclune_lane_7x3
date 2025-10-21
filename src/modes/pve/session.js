@@ -41,11 +41,11 @@ import { safeNow } from '../../utils/time.js';
 import { getSummonSpec, resolveSummonSlots } from '../../utils/kit.js';
 
 /**
- * @typedef {import('../../../types/game-entities').UnitToken} UnitToken
- * @typedef {import('../../../types/game-entities').QueuedSummonState} QueuedSummonState
- * @typedef {import('../../../types/game-entities').ActionChainEntry} ActionChainEntry
- * @typedef {import('../../../types/game-entities').SessionState as CoreSessionState} CoreSessionState
- * @typedef {import('../../../types/game-entities').TurnSnapshot} TurnSnapshot
+ * @typedef {import('@types/units').UnitToken} UnitToken
+ * @typedef {import('@types/units').QueuedSummonState} QueuedSummonState
+ * @typedef {import('@types/units').ActionChainEntry} ActionChainEntry
+ * @typedef {import('@types/combat').SessionState as CoreSessionState} CoreSessionState
+ * @typedef {import('@types/turn-order').TurnSnapshot} TurnSnapshot
  */
 
 /**
