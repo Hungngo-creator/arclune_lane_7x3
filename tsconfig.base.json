@@ -28,7 +28,8 @@
         "src/background/*",
         "src/vfx/*",
         "src/art/*"
-      ]
+      ],
+      "@types/*": ["src/types/*"]
     }
   },
   "include": ["src/**/*", "types/**/*"]
