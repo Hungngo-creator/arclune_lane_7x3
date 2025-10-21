@@ -209,6 +209,8 @@ export interface ActionChainEntry {
   unit: Partial<UnitToken>;
 }
 
+export type ActionChainProcessedResult = number | null;
+
 export interface TelemetryEvent {
   type: string;
   timestamp: number;
