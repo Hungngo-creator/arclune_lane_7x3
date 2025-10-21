@@ -269,7 +269,7 @@ export const ROSTER = ([
     mods: { ATK:+0.10, PER:+0.10 },
     kit: {
       onSpawn: { rage: 100, exceptLeader: true },
-basic: {
+      basic: {
         name: 'Đánh Thường',
         tags: ['single-target']
       },
