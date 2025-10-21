@@ -7,7 +7,7 @@ import { Statuses } from '../../statuses.js';
 import { CFG, CAM } from '../../config.js';
 import { UNITS } from '../../units.js';
 import { Meta, makeInstanceStats, initialRageFor } from '../../meta.js';
-import { basicAttack, pickTarget, dealAbilityDamage, healUnit, grantShield, applyDamage } from '../../combat.js';
+import { basicAttack, pickTarget, dealAbilityDamage, healUnit, grantShield, applyDamage } from '../../combat.ts';
 import { initializeFury, setFury, spendFury, resolveUltCost, gainFury, finishFuryHit } from '../../utils/fury.js';
 import {
   ROSTER, ROSTER_MAP,
