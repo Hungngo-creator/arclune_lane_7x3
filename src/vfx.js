@@ -7,6 +7,7 @@ import { projectCellOblique } from './engine.js';
 import { CFG, CHIBI } from './config.js';
 import { safeNow } from './utils/time.js';
 import loithienanhAnchors from './data/vfx_anchors/loithienanh.json';
+import { parseVfxAnchorDataset } from './data/vfx_anchors/schema';
 
 const now = () => safeNow();
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -40,7 +41,16 @@ function registerAnchorDataset(dataset) {
   VFX_ANCHOR_CACHE.set(unitId, entry);
 }
 
-registerAnchorDataset(loithienanhAnchors);
+try {
+  const dataset = parseVfxAnchorDataset(loithienanhAnchors);
+  registerAnchorDataset(dataset);
+} catch (error) {
+  // behavior-preserving: fall back to raw dataset when validation fails.
+  if (typeof console !== 'undefined' && console?.warn) {
+    console.warn('[vfxDraw] Failed to parse anchor dataset', error);
+  }
+  registerAnchorDataset(loithienanhAnchors);
+}
 
 function getUnitAnchorDataset(unit) {
   if (!unit) return null;
