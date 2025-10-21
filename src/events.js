@@ -2,12 +2,12 @@
 // events.js
 
 /**
- * @typedef {import('../types/game-entities').SessionState} SessionState
- * @typedef {import('../types/game-entities').UnitToken} UnitToken
- * @typedef {import('../types/game-entities').BattleResult} BattleResult
- * @typedef {import('../types/game-entities').Side} Side
- * * @typedef {import('../types/game-entities').ActionChainProcessedResult} ActionChainProcessedResult
- * @typedef {import('../types/game-entities').BattleDetail} BattleDetail
+ * @typedef {import('@types/combat').SessionState} SessionState
+ * @typedef {import('@types/units').UnitToken} UnitToken
+ * @typedef {import('@types/combat').BattleResult} BattleResult
+ * @typedef {import('@types/units').Side} Side
+ * @typedef {import('@types/combat').ActionChainProcessedResult} ActionChainProcessedResult
+ * @typedef {import('@types/combat').BattleDetail} BattleDetail
  */
 
 /**

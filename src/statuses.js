@@ -2,9 +2,9 @@
 // statuses.js — Hệ trạng thái/effect data-driven v0.7
 import { gainFury, finishFuryHit } from './utils/fury.js';
 /**
- * @typedef {import('../types/game-entities').UnitToken} UnitToken
- * @typedef {import('../types/game-entities').StatusEffect} StatusEffect
- * @typedef {import('../types/game-entities').DamageContext} DamageContext
+ * @typedef {import('@types/units').UnitToken} UnitToken
+ * @typedef {import('@types/combat').StatusEffect} StatusEffect
+ * @typedef {import('@types/combat').DamageContext} DamageContext
  */
 
 /** @typedef {{ [key: string]: (spec?: Record<string, unknown>) => StatusEffect }} StatusFactory */

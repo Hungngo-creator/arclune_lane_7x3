@@ -3,9 +3,9 @@
 // 1) Rank multiplier (đơn giản) — áp lên TẤT CẢ stat trừ SPD
 import { kitSupportsSummon } from './utils/kit.js';
 
-/** @typedef {import('../types/game-entities').CatalogStatBlock} CatalogStatBlock */
-/** @typedef {import('../types/game-entities').RosterUnitDefinition} RosterUnitDefinition */
-/** @typedef {import('../types/game-entities').UnitId} UnitId */
+/** @typedef {import('@types/config').CatalogStatBlock} CatalogStatBlock */
+/** @typedef {import('@types/config').RosterUnitDefinition} RosterUnitDefinition */
+/** @typedef {import('@types/units').UnitId} UnitId */
 
 export const RANK_MULT = { N:0.80, R:0.90, SR:1.05, SSR:1.25, UR:1.50, Prime:1.80 };
 
@@ -269,7 +269,7 @@ export const ROSTER = ([
     mods: { ATK:+0.10, PER:+0.10 },
     kit: {
       onSpawn: { rage: 100, exceptLeader: true },
-      basic: {
+basic: {
         name: 'Đánh Thường',
         tags: ['single-target']
       },

@@ -6,9 +6,9 @@ import { safeNow } from './utils/time.js';
 const clamp01 = (x) => Math.max(0, Math.min(1, x));
 
 /**
- * @typedef {import('../types/game-entities').SessionState} SessionState
- * @typedef {import('../types/game-entities').UnitToken} UnitToken
- * @typedef {import('../types/game-entities').StatusEffect} StatusEffect
+ * @typedef {import('@types/combat').SessionState} SessionState
+ * @typedef {import('@types/units').UnitToken} UnitToken
+ * @typedef {import('@types/combat').StatusEffect} StatusEffect
  */
 
 /**

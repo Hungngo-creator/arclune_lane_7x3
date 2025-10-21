@@ -3,10 +3,10 @@ import { TOKEN_STYLE, CHIBI, CFG } from './config.js';
 import { getUnitArt, getUnitSkin } from './art.js';
 //v0.7.4
 /**
- * @typedef {import('../types/game-entities').UnitToken} UnitToken
- * @typedef {import('../types/game-entities').QueuedSummonState} QueuedSummonState
- * @typedef {import('../types/game-entities').QueuedSummonRequest} QueuedSummonRequest
- * @typedef {import('../types/game-entities').Side} Side
+ * @typedef {import('@types/units').UnitToken} UnitToken
+ * @typedef {import('@types/units').QueuedSummonState} QueuedSummonState
+ * @typedef {import('@types/units').QueuedSummonRequest} QueuedSummonRequest
+ * @typedef {import('@types/units').Side} Side
  */
 
 /**

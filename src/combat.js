@@ -10,9 +10,9 @@ import { gainFury, startFurySkill, finishFuryHit } from './utils/fury.js';
 import { safeNow } from './utils/time.js';
 
 /**
- * @typedef {import('../types/game-entities').SessionState} SessionState
- * @typedef {import('../types/game-entities').UnitToken} UnitToken
- */
+ * @typedef {import('@types/combat').SessionState} SessionState
+ * @typedef {import('@types/units').UnitToken} UnitToken
+/*
 
 /**
  * @typedef {Object} AbilityDamageOptions
