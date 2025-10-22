@@ -1,4 +1,4 @@
-import { createPveSession } from './modes/pve/session.js';
+import { createPveSession } from './modes/pve/session.ts';
 import { ensureNestedModuleSupport } from './utils/dummy.js';
 export { gameEvents, emitGameEvent, dispatchGameEvent, addGameEventListener, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN, BATTLE_END } from './events.ts';
 
