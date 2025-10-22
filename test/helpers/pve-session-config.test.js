@@ -20,19 +20,19 @@ const backgroundModule = {
 };
 
 const stubModules = new Map([
-  ['./turns.js', {
+  ['./turns.ts', {
     stepTurn() {},
     doActionOrSkip() {}
   }],
-  ['./summon.js', {
+  ['./summon.ts', {
     enqueueImmediate() {},
     processActionChain() {}
   }],
-  ['./ai.js', {
+  ['./ai.ts', {
     refillDeckEnemy() {},
     aiMaybeAct() {}
   }],
-  ['./statuses.js', {
+  ['./statuses.ts', {
     Statuses: {}
   }],
   ['./config.js', {
@@ -51,7 +51,7 @@ const stubModules = new Map([
       DEBUG: null
     }
   }],
-  ['./units.js', {
+  ['./units.ts', {
     UNITS: []
   }],
   ['./meta.js', {
