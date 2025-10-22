@@ -19,11 +19,27 @@ const backgroundModule = {
   }
 };
 
+const turnsModule = {
+  stepTurn() {},
+  doActionOrSkip() {}
+};
+
+const statusesModule = {
+  Statuses: {}
+};
+
+const combatModule = {
+  basicAttack() {},
+  pickTarget() { return null; },
+  dealAbilityDamage() {},
+  healUnit() {},
+  grantShield() {},
+  applyDamage() {}
+};
+
 const stubModules = new Map([
-  ['./turns.ts', {
-    stepTurn() {},
-    doActionOrSkip() {}
-  }],
+['./turns.js', turnsModule],
+  ['./turns.ts', turnsModule],
   ['./summon.js', {
     enqueueImmediate() {},
     processActionChain() {}
@@ -32,9 +48,8 @@ const stubModules = new Map([
     refillDeckEnemy() {},
     aiMaybeAct() {}
   }],
-  ['./statuses.js', {
-    Statuses: {}
-  }],
+['./statuses.js', statusesModule],
+  ['./statuses.ts', statusesModule],
   ['./config.js', {
     CAM: { landscape_oblique: {} },
     CFG: {
@@ -59,14 +74,8 @@ const stubModules = new Map([
     makeInstanceStats() { return {}; },
     initialRageFor() { return 0; }
   }],
-  ['./combat.js', {
-    basicAttack() {},
-    pickTarget() { return null; },
-    dealAbilityDamage() {},
-    healUnit() {},
-    grantShield() {},
-    applyDamage() {}
-  }],
+['./combat.js', combatModule],
+  ['./combat.ts', combatModule],
   ['./catalog.js', {
     ROSTER: [],
     ROSTER_MAP: new Map(),
