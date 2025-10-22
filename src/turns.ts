@@ -1,27 +1,16 @@
 // v0.7.4
-// @ts-ignore runtime import shim for typecheck build
 import { slotToCell, slotIndex } from './engine.ts';
-// @ts-ignore runtime import shim for typecheck build
 import { Statuses } from './statuses.ts';
-// @ts-ignore runtime import shim for typecheck build
+
 import { doBasicWithFollowups } from './combat.ts';
-// @ts-ignore runtime import shim for typecheck build
 import { CFG } from './config.js';
-// @ts-ignore runtime import shim for typecheck build
 import { makeInstanceStats, initialRageFor } from './meta.js';
-// @ts-ignore runtime import shim for typecheck build
 import { vfxAddSpawn, vfxAddBloodPulse } from './vfx.js';
-// @ts-ignore runtime import shim for typecheck build
 import { getUnitArt } from './art.js';
-// @ts-ignore runtime import shim for typecheck build
 import { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } from './passives.ts';
-// @ts-ignore runtime import shim for typecheck build
 import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } from './events.ts';
-// @ts-ignore runtime import shim for typecheck build
 import { safeNow } from './utils/time.js';
-// @ts-ignore runtime import shim for typecheck build
 import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } from './utils/fury.js';
-// @ts-ignore runtime import shim for typecheck build
 import { nextTurnInterleaved } from './turns/interleaved.ts';
 
 import type { ActionChainProcessedResult, SessionState } from '@types/combat';
