@@ -46,44 +46,12 @@ import { getSummonSpec, resolveSummonSlots } from '../../utils/kit.js';
  * @typedef {import('@types/units').ActionChainEntry} ActionChainEntry
  * @typedef {import('@types/combat').SessionState as CoreSessionState} CoreSessionState
  * @typedef {import('@types/turn-order').TurnSnapshot} TurnSnapshot
- */
-
-/**
- * @typedef {Object} RewardRoll
- * @property {string} id
- * @property {number} weight
- * @property {number} tier
- * @property {Record<string, unknown>} [data]
- */
-
-/**
- * @typedef {Object} WaveState
- * @property {number} index
- * @property {ReadonlyArray<UnitToken>} units
- * @property {'pending' | 'spawning' | 'active' | 'cleared'} status
- * @property {number} spawnCycle
- * @property {RewardRoll[]} rewards
- */
-
-/**
- * @typedef {Object} EncounterState
- * @property {string} id
- * @property {number} waveIndex
- * @property {WaveState[]} waves
- * @property {'idle' | 'running' | 'completed' | 'failed'} status
- * @property {RewardRoll[]} pendingRewards
- * @property {Record<string, unknown>} [metadata]
- */
-
-/**
- * @typedef {Object} SessionRuntimeState
- * @property {EncounterState | null} encounter
- * @property {WaveState | null} wave
- * @property {RewardRoll[]} rewardQueue
- */
-
-/**
- * @typedef {CoreSessionState & { runtime: SessionRuntimeState, _inited?: boolean }} SessionState
+* @typedef {import('@types/pve').RewardRoll} RewardRoll
+ * @typedef {import('@types/pve').WaveState} WaveState
+ * @typedef {import('@types/pve').EncounterState} EncounterState
+ * @typedef {import('@types/pve').SessionRuntimeState} SessionRuntimeState
+ * @typedef {import('@types/pve').CreateSessionOptions} CreateSessionOptions
+ * @typedef {import('@types/pve').SessionState} SessionStatee
  */
 
 /**
@@ -95,20 +63,6 @@ import { getSummonSpec, resolveSummonSlots } from '../../utils/kit.js';
  * @property {ReadonlyArray<UnitToken>=} startingDeck
  */
 
-/**
- * @typedef {Object} CreateSessionOptions
- * @property {string=} modeKey
- * @property {string=} sceneTheme
- * @property {string=} backgroundKey
- * @property {ReadonlyArray<UnitToken>=} deck
- * @property {EnemyAIPreset=} aiPreset
- * @property {number=} costCap
- * @property {number=} summonLimit
- * @property {string=} turnMode
- * @property {{ mode?: string }=} turn
- * @property {string=} turnOrderMode
- * @property {{ mode?: string }=} turnOrder
- */
 /** @type {HTMLCanvasElement|null} */ let canvas = null;
 /** @type {CanvasRenderingContext2D|null} */ let ctx = null;
 /** @type {{update:(g:any)=>void, cleanup?:()=>void}|null} */ let hud = null;   // ← THÊM
