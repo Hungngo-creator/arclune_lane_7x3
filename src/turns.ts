@@ -16,7 +16,7 @@ import { getUnitArt } from './art.js';
 // @ts-ignore runtime import shim for typecheck build
 import { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } from './passives.ts';
 // @ts-ignore runtime import shim for typecheck build
-import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } from './events.js';
+import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } from './events.ts';
 // @ts-ignore runtime import shim for typecheck build
 import { safeNow } from './utils/time.js';
 // @ts-ignore runtime import shim for typecheck build
