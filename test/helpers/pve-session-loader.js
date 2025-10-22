@@ -1,6 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const vm = require('vm');
+const ts = require('typescript');
 
 const ROOT_DIR = path.resolve(__dirname, '..', '..');
 const SRC_DIR = path.join(ROOT_DIR, 'src');
@@ -151,6 +152,20 @@ const stubModules = new Map([
 
 const moduleCache = new Map();
 
+function transpileSource(code, filename) {
+  const result = ts.transpileModule(code, {
+    compilerOptions: {
+      module: ts.ModuleKind.ESNext,
+      target: ts.ScriptTarget.ES2020,
+      allowJs: true,
+      importsNotUsedAsValues: ts.ImportsNotUsedAsValues.Remove,
+    },
+    fileName: filename,
+    reportDiagnostics: false,
+  });
+  return result.outputText;
+}
+
 function createImportReplacement(specifiers, moduleVar) {
   const lines = [];
   const cleaned = specifiers.trim();
@@ -161,7 +176,12 @@ function createImportReplacement(specifiers, moduleVar) {
   const parts = inside.split(',').map((p) => p.trim()).filter(Boolean);
   for (const part of parts) {
     if (!part) continue;
-    const [importedRaw, localRaw] = part.split(/\s+as\s+/);
+    const isTypeOnlyImport = /^type\s+/.test(part);
+    if (isTypeOnlyImport) {
+      continue;
+    }
+    const sanitized = part.replace(/^type\s+/, '');
+    const [importedRaw, localRaw] = sanitized.split(/\s+as\s+/);
     const imported = importedRaw.trim();
     const local = (localRaw || importedRaw).trim();
     lines.push(`const ${local} = ${moduleVar}.${imported};`);
@@ -183,6 +203,20 @@ function transformModule(code, id) {
   const exportsAssignments = [];
   const usedAliases = new Set();
   let depIndex = 0;
+  const exportStarRegex = /export\s*\*\s*from\s*['\"](.+?)['\"];?/g;
+  code = code.replace(exportStarRegex, (match, source) => {
+    const depId = resolveImport(id, source.trim());
+    const moduleVar = `__reexport${depIndex++}`;
+    const lines = [`const ${moduleVar} = __require('${depId}');`];
+    lines.push(
+      `for (const key of Object.keys(${moduleVar})) {`,
+      "  if (key === 'default' || Object.prototype.hasOwnProperty.call(exports, key)) continue;",
+      `  exports[key] = ${moduleVar}[key];`,
+      '}'
+    );
+    return lines.join('\n');
+  });
+
   const reExportRegex = /export\s*{([\s\S]*?)}\s*from\s*['\"](.+?)['\"];?/g;
   code = code.replace(reExportRegex, (match, spec, source) => {
     const depId = resolveImport(id, source.trim());
@@ -204,10 +238,14 @@ function transformModule(code, id) {
 
   const importRegex = /import\s*([\s\S]*?)\s*from\s*['\"](.+?)['\"];?/g;
   code = code.replace(importRegex, (match, clause, source) => {
+    const cleanedClause = clause.trim();
+    if (/^type\b/.test(cleanedClause)) {
+      return '';
+    }
     const depId = resolveImport(id, source.trim());
     const moduleVar = `__dep${depIndex++}`;
     const lines = [`const ${moduleVar} = __require('${depId}');`];
-    const importLines = createImportReplacement(clause, moduleVar);
+    const importLines = createImportReplacement(cleanedClause, moduleVar);
     lines.push(...importLines);
     return lines.join('\n');
   });
@@ -267,7 +305,8 @@ function loadModule(id) {
   }
   const filename = path.join(SRC_DIR, id.slice(2));
   const source = fs.readFileSync(filename, 'utf8');
-  const transformed = transformModule(source, id);
+  const transpiled = transpileSource(source, filename);
+  const transformed = transformModule(transpiled, id);
   const module = { exports: {} };
   moduleCache.set(id, module);
 
@@ -316,7 +355,7 @@ function clearModuleCache() {
 }
 
 function loadSessionModule() {
-  return loadModule('./modes/pve/session.js');
+  return loadModule('./modes/pve/session.ts');
 }
 
 module.exports = {

@@ -1,6 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const vm = require('vm');
+const ts = require('typescript');
 
 const ROOT_DIR = path.resolve(__dirname, '..', '..');
 const SRC_DIR = path.join(ROOT_DIR, 'src');
@@ -144,6 +145,20 @@ const stubModules = new Map([
 
 const moduleCache = new Map();
 
+function transpileSource(code, filename) {
+  const result = ts.transpileModule(code, {
+    compilerOptions: {
+      module: ts.ModuleKind.ESNext,
+      target: ts.ScriptTarget.ES2020,
+      allowJs: true,
+      importsNotUsedAsValues: ts.ImportsNotUsedAsValues.Remove,
+    },
+    fileName: filename,
+    reportDiagnostics: false,
+  });
+  return result.outputText;
+}
+
 function createImportReplacement(specifiers, moduleVar) {
   const lines = [];
   const cleaned = specifiers.trim();
@@ -260,7 +275,8 @@ function loadModule(id) {
   }
   const filename = path.join(SRC_DIR, id.slice(2));
   const source = fs.readFileSync(filename, 'utf8');
-  const transformed = transformModule(source, id);
+  const transpiled = transpileSource(source, filename);
+  const transformed = transformModule(transpiled, id);
   const module = { exports: {} };
   moduleCache.set(id, module);
 
@@ -309,7 +325,7 @@ function clearModuleCache() {
 }
 
 function loadSessionModule() {
-  return loadModule('./modes/pve/session.js');
+  return loadModule('./modes/pve/session.ts');
 }
 
 module.exports = {
