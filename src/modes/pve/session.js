@@ -21,7 +21,7 @@ import {
   cellOccupied, spawnLeaders, pickRandom, slotIndex, slotToCell, cellReserved, ORDER_ENEMY,
   ART_SPRITE_EVENT,
 } from '../../engine.ts';
-import { drawEnvironmentProps, getEnvironmentBackground } from '../../background.js';
+import { drawEnvironmentProps } from '../../background.js';
 import { getUnitArt, setUnitSkin } from '../../art.js';
 import { initHUD, startSummonBar } from '../../ui.js';
 import {
@@ -34,11 +34,18 @@ import {
   vfxAddGroundBurst,
   vfxAddShieldWrap
 } from '../../vfx.js';
-import { drawBattlefieldScene, getCachedBattlefieldScene } from '../../scene.js';
+import { drawBattlefieldScene } from '../../scene.js';
 import { gameEvents, TURN_START, TURN_END, ACTION_START, ACTION_END, BATTLE_END, emitGameEvent } from '../../events.ts';
 import { ensureNestedModuleSupport } from '../../utils/dummy.js';
 import { safeNow } from '../../utils/time.js';
 import { getSummonSpec, resolveSummonSlots } from '../../utils/kit.js';
+import {
+  normalizeConfig,
+  createSession,
+  invalidateSceneCache,
+  ensureSceneCache,
+  clearBackgroundSignatureCache
+} from './session-state.ts';
 
 /**
  * @typedef {import('@types/units').UnitToken} UnitToken
@@ -98,244 +105,7 @@ let rootElement = null;
 /** @type {Record<string, unknown>} */
 let storedConfig = {};
 let running = false;
-let sceneCache = null;
 const hpBarGradientCache = new Map();
-const backgroundSignatureCache = new Map();
-
-function stableStringify(value, seen = new WeakSet()){
-  if (value === null) return 'null';
-  const type = typeof value;
-  if (type === 'undefined') return 'undefined';
-  if (type === 'number' || type === 'boolean' || type === 'bigint') return String(value);
-  if (type === 'string') return JSON.stringify(value);
-  if (type === 'symbol') return value.toString();
-  if (type === 'function') return `[Function:${value.name || 'anonymous'}]`;
-  if (Array.isArray(value)){
-    return `[${value.map(entry => stableStringify(entry, seen)).join(',')}]`;
-  }
-  if (type === 'object'){
-    if (seen.has(value)) return '"[Circular]"';
-    seen.add(value);
-    const keys = Object.keys(value).sort();
-    const entries = keys.map(key => `${JSON.stringify(key)}:${stableStringify(value[key], seen)}`);
-    seen.delete(value);
-    return `{${entries.join(',')}}`;
-  }
-  return String(value);
-}
-
-function normalizeBackgroundCacheKey(backgroundKey){
-  return `key:${backgroundKey ?? '__no-key__'}`;
-}
-
-export function clearBackgroundSignatureCache(){
-  backgroundSignatureCache.clear();
-}
-
-export function computeBackgroundSignature(backgroundKey){
-  const cacheKey = normalizeBackgroundCacheKey(backgroundKey);
-  const config = getEnvironmentBackground(backgroundKey);
-  if (!config){
-    backgroundSignatureCache.delete(cacheKey);
-    return `${backgroundKey || 'no-key'}:no-config`;
-  }
-  const cached = backgroundSignatureCache.get(cacheKey);
-  if (cached && cached.config === config){
-    return cached.signature;
-  }
-  let signature;
-  try {
-    signature = `${backgroundKey || 'no-key'}:${stableStringify(config)}`;
-  } catch (_) {
-    const keyPart = config?.key ?? '';
-    const themePart = config?.theme ?? '';
-    const propsLength = Array.isArray(config?.props) ? config.props.length : 0;
-    signature = `${backgroundKey || 'no-key'}:fallback:${String(keyPart)}:${String(themePart)}:${propsLength}`;
-  }
-  backgroundSignatureCache.set(cacheKey, { config, signature });
-  return signature;
-}
-
-function normalizeConfig(input = {}){
-  const out = { ...input };
-  const scene = input.scene || {};
-  if (typeof out.sceneTheme === 'undefined' && typeof scene.theme !== 'undefined'){
-    out.sceneTheme = scene.theme;
-  }
-  if (typeof out.backgroundKey === 'undefined'){
-    if (typeof scene.backgroundKey !== 'undefined') out.backgroundKey = scene.backgroundKey;
-    else if (typeof scene.background !== 'undefined') out.backgroundKey = scene.background;
-  }
-  delete out.scene;
-  return out;
-}
-
-function buildTurnOrder(){
-  const cfg = CFG.turnOrder || {};
-  const rawSides = Array.isArray(cfg.sides) ? cfg.sides : null;
-  const sides = (rawSides && rawSides.length) ? rawSides.filter(s => s === 'ally' || s === 'enemy') : ['ally', 'enemy'];
-  const order = [];
-  const addPair = (side, slot)=>{
-    if (side !== 'ally' && side !== 'enemy') return;
-    const num = Number(slot);
-    if (!Number.isFinite(num)) return;
-    const safeSlot = Math.max(1, Math.min(9, Math.round(num)));
-    order.push({ side, slot: safeSlot });
-  };
-  const appendSlots = (slot)=>{
-    for (const side of sides){
-      addPair(side, slot);
-    }
-  };
-
-  const scan = Array.isArray(cfg.pairScan) ? cfg.pairScan : null;
-  if (scan && scan.length){
-    for (const entry of scan){
-      if (typeof entry === 'number'){
-        appendSlots(entry);
-        continue;
-      }
-      if (Array.isArray(entry)){
-        if (entry.length === 2 && typeof entry[0] === 'string' && Number.isFinite(entry[1])){
-          addPair(entry[0] === 'enemy' ? 'enemy' : 'ally', entry[1]);
-        } else {
-          for (const val of entry){
-            if (typeof val === 'number') appendSlots(val);
-          }
-        }
-        continue;
-      }
-      if (entry && typeof entry === 'object'){
-        const slot = Number(entry.slot ?? entry.s ?? entry.index);
-        if (typeof entry.side === 'string' && Number.isFinite(slot)){
-          addPair(entry.side === 'enemy' ? 'enemy' : 'ally', slot);
-        } else if (Number.isFinite(slot)){
-          appendSlots(slot);
-        }
-      }
-    }
-  }
-
-  if (!order.length){
-    const fallback = [1,2,3,4,5,6,7,8,9];
-    for (const slot of fallback) appendSlots(slot);
-  }
-
-  const indexMap = new Map();
-  order.forEach((entry, idx)=>{
-    const key = `${entry.side}:${entry.slot}`;
-    if (!indexMap.has(key)) indexMap.set(key, idx);
-  });
-
-  return { order, indexMap };
-}
-
-/**
- * Khởi tạo state PvE session dựa trên cấu hình.
- * @param {CreateSessionOptions} [options]
- * @returns {SessionState}
- */
-function createSession(options = {}){
-  options = normalizeConfig(options);
-  const modeKey = typeof options.modeKey === 'string' ? options.modeKey : null;
-  const sceneTheme = options.sceneTheme
-    ?? CFG.SCENE?.CURRENT_THEME
-    ?? CFG.SCENE?.DEFAULT_THEME;
-  const backgroundKey = options.backgroundKey
-    ?? CFG.CURRENT_BACKGROUND
-    ?? CFG.SCENE?.CURRENT_BACKGROUND
-    ?? CFG.SCENE?.CURRENT_THEME
-    ?? CFG.SCENE?.DEFAULT_THEME;
-
-  const allyUnits = Array.isArray(options.deck) && options.deck.length
-    ? options.deck
-    : UNITS;
-  const enemyPreset = options.aiPreset || {};
-  const enemyUnits = Array.isArray(enemyPreset.deck) && enemyPreset.deck.length
-    ? enemyPreset.deck
-    : (Array.isArray(enemyPreset.unitsAll) && enemyPreset.unitsAll.length ? enemyPreset.unitsAll : UNITS);
-
-const requestedTurnMode = options.turnMode
-    ?? options.turn?.mode
-    ?? options.turnOrderMode
-    ?? options.turnOrder?.mode
-    ?? CFG?.turnOrder?.mode;
-  const useInterleaved = requestedTurnMode === 'interleaved_by_position';
-  const allyCols = Number.isFinite(CFG?.ALLY_COLS) ? Math.max(1, Math.floor(CFG.ALLY_COLS)) : 3;
-  const gridRows = Number.isFinite(CFG?.GRID_ROWS) ? Math.max(1, Math.floor(CFG.GRID_ROWS)) : 3;
-  const slotsPerSide = Math.max(1, allyCols * gridRows);
-
-  const buildTurnState = () => {
-    if (useInterleaved){
-      return {
-        mode: 'interleaved_by_position',
-        nextSide: 'ALLY',
-        lastPos: { ALLY: 0, ENEMY: 0 },
-        wrapCount: { ALLY: 0, ENEMY: 0 },
-        turnCount: 0,
-        slotCount: slotsPerSide,
-        cycle: 0,
-        busyUntil: 0
-      };
-    }
-    const { order, indexMap } = buildTurnOrder();
-    return { order, orderIndex: indexMap, cursor: 0, cycle: 0, busyUntil: 0 };
-  };
-
-/** @type {SessionState} */
-  const game = {
-    modeKey,
-    grid: null,
-    tokens: [],
-    cost: 0,
-    costCap: Number.isFinite(options.costCap) ? options.costCap : CFG.COST_CAP,
-    summoned: 0,
-    summonLimit: Number.isFinite(options.summonLimit) ? options.summonLimit : CFG.SUMMON_LIMIT,
-    battle: {
-      over: false,
-      winner: null,
-      reason: null,
-      detail: null,
-      finishedAt: 0,
-      result: null
-    },
-    result: null,
-
-    // deck-3 + quản lý “độc nhất”
-    unitsAll: allyUnits,
-    usedUnitIds: new Set(),       // những unit đã ra sân
-    deck3: [],                    // mảng 3 unit
-    selectedId: null,
-    ui: { bar: null },
-    turn: buildTurnState(),
-    queued: { ally: new Map(), enemy: new Map() },
-    actionChain: /** @type {ActionChainEntry[]} */ ([]),
-    events: gameEvents,
-    sceneTheme,
-    backgroundKey,
-    runtime: {
-      encounter: null,
-      wave: null,
-      rewardQueue: []
-    }
-  };
-
-  game.ai = {
-    cost: 0,
-    costCap: Number.isFinite(enemyPreset.costCap) ? enemyPreset.costCap : (enemyPreset.costCap ?? CFG.COST_CAP),
-    summoned: 0,
-    summonLimit: Number.isFinite(enemyPreset.summonLimit) ? enemyPreset.summonLimit : (enemyPreset.summonLimit ?? CFG.SUMMON_LIMIT),
-    unitsAll: enemyUnits,
-    usedUnitIds: new Set(),
-    deck: Array.isArray(enemyPreset.startingDeck) ? enemyPreset.startingDeck.slice() : [],
-    selectedId: null,
-    lastThinkMs: 0,
-    lastDecision: null
-  };
-
-  game.meta = Meta;
-  return game;
-}
 
 /**
  * Cập nhật tiến trình encounter/wave của session.
@@ -565,106 +335,6 @@ function scheduleResize(){
     resizeSchedulerUsesTimeout = true;
     resizeSchedulerHandle = setTimeout(flushScheduledResize, 32);
   }
-}
-
-function invalidateSceneCache(){
-  sceneCache = null;
-  clearBackgroundSignatureCache();
-}
-
-function createSceneCacheCanvas(pixelWidth, pixelHeight){
-  if (!Number.isFinite(pixelWidth) || !Number.isFinite(pixelHeight)) return null;
-  const safeW = Math.max(1, Math.floor(pixelWidth));
-  const safeH = Math.max(1, Math.floor(pixelHeight));
-  if (typeof OffscreenCanvas === 'function'){
-    try {
-      return new OffscreenCanvas(safeW, safeH);
-    } catch (_) {}
-  }
-  const doc = docRef || (typeof document !== 'undefined' ? document : null);
-  if (!doc || typeof doc.createElement !== 'function') return null;
-  const offscreen = doc.createElement('canvas');
-  offscreen.width = safeW;
-  offscreen.height = safeH;
-  return offscreen;
-}
-
-function ensureSceneCache(){
-  if (!Game || !Game.grid) return null;
-  const grid = Game.grid;
-  const sceneCfg = CFG.SCENE || {};
-  const themeKey = Game.sceneTheme || sceneCfg.CURRENT_THEME || sceneCfg.DEFAULT_THEME;
-  const theme = (sceneCfg.THEMES && themeKey) ? sceneCfg.THEMES[themeKey] : null;
-  const backgroundKey = Game.backgroundKey;
-  const backgroundSignature = computeBackgroundSignature(backgroundKey);
-  const dpr = Number.isFinite(grid.dpr) && grid.dpr > 0 ? grid.dpr : 1;
-  const cssWidth = grid.w ?? (canvas ? canvas.width / dpr : 0);
-  const cssHeight = grid.h ?? (canvas ? canvas.height / dpr : 0);
-  if (!cssWidth || !cssHeight) return null;
-  const pixelWidth = Math.max(1, Math.round(cssWidth * dpr));
-  const pixelHeight = Math.max(1, Math.round(cssHeight * dpr));
-
-  const baseScene = getCachedBattlefieldScene(grid, theme, { width: cssWidth, height: cssHeight, dpr });
-  const baseKey = baseScene?.cacheKey;
-  if (!baseScene){
-    sceneCache = null;
-    return null;
-  }
-  
-  let needsRebuild = false;
-  if (!sceneCache) needsRebuild = true;
-  else if (sceneCache.pixelWidth !== pixelWidth || sceneCache.pixelHeight !== pixelHeight) needsRebuild = true;
-  else if (sceneCache.themeKey !== themeKey || sceneCache.backgroundKey !== backgroundKey) needsRebuild = true;
-  else if (sceneCache.backgroundSignature !== backgroundSignature) needsRebuild = true;
-  else if (sceneCache.dpr !== dpr) needsRebuild = true;
-  else if (sceneCache.baseKey !== baseKey) needsRebuild = true;
-
-  if (!needsRebuild) return sceneCache;
-
-  const offscreen = createSceneCacheCanvas(pixelWidth, pixelHeight);
-  if (!offscreen) return null;
-  const cacheCtx = offscreen.getContext('2d');
-  if (!cacheCtx) return null;
-
-  if (typeof cacheCtx.resetTransform === 'function'){
-    cacheCtx.resetTransform();
-  } else if (typeof cacheCtx.setTransform === 'function'){
-    cacheCtx.setTransform(1, 0, 0, 1, 0, 0);
-  }
-  cacheCtx.clearRect(0, 0, pixelWidth, pixelHeight);
-  
-  try {
-    cacheCtx.drawImage(baseScene.canvas, 0, 0);
-  } catch (err) {
-    console.error('[scene-cache:base]', err);
-    return null;
-  }
-  
-  if (typeof cacheCtx.setTransform === 'function'){
-    cacheCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  } else if (dpr !== 1 && typeof cacheCtx.scale === 'function'){
-    cacheCtx.scale(dpr, dpr);
-  }
-
-  try {
-    drawEnvironmentProps(cacheCtx, grid, CAM_PRESET, backgroundKey);
-  } catch (err) {
-    console.error('[scene-cache]', err);
-    return null;
-  }
-
-  sceneCache = {
-    canvas: offscreen,
-    pixelWidth,
-    pixelHeight,
-    cssWidth,
-    cssHeight,
-    themeKey,
-    backgroundKey,
-    backgroundSignature,
-    dpr, baseKey
-  };
-  return sceneCache;
 }
 
 function refreshQueuedArtFor(unitId){
@@ -1763,7 +1433,12 @@ function draw(){
   const clearW = Game.grid?.w ?? canvas.width;
   const clearH = Game.grid?.h ?? canvas.height;
   ctx.clearRect(0, 0, clearW, clearH);
-  const cache = ensureSceneCache();
+  const cache = ensureSceneCache({
+    game: Game,
+    canvas,
+    documentRef: docRef,
+    camPreset: CAM_PRESET
+  });
   if (cache && cache.canvas){
     ctx.drawImage(cache.canvas, 0, 0, cache.pixelWidth, cache.pixelHeight, 0, 0, cache.cssWidth, cache.cssHeight);
   } else {
@@ -2157,7 +1832,6 @@ export function createPveSession(rootEl, options = {}){
   };
 }
 
-export const __backgroundSignatureCache = backgroundSignatureCache;
 export function __getStoredConfig(){
   return storedConfig ? { ...storedConfig } : {};
 }
@@ -2166,3 +1840,4 @@ export function __getActiveGame(){
   return Game;
 }
 export { gameEvents, emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN, BATTLE_END } from '../../events.ts';
+export { clearBackgroundSignatureCache, computeBackgroundSignature, __backgroundSignatureCache } from './session-state.ts';
