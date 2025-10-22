@@ -1,7 +1,5 @@
 // v0.7.7 interleaved helpers
-// @ts-ignore runtime import shim for typecheck build
 import { slotIndex } from '../engine.ts';
-// @ts-ignore runtime import shim for typecheck build
 import { Statuses } from '../statuses.ts';
 
 import type { SessionState } from '@types/combat';
