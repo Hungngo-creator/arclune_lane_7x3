@@ -3,7 +3,7 @@
 import { stepTurn, doActionOrSkip, predictSpawnCycle } from '../../turns.ts';
 import { enqueueImmediate, processActionChain } from '../../summon.js';
 import { refillDeckEnemy, aiMaybeAct } from '../../ai.js';
-import { Statuses } from '../../statuses.js';
+import { Statuses } from '../../statuses.ts';
 import { CFG, CAM } from '../../config.js';
 import { UNITS } from '../../units.js';
 import { Meta, makeInstanceStats, initialRageFor } from '../../meta.js';
