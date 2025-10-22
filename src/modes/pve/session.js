@@ -35,7 +35,7 @@ import {
   vfxAddShieldWrap
 } from '../../vfx.js';
 import { drawBattlefieldScene, getCachedBattlefieldScene } from '../../scene.js';
-import { gameEvents, TURN_START, TURN_END, ACTION_START, ACTION_END, BATTLE_END, emitGameEvent } from '../../events.js';
+import { gameEvents, TURN_START, TURN_END, ACTION_START, ACTION_END, BATTLE_END, emitGameEvent } from '../../events.ts';
 import { ensureNestedModuleSupport } from '../../utils/dummy.js';
 import { safeNow } from '../../utils/time.js';
 import { getSummonSpec, resolveSummonSlots } from '../../utils/kit.js';
@@ -2211,4 +2211,4 @@ export function __getStoredConfig(){
 export function __getActiveGame(){
   return Game;
 }
-export { gameEvents, emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN, BATTLE_END } from '../../events.js';
+export { gameEvents, emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN, BATTLE_END } from '../../events.ts';
