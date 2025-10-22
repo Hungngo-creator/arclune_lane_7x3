@@ -1,5 +1,5 @@
 import { ROSTER } from '../../catalog.js';
-import { UNITS } from '../../units.js';
+import { UNITS } from '../../units.ts';
 import { getUnitArt } from '../../art.js';
 import { listCurrencies } from '../../data/economy.js';
 import { getSkillSet } from '../../data/skills.js';
