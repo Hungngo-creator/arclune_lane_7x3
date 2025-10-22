@@ -5,7 +5,7 @@ import { kitSupportsSummon } from './utils/kit.js';
 
 /** @typedef {import('./types/config.js').CatalogStatBlock} CatalogStatBlock */
 /** @typedef {import('./types/config.js').RosterUnitDefinition} RosterUnitDefinition */
-/** @typedef {import('./types/units.js').UnitId} UnitId */
+/** @typedef {import('./types/units.ts').UnitId} UnitId */
 
 export const RANK_MULT = { N:0.80, R:0.90, SR:1.05, SSR:1.25, UR:1.50, Prime:1.80 };
 

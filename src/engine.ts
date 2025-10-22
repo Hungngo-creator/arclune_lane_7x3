@@ -1,6 +1,6 @@
 import { TOKEN_STYLE, CHIBI, CFG } from './config.js';
 import { getUnitArt, getUnitSkin } from './art.js';
-import type { UnitToken, QueuedSummonState, QueuedSummonRequest, Side } from './types/units.js';
+import type { UnitToken, QueuedSummonState, QueuedSummonRequest, Side } from './types/units.ts';
 
 type GridSpec = {
   cols: number;
