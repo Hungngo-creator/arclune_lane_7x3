@@ -50,7 +50,7 @@ declare module './passives.js' {
   export function prepareUnitForPassives(unit: unknown): void;
 }
 
-declare module './events.js' {
+declare module './events.ts' {
   export function emitGameEvent(...args: unknown[]): void;
   export const TURN_START: string;
   export const TURN_END: string;
