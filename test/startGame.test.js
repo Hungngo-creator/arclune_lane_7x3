@@ -16,7 +16,7 @@ const stubModules = new Map([
     export function enqueueImmediate() {}
     export function processActionChain() {}
   `],
-  ['./ai.js', `
+  ['./ai.ts', `
     export function refillDeckEnemy() {}
     export function aiMaybeAct() {}
   `],
@@ -42,7 +42,7 @@ const stubModules = new Map([
       DEBUG: null
     };
   `],
-  ['./units.js', `
+  ['./units.ts', `
     export const UNITS = [];
   `],
   ['./meta.js', `
