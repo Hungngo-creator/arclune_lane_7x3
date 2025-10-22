@@ -13,14 +13,15 @@ async function loadTurnsHarness(overrides = {}){
 
   const replacements = new Map([
     ["import { slotToCell, slotIndex } from './engine.ts';", "const { slotToCell, slotIndex } = __deps['./engine.js'];"],
-   ["import { Statuses } from './statuses.ts';", "const { Statuses } = __deps['./statuses.js'];"],
-    ["import { Statuses } from './statuses.js';", "const { Statuses } = __deps['./statuses.js'];"],
+   ["import { Statuses } from './statuses.ts';", "const { Statuses } = __deps['./statuses.ts'];"],
+    ["import { Statuses } from './statuses.js';", "const { Statuses } = __deps['./statuses.ts'];"],
     ["import { doBasicWithFollowups } from './combat.ts';", "const { doBasicWithFollowups } = __deps['./combat.js'];"],
     ["import { CFG } from './config.js';", "const { CFG } = __deps['./config.js'];"],
     ["import { makeInstanceStats, initialRageFor } from './meta.js';", "const { makeInstanceStats, initialRageFor } = __deps['./meta.js'];"],
     ["import { vfxAddSpawn, vfxAddBloodPulse } from './vfx.js';", "const { vfxAddSpawn, vfxAddBloodPulse } = __deps['./vfx.js'];"],
     ["import { getUnitArt } from './art.js';", "const { getUnitArt } = __deps['./art.js'];"],
-    ["import { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } from './passives.js';", "const { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } = __deps['./passives.js'];"],
+    ["import { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } from './passives.ts';", "const { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } = __deps['./passives.ts'];"],
+  ["import { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } from './passives.js';", "const { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } = __deps['./passives.ts'];"],
     ["import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } from './events.js';", "const { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } = __deps['./events.ts'];"],
     ["import { safeNow } from './utils/time.js';", "const { safeNow } = __deps['./utils/time.js'];"],
     ["import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } from './utils/fury.js';", "const { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } = __deps['./utils/fury.js'];"],
@@ -65,7 +66,7 @@ async function loadTurnsHarness(overrides = {}){
         return baseCol * 3 + cy + 1;
       }
     },
-    './statuses.js': {
+    './statuses.ts': {
       Statuses: {
         onTurnStart(){},
         canAct(){ return true; },
@@ -93,7 +94,7 @@ async function loadTurnsHarness(overrides = {}){
     './art.js': {
       getUnitArt(){ return {}; }
     },
-    './passives.js': {
+    './passives.ts': {
       emitPassiveEvent(){ },
       applyOnSpawnEffects(){ },
       prepareUnitForPassives(){ }
@@ -124,7 +125,7 @@ async function loadTurnsHarness(overrides = {}){
 
   const deps = { ...defaultDeps, ...overrides };
   deps['../engine.js'] = deps['../engine.js'] || deps['./engine.js'];
-  deps['../statuses.js'] = deps['../statuses.js'] || deps['./statuses.js'];
+  deps['../statuses.ts'] = deps['../statuses.ts'] || deps['./statuses.ts'];
 
   const interleavedKey = './turns/interleaved.js';
   const interleavedAltKey = '../turns/interleaved.js';
@@ -134,7 +135,8 @@ async function loadTurnsHarness(overrides = {}){
     let interleavedCode = await fs.readFile(interleavedPath, 'utf8');
     const interleavedReplacements = new Map([
 ["import { slotIndex } from '../engine.ts';", "const { slotIndex } = __deps['../engine.js'];"],
-      ["import { Statuses } from '../statuses.js';", "const { Statuses } = __deps['../statuses.js'];"],
+["import { Statuses } from '../statuses.ts';", "const { Statuses } = __deps['../statuses.ts'];"],
+      ["import { Statuses } from '../statuses.js';", "const { Statuses } = __deps['../statuses.ts'];"],
       ["import { slotIndex } from '../engine.js';", "const { slotIndex } = __deps['../engine.js'];"]
     ]);
     for (const [needle, replacement] of interleavedReplacements.entries()){
@@ -300,7 +302,7 @@ test('deck spawn auto-casts ultimate and drains fury', async () => {
   };
   const harness = await loadTurnsHarness({
     './utils/fury.js': furyModule,
-    './statuses.js': {
+    './statuses.ts': {
       Statuses: {
         onTurnStart(){},
         canAct(){ return true; },
@@ -387,7 +389,7 @@ test('revived spawn keeps provided resources without forced ultimate', async () 
         return 0;
       }
     },
-    './statuses.js': {
+    './statuses.ts': {
       Statuses: {
         onTurnStart(){},
         canAct(){ return true; },
@@ -436,7 +438,7 @@ test('revived spawn keeps provided resources without forced ultimate', async () 
 
 test('turn regen restores hp and ae each turn without exceeding max', async () => {
   const harness = await loadTurnsHarness({
-    './statuses.js': {
+    './statuses.ts': {
       Statuses: {
         onTurnStart(){},
         canAct(){ return false; },
@@ -455,7 +457,7 @@ test('turn regen restores hp and ae each turn without exceeding max', async () =
   });
 
   const { doActionOrSkip, deps, eventLog } = harness;
-  const statuses = deps['./statuses.js'].Statuses;
+  const statuses = deps['./statuses.ts'].Statuses;
   const startSnapshots = [];
   statuses.onTurnStart = (unit) => {
     startSnapshots.push({ hp: unit.hp, ae: unit.ae });
@@ -732,8 +734,8 @@ test('stunned units are skipped by interleaved scan', async () => {
   const slotToCell = deps['./engine.js'].slotToCell;
 
   const stunnedIds = new Set(['enemyStun']);
-  deps['./statuses.js'].Statuses.canAct = (unit) => !stunnedIds.has(unit?.id);
-  deps['../statuses.js'].Statuses = deps['./statuses.js'].Statuses;
+  deps['./statuses.ts'].Statuses.canAct = (unit) => !stunnedIds.has(unit?.id);
+  deps['../statuses.ts'].Statuses = deps['./statuses.ts'].Statuses;atuses = deps['./statuses.js'].Statuses;
 
   const allyUnit = { id: 'allyUnit', side: 'ally', alive: true, ...slotToCell('ally', 1) };
   const enemyStun = { id: 'enemyStun', side: 'enemy', alive: true, ...slotToCell('enemy', 1) };
@@ -775,8 +777,8 @@ test('queued spawn is processed even when existing units cannot act', async () =
   const slotToCell = deps['./engine.js'].slotToCell;
 
   const stunnedIds = new Set(['enemySleep']);
-  deps['./statuses.js'].Statuses.canAct = (unit) => !stunnedIds.has(unit?.id);
-  deps['../statuses.js'].Statuses = deps['./statuses.js'].Statuses;
+  deps['./statuses.ts'].Statuses.canAct = (unit) => !stunnedIds.has(unit?.id);
+  deps['../statuses.ts'].Statuses = deps['./statuses.ts'].Statuses;
 
   const enemySleep = { id: 'enemySleep', side: 'enemy', alive: true, ...slotToCell('enemy', 1) };
   const enemySlot = 3;

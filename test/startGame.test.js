@@ -20,9 +20,6 @@ const stubModules = new Map([
     export function refillDeckEnemy() {}
     export function aiMaybeAct() {}
   `],
-  ['./statuses.js', `
-    export const Statuses = {};
-  `],
   ['./statuses.ts', `
     export const Statuses = {};
   `],
