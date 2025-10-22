@@ -35,7 +35,7 @@ const MODE_DEFINITIONS = MODES.reduce((acc, mode) => {
   const screenId = shell.screenId || SCREEN_MAIN_MENU;
   const moduleId = mode.status === MODE_STATUS.AVAILABLE && shell.moduleId
     ? shell.moduleId
-    : (shell.fallbackModuleId || './modes/coming-soon.stub.js');
+    : (shell.fallbackModuleId || './modes/coming-soon.stub.ts');
   const params = mode.status === MODE_STATUS.AVAILABLE && shell.defaultParams
     ? { ...shell.defaultParams }
     : null;
