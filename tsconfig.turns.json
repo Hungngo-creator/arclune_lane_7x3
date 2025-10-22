@@ -2,7 +2,8 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "noEmit": true,
-    "checkJs": false
+    "checkJs": false,
+    "allowImportingTsExtensions": true
   },
   "include": [
     "src/turns.ts",
