@@ -1,7 +1,7 @@
 // @ts-check
 import { ROSTER } from '../catalog.js';
 
-/** @typedef {import('../types/units.js').UnitId} UnitId */
+/** @typedef {import('../types/units.ts').UnitId} UnitId */
 /** @typedef {import('../types/config.js').SkillSection} SkillSection */
 /** @typedef {import('../types/config.js').SkillEntry} SkillEntry */
 
