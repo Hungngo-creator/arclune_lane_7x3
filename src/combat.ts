@@ -1,7 +1,7 @@
-import { Statuses, hookOnLethalDamage } from './statuses.js';
+import { Statuses, hookOnLethalDamage } from './statuses.ts';
 import { vfxAddHit, vfxAddMelee, vfxAddLightningArc } from './vfx.js';
 import { slotToCell } from './engine.ts';
-import { emitPassiveEvent } from './passives.js';
+import { emitPassiveEvent } from './passives.ts';
 import { CFG } from './config.js';
 import { gainFury, startFurySkill, finishFuryHit } from './utils/fury.js';
 import { safeNow } from './utils/time.js';
@@ -352,4 +352,4 @@ export function doBasicWithFollowups(Game: SessionState, unit: UnitToken, cap = 
   } catch (error) {
     console.error('[doBasicWithFollowups]', error);
   }
-    }
+}

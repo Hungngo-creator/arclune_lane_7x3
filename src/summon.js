@@ -3,7 +3,7 @@ import { slotToCell, cellReserved } from './engine.ts';
 import { vfxAddSpawn } from './vfx.js';
 import { getUnitArt } from './art.js';
 import { kitSupportsSummon } from './utils/kit.js';
-import { prepareUnitForPassives, applyOnSpawnEffects } from './passives.js';
+import { prepareUnitForPassives, applyOnSpawnEffects } from './passives.ts';
 // local helper
 const tokensAlive = (Game) => Game.tokens.filter(t => t.alive);
 

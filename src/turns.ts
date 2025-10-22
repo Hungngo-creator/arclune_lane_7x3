@@ -2,7 +2,7 @@
 // @ts-ignore runtime import shim for typecheck build
 import { slotToCell, slotIndex } from './engine.ts';
 // @ts-ignore runtime import shim for typecheck build
-import { Statuses } from './statuses.js';
+import { Statuses } from './statuses.ts';
 // @ts-ignore runtime import shim for typecheck build
 import { doBasicWithFollowups } from './combat.ts';
 // @ts-ignore runtime import shim for typecheck build
@@ -14,7 +14,7 @@ import { vfxAddSpawn, vfxAddBloodPulse } from './vfx.js';
 // @ts-ignore runtime import shim for typecheck build
 import { getUnitArt } from './art.js';
 // @ts-ignore runtime import shim for typecheck build
-import { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } from './passives.js';
+import { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } from './passives.ts';
 // @ts-ignore runtime import shim for typecheck build
 import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } from './events.js';
 // @ts-ignore runtime import shim for typecheck build
