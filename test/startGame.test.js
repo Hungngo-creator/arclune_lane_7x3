@@ -23,6 +23,9 @@ const stubModules = new Map([
   ['./statuses.js', `
     export const Statuses = {};
   `],
+  ['./statuses.ts', `
+    export const Statuses = {};
+  `],
   ['./config.js', `
     export const CAM = { landscape_oblique: {} };
     export const CFG = {
@@ -48,6 +51,14 @@ const stubModules = new Map([
     export function initialRageFor() { return 0; }
   `],
   ['./combat.js', `
+    export function basicAttack() {}
+    export function pickTarget() { return null; }
+    export function dealAbilityDamage() {}
+    export function healUnit() {}
+    export function grantShield() {}
+    export function applyDamage() {}
+  `],
+  ['./combat.ts', `
     export function basicAttack() {}
     export function pickTarget() { return null; }
     export function dealAbilityDamage() {}

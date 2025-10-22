@@ -13,6 +13,7 @@ async function loadTurnsHarness(overrides = {}){
 
   const replacements = new Map([
     ["import { slotToCell, slotIndex } from './engine.ts';", "const { slotToCell, slotIndex } = __deps['./engine.js'];"],
+   ["import { Statuses } from './statuses.ts';", "const { Statuses } = __deps['./statuses.js'];"],
     ["import { Statuses } from './statuses.js';", "const { Statuses } = __deps['./statuses.js'];"],
     ["import { doBasicWithFollowups } from './combat.ts';", "const { doBasicWithFollowups } = __deps['./combat.js'];"],
     ["import { CFG } from './config.js';", "const { CFG } = __deps['./config.js'];"],
