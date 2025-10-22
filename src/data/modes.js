@@ -115,7 +115,7 @@ const MODES = /** @satisfies ReadonlyArray<ModeConfig> */ ([
     parentId: 'arena-hub',
     shell: {
       screenId: 'main-menu',
-      fallbackModuleId: './modes/coming-soon.stub.js'
+      fallbackModuleId: './modes/coming-soon.stub.ts'
     }
   },
   {
@@ -130,7 +130,7 @@ const MODES = /** @satisfies ReadonlyArray<ModeConfig> */ ([
     menuSections: ['economy'],
     shell: {
       screenId: 'main-menu',
-      fallbackModuleId: './modes/coming-soon.stub.js'
+      fallbackModuleId: './modes/coming-soon.stub.ts'
     }
   },
   {
@@ -145,7 +145,7 @@ const MODES = /** @satisfies ReadonlyArray<ModeConfig> */ ([
     menuSections: ['economy'],
     shell: {
       screenId: 'main-menu',
-      fallbackModuleId: './modes/coming-soon.stub.js'
+      fallbackModuleId: './modes/coming-soon.stub.ts'
     }
   },
   {
@@ -209,7 +209,7 @@ const MODES = /** @satisfies ReadonlyArray<ModeConfig> */ ([
     menuSections: ['economy'],
     shell: {
       screenId: 'main-menu',
-      fallbackModuleId: './modes/coming-soon.stub.js'
+      fallbackModuleId: './modes/coming-soon.stub.ts'
     }
   },
   {
@@ -224,7 +224,7 @@ const MODES = /** @satisfies ReadonlyArray<ModeConfig> */ ([
     menuSections: ['economy'],
     shell: {
       screenId: 'main-menu',
-      fallbackModuleId: './modes/coming-soon.stub.js'
+      fallbackModuleId: './modes/coming-soon.stub.ts'
     }
   },
   {
@@ -239,7 +239,7 @@ const MODES = /** @satisfies ReadonlyArray<ModeConfig> */ ([
     menuSections: ['economy'],
     shell: {
       screenId: 'main-menu',
-      fallbackModuleId: './modes/coming-soon.stub.js'
+      fallbackModuleId: './modes/coming-soon.stub.ts'
     }
   },
   {
@@ -255,7 +255,7 @@ const MODES = /** @satisfies ReadonlyArray<ModeConfig> */ ([
     parentId: 'arena-hub',
     shell: {
       screenId: 'main-menu',
-      fallbackModuleId: './modes/coming-soon.stub.js'
+      fallbackModuleId: './modes/coming-soon.stub.ts'
     }
   }
 ]);
