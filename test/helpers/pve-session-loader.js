@@ -38,7 +38,6 @@ const combatModule = {
 };
 
 const stubModules = new Map([
-['./turns.js', turnsModule],
   ['./turns.ts', turnsModule],
   ['./summon.js', {
     enqueueImmediate() {},
@@ -48,7 +47,6 @@ const stubModules = new Map([
     refillDeckEnemy() {},
     aiMaybeAct() {}
   }],
-['./statuses.js', statusesModule],
   ['./statuses.ts', statusesModule],
   ['./config.js', {
     CAM: { landscape_oblique: {} },
@@ -74,7 +72,7 @@ const stubModules = new Map([
     makeInstanceStats() { return {}; },
     initialRageFor() { return 0; }
   }],
-['./combat.js', combatModule],
+  ['./combat.js', combatModule],
   ['./combat.ts', combatModule],
   ['./catalog.js', {
     ROSTER: [],
