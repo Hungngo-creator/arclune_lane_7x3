@@ -2,7 +2,7 @@
 // @ts-ignore runtime import shim for typecheck build
 import { slotIndex } from '../engine.ts';
 // @ts-ignore runtime import shim for typecheck build
-import { Statuses } from '../statuses.js';
+import { Statuses } from '../statuses.ts';
 
 import type { SessionState } from '@types/combat';
 import type { QueuedSummonRequest, Side, UnitToken } from '@types/units';
