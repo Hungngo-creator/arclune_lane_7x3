@@ -46,6 +46,7 @@ import {
   clearBackgroundSignatureCache
 } from './session-state.ts';
 
+import type { BattleDetail, BattleResult, BattleState, LeaderSnapshot } from '@types/combat';
 import type { UnitToken, QueuedSummonState, ActionChainEntry } from '@types/units';
 import type { TurnSnapshot } from '@types/turn-order';
 import type {
@@ -56,6 +57,39 @@ import type {
   CreateSessionOptions,
   SessionState,
 } from '@types/pve';
+import type { NormalizedSessionConfig } from './session-state.ts';
+
+type RootLike = Element | Document | null | undefined;
+type StartConfigOverrides = Partial<CreateSessionOptions> & Record<string, unknown>;
+type PveSessionStartConfig = StartConfigOverrides & {
+  root?: RootLike;
+  rootEl?: RootLike;
+};
+
+export type PveSessionHandle = {
+  start: (startConfig?: PveSessionStartConfig | null) => SessionState | null;
+  stop: () => void;
+  updateConfig: (next?: StartConfigOverrides | null) => void;
+  setUnitSkin: (unitId: string, skinKey: string | null | undefined) => boolean;
+};
+
+function sanitizeStartConfig(
+  config: PveSessionStartConfig | null | undefined,
+): { rest: StartConfigOverrides; root: RootLike } {
+  const raw = (config ?? {}) as PveSessionStartConfig;
+  const { root, rootEl, ...rest } = raw;
+  return {
+    rest: rest as StartConfigOverrides,
+    root: (root ?? rootEl) ?? null,
+  };
+}
+
+type BattleFinalizePayload = {
+  winner?: BattleResult['winner'];
+  reason?: string | null;
+  detail?: BattleDetail | null;
+  finishedAt?: number;
+};
 
 type EnemyAIPreset = {
   deck?: ReadonlyArray<string>;
@@ -96,13 +130,13 @@ let visibilityHandlerBound = false;
 let winRef = null;
 let docRef = null;
 let rootElement = null;
-let storedConfig: Record<string, unknown> = {};
+let storedConfig: NormalizedSessionConfig = normalizeConfig();
 let running = false;
 const hpBarGradientCache = new Map();
 
-function resetSessionState(options = {}){
+function resetSessionState(options: StartConfigOverrides = {}): void {
   storedConfig = normalizeConfig({ ...storedConfig, ...options });
-  Game = createSession(storedConfig as CreateSessionOptions);
+  Game = createSession(storedConfig);
   _IID = 1;
   _BORN = 1;
   CLOCK = createClock();
@@ -265,7 +299,7 @@ function refreshQueuedArtFor(unitId){
   apply(Game.queued?.enemy);
 }
 
-function setUnitSkinForSession(unitId, skinKey){
+function setUnitSkinForSession(unitId: string, skinKey: string | null | undefined): boolean {
   if (!Game) return false;
   const ok = setUnitSkin(unitId, skinKey);
   if (!ok) return false;
@@ -823,7 +857,7 @@ case 'hpTradeBurst': {
 }
 const tokensAlive = () => (Game?.tokens || []).filter(t => t.alive);
 
-function ensureBattleState(game){
+function ensureBattleState(game: SessionState | null): BattleState | null {
   if (!game || typeof game !== 'object') return null;
   if (!game.battle || typeof game.battle !== 'object'){
     game.battle = {
@@ -832,19 +866,20 @@ function ensureBattleState(game){
       reason: null,
       detail: null,
       finishedAt: 0,
-      result: null
+      result: null,
+    } as BattleState;
     };
   }
   if (typeof game.result === 'undefined'){
     game.result = null;
   }
   if (!Object.prototype.hasOwnProperty.call(game.battle, 'result')){
-    game.battle.result = null;
+    (game.battle as BattleState).result = null;
   }
-  return game.battle;
+  return game.battle as BattleState;
 }
 
-function isUnitAlive(unit){
+function isUnitAlive(unit: UnitToken | null | undefined): boolean {
   if (!unit) return false;
   if (!unit.alive) return false;
   if (Number.isFinite(unit.hp)){
@@ -853,7 +888,7 @@ function isUnitAlive(unit){
   return true;
 }
 
-function getHpRatio(unit){
+function getHpRatio(unit: UnitToken | null | undefined): number {
   if (!unit) return 0;
   const hp = Number.isFinite(unit.hp) ? unit.hp : 0;
   const hpMax = Number.isFinite(unit.hpMax) ? unit.hpMax : 0;
@@ -863,7 +898,7 @@ function getHpRatio(unit){
   return hp > 0 ? 1 : 0;
 }
 
-function snapshotLeader(unit){
+function snapshotLeader(unit: UnitToken | null | undefined): LeaderSnapshot | null {
   if (!unit) return null;
   return {
     id: unit.id || null,
@@ -889,11 +924,18 @@ function isPvpMode(game){
   return key.includes('pvp');
 }
 
-function finalizeBattle(game, payload, context){
+function finalizeBattle(
+  game: SessionState | null,
+  payload: BattleFinalizePayload,
+  context: Record<string, unknown>,
+): BattleResult | null {
   const battle = ensureBattleState(game);
   if (!battle || battle.over) return battle?.result || null;
-  const finishedAt = Number.isFinite(payload?.finishedAt) ? payload.finishedAt : getNow();
-  const result = {
+  const finishedAtRaw = payload?.finishedAt;
+  const finishedAt = typeof finishedAtRaw === 'number' && Number.isFinite(finishedAtRaw)
+    ? finishedAtRaw
+    : getNow();
+  const result: BattleResult = {
     winner: payload?.winner ?? null,
     reason: payload?.reason ?? null,
     detail: payload?.detail ?? null,
@@ -905,8 +947,8 @@ function finalizeBattle(game, payload, context){
   battle.detail = result.detail;
   battle.finishedAt = finishedAt;
   battle.result = result;
-  game.result = result;
-  if (game.turn){
+  if (game) game.result = result;
+  if (game?.turn){
     game.turn.completed = true;
     game.turn.busyUntil = finishedAt;
   }
@@ -922,7 +964,10 @@ function finalizeBattle(game, payload, context){
   return result;
 }
 
-function checkBattleEnd(game, context = {}){
+function checkBattleEnd(
+  game: SessionState | null,
+  context: Record<string, unknown> = {},
+): BattleResult | null {
   if (!game) return null;
   const battle = ensureBattleState(game);
   if (!battle) return null;
@@ -934,8 +979,11 @@ function checkBattleEnd(game, context = {}){
   const leaderAAlive = isUnitAlive(leaderA);
   const leaderBAlive = isUnitAlive(leaderB);
 
-  const contextDetail = context && typeof context === 'object' ? { ...context } : {};
-  const detail = {
+  const contextDetail: Record<string, unknown> =
+    context && typeof context === 'object' ? { ...context } : {};
+  const triggerValue = contextDetail['trigger'];
+  const trigger = typeof triggerValue === 'string' ? triggerValue : null;
+  const detail: BattleDetail = {
     context: contextDetail,
     leaders: {
       ally: snapshotLeader(leaderA),
@@ -943,17 +991,19 @@ function checkBattleEnd(game, context = {}){
     }
   };
 
-  let winner = null;
-  let reason = null;
+  let winner: BattleResult['winner'] | null = null;
+  let reason: string | null = null;
 
   if (!leaderAAlive || !leaderBAlive){
     reason = 'leader_down';
     if (leaderAAlive && !leaderBAlive) winner = 'ally';
     else if (!leaderAAlive && leaderBAlive) winner = 'enemy';
     else winner = 'draw';
-  } else if (contextDetail.trigger === 'timeout'){
+} else if (trigger === 'timeout'){
     reason = 'timeout';
-    const remain = Number.isFinite(contextDetail.remain) ? contextDetail.remain : 0;
+    const remainRaw = contextDetail['remain'];
+    const remainCandidate = typeof remainRaw === 'number' ? remainRaw : Number(remainRaw);
+    const remain = Number.isFinite(remainCandidate) ? remainCandidate : 0;
     if (isPvpMode(game)){
       const allyRatio = getHpRatio(leaderA);
       const enemyRatio = getHpRatio(leaderB);
@@ -966,7 +1016,7 @@ function checkBattleEnd(game, context = {}){
       else if (enemyRatio > allyRatio) winner = 'enemy';
       else winner = 'draw';
     } else {
-      const bossAlive = tokens.some(t => t && t.alive && t.side === 'enemy' && isBossToken(game, t));
+      const bossAlive = tokens.some((t) => t && t.alive && t.side === 'enemy' && isBossToken(game, t));
       detail.timeout = {
         mode: 'pve',
         remain,
@@ -978,7 +1028,10 @@ function checkBattleEnd(game, context = {}){
 
   if (!winner) return null;
 
-  const finishedAt = Number.isFinite(contextDetail.timestamp) ? contextDetail.timestamp : undefined;
+  const timestampRaw = contextDetail['timestamp'];
+  const finishedAt = typeof timestampRaw === 'number' && Number.isFinite(timestampRaw)
+    ? timestampRaw
+    : undefined;
   return finalizeBattle(game, { winner, reason, detail, finishedAt }, contextDetail);
 }
 // Giảm TTL minion của 1 phe sau khi phe đó kết thúc phase
@@ -1638,7 +1691,7 @@ function bindSession(){
   }
 }
 
-function startSession(config = {}){
+function startSession(config: StartConfigOverrides = {}): SessionState | null {
   configureRoot(rootElement);
   const overrides = normalizeConfig(config);
   if (running) stopSession();
@@ -1663,7 +1716,7 @@ function startSession(config = {}){
   }
 }
 
-function applyConfigToRunningGame(cfg){
+function applyConfigToRunningGame(cfg: NormalizedSessionConfig): void {
   if (!Game) return;
   let sceneChanged = false;
   if (typeof cfg.sceneTheme !== 'undefined'){
@@ -1697,45 +1750,47 @@ function applyConfigToRunningGame(cfg){
   }
 }
 
-function updateSessionConfig(next = {}){
+function updateSessionConfig(next: StartConfigOverrides = {}): void {
   const normalized = normalizeConfig(next);
   storedConfig = normalizeConfig({ ...storedConfig, ...normalized });
   applyConfigToRunningGame(normalized);
 }
 
-export function createPveSession(rootEl, options = {}){
-  const normalized = normalizeConfig(options || {});
+export function createPveSession(
+  rootEl: RootLike,
+  options: PveSessionStartConfig | null = null,
+): PveSessionHandle {
+  const initial = sanitizeStartConfig(options);
+  const normalized = normalizeConfig(initial.rest);
   storedConfig = { ...normalized };
-  configureRoot(rootEl);
-  return {
-    start(startConfig = {}){
-      if (startConfig && (startConfig.root || startConfig.rootEl)) {
-        const r = startConfig.root || startConfig.rootEl;
-        const rest = { ...startConfig };
-        delete rest.root;
-        delete rest.rootEl;
-        configureRoot(r);
-        return startSession(rest);
-      }
-      return startSession(startConfig);
+  configureRoot((rootEl ?? initial.root) ?? null);
+
+  const handle: PveSessionHandle = {
+    start(startConfig: PveSessionStartConfig | null = null): SessionState | null {
+      const { rest, root } = sanitizeStartConfig(startConfig);
+      if (root) configureRoot(root);
+      return startSession(rest);
     },
-    stop(){
+    stop(): void {
       stopSession();
     },
-    updateConfig(next = {}){
-      updateSessionConfig(next);
+    updateConfig(next: StartConfigOverrides | null = null): void {
+      const overrides = (next ?? {}) as StartConfigOverrides;
+      updateSessionConfig(overrides);
     },
-    setUnitSkin(unitId, skinKey){
+    setUnitSkin(unitId: string, skinKey: string | null | undefined): boolean {
       return setUnitSkinForSession(unitId, skinKey);
     },
   };
+  
+  return handle;
 }
 
-export function __getStoredConfig(){
-  return storedConfig ? { ...storedConfig } : {};
+export function __getStoredConfig(): NormalizedSessionConfig {
+  return { ...storedConfig };
 }
 
-export function __getActiveGame(){
+export function __getActiveGame(): SessionState | null {
   return Game;
 }
 export { gameEvents, emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN, BATTLE_END } from '../../events.ts';
