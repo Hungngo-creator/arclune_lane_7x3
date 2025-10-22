@@ -1,47 +1,58 @@
 declare module './engine.ts' {
-  export function slotToCell(side: unknown, slot: number): { cx: number; cy: number };
-  export function slotIndex(side: unknown, cx: number, cy: number): number;
+import type { Side } from '@types/units';
+
+  type SlotSpecifier = Side | Uppercase<Side>;
+
+  interface CellCoords {
+    cx: number;
+    cy: number;
+  }
+
+  export function slotToCell(side: SlotSpecifier, slot: number): CellCoords;
+  export function slotIndex(side: SlotSpecifier, cx: number, cy: number): number;
 }
 
 declare module '../engine.ts' {
-  export function slotIndex(side: unknown, cx: number, cy: number): number;
+  export * from './engine.ts';;
 }
 
 declare module './statuses.ts' {
   import type { DamageContext, StatusEffect, StatusRegistry } from '@types/combat';
   import type { UnitToken } from '@types/units';
 
-  export interface ShieldResult {
+  interface ShieldResult {
     remain: number;
     absorbed: number;
     broke: boolean;
   }
 
-  export interface DamageResult {
+  interface DamageResult {
     dealt?: number;
     absorbed?: number;
     dtype?: string;
   }
 
+type StatusTarget = UnitToken | null | undefined;
+
   export interface StatusService {
-    add(unit: UnitToken | null | undefined, status: StatusEffect): StatusEffect;
-    remove(unit: UnitToken | null | undefined, id: string): void;
-    has(unit: UnitToken | null | undefined, id: string): boolean;
-    get(unit: UnitToken | null | undefined, id: string): StatusEffect | null;
-    purge(unit: UnitToken | null | undefined): void;
-    stacks(unit: UnitToken | null | undefined, id: string): number;
-    onTurnStart(unit: UnitToken | null | undefined, ctx?: Record<string, unknown>): void;
-    onTurnEnd(unit: UnitToken | null | undefined, ctx?: Record<string, unknown>): void;
+    add(unit: StatusTarget, status: StatusEffect): StatusEffect;
+    remove(unit: StatusTarget, id: string): void;
+    has(unit: StatusTarget, id: string): boolean;
+    get(unit: StatusTarget, id: string): StatusEffect | null;
+    purge(unit: StatusTarget): void;
+    stacks(unit: StatusTarget, id: string): number;
+    onTurnStart(unit: StatusTarget, ctx?: Record<string, unknown>): void;
+    onTurnEnd(unit: StatusTarget, ctx?: Record<string, unknown>): void;
     onPhaseStart(side: string, ctx?: Record<string, unknown>): void;
     onPhaseEnd(side: string, ctx?: Record<string, unknown>): void;
-    canAct(unit: UnitToken | null | undefined): boolean;
-    blocks(unit: UnitToken | null | undefined, kind: string): boolean;
+    canAct(unit: StatusTarget): boolean;
+    blocks(unit: StatusTarget, kind: string): boolean;
     resolveTarget(
       attacker: UnitToken,
       candidates: ReadonlyArray<UnitToken>,
       ctx?: Record<string, unknown>,
     ): UnitToken | null;
-    modifyStats(unit: UnitToken | null | undefined, base: Record<string, number>): Record<string, number>;
+    modifyStats(unit: StatusTarget, base: Record<string, number>): Record<string, number>;
     beforeDamage(
       attacker: UnitToken,
       target: UnitToken,
@@ -53,7 +64,7 @@ declare module './statuses.ts' {
   }
 
   export const Statuses: StatusService;
-  export function hookOnLethalDamage(target: UnitToken): boolean;
+  export function hookOnLethalDamage(target: StatusTarget): boolean;
 }
 
 declare module '../statuses.ts' {
@@ -61,25 +72,92 @@ declare module '../statuses.ts' {
 }
 
 declare module './combat.ts' {
-  export function doBasicWithFollowups(state: unknown, unit: unknown, cap: number): void;
+  import type { SessionState } from '@types/combat';
+  import type { UnitToken } from '@types/units';
+
+  export function doBasicWithFollowups(Game: SessionState, unit: UnitToken, cap?: number): void;
 }
 
 declare module './config.js' {
-  export const CFG: Record<string, unknown>;
+  import type { GameConfig } from '@types/config';
+
+  export const CFG: GameConfig;
 }
 
 declare module './meta.js' {
-  export function makeInstanceStats(unitId: unknown): Record<string, unknown>;
-  export function initialRageFor(unitId: unknown, options?: Record<string, unknown>): number;
+  import type { UnitId } from '@types/units';
+
+  export interface InstanceStats {
+    hpMax: number;
+    hp: number;
+    atk: number;
+    wil: number;
+    arm: number;
+    res: number;
+    agi: number;
+    per: number;
+    spd: number;
+    aeMax: number;
+    ae: number;
+    aeRegen: number;
+    hpRegen: number;
+    [extra: string]: number;
+  }
+
+  export interface InitialRageOptions {
+    isLeader?: boolean;
+    revive?: boolean;
+    reviveSpec?: { rage?: number } | null | undefined;
+    [extra: string]: unknown;
+  }
+
+  export function makeInstanceStats(unitId: UnitId): InstanceStats;
+  export function initialRageFor(unitId: UnitId, options?: InitialRageOptions): number;
 }
 
 declare module './vfx.js' {
-  export function vfxAddSpawn(...args: unknown[]): void;
-  export function vfxAddBloodPulse(...args: unknown[]): void;
+  import type { SessionState } from '@types/combat';
+  import type { Side, UnitToken } from '@types/units';
+
+  type SessionWithVfx = SessionState & { vfx?: Array<Record<string, unknown>> | undefined };
+
+  export interface BloodPulseOptions {
+    busyMs?: number;
+    anchorId?: string;
+    bindingKey?: string;
+    timing?: number | string;
+    ambientKey?: string;
+    anchorRadius?: number;
+    color?: string;
+    rings?: number;
+    maxScale?: number;
+    alpha?: number;
+  }
+
+  export function vfxAddSpawn(Game: SessionWithVfx, cx: number, cy: number, side: Side): void;
+  export function vfxAddBloodPulse(
+    Game: SessionWithVfx,
+    source: UnitToken | null | undefined,
+    opts?: BloodPulseOptions,
+  ): number;
 }
 
 declare module './art.js' {
-  export function getUnitArt(unitId: unknown): Record<string, unknown> | null;
+  export interface UnitArtInstance extends Record<string, unknown> {
+    palette?: Record<string, unknown> | null;
+    layout?: Record<string, unknown> | null;
+    hpBar?: Record<string, unknown> | null;
+    label?: Record<string, unknown> | null;
+    sprite?: Record<string, unknown> | null;
+    skinKey?: string | null;
+  }
+
+  export interface GetUnitArtOptions {
+    skinKey?: string | null;
+    [extra: string]: unknown;
+  }
+
+  export function getUnitArt(unitId: string, options?: GetUnitArtOptions): UnitArtInstance | null;
 }
 
 declare module './passives.ts' {
@@ -110,12 +188,83 @@ declare module './passives.ts' {
 }
 
 declare module './events.ts' {
-  export function emitGameEvent(...args: unknown[]): void;
-  export const TURN_START: string;
-  export const TURN_END: string;
-  export const ACTION_START: string;
-  export const ACTION_END: string;
-  export const TURN_REGEN: string;
+  import type {
+    ActionChainProcessedResult,
+    BattleDetail,
+    BattleResult,
+    SessionState,
+  } from '@types/combat';
+  import type { Side, UnitToken } from '@types/units';
+
+  export const TURN_START: 'turn:start';
+  export const TURN_END: 'turn:end';
+  export const ACTION_START: 'action:start';
+  export const ACTION_END: 'action:end';
+  export const TURN_REGEN: 'turn:regen';
+  export const BATTLE_END: 'battle:end';
+
+  export type GameEventType =
+    | typeof TURN_START
+    | typeof TURN_END
+    | typeof ACTION_START
+    | typeof ACTION_END
+    | typeof TURN_REGEN
+    | typeof BATTLE_END;
+
+  export interface TurnEventDetail {
+    game: SessionState;
+    unit: UnitToken | null;
+    side: Side | null;
+    slot: number | null;
+    phase: string | null;
+    cycle: number | null;
+    orderIndex: number | null;
+    orderLength: number | null;
+    spawned: boolean;
+    processedChain: ActionChainProcessedResult | null;
+  }
+
+  export interface ActionEventDetail {
+    game: SessionState;
+    unit: UnitToken | null;
+    side: Side | null;
+    slot: number | null;
+    phase: string | null;
+    cycle: number | null;
+    orderIndex: number | null;
+    orderLength: number | null;
+    action: 'basic' | 'ult' | string | null;
+    skipped: boolean;
+    reason: string | null;
+    ultOk?: boolean | null;
+  }
+
+  export interface TurnRegenDetail {
+    game: SessionState;
+    unit: UnitToken | null;
+    hpDelta: number;
+    aeDelta: number;
+  }
+
+  export interface BattleEndDetail {
+    game: SessionState;
+    result: BattleResult | null;
+    context: BattleDetail['context'] | null | undefined;
+  }
+
+  export interface GameEventDetailMap {
+    [TURN_START]: TurnEventDetail;
+    [TURN_END]: TurnEventDetail;
+    [ACTION_START]: ActionEventDetail;
+    [ACTION_END]: ActionEventDetail;
+    [TURN_REGEN]: TurnRegenDetail;
+    [BATTLE_END]: BattleEndDetail;
+  }
+
+  export function emitGameEvent<T extends GameEventType>(
+    type: T,
+    detail: GameEventDetailMap[T],
+  ): boolean;
 }
 
 declare module './utils/time.js' {
@@ -123,10 +272,30 @@ declare module './utils/time.js' {
 }
 
 declare module './utils/fury.js' {
-  export function initializeFury(...args: unknown[]): void;
-  export function startFuryTurn(...args: unknown[]): void;
-  export function spendFury(...args: unknown[]): void;
-  export function resolveUltCost(unit: unknown, cfg: unknown): number;
-  export function setFury(...args: unknown[]): void;
-  export function clearFreshSummon(...args: unknown[]): void;
+  import type { GameConfig } from '@types/config';
+  import type { UnitId, UnitToken } from '@types/units';
+
+  export interface FuryTurnOptions {
+    clearFresh?: boolean;
+    turnStamp?: unknown;
+    turnKey?: unknown;
+    grantStart?: boolean;
+    startAmount?: number;
+  }
+
+  export function initializeFury(
+    unit: UnitToken | null | undefined,
+    unitId: UnitId | null | undefined,
+    initial?: number,
+    cfg?: GameConfig,
+  ): void;
+  export function startFuryTurn(unit: UnitToken | null | undefined, opts?: FuryTurnOptions): void;
+  export function spendFury(
+    unit: UnitToken | null | undefined,
+    amount: number | null | undefined,
+    cfg?: GameConfig,
+  ): number;
+  export function resolveUltCost(unit: UnitToken | null | undefined, cfg?: GameConfig): number;
+  export function setFury(unit: UnitToken | null | undefined, value: number | null | undefined): number;
+  export function clearFreshSummon(unit: UnitToken | null | undefined): void;
 }
