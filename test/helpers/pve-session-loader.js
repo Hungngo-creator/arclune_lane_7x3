@@ -131,7 +131,7 @@ const stubModules = new Map([
     drawBattlefieldScene() {},
     getCachedBattlefieldScene() { return null; }
   }],
-  ['./events.js', {
+  ['./events.ts', {
     gameEvents: {
       addEventListener() {},
       removeEventListener() {},
