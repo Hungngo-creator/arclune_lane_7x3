@@ -44,7 +44,7 @@ const stubModules = new Map([
     enqueueImmediate() {},
     processActionChain() {}
   }],
-  ['./ai.js', {
+  ['./ai.ts', {
     refillDeckEnemy() {},
     aiMaybeAct() {}
   }],
@@ -66,7 +66,7 @@ const stubModules = new Map([
       DEBUG: null
     }
   }],
-  ['./units.js', {
+  ['./units.ts', {
     UNITS: []
   }],
   ['./meta.js', {
