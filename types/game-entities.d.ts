@@ -52,7 +52,7 @@ import type {
   UnitToken,
   Undefinable,
   ValueOf,
-} from '../src/types/index.js';
+} from '../src/types/index.ts';
 
 export type {
   ActionChainEntry,
