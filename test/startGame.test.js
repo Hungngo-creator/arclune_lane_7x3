@@ -127,7 +127,7 @@ const stubModules = new Map([
   ['./scene.js', `
     export function drawBattlefieldScene() {}
   `],
-  ['./events.js', `
+  ['./events.ts', `
     const listeners = new Map();
     export const gameEvents = {
       addEventListener(type, handler) {

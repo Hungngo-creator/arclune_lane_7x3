@@ -21,7 +21,7 @@ async function loadTurnsHarness(overrides = {}){
     ["import { vfxAddSpawn, vfxAddBloodPulse } from './vfx.js';", "const { vfxAddSpawn, vfxAddBloodPulse } = __deps['./vfx.js'];"],
     ["import { getUnitArt } from './art.js';", "const { getUnitArt } = __deps['./art.js'];"],
     ["import { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } from './passives.js';", "const { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } = __deps['./passives.js'];"],
-    ["import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } from './events.js';", "const { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } = __deps['./events.js'];"],
+    ["import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } from './events.js';", "const { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } = __deps['./events.ts'];"],
     ["import { safeNow } from './utils/time.js';", "const { safeNow } = __deps['./utils/time.js'];"],
     ["import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } from './utils/fury.js';", "const { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } = __deps['./utils/fury.js'];"],
     ["import { nextTurnInterleaved } from './turns/interleaved.ts';", "const { nextTurnInterleaved } = __deps['./turns/interleaved.js'];"],
@@ -98,7 +98,7 @@ async function loadTurnsHarness(overrides = {}){
       applyOnSpawnEffects(){ },
       prepareUnitForPassives(){ }
     },
-    './events.js': {
+    './events.ts': {
       emitGameEvent(type, detail){
         eventLog.push({ type, detail });
       },
@@ -498,7 +498,7 @@ test('turn regen restores hp and ae each turn without exceeding max', async () =
   assert.equal(unit.hp, 100);
   assert.equal(unit.ae, 40);
 
-  const regenEvents = eventLog.filter(ev => ev.type === deps['./events.js'].TURN_REGEN);
+  const regenEvents = eventLog.filter(ev => ev.type === deps['./events.ts'].TURN_REGEN);
   assert.equal(regenEvents.length, 3);
   assert.deepStrictEqual(
     regenEvents.map(ev => ({ hpDelta: ev.detail.hpDelta, aeDelta: ev.detail.aeDelta })),

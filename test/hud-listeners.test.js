@@ -41,8 +41,8 @@ function loadUiModule(deps){
     "const { CFG } = __deps['./config.js'];"
   );
   code = code.replace(
-    "import { gameEvents, TURN_START, TURN_END, ACTION_END } from './events.js';",
-    "const { gameEvents, TURN_START, TURN_END, ACTION_END } = __deps['./events.js'];"
+    "import { gameEvents, TURN_START, TURN_END, ACTION_END } from './events.ts';",
+    "const { gameEvents, TURN_START, TURN_END, ACTION_END } = __deps['./events.ts'];"
   );
   code = code.replace(/export function/g, 'function');
   code += '\nmodule.exports = { initHUD, startSummonBar };';
@@ -115,7 +115,7 @@ const events = createGameEvents();
 
 const { initHUD } = loadUiModule({
   './config.js': { CFG: { COST_CAP: 30, UI: {} } },
-  './events.js': {
+  './events.ts': {
     gameEvents: events.target,
     TURN_START,
     TURN_END,
