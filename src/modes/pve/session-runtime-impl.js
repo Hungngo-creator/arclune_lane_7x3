@@ -1,4 +1,3 @@
-// @ts-check
 //v0.7.6
 import { stepTurn, doActionOrSkip, predictSpawnCycle } from '../../turns.ts';
 import { enqueueImmediate, processActionChain } from '../../summon.js';
@@ -47,33 +46,29 @@ import {
   clearBackgroundSignatureCache
 } from './session-state.ts';
 
-/**
- * @typedef {import('@types/units').UnitToken} UnitToken
- * @typedef {import('@types/units').QueuedSummonState} QueuedSummonState
- * @typedef {import('@types/units').ActionChainEntry} ActionChainEntry
- * @typedef {import('@types/combat').SessionState as CoreSessionState} CoreSessionState
- * @typedef {import('@types/turn-order').TurnSnapshot} TurnSnapshot
-* @typedef {import('@types/pve').RewardRoll} RewardRoll
- * @typedef {import('@types/pve').WaveState} WaveState
- * @typedef {import('@types/pve').EncounterState} EncounterState
- * @typedef {import('@types/pve').SessionRuntimeState} SessionRuntimeState
- * @typedef {import('@types/pve').CreateSessionOptions} CreateSessionOptions
- * @typedef {import('@types/pve').SessionState} SessionStatee
- */
+import type { UnitToken, QueuedSummonState, ActionChainEntry } from '@types/units';
+import type { TurnSnapshot } from '@types/turn-order';
+import type {
+  RewardRoll,
+  WaveState,
+  EncounterState,
+  SessionRuntimeState,
+  CreateSessionOptions,
+  SessionState,
+} from '@types/pve';
 
-/**
- * @typedef {Object} EnemyAIPreset
- * @property {ReadonlyArray<string>=} deck
- * @property {ReadonlyArray<string>=} unitsAll
- * @property {number=} costCap
- * @property {number=} summonLimit
- * @property {ReadonlyArray<UnitToken>=} startingDeck
- */
+type EnemyAIPreset = {
+  deck?: ReadonlyArray<string>;
+  unitsAll?: ReadonlyArray<string>;
+  costCap?: number;
+  summonLimit?: number;
+  startingDeck?: ReadonlyArray<UnitToken>;
+};
 
-/** @type {HTMLCanvasElement|null} */ let canvas = null;
-/** @type {CanvasRenderingContext2D|null} */ let ctx = null;
-/** @type {{update:(g:any)=>void, cleanup?:()=>void}|null} */ let hud = null;   // ← THÊM
-/** @type {(() => void)|null} */ let hudCleanup = null;
+let canvas: HTMLCanvasElement | null = null;
+let ctx: CanvasRenderingContext2D | null = null;
+let hud: { update: (g: any) => void; cleanup?: () => void } | null = null;   // ← THÊM
+let hudCleanup: (() => void) | null = null;
 const CAM_PRESET = CAM[CFG.CAMERA] || CAM.landscape_oblique;
 const HAND_SIZE  = CFG.HAND_SIZE ?? 4;
 
@@ -86,8 +81,7 @@ let _IID = 1;
 let _BORN = 1;
 const nextIid = ()=> _IID++;
 
-/** @type {SessionState|null} */
-let Game = null;
+let Game: SessionState | null = null;
 let tickLoopHandle = null;
 let tickLoopUsesTimeout = false;
 let resizeHandler = null;
@@ -102,14 +96,13 @@ let visibilityHandlerBound = false;
 let winRef = null;
 let docRef = null;
 let rootElement = null;
-/** @type {Record<string, unknown>} */
-let storedConfig = {};
+let storedConfig: Record<string, unknown> = {};
 let running = false;
 const hpBarGradientCache = new Map();
 
 function resetSessionState(options = {}){
   storedConfig = normalizeConfig({ ...storedConfig, ...options });
-  Game = createSession(/** @type {CreateSessionOptions} */ (storedConfig));
+  Game = createSession(storedConfig as CreateSessionOptions);
   _IID = 1;
   _BORN = 1;
   CLOCK = createClock();
@@ -1023,12 +1016,12 @@ function init(){
   const boardFromDocument = (typeof doc.querySelector === 'function')
     ? doc.querySelector('#board')
     : (typeof doc.getElementById === 'function' ? doc.getElementById('board') : null);
-  const boardEl = /** @type {HTMLCanvasElement|null} */ (boardFromRoot || boardFromDocument);
+  const boardEl = (boardFromRoot || boardFromDocument) as HTMLCanvasElement | null;
   if (!boardEl){
     return false;
   }
   canvas = boardEl;
-  ctx = /** @type {CanvasRenderingContext2D} */ (boardEl.getContext('2d'));
+  ctx = boardEl.getContext('2d') as CanvasRenderingContext2D;
   
   if (typeof hudCleanup === 'function'){
     hudCleanup();
@@ -1172,7 +1165,7 @@ const viewport = winRef?.visualViewport;
       CLOCK.lastTimerRemain = remain;
       const mm = String(Math.floor(remain/60)).padStart(2,'0');
       const ss = String(remain%60).padStart(2,'0');
-      const tEl = /** @type {HTMLElement|null} */ (queryFromRoot('#timer') || doc.getElementById('timer'));
+      const tEl = (queryFromRoot('#timer') || doc.getElementById('timer')) as HTMLElement | null;
       if (tEl) tEl.textContent = `${mm}:${ss}`;
     }
 
@@ -1689,7 +1682,7 @@ function applyConfigToRunningGame(cfg){
   }
   if (Array.isArray(cfg.deck) && cfg.deck.length) Game.unitsAll = cfg.deck;
   if (cfg.aiPreset){
-    const preset = cfg.aiPreset || {};
+    const preset: EnemyAIPreset = cfg.aiPreset || {};
     if (Array.isArray(preset.deck) && preset.deck.length){
       Game.ai.unitsAll = preset.deck;
     } else if (Array.isArray(preset.unitsAll) && preset.unitsAll.length){

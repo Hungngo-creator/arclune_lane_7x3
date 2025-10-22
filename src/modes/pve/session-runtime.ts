@@ -22,7 +22,7 @@ import {
   createPveSession as createPveSessionImpl,
   __getStoredConfig,
   __getActiveGame,
-} from './session-runtime-impl.js';
+} from './session-runtime-impl.ts';
 
 type RewardList = ReadonlyArray<RewardRoll>;
 type MutableRewardList = RewardRoll[];
