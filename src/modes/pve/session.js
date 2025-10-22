@@ -2,10 +2,10 @@
 //v0.7.6
 import { stepTurn, doActionOrSkip, predictSpawnCycle } from '../../turns.ts';
 import { enqueueImmediate, processActionChain } from '../../summon.js';
-import { refillDeckEnemy, aiMaybeAct } from '../../ai.js';
+import { refillDeckEnemy, aiMaybeAct } from '../../ai.ts';
 import { Statuses } from '../../statuses.ts';
 import { CFG, CAM } from '../../config.js';
-import { UNITS } from '../../units.js';
+import { UNITS } from '../../units.ts';
 import { Meta, makeInstanceStats, initialRageFor } from '../../meta.js';
 import { basicAttack, pickTarget, dealAbilityDamage, healUnit, grantShield, applyDamage } from '../../combat.ts';
 import { initializeFury, setFury, spendFury, resolveUltCost, gainFury, finishFuryHit } from '../../utils/fury.js';
