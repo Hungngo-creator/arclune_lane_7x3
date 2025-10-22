@@ -64,7 +64,7 @@ const MODES = /** @satisfies ReadonlyArray<ModeConfig> */ ([
     parentId: 'arena-hub',
     shell: {
       screenId: 'pve-session',
-      moduleId: './modes/pve/session.js',
+      moduleId: './modes/pve/session.ts',
       defaultParams: { modeKey: 'campaign' }
     }
   },
@@ -81,7 +81,7 @@ const MODES = /** @satisfies ReadonlyArray<ModeConfig> */ ([
     parentId: 'arena-hub',
     shell: {
       screenId: 'pve-session',
-      moduleId: './modes/pve/session.js',
+      moduleId: './modes/pve/session.ts',
       defaultParams: { modeKey: 'challenge' }
     }
   },
@@ -98,7 +98,7 @@ const MODES = /** @satisfies ReadonlyArray<ModeConfig> */ ([
     parentId: 'arena-hub',
     shell: {
       screenId: 'pve-session',
-      moduleId: './modes/pve/session.js',
+      moduleId: './modes/pve/session.ts',
       defaultParams: { modeKey: 'arena' }
     }
   },
