@@ -3,6 +3,7 @@ const assert = require('assert/strict');
 const path = require('path');
 const fs = require('fs/promises');
 const vm = require('vm');
+const ts = require('typescript');
 
 const ROOT_DIR = path.resolve(__dirname, '..');
 const SRC_DIR = path.join(ROOT_DIR, 'src');
@@ -165,7 +166,12 @@ function createImportReplacement(specifiers, moduleVar) {
   const parts = inside.split(',').map((p) => p.trim()).filter(Boolean);
   for (const part of parts) {
     if (!part) continue;
-    const [importedRaw, localRaw] = part.split(/\s+as\s+/);
+    const isTypeOnlyImport = /^type\s+/.test(part);
+    if (isTypeOnlyImport) {
+      continue;
+    }
+    const sanitized = part.replace(/^type\s+/, '');
+    const [importedRaw, localRaw] = sanitized.split(/\s+as\s+/);
     const imported = importedRaw.trim();
     const local = (localRaw || importedRaw).trim();
     lines.push(`const ${local} = ${moduleVar}.${imported};`);
@@ -183,10 +189,38 @@ function resolveImport(fromId, specifier) {
   return `./${relative}`;
 }
 
+function transpileSource(code, filename) {
+  const result = ts.transpileModule(code, {
+    compilerOptions: {
+      module: ts.ModuleKind.ESNext,
+      target: ts.ScriptTarget.ES2020,
+      allowJs: true,
+      importsNotUsedAsValues: ts.ImportsNotUsedAsValues.Remove,
+    },
+    fileName: filename,
+    reportDiagnostics: false,
+  });
+  return result.outputText;
+}
+
 function transformModule(code, id) {
   const exportsAssignments = [];
   const usedAliases = new Set();
   let depIndex = 0;
+  const exportStarRegex = /export\s*\*\s*from\s*['\"](.+?)['\"];?/g;
+  code = code.replace(exportStarRegex, (match, source) => {
+    const depId = resolveImport(id, source.trim());
+    const moduleVar = `__reexport${depIndex++}`;
+    const lines = [`const ${moduleVar} = __require('${depId}');`];
+    lines.push(
+      `for (const key of Object.keys(${moduleVar})) {`,
+      "  if (key === 'default' || Object.prototype.hasOwnProperty.call(exports, key)) continue;",
+      `  exports[key] = ${moduleVar}[key];`,
+      '}'
+    );
+    return lines.join('\n');
+  });
+
   const reExportRegex = /export\s*{([\s\S]*?)}\s*from\s*['\"](.+?)['\"];?/g;
   code = code.replace(reExportRegex, (match, spec, source) => {
     const depId = resolveImport(id, source.trim());
@@ -208,10 +242,14 @@ function transformModule(code, id) {
 
   const importRegex = /import\s*([\s\S]*?)\s*from\s*['\"](.+?)['\"];?/g;
   code = code.replace(importRegex, (match, clause, source) => {
+    const cleanedClause = clause.trim();
+    if (/^type\b/.test(cleanedClause)) {
+      return '';
+    }
     const depId = resolveImport(id, source.trim());
     const moduleVar = `__dep${depIndex++}`;
     const lines = [`const ${moduleVar} = __require('${depId}');`];
-    const importLines = createImportReplacement(clause, moduleVar);
+    const importLines = createImportReplacement(cleanedClause, moduleVar);
     lines.push(...importLines);
     return lines.join('\n');
   });
@@ -524,7 +562,9 @@ function getListenerCount(target, type) {
 async function compileModuleScripts() {
   const scripts = new Map();
   const addModule = async (id, source) => {
-    const transformed = transformModule(source, id);
+    const filename = id.startsWith('./') ? path.join(SRC_DIR, id.slice(2)) : id;
+    const transpiled = transpileSource(source, filename);
+    const transformed = transformModule(transpiled, id);
     const wrapped = `(function(exports, module, __require){\n${transformed}\n})`;
     scripts.set(id, new vm.Script(wrapped, { filename: id }));
   };
@@ -535,8 +575,8 @@ async function compileModuleScripts() {
 
   const mainSource = await fs.readFile(path.join(SRC_DIR, 'main.js'), 'utf8');
   await addModule('./main.js', mainSource);
-  const sessionSource = await fs.readFile(path.join(SRC_DIR, 'modes', 'pve', 'session.js'), 'utf8');
-  await addModule('./modes/pve/session.js', sessionSource);
+  const sessionSource = await fs.readFile(path.join(SRC_DIR, 'modes', 'pve', 'session.ts'), 'utf8');
+  await addModule('./modes/pve/session.ts', sessionSource);
   const dummySource = await fs.readFile(path.join(SRC_DIR, 'utils', 'dummy.js'), 'utf8');
   await addModule('./utils/dummy.js', dummySource);
   return scripts;
