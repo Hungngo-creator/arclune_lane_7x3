@@ -19,12 +19,34 @@ export interface StatusEffect {
   ttl?: number;
   ttlTurns?: number;
   turns?: number;
-  tick?: 'turn' | 'phase' | string;
+  tick?: 'turn' | 'phase' | string | null;
   power?: number;
   amount?: number;
   /** Giá trị tuỳ ý khác (ví dụ metadata riêng của hiệu ứng) */
   [extra: string]: unknown;
 }
+
+export interface StatusLifecyclePayload<TPayload = unknown> {
+  Game: SessionState | null;
+  target: UnitToken | null;
+  source?: UnitToken | null;
+  status: StatusEffect;
+  payload: TPayload;
+}
+
+export type StatusDefinition<
+  TApplyPayload = unknown,
+  TTickPayload = unknown,
+  TRemovePayload = unknown,
+> = (
+  spec?: Record<string, unknown>,
+) => StatusEffect & {
+  onApply?: (payload: StatusLifecyclePayload<TApplyPayload>) => void;
+  onTick?: (payload: StatusLifecyclePayload<TTickPayload>) => void;
+  onRemove?: (payload: StatusLifecyclePayload<TRemovePayload>) => void;
+};
+
+export type StatusRegistry = Record<string, StatusDefinition>;
 
 export interface SkillCost {
   aether?: number;
@@ -144,3 +166,34 @@ export interface SessionState {
   telemetryLog?: TelemetryEvent[];
   [extra: string]: unknown;
 }
+
+export interface PassiveSpec {
+  id: string;
+  when?: string;
+  effect?:
+    | string
+    | {
+        type?: string;
+        kind?: string;
+        params?: Record<string, unknown>;
+        stats?: Record<string, number>;
+        flatStats?: Record<string, number>;
+      };
+  params?: Record<string, unknown>;
+  condition?: Record<string, unknown>;
+  conditions?: Array<unknown> | unknown;
+}
+
+export interface PassiveEffectArgs<
+  TPassive extends PassiveSpec = PassiveSpec,
+  TContext extends Record<string, unknown> | undefined = Record<string, unknown> | undefined,
+> {
+  Game: SessionState | null;
+  unit: UnitToken | null;
+  passive: TPassive | null;
+  ctx: TContext;
+}
+
+export type PassiveDefinition = (args: PassiveEffectArgs) => void;
+
+export type PassiveRegistry = Record<string, PassiveDefinition>;

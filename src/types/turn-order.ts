@@ -1,5 +1,5 @@
-import type { ActionChainProcessedResult, SessionState } from './combat';
-import type { Side, UnitId, UnitToken } from './units';
+import type { SessionState } from './combat';
+import type { ActionChainProcessedResult, Side, UnitId, UnitToken } from './units';
 
 export type TurnSideKey = 'ALLY' | 'ENEMY';
 
