@@ -78,13 +78,13 @@ declare module './combat.ts' {
   export function doBasicWithFollowups(Game: SessionState, unit: UnitToken, cap?: number): void;
 }
 
-declare module './config.js' {
+declare module './config.ts' {
   import type { GameConfig } from '@types/config';
 
   export const CFG: GameConfig;
 }
 
-declare module './meta.js' {
+declare module './meta.ts' {
   import type { UnitId } from '@types/units';
 
   export interface InstanceStats {
