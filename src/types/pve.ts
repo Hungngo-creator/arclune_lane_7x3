@@ -1,5 +1,8 @@
 import type { SessionState as CoreSessionState } from './combat';
 import type { UnitToken } from './units';
+import type { RosterUnitDefinition } from './config';
+
+export type MetaEntry = RosterUnitDefinition;
 
 export interface RewardRoll {
   id: string;

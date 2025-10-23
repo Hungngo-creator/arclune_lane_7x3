@@ -1,5 +1,6 @@
 import type { SkillDefinition } from './combat';
 import type { UnitId } from './units';
+import type { BackgroundDefinition, BackgroundProp } from '../config/schema';
 
 export interface CurrencyDefinition {
   id: string;
@@ -169,6 +170,39 @@ export interface ChibiProportions {
   weapon: number;
   nameAlpha: number;
 }
+
+export interface BackgroundPalette {
+  primary?: string;
+  secondary?: string;
+  accent?: string;
+  shadow?: string;
+  outline?: string;
+}
+
+export interface BackgroundFallback {
+  shape?: string;
+  [extra: string]: unknown;
+}
+
+export type BackgroundPropConfig = BackgroundProp & {
+  asset?: string | null;
+  fallback?: BackgroundFallback | null;
+  palette?: BackgroundPalette | null;
+  anchor?: { x?: number; y?: number } | null;
+  size?: { w?: number; h?: number } | null;
+  baseLift?: number;
+  pixelOffset?: { x?: number; y?: number } | null;
+  cell: BackgroundProp['cell'] & { depth?: number };
+  cx?: number;
+  cy?: number;
+  [extra: string]: unknown;
+};
+
+export type BackgroundDefinitionConfig = Omit<BackgroundDefinition, 'props'> & {
+  props: BackgroundPropConfig[];
+};
+
+export type BackgroundConfig = BackgroundDefinitionConfig | null;
 
 export type {
   GameConfig,
