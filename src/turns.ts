@@ -3,8 +3,8 @@ import { slotToCell, slotIndex } from './engine.ts';
 import { Statuses } from './statuses.ts';
 
 import { doBasicWithFollowups } from './combat.ts';
-import { CFG } from './config.js';
-import { makeInstanceStats, initialRageFor } from './meta.js';
+import { CFG } from './config.ts';
+import { makeInstanceStats, initialRageFor } from './meta.ts';
 import { vfxAddSpawn, vfxAddBloodPulse } from './vfx.js';
 import { getUnitArt } from './art.js';
 import { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } from './passives.ts';

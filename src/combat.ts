@@ -2,7 +2,7 @@ import { Statuses, hookOnLethalDamage } from './statuses.ts';
 import { vfxAddHit, vfxAddMelee, vfxAddLightningArc } from './vfx.js';
 import { slotToCell } from './engine.ts';
 import { emitPassiveEvent } from './passives.ts';
-import { CFG } from './config.js';
+import { CFG } from './config.ts';
 import { gainFury, startFurySkill, finishFuryHit } from './utils/fury.js';
 import { safeNow } from './utils/time.js';
 

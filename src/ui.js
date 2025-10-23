@@ -1,5 +1,5 @@
 //v0.7.1
-import { CFG } from './config.js';
+import { CFG } from './config.ts';
 import { gameEvents, TURN_START, TURN_END, ACTION_END } from './events.ts';
 
 export function initHUD(doc, root){

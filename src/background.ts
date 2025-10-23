@@ -415,4 +415,4 @@ export function drawEnvironmentProps(
 export function getEnvironmentBackground(backgroundKey?: string | null): BackgroundConfig {
   const resolved = resolveBackground(backgroundKey ?? null);
   return resolved ? resolved.config : null;
-               }
+}
