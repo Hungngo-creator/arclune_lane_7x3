@@ -3,12 +3,12 @@ import type { CameraPreset } from '@types/config';
 import type { TurnSnapshot } from '@types/turn-order';
 import type { QueuedSummonState, ActionChainEntry } from '@types/units';
 
-import { CFG } from '../../config.js';
+import { CFG } from '../../config.ts';
 import { UNITS } from '../../units.ts';
-import { Meta } from '../../meta.js';
+import { Meta } from '../../meta.ts';
 import { gameEvents } from '../../events.ts';
-import { getEnvironmentBackground, drawEnvironmentProps } from '../../background.js';
-import { getCachedBattlefieldScene } from '../../scene.js';
+import { getEnvironmentBackground, drawEnvironmentProps } from '../../background.ts';
+import { getCachedBattlefieldScene } from '../../scene.ts';
 import { Statuses } from '../../statuses.ts';
 
 void Statuses;

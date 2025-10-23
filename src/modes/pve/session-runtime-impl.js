@@ -3,9 +3,9 @@ import { stepTurn, doActionOrSkip, predictSpawnCycle } from '../../turns.ts';
 import { enqueueImmediate, processActionChain } from '../../summon.js';
 import { refillDeckEnemy, aiMaybeAct } from '../../ai.ts';
 import { Statuses } from '../../statuses.ts';
-import { CFG, CAM } from '../../config.js';
+import { CFG, CAM } from '../../config.ts';
 import { UNITS } from '../../units.ts';
-import { Meta, makeInstanceStats, initialRageFor } from '../../meta.js';
+import { Meta, makeInstanceStats, initialRageFor } from '../../meta.ts';
 import { basicAttack, pickTarget, dealAbilityDamage, healUnit, grantShield, applyDamage } from '../../combat.ts';
 import { initializeFury, setFury, spendFury, resolveUltCost, gainFury, finishFuryHit } from '../../utils/fury.js';
 import {
@@ -20,7 +20,7 @@ import {
   cellOccupied, spawnLeaders, pickRandom, slotIndex, slotToCell, cellReserved, ORDER_ENEMY,
   ART_SPRITE_EVENT,
 } from '../../engine.ts';
-import { drawEnvironmentProps } from '../../background.js';
+import { drawEnvironmentProps } from '../../background.ts';
 import { getUnitArt, setUnitSkin } from '../../art.js';
 import { initHUD, startSummonBar } from '../../ui.js';
 import {
@@ -33,7 +33,7 @@ import {
   vfxAddGroundBurst,
   vfxAddShieldWrap
 } from '../../vfx.js';
-import { drawBattlefieldScene } from '../../scene.js';
+import { drawBattlefieldScene } from '../../scene.ts';
 import { gameEvents, TURN_START, TURN_END, ACTION_START, ACTION_END, BATTLE_END, emitGameEvent } from '../../events.ts';
 import { ensureNestedModuleSupport } from '../../utils/dummy.js';
 import { safeNow } from '../../utils/time.js';
