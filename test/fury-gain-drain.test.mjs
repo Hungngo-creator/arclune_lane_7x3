@@ -8,13 +8,13 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 async function loadConfig(){
-  const filePath = path.resolve(__dirname, '../src/config.js');
+  const filePath = path.resolve(__dirname, '../src/config.ts');
   let code = await fs.readFile(filePath, 'utf8');
   code = code.replace(/export const /g, 'const ');
   code += '\nmodule.exports = { CFG };\n';
   const context = { module: { exports: {} }, exports: {} };
   vm.createContext(context);
-  const script = new vm.Script(code, { filename: 'config.js' });
+  const script = new vm.Script(code, { filename: 'config.ts' });
   script.runInContext(context);
   return context.module.exports.CFG;
 }
@@ -24,7 +24,7 @@ async function loadFuryHarness(overrides = {}){
   let code = await fs.readFile(filePath, 'utf8');
 
   const replacements = new Map([
-    ["import { CFG } from '../config.js';", "const { CFG } = __deps['../config.js'];"],
+    ["import { CFG } from '../config.js';", "const { CFG } = __deps['../config.ts'];"],
     ["import { safeNow } from './time.js';", "const { safeNow } = __deps['./time.js'];"]
   ]);
 
@@ -38,7 +38,7 @@ async function loadFuryHarness(overrides = {}){
 
   const cfg = await loadConfig();
   const defaultDeps = {
-    '../config.js': { CFG: cfg },
+    '../config.ts': { CFG: cfg },
     './time.js': { safeNow: () => 0 }
   };
 

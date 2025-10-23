@@ -24,7 +24,7 @@ const stubModules = new Map([
   ['./statuses.ts', `
     export const Statuses = {};
   `],
-  ['./config.js', `
+  ['./config.ts', `
     export const CAM = { landscape_oblique: {} };
     export const CFG = {
       CAMERA: 'landscape_oblique',
@@ -43,7 +43,7 @@ const stubModules = new Map([
   ['./units.ts', `
     export const UNITS = [];
   `],
-  ['./meta.js', `
+  ['./meta.ts', `
     export const Meta = {};
     export function makeInstanceStats() { return {}; }
     export function initialRageFor() { return 0; }
@@ -96,7 +96,7 @@ const stubModules = new Map([
     export const ORDER_ENEMY = [];
     export const ART_SPRITE_EVENT = 'art:sprite';
   `],
-  ['./background.js', `
+  ['./background.ts', `
     export function drawEnvironmentProps() {}
   `],
   ['./art.js', `
@@ -122,7 +122,7 @@ const stubModules = new Map([
     export function vfxAddMelee() {}
     export function vfxDraw() {}
   `],
-  ['./scene.js', `
+  ['./scene.ts', `
     export function drawBattlefieldScene() {}
   `],
   ['./events.ts', `

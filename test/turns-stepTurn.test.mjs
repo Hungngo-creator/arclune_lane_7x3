@@ -16,8 +16,8 @@ async function loadTurnsHarness(overrides = {}){
    ["import { Statuses } from './statuses.ts';", "const { Statuses } = __deps['./statuses.ts'];"],
     ["import { Statuses } from './statuses.js';", "const { Statuses } = __deps['./statuses.ts'];"],
     ["import { doBasicWithFollowups } from './combat.ts';", "const { doBasicWithFollowups } = __deps['./combat.js'];"],
-    ["import { CFG } from './config.js';", "const { CFG } = __deps['./config.js'];"],
-    ["import { makeInstanceStats, initialRageFor } from './meta.js';", "const { makeInstanceStats, initialRageFor } = __deps['./meta.js'];"],
+    ["import { CFG } from './config.ts';", "const { CFG } = __deps['./config.ts'];"],
+    ["import { makeInstanceStats, initialRageFor } from './meta.ts';", "const { makeInstanceStats, initialRageFor } = __deps['./meta.ts'];"],
     ["import { vfxAddSpawn, vfxAddBloodPulse } from './vfx.js';", "const { vfxAddSpawn, vfxAddBloodPulse } = __deps['./vfx.js'];"],
     ["import { getUnitArt } from './art.js';", "const { getUnitArt } = __deps['./art.js'];"],
     ["import { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } from './passives.ts';", "const { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } = __deps['./passives.ts'];"],
@@ -77,13 +77,13 @@ async function loadTurnsHarness(overrides = {}){
     './combat.js': {
       doBasicWithFollowups(){ }
     },
-    './config.js': {
+    './config.ts': {
       CFG: {
         fury: { turn: { startGain: 0 } },
         FOLLOWUP_CAP_DEFAULT: 0
       }
     },
-    './meta.js': {
+    './meta.ts': {
       makeInstanceStats(){ return {}; },
       initialRageFor(){ return 0; }
     },
@@ -378,7 +378,7 @@ test('revived spawn keeps provided resources without forced ultimate', async () 
   };
   const harness = await loadTurnsHarness({
     './utils/fury.js': furyModule,
-    './meta.js': {
+    './meta.ts': {
       makeInstanceStats(){
         return { hpMax: 120, hp: 90 };
       },

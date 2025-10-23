@@ -37,8 +37,8 @@ function loadUiModule(deps){
   const filePath = path.resolve(__dirname, '../src/ui.js');
   let code = fs.readFileSync(filePath, 'utf8');
   code = code.replace(
-    "import { CFG } from './config.js';",
-    "const { CFG } = __deps['./config.js'];"
+    "import { CFG } from './config.ts';",
+    "const { CFG } = __deps['./config.ts'];"
   );
   code = code.replace(
     "import { gameEvents, TURN_START, TURN_END, ACTION_END } from './events.ts';",
@@ -114,7 +114,7 @@ const ACTION_END = 'ACTION_END';
 const events = createGameEvents();
 
 const { initHUD } = loadUiModule({
-  './config.js': { CFG: { COST_CAP: 30, UI: {} } },
+  './config.ts': { CFG: { COST_CAP: 30, UI: {} } },
   './events.ts': {
     gameEvents: events.target,
     TURN_START,
