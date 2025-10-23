@@ -1,6 +1,6 @@
 //v0.7.6
 import { stepTurn, doActionOrSkip, predictSpawnCycle } from '../../turns.ts';
-import { enqueueImmediate, processActionChain } from '../../summon.js';
+import { enqueueImmediate, processActionChain } from '../../summon.ts';
 import { refillDeckEnemy, aiMaybeAct } from '../../ai.ts';
 import { Statuses } from '../../statuses.ts';
 import { CFG, CAM } from '../../config.ts';
@@ -21,8 +21,8 @@ import {
   ART_SPRITE_EVENT,
 } from '../../engine.ts';
 import { drawEnvironmentProps } from '../../background.ts';
-import { getUnitArt, setUnitSkin } from '../../art.js';
-import { initHUD, startSummonBar } from '../../ui.js';
+import { getUnitArt, setUnitSkin } from '../../art.ts';
+import { initHUD, startSummonBar } from '../../ui.ts';
 import {
   vfxDraw,
   vfxAddSpawn,
