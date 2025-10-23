@@ -3,20 +3,26 @@ const assert = require('assert/strict');
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
+const ts = require('typescript');
 
 function loadShell(){
-  const filePath = path.resolve(__dirname, '../src/app/shell.js');
-  let code = fs.readFileSync(filePath, 'utf8');
-  code = code.replace('export function createAppShell', 'function createAppShell');
-  code = code.replace(/\nexport default createAppShell;\s*$/, '\n');
-  code += '\nmodule.exports = { createAppShell };\n';
+  const filePath = path.resolve(__dirname, '../src/app/shell.ts');
+  const source = fs.readFileSync(filePath, 'utf8');
+  const transpiled = ts.transpileModule(source, {
+    compilerOptions: {
+      module: ts.ModuleKind.CommonJS,
+      target: ts.ScriptTarget.ES2020,
+      esModuleInterop: true
+    }
+  });
   const context = {
     module: { exports: {} },
     exports: {},
+    require,
     console
   };
   vm.createContext(context);
-  const script = new vm.Script(code, { filename: 'shell.js' });
+  const script = new vm.Script(transpiled.outputText, { filename: 'shell.ts' });
   script.runInContext(context);
   return context.module.exports;
 }
