@@ -37,7 +37,7 @@
 | Nhiễu nhiệt | Sau toàn thân, trước hậu cảnh | Hiện | Shader distortion nhẹ (amplitude 3 px), scroll dọc chậm. |
 
 ## 4. Bảng màu & ghi chú chất liệu
-- **Nguồn palette**: `loithien` trong `src/art.js` (primary `#8bd1ff`, secondary `#163044`, accent `#c7f1ff`, outline `#1e3e53`).
+- **Nguồn palette**: `loithien` trong `src/art.ts` (primary `#8bd1ff`, secondary `#163044`, accent `#c7f1ff`, outline `#1e3e53`).
 - **Da**: base gradient từ `#f4fbff` (sáng) → `#cbe7ff` (bóng khuất); thêm emissive nhẹ `#c7f1ff` quanh xăm lôi văn.
 - **Kim loại giáp**: primary làm midtone; highlight `#d9f2ff`, shadow pha secondary `#163044`; cạnh sắc add rim `#c7f1ff` ~70% opacity.
 - **Vải áo choàng**: secondary làm nền, lót trong dùng blend `#0f1f2c`; mép áo quét accent 40% tạo viền phát sáng.
