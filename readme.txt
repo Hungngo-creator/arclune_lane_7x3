@@ -2,7 +2,7 @@
 
 index.html – loader & thứ tự <script type="module">.
 
-config.js – CFG, CAM (preset camera nghiêng).
+config.ts – CFG, CAM (preset camera nghiêng).
 
 engine.js – grid, phép chiếu oblique; slotIndex/slotToCell, cellReserved, drawGridOblique, …
 
