@@ -573,8 +573,8 @@ async function compileModuleScripts() {
     await addModule(id, source);
   }
 
-  const mainSource = await fs.readFile(path.join(SRC_DIR, 'main.js'), 'utf8');
-  await addModule('./main.js', mainSource);
+  const mainSource = await fs.readFile(path.join(SRC_DIR, 'main.ts'), 'utf8');
+  await addModule('./main.ts', mainSource);
   const sessionSource = await fs.readFile(path.join(SRC_DIR, 'modes', 'pve', 'session.ts'), 'utf8');
   await addModule('./modes/pve/session.ts', sessionSource);
   const dummySource = await fs.readFile(path.join(SRC_DIR, 'utils', 'dummy.js'), 'utf8');
@@ -622,7 +622,7 @@ async function loadMainModule(boardFlag) {
   const moduleScripts = await compileModuleScripts();
   const { sandbox, documentStub } = createSandbox(boardFlag);
   const { require: localRequire, cache } = createRequire(moduleScripts, sandbox);
-  const mainExports = localRequire('./main.js');
+  const mainExports = localRequire('./main.ts');
   return { startGame: mainExports.startGame, documentStub, require: localRequire, moduleCache: cache };
 }
 
