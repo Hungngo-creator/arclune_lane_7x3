@@ -19,7 +19,7 @@ async function loadTurnsHarness(overrides = {}){
     ["import { CFG } from './config.ts';", "const { CFG } = __deps['./config.ts'];"],
     ["import { makeInstanceStats, initialRageFor } from './meta.ts';", "const { makeInstanceStats, initialRageFor } = __deps['./meta.ts'];"],
     ["import { vfxAddSpawn, vfxAddBloodPulse } from './vfx.js';", "const { vfxAddSpawn, vfxAddBloodPulse } = __deps['./vfx.js'];"],
-    ["import { getUnitArt } from './art.js';", "const { getUnitArt } = __deps['./art.js'];"],
+    ["import { getUnitArt } from './art.ts';", "const { getUnitArt } = __deps['./art.ts'];"],
     ["import { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } from './passives.ts';", "const { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } = __deps['./passives.ts'];"],
   ["import { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } from './passives.js';", "const { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } = __deps['./passives.ts'];"],
     ["import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } from './events.js';", "const { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } = __deps['./events.ts'];"],
@@ -91,7 +91,7 @@ async function loadTurnsHarness(overrides = {}){
       vfxAddSpawn(){ },
       vfxAddBloodPulse(){ }
     },
-    './art.js': {
+    './art.ts': {
       getUnitArt(){ return {}; }
     },
     './passives.ts': {

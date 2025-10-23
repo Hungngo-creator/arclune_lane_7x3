@@ -34,7 +34,7 @@ function createGameEvents(){
 }
 
 function loadUiModule(deps){
-  const filePath = path.resolve(__dirname, '../src/ui.js');
+  const filePath = path.resolve(__dirname, '../src/ui.ts');
   let code = fs.readFileSync(filePath, 'utf8');
   code = code.replace(
     "import { CFG } from './config.ts';",
@@ -43,6 +43,10 @@ function loadUiModule(deps){
   code = code.replace(
     "import { gameEvents, TURN_START, TURN_END, ACTION_END } from './events.ts';",
     "const { gameEvents, TURN_START, TURN_END, ACTION_END } = __deps['./events.ts'];"
+  );
+  code = code.replace(
+    "import type { HudHandles, SummonBarCard, SummonBarHandles, SummonBarOptions } from './types/ui.ts';\n\n",
+    ''
   );
   code = code.replace(/export function/g, 'function');
   code += '\nmodule.exports = { initHUD, startSummonBar };';
@@ -53,7 +57,7 @@ function loadUiModule(deps){
     __deps: deps
   };
   vm.createContext(context);
-  const script = new vm.Script(code, { filename: 'ui.js' });
+  const script = new vm.Script(code, { filename: 'ui.ts' });
   script.runInContext(context);
   return context.module.exports;
 }

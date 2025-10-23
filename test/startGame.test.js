@@ -13,7 +13,7 @@ const stubModules = new Map([
     export function stepTurn() {}
     export function doActionOrSkip() {}
   `],
-  ['./summon.js', `
+  ['./summon.ts', `
     export function enqueueImmediate() {}
     export function processActionChain() {}
   `],
@@ -99,11 +99,11 @@ const stubModules = new Map([
   ['./background.ts', `
     export function drawEnvironmentProps() {}
   `],
-  ['./art.js', `
+  ['./art.ts', `
     export function getUnitArt() { return {}; }
     export function setUnitSkin() { return true; }
   `],
-  ['./ui.js', `
+  ['./ui.ts', `
     let initHudCalls = 0;
     export function initHUD(doc, root) {
       initHudCalls += 1;
@@ -629,7 +629,7 @@ async function loadMainModule(boardFlag) {
 test('startGame retries initialization after DOM becomes ready', async () => {
   const boardFlag = { value: false };
   const { startGame, documentStub, require: localRequire } = await loadMainModule(boardFlag);
-  const uiModule = localRequire('./ui.js');
+  const uiModule = localRequire('./ui.ts');
   const getInitHudCalls = uiModule.__getInitHudCalls;
 
   assert.strictEqual(getInitHudCalls(), 0);
@@ -662,7 +662,7 @@ test('startGame retries initialization after DOM becomes ready', async () => {
 test('startGame initialises using provided root when document lacks #board', async () => {
   const boardFlag = { value: false };
   const { startGame, documentStub, require: localRequire } = await loadMainModule(boardFlag);
-  const uiModule = localRequire('./ui.js');
+  const uiModule = localRequire('./ui.ts');
   const getInitHudCalls = uiModule.__getInitHudCalls;
 
   const rootCanvas = createCanvasElement();

@@ -101,11 +101,11 @@ const stubModules = new Map([
     ART_SPRITE_EVENT: 'art:sprite'
   }],
   ['./background.js', backgroundModule],
-  ['./art.js', {
+  ['./art.ts', {
     getUnitArt() { return {}; },
     setUnitSkin() { return true; }
   }],
-  ['./ui.js', {
+  ['./ui.ts', {
     initHUD() {
       return { update() {}, cleanup() {} };
     },
