@@ -1,4 +1,4 @@
-import { getUnitArt } from '../../art.js';
+import { getUnitArt } from '../../art.ts';
 
 export const HERO_DEFAULT_ID = 'leaderA';
 
