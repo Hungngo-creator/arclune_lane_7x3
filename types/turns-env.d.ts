@@ -142,7 +142,7 @@ declare module './vfx.js' {
   ): number;
 }
 
-declare module './art.js' {
+declare module './art.ts' {
   export interface UnitArtInstance extends Record<string, unknown> {
     palette?: Record<string, unknown> | null;
     layout?: Record<string, unknown> | null;
