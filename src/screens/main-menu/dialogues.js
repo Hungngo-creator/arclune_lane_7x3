@@ -1,8 +1,31 @@
 import { getUnitArt } from '../../art.ts';
+import type {
+  HeroCue,
+  HeroDialogue,
+  HeroDialogueLine,
+  HeroGender,
+  HeroHotspot,
+  HeroProfile,
+  HeroTone
+} from './types.ts';
 
 export const HERO_DEFAULT_ID = 'leaderA';
 
-const HERO_LIBRARY = {
+type HeroDialogueBuckets = Partial<Record<HeroGender | 'default', ReadonlyArray<HeroDialogueLine>>>;
+
+interface HeroLibraryEntry {
+  id: string;
+  name?: string;
+  title?: string;
+  faction?: string;
+  role?: string;
+  portrait?: string;
+  motto?: string;
+  hotspots?: ReadonlyArray<HeroHotspot>;
+  dialogues?: Partial<Record<HeroCue, HeroDialogueBuckets>>;
+}
+
+const HERO_LIBRARY: Record<string, HeroLibraryEntry> = {
   leaderA: {
     id: 'leaderA',
     name: 'Uyên',
@@ -136,7 +159,7 @@ const HERO_LIBRARY = {
   }
 };
 
-const GENDER_MAP = {
+const GENDER_MAP: Record<string, HeroGender> = {
   male: 'male',
   m: 'male',
   nam: 'male',
@@ -151,7 +174,7 @@ const GENDER_MAP = {
   null: 'neutral'
 };
 
-const CUE_LABELS = {
+const CUE_LABELS: Record<HeroCue | string, string> = {
   intro: 'Chào hỏi',
   hover: 'Phản hồi',
   tap: 'Hiệu lệnh',
@@ -159,7 +182,7 @@ const CUE_LABELS = {
   idle: 'Độc thoại'
 };
 
-const CUE_TONES = {
+const CUE_TONES: Partial<Record<HeroCue | HeroTone, HeroTone>> = {
   greeting: 'greeting',
   focus: 'focus',
   gentle: 'gentle',
@@ -168,7 +191,7 @@ const CUE_TONES = {
   calm: 'calm'
 };
 
-const TONE_TO_CUE = {
+const TONE_TO_CUE: Partial<Record<HeroCue, HeroTone>> = {
   intro: 'greeting',
   hover: 'focus',
   tap: 'motivate',
@@ -176,62 +199,88 @@ const TONE_TO_CUE = {
   idle: 'calm'
 };
 
-function normalizeGender(value){
+function normalizeGender(value: unknown): HeroGender {
   if (typeof value === 'string'){
     const key = value.trim().toLowerCase();
-    if (key in GENDER_MAP) return GENDER_MAP[key];
+    if (key in GENDER_MAP){
+      return GENDER_MAP[key];
+    }
   }
   return 'neutral';
 }
 
-function ensureArray(value){
+function ensureArray<T>(value: T | ReadonlyArray<T> | null | undefined): ReadonlyArray<T> {
   if (!value) return [];
   return Array.isArray(value) ? value : [value];
 }
 
-function pickLine(pool){
-  const list = ensureArray(pool).filter(Boolean);
+function pickLine(pool: ReadonlyArray<HeroDialogueLine> | HeroDialogueLine | null | undefined): HeroDialogueLine | null {
+  const list = ensureArray(pool).filter(Boolean) as ReadonlyArray<HeroDialogueLine>;
   if (!list.length) return null;
   const index = Math.floor(Math.random() * list.length);
   const item = list[index];
-  if (item && typeof item === 'object'){ return { text: item.text || '', tone: item.tone || null, label: item.label || null }; }
-  return { text: String(item || ''), tone: null, label: null };
+  if (item && typeof item === 'object'){
+    return {
+      text: item.text || '',
+      tone: item.tone || null,
+      label: item.label || null
+    };
+  }
+  return { text: String(item ?? ''), tone: null, label: null };
 }
 
-function inferTone(cue){
-  return CUE_TONES[cue] || TONE_TO_CUE[cue] || 'calm';
+function inferTone(cue: HeroCue | string | null | undefined): HeroTone {
+  if (cue && CUE_TONES[cue]){
+    return CUE_TONES[cue] as HeroTone;
+  }
+  if (cue && TONE_TO_CUE[cue as HeroCue]){
+    return TONE_TO_CUE[cue as HeroCue] as HeroTone;
+  }
+  return 'calm';
 }
 
-function inferLabel(cue){
-  return CUE_LABELS[cue] || 'Tương tác';
+function inferLabel(cue: HeroCue | string | null | undefined): string {
+  if (cue && CUE_LABELS[cue]){
+    return CUE_LABELS[cue];
+  }
+  return 'Tương tác';
 }
 
-export function getHeroProfile(heroId = HERO_DEFAULT_ID){
+export function getHeroProfile(heroId: string = HERO_DEFAULT_ID): HeroProfile {
   const profile = HERO_LIBRARY[heroId] || HERO_LIBRARY.default;
   const art = getUnitArt(profile.portrait || heroId || HERO_DEFAULT_ID) || null;
   return {
     id: profile.id,
-    name: profile.name,
-    title: profile.title,
-    faction: profile.faction,
-    role: profile.role,
-    motto: profile.motto,
+    name: profile.name || null,
+    title: profile.title || null,
+    faction: profile.faction || null,
+    role: profile.role || null,
+    motto: profile.motto || null,
     portrait: profile.portrait || heroId || HERO_DEFAULT_ID,
     hotspots: (profile.hotspots || []).map(item => ({ ...item })),
     art
   };
 }
 
-export function getHeroHotspots(heroId = HERO_DEFAULT_ID){
+export function getHeroHotspots(heroId: string = HERO_DEFAULT_ID): ReadonlyArray<HeroHotspot> {
   const profile = HERO_LIBRARY[heroId] || HERO_LIBRARY.default;
   return (profile.hotspots || []).map(item => ({ ...item }));
 }
 
-export function getHeroDialogue(heroId, cue, options = {}){
-  const targetCue = cue || 'intro';
+interface DialogueOptions {
+  gender?: string;
+  zone?: string | null;
+}
+
+export function getHeroDialogue(
+  heroId: string | null | undefined,
+  cue: HeroCue | string | null | undefined,
+  options: DialogueOptions = {}
+): HeroDialogue {
+  const targetCue = (cue || 'intro') as HeroCue;
   const gender = normalizeGender(options.gender);
   const zone = options.zone || null;
-  const profile = HERO_LIBRARY[heroId] || HERO_LIBRARY.default;
+  const profile = HERO_LIBRARY[heroId || ''] || HERO_LIBRARY.default;
   const fallback = HERO_LIBRARY.default;
   const table = profile.dialogues?.[targetCue] || fallback.dialogues?.[targetCue] || null;
   const pool = table ? (table[gender] || table.neutral || table.default || null) : null;
@@ -249,6 +298,6 @@ export function getHeroDialogue(heroId, cue, options = {}){
   };
 }
 
-export function listAvailableHeroes(){
+export function listAvailableHeroes(): ReadonlyArray<string> {
   return Object.keys(HERO_LIBRARY).filter(key => key !== 'default');
 }

@@ -1,27 +1,20 @@
-import { getHeroDialogue, getHeroHotspots, getHeroProfile, HERO_DEFAULT_ID } from './dialogues.js';
-import { getAllSidebarAnnouncements } from '../../data/announcements.js';
+import { getAllSidebarAnnouncements } from '../../../data/announcements.js';
+import { getHeroDialogue, getHeroHotspots, getHeroProfile, HERO_DEFAULT_ID } from '../dialogues.ts';
+import type {
+  CleanupRegistrar,
+  ComingSoonHandler,
+  HeroProfile,
+  MainMenuShell,
+  MenuCardMetadata,
+  MenuSection
+} from '../types.ts';
+import { cueTone, createModeCard, createModeGroupCard } from './events.ts';
 
 const STYLE_ID = 'main-menu-view-style';
 
-const TONE_ICONS = {
-  greeting: '✨',
-  focus: '🎯',
-  gentle: '🌬️',
-  motivate: '🔥',
-  warning: '⚠️',
-  calm: '🌙'
-};
-
-const TAG_CLASS_MAP = new Map([
-  ['PvE', 'mode-tag--pve'],
-  ['PvP', 'mode-tag--pvp'],
-  ['Coming soon', 'mode-tag--coming'],
-  ['Kinh tế nguyên tinh', 'mode-tag--economy']
-]);
-
-function ensureStyles(){
+export function ensureStyles(): void {
   let style = document.getElementById(STYLE_ID);
-  if (!style || style.tagName.toLowerCase() !== 'style'){
+  if (!(style instanceof HTMLStyleElement)){
     style = document.createElement('style');
     style.id = STYLE_ID;
     document.head.appendChild(style);
@@ -120,14 +113,14 @@ function ensureStyles(){
     @media(max-width:960px){.main-menu-v2__layout{grid-template-columns:1fr;}.main-menu-sidebar{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;}}
     @media(max-width:640px){.main-menu-v2{gap:24px;}.hero-panel__info{padding:24px;}.hero-panel__canvas{padding:20px;}.main-menu-v2__title{font-size:36px;}.mode-card{padding:20px;}}
   `;
-  
+
   if (style.textContent !== css){
     style.textContent = css;
   }
 }
 
-function applyPalette(element, profile){
-  const palette = profile?.art?.palette || {};
+function applyPalette(element: HTMLElement | null, profile: HeroProfile): void {
+  const palette = profile.art?.palette || {};
   if (!element) return;
   if (palette.primary) element.style.setProperty('--hero-primary', palette.primary);
   if (palette.secondary) element.style.setProperty('--hero-secondary', palette.secondary);
@@ -135,283 +128,15 @@ function applyPalette(element, profile){
   if (palette.outline) element.style.setProperty('--hero-outline', palette.outline);
 }
 
-function buildModeCardBase(element, mode, options = {}){
-  if (!element || !mode) return null;
-  const { extraClasses = [], showStatus = true } = options;
-  element.classList.add('mode-card');
-  extraClasses.forEach(cls => element.classList.add(cls));
-  element.dataset.mode = mode.key;
-
-  const icon = document.createElement('span');
-  icon.className = 'mode-card__icon';
-  icon.textContent = mode.icon || '◆';
-  element.appendChild(icon);
-
-  const title = document.createElement('h3');
-  title.className = 'mode-card__title';
-  title.textContent = mode.title || mode.label || mode.key;
-  element.appendChild(title);
-
-  if (mode.description){
-    const desc = document.createElement('p');
-    desc.className = 'mode-card__desc';
-    desc.textContent = mode.description;
-    element.appendChild(desc);
-  }
-
-  const tags = document.createElement('div');
-  tags.className = 'mode-card__tags';
-  (mode.tags || []).forEach(tag => {
-    const chip = document.createElement('span');
-    chip.className = 'mode-tag';
-    chip.textContent = tag;
-    const mapped = TAG_CLASS_MAP.get(tag);
-    if (mapped) chip.classList.add(mapped);
-    tags.appendChild(chip);
-  });
-  if (tags.childElementCount > 0){
-    element.appendChild(tags);
-  }
-
-  let statusEl = null;
-  if (showStatus && mode.status === 'coming-soon'){
-    element.classList.add('mode-card--coming');
-    element.setAttribute('aria-describedby', `${mode.key}-status`);
-    element.setAttribute('aria-disabled', 'true');
-    statusEl = document.createElement('span');
-    statusEl.id = `${mode.key}-status`;
-    statusEl.className = 'mode-card__status';
-    statusEl.textContent = 'Coming soon';
-    element.appendChild(statusEl);
-  }
-
-  return { statusEl };
+interface ModesSectionOptions {
+  sections: ReadonlyArray<MenuSection>;
+  metadata: ReadonlyArray<MenuCardMetadata>;
+  shell: MainMenuShell | null | undefined;
+  onShowComingSoon?: ComingSoonHandler;
+  addCleanup: CleanupRegistrar;
 }
 
-function createModeCard(mode, shell, onShowComingSoon, addCleanup, options = {}){
-  const button = document.createElement('button');
-  button.type = 'button';
-  const extraClasses = Array.isArray(options.extraClasses)
-    ? options.extraClasses
-    : (options.extraClass ? [options.extraClass] : []);
-  buildModeCardBase(button, mode, {
-    extraClasses,
-    showStatus: options.showStatus !== false
-  });
-
-  const handleClick = event => {
-    event.preventDefault();
-    event.stopPropagation();
-    if (typeof options.onPrimaryAction === 'function'){
-      options.onPrimaryAction({ mode, event, element: button });
-      return;
-    }
-    if (!shell || typeof shell.enterScreen !== 'function') return;
-    if (mode.status === 'coming-soon'){
-      if (typeof onShowComingSoon === 'function'){
-        onShowComingSoon(mode);
-      }
-      shell.enterScreen(mode.id || 'main-menu', mode.params || null);
-      return;
-    }
-    shell.enterScreen(mode.id || 'main-menu', mode.params || null);
-  };
-  button.addEventListener('click', handleClick);
-  addCleanup(() => button.removeEventListener('click', handleClick));
-  if (typeof options.afterCreate === 'function'){
-    options.afterCreate(button);
-  }
-
-  return button;
-}
-
-function createModeGroupCard(group, childModes, shell, onShowComingSoon, addCleanup){
-  const wrapper = document.createElement('div');
-  const groupClasses = Array.isArray(group.extraClasses)
-    ? ['mode-card--group', ...group.extraClasses]
-    : ['mode-card--group'];
-  buildModeCardBase(wrapper, group, { extraClasses: groupClasses, showStatus: false });
-  wrapper.setAttribute('role', 'button');
-  wrapper.setAttribute('aria-haspopup', 'true');
-  wrapper.setAttribute('aria-expanded', 'false');
-  if (group.title){
-    wrapper.setAttribute('aria-label', `Chọn chế độ trong ${group.title}`);
-  }
-  wrapper.tabIndex = 0;
-  
-  const infoBlock = document.createElement('div');
-  infoBlock.className = 'mode-card__group-info';
-  infoBlock.setAttribute('aria-hidden', 'false');
-  const existingIcon = wrapper.querySelector('.mode-card__icon');
-  const existingTitle = wrapper.querySelector('.mode-card__title');
-  const existingDesc = wrapper.querySelector('.mode-card__desc');
-  if (existingIcon) infoBlock.appendChild(existingIcon);
-  if (existingTitle) infoBlock.appendChild(existingTitle);
-  if (existingDesc) infoBlock.appendChild(existingDesc);
-  wrapper.insertBefore(infoBlock, wrapper.firstChild);
-
-  const caret = document.createElement('span');
-  caret.className = 'mode-card__group-caret';
-  caret.setAttribute('aria-hidden', 'true');
-  caret.textContent = '▾';
-  wrapper.appendChild(caret);
-
-  const childrenGrid = document.createElement('div');
-  childrenGrid.className = 'mode-card__group-children';
-  childrenGrid.setAttribute('role', 'menu');
-  childrenGrid.setAttribute('aria-hidden', 'true');
-  childrenGrid.hidden = true;
-  wrapper.appendChild(childrenGrid);
-
-  let isOpen = false;
-  let documentListenerActive = false;
-
-  const handleDocumentClick = event => {
-    if (!wrapper.contains(event.target)){
-      close();
-    }
-  };
-
-  const bindOutsideClick = () => {
-    if (documentListenerActive) return;
-    document.addEventListener('click', handleDocumentClick);
-    documentListenerActive = true;
-  };
-
-  const unbindOutsideClick = () => {
-    if (!documentListenerActive) return;
-    document.removeEventListener('click', handleDocumentClick);
-    documentListenerActive = false;
-  };
-
-  const open = () => {
-    if (isOpen) return;
-    isOpen = true;
-    wrapper.classList.add('is-open');
-    wrapper.setAttribute('aria-expanded', 'true');
-    infoBlock.hidden = true;
-    infoBlock.setAttribute('aria-hidden', 'true');
-    childrenGrid.hidden = false;
-    childrenGrid.setAttribute('aria-hidden', 'false');
-    setTimeout(bindOutsideClick, 0);
-  };
-
-  const close = () => {
-    if (!isOpen) return;
-    isOpen = false;
-    wrapper.classList.remove('is-open');
-    wrapper.setAttribute('aria-expanded', 'false');
-    infoBlock.hidden = false;
-    infoBlock.setAttribute('aria-hidden', 'false');
-    childrenGrid.hidden = true;
-    childrenGrid.setAttribute('aria-hidden', 'true');
-    unbindOutsideClick();
-  };
-
-  const toggle = () => {
-    if (isOpen){
-      close();
-    } else {
-      open();
-    }
-  };
-
-  const handleToggle = event => {
-    event.preventDefault();
-    event.stopPropagation();
-    toggle();
-  };
-
-  const handleKeydown = event => {
-    if (event.key === 'Enter' || event.key === ' '){
-      event.preventDefault();
-      toggle();
-      return;
-    }
-    if (event.key === 'Escape' && isOpen){
-      event.preventDefault();
-      close();
-      wrapper.focus({ preventScroll: true });
-    }
-  };
-
-  const handleFocusOut = event => {
-    if (!isOpen) return;
-    if (!wrapper.contains(event.relatedTarget)){
-      close();
-    }
-  };
-
-  wrapper.addEventListener('click', handleToggle);
-  wrapper.addEventListener('keydown', handleKeydown);
-  wrapper.addEventListener('focusout', handleFocusOut);
-
-  addCleanup(() => {
-    wrapper.removeEventListener('click', handleToggle);
-    wrapper.removeEventListener('keydown', handleKeydown);
-    wrapper.removeEventListener('focusout', handleFocusOut);
-    unbindOutsideClick();
-  });
-
-  childModes.forEach(child => {
-    const item = document.createElement('button');
-    item.type = 'button';
-    item.className = 'mode-card__child';
-    item.dataset.mode = child.key;
-    item.setAttribute('role', 'menuitem');
-    if (child.status === 'coming-soon'){
-      item.classList.add('mode-card__child--coming');
-    }
-
-    const icon = document.createElement('span');
-    icon.className = 'mode-card__child-icon';
-    icon.textContent = child.icon || '◆';
-    item.appendChild(icon);
-
-    const body = document.createElement('span');
-    body.className = 'mode-card__child-body';
-
-    const title = document.createElement('span');
-    title.className = 'mode-card__child-title';
-    title.textContent = child.title || child.label || child.key;
-    body.appendChild(title);
-
-    const status = document.createElement('span');
-    status.className = 'mode-card__child-status';
-    status.textContent = child.status === 'coming-soon' ? 'Coming soon' : 'Sẵn sàng';
-    body.appendChild(status);
-
-    if (child.description){
-      const desc = document.createElement('span');
-      desc.className = 'mode-card__child-desc';
-      desc.textContent = child.description;
-      body.appendChild(desc);
-    }
-
-    item.appendChild(body);
-
-    const handleSelect = event => {
-      event.preventDefault();
-      event.stopPropagation();
-      if (!shell || typeof shell.enterScreen !== 'function') return;
-      if (child.status === 'coming-soon' && typeof onShowComingSoon === 'function'){
-        onShowComingSoon(child);
-      }
-      shell.enterScreen(child.id || 'main-menu', child.params || null);
-      close();
-      wrapper.focus({ preventScroll: true });
-    };
-
-    item.addEventListener('click', handleSelect);
-    addCleanup(() => item.removeEventListener('click', handleSelect));
-
-    childrenGrid.appendChild(item);
-  });
-
-  return wrapper;
-}
-
-function createModesSection(options){
+export function createModesSection(options: ModesSectionOptions): HTMLElement {
   const { sections = [], metadata = [], shell, onShowComingSoon, addCleanup } = options;
   const sectionEl = document.createElement('section');
   sectionEl.className = 'main-menu-modes';
@@ -421,12 +146,15 @@ function createModesSection(options){
   title.textContent = 'Chế độ tác chiến';
   sectionEl.appendChild(title);
 
-  const metaByKey = new Map();
+  const metaByKey = new Map<string, MenuCardMetadata>();
   metadata.forEach(mode => {
-    metaByKey.set(mode.key, mode);
+    if (mode?.key){
+      metaByKey.set(mode.key, mode);
+    }
   });
 
   sections.forEach(section => {
+    if (!section) return;
     const sectionGroup = document.createElement('div');
     sectionGroup.className = 'mode-section';
 
@@ -439,6 +167,7 @@ function createModesSection(options){
     grid.className = 'mode-grid';
 
     (section.entries || []).forEach(entry => {
+      if (!entry) return;
       const cardKey = entry.cardId || entry.id;
       if (!cardKey) return;
       const cardMeta = metaByKey.get(cardKey);
@@ -446,8 +175,8 @@ function createModesSection(options){
 
       if (entry.type === 'group'){
         const childMetas = (entry.childModeIds || [])
-          .map(childId => metaByKey.get(childId))
-          .filter(Boolean);
+          .map(childId => (childId ? metaByKey.get(childId) : null))
+          .filter((item): item is MenuCardMetadata => Boolean(item));
         if (childMetas.length === 0) return;
         const groupCard = createModeGroupCard(cardMeta, childMetas, shell, onShowComingSoon, addCleanup);
         grid.appendChild(groupCard);
@@ -465,11 +194,13 @@ function createModesSection(options){
   return sectionEl;
 }
 
-function cueTone(tone){
-  return TONE_ICONS[tone] ? { icon: TONE_ICONS[tone], tone } : { icon: '✦', tone: tone || 'calm' };
+interface HeroSectionOptions {
+  heroId?: string;
+  playerGender?: string;
+  addCleanup: CleanupRegistrar;
 }
 
-function createHeroSection(options){
+export function createHeroSection(options: HeroSectionOptions): HTMLElement {
   const { heroId = HERO_DEFAULT_ID, playerGender = 'neutral', addCleanup } = options;
   const profile = getHeroProfile(heroId);
   const heroSection = document.createElement('section');
@@ -477,7 +208,7 @@ function createHeroSection(options){
 
   const panel = document.createElement('div');
   panel.className = 'hero-panel';
-    applyPalette(panel, profile);
+  applyPalette(panel, profile);
   heroSection.appendChild(panel);
 
   const info = document.createElement('div');
@@ -540,6 +271,7 @@ function createHeroSection(options){
 
   const hotspots = getHeroHotspots(profile.id);
   hotspots.forEach(spot => {
+    if (!spot) return;
     const hotspotBtn = document.createElement('button');
     hotspotBtn.type = 'button';
     hotspotBtn.className = 'hero-panel__hotspot';
@@ -549,12 +281,13 @@ function createHeroSection(options){
     const label = document.createElement('span');
     label.textContent = spot.label || 'Tương tác';
     hotspotBtn.appendChild(label);
-    const handleClick = event => {
+
+    const handleClick = (event: MouseEvent) => {
       event.preventDefault();
       event.stopPropagation();
       showDialogue(spot.cue || 'sensitive', { zone: spot.key });
       panel.classList.add('hero-panel--alert');
-      setTimeout(() => panel.classList.remove('hero-panel--alert'), 620);
+      window.setTimeout(() => panel.classList.remove('hero-panel--alert'), 620);
     };
     const handleHover = () => {
       panel.classList.add('is-hovered');
@@ -562,6 +295,7 @@ function createHeroSection(options){
     const handleLeave = () => {
       panel.classList.remove('is-hovered');
     };
+
     hotspotBtn.addEventListener('click', handleClick);
     hotspotBtn.addEventListener('mouseenter', handleHover);
     hotspotBtn.addEventListener('focus', handleHover);
@@ -574,18 +308,19 @@ function createHeroSection(options){
       hotspotBtn.removeEventListener('mouseleave', handleLeave);
       hotspotBtn.removeEventListener('blur', handleLeave);
     });
+
     canvas.appendChild(hotspotBtn);
   });
 
   panel.appendChild(canvas);
 
-  const updateTone = (tone, label) => {
+  const updateTone = (tone: string | null | undefined, label: string | null | undefined) => {
     const { icon, tone: normalizedTone } = cueTone(tone);
     toneEl.dataset.tone = normalizedTone;
     toneEl.textContent = `${icon} ${label || ''}`.trim();
   };
 
-  const showDialogue = (cue, extra = {}) => {
+  const showDialogue = (cue: string, extra: { zone?: string | null } = {}) => {
     const dialogueData = getHeroDialogue(profile.id, cue, { gender: playerGender, zone: extra.zone });
     textEl.textContent = dialogueData.text;
     updateTone(dialogueData.tone, dialogueData.label);
@@ -599,16 +334,19 @@ function createHeroSection(options){
     panel.classList.remove('is-hovered');
     showDialogue('idle');
   };
-  const handleClick = event => {
-    event.preventDefault();
+  const triggerTap = () => {
     panel.classList.add('is-pressed');
     showDialogue('tap');
-    setTimeout(() => panel.classList.remove('is-pressed'), 220);
+    window.setTimeout(() => panel.classList.remove('is-pressed'), 220);
   };
-  const handleKey = event => {
+  const handleClick = (event: MouseEvent) => {
+    event.preventDefault();
+    triggerTap();
+  };
+  const handleKey = (event: KeyboardEvent) => {
     if (event.key === 'Enter' || event.key === ' '){
       event.preventDefault();
-      handleClick(event);
+      triggerTap();
     }
   };
 
@@ -633,19 +371,42 @@ function createHeroSection(options){
   return heroSection;
 }
 
-function createSidebar(options = {}){
+interface SidebarOptions {
+  shell: MainMenuShell | null | undefined;
+  addCleanup: CleanupRegistrar;
+}
+
+type SidebarAnnouncementEntry = {
+  id?: string | null;
+  title?: string | null;
+  shortDescription?: string | null;
+  tooltip?: string | null;
+  rewardCallout?: string | null;
+  translationKey?: string | null;
+  startAt?: string | null;
+  endAt?: string | null;
+};
+
+type SidebarAnnouncement = {
+  key: string;
+  label: string;
+  entry: SidebarAnnouncementEntry | null;
+};
+
+export function createSidebar(options: SidebarOptions): HTMLElement {
   const { shell, addCleanup } = options;
   const aside = document.createElement('aside');
   aside.className = 'main-menu-sidebar';
-  const announcements = getAllSidebarAnnouncements();
+  const announcements = getAllSidebarAnnouncements() as ReadonlyArray<SidebarAnnouncement>;
 
-  const attachTooltipHandlers = (element, info) => {
-    if (!element) return;
-    const { slotKey, entry } = info || {};
+  const attachTooltipHandlers = (element: HTMLElement | null, info: { slotKey: string; entry: SidebarAnnouncementEntry } | null) => {
+    if (!element || !info) return;
+    const { slotKey, entry } = info;
     if (!slotKey || !entry) return;
     if (!shell || typeof shell.showTooltip !== 'function') return;
+
     const showTooltip = () => {
-      shell.showTooltip({
+      shell.showTooltip?.({
         id: entry.id,
         slot: slotKey,
         title: entry.title,
@@ -658,7 +419,7 @@ function createSidebar(options = {}){
     };
     const hideTooltip = () => {
       if (typeof shell.hideTooltip === 'function'){
-        shell.hideTooltip({ id: entry.id, slot: slotKey });
+        shell.hideTooltip({ id: entry.id || null, slot: slotKey });
       }
     };
 
@@ -667,17 +428,15 @@ function createSidebar(options = {}){
     element.addEventListener('focus', showTooltip);
     element.addEventListener('blur', hideTooltip);
 
-    if (typeof addCleanup === 'function'){
-      addCleanup(() => {
-        element.removeEventListener('mouseenter', showTooltip);
-        element.removeEventListener('mouseleave', hideTooltip);
-        element.removeEventListener('focus', showTooltip);
-        element.removeEventListener('blur', hideTooltip);
-      });
-    }
+    addCleanup(() => {
+      element.removeEventListener('mouseenter', showTooltip);
+      element.removeEventListener('mouseleave', hideTooltip);
+      element.removeEventListener('focus', showTooltip);
+      element.removeEventListener('blur', hideTooltip);
+    });
   };
 
-    announcements.forEach(item => {
+ announcements.forEach(item => {
     const { key, label, entry } = item;
     if (!entry) return;
     const card = document.createElement('div');
@@ -695,11 +454,11 @@ function createSidebar(options = {}){
 
     const titleEl = document.createElement('h4');
     titleEl.className = 'sidebar-slot__title';
-    titleEl.textContent = entry.title;
+    titleEl.textContent = entry.title || '';
 
     const descEl = document.createElement('p');
     descEl.className = 'sidebar-slot__desc';
-    descEl.textContent = entry.shortDescription;
+    descEl.textContent = entry.shortDescription || '';
 
     card.appendChild(labelEl);
     card.appendChild(titleEl);
@@ -727,7 +486,7 @@ function createSidebar(options = {}){
   return aside;
 }
 
-function createHeader(){
+export function createHeader(): HTMLElement {
   const header = document.createElement('header');
   header.className = 'main-menu-v2__header';
 
@@ -760,59 +519,4 @@ function createHeader(){
   header.appendChild(brand);
   header.appendChild(meta);
   return header;
-}
-
-export function renderMainMenuView(options = {}){
-  const { root, shell, sections = [], metadata = [], heroId = HERO_DEFAULT_ID, playerGender = 'neutral', onShowComingSoon } = options;
-  if (!root) return null;
-  ensureStyles();
-  root.innerHTML = '';
-  root.classList.remove('app--pve');
-  root.classList.add('app--main-menu');
-
-  const cleanups = [];
-  const addCleanup = fn => {
-    if (typeof fn === 'function') cleanups.push(fn);
-  };
-
-  const container = document.createElement('div');
-  container.className = 'main-menu-v2';
-
-  const header = createHeader();
-  container.appendChild(header);
-
-  const layout = document.createElement('div');
-  layout.className = 'main-menu-v2__layout';
-  container.appendChild(layout);
-
-  const primary = document.createElement('div');
-  primary.className = 'main-menu-v2__primary';
-  const hero = createHeroSection({ heroId, playerGender, addCleanup });
-  primary.appendChild(hero);
-  const modes = createModesSection({ sections, metadata, shell, onShowComingSoon, addCleanup });
-  primary.appendChild(modes);
-
-  const sidebar = createSidebar({ shell, addCleanup });
-
-  layout.appendChild(primary);
-  layout.appendChild(sidebar);
-
-  root.appendChild(container);
-
-  return {
-    destroy(){
-      cleanups.forEach(fn => {
-        try {
-          fn();
-        } catch (err) {
-          console.error('[main-menu] cleanup failed', err);
-        }
-      });
-      cleanups.length = 0;
-      if (container.parentNode === root){
-        root.removeChild(container);
-      }
-      root.classList.remove('app--main-menu');
-    }
-  };
 }
