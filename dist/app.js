@@ -1,9 +1,12 @@
 // Bundled by build.mjs
 const __modules = Object.create(null);
+const __legacyModuleAliases = {"./modes/pve/session.js":"./modes/pve/session.ts"};
+function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }
 function __define(id, factory){ __modules[id] = { factory, exports: null, initialized: false }; }
 function __require(id){
-  const mod = __modules[id];
-  if (!mod) throw new Error('Module not found: ' + id);
+  const normalizedId = __normalizeModuleId(id);
+  const mod = __modules[normalizedId];
+  if (!mod) throw new Error('Module not found: ' + normalizedId);
   if (!mod.initialized){
     mod.initialized = true;
     const module = { exports: {} };
@@ -13,15 +16,14 @@ function __require(id){
   }
   return mod.exports;
 }
-__define('./ai.js', (exports, module, __require) => {
-  // ai.js v0.7.6
-  const __dep0 = __require('./engine.js');
+__define('./ai.ts', (exports, module, __require) => {
+  const __dep0 = __require('./engine.ts');
   const pickRandom = __dep0.pickRandom;
   const slotToCell = __dep0.slotToCell;
   const cellReserved = __dep0.cellReserved;
   const __dep1 = __require('./turns.js');
   const predictSpawnCycle = __dep1.predictSpawnCycle;
-  const __dep2 = __require('./config.js');
+  const __dep2 = __require('./config.ts');
   const CFG = __dep2.CFG;
   const __dep3 = __require('./utils/time.js');
   const sharedSafeNow = __dep3.safeNow;
@@ -29,55 +31,134 @@ __define('./ai.js', (exports, module, __require) => {
   const detectUltBehavior = __dep4.detectUltBehavior;
   const getSummonSpec = __dep4.getSummonSpec;
   const resolveSummonSlots = __dep4.resolveSummonSlots;
+  const __dep5 = __require('./units.ts');
+  const lookupUnit = __dep5.lookupUnit;
 
-  const safeNow = () => sharedSafeNow();
 
-  const tokensAlive = (Game) => Game.tokens.filter(t => t.alive);
+
+
+  type CandidateCell = { s: number; cx: number; cy: number };
+  type WeightKey =
+    | 'pressure'
+    | 'safety'
+    | 'eta'
+    | 'summon'
+    | 'kitInstant'
+    | 'kitDefense'
+    | 'kitRevive';
+
+  export interface AiCard {
+    id: UnitId;
+    name?: string | null;
+    cost: number;
+    [extra: string]: unknown;
+  }
+
+  export type DeckState = AiCard[];
+  export type AI_REASON = 'cost' | 'board' | (string & {});
+
+  type CandidateContributions = Record<string, number>;
+
+  type CandidateMultipliers = {
+    row: number;
+    role: number;
+  };
+
+  type CandidateMeta = Record<string, unknown> | null | undefined;
+
+  interface CandidateEvaluation {
+    card: AiCard;
+    meta: CandidateMeta;
+    cell: CandidateCell;
+    score: number;
+    baseScore: number;
+    contributions: CandidateContributions;
+    raw: CandidateContributions;
+    multipliers: CandidateMultipliers;
+    blockedReason?: string | null;
+  }
+
+  interface CandidateDebug {
+    cardId?: UnitId;
+    cardName?: string | null;
+    cost?: number;
+    slot?: number;
+    cx?: number;
+    cy?: number;
+    score?: number;
+    baseScore?: number;
+    contributions?: CandidateContributions;
+    raw?: CandidateContributions;
+    multipliers?: CandidateMultipliers;
+    blocked?: string | null;
+  }
+
+  interface KitTraitSummary {
+    hasInstant: boolean;
+    hasDefBuff: boolean;
+    hasRevive: boolean;
+  }
+
+  interface AiDecision extends Record<string, unknown> {
+    reason: AI_REASON;
+    at: number;
+    weights: Record<string, number>;
+    chosen: CandidateDebug | null;
+    considered: CandidateDebug[];
+    skipped: string | null;
+  }
+
+  const safeNow = (): number => sharedSafeNow();
+
   const DEFAULT_WEIGHTS = Object.freeze({
     pressure: 0.42,
-    safety: 0.20,
+    safety: 0.2,
     eta: 0.16,
     summon: 0.08,
     kitInstant: 0.06,
     kitDefense: 0.04,
-    kitRevive: 0.04
-  });
+    kitRevive: 0.04,
+  } satisfies Record<WeightKey, number>);
 
   const DEFAULT_DEBUG_KEEP = 6;
 
-  function mergedWeights(){
-    const cfg = CFG.AI?.WEIGHTS || {};
-    const out = { ...DEFAULT_WEIGHTS };
-    for (const [key, val] of Object.entries(cfg)){
+  const tokensAlive = (Game: SessionState): UnitToken[] => Game.tokens.filter((t) => t.alive);
+
+  function mergedWeights(): Record<string, number> {
+    const cfg = CFG.AI?.WEIGHTS ?? {};
+    const out: Record<string, number> = { ...DEFAULT_WEIGHTS };
+    for (const [key, val] of Object.entries(cfg)) {
       if (typeof val === 'number' && Number.isFinite(val)) out[key] = val;
     }
     return out;
   }
 
-  function debugConfig(){
-    const cfg = CFG.AI?.DEBUG || {};
+  function debugConfig(): { keepTop: number } {
+    const cfg = CFG.AI?.DEBUG ?? {};
     const keepTopRaw = cfg.keepTop ?? cfg.KEEP_TOP ?? DEFAULT_DEBUG_KEEP;
     const keepTopNum = Number(keepTopRaw);
     return {
-      keepTop: Math.max(0, Math.floor(Number.isFinite(keepTopNum) ? keepTopNum : DEFAULT_DEBUG_KEEP))
+      keepTop: Math.max(0, Math.floor(Number.isFinite(keepTopNum) ? keepTopNum : DEFAULT_DEBUG_KEEP)),
     };
   }
 
-  function detectKitTraits(meta){
-    const analysis = detectUltBehavior(meta?.kit || meta || {});
-    const hasInstant = analysis.hasInstant || (meta?.class === 'Summoner' && !!analysis.summon);
+  function detectKitTraits(meta: CandidateMeta): KitTraitSummary {
+    const analysis = detectUltBehavior((meta && (meta as Record<string, unknown>).kit) || meta || {});
+    const hasInstant =
+      Boolean(analysis.hasInstant) ||
+      (meta && (meta as Record<string, unknown>).class === 'Summoner' && Boolean(analysis.summon));
     return {
-      hasInstant: !!hasInstant,
-      hasDefBuff: !!analysis.hasDefensive,
-      hasRevive: !!analysis.hasRevive
+      hasInstant,
+      hasDefBuff: Boolean(analysis.hasDefensive),
+      hasRevive: Boolean(analysis.hasRevive),
     };
   }
 
-  function exportCandidateDebug(entry){
+  function exportCandidateDebug(entry: CandidateEvaluation | null | undefined): CandidateDebug | null {
     if (!entry) return null;
     return {
       cardId: entry.card?.id,
-      cardName: entry.card?.name,
+      cardName: entry.card?.name ?? null,
       cost: entry.card?.cost,
       slot: entry.cell?.s,
       cx: entry.cell?.cx,
@@ -87,52 +168,126 @@ __define('./ai.js', (exports, module, __require) => {
       contributions: entry.contributions,
       raw: entry.raw,
       multipliers: entry.multipliers,
-      blocked: entry.blockedReason || null
+      blocked: entry.blockedReason ?? null,
     };
   }
 
-  // luôn giữ deck-4 của địch đầy
-  function refillDeckEnemy(Game){
-    const handSize = CFG.HAND_SIZE ?? 4;
-    const need = handSize - Game.ai.deck.length;
-    if (need <= 0) return;
-    const exclude = new Set([...Game.ai.usedUnitIds, ...Game.ai.deck.map(u=>u.id)]);
-    const more = pickRandom(Game.ai.unitsAll, exclude, handSize).slice(0, need);
-    Game.ai.deck.push(...more);
+  function isAiCard(value: unknown): value is AiCard {
+    if (!value || typeof value !== 'object') return false;
+    const candidate = value as AiCard;
+    return typeof candidate.id === 'string' && candidate.id !== '' && typeof candidate.cost === 'number' && Number.isFinite(candidate.cost);
   }
 
-  function listEmptyEnemySlots(Game, aliveTokens){
+  function toAiCard(entry: unknown): AiCard | null {
+    if (isAiCard(entry)) {
+      return { ...(entry as AiCard) };
+    }
+    if (typeof entry === 'string') {
+      const def = lookupUnit(entry);
+      return def ? { ...def } : null;
+    }
+    if (entry && typeof entry === 'object') {
+      const candidate = entry as Record<string, unknown>;
+      const idRaw = candidate.id;
+      if (typeof idRaw !== 'string' || idRaw.trim() === '') return null;
+      const def = lookupUnit(idRaw);
+      const fallbackCost = def?.cost;
+      const candidateCost = candidate.cost;
+      const cost =
+        typeof candidateCost === 'number' && Number.isFinite(candidateCost)
+          ? candidateCost
+          : typeof fallbackCost === 'number' && Number.isFinite(fallbackCost)
+            ? fallbackCost
+            : null;
+      if (cost === null) return null;
+      const candidateName = candidate.name;
+      const name =
+        typeof candidateName === 'string' && candidateName.trim() !== ''
+          ? candidateName
+          : def?.name ?? null;
+      const card: AiCard = {
+        ...(def ?? { id: idRaw, cost }),
+        id: idRaw,
+        cost,
+      };
+      if (name != null) {
+        card.name = name;
+      }
+      Object.assign(card, candidate);
+      card.id = idRaw;
+      card.cost = cost;
+      if (name != null) {
+        card.name = name;
+      }
+      return card;
+    }
+    return null;
+  }
+
+  function getDeck(Game: SessionState): DeckState {
+    const rawDeck = Array.isArray(Game.ai.deck) ? Game.ai.deck : [];
+    if (!Array.isArray(Game.ai.deck)) {
+      Game.ai.deck = [] as unknown as SessionState['ai']['deck'];
+    }
+    const normalized: AiCard[] = [];
+    let changed = !Array.isArray(Game.ai.deck);
+    for (const entry of rawDeck as unknown[]) {
+      const card = toAiCard(entry);
+      if (card) {
+        normalized.push(card);
+        if (card !== entry) changed = true;
+      } else {
+        changed = true;
+      }
+    }
+    if (changed) {
+      Game.ai.deck = normalized as unknown as SessionState['ai']['deck'];
+      return normalized;
+    }
+    return rawDeck as DeckState;
+  }
+
+  function listEmptyEnemySlots(Game: SessionState, aliveTokens?: readonly UnitToken[] | null): CandidateCell[] {
     const alive = Array.isArray(aliveTokens) ? aliveTokens : tokensAlive(Game);
-    const out = [];
-    for (let s = 1; s <= 9; s++){
+    const out: CandidateCell[] = [];
+    for (let s = 1; s <= 9; s += 1) {
       const { cx, cy } = slotToCell('enemy', s);
       if (!cellReserved(alive, Game.queued, cx, cy)) out.push({ s, cx, cy });
     }
     return out;
   }
-  function etaScoreEnemy(Game, slot){
-    return predictSpawnCycle(Game, 'enemy', slot) === (Game.turn?.cycle ?? 0) ? 1.0 : 0.5;
+
+  function etaScoreEnemy(Game: SessionState, slot: number): number {
+    return predictSpawnCycle(Game, 'enemy', slot) === (Game.turn?.cycle ?? 0) ? 1 : 0.5;
   }
-  function pressureScore(cx, cy){
+
+  function pressureScore(cx: number, cy: number): number {
     const dist = Math.abs(cx - 0) + Math.abs(cy - 1);
     return 1 - Math.min(1, dist / 7);
   }
-  function safetyScore(Game, cx, cy, allyTokens){
-    const foesSource = Array.isArray(allyTokens) ? allyTokens : tokensAlive(Game).filter(t => t.side === 'ally');
-    const sameRow = foesSource.filter(t => t.cy === cy);
-    const near = sameRow.filter(t => Math.abs(t.cx - cx) <= 1).length;
-    const far  = sameRow.length - near;
-    return Math.max(0, Math.min(1, 1 - (near*0.6 + far*0.2)/3));
+
+  function safetyScore(Game: SessionState, cx: number, cy: number, allyTokens?: readonly UnitToken[] | null): number {
+    const foesSource = Array.isArray(allyTokens) ? allyTokens : tokensAlive(Game).filter((t) => t.side === 'ally');
+    const sameRow = foesSource.filter((t) => t.cy === cy);
+    const near = sameRow.filter((t) => Math.abs(t.cx - cx) <= 1).length;
+    const far = sameRow.length - near;
+    return Math.max(0, Math.min(1, 1 - ((near * 0.6 + far * 0.2) / 3)));
   }
-  function summonerFeasibility(Game, unitId, baseSlot, aliveTokens){
+
+  function summonerFeasibility(
+    Game: SessionState,
+    unitId: UnitId,
+    baseSlot: number,
+    aliveTokens?: readonly UnitToken[] | null,
+  ): number {
     const meta = Game.meta.get(unitId);
-    if (!meta || meta.class !== 'Summoner') return 1.0;
+    if (!meta || (meta as Record<string, unknown>).class !== 'Summoner') return 1;
     const summonSpec = getSummonSpec(meta);
-    if (!summonSpec) return 1.0;
+    if (!summonSpec) return 1;
     const alive = Array.isArray(aliveTokens) ? aliveTokens : tokensAlive(Game);
     const cand = resolveSummonSlots(summonSpec, baseSlot)
       .filter(Boolean)
-      .filter(s => {
+      .filter((s) => {
         const { cx, cy } = slotToCell('enemy', s);
         return !cellReserved(alive, Game.queued, cx, cy);
       });
@@ -140,29 +295,38 @@ __define('./ai.js', (exports, module, __require) => {
     const need = Math.max(1, Number.isFinite(countRaw) ? countRaw : 1);
     return Math.min(1, cand.length / need);
   }
-  function candidateBlocked(Game, entry, aliveTokens){
+
+  function candidateBlocked(
+    Game: SessionState,
+    entry: CandidateEvaluation | null | undefined,
+    aliveTokens?: readonly UnitToken[] | null,
+  ): string | null {
     if (!entry) return 'invalid';
-    const alive = aliveTokens || tokensAlive(Game);
+    const alive = aliveTokens ?? tokensAlive(Game);
     const slot = entry.cell?.s;
     const cx = entry.cell?.cx;
     const cy = entry.cell?.cy;
     if (!Number.isFinite(slot) || !Number.isFinite(cx) || !Number.isFinite(cy)) return 'invalid';
-    if (Game.queued?.enemy?.has(slot)) return 'slotQueued';
+    const enemyQueue = (Game.queued?.enemy ?? null) as Map<number, QueuedSummonRequest> | null;
+    if (enemyQueue?.has(slot)) return 'slotQueued';
     if (cellReserved(alive, Game.queued, cx, cy)) return 'cellReserved';
 
-    const meta = entry.meta;
-    if (meta && meta.class === 'Summoner'){
+    const meta = entry.meta as Record<string, unknown> | null | undefined;
+    if (meta && meta.class === 'Summoner') {
       const summonSpec = getSummonSpec(meta);
-      if (summonSpec){
+      if (summonSpec) {
         const patternSlots = resolveSummonSlots(summonSpec, slot).filter(Boolean);
-        if (patternSlots.length){
+        if (patternSlots.length) {
           let available = 0;
-          for (const s of patternSlots){
+          for (const s of patternSlots) {
             const { cx: scx, cy: scy } = slotToCell('enemy', s);
             if (!cellReserved(alive, Game.queued, scx, scy)) available += 1;
           }
           const countRaw = Number(summonSpec.count);
-          const need = Math.min(patternSlots.length, Math.max(1, Number.isFinite(countRaw) ? countRaw : 1));
+          const need = Math.min(
+            patternSlots.length,
+            Math.max(1, Number.isFinite(countRaw) ? countRaw : 1),
+          );
           if (available < need) return 'summonBlocked';
         }
       }
@@ -170,116 +334,181 @@ __define('./ai.js', (exports, module, __require) => {
     return null;
   }
 
-  function rowCrowdingFactor(Game, cy, enemyTokens){
-    const ours = (Array.isArray(enemyTokens) ? enemyTokens : tokensAlive(Game).filter(t => t.side==='enemy'))
-      .filter(t => t.cy===cy).length;
+  function rowCrowdingFactor(
+    Game: SessionState,
+    cy: number,
+    enemyTokens?: readonly UnitToken[] | null,
+  ): number {
+    const ours = (Array.isArray(enemyTokens) ? enemyTokens : tokensAlive(Game).filter((t) => t.side === 'enemy')).filter(
+      (t) => t.cy === cy,
+    ).length;
     let queued = 0;
-    const m = Game.queued?.enemy;
-    if (m && typeof m.values === 'function'){
-      for (const p of m.values()) { if (p && p.cy === cy) queued++; }
+    const m = (Game.queued?.enemy ?? null) as Map<number, QueuedSummonRequest> | null;
+    if (m && typeof m.values === 'function') {
+      for (const p of m.values()) {
+        if (p && p.cy === cy) queued += 1;
+      }
     }
     const n = ours + queued;
-    if (n >= 3) return 0.70;
-    if (n === 2) return ((CFG.AI?.ROW_CROWDING_PENALTY) ?? 0.85);
-    return 1.0;
-  }
-  function roleBias(className, cx){
-    const front = (cx <= (CFG.GRID_COLS - CFG.ENEMY_COLS)); // cột 4–5 là "front" phía địch
-    const R = CFG.AI?.ROLE?.[className] || {};
-    let f = 1.0;
-    if (front && typeof R.front === 'number') f *= (1 + R.front);
-    if (!front && typeof R.back  === 'number') f *= (1 + R.back);
-    return f;
+    if (n >= 3) return 0.7;
+    if (n === 2) return CFG.AI?.ROW_CROWDING_PENALTY ?? 0.85;
+    return 1;
   }
 
-  function queueEnemyAt(Game, card, slot, cx, cy, aliveTokens){
-    if (Game.ai.cost < card.cost) return false;
+  function roleBias(className: unknown, cx: number): number {
+    const front = cx <= CFG.GRID_COLS - CFG.ENEMY_COLS;
+    const roleCfg = CFG.AI?.ROLE?.[typeof className === 'string' ? className : ''] ?? {};
+    let factor = 1;
+    if (front && typeof roleCfg.front === 'number') factor *= 1 + roleCfg.front;
+    if (!front && typeof roleCfg.back === 'number') factor *= 1 + roleCfg.back;
+    return factor;
+  }
+
+  function ensureUsedUnitIds(Game: SessionState): Set<UnitId> {
+    if (Game.ai.usedUnitIds instanceof Set) return Game.ai.usedUnitIds as Set<UnitId>;
+    Game.ai.usedUnitIds = new Set<UnitId>();
+    return Game.ai.usedUnitIds;
+  }
+
+  function refillDeckEnemy(Game: SessionState): void {
+    const deck = getDeck(Game);
+    const handSize = CFG.HAND_SIZE ?? 4;
+    const need = handSize - deck.length;
+    if (need <= 0) return;
+
+    const exclude = new Set<string>();
+    const usedIds = ensureUsedUnitIds(Game);
+    for (const id of usedIds) exclude.add(String(id));
+    for (const card of deck) exclude.add(String(card.id));
+
+    const pool = Array.isArray(Game.ai.unitsAll) ? Game.ai.unitsAll : [];
+    const more = pickRandom(pool as readonly unknown[], exclude, handSize).slice(0, need);
+    const normalized: AiCard[] = [];
+    for (const entry of more) {
+      const card = toAiCard(entry);
+      if (card) normalized.push(card);
+    }
+    if (!normalized.length) return;
+    deck.push(...normalized);
+  }
+
+  function queueEnemyAt(
+    Game: SessionState,
+    card: AiCard,
+    slot: number,
+    cx: number,
+    cy: number,
+    aliveTokens?: readonly UnitToken[] | null,
+  ): boolean {
+    const cost = Number.isFinite(card.cost) ? card.cost : NaN;
+    if (!Number.isFinite(cost) || Game.ai.cost < cost) return false;
     if (Game.ai.summoned >= Game.ai.summonLimit) return false;
     const alive = Array.isArray(aliveTokens) ? aliveTokens : tokensAlive(Game);
     if (cellReserved(alive, Game.queued, cx, cy)) return false;
-    if (Game.queued.enemy.has(slot)) return false;
+    const enemyQueueRaw = Game.queued.enemy;
+    const queue =
+      enemyQueueRaw instanceof Map
+        ? (enemyQueueRaw as Map<number, QueuedSummonRequest>)
+        : (() => {
+            const created = new Map<number, QueuedSummonRequest>();
+            Game.queued.enemy = created as unknown as typeof Game.queued.enemy;
+            return created;
+          })();
+    if (queue.has(slot)) return false;
 
     const spawnCycle = predictSpawnCycle(Game, 'enemy', slot);
 
-    Game.queued.enemy.set(slot, {
-      unitId: card.id, name: card.name, side:'enemy',
-      cx, cy, slot, spawnCycle, color:'#ed9dad',
-      source: 'deck'
+    queue.set(slot, {
+      unitId: card.id,
+      name: typeof card.name === 'string' ? card.name : undefined,
+      side: 'enemy',
+      cx,
+      cy,
+      slot,
+      spawnCycle,
+      color: '#ed9dad',
+      source: 'deck',
     });
 
-    Game.ai.cost = Math.max(0, Game.ai.cost - card.cost);
+    Game.ai.cost = Math.max(0, Game.ai.cost - cost);
     Game.ai.summoned += 1;
-    Game.ai.usedUnitIds.add(card.id);
-    Game.ai.deck = Game.ai.deck.filter(u => u.id !== card.id);
+    ensureUsedUnitIds(Game).add(card.id);
+
+    const deck = getDeck(Game);
+    const index = deck.findIndex((entry) => entry.id === card.id);
+    if (index >= 0) deck.splice(index, 1);
     refillDeckEnemy(Game);
     return true;
   }
 
-  function aiMaybeAct(Game, reason){
+  function aiMaybeAct(Game: SessionState, reason: AI_REASON): void {
     const now = safeNow();
-    if (now - (Game.ai.lastThinkMs||0) < 120) return;
+    if (now - (Game.ai.lastThinkMs || 0) < 120) return;
     const weights = mergedWeights();
     const dbgCfg = debugConfig();
 
-    const hand = Game.ai.deck.filter(c => Game.ai.cost >= c.cost);
+    const deck = getDeck(Game);
+    const hand = deck.filter((c) => Number.isFinite(c.cost) && Game.ai.cost >= c.cost);
     if (!hand.length) {
-      Game.ai.lastDecision = {
+      const decision: AiDecision = {
         reason,
         at: now,
         weights,
         chosen: null,
         considered: [],
-        skipped: 'noPlayableCard'
+        skipped: 'noPlayableCard',
       };
+      Game.ai.lastDecision = decision;
       Game.ai.lastThinkMs = now;
       return;
-   }
+    }
+
     const alive = tokensAlive(Game);
-    const aliveAllies = alive.filter(t => t.side === 'ally');
-    const aliveEnemies = alive.filter(t => t.side === 'enemy');
+    const aliveAllies = alive.filter((t) => t.side === 'ally');
+    const aliveEnemies = alive.filter((t) => t.side === 'enemy');
 
     const cells = listEmptyEnemySlots(Game, alive);
-      if (!cells.length) {
-      Game.ai.lastDecision = {
+    if (!cells.length) {
+      const decision: AiDecision = {
         reason,
         at: now,
         weights,
         chosen: null,
         considered: [],
-        skipped: 'noOpenSlot'
+        skipped: 'noOpenSlot',
       };
+      Game.ai.lastDecision = decision;
       Game.ai.lastThinkMs = now;
       return;
-      }
+    }
 
-    const evaluations = [];
-    for (const card of hand){
+    const evaluations: CandidateEvaluation[] = [];
+    for (const card of hand) {
       const meta = Game.meta.get(card.id);
       const kitTraits = detectKitTraits(meta);
-      for (const cell of cells){
-
-        const p  = pressureScore(cell.cx, cell.cy);
-        const s  = safetyScore(Game, cell.cx, cell.cy, aliveAllies);
-        const e  = etaScoreEnemy(Game, cell.s);
+      for (const cell of cells) {
+        const p = pressureScore(cell.cx, cell.cy);
+        const s = safetyScore(Game, cell.cx, cell.cy, aliveAllies);
+        const e = etaScoreEnemy(Game, cell.s);
         const sf = summonerFeasibility(Game, card.id, cell.s, alive);
 
         const kitInstantScore = kitTraits.hasInstant ? e : 0;
-        const kitDefenseScore = kitTraits.hasDefBuff ? (1 - s) : 0;
-        const kitReviveScore  = kitTraits.hasRevive ? s : 0;
+        const kitDefenseScore = kitTraits.hasDefBuff ? 1 - s : 0;
+        const kitReviveScore = kitTraits.hasRevive ? s : 0;
 
-        const contributions = {
+        const contributions: CandidateContributions = {
           pressure: (weights.pressure ?? 0) * p,
           safety: (weights.safety ?? 0) * s,
           eta: (weights.eta ?? 0) * e,
           summon: (weights.summon ?? 0) * sf,
           kitInstant: (weights.kitInstant ?? 0) * kitInstantScore,
           kitDefense: (weights.kitDefense ?? 0) * kitDefenseScore,
-          kitRevive: (weights.kitRevive ?? 0) * kitReviveScore
+          kitRevive: (weights.kitRevive ?? 0) * kitReviveScore,
         };
 
         const baseScore = Object.values(contributions).reduce((acc, val) => acc + val, 0);
         const rowFactor = rowCrowdingFactor(Game, cell.cy, aliveEnemies);
-        const roleFactor = roleBias(meta?.class, cell.cx);
+        const roleFactor = roleBias((meta as Record<string, unknown> | null | undefined)?.class, cell.cx);
         const finalScore = baseScore * rowFactor * roleFactor;
 
         evaluations.push({
@@ -296,63 +525,82 @@ __define('./ai.js', (exports, module, __require) => {
             summon: sf,
             kitInstant: kitInstantScore,
             kitDefense: kitDefenseScore,
-            kitRevive: kitReviveScore
+            kitRevive: kitReviveScore,
           },
-          multipliers: { row: rowFactor, role: roleFactor }
+          multipliers: { row: rowFactor, role: roleFactor },
         });
       }
     }
+
     if (!evaluations.length) {
-      Game.ai.lastDecision = {
+      const decision: AiDecision = {
         reason,
         at: now,
         weights,
         chosen: null,
         considered: [],
-        skipped: 'noEvaluation'
+        skipped: 'noEvaluation',
       };
+      Game.ai.lastDecision = decision;
       Game.ai.lastThinkMs = now;
       return;
     }
 
-    evaluations.sort((a, b) => (b.score - a.score));
+    evaluations.sort((a, b) => b.score - a.score);
 
-    let chosen = null;
-    for (const entry of evaluations){
+    let chosen: CandidateEvaluation | null = null;
+    for (const entry of evaluations) {
       const blocked = candidateBlocked(Game, entry, alive);
-      if (blocked){
+      if (blocked) {
         entry.blockedReason = blocked;
         continue;
       }
       const ok = queueEnemyAt(Game, entry.card, entry.cell.s, entry.cell.cx, entry.cell.cy, alive);
-      if (ok){
+      if (ok) {
         chosen = entry;
         break;
       }
       entry.blockedReason = 'queueFailed';
     }
-    const considered = dbgCfg.keepTop > 0
-      ? evaluations.slice(0, dbgCfg.keepTop).map(exportCandidateDebug)
-      : [];
 
-    Game.ai.lastDecision = {
+    const considered = dbgCfg.keepTop > 0 ? evaluations.slice(0, dbgCfg.keepTop).map(exportCandidateDebug).filter(Boolean) : [];
+
+    const decision: AiDecision = {
       reason,
       at: now,
       weights,
       chosen: exportCandidateDebug(chosen),
-      considered,
-      skipped: chosen ? null : 'allBlocked'
+      considered: considered as CandidateDebug[],
+      skipped: chosen ? null : 'allBlocked',
     };
+    Game.ai.lastDecision = decision;
     Game.ai.lastThinkMs = now;
   }
-
   exports.refillDeckEnemy = refillDeckEnemy;
   exports.queueEnemyAt = queueEnemyAt;
   exports.aiMaybeAct = aiMaybeAct;
 });
 __define('./app/shell.js', (exports, module, __require) => {
+  /**
+   * @typedef {Record<string, unknown>} ScreenParams
+   * @typedef {{ screen: string; activeSession: unknown; screenParams: ScreenParams | null }} AppShellState
+   * @typedef {(state: AppShellState) => void} AppShellListener
+   * @typedef {{
+   *   enterScreen: (key: string, params?: ScreenParams | null) => void;
+   *   setActiveSession: (session: unknown) => void;
+   *   clearActiveSession: () => void;
+   *   getState: () => AppShellState;
+   *   onChange: (listener: AppShellListener) => () => void;
+   *   setErrorHandler: (handler: ((error: unknown, context: Record<string, unknown> | null) => void) | null) => void;
+   * }} AppShell
+   */
+
   const DEFAULT_SCREEN = 'main-menu';
 
+  /**
+   * @param {AppShellState} state
+   * @returns {AppShellState}
+   */
   function cloneState(state){
     return {
       screen: state.screen,
@@ -361,16 +609,28 @@ __define('./app/shell.js', (exports, module, __require) => {
     };
   }
 
+  /**
+   * @param {{ screen?: string; activeSession?: unknown; screenParams?: ScreenParams | null; onError?: (error: unknown, context: Record<string, unknown> | null) => void }} [options]
+   * @returns {AppShell}
+   */
   function createAppShell(options = {}){
+   /** @type {AppShellState} */
     const state = {
       screen: options.screen || DEFAULT_SCREEN,
       activeSession: options.activeSession || null,
       screenParams: options.screenParams || null
     };
+    /** @type {Set<AppShellListener>} */
     const listeners = new Set();
+    /** @type {((error: unknown, context: Record<string, unknown> | null) => void) | null} */
     let errorHandler = typeof options.onError === 'function' ? options.onError : null;
 
-    function dispatchError(error, context){
+  /**
+     * @param {unknown} error
+     * @param {Record<string, unknown> | null | undefined} context
+     * @returns {void}
+     */
+  function dispatchError(error, context){
       console.error('[shell] listener error', error);
       if (!errorHandler) return;
       try {
@@ -380,7 +640,7 @@ __define('./app/shell.js', (exports, module, __require) => {
       }
     }
 
-    function notify(){
+  function notify(){
       const snapshot = cloneState(state);
       for (const fn of listeners){
         try {
@@ -391,7 +651,12 @@ __define('./app/shell.js', (exports, module, __require) => {
       }
     }
 
-    function setScreen(nextScreen, params){
+  /**
+     * @param {string} [nextScreen]
+     * @param {ScreenParams | null | undefined} [params]
+     * @returns {void}
+     */
+  function setScreen(nextScreen, params){
       const target = nextScreen || DEFAULT_SCREEN;
       let changed = false;
       if (state.screen !== target){
@@ -406,12 +671,20 @@ __define('./app/shell.js', (exports, module, __require) => {
       if (changed) notify();
     }
 
+  /**
+     * @param {unknown} nextSession
+     * @returns {void}
+     */
     function setSession(nextSession){
       if (state.activeSession === nextSession) return;
       state.activeSession = nextSession || null;
       notify();
     }
 
+  /**
+     * @param {AppShellListener} handler
+     * @returns {() => void}
+     */
     function subscribe(handler){
       if (typeof handler !== 'function') return ()=>{};
       listeners.add(handler);
@@ -425,7 +698,8 @@ __define('./app/shell.js', (exports, module, __require) => {
       };
     }
 
-    return {
+    /** @type {AppShell} */
+    const api = {
       enterScreen(key, params){
         setScreen(key, params);
       },
@@ -449,12 +723,9 @@ __define('./app/shell.js', (exports, module, __require) => {
         }
       }
     };
+    return api;
   }
-
-
   exports.createAppShell = createAppShell;
-  exports.default = createAppShell;
-  module.exports.default = exports.default;
 });
 __define('./art.js', (exports, module, __require) => {
   // v0.7.7 – Unit art catalog
@@ -966,7 +1237,7 @@ __define('./art.js', (exports, module, __require) => {
 __define('./background.js', (exports, module, __require) => {
   const __dep0 = __require('./config.js');
   const CFG = __dep0.CFG;
-  const __dep1 = __require('./engine.js');
+  const __dep1 = __require('./engine.ts');
   const projectCellOblique = __dep1.projectCellOblique;
   const ensureSpriteLoaded = __dep1.ensureSpriteLoaded;
 
@@ -1305,14 +1576,21 @@ __define('./background.js', (exports, module, __require) => {
   exports.getEnvironmentBackground = getEnvironmentBackground;
 });
 __define('./catalog.js', (exports, module, __require) => {
-  //v0.7
+  // @ts-check
+  //v0.8
   // 1) Rank multiplier (đơn giản) — áp lên TẤT CẢ stat trừ SPD
   const __dep0 = __require('./utils/kit.js');
   const kitSupportsSummon = __dep0.kitSupportsSummon;
+
+  /** @typedef {import('./types/config.js').CatalogStatBlock} CatalogStatBlock */
+  /** @typedef {import('./types/config.js').RosterUnitDefinition} RosterUnitDefinition */
+  /** @typedef {import('./types/units.ts').UnitId} UnitId */
+
   const RANK_MULT = { N:0.80, R:0.90, SR:1.05, SSR:1.25, UR:1.50, Prime:1.80 };
 
   // 2) Class base (mốc lv1 để test). SPD không chịu rank multiplier.
-  const CLASS_BASE = {
+  /** @type {Readonly<Record<string, CatalogStatBlock>>} */
+  const CLASS_BASE = ({
     Mage:     { HP:360, ATK:28, WIL:30, ARM:0.08, RES:0.12, AGI:10, PER:12, SPD:1.00, AEmax:110, AEregen: 8.0, HPregen:14 },
     Tanker:   { HP:500, ATK:22, WIL:20, ARM:0.18, RES:0.14, AGI: 9, PER:10, SPD:0.95, AEmax: 60, AEregen: 4.0, HPregen:22 },
     Ranger:   { HP:360, ATK:35, WIL:16, ARM:0.08, RES:0.08, AGI:12, PER:14, SPD:1.20, AEmax: 75, AEregen: 7.0, HPregen:12 },
@@ -1320,20 +1598,28 @@ __define('./catalog.js', (exports, module, __require) => {
     Summoner: { HP:330, ATK:22, WIL:26, ARM:0.08, RES:0.14, AGI:10, PER:10, SPD:1.05, AEmax: 90, AEregen: 8.5, HPregen:18 },
     Support:  { HP:380, ATK:24, WIL:24, ARM:0.10, RES:0.13, AGI:10, PER:11, SPD:1.00, AEmax:100, AEregen: 7.5, HPregen:20 },
     Assassin: { HP:320, ATK:36, WIL:16, ARM:0.06, RES:0.08, AGI:14, PER:16, SPD:1.25, AEmax: 65, AEregen: 6.0, HPregen:10 }
-  };
+  });
 
   // 3) Helper: áp rank & mod (mods không áp vào SPD)
+  /**
+   * @param {CatalogStatBlock} base
+   * @param {keyof typeof RANK_MULT} rank
+   * @param {Partial<Record<keyof CatalogStatBlock, number>>} [mods]
+   * @returns {CatalogStatBlock}
+   */
   function applyRankAndMods(base, rank, mods = {}){
     const m = RANK_MULT[rank] ?? 1;
     const out = { ...base };
-    for (const k of Object.keys(base)){
-      const mod = 1 + (mods[k] || 0);
-      if (k === 'SPD') { // SPD không nhân theo bậc
-        out[k] = Math.round(base[k] * mod * 100) / 100;
+    const keys = /** @type {Array<keyof CatalogStatBlock>} */ (Object.keys(base));
+    for (const key of keys){
+      const baseValue = base[key] ?? 0;
+      const mod = 1 + (mods?.[key] ?? 0);
+      if (key === 'SPD') { // SPD không nhân theo bậc
+        out[key] = Math.round(baseValue * mod * 100) / 100;
         continue;
       }
-      const precision = (k === 'ARM' || k === 'RES') ? 100 : (k === 'AEregen' ? 10 : 1);
-      out[k] = Math.round(base[k] * mod * m * precision) / precision;
+      const precision = (key === 'ARM' || key === 'RES') ? 100 : (key === 'AEregen' ? 10 : 1);
+      out[key] = Math.round(baseValue * mod * m * precision) / precision;
     }
     return out;
   }
@@ -1341,7 +1627,8 @@ __define('./catalog.js', (exports, module, __require) => {
   // 4) Roster (dex/meta) — 8 nhân vật, ngân sách mod bằng nhau (~+20% tổng, không đụng SPD)
   //  - onSpawn.rage: 100 cho mọi unit từ deck (trừ leader). Revive không áp quy tắc này.
   //  - kit.traits.summon / kit.ult.summon đánh dấu Summoner -> kích hoạt Immediate Summon (action-chain).
-  const ROSTER = [
+  /** @type {ReadonlyArray<RosterUnitDefinition>} */
+  const ROSTER = ([
     {
       id: 'phe', name: 'Phệ', class: 'Mage', rank: 'Prime',
       mods: { WIL:+0.10, AEregen:+0.10 }, // 20% tổng
@@ -1612,11 +1899,21 @@ __define('./catalog.js', (exports, module, __require) => {
         ]
       }
     }
-  ];
+  ]);
 
   // 5) Map & helper tra cứu
-  const ROSTER_MAP = new Map(ROSTER.map(x => [x.id, x]));
-  const getMetaById = (id) => ROSTER_MAP.get(id);
+  const ROSTER_MAP = new Map(ROSTER.map(entry => [entry.id, entry]));
+
+  /**
+   * @param {UnitId | string | null | undefined} id
+   * @returns {RosterUnitDefinition | undefined}
+   */
+  const getMetaById = (id) => (id == null ? undefined : ROSTER_MAP.get(id));
+
+  /**
+   * @param {UnitId | string | null | undefined} id
+   * @returns {boolean}
+   */
   const isSummoner = (id) => {
     const m = getMetaById(id);
     return !!(m && m.class === 'Summoner' && kitSupportsSummon(m));
@@ -1630,292 +1927,374 @@ __define('./catalog.js', (exports, module, __require) => {
   exports.isSummoner = isSummoner;
   exports.applyRankAndMods = applyRankAndMods;
 });
-__define('./combat.js', (exports, module, __require) => {
-  //v0.8
-  const __dep0 = __require('./statuses.js');
+__define('./combat.ts', (exports, module, __require) => {
+  const __dep0 = __require('./statuses.ts');
   const Statuses = __dep0.Statuses;
   const hookOnLethalDamage = __dep0.hookOnLethalDamage;
   const __dep1 = __require('./vfx.js');
-  const vfxAddTracer = __dep1.vfxAddTracer;
   const vfxAddHit = __dep1.vfxAddHit;
   const vfxAddMelee = __dep1.vfxAddMelee;
   const vfxAddLightningArc = __dep1.vfxAddLightningArc;
-  const __dep2 = __require('./engine.js');
+  const __dep2 = __require('./engine.ts');
   const slotToCell = __dep2.slotToCell;
-  const cellReserved = __dep2.cellReserved;
-  const __dep3 = __require('./vfx.js');
-  const vfxAddSpawn = __dep3.vfxAddSpawn;
-  const __dep4 = __require('./passives.js');
-  const emitPassiveEvent = __dep4.emitPassiveEvent;
-  const __dep5 = __require('./config.js');
-  const CFG = __dep5.CFG;
-  const __dep6 = __require('./utils/fury.js');
-  const gainFury = __dep6.gainFury;
-  const startFurySkill = __dep6.startFurySkill;
-  const finishFuryHit = __dep6.finishFuryHit;
-  const __dep7 = __require('./utils/time.js');
-  const safeNow = __dep7.safeNow;
-  function pickTarget(Game, attacker){
-   const foe = attacker.side === 'ally' ? 'enemy' : 'ally';
-   const pool = Game.tokens.filter(t => t.side === foe && t.alive);
-    if (!pool.length) return null;
+  const __dep3 = __require('./passives.ts');
+  const emitPassiveEvent = __dep3.emitPassiveEvent;
+  const __dep4 = __require('./config.js');
+  const CFG = __dep4.CFG;
+  const __dep5 = __require('./utils/fury.js');
+  const gainFury = __dep5.gainFury;
+  const startFurySkill = __dep5.startFurySkill;
+  const finishFuryHit = __dep5.finishFuryHit;
+  const __dep6 = __require('./utils/time.js');
+  const safeNow = __dep6.safeNow;
 
-    // 1) “Trước mắt”: cùng hàng, ưu tiên cột sát midline → xa dần
-   const r = attacker.cy;                 // 0=top,1=mid,2=bot
-    const seq = [];
-    const targetSide = attacker.side === 'ally' ? 'enemy' : 'ally';
-    const s1 = Math.max(1, Math.min(3, (r|0) + 1)); // 1|2|3 (gần midline)
-    seq.push(s1, s1 + 3, s1 + 6);        // 1→4→7 / 2→5→8 / 3→6→9
-    for (const s of seq){
-      const cell = slotToCell(targetSide, s);
-      if (!cell) continue;
-      const { cx, cy } = cell;
-      const tgt = pool.find(t => t.cx === cx && t.cy === cy);
-      if (tgt) return tgt;
-   }
 
-   // 2) Fallback: không có ai “trước mắt” ⇒ đánh đơn vị gần nhất
-   return pool.sort((a,b)=>{
-     const da = Math.abs(a.cx - attacker.cx) + Math.abs(a.cy - attacker.cy);
-     const db = Math.abs(b.cx - attacker.cx) + Math.abs(b.cy - attacker.cy);
-    return da - db;
-   })[0] || null;
+
+
+
+  type TargetableGameState = SessionState | { tokens: ReadonlyArray<UnitToken> };
+
+  export interface AbilityDamageOptions {
+    base?: number;
+    defPen?: number;
+    attackType?: string;
+    dtype?: string;
+    furyTag?: string;
+    isAoE?: boolean;
+    isCrit?: boolean;
+    targetsHit?: number;
+    [extra: string]: unknown;
   }
 
-  function applyDamage(target, amount){
+  export interface AbilityDamageResult {
+    dealt: number;
+    absorbed: number;
+    total: number;
+  }
+
+  export interface BasicAttackAfterHitResult {
+    dealt: number;
+    absorbed: number;
+  }
+
+  export interface BasicAttackAfterHitArgs {
+    target: UnitToken;
+    owner: UnitToken;
+    result: BasicAttackAfterHitResult;
+  }
+
+  export type BasicAttackAfterHitHandler = (ctx: BasicAttackAfterHitArgs) => void;
+
+  export interface BasicAttackContext {
+    target: UnitToken;
+    damage: {
+      baseMul: number;
+      flatAdd: number;
+    };
+    afterHit: BasicAttackAfterHitHandler[];
+    log?: unknown;
+  }
+
+  interface ShieldAbsorptionResult {
+    remain: number;
+    absorbed: number;
+    broke?: boolean;
+  }
+
+  const GAME_CONFIG = CFG as Readonly<GameConfig>;
+
+  function pickTarget(Game: TargetableGameState, attacker: UnitToken): UnitToken | null {
+    const foeSide = attacker.side === 'ally' ? 'enemy' : 'ally';
+    const pool = Game.tokens.filter((t): t is UnitToken => t.side === foeSide && t.alive);
+    if (pool.length === 0) return null;
+
+    const attackerRow = attacker.cy;
+    const targetSide = foeSide;
+    const primarySlot = Math.max(1, Math.min(3, (attackerRow | 0) + 1));
+    const slotPriority: ReadonlyArray<number> = [primarySlot, primarySlot + 3, primarySlot + 6];
+
+    for (const slot of slotPriority) {
+      const cell = slotToCell(targetSide, slot);
+      const { cx, cy } = cell;
+      const found = pool.find(t => t.cx === cx && t.cy === cy);
+      if (found) return found;
+    }
+
+    const sorted = [...pool].sort((a, b) => {
+      const distanceA = Math.abs(a.cx - attacker.cx) + Math.abs(a.cy - attacker.cy);
+      const distanceB = Math.abs(b.cx - attacker.cx) + Math.abs(b.cy - attacker.cy);
+      return distanceA - distanceB;
+    });
+
+    return sorted[0] ?? null;
+  }
+
+  function applyDamage(target: UnitToken, amount: number): void {
     if (!Number.isFinite(target.hpMax)) return;
-    target.hp = Math.max(0, Math.min(target.hpMax, (target.hp|0) - (amount|0)));
-    if (target.hp <= 0){
-    if (target.alive !== false && !target.deadAt) target.deadAt = safeNow();
+
+    const currentHp = target.hp ?? 0;
+    const maxHp = target.hpMax ?? 0;
+    const newHp = Math.max(0, Math.min(maxHp, Math.floor(currentHp) - Math.floor(amount)));
+    target.hp = newHp;
+
+    if (target.hp <= 0) {
+      if (target.alive !== false && !target.deadAt) {
+        target.deadAt = safeNow();
+      }
       target.alive = false;
     }
   }
-  function dealAbilityDamage(Game, attacker, target, opts = {}){
-    if (!attacker || !target || !target.alive) return { dealt: 0, absorbed: 0, total: 0 };
 
-  startFurySkill(attacker, { tag: opts.furyTag || opts.attackType || 'ability' });
+  function dealAbilityDamage(
+    Game: SessionState | null,
+    attacker: UnitToken | null | undefined,
+    target: UnitToken | null | undefined,
+    opts: AbilityDamageOptions = {}
+  ): AbilityDamageResult {
+    if (!attacker || !target || !target.alive) {
+      return { dealt: 0, absorbed: 0, total: 0 };
+    }
 
-    const dtype = opts.dtype || 'physical';
-    const attackType = opts.attackType || 'skill';
+    startFurySkill(attacker, { tag: String(opts.furyTag || opts.attackType || 'ability') });
+
+    const dtype = typeof opts.dtype === 'string' ? opts.dtype : 'physical';
+    const attackType = typeof opts.attackType === 'string' ? opts.attackType : 'skill';
     const baseDefault = dtype === 'arcane'
-      ? Math.max(0, Math.floor(attacker.wil || 0))
-      : Math.max(0, Math.floor(attacker.atk || 0));
-    const base = Math.max(0, opts.base != null ? Math.floor(opts.base) : baseDefault);
+      ? Math.max(0, Math.floor(attacker.wil ?? 0))
+      : Math.max(0, Math.floor(attacker.atk ?? 0));
+    const base = Math.max(0, opts.base != null ? Math.floor(Number(opts.base)) : baseDefault);
 
     const pre = Statuses.beforeDamage(attacker, target, { dtype, base, attackType });
 
-    const combinedPen = Math.max(0, Math.min(1, Math.max(pre.defPen || 0, opts.defPen || 0)));
-   const defStat = dtype === 'arcane' ? (target.res || 0) : (target.arm || 0);
+    const combinedPen = Math.max(0, Math.min(1, Math.max(pre.defPen ?? 0, opts.defPen ?? 0)));
+    const defenseStat = dtype === 'arcane' ? target.res ?? 0 : target.arm ?? 0;
 
     let dmg = Math.max(0, Math.floor(pre.base * pre.outMul));
     if (pre.ignoreAll) {
       dmg = 0;
     } else {
-      const effectiveDef = Math.max(0, defStat * (1 - combinedPen));
+      const effectiveDef = Math.max(0, defenseStat * (1 - combinedPen));
       dmg = Math.max(0, Math.floor(dmg * (1 - effectiveDef)));
       dmg = Math.max(0, Math.floor(dmg * pre.inMul));
     }
 
-    const abs = Statuses.absorbShield(target, dmg, { dtype });
-    const remain = Math.max(0, abs.remain);
+    const abs = Statuses.absorbShield(target, dmg, { dtype }) as ShieldAbsorptionResult;
+    const remain = Math.max(0, Math.floor(abs.remain));
 
-    if (remain > 0) applyDamage(target, remain);
-    if (target.hp <= 0) hookOnLethalDamage(target);
+    if (remain > 0) {
+      applyDamage(target, remain);
+    }
+    if (target.hp <= 0) {
+      hookOnLethalDamage(target);
+    }
 
     Statuses.afterDamage(attacker, target, { dealt: remain, absorbed: abs.absorbed, dtype });
 
     if (Game) {
-      try { vfxAddHit(Game, target); } catch (_) {}
+      try {
+        vfxAddHit(Game, target);
+      } catch {
+        // bỏ qua lỗi VFX runtime
+      }
     }
 
     const dealt = Math.max(0, remain);
     const isKill = target.hp <= 0;
+
     gainFury(attacker, {
       type: attackType === 'basic' ? 'basic' : 'ability',
       dealt,
       isAoE: !!opts.isAoE,
       isKill,
       isCrit: !!opts.isCrit,
-      targetsHit: Number.isFinite(opts.targetsHit) ? opts.targetsHit : 1,
-      targetMaxHp: Number.isFinite(target?.hpMax) ? target.hpMax : undefined
+      targetsHit: Number.isFinite(opts.targetsHit) ? Number(opts.targetsHit) : 1,
+      targetMaxHp: Number.isFinite(target.hpMax) ? target.hpMax : undefined,
     });
+
     gainFury(target, {
       type: 'damageTaken',
       dealt,
       isAoE: !!opts.isAoE,
-      selfMaxHp: Number.isFinite(target?.hpMax) ? target.hpMax : undefined,
-      damageTaken: dealt
+      selfMaxHp: Number.isFinite(target.hpMax) ? target.hpMax : undefined,
+      damageTaken: dealt,
     });
+
     finishFuryHit(target);
     finishFuryHit(attacker);
 
     return { dealt: remain, absorbed: abs.absorbed, total: dmg };
   }
 
-  function healUnit(target, amount){
-    if (!target || !Number.isFinite(target.hpMax)) return { healed: 0, overheal: 0 };
+  export interface HealResult {
+    healed: number;
+    overheal: number;
+  }
+
+  function healUnit(target: UnitToken | null | undefined, amount: number): HealResult {
+    if (!target || !Number.isFinite(target.hpMax)) {
+      return { healed: 0, overheal: 0 };
+    }
+
     const amt = Math.max(0, Math.floor(amount ?? 0));
-  if (amt <= 0) return { healed: 0, overheal: 0 };
-    const before = Math.max(0, target.hp || 0);
-    const healCap = Math.max(0, target.hpMax - before);
+    if (amt <= 0) {
+      return { healed: 0, overheal: 0 };
+    }
+
+    const before = Math.max(0, Math.floor(target.hp ?? 0));
+    const healCap = Math.max(0, (target.hpMax ?? 0) - before);
     const healed = Math.min(amt, healCap);
     target.hp = before + healed;
+
     return { healed, overheal: Math.max(0, amt - healed) };
   }
 
-  function grantShield(target, amount){
+  function grantShield(target: UnitToken | null | undefined, amount: number): number {
     if (!target) return 0;
+
     const amt = Math.max(0, Math.floor(amount ?? 0));
     if (amt <= 0) return 0;
-    const cur = Statuses.get(target, 'shield');
-    if (cur) {
-      cur.amount = (cur.amount || 0) + amt;
-     } else {
+
+    const current = Statuses.get(target, 'shield');
+    if (current) {
+      current.amount = (current.amount ?? 0) + amt;
+    } else {
       Statuses.add(target, { id: 'shield', kind: 'buff', tag: 'shield', amount: amt });
     }
     return amt;
   }
-   
-  function basicAttack(Game, unit){
-    const foe = unit.side === 'ally' ? 'enemy' : 'ally';
-    const pool = Game.tokens.filter(t => t.side === foe && t.alive);
-    if (!pool.length) return;
+
+  function basicAttack(Game: SessionState, unit: UnitToken): void {
+    const foeSide = unit.side === 'ally' ? 'enemy' : 'ally';
+    const pool = Game.tokens.filter((t): t is UnitToken => t.side === foeSide && t.alive);
+    if (pool.length === 0) return;
 
     startFurySkill(unit, { tag: 'basic' });
 
-    // Đầu tiên chọn theo “trước mắt/ganh gần” như cũ
     const fallback = pickTarget(Game, unit);
+    const resolved = Statuses.resolveTarget(unit, pool, { attackType: 'basic' }) ?? fallback;
+    if (!resolved) return;
 
-    // Sau đó cho Statuses có quyền điều phối (taunt/allure…), nếu trả về null thì bỏ lượt
+    const isLoithienanh = unit.id === 'loithienanh';
 
-    const tgt = Statuses.resolveTarget(unit, pool, { attackType: 'basic' }) ?? fallback;
-    if (!tgt) return;
-
-  const isLoithienanh = unit?.id === 'loithienanh';
-
-    const updateTurnBusy = (startedAt, busyMs) => {
-      if (!Game?.turn) return;
+    const updateTurnBusy = (startedAt: number, busyMs: number): void => {
+      if (!Game.turn) return;
       if (!Number.isFinite(startedAt) || !Number.isFinite(busyMs)) return;
-      const prevBusy = Number.isFinite(Game.turn.busyUntil) ? Game.turn.busyUntil : 0;
+      const prevBusy = Number.isFinite(Game.turn.busyUntil) ? Number(Game.turn.busyUntil) : 0;
       Game.turn.busyUntil = Math.max(prevBusy, startedAt + busyMs);
     };
 
-    const triggerLightningArc = timing => {
+    const triggerLightningArc = (timing: string): void => {
       if (!isLoithienanh) return;
       const arcStart = safeNow();
       try {
-        const busyMs = vfxAddLightningArc(Game, unit, tgt, {
+        const busyMs = vfxAddLightningArc(Game, unit, resolved, {
           bindingKey: 'basic_combo',
-          timing
+          timing,
         });
         updateTurnBusy(arcStart, busyMs);
-      } catch (_) {}
+      } catch {
+        // bỏ qua lỗi VFX runtime
+      }
     };
 
-    const passiveCtx = {
-      target: tgt,
+    const passiveCtx: BasicAttackContext = {
+      target: resolved,
       damage: { baseMul: 1, flatAdd: 0 },
       afterHit: [],
-      log: Game?.passiveLog
+      log: Game?.passiveLog,
     };
     emitPassiveEvent(Game, unit, 'onBasicHit', passiveCtx);
-   
-  // VFX: tất cả basic đều step-in/out (1.1s), không dùng tracer
-    const meleeDur = CFG?.ANIMATION?.meleeDurationMs ?? 1100;
+
+    const meleeDur = GAME_CONFIG.ANIMATION?.meleeDurationMs ?? 1100;
     const meleeStartMs = safeNow();
     let meleeTriggered = false;
     try {
-      vfxAddMelee(Game, unit, tgt, { dur: meleeDur });
+      vfxAddMelee(Game, unit, resolved, { dur: meleeDur });
       meleeTriggered = true;
-    } catch (_) {}
-    if (meleeTriggered && Game?.turn) {
-      const prevBusy = Number.isFinite(Game.turn.busyUntil) ? Game.turn.busyUntil : 0;
+    } catch {
+      // bỏ qua lỗi VFX runtime
+    }
+    if (meleeTriggered && Game.turn) {
+      const prevBusy = Number.isFinite(Game.turn.busyUntil) ? Number(Game.turn.busyUntil) : 0;
       Game.turn.busyUntil = Math.max(prevBusy, meleeStartMs + meleeDur);
     }
-   
-    // Tính raw và modifiers trước giáp
-    const dtype = 'physical';
-    const rawBase = Math.max(
-      1,
-      Math.floor((unit.atk || 0) + (unit.wil || 0))
-    );
+
+    const dtype = 'physical' as const;
+    const rawBase = Math.max(1, Math.floor((unit.atk ?? 0) + (unit.wil ?? 0)));
     const modBase = Math.max(
       1,
-      Math.floor(rawBase * ((passiveCtx.damage?.baseMul) ?? 1) + ((passiveCtx.damage?.flatAdd) ?? 0))
+      Math.floor(rawBase * (passiveCtx.damage?.baseMul ?? 1) + (passiveCtx.damage?.flatAdd ?? 0))
     );
-    const pre = Statuses.beforeDamage(unit, tgt, { dtype, base: modBase, attackType: 'basic' });
-    // OutMul (buff/debuff output)
+    const pre = Statuses.beforeDamage(unit, resolved, { dtype, base: modBase, attackType: 'basic' });
     let dmg = Math.max(1, Math.floor(pre.base * pre.outMul));
 
-    // Giáp/kháng có xuyên giáp (defPen)
-    const def = Math.max(0, (tgt.arm ||0) * (1 - (pre.defPen ||0))); // dtype === 'physical'
+    const def = Math.max(0, (resolved.arm ?? 0) * (1 - (pre.defPen ?? 0)));
     dmg = Math.max(0, Math.floor(dmg * (1 - def)));
-
-    // InMul (giảm/tăng dmg nhận vào, stealth=0%)
     dmg = Math.max(0, Math.floor(dmg * pre.inMul));
 
-    // Khiên hấp thụ
     triggerLightningArc('hit1');
-    const abs = Statuses.absorbShield(tgt, dmg, { dtype });
+    const abs = Statuses.absorbShield(resolved, dmg, { dtype }) as ShieldAbsorptionResult;
 
-    // Trừ HP phần còn lại
     triggerLightningArc('hit2');
-    applyDamage(tgt, abs.remain);
+    applyDamage(resolved, abs.remain);
 
-    // VFX: hit ring tại target
-    try { vfxAddHit(Game, tgt); } catch (_) {}
-    // “Bất Khuất” (undying) — chết còn 1 HP (one-shot)
-    if (tgt.hp <= 0) hookOnLethalDamage(tgt);
-  const dealt = Math.max(0, Math.min(dmg, abs.remain || 0));
-    // Hậu quả sau đòn: phản dmg, độc theo dealt, execute ≤10%…
-    Statuses.afterDamage(unit, tgt, { dealt, absorbed: abs.absorbed, dtype });
+    try {
+      vfxAddHit(Game, resolved);
+    } catch {
+      // bỏ qua lỗi VFX runtime
+    }
+    if (resolved.hp <= 0) {
+      hookOnLethalDamage(resolved);
+    }
 
-    const isKill = tgt.hp <= 0;
+    const dealt = Math.max(0, Math.min(dmg, abs.remain ?? 0));
+    Statuses.afterDamage(unit, resolved, { dealt, absorbed: abs.absorbed, dtype });
+
+    const isKill = resolved.hp <= 0;
     gainFury(unit, {
       type: 'basic',
       dealt,
       isKill,
       targetsHit: 1,
-      targetMaxHp: Number.isFinite(tgt?.hpMax) ? tgt.hpMax : undefined
+      targetMaxHp: Number.isFinite(resolved.hpMax) ? resolved.hpMax : undefined,
     });
-    gainFury(tgt, {
+    gainFury(resolved, {
       type: 'damageTaken',
       dealt,
-      selfMaxHp: Number.isFinite(tgt?.hpMax) ? tgt.hpMax : undefined,
-      damageTaken: dealt
+      selfMaxHp: Number.isFinite(resolved.hpMax) ? resolved.hpMax : undefined,
+      damageTaken: dealt,
     });
-    finishFuryHit(tgt);
+    finishFuryHit(resolved);
     finishFuryHit(unit);
 
-    if (Array.isArray(passiveCtx.afterHit) && passiveCtx.afterHit.length){
-      const afterCtx = { target: tgt, owner: unit, result: { dealt, absorbed: abs.absorbed } };
+    if (passiveCtx.afterHit.length > 0) {
+      const afterCtx: BasicAttackAfterHitArgs = {
+        target: resolved,
+        owner: unit,
+        result: { dealt, absorbed: abs.absorbed },
+      };
       for (const fn of passiveCtx.afterHit) {
         try {
           fn(afterCtx);
-        } catch (err){
+        } catch (err) {
           console.error('[passive afterHit]', err);
         }
       }
     }
   }
-   
-  // Helper: basic + follow-ups trong cùng turn-step.
-  // cap = số follow-up (không tính đòn thường). Không đẩy con trỏ lượt.
-  function doBasicWithFollowups(Game, unit, cap = 2){
+
+  function doBasicWithFollowups(Game: SessionState, unit: UnitToken, cap = 2): void {
     try {
-     // Đòn đánh thường đầu tiên
-     basicAttack(Game, unit);
-     // Đòn phụ
-     const n = Math.max(0, cap|0);
-    for (let i=0; i<n; i++){
-       if (!unit || !unit.alive) break;
+      basicAttack(Game, unit);
+      const followupCount = Math.max(0, cap | 0);
+      for (let i = 0; i < followupCount; i += 1) {
+        if (!unit || !unit.alive) break;
         basicAttack(Game, unit);
-     }
-    } catch(e){
-      console.error('[doBasicWithFollowups]', e);
+      }
+    } catch (error) {
+      console.error('[doBasicWithFollowups]', error);
     }
   }
-
   exports.pickTarget = pickTarget;
   exports.applyDamage = applyDamage;
   exports.dealAbilityDamage = dealAbilityDamage;
@@ -1925,8 +2304,18 @@ __define('./combat.js', (exports, module, __require) => {
   exports.doBasicWithFollowups = doBasicWithFollowups;
 });
 __define('./config.js', (exports, module, __require) => {
+  // @ts-check
+
   // config.js v0.7.5
-  const CFG = {
+
+  const __dep0 = __require('./config/schema.ts');
+  const GameConfigSchema = __dep0.GameConfigSchema;
+
+  /** @typedef {import('@types/config').GameConfig} GameConfig */
+  /** @typedef {import('@types/config').CameraPreset} CameraPreset */
+  /** @typedef {import('@types/config').ChibiProportions} ChibiProportions */
+
+  const rawConfig = {
     GRID_COLS: 7,
     GRID_ROWS: 3,
     ALLY_COLS: 3,
@@ -1934,7 +2323,7 @@ __define('./config.js', (exports, module, __require) => {
     COST_CAP: 30,
     SUMMON_LIMIT: 10,
     HAND_SIZE: 4,
-  FOLLOWUP_CAP_DEFAULT: 2,
+    FOLLOWUP_CAP_DEFAULT: 2,
 
     fury: {
       max: 100,
@@ -1960,7 +2349,7 @@ __define('./config.js', (exports, module, __require) => {
       }
     },
 
-  turnOrder: {
+    turnOrder: {
       pairScan: [1, 4, 7, 2, 5, 8, 3, 6, 9],
       sides: ['ally', 'enemy']
     },
@@ -2101,15 +2490,24 @@ __define('./config.js', (exports, module, __require) => {
     CAMERA: 'landscape_oblique'
   };
 
+  const parsedConfig = GameConfigSchema.parse(rawConfig); // behavior-preserving validation
+  Object.freeze(parsedConfig);
+
+  /** @type {GameConfig} */
+  const CFG = parsedConfig;
+
   // Camera presets (giữ nguyên)
+  /** @type {Record<string, CameraPreset>} */
   const CAM = {
     landscape_oblique: { rowGapRatio: 0.62, topScale: 0.80, depthScale: 0.94 },
     portrait_leader45: { rowGapRatio: 0.72, topScale: 0.86, depthScale: 0.96 }
   };
   // === Token render style ===
+  /** @type {'chibi' | 'disk'} */
   const TOKEN_STYLE = 'chibi'; // 'chibi' | 'disk'
 
   // Proportions cho chibi (tính theo bán kính cơ sở r)
+  /** @type {ChibiProportions} */
   const CHIBI = {
     // đường đậm hơn + tỉ lệ chibi mập mạp (đầu to, tay chân ngắn)
     line: 3,
@@ -2126,13 +2524,228 @@ __define('./config.js', (exports, module, __require) => {
   exports.TOKEN_STYLE = TOKEN_STYLE;
   exports.CHIBI = CHIBI;
 });
+__define('./config/schema.ts', (exports, module, __require) => {
+  const __dep0 = __require('./zod');
+  const z = __dep0.z;
+
+  const SideSchema = z.enum(['ally', 'enemy']);
+
+  const FuryCapsSchema = z.object({
+    perTurn: z.number(),
+    perSkill: z.number(),
+    perHit: z.number()
+  });
+  export type FuryCaps = z.infer<typeof FuryCapsSchema>;
+
+  const FuryGainEntrySchema = z.object({
+    base: z.number(),
+    perTarget: z.number().optional(),
+    crit: z.number().optional(),
+    kill: z.number().optional(),
+    targetRatio: z.number().optional()
+  });
+  export type FuryGainEntry = z.infer<typeof FuryGainEntrySchema>;
+
+  const FuryConfigSchema = z.object({
+    max: z.number(),
+    ultCost: z.number(),
+    specialMax: z.record(z.object({
+      max: z.number(),
+      ultCost: z.number()
+    })),
+    caps: FuryCapsSchema,
+    gain: z.object({
+      turnStart: z.object({ amount: z.number() }),
+      dealSingle: FuryGainEntrySchema,
+      dealAoePerTarget: FuryGainEntrySchema,
+      damageTaken: z.object({ base: z.number(), selfRatio: z.number() })
+    }),
+    drain: z.object({
+      perTargetBase: z.number(),
+      perTargetPct: z.number(),
+      skillTotalCap: z.number()
+    })
+  });
+  export type FuryConfig = z.infer<typeof FuryConfigSchema>;
+
+  const TurnOrderConfigSchema = z.object({
+    pairScan: z.array(z.number()),
+    sides: z.array(SideSchema)
+  });
+  export type TurnOrderConfig = z.infer<typeof TurnOrderConfigSchema>;
+
+  const AiWeightsSchema = z.object({
+    pressure: z.number(),
+    safety: z.number(),
+    eta: z.number(),
+    summon: z.number(),
+    kitInstant: z.number(),
+    kitDefense: z.number(),
+    kitRevive: z.number()
+  });
+  export type AiWeights = z.infer<typeof AiWeightsSchema>;
+
+  const AiRoleWeightSchema = z.object({
+    front: z.number(),
+    back: z.number(),
+    summonBoost: z.number().optional()
+  });
+  export type AiRoleWeight = z.infer<typeof AiRoleWeightSchema>;
+
+  const AiConfigSchema = z.object({
+    WEIGHTS: AiWeightsSchema,
+    ROW_CROWDING_PENALTY: z.number(),
+    ROLE: z.record(AiRoleWeightSchema),
+    DEBUG: z.object({ KEEP_TOP: z.number() })
+  });
+  export type AiConfig = z.infer<typeof AiConfigSchema>;
+
+  const AnimationConfigSchema = z.object({
+    turnIntervalMs: z.number(),
+    meleeDurationMs: z.number()
+  });
+  export type AnimationConfig = z.infer<typeof AnimationConfigSchema>;
+
+  const UiConfigSchema = z.object({
+    PAD: z.number(),
+    BOARD_MAX_W: z.number(),
+    BOARD_MIN_H: z.number(),
+    BOARD_H_RATIO: z.number(),
+    MAX_DPR: z.number(),
+    MAX_PIXEL_AREA: z.number(),
+    CARD_GAP: z.number(),
+    CARD_MIN: z.number()
+  });
+  export type UiConfig = z.infer<typeof UiConfigSchema>;
+
+  const DebugFlagsSchema = z.object({
+    SHOW_QUEUED: z.boolean(),
+    SHOW_QUEUED_ENEMY: z.boolean()
+  });
+  export type DebugFlags = z.infer<typeof DebugFlagsSchema>;
+
+  const ShadowPresetSchema = z.enum(['off', 'medium', 'soft']);
+
+  const PerformanceConfigSchema = z.object({
+    LOW_POWER_MODE: z.boolean(),
+    LOW_POWER_DPR: z.number(),
+    LOW_POWER_SHADOWS: z.boolean(),
+    LOW_SHADOW_PRESET: ShadowPresetSchema,
+    SHADOW_MEDIUM_THRESHOLD: z.number(),
+    SHADOW_DISABLE_THRESHOLD: z.number(),
+    MEDIUM_SHADOW_PRESET: ShadowPresetSchema,
+    HIGH_LOAD_SHADOW_PRESET: ShadowPresetSchema,
+    SHADOW_HIGH_DPR_CUTOFF: z.number(),
+    HIGH_DPR_SHADOW_PRESET: ShadowPresetSchema
+  });
+  export type PerformanceConfig = z.infer<typeof PerformanceConfigSchema>;
+
+  const ColorPaletteSchema = z.object({
+    ally: z.string(),
+    enemy: z.string(),
+    mid: z.string(),
+    line: z.string(),
+    tokenText: z.string()
+  });
+  export type ColorPalette = z.infer<typeof ColorPaletteSchema>;
+
+  const SceneLayerSchema = z.object({
+    top: z.string(),
+    mid: z.string().optional(),
+    bottom: z.string().optional(),
+    glow: z.string().optional(),
+    height: z.number().optional(),
+    thickness: z.number().optional(),
+    color: z.string().optional(),
+    accent: z.string().optional(),
+    parallax: z.number().optional(),
+    topScale: z.number().optional(),
+    bottomScale: z.number().optional(),
+    highlight: z.string().optional()
+  });
+  export type SceneLayer = z.infer<typeof SceneLayerSchema>;
+
+  const SceneThemeSchema = z.object({
+    sky: SceneLayerSchema,
+    horizon: SceneLayerSchema,
+    ground: SceneLayerSchema
+  });
+  export type SceneTheme = z.infer<typeof SceneThemeSchema>;
+
+  const SceneConfigSchema = z.object({
+    DEFAULT_THEME: z.string(),
+    CURRENT_THEME: z.string(),
+    THEMES: z.record(SceneThemeSchema)
+  });
+  export type SceneConfig = z.infer<typeof SceneConfigSchema>;
+
+  const BackgroundPropSchema = z.object({
+    type: z.string(),
+    cell: z.object({ cx: z.number(), cy: z.number() }),
+    offset: z.object({ x: z.number().optional(), y: z.number().optional() }).optional(),
+    scale: z.number().optional(),
+    alpha: z.number().optional(),
+    depth: z.number().optional(),
+    sortBias: z.number().optional(),
+    flip: z.number().optional()
+  });
+  export type BackgroundProp = z.infer<typeof BackgroundPropSchema>;
+
+  const BackgroundDefinitionSchema = z.object({
+    props: z.array(BackgroundPropSchema)
+  });
+  export type BackgroundDefinition = z.infer<typeof BackgroundDefinitionSchema>;
+
+  const WorldMapConfigSchema = z.object({
+    SCENE: SceneConfigSchema,
+    CURRENT_BACKGROUND: z.string(),
+    BACKGROUNDS: z.record(BackgroundDefinitionSchema),
+    CAMERA: z.string()
+  });
+  export type WorldMapConfig = z.infer<typeof WorldMapConfigSchema>;
+
+  const CombatTuningSchema = z.object({
+    GRID_COLS: z.number(),
+    GRID_ROWS: z.number(),
+    ALLY_COLS: z.number(),
+    ENEMY_COLS: z.number(),
+    COST_CAP: z.number(),
+    SUMMON_LIMIT: z.number(),
+    HAND_SIZE: z.number(),
+    FOLLOWUP_CAP_DEFAULT: z.number(),
+    fury: FuryConfigSchema,
+    turnOrder: TurnOrderConfigSchema,
+    AI: AiConfigSchema,
+    ANIMATION: AnimationConfigSchema
+  });
+  export type CombatTuning = z.infer<typeof CombatTuningSchema>;
+
+  const GameConfigSchema = CombatTuningSchema
+    .merge(
+      z.object({
+        UI: UiConfigSchema,
+        DEBUG: DebugFlagsSchema,
+        PERFORMANCE: PerformanceConfigSchema,
+        COLORS: ColorPaletteSchema
+      })
+    )
+    .merge(WorldMapConfigSchema);
+
+  export type GameConfig = z.infer<typeof GameConfigSchema>;
+  exports.GameConfigSchema = GameConfigSchema;
+});
 __define('./data/announcements.js', (exports, module, __require) => {
+  // @ts-check
   const __dep0 = __require('./data/economy.js');
   const CURRENCY_IDS = __dep0.CURRENCY_IDS;
   const convertCurrency = __dep0.convertCurrency;
   const formatBalance = __dep0.formatBalance;
   const getLotterySplit = __dep0.getLotterySplit;
 
+  /** @typedef {import('@types/config').AnnouncementEntry} AnnouncementEntry */
+  /** @typedef {import('@types/config').AnnouncementSlot} AnnouncementSlot */
+
+  /** @type {import('@types/config').LotterySplit} */
   const LOTTERY_SPLIT = getLotterySplit();
   const LOTTERY_DEV_PERCENT = Math.round((LOTTERY_SPLIT.devVault || 0) * 100);
   const LOTTERY_PRIZE_PERCENT = Math.round((LOTTERY_SPLIT.prizePool || 0) * 100);
@@ -2145,6 +2758,10 @@ __define('./data/announcements.js', (exports, module, __require) => {
     formatBalance(convertCurrency(1, CURRENCY_IDS.TT, CURRENCY_IDS.VNT), CURRENCY_IDS.VNT)
   ].join(' = ');
 
+  /**
+   * @param {AnnouncementEntry | null | undefined} entry
+   * @param {Date} now
+   */
   function isEntryActive(entry, now){
     if (!entry) return false;
     if (!entry.startAt && !entry.endAt) return true;
@@ -2155,7 +2772,7 @@ __define('./data/announcements.js', (exports, module, __require) => {
     return true;
   }
 
-  const SIDE_SLOT_ANNOUNCEMENTS = [
+  const SIDE_SLOT_ANNOUNCEMENTS = /** @satisfies ReadonlyArray<AnnouncementSlot> */ ([
     {
       key: 'event',
       label: 'Sự kiện giới hạn',
@@ -2250,8 +2867,13 @@ __define('./data/announcements.js', (exports, module, __require) => {
         }
       ]
     }
-  ];
+  ]);
 
+  /**
+   * @param {string} slotKey
+   * @param {{ now?: Date }} [options]
+   * @returns {{ slot: AnnouncementSlot; entry: AnnouncementEntry } | null}
+   */
   function selectAnnouncementEntry(slotKey, options = {}){
     const now = options.now instanceof Date ? options.now : new Date();
     const slot = SIDE_SLOT_ANNOUNCEMENTS.find(item => item.key === slotKey);
@@ -2261,6 +2883,10 @@ __define('./data/announcements.js', (exports, module, __require) => {
     return { slot, entry };
   }
 
+  /**
+   * @param {{ now?: Date }} [options]
+   * @returns {Array<{ key: AnnouncementSlot['key']; label: AnnouncementSlot['label']; entry: AnnouncementEntry | null }>}
+   */
   function getAllSidebarAnnouncements(options = {}){
     const now = options.now instanceof Date ? options.now : new Date();
     return SIDE_SLOT_ANNOUNCEMENTS.map(slot => {
@@ -2272,18 +2898,20 @@ __define('./data/announcements.js', (exports, module, __require) => {
       };
     }).filter(item => Boolean(item.entry));
   }
-
-
   exports.SIDE_SLOT_ANNOUNCEMENTS = SIDE_SLOT_ANNOUNCEMENTS;
   exports.selectAnnouncementEntry = selectAnnouncementEntry;
   exports.getAllSidebarAnnouncements = getAllSidebarAnnouncements;
-  exports.default = SIDE_SLOT_ANNOUNCEMENTS;
-  module.exports.default = exports.default;
 });
 __define('./data/economy.js', (exports, module, __require) => {
+  // @ts-check
   const __dep0 = __require('./utils/format.js');
   const HAS_INTL_NUMBER_FORMAT = __dep0.HAS_INTL_NUMBER_FORMAT;
   const createNumberFormatter = __dep0.createNumberFormatter;
+
+  /** @typedef {import('@types/config').CurrencyDefinition} CurrencyDefinition */
+  /** @typedef {import('@types/config').PityConfiguration} PityConfiguration */
+  /** @typedef {import('@types/config').ShopTaxBracket} ShopTaxBracket */
+  /** @typedef {import('@types/config').LotterySplit} LotterySplit */
 
   const CURRENCY_IDS = Object.freeze({
     VNT: 'VNT',
@@ -2293,7 +2921,7 @@ __define('./data/economy.js', (exports, module, __require) => {
     TT: 'TT'
   });
 
-  const CURRENCIES = Object.freeze([
+  const CURRENCIES = /** @satisfies ReadonlyArray<CurrencyDefinition> */ (Object.freeze([
     {
       id: CURRENCY_IDS.VNT,
       name: 'Vụn Nguyên Tinh',
@@ -2334,21 +2962,31 @@ __define('./data/economy.js', (exports, module, __require) => {
       ratioToBase: 100000,
       description: 'Đơn vị tối thượng cho các giao dịch Prime và quỹ dự trữ chiến lược.'
     }
-  ]);
+  ]));
 
-  const CURRENCY_INDEX = CURRENCIES.reduce((acc, currency) => {
+  const CURRENCY_INDEX = /** @type {Record<string, CurrencyDefinition>} */ (CURRENCIES.reduce((acc, currency) => {
     acc[currency.id] = currency;
     return acc;
-  }, {});
+  }, {}));
 
+  /**
+   * @param {string} currencyId
+   * @returns {CurrencyDefinition | null}
+   */
   function getCurrency(currencyId){
-    return CURRENCY_INDEX[currencyId] || null;
+    return CURRENCY_INDEX[currencyId] ?? null;
   }
 
+  /** @returns {CurrencyDefinition[]} */
   function listCurrencies(){
     return CURRENCIES.slice();
   }
 
+  /**
+   * @param {number} value
+   * @param {string} fromId
+   * @param {string} toId
+   */
   function convertCurrency(value, fromId, toId){
     const from = getCurrency(fromId);
     const to = getCurrency(toId);
@@ -2424,7 +3062,7 @@ __define('./data/economy.js', (exports, module, __require) => {
     return includeSuffix ? `${formatted} ${suffix}` : formatted;
   }
 
-  const PITY_CONFIG = Object.freeze({
+  const PITY_CONFIG = /** @satisfies Record<string, PityConfiguration> */ (Object.freeze({
     SSR: Object.freeze({
       tier: 'SSR',
       hardPity: 60,
@@ -2445,44 +3083,58 @@ __define('./data/economy.js', (exports, module, __require) => {
         { tier: 'UR', pull: 60 }
       ]
     })
-  });
+  }));
 
+  /**
+   * @param {string} tier
+   * @returns {PityConfiguration | null}
+   */
   function getPityConfig(tier){
-    return PITY_CONFIG[tier] || null;
+    return PITY_CONFIG[tier] ?? null;
   }
 
+  /** @returns {string[]} */
   function listPityTiers(){
     return Object.keys(PITY_CONFIG);
   }
 
-  const SHOP_TAX_BRACKETS = Object.freeze([
+  const SHOP_TAX_BRACKETS = /** @satisfies ReadonlyArray<ShopTaxBracket> */ (Object.freeze([
     { rank: 'N', label: 'Phổ thông (N)', rate: 0.05 },
     { rank: 'R', label: 'Hiếm (R)', rate: 0.08 },
     { rank: 'SR', label: 'Siêu hiếm (SR)', rate: 0.1 },
     { rank: 'SSR', label: 'Cực hiếm (SSR)', rate: 0.12 },
     { rank: 'UR', label: 'Siêu thực (UR)', rate: 0.15 },
     { rank: 'PRIME', label: 'Tối thượng (Prime)', rate: 0.18 }
-  ]);
+  ]));
 
-  const SHOP_TAX_INDEX = SHOP_TAX_BRACKETS.reduce((acc, bracket) => {
+  const SHOP_TAX_INDEX = /** @type {Record<string, ShopTaxBracket>} */ (SHOP_TAX_BRACKETS.reduce((acc, bracket) => {
     acc[bracket.rank] = bracket;
     return acc;
-  }, {});
+  }, {}));
 
+  /**
+   * @param {string} rank
+   * @returns {ShopTaxBracket | null}
+   */
   function getShopTaxBracket(rank){
-    return SHOP_TAX_INDEX[rank] || null;
+    return SHOP_TAX_INDEX[rank] ?? null;
   }
 
+  /**
+   * @param {string} rank
+   * @returns {number | null}
+   */
   function getShopTaxRate(rank){
     const bracket = getShopTaxBracket(rank);
     return bracket ? bracket.rate : null;
   }
 
-  const LOTTERY_SPLIT = Object.freeze({
+  const LOTTERY_SPLIT = /** @type {LotterySplit} */ (Object.freeze({
     devVault: 0.5,
     prizePool: 0.5
-  });
+  }));
 
+  /** @returns {LotterySplit} */
   function getLotterySplit(){
     return LOTTERY_SPLIT;
   }
@@ -2503,16 +3155,29 @@ __define('./data/economy.js', (exports, module, __require) => {
   exports.getLotterySplit = getLotterySplit;
 });
 __define('./data/modes.js', (exports, module, __require) => {
+  // @ts-check
   const __dep0 = __require('./data/economy.js');
   const getLotterySplit = __dep0.getLotterySplit;
   const getPityConfig = __dep0.getPityConfig;
   const getShopTaxRate = __dep0.getShopTaxRate;
 
+  /** @typedef {import('@types/config').ModeConfig} ModeConfig */
+  /** @typedef {import('@types/config').ModeGroup} ModeGroup */
+  /** @typedef {import('@types/config').MenuSectionDefinition} MenuSectionDefinition */
+  /** @typedef {import('@types/config').PityConfiguration} PityConfiguration */
+  /** @typedef {import('@types/config').LotterySplit} LotterySplit */
+
+  /** @type {PityConfiguration | null} */
   const SSR_PITY = getPityConfig('SSR');
+  /** @type {PityConfiguration | null} */
   const UR_PITY = getPityConfig('UR');
+  /** @type {PityConfiguration | null} */
   const PRIME_PITY = getPityConfig('PRIME');
+  /** @type {LotterySplit} */
   const LOTTERY_SPLIT = getLotterySplit();
+  /** @type {number | null} */
   const BASE_TAX_RATE = getShopTaxRate('N');
+  /** @type {number | null} */
   const TOP_TAX_RATE = getShopTaxRate('PRIME');
 
   const MODE_TYPES = Object.freeze({
@@ -2527,12 +3192,12 @@ __define('./data/modes.js', (exports, module, __require) => {
     PLANNED: 'planned'
   });
 
-  const MENU_SECTION_DEFINITIONS = [
+  const MENU_SECTION_DEFINITIONS = /** @satisfies ReadonlyArray<MenuSectionDefinition> */ ([
     { id: 'core-pve', title: 'PvE' },
     { id: 'economy', title: 'Kinh tế & Hạ tầng' }
-  ];
+  ]);
 
-  const MODE_GROUPS = [
+  const MODE_GROUPS = /** @satisfies ReadonlyArray<ModeGroup> */ ([
     {
       id: 'arena-hub',
       title: 'Chiến Trường',
@@ -2543,9 +3208,9 @@ __define('./data/modes.js', (exports, module, __require) => {
       childModeIds: ['arena', 'beast-arena', 'ares', 'challenge', 'campaign'],
       extraClasses: ['mode-card--wide']
     }
-  ];
+  ]);
 
-  const MODES = [
+  const MODES = /** @satisfies ReadonlyArray<ModeConfig> */ ([
     {
       id: 'campaign',
       title: 'Chiến Dịch',
@@ -2559,7 +3224,7 @@ __define('./data/modes.js', (exports, module, __require) => {
       parentId: 'arena-hub',
       shell: {
         screenId: 'pve-session',
-        moduleId: './modes/pve/session.js',
+        moduleId: './modes/pve/session.ts',
         defaultParams: { modeKey: 'campaign' }
       }
     },
@@ -2576,7 +3241,7 @@ __define('./data/modes.js', (exports, module, __require) => {
       parentId: 'arena-hub',
       shell: {
         screenId: 'pve-session',
-        moduleId: './modes/pve/session.js',
+        moduleId: './modes/pve/session.ts',
         defaultParams: { modeKey: 'challenge' }
       }
     },
@@ -2593,7 +3258,7 @@ __define('./data/modes.js', (exports, module, __require) => {
       parentId: 'arena-hub',
       shell: {
         screenId: 'pve-session',
-        moduleId: './modes/pve/session.js',
+        moduleId: './modes/pve/session.ts',
         defaultParams: { modeKey: 'arena' }
       }
     },
@@ -2610,7 +3275,7 @@ __define('./data/modes.js', (exports, module, __require) => {
       parentId: 'arena-hub',
       shell: {
         screenId: 'main-menu',
-        fallbackModuleId: './modes/coming-soon.stub.js'
+        fallbackModuleId: './modes/coming-soon.stub.ts'
       }
     },
     {
@@ -2625,7 +3290,7 @@ __define('./data/modes.js', (exports, module, __require) => {
       menuSections: ['economy'],
       shell: {
         screenId: 'main-menu',
-        fallbackModuleId: './modes/coming-soon.stub.js'
+        fallbackModuleId: './modes/coming-soon.stub.ts'
       }
     },
     {
@@ -2640,7 +3305,7 @@ __define('./data/modes.js', (exports, module, __require) => {
       menuSections: ['economy'],
       shell: {
         screenId: 'main-menu',
-        fallbackModuleId: './modes/coming-soon.stub.js'
+        fallbackModuleId: './modes/coming-soon.stub.ts'
       }
     },
     {
@@ -2704,7 +3369,7 @@ __define('./data/modes.js', (exports, module, __require) => {
       menuSections: ['economy'],
       shell: {
         screenId: 'main-menu',
-        fallbackModuleId: './modes/coming-soon.stub.js'
+        fallbackModuleId: './modes/coming-soon.stub.ts'
       }
     },
     {
@@ -2719,7 +3384,7 @@ __define('./data/modes.js', (exports, module, __require) => {
       menuSections: ['economy'],
       shell: {
         screenId: 'main-menu',
-        fallbackModuleId: './modes/coming-soon.stub.js'
+        fallbackModuleId: './modes/coming-soon.stub.ts'
       }
     },
     {
@@ -2734,7 +3399,7 @@ __define('./data/modes.js', (exports, module, __require) => {
       menuSections: ['economy'],
       shell: {
         screenId: 'main-menu',
-        fallbackModuleId: './modes/coming-soon.stub.js'
+        fallbackModuleId: './modes/coming-soon.stub.ts'
       }
     },
     {
@@ -2750,10 +3415,10 @@ __define('./data/modes.js', (exports, module, __require) => {
       parentId: 'arena-hub',
       shell: {
         screenId: 'main-menu',
-        fallbackModuleId: './modes/coming-soon.stub.js'
+        fallbackModuleId: './modes/coming-soon.stub.ts'
       }
     }
-  ];
+  ]);
 
   const MODE_INDEX = MODES.reduce((acc, mode) => {
     acc[mode.id] = mode;
@@ -2834,10 +3499,16 @@ __define('./data/modes.js', (exports, module, __require) => {
   exports.getMenuSections = getMenuSections;
 });
 __define('./data/roster-preview.js', (exports, module, __require) => {
+  // @ts-check
   const __dep0 = __require('./catalog.js');
   const CLASS_BASE = __dep0.CLASS_BASE;
   const RANK_MULT = __dep0.RANK_MULT;
   const ROSTER = __dep0.ROSTER;
+
+  /** @typedef {import('@types/config').CatalogStatBlock} CatalogStatBlock */
+  /** @typedef {import('@types/config').RosterPreview} RosterPreview */
+  /** @typedef {import('@types/config').RosterPreviewRow} RosterPreviewRow */
+  /** @typedef {import('@types/config').RosterUnitDefinition} RosterUnitDefinition */
 
   // Talent Point (TP) deltas documented in "ý tưởng nhân vật v3.txt".
   const TP_DELTA = Object.freeze({
@@ -2853,7 +3524,7 @@ __define('./data/roster-preview.js', (exports, module, __require) => {
     HPregen: 2
   });
 
-  const STAT_ORDER = [
+  const STAT_ORDER = /** @satisfies ReadonlyArray<string> */ ([
     'HP',
     'ATK',
     'WIL',
@@ -2865,7 +3536,7 @@ __define('./data/roster-preview.js', (exports, module, __require) => {
     'AEmax',
     'AEregen',
     'HPregen'
-  ];
+  ]);
 
   const PRECISION = {
     ARM: 100,
@@ -2874,15 +3545,26 @@ __define('./data/roster-preview.js', (exports, module, __require) => {
     AEregen: 10
   };
 
+  /**
+   * @param {string} stat
+   * @param {number} value
+   */
   function roundStat(stat, value) {
     const precision = PRECISION[stat] ?? 1;
     return Math.round(value * precision) / precision;
   }
 
+  /**
+   * @param {number} value
+   */
   function roundTpValue(value) {
     return Math.round(value * 1e6) / 1e6;
   }
 
+  /**
+   * @param {Record<string, number | null | undefined>} [tpAlloc]
+   * @returns {Record<string, number>}
+   */
   function sanitizeTpAllocation(tpAlloc = {}) {
     const clean = {};
     for (const [stat, value] of Object.entries(tpAlloc)) {
@@ -2895,6 +3577,11 @@ __define('./data/roster-preview.js', (exports, module, __require) => {
     return clean;
   }
 
+  /**
+   * @param {CatalogStatBlock} base
+   * @param {Record<string, number | null | undefined>} [tpAlloc]
+   * @returns {CatalogStatBlock}
+   */
   function applyTpToBase(base, tpAlloc = {}) {
     const cleanTp = sanitizeTpAllocation(tpAlloc);
     const out = {};
@@ -2910,6 +3597,10 @@ __define('./data/roster-preview.js', (exports, module, __require) => {
     return out;
   }
 
+  /**
+   * @param {keyof typeof RANK_MULT} rank
+   * @returns {number}
+   */
   function getRankMultiplier(rank) {
     const multiplier = RANK_MULT[rank];
     if (multiplier === undefined) {
@@ -2918,6 +3609,11 @@ __define('./data/roster-preview.js', (exports, module, __require) => {
     return multiplier;
   }
 
+  /**
+   * @param {CatalogStatBlock} preRank
+   * @param {keyof typeof RANK_MULT} rank
+   * @returns {CatalogStatBlock}
+   */
   function applyRankMultiplier(preRank, rank) {
     const multiplier = getRankMultiplier(rank);
     const out = {};
@@ -2931,6 +3627,12 @@ __define('./data/roster-preview.js', (exports, module, __require) => {
     return out;
   }
 
+  /**
+   * @param {keyof typeof CLASS_BASE} className
+   * @param {keyof typeof RANK_MULT} rank
+   * @param {Record<string, number | null | undefined>} [tpAlloc]
+   * @returns {CatalogStatBlock}
+   */
   function computeFinalStats(className, rank, tpAlloc = {}) {
     const base = CLASS_BASE[className];
     if (!base) {
@@ -2940,6 +3642,11 @@ __define('./data/roster-preview.js', (exports, module, __require) => {
     return applyRankMultiplier(preRank, rank);
   }
 
+  /**
+   * @param {CatalogStatBlock} base
+   * @param {RosterUnitDefinition['mods']} [mods]
+   * @returns {Record<string, number>}
+   */
   function deriveTpFromMods(base, mods = {}) {
     if (!mods) return {};
     const tp = {};
@@ -2956,15 +3663,23 @@ __define('./data/roster-preview.js', (exports, module, __require) => {
     return tp;
   }
 
+  /**
+   * @param {Record<string, number>} [tpAlloc]
+   */
   function totalTp(tpAlloc = {}) {
     return roundTpValue(
       Object.values(tpAlloc).reduce((sum, value) => sum + value, 0)
     );
   }
 
+  /**
+   * @param {Record<string, Record<string, number>> | undefined} [tpAllocations]
+   * @returns {Record<string, RosterPreview>}
+   */
   function buildRosterPreviews(tpAllocations = undefined) {
+    /** @type {Record<string, RosterPreview>} */
     const result = {};
-    for (const unit of ROSTER) {
+      for (const unit of /** @type {ReadonlyArray<RosterUnitDefinition>} */ (ROSTER)) {
       const base = CLASS_BASE[unit.class];
       if (!base) continue;
       const derivedTp = tpAllocations?.[unit.id] ?? deriveTpFromMods(base, unit.mods);
@@ -2987,6 +3702,11 @@ __define('./data/roster-preview.js', (exports, module, __require) => {
     return result;
   }
 
+  /**
+   * @param {Record<string, RosterPreview>} previews
+   * @param {ReadonlyArray<string>} [statsOrder]
+   * @returns {RosterPreviewRow[]}
+   */
   function buildPreviewRows(previews, statsOrder = STAT_ORDER) {
     return statsOrder.map((stat) => ({
       stat,
@@ -3026,9 +3746,19 @@ __define('./data/roster-preview.js', (exports, module, __require) => {
   exports.buildPreviewRows = buildPreviewRows;
 });
 __define('./data/skills.js', (exports, module, __require) => {
+  // @ts-check
   const __dep0 = __require('./catalog.js');
   const ROSTER = __dep0.ROSTER;
 
+  /** @typedef {import('../types/units.ts').UnitId} UnitId */
+  /** @typedef {import('../types/config.js').SkillSection} SkillSection */
+  /** @typedef {import('../types/config.js').SkillEntry} SkillEntry */
+
+  /**
+   * @template T
+   * @param {T} value
+   * @returns {T}
+   */
   function deepFreeze(value){
     if (Array.isArray(value)){
       value.forEach(deepFreeze);
@@ -3041,27 +3771,35 @@ __define('./data/skills.js', (exports, module, __require) => {
     return value;
   }
 
+  /**
+   * @param {SkillSection | string | null | undefined} section
+   * @returns {SkillSection | null}
+   */
   function normalizeSection(section){
     if (!section) return null;
     if (typeof section === 'string'){
-      return { name: '', description: section };
+      return /** @type {SkillSection} */ ({ name: '', description: section });
     }
-    const normalized = { ...section };
+    const normalized = /** @type {SkillSection} */ ({ ...section });
     if (Array.isArray(section.tags)){
       normalized.tags = [...section.tags];
     }
     if (Array.isArray(section.notes)){
       normalized.notes = [...section.notes];
-    }
-    if (section.notes && !Array.isArray(section.notes)){
-      normalized.notes = [section.notes];
+    } else if (typeof section.notes === 'string'){
+      const note = /** @type {string} */ (section.notes);
+      normalized.notes = [note];
     }
     return normalized;
   }
 
+  /**
+   * @param {SkillSection | null | undefined} entry
+   * @returns {SkillSection | null}
+   */
   function normalizeSkillEntry(entry){
     if (!entry) return null;
-    const normalized = { ...entry };
+    const normalized = /** @type {SkillSection} */ ({ ...entry });
     if (Array.isArray(entry.tags)){
       normalized.tags = [...entry.tags];
     }
@@ -3072,12 +3810,19 @@ __define('./data/skills.js', (exports, module, __require) => {
       normalized.notes = [...entry.notes];
     }
     if (entry.notes && !Array.isArray(entry.notes)){
-      normalized.notes = [entry.notes];
+      const note = /** @type {string} */ (entry.notes);
+      normalized.notes = [note];
     }
     return normalized;
   }
 
-  const rawSkillSets = [
+  /**
+    * @typedef {Readonly<{ unitId: UnitId; basic?: SkillSection | string | null; skill?: SkillSection | null; skills?: ReadonlyArray<SkillSection>; ult?: SkillSection | string | null; talent?: SkillSection | string | null; technique?: SkillSection | string | null; notes?: ReadonlyArray<string> | string | null; [extra: string]: unknown; }>}
+   * RawSkillSet
+   */
+
+  /** @type {ReadonlyArray<RawSkillSet>} */
+  const rawSkillSets = ([
     {
       unitId: 'phe',
       basic: {
@@ -3086,7 +3831,7 @@ __define('./data/skills.js', (exports, module, __require) => {
         tags: ['single-target', 'lifesteal', 'mark'],
         effects: {
           lifesteal: { percentOfDamage: 0.10 },
-          applyMark: { id: 'phe_mark', stacks: 1, maxStacks: 3, ttlTurns: 3, refreshOnHit: true }
+          applyMark: { id: 'mark_devour', stacks: 1, maxStacks: 3, ttlTurns: 3, refreshOnHit: true }
         },
         description: 'Gây sát thương theo n% WIL + x% ATK lên một mục tiêu, hồi lại 10% lượng sát thương gây ra và đặt 1 tầng Phệ Ấn lên mục tiêu (tối đa 3 tầng, làm mới thời gian tồn tại mỗi khi cộng dồn).'
       },
@@ -3561,12 +4306,15 @@ __define('./data/skills.js', (exports, module, __require) => {
         'Còi Tăng Tốc ưu tiên đồng minh ngẫu nhiên; hiệu ứng có thể trùng lặp với các nguồn tăng tốc khác.'
       ]
     }
-  ];
+  ]);
 
-  const SKILL_KEYS = ['basic', 'skill', 'skills', 'ult', 'talent', 'technique', 'notes'];
+  /** @type {ReadonlyArray<keyof SkillEntry | 'skill'>} */
+  const SKILL_KEYS = (['basic', 'skill', 'skills', 'ult', 'talent', 'technique', 'notes']);
 
-  const skillSets = rawSkillSets.reduce((acc, entry) => {
-    const skills = Array.isArray(entry.skills) ? entry.skills.map(normalizeSkillEntry) : [];
+  const skillSets = /** @type {Record<UnitId, SkillEntry>} */ (rawSkillSets.reduce((acc, entry) => {
+    const skills = Array.isArray(entry.skills)
+      ? entry.skills.map(normalizeSkillEntry).filter(isSkillSection)
+      : [];
     const skill = entry.skill ? normalizeSkillEntry(entry.skill) : (skills[0] ?? null);
     const normalized = {
       unitId: entry.unitId,
@@ -3581,34 +4329,69 @@ __define('./data/skills.js', (exports, module, __require) => {
     deepFreeze(normalized);
     acc[entry.unitId] = normalized;
     return acc;
-  }, {});
+  }, /** @type {Record<UnitId, SkillEntry>} */ ({})));
 
   deepFreeze(skillSets);
 
   exports.skillSets = skillSets;
 
+  /**
+   * @param {SkillEntry | null | undefined} entry
+   * @returns {entry is SkillEntry}
+   */
+  function isSkillEntry(entry){
+    return Boolean(entry);
+  }
+
+  /**
+   * @param {SkillSection | null | undefined} entry
+   * @returns {entry is SkillSection}
+   */
+  function isSkillSection(entry){
+    return Boolean(entry);
+  }
+
+  /**
+   * @param {UnitId | null | undefined} unitId
+   * @returns {SkillEntry | null}
+   */
   function getSkillSet(unitId){
     if (!unitId) return null;
     return skillSets[unitId] ?? null;
   }
 
+  /** @returns {SkillEntry[]} */
   function listSkillSets(){
-    return ROSTER.map(unit => skillSets[unit.id]).filter(Boolean);
+    return ROSTER
+      .map(unit => skillSets[unit.id])
+      .filter(isSkillEntry);
   }
 
+  /**
+   * @param {UnitId | null | undefined} unitId
+   * @returns {boolean}
+   */
   function hasSkillSet(unitId){
     return unitId != null && Object.prototype.hasOwnProperty.call(skillSets, unitId);
   }
 
+  /**
+   * @param {unknown} entry
+   * @returns {boolean}
+   */
   function validateSkillSetStructure(entry){
     if (!entry || typeof entry !== 'object') return false;
+    const record = /** @type {Record<string, unknown>} */ (entry);
     for (const key of SKILL_KEYS){
       if (!(key in entry)){
         return false;
       }
     }
-    if (!entry.unitId) return false;
-    if (entry.skills && !Array.isArray(entry.skills)) return false;
+    if (!('unitId' in record) || !record.unitId) return false;
+    if ('skills' in record){
+      const skillsValue = record.skills;
+      if (skillsValue && !Array.isArray(skillsValue)) return false;
+    }
     return true;
   }
 
@@ -3622,7 +4405,52 @@ __define('./data/vfx_anchors/loithienanh.json', (exports, module, __require) => 
   module.exports = data;
   module.exports.default = data;
 });
-__define('./engine.js', (exports, module, __require) => {
+__define('./data/vfx_anchors/schema.ts', (exports, module, __require) => {
+  const __dep0 = __require('./zod');
+  const z = __dep0.z;
+
+
+
+  const AnchorPointSchema = z.object({
+    x: z.number(),
+    y: z.number()
+  });
+
+  const AnchorSchema = z.object({
+    id: z.string(),
+    timing: z.string().optional(),
+    radius: z.number().optional()
+  });
+
+  const BindingSchema = z.object({
+    description: z.string().optional(),
+    anchors: z.array(AnchorSchema)
+  });
+
+  const BindingMapSchema = z.record(BindingSchema);
+
+  const VfxAnchorDatasetSchema = z.object({
+    unitId: z.string(),
+    bodyAnchors: z.record(AnchorPointSchema).optional(),
+    vfxBindings: BindingMapSchema.optional(),
+    ambientEffects: BindingMapSchema.optional()
+  });
+
+  type ParsedDataset = z.infer<typeof VfxAnchorDatasetSchema>;
+
+  const parseVfxAnchorDataset = (input: unknown): VfxAnchorDataset => {
+    const dataset: ParsedDataset = VfxAnchorDatasetSchema.parse(input);
+
+    return {
+      unitId: dataset.unitId,
+      bodyAnchors: dataset.bodyAnchors ?? {},
+      vfxBindings: dataset.vfxBindings ?? {},
+      ambientEffects: dataset.ambientEffects ?? {}
+    };
+  };
+  exports.parseVfxAnchorDataset = parseVfxAnchorDataset;
+});
+__define('./engine.ts', (exports, module, __require) => {
   const __dep0 = __require('./config.js');
   const TOKEN_STYLE = __dep0.TOKEN_STYLE;
   const CHIBI = __dep0.CHIBI;
@@ -3630,33 +4458,170 @@ __define('./engine.js', (exports, module, __require) => {
   const __dep1 = __require('./art.js');
   const getUnitArt = __dep1.getUnitArt;
   const getUnitSkin = __dep1.getUnitSkin;
-  //v0.7.3
+
+
+  type GridSpec = {
+    cols: number;
+    rows: number;
+    tile: number;
+    ox: number;
+    oy: number;
+    w: number;
+    h: number;
+    pad: number;
+    dpr: number;
+    pixelW: number;
+    pixelH: number;
+    pixelArea: number;
+  };
+
+  type CameraOptions = {
+    rowGapRatio?: number;
+    topScale?: number;
+    depthScale?: number;
+  };
+
+  type ProjectionState = {
+    x: number;
+    y: number;
+    scale: number;
+  };
+
+  type ShadowConfig = {
+    color?: string;
+    blur?: number;
+    offsetX?: number;
+    offsetY?: number;
+  };
+
+  type SpriteDescriptor = {
+    src?: string;
+    cacheKey?: string;
+    skinId?: string | null;
+    shadow?: ShadowConfig | null;
+    scale?: number;
+    aspect?: number;
+    anchor?: number;
+  };
+
+  type LayoutConfig = {
+    spriteHeight?: number;
+    spriteAspect?: number;
+    anchor?: number;
+    labelOffset?: number;
+    labelFont?: number;
+  };
+
+  type LabelConfig = {
+    bg?: string;
+    text?: string;
+    stroke?: string;
+  };
+
+  type UnitArtDescriptor = {
+    sprite?: string | SpriteDescriptor | null;
+    layout?: LayoutConfig | null;
+    shape?: string | null;
+    palette?: {
+      primary?: string;
+      secondary?: string;
+      accent?: string;
+      outline?: string;
+    } | null;
+    label?: LabelConfig | false | null;
+    glow?: string;
+    shadow?: ShadowConfig | string | null;
+    size?: number;
+    mirror?: boolean;
+    skinKey?: string | null;
+    [extra: string]: unknown;
+  };
+
+  type TokenWithArt = UnitToken & {
+    art?: UnitArtDescriptor | null;
+    skinKey?: string | null;
+  };
+
+  type SpriteCacheEntry = {
+    status: 'loading' | 'ready' | 'error';
+    img: HTMLImageElement;
+    key: string;
+    src: string;
+    skinId: string | null;
+  };
+
+  type TokenProjectionEntry = {
+    cx: number;
+    cy: number;
+    sig: string;
+    projection: ProjectionState;
+  };
+
+  type TokenVisualEntry = {
+    spriteKey: string | null;
+    spriteEntry: SpriteCacheEntry | null;
+    shadowCfg: ShadowConfig | string | null;
+  };
+
+  type ZoneCodeOptions = {
+    numeric?: boolean;
+  };
+
+  type CellCoords = {
+    cx: number;
+    cy: number;
+  };
+
+  type TokenShadowPreset = 'off' | 'soft' | 'medium' | null;
+
+  type SummonMap = Map<number, QueuedSummonRequest> | null | undefined;
+
+  type SlotSpecifier = Side | keyof typeof SIDE;
+
+  type ChibiProportions = {
+    line: number;
+    headR: number;
+    torso: number;
+    arm: number;
+    leg: number;
+    weapon: number;
+    nameAlpha: number;
+  };
+
+  const DEFAULT_OBLIQUE_CAMERA = {
+    rowGapRatio: 0.62,
+    topScale: 0.8,
+    depthScale: 0.94,
+  } as const satisfies Required<CameraOptions>;
+
+  const CHIBI_PROPS: ChibiProportions = CHIBI as ChibiProportions;
+  const TOKEN_STYLE_VALUE = TOKEN_STYLE as 'chibi' | 'disk';
+
   /* ---------- Grid ---------- */
-  function makeGrid(canvas, cols, rows){
-    const pad = (CFG.UI?.PAD) ?? 12;
-    let viewportW = null;
-    if (typeof window !== 'undefined'){
+  function makeGrid(canvas: HTMLCanvasElement | null | undefined, cols: number, rows: number): GridSpec {
+    const pad = CFG.UI?.PAD ?? 12;
+    let viewportW: number | null = null;
+
+    if (typeof window !== 'undefined') {
       const { innerWidth, visualViewport } = window;
       if (Number.isFinite(innerWidth)) viewportW = viewportW === null ? innerWidth : Math.min(viewportW, innerWidth);
       const vvWidth = visualViewport?.width;
       if (Number.isFinite(vvWidth)) viewportW = viewportW === null ? vvWidth : Math.min(viewportW, vvWidth);
     }
-    if (typeof document !== 'undefined'){
+    if (typeof document !== 'undefined') {
       const docWidth = document.documentElement?.clientWidth;
       if (Number.isFinite(docWidth)) viewportW = viewportW === null ? docWidth : Math.min(viewportW, docWidth);
     }
-    const boardMaxW = (CFG.UI?.BOARD_MAX_W) ?? 900;
+
+    const boardMaxW = CFG.UI?.BOARD_MAX_W ?? 900;
     const viewportSafeW = viewportW === null ? boardMaxW + pad * 2 : viewportW;
     const availableW = Math.max(1, viewportSafeW - pad * 2);
     const w = Math.min(availableW, boardMaxW);
-    const h = Math.max(
-      Math.floor(w * ((CFG.UI?.BOARD_H_RATIO) ?? (3/7))),
-      (CFG.UI?.BOARD_MIN_H) ?? 220
-    );
+    const h = Math.max(Math.floor(w * (CFG.UI?.BOARD_H_RATIO ?? 3 / 7)), CFG.UI?.BOARD_MIN_H ?? 220);
 
     const maxDprCfg = CFG.UI?.MAX_DPR;
     const dprClamp = Number.isFinite(maxDprCfg) && maxDprCfg > 0 ? maxDprCfg : 2;
-    const dprRaw = (typeof window !== 'undefined' && Number.isFinite(window.devicePixelRatio))
+    const dprRaw = typeof window !== 'undefined' && Number.isFinite(window.devicePixelRatio)
       ? window.devicePixelRatio
       : 1;
     const dprSafe = dprRaw > 0 ? dprRaw : 1;
@@ -3668,35 +4633,33 @@ __define('./engine.js', (exports, module, __require) => {
       : 1.5;
 
     let dpr = Math.min(dprClamp, dprSafe);
-    if (lowPowerMode){
+    if (lowPowerMode) {
       dpr = Math.min(dpr, lowPowerDpr);
     }
 
     const displayW = w;
     const displayH = h;
     const maxPixelAreaCfg = CFG.UI?.MAX_PIXEL_AREA;
-    const pixelAreaLimit = Number.isFinite(maxPixelAreaCfg) && maxPixelAreaCfg > 0
-      ? maxPixelAreaCfg
-      : null;
-    if (pixelAreaLimit){
+    const pixelAreaLimit = Number.isFinite(maxPixelAreaCfg) && maxPixelAreaCfg > 0 ? maxPixelAreaCfg : null;
+    if (pixelAreaLimit) {
       const cssArea = displayW * displayH;
-      if (cssArea > 0){
+      if (cssArea > 0) {
         const maxDprByArea = Math.sqrt(pixelAreaLimit / cssArea);
-        if (Number.isFinite(maxDprByArea) && maxDprByArea > 0){
+        if (Number.isFinite(maxDprByArea) && maxDprByArea > 0) {
           dpr = Math.min(dpr, maxDprByArea);
         }
       }
     }
 
-    if (!Number.isFinite(dpr) || dpr <= 0){
+    if (!Number.isFinite(dpr) || dpr <= 0) {
       dpr = 1;
     }
 
-  if (typeof window !== 'undefined'){
+    if (typeof window !== 'undefined') {
       const vvScale = window.visualViewport?.scale;
-      if (Number.isFinite(vvScale) && vvScale > 0){
+      if (Number.isFinite(vvScale) && vvScale > 0) {
         const scaledDpr = dpr * vvScale;
-        if (Number.isFinite(scaledDpr) && scaledDpr > 0){
+        if (Number.isFinite(scaledDpr) && scaledDpr > 0) {
           dpr = Math.min(dpr, scaledDpr);
         }
       }
@@ -3706,8 +4669,8 @@ __define('./engine.js', (exports, module, __require) => {
     const pixelH = Math.max(1, Math.round(displayH * dpr));
     const pixelArea = pixelW * pixelH;
 
-    if (canvas){
-      if (canvas.style){
+    if (canvas) {
+      if (canvas.style) {
         canvas.style.width = `${displayW}px`;
         canvas.style.height = `${displayH}px`;
       }
@@ -3717,184 +4680,264 @@ __define('./engine.js', (exports, module, __require) => {
 
     const usableW = displayW - pad * 2;
     const usableH = displayH - pad * 2;
-
     const tile = Math.floor(Math.min(usableW / cols, usableH / rows));
+    const ox = Math.floor((displayW - tile * cols) / 2);
+    const oy = Math.floor((displayH - tile * rows) / 2);
 
-    const ox = Math.floor((displayW - tile*cols)/2);
-    const oy = Math.floor((displayH - tile*rows)/2);
-    return { cols, rows, tile, ox, oy, w: displayW, h: displayH, pad, dpr, pixelW, pixelH, pixelArea };
+    return {
+      cols,
+      rows,
+      tile,
+      ox,
+      oy,
+      w: displayW,
+      h: displayH,
+      pad,
+      dpr,
+      pixelW,
+      pixelH,
+      pixelArea,
+    };
   }
 
-  function hitToCell(g, px, py){
+  function hitToCell(g: GridSpec, px: number, py: number): CellCoords | null {
     const cx = Math.floor((px - g.ox) / g.tile);
     const cy = Math.floor((py - g.oy) / g.tile);
-    if (cx<0 || cy<0 || cx>=g.cols || cy>=g.rows) return null;
+    if (cx < 0 || cy < 0 || cx >= g.cols || cy >= g.rows) return null;
     return { cx, cy };
   }
 
+  function cellCenter(g: GridSpec, cx: number, cy: number): { x: number; y: number } {
+    const x = g.ox + g.tile * (cx + 0.5);
+    const y = g.oy + g.tile * (cy + 0.5);
+    return { x, y };
+  }
   /* ---------- Tokens ---------- */
-  function drawTokens(ctx, g, tokens){
-    ctx.textAlign='center';
-    ctx.textBaseline='middle';
-    const fs = Math.floor(g.tile*0.28);
+  function drawTokens(ctx: CanvasRenderingContext2D, g: GridSpec, tokens: readonly UnitToken[]): void {
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const fs = Math.floor(g.tile * 0.28);
 
-    tokens.forEach(t=>{
-      const {x,y} = cellCenter(g, t.cx, t.cy);
-      const r = Math.floor(g.tile*0.36);
-      ctx.fillStyle = t.color; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
-      ctx.fillStyle = CFG.COLORS.tokenText; ctx.font = `${fs}px system-ui`;
-      ctx.fillText(t.name, x, y);
+    tokens.forEach((t) => {
+      const { x, y } = cellCenter(g, t.cx, t.cy);
+      const r = Math.floor(g.tile * 0.36);
+      ctx.fillStyle = t.color ?? '#9adcf0';
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = CFG.COLORS.tokenText;
+      ctx.font = `${fs}px system-ui`;
+      ctx.fillText(String(t.name ?? ''), x, y);
     });
   }
 
-  function cellOccupied(tokens, cx, cy){
-    return tokens.some(t => t.cx === cx && t.cy === cy);
+  function cellOccupied(tokens: readonly UnitToken[], cx: number, cy: number): boolean {
+    return tokens.some((t) => t.cx === cx && t.cy === cy);
   }
 
-  // queued: { ally:Map(slot→PendingUnit), enemy:Map(...) }
-  function cellReserved(tokens, queued, cx, cy){
-    // 1) Active đang đứng
+  function isSummonMap(value: SummonMap): value is Map<number, QueuedSummonRequest> {
+    if (!value) return false;
+    if (value instanceof Map) return true;
+    return typeof (value as { values?: unknown }).values === 'function';
+  }
+
+  function cellReserved(tokens: readonly UnitToken[], queued: QueuedSummonState | null | undefined, cx: number, cy: number): boolean {
     if (cellOccupied(tokens, cx, cy)) return true;
-    // 2) Queued (đã trừ cost, đang mờ)
-    if (queued){
-      const checkQ = (m)=> {
-        if (!m || typeof m.values !== 'function') return false;
-        for (const p of m.values()){
-        if (!p) continue;
-          if (p.cx === cx && p.cy === cy) return true;
+    if (queued) {
+      const checkQueue = (m: SummonMap): boolean => {
+        if (!isSummonMap(m)) return false;
+        for (const request of m.values()) {
+          if (!request) continue;
+          if (request.cx === cx && request.cy === cy) return true;
         }
         return false;
       };
-      if (checkQ(queued.ally))  return true;
-      if (checkQ(queued.enemy)) return true;
+      if (checkQueue(queued.ally)) return true;
+      if (checkQueue(queued.enemy)) return true;
     }
     return false;
   }
 
-  function spawnLeaders(tokens, g){
-    // Ally leader ở (0,1), Enemy leader ở (6,1)
-    const artAlly = getUnitArt('leaderA');
-    const artEnemy = getUnitArt('leaderB');
-    tokens.push({ id:'leaderA', name:'Uyên', color:'#6cc8ff', cx:0, cy:1, side:'ally', alive:true, art: artAlly, skinKey: artAlly?.skinKey });
-    tokens.push({ id:'leaderB', name:'Địch', color:'#ff9aa0', cx:g.cols-1, cy:1, side:'enemy', alive:true, art: artEnemy, skinKey: artEnemy?.skinKey });
+  function spawnLeaders(tokens: TokenWithArt[], g: GridSpec): void {
+    const artAlly = getUnitArt('leaderA') as UnitArtDescriptor | null;
+    const artEnemy = getUnitArt('leaderB') as UnitArtDescriptor | null;
+    tokens.push({
+      id: 'leaderA',
+      name: 'Uyên',
+      color: '#6cc8ff',
+      cx: 0,
+      cy: 1,
+      side: 'ally',
+      alive: true,
+      art: artAlly,
+      skinKey: artAlly?.skinKey ?? null,
+    });
+    tokens.push({
+      id: 'leaderB',
+      name: 'Địch',
+      color: '#ff9aa0',
+      cx: g.cols - 1,
+      cy: 1,
+      side: 'enemy',
+      alive: true,
+      art: artEnemy,
+      skinKey: artEnemy?.skinKey ?? null,
+    });
   }
 
   /* ---------- Helper ---------- */
-  function pickRandom(pool, excludeSet, n = 4){
-    const remain = pool.filter(u => !excludeSet.has(u.id));
-    for (let i=remain.length-1;i>0;i--){
-     const j = (Math.random()*(i+1))|0; const t = remain[i]; remain[i]=remain[j]; remain[j]=t;
-   }
-   return remain.slice(0, n);
-  }
-  // Giữ alias cũ (nếu có file nào khác còn import)
-  const pick3Random = (pool, ex) => pickRandom(pool, ex, 3);
-  // === Grid nghiêng kiểu hình thang (không bị crop) ===
+  function pickRandom<T>(pool: readonly T[], excludeSet: ReadonlySet<string>, n = 4): T[] {
+    const remain = pool.filter((u) => {
+      if (u && typeof u === 'object') {
+        const candidate = u as { id?: unknown };
+        const id = candidate.id;
+        if (id !== undefined && id !== null) {
+          return !excludeSet.has(String(id));
+        }
+        return true;
+      }
+      if (typeof u === 'string') {
+        return !excludeSet.has(u);
+      }
+      return true;
+    });
 
-  // Biên trái/phải của một "đường hàng" r (cho phép số thực)
-  // r = 0 là đỉnh trên, r = g.rows là đáy
-  function _rowLR(g, r, C){
+    for (let i = remain.length - 1; i > 0; i--) {
+      const j = (Math.random() * (i + 1)) | 0;
+      const temp = remain[i];
+      remain[i] = remain[j];
+      remain[j] = temp;
+    }
+    return remain.slice(0, n);
+  }
+
+  const pick3Random = <T>(pool: readonly T[], excludeSet: ReadonlySet<string>): T[] => pickRandom(pool, excludeSet, 3);
+  /* ---------- Oblique grid helpers ---------- */
+  function rowLR(g: GridSpec, r: number, C: CameraOptions): { left: number; right: number } {
     const colsW = g.tile * g.cols;
-    const topScale = C.topScale ?? 0.80;           // 0.75..0.90
-    const pinch = (1 - topScale) * colsW;          // lượng "bóp" ở đỉnh
-    const t = r / g.rows;                           // 0..1 từ trên xuống dưới
-    const width = colsW - pinch * (1 - t);         // càng lên trên càng hẹp
-    const left  = g.ox + (colsW - width) / 2;      // cân giữa
+    const topScale = C.topScale ?? 0.8;
+    const pinch = (1 - topScale) * colsW;
+    const t = r / g.rows;
+    const width = colsW - pinch * (1 - t);
+    const left = g.ox + (colsW - width) / 2;
     const right = left + width;
     return { left, right };
   }
 
-  function drawGridOblique(ctx, g, cam, opts = {}){
-    const C = cam || { rowGapRatio:0.62, topScale:0.80, depthScale:0.94 };
-    const colors = Object.assign({}, CFG.COLORS, opts.colors||{});
+  function drawGridOblique(
+    ctx: CanvasRenderingContext2D,
+    g: GridSpec,
+    cam: CameraOptions | null | undefined,
+    opts: { colors?: Partial<Record<'ally' | 'enemy' | 'mid' | 'line', string>> } = {},
+  ): void {
+    const C = cam ?? DEFAULT_OBLIQUE_CAMERA;
+    const colors = {
+      ally: CFG.COLORS.ally,
+      enemy: CFG.COLORS.enemy,
+      mid: CFG.COLORS.mid,
+      line: CFG.COLORS.line,
+      ...(opts.colors ?? {}),
+    } satisfies Record<'ally' | 'enemy' | 'mid' | 'line', string>;
     const rowGap = (C.rowGapRatio ?? 0.62) * g.tile;
 
-    for (let cy=0; cy<g.rows; cy++){
-      const yTop = g.oy + cy*rowGap;
-      const yBot = g.oy + (cy+1)*rowGap;
-      const LRt = _rowLR(g, cy,   C);
-      const LRb = _rowLR(g, cy+1, C);
+    for (let cy = 0; cy < g.rows; cy++) {
+      const yTop = g.oy + cy * rowGap;
+      const yBot = g.oy + (cy + 1) * rowGap;
+      const LRt = rowLR(g, cy, C);
+      const LRb = rowLR(g, cy + 1, C);
 
-      for (let cx=0; cx<g.cols; cx++){
-        // chia đều theo tỉ lệ trên mỗi cạnh
-        const xtL = LRt.left +  (cx    / g.cols) * (LRt.right - LRt.left);
-        const xtR = LRt.left +  ((cx+1)/ g.cols) * (LRt.right - LRt.left);
-        const xbL = LRb.left +  (cx    / g.cols) * (LRb.right - LRb.left);
-        const xbR = LRb.left +  ((cx+1)/ g.cols) * (LRb.right - LRb.left);
+      for (let cx = 0; cx < g.cols; cx++) {
+        const xtL = LRt.left + (cx / g.cols) * (LRt.right - LRt.left);
+        const xtR = LRt.left + ((cx + 1) / g.cols) * (LRt.right - LRt.left);
+        const xbL = LRb.left + (cx / g.cols) * (LRb.right - LRb.left);
+        const xbR = LRb.left + ((cx + 1) / g.cols) * (LRb.right - LRb.left);
 
-        // màu theo phe
-        let fill;
+        let fill: string;
         if (cx < CFG.ALLY_COLS) fill = colors.ally;
         else if (cx >= g.cols - CFG.ENEMY_COLS) fill = colors.enemy;
         else fill = colors.mid;
 
         ctx.beginPath();
-        ctx.moveTo(xtL, yTop);   // TL
-        ctx.lineTo(xtR, yTop);   // TR
-        ctx.lineTo(xbR, yBot);   // BR
-        ctx.lineTo(xbL, yBot);   // BL
+        ctx.moveTo(xtL, yTop);
+        ctx.lineTo(xtR, yTop);
+        ctx.lineTo(xbR, yBot);
+        ctx.lineTo(xbL, yBot);
         ctx.closePath();
-        ctx.fillStyle = fill; ctx.fill();
-        ctx.strokeStyle = colors.line; ctx.lineWidth = 1; ctx.stroke();
+        ctx.fillStyle = fill;
+        ctx.fill();
+        ctx.strokeStyle = colors.line;
+        ctx.lineWidth = 1;
+        ctx.stroke();
       }
     }
   }
 
-  // Hit-test ngược theo hình thang
-  function hitToCellOblique(g, px, py, cam){
-    const C = cam || { rowGapRatio:0.62, topScale:0.80 };
+  function hitToCellOblique(g: GridSpec, px: number, py: number, cam: CameraOptions | null | undefined): CellCoords | null {
+    const C = cam ?? DEFAULT_OBLIQUE_CAMERA;
     const rowGap = (C.rowGapRatio ?? 0.62) * g.tile;
 
-    const r = (py - g.oy) / rowGap;           // chỉ số hàng dạng thực
+    const r = (py - g.oy) / rowGap;
     if (r < 0 || r >= g.rows) return null;
 
-    const LR = _rowLR(g, r, C);
-    const u = (px - LR.left) / (LR.right - LR.left);  // 0..1 trên bề ngang tại hàng r
+    const LR = rowLR(g, r, C);
+    const u = (px - LR.left) / (LR.right - LR.left);
     if (u < 0 || u >= 1) return null;
 
     const cx = Math.floor(u * g.cols);
     const cy = Math.floor(r);
     return { cx, cy };
   }
-  // Bốn đỉnh của ô (cx,cy) trong lưới hình thang + tâm ô
-  function _cellQuadOblique(g, cx, cy, C){
+
+  function cellQuadOblique(g: GridSpec, cx: number, cy: number, C: CameraOptions): {
+    xtL: number;
+    xtR: number;
+    xbL: number;
+    xbR: number;
+    yTop: number;
+    yBot: number;
+  } {
     const rowGap = (C.rowGapRatio ?? 0.62) * g.tile;
     const yTop = g.oy + cy * rowGap;
     const yBot = yTop + rowGap;
-    const LRt = _rowLR(g, cy,   C);
-    const LRb = _rowLR(g, cy+1, C);
+    const LRt = rowLR(g, cy, C);
+    const LRb = rowLR(g, cy + 1, C);
 
-    const xtL = LRt.left +  (cx    / g.cols) * (LRt.right - LRt.left);
-    const xtR = LRt.left +  ((cx+1)/ g.cols) * (LRt.right - LRt.left);
-    const xbL = LRb.left +  (cx    / g.cols) * (LRb.right - LRb.left);
-    const xbR = LRb.left +  ((cx+1)/ g.cols) * (LRb.right - LRb.left);
+    const xtL = LRt.left + (cx / g.cols) * (LRt.right - LRt.left);
+    const xtR = LRt.left + ((cx + 1) / g.cols) * (LRt.right - LRt.left);
+    const xbL = LRb.left + (cx / g.cols) * (LRb.right - LRb.left);
+    const xbR = LRb.left + ((cx + 1) / g.cols) * (LRb.right - LRb.left);
     return { xtL, xtR, xbL, xbR, yTop, yBot };
   }
 
-  function _cellCenterOblique(g, cx, cy, C){
-    const q = _cellQuadOblique(g, cx, cy, C);
+  function cellCenterOblique(g: GridSpec, cx: number, cy: number, C: CameraOptions): { x: number; y: number } {
+    const q = cellQuadOblique(g, cx, cy, C);
     const x = (q.xtL + q.xtR + q.xbL + q.xbR) / 4;
     const y = (q.yTop + q.yBot) / 2;
     return { x, y };
   }
 
-  // --- Optional oblique rendering (non-breaking) ---
-  function projectCellOblique(g, cx, cy, cam){
-    const C = cam || {};
-    const { x, y } = _cellCenterOblique(g, cx, cy, C);
-    const k      =  (C.depthScale ?? 0.94);
-    // cy: 0=trên (xa), 2=dưới (gần)
-    const depth  = (g.rows - 1 - cy);
-    const scale  = Math.pow(k, depth);
+  function projectCellOblique(g: GridSpec, cx: number, cy: number, cam: CameraOptions | null | undefined): ProjectionState {
+    const C = cam ?? {};
+    const { x, y } = cellCenterOblique(g, cx, cy, C);
+    const k = C.depthScale ?? 0.94;
+    const depth = g.rows - 1 - cy;
+    const scale = Math.pow(k, depth);
     return { x, y, scale };
   }
-  function drawChibi(ctx, x, y, r, facing = 1, color = '#a9f58c') {
-    const lw = Math.max(CHIBI.line, Math.floor(r * 0.28));
-    const hr = Math.max(3, Math.floor(r * CHIBI.headR));
-    const torso = r * CHIBI.torso;
-    const arm = r * CHIBI.arm;
-    const leg = r * CHIBI.leg;
-    const wep = r * CHIBI.weapon;
+  function drawChibi(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    r: number,
+    facing: number = 1,
+    color: string = '#a9f58c',
+  ): void {
+    const lw = Math.max(CHIBI_PROPS.line, Math.floor(r * 0.28));
+    const hr = Math.max(3, Math.floor(r * CHIBI_PROPS.headR));
+    const torso = r * CHIBI_PROPS.torso;
+    const arm = r * CHIBI_PROPS.arm;
+    const leg = r * CHIBI_PROPS.leg;
+    const wep = r * CHIBI_PROPS.weapon;
 
     ctx.save();
     ctx.translate(x, y);
@@ -3904,26 +4947,22 @@ __define('./engine.js', (exports, module, __require) => {
     ctx.fillStyle = color;
     ctx.lineWidth = lw;
 
-    // đầu
     ctx.beginPath();
     ctx.arc(0, -torso - hr, hr, 0, Math.PI * 2);
     ctx.stroke();
 
-    // thân
     ctx.beginPath();
     ctx.moveTo(0, -torso);
     ctx.lineTo(0, 0);
     ctx.stroke();
 
-    // tay
     ctx.beginPath();
     ctx.moveTo(0, -torso * 0.6);
-    ctx.lineTo(-arm * 0.8, -torso * 0.2);             // tay sau
+    ctx.lineTo(-arm * 0.8, -torso * 0.2);
     ctx.moveTo(0, -torso * 0.6);
-    ctx.lineTo(arm * 0.8 * facing, -torso * 0.2);     // tay cầm kiếm
+    ctx.lineTo(arm * 0.8 * facing, -torso * 0.2);
     ctx.stroke();
 
-    // chân
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.lineTo(-leg * 0.6, leg * 0.9);
@@ -3931,8 +4970,8 @@ __define('./engine.js', (exports, module, __require) => {
     ctx.lineTo(leg * 0.6, leg * 0.9);
     ctx.stroke();
 
-    // kiếm
-    const hx = arm * 0.8 * facing, hy = -torso * 0.2;
+    const hx = arm * 0.8 * facing;
+    const hy = -torso * 0.2;
     ctx.beginPath();
     ctx.moveTo(hx, hy);
     ctx.lineTo(hx + wep * facing, hy);
@@ -3941,120 +4980,141 @@ __define('./engine.js', (exports, module, __require) => {
     ctx.restore();
   }
 
-  const SPRITE_CACHE = new Map();
+  const SPRITE_CACHE = new Map<string, SpriteCacheEntry>();
   const ART_SPRITE_EVENT = 'unit-art:sprite-loaded';
 
-  const TOKEN_PROJECTION_CACHE = new WeakMap();
-  const TOKEN_VISUAL_CACHE = new Map();
+  const TOKEN_PROJECTION_CACHE = new WeakMap<UnitToken, TokenProjectionEntry>();
+  const TOKEN_VISUAL_CACHE = new Map<string, TokenVisualEntry>();
 
-  function contextSignature(g, cam){
-    const C = cam || {};
+  function contextSignature(g: GridSpec, cam: CameraOptions | null | undefined): string {
+    const C = cam ?? {};
     return [
-      g.cols, g.rows, g.tile, g.ox, g.oy,
+      g.cols,
+      g.rows,
+      g.tile,
+      g.ox,
+      g.oy,
       C.rowGapRatio ?? 0.62,
-      C.topScale ?? 0.80,
-      C.depthScale ?? 0.94
+      C.topScale ?? 0.8,
+      C.depthScale ?? 0.94,
     ].join('|');
   }
 
-  function warnInvalidToken(context, token){
+  function warnInvalidToken(context: string, token: unknown): void {
     if (!CFG.DEBUG) return;
     try {
       console.warn(`[engine] ${context}: expected token object but received`, token);
-    } catch(_){}
+    } catch (_err) {
+      // ignore logging errors
+    }
   }
 
-  function getTokenProjection(token, g, cam, sig){
-    if (!token){
+  function getTokenProjection(
+    token: UnitToken | null | undefined,
+    g: GridSpec,
+    cam: CameraOptions | null | undefined,
+    sig: string,
+  ): ProjectionState | null {
+    if (!token) {
       return null;
     }
-    if (typeof token !== 'object' || token === null){
+    if (typeof token !== 'object') {
       warnInvalidToken('getTokenProjection', token);
       return null;
     }
     let entry = TOKEN_PROJECTION_CACHE.get(token);
-    if (!entry || entry.cx !== token.cx || entry.cy !== token.cy || entry.sig !== sig){
+    if (!entry || entry.cx !== token.cx || entry.cy !== token.cy || entry.sig !== sig) {
       const projection = projectCellOblique(g, token.cx, token.cy, cam);
       entry = {
         cx: token.cx,
         cy: token.cy,
         sig,
-        projection
+        projection,
       };
       TOKEN_PROJECTION_CACHE.set(token, entry);
     }
     return entry.projection;
   }
 
-  function clearTokenCaches(token){
-    if (!token){
+  function clearTokenCaches(token: UnitToken | null | undefined): void {
+    if (!token) {
       return;
     }
-    if (typeof token !== 'object' || token === null){
+    if (typeof token !== 'object') {
       warnInvalidToken('clearTokenCaches', token);
       return;
     }
     TOKEN_PROJECTION_CACHE.delete(token);
-    const skinKey = token.skinKey ?? null;
+    const skinKey = (token as TokenWithArt).skinKey ?? null;
     const cacheKey = `${token.id ?? '__anon__'}::${skinKey ?? ''}`;
     TOKEN_VISUAL_CACHE.delete(cacheKey);
   }
 
-  function getTokenVisual(token, art){
-    if (!token) return { spriteEntry: null, shadowCfg: null };
+  function normalizeSpriteDescriptor(sprite: UnitArtDescriptor['sprite']): SpriteDescriptor | null {
+    if (!sprite) return null;
+    if (typeof sprite === 'string') {
+      return { src: sprite };
+    }
+    return sprite;
+  }
+
+  function getTokenVisual(token: TokenWithArt | null | undefined, art: UnitArtDescriptor | null | undefined): TokenVisualEntry {
+    if (!token) {
+      return { spriteKey: null, spriteEntry: null, shadowCfg: null };
+    }
     const skinKey = art?.skinKey ?? token.skinKey ?? null;
     const cacheKey = `${token.id ?? '__anon__'}::${skinKey ?? ''}`;
-    const spriteCfg = art?.sprite || {};
-    const descriptor = typeof spriteCfg === 'string' ? { src: spriteCfg } : spriteCfg;
+    const descriptor = normalizeSpriteDescriptor(art?.sprite);
     const spriteSrc = descriptor?.src ?? null;
     const spriteKey = descriptor?.cacheKey || (spriteSrc ? `${spriteSrc}::${descriptor?.skinId ?? skinKey ?? ''}` : null);
 
     let entry = TOKEN_VISUAL_CACHE.get(cacheKey);
-    if (!entry || entry.spriteKey !== spriteKey){
+    if (!entry || entry.spriteKey !== spriteKey) {
       const spriteEntry = spriteSrc ? ensureSpriteLoaded(art) : null;
       const shadowCfg = descriptor?.shadow ?? art?.shadow ?? null;
       entry = {
         spriteKey,
         spriteEntry,
-        shadowCfg
+        shadowCfg,
       };
       TOKEN_VISUAL_CACHE.set(cacheKey, entry);
     }
     return entry;
   }
 
-  function ensureTokenArt(token){
+  function ensureTokenArt(token: TokenWithArt | null | undefined): UnitArtDescriptor | null {
     if (!token) return null;
     const desiredSkin = getUnitSkin(token.id);
-    if (!token.art || token.skinKey !== desiredSkin){
-      const art = getUnitArt(token.id, { skinKey: desiredSkin });
+    if (!token.art || token.skinKey !== desiredSkin) {
+      const art = getUnitArt(token.id, { skinKey: desiredSkin }) as UnitArtDescriptor | null;
       token.art = art;
       token.skinKey = art?.skinKey ?? desiredSkin ?? null;
     }
-    return token.art;
+    return token.art ?? null;
   }
-
-  function ensureSpriteLoaded(art){
+  function ensureSpriteLoaded(art: UnitArtDescriptor | null | undefined): SpriteCacheEntry | null {
     if (!art || !art.sprite || typeof Image === 'undefined') return null;
-    const descriptor = typeof art.sprite === 'string' ? { src: art.sprite } : art.sprite;
+    const descriptor = normalizeSpriteDescriptor(art.sprite);
     if (!descriptor || !descriptor.src) return null;
     const skinId = descriptor.skinId ?? art.skinKey ?? null;
     const key = descriptor.cacheKey || `${descriptor.src}::${skinId ?? ''}`;
     let entry = SPRITE_CACHE.get(key);
-    if (!entry){
+    if (!entry) {
       const img = new Image();
       entry = { status: 'loading', img, key, src: descriptor.src, skinId };
-      if ('decoding' in img) img.decoding = 'async';
-      img.onload = ()=>{
-        entry.status = 'ready';
-        if (typeof window !== 'undefined'){
+      if ('decoding' in img) (img as HTMLImageElement & { decoding?: string }).decoding = 'async';
+      img.onload = () => {
+        entry!.status = 'ready';
+        if (typeof window !== 'undefined') {
           try {
             window.dispatchEvent(new Event(ART_SPRITE_EVENT));
-          } catch(_){}
+          } catch (_err) {
+            // ignore
+          }
         }
       };
-      img.onerror = ()=>{
-        entry.status = 'error';
+      img.onerror = () => {
+        entry!.status = 'error';
       };
       img.src = descriptor.src;
       SPRITE_CACHE.set(key, entry);
@@ -4062,23 +5122,29 @@ __define('./engine.js', (exports, module, __require) => {
     return entry;
   }
 
-  function drawStylizedShape(ctx, width, height, anchor, art){
-    const palette = art?.palette || {};
-    const primary = palette.primary || '#86c4ff';
-    const secondary = palette.secondary || '#1f3242';
-    const accent = palette.accent || '#d2f4ff';
-    const outline = palette.outline || 'rgba(0,0,0,0.55)';
+  function drawStylizedShape(
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    anchor: number,
+    art: UnitArtDescriptor | null | undefined,
+  ): void {
+    const palette = art?.palette ?? {};
+    const primary = palette.primary ?? '#86c4ff';
+    const secondary = palette.secondary ?? '#1f3242';
+    const accent = palette.accent ?? '#d2f4ff';
+    const outline = palette.outline ?? 'rgba(0,0,0,0.55)';
     const top = -height * anchor;
     const bottom = height - height * anchor;
     const halfW = width / 2;
-    const shape = art?.shape || 'sentinel';
+    const shape = art?.shape ?? 'sentinel';
     const gradient = ctx.createLinearGradient(0, top, 0, bottom);
     gradient.addColorStop(0, primary);
     gradient.addColorStop(1, secondary);
 
     ctx.save();
     ctx.beginPath();
-    switch(shape){
+    switch (shape) {
       case 'wing': {
         ctx.moveTo(-halfW * 0.92, bottom * 0.35);
         ctx.quadraticCurveTo(-halfW * 1.05, top + height * 0.1, 0, top);
@@ -4137,7 +5203,7 @@ __define('./engine.js', (exports, module, __require) => {
     ctx.restore();
   }
 
-  function roundedRectPath(ctx, x, y, w, h, radius){
+  function roundedRectPath(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, radius: number): void {
     const r = Math.min(radius, w / 2, h / 2);
     ctx.beginPath();
     ctx.moveTo(x + r, y);
@@ -4152,20 +5218,27 @@ __define('./engine.js', (exports, module, __require) => {
     ctx.closePath();
   }
 
-  function formatName(text){
+  function formatName(text: string | undefined): string {
     if (!text) return '';
     const str = String(text);
     if (str.length <= 16) return str;
     return `${str.slice(0, 15)}…`;
   }
 
-  const nameplateMetricsCache = new Map();
+  const nameplateMetricsCache = new Map<string, { width: number; height: number }>();
   let nameplateCacheFontSignature = '';
 
-  function drawNameplate(ctx, text, x, y, r, art){
+  function drawNameplate(
+    ctx: CanvasRenderingContext2D,
+    text: string,
+    x: number,
+    y: number,
+    r: number,
+    art: UnitArtDescriptor | null | undefined,
+  ): void {
     if (!text) return;
-    const layout = art?.layout || {};
-    const fontSize = Math.max(11, Math.floor(r * (layout.labelFont || 0.7)));
+    const layout: LayoutConfig = art?.layout ?? {};
+    const fontSize = Math.max(11, Math.floor(r * (layout.labelFont ?? 0.7)));
     const padX = Math.max(8, Math.floor(fontSize * 0.6));
     const padY = Math.max(4, Math.floor(fontSize * 0.35));
     ctx.save();
@@ -4175,17 +5248,17 @@ __define('./engine.js', (exports, module, __require) => {
     ctx.font = font;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    if (font !== nameplateCacheFontSignature){
+    if (font !== nameplateCacheFontSignature) {
       nameplateMetricsCache.clear();
       nameplateCacheFontSignature = font;
     }
     const key = `${fontSize}|${text}`;
     let cached = nameplateMetricsCache.get(key);
-    if (!cached){
+    if (!cached) {
       const metrics = ctx.measureText(text);
       cached = {
         width: Math.ceil(metrics.width + padX * 2),
-        height: Math.ceil(fontSize + padY * 2)
+        height: Math.ceil(fontSize + padY * 2),
       };
       nameplateMetricsCache.set(key, cached);
     }
@@ -4194,30 +5267,38 @@ __define('./engine.js', (exports, module, __require) => {
     const boxX = Math.round(x - width / 2);
     const boxY = Math.round(y - height / 2);
     roundedRectPath(ctx, boxX, boxY, width, height, radius);
-    ctx.fillStyle = art?.label?.bg || 'rgba(12,20,30,0.82)';
+    const label = art?.label;
+    const bgColor = (label && typeof label === 'object' && label.bg) || 'rgba(12,20,30,0.82)';
+    ctx.fillStyle = bgColor;
     ctx.fill();
-    if (art?.label?.stroke){
-      ctx.strokeStyle = art.label.stroke;
+    if (label && typeof label === 'object' && label.stroke) {
+      ctx.strokeStyle = label.stroke;
       ctx.lineWidth = 1;
       ctx.stroke();
     }
-    ctx.fillStyle = art?.label?.text || '#f4f8ff';
+    const textColor = (label && typeof label === 'object' && label.text) || '#f4f8ff';
+    ctx.fillStyle = textColor;
     ctx.fillText(text, x, boxY + height / 2);
     ctx.restore();
-    }
-  function drawTokensOblique(ctx, g, tokens, cam){
-    const C = cam || { rowGapRatio: 0.62, topScale: 0.80, depthScale: 0.94 };
+  }
+  function drawTokensOblique(
+    ctx: CanvasRenderingContext2D,
+    g: GridSpec,
+    tokens: readonly TokenWithArt[],
+    cam: CameraOptions | null | undefined,
+  ): void {
+    const C = cam ?? DEFAULT_OBLIQUE_CAMERA;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
     const baseR = Math.floor(g.tile * 0.36);
     const sig = contextSignature(g, C);
 
-  const alive = [];
-    for (const token of tokens){
-      if (!token || !token.alive){
-        if (token && !token.alive){
-          if (typeof token === 'object' && token !== null){
+    const alive: Array<{ token: TokenWithArt; projection: ProjectionState }> = [];
+    for (const token of tokens) {
+      if (!token || !token.alive) {
+        if (token && !token.alive) {
+          if (typeof token === 'object') {
             clearTokenCaches(token);
           } else {
             warnInvalidToken('drawTokensOblique', token);
@@ -4230,79 +5311,91 @@ __define('./engine.js', (exports, module, __require) => {
       alive.push({ token, projection });
     }
 
-    alive.sort((a, b)=>{
+    alive.sort((a, b) => {
       const ya = a.projection.y;
       const yb = b.projection.y;
       if (ya === yb) return a.token.cx - b.token.cx;
       return ya - yb;
     });
+
     const perfCfg = CFG?.PERFORMANCE || {};
-    const normalizePreset = (value, fallback = null)=>{
+    const normalizePreset = (value: unknown, fallback: TokenShadowPreset = null): TokenShadowPreset => {
       if (value === 'off' || value === 'soft' || value === 'medium') return value;
       return fallback;
     };
     const mediumThreshold = Number.isFinite(perfCfg.SHADOW_MEDIUM_THRESHOLD)
-      ? perfCfg.SHADOW_MEDIUM_THRESHOLD
+      ? (perfCfg.SHADOW_MEDIUM_THRESHOLD as number)
       : null;
     const shadowThreshold = Number.isFinite(perfCfg.SHADOW_DISABLE_THRESHOLD)
-      ? perfCfg.SHADOW_DISABLE_THRESHOLD
+      ? (perfCfg.SHADOW_DISABLE_THRESHOLD as number)
       : null;
     const highDprCutoff = Number.isFinite(perfCfg.SHADOW_HIGH_DPR_CUTOFF)
-      ? perfCfg.SHADOW_HIGH_DPR_CUTOFF
+      ? (perfCfg.SHADOW_HIGH_DPR_CUTOFF as number)
       : null;
     const gridDpr = Number.isFinite(g?.dpr) ? g.dpr : null;
 
-    let shadowPreset = null;
-    if (perfCfg.LOW_POWER_SHADOWS){
+    let shadowPreset: TokenShadowPreset = null;
+    if (perfCfg.LOW_POWER_SHADOWS) {
       shadowPreset = normalizePreset(perfCfg.LOW_SHADOW_PRESET, 'off');
     } else {
-      if (!shadowPreset && highDprCutoff !== null && gridDpr !== null && gridDpr >= highDprCutoff){
+      if (!shadowPreset && highDprCutoff !== null && gridDpr !== null && gridDpr >= highDprCutoff) {
         shadowPreset = normalizePreset(perfCfg.HIGH_DPR_SHADOW_PRESET, 'off');
       }
-      if (!shadowPreset && shadowThreshold !== null && alive.length >= shadowThreshold){
-        shadowPreset = normalizePreset(perfCfg.HIGH_LOAD_SHADOW_PRESET, normalizePreset(perfCfg.LOW_SHADOW_PRESET, 'off'));
+      if (!shadowPreset && shadowThreshold !== null && alive.length >= shadowThreshold) {
+        shadowPreset = normalizePreset(
+          perfCfg.HIGH_LOAD_SHADOW_PRESET,
+          normalizePreset(perfCfg.LOW_SHADOW_PRESET, 'off'),
+        );
       }
-      if (!shadowPreset && mediumThreshold !== null && alive.length >= mediumThreshold){
+      if (!shadowPreset && mediumThreshold !== null && alive.length >= mediumThreshold) {
         shadowPreset = normalizePreset(perfCfg.MEDIUM_SHADOW_PRESET, 'medium');
       }
     }
-    const reduceShadows = !!shadowPreset;
-    for (const { token: t, projection: p } of alive){
+    const reduceShadows = shadowPreset !== null;
+
+    for (const { token: t, projection: p } of alive) {
       const scale = p.scale ?? 1;
       const r = Math.max(6, Math.floor(baseR * scale));
-      const facing = (t.side === 'ally') ? 1 : -1;
+      const facing = t.side === 'ally' ? 1 : -1;
 
       const art = ensureTokenArt(t);
-      const layout = art?.layout || {};
-      const spriteCfgRaw = art?.sprite;
-      const spriteCfg = typeof spriteCfgRaw === 'string' ? { src: spriteCfgRaw } : (spriteCfgRaw || {});
-      const spriteHeightMult = layout.spriteHeight || 2.4;
-      const spriteScale = Number.isFinite(spriteCfg.scale) ? spriteCfg.scale : 1;
-      const spriteHeight = r * spriteHeightMult * ((art?.size) ?? 1) * spriteScale;
-      const spriteAspect = (Number.isFinite(spriteCfg.aspect) ? spriteCfg.aspect : null) || layout.spriteAspect || 0.78;
+      const layout: LayoutConfig = art?.layout ?? {};
+      const spriteCfg = normalizeSpriteDescriptor(art?.sprite) ?? {};
+      const spriteHeightMult = layout.spriteHeight ?? 2.4;
+      const spriteScale = Number.isFinite(spriteCfg.scale) ? spriteCfg.scale! : 1;
+      const spriteHeight = r * spriteHeightMult * (art?.size ?? 1) * spriteScale;
+      const spriteAspect = (Number.isFinite(spriteCfg.aspect) ? spriteCfg.aspect! : null) ?? layout.spriteAspect ?? 0.78;
       const spriteWidth = spriteHeight * spriteAspect;
-      const anchor = Number.isFinite(spriteCfg.anchor) ? spriteCfg.anchor : (layout.anchor ?? 0.78);
+      const anchor = Number.isFinite(spriteCfg.anchor) ? spriteCfg.anchor! : layout.anchor ?? 0.78;
       const hasRichArt = !!(art && ((spriteCfg && spriteCfg.src) || art.shape));
 
-      if (hasRichArt){
+      if (hasRichArt) {
         const { spriteEntry, shadowCfg } = getTokenVisual(t, art);
-        const spriteReady = spriteEntry && spriteEntry.status === 'ready' && spriteEntry.img;
+        const spriteReady = !!(spriteEntry && spriteEntry.status === 'ready' && spriteEntry.img);
         ctx.save();
         ctx.translate(p.x, p.y);
         if (facing === -1 && art?.mirror !== false) ctx.scale(-1, 1);
-        const shadow = shadowCfg || {};
-        let shadowColor = shadow.color || art?.glow || art?.shadow || 'rgba(0,0,0,0.35)';
-        let shadowBlur = Number.isFinite(shadow.blur) ? shadow.blur : Math.max(6, r * 0.7);
-        let shadowOffsetX = Number.isFinite(shadow.offsetX) ? shadow.offsetX : 0;
-        let shadowOffsetY = Number.isFinite(shadow.offsetY) ? shadow.offsetY : Math.max(2, r * 0.2);
-        if (reduceShadows){
+
+        const rawShadow = shadowCfg ?? art?.shadow ?? null;
+        const shadowObject: ShadowConfig = rawShadow && typeof rawShadow === 'object' ? rawShadow : {};
+        const shadowColorFallback = typeof rawShadow === 'string'
+          ? rawShadow
+          : typeof art?.shadow === 'string'
+            ? art.shadow
+            : undefined;
+        let shadowColor = shadowObject.color ?? art?.glow ?? shadowColorFallback ?? 'rgba(0,0,0,0.35)';
+        let shadowBlur = Number.isFinite(shadowObject.blur) ? shadowObject.blur! : Math.max(6, r * 0.7);
+        let shadowOffsetX = Number.isFinite(shadowObject.offsetX) ? shadowObject.offsetX! : 0;
+        let shadowOffsetY = Number.isFinite(shadowObject.offsetY) ? shadowObject.offsetY! : Math.max(2, r * 0.2);
+
+        if (reduceShadows) {
           const cheap = shadowPreset;
-          if (cheap === 'soft'){ // giữ chút bóng nhẹ nhàng
+          if (cheap === 'soft') {
             shadowColor = 'rgba(0, 0, 0, 0.18)';
             shadowBlur = Math.min(6, shadowBlur * 0.4);
             shadowOffsetX = 0;
             shadowOffsetY = Math.min(4, Math.max(1, shadowOffsetY * 0.4));
-          } else if (cheap === 'medium'){
+          } else if (cheap === 'medium') {
             shadowColor = 'rgba(0, 0, 0, 0.24)';
             shadowBlur = Math.min(10, Math.max(2, shadowBlur * 0.6));
             shadowOffsetX = 0;
@@ -4314,104 +5407,106 @@ __define('./engine.js', (exports, module, __require) => {
             shadowOffsetY = 0;
           }
         }
+
         ctx.shadowColor = shadowColor;
         ctx.shadowBlur = shadowBlur;
         ctx.shadowOffsetX = shadowOffsetX;
         ctx.shadowOffsetY = shadowOffsetY;
-        if (spriteReady){
-          ctx.drawImage(spriteEntry.img, -spriteWidth/2, -spriteHeight*anchor, spriteWidth, spriteHeight);
+        if (spriteReady && spriteEntry) {
+          ctx.drawImage(spriteEntry.img, -spriteWidth / 2, -spriteHeight * anchor, spriteWidth, spriteHeight);
         } else {
           drawStylizedShape(ctx, spriteWidth, spriteHeight, anchor, art);
         }
         ctx.restore();
-        } else if (TOKEN_STYLE === 'chibi') {
+      } else if (TOKEN_STYLE_VALUE === 'chibi') {
         drawChibi(ctx, p.x, p.y, r, facing, t.color || '#9adcf0');
-    } else {
+      } else {
         ctx.fillStyle = t.color || '#9adcf0';
         ctx.beginPath();
-        ctx.arc(p.x, p.y, r, 0, Math.PI*2);
+        ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      if (art?.label !== false){
+      if (art?.label !== false) {
         const name = formatName(t.name || t.id);
         const offset = layout.labelOffset ?? 1.2;
         drawNameplate(ctx, name, p.x, p.y + r * offset, r, art);
       }
     }
   }
-  // (W2-J2) Vẽ “Chờ Lượt” – silhouette mờ/tối, chỉ hiển thị theo flag DEBUG
-  function drawQueuedOblique(ctx, g, queued, cam){
-   if (!queued) return;
-   const C = cam || { rowGapRatio: 0.62, topScale: 0.80, depthScale: 0.94 };
-   const baseR = Math.floor(g.tile * 0.36);
-   const k = C.depthScale ?? 0.94;
 
-   function drawSide(map, side){
-    if (!map) return;
-     // Ally thấy theo SHOW_QUEUED; enemy ẩn trừ khi bật SHOW_QUEUED_ENEMY
-    if (side === 'ally'  && !(CFG.DEBUG?.SHOW_QUEUED)) return;
-     if (side === 'enemy' && !(CFG.DEBUG?.SHOW_QUEUED_ENEMY)) return;
-     for (const p of map.values()){
-      const c = _cellCenterOblique(g, p.cx, p.cy, C);
-      const depth = g.rows - 1 - p.cy;
-      const r = Math.max(6, Math.floor(baseR * Math.pow(k, depth)));
-       ctx.save();
-       ctx.globalAlpha = 0.5;          // mờ/tối
-      ctx.fillStyle = p.color || '#5b6a78';
-       ctx.beginPath(); ctx.arc(c.x, c.y, r, 0, Math.PI*2); ctx.fill();
+  function drawQueuedOblique(
+    ctx: CanvasRenderingContext2D,
+    g: GridSpec,
+    queued: QueuedSummonState | null | undefined,
+    cam: CameraOptions | null | undefined,
+  ): void {
+    if (!queued) return;
+    const C = cam ?? DEFAULT_OBLIQUE_CAMERA;
+    const baseR = Math.floor(g.tile * 0.36);
+    const k = C.depthScale ?? 0.94;
+
+    const drawSide = (map: SummonMap, side: Side): void => {
+      if (!isSummonMap(map)) return;
+      if (side === 'ally' && !(CFG.DEBUG?.SHOW_QUEUED)) return;
+      if (side === 'enemy' && !(CFG.DEBUG?.SHOW_QUEUED_ENEMY)) return;
+      for (const p of map.values()) {
+        if (!p) continue;
+        const c = cellCenterOblique(g, p.cx, p.cy, C);
+        const depth = g.rows - 1 - p.cy;
+        const r = Math.max(6, Math.floor(baseR * Math.pow(k, depth)));
+        ctx.save();
+        ctx.globalAlpha = 0.5;
+        ctx.fillStyle = p.color || '#5b6a78';
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, r, 0, Math.PI * 2);
+        ctx.fill();
         ctx.restore();
       }
-   }
-    drawSide(queued.ally,  'ally');
+    };
+
+    drawSide(queued.ally, 'ally');
     drawSide(queued.enemy, 'enemy');
   }
 
-  /* ---------- TURN/ZONE HELPERS (W1-J1) ---------- */
-  const SIDE = { ALLY: 'ally', ENEMY: 'enemy' };
+  const SIDE = {
+    ALLY: 'ally',
+    ENEMY: 'enemy',
+  } as const satisfies Record<'ALLY' | 'ENEMY', Side>;
 
-  // Trả về chỉ số lượt 1..9 của ô (cx,cy) theo phe
-  function slotIndex(side, cx, cy){
-    if (side === SIDE.ALLY || side === 'ally'){
-     // Ally: c=2 → 1..3 (trên→dưới), c=1 → 4..6, c=0 → 7..9
+  function slotIndex(side: SlotSpecifier, cx: number, cy: number): number {
+    if (side === SIDE.ALLY || side === 'ally') {
       return (CFG.ALLY_COLS - 1 - cx) * 3 + (cy + 1);
-   } else {
-  // Enemy: c=4 → 1..3 (trên→dưới), c=5 → 4..6, c=6 → 7..9
-     const enemyStart = CFG.GRID_COLS - CFG.ENEMY_COLS; // 7-3=4
-     const colIndex = cx - enemyStart;                   // 0..2
-     return colIndex * 3 + (cy + 1);
     }
+    const enemyStart = CFG.GRID_COLS - CFG.ENEMY_COLS;
+    const colIndex = cx - enemyStart;
+    return colIndex * 3 + (cy + 1);
   }
 
-  // Ngược lại: từ slot (1..9) suy ra (cx,cy) theo phe
-  function slotToCell(side, slot){
-   const s = Math.max(1, Math.min(9, slot|0));
-   const colIndex = Math.floor((s - 1) / 3); // 0..2 (gần mid → xa)
-    const rowIndex = (s - 1) % 3;             // 0..2
-   if (side === SIDE.ALLY || side === 'ally'){
-     const cx = (CFG.ALLY_COLS - 1) - colIndex; // 2,1,0
-     const cy = rowIndex;                       // 0..2 (trên→dưới)
+  function slotToCell(side: SlotSpecifier, slot: number): CellCoords {
+    const s = Math.max(1, Math.min(9, slot | 0));
+    const colIndex = Math.floor((s - 1) / 3);
+    const rowIndex = (s - 1) % 3;
+    if (side === SIDE.ALLY || side === 'ally') {
+      const cx = CFG.ALLY_COLS - 1 - colIndex;
+      const cy = rowIndex;
+      return { cx, cy };
+    }
+    const enemyStart = CFG.GRID_COLS - CFG.ENEMY_COLS;
+    const cx = enemyStart + colIndex;
+    const cy = rowIndex;
     return { cx, cy };
-    } else {
-      const enemyStart = CFG.GRID_COLS - CFG.ENEMY_COLS; // 4
-     const cx = enemyStart + colIndex;                  // 4,5,6
-     const cy = rowIndex;                               // 0..2 (trên→dưới)
-   return { cx, cy };
-    }
   }
 
-  // Gán nhãn “mã vùng” cho AI/AoE (A1..A9 | E1..E9) hoặc mã số tileId
-  function zoneCode(side, cx, cy, { numeric=false } = {}){
+  function zoneCode(side: SlotSpecifier, cx: number, cy: number, { numeric = false }: ZoneCodeOptions = {}): string | number {
     const slot = slotIndex(side, cx, cy);
     if (numeric) return (side === SIDE.ALLY || side === 'ally' ? 0 : 1) * 16 + slot;
-   const pfx = (side === SIDE.ALLY || side === 'ally') ? 'A' : 'E';
-    return pfx + String(slot);
+    const prefix = side === SIDE.ALLY || side === 'ally' ? 'A' : 'E';
+    return prefix + String(slot);
   }
 
-  // Bảng tra cứu thuận tiện (chưa dùng nhưng hữu ích cho AI/visual debug)
-  const ORDER_ALLY  = Array.from({length:9}, (_,i)=> slotToCell(SIDE.ALLY,  i+1));
-  const ORDER_ENEMY = Array.from({length:9}, (_,i)=> slotToCell(SIDE.ENEMY, i+1));
-
+  const ORDER_ALLY: ReadonlyArray<CellCoords> = Array.from({ length: 9 }, (_, i) => slotToCell(SIDE.ALLY, i + 1));
+  const ORDER_ENEMY: ReadonlyArray<CellCoords> = Array.from({ length: 9 }, (_, i) => slotToCell(SIDE.ENEMY, i + 1));
   exports.pick3Random = pick3Random;
   exports.ART_SPRITE_EVENT = ART_SPRITE_EVENT;
   exports.SIDE = SIDE;
@@ -4458,10 +5553,19 @@ __define('./entry.js', (exports, module, __require) => {
   ];
 
   function loadBundledModule(id){
-    if (typeof __require === 'function'){
-      return Promise.resolve().then(() => __require(id));
-    }
-    return import(id);
+    const loader = typeof __require === 'function'
+      ? Promise.resolve().then(() => __require(id))
+      : import(id);
+
+    return Promise.resolve(loader).then(module => {
+      if (module && typeof module === 'object'){
+        const comingSoonFlag = module.comingSoon ?? module.COMING_SOON_MODULE?.comingSoon;
+        if (typeof comingSoonFlag !== 'undefined' && module.comingSoon !== comingSoonFlag){
+          return { ...module, comingSoon: comingSoonFlag };
+        }
+      }
+      return module;
+    });
   }
 
   const MODE_DEFINITIONS = MODES.reduce((acc, mode) => {
@@ -4469,7 +5573,7 @@ __define('./entry.js', (exports, module, __require) => {
     const screenId = shell.screenId || SCREEN_MAIN_MENU;
     const moduleId = mode.status === MODE_STATUS.AVAILABLE && shell.moduleId
       ? shell.moduleId
-      : (shell.fallbackModuleId || './modes/coming-soon.stub.js');
+      : (shell.fallbackModuleId || './modes/coming-soon.stub.ts');
     const params = mode.status === MODE_STATUS.AVAILABLE && shell.defaultParams
       ? { ...shell.defaultParams }
       : null;
@@ -4647,7 +5751,7 @@ __define('./entry.js', (exports, module, __require) => {
   function isComingSoonModule(module){
     if (!module) return true;
     if (module.comingSoon) return true;
-    if (module.default && module.default.comingSoon) return true;
+    if (module.COMING_SOON_MODULE?.comingSoon) return true;
     return false;
   }
 
@@ -4746,16 +5850,40 @@ __define('./entry.js', (exports, module, __require) => {
     return null;
   }
 
-  function resolveScreenRenderer(module){
-    if (!module) return null;
-    if (typeof module.renderCollectionScreen === 'function') return module.renderCollectionScreen;
-    if (typeof module.renderScreen === 'function') return module.renderScreen;
-    if (typeof module.default === 'function') return module.default;
-    if (module.default){
-      if (typeof module.default.renderCollectionScreen === 'function') return module.default.renderCollectionScreen;
-      if (typeof module.default.renderScreen === 'function') return module.default.renderScreen;
+  function pickFunctionFromSource(source, preferredKeys = [], fallbackKeys = []){
+    if (!source) return null;
+
+    if (typeof source === 'function'){
+      return source;
     }
+
+    if (source && typeof source === 'object'){
+      for (const key of preferredKeys){
+        if (typeof source[key] === 'function'){
+          return source[key];
+        }
+      }
+      for (const key of fallbackKeys){
+        if (typeof source[key] === 'function'){
+          return source[key];
+        }
+      }
+    }
+
     return null;
+  }
+
+  function resolveModuleFunction(module, preferredKeys = [], fallbackKeys = []){
+    const candidate = pickFunctionFromSource(module, preferredKeys, fallbackKeys);
+    return typeof candidate === 'function' ? candidate : null;
+  }
+
+  function resolveScreenRenderer(module){
+    return resolveModuleFunction(
+      module,
+      ['renderCollectionScreen', 'renderScreen'],
+      ['render']
+    );
   }
 
   function getDefinitionByScreen(screenId){
@@ -4877,7 +6005,11 @@ __define('./entry.js', (exports, module, __require) => {
 
     if (token !== collectionRenderToken) return;
 
-    const render = module?.renderCollectionScreen || module?.default?.renderCollectionScreen;
+    const render = resolveModuleFunction(
+      module,
+      ['renderCollectionScreen', 'renderCollectionView'],
+      ['render']
+    );
     if (typeof render !== 'function'){
       throw new Error('Module bộ sưu tập không cung cấp hàm render hợp lệ.');
     }
@@ -4916,7 +6048,11 @@ __define('./entry.js', (exports, module, __require) => {
 
     if (token !== lineupRenderToken) return;
 
-    const render = module?.renderLineupScreen || module?.default?.renderLineupScreen;
+    const render = resolveModuleFunction(
+      module,
+      ['renderLineupScreen'],
+      ['render']
+    );
     if (typeof render !== 'function'){
       throw new Error('Module đội hình không cung cấp hàm render hợp lệ.');
     }
@@ -5083,11 +6219,10 @@ __define('./entry.js', (exports, module, __require) => {
       shellInstance.enterScreen(SCREEN_MAIN_MENU);
       return;
     }
-    const createPveSession = typeof module.createPveSession === 'function'
-      ? module.createPveSession
-      : (module.default && typeof module.default.createPveSession === 'function'
-        ? module.default.createPveSession
-        : null);
+    const createPveSession = resolveModuleFunction(
+      module,
+      ['createPveSession']
+    );
     if (typeof createPveSession !== 'function'){
       throw new Error('PvE module missing createPveSession().');
     }
@@ -5315,72 +6450,170 @@ __define('./entry.js', (exports, module, __require) => {
   })();
 
 });
-__define('./events.js', (exports, module, __require) => {
-  // events.js
+__define('./events.ts', (exports, module, __require) => {
+
+
+
+  export interface TurnEventDetail {
+    game: SessionState;
+    unit: UnitToken | null;
+    side: Side | null;
+    slot: number | null;
+    phase: string | null;
+    cycle: number | null;
+    orderIndex: number | null;
+    orderLength: number | null;
+    spawned: boolean;
+    processedChain: ActionChainProcessedResult | null;
+  }
+
+  export interface ActionEventDetail {
+    game: SessionState;
+    unit: UnitToken | null;
+    side: Side | null;
+    slot: number | null;
+    phase: string | null;
+    cycle: number | null;
+    orderIndex: number | null;
+    orderLength: number | null;
+    action: 'basic' | 'ult' | string | null;
+    skipped: boolean;
+    reason: string | null;
+    ultOk?: boolean | null;
+  }
+
+  export interface TurnRegenDetail {
+    game: SessionState;
+    unit: UnitToken | null;
+    hpDelta: number;
+    aeDelta: number;
+  }
+
+  export interface BattleEndDetail {
+    game: SessionState;
+    result: BattleResult | null;
+    context: BattleDetail['context'] | null | undefined;
+  }
+
+  const TURN_START = 'turn:start' as const;
+  const TURN_END = 'turn:end' as const;
+  const ACTION_START = 'action:start' as const;
+  const ACTION_END = 'action:end' as const;
+  const TURN_REGEN = 'turn:regen' as const;
+  const BATTLE_END = 'battle:end' as const;
+
+  export type GameEventType =
+    | typeof TURN_START
+    | typeof TURN_END
+    | typeof ACTION_START
+    | typeof ACTION_END
+    | typeof TURN_REGEN
+    | typeof BATTLE_END;
+
+  export interface GameEventDetailMap {
+    [TURN_START]: TurnEventDetail;
+    [TURN_END]: TurnEventDetail;
+    [ACTION_START]: ActionEventDetail;
+    [ACTION_END]: ActionEventDetail;
+    [TURN_REGEN]: TurnRegenDetail;
+    [BATTLE_END]: BattleEndDetail;
+  }
+
+  export type GameEventDetail<T extends GameEventType> =
+    | (CustomEvent<GameEventDetailMap[T]> & { detail: GameEventDetailMap[T] })
+    | {
+        type: T;
+        detail: GameEventDetailMap[T];
+        target?: EventTarget | SimpleEventTarget | null;
+        currentTarget?: EventTarget | SimpleEventTarget | null;
+      };
+
+  export type GameEventHandler<T extends GameEventType = GameEventType> = (
+    event: GameEventDetail<T>,
+  ) => void;
+
   const HAS_EVENT_TARGET = typeof EventTarget === 'function';
 
-  function createNativeEvent(type, detail){
+  type LegacyEvent = Event & {
+    initEvent?: (type: string, bubbles?: boolean, cancelable?: boolean) => void;
+    detail?: unknown;
+  };
+
+  function createNativeEvent<T extends GameEventType>(
+    type: T,
+    detail?: GameEventDetailMap[T],
+  ): GameEventDetail<T> | null {
     if (!type) return null;
     if (typeof CustomEvent === 'function'){
       try {
-        return new CustomEvent(type, { detail });
-      } catch (_) {
+        return new CustomEvent(type, { detail }) as GameEventDetail<T>;
+      } catch (_err) {
         // ignore and fall through
       }
     }
     if (typeof Event === 'function'){
       try {
-        const ev = new Event(type);
+        const ev = new Event(type) as LegacyEvent;
         try {
           ev.detail = detail;
-        } catch (_) {
+        } catch (_assignErr) {
           // ignore assignment failures (readonly in some browsers)
         }
-        return ev;
-      } catch (_) {
+        return ev as GameEventDetail<T>;
+      } catch (_err) {
         // ignore and fall through
       }
     }
     if (typeof document === 'object' && document && typeof document.createEvent === 'function'){
       try {
-        const ev = document.createEvent('Event');
+        const ev = document.createEvent('Event') as LegacyEvent;
         if (typeof ev.initEvent === 'function'){
           ev.initEvent(type, false, false);
         }
         ev.detail = detail;
-        return ev;
-      } catch (_) {
+        return ev as GameEventDetail<T>;
+      } catch (_err) {
         // ignore and fall through
       }
     }
     return null;
   }
+
   class SimpleEventTarget {
-    constructor(){
-      this._map = new Map();
-    }
-    addEventListener(type, handler){
+    private readonly listeners: Map<GameEventType, Set<GameEventHandler>> = new Map();
+
+    addEventListener<T extends GameEventType>(type: T, handler: GameEventHandler<T>): void {
       if (!type || typeof handler !== 'function') return;
-      const list = this._map.get(type) || [];
-      list.push(handler);
-      this._map.set(type, list);
+      const set = this.listeners.get(type) ?? new Set<GameEventHandler>();
+      set.add(handler as GameEventHandler);
+      this.listeners.set(type, set);
     }
-    removeEventListener(type, handler){
+
+    removeEventListener<T extends GameEventType>(type: T, handler: GameEventHandler<T>): void {
       if (!type || typeof handler !== 'function') return;
-      const list = this._map.get(type);
-      if (!list || !list.length) return;
-      const idx = list.indexOf(handler);
-      if (idx >= 0){
-        list.splice(idx, 1);
-        if (!list.length) this._map.delete(type);
-        else this._map.set(type, list);
+      const set = this.listeners.get(type);
+      if (!set || set.size === 0) return;
+      set.delete(handler as GameEventHandler);
+      if (set.size === 0){
+        this.listeners.delete(type);
       }
     }
-    dispatchEvent(event){
+
+    dispatchEvent<T extends GameEventType>(event: GameEventDetail<T>): boolean {
       if (!event || !event.type) return false;
-      const list = this._map.get(event.type);
-      if (!list || !list.length) return true;
-      for (const handler of [...list]){
+      const set = this.listeners.get(event.type);
+      if (!set || set.size === 0) return true;
+      const snapshot = Array.from(set);
+      const eventRecord = event as Record<string, unknown>;
+      try {
+        if (typeof eventRecord.target === 'undefined'){
+          eventRecord.target = this;
+        }
+        eventRecord.currentTarget = this;
+      } catch (_err) {
+        // ignore assignment failures
+      }
+      for (const handler of snapshot){
         try {
           handler.call(this, event);
         } catch (err) {
@@ -5391,26 +6624,28 @@ __define('./events.js', (exports, module, __require) => {
     }
   }
 
-  function makeEventTarget(){
+  function makeEventTarget(): EventTarget | SimpleEventTarget {
     if (!HAS_EVENT_TARGET) return new SimpleEventTarget();
     const probeType = '__probe__';
-    const probeEvent = createNativeEvent(probeType);
+    const probeEvent = createNativeEvent(probeType as GameEventType);
     const hasEventConstructor = typeof Event === 'function';
     const isRealEvent = !!probeEvent && (!hasEventConstructor || probeEvent instanceof Event);
     if (!isRealEvent) return new SimpleEventTarget();
     try {
       const target = new EventTarget();
       let handled = false;
-      const handler = () => { handled = true; };
+      const handler = (): void => {
+        handled = true;
+      };
       if (typeof target.addEventListener === 'function'){
-        target.addEventListener(probeType, handler);
+        target.addEventListener(probeType, handler as EventListener);
         try {
           if (typeof target.dispatchEvent === 'function' && isRealEvent){
-           target.dispatchEvent(probeEvent);
+            target.dispatchEvent(probeEvent as Event);
           }
         } finally {
           if (typeof target.removeEventListener === 'function'){
-            target.removeEventListener(probeType, handler);
+            target.removeEventListener(probeType, handler as EventListener);
           }
         }
       }
@@ -5421,30 +6656,33 @@ __define('./events.js', (exports, module, __require) => {
     return new SimpleEventTarget();
   }
 
-  const TURN_START = 'turn:start';
-  const TURN_END = 'turn:end';
-  const ACTION_START = 'action:start';
-  const ACTION_END = 'action:end';
-  const TURN_REGEN = 'turn:regen';
-  const BATTLE_END = 'battle:end';
-
   const gameEvents = makeEventTarget();
 
-  function emitGameEvent(type, detail){
+  function emitGameEvent<T extends GameEventType>(
+    type: T,
+    detail?: GameEventDetailMap[T],
+  ): boolean {
     if (!type || !gameEvents) return false;
     try {
-      if (typeof gameEvents.dispatchEvent === 'function'){
+      if (typeof (gameEvents as EventTarget).dispatchEvent === 'function'){
         const nativeEvent = createNativeEvent(type, detail);
         if (nativeEvent){
-          return gameEvents.dispatchEvent(nativeEvent);
+          return (gameEvents as EventTarget).dispatchEvent(nativeEvent as Event);
         }
         if (gameEvents instanceof SimpleEventTarget){
-          return gameEvents.dispatchEvent({ type, detail });
+          const syntheticEvent: GameEventDetail<T> = {
+            type,
+            detail: detail as GameEventDetailMap[T],
+          };
+          return gameEvents.dispatchEvent(syntheticEvent);
         }
         return false;
       }
-      if (typeof gameEvents.emit === 'function'){
-        gameEvents.emit(type, detail);
+      const emitter = gameEvents as unknown as {
+        emit?: (eventType: T, eventDetail?: GameEventDetailMap[T]) => void;
+      };
+      if (typeof emitter.emit === 'function'){
+        emitter.emit(type, detail);
         return true;
       }
     } catch (err) {
@@ -5453,6 +6691,46 @@ __define('./events.js', (exports, module, __require) => {
     return false;
   }
 
+  const dispatchGameEvent = <T extends GameEventType>(
+    type: T,
+    detail?: GameEventDetailMap[T],
+  ): boolean => emitGameEvent(type, detail);
+
+  function addGameEventListener<T extends GameEventType>(
+    type: T,
+    handler: GameEventHandler<T>,
+  ): () => void {
+    if (!type || typeof handler !== 'function' || !gameEvents){
+      return () => {};
+    }
+    if (typeof (gameEvents as EventTarget).addEventListener === 'function'){
+      (gameEvents as EventTarget).addEventListener(type, handler as EventListener);
+      let disposed = false;
+      return () => {
+        if (disposed) return;
+        disposed = true;
+        if (typeof (gameEvents as EventTarget).removeEventListener === 'function'){
+          (gameEvents as EventTarget).removeEventListener(type, handler as EventListener);
+        }
+      };
+    }
+    const eventEmitter = gameEvents as unknown as {
+      on?: (eventType: T, listener: GameEventHandler<T>) => void;
+      off?: (eventType: T, listener: GameEventHandler<T>) => void;
+    };
+    if (typeof eventEmitter.on === 'function'){
+      eventEmitter.on(type, handler);
+      let disposed = false;
+      return () => {
+        if (disposed) return;
+        disposed = true;
+        if (typeof eventEmitter.off === 'function'){
+          eventEmitter.off(type, handler);
+        }
+      };
+    }
+    return () => {};
+  }
   exports.TURN_START = TURN_START;
   exports.TURN_END = TURN_END;
   exports.ACTION_START = ACTION_START;
@@ -5460,14 +6738,16 @@ __define('./events.js', (exports, module, __require) => {
   exports.TURN_REGEN = TURN_REGEN;
   exports.BATTLE_END = BATTLE_END;
   exports.gameEvents = gameEvents;
+  exports.dispatchGameEvent = dispatchGameEvent;
   exports.emitGameEvent = emitGameEvent;
+  exports.addGameEventListener = addGameEventListener;
 });
 __define('./main.js', (exports, module, __require) => {
-  const __dep1 = __require('./modes/pve/session.js');
+  const __dep1 = __require('./modes/pve/session.ts');
   const createPveSession = __dep1.createPveSession;
   const __dep2 = __require('./utils/dummy.js');
   const ensureNestedModuleSupport = __dep2.ensureNestedModuleSupport;
-  const __reexport0 = __require('./events.js');
+  const __reexport0 = __require('./events.ts');
 
   let currentSession = null;
 
@@ -5522,6 +6802,8 @@ __define('./main.js', (exports, module, __require) => {
 
   exports.gameEvents = __reexport0.gameEvents;
   exports.emitGameEvent = __reexport0.emitGameEvent;
+  exports.dispatchGameEvent = __reexport0.dispatchGameEvent;
+  exports.addGameEventListener = __reexport0.addGameEventListener;
   exports.TURN_START = __reexport0.TURN_START;
   exports.TURN_END = __reexport0.TURN_END;
   exports.ACTION_START = __reexport0.ACTION_START;
@@ -5591,116 +6873,170 @@ __define('./meta.js', (exports, module, __require) => {
   exports.makeInstanceStats = makeInstanceStats;
   exports.initialRageFor = initialRageFor;
 });
-__define('./modes/coming-soon.stub.js', (exports, module, __require) => {
+__define('./modes/coming-soon.stub.ts', (exports, module, __require) => {
+  export type ComingSoonModule = {
+    comingSoon: true;
+  };
+
   const comingSoon = true;
 
-  const __defaultExport = {
-    comingSoon
+  const COMING_SOON_MODULE: ComingSoonModule = {
+    comingSoon,
   };
   exports.comingSoon = comingSoon;
-  exports.default = __defaultExport;
-  module.exports.default = exports.default;
+  exports.COMING_SOON_MODULE = COMING_SOON_MODULE;
 });
-__define('./modes/pve/session.js', (exports, module, __require) => {
+__define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => {
   //v0.7.6
-  const __dep1 = __require('./turns.js');
-  const stepTurn = __dep1.stepTurn;
-  const doActionOrSkip = __dep1.doActionOrSkip;
-  const predictSpawnCycle = __dep1.predictSpawnCycle;
-  const __dep2 = __require('./summon.js');
-  const enqueueImmediate = __dep2.enqueueImmediate;
-  const processActionChain = __dep2.processActionChain;
-  const __dep3 = __require('./ai.js');
-  const refillDeckEnemy = __dep3.refillDeckEnemy;
-  const aiMaybeAct = __dep3.aiMaybeAct;
-  const __dep4 = __require('./statuses.js');
-  const Statuses = __dep4.Statuses;
-  const __dep5 = __require('./config.js');
-  const CFG = __dep5.CFG;
-  const CAM = __dep5.CAM;
-  const __dep6 = __require('./units.js');
-  const UNITS = __dep6.UNITS;
-  const __dep7 = __require('./meta.js');
-  const Meta = __dep7.Meta;
-  const makeInstanceStats = __dep7.makeInstanceStats;
-  const initialRageFor = __dep7.initialRageFor;
-  const __dep8 = __require('./combat.js');
-  const basicAttack = __dep8.basicAttack;
-  const pickTarget = __dep8.pickTarget;
-  const dealAbilityDamage = __dep8.dealAbilityDamage;
-  const healUnit = __dep8.healUnit;
-  const grantShield = __dep8.grantShield;
-  const applyDamage = __dep8.applyDamage;
-  const __dep9 = __require('./utils/fury.js');
-  const initializeFury = __dep9.initializeFury;
-  const setFury = __dep9.setFury;
-  const spendFury = __dep9.spendFury;
-  const resolveUltCost = __dep9.resolveUltCost;
-  const gainFury = __dep9.gainFury;
-  const finishFuryHit = __dep9.finishFuryHit;
-  const __dep10 = __require('./catalog.js');
-  const ROSTER = __dep10.ROSTER;
-  const ROSTER_MAP = __dep10.ROSTER_MAP;
-  const CLASS_BASE = __dep10.CLASS_BASE;
-  const RANK_MULT = __dep10.RANK_MULT;
-  const getMetaById = __dep10.getMetaById;
-  const isSummoner = __dep10.isSummoner;
-  const applyRankAndMods = __dep10.applyRankAndMods;
-  const __dep11 = __require('./engine.js');
-  const makeGrid = __dep11.makeGrid;
-  const drawGridOblique = __dep11.drawGridOblique;
-  const drawTokensOblique = __dep11.drawTokensOblique;
-  const drawQueuedOblique = __dep11.drawQueuedOblique;
-  const hitToCellOblique = __dep11.hitToCellOblique;
-  const projectCellOblique = __dep11.projectCellOblique;
-  const cellOccupied = __dep11.cellOccupied;
-  const spawnLeaders = __dep11.spawnLeaders;
-  const pickRandom = __dep11.pickRandom;
-  const slotIndex = __dep11.slotIndex;
-  const slotToCell = __dep11.slotToCell;
-  const cellReserved = __dep11.cellReserved;
-  const ORDER_ENEMY = __dep11.ORDER_ENEMY;
-  const ART_SPRITE_EVENT = __dep11.ART_SPRITE_EVENT;
-  const __dep12 = __require('./background.js');
-  const drawEnvironmentProps = __dep12.drawEnvironmentProps;
-  const getEnvironmentBackground = __dep12.getEnvironmentBackground;
-  const __dep13 = __require('./art.js');
-  const getUnitArt = __dep13.getUnitArt;
-  const setUnitSkin = __dep13.setUnitSkin;
-  const __dep14 = __require('./ui.js');
-  const initHUD = __dep14.initHUD;
-  const startSummonBar = __dep14.startSummonBar;
-  const __dep15 = __require('./vfx.js');
-  const vfxDraw = __dep15.vfxDraw;
-  const vfxAddSpawn = __dep15.vfxAddSpawn;
-  const vfxAddHit = __dep15.vfxAddHit;
-  const vfxAddMelee = __dep15.vfxAddMelee;
-  const vfxAddLightningArc = __dep15.vfxAddLightningArc;
-  const vfxAddBloodPulse = __dep15.vfxAddBloodPulse;
-  const vfxAddGroundBurst = __dep15.vfxAddGroundBurst;
-  const vfxAddShieldWrap = __dep15.vfxAddShieldWrap;
-  const __dep16 = __require('./scene.js');
-  const drawBattlefieldScene = __dep16.drawBattlefieldScene;
-  const getCachedBattlefieldScene = __dep16.getCachedBattlefieldScene;
-  const __dep17 = __require('./events.js');
-  const gameEvents = __dep17.gameEvents;
-  const TURN_START = __dep17.TURN_START;
-  const TURN_END = __dep17.TURN_END;
-  const ACTION_START = __dep17.ACTION_START;
-  const ACTION_END = __dep17.ACTION_END;
-  const BATTLE_END = __dep17.BATTLE_END;
-  const emitGameEvent = __dep17.emitGameEvent;
-  const __dep18 = __require('./utils/dummy.js');
-  const ensureNestedModuleSupport = __dep18.ensureNestedModuleSupport;
-  const __dep19 = __require('./utils/time.js');
-  const safeNow = __dep19.safeNow;
-  const __dep20 = __require('./utils/kit.js');
-  const getSummonSpec = __dep20.getSummonSpec;
-  const resolveSummonSlots = __dep20.resolveSummonSlots;
-  /** @type {HTMLCanvasElement|null} */ let canvas = null;
-  /** @type {CanvasRenderingContext2D|null} */ let ctx = null;
-  /** @type {{update:(g:any)=>void, cleanup?:()=>void}|null} */ let hud = null;   // ← THÊM
-  /** @type {(() => void)|null} */ let hudCleanup = null;
+  const __dep2 = __require('./turns.ts');
+  const stepTurn = __dep2.stepTurn;
+  const doActionOrSkip = __dep2.doActionOrSkip;
+  const predictSpawnCycle = __dep2.predictSpawnCycle;
+  const __dep3 = __require('./summon.js');
+  const enqueueImmediate = __dep3.enqueueImmediate;
+  const processActionChain = __dep3.processActionChain;
+  const __dep4 = __require('./ai.ts');
+  const refillDeckEnemy = __dep4.refillDeckEnemy;
+  const aiMaybeAct = __dep4.aiMaybeAct;
+  const __dep5 = __require('./statuses.ts');
+  const Statuses = __dep5.Statuses;
+  const __dep6 = __require('./config.js');
+  const CFG = __dep6.CFG;
+  const CAM = __dep6.CAM;
+  const __dep7 = __require('./units.ts');
+  const UNITS = __dep7.UNITS;
+  const __dep8 = __require('./meta.js');
+  const Meta = __dep8.Meta;
+  const makeInstanceStats = __dep8.makeInstanceStats;
+  const initialRageFor = __dep8.initialRageFor;
+  const __dep9 = __require('./combat.ts');
+  const basicAttack = __dep9.basicAttack;
+  const pickTarget = __dep9.pickTarget;
+  const dealAbilityDamage = __dep9.dealAbilityDamage;
+  const healUnit = __dep9.healUnit;
+  const grantShield = __dep9.grantShield;
+  const applyDamage = __dep9.applyDamage;
+  const __dep10 = __require('./utils/fury.js');
+  const initializeFury = __dep10.initializeFury;
+  const setFury = __dep10.setFury;
+  const spendFury = __dep10.spendFury;
+  const resolveUltCost = __dep10.resolveUltCost;
+  const gainFury = __dep10.gainFury;
+  const finishFuryHit = __dep10.finishFuryHit;
+  const __dep11 = __require('./catalog.js');
+  const ROSTER = __dep11.ROSTER;
+  const ROSTER_MAP = __dep11.ROSTER_MAP;
+  const CLASS_BASE = __dep11.CLASS_BASE;
+  const RANK_MULT = __dep11.RANK_MULT;
+  const getMetaById = __dep11.getMetaById;
+  const isSummoner = __dep11.isSummoner;
+  const applyRankAndMods = __dep11.applyRankAndMods;
+  const __dep12 = __require('./engine.ts');
+  const makeGrid = __dep12.makeGrid;
+  const drawGridOblique = __dep12.drawGridOblique;
+  const drawTokensOblique = __dep12.drawTokensOblique;
+  const drawQueuedOblique = __dep12.drawQueuedOblique;
+  const hitToCellOblique = __dep12.hitToCellOblique;
+  const projectCellOblique = __dep12.projectCellOblique;
+  const cellOccupied = __dep12.cellOccupied;
+  const spawnLeaders = __dep12.spawnLeaders;
+  const pickRandom = __dep12.pickRandom;
+  const slotIndex = __dep12.slotIndex;
+  const slotToCell = __dep12.slotToCell;
+  const cellReserved = __dep12.cellReserved;
+  const ORDER_ENEMY = __dep12.ORDER_ENEMY;
+  const ART_SPRITE_EVENT = __dep12.ART_SPRITE_EVENT;
+  const __dep13 = __require('./background.js');
+  const drawEnvironmentProps = __dep13.drawEnvironmentProps;
+  const __dep14 = __require('./art.js');
+  const getUnitArt = __dep14.getUnitArt;
+  const setUnitSkin = __dep14.setUnitSkin;
+  const __dep15 = __require('./ui.js');
+  const initHUD = __dep15.initHUD;
+  const startSummonBar = __dep15.startSummonBar;
+  const __dep16 = __require('./vfx.js');
+  const vfxDraw = __dep16.vfxDraw;
+  const vfxAddSpawn = __dep16.vfxAddSpawn;
+  const vfxAddHit = __dep16.vfxAddHit;
+  const vfxAddMelee = __dep16.vfxAddMelee;
+  const vfxAddLightningArc = __dep16.vfxAddLightningArc;
+  const vfxAddBloodPulse = __dep16.vfxAddBloodPulse;
+  const vfxAddGroundBurst = __dep16.vfxAddGroundBurst;
+  const vfxAddShieldWrap = __dep16.vfxAddShieldWrap;
+  const __dep17 = __require('./scene.js');
+  const drawBattlefieldScene = __dep17.drawBattlefieldScene;
+  const __dep18 = __require('./events.ts');
+  const gameEvents = __dep18.gameEvents;
+  const TURN_START = __dep18.TURN_START;
+  const TURN_END = __dep18.TURN_END;
+  const ACTION_START = __dep18.ACTION_START;
+  const ACTION_END = __dep18.ACTION_END;
+  const BATTLE_END = __dep18.BATTLE_END;
+  const emitGameEvent = __dep18.emitGameEvent;
+  const __dep19 = __require('./utils/dummy.js');
+  const ensureNestedModuleSupport = __dep19.ensureNestedModuleSupport;
+  const __dep20 = __require('./utils/time.js');
+  const safeNow = __dep20.safeNow;
+  const __dep21 = __require('./utils/kit.js');
+  const getSummonSpec = __dep21.getSummonSpec;
+  const resolveSummonSlots = __dep21.resolveSummonSlots;
+  const __dep22 = __require('./modes/pve/session-state.ts');
+  const normalizeConfig = __dep22.normalizeConfig;
+  const createSession = __dep22.createSession;
+  const invalidateSceneCache = __dep22.invalidateSceneCache;
+  const ensureSceneCache = __dep22.ensureSceneCache;
+  const clearBackgroundSignatureCache = __dep22.clearBackgroundSignatureCache;
+
+
+
+
+
+
+
+  type RootLike = Element | Document | null | undefined;
+  type StartConfigOverrides = Partial<CreateSessionOptions> & Record<string, unknown>;
+  type PveSessionStartConfig = StartConfigOverrides & {
+    root?: RootLike;
+    rootEl?: RootLike;
+  };
+
+  export type PveSessionHandle = {
+    start: (startConfig?: PveSessionStartConfig | null) => SessionState | null;
+    stop: () => void;
+    updateConfig: (next?: StartConfigOverrides | null) => void;
+    setUnitSkin: (unitId: string, skinKey: string | null | undefined) => boolean;
+  };
+
+  function sanitizeStartConfig(
+    config: PveSessionStartConfig | null | undefined,
+  ): { rest: StartConfigOverrides; root: RootLike } {
+    const raw = (config ?? {}) as PveSessionStartConfig;
+    const { root, rootEl, ...rest } = raw;
+    return {
+      rest: rest as StartConfigOverrides,
+      root: (root ?? rootEl) ?? null,
+    };
+  }
+
+  type BattleFinalizePayload = {
+    winner?: BattleResult['winner'];
+    reason?: string | null;
+    detail?: BattleDetail | null;
+    finishedAt?: number;
+  };
+
+  type EnemyAIPreset = {
+    deck?: ReadonlyArray<string>;
+    unitsAll?: ReadonlyArray<string>;
+    costCap?: number;
+    summonLimit?: number;
+    startingDeck?: ReadonlyArray<UnitToken>;
+  };
+
+  let canvas: HTMLCanvasElement | null = null;
+  let ctx: CanvasRenderingContext2D | null = null;
+  let hud: { update: (g: any) => void; cleanup?: () => void } | null = null;   // ← THÊM
+  let hudCleanup: (() => void) | null = null;
   const CAM_PRESET = CAM[CFG.CAMERA] || CAM.landscape_oblique;
   const HAND_SIZE  = CFG.HAND_SIZE ?? 4;
 
@@ -5713,7 +7049,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
   let _BORN = 1;
   const nextIid = ()=> _IID++;
 
-  let Game = null;
+  let Game: SessionState | null = null;
   let tickLoopHandle = null;
   let tickLoopUsesTimeout = false;
   let resizeHandler = null;
@@ -5728,239 +7064,13 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
   let winRef = null;
   let docRef = null;
   let rootElement = null;
-  let storedConfig = {};
+  let storedConfig: NormalizedSessionConfig = normalizeConfig();
   let running = false;
-  let sceneCache = null;
   const hpBarGradientCache = new Map();
-  const backgroundSignatureCache = new Map();
 
-  function stableStringify(value, seen = new WeakSet()){
-    if (value === null) return 'null';
-    const type = typeof value;
-    if (type === 'undefined') return 'undefined';
-    if (type === 'number' || type === 'boolean' || type === 'bigint') return String(value);
-    if (type === 'string') return JSON.stringify(value);
-    if (type === 'symbol') return value.toString();
-    if (type === 'function') return `[Function:${value.name || 'anonymous'}]`;
-    if (Array.isArray(value)){
-      return `[${value.map(entry => stableStringify(entry, seen)).join(',')}]`;
-    }
-    if (type === 'object'){
-      if (seen.has(value)) return '"[Circular]"';
-      seen.add(value);
-      const keys = Object.keys(value).sort();
-      const entries = keys.map(key => `${JSON.stringify(key)}:${stableStringify(value[key], seen)}`);
-      seen.delete(value);
-      return `{${entries.join(',')}}`;
-    }
-    return String(value);
-  }
-
-  function normalizeBackgroundCacheKey(backgroundKey){
-    return `key:${backgroundKey ?? '__no-key__'}`;
-  }
-
-  function clearBackgroundSignatureCache(){
-    backgroundSignatureCache.clear();
-  }
-
-  function computeBackgroundSignature(backgroundKey){
-    const cacheKey = normalizeBackgroundCacheKey(backgroundKey);
-    const config = getEnvironmentBackground(backgroundKey);
-    if (!config){
-      backgroundSignatureCache.delete(cacheKey);
-      return `${backgroundKey || 'no-key'}:no-config`;
-    }
-    const cached = backgroundSignatureCache.get(cacheKey);
-    if (cached && cached.config === config){
-      return cached.signature;
-    }
-    let signature;
-    try {
-      signature = `${backgroundKey || 'no-key'}:${stableStringify(config)}`;
-    } catch (_) {
-      const keyPart = config?.key ?? '';
-      const themePart = config?.theme ?? '';
-      const propsLength = Array.isArray(config?.props) ? config.props.length : 0;
-      signature = `${backgroundKey || 'no-key'}:fallback:${String(keyPart)}:${String(themePart)}:${propsLength}`;
-    }
-    backgroundSignatureCache.set(cacheKey, { config, signature });
-    return signature;
-  }
-
-  function normalizeConfig(input = {}){
-    const out = { ...input };
-    const scene = input.scene || {};
-    if (typeof out.sceneTheme === 'undefined' && typeof scene.theme !== 'undefined'){
-      out.sceneTheme = scene.theme;
-    }
-    if (typeof out.backgroundKey === 'undefined'){
-      if (typeof scene.backgroundKey !== 'undefined') out.backgroundKey = scene.backgroundKey;
-      else if (typeof scene.background !== 'undefined') out.backgroundKey = scene.background;
-    }
-    delete out.scene;
-    return out;
-  }
-
-  function buildTurnOrder(){
-    const cfg = CFG.turnOrder || {};
-    const rawSides = Array.isArray(cfg.sides) ? cfg.sides : null;
-    const sides = (rawSides && rawSides.length) ? rawSides.filter(s => s === 'ally' || s === 'enemy') : ['ally', 'enemy'];
-    const order = [];
-    const addPair = (side, slot)=>{
-      if (side !== 'ally' && side !== 'enemy') return;
-      const num = Number(slot);
-      if (!Number.isFinite(num)) return;
-      const safeSlot = Math.max(1, Math.min(9, Math.round(num)));
-      order.push({ side, slot: safeSlot });
-    };
-    const appendSlots = (slot)=>{
-      for (const side of sides){
-        addPair(side, slot);
-      }
-    };
-
-    const scan = Array.isArray(cfg.pairScan) ? cfg.pairScan : null;
-    if (scan && scan.length){
-      for (const entry of scan){
-        if (typeof entry === 'number'){
-          appendSlots(entry);
-          continue;
-        }
-        if (Array.isArray(entry)){
-          if (entry.length === 2 && typeof entry[0] === 'string' && Number.isFinite(entry[1])){
-            addPair(entry[0] === 'enemy' ? 'enemy' : 'ally', entry[1]);
-          } else {
-            for (const val of entry){
-              if (typeof val === 'number') appendSlots(val);
-            }
-          }
-          continue;
-        }
-        if (entry && typeof entry === 'object'){
-          const slot = Number(entry.slot ?? entry.s ?? entry.index);
-          if (typeof entry.side === 'string' && Number.isFinite(slot)){
-            addPair(entry.side === 'enemy' ? 'enemy' : 'ally', slot);
-          } else if (Number.isFinite(slot)){
-            appendSlots(slot);
-          }
-        }
-      }
-    }
-
-    if (!order.length){
-      const fallback = [1,2,3,4,5,6,7,8,9];
-      for (const slot of fallback) appendSlots(slot);
-    }
-
-    const indexMap = new Map();
-    order.forEach((entry, idx)=>{
-      const key = `${entry.side}:${entry.slot}`;
-      if (!indexMap.has(key)) indexMap.set(key, idx);
-    });
-
-    return { order, indexMap };
-  }
-
-  function createGameState(options = {}){
-    options = normalizeConfig(options);
-    const modeKey = typeof options.modeKey === 'string' ? options.modeKey : null;
-    const sceneTheme = options.sceneTheme
-      ?? CFG.SCENE?.CURRENT_THEME
-      ?? CFG.SCENE?.DEFAULT_THEME;
-    const backgroundKey = options.backgroundKey
-      ?? CFG.CURRENT_BACKGROUND
-      ?? CFG.SCENE?.CURRENT_BACKGROUND
-      ?? CFG.SCENE?.CURRENT_THEME
-      ?? CFG.SCENE?.DEFAULT_THEME;
-
-    const allyUnits = Array.isArray(options.deck) && options.deck.length
-      ? options.deck
-      : UNITS;
-    const enemyPreset = options.aiPreset || {};
-    const enemyUnits = Array.isArray(enemyPreset.deck) && enemyPreset.deck.length
-      ? enemyPreset.deck
-      : (Array.isArray(enemyPreset.unitsAll) && enemyPreset.unitsAll.length ? enemyPreset.unitsAll : UNITS);
-
-  const requestedTurnMode = options.turnMode
-      ?? options.turn?.mode
-      ?? options.turnOrderMode
-      ?? options.turnOrder?.mode
-      ?? CFG?.turnOrder?.mode;
-    const useInterleaved = requestedTurnMode === 'interleaved_by_position';
-    const allyCols = Number.isFinite(CFG?.ALLY_COLS) ? Math.max(1, Math.floor(CFG.ALLY_COLS)) : 3;
-    const gridRows = Number.isFinite(CFG?.GRID_ROWS) ? Math.max(1, Math.floor(CFG.GRID_ROWS)) : 3;
-    const slotsPerSide = Math.max(1, allyCols * gridRows);
-
-    const buildTurnState = () => {
-      if (useInterleaved){
-        return {
-          mode: 'interleaved_by_position',
-          nextSide: 'ALLY',
-          lastPos: { ALLY: 0, ENEMY: 0 },
-          wrapCount: { ALLY: 0, ENEMY: 0 },
-          turnCount: 0,
-          slotCount: slotsPerSide,
-          cycle: 0,
-          busyUntil: 0
-        };
-      }
-      const { order, indexMap } = buildTurnOrder();
-      return { order, orderIndex: indexMap, cursor: 0, cycle: 0, busyUntil: 0 };
-    };
-
-    const game = {
-      modeKey,
-      grid: null,
-      tokens: [],
-      cost: 0,
-      costCap: Number.isFinite(options.costCap) ? options.costCap : CFG.COST_CAP,
-      summoned: 0,
-      summonLimit: Number.isFinite(options.summonLimit) ? options.summonLimit : CFG.SUMMON_LIMIT,
-      battle: {
-        over: false,
-        winner: null,
-        reason: null,
-        detail: null,
-        finishedAt: 0,
-        result: null
-      },
-      result: null,
-
-      // deck-3 + quản lý “độc nhất”
-      unitsAll: allyUnits,
-      usedUnitIds: new Set(),       // những unit đã ra sân
-      deck3: [],                    // mảng 3 unit
-      selectedId: null,
-      ui: { bar: null },
-      turn: buildTurnState(),
-      queued: { ally: new Map(), enemy: new Map() },
-      actionChain: [],
-      events: gameEvents,
-      sceneTheme,
-      backgroundKey
-    };
-
-    game.ai = {
-      cost: 0,
-      costCap: Number.isFinite(enemyPreset.costCap) ? enemyPreset.costCap : (enemyPreset.costCap ?? CFG.COST_CAP),
-      summoned: 0,
-      summonLimit: Number.isFinite(enemyPreset.summonLimit) ? enemyPreset.summonLimit : (enemyPreset.summonLimit ?? CFG.SUMMON_LIMIT),
-      unitsAll: enemyUnits,
-      usedUnitIds: new Set(),
-      deck: Array.isArray(enemyPreset.startingDeck) ? enemyPreset.startingDeck.slice() : [],
-      selectedId: null,
-      lastThinkMs: 0,
-      lastDecision: null
-    };
-
-    game.meta = Meta;
-    return game;
-  }
-
-  function resetSessionState(options = {}){
+  function resetSessionState(options: StartConfigOverrides = {}): void {
     storedConfig = normalizeConfig({ ...storedConfig, ...options });
-    Game = createGameState(storedConfig);
+    Game = createSession(storedConfig);
     _IID = 1;
     _BORN = 1;
     CLOCK = createClock();
@@ -6082,7 +7192,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     pendingResize = false;
     try {
       resize();
-      if (hud && typeof hud.update === 'function'){
+      if (hud && typeof hud.update === 'function' && Game){
         hud.update(Game);
       }
       scheduleDraw();
@@ -6106,106 +7216,6 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     }
   }
 
-  function invalidateSceneCache(){
-    sceneCache = null;
-    clearBackgroundSignatureCache();
-  }
-
-  function createSceneCacheCanvas(pixelWidth, pixelHeight){
-    if (!Number.isFinite(pixelWidth) || !Number.isFinite(pixelHeight)) return null;
-    const safeW = Math.max(1, Math.floor(pixelWidth));
-    const safeH = Math.max(1, Math.floor(pixelHeight));
-    if (typeof OffscreenCanvas === 'function'){
-      try {
-        return new OffscreenCanvas(safeW, safeH);
-      } catch (_) {}
-    }
-    const doc = docRef || (typeof document !== 'undefined' ? document : null);
-    if (!doc || typeof doc.createElement !== 'function') return null;
-    const offscreen = doc.createElement('canvas');
-    offscreen.width = safeW;
-    offscreen.height = safeH;
-    return offscreen;
-  }
-
-  function ensureSceneCache(){
-    if (!Game || !Game.grid) return null;
-    const grid = Game.grid;
-    const sceneCfg = CFG.SCENE || {};
-    const themeKey = Game.sceneTheme || sceneCfg.CURRENT_THEME || sceneCfg.DEFAULT_THEME;
-    const theme = (sceneCfg.THEMES && themeKey) ? sceneCfg.THEMES[themeKey] : null;
-    const backgroundKey = Game.backgroundKey;
-    const backgroundSignature = computeBackgroundSignature(backgroundKey);
-    const dpr = Number.isFinite(grid.dpr) && grid.dpr > 0 ? grid.dpr : 1;
-    const cssWidth = grid.w ?? (canvas ? canvas.width / dpr : 0);
-    const cssHeight = grid.h ?? (canvas ? canvas.height / dpr : 0);
-    if (!cssWidth || !cssHeight) return null;
-    const pixelWidth = Math.max(1, Math.round(cssWidth * dpr));
-    const pixelHeight = Math.max(1, Math.round(cssHeight * dpr));
-
-    const baseScene = getCachedBattlefieldScene(grid, theme, { width: cssWidth, height: cssHeight, dpr });
-    const baseKey = baseScene?.cacheKey;
-    if (!baseScene){
-      sceneCache = null;
-      return null;
-    }
-    
-    let needsRebuild = false;
-    if (!sceneCache) needsRebuild = true;
-    else if (sceneCache.pixelWidth !== pixelWidth || sceneCache.pixelHeight !== pixelHeight) needsRebuild = true;
-    else if (sceneCache.themeKey !== themeKey || sceneCache.backgroundKey !== backgroundKey) needsRebuild = true;
-    else if (sceneCache.backgroundSignature !== backgroundSignature) needsRebuild = true;
-    else if (sceneCache.dpr !== dpr) needsRebuild = true;
-    else if (sceneCache.baseKey !== baseKey) needsRebuild = true;
-
-    if (!needsRebuild) return sceneCache;
-
-    const offscreen = createSceneCacheCanvas(pixelWidth, pixelHeight);
-    if (!offscreen) return null;
-    const cacheCtx = offscreen.getContext('2d');
-    if (!cacheCtx) return null;
-
-    if (typeof cacheCtx.resetTransform === 'function'){
-      cacheCtx.resetTransform();
-    } else if (typeof cacheCtx.setTransform === 'function'){
-      cacheCtx.setTransform(1, 0, 0, 1, 0, 0);
-    }
-    cacheCtx.clearRect(0, 0, pixelWidth, pixelHeight);
-    
-    try {
-      cacheCtx.drawImage(baseScene.canvas, 0, 0);
-    } catch (err) {
-      console.error('[scene-cache:base]', err);
-      return null;
-    }
-    
-    if (typeof cacheCtx.setTransform === 'function'){
-      cacheCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    } else if (dpr !== 1 && typeof cacheCtx.scale === 'function'){
-      cacheCtx.scale(dpr, dpr);
-    }
-
-    try {
-      drawEnvironmentProps(cacheCtx, grid, CAM_PRESET, backgroundKey);
-    } catch (err) {
-      console.error('[scene-cache]', err);
-      return null;
-    }
-
-    sceneCache = {
-      canvas: offscreen,
-      pixelWidth,
-      pixelHeight,
-      cssWidth,
-      cssHeight,
-      themeKey,
-      backgroundKey,
-      backgroundSignature,
-      dpr, baseKey
-    };
-    return sceneCache;
-  }
-
   function refreshQueuedArtFor(unitId){
     const apply = (map)=>{
       if (!map || typeof map.values !== 'function') return;
@@ -6223,11 +7233,12 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     apply(Game.queued?.enemy);
   }
 
-  function setUnitSkinForSession(unitId, skinKey){
+  function setUnitSkinForSession(unitId: string, skinKey: string | null | undefined): boolean {
     if (!Game) return false;
     const ok = setUnitSkin(unitId, skinKey);
     if (!ok) return false;
-    for (const token of Game.tokens){
+    const tokens = Game.tokens || [];
+    for (const token of tokens){
       if (!token || token.id !== unitId) continue;
       const art = getUnitArt(unitId);
       token.art = art;
@@ -6278,8 +7289,10 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
   // Xác chết chờ vanish (để sau này thay bằng dead-animation)
   const DEATH_VANISH_MS = 900;
   function cleanupDead(now){
+    if (!Game?.tokens) return;
+    const tokens = Game.tokens;
     const keep = [];
-    for (const t of Game.tokens){
+    for (const t of tokens){
       if (t.alive) { keep.push(t); continue; }
       const t0 = t.deadAt || 0;
       if (!t0) { keep.push(t); continue; }                 // phòng hờ
@@ -6307,17 +7320,19 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
   }
 
   function getMinionsOf(masterIid){
-    return Game.tokens.filter(t => t.isMinion && t.ownerIid === masterIid && t.alive);
+    return (Game?.tokens || []).filter(t => t.isMinion && t.ownerIid === masterIid && t.alive);
   }
   function removeOldestMinions(masterIid, count){
     if (count <= 0) return;
+    const tokens = Game?.tokens;
+    if (!tokens) return;
     const list = getMinionsOf(masterIid).sort((a,b)=> (a.bornSerial||0) - (b.bornSerial||0));
     for (let i=0;i<count && i<list.length;i++){
       const x = list[i];
       x.alive = false;
       // xoá khỏi mảng để khỏi vẽ/đụng lượt
-      const idx = Game.tokens.indexOf(x);
-      if (idx >= 0) Game.tokens.splice(idx,1);
+      const idx = tokens.indexOf(x);
+      if (idx >= 0) tokens.splice(idx,1);
     }
   }
   function extendBusy(duration){
@@ -6330,19 +7345,25 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
 
   // Thực thi Ult: Summoner -> Immediate Summon theo meta; class khác: trừ nộ
   function performUlt(unit){
-    const meta = Game.meta.get(unit.id);
+    if (!Game){
+      setFury(unit, 0);
+      return;
+    }
+    const metaGetter = Game.meta?.get;
+    const meta = typeof metaGetter === 'function' ? metaGetter.call(Game.meta, unit.id) : null;
     if (!meta) { setFury(unit, 0); return; }
 
     const slot = slotIndex(unit.side, unit.cx, unit.cy);
 
-  const summonSpec = meta.class === 'Summoner' ? getSummonSpec(meta) : null;
+    const summonSpec = meta.class === 'Summoner' ? getSummonSpec(meta) : null;
     if (meta.class === 'Summoner' && summonSpec){
       const aliveNow = tokensAlive();
+      const queued = Game.queued || { ally: new Map(), enemy: new Map() };
       const patternSlots = resolveSummonSlots(summonSpec, slot)
         .filter(Boolean)
         .filter(s => {
           const { cx, cy } = slotToCell(unit.side, s);
-          return !cellReserved(aliveNow, Game.queued, cx, cy);
+          return !cellReserved(aliveNow, queued, cx, cy);
         })
         .sort((a, b) => a - b);
 
@@ -6675,7 +7696,8 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
       }
 
       case 'revive': {
-        const fallen = Game.tokens.filter(t => t.side === unit.side && !t.alive);
+        const tokens = Game?.tokens || [];
+        const fallen = tokens.filter(t => t.side === unit.side && !t.alive);
         if (!fallen.length) break;
         fallen.sort((a,b)=> (b.deadAt||0) - (a.deadAt||0));
         const take = Math.max(1, Math.min(fallen.length, (u.targets|0) || 1));
@@ -6713,7 +7735,8 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
         const selected = allies.slice(0, count);
         if (u.healLeader){
           const leaderId = unit.side === 'ally' ? 'leaderA' : 'leaderB';
-          const leader = Game.tokens.find(t => t.id === leaderId && t.alive);
+          const tokens = Game?.tokens || [];
+          const leader = tokens.find(t => t.id === leaderId && t.alive);
           if (leader && !selected.includes(leader)) selected.push(leader);
         }
         if (!selected.length) break;
@@ -6768,7 +7791,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
   }
   const tokensAlive = () => (Game?.tokens || []).filter(t => t.alive);
 
-  function ensureBattleState(game){
+  function ensureBattleState(game: SessionState | null): BattleState | null {
     if (!game || typeof game !== 'object') return null;
     if (!game.battle || typeof game.battle !== 'object'){
       game.battle = {
@@ -6777,19 +7800,20 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
         reason: null,
         detail: null,
         finishedAt: 0,
-        result: null
+        result: null,
+      } as BattleState;
       };
     }
     if (typeof game.result === 'undefined'){
       game.result = null;
     }
     if (!Object.prototype.hasOwnProperty.call(game.battle, 'result')){
-      game.battle.result = null;
+      (game.battle as BattleState).result = null;
     }
-    return game.battle;
+    return game.battle as BattleState;
   }
 
-  function isUnitAlive(unit){
+  function isUnitAlive(unit: UnitToken | null | undefined): boolean {
     if (!unit) return false;
     if (!unit.alive) return false;
     if (Number.isFinite(unit.hp)){
@@ -6798,7 +7822,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     return true;
   }
 
-  function getHpRatio(unit){
+  function getHpRatio(unit: UnitToken | null | undefined): number {
     if (!unit) return 0;
     const hp = Number.isFinite(unit.hp) ? unit.hp : 0;
     const hpMax = Number.isFinite(unit.hpMax) ? unit.hpMax : 0;
@@ -6808,7 +7832,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     return hp > 0 ? 1 : 0;
   }
 
-  function snapshotLeader(unit){
+  function snapshotLeader(unit: UnitToken | null | undefined): LeaderSnapshot | null {
     if (!unit) return null;
     return {
       id: unit.id || null,
@@ -6834,11 +7858,18 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     return key.includes('pvp');
   }
 
-  function finalizeBattle(game, payload, context){
+  function finalizeBattle(
+    game: SessionState | null,
+    payload: BattleFinalizePayload,
+    context: Record<string, unknown>,
+  ): BattleResult | null {
     const battle = ensureBattleState(game);
     if (!battle || battle.over) return battle?.result || null;
-    const finishedAt = Number.isFinite(payload?.finishedAt) ? payload.finishedAt : getNow();
-    const result = {
+    const finishedAtRaw = payload?.finishedAt;
+    const finishedAt = typeof finishedAtRaw === 'number' && Number.isFinite(finishedAtRaw)
+      ? finishedAtRaw
+      : getNow();
+    const result: BattleResult = {
       winner: payload?.winner ?? null,
       reason: payload?.reason ?? null,
       detail: payload?.detail ?? null,
@@ -6850,8 +7881,8 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     battle.detail = result.detail;
     battle.finishedAt = finishedAt;
     battle.result = result;
-    game.result = result;
-    if (game.turn){
+    if (game) game.result = result;
+    if (game?.turn){
       game.turn.completed = true;
       game.turn.busyUntil = finishedAt;
     }
@@ -6859,7 +7890,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
       running = false;
       clearSessionTimers();
       try {
-        if (hud && typeof hud.update === 'function') hud.update(Game);
+        if (hud && typeof hud.update === 'function' && Game) hud.update(Game);
       } catch (_) {}
       scheduleDraw();
     }
@@ -6867,7 +7898,10 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     return result;
   }
 
-  function checkBattleEnd(game, context = {}){
+  function checkBattleEnd(
+    game: SessionState | null,
+    context: Record<string, unknown> = {},
+  ): BattleResult | null {
     if (!game) return null;
     const battle = ensureBattleState(game);
     if (!battle) return null;
@@ -6879,8 +7913,11 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     const leaderAAlive = isUnitAlive(leaderA);
     const leaderBAlive = isUnitAlive(leaderB);
 
-    const contextDetail = context && typeof context === 'object' ? { ...context } : {};
-    const detail = {
+    const contextDetail: Record<string, unknown> =
+      context && typeof context === 'object' ? { ...context } : {};
+    const triggerValue = contextDetail['trigger'];
+    const trigger = typeof triggerValue === 'string' ? triggerValue : null;
+    const detail: BattleDetail = {
       context: contextDetail,
       leaders: {
         ally: snapshotLeader(leaderA),
@@ -6888,17 +7925,19 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
       }
     };
 
-    let winner = null;
-    let reason = null;
+    let winner: BattleResult['winner'] | null = null;
+    let reason: string | null = null;
 
     if (!leaderAAlive || !leaderBAlive){
       reason = 'leader_down';
       if (leaderAAlive && !leaderBAlive) winner = 'ally';
       else if (!leaderAAlive && leaderBAlive) winner = 'enemy';
       else winner = 'draw';
-    } else if (contextDetail.trigger === 'timeout'){
+  } else if (trigger === 'timeout'){
       reason = 'timeout';
-      const remain = Number.isFinite(contextDetail.remain) ? contextDetail.remain : 0;
+      const remainRaw = contextDetail['remain'];
+      const remainCandidate = typeof remainRaw === 'number' ? remainRaw : Number(remainRaw);
+      const remain = Number.isFinite(remainCandidate) ? remainCandidate : 0;
       if (isPvpMode(game)){
         const allyRatio = getHpRatio(leaderA);
         const enemyRatio = getHpRatio(leaderB);
@@ -6911,7 +7950,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
         else if (enemyRatio > allyRatio) winner = 'enemy';
         else winner = 'draw';
       } else {
-        const bossAlive = tokens.some(t => t && t.alive && t.side === 'enemy' && isBossToken(game, t));
+        const bossAlive = tokens.some((t) => t && t.alive && t.side === 'enemy' && isBossToken(game, t));
         detail.timeout = {
           mode: 'pve',
           remain,
@@ -6923,14 +7962,19 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
 
     if (!winner) return null;
 
-    const finishedAt = Number.isFinite(contextDetail.timestamp) ? contextDetail.timestamp : undefined;
+    const timestampRaw = contextDetail['timestamp'];
+    const finishedAt = typeof timestampRaw === 'number' && Number.isFinite(timestampRaw)
+      ? timestampRaw
+      : undefined;
     return finalizeBattle(game, { winner, reason, detail, finishedAt }, contextDetail);
   }
   // Giảm TTL minion của 1 phe sau khi phe đó kết thúc phase
   function tickMinionTTL(side){
     // gom những minion hết hạn để xoá sau vòng lặp
+    if (!Game?.tokens) return;
+    const tokens = Game.tokens;
     const toRemove = [];
-    for (const t of Game.tokens){
+    for (const t of tokens){
       if (!t.alive) continue;
       if (t.side !== side) continue;
       if (!t.isMinion) continue;
@@ -6942,13 +7986,14 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     // xoá ra khỏi tokens để không còn được vẽ/đi lượt
     for (const t of toRemove){
       t.alive = false;
-      const idx = Game.tokens.indexOf(t);
-      if (idx >= 0) Game.tokens.splice(idx, 1);
+      const idx = tokens.indexOf(t);
+      if (idx >= 0) tokens.splice(idx, 1);
     }
   }
 
   function init(){
-    if (Game?._inited) return true;
+    if (!Game) return false;
+    if (Game._inited) return true;
     const doc = docRef || (typeof document !== 'undefined' ? document : null);
     if (!doc) return false;
     const root = rootElement || null;
@@ -6958,12 +8003,12 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     const boardFromDocument = (typeof doc.querySelector === 'function')
       ? doc.querySelector('#board')
       : (typeof doc.getElementById === 'function' ? doc.getElementById('board') : null);
-    const boardEl = /** @type {HTMLCanvasElement|null} */ (boardFromRoot || boardFromDocument);
+    const boardEl = (boardFromRoot || boardFromDocument) as HTMLCanvasElement | null;
     if (!boardEl){
       return false;
     }
     canvas = boardEl;
-    ctx = /** @type {CanvasRenderingContext2D} */ (boardEl.getContext('2d'));
+    ctx = boardEl.getContext('2d') as CanvasRenderingContext2D;
     
     if (typeof hudCleanup === 'function'){
       hudCleanup();
@@ -6972,14 +8017,15 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     hud = initHUD(doc, root);
     hudCleanup = (hud && typeof hud.cleanup === 'function') ? hud.cleanup : null;
     resize();
-    spawnLeaders(Game.tokens, Game.grid);
+    if (Game.grid) spawnLeaders(Game.tokens, Game.grid);
 
-    Game.tokens.forEach(t=>{
+    const tokens = Game.tokens || [];
+    tokens.forEach(t=>{
       if (t.id === 'leaderA' || t.id === 'leaderB'){
         vfxAddSpawn(Game, t.cx, t.cy, t.side);
       }
     });
-    Game.tokens.forEach(t=>{
+    tokens.forEach(t=>{
       if (!t.iid) t.iid = nextIid();
       if (t.id === 'leaderA' || t.id === 'leaderB'){
         Object.assign(t, {
@@ -6989,9 +8035,9 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
         initializeFury(t, t.id, 0);
       }
     });
-    Game.tokens.forEach(t => { if (!t.iid) t.iid = nextIid(); });
+    tokens.forEach(t => { if (!t.iid) t.iid = nextIid(); });
 
-    hud.update(Game);
+    if (hud && typeof hud.update === 'function' && Game) hud.update(Game);
     scheduleDraw();
     Game._inited = true;
 
@@ -7016,6 +8062,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
       canvasClickHandler = null;
     }
     canvasClickHandler = (ev)=>{
+      if (!Game.grid) return;
       const rect = canvas.getBoundingClientRect();
       const p = { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
       const cell = hitToCellOblique(Game.grid, p.x, p.y, CAM_PRESET);
@@ -7046,7 +8093,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
       Game.queued.ally.set(slot, pending);
 
       Game.cost = Math.max(0, Game.cost - card.cost);
-      hud.update(Game);
+      if (hud && typeof hud.update === 'function' && Game) hud.update(Game);
       Game.summoned += 1;
       Game.usedUnitIds.add(card.id);
 
@@ -7105,7 +8152,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
         CLOCK.lastTimerRemain = remain;
         const mm = String(Math.floor(remain/60)).padStart(2,'0');
         const ss = String(remain%60).padStart(2,'0');
-        const tEl = /** @type {HTMLElement|null} */ (queryFromRoot('#timer') || doc.getElementById('timer'));
+        const tEl = (queryFromRoot('#timer') || doc.getElementById('timer')) as HTMLElement | null;
         if (tEl) tEl.textContent = `${mm}:${ss}`;
       }
 
@@ -7125,7 +8172,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
 
         CLOCK.lastCostCreditedSec = elapsedSec;
 
-        hud.update(Game);
+        if (hud && typeof hud.update === 'function' && Game) hud.update(Game);
         if (!Game.selectedId) selectFirstAffordable();
         if (Game.ui?.bar) Game.ui.bar.render();
         aiMaybeAct(Game, 'cost');
@@ -7218,6 +8265,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
 
   /* ---------- Deck logic ---------- */
   function refillDeck(){
+    if (!Game) return;
 
     const need = HAND_SIZE - Game.deck3.length;
     if (need <= 0) return;
@@ -7232,7 +8280,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
 
   /* ---------- Vẽ ---------- */
   function resize(){
-    if (!canvas) return;                                  // guard
+    if (!canvas || !Game) return;                         // guard
     const prevGrid = Game?.grid ? {
       w: Game.grid.w,
       h: Game.grid.h,
@@ -7279,23 +8327,31 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     }
   }
   function draw(){
-    if (!ctx || !canvas || !Game.grid) return;            // guard
-    const clearW = Game.grid.w ?? canvas.width;
-    const clearH = Game.grid.h ?? canvas.height;
+    if (!ctx || !canvas || !Game?.grid) return;           // guard
+    const clearW = Game.grid?.w ?? canvas.width;
+    const clearH = Game.grid?.h ?? canvas.height;
     ctx.clearRect(0, 0, clearW, clearH);
-    const cache = ensureSceneCache();
+    const cache = ensureSceneCache({
+      game: Game,
+      canvas,
+      documentRef: docRef,
+      camPreset: CAM_PRESET
+    });
     if (cache && cache.canvas){
       ctx.drawImage(cache.canvas, 0, 0, cache.pixelWidth, cache.pixelHeight, 0, 0, cache.cssWidth, cache.cssHeight);
     } else {
       const sceneCfg = CFG.SCENE || {};
       const themeKey = Game.sceneTheme || sceneCfg.CURRENT_THEME || sceneCfg.DEFAULT_THEME;
       const theme = (sceneCfg.THEMES && themeKey) ? sceneCfg.THEMES[themeKey] : null;
-      drawBattlefieldScene(ctx, Game.grid, theme);
-      drawEnvironmentProps(ctx, Game.grid, CAM_PRESET, Game.backgroundKey);
+      if (Game.grid) drawBattlefieldScene(ctx, Game.grid, theme);
+      if (Game.grid) drawEnvironmentProps(ctx, Game.grid, CAM_PRESET, Game.backgroundKey);
     }
-    drawGridOblique(ctx, Game.grid, CAM_PRESET);
-    drawQueuedOblique(ctx, Game.grid, Game.queued, CAM_PRESET);
-    drawTokensOblique(ctx, Game.grid, Game.tokens, CAM_PRESET);
+    if (Game.grid){
+      drawGridOblique(ctx, Game.grid, CAM_PRESET);
+      drawQueuedOblique(ctx, Game.grid, Game.queued, CAM_PRESET);
+      const tokens = Game.tokens || [];
+      drawTokensOblique(ctx, Game.grid, tokens, CAM_PRESET);
+    }
     vfxDraw(ctx, Game, CAM_PRESET);
     drawHPBars();
   }
@@ -7390,11 +8446,12 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
   }
 
   function drawHPBars(){
-    if (!ctx || !Game.grid) return;
+    if (!ctx || !Game?.grid) return;
     const baseR = Math.floor(Game.grid.tile * 0.36);
-    for (const t of Game.tokens){
+    const tokens = Game.tokens || [];
+    for (const t of tokens){
       if (!t.alive || !Number.isFinite(t.hpMax)) continue;
-    const p = cellCenterObliqueLocal(Game.grid, t.cx, t.cy, CAM_PRESET);
+      const p = cellCenterObliqueLocal(Game.grid, t.cx, t.cy, CAM_PRESET);
       const art = t.art || getUnitArt(t.id, { skinKey: t.skinKey });
       const layout = art?.layout || {};
       const r = Math.max(6, Math.floor(baseR * (p.scale || 1)));
@@ -7568,7 +8625,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     }
   }
 
-  function startSession(config = {}){
+  function startSession(config: StartConfigOverrides = {}): SessionState | null {
     configureRoot(rootElement);
     const overrides = normalizeConfig(config);
     if (running) stopSession();
@@ -7593,7 +8650,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     }
   }
 
-  function applyConfigToRunningGame(cfg){
+  function applyConfigToRunningGame(cfg: NormalizedSessionConfig): void {
     if (!Game) return;
     let sceneChanged = false;
     if (typeof cfg.sceneTheme !== 'undefined'){
@@ -7612,7 +8669,7 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     }
     if (Array.isArray(cfg.deck) && cfg.deck.length) Game.unitsAll = cfg.deck;
     if (cfg.aiPreset){
-      const preset = cfg.aiPreset || {};
+      const preset: EnemyAIPreset = cfg.aiPreset || {};
       if (Array.isArray(preset.deck) && preset.deck.length){
         Game.ai.unitsAll = preset.deck;
       } else if (Array.isArray(preset.unitsAll) && preset.unitsAll.length){
@@ -7627,61 +8684,51 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
     }
   }
 
-  function updateSessionConfig(next = {}){
+  function updateSessionConfig(next: StartConfigOverrides = {}): void {
     const normalized = normalizeConfig(next);
     storedConfig = normalizeConfig({ ...storedConfig, ...normalized });
     applyConfigToRunningGame(normalized);
   }
 
-  function onSessionEvent(type, handler){
-    if (!type || typeof handler !== 'function') return ()=>{};
-    if (!gameEvents || typeof gameEvents.addEventListener !== 'function') return ()=>{};
-    gameEvents.addEventListener(type, handler);
-    return ()=>{
-      if (typeof gameEvents.removeEventListener === 'function'){
-        gameEvents.removeEventListener(type, handler);
-      }
-    };
-  }
-
-  function createPveSession(rootEl, options = {}){
-    const normalized = normalizeConfig(options || {});
+  function createPveSession(
+    rootEl: RootLike,
+    options: PveSessionStartConfig | null = null,
+  ): PveSessionHandle {
+    const initial = sanitizeStartConfig(options);
+    const normalized = normalizeConfig(initial.rest);
     storedConfig = { ...normalized };
-    configureRoot(rootEl);
-    return {
-      start(startConfig = {}){
-        if (startConfig && (startConfig.root || startConfig.rootEl)) {
-          const r = startConfig.root || startConfig.rootEl;
-          const rest = { ...startConfig };
-          delete rest.root;
-          delete rest.rootEl;
-          configureRoot(r);
-          return startSession(rest);
-        }
-        return startSession(startConfig);
+    configureRoot((rootEl ?? initial.root) ?? null);
+
+    const handle: PveSessionHandle = {
+      start(startConfig: PveSessionStartConfig | null = null): SessionState | null {
+        const { rest, root } = sanitizeStartConfig(startConfig);
+        if (root) configureRoot(root);
+        return startSession(rest);
       },
-      stop(){
+      stop(): void {
         stopSession();
       },
-      updateConfig(next = {}){
-        updateSessionConfig(next);
+      updateConfig(next: StartConfigOverrides | null = null): void {
+        const overrides = (next ?? {}) as StartConfigOverrides;
+        updateSessionConfig(overrides);
       },
-      setUnitSkin(unitId, skinKey){
+      setUnitSkin(unitId: string, skinKey: string | null | undefined): boolean {
         return setUnitSkinForSession(unitId, skinKey);
       },
-      onEvent: onSessionEvent
     };
+    
+    return handle;
   }
 
-  const __backgroundSignatureCache = backgroundSignatureCache;
-  function __getStoredConfig(){
-    return storedConfig ? { ...storedConfig } : {};
+  function __getStoredConfig(): NormalizedSessionConfig {
+    return { ...storedConfig };
   }
 
-  function __getActiveGame(){
+  function __getActiveGame(): SessionState | null {
     return Game;
   }
-  const __reexport0 = __require('./events.js');
+  const __reexport0 = __require('./events.ts');
+  const __reexport1 = __require('./modes/pve/session-state.ts');
   exports.gameEvents = __reexport0.gameEvents;
   exports.emitGameEvent = __reexport0.emitGameEvent;
   exports.TURN_START = __reexport0.TURN_START;
@@ -7690,24 +8737,711 @@ __define('./modes/pve/session.js', (exports, module, __require) => {
   exports.ACTION_END = __reexport0.ACTION_END;
   exports.TURN_REGEN = __reexport0.TURN_REGEN;
   exports.BATTLE_END = __reexport0.BATTLE_END;
-  exports.__backgroundSignatureCache = __backgroundSignatureCache;
-  exports.clearBackgroundSignatureCache = clearBackgroundSignatureCache;
-  exports.computeBackgroundSignature = computeBackgroundSignature;
+  exports.clearBackgroundSignatureCache = __reexport1.clearBackgroundSignatureCache;
+  exports.computeBackgroundSignature = __reexport1.computeBackgroundSignature;
+  exports.__backgroundSignatureCache = __reexport1.__backgroundSignatureCache;
   exports.createPveSession = createPveSession;
   exports.__getStoredConfig = __getStoredConfig;
   exports.__getActiveGame = __getActiveGame;
 });
-__define('./passives.js', (exports, module, __require) => {
-  // passives.js — passive event dispatch & helpers v0.7
-  const __dep0 = __require('./statuses.js');
+__define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
+
+
+
+
+  const __dep0 = __require('./events.ts');
+  const gameEvents = __dep0.gameEvents;
+  const emitGameEvent = __dep0.emitGameEvent;
+  const TURN_START = __dep0.TURN_START;
+  const TURN_END = __dep0.TURN_END;
+  const ACTION_START = __dep0.ACTION_START;
+  const ACTION_END = __dep0.ACTION_END;
+  const TURN_REGEN = __dep0.TURN_REGEN;
+  const BATTLE_END = __dep0.BATTLE_END;
+  const __dep1 = __require('./modes/pve/session-runtime-impl.ts');
+  const createPveSessionImpl = __dep1.createPveSession;
+  const __getStoredConfig = __dep1.__getStoredConfig;
+  const __getActiveGame = __dep1.__getActiveGame;
+
+  type RewardList = ReadonlyArray<RewardRoll>;
+  type MutableRewardList = RewardRoll[];
+  type SessionWithTurn = SessionState & { turn?: TurnSnapshot | null | undefined };
+
+  function isReward(entry: RewardRoll | null | undefined): entry is RewardRoll {
+    return Boolean(entry && typeof entry.id === 'string');
+  }
+
+  function normalizeRewardList(value: unknown): RewardList {
+    if (!Array.isArray(value)) return [];
+    return value.filter(isReward);
+  }
+
+  function ensureRewardQueue(runtime: SessionRuntimeState): MutableRewardList {
+    if (Array.isArray(runtime.rewardQueue)) {
+      runtime.rewardQueue = runtime.rewardQueue.filter(isReward);
+    } else {
+      runtime.rewardQueue = [];
+    }
+    return runtime.rewardQueue;
+  }
+
+  function ensurePendingRewards(encounter: EncounterState): MutableRewardList {
+    if (Array.isArray(encounter.pendingRewards)) {
+      encounter.pendingRewards = encounter.pendingRewards.filter(isReward);
+    } else {
+      encounter.pendingRewards = [];
+    }
+    return encounter.pendingRewards;
+  }
+
+  function mergeRewards(existing: RewardList, additions: RewardList): RewardRoll[] {
+    if (!existing.length && !additions.length) return [];
+    if (!additions.length) return existing.slice();
+    const map = new Map<string, RewardRoll>();
+    for (const reward of existing) {
+      map.set(reward.id, reward);
+    }
+    for (const reward of additions) {
+      if (map.has(reward.id)) {
+        map.delete(reward.id);
+      }
+      map.set(reward.id, reward);
+    }
+    return Array.from(map.values());
+  }
+
+  function updateRuntimeRewards(runtime: SessionRuntimeState, additions: RewardList): RewardRoll[] {
+    const queue = ensureRewardQueue(runtime);
+    const merged = mergeRewards(queue, additions);
+    runtime.rewardQueue = merged;
+    return merged;
+  }
+
+  function updateEncounterRewards(encounter: EncounterState, additions: RewardList): RewardRoll[] {
+    const pending = ensurePendingRewards(encounter);
+    const merged = mergeRewards(pending, additions);
+    encounter.pendingRewards = merged;
+    return merged;
+  }
+
+  function toWaveList(value: unknown): ReadonlyArray<WaveState> {
+    if (!Array.isArray(value)) return [];
+    return value.filter((wave): wave is WaveState => Boolean(wave));
+  }
+
+  function getTurnSnapshot(session: SessionState | null | undefined): TurnSnapshot | null {
+    const turn = (session as SessionWithTurn | null | undefined)?.turn;
+    return turn ?? null;
+  }
+
+  function advanceSession(session: SessionState | null | undefined): EncounterState | null {
+    const runtime = session?.runtime;
+    if (!runtime) return null;
+    const encounter = runtime.encounter;
+    if (!encounter) {
+      runtime.wave = null;
+      return null;
+    }
+
+    ensureRewardQueue(runtime);
+    ensurePendingRewards(encounter);
+
+    const waves = toWaveList(encounter.waves);
+    const index = Math.max(0, encounter.waveIndex | 0);
+    const wave = waves[index] ?? null;
+
+    if (!wave) {
+      encounter.status = 'completed';
+      runtime.wave = null;
+      return encounter;
+    }
+
+    switch (wave.status) {
+      case 'pending':
+        wave.status = 'spawning';
+        runtime.wave = wave;
+        if (encounter.status === 'idle') encounter.status = 'running';
+        break;
+      case 'spawning':
+        wave.status = 'active';
+        runtime.wave = wave;
+        encounter.status = 'running';
+        break;
+      case 'active': {
+        wave.status = 'cleared';
+        runtime.wave = null;
+        encounter.waveIndex = index + 1;
+        const rewards = normalizeRewardList(wave.rewards);
+        if (rewards.length) {
+          updateEncounterRewards(encounter, rewards);
+          updateRuntimeRewards(runtime, rewards);
+        }
+        break;
+      }
+      case 'cleared':
+        runtime.wave = null;
+        encounter.waveIndex = index + 1;
+        break;
+      default:
+        runtime.wave = null;
+        break;
+    }
+
+    if (encounter.waveIndex >= waves.length) {
+      encounter.status = 'completed';
+      runtime.wave = null;
+    }
+
+    const currentTurn: TurnSnapshot | null = getTurnSnapshot(session);
+    void currentTurn;
+
+    return encounter;
+  }
+
+  function applyReward(
+    session: SessionState | null | undefined,
+    reward: RewardRoll | null | undefined,
+  ): RewardRoll | null {
+    if (!session?.runtime) return null;
+    if (!isReward(reward)) return null;
+    const runtime = session.runtime;
+    updateRuntimeRewards(runtime, [reward]);
+    const encounter = runtime.encounter;
+    if (encounter) {
+      updateEncounterRewards(encounter, [reward]);
+    }
+    return reward;
+  }
+
+  function onSessionEvent<T extends GameEventType>(
+    type: T,
+    handler: GameEventHandler<T>,
+  ): () => void {
+    if (!type || typeof handler !== 'function') {
+      return () => {};
+    }
+    if (!gameEvents || typeof gameEvents.addEventListener !== 'function') {
+      return () => {};
+    }
+    gameEvents.addEventListener(type, handler);
+    return () => {
+      if (typeof gameEvents.removeEventListener === 'function') {
+        gameEvents.removeEventListener(type, handler);
+      }
+    };
+  }
+
+  type SessionController = ReturnType<typeof createPveSessionImpl>;
+
+  type ControllerWithEvents = SessionController & {
+    onEvent: <T extends GameEventType>(
+      type: T,
+      handler: GameEventHandler<T>,
+    ) => () => void;
+  };
+
+  function createPveSession(
+    rootEl: Parameters<typeof createPveSessionImpl>[0],
+    options: Parameters<typeof createPveSessionImpl>[1] = {},
+  ): ControllerWithEvents {
+    const controller = createPveSessionImpl(rootEl, options);
+    return {
+      ...controller,
+      onEvent: onSessionEvent,
+    };
+  }
+
+  exports.__getStoredConfig = __getStoredConfig;
+  exports.__getActiveGame = __getActiveGame;
+  exports.gameEvents = gameEvents;
+  exports.emitGameEvent = emitGameEvent;
+  exports.TURN_START = TURN_START;
+  exports.TURN_END = TURN_END;
+  exports.ACTION_START = ACTION_START;
+  exports.ACTION_END = ACTION_END;
+  exports.TURN_REGEN = TURN_REGEN;
+  exports.BATTLE_END = BATTLE_END;
+  exports.advanceSession = advanceSession;
+  exports.applyReward = applyReward;
+  exports.onSessionEvent = onSessionEvent;
+  exports.createPveSession = createPveSession;
+});
+__define('./modes/pve/session-state.ts', (exports, module, __require) => {
+
+
+
+
+
+  const __dep0 = __require('./config.js');
+  const CFG = __dep0.CFG;
+  const __dep1 = __require('./units.ts');
+  const UNITS = __dep1.UNITS;
+  const __dep2 = __require('./meta.js');
+  const Meta = __dep2.Meta;
+  const __dep3 = __require('./events.ts');
+  const gameEvents = __dep3.gameEvents;
+  const __dep4 = __require('./background.js');
+  const getEnvironmentBackground = __dep4.getEnvironmentBackground;
+  const drawEnvironmentProps = __dep4.drawEnvironmentProps;
+  const __dep5 = __require('./scene.js');
+  const getCachedBattlefieldScene = __dep5.getCachedBattlefieldScene;
+  const __dep6 = __require('./statuses.ts');
+  const Statuses = __dep6.Statuses;
+
+  void Statuses;
+
+  type SessionConfigInput = Partial<
+    CreateSessionOptions & {
+      scene?: {
+        theme?: string;
+        backgroundKey?: string;
+        background?: string;
+        [extra: string]: unknown;
+      };
+      [extra: string]: unknown;
+    }
+  >;
+
+  export type NormalizedSessionConfig = (CreateSessionOptions & {
+    sceneTheme?: string;
+    backgroundKey?: string;
+  }) & Record<string, unknown>;
+
+  type TurnOrderEntry = { side: 'ally' | 'enemy'; slot: number };
+
+  type BackgroundConfig = ReturnType<typeof getEnvironmentBackground>;
+
+  type BackgroundCacheEntry = {
+    config: BackgroundConfig;
+    signature: string;
+  };
+
+  export interface SceneCacheEntry {
+    canvas: OffscreenCanvas | HTMLCanvasElement;
+    pixelWidth: number;
+    pixelHeight: number;
+    cssWidth: number;
+    cssHeight: number;
+    themeKey: string | null | undefined;
+    backgroundKey: string | null | undefined;
+    backgroundSignature: string;
+    dpr: number;
+    baseKey: string | null | undefined;
+  }
+
+  export interface EnsureSceneCacheArgs {
+    game: SessionState | null;
+    canvas: HTMLCanvasElement | OffscreenCanvas | null;
+    documentRef: Document | null;
+    camPreset: CameraPreset | undefined;
+  }
+
+  const backgroundSignatureCache = new Map<string, BackgroundCacheEntry>();
+  let sceneCache: SceneCacheEntry | null = null;
+
+  function stableStringify(value: unknown, seen: WeakSet<object> = new WeakSet()): string {
+    if (value === null) return 'null';
+    const type = typeof value;
+    if (type === 'undefined') return 'undefined';
+    if (type === 'number' || type === 'boolean' || type === 'bigint') return String(value);
+    if (type === 'string') return JSON.stringify(value);
+    if (type === 'symbol') return value.toString();
+    if (type === 'function') return `[Function:${(value as { name?: string }).name || 'anonymous'}]`;
+    if (Array.isArray(value)) {
+      return `[${value.map((entry) => stableStringify(entry, seen)).join(',')}]`;
+    }
+    if (type === 'object') {
+      const objectValue = value as Record<string | number | symbol, unknown>;
+      if (seen.has(objectValue)) return '"[Circular]"';
+      seen.add(objectValue);
+      const keys = Object.keys(objectValue).sort();
+      const entries = keys.map((key) => `${JSON.stringify(key)}:${stableStringify(objectValue[key], seen)}`);
+      seen.delete(objectValue);
+      return `{${entries.join(',')}}`;
+    }
+    return String(value);
+  }
+
+  function normalizeBackgroundCacheKey(backgroundKey: string | null | undefined): string {
+    return `key:${backgroundKey ?? '__no-key__'}`;
+  }
+
+  function clearBackgroundSignatureCache(): void {
+    backgroundSignatureCache.clear();
+  }
+
+  function computeBackgroundSignature(backgroundKey: string | null | undefined): string {
+    const cacheKey = normalizeBackgroundCacheKey(backgroundKey);
+    const config = getEnvironmentBackground(backgroundKey);
+    if (!config) {
+      backgroundSignatureCache.delete(cacheKey);
+      return `${backgroundKey || 'no-key'}:no-config`;
+    }
+    const cached = backgroundSignatureCache.get(cacheKey);
+    if (cached && cached.config === config) {
+      return cached.signature;
+    }
+    let signature: string;
+    try {
+      signature = `${backgroundKey || 'no-key'}:${stableStringify(config)}`;
+    } catch (_) {
+      const keyPart = (config as Record<string, unknown>)?.key ?? '';
+      const themePart = (config as Record<string, unknown>)?.theme ?? '';
+      const propsLength = Array.isArray((config as Record<string, unknown>)?.props)
+        ? ((config as { props: unknown[] }).props.length)
+        : 0;
+      signature = `${backgroundKey || 'no-key'}:fallback:${String(keyPart)}:${String(themePart)}:${propsLength}`;
+    }
+    backgroundSignatureCache.set(cacheKey, { config, signature });
+    return signature;
+  }
+
+  function normalizeConfig(input: SessionConfigInput = {}): NormalizedSessionConfig {
+    const out = { ...(input as Record<string, unknown>) } as NormalizedSessionConfig & {
+      scene?: {
+        theme?: string;
+        backgroundKey?: string;
+        background?: string;
+        [extra: string]: unknown;
+      };
+    };
+    const scene = (input.scene ?? {}) as {
+      theme?: string;
+      backgroundKey?: string;
+      background?: string;
+    };
+    if (typeof out.sceneTheme === 'undefined' && typeof scene.theme !== 'undefined') {
+      out.sceneTheme = scene.theme;
+    }
+    if (typeof out.backgroundKey === 'undefined') {
+      if (typeof scene.backgroundKey !== 'undefined') out.backgroundKey = scene.backgroundKey;
+      else if (typeof scene.background !== 'undefined') out.backgroundKey = scene.background;
+    }
+    delete (out as Record<string, unknown>).scene;
+    return out;
+  }
+
+  function buildTurnOrder(): { order: TurnOrderEntry[]; indexMap: Map<string, number> } {
+    const cfg = (CFG as Record<string, unknown>).turnOrder as
+      | { sides?: unknown; pairScan?: unknown }
+      | undefined
+      | null;
+    const rawSides = Array.isArray(cfg?.sides) ? cfg?.sides : null;
+    const sides = rawSides && rawSides.length
+      ? (rawSides.filter((s) => s === 'ally' || s === 'enemy') as Array<'ally' | 'enemy'>)
+      : ['ally', 'enemy'];
+    const order: TurnOrderEntry[] = [];
+    const addPair = (side: unknown, slot: unknown): void => {
+      if (side !== 'ally' && side !== 'enemy') return;
+      const num = Number(slot);
+      if (!Number.isFinite(num)) return;
+      const safeSlot = Math.max(1, Math.min(9, Math.round(num)));
+      order.push({ side, slot: safeSlot });
+    };
+    const appendSlots = (slot: unknown): void => {
+      for (const side of sides) {
+        addPair(side, slot);
+      }
+    };
+
+    const scan = Array.isArray(cfg?.pairScan) ? cfg?.pairScan : null;
+    if (scan && scan.length) {
+      for (const entry of scan) {
+        if (typeof entry === 'number') {
+          appendSlots(entry);
+          continue;
+        }
+        if (Array.isArray(entry)) {
+          if (entry.length === 2 && typeof entry[0] === 'string' && Number.isFinite(entry[1])) {
+            addPair(entry[0] === 'enemy' ? 'enemy' : 'ally', entry[1]);
+          } else {
+            for (const val of entry) {
+              if (typeof val === 'number') appendSlots(val);
+            }
+          }
+          continue;
+        }
+        if (entry && typeof entry === 'object') {
+          const candidate = entry as { side?: string; slot?: unknown; s?: unknown; index?: unknown };
+          const slot = Number(candidate.slot ?? candidate.s ?? candidate.index);
+          if (typeof candidate.side === 'string' && Number.isFinite(slot)) {
+            addPair(candidate.side === 'enemy' ? 'enemy' : 'ally', slot);
+          } else if (Number.isFinite(slot)) {
+            appendSlots(slot);
+          }
+        }
+      }
+    }
+
+    if (!order.length) {
+      const fallback = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+      for (const slot of fallback) appendSlots(slot);
+    }
+
+    const indexMap = new Map<string, number>();
+    order.forEach((entry, idx) => {
+      const key = `${entry.side}:${entry.slot}`;
+      if (!indexMap.has(key)) indexMap.set(key, idx);
+    });
+
+    return { order, indexMap };
+  }
+
+  function createSession(options: CreateSessionOptions = {}): SessionState {
+    const normalized = normalizeConfig(options);
+    const modeKey = typeof normalized.modeKey === 'string' ? normalized.modeKey : null;
+    const sceneTheme = normalized.sceneTheme
+      ?? (CFG as Record<string, any>).SCENE?.CURRENT_THEME
+      ?? (CFG as Record<string, any>).SCENE?.DEFAULT_THEME;
+    const backgroundKey = normalized.backgroundKey
+      ?? (CFG as Record<string, any>).CURRENT_BACKGROUND
+      ?? (CFG as Record<string, any>).SCENE?.CURRENT_BACKGROUND
+      ?? (CFG as Record<string, any>).SCENE?.CURRENT_THEME
+      ?? (CFG as Record<string, any>).SCENE?.DEFAULT_THEME;
+
+    const allyUnits = (Array.isArray(normalized.deck) && normalized.deck.length
+      ? normalized.deck
+      : (UNITS as unknown)) as SessionState['unitsAll'];
+    const enemyPreset = (normalized.aiPreset ?? {}) as {
+      deck?: ReadonlyArray<string>;
+      unitsAll?: ReadonlyArray<string>;
+      costCap?: number;
+      summonLimit?: number;
+      startingDeck?: ReadonlyArray<unknown>;
+    };
+    const enemyUnits = (Array.isArray(enemyPreset.deck) && enemyPreset.deck.length
+      ? enemyPreset.deck
+      : (Array.isArray(enemyPreset.unitsAll) && enemyPreset.unitsAll.length ? enemyPreset.unitsAll : (UNITS as unknown))) as SessionState['unitsAll'];
+
+    const requestedTurnMode = normalized.turnMode
+      ?? normalized.turn?.mode
+      ?? normalized.turnOrderMode
+      ?? normalized.turnOrder?.mode
+      ?? (CFG as Record<string, any>)?.turnOrder?.mode;
+    const useInterleaved = requestedTurnMode === 'interleaved_by_position';
+    const allyColsRaw = (CFG as Record<string, any>)?.ALLY_COLS;
+    const gridRowsRaw = (CFG as Record<string, any>)?.GRID_ROWS;
+    const allyCols = Number.isFinite(allyColsRaw) ? Math.max(1, Math.floor(allyColsRaw)) : 3;
+    const gridRows = Number.isFinite(gridRowsRaw) ? Math.max(1, Math.floor(gridRowsRaw)) : 3;
+    const slotsPerSide = Math.max(1, allyCols * gridRows);
+
+    const buildTurnState = (): TurnSnapshot => {
+      if (useInterleaved) {
+        return {
+          mode: 'interleaved_by_position',
+          nextSide: 'ALLY',
+          lastPos: { ALLY: 0, ENEMY: 0 },
+          wrapCount: { ALLY: 0, ENEMY: 0 },
+          turnCount: 0,
+          slotCount: slotsPerSide,
+          cycle: 0,
+          busyUntil: 0,
+        } satisfies TurnSnapshot;
+      }
+      const { order, indexMap } = buildTurnOrder();
+      return {
+        order,
+        orderIndex: indexMap,
+        cursor: 0,
+        cycle: 0,
+        busyUntil: 0,
+      } satisfies TurnSnapshot;
+    };
+
+    const game = {
+      modeKey,
+      grid: null,
+      tokens: [],
+      cost: 0,
+      costCap: Number.isFinite(normalized.costCap) ? Number(normalized.costCap) : (CFG as Record<string, any>).COST_CAP,
+      summoned: 0,
+      summonLimit: Number.isFinite(normalized.summonLimit)
+        ? Number(normalized.summonLimit)
+        : (CFG as Record<string, any>).SUMMON_LIMIT,
+      battle: {
+        over: false,
+        winner: null,
+        reason: null,
+        detail: null,
+        finishedAt: 0,
+        result: null,
+      },
+      result: null,
+      unitsAll: allyUnits,
+      usedUnitIds: new Set(),
+      deck3: [],
+      selectedId: null,
+      ui: { bar: null },
+      turn: buildTurnState(),
+      queued: { ally: new Map(), enemy: new Map() } as QueuedSummonState,
+      actionChain: [] as ActionChainEntry[],
+      events: gameEvents,
+      sceneTheme,
+      backgroundKey,
+      runtime: {
+        encounter: null,
+        wave: null,
+        rewardQueue: [],
+      },
+    } as SessionState;
+
+    game.ai = {
+      cost: 0,
+      costCap: Number.isFinite(enemyPreset.costCap)
+        ? Number(enemyPreset.costCap)
+        : (enemyPreset.costCap ?? (CFG as Record<string, any>).COST_CAP),
+      summoned: 0,
+      summonLimit: Number.isFinite(enemyPreset.summonLimit)
+        ? Number(enemyPreset.summonLimit)
+        : (enemyPreset.summonLimit ?? (CFG as Record<string, any>).SUMMON_LIMIT),
+      unitsAll: enemyUnits,
+      usedUnitIds: new Set(),
+      deck: Array.isArray(enemyPreset.startingDeck) ? enemyPreset.startingDeck.slice() : [],
+      selectedId: null,
+      lastThinkMs: 0,
+      lastDecision: null,
+    } as SessionState['ai'];
+
+    game.meta = Meta;
+    return game;
+  }
+
+  function invalidateSceneCache(): void {
+    sceneCache = null;
+    clearBackgroundSignatureCache();
+  }
+
+  function createSceneCacheCanvas(
+    pixelWidth: number,
+    pixelHeight: number,
+    documentRef: Document | null,
+  ): OffscreenCanvas | HTMLCanvasElement | null {
+    if (!Number.isFinite(pixelWidth) || !Number.isFinite(pixelHeight)) return null;
+    const safeW = Math.max(1, Math.floor(pixelWidth));
+    const safeH = Math.max(1, Math.floor(pixelHeight));
+    if (typeof OffscreenCanvas === 'function') {
+      try {
+        return new OffscreenCanvas(safeW, safeH);
+      } catch (_) {
+        // ignore and fall back
+      }
+    }
+    const doc = documentRef || (typeof document !== 'undefined' ? document : null);
+    if (!doc || typeof doc.createElement !== 'function') return null;
+    const offscreen = doc.createElement('canvas');
+    offscreen.width = safeW;
+    offscreen.height = safeH;
+    return offscreen;
+  }
+
+  function ensureSceneCache(args: EnsureSceneCacheArgs): SceneCacheEntry | null {
+    const { game, canvas, documentRef, camPreset } = args;
+    if (!game?.grid) return null;
+    const grid = game.grid as Record<string, any>;
+    const sceneCfg = ((CFG as Record<string, any>).SCENE ?? {}) as Record<string, any>;
+    const themeKey = game.sceneTheme ?? sceneCfg.CURRENT_THEME ?? sceneCfg.DEFAULT_THEME;
+    const theme = themeKey ? sceneCfg.THEMES?.[themeKey] ?? null : null;
+    const backgroundKey = game.backgroundKey;
+    const backgroundSignature = computeBackgroundSignature(backgroundKey ?? null);
+    const dprRaw = Number.isFinite(grid.dpr) && grid.dpr > 0 ? Number(grid.dpr) : 1;
+    const cssWidth = grid.w ?? (canvas ? (canvas.width as number) / dprRaw : 0);
+    const cssHeight = grid.h ?? (canvas ? (canvas.height as number) / dprRaw : 0);
+    if (!cssWidth || !cssHeight) return null;
+    const pixelWidth = Math.max(1, Math.round(cssWidth * dprRaw));
+    const pixelHeight = Math.max(1, Math.round(cssHeight * dprRaw));
+
+    const baseScene = getCachedBattlefieldScene(grid, theme, { width: cssWidth, height: cssHeight, dpr: dprRaw });
+    const baseKey = baseScene?.cacheKey ?? null;
+    if (!baseScene) {
+      sceneCache = null;
+      return null;
+    }
+
+    let needsRebuild = false;
+    if (!sceneCache) needsRebuild = true;
+    else if (sceneCache.pixelWidth !== pixelWidth || sceneCache.pixelHeight !== pixelHeight) needsRebuild = true;
+    else if (sceneCache.themeKey !== themeKey || sceneCache.backgroundKey !== backgroundKey) needsRebuild = true;
+    else if (sceneCache.backgroundSignature !== backgroundSignature) needsRebuild = true;
+    else if (sceneCache.dpr !== dprRaw) needsRebuild = true;
+    else if (sceneCache.baseKey !== baseKey) needsRebuild = true;
+
+    if (!needsRebuild) return sceneCache;
+
+    const offscreen = createSceneCacheCanvas(pixelWidth, pixelHeight, documentRef);
+    if (!offscreen) return null;
+    const cacheCtx = offscreen.getContext('2d');
+    if (!cacheCtx) return null;
+
+    if (typeof cacheCtx.resetTransform === 'function') {
+      cacheCtx.resetTransform();
+    } else if (typeof cacheCtx.setTransform === 'function') {
+      cacheCtx.setTransform(1, 0, 0, 1, 0, 0);
+    }
+    cacheCtx.clearRect(0, 0, pixelWidth, pixelHeight);
+
+    try {
+      cacheCtx.drawImage(baseScene.canvas as CanvasImageSource, 0, 0);
+    } catch (err) {
+      console.error('[scene-cache:base]', err);
+      return null;
+    }
+
+    if (typeof cacheCtx.setTransform === 'function') {
+      cacheCtx.setTransform(dprRaw, 0, 0, dprRaw, 0, 0);
+    } else if (dprRaw !== 1 && typeof cacheCtx.scale === 'function') {
+      cacheCtx.scale(dprRaw, dprRaw);
+    }
+
+    try {
+      drawEnvironmentProps(cacheCtx, grid, camPreset, backgroundKey ?? undefined);
+    } catch (err) {
+      console.error('[scene-cache]', err);
+      return null;
+    }
+
+    sceneCache = {
+      canvas: offscreen,
+      pixelWidth,
+      pixelHeight,
+      cssWidth,
+      cssHeight,
+      themeKey,
+      backgroundKey,
+      backgroundSignature,
+      dpr: dprRaw,
+      baseKey,
+    };
+    return sceneCache;
+  }
+
+  exports.__backgroundSignatureCache = backgroundSignatureCache;
+  exports.clearBackgroundSignatureCache = clearBackgroundSignatureCache;
+  exports.computeBackgroundSignature = computeBackgroundSignature;
+  exports.normalizeConfig = normalizeConfig;
+  exports.buildTurnOrder = buildTurnOrder;
+  exports.createSession = createSession;
+  exports.invalidateSceneCache = invalidateSceneCache;
+  exports.createSceneCacheCanvas = createSceneCacheCanvas;
+  exports.ensureSceneCache = ensureSceneCache;
+});
+__define('./modes/pve/session.ts', (exports, module, __require) => {
+  export * from './session-state.ts';
+  export * from './session-runtime.ts';
+});
+__define('./passives.ts', (exports, module, __require) => {
+  // passives.ts — passive event dispatch & helpers v0.7
+  const __dep0 = __require('./statuses.ts');
   const Statuses = __dep0.Statuses;
   const hookOnLethalDamage = __dep0.hookOnLethalDamage;
   const __dep1 = __require('./utils/time.js');
   const safeNow = __dep1.safeNow;
 
-  const clamp01 = (x) => Math.max(0, Math.min(1, x));
 
-  const STAT_ALIAS = new Map([
+
+
+  const clamp01 = (value: number): number => Math.max(0, Math.min(1, value));
+
+  const STAT_ALIAS: Map<string, string> = new Map([
     ['atk', 'atk'],
     ['attack', 'atk'],
     ['wil', 'wil'],
@@ -7733,9 +9467,21 @@ __define('./passives.js', (exports, module, __require) => {
     ['hp_regen', 'hpRegen']
   ]);
 
-  const BASE_STAT_KEYS = ['atk','wil','res','arm','agi','per','hpMax','spd','aeMax','aeRegen','hpRegen'];
+  const BASE_STAT_KEYS: Array<keyof UnitToken> = [
+    'atk',
+    'wil',
+    'res',
+    'arm',
+    'agi',
+    'per',
+    'hpMax',
+    'spd',
+    'aeMax',
+    'aeRegen',
+    'hpRegen',
+  ];
 
-  function normalizeStatKey(stat){
+  const normalizeStatKey = (stat: string | null | undefined): string | null => {
     if (typeof stat === 'string'){
       const trimmed = stat.trim();
       if (!trimmed) return null;
@@ -7743,26 +9489,40 @@ __define('./passives.js', (exports, module, __require) => {
       return STAT_ALIAS.get(canonical) || trimmed;
     }
     return null;
-  }
+  };
 
-  const normalizeKey = (value) => (typeof value === 'string' ? value.trim().toLowerCase() : '');
+  const normalizeKey = (value: unknown): string => (typeof value === 'string' ? value.trim().toLowerCase() : '');
 
-  function ensureStatusContainer(unit){
+  const toNumber = (value: unknown, fallback = 0): number =>
+    typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+
+  const ensureStatusContainer = (unit: UnitToken | null | undefined): void => {
     if (!unit) return;
     if (!Array.isArray(unit.statuses)) unit.statuses = [];
+  };
+
+  const stacksOf = (unit: UnitToken | null | undefined, id: string): number => {
+    const status = Statuses.get(unit, id);
+    return status ? status.stacks ?? 0 : 0;
+  };
+
+  interface StatBuffSpec {
+    attr: string | null | undefined;
+    mode?: 'percent' | 'flat';
+    amount?: number;
+    purgeable?: boolean;
   }
 
-  function stacksOf(unit, id){
-    const s = Statuses.get(unit, id);
-    return s ? (s.stacks || 0) : 0;
-  }
-
-  function ensureStatBuff(unit, id, { attr, mode='percent', amount=0, purgeable=true }){
+  const ensureStatBuff = (
+    unit: UnitToken | null | undefined,
+    id: string,
+    { attr, mode = 'percent', amount = 0, purgeable = true }: StatBuffSpec,
+  ): StatusEffect | null => {
     ensureStatusContainer(unit);
     const statKey = normalizeStatKey(attr) || attr;
-    let st = Statuses.get(unit, id);
-    if (!st){
-      st = Statuses.add(unit, {
+    let status = Statuses.get(unit, id);
+    if (!status){
+      status = Statuses.add(unit, {
         id,
         kind: 'buff',
         tag: 'stat',
@@ -7770,106 +9530,166 @@ __define('./passives.js', (exports, module, __require) => {
         mode,
         amount,
         purgeable,
-        stacks: 0
+        stacks: 0,
       });
     }
-    st.attr = statKey;
-    st.mode = mode;
-    st.amount = amount;
-    st.purgeable = purgeable;
-    return st;
+    status.attr = statKey;
+    status.mode = mode;
+    status.amount = amount;
+    status.purgeable = purgeable;
+    return status;
+  };
+
+  const applyStatStacks = (
+    status: StatusEffect | null | undefined,
+    stacks: number,
+    { maxStacks = null }: { maxStacks?: number | null } = {},
+  ): void => {
+    if (!status) return;
+    let next = Math.max(0, stacks | 0);
+    if (typeof maxStacks === 'number'){
+      next = Math.min(next, maxStacks);
+    }
+    status.stacks = next;
+  };
+
+  interface ApplyStatMapOptions {
+    mode?: 'percent' | 'flat';
+    purgeable?: boolean;
+    stack?: boolean;
+    stacks?: number;
+    maxStacks?: number | null;
+    idPrefix?: string;
+    stackFlat?: boolean;
   }
 
-  function applyStatStacks(st, stacks, { maxStacks = null } = {}){
-    if (!st) return;
-    let next = Math.max(0, stacks|0);
-    if (typeof maxStacks === 'number'){ next = Math.min(next, maxStacks); }
-    st.stacks = next;
-  }
+  type AfterHitHandler = (afterCtx?: Record<string, unknown>) => void;
 
-  function applyStatMap(unit, passive, stats, options = {}){
+  type PassiveRuntimeContext = Record<string, unknown> & {
+    afterHit?: AfterHitHandler[];
+    damage?: Record<string, unknown> & { baseMul?: number };
+    log?: Array<Record<string, unknown>>;
+    target?: UnitToken | null;
+  };
+
+  const applyStatMap = (
+    unit: UnitToken | null | undefined,
+    passive: PassiveSpec | null | undefined,
+    stats: Record<string, number>,
+    options: ApplyStatMapOptions = {},
+  ): boolean => {
     if (!unit || !stats) return false;
     const mode = options.mode === 'flat' ? 'flat' : 'percent';
     const purgeable = options.purgeable !== false;
     const stackable = options.stack !== false;
-    const stacks = Number.isFinite(options.stacks) ? options.stacks : 1;
+    const stacks = Number.isFinite(options.stacks) ? Number(options.stacks) : 1;
     const maxStacks = options.maxStacks;
-    const idPrefix = options.idPrefix || (passive?.id || 'stat');
+    const idPrefix = options.idPrefix || passive?.id || 'stat';
     let applied = false;
     for (const [stat, value] of Object.entries(stats)){
       if (!Number.isFinite(value)) continue;
       const attr = normalizeStatKey(stat);
       if (!attr) continue;
-      const st = ensureStatBuff(unit, `${idPrefix}_${attr}`, { attr, mode, amount: value, purgeable });
-      const nextStacks = stackable ? (st.stacks || 0) + stacks : stacks;
-      applyStatStacks(st, nextStacks, { maxStacks });
+      const status = ensureStatBuff(unit, `${idPrefix}_${attr}`, { attr, mode, amount: value, purgeable });
+      const nextStacks = stackable ? (status?.stacks ?? 0) + stacks : stacks;
+      applyStatStacks(status, nextStacks, { maxStacks });
       applied = true;
     }
     if (applied) recomputeFromStatuses(unit);
     return applied;
-  }
+  };
 
-  function captureBaseStats(unit){
-    const out = {};
+  const captureBaseStats = (unit: UnitToken | null | undefined): Record<string, number> => {
+    const source = unit ?? ({} as UnitToken);
+    const result: Record<string, number> = {};
     for (const key of BASE_STAT_KEYS){
-      const value = unit[key];
+      const value = source[key];
       if (typeof value === 'number' && Number.isFinite(value)){
-        out[key] = value;
+        result[key] = value;
       }
     }
-    return out;
-  }
+    return result;
+  };
 
-  function hasLivingMinion(unit, Game){
+  const hasLivingMinion = (unit: UnitToken | null | undefined, Game: SessionState | null | undefined): boolean => {
     if (!unit || !Game) return false;
-    return (Game.tokens || []).some(t => t && t.alive && t.isMinion && t.ownerIid === unit.iid);
+    return (Game.tokens || []).some(token => token && token.alive && token.isMinion && token.ownerIid === unit.iid);
+  };
+
+  /**
+   * @param {Record<string, unknown> | null | undefined} condition
+   * @param {{ Game?: SessionState | null; unit?: UnitToken | null; ctx?: Record<string, unknown> | null; passive?: PassiveDefinition | null }} options
+   * @returns {boolean}
+   */
+  interface PassiveConditionContext {
+    Game?: SessionState | null;
+    unit?: UnitToken | null;
+    ctx?: Record<string, unknown> | null;
+    passive?: PassiveSpec | null;
   }
 
-  function evaluateConditionObject(condition, { Game, unit, ctx, passive }){
+  const evaluateConditionObject = (
+    condition: Record<string, unknown> | null | undefined,
+    { Game, unit, ctx, passive }: PassiveConditionContext,
+  ): boolean => {
     if (!condition || typeof condition !== 'object') return true;
-    const hpMax = Number.isFinite(unit?.hpMax) ? unit.hpMax : Number.isFinite(unit?.baseStats?.hpMax) ? unit.baseStats.hpMax : 0;
+    const hpMax = Number.isFinite(unit?.hpMax)
+      ? unit?.hpMax ?? 0
+      : Number.isFinite(unit?.baseStats?.hpMax)
+        ? unit?.baseStats?.hpMax ?? 0
+        : 0;
     const hpPct = hpMax > 0 ? ((unit?.hp ?? hpMax) / hpMax) : 0;
-    if (condition.selfHPAbove != null && hpPct <= condition.selfHPAbove) return false;
-    if (condition.selfHPBelow != null && hpPct >= condition.selfHPBelow) return false;
-    if (condition.hpAbove != null && hpPct <= condition.hpAbove) return false;
-    if (condition.hpBelow != null && hpPct >= condition.hpBelow) return false;
+    if (condition.selfHPAbove != null && hpPct <= Number(condition.selfHPAbove)) return false;
+    if (condition.selfHPBelow != null && hpPct >= Number(condition.selfHPBelow)) return false;
+    if (condition.hpAbove != null && hpPct <= Number(condition.hpAbove)) return false;
+    if (condition.hpBelow != null && hpPct >= Number(condition.hpBelow)) return false;
 
-    if (condition.requiresStatus){
+    if ('requiresStatus' in condition && condition.requiresStatus){
       const list = Array.isArray(condition.requiresStatus) ? condition.requiresStatus : [condition.requiresStatus];
       for (const id of list){
-        if (!Statuses.has(unit, id)) return false;
+        if (typeof id !== 'string' || !Statuses.has(unit ?? null, id)) return false;
       }
     }
 
-    if (condition.targetHasStatus){
-      const target = ctx?.target;
+    if ('targetHasStatus' in condition && condition.targetHasStatus){
+      const target = (ctx as { target?: UnitToken | null } | null | undefined)?.target;
       if (!target) return false;
       const list = Array.isArray(condition.targetHasStatus) ? condition.targetHasStatus : [condition.targetHasStatus];
       for (const id of list){
-        if (!Statuses.has(target, id)) return false;
+        if (typeof id !== 'string' || !Statuses.has(target, id)) return false;
       }
     }
 
     if (condition.minMinions != null){
       const tokens = Game?.tokens || [];
       const count = tokens.filter(t => t && t.alive && t.isMinion && t.ownerIid === unit.iid).length;
-      if (count < condition.minMinions) return false;
+      if (count < Number(condition.minMinions)) return false;
     }
 
     if (condition.maxStacks != null){
-      const stackId = condition.stackId || passive?.id;
+      const stackId = (condition.stackId as string | undefined) || passive?.id;
       if (stackId){
-        const st = Statuses.get(unit, stackId);
-        const stacks = st ? (st.stacks || 0) : 0;
-        if (stacks >= condition.maxStacks) return false;
+        const st = Statuses.get(unit ?? null, stackId);
+        const stacks = st ? st.stacks ?? 0 : 0;
+        if (stacks >= Number(condition.maxStacks)) return false;
       }
     }
 
     return true;
-  }
+  };
 
-  function passiveConditionsOk({ Game, unit, passive, ctx }){
-    const conditions = passive?.conditions;
+  const passiveConditionsOk = ({
+    Game,
+    unit,
+    passive,
+    ctx,
+  }: {
+    Game?: SessionState | null;
+    unit?: UnitToken | null;
+    passive?: PassiveSpec | null;
+    ctx?: Record<string, unknown> | null;
+  }): boolean => {
+    const conditions = passive?.conditions as unknown;
     if (!conditions) return true;
     const list = Array.isArray(conditions) ? conditions : [conditions];
     for (const cond of list){
@@ -7890,37 +9710,37 @@ __define('./passives.js', (exports, module, __require) => {
         continue;
       }
       if (typeof cond === 'object'){
-        if (!evaluateConditionObject(cond, { Game, unit, ctx, passive })) return false;
+        if (!evaluateConditionObject(cond as Record<string, unknown>, { Game, unit, ctx, passive })) return false;
       }
     }
     return true;
-  }
+  };
 
-  function recomputeFromStatuses(unit){
+  const recomputeFromStatuses = (unit: UnitToken | null | undefined): void => {
     if (!unit || !unit.baseStats) return;
     ensureStatusContainer(unit);
 
-    const percent = new Map();
-    const flat = new Map();
-    for (const st of unit.statuses){
-      if (!st || !st.attr || !st.mode) continue;
-    const attr = normalizeStatKey(st.attr);
+    const percent = new Map<string, number>();
+    const flat = new Map<string, number>();
+    for (const status of unit.statuses ?? []){
+      if (!status || !status.attr || !status.mode) continue;
+      const attr = normalizeStatKey(status.attr);
       if (!attr) continue;
-      const stacks = st.stacks == null ? 1 : st.stacks;
-      const amount = (st.amount ?? st.power ?? 0) * stacks;
+      const stacks = status.stacks == null ? 1 : status.stacks;
+      const amount = (status.amount ?? status.power ?? 0) * stacks;
       if (!Number.isFinite(amount)) continue;
-      const mode = st.mode === 'flat' ? 'flat' : 'percent';
+      const mode = status.mode === 'flat' ? 'flat' : 'percent';
       const store = mode === 'flat' ? flat : percent;
-      const prev = store.get(attr) || 0;
+      const prev = store.get(attr) ?? 0;
       store.set(attr, prev + amount);
     }
 
-  for (const [key, baseValue] of Object.entries(unit.baseStats)){
+    for (const [key, baseValue] of Object.entries(unit.baseStats)){
       if (!Number.isFinite(baseValue)) continue;
       const attr = normalizeStatKey(key) || key;
       const pct = percent.get(attr) ?? percent.get(key) ?? 0;
       const add = flat.get(attr) ?? flat.get(key) ?? 0;
-      let next = baseValue * (1 + pct) + add;
+      let next = (baseValue ?? 0) * (1 + pct) + add;
 
       if (attr === 'arm' || attr === 'res'){
         unit[attr] = clamp01(next);
@@ -7940,118 +9760,127 @@ __define('./passives.js', (exports, module, __require) => {
       }
       unit[attr] = Math.max(0, Math.round(next));
     }
-  }
+  };
 
-  function healTeam(Game, unit, pct, opts = {}){
+  const healTeam = (
+    Game: SessionState | null | undefined,
+    unit: UnitToken | null | undefined,
+    pct: number,
+    opts: { mode?: 'targetMax' | 'casterMax' } = {},
+  ): void => {
     if (!Game || !unit) return;
     if (!Number.isFinite(pct) || pct <= 0) return;
     const mode = opts.mode || 'targetMax';
-    const casterHpMax = Number.isFinite(unit.hpMax) ? unit.hpMax : 0;
-    const allies = (Game.tokens || []).filter(t => t.side === unit.side && t.alive);
+    const casterHpMax = Number.isFinite(unit.hpMax) ? unit.hpMax ?? 0 : 0;
+    const allies = (Game.tokens || []).filter(t => t && t.side === unit.side && t.alive);
     for (const ally of allies){
       if (!Number.isFinite(ally.hpMax)) continue;
-      const base = mode === 'casterMax' ? casterHpMax : (ally.hpMax || 0);
+      const base = mode === 'casterMax' ? casterHpMax : ally.hpMax ?? 0;
       if (!Number.isFinite(base) || base <= 0) continue;
-      const heal = Math.max(0, Math.round(base * pct));
-      if (heal <= 0) continue;
-      ally.hp = Math.min(ally.hpMax, (ally.hp ?? ally.hpMax) + heal);
+      const healAmount = Math.max(0, Math.round(base * pct));
+      if (healAmount <= 0) continue;
+      ally.hp = Math.min(ally.hpMax ?? 0, (ally.hp ?? ally.hpMax ?? 0) + healAmount);
     }
-  }
+  };
 
-  const EFFECTS = {
-    placeMark({ Game, unit, passive, ctx }){
-      if (!ctx || !ctx.target) return;
-      const params = passive?.params || {};
-      const ttl = Number.isFinite(params.ttlTurns) ? params.ttlTurns : 3;
-      const stacksToExplode = Math.max(1, params.stacksToExplode || 3);
-      const dmgMul = params.dmgFromWIL ?? 0.5;
+  const EFFECTS: Record<string, PassiveDefinition> = {
+    placeMark({ unit, passive, ctx }) {
+      const runtime = (ctx ?? {}) as PassiveRuntimeContext;
+      const id = passive?.id;
+      const target = runtime.target ?? null;
+      if (!id || !target) return;
+      const params = (passive?.params ?? {}) as Record<string, unknown>;
+      const ttl = Number.isFinite(params.ttlTurns) ? Number(params.ttlTurns) : 3;
+      const stacksToExplode = Math.max(1, toNumber(params.stacksToExplode, 3));
+      const dmgMul = toNumber(params.dmgFromWIL, 0.5);
       const purgeable = params.purgeable !== false;
-      if (!Array.isArray(ctx.afterHit)) ctx.afterHit = [];
-      ctx.afterHit.push((afterCtx = {}) => {
-        const target = afterCtx.target || ctx.target;
-        if (!target || !target.alive) return;
-        ensureStatusContainer(target);
-        let st = Statuses.get(target, passive.id);
-        if (!st){
-          st = Statuses.add(target, {
-            id: passive.id,
+      if (!Array.isArray(runtime.afterHit)) runtime.afterHit = [];
+      runtime.afterHit.push((afterCtx: Record<string, unknown> = {}) => {
+        const afterTarget = (afterCtx.target as UnitToken | undefined) ?? runtime.target ?? null;
+        if (!afterTarget || !afterTarget.alive) return;
+        ensureStatusContainer(afterTarget);
+        let status = Statuses.get(afterTarget, id);
+        if (!status){
+          status = Statuses.add(afterTarget, {
+            id,
             kind: 'debuff',
             tag: 'mark',
             stacks: 0,
             dur: ttl,
             tick: 'turn',
-            purgeable
+            purgeable,
           });
         }
-        st.dur = ttl;
-        st.stacks = (st.stacks || 0) + 1;
-        if (st.stacks < stacksToExplode) return;
+        if (!status) return;
+        status.dur = ttl;
+        status.stacks = (status.stacks ?? 0) + 1;
+        if ((status.stacks ?? 0) < stacksToExplode) return;
 
-        Statuses.remove(target, passive.id);
-        const amount = Math.max(1, Math.round((unit?.wil || 0) * dmgMul));
-        target.hp = Math.max(0, (target.hp || 0) - amount);
-        if (target.hp <= 0){
-          if (!hookOnLethalDamage(target)){
-            target.alive = false;
-            if (!target.deadAt) target.deadAt = safeNow();
+        Statuses.remove(afterTarget, id);
+        const amount = Math.max(1, Math.round(toNumber(unit?.wil, 0) * dmgMul));
+        afterTarget.hp = Math.max(0, (afterTarget.hp ?? 0) - amount);
+        if ((afterTarget.hp ?? 0) <= 0){
+          if (!hookOnLethalDamage(afterTarget)){
+            afterTarget.alive = false;
+            if (!afterTarget.deadAt) afterTarget.deadAt = safeNow();
           }
         }
-        if (ctx && Array.isArray(ctx.log)){
-          ctx.log.push({ t: passive.id, source: unit?.name, target: target?.name, dmg: amount });
+        if (Array.isArray(runtime.log)){
+          runtime.log.push({ t: id, source: unit?.name, target: afterTarget?.name, dmg: amount });
         }
       });
     },
 
-    gainATKPercent({ unit, passive }){
+    gainATKPercent({ unit, passive }) {
       if (!unit) return;
-      const params = passive?.params || {};
-      const amount = params.amount ?? 0;
-      applyStatMap(unit, passive, { atk: amount }, {
+      const params = (passive?.params ?? {}) as Record<string, unknown>;
+      const amount = toNumber(params.amount, 0);
+      applyStatMap(unit, passive ?? null, { atk: amount }, {
         mode: 'percent',
         stack: params.stack !== false,
         purgeable: params.purgeable !== false,
-        maxStacks: params.maxStacks
+        maxStacks: typeof params.maxStacks === 'number' ? params.maxStacks : undefined,
       });
     },
 
-    gainWILPercent({ unit, passive }){
+    gainWILPercent({ unit, passive }) {
       if (!unit) return;
-      const params = passive?.params || {};
-      const amount = params.amount ?? 0;
-      applyStatMap(unit, passive, { wil: amount }, {
+      const params = (passive?.params ?? {}) as Record<string, unknown>;
+      const amount = toNumber(params.amount, 0);
+      applyStatMap(unit, passive ?? null, { wil: amount }, {
         mode: 'percent',
         stack: params.stack !== false,
         purgeable: params.purgeable !== false,
-        maxStacks: params.maxStacks
+        maxStacks: typeof params.maxStacks === 'number' ? params.maxStacks : undefined,
       });
     },
 
-    conditionalBuff({ unit, passive, ctx }){
-      if (!unit) return;
-      const params = passive?.params || {};
-      const hpMax = unit.hpMax || 0;
-      const hpPct = hpMax > 0 ? (unit.hp || 0) / hpMax : 0;
-      const threshold = params.ifHPgt ?? 0.5;
-      const trueStats = {};
-      const falseStats = {};
-      if (params.RES != null) trueStats.res = params.RES;
-      if (params.ARM != null) trueStats.arm = params.ARM;
-      if (params.ATK != null) trueStats.atk = params.ATK;
-      if (params.WIL != null) trueStats.wil = params.WIL;
-      if (params.elseRES != null) falseStats.res = params.elseRES;
-      if (params.elseARM != null) falseStats.arm = params.elseARM;
-      if (params.elseATK != null) falseStats.atk = params.elseATK;
-      if (params.elseWIL != null) falseStats.wil = params.elseWIL;
+    conditionalBuff({ unit, passive }) {
+      if (!unit || !passive?.id) return;
+      const params = (passive.params ?? {}) as Record<string, unknown>;
+      const hpMax = toNumber(unit.hpMax, 0);
+      const hpPct = hpMax > 0 ? toNumber(unit.hp, hpMax) / hpMax : 0;
+      const threshold = toNumber(params.ifHPgt, 0.5);
+      const trueStats: Record<string, number> = {};
+      const falseStats: Record<string, number> = {};
+      if (params.RES != null) trueStats.res = toNumber(params.RES, 0);
+      if (params.ARM != null) trueStats.arm = toNumber(params.ARM, 0);
+      if (params.ATK != null) trueStats.atk = toNumber(params.ATK, 0);
+      if (params.WIL != null) trueStats.wil = toNumber(params.WIL, 0);
+      if (params.elseRES != null) falseStats.res = toNumber(params.elseRES, 0);
+      if (params.elseARM != null) falseStats.arm = toNumber(params.elseARM, 0);
+      if (params.elseATK != null) falseStats.atk = toNumber(params.elseATK, 0);
+      if (params.elseWIL != null) falseStats.wil = toNumber(params.elseWIL, 0);
 
       const purgeable = params.purgeable !== false;
-      const applyStats = (stats, suffix) => {
+      const applyStats = (stats: Record<string, number>) => {
         for (const [stat, amount] of Object.entries(stats)){
           const attr = stat.toLowerCase();
-          const st = ensureStatBuff(unit, `${passive.id}_${attr}`, { attr, mode:'percent', amount, purgeable });
-          applyStatStacks(st, 1);
+          const status = ensureStatBuff(unit, `${passive.id}_${attr}`, { attr, mode: 'percent', amount, purgeable });
+          applyStatStacks(status, 1);
         }
       };
-      const removeStats = (stats) => {
+      const removeStats = (stats: Record<string, number>) => {
         for (const stat of Object.keys(stats)){
           Statuses.remove(unit, `${passive.id}_${stat.toLowerCase()}`);
         }
@@ -8067,87 +9896,92 @@ __define('./passives.js', (exports, module, __require) => {
       recomputeFromStatuses(unit);
     },
 
-    gainRESPct({ Game, unit, passive }){
+    gainRESPct({ Game, unit, passive }) {
       if (!unit) return;
-      const params = passive?.params || {};
-      const amount = params.amount ?? 0;
-      applyStatMap(unit, passive, { res: amount }, {
+      const params = (passive?.params ?? {}) as Record<string, unknown>;
+      const amount = toNumber(params.amount, 0);
+      applyStatMap(unit, passive ?? null, { res: amount }, {
         mode: 'percent',
         stack: params.stack !== false,
         purgeable: params.purgeable !== false,
-        maxStacks: params.maxStacks
+        maxStacks: typeof params.maxStacks === 'number' ? params.maxStacks : undefined,
       });
     },
 
-    gainStats({ unit, passive }){
+    gainStats({ unit, passive }) {
       if (!unit) return;
-      const params = passive?.params || {};
-      const modeRaw = params.mode || params.statMode || params.kind;
+      const params = (passive?.params ?? {}) as Record<string, unknown>;
+      const modeRaw = params.mode ?? params.statMode ?? params.kind;
       const mode = modeRaw === 'flat' ? 'flat' : 'percent';
       let applied = false;
-      if (params.stats && typeof params.stats === 'object'){
-        applied = applyStatMap(unit, passive, params.stats, {
+      const stats = params.stats;
+      if (stats && typeof stats === 'object'){
+        applied = applyStatMap(unit, passive ?? null, stats as Record<string, number>, {
           mode,
           stack: params.stack !== false,
-          stacks: params.stacks,
+          stacks: typeof params.stacks === 'number' ? params.stacks : undefined,
           purgeable: params.purgeable !== false,
-          maxStacks: params.maxStacks,
-          idPrefix: params.idPrefix || passive?.id
+          maxStacks: typeof params.maxStacks === 'number' ? params.maxStacks : undefined,
+          idPrefix: typeof params.idPrefix === 'string' ? params.idPrefix : passive?.id,
         }) || applied;
       }
-      if (params.flatStats && typeof params.flatStats === 'object'){
-        applied = applyStatMap(unit, passive, params.flatStats, {
+      const flatStats = params.flatStats;
+      if (flatStats && typeof flatStats === 'object'){
+        applied = applyStatMap(unit, passive ?? null, flatStats as Record<string, number>, {
           mode: 'flat',
           stack: params.stackFlat !== false,
-          stacks: params.stacksFlat ?? params.stacks,
+          stacks: typeof params.stacksFlat === 'number' ? params.stacksFlat : typeof params.stacks === 'number' ? params.stacks : undefined,
           purgeable: params.purgeable !== false,
-          maxStacks: params.maxStacksFlat ?? params.maxStacks,
-          idPrefix: `${passive?.id || 'stat'}_flat`
+          maxStacks: typeof params.maxStacksFlat === 'number' ? params.maxStacksFlat : typeof params.maxStacks === 'number' ? params.maxStacks : undefined,
+          idPrefix: `${passive?.id ?? 'stat'}_flat`,
         }) || applied;
       }
-      if (!applied && params.attr != null && Number.isFinite(params.amount)){
+      if (!applied && params.attr != null && typeof params.attr === 'string' && typeof params.amount === 'number'){
         const attr = normalizeStatKey(params.attr);
         if (attr){
-          applyStatMap(unit, passive, { [attr]: params.amount }, {
+          applyStatMap(unit, passive ?? null, { [attr]: params.amount } as Record<string, number>, {
             mode,
             stack: params.stack !== false,
-            stacks: params.stacks,
+            stacks: typeof params.stacks === 'number' ? params.stacks : undefined,
             purgeable: params.purgeable !== false,
-            maxStacks: params.maxStacks
+            maxStacks: typeof params.maxStacks === 'number' ? params.maxStacks : undefined,
           });
         }
       }
     },
 
-    gainBonus({ Game, unit, passive, ctx }){
-      if (!unit || !ctx) return;
-      const params = passive?.params || {};
-      const perMinion = params.perMinion ?? 0;
+    gainBonus({ Game, unit, passive, ctx }) {
+      if (!unit || !ctx || !passive?.id) return;
+      const runtime = ctx as PassiveRuntimeContext;
+      const params = (passive.params ?? {}) as Record<string, unknown>;
+      const perMinion = toNumber(params.perMinion, 0);
       const ownerIid = unit.iid;
-      const minions = (Game.tokens || []).filter(t => t && t.alive && t.isMinion && t.ownerIid === ownerIid).length;
-      const st = ensureStatBuff(unit, passive.id, { attr:'atk', mode:'percent', amount: 0, purgeable: params.purgeable !== false });
-      st.attr = 'atk';
-      st.mode = 'percent';
-      st.amount = perMinion;
-      applyStatStacks(st, minions);
+      const minions = (Game?.tokens || []).filter(token => token && token.alive && token.isMinion && token.ownerIid === ownerIid).length;
+      const status = ensureStatBuff(unit, passive.id, { attr: 'atk', mode: 'percent', amount: 0, purgeable: params.purgeable !== false });
+      if (!status) return;
+      status.attr = 'atk';
+      status.mode = 'percent';
+      status.amount = perMinion;
+      applyStatStacks(status, minions);
       recomputeFromStatuses(unit);
-      if (ctx.damage){
+      if (runtime.damage){
         const bonusPct = perMinion * minions;
-        ctx.damage.baseMul = (ctx.damage.baseMul ?? 1) * (1 + bonusPct);
+        runtime.damage.baseMul = toNumber(runtime.damage.baseMul, 1) * (1 + bonusPct);
       }
     },
 
-    resPerSleeping({ Game, unit, passive }){
-      if (!Game || !unit) return;
-      const params = passive?.params || {};
-      const foes = (Game.tokens || []).filter(t => t && t.alive && t.side !== unit.side && Statuses.has(t, 'sleep'));
-      const st = ensureStatBuff(unit, passive.id, { attr:'res', mode:'percent', amount: params.perTarget ?? 0, purgeable: params.purgeable !== false });
-      applyStatStacks(st, foes.length, { maxStacks: params.maxStacks });
+    resPerSleeping({ Game, unit, passive }) {
+      if (!Game || !unit || !passive?.id) return;
+      const params = (passive.params ?? {}) as Record<string, unknown>;
+      const foes = (Game.tokens || []).filter(token => token && token.alive && token.side !== unit.side && Statuses.has(token, 'sleep'));
+      const status = ensureStatBuff(unit, passive.id, { attr: 'res', mode: 'percent', amount: toNumber(params.perTarget, 0), purgeable: params.purgeable !== false });
+      applyStatStacks(status, foes.length, { maxStacks: typeof params.maxStacks === 'number' ? params.maxStacks : undefined });
       recomputeFromStatuses(unit);
-    }
+    },
   };
 
-  const EFFECT_MAP = {
+  /** @type {Record<string, PassiveEffectHandler>} */
+  const PASSIVES = {
     placeMark: EFFECTS.placeMark,
     'gainATK%': EFFECTS.gainATKPercent,
     'gainWIL%': EFFECTS.gainWILPercent,
@@ -8157,63 +9991,86 @@ __define('./passives.js', (exports, module, __require) => {
     gainStats: EFFECTS.gainStats,
     'gainStats%': EFFECTS.gainStats,
     statBuff: EFFECTS.gainStats,
-    statGain: EFFECTS.gainStats
-  };
+    statGain: EFFECTS.gainStats,
+  } satisfies PassiveRegistry;
 
-  function emitPassiveEvent(Game, unit, when, ctx = {}){
+  /**
+   * @param {SessionState | null | undefined} Game
+   * @param {UnitToken | null | undefined} unit
+   * @param {string} when
+   * @param {Record<string, unknown>} [ctx]
+   * @returns {void}
+   */
+  function emitPassiveEvent(
+    Game: SessionState | null | undefined,
+    unit: UnitToken | null | undefined,
+    when: string,
+    ctx: PassiveRuntimeContext = {},
+  ): void {
     if (!Game || !unit) return;
     const meta = Game.meta && typeof Game.meta.get === 'function' ? Game.meta.get(unit.id) : null;
     const kit = meta?.kit;
     if (!kit || !Array.isArray(kit.passives)) return;
-    ctx.meta = meta;
-    ctx.kit = kit;
-    for (const passive of kit.passives){
+    ctx.meta = meta as unknown;
+    ctx.kit = kit as unknown;
+    for (const passive of kit.passives as Array<PassiveSpec | null | undefined>){
       if (!passive || passive.when !== when) continue;
       const effectKey = typeof passive.effect === 'string'
         ? passive.effect
         : (passive.effect?.type || passive.effect?.kind || null);
-      let handler = effectKey ? EFFECT_MAP[effectKey] : EFFECT_MAP[passive.effect];
-      let effectivePassive = passive;
+      let handler: PassiveDefinition | undefined = effectKey ? PASSIVES[effectKey] : undefined;
+      let effectivePassive: PassiveSpec | null = passive;
 
       if (passive && typeof passive.effect === 'object' && passive.effect !== null){
         const spec = passive.effect;
         const type = spec.type || spec.kind;
-        if (type && EFFECT_MAP[type]) handler = EFFECT_MAP[type];
+        if (type && PASSIVES[type]) handler = PASSIVES[type];
         const mergedParams = {
           ...(spec.params || {}),
           ...(passive.params || {}),
           ...(spec.stats ? { stats: spec.stats } : {}),
-          ...(spec.flatStats ? { flatStats: spec.flatStats } : {})
+          ...(spec.flatStats ? { flatStats: spec.flatStats } : {}),
         };
         effectivePassive = { ...passive, params: mergedParams };
-        if (!handler && (mergedParams.stats || mergedParams.flatStats)){
+        if (!handler && ((mergedParams as Record<string, unknown>).stats || (mergedParams as Record<string, unknown>).flatStats)){
           handler = EFFECTS.gainStats;
         }
       } else if (!handler && passive?.params && (passive.params.stats || passive.params.flatStats)){
         handler = EFFECTS.gainStats;
       }
 
-      if (effectKey === 'gainRES%' && effectivePassive?.params?.perTarget != null){
+      const params = effectivePassive?.params as Record<string, unknown> | undefined;
+      if (effectKey === 'gainRES%' && params && params.perTarget != null){
         handler = EFFECTS.resPerSleeping;
       }
       if (typeof handler !== 'function') continue;
       if (!passiveConditionsOk({ Game, unit, passive: effectivePassive, ctx })) continue;
-      handler({ Game, unit, passive: effectivePassive, ctx });
+      handler({ Game: Game ?? null, unit: unit ?? null, passive: effectivePassive ?? null, ctx });
     }
   }
 
-  function applyOnSpawnEffects(Game, unit, onSpawn = {}){
+  /**
+   * @param {SessionState | null | undefined} Game
+   * @param {UnitToken | null | undefined} unit
+   * @param {Record<string, unknown>} [onSpawn]
+   * @returns {void}
+   */
+  function applyOnSpawnEffects(
+    Game: SessionState | null | undefined,
+    unit: UnitToken | null | undefined,
+    onSpawn: Record<string, unknown> = {},
+  ): void {
     if (!Game || !unit || !onSpawn) return;
     ensureStatusContainer(unit);
 
-    const effects = [];
-    if (Array.isArray(onSpawn.effects)) effects.push(...onSpawn.effects);
+    const effects: Array<Record<string, unknown>> = [];
+    if (Array.isArray(onSpawn.effects)) effects.push(...onSpawn.effects as Record<string, unknown>[]);
 
-    if (Number.isFinite(onSpawn.teamHealOnEntry) && onSpawn.teamHealOnEntry > 0){
+    if (Number.isFinite(onSpawn.teamHealOnEntry) && Number(onSpawn.teamHealOnEntry) > 0){
       effects.push({ type: 'teamHeal', amount: onSpawn.teamHealOnEntry, mode: 'targetMax' });
     }
-    const casterHeal = onSpawn.teamHealPercentMaxHPOfCaster ?? onSpawn.teamHealPercentCasterMaxHP;
-    if (Number.isFinite(casterHeal) && casterHeal > 0){
+    const casterHeal = (onSpawn.teamHealPercentMaxHPOfCaster ?? onSpawn.teamHealPercentCasterMaxHP) as number | undefined;
+    if (Number.isFinite(casterHeal) && Number(casterHeal) > 0){
       effects.push({ type: 'teamHeal', amount: casterHeal, mode: 'casterMax' });
     }
 
@@ -8243,30 +10100,31 @@ __define('./passives.js', (exports, module, __require) => {
     let statsChanged = false;
     for (const effect of effects){
       if (!effect) continue;
-      const type = normalizeKey(effect.type || effect.kind || effect.effect);
+      const type = normalizeKey(effect.type ?? effect.kind ?? effect.effect);
       if (type === 'teamheal'){
-        const amount = effect.amount ?? effect.value ?? effect.percent ?? 0;
-        if (!Number.isFinite(amount) || amount <= 0) continue;
+        const amount = toNumber(effect.amount ?? effect.value ?? effect.percent, 0);
+        if (amount <= 0) continue;
         const mode = effect.mode === 'casterMax' ? 'casterMax' : 'targetMax';
         healTeam(Game, unit, amount, { mode });
         continue;
       }
       if (type === 'status' || type === 'addstatus'){
-        if (effect.status && typeof effect.status === 'object'){
-          Statuses.add(unit, effect.status);
+        const statusEffect = effect.status;
+        if (statusEffect && typeof statusEffect === 'object'){
+          Statuses.add(unit, statusEffect as StatusEffect);
         }
         continue;
       }
       if (type === 'stats' || type === 'stat' || type === 'buff'){
         const stats = effect.stats || effect.values;
         if (!stats || typeof stats !== 'object') continue;
-        const applied = applyStatMap(unit, { id: effect.id || 'onSpawn' }, stats, {
+        const applied = applyStatMap(unit, ({ id: (effect.id as string) || 'onSpawn' } as PassiveSpec), stats as Record<string, number>, {
           mode: effect.mode === 'flat' ? 'flat' : (effect.statMode === 'flat' ? 'flat' : 'percent'),
           stack: effect.stack !== false,
-          stacks: effect.stacks,
+          stacks: typeof effect.stacks === 'number' ? effect.stacks : undefined,
           purgeable: effect.purgeable !== false,
-          maxStacks: effect.maxStacks,
-          idPrefix: effect.id || 'onSpawn'
+          maxStacks: typeof effect.maxStacks === 'number' ? effect.maxStacks : undefined,
+          idPrefix: (effect.id as string) || 'onSpawn',
         });
         statsChanged = applied || statsChanged;
         continue;
@@ -8286,16 +10144,20 @@ __define('./passives.js', (exports, module, __require) => {
     }
   }
 
-  function prepareUnitForPassives(unit){
+  /**
+   * @param {UnitToken | null | undefined} unit
+   * @returns {void}
+   */
+  function prepareUnitForPassives(unit: UnitToken | null | undefined): void {
     if (!unit) return;
     ensureStatusContainer(unit);
     const captured = captureBaseStats(unit);
     if (!unit.baseStats || typeof unit.baseStats !== 'object'){
-      unit.baseStats = { ...captured };
+      unit.baseStats = { ...captured } as Record<string, number>;
     } else {
       for (const [key, value] of Object.entries(captured)){
-        if (!Number.isFinite(unit.baseStats[key])){
-          unit.baseStats[key] = value;
+        if (!Number.isFinite((unit.baseStats as Record<string, number>)[key])){
+          (unit.baseStats as Record<string, number>)[key] = value;
         }
       }
     }
@@ -8304,7 +10166,6 @@ __define('./passives.js', (exports, module, __require) => {
 
   exports.recomputeUnitStats = recomputeFromStatuses;
   exports.stacksOf = stacksOf;
-
   exports.emitPassiveEvent = emitPassiveEvent;
   exports.applyOnSpawnEffects = applyOnSpawnEffects;
   exports.prepareUnitForPassives = prepareUnitForPassives;
@@ -8622,15 +10483,12 @@ __define('./screens/collection/index.js', (exports, module, __require) => {
 
   exports.renderCollectionView = renderCollectionView;
 
-  const __defaultExport = { renderCollectionScreen };
   exports.renderCollectionScreen = renderCollectionScreen;
-  exports.default = __defaultExport;
-  module.exports.default = exports.default;
 });
 __define('./screens/collection/view.js', (exports, module, __require) => {
   const __dep0 = __require('./catalog.js');
   const ROSTER = __dep0.ROSTER;
-  const __dep1 = __require('./units.js');
+  const __dep1 = __require('./units.ts');
   const UNITS = __dep1.UNITS;
   const __dep2 = __require('./art.js');
   const getUnitArt = __dep2.getUnitArt;
@@ -9851,10 +11709,7 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
     };
   }
 
-
   exports.renderCollectionView = renderCollectionView;
-  exports.default = renderCollectionView;
-  module.exports.default = exports.default;
 });
 __define('./screens/lineup/index.js', (exports, module, __require) => {
   const __dep0 = __require('./screens/lineup/view.js');
@@ -9913,12 +11768,8 @@ __define('./screens/lineup/index.js', (exports, module, __require) => {
     });
   }
 
-  exports.renderLineupView = renderLineupView;
-
-  const __defaultExport = { renderLineupScreen };
   exports.renderLineupScreen = renderLineupScreen;
-  exports.default = __defaultExport;
-  module.exports.default = exports.default;
+  exports.renderLineupView = renderLineupView;
 });
 __define('./screens/lineup/view.js', (exports, module, __require) => {
   const __dep0 = __require('./catalog.js');
@@ -11556,10 +13407,7 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
     };
   }
 
-  const __defaultExport = { renderLineupView };
   exports.renderLineupView = renderLineupView;
-  exports.default = __defaultExport;
-  module.exports.default = exports.default;
 });
 __define('./screens/main-menu/dialogues.js', (exports, module, __require) => {
   const __dep0 = __require('./art.js');
@@ -12647,307 +14495,418 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
       }
     };
   }
-
-
-
   exports.renderMainMenuView = renderMainMenuView;
-  exports.default = renderMainMenuView;
-  module.exports.default = exports.default;
 });
-__define('./statuses.js', (exports, module, __require) => {
-  // statuses.js — Hệ trạng thái/effect data-driven v0.7
+__define('./statuses.ts', (exports, module, __require) => {
   const __dep0 = __require('./utils/fury.js');
   const gainFury = __dep0.gainFury;
   const finishFuryHit = __dep0.finishFuryHit;
-  const byId = (u) => (u && u.statuses) || (u.statuses = []);
 
-  // ===== Utilities
-  function _find(u, id) {
-    const arr = byId(u);
-    const i = arr.findIndex(s => s.id === id);
-    return [arr, i, i >= 0 ? arr[i] : null];
-  }
-  function clamp01(x){ return x < 0 ? 0 : (x > 1 ? 1 : x); }
-  function _dec(u, s){
-    if (typeof s.dur === 'number') { s.dur -= 1; if (s.dur <= 0) Statuses.remove(u, s.id); }
+
+
+
+  interface ShieldResult {
+    remain: number;
+    absorbed: number;
+    broke: boolean;
   }
 
-  // ===== Public API
-  const Statuses = {
-    // ---- CRUD
-    add(unit, st) {
-      const arr = byId(unit);
-      const [_, i, cur] = _find(unit, st.id);
-      if (cur) {
-        // stacking / refresh logic
-        if (st.maxStacks && cur.stacks != null) {
-          cur.stacks = Math.min(st.maxStacks, (cur.stacks || 1) + (st.stacks || 1));
+  interface DamageResult {
+    dealt?: number;
+    absorbed?: number;
+    dtype?: string;
+  }
+
+  interface ResolveContext {
+    attackType?: string;
+  }
+
+  interface StatusTurnContext extends Record<string, unknown> {
+    log?: Array<Record<string, unknown>>;
+  }
+
+  interface StatusService {
+    add(unit: UnitToken, status: StatusEffect): StatusEffect;
+    remove(unit: UnitToken, id: string): void;
+    has(unit: UnitToken, id: string): boolean;
+    get(unit: UnitToken, id: string): StatusEffect | null;
+    purge(unit: UnitToken): void;
+    stacks(unit: UnitToken, id: string): number;
+    onTurnStart(unit: UnitToken, ctx?: Record<string, unknown>): void;
+    onTurnEnd(unit: UnitToken, ctx?: StatusTurnContext): void;
+    onPhaseStart(side: string, ctx?: Record<string, unknown>): void;
+    onPhaseEnd(side: string, ctx?: Record<string, unknown>): void;
+    canAct(unit: UnitToken): boolean;
+    blocks(unit: UnitToken, what: string): boolean;
+    resolveTarget(attacker: UnitToken, candidates: UnitToken[], ctx?: ResolveContext): UnitToken | null;
+    modifyStats(unit: UnitToken, base: Record<string, number>): Record<string, number>;
+    beforeDamage(
+      attacker: UnitToken,
+      target: UnitToken,
+      ctx?: Partial<DamageContext> & ResolveContext,
+    ): DamageContext;
+    absorbShield(target: UnitToken, dmg: number, ctx?: Record<string, unknown>): ShieldResult;
+    afterDamage(attacker: UnitToken, target: UnitToken, result?: DamageResult): DamageResult;
+    make: StatusRegistry;
+  }
+
+  const clamp01 = (value: number): number => Math.max(0, Math.min(1, value));
+
+  const ensureStatusList = (unit?: UnitToken | null): StatusEffect[] => {
+    if (!unit) return [];
+    if (!Array.isArray(unit.statuses)) {
+      unit.statuses = [];
+    }
+    return unit.statuses;
+  };
+
+  function findStatus(
+    unit: UnitToken | null | undefined,
+    id: string,
+  ): [StatusEffect[], number, StatusEffect | null] {
+    const list = ensureStatusList(unit);
+    const index = list.findIndex(status => status.id === id);
+    return [list, index, index >= 0 ? list[index] : null];
+  }
+
+  function decrementDuration(unit: UnitToken, status: StatusEffect): void {
+    if (typeof status.dur === 'number') {
+      status.dur -= 1;
+      if (status.dur <= 0) Statuses.remove(unit, status.id);
+    }
+  }
+
+  const statusFactories = {
+    stun: (spec?: Record<string, unknown>) => {
+      const { turns = 1 } = (spec ?? {}) as { turns?: number };
+      return { id: 'stun', kind: 'debuff', tag: 'control', dur: turns, tick: 'turn' };
+    },
+    sleep: (spec?: Record<string, unknown>) => {
+      const { turns = 1 } = (spec ?? {}) as { turns?: number };
+      return { id: 'sleep', kind: 'debuff', tag: 'control', dur: turns, tick: 'turn' };
+    },
+    taunt: (spec?: Record<string, unknown>) => {
+      const { turns = 1 } = (spec ?? {}) as { turns?: number };
+      return { id: 'taunt', kind: 'debuff', tag: 'control', dur: turns, tick: 'turn' };
+    },
+    reflect: (spec?: Record<string, unknown>) => {
+      const { pct = 0.2, turns = 1 } = (spec ?? {}) as { pct?: number; turns?: number };
+      return { id: 'reflect', kind: 'buff', tag: 'counter', power: pct, dur: turns, tick: 'turn' };
+    },
+    bleed: (spec?: Record<string, unknown>) => {
+      const { turns = 2 } = (spec ?? {}) as { turns?: number };
+      return { id: 'bleed', kind: 'debuff', tag: 'dot', dur: turns, tick: 'turn' };
+    },
+    damageCut: (spec?: Record<string, unknown>) => {
+      const { pct = 0.2, turns = 1 } = (spec ?? {}) as { pct?: number; turns?: number };
+      return { id: 'dmgCut', kind: 'buff', tag: 'mitigation', power: pct, dur: turns, tick: 'turn' };
+    },
+    fatigue: (spec?: Record<string, unknown>) => {
+      const { turns = 2 } = (spec ?? {}) as { turns?: number };
+      return { id: 'fatigue', kind: 'debuff', tag: 'output', dur: turns, tick: 'turn' };
+    },
+    silence: (spec?: Record<string, unknown>) => {
+      const { turns = 1 } = (spec ?? {}) as { turns?: number };
+      return { id: 'silence', kind: 'debuff', tag: 'silence', dur: turns, tick: 'turn' };
+    },
+    shield: (spec?: Record<string, unknown>) => {
+      const { pct = 0.2, amount = 0 } = (spec ?? {}) as { pct?: number; amount?: number };
+      return {
+        id: 'shield',
+        kind: 'buff',
+        tag: 'shield',
+        amount: amount ?? 0,
+        power: pct,
+        tick: null,
+      };
+    },
+    exalt: (spec?: Record<string, unknown>) => {
+      const { turns = 2 } = (spec ?? {}) as { turns?: number };
+      return { id: 'exalt', kind: 'buff', tag: 'output', dur: turns, tick: 'turn' };
+    },
+    pierce: (spec?: Record<string, unknown>) => {
+      const { pct = 0.1, turns = 2 } = (spec ?? {}) as { pct?: number; turns?: number };
+      return { id: 'pierce', kind: 'buff', tag: 'penetration', power: pct, dur: turns, tick: 'turn' };
+    },
+    daze: (spec?: Record<string, unknown>) => {
+      const { turns = 1 } = (spec ?? {}) as { turns?: number };
+      return { id: 'daze', kind: 'debuff', tag: 'stat', dur: turns, tick: 'turn' };
+    },
+    frenzy: (spec?: Record<string, unknown>) => {
+      const { turns = 2 } = (spec ?? {}) as { turns?: number };
+      return { id: 'frenzy', kind: 'buff', tag: 'basic-boost', dur: turns, tick: 'turn' };
+    },
+    weaken: (spec?: Record<string, unknown>) => {
+      const { turns = 2, stacks = 1 } = (spec ?? {}) as { turns?: number; stacks?: number };
+      return {
+        id: 'weaken',
+        kind: 'debuff',
+        tag: 'output',
+        dur: turns,
+        tick: 'turn',
+        stacks,
+        maxStacks: 5,
+      };
+    },
+    fear: (spec?: Record<string, unknown>) => {
+      const { turns = 1 } = (spec ?? {}) as { turns?: number };
+      return { id: 'fear', kind: 'debuff', tag: 'output', dur: turns, tick: 'turn' };
+    },
+    stealth: (spec?: Record<string, unknown>) => {
+      const { turns = 1 } = (spec ?? {}) as { turns?: number };
+      return { id: 'stealth', kind: 'buff', tag: 'invuln', dur: turns, tick: 'turn' };
+    },
+    venom: (spec?: Record<string, unknown>) => {
+      const { pct = 0.15, turns = 2 } = (spec ?? {}) as { pct?: number; turns?: number };
+      return { id: 'venom', kind: 'buff', tag: 'on-hit', power: pct, dur: turns, tick: 'turn' };
+    },
+    execute: (spec?: Record<string, unknown>) => {
+      const { turns = 2 } = (spec ?? {}) as { turns?: number };
+      return { id: 'execute', kind: 'buff', tag: 'execute', dur: turns, tick: 'turn' };
+    },
+    undying: () => ({ id: 'undying', kind: 'buff', tag: 'cheat-death', once: true }),
+    allure: (spec?: Record<string, unknown>) => {
+      const { turns = 1 } = (spec ?? {}) as { turns?: number };
+      return { id: 'allure', kind: 'buff', tag: 'avoid-basic', dur: turns, tick: 'turn' };
+    },
+    haste: (spec?: Record<string, unknown>) => {
+      const { pct = 0.1, turns = 1 } = (spec ?? {}) as { pct?: number; turns?: number };
+      return { id: 'haste', kind: 'buff', tag: 'stat', power: pct, dur: turns, tick: 'turn' };
+    },
+  } satisfies StatusRegistry;
+
+  const Statuses: StatusService = {
+    add(unit, status) {
+      const list = ensureStatusList(unit);
+      const [, index, existing] = findStatus(unit, status.id);
+      if (existing) {
+        if (status.maxStacks && existing.stacks != null) {
+          existing.stacks = Math.min(status.maxStacks, (existing.stacks || 1) + (status.stacks || 1));
         }
-        if (st.dur != null) cur.dur = st.dur;            // refresh thời lượng
-        if (st.power != null) cur.power = st.power;      // replace nếu mạnh hơn (tuỳ loại)
-        if (st.amount != null) cur.amount = (cur.amount ?? 0) + (st.amount ?? 0); // shield cộng dồn
-        return cur;
+        if (status.dur != null) existing.dur = status.dur;
+        if (status.power != null) existing.power = status.power;
+        if (status.amount != null) existing.amount = (existing.amount ?? 0) + (status.amount ?? 0);
+        return existing;
       }
-      const copy = { ...st };
+      const copy: StatusEffect = { ...status };
       if (copy.stacks == null) copy.stacks = 1;
-      arr.push(copy);
+      list.push(copy);
       return copy;
     },
-    remove(unit, id){
-      const [arr, i] = _find(unit, id);
-      if (i >= 0) arr.splice(i,1);
+    remove(unit, id) {
+      const [list, index] = findStatus(unit, id);
+      if (index >= 0) list.splice(index, 1);
     },
-    has(unit, id){ const [, , cur] = _find(unit, id); return !!cur; },
-    get(unit, id){ const [, , cur] = _find(unit, id); return cur; },
-    purge(unit){ unit.statuses = []; },
-    stacks(unit, id){ const s = this.get(unit,id); return s ? (s.stacks || 0) : 0; },
-
-    // ---- Turn hooks
-    onTurnStart(unit, ctx){
-      // chặn hành động nếu bị stun/sleep
-      // (đếm thời lượng ở onTurnEnd để vẫn "mất lượt" trọn vẹn)
+    has(unit, id) {
+      const [, , found] = findStatus(unit, id);
+      return found != null;
     },
-    onTurnEnd(unit, ctx){
-      const arr = byId(unit);
-      // Bleed: mất 5% HPmax sau khi unit này kết thúc lượt (effect 4)
+    get(unit, id) {
+      const [, , found] = findStatus(unit, id);
+      return found;
+    },
+    purge(unit) {
+      unit.statuses = [];
+    },
+    stacks(unit, id) {
+      const found = this.get(unit, id);
+      return found ? found.stacks ?? 0 : 0;
+    },
+    onTurnStart(_unit, _ctx) {
+      // reserved
+    },
+    onTurnEnd(unit, ctx) {
+      const list = ensureStatusList(unit);
       const bleed = this.get(unit, 'bleed');
-      if (bleed){
-        const lost = Math.round(unit.hpMax * 0.05);
-        unit.hp = Math.max(0, unit.hp - lost);
-        if (ctx?.log) ctx.log.push({t:'bleed', who:unit.name, lost});
-        _dec(unit, bleed);
+      if (bleed) {
+        const lost = Math.round((unit.hpMax ?? 0) * 0.05);
+        unit.hp = Math.max(0, (unit.hp ?? 0) - lost);
+        if (ctx?.log && Array.isArray(ctx.log)) {
+          ctx.log.push({ t: 'bleed', who: unit.name, lost });
+        }
+        decrementDuration(unit, bleed);
       }
-      // Các status có dur tính theo lượt của chính unit sẽ giảm ở đây
-      for (const s of [...arr]) {
-        if (s.id !== 'bleed' && s.tick === 'turn') _dec(unit, s);
+      for (const status of [...list]) {
+        if (status.id !== 'bleed' && status.tick === 'turn') {
+          decrementDuration(unit, status);
+        }
       }
     },
-    onPhaseStart(side, ctx){/* reserved */},
-    onPhaseEnd(side, ctx){/* reserved */},
-
-    // ---- Action gates
-    canAct(unit){
-      return !(this.has(unit,'stun') || this.has(unit,'sleep'));
+    onPhaseStart(_side, _ctx) {
+      // reserved
     },
-    blocks(unit, what){ // what: 'ult'
-      if (what === 'ult') return this.has(unit,'silence');
+    onPhaseEnd(_side, _ctx) {
+      // reserved
+    },
+    canAct(unit) {
+      return !(this.has(unit, 'stun') || this.has(unit, 'sleep'));
+    },
+    blocks(unit, what) {
+      if (what === 'ult') return this.has(unit, 'silence');
       return false;
     },
-
-    // ---- Targeting
-    resolveTarget(attacker, candidates, {attackType} = {attackType:'basic'}){
-      // 2) "Mê hoặc": không thể bị nhắm bởi đòn đánh thường
+    resolveTarget(attacker, candidates, ctx = {}) {
+      const attackType = ctx.attackType ?? 'basic';
+      let pool = candidates;
       if (attackType === 'basic') {
-        const filtered = candidates.filter(t => !this.has(t,'allure'));
-        if (filtered.length) candidates = filtered;
+        const filtered = candidates.filter(target => !this.has(target, 'allure'));
+        if (filtered.length > 0) {
+          pool = filtered;
+        }
       }
-      // 1) Taunt: nếu có bất kỳ mục tiêu mang taunt → bắt buộc chọn trong nhóm đó
-      const taunters = candidates.filter(t => this.has(t,'taunt'));
-      if (taunters.length){
-        // chọn gần nhất theo Manhattan làm tie-break
-        let best = null, bestD = 1e9;
-        for (const t of taunters){
-          const d = Math.abs(t.cx - attacker.cx) + Math.abs(t.cy - attacker.cy);
-          if (d < bestD){ best = t; bestD = d; }
+      const taunters = pool.filter(target => this.has(target, 'taunt'));
+      if (taunters.length > 0) {
+        let best: UnitToken | null = null;
+        let bestDistance = Number.POSITIVE_INFINITY;
+        for (const target of taunters) {
+          const distance = Math.abs(target.cx - attacker.cx) + Math.abs(target.cy - attacker.cy);
+          if (distance < bestDistance) {
+            best = target;
+            bestDistance = distance;
+          }
         }
         return best;
       }
-      return null; // để engine tiếp tục fallback positional rule của mày
+      return null;
     },
-
-    // ---- Stat & damage pipelines
-    // Sửa chỉ số tạm thời (spd/agi…)
-    modifyStats(unit, base){
-      let out = { ...base };
-      // 11) Chóng mặt: -10% SPD & AGI
-      if (this.has(unit,'daze')){
-        out.SPD = (out.SPD ?? 0) * 0.9;
-        out.AGI = (out.AGI ?? 0) * 0.9;
+    modifyStats(unit, base) {
+      const next = { ...base };
+      if (this.has(unit, 'daze')) {
+        next.SPD = (next.SPD ?? 0) * 0.9;
+        next.AGI = (next.AGI ?? 0) * 0.9;
       }
-      // 14) Sợ hãi: -10% SPD
-      if (this.has(unit,'fear')){
-        out.SPD = (out.SPD ?? 0) * 0.9;
+      if (this.has(unit, 'fear')) {
+        next.SPD = (next.SPD ?? 0) * 0.9;
       }
-        // 20) Thần tốc: +% SPD
-      const haste = this.get(unit,'haste');
-      if (haste){
+      const haste = this.get(unit, 'haste');
+      if (haste) {
         const boost = 1 + clamp01(haste.power ?? 0.1);
-        out.SPD = (out.SPD ?? 0) * boost;
+        next.SPD = (next.SPD ?? 0) * boost;
       }
-      return out;
+      return next;
     },
-
-    // Trước khi tính sát thương/giáp
-    beforeDamage(attacker, target, ctx = {dtype:'phys', base:0}){
-      let outMul = 1;     // nhân vào sát thương gây ra (attacker side)
-      let inMul = 1;      // nhân vào sát thương nhận vào (target side)
-      let defPen = 0;     // % xuyên giáp/kháng (0..1)
+    beforeDamage(attacker, target, ctx = {}) {
+      const attackType = ctx.attackType ?? 'basic';
+      const dtype = ctx.dtype ?? 'phys';
+      const base = ctx.base ?? 0;
+      let outMul = 1;
+      let inMul = 1;
+      let defPen = 0;
       let ignoreAll = false;
 
-      // 6) Mệt mỏi: -10% tổng sát thương gây ra
-      if (this.has(attacker,'fatigue')) outMul *= 0.90;
-      // 9) Hưng phấn: +10% tổng sát thương
-      if (this.has(attacker,'exalt')) outMul *= 1.10;
-      // 12) Cuồng bạo: +20% sát thương đòn đánh thường
-      if (ctx.attackType === 'basic' && this.has(attacker,'frenzy')) outMul *= 1.20;
-      // 13) Suy yếu: -10% tổng sát thương, tối đa 5 stack
-      const weak = this.get(attacker,'weaken');
-      if (weak) outMul *= (1 - 0.10 * Math.min(5, weak.stacks || 1));
-      // 14) Sợ hãi: -10% tổng sát thương
-      if (this.has(attacker,'fear')) outMul *= 0.90;
+      if (this.has(attacker, 'fatigue')) outMul *= 0.9;
+      if (this.has(attacker, 'exalt')) outMul *= 1.1;
+      if (attackType === 'basic' && this.has(attacker, 'frenzy')) outMul *= 1.2;
+      const weak = this.get(attacker, 'weaken');
+      if (weak) outMul *= 1 - 0.1 * Math.min(5, weak.stacks ?? 1);
+      if (this.has(attacker, 'fear')) outMul *= 0.9;
 
-      // 5) Giảm sát thương nhận vào n%
-      const cut = this.get(target,'dmgCut');
-      if (cut) inMul *= (1 - clamp01(cut.power ?? 0));
-      // 15) Tàng hình: miễn 100% sát thương trong 1 turn
-      if (this.has(target,'stealth')) { inMul = 0; ignoreAll = true; }
-      // 10) Xuyên giáp: bỏ qua 10% ARM/RES
-      const pierce = this.get(attacker,'pierce');
-      if (pierce) defPen = Math.max(defPen, clamp01(pierce.power ?? 0.10));
-      // 1) Stun/Sleep: không tác động sát thương, chỉ chặn hành động → xử ở canAct()
+      const cut = this.get(target, 'dmgCut');
+      if (cut) inMul *= 1 - clamp01(cut.power ?? 0);
+      if (this.has(target, 'stealth')) {
+        inMul = 0;
+        ignoreAll = true;
+      }
+      const pierce = this.get(attacker, 'pierce');
+      if (pierce) defPen = Math.max(defPen, clamp01(pierce.power ?? 0.1));
 
-      return { ...ctx, outMul, inMul, defPen, ignoreAll };
+      return {
+        ...ctx,
+        attackType,
+        dtype,
+        base,
+        outMul,
+        inMul,
+        defPen,
+        ignoreAll,
+      } as DamageContext;
     },
-
-    // Khiên hấp thụ sát thương (8)
-    absorbShield(target, dmg, ctx={dtype:'any'}){
-      const s = this.get(target,'shield');
-      if (!s || (s.amount ?? 0) <= 0) return { remain: dmg, absorbed: 0, broke:false };
-      let left = s.amount ?? 0;
-      const absorbed = Math.min(left, dmg);
-      left -= absorbed;
-      s.amount = left;
-      if (left <= 0) this.remove(target, 'shield');
-      return { remain: dmg - absorbed, absorbed, broke: left<=0 };
+    absorbShield(target, dmg, _ctx = {}) {
+      const shield = this.get(target, 'shield');
+      if (!shield || (shield.amount ?? 0) <= 0) {
+        return { remain: dmg, absorbed: 0, broke: false };
+      }
+      const current = shield.amount ?? 0;
+      const absorbed = Math.min(current, dmg);
+      const remain = dmg - absorbed;
+      const left = current - absorbed;
+      shield.amount = left;
+      if (left <= 0) {
+        this.remove(target, 'shield');
+      }
+      return { remain, absorbed, broke: left <= 0 };
     },
-
-    // Sau khi đã trừ khiên và trừ vào HP
-    afterDamage(attacker, target, result = {dealt:0, absorbed:0, dtype:'phys'}){
-      const dealt = result.dealt;
-
-      // 3) Phản sát thương: attacker nhận n% sát thương cuối cùng
+    afterDamage(attacker, target, result = {}) {
+      const dealt = result.dealt ?? 0;
       const reflect = this.get(target, 'reflect');
-      if (reflect && dealt > 0){
+      if (reflect && dealt > 0) {
         const back = Math.round(dealt * clamp01(reflect.power ?? 0));
-        attacker.hp = Math.max(0, attacker.hp - back);
-        if (back > 0){
+        attacker.hp = Math.max(0, (attacker.hp ?? 0) - back);
+        if (back > 0) {
           gainFury(attacker, {
             type: 'damageTaken',
             dealt: back,
             selfMaxHp: Number.isFinite(attacker?.hpMax) ? attacker.hpMax : undefined,
-            damageTaken: back
+            damageTaken: back,
           });
           finishFuryHit(attacker);
         }
-        // không phản khi stealth target đang miễn sát thương (dealt=0 thì như nhau)
       }
 
-      // 16) Độc (venom): khi attacker có hiệu ứng, mỗi đòn sẽ gây thêm n% sát thương đã gây ra
       const venom = this.get(attacker, 'venom');
-      if (venom && dealt > 0){
+      if (venom && dealt > 0) {
         const extra = Math.round(dealt * clamp01(venom.power ?? 0));
-        target.hp = Math.max(0, target.hp - extra);
-        if (extra > 0){
+        target.hp = Math.max(0, (target.hp ?? 0) - extra);
+        if (extra > 0) {
           gainFury(target, {
             type: 'damageTaken',
             dealt: extra,
             selfMaxHp: Number.isFinite(target?.hpMax) ? target.hpMax : undefined,
-            damageTaken: extra
+            damageTaken: extra,
           });
           finishFuryHit(target);
         }
       }
 
-      // 17) Tàn sát: nếu sau đòn còn ≤10% HPmax → xử tử
-      if (this.has(attacker,'execute')){
-        if (target.hp <= Math.ceil(target.hpMax * 0.10)) target.hp = 0;
+      if (this.has(attacker, 'execute')) {
+        if ((target.hp ?? 0) <= Math.ceil((target.hpMax ?? 0) * 0.1)) {
+          target.hp = 0;
+        }
       }
-
-      // Hết lượt: giảm thời lượng các status “bị đánh thì giảm” (reflect chỉ theo turn → không giảm ở đây)
 
       return result;
     },
-
-    // ===== Factory (constructor) cho 19 hiệu ứng
-    make: {
-      // 1) Stun/Sleep
-      stun:      ({turns=1}={}) => ({ id:'stun',   kind:'debuff', tag:'control', dur:turns, tick:'turn' }),
-      sleep:     ({turns=1}={}) => ({ id:'sleep',  kind:'debuff', tag:'control', dur:turns, tick:'turn' }),
-
-      // 2) Taunt/Khiêu khích
-      taunt:     ({turns=1}={}) => ({ id:'taunt',  kind:'debuff', tag:'control', dur:turns, tick:'turn' }),
-
-      // 3) Phản sát thương
-      reflect:   ({pct=0.2, turns=1}={}) => ({ id:'reflect', kind:'buff', tag:'counter', power:pct, dur:turns, tick:'turn' }),
-
-      // 4) Chảy máu
-      bleed:     ({turns=2}={}) => ({ id:'bleed',  kind:'debuff', tag:'dot', dur:turns, tick:'turn' }),
-
-      // 5) Giảm sát thương nhận vào
-      damageCut: ({pct=0.2, turns=1}={}) => ({ id:'dmgCut', kind:'buff', tag:'mitigation', power:pct, dur:turns, tick:'turn' }),
-
-      // 6) Mệt mỏi (giảm output)
-      fatigue:   ({turns=2}={}) => ({ id:'fatigue', kind:'debuff', tag:'output', dur:turns, tick:'turn' }),
-
-      // 7) Quên Lãng (cấm ult)
-      silence:   ({turns=1}={}) => ({ id:'silence', kind:'debuff', tag:'silence', dur:turns, tick:'turn' }),
-
-      // 8) Khiên (không giới hạn turn, tự hết khi cạn)
-      shield:    ({pct=0.2, amount=0, of='self'}={}) => ({ id:'shield', kind:'buff', tag:'shield',
-                      amount: amount ?? 0, // nên set = Math.round(unit.hpMax * pct) khi add()
-                      power:pct, tick:null }),
-
-      // 9) Hưng phấn (+10% output)
-      exalt:     ({turns=2}={}) => ({ id:'exalt', kind:'buff', tag:'output', dur:turns, tick:'turn' }),
-
-      // 10) Xuyên giáp 10%
-      pierce:    ({pct=0.10, turns=2}={}) => ({ id:'pierce', kind:'buff', tag:'penetration', power:pct, dur:turns, tick:'turn' }),
-
-      // 11) Chóng mặt: -10% SPD/AGI
-      daze:      ({turns=1}={}) => ({ id:'daze', kind:'debuff', tag:'stat', dur:turns, tick:'turn' }),
-
-      // 12) Cuồng bạo: +20% basic
-      frenzy:    ({turns=2}={}) => ({ id:'frenzy', kind:'buff', tag:'basic-boost', dur:turns, tick:'turn' }),
-
-      // 13) Suy yếu: -10% output, stack tối đa 5
-      weaken:    ({turns=2, stacks=1}={}) => ({ id:'weaken', kind:'debuff', tag:'output', dur:turns, tick:'turn', stacks, maxStacks:5 }),
-
-      // 14) Sợ hãi: -10% output & -10% SPD
-      fear:      ({turns=1}={}) => ({ id:'fear', kind:'debuff', tag:'output', dur:turns, tick:'turn' }),
-
-      // 15) Tàng hình: miễn 100% dmg 1 turn
-      stealth:   ({turns=1}={}) => ({ id:'stealth', kind:'buff', tag:'invuln', dur:turns, tick:'turn' }),
-
-      // 16) Độc (venom on attacker): mỗi hit gây thêm n% dmg đã gây
-      venom:     ({pct=0.15, turns=2}={}) => ({ id:'venom', kind:'buff', tag:'on-hit', power:pct, dur:turns, tick:'turn' }),
-
-      // 17) Tàn sát (execute)
-      execute:   ({turns=2}={}) => ({ id:'execute', kind:'buff', tag:'execute', dur:turns, tick:'turn' }),
-
-      // 18) “Bất Khuất” (tên đề nghị) — chết còn 1 HP (one-shot, không theo turn)
-      undying:   () => ({ id:'undying', kind:'buff', tag:'cheat-death', once:true }),
-
-      // 19) Mê hoặc — không thể bị target bằng đòn đánh thường
-      allure:    ({turns=1}={}) => ({ id:'allure', kind:'buff', tag:'avoid-basic', dur:turns, tick:'turn' }),
-   // 20) Thần tốc: +% SPD
-      haste:     ({pct=0.10, turns=1}={}) => ({ id:'haste', kind:'buff', tag:'stat', power:pct, dur:turns, tick:'turn' }),
-    },
+    make: statusFactories,
   };
 
-  // ===== Special: hook chặn chết còn 1HP (18)
-  function hookOnLethalDamage(target){
-    const s = Statuses.get(target, 'undying');
-    if (!s) return false;
-    if (target.hp <= 0){ target.hp = 1; Statuses.remove(target, 'undying'); return true; }
-    return false;
+  function applyStatus(unit: UnitToken | null | undefined, status: StatusEffect): StatusEffect | null {
+    if (!unit) return null;
+    return Statuses.add(unit, status);
   }
 
+  function clearStatus(unit: UnitToken | null | undefined, id: string): void {
+    if (!unit) return;
+    Statuses.remove(unit, id);
+  }
+
+  function hookOnLethalDamage(target: UnitToken): boolean {
+    const status = Statuses.get(target, 'undying');
+    if (!status) return false;
+    if ((target.hp ?? 0) <= 0) {
+      target.hp = 1;
+      Statuses.remove(target, 'undying');
+      return true;
+    }
+    return false;
+  }
   exports.Statuses = Statuses;
+  exports.applyStatus = applyStatus;
+  exports.clearStatus = clearStatus;
   exports.hookOnLethalDamage = hookOnLethalDamage;
 });
 __define('./summon.js', (exports, module, __require) => {
   // v0.7.3
-  const __dep0 = __require('./engine.js');
+  const __dep0 = __require('./engine.ts');
   const slotToCell = __dep0.slotToCell;
   const cellReserved = __dep0.cellReserved;
   const __dep1 = __require('./vfx.js');
@@ -12956,7 +14915,7 @@ __define('./summon.js', (exports, module, __require) => {
   const getUnitArt = __dep2.getUnitArt;
   const __dep3 = __require('./utils/kit.js');
   const kitSupportsSummon = __dep3.kitSupportsSummon;
-  const __dep4 = __require('./passives.js');
+  const __dep4 = __require('./passives.ts');
   const prepareUnitForPassives = __dep4.prepareUnitForPassives;
   const applyOnSpawnEffects = __dep4.applyOnSpawnEffects;
   // local helper
@@ -13045,14 +15004,15 @@ __define('./summon.js', (exports, module, __require) => {
   exports.enqueueImmediate = enqueueImmediate;
   exports.processActionChain = processActionChain;
 });
-__define('./turns.js', (exports, module, __require) => {
+__define('./turns.ts', (exports, module, __require) => {
   // v0.7.4
-  const __dep0 = __require('./engine.js');
+  const __dep0 = __require('./engine.ts');
   const slotToCell = __dep0.slotToCell;
   const slotIndex = __dep0.slotIndex;
-  const __dep1 = __require('./statuses.js');
+  const __dep1 = __require('./statuses.ts');
   const Statuses = __dep1.Statuses;
-  const __dep2 = __require('./combat.js');
+
+  const __dep2 = __require('./combat.ts');
   const doBasicWithFollowups = __dep2.doBasicWithFollowups;
   const __dep3 = __require('./config.js');
   const CFG = __dep3.CFG;
@@ -13064,11 +15024,11 @@ __define('./turns.js', (exports, module, __require) => {
   const vfxAddBloodPulse = __dep5.vfxAddBloodPulse;
   const __dep6 = __require('./art.js');
   const getUnitArt = __dep6.getUnitArt;
-  const __dep7 = __require('./passives.js');
+  const __dep7 = __require('./passives.ts');
   const emitPassiveEvent = __dep7.emitPassiveEvent;
   const applyOnSpawnEffects = __dep7.applyOnSpawnEffects;
   const prepareUnitForPassives = __dep7.prepareUnitForPassives;
-  const __dep8 = __require('./events.js');
+  const __dep8 = __require('./events.ts');
   const emitGameEvent = __dep8.emitGameEvent;
   const TURN_START = __dep8.TURN_START;
   const TURN_END = __dep8.TURN_END;
@@ -13084,16 +15044,30 @@ __define('./turns.js', (exports, module, __require) => {
   const resolveUltCost = __dep10.resolveUltCost;
   const setFury = __dep10.setFury;
   const clearFreshSummon = __dep10.clearFreshSummon;
-  const __dep11 = __require('./turns/interleaved.js');
+  const __dep11 = __require('./turns/interleaved.ts');
   const nextTurnInterleaved = __dep11.nextTurnInterleaved;
 
-  // local helper
-  const tokensAlive = (Game) => Game.tokens.filter(t => t.alive);
 
-  function applyTurnRegen(Game, unit){
+
+
+
+  interface SpawnResult {
+    actor: UnitToken | null;
+    spawned: boolean;
+  }
+
+  type TurnOrderSide = Side | 'ALLY' | 'ENEMY';
+
+  const tokensAlive = (Game: SessionState): UnitToken[] =>
+    Game.tokens.filter((t): t is UnitToken => t.alive);
+
+  function applyTurnRegen(
+    Game: SessionState,
+    unit: UnitToken | null | undefined
+  ): { hpDelta: number; aeDelta: number } {
     if (!unit || !unit.alive) return { hpDelta: 0, aeDelta: 0 };
 
-    const clampStat = (value, max) => {
+    const clampStat = (value: number, max: number | undefined): number => {
       if (!Number.isFinite(max)){
         return Math.max(0, value);
       }
@@ -13132,52 +15106,73 @@ __define('./turns.js', (exports, module, __require) => {
   }
 
   // --- Active/Spawn helpers (từ main.js) ---
-  const keyOf = (side, slot) => `${side}:${slot}`;
+  const keyOf = (side: string, slot: number): string => `${side}:${slot}`;
 
-  function getActiveAt(Game, side, slot){
+  function getActiveAt(
+    Game: SessionState,
+    side: TurnOrderSide,
+    slot: number
+  ): UnitToken | undefined {
     const { cx, cy } = slotToCell(side, slot);
-    return Game.tokens.find(t => t.side===side && t.cx===cx && t.cy===cy && t.alive);
+    return Game.tokens.find(t => t.side === side && t.cx === cx && t.cy === cy && t.alive);
   }
 
-  function getTurnOrderIndex(Game, side, slot){
-    const turn = Game?.turn;
+  /**
+   * @param {SessionState} Game
+   * @param {string} side
+   * @param {number} slot
+   * @returns {number}
+   */
+  function getTurnOrderIndex(Game: SessionState, side: TurnOrderSide, slot: number): number {
+    const turn = Game.turn;
     if (!turn) return -1;
+    if (!('order' in turn)) return -1; // behavior-preserving
+    const sequential = turn as SequentialTurnState;
     const key = keyOf(side, slot);
-    if (turn.orderIndex instanceof Map && turn.orderIndex.has(key)){
-      const v = turn.orderIndex.get(key);
+    if (sequential.orderIndex instanceof Map && sequential.orderIndex.has(key)){
+      const v = sequential.orderIndex.get(key);
       return typeof v === 'number' ? v : -1;
     }
-    const order = Array.isArray(turn.order) ? turn.order : [];
+    const order = Array.isArray(sequential.order) ? sequential.order : [];
     const idx = order.findIndex(entry => entry && entry.side === side && entry.slot === slot);
-    if (turn.orderIndex instanceof Map && !turn.orderIndex.has(key) && idx >= 0){
-      turn.orderIndex.set(key, idx);
+    if (sequential.orderIndex instanceof Map && !sequential.orderIndex.has(key) && idx >= 0){
+      sequential.orderIndex.set(key, idx);
     }
     return idx;
   }
 
-  function predictSpawnCycle(Game, side, slot){
-    const turn = Game?.turn;
+  function predictSpawnCycle(Game: SessionState, side: TurnOrderSide, slot: number): number {
+    const turn = Game.turn;
     if (!turn) return 0;
-    const order = Array.isArray(turn.order) ? turn.order : [];
+    if (!('order' in turn)){
+      const cycle = Math.max(0, Number.isFinite(turn.cycle) ? turn.cycle : 0);
+      return turn.mode === 'interleaved_by_position' ? cycle : cycle + 1;
+    }
+    const sequential = turn as SequentialTurnState;
+    const order = Array.isArray(sequential.order) ? sequential.order : [];
     const orderLen = order.length;
-    const currentCycle = Math.max(0, Number.isFinite(turn.cycle) ? turn.cycle : 0);
+     const currentCycle = Math.max(0, Number.isFinite(sequential.cycle) ? sequential.cycle : 0);
     if (!orderLen){
-      return turn.mode === 'interleaved_by_position' ? currentCycle : currentCycle + 1;
+      return currentCycle + 1;
     }
     const idx = getTurnOrderIndex(Game, side, slot);
     if (idx < 0) return currentCycle + 1;
-    const cursorRaw = Number.isFinite(turn.cursor) ? turn.cursor : 0;
+    const cursorRaw = Number.isFinite(sequential.cursor) ? sequential.cursor : 0;
     const cursor = Math.max(0, Math.min(orderLen - 1, cursorRaw));
     return idx >= cursor ? currentCycle : currentCycle + 1;
   }
 
-  function spawnQueuedIfDue(Game, entry, { allocIid, performUlt } = {}){
+  function spawnQueuedIfDue(
+    Game: SessionState,
+    entry: QueuedSummonEntry | { side: TurnOrderSide; slot: number } | null | undefined,
+    { allocIid, performUlt }: Pick<TurnHooks, 'allocIid' | 'performUlt'> = {}
+  ): SpawnResult {
     if (!entry) return { actor: null, spawned: false };
     const side = entry.side;
     const slot = entry.slot;
     const active = getActiveAt(Game, side, slot);
-    const m = Game.queued?.[side];
-    const p = m && m.get(slot);
+    const queueMap = Game.queued?.[side as Side] as Map<number, QueuedSummonRequest> | undefined;
+    const p = queueMap?.get(slot);
     if (!p){
       return { actor: active || null, spawned: false };
     }
@@ -13185,7 +15180,7 @@ __define('./turns.js', (exports, module, __require) => {
       return { actor: active || null, spawned: false };
     }
 
-    m.delete(slot);
+    queueMap?.delete(slot);
 
     const meta = Game.meta && typeof Game.meta.get === 'function' ? Game.meta.get(p.unitId) : null;
     const source = p.source || null;
@@ -13214,8 +15209,10 @@ __define('./turns.js', (exports, module, __require) => {
     prepareUnitForPassives(obj);
     Game.tokens.push(obj);
     applyOnSpawnEffects(Game, obj, kit?.onSpawn);
-    try { vfxAddSpawn(Game, p.cx, p.cy, p.side); } catch(_){}
-     const actor = getActiveAt(Game, side, slot);
+    try {
+      vfxAddSpawn(Game, p.cx, p.cy, p.side);
+    } catch (_) {}
+    const actor = getActiveAt(Game, side, slot);
     const isLeader = actor?.id === 'leaderA' || actor?.id === 'leaderB';
     const canAutoUlt = fromDeck && !isLeader && actor && actor.alive && typeof performUlt === 'function';
     if (canAutoUlt && !Statuses.blocks(actor, 'ult')){
@@ -13234,8 +15231,13 @@ __define('./turns.js', (exports, module, __require) => {
   }
 
   // giảm TTL minion sau khi phe đó hoàn tất lượt của mình
-  function tickMinionTTL(Game, side){
-    const toRemove = [];
+  /**
+   * @param {SessionState} Game
+   * @param {string} side
+   * @returns {void}
+   */
+  function tickMinionTTL(Game: SessionState, side: Side): void {
+    const toRemove: UnitToken[] = [];
     for (const t of Game.tokens){
       if (!t.alive) continue;
       if (t.side !== side) continue;
@@ -13252,47 +15254,56 @@ __define('./turns.js', (exports, module, __require) => {
   }
 
   // hành động 1 unit (ưu tiên ult nếu đủ nộ & không bị chặn)
-  function doActionOrSkip(Game, unit, { performUlt, turnContext } = {}){
-    const ensureBusyReset = () => {
-      if (!Game || !Game.turn) return;
+  function doActionOrSkip(
+    Game: SessionState,
+    unit: UnitToken | null | undefined,
+    { performUlt, turnContext }: { performUlt?: TurnHooks['performUlt']; turnContext?: TurnContext } = {}
+  ): void {
+    const ensureBusyReset = (): void => {
+      if (!Game.turn) return;
       const now = safeNow();
       if (!Number.isFinite(Game.turn.busyUntil) || Game.turn.busyUntil < now) {
         Game.turn.busyUntil = now;
       }
     };
+
     const slot = turnContext?.slot ?? (unit ? slotIndex(unit.side, unit.cx, unit.cy) : null);
-    const side = turnContext?.side ?? unit?.side ?? null;
+    const side: Side | null = turnContext?.side ?? unit?.side ?? null;
     const orderIndex = typeof turnContext?.orderIndex === 'number' ? turnContext.orderIndex : null;
-    const cycle = typeof turnContext?.cycle === 'number' ? turnContext.cycle : (Game?.turn?.cycle ?? null);
+    const cycle = typeof turnContext?.cycle === 'number' ? turnContext.cycle : Game.turn?.cycle ?? null;
     const orderLength = typeof turnContext?.orderLength === 'number'
       ? turnContext.orderLength
-      : (Array.isArray(Game?.turn?.order) ? Game.turn.order.length : null);
+      : (Array.isArray(Game.turn?.order) ? Game.turn!.order.length : null);
+
     const baseDetail = {
       game: Game,
-      unit: unit || null,
+      unit: unit ?? null,
       side,
       slot,
       phase: side,
       cycle,
       orderIndex,
       orderLength,
-      action: null,
+      action: null as string | null,
       skipped: false,
-      reason: null
+      reason: null as string | null
     };
-    const finishAction = (extra)=>{
+
+    const finishAction = (extra: Record<string, unknown>): void => {
       emitGameEvent(ACTION_END, { ...baseDetail, ...extra });
     };
+
     if (!unit || !unit.alive) {
       emitGameEvent(ACTION_START, baseDetail);
       ensureBusyReset();
       finishAction({ skipped: true, reason: 'missingUnit' });
       return;
     }
+
     const meta = Game.meta.get(unit.id);
     emitPassiveEvent(Game, unit, 'onTurnStart', {});
 
-   const turnStamp = `${side ?? ''}:${slot ?? ''}:${cycle ?? 0}`;
+    const turnStamp = `${side ?? ''}:${slot ?? ''}:${cycle ?? 0}`;
     startFuryTurn(unit, { turnStamp, startAmount: CFG?.fury?.turn?.startGain, grantStart: true });
     applyTurnRegen(Game, unit);
     Statuses.onTurnStart(unit, {});
@@ -13306,12 +15317,12 @@ __define('./turns.js', (exports, module, __require) => {
     }
 
     const ultCost = resolveUltCost(unit, CFG);
-    if (meta && (unit.fury|0) >= ultCost && !Statuses.blocks(unit,'ult')){
+    if (meta && (unit.fury ?? 0) >= ultCost && !Statuses.blocks(unit, 'ult')){
       let ultOk = false;
       try {
-        performUlt(unit);
+        performUlt!(unit);
         ultOk = true;
-      } catch(e){
+      } catch (e){
         console.error('[performUlt]', e);
         setFury(unit, 0);
       }
@@ -13325,7 +15336,7 @@ __define('./turns.js', (exports, module, __require) => {
       return;
     }
 
-    const cap = (meta && typeof meta.followupCap === 'number') ? (meta.followupCap|0) : (CFG.FOLLOWUP_CAP_DEFAULT|0);
+    const cap = typeof meta?.followupCap === 'number' ? (meta.followupCap | 0) : (CFG.FOLLOWUP_CAP_DEFAULT | 0);
     doBasicWithFollowups(Game, unit, cap);
     emitPassiveEvent(Game, unit, 'onActionEnd', {});
     Statuses.onTurnEnd(unit, {});
@@ -13335,13 +15346,14 @@ __define('./turns.js', (exports, module, __require) => {
 
   // Bước con trỏ lượt (sparse-cursor) đúng đặc tả
   // hooks = { performUlt, processActionChain, allocIid, doActionOrSkip }
-  function stepTurn(Game, hooks){
-    const turn = Game?.turn;
+  function stepTurn(Game: SessionState, hooks: TurnHooks): void {
+    const turn = Game.turn;
     if (!turn) return;
-    if (Game?.battle?.over) return;
+    if (Game.battle?.over) return;
 
-    if (turn.mode === 'interleaved_by_position'){
-      let selection = nextTurnInterleaved(Game);
+    if ((turn as InterleavedState | InterleavedTurnState).mode === 'interleaved_by_position'){
+      const interleavedTurn = turn as InterleavedTurnState;
+      let selection: InterleavedState | null = nextTurnInterleaved(Game, interleavedTurn);
       if (!selection) return;
 
       let spawnLoopGuard = 0;
@@ -13350,25 +15362,25 @@ __define('./turns.js', (exports, module, __require) => {
         if (spawnLoopGuard > 12){
           return;
         }
-        const spawnEntry = { side: selection.side, slot: selection.pos };
+        const spawnEntry: QueuedSummonEntry = { side: selection.side, slot: selection.pos };
         const spawnResult = spawnQueuedIfDue(Game, spawnEntry, hooks);
         if (!spawnResult.spawned){
           return;
         }
-        selection = nextTurnInterleaved(Game);
+        selection = nextTurnInterleaved(Game, interleavedTurn);
         if (!selection) return;
       }
       if (!selection) return;
 
-      const entry = { side: selection.side, slot: selection.pos };
+      const entry: QueuedSummonEntry = { side: selection.side, slot: selection.pos };
       const { actor, spawned } = spawnQueuedIfDue(Game, entry, hooks);
-      let active = null;
+      let active: UnitToken | null = null;
       if (actor && actor.alive){
         active = actor;
       } else if (selection.unit && selection.unit.alive){
         active = selection.unit;
       } else {
-        active = getActiveAt(Game, entry.side, entry.slot);
+        active = getActiveAt(Game, entry.side, entry.slot) ?? null; // behavior-preserving
       }
 
       if (spawned && actor && actor.alive){
@@ -13379,8 +15391,8 @@ __define('./turns.js', (exports, module, __require) => {
         return;
       }
 
-      const cycle = Number.isFinite(Game?.turn?.cycle) ? Game.turn.cycle : 0;
-      const turnContext = {
+      const cycle = Number.isFinite(interleavedTurn.cycle) ? interleavedTurn.cycle : 0;
+      const turnContext: TurnContext = {
         side: entry.side,
         slot: entry.slot,
         orderIndex: -1,
@@ -13398,7 +15410,7 @@ __define('./turns.js', (exports, module, __require) => {
         orderIndex: -1,
         orderLength: null,
         spawned: !!spawned,
-        processedChain: null
+        processedChain: null as ActionChainProcessedResult | null
       };
 
       emitGameEvent(TURN_START, turnDetail);
@@ -13425,20 +15437,21 @@ __define('./turns.js', (exports, module, __require) => {
       return;
     }
 
-    const order = Array.isArray(turn?.order) ? turn.order : [];
+    const sequentialTurn = turn as SequentialTurnState;
+    const order = Array.isArray(sequentialTurn?.order) ? sequentialTurn.order : [];
     if (!order.length) return;
 
     const orderLength = order.length;
-    let cursor = Math.max(0, Math.min(orderLength - 1, Number.isFinite(turn?.cursor) ? turn.cursor : 0));
-    let cycle = Number.isFinite(turn?.cycle) ? turn.cycle : 0;
+    let cursor = Math.max(0, Math.min(orderLength - 1, Number.isFinite(sequentialTurn.cursor) ? sequentialTurn.cursor : 0));
+    let cycle = Number.isFinite(sequentialTurn.cycle) ? sequentialTurn.cycle : 0;
 
-    const advanceCursor = () => {
+    const advanceCursor = (): void => {
       const nextCursor = (cursor + 1) % orderLength;
-      Game.turn.cursor = nextCursor;
+      sequentialTurn.cursor = nextCursor;
       if (nextCursor === 0){
         cycle += 1;
       }
-      Game.turn.cycle = cycle;
+      sequentialTurn.cycle = cycle;
       cursor = nextCursor;
     };
 
@@ -13449,7 +15462,7 @@ __define('./turns.js', (exports, module, __require) => {
         continue;
       }
 
-    const turnContext = {
+      const turnContext: TurnContext = {
         side: entry.side,
         slot: entry.slot,
         orderIndex: cursor,
@@ -13457,7 +15470,7 @@ __define('./turns.js', (exports, module, __require) => {
         cycle
       };
 
-    const { actor, spawned } = spawnQueuedIfDue(Game, entry, hooks);
+      const { actor, spawned } = spawnQueuedIfDue(Game, entry, hooks);
       if (spawned && actor && actor.alive){
         advanceCursor();
         return;
@@ -13481,7 +15494,7 @@ __define('./turns.js', (exports, module, __require) => {
         orderIndex: cursor,
         orderLength,
         spawned: !!spawned,
-        processedChain: null
+        processedChain: null as ActionChainProcessedResult | null
       };
       emitGameEvent(TURN_START, turnDetail);
 
@@ -13518,34 +15531,38 @@ __define('./turns.js', (exports, module, __require) => {
   exports.doActionOrSkip = doActionOrSkip;
   exports.stepTurn = stepTurn;
 });
-__define('./turns/interleaved.js', (exports, module, __require) => {
+__define('./turns/interleaved.ts', (exports, module, __require) => {
   // v0.7.7 interleaved helpers
-  const __dep0 = __require('./engine.js');
+  const __dep0 = __require('./engine.ts');
   const slotIndex = __dep0.slotIndex;
-  const __dep1 = __require('./statuses.js');
+  const __dep1 = __require('./statuses.ts');
   const Statuses = __dep1.Statuses;
 
-  const SIDE_TO_LOWER = { ALLY: 'ally', ENEMY: 'enemy' };
-  const LOWER_TO_UPPER = { ally: 'ALLY', enemy: 'ENEMY' };
-  const DEFAULT_LAST_POS = { ALLY: 0, ENEMY: 0 };
-  const DEFAULT_WRAP_COUNT = { ALLY: 0, ENEMY: 0 };
+
+
+
+
+  const SIDE_TO_LOWER: Record<TurnSideKey, Side> = { ALLY: 'ally', ENEMY: 'enemy' };
+  const LOWER_TO_UPPER: Record<Side, TurnSideKey> = { ally: 'ALLY', enemy: 'ENEMY' };
+  const DEFAULT_LAST_POS: Record<TurnSideKey, number> = { ALLY: 0, ENEMY: 0 };
+  const DEFAULT_WRAP_COUNT: Record<TurnSideKey, number> = { ALLY: 0, ENEMY: 0 };
   const SLOT_CAP = 9;
 
-  function normalizeSide(side){
+  function normalizeSide(side: Side | TurnSideKey | string): TurnSideKey {
     if (side === 'ENEMY') return 'ENEMY';
     if (side === 'ALLY') return 'ALLY';
-    return LOWER_TO_UPPER[side] || 'ALLY';
+    return LOWER_TO_UPPER[side as Side] || 'ALLY';
   }
 
-  function resolveSlotCount(turn){
-    const raw = Number.isFinite(turn?.slotCount) ? turn.slotCount : null;
-    if (Number.isFinite(raw) && raw > 0){
-      return Math.max(1, Math.min(SLOT_CAP, Math.floor(raw)));
+  function resolveSlotCount(turn: InterleavedTurnState | null | undefined): number {
+    const raw = Number.isFinite(turn?.slotCount) ? turn?.slotCount ?? null : null;
+    if (Number.isFinite(raw) && (raw ?? 0) > 0){
+      return Math.max(1, Math.min(SLOT_CAP, Math.floor(raw ?? SLOT_CAP)));
     }
     return SLOT_CAP;
   }
 
-  function ensureTurnState(turn){
+  function ensureTurnState(turn: InterleavedTurnState): void {
     if (!turn.lastPos || typeof turn.lastPos !== 'object'){
       turn.lastPos = { ...DEFAULT_LAST_POS };
     } else {
@@ -13563,8 +15580,8 @@ __define('./turns/interleaved.js', (exports, module, __require) => {
     }
   }
 
-  function buildSlotMap(tokens, sideLower){
-    const map = new Map();
+  function buildSlotMap(tokens: ReadonlyArray<UnitToken> | null | undefined, sideLower: Side): Map<number, UnitToken> {
+    const map = new Map<number, UnitToken>();
     if (!Array.isArray(tokens)) return map;
     for (const unit of tokens){
       if (!unit || !unit.alive) continue;
@@ -13578,89 +15595,93 @@ __define('./turns/interleaved.js', (exports, module, __require) => {
     return map;
   }
 
-  function isQueueDue(state, sideLower, slot){
-    const queued = state?.queued?.[sideLower];
-    if (!queued || typeof queued.get !== 'function') return false;
+  function isQueueDue(state: SessionState, sideLower: Side, slot: number, cycle: number): boolean {
+    const queued = state.queued?.[sideLower] as Map<number, QueuedSummonRequest> | undefined;
+    if (!queued) return false;
     const entry = queued.get(slot);
     if (!entry) return false;
-    const cycle = Number.isFinite(state?.turn?.cycle) ? state.turn.cycle : 0;
     return (entry.spawnCycle ?? 0) <= cycle;
   }
 
-  function makeWrappedFlag(start, pos){
+  function makeWrappedFlag(start: number, pos: number): boolean {
     if (!Number.isFinite(start) || start <= 0) return false;
     return pos <= start;
   }
 
-  function findNextOccupiedPos(state, side, startPos = 0){
-    const turn = state?.turn || {};
+  function findNextOccupiedPos(
+    state: SessionState,
+    side: Side | TurnSideKey,
+    startPos = 0
+  ): InterleavedState | null {
+    const turn = (state.turn as InterleavedTurnState | null) ?? null;
     const sideKey = normalizeSide(side);
     const sideLower = SIDE_TO_LOWER[sideKey];
     if (!sideLower) return null;
 
     const slotCount = resolveSlotCount(turn);
     const start = Number.isFinite(startPos) ? Math.max(0, Math.min(slotCount, Math.floor(startPos))) : 0;
-    const unitsBySlot = buildSlotMap(state?.tokens, sideLower);
+    const unitsBySlot = buildSlotMap(state.tokens, sideLower);
+    const cycle = Number.isFinite(turn?.cycle) ? turn!.cycle : 0;
 
     for (let offset = 1; offset <= slotCount; offset += 1){
       const pos = ((start + offset - 1) % slotCount) + 1;
       const wrapped = makeWrappedFlag(start, pos);
-      const unit = unitsBySlot.get(pos) || null;
+      const unit = unitsBySlot.get(pos) ?? null;
+      const queued = isQueueDue(state, sideLower, pos, cycle);
       if (unit && unit.alive && Statuses.canAct(unit)){
-        return { pos, unit, wrapped, queued: isQueueDue(state, sideLower, pos) };
+        return {
+          side: sideLower,
+          pos,
+          unit,
+          unitId: unit.id ?? null,
+          queued,
+          wrapped,
+          sideKey,
+          spawnOnly: false
+        };
       }
-      if (isQueueDue(state, sideLower, pos)){
-        return { pos, unit: null, wrapped, queued: true };
+      if (queued){
+        return {
+          side: sideLower,
+          pos,
+          unit: null,
+          unitId: null,
+          queued: true,
+          wrapped,
+          sideKey,
+          spawnOnly: true
+        };
       }
     }
 
     return null;
   }
 
-  function nextTurnInterleaved(state){
-    const turn = state?.turn;
+  function nextTurnInterleaved(
+    state: SessionState,
+    turn: InterleavedTurnState | null = (state.turn as InterleavedTurnState | null)
+  ): InterleavedState | null {
     if (!state || !turn) return null;
 
     ensureTurnState(turn);
     const slotCount = resolveSlotCount(turn);
     if (slotCount <= 0) return null;
 
-    const pickSide = (sideKey) => {
+    const pickSide = (sideKey: TurnSideKey): InterleavedState | null => {
       const last = Number.isFinite(turn.lastPos?.[sideKey]) ? turn.lastPos[sideKey] : 0;
       const found = findNextOccupiedPos(state, sideKey, last);
       if (!found) return null;
-      const sideLower = SIDE_TO_LOWER[sideKey];
-      const isSpawnOnly = !found.unit && found.queued;
-      if (isSpawnOnly){
-        return {
-          side: sideLower,
-          pos: found.pos,
-          unit: null,
-          unitId: null,
-          queued: true,
-          wrapped: !!found.wrapped,
-          sideKey,
-          spawnOnly: true
-        };
+      if (!found.spawnOnly){
+        turn.lastPos[sideKey] = found.pos;
+        if (found.wrapped){
+          turn.wrapCount[sideKey] = (turn.wrapCount[sideKey] ?? 0) + 1;
+        }
       }
-      turn.lastPos[sideKey] = found.pos;
-      if (found.wrapped){
-        turn.wrapCount[sideKey] = (turn.wrapCount[sideKey] ?? 0) + 1;
-      }
-      return {
-        side: sideLower,
-        pos: found.pos,
-        unit: found.unit || null,
-        unitId: found.unit?.id ?? null,
-        queued: !!found.queued,
-        wrapped: !!found.wrapped,
-        sideKey,
-        spawnOnly: false
-      };
+      return found;
     };
 
     const primarySide = normalizeSide(turn.nextSide);
-    const fallbackSide = primarySide === 'ALLY' ? 'ENEMY' : 'ALLY';
+    const fallbackSide: TurnSideKey = primarySide === 'ALLY' ? 'ENEMY' : 'ALLY';
 
     let selection = pickSide(primarySide);
     if (!selection){
@@ -13689,11 +15710,735 @@ __define('./turns/interleaved.js', (exports, module, __require) => {
   exports.findNextOccupiedPos = findNextOccupiedPos;
   exports.nextTurnInterleaved = nextTurnInterleaved;
 });
+__define('./types/combat.ts', (exports, module, __require) => {
+
+
+
+
+
+  export interface StatusEffect {
+    id: string;
+    kind?: 'buff' | 'debuff' | 'mark' | string;
+    tag?: string;
+    stacks?: number;
+    maxStacks?: number;
+    dur?: number;
+    ttl?: number;
+    ttlTurns?: number;
+    turns?: number;
+    tick?: 'turn' | 'phase' | string | null;
+    power?: number;
+    amount?: number;
+    /** Giá trị tuỳ ý khác (ví dụ metadata riêng của hiệu ứng) */
+    [extra: string]: unknown;
+  }
+
+  export interface StatusLifecyclePayload<TPayload = unknown> {
+    Game: SessionState | null;
+    target: UnitToken | null;
+    source?: UnitToken | null;
+    status: StatusEffect;
+    payload: TPayload;
+  }
+
+  export type StatusDefinition<
+    TApplyPayload = unknown,
+    TTickPayload = unknown,
+    TRemovePayload = unknown,
+  > = (
+    spec?: Record<string, unknown>,
+  ) => StatusEffect & {
+    onApply?: (payload: StatusLifecyclePayload<TApplyPayload>) => void;
+    onTick?: (payload: StatusLifecyclePayload<TTickPayload>) => void;
+    onRemove?: (payload: StatusLifecyclePayload<TRemovePayload>) => void;
+  };
+
+  export type StatusRegistry = Record<string, StatusDefinition>;
+
+  export interface SkillCost {
+    aether?: number;
+    fury?: number;
+    hpPercent?: number;
+    [currency: string]: number | undefined;
+  }
+
+  export interface SkillDefinition {
+    key?: string;
+    name?: string;
+    type?: string;
+    tags?: string[];
+    cost?: SkillCost | null;
+    hits?: number;
+    countsAsBasic?: boolean;
+    targets?: string | number | Record<string, unknown>;
+    duration?: number | 'battle' | {
+      turns?: number | string;
+      [extra: string]: unknown;
+    };
+    delayTurns?: number;
+    reduceDamage?: number;
+    bonusVsLeader?: number;
+    damageMultiplier?: number;
+    damage?: Record<string, unknown>;
+    buffStats?: Record<string, number>;
+    debuff?: Record<string, unknown>;
+    selfBuff?: Record<string, unknown>;
+    link?: Record<string, unknown>;
+    notes?: ReadonlyArray<string> | string | null;
+    metadata?: Record<string, unknown>;
+    [extra: string]: unknown;
+  }
+
+  export interface DamageContext {
+    dtype: string;
+    base: number;
+    attackType: string;
+    outMul: number;
+    inMul: number;
+    defPen: number;
+    ignoreAll: boolean;
+    isAoE?: boolean;
+    isCrit?: boolean;
+    isKill?: boolean;
+    targetsHit?: number;
+    targetMaxHp?: number;
+    [extra: string]: unknown;
+  }
+
+  export interface LeaderSnapshot {
+    id: UnitId | null;
+    side: Side | null;
+    alive: boolean;
+    hp: number | null;
+    hpMax: number | null;
+  }
+
+  export interface BattleDetail {
+    context?: Record<string, unknown>;
+    leaders?: { ally: LeaderSnapshot | null; enemy: LeaderSnapshot | null };
+    timeout?: Record<string, unknown>;
+    [extra: string]: unknown;
+  }
+
+  export interface BattleResult {
+    winner: Side | 'draw' | null;
+    reason: string | null;
+    detail: BattleDetail | null;
+    finishedAt: number;
+  }
+
+  export interface BattleState extends BattleResult {
+    over: boolean;
+    result: BattleResult | null;
+  }
+
+  export interface SessionAIState {
+    cost: number;
+    costCap: number;
+    summoned: number;
+    summonLimit: number;
+    unitsAll: UnitId[];
+    usedUnitIds: Set<UnitId>;
+    deck: UnitToken[] | { id: UnitId }[];
+    selectedId: UnitId | null;
+    lastThinkMs: number;
+    lastDecision: Record<string, unknown> | null;
+    [extra: string]: unknown;
+  }
+
+  export interface SessionState {
+    modeKey: string | null;
+    grid: unknown;
+    tokens: UnitToken[];
+    cost: number;
+    costCap: number;
+    summoned: number;
+    summonLimit: number;
+    unitsAll: UnitId[];
+    usedUnitIds: Set<UnitId>;
+    deck3: UnitToken[];
+    selectedId: UnitId | null;
+    ui: { bar: unknown };
+    turn: TurnSnapshot | null;
+    queued: QueuedSummonState;
+    actionChain: ActionChainEntry[];
+    events: EventTarget;
+    sceneTheme?: string | null;
+    backgroundKey?: string | null;
+    battle: BattleState;
+    result: BattleResult | null;
+    ai: SessionAIState;
+    meta: { get(id: UnitId): Record<string, unknown> | null; [extra: string]: unknown };
+    rng?: RngState;
+    telemetryLog?: TelemetryEvent[];
+    [extra: string]: unknown;
+  }
+
+  export interface PassiveSpec {
+    id: string;
+    when?: string;
+    effect?:
+      | string
+      | {
+          type?: string;
+          kind?: string;
+          params?: Record<string, unknown>;
+          stats?: Record<string, number>;
+          flatStats?: Record<string, number>;
+        };
+    params?: Record<string, unknown>;
+    condition?: Record<string, unknown>;
+    conditions?: Array<unknown> | unknown;
+  }
+
+  export interface PassiveEffectArgs<
+    TPassive extends PassiveSpec = PassiveSpec,
+    TContext extends Record<string, unknown> | undefined = Record<string, unknown> | undefined,
+  > {
+    Game: SessionState | null;
+    unit: UnitToken | null;
+    passive: TPassive | null;
+    ctx: TContext;
+  }
+
+  export type PassiveDefinition = (args: PassiveEffectArgs) => void;
+
+  export type PassiveRegistry = Record<string, PassiveDefinition>;
+});
+__define('./types/config.ts', (exports, module, __require) => {
+
+
+
+  export interface CurrencyDefinition {
+    id: string;
+    name: string;
+    shortName: string;
+    suffix: string;
+    ratioToBase: number;
+    description?: string;
+  }
+
+  export interface PityRule {
+    tier: string;
+    pull: number;
+  }
+
+  export interface PityConfiguration {
+    tier: string;
+    hardPity: number;
+    softGuarantees: ReadonlyArray<PityRule>;
+  }
+
+  export interface ShopTaxBracket {
+    rank: string;
+    label: string;
+    rate: number;
+  }
+
+  export interface LotterySplit {
+    devVault: number;
+    prizePool: number;
+  }
+
+  export interface AnnouncementEntry {
+    id: string;
+    title: string;
+    shortDescription: string;
+    tooltip?: string;
+    rewardCallout?: string;
+    startAt: string | null;
+    endAt: string | null;
+    translationKey?: string;
+  }
+
+  export interface AnnouncementSlot {
+    key: string;
+    label: string;
+    entries: ReadonlyArray<AnnouncementEntry>;
+  }
+
+  export interface ModeShellConfig {
+    screenId: string;
+    moduleId?: string;
+    fallbackModuleId?: string;
+    defaultParams?: Record<string, unknown>;
+  }
+
+  export interface ModeConfig {
+    id: string;
+    title: string;
+    type: string;
+    status: string;
+    icon?: string;
+    shortDescription?: string;
+    unlockNotes?: string;
+    tags?: ReadonlyArray<string>;
+    menuSections?: ReadonlyArray<string>;
+    parentId?: string | null;
+    shell?: ModeShellConfig;
+  }
+
+  export interface ModeGroup {
+    id: string;
+    title: string;
+    shortDescription?: string;
+    icon?: string;
+    tags?: ReadonlyArray<string>;
+    menuSections?: ReadonlyArray<string>;
+    childModeIds: ReadonlyArray<string>;
+    extraClasses?: ReadonlyArray<string>;
+  }
+
+  export interface MenuSectionDefinition {
+    id: string;
+    title: string;
+  }
+
+  export interface SkillSection extends SkillDefinition {
+    description?: string;
+    notes?: ReadonlyArray<string> | string | null;
+  }
+
+  export interface SkillEntry {
+    unitId: UnitId;
+    basic: SkillSection | null;
+    skill: SkillSection | null;
+    skills: ReadonlyArray<SkillSection>;
+    ult: SkillSection | null;
+    talent: SkillSection | null;
+    technique: SkillSection | null;
+    notes: ReadonlyArray<string>;
+  }
+
+  export interface SkillRegistry {
+    [unitId: UnitId]: SkillEntry;
+  }
+
+  export interface RosterPreview {
+    id: UnitId;
+    name: string;
+    class: string;
+    rank: string;
+    rankMultiplier: number;
+    tp: Record<string, number>;
+    totalTP: number;
+    preRank: Record<string, number>;
+    final: Record<string, number>;
+  }
+
+  export interface RosterPreviewRow {
+    stat: string;
+    values: ReadonlyArray<{
+      id: UnitId;
+      name: string;
+      value: number | null;
+      preRank: number | null;
+      tp: number;
+    }>;
+  }
+
+  export interface CatalogStatBlock {
+    HP: number;
+    ATK: number;
+    WIL: number;
+    ARM: number;
+    RES: number;
+    AGI: number;
+    PER: number;
+    SPD: number;
+    AEmax: number;
+    AEregen: number;
+    HPregen: number;
+    [extra: string]: number;
+  }
+
+  export interface RosterUnitDefinition {
+    id: UnitId;
+    name: string;
+    class: string;
+    rank: string;
+    mods?: Partial<Record<keyof CatalogStatBlock, number>>;
+    kit: Record<string, unknown>;
+    [extra: string]: unknown;
+  }
+
+  export interface CameraPreset {
+    rowGapRatio: number;
+    topScale: number;
+    depthScale: number;
+  }
+
+  export interface ChibiProportions {
+    line: number;
+    headR: number;
+    torso: number;
+    arm: number;
+    leg: number;
+    weapon: number;
+    nameAlpha: number;
+  }
+
+  export type {
+    GameConfig,
+    CombatTuning,
+    FuryConfig,
+    FuryGainEntry,
+    FuryCaps,
+    TurnOrderConfig,
+    AiConfig,
+    AiWeights,
+    AiRoleWeight,
+    AnimationConfig,
+    UiConfig,
+    DebugFlags,
+    PerformanceConfig,
+    ColorPalette,
+    SceneLayer,
+    SceneTheme,
+    SceneConfig,
+    BackgroundProp,
+    BackgroundDefinition,
+    WorldMapConfig,
+  } from '../config/schema';
+});
+__define('./types/index.ts', (exports, module, __require) => {
+  export type * from './units';
+  export type {
+    StatusEffect,
+    StatusLifecyclePayload,
+    StatusDefinition,
+    StatusRegistry,
+    SkillCost,
+    SkillDefinition,
+    DamageContext,
+    LeaderSnapshot,
+    BattleDetail,
+    BattleResult,
+    BattleState,
+    SessionAIState,
+    PassiveSpec,
+    PassiveEffectArgs,
+    PassiveDefinition,
+    PassiveRegistry,
+  } from './combat';
+  export type * from './turn-order';
+  export type * from './rng';
+  export type * from './telemetry';
+  export type * from './config';
+  export type * from './utils';
+  export type * from './vfx';
+  export type {
+    RewardRoll,
+    WaveState,
+    EncounterState,
+    SessionRuntimeState,
+    CreateSessionOptions,
+    SessionState,
+  } from './pve';
+});
+__define('./types/pve.ts', (exports, module, __require) => {
+
+
+
+  export interface RewardRoll {
+    id: string;
+    weight: number;
+    tier: number;
+    data?: Record<string, unknown>;
+  }
+
+  export interface WaveState {
+    index: number;
+    units: ReadonlyArray<UnitToken>;
+    status: 'pending' | 'spawning' | 'active' | 'cleared';
+    spawnCycle: number;
+    rewards: RewardRoll[];
+  }
+
+  export interface EncounterState {
+    id: string;
+    waveIndex: number;
+    waves: WaveState[];
+    status: 'idle' | 'running' | 'completed' | 'failed';
+    pendingRewards: RewardRoll[];
+    metadata?: Record<string, unknown>;
+  }
+
+  export interface SessionRuntimeState {
+    encounter: EncounterState | null;
+    wave: WaveState | null;
+    rewardQueue: RewardRoll[];
+  }
+
+  export interface CreateSessionOptions {
+    modeKey?: string;
+    sceneTheme?: string;
+    backgroundKey?: string;
+    deck?: ReadonlyArray<UnitToken>;
+    aiPreset?: {
+      deck?: ReadonlyArray<string>;
+      unitsAll?: ReadonlyArray<string>;
+      costCap?: number;
+      summonLimit?: number;
+      startingDeck?: ReadonlyArray<UnitToken>;
+    };
+    costCap?: number;
+    summonLimit?: number;
+    turnMode?: string;
+    turn?: { mode?: string };
+    turnOrderMode?: string;
+    turnOrder?: { mode?: string };
+  }
+
+  export type SessionState = CoreSessionState & {
+    runtime: SessionRuntimeState;
+    _inited?: boolean;
+  };
+});
+__define('./types/rng.ts', (exports, module, __require) => {
+  export interface RngState {
+    seed: number;
+    calls: number;
+    history?: number[];
+    [extra: string]: unknown;
+  }
+});
+__define('./types/telemetry.ts', (exports, module, __require) => {
+  export interface TelemetryEvent {
+    type: string;
+    timestamp: number;
+    payload?: Record<string, unknown>;
+    sessionId?: string;
+    [extra: string]: unknown;
+  }
+});
+__define('./types/turn-order.ts', (exports, module, __require) => {
+
+
+
+  export type TurnSideKey = 'ALLY' | 'ENEMY';
+
+  export interface InterleavedTurnState {
+    mode: 'interleaved_by_position';
+    nextSide: TurnSideKey;
+    lastPos: Record<TurnSideKey, number>;
+    wrapCount: Record<TurnSideKey, number>;
+    turnCount: number;
+    slotCount: number;
+    cycle: number;
+    busyUntil: number;
+    completed?: boolean;
+  }
+
+  export interface SequentialTurnStateEntry {
+    side: Side;
+    slot: number;
+  }
+
+  export interface SequentialTurnState {
+    mode?: string;
+    order: SequentialTurnStateEntry[];
+    orderIndex: Map<string, number>;
+    cursor: number;
+    cycle: number;
+    busyUntil: number;
+    completed?: boolean;
+  }
+
+  export interface TurnContext {
+    side: Side;
+    slot: number;
+    orderIndex: number;
+    orderLength: number | null;
+    cycle: number;
+  }
+
+  export interface QueuedSummonEntry {
+    side: Side;
+    slot: number;
+  }
+
+  export interface InterleavedState {
+    side: Side;
+    pos: number;
+    unit: UnitToken | null;
+    unitId: UnitId | null;
+    queued: boolean;
+    wrapped: boolean;
+    sideKey: TurnSideKey;
+    spawnOnly: boolean;
+  }
+
+  export type GetTurnOrderIndexHook = (
+    game: SessionState,
+    side: Side | TurnSideKey,
+    slot: number
+  ) => number;
+
+  export interface TurnHooks {
+    performUlt?: (unit: UnitToken) => void;
+    allocIid?: () => number;
+    processActionChain?: (
+      game: SessionState,
+      side: Side,
+      slot: number,
+      hooks: TurnHooks & { getTurnOrderIndex: GetTurnOrderIndexHook }
+    ) => ActionChainProcessedResult | undefined;
+    checkBattleEnd?: (game: SessionState, info: Record<string, unknown>) => boolean | void;
+    doActionOrSkip?: (
+      game: SessionState,
+      unit: UnitToken | null,
+      options?: { performUlt?: TurnHooks['performUlt']; turnContext?: TurnContext }
+    ) => void;
+    getTurnOrderIndex?: GetTurnOrderIndexHook;
+  }
+
+  export type TurnSnapshot = InterleavedTurnState | SequentialTurnState;
+});
+__define('./types/units.ts', (exports, module, __require) => {
+
+
+  export type UnitId = string;
+
+  export type Side = 'ally' | 'enemy';
+
+  export interface StatBlock {
+    hpMax?: number;
+    hp?: number;
+    atk?: number;
+    wil?: number;
+    arm?: number;
+    res?: number;
+    agi?: number;
+    per?: number;
+    spd?: number;
+    aeMax?: number;
+    ae?: number;
+    aeRegen?: number;
+    hpRegen?: number;
+    fury?: number;
+    furyMax?: number;
+    rage?: number;
+    /** Các chỉ số cơ sở trước khi áp buff/debuff */
+    baseStats?: Partial<Pick<StatBlock, 'atk' | 'wil' | 'res'>>;
+  }
+
+  export interface FuryState {
+    turnGain: number;
+    skillGain: number;
+    hitGain: number;
+    skillPerTargetGain: number;
+    skillDrain: number;
+    turnStamp: number | null;
+    skillTag: string | null;
+    freshSummon: boolean;
+    lastStart: number;
+  }
+
+  export interface UnitToken extends StatBlock {
+    id: UnitId;
+    name?: string;
+    side: Side;
+    cx: number;
+    cy: number;
+    iid?: number;
+    bornSerial?: number;
+    ownerIid?: number;
+    alive: boolean;
+    deadAt?: number;
+    isMinion?: boolean;
+    ttlTurns?: number;
+    statuses?: StatusEffect[];
+    color?: string;
+    art?: Record<string, unknown> | null;
+    skinKey?: string | null;
+    furyMax?: number;
+    fury?: number;
+    rage?: number;
+    _furyState?: FuryState;
+    [extra: string]: unknown;
+  }
+
+  export interface QueuedSummonRequest {
+    unitId: UnitId;
+    side: Side;
+    slot: number;
+    cx: number;
+    cy: number;
+    spawnCycle: number;
+    name?: string;
+    color?: string;
+    revive?: boolean;
+    revived?: Partial<UnitToken> | null;
+    source?: string;
+  }
+
+  export interface QueuedSummonState {
+    ally: Map<number, QueuedSummonRequest>;
+    enemy: Map<number, QueuedSummonRequest>;
+  }
+
+  export interface ActionChainEntry {
+    side: Side;
+    slot: number;
+    unit: Partial<UnitToken>;
+  }
+
+  export type ActionChainProcessedResult = number | null;
+});
+__define('./types/utils.ts', (exports, module, __require) => {
+  type Primitive = string | number | boolean | bigint | symbol | null | undefined;
+
+  type Builtin = Primitive | Date | RegExp | Function | Error | Promise<unknown>;
+
+  export type ValueOf<T> = T[keyof T];
+
+  export type ReadonlyDeep<T> = T extends Builtin
+    ? T
+    : T extends Map<infer K, infer V>
+      ? ReadonlyMap<ReadonlyDeep<K>, ReadonlyDeep<V>>
+      : T extends Set<infer M>
+        ? ReadonlySet<ReadonlyDeep<M>>
+        : T extends Array<infer U>
+          ? ReadonlyArray<ReadonlyDeep<U>>
+          : T extends object
+            ? { readonly [P in keyof T]: ReadonlyDeep<T[P]> }
+            : T;
+
+  export type MaybeArray<T> = T | T[];
+
+  export type Nullable<T> = T | null;
+
+  export type Undefinable<T> = T | undefined;
+
+  export type NonEmptyArray<T> = [T, ...T[]];
+
+  export type MaybePromise<T> = T | Promise<T>;
+});
+__define('./types/vfx.ts', (exports, module, __require) => {
+  export type VfxAnchor = {
+    id: string;
+    timing?: string;
+    radius?: number;
+  };
+
+  export type VfxBinding = {
+    description?: string;
+    anchors: VfxAnchor[];
+  };
+
+  export type VfxAnchorDataset = {
+    unitId: string;
+    bodyAnchors: Record<string, { x: number; y: number }>;
+    vfxBindings: Record<string, VfxBinding>;
+    ambientEffects: Record<string, VfxBinding>;
+  };
+});
 __define('./ui.js', (exports, module, __require) => {
   //v0.7.1
   const __dep0 = __require('./config.js');
   const CFG = __dep0.CFG;
-  const __dep1 = __require('./events.js');
+  const __dep1 = __require('./events.ts');
   const gameEvents = __dep1.gameEvents;
   const TURN_START = __dep1.TURN_START;
   const TURN_END = __dep1.TURN_END;
@@ -13936,23 +16681,50 @@ __define('./ui.js', (exports, module, __require) => {
   exports.initHUD = initHUD;
   exports.startSummonBar = startSummonBar;
 });
-__define('./units.js', (exports, module, __require) => {
-  // ver v.0.7
+__define('./units.ts', (exports, module, __require) => {
 
-  const UNITS = [
-    { id: 'phe',          name: 'Phệ',             cost: 20 },
-    { id: 'kiemtruongda', name: 'Kiếm Trường Dạ',  cost: 16 },
-    { id: 'loithienanh',  name: 'Lôi Thiên Ảnh',   cost: 18 },
-    { id: 'laky',         name: 'La Kỳ',           cost: 14 },
-    { id: 'kydieu',       name: 'Kỳ Diêu',         cost: 12 },
-    { id: 'doanminh',     name: 'Doãn Minh',       cost: 12 },
-    { id: 'tranquat',     name: 'Trần Quát',       cost: 10 },
-    { id: 'linhgac',      name: 'Lính Gác',        cost:  8 }
-  ];
 
+  export interface UnitDefinition {
+    id: UnitId;
+    name: string;
+    cost: number;
+    rank?: string | null;
+    role?: string | null;
+  }
+
+  const UNIT_LIST = [
+    { id: 'phe', name: 'Phệ', cost: 20 },
+    { id: 'kiemtruongda', name: 'Kiếm Trường Dạ', cost: 16 },
+    { id: 'loithienanh', name: 'Lôi Thiên Ảnh', cost: 18 },
+    { id: 'laky', name: 'La Kỳ', cost: 14 },
+    { id: 'kydieu', name: 'Kỳ Diêu', cost: 12 },
+    { id: 'doanminh', name: 'Doãn Minh', cost: 12 },
+    { id: 'tranquat', name: 'Trần Quát', cost: 10 },
+    { id: 'linhgac', name: 'Lính Gác', cost: 8 },
+  ] satisfies ReadonlyArray<UnitDefinition>;
+
+  const UNITS: ReadonlyArray<UnitDefinition> = UNIT_LIST;
+
+  const UNIT_INDEX_INTERNAL = new Map<UnitId, UnitDefinition>(
+    UNIT_LIST.map((unit) => [unit.id, unit] as const),
+  );
+
+  const UNIT_INDEX: ReadonlyMap<UnitId, UnitDefinition> = UNIT_INDEX_INTERNAL;
+
+  function lookupUnit(unitId: UnitId): UnitDefinition | null {
+    const unit = UNIT_INDEX_INTERNAL.get(unitId);
+    return unit ? { ...unit } : null;
+  }
   exports.UNITS = UNITS;
+  exports.UNIT_INDEX = UNIT_INDEX;
+  exports.lookupUnit = lookupUnit;
 });
 __define('./utils/dummy.js', (exports, module, __require) => {
+  // @ts-check
+
+  /**
+   * @returns {true}
+   */
   function ensureNestedModuleSupport(){
     return true;
   }
@@ -13960,8 +16732,23 @@ __define('./utils/dummy.js', (exports, module, __require) => {
   exports.ensureNestedModuleSupport = ensureNestedModuleSupport;
 });
 __define('./utils/format.js', (exports, module, __require) => {
+  // @ts-check
+
+  /**
+   * @typedef {number | string | { toLocaleString?: (locale?: string | string[], options?: Intl.NumberFormatOptions) => string }} NumberFormatInput
+   */
+
+  /**
+   * @typedef {{ format(value: NumberFormatInput | null | undefined): string }} PolyfillNumberFormatter
+   */
+
   const HAS_INTL_NUMBER_FORMAT = typeof Intl === 'object' && typeof Intl.NumberFormat === 'function';
 
+  /**
+   * @param {string | string[] | undefined} locale
+   * @param {Intl.NumberFormatOptions | undefined} options
+   * @returns {Intl.NumberFormat | PolyfillNumberFormatter}
+   */
   function createNumberFormatter(locale, options){
     if (HAS_INTL_NUMBER_FORMAT){
       return new Intl.NumberFormat(locale, options);
@@ -13970,6 +16757,10 @@ __define('./utils/format.js', (exports, module, __require) => {
     const hasLocaleString = typeof Number.prototype.toLocaleString === 'function';
 
     return {
+      /**
+       * @param {NumberFormatInput | null | undefined} value
+       * @returns {string}
+       */
       format(value){
         if (typeof value === 'number'){
           if (hasLocaleString){
@@ -14003,21 +16794,74 @@ __define('./utils/format.js', (exports, module, __require) => {
   exports.createNumberFormatter = createNumberFormatter;
 });
 __define('./utils/fury.js', (exports, module, __require) => {
+  // @ts-check
+
   const __dep0 = __require('./config.js');
   const CFG = __dep0.CFG;
   const __dep1 = __require('./utils/time.js');
   const safeNow = __dep1.safeNow;
+
+  /**
+   * @typedef {import('types/game-entities').UnitToken} UnitToken
+   * @typedef {import('types/game-entities').FuryState} FuryState
+   * @typedef {import('types/game-entities').UnitId} UnitId
+   */
 
   const DEFAULT_TURN_CAP = 40;
   const DEFAULT_SKILL_CAP = 30;
   const DEFAULT_HIT_CAP = 20;
   const TURN_GRANT_KEY = Symbol('turn');
 
+  /**
+   * @typedef {object} FuryGainSpec
+   * @property {number} [amount]
+   * @property {string} [type]
+   * @property {number} [base]
+   * @property {number} [bonus]
+   * @property {number} [multiplier]
+   * @property {number} [damageTaken]
+   * @property {number} [dealt]
+   * @property {number} [selfMaxHp]
+   * @property {number} [targetMaxHp]
+   * @property {boolean} [isAoE]
+   * @property {boolean} [isCrit]
+   * @property {boolean} [isKill]
+   * @property {number} [targetsHit]
+   */
+
+  /**
+   * @typedef {{ amount: number; perTarget: number }} FuryGainResult
+   */
+
+  /**
+   * @typedef {object} FuryTurnOptions
+   * @property {boolean} [clearFresh]
+   * @property {unknown} [turnStamp]
+   * @property {unknown} [turnKey]
+   * @property {boolean} [grantStart]
+   * @property {number} [startAmount]
+   */
+
+  /**
+   * @typedef {object} FuryDrainOptions
+   * @property {number} [base]
+   * @property {number} [percent]
+   * @property {number} [skillTotalCap]
+   */
+
+  /**
+   * @param {unknown} value
+   * @returns {number}
+   */
   function toNumber(value){
     const num = Number(value);
     return Number.isFinite(num) ? num : 0;
   }
 
+  /**
+   * @param {UnitToken | null | undefined} unit
+   * @returns {void}
+   */
   function ensureAlias(unit){
     if (!unit) return;
     if (typeof unit.fury !== 'number' && typeof unit.rage === 'number'){
@@ -14041,6 +16885,10 @@ __define('./utils/fury.js', (exports, module, __require) => {
     }
   }
 
+  /**
+   * @param {UnitToken | null | undefined} unit
+   * @returns {FuryState | null}
+   */
   function ensureState(unit){
     if (!unit) return null;
     ensureAlias(unit);
@@ -14060,6 +16908,11 @@ __define('./utils/fury.js', (exports, module, __require) => {
     return unit._furyState;
   }
 
+  /**
+   * @param {UnitId | null | undefined} unitId
+   * @param {typeof CFG} [cfg]
+   * @returns {number}
+   */
   function resolveMaxFury(unitId, cfg = CFG){
     const furyCfg = cfg?.fury || {};
     const special = furyCfg.specialMax || {};
@@ -14076,6 +16929,11 @@ __define('./utils/fury.js', (exports, module, __require) => {
     return 100;
   }
 
+  /**
+   * @param {UnitToken | null | undefined} unit
+   * @param {typeof CFG} [cfg]
+   * @returns {number}
+   */
   function resolveUltCost(unit, cfg = CFG){
     if (!unit) return resolveMaxFury(null, cfg);
     const furyCfg = cfg?.fury || {};
@@ -14088,6 +16946,13 @@ __define('./utils/fury.js', (exports, module, __require) => {
     return unit.furyMax ?? resolveMaxFury(unit.id, cfg);
   }
 
+  /**
+   * @param {UnitToken | null | undefined} unit
+   * @param {UnitId | null | undefined} unitId
+   * @param {number} [initial]
+   * @param {typeof CFG} [cfg]
+   * @returns {void}
+   */
   function initializeFury(unit, unitId, initial = 0, cfg = CFG){
     if (!unit) return;
     const max = resolveMaxFury(unitId, cfg);
@@ -14108,6 +16973,11 @@ __define('./utils/fury.js', (exports, module, __require) => {
     }
   }
 
+  /**
+   * @param {UnitToken | null | undefined} unit
+   * @param {boolean} [flag]
+   * @returns {void}
+   */
   function markFreshSummon(unit, flag = true){
     const state = ensureState(unit);
     if (state){
@@ -14116,6 +16986,10 @@ __define('./utils/fury.js', (exports, module, __require) => {
     }
   }
 
+  /**
+   * @param {UnitToken | null | undefined} unit
+   * @returns {void}
+   */
   function clearFreshSummon(unit){
     const state = ensureState(unit);
     if (state){
@@ -14123,6 +16997,11 @@ __define('./utils/fury.js', (exports, module, __require) => {
     }
   }
 
+  /**
+   * @param {UnitToken | null | undefined} unit
+   * @param {unknown} value
+   * @returns {number}
+   */
   function setFury(unit, value){
     if (!unit) return 0;
     ensureAlias(unit);
@@ -14133,6 +17012,10 @@ __define('./utils/fury.js', (exports, module, __require) => {
     return amount;
   }
 
+  /**
+   * @param {typeof CFG} cfg
+   * @returns {number}
+   */
   function resolveTurnCap(cfg){
     const furyCfg = cfg?.fury || {};
     if (Number.isFinite(furyCfg.turnCap)) return furyCfg.turnCap;
@@ -14141,6 +17024,10 @@ __define('./utils/fury.js', (exports, module, __require) => {
     return DEFAULT_TURN_CAP;
   }
 
+  /**
+   * @param {typeof CFG} cfg
+   * @returns {number}
+   */
   function resolveSkillCap(cfg){
     const furyCfg = cfg?.fury || {};
     if (Number.isFinite(furyCfg.skillCap)) return furyCfg.skillCap;
@@ -14149,6 +17036,10 @@ __define('./utils/fury.js', (exports, module, __require) => {
     return DEFAULT_SKILL_CAP;
   }
 
+  /**
+   * @param {typeof CFG} cfg
+   * @returns {number}
+   */
   function resolveHitCap(cfg){
     const furyCfg = cfg?.fury || {};
     if (Number.isFinite(furyCfg.hitCap)) return furyCfg.hitCap;
@@ -14157,6 +17048,12 @@ __define('./utils/fury.js', (exports, module, __require) => {
     return DEFAULT_HIT_CAP;
   }
 
+  /**
+   * @param {FuryGainSpec} [spec]
+   * @param {typeof CFG} [cfg]
+   * @param {FuryState | null} [state]
+   * @returns {FuryGainResult}
+   */
   function resolveGainAmount(spec = {}, cfg = CFG, state = null){
     if (Number.isFinite(spec.amount)){
       return { amount: Math.floor(spec.amount), perTarget: 0 };
@@ -14177,8 +17074,8 @@ __define('./utils/fury.js', (exports, module, __require) => {
       let total = Number.isFinite(spec.base) ? spec.base : (Number.isFinite(mode.base) ? mode.base : 0);
       const ratio = Number.isFinite(mode.selfRatio) ? mode.selfRatio : 0;
       const taken = Number.isFinite(spec.damageTaken) ? spec.damageTaken : spec.dealt;
-      if (ratio && Number.isFinite(taken) && Number.isFinite(spec.selfMaxHp) && spec.selfMaxHp > 0){
-        total += Math.round((ratio * Math.max(0, taken)) / spec.selfMaxHp);
+      if (ratio && Number.isFinite(taken) && Number.isFinite(spec.selfMaxHp) && (spec.selfMaxHp ?? 0) > 0){
+        total += Math.round((ratio * Math.max(0, taken ?? 0)) / spec.selfMaxHp);
       }
       if (Number.isFinite(mode.min)) total = Math.max(mode.min, total);
       if (Number.isFinite(mode.max)) total = Math.min(mode.max, total);
@@ -14187,14 +17084,14 @@ __define('./utils/fury.js', (exports, module, __require) => {
       return { amount: Math.floor(Math.max(0, total)), perTarget: 0 };
     }
 
-    const isAoE = !!spec.isAoE || (Number.isFinite(spec.targetsHit) && spec.targetsHit > 1);
+    const isAoE = !!spec.isAoE || (Number.isFinite(spec.targetsHit) && (spec.targetsHit ?? 0) > 1);
     const mode = isAoE ? (table.dealAoePerTarget || {}) : (table.dealSingle || {});
     let total = Number.isFinite(spec.base) ? spec.base : (Number.isFinite(mode.base) ? mode.base : 0);
     if (spec.isCrit && Number.isFinite(mode.crit)) total += mode.crit;
     if (spec.isKill && Number.isFinite(mode.kill)) total += mode.kill;
 
     let perTargetApplied = 0;
-    if (Number.isFinite(spec.targetsHit) && spec.targetsHit > 0 && Number.isFinite(mode.perTarget)){
+    if (Number.isFinite(spec.targetsHit) && (spec.targetsHit ?? 0) > 0 && Number.isFinite(mode.perTarget)){
       const desired = mode.perTarget * spec.targetsHit;
       const used = state?.skillPerTargetGain ?? 0;
       const room = Math.max(0, 12 - used);
@@ -14204,18 +17101,23 @@ __define('./utils/fury.js', (exports, module, __require) => {
     }
 
     const ratio = Number.isFinite(mode.targetRatio) ? mode.targetRatio : 0;
-    if (ratio && Number.isFinite(spec.dealt) && Number.isFinite(spec.targetMaxHp) && spec.targetMaxHp > 0){
-      total += Math.round((ratio * Math.max(0, spec.dealt)) / spec.targetMaxHp);
+    if (ratio && Number.isFinite(spec.dealt) && Number.isFinite(spec.targetMaxHp) && (spec.targetMaxHp ?? 0) > 0){
+      total += Math.round((ratio * Math.max(0, spec.dealt ?? 0)) / spec.targetMaxHp);;
     }
 
-     if (Number.isFinite(mode.min)) total = Math.max(mode.min, total);
+    if (Number.isFinite(mode.min)) total = Math.max(mode.min, total);
     if (Number.isFinite(mode.max)) total = Math.min(mode.max, total);
     if (Number.isFinite(spec.bonus)) total += spec.bonus;
     if (Number.isFinite(spec.multiplier)) total *= spec.multiplier;
 
     return { amount: Math.floor(Math.max(0, total)), perTarget: perTargetApplied };
-    }
+   }
 
+  /**
+   * @param {UnitToken | null | undefined} unit
+   * @param {number} amount
+   * @returns {number}
+   */
   function applyBonuses(unit, amount){
     if (!unit) return amount;
     const bonus = toNumber(unit.furyGainBonus ?? unit.rageGainBonus);
@@ -14223,6 +17125,11 @@ __define('./utils/fury.js', (exports, module, __require) => {
     return amount;
   }
 
+  /**
+   * @param {UnitToken | null | undefined} unit
+   * @param {FuryTurnOptions} [opts]
+   * @returns {void}
+   */
   function startFuryTurn(unit, opts = {}){
     const state = ensureState(unit);
     if (!state) return;
@@ -14243,12 +17150,17 @@ __define('./utils/fury.js', (exports, module, __require) => {
         ? furyCfg.gain.turnStart.amount
         : (Number.isFinite(furyCfg?.turn?.startGain) ? furyCfg.turn.startGain : (furyCfg.startGain ?? 3));
       const startAmount = Number.isFinite(opts.startAmount) ? opts.startAmount : baseStart;
-      if (startAmount > 0){
+      if ((startAmount ?? 0) > 0){
         gainFury(unit, { amount: startAmount, type: 'turnStart' });
       }
     }
   }
 
+  /**
+   * @param {UnitToken | null | undefined} unit
+   * @param {{ tag?: string | null; forceReset?: boolean }} [options]
+   * @returns {void}
+   */
   function startFurySkill(unit, { tag = null, forceReset = false } = {}){
     const state = ensureState(unit);
     if (!state) return;
@@ -14262,6 +17174,10 @@ __define('./utils/fury.js', (exports, module, __require) => {
     }
   }
 
+  /**
+   * @param {UnitToken | null | undefined} unit
+   * @returns {void}
+   */
   function finishFuryHit(unit){
     const state = ensureState(unit);
     if (state){
@@ -14269,6 +17185,12 @@ __define('./utils/fury.js', (exports, module, __require) => {
     }
   }
 
+  /**
+   * @param {UnitToken | null | undefined} unit
+   * @param {FuryGainSpec} [spec]
+   * @param {typeof CFG} [cfg]
+   * @returns {number}
+   */
   function gainFury(unit, spec = {}, cfg = CFG){
     if (!unit) return 0;
     ensureAlias(unit);
@@ -14309,6 +17231,12 @@ __define('./utils/fury.js', (exports, module, __require) => {
     return gained;
   }
 
+  /**
+   * @param {UnitToken | null | undefined} unit
+   * @param {unknown} amount
+   * @param {typeof CFG} [cfg]
+   * @returns {number}
+   */
   function spendFury(unit, amount, cfg = CFG){
     if (!unit) return 0;
     ensureAlias(unit);
@@ -14320,6 +17248,13 @@ __define('./utils/fury.js', (exports, module, __require) => {
     return before - next;
   }
 
+  /**
+   * @param {UnitToken | null | undefined} source
+   * @param {UnitToken | null | undefined} target
+   * @param {FuryDrainOptions} [opts]
+   * @param {typeof CFG} [cfg]
+   * @returns {number}
+   */
   function drainFury(source, target, opts = {}, cfg = CFG){
     if (!target) return 0;
     ensureAlias(target);
@@ -14340,10 +17275,10 @@ __define('./utils/fury.js', (exports, module, __require) => {
     const current = Math.max(0, Math.floor(target.fury ?? 0));
     if (current <= 0) return 0;
 
-    let desired = Math.max(0, Math.floor(base));
+    let desired = Math.max(0, Math.floor(base ?? 0));
     if (percent) desired += Math.round(current * percent);
     if (desired <= 0) return 0;
-    
+
     let capRoom = desired;
     let sourceState = null;
     if (Number.isFinite(skillCap)){
@@ -14357,7 +17292,7 @@ __define('./utils/fury.js', (exports, module, __require) => {
 
     target.fury = current - drained;
     target.rage = target.fury;
-    
+
     if (sourceState && Number.isFinite(skillCap)){
       sourceState.skillDrain = (sourceState.skillDrain ?? 0) + drained;
     }
@@ -14365,12 +17300,20 @@ __define('./utils/fury.js', (exports, module, __require) => {
     return drained;
   }
 
+  /**
+   * @param {UnitToken | null | undefined} unit
+   * @returns {number}
+   */
   function furyValue(unit){
     if (!unit) return 0;
     ensureAlias(unit);
     return Math.floor(unit.fury ?? 0);
   }
 
+  /**
+   * @param {UnitToken | null | undefined} unit
+   * @returns {number}
+   */
   function furyRoom(unit){
     if (!unit) return 0;
     ensureAlias(unit);
@@ -14378,6 +17321,10 @@ __define('./utils/fury.js', (exports, module, __require) => {
     return Math.max(0, max - Math.floor(unit.fury ?? 0));
   }
 
+  /**
+   * @param {UnitToken | null | undefined} unit
+   * @returns {FuryState | null}
+   */
   function furyState(unit){
     return ensureState(unit);
   }
@@ -14399,21 +17346,103 @@ __define('./utils/fury.js', (exports, module, __require) => {
   exports.furyState = furyState;
 });
 __define('./utils/kit.js', (exports, module, __require) => {
+  // @ts-check
+
+  /**
+   * @typedef {Record<string, unknown> & { id?: string; key?: string; type?: string; name?: string; tags?: ReadonlyArray<string>; categories?: ReadonlyArray<string>; label?: string; [extra: string]: unknown; }} KitTraitObject
+   */
+
+  /**
+   * @typedef {ReadonlyArray<string | KitTraitObject | boolean | number | null | undefined> | Record<string, unknown> | null | undefined} KitTraits
+   */
+
+  /**
+   * @typedef {Record<string, unknown> & { type?: string; kind?: string; category?: string; tags?: ReadonlyArray<string>; categories?: ReadonlyArray<string>; label?: string; summon?: SummonSpecLike | null | undefined; revive?: Record<string, unknown> | null | undefined; instant?: boolean; instantCast?: boolean; cast?: string; immediate?: boolean; reduceDamage?: number; shield?: number; barrier?: number; buffs?: ReadonlyArray<Record<string, unknown>> | null | undefined; }} UltMetadata
+   */
+
+  /**
+   * @typedef {Record<string, unknown> & { pattern?: string; placement?: string; patternKey?: string; shape?: string; area?: string; slots?: ReadonlyArray<number | null | undefined>; count?: number; summonCount?: number; ttl?: number; ttlTurns?: number; inherit?: unknown; limit?: number; replace?: unknown; creep?: unknown; }} SummonSpecLike
+   */
+
+  /**
+   * @typedef {SummonSpecLike & { slots?: ReadonlyArray<number>; pattern?: string; ttl?: number; ttlTurns?: number; }} NormalizedSummonSpec
+   */
+
+  /**
+   * @typedef {Record<string, unknown> & { type?: string; kind?: string; category?: string; tags?: ReadonlyArray<string>; metadata?: UltMetadata | null | undefined; meta?: UltMetadata | null | undefined; summon?: SummonSpecLike | null | undefined; revive?: Record<string, unknown> | null | undefined; summonCount?: number; placement?: string; pattern?: string; ttl?: number; ttlTurns?: number; limit?: number; inherit?: unknown; replace?: unknown; creep?: unknown; }} UltSpec
+   */
+
+  /**
+   * @typedef {Record<string, unknown> & { kit?: KitData | null | undefined; traits?: KitTraits; ult?: UltSpec | null | undefined; }} KitMeta
+   */
+
+  /**
+   * @typedef {Record<string, unknown> & { traits?: KitTraits; ult?: UltSpec | null | undefined; }} KitData
+   */
+
+  /**
+   * @typedef {object} UltBehavior
+   * @property {ReadonlyArray<string>} tags
+   * @property {boolean} hasInstant
+   * @property {boolean} hasDefensive
+   * @property {boolean} hasRevive
+   * @property {Record<string, unknown> | null} revive
+   * @property {NormalizedSummonSpec | null} summon
+   */
+
+  /**
+   * @typedef {object} OnSpawnRageMap
+   * @property {number} [revive]
+   * @property {number} [leader]
+   * @property {number} [deck]
+   * @property {number} [nonLeader]
+   * @property {number} [default]
+   * @property {number} [value]
+   */
+
+  /**
+   * @typedef {Record<string, unknown> & { type?: string; kind?: string; effect?: string; phase?: string; stage?: string; when?: string; target?: string; amount?: number; value?: number; }} OnSpawnEffect
+   */
+
+  /**
+   * @typedef {Record<string, unknown> & { rage?: number | string | OnSpawnRageMap | null; effects?: ReadonlyArray<OnSpawnEffect | null | undefined>; revive?: { rage?: number } | null | undefined; onRevive?: { rage?: number } | null | undefined; revived?: { rage?: number } | null | undefined; deck?: { rage?: number } | null | undefined; default?: { rage?: number } | null | undefined; reviveRage?: number | null | undefined; defaultRage?: number | null | undefined; rageOnSummon?: number | null | undefined; }} OnSpawnConfig
+   */
+
+  /**
+   * @typedef {object} ExtractOnSpawnRageOptions
+   * @property {boolean} [isLeader]
+   * @property {boolean} [revive]
+   * @property {{ rage?: number } | null | undefined} [reviveSpec]
+   */
+
   const KNOWN_SUMMON_KEYS = ['summon', 'summoner', 'immediateSummon'];
   const KNOWN_REVIVE_KEYS = ['revive', 'reviver'];
   const DEFENSIVE_TAGS = ['defense', 'defensive', 'protection', 'shield', 'barrier', 'support'];
   const INSTANT_TAGS = ['instant', 'instant-cast', 'instantCast'];
 
+  /**
+   * @param {KitMeta | KitData | null | undefined} metaOrKit
+   * @returns {KitData | null}
+   */
   function coerceKit(metaOrKit){
     if (!metaOrKit) return null;
-    if (metaOrKit.kit) return metaOrKit.kit;
-    return metaOrKit;
+    if ('kit' in metaOrKit && metaOrKit.kit) return /** @type {KitData} */ (metaOrKit.kit);
+    return /** @type {KitData} */ (metaOrKit);
   }
 
+  /**
+   * @param {unknown} key
+   * @returns {string}
+   */
   function normalizeKey(key){
     return typeof key === 'string' ? key.trim().toLowerCase() : '';
   }
 
+  /**
+   * @param {KitTraits | null | undefined} traits
+   * @param {string} key
+   * @returns {boolean | KitTraitObject | string | number | null}
+   */
   function readTrait(traits, key){
     if (!traits) return null;
     const target = normalizeKey(key);
@@ -14427,9 +17456,12 @@ __define('./utils/kit.js', (exports, module, __require) => {
           continue;
         }
         if (typeof entry === 'object'){
-          const id = normalizeKey(entry.id || entry.key || entry.type || entry.name);
-          if (id === target) return entry;
-          if (entry[target] != null) return entry[target];
+          const candidate = /** @type {KitTraitObject} */ (entry);
+          const id = normalizeKey(candidate.id || candidate.key || candidate.type || candidate.name);
+          if (id === target) return candidate;
+          if (candidate[target] != null){
+            return /** @type {boolean | KitTraitObject | string | number | null} */ (candidate[target]);
+          }
         }
       }
       return null;
@@ -14437,31 +17469,55 @@ __define('./utils/kit.js', (exports, module, __require) => {
 
     if (typeof traits === 'object'){
       for (const [k, value] of Object.entries(traits)){
-        if (normalizeKey(k) === target) return value;
+        if (normalizeKey(k) === target){
+          return /** @type {boolean | KitTraitObject | string | number | null} */ (value);
+        }
       }
     }
     return null;
   }
 
+  /**
+   * @template T
+   * @param {T | null | undefined} value
+   * @returns {T | null}
+   */
   function cloneShallow(value){
-    if (!value || typeof value !== 'object') return value ?? null;
-    if (Array.isArray(value)) return value.map(cloneShallow);
-    const out = { ...value };
+    if (value == null || typeof value !== 'object') return (value ?? null);
+    if (Array.isArray(value)) return /** @type {T | null} */ (value.map(cloneShallow));
+    const out = /** @type {Record<string, unknown>} */ ({ ...value });
     for (const [k, v] of Object.entries(out)){
-      if (v && typeof v === 'object' && !Array.isArray(v)) out[k] = { ...v };
-      if (Array.isArray(v)) out[k] = v.map(cloneShallow);
+      if (Array.isArray(v)){
+        out[k] = v.map(cloneShallow);
+        continue;
+      }
+      if (v && typeof v === 'object'){
+        out[k] = cloneShallow(v);
+      }
     }
-    return out;
+    return /** @type {T} */ (out);
   }
 
+  /**
+   * @param {UltSpec | null | undefined} ult
+   * @returns {Partial<NormalizedSummonSpec> | null}
+   */
   function extractUltSummonFields(ult){
     if (!ult || typeof ult !== 'object') return null;
-    const out = {};
+  const out = /** @type {Partial<NormalizedSummonSpec> & Record<string, unknown>} */ ({});
     let hasValue = false;
+    /**
+     * @param {keyof NormalizedSummonSpec} key
+     * @param {unknown} value
+     * @param {boolean} [clone]
+     */
     const assign = (key, value, clone = false) => {
-      if (value === undefined) return;
-      if (value === null) return;
-      out[key] = clone ? cloneShallow(value) : value;
+      if (value === undefined || value === null) return;
+  if (clone && value && typeof value === 'object'){
+        out[key] = Array.isArray(value) ? value.map(cloneShallow) : cloneShallow(value);
+      } else {
+        out[key] = value;
+      }
       hasValue = true;
     };
 
@@ -14479,28 +17535,46 @@ __define('./utils/kit.js', (exports, module, __require) => {
     assign('replace', ult.replace);
     assign('creep', ult.creep, true);
 
-    return hasValue ? out : null;
+    return hasValue ? /** @type {Partial<NormalizedSummonSpec>} */ (out) : null;
   }
 
+  /**
+   * @param {SummonSpecLike | null | undefined} spec
+   * @param {UltSpec | null | undefined} ult
+   * @returns {SummonSpecLike | null}
+   */
   function applyUltSummonDefaults(spec, ult){
     const fields = extractUltSummonFields(ult);
-    if (!fields) return spec;
-    const out = spec ?? {};
+    if (!fields) return spec ?? null;
+    const out = spec ?? /** @type {SummonSpecLike} */ ({});
+    const target = /** @type {SummonSpecLike & Record<string, unknown>} */ (out);
     for (const [key, value] of Object.entries(fields)){
-      if (out[key] === undefined || out[key] === null){
-        out[key] = value;
+      const current = target[key];
+      if (current === undefined || current === null){
+  target[key] = value;
       }
     }
     return out;
   }
 
+  /**
+   * @param {KitMeta | KitData | null | undefined} metaOrKit
+   * @returns {Set<string>}
+   */
   function collectUltTags(metaOrKit){
     const kit = coerceKit(metaOrKit);
     const ult = kit?.ult;
+    /** @type {Set<string>} */
     const tags = new Set();
+    /**
+     * @param {unknown} val
+     */
     const add = (val) => {
       if (typeof val === 'string' && val.trim() !== '') tags.add(val.trim());
     };
+      /**
+     * @param {unknown} vals
+     */
     const addMany = (vals) => {
       if (!Array.isArray(vals)) return;
       for (const val of vals){ add(val); }
@@ -14522,33 +17596,39 @@ __define('./utils/kit.js', (exports, module, __require) => {
       if (metadata.label) add(metadata.label);
     }
 
-    const traitUlt = readTrait(kit?.traits, 'ult');
+    const traitUlt = readTrait(kit?.traits ?? null, 'ult');
     if (traitUlt){
       if (typeof traitUlt === 'string') add(traitUlt);
       if (Array.isArray(traitUlt)) addMany(traitUlt);
       if (traitUlt && typeof traitUlt === 'object'){
-        add(traitUlt.type);
-        addMany(traitUlt.tags);
-        addMany(traitUlt.categories);
-        if (typeof traitUlt.label === 'string') add(traitUlt.label);
+        const traitObj = /** @type {KitTraitObject} */ (traitUlt);
+        add(traitObj.type);
+        addMany(traitObj.tags);
+        addMany(traitObj.categories);
+        if (typeof traitObj.label === 'string') add(traitObj.label);
       }
     }
 
     return tags;
   }
 
+  /**
+   * @param {KitMeta | KitData | null | undefined} metaOrKit
+   * @returns {NormalizedSummonSpec | null}
+   */
   function getSummonSpec(metaOrKit){
     const kit = coerceKit(metaOrKit);
     if (!kit) return null;
 
+  /** @type {SummonSpecLike | null} */
     let spec = null;
     for (const key of KNOWN_SUMMON_KEYS){
-      const trait = readTrait(kit.traits, key);
+      const trait = readTrait(kit.traits ?? null, key);
       if (trait){
         if (trait === true) {
           spec = {};
         } else if (typeof trait === 'object'){
-          spec = cloneShallow(trait);
+          spec = /** @type {SummonSpecLike | null} */ (cloneShallow(trait));
         } else if (typeof trait === 'number'){
           spec = { count: trait };
         } else {
@@ -14561,18 +17641,18 @@ __define('./utils/kit.js', (exports, module, __require) => {
     const ult = kit.ult || null;
     if (!spec && ult){
       if (ult.summon){
-        spec = cloneShallow(ult.summon);
+        spec = /** @type {SummonSpecLike | null} */ (cloneShallow(ult.summon));
       } else if (ult.metadata?.summon){
-        spec = cloneShallow(ult.metadata.summon);
+        spec = /** @type {SummonSpecLike | null} */ (cloneShallow(ult.metadata.summon));
       } else if (ult.meta?.summon){
-        spec = cloneShallow(ult.meta.summon);
+        spec = /** @type {SummonSpecLike | null} */ (cloneShallow(ult.meta.summon));
       }
     }
 
     const tags = collectUltTags(kit);
     if (!spec && kitUltHasTag(kit, 'summon', tags)){
       if (ult?.summon){
-        spec = cloneShallow(ult.summon);
+        spec = /** @type {SummonSpecLike | null} */ (cloneShallow(ult.summon));
       }
       spec = applyUltSummonDefaults(spec, ult);
     }
@@ -14582,7 +17662,7 @@ __define('./utils/kit.js', (exports, module, __require) => {
 
     if (!spec) return null;
 
-    const normalized = cloneShallow(spec) || {};
+    const normalized = /** @type {NormalizedSummonSpec} */ (cloneShallow(spec) || {});
     if (!normalized.pattern && typeof normalized.placement === 'string'){
       normalized.pattern = normalized.placement;
     }
@@ -14595,33 +17675,50 @@ __define('./utils/kit.js', (exports, module, __require) => {
     if (normalized.ttlTurns == null && typeof normalized.ttl === 'number'){
       normalized.ttlTurns = normalized.ttl;
     }
+    if (Array.isArray(normalized.slots)){
+      normalized.slots = normalized.slots.filter((s) => Number.isFinite(s)).map((s) => Number(s));
+    }
     return normalized;
   }
 
+  /**
+   * @param {KitMeta | KitData | null | undefined} metaOrKit
+   * @returns {Record<string, unknown> | null}
+   */
   function getReviveSpec(metaOrKit){
     const kit = coerceKit(metaOrKit);
     if (!kit) return null;
     for (const key of KNOWN_REVIVE_KEYS){
-      const trait = readTrait(kit.traits, key);
+    const trait = readTrait(kit.traits ?? null, key);
       if (trait){
         if (trait === true) return {};
-        if (typeof trait === 'object') return cloneShallow(trait);
+        if (typeof trait === 'object') return /** @type {Record<string, unknown>} */ (cloneShallow(trait) || {});
         return {};
       }
     }
     const ult = kit.ult || null;
-    if (ult?.revive) return cloneShallow(ult.revive);
-    if (ult?.metadata?.revive) return cloneShallow(ult.metadata.revive);
+    if (ult?.revive) return /** @type {Record<string, unknown>} */ (cloneShallow(ult.revive) || {});
+    if (ult?.metadata?.revive) return /** @type {Record<string, unknown>} */ (cloneShallow(ult.metadata.revive) || {});
     if (kitUltHasTag(kit, 'revive')){
-      return cloneShallow(ult?.revive || {});
+      return /** @type {Record<string, unknown>} */ (cloneShallow(ult?.revive || {}) || {});
     }
     return null;
   }
 
+  /**
+   * @param {KitMeta | KitData | null | undefined} metaOrKit
+   * @returns {boolean}
+   */
   function kitSupportsSummon(metaOrKit){
-    return !!getSummonSpec(metaOrKit);
+    return getSummonSpec(metaOrKit) != null;
   }
 
+  /**
+   * @param {KitMeta | KitData | null | undefined} metaOrKit
+   * @param {string} tag
+   * @param {Set<string> | null} [precomputedTags]
+   * @returns {boolean}
+   */
   function kitUltHasTag(metaOrKit, tag, precomputedTags = null){
     if (!tag) return false;
     const tags = precomputedTags ?? collectUltTags(metaOrKit);
@@ -14632,25 +17729,29 @@ __define('./utils/kit.js', (exports, module, __require) => {
     return false;
   }
 
+  /**
+   * @param {KitMeta | KitData | null | undefined} metaOrKit
+   * @returns {UltBehavior}
+   */
   function detectUltBehavior(metaOrKit){
     const kit = coerceKit(metaOrKit);
     const ult = kit?.ult;
     const tags = collectUltTags(kit);
-    const metadata = ult?.metadata || ult?.meta || {};
-    const traits = kit?.traits || null;
+    const metadata = ult?.metadata || ult?.meta || /** @type {UltMetadata} */ ({});
+    const traits = kit?.traits ?? null;
 
     const hasInstant = Boolean(
       metadata.instant === true || metadata.instantCast === true || metadata.cast === 'instant'
         || (ult && (ult.instant || ult.cast === 'instant' || ult.immediate === true))
-        || INSTANT_TAGS.some(tag => kitUltHasTag(kit, tag))
+        || INSTANT_TAGS.some((tag) => kitUltHasTag(kit, tag))
         || readTrait(traits, 'instantUlt') === true || readTrait(traits, 'instantUltimate') === true
     );
 
     const hasDefensive = Boolean(
       metadata.defensive === true || metadata.role === 'defensive'
-        || DEFENSIVE_TAGS.some(tag => kitUltHasTag(kit, tag))
+        || DEFENSIVE_TAGS.some((tag) => kitUltHasTag(kit, tag))
         || (ult && (typeof ult.reduceDamage === 'number' || typeof ult.shield === 'number' || typeof ult.barrier === 'number'
-          || Array.isArray(ult.shields) || Array.isArray(ult.buffs) && ult.buffs.some(b => normalizeKey(b.effect) === 'shield')))
+          || Array.isArray(ult.shields) || Array.isArray(ult.buffs) && ult.buffs.some((b) => normalizeKey(b.effect) === 'shield')))
         || readTrait(traits, 'defensiveUlt') === true || readTrait(traits, 'guardianUlt') === true
     );
 
@@ -14667,29 +17768,40 @@ __define('./utils/kit.js', (exports, module, __require) => {
     };
   }
 
-  function extractRageFromEffects(onSpawn, opts){
+  /**
+   * @param {OnSpawnConfig | null | undefined} onSpawn
+   * @param {ExtractOnSpawnRageOptions} [opts]
+   * @returns {number | null}
+   */
+  function extractRageFromEffects(onSpawn, opts = {}){
     const effects = Array.isArray(onSpawn?.effects) ? onSpawn.effects : [];
     for (const effect of effects){
       if (!effect) continue;
-      const type = normalizeKey(effect.type || effect.kind || effect.effect);
+      const effectObj = /** @type {OnSpawnEffect} */ (effect);
+      const type = normalizeKey(effectObj.type || effectObj.kind || effectObj.effect);
       if (!type) continue;
       if (type === 'setrage' || type === 'addrage' || type === 'giverage'){
-        if (opts.revive && normalizeKey(effect.phase || effect.stage || effect.when) === 'revive' && typeof effect.amount === 'number'){
-          return effect.amount;
+        if (opts.revive && normalizeKey(effectObj.phase || effectObj.stage || effectObj.when) === 'revive' && typeof effectObj.amount === 'number'){
+          return effectObj.amount;
         }
-        if (opts.isLeader && normalizeKey(effect.target) === 'leader' && typeof effect.amount === 'number'){
-          return effect.amount;
+        if (opts.isLeader && normalizeKey(effectObj.target) === 'leader' && typeof effectObj.amount === 'number'){
+          return effectObj.amount;
         }
-        if (!opts.isLeader && (effect.target == null || ['deck', 'nonleader', 'non-leader'].includes(normalizeKey(effect.target)))){
-          if (typeof effect.amount === 'number') return effect.amount;
+        if (!opts.isLeader && (effectObj.target == null || ['deck', 'nonleader', 'non-leader'].includes(normalizeKey(effectObj.target)))){
+          if (typeof effectObj.amount === 'number') return effectObj.amount;
         }
-        if (typeof effect.value === 'number') return effect.value;
-        if (typeof effect.amount === 'number') return effect.amount;
+        if (typeof effectObj.value === 'number') return effectObj.value;
+        if (typeof effectObj.amount === 'number') return effectObj.amount;
       }
     }
     return null;
   }
 
+  /**
+   * @param {OnSpawnConfig | null | undefined} onSpawn
+   * @param {ExtractOnSpawnRageOptions} [opts]
+   * @returns {number | null}
+   */
   function extractOnSpawnRage(onSpawn, opts = {}){
     if (!onSpawn) return null;
     const { isLeader = false, revive = false, reviveSpec = null } = opts;
@@ -14702,7 +17814,7 @@ __define('./utils/kit.js', (exports, module, __require) => {
       if (reviveCfg && typeof reviveCfg.rage === 'number') return Math.max(0, reviveCfg.rage);
     }
 
-    const fromEffects = extractRageFromEffects(onSpawn, opts);
+    const fromEffects = extractRageFromEffects(onSpawn, { isLeader, revive, reviveSpec });
     if (fromEffects != null) return Math.max(0, fromEffects);
 
     const rage = onSpawn.rage;
@@ -14712,14 +17824,17 @@ __define('./utils/kit.js', (exports, module, __require) => {
       if (!Number.isNaN(parsed)) return Math.max(0, parsed);
     }
     if (rage && typeof rage === 'object'){
-      if (revive && typeof rage.revive === 'number') return Math.max(0, rage.revive);
-      if (isLeader && typeof rage.leader === 'number') return Math.max(0, rage.leader);
+      const rageObj = /** @type {OnSpawnRageMap} */ (rage);
+      if (revive && typeof rageObj.revive === 'number') return Math.max(0, rageObj.revive);
+      if (isLeader && typeof rageObj.leader === 'number') return Math.max(0, rageObj.leader);
       if (!isLeader){
-        if (typeof rage.deck === 'number') return Math.max(0, rage.deck);
-        if (typeof rage.nonLeader === 'number') return Math.max(0, rage.nonLeader);
+        if (typeof rageObj.deck === 'number') return Math.max(0, rageObj.deck);
+        if (typeof rageObj.nonLeader === 'number') return Math.max(0, rageObj.nonLeader);
       }
-      if (typeof rage.default === 'number') return Math.max(0, rage.default);
-      if (typeof rage.value === 'number') return Math.max(0, rage.value);
+      if (typeof rageObj.default === 'number') return Math.max(0, rageObj.default);
+      if (typeof rageObj.value === 'number'){
+        return Math.max(0, rageObj.value);
+      }
     }
 
     if (onSpawn.deck && typeof onSpawn.deck.rage === 'number' && !isLeader){
@@ -14740,26 +17855,40 @@ __define('./utils/kit.js', (exports, module, __require) => {
     return null;
   }
 
+  /**
+   * @param {number} baseSlot
+   * @returns {ReadonlyArray<number>}
+   */
   function verticalNeighbors(baseSlot){
     const row = (baseSlot - 1) % 3;
+    /** @type {number[]} */
     const list = [];
     if (row > 0) list.push(baseSlot - 1);
     if (row < 2) list.push(baseSlot + 1);
     return list;
   }
 
+  /**
+   * @param {number} baseSlot
+   * @returns {ReadonlyArray<number>}
+   */
   function rowNeighbors(baseSlot){
     const col = Math.floor((baseSlot - 1) / 3);
     const row = (baseSlot - 1) % 3;
     const left  = (col < 2) ? ((col + 1) * 3 + row + 1) : null;
     const right = (col > 0) ? ((col - 1) * 3 + row + 1) : null;
-    return [right, left].filter(Boolean);
+    return /** @type {ReadonlyArray<number>} */ ([right, left].filter(Boolean));
   }
 
+  /**
+   * @param {SummonSpecLike | null | undefined} spec
+   * @param {number} baseSlot
+   * @returns {ReadonlyArray<number>}
+   */
   function resolveSummonSlots(spec, baseSlot){
     if (!spec || !Number.isFinite(baseSlot)) return [];
     if (Array.isArray(spec.slots) && spec.slots.length){
-      return spec.slots.filter(s => Number.isFinite(s)).map(s => s|0);
+      return spec.slots.filter((s) => Number.isFinite(s)).map((s) => Number(s));
     }
 
     const patternRaw = spec.pattern || spec.placement || spec.shape || spec.area;
@@ -14801,10 +17930,15 @@ __define('./utils/kit.js', (exports, module, __require) => {
   exports.getReviveSpec = getReviveSpec;
 });
 __define('./utils/time.js', (exports, module, __require) => {
+  // @ts-check
+
   const perf = typeof globalThis !== 'undefined' ? globalThis.performance : undefined;
   const hasPerfNow = !!(perf && typeof perf.now === 'function');
   let lastFallbackNow = 0;
 
+  /**
+   * @returns {number}
+   */
   function safeNow(){
     if (hasPerfNow) return perf.now();
     const current = Date.now();
@@ -14823,7 +17957,7 @@ __define('./vfx.js', (exports, module, __require) => {
   // Không thay đổi logic combat/turn — chỉ vẽ đè.
   // Durations: spawn 500ms, hit 380ms, tracer 400ms, melee 1100ms.
 
-  const __dep0 = __require('./engine.js');
+  const __dep0 = __require('./engine.ts');
   const projectCellOblique = __dep0.projectCellOblique;
   const __dep1 = __require('./config.js');
   const CFG = __dep1.CFG;
@@ -14832,6 +17966,10 @@ __define('./vfx.js', (exports, module, __require) => {
   const safeNow = __dep2.safeNow;
   const __dep3 = __require('./data/vfx_anchors/loithienanh.json');
   const loithienanhAnchors = __dep3.default ?? __dep3;
+  const __dep4 = __require('./data/vfx_anchors/schema.ts');
+  const parseVfxAnchorDataset = __dep4.parseVfxAnchorDataset;
+
+  /** @typedef {import('@types/vfx').VfxAnchorDataset} VfxAnchorDataset */
 
   const now = () => safeNow();
   const lerp = (a, b, t) => a + (b - a) * t;
@@ -14851,6 +17989,7 @@ __define('./vfx.js', (exports, module, __require) => {
   const UNIT_HEIGHT_RATIO = 1.85;
   const DEFAULT_SEGMENTS = 6;
 
+  /** @type {Map<string, VfxAnchorDataset>} */
   const VFX_ANCHOR_CACHE = new Map();
 
   function registerAnchorDataset(dataset) {
@@ -14865,7 +18004,16 @@ __define('./vfx.js', (exports, module, __require) => {
     VFX_ANCHOR_CACHE.set(unitId, entry);
   }
 
-  registerAnchorDataset(loithienanhAnchors);
+  try {
+    const dataset = parseVfxAnchorDataset(loithienanhAnchors);
+    registerAnchorDataset(dataset);
+  } catch (error) {
+    // behavior-preserving: fall back to raw dataset when validation fails.
+    if (typeof console !== 'undefined' && console?.warn) {
+      console.warn('[vfxDraw] Failed to parse anchor dataset', error);
+    }
+    registerAnchorDataset(loithienanhAnchors);
+  }
 
   function getUnitAnchorDataset(unit) {
     if (!unit) return null;
