@@ -1,4 +1,5 @@
 export type * from './units';
+export type * from './art';
 export type {
   StatusEffect,
   StatusLifecyclePayload,
@@ -23,6 +24,7 @@ export type * from './telemetry';
 export type * from './config';
 export type * from './utils';
 export type * from './vfx';
+export type * from './ui';
 export type {
   RewardRoll,
   WaveState,

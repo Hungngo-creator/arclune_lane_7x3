@@ -1,4 +1,5 @@
 import type { StatusEffect } from './combat';
+import type { UnitArt } from './art';
 
 export type UnitId = string;
 
@@ -52,13 +53,20 @@ export interface UnitToken extends StatBlock {
   ttlTurns?: number;
   statuses?: StatusEffect[];
   color?: string;
-  art?: Record<string, unknown> | null;
+  art?: UnitArt | null;
   skinKey?: string | null;
   furyMax?: number;
   fury?: number;
   rage?: number;
   _furyState?: FuryState;
   [extra: string]: unknown;
+}
+
+export interface SummonRequest {
+  by?: UnitId | null;
+  side: Side;
+  slot: number;
+  unit?: (Partial<UnitToken> & { art?: UnitArt | null }) | null;
 }
 
 export interface QueuedSummonRequest {
