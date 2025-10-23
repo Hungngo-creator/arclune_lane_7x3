@@ -17,6 +17,9 @@ const DIST_DIR = path.join(__dirname, 'dist');
 const ENTRY_ID = './entry.js';
 const SOURCE_EXTENSIONS = ['.js', '.ts', '.tsx', '.json'];
 const SCRIPT_EXTENSIONS = new Set(['.js', '.ts', '.tsx']);
+const LEGACY_MODULE_ID_ALIASES = new Map([
+  ['./modes/pve/session.js', './modes/pve/session.ts'],
+]);
 
 const args = process.argv.slice(2);
 const modeArg = args.find((arg) => arg.startsWith('--mode='));
@@ -76,6 +79,10 @@ function resolveAlias(specifier){
   return null;
 }
 
+function applyLegacyModuleAlias(moduleId){
+  return LEGACY_MODULE_ID_ALIASES.get(moduleId) ?? moduleId;
+}
+
 function resolveWithExtensions(basePath){
   if (!basePath) return null;
   if (fsSync.existsSync(basePath)){
@@ -112,7 +119,7 @@ function toModuleId(filePath){
 function resolveImport(fromId, specifier){
   const aliasResolved = resolveAlias(specifier);
   if (aliasResolved){
-    return toModuleId(aliasResolved);
+    return applyLegacyModuleAlias(aliasResolved);
   }
 
   const fromPath = path.join(SRC_DIR, fromId.slice(2));
@@ -120,7 +127,8 @@ function resolveImport(fromId, specifier){
     ? path.resolve(path.dirname(fromPath), specifier)
     : path.resolve(SRC_DIR, specifier);
   const withExt = resolveWithExtensions(baseResolved);
-  return toModuleId(withExt || baseResolved);
+  const moduleId = toModuleId(withExt || baseResolved);
+  return applyLegacyModuleAlias(moduleId);
 }
 
 async function listSourceFiles(){
@@ -269,6 +277,8 @@ function transformModule(code, id){
   });
 
   const importRegex = /import\s*([\s\S]*?)\s*from\s*['\"](.+?)['\"];?/g;
+  const importTypeRegex = /import\s+type\s+([\s\S]*?)\s*from\s*['\"](.+?)['\"];?/g;
+  code = code.replace(importTypeRegex, () => '');
   code = code.replace(importRegex, (match, clause, source) => {
     const depId = resolveImport(id, source.trim());
     const moduleVar = `__dep${depIndex++}`;
@@ -429,10 +439,14 @@ async function build(){
   const parts = [];
   parts.push('// Bundled by build.mjs');
   parts.push('const __modules = Object.create(null);');
+  const legacyAliasObject = Object.fromEntries(LEGACY_MODULE_ID_ALIASES);
+  parts.push(`const __legacyModuleAliases = ${JSON.stringify(legacyAliasObject)};`);
+  parts.push('function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }');
   parts.push('function __define(id, factory){ __modules[id] = { factory, exports: null, initialized: false }; }');
   parts.push('function __require(id){');
-  parts.push('  const mod = __modules[id];');
-  parts.push("  if (!mod) throw new Error('Module not found: ' + id);");
+  parts.push('  const normalizedId = __normalizeModuleId(id);');
+  parts.push('  const mod = __modules[normalizedId];');
+  parts.push("  if (!mod) throw new Error('Module not found: ' + normalizedId);");
   parts.push('  if (!mod.initialized){');
   parts.push('    mod.initialized = true;');
   parts.push('    const module = { exports: {} };');
