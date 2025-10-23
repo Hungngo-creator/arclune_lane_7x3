@@ -14,11 +14,12 @@ try {
 }
 const SRC_DIR = path.join(__dirname, 'src');
 const DIST_DIR = path.join(__dirname, 'dist');
-const ENTRY_ID = './entry.js';
+const ENTRY_ID = './entry.ts';
 const SOURCE_EXTENSIONS = ['.js', '.ts', '.tsx', '.json'];
 const SCRIPT_EXTENSIONS = new Set(['.js', '.ts', '.tsx']);
 const LEGACY_MODULE_ID_ALIASES = new Map([
   ['./modes/pve/session.js', './modes/pve/session.ts'],
+  ['./entry.js', './entry.ts'],
 ]);
 
 const args = process.argv.slice(2);
