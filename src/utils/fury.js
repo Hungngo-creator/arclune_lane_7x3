@@ -1,6 +1,6 @@
 // @ts-check
 
-import { CFG } from '../config.js';
+import { CFG } from '../config.ts';
 import { safeNow } from './time.js';
 
 /**
