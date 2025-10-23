@@ -1,4 +1,4 @@
-import { createAppShell } from './app/shell.js';
+import { createAppShell } from './app/shell.ts';
 import { renderMainMenuView } from './screens/main-menu/view.js';
 import { MODES, MODE_GROUPS, MODE_STATUS, getMenuSections } from './data/modes.js';
 import type { ModeConfig, ModeGroup, ModeShellConfig } from '@types/config';
