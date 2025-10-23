@@ -2,8 +2,8 @@
 import { ROSTER } from '../catalog.js';
 
 /** @typedef {import('../types/units.ts').UnitId} UnitId */
-/** @typedef {import('../types/config.js').SkillSection} SkillSection */
-/** @typedef {import('../types/config.js').SkillEntry} SkillEntry */
+/** @typedef {import('../types/config.ts').SkillSection} SkillSection */
+/** @typedef {import('../types/config.ts').SkillEntry} SkillEntry */
 
 /**
  * @template T
