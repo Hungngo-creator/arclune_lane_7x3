@@ -1,6 +1,7 @@
 import { TOKEN_STYLE, CHIBI, CFG } from './config.ts';
-import { getUnitArt, getUnitSkin } from './art.js';
+import { getUnitArt, getUnitSkin } from './art.ts';
 import type { UnitToken, QueuedSummonState, QueuedSummonRequest, Side } from './types/units.ts';
+import type { UnitArt } from './types/art.ts';
 
 type GridSpec = {
   cols: number;
@@ -60,24 +61,7 @@ type LabelConfig = {
   stroke?: string;
 };
 
-type UnitArtDescriptor = {
-  sprite?: string | SpriteDescriptor | null;
-  layout?: LayoutConfig | null;
-  shape?: string | null;
-  palette?: {
-    primary?: string;
-    secondary?: string;
-    accent?: string;
-    outline?: string;
-  } | null;
-  label?: LabelConfig | false | null;
-  glow?: string;
-  shadow?: ShadowConfig | string | null;
-  size?: number;
-  mirror?: boolean;
-  skinKey?: string | null;
-  [extra: string]: unknown;
-};
+type UnitArtDescriptor = UnitArt;
 
 type TokenWithArt = UnitToken & {
   art?: UnitArtDescriptor | null;

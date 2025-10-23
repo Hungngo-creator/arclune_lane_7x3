@@ -6,7 +6,7 @@ import { doBasicWithFollowups } from './combat.ts';
 import { CFG } from './config.ts';
 import { makeInstanceStats, initialRageFor } from './meta.ts';
 import { vfxAddSpawn, vfxAddBloodPulse } from './vfx.js';
-import { getUnitArt } from './art.js';
+import { getUnitArt } from './art.ts';
 import { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } from './passives.ts';
 import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } from './events.ts';
 import { safeNow } from './utils/time.js';
