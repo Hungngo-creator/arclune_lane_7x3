@@ -1,6 +1,6 @@
 import { ROSTER } from '../../catalog.js';
 import { UNITS } from '../../units.ts';
-import { getUnitArt } from '../../art.js';
+import { getUnitArt } from '../../art.ts';
 import { listCurrencies } from '../../data/economy.js';
 import { getSkillSet } from '../../data/skills.js';
 import { createNumberFormatter } from '../../utils/format.js';
