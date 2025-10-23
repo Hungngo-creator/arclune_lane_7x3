@@ -1,7 +1,8 @@
 import { createAppShell } from './app/shell.ts';
-import { renderMainMenuView } from './screens/main-menu/view.js';
+import { renderMainMenuView } from './screens/main-menu/view/index.ts';
 import { MODES, MODE_GROUPS, MODE_STATUS, getMenuSections } from './data/modes.js';
 import type { ModeConfig, ModeGroup, ModeShellConfig } from '@types/config';
+import type { MenuCardMetadata, MenuSection, MenuSectionEntry } from './screens/main-menu/types.ts';
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -80,19 +81,6 @@ interface RenderPveLayoutOptions {
 interface PveSession {
   start?: (config: UnknownRecord) => unknown;
   stop?: () => void;
-}
-
-interface MenuSectionEntry {
-  id: string;
-  type: string;
-  cardId?: string;
-  childModeIds?: ReadonlyArray<string>;
-}
-
-interface MenuSection {
-  id: string;
-  title: string;
-  entries?: ReadonlyArray<MenuSectionEntry | null>;
 }
 
 declare global {
@@ -178,8 +166,8 @@ const MODE_METADATA = (MODES as ReadonlyArray<ModeConfig>).map(mode => {
     status: mode.status,
     params: definition?.params || null,
     parentId: mode.parentId || null
-  };
-});
+} satisfies MenuCardMetadata;
+}) satisfies ReadonlyArray<MenuCardMetadata>;
 
 const MODE_GROUP_METADATA = (MODE_GROUPS as ReadonlyArray<ModeGroup>).map(group => {
   const childModeIds = Array.isArray(group.childModeIds) ? [...group.childModeIds] : [];
@@ -211,10 +199,10 @@ const MODE_GROUP_METADATA = (MODE_GROUPS as ReadonlyArray<ModeGroup>).map(group 
     isGroup: true,
     childModeIds,
     extraClasses: Array.isArray(group.extraClasses) ? [...group.extraClasses] : []
-  };
-});
+  } satisfies MenuCardMetadata;
+}) satisfies ReadonlyArray<MenuCardMetadata>;
 
-const CARD_METADATA = [...MODE_METADATA, ...MODE_GROUP_METADATA];
+const CARD_METADATA: ReadonlyArray<MenuCardMetadata> = [...MODE_METADATA, ...MODE_GROUP_METADATA];
 
 const MENU_SECTIONS = getMenuSections({
   includeStatuses: [MODE_STATUS.AVAILABLE, MODE_STATUS.COMING_SOON]
@@ -651,14 +639,14 @@ function renderMainMenuScreen(): void{
     rootElement.classList.add('app--main-menu');
   }
 
-lineupRenderToken += 1;
+  lineupRenderToken += 1;
   destroyLineupView();
 
   if (mainMenuView && typeof mainMenuView.destroy === 'function'){
     mainMenuView.destroy();
     mainMenuView = null;
   }
-  const sections = MENU_SECTIONS.map(section => ({
+  const sections: ReadonlyArray<MenuSection> = MENU_SECTIONS.map(section => ({
     id: section.id,
     title: section.title,
     entries: (section.entries || [])
@@ -676,7 +664,7 @@ lineupRenderToken += 1;
     sections,
     metadata: CARD_METADATA,
     playerGender: bootstrapOptions.playerGender || 'neutral',
-    onShowComingSoon: (mode: { key?: string; title?: string; label?: string }) => {
+    onShowComingSoon: (mode: MenuCardMetadata) => {
       const def = mode?.key ? MODE_DEFINITIONS[mode.key] : null;
       const label = def?.label || mode?.title || mode?.label || '';
       showComingSoonModal(label);
