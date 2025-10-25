@@ -3,6 +3,7 @@ import { renderMainMenuView } from './screens/main-menu/view/index.ts';
 import { MODES, MODE_GROUPS, MODE_STATUS, getMenuSections } from './data/modes.js';
 import type { ModeConfig, ModeGroup, ModeShellConfig } from '@types/config';
 import type { MenuCardMetadata, MenuSection, MenuSectionEntry } from './screens/main-menu/types.ts';
+import type { LineupViewHandle } from './screens/lineup/view/index.ts';
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -220,7 +221,7 @@ let customScreenId: string | null = null;
 let customScreenToken = 0;
 let collectionView: MaybeViewController = null;
 let collectionRenderToken = 0;
-let lineupView: MaybeViewController = null;
+let lineupView: LineupViewHandle | null = null;
 let lineupRenderToken = 0;
 
 function dispatchLoaded(): void{
@@ -623,12 +624,13 @@ async function renderLineupScreen(params: ScreenParams): Promise<void>{
   if (!definition){
     throw new Error('Không tìm thấy định nghĩa màn hình đội hình.');
   }
-  lineupView = (render({
+  const lineupResult = render({
     root: rootElement,
     shell: shellInstance,
     definition,
     params: params || null
-  }) ?? null;
+});
+  lineupView = (lineupResult as LineupViewHandle | void) ?? null;
 }
 
 function renderMainMenuScreen(): void{
