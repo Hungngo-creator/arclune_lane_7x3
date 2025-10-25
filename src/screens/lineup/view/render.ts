@@ -1,5 +1,6 @@
 import { getSkillSet } from '../../../data/skills.ts';
 import { createNumberFormatter } from '../../../utils/format.js';
+import { assertElement, ensureStyleTag, mountSection } from '../../../../ui/dom.ts';
 import {
   normalizeRoster,
   normalizeLineups,
@@ -23,14 +24,6 @@ const powerFormatter = createNumberFormatter('vi-VN');
 type UnknownRecord = Record<string, unknown>;
 
 function ensureStyles(): void{
-  if (typeof document === 'undefined') return;
-  let style = document.getElementById(STYLE_ID);
-  if (!style || style.tagName.toLowerCase() !== 'style'){
-    style = document.createElement('style');
-    style.id = STYLE_ID;
-    document.head.appendChild(style);
-  }
-
   const css = `
     .app--lineup{padding:32px 16px 72px;}
     .lineup-view{max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:28px;color:inherit;--lineup-bench-slot-size:64px;--lineup-bench-slot-gap:12px;}
@@ -148,10 +141,8 @@ function ensureStyles(): void{
     @media(max-width:720px){.lineup-view__title{font-size:30px;}.lineup-view__header{flex-direction:column;align-items:flex-start;}.lineup-main-area{gap:18px;}.lineup-bench__content{grid-template-columns:1fr;}.lineup-bench__grid{flex-wrap:wrap;}.lineup-slot__avatar{width:64px;height:64px;}.lineup-roster__list{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}}
   `;
 
-  if (style.textContent !== css){
-    style.textContent = css;
+  ensureStyleTag(STYLE_ID, { css });
   }
-}
 
 function createOverlay(): HTMLDivElement{
   const overlay = document.createElement('div');
@@ -279,9 +270,10 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
     currencies = null,
   } = options;
 
-  if (!root){
-    throw new Error('renderLineupView cần một phần tử root hợp lệ.');
-  }
+  const host = assertElement<HTMLElement>(root, {
+    guard: (node): node is HTMLElement => node instanceof HTMLElement,
+    message: 'renderLineupView cần một phần tử root hợp lệ.',
+  });
 
   ensureStyles();
 
@@ -324,10 +316,12 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
     filterOptions: createFilterOptions(normalizedRoster),
   };
 
-  root.innerHTML = '';
   const container = document.createElement('div');
   container.className = 'lineup-view';
-  root.appendChild(container);
+  const mount = mountSection({
+    root: host,
+    section: container,
+  });
 
   const header = document.createElement('div');
   header.className = 'lineup-view__header';
@@ -442,30 +436,48 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
 
   const passiveOverlay = createOverlay();
   passiveOverlay.classList.add('lineup-overlay--passive');
-  const passiveOverlayBody = passiveOverlay.querySelector<HTMLDivElement>('.lineup-overlay__body');
-  const passiveClose = passiveOverlay.querySelector<HTMLButtonElement>('.lineup-overlay__close');
-  if (!passiveOverlayBody || !passiveClose){
-    throw new Error('Không thể khởi tạo overlay passive.');
-  }
+  const passiveOverlayBody = assertElement<HTMLDivElement>(
+    passiveOverlay.querySelector('.lineup-overlay__body'),
+    {
+      guard: (node): node is HTMLDivElement => node instanceof HTMLDivElement,
+      message: 'Không thể khởi tạo overlay passive.',
+    },
+  );
+  const passiveClose = assertElement<HTMLButtonElement>(
+    passiveOverlay.querySelector('.lineup-overlay__close'),
+    {
+      guard: (node): node is HTMLButtonElement => node instanceof HTMLButtonElement,
+      message: 'Không thể khởi tạo overlay passive.',
+    },
+  );
   passiveOverlayBody.innerHTML = '';
   if (document.body){
     document.body.appendChild(passiveOverlay);
   } else {
-    root.appendChild(passiveOverlay);
+    host.appendChild(passiveOverlay);
   }
 
   const leaderOverlay = createOverlay();
   leaderOverlay.classList.add('lineup-overlay--leader');
-  const leaderOverlayBody = leaderOverlay.querySelector<HTMLDivElement>('.lineup-overlay__body');
-  const leaderClose = leaderOverlay.querySelector<HTMLButtonElement>('.lineup-overlay__close');
-  if (!leaderOverlayBody || !leaderClose){
-    throw new Error('Không thể khởi tạo overlay leader.');
-  }
+  const leaderOverlayBody = assertElement<HTMLDivElement>(
+    leaderOverlay.querySelector('.lineup-overlay__body'),
+    {
+      guard: (node): node is HTMLDivElement => node instanceof HTMLDivElement,
+      message: 'Không thể khởi tạo overlay leader.',
+    },
+  );
+  const leaderClose = assertElement<HTMLButtonElement>(
+    leaderOverlay.querySelector('.lineup-overlay__close'),
+    {
+      guard: (node): node is HTMLButtonElement => node instanceof HTMLButtonElement,
+      message: 'Không thể khởi tạo overlay leader.',
+    },
+  );
   leaderOverlayBody.innerHTML = '';
   if (document.body){
     document.body.appendChild(leaderOverlay);
   } else {
-    root.appendChild(leaderOverlay);
+    host.appendChild(leaderOverlay);
   }
 
   let activeOverlay: HTMLElement | null = null;
@@ -981,11 +993,12 @@ const eventCleanup = bindLineupEvents({
         const fn = cleanup.pop();
         if (!fn) continue;
         try {
-        fn();
+          fn();
         } catch (error){
           console.error('[lineup] destroy error', error);
         }
       }
+     mount.destroy();
     },
   };
 }
