@@ -9,6 +9,7 @@
     "dev": "APP_ENTRY=${APP_ENTRY:-src/main.ts} tsx watch $APP_ENTRY",
     "start": "NODE_ENV=${NODE_ENV:-production} APP_ENTRY=${APP_ENTRY:-src/main.ts} tsx $APP_ENTRY",
     "test": "jest --runInBand",
+    "ci": "npm test",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [],
