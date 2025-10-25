@@ -1,7 +1,7 @@
-import { ROSTER } from '../../../catalog.js';
-import { listCurrencies } from '../../../data/economy.js';
-import { createNumberFormatter } from '../../../utils/format.js';
-import type { LineupSlot, LineupState, EquipmentLoadout } from '@types/ui';
+import { ROSTER } from '../../../catalog.ts';
+import { listCurrencies } from '../../../data/economy.ts';
+import { createNumberFormatter } from '../../../utils/format.ts';
+import type { LineupSlot, LineupState, EquipmentLoadout } from './types/ui';
 
 export interface RosterUnit {
   id: string;
