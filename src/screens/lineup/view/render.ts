@@ -1,4 +1,4 @@
-import { getSkillSet } from '../../../data/skills.js';
+import { getSkillSet } from '../../../data/skills.ts';
 import { createNumberFormatter } from '../../../utils/format.js';
 import {
   normalizeRoster,
