@@ -5,10 +5,15 @@
     "checkJs": false
   },
   "include": [
+    "src/data/load-config.ts",
+    "src/data/announcements.config.ts",
     "src/data/announcements.ts",
+    "src/data/economy.config.ts",
     "src/data/economy.ts",
     "src/data/modes.ts",
+    "src/data/roster-preview.config.ts",
     "src/data/roster-preview.ts",
+    "src/data/skills.config.ts",
     "src/data/skills.ts",
     "types/**/*"
   ]
