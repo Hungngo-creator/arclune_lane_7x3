@@ -557,7 +557,7 @@ async function renderCollectionScreen(params: ScreenParams): Promise<void>{
 
   let module: unknown;
   try {
-    module = await loadBundledModule('./screens/collection/index.js');
+    module = await loadBundledModule('./screens/collection/index.ts');
   } catch (error) {
     if (token !== collectionRenderToken) return;
     throw error;
