@@ -1,4 +1,4 @@
-import { ROSTER } from '../../catalog.js';
+import { ROSTER } from '../../catalog.ts';
 import { UNITS } from '../../units.ts';
 import type { UnitDefinition } from '../../units.ts';
 import type { CollectionEntry, CurrencyCatalog, CurrencyBalanceProvider, UnknownRecord } from './types.ts';
