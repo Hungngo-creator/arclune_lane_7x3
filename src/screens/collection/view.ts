@@ -1,6 +1,6 @@
 import { getUnitArt } from '../../art.ts';
-import { listCurrencies } from '../../data/economy.js';
-import { getSkillSet } from '../../data/skills.js';
+import { listCurrencies } from '../../data/economy.ts';
+import { getSkillSet } from '../../data/skills.ts';
 import { createNumberFormatter } from '../../utils/format.js';
 
 import {
