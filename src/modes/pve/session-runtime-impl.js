@@ -12,7 +12,7 @@ import {
   ROSTER, ROSTER_MAP,
   CLASS_BASE, RANK_MULT,
   getMetaById, isSummoner, applyRankAndMods
-} from '../../catalog.js';
+} from '../../catalog.ts';
 import {
   makeGrid, drawGridOblique,
   drawTokensOblique, drawQueuedOblique,
