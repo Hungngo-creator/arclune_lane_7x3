@@ -68,14 +68,14 @@ const stubModules = new Map([
   ['./units.ts', {
     UNITS: []
   }],
-  ['./meta.js', {
+  ['./meta.ts', {
     Meta: {},
     makeInstanceStats() { return {}; },
     initialRageFor() { return 0; }
   }],
-  ['./combat.js', combatModule],
   ['./combat.ts', combatModule],
-  ['./catalog.js', {
+  ['./combat.ts', combatModule],
+  ['./catalog.ts', {
     ROSTER: [],
     ROSTER_MAP: new Map(),
     CLASS_BASE: {},
@@ -84,7 +84,7 @@ const stubModules = new Map([
     isSummoner() { return false; },
     applyRankAndMods(meta) { return meta; }
   }],
-  ['./engine.js', {
+  ['./engine.ts', {
     makeGrid() {
       return { tile: 1, cols: 7, rows: 6, ox: 0, oy: 0, dpr: 1, w: 700, h: 600 };
     },
@@ -107,12 +107,12 @@ const stubModules = new Map([
     ORDER_ENEMY: [],
     ART_SPRITE_EVENT: 'art:sprite'
   }],
-  ['./background.js', backgroundModule],
-  ['./art.js', {
+  ['./background.ts', backgroundModule],
+  ['./art.ts', {
     getUnitArt() { return {}; },
     setUnitSkin() { return true; }
   }],
-  ['./ui.js', {
+  ['./ui.ts', {
     initHUD() {
       return { update() {}, cleanup() {} };
     },
@@ -120,13 +120,13 @@ const stubModules = new Map([
       return { render() {} };
     }
   }],
-  ['./vfx.js', {
+  ['./vfx.ts', {
     vfxDraw() {},
     vfxAddSpawn() {},
     vfxAddHit() {},
     vfxAddMelee() {}
   }],
-  ['./scene.js', {
+  ['./scene.ts', {
     drawBattlefieldScene() {},
     getCachedBattlefieldScene() { return null; }
   }],
