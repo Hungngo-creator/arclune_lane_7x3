@@ -2,6 +2,7 @@ import { getUnitArt } from '../../art.ts';
 import { listCurrencies } from '../../data/economy.ts';
 import { getSkillSet } from '../../data/skills.ts';
 import { createNumberFormatter } from '../../utils/format.js';
+import { assertElement, ensureStyleTag, mountSection } from '../../../ui/dom.ts';
 
 import {
   ABILITY_TYPE_LABELS,
@@ -42,14 +43,6 @@ const currencyCatalog: CurrencyCatalog = getCurrencyCatalog(listCurrencies as ()
 const currencyFormatter = ensureNumberFormatter(createNumberFormatter, 'vi-VN');
 
 function ensureStyles(){
-  if (typeof document === 'undefined') return;
-  let style = document.getElementById(STYLE_ID);
-  if (!style || style.tagName.toLowerCase() !== 'style'){
-    style = document.createElement('style');
-    style.id = STYLE_ID;
-    document.head.appendChild(style);
-  }
-
   const css = `
     .app--collection{padding:32px 16px 64px;}
     .collection-view{max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:28px;color:inherit;}
@@ -182,9 +175,7 @@ function ensureStyles(){
     }
   `;
 
-  if (style.textContent !== css){
-    style.textContent = css;
-  }
+  ensureStyleTag(STYLE_ID, { css });
 }
 
 type AbilityEntry = Record<string, unknown> & {
@@ -295,17 +286,12 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
     roster = null,
     currencies = null,
   } = options;
-  if (!root){
-    throw new Error('renderCollectionView cần một phần tử root hợp lệ.');
-  }
+  const host = assertElement<HTMLElement>(root, {
+    guard: (node): node is HTMLElement => node instanceof HTMLElement,
+    message: 'renderCollectionView cần một phần tử root hợp lệ.',
+  });
 
   ensureStyles();
-  if (typeof root.innerHTML === 'string'){
-    root.innerHTML = '';
-  }
-  if (root.classList){
-    root.classList.add('app--collection');
-  }
 
   const cleanups: Array<() => void> = [];
   const addCleanup = (fn: (() => void) | null | undefined) => {
@@ -316,6 +302,11 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
 
   const container = document.createElement('div');
   container.className = 'collection-view';
+  const mount = mountSection({
+    root: host,
+    section: container,
+    rootClasses: 'app--collection',
+  });
 
   const header = document.createElement('header');
   header.className = 'collection-view__header';
@@ -967,12 +958,7 @@ const overlayDetailPanel = document.createElement('aside');
           console.error('[collection] cleanup error', error);
         }
       }
-      if (container.parentNode === root){
-        root.removeChild(container);
-      }
-      if (root.classList){
-        root.classList.remove('app--collection');
-      }
+      mount.destroy();
     }
   } satisfies CollectionViewHandle;
 }
