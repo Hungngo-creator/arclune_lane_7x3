@@ -1,4 +1,7 @@
+import { z } from 'zod';
+
 import { HAS_INTL_NUMBER_FORMAT, createNumberFormatter } from '../utils/format.ts';
+import { loadConfig } from './load-config.ts';
 
 import type {
   CurrencyDefinition,
@@ -7,56 +10,80 @@ import type {
   ShopTaxBracket
 } from '../types/config.ts';
 
-const CURRENCY_IDS = {
-  VNT: 'VNT',
-  HNT: 'HNT',
-  TNT: 'TNT',
-  THNT: 'ThNT',
-  TT: 'TT'
-} as const satisfies Readonly<Record<'VNT' | 'HNT' | 'TNT' | 'THNT' | 'TT', string>>;
+type CurrencyId = 'VNT' | 'HNT' | 'TNT' | 'ThNT' | 'TT';
+const CurrencyIdSchema = z.enum(['VNT', 'HNT', 'TNT', 'ThNT', 'TT'] as [string, ...string[]]);
+const currencyIdValues: CurrencyId[] = ['VNT', 'HNT', 'TNT', 'ThNT', 'TT'];
 
-const CURRENCIES: ReadonlyArray<CurrencyDefinition> = [
-  {
-    id: CURRENCY_IDS.VNT,
-    name: 'Vụn Nguyên Tinh',
-    shortName: 'Vụn',
-    suffix: 'VNT',
-    ratioToBase: 1,
-    description: 'Đơn vị nhỏ nhất, rơi ra từ tinh thể vỡ và hoạt động hằng ngày.'
-  },
-  {
-    id: CURRENCY_IDS.HNT,
-    name: 'Hạ Nguyên Tinh',
-    shortName: 'Hạ',
-    suffix: 'HNT',
-    ratioToBase: 100,
-    description: 'Tinh thể đã tinh luyện, dùng cho giao dịch phổ thông và vé gacha thường.'
-  },
-  {
-    id: CURRENCY_IDS.TNT,
-    name: 'Trung Nguyên Tinh',
-    shortName: 'Trung',
-    suffix: 'TNT',
-    ratioToBase: 1000,
-    description: 'Kho dự trữ cho các kiến trúc tông môn, chế tác pháp khí và banner cao cấp.'
-  },
-  {
-    id: CURRENCY_IDS.THNT,
-    name: 'Thượng Nguyên Tinh',
-    shortName: 'Thượng',
-    suffix: 'ThNT',
-    ratioToBase: 10000,
-    description: 'Đơn vị luân chuyển giữa các tông môn, đổi thưởng cao cấp và sự kiện giới hạn.'
-  },
-  {
-    id: CURRENCY_IDS.TT,
-    name: 'Thần Tinh',
-    shortName: 'Thần',
-    suffix: 'TT',
-    ratioToBase: 100000,
-    description: 'Đơn vị tối thượng cho các giao dịch Prime và quỹ dự trữ chiến lược.'
+const CurrencySchema = z.object({
+  id: CurrencyIdSchema,
+  name: z.string(),
+  shortName: z.string(),
+  suffix: z.string(),
+  ratioToBase: z.number(),
+  description: z.string().optional()
+});
+
+const PityRuleSchema = z.object({ tier: z.string(), pull: z.number() });
+
+const PityEntrySchema = z.object({
+  tier: z.string(),
+  hardPity: z.number(),
+  softGuarantees: z.array(PityRuleSchema)
+});
+
+const PityTierSchema = z.enum(['SSR', 'UR', 'PRIME']);
+type PityTier = z.infer<typeof PityTierSchema>;
+
+const PityConfigSchema = z.object({
+  SSR: PityEntrySchema,
+  UR: PityEntrySchema,
+  PRIME: PityEntrySchema
+});
+
+const ShopRankSchema = z.enum(['N', 'R', 'SR', 'SSR', 'UR', 'PRIME']);
+
+const ShopTaxBracketSchema = z.object({
+  rank: ShopRankSchema,
+  label: z.string(),
+  rate: z.number()
+});
+
+const LotterySplitSchema = z.object({
+  devVault: z.number(),
+  prizePool: z.number()
+});
+
+const EconomyConfigSchema = z.object({
+  currencies: z.array(CurrencySchema),
+  pityConfig: PityConfigSchema,
+  shopTaxBrackets: z.array(ShopTaxBracketSchema),
+  lotterySplit: LotterySplitSchema
+});
+
+const economyConfig = await loadConfig(
+  new URL('./economy.config.ts', import.meta.url),
+  EconomyConfigSchema
+);
+
+for (const [tier, entry] of Object.entries(economyConfig.pityConfig)){
+  if (entry.tier !== tier){
+    throw new Error(`Cấu hình pity cho tier "${tier}" không khớp giá trị nội tại (${entry.tier}).`);
   }
-] satisfies ReadonlyArray<CurrencyDefinition>;
+}
+
+const currencyIdMap = {} as Record<CurrencyId, CurrencyId>;
+for (const id of currencyIdValues){
+  currencyIdMap[id] = id;
+}
+
+const CURRENCY_IDS = Object.freeze({
+  ...currencyIdMap,
+  THNT: currencyIdMap.ThNT
+});
+
+const CURRENCIES: ReadonlyArray<CurrencyDefinition> = Object.freeze(
+  economyConfig.currencies.map((currency) => Object.freeze({ ...currency }))
+);
 
 const CURRENCY_INDEX: Readonly<Record<string, CurrencyDefinition>> = CURRENCIES.reduce<Record<string, CurrencyDefinition>>((acc, currency) => {
   acc[currency.id] = currency;
@@ -154,30 +181,18 @@ function formatBalance(value: number, currencyId: string, options: FormatBalance
   return includeSuffix ? `${formatted} ${suffix}` : formatted;
 }
 
-const PITY_CONFIG = {
-  SSR: {
-    tier: 'SSR',
-    hardPity: 60,
-    softGuarantees: []
-  },
-  UR: {
-    tier: 'UR',
-    hardPity: 70,
-    softGuarantees: [
-      { tier: 'SSR', pull: 50 }
-    ]
-  },
-  PRIME: {
-    tier: 'PRIME',
-    hardPity: 80,
-    softGuarantees: [
-      { tier: 'SSR', pull: 40 },
-      { tier: 'UR', pull: 60 }
-    ]
-  }
-} satisfies Readonly<Record<'SSR' | 'UR' | 'PRIME', PityConfiguration>>;
-
-type PityTier = keyof typeof PITY_CONFIG;
+const PITY_CONFIG: Readonly<Record<PityTier, PityConfiguration>> = Object.freeze(
+  Object.fromEntries(
+    Object.entries(economyConfig.pityConfig).map(([tier, config]) => [
+      tier,
+      {
+        tier: config.tier,
+        hardPity: config.hardPity,
+        softGuarantees: config.softGuarantees.map((rule) => ({ ...rule }))
+      }
+    ])
+  ) as Record<PityTier, PityConfiguration>
+);
 
 function isPityTier(tier: string): tier is PityTier {
   return tier in PITY_CONFIG;
@@ -185,7 +200,7 @@ function isPityTier(tier: string): tier is PityTier {
 
 function getPityConfig(tier: string): PityConfiguration | null {
   if (isPityTier(tier)){
-    return PITY_CONFIG[tier];
+    return PITY_CONFIG[tier] ?? null;
   }
   return null;
 }
@@ -194,14 +209,9 @@ function listPityTiers(): string[] {
   return Object.keys(PITY_CONFIG);
 }
 
-const SHOP_TAX_BRACKETS = [
-  { rank: 'N', label: 'Phổ thông (N)', rate: 0.05 },
-  { rank: 'R', label: 'Hiếm (R)', rate: 0.08 },
-  { rank: 'SR', label: 'Siêu hiếm (SR)', rate: 0.1 },
-  { rank: 'SSR', label: 'Cực hiếm (SSR)', rate: 0.12 },
-  { rank: 'UR', label: 'Siêu thực (UR)', rate: 0.15 },
-  { rank: 'PRIME', label: 'Tối thượng (Prime)', rate: 0.18 }
-] satisfies ReadonlyArray<ShopTaxBracket>;
+const SHOP_TAX_BRACKETS: ReadonlyArray<ShopTaxBracket> = Object.freeze(
+  economyConfig.shopTaxBrackets.map((bracket) => Object.freeze({ ...bracket }))
+);
 
 const SHOP_TAX_INDEX: Readonly<Record<string, ShopTaxBracket>> = SHOP_TAX_BRACKETS.reduce<Record<string, ShopTaxBracket>>((acc, bracket) => {
   acc[bracket.rank] = bracket;
@@ -217,10 +227,7 @@ function getShopTaxRate(rank: string): number | null {
   return bracket ? bracket.rate : null;
 }
 
-const LOTTERY_SPLIT = {
-  devVault: 0.5,
-  prizePool: 0.5
-} satisfies LotterySplit;
+const LOTTERY_SPLIT: LotterySplit = Object.freeze({ ...economyConfig.lotterySplit });
 
 function getLotterySplit(): LotterySplit {
   return LOTTERY_SPLIT;

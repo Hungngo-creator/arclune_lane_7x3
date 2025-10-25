@@ -1,3 +1,6 @@
+import { z } from 'zod';
+
+import { loadConfig } from './load-config.ts';
 import { CLASS_BASE, RANK_MULT, ROSTER } from '../catalog.ts';
 
 import type {
@@ -7,40 +10,29 @@ import type {
   RosterUnitDefinition
 } from '../types/config.ts';
 
-// Talent Point (TP) deltas documented in "ý tưởng nhân vật v3.txt".
-export const TP_DELTA: Readonly<Record<string, number>> = {
-  HP: 20,
-  ATK: 1,
-  WIL: 1,
-  ARM: 0.01,
-  RES: 0.01,
-  AGI: 1,
-  PER: 1,
-  AEmax: 10,
-  AEregen: 0.5,
-  HPregen: 2
-};
+const RosterPreviewConfigSchema = z.object({
+  tpDelta: z.record(z.number()),
+  statOrder: z.array(z.string()),
+  precision: z.record(z.number())
+});
 
-const STAT_ORDER: ReadonlyArray<string> = [
-  'HP',
-  'ATK',
-  'WIL',
-  'ARM',
-  'RES',
-  'AGI',
-  'PER',
-  'SPD',
-  'AEmax',
-  'AEregen',
-  'HPregen'
-];
+const rosterPreviewConfig = await loadConfig(
+  new URL('./roster-preview.config.ts', import.meta.url),
+  RosterPreviewConfigSchema
+);
 
-const PRECISION: Readonly<Record<string, number>> = {
-  ARM: 100,
-  RES: 100,
-  SPD: 100,
-  AEregen: 10
-};
+// Talent Point (TP) deltas documented trong "ý tưởng nhân vật v3.txt".
+export const TP_DELTA: Readonly<Record<string, number>> = Object.freeze({
+  ...rosterPreviewConfig.tpDelta
+});
+
+const STAT_ORDER: ReadonlyArray<string> = Object.freeze([
+  ...rosterPreviewConfig.statOrder
+]);
+
+const PRECISION: Readonly<Record<string, number>> = Object.freeze({
+  ...rosterPreviewConfig.precision
+});
 
 function roundStat(stat: string, value: number) {
   const precision = PRECISION[stat] ?? 1;
