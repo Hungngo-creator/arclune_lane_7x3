@@ -1,6 +1,6 @@
 import { createAppShell } from './app/shell.ts';
 import { renderMainMenuView } from './screens/main-menu/view/index.ts';
-import { MODES, MODE_GROUPS, MODE_STATUS, getMenuSections } from './data/modes.js';
+import { MODES, MODE_GROUPS, MODE_STATUS, getMenuSections } from './data/modes.ts';
 import type { ModeConfig, ModeGroup, ModeShellConfig } from '@types/config';
 import type { MenuCardMetadata, MenuSection, MenuSectionEntry } from './screens/main-menu/types.ts';
 import type { LineupViewHandle } from './screens/lineup/view/index.ts';
@@ -575,7 +575,7 @@ async function renderCollectionScreen(params: ScreenParams): Promise<void>{
   }
 
   const definition = getDefinitionByScreen(SCREEN_COLLECTION);
-if (!definition){
+  if (!definition){
     throw new Error('Không tìm thấy định nghĩa màn hình bộ sưu tập.');
   }
   collectionView = (render({
@@ -583,7 +583,7 @@ if (!definition){
     shell: shellInstance,
     definition,
     params: params || null
-  }) ?? null;
+  }) ?? null);
 }
 
 async function renderLineupScreen(params: ScreenParams): Promise<void>{
