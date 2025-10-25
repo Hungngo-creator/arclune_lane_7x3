@@ -1,4 +1,4 @@
-import { getAllSidebarAnnouncements } from '../../../data/announcements.js';
+import { getAllSidebarAnnouncements } from '../../../data/announcements.ts';
 import { getHeroDialogue, getHeroHotspots, getHeroProfile, HERO_DEFAULT_ID } from '../dialogues.ts';
 import type {
   CleanupRegistrar,
