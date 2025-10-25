@@ -1,5 +1,5 @@
 // @ts-check
-import { CLASS_BASE, RANK_MULT, ROSTER } from '../catalog.js';
+import { CLASS_BASE, RANK_MULT, ROSTER } from '../catalog.ts';
 
 /** @typedef {import('@types/config').CatalogStatBlock} CatalogStatBlock */
 /** @typedef {import('@types/config').RosterPreview} RosterPreview */
