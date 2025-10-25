@@ -1,6 +1,7 @@
 // v0.7.1
 import { CFG } from './config.ts';
 import { ACTION_END, TURN_END, TURN_START, gameEvents } from './events.ts';
+import { assertElement } from './ui/dom.ts';
 
 import type { HudHandles, SummonBarCard, SummonBarHandles, SummonBarOptions } from './types/ui.ts';
 
@@ -131,10 +132,14 @@ export function startSummonBar<TCard extends SummonBarCard = SummonBarCard>(
     return null;
   };
 
-  const host = queryFromRoot<HTMLElement>('#cards', 'cards');
-  if (!host){
+  const hostElement = queryFromRoot<HTMLElement>('#cards', 'cards');
+  if (!hostElement){
     return { render: () => {} } satisfies SummonBarHandles;
   }
+  const host = assertElement<HTMLElement>(hostElement, {
+    guard: (node): node is HTMLElement => node instanceof HTMLElement,
+    message: 'Summon bar cần một phần tử host hợp lệ.',
+  });
 
   host.innerHTML = '';
   host.addEventListener('click', (event: Event) => {
@@ -192,8 +197,11 @@ export function startSummonBar<TCard extends SummonBarCard = SummonBarCard>(
 
   let removalObserver: MutationObserver | null = null;
   if (host && typeof MutationObserver === 'function'){
-    const target = doc.body || doc.documentElement;
-    if (target){
+    const targetRoot = doc.body || doc.documentElement;
+    const observerTarget = targetRoot
+      ? assertElement<Element>(targetRoot, 'Cần một phần tử gốc để quan sát trạng thái kết nối.')
+      : null;
+    if (observerTarget){
       removalObserver = new MutationObserver(() => {
         if (!host.isConnected){
           cleanupResize();
@@ -201,7 +209,7 @@ export function startSummonBar<TCard extends SummonBarCard = SummonBarCard>(
           removalObserver = null;
         }
       });
-      removalObserver.observe(target, { childList: true, subtree: true });
+      removalObserver.observe(observerTarget, { childList: true, subtree: true });
     }
   }
 
