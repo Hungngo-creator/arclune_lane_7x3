@@ -1,5 +1,6 @@
 import type { CleanupFn, CleanupRegistrar, MainMenuState, RenderedMainMenu } from '../types.ts';
 import { HERO_DEFAULT_ID } from '../dialogues.ts';
+import { mountSection } from '../../../../ui/dom.ts';
 import { ensureStyles, createHeader, createHeroSection, createModesSection, createSidebar } from './layout.ts';
 
 export function renderMainMenuView(state: MainMenuState): RenderedMainMenu | null {
@@ -16,9 +17,6 @@ export function renderMainMenuView(state: MainMenuState): RenderedMainMenu | nul
   if (!root) return null;
 
   ensureStyles();
-  root.innerHTML = '';
-  root.classList.remove('app--pve');
-  root.classList.add('app--main-menu');
 
   const cleanups: CleanupFn[] = [];
   const addCleanup: CleanupRegistrar = fn => {
@@ -29,6 +27,12 @@ export function renderMainMenuView(state: MainMenuState): RenderedMainMenu | nul
 
   const container = document.createElement('div');
   container.className = 'main-menu-v2';
+  const mount = mountSection({
+    root,
+    section: container,
+    rootClasses: 'app--main-menu',
+    removeRootClasses: 'app--pve',
+  });
 
   const header = createHeader();
   container.appendChild(header);
@@ -49,8 +53,6 @@ export function renderMainMenuView(state: MainMenuState): RenderedMainMenu | nul
   layout.appendChild(primary);
   layout.appendChild(sidebar);
 
-  root.appendChild(container);
-
   return {
     destroy(){
       cleanups.forEach(fn => {
@@ -61,10 +63,7 @@ export function renderMainMenuView(state: MainMenuState): RenderedMainMenu | nul
         }
       });
       cleanups.length = 0;
-      if (container.parentNode === root){
-        root.removeChild(container);
-      }
-      root.classList.remove('app--main-menu');
+      mount.destroy();
     }
   };
 }
