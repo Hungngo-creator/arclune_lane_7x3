@@ -130,14 +130,14 @@ hit_react: f1 play hit_body -12dB; tạm tắt .fx-glow trong 6f.
   │   ├─ fx_trail_lance.json
   │   └─ fx_floor_crack.json
   └─ meta/
-      └─ LA_runtime_meta.json       # xem mục 10
+       └─ LA_runtime_meta (định dạng .json)       # xem mục 10
 
 Preset xuất PNG (nếu cần sprite): 4x scale (640×800), background alpha, quantize 256 màu cho mobile.
 
 LOD: LA_base_lite.svg bỏ .fx-heat & giảm path points ~30% cho low-end.
 
 
-10) LA_runtime_meta.json (mẫu)
+10) LA_runtime_meta (mẫu .json)
 
 {
   "id": "LA",
