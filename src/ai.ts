@@ -5,8 +5,9 @@ import { safeNow as sharedSafeNow } from './utils/time.ts';
 import { detectUltBehavior, getSummonSpec, resolveSummonSlots } from './utils/kit.ts';
 import { lookupUnit } from './units.ts';
 
-import type { AiDeckCard, SessionState } from '@types/combat';
-import type { QueuedSummonRequest, UnitId, UnitToken } from '@types/units';
+import type { AiCard, AiCardDeck, SessionState } from './types/combat.ts';
+import type { RosterUnitDefinition } from './types/config.ts';
+import type { QueuedSummonRequest, UnitId, UnitToken } from './types/units.ts';
 
 type CandidateCell = { s: number; cx: number; cy: number };
 type WeightKey =
@@ -18,11 +19,7 @@ type WeightKey =
   | 'kitDefense'
   | 'kitRevive';
 
-export interface AiCard extends AiDeckCard {
-  cost: number;
-}
-
-export type DeckState = AiCard[];
+type DeckState = AiCardDeck;
 export type AI_REASON = 'cost' | 'board' | (string & {});
 
 type CandidateContributions = Record<string, number>;
@@ -32,7 +29,27 @@ type CandidateMultipliers = {
   role: number;
 };
 
-type CandidateMeta = Record<string, unknown> | null | undefined;
+type CandidateMeta = RosterUnitDefinition | null | undefined;
+
+interface DeckEntryCandidate {
+  id?: unknown;
+  cost?: unknown;
+  name?: unknown;
+  class?: unknown;
+  rank?: unknown;
+  kit?: unknown;
+  [key: string]: unknown;
+}
+
+function toMetaEntry(value: unknown): RosterUnitDefinition | null {
+  if (!value || typeof value !== 'object') return null;
+  const candidate = value as DeckEntryCandidate;
+  if (typeof candidate.id !== 'string') return null;
+  if (typeof candidate.class !== 'string') return null;
+  if (typeof candidate.rank !== 'string') return null;
+  if (!candidate.kit || typeof candidate.kit !== 'object') return null;
+  return candidate as RosterUnitDefinition;
+}
 
 interface CandidateEvaluation {
   card: AiCard;
@@ -111,10 +128,9 @@ function debugConfig(): { keepTop: number } {
 }
 
 function detectKitTraits(meta: CandidateMeta): KitTraitSummary {
-  const analysis = detectUltBehavior((meta && (meta as Record<string, unknown>).kit) || meta || {});
-  const hasInstant =
-    Boolean(analysis.hasInstant) ||
-    (meta && (meta as Record<string, unknown>).class === 'Summoner' && Boolean(analysis.summon));
+  const kitSource = meta?.kit ?? meta ?? {};
+  const analysis = detectUltBehavior(kitSource);
+  const hasInstant = Boolean(analysis.hasInstant) || (meta?.class === 'Summoner' && Boolean(analysis.summon));
   return {
     hasInstant,
     hasDefBuff: Boolean(analysis.hasDefensive),
@@ -155,7 +171,7 @@ function toAiCard(entry: unknown): AiCard | null {
     return def ? { ...def } : null;
   }
   if (entry && typeof entry === 'object') {
-    const candidate = entry as Record<string, unknown>;
+    const candidate = entry as DeckEntryCandidate;
     const idRaw = candidate.id;
     if (typeof idRaw !== 'string' || idRaw.trim() === '') return null;
     const def = lookupUnit(idRaw);
@@ -238,20 +254,18 @@ function summonerFeasibility(
   baseSlot: number,
   aliveTokens?: readonly UnitToken[] | null,
 ): number {
-  const meta = Game.meta.get(unitId);
-  if (!meta || (meta as Record<string, unknown>).class !== 'Summoner') return 1;
+  const meta = toMetaEntry(Game.meta.get(unitId));
+  if (!meta || meta.class !== 'Summoner') return 1;
   const summonSpec = getSummonSpec(meta);
   if (!summonSpec) return 1;
   const alive = Array.isArray(aliveTokens) ? aliveTokens : tokensAlive(Game);
-  const cand = resolveSummonSlots(summonSpec, baseSlot)
-    .filter(Boolean)
-    .filter((s) => {
-      const { cx, cy } = slotToCell('enemy', s);
-      return !cellReserved(alive, Game.queued, cx, cy);
-    });
-  const countRaw = Number(summonSpec.count);
-  const need = Math.max(1, Number.isFinite(countRaw) ? countRaw : 1);
-  return Math.min(1, cand.length / need);
+  const candidateSlots = resolveSummonSlots(summonSpec, baseSlot).filter((slot) => {
+    const { cx, cy } = slotToCell('enemy', slot);
+    return !cellReserved(alive, Game.queued, cx, cy);
+  });
+  const countRaw = summonSpec.count;
+  const need = Math.max(1, typeof countRaw === 'number' && Number.isFinite(countRaw) ? countRaw : 1);
+  return Math.min(1, candidateSlots.length / need);
 }
 
 function candidateBlocked(
@@ -265,15 +279,15 @@ function candidateBlocked(
   const cx = entry.cell?.cx;
   const cy = entry.cell?.cy;
   if (!Number.isFinite(slot) || !Number.isFinite(cx) || !Number.isFinite(cy)) return 'invalid';
-  const enemyQueue = (Game.queued?.enemy ?? null) as Map<number, QueuedSummonRequest> | null;
-  if (enemyQueue?.has(slot)) return 'slotQueued';
+  const enemyQueue = Game.queued.enemy;
+  if (enemyQueue.has(slot)) return 'slotQueued';
   if (cellReserved(alive, Game.queued, cx, cy)) return 'cellReserved';
 
-  const meta = entry.meta as Record<string, unknown> | null | undefined;
+  const meta = entry.meta;
   if (meta && meta.class === 'Summoner') {
     const summonSpec = getSummonSpec(meta);
     if (summonSpec) {
-      const patternSlots = resolveSummonSlots(summonSpec, slot).filter(Boolean);
+      const patternSlots = resolveSummonSlots(summonSpec, slot);
       if (patternSlots.length) {
         let available = 0;
         for (const s of patternSlots) {
@@ -301,11 +315,9 @@ function rowCrowdingFactor(
     (t) => t.cy === cy,
   ).length;
   let queued = 0;
-  const m = (Game.queued?.enemy ?? null) as Map<number, QueuedSummonRequest> | null;
-  if (m && typeof m.values === 'function') {
-    for (const p of m.values()) {
-      if (p && p.cy === cy) queued += 1;
-    }
+  const queue = Game.queued.enemy;
+  for (const request of queue.values()) {
+  if (request && request.cy === cy) queued += 1;
   }
   const n = ours + queued;
   if (n >= 3) return 0.7;
@@ -326,6 +338,20 @@ function ensureUsedUnitIds(Game: SessionState): Set<UnitId> {
   if (Game.ai.usedUnitIds instanceof Set) return Game.ai.usedUnitIds;
   Game.ai.usedUnitIds = new Set<UnitId>();
   return Game.ai.usedUnitIds;
+}
+
+function isSummonQueue(value: unknown): value is Map<number, QueuedSummonRequest> {
+  return value instanceof Map;
+}
+
+function ensureEnemyQueue(Game: SessionState): Map<number, QueuedSummonRequest> {
+  const candidate: unknown = Game.queued.enemy;
+  if (isSummonQueue(candidate)) {
+    return candidate;
+  }
+  const created = new Map<number, QueuedSummonRequest>();
+  Game.queued.enemy = created;
+  return created;
 }
 
 export function refillDeckEnemy(Game: SessionState): void {
@@ -363,15 +389,7 @@ export function queueEnemyAt(
   if (Game.ai.summoned >= Game.ai.summonLimit) return false;
   const alive = Array.isArray(aliveTokens) ? aliveTokens : tokensAlive(Game);
   if (cellReserved(alive, Game.queued, cx, cy)) return false;
-  const enemyQueueRaw = Game.queued.enemy;
-  const queue =
-    enemyQueueRaw instanceof Map
-    ? enemyQueueRaw
-      : (() => {
-          const created = new Map<number, QueuedSummonRequest>();
-          Game.queued.enemy = created;
-          return created;
-        })();
+  const queue = ensureEnemyQueue(Game);
   if (queue.has(slot)) return false;
 
   const spawnCycle = predictSpawnCycle(Game, 'enemy', slot);
@@ -442,7 +460,7 @@ export function aiMaybeAct(Game: SessionState, reason: AI_REASON): void {
 
   const evaluations: CandidateEvaluation[] = [];
   for (const card of hand) {
-    const meta = Game.meta.get(card.id);
+    const meta = toMetaEntry(Game.meta.get(card.id));
     const kitTraits = detectKitTraits(meta);
     for (const cell of cells) {
       const p = pressureScore(cell.cx, cell.cy);
@@ -466,7 +484,7 @@ export function aiMaybeAct(Game: SessionState, reason: AI_REASON): void {
 
       const baseScore = Object.values(contributions).reduce((acc, val) => acc + val, 0);
       const rowFactor = rowCrowdingFactor(Game, cell.cy, aliveEnemies);
-      const roleFactor = roleBias((meta as Record<string, unknown> | null | undefined)?.class, cell.cx);
+      const roleFactor = roleBias(meta?.class, cell.cx);
       const finalScore = baseScore * rowFactor * roleFactor;
 
       evaluations.push({
