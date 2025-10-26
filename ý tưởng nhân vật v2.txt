@@ -1,6 +1,6 @@
 Vì tệp ý tưởng nhân vật v3 quá lag nên tao đã tạo tệp này.
 A. Nhân vật gacha
-31 nằm ở ý tưởng nhân vật v3.txt
+31 nằm ở ý tưởng nhân vật.txt
 32) Vũ Thiên
 Mô tả: một nam nhân cầm đinh ba, da ngâm nhẹ, ở trần và thích sống ở môi trường biển cả.
 
@@ -38,7 +38,98 @@ Ultimate: gây sát thương = 250% đánh thường lên 1 mục tiêu, bỏ qu
 
 Ultimate: gây sát thương=200% đánh thường lên toàn sân kẻ địch, áp dụng hiệu ứng Phản Hồi Phục lên kẻ chịu sát thương từ ultimate trong 1 turn kể từ lúc kẻ thù dính debuff này.
 
-B. Nhân vật npc pve không gacha.
+36) The Fallen Saint" - Thanh Thánh Nữ Sa Đọa (堕落圣女 - Duò Luò Shèng Nǚ) - Ái Lân (艾琳 - Ài Lín)
+
+Lai lịch: Thánh nữ của Giáo Hội Ánh SángLore:
+Ái Lân từng là Thánh Nữ cao quý nhất của Giáo Hội Ánh Sáng, sở hữu sức mạnh chữa lành kỳ diệu. Nhưng trong một lần thanh tẩy một ngôi đền bị ma quỷ chiếm cứ, cô phát hiện ra sự thật kinh hoàng: Giáo Hội từng thực hiện những nghi lễ tàn bạo, hy sinh hàng nghìn người vô tội để duy trì sức mạnh. Bị phản bội bởi đức tin của mình, cô phá hủy thánh tích của Giáo Hội và trốn chạy. Trong lúc tuyệt vọng, cô ký kết khế ước với một Ác Ma tên D'moreth - nhận được "Sức Mạnh Hắc Thánh" để chống lại chính tổ chức mình từng phục vụ. Giờ đây, cô sử dụng cả sức mạnh Thánh và Ma, trở thành một tồn tại mâu thuẫn giữa ánh sáng và bóng tối. Đặc điểm:Có thể chữa lành nhưng cũng có thể nguyền rủaCánh thiên thần của cô một bên trắng, một bên đenĐang bị truy đuổi bởi cả Giáo Hội và các Ác Ma.
+ 
+37) Từ Mặc Tẫn (徐墨尽) — Dạ Ảnh Cự LyHệ: Âm (bóng tối, tịnh lặng, linh cảm)
+Hắn tu luyện trong “Tịch Thủy Cốc”, lấy bóng đêm làm đạo, hấp thu cảm xúc tiêu cực của thế gian để tăng cường linh lực. Nhưng khi đạt đến cực hạn, hắn trở thành bản thể của chính những nỗi đau mà hắn từng thu thập — một linh hồn u ám du hành giữa ranh giới sự sống.
+
+38) Khương Tư Nhi (姜思儿) — Tâm Mộng Chi ChủNăng lực: Nhập mộng – điều khiển ký ức linh hồn
+Tu luyện bằng cách tiến vào linh hồn của người khác qua mộng giới, tái cấu trúc dòng ký ức để chữa hoặc phá hủy tâm trí. Cô đã từng đánh đổi một phần linh hồn của mình để bảo hộ giấc mơ của một đứa trẻ — giờ, trong tâm hồn cô vang vọng hàng ngàn giọng nói chưa bao giờ thức dậy.
+
+39) Ngụy Thiên Sơ (魏天初) — Hồn Khí Sư Cuối CùngNăng lực: Linh khí nhập thể – Hồn dung vật
+Hắn rèn pháp bảo không bằng kim loại, mà dùng linh hồn. Mỗi pháp khí hắn tạo ra là một linh thể tự nhận thức. Khi chiến đấu, hắn có thể triệu hồi "Cửu Vật Linh" — chín linh hồn pháp khí bị phong ấn trong cơ thể, nhưng nếu mất kiểm soát, chúng sẽ đồng loạt phản chủ.
+
+40) 
+Triệu hồi kĩ năng gây sát thương lên kẻ thù theo thời gian trên sân đồng minh, gây sát thương lên kẻ địch khi chúng tiếp cận bản thân, dạng bị động.
+
+41) Bá Tước Huyết Tộc - Charles
+Nội tại: ra sân tăng hp regen 300% và aether regen 100%
+
+Kĩ năng 1: mất 3% hp hiện có, ngưng tụ 3 mũi tên máu tấn công 1 mục tiêu, mỗi mũi tên gây 50% đánh thường, không tính là đánh thường, 20 aether.
+Kĩ năng 2: mất hp = 20% max hp, ngưng tụ ra 1 huyết phân thân kế thừa 20% mọi chỉ số hiện tại của Charles, tồn tại trong 3 turn, huyết phân thân chỉ có thể đánh thường, không thể hồi sinh, ra sân ngẫu nhiên ở vị trí trống trên sân đồng minh, 20 aether.
+Kĩ năng 3: đối với kẻ thù thuộc Huyết Tộc dưới bậc Bá Tước hút hp = 20% max hp của mục tiêu, không thể hút chết đối phương, lượng hp hút được sẽ chuyển thành khiên cho Charles, tối đa = 100% max hp. 25 aether.
+
+Ultimate: gây sát thương lên 1 mục tiêu = 300% đánh thường, tăng max hp = 6% sát thương gây ra sau đó hồi hp cho bản thân = 20% sát thương gây ra.
+
+Đánh thường: Gây sát thương = 100% wil và atk lên 1 mục tiêu.
+
+42) Faun
+Mô tả: một tinh linh có thể triệu hồi động vật.
+Nội tại: khi có một động vật trên sân đồng minh + 3% 10 chỉ số, tối đa 5 stack, thanh nộ của nhân vật này chỉ có 85 thay vì mặc định là 100.
+Sát thương nhận vào từ động vật từ Faun của kẻ thù giảm 20%.
+
+Đánh thường: Gây sát thương = 100% wil và atk lên 1 mục tiêu.
+
+Kĩ năng 1: Faun và động vật được triệu hồi từ ultimate thực hiện 1 lần đánh thường, không ảnh hưởng turn luân phiên hiện có, 25 aether.
+Kĩ năng 2: 5 động vật được triệu hồi tiếp theo từ ultimate của faun sẽ được tăng thừa hưởng chỉ số từ faun từ 50% lên 80%, 25 aether.
+Kĩ năng 3: khi kích hoạt kĩ năng này, hồi hp = 7% max hp bản thân và nhận 1 stack bất khuất, khi bất khuất từ kĩ năng này được kích hoạt thì 1 đơn vị động vật đồng minh từ ultimate của Faun sẽ chết, hp về 0 bất kể hp của động vật đó còn bao nhiêu, loại động vật đó cũng không thể triệu hồi đến hết trận, kĩ năng ưu tiên động vật có hp thấp nhất, nếu Faun có 2 stack bất khuất trở lên, ưu tiên kích hoạt bất khuất nhận được từ kĩ năng này, 25 aether.
+
+Ultimate: Triệu hồi 1 động vật trong các động vật ngẫu nhiên sau lên sân ở vị trí trống ngẫu nhiên trên sân đồng minh: ( mỗi động vật từ ultimate này không thể dùng ult, không có nộ, aether, kĩ năng và chỉ đánh thường). Mọi đánh thường của động vật trong ultimate này được tính là gây sát thương= 100% wil và atk của động vật đó, mỗi động vật không thể tồn tại 2 con trên sân đồng minh.
+- Tiểu Hắc: một con báo đen nhanh nhẹn, thừa hưởng 50% mọi chỉ số từ Faun trừ aeregen, tồn tại tối đa 5 turn, đòn tấn công bỏ qua 10% arm của mục tiêu, tấn công dạng cắn và cào.
+- Tiểu Bạch: một con hồ ly màu trắng, thừa hưởng chỉ số và turn tồn tại tối đa như tiểu hắc nhưng đánh thường gây thêm 5% sát thương và không bỏ qua arm như tiểu hắc.
+- Tiểu Hoàng: một con gà vàng thừa hưởng chỉ số và turn tồn tại tối đa như tiểu hắc, khi chết Faun sẽ ăn Tiểu Hoàng và Faun được hồi hp = 50% max hp của Tiểu Hoàng.
+- Tiểu Bất Điểm: một con sóc nhỏ thừa hưởng chỉ số và turn tồn tại tối đa như tiểu hắc, đánh thường không gây sát thương mà sẽ hồi hp cho động vật khác và Faun mỗi đơn vị = 30% wil và atk của bản thân Tiểu Bất Điểm.
+
+B. Nhân vật npc pve không gacha. Hưởng lợi chỉ số từ mục B trong ý tưởng nhân vật.txt
+
+1) Void Whisper - Xul'gathar (虚空低语者 - Xū Kōng Dī Yǔ Zhě)
+
+Nguồn gốc: Sinh vật từ Thứ Nguyên Trống Rỗng.
+Lore:
+Xul'gathar không có hình dạng vật chất - nó là một ý thức thuần túy lang thang trong Thứ Nguyên Trống Rỗng, nơi không có ánh sáng, âm thanh, hay bất cứ điều gì. Nó sinh ra từ sự cô đơn tuyệt đối của cái không, và khao khát được "tồn tại" như các sinh vật khác. Xul'gathar xâm nhập vào thế giới vật chất bằng cách thì thầm vào tâm trí những người cô đơn, hứa hẹn sẽ lấp đầy khoảng trống trong lòng họ. Nhưng một khi đã nghe thấy tiếng thì thầm, nạn nhân sẽ dần dần trở thành vật chủ cho ý thức của nó, cuối cùng biến thành một "Hồi Âm Trống Rỗng" - xác sống không có linh hồn nhưng phát tán ra tiếng thì thầm điên loạn. Đặc điểm:Không thể bị tấn công vật lý vì không có thể xác, Những ai nghe thấy thì thầm của nó sẽ dần mất đi ký ức về bản thân.
+
+Nội tại: mỗi khi nhận sát thương hay gây sát thương thì mục tiêu đều bị đánh dấu, đánh dấu này không thể xoá bỏ và khi đủ 7 đánh dấu lên 1 mục tiêu, mục tiêu sẽ chỉ đánh thường, không dùng kỹ năng, aether và thanh nộ sẽ bị đông cứng, trạng thái này chỉ mất khi mục tiêu chết.
+
+Đánh thường: gầm thét, gây sát thương = 100% wil và atk lên toàn mục tiêu trên sân.
+
+Ultimate: thực thi liên tiếp 3 lần đánh thường.
+
+2) Ur'zaloth - Kẻ Uốn Cong Thực Tại (现实扭曲者 - Xiàn Shí Niǔ Qǔ Zhě)
+
+Nguồn gốc: Thực thể từ Thứ Nguyên Hỗn Loạn
+Lore:
+Ur'zaloth tồn tại trong Thứ Nguyên Hỗn Loạn - nơi các định luật vật lý không có nghĩa. Nó có khả năng "viết lại" các quy tắc của thực tại trong phạm vi giới hạn. Khi nó xuất hiện, trọng lực có thể đảo ngược, lửa có thể đóng băng, và cái chết có thể trở thành điểm khởi đầu của sự sống. Ur'zaloth không có mục đích rõ ràng - nó chỉ thích "thí nghiệm" với thực tại để xem điều gì sẽ xảy ra. Một số khu vực nơi nó từng xuất hiện vẫn còn bị biến dạng vĩnh viễn, với những hiện tượng kỳ lạ như nước chảy ngược, bầu trời biến thành đất, hay cây cối mọc ra thịt thay vì gỗ. Đặc điểm: Hình dạng luôn thay đổi - đôi khi là người, đôi khi là quái vật, đôi khi là hình học trừu tượng Có thể tạo ra "Vùng Dị Thường" nơi mọi thứ không tuân theo logic Những ai ở gần nó quá lâu sẽ bị biến dị về cả thể xác lẫn tinh thần.
+
+Nội tại: không thể bị chỉ định bởi kĩ năng, đánh thường hay ult có thiết lập tấn công aoe ngẫu nhiên mà không phải tấn công aoe vị trí cố định, nhân vật bất kỳ tấn công nhân vật này khi đạt 12 lần sẽ bị biến dị.
+Biến dị: ngoại hình trở nên mơ hồ, vặn vẹo và luôn thay đổi, da thịt thối rữa.
+aether và nộ bị đóng băng, không thể tăng, max hp giảm 20% tính từ lúc đánh Ur'zaloth 12 lần, mỗi lần hành động turn thành công hp của kẻ biến dị sẽ giảm hp = 10% max hp. Biến dị không phải là buff hay debuff, cách duy nhât thoát khỏi trạng thái này là chết và được hồi sinh, biến dị không có tác dụng với nhân vật thuộc bậc Prime.
+
+Đánh thường: Cách không triệu hồi 1 cánh cổng không gian trước mặt leader địch, thò tay vào cổng không gian trước mặt, bàn tay xuất hiện ở cổng không gian trước mặt leader địch, tát mục tiêu và gây sát thương = 100% wil và atk lên leader đối phương, đánh thường là sát thương đơn, cố định và luôn tấn công vào vị trí số 8 của kẻ địch là leader đối phương.
+
+Ultimate: Áp dụng ngẫu nhiên 1 trong các quy tắc sau trong 2 turn:
+- Không thể chết: Bất kể là nhân vật đồng minh hay kẻ thù chỉ cần đứng trên sân đều không thể chết vì hp về 0 (đơn vị được triệu hồi không tính).
+- Không thể bị chỉ định: bất kể là đồng minh hay kẻ thù thì mỗi đơn vị đều không thể chỉ định mục tiêu bằng đòn tấn công aoe có thiết lập tấn công ngẫu nhiên mà không phải thiết lập tấn công aoe có vị trí cố định.
+- Không thể hồi phục: bất kể là đồng minh hay kẻ thù thì mỗi đơn vị đứng trên sân đều không thể hồi hp dưới mọi hình thức ( hp regen, kĩ năng, đánh thường, nội tại và ultimate đều không được).
+- Không thể gây sát thương lên mục tiêu vượt quá 3% max hp của mục tiêu, quy tắc này áp dụng toàn sân bất kể kẻ thù hay đồng minh.
+Lưu ý về ultimate này: quy tắc từ ultimate này áp dụng cho tất cả đơn vị trên chiến trường, nhân vật mới ra sân từ deck cũng sẽ bị quy tắc này ảnh hưởng, quy tắc từ kĩ năng này không phải là buff hay debuff, không thể miễn dịch, tiến hoá để không bị ảnh hưởng, quy tắc có độ ưu tiên cao nhất.
+
+3) Thâm Uyên Devourer - Shab'gorath (深渊吞噬者 - Shēn Yuān Tūn Shì Zhě)
+
+Nguồn gốc: Thực thể từ Chiều Không Gian Thứ 5
+Lore:
+Shab'gorath là một thực thể sống trong chiều không gian thứ năm, nơi mà khái niệm "hiện tại", "quá khứ", và "tương lai" đan xen lẫn nhau. Đối với các sinh vật ba chiều, Shab'gorath xuất hiện như những phần cơ thể rời rạc: một cái tay ở đây, một cái đầu ở kia, nhưng thực chất đó chỉ là những "lát cắt" của cơ thể đa chiều của nó. Nó nuôi sống bằng cách hấp thụ "thời gian sống" của sinh vật khác - những ai gần nó sẽ thấy tuổi tác tăng lên nhanh chóng. Một số giáo phái thờ nó như một vị thần, hy vọng đạt được sự bất tử bằng cách hiến tế thời gian của người khác. Đặc điểm: Có thể xuất hiện và biến mất mà không cần di chuyển trong không gian ba chiềuCó khả năng "thấy" mọi khả năng trong tương laiChạm vào nó có thể khiến người đó nhảy cóc qua thời gian một cách ngẫu nhiên
+
+4) Ny'rakath - Chúa Tể Nghìn Mắt (千眼之主 - Qiān Yǎn Zhī Zhǔ)
+
+Nguồn gốc: Cổ Thần từ Thứ Nguyên Hỗn MangLore:
+Ny'rakath là một trong những Cổ Thần ra đời trước cả vũ trụ hiện tại. Hình dáng của nó là một khối cầu khổng lồ phủ đầy con mắt, mỗi con mắt nhìn vào một thứ nguyên khác nhau. Nó không có khái niệm về thiện ác như con người - đối với nó, mọi sinh vật đều chỉ là "mẫu quan sát". Ny'rakath thỉnh thoảng gửi một phần ý thức xuống thế giới phàm trần, khiến những ai nhìn thấy nó rơi vào điên loạn. Một số pháp sư liều lĩnh cố gắng triệu hồi nó để có được tri thức cấm kỵ, nhưng thường xuyên kết thúc bằng việc mất trí hoàn toàn���.Đặc điểm:Mỗi con mắt có thể phóng ra tia năng lượng khác nhau (lửa, băng, sấm sét, thời gian...)Có thể đọc được suy nghĩ của mọi sinh vật trong bán kính 10 kmHình dạng thực sự của nó vượt quá khả năng nhận thức của sinh vật 3 chiều��
+
+5) Kerrath Mortalis — Hoàng Tử Của Sự Lãng Quên
+
+Người thừa kế cuối cùng của vương quốc bị xóa khỏi lịch sử. Cả thế giới không còn nhớ tên hắn, và chỉ hắn còn biết bản thân từng tồn tại. Mỗi khi Kerrath giết ai, nạn nhân cũng bị xóa sạch khỏi ký ức nhân loại. Hắn săn lùng chính “ký ức” của mình — hy vọng tìm lại đất nước trong bóng tối
 
 C. Các hiệu ứng buff/debuff bổ sung nếu trong game chưa có hiệu ứng tương tự có thể thêm vào game.
 

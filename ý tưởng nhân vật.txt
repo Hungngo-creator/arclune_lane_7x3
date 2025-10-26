@@ -18,7 +18,7 @@ AEmax_base    = ( CLASS_BASE[class].AEmax   + TP[AEmax]   * Δ_AEmax )   * RANK_
 AEmax_final   = clamp( ( AEmax_base + Σflat_AEmax ) * ( 1 + Σ%_AEmax ), AE_floor=0, AE_cap )
 AEregen_base  = ( CLASS_BASE[class].AEregen + TP[AEregen] * Δ_AEregen ) * RANK_MULT[rank]
 # AEregen dùng chung thang đo với ví dụ (đơn vị AE/turn, chính xác tới 0.1): CLASS_BASE đã nhân ×10 so với phiên bản cũ.
-# Đối chiếu: CLASS_BASE.Ranger.AEregen = 7.0 AE/turn (theo catalog.js & "các lưu ý về chỉ số, bậc, class v0.3.txt").
+# Đối chiếu: CLASS_BASE.Ranger.AEregen = 7.0 AE/turn (theo catalog.ts & "các lưu ý về chỉ số, bậc, class v0.3.txt").
 # Sau khi nhân hệ số rank, ví dụ Ranger hạng SSR (1.30) có AEregen_base = 7.0 × 1.30 = 9.1 AE/turn.
 # Nhắc lại: SPD không nhân hệ số RANK_MULT như các chỉ số khác; chỉ lấy trực tiếp từ CLASS_BASE.
 # Σflat_AEmax và Σ%_AEmax gom mọi buff/debuff tác động lên trần AE; AE_cap do nhóm cân bằng ấn định (vd 150% AEmax_base) để tránh vượt trần quá mức.
@@ -87,7 +87,7 @@ HPregen_base = ( CLASS_BASE[class].HPregen + TP[HPregen] * Δ_HPregen ) * RANK_M
 HPregen_turn = clamp( ( HPregen_base + Σflat ) * ( 1 + Σ% ), 0, targetMaxHP * regen_cap )
 # regen_cap mặc định = 0.30 (tối đa 30% máu tối đa mỗi lượt); có thể tùy chỉnh theo mode/kỹ năng nếu cần nới trần.
 # Σflat và Σ% gom toàn bộ buff/debuff theo lượt (VD: buff regen 50 HP cố định → Σflat += 50; buff +20% regen → Σ% += 0.20).
-# Nguồn chỉ số HPregen gốc: CLASS_BASE trong catalog.js (và bảng “Base lv1 theo class” ở tài liệu cân bằng chỉ số).
+# Nguồn chỉ số HPregen gốc: CLASS_BASE trong catalog.ts (và bảng “Base lv1 theo class” ở tài liệu cân bằng chỉ số).
 
 • Regen theo hành động (action-based): mỗi hiệu ứng ghi rõ trigger và giá trị, ví dụ "hồi 1% max HP sau khi thực thi turn" → actionRegen = targetMaxHP * 0.01. Tổng regen lượt = actionRegen (tích lũy trong lượt) + HPregen_turn ở cuối lượt; chúng không nhân lẫn nhau, chỉ cộng đại số rồi clamp theo HP/giáp máu.
 

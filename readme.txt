@@ -2,17 +2,17 @@
 
 index.html – loader & thứ tự <script type="module">.
 
-config.ts – CFG, CAM (preset camera nghiêng).
+config.js – CFG, CAM (preset camera nghiêng).
 
 engine.js – grid, phép chiếu oblique; slotIndex/slotToCell, cellReserved, drawGridOblique, …
 
 ui.js – HUD: cost bar 0→30, timer, deck-3; auto-select theo cost.
 
-catalog.js – RANK_MULT, CLASS_BASE, ROSTER, applyRankAndMods/getMetaById/isSummoner.
+catalog.ts – RANK_MULT, CLASS_BASE, ROSTER, applyRankAndMods/getMetaById/isSummoner.
 
 units.js – 8 unit cho deck (id/name/cost) — không chứa chỉ số.
 
-meta.js – Meta (dựa trên catalog.js), makeInstanceStats(), initialRageFor().
+meta.ts – Meta (dựa trên catalog.ts), makeInstanceStats(), initialRageFor().
 
 combat.js – basicAttack/pickTarget/applyDamage/dealAbilityDamage (đủ test turn).
 
@@ -88,12 +88,12 @@ Rank Mult (áp lên mọi stat trừ SPD): N 0.8, R 0.9, SR 1.05, SSR 1.25, UR 1
 7 class: Mage/Pháp Sư, Tanker, Ranger/Cung Thủ, Warrior/Chiến Binh, Summoner, Support/Hỗ Trợ, Assassin/Sát Thủ.
 Trong thảo luận có thể dùng en/vn đan xen.
 
-SPD không nhân theo rank; class base đã cân bằng trong catalog.js.
+SPD không nhân theo rank; class base đã cân bằng trong catalog.ts.
 
 
 3) Dữ liệu nhân vật (tóm tắt)
 
-8 nhân vật trong catalog.js/ROSTER (trùng id với units.js).
+8 nhân vật trong catalog.ts/ROSTER (trùng id với units.ts).
 
 kit.onSpawn.rage = 100, exceptLeader:true cho mọi unit vào sân từ deck.
 
