@@ -220,12 +220,23 @@ export function startSummonBar<TCard extends SummonBarCard = SummonBarCard>(
       removalObserver.observe(observerTarget, { childList: true, subtree: true });
     }
   }
+  
+  const resolveCardCost = (card: TCard | null | undefined): number => {
+    if (!card) return 0;
+    const raw = card.cost;
+    if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
+    if (typeof raw === 'string') {
+      const parsed = Number(raw);
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+    return 0;
+  };
 
   const makeBtn = (card: TCard): HTMLButtonElement => {
     const btn = doc.createElement('button');
     btn.className = 'card';
     btn.dataset.id = card.id;
-    btn.innerHTML = `<span class="cost">${card.cost}</span>`;
+    btn.innerHTML = `<span class="cost">${resolveCardCost(card)}</span>`;
     const affordable = canAfford(card);
     btn.disabled = !affordable;
     btn.classList.toggle('disabled', !affordable);
@@ -251,7 +262,7 @@ export function startSummonBar<TCard extends SummonBarCard = SummonBarCard>(
       button.hidden = false;
       button.dataset.id = card.id;
       const span = button.querySelector<HTMLSpanElement>('.cost');
-      if (span) span.textContent = String(card.cost);
+      if (span) span.textContent = String(resolveCardCost(card));
       const affordable = canAfford(card);
       button.disabled = !affordable;
       button.classList.toggle('disabled', !affordable);
