@@ -1,4 +1,5 @@
-import { renderCollectionView, type CollectionViewHandle } from './view.ts';
+import { renderCollectionView } from './view.ts';
+import type { CollectionViewHandle } from './view.ts';
 import type {
   CollectionDefinition,
   CollectionDefinitionParams,
