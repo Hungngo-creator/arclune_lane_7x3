@@ -5,6 +5,22 @@ import { kitSupportsSummon } from './utils/kit.ts';
 
 import type { CatalogStatBlock, RosterUnitDefinition } from './@types/config.ts';
 import type { UnitId } from './@types/units.ts';
+import type { UnknownRecord } from './types/common.ts';
+
+export interface RosterKitDefinition extends UnknownRecord {
+  onSpawn?: UnknownRecord | null;
+  basic?: UnknownRecord | null;
+  skills?: ReadonlyArray<UnknownRecord> | null;
+  ult?: UnknownRecord | null;
+  talent?: UnknownRecord | null;
+  technique?: UnknownRecord | null;
+  passives?: ReadonlyArray<UnknownRecord> | null;
+  traits?: ReadonlyArray<UnknownRecord> | null;
+}
+
+export type RosterEntry = Omit<RosterUnitDefinition, 'kit'> & {
+  kit: RosterKitDefinition;
+};
 
 export const RANK_MULT = {
   N: 0.80,
@@ -331,7 +347,7 @@ basic: {
       ]
     }
   }
-] satisfies ReadonlyArray<RosterUnitDefinition>;
+] satisfies ReadonlyArray<RosterEntry>;
 
 const unitBaseEntries = ROSTER
   .map((entry) => {
@@ -351,11 +367,11 @@ export const UNIT_BASE = Object.freeze(
 ) satisfies Readonly<Record<UnitId, CatalogStatBlock>>;
 
 // 5) Map & helper tra cứu
-export const ROSTER_MAP = new Map<UnitId, RosterUnitDefinition>(
+export const ROSTER_MAP = new Map<UnitId, RosterEntry>(
   ROSTER.map((entry) => [entry.id, entry] as const),
 );
 
-export const getMetaById = (id: MaybeUnitId): RosterUnitDefinition | undefined => {
+export const getMetaById = (id: MaybeUnitId): RosterEntry | undefined => {
   if (typeof id !== 'string') return undefined;
   return ROSTER_MAP.get(id);
 };
