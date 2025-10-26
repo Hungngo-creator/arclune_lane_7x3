@@ -125,14 +125,27 @@ export interface BattleState extends BattleResult {
   result: BattleResult | null;
 }
 
+export interface AiDeckCard {
+  id: UnitId;
+  cost?: number | null;
+  name?: string | null;
+  [extra: string]: unknown;
+}
+
+export type AiDeckEntry = UnitId | AiDeckCard | UnitToken;
+
+export type SessionRosterEntry = AiDeckEntry;
+
+export type SessionRoster = ReadonlyArray<SessionRosterEntry>;
+
 export interface SessionAIState {
   cost: number;
   costCap: number;
   summoned: number;
   summonLimit: number;
-  unitsAll: UnitId[];
+  unitsAll: SessionRoster;
   usedUnitIds: Set<UnitId>;
-  deck: UnitToken[] | { id: UnitId }[];
+  deck: AiDeckEntry[];
   selectedId: UnitId | null;
   lastThinkMs: number;
   lastDecision: Record<string, unknown> | null;
@@ -147,7 +160,7 @@ export interface SessionState {
   costCap: number;
   summoned: number;
   summonLimit: number;
-  unitsAll: UnitId[];
+  unitsAll: SessionRoster;
   usedUnitIds: Set<UnitId>;
   deck3: UnitToken[];
   selectedId: UnitId | null;
