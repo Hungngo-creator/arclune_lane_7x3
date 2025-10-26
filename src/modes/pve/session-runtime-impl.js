@@ -7,7 +7,7 @@ import { CFG, CAM } from '../../config.ts';
 import { UNITS } from '../../units.ts';
 import { Meta, makeInstanceStats, initialRageFor } from '../../meta.ts';
 import { basicAttack, pickTarget, dealAbilityDamage, healUnit, grantShield, applyDamage } from '../../combat.ts';
-import { initializeFury, setFury, spendFury, resolveUltCost, gainFury, finishFuryHit } from '../../utils/fury.js';
+import { initializeFury, setFury, spendFury, resolveUltCost, gainFury, finishFuryHit } from '../../utils/fury.ts';
 import {
   ROSTER, ROSTER_MAP,
   CLASS_BASE, RANK_MULT,
@@ -35,9 +35,9 @@ import {
 } from '../../vfx.ts';
 import { drawBattlefieldScene } from '../../scene.ts';
 import { gameEvents, TURN_START, TURN_END, ACTION_START, ACTION_END, BATTLE_END, emitGameEvent } from '../../events.ts';
-import { ensureNestedModuleSupport } from '../../utils/dummy.js';
-import { safeNow } from '../../utils/time.js';
-import { getSummonSpec, resolveSummonSlots } from '../../utils/kit.js';
+import { ensureNestedModuleSupport } from '../../utils/dummy.ts';
+import { safeNow } from '../../utils/time.ts';
+import { getSummonSpec, resolveSummonSlots } from '../../utils/kit.ts';
 import {
   normalizeConfig,
   createSession,
