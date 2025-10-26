@@ -3,7 +3,13 @@ import { Statuses, hookOnLethalDamage } from './statuses.ts';
 import { safeNow } from './utils/time.ts';
 
 import type {
+  PassiveCondition,
+  PassiveConditionContext,
+  PassiveConditionFn,
+  PassiveConditionObject,
   PassiveDefinition,
+  PassiveKitDefinition,
+  PassiveMetaContext,
   PassiveRegistry,
   PassiveSpec,
   SessionState,
@@ -12,6 +18,26 @@ import type {
 import type { UnitToken } from '@types/units';
 
 const clamp01 = (value: number): number => Math.max(0, Math.min(1, value));
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  !!value && typeof value === 'object' && !Array.isArray(value);
+
+const isPassiveKitDefinition = (value: unknown): value is PassiveKitDefinition => {
+  if (!isRecord(value)) return false;
+  const passives = (value as { passives?: unknown }).passives;
+  return passives == null || Array.isArray(passives);
+};
+
+const coercePassiveMeta = (value: unknown): PassiveMetaContext | null => {
+  if (!isRecord(value)) return null;
+  const kitCandidate = 'kit' in value ? (value.kit as unknown) : null;
+  const kit = isPassiveKitDefinition(kitCandidate) ? kitCandidate : null;
+  const meta = value as PassiveMetaContext['meta'];
+  return {
+    meta,
+    kit,
+  } satisfies PassiveMetaContext;
+};
 
 const STAT_ALIAS: Map<string, string> = new Map([
   ['atk', 'atk'],
@@ -137,11 +163,14 @@ interface ApplyStatMapOptions {
 
 type AfterHitHandler = (afterCtx?: Record<string, unknown>) => void;
 
-type PassiveRuntimeContext = Record<string, unknown> & {
+type PassiveRuntimeContext = {
   afterHit?: AfterHitHandler[];
   damage?: Record<string, unknown> & { baseMul?: number };
   log?: Array<Record<string, unknown>>;
   target?: UnitToken | null;
+  meta?: PassiveMetaContext['meta'];
+  kit?: PassiveMetaContext['kit'];
+  [extra: string]: unknown;
 };
 
 const applyStatMap = (
@@ -193,15 +222,8 @@ const hasLivingMinion = (unit: UnitToken | null | undefined, Game: SessionState 
  * @param {{ Game?: SessionState | null; unit?: UnitToken | null; ctx?: Record<string, unknown> | null; passive?: PassiveDefinition | null }} options
  * @returns {boolean}
  */
-interface PassiveConditionContext {
-  Game?: SessionState | null;
-  unit?: UnitToken | null;
-  ctx?: Record<string, unknown> | null;
-  passive?: PassiveSpec | null;
-}
-
 const evaluateConditionObject = (
-  condition: Record<string, unknown> | null | undefined,
+  condition: PassiveConditionObject | null | undefined,
   { Game, unit, ctx, passive }: PassiveConditionContext,
 ): boolean => {
   if (!condition || typeof condition !== 'object') return true;
@@ -250,6 +272,11 @@ const evaluateConditionObject = (
   return true;
 };
 
+const isPassiveConditionFn = (cond: PassiveCondition): cond is PassiveConditionFn => typeof cond === 'function';
+
+const isPassiveConditionObject = (cond: PassiveCondition): cond is PassiveConditionObject =>
+  !!cond && typeof cond === 'object' && !Array.isArray(cond);
+
 const passiveConditionsOk = ({
   Game,
   unit,
@@ -259,14 +286,14 @@ const passiveConditionsOk = ({
   Game?: SessionState | null;
   unit?: UnitToken | null;
   passive?: PassiveSpec | null;
-  ctx?: Record<string, unknown> | null;
+  ctx?: PassiveRuntimeContext | null;
 }): boolean => {
-  const conditions = passive?.conditions as unknown;
+  const conditions = passive?.conditions;
   if (!conditions) return true;
   const list = Array.isArray(conditions) ? conditions : [conditions];
   for (const cond of list){
     if (!cond) continue;
-    if (typeof cond === 'function'){
+    if (isPassiveConditionFn(cond)){
       try {
         if (!cond({ Game, unit, ctx, passive })) return false;
       } catch (_) {
@@ -281,8 +308,8 @@ const passiveConditionsOk = ({
       }
       continue;
     }
-    if (typeof cond === 'object'){
-      if (!evaluateConditionObject(cond as Record<string, unknown>, { Game, unit, ctx, passive })) return false;
+    if (isPassiveConditionObject(cond)){
+      if (!evaluateConditionObject(cond, { Game, unit, ctx, passive })) return false;
     }
   }
   return true;
@@ -580,11 +607,12 @@ export function emitPassiveEvent(
   ctx: PassiveRuntimeContext = {},
 ): void {
   if (!Game || !unit) return;
-  const meta = Game.meta && typeof Game.meta.get === 'function' ? Game.meta.get(unit.id) : null;
-  const kit = meta?.kit;
+  const metaValue = Game.meta && typeof Game.meta.get === 'function' ? Game.meta.get(unit.id) : null;
+  const metaContext = coercePassiveMeta(metaValue);
+  const kit = metaContext?.kit ?? null;
+  ctx.meta = metaContext?.meta ?? null;
+  ctx.kit = kit;
   if (!kit || !Array.isArray(kit.passives)) return;
-  ctx.meta = meta as unknown;
-  ctx.kit = kit as unknown;
   for (const passive of kit.passives as Array<PassiveSpec | null | undefined>){
     if (!passive || passive.when !== when) continue;
     const effectKey = typeof passive.effect === 'string'
@@ -636,7 +664,11 @@ export function applyOnSpawnEffects(
   ensureStatusContainer(unit);
 
   const effects: Array<Record<string, unknown>> = [];
-  if (Array.isArray(onSpawn.effects)) effects.push(...onSpawn.effects as Record<string, unknown>[]);
+  if (Array.isArray(onSpawn.effects)){
+    for (const effect of onSpawn.effects){
+      if (isRecord(effect)) effects.push(effect);
+    }
+  }
 
   if (Number.isFinite(onSpawn.teamHealOnEntry) && Number(onSpawn.teamHealOnEntry) > 0){
     effects.push({ type: 'teamHeal', amount: onSpawn.teamHealOnEntry, mode: 'targetMax' });
@@ -690,13 +722,14 @@ export function applyOnSpawnEffects(
     if (type === 'stats' || type === 'stat' || type === 'buff'){
       const stats = effect.stats || effect.values;
       if (!stats || typeof stats !== 'object') continue;
-      const applied = applyStatMap(unit, ({ id: (effect.id as string) || 'onSpawn' } as PassiveSpec), stats as Record<string, number>, {
+      const effectId = typeof effect.id === 'string' && effect.id.trim() ? effect.id : 'onSpawn';
+      const applied = applyStatMap(unit, ({ id: effectId } as PassiveSpec), stats as Record<string, number>, {
         mode: effect.mode === 'flat' ? 'flat' : (effect.statMode === 'flat' ? 'flat' : 'percent'),
         stack: effect.stack !== false,
         stacks: typeof effect.stacks === 'number' ? effect.stacks : undefined,
         purgeable: effect.purgeable !== false,
         maxStacks: typeof effect.maxStacks === 'number' ? effect.maxStacks : undefined,
-        idPrefix: (effect.id as string) || 'onSpawn',
+        idPrefix: effectId,
       });
       statsChanged = applied || statsChanged;
       continue;
