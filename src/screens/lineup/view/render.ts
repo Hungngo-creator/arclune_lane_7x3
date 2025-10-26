@@ -1000,7 +1000,8 @@ const eventCleanup = bindLineupEvents({
           console.error('[lineup] destroy error', error);
         }
       }
-     mount.destroy();
+      mount.destroy();
     },
   };
+ }
 }
