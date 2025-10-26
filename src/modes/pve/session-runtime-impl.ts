@@ -869,7 +869,6 @@ function ensureBattleState(game: SessionState | null): BattleState | null {
       finishedAt: 0,
       result: null,
     } as BattleState;
-    };
   }
   if (typeof game.result === 'undefined'){
     game.result = null;
