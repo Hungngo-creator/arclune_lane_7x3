@@ -3,9 +3,11 @@ import type { LineupViewHandle } from './view/index.ts';
 import type { UnknownRecord } from '../../types/common.ts';
 import type {
   LineupCurrencies,
-  LineupCurrencyMap,
+  LineupCurrencyConfig,
   LineupCurrencyValue,
 } from '../../types/currency.ts';
+import type { LineupDefinition as LineupDefinitionInput } from '../../types/lineup.ts';
+import { isLineupCurrencies, normalizeCurrencyBalances } from '../../types/currency.ts';
 
 export type { LineupCurrencies } from '../../types/currency.ts';
 
@@ -40,22 +42,6 @@ const mergeParams = <T extends Mergeable>(
   return cloneMergeable(override);
 };
 
-const isLineupCurrencyValue = (value: unknown): value is LineupCurrencyValue => {
-  if (value == null) return true;
-  return typeof value === 'number'
-    || typeof value === 'string'
-    || isUnknownRecord(value);
-};
-
-const isLineupCurrencyMap = (value: unknown): value is LineupCurrencyMap => isUnknownRecord(value);
-
-const isLineupCurrencies = (value: unknown): value is LineupCurrencies => {
-  if (Array.isArray(value)){
-    return value.every(isLineupCurrencyValue);
-  }
-  return isLineupCurrencyMap(value);
-};
-
 const cloneCurrencyValue = (value: LineupCurrencyValue): LineupCurrencyValue => {
   if (value && typeof value === 'object'){
     return { ...(value as UnknownRecord) };
@@ -67,8 +53,8 @@ const cloneLineupCurrencies = (source: LineupCurrencies): LineupCurrencies => {
   if (Array.isArray(source)){
     return source.map(item => cloneCurrencyValue(item)) as ReadonlyArray<LineupCurrencyValue>;
   }
-  const mapSource = source as LineupCurrencyMap;
-  const clone: LineupCurrencyMap = {};
+  const mapSource = source as LineupCurrencyConfig;
+  const clone: LineupCurrencyConfig = {};
   Object.entries(mapSource).forEach(([key, value]) => {
     if (key === 'balances'){
       if (value && typeof value === 'object' && !Array.isArray(value)){
@@ -105,7 +91,7 @@ const toMergeable = (value: unknown): Mergeable | null => {
   return null;
 };
 
-interface LineupDefinitionParams extends UnknownRecord {
+interface LineupScreenDefinitionParams extends UnknownRecord {
   lineups?: unknown;
   roster?: unknown;
   currencies?: LineupCurrencies | null;
@@ -113,24 +99,24 @@ interface LineupDefinitionParams extends UnknownRecord {
   playerState?: UnknownRecord | null;
 }
 
-interface LineupDefinition {
+interface LineupScreenDefinition {
   label?: string;
   title?: string;
   description?: string;
-  params?: LineupDefinitionParams | null;
+  params?: LineupScreenDefinitionParams | null;
 }
 
 export interface RenderLineupScreenOptions {
   root: HTMLElement;
   shell?: { enterScreen?: (screenId: string, params?: unknown) => void } | null;
-  definition?: LineupDefinition | null;
-  params?: LineupDefinitionParams | null;
+  definition?: LineupScreenDefinition | null;
+  params?: LineupScreenDefinitionParams | null;
 }
 
 function resolveLineups(
-  definitionParams: LineupDefinitionParams | null | undefined,
-  params: LineupDefinitionParams | null | undefined,
-): unknown {
+ definitionParams: LineupScreenDefinitionParams | null | undefined,
+  params: LineupScreenDefinitionParams | null | undefined,
+): ReadonlyArray<LineupDefinitionInput | null | undefined> { 
   const base = Array.isArray(definitionParams?.lineups) ? definitionParams?.lineups : null;
   const override = Array.isArray(params?.lineups) ? params?.lineups : null;
   if (override) return override;
@@ -157,9 +143,7 @@ export function renderLineupScreen(options: RenderLineupScreenOptions): LineupVi
   const baseCurrencies = isLineupCurrencies(defParams?.currencies) ? defParams?.currencies ?? null : null;
   const overrideCurrencies = isLineupCurrencies(params?.currencies) ? params?.currencies ?? null : null;
   const mergedCurrencySource = mergeParams<LineupCurrencies>(baseCurrencies, overrideCurrencies);
-  const playerCurrencySource = isLineupCurrencies((mergedPlayerState as { currencies?: unknown } | null)?.currencies)
-    ? (mergedPlayerState as { currencies?: LineupCurrencies }).currencies ?? null
-    : null;
+  const playerCurrencySource = normalizeCurrencyBalances(mergedPlayerState);
   const currencies = mergedCurrencySource
     ? cloneLineupCurrencies(mergedCurrencySource)
     : playerCurrencySource
