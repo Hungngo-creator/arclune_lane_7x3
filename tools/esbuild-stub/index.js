@@ -1,3 +1,5 @@
+const path = require('path');
+
 function transform(code){
   if (typeof code !== 'string'){
     throw new TypeError('esbuild stub transform expects code string');
@@ -5,4 +7,51 @@ function transform(code){
   return Promise.resolve({ code, map: null, warnings: [] });
 }
 
- module.exports = { transform };
+ async function build(options = {}){
+  const { stdin, write = true, metafile } = options;
+  if (!stdin || typeof stdin.contents !== 'string'){
+    throw new Error('esbuild stub build currently only supports stdin.contents');
+  }
+  if (write){
+    throw new Error('esbuild stub build does not support write=true');
+  }
+  const text = stdin.contents;
+  const outputPath = options.outfile
+    ? options.outfile
+    : options.outdir
+      ? path.join(options.outdir, stdin.sourcefile || 'stdin.js')
+      : stdin.sourcefile || '<stdout>';
+  const buffer = Buffer.from(text, 'utf8');
+  const outputFiles = [{
+    path: outputPath,
+    text,
+    contents: buffer,
+  }];
+  const result = {
+    outputFiles,
+    warnings: [],
+  };
+  if (metafile){
+    const inputPath = stdin.sourcefile || '<stdin>';
+    result.metafile = {
+      inputs: {
+        [inputPath]: {
+          bytes: Buffer.byteLength(stdin.contents, 'utf8'),
+        },
+      },
+      outputs: {
+        [outputPath]: {
+          bytes: buffer.byteLength,
+          inputs: {
+            [inputPath]: {
+              bytesInOutput: buffer.byteLength,
+            },
+          },
+        },
+      },
+    };
+  }
+  return result;
+}
+
+module.exports = { transform, build };
