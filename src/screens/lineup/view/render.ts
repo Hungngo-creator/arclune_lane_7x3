@@ -10,10 +10,12 @@ import {
   collectAssignedUnitIds,
   evaluatePassive,
   filterRoster,
-  type LineupViewState,
-  type LineupMessageType,
-  type LineupPassive,
-  type RosterUnit,
+} from './state.ts';
+import type {
+  LineupViewState,
+  LineupMessageType,
+  LineupPassive,
+  RosterUnit,
 } from './state.ts';
 import { bindLineupEvents } from './events.ts';
 import type { LineupState } from '@types/ui';
