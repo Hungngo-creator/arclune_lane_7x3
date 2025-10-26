@@ -200,6 +200,39 @@ export interface SessionState {
   [extra: string]: unknown;
 }
 
+export interface PassiveConditionObject {
+  selfHPAbove?: number | null;
+  selfHPBelow?: number | null;
+  hpAbove?: number | null;
+  hpBelow?: number | null;
+  requiresStatus?: string | ReadonlyArray<string | null | undefined> | null;
+  targetHasStatus?: string | ReadonlyArray<string | null | undefined> | null;
+  minMinions?: number | null;
+  maxStacks?: number | null;
+  stackId?: string | null;
+  [extra: string]: unknown;
+}
+
+export interface PassiveKitDefinition extends Record<string, unknown> {
+  passives?: ReadonlyArray<PassiveSpec | null | undefined> | null;
+}
+
+export interface PassiveMetaContext {
+  kit: PassiveKitDefinition | null;
+  meta: RosterUnitDefinition | null;
+}
+
+export interface PassiveConditionContext {
+  Game?: SessionState | null;
+  unit?: UnitToken | null;
+  ctx?: Record<string, unknown> | null;
+  passive?: PassiveSpec | null;
+}
+
+export type PassiveConditionFn = (context: PassiveConditionContext) => boolean;
+
+export type PassiveCondition = string | PassiveConditionObject | PassiveConditionFn;
+
 export interface PassiveSpec {
   id: string;
   when?: string;
@@ -213,8 +246,8 @@ export interface PassiveSpec {
         flatStats?: Record<string, number>;
       };
   params?: Record<string, unknown>;
-  condition?: Record<string, unknown>;
-  conditions?: Array<unknown> | unknown;
+  condition?: PassiveCondition | null;
+  conditions?: PassiveCondition[] | PassiveCondition | null;
 }
 
 export interface PassiveEffectArgs<
