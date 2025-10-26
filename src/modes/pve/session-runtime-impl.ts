@@ -34,7 +34,16 @@ import {
   vfxAddShieldWrap
 } from '../../vfx.ts';
 import { drawBattlefieldScene } from '../../scene.ts';
-import { gameEvents, TURN_START, TURN_END, ACTION_START, ACTION_END, BATTLE_END, emitGameEvent } from '../../events.ts';
+import {
+  gameEvents,
+  TURN_START,
+  TURN_END,
+  ACTION_START,
+  ACTION_END,
+  BATTLE_END,
+  emitGameEvent,
+  addGameEventListener,
+} from '../../events.ts';
 import { ensureNestedModuleSupport } from '../../utils/dummy.ts';
 import { safeNow } from '../../utils/time.ts';
 import { getSummonSpec, resolveSummonSlots } from '../../utils/kit.ts';
@@ -211,7 +220,7 @@ if (CFG?.DEBUG?.LOG_EVENTS) {
   const types = [TURN_START, TURN_END, ACTION_START, ACTION_END] as const;
   for (const type of types){
     try {
-      gameEvents.addEventListener(type, logEvent(type));
+      addGameEventListener(type, logEvent(type));
     } catch (err) {
       console.error('[events]', err);
     }

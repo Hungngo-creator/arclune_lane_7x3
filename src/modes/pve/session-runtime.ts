@@ -17,6 +17,7 @@ import {
   ACTION_END,
   TURN_REGEN,
   BATTLE_END,
+  addGameEventListener,
 } from '../../events.ts';
 import {
   createPveSession as createPveSessionImpl,
@@ -181,15 +182,7 @@ export function onSessionEvent<T extends GameEventType>(
   if (!type || typeof handler !== 'function') {
     return () => {};
   }
-  if (!gameEvents || typeof gameEvents.addEventListener !== 'function') {
-    return () => {};
-  }
-  gameEvents.addEventListener(type, handler);
-  return () => {
-    if (typeof gameEvents.removeEventListener === 'function') {
-      gameEvents.removeEventListener(type, handler);
-    }
-  };
+  return addGameEventListener(type, handler);
 }
 
 type SessionController = ReturnType<typeof createPveSessionImpl>;
