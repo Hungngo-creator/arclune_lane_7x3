@@ -1,4 +1,4 @@
-import type { SessionState as CoreSessionState } from './combat';
+import type { PveDeckEntry, SessionState as CoreSessionState } from './combat';
 import type { UnitToken } from './units';
 import type { RosterUnitDefinition } from './config';
 
@@ -38,10 +38,10 @@ export interface CreateSessionOptions {
   modeKey?: string;
   sceneTheme?: string;
   backgroundKey?: string;
-  deck?: ReadonlyArray<UnitToken>;
+  deck?: ReadonlyArray<PveDeckEntry>;
   aiPreset?: {
-    deck?: ReadonlyArray<string>;
-    unitsAll?: ReadonlyArray<string>;
+    deck?: ReadonlyArray<PveDeckEntry>;
+    unitsAll?: ReadonlyArray<PveDeckEntry>;
     costCap?: number;
     summonLimit?: number;
     startingDeck?: ReadonlyArray<UnitToken>;

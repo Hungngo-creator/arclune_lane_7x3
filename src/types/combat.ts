@@ -5,6 +5,7 @@ import type {
   UnitId,
   UnitToken,
 } from './units';
+import type { UnitArt } from './art';
 import type { RosterUnitDefinition } from './config';
 import type { TurnSnapshot } from './turn-order';
 import type { RngState } from './rng';
@@ -142,7 +143,16 @@ export interface AiCard extends AiDeckCard {
 
 export type AiCardDeck = AiCard[];
 
-export type SessionRosterEntry = AiDeckEntry;
+export interface PveDeckEntry {
+  id: UnitId;
+  cost?: number | null;
+  name?: string | null;
+  art?: UnitArt | null;
+  skinKey?: string | null;
+  [extra: string]: unknown;
+}
+
+export type SessionRosterEntry = PveDeckEntry;
 
 export type SessionRoster = ReadonlyArray<SessionRosterEntry>;
 
@@ -151,7 +161,7 @@ export interface SessionAIState {
   costCap: number;
   summoned: number;
   summonLimit: number;
-  unitsAll: SessionRoster;
+  unitsAll: ReadonlyArray<PveDeckEntry>;
   usedUnitIds: Set<UnitId>;
   deck: AiDeckEntry[] | AiCardDeck;
   selectedId: UnitId | null;
@@ -168,9 +178,9 @@ export interface SessionState {
   costCap: number;
   summoned: number;
   summonLimit: number;
-  unitsAll: SessionRoster;
+  unitsAll: ReadonlyArray<PveDeckEntry>;
   usedUnitIds: Set<UnitId>;
-  deck3: UnitToken[];
+  deck3: ReadonlyArray<PveDeckEntry>;
   selectedId: UnitId | null;
   ui: { bar: unknown };
   turn: TurnSnapshot | null;

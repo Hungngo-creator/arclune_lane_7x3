@@ -7,7 +7,7 @@ export interface HudHandles {
 
 export interface SummonBarCard {
   id: string;
-  cost: number;
+  cost?: number | null;
   [extra: string]: unknown;
 }
 
