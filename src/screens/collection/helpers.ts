@@ -3,6 +3,26 @@ import { UNITS } from '../../units.ts';
 import type { UnitDefinition } from '../../units.ts';
 import type { CollectionEntry, CurrencyCatalog, CurrencyBalanceProvider, UnknownRecord } from './types.ts';
 
+const isRecord = (value: unknown): value is Record<string, unknown> => (
+  typeof value === 'object'
+  && value !== null
+  && !Array.isArray(value)
+);
+
+const isCollectionEntry = (value: unknown): value is CollectionEntry => {
+  if (!isRecord(value)) return false;
+  if (typeof value.id !== 'string') return false;
+  if (typeof value.name !== 'string') return false;
+  if (typeof value.class !== 'string') return false;
+  if (typeof value.rank !== 'string') return false;
+  const kit = value.kit;
+  return typeof kit === 'object' && kit !== null;
+};
+
+const isCollectionEntryArray = (input: unknown): input is ReadonlyArray<CollectionEntry> => (
+  Array.isArray(input) && input.every(isCollectionEntry)
+);
+
 export const ABILITY_TYPE_LABELS = Object.freeze({
   basic: 'Đánh thường',
   active: 'Kĩ năng',
@@ -33,19 +53,22 @@ export interface AbilityFact {
 }
 
 export function cloneRoster(input: unknown): CollectionEntry[]{
-  if (!Array.isArray(input) || input.length === 0){
-    return (ROSTER as unknown as ReadonlyArray<CollectionEntry>).map((unit) => ({ ...unit }));
+  if (isCollectionEntryArray(input) && input.length > 0){
+    return input.map((entry) => ({ ...entry }));
   }
-  return input.map((entry) => ({ ...(entry as CollectionEntry) }));
+  return ROSTER.map((unit): CollectionEntry => ({ ...unit }));
 }
 
 export function buildRosterWithCost(rosterSource: ReadonlyArray<CollectionEntry>): CollectionEntry[]{
   const costs = new Map<string, number>(UNITS.map((unit: UnitDefinition) => [unit.id, unit.cost] as const));
   return rosterSource.map((entry) => ({
     ...entry,
-    cost: Number.isFinite((entry as CollectionEntry).cost)
-      ? (entry as CollectionEntry).cost ?? null
-      : costs.get(entry.id) ?? null,
+    id: typeof entry.id === 'string' ? entry.id : String(entry.id ?? ''),
+    cost: typeof entry.cost === 'number' && Number.isFinite(entry.cost)
+      ? entry.cost
+      : entry.cost === null
+        ? null
+        : costs.get(typeof entry.id === 'string' ? entry.id : String(entry.id ?? '')) ?? null,
   }));
 }
 
