@@ -15,6 +15,7 @@
     "src/data/roster-preview.ts",
     "src/data/skills.config.ts",
     "src/data/skills.ts",
+    "src/utils/**/*.ts",
     "types/**/*"
   ]
 }
