@@ -1,6 +1,13 @@
 // v0.7.1
 import { CFG } from './config.ts';
-import { ACTION_END, TURN_END, TURN_START, gameEvents } from './events.ts';
+import {
+  ACTION_END,
+  TURN_END,
+  TURN_START,
+  addGameEventListener,
+  gameEvents,
+} from './events.ts';
+import type { GameEventDetail, GameEventType } from './events.ts';
 import { assertElement } from './ui/dom.ts';
 
 import type { HudHandles, SummonBarCard, SummonBarHandles, SummonBarOptions } from './types/ui.ts';
@@ -44,28 +51,29 @@ export function initHUD(doc: Document, root?: QueryableRoot | null): HudHandles 
     }
   };
 
-  const handleGameEvent = (event: Event): void => {
-    const detail = (event as CustomEvent<{ game?: HudGameLike }>).detail;
+  const handleGameEvent = (event: GameEventDetail<GameEventType>): void => {
+    const detail = event.detail as { game?: HudGameLike } | undefined;
     const state = detail?.game ?? null;
     if (state) update(state);
   };
 
   let cleanedUp = false;
+  const disposers: Array<() => void> = [];
   const cleanup = (): void => {
     if (cleanedUp) return;
     cleanedUp = true;
-    if (gameEvents && typeof gameEvents.removeEventListener === 'function'){
-      const types = [TURN_START, TURN_END, ACTION_END] as const;
-      for (const type of types){
-        gameEvents.removeEventListener(type, handleGameEvent);
+    while (disposers.length > 0){
+      const dispose = disposers.pop();
+      if (dispose){
+        dispose();
       }
     }
   };
 
-  if (gameEvents && typeof gameEvents.addEventListener === 'function'){
+  if (gameEvents){
     const types = [TURN_START, TURN_END, ACTION_END] as const;
     for (const type of types){
-      gameEvents.addEventListener(type, handleGameEvent);
+      disposers.push(addGameEventListener(type, handleGameEvent));
     }
   }
 
@@ -252,11 +260,11 @@ export function startSummonBar<TCard extends SummonBarCard = SummonBarCard>(
     }
   };
 
-  if (gameEvents && typeof gameEvents.addEventListener === 'function'){
+  if (gameEvents){
     const rerender = (): void => render();
     const types = [TURN_START, TURN_END, ACTION_END] as const;
     for (const type of types){
-      gameEvents.addEventListener(type, rerender);
+      addGameEventListener(type, () => rerender());
     }
   }
 

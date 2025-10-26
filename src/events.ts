@@ -71,13 +71,19 @@ export interface GameEventDetailMap {
   [BATTLE_END]: BattleEndDetail;
 }
 
+export interface EventEmitterLike {
+  on: <T extends GameEventType>(type: T, listener: GameEventHandler<T>) => unknown;
+  off?: <T extends GameEventType>(type: T, listener: GameEventHandler<T>) => unknown;
+  emit: <T extends GameEventType>(type: T, detail?: GameEventDetailMap[T]) => unknown;
+}
+
 export type GameEventDetail<T extends GameEventType> =
   | (CustomEvent<GameEventDetailMap[T]> & { detail: GameEventDetailMap[T] })
   | {
       type: T;
       detail: GameEventDetailMap[T];
-      target?: EventTarget | SimpleEventTarget | null;
-      currentTarget?: EventTarget | SimpleEventTarget | null;
+      target?: EventTarget | SimpleEventTarget | EventEmitterLike | null;
+      currentTarget?: EventTarget | SimpleEventTarget | EventEmitterLike | null;
     };
 
 export type GameEventHandler<T extends GameEventType = GameEventType> = (
@@ -176,7 +182,20 @@ class SimpleEventTarget {
   }
 }
 
-function makeEventTarget(): EventTarget | SimpleEventTarget {
+export type GameEventTargetLike = EventTarget | SimpleEventTarget | EventEmitterLike;
+
+export function isEventEmitterLike(value: unknown): value is EventEmitterLike {
+  if (!value || typeof value !== 'object'){
+    return false;
+  }
+  const candidate = value as Partial<EventEmitterLike>;
+  return (
+    typeof candidate.on === 'function' &&
+    typeof candidate.emit === 'function'
+  );
+}
+
+function makeEventTarget(): GameEventTargetLike {
   if (!HAS_EVENT_TARGET) return new SimpleEventTarget();
   const probeType = '__probe__';
   const probeEvent = createNativeEvent(probeType as GameEventType);
@@ -208,7 +227,7 @@ function makeEventTarget(): EventTarget | SimpleEventTarget {
   return new SimpleEventTarget();
 }
 
-export const gameEvents = makeEventTarget();
+export const gameEvents: GameEventTargetLike = makeEventTarget();
 
 export function emitGameEvent<T extends GameEventType>(
   type: T,
@@ -216,25 +235,21 @@ export function emitGameEvent<T extends GameEventType>(
 ): boolean {
   if (!type || !gameEvents) return false;
   try {
-    if (typeof (gameEvents as EventTarget).dispatchEvent === 'function'){
+    if (HAS_EVENT_TARGET && gameEvents instanceof EventTarget){
       const nativeEvent = createNativeEvent(type, detail);
       if (nativeEvent){
-        return (gameEvents as EventTarget).dispatchEvent(nativeEvent as Event);
+        return gameEvents.dispatchEvent(nativeEvent as Event);
       }
-      if (gameEvents instanceof SimpleEventTarget){
-        const syntheticEvent: GameEventDetail<T> = {
-          type,
-          detail: detail as GameEventDetailMap[T],
-        };
-        return gameEvents.dispatchEvent(syntheticEvent);
-      }
-      return false;
     }
-    const emitter = gameEvents as unknown as {
-      emit?: (eventType: T, eventDetail?: GameEventDetailMap[T]) => void;
-    };
-    if (typeof emitter.emit === 'function'){
-      emitter.emit(type, detail);
+    if (gameEvents instanceof SimpleEventTarget){
+      const syntheticEvent: GameEventDetail<T> = {
+        type,
+        detail: detail as GameEventDetailMap[T],
+      };
+      return gameEvents.dispatchEvent(syntheticEvent);
+    }
+    if (isEventEmitterLike(gameEvents)){
+      gameEvents.emit(type, detail);
       return true;
     }
   } catch (err) {
@@ -255,29 +270,34 @@ export function addGameEventListener<T extends GameEventType>(
   if (!type || typeof handler !== 'function' || !gameEvents){
     return () => {};
   }
-  if (typeof (gameEvents as EventTarget).addEventListener === 'function'){
-    (gameEvents as EventTarget).addEventListener(type, handler as EventListener);
+  if (HAS_EVENT_TARGET && gameEvents instanceof EventTarget){
+    gameEvents.addEventListener(type, handler as EventListener);
     let disposed = false;
     return () => {
       if (disposed) return;
       disposed = true;
-      if (typeof (gameEvents as EventTarget).removeEventListener === 'function'){
-        (gameEvents as EventTarget).removeEventListener(type, handler as EventListener);
+      if (HAS_EVENT_TARGET && gameEvents instanceof EventTarget){
+        gameEvents.removeEventListener(type, handler as EventListener);
       }
     };
   }
-  const eventEmitter = gameEvents as unknown as {
-    on?: (eventType: T, listener: GameEventHandler<T>) => void;
-    off?: (eventType: T, listener: GameEventHandler<T>) => void;
-  };
-  if (typeof eventEmitter.on === 'function'){
-    eventEmitter.on(type, handler);
+  if (gameEvents instanceof SimpleEventTarget){
+    gameEvents.addEventListener(type, handler);
     let disposed = false;
     return () => {
       if (disposed) return;
       disposed = true;
-      if (typeof eventEmitter.off === 'function'){
-        eventEmitter.off(type, handler);
+      gameEvents.removeEventListener(type, handler);
+    };
+  }
+  if (isEventEmitterLike(gameEvents)){
+    gameEvents.on(type, handler);
+    let disposed = false;
+    return () => {
+      if (disposed) return;
+      disposed = true;
+      if (typeof gameEvents.off === 'function'){
+        gameEvents.off(type, handler);
       }
     };
   }
