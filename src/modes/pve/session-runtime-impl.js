@@ -32,7 +32,7 @@ import {
   vfxAddBloodPulse,
   vfxAddGroundBurst,
   vfxAddShieldWrap
-} from '../../vfx.js';
+} from '../../vfx.ts';
 import { drawBattlefieldScene } from '../../scene.ts';
 import { gameEvents, TURN_START, TURN_END, ACTION_START, ACTION_END, BATTLE_END, emitGameEvent } from '../../events.ts';
 import { ensureNestedModuleSupport } from '../../utils/dummy.js';
