@@ -115,32 +115,28 @@ declare module './meta.ts' {
   export function initialRageFor(unitId: UnitId, options?: InitialRageOptions): number;
 }
 
-declare module './vfx.js' {
-  import type { SessionState } from '@types/combat';
-  import type { Side, UnitToken } from '@types/units';
+declare module './vfx.ts' {
+  export type {
+    SessionWithVfx,
+    VfxEvent,
+    VfxEventList,
+    BloodPulseOptions,
+    LightningArcOptions,
+    ShieldWrapOptions,
+    GroundBurstOptions,
+  } from '../src/vfx.ts';
 
-  type SessionWithVfx = SessionState & { vfx?: Array<Record<string, unknown>> | undefined };
-
-  export interface BloodPulseOptions {
-    busyMs?: number;
-    anchorId?: string;
-    bindingKey?: string;
-    timing?: number | string;
-    ambientKey?: string;
-    anchorRadius?: number;
-    color?: string;
-    rings?: number;
-    maxScale?: number;
-    alpha?: number;
-  }
-
-  export function vfxAddSpawn(Game: SessionWithVfx, cx: number, cy: number, side: Side): void;
-  export function vfxAddBloodPulse(
-    Game: SessionWithVfx,
-    source: UnitToken | null | undefined,
-    opts?: BloodPulseOptions,
-  ): number;
-}
+  export {
+    vfxAddSpawn,
+    vfxAddBloodPulse,
+    vfxAddHit,
+    vfxAddMelee,
+    vfxAddTracer,
+    vfxAddLightningArc,
+    vfxAddShieldWrap,
+    vfxAddGroundBurst,
+    vfxDraw,
+  } from '../src/vfx.ts';
 
 declare module './art.ts' {
   export interface UnitArtInstance extends Record<string, unknown> {
