@@ -83,9 +83,15 @@ export interface QueuedSummonRequest {
   source?: string;
 }
 
+export type SummonQueue = Map<number, QueuedSummonRequest>;
+
+export function createSummonQueue(): SummonQueue {
+  return new Map<number, QueuedSummonRequest>();
+}
+
 export interface QueuedSummonState {
-  ally: Map<number, QueuedSummonRequest>;
-  enemy: Map<number, QueuedSummonRequest>;
+  ally: SummonQueue;
+  enemy: SummonQueue;
 }
 
 export interface ActionChainEntry {

@@ -143,6 +143,8 @@ export interface AiCard extends AiDeckCard {
 
 export type AiCardDeck = AiCard[];
 
+export type AiDeckPool = AiCardDeck | ReadonlyArray<AiDeckEntry>;
+
 export interface PveDeckEntry {
   id: UnitId;
   cost?: number | null;
@@ -161,9 +163,9 @@ export interface SessionAIState {
   costCap: number;
   summoned: number;
   summonLimit: number;
-  unitsAll: ReadonlyArray<PveDeckEntry>;
+  unitsAll: AiDeckPool;
   usedUnitIds: Set<UnitId>;
-  deck: AiDeckEntry[] | AiCardDeck;
+  deck: AiDeckPool;
   selectedId: UnitId | null;
   lastThinkMs: number;
   lastDecision: Record<string, unknown> | null;
