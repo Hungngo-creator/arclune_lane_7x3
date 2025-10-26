@@ -113,7 +113,7 @@ const stubModules = new Map([
       return { render() {} };
     }
   }],
-  ['./vfx.js', {
+  ['./vfx.ts', {
     vfxDraw() {},
     vfxAddSpawn() {},
     vfxAddHit() {},

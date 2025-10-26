@@ -116,7 +116,7 @@ const stubModules = new Map([
       return initHudCalls;
     }
   `],
-  ['./vfx.js', `
+  ['./vfx.ts', `
     export function vfxAddSpawn() {}
     export function vfxAddHit() {}
     export function vfxAddMelee() {}
