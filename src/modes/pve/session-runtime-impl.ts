@@ -52,10 +52,11 @@ import {
   createSession,
   invalidateSceneCache,
   ensureSceneCache,
-  clearBackgroundSignatureCache
+  clearBackgroundSignatureCache,
+  normalizeDeckEntries,
 } from './session-state.ts';
 
-import type { BattleDetail, BattleResult, BattleState, LeaderSnapshot } from '@types/combat';
+import type { BattleDetail, BattleResult, BattleState, LeaderSnapshot, PveDeckEntry } from '@types/combat';
 import type {
   UnitToken,
   ActionChainEntry,
@@ -97,14 +98,69 @@ type ExtendedQueuedSummon = (QueuedSummonRequest & {
   color?: string | null;
   [extra: string]: unknown;
 }) | null;
-type DeckEntry = {
-  id: string;
-  cost?: number | null;
-  name?: string | null;
-  [extra: string]: unknown;
-};
+type DeckEntry = PveDeckEntry;
 type CameraPreset = { topScale?: number; rowGapRatio?: number; depthScale?: number } | null | undefined;
 type GridSpec = ReturnType<typeof makeGrid>;
+
+const isDeckEntry = (value: unknown): value is DeckEntry => {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as { id?: unknown };
+  return typeof candidate.id === 'string' && candidate.id.trim() !== '';
+};
+
+function assertDeckEntry(value: unknown): asserts value is DeckEntry {
+  if (!isDeckEntry(value)) {
+    throw new TypeError('Thẻ bài không hợp lệ.');
+  }
+}
+
+function asDeckEntry<T>(value: T): DeckEntry {
+  assertDeckEntry(value);
+  return value;
+}
+
+function sanitizeDeckEntries(value: unknown): DeckEntry[] {
+  if (!Array.isArray(value)) return [];
+  let changed = false;
+  const normalized: DeckEntry[] = [];
+  for (const entry of value) {
+    if (isDeckEntry(entry)) {
+      normalized.push(entry);
+    } else {
+      changed = true;
+    }
+  }
+  return changed ? normalized : (value as DeckEntry[]);
+}
+
+function ensureDeck(): DeckEntry[] {
+  if (!Game) return [];
+  const deck = sanitizeDeckEntries(Game.deck3);
+  if (deck !== Game.deck3) {
+    Game.deck3 = deck;
+  }
+  return deck;
+}
+
+function ensureRoster(): ReadonlyArray<DeckEntry> {
+  if (!Game) return [];
+  const roster = sanitizeDeckEntries(Game.unitsAll);
+  if (roster !== Game.unitsAll) {
+    Game.unitsAll = roster;
+  }
+  return Game.unitsAll;
+}
+
+const getCardCost = (card: DeckEntry | null | undefined): number => {
+  if (!card) return 0;
+  const raw = card.cost;
+  if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
+  if (typeof raw === 'string') {
+    const parsed = Number(raw);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+  return 0;
+};
 
 export type PveSessionHandle = {
   start: (startConfig?: PveSessionStartConfig | null) => SessionState | null;
@@ -132,8 +188,8 @@ type BattleFinalizePayload = {
 };
 
 type EnemyAIPreset = {
-  deck?: ReadonlyArray<string>;
-  unitsAll?: ReadonlyArray<string>;
+  deck?: ReadonlyArray<PveDeckEntry>;
+  unitsAll?: ReadonlyArray<PveDeckEntry>;
   costCap?: number;
   summonLimit?: number;
   startingDeck?: ReadonlyArray<UnitToken>;
@@ -1183,16 +1239,15 @@ function init(): boolean {
 
   Game.ui.bar = startSummonBar(doc, {
     onPick: (card): void => {
-      const entry = card as DeckEntry;
+      const entry = asDeckEntry(card);
       Game.selectedId = entry.id;
       renderSummonBar();
     },
     canAfford: (card): boolean => {
-      const entry = card as DeckEntry;
-      const cost = Number.isFinite(entry.cost) ? Number(entry.cost) : 0;
-      return Game.cost >= cost;
+      const entry = asDeckEntry(card);
+      return Game.cost >= getCardCost(entry);
     },
-    getDeck: () => Game.deck3 as DeckEntry[],
+    getDeck: () => ensureDeck(),
     getSelectedId: () => Game.selectedId,
   }, root ?? undefined);
 
@@ -1212,12 +1267,12 @@ function init(): boolean {
 
     if (cell.cx >= CFG.ALLY_COLS) return;
 
-    const deck = Game.deck3 as DeckEntry[];
+    const deck = ensureDeck();
     const card = deck.find((u) => u.id === Game.selectedId) ?? null;
     if (!card) return;
 
     if (cellReserved(tokensAlive(), Game.queued, cell.cx, cell.cy)) return;
-    const cardCost = Number.isFinite(card.cost) ? Number(card.cost) : 0;
+    const cardCost = getCardCost(card);
     if (Game.cost < cardCost) return;
     if (Game.summoned >= Game.summonLimit) return;
 
@@ -1249,7 +1304,7 @@ function init(): boolean {
     Game.summoned += 1;
     Game.usedUnitIds.add(card.id);
 
-    Game.deck3 = Game.deck3.filter((u) => u.id !== card.id);
+    Game.deck3 = deck.filter((u) => u.id !== card.id);
     Game.selectedId = null;
     refillDeck();
     selectFirstAffordable();
@@ -1384,7 +1439,7 @@ function init(): boolean {
 function selectFirstAffordable(): void {
   if (!Game) return;
 
-  const deck = (Array.isArray(Game.deck3) ? Game.deck3 : []) as DeckEntry[];
+  const deck = ensureDeck();
   if (!deck.length){
     Game.selectedId = null;
     return;
@@ -1398,15 +1453,15 @@ function selectFirstAffordable(): void {
   for (const card of deck){
     if (!card) continue;
 
-    const hasFiniteCost = Number.isFinite(card.cost);
-    const cardCost = hasFiniteCost ? card.cost : 0;
+    const rawCost = card.cost;
+    const cardCost = getCardCost(card);
 
     if (cardCost < cheapestOverallCost){
       cheapestOverall = card;
       cheapestOverallCost = cardCost;
     }
 
-    const affordable = !hasFiniteCost || card.cost <= Game.cost;
+    const affordable = !(typeof rawCost === 'number' && Number.isFinite(rawCost)) || cardCost <= Game.cost;
     if (affordable && cardCost < cheapestAffordableCost){
       cheapestAffordable = card;
       cheapestAffordableCost = cardCost;
@@ -1421,16 +1476,18 @@ function selectFirstAffordable(): void {
 function refillDeck(): void {
   if (!Game) return;
 
-  const need = HAND_SIZE - Game.deck3.length;
+  const deck = ensureDeck();
+  const need = HAND_SIZE - deck.length;
   if (need <= 0) return;
 
   const exclude = new Set([
     ...Game.usedUnitIds,
-    ...Game.deck3.map(u=>u.id)
+    ...deck.map((u) => u.id)
   ]);
-  const more = pickRandom(Game.unitsAll as ReadonlyArray<DeckEntry>, exclude).slice(0, need);
-  const deck = Game.deck3 as DeckEntry[];
+  const roster = ensureRoster();
+  const more = pickRandom(roster, exclude).slice(0, need);
   deck.push(...more);
+  Game.deck3 = deck;
 }
 
 /* ---------- Vẽ ---------- */
@@ -1833,13 +1890,18 @@ function applyConfigToRunningGame(cfg: NormalizedSessionConfig): void {
   if (typeof cfg.modeKey !== 'undefined'){
     Game.modeKey = typeof cfg.modeKey === 'string' ? cfg.modeKey : (cfg.modeKey || null);
   }
-  if (Array.isArray(cfg.deck) && cfg.deck.length) Game.unitsAll = cfg.deck;
+  if (Array.isArray(cfg.deck) && cfg.deck.length) {
+    const deck = normalizeDeckEntries(cfg.deck);
+    if (deck.length) Game.unitsAll = deck;
+  }
   if (cfg.aiPreset){
     const preset: EnemyAIPreset = cfg.aiPreset || {};
     if (Array.isArray(preset.deck) && preset.deck.length){
-      Game.ai.unitsAll = preset.deck;
+      const enemyDeck = normalizeDeckEntries(preset.deck);
+      if (enemyDeck.length) Game.ai.unitsAll = enemyDeck;
     } else if (Array.isArray(preset.unitsAll) && preset.unitsAll.length){
-      Game.ai.unitsAll = preset.unitsAll;
+      const enemyPool = normalizeDeckEntries(preset.unitsAll);
+      if (enemyPool.length) Game.ai.unitsAll = enemyPool;
     }
     if (Number.isFinite(preset.costCap)) Game.ai.costCap = preset.costCap;
     if (Number.isFinite(preset.summonLimit)) Game.ai.summonLimit = preset.summonLimit;

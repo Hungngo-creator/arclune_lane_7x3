@@ -4,22 +4,28 @@ import type { TurnSnapshot } from '@types/turn-order';
 import type { QueuedSummonState, ActionChainEntry, QueuedSummonRequest, UnitId } from '@types/units';
 
 import { CFG } from '../../config.ts';
-import { UNITS } from '../../units.ts';
+import { UNITS, lookupUnit } from '../../units.ts';
 import { Meta } from '../../meta.ts';
 import { gameEvents } from '../../events.ts';
 import { getEnvironmentBackground, drawEnvironmentProps } from '../../background.ts';
 import { getCachedBattlefieldScene } from '../../scene.ts';
 import { Statuses } from '../../statuses.ts';
+import { getUnitArt } from '../../art.ts';
 
 void Statuses;
 
 type SceneConfigWithExtras = (SceneConfig & { CURRENT_BACKGROUND?: string | null | undefined }) | null;
 
-const DEFAULT_UNIT_ROSTER = UNITS.map((unit) => ({
-  id: unit.id,
-  name: unit.name,
-  cost: unit.cost,
-})) satisfies ReadonlyArray<SessionState['unitsAll'][number]>;
+const DEFAULT_UNIT_ROSTER = UNITS.map((unit) => {
+  const art = getUnitArt(unit.id);
+  return {
+    id: unit.id,
+    name: unit.name,
+    cost: Number.isFinite(unit.cost) ? unit.cost : null,
+    art,
+    skinKey: art?.skinKey ?? null,
+  } satisfies SessionState['unitsAll'][number];
+}) as ReadonlyArray<SessionState['unitsAll'][number]>;
 
 type SessionConfigInput = Partial<CreateSessionOptions> & {
   scene?: {
@@ -242,6 +248,15 @@ export function normalizeConfig(input: SessionConfigInput = {}): NormalizedSessi
   if (typeof out.backgroundKey === 'undefined') {
     if (typeof sceneConfig.backgroundKey === 'string') out.backgroundKey = sceneConfig.backgroundKey;
     else if (typeof sceneConfig.background === 'string') out.backgroundKey = sceneConfig.background;
+  }
+  if (Array.isArray(out.deck)) {
+    out.deck = normalizeDeckEntries(out.deck);
+  }
+  if (out.aiPreset) {
+    const preset = { ...out.aiPreset };
+    if (Array.isArray(preset.deck)) preset.deck = normalizeDeckEntries(preset.deck);
+    if (Array.isArray(preset.unitsAll)) preset.unitsAll = normalizeDeckEntries(preset.unitsAll);
+    out.aiPreset = preset;
   }
   return out;
 }
@@ -515,3 +530,63 @@ export function ensureSceneCache(args: EnsureSceneCacheArgs): SceneCacheEntry | 
 }
 
 export { backgroundSignatureCache as __backgroundSignatureCache };
+function toFiniteCost(value: unknown): number | null {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null;
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+}
+
+function makeDeckEntrySkeleton(unitId: string): SessionState['unitsAll'][number] {
+  const unitDef = lookupUnit(unitId);
+  const art = getUnitArt(unitId);
+  return {
+    id: unitId,
+    cost: toFiniteCost(unitDef?.cost) ?? null,
+    name: typeof unitDef?.name === 'string' ? unitDef.name : null,
+    art,
+    skinKey: art?.skinKey ?? null,
+  } satisfies SessionState['unitsAll'][number];
+}
+
+function normalizeDeckEntry(entry: unknown): SessionState['unitsAll'][number] | null {
+  if (!entry) return null;
+  if (typeof entry === 'string') {
+    return makeDeckEntrySkeleton(entry);
+  }
+  if (typeof entry !== 'object') return null;
+  const candidate = entry as Record<string, unknown>;
+  const idRaw = candidate.id;
+  if (typeof idRaw !== 'string' || idRaw.trim() === '') return null;
+  const skeleton = makeDeckEntrySkeleton(idRaw);
+  const merged = { ...skeleton, ...(candidate as SessionState['unitsAll'][number]), id: idRaw };
+  const costOverride = toFiniteCost(candidate.cost);
+  merged.cost = costOverride ?? skeleton.cost ?? null;
+  const nameCandidate = candidate.name;
+  if (typeof nameCandidate === 'string' && nameCandidate.trim() !== '') {
+    merged.name = nameCandidate;
+  } else if (merged.name == null) {
+    merged.name = skeleton.name ?? null;
+  }
+  if (merged.art == null) {
+    merged.art = skeleton.art ?? null;
+  }
+  if (typeof merged.skinKey === 'string') {
+    merged.skinKey = merged.skinKey.trim() !== '' ? merged.skinKey : merged.art?.skinKey ?? skeleton.skinKey ?? null;
+  } else {
+    merged.skinKey = merged.art?.skinKey ?? skeleton.skinKey ?? null;
+  }
+  return merged;
+}
+
+export function normalizeDeckEntries(value: unknown): SessionState['unitsAll'] {
+  if (!Array.isArray(value)) return [];
+  const normalized: SessionState['unitsAll'][number][] = [];
+  for (const item of value) {
+    const entry = normalizeDeckEntry(item);
+    if (entry) normalized.push(entry);
+  }
+  return normalized as SessionState['unitsAll'];
+}
