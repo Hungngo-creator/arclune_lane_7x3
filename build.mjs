@@ -17,13 +17,33 @@ const DIST_DIR = path.join(__dirname, 'dist');
 const ENTRY_ID = './entry.ts';
 const SOURCE_EXTENSIONS = ['.js', '.ts', '.tsx', '.json'];
 const SCRIPT_EXTENSIONS = new Set(['.js', '.ts', '.tsx']);
-const LEGACY_MODULE_ID_ALIASES = new Map([
-  ['./modes/pve/session.js', './modes/pve/session.ts'],
+function normalizeModuleId(id){
+  if (!id){
+    return id;
+  }
+  if (path.isAbsolute(id)){
+    const rel = path.relative(SRC_DIR, id);
+    if (!rel.startsWith('..')){
+      return `./${rel.split(path.sep).join('/')}`;
+    }
+    return id.replace(/\\/g, '/');
+  }
+  return id.replace(/\\/g, '/');
+}
+
+const LEGACY_MODULE_ID_ALIAS_ENTRIES = [
+  ['./catalog.js', './catalog.ts'],
+  ['./entry.js', './entry.ts'],
+  ['./meta.js', './meta.ts'],
   ['./modes/coming-soon.stub.js', './modes/coming-soon.stub.ts'],
+  ['./modes/pve/session.js', './modes/pve/session.ts'],
   ['./screens/collection/index.js', './screens/collection/index.ts'],
   ['./screens/lineup/index.js', './screens/lineup/index.ts'],
-  ['./entry.js', './entry.ts'],
-]);
+ ];
+
+const LEGACY_MODULE_ID_ALIASES = new Map(
+  LEGACY_MODULE_ID_ALIAS_ENTRIES.map(([fromId, toId]) => [normalizeModuleId(fromId), normalizeModuleId(toId)])
+);
 
 const args = process.argv.slice(2);
 const modeArg = args.find((arg) => arg.startsWith('--mode='));
@@ -68,14 +88,14 @@ function resolveAlias(specifier){
         const candidate = path.join(replacement, suffix);
         const resolved = resolveWithExtensions(candidate);
         if (resolved){
-          return resolved;
+          return toModuleId(resolved);
         }
       }
     } else if (specifier === find){
       for (const replacement of replacements){
         const resolved = resolveWithExtensions(replacement);
         if (resolved){
-          return resolved;
+          return toModuleId(resolved);
         }
       }
     }
@@ -84,7 +104,20 @@ function resolveAlias(specifier){
 }
 
 function applyLegacyModuleAlias(moduleId){
-  return LEGACY_MODULE_ID_ALIASES.get(moduleId) ?? moduleId;
+  const normalized = normalizeModuleId(moduleId);
+  return LEGACY_MODULE_ID_ALIASES.get(normalized) ?? normalized;
+}
+
+function registerLegacyModuleAlias(fromId, toId, { override = true } = {}){
+  const normalizedFrom = normalizeModuleId(fromId);
+  const normalizedTo = normalizeModuleId(toId);
+  if (!normalizedFrom || !normalizedTo || normalizedFrom === normalizedTo){
+    return;
+  }
+  if (!override && LEGACY_MODULE_ID_ALIASES.has(normalizedFrom)){
+    return;
+  }
+  LEGACY_MODULE_ID_ALIASES.set(normalizedFrom, normalizedTo);
 }
 
 function resolveWithExtensions(basePath){
@@ -153,6 +186,17 @@ async function listSourceFiles(){
   }
   await walk(SRC_DIR);
   return files.sort();
+}
+
+function syncLegacyModuleAliases(files){
+  for (const file of files){
+    const ext = path.extname(file);
+    if (ext === '.ts' || ext === '.tsx'){
+      const moduleId = toModuleId(file);
+      const jsModuleId = moduleId.replace(/\.tsx?$/, '.js');
+      registerLegacyModuleAlias(jsModuleId, moduleId, { override: false });
+    }
+  }
 }
 
 function splitImportClause(clause){
@@ -402,6 +446,7 @@ function indent(code, spaces = 2){
 
 async function build(){
   const files = await listSourceFiles();
+  syncLegacyModuleAliases(files);
   const modules = [];
   for (const file of files){
     const id = toModuleId(file);
