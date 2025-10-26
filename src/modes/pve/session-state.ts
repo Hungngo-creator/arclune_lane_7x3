@@ -1,5 +1,13 @@
 import type { CreateSessionOptions, SessionState } from '@types/pve';
-import type { CameraPreset, GameConfig, SceneConfig } from '@types/config';
+import type {
+  CameraPreset,
+  GameConfig,
+  SceneConfig,
+  TurnOrderPairScanEntry,
+  TurnOrderPairScanSideObject,
+  TurnOrderPairScanSlotObject,
+  TurnOrderSide,
+} from '@types/config';
 import type { TurnSnapshot } from '@types/turn-order';
 import type { QueuedSummonState, ActionChainEntry, QueuedSummonRequest, UnitId } from '@types/units';
 
@@ -61,7 +69,7 @@ function getSceneConfig(cfg: GameConfig | null | undefined): SceneConfigWithExtr
 }
 
 function getTurnOrderMode(cfg: GameConfig): string | null {
-  const rawMode = (cfg.turnOrder as unknown as { mode?: unknown }).mode;
+  const rawMode = cfg.turnOrder.mode ?? null;
   return typeof rawMode === 'string' ? rawMode : null;
 }
 
@@ -261,58 +269,120 @@ export function normalizeConfig(input: SessionConfigInput = {}): NormalizedSessi
   return out;
 }
 
-export function buildTurnOrder(): { order: TurnOrderEntry[]; indexMap: Map<string, number> } {
-  const cfg: GameConfig['turnOrder'] & { sides?: unknown; pairScan?: unknown } = CFG.turnOrder;
-  const rawSides = Array.isArray(cfg.sides) ? cfg.sides : null;
-  const sides = rawSides && rawSides.length
-   ? (rawSides.filter((s: unknown): s is 'ally' | 'enemy' => s === 'ally' || s === 'enemy'))
-    : ['ally', 'enemy'];
-  const order: TurnOrderEntry[] = [];
-  const addPair = (side: unknown, slot: unknown): void => {
-    if (side !== 'ally' && side !== 'enemy') return;
-    const num = Number(slot);
-    if (!Number.isFinite(num)) return;
-    const safeSlot = Math.max(1, Math.min(9, Math.round(num)));
-    order.push({ side, slot: safeSlot });
-  };
-  const appendSlots = (slot: unknown): void => {
-    for (const side of sides) {
-      addPair(side, slot);
-    }
-  };
+function isTurnOrderSide(value: unknown): value is TurnOrderSide {
+  return value === 'ally' || value === 'enemy';
+}
 
-  const scan = Array.isArray(cfg.pairScan) ? (cfg.pairScan as unknown[]) : null;
-  if (scan && scan.length) {
-    for (const entry of scan) {
-      if (typeof entry === 'number') {
-        appendSlots(entry);
-        continue;
-      }
-      if (Array.isArray(entry)) {
-        if (entry.length === 2 && typeof entry[0] === 'string' && Number.isFinite(entry[1])) {
-          addPair(entry[0] === 'enemy' ? 'enemy' : 'ally', entry[1]);
-        } else {
-          for (const val of entry) {
-            if (typeof val === 'number') appendSlots(val);
-          }
-        }
-        continue;
-      }
-      if (entry && typeof entry === 'object') {
-        const candidate = entry as { side?: string; slot?: unknown; s?: unknown; index?: unknown };
-        const slot = Number(candidate.slot ?? candidate.s ?? candidate.index);
-        if (typeof candidate.side === 'string' && Number.isFinite(slot)) {
-          addPair(candidate.side === 'enemy' ? 'enemy' : 'ally', slot);
-        } else if (Number.isFinite(slot)) {
-          appendSlots(slot);
-        }
-      }
+function isPairScanTuple(entry: readonly unknown[]): entry is readonly [string, number] {
+  return entry.length === 2 && typeof entry[0] === 'string' && Number.isFinite(entry[1]);
+}
+
+function hasSlotKey(value: { slot?: unknown; s?: unknown; index?: unknown }): boolean {
+  return 'slot' in value || 's' in value || 'index' in value;
+}
+
+function isPairScanObject(
+  entry: unknown,
+): entry is TurnOrderPairScanSideObject | TurnOrderPairScanSlotObject {
+  if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return false;
+  const candidate = entry as { slot?: unknown; s?: unknown; index?: unknown };
+  return hasSlotKey(candidate);
+}
+
+function isPairScanObjectWithSide(entry: unknown): entry is TurnOrderPairScanSideObject {
+  if (!isPairScanObject(entry)) return false;
+  const candidate = entry as { side?: unknown };
+  return typeof candidate.side === 'string';
+}
+
+function isPairScanObjectWithoutSide(entry: unknown): entry is TurnOrderPairScanSlotObject {
+  if (!isPairScanObject(entry)) return false;
+  const candidate = entry as { side?: unknown };
+  return typeof candidate.side !== 'string';
+}
+
+function parseSlotValue(entry: TurnOrderPairScanSideObject | TurnOrderPairScanSlotObject): number | null {
+  const raw = entry.slot ?? entry.s ?? entry.index;
+  if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
+  if (typeof raw === 'string') {
+    const parsed = Number(raw);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+}
+
+function clampTurnOrderSlot(slot: number): number {
+  const rounded = Math.round(slot);
+  return Math.max(1, Math.min(9, rounded));
+}
+
+function normalizePairScanEntry(
+  entry: TurnOrderPairScanEntry,
+  sides: readonly TurnOrderSide[],
+): TurnOrderEntry[] {
+  const normalized: TurnOrderEntry[] = [];
+  const pushPair = (side: TurnOrderSide, slot: number): void => {
+    normalized.push({ side, slot: clampTurnOrderSlot(slot) });
+  };
+const pushForSides = (slot: number, targetSides?: readonly TurnOrderSide[]): void => {
+    const resolvedSides = targetSides && targetSides.length ? targetSides : sides;
+    for (const side of resolvedSides) {
+      pushPair(side, slot);
     }
+};
+
+if (typeof entry === 'number') {
+    if (Number.isFinite(entry)) pushForSides(entry);
+    return normalized;
   }
 
-  if (!order.length) {
-    const fallback = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-    for (const slot of fallback) appendSlots(slot);
+  if (Array.isArray(entry)) {
+    if (isPairScanTuple(entry)) {
+      const [, slot] = entry;
+      const side = entry[0] === 'enemy' ? 'enemy' : 'ally';
+      pushPair(side, slot);
+      return normalized;
+    }
+    for (const value of entry) {
+      if (typeof value === 'number' && Number.isFinite(value)) pushForSides(value);
+    }
+    return normalized;
+  }
+
+  if (isPairScanObjectWithSide(entry)) {
+    const slot = parseSlotValue(entry);
+    if (slot !== null) {
+      const side = entry.side === 'enemy' ? 'enemy' : 'ally';
+      pushPair(side, slot);
+    }
+    return normalized;
+  }
+
+  if (isPairScanObjectWithoutSide(entry)) {
+    const slot = parseSlotValue(entry);
+    if (slot !== null) pushForSides(slot);
+  }
+
+  return normalized;
+}
+
+export function buildTurnOrder(): { order: TurnOrderEntry[]; indexMap: Map<string, number> } {
+  const cfg = CFG.turnOrder;
+  const rawSides = Array.isArray(cfg.sides) ? cfg.sides : null;
+  const sides = rawSides && rawSides.length
+    ? rawSides.filter((side): side is TurnOrderSide => isTurnOrderSide(side))
+    : (['ally', 'enemy'] as const satisfies ReadonlyArray<TurnOrderSide>);
+  const order: TurnOrderEntry[] = [];
+  const scan = Array.isArray(cfg.pairScan) ? cfg.pairScan : [];
+  for (const entry of scan) {
+    const normalized = normalizePairScanEntry(entry, sides);
+    if (normalized.length) order.push(...normalized);
+  }
+    if (!order.length) {
+      const fallback = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
+    for (const slot of fallback) {
+      order.push(...normalizePairScanEntry(slot, sides));
+    }
   }
 
   const indexMap = new Map<string, number>();
