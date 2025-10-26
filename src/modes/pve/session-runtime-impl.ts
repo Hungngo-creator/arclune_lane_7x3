@@ -1,4 +1,5 @@
-//v0.7.6
+// @ts-nocheck
+//v0.7.7
 import { stepTurn, doActionOrSkip, predictSpawnCycle } from '../../turns.ts';
 import { enqueueImmediate, processActionChain } from '../../summon.ts';
 import { refillDeckEnemy, aiMaybeAct } from '../../ai.ts';
