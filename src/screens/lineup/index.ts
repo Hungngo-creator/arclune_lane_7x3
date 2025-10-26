@@ -1,4 +1,5 @@
-import { renderLineupView, type LineupViewHandle } from './view/index.ts';
+import { renderLineupView } from './view/index.ts';
+import type { LineupViewHandle } from './view/index.ts';
 
 type UnknownRecord = Record<string, unknown>;
 
