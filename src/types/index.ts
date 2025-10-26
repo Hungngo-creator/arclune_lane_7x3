@@ -1,6 +1,8 @@
 export type * from './units';
 export type * from './art';
 export type {
+  AiCard,
+  AiCardDeck,
   StatusEffect,
   StatusLifecyclePayload,
   StatusDefinition,

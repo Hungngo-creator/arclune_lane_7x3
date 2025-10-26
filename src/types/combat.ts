@@ -5,6 +5,7 @@ import type {
   UnitId,
   UnitToken,
 } from './units';
+import type { RosterUnitDefinition } from './config';
 import type { TurnSnapshot } from './turn-order';
 import type { RngState } from './rng';
 import type { TelemetryEvent } from './telemetry';
@@ -134,6 +135,12 @@ export interface AiDeckCard {
 
 export type AiDeckEntry = UnitId | AiDeckCard | UnitToken;
 
+export interface AiCard extends AiDeckCard {
+  cost: number;
+}
+
+export type AiCardDeck = AiCard[];
+
 export type SessionRosterEntry = AiDeckEntry;
 
 export type SessionRoster = ReadonlyArray<SessionRosterEntry>;
@@ -145,7 +152,7 @@ export interface SessionAIState {
   summonLimit: number;
   unitsAll: SessionRoster;
   usedUnitIds: Set<UnitId>;
-  deck: AiDeckEntry[];
+  deck: AiDeckEntry[] | AiCardDeck;
   selectedId: UnitId | null;
   lastThinkMs: number;
   lastDecision: Record<string, unknown> | null;
@@ -174,7 +181,7 @@ export interface SessionState {
   battle: BattleState;
   result: BattleResult | null;
   ai: SessionAIState;
-  meta: { get(id: UnitId): Record<string, unknown> | null; [extra: string]: unknown };
+  meta: { get(id: UnitId): RosterUnitDefinition | null | undefined; [extra: string]: unknown };
   rng?: RngState;
   telemetryLog?: TelemetryEvent[];
   [extra: string]: unknown;
