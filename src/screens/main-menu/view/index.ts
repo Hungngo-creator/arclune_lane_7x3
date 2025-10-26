@@ -67,3 +67,11 @@ export function renderMainMenuView(state: MainMenuState): RenderedMainMenu | nul
     }
   };
 }
+
+export {
+  ensureStyles,
+  createHeader,
+  createHeroSection,
+  createModesSection,
+  createSidebar
+} from './layout.ts';

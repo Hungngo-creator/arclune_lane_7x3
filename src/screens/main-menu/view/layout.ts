@@ -1,6 +1,7 @@
 import { getAllSidebarAnnouncements } from '../../../../data/announcements.ts';
 import { ensureStyleTag } from '../../../../ui/dom.ts';
 import { getHeroDialogue, getHeroHotspots, getHeroProfile, HERO_DEFAULT_ID } from '../dialogues.ts';
+import type { AnnouncementEntry } from '../../../../types/config.ts';
 import type {
   CleanupRegistrar,
   ComingSoonHandler,
@@ -368,33 +369,22 @@ interface SidebarOptions {
   addCleanup: CleanupRegistrar;
 }
 
-type SidebarAnnouncementEntry = {
-  id?: string | null;
-  title?: string | null;
-  shortDescription?: string | null;
-  tooltip?: string | null;
-  rewardCallout?: string | null;
-  translationKey?: string | null;
-  startAt?: string | null;
-  endAt?: string | null;
-};
-
 type SidebarAnnouncement = {
   key: string;
   label: string;
-  entry: SidebarAnnouncementEntry | null;
+  entry: AnnouncementEntry;
 };
 
 export function createSidebar(options: SidebarOptions): HTMLElement {
   const { shell, addCleanup } = options;
   const aside = document.createElement('aside');
   aside.className = 'main-menu-sidebar';
-  const announcements = getAllSidebarAnnouncements() as ReadonlyArray<SidebarAnnouncement>;
+  const announcements: ReadonlyArray<SidebarAnnouncement> = getAllSidebarAnnouncements();
 
-  const attachTooltipHandlers = (element: HTMLElement | null, info: { slotKey: string; entry: SidebarAnnouncementEntry } | null) => {
+  const attachTooltipHandlers = (element: HTMLElement | null, info: { slotKey: string; entry: AnnouncementEntry } | null) => {
     if (!element || !info) return;
     const { slotKey, entry } = info;
-    if (!slotKey || !entry) return;
+    if (!slotKey) return;
     if (!shell || typeof shell.showTooltip !== 'function') return;
 
     const showTooltip = () => {
@@ -428,9 +418,8 @@ export function createSidebar(options: SidebarOptions): HTMLElement {
     });
   };
 
- announcements.forEach(item => {
+  announcements.forEach(item => {
     const { key, label, entry } = item;
-    if (!entry) return;
     const card = document.createElement('div');
     card.className = 'sidebar-slot';
     card.dataset.slot = key;
