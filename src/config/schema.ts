@@ -40,9 +40,26 @@ const FuryConfigSchema = z.object({
 });
 export type FuryConfig = z.infer<typeof FuryConfigSchema>;
 
+const TurnOrderSlotValueSchema = z.union([z.number(), z.string()]);
+
+const TurnOrderPairScanObjectSchema = z.object({
+  side: SideSchema.optional(),
+  slot: TurnOrderSlotValueSchema.optional(),
+  s: TurnOrderSlotValueSchema.optional(),
+  index: TurnOrderSlotValueSchema.optional()
+});
+
+const TurnOrderPairScanEntrySchema = z.union([
+  z.number(),
+  z.array(z.number()),
+  z.tuple([SideSchema, z.number()]),
+  TurnOrderPairScanObjectSchema
+]);
+
 const TurnOrderConfigSchema = z.object({
-  pairScan: z.array(z.number()),
-  sides: z.array(SideSchema)
+  mode: z.string().optional(),
+  pairScan: z.array(TurnOrderPairScanEntrySchema).optional(),
+  sides: z.array(SideSchema).optional()
 });
 export type TurnOrderConfig = z.infer<typeof TurnOrderConfigSchema>;
 
