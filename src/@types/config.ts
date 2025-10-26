@@ -6,6 +6,12 @@ export type {
   CameraPreset,
   ChibiProportions,
   GameConfig,
+  GameTurnOrderConfig,
   SceneTheme,
   FuryConfig,
+  TurnOrderConfigDetails,
+  TurnOrderPairScanEntry,
+  TurnOrderPairScanSideObject,
+  TurnOrderPairScanSlotObject,
+  TurnOrderSide,
 } from '../types/config.ts';
