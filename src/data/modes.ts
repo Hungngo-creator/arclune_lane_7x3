@@ -157,7 +157,7 @@ const MODES = [
     menuSections: ['economy'],
     shell: {
       screenId: 'lineup',
-      moduleId: './screens/lineup/index.js',
+      moduleId: './screens/lineup/index.ts',
       defaultParams: {
         shortDescription: 'Theo dõi đội hình đề xuất và cấu trúc tổ đội tối ưu cho từng mục tiêu.',
         lineups: [
