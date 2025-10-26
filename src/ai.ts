@@ -5,9 +5,10 @@ import { safeNow as sharedSafeNow } from './utils/time.ts';
 import { detectUltBehavior, getSummonSpec, resolveSummonSlots } from './utils/kit.ts';
 import { lookupUnit } from './units.ts';
 
-import type { AiCard, AiCardDeck, SessionState } from './types/combat.ts';
+import type { AiCard, AiCardDeck, AiDeckEntry, AiDeckPool, SessionState } from './types/combat.ts';
 import type { RosterUnitDefinition } from './types/config.ts';
-import type { QueuedSummonRequest, UnitId, UnitToken } from './types/units.ts';
+import { createSummonQueue } from './types/units.ts';
+import type { SummonQueue, UnitId, UnitToken } from './types/units.ts';
 
 type CandidateCell = { s: number; cx: number; cy: number };
 type WeightKey =
@@ -107,7 +108,7 @@ const DEFAULT_WEIGHTS = Object.freeze({
 
 const DEFAULT_DEBUG_KEEP = 6;
 
-const tokensAlive = (Game: SessionState): UnitToken[] => Game.tokens.filter((t) => t.alive);
+const tokensAlive = (Game: SessionState): ReadonlyArray<UnitToken> => Game.tokens.filter((t) => t.alive);
 
 function mergedWeights(): Record<string, number> {
   const cfg = CFG.AI?.WEIGHTS ?? {};
@@ -162,21 +163,22 @@ function isAiCard(value: unknown): value is AiCard {
   return typeof candidate.id === 'string' && candidate.id !== '' && typeof candidate.cost === 'number' && Number.isFinite(candidate.cost);
 }
 
-function toAiCard(entry: unknown): AiCard | null {
-  if (isAiCard(entry)) {
-    return { ...(entry as AiCard) };
-  }
+function normalizeDeckEntry(entry: AiDeckEntry): AiCard | null {
   if (typeof entry === 'string') {
     const def = lookupUnit(entry);
     return def ? { ...def } : null;
   }
+  if (isAiCard(entry)) {
+    const card: AiCard = { ...entry };
+    return card;
+  }
   if (entry && typeof entry === 'object') {
-    const candidate = entry as DeckEntryCandidate;
-    const idRaw = candidate.id;
-    if (typeof idRaw !== 'string' || idRaw.trim() === '') return null;
+    const candidate = entry;
+    const idRaw = typeof candidate.id === 'string' ? candidate.id : null;
+    if (!idRaw || idRaw.trim() === '') return null;
     const def = lookupUnit(idRaw);
     const fallbackCost = def?.cost;
-    const candidateCost = candidate.cost;
+    const candidateCost = 'cost' in candidate ? candidate.cost : undefined;
     const cost =
       typeof candidateCost === 'number' && Number.isFinite(candidateCost)
         ? candidateCost
@@ -184,7 +186,7 @@ function toAiCard(entry: unknown): AiCard | null {
           ? fallbackCost
           : null;
     if (cost === null) return null;
-    const candidateName = candidate.name;
+    const candidateName = 'name' in candidate ? candidate.name : undefined;
     const name =
       typeof candidateName === 'string' && candidateName.trim() !== ''
         ? candidateName
@@ -209,10 +211,10 @@ function toAiCard(entry: unknown): AiCard | null {
 }
 
 function getDeck(Game: SessionState): DeckState {
-  const source = Array.isArray(Game.ai.deck) ? Game.ai.deck : [];
-  const normalized: AiCard[] = [];
+  const source: AiDeckPool = Game.ai.deck;
+  const normalized: DeckState = [];
   for (const entry of source) {
-    const card = toAiCard(entry);
+    const card = normalizeDeckEntry(entry);
     if (card) {
       normalized.push(card);
     }
@@ -340,16 +342,22 @@ function ensureUsedUnitIds(Game: SessionState): Set<UnitId> {
   return Game.ai.usedUnitIds;
 }
 
-function isSummonQueue(value: unknown): value is Map<number, QueuedSummonRequest> {
-  return value instanceof Map;
+function isSummonQueue(value: unknown): value is SummonQueue {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as { set?: unknown; get?: unknown; clear?: unknown };
+  return (
+    typeof candidate.set === 'function' &&
+    typeof candidate.get === 'function' &&
+    typeof candidate.clear === 'function'
+  );
 }
 
-function ensureEnemyQueue(Game: SessionState): Map<number, QueuedSummonRequest> {
+function ensureEnemyQueue(Game: SessionState): SummonQueue {
   const candidate: unknown = Game.queued.enemy;
   if (isSummonQueue(candidate)) {
     return candidate;
   }
-  const created = new Map<number, QueuedSummonRequest>();
+  const created = createSummonQueue();
   Game.queued.enemy = created;
   return created;
 }
@@ -365,11 +373,11 @@ export function refillDeckEnemy(Game: SessionState): void {
   for (const id of usedIds) exclude.add(String(id));
   for (const card of deck) exclude.add(String(card.id));
 
-  const pool = Array.isArray(Game.ai.unitsAll) ? Game.ai.unitsAll : [];
-  const more = pickRandom(pool as readonly unknown[], exclude, handSize).slice(0, need);
-  const normalized: AiCard[] = [];
+  const pool: ReadonlyArray<AiDeckEntry> = Game.ai.unitsAll;
+  const more = pickRandom(pool, exclude, handSize).slice(0, need);
+  const normalized: DeckState = [];
   for (const entry of more) {
-    const card = toAiCard(entry);
+    const card = normalizeDeckEntry(entry);
     if (card) normalized.push(card);
   }
   if (!normalized.length) return;
