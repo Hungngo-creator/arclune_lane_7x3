@@ -6,6 +6,8 @@ import { renderMainMenuView } from '../../src/screens/main-menu/view/index.ts';
 import { renderLineupScreen } from '../../src/screens/lineup/index.ts';
 import { renderCollectionScreen } from '../../src/screens/collection/index.ts';
 import type { MainMenuState, MenuCardMetadata, MenuSection } from '../../src/screens/main-menu/types.ts';
+import type { RosterEntryLite, LineupDefinition } from '../../src/types/lineup.ts';
+import type { LineupCurrencyConfig } from '../../src/types/currency.ts';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -98,6 +100,46 @@ describe('renderLineupScreen', () => {
 
     handle.destroy();
   });
+  
+  it('khởi tạo lineup với roster và currencies typed', () => {
+    const root = document.createElement('div');
+    document.body.appendChild(root);
+
+    const roster: RosterEntryLite[] = [
+      { id: 'alpha', name: 'Alpha', class: 'Mage', rank: 'SR', tags: ['mage'] },
+      { id: 'beta', name: 'Beta', class: 'Warrior', rank: 'R', tags: ['warrior'] },
+    ];
+    const lineups: LineupDefinition[] = [
+      {
+        id: 'lineup-1',
+        name: 'Đội hình mẫu',
+        members: ['alpha', 'beta'],
+        passives: [
+          { id: 'passive-1', name: 'Chiến thuật', description: 'Tăng sát thương 10%.', autoActive: true },
+        ],
+      },
+    ];
+    const currencies: LineupCurrencyConfig = {
+      balances: { VNT: 5000 },
+      premium: { id: 'premium', balance: 15 },
+    };
+
+    const handle = renderLineupScreen({
+      root,
+      definition: {
+        label: 'Đội hình typed',
+        params: { roster, lineups, currencies },
+      },
+      params: {
+        playerState: { currencies: { VNT: 4200, premium: { id: 'premium', balance: 20 } } },
+      },
+    });
+
+    expect(root.querySelector('.lineup-view')).not.toBeNull();
+    expect(root.querySelector('.lineup-wallet__balance')?.textContent).toContain('VNT');
+
+    handle.destroy();
+  });
 });
 
 describe('renderCollectionScreen', () => {
@@ -123,6 +165,34 @@ describe('renderCollectionScreen', () => {
 
     exitButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(enterScreen).toHaveBeenCalledWith('main-menu');
+
+    handle.destroy();
+  });
+
+  it('hỗ trợ truyền roster và currencies đã gõ kiểu', () => {
+    const root = document.createElement('div');
+    document.body.appendChild(root);
+
+    const roster: RosterEntryLite[] = [
+      { id: 'gamma', name: 'Gamma', class: 'Support', rank: 'SSR', tags: ['support'], passives: [] },
+    ];
+    const currencies: LineupCurrencyConfig = {
+      balances: { VNT: 12345 },
+      essence: { id: 'essence', balance: 12 },
+    };
+
+    const handle = renderCollectionScreen({
+      root,
+      params: {
+        roster,
+        currencies,
+        playerState: { currencies: { VNT: 67890 } },
+      },
+    });
+
+    expect(root.querySelector('.collection-view')).not.toBeNull();
+    const walletItems = root.querySelectorAll('.collection-wallet__item');
+    expect(walletItems.length).toBeGreaterThan(0);
 
     handle.destroy();
   });
