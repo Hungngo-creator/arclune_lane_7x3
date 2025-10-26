@@ -3,8 +3,8 @@
 // 1) Rank multiplier (đơn giản) — áp lên TẤT CẢ stat trừ SPD
 import { kitSupportsSummon } from './utils/kit.ts';
 
-import type { CatalogStatBlock, RosterUnitDefinition } from './@types/config.ts';
-import type { UnitId } from './@types/units.ts';
+import type { CatalogStatBlock, RosterUnitDefinition } from '@types/config';
+import type { UnitId } from '@types/units';
 import type { UnknownRecord } from './types/common.ts';
 
 export interface RosterKitDefinition extends UnknownRecord {
