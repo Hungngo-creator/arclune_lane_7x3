@@ -14,6 +14,10 @@ const PRIME_PITY: PityConfiguration | null = getPityConfig('PRIME');
 const LOTTERY_SPLIT: LotterySplit = getLotterySplit();
 const BASE_TAX_RATE = getShopTaxRate('N');
 const TOP_TAX_RATE = getShopTaxRate('PRIME');
+const PVE_SESSION_MODULE_ID = './modes/pve/session.ts' as const;
+const COMING_SOON_MODULE_ID = './modes/coming-soon.stub.ts' as const;
+const LINEUP_SCREEN_MODULE_ID = './screens/lineup/index.ts' as const;
+const COLLECTION_SCREEN_MODULE_ID = './screens/collection/index.ts' as const;
 
 const MODE_TYPES = {
   PVE: 'PvE',
@@ -61,7 +65,7 @@ const MODES = [
     parentId: 'arena-hub',
     shell: {
       screenId: 'pve-session',
-      moduleId: './modes/pve/session.ts',
+      moduleId: PVE_SESSION_MODULE_ID,
       defaultParams: { modeKey: 'campaign' }
     }
   },
@@ -78,7 +82,7 @@ const MODES = [
     parentId: 'arena-hub',
     shell: {
       screenId: 'pve-session',
-      moduleId: './modes/pve/session.ts',
+      moduleId: PVE_SESSION_MODULE_ID,
       defaultParams: { modeKey: 'challenge' }
     }
   },
@@ -95,7 +99,7 @@ const MODES = [
     parentId: 'arena-hub',
     shell: {
       screenId: 'pve-session',
-      moduleId: './modes/pve/session.ts',
+      moduleId: PVE_SESSION_MODULE_ID,
       defaultParams: { modeKey: 'arena' }
     }
   },
@@ -112,7 +116,7 @@ const MODES = [
     parentId: 'arena-hub',
     shell: {
       screenId: 'main-menu',
-      fallbackModuleId: './modes/coming-soon.stub.ts'
+      fallbackModuleId: COMING_SOON_MODULE_ID
     }
   },
   {
@@ -127,7 +131,7 @@ const MODES = [
     menuSections: ['economy'],
     shell: {
       screenId: 'main-menu',
-      fallbackModuleId: './modes/coming-soon.stub.ts'
+      fallbackModuleId: COMING_SOON_MODULE_ID
     }
   },
   {
@@ -142,7 +146,7 @@ const MODES = [
     menuSections: ['economy'],
     shell: {
       screenId: 'main-menu',
-      fallbackModuleId: './modes/coming-soon.stub.ts'
+      fallbackModuleId: COMING_SOON_MODULE_ID
     }
   },
   {
@@ -157,7 +161,7 @@ const MODES = [
     menuSections: ['economy'],
     shell: {
       screenId: 'lineup',
-      moduleId: './screens/lineup/index.ts',
+      moduleId: LINEUP_SCREEN_MODULE_ID,
       defaultParams: {
         shortDescription: 'Theo dõi đội hình đề xuất và cấu trúc tổ đội tối ưu cho từng mục tiêu.',
         lineups: [
@@ -190,7 +194,7 @@ const MODES = [
     menuSections: ['economy'],
     shell: {
       screenId: 'collection',
-      moduleId: './screens/collection/index.ts'
+      moduleId: COLLECTION_SCREEN_MODULE_ID
     }
   },
   {
@@ -205,7 +209,7 @@ const MODES = [
     menuSections: ['economy'],
     shell: {
       screenId: 'main-menu',
-      fallbackModuleId: './modes/coming-soon.stub.ts'
+      fallbackModuleId: COMING_SOON_MODULE_ID
     }
   },
   {
@@ -220,7 +224,7 @@ const MODES = [
     menuSections: ['economy'],
     shell: {
       screenId: 'main-menu',
-      fallbackModuleId: './modes/coming-soon.stub.ts'
+      fallbackModuleId: COMING_SOON_MODULE_ID
     }
   },
   {
@@ -235,7 +239,7 @@ const MODES = [
     menuSections: ['economy'],
     shell: {
       screenId: 'main-menu',
-      fallbackModuleId: './modes/coming-soon.stub.ts'
+      fallbackModuleId: COMING_SOON_MODULE_ID
     }
   },
   {
@@ -251,7 +255,7 @@ const MODES = [
     parentId: 'arena-hub',
     shell: {
       screenId: 'main-menu',
-      fallbackModuleId: './modes/coming-soon.stub.ts'
+      fallbackModuleId: COMING_SOON_MODULE_ID
     }
   }
 ] satisfies ReadonlyArray<ModeConfig>;
