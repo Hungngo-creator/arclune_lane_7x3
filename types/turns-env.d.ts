@@ -137,6 +137,7 @@ declare module './vfx.ts' {
     vfxAddGroundBurst,
     vfxDraw,
   } from '../src/vfx.ts';
+}
 
 declare module './art.ts' {
   export interface UnitArtInstance extends Record<string, unknown> {
@@ -294,4 +295,4 @@ declare module './utils/fury.js' {
   export function resolveUltCost(unit: UnitToken | null | undefined, cfg?: GameConfig): number;
   export function setFury(unit: UnitToken | null | undefined, value: number | null | undefined): number;
   export function clearFreshSummon(unit: UnitToken | null | undefined): void;
-}
+ }
