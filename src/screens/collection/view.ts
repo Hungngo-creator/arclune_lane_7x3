@@ -1,7 +1,7 @@
 import { getUnitArt } from '../../art.ts';
 import { listCurrencies } from '../../data/economy.ts';
 import { getSkillSet } from '../../data/skills.ts';
-import { createNumberFormatter } from '../../utils/format.js';
+import { createNumberFormatter } from '../../utils/format.ts';
 import { assertElement, ensureStyleTag, mountSection } from '../../../ui/dom.ts';
 
 import {
