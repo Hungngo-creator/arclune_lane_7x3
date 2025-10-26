@@ -32,7 +32,7 @@ export interface FuryState {
   hitGain: number;
   skillPerTargetGain: number;
   skillDrain: number;
-  turnStamp: number | null;
+  turnStamp: unknown;
   skillTag: string | null;
   freshSummon: boolean;
   lastStart: number;

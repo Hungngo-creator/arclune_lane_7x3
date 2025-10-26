@@ -20,7 +20,7 @@ export interface SummonBarOptions<TCard extends SummonBarCard = SummonBarCard> {
 
 export interface SummonBarHandles {
   render(): void;
-  }
+}
 
 export interface EquipmentLoadout {
   weaponId?: string | null;
