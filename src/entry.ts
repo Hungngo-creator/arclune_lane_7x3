@@ -99,9 +99,9 @@ const SCREEN_MAIN_MENU = 'main-menu';
 const SCREEN_PVE = 'pve-session';
 const SCREEN_COLLECTION = 'collection';
 const SCREEN_LINEUP = 'lineup';
-const COMING_SOON_MODULE_ID = './modes/coming-soon.stub.ts' as const;
-const COLLECTION_SCREEN_MODULE_ID = './screens/collection/index.ts' as const;
-const LINEUP_SCREEN_MODULE_ID = './screens/lineup/index.ts' as const;
+const COMING_SOON_MODULE_ID = '@modes/coming-soon.stub.ts' as const;
+const COLLECTION_SCREEN_MODULE_ID = '@screens/collection/index.ts' as const;
+const LINEUP_SCREEN_MODULE_ID = '@screens/lineup/index.ts' as const;
 const APP_SCREEN_CLASSES = [
   `app--${SCREEN_MAIN_MENU}`,
   `app--${SCREEN_PVE}`,
