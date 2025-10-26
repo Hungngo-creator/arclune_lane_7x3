@@ -1,5 +1,6 @@
 export type * from './units';
 export type * from './art';
+export type * from './lineup';
 export type {
   AiCard,
   AiCardDeck,
