@@ -19,11 +19,11 @@ import type {
 } from './state.ts';
 import { bindLineupEvents } from './events.ts';
 import type { LineupState } from '@types/ui';
+import type { LineupCurrencies } from '../../../types/currency.ts';
+import type { UnknownRecord } from '../../../types/common.ts';
 
 const STYLE_ID = 'lineup-view-style-v1';
 const powerFormatter = createNumberFormatter('vi-VN');
-
-type UnknownRecord = Record<string, unknown>;
 
 function ensureStyles(): void{
   const css = `
@@ -253,7 +253,7 @@ export interface LineupViewOptions {
   lineups?: unknown;
   roster?: unknown;
   playerState?: UnknownRecord | null;
-  currencies?: unknown;
+  currencies?: LineupCurrencies | null;
 }
 
 export interface LineupViewHandle {
