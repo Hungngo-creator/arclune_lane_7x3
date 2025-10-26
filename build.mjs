@@ -62,6 +62,7 @@ const ESBUILD_BASE_OPTIONS = {
   target: ['es2023'],
   sourcemap: MODE === 'production' ? false : true,
   splitting: true,
+  metafile: true,
 };
 
 const TS_CONFIG_PATH = path.join(__dirname, 'tsconfig.base.json');
@@ -448,6 +449,43 @@ function indent(code, spaces = 2){
     .join('\n');
 }
 
+function formatBytes(bytes){
+  if (!Number.isFinite(bytes) || bytes < 0){
+    return `${bytes}`;
+  }
+  const units = ['B', 'KB', 'MB', 'GB'];
+  let index = 0;
+  let value = bytes;
+  while (value >= 1024 && index < units.length - 1){
+    value /= 1024;
+    index += 1;
+  }
+  const display = value >= 10 || index === 0 ? value.toFixed(0) : value.toFixed(1);
+  return `${display} ${units[index]}`;
+}
+
+function logTopBundleSizes(metafile, limit = 5){
+  if (!metafile || !metafile.outputs){
+    return;
+  }
+  const entries = Object.entries(metafile.outputs)
+    .map(([file, info]) => ({
+      file,
+      bytes: typeof info.bytes === 'number' ? info.bytes : info.bytesWritten,
+    }))
+    .filter((item) => typeof item.bytes === 'number' && item.bytes >= 0);
+  if (!entries.length){
+    return;
+  }
+  entries.sort((a, b) => b.bytes - a.bytes);
+  const topEntries = entries.slice(0, limit);
+  const label = MODE === 'production' ? 'Production' : 'Development';
+  console.log(`[${label}] Top bundle size${topEntries.length > 1 ? 's' : ''}:`);
+  for (const { file, bytes } of topEntries){
+    console.log(` - ${file}: ${formatBytes(bytes)} (${bytes} bytes)`);
+  }
+}
+
 async function build(){
   const files = await listSourceFiles();
   syncLegacyModuleAliases(files);
@@ -524,13 +562,27 @@ async function build(){
   parts.push('}');
 
   const output = parts.join('\n') + '\n';
-  const { code: transpiled } = await esbuild.transform(output, {
-    loader: 'js',
-format: ESBUILD_BASE_OPTIONS.format,
+  const result = await esbuild.build({
+    stdin: {
+      contents: output,
+      resolveDir: SRC_DIR,
+      sourcefile: 'virtual-entry.js',
+      loader: 'js',
+    },
+    write: false,
+    format: ESBUILD_BASE_OPTIONS.format,
     target: ESBUILD_BASE_OPTIONS.target,
     sourcemap: ESBUILD_BASE_OPTIONS.sourcemap,
+  metafile: ESBUILD_BASE_OPTIONS.metafile,
   });
+  const outputFile = result.outputFiles?.[0];
+  const transpiled = outputFile?.text ?? '';
   await fs.writeFile(path.join(DIST_DIR, 'app.js'), transpiled, 'utf8');
+  if (result.metafile){
+    const reportPath = path.join(DIST_DIR, 'build-report.json');
+    await fs.writeFile(reportPath, JSON.stringify(result.metafile, null, 2), 'utf8');
+    logTopBundleSizes(result.metafile);
+  }
 }
 
 build().catch((err) => {
