@@ -16,7 +16,9 @@ type KitTraits =
   | null
   | undefined;
 
-interface SummonSpecLike extends Record<string, unknown> {
+type SummonSpec = Record<string, unknown>;
+
+interface SummonSpecLike extends SummonSpec {
   pattern?: string;
   placement?: string;
   patternKey?: string;
@@ -156,6 +158,20 @@ const KNOWN_REVIVE_KEYS = ['revive', 'reviver'] satisfies ReadonlyArray<string>;
 const DEFENSIVE_TAGS = ['defense', 'defensive', 'protection', 'shield', 'barrier', 'support'] satisfies ReadonlyArray<string>;
 const INSTANT_TAGS = ['instant', 'instant-cast', 'instantCast'] satisfies ReadonlyArray<string>;
 
+type CloneableArray = ReadonlyArray<unknown>;
+type CloneableRecord = Record<string, unknown>;
+
+function isPlainRecord(value: unknown): value is CloneableRecord {
+  if (!value || typeof value !== 'object') return false;
+  if (Array.isArray(value)) return false;
+  const proto = Object.getPrototypeOf(value);
+  return proto === Object.prototype || proto === null;
+}
+
+function isCloneCandidate(value: unknown): value is CloneableArray | CloneableRecord {
+  return Array.isArray(value) || isPlainRecord(value);
+}
+
 function coerceKit(metaOrKit: KitMeta | KitData | null | undefined): KitData | null {
   if (!metaOrKit) return null;
   if ('kit' in metaOrKit && metaOrKit.kit) return metaOrKit.kit as KitData;
@@ -200,22 +216,24 @@ function readTrait(traits: KitTraits, key: string): boolean | KitTraitObject | s
   return null;
 }
 
+function cloneShallow<T extends CloneableArray>(value: T): T;
+function cloneShallow<T extends CloneableRecord>(value: T): T;
+function cloneShallow<T extends CloneableArray | CloneableRecord>(value: T): T;
 function cloneShallow<T>(value: T | null | undefined): T | null {
-  if (value == null || typeof value !== 'object') return (value ?? null) as T | null;
+  if (value == null || typeof value !== 'object') return value ?? null;
+  if (!isCloneCandidate(value)) return value;
   if (Array.isArray(value)){
-    return value.map((entry) => cloneShallow(entry)) as unknown as T;
-  }
-  const out: Record<string, unknown> = { ...(value as Record<string, unknown>) };
-  for (const [k, v] of Object.entries(out)){
-    if (Array.isArray(v)){
-      out[k] = v.map((item) => cloneShallow(item));
-      continue;
+  const result = value.map((entry) => (isCloneCandidate(entry) ? cloneShallow(entry) : entry));
+    return result as T;
+  } else {
+    const out: CloneableRecord = { ...(value as CloneableRecord) };
+    for (const [key, entry] of Object.entries(out)){
+      if (isCloneCandidate(entry)){
+        out[key] = cloneShallow(entry);
+      }
     }
-    if (v && typeof v === 'object'){
-      out[k] = cloneShallow(v);
-    }
+    return out as T;
   }
-  return out as T;
 }
 
 function extractUltSummonFields(ult: UltSpec | null | undefined): Partial<NormalizedSummonSpec> | null {
@@ -224,8 +242,8 @@ function extractUltSummonFields(ult: UltSpec | null | undefined): Partial<Normal
   let hasValue = false;
   const assign = (key: keyof NormalizedSummonSpec, value: unknown, clone = false) => {
     if (value === undefined || value === null) return;
-    if (clone && value && typeof value === 'object'){
-      out[key] = Array.isArray(value) ? value.map((item) => cloneShallow(item)) : cloneShallow(value);
+    if (clone && isCloneCandidate(value)){
+      out[key] = cloneShallow(value);
     } else {
       out[key] = value as NormalizedSummonSpec[typeof key];
     }
@@ -246,7 +264,7 @@ function extractUltSummonFields(ult: UltSpec | null | undefined): Partial<Normal
   assign('replace', ult.replace);
   assign('creep', ult.creep, true);
 
-  return hasValue ? (out as Partial<NormalizedSummonSpec>) : null;
+  return hasValue ? out : null;
 }
 
 function applyUltSummonDefaults(
@@ -255,8 +273,8 @@ function applyUltSummonDefaults(
 ): SummonSpecLike | null {
   const fields = extractUltSummonFields(ult);
   if (!fields) return spec ?? null;
-  const out = spec ?? ({} as SummonSpecLike);
-  const target = out as SummonSpecLike & Record<string, unknown>;
+  const out: SummonSpecLike = spec ?? {};
+  const target: SummonSpec = out;
   for (const [key, value] of Object.entries(fields)){
     const current = target[key];
     if (current === undefined || current === null){
@@ -321,7 +339,7 @@ export function getSummonSpec(metaOrKit: KitMeta | KitData | null | undefined): 
       if (trait === true) {
         spec = {};
       } else if (typeof trait === 'object'){
-        spec = cloneShallow(trait) as SummonSpecLike | null;
+        spec = cloneShallow(trait);
       } else if (typeof trait === 'number'){
         spec = { count: trait };
       } else {
@@ -334,18 +352,18 @@ export function getSummonSpec(metaOrKit: KitMeta | KitData | null | undefined): 
   const ult = kit.ult || null;
   if (!spec && ult){
     if (ult.summon){
-      spec = cloneShallow(ult.summon) as SummonSpecLike | null;
+      spec = cloneShallow(ult.summon);
     } else if (ult.metadata?.summon){
-      spec = cloneShallow(ult.metadata.summon) as SummonSpecLike | null;
+      spec = cloneShallow(ult.metadata.summon);
     } else if (ult.meta?.summon){
-      spec = cloneShallow(ult.meta.summon) as SummonSpecLike | null;
+      spec = cloneShallow(ult.meta.summon);;
     }
   }
 
   const tags = collectUltTags(kit);
   if (!spec && kitUltHasTag(kit, 'summon', tags)){
     if (ult?.summon){
-      spec = cloneShallow(ult.summon) as SummonSpecLike | null;
+      spec = cloneShallow(ult.summon);
     }
     spec = applyUltSummonDefaults(spec, ult);
   }
@@ -355,7 +373,7 @@ export function getSummonSpec(metaOrKit: KitMeta | KitData | null | undefined): 
 
   if (!spec) return null;
 
-  const normalized = (cloneShallow(spec) || {}) as NormalizedSummonSpec;
+  const normalized = { ...(cloneShallow(spec) ?? spec ?? {}) } as NormalizedSummonSpec;
   if (!normalized.pattern && typeof normalized.placement === 'string'){
     normalized.pattern = normalized.placement;
   }
@@ -381,15 +399,16 @@ export function getReviveSpec(metaOrKit: KitMeta | KitData | null | undefined): 
     const trait = readTrait(kit.traits ?? null, key);
     if (trait){
       if (trait === true) return {};
-      if (typeof trait === 'object') return (cloneShallow(trait) || {}) as Record<string, unknown>;
+      if (typeof trait === 'object') return cloneShallow(trait);
       return {};
     }
   }
   const ult = kit.ult || null;
-  if (ult?.revive) return (cloneShallow(ult.revive) || {}) as Record<string, unknown>;
-  if (ult?.metadata?.revive) return (cloneShallow(ult.metadata.revive) || {}) as Record<string, unknown>;
+  if (ult?.revive) return cloneShallow(ult.revive);
+  if (ult?.metadata?.revive) return cloneShallow(ult.metadata.revive);
   if (kitUltHasTag(kit, 'revive')){
-    return (cloneShallow(ult?.revive || {}) || {}) as Record<string, unknown>;
+    const revive = ult?.revive ?? {};
+    return cloneShallow(revive);
   }
   return null;
 }
