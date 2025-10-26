@@ -9,7 +9,8 @@ import type {
   TurnOrderSide,
 } from '@types/config';
 import type { TurnSnapshot } from '@types/turn-order';
-import type { QueuedSummonState, ActionChainEntry, QueuedSummonRequest, UnitId } from '@types/units';
+import type { QueuedSummonState, ActionChainEntry, UnitId } from '@types/units';
+import { createSummonQueue } from '@types/units';
 
 import { CFG } from '../../config.ts';
 import { UNITS, lookupUnit } from '../../units.ts';
@@ -75,8 +76,8 @@ function getTurnOrderMode(cfg: GameConfig): string | null {
 
 function buildQueuedSummonState(): QueuedSummonState {
   return {
-    ally: new Map<number, QueuedSummonRequest>(),
-    enemy: new Map<number, QueuedSummonRequest>(),
+    ally: createSummonQueue(),
+    enemy: createSummonQueue(),
   };
 }
 
