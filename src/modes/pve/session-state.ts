@@ -1,7 +1,7 @@
 import type { CreateSessionOptions, SessionState } from '@types/pve';
-import type { CameraPreset } from '@types/config';
+import type { CameraPreset, GameConfig, SceneConfig } from '@types/config';
 import type { TurnSnapshot } from '@types/turn-order';
-import type { QueuedSummonState, ActionChainEntry } from '@types/units';
+import type { QueuedSummonState, ActionChainEntry, QueuedSummonRequest, UnitId } from '@types/units';
 
 import { CFG } from '../../config.ts';
 import { UNITS } from '../../units.ts';
@@ -13,17 +13,22 @@ import { Statuses } from '../../statuses.ts';
 
 void Statuses;
 
-type SessionConfigInput = Partial<
-  CreateSessionOptions & {
-    scene?: {
-      theme?: string;
-      backgroundKey?: string;
-      background?: string;
-      [extra: string]: unknown;
-    };
+type SceneConfigWithExtras = (SceneConfig & { CURRENT_BACKGROUND?: string | null | undefined }) | null;
+
+const DEFAULT_UNIT_ROSTER = UNITS.map((unit) => ({
+  id: unit.id,
+  name: unit.name,
+  cost: unit.cost,
+})) satisfies ReadonlyArray<SessionState['unitsAll'][number]>;
+
+type SessionConfigInput = Partial<CreateSessionOptions> & {
+  scene?: {
+    theme?: string;
+    backgroundKey?: string;
+    background?: string;
     [extra: string]: unknown;
-  }
->;
+  };
+};
 
 export type NormalizedSessionConfig = (CreateSessionOptions & {
   sceneTheme?: string;
@@ -38,6 +43,114 @@ type BackgroundCacheEntry = {
   config: BackgroundConfig;
   signature: string;
 };
+
+function getSceneConfig(cfg: GameConfig | null | undefined): SceneConfigWithExtras {
+  if (!cfg || typeof cfg !== 'object') return null;
+  const sceneCandidate = (cfg as { SCENE?: unknown }).SCENE;
+  if (!sceneCandidate || typeof sceneCandidate !== 'object') return null;
+  const scene = sceneCandidate as SceneConfig & { CURRENT_BACKGROUND?: string | null | undefined };
+  if (typeof scene.DEFAULT_THEME !== 'string' || typeof scene.CURRENT_THEME !== 'string') return null;
+  if (!scene.THEMES || typeof scene.THEMES !== 'object') return null;
+  return scene;
+}
+
+function getTurnOrderMode(cfg: GameConfig): string | null {
+  const rawMode = (cfg.turnOrder as unknown as { mode?: unknown }).mode;
+  return typeof rawMode === 'string' ? rawMode : null;
+}
+
+function buildQueuedSummonState(): QueuedSummonState {
+  return {
+    ally: new Map<number, QueuedSummonRequest>(),
+    enemy: new Map<number, QueuedSummonRequest>(),
+  };
+}
+
+interface BuildAiStateParams {
+  preset: CreateSessionOptions['aiPreset'] | null | undefined;
+  unitsAll: SessionState['ai']['unitsAll'];
+  defaultCostCap: number;
+  defaultSummonLimit: number;
+}
+
+function buildAiState(params: BuildAiStateParams): SessionState['ai'] {
+  const { preset, unitsAll, defaultCostCap, defaultSummonLimit } = params;
+  const costCapCandidate = preset?.costCap;
+  const summonLimitCandidate = preset?.summonLimit;
+  const startingDeck = Array.isArray(preset?.startingDeck) ? preset.startingDeck : null;
+  const costCap = Number.isFinite(costCapCandidate)
+    ? Number(costCapCandidate)
+    : typeof costCapCandidate === 'number'
+      ? costCapCandidate
+      : defaultCostCap;
+  const summonLimit = Number.isFinite(summonLimitCandidate)
+    ? Number(summonLimitCandidate)
+    : typeof summonLimitCandidate === 'number'
+      ? summonLimitCandidate
+      : defaultSummonLimit;
+  return {
+    cost: 0,
+    costCap,
+    summoned: 0,
+    summonLimit,
+    unitsAll,
+    usedUnitIds: new Set<UnitId>(),
+    deck: startingDeck ? [...startingDeck] : [],
+    selectedId: null,
+    lastThinkMs: 0,
+    lastDecision: null,
+  };
+}
+
+interface BuildBaseStateParams {
+  modeKey: string | null;
+  allyUnits: SessionState['unitsAll'];
+  costCap: number;
+  summonLimit: number;
+  sceneTheme: string | null;
+  backgroundKey: string | null;
+  turn: TurnSnapshot;
+  ai: SessionState['ai'];
+}
+
+function buildBaseState(params: BuildBaseStateParams): SessionState {
+  return {
+    modeKey: params.modeKey,
+    grid: null,
+    tokens: [],
+    cost: 0,
+    costCap: params.costCap,
+    summoned: 0,
+    summonLimit: params.summonLimit,
+    unitsAll: params.allyUnits,
+    usedUnitIds: new Set<UnitId>(),
+    deck3: [],
+    selectedId: null,
+    ui: { bar: null },
+    turn: params.turn,
+    queued: buildQueuedSummonState(),
+    actionChain: [],
+    events: gameEvents,
+    sceneTheme: params.sceneTheme,
+    backgroundKey: params.backgroundKey,
+    battle: {
+      over: false,
+      winner: null,
+      reason: null,
+      detail: null,
+      finishedAt: 0,
+      result: null,
+    },
+    result: null,
+    ai: params.ai,
+    meta: Meta,
+    runtime: {
+      encounter: null,
+      wave: null,
+      rewardQueue: [],
+    },
+  };
+}
 
 export interface SceneCacheEntry {
   canvas: OffscreenCanvas | HTMLCanvasElement;
@@ -68,7 +181,7 @@ function stableStringify(value: unknown, seen: WeakSet<object> = new WeakSet()):
   if (type === 'undefined') return 'undefined';
   if (type === 'number' || type === 'boolean' || type === 'bigint') return String(value);
   if (type === 'string') return JSON.stringify(value);
-  if (type === 'symbol') return value.toString();
+  if (type === 'symbol') return (value as symbol).toString();
   if (type === 'function') return `[Function:${(value as { name?: string }).name || 'anonymous'}]`;
   if (Array.isArray(value)) {
     return `[${value.map((entry) => stableStringify(entry, seen)).join(',')}]`;
@@ -120,38 +233,24 @@ export function computeBackgroundSignature(backgroundKey: string | null | undefi
 }
 
 export function normalizeConfig(input: SessionConfigInput = {}): NormalizedSessionConfig {
-  const out = { ...(input as Record<string, unknown>) } as NormalizedSessionConfig & {
-    scene?: {
-      theme?: string;
-      backgroundKey?: string;
-      background?: string;
-      [extra: string]: unknown;
-    };
-  };
-  const scene = (input.scene ?? {}) as {
-    theme?: string;
-    backgroundKey?: string;
-    background?: string;
-  };
-  if (typeof out.sceneTheme === 'undefined' && typeof scene.theme !== 'undefined') {
-    out.sceneTheme = scene.theme;
+  const { scene, ...rest } = input;
+  const out = { ...rest } as NormalizedSessionConfig;
+  const sceneConfig: NonNullable<SessionConfigInput['scene']> = scene ?? {};
+  if (typeof out.sceneTheme === 'undefined' && typeof sceneConfig.theme === 'string') {
+    out.sceneTheme = sceneConfig.theme;
   }
   if (typeof out.backgroundKey === 'undefined') {
-    if (typeof scene.backgroundKey !== 'undefined') out.backgroundKey = scene.backgroundKey;
-    else if (typeof scene.background !== 'undefined') out.backgroundKey = scene.background;
+    if (typeof sceneConfig.backgroundKey === 'string') out.backgroundKey = sceneConfig.backgroundKey;
+    else if (typeof sceneConfig.background === 'string') out.backgroundKey = sceneConfig.background;
   }
-  delete (out as Record<string, unknown>).scene;
   return out;
 }
 
 export function buildTurnOrder(): { order: TurnOrderEntry[]; indexMap: Map<string, number> } {
-  const cfg = (CFG as Record<string, unknown>).turnOrder as
-    | { sides?: unknown; pairScan?: unknown }
-    | undefined
-    | null;
-  const rawSides = Array.isArray(cfg?.sides) ? cfg?.sides : null;
+  const cfg: GameConfig['turnOrder'] & { sides?: unknown; pairScan?: unknown } = CFG.turnOrder;
+  const rawSides = Array.isArray(cfg.sides) ? cfg.sides : null;
   const sides = rawSides && rawSides.length
-    ? (rawSides.filter((s) => s === 'ally' || s === 'enemy') as Array<'ally' | 'enemy'>)
+   ? (rawSides.filter((s: unknown): s is 'ally' | 'enemy' => s === 'ally' || s === 'enemy'))
     : ['ally', 'enemy'];
   const order: TurnOrderEntry[] = [];
   const addPair = (side: unknown, slot: unknown): void => {
@@ -167,7 +266,7 @@ export function buildTurnOrder(): { order: TurnOrderEntry[]; indexMap: Map<strin
     }
   };
 
-  const scan = Array.isArray(cfg?.pairScan) ? cfg?.pairScan : null;
+  const scan = Array.isArray(cfg.pairScan) ? (cfg.pairScan as unknown[]) : null;
   if (scan && scan.length) {
     for (const entry of scan) {
       if (typeof entry === 'number') {
@@ -213,37 +312,39 @@ export function buildTurnOrder(): { order: TurnOrderEntry[]; indexMap: Map<strin
 export function createSession(options: CreateSessionOptions = {}): SessionState {
   const normalized = normalizeConfig(options);
   const modeKey = typeof normalized.modeKey === 'string' ? normalized.modeKey : null;
+  const sceneCfg = getSceneConfig(CFG);
   const sceneTheme = normalized.sceneTheme
-    ?? (CFG as Record<string, any>).SCENE?.CURRENT_THEME
-    ?? (CFG as Record<string, any>).SCENE?.DEFAULT_THEME;
+    ?? sceneCfg?.CURRENT_THEME
+    ?? sceneCfg?.DEFAULT_THEME
+    ?? null;
   const backgroundKey = normalized.backgroundKey
-    ?? (CFG as Record<string, any>).CURRENT_BACKGROUND
-    ?? (CFG as Record<string, any>).SCENE?.CURRENT_BACKGROUND
-    ?? (CFG as Record<string, any>).SCENE?.CURRENT_THEME
-    ?? (CFG as Record<string, any>).SCENE?.DEFAULT_THEME;
+  ?? CFG.CURRENT_BACKGROUND
+    ?? sceneCfg?.CURRENT_BACKGROUND
+    ?? sceneCfg?.CURRENT_THEME
+    ?? sceneCfg?.DEFAULT_THEME
+    ?? null;
 
-  const allyUnits = (Array.isArray(normalized.deck) && normalized.deck.length
-    ? normalized.deck
-    : (UNITS as unknown)) as SessionState['unitsAll'];
-  const enemyPreset = (normalized.aiPreset ?? {}) as {
-    deck?: ReadonlyArray<string>;
-    unitsAll?: ReadonlyArray<string>;
-    costCap?: number;
-    summonLimit?: number;
-    startingDeck?: ReadonlyArray<unknown>;
-  };
-  const enemyUnits = (Array.isArray(enemyPreset.deck) && enemyPreset.deck.length
-    ? enemyPreset.deck
-    : (Array.isArray(enemyPreset.unitsAll) && enemyPreset.unitsAll.length ? enemyPreset.unitsAll : (UNITS as unknown))) as SessionState['unitsAll'];
+  const allyUnits: SessionState['unitsAll'] =
+    Array.isArray(normalized.deck) && normalized.deck.length
+      ? normalized.deck.slice()
+      : DEFAULT_UNIT_ROSTER;
+
+  const enemyPreset = normalized.aiPreset ?? null;
+  const enemyUnits: SessionState['ai']['unitsAll'] =
+    Array.isArray(enemyPreset?.deck) && enemyPreset.deck.length
+      ? [...enemyPreset.deck]
+      : Array.isArray(enemyPreset?.unitsAll) && enemyPreset.unitsAll.length
+        ? [...enemyPreset.unitsAll]
+        : DEFAULT_UNIT_ROSTER;
 
   const requestedTurnMode = normalized.turnMode
     ?? normalized.turn?.mode
     ?? normalized.turnOrderMode
     ?? normalized.turnOrder?.mode
-    ?? (CFG as Record<string, any>)?.turnOrder?.mode;
+    ?? getTurnOrderMode(CFG);
   const useInterleaved = requestedTurnMode === 'interleaved_by_position';
-  const allyColsRaw = (CFG as Record<string, any>)?.ALLY_COLS;
-  const gridRowsRaw = (CFG as Record<string, any>)?.GRID_ROWS;
+  const allyColsRaw = CFG.ALLY_COLS;
+  const gridRowsRaw = CFG.GRID_ROWS;
   const allyCols = Number.isFinite(allyColsRaw) ? Math.max(1, Math.floor(allyColsRaw)) : 3;
   const gridRows = Number.isFinite(gridRowsRaw) ? Math.max(1, Math.floor(gridRowsRaw)) : 3;
   const slotsPerSide = Math.max(1, allyCols * gridRows);
@@ -271,62 +372,30 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
     } satisfies TurnSnapshot;
   };
 
-  const game = {
+  const aiState = buildAiState({
+    preset: enemyPreset,
+    unitsAll: enemyUnits,
+    defaultCostCap: CFG.COST_CAP,
+    defaultSummonLimit: CFG.SUMMON_LIMIT,
+  });
+
+  const costCap = Number.isFinite(normalized.costCap)
+    ? Number(normalized.costCap)
+    : CFG.COST_CAP;
+  const summonLimit = Number.isFinite(normalized.summonLimit)
+    ? Number(normalized.summonLimit)
+    : CFG.SUMMON_LIMIT;
+
+  return buildBaseState({
     modeKey,
-    grid: null,
-    tokens: [],
-    cost: 0,
-    costCap: Number.isFinite(normalized.costCap) ? Number(normalized.costCap) : (CFG as Record<string, any>).COST_CAP,
-    summoned: 0,
-    summonLimit: Number.isFinite(normalized.summonLimit)
-      ? Number(normalized.summonLimit)
-      : (CFG as Record<string, any>).SUMMON_LIMIT,
-    battle: {
-      over: false,
-      winner: null,
-      reason: null,
-      detail: null,
-      finishedAt: 0,
-      result: null,
-    },
-    result: null,
-    unitsAll: allyUnits,
-    usedUnitIds: new Set(),
-    deck3: [],
-    selectedId: null,
-    ui: { bar: null },
-    turn: buildTurnState(),
-    queued: { ally: new Map(), enemy: new Map() } as QueuedSummonState,
-    actionChain: [] as ActionChainEntry[],
-    events: gameEvents,
+    allyUnits,
+    costCap,
+    summonLimit,
     sceneTheme,
     backgroundKey,
-    runtime: {
-      encounter: null,
-      wave: null,
-      rewardQueue: [],
-    },
-  } as SessionState;
-
-  game.ai = {
-    cost: 0,
-    costCap: Number.isFinite(enemyPreset.costCap)
-      ? Number(enemyPreset.costCap)
-      : (enemyPreset.costCap ?? (CFG as Record<string, any>).COST_CAP),
-    summoned: 0,
-    summonLimit: Number.isFinite(enemyPreset.summonLimit)
-      ? Number(enemyPreset.summonLimit)
-      : (enemyPreset.summonLimit ?? (CFG as Record<string, any>).SUMMON_LIMIT),
-    unitsAll: enemyUnits,
-    usedUnitIds: new Set(),
-    deck: Array.isArray(enemyPreset.startingDeck) ? enemyPreset.startingDeck.slice() : [],
-    selectedId: null,
-    lastThinkMs: 0,
-    lastDecision: null,
-  } as SessionState['ai'];
-
-  game.meta = Meta;
-  return game;
+    turn: buildTurnState(),
+    ai: aiState,
+  });
 }
 
 export function invalidateSceneCache(): void {
@@ -360,20 +429,28 @@ export function createSceneCacheCanvas(
 export function ensureSceneCache(args: EnsureSceneCacheArgs): SceneCacheEntry | null {
   const { game, canvas, documentRef, camPreset } = args;
   if (!game?.grid) return null;
-  const grid = game.grid as Record<string, any>;
-  const sceneCfg = ((CFG as Record<string, any>).SCENE ?? {}) as Record<string, any>;
-  const themeKey = game.sceneTheme ?? sceneCfg.CURRENT_THEME ?? sceneCfg.DEFAULT_THEME;
-  const theme = themeKey ? sceneCfg.THEMES?.[themeKey] ?? null : null;
-  const backgroundKey = game.backgroundKey;
-  const backgroundSignature = computeBackgroundSignature(backgroundKey ?? null);
-  const dprRaw = Number.isFinite(grid.dpr) && grid.dpr > 0 ? Number(grid.dpr) : 1;
-  const cssWidth = grid.w ?? (canvas ? (canvas.width as number) / dprRaw : 0);
-  const cssHeight = grid.h ?? (canvas ? (canvas.height as number) / dprRaw : 0);
+  if (typeof game.grid !== 'object') return null;
+  const grid = game.grid as Parameters<typeof drawEnvironmentProps>[1];
+  const gridDims = game.grid as { dpr?: number | null | undefined; w?: number | null | undefined; h?: number | null | undefined };
+  const dprCandidate = Number(gridDims.dpr);
+  const dprRaw = Number.isFinite(dprCandidate) && dprCandidate > 0 ? dprCandidate : 1;
+  const cssWidth = typeof gridDims.w === 'number' ? gridDims.w : canvas ? canvas.width / dprRaw : 0;
+  const cssHeight = typeof gridDims.h === 'number' ? gridDims.h : canvas ? canvas.height / dprRaw : 0;
   if (!cssWidth || !cssHeight) return null;
   const pixelWidth = Math.max(1, Math.round(cssWidth * dprRaw));
   const pixelHeight = Math.max(1, Math.round(cssHeight * dprRaw));
 
-  const baseScene = getCachedBattlefieldScene(grid, theme, { width: cssWidth, height: cssHeight, dpr: dprRaw });
+  const sceneCfg = getSceneConfig(CFG);
+  const themeKey = game.sceneTheme ?? sceneCfg?.CURRENT_THEME ?? sceneCfg?.DEFAULT_THEME ?? null;
+  const theme = themeKey ? sceneCfg?.THEMES?.[themeKey] ?? null : null;
+  const backgroundKey = game.backgroundKey ?? null;
+  const backgroundSignature = computeBackgroundSignature(backgroundKey);
+
+  const baseScene = getCachedBattlefieldScene(
+    grid as Parameters<typeof getCachedBattlefieldScene>[0],
+    theme,
+    { width: cssWidth, height: cssHeight, dpr: dprRaw },
+  );
   const baseKey = baseScene?.cacheKey ?? null;
   if (!baseScene) {
     sceneCache = null;
