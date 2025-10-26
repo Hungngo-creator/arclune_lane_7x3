@@ -14,10 +14,10 @@ const PRIME_PITY: PityConfiguration | null = getPityConfig('PRIME');
 const LOTTERY_SPLIT: LotterySplit = getLotterySplit();
 const BASE_TAX_RATE = getShopTaxRate('N');
 const TOP_TAX_RATE = getShopTaxRate('PRIME');
-const PVE_SESSION_MODULE_ID = './modes/pve/session.ts' as const;
-const COMING_SOON_MODULE_ID = './modes/coming-soon.stub.ts' as const;
-const LINEUP_SCREEN_MODULE_ID = './screens/lineup/index.ts' as const;
-const COLLECTION_SCREEN_MODULE_ID = './screens/collection/index.ts' as const;
+const PVE_SESSION_MODULE_ID = '@modes/pve/session.ts' as const;
+const COMING_SOON_MODULE_ID = '@modes/coming-soon.stub.ts' as const;
+const LINEUP_SCREEN_MODULE_ID = '@screens/lineup/index.ts' as const;
+const COLLECTION_SCREEN_MODULE_ID = '@screens/collection/index.ts' as const;
 
 const MODE_TYPES = {
   PVE: 'PvE',
