@@ -1,6 +1,37 @@
 import type { SkillDefinition } from './combat';
 import type { UnitId } from './units';
-import type { BackgroundDefinition, BackgroundProp } from '../config/schema';
+import type { BackgroundDefinition, BackgroundProp, TurnOrderConfig as TurnOrderConfigSchema } from '../config/schema';
+
+export type TurnOrderSide = 'ally' | 'enemy';
+
+export interface TurnOrderPairScanSlotFields {
+  slot?: number | string;
+  s?: number | string;
+  index?: number | string;
+}
+
+export interface TurnOrderPairScanSideObject extends TurnOrderPairScanSlotFields {
+  side: TurnOrderSide | (string & Record<never, never>);
+}
+
+export interface TurnOrderPairScanSlotObject extends TurnOrderPairScanSlotFields {
+  side?: unknown;
+}
+
+export type TurnOrderPairScanEntry =
+  | number
+  | ReadonlyArray<number>
+  | readonly [TurnOrderSide | (string & Record<never, never>), number]
+  | TurnOrderPairScanSideObject
+  | TurnOrderPairScanSlotObject;
+
+export interface TurnOrderConfigDetails {
+  mode?: string | null;
+  sides?: ReadonlyArray<TurnOrderSide>;
+  pairScan?: ReadonlyArray<TurnOrderPairScanEntry>;
+}
+
+export type GameTurnOrderConfig = TurnOrderConfigSchema & TurnOrderConfigDetails;
 
 export interface CurrencyDefinition {
   id: string;
