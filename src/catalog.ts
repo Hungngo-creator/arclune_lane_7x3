@@ -3,10 +3,8 @@
 // 1) Rank multiplier (đơn giản) — áp lên TẤT CẢ stat trừ SPD
 import { kitSupportsSummon } from './utils/kit.ts';
 
-// @ts-ignore -- bundler module resolution forbids '@types/*' bare specifiers, but path mapping supplies runtime stubs.
-import type { CatalogStatBlock, RosterUnitDefinition } from '@types/config';
-// @ts-ignore -- bundler module resolution forbids '@types/*' bare specifiers, but path mapping supplies runtime stubs.
-import type { UnitId } from '@types/units';
+import type { CatalogStatBlock, RosterUnitDefinition } from './@types/config.ts';
+import type { UnitId } from './@types/units.ts';
 
 export const RANK_MULT = {
   N: 0.80,
