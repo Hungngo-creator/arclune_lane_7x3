@@ -3,8 +3,8 @@ import { vfxAddHit, vfxAddMelee, vfxAddLightningArc } from './vfx.ts';
 import { slotToCell } from './engine.ts';
 import { emitPassiveEvent } from './passives.ts';
 import { CFG } from './config.ts';
-import { gainFury, startFurySkill, finishFuryHit } from './utils/fury.js';
-import { safeNow } from './utils/time.js';
+import { gainFury, startFurySkill, finishFuryHit } from './utils/fury.ts';
+import { safeNow } from './utils/time.ts';
 
 import type { SessionState } from '@types/combat';
 import type { UnitToken } from '@types/units';

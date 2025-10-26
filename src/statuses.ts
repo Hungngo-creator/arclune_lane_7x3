@@ -1,4 +1,4 @@
-import { gainFury, finishFuryHit } from './utils/fury.js';
+import { gainFury, finishFuryHit } from './utils/fury.ts';
 
 import type { DamageContext, StatusEffect, StatusRegistry } from '@types/combat';
 import type { UnitToken } from '@types/units';

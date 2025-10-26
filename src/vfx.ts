@@ -5,7 +5,7 @@
 
 import { projectCellOblique } from './engine.ts';
 import { CFG, CHIBI } from './config.ts';
-import { safeNow } from './utils/time.js';
+import { safeNow } from './utils/time.ts';
 import loithienanhAnchors from './data/vfx_anchors/loithienanh.json';
 import { parseVfxAnchorDataset } from './data/vfx_anchors/schema';
 

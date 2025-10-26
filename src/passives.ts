@@ -1,6 +1,6 @@
 // passives.ts — passive event dispatch & helpers v0.7
 import { Statuses, hookOnLethalDamage } from './statuses.ts';
-import { safeNow } from './utils/time.js';
+import { safeNow } from './utils/time.ts';
 
 import type {
   PassiveDefinition,

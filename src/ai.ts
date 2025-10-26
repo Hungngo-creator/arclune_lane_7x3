@@ -1,8 +1,8 @@
 import { pickRandom, slotToCell, cellReserved } from './engine.ts';
-import { predictSpawnCycle } from './turns.js';
+import { predictSpawnCycle } from './turns.ts';
 import { CFG } from './config.ts';
-import { safeNow as sharedSafeNow } from './utils/time.js';
-import { detectUltBehavior, getSummonSpec, resolveSummonSlots } from './utils/kit.js';
+import { safeNow as sharedSafeNow } from './utils/time.ts';
+import { detectUltBehavior, getSummonSpec, resolveSummonSlots } from './utils/kit.ts';
 import { lookupUnit } from './units.ts';
 
 import type { SessionState } from '@types/combat';

@@ -1,6 +1,7 @@
+// @ts-check
 //v0.8
 // 1) Rank multiplier (đơn giản) — áp lên TẤT CẢ stat trừ SPD
-import { kitSupportsSummon } from './utils/kit.js';
+import { kitSupportsSummon } from './utils/kit.ts';
 
 // @ts-ignore -- bundler module resolution forbids '@types/*' bare specifiers, but path mapping supplies runtime stubs.
 import type { CatalogStatBlock, RosterUnitDefinition } from '@types/config';

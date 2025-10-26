@@ -603,7 +603,7 @@ async function renderLineupScreen(params: ScreenParams): Promise<void>{
 
   let module: unknown;
   try {
-    module = await loadBundledModule('./screens/lineup/index.js');
+    module = await loadBundledModule('./screens/lineup/index.ts');
   } catch (error) {
     if (token !== lineupRenderToken) return;
     throw error;

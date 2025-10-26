@@ -4,8 +4,8 @@ import {
   CLASS_BASE,
   applyRankAndMods,
   getMetaById,
-} from './catalog.js';
-import { extractOnSpawnRage, kitSupportsSummon } from './utils/kit.js';
+} from './catalog.ts';
+import { extractOnSpawnRage, kitSupportsSummon } from './utils/kit.ts';
 
 import type { CatalogStatBlock } from '@types/config';
 import type { MetaEntry } from '@types/pve';

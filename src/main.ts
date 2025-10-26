@@ -3,7 +3,7 @@ import type { GameConfig } from '@types/config';
 import type { GameEventHandler, GameEventType } from './events.ts';
 
 import { createPveSession } from './modes/pve/session.ts';
-import { ensureNestedModuleSupport } from './utils/dummy.js';
+import { ensureNestedModuleSupport } from './utils/dummy.ts';
 
 export {
   gameEvents,

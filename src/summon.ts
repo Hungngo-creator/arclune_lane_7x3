@@ -2,7 +2,7 @@
 import { slotToCell, cellReserved } from './engine.ts';
 import { vfxAddSpawn } from './vfx.ts';
 import { getUnitArt } from './art.ts';
-import { kitSupportsSummon } from './utils/kit.js';
+import { kitSupportsSummon } from './utils/kit.ts';
 import { prepareUnitForPassives, applyOnSpawnEffects } from './passives.ts';
 
 import type { SessionState } from '@types/combat';
