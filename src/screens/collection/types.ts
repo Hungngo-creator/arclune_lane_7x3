@@ -1,7 +1,7 @@
 import type { CurrencyDefinition } from '../../types/config.ts';
 import type { UnknownRecord } from '../../types/common.ts';
-import type { LineupCurrencies, LineupCurrencyValue } from '../../types/currency.ts';
-import type { RosterEntry } from '../../catalog.ts';
+import type { LineupCurrencies } from '../../types/currency.ts';
+import type { RosterEntryLite } from '../../types/lineup.ts';
 
 export type { UnknownRecord } from '../../types/common.ts';
 
@@ -12,13 +12,13 @@ export interface FilterState {
   selectedUnitId: string | null;
 }
 
-export interface CollectionEntry extends RosterEntry {
+export interface CollectionEntry extends RosterEntryLite {
   cost?: number | null;
 }
 
 export interface CollectionDefinitionParams extends UnknownRecord {
-  roster?: ReadonlyArray<RosterEntry | CollectionEntry> | null;
-  currencies?: LineupCurrencies | ReadonlyArray<LineupCurrencyValue> | null;
+  roster?: ReadonlyArray<RosterEntryLite> | null;
+  currencies?: LineupCurrencies | null;
   playerState?: UnknownRecord | null;
 }
 
@@ -43,8 +43,8 @@ export interface CollectionViewOptions {
   shell?: CollectionScreenParams['shell'];
   definition?: CollectionDefinition | null;
   playerState?: UnknownRecord;
-  roster?: ReadonlyArray<RosterEntry | CollectionEntry> | null;
-  currencies?: LineupCurrencies | ReadonlyArray<LineupCurrencyValue> | null;
+  roster?: ReadonlyArray<RosterEntryLite> | null;
+  currencies?: LineupCurrencies | null;
 }
 
 export interface CollectionViewHandle {
@@ -52,7 +52,11 @@ export interface CollectionViewHandle {
 }
 
 export interface CurrencyBalanceProvider {
-  (currencyId: string, providedCurrencies: unknown, playerState: UnknownRecord | null | undefined): number;
+  (
+    currencyId: string,
+    providedCurrencies: LineupCurrencies | null | undefined,
+    playerState: UnknownRecord | null | undefined,
+  ): number;
 }
 
 export type CurrencyCatalog = ReadonlyArray<CurrencyDefinition>;

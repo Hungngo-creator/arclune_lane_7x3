@@ -1,26 +1,15 @@
 import { ROSTER } from '../../catalog.ts';
 import { UNITS } from '../../units.ts';
 import type { UnitDefinition } from '../../units.ts';
+import type { RosterEntryLite } from '../../types/lineup.ts';
+import type { LineupCurrencies, LineupCurrencyConfig } from '../../types/currency.ts';
+import { normalizeCurrencyBalances } from '../../types/currency.ts';
 import type { CollectionEntry, CurrencyCatalog, CurrencyBalanceProvider, UnknownRecord } from './types.ts';
 
-const isRecord = (value: unknown): value is Record<string, unknown> => (
+const isRosterEntryLite = (value: unknown): value is RosterEntryLite => (
   typeof value === 'object'
   && value !== null
   && !Array.isArray(value)
-);
-
-const isCollectionEntry = (value: unknown): value is CollectionEntry => {
-  if (!isRecord(value)) return false;
-  if (typeof value.id !== 'string') return false;
-  if (typeof value.name !== 'string') return false;
-  if (typeof value.class !== 'string') return false;
-  if (typeof value.rank !== 'string') return false;
-  const kit = value.kit;
-  return typeof kit === 'object' && kit !== null;
-};
-
-const isCollectionEntryArray = (input: unknown): input is ReadonlyArray<CollectionEntry> => (
-  Array.isArray(input) && input.every(isCollectionEntry)
 );
 
 export const ABILITY_TYPE_LABELS = Object.freeze({
@@ -52,9 +41,14 @@ export interface AbilityFact {
   tooltip: string | null;
 }
 
-export function cloneRoster(input: unknown): CollectionEntry[]{
-  if (isCollectionEntryArray(input) && input.length > 0){
-    return input.map((entry) => ({ ...entry }));
+export function cloneRoster(input: ReadonlyArray<RosterEntryLite> | null | undefined): CollectionEntry[]{
+  if (Array.isArray(input)){
+    const clones = input
+      .filter(isRosterEntryLite)
+      .map((entry) => ({ ...entry } as CollectionEntry));
+    if (clones.length > 0){
+      return clones;
+    }
   }
   return ROSTER.map((unit): CollectionEntry => ({ ...unit }));
 }
@@ -89,12 +83,21 @@ export const resolveCurrencyBalance: CurrencyBalanceProvider = (currencyId, prov
     return null;
   };
 
-  const inspectContainer = (container: unknown): number | null => {
+  const inspectContainer = (container: LineupCurrencies | null | undefined): number | null => {
     if (!container) return null;
     if (Array.isArray(container)){
       for (const entry of container){
         if (!entry) continue;
-        const record = entry as Record<string, unknown>;
+        if (typeof entry === 'number'){
+          if (Number.isFinite(entry)){ return entry; }
+          continue;
+        }
+        if (typeof entry === 'string'){
+          const parsed = Number(entry);
+          if (!Number.isNaN(parsed)){ return parsed; }
+        }
+        if (typeof entry !== 'object' || Array.isArray(entry)) continue;
+        const record = entry as { id?: unknown; currencyId?: unknown; key?: unknown; balance?: unknown; amount?: unknown; value?: unknown; total?: unknown };
         const id = (record.id || record.currencyId || record.key) as string | undefined;
         if (id === currencyId){
           const extracted = tryExtract(record.balance ?? record.amount ?? record.value ?? record.total ?? record);
@@ -104,7 +107,7 @@ export const resolveCurrencyBalance: CurrencyBalanceProvider = (currencyId, prov
       return null;
     }
     if (typeof container === 'object'){
-      const record = container as Record<string, unknown> & { balances?: Record<string, unknown> };
+      const record = container as LineupCurrencyConfig;
       if (currencyId in record){
         const extracted = tryExtract(record[currencyId]);
         if (extracted != null) return extracted;
@@ -119,7 +122,7 @@ export const resolveCurrencyBalance: CurrencyBalanceProvider = (currencyId, prov
 
   const fromProvided = inspectContainer(providedCurrencies);
   if (fromProvided != null) return fromProvided;
-  const fromState = inspectContainer(playerState?.currencies);
+  const fromState = inspectContainer(normalizeCurrencyBalances(playerState ?? null));
   if (fromState != null) return fromState;
   return 0;
 };

@@ -6,6 +6,9 @@ import type {
   CollectionScreenParams,
   UnknownRecord,
 } from './types.ts';
+import type { RosterEntryLite } from '../../types/lineup.ts';
+import type { LineupCurrencies } from '../../types/currency.ts';
+import { isLineupCurrencies, normalizeCurrencyBalances } from '../../types/currency.ts';
 
 type Mergeable<TValue> = TValue | null | undefined;
 
@@ -37,18 +40,26 @@ function mergePlayerState(
 function resolveRoster(
   definitionParams: CollectionDefinitionParams | null | undefined,
   params: CollectionDefinitionParams | null | undefined,
-): unknown {
-  return mergeParams(definitionParams?.roster ?? null, params?.roster ?? null);
+): ReadonlyArray<RosterEntryLite> {
+  const override = Array.isArray(params?.roster) ? params.roster : null;
+  const base = Array.isArray(definitionParams?.roster) ? definitionParams.roster : null;
+  return override ?? base ?? [];
 }
 
 function resolveCurrencies(
   definitionParams: CollectionDefinitionParams | null | undefined,
   params: CollectionDefinitionParams | null | undefined,
   playerState: UnknownRecord,
-): unknown {
-  return mergeParams(definitionParams?.currencies ?? null, params?.currencies ?? null)
-    ?? (playerState?.currencies as unknown)
-    ?? null;
+): LineupCurrencies | null {
+  const override = params?.currencies;
+  if (isLineupCurrencies(override)){
+    return override ?? null;
+  }
+  const base = definitionParams?.currencies;
+  if (isLineupCurrencies(base)){
+    return base ?? null;
+  }
+  return normalizeCurrencyBalances(playerState);
 }
 
 export function renderCollectionScreen(options: CollectionScreenParams): CollectionViewHandle{
