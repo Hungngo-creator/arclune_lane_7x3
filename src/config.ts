@@ -1,4 +1,3 @@
-// @ts-nocheck
 // config.ts v0.7.5
 import { GameConfigSchema } from './config/schema';
 import type {
