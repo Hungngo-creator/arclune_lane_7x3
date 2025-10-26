@@ -99,6 +99,9 @@ const SCREEN_MAIN_MENU = 'main-menu';
 const SCREEN_PVE = 'pve-session';
 const SCREEN_COLLECTION = 'collection';
 const SCREEN_LINEUP = 'lineup';
+const COMING_SOON_MODULE_ID = './modes/coming-soon.stub.ts' as const;
+const COLLECTION_SCREEN_MODULE_ID = './screens/collection/index.ts' as const;
+const LINEUP_SCREEN_MODULE_ID = './screens/lineup/index.ts' as const;
 const APP_SCREEN_CLASSES = [
   `app--${SCREEN_MAIN_MENU}`,
   `app--${SCREEN_PVE}`,
@@ -127,7 +130,7 @@ const MODE_DEFINITIONS: Record<string, ModeDefinition> = (MODES as ReadonlyArray
   const screenId = shell?.screenId || SCREEN_MAIN_MENU;
   const moduleId = mode.status === MODE_STATUS.AVAILABLE && shell?.moduleId
     ? shell.moduleId
-   : (shell?.fallbackModuleId || './modes/coming-soon.stub.ts');
+   : (shell?.fallbackModuleId || COMING_SOON_MODULE_ID);
   const params: ScreenParams = mode.status === MODE_STATUS.AVAILABLE && shell?.defaultParams
   ? { ...shell.defaultParams }
     : null;
@@ -557,7 +560,7 @@ async function renderCollectionScreen(params: ScreenParams): Promise<void>{
 
   let module: unknown;
   try {
-    module = await loadBundledModule('./screens/collection/index.ts');
+    module = await loadBundledModule(COLLECTION_SCREEN_MODULE_ID);
   } catch (error) {
     if (token !== collectionRenderToken) return;
     throw error;
@@ -603,7 +606,7 @@ async function renderLineupScreen(params: ScreenParams): Promise<void>{
 
   let module: unknown;
   try {
-    module = await loadBundledModule('./screens/lineup/index.ts');
+    module = await loadBundledModule(LINEUP_SCREEN_MODULE_ID);
   } catch (error) {
     if (token !== lineupRenderToken) return;
     throw error;
