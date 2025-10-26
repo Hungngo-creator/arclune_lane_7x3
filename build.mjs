@@ -8,7 +8,7 @@ try {
   const imported = await import('esbuild');
   esbuild = imported?.default ?? imported;
 } catch (err) {
-  const fallback = await import('./tools/esbuild-stub/index.js');
+  const fallback = await import('./tools/esbuild-stub/index.ts');
   esbuild = fallback?.default ?? fallback;
   console.warn('Sử dụng esbuild fallback từ tools/esbuild-stub do không thể tải gói esbuild chuẩn:', err?.message || err);
 }
@@ -19,6 +19,9 @@ const SOURCE_EXTENSIONS = ['.js', '.ts', '.tsx', '.json'];
 const SCRIPT_EXTENSIONS = new Set(['.js', '.ts', '.tsx']);
 const LEGACY_MODULE_ID_ALIASES = new Map([
   ['./modes/pve/session.js', './modes/pve/session.ts'],
+  ['./modes/coming-soon.stub.js', './modes/coming-soon.stub.ts'],
+  ['./screens/collection/index.js', './screens/collection/index.ts'],
+  ['./screens/lineup/index.js', './screens/lineup/index.ts'],
   ['./entry.js', './entry.ts'],
 ]);
 
