@@ -1,6 +1,7 @@
 import { getSkillSet } from '../../../data/skills.ts';
 import { createNumberFormatter } from '../../../utils/format.ts';
 import { assertElement, ensureStyleTag, mountSection } from '../../../../ui/dom.ts';
+import { normalizeCurrencyBalances } from '../../../types/currency.ts';
 import {
   normalizeRoster,
   normalizeLineups,
@@ -21,6 +22,7 @@ import { bindLineupEvents } from './events.ts';
 import type { LineupState } from '@types/ui';
 import type { LineupCurrencies } from '../../../types/currency.ts';
 import type { UnknownRecord } from '../../../types/common.ts';
+import type { LineupDefinition, RosterEntryLite } from '../../../types/lineup.ts';
 
 const STYLE_ID = 'lineup-view-style-v1';
 const powerFormatter = createNumberFormatter('vi-VN');
@@ -250,8 +252,8 @@ export interface LineupViewOptions {
   shell?: { enterScreen?: (screenId: string, params?: unknown) => void } | null;
   definition?: { label?: string; title?: string; description?: string } | null;
   description?: string | null;
-  lineups?: unknown;
-  roster?: unknown;
+  lineups?: ReadonlyArray<LineupDefinition | null | undefined> | null;
+  roster?: ReadonlyArray<RosterEntryLite> | null;
   playerState?: UnknownRecord | null;
   currencies?: LineupCurrencies | null;
 }
@@ -279,8 +281,8 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
 
   ensureStyles();
 
-  const normalizedRoster = normalizeRoster(roster);
-  const normalizedLineups = normalizeLineups(lineups, normalizedRoster);
+  const normalizedRoster = normalizeRoster(roster ?? null);
+  const normalizedLineups = normalizeLineups(lineups ?? null, normalizedRoster);
   const rosterLookup = new Map<string, RosterUnit>(normalizedRoster.map(unit => [unit.id, unit] as const));
 
   const lineupState = new Map<string, LineupState>();
@@ -301,7 +303,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
     });
   });
 
-  const playerCurrencySource = (playerState as { currencies?: unknown } | null)?.currencies ?? null;
+  const playerCurrencySource = normalizeCurrencyBalances(playerState ?? null);
   const currencyBalances = createCurrencyBalances(playerCurrencySource, currencies);
 
   const state: LineupViewState = {

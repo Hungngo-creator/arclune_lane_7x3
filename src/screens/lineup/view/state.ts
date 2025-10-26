@@ -2,6 +2,12 @@ import { ROSTER } from '../../../catalog.ts';
 import { listCurrencies } from '../../../data/economy.ts';
 import { createNumberFormatter } from '../../../utils/format.ts';
 import type { LineupSlot, LineupState, EquipmentLoadout } from './types/ui';
+import type {
+  LineupDefinition,
+  LineupMemberConfig,
+  LineupPassiveConfig,
+  RosterEntryLite,
+} from '../../../types/lineup.ts';
 
 export interface RosterUnit {
   id: string;
@@ -73,34 +79,52 @@ const currencyCatalog = listCurrencies();
 const currencyIndex = new Map(currencyCatalog.map(currency => [currency.id, currency]));
 const numberFormatter = createNumberFormatter('vi-VN');
 
-function cloneRoster(source: unknown): unknown[] {
+const isObjectLike = (value: unknown): value is Record<string, unknown> => (
+  typeof value === 'object' && value !== null && !Array.isArray(value)
+);
+
+const isRosterEntryLite = (value: unknown): value is RosterEntryLite => isObjectLike(value);
+
+const isLineupDefinition = (value: unknown): value is LineupDefinition => isObjectLike(value);
+
+const isLineupMemberConfig = (value: unknown): value is LineupMemberConfig => isObjectLike(value);
+
+const isLineupPassiveConfig = (value: unknown): value is LineupPassiveConfig => isObjectLike(value);
+
+function cloneRoster(source: ReadonlyArray<RosterEntryLite> | null | undefined): RosterEntryLite[] {
   if (Array.isArray(source) && source.length > 0){
-    return source.map(entry => (entry && typeof entry === 'object') ? { ...entry } : entry);
+    const clones = source.filter(isRosterEntryLite).map(entry => ({ ...entry }));
+    if (clones.length > 0){
+      return clones;
+    }
   }
   return ROSTER.map(entry => ({ ...entry }));
 }
 
-function normalizeRosterEntry(entry: Record<string, unknown>, index: number): RosterUnit {
-  const id = entry.id ?? entry.key ?? `unit-${index}`;
-  const name = entry.name ?? entry.title ?? `Nhân vật #${index + 1}`;
-  const role = entry.class ?? entry.role ?? entry.archetype ?? '';
-  const rank = entry.rank ?? entry.tier ?? '';
-  const tags = Array.isArray(entry.tags)
-    ? entry.tags.slice()
-    : Array.isArray(entry.labels)
-      ? entry.labels.slice()
+function normalizeRosterEntry(entry: RosterEntryLite | null | undefined, index: number): RosterUnit {
+  const source: RosterEntryLite = entry ?? {};
+  const id = source.id ?? source.key ?? `unit-${index}`;
+  const name = source.name ?? source.title ?? `Nhân vật #${index + 1}`;
+  const role = source.class ?? source.role ?? source.archetype ?? '';
+  const rank = source.rank ?? source.tier ?? '';
+  const tags = Array.isArray(source.tags)
+    ? source.tags.slice()
+    : Array.isArray(source.labels)
+      ? source.labels.slice()
       : [];
-  const power = Number.isFinite(entry.power)
-    ? Number(entry.power)
-    : (Number.isFinite(entry.cp) ? Number(entry.cp) : null);
-  const avatar = typeof entry.avatar === 'string'
-    ? entry.avatar
-    : typeof entry.icon === 'string'
-      ? entry.icon
-      : typeof entry.portrait === 'string'
-        ? entry.portrait
+  const numericPower = Number(source.power);
+  const numericCp = Number(source.cp);
+  const power = Number.isFinite(numericPower)
+    ? numericPower
+    : (Number.isFinite(numericCp) ? numericCp : null);
+  const avatar = typeof source.avatar === 'string'
+    ? source.avatar
+    : typeof source.icon === 'string'
+      ? source.icon
+      : typeof source.portrait === 'string'
+        ? source.portrait
         : null;
-  const passives = Array.isArray(entry.passives) ? entry.passives.slice() : [];
+  const passives = Array.isArray(source.passives) ? source.passives.slice() : [];
   return {
     id: String(id),
     name: typeof name === 'string' ? name : `Nhân vật #${index + 1}`,
@@ -110,16 +134,13 @@ function normalizeRosterEntry(entry: Record<string, unknown>, index: number): Ro
     power: power ?? null,
     avatar,
     passives,
-    raw: entry,
+    raw: isObjectLike(source) ? { ...source } : null,
   };
 }
 
-export function normalizeRoster(source: unknown): RosterUnit[] {
+export function normalizeRoster(source: ReadonlyArray<RosterEntryLite> | null | undefined): RosterUnit[] {
   const cloned = cloneRoster(source);
-  return cloned.map((entry, index) => normalizeRosterEntry(
-    (entry && typeof entry === 'object') ? entry as Record<string, unknown> : {},
-    index,
-  ));
+  return cloned.map((entry, index) => normalizeRosterEntry(entry, index));
 }
 
 function normalizeAssignment(input: unknown, rosterIndex: Set<string>): AssignmentResult {
@@ -203,8 +224,8 @@ function normalizeCost(cost: unknown, fallbackCurrencyId: string | null): { curr
   return null;
 }
 
-function normalizeLineupEntry(entry: unknown, index: number, rosterIndex: Set<string>): LineupState {
-  const source = (entry && typeof entry === 'object') ? entry as Record<string, unknown> : {};
+function normalizeLineupEntry(entry: LineupDefinition | null | undefined, index: number, rosterIndex: Set<string>): LineupState {
+  const source: LineupDefinition = entry && isLineupDefinition(entry) ? entry : {};
   const id = source.id ?? source.key ?? `lineup-${index}`;
   const name = source.name ?? source.title ?? `Đội hình #${index + 1}`;
   const role = source.role ?? source.type ?? '';
@@ -215,16 +236,16 @@ function normalizeLineupEntry(entry: unknown, index: number, rosterIndex: Set<st
   const slotCosts = Array.isArray(source.slotCosts) ? source.slotCosts : null;
   const unlockCosts = Array.isArray(source.unlockCosts) ? source.unlockCosts : slotCosts;
   let unlockedCount = Math.min(3, 5);
-  if (Number.isFinite(source.initialUnlockedSlots)){
+  if (Number.isFinite(source.initialUnlockedSlots as number)){
     unlockedCount = Math.max(0, Math.min(5, Number(source.initialUnlockedSlots)));
-  } else if (rawSlots.some(slot => slot && typeof slot === 'object' && (slot as Record<string, unknown>).unlocked === false)){
-    unlockedCount = rawSlots.filter(slot => slot && typeof slot === 'object' && (slot as Record<string, unknown>).unlocked !== false).length;
+  } else if (rawSlots.some(slot => isLineupMemberConfig(slot) && slot.unlocked === false)){
+    unlockedCount = rawSlots.filter(slot => isLineupMemberConfig(slot) && slot.unlocked !== false).length;
   }
   const slots: LineupSlot[] = new Array(5).fill(null).map((_, slotIndex) => {
     const slotInput = rawSlots[slotIndex] ?? memberList[slotIndex] ?? null;
     const { unitId, label } = normalizeAssignment(slotInput, rosterIndex);
-    const record = (slotInput && typeof slotInput === 'object') ? slotInput as Record<string, unknown> : null;
-    const slotUnlock = record && 'unlocked' in record ? record.unlocked : null;
+    const record = isLineupMemberConfig(slotInput) ? slotInput : null;
+    const slotUnlock = record?.unlocked ?? null;
     const unlocked = slotUnlock != null ? Boolean(slotUnlock) : slotIndex < unlockedCount;
     const costSource = record?.cost
       ?? record?.unlockCost
@@ -250,7 +271,7 @@ function normalizeLineupEntry(entry: unknown, index: number, rosterIndex: Set<st
     : Array.isArray(source.reserve)
       ? source.reserve
       : Array.isArray(source.members)
-        ? (source.members as unknown[]).slice(5)
+       ? source.members.slice(5)
         : [];
   const bench: LineupBenchCell[] = new Array(10).fill(null).map((_, benchIndex) => {
     const benchInput = benchSource[benchIndex] ?? null;
@@ -259,7 +280,7 @@ function normalizeLineupEntry(entry: unknown, index: number, rosterIndex: Set<st
       index: benchIndex,
       unitId,
       label,
-      meta: (benchInput && typeof benchInput === 'object') ? { ...(benchInput as Record<string, unknown>) } : null,
+      meta: isLineupMemberConfig(benchInput) ? { ...benchInput } : null,
     };
   });
 
@@ -284,7 +305,7 @@ function normalizeLineupEntry(entry: unknown, index: number, rosterIndex: Set<st
         source: null,
       };
     }
-    const passive = passiveInput as Record<string, unknown>;
+    const passive = isLineupPassiveConfig(passiveInput) ? passiveInput : {};
     const idValue = passive.id ?? passive.key ?? `passive-${passiveIndex}`;
     const nameValue = passive.name ?? passive.title ?? `Passive #${passiveIndex + 1}`;
     const descriptionValue = passive.description ?? passive.effect ?? passive.text ?? '';
@@ -310,7 +331,7 @@ function normalizeLineupEntry(entry: unknown, index: number, rosterIndex: Set<st
       requiredTags,
       isEmpty: false,
       autoActive: Boolean(auto),
-      source: passive,
+      source: isLineupPassiveConfig(passiveInput) ? passiveInput : null,
     };
   });
 
@@ -331,7 +352,10 @@ function normalizeLineupEntry(entry: unknown, index: number, rosterIndex: Set<st
   };
 }
 
-export function normalizeLineups(rawLineups: unknown, roster: RosterUnit[]): LineupState[] {
+export function normalizeLineups(
+  rawLineups: ReadonlyArray<LineupDefinition | null | undefined> | null,
+  roster: RosterUnit[],
+): LineupState[] {
   const rosterIndex = new Set(roster.map(unit => unit.id));
   if (!Array.isArray(rawLineups) || rawLineups.length === 0){
     const slots: LineupSlot[] = new Array(5).fill(null).map((_, index) => ({
@@ -373,7 +397,7 @@ export function normalizeLineups(rawLineups: unknown, roster: RosterUnit[]): Lin
       defaultCurrencyId: null,
     }];
   }
-  return rawLineups.map((entry, index) => normalizeLineupEntry(entry, index, rosterIndex));
+  return rawLineups.map((entry, index) => normalizeLineupEntry(entry ?? null, index, rosterIndex));
 }
 
 function extractCurrencyBalances(source: unknown): CurrencyBalances {
