@@ -1,5 +1,5 @@
 import { Statuses, hookOnLethalDamage } from './statuses.ts';
-import { vfxAddHit, vfxAddMelee, vfxAddLightningArc } from './vfx.js';
+import { vfxAddHit, vfxAddMelee, vfxAddLightningArc } from './vfx.ts';
 import { slotToCell } from './engine.ts';
 import { emitPassiveEvent } from './passives.ts';
 import { CFG } from './config.ts';
