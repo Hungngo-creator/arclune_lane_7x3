@@ -264,11 +264,11 @@ declare module './events.ts' {
   ): boolean;
 }
 
-declare module './utils/time.js' {
+declare module './utils/time.ts' {
   export function safeNow(): number;
 }
 
-declare module './utils/fury.js' {
+declare module './utils/fury.ts' {
   import type { GameConfig } from '@types/config';
   import type { UnitId, UnitToken } from '@types/units';
 
