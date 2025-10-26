@@ -1,7 +1,6 @@
 import { CFG } from '../config.ts';
 import { safeNow } from './time.ts';
 
-// @ts-ignore -- bundler module resolution forbids '@types/*' bare specifiers, but path mapping supplies runtime stubs.
 import type { FuryState, UnitId, UnitToken } from '@types/units-export';
 
 const DEFAULT_TURN_CAP = 40;
