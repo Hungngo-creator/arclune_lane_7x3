@@ -30,8 +30,8 @@
         "src/vfx/*",
         "src/art/*"
       ],
-      "@types/config": ["src/@types/config.ts"],
-      "@types/units": ["src/@types/units.ts"],
+      "@types/config": ["src/types/config.ts"],
+      "@types/units": ["src/types/units.ts"],
       "@types/*": ["src/types/*"]
     }
   },
