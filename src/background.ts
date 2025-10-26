@@ -362,7 +362,7 @@ function drawFallback(
 }
 
 export function drawEnvironmentProps(
-  ctx: CanvasRenderingContext2D,
+  ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
   g: GridSpec,
   cam: CameraOptions | null | undefined,
   backgroundKey?: string | null,

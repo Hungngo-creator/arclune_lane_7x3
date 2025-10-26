@@ -5,7 +5,7 @@ import { safeNow as sharedSafeNow } from './utils/time.ts';
 import { detectUltBehavior, getSummonSpec, resolveSummonSlots } from './utils/kit.ts';
 import { lookupUnit } from './units.ts';
 
-import type { SessionState } from '@types/combat';
+import type { AiDeckCard, SessionState } from '@types/combat';
 import type { QueuedSummonRequest, UnitId, UnitToken } from '@types/units';
 
 type CandidateCell = { s: number; cx: number; cy: number };
@@ -18,11 +18,8 @@ type WeightKey =
   | 'kitDefense'
   | 'kitRevive';
 
-export interface AiCard {
-  id: UnitId;
-  name?: string | null;
+export interface AiCard extends AiDeckCard {
   cost: number;
-  [extra: string]: unknown;
 }
 
 export type DeckState = AiCard[];
@@ -196,26 +193,16 @@ function toAiCard(entry: unknown): AiCard | null {
 }
 
 function getDeck(Game: SessionState): DeckState {
-  const rawDeck = Array.isArray(Game.ai.deck) ? Game.ai.deck : [];
-  if (!Array.isArray(Game.ai.deck)) {
-    Game.ai.deck = [] as unknown as SessionState['ai']['deck'];
-  }
+  const source = Array.isArray(Game.ai.deck) ? Game.ai.deck : [];
   const normalized: AiCard[] = [];
-  let changed = !Array.isArray(Game.ai.deck);
-  for (const entry of rawDeck as unknown[]) {
+  for (const entry of source) {
     const card = toAiCard(entry);
     if (card) {
       normalized.push(card);
-      if (card !== entry) changed = true;
-    } else {
-      changed = true;
     }
   }
-  if (changed) {
-    Game.ai.deck = normalized as unknown as SessionState['ai']['deck'];
-    return normalized;
-  }
-  return rawDeck as DeckState;
+  Game.ai.deck = normalized;
+  return normalized;
 }
 
 function listEmptyEnemySlots(Game: SessionState, aliveTokens?: readonly UnitToken[] | null): CandidateCell[] {
@@ -336,7 +323,7 @@ function roleBias(className: unknown, cx: number): number {
 }
 
 function ensureUsedUnitIds(Game: SessionState): Set<UnitId> {
-  if (Game.ai.usedUnitIds instanceof Set) return Game.ai.usedUnitIds as Set<UnitId>;
+  if (Game.ai.usedUnitIds instanceof Set) return Game.ai.usedUnitIds;
   Game.ai.usedUnitIds = new Set<UnitId>();
   return Game.ai.usedUnitIds;
 }
@@ -379,10 +366,10 @@ export function queueEnemyAt(
   const enemyQueueRaw = Game.queued.enemy;
   const queue =
     enemyQueueRaw instanceof Map
-      ? (enemyQueueRaw as Map<number, QueuedSummonRequest>)
+    ? enemyQueueRaw
       : (() => {
           const created = new Map<number, QueuedSummonRequest>();
-          Game.queued.enemy = created as unknown as typeof Game.queued.enemy;
+          Game.queued.enemy = created;
           return created;
         })();
   if (queue.has(slot)) return false;
