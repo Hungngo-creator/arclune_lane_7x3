@@ -1,4 +1,3 @@
-// @ts-nocheck
 //v0.7.7
 import { stepTurn, doActionOrSkip, predictSpawnCycle } from '../../turns.ts';
 import { enqueueImmediate, processActionChain } from '../../summon.ts';
@@ -48,7 +47,12 @@ import {
 } from './session-state.ts';
 
 import type { BattleDetail, BattleResult, BattleState, LeaderSnapshot } from '@types/combat';
-import type { UnitToken, QueuedSummonState, ActionChainEntry } from '@types/units';
+import type {
+  UnitToken,
+  ActionChainEntry,
+  QueuedSummonRequest,
+  Side,
+} from '@types/units';
 import type { TurnSnapshot } from '@types/turn-order';
 import type {
   RewardRoll,
@@ -58,6 +62,7 @@ import type {
   CreateSessionOptions,
   SessionState,
 } from '@types/pve';
+import type { HudHandles } from '@types/ui';
 import type { NormalizedSessionConfig } from './session-state.ts';
 
 type RootLike = Element | Document | null | undefined;
@@ -66,6 +71,31 @@ type PveSessionStartConfig = StartConfigOverrides & {
   root?: RootLike;
   rootEl?: RootLike;
 };
+
+type FrameHandle = number | ReturnType<typeof setTimeout>;
+type GradientValue = CanvasGradient | string | undefined;
+type CanvasClickHandler = ((event: Event) => void) | null;
+type ClockState = {
+  startMs: number;
+  lastTimerRemain: number;
+  lastCostCreditedSec: number;
+  turnEveryMs: number;
+  lastTurnStepMs: number;
+};
+type ExtendedQueuedSummon = (QueuedSummonRequest & {
+  art?: ReturnType<typeof getUnitArt> | null;
+  skinKey?: string | null;
+  color?: string | null;
+  [extra: string]: unknown;
+}) | null;
+type DeckEntry = {
+  id: string;
+  cost?: number | null;
+  name?: string | null;
+  [extra: string]: unknown;
+};
+type CameraPreset = { topScale?: number; rowGapRatio?: number; depthScale?: number } | null | undefined;
+type GridSpec = ReturnType<typeof makeGrid>;
 
 export type PveSessionHandle = {
   start: (startConfig?: PveSessionStartConfig | null) => SessionState | null;
@@ -102,38 +132,43 @@ type EnemyAIPreset = {
 
 let canvas: HTMLCanvasElement | null = null;
 let ctx: CanvasRenderingContext2D | null = null;
-let hud: { update: (g: any) => void; cleanup?: () => void } | null = null;   // ← THÊM
+let hud: HudHandles | null = null;
 let hudCleanup: (() => void) | null = null;
 const CAM_PRESET = CAM[CFG.CAMERA] || CAM.landscape_oblique;
 const HAND_SIZE  = CFG.HAND_SIZE ?? 4;
 
 ensureNestedModuleSupport();
 
-const getNow = () => safeNow();
+const getNow = (): number => safeNow();
 
 // --- Instance counters (để gắn id cho token/minion) ---
 let _IID = 1;
 let _BORN = 1;
-const nextIid = ()=> _IID++;
+const nextIid = (): number => _IID++;
 
 let Game: SessionState | null = null;
-let tickLoopHandle = null;
+let tickLoopHandle: FrameHandle | null = null;
 let tickLoopUsesTimeout = false;
-let resizeHandler = null;
-let visualViewportResizeHandler = null;
-let visualViewportScrollHandler = null;
-let resizeSchedulerHandle = null;
+let resizeHandler: (() => void) | null = null;
+let visualViewportResizeHandler: (() => void) | null = null;
+let visualViewportScrollHandler: (() => void) | null = null;
+let resizeSchedulerHandle: FrameHandle | null = null;
 let resizeSchedulerUsesTimeout = false;
 let pendingResize = false;
-let canvasClickHandler = null;
-let artSpriteHandler = null;
+let canvasClickHandler: CanvasClickHandler = null;
+let artSpriteHandler: (() => void) | null = null;
 let visibilityHandlerBound = false;
-let winRef = null;
-let docRef = null;
-let rootElement = null;
+let winRef: (Window & typeof globalThis) | null = null;
+let docRef: Document | null = null;
+let rootElement: Element | Document | null = null;
 let storedConfig: NormalizedSessionConfig = normalizeConfig();
 let running = false;
-const hpBarGradientCache = new Map();
+const hpBarGradientCache = new Map<string, GradientValue>();
+
+const renderSummonBar = (): void => {
+  const bar = (Game?.ui?.bar ?? null) as { render?: () => void } | null;
+  if (bar?.render) bar.render();
+};
 
 function resetSessionState(options: StartConfigOverrides = {}): void {
   storedConfig = normalizeConfig({ ...storedConfig, ...options });
@@ -145,25 +180,35 @@ function resetSessionState(options: StartConfigOverrides = {}): void {
 }
 
 if (CFG?.DEBUG?.LOG_EVENTS) {
-  const logEvent = (type) => (ev)=>{
-    const detail = ev?.detail || {};
-    const unit = detail.unit;
+  const logEvent = (type: string) => (ev: Event): void => {
+    const detailRaw = (ev as CustomEvent<Record<string, unknown>> | null)?.detail ?? {};
+    const detail = detailRaw as Record<string, unknown>;
+    const unitRaw = detail['unit'] as { id?: string; name?: string } | null | undefined;
+    const readString = (value: unknown): string | null => (typeof value === 'string' ? value : null);
+    const readNumber = (value: unknown): number | null => {
+      if (typeof value === 'number' && Number.isFinite(value)) return value;
+      if (typeof value === 'string'){
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : null;
+      }
+      return null;
+    };
     const info = {
-      side: detail.side ?? null,
-      slot: detail.slot ?? null,
-      cycle: detail.cycle ?? null,
-      orderIndex: detail.orderIndex ?? null,
-      orderLength: detail.orderLength ?? null,
-      phase: detail.phase ?? null,
-      unit: unit?.id || unit?.name || null,
-      action: detail.action || null,
-      skipped: detail.skipped || false,
-      reason: detail.reason || null,
-      processedChain: detail.processedChain ?? null
+      side: readString(detail['side']),
+      slot: readNumber(detail['slot']),
+      cycle: readNumber(detail['cycle']),
+      orderIndex: readNumber(detail['orderIndex']),
+      orderLength: readNumber(detail['orderLength']),
+      phase: readString(detail['phase']),
+      unit: readString(unitRaw?.id) ?? readString(unitRaw?.name),
+      action: readString(detail['action']),
+      skipped: Boolean(detail['skipped']),
+      reason: readString(detail['reason']),
+      processedChain: detail['processedChain'] ?? null,
     };
     console.debug(`[events] ${type}`, info);
   };
-  const types = [TURN_START, TURN_END, ACTION_START, ACTION_END];
+  const types = [TURN_START, TURN_END, ACTION_START, ACTION_END] as const;
   for (const type of types){
     try {
       gameEvents.addEventListener(type, logEvent(type));
@@ -173,12 +218,12 @@ if (CFG?.DEBUG?.LOG_EVENTS) {
   }
 }
 
-let drawFrameHandle = null;
+let drawFrameHandle: FrameHandle | null = null;
 let drawFrameUsesTimeout = false;
 let drawPending = false;
 let drawPaused = false;
 
-function cancelScheduledDraw(){
+function cancelScheduledDraw(): void {
   if (drawFrameHandle !== null){
     if (drawFrameUsesTimeout){
       clearTimeout(drawFrameHandle);
@@ -196,7 +241,7 @@ function cancelScheduledDraw(){
   drawPending = false;
 }
 
-function scheduleDraw(){
+function scheduleDraw(): void {
   if (drawPaused) return;
   if (drawPending) return;
   if (!canvas || !ctx) return;
@@ -235,7 +280,7 @@ function scheduleDraw(){
   }
 }
 
-function cancelScheduledResize(){
+function cancelScheduledResize(): void {
   if (resizeSchedulerHandle !== null){
     if (resizeSchedulerUsesTimeout){
       clearTimeout(resizeSchedulerHandle);
@@ -253,7 +298,7 @@ function cancelScheduledResize(){
   pendingResize = false;
 }
 
-function flushScheduledResize(){
+function flushScheduledResize(): void {
   resizeSchedulerHandle = null;
   resizeSchedulerUsesTimeout = false;
   pendingResize = false;
@@ -268,7 +313,7 @@ function flushScheduledResize(){
   }
 }
 
-function scheduleResize(){
+function scheduleResize(): void {
   if (pendingResize) return;
   pendingResize = true;
   const raf = (winRef && typeof winRef.requestAnimationFrame === 'function')
@@ -283,21 +328,25 @@ function scheduleResize(){
   }
 }
 
-function refreshQueuedArtFor(unitId){
-  const apply = (map)=>{
+function refreshQueuedArtFor(unitId: string): void {
+  const apply = (map: Map<number, QueuedSummonRequest> | null | undefined): void => {
     if (!map || typeof map.values !== 'function') return;
     for (const pending of map.values()){
       if (!pending || pending.unitId !== unitId) continue;
       const updated = getUnitArt(unitId);
-      pending.art = updated;
-      pending.skinKey = updated?.skinKey;
-      if (!pending.color && updated?.palette?.primary){
-        pending.color = updated.palette.primary;
+      const pendingExt = pending as ExtendedQueuedSummon;
+      if (pendingExt){
+        pendingExt.art = updated ?? null;
+        pendingExt.skinKey = updated?.skinKey ?? null;
+        if (!pendingExt.color && updated?.palette?.primary){
+          pendingExt.color = updated.palette.primary;
+        }
       }
     }
   };
-  apply(Game.queued?.ally);
-  apply(Game.queued?.enemy);
+  if (!Game?.queued) return;
+  apply(Game.queued.ally);
+  apply(Game.queued.enemy);
 }
 
 function setUnitSkinForSession(unitId: string, skinKey: string | null | undefined): boolean {
@@ -319,7 +368,7 @@ function setUnitSkinForSession(unitId: string, skinKey: string | null | undefine
   return true;
 }
 
-function setDrawPaused(paused){
+function setDrawPaused(paused: boolean): void {
   drawPaused = !!paused;
   if (drawPaused){
     cancelScheduledDraw();
@@ -327,22 +376,22 @@ function setDrawPaused(paused){
     scheduleDraw();
   }
 }
-function bindArtSpriteListener(){
+function bindArtSpriteListener(): void {
   if (!winRef || typeof winRef.addEventListener !== 'function') return;
   if (artSpriteHandler) return;
   artSpriteHandler = ()=>{ invalidateSceneCache(); scheduleDraw(); };
   winRef.addEventListener(ART_SPRITE_EVENT, artSpriteHandler);
 }
 
-function unbindArtSpriteListener(){
+function unbindArtSpriteListener(): void {
   if (!winRef || !artSpriteHandler || typeof winRef.removeEventListener !== 'function') return;
   winRef.removeEventListener(ART_SPRITE_EVENT, artSpriteHandler);
   artSpriteHandler = null;
 }
 // Master clock theo timestamp – tránh drift giữa nhiều interval
-let CLOCK = null;
+let CLOCK: ClockState | null = null;
 
-function createClock(){
+function createClock(): ClockState {
   const now = getNow();
   return {
     startMs: now,
@@ -355,7 +404,7 @@ function createClock(){
 
 // Xác chết chờ vanish (để sau này thay bằng dead-animation)
 const DEATH_VANISH_MS = 900;
-function cleanupDead(now){
+function cleanupDead(now: number): void {
   if (!Game?.tokens) return;
   const tokens = Game.tokens;
   const keep = [];
@@ -370,14 +419,17 @@ function cleanupDead(now){
 }
 
 // LẤY TỪ INSTANCE đang đứng trên sân (đúng spec: thừa hưởng % chỉ số hiện tại của chủ)
-function creepStatsFromInherit(masterUnit, inherit){
+function creepStatsFromInherit(
+  masterUnit: UnitToken | null | undefined,
+  inherit: Record<string, unknown> | null | undefined,
+): Partial<Pick<UnitToken, 'hpMax' | 'hp' | 'atk' | 'wil' | 'res' | 'arm'>> {
   if (!inherit || typeof inherit !== 'object') return {};
   const hpMax = Math.round((masterUnit?.hpMax || 0) * ((inherit.HP ?? inherit.hp ?? inherit.HPMax ?? inherit.hpMax) || 0));
   const atk   = Math.round((masterUnit?.atk   || 0) * ((inherit.ATK ?? inherit.atk) || 0));
   const wil   = Math.round((masterUnit?.wil   || 0) * ((inherit.WIL ?? inherit.wil) || 0));
   const res   = Math.round((masterUnit?.res   || 0) * ((inherit.RES ?? inherit.res) || 0));
   const arm   = Math.round((masterUnit?.arm   || 0) * ((inherit.ARM ?? inherit.arm) || 0) * 100) / 100;
-  const stats = {};
+  const stats: Partial<Pick<UnitToken, 'hpMax' | 'hp' | 'atk' | 'wil' | 'res' | 'arm'>> = {};
   if (hpMax > 0){ stats.hpMax = hpMax; stats.hp = hpMax; }
   if (atk > 0) stats.atk = atk;
   if (wil > 0) stats.wil = wil;
@@ -386,14 +438,14 @@ function creepStatsFromInherit(masterUnit, inherit){
   return stats;
 }
 
-function getMinionsOf(masterIid){
-  return (Game?.tokens || []).filter(t => t.isMinion && t.ownerIid === masterIid && t.alive);
+function getMinionsOf(masterIid: number): UnitToken[] {
+  return (Game?.tokens || []).filter((t) => t.isMinion && t.ownerIid === masterIid && t.alive);
 }
-function removeOldestMinions(masterIid, count){
+function removeOldestMinions(masterIid: number, count: number): void {
   if (count <= 0) return;
   const tokens = Game?.tokens;
   if (!tokens) return;
-  const list = getMinionsOf(masterIid).sort((a,b)=> (a.bornSerial||0) - (b.bornSerial||0));
+  const list = getMinionsOf(masterIid).sort((a, b) => (a.bornSerial || 0) - (b.bornSerial || 0));
   for (let i=0;i<count && i<list.length;i++){
     const x = list[i];
     x.alive = false;
@@ -402,7 +454,7 @@ function removeOldestMinions(masterIid, count){
     if (idx >= 0) tokens.splice(idx,1);
   }
 }
-function extendBusy(duration){
+function extendBusy(duration: number): void {
   if (!Game || !Game.turn) return;
   const now = getNow();
   const prev = Number.isFinite(Game.turn.busyUntil) ? Game.turn.busyUntil : now;
@@ -411,7 +463,7 @@ function extendBusy(duration){
 }
 
 // Thực thi Ult: Summoner -> Immediate Summon theo meta; class khác: trừ nộ
-function performUlt(unit){
+function performUlt(unit: UnitToken): void {
   if (!Game){
     setFury(unit, 0);
     return;
@@ -551,7 +603,7 @@ case 'hpTradeBurst': {
         }
       }
 
-      const applyBusyFromVfx = (startedAt, duration) => {
+      const applyBusyFromVfx = (startedAt: number, duration: number | null | undefined): void => {
         if (!Number.isFinite(startedAt) || !Number.isFinite(duration)) return;
         busyMs = Math.max(busyMs, duration);
         if (Game?.turn){
@@ -856,7 +908,7 @@ case 'hpTradeBurst': {
   extendBusy(busyMs);
   spendFury(unit, resolveUltCost(unit));
 }
-const tokensAlive = () => (Game?.tokens || []).filter(t => t.alive);
+const tokensAlive = (): UnitToken[] => (Game?.tokens || []).filter((t) => t.alive);
 
 function ensureBattleState(game: SessionState | null): BattleState | null {
   if (!game || typeof game !== 'object') return null;
@@ -909,7 +961,7 @@ function snapshotLeader(unit: UnitToken | null | undefined): LeaderSnapshot | nu
   };
 }
 
-function isBossToken(game, token){
+function isBossToken(game: SessionState | null, token: UnitToken | null | undefined): boolean {
   if (!token) return false;
   if (token.isBoss) return true;
   const rankRaw = typeof token.rank === 'string' && token.rank ? token.rank : (game?.meta?.rankOf?.(token.id) || '');
@@ -917,7 +969,7 @@ function isBossToken(game, token){
   return rank === 'boss';
 }
 
-function isPvpMode(game){
+function isPvpMode(game: SessionState | null): boolean {
   const key = (game?.modeKey || '').toString().toLowerCase();
   if (!key) return false;
   if (key === 'ares') return true;
@@ -1035,7 +1087,7 @@ function checkBattleEnd(
   return finalizeBattle(game, { winner, reason, detail, finishedAt }, contextDetail);
 }
 // Giảm TTL minion của 1 phe sau khi phe đó kết thúc phase
-function tickMinionTTL(side){
+function tickMinionTTL(side: Side): void {
   // gom những minion hết hạn để xoá sau vòng lặp
   if (!Game?.tokens) return;
   const tokens = Game.tokens;
@@ -1057,53 +1109,63 @@ function tickMinionTTL(side){
   }
 }
 
-function init(){
+function init(): boolean {
   if (!Game) return false;
   if (Game._inited) return true;
-  const doc = docRef || (typeof document !== 'undefined' ? document : null);
+  const doc = docRef ?? (typeof document !== 'undefined' ? document : null);
   if (!doc) return false;
-  const root = rootElement || null;
-  const boardFromRoot = (root && typeof root.querySelector === 'function')
-    ? root.querySelector('#board')
+  const root = rootElement ?? null;
+  const boardFromRoot = (root && typeof (root as ParentNode).querySelector === 'function')
+    ? (root as ParentNode).querySelector('#board')
     : null;
-  const boardFromDocument = (typeof doc.querySelector === 'function')
+  const boardFromDocument = typeof doc.querySelector === 'function'
     ? doc.querySelector('#board')
-    : (typeof doc.getElementById === 'function' ? doc.getElementById('board') : null);
-  const boardEl = (boardFromRoot || boardFromDocument) as HTMLCanvasElement | null;
+  : typeof doc.getElementById === 'function'
+      ? doc.getElementById('board')
+      : null;
+  const boardEl = (boardFromRoot ?? boardFromDocument) as HTMLCanvasElement | null;
   if (!boardEl){
     return false;
   }
   canvas = boardEl;
-  ctx = boardEl.getContext('2d') as CanvasRenderingContext2D;
+  ctx = boardEl.getContext('2d') as CanvasRenderingContext2D | null;
   
   if (typeof hudCleanup === 'function'){
     hudCleanup();
     hudCleanup = null;
   }
-  hud = initHUD(doc, root);
-  hudCleanup = (hud && typeof hud.cleanup === 'function') ? hud.cleanup : null;
+  hud = initHUD(doc, root ?? undefined);
+  hudCleanup = hud ? () => hud.cleanup() : null;;
   resize();
   if (Game.grid) spawnLeaders(Game.tokens, Game.grid);
 
   const tokens = Game.tokens || [];
-  tokens.forEach(t=>{
+  for (const t of tokens){
     if (t.id === 'leaderA' || t.id === 'leaderB'){
       vfxAddSpawn(Game, t.cx, t.cy, t.side);
     }
-  });
-  tokens.forEach(t=>{
+}
+  for (const t of tokens){
     if (!t.iid) t.iid = nextIid();
     if (t.id === 'leaderA' || t.id === 'leaderB'){
       Object.assign(t, {
-        hpMax: 1600, hp: 1600, arm: 0.12, res: 0.12, atk: 40, wil: 30,
-        aeMax: 0, ae: 0
+        hpMax: 1600,
+        hp: 1600,
+        arm: 0.12,
+        res: 0.12,
+        atk: 40,
+        wil: 30,
+        aeMax: 0,
+        ae: 0,
       });
       initializeFury(t, t.id, 0);
     }
-  });
-  tokens.forEach(t => { if (!t.iid) t.iid = nextIid(); });
+}
+  for (const t of tokens){
+    if (!t.iid) t.iid = nextIid();
+  }
 
-  if (hud && typeof hud.update === 'function' && Game) hud.update(Game);
+  if (hud && Game) hud.update(Game);
   scheduleDraw();
   Game._inited = true;
 
@@ -1111,24 +1173,29 @@ function init(){
   refillDeckEnemy(Game);
 
   Game.ui.bar = startSummonBar(doc, {
-    onPick: (c)=>{
-      Game.selectedId = c.id;
-      Game.ui.bar.render();
+    onPick: (card): void => {
+      const entry = card as DeckEntry;
+      Game.selectedId = entry.id;
+      renderSummonBar();
     },
-    canAfford: (c)=> Game.cost >= c.cost,
-    getDeck: ()=> Game.deck3,
-    getSelectedId: ()=> Game.selectedId
-  }, root);
+    canAfford: (card): boolean => {
+      const entry = card as DeckEntry;
+      const cost = Number.isFinite(entry.cost) ? Number(entry.cost) : 0;
+      return Game.cost >= cost;
+    },
+    getDeck: () => Game.deck3 as DeckEntry[],
+    getSelectedId: () => Game.selectedId,
+  }, root ?? undefined);
 
   selectFirstAffordable();
-  Game.ui.bar.render();
+  renderSummonBar();
 
-  if (canvasClickHandler){
+  if (canvasClickHandler && canvas){
     canvas.removeEventListener('click', canvasClickHandler);
     canvasClickHandler = null;
   }
-  canvasClickHandler = (ev)=>{
-    if (!Game.grid) return;
+  canvasClickHandler = (ev: MouseEvent): void => {
+    if (!canvas || !Game.grid) return;;
     const rect = canvas.getBoundingClientRect();
     const p = { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
     const cell = hitToCellOblique(Game.grid, p.x, p.y, CAM_PRESET);
@@ -1136,11 +1203,13 @@ function init(){
 
     if (cell.cx >= CFG.ALLY_COLS) return;
 
-    const card = Game.deck3.find(u => u.id === Game.selectedId);
+    const deck = Game.deck3 as DeckEntry[];
+    const card = deck.find((u) => u.id === Game.selectedId) ?? null;
     if (!card) return;
 
     if (cellReserved(tokensAlive(), Game.queued, cell.cx, cell.cy)) return;
-    if (Game.cost < card.cost) return;
+    const cardCost = Number.isFinite(card.cost) ? Number(card.cost) : 0;
+    if (Game.cost < cardCost) return;
     if (Game.summoned >= Game.summonLimit) return;
 
     const slot = slotIndex('ally', cell.cx, cell.cy);
@@ -1148,76 +1217,85 @@ function init(){
 
     const spawnCycle = predictSpawnCycle(Game, 'ally', slot);
     const pendingArt = getUnitArt(card.id);
-    const pending = {
-      unitId: card.id, name: card.name, side:'ally',
-      cx: cell.cx, cy: cell.cy, slot, spawnCycle,
+    const pending: QueuedSummonRequest & {
+      art?: ReturnType<typeof getUnitArt> | null;
+      skinKey?: string | null;
+    } = {
+      unitId: card.id,
+      name: typeof card.name === 'string' ? card.name : null,
+      side: 'ally',
+      cx: cell.cx,
+      cy: cell.cy,
+      slot,
+      spawnCycle,
       source: 'deck',
       color: pendingArt?.palette?.primary || '#a9f58c',
-      art: pendingArt,
-      skinKey: pendingArt?.skinKey
+      art: pendingArt ?? null,
+      skinKey: pendingArt?.skinKey ?? null,
     };
     Game.queued.ally.set(slot, pending);
 
-    Game.cost = Math.max(0, Game.cost - card.cost);
-    if (hud && typeof hud.update === 'function' && Game) hud.update(Game);
+    Game.cost = Math.max(0, Game.cost - cardCost);
+    if (hud && Game) hud.update(Game);
     Game.summoned += 1;
     Game.usedUnitIds.add(card.id);
 
-    Game.deck3 = Game.deck3.filter(u => u.id !== card.id);
+    Game.deck3 = Game.deck3.filter((u) => u.id !== card.id);
     Game.selectedId = null;
     refillDeck();
     selectFirstAffordable();
-    Game.ui.bar.render();
+    renderSummonBar();
     scheduleDraw();
   };
-  canvas.addEventListener('click', canvasClickHandler);
+  if (canvas && canvasClickHandler){
+    canvas.addEventListener('click', canvasClickHandler);
+  }
 
   if (resizeHandler && winRef && typeof winRef.removeEventListener === 'function'){
     winRef.removeEventListener('resize', resizeHandler);
     resizeHandler = null;
   }
-  resizeHandler = ()=>{ scheduleResize(); };
-  if (winRef && typeof winRef.addEventListener === 'function'){
+  resizeHandler = (): void => { scheduleResize(); };
+  if (winRef && typeof winRef.addEventListener === 'function' && resizeHandler){
     winRef.addEventListener('resize', resizeHandler);
   }
 
-const viewport = winRef?.visualViewport;
+  const viewport = winRef?.visualViewport ?? null;
   if (viewport && typeof viewport.addEventListener === 'function'){
     if (visualViewportResizeHandler && typeof viewport.removeEventListener === 'function'){
       viewport.removeEventListener('resize', visualViewportResizeHandler);
     }
-    visualViewportResizeHandler = ()=>{ scheduleResize(); };
+    visualViewportResizeHandler = (): void => { scheduleResize(); };
     viewport.addEventListener('resize', visualViewportResizeHandler);
 
     if (visualViewportScrollHandler && typeof viewport.removeEventListener === 'function'){
       viewport.removeEventListener('scroll', visualViewportScrollHandler);
     }
-    visualViewportScrollHandler = ()=>{ scheduleResize(); };
+    visualViewportScrollHandler = (): void => { scheduleResize(); };
     viewport.addEventListener('scroll', visualViewportScrollHandler);
   }
 
-  const queryFromRoot = (selector)=>{
-    if (root && typeof root.querySelector === 'function'){
-      const el = root.querySelector(selector);
+  const queryFromRoot = (selector: string): Element | null => {
+    if (root && typeof (root as ParentNode).querySelector === 'function'){
+      const el = (root as ParentNode).querySelector(selector);
       if (el) return el;
     }
     return null;
   };
-  
-  const updateTimerAndCost = (timestamp)=>{
-    if (!CLOCK) return;
-    if (!Game) return;
-    if (Game?.battle?.over) return;
 
-    const now = Number.isFinite(timestamp) ? timestamp : getNow();
+    const updateTimerAndCost = (timestamp?: number): void => {
+    if (!CLOCK || !Game) return;
+    if (Game.battle?.over) return;
+
+    const now = Number.isFinite(timestamp) ? Number(timestamp) : getNow();
     const elapsedSec = Math.floor((now - CLOCK.startMs) / 1000);
 
     const prevRemain = Number.isFinite(CLOCK.lastTimerRemain) ? CLOCK.lastTimerRemain : 0;
     const remain = Math.max(0, 240 - elapsedSec);
     if (remain !== CLOCK.lastTimerRemain){
       CLOCK.lastTimerRemain = remain;
-      const mm = String(Math.floor(remain/60)).padStart(2,'0');
-      const ss = String(remain%60).padStart(2,'0');
+      const mm = String(Math.floor(remain / 60)).padStart(2, '0');
+      const ss = String(remain % 60).padStart(2, '0');
       const tEl = (queryFromRoot('#timer') || doc.getElementById('timer')) as HTMLElement | null;
       if (tEl) tEl.textContent = `${mm}:${ss}`;
     }
@@ -1238,15 +1316,15 @@ const viewport = winRef?.visualViewport;
 
       CLOCK.lastCostCreditedSec = elapsedSec;
 
-      if (hud && typeof hud.update === 'function' && Game) hud.update(Game);
+      if (hud && Game) hud.update(Game);
       if (!Game.selectedId) selectFirstAffordable();
-      if (Game.ui?.bar) Game.ui.bar.render();
+      renderSummonBar();
       aiMaybeAct(Game, 'cost');
     }
 
-  if (Game?.battle?.over) return;
+   if (Game.battle?.over) return;
 
-    const busyUntil = (Game.turn?.busyUntil) ?? 0;
+    const busyUntil = Game.turn?.busyUntil ?? 0;
     if (now >= busyUntil && now - CLOCK.lastTurnStepMs >= CLOCK.turnEveryMs){
       CLOCK.lastTurnStepMs = now;
       stepTurn(Game, {
@@ -1254,7 +1332,7 @@ const viewport = winRef?.visualViewport;
         processActionChain,
         allocIid: nextIid,
         doActionOrSkip,
-        checkBattleEnd
+        checkBattleEnd,
       });
       cleanupDead(now);
       const postTurnResult = checkBattleEnd(Game, { trigger: 'post-turn', timestamp: now });
@@ -1267,14 +1345,14 @@ const viewport = winRef?.visualViewport;
     }
   };
 
-  const runTickLoop = (timestamp)=>{
+  const runTickLoop = (timestamp?: number): void => {
     tickLoopHandle = null;
     updateTimerAndCost(timestamp);
     if (!running || !CLOCK) return;
     scheduleTickLoop();
   };
 
-  function scheduleTickLoop(){
+  function scheduleTickLoop(): void {
     if (!running || !CLOCK) return;
     if (tickLoopHandle !== null) return;
     const raf = (winRef && typeof winRef.requestAnimationFrame === 'function')
@@ -1285,26 +1363,27 @@ const viewport = winRef?.visualViewport;
       tickLoopHandle = raf(runTickLoop);
     } else {
       tickLoopUsesTimeout = true;
-      tickLoopHandle = setTimeout(()=> runTickLoop(getNow()), 16);
+      tickLoopHandle = setTimeout(() => runTickLoop(getNow()), 16);
     }
   }
+
   updateTimerAndCost(getNow());
   scheduleTickLoop();
   return true;
 }
 
-function selectFirstAffordable(){
+function selectFirstAffordable(): void {
   if (!Game) return;
 
-  const deck = Array.isArray(Game.deck3) ? Game.deck3 : [];
+  const deck = (Array.isArray(Game.deck3) ? Game.deck3 : []) as DeckEntry[];
   if (!deck.length){
     Game.selectedId = null;
     return;
   }
 
-  let cheapestAffordable = null;
+  let cheapestAffordable: DeckEntry | null = null;
   let cheapestAffordableCost = Infinity;
-  let cheapestOverall = null;
+  let cheapestOverall: DeckEntry | null = null;
   let cheapestOverallCost = Infinity;
 
   for (const card of deck){
@@ -1330,7 +1409,7 @@ function selectFirstAffordable(){
 }
 
 /* ---------- Deck logic ---------- */
-function refillDeck(){
+function refillDeck(): void {
   if (!Game) return;
 
   const need = HAND_SIZE - Game.deck3.length;
@@ -1340,12 +1419,13 @@ function refillDeck(){
     ...Game.usedUnitIds,
     ...Game.deck3.map(u=>u.id)
   ]);
-  const more = pickRandom(Game.unitsAll, exclude).slice(0, need);
-  Game.deck3.push(...more);
+  const more = pickRandom(Game.unitsAll as ReadonlyArray<DeckEntry>, exclude).slice(0, need);
+  const deck = Game.deck3 as DeckEntry[];
+  deck.push(...more);
 }
 
 /* ---------- Vẽ ---------- */
-function resize(){
+function resize(): void {
   if (!canvas || !Game) return;                         // guard
   const prevGrid = Game?.grid ? {
     w: Game.grid.w,
@@ -1392,7 +1472,7 @@ function resize(){
     invalidateSceneCache();
   }
 }
-function draw(){
+function draw(): void {
   if (!ctx || !canvas || !Game?.grid) return;           // guard
   const clearW = Game.grid?.w ?? canvas.width;
   const clearH = Game.grid?.h ?? canvas.height;
@@ -1421,12 +1501,12 @@ function draw(){
   vfxDraw(ctx, Game, CAM_PRESET);
   drawHPBars();
 }
-function cellCenterObliqueLocal(g, cx, cy, C){
+function cellCenterObliqueLocal(g: GridSpec, cx: number, cy: number, C: CameraPreset): { x: number; y: number; scale: number } {
   const colsW = g.tile * g.cols;
   const topScale = ((C?.topScale) ?? 0.80);
   const rowGap = ((C?.rowGapRatio) ?? 0.62) * g.tile;
 
-  function rowLR(r){
+  function rowLR(r: number): { left: number; right: number } {
     const pinch = (1 - topScale) * colsW;
     const t = r / g.rows;
     const width = colsW - pinch * (1 - t);
@@ -1452,7 +1532,7 @@ function cellCenterObliqueLocal(g, cx, cy, C){
   return { x, y, scale };
 }
 
-function roundedRectPathUI(ctx, x, y, w, h, radius){
+function roundedRectPathUI(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, radius: number): void {
   const r = Math.min(radius, w / 2, h / 2);
   ctx.beginPath();
   ctx.moveTo(x + r, y);
@@ -1467,7 +1547,7 @@ function roundedRectPathUI(ctx, x, y, w, h, radius){
   ctx.closePath();
 }
 
-function lightenColor(color, amount){
+function lightenColor(color: string | null | undefined, amount: number): string | null | undefined {
   if (typeof color !== 'string') return color;
   if (!color.startsWith('#')) return color;
   let hex = color.slice(1);
@@ -1482,7 +1562,12 @@ function lightenColor(color, amount){
   return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
 }
 
-function normalizeHpBarCacheKey(fillColor, innerHeight, innerRadius, startY){
+function normalizeHpBarCacheKey(
+  fillColor: string | undefined,
+  innerHeight: number,
+  innerRadius: number,
+  startY: number,
+): string {
   const color = typeof fillColor === 'string' ? fillColor.trim().toLowerCase() : String(fillColor ?? '');
   const height = Number.isFinite(innerHeight) ? Math.max(0, Math.round(innerHeight)) : 0;
   const radius = Number.isFinite(innerRadius) ? Math.max(0, Math.round(innerRadius)) : 0;
@@ -1490,7 +1575,13 @@ function normalizeHpBarCacheKey(fillColor, innerHeight, innerRadius, startY){
   return `${color}|h:${height}|r:${radius}|y:${start}`;
 }
 
-function ensureHpBarGradient(fillColor, innerHeight, innerRadius, startY, x){
+function ensureHpBarGradient(
+  fillColor: string | undefined,
+  innerHeight: number,
+  innerRadius: number,
+  startY: number,
+  x: number,
+): GradientValue {
   const key = normalizeHpBarCacheKey(fillColor, innerHeight, innerRadius, startY);
   const cached = hpBarGradientCache.get(key);
   if (cached) return cached;
@@ -1511,7 +1602,7 @@ function ensureHpBarGradient(fillColor, innerHeight, innerRadius, startY, x){
   return gradient;
 }
 
-function drawHPBars(){
+function drawHPBars(): void {
   if (!ctx || !Game?.grid) return;
   const baseR = Math.floor(Game.grid.tile * 0.36);
   const tokens = Game.tokens || [];
@@ -1562,12 +1653,12 @@ function drawHPBars(){
   }
 }
 /* ---------- Chạy ---------- */
-function handleVisibilityChange(){
+function handleVisibilityChange(): void {
   if (!docRef) return;
   setDrawPaused(!!docRef.hidden);
 }
 
-function bindVisibility(){
+function bindVisibility(): void {
   if (visibilityHandlerBound) return;
   const doc = docRef;
   if (!doc || typeof doc.addEventListener !== 'function') return;
@@ -1575,7 +1666,7 @@ function bindVisibility(){
   visibilityHandlerBound = true;
 }
 
-function unbindVisibility(){
+function unbindVisibility(): void {
   if (!visibilityHandlerBound) return;
   const doc = docRef;
   if (doc && typeof doc.removeEventListener === 'function'){
@@ -1584,7 +1675,7 @@ function unbindVisibility(){
   visibilityHandlerBound = false;
 }
 
-function configureRoot(root){
+function configureRoot(root: RootLike): void {
   rootElement = root || null;
   if (rootElement && rootElement.ownerDocument){
     docRef = rootElement.ownerDocument;
@@ -1596,7 +1687,7 @@ function configureRoot(root){
   winRef = docRef?.defaultView ?? (typeof window !== 'undefined' ? window : null);
 }
 
-function clearSessionTimers(){
+function clearSessionTimers(): void {
   if (tickLoopHandle !== null){
     if (tickLoopUsesTimeout){
       clearTimeout(tickLoopHandle);
@@ -1615,7 +1706,7 @@ function clearSessionTimers(){
   cancelScheduledResize();
 }
 
-function clearSessionListeners(){
+function clearSessionListeners(): void {
   if (canvas && canvasClickHandler && typeof canvas.removeEventListener === 'function'){
     canvas.removeEventListener('click', canvasClickHandler);
   }
@@ -1644,7 +1735,7 @@ function clearSessionListeners(){
   unbindVisibility();
 }
 
-function resetDomRefs(){
+function resetDomRefs(): void {
   canvas = null;
   ctx = null;
   hud = null;
@@ -1653,7 +1744,7 @@ function resetDomRefs(){
   invalidateSceneCache();
 }
 
-function stopSession(){
+function stopSession(): void {
   clearSessionTimers();
   clearSessionListeners();
   if (Game){
@@ -1681,7 +1772,7 @@ function stopSession(){
   invalidateSceneCache();
 }
 
-function bindSession(){
+function bindSession(): void {
   bindArtSpriteListener();
   bindVisibility();
   if (docRef){
