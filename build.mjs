@@ -39,7 +39,11 @@ const LEGACY_MODULE_ID_ALIAS_ENTRIES = [
   ['./modes/pve/session.js', './modes/pve/session.ts'],
   ['./screens/collection/index.js', './screens/collection/index.ts'],
   ['./screens/lineup/index.js', './screens/lineup/index.ts'],
- ];
+ ['@modes/coming-soon.stub.ts', './modes/coming-soon.stub.ts'],
+  ['@modes/pve/session.ts', './modes/pve/session.ts'],
+  ['@screens/collection/index.ts', './screens/collection/index.ts'],
+  ['@screens/lineup/index.ts', './screens/lineup/index.ts'],
+];
 
 const LEGACY_MODULE_ID_ALIASES = new Map(
   LEGACY_MODULE_ID_ALIAS_ENTRIES.map(([fromId, toId]) => [normalizeModuleId(fromId), normalizeModuleId(toId)])
