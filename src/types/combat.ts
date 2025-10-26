@@ -9,6 +9,7 @@ import type { RosterUnitDefinition } from './config';
 import type { TurnSnapshot } from './turn-order';
 import type { RngState } from './rng';
 import type { TelemetryEvent } from './telemetry';
+import type { GameEventTargetLike } from '../events';
 
 export interface StatusEffect {
   id: string;
@@ -175,7 +176,7 @@ export interface SessionState {
   turn: TurnSnapshot | null;
   queued: QueuedSummonState;
   actionChain: ActionChainEntry[];
-  events: EventTarget;
+  events: GameEventTargetLike;
   sceneTheme?: string | null;
   backgroundKey?: string | null;
   battle: BattleState;
