@@ -167,10 +167,12 @@ export function applyReward(
   if (!session?.runtime) return null;
   if (!isReward(reward)) return null;
   const runtime = session.runtime;
-  updateRuntimeRewards(runtime, [reward]);
+  const queue = ensureRewardQueue(runtime);
+  runtime.rewardQueue = queue.filter((entry) => entry.id !== reward.id);
   const encounter = runtime.encounter;
   if (encounter) {
-    updateEncounterRewards(encounter, [reward]);
+    const pending = ensurePendingRewards(encounter);
+    encounter.pendingRewards = pending.filter((entry) => entry.id !== reward.id);
   }
   return reward;
 }
