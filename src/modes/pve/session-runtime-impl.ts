@@ -406,6 +406,8 @@ function scheduleResize(): void {
   }
 }
 
+const DEFAULT_TOKEN_COLOR = '#a9f58c';
+
 function refreshQueuedArtFor(unitId: string): void {
   const apply = (map: Map<number, QueuedSummonRequest> | null | undefined): void => {
     if (!map || typeof map.values !== 'function') return;
@@ -414,11 +416,10 @@ function refreshQueuedArtFor(unitId: string): void {
       const updated = getUnitArt(unitId);
       const pendingExt = pending as ExtendedQueuedSummon;
       if (pendingExt){
+        const nextColor = updated?.palette?.primary ?? pendingExt.color ?? DEFAULT_TOKEN_COLOR;
         pendingExt.art = updated ?? null;
         pendingExt.skinKey = updated?.skinKey ?? null;
-        if (!pendingExt.color && updated?.palette?.primary){
-          pendingExt.color = updated.palette.primary;
-        }
+        pendingExt.color = nextColor;
       }
     }
   };
@@ -434,20 +435,23 @@ function setUnitSkinForSession(unitId: string, skinKey: string | null | undefine
   const art = getUnitArt(unitId);
   const resolvedSkin = art?.skinKey ?? null;
   const primaryColor = art?.palette?.primary ?? null;
+  const resolveColor = (current: string | null | undefined): string => {
+    return primaryColor ?? current ?? DEFAULT_TOKEN_COLOR;
+  };
   const applyArtMetadata = (entry: DeckEntry | null | undefined): void => {
     if (!entry || entry.id !== unitId) return;
+    const nextColor = resolveColor(entry.color);
     entry.art = art ?? null;
     entry.skinKey = resolvedSkin;
-    if (primaryColor) entry.color = primaryColor;
+    entry.color = nextColor;
   };
   const tokens = Game.tokens || [];
   for (const token of tokens){
     if (!token || token.id !== unitId) continue;
+    const nextColor = resolveColor(token.color);
     token.art = art;
     token.skinKey = resolvedSkin;
-    if (primaryColor){
-      token.color = primaryColor;
-    }
+    token.color = nextColor;
   }
   if (Array.isArray(Game.deck3)){
     for (const entry of Game.deck3){
