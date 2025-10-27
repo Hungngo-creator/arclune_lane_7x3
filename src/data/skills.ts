@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { loadConfig } from './load-config.ts';
 import { ROSTER } from '../catalog.ts';
 
+import type { UnknownRecord } from '@types/common';
 import type { UnitId } from '@types/units';
 import type { SkillEntry, SkillSection } from '@types/config';
 
@@ -55,17 +56,19 @@ function normalizeSkillEntry(entry: SkillSection | null | undefined): SkillSecti
   return normalized;
 }
 
-type RawSkillSet = Readonly<{
-  unitId: UnitId;
-  basic?: SkillSection | string | null;
-  skill?: SkillSection | null;
-  skills?: ReadonlyArray<SkillSection>;
-  ult?: SkillSection | string | null;
-  talent?: SkillSection | string | null;
-  technique?: SkillSection | string | null;
-  notes?: ReadonlyArray<string> | string | null;
-  [extra: string]: unknown;
-}>;
+type RawSkillSet = Readonly<
+  {
+    unitId: UnitId;
+    basic?: SkillSection | string | null;
+    skill?: SkillSection | null;
+    skills?: ReadonlyArray<SkillSection>;
+    ult?: SkillSection | string | null;
+    talent?: SkillSection | string | null;
+    technique?: SkillSection | string | null;
+    notes?: ReadonlyArray<string> | string | null;
+  } &
+    UnknownRecord
+>;
 
 const RawSkillSetSchema = z.object({
   unitId: z.string()
