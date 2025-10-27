@@ -1,0 +1,17 @@
+{
+  "inputs": {
+    "virtual-entry.js": {
+      "bytes": 805051
+    }
+  },
+  "outputs": {
+    "virtual-entry.js": {
+      "bytes": 805051,
+      "inputs": {
+        "virtual-entry.js": {
+          "bytesInOutput": 805051
+        }
+      }
+    }
+  }
+}
