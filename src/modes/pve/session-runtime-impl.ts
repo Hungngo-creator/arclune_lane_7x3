@@ -431,17 +431,36 @@ function setUnitSkinForSession(unitId: string, skinKey: string | null | undefine
   if (!Game) return false;
   const ok = setUnitSkin(unitId, skinKey);
   if (!ok) return false;
+  const art = getUnitArt(unitId);
+  const resolvedSkin = art?.skinKey ?? null;
+  const primaryColor = art?.palette?.primary ?? null;
+  const applyArtMetadata = (entry: DeckEntry | null | undefined): void => {
+    if (!entry || entry.id !== unitId) return;
+    entry.art = art ?? null;
+    entry.skinKey = resolvedSkin;
+    if (primaryColor) entry.color = primaryColor;
+  };
   const tokens = Game.tokens || [];
   for (const token of tokens){
     if (!token || token.id !== unitId) continue;
-    const art = getUnitArt(unitId);
     token.art = art;
-    token.skinKey = art?.skinKey;
-    if (!token.color && art?.palette?.primary){
-      token.color = art.palette.primary;
+    token.skinKey = resolvedSkin;
+    if (primaryColor){
+      token.color = primaryColor;
+    }
+  }
+  if (Array.isArray(Game.deck3)){
+    for (const entry of Game.deck3){
+      applyArtMetadata(entry as DeckEntry);
+    }
+  }
+  if (Array.isArray(Game.unitsAll)){
+    for (const entry of Game.unitsAll){
+      applyArtMetadata(entry as DeckEntry);
     }
   }
   refreshQueuedArtFor(unitId);
+  renderSummonBar();
   scheduleDraw();
   return true;
 }
