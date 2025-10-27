@@ -6,8 +6,8 @@ import { renderMainMenuView } from '../../src/screens/main-menu/view/index.ts';
 import { renderLineupScreen } from '../../src/screens/lineup/index.ts';
 import { renderCollectionScreen } from '../../src/screens/collection/index.ts';
 import type { MainMenuState, MenuCardMetadata, MenuSection } from '../../src/screens/main-menu/types.ts';
-import type { RosterEntryLite, LineupDefinition } from '../../src/types/lineup.ts';
-import type { LineupCurrencyConfig } from '../../src/types/currency.ts';
+import type { RosterEntryLite, LineupDefinition } from '@types/lineup';
+import type { LineupCurrencyConfig } from '@types/currency';
 
 beforeEach(() => {
   document.body.innerHTML = '';
