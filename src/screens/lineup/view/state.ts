@@ -7,7 +7,7 @@ import type {
   LineupMemberConfig,
   LineupPassiveConfig,
   RosterEntryLite,
-} from '../../../types/lineup.ts';
+} from '@types/lineup';
 
 export interface RosterUnit {
   id: string;
