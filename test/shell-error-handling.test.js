@@ -79,3 +79,63 @@ test('onError option is used when provided', () => {
   assert.equal(captured.length, 1);
   assert.strictEqual(captured[0].error, boom);
 });
+
+test('mutating snapshots does not leak into internal state', () => {
+  const initialParams = { foo: 'bar', count: 1 };
+  const shell = createAppShell({
+    screen: 'initial',
+    screenParams: initialParams
+  });
+
+  const firstState = shell.getState();
+  assert.notStrictEqual(firstState.screenParams, initialParams);
+  assert.equal(firstState.screenParams?.foo, 'bar');
+
+  if (firstState.screenParams) {
+    firstState.screenParams.foo = 'mutated';
+    firstState.screenParams.count = 42;
+  }
+
+  const secondState = shell.getState();
+  assert.equal(secondState.screenParams?.foo, 'bar');
+  assert.equal(secondState.screenParams?.count, 1);
+});
+
+test('mutating provided params after enterScreen does not affect state', () => {
+  const shell = createAppShell();
+  const params = { stage: 3, mode: 'normal' };
+
+  shell.enterScreen('battle', params);
+
+  params.stage = 5;
+  params.mode = 'hard';
+
+  const state = shell.getState();
+  assert.equal(state.screen, 'battle');
+  assert.equal(state.screenParams?.stage, 3);
+  assert.equal(state.screenParams?.mode, 'normal');
+});
+
+test('listener receives isolated screenParams snapshot', () => {
+  const shell = createAppShell();
+  const captured = [];
+
+  shell.onChange((state) => {
+    if (state.screenParams) {
+      captured.push(state.screenParams);
+    }
+  });
+
+  const params = { filter: 'all', page: 1 };
+  shell.enterScreen('inventory', params);
+
+  assert.equal(captured.length, 1);
+  assert.notStrictEqual(captured[0], params);
+
+  captured[0].filter = 'mutated';
+  captured[0].page = 99;
+
+  const latest = shell.getState();
+  assert.equal(latest.screenParams?.filter, 'all');
+  assert.equal(latest.screenParams?.page, 1);
+});
