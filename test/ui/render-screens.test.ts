@@ -5,9 +5,10 @@
 import { renderMainMenuView } from '../../src/screens/main-menu/view/index.ts';
 import { renderLineupScreen } from '../../src/screens/lineup/index.ts';
 import { renderCollectionScreen } from '../../src/screens/collection/index.ts';
+import { resolveCurrencyBalance } from '../../src/screens/collection/helpers.ts';
 import type { MainMenuState, MenuCardMetadata, MenuSection } from '../../src/screens/main-menu/types.ts';
 import type { RosterEntryLite, LineupDefinition } from '@types/lineup';
-import type { LineupCurrencyConfig } from '@types/currency';
+import type { LineupCurrencyConfig, LineupCurrencies } from '@types/currency';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -200,5 +201,17 @@ describe('renderCollectionScreen', () => {
     expect(walletItems.length).toBeGreaterThan(0);
 
     handle.destroy();
+  });
+});
+
+describe('resolveCurrencyBalance', () => {
+  it('ưu tiên currencyId phù hợp trong mảng nhiều loại tiền', () => {
+    const currencyArray: LineupCurrencies = [
+      7500,
+      { id: 'HNT', balance: 42 },
+    ];
+
+    expect(resolveCurrencyBalance('VNT', currencyArray, null)).toBe(7500);
+    expect(resolveCurrencyBalance('HNT', currencyArray, null)).toBe(42);
   });
 });
