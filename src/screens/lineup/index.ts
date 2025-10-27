@@ -1,15 +1,15 @@
 import { renderLineupView } from './view/index.ts';
 import type { LineupViewHandle } from './view/index.ts';
-import type { UnknownRecord } from '../../types/common.ts';
+import type { UnknownRecord } from '@types/common';
 import type {
   LineupCurrencies,
   LineupCurrencyConfig,
   LineupCurrencyValue,
-} from '../../types/currency.ts';
-import type { LineupDefinition as LineupDefinitionInput } from '../../types/lineup.ts';
-import { isLineupCurrencies, normalizeCurrencyBalances } from '../../types/currency.ts';
+} from '@types/currency';
+import type { LineupDefinition as LineupDefinitionInput } from '@types/lineup';
+import { isLineupCurrencies, normalizeCurrencyBalances } from '@types/currency';
 
-export type { LineupCurrencies } from '../../types/currency.ts';
+export type { LineupCurrencies } from '@types/currency';
 
 type Mergeable = UnknownRecord | ReadonlyArray<unknown>;
 
