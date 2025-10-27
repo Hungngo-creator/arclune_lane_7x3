@@ -3,8 +3,8 @@ import { z } from 'zod';
 import { loadConfig } from './load-config.ts';
 import { ROSTER } from '../catalog.ts';
 
-import type { UnitId } from '../types/units.ts';
-import type { SkillEntry, SkillSection } from '../types/config.ts';
+import type { UnitId } from '@types/units';
+import type { SkillEntry, SkillSection } from '@types/config';
 
 function deepFreeze<T>(value: T): T{
   if (Array.isArray(value)){
