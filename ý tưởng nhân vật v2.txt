@@ -29,7 +29,7 @@ Nội tại: không bị ảnh hưởng bởi hiệu ứng khiêu khích từ k�
 Đánh thường: cầm gậy, bổ từ trên cao vào đầu mục tiêu gây sát thương = 100% atk và wil.
 
 Kĩ năng 1: chọt mạnh cây gậy vào bụng mục tiêu, gây 1 đòn đánh thường, kĩ năng này bỏ qua 15% res và arm của mục tiêu, 20 aether.
-Kĩ năng 2: khi bị đòn tấn công aoe cố định vị trí mà không phải ngẫu nhiên chọn mục tiêu đánh trúng có 30% tỉ lệ chạy khỏi ô đang đứng và đi đến ô gần nhất (trừ ô leader đứng), skill kích hoạt 1 lần dùng hết trận. Khi chạy thành công sẽ đứng luôn ở ô vừa chạy đến, nếu không có ô đồng minh nào trống thì không thể chạy, hoạt động đến hết trận kể cả chết rồi được hồi sinh vẫn hoạt động, kỹ năng dạng nội tại, 25 aether.
+Kĩ năng 2: khi bị đòn tấn công aoe cố định vị trí mà không phải ngẫu nhiên chọn mục tiêu đánh trúng có 25% tỉ lệ chạy khỏi ô đang đứng và đi đến ô gần nhất (trừ ô leader đứng), skill kích hoạt 1 lần dùng hết trận. Khi chạy thành công sẽ đứng luôn ở ô vừa chạy đến, nếu không có ô đồng minh nào trống thì không thể chạy, hoạt động đến hết trận kể cả chết rồi được hồi sinh vẫn hoạt động, kỹ năng dạng nội tại, 25 aether.
 Kĩ năng 3: loạn côn đánh ngẫu nhiên 3 mục tiêu, gây 3 đòn đánh thường, bỏ qua 20% res và arm của mục tiêu, 35 aether.
 
 Ultimate: gây sát thương = 250% đánh thường lên 1 mục tiêu, bỏ qua 10% res/arm của mục tiêu.
@@ -40,14 +40,37 @@ Ultimate: gây sát thương=200% đánh thường lên toàn sân kẻ địch,
 
 36) The Fallen Saint" - Thanh Thánh Nữ Sa Đọa (堕落圣女 - Duò Luò Shèng Nǚ) - Ái Lân (艾琳 - Ài Lín)
 
-Lai lịch: Thánh nữ của Giáo Hội Ánh SángLore:
-Ái Lân từng là Thánh Nữ cao quý nhất của Giáo Hội Ánh Sáng, sở hữu sức mạnh chữa lành kỳ diệu. Nhưng trong một lần thanh tẩy một ngôi đền bị ma quỷ chiếm cứ, cô phát hiện ra sự thật kinh hoàng: Giáo Hội từng thực hiện những nghi lễ tàn bạo, hy sinh hàng nghìn người vô tội để duy trì sức mạnh. Bị phản bội bởi đức tin của mình, cô phá hủy thánh tích của Giáo Hội và trốn chạy. Trong lúc tuyệt vọng, cô ký kết khế ước với một Ác Ma tên D'moreth - nhận được "Sức Mạnh Hắc Thánh" để chống lại chính tổ chức mình từng phục vụ. Giờ đây, cô sử dụng cả sức mạnh Thánh và Ma, trở thành một tồn tại mâu thuẫn giữa ánh sáng và bóng tối. Đặc điểm:Có thể chữa lành nhưng cũng có thể nguyền rủaCánh thiên thần của cô một bên trắng, một bên đenĐang bị truy đuổi bởi cả Giáo Hội và các Ác Ma.
+Lai lịch: Thánh nữ của Giáo Hội Ánh Sáng
+Lore: Ái Lân từng là Thánh Nữ cao quý nhất của Giáo Hội Ánh Sáng, sở hữu sức mạnh chữa lành kỳ diệu. Nhưng trong một lần thanh tẩy một ngôi đền bị ma quỷ chiếm cứ, cô phát hiện ra sự thật kinh hoàng: Giáo Hội từng thực hiện những nghi lễ tàn bạo, hy sinh hàng nghìn người vô tội để duy trì sức mạnh. Bị phản bội bởi đức tin của mình, cô phá hủy thánh tích của Giáo Hội và trốn chạy. Trong lúc tuyệt vọng, cô ký kết khế ước với một Ác Ma tên D'moreth - nhận được "Chúc Phúc Hắc Ám" để chống lại chính tổ chức mình từng phục vụ. Giờ đây, cô sử dụng cả sức mạnh Ánh Sáng và Bóng Tối, trở thành một tồn tại mâu thuẫn giữa ánh sáng và bóng tối. Đặc điểm: Có thể chữa lành nhưng cũng có thể nguyền rủa. Cánh thiên thần của cô một bên trắng, một bên đen. Đang bị truy đuổi bởi cả Giáo Hội và các Ác Ma.
+
+Nội tại: chuyển đôi trạng thái ánh sáng và tối luân phiên, vào trận turn 1 là ánh sáng, turn 2 là bóng tối, turn 3 là ánh sáng cứ thế lặp lại đến hết trận.
+Ánh sáng: đòn đánh lên kẻ định giảm 5% agi của mục tiêu trong 1 turn, hồi hp cho bản thân = 10% mọi sát thương gây ra trong turn đó.
+Bóng tối: đòn đánh bỏ qua 10% res và arm của mục tiêu trong turn đó.
+
+Kĩ năng 1: có thể dùng ở 2 trạng thái ánh sáng và bóng tối, chuyển hp = 20% max hp của Ái Lân cho leader đồng minh, chuyển hp = 10% max hp cho 1 đồng minh ngẫu nhiên (Ái Lân không mất max hp), leader và 1 đồng minh ngẫu nhiên đó nhận 1 tầng khiên = 10% max hp của Ái Lân, khiên đó tồn tại tối đa 2 turn, 25 aether. Không tính là đánh thường.
+Kĩ năng 2: chỉ có thể dùng ở trạng thái bóng tối, đứng yên tại chỗ, gõ pháp trượng xuống đấu trường và triệu hồi bóng tối dưới chân 3 kẻ địch, ăn mòn chúng và gây sát thương, mỗi kẻ nhận sát thương = 70% đánh thường của Ái Lân, 25 aether. Không tính là đánh thường.
+Kĩ năng 3: chỉ có thể dùng ở trạng thái ánh sáng, đứng tại chỗ giơ cao pháp trượng, hồi hp cho ái lân cùng 1 đồng minh ngẫu nhiên = 60% wil và atk của ái lân, 20 aether.
+
+Đánh thường: Ái Lân tiếp cận kẻ thù, gõ mạnh pháp trượng vào đầu đối phương gây sát thương = 100% wil và atk, mỗi lần đánh thường có 2% tỉ lệ gây debuff choáng lên mục tiêu.
+
+Ultimate: nếu dùng ở trạng thái ánh sáng: giơ cao pháp trượng, pháp trượng toả sáng và hồi hp cho 3 đồng minh ngẫu nhiên = 30% max hp + 5% wil và atk của bản thân Ái Lân.
+Nếu dùng ở trạng thái bóng tối: giơ pháp trượng, 4 luồng bóng tối lao đến 4 kẻ địch ngẫu nhiên trên sân, mỗi kẻ nhận sát thương = 75% đánh thường của Ái Lân. Không tính là đánh thường.
  
-37) Từ Mặc Tẫn (徐墨尽) — Dạ Ảnh Cự LyHệ: Âm (bóng tối, tịnh lặng, linh cảm)
+37) Từ Mặc Tẫn (徐墨尽) — Dạ Ảnh Cự Ly
+Hệ: Âm (bóng tối, tịnh lặng, linh cảm)
 Hắn tu luyện trong “Tịch Thủy Cốc”, lấy bóng đêm làm đạo, hấp thu cảm xúc tiêu cực của thế gian để tăng cường linh lực. Nhưng khi đạt đến cực hạn, hắn trở thành bản thể của chính những nỗi đau mà hắn từng thu thập — một linh hồn u ám du hành giữa ranh giới sự sống.
 
-38) Khương Tư Nhi (姜思儿) — Tâm Mộng Chi ChủNăng lực: Nhập mộng – điều khiển ký ức linh hồn
+Nội tại: bất kỳ sát thương Từ Mặc Tẫn gây ra lên đối phương bằng kĩ năng hoặc ultimate sẽ gây 1 debuff ngẫu nhiên trong các debuff sau lên mục tiê trong 1 turn: sợ hãi, trầm mặc.
+
+38) Khương Tư Nhi (姜思儿) — Tâm Mộng Chi Chủ
+Năng lực: Nhập mộng – điều khiển ký ức linh hồn
 Tu luyện bằng cách tiến vào linh hồn của người khác qua mộng giới, tái cấu trúc dòng ký ức để chữa hoặc phá hủy tâm trí. Cô đã từng đánh đổi một phần linh hồn của mình để bảo hộ giấc mơ của một đứa trẻ — giờ, trong tâm hồn cô vang vọng hàng ngàn giọng nói chưa bao giờ thức dậy.
+
+Nội tại: +5% mọi chỉ số/mỗi stack ngủ mà kẻ địch mắc phải.
+Khi một kẻ thù chết, chiếm giữ linh hồn của kẻ thù đó trong 1 turn, kẻ đó không thể hồi sinh trong 1 turn đó. Đơn giản là kẻ thù chết khi Khương Tư Nhi đứng trên sân sẽ không thể hồi sinh trong 1 turn tính từ lúc nhân vật đó chết.
+
+Ultimate: nếu không có kẻ thù nào đang ở trạng thái ngủ trên sân: gây sát thương ngẫu nhiên lên 3 kẻ địch, mỗi kẻ nhận sát thương = 85% đánh thường của nhân vật này,
+
 
 39) Ngụy Thiên Sơ (魏天初) — Hồn Khí Sư Cuối CùngNăng lực: Linh khí nhập thể – Hồn dung vật
 Hắn rèn pháp bảo không bằng kim loại, mà dùng linh hồn. Mỗi pháp khí hắn tạo ra là một linh thể tự nhận thức. Khi chiến đấu, hắn có thể triệu hồi "Cửu Vật Linh" — chín linh hồn pháp khí bị phong ấn trong cơ thể, nhưng nếu mất kiểm soát, chúng sẽ đồng loạt phản chủ.
@@ -78,12 +101,31 @@ Kĩ năng 2: 5 động vật được triệu hồi tiếp theo từ ultimate c�
 Kĩ năng 3: khi kích hoạt kĩ năng này, hồi hp = 7% max hp bản thân và nhận 1 stack bất khuất, khi bất khuất từ kĩ năng này được kích hoạt thì 1 đơn vị động vật đồng minh từ ultimate của Faun sẽ chết, hp về 0 bất kể hp của động vật đó còn bao nhiêu, loại động vật đó cũng không thể triệu hồi đến hết trận, kĩ năng ưu tiên động vật có hp thấp nhất, nếu Faun có 2 stack bất khuất trở lên, ưu tiên kích hoạt bất khuất nhận được từ kĩ năng này, 25 aether.
 
 Ultimate: Triệu hồi 1 động vật trong các động vật ngẫu nhiên sau lên sân ở vị trí trống ngẫu nhiên trên sân đồng minh: ( mỗi động vật từ ultimate này không thể dùng ult, không có nộ, aether, kĩ năng và chỉ đánh thường). Mọi đánh thường của động vật trong ultimate này được tính là gây sát thương= 100% wil và atk của động vật đó, mỗi động vật không thể tồn tại 2 con trên sân đồng minh.
-- Tiểu Hắc: một con báo đen nhanh nhẹn, thừa hưởng 50% mọi chỉ số từ Faun trừ aeregen, tồn tại tối đa 5 turn, đòn tấn công bỏ qua 10% arm của mục tiêu, tấn công dạng cắn và cào.
-- Tiểu Bạch: một con hồ ly màu trắng, thừa hưởng chỉ số và turn tồn tại tối đa như tiểu hắc nhưng đánh thường gây thêm 5% sát thương và không bỏ qua arm như tiểu hắc.
+- Tiểu Hắc: một con báo đen nhanh nhẹn, thừa hưởng 50% mọi chỉ số từ Faun trừ aeregen, tồn tại tối đa 5 turn, đòn tấn công bỏ qua 10% arm của mục tiêu, tấn công dạng cắn và cào. Mô tả ngoại hình: ngầu.
+- Tiểu Bạch: một con hồ ly màu trắng, thừa hưởng chỉ số và turn tồn tại tối đa như tiểu hắc nhưng đánh thường gây thêm 5% sát thương và không bỏ qua arm như tiểu hắc. Mô tả ngoại hình: đáng yêu, lông trắng và có 3 đuôi.
 - Tiểu Hoàng: một con gà vàng thừa hưởng chỉ số và turn tồn tại tối đa như tiểu hắc, khi chết Faun sẽ ăn Tiểu Hoàng và Faun được hồi hp = 50% max hp của Tiểu Hoàng.
-- Tiểu Bất Điểm: một con sóc nhỏ thừa hưởng chỉ số và turn tồn tại tối đa như tiểu hắc, đánh thường không gây sát thương mà sẽ hồi hp cho động vật khác và Faun mỗi đơn vị = 30% wil và atk của bản thân Tiểu Bất Điểm.
+- Tiểu Bất Điểm: một con sóc nhỏ thừa hưởng chỉ số và turn tồn tại tối đa như tiểu hắc, đánh thường không gây sát thương mà sẽ hồi hp cho động vật khác và Faun mỗi đơn vị = 30% wil và atk của bản thân Tiểu Bất Điểm. Mô tả ngoại hình: đáng yêu, lông trộn lẫn giữa trắng, nâu và xám.
+- Nhị Cẩu: một con chó nhà giống chó shiba, thừa hưởng 50% mọi chỉ số từ Faun trừ aeregen, tồn tại tối đa 5 turn, không tấn công mà mỗi turn sẽ hồi hp = 10% max hp của bản thân Nhị Cẩu, mỗi 2 turn nhận 1 turn khiêu khích. Mô tả ngoại hình: con chó này cần có ngoại hình cực kỳ muốn ăn đòn, người khác nhìn vào phải muốn đánh nó, hài hước mà phải khiêu khích người nhìn, gợi đòn.
 
-B. Nhân vật npc pve không gacha. Hưởng lợi chỉ số từ mục B trong ý tưởng nhân vật.txt
+43) Huyết Tộc Thân Vương
+
+44) Thiết Lang
+
+Nội tại: bất kỳ nhân vật nào gây sát thương lên nhân vật này đều nhận 1 hiệu ứng độc, nội tại này có thể stack tối đa 10 lần lên 1 mục tiêu, không giới hạn lượng mục tiêu. Nội tại độc giới hạn gây 1 hiệu ứng độc/turn/mỗi kẻ tấn công, dù nhận bao nhiêu sát thương từ 1 kẻ tấn công thì nội tại chỉ gây 1 debuff độc lên kẻ tấn công đó/mỗi turn, không giới hạn gây bao nhiêu hiệu ứng độc/turn (có thể gây hiệu ứng độc lên nhiều kẻ tấn công trong 1 turn nhưng mỗi kẻ tấn công chỉ nhận tối đa 1 debuff độc từ nội tại này). Nội tại này không thể lãng quên.
+
+Kĩ năng 1: tăng 1,5% max hp/mỗi stack độc kẻ thù đang mắc phải tính cả hiệu ứng độc do đồng minh gây ra lên kẻ thù, sau khi dùng kỹ năng này tăng max hp thành công thì mọi hiệu ứng độc trên kẻ thù đứng trên sân sẽ biến mất, 30 aether.
+
+Kĩ năng 2: giảm 10% max hp, nhận hiệu ứng phản sát thương trong 2 turn, 25 aether.
+
+Kĩ năng 3: gây 2 đòn đánh thường lên 1 mục tiêu, 20 aether.
+
+Đánh thường: Gây sát thương = 100% wil và atk lên 1 mục tiêu.
+
+Ultimate: Nhận hiệu ứng khiêu khích (taunt) trong 2 turn, trong quá trình nhận taunt này arm và res của nhân vật này tăng 20% tính từ lúc bắt đầu dùng ult, sau khi hết taunt hiệu ứng tăng res và arm này sẽ biến mất.
+
+45)
+
+B. Nhân vật npc pve không gacha. Hưởng lợi chỉ số từ miêu tả ở mục B trong ý tưởng nhân vật.txt
 
 1) Void Whisper - Xul'gathar (虚空低语者 - Xū Kōng Dī Yǔ Zhě)
 
@@ -120,24 +162,37 @@ Lưu ý về ultimate này: quy tắc từ ultimate này áp dụng cho tất c�
 
 Nguồn gốc: Thực thể từ Chiều Không Gian Thứ 5
 Lore:
-Shab'gorath là một thực thể sống trong chiều không gian thứ năm, nơi mà khái niệm "hiện tại", "quá khứ", và "tương lai" đan xen lẫn nhau. Đối với các sinh vật ba chiều, Shab'gorath xuất hiện như những phần cơ thể rời rạc: một cái tay ở đây, một cái đầu ở kia, nhưng thực chất đó chỉ là những "lát cắt" của cơ thể đa chiều của nó. Nó nuôi sống bằng cách hấp thụ "thời gian sống" của sinh vật khác - những ai gần nó sẽ thấy tuổi tác tăng lên nhanh chóng. Một số giáo phái thờ nó như một vị thần, hy vọng đạt được sự bất tử bằng cách hiến tế thời gian của người khác. Đặc điểm: Có thể xuất hiện và biến mất mà không cần di chuyển trong không gian ba chiềuCó khả năng "thấy" mọi khả năng trong tương laiChạm vào nó có thể khiến người đó nhảy cóc qua thời gian một cách ngẫu nhiên
+Shab'gorath là một thực thể sống trong chiều không gian thứ năm, nơi mà khái niệm "hiện tại", "quá khứ", và "tương lai" đan xen lẫn nhau. Đối với các sinh vật ba chiều, Shab'gorath xuất hiện như những phần cơ thể rời rạc: một cái tay ở đây, một cái đầu ở kia, nhưng thực chất đó chỉ là những "lát cắt" của cơ thể đa chiều của nó. Nó nuôi sống bằng cách hấp thụ "thời gian sống" của sinh vật khác - những ai gần nó sẽ thấy tuổi tác tăng lên nhanh chóng. Một số giáo phái thờ nó như một vị thần, hy vọng đạt được sự bất tử bằng cách hiến tế thời gian của người khác. Đặc điểm: Có thể xuất hiện và biến mất mà không cần di chuyển trong không gian ba chiềuCó khả năng "thấy" mọi khả năng trong tương laiChạm vào nó có thể khiến người đó nhảy cóc qua thời gian một cách ngẫu nhiên.
+
+Nội tại, mỗi khi bị tấn công, kẻ tấn công sẽ được ngẫu nhiên hồi hp hoặc trừ hp, cộng trừ tối đa 10% max hp của kẻ tấn công, có thể giết chết mục tiêu, tỉ lệ + hp là 40%, trừ hp là 60% trong 40% và 60% cộng trừ hp này thì lượng hp + - là ngẫu nhiên, cap = 10% max hp của mục tiêu. Mỗi khi bị tấn công, kẻ tấn công sẽ được xoá 1 buff hoặc 1 debuff ngẫu nhiên.
 
 4) Ny'rakath - Chúa Tể Nghìn Mắt (千眼之主 - Qiān Yǎn Zhī Zhǔ)
 
-Nguồn gốc: Cổ Thần từ Thứ Nguyên Hỗn MangLore:
-Ny'rakath là một trong những Cổ Thần ra đời trước cả vũ trụ hiện tại. Hình dáng của nó là một khối cầu khổng lồ phủ đầy con mắt, mỗi con mắt nhìn vào một thứ nguyên khác nhau. Nó không có khái niệm về thiện ác như con người - đối với nó, mọi sinh vật đều chỉ là "mẫu quan sát". Ny'rakath thỉnh thoảng gửi một phần ý thức xuống thế giới phàm trần, khiến những ai nhìn thấy nó rơi vào điên loạn. Một số pháp sư liều lĩnh cố gắng triệu hồi nó để có được tri thức cấm kỵ, nhưng thường xuyên kết thúc bằng việc mất trí hoàn toàn���.Đặc điểm:Mỗi con mắt có thể phóng ra tia năng lượng khác nhau (lửa, băng, sấm sét, thời gian...)Có thể đọc được suy nghĩ của mọi sinh vật trong bán kính 10 kmHình dạng thực sự của nó vượt quá khả năng nhận thức của sinh vật 3 chiều��
+Nguồn gốc: Cổ Thần từ Thứ Nguyên Hỗn Mang
+Lore:
+Ny'rakath là một trong những Cổ Thần ra đời trước cả vũ trụ hiện tại. Hình dáng của nó là một khối cầu khổng lồ phủ đầy con mắt, mỗi con mắt nhìn vào một thứ nguyên khác nhau. Nó không có khái niệm về thiện ác như con người - đối với nó, mọi sinh vật đều chỉ là "mẫu quan sát". Ny'rakath thỉnh thoảng gửi một phần ý thức xuống thế giới phàm trần, khiến những ai nhìn thấy nó rơi vào điên loạn. Một số pháp sư liều lĩnh cố gắng triệu hồi nó để có được tri thức cấm kỵ, nhưng thường xuyên kết thúc bằng việc mất trí hoàn toàn. Đặc điểm:Mỗi con mắt có thể phóng ra tia năng lượng khác nhau (lửa, băng, sấm sét, thời gian...)Có thể đọc được suy nghĩ của mọi sinh vật trong trong tầm nhìn, Hình dạng thực sự của nó vượt quá khả năng nhận thức của sinh vật 3 chiều
 
 5) Kerrath Mortalis — Hoàng Tử Của Sự Lãng Quên
 
 Người thừa kế cuối cùng của vương quốc bị xóa khỏi lịch sử. Cả thế giới không còn nhớ tên hắn, và chỉ hắn còn biết bản thân từng tồn tại. Mỗi khi Kerrath giết ai, nạn nhân cũng bị xóa sạch khỏi ký ức nhân loại. Hắn săn lùng chính “ký ức” của mình — hy vọng tìm lại đất nước trong bóng tối
 
+Nội tại: kẻ bị Kerrath Mortalis giết không thể hồi sinh đến hết trận đấu.
+
+6) Huyết Nô - James
+
+Mô tả: một trong hằng hà sa số huyết nô thuộc huyết tộc, cuộc đời hắn từ khi sinh ra liền được quán thâu tư tưởng vì các Huyết Tộc lão gia cung cấp huyết dịch mà sống, trong lòng ôm lấy may mắn được vị nào đó coi trọng mà tấn thăng làm chân chính Huyết Tộc, vì làm huyết tộc chó săn mà phấn đấu.
+
+Nội tại: +3% mọi chỉ số cho mỗi vị huyết tộc có tước vị trên sân đồng minh, khi hp dưới 10% sẽ chủ động tự sát, hp về 0 và mỗi vị đồng minh huyết tộc có tước vị trên sân sẽ được hồi hp = 10% max ho của James.
+
+Đánh thường: gây sát thương = 100% atk và wil
+
 C. Các hiệu ứng buff/debuff bổ sung nếu trong game chưa có hiệu ứng tương tự có thể thêm vào game.
 
 1) Trầm Mặc: nhân vật dính hiệu ứng này không thể dùng ultimate. Debuff
 2) Ăn Mòn: giảm 2% max hp của nhân vật dính hiệu ứng này. Debuff.
-3) Thích Ứng: debuff đầu tiên nhận khi đã nhận Thích Ứng sẽ không thể áp dụng lên nhân vật có thích ứng sau 2 turn. Thích Ứng giúp kẻ có buff này không nhận 1 debuff khi có thích ứng, nếu nhân vật có thích ứng và đã không nhận debuff chết thi sau khi hồi sinh sẽ mất hiệu ứng không nhận debuff tương quan từ Thích Ứng. Buff.
-4) Phản Hồi Phục: mọi hiệu ứng hồi phục trừ hp regen của bản thân sẽ được chuyển thành sát thương nhận vào, bỏ qua res và arm.
-5) 
+3) Thích Ứng: debuff đầu tiên nhận khi đã nhận Thích Ứng sẽ không thể áp dụng lên nhân vật có thích ứng sau 2 turn. Thích Ứng giúp kẻ có buff này không nhận 1 debuff khi có thích ứng, nếu nhân vật có thích ứng và đã không nhận debuff chết thì sau khi hồi sinh sẽ mất hiệu ứng không nhận debuff tương quan từ Thích Ứng. Buff.
+4) Phản Hồi Phục: mọi hiệu ứng hồi phục trừ hp regen của bản thân sẽ được chuyển thành sát thương nhận vào mà không hồi hp, bỏ qua res và arm.
+5) Phản Sát Thương: nhân vật có hiệu ứng này khi bị tấn công thì kẻ bị tấn công nhận sát thương = sát thương nhân vật đó gây ra lên kẻ có hiệu ứng này. Ví dụ, A đánh B gây 100 sát thương thì A và B đều nhận 100 sát thương. Res và arm vẫn giảm sát thương khi kẻ địch nhận vào sát thương khi tấn công kẻ có buff này.
 
 
 
