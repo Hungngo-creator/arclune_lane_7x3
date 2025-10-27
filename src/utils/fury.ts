@@ -57,8 +57,9 @@ function toNumber(value: unknown): number {
 function ensureAlias(unit: UnitToken | null | undefined): void {
   if (!unit) return;
   const internal = unit as UnitTokenInternal;
-  if (!isFiniteNumber(internal.fury) && isFiniteNumber(internal.rage)){
-    internal.fury = internal.rage;
+  const rageValue = toNumber(internal.rage);
+  if (!isFiniteNumber(internal.fury) && Number.isFinite(rageValue)){
+    internal.fury = rageValue;
   }
   if (!isFiniteNumber(internal.fury)) internal.fury = 0;
   try {
@@ -71,10 +72,10 @@ function ensureAlias(unit: UnitToken | null | undefined): void {
         set(v){ internal.fury = toNumber(v); }
       });
     } else {
-      internal.rage = internal.fury;
+      internal.rage = toNumber(internal.fury);
     }
   } catch (_) {
-    internal.rage = internal.fury;
+    internal.rage = toNumber(internal.fury);
   }
 }
 
