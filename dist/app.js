@@ -1,6 +1,6 @@
 // Bundled by build.mjs
 const __modules = Object.create(null);
-const __legacyModuleAliases = {"./modes/pve/session.js":"./modes/pve/session.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/time.js":"./utils/time.ts","./vfx.js":"./vfx.ts"};
 function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }
 function __define(id, factory){ __modules[id] = { factory, exports: null, initialized: false }; }
 function __require(id){
@@ -21,13 +21,13 @@ __define('./ai.ts', (exports, module, __require) => {
   const pickRandom = __dep0.pickRandom;
   const slotToCell = __dep0.slotToCell;
   const cellReserved = __dep0.cellReserved;
-  const __dep1 = __require('./turns.js');
+  const __dep1 = __require('./turns.ts');
   const predictSpawnCycle = __dep1.predictSpawnCycle;
   const __dep2 = __require('./config.ts');
   const CFG = __dep2.CFG;
-  const __dep3 = __require('./utils/time.js');
+  const __dep3 = __require('./utils/time.ts');
   const sharedSafeNow = __dep3.safeNow;
-  const __dep4 = __require('./utils/kit.js');
+  const __dep4 = __require('./utils/kit.ts');
   const detectUltBehavior = __dep4.detectUltBehavior;
   const getSummonSpec = __dep4.getSummonSpec;
   const resolveSummonSlots = __dep4.resolveSummonSlots;
@@ -35,6 +35,9 @@ __define('./ai.ts', (exports, module, __require) => {
   const lookupUnit = __dep5.lookupUnit;
 
 
+
+  const __dep6 = __require('./types/units.ts');
+  const createSummonQueue = __dep6.createSummonQueue;
 
 
   type CandidateCell = { s: number; cx: number; cy: number };
@@ -47,14 +50,7 @@ __define('./ai.ts', (exports, module, __require) => {
     | 'kitDefense'
     | 'kitRevive';
 
-  export interface AiCard {
-    id: UnitId;
-    name?: string | null;
-    cost: number;
-    [extra: string]: unknown;
-  }
-
-  export type DeckState = AiCard[];
+  type DeckState = AiCardDeck;
   export type AI_REASON = 'cost' | 'board' | (string & {});
 
   type CandidateContributions = Record<string, number>;
@@ -64,7 +60,27 @@ __define('./ai.ts', (exports, module, __require) => {
     role: number;
   };
 
-  type CandidateMeta = Record<string, unknown> | null | undefined;
+  type CandidateMeta = RosterUnitDefinition | null | undefined;
+
+  interface DeckEntryCandidate {
+    id?: unknown;
+    cost?: unknown;
+    name?: unknown;
+    class?: unknown;
+    rank?: unknown;
+    kit?: unknown;
+    [key: string]: unknown;
+  }
+
+  function toMetaEntry(value: unknown): RosterUnitDefinition | null {
+    if (!value || typeof value !== 'object') return null;
+    const candidate = value as DeckEntryCandidate;
+    if (typeof candidate.id !== 'string') return null;
+    if (typeof candidate.class !== 'string') return null;
+    if (typeof candidate.rank !== 'string') return null;
+    if (!candidate.kit || typeof candidate.kit !== 'object') return null;
+    return candidate as RosterUnitDefinition;
+  }
 
   interface CandidateEvaluation {
     card: AiCard;
@@ -122,7 +138,7 @@ __define('./ai.ts', (exports, module, __require) => {
 
   const DEFAULT_DEBUG_KEEP = 6;
 
-  const tokensAlive = (Game: SessionState): UnitToken[] => Game.tokens.filter((t) => t.alive);
+  const tokensAlive = (Game: SessionState): ReadonlyArray<UnitToken> => Game.tokens.filter((t) => t.alive);
 
   function mergedWeights(): Record<string, number> {
     const cfg = CFG.AI?.WEIGHTS ?? {};
@@ -143,10 +159,9 @@ __define('./ai.ts', (exports, module, __require) => {
   }
 
   function detectKitTraits(meta: CandidateMeta): KitTraitSummary {
-    const analysis = detectUltBehavior((meta && (meta as Record<string, unknown>).kit) || meta || {});
-    const hasInstant =
-      Boolean(analysis.hasInstant) ||
-      (meta && (meta as Record<string, unknown>).class === 'Summoner' && Boolean(analysis.summon));
+    const kitSource = meta?.kit ?? meta ?? {};
+    const analysis = detectUltBehavior(kitSource);
+    const hasInstant = Boolean(analysis.hasInstant) || (meta?.class === 'Summoner' && Boolean(analysis.summon));
     return {
       hasInstant,
       hasDefBuff: Boolean(analysis.hasDefensive),
@@ -178,21 +193,22 @@ __define('./ai.ts', (exports, module, __require) => {
     return typeof candidate.id === 'string' && candidate.id !== '' && typeof candidate.cost === 'number' && Number.isFinite(candidate.cost);
   }
 
-  function toAiCard(entry: unknown): AiCard | null {
-    if (isAiCard(entry)) {
-      return { ...(entry as AiCard) };
-    }
+  function normalizeDeckEntry(entry: AiDeckEntry): AiCard | null {
     if (typeof entry === 'string') {
       const def = lookupUnit(entry);
       return def ? { ...def } : null;
     }
+    if (isAiCard(entry)) {
+      const card: AiCard = { ...entry };
+      return card;
+    }
     if (entry && typeof entry === 'object') {
-      const candidate = entry as Record<string, unknown>;
-      const idRaw = candidate.id;
-      if (typeof idRaw !== 'string' || idRaw.trim() === '') return null;
+      const candidate = entry;
+      const idRaw = typeof candidate.id === 'string' ? candidate.id : null;
+      if (!idRaw || idRaw.trim() === '') return null;
       const def = lookupUnit(idRaw);
       const fallbackCost = def?.cost;
-      const candidateCost = candidate.cost;
+      const candidateCost = 'cost' in candidate ? candidate.cost : undefined;
       const cost =
         typeof candidateCost === 'number' && Number.isFinite(candidateCost)
           ? candidateCost
@@ -200,7 +216,7 @@ __define('./ai.ts', (exports, module, __require) => {
             ? fallbackCost
             : null;
       if (cost === null) return null;
-      const candidateName = candidate.name;
+      const candidateName = 'name' in candidate ? candidate.name : undefined;
       const name =
         typeof candidateName === 'string' && candidateName.trim() !== ''
           ? candidateName
@@ -225,26 +241,16 @@ __define('./ai.ts', (exports, module, __require) => {
   }
 
   function getDeck(Game: SessionState): DeckState {
-    const rawDeck = Array.isArray(Game.ai.deck) ? Game.ai.deck : [];
-    if (!Array.isArray(Game.ai.deck)) {
-      Game.ai.deck = [] as unknown as SessionState['ai']['deck'];
-    }
-    const normalized: AiCard[] = [];
-    let changed = !Array.isArray(Game.ai.deck);
-    for (const entry of rawDeck as unknown[]) {
-      const card = toAiCard(entry);
+    const source: AiDeckPool = Game.ai.deck;
+    const normalized: DeckState = [];
+    for (const entry of source) {
+      const card = normalizeDeckEntry(entry);
       if (card) {
         normalized.push(card);
-        if (card !== entry) changed = true;
-      } else {
-        changed = true;
       }
     }
-    if (changed) {
-      Game.ai.deck = normalized as unknown as SessionState['ai']['deck'];
-      return normalized;
-    }
-    return rawDeck as DeckState;
+    Game.ai.deck = normalized;
+    return normalized;
   }
 
   function listEmptyEnemySlots(Game: SessionState, aliveTokens?: readonly UnitToken[] | null): CandidateCell[] {
@@ -280,20 +286,18 @@ __define('./ai.ts', (exports, module, __require) => {
     baseSlot: number,
     aliveTokens?: readonly UnitToken[] | null,
   ): number {
-    const meta = Game.meta.get(unitId);
-    if (!meta || (meta as Record<string, unknown>).class !== 'Summoner') return 1;
+    const meta = toMetaEntry(Game.meta.get(unitId));
+    if (!meta || meta.class !== 'Summoner') return 1;
     const summonSpec = getSummonSpec(meta);
     if (!summonSpec) return 1;
     const alive = Array.isArray(aliveTokens) ? aliveTokens : tokensAlive(Game);
-    const cand = resolveSummonSlots(summonSpec, baseSlot)
-      .filter(Boolean)
-      .filter((s) => {
-        const { cx, cy } = slotToCell('enemy', s);
-        return !cellReserved(alive, Game.queued, cx, cy);
-      });
-    const countRaw = Number(summonSpec.count);
-    const need = Math.max(1, Number.isFinite(countRaw) ? countRaw : 1);
-    return Math.min(1, cand.length / need);
+    const candidateSlots = resolveSummonSlots(summonSpec, baseSlot).filter((slot) => {
+      const { cx, cy } = slotToCell('enemy', slot);
+      return !cellReserved(alive, Game.queued, cx, cy);
+    });
+    const countRaw = summonSpec.count;
+    const need = Math.max(1, typeof countRaw === 'number' && Number.isFinite(countRaw) ? countRaw : 1);
+    return Math.min(1, candidateSlots.length / need);
   }
 
   function candidateBlocked(
@@ -307,15 +311,15 @@ __define('./ai.ts', (exports, module, __require) => {
     const cx = entry.cell?.cx;
     const cy = entry.cell?.cy;
     if (!Number.isFinite(slot) || !Number.isFinite(cx) || !Number.isFinite(cy)) return 'invalid';
-    const enemyQueue = (Game.queued?.enemy ?? null) as Map<number, QueuedSummonRequest> | null;
-    if (enemyQueue?.has(slot)) return 'slotQueued';
+    const enemyQueue = Game.queued.enemy;
+    if (enemyQueue.has(slot)) return 'slotQueued';
     if (cellReserved(alive, Game.queued, cx, cy)) return 'cellReserved';
 
-    const meta = entry.meta as Record<string, unknown> | null | undefined;
+    const meta = entry.meta;
     if (meta && meta.class === 'Summoner') {
       const summonSpec = getSummonSpec(meta);
       if (summonSpec) {
-        const patternSlots = resolveSummonSlots(summonSpec, slot).filter(Boolean);
+        const patternSlots = resolveSummonSlots(summonSpec, slot);
         if (patternSlots.length) {
           let available = 0;
           for (const s of patternSlots) {
@@ -343,11 +347,9 @@ __define('./ai.ts', (exports, module, __require) => {
       (t) => t.cy === cy,
     ).length;
     let queued = 0;
-    const m = (Game.queued?.enemy ?? null) as Map<number, QueuedSummonRequest> | null;
-    if (m && typeof m.values === 'function') {
-      for (const p of m.values()) {
-        if (p && p.cy === cy) queued += 1;
-      }
+    const queue = Game.queued.enemy;
+    for (const request of queue.values()) {
+    if (request && request.cy === cy) queued += 1;
     }
     const n = ours + queued;
     if (n >= 3) return 0.7;
@@ -365,9 +367,29 @@ __define('./ai.ts', (exports, module, __require) => {
   }
 
   function ensureUsedUnitIds(Game: SessionState): Set<UnitId> {
-    if (Game.ai.usedUnitIds instanceof Set) return Game.ai.usedUnitIds as Set<UnitId>;
+    if (Game.ai.usedUnitIds instanceof Set) return Game.ai.usedUnitIds;
     Game.ai.usedUnitIds = new Set<UnitId>();
     return Game.ai.usedUnitIds;
+  }
+
+  function isSummonQueue(value: unknown): value is SummonQueue {
+    if (!value || typeof value !== 'object') return false;
+    const candidate = value as { set?: unknown; get?: unknown; clear?: unknown };
+    return (
+      typeof candidate.set === 'function' &&
+      typeof candidate.get === 'function' &&
+      typeof candidate.clear === 'function'
+    );
+  }
+
+  function ensureEnemyQueue(Game: SessionState): SummonQueue {
+    const candidate: unknown = Game.queued.enemy;
+    if (isSummonQueue(candidate)) {
+      return candidate;
+    }
+    const created = createSummonQueue();
+    Game.queued.enemy = created;
+    return created;
   }
 
   function refillDeckEnemy(Game: SessionState): void {
@@ -381,11 +403,11 @@ __define('./ai.ts', (exports, module, __require) => {
     for (const id of usedIds) exclude.add(String(id));
     for (const card of deck) exclude.add(String(card.id));
 
-    const pool = Array.isArray(Game.ai.unitsAll) ? Game.ai.unitsAll : [];
-    const more = pickRandom(pool as readonly unknown[], exclude, handSize).slice(0, need);
-    const normalized: AiCard[] = [];
+    const pool: ReadonlyArray<AiDeckEntry> = Game.ai.unitsAll;
+    const more = pickRandom(pool, exclude, handSize).slice(0, need);
+    const normalized: DeckState = [];
     for (const entry of more) {
-      const card = toAiCard(entry);
+      const card = normalizeDeckEntry(entry);
       if (card) normalized.push(card);
     }
     if (!normalized.length) return;
@@ -405,15 +427,7 @@ __define('./ai.ts', (exports, module, __require) => {
     if (Game.ai.summoned >= Game.ai.summonLimit) return false;
     const alive = Array.isArray(aliveTokens) ? aliveTokens : tokensAlive(Game);
     if (cellReserved(alive, Game.queued, cx, cy)) return false;
-    const enemyQueueRaw = Game.queued.enemy;
-    const queue =
-      enemyQueueRaw instanceof Map
-        ? (enemyQueueRaw as Map<number, QueuedSummonRequest>)
-        : (() => {
-            const created = new Map<number, QueuedSummonRequest>();
-            Game.queued.enemy = created as unknown as typeof Game.queued.enemy;
-            return created;
-          })();
+    const queue = ensureEnemyQueue(Game);
     if (queue.has(slot)) return false;
 
     const spawnCycle = predictSpawnCycle(Game, 'enemy', slot);
@@ -484,7 +498,7 @@ __define('./ai.ts', (exports, module, __require) => {
 
     const evaluations: CandidateEvaluation[] = [];
     for (const card of hand) {
-      const meta = Game.meta.get(card.id);
+      const meta = toMetaEntry(Game.meta.get(card.id));
       const kitTraits = detectKitTraits(meta);
       for (const cell of cells) {
         const p = pressureScore(cell.cx, cell.cy);
@@ -508,7 +522,7 @@ __define('./ai.ts', (exports, module, __require) => {
 
         const baseScore = Object.values(contributions).reduce((acc, val) => acc + val, 0);
         const rowFactor = rowCrowdingFactor(Game, cell.cy, aliveEnemies);
-        const roleFactor = roleBias((meta as Record<string, unknown> | null | undefined)?.class, cell.cx);
+        const roleFactor = roleBias(meta?.class, cell.cx);
         const finalScore = baseScore * rowFactor * roleFactor;
 
         evaluations.push({
@@ -580,69 +594,149 @@ __define('./ai.ts', (exports, module, __require) => {
   exports.queueEnemyAt = queueEnemyAt;
   exports.aiMaybeAct = aiMaybeAct;
 });
-__define('./app/shell.js', (exports, module, __require) => {
-  /**
-   * @typedef {Record<string, unknown>} ScreenParams
-   * @typedef {{ screen: string; activeSession: unknown; screenParams: ScreenParams | null }} AppShellState
-   * @typedef {(state: AppShellState) => void} AppShellListener
-   * @typedef {{
-   *   enterScreen: (key: string, params?: ScreenParams | null) => void;
-   *   setActiveSession: (session: unknown) => void;
-   *   clearActiveSession: () => void;
-   *   getState: () => AppShellState;
-   *   onChange: (listener: AppShellListener) => () => void;
-   *   setErrorHandler: (handler: ((error: unknown, context: Record<string, unknown> | null) => void) | null) => void;
-   * }} AppShell
-   */
+__define('./app/shell.ts', (exports, module, __require) => {
+  export type ScreenParams = Record<string, unknown>;
+
+  export interface AppShellState {
+    screen: string;
+    activeSession: unknown | null;
+    screenParams: ScreenParams | null;
+  }
+
+  export type AppShellListener = (state: Readonly<AppShellState>) => void;
+
+  export type AppShellErrorHandler = (
+    error: unknown,
+    context: Record<string, unknown> | null
+  ) => void;
+
+  export interface AppShell {
+    enterScreen: (key: string, params?: ScreenParams | null) => void;
+    setActiveSession: (session: unknown | null) => void;
+    clearActiveSession: () => void;
+    getState: () => Readonly<AppShellState>;
+    onChange: (listener: AppShellListener) => () => void;
+    setErrorHandler: (handler: AppShellErrorHandler | null) => void;
+  }
+
+  export interface CreateAppShellOptions {
+    screen?: string | null;
+    activeSession?: unknown | null;
+    screenParams?: ScreenParams | null;
+    onError?: AppShellErrorHandler | null;
+  }
 
   const DEFAULT_SCREEN = 'main-menu';
 
-  /**
-   * @param {AppShellState} state
-   * @returns {AppShellState}
-   */
-  function cloneState(state){
-    return {
-      screen: state.screen,
-      activeSession: state.activeSession,
-      screenParams: state.screenParams
-    };
+  function cloneParams(params: ScreenParams | null): ScreenParams | null {
+    if (params === null) {
+      return null;
+    }
+
+    const cloned = { ...params };
+    return Object.freeze(cloned);
   }
 
-  /**
-   * @param {{ screen?: string; activeSession?: unknown; screenParams?: ScreenParams | null; onError?: (error: unknown, context: Record<string, unknown> | null) => void }} [options]
-   * @returns {AppShell}
-   */
-  function createAppShell(options = {}){
-   /** @type {AppShellState} */
-    const state = {
-      screen: options.screen || DEFAULT_SCREEN,
-      activeSession: options.activeSession || null,
-      screenParams: options.screenParams || null
+  function cloneState(state: AppShellState): Readonly<AppShellState> {
+    const snapshot: AppShellState = {
+      screen: state.screen,
+      activeSession: state.activeSession,
+      screenParams: cloneParams(state.screenParams),
     };
-    /** @type {Set<AppShellListener>} */
-    const listeners = new Set();
-    /** @type {((error: unknown, context: Record<string, unknown> | null) => void) | null} */
-    let errorHandler = typeof options.onError === 'function' ? options.onError : null;
+    
+    return Object.freeze(snapshot);
+  }
 
-  /**
-     * @param {unknown} error
-     * @param {Record<string, unknown> | null | undefined} context
-     * @returns {void}
-     */
-  function dispatchError(error, context){
+  function normalizeScreen(screen: string | null | undefined): string {
+    if (screen === null || screen === undefined || screen === '') {
+      return DEFAULT_SCREEN;
+    }
+    return screen;
+  }
+
+  function normalizeParams(params: ScreenParams | null | undefined): ScreenParams | null {
+    if (params === null || params === undefined) {
+      return null;
+    }
+    
+    return cloneParams(params);
+  }
+
+  function areParamsShallowEqual(
+    current: ScreenParams | null,
+    next: ScreenParams | null
+  ): boolean {
+    if (current === next) {
+      return true;
+    }
+
+    if (current === null || next === null) {
+      return false;
+    }
+
+    const currentKeys = Object.keys(current);
+    const nextKeys = Object.keys(next);
+
+    if (currentKeys.length !== nextKeys.length) {
+      return false;
+    }
+
+    for (const key of currentKeys) {
+      if (!Object.prototype.hasOwnProperty.call(next, key)) {
+        return false;
+      }
+      if (current[key] !== next[key]) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  function normalizeSession(session: unknown | null | undefined): unknown | null {
+    if (session === null || session === undefined) {
+      return null;
+    }
+    return session;
+  }
+
+  function createAppShell(options: CreateAppShellOptions = {}): AppShell {
+    const initialScreen = normalizeScreen(options.screen);
+    const initialSession = normalizeSession(options.activeSession ?? null);
+    const initialParams = normalizeParams(options.screenParams);
+
+    const state: AppShellState = {
+      screen: initialScreen,
+      activeSession: initialSession,
+      screenParams: initialParams,
+    };
+
+    const listeners = new Set<AppShellListener>();
+
+    let errorHandler: AppShellErrorHandler | null =
+      typeof options.onError === 'function' ? options.onError : null;
+
+    function dispatchError(
+      error: unknown,
+      context: Record<string, unknown> | null | undefined
+    ): void {
       console.error('[shell] listener error', error);
-      if (!errorHandler) return;
+      if (!errorHandler) {
+        return;
+      }
+
+      const normalizedContext = context ?? null;
+
       try {
-        errorHandler(error, context || null);
+        errorHandler(error, normalizedContext);
       } catch (handlerError) {
         console.error('[shell] error handler failure', handlerError);
       }
     }
 
-  function notify(){
+    function notify(): void {
       const snapshot = cloneState(state);
-      for (const fn of listeners){
+      for (const fn of listeners) {
         try {
           fn(snapshot);
         } catch (err) {
@@ -651,96 +745,138 @@ __define('./app/shell.js', (exports, module, __require) => {
       }
     }
 
-  /**
-     * @param {string} [nextScreen]
-     * @param {ScreenParams | null | undefined} [params]
-     * @returns {void}
-     */
-  function setScreen(nextScreen, params){
-      const target = nextScreen || DEFAULT_SCREEN;
+    function setScreen(nextScreen?: string | null, params?: ScreenParams | null): void {
+      const target = normalizeScreen(nextScreen);
       let changed = false;
-      if (state.screen !== target){
+
+      if (state.screen !== target) {
         state.screen = target;
         changed = true;
       }
-      const normalizedParams = params || null;
-      if (state.screenParams !== normalizedParams){
-        state.screenParams = normalizedParams;
+
+      const nextParams = params ?? null;
+
+      if (!areParamsShallowEqual(state.screenParams, nextParams)) {
+        state.screenParams = normalizeParams(nextParams);
         changed = true;
       }
-      if (changed) notify();
+
+      if (changed) {
+        notify();
+      }
     }
 
-  /**
-     * @param {unknown} nextSession
-     * @returns {void}
-     */
-    function setSession(nextSession){
-      if (state.activeSession === nextSession) return;
-      state.activeSession = nextSession || null;
+    function setSession(nextSession: unknown | null | undefined): void {
+      const normalizedSession = normalizeSession(nextSession);
+
+      if (state.activeSession === normalizedSession) {
+        return;
+      }
+
+      state.activeSession = normalizedSession;
       notify();
     }
 
-  /**
-     * @param {AppShellListener} handler
-     * @returns {() => void}
-     */
-    function subscribe(handler){
-      if (typeof handler !== 'function') return ()=>{};
+    function subscribe(handler: AppShellListener): () => void {
+      if (typeof handler !== 'function') {
+        return () => undefined;
+      }
+
       listeners.add(handler);
+
       try {
         handler(cloneState(state));
       } catch (err) {
         dispatchError(err, { phase: 'subscribe', listener: handler });
       }
-      return ()=>{
+
+      return () => {
         listeners.delete(handler);
       };
     }
 
-    /** @type {AppShell} */
-    const api = {
-      enterScreen(key, params){
+    const api: AppShell = {
+      enterScreen(key, params) {
         setScreen(key, params);
       },
-      setActiveSession(session){
+      setActiveSession(session) {
         setSession(session);
       },
-      clearActiveSession(){
-        if (!state.activeSession) return;
+      clearActiveSession() {
+        if (state.activeSession === null) {
+          return;
+        }
+
         state.activeSession = null;
         notify();
       },
-      getState(){
+      getState() {
         return cloneState(state);
       },
       onChange: subscribe,
-      setErrorHandler(handler){
-        if (typeof handler === 'function'){
+      setErrorHandler(handler) {
+        if (typeof handler === 'function') {
           errorHandler = handler;
         } else {
           errorHandler = null;
         }
-      }
+      },
     };
+
     return api;
   }
+
   exports.createAppShell = createAppShell;
 });
-__define('./art.js', (exports, module, __require) => {
+__define('./art.ts', (exports, module, __require) => {
   // v0.7.7 – Unit art catalog
 
-  function svgData(width, height, body){
+
+
+  type UnitArtSpriteInput =
+    | string
+    | ({
+        src?: string | null;
+        url?: string | null;
+        shadow?: UnitArtShadow;
+        anchor?: number | null;
+        scale?: number | null;
+        aspect?: number | null;
+        skinId?: string | null;
+        key?: string | null;
+        cacheKey?: string | null;
+      } & Record<string, unknown>);
+
+  type MakeArtOptions = {
+    layout?: Partial<UnitArtLayout> | null;
+    label?: Partial<UnitArtLabel> | null;
+    hpBar?: Partial<UnitArtHpBar> | null;
+    shadow?: UnitArtShadow;
+    defaultSkin?: string | null;
+    skins?: Record<string, UnitArtSpriteInput> | null;
+    sprite?: UnitArtSpriteInput | null;
+    spriteFactory?: ((palette: UnitArtPalette) => string) | null;
+    shape?: string | null;
+    size?: number | null;
+    glow?: string | null;
+    mirror?: boolean | null;
+  };
+
+  interface UnitArtSpriteDraft extends Omit<UnitArtSprite, 'key'> {
+    key?: string;
+  }
+
+  function svgData(width: number, height: number, body: string): string {
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet">${body}</svg>`;
     return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
   }
 
-  function sanitizeId(base, palette){
+  function sanitizeId(base: string, palette: UnitArtPalette): string {
     const seed = `${palette.primary || ''}${palette.secondary || ''}${palette.accent || ''}`.replace(/[^a-zA-Z0-9]/g, '').slice(0, 10);
     return `${base}${seed}` || `${base}0`;
   }
 
-  function svgShield(palette){
+  function svgShield(palette: UnitArtPalette): string {
     const gradId = sanitizeId('gradShield', palette);
     const light = palette.accent || '#f4f8ff';
     const outline = palette.outline || 'rgba(12,18,26,0.85)';
@@ -759,7 +895,7 @@ __define('./art.js', (exports, module, __require) => {
     return svgData(96, 120, body);
   }
 
-  function svgWing(palette){
+  function svgWing(palette: UnitArtPalette): string {
     const gradId = sanitizeId('gradWing', palette);
     const accent = palette.accent || '#ffe2e6';
     const outline = palette.outline || 'rgba(24,12,16,0.85)';
@@ -777,7 +913,7 @@ __define('./art.js', (exports, module, __require) => {
     return svgData(120, 128, body);
   }
 
-  function svgRune(palette){
+  function svgRune(palette: UnitArtPalette): string {
     const gradId = sanitizeId('gradRune', palette);
     const accent = palette.accent || '#f1dbff';
     const outline = palette.outline || 'rgba(22,15,35,0.85)';
@@ -796,7 +932,7 @@ __define('./art.js', (exports, module, __require) => {
     return svgData(120, 120, body);
   }
 
-  function svgBloom(palette){
+  function svgBloom(palette: UnitArtPalette): string {
     const gradId = sanitizeId('gradBloom', palette);
     const accent = palette.accent || '#ffeef7';
     const outline = palette.outline || 'rgba(22,26,24,0.78)';
@@ -814,7 +950,7 @@ __define('./art.js', (exports, module, __require) => {
     return svgData(120, 128, body);
   }
 
-  function svgPike(palette){
+  function svgPike(palette: UnitArtPalette): string {
     const gradId = sanitizeId('gradPike', palette);
     const accent = palette.accent || '#f9f7e8';
     const outline = palette.outline || 'rgba(28,26,18,0.82)';
@@ -832,7 +968,7 @@ __define('./art.js', (exports, module, __require) => {
     return svgData(120, 120, body);
   }
 
-  function svgSentinel(palette){
+  function svgSentinel(palette: UnitArtPalette): string {
     const gradId = sanitizeId('gradSentinel', palette);
     const accent = palette.accent || '#e1f7ff';
     const outline = palette.outline || 'rgba(18,25,32,0.85)';
@@ -850,7 +986,7 @@ __define('./art.js', (exports, module, __require) => {
     return svgData(120, 132, body);
   }
 
-  const SPRITES = {
+  const SPRITES: Record<string, (palette: UnitArtPalette) => string> = {
     shield: svgShield,
     wing: svgWing,
     rune: svgRune,
@@ -859,13 +995,13 @@ __define('./art.js', (exports, module, __require) => {
     sentinel: svgSentinel
   };
 
-  function merge(target, source){
-    return Object.assign({}, target, source || {});
+  function merge<T extends Record<string, unknown>>(target: T, source: Partial<T> | null | undefined): T {
+    return Object.assign({}, target, source ?? {});
   }
 
-  const UNIT_SKIN_SELECTION = new Map();
+  const UNIT_SKIN_SELECTION: Map<string, string> = new Map();
 
-  function getBaseArt(id){
+  function getBaseArt(id: string | null | undefined): UnitArtDefinition {
     if (!id) return UNIT_ART.default;
     if (UNIT_ART[id]) return UNIT_ART[id];
     if (id.endsWith('_minion')){
@@ -876,39 +1012,41 @@ __define('./art.js', (exports, module, __require) => {
     return UNIT_ART.default;
   }
 
-  function resolveSkinKey(id, baseArt, explicit){
+  function resolveSkinKey(id: string | null | undefined, baseArt: UnitArtDefinition | null, explicit?: string | null): string | null {
     if (!baseArt) return null;
-    if (explicit && baseArt.skins && baseArt.skins[explicit]) return explicit;
-    const override = UNIT_SKIN_SELECTION.get(id);
-    if (override && baseArt.skins && baseArt.skins[override]) return override;
-    if (baseArt.defaultSkin && baseArt.skins && baseArt.skins[baseArt.defaultSkin]) return baseArt.defaultSkin;
-    const keys = baseArt.skins ? Object.keys(baseArt.skins) : [];
+    if (explicit && baseArt.skins[explicit]) return explicit;
+    const idKey = id ?? '';
+    const override = UNIT_SKIN_SELECTION.get(idKey);
+    if (override && baseArt.skins[override]) return override;
+    if (baseArt.defaultSkin && baseArt.skins[baseArt.defaultSkin]) return baseArt.defaultSkin;
+    const keys = Object.keys(baseArt.skins ?? {});
     return keys[0] || null;
   }
 
-  function instantiateArt(id, baseArt, skinKey){
+  function instantiateArt(id: string | null | undefined, baseArt: UnitArtDefinition | null, skinKey: string | null): UnitArt | null {
     if (!baseArt) return null;
-    const art = {
-      ...baseArt,
-      layout: baseArt.layout ? { ...baseArt.layout } : undefined,
-      label: baseArt.label ? { ...baseArt.label } : undefined,
-      hpBar: baseArt.hpBar ? { ...baseArt.hpBar } : undefined
+    const art: UnitArt = {
+      ...(baseArt as UnitArt),
+      layout: baseArt.layout ? { ...baseArt.layout } : ({} as UnitArtLayout),
+      label: baseArt.label ? { ...baseArt.label } : ({} as UnitArtLabel),
+      hpBar: baseArt.hpBar ? { ...baseArt.hpBar } : ({} as UnitArtHpBar),
+      sprite: null,
+      skinKey: skinKey ?? null,
     };
-    const spriteDef = (skinKey && baseArt.skins && baseArt.skins[skinKey]) ? baseArt.skins[skinKey] : null;
+    const spriteDef = skinKey ? baseArt.skins[skinKey] : undefined;
     if (spriteDef){
       art.sprite = {
         ...spriteDef,
         key: skinKey,
-        skinId: spriteDef.skinId || skinKey
+        skinId: spriteDef.skinId ?? skinKey,
       };
     } else {
       art.sprite = null;
     }
-    art.skinKey = skinKey || null;
     return art;
   }
 
-  function setUnitSkin(unitId, skinKey){
+  function setUnitSkin(unitId: string | null | undefined, skinKey: string | null | undefined): boolean {
     if (!unitId) return false;
     const baseArt = getBaseArt(unitId);
     if (!baseArt || !baseArt.skins) return false;
@@ -923,103 +1061,155 @@ __define('./art.js', (exports, module, __require) => {
     return false;
   }
 
-  function getUnitSkin(unitId){
+  function getUnitSkin(unitId: string | null | undefined): string | null {
+    if (!unitId) return null;
     const baseArt = getBaseArt(unitId);
     if (!baseArt) return null;
     const override = UNIT_SKIN_SELECTION.get(unitId);
-    if (override && baseArt.skins && baseArt.skins[override]) return override;
-    if (baseArt.defaultSkin && baseArt.skins && baseArt.skins[baseArt.defaultSkin]) return baseArt.defaultSkin;
-    const keys = baseArt.skins ? Object.keys(baseArt.skins) : [];
+    if (override && baseArt.skins[override]) return override;
+    if (baseArt.defaultSkin && baseArt.skins[baseArt.defaultSkin]) return baseArt.defaultSkin;
+    const keys = Object.keys(baseArt.skins ?? {});
     return keys[0] || null;
   }
 
-  function normalizeShadow(shadow, fallback){
+  function normalizeShadow(
+    shadow: UnitArtShadow | undefined,
+    fallback: UnitArtShadow | undefined,
+  ): UnitArtShadowConfig | null {
     if (shadow === null) return null;
-    const base = {
+    const base: UnitArtShadowConfig = {
       color: 'rgba(0,0,0,0.35)',
       blur: 18,
       offsetX: 0,
-      offsetY: 10
+      offsetY: 10,
     };
-    if (typeof fallback === 'string') base.color = fallback;
-    if (typeof shadow === 'string'){ return { ...base, color: shadow }; }
-    if (shadow && typeof shadow === 'object'){
+
+    const fallbackColor =
+      typeof fallback === 'string'
+        ? fallback
+        : fallback && typeof fallback === 'object'
+          ? fallback.color ?? null
+          : null;
+    if (fallbackColor) {
+      base.color = fallbackColor;
+    }
+
+    if (typeof shadow === 'string') {
+      return { ...base, color: shadow };
+    }
+    if (shadow && typeof shadow === 'object') {
       return {
         color: shadow.color ?? base.color,
-        blur: Number.isFinite(shadow.blur) ? shadow.blur : base.blur,
-        offsetX: Number.isFinite(shadow.offsetX) ? shadow.offsetX : base.offsetX,
-        offsetY: Number.isFinite(shadow.offsetY) ? shadow.offsetY : base.offsetY
+        blur: Number.isFinite(shadow.blur) ? (shadow.blur as number) : base.blur,
+        offsetX: Number.isFinite(shadow.offsetX) ? (shadow.offsetX as number) : base.offsetX,
+        offsetY: Number.isFinite(shadow.offsetY) ? (shadow.offsetY as number) : base.offsetY,
       };
     }
-    return { ...base, color: fallback || base.color };
+    if (fallback && typeof fallback === 'object') {
+      return {
+        color: fallback.color ?? base.color,
+        blur: Number.isFinite(fallback.blur) ? (fallback.blur as number) : base.blur,
+        offsetX: Number.isFinite(fallback.offsetX) ? (fallback.offsetX as number) : base.offsetX,
+        offsetY: Number.isFinite(fallback.offsetY) ? (fallback.offsetY as number) : base.offsetY,
+      };
+    }
+    return { ...base };
   }
 
-  function normalizeSpriteEntry(conf, { anchor, shadow }){
+  function normalizeSpriteEntry(
+    conf: UnitArtSpriteInput | null | undefined,
+    context: { anchor: number; shadow: UnitArtShadow | undefined },
+  ): UnitArtSpriteDraft | null {
     if (!conf) return null;
     const input = typeof conf === 'string' ? { src: conf } : conf;
-    const src = input.src || input.url || null;
-    if (!src) return null;
-    const normalizedShadow = normalizeShadow(input.shadow, shadow);
+    const srcCandidate = input.src ?? input.url ?? null;
+    if (!srcCandidate) return null;
+    const normalizedShadow = normalizeShadow(
+      (input as Record<string, unknown>).shadow as UnitArtShadow | undefined,
+      context.shadow,
+    );
     return {
-      src,
-      anchor: Number.isFinite(input.anchor) ? input.anchor : anchor,
-      scale: Number.isFinite(input.scale) ? input.scale : 1,
-      aspect: Number.isFinite(input.aspect) ? input.aspect : null,
+      src: srcCandidate,
+      anchor: Number.isFinite(input.anchor) ? (input.anchor as number) : context.anchor,
+      scale: Number.isFinite(input.scale) ? (input.scale as number) : 1,
+      aspect: Number.isFinite(input.aspect) ? (input.aspect as number) : null,
       shadow: normalizedShadow,
-      skinId: input.skinId || input.key || input.id || null,
-      cacheKey: input.cacheKey || null
+      skinId:
+        typeof input.skinId === 'string'
+          ? input.skinId
+          : typeof input.key === 'string'
+            ? input.key
+            : typeof (input as Record<string, unknown>).id === 'string'
+              ? ((input as Record<string, unknown>).id as string)
+              : null,
+      cacheKey: typeof input.cacheKey === 'string' ? input.cacheKey : null,
     };
   }
 
-  function makeArt(pattern, palette, opts = {}){
-    const spriteFactory = opts.spriteFactory || SPRITES[pattern];
-    const layout = merge({
-      anchor: 0.78,
-      labelOffset: 1.18,
-      labelFont: 0.72,
-      hpOffset: 1.46,
-      hpWidth: 2.4,
-      hpHeight: 0.42,
-      spriteAspect: 0.78,
-      spriteHeight: 2.4
-    }, opts.layout);
-    const label = merge({
-      bg: 'rgba(12,20,30,0.82)',
-      text: '#f4f8ff',
-      stroke: 'rgba(255,255,255,0.08)'
-    }, opts.label);
-    const hpBar = merge({
-      bg: 'rgba(9,14,21,0.74)',
-      fill: palette.accent || '#6ff0c0',
-      border: 'rgba(0,0,0,0.55)'
-    }, opts.hpBar);
+  function makeArt(pattern: string, palette: UnitArtPalette, opts: MakeArtOptions = {}): UnitArtDefinition {
+    const spriteFactory = opts.spriteFactory ?? SPRITES[pattern];
+    const layout = merge<UnitArtLayout>(
+      {
+        anchor: 0.78,
+        labelOffset: 1.18,
+        labelFont: 0.72,
+        hpOffset: 1.46,
+        hpWidth: 2.4,
+        hpHeight: 0.42,
+        spriteAspect: 0.78,
+        spriteHeight: 2.4,
+      },
+      (opts.layout ?? undefined) as Partial<UnitArtLayout>,
+    );
+    const label = merge<UnitArtLabel>(
+      {
+        bg: 'rgba(12,20,30,0.82)',
+        text: '#f4f8ff',
+        stroke: 'rgba(255,255,255,0.08)',
+      },
+      (opts.label ?? undefined) as Partial<UnitArtLabel>,
+    );
+    const hpBar = merge<UnitArtHpBar>(
+      {
+        bg: 'rgba(9,14,21,0.74)',
+        fill: palette.accent || '#6ff0c0',
+        border: 'rgba(0,0,0,0.55)',
+      },
+      (opts.hpBar ?? undefined) as Partial<UnitArtHpBar>,
+    );
     const shadow = opts.shadow ?? 'rgba(0,0,0,0.35)';
 
     const defaultSkinKey = opts.defaultSkin || 'default';
-    const skinsInput = opts.skins || (opts.sprite ? { [defaultSkinKey]: opts.sprite } : null);
-    const normalizedSkins = {};
+    const skinsInput = opts.skins ?? (opts.sprite ? { [defaultSkinKey]: opts.sprite } : null);
+    const normalizedSkins: Record<string, UnitArtSprite> = {};
     const anchor = layout.anchor ?? 0.78;
     if (skinsInput){
       for (const [key, conf] of Object.entries(skinsInput)){
         const normalized = normalizeSpriteEntry(conf, { anchor, shadow });
         if (!normalized) continue;
-        normalized.key = key;
-        if (!normalized.skinId) normalized.skinId = key;
-        normalizedSkins[key] = normalized;
+        normalizedSkins[key] = {
+          ...normalized,
+          key,
+          skinId: normalized.skinId ?? key,
+        };
       }
     } else if (opts.sprite !== null && spriteFactory){
       const generated = normalizeSpriteEntry({ src: spriteFactory(palette) }, { anchor, shadow });
       if (generated){
-        generated.key = defaultSkinKey;
-        if (!generated.skinId) generated.skinId = defaultSkinKey;
-        normalizedSkins[defaultSkinKey] = generated;
+        normalizedSkins[defaultSkinKey] = {
+          ...generated,
+          key: defaultSkinKey,
+          skinId: generated.skinId ?? defaultSkinKey,
+        };
       }
     }
 
-    const preferredKey = normalizedSkins[defaultSkinKey] ? defaultSkinKey : Object.keys(normalizedSkins)[0] || defaultSkinKey;
+    const preferredKey = normalizedSkins[defaultSkinKey]
+      ? defaultSkinKey
+      : Object.keys(normalizedSkins)[0] || defaultSkinKey;
 
     return {
-      sprite: normalizedSkins[preferredKey] || null,
+      sprite: normalizedSkins[preferredKey] ?? null,
       skins: normalizedSkins,
       defaultSkin: preferredKey,
       palette,
@@ -1030,11 +1220,11 @@ __define('./art.js', (exports, module, __require) => {
       mirror: opts.mirror ?? true,
       layout,
       label,
-      hpBar
-    };
+      hpBar,
+    } satisfies UnitArtDefinition;
   }
 
-  const basePalettes = {
+  const basePalettes: Record<string, UnitArtPalette> = {
     default:   { primary:'#7fa6c0', secondary:'#1d2b38', accent:'#d6f2ff', outline:'#223548' },
     leaderA:   { primary:'#74cfff', secondary:'#123c55', accent:'#dff7ff', outline:'#1a4d68' },
     leaderB:   { primary:'#ff9aa0', secondary:'#4a1921', accent:'#ffd9dd', outline:'#571f28' },
@@ -1049,7 +1239,7 @@ __define('./art.js', (exports, module, __require) => {
     minion:    { primary:'#ffd27d', secondary:'#5a3a17', accent:'#fff4cc', outline:'#452b0f' }
   };
 
-  const UNIT_ART = {
+  const UNIT_ART: Record<string, UnitArtDefinition> = {
     default: makeArt('sentinel', basePalettes.default, {
       layout: { labelOffset: 1.1, hpOffset: 1.38, spriteAspect: 0.8 },
       skins: {
@@ -1224,9 +1414,9 @@ __define('./art.js', (exports, module, __require) => {
     })
   };
 
-  function getUnitArt(id, opts = {}){
+  function getUnitArt(id: string | null | undefined, opts: GetUnitArtOptions = {}): UnitArt | null {
     const baseArt = getBaseArt(id);
-    const skinKey = resolveSkinKey(id, baseArt, opts.skinKey);
+    const skinKey = resolveSkinKey(id, baseArt, opts.skinKey ?? null);
     return instantiateArt(id, baseArt, skinKey);
   }
   exports.UNIT_ART = UNIT_ART;
@@ -1234,66 +1424,73 @@ __define('./art.js', (exports, module, __require) => {
   exports.getUnitSkin = getUnitSkin;
   exports.getUnitArt = getUnitArt;
 });
-__define('./background.js', (exports, module, __require) => {
-  const __dep0 = __require('./config.js');
+__define('./background.ts', (exports, module, __require) => {
+  const __dep0 = __require('./config.ts');
   const CFG = __dep0.CFG;
   const __dep1 = __require('./engine.ts');
-  const projectCellOblique = __dep1.projectCellOblique;
   const ensureSpriteLoaded = __dep1.ensureSpriteLoaded;
+  const projectCellOblique = __dep1.projectCellOblique;
 
-  const BACKGROUND_PROP_CACHE = new WeakMap();
 
-  function stableStringify(value, seen = new WeakSet()){
-    if (value === null) return 'null';
-    const type = typeof value;
-    if (type === 'undefined') return 'undefined';
-    if (type === 'number' || type === 'boolean') return String(value);
-    if (type === 'string') return JSON.stringify(value);
-    if (type === 'symbol') return value.toString();
-    if (type === 'function') return `[Function:${value.name || 'anonymous'}]`;
-    if (Array.isArray(value)){
-      return `[${value.map(v => stableStringify(v, seen)).join(',')}]`;
-    }
-    if (type === 'object'){
-      if (seen.has(value)) return '"[Circular]"';
-      seen.add(value);
-      const keys = Object.keys(value).sort();
-      const entries = keys.map(key => `${JSON.stringify(key)}:${stableStringify(value[key], seen)}`);
-      seen.delete(value);
-      return `{${entries.join(',')}}`;
-    }
-    return String(value);
+
+  type GridSpec = Parameters<typeof projectCellOblique>[0];
+  type CameraOptions = Parameters<typeof projectCellOblique>[3];
+  type SpriteCacheEntry = ReturnType<typeof ensureSpriteLoaded>;
+
+  type EnvironmentPropDefaults = {
+    asset?: string | null;
+    size?: { w: number; h: number };
+    anchor?: { x: number; y: number };
+    baseLift?: number;
+    fallback?: BackgroundFallback | null;
+    palette?: BackgroundPalette | null;
+  };
+
+  interface NormalizedPropConfig {
+    type: string | null;
+    asset: string | null;
+    fallback: BackgroundFallback | null;
+    palette: BackgroundPalette;
+    anchor: { x: number; y: number };
+    size: { w: number; h: number };
+    cell: { cx: number; cy: number };
+    depth: number;
+    baseLift: number;
+    offset: { x: number; y: number };
+    pixelOffset: { x: number; y: number };
+    scale: number;
+    alpha: number;
+    flip: number;
+    sortBias: number;
   }
 
-  function computePropsSignature(props){
-    if (!Array.isArray(props) || !props.length) return 'len:0';
-    try {
-      return stableStringify(props);
-    } catch(_){
-      return `len:${props.length}`;
-    }
+  interface NormalizedPropEntry {
+    prop: NormalizedPropConfig;
+    base: { cx: number; cyWithDepth: number };
+    spriteEntry: SpriteCacheEntry | null;
   }
 
-  function getBoardSignature(g, cam){
-    if (!g) return 'no-grid';
-    const baseParts = [
-      g.cols,
-      g.rows,
-      g.tile,
-      g.ox,
-      g.oy,
-      g.w,
-      g.h,
-      g.pad,
-      g.dpr
-    ];
-    const camParts = [
-      cam?.rowGapRatio ?? 'rg',
-      cam?.topScale ?? 'ts',
-      cam?.depthScale ?? 'ds'
-    ];
-    return [...baseParts, ...camParts].join('|');
+  interface DrawableEntry {
+    prop: NormalizedPropConfig;
+    x: number;
+    y: number;
+    scale: number;
+    spriteEntry: SpriteCacheEntry | null;
+    sortY: number;
   }
+
+  interface BoardState {
+    signature: string;
+    drawables: DrawableEntry[];
+  }
+
+  interface BackgroundPropCacheEntry {
+    signature: string;
+    normalizedProps: NormalizedPropEntry[];
+    boardStates: Map<string, BoardState>;
+  }
+
+  const BACKGROUND_PROP_CACHE: WeakMap<BackgroundDefinitionConfig, BackgroundPropCacheEntry> = new WeakMap();
 
   const ENVIRONMENT_PROP_TYPES = {
     'stone-obelisk': {
@@ -1307,8 +1504,8 @@ __define('./background.js', (exports, module, __require) => {
         secondary: '#7d8ba9',
         accent: '#f7fbff',
         shadow: '#2c3346',
-        outline: 'rgba(16,20,32,0.78)'
-      }
+        outline: 'rgba(16,20,32,0.78)',
+      },
     },
     'sun-banner': {
       asset: 'dist/assets/environment/sun-banner.svg',
@@ -1321,48 +1518,107 @@ __define('./background.js', (exports, module, __require) => {
         secondary: '#d47b3a',
         accent: '#fff4d1',
         shadow: '#6d3218',
-        outline: 'rgba(46,23,11,0.78)'
-      }
-    }
-  };
+        outline: 'rgba(46,23,11,0.78)',
+      },
+    },
+  } satisfies Record<string, EnvironmentPropDefaults>;
 
-  function resolveBackground(backgroundKey){
-    const backgrounds = CFG.BACKGROUNDS || {};
+  function stableStringify(value: unknown, seen: WeakSet<object> = new WeakSet()): string {
+    if (value === null) return 'null';
+    const type = typeof value;
+    if (type === 'undefined') return 'undefined';
+    if (type === 'number' || type === 'boolean' || type === 'bigint') return String(value);
+    if (type === 'string') return JSON.stringify(value);
+    if (type === 'symbol') return value.toString();
+    if (type === 'function') {
+      const func = value as { name?: string };
+      return `[Function:${func.name || 'anonymous'}]`;
+    }
+    if (Array.isArray(value)) {
+      return `[${value.map((entry) => stableStringify(entry, seen)).join(',')}]`;
+    }
+    if (type === 'object') {
+      const objectValue = value as Record<string | number | symbol, unknown>;
+      if (seen.has(objectValue)) return '"[Circular]"';
+      seen.add(objectValue);
+      const keys = Object.keys(objectValue).sort();
+      const entries = keys.map((key) => `${JSON.stringify(key)}:${stableStringify(objectValue[key], seen)}`);
+      seen.delete(objectValue);
+      return `{${entries.join(',')}}`;
+    }
+    return String(value);
+  }
+
+  function computePropsSignature(props: ReadonlyArray<BackgroundPropConfig> | null | undefined): string {
+    if (!props || !props.length) return 'len:0';
+    try {
+      return stableStringify(props);
+    } catch {
+      return `len:${props.length}`;
+    }
+  }
+
+  function getBoardSignature(g: GridSpec | null | undefined, cam: CameraOptions | null | undefined): string {
+    if (!g) return 'no-grid';
+    const baseParts = [
+      g.cols,
+      g.rows,
+      g.tile,
+      g.ox,
+      g.oy,
+      g.w,
+      g.h,
+      g.pad,
+      g.dpr,
+    ];
+    const camParts = [
+      cam?.rowGapRatio ?? 'rg',
+      cam?.topScale ?? 'ts',
+      cam?.depthScale ?? 'ds',
+    ];
+    return [...baseParts, ...camParts].join('|');
+  }
+
+  function resolveBackground(backgroundKey: string | null | undefined): { key: string; config: BackgroundDefinitionConfig } | null {
+    const backgrounds = CFG.BACKGROUNDS as Record<string, BackgroundDefinitionConfig> | undefined;
     if (!backgrounds || typeof backgrounds !== 'object') return null;
-    if (backgroundKey && backgrounds[backgroundKey]){
+    if (backgroundKey && backgrounds[backgroundKey]) {
       return { key: backgroundKey, config: backgrounds[backgroundKey] };
     }
     const preferred = CFG.CURRENT_BACKGROUND || CFG.SCENE?.CURRENT_BACKGROUND;
-    if (preferred && backgrounds[preferred]){
+    if (preferred && backgrounds[preferred]) {
       return { key: preferred, config: backgrounds[preferred] };
     }
     const themeKey = CFG.SCENE?.CURRENT_THEME || CFG.SCENE?.DEFAULT_THEME;
-    if (themeKey && backgrounds[themeKey]){
+    if (themeKey && backgrounds[themeKey]) {
       return { key: themeKey, config: backgrounds[themeKey] };
     }
-    const fallbackKey = Object.keys(backgrounds)[0];
-    if (fallbackKey){
+    const [fallbackKey] = Object.keys(backgrounds);
+    if (fallbackKey) {
       return { key: fallbackKey, config: backgrounds[fallbackKey] };
     }
     return null;
   }
 
-  function normalizePropConfig(propCfg){
+  function normalizePropConfig(propCfg: BackgroundPropConfig | null | undefined): NormalizedPropConfig | null {
     if (!propCfg) return null;
-    const typeId = propCfg.type || propCfg.kind;
-    const typeDef = typeId ? ENVIRONMENT_PROP_TYPES[typeId] : null;
+    const typeId = propCfg.type || (propCfg as { kind?: string }).kind || null;
+    const typeDef = typeId ? ENVIRONMENT_PROP_TYPES[typeId] : undefined;
     const anchor = {
       x: propCfg.anchor?.x ?? typeDef?.anchor?.x ?? 0.5,
-      y: propCfg.anchor?.y ?? typeDef?.anchor?.y ?? 1
+      y: propCfg.anchor?.y ?? typeDef?.anchor?.y ?? 1,
     };
     const size = {
       w: propCfg.size?.w ?? typeDef?.size?.w ?? 120,
-      h: propCfg.size?.h ?? typeDef?.size?.h ?? 180
+      h: propCfg.size?.h ?? typeDef?.size?.h ?? 180,
     };
-    const palette = {
-      ...(typeDef?.palette || {}),
-      ...(propCfg.palette || {})
+    const palette: BackgroundPalette = {
+      ...(typeDef?.palette ?? {}),
+      ...(propCfg.palette ?? {}),
     };
+    const cellCx = propCfg.cx ?? propCfg.cell?.cx ?? 0;
+    const cellCy = propCfg.cy ?? propCfg.cell?.cy ?? 0;
+    const depth = propCfg.depth ?? propCfg.cell?.depth ?? 0;
     return {
       type: typeId,
       asset: propCfg.asset ?? typeDef?.asset ?? null,
@@ -1370,86 +1626,94 @@ __define('./background.js', (exports, module, __require) => {
       palette,
       anchor,
       size,
-      cell: {
-        cx: propCfg.cx ?? propCfg.cell?.cx ?? 0,
-        cy: propCfg.cy ?? propCfg.cell?.cy ?? 0
-      },
-      depth: propCfg.depth ?? propCfg.cell?.depth ?? 0,
+      cell: { cx: cellCx, cy: cellCy },
+      depth,
       baseLift: propCfg.baseLift ?? typeDef?.baseLift ?? 0.5,
       offset: {
         x: propCfg.offset?.x ?? 0,
-        y: propCfg.offset?.y ?? 0
+        y: propCfg.offset?.y ?? 0,
       },
       pixelOffset: {
         x: propCfg.pixelOffset?.x ?? 0,
-        y: propCfg.pixelOffset?.y ?? 0
+        y: propCfg.pixelOffset?.y ?? 0,
       },
       scale: propCfg.scale ?? 1,
       alpha: propCfg.alpha ?? 1,
       flip: propCfg.flip ?? 1,
-      sortBias: propCfg.sortBias ?? 0
+      sortBias: propCfg.sortBias ?? 0,
     };
   }
 
-  function getBackgroundPropCache(config){
+  function getBackgroundPropCache(config: BackgroundDefinitionConfig | null): BackgroundPropCacheEntry | null {
     if (!config) return null;
     const props = Array.isArray(config.props) ? config.props : [];
     const signature = computePropsSignature(props);
     let cache = BACKGROUND_PROP_CACHE.get(config);
-    if (!cache || cache.signature !== signature){
-      const normalizedProps = [];
-      for (const rawProp of props){
+    if (!cache || cache.signature !== signature) {
+      const normalizedProps: NormalizedPropEntry[] = [];
+      for (const rawProp of props) {
         const prop = normalizePropConfig(rawProp);
         if (!prop) continue;
-        const cyWithDepth = prop.cell.cy + (prop.depth ?? 0);
+        const cyWithDepth = prop.cell.cy + prop.depth;
         const spriteEntry = prop.asset ? ensureSpriteLoaded({ sprite: prop.asset }) : null;
         normalizedProps.push({
           prop,
           base: {
             cx: prop.cell.cx,
-            cyWithDepth
+            cyWithDepth,
           },
-          spriteEntry
+          spriteEntry,
         });
       }
       cache = {
         signature,
         normalizedProps,
-        boardStates: new Map()
+        boardStates: new Map<string, BoardState>(),
       };
       BACKGROUND_PROP_CACHE.set(config, cache);
     }
     return cache;
   }
 
-  function buildBoardState(normalizedProps, g, cam){
+  function buildBoardState(
+    normalizedProps: readonly NormalizedPropEntry[],
+    g: GridSpec | null | undefined,
+    cam: CameraOptions | null | undefined,
+  ): BoardState | null {
     if (!g) return null;
     const rowGap = ((cam?.rowGapRatio) ?? 0.62) * g.tile;
-    const drawables = [];
-    for (const entry of normalizedProps){
+    const drawables: DrawableEntry[] = [];
+    for (const entry of normalizedProps) {
       if (!entry?.prop) continue;
       const { prop, base } = entry;
       const projection = projectCellOblique(g, base.cx, base.cyWithDepth, cam);
       const scale = projection.scale * prop.scale;
-      const spriteEntry = entry.spriteEntry || (prop.asset ? ensureSpriteLoaded({ sprite: prop.asset }) : null);
+      const spriteEntry = entry.spriteEntry ?? (prop.asset ? ensureSpriteLoaded({ sprite: prop.asset }) : null);
       entry.spriteEntry = spriteEntry;
       drawables.push({
         prop,
         x: projection.x + prop.offset.x * g.tile + prop.pixelOffset.x,
-        y: projection.y + (prop.baseLift ?? 0.5) * rowGap + prop.offset.y * rowGap + prop.pixelOffset.y,
+        y: projection.y + prop.baseLift * rowGap + prop.offset.y * rowGap + prop.pixelOffset.y,
         scale,
         spriteEntry,
-        sortY: projection.y + prop.sortBias
+        sortY: projection.y + prop.sortBias,
       });
     }
     drawables.sort((a, b) => a.sortY - b.sortY);
     return {
       signature: getBoardSignature(g, cam),
-      drawables
+      drawables,
     };
   }
 
-  function drawFallback(ctx, width, height, anchor, palette, fallback){
+  function drawFallback(
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    anchor: { x?: number | null; y?: number | null },
+    palette: BackgroundPalette,
+    fallback: BackgroundFallback | null,
+  ): void {
     const primary = palette?.primary || '#ccd7ec';
     const secondary = palette?.secondary || '#7b86a1';
     const accent = palette?.accent || '#f4f7ff';
@@ -1460,7 +1724,7 @@ __define('./background.js', (exports, module, __require) => {
     const halfW = width / 2;
     ctx.save();
     ctx.beginPath();
-    switch(fallback?.shape){
+    switch (fallback?.shape) {
       case 'banner': {
         ctx.moveTo(-halfW * 0.65, top + height * 0.08);
         ctx.lineTo(halfW * 0.65, top + height * 0.08);
@@ -1521,30 +1785,35 @@ __define('./background.js', (exports, module, __require) => {
     ctx.restore();
   }
 
-  function drawEnvironmentProps(ctx, g, cam, backgroundKey){
+  function drawEnvironmentProps(
+    ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
+    g: GridSpec,
+    cam: CameraOptions | null | undefined,
+    backgroundKey?: string | null,
+  ): void {
     if (!ctx || !g) return;
-    const resolved = resolveBackground(backgroundKey);
+    const resolved = resolveBackground(backgroundKey ?? null);
     if (!resolved) return;
     const { config } = resolved;
-    if (!config || config.enabled === false) return;
+    if (!config || (config as { enabled?: boolean }).enabled === false) return;
     const cache = getBackgroundPropCache(config);
     const normalizedProps = cache?.normalizedProps;
     if (!normalizedProps || !normalizedProps.length) return;
 
     const boardSignature = getBoardSignature(g, cam);
     let boardState = cache.boardStates.get(boardSignature);
-    if (!boardState){
+    if (!boardState) {
       boardState = buildBoardState(normalizedProps, g, cam);
       if (!boardState) return;
       cache.boardStates.set(boardSignature, boardState);
     }
 
-    for (const item of boardState.drawables){
+    for (const item of boardState.drawables) {
       const { prop } = item;
       let width = prop.size.w * item.scale;
       let height = prop.size.h * item.scale;
       const spriteEntry = item.spriteEntry;
-      if (spriteEntry && spriteEntry.status === 'ready' && spriteEntry.img){
+      if (spriteEntry && spriteEntry.status === 'ready' && spriteEntry.img) {
         const naturalW = spriteEntry.img.naturalWidth || prop.size.w;
         const naturalH = spriteEntry.img.naturalHeight || prop.size.h;
         width = naturalW * item.scale;
@@ -1553,12 +1822,12 @@ __define('./background.js', (exports, module, __require) => {
       ctx.save();
       ctx.globalAlpha = prop.alpha;
       ctx.translate(item.x, item.y);
-      if (prop.flip === -1){
+      if (prop.flip === -1) {
         ctx.scale(-1, 1);
       }
       const drawX = -width * (prop.anchor.x ?? 0.5);
       const drawY = -height * (prop.anchor.y ?? 1);
-      if (spriteEntry && spriteEntry.status === 'ready' && spriteEntry.img){
+      if (spriteEntry && spriteEntry.status === 'ready' && spriteEntry.img) {
         ctx.drawImage(spriteEntry.img, drawX, drawY, width, height);
       } else {
         drawFallback(ctx, width, height, prop.anchor, prop.palette, prop.fallback);
@@ -1567,30 +1836,53 @@ __define('./background.js', (exports, module, __require) => {
     }
   }
 
-  function getEnvironmentBackground(backgroundKey){
-    const resolved = resolveBackground(backgroundKey);
+  function getEnvironmentBackground(backgroundKey?: string | null): BackgroundConfig {
+    const resolved = resolveBackground(backgroundKey ?? null);
     return resolved ? resolved.config : null;
   }
   exports.ENVIRONMENT_PROP_TYPES = ENVIRONMENT_PROP_TYPES;
   exports.drawEnvironmentProps = drawEnvironmentProps;
   exports.getEnvironmentBackground = getEnvironmentBackground;
 });
-__define('./catalog.js', (exports, module, __require) => {
+__define('./catalog.ts', (exports, module, __require) => {
   // @ts-check
   //v0.8
   // 1) Rank multiplier (đơn giản) — áp lên TẤT CẢ stat trừ SPD
-  const __dep0 = __require('./utils/kit.js');
+  const __dep0 = __require('./utils/kit.ts');
   const kitSupportsSummon = __dep0.kitSupportsSummon;
 
-  /** @typedef {import('./types/config.js').CatalogStatBlock} CatalogStatBlock */
-  /** @typedef {import('./types/config.js').RosterUnitDefinition} RosterUnitDefinition */
-  /** @typedef {import('./types/units.ts').UnitId} UnitId */
 
-  const RANK_MULT = { N:0.80, R:0.90, SR:1.05, SSR:1.25, UR:1.50, Prime:1.80 };
+
+
+
+  export interface RosterKitDefinition extends UnknownRecord {
+    onSpawn?: UnknownRecord | null;
+    basic?: UnknownRecord | null;
+    skills?: ReadonlyArray<UnknownRecord> | null;
+    ult?: UnknownRecord | null;
+    talent?: UnknownRecord | null;
+    technique?: UnknownRecord | null;
+    passives?: ReadonlyArray<UnknownRecord> | null;
+    traits?: ReadonlyArray<UnknownRecord> | null;
+  }
+
+  export type RosterEntry = Omit<RosterUnitDefinition, 'kit'> & {
+    kit: RosterKitDefinition;
+  };
+
+  const RANK_MULT = {
+    N: 0.80,
+    R: 0.90,
+    SR: 1.05,
+    SSR: 1.25,
+    UR: 1.50,
+    Prime: 1.80,
+  } satisfies Readonly<Record<'N' | 'R' | 'SR' | 'SSR' | 'UR' | 'Prime', number>>;
+
+  export type RankName = keyof typeof RANK_MULT;
 
   // 2) Class base (mốc lv1 để test). SPD không chịu rank multiplier.
-  /** @type {Readonly<Record<string, CatalogStatBlock>>} */
-  const CLASS_BASE = ({
+  const CLASS_BASE = {
     Mage:     { HP:360, ATK:28, WIL:30, ARM:0.08, RES:0.12, AGI:10, PER:12, SPD:1.00, AEmax:110, AEregen: 8.0, HPregen:14 },
     Tanker:   { HP:500, ATK:22, WIL:20, ARM:0.18, RES:0.14, AGI: 9, PER:10, SPD:0.95, AEmax: 60, AEregen: 4.0, HPregen:22 },
     Ranger:   { HP:360, ATK:35, WIL:16, ARM:0.08, RES:0.08, AGI:12, PER:14, SPD:1.20, AEmax: 75, AEregen: 7.0, HPregen:12 },
@@ -1598,19 +1890,24 @@ __define('./catalog.js', (exports, module, __require) => {
     Summoner: { HP:330, ATK:22, WIL:26, ARM:0.08, RES:0.14, AGI:10, PER:10, SPD:1.05, AEmax: 90, AEregen: 8.5, HPregen:18 },
     Support:  { HP:380, ATK:24, WIL:24, ARM:0.10, RES:0.13, AGI:10, PER:11, SPD:1.00, AEmax:100, AEregen: 7.5, HPregen:20 },
     Assassin: { HP:320, ATK:36, WIL:16, ARM:0.06, RES:0.08, AGI:14, PER:16, SPD:1.25, AEmax: 65, AEregen: 6.0, HPregen:10 }
-  });
+  } satisfies Readonly<Record<'Mage' | 'Tanker' | 'Ranger' | 'Warrior' | 'Summoner' | 'Support' | 'Assassin', CatalogStatBlock>>;
+
+  export type ClassName = keyof typeof CLASS_BASE;
+
+  const isRankName = (value: string): value is RankName => value in RANK_MULT;
+  const isClassName = (value: string): value is ClassName => value in CLASS_BASE;
+
+  type MaybeUnitId = UnitId | string | null | undefined;
 
   // 3) Helper: áp rank & mod (mods không áp vào SPD)
-  /**
-   * @param {CatalogStatBlock} base
-   * @param {keyof typeof RANK_MULT} rank
-   * @param {Partial<Record<keyof CatalogStatBlock, number>>} [mods]
-   * @returns {CatalogStatBlock}
-   */
-  function applyRankAndMods(base, rank, mods = {}){
-    const m = RANK_MULT[rank] ?? 1;
-    const out = { ...base };
-    const keys = /** @type {Array<keyof CatalogStatBlock>} */ (Object.keys(base));
+  function applyRankAndMods(
+    base: CatalogStatBlock,
+    rank: RankName,
+    mods: Partial<Record<keyof CatalogStatBlock, number>> = {},
+  ): CatalogStatBlock {
+    const multiplier = RANK_MULT[rank] ?? 1;
+    const out: CatalogStatBlock = { ...base };
+    const keys = Object.keys(base) as Array<keyof CatalogStatBlock>;
     for (const key of keys){
       const baseValue = base[key] ?? 0;
       const mod = 1 + (mods?.[key] ?? 0);
@@ -1619,7 +1916,7 @@ __define('./catalog.js', (exports, module, __require) => {
         continue;
       }
       const precision = (key === 'ARM' || key === 'RES') ? 100 : (key === 'AEregen' ? 10 : 1);
-      out[key] = Math.round(baseValue * mod * m * precision) / precision;
+      out[key] = Math.round(baseValue * mod * multiplier * precision) / precision;
     }
     return out;
   }
@@ -1627,8 +1924,7 @@ __define('./catalog.js', (exports, module, __require) => {
   // 4) Roster (dex/meta) — 8 nhân vật, ngân sách mod bằng nhau (~+20% tổng, không đụng SPD)
   //  - onSpawn.rage: 100 cho mọi unit từ deck (trừ leader). Revive không áp quy tắc này.
   //  - kit.traits.summon / kit.ult.summon đánh dấu Summoner -> kích hoạt Immediate Summon (action-chain).
-  /** @type {ReadonlyArray<RosterUnitDefinition>} */
-  const ROSTER = ([
+  const ROSTER = [
     {
       id: 'phe', name: 'Phệ', class: 'Mage', rank: 'Prime',
       mods: { WIL:+0.10, AEregen:+0.10 }, // 20% tổng
@@ -1899,22 +2195,36 @@ __define('./catalog.js', (exports, module, __require) => {
         ]
       }
     }
-  ]);
+  ] satisfies ReadonlyArray<RosterEntry>;
+
+  const unitBaseEntries = ROSTER
+    .map((entry) => {
+      const rank = entry.rank;
+      const className = entry.class;
+      if (!isRankName(rank) || !isClassName(className)) {
+        return null;
+      }
+      const base = CLASS_BASE[className];
+      const final = applyRankAndMods(base, rank, entry.mods);
+      return [entry.id, final] as const;
+    })
+    .filter((pair): pair is readonly [UnitId, CatalogStatBlock] => pair !== null);
+
+  const UNIT_BASE = Object.freeze(
+    Object.fromEntries(unitBaseEntries),
+  ) satisfies Readonly<Record<UnitId, CatalogStatBlock>>;
 
   // 5) Map & helper tra cứu
-  const ROSTER_MAP = new Map(ROSTER.map(entry => [entry.id, entry]));
+  const ROSTER_MAP = new Map<UnitId, RosterEntry>(
+    ROSTER.map((entry) => [entry.id, entry] as const),
+  );
 
-  /**
-   * @param {UnitId | string | null | undefined} id
-   * @returns {RosterUnitDefinition | undefined}
-   */
-  const getMetaById = (id) => (id == null ? undefined : ROSTER_MAP.get(id));
+  const getMetaById = (id: MaybeUnitId): RosterEntry | undefined => {
+    if (typeof id !== 'string') return undefined;
+    return ROSTER_MAP.get(id);
+  };
 
-  /**
-   * @param {UnitId | string | null | undefined} id
-   * @returns {boolean}
-   */
-  const isSummoner = (id) => {
+  const isSummoner = (id: MaybeUnitId): boolean => {
     const m = getMetaById(id);
     return !!(m && m.class === 'Summoner' && kitSupportsSummon(m));
   };
@@ -1922,6 +2232,7 @@ __define('./catalog.js', (exports, module, __require) => {
   exports.RANK_MULT = RANK_MULT;
   exports.CLASS_BASE = CLASS_BASE;
   exports.ROSTER = ROSTER;
+  exports.UNIT_BASE = UNIT_BASE;
   exports.ROSTER_MAP = ROSTER_MAP;
   exports.getMetaById = getMetaById;
   exports.isSummoner = isSummoner;
@@ -1931,7 +2242,7 @@ __define('./combat.ts', (exports, module, __require) => {
   const __dep0 = __require('./statuses.ts');
   const Statuses = __dep0.Statuses;
   const hookOnLethalDamage = __dep0.hookOnLethalDamage;
-  const __dep1 = __require('./vfx.js');
+  const __dep1 = __require('./vfx.ts');
   const vfxAddHit = __dep1.vfxAddHit;
   const vfxAddMelee = __dep1.vfxAddMelee;
   const vfxAddLightningArc = __dep1.vfxAddLightningArc;
@@ -1939,13 +2250,13 @@ __define('./combat.ts', (exports, module, __require) => {
   const slotToCell = __dep2.slotToCell;
   const __dep3 = __require('./passives.ts');
   const emitPassiveEvent = __dep3.emitPassiveEvent;
-  const __dep4 = __require('./config.js');
+  const __dep4 = __require('./config.ts');
   const CFG = __dep4.CFG;
-  const __dep5 = __require('./utils/fury.js');
+  const __dep5 = __require('./utils/fury.ts');
   const gainFury = __dep5.gainFury;
   const startFurySkill = __dep5.startFurySkill;
   const finishFuryHit = __dep5.finishFuryHit;
-  const __dep6 = __require('./utils/time.js');
+  const __dep6 = __require('./utils/time.ts');
   const safeNow = __dep6.safeNow;
 
 
@@ -2303,17 +2614,76 @@ __define('./combat.ts', (exports, module, __require) => {
   exports.basicAttack = basicAttack;
   exports.doBasicWithFollowups = doBasicWithFollowups;
 });
-__define('./config.js', (exports, module, __require) => {
-  // @ts-check
-
-  // config.js v0.7.5
-
+__define('./config.ts', (exports, module, __require) => {
+  // config.ts v0.7.5
   const __dep0 = __require('./config/schema.ts');
   const GameConfigSchema = __dep0.GameConfigSchema;
 
-  /** @typedef {import('@types/config').GameConfig} GameConfig */
-  /** @typedef {import('@types/config').CameraPreset} CameraPreset */
-  /** @typedef {import('@types/config').ChibiProportions} ChibiProportions */
+
+  const daylightTheme = {
+    sky: {
+      top: '#1b2434',
+      mid: '#2f455e',
+      bottom: '#55759a',
+      glow: 'rgba(255, 236, 205, 0.35)',
+    },
+    horizon: {
+      color: '#f4d9ad',
+      glow: 'rgba(255, 236, 205, 0.55)',
+      height: 0.22,
+      thickness: 0.9,
+    },
+    ground: {
+      top: '#312724',
+      accent: '#3f302c',
+      bottom: '#181210',
+      highlight: '#6c5344',
+      parallax: 0.12,
+      topScale: 0.9,
+      bottomScale: 1.45,
+    },
+  } satisfies SceneTheme;
+
+  const backgroundDefinitions = {
+    daylight: {
+      props: [
+        {
+          type: 'stone-obelisk',
+          cell: { cx: -0.8, cy: -0.2 },
+          offset: { x: -0.35, y: -0.08 },
+          scale: 1.02,
+          alpha: 0.94,
+        },
+        {
+          type: 'stone-obelisk',
+          cell: { cx: 6.8, cy: -0.25 },
+          offset: { x: 0.32, y: -0.1 },
+          scale: 1.02,
+          alpha: 0.94,
+          flip: -1,
+        },
+        {
+          type: 'sun-banner',
+          cell: { cx: -1.05, cy: 2.24 },
+          depth: 0.15,
+          offset: { x: -0.28, y: 0.38 },
+          sortBias: 18,
+          scale: 1.08,
+          alpha: 0.96,
+        },
+        {
+          type: 'sun-banner',
+          cell: { cx: 7.05, cy: 2.28 },
+          depth: 0.15,
+          offset: { x: 0.28, y: 0.38 },
+          sortBias: 18,
+          scale: 1.08,
+          alpha: 0.96,
+          flip: -1,
+        },
+      ],
+    },
+  } satisfies Record<string, BackgroundDefinitionConfig>;
 
   const rawConfig = {
     GRID_COLS: 7,
@@ -2420,95 +2790,29 @@ __define('./config.js', (exports, module, __require) => {
       DEFAULT_THEME: 'daylight',
       CURRENT_THEME: 'daylight',
       THEMES: {
-        daylight: {
-          sky: {
-            top: '#1b2434',
-            mid: '#2f455e',
-            bottom: '#55759a',
-            glow: 'rgba(255, 236, 205, 0.35)'
-          },
-          horizon: {
-            color: '#f4d9ad',
-            glow: 'rgba(255, 236, 205, 0.55)',
-            height: 0.22,
-            thickness: 0.9
-          },
-          ground: {
-            top: '#312724',
-            accent: '#3f302c',
-            bottom: '#181210',
-            highlight: '#6c5344',
-            parallax: 0.12,
-            topScale: 0.9,
-            bottomScale: 1.45
-          }
-        }
-      }
+        daylight: daylightTheme,
+      },
     },
-
-  CURRENT_BACKGROUND: 'daylight',
-    BACKGROUNDS: {
-      daylight: {
-        props: [
-          {
-            type: 'stone-obelisk',
-            cell: { cx: -0.8, cy: -0.2 },
-            offset: { x: -0.35, y: -0.08 },
-            scale: 1.02,
-            alpha: 0.94
-          },
-          {
-            type: 'stone-obelisk',
-            cell: { cx: 6.8, cy: -0.25 },
-            offset: { x: 0.32, y: -0.1 },
-            scale: 1.02,
-            alpha: 0.94,
-            flip: -1
-          },
-          {
-            type: 'sun-banner',
-            cell: { cx: -1.05, cy: 2.24 },
-            depth: 0.15,
-            offset: { x: -0.28, y: 0.38 },
-            sortBias: 18,
-            scale: 1.08,
-            alpha: 0.96
-          },
-          {
-            type: 'sun-banner',
-            cell: { cx: 7.05, cy: 2.28 },
-            depth: 0.15,
-            offset: { x: 0.28, y: 0.38 },
-            sortBias: 18,
-            scale: 1.08,
-            alpha: 0.96,
-            flip: -1
-          }
-        ]
-      }
-    },
-    CAMERA: 'landscape_oblique'
-  };
+    CURRENT_BACKGROUND: 'daylight',
+    BACKGROUNDS: backgroundDefinitions,
+    CAMERA: 'landscape_oblique',
+  } satisfies GameConfig;
 
   const parsedConfig = GameConfigSchema.parse(rawConfig); // behavior-preserving validation
   Object.freeze(parsedConfig);
 
-  /** @type {GameConfig} */
-  const CFG = parsedConfig;
+  const CFG: GameConfig = parsedConfig;
 
   // Camera presets (giữ nguyên)
-  /** @type {Record<string, CameraPreset>} */
   const CAM = {
     landscape_oblique: { rowGapRatio: 0.62, topScale: 0.80, depthScale: 0.94 },
-    portrait_leader45: { rowGapRatio: 0.72, topScale: 0.86, depthScale: 0.96 }
-  };
+    portrait_leader45: { rowGapRatio: 0.72, topScale: 0.86, depthScale: 0.96 },
+  } satisfies Record<string, CameraPreset>;
   // === Token render style ===
-  /** @type {'chibi' | 'disk'} */
-  const TOKEN_STYLE = 'chibi'; // 'chibi' | 'disk'
+  const TOKEN_STYLE: 'chibi' | 'disk' = 'chibi';
 
   // Proportions cho chibi (tính theo bán kính cơ sở r)
-  /** @type {ChibiProportions} */
-  const CHIBI = {
+  const CHIBI: ChibiProportions = {
     // đường đậm hơn + tỉ lệ chibi mập mạp (đầu to, tay chân ngắn)
     line: 3,
     headR: 0.52,   // đầu to hơn
@@ -2524,8 +2828,18 @@ __define('./config.js', (exports, module, __require) => {
   exports.TOKEN_STYLE = TOKEN_STYLE;
   exports.CHIBI = CHIBI;
 });
+__define('./config/package-lock.json', (exports, module, __require) => {
+  const data = JSON.parse('{"name":"arclune_lane_7x3","version":"1.0.0","lockfileVersion":3,"requires":true,"packages":{"":{"name":"arclune_lane_7x3","version":"1.0.0","license":"ISC","dependencies":{"zod":"file:tools/zod-stub"},"devDependencies":{"esbuild":"file:tools/esbuild-stub","tsx":"file:tools/tsx-stub"}},"node_modules/esbuild":{"resolved":"tools/esbuild-stub","link":true},"node_modules/zod":{"resolved":"tools/zod-stub","link":true},"node_modules/tsx":{"resolved":"tools/tsx-stub","link":true},"tools/esbuild-stub":{"name":"esbuild","version":"0.0.0-stub","dev":true},"tools/zod-stub":{"name":"zod","version":"0.0.0-stub"},"tools/tsx-stub":{"name":"tsx","version":"4.7.1","dev":true,"bin":{"tsx":"bin.js"}}}}');
+  module.exports = data;
+  module.exports.default = data;
+});
+__define('./config/package.json', (exports, module, __require) => {
+  const data = JSON.parse('{"name":"arclune_lane_7x3","version":"1.0.0","description":"","scripts":{"build":"npm run build:prod","build:dev":"node ../../tools/generate-loithienanh-svg.mjs && node ../../build.mjs --mode=development","build:prod":"node ../../tools/generate-loithienanh-svg.mjs && node ../../build.mjs --mode=production","dev":"APP_ENTRY=${APP_ENTRY:-src/main.ts} tsx watch $APP_ENTRY","start":"NODE_ENV=${NODE_ENV:-production} APP_ENTRY=${APP_ENTRY:-src/main.ts} tsx $APP_ENTRY","test":"jest --runInBand","typecheck":"tsc --noEmit"},"keywords":[],"author":"","license":"ISC","type":"commonjs","dependencies":{"zod":"file:tools/zod-stub"},"devDependencies":{"@types/jest":"^29.5.12","esbuild":"file:tools/esbuild-stub","jest":"^29.7.0","ts-jest":"^29.2.5","ts-node":"^10.9.2","tsx":"file:tools/tsx-stub","typescript":"^5.4.0"}}');
+  module.exports = data;
+  module.exports.default = data;
+});
 __define('./config/schema.ts', (exports, module, __require) => {
-  const __dep0 = __require('./zod');
+  const __dep0 = __require('./../tools/zod-stub/index.js');
   const z = __dep0.z;
 
   const SideSchema = z.enum(['ally', 'enemy']);
@@ -2568,9 +2882,26 @@ __define('./config/schema.ts', (exports, module, __require) => {
   });
   export type FuryConfig = z.infer<typeof FuryConfigSchema>;
 
+  const TurnOrderSlotValueSchema = z.union([z.number(), z.string()]);
+
+  const TurnOrderPairScanObjectSchema = z.object({
+    side: SideSchema.optional(),
+    slot: TurnOrderSlotValueSchema.optional(),
+    s: TurnOrderSlotValueSchema.optional(),
+    index: TurnOrderSlotValueSchema.optional()
+  });
+
+  const TurnOrderPairScanEntrySchema = z.union([
+    z.number(),
+    z.array(z.number()),
+    z.tuple([SideSchema, z.number()]),
+    TurnOrderPairScanObjectSchema
+  ]);
+
   const TurnOrderConfigSchema = z.object({
-    pairScan: z.array(z.number()),
-    sides: z.array(SideSchema)
+    mode: z.string().optional(),
+    pairScan: z.array(TurnOrderPairScanEntrySchema).optional(),
+    sides: z.array(SideSchema).optional()
   });
   export type TurnOrderConfig = z.infer<typeof TurnOrderConfigSchema>;
 
@@ -2734,45 +3065,8 @@ __define('./config/schema.ts', (exports, module, __require) => {
   export type GameConfig = z.infer<typeof GameConfigSchema>;
   exports.GameConfigSchema = GameConfigSchema;
 });
-__define('./data/announcements.js', (exports, module, __require) => {
-  // @ts-check
-  const __dep0 = __require('./data/economy.js');
-  const CURRENCY_IDS = __dep0.CURRENCY_IDS;
-  const convertCurrency = __dep0.convertCurrency;
-  const formatBalance = __dep0.formatBalance;
-  const getLotterySplit = __dep0.getLotterySplit;
-
-  /** @typedef {import('@types/config').AnnouncementEntry} AnnouncementEntry */
-  /** @typedef {import('@types/config').AnnouncementSlot} AnnouncementSlot */
-
-  /** @type {import('@types/config').LotterySplit} */
-  const LOTTERY_SPLIT = getLotterySplit();
-  const LOTTERY_DEV_PERCENT = Math.round((LOTTERY_SPLIT.devVault || 0) * 100);
-  const LOTTERY_PRIZE_PERCENT = Math.round((LOTTERY_SPLIT.prizePool || 0) * 100);
-
-  const TT_CONVERSION_CHAIN = [
-    formatBalance(1, CURRENCY_IDS.TT),
-    formatBalance(convertCurrency(1, CURRENCY_IDS.TT, CURRENCY_IDS.THNT), CURRENCY_IDS.THNT),
-    formatBalance(convertCurrency(1, CURRENCY_IDS.TT, CURRENCY_IDS.TNT), CURRENCY_IDS.TNT),
-    formatBalance(convertCurrency(1, CURRENCY_IDS.TT, CURRENCY_IDS.HNT), CURRENCY_IDS.HNT),
-    formatBalance(convertCurrency(1, CURRENCY_IDS.TT, CURRENCY_IDS.VNT), CURRENCY_IDS.VNT)
-  ].join(' = ');
-
-  /**
-   * @param {AnnouncementEntry | null | undefined} entry
-   * @param {Date} now
-   */
-  function isEntryActive(entry, now){
-    if (!entry) return false;
-    if (!entry.startAt && !entry.endAt) return true;
-    const start = entry.startAt ? new Date(entry.startAt) : null;
-    const end = entry.endAt ? new Date(entry.endAt) : null;
-    if (start && Number.isFinite(start.getTime()) && now < start) return false;
-    if (end && Number.isFinite(end.getTime()) && now > end) return false;
-    return true;
-  }
-
-  const SIDE_SLOT_ANNOUNCEMENTS = /** @satisfies ReadonlyArray<AnnouncementSlot> */ ([
+__define('./data/announcements.config.ts', (exports, module, __require) => {
+  const announcementsConfig = [
     {
       key: 'event',
       label: 'Sự kiện giới hạn',
@@ -2780,11 +3074,9 @@ __define('./data/announcements.js', (exports, module, __require) => {
         {
           id: 'primal-lottery',
           title: 'Chiến dịch Vé số Nguyên Tinh',
-          shortDescription: `Mở lại vé số tuần, chia ${LOTTERY_PRIZE_PERCENT}% quỹ thưởng và ${LOTTERY_DEV_PERCENT}% vận hành.`,
+          shortDescription: 'Mở lại vé số tuần, chia {{LOTTERY_PRIZE_PERCENT}}% quỹ thưởng và {{LOTTERY_DEV_PERCENT}}% vận hành.',
           tooltip: 'Hoạt động vé số giới hạn thời gian: người chơi dùng tiền tệ trong game để mua vé; 50% doanh thu quay về ví dev để ổn định kinh tế, 50% tích vào giải thưởng cho cộng đồng.',
-          rewardCallout: `Chuỗi quy đổi tham chiếu: ${TT_CONVERSION_CHAIN}.`,
-          startAt: null,
-          endAt: null,
+          rewardCallout: 'Chuỗi quy đổi tham chiếu: {{TT_CONVERSION_CHAIN}}.',
           translationKey: 'sidebar.events.primalLottery'
         },
         {
@@ -2809,8 +3101,6 @@ __define('./data/announcements.js', (exports, module, __require) => {
           shortDescription: 'Đạt 500/1000/10000 trận thắng trong một mùa đấu thú trường để nhận Thú Vương, Bách Thú Vương, Vạn Thú Vương.',
           tooltip: 'Chuỗi thành tựu đấu thú trường: Thú Vương (500 trận thắng), Bách Thú Vương (1000 trận), Vạn Thú Vương (10000 trận) trong cùng một mùa.',
           rewardCallout: 'Phần thưởng thành tựu sẽ cập nhật sau bản cân bằng tiền tệ.',
-          startAt: null,
-          endAt: null,
           translationKey: 'sidebar.achievements.beastKings'
         },
         {
@@ -2835,9 +3125,7 @@ __define('./data/announcements.js', (exports, module, __require) => {
           shortDescription: 'Chuỗi thắng 1→186 trận đưa bạn từ Đồng đến Tối Cao; giữ top sẽ chạm Đấu Thần & Đấu Vương.',
           tooltip: 'Thắng liên tục mở khoá bậc: 1/3/6 trận đạt Đồng 1/2/3; 10/14/18 cho Bạc; 23→33 cho Vàng; 39→51 cho Bạch Kim; 58→72 cho Kim Cương; 80→96 cho Bậc Thầy; 105→123 cho Bá Chủ; 133→153 cho Thách Đấu; 164→186 cho Tối Cao. Top 1 giữ mùa đạt Đấu Thần, Top 2-4 đạt Đấu Vương.',
           rewardCallout: 'Mọi bậc đều có thưởng; phần thưởng đặc biệt cho Đấu Thần và Đấu Vương cuối mùa.',
-          startAt: null,
-          endAt: null,
-          translationKey: 'sidebar.ladder.progress'
+              translationKey: 'sidebar.ladder.progress'
         },
         {
           id: 'defense-record',
@@ -2846,7 +3134,6 @@ __define('./data/announcements.js', (exports, module, __require) => {
           tooltip: 'Thành tựu phòng thủ đấu thú trường: chịu 300 lần công kích khi ở rank Đấu Thần nhưng không bị đánh bại để nhận danh hiệu “Ngươi thật là ích kỷ a”.',
           rewardCallout: 'Kể cả phòng thủ cũng được ghi nhận trên bảng danh dự đấu thú.',
           startAt: '2025-10-01T00:00:00+07:00',
-          endAt: null,
           translationKey: 'sidebar.ladder.defenseRecord'
         }
       ]
@@ -2861,20 +3148,117 @@ __define('./data/announcements.js', (exports, module, __require) => {
           shortDescription: 'Khung chat realtime + thông báo cộng đồng giúp bạn theo dõi đội hình và lịch sự kiện.',
           tooltip: 'Chat & Xã hội: khung chat realtime kết nối quân đoàn, kết hợp thông báo cộng đồng để hội viên bắt kịp hoạt động.',
           rewardCallout: 'Nhận ping khi đội mở lobby hoặc khi sự kiện đấu thú sắp khóa sổ.',
-          startAt: null,
-          endAt: null,
-          translationKey: 'sidebar.community.channel'
+              translationKey: 'sidebar.community.channel'
         }
       ]
     }
-  ]);
+  ] as const;
+
+
+  exports.default = announcementsConfig;
+  module.exports.default = exports.default;
+});
+__define('./data/announcements.ts', (exports, module, __require) => {
+  const __dep0 = __require('./../tools/zod-stub/index.js');
+  const z = __dep0.z;
+
+  const __dep1 = __require('./data/load-config.ts');
+  const loadConfig = __dep1.loadConfig;
+  const __dep2 = __require('./data/economy.ts');
+  const CURRENCY_IDS = __dep2.CURRENCY_IDS;
+  const convertCurrency = __dep2.convertCurrency;
+  const formatBalance = __dep2.formatBalance;
+  const getLotterySplit = __dep2.getLotterySplit;
+
+
+
+  const AnnouncementEntryConfigSchema = z.object({
+    id: z.string(),
+    title: z.string(),
+    shortDescription: z.string(),
+    tooltip: z.string().optional(),
+    rewardCallout: z.string().optional(),
+    startAt: z.string().optional(),
+    endAt: z.string().optional(),
+    translationKey: z.string().optional()
+  });
+
+  const AnnouncementSlotConfigSchema = z.object({
+    key: z.string(),
+    label: z.string(),
+    entries: z.array(AnnouncementEntryConfigSchema)
+  });
+
+  const AnnouncementsConfigSchema = z.array(AnnouncementSlotConfigSchema);
+
+  const LOTTERY_SPLIT: LotterySplit = getLotterySplit();
+  const LOTTERY_DEV_PERCENT = Math.round((LOTTERY_SPLIT.devVault || 0) * 100);
+  const LOTTERY_PRIZE_PERCENT = Math.round((LOTTERY_SPLIT.prizePool || 0) * 100);
+
+  const TT_CONVERSION_CHAIN = [
+    formatBalance(1, CURRENCY_IDS.TT),
+    formatBalance(convertCurrency(1, CURRENCY_IDS.TT, CURRENCY_IDS.ThNT), CURRENCY_IDS.ThNT),
+    formatBalance(convertCurrency(1, CURRENCY_IDS.TT, CURRENCY_IDS.TNT), CURRENCY_IDS.TNT),
+    formatBalance(convertCurrency(1, CURRENCY_IDS.TT, CURRENCY_IDS.HNT), CURRENCY_IDS.HNT),
+    formatBalance(convertCurrency(1, CURRENCY_IDS.TT, CURRENCY_IDS.VNT), CURRENCY_IDS.VNT)
+  ].join(' = ');
+
+  const announcementConfig = await loadConfig(
+    new URL('./announcements.config.ts', import.meta.url),
+    AnnouncementsConfigSchema
+  );
+
+  const MACROS: Readonly<Record<string, string>> = Object.freeze({
+    LOTTERY_PRIZE_PERCENT: `${LOTTERY_PRIZE_PERCENT}`,
+    LOTTERY_DEV_PERCENT: `${LOTTERY_DEV_PERCENT}`,
+    TT_CONVERSION_CHAIN
+  });
+
+  function applyMacros(value: string | null | undefined): string | null | undefined {
+    if (value === undefined || value === null) return value;
+    let result = value;
+    for (const [token, replacement] of Object.entries(MACROS)){
+      result = result.replaceAll(`{{${token}}}`, replacement);
+    }
+    return result;
+  }
+
+  function isEntryActive(entry: AnnouncementEntry | null | undefined, now: Date){
+    if (!entry) return false;
+    if (!entry.startAt && !entry.endAt) return true;
+    const start = entry.startAt ? new Date(entry.startAt) : null;
+    const end = entry.endAt ? new Date(entry.endAt) : null;
+    if (start && Number.isFinite(start.getTime()) && now < start) return false;
+    if (end && Number.isFinite(end.getTime()) && now > end) return false;
+    return true;
+  }
+
+  const SIDE_SLOT_ANNOUNCEMENTS: ReadonlyArray<AnnouncementSlot> = Object.freeze(
+    announcementConfig.map((slot) => ({
+      key: slot.key,
+      label: slot.label,
+      entries: Object.freeze(
+        slot.entries.map((entry) => Object.freeze({
+          ...entry,
+          shortDescription: applyMacros(entry.shortDescription) ?? entry.shortDescription,
+          tooltip: applyMacros(entry.tooltip) ?? undefined,
+          rewardCallout: applyMacros(entry.rewardCallout) ?? undefined,
+          startAt: entry.startAt ?? null,
+          endAt: entry.endAt ?? null
+        }))
+      )
+    }))
+  );
 
   /**
    * @param {string} slotKey
    * @param {{ now?: Date }} [options]
    * @returns {{ slot: AnnouncementSlot; entry: AnnouncementEntry } | null}
    */
-  function selectAnnouncementEntry(slotKey, options = {}){
+  function selectAnnouncementEntry(
+    slotKey: string,
+    options: { now?: Date } = {}
+  ): { slot: AnnouncementSlot; entry: AnnouncementEntry } | null {
     const now = options.now instanceof Date ? options.now : new Date();
     const slot = SIDE_SLOT_ANNOUNCEMENTS.find(item => item.key === slotKey);
     if (!slot) return null;
@@ -2883,11 +3267,7 @@ __define('./data/announcements.js', (exports, module, __require) => {
     return { slot, entry };
   }
 
-  /**
-   * @param {{ now?: Date }} [options]
-   * @returns {Array<{ key: AnnouncementSlot['key']; label: AnnouncementSlot['label']; entry: AnnouncementEntry | null }>}
-   */
-  function getAllSidebarAnnouncements(options = {}){
+  function getAllSidebarAnnouncements(options: { now?: Date } = {}){
     const now = options.now instanceof Date ? options.now : new Date();
     return SIDE_SLOT_ANNOUNCEMENTS.map(slot => {
       const entry = slot.entries.find(item => isEntryActive(item, now)) || slot.entries[0] || null;
@@ -2896,98 +3276,197 @@ __define('./data/announcements.js', (exports, module, __require) => {
         label: slot.label,
         entry
       };
-    }).filter(item => Boolean(item.entry));
+    }).filter((item): item is typeof item & { entry: AnnouncementEntry } => Boolean(item.entry));
   }
   exports.SIDE_SLOT_ANNOUNCEMENTS = SIDE_SLOT_ANNOUNCEMENTS;
   exports.selectAnnouncementEntry = selectAnnouncementEntry;
   exports.getAllSidebarAnnouncements = getAllSidebarAnnouncements;
 });
-__define('./data/economy.js', (exports, module, __require) => {
-  // @ts-check
-  const __dep0 = __require('./utils/format.js');
-  const HAS_INTL_NUMBER_FORMAT = __dep0.HAS_INTL_NUMBER_FORMAT;
-  const createNumberFormatter = __dep0.createNumberFormatter;
+__define('./data/economy.config.ts', (exports, module, __require) => {
+  const economyConfig = {
+    currencies: [
+      {
+        id: 'VNT',
+        name: 'Vụn Nguyên Tinh',
+        shortName: 'Vụn',
+        suffix: 'VNT',
+        ratioToBase: 1,
+        description: 'Đơn vị nhỏ nhất, rơi ra từ tinh thể vỡ và hoạt động hằng ngày.'
+      },
+      {
+        id: 'HNT',
+        name: 'Hạ Nguyên Tinh',
+        shortName: 'Hạ',
+        suffix: 'HNT',
+        ratioToBase: 100,
+        description: 'Tinh thể đã tinh luyện, dùng cho giao dịch phổ thông và vé gacha thường.'
+      },
+      {
+        id: 'TNT',
+        name: 'Trung Nguyên Tinh',
+        shortName: 'Trung',
+        suffix: 'TNT',
+        ratioToBase: 1000,
+        description: 'Kho dự trữ cho các kiến trúc tông môn, chế tác pháp khí và banner cao cấp.'
+      },
+      {
+        id: 'ThNT',
+        name: 'Thượng Nguyên Tinh',
+        shortName: 'Thượng',
+        suffix: 'ThNT',
+        ratioToBase: 10000,
+        description: 'Đơn vị luân chuyển giữa các tông môn, đổi thưởng cao cấp và sự kiện giới hạn.'
+      },
+      {
+        id: 'TT',
+        name: 'Thần Tinh',
+        shortName: 'Thần',
+        suffix: 'TT',
+        ratioToBase: 100000,
+        description: 'Đơn vị tối thượng cho các giao dịch Prime và quỹ dự trữ chiến lược.'
+      }
+    ],
+    pityConfig: {
+      SSR: {
+        tier: 'SSR',
+        hardPity: 60,
+        softGuarantees: []
+      },
+      UR: {
+        tier: 'UR',
+        hardPity: 70,
+        softGuarantees: [
+          { tier: 'SSR', pull: 50 }
+        ]
+      },
+      PRIME: {
+        tier: 'PRIME',
+        hardPity: 80,
+        softGuarantees: [
+          { tier: 'SSR', pull: 40 },
+          { tier: 'UR', pull: 60 }
+        ]
+      }
+    },
+    shopTaxBrackets: [
+      { rank: 'N', label: 'Phổ thông (N)', rate: 0.05 },
+      { rank: 'R', label: 'Hiếm (R)', rate: 0.08 },
+      { rank: 'SR', label: 'Siêu hiếm (SR)', rate: 0.1 },
+      { rank: 'SSR', label: 'Cực hiếm (SSR)', rate: 0.12 },
+      { rank: 'UR', label: 'Siêu thực (UR)', rate: 0.15 },
+      { rank: 'PRIME', label: 'Tối thượng (Prime)', rate: 0.18 }
+    ],
+    lotterySplit: {
+      devVault: 0.5,
+      prizePool: 0.5
+    }
+  } as const;
 
-  /** @typedef {import('@types/config').CurrencyDefinition} CurrencyDefinition */
-  /** @typedef {import('@types/config').PityConfiguration} PityConfiguration */
-  /** @typedef {import('@types/config').ShopTaxBracket} ShopTaxBracket */
-  /** @typedef {import('@types/config').LotterySplit} LotterySplit */
 
-  const CURRENCY_IDS = Object.freeze({
-    VNT: 'VNT',
-    HNT: 'HNT',
-    TNT: 'TNT',
-    THNT: 'ThNT',
-    TT: 'TT'
+  exports.default = economyConfig;
+  module.exports.default = exports.default;
+});
+__define('./data/economy.ts', (exports, module, __require) => {
+  const __dep0 = __require('./../tools/zod-stub/index.js');
+  const z = __dep0.z;
+
+  const __dep1 = __require('./utils/format.ts');
+  const HAS_INTL_NUMBER_FORMAT = __dep1.HAS_INTL_NUMBER_FORMAT;
+  const createNumberFormatter = __dep1.createNumberFormatter;
+  const __dep2 = __require('./data/load-config.ts');
+  const loadConfig = __dep2.loadConfig;
+
+
+
+  type CurrencyId = 'VNT' | 'HNT' | 'TNT' | 'ThNT' | 'TT';
+  const CurrencyIdSchema = z.enum(['VNT', 'HNT', 'TNT', 'ThNT', 'TT'] as [string, ...string[]]);
+  const currencyIdValues: CurrencyId[] = ['VNT', 'HNT', 'TNT', 'ThNT', 'TT'];
+
+  const CurrencySchema = z.object({
+    id: CurrencyIdSchema,
+    name: z.string(),
+    shortName: z.string(),
+    suffix: z.string(),
+    ratioToBase: z.number(),
+    description: z.string().optional()
   });
 
-  const CURRENCIES = /** @satisfies ReadonlyArray<CurrencyDefinition> */ (Object.freeze([
-    {
-      id: CURRENCY_IDS.VNT,
-      name: 'Vụn Nguyên Tinh',
-      shortName: 'Vụn',
-      suffix: 'VNT',
-      ratioToBase: 1,
-      description: 'Đơn vị nhỏ nhất, rơi ra từ tinh thể vỡ và hoạt động hằng ngày.'
-    },
-    {
-      id: CURRENCY_IDS.HNT,
-      name: 'Hạ Nguyên Tinh',
-      shortName: 'Hạ',
-      suffix: 'HNT',
-      ratioToBase: 100,
-      description: 'Tinh thể đã tinh luyện, dùng cho giao dịch phổ thông và vé gacha thường.'
-    },
-    {
-      id: CURRENCY_IDS.TNT,
-      name: 'Trung Nguyên Tinh',
-      shortName: 'Trung',
-      suffix: 'TNT',
-      ratioToBase: 1000,
-      description: 'Kho dự trữ cho các kiến trúc tông môn, chế tác pháp khí và banner cao cấp.'
-    },
-    {
-      id: CURRENCY_IDS.THNT,
-      name: 'Thượng Nguyên Tinh',
-      shortName: 'Thượng',
-      suffix: 'ThNT',
-      ratioToBase: 10000,
-      description: 'Đơn vị luân chuyển giữa các tông môn, đổi thưởng cao cấp và sự kiện giới hạn.'
-    },
-    {
-      id: CURRENCY_IDS.TT,
-      name: 'Thần Tinh',
-      shortName: 'Thần',
-      suffix: 'TT',
-      ratioToBase: 100000,
-      description: 'Đơn vị tối thượng cho các giao dịch Prime và quỹ dự trữ chiến lược.'
-    }
-  ]));
+  const PityRuleSchema = z.object({ tier: z.string(), pull: z.number() });
 
-  const CURRENCY_INDEX = /** @type {Record<string, CurrencyDefinition>} */ (CURRENCIES.reduce((acc, currency) => {
+  const PityEntrySchema = z.object({
+    tier: z.string(),
+    hardPity: z.number(),
+    softGuarantees: z.array(PityRuleSchema)
+  });
+
+  const PityTierSchema = z.enum(['SSR', 'UR', 'PRIME']);
+  type PityTier = z.infer<typeof PityTierSchema>;
+
+  const PityConfigSchema = z.object({
+    SSR: PityEntrySchema,
+    UR: PityEntrySchema,
+    PRIME: PityEntrySchema
+  });
+
+  const ShopRankSchema = z.enum(['N', 'R', 'SR', 'SSR', 'UR', 'PRIME']);
+
+  const ShopTaxBracketSchema = z.object({
+    rank: ShopRankSchema,
+    label: z.string(),
+    rate: z.number()
+  });
+
+  const LotterySplitSchema = z.object({
+    devVault: z.number(),
+    prizePool: z.number()
+  });
+
+  const EconomyConfigSchema = z.object({
+    currencies: z.array(CurrencySchema),
+    pityConfig: PityConfigSchema,
+    shopTaxBrackets: z.array(ShopTaxBracketSchema),
+    lotterySplit: LotterySplitSchema
+  });
+
+  const economyConfig = await loadConfig(
+    new URL('./economy.config.ts', import.meta.url),
+    EconomyConfigSchema
+  );
+
+  for (const [tier, entry] of Object.entries(economyConfig.pityConfig)){
+    if (entry.tier !== tier){
+      throw new Error(`Cấu hình pity cho tier "${tier}" không khớp giá trị nội tại (${entry.tier}).`);
+    }
+  }
+
+  const currencyIdMap = {} as Record<CurrencyId, CurrencyId>;
+  for (const id of currencyIdValues){
+    currencyIdMap[id] = id;
+  }
+
+  const CURRENCY_IDS = Object.freeze({
+    ...currencyIdMap,
+    THNT: currencyIdMap.ThNT
+  });
+
+  const CURRENCIES: ReadonlyArray<CurrencyDefinition> = Object.freeze(
+    economyConfig.currencies.map((currency) => Object.freeze({ ...currency }))
+  );
+
+  const CURRENCY_INDEX: Readonly<Record<string, CurrencyDefinition>> = CURRENCIES.reduce<Record<string, CurrencyDefinition>>((acc, currency) => {
     acc[currency.id] = currency;
     return acc;
-  }, {}));
+  }, {});
 
-  /**
-   * @param {string} currencyId
-   * @returns {CurrencyDefinition | null}
-   */
-  function getCurrency(currencyId){
+  function getCurrency(currencyId: string): CurrencyDefinition | null {
     return CURRENCY_INDEX[currencyId] ?? null;
   }
 
-  /** @returns {CurrencyDefinition[]} */
-  function listCurrencies(){
-    return CURRENCIES.slice();
+  function listCurrencies(): CurrencyDefinition[] {
+    return [...CURRENCIES];
   }
 
-  /**
-   * @param {number} value
-   * @param {string} fromId
-   * @param {string} toId
-   */
-  function convertCurrency(value, fromId, toId){
+  function convertCurrency(value: number, fromId: string, toId: string): number {
     const from = getCurrency(fromId);
     const to = getCurrency(toId);
     if (!from || !to){
@@ -3015,7 +3494,14 @@ __define('./data/economy.js', (exports, module, __require) => {
     }
   }
 
-  function formatBalance(value, currencyId, options = {}){
+  interface FormatBalanceOptions {
+    notation?: 'standard' | 'compact';
+    includeSuffix?: boolean;
+    precision?: number;
+    autoScale?: boolean;
+  }
+
+  function formatBalance(value: number, currencyId: string, options: FormatBalanceOptions = {}){
     const currency = getCurrency(currencyId);
     if (!currency){
       throw new Error(`Unknown currency id: ${currencyId}`);
@@ -3032,9 +3518,10 @@ __define('./data/economy.js', (exports, module, __require) => {
     let suffix = currency.suffix;
 
     if (autoScale){
-      const ordered = CURRENCIES.slice().sort((a, b) => a.ratioToBase - b.ratioToBase);
+      const ordered = [...CURRENCIES].sort((a, b) => a.ratioToBase - b.ratioToBase);
       for (let i = ordered.length - 1; i >= 0; i -= 1){
         const candidate = ordered[i];
+        if (!candidate) continue;
         const inCandidate = convertCurrency(value, currency.id, candidate.id);
         if (Math.abs(inCandidate) >= 1){
           amount = inCandidate;
@@ -3048,7 +3535,7 @@ __define('./data/economy.js', (exports, module, __require) => {
 
     let formatter = shouldUseCompact ? FORMATTER_COMPACT : FORMATTER_STANDARD;
     if (typeof precision === 'number'){
-      const formatterOptions = {
+      const formatterOptions: Intl.NumberFormatOptions = {
         maximumFractionDigits: precision,
         minimumFractionDigits: precision
       };
@@ -3062,80 +3549,55 @@ __define('./data/economy.js', (exports, module, __require) => {
     return includeSuffix ? `${formatted} ${suffix}` : formatted;
   }
 
-  const PITY_CONFIG = /** @satisfies Record<string, PityConfiguration> */ (Object.freeze({
-    SSR: Object.freeze({
-      tier: 'SSR',
-      hardPity: 60,
-      softGuarantees: []
-    }),
-    UR: Object.freeze({
-      tier: 'UR',
-      hardPity: 70,
-      softGuarantees: [
-        { tier: 'SSR', pull: 50 }
-      ]
-    }),
-    PRIME: Object.freeze({
-      tier: 'PRIME',
-      hardPity: 80,
-      softGuarantees: [
-        { tier: 'SSR', pull: 40 },
-        { tier: 'UR', pull: 60 }
-      ]
-    })
-  }));
+  const PITY_CONFIG: Readonly<Record<PityTier, PityConfiguration>> = Object.freeze(
+    Object.fromEntries(
+      Object.entries(economyConfig.pityConfig).map(([tier, config]) => [
+        tier,
+        {
+          tier: config.tier,
+          hardPity: config.hardPity,
+          softGuarantees: config.softGuarantees.map((rule) => ({ ...rule }))
+        }
+      ])
+    ) as Record<PityTier, PityConfiguration>
+  );
 
-  /**
-   * @param {string} tier
-   * @returns {PityConfiguration | null}
-   */
-  function getPityConfig(tier){
-    return PITY_CONFIG[tier] ?? null;
+  function isPityTier(tier: string): tier is PityTier {
+    return tier in PITY_CONFIG;
   }
 
-  /** @returns {string[]} */
-  function listPityTiers(){
+  function getPityConfig(tier: string): PityConfiguration | null {
+    if (isPityTier(tier)){
+      return PITY_CONFIG[tier] ?? null;
+    }
+    return null;
+  }
+
+  function listPityTiers(): string[] {
     return Object.keys(PITY_CONFIG);
   }
 
-  const SHOP_TAX_BRACKETS = /** @satisfies ReadonlyArray<ShopTaxBracket> */ (Object.freeze([
-    { rank: 'N', label: 'Phổ thông (N)', rate: 0.05 },
-    { rank: 'R', label: 'Hiếm (R)', rate: 0.08 },
-    { rank: 'SR', label: 'Siêu hiếm (SR)', rate: 0.1 },
-    { rank: 'SSR', label: 'Cực hiếm (SSR)', rate: 0.12 },
-    { rank: 'UR', label: 'Siêu thực (UR)', rate: 0.15 },
-    { rank: 'PRIME', label: 'Tối thượng (Prime)', rate: 0.18 }
-  ]));
+  const SHOP_TAX_BRACKETS: ReadonlyArray<ShopTaxBracket> = Object.freeze(
+    economyConfig.shopTaxBrackets.map((bracket) => Object.freeze({ ...bracket }))
+  );
 
-  const SHOP_TAX_INDEX = /** @type {Record<string, ShopTaxBracket>} */ (SHOP_TAX_BRACKETS.reduce((acc, bracket) => {
+  const SHOP_TAX_INDEX: Readonly<Record<string, ShopTaxBracket>> = SHOP_TAX_BRACKETS.reduce<Record<string, ShopTaxBracket>>((acc, bracket) => {
     acc[bracket.rank] = bracket;
     return acc;
-  }, {}));
+  }, {});
 
-  /**
-   * @param {string} rank
-   * @returns {ShopTaxBracket | null}
-   */
-  function getShopTaxBracket(rank){
+  function getShopTaxBracket(rank: string): ShopTaxBracket | null {
     return SHOP_TAX_INDEX[rank] ?? null;
   }
 
-  /**
-   * @param {string} rank
-   * @returns {number | null}
-   */
-  function getShopTaxRate(rank){
+  function getShopTaxRate(rank: string): number | null {
     const bracket = getShopTaxBracket(rank);
     return bracket ? bracket.rate : null;
   }
 
-  const LOTTERY_SPLIT = /** @type {LotterySplit} */ (Object.freeze({
-    devVault: 0.5,
-    prizePool: 0.5
-  }));
+  const LOTTERY_SPLIT: LotterySplit = Object.freeze({ ...economyConfig.lotterySplit });
 
-  /** @returns {LotterySplit} */
-  function getLotterySplit(){
+  function getLotterySplit(): LotterySplit {
     return LOTTERY_SPLIT;
   }
 
@@ -3154,50 +3616,63 @@ __define('./data/economy.js', (exports, module, __require) => {
   exports.LOTTERY_SPLIT = LOTTERY_SPLIT;
   exports.getLotterySplit = getLotterySplit;
 });
-__define('./data/modes.js', (exports, module, __require) => {
-  // @ts-check
-  const __dep0 = __require('./data/economy.js');
+__define('./data/load-config.ts', (exports, module, __require) => {
+  export async function loadConfig<T>(
+    resource: URL | string,
+    schema: { parse(input: unknown): T }
+  ): Promise<T> {
+    const target = resource instanceof URL ? resource : new URL(resource, import.meta.url);
+    try {
+      const module = await import(target.href);
+      const value = 'default' in module ? module.default : module;
+      return schema.parse(value);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new Error(`Không thể tải cấu hình từ ${target.href}: ${message}`, {
+        cause: error instanceof Error ? error : undefined
+      });
+    }
+  }
+});
+__define('./data/modes.ts', (exports, module, __require) => {
+  const __dep0 = __require('./data/economy.ts');
   const getLotterySplit = __dep0.getLotterySplit;
   const getPityConfig = __dep0.getPityConfig;
   const getShopTaxRate = __dep0.getShopTaxRate;
 
-  /** @typedef {import('@types/config').ModeConfig} ModeConfig */
-  /** @typedef {import('@types/config').ModeGroup} ModeGroup */
-  /** @typedef {import('@types/config').MenuSectionDefinition} MenuSectionDefinition */
-  /** @typedef {import('@types/config').PityConfiguration} PityConfiguration */
-  /** @typedef {import('@types/config').LotterySplit} LotterySplit */
 
-  /** @type {PityConfiguration | null} */
-  const SSR_PITY = getPityConfig('SSR');
-  /** @type {PityConfiguration | null} */
-  const UR_PITY = getPityConfig('UR');
-  /** @type {PityConfiguration | null} */
-  const PRIME_PITY = getPityConfig('PRIME');
-  /** @type {LotterySplit} */
-  const LOTTERY_SPLIT = getLotterySplit();
-  /** @type {number | null} */
+
+  const SSR_PITY: PityConfiguration | null = getPityConfig('SSR');
+  const UR_PITY: PityConfiguration | null = getPityConfig('UR');
+  const PRIME_PITY: PityConfiguration | null = getPityConfig('PRIME');
+  const LOTTERY_SPLIT: LotterySplit = getLotterySplit();
   const BASE_TAX_RATE = getShopTaxRate('N');
-  /** @type {number | null} */
   const TOP_TAX_RATE = getShopTaxRate('PRIME');
+  const PVE_SESSION_MODULE_ID = '@modes/pve/session.ts' as const;
+  const COMING_SOON_MODULE_ID = '@modes/coming-soon.stub.ts' as const;
+  const LINEUP_SCREEN_MODULE_ID = '@screens/lineup/index.ts' as const;
+  const COLLECTION_SCREEN_MODULE_ID = '@screens/collection/index.ts' as const;
 
-  const MODE_TYPES = Object.freeze({
+  const MODE_TYPES = {
     PVE: 'PvE',
     PVP: 'PvP',
     ECONOMY: 'Kinh tế'
-  });
+  } as const satisfies Readonly<Record<'PVE' | 'PVP' | 'ECONOMY', string>>;
 
-  const MODE_STATUS = Object.freeze({
+  const MODE_STATUS = {
     AVAILABLE: 'available',
     COMING_SOON: 'coming-soon',
     PLANNED: 'planned'
-  });
+  } as const satisfies Readonly<Record<'AVAILABLE' | 'COMING_SOON' | 'PLANNED', string>>;
 
-  const MENU_SECTION_DEFINITIONS = /** @satisfies ReadonlyArray<MenuSectionDefinition> */ ([
+  type ModeStatus = typeof MODE_STATUS[keyof typeof MODE_STATUS];
+
+  const MENU_SECTION_DEFINITIONS = [
     { id: 'core-pve', title: 'PvE' },
     { id: 'economy', title: 'Kinh tế & Hạ tầng' }
-  ]);
+  ] satisfies ReadonlyArray<MenuSectionDefinition>;
 
-  const MODE_GROUPS = /** @satisfies ReadonlyArray<ModeGroup> */ ([
+  const MODE_GROUPS = [
     {
       id: 'arena-hub',
       title: 'Chiến Trường',
@@ -3208,9 +3683,9 @@ __define('./data/modes.js', (exports, module, __require) => {
       childModeIds: ['arena', 'beast-arena', 'ares', 'challenge', 'campaign'],
       extraClasses: ['mode-card--wide']
     }
-  ]);
+  ] satisfies ReadonlyArray<ModeGroup>;
 
-  const MODES = /** @satisfies ReadonlyArray<ModeConfig> */ ([
+  const MODES = [
     {
       id: 'campaign',
       title: 'Chiến Dịch',
@@ -3224,7 +3699,7 @@ __define('./data/modes.js', (exports, module, __require) => {
       parentId: 'arena-hub',
       shell: {
         screenId: 'pve-session',
-        moduleId: './modes/pve/session.ts',
+        moduleId: PVE_SESSION_MODULE_ID,
         defaultParams: { modeKey: 'campaign' }
       }
     },
@@ -3241,7 +3716,7 @@ __define('./data/modes.js', (exports, module, __require) => {
       parentId: 'arena-hub',
       shell: {
         screenId: 'pve-session',
-        moduleId: './modes/pve/session.ts',
+        moduleId: PVE_SESSION_MODULE_ID,
         defaultParams: { modeKey: 'challenge' }
       }
     },
@@ -3258,7 +3733,7 @@ __define('./data/modes.js', (exports, module, __require) => {
       parentId: 'arena-hub',
       shell: {
         screenId: 'pve-session',
-        moduleId: './modes/pve/session.ts',
+        moduleId: PVE_SESSION_MODULE_ID,
         defaultParams: { modeKey: 'arena' }
       }
     },
@@ -3275,7 +3750,7 @@ __define('./data/modes.js', (exports, module, __require) => {
       parentId: 'arena-hub',
       shell: {
         screenId: 'main-menu',
-        fallbackModuleId: './modes/coming-soon.stub.ts'
+        fallbackModuleId: COMING_SOON_MODULE_ID
       }
     },
     {
@@ -3290,7 +3765,7 @@ __define('./data/modes.js', (exports, module, __require) => {
       menuSections: ['economy'],
       shell: {
         screenId: 'main-menu',
-        fallbackModuleId: './modes/coming-soon.stub.ts'
+        fallbackModuleId: COMING_SOON_MODULE_ID
       }
     },
     {
@@ -3300,12 +3775,12 @@ __define('./data/modes.js', (exports, module, __require) => {
       status: MODE_STATUS.COMING_SOON,
       icon: '🎲',
       shortDescription: `Quầy gacha phân tab Nhân Vật, Công Pháp, Vũ Khí, Sủng Thú với bảo hiểm ${SSR_PITY?.hardPity || 60}/${UR_PITY?.hardPity || 70}/${PRIME_PITY?.hardPity || 80} lượt cho các banner SSR/UR/Prime.`,
-      unlockNotes: `Banner UR bảo hiểm SSR ở lượt ${UR_PITY?.softGuarantees?.[0]?.pull || 50}; banner Prime lần lượt bảo hiểm SSR/UR ở ${PRIME_PITY?.softGuarantees?.map(rule => rule.pull).join('/') || '40/60'} và Prime ở ${PRIME_PITY?.hardPity || 80}.`,
+      unlockNotes: `Banner UR bảo hiểm SSR ở lượt ${UR_PITY?.softGuarantees?.[0]?.pull || 50}; banner Prime lần lượt bảo hiểm SSR/UR ở ${PRIME_PITY?.softGuarantees?.map(({ pull }) => pull).join('/') || '40/60'} và Prime ở ${PRIME_PITY?.hardPity || 80}.`,
       tags: ['Kinh tế nguyên tinh', 'Coming soon'],
       menuSections: ['economy'],
       shell: {
         screenId: 'main-menu',
-        fallbackModuleId: './modes/coming-soon.stub.ts'
+        fallbackModuleId: COMING_SOON_MODULE_ID
       }
     },
     {
@@ -3320,7 +3795,7 @@ __define('./data/modes.js', (exports, module, __require) => {
       menuSections: ['economy'],
       shell: {
         screenId: 'lineup',
-        moduleId: './screens/lineup/index.js',
+        moduleId: LINEUP_SCREEN_MODULE_ID,
         defaultParams: {
           shortDescription: 'Theo dõi đội hình đề xuất và cấu trúc tổ đội tối ưu cho từng mục tiêu.',
           lineups: [
@@ -3353,8 +3828,7 @@ __define('./data/modes.js', (exports, module, __require) => {
       menuSections: ['economy'],
       shell: {
         screenId: 'collection',
-        moduleId: './screens/collection/index.js',
-        defaultParams: null
+        moduleId: COLLECTION_SCREEN_MODULE_ID
       }
     },
     {
@@ -3369,7 +3843,7 @@ __define('./data/modes.js', (exports, module, __require) => {
       menuSections: ['economy'],
       shell: {
         screenId: 'main-menu',
-        fallbackModuleId: './modes/coming-soon.stub.ts'
+        fallbackModuleId: COMING_SOON_MODULE_ID
       }
     },
     {
@@ -3384,7 +3858,7 @@ __define('./data/modes.js', (exports, module, __require) => {
       menuSections: ['economy'],
       shell: {
         screenId: 'main-menu',
-        fallbackModuleId: './modes/coming-soon.stub.ts'
+        fallbackModuleId: COMING_SOON_MODULE_ID
       }
     },
     {
@@ -3399,7 +3873,7 @@ __define('./data/modes.js', (exports, module, __require) => {
       menuSections: ['economy'],
       shell: {
         screenId: 'main-menu',
-        fallbackModuleId: './modes/coming-soon.stub.ts'
+        fallbackModuleId: COMING_SOON_MODULE_ID
       }
     },
     {
@@ -3415,17 +3889,21 @@ __define('./data/modes.js', (exports, module, __require) => {
       parentId: 'arena-hub',
       shell: {
         screenId: 'main-menu',
-        fallbackModuleId: './modes/coming-soon.stub.ts'
+        fallbackModuleId: COMING_SOON_MODULE_ID
       }
     }
-  ]);
+  ] satisfies ReadonlyArray<ModeConfig>;
 
-  const MODE_INDEX = MODES.reduce((acc, mode) => {
+  const MODE_INDEX: Readonly<Record<string, ModeConfig>> = MODES.reduce<Record<string, ModeConfig>>((acc, mode) => {
     acc[mode.id] = mode;
     return acc;
   }, {});
 
-  function listModesForSection(sectionId, options = {}){
+  interface ListModesOptions {
+    includeStatuses?: ReadonlyArray<ModeStatus>;
+  }
+
+  function listModesForSection(sectionId: string, options: ListModesOptions = {}): ModeConfig[]{
     const { includeStatuses } = options;
     return MODES.filter(mode => {
       if (!mode.menuSections || !mode.menuSections.includes(sectionId)){
@@ -3438,13 +3916,20 @@ __define('./data/modes.js', (exports, module, __require) => {
     });
   }
 
-  function getMenuSections(options = {}){
+  type MenuSectionEntryDefinition = {
+    id: string;
+    type: 'group' | 'mode';
+    cardId: string;
+    childModeIds: ReadonlyArray<string>;
+  };
+
+  function getMenuSections(options: ListModesOptions = {}){
     const { includeStatuses } = options;
     const includeSet = Array.isArray(includeStatuses) && includeStatuses.length > 0
       ? new Set(includeStatuses)
       : null;
 
-    const filterChildModeIds = (childIds = []) => {
+    const filterChildModeIds = (childIds: ReadonlyArray<string> = []) => {
       return childIds.filter(childId => {
         const mode = MODE_INDEX[childId];
         if (!mode) return false;
@@ -3453,7 +3938,7 @@ __define('./data/modes.js', (exports, module, __require) => {
       });
     };
     return MENU_SECTION_DEFINITIONS.map(section => {
-      const entries = [];
+      const entries: MenuSectionEntryDefinition[] = [];
 
       MODE_GROUPS.forEach(group => {
         if (!group.menuSections || !group.menuSections.includes(section.id)) return;
@@ -3480,13 +3965,13 @@ __define('./data/modes.js', (exports, module, __require) => {
       });
 
       if (entries.length === 0) return null;
-      
+
       return {
         id: section.id,
         title: section.title,
         entries
       };
-     }).filter(Boolean);
+     }).filter((entry): entry is NonNullable<typeof entry> => Boolean(entry));
   }
 
   exports.MODES = MODES;
@@ -3498,77 +3983,95 @@ __define('./data/modes.js', (exports, module, __require) => {
   exports.listModesForSection = listModesForSection;
   exports.getMenuSections = getMenuSections;
 });
-__define('./data/roster-preview.js', (exports, module, __require) => {
-  // @ts-check
-  const __dep0 = __require('./catalog.js');
-  const CLASS_BASE = __dep0.CLASS_BASE;
-  const RANK_MULT = __dep0.RANK_MULT;
-  const ROSTER = __dep0.ROSTER;
+__define('./data/roster-preview.config.ts', (exports, module, __require) => {
+  const rosterPreviewConfig = {
+    tpDelta: {
+      HP: 20,
+      ATK: 1,
+      WIL: 1,
+      ARM: 0.01,
+      RES: 0.01,
+      AGI: 1,
+      PER: 1,
+      AEmax: 10,
+      AEregen: 0.5,
+      HPregen: 2
+    },
+    statOrder: [
+      'HP',
+      'ATK',
+      'WIL',
+      'ARM',
+      'RES',
+      'AGI',
+      'PER',
+      'SPD',
+      'AEmax',
+      'AEregen',
+      'HPregen'
+    ],
+    precision: {
+      ARM: 100,
+      RES: 100,
+      SPD: 100,
+      AEregen: 10
+    }
+  } as const;
 
-  /** @typedef {import('@types/config').CatalogStatBlock} CatalogStatBlock */
-  /** @typedef {import('@types/config').RosterPreview} RosterPreview */
-  /** @typedef {import('@types/config').RosterPreviewRow} RosterPreviewRow */
-  /** @typedef {import('@types/config').RosterUnitDefinition} RosterUnitDefinition */
 
-  // Talent Point (TP) deltas documented in "ý tưởng nhân vật v3.txt".
-  const TP_DELTA = Object.freeze({
-    HP: 20,
-    ATK: 1,
-    WIL: 1,
-    ARM: 0.01,
-    RES: 0.01,
-    AGI: 1,
-    PER: 1,
-    AEmax: 10,
-    AEregen: 0.5,
-    HPregen: 2
+  exports.default = rosterPreviewConfig;
+  module.exports.default = exports.default;
+});
+__define('./data/roster-preview.ts', (exports, module, __require) => {
+  const __dep0 = __require('./../tools/zod-stub/index.js');
+  const z = __dep0.z;
+
+  const __dep1 = __require('./data/load-config.ts');
+  const loadConfig = __dep1.loadConfig;
+  const __dep2 = __require('./catalog.ts');
+  const CLASS_BASE = __dep2.CLASS_BASE;
+  const RANK_MULT = __dep2.RANK_MULT;
+  const ROSTER = __dep2.ROSTER;
+
+
+
+  const RosterPreviewConfigSchema = z.object({
+    tpDelta: z.record(z.number()),
+    statOrder: z.array(z.string()),
+    precision: z.record(z.number())
   });
 
-  const STAT_ORDER = /** @satisfies ReadonlyArray<string> */ ([
-    'HP',
-    'ATK',
-    'WIL',
-    'ARM',
-    'RES',
-    'AGI',
-    'PER',
-    'SPD',
-    'AEmax',
-    'AEregen',
-    'HPregen'
+  const rosterPreviewConfig = await loadConfig(
+    new URL('./roster-preview.config.ts', import.meta.url),
+    RosterPreviewConfigSchema
+  );
+
+  // Talent Point (TP) deltas documented trong "ý tưởng nhân vật v3.txt".
+  const TP_DELTA: Readonly<Record<string, number>> = Object.freeze({
+    ...rosterPreviewConfig.tpDelta
+  });
+
+  const STAT_ORDER: ReadonlyArray<string> = Object.freeze([
+    ...rosterPreviewConfig.statOrder
   ]);
 
-  const PRECISION = {
-    ARM: 100,
-    RES: 100,
-    SPD: 100,
-    AEregen: 10
-  };
+  const PRECISION: Readonly<Record<string, number>> = Object.freeze({
+    ...rosterPreviewConfig.precision
+  });
 
-  /**
-   * @param {string} stat
-   * @param {number} value
-   */
-  function roundStat(stat, value) {
+  function roundStat(stat: string, value: number) {
     const precision = PRECISION[stat] ?? 1;
     return Math.round(value * precision) / precision;
   }
 
-  /**
-   * @param {number} value
-   */
-  function roundTpValue(value) {
+  function roundTpValue(value: number) {
     return Math.round(value * 1e6) / 1e6;
   }
 
-  /**
-   * @param {Record<string, number | null | undefined>} [tpAlloc]
-   * @returns {Record<string, number>}
-   */
-  function sanitizeTpAllocation(tpAlloc = {}) {
-    const clean = {};
+  function sanitizeTpAllocation(tpAlloc: Record<string, number | null | undefined> = {}) {
+    const clean: Record<string, number> = {};
     for (const [stat, value] of Object.entries(tpAlloc)) {
-      if (!TP_DELTA[stat]) continue;
+      if (!(stat in TP_DELTA)) continue;
       const rounded = roundTpValue(value ?? 0);
       if (rounded !== 0) {
         clean[stat] = rounded;
@@ -3577,19 +4080,17 @@ __define('./data/roster-preview.js', (exports, module, __require) => {
     return clean;
   }
 
-  /**
-   * @param {CatalogStatBlock} base
-   * @param {Record<string, number | null | undefined>} [tpAlloc]
-   * @returns {CatalogStatBlock}
-   */
-  function applyTpToBase(base, tpAlloc = {}) {
+  function applyTpToBase(
+    base: CatalogStatBlock,
+    tpAlloc: Record<string, number | null | undefined> = {}
+  ): CatalogStatBlock {
     const cleanTp = sanitizeTpAllocation(tpAlloc);
-    const out = {};
-    for (const [stat, baseValue] of Object.entries(base)) {
+    const out: CatalogStatBlock = { ...base };
+    for (const [stat, baseValue] of Object.entries(base) as Array<[string, number]>) {
       const delta = TP_DELTA[stat];
       if (delta) {
         const tp = cleanTp[stat] ?? 0;
-        out[stat] = baseValue + delta * tp;
+        out[stat] = (baseValue ?? 0) + delta * tp;
       } else {
         out[stat] = baseValue;
       }
@@ -3597,11 +4098,7 @@ __define('./data/roster-preview.js', (exports, module, __require) => {
     return out;
   }
 
-  /**
-   * @param {keyof typeof RANK_MULT} rank
-   * @returns {number}
-   */
-  function getRankMultiplier(rank) {
+  function getRankMultiplier(rank: keyof typeof RANK_MULT) {
     const multiplier = RANK_MULT[rank];
     if (multiplier === undefined) {
       throw new Error(`Missing rank multiplier for "${rank}"`);
@@ -3609,31 +4106,24 @@ __define('./data/roster-preview.js', (exports, module, __require) => {
     return multiplier;
   }
 
-  /**
-   * @param {CatalogStatBlock} preRank
-   * @param {keyof typeof RANK_MULT} rank
-   * @returns {CatalogStatBlock}
-   */
-  function applyRankMultiplier(preRank, rank) {
+  function applyRankMultiplier(preRank: CatalogStatBlock, rank: keyof typeof RANK_MULT): CatalogStatBlock {
     const multiplier = getRankMultiplier(rank);
-    const out = {};
-    for (const [stat, value] of Object.entries(preRank)) {
+    const out: CatalogStatBlock = { ...preRank };
+    for (const [stat, value] of Object.entries(preRank) as Array<[string, number]>) {
       if (stat === 'SPD') {
-        out[stat] = roundStat(stat, value);
+        out[stat] = roundStat(stat, value ?? 0);;
         continue;
       }
-      out[stat] = roundStat(stat, value * multiplier);
+      out[stat] = roundStat(stat, (value ?? 0) * multiplier);
     }
     return out;
   }
 
-  /**
-   * @param {keyof typeof CLASS_BASE} className
-   * @param {keyof typeof RANK_MULT} rank
-   * @param {Record<string, number | null | undefined>} [tpAlloc]
-   * @returns {CatalogStatBlock}
-   */
-  function computeFinalStats(className, rank, tpAlloc = {}) {
+  function computeFinalStats(
+    className: keyof typeof CLASS_BASE,
+    rank: keyof typeof RANK_MULT,
+    tpAlloc: Record<string, number | null | undefined> = {}
+  ): CatalogStatBlock {
     const base = CLASS_BASE[className];
     if (!base) {
       throw new Error(`Unknown class "${className}"`);
@@ -3642,19 +4132,18 @@ __define('./data/roster-preview.js', (exports, module, __require) => {
     return applyRankMultiplier(preRank, rank);
   }
 
-  /**
-   * @param {CatalogStatBlock} base
-   * @param {RosterUnitDefinition['mods']} [mods]
-   * @returns {Record<string, number>}
-   */
-  function deriveTpFromMods(base, mods = {}) {
+  function deriveTpFromMods(
+    base: CatalogStatBlock,
+    mods: RosterUnitDefinition['mods'] = {}
+  ): Record<string, number> {
     if (!mods) return {};
-    const tp = {};
+    const tp: Record<string, number> = {};
     for (const [stat, modValue] of Object.entries(mods)) {
-      if (!TP_DELTA[stat]) continue;
+      if (!(stat in TP_DELTA)) continue;
       const baseValue = base[stat];
       if (typeof baseValue !== 'number') continue;
-      const raw = (baseValue * (modValue ?? 0)) / TP_DELTA[stat];
+      const delta = TP_DELTA[stat];
+      const raw = delta ? (baseValue * (modValue ?? 0)) / delta : 0;
       const rounded = roundTpValue(raw);
       if (rounded !== 0) {
         tp[stat] = rounded;
@@ -3663,30 +4152,25 @@ __define('./data/roster-preview.js', (exports, module, __require) => {
     return tp;
   }
 
-  /**
-   * @param {Record<string, number>} [tpAlloc]
-   */
-  function totalTp(tpAlloc = {}) {
+  function totalTp(tpAlloc: Record<string, number> = {}) {
     return roundTpValue(
       Object.values(tpAlloc).reduce((sum, value) => sum + value, 0)
     );
   }
 
-  /**
-   * @param {Record<string, Record<string, number>> | undefined} [tpAllocations]
-   * @returns {Record<string, RosterPreview>}
-   */
-  function buildRosterPreviews(tpAllocations = undefined) {
-    /** @type {Record<string, RosterPreview>} */
-    const result = {};
-      for (const unit of /** @type {ReadonlyArray<RosterUnitDefinition>} */ (ROSTER)) {
-      const base = CLASS_BASE[unit.class];
+  function buildRosterPreviews(
+    tpAllocations: Record<string, Record<string, number>> | undefined = undefined
+  ): Record<string, RosterPreview> {
+    const result: Record<string, RosterPreview> = {};
+    for (const unit of ROSTER as ReadonlyArray<RosterUnitDefinition>) {
+      const base = CLASS_BASE[unit.class as keyof typeof CLASS_BASE];
       if (!base) continue;
       const derivedTp = tpAllocations?.[unit.id] ?? deriveTpFromMods(base, unit.mods);
       const cleanTp = sanitizeTpAllocation(derivedTp);
       const preRank = applyTpToBase(base, cleanTp);
-      const multiplier = getRankMultiplier(unit.rank);
-      const final = applyRankMultiplier(preRank, unit.rank);
+      const rankKey = unit.rank as keyof typeof RANK_MULT;
+      const multiplier = getRankMultiplier(rankKey);
+      const final = applyRankMultiplier(preRank, rankKey);
       result[unit.id] = {
         id: unit.id,
         name: unit.name,
@@ -3707,8 +4191,11 @@ __define('./data/roster-preview.js', (exports, module, __require) => {
    * @param {ReadonlyArray<string>} [statsOrder]
    * @returns {RosterPreviewRow[]}
    */
-  function buildPreviewRows(previews, statsOrder = STAT_ORDER) {
-    return statsOrder.map((stat) => ({
+  function buildPreviewRows(
+    previews: Record<string, RosterPreview>,
+    statsOrder: ReadonlyArray<string> = STAT_ORDER
+  ): RosterPreviewRow[] {
+    return statsOrder.map((stat): RosterPreviewRow => ({
       stat,
       values: ROSTER.map((unit) => {
         const preview = previews[unit.id];
@@ -3725,10 +4212,10 @@ __define('./data/roster-preview.js', (exports, module, __require) => {
 
   const ROSTER_TP_ALLOCATIONS = Object.fromEntries(
     ROSTER.map((unit) => {
-      const base = CLASS_BASE[unit.class];
+      const base = CLASS_BASE[unit.class as keyof typeof CLASS_BASE];
       return [unit.id, deriveTpFromMods(base, unit.mods)];
     })
-  );
+  ) as Readonly<Record<string, Record<string, number>>>;
 
   const ROSTER_PREVIEWS = buildRosterPreviews(ROSTER_TP_ALLOCATIONS);
   const ROSTER_PREVIEW_ROWS = buildPreviewRows(ROSTER_PREVIEWS);
@@ -3745,84 +4232,8 @@ __define('./data/roster-preview.js', (exports, module, __require) => {
   exports.buildRosterPreviews = buildRosterPreviews;
   exports.buildPreviewRows = buildPreviewRows;
 });
-__define('./data/skills.js', (exports, module, __require) => {
-  // @ts-check
-  const __dep0 = __require('./catalog.js');
-  const ROSTER = __dep0.ROSTER;
-
-  /** @typedef {import('../types/units.ts').UnitId} UnitId */
-  /** @typedef {import('../types/config.js').SkillSection} SkillSection */
-  /** @typedef {import('../types/config.js').SkillEntry} SkillEntry */
-
-  /**
-   * @template T
-   * @param {T} value
-   * @returns {T}
-   */
-  function deepFreeze(value){
-    if (Array.isArray(value)){
-      value.forEach(deepFreeze);
-      return Object.freeze(value);
-    }
-    if (value && typeof value === 'object'){
-      Object.values(value).forEach(deepFreeze);
-      return Object.freeze(value);
-    }
-    return value;
-  }
-
-  /**
-   * @param {SkillSection | string | null | undefined} section
-   * @returns {SkillSection | null}
-   */
-  function normalizeSection(section){
-    if (!section) return null;
-    if (typeof section === 'string'){
-      return /** @type {SkillSection} */ ({ name: '', description: section });
-    }
-    const normalized = /** @type {SkillSection} */ ({ ...section });
-    if (Array.isArray(section.tags)){
-      normalized.tags = [...section.tags];
-    }
-    if (Array.isArray(section.notes)){
-      normalized.notes = [...section.notes];
-    } else if (typeof section.notes === 'string'){
-      const note = /** @type {string} */ (section.notes);
-      normalized.notes = [note];
-    }
-    return normalized;
-  }
-
-  /**
-   * @param {SkillSection | null | undefined} entry
-   * @returns {SkillSection | null}
-   */
-  function normalizeSkillEntry(entry){
-    if (!entry) return null;
-    const normalized = /** @type {SkillSection} */ ({ ...entry });
-    if (Array.isArray(entry.tags)){
-      normalized.tags = [...entry.tags];
-    }
-    if (entry.cost && typeof entry.cost === 'object'){
-      normalized.cost = { ...entry.cost };
-    }
-    if (Array.isArray(entry.notes)){
-      normalized.notes = [...entry.notes];
-    }
-    if (entry.notes && !Array.isArray(entry.notes)){
-      const note = /** @type {string} */ (entry.notes);
-      normalized.notes = [note];
-    }
-    return normalized;
-  }
-
-  /**
-    * @typedef {Readonly<{ unitId: UnitId; basic?: SkillSection | string | null; skill?: SkillSection | null; skills?: ReadonlyArray<SkillSection>; ult?: SkillSection | string | null; talent?: SkillSection | string | null; technique?: SkillSection | string | null; notes?: ReadonlyArray<string> | string | null; [extra: string]: unknown; }>}
-   * RawSkillSet
-   */
-
-  /** @type {ReadonlyArray<RawSkillSet>} */
-  const rawSkillSets = ([
+__define('./data/skills.config.ts', (exports, module, __require) => {
+  const skillsConfig = [
     {
       unitId: 'phe',
       basic: {
@@ -4306,17 +4717,104 @@ __define('./data/skills.js', (exports, module, __require) => {
         'Còi Tăng Tốc ưu tiên đồng minh ngẫu nhiên; hiệu ứng có thể trùng lặp với các nguồn tăng tốc khác.'
       ]
     }
-  ]);
+  ] as const;
 
-  /** @type {ReadonlyArray<keyof SkillEntry | 'skill'>} */
-  const SKILL_KEYS = (['basic', 'skill', 'skills', 'ult', 'talent', 'technique', 'notes']);
 
-  const skillSets = /** @type {Record<UnitId, SkillEntry>} */ (rawSkillSets.reduce((acc, entry) => {
+  exports.default = skillsConfig;
+  module.exports.default = exports.default;
+});
+__define('./data/skills.ts', (exports, module, __require) => {
+  const __dep0 = __require('./../tools/zod-stub/index.js');
+  const z = __dep0.z;
+
+  const __dep1 = __require('./data/load-config.ts');
+  const loadConfig = __dep1.loadConfig;
+  const __dep2 = __require('./catalog.ts');
+  const ROSTER = __dep2.ROSTER;
+
+
+
+
+
+  function deepFreeze<T>(value: T): T{
+    if (Array.isArray(value)){
+      value.forEach(deepFreeze);
+      return Object.freeze(value);
+    }
+    if (value && typeof value === 'object'){
+      Object.values(value).forEach(deepFreeze);
+      return Object.freeze(value);
+    }
+    return value;
+  }
+
+  function normalizeSection(section: SkillSection | string | null | undefined): SkillSection | null{
+    if (!section) return null;
+    if (typeof section === 'string'){
+      return { name: '', description: section } as SkillSection;
+    }
+    const normalized: SkillSection = { ...section };
+    if (Array.isArray(section.tags)){
+      normalized.tags = [...section.tags];
+    }
+    if (Array.isArray(section.notes)){
+      normalized.notes = [...section.notes];
+    } else if (typeof section.notes === 'string'){
+      const note = section.notes;
+      normalized.notes = [note];
+    }
+    return normalized;
+  }
+
+  function normalizeSkillEntry(entry: SkillSection | null | undefined): SkillSection | null{
+    if (!entry) return null;
+    const normalized: SkillSection = { ...entry };
+    if (Array.isArray(entry.tags)){
+      normalized.tags = [...entry.tags];
+    }
+    if (entry.cost && typeof entry.cost === 'object'){
+      normalized.cost = { ...entry.cost };
+    }
+    if (Array.isArray(entry.notes)){
+      normalized.notes = [...entry.notes];
+    }
+    if (entry.notes && !Array.isArray(entry.notes)){
+      const note = entry.notes as string;
+      normalized.notes = [note];
+    }
+    return normalized;
+  }
+
+  type RawSkillSet = Readonly<
+    {
+      unitId: UnitId;
+      basic?: SkillSection | string | null;
+      skill?: SkillSection | null;
+      skills?: ReadonlyArray<SkillSection>;
+      ult?: SkillSection | string | null;
+      talent?: SkillSection | string | null;
+      technique?: SkillSection | string | null;
+      notes?: ReadonlyArray<string> | string | null;
+    } &
+      UnknownRecord
+  >;
+
+  const RawSkillSetSchema = z.object({
+    unitId: z.string()
+  });
+  const rawSkillSets = await loadConfig(
+    new URL('./skills.config.ts', import.meta.url),
+    z.array(RawSkillSetSchema)
+  ) as ReadonlyArray<RawSkillSet>;
+
+  const SKILL_KEYS = ['basic', 'skill', 'skills', 'ult', 'talent', 'technique', 'notes'] as const satisfies ReadonlyArray<keyof SkillEntry | 'skill'>;
+
+  const skillSets: Readonly<Record<UnitId, SkillEntry>> = rawSkillSets.reduce<Record<UnitId, SkillEntry>>((acc, entry) => {
     const skills = Array.isArray(entry.skills)
       ? entry.skills.map(normalizeSkillEntry).filter(isSkillSection)
       : [];
     const skill = entry.skill ? normalizeSkillEntry(entry.skill) : (skills[0] ?? null);
-    const normalized = {
+    const normalized: SkillEntry = {
       unitId: entry.unitId,
       basic: normalizeSection(entry.basic),
       skill,
@@ -4329,59 +4827,38 @@ __define('./data/skills.js', (exports, module, __require) => {
     deepFreeze(normalized);
     acc[entry.unitId] = normalized;
     return acc;
-  }, /** @type {Record<UnitId, SkillEntry>} */ ({})));
+  }, {});
 
   deepFreeze(skillSets);
 
   exports.skillSets = skillSets;
 
-  /**
-   * @param {SkillEntry | null | undefined} entry
-   * @returns {entry is SkillEntry}
-   */
-  function isSkillEntry(entry){
+  function isSkillEntry(entry: SkillEntry | null | undefined): entry is SkillEntry{
     return Boolean(entry);
   }
 
-  /**
-   * @param {SkillSection | null | undefined} entry
-   * @returns {entry is SkillSection}
-   */
-  function isSkillSection(entry){
+  function isSkillSection(entry: SkillSection | null | undefined): entry is SkillSection{
     return Boolean(entry);
   }
 
-  /**
-   * @param {UnitId | null | undefined} unitId
-   * @returns {SkillEntry | null}
-   */
-  function getSkillSet(unitId){
+  function getSkillSet(unitId: UnitId | null | undefined): SkillEntry | null{
     if (!unitId) return null;
     return skillSets[unitId] ?? null;
   }
 
-  /** @returns {SkillEntry[]} */
-  function listSkillSets(){
+  function listSkillSets(): SkillEntry[]{
     return ROSTER
       .map(unit => skillSets[unit.id])
       .filter(isSkillEntry);
   }
 
-  /**
-   * @param {UnitId | null | undefined} unitId
-   * @returns {boolean}
-   */
-  function hasSkillSet(unitId){
+  function hasSkillSet(unitId: UnitId | null | undefined): boolean{
     return unitId != null && Object.prototype.hasOwnProperty.call(skillSets, unitId);
   }
 
-  /**
-   * @param {unknown} entry
-   * @returns {boolean}
-   */
-  function validateSkillSetStructure(entry){
+  function validateSkillSetStructure(entry: unknown): boolean{
     if (!entry || typeof entry !== 'object') return false;
-    const record = /** @type {Record<string, unknown>} */ (entry);
+    const record = entry as Record<string, unknown>;
     for (const key of SKILL_KEYS){
       if (!(key in entry)){
         return false;
@@ -4406,7 +4883,7 @@ __define('./data/vfx_anchors/loithienanh.json', (exports, module, __require) => 
   module.exports.default = data;
 });
 __define('./data/vfx_anchors/schema.ts', (exports, module, __require) => {
-  const __dep0 = __require('./zod');
+  const __dep0 = __require('./../tools/zod-stub/index.js');
   const z = __dep0.z;
 
 
@@ -4448,16 +4925,18 @@ __define('./data/vfx_anchors/schema.ts', (exports, module, __require) => {
       ambientEffects: dataset.ambientEffects ?? {}
     };
   };
+
   exports.parseVfxAnchorDataset = parseVfxAnchorDataset;
 });
 __define('./engine.ts', (exports, module, __require) => {
-  const __dep0 = __require('./config.js');
+  const __dep0 = __require('./config.ts');
   const TOKEN_STYLE = __dep0.TOKEN_STYLE;
   const CHIBI = __dep0.CHIBI;
   const CFG = __dep0.CFG;
-  const __dep1 = __require('./art.js');
+  const __dep1 = __require('./art.ts');
   const getUnitArt = __dep1.getUnitArt;
   const getUnitSkin = __dep1.getUnitSkin;
+
 
 
   type GridSpec = {
@@ -4518,24 +4997,7 @@ __define('./engine.ts', (exports, module, __require) => {
     stroke?: string;
   };
 
-  type UnitArtDescriptor = {
-    sprite?: string | SpriteDescriptor | null;
-    layout?: LayoutConfig | null;
-    shape?: string | null;
-    palette?: {
-      primary?: string;
-      secondary?: string;
-      accent?: string;
-      outline?: string;
-    } | null;
-    label?: LabelConfig | false | null;
-    glow?: string;
-    shadow?: ShadowConfig | string | null;
-    size?: number;
-    mirror?: boolean;
-    skinKey?: string | null;
-    [extra: string]: unknown;
-  };
+  type UnitArtDescriptor = UnitArt;
 
   type TokenWithArt = UnitToken & {
     art?: UnitArtDescriptor | null;
@@ -5529,60 +5991,156 @@ __define('./engine.ts', (exports, module, __require) => {
   exports.slotToCell = slotToCell;
   exports.zoneCode = zoneCode;
 });
-__define('./entry.js', (exports, module, __require) => {
-  const __dep0 = __require('./app/shell.js');
+__define('./entry.ts', (exports, module, __require) => {
+  const __dep0 = __require('./app/shell.ts');
   const createAppShell = __dep0.createAppShell;
-  const __dep1 = __require('./screens/main-menu/view.js');
+  const __dep1 = __require('./screens/main-menu/view/index.ts');
   const renderMainMenuView = __dep1.renderMainMenuView;
-  const __dep2 = __require('./data/modes.js');
+  const __dep2 = __require('./data/modes.ts');
   const MODES = __dep2.MODES;
   const MODE_GROUPS = __dep2.MODE_GROUPS;
   const MODE_STATUS = __dep2.MODE_STATUS;
   const getMenuSections = __dep2.getMenuSections;
+
+
+
+
+  type UnknownRecord = Record<string, unknown>;
+
+  export type ScreenParams = UnknownRecord | null;
+
+  export interface ShellState {
+    screen: string;
+    activeSession: unknown;
+    screenParams: ScreenParams;
+  }
+
+  export type ShellErrorHandler = (error: unknown, context: UnknownRecord | null) => void;
+
+  export interface Shell {
+    enterScreen: (key: string, params?: ScreenParams) => void;
+    setActiveSession: (session: unknown) => void;
+    clearActiveSession: () => void;
+    getState: () => ShellState;
+    onChange: (listener: ShellEventListener) => () => void;
+    setErrorHandler: (handler: ShellErrorHandler | null) => void;
+  }
+
+  export type ShellEventPayload = ShellState;
+
+  export type ShellEventListener = (state: ShellEventPayload) => void;
+
+  export interface ViewController {
+    destroy?: () => void;
+  }
+
+  export type MaybeViewController = ViewController | null;
+
+  export interface ModeDefinition {
+    key: string;
+    label: string;
+    type: string;
+    description: string;
+    loader: ModuleLoader;
+    screenId: string;
+    icon?: string;
+    tags: string[];
+    status: string;
+    unlockNotes: string;
+    params: ScreenParams;
+  }
+
+  export interface ScreenRendererContext {
+    root: HTMLElement;
+    shell: Shell;
+    definition: ModeDefinition;
+    params: ScreenParams;
+    screenId: string;
+  }
+
+  export type ScreenRendererResult = MaybeViewController | void;
+
+  export type ScreenRenderer = (context: ScreenRendererContext) => ScreenRendererResult;
+
+  export type ModuleLoader<TModule = unknown> = () => Promise<TModule>;
+
+  export interface RenderMessageOptions {
+    title?: string;
+    body?: string;
+  }
+
+  export type RenderMessage = (options?: RenderMessageOptions) => void;
+
+  type AnyFunction = (...args: unknown[]) => unknown;
+
+  interface RenderPveLayoutOptions {
+    title?: string;
+    modeKey?: string;
+    onExit?: () => void;
+  }
+
+  interface PveSession {
+    start?: (config: UnknownRecord) => unknown;
+    stop?: () => void;
+  }
+
+  declare global {
+    // eslint-disable-next-line no-var
+    var __require: ((id: string) => unknown) | undefined;
+
+    interface Window {
+      arcluneRenderMessage?: RenderMessage;
+      arcluneShowFatal?: (error: unknown) => void;
+    }
+  }
 
   const SUCCESS_EVENT = 'arclune:loaded';
   const SCREEN_MAIN_MENU = 'main-menu';
   const SCREEN_PVE = 'pve-session';
   const SCREEN_COLLECTION = 'collection';
   const SCREEN_LINEUP = 'lineup';
+  const COMING_SOON_MODULE_ID = '@modes/coming-soon.stub.ts' as const;
+  const COLLECTION_SCREEN_MODULE_ID = '@screens/collection/index.ts' as const;
+  const LINEUP_SCREEN_MODULE_ID = '@screens/lineup/index.ts' as const;
   const APP_SCREEN_CLASSES = [
     `app--${SCREEN_MAIN_MENU}`,
     `app--${SCREEN_PVE}`,
+    'app--pve',
     `app--${SCREEN_COLLECTION}`,
     `app--${SCREEN_LINEUP}`
   ];
 
-  function loadBundledModule(id){
+  async function loadBundledModule<TModule = unknown>(id: string): Promise<TModule>{
     const loader = typeof __require === 'function'
       ? Promise.resolve().then(() => __require(id))
       : import(id);
 
-    return Promise.resolve(loader).then(module => {
-      if (module && typeof module === 'object'){
-        const comingSoonFlag = module.comingSoon ?? module.COMING_SOON_MODULE?.comingSoon;
-        if (typeof comingSoonFlag !== 'undefined' && module.comingSoon !== comingSoonFlag){
-          return { ...module, comingSoon: comingSoonFlag };
-        }
+    const resolved = await loader;
+    if (resolved && typeof resolved === 'object'){
+      const moduleRecord = resolved as Record<string, unknown> & { comingSoon?: unknown; COMING_SOON_MODULE?: { comingSoon?: unknown } };
+      const comingSoonFlag = moduleRecord.comingSoon ?? moduleRecord.COMING_SOON_MODULE?.comingSoon;
+      if (typeof comingSoonFlag !== 'undefined' && moduleRecord.comingSoon !== comingSoonFlag){
+        return { ...moduleRecord, comingSoon: comingSoonFlag } as TModule;
       }
-      return module;
-    });
+    }
+    return resolved as TModule;
   }
 
-  const MODE_DEFINITIONS = MODES.reduce((acc, mode) => {
-    const shell = mode.shell || {};
-    const screenId = shell.screenId || SCREEN_MAIN_MENU;
-    const moduleId = mode.status === MODE_STATUS.AVAILABLE && shell.moduleId
+  const MODE_DEFINITIONS: Record<string, ModeDefinition> = (MODES as ReadonlyArray<ModeConfig>).reduce<Record<string, ModeDefinition>>((acc, mode) => {
+    const shell: ModeShellConfig | undefined = mode.shell;
+    const screenId = shell?.screenId || SCREEN_MAIN_MENU;
+    const moduleId = mode.status === MODE_STATUS.AVAILABLE && shell?.moduleId
       ? shell.moduleId
-      : (shell.fallbackModuleId || './modes/coming-soon.stub.ts');
-    const params = mode.status === MODE_STATUS.AVAILABLE && shell.defaultParams
-      ? { ...shell.defaultParams }
+     : (shell?.fallbackModuleId || COMING_SOON_MODULE_ID);
+    const params: ScreenParams = mode.status === MODE_STATUS.AVAILABLE && shell?.defaultParams
+    ? { ...shell.defaultParams }
       : null;
 
     acc[mode.id] = {
       key: mode.id,
       label: mode.title,
       type: mode.type,
-      description: mode.shortDescription,
+      description: mode.shortDescription || '',
       loader: () => loadBundledModule(moduleId),
       screenId,
       icon: mode.icon,
@@ -5594,14 +6152,14 @@ __define('./entry.js', (exports, module, __require) => {
     return acc;
   }, {});
 
-  const SCREEN_DEFINITION_LOOKUP = Object.values(MODE_DEFINITIONS).reduce((map, definition) => {
+  const SCREEN_DEFINITION_LOOKUP: Map<string, ModeDefinition> = Object.values(MODE_DEFINITIONS).reduce((map, definition) => {
     if (definition && definition.screenId && !map.has(definition.screenId)){
       map.set(definition.screenId, definition);
     }
     return map;
-  }, new Map());
+  }, new Map<string, ModeDefinition>());
 
-  const MODE_METADATA = MODES.map(mode => {
+  const MODE_METADATA = (MODES as ReadonlyArray<ModeConfig>).map(mode => {
     const definition = MODE_DEFINITIONS[mode.id];
     return {
       key: mode.id,
@@ -5613,18 +6171,18 @@ __define('./entry.js', (exports, module, __require) => {
       status: mode.status,
       params: definition?.params || null,
       parentId: mode.parentId || null
-    };
-  });
+  } satisfies MenuCardMetadata;
+  }) satisfies ReadonlyArray<MenuCardMetadata>;
 
-  const MODE_GROUP_METADATA = MODE_GROUPS.map(group => {
+  const MODE_GROUP_METADATA = (MODE_GROUPS as ReadonlyArray<ModeGroup>).map(group => {
     const childModeIds = Array.isArray(group.childModeIds) ? [...group.childModeIds] : [];
-    const childStatuses = childModeIds.reduce((acc, childId) => {
-      const child = MODES.find(mode => mode.id === childId);
+    const childStatuses = childModeIds.reduce<Set<string>>((acc, childId) => {
+      const child = (MODES as ReadonlyArray<ModeConfig>).find(mode => mode.id === childId);
       if (child){
         acc.add(child.status);
       }
       return acc;
-    }, new Set());
+    }, new Set<string>());
     let status = MODE_STATUS.PLANNED;
     if (childStatuses.has(MODE_STATUS.AVAILABLE)){
       status = MODE_STATUS.AVAILABLE;
@@ -5646,31 +6204,31 @@ __define('./entry.js', (exports, module, __require) => {
       isGroup: true,
       childModeIds,
       extraClasses: Array.isArray(group.extraClasses) ? [...group.extraClasses] : []
-    };
-  });
+    } satisfies MenuCardMetadata;
+  }) satisfies ReadonlyArray<MenuCardMetadata>;
 
-  const CARD_METADATA = [...MODE_METADATA, ...MODE_GROUP_METADATA];
+  const CARD_METADATA: ReadonlyArray<MenuCardMetadata> = [...MODE_METADATA, ...MODE_GROUP_METADATA];
 
   const MENU_SECTIONS = getMenuSections({
     includeStatuses: [MODE_STATUS.AVAILABLE, MODE_STATUS.COMING_SOON]
-  });
+  }) as ReadonlyArray<MenuSection>;
 
-  let activeModal = null;
-  let shellInstance = null;
-  let rootElement = null;
+  let activeModal: HTMLElement | null = null;
+  let shellInstance: Shell | null = null;
+  let rootElement: HTMLElement | null = null;
   let pveRenderToken = 0;
-  const bootstrapOptions = { isFileProtocol: false };
-  let renderMessageRef = null;
-  let mainMenuView = null;
-  let customScreenController = null;
-  let customScreenId = null;
+  const bootstrapOptions: { isFileProtocol: boolean; playerGender?: string } = { isFileProtocol: false };
+  let renderMessageRef: RenderMessage | null = null;
+  let mainMenuView: MaybeViewController = null;
+  let customScreenController: MaybeViewController = null;
+  let customScreenId: string | null = null;
   let customScreenToken = 0;
-  let collectionView = null;
+  let collectionView: MaybeViewController = null;
   let collectionRenderToken = 0;
-  let lineupView = null;
+  let lineupView: LineupViewHandle | null = null;
   let lineupRenderToken = 0;
 
-  function dispatchLoaded(){
+  function dispatchLoaded(): void{
     try {
       window.dispatchEvent(new Event(SUCCESS_EVENT));
     } catch (err) {
@@ -5678,11 +6236,11 @@ __define('./entry.js', (exports, module, __require) => {
     }
   }
 
-  function ensureRenderer(){
+  function ensureRenderer(): RenderMessage{
     if (typeof window.arcluneRenderMessage === 'function'){
       return window.arcluneRenderMessage;
     }
-    return (options = {}) => {
+    return (options: RenderMessageOptions = {}) => {
       const { title = 'Arclune', body = '' } = options;
       const wrapper = document.createElement('div');
       wrapper.style.maxWidth = '640px';
@@ -5702,7 +6260,7 @@ __define('./entry.js', (exports, module, __require) => {
     };
   }
 
-  function resolveErrorMessage(error, fallback = 'Lỗi không xác định.'){
+  function resolveErrorMessage(error: unknown, fallback = 'Lỗi không xác định.'): string{
     if (error && typeof error === 'object' && 'message' in error){
       return String(error.message);
     }
@@ -5710,8 +6268,8 @@ __define('./entry.js', (exports, module, __require) => {
     return value.trim() ? value : fallback;
   }
 
-  function showFatalError(error, renderMessage, options){
-   const { isFileProtocol = false } = options || {};
+  function showFatalError(error: unknown, renderMessage: RenderMessage, options?: { isFileProtocol?: boolean }): void{
+    const { isFileProtocol = false } = options || {};
     const detail = resolveErrorMessage(error);
     const advice = isFileProtocol
       ? '<p><small>Arclune đang chạy trực tiếp từ ổ đĩa (<code>file://</code>). Nếu gặp lỗi tải tài nguyên, hãy thử mở thông qua một HTTP server tĩnh.</small></p>'
@@ -5722,11 +6280,12 @@ __define('./entry.js', (exports, module, __require) => {
     });
   }
 
-  function isMissingModuleError(error){
+  function isMissingModuleError(error: unknown): boolean{
     if (!error || typeof error !== 'object') return false;
-    if ('code' in error && error.code === 'MODULE_NOT_FOUND') return true;
-    const message = typeof error.message === 'string' ? error.message : '';
-    const name = typeof error.name === 'string' ? error.name : '';
+    const err = error as { code?: unknown; message?: unknown; name?: unknown; cause?: unknown };
+    if (err.code === 'MODULE_NOT_FOUND') return true;
+    const message = typeof err.message === 'string' ? err.message : '';
+    const name = typeof err.name === 'string' ? err.name : '';
     if (name === 'TypeError'){
       const typeErrorImportPatterns = [
         /Failed to fetch dynamically imported module/i,
@@ -5740,34 +6299,35 @@ __define('./entry.js', (exports, module, __require) => {
         return true;
       }
     }
-    if (error && error.cause && error.cause !== error && typeof error.cause === 'object'){
-      if (isMissingModuleError(error.cause)){
+  if (err.cause && err.cause !== error && typeof err.cause === 'object'){
+      if (isMissingModuleError(err.cause)){
         return true;
       }
     }
     return /Cannot find module/i.test(message) || /module(\s|-)not(\s|-)found/i.test(message);
   }
 
-  function isComingSoonModule(module){
+  function isComingSoonModule(module: unknown): boolean{
     if (!module) return true;
-    if (module.comingSoon) return true;
-    if (module.COMING_SOON_MODULE?.comingSoon) return true;
+    const record = module as { comingSoon?: unknown; COMING_SOON_MODULE?: { comingSoon?: unknown } };
+    if (record.comingSoon) return true;
+    if (record.COMING_SOON_MODULE?.comingSoon) return true;
     return false;
   }
 
-  function dismissModal(){
+  function dismissModal(): void{
     if (activeModal && typeof activeModal.remove === 'function'){
       activeModal.remove();
     }
     activeModal = null;
   }
 
-  function clearAppScreenClasses(){
+  function clearAppScreenClasses(): void{
     if (!rootElement || !rootElement.classList) return;
     APP_SCREEN_CLASSES.forEach(cls => rootElement.classList.remove(cls));
   }
 
-  function destroyCustomScreen(force = false){
+  function destroyCustomScreen(force = false): void{
     const hasActiveScreen = !!(customScreenController || customScreenId);
     if (!force && !hasActiveScreen){
       return;
@@ -5790,7 +6350,7 @@ __define('./entry.js', (exports, module, __require) => {
     }
   }
 
-  function destroyCollectionView(){
+  function destroyCollectionView(): void{
     if (collectionView && typeof collectionView.destroy === 'function'){
       try {
         collectionView.destroy();
@@ -5801,7 +6361,7 @@ __define('./entry.js', (exports, module, __require) => {
     collectionView = null;
   }
 
-  function destroyLineupView(){
+  function destroyLineupView(): void{
     if (lineupView && typeof lineupView.destroy === 'function'){
       try {
         lineupView.destroy();
@@ -5812,17 +6372,17 @@ __define('./entry.js', (exports, module, __require) => {
     lineupView = null;
   }
 
-  function cloneParamValue(value){
+  function cloneParamValue<T>(value: T): T{
     if (!value || typeof value !== 'object'){
       return value;
     }
     if (Array.isArray(value)){
-      return [...value];
+      return [...value] as T;
     }
-  return { ...value };
+   return { ...(value as UnknownRecord) } as T;
   }
 
-  function mergeDefinitionParams(definition, params){
+  function mergeDefinitionParams(definition: ModeDefinition | null, params: ScreenParams): ScreenParams{
     const baseValue = typeof definition?.params !== 'undefined'
       ? cloneParamValue(definition.params)
       : undefined;
@@ -5834,23 +6394,23 @@ __define('./entry.js', (exports, module, __require) => {
 
     if (baseIsObject || incomingIsObject){
       return {
-        ...(baseIsObject ? baseValue : {}),
-        ...(incomingIsObject ? incomingValue : {})
+        ...(baseIsObject ? baseValue as UnknownRecord : {}),
+        ...(incomingIsObject ? incomingValue as UnknownRecord : {})
       };
     }
 
     if (typeof incomingValue !== 'undefined'){
-      return incomingValue;
+      return incomingValue as ScreenParams;
     }
 
     if (typeof baseValue !== 'undefined'){
-      return baseValue;
+      return baseValue as ScreenParams;
     }
 
     return null;
   }
 
-  function pickFunctionFromSource(source, preferredKeys = [], fallbackKeys = []){
+  function pickFunctionFromSource(source: unknown, preferredKeys: ReadonlyArray<string> = [], fallbackKeys: ReadonlyArray<string> = []): AnyFunction | null{
     if (!source) return null;
 
     if (typeof source === 'function'){
@@ -5858,14 +6418,17 @@ __define('./entry.js', (exports, module, __require) => {
     }
 
     if (source && typeof source === 'object'){
+      const record = source as Record<string, unknown>;
       for (const key of preferredKeys){
-        if (typeof source[key] === 'function'){
-          return source[key];
+        const value = record[key];
+        if (typeof value === 'function'){
+          return value as AnyFunction;
         }
       }
       for (const key of fallbackKeys){
-        if (typeof source[key] === 'function'){
-          return source[key];
+        const value = record[key];
+        if (typeof value === 'function'){
+          return value as AnyFunction;
         }
       }
     }
@@ -5873,24 +6436,25 @@ __define('./entry.js', (exports, module, __require) => {
     return null;
   }
 
-  function resolveModuleFunction(module, preferredKeys = [], fallbackKeys = []){
+  function resolveModuleFunction(module: unknown, preferredKeys: ReadonlyArray<string> = [], fallbackKeys: ReadonlyArray<string> = []): AnyFunction | null{
     const candidate = pickFunctionFromSource(module, preferredKeys, fallbackKeys);
     return typeof candidate === 'function' ? candidate : null;
   }
 
-  function resolveScreenRenderer(module){
-    return resolveModuleFunction(
+  function resolveScreenRenderer(module: unknown): ScreenRenderer | null{
+    const candidate = resolveModuleFunction(
       module,
       ['renderCollectionScreen', 'renderScreen'],
       ['render']
     );
+    return typeof candidate === 'function' ? candidate as ScreenRenderer : null;
   }
 
-  function getDefinitionByScreen(screenId){
+  function getDefinitionByScreen(screenId: string): ModeDefinition | null{
     return SCREEN_DEFINITION_LOOKUP.get(screenId) || null;
   }
 
-  async function mountModeScreen(screenId, params){
+  async function mountModeScreen(screenId: string, params: ScreenParams): Promise<void>{
     const token = ++customScreenToken;
     destroyCustomScreen(true);
     dismissModal();
@@ -5904,7 +6468,7 @@ __define('./entry.js', (exports, module, __require) => {
     }
 
     const mergedParams = mergeDefinitionParams(definition, params);
-    
+
     clearAppScreenClasses();
     if (rootElement.classList){
       rootElement.classList.add(`app--${screenId}`);
@@ -5914,7 +6478,7 @@ __define('./entry.js', (exports, module, __require) => {
       rootElement.innerHTML = `<div class="app-loading">Đang tải ${label}...</div>`;
     }
 
-    let module;
+    let module: unknown;
     try {
       module = await definition.loader();
     } catch (error) {
@@ -5950,13 +6514,13 @@ __define('./entry.js', (exports, module, __require) => {
       definition,
       params: mergedParams,
       screenId
-    }) || null;
+    }) ?? null;
 
-    customScreenController = controller;
+    customScreenController = controller as MaybeViewController;
     customScreenId = screenId;
   }
 
-  function showComingSoonModal(label){
+  function showComingSoonModal(label?: string): void{
     dismissModal();
     if (!rootElement) return;
     const modal = document.createElement('div');
@@ -5971,7 +6535,7 @@ __define('./entry.js', (exports, module, __require) => {
       </div>
     `;
     const closeButton = modal.querySelector('[data-action="close"]');
-    if (closeButton){
+    if (closeButton instanceof HTMLElement){
       closeButton.addEventListener('click', ()=>{
         dismissModal();
       });
@@ -5980,7 +6544,7 @@ __define('./entry.js', (exports, module, __require) => {
     activeModal = modal;
   }
 
-  async function renderCollectionScreen(params){
+  async function renderCollectionScreen(params: ScreenParams): Promise<void>{
     if (!rootElement || !shellInstance) return;
     const token = ++collectionRenderToken;
     dismissModal();
@@ -5995,9 +6559,9 @@ __define('./entry.js', (exports, module, __require) => {
       rootElement.innerHTML = '<div class="app-loading">Đang tải bộ sưu tập...</div>';
     }
 
-    let module;
+    let module: unknown;
     try {
-      module = await loadBundledModule('./screens/collection/index.js');
+      module = await loadBundledModule(COLLECTION_SCREEN_MODULE_ID);
     } catch (error) {
       if (token !== collectionRenderToken) return;
       throw error;
@@ -6009,21 +6573,24 @@ __define('./entry.js', (exports, module, __require) => {
       module,
       ['renderCollectionScreen', 'renderCollectionView'],
       ['render']
-    );
+    ) as ScreenRenderer | null;
     if (typeof render !== 'function'){
       throw new Error('Module bộ sưu tập không cung cấp hàm render hợp lệ.');
     }
 
     const definition = getDefinitionByScreen(SCREEN_COLLECTION);
-    collectionView = render({
+    if (!definition){
+      throw new Error('Không tìm thấy định nghĩa màn hình bộ sưu tập.');
+    }
+    collectionView = (render({
       root: rootElement,
       shell: shellInstance,
       definition,
       params: params || null
-    }) || null;
+    }) ?? null);
   }
 
-  async function renderLineupScreen(params){
+  async function renderLineupScreen(params: ScreenParams): Promise<void>{
     if (!rootElement || !shellInstance) return;
     const token = ++lineupRenderToken;
     dismissModal();
@@ -6038,9 +6605,9 @@ __define('./entry.js', (exports, module, __require) => {
       rootElement.innerHTML = '<div class="app-loading">Đang tải đội hình...</div>';
     }
 
-    let module;
+    let module: unknown;
     try {
-      module = await loadBundledModule('./screens/lineup/index.js');
+      module = await loadBundledModule(LINEUP_SCREEN_MODULE_ID);
     } catch (error) {
       if (token !== lineupRenderToken) return;
       throw error;
@@ -6052,21 +6619,25 @@ __define('./entry.js', (exports, module, __require) => {
       module,
       ['renderLineupScreen'],
       ['render']
-    );
+    ) as ScreenRenderer | null;
     if (typeof render !== 'function'){
       throw new Error('Module đội hình không cung cấp hàm render hợp lệ.');
     }
 
     const definition = getDefinitionByScreen(SCREEN_LINEUP);
-    lineupView = render({
+    if (!definition){
+      throw new Error('Không tìm thấy định nghĩa màn hình đội hình.');
+    }
+    const lineupResult = render({
       root: rootElement,
       shell: shellInstance,
       definition,
       params: params || null
-    }) || null;
+  });
+    lineupView = (lineupResult as LineupViewHandle | void) ?? null;
   }
 
-  function renderMainMenuScreen(){
+  function renderMainMenuScreen(): void{
     if (!rootElement || !shellInstance) return;
     dismissModal();
     clearAppScreenClasses();
@@ -6074,22 +6645,24 @@ __define('./entry.js', (exports, module, __require) => {
       rootElement.classList.add('app--main-menu');
     }
 
-  lineupRenderToken += 1;
+    lineupRenderToken += 1;
     destroyLineupView();
 
     if (mainMenuView && typeof mainMenuView.destroy === 'function'){
       mainMenuView.destroy();
       mainMenuView = null;
     }
-    const sections = MENU_SECTIONS.map(section => ({
+    const sections: ReadonlyArray<MenuSection> = MENU_SECTIONS.map(section => ({
       id: section.id,
       title: section.title,
-      entries: (section.entries || []).map(entry => ({
-        id: entry.id,
-        type: entry.type,
-        cardId: entry.cardId,
-        childModeIds: Array.isArray(entry.childModeIds) ? [...entry.childModeIds] : []
-      }))
+      entries: (section.entries || [])
+        .filter((entry): entry is MenuSectionEntry => !!entry)
+        .map(entry => ({
+          id: entry.id,
+          type: entry.type,
+          cardId: entry.cardId,
+          childModeIds: Array.isArray(entry.childModeIds) ? [...entry.childModeIds] : []
+        }))
     }));
     mainMenuView = renderMainMenuView({
       root: rootElement,
@@ -6097,15 +6670,15 @@ __define('./entry.js', (exports, module, __require) => {
       sections,
       metadata: CARD_METADATA,
       playerGender: bootstrapOptions.playerGender || 'neutral',
-      onShowComingSoon: mode => {
+      onShowComingSoon: (mode: MenuCardMetadata) => {
         const def = mode?.key ? MODE_DEFINITIONS[mode.key] : null;
         const label = def?.label || mode?.title || mode?.label || '';
         showComingSoonModal(label);
       }
-    });
+    }) as MaybeViewController;
   }
 
-  function renderPveLayout(options){
+  function renderPveLayout(options: RenderPveLayoutOptions): HTMLElement | null{
     if (!rootElement) return null;
     dismissModal();
     clearAppScreenClasses();
@@ -6137,15 +6710,15 @@ __define('./entry.js', (exports, module, __require) => {
     `;
     rootElement.appendChild(container);
     const exitButton = container.querySelector('[data-action="exit"]');
-    if (exitButton && typeof options?.onExit === 'function'){
+    if (exitButton instanceof HTMLElement && typeof options?.onExit === 'function'){
       exitButton.addEventListener('click', options.onExit);
     }
     return container;
   }
 
-  function teardownActiveSession(){
+  function teardownActiveSession(): void{
     if (!shellInstance) return;
-    const current = shellInstance.getState()?.activeSession;
+    const current = shellInstance.getState()?.activeSession as { stop?: () => void } | null;
     if (current && typeof current.stop === 'function'){
       try {
         current.stop();
@@ -6156,41 +6729,53 @@ __define('./entry.js', (exports, module, __require) => {
     shellInstance.setActiveSession(null);
   }
 
-  async function mountPveScreen(params){
+  async function mountPveScreen(params: ScreenParams): Promise<void>{
     const token = ++pveRenderToken;
-    const extractStartConfig = (source) => {
+    const extractStartConfig = (source: unknown): UnknownRecord | null => {
       if (!source || typeof source !== 'object') return null;
-      const payload = source.sessionConfig && typeof source.sessionConfig === 'object'
-        ? source.sessionConfig
-        : source;
+      const record = source as UnknownRecord & { sessionConfig?: unknown };
+      const payload = record.sessionConfig && typeof record.sessionConfig === 'object'
+        ? record.sessionConfig as UnknownRecord
+        : record;
       return { ...payload };
     };
     teardownActiveSession();
-    const modeKey = params?.modeKey && MODE_DEFINITIONS[params.modeKey] ? params.modeKey : 'campaign';
+    if (!shellInstance) return;
+    const candidateModeKey = params && typeof params === 'object' && !Array.isArray(params)
+      ? (params as { modeKey?: unknown }).modeKey
+      : undefined;
+    const modeKey = typeof candidateModeKey === 'string' && MODE_DEFINITIONS[candidateModeKey]
+      ? candidateModeKey
+      : 'campaign';
     const definition = MODE_DEFINITIONS[modeKey] || MODE_DEFINITIONS.campaign;
-    const rawParams = (params && typeof params === 'object') ? params : {};
-    const defaultParams = (definition?.params && typeof definition.params === 'object') ? definition.params : {};
-    const mergedParams = { ...defaultParams, ...rawParams };
-    const definitionConfig = extractStartConfig(definition?.params);
+    const rawParams = params && typeof params === 'object' && !Array.isArray(params)
+      ? { ...(params as UnknownRecord) }
+      : {};
+    const defaultParams = definition?.params && typeof definition.params === 'object' && !Array.isArray(definition.params)
+      ? { ...(definition.params as UnknownRecord) }
+      : {};
+    const mergedParams: UnknownRecord = { ...defaultParams, ...rawParams };
+    const definitionConfig = extractStartConfig(definition?.params ?? null);
     const incomingConfig = extractStartConfig(params);
-    const mergedStartConfig = {
+    const mergedStartConfig: UnknownRecord = {
       ...(definitionConfig || {}),
       ...(incomingConfig || {})
     };
-    const hasSessionConfig = Object.prototype.hasOwnProperty.call(mergedParams, 'sessionConfig');
-    const sessionConfigValue = hasSessionConfig && mergedParams.sessionConfig && typeof mergedParams.sessionConfig === 'object'
-      ? { ...mergedParams.sessionConfig }
-      : mergedParams.sessionConfig;
-      const hasSessionConfigObject = hasSessionConfig && sessionConfigValue && typeof sessionConfigValue === 'object';
-    const { sessionConfig: _ignoredSessionConfig, ...restMergedParams } = mergedParams;
-    const createSessionOptions = {
+    const mergedParamsWithConfig = mergedParams as UnknownRecord & { sessionConfig?: unknown };
+    const hasSessionConfig = Object.prototype.hasOwnProperty.call(mergedParamsWithConfig, 'sessionConfig');
+    const sessionConfigValue = hasSessionConfig && mergedParamsWithConfig.sessionConfig && typeof mergedParamsWithConfig.sessionConfig === 'object'
+      ? { ...(mergedParamsWithConfig.sessionConfig as UnknownRecord) }
+      : mergedParamsWithConfig.sessionConfig;
+    const hasSessionConfigObject = hasSessionConfig && sessionConfigValue && typeof sessionConfigValue === 'object';
+    const { sessionConfig: _ignoredSessionConfig, ...restMergedParams } = mergedParamsWithConfig;
+    const createSessionOptions: UnknownRecord = {
       ...restMergedParams,
       ...mergedStartConfig,
       ...(hasSessionConfig ? {
-        sessionConfig: hasSessionConfigObject ? { ...sessionConfigValue } : sessionConfigValue
+        sessionConfig: hasSessionConfigObject ? { ...sessionConfigValue as UnknownRecord } : sessionConfigValue
       } : {})
     };
-    const startSessionOptions = {
+    const startSessionOptions: UnknownRecord = {
       ...restMergedParams,
       ...mergedStartConfig
     };
@@ -6201,7 +6786,7 @@ __define('./entry.js', (exports, module, __require) => {
       }
       rootElement.innerHTML = `<div class="app-loading">Đang tải ${definition.label}...</div>`;
     }
-    let module;
+    let module: unknown;
     try {
       module = await definition.loader();
     } catch (error) {
@@ -6222,7 +6807,7 @@ __define('./entry.js', (exports, module, __require) => {
     const createPveSession = resolveModuleFunction(
       module,
       ['createPveSession']
-    );
+    ) as ((container: HTMLElement, options: UnknownRecord) => PveSession) | null;
     if (typeof createPveSession !== 'function'){
       throw new Error('PvE module missing createPveSession().');
     }
@@ -6246,10 +6831,10 @@ __define('./entry.js', (exports, module, __require) => {
     if (!container){
       throw new Error('Không thể dựng giao diện PvE.');
     }
-    const session = createPveSession(container, createSessionOptions);
+    const session = createPveSession(container, createSessionOptions) as PveSession;
     shellInstance.setActiveSession(session);
     if (typeof session.start === 'function'){
-      const scheduleRetry = (callback) => {
+     const scheduleRetry = (callback: () => void) => {
         if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function'){
           window.requestAnimationFrame(callback);
         } else {
@@ -6314,7 +6899,7 @@ __define('./entry.js', (exports, module, __require) => {
         throw new Error('Không tìm thấy phần tử #appRoot.');
       }
       renderMessageRef = renderMessage;
-      const handleShellError = (error) => {
+      const handleShellError = (error: unknown) => {
         console.error('Arclune shell listener error', error);
         const renderer = renderMessageRef || renderMessage;
         if (renderer){
@@ -6323,10 +6908,10 @@ __define('./entry.js', (exports, module, __require) => {
       };
       shellInstance = createAppShell({ onError: handleShellError });
       bootstrapOptions.isFileProtocol = isFileProtocol;
-      let lastScreen = null;
-      let lastParams = null;
+      let lastScreen: string | null = null;
+      let lastParams: ScreenParams = null;
 
-      shellInstance.onChange(state => {
+      shellInstance.onChange((state: ShellEventPayload) => {
         const nextScreen = state.screen;
         const nextParams = state.screenParams;
         const screenChanged = nextScreen !== lastScreen;
@@ -6364,7 +6949,7 @@ __define('./entry.js', (exports, module, __require) => {
           lastScreen = SCREEN_COLLECTION;
           lastParams = nextParams;
           pveRenderToken += 1;
-          renderCollectionScreen(nextParams || null).catch(error => {
+          renderCollectionScreen(nextParams || null).catch((error: unknown) => {
             console.error('Arclune failed to load collection screen', error);
             if (renderMessageRef){
               showFatalError(error, renderMessageRef, bootstrapOptions);
@@ -6373,7 +6958,7 @@ __define('./entry.js', (exports, module, __require) => {
           return;
         }
 
-  if (nextScreen === SCREEN_LINEUP){
+        if (nextScreen === SCREEN_LINEUP){
           customScreenToken += 1;
           destroyCustomScreen();
           collectionRenderToken += 1;
@@ -6387,7 +6972,7 @@ __define('./entry.js', (exports, module, __require) => {
           lastScreen = SCREEN_LINEUP;
           lastParams = nextParams;
           pveRenderToken += 1;
-          renderLineupScreen(nextParams || null).catch(error => {
+          renderLineupScreen(nextParams || null).catch((error: unknown) => {
             console.error('Arclune failed to load lineup screen', error);
             if (renderMessageRef){
               showFatalError(error, renderMessageRef, bootstrapOptions);
@@ -6409,7 +6994,7 @@ __define('./entry.js', (exports, module, __require) => {
           }
           lastScreen = SCREEN_PVE;
           lastParams = nextParams;
-          mountPveScreen(nextParams || {}).catch(error => {
+          mountPveScreen(nextParams || {}).catch((error: unknown) => {
             console.error('Arclune failed to start PvE session', error);
             if (renderMessageRef){
               showFatalError(error, renderMessageRef, bootstrapOptions);
@@ -6430,7 +7015,7 @@ __define('./entry.js', (exports, module, __require) => {
 
         lastScreen = nextScreen;
         lastParams = nextParams;
-        mountModeScreen(nextScreen, nextParams || null).catch(error => {
+        mountModeScreen(nextScreen, nextParams || null).catch((error: unknown) => {
           console.error(`Arclune failed to load screen ${nextScreen}`, error);
           if (renderMessageRef){
             showFatalError(error, renderMessageRef, bootstrapOptions);
@@ -6519,13 +7104,19 @@ __define('./events.ts', (exports, module, __require) => {
     [BATTLE_END]: BattleEndDetail;
   }
 
+  export interface EventEmitterLike {
+    on: <T extends GameEventType>(type: T, listener: GameEventHandler<T>) => unknown;
+    off?: <T extends GameEventType>(type: T, listener: GameEventHandler<T>) => unknown;
+    emit: <T extends GameEventType>(type: T, detail?: GameEventDetailMap[T]) => unknown;
+  }
+
   export type GameEventDetail<T extends GameEventType> =
     | (CustomEvent<GameEventDetailMap[T]> & { detail: GameEventDetailMap[T] })
     | {
         type: T;
         detail: GameEventDetailMap[T];
-        target?: EventTarget | SimpleEventTarget | null;
-        currentTarget?: EventTarget | SimpleEventTarget | null;
+        target?: EventTarget | SimpleEventTarget | EventEmitterLike | null;
+        currentTarget?: EventTarget | SimpleEventTarget | EventEmitterLike | null;
       };
 
   export type GameEventHandler<T extends GameEventType = GameEventType> = (
@@ -6624,7 +7215,20 @@ __define('./events.ts', (exports, module, __require) => {
     }
   }
 
-  function makeEventTarget(): EventTarget | SimpleEventTarget {
+  export type GameEventTargetLike = EventTarget | SimpleEventTarget | EventEmitterLike;
+
+  function isEventEmitterLike(value: unknown): value is EventEmitterLike {
+    if (!value || typeof value !== 'object'){
+      return false;
+    }
+    const candidate = value as Partial<EventEmitterLike>;
+    return (
+      typeof candidate.on === 'function' &&
+      typeof candidate.emit === 'function'
+    );
+  }
+
+  function makeEventTarget(): GameEventTargetLike {
     if (!HAS_EVENT_TARGET) return new SimpleEventTarget();
     const probeType = '__probe__';
     const probeEvent = createNativeEvent(probeType as GameEventType);
@@ -6656,7 +7260,7 @@ __define('./events.ts', (exports, module, __require) => {
     return new SimpleEventTarget();
   }
 
-  const gameEvents = makeEventTarget();
+  const gameEvents: GameEventTargetLike = makeEventTarget();
 
   function emitGameEvent<T extends GameEventType>(
     type: T,
@@ -6664,25 +7268,21 @@ __define('./events.ts', (exports, module, __require) => {
   ): boolean {
     if (!type || !gameEvents) return false;
     try {
-      if (typeof (gameEvents as EventTarget).dispatchEvent === 'function'){
+      if (HAS_EVENT_TARGET && gameEvents instanceof EventTarget){
         const nativeEvent = createNativeEvent(type, detail);
         if (nativeEvent){
-          return (gameEvents as EventTarget).dispatchEvent(nativeEvent as Event);
+          return gameEvents.dispatchEvent(nativeEvent as Event);
         }
-        if (gameEvents instanceof SimpleEventTarget){
-          const syntheticEvent: GameEventDetail<T> = {
-            type,
-            detail: detail as GameEventDetailMap[T],
-          };
-          return gameEvents.dispatchEvent(syntheticEvent);
-        }
-        return false;
       }
-      const emitter = gameEvents as unknown as {
-        emit?: (eventType: T, eventDetail?: GameEventDetailMap[T]) => void;
-      };
-      if (typeof emitter.emit === 'function'){
-        emitter.emit(type, detail);
+      if (gameEvents instanceof SimpleEventTarget){
+        const syntheticEvent: GameEventDetail<T> = {
+          type,
+          detail: detail as GameEventDetailMap[T],
+        };
+        return gameEvents.dispatchEvent(syntheticEvent);
+      }
+      if (isEventEmitterLike(gameEvents)){
+        gameEvents.emit(type, detail);
         return true;
       }
     } catch (err) {
@@ -6703,29 +7303,34 @@ __define('./events.ts', (exports, module, __require) => {
     if (!type || typeof handler !== 'function' || !gameEvents){
       return () => {};
     }
-    if (typeof (gameEvents as EventTarget).addEventListener === 'function'){
-      (gameEvents as EventTarget).addEventListener(type, handler as EventListener);
+    if (HAS_EVENT_TARGET && gameEvents instanceof EventTarget){
+      gameEvents.addEventListener(type, handler as EventListener);
       let disposed = false;
       return () => {
         if (disposed) return;
         disposed = true;
-        if (typeof (gameEvents as EventTarget).removeEventListener === 'function'){
-          (gameEvents as EventTarget).removeEventListener(type, handler as EventListener);
+        if (HAS_EVENT_TARGET && gameEvents instanceof EventTarget){
+          gameEvents.removeEventListener(type, handler as EventListener);
         }
       };
     }
-    const eventEmitter = gameEvents as unknown as {
-      on?: (eventType: T, listener: GameEventHandler<T>) => void;
-      off?: (eventType: T, listener: GameEventHandler<T>) => void;
-    };
-    if (typeof eventEmitter.on === 'function'){
-      eventEmitter.on(type, handler);
+    if (gameEvents instanceof SimpleEventTarget){
+      gameEvents.addEventListener(type, handler);
       let disposed = false;
       return () => {
         if (disposed) return;
         disposed = true;
-        if (typeof eventEmitter.off === 'function'){
-          eventEmitter.off(type, handler);
+        gameEvents.removeEventListener(type, handler);
+      };
+    }
+    if (isEventEmitterLike(gameEvents)){
+      gameEvents.on(type, handler);
+      let disposed = false;
+      return () => {
+        if (disposed) return;
+        disposed = true;
+        if (typeof gameEvents.off === 'function'){
+          gameEvents.off(type, handler);
         }
       };
     }
@@ -6739,67 +7344,103 @@ __define('./events.ts', (exports, module, __require) => {
   exports.BATTLE_END = BATTLE_END;
   exports.gameEvents = gameEvents;
   exports.dispatchGameEvent = dispatchGameEvent;
+  exports.isEventEmitterLike = isEventEmitterLike;
   exports.emitGameEvent = emitGameEvent;
   exports.addGameEventListener = addGameEventListener;
 });
-__define('./main.js', (exports, module, __require) => {
-  const __dep1 = __require('./modes/pve/session.ts');
-  const createPveSession = __dep1.createPveSession;
-  const __dep2 = __require('./utils/dummy.js');
-  const ensureNestedModuleSupport = __dep2.ensureNestedModuleSupport;
+__define('./main.ts', (exports, module, __require) => {
+
+
+
+  const __dep1 = __require('./events.ts');
+  const addGameEventListener = __dep1.addGameEventListener;
+
+  const __dep2 = __require('./modes/pve/session.ts');
+  const createPveSession = __dep2.createPveSession;
+  const __dep3 = __require('./utils/dummy.ts');
+  const ensureNestedModuleSupport = __dep3.ensureNestedModuleSupport;
+
   const __reexport0 = __require('./events.ts');
 
-  let currentSession = null;
+  type RootSource = Element | Document | null | undefined;
+  type RootTarget = Element | Document | null;
 
-  function resolveRoot(config){
-    if (!config) return (typeof document !== 'undefined') ? document : null;
+  type SessionConfigOverrides = Partial<CreateSessionOptions> &
+    Partial<GameConfig> &
+    Record<string, unknown>;
+
+  export interface StartGameOptions extends SessionConfigOverrides {
+    root?: RootSource;
+    rootEl?: RootSource;
+    element?: RootSource;
+  }
+
+  type BaseSessionHandle = ReturnType<typeof createPveSession>;
+
+  export interface ActiveSessionHandle extends BaseSessionHandle {
+    start(startConfig?: StartGameOptions | null): SessionState | null;
+    stop(): void;
+    updateConfig(next?: SessionConfigOverrides | null): void;
+    setUnitSkin(unitId: string, skinKey: string | null | undefined): boolean;
+    onEvent<T extends GameEventType>(type: T, handler: GameEventHandler<T>): () => void;
+  }
+
+  let currentSession: ActiveSessionHandle | null = null;
+
+  function resolveRoot(
+    config: Pick<StartGameOptions, 'root' | 'rootEl' | 'element'> | null | undefined,
+  ): RootTarget {
+    if (!config) return typeof document !== 'undefined' ? document : null;
     if (config.root) return config.root;
     if (config.rootEl) return config.rootEl;
     if (config.element) return config.element;
-    return (typeof document !== 'undefined') ? document : null;
+    return typeof document !== 'undefined' ? document : null;
   }
 
-  function startGame(options = {}){
+  function startGame(options?: StartGameOptions | null): SessionState {
     ensureNestedModuleSupport();
-    const { root, rootEl, element, ...rest } = options || {};
+    const sanitizedOptions = (options ?? {}) as StartGameOptions;
+    const { root, rootEl, element, ...rest } = sanitizedOptions;
     const rootTarget = resolveRoot({ root, rootEl, element });
-    const initialConfig = { ...rest };
-    if (!currentSession){
+    const initialConfig: SessionConfigOverrides = { ...rest };
+    if (!currentSession) {
       currentSession = createPveSession(rootTarget, initialConfig);
     }
-    const startConfig = { ...initialConfig, root: rootTarget };
+    const startConfig: StartGameOptions = { ...initialConfig, root: rootTarget };
     const session = currentSession.start(startConfig);
-    if (!session){
+    if (!session) {
       throw new Error('PvE board markup not found; render the layout before calling startGame');
     }
     return session;
   }
 
-  function stopGame(){
+  function stopGame(): void {
     if (!currentSession) return;
     currentSession.stop();
     currentSession = null;
   }
 
-  function updateGameConfig(config = {}){
+  function updateGameConfig(config: SessionConfigOverrides | null | undefined = {}): void {
     if (!currentSession) return;
-    currentSession.updateConfig(config);
+    currentSession.updateConfig(config ?? {});
   }
 
-  function getCurrentSession(){
+  function getCurrentSession(): ActiveSessionHandle | null {
     return currentSession;
   }
 
-  function setUnitSkin(unitId, skinKey){
+  function setUnitSkin(unitId: string, skinKey: string | null | undefined): boolean {
     if (!currentSession) return false;
     return currentSession.setUnitSkin(unitId, skinKey);
   }
 
-  function onGameEvent(type, handler){
-    if (!currentSession) return ()=>{};
-    return currentSession.onEvent(type, handler);
+  function onGameEvent<T extends GameEventType>(
+    type: T,
+    handler: GameEventHandler<T>,
+  ): () => void {
+    const subscribe = currentSession?.onEvent ?? addGameEventListener;
+    return subscribe(type, handler);
   }
-
   exports.gameEvents = __reexport0.gameEvents;
   exports.emitGameEvent = __reexport0.emitGameEvent;
   exports.dispatchGameEvent = __reexport0.dispatchGameEvent;
@@ -6817,47 +7458,103 @@ __define('./main.js', (exports, module, __require) => {
   exports.setUnitSkin = setUnitSkin;
   exports.onGameEvent = onGameEvent;
 });
-__define('./meta.js', (exports, module, __require) => {
+__define('./meta.ts', (exports, module, __require) => {
   //v0.8
-  // meta.js — gom lookup + stat khởi tạo + nộ khởi điểm
-  const __dep0 = __require('./catalog.js');
+  // meta.ts — gom lookup + stat khởi tạo + nộ khởi điểm
+  const __dep0 = __require('./catalog.ts');
   const CLASS_BASE = __dep0.CLASS_BASE;
-  const getMetaById = __dep0.getMetaById;
   const applyRankAndMods = __dep0.applyRankAndMods;
-  const __dep1 = __require('./utils/kit.js');
-  const kitSupportsSummon = __dep1.kitSupportsSummon;
+  const getMetaById = __dep0.getMetaById;
+  const __dep1 = __require('./utils/kit.ts');
   const extractOnSpawnRage = __dep1.extractOnSpawnRage;
+  const kitSupportsSummon = __dep1.kitSupportsSummon;
+
+
+
+
+
+  type MetaId = UnitId | string | null | undefined;
+
+  export interface InstanceStats {
+    hpMax: number;
+    hp: number;
+    atk: number;
+    wil: number;
+    arm: number;
+    res: number;
+    agi: number;
+    per: number;
+    spd: number;
+    aeMax: number;
+    ae: number;
+    aeRegen: number;
+    hpRegen: number;
+    [extra: string]: number;
+  }
+
+  export interface InitialRageOptions {
+    isLeader?: boolean;
+    revive?: boolean;
+    reviveSpec?: { rage?: number } | null | undefined;
+    [extra: string]: unknown;
+  }
+
+  interface MetaService {
+    get(id: MetaId): MetaEntry | undefined;
+    classOf(id: MetaId): MetaEntry['class'] | null;
+    rankOf(id: MetaId): MetaEntry['rank'] | null;
+    kit(id: MetaId): MetaEntry['kit'] | null;
+    isSummoner(id: MetaId): boolean;
+  }
 
   // Dùng trực tiếp catalog cho tra cứu
   const Meta = {
-    get: getMetaById,
-    classOf(id){ return (this.get(id)?.class) ?? null; },
-    rankOf(id){  return (this.get(id)?.rank)  ?? null; },
-    kit(id){     return (this.get(id)?.kit)   ?? null; },
-    isSummoner(id){
-      const m = this.get(id);
-      return !!(m && m.class === 'Summoner' && kitSupportsSummon(m));
-    }
-  };
+    get: getMetaById as MetaService['get'],
+    classOf(id: MetaId) {
+      const entry = getMetaById(id);
+      return entry?.class ?? null;
+    },
+    rankOf(id: MetaId) {
+      const entry = getMetaById(id);
+      return entry?.rank ?? null;
+    },
+    kit(id: MetaId) {
+      const entry = getMetaById(id);
+      return (entry?.kit ?? null) as MetaEntry['kit'] | null;
+    },
+    isSummoner(id: MetaId) {
+      const entry = getMetaById(id);
+      return !!(entry && entry.class === 'Summoner' && kitSupportsSummon(entry));
+    },
+  } satisfies MetaService;
 
   // Tạo chỉ số instance theo class+rank+mods (SPD không nhân theo rank)
-  function makeInstanceStats(unitId){
-    const m = Meta.get(unitId);
-    if (!m) return {};
-    const fin = applyRankAndMods(CLASS_BASE[m.class], m.rank, m.mods);
+  function makeInstanceStats(unitId: MetaId): InstanceStats | Record<string, never> {
+    const entry = Meta.get(unitId);
+    if (!entry) return {};
+    const base: CatalogStatBlock | undefined = CLASS_BASE[entry.class];
+    if (!base) return {};
+    const fin = applyRankAndMods(base, entry.rank, entry.mods);
     return {
-      hpMax: fin.HP|0, hp: fin.HP|0,
-      atk: fin.ATK|0, wil: fin.WIL|0,
-      arm: fin.ARM||0, res: fin.RES||0,
-      agi: fin.AGI|0, per: fin.PER|0,
-      spd: fin.SPD||1,
-      aeMax: fin.AEmax|0, ae: 0, aeRegen: fin.AEregen||0, hpRegen: fin.HPregen||0
-    };
+      hpMax: Math.trunc(fin.HP ?? 0),
+      hp: Math.trunc(fin.HP ?? 0),
+      atk: Math.trunc(fin.ATK ?? 0),
+      wil: Math.trunc(fin.WIL ?? 0),
+      arm: fin.ARM || 0,
+      res: fin.RES || 0,
+      agi: Math.trunc(fin.AGI ?? 0),
+      per: Math.trunc(fin.PER ?? 0),
+      spd: fin.SPD || 1,
+      aeMax: Math.trunc(fin.AEmax ?? 0),
+      ae: 0,
+      aeRegen: fin.AEregen || 0,
+      hpRegen: fin.HPregen || 0,
+    } satisfies InstanceStats;
   }
 
   // Nộ khi vào sân (trừ leader). Revive: theo spec của skill.
-  function initialRageFor(unitId, opts = {}){
-    const onSpawn = Meta.kit(unitId)?.onSpawn;
+  function initialRageFor(unitId: MetaId, opts: InitialRageOptions = {}): number {
+    const onSpawn = Meta.kit(unitId)?.onSpawn as { exceptLeader?: boolean } | undefined;
     if (!onSpawn) return 0;
     if (onSpawn.exceptLeader && opts.isLeader) {
       const leaderSpecific = extractOnSpawnRage(onSpawn, { ...opts, isLeader: true });
@@ -6865,10 +7562,9 @@ __define('./meta.js', (exports, module, __require) => {
     }
     const amount = extractOnSpawnRage(onSpawn, opts);
     if (amount != null) return Math.max(0, amount);
-    if (opts.revive) return Math.max(0, (opts.reviveSpec?.rage) ?? 0);
+    if (opts.revive) return Math.max(0, opts.reviveSpec?.rage ?? 0);
     return 0;
   }
-
   exports.Meta = Meta;
   exports.makeInstanceStats = makeInstanceStats;
   exports.initialRageFor = initialRageFor;
@@ -6886,13 +7582,13 @@ __define('./modes/coming-soon.stub.ts', (exports, module, __require) => {
   exports.comingSoon = comingSoon;
   exports.COMING_SOON_MODULE = COMING_SOON_MODULE;
 });
-__define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => {
-  //v0.7.6
+__define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => {
+  //v0.7.7
   const __dep2 = __require('./turns.ts');
   const stepTurn = __dep2.stepTurn;
   const doActionOrSkip = __dep2.doActionOrSkip;
   const predictSpawnCycle = __dep2.predictSpawnCycle;
-  const __dep3 = __require('./summon.js');
+  const __dep3 = __require('./summon.ts');
   const enqueueImmediate = __dep3.enqueueImmediate;
   const processActionChain = __dep3.processActionChain;
   const __dep4 = __require('./ai.ts');
@@ -6900,12 +7596,12 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
   const aiMaybeAct = __dep4.aiMaybeAct;
   const __dep5 = __require('./statuses.ts');
   const Statuses = __dep5.Statuses;
-  const __dep6 = __require('./config.js');
+  const __dep6 = __require('./config.ts');
   const CFG = __dep6.CFG;
   const CAM = __dep6.CAM;
   const __dep7 = __require('./units.ts');
   const UNITS = __dep7.UNITS;
-  const __dep8 = __require('./meta.js');
+  const __dep8 = __require('./meta.ts');
   const Meta = __dep8.Meta;
   const makeInstanceStats = __dep8.makeInstanceStats;
   const initialRageFor = __dep8.initialRageFor;
@@ -6916,14 +7612,14 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
   const healUnit = __dep9.healUnit;
   const grantShield = __dep9.grantShield;
   const applyDamage = __dep9.applyDamage;
-  const __dep10 = __require('./utils/fury.js');
+  const __dep10 = __require('./utils/fury.ts');
   const initializeFury = __dep10.initializeFury;
   const setFury = __dep10.setFury;
   const spendFury = __dep10.spendFury;
   const resolveUltCost = __dep10.resolveUltCost;
   const gainFury = __dep10.gainFury;
   const finishFuryHit = __dep10.finishFuryHit;
-  const __dep11 = __require('./catalog.js');
+  const __dep11 = __require('./catalog.ts');
   const ROSTER = __dep11.ROSTER;
   const ROSTER_MAP = __dep11.ROSTER_MAP;
   const CLASS_BASE = __dep11.CLASS_BASE;
@@ -6946,15 +7642,15 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
   const cellReserved = __dep12.cellReserved;
   const ORDER_ENEMY = __dep12.ORDER_ENEMY;
   const ART_SPRITE_EVENT = __dep12.ART_SPRITE_EVENT;
-  const __dep13 = __require('./background.js');
+  const __dep13 = __require('./background.ts');
   const drawEnvironmentProps = __dep13.drawEnvironmentProps;
-  const __dep14 = __require('./art.js');
+  const __dep14 = __require('./art.ts');
   const getUnitArt = __dep14.getUnitArt;
   const setUnitSkin = __dep14.setUnitSkin;
-  const __dep15 = __require('./ui.js');
+  const __dep15 = __require('./ui.ts');
   const initHUD = __dep15.initHUD;
   const startSummonBar = __dep15.startSummonBar;
-  const __dep16 = __require('./vfx.js');
+  const __dep16 = __require('./vfx.ts');
   const vfxDraw = __dep16.vfxDraw;
   const vfxAddSpawn = __dep16.vfxAddSpawn;
   const vfxAddHit = __dep16.vfxAddHit;
@@ -6963,7 +7659,7 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
   const vfxAddBloodPulse = __dep16.vfxAddBloodPulse;
   const vfxAddGroundBurst = __dep16.vfxAddGroundBurst;
   const vfxAddShieldWrap = __dep16.vfxAddShieldWrap;
-  const __dep17 = __require('./scene.js');
+  const __dep17 = __require('./scene.ts');
   const drawBattlefieldScene = __dep17.drawBattlefieldScene;
   const __dep18 = __require('./events.ts');
   const gameEvents = __dep18.gameEvents;
@@ -6973,11 +7669,12 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
   const ACTION_END = __dep18.ACTION_END;
   const BATTLE_END = __dep18.BATTLE_END;
   const emitGameEvent = __dep18.emitGameEvent;
-  const __dep19 = __require('./utils/dummy.js');
+  const addGameEventListener = __dep18.addGameEventListener;
+  const __dep19 = __require('./utils/dummy.ts');
   const ensureNestedModuleSupport = __dep19.ensureNestedModuleSupport;
-  const __dep20 = __require('./utils/time.js');
+  const __dep20 = __require('./utils/time.ts');
   const safeNow = __dep20.safeNow;
-  const __dep21 = __require('./utils/kit.js');
+  const __dep21 = __require('./utils/kit.ts');
   const getSummonSpec = __dep21.getSummonSpec;
   const resolveSummonSlots = __dep21.resolveSummonSlots;
   const __dep22 = __require('./modes/pve/session-state.ts');
@@ -6986,6 +7683,8 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
   const invalidateSceneCache = __dep22.invalidateSceneCache;
   const ensureSceneCache = __dep22.ensureSceneCache;
   const clearBackgroundSignatureCache = __dep22.clearBackgroundSignatureCache;
+  const normalizeDeckEntries = __dep22.normalizeDeckEntries;
+
 
 
 
@@ -6998,6 +7697,86 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
   type PveSessionStartConfig = StartConfigOverrides & {
     root?: RootLike;
     rootEl?: RootLike;
+  };
+
+  type FrameHandle = number | ReturnType<typeof setTimeout>;
+  type GradientValue = CanvasGradient | string | undefined;
+  type CanvasClickHandler = ((event: Event) => void) | null;
+  type ClockState = {
+    startMs: number;
+    lastTimerRemain: number;
+    lastCostCreditedSec: number;
+    turnEveryMs: number;
+    lastTurnStepMs: number;
+  };
+  type ExtendedQueuedSummon = (QueuedSummonRequest & {
+    art?: ReturnType<typeof getUnitArt> | null;
+    skinKey?: string | null;
+    color?: string | null;
+    [extra: string]: unknown;
+  }) | null;
+  type DeckEntry = PveDeckEntry;
+  type CameraPreset = { topScale?: number; rowGapRatio?: number; depthScale?: number } | null | undefined;
+  type GridSpec = ReturnType<typeof makeGrid>;
+
+  const isDeckEntry = (value: unknown): value is DeckEntry => {
+    if (!value || typeof value !== 'object') return false;
+    const candidate = value as { id?: unknown };
+    return typeof candidate.id === 'string' && candidate.id.trim() !== '';
+  };
+
+  function assertDeckEntry(value: unknown): asserts value is DeckEntry {
+    if (!isDeckEntry(value)) {
+      throw new TypeError('Thẻ bài không hợp lệ.');
+    }
+  }
+
+  function asDeckEntry<T>(value: T): DeckEntry {
+    assertDeckEntry(value);
+    return value;
+  }
+
+  function sanitizeDeckEntries(value: unknown): DeckEntry[] {
+    if (!Array.isArray(value)) return [];
+    let changed = false;
+    const normalized: DeckEntry[] = [];
+    for (const entry of value) {
+      if (isDeckEntry(entry)) {
+        normalized.push(entry);
+      } else {
+        changed = true;
+      }
+    }
+    return changed ? normalized : (value as DeckEntry[]);
+  }
+
+  function ensureDeck(): DeckEntry[] {
+    if (!Game) return [];
+    const deck = sanitizeDeckEntries(Game.deck3);
+    if (deck !== Game.deck3) {
+      Game.deck3 = deck;
+    }
+    return deck;
+  }
+
+  function ensureRoster(): ReadonlyArray<DeckEntry> {
+    if (!Game) return [];
+    const roster = sanitizeDeckEntries(Game.unitsAll);
+    if (roster !== Game.unitsAll) {
+      Game.unitsAll = roster;
+    }
+    return Game.unitsAll;
+  }
+
+  const getCardCost = (card: DeckEntry | null | undefined): number => {
+    if (!card) return 0;
+    const raw = card.cost;
+    if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
+    if (typeof raw === 'string') {
+      const parsed = Number(raw);
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+    return 0;
   };
 
   export type PveSessionHandle = {
@@ -7026,8 +7805,8 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
   };
 
   type EnemyAIPreset = {
-    deck?: ReadonlyArray<string>;
-    unitsAll?: ReadonlyArray<string>;
+    deck?: ReadonlyArray<PveDeckEntry>;
+    unitsAll?: ReadonlyArray<PveDeckEntry>;
     costCap?: number;
     summonLimit?: number;
     startingDeck?: ReadonlyArray<UnitToken>;
@@ -7035,38 +7814,56 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
 
   let canvas: HTMLCanvasElement | null = null;
   let ctx: CanvasRenderingContext2D | null = null;
-  let hud: { update: (g: any) => void; cleanup?: () => void } | null = null;   // ← THÊM
+  let hud: HudHandles | null = null;
+  let summonBarHandle: SummonBarHandles | null = null;
   let hudCleanup: (() => void) | null = null;
   const CAM_PRESET = CAM[CFG.CAMERA] || CAM.landscape_oblique;
   const HAND_SIZE  = CFG.HAND_SIZE ?? 4;
 
   ensureNestedModuleSupport();
 
-  const getNow = () => safeNow();
+  const getNow = (): number => safeNow();
 
   // --- Instance counters (để gắn id cho token/minion) ---
   let _IID = 1;
   let _BORN = 1;
-  const nextIid = ()=> _IID++;
+  const nextIid = (): number => _IID++;
 
   let Game: SessionState | null = null;
-  let tickLoopHandle = null;
+  let tickLoopHandle: FrameHandle | null = null;
   let tickLoopUsesTimeout = false;
-  let resizeHandler = null;
-  let visualViewportResizeHandler = null;
-  let visualViewportScrollHandler = null;
-  let resizeSchedulerHandle = null;
+  let resizeHandler: (() => void) | null = null;
+  let visualViewportResizeHandler: (() => void) | null = null;
+  let visualViewportScrollHandler: (() => void) | null = null;
+  let resizeSchedulerHandle: FrameHandle | null = null;
   let resizeSchedulerUsesTimeout = false;
   let pendingResize = false;
-  let canvasClickHandler = null;
-  let artSpriteHandler = null;
+  let canvasClickHandler: CanvasClickHandler = null;
+  let artSpriteHandler: (() => void) | null = null;
   let visibilityHandlerBound = false;
-  let winRef = null;
-  let docRef = null;
-  let rootElement = null;
+  let winRef: (Window & typeof globalThis) | null = null;
+  let docRef: Document | null = null;
+  let rootElement: Element | Document | null = null;
   let storedConfig: NormalizedSessionConfig = normalizeConfig();
   let running = false;
-  const hpBarGradientCache = new Map();
+  const hpBarGradientCache = new Map<string, GradientValue>();
+
+  const renderSummonBar = (): void => {
+    const bar = (Game?.ui?.bar ?? null) as { render?: () => void } | null;
+    if (bar?.render) bar.render();
+  };
+
+  function cleanupSummonBar(): void {
+    if (summonBarHandle && typeof summonBarHandle.cleanup === 'function'){
+      try {
+        summonBarHandle.cleanup();
+      } catch {}
+    }
+    summonBarHandle = null;
+    if (Game?.ui){
+      Game.ui.bar = null;
+    }
+  }
 
   function resetSessionState(options: StartConfigOverrides = {}): void {
     storedConfig = normalizeConfig({ ...storedConfig, ...options });
@@ -7078,40 +7875,50 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
   }
 
   if (CFG?.DEBUG?.LOG_EVENTS) {
-    const logEvent = (type) => (ev)=>{
-      const detail = ev?.detail || {};
-      const unit = detail.unit;
+    const logEvent = (type: string) => (ev: Event): void => {
+      const detailRaw = (ev as CustomEvent<Record<string, unknown>> | null)?.detail ?? {};
+      const detail = detailRaw as Record<string, unknown>;
+      const unitRaw = detail['unit'] as { id?: string; name?: string } | null | undefined;
+      const readString = (value: unknown): string | null => (typeof value === 'string' ? value : null);
+      const readNumber = (value: unknown): number | null => {
+        if (typeof value === 'number' && Number.isFinite(value)) return value;
+        if (typeof value === 'string'){
+          const parsed = Number(value);
+          return Number.isFinite(parsed) ? parsed : null;
+        }
+        return null;
+      };
       const info = {
-        side: detail.side ?? null,
-        slot: detail.slot ?? null,
-        cycle: detail.cycle ?? null,
-        orderIndex: detail.orderIndex ?? null,
-        orderLength: detail.orderLength ?? null,
-        phase: detail.phase ?? null,
-        unit: unit?.id || unit?.name || null,
-        action: detail.action || null,
-        skipped: detail.skipped || false,
-        reason: detail.reason || null,
-        processedChain: detail.processedChain ?? null
+        side: readString(detail['side']),
+        slot: readNumber(detail['slot']),
+        cycle: readNumber(detail['cycle']),
+        orderIndex: readNumber(detail['orderIndex']),
+        orderLength: readNumber(detail['orderLength']),
+        phase: readString(detail['phase']),
+        unit: readString(unitRaw?.id) ?? readString(unitRaw?.name),
+        action: readString(detail['action']),
+        skipped: Boolean(detail['skipped']),
+        reason: readString(detail['reason']),
+        processedChain: detail['processedChain'] ?? null,
       };
       console.debug(`[events] ${type}`, info);
     };
-    const types = [TURN_START, TURN_END, ACTION_START, ACTION_END];
+    const types = [TURN_START, TURN_END, ACTION_START, ACTION_END] as const;
     for (const type of types){
       try {
-        gameEvents.addEventListener(type, logEvent(type));
+        addGameEventListener(type, logEvent(type));
       } catch (err) {
         console.error('[events]', err);
       }
     }
   }
 
-  let drawFrameHandle = null;
+  let drawFrameHandle: FrameHandle | null = null;
   let drawFrameUsesTimeout = false;
   let drawPending = false;
   let drawPaused = false;
 
-  function cancelScheduledDraw(){
+  function cancelScheduledDraw(): void {
     if (drawFrameHandle !== null){
       if (drawFrameUsesTimeout){
         clearTimeout(drawFrameHandle);
@@ -7129,7 +7936,7 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
     drawPending = false;
   }
 
-  function scheduleDraw(){
+  function scheduleDraw(): void {
     if (drawPaused) return;
     if (drawPending) return;
     if (!canvas || !ctx) return;
@@ -7168,7 +7975,7 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
     }
   }
 
-  function cancelScheduledResize(){
+  function cancelScheduledResize(): void {
     if (resizeSchedulerHandle !== null){
       if (resizeSchedulerUsesTimeout){
         clearTimeout(resizeSchedulerHandle);
@@ -7186,7 +7993,7 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
     pendingResize = false;
   }
 
-  function flushScheduledResize(){
+  function flushScheduledResize(): void {
     resizeSchedulerHandle = null;
     resizeSchedulerUsesTimeout = false;
     pendingResize = false;
@@ -7201,7 +8008,7 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
     }
   }
 
-  function scheduleResize(){
+  function scheduleResize(): void {
     if (pendingResize) return;
     pendingResize = true;
     const raf = (winRef && typeof winRef.requestAnimationFrame === 'function')
@@ -7216,43 +8023,70 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
     }
   }
 
-  function refreshQueuedArtFor(unitId){
-    const apply = (map)=>{
+  const DEFAULT_TOKEN_COLOR = '#a9f58c';
+
+  function refreshQueuedArtFor(unitId: string): void {
+    const apply = (map: Map<number, QueuedSummonRequest> | null | undefined): void => {
       if (!map || typeof map.values !== 'function') return;
       for (const pending of map.values()){
         if (!pending || pending.unitId !== unitId) continue;
         const updated = getUnitArt(unitId);
-        pending.art = updated;
-        pending.skinKey = updated?.skinKey;
-        if (!pending.color && updated?.palette?.primary){
-          pending.color = updated.palette.primary;
+        const pendingExt = pending as ExtendedQueuedSummon;
+        if (pendingExt){
+          const nextColor = updated?.palette?.primary ?? pendingExt.color ?? DEFAULT_TOKEN_COLOR;
+          pendingExt.art = updated ?? null;
+          pendingExt.skinKey = updated?.skinKey ?? null;
+          pendingExt.color = nextColor;
         }
       }
     };
-    apply(Game.queued?.ally);
-    apply(Game.queued?.enemy);
+    if (!Game?.queued) return;
+    apply(Game.queued.ally);
+    apply(Game.queued.enemy);
   }
 
   function setUnitSkinForSession(unitId: string, skinKey: string | null | undefined): boolean {
     if (!Game) return false;
     const ok = setUnitSkin(unitId, skinKey);
     if (!ok) return false;
+    const art = getUnitArt(unitId);
+    const resolvedSkin = art?.skinKey ?? null;
+    const primaryColor = art?.palette?.primary ?? null;
+    const resolveColor = (current: string | null | undefined): string => {
+      return primaryColor ?? current ?? DEFAULT_TOKEN_COLOR;
+    };
+    const applyArtMetadata = (entry: DeckEntry | null | undefined): void => {
+      if (!entry || entry.id !== unitId) return;
+      const nextColor = resolveColor(entry.color);
+      entry.art = art ?? null;
+      entry.skinKey = resolvedSkin;
+      entry.color = nextColor;
+    };
     const tokens = Game.tokens || [];
     for (const token of tokens){
       if (!token || token.id !== unitId) continue;
-      const art = getUnitArt(unitId);
+      const nextColor = resolveColor(token.color);
       token.art = art;
-      token.skinKey = art?.skinKey;
-      if (!token.color && art?.palette?.primary){
-        token.color = art.palette.primary;
+      token.skinKey = resolvedSkin;
+      token.color = nextColor;
+    }
+    if (Array.isArray(Game.deck3)){
+      for (const entry of Game.deck3){
+        applyArtMetadata(entry as DeckEntry);
+      }
+    }
+    if (Array.isArray(Game.unitsAll)){
+      for (const entry of Game.unitsAll){
+        applyArtMetadata(entry as DeckEntry);
       }
     }
     refreshQueuedArtFor(unitId);
+    renderSummonBar();
     scheduleDraw();
     return true;
   }
 
-  function setDrawPaused(paused){
+  function setDrawPaused(paused: boolean): void {
     drawPaused = !!paused;
     if (drawPaused){
       cancelScheduledDraw();
@@ -7260,22 +8094,22 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
       scheduleDraw();
     }
   }
-  function bindArtSpriteListener(){
+  function bindArtSpriteListener(): void {
     if (!winRef || typeof winRef.addEventListener !== 'function') return;
     if (artSpriteHandler) return;
     artSpriteHandler = ()=>{ invalidateSceneCache(); scheduleDraw(); };
     winRef.addEventListener(ART_SPRITE_EVENT, artSpriteHandler);
   }
 
-  function unbindArtSpriteListener(){
+  function unbindArtSpriteListener(): void {
     if (!winRef || !artSpriteHandler || typeof winRef.removeEventListener !== 'function') return;
     winRef.removeEventListener(ART_SPRITE_EVENT, artSpriteHandler);
     artSpriteHandler = null;
   }
   // Master clock theo timestamp – tránh drift giữa nhiều interval
-  let CLOCK = null;
+  let CLOCK: ClockState | null = null;
 
-  function createClock(){
+  function createClock(): ClockState {
     const now = getNow();
     return {
       startMs: now,
@@ -7288,7 +8122,7 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
 
   // Xác chết chờ vanish (để sau này thay bằng dead-animation)
   const DEATH_VANISH_MS = 900;
-  function cleanupDead(now){
+  function cleanupDead(now: number): void {
     if (!Game?.tokens) return;
     const tokens = Game.tokens;
     const keep = [];
@@ -7303,14 +8137,17 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
   }
 
   // LẤY TỪ INSTANCE đang đứng trên sân (đúng spec: thừa hưởng % chỉ số hiện tại của chủ)
-  function creepStatsFromInherit(masterUnit, inherit){
+  function creepStatsFromInherit(
+    masterUnit: UnitToken | null | undefined,
+    inherit: Record<string, unknown> | null | undefined,
+  ): Partial<Pick<UnitToken, 'hpMax' | 'hp' | 'atk' | 'wil' | 'res' | 'arm'>> {
     if (!inherit || typeof inherit !== 'object') return {};
     const hpMax = Math.round((masterUnit?.hpMax || 0) * ((inherit.HP ?? inherit.hp ?? inherit.HPMax ?? inherit.hpMax) || 0));
     const atk   = Math.round((masterUnit?.atk   || 0) * ((inherit.ATK ?? inherit.atk) || 0));
     const wil   = Math.round((masterUnit?.wil   || 0) * ((inherit.WIL ?? inherit.wil) || 0));
     const res   = Math.round((masterUnit?.res   || 0) * ((inherit.RES ?? inherit.res) || 0));
     const arm   = Math.round((masterUnit?.arm   || 0) * ((inherit.ARM ?? inherit.arm) || 0) * 100) / 100;
-    const stats = {};
+    const stats: Partial<Pick<UnitToken, 'hpMax' | 'hp' | 'atk' | 'wil' | 'res' | 'arm'>> = {};
     if (hpMax > 0){ stats.hpMax = hpMax; stats.hp = hpMax; }
     if (atk > 0) stats.atk = atk;
     if (wil > 0) stats.wil = wil;
@@ -7319,14 +8156,14 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
     return stats;
   }
 
-  function getMinionsOf(masterIid){
-    return (Game?.tokens || []).filter(t => t.isMinion && t.ownerIid === masterIid && t.alive);
+  function getMinionsOf(masterIid: number): UnitToken[] {
+    return (Game?.tokens || []).filter((t) => t.isMinion && t.ownerIid === masterIid && t.alive);
   }
-  function removeOldestMinions(masterIid, count){
+  function removeOldestMinions(masterIid: number, count: number): void {
     if (count <= 0) return;
     const tokens = Game?.tokens;
     if (!tokens) return;
-    const list = getMinionsOf(masterIid).sort((a,b)=> (a.bornSerial||0) - (b.bornSerial||0));
+    const list = getMinionsOf(masterIid).sort((a, b) => (a.bornSerial || 0) - (b.bornSerial || 0));
     for (let i=0;i<count && i<list.length;i++){
       const x = list[i];
       x.alive = false;
@@ -7335,7 +8172,7 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
       if (idx >= 0) tokens.splice(idx,1);
     }
   }
-  function extendBusy(duration){
+  function extendBusy(duration: number): void {
     if (!Game || !Game.turn) return;
     const now = getNow();
     const prev = Number.isFinite(Game.turn.busyUntil) ? Game.turn.busyUntil : now;
@@ -7344,7 +8181,7 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
   }
 
   // Thực thi Ult: Summoner -> Immediate Summon theo meta; class khác: trừ nộ
-  function performUlt(unit){
+  function performUlt(unit: UnitToken): void {
     if (!Game){
       setFury(unit, 0);
       return;
@@ -7484,7 +8321,7 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
           }
         }
 
-        const applyBusyFromVfx = (startedAt, duration) => {
+        const applyBusyFromVfx = (startedAt: number, duration: number | null | undefined): void => {
           if (!Number.isFinite(startedAt) || !Number.isFinite(duration)) return;
           busyMs = Math.max(busyMs, duration);
           if (Game?.turn){
@@ -7789,7 +8626,7 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
     extendBusy(busyMs);
     spendFury(unit, resolveUltCost(unit));
   }
-  const tokensAlive = () => (Game?.tokens || []).filter(t => t.alive);
+  const tokensAlive = (): UnitToken[] => (Game?.tokens || []).filter((t) => t.alive);
 
   function ensureBattleState(game: SessionState | null): BattleState | null {
     if (!game || typeof game !== 'object') return null;
@@ -7802,7 +8639,6 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
         finishedAt: 0,
         result: null,
       } as BattleState;
-      };
     }
     if (typeof game.result === 'undefined'){
       game.result = null;
@@ -7843,7 +8679,7 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
     };
   }
 
-  function isBossToken(game, token){
+  function isBossToken(game: SessionState | null, token: UnitToken | null | undefined): boolean {
     if (!token) return false;
     if (token.isBoss) return true;
     const rankRaw = typeof token.rank === 'string' && token.rank ? token.rank : (game?.meta?.rankOf?.(token.id) || '');
@@ -7851,7 +8687,7 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
     return rank === 'boss';
   }
 
-  function isPvpMode(game){
+  function isPvpMode(game: SessionState | null): boolean {
     const key = (game?.modeKey || '').toString().toLowerCase();
     if (!key) return false;
     if (key === 'ares') return true;
@@ -7969,7 +8805,7 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
     return finalizeBattle(game, { winner, reason, detail, finishedAt }, contextDetail);
   }
   // Giảm TTL minion của 1 phe sau khi phe đó kết thúc phase
-  function tickMinionTTL(side){
+  function tickMinionTTL(side: Side): void {
     // gom những minion hết hạn để xoá sau vòng lặp
     if (!Game?.tokens) return;
     const tokens = Game.tokens;
@@ -7991,78 +8827,95 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
     }
   }
 
-  function init(){
+  function init(): boolean {
     if (!Game) return false;
     if (Game._inited) return true;
-    const doc = docRef || (typeof document !== 'undefined' ? document : null);
+    const doc = docRef ?? (typeof document !== 'undefined' ? document : null);
     if (!doc) return false;
-    const root = rootElement || null;
-    const boardFromRoot = (root && typeof root.querySelector === 'function')
-      ? root.querySelector('#board')
+    const root = rootElement ?? null;
+    const boardFromRoot = (root && typeof (root as ParentNode).querySelector === 'function')
+      ? (root as ParentNode).querySelector('#board')
       : null;
-    const boardFromDocument = (typeof doc.querySelector === 'function')
+    const boardFromDocument = typeof doc.querySelector === 'function'
       ? doc.querySelector('#board')
-      : (typeof doc.getElementById === 'function' ? doc.getElementById('board') : null);
-    const boardEl = (boardFromRoot || boardFromDocument) as HTMLCanvasElement | null;
+    : typeof doc.getElementById === 'function'
+        ? doc.getElementById('board')
+        : null;
+    const boardEl = (boardFromRoot ?? boardFromDocument) as HTMLCanvasElement | null;
     if (!boardEl){
       return false;
     }
     canvas = boardEl;
-    ctx = boardEl.getContext('2d') as CanvasRenderingContext2D;
+    ctx = boardEl.getContext('2d') as CanvasRenderingContext2D | null;
     
     if (typeof hudCleanup === 'function'){
       hudCleanup();
       hudCleanup = null;
     }
-    hud = initHUD(doc, root);
-    hudCleanup = (hud && typeof hud.cleanup === 'function') ? hud.cleanup : null;
+    hud = initHUD(doc, root ?? undefined);
+    hudCleanup = hud ? () => hud.cleanup() : null;;
     resize();
     if (Game.grid) spawnLeaders(Game.tokens, Game.grid);
 
     const tokens = Game.tokens || [];
-    tokens.forEach(t=>{
+    for (const t of tokens){
       if (t.id === 'leaderA' || t.id === 'leaderB'){
         vfxAddSpawn(Game, t.cx, t.cy, t.side);
       }
-    });
-    tokens.forEach(t=>{
+  }
+    for (const t of tokens){
       if (!t.iid) t.iid = nextIid();
       if (t.id === 'leaderA' || t.id === 'leaderB'){
         Object.assign(t, {
-          hpMax: 1600, hp: 1600, arm: 0.12, res: 0.12, atk: 40, wil: 30,
-          aeMax: 0, ae: 0
+          hpMax: 1600,
+          hp: 1600,
+          arm: 0.12,
+          res: 0.12,
+          atk: 40,
+          wil: 30,
+          aeMax: 0,
+          ae: 0,
         });
         initializeFury(t, t.id, 0);
       }
-    });
-    tokens.forEach(t => { if (!t.iid) t.iid = nextIid(); });
+  }
+    for (const t of tokens){
+      if (!t.iid) t.iid = nextIid();
+    }
 
-    if (hud && typeof hud.update === 'function' && Game) hud.update(Game);
+    if (hud && Game) hud.update(Game);
     scheduleDraw();
     Game._inited = true;
 
     refillDeck();
     refillDeckEnemy(Game);
 
-    Game.ui.bar = startSummonBar(doc, {
-      onPick: (c)=>{
-        Game.selectedId = c.id;
-        Game.ui.bar.render();
+    cleanupSummonBar();
+    const barHandle = startSummonBar(doc, {
+      onPick: (card): void => {
+        const entry = asDeckEntry(card);
+        Game.selectedId = entry.id;
+        renderSummonBar();
       },
-      canAfford: (c)=> Game.cost >= c.cost,
-      getDeck: ()=> Game.deck3,
-      getSelectedId: ()=> Game.selectedId
-    }, root);
+      canAfford: (card): boolean => {
+        const entry = asDeckEntry(card);
+        return Game.cost >= getCardCost(entry);
+      },
+      getDeck: () => ensureDeck(),
+      getSelectedId: () => Game.selectedId,
+    }, root ?? undefined);
+    summonBarHandle = barHandle;
+    Game.ui.bar = barHandle;
 
     selectFirstAffordable();
-    Game.ui.bar.render();
+    renderSummonBar();
 
-    if (canvasClickHandler){
+    if (canvasClickHandler && canvas){
       canvas.removeEventListener('click', canvasClickHandler);
       canvasClickHandler = null;
     }
-    canvasClickHandler = (ev)=>{
-      if (!Game.grid) return;
+    canvasClickHandler = (ev: MouseEvent): void => {
+      if (!canvas || !Game.grid) return;;
       const rect = canvas.getBoundingClientRect();
       const p = { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
       const cell = hitToCellOblique(Game.grid, p.x, p.y, CAM_PRESET);
@@ -8070,11 +8923,13 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
 
       if (cell.cx >= CFG.ALLY_COLS) return;
 
-      const card = Game.deck3.find(u => u.id === Game.selectedId);
+      const deck = ensureDeck();
+      const card = deck.find((u) => u.id === Game.selectedId) ?? null;
       if (!card) return;
 
       if (cellReserved(tokensAlive(), Game.queued, cell.cx, cell.cy)) return;
-      if (Game.cost < card.cost) return;
+      const cardCost = getCardCost(card);
+      if (Game.cost < cardCost) return;
       if (Game.summoned >= Game.summonLimit) return;
 
       const slot = slotIndex('ally', cell.cx, cell.cy);
@@ -8082,76 +8937,85 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
 
       const spawnCycle = predictSpawnCycle(Game, 'ally', slot);
       const pendingArt = getUnitArt(card.id);
-      const pending = {
-        unitId: card.id, name: card.name, side:'ally',
-        cx: cell.cx, cy: cell.cy, slot, spawnCycle,
+      const pending: QueuedSummonRequest & {
+        art?: ReturnType<typeof getUnitArt> | null;
+        skinKey?: string | null;
+      } = {
+        unitId: card.id,
+        name: typeof card.name === 'string' ? card.name : null,
+        side: 'ally',
+        cx: cell.cx,
+        cy: cell.cy,
+        slot,
+        spawnCycle,
         source: 'deck',
         color: pendingArt?.palette?.primary || '#a9f58c',
-        art: pendingArt,
-        skinKey: pendingArt?.skinKey
+        art: pendingArt ?? null,
+        skinKey: pendingArt?.skinKey ?? null,
       };
       Game.queued.ally.set(slot, pending);
 
-      Game.cost = Math.max(0, Game.cost - card.cost);
-      if (hud && typeof hud.update === 'function' && Game) hud.update(Game);
+      Game.cost = Math.max(0, Game.cost - cardCost);
+      if (hud && Game) hud.update(Game);
       Game.summoned += 1;
       Game.usedUnitIds.add(card.id);
 
-      Game.deck3 = Game.deck3.filter(u => u.id !== card.id);
+      Game.deck3 = deck.filter((u) => u.id !== card.id);
       Game.selectedId = null;
       refillDeck();
       selectFirstAffordable();
-      Game.ui.bar.render();
+      renderSummonBar();
       scheduleDraw();
     };
-    canvas.addEventListener('click', canvasClickHandler);
+    if (canvas && canvasClickHandler){
+      canvas.addEventListener('click', canvasClickHandler);
+    }
 
     if (resizeHandler && winRef && typeof winRef.removeEventListener === 'function'){
       winRef.removeEventListener('resize', resizeHandler);
       resizeHandler = null;
     }
-    resizeHandler = ()=>{ scheduleResize(); };
-    if (winRef && typeof winRef.addEventListener === 'function'){
+    resizeHandler = (): void => { scheduleResize(); };
+    if (winRef && typeof winRef.addEventListener === 'function' && resizeHandler){
       winRef.addEventListener('resize', resizeHandler);
     }
 
-  const viewport = winRef?.visualViewport;
+    const viewport = winRef?.visualViewport ?? null;
     if (viewport && typeof viewport.addEventListener === 'function'){
       if (visualViewportResizeHandler && typeof viewport.removeEventListener === 'function'){
         viewport.removeEventListener('resize', visualViewportResizeHandler);
       }
-      visualViewportResizeHandler = ()=>{ scheduleResize(); };
+      visualViewportResizeHandler = (): void => { scheduleResize(); };
       viewport.addEventListener('resize', visualViewportResizeHandler);
 
       if (visualViewportScrollHandler && typeof viewport.removeEventListener === 'function'){
         viewport.removeEventListener('scroll', visualViewportScrollHandler);
       }
-      visualViewportScrollHandler = ()=>{ scheduleResize(); };
+      visualViewportScrollHandler = (): void => { scheduleResize(); };
       viewport.addEventListener('scroll', visualViewportScrollHandler);
     }
 
-    const queryFromRoot = (selector)=>{
-      if (root && typeof root.querySelector === 'function'){
-        const el = root.querySelector(selector);
+    const queryFromRoot = (selector: string): Element | null => {
+      if (root && typeof (root as ParentNode).querySelector === 'function'){
+        const el = (root as ParentNode).querySelector(selector);
         if (el) return el;
       }
       return null;
     };
-    
-    const updateTimerAndCost = (timestamp)=>{
-      if (!CLOCK) return;
-      if (!Game) return;
-      if (Game?.battle?.over) return;
 
-      const now = Number.isFinite(timestamp) ? timestamp : getNow();
+      const updateTimerAndCost = (timestamp?: number): void => {
+      if (!CLOCK || !Game) return;
+      if (Game.battle?.over) return;
+
+      const now = Number.isFinite(timestamp) ? Number(timestamp) : getNow();
       const elapsedSec = Math.floor((now - CLOCK.startMs) / 1000);
 
       const prevRemain = Number.isFinite(CLOCK.lastTimerRemain) ? CLOCK.lastTimerRemain : 0;
       const remain = Math.max(0, 240 - elapsedSec);
       if (remain !== CLOCK.lastTimerRemain){
         CLOCK.lastTimerRemain = remain;
-        const mm = String(Math.floor(remain/60)).padStart(2,'0');
-        const ss = String(remain%60).padStart(2,'0');
+        const mm = String(Math.floor(remain / 60)).padStart(2, '0');
+        const ss = String(remain % 60).padStart(2, '0');
         const tEl = (queryFromRoot('#timer') || doc.getElementById('timer')) as HTMLElement | null;
         if (tEl) tEl.textContent = `${mm}:${ss}`;
       }
@@ -8172,15 +9036,15 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
 
         CLOCK.lastCostCreditedSec = elapsedSec;
 
-        if (hud && typeof hud.update === 'function' && Game) hud.update(Game);
+        if (hud && Game) hud.update(Game);
         if (!Game.selectedId) selectFirstAffordable();
-        if (Game.ui?.bar) Game.ui.bar.render();
+        renderSummonBar();
         aiMaybeAct(Game, 'cost');
       }
 
-    if (Game?.battle?.over) return;
+     if (Game.battle?.over) return;
 
-      const busyUntil = (Game.turn?.busyUntil) ?? 0;
+      const busyUntil = Game.turn?.busyUntil ?? 0;
       if (now >= busyUntil && now - CLOCK.lastTurnStepMs >= CLOCK.turnEveryMs){
         CLOCK.lastTurnStepMs = now;
         stepTurn(Game, {
@@ -8188,7 +9052,7 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
           processActionChain,
           allocIid: nextIid,
           doActionOrSkip,
-          checkBattleEnd
+          checkBattleEnd,
         });
         cleanupDead(now);
         const postTurnResult = checkBattleEnd(Game, { trigger: 'post-turn', timestamp: now });
@@ -8201,14 +9065,14 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
       }
     };
 
-    const runTickLoop = (timestamp)=>{
+    const runTickLoop = (timestamp?: number): void => {
       tickLoopHandle = null;
       updateTimerAndCost(timestamp);
       if (!running || !CLOCK) return;
       scheduleTickLoop();
     };
 
-    function scheduleTickLoop(){
+    function scheduleTickLoop(): void {
       if (!running || !CLOCK) return;
       if (tickLoopHandle !== null) return;
       const raf = (winRef && typeof winRef.requestAnimationFrame === 'function')
@@ -8219,40 +9083,41 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
         tickLoopHandle = raf(runTickLoop);
       } else {
         tickLoopUsesTimeout = true;
-        tickLoopHandle = setTimeout(()=> runTickLoop(getNow()), 16);
+        tickLoopHandle = setTimeout(() => runTickLoop(getNow()), 16);
       }
     }
+
     updateTimerAndCost(getNow());
     scheduleTickLoop();
     return true;
   }
 
-  function selectFirstAffordable(){
+  function selectFirstAffordable(): void {
     if (!Game) return;
 
-    const deck = Array.isArray(Game.deck3) ? Game.deck3 : [];
+    const deck = ensureDeck();
     if (!deck.length){
       Game.selectedId = null;
       return;
     }
 
-    let cheapestAffordable = null;
+    let cheapestAffordable: DeckEntry | null = null;
     let cheapestAffordableCost = Infinity;
-    let cheapestOverall = null;
+    let cheapestOverall: DeckEntry | null = null;
     let cheapestOverallCost = Infinity;
 
     for (const card of deck){
       if (!card) continue;
 
-      const hasFiniteCost = Number.isFinite(card.cost);
-      const cardCost = hasFiniteCost ? card.cost : 0;
+      const cardCost = getCardCost(card);
 
       if (cardCost < cheapestOverallCost){
         cheapestOverall = card;
         cheapestOverallCost = cardCost;
       }
 
-      const affordable = !hasFiniteCost || card.cost <= Game.cost;
+      const costForComparison = Number.isFinite(cardCost) ? cardCost : 0;
+      const affordable = costForComparison <= Game.cost;
       if (affordable && cardCost < cheapestAffordableCost){
         cheapestAffordable = card;
         cheapestAffordableCost = cardCost;
@@ -8264,22 +9129,25 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
   }
 
   /* ---------- Deck logic ---------- */
-  function refillDeck(){
+  function refillDeck(): void {
     if (!Game) return;
 
-    const need = HAND_SIZE - Game.deck3.length;
+    const deck = ensureDeck();
+    const need = HAND_SIZE - deck.length;
     if (need <= 0) return;
 
     const exclude = new Set([
       ...Game.usedUnitIds,
-      ...Game.deck3.map(u=>u.id)
+      ...deck.map((u) => u.id)
     ]);
-    const more = pickRandom(Game.unitsAll, exclude).slice(0, need);
-    Game.deck3.push(...more);
+    const roster = ensureRoster();
+    const more = pickRandom(roster, exclude).slice(0, need);
+    deck.push(...more);
+    Game.deck3 = deck;
   }
 
   /* ---------- Vẽ ---------- */
-  function resize(){
+  function resize(): void {
     if (!canvas || !Game) return;                         // guard
     const prevGrid = Game?.grid ? {
       w: Game.grid.w,
@@ -8326,7 +9194,7 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
       invalidateSceneCache();
     }
   }
-  function draw(){
+  function draw(): void {
     if (!ctx || !canvas || !Game?.grid) return;           // guard
     const clearW = Game.grid?.w ?? canvas.width;
     const clearH = Game.grid?.h ?? canvas.height;
@@ -8355,12 +9223,12 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
     vfxDraw(ctx, Game, CAM_PRESET);
     drawHPBars();
   }
-  function cellCenterObliqueLocal(g, cx, cy, C){
+  function cellCenterObliqueLocal(g: GridSpec, cx: number, cy: number, C: CameraPreset): { x: number; y: number; scale: number } {
     const colsW = g.tile * g.cols;
     const topScale = ((C?.topScale) ?? 0.80);
     const rowGap = ((C?.rowGapRatio) ?? 0.62) * g.tile;
 
-    function rowLR(r){
+    function rowLR(r: number): { left: number; right: number } {
       const pinch = (1 - topScale) * colsW;
       const t = r / g.rows;
       const width = colsW - pinch * (1 - t);
@@ -8386,7 +9254,7 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
     return { x, y, scale };
   }
 
-  function roundedRectPathUI(ctx, x, y, w, h, radius){
+  function roundedRectPathUI(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, radius: number): void {
     const r = Math.min(radius, w / 2, h / 2);
     ctx.beginPath();
     ctx.moveTo(x + r, y);
@@ -8401,7 +9269,7 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
     ctx.closePath();
   }
 
-  function lightenColor(color, amount){
+  function lightenColor(color: string | null | undefined, amount: number): string | null | undefined {
     if (typeof color !== 'string') return color;
     if (!color.startsWith('#')) return color;
     let hex = color.slice(1);
@@ -8416,7 +9284,12 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
     return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
   }
 
-  function normalizeHpBarCacheKey(fillColor, innerHeight, innerRadius, startY){
+  function normalizeHpBarCacheKey(
+    fillColor: string | undefined,
+    innerHeight: number,
+    innerRadius: number,
+    startY: number,
+  ): string {
     const color = typeof fillColor === 'string' ? fillColor.trim().toLowerCase() : String(fillColor ?? '');
     const height = Number.isFinite(innerHeight) ? Math.max(0, Math.round(innerHeight)) : 0;
     const radius = Number.isFinite(innerRadius) ? Math.max(0, Math.round(innerRadius)) : 0;
@@ -8424,7 +9297,13 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
     return `${color}|h:${height}|r:${radius}|y:${start}`;
   }
 
-  function ensureHpBarGradient(fillColor, innerHeight, innerRadius, startY, x){
+  function ensureHpBarGradient(
+    fillColor: string | undefined,
+    innerHeight: number,
+    innerRadius: number,
+    startY: number,
+    x: number,
+  ): GradientValue {
     const key = normalizeHpBarCacheKey(fillColor, innerHeight, innerRadius, startY);
     const cached = hpBarGradientCache.get(key);
     if (cached) return cached;
@@ -8445,7 +9324,7 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
     return gradient;
   }
 
-  function drawHPBars(){
+  function drawHPBars(): void {
     if (!ctx || !Game?.grid) return;
     const baseR = Math.floor(Game.grid.tile * 0.36);
     const tokens = Game.tokens || [];
@@ -8496,12 +9375,12 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
     }
   }
   /* ---------- Chạy ---------- */
-  function handleVisibilityChange(){
+  function handleVisibilityChange(): void {
     if (!docRef) return;
     setDrawPaused(!!docRef.hidden);
   }
 
-  function bindVisibility(){
+  function bindVisibility(): void {
     if (visibilityHandlerBound) return;
     const doc = docRef;
     if (!doc || typeof doc.addEventListener !== 'function') return;
@@ -8509,7 +9388,7 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
     visibilityHandlerBound = true;
   }
 
-  function unbindVisibility(){
+  function unbindVisibility(): void {
     if (!visibilityHandlerBound) return;
     const doc = docRef;
     if (doc && typeof doc.removeEventListener === 'function'){
@@ -8518,7 +9397,7 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
     visibilityHandlerBound = false;
   }
 
-  function configureRoot(root){
+  function configureRoot(root: RootLike): void {
     rootElement = root || null;
     if (rootElement && rootElement.ownerDocument){
       docRef = rootElement.ownerDocument;
@@ -8530,7 +9409,7 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
     winRef = docRef?.defaultView ?? (typeof window !== 'undefined' ? window : null);
   }
 
-  function clearSessionTimers(){
+  function clearSessionTimers(): void {
     if (tickLoopHandle !== null){
       if (tickLoopUsesTimeout){
         clearTimeout(tickLoopHandle);
@@ -8549,7 +9428,7 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
     cancelScheduledResize();
   }
 
-  function clearSessionListeners(){
+  function clearSessionListeners(): void {
     if (canvas && canvasClickHandler && typeof canvas.removeEventListener === 'function'){
       canvas.removeEventListener('click', canvasClickHandler);
     }
@@ -8578,7 +9457,7 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
     unbindVisibility();
   }
 
-  function resetDomRefs(){
+  function resetDomRefs(): void {
     canvas = null;
     ctx = null;
     hud = null;
@@ -8587,9 +9466,10 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
     invalidateSceneCache();
   }
 
-  function stopSession(){
+  function stopSession(): void {
     clearSessionTimers();
     clearSessionListeners();
+    cleanupSummonBar();
     if (Game){
       if (Game.queued?.ally?.clear) Game.queued.ally.clear();
       if (Game.queued?.enemy?.clear) Game.queued.enemy.clear();
@@ -8615,7 +9495,7 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
     invalidateSceneCache();
   }
 
-  function bindSession(){
+  function bindSession(): void {
     bindArtSpriteListener();
     bindVisibility();
     if (docRef){
@@ -8667,13 +9547,18 @@ __define('./modes/pve/session-runtime-impl.js', (exports, module, __require) => 
     if (typeof cfg.modeKey !== 'undefined'){
       Game.modeKey = typeof cfg.modeKey === 'string' ? cfg.modeKey : (cfg.modeKey || null);
     }
-    if (Array.isArray(cfg.deck) && cfg.deck.length) Game.unitsAll = cfg.deck;
+    if (Array.isArray(cfg.deck) && cfg.deck.length) {
+      const deck = normalizeDeckEntries(cfg.deck);
+      if (deck.length) Game.unitsAll = deck;
+    }
     if (cfg.aiPreset){
       const preset: EnemyAIPreset = cfg.aiPreset || {};
       if (Array.isArray(preset.deck) && preset.deck.length){
-        Game.ai.unitsAll = preset.deck;
+        const enemyDeck = normalizeDeckEntries(preset.deck);
+        if (enemyDeck.length) Game.ai.unitsAll = enemyDeck;
       } else if (Array.isArray(preset.unitsAll) && preset.unitsAll.length){
-        Game.ai.unitsAll = preset.unitsAll;
+        const enemyPool = normalizeDeckEntries(preset.unitsAll);
+        if (enemyPool.length) Game.ai.unitsAll = enemyPool;
       }
       if (Number.isFinite(preset.costCap)) Game.ai.costCap = preset.costCap;
       if (Number.isFinite(preset.summonLimit)) Game.ai.summonLimit = preset.summonLimit;
@@ -8758,6 +9643,7 @@ __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
   const ACTION_END = __dep0.ACTION_END;
   const TURN_REGEN = __dep0.TURN_REGEN;
   const BATTLE_END = __dep0.BATTLE_END;
+  const addGameEventListener = __dep0.addGameEventListener;
   const __dep1 = __require('./modes/pve/session-runtime-impl.ts');
   const createPveSessionImpl = __dep1.createPveSession;
   const __getStoredConfig = __dep1.__getStoredConfig;
@@ -8905,10 +9791,12 @@ __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
     if (!session?.runtime) return null;
     if (!isReward(reward)) return null;
     const runtime = session.runtime;
-    updateRuntimeRewards(runtime, [reward]);
+    const queue = ensureRewardQueue(runtime);
+    runtime.rewardQueue = queue.filter((entry) => entry.id !== reward.id);
     const encounter = runtime.encounter;
     if (encounter) {
-      updateEncounterRewards(encounter, [reward]);
+      const pending = ensurePendingRewards(encounter);
+      encounter.pendingRewards = pending.filter((entry) => entry.id !== reward.id);
     }
     return reward;
   }
@@ -8920,15 +9808,7 @@ __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
     if (!type || typeof handler !== 'function') {
       return () => {};
     }
-    if (!gameEvents || typeof gameEvents.addEventListener !== 'function') {
-      return () => {};
-    }
-    gameEvents.addEventListener(type, handler);
-    return () => {
-      if (typeof gameEvents.removeEventListener === 'function') {
-        gameEvents.removeEventListener(type, handler);
-      }
-    };
+    return addGameEventListener(type, handler);
   }
 
   type SessionController = ReturnType<typeof createPveSessionImpl>;
@@ -8971,36 +9851,51 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
 
 
 
+  const __dep0 = __require('./types/units.ts');
+  const createSummonQueue = __dep0.createSummonQueue;
 
-  const __dep0 = __require('./config.js');
-  const CFG = __dep0.CFG;
-  const __dep1 = __require('./units.ts');
-  const UNITS = __dep1.UNITS;
-  const __dep2 = __require('./meta.js');
-  const Meta = __dep2.Meta;
-  const __dep3 = __require('./events.ts');
-  const gameEvents = __dep3.gameEvents;
-  const __dep4 = __require('./background.js');
-  const getEnvironmentBackground = __dep4.getEnvironmentBackground;
-  const drawEnvironmentProps = __dep4.drawEnvironmentProps;
-  const __dep5 = __require('./scene.js');
-  const getCachedBattlefieldScene = __dep5.getCachedBattlefieldScene;
-  const __dep6 = __require('./statuses.ts');
-  const Statuses = __dep6.Statuses;
+  const __dep1 = __require('./config.ts');
+  const CFG = __dep1.CFG;
+  const __dep2 = __require('./units.ts');
+  const UNITS = __dep2.UNITS;
+  const lookupUnit = __dep2.lookupUnit;
+  const __dep3 = __require('./meta.ts');
+  const Meta = __dep3.Meta;
+  const __dep4 = __require('./events.ts');
+  const gameEvents = __dep4.gameEvents;
+  const __dep5 = __require('./background.ts');
+  const getEnvironmentBackground = __dep5.getEnvironmentBackground;
+  const drawEnvironmentProps = __dep5.drawEnvironmentProps;
+  const __dep6 = __require('./scene.ts');
+  const getCachedBattlefieldScene = __dep6.getCachedBattlefieldScene;
+  const __dep7 = __require('./statuses.ts');
+  const Statuses = __dep7.Statuses;
+  const __dep8 = __require('./art.ts');
+  const getUnitArt = __dep8.getUnitArt;
 
   void Statuses;
 
-  type SessionConfigInput = Partial<
-    CreateSessionOptions & {
-      scene?: {
-        theme?: string;
-        backgroundKey?: string;
-        background?: string;
-        [extra: string]: unknown;
-      };
+  type SceneConfigWithExtras = (SceneConfig & { CURRENT_BACKGROUND?: string | null | undefined }) | null;
+
+  const DEFAULT_UNIT_ROSTER = UNITS.map((unit) => {
+    const art = getUnitArt(unit.id);
+    return {
+      id: unit.id,
+      name: unit.name,
+      cost: Number.isFinite(unit.cost) ? unit.cost : null,
+      art,
+      skinKey: art?.skinKey ?? null,
+    } satisfies SessionState['unitsAll'][number];
+  }) as ReadonlyArray<SessionState['unitsAll'][number]>;
+
+  type SessionConfigInput = Partial<CreateSessionOptions> & {
+    scene?: {
+      theme?: string;
+      backgroundKey?: string;
+      background?: string;
       [extra: string]: unknown;
-    }
-  >;
+    };
+  };
 
   export type NormalizedSessionConfig = (CreateSessionOptions & {
     sceneTheme?: string;
@@ -9015,6 +9910,114 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
     config: BackgroundConfig;
     signature: string;
   };
+
+  function getSceneConfig(cfg: GameConfig | null | undefined): SceneConfigWithExtras {
+    if (!cfg || typeof cfg !== 'object') return null;
+    const sceneCandidate = (cfg as { SCENE?: unknown }).SCENE;
+    if (!sceneCandidate || typeof sceneCandidate !== 'object') return null;
+    const scene = sceneCandidate as SceneConfig & { CURRENT_BACKGROUND?: string | null | undefined };
+    if (typeof scene.DEFAULT_THEME !== 'string' || typeof scene.CURRENT_THEME !== 'string') return null;
+    if (!scene.THEMES || typeof scene.THEMES !== 'object') return null;
+    return scene;
+  }
+
+  function getTurnOrderMode(cfg: GameConfig): string | null {
+    const rawMode = cfg.turnOrder.mode ?? null;
+    return typeof rawMode === 'string' ? rawMode : null;
+  }
+
+  function buildQueuedSummonState(): QueuedSummonState {
+    return {
+      ally: createSummonQueue(),
+      enemy: createSummonQueue(),
+    };
+  }
+
+  interface BuildAiStateParams {
+    preset: CreateSessionOptions['aiPreset'] | null | undefined;
+    unitsAll: SessionState['ai']['unitsAll'];
+    defaultCostCap: number;
+    defaultSummonLimit: number;
+  }
+
+  function buildAiState(params: BuildAiStateParams): SessionState['ai'] {
+    const { preset, unitsAll, defaultCostCap, defaultSummonLimit } = params;
+    const costCapCandidate = preset?.costCap;
+    const summonLimitCandidate = preset?.summonLimit;
+    const startingDeck = Array.isArray(preset?.startingDeck) ? preset.startingDeck : null;
+    const costCap = Number.isFinite(costCapCandidate)
+      ? Number(costCapCandidate)
+      : typeof costCapCandidate === 'number'
+        ? costCapCandidate
+        : defaultCostCap;
+    const summonLimit = Number.isFinite(summonLimitCandidate)
+      ? Number(summonLimitCandidate)
+      : typeof summonLimitCandidate === 'number'
+        ? summonLimitCandidate
+        : defaultSummonLimit;
+    return {
+      cost: 0,
+      costCap,
+      summoned: 0,
+      summonLimit,
+      unitsAll,
+      usedUnitIds: new Set<UnitId>(),
+      deck: startingDeck ? [...startingDeck] : [],
+      selectedId: null,
+      lastThinkMs: 0,
+      lastDecision: null,
+    };
+  }
+
+  interface BuildBaseStateParams {
+    modeKey: string | null;
+    allyUnits: SessionState['unitsAll'];
+    costCap: number;
+    summonLimit: number;
+    sceneTheme: string | null;
+    backgroundKey: string | null;
+    turn: TurnSnapshot;
+    ai: SessionState['ai'];
+  }
+
+  function buildBaseState(params: BuildBaseStateParams): SessionState {
+    return {
+      modeKey: params.modeKey,
+      grid: null,
+      tokens: [],
+      cost: 0,
+      costCap: params.costCap,
+      summoned: 0,
+      summonLimit: params.summonLimit,
+      unitsAll: params.allyUnits,
+      usedUnitIds: new Set<UnitId>(),
+      deck3: [],
+      selectedId: null,
+      ui: { bar: null },
+      turn: params.turn,
+      queued: buildQueuedSummonState(),
+      actionChain: [],
+      events: gameEvents,
+      sceneTheme: params.sceneTheme,
+      backgroundKey: params.backgroundKey,
+      battle: {
+        over: false,
+        winner: null,
+        reason: null,
+        detail: null,
+        finishedAt: 0,
+        result: null,
+      },
+      result: null,
+      ai: params.ai,
+      meta: Meta,
+      runtime: {
+        encounter: null,
+        wave: null,
+        rewardQueue: [],
+      },
+    };
+  }
 
   export interface SceneCacheEntry {
     canvas: OffscreenCanvas | HTMLCanvasElement;
@@ -9045,7 +10048,7 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
     if (type === 'undefined') return 'undefined';
     if (type === 'number' || type === 'boolean' || type === 'bigint') return String(value);
     if (type === 'string') return JSON.stringify(value);
-    if (type === 'symbol') return value.toString();
+    if (type === 'symbol') return (value as symbol).toString();
     if (type === 'function') return `[Function:${(value as { name?: string }).name || 'anonymous'}]`;
     if (Array.isArray(value)) {
       return `[${value.map((entry) => stableStringify(entry, seen)).join(',')}]`;
@@ -9097,85 +10100,142 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
   }
 
   function normalizeConfig(input: SessionConfigInput = {}): NormalizedSessionConfig {
-    const out = { ...(input as Record<string, unknown>) } as NormalizedSessionConfig & {
-      scene?: {
-        theme?: string;
-        backgroundKey?: string;
-        background?: string;
-        [extra: string]: unknown;
-      };
-    };
-    const scene = (input.scene ?? {}) as {
-      theme?: string;
-      backgroundKey?: string;
-      background?: string;
-    };
-    if (typeof out.sceneTheme === 'undefined' && typeof scene.theme !== 'undefined') {
-      out.sceneTheme = scene.theme;
+    const { scene, ...rest } = input;
+    const out = { ...rest } as NormalizedSessionConfig;
+    const sceneConfig: NonNullable<SessionConfigInput['scene']> = scene ?? {};
+    if (typeof out.sceneTheme === 'undefined' && typeof sceneConfig.theme === 'string') {
+      out.sceneTheme = sceneConfig.theme;
     }
     if (typeof out.backgroundKey === 'undefined') {
-      if (typeof scene.backgroundKey !== 'undefined') out.backgroundKey = scene.backgroundKey;
-      else if (typeof scene.background !== 'undefined') out.backgroundKey = scene.background;
+      if (typeof sceneConfig.backgroundKey === 'string') out.backgroundKey = sceneConfig.backgroundKey;
+      else if (typeof sceneConfig.background === 'string') out.backgroundKey = sceneConfig.background;
     }
-    delete (out as Record<string, unknown>).scene;
+    if (Array.isArray(out.deck)) {
+      out.deck = normalizeDeckEntries(out.deck);
+    }
+    if (out.aiPreset) {
+      const preset = { ...out.aiPreset };
+      if (Array.isArray(preset.deck)) preset.deck = normalizeDeckEntries(preset.deck);
+      if (Array.isArray(preset.unitsAll)) preset.unitsAll = normalizeDeckEntries(preset.unitsAll);
+      out.aiPreset = preset;
+    }
     return out;
   }
 
-  function buildTurnOrder(): { order: TurnOrderEntry[]; indexMap: Map<string, number> } {
-    const cfg = (CFG as Record<string, unknown>).turnOrder as
-      | { sides?: unknown; pairScan?: unknown }
-      | undefined
-      | null;
-    const rawSides = Array.isArray(cfg?.sides) ? cfg?.sides : null;
-    const sides = rawSides && rawSides.length
-      ? (rawSides.filter((s) => s === 'ally' || s === 'enemy') as Array<'ally' | 'enemy'>)
-      : ['ally', 'enemy'];
-    const order: TurnOrderEntry[] = [];
-    const addPair = (side: unknown, slot: unknown): void => {
-      if (side !== 'ally' && side !== 'enemy') return;
-      const num = Number(slot);
-      if (!Number.isFinite(num)) return;
-      const safeSlot = Math.max(1, Math.min(9, Math.round(num)));
-      order.push({ side, slot: safeSlot });
-    };
-    const appendSlots = (slot: unknown): void => {
-      for (const side of sides) {
-        addPair(side, slot);
-      }
-    };
+  function isTurnOrderSide(value: unknown): value is TurnOrderSide {
+    return value === 'ally' || value === 'enemy';
+  }
 
-    const scan = Array.isArray(cfg?.pairScan) ? cfg?.pairScan : null;
-    if (scan && scan.length) {
-      for (const entry of scan) {
-        if (typeof entry === 'number') {
-          appendSlots(entry);
-          continue;
-        }
-        if (Array.isArray(entry)) {
-          if (entry.length === 2 && typeof entry[0] === 'string' && Number.isFinite(entry[1])) {
-            addPair(entry[0] === 'enemy' ? 'enemy' : 'ally', entry[1]);
-          } else {
-            for (const val of entry) {
-              if (typeof val === 'number') appendSlots(val);
-            }
-          }
-          continue;
-        }
-        if (entry && typeof entry === 'object') {
-          const candidate = entry as { side?: string; slot?: unknown; s?: unknown; index?: unknown };
-          const slot = Number(candidate.slot ?? candidate.s ?? candidate.index);
-          if (typeof candidate.side === 'string' && Number.isFinite(slot)) {
-            addPair(candidate.side === 'enemy' ? 'enemy' : 'ally', slot);
-          } else if (Number.isFinite(slot)) {
-            appendSlots(slot);
-          }
-        }
+  function isPairScanTuple(entry: readonly unknown[]): entry is readonly [string, number] {
+    return entry.length === 2 && typeof entry[0] === 'string' && Number.isFinite(entry[1]);
+  }
+
+  function hasSlotKey(value: { slot?: unknown; s?: unknown; index?: unknown }): boolean {
+    return 'slot' in value || 's' in value || 'index' in value;
+  }
+
+  function isPairScanObject(
+    entry: unknown,
+  ): entry is TurnOrderPairScanSideObject | TurnOrderPairScanSlotObject {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return false;
+    const candidate = entry as { slot?: unknown; s?: unknown; index?: unknown };
+    return hasSlotKey(candidate);
+  }
+
+  function isPairScanObjectWithSide(entry: unknown): entry is TurnOrderPairScanSideObject {
+    if (!isPairScanObject(entry)) return false;
+    const candidate = entry as { side?: unknown };
+    return typeof candidate.side === 'string';
+  }
+
+  function isPairScanObjectWithoutSide(entry: unknown): entry is TurnOrderPairScanSlotObject {
+    if (!isPairScanObject(entry)) return false;
+    const candidate = entry as { side?: unknown };
+    return typeof candidate.side !== 'string';
+  }
+
+  function parseSlotValue(entry: TurnOrderPairScanSideObject | TurnOrderPairScanSlotObject): number | null {
+    const raw = entry.slot ?? entry.s ?? entry.index;
+    if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
+    if (typeof raw === 'string') {
+      const parsed = Number(raw);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+    return null;
+  }
+
+  function clampTurnOrderSlot(slot: number): number {
+    const rounded = Math.round(slot);
+    return Math.max(1, Math.min(9, rounded));
+  }
+
+  function normalizePairScanEntry(
+    entry: TurnOrderPairScanEntry,
+    sides: readonly TurnOrderSide[],
+  ): TurnOrderEntry[] {
+    const normalized: TurnOrderEntry[] = [];
+    const pushPair = (side: TurnOrderSide, slot: number): void => {
+      normalized.push({ side, slot: clampTurnOrderSlot(slot) });
+    };
+  const pushForSides = (slot: number, targetSides?: readonly TurnOrderSide[]): void => {
+      const resolvedSides = targetSides && targetSides.length ? targetSides : sides;
+      for (const side of resolvedSides) {
+        pushPair(side, slot);
       }
+  };
+
+  if (typeof entry === 'number') {
+      if (Number.isFinite(entry)) pushForSides(entry);
+      return normalized;
     }
 
-    if (!order.length) {
-      const fallback = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-      for (const slot of fallback) appendSlots(slot);
+    if (Array.isArray(entry)) {
+      if (isPairScanTuple(entry)) {
+        const [, slot] = entry;
+        const side = entry[0] === 'enemy' ? 'enemy' : 'ally';
+        pushPair(side, slot);
+        return normalized;
+      }
+      for (const value of entry) {
+        if (typeof value === 'number' && Number.isFinite(value)) pushForSides(value);
+      }
+      return normalized;
+    }
+
+    if (isPairScanObjectWithSide(entry)) {
+      const slot = parseSlotValue(entry);
+      if (slot !== null) {
+        const side = entry.side === 'enemy' ? 'enemy' : 'ally';
+        pushPair(side, slot);
+      }
+      return normalized;
+    }
+
+    if (isPairScanObjectWithoutSide(entry)) {
+      const slot = parseSlotValue(entry);
+      if (slot !== null) pushForSides(slot);
+    }
+
+    return normalized;
+  }
+
+  function buildTurnOrder(): { order: TurnOrderEntry[]; indexMap: Map<string, number> } {
+    const cfg = CFG.turnOrder;
+    const rawSides = Array.isArray(cfg.sides) ? cfg.sides : null;
+    const sides = rawSides && rawSides.length
+      ? rawSides.filter((side): side is TurnOrderSide => isTurnOrderSide(side))
+      : (['ally', 'enemy'] as const satisfies ReadonlyArray<TurnOrderSide>);
+    const order: TurnOrderEntry[] = [];
+    const scan = Array.isArray(cfg.pairScan) ? cfg.pairScan : [];
+    for (const entry of scan) {
+      const normalized = normalizePairScanEntry(entry, sides);
+      if (normalized.length) order.push(...normalized);
+    }
+      if (!order.length) {
+        const fallback = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
+      for (const slot of fallback) {
+        order.push(...normalizePairScanEntry(slot, sides));
+      }
     }
 
     const indexMap = new Map<string, number>();
@@ -9190,37 +10250,39 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
   function createSession(options: CreateSessionOptions = {}): SessionState {
     const normalized = normalizeConfig(options);
     const modeKey = typeof normalized.modeKey === 'string' ? normalized.modeKey : null;
+    const sceneCfg = getSceneConfig(CFG);
     const sceneTheme = normalized.sceneTheme
-      ?? (CFG as Record<string, any>).SCENE?.CURRENT_THEME
-      ?? (CFG as Record<string, any>).SCENE?.DEFAULT_THEME;
+      ?? sceneCfg?.CURRENT_THEME
+      ?? sceneCfg?.DEFAULT_THEME
+      ?? null;
     const backgroundKey = normalized.backgroundKey
-      ?? (CFG as Record<string, any>).CURRENT_BACKGROUND
-      ?? (CFG as Record<string, any>).SCENE?.CURRENT_BACKGROUND
-      ?? (CFG as Record<string, any>).SCENE?.CURRENT_THEME
-      ?? (CFG as Record<string, any>).SCENE?.DEFAULT_THEME;
+    ?? CFG.CURRENT_BACKGROUND
+      ?? sceneCfg?.CURRENT_BACKGROUND
+      ?? sceneCfg?.CURRENT_THEME
+      ?? sceneCfg?.DEFAULT_THEME
+      ?? null;
 
-    const allyUnits = (Array.isArray(normalized.deck) && normalized.deck.length
-      ? normalized.deck
-      : (UNITS as unknown)) as SessionState['unitsAll'];
-    const enemyPreset = (normalized.aiPreset ?? {}) as {
-      deck?: ReadonlyArray<string>;
-      unitsAll?: ReadonlyArray<string>;
-      costCap?: number;
-      summonLimit?: number;
-      startingDeck?: ReadonlyArray<unknown>;
-    };
-    const enemyUnits = (Array.isArray(enemyPreset.deck) && enemyPreset.deck.length
-      ? enemyPreset.deck
-      : (Array.isArray(enemyPreset.unitsAll) && enemyPreset.unitsAll.length ? enemyPreset.unitsAll : (UNITS as unknown))) as SessionState['unitsAll'];
+    const allyUnits: SessionState['unitsAll'] =
+      Array.isArray(normalized.deck) && normalized.deck.length
+        ? normalized.deck.slice()
+        : DEFAULT_UNIT_ROSTER;
+
+    const enemyPreset = normalized.aiPreset ?? null;
+    const enemyUnits: SessionState['ai']['unitsAll'] =
+      Array.isArray(enemyPreset?.deck) && enemyPreset.deck.length
+        ? [...enemyPreset.deck]
+        : Array.isArray(enemyPreset?.unitsAll) && enemyPreset.unitsAll.length
+          ? [...enemyPreset.unitsAll]
+          : DEFAULT_UNIT_ROSTER;
 
     const requestedTurnMode = normalized.turnMode
       ?? normalized.turn?.mode
       ?? normalized.turnOrderMode
       ?? normalized.turnOrder?.mode
-      ?? (CFG as Record<string, any>)?.turnOrder?.mode;
+      ?? getTurnOrderMode(CFG);
     const useInterleaved = requestedTurnMode === 'interleaved_by_position';
-    const allyColsRaw = (CFG as Record<string, any>)?.ALLY_COLS;
-    const gridRowsRaw = (CFG as Record<string, any>)?.GRID_ROWS;
+    const allyColsRaw = CFG.ALLY_COLS;
+    const gridRowsRaw = CFG.GRID_ROWS;
     const allyCols = Number.isFinite(allyColsRaw) ? Math.max(1, Math.floor(allyColsRaw)) : 3;
     const gridRows = Number.isFinite(gridRowsRaw) ? Math.max(1, Math.floor(gridRowsRaw)) : 3;
     const slotsPerSide = Math.max(1, allyCols * gridRows);
@@ -9248,62 +10310,30 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
       } satisfies TurnSnapshot;
     };
 
-    const game = {
+    const aiState = buildAiState({
+      preset: enemyPreset,
+      unitsAll: enemyUnits,
+      defaultCostCap: CFG.COST_CAP,
+      defaultSummonLimit: CFG.SUMMON_LIMIT,
+    });
+
+    const costCap = Number.isFinite(normalized.costCap)
+      ? Number(normalized.costCap)
+      : CFG.COST_CAP;
+    const summonLimit = Number.isFinite(normalized.summonLimit)
+      ? Number(normalized.summonLimit)
+      : CFG.SUMMON_LIMIT;
+
+    return buildBaseState({
       modeKey,
-      grid: null,
-      tokens: [],
-      cost: 0,
-      costCap: Number.isFinite(normalized.costCap) ? Number(normalized.costCap) : (CFG as Record<string, any>).COST_CAP,
-      summoned: 0,
-      summonLimit: Number.isFinite(normalized.summonLimit)
-        ? Number(normalized.summonLimit)
-        : (CFG as Record<string, any>).SUMMON_LIMIT,
-      battle: {
-        over: false,
-        winner: null,
-        reason: null,
-        detail: null,
-        finishedAt: 0,
-        result: null,
-      },
-      result: null,
-      unitsAll: allyUnits,
-      usedUnitIds: new Set(),
-      deck3: [],
-      selectedId: null,
-      ui: { bar: null },
-      turn: buildTurnState(),
-      queued: { ally: new Map(), enemy: new Map() } as QueuedSummonState,
-      actionChain: [] as ActionChainEntry[],
-      events: gameEvents,
+      allyUnits,
+      costCap,
+      summonLimit,
       sceneTheme,
       backgroundKey,
-      runtime: {
-        encounter: null,
-        wave: null,
-        rewardQueue: [],
-      },
-    } as SessionState;
-
-    game.ai = {
-      cost: 0,
-      costCap: Number.isFinite(enemyPreset.costCap)
-        ? Number(enemyPreset.costCap)
-        : (enemyPreset.costCap ?? (CFG as Record<string, any>).COST_CAP),
-      summoned: 0,
-      summonLimit: Number.isFinite(enemyPreset.summonLimit)
-        ? Number(enemyPreset.summonLimit)
-        : (enemyPreset.summonLimit ?? (CFG as Record<string, any>).SUMMON_LIMIT),
-      unitsAll: enemyUnits,
-      usedUnitIds: new Set(),
-      deck: Array.isArray(enemyPreset.startingDeck) ? enemyPreset.startingDeck.slice() : [],
-      selectedId: null,
-      lastThinkMs: 0,
-      lastDecision: null,
-    } as SessionState['ai'];
-
-    game.meta = Meta;
-    return game;
+      turn: buildTurnState(),
+      ai: aiState,
+    });
   }
 
   function invalidateSceneCache(): void {
@@ -9337,20 +10367,28 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
   function ensureSceneCache(args: EnsureSceneCacheArgs): SceneCacheEntry | null {
     const { game, canvas, documentRef, camPreset } = args;
     if (!game?.grid) return null;
-    const grid = game.grid as Record<string, any>;
-    const sceneCfg = ((CFG as Record<string, any>).SCENE ?? {}) as Record<string, any>;
-    const themeKey = game.sceneTheme ?? sceneCfg.CURRENT_THEME ?? sceneCfg.DEFAULT_THEME;
-    const theme = themeKey ? sceneCfg.THEMES?.[themeKey] ?? null : null;
-    const backgroundKey = game.backgroundKey;
-    const backgroundSignature = computeBackgroundSignature(backgroundKey ?? null);
-    const dprRaw = Number.isFinite(grid.dpr) && grid.dpr > 0 ? Number(grid.dpr) : 1;
-    const cssWidth = grid.w ?? (canvas ? (canvas.width as number) / dprRaw : 0);
-    const cssHeight = grid.h ?? (canvas ? (canvas.height as number) / dprRaw : 0);
+    if (typeof game.grid !== 'object') return null;
+    const grid = game.grid as Parameters<typeof drawEnvironmentProps>[1];
+    const gridDims = game.grid as { dpr?: number | null | undefined; w?: number | null | undefined; h?: number | null | undefined };
+    const dprCandidate = Number(gridDims.dpr);
+    const dprRaw = Number.isFinite(dprCandidate) && dprCandidate > 0 ? dprCandidate : 1;
+    const cssWidth = typeof gridDims.w === 'number' ? gridDims.w : canvas ? canvas.width / dprRaw : 0;
+    const cssHeight = typeof gridDims.h === 'number' ? gridDims.h : canvas ? canvas.height / dprRaw : 0;
     if (!cssWidth || !cssHeight) return null;
     const pixelWidth = Math.max(1, Math.round(cssWidth * dprRaw));
     const pixelHeight = Math.max(1, Math.round(cssHeight * dprRaw));
 
-    const baseScene = getCachedBattlefieldScene(grid, theme, { width: cssWidth, height: cssHeight, dpr: dprRaw });
+    const sceneCfg = getSceneConfig(CFG);
+    const themeKey = game.sceneTheme ?? sceneCfg?.CURRENT_THEME ?? sceneCfg?.DEFAULT_THEME ?? null;
+    const theme = themeKey ? sceneCfg?.THEMES?.[themeKey] ?? null : null;
+    const backgroundKey = game.backgroundKey ?? null;
+    const backgroundSignature = computeBackgroundSignature(backgroundKey);
+
+    const baseScene = getCachedBattlefieldScene(
+      grid as Parameters<typeof getCachedBattlefieldScene>[0],
+      theme,
+      { width: cssWidth, height: cssHeight, dpr: dprRaw },
+    );
     const baseKey = baseScene?.cacheKey ?? null;
     if (!baseScene) {
       sceneCache = null;
@@ -9415,6 +10453,66 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
   }
 
   exports.__backgroundSignatureCache = backgroundSignatureCache;
+  function toFiniteCost(value: unknown): number | null {
+    if (typeof value === 'number') return Number.isFinite(value) ? value : null;
+    if (typeof value === 'string') {
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+    return null;
+  }
+
+  function makeDeckEntrySkeleton(unitId: string): SessionState['unitsAll'][number] {
+    const unitDef = lookupUnit(unitId);
+    const art = getUnitArt(unitId);
+    return {
+      id: unitId,
+      cost: toFiniteCost(unitDef?.cost) ?? null,
+      name: typeof unitDef?.name === 'string' ? unitDef.name : null,
+      art,
+      skinKey: art?.skinKey ?? null,
+    } satisfies SessionState['unitsAll'][number];
+  }
+
+  function normalizeDeckEntry(entry: unknown): SessionState['unitsAll'][number] | null {
+    if (!entry) return null;
+    if (typeof entry === 'string') {
+      return makeDeckEntrySkeleton(entry);
+    }
+    if (typeof entry !== 'object') return null;
+    const candidate = entry as Record<string, unknown>;
+    const idRaw = candidate.id;
+    if (typeof idRaw !== 'string' || idRaw.trim() === '') return null;
+    const skeleton = makeDeckEntrySkeleton(idRaw);
+    const merged = { ...skeleton, ...(candidate as SessionState['unitsAll'][number]), id: idRaw };
+    const costOverride = toFiniteCost(candidate.cost);
+    merged.cost = costOverride ?? skeleton.cost ?? null;
+    const nameCandidate = candidate.name;
+    if (typeof nameCandidate === 'string' && nameCandidate.trim() !== '') {
+      merged.name = nameCandidate;
+    } else if (merged.name == null) {
+      merged.name = skeleton.name ?? null;
+    }
+    if (merged.art == null) {
+      merged.art = skeleton.art ?? null;
+    }
+    if (typeof merged.skinKey === 'string') {
+      merged.skinKey = merged.skinKey.trim() !== '' ? merged.skinKey : merged.art?.skinKey ?? skeleton.skinKey ?? null;
+    } else {
+      merged.skinKey = merged.art?.skinKey ?? skeleton.skinKey ?? null;
+    }
+    return merged;
+  }
+
+  function normalizeDeckEntries(value: unknown): SessionState['unitsAll'] {
+    if (!Array.isArray(value)) return [];
+    const normalized: SessionState['unitsAll'][number][] = [];
+    for (const item of value) {
+      const entry = normalizeDeckEntry(item);
+      if (entry) normalized.push(entry);
+    }
+    return normalized as SessionState['unitsAll'];
+  }
   exports.clearBackgroundSignatureCache = clearBackgroundSignatureCache;
   exports.computeBackgroundSignature = computeBackgroundSignature;
   exports.normalizeConfig = normalizeConfig;
@@ -9423,6 +10521,7 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
   exports.invalidateSceneCache = invalidateSceneCache;
   exports.createSceneCacheCanvas = createSceneCacheCanvas;
   exports.ensureSceneCache = ensureSceneCache;
+  exports.normalizeDeckEntries = normalizeDeckEntries;
 });
 __define('./modes/pve/session.ts', (exports, module, __require) => {
   export * from './session-state.ts';
@@ -9433,13 +10532,33 @@ __define('./passives.ts', (exports, module, __require) => {
   const __dep0 = __require('./statuses.ts');
   const Statuses = __dep0.Statuses;
   const hookOnLethalDamage = __dep0.hookOnLethalDamage;
-  const __dep1 = __require('./utils/time.js');
+  const __dep1 = __require('./utils/time.ts');
   const safeNow = __dep1.safeNow;
 
 
 
 
   const clamp01 = (value: number): number => Math.max(0, Math.min(1, value));
+
+  const isRecord = (value: unknown): value is Record<string, unknown> =>
+    !!value && typeof value === 'object' && !Array.isArray(value);
+
+  const isPassiveKitDefinition = (value: unknown): value is PassiveKitDefinition => {
+    if (!isRecord(value)) return false;
+    const passives = (value as { passives?: unknown }).passives;
+    return passives == null || Array.isArray(passives);
+  };
+
+  const coercePassiveMeta = (value: unknown): PassiveMetaContext | null => {
+    if (!isRecord(value)) return null;
+    const kitCandidate = 'kit' in value ? (value.kit as unknown) : null;
+    const kit = isPassiveKitDefinition(kitCandidate) ? kitCandidate : null;
+    const meta = value as PassiveMetaContext['meta'];
+    return {
+      meta,
+      kit,
+    } satisfies PassiveMetaContext;
+  };
 
   const STAT_ALIAS: Map<string, string> = new Map([
     ['atk', 'atk'],
@@ -9565,11 +10684,14 @@ __define('./passives.ts', (exports, module, __require) => {
 
   type AfterHitHandler = (afterCtx?: Record<string, unknown>) => void;
 
-  type PassiveRuntimeContext = Record<string, unknown> & {
+  type PassiveRuntimeContext = {
     afterHit?: AfterHitHandler[];
     damage?: Record<string, unknown> & { baseMul?: number };
     log?: Array<Record<string, unknown>>;
     target?: UnitToken | null;
+    meta?: PassiveMetaContext['meta'];
+    kit?: PassiveMetaContext['kit'];
+    [extra: string]: unknown;
   };
 
   const applyStatMap = (
@@ -9621,15 +10743,8 @@ __define('./passives.ts', (exports, module, __require) => {
    * @param {{ Game?: SessionState | null; unit?: UnitToken | null; ctx?: Record<string, unknown> | null; passive?: PassiveDefinition | null }} options
    * @returns {boolean}
    */
-  interface PassiveConditionContext {
-    Game?: SessionState | null;
-    unit?: UnitToken | null;
-    ctx?: Record<string, unknown> | null;
-    passive?: PassiveSpec | null;
-  }
-
   const evaluateConditionObject = (
-    condition: Record<string, unknown> | null | undefined,
+    condition: PassiveConditionObject | null | undefined,
     { Game, unit, ctx, passive }: PassiveConditionContext,
   ): boolean => {
     if (!condition || typeof condition !== 'object') return true;
@@ -9678,6 +10793,11 @@ __define('./passives.ts', (exports, module, __require) => {
     return true;
   };
 
+  const isPassiveConditionFn = (cond: PassiveCondition): cond is PassiveConditionFn => typeof cond === 'function';
+
+  const isPassiveConditionObject = (cond: PassiveCondition): cond is PassiveConditionObject =>
+    !!cond && typeof cond === 'object' && !Array.isArray(cond);
+
   const passiveConditionsOk = ({
     Game,
     unit,
@@ -9687,14 +10807,14 @@ __define('./passives.ts', (exports, module, __require) => {
     Game?: SessionState | null;
     unit?: UnitToken | null;
     passive?: PassiveSpec | null;
-    ctx?: Record<string, unknown> | null;
+    ctx?: PassiveRuntimeContext | null;
   }): boolean => {
-    const conditions = passive?.conditions as unknown;
+    const conditions = passive?.conditions;
     if (!conditions) return true;
     const list = Array.isArray(conditions) ? conditions : [conditions];
     for (const cond of list){
       if (!cond) continue;
-      if (typeof cond === 'function'){
+      if (isPassiveConditionFn(cond)){
         try {
           if (!cond({ Game, unit, ctx, passive })) return false;
         } catch (_) {
@@ -9709,8 +10829,8 @@ __define('./passives.ts', (exports, module, __require) => {
         }
         continue;
       }
-      if (typeof cond === 'object'){
-        if (!evaluateConditionObject(cond as Record<string, unknown>, { Game, unit, ctx, passive })) return false;
+      if (isPassiveConditionObject(cond)){
+        if (!evaluateConditionObject(cond, { Game, unit, ctx, passive })) return false;
       }
     }
     return true;
@@ -10008,11 +11128,12 @@ __define('./passives.ts', (exports, module, __require) => {
     ctx: PassiveRuntimeContext = {},
   ): void {
     if (!Game || !unit) return;
-    const meta = Game.meta && typeof Game.meta.get === 'function' ? Game.meta.get(unit.id) : null;
-    const kit = meta?.kit;
+    const metaValue = Game.meta && typeof Game.meta.get === 'function' ? Game.meta.get(unit.id) : null;
+    const metaContext = coercePassiveMeta(metaValue);
+    const kit = metaContext?.kit ?? null;
+    ctx.meta = metaContext?.meta ?? null;
+    ctx.kit = kit;
     if (!kit || !Array.isArray(kit.passives)) return;
-    ctx.meta = meta as unknown;
-    ctx.kit = kit as unknown;
     for (const passive of kit.passives as Array<PassiveSpec | null | undefined>){
       if (!passive || passive.when !== when) continue;
       const effectKey = typeof passive.effect === 'string'
@@ -10064,7 +11185,11 @@ __define('./passives.ts', (exports, module, __require) => {
     ensureStatusContainer(unit);
 
     const effects: Array<Record<string, unknown>> = [];
-    if (Array.isArray(onSpawn.effects)) effects.push(...onSpawn.effects as Record<string, unknown>[]);
+    if (Array.isArray(onSpawn.effects)){
+      for (const effect of onSpawn.effects){
+        if (isRecord(effect)) effects.push(effect);
+      }
+    }
 
     if (Number.isFinite(onSpawn.teamHealOnEntry) && Number(onSpawn.teamHealOnEntry) > 0){
       effects.push({ type: 'teamHeal', amount: onSpawn.teamHealOnEntry, mode: 'targetMax' });
@@ -10118,13 +11243,14 @@ __define('./passives.ts', (exports, module, __require) => {
       if (type === 'stats' || type === 'stat' || type === 'buff'){
         const stats = effect.stats || effect.values;
         if (!stats || typeof stats !== 'object') continue;
-        const applied = applyStatMap(unit, ({ id: (effect.id as string) || 'onSpawn' } as PassiveSpec), stats as Record<string, number>, {
+        const effectId = typeof effect.id === 'string' && effect.id.trim() ? effect.id : 'onSpawn';
+        const applied = applyStatMap(unit, ({ id: effectId } as PassiveSpec), stats as Record<string, number>, {
           mode: effect.mode === 'flat' ? 'flat' : (effect.statMode === 'flat' ? 'flat' : 'percent'),
           stack: effect.stack !== false,
           stacks: typeof effect.stacks === 'number' ? effect.stacks : undefined,
           purgeable: effect.purgeable !== false,
           maxStacks: typeof effect.maxStacks === 'number' ? effect.maxStacks : undefined,
-          idPrefix: (effect.id as string) || 'onSpawn',
+          idPrefix: effectId,
         });
         statsChanged = applied || statsChanged;
         continue;
@@ -10170,19 +11296,51 @@ __define('./passives.ts', (exports, module, __require) => {
   exports.applyOnSpawnEffects = applyOnSpawnEffects;
   exports.prepareUnitForPassives = prepareUnitForPassives;
 });
-__define('./scene.js', (exports, module, __require) => {
+__define('./scene.ts', (exports, module, __require) => {
+
+
+  type SceneGrid = {
+    cols: number;
+    rows: number;
+    tile: number;
+    ox: number;
+    oy: number;
+    w?: number;
+    h?: number;
+    dpr?: number;
+    pad?: number;
+  };
+
+  export interface BattlefieldSceneCacheEntry {
+    canvas: OffscreenCanvas | HTMLCanvasElement;
+    pixelWidth: number;
+    pixelHeight: number;
+    cssWidth: number;
+    cssHeight: number;
+    dpr: number;
+    gridKey: string;
+    themeKey: string;
+    cacheKey: string;
+  }
+
+  interface BattlefieldSceneOptions {
+    width?: number;
+    height?: number;
+    dpr?: number;
+  }
+
   const DEFAULT_THEME = {
     sky: {
       top: '#1b2434',
       mid: '#2f455e',
       bottom: '#55759a',
-      glow: 'rgba(255, 236, 205, 0.35)'
+      glow: 'rgba(255, 236, 205, 0.35)',
     },
     horizon: {
       color: '#f4d9ad',
       glow: 'rgba(255, 236, 205, 0.55)',
       height: 0.22,
-      thickness: 0.9
+      thickness: 0.9,
     },
     ground: {
       top: '#312724',
@@ -10191,27 +11349,29 @@ __define('./scene.js', (exports, module, __require) => {
       highlight: '#6c5344',
       parallax: 0.12,
       topScale: 0.9,
-      bottomScale: 1.45
-    }
-  };
+      bottomScale: 1.45,
+    },
+  } satisfies SceneTheme;
 
-  const battlefieldSceneCache = new Map();
+  const battlefieldSceneCache = new Map<string, BattlefieldSceneCacheEntry>() satisfies Map<string, BattlefieldSceneCacheEntry>;
 
-  function normalizeDimension(value){
+  function normalizeDimension(value: number | null | undefined): number {
     if (!Number.isFinite(value)) return 0;
-    return value;
+    return value as number;
   }
 
-  function createOffscreenCanvas(pixelWidth, pixelHeight){
+  function createOffscreenCanvas(pixelWidth: number, pixelHeight: number): OffscreenCanvas | HTMLCanvasElement | null {
     const safeW = Math.max(1, Math.floor(pixelWidth || 0));
     const safeH = Math.max(1, Math.floor(pixelHeight || 0));
     if (!safeW || !safeH) return null;
-    if (typeof OffscreenCanvas === 'function'){
+    if (typeof OffscreenCanvas === 'function') {
       try {
         return new OffscreenCanvas(safeW, safeH);
-      } catch (_) {}
+      } catch {
+        // ignore and fall back
+      }
     }
-    if (typeof document !== 'undefined' && typeof document.createElement === 'function'){
+    if (typeof document !== 'undefined' && typeof document.createElement === 'function') {
       const canvas = document.createElement('canvas');
       canvas.width = safeW;
       canvas.height = safeH;
@@ -10220,16 +11380,16 @@ __define('./scene.js', (exports, module, __require) => {
     return null;
   }
 
-  function themeSignature(theme){
+  function themeSignature(theme: SceneTheme | null | undefined): string {
     try {
       const merged = mergeTheme(theme);
       return JSON.stringify(merged);
-    } catch (_) {
+    } catch {
       return 'default-theme';
     }
   }
 
-  function gridSignature(g, cssWidth, cssHeight, dpr){
+  function gridSignature(g: SceneGrid | null | undefined, cssWidth: number, cssHeight: number, dpr: number): string {
     if (!g) return 'no-grid';
     const parts = [
       `cols:${g.cols ?? 'na'}`,
@@ -10239,22 +11399,26 @@ __define('./scene.js', (exports, module, __require) => {
       `oy:${Math.round(g.oy ?? 0)}`,
       `w:${Math.round(cssWidth ?? 0)}`,
       `h:${Math.round(cssHeight ?? 0)}`,
-      `dpr:${Number.isFinite(dpr) ? dpr : 'na'}`
+      `dpr:${Number.isFinite(dpr) ? dpr : 'na'}`,
     ];
     return parts.join('|');
   }
 
-  function invalidateBattlefieldSceneCache(){
+  function invalidateBattlefieldSceneCache(): void {
     battlefieldSceneCache.clear();
   }
 
-  function getCachedBattlefieldScene(g, theme, options = {}){
+  function getCachedBattlefieldScene(
+    g: SceneGrid | null | undefined,
+    theme: SceneTheme | null | undefined,
+    options: BattlefieldSceneOptions = {},
+  ): BattlefieldSceneCacheEntry | null {
     if (!g) return null;
     const cssWidth = normalizeDimension(options.width ?? g.w);
     const cssHeight = normalizeDimension(options.height ?? g.h);
-    const dpr = Number.isFinite(options.dpr) && options.dpr > 0
-      ? options.dpr
-      : (Number.isFinite(g.dpr) && g.dpr > 0 ? g.dpr : 1);
+    const dpr = Number.isFinite(options.dpr) && (options.dpr ?? 0) > 0
+      ? (options.dpr as number)
+      : (Number.isFinite(g.dpr) && (g.dpr ?? 0) > 0 ? (g.dpr as number) : 1);
     if (!cssWidth || !cssHeight) return null;
     const pixelWidth = Math.max(1, Math.round(cssWidth * dpr));
     const pixelHeight = Math.max(1, Math.round(cssHeight * dpr));
@@ -10262,7 +11426,7 @@ __define('./scene.js', (exports, module, __require) => {
     const themeKey = themeSignature(theme);
     const cacheKey = `${gridKey}::${themeKey}`;
     const existing = battlefieldSceneCache.get(cacheKey);
-    if (existing && existing.pixelWidth === pixelWidth && existing.pixelHeight === pixelHeight){
+    if (existing && existing.pixelWidth === pixelWidth && existing.pixelHeight === pixelHeight) {
       return existing;
     }
 
@@ -10279,10 +11443,10 @@ __define('./scene.js', (exports, module, __require) => {
     if (typeof offCtx.setTransform === 'function') offCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     else if (dpr !== 1 && typeof offCtx.scale === 'function') offCtx.scale(dpr, dpr);
 
-    const gridForDraw = { ...g, w: cssWidth, h: cssHeight, dpr };
+    const gridForDraw: SceneGrid = { ...g, w: cssWidth, h: cssHeight, dpr };
     drawBattlefieldScene(offCtx, gridForDraw, theme);
 
-    const entry = {
+    const entry: BattlefieldSceneCacheEntry = {
       canvas: offscreen,
       pixelWidth,
       pixelHeight,
@@ -10291,28 +11455,28 @@ __define('./scene.js', (exports, module, __require) => {
       dpr,
       gridKey,
       themeKey,
-      cacheKey
+      cacheKey,
     };
     battlefieldSceneCache.set(cacheKey, entry);
     return entry;
   }
 
-  function mergeTheme(theme){
+  function mergeTheme(theme: SceneTheme | null | undefined): SceneTheme {
     if (!theme) return DEFAULT_THEME;
     return {
       sky: { ...DEFAULT_THEME.sky, ...(theme.sky || {}) },
       horizon: { ...DEFAULT_THEME.horizon, ...(theme.horizon || {}) },
-      ground: { ...DEFAULT_THEME.ground, ...(theme.ground || {}) }
+      ground: { ...DEFAULT_THEME.ground, ...(theme.ground || {}) },
     };
   }
 
-  function hexToRgb(hex){
+  function hexToRgb(hex: string | null | undefined): { r: number; g: number; b: number } | null {
     if (typeof hex !== 'string') return null;
     let value = hex.trim();
     if (!value.startsWith('#')) return null;
     value = value.slice(1);
-    if (value.length === 3){
-      value = value.split('').map(ch => ch + ch).join('');
+    if (value.length === 3) {
+      value = value.split('').map((ch) => ch + ch).join('');
     }
     if (value.length !== 6) return null;
     const num = Number.parseInt(value, 16);
@@ -10320,22 +11484,26 @@ __define('./scene.js', (exports, module, __require) => {
     return {
       r: (num >> 16) & 0xff,
       g: (num >> 8) & 0xff,
-      b: num & 0xff
+      b: num & 0xff,
     };
   }
 
-  function mixHex(a, b, t){
+  function mixHex(a: string | null | undefined, b: string | null | undefined, t: number): string {
     const ca = hexToRgb(a);
     const cb = hexToRgb(b);
-    if (!ca || !cb) return t < 0.5 ? (a || b) : (b || a);
-    const mix = (x, y)=> Math.round(x + (y - x) * t);
+    if (!ca || !cb) return t < 0.5 ? (a || b || '') : (b || a || '');
+    const mix = (x: number, y: number) => Math.round(x + (y - x) * t);
     const r = mix(ca.r, cb.r);
     const g = mix(ca.g, cb.g);
     const bVal = mix(ca.b, cb.b);
     return `rgb(${r}, ${g}, ${bVal})`;
   }
 
-  function drawBattlefieldScene(ctx, g, theme){
+  function drawBattlefieldScene(
+    ctx: CanvasRenderingContext2D,
+    g: SceneGrid,
+    theme: SceneTheme | null | undefined,
+  ): void {
     if (!ctx || !g) return;
     const t = mergeTheme(theme);
     const w = g.w ?? ctx.canvas.width;
@@ -10347,7 +11515,6 @@ __define('./scene.js', (exports, module, __require) => {
 
     ctx.save();
 
-    // --- Sky gradient ---
     const skyGradient = ctx.createLinearGradient(0, 0, 0, boardBottom);
     skyGradient.addColorStop(0, t.sky.top);
     skyGradient.addColorStop(0.55, t.sky.mid);
@@ -10355,40 +11522,38 @@ __define('./scene.js', (exports, module, __require) => {
     ctx.fillStyle = skyGradient;
     ctx.fillRect(0, 0, w, boardBottom);
 
-    // extend sky color below the board in case the canvas is taller
-    if (boardBottom < h){
+    if (boardBottom < h) {
       ctx.fillStyle = t.sky.bottom;
       ctx.fillRect(0, boardBottom, w, h - boardBottom);
     }
 
-    // --- Horizon glow band ---
-    const horizonY = boardTop + Math.min(Math.max(t.horizon.height, 0), 1) * boardHeight;
-    const glowHeight = Math.max(4, g.tile * t.horizon.thickness);
+    const horizonY = boardTop + Math.min(Math.max(t.horizon.height ?? 0, 0), 1) * boardHeight;
+    const glowHeight = Math.max(4, g.tile * (t.horizon.thickness ?? 0));
     const glowGradient = ctx.createLinearGradient(0, horizonY - glowHeight, 0, horizonY + glowHeight);
     glowGradient.addColorStop(0, 'rgba(0,0,0,0)');
-    glowGradient.addColorStop(0.45, t.horizon.glow);
-    glowGradient.addColorStop(0.55, t.horizon.glow);
+    glowGradient.addColorStop(0.45, t.horizon.glow ?? 'rgba(0,0,0,0)');
+    glowGradient.addColorStop(0.55, t.horizon.glow ?? 'rgba(0,0,0,0)');
     glowGradient.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = glowGradient;
     ctx.fillRect(0, Math.max(0, horizonY - glowHeight), w, glowHeight * 2);
 
-    // Horizon line
-    ctx.strokeStyle = t.horizon.color;
+    ctx.strokeStyle = t.horizon.color ?? '#f4d9ad';
     ctx.lineWidth = Math.max(1, g.tile * 0.05);
     ctx.beginPath();
     ctx.moveTo(g.ox - g.tile, horizonY);
     ctx.lineTo(g.ox + g.tile * g.cols + g.tile, horizonY);
     ctx.stroke();
 
-    // --- Ground base ---
-    const groundTopWidth = g.tile * g.cols * t.ground.topScale;
-    const groundBottomWidth = g.tile * g.cols * t.ground.bottomScale;
+    const groundTopScale = t.ground.topScale ?? 1;
+    const groundBottomScale = t.ground.bottomScale ?? 1;
+    const groundTopWidth = g.tile * g.cols * groundTopScale;
+    const groundBottomWidth = g.tile * g.cols * groundBottomScale;
     const groundTop = boardTop + g.tile * 0.35;
     const groundBottom = h;
     const groundGradient = ctx.createLinearGradient(0, groundTop, 0, groundBottom);
-    groundGradient.addColorStop(0, t.ground.top);
-    groundGradient.addColorStop(0.45, t.ground.accent);
-    groundGradient.addColorStop(1, t.ground.bottom);
+    groundGradient.addColorStop(0, t.ground.top ?? '#312724');
+    groundGradient.addColorStop(0.45, t.ground.accent ?? '#3f302c');
+    groundGradient.addColorStop(1, t.ground.bottom ?? '#181210');
 
     ctx.fillStyle = groundGradient;
     ctx.beginPath();
@@ -10399,10 +11564,9 @@ __define('./scene.js', (exports, module, __require) => {
     ctx.closePath();
     ctx.fill();
 
-    // --- Parallax stripes ---
     const layerCount = Math.max(4, g.rows * 2);
-    const parallaxStrength = t.ground.parallax * g.tile;
-    for (let i = 0; i < layerCount; i++){
+    const parallaxStrength = (t.ground.parallax ?? 0) * g.tile;
+    for (let i = 0; i < layerCount; i += 1) {
       const t0 = i / layerCount;
       const t1 = (i + 1) / layerCount;
       const width0 = groundTopWidth + (groundBottomWidth - groundTopWidth) * t0;
@@ -10425,7 +11589,6 @@ __define('./scene.js', (exports, module, __require) => {
     }
     ctx.globalAlpha = 1;
 
-    // subtle rim light near the board edge
     const rimGradient = ctx.createLinearGradient(0, boardBottom - g.tile * 0.4, 0, boardBottom + g.tile);
     rimGradient.addColorStop(0, 'rgba(255,255,255,0.25)');
     rimGradient.addColorStop(0.4, 'rgba(255,255,255,0.08)');
@@ -10445,59 +11608,601 @@ __define('./scene.js', (exports, module, __require) => {
   exports.getCachedBattlefieldScene = getCachedBattlefieldScene;
   exports.drawBattlefieldScene = drawBattlefieldScene;
 });
-__define('./screens/collection/index.js', (exports, module, __require) => {
-  const __dep0 = __require('./screens/collection/view.js');
-  const renderCollectionView = __dep0.renderCollectionView;
+__define('./screens/collection/helpers.ts', (exports, module, __require) => {
+  const __dep0 = __require('./catalog.ts');
+  const ROSTER = __dep0.ROSTER;
+  const __dep1 = __require('./units.ts');
+  const UNITS = __dep1.UNITS;
 
-  function mergeParams(base, override){
-    if (!base && !override) return null;
-    if (!base) return typeof override === 'object' ? { ...override } : override;
-    if (!override) return typeof base === 'object' ? { ...base } : base;
-    if (typeof base === 'object' && typeof override === 'object' && !Array.isArray(base) && !Array.isArray(override)){
-      return { ...base, ...override };
-    }
-  return override;
+
+
+  const __dep2 = __require('./types/currency.ts');
+  const normalizeCurrencyBalances = __dep2.normalizeCurrencyBalances;
+
+
+  const isRosterEntryLite = (value: unknown): value is RosterEntryLite => (
+    typeof value === 'object'
+    && value !== null
+    && !Array.isArray(value)
+  );
+
+  const ABILITY_TYPE_LABELS = Object.freeze({
+    basic: 'Đánh thường',
+    active: 'Kĩ năng',
+    ultimate: 'Tuyệt kỹ',
+    talent: 'Thiên phú',
+    technique: 'Tuyệt học',
+    passive: 'Nội tại',
+  });
+
+  const TARGET_LABELS: Record<string, string> = Object.freeze({
+    single: 'Đơn mục tiêu',
+    singleTarget: 'Đơn mục tiêu',
+    randomEnemies: 'Địch ngẫu nhiên',
+    randomRow: 'Một hàng ngẫu nhiên',
+    randomColumn: 'Một cột ngẫu nhiên',
+    allEnemies: 'Toàn bộ địch',
+    allAllies: 'Toàn bộ đồng minh',
+    allies: 'Đồng minh',
+    self: 'Bản thân',
+    'self+2allies': 'Bản thân + 2 đồng minh',
+  });
+
+  export interface AbilityFact {
+    icon: string | null;
+    label: string | null;
+    value: string;
+    tooltip: string | null;
   }
 
-  function renderCollectionScreen(options = {}){
-    const { root, shell, definition, params } = options;
+  function cloneRoster(input: ReadonlyArray<RosterEntryLite> | null | undefined): CollectionEntry[]{
+    if (Array.isArray(input)){
+      const clones = input
+        .filter(isRosterEntryLite)
+        .map((entry) => ({ ...entry } as CollectionEntry));
+      if (clones.length > 0){
+        return clones;
+      }
+    }
+    return ROSTER.map((unit): CollectionEntry => ({ ...unit }));
+  }
+
+  function buildRosterWithCost(rosterSource: ReadonlyArray<CollectionEntry>): CollectionEntry[]{
+    const costs = new Map<string, number>(UNITS.map((unit: UnitDefinition) => [unit.id, unit.cost] as const));
+    return rosterSource.map((entry) => ({
+      ...entry,
+      id: typeof entry.id === 'string' ? entry.id : String(entry.id ?? ''),
+      cost: typeof entry.cost === 'number' && Number.isFinite(entry.cost)
+        ? entry.cost
+        : entry.cost === null
+          ? null
+          : costs.get(typeof entry.id === 'string' ? entry.id : String(entry.id ?? '')) ?? null,
+    }));
+  }
+
+  const resolveCurrencyBalance: CurrencyBalanceProvider = (currencyId, providedCurrencies, playerState) => {
+    const tryExtract = (candidate: unknown): number | null => {
+      if (candidate == null) return null;
+      if (typeof candidate === 'number' && Number.isFinite(candidate)) return candidate;
+      if (typeof candidate === 'string' && candidate.trim() !== '' && !Number.isNaN(Number(candidate))){
+        return Number(candidate);
+      }
+      if (typeof candidate === 'object'){
+        const record = candidate as Record<string, unknown>;
+        const balance = record.balance ?? record.amount ?? record.value ?? null;
+        if (typeof balance === 'number' && Number.isFinite(balance)){
+          return balance;
+        }
+      }
+      return null;
+    };
+
+    const inspectContainer = (container: LineupCurrencies | null | undefined): number | null => {
+      if (!container) return null;
+      if (Array.isArray(container)){
+        for (const entry of container){
+          if (entry == null) continue;
+          if (typeof entry === 'number' || typeof entry === 'string'){
+            const entryId = 'VNT';
+            if (entryId !== currencyId) continue;
+            const extracted = tryExtract(entry);
+            if (extracted != null) return extracted;
+            continue;
+          }
+          if (typeof entry !== 'object' || Array.isArray(entry)) continue;
+          const record = entry as { id?: unknown; currencyId?: unknown; key?: unknown; type?: unknown; balance?: unknown; amount?: unknown; value?: unknown; total?: unknown };
+          const id = (record.id || record.currencyId || record.key || record.type) as string | undefined;
+          if (id === currencyId){
+            const extracted = tryExtract(record.balance ?? record.amount ?? record.value ?? record.total ?? record);
+            if (extracted != null) return extracted;
+          }
+        }
+        return null;
+      }
+      if (typeof container === 'object'){
+        const record = container as LineupCurrencyConfig;
+        if (currencyId in record){
+          const extracted = tryExtract(record[currencyId]);
+          if (extracted != null) return extracted;
+        }
+        if (record.balances && currencyId in record.balances){
+          const extracted = tryExtract(record.balances[currencyId]);
+          if (extracted != null) return extracted;
+        }
+      }
+      return null;
+    };
+
+    const fromProvided = inspectContainer(providedCurrencies);
+    if (fromProvided != null) return fromProvided;
+    const fromState = inspectContainer(normalizeCurrencyBalances(playerState ?? null));
+    if (fromState != null) return fromState;
+    return 0;
+  };
+
+  function describeUlt(unit: CollectionEntry | null | undefined): string{
+    return unit?.name ? `Bộ kỹ năng của ${unit.name}.` : 'Chọn nhân vật để xem mô tả chi tiết.';
+  }
+
+  function formatResourceCost(cost: unknown): string{
+    if (!cost || typeof cost !== 'object') return 'Không tốn tài nguyên';
+    const parts: string[] = [];
+    for (const [key, value] of Object.entries(cost as Record<string, unknown>)){
+      if (!Number.isFinite(value)) continue;
+      const label = key === 'aether' ? 'Aether' : key.replace(/_/g, ' ');
+      parts.push(`${value as number} ${label}`);
+    }
+    return parts.length ? parts.join(' + ') : 'Không tốn tài nguyên';
+  }
+
+  function formatDuration(duration: unknown): string | null{
+    if (!duration) return null;
+    if (typeof duration === 'number') return `Hiệu lực ${duration} lượt`;
+    if (typeof duration === 'string'){
+      return duration === 'battle' ? 'Hiệu lực tới hết trận' : null;
+    }
+    if (typeof duration !== 'object') return null;
+    const record = duration as Record<string, unknown> & { turns?: number | 'battle'; start?: string; bossModifier?: number; affectedStat?: string };
+    const parts: string[] = [];
+    if (record.turns === 'battle'){
+      parts.push('Hiệu lực tới hết trận');
+    } else if (typeof record.turns === 'number' && Number.isFinite(record.turns)){
+      parts.push(`Hiệu lực ${record.turns} lượt`);
+    }
+    if (record.start === 'nextTurn'){
+      parts.push('Bắt đầu từ lượt kế tiếp');
+    }
+    if (typeof record.bossModifier === 'number' && Number.isFinite(record.bossModifier) && typeof record.turns === 'number'){
+      const bossTurns = Math.max(1, Math.floor(record.turns * record.bossModifier));
+      parts.push(`Boss PvE: ${bossTurns} lượt`);
+    }
+    if (typeof record.affectedStat === 'string' && record.affectedStat){
+      parts.push(`Ảnh hưởng: ${record.affectedStat}`);
+    }
+    return parts.length ? parts.join(' · ') : null;
+  }
+
+  function formatTargetLabel(target: unknown): string | null{
+    if (target == null) return null;
+    if (typeof target === 'number'){
+      return `Nhắm tới ${target} mục tiêu`;
+    }
+    const key = target.toString();
+    return TARGET_LABELS[key] || key;
+  }
+
+  function formatSummonSummary(summon: unknown): string | null{
+    if (!summon || typeof summon !== 'object') return null;
+    const record = summon as Record<string, unknown> & { count?: number; placement?: string; pattern?: string; limit?: number; ttlTurns?: number; ttl?: number; replace?: string; inherit?: Record<string, number> };
+    const parts: string[] = [];
+    if (Number.isFinite(record.count)){
+      parts.push(`Triệu hồi ${record.count} đơn vị`);
+    } else {
+      parts.push('Triệu hồi đơn vị');
+    }
+    if (record.placement || record.pattern){
+      parts.push(`ô ${record.placement || record.pattern}`);
+    }
+    if (record.limit != null){
+      parts.push(`giới hạn ${record.limit}`);
+    }
+    const ttl = (record.ttlTurns ?? record.ttl) as number | undefined;
+    if (Number.isFinite(ttl) && (ttl ?? 0) > 0){
+      parts.push(`tồn tại ${ttl} lượt`);
+    }
+    if (record.replace){
+      parts.push(`thay ${record.replace}`);
+    }
+    if (record.inherit && typeof record.inherit === 'object'){
+      const inheritParts: string[] = [];
+      for (const [stat, value] of Object.entries(record.inherit)){
+        if (!Number.isFinite(value)) continue;
+        inheritParts.push(`${Math.round((value as number) * 100)}% ${stat.toUpperCase()}`);
+      }
+      if (inheritParts.length){
+        parts.push(`kế thừa ${inheritParts.join(', ')}`);
+      }
+    }
+    return parts.join(' · ');
+  }
+
+  function formatReviveSummary(revive: unknown): string | null{
+    if (!revive || typeof revive !== 'object') return null;
+    const record = revive as Record<string, unknown> & { targets?: number; priority?: string; hpPercent?: number; ragePercent?: number; lockSkillsTurns?: number };
+    const parts: string[] = [];
+    const targets = Number.isFinite(record.targets) ? Number(record.targets) : 1;
+    parts.push(`Hồi sinh ${targets} đồng minh`);
+    if (record.priority){
+      parts.push(`ưu tiên ${record.priority}`);
+    }
+    if (Number.isFinite(record.hpPercent)){
+      parts.push(`HP ${Math.round(Number(record.hpPercent) * 100)}%`);
+    }
+    if (Number.isFinite(record.ragePercent)){
+      parts.push(`Nộ ${Math.round(Number(record.ragePercent) * 100)}%`);
+    }
+    if (Number.isFinite(record.lockSkillsTurns)){
+      parts.push(`Khoá kỹ năng ${record.lockSkillsTurns} lượt`);
+    }
+    return parts.join(' · ');
+  }
+
+  function formatLinksSummary(links: unknown): string | null{
+    if (!links || typeof links !== 'object') return null;
+    const record = links as Record<string, unknown> & { sharePercent?: number; maxConcurrent?: number; maxLinks?: number };
+    const parts: string[] = [];
+    const sharePercent = record.sharePercent ?? record.maxLinks;
+    if (Number.isFinite(sharePercent)){
+      parts.push(`Chia ${Math.round(Number(sharePercent) * 100)}% sát thương`);
+    }
+    if (record.maxConcurrent != null){
+      parts.push(`tối đa ${record.maxConcurrent} mục tiêu`);
+    }
+    return parts.join(' · ');
+  }
+
+  function formatTagLabel(tag: unknown): string{
+    if (typeof tag !== 'string') return '';
+    return tag.replace(/-/g, ' ');
+  }
+
+  function labelForAbility(entry: unknown, fallback?: string | null): string{
+    const record = entry as { type?: string } | null;
+    if (record?.type && typeof record.type === 'string' && record.type in ABILITY_TYPE_LABELS){
+      return ABILITY_TYPE_LABELS[record.type as keyof typeof ABILITY_TYPE_LABELS];
+    }
+    return fallback || 'Kĩ năng';
+  }
+
+  function collectAbilityFacts(entry: unknown): AbilityFact[]{
+    const facts: AbilityFact[] = [];
+    const addFact = (icon: string | null, label: string | null, value: string | null, tooltip: string | null = null) => {
+      if (!value) return;
+      facts.push({
+        icon: icon || null,
+        label: label || null,
+        value,
+        tooltip: tooltip || null,
+      });
+    };
+
+    if (entry && typeof entry === 'object'){
+      const record = entry as Record<string, unknown>;
+
+      if (record.cost && typeof record.cost === 'object'){
+        const formattedCost = formatResourceCost(record.cost);
+        if (formattedCost){
+          addFact('💠', 'Chi phí', formattedCost);
+        }
+      }
+
+      if (typeof record.hits === 'number' && record.hits > 0){
+        const displayHits = record.hits === 1 ? '1 hit' : `${record.hits} hit`;
+        addFact('✦', 'Số hit', displayHits);
+      }
+
+      if (typeof record.targets !== 'undefined'){
+        const label = formatTargetLabel(record.targets);
+        if (label){
+          addFact('🎯', 'Mục tiêu', label);
+        }
+      }
+
+      if (record.duration){
+        const label = formatDuration(record.duration);
+        if (label){
+          addFact('⏳', 'Thời lượng', label);
+        }
+      }
+
+      if (record.summon){
+        const label = formatSummonSummary(record.summon);
+        if (label){
+          addFact('🜂', 'Triệu hồi', label);
+        }
+      }
+
+      if (record.revive){
+        const label = formatReviveSummary(record.revive);
+        if (label){
+          addFact('✙', 'Hồi sinh', label);
+        }
+      }
+
+      if (record.link || record.links){
+        const label = formatLinksSummary(record.link || record.links);
+        if (label){
+          addFact('⛓', 'Liên kết', label);
+        }
+      }
+
+      if (Array.isArray(record.tags)){
+        const resolvedTags = record.tags.map(formatTagLabel).filter(Boolean).join(', ');
+        if (resolvedTags){
+          addFact('🏷', 'Tags', resolvedTags);
+        }
+      }
+
+      if (record.notes){
+        const notes = Array.isArray(record.notes)
+          ? record.notes
+          : typeof record.notes === 'string'
+            ? [record.notes]
+            : [];
+        const uniqueNotes = notes
+          .map((note) => (typeof note === 'string' ? note.trim() : ''))
+          .filter((note, index, array) => note && array.indexOf(note) === index);
+        if (uniqueNotes.length){
+          addFact('🗒', 'Ghi chú', uniqueNotes.join(' · '));
+        }
+      }
+    }
+
+    return facts;
+  }
+
+  function getCurrencyCatalog(listCurrencies: () => unknown): CurrencyCatalog{
+    const catalog = listCurrencies();
+    if (Array.isArray(catalog)){
+      return catalog as CurrencyCatalog;
+    }
+    return [];
+  }
+
+  function ensureNumberFormatter(
+    createNumberFormatter: (locale: string, options?: Intl.NumberFormatOptions) => Intl.NumberFormat,
+    locale: string,
+    options?: Intl.NumberFormatOptions,
+  ): Intl.NumberFormat{
+    return createNumberFormatter(locale, options);
+  }
+  exports.ABILITY_TYPE_LABELS = ABILITY_TYPE_LABELS;
+  exports.resolveCurrencyBalance = resolveCurrencyBalance;
+  exports.cloneRoster = cloneRoster;
+  exports.buildRosterWithCost = buildRosterWithCost;
+  exports.describeUlt = describeUlt;
+  exports.formatResourceCost = formatResourceCost;
+  exports.formatDuration = formatDuration;
+  exports.formatTargetLabel = formatTargetLabel;
+  exports.formatSummonSummary = formatSummonSummary;
+  exports.formatReviveSummary = formatReviveSummary;
+  exports.formatLinksSummary = formatLinksSummary;
+  exports.formatTagLabel = formatTagLabel;
+  exports.labelForAbility = labelForAbility;
+  exports.collectAbilityFacts = collectAbilityFacts;
+  exports.getCurrencyCatalog = getCurrencyCatalog;
+  exports.ensureNumberFormatter = ensureNumberFormatter;
+});
+__define('./screens/collection/index.ts', (exports, module, __require) => {
+  const __dep0 = __require('./screens/collection/view.ts');
+  const renderCollectionView = __dep0.renderCollectionView;
+
+
+
+
+  const __dep1 = __require('./types/currency.ts');
+  const isLineupCurrencies = __dep1.isLineupCurrencies;
+  const normalizeCurrencyBalances = __dep1.normalizeCurrencyBalances;
+
+  type Mergeable<TValue> = TValue | null | undefined;
+
+  type MaybeRecord = Record<string, unknown>;
+
+  function mergeParams<TValue>(base: Mergeable<TValue>, override: Mergeable<TValue>): TValue | null{
+    if (!base && !override) return null;
+    if (!base) return typeof override === 'object' ? { ...(override as MaybeRecord) } as TValue : override ?? null;
+    if (!override) return typeof base === 'object' ? { ...(base as MaybeRecord) } as TValue : base ?? null;
+    if (
+      typeof base === 'object'
+      && typeof override === 'object'
+      && !Array.isArray(base)
+      && !Array.isArray(override)
+    ){
+      return { ...(base as MaybeRecord), ...(override as MaybeRecord) } as TValue;
+    }
+    return override ?? null;
+  }
+
+  function mergePlayerState(
+    definitionParams: CollectionDefinitionParams | null | undefined,
+    params: CollectionDefinitionParams | null | undefined,
+  ): UnknownRecord{
+    const merged = mergeParams<UnknownRecord>(definitionParams?.playerState ?? null, params?.playerState ?? null);
+    return merged ?? {};
+  }
+
+  function resolveRoster(
+    definitionParams: CollectionDefinitionParams | null | undefined,
+    params: CollectionDefinitionParams | null | undefined,
+  ): ReadonlyArray<RosterEntryLite> {
+    const override = Array.isArray(params?.roster) ? params.roster : null;
+    const base = Array.isArray(definitionParams?.roster) ? definitionParams.roster : null;
+    return override ?? base ?? [];
+  }
+
+  function resolveCurrencies(
+    definitionParams: CollectionDefinitionParams | null | undefined,
+    params: CollectionDefinitionParams | null | undefined,
+    playerState: UnknownRecord,
+  ): LineupCurrencies | null {
+    const override = params?.currencies;
+    if (isLineupCurrencies(override)){
+      return override ?? null;
+    }
+    const base = definitionParams?.currencies;
+    if (isLineupCurrencies(base)){
+      return base ?? null;
+    }
+    return normalizeCurrencyBalances(playerState);
+  }
+
+  function renderCollectionScreen(options: CollectionScreenParams): CollectionViewHandle{
+    const {
+      root,
+      shell = null,
+      definition = null,
+      params = null,
+    } = options;
     if (!root){
       throw new Error('renderCollectionScreen cần một phần tử root hợp lệ.');
     }
 
-  const defParams = definition?.params || null;
-    const mergedPlayerState = mergeParams(defParams?.playerState || null, params?.playerState || null) || {};
-    const rosterSource = mergeParams(defParams?.roster || null, params?.roster || null) || null;
-    const currencies = mergeParams(defParams?.currencies || null, params?.currencies || null)
-      || mergedPlayerState?.currencies
-      || null;
+    const definitionParams: CollectionDefinition['params'] = definition?.params ?? null;
+    const playerState = mergePlayerState(definitionParams, params);
+    const roster = resolveRoster(definitionParams, params);
+    const currencies = resolveCurrencies(definitionParams, params, playerState);
 
     return renderCollectionView({
       root,
       shell,
-      playerState: mergedPlayerState,
-      roster: rosterSource,
-      currencies
+      definition,
+      playerState,
+      roster,
+      currencies,
     });
   }
 
   exports.renderCollectionView = renderCollectionView;
-
   exports.renderCollectionScreen = renderCollectionScreen;
 });
-__define('./screens/collection/view.js', (exports, module, __require) => {
-  const __dep0 = __require('./catalog.js');
-  const ROSTER = __dep0.ROSTER;
-  const __dep1 = __require('./units.ts');
-  const UNITS = __dep1.UNITS;
-  const __dep2 = __require('./art.js');
-  const getUnitArt = __dep2.getUnitArt;
-  const __dep3 = __require('./data/economy.js');
-  const listCurrencies = __dep3.listCurrencies;
-  const __dep4 = __require('./data/skills.js');
-  const getSkillSet = __dep4.getSkillSet;
-  const __dep5 = __require('./utils/format.js');
-  const createNumberFormatter = __dep5.createNumberFormatter;
+__define('./screens/collection/state.ts', (exports, module, __require) => {
+
+
+  function createFilterState(initial?: Partial<FilterState>): FilterState{
+    return {
+      activeTab: initial?.activeTab ?? 'awakening',
+      selectedUnitId: initial?.selectedUnitId ?? null,
+    };
+  }
+
+  function updateActiveTab(state: FilterState, tab: CollectionTabKey): void{
+    state.activeTab = tab;
+  }
+
+  function updateSelectedUnit(state: FilterState, unitId: string | null): void{
+    state.selectedUnitId = unitId;
+  }
+
+  exports.createFilterState = createFilterState;
+  exports.updateActiveTab = updateActiveTab;
+  exports.updateSelectedUnit = updateSelectedUnit;
+});
+__define('./screens/collection/types.ts', (exports, module, __require) => {
+
+
+
+
+
+  export type { UnknownRecord } from '@types/common';
+
+  export type CollectionTabKey = 'awakening' | 'skills' | 'arts' | 'skins' | 'voice';
+
+  export interface FilterState {
+    activeTab: CollectionTabKey;
+    selectedUnitId: string | null;
+  }
+
+  export interface CollectionEntry extends RosterEntryLite {
+    cost?: number | null;
+  }
+
+  export interface CollectionDefinitionParams extends UnknownRecord {
+    roster?: ReadonlyArray<RosterEntryLite> | null;
+    currencies?: LineupCurrencies | null;
+    playerState?: UnknownRecord | null;
+  }
+
+  export interface CollectionDefinition {
+    label?: string;
+    title?: string;
+    description?: string;
+    params?: CollectionDefinitionParams | null;
+  }
+
+  export interface CollectionScreenParams {
+    root: HTMLElement;
+    shell?: {
+      enterScreen?: (screenId: string, params?: unknown) => void;
+    } | null;
+    definition?: CollectionDefinition | null;
+    params?: CollectionDefinitionParams | null;
+  }
+
+  export interface CollectionViewOptions {
+    root: HTMLElement;
+    shell?: CollectionScreenParams['shell'];
+    definition?: CollectionDefinition | null;
+    playerState?: UnknownRecord;
+    roster?: ReadonlyArray<RosterEntryLite> | null;
+    currencies?: LineupCurrencies | null;
+  }
+
+  export interface CollectionViewHandle {
+    destroy(): void;
+  }
+
+  export interface CurrencyBalanceProvider {
+    (
+      currencyId: string,
+      providedCurrencies: LineupCurrencies | null | undefined,
+      playerState: UnknownRecord | null | undefined,
+    ): number;
+  }
+
+  export type CurrencyCatalog = ReadonlyArray<CurrencyDefinition>;
+});
+__define('./screens/collection/view.ts', (exports, module, __require) => {
+  const __dep0 = __require('./art.ts');
+  const getUnitArt = __dep0.getUnitArt;
+  const __dep1 = __require('./data/economy.ts');
+  const listCurrencies = __dep1.listCurrencies;
+  const __dep2 = __require('./data/skills.ts');
+  const getSkillSet = __dep2.getSkillSet;
+  const __dep3 = __require('./utils/format.ts');
+  const createNumberFormatter = __dep3.createNumberFormatter;
+  const __dep4 = __require('./../ui/dom.ts');
+  const assertElement = __dep4.assertElement;
+  const ensureStyleTag = __dep4.ensureStyleTag;
+  const mountSection = __dep4.mountSection;
+
+  const __dep5 = __require('./screens/collection/helpers.ts');
+  const ABILITY_TYPE_LABELS = __dep5.ABILITY_TYPE_LABELS;
+  const buildRosterWithCost = __dep5.buildRosterWithCost;
+  const cloneRoster = __dep5.cloneRoster;
+  const collectAbilityFacts = __dep5.collectAbilityFacts;
+  const describeUlt = __dep5.describeUlt;
+  const formatTagLabel = __dep5.formatTagLabel;
+  const labelForAbility = __dep5.labelForAbility;
+  const resolveCurrencyBalance = __dep5.resolveCurrencyBalance;
+  const getCurrencyCatalog = __dep5.getCurrencyCatalog;
+  const ensureNumberFormatter = __dep5.ensureNumberFormatter;
+  const __dep6 = __require('./screens/collection/state.ts');
+  const createFilterState = __dep6.createFilterState;
+  const updateActiveTab = __dep6.updateActiveTab;
+  const updateSelectedUnit = __dep6.updateSelectedUnit;
+
+
+
 
   const STYLE_ID = 'collection-view-style-v2';
 
@@ -10507,20 +12212,12 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
     { key: 'arts', label: 'Công Pháp & Trang Bị', hint: 'Liệt kê công pháp, pháp khí và trang bị đang trang bị cho nhân vật.' },
     { key: 'skins', label: 'Skin', hint: 'Quản lý skin đã mở khóa và áp dụng bảng phối màu yêu thích.' },
     { key: 'voice', label: 'Giọng Nói', hint: 'Nghe thử voice line, thiết lập voice pack và gợi ý mở khóa.' }
-  ];
+  ] satisfies ReadonlyArray<{ key: CollectionTabKey; label: string; hint: string }>;
 
-  const currencyCatalog = listCurrencies();
-  const currencyFormatter = createNumberFormatter('vi-VN');
+  const currencyCatalog: CurrencyCatalog = getCurrencyCatalog(listCurrencies as () => ReadonlyArray<CurrencyDefinition>);
+  const currencyFormatter = ensureNumberFormatter(createNumberFormatter, 'vi-VN');
 
   function ensureStyles(){
-    if (typeof document === 'undefined') return;
-    let style = document.getElementById(STYLE_ID);
-    if (!style || style.tagName.toLowerCase() !== 'style'){
-      style = document.createElement('style');
-      style.id = STYLE_ID;
-      document.head.appendChild(style);
-    }
-
     const css = `
       .app--collection{padding:32px 16px 64px;}
       .collection-view{max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:28px;color:inherit;}
@@ -10653,300 +12350,25 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
       }
     `;
 
-    if (style.textContent !== css){
-      style.textContent = css;
-    }
+    ensureStyleTag(STYLE_ID, { css });
   }
 
-  function cloneRoster(input){
-    if (!Array.isArray(input) || input.length === 0){
-      return ROSTER.map(unit => ({ ...unit }));
-    }
-    return input.map(entry => ({ ...entry }));
-  }
-
-  function buildRosterWithCost(rosterSource){
-    const costs = new Map(UNITS.map(unit => [unit.id, unit.cost]));
-    return rosterSource.map(entry => ({
-      ...entry,
-      cost: Number.isFinite(entry.cost) ? entry.cost : (costs.get(entry.id) ?? null)
-    }));
-  }
-
-  function resolveCurrencyBalance(currencyId, providedCurrencies, playerState){
-    const tryExtract = candidate => {
-      if (candidate == null) return null;
-      if (typeof candidate === 'number' && Number.isFinite(candidate)) return candidate;
-      if (typeof candidate === 'string' && candidate.trim() !== '' && !Number.isNaN(Number(candidate))){
-        return Number(candidate);
-      }
-      if (typeof candidate === 'object'){
-        if (Number.isFinite(candidate.balance)) return candidate.balance;
-        if (Number.isFinite(candidate.amount)) return candidate.amount;
-        if (Number.isFinite(candidate.value)) return candidate.value;
-      }
-      return null;
-    };
-
-    const inspectContainer = container => {
-      if (!container) return null;
-      if (Array.isArray(container)){
-        for (const entry of container){
-          if (!entry) continue;
-          const id = entry.id || entry.currencyId || entry.key;
-          if (id === currencyId){
-            const extracted = tryExtract(entry.balance ?? entry.amount ?? entry.value ?? entry.total ?? entry);
-            if (extracted != null) return extracted;
-          }
-        }
-        return null;
-      }
-      if (typeof container === 'object'){
-        if (currencyId in container){
-          const extracted = tryExtract(container[currencyId]);
-          if (extracted != null) return extracted;
-        }
-        if (container.balances && currencyId in container.balances){
-          const extracted = tryExtract(container.balances[currencyId]);
-          if (extracted != null) return extracted;
-        }
-      }
-      return null;
-    };
-
-    const fromProvided = inspectContainer(providedCurrencies);
-    if (fromProvided != null) return fromProvided;
-    const fromState = inspectContainer(playerState?.currencies);
-    if (fromState != null) return fromState;
-    return 0;
-  }
-
-  function describeUlt(unit){
-    return unit?.name ? `Bộ kỹ năng của ${unit.name}.` : 'Chọn nhân vật để xem mô tả chi tiết.';
-  }
-
-  const TARGET_LABELS = {
-    single: 'Đơn mục tiêu',
-    singleTarget: 'Đơn mục tiêu',
-    randomEnemies: 'Địch ngẫu nhiên',
-    randomRow: 'Một hàng ngẫu nhiên',
-    randomColumn: 'Một cột ngẫu nhiên',
-    allEnemies: 'Toàn bộ địch',
-    allAllies: 'Toàn bộ đồng minh',
-    allies: 'Đồng minh',
-    self: 'Bản thân',
-    'self+2allies': 'Bản thân + 2 đồng minh'
+  type AbilityEntry = Record<string, unknown> & {
+    name?: string;
+    description?: string;
+    notes?: unknown;
+    id?: string | number;
+    abilityId?: string | number;
+    type?: string;
   };
 
-  const ABILITY_TYPE_LABELS = {
-    basic: 'Đánh thường',
-    active: 'Kĩ năng',
-    ultimate: 'Tuyệt kỹ',
-    talent: 'Thiên phú',
-    technique: 'Tuyệt học',
-    passive: 'Nội tại'
-  };
-
-  function formatResourceCost(cost){
-    if (!cost || typeof cost !== 'object') return 'Không tốn tài nguyên';
-    const parts = [];
-    for (const [key, value] of Object.entries(cost)){
-      if (!Number.isFinite(value)) continue;
-      const label = key === 'aether' ? 'Aether' : key.replace(/_/g, ' ');
-      parts.push(`${value} ${label}`);
-    }
-    return parts.length ? parts.join(' + ') : 'Không tốn tài nguyên';
+  interface AbilityCardOptions {
+    typeLabel?: string | null;
+    unitId?: string | null;
   }
 
-  function formatDuration(duration){
-    if (!duration) return null;
-    if (typeof duration === 'number') return `Hiệu lực ${duration} lượt`;
-    if (typeof duration === 'string'){
-      return duration === 'battle' ? 'Hiệu lực tới hết trận' : null;
-    }
-    const parts = [];
-    if (duration.turns === 'battle'){
-      parts.push('Hiệu lực tới hết trận');
-    } else if (Number.isFinite(duration.turns)){
-      parts.push(`Hiệu lực ${duration.turns} lượt`);
-    }
-    if (duration.start === 'nextTurn'){
-      parts.push('Bắt đầu từ lượt kế tiếp');
-    }
-    if (Number.isFinite(duration.bossModifier) && Number.isFinite(duration.turns)){
-      const bossTurns = Math.max(1, Math.floor(duration.turns * duration.bossModifier));
-      parts.push(`Boss PvE: ${bossTurns} lượt`);
-    }
-    if (duration.affectedStat){
-      parts.push(`Ảnh hưởng: ${duration.affectedStat}`);
-    }
-    return parts.length ? parts.join(' · ') : null;
-  }
-
-  function formatTargetLabel(target){
-    if (target == null) return null;
-    if (typeof target === 'number'){
-      return `Nhắm tới ${target} mục tiêu`;
-    }
-    const key = target.toString();
-    return TARGET_LABELS[key] || key;
-  }
-
-  function formatSummonSummary(summon){
-    if (!summon || typeof summon !== 'object') return null;
-    const parts = [];
-    if (Number.isFinite(summon.count)){
-      parts.push(`Triệu hồi ${summon.count} đơn vị`);
-    } else {
-      parts.push('Triệu hồi đơn vị');
-    }
-    if (summon.placement || summon.pattern){
-      parts.push(`ô ${summon.placement || summon.pattern}`);
-    }
-    if (summon.limit != null){
-      parts.push(`giới hạn ${summon.limit}`);
-    }
-    const ttl = summon.ttlTurns ?? summon.ttl;
-    if (Number.isFinite(ttl) && ttl > 0){
-      parts.push(`tồn tại ${ttl} lượt`);
-    }
-    if (summon.replace){
-      parts.push(`thay ${summon.replace}`);
-    }
-    if (summon.inherit && typeof summon.inherit === 'object'){
-      const inheritParts = [];
-      for (const [stat, value] of Object.entries(summon.inherit)){
-        if (!Number.isFinite(value)) continue;
-        inheritParts.push(`${Math.round(value * 100)}% ${stat.toUpperCase()}`);
-      }
-      if (inheritParts.length){
-        parts.push(`kế thừa ${inheritParts.join(', ')}`);
-      }
-    }
-    return parts.join(' · ');
-  }
-
-  function formatReviveSummary(revive){
-    if (!revive || typeof revive !== 'object') return null;
-    const parts = [];
-    const targets = Number.isFinite(revive.targets) ? revive.targets : 1;
-    parts.push(`Hồi sinh ${targets} đồng minh`);
-    if (revive.priority){
-      parts.push(`ưu tiên ${revive.priority}`);
-    }
-    if (Number.isFinite(revive.hpPercent)){
-      parts.push(`HP ${Math.round(revive.hpPercent * 100)}%`);
-    }
-    if (Number.isFinite(revive.ragePercent)){
-      parts.push(`Nộ ${Math.round(revive.ragePercent * 100)}%`);
-    }
-    if (Number.isFinite(revive.lockSkillsTurns)){
-      parts.push(`Khoá kỹ năng ${revive.lockSkillsTurns} lượt`);
-    }
-    return parts.join(' · ');
-  }
-
-  function formatLinksSummary(links){
-    if (!links || typeof links !== 'object') return null;
-    const parts = [];
-    if (Number.isFinite(links.sharePercent)){
-      parts.push(`Chia ${Math.round(links.sharePercent * 100)}% sát thương`);
-    }
-    if (links.maxConcurrent != null){
-      parts.push(`tối đa ${links.maxConcurrent} mục tiêu`);
-    }
-    return parts.join(' · ');
-  }
-
-  function formatTagLabel(tag){
-    if (typeof tag !== 'string') return '';
-    return tag.replace(/-/g, ' ');
-  }
-
-  function labelForAbility(entry, fallback){
-    const type = entry?.type;
-    if (type && ABILITY_TYPE_LABELS[type]) return ABILITY_TYPE_LABELS[type];
-    return fallback || 'Kĩ năng';
-  }
-
-  function collectAbilityFacts(entry){
-    const facts = [];
-    const addFact = (icon, label, value, tooltip = null) => {
-      if (!value) return;
-      facts.push({
-        icon: icon || null,
-        label: label || null,
-        value,
-        tooltip: tooltip || null
-      });
-    };
-
-    if (entry?.cost && typeof entry.cost === 'object'){
-      const formattedCost = formatResourceCost(entry.cost);
-      if (formattedCost){
-        addFact('💠', 'Chi phí', formattedCost);
-      }
-    }
-
-    if (typeof entry?.hits === 'number' && entry.hits > 0){
-      const displayHits = entry.hits === 1 ? '1 hit' : `${entry.hits} hit`;
-      addFact('✦', 'Số hit', displayHits);
-    }
-
-    const targetLabel = formatTargetLabel(entry?.targets ?? entry?.target);
-    if (targetLabel){
-      addFact('🎯', 'Mục tiêu', targetLabel);
-    }
-
-    const duration = formatDuration(entry?.duration);
-    if (duration){
-      const parts = duration.split(' · ');
-      const primary = parts.shift();
-      const tooltip = parts.length ? duration : null;
-      addFact('⏱', 'Hiệu lực', primary, tooltip);
-    }
-
-    if (Number.isFinite(entry?.limitUses)){
-      addFact('🔁', 'Giới hạn', `${entry.limitUses} lần`);
-    }
-
-    if (entry?.lockout){
-      const label = entry.lockout === 'battle' ? 'đến hết trận' : entry.lockout;
-      addFact('🔒', 'Khoá', label);
-    }
-
-    if (Number.isFinite(entry?.maxStacks)){
-      addFact('📚', 'Tối đa tầng', `${entry.maxStacks}`);
-    }
-
-    if (Array.isArray(entry?.tags) && entry.tags.length){
-      const resolvedTags = entry.tags.map(formatTagLabel).filter(Boolean);
-      if (resolvedTags.length){
-        const [firstTag, ...restTags] = resolvedTags;
-        const display = restTags.length ? `${firstTag} +${restTags.length}` : firstTag;
-        addFact('🏷️', 'Tag', display, resolvedTags.join(', '));
-      }
-    }
-
-    const summon = formatSummonSummary(entry?.summon);
-    if (summon){
-      addFact('🜂', 'Triệu hồi', summon);
-    }
-
-    const revive = formatReviveSummary(entry?.revive);
-    if (revive){
-      addFact('☯️', 'Hồi sinh', revive);
-    }
-
-    const links = formatLinksSummary(entry?.links);
-    if (links){
-      addFact('🔗', 'Liên kết', links);
-    }
-
-    return facts;
-  }
-
-  function renderAbilityCard(entry, { typeLabel = null, unitId = null } = {}){
+  function renderAbilityCard(entry: AbilityEntry | null | undefined, options: AbilityCardOptions = {}): HTMLElement{
+    const { typeLabel = null, unitId = null } = options;
     const card = document.createElement('article');
     card.className = 'collection-skill-card';
 
@@ -10991,7 +12413,7 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
       : 'Chưa có mô tả chi tiết.';
     card.dataset.description = descriptionText;
 
-        if (resolvedTypeLabel){
+    if (resolvedTypeLabel){
       card.dataset.typeLabel = resolvedTypeLabel;
     }
     if (unitId){
@@ -11010,13 +12432,14 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
       }
     }
     
-    const facts = collectAbilityFacts(entry);
+    const facts: AbilityFact[] = collectAbilityFacts(entry);
     if (facts.length){
       card.dataset.meta = JSON.stringify(facts);
     }
 
     card.addEventListener('click', event => {
-      if (event.target.closest('.collection-skill-card__upgrade')){
+      const target = event.target as HTMLElement | null;
+      if (target?.closest('.collection-skill-card__upgrade')){
         return;
       }
       const detail = {
@@ -11030,27 +12453,35 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
     return card;
   }
 
-  function renderCollectionView(options = {}){
-    const { root, shell, playerState = {}, roster, currencies } = options;
-    if (!root){
-      throw new Error('renderCollectionView cần một phần tử root hợp lệ.');
-    }
+  function renderCollectionView(options: CollectionViewOptions): CollectionViewHandle{
+    const {
+      root,
+      shell = null,
+      playerState = {} as UnknownRecord,
+      roster = null,
+      currencies = null,
+    } = options;
+    const host = assertElement<HTMLElement>(root, {
+      guard: (node): node is HTMLElement => node instanceof HTMLElement,
+      message: 'renderCollectionView cần một phần tử root hợp lệ.',
+    });
 
     ensureStyles();
-    if (typeof root.innerHTML === 'string'){
-      root.innerHTML = '';
-    }
-    if (root.classList){
-      root.classList.add('app--collection');
-    }
 
-    const cleanups = [];
-    const addCleanup = fn => {
+    const cleanups: Array<() => void> = [];
+    const addCleanup = (fn: (() => void) | null | undefined) => {
       if (typeof fn === 'function') cleanups.push(fn);
     };
 
+    const filterState: FilterState = createFilterState();
+
     const container = document.createElement('div');
     container.className = 'collection-view';
+    const mount = mountSection({
+      root: host,
+      section: container,
+      rootClasses: 'app--collection',
+    });
 
     const header = document.createElement('header');
     header.className = 'collection-view__header';
@@ -11113,7 +12544,7 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
     rosterList.className = 'collection-roster__list';
 
     const rosterSource = buildRosterWithCost(cloneRoster(roster));
-    const rosterEntries = new Map();
+    const rosterEntries = new Map<string, { button: HTMLButtonElement; costEl: HTMLElement | null; meta: CollectionEntry }>();
 
     for (const unit of rosterSource){
       const item = document.createElement('li');
@@ -11314,9 +12745,9 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
     stage.appendChild(stageStatus);
     stage.appendChild(overlay);
 
-  let activeAbilityCard = null;
+    let activeAbilityCard: HTMLElement | null = null;
 
-    const clearSkillDetail = () => {
+    const clearSkillDetail = (): void => {
       if (activeAbilityCard){
         activeAbilityCard.classList.remove('is-expanded');
         activeAbilityCard = null;
@@ -11338,8 +12769,9 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
       detailEmpty.style.display = 'none';
     };
 
-    const populateSkillDetail = (card, payload) => {
-      if (!payload?.ability){
+    const populateSkillDetail = (card: HTMLElement, payload: Record<string, unknown> | null | undefined): void => {
+      const ability = (payload?.ability ?? null) as AbilityEntry | null;
+      if (!ability){
         clearSkillDetail();
         return;
       }
@@ -11355,11 +12787,12 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
       activeAbilityCard = card;
       activeAbilityCard.classList.add('is-expanded');
 
-      const ability = payload.ability;
       const abilityName = ability?.name || 'Kĩ năng';
       detailTitle.textContent = abilityName;
 
-      const typeLabel = payload.typeLabel || card.dataset.typeLabel || labelForAbility(ability);
+      const typeLabel = (payload?.typeLabel as string | null | undefined)
+        || card.dataset.typeLabel
+        || labelForAbility(ability);
       if (typeLabel){
         detailBadge.textContent = typeLabel;
         detailBadge.style.display = '';
@@ -11376,7 +12809,7 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
       while (detailFacts.firstChild){
         detailFacts.removeChild(detailFacts.firstChild);
       }
-      const facts = collectAbilityFacts(ability);
+      const facts: AbilityFact[] = collectAbilityFacts(ability);
       if (facts.length){
         for (const fact of facts){
           const item = document.createElement('div');
@@ -11449,21 +12882,22 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
       overlayContent.classList.add('has-detail');
     };
 
-    const handleSkillDetailToggle = event => {
-      const card = event.target.closest('.collection-skill-card');
+    const handleSkillDetailToggle = (event: CustomEvent): void => {
+      const target = event.target as HTMLElement | null;
+      const card = target?.closest('.collection-skill-card') as HTMLElement | null;
       if (!card){
         return;
       }
-      populateSkillDetail(card, event.detail);
+      populateSkillDetail(card, event.detail as Record<string, unknown>);
     };
 
     overlay.addEventListener('collection:toggle-skill-detail', handleSkillDetailToggle);
     addCleanup(() => overlay.removeEventListener('collection:toggle-skill-detail', handleSkillDetailToggle));
 
-    const handleGlobalClick = event => {
+    const handleGlobalClick = (event: MouseEvent): void => {
       if (overlayDetailPanel.hidden) return;
-      const target = event.target;
-      if (overlay.contains(target)){
+      const target = event.target as HTMLElement | null;
+      if (target && overlay.contains(target)){
         if (target.closest('.collection-skill-detail')) return;
         if (target.closest('.collection-skill-card')) return;
       }
@@ -11481,11 +12915,10 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
     tabsTitle.textContent = 'Danh sách tab';
     tabs.appendChild(tabsTitle);
 
-    const tabButtons = new Map();
-    let activeTab = 'awakening';
+    const tabButtons = new Map<CollectionTabKey, HTMLButtonElement>();;
 
-    const setActiveTab = key => {
-      activeTab = key;
+    const setActiveTab = (key: CollectionTabKey) => {
+      updateActiveTab(filterState, key);
       for (const [tabKey, button] of tabButtons){
         if (!button) continue;
         if (tabKey === key){
@@ -11504,7 +12937,7 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
       }
     };
 
-    const handleTabClick = key => {
+    const handleTabClick = (key: CollectionTabKey | 'close') => {
       if (key === 'close'){
         if (shell && typeof shell.enterScreen === 'function'){
           shell.enterScreen('main-menu');
@@ -11561,8 +12994,9 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
       root.appendChild(container);
     }
 
-    const selectUnit = unitId => {
+    const selectUnit = (unitId: string | null) => {
       if (!unitId || !rosterEntries.has(unitId)) return;
+      updateSelectedUnit(filterState, unitId);
       clearSkillDetail();
       for (const [id, entry] of rosterEntries){
         if (!entry?.button) continue;
@@ -11639,7 +13073,7 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
       while (overlayAbilities.firstChild){
         overlayAbilities.removeChild(overlayAbilities.firstChild);
       }
-      const abilityEntries = [];
+      const abilityEntries: Array<{ entry: AbilityEntry | null | undefined; label: string }> = [];
       if (skillSet?.basic){
         abilityEntries.push({ entry: skillSet.basic, label: ABILITY_TYPE_LABELS.basic });
       }
@@ -11670,7 +13104,7 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
         overlayAbilities.appendChild(placeholder);
       }
 
-      if (activeTab === 'skills'){
+      if (filterState.activeTab === 'skills'){
         overlay.classList.add('is-open');
       }
     };
@@ -11688,7 +13122,7 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
       }
     }
 
-    setActiveTab(activeTab);
+    setActiveTab(filterState.activeTab);
 
     return {
       destroy(){
@@ -11699,58 +13133,164 @@ __define('./screens/collection/view.js', (exports, module, __require) => {
             console.error('[collection] cleanup error', error);
           }
         }
-        if (container.parentNode === root){
-          root.removeChild(container);
-        }
-        if (root.classList){
-          root.classList.remove('app--collection');
-        }
+        mount.destroy();
       }
-    };
+    } satisfies CollectionViewHandle;
   }
 
   exports.renderCollectionView = renderCollectionView;
 });
-__define('./screens/lineup/index.js', (exports, module, __require) => {
-  const __dep0 = __require('./screens/lineup/view.js');
-  const renderLineupView = __dep0.renderLineupView;
+__define('./screens/lineup/index.ts', (exports, module, __require) => {
+  const __dep1 = __require('./screens/lineup/view/index.ts');
+  const renderLineupView = __dep1.renderLineupView;
 
-  function mergeParams(base, override){
-    if (!base && !override) return null;
-    if (!base) return typeof override === 'object' ? { ...override } : override;
-    if (!override) return typeof base === 'object' ? { ...base } : base;
-    if (
-      typeof base === 'object'
-      && typeof override === 'object'
-      && !Array.isArray(base)
-      && !Array.isArray(override)
-    ){
-      return { ...base, ...override };
+
+
+
+  const __dep2 = __require('./types/currency.ts');
+  const isLineupCurrencies = __dep2.isLineupCurrencies;
+  const normalizeCurrencyBalances = __dep2.normalizeCurrencyBalances;
+
+  export type { LineupCurrencies } from '@types/currency';
+
+  type Mergeable = UnknownRecord | ReadonlyArray<unknown>;
+
+  const isUnknownRecord = (value: unknown): value is UnknownRecord => (
+    typeof value === 'object'
+    && value !== null
+    && !Array.isArray(value)
+  );
+
+  const cloneMergeable = <T extends Mergeable>(value: T): T => {
+    if (Array.isArray(value)){
+      return value.slice() as T;
     }
-    return override;
+    return { ...value } as T;
+  };
+
+  const mergeParams = <T extends Mergeable>(
+    base: T | null | undefined,
+    override: T | null | undefined,
+  ): T | null => {
+    if (!base && !override) return null;
+    if (!base) return override ? cloneMergeable(override) : null;
+    if (!override) return cloneMergeable(base);
+    if (Array.isArray(base) && Array.isArray(override)){
+      return cloneMergeable(override);
+    }
+    if (!Array.isArray(base) && !Array.isArray(override)){
+      return { ...base, ...override } as T;
+    }
+    return cloneMergeable(override);
+  };
+
+  const cloneCurrencyValue = (value: LineupCurrencyValue): LineupCurrencyValue => {
+    if (value && typeof value === 'object'){
+      return { ...(value as UnknownRecord) };
+    }
+    return value;
+  };
+
+  const cloneLineupCurrencies = (source: LineupCurrencies): LineupCurrencies => {
+    if (Array.isArray(source)){
+      return source.map(item => cloneCurrencyValue(item)) as ReadonlyArray<LineupCurrencyValue>;
+    }
+    const mapSource = source as LineupCurrencyConfig;
+    const clone: LineupCurrencyConfig = {};
+    Object.entries(mapSource).forEach(([key, value]) => {
+      if (key === 'balances'){
+        if (value && typeof value === 'object' && !Array.isArray(value)){
+          clone.balances = Object.fromEntries(
+            Object.entries(value as Record<string, LineupCurrencyValue>).map(([id, entry]) => [
+              id,
+              cloneCurrencyValue(entry),
+            ]),
+          );
+        } else if (value == null){
+          clone.balances = null;
+        }
+        return;
+      }
+      if (Array.isArray(value)){
+        clone[key] = value.map(item => cloneCurrencyValue(item));
+        return;
+      }
+      if (value && typeof value === 'object'){
+        clone[key] = { ...(value as UnknownRecord) };
+        return;
+      }
+      clone[key] = value as LineupCurrencyValue;
+    });
+    if (!('balances' in clone) && 'balances' in mapSource){
+      clone.balances = mapSource.balances ?? null;
+    }
+    return clone;
+  };
+
+  const toMergeable = (value: unknown): Mergeable | null => {
+    if (Array.isArray(value)) return value as ReadonlyArray<unknown>;
+    if (isUnknownRecord(value)) return value;
+    return null;
+  };
+
+  interface LineupScreenDefinitionParams extends UnknownRecord {
+    lineups?: unknown;
+    roster?: unknown;
+    currencies?: LineupCurrencies | null;
+    shortDescription?: string;
+    playerState?: UnknownRecord | null;
   }
 
-    function resolveLineups(definitionParams, params){
-    const base = Array.isArray(definitionParams?.lineups) ? definitionParams.lineups : null;
-    const override = Array.isArray(params?.lineups) ? params.lineups : null;
+  interface LineupScreenDefinition {
+    label?: string;
+    title?: string;
+    description?: string;
+    params?: LineupScreenDefinitionParams | null;
+  }
+
+  export interface RenderLineupScreenOptions {
+    root: HTMLElement;
+    shell?: { enterScreen?: (screenId: string, params?: unknown) => void } | null;
+    definition?: LineupScreenDefinition | null;
+    params?: LineupScreenDefinitionParams | null;
+  }
+
+  function resolveLineups(
+   definitionParams: LineupScreenDefinitionParams | null | undefined,
+    params: LineupScreenDefinitionParams | null | undefined,
+  ): ReadonlyArray<LineupDefinitionInput | null | undefined> { 
+    const base = Array.isArray(definitionParams?.lineups) ? definitionParams?.lineups : null;
+    const override = Array.isArray(params?.lineups) ? params?.lineups : null;
     if (override) return override;
     if (base) return base;
     return [];
   }
 
-  function renderLineupScreen(options = {}){
-    const { root, shell, definition, params } = options;
+  function renderLineupScreen(options: RenderLineupScreenOptions): LineupViewHandle {
+    const { root, shell = null, definition = null, params = null } = options;
     if (!root){
       throw new Error('renderLineupScreen cần một phần tử root hợp lệ.');
     }
 
-    const defParams = definition?.params || null;
-    const mergedPlayerState = mergeParams(defParams?.playerState || null, params?.playerState || null) || {};
+    const defParams = definition?.params ?? null;
+    const mergedPlayerState = mergeParams<UnknownRecord>(
+      defParams?.playerState ?? null,
+      params?.playerState ?? null,
+    ) || {};
     const lineups = resolveLineups(defParams, params);
-    const roster = mergeParams(defParams?.roster || null, params?.roster || null) || null;
-    const currencies = mergeParams(defParams?.currencies || null, params?.currencies || null)
-      || mergedPlayerState?.currencies
-      || null;
+    const roster = mergeParams<Mergeable>(
+      toMergeable(defParams?.roster),
+      toMergeable(params?.roster),
+    );
+    const baseCurrencies = isLineupCurrencies(defParams?.currencies) ? defParams?.currencies ?? null : null;
+    const overrideCurrencies = isLineupCurrencies(params?.currencies) ? params?.currencies ?? null : null;
+    const mergedCurrencySource = mergeParams<LineupCurrencies>(baseCurrencies, overrideCurrencies);
+    const playerCurrencySource = normalizeCurrencyBalances(mergedPlayerState);
+    const currencies = mergedCurrencySource
+      ? cloneLineupCurrencies(mergedCurrencySource)
+      : playerCurrencySource
+        ? cloneLineupCurrencies(playerCurrencySource)
+        : null;
     const description = params?.shortDescription
       ?? defParams?.shortDescription
       ?? definition?.description
@@ -11764,38 +13304,347 @@ __define('./screens/lineup/index.js', (exports, module, __require) => {
       lineups,
       roster,
       playerState: mergedPlayerState,
-      currencies
+      currencies,
     });
   }
 
+  const __reexport0 = __require('./screens/lineup/view/index.ts');
+  exports.renderLineupView = __reexport0.renderLineupView;
   exports.renderLineupScreen = renderLineupScreen;
-  exports.renderLineupView = renderLineupView;
 });
-__define('./screens/lineup/view.js', (exports, module, __require) => {
-  const __dep0 = __require('./catalog.js');
-  const ROSTER = __dep0.ROSTER;
-  const __dep1 = __require('./data/economy.js');
-  const listCurrencies = __dep1.listCurrencies;
-  const __dep2 = __require('./data/skills.js');
-  const getSkillSet = __dep2.getSkillSet;
-  const __dep3 = __require('./utils/format.js');
-  const createNumberFormatter = __dep3.createNumberFormatter;
+__define('./screens/lineup/view/events.ts', (exports, module, __require) => {
 
-  const STYLE_ID = 'lineup-view-style-v1';
+  const __dep0 = __require('./screens/lineup/view/state.ts');
+  const assignUnitToBench = __dep0.assignUnitToBench;
+  const removeUnitFromBench = __dep0.removeUnitFromBench;
+  const setLeader = __dep0.setLeader;
 
-  const currencyCatalog = listCurrencies();
-  const currencyIndex = new Map(currencyCatalog.map(currency => [currency.id, currency]));
-  const numberFormatter = createNumberFormatter('vi-VN');
 
-  function ensureStyles(){
-    if (typeof document === 'undefined') return;
-    let style = document.getElementById(STYLE_ID);
-    if (!style || style.tagName.toLowerCase() !== 'style'){
-      style = document.createElement('style');
-      style.id = STYLE_ID;
-      document.head.appendChild(style);
+  export type CleanupCallback = () => void;
+
+  export interface LineupEventElements {
+    backButton: HTMLButtonElement;
+    benchGrid: HTMLElement;
+    benchDetails: HTMLElement;
+    passiveGrid: HTMLElement;
+    rosterFilters: HTMLElement;
+    rosterList: HTMLElement;
+    leaderAvatar: HTMLButtonElement;
+    leaderSection: HTMLElement;
+    passiveOverlay: HTMLElement;
+    passiveClose: HTMLButtonElement;
+    leaderOverlay: HTMLElement;
+    leaderOverlayBody: HTMLElement;
+    leaderClose: HTMLButtonElement;
+  }
+
+  export interface OverlayController {
+    getActive: () => HTMLElement | null;
+    close: (overlay: HTMLElement | null) => void;
+  }
+
+  export interface LineupEventHelpers {
+    getSelectedLineup: () => LineupState | null;
+    setMessage: (text: string, type?: LineupMessageType) => void;
+    renderBench: () => void;
+    renderBenchDetails: () => void;
+    renderLeader: () => void;
+    renderPassives: () => void;
+    renderFilters: () => void;
+    renderRoster: () => void;
+    updateActiveBenchHighlight: () => void;
+    syncBenchDetailsHeight: () => void;
+    openPassiveDetails: (passive: LineupPassive) => void;
+    openLeaderPicker: () => void;
+  }
+
+  export interface LineupEventContext {
+    shell: { enterScreen?: (screenId: string) => void } | null;
+    state: LineupViewState;
+    elements: LineupEventElements;
+    overlays: OverlayController;
+    helpers: LineupEventHelpers;
+    rosterLookup: Map<string, RosterUnit>;
+  }
+
+  function bindLineupEvents(context: LineupEventContext): CleanupCallback[] {
+    const { state, elements, helpers, overlays, rosterLookup, shell } = context;
+    const {
+      backButton,
+      benchGrid,
+      benchDetails,
+      passiveGrid,
+      rosterFilters,
+      rosterList,
+      leaderAvatar,
+      leaderSection,
+      passiveOverlay,
+      passiveClose,
+      leaderOverlay,
+      leaderOverlayBody,
+      leaderClose,
+    } = elements;
+
+    const cleanup: CleanupCallback[] = [];
+
+    let leaderObserver: ResizeObserver | null = null;
+    if (typeof ResizeObserver === 'function'){
+      leaderObserver = new ResizeObserver(() => {
+        helpers.syncBenchDetailsHeight();
+      });
+      leaderObserver.observe(leaderSection);
+      cleanup.push(() => {
+        if (leaderObserver){
+          leaderObserver.disconnect();
+        }
+      });
     }
 
+    const handleWindowResize = () => helpers.syncBenchDetailsHeight();
+    if (typeof window !== 'undefined'){
+      window.addEventListener('resize', handleWindowResize);
+      cleanup.push(() => {
+        window.removeEventListener('resize', handleWindowResize);
+      });
+    }
+
+    const handleBack = () => {
+      if (shell && typeof shell.enterScreen === 'function'){
+        shell.enterScreen('main-menu');
+      }
+    };
+    backButton.addEventListener('click', handleBack);
+    cleanup.push(() => backButton.removeEventListener('click', handleBack));
+
+    const handleBenchInteraction = (event: Event) => {
+      const benchEl = (event.target as HTMLElement | null)?.closest<HTMLElement>('.lineup-bench__cell');
+      if (!benchEl) return;
+      const lineup = helpers.getSelectedLineup();
+      if (!lineup) return;
+      const benchIndex = Number(benchEl.dataset.benchIndex);
+      if (!Number.isFinite(benchIndex)) return;
+      const cell = lineup.bench[benchIndex];
+      if (!cell) return;
+
+      if (state.selectedUnitId){
+        const result = assignUnitToBench(lineup, benchIndex, state.selectedUnitId);
+        if (!result.ok){
+          helpers.setMessage(result.message || 'Không thể gán nhân vật.', 'error');
+        } else {
+          helpers.setMessage('Đã thêm nhân vật vào dự bị.', 'info');
+        }
+        helpers.renderBench();
+        helpers.renderLeader();
+        helpers.renderPassives();
+        helpers.renderRoster();
+        return;
+      }
+
+      const mouseEvent = event as MouseEvent;
+      if (mouseEvent.altKey || mouseEvent.ctrlKey || mouseEvent.metaKey){
+        if (cell.unitId){
+          removeUnitFromBench(lineup, benchIndex);
+          state.activeBenchIndex = benchIndex;
+          helpers.renderBench();
+          helpers.renderPassives();
+          helpers.renderRoster();
+          helpers.renderLeader();
+          helpers.setMessage('Đã bỏ nhân vật khỏi dự bị.', 'info');
+        }
+        return;
+      }
+
+      state.activeBenchIndex = benchIndex;
+      helpers.updateActiveBenchHighlight();
+      helpers.renderBenchDetails();
+    };
+    benchGrid.addEventListener('click', handleBenchInteraction);
+    cleanup.push(() => benchGrid.removeEventListener('click', handleBenchInteraction));
+
+    const handleBenchFocus = (event: Event) => {
+      const benchEl = (event.target as HTMLElement | null)?.closest<HTMLElement>('.lineup-bench__cell');
+      if (!benchEl) return;
+      const lineup = helpers.getSelectedLineup();
+      if (!lineup) return;
+      const benchIndex = Number(benchEl.dataset.benchIndex);
+      if (!Number.isFinite(benchIndex)) return;
+      if (state.activeBenchIndex === benchIndex) return;
+      state.activeBenchIndex = benchIndex;
+      helpers.updateActiveBenchHighlight();
+      helpers.renderBenchDetails();
+    };
+    benchGrid.addEventListener('focusin', handleBenchFocus);
+    cleanup.push(() => benchGrid.removeEventListener('focusin', handleBenchFocus));
+    benchGrid.addEventListener('mouseenter', handleBenchFocus, true);
+    cleanup.push(() => benchGrid.removeEventListener('mouseenter', handleBenchFocus, true));
+
+    const handlePassiveClick = (event: Event) => {
+      const btn = (event.target as HTMLElement | null)?.closest<HTMLElement>('.lineup-passive');
+      if (!btn) return;
+      const lineup = helpers.getSelectedLineup();
+      if (!lineup) return;
+      const index = Number(btn.dataset.passiveIndex);
+      if (!Number.isFinite(index)) return;
+      const passive = lineup.passives[index] as LineupPassive | undefined;
+      if (!passive || passive.isEmpty) return;
+      helpers.openPassiveDetails(passive);
+    };
+    passiveGrid.addEventListener('click', handlePassiveClick);
+    cleanup.push(() => passiveGrid.removeEventListener('click', handlePassiveClick));
+
+    const handleRosterFilter = (event: Event) => {
+      const button = (event.target as HTMLElement | null)?.closest<HTMLElement>('.lineup-roster__filter');
+      if (!button) return;
+      const type = (button.dataset.filterType || 'all') as LineupViewState['filter']['type'];
+      const value = button.dataset.filterValue ?? null;
+      state.filter = { type, value };
+      helpers.renderFilters();
+      helpers.renderRoster();
+    };
+    rosterFilters.addEventListener('click', handleRosterFilter);
+    cleanup.push(() => rosterFilters.removeEventListener('click', handleRosterFilter));
+
+    const handleRosterSelect = (event: Event) => {
+      const entry = (event.target as HTMLElement | null)?.closest<HTMLElement>('.lineup-roster__entry');
+      if (!entry) return;
+      const unitId = entry.dataset.unitId || null;
+      if (!unitId) return;
+      if (state.selectedUnitId === unitId){
+        state.selectedUnitId = null;
+        helpers.setMessage('Đã bỏ chọn nhân vật.', 'info');
+      } else {
+        state.selectedUnitId = unitId;
+        const unit = rosterLookup.get(unitId);
+        helpers.setMessage(`Đã chọn ${unit?.name || 'nhân vật'}. Chạm ô dự bị hoặc leader để gán.`, 'info');
+      }
+      helpers.renderRoster();
+    };
+    rosterList.addEventListener('click', handleRosterSelect);
+    cleanup.push(() => rosterList.removeEventListener('click', handleRosterSelect));
+
+    const handleLeaderOpen = () => {
+      helpers.openLeaderPicker();
+    };
+    leaderAvatar.addEventListener('click', handleLeaderOpen);
+    cleanup.push(() => leaderAvatar.removeEventListener('click', handleLeaderOpen));
+
+    const handlePassiveClose = () => {
+      overlays.close(passiveOverlay);
+    };
+    passiveClose.addEventListener('click', handlePassiveClose);
+    cleanup.push(() => passiveClose.removeEventListener('click', handlePassiveClose));
+
+    const handleLeaderClose = () => {
+      overlays.close(leaderOverlay);
+    };
+    leaderClose.addEventListener('click', handleLeaderClose);
+    cleanup.push(() => leaderClose.removeEventListener('click', handleLeaderClose));
+
+    const handlePassiveOverlayClick = (event: Event) => {
+      if (event.target === passiveOverlay){
+        overlays.close(passiveOverlay);
+      }
+    };
+    passiveOverlay.addEventListener('click', handlePassiveOverlayClick);
+    cleanup.push(() => passiveOverlay.removeEventListener('click', handlePassiveOverlayClick));
+
+    const handleLeaderOverlayClick = (event: Event) => {
+      if (event.target === leaderOverlay){
+        overlays.close(leaderOverlay);
+      }
+    };
+    leaderOverlay.addEventListener('click', handleLeaderOverlayClick);
+    cleanup.push(() => leaderOverlay.removeEventListener('click', handleLeaderOverlayClick));
+
+    const handleLeaderOption = (event: Event) => {
+      const option = (event.target as HTMLElement | null)?.closest<HTMLElement>('.lineup-overlay__option');
+      if (!option) return;
+      const lineup = helpers.getSelectedLineup();
+      if (!lineup) return;
+      const unitId = option.dataset.unitId ?? null;
+      const result = setLeader(lineup, unitId || null, rosterLookup);
+      if (!result.ok){
+        helpers.setMessage(result.message || 'Không thể đặt leader.', 'error');
+      } else {
+        if (unitId){
+          const unit = rosterLookup.get(unitId);
+          helpers.setMessage(`Đã chọn ${unit?.name || 'leader'}.`, 'info');
+        } else {
+          helpers.setMessage('Đã bỏ chọn leader.', 'info');
+        }
+      }
+      helpers.renderLeader();
+      helpers.renderBench();
+      helpers.renderPassives();
+      helpers.renderRoster();
+      overlays.close(leaderOverlay);
+    };
+    leaderOverlayBody.addEventListener('click', handleLeaderOption);
+    cleanup.push(() => leaderOverlayBody.removeEventListener('click', handleLeaderOption));
+
+    const handleGlobalKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape'){
+        const active = overlays.getActive();
+        if (active){
+          overlays.close(active);
+        }
+      }
+    };
+    document.addEventListener('keydown', handleGlobalKey);
+    cleanup.push(() => document.removeEventListener('keydown', handleGlobalKey));
+
+    return cleanup;
+  }
+
+  exports.bindLineupEvents = bindLineupEvents;
+});
+__define('./screens/lineup/view/index.ts', (exports, module, __require) => {
+  const __reexport0 = __require('./screens/lineup/view/render.ts');
+  export type { LineupViewHandle, LineupViewOptions } from './render.ts';
+  export type {
+    LineupViewState,
+    LineupMessageType,
+    LineupFilter,
+    LineupFilterOptions,
+    LineupBenchCell,
+    LineupPassive,
+    RosterUnit,
+  } from './state.ts';
+
+  exports.renderLineupView = __reexport0.renderLineupView;
+});
+__define('./screens/lineup/view/render.ts', (exports, module, __require) => {
+  const __dep0 = __require('./data/skills.ts');
+  const getSkillSet = __dep0.getSkillSet;
+  const __dep1 = __require('./utils/format.ts');
+  const createNumberFormatter = __dep1.createNumberFormatter;
+  const __dep2 = __require('./ui/dom.ts');
+  const assertElement = __dep2.assertElement;
+  const ensureStyleTag = __dep2.ensureStyleTag;
+  const mountSection = __dep2.mountSection;
+  const __dep3 = __require('./types/currency.ts');
+  const normalizeCurrencyBalances = __dep3.normalizeCurrencyBalances;
+  const __dep4 = __require('./screens/lineup/view/state.ts');
+  const normalizeRoster = __dep4.normalizeRoster;
+  const normalizeLineups = __dep4.normalizeLineups;
+  const createCurrencyBalances = __dep4.createCurrencyBalances;
+  const createFilterOptions = __dep4.createFilterOptions;
+  const formatCurrencyBalance = __dep4.formatCurrencyBalance;
+  const collectAssignedUnitIds = __dep4.collectAssignedUnitIds;
+  const evaluatePassive = __dep4.evaluatePassive;
+  const filterRoster = __dep4.filterRoster;
+
+  const __dep5 = __require('./screens/lineup/view/events.ts');
+  const bindLineupEvents = __dep5.bindLineupEvents;
+
+
+
+
+
+  const STYLE_ID = 'lineup-view-style-v1';
+  const powerFormatter = createNumberFormatter('vi-VN');
+
+  function ensureStyles(): void{
     const css = `
       .app--lineup{padding:32px 16px 72px;}
       .lineup-view{max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:28px;color:inherit;--lineup-bench-slot-size:64px;--lineup-bench-slot-gap:12px;}
@@ -11835,7 +13684,7 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
       .lineup-bench{display:flex;flex-direction:column;gap:12px;min-height:100%;padding:0;border:none;background:none;}
       .lineup-bench__title{margin:0;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
       .lineup-bench__content{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,320px);align-items:flex-start;gap:12px;flex:1;padding:0;border:none;background:none;}
-     .lineup-bench__grid{display:flex;align-items:flex-start;justify-content:flex-start;gap:var(--lineup-bench-slot-gap);flex:1;min-height:0;align-self:stretch;}
+      .lineup-bench__grid{display:flex;align-items:flex-start;justify-content:flex-start;gap:var(--lineup-bench-slot-gap);flex:1;min-height:0;align-self:stretch;}
       .lineup-bench__column{display:flex;flex-direction:column;gap:var(--lineup-bench-slot-gap);}
       .lineup-bench__column:first-child{margin-left:0;}
       .lineup-bench__cell{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;background:none;border:none;padding:0;width:var(--lineup-bench-slot-size);}
@@ -11901,6 +13750,7 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
       .lineup-overlay__close:focus-visible{outline:2px solid rgba(174,228,255,.7);outline-offset:3px;}
       .lineup-overlay__title{margin:0;font-size:20px;letter-spacing:.04em;}
       .lineup-overlay__subtitle{margin:0;font-size:13px;color:#9cbcd9;line-height:1.6;}
+      .lineup-overlay__body{display:flex;flex-direction:column;gap:12px;}
       .lineup-overlay__list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;max-height:360px;overflow:auto;}
       .lineup-overlay__option{padding:10px 12px;border-radius:12px;border:1px solid rgba(125,211,252,.2);background:rgba(12,22,32,.82);display:flex;align-items:center;gap:10px;cursor:pointer;transition:transform .16s ease,border-color .16s ease;}
       .lineup-overlay__option:hover{transform:translateY(-1px);border-color:rgba(125,211,252,.42);background:rgba(16,28,40,.9);}
@@ -11912,94 +13762,31 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
       @media(max-width:720px){.lineup-view__title{font-size:30px;}.lineup-view__header{flex-direction:column;align-items:flex-start;}.lineup-main-area{gap:18px;}.lineup-bench__content{grid-template-columns:1fr;}.lineup-bench__grid{flex-wrap:wrap;}.lineup-slot__avatar{width:64px;height:64px;}.lineup-roster__list{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}}
     `;
 
-    if (style.textContent !== css){
-      style.textContent = css;
+    ensureStyleTag(STYLE_ID, { css });
     }
+
+  function createOverlay(): HTMLDivElement{
+    const overlay = document.createElement('div');
+    overlay.className = 'lineup-overlay';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.innerHTML = `
+      <div class="lineup-overlay__panel" role="document">
+        <button type="button" class="lineup-overlay__close" aria-label="Đóng">Đóng</button>
+        <div class="lineup-overlay__body"></div>
+      </div>
+    `;
+    return overlay;
   }
 
-  function cloneRoster(source){
-    if (Array.isArray(source) && source.length > 0){
-      return source.map(entry => ({ ...entry }));
-    }
-    return ROSTER.map(entry => ({ ...entry }));
-  }
-
-  function normalizeRosterEntry(entry, index){
-    const id = entry.id || entry.key || `unit-${index}`;
-    const name = entry.name || entry.title || `Nhân vật #${index + 1}`;
-    const role = entry.class || entry.role || entry.archetype || '';
-    const rank = entry.rank || entry.tier || '';
-    const tags = Array.isArray(entry.tags)
-      ? entry.tags.slice()
-      : Array.isArray(entry.labels)
-        ? entry.labels.slice()
-        : [];
-    const power = Number.isFinite(entry.power)
-      ? entry.power
-      : (Number.isFinite(entry.cp) ? entry.cp : null);
-    const avatar = entry.avatar || entry.icon || entry.portrait || null;
-    const passives = Array.isArray(entry.passives) ? entry.passives : [];
-    return {
-      id: String(id),
-      name,
-      role,
-      rank,
-      tags,
-      power,
-      avatar,
-      passives,
-      raw: entry
-    };
-  }
-
-  function normalizeRoster(source){
-    const cloned = cloneRoster(source);
-    return cloned.map((entry, index) => normalizeRosterEntry(entry, index));
-  }
-
-  function normalizeAssignment(input, rosterIndex){
-    if (!input){
-      return { unitId: null, label: null };
-    }
-    if (typeof input === 'string'){
-      const trimmed = input.trim();
-      if (trimmed && rosterIndex.has(trimmed)){
-        return { unitId: trimmed, label: null };
-      }
-      return { unitId: null, label: trimmed || null };
-    }
-    if (Array.isArray(input)){
-      if (input.length >= 2 && typeof input[0] === 'string' && rosterIndex.has(input[0])){
-        return { unitId: input[0], label: null };
-      }
-      if (input.length === 1){
-        return normalizeAssignment(input[0], rosterIndex);
-      }
-    }
-    if (typeof input === 'object'){
-      const candidateId = input.unitId || input.id || input.key || null;
-      const label = input.name || input.title || input.label || input.displayName || null;
-      if (candidateId && rosterIndex.has(String(candidateId))){
-        return { unitId: String(candidateId), label: label || null };
-      }
-      if (label){
-        return { unitId: null, label };
-      }
-    }
-    return { unitId: null, label: null };
-  }
-
-  function sanitizeCodeToken(token){
+  function sanitizeCodeToken(token: string): string{
     if (!token){
       return '';
     }
     return token.replace(/[^A-Za-z0-9]/g, '');
   }
 
-  function normalizeForCode(value){
-    if (typeof value !== 'string'){
-      return '';
-    }
+  function normalizeForCode(value: string): string{
     const trimmed = value.trim();
     if (!trimmed){
       return '';
@@ -12007,7 +13794,7 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
     return trimmed.normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
   }
 
-  function extractCodeFromNormalized(normalized){
+  function extractCodeFromNormalized(normalized: string): string{
     if (!normalized){
       return '';
     }
@@ -12037,379 +13824,31 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
     return cleaned.slice(0, 3);
   }
 
-  function getUnitCode(unit, fallbackLabel){
-    const nameSource = normalizeForCode(
-      (typeof unit?.name === 'string' && unit.name.trim())
-        ? unit.name
-        : (typeof fallbackLabel === 'string' ? fallbackLabel : '')
-    );
-    let code = extractCodeFromNormalized(nameSource);
+  function getUnitCode(unit: RosterUnit | null | undefined, fallbackLabel: string): string{
+    const sourceName = unit?.name && unit.name.trim()
+      ? unit.name
+      : (typeof fallbackLabel === 'string' ? fallbackLabel : '');
+    const normalizedName = normalizeForCode(sourceName);
+    let code = extractCodeFromNormalized(normalizedName);
     if (!code){
-      const fallbackId = normalizeForCode(unit?.id != null ? String(unit.id) : '');
-      code = extractCodeFromNormalized(fallbackId);
+      const normalizedId = normalizeForCode(unit?.id != null ? String(unit.id) : '');
+      code = extractCodeFromNormalized(normalizedId);
     }
     return code ? code.toLocaleUpperCase('vi-VN') : '';
   }
 
-  function normalizeCost(cost, fallbackCurrencyId){
-    if (cost == null){
-      return null;
+  function getInitials(name: string): string{
+    if (!name){
+      return '';
     }
-    if (Array.isArray(cost)){
-      if (cost.length >= 2 && typeof cost[0] === 'string' && !Number.isNaN(Number(cost[1]))){
-        const amount = Number(cost[1]);
-        if (Number.isFinite(amount) && amount > 0){
-          return { currencyId: cost[0], amount };
-        }
-      }
-      if (cost.length === 1){
-        return normalizeCost(cost[0], fallbackCurrencyId);
-      }
-    }
-    if (typeof cost === 'number'){
-      if (!Number.isFinite(cost) || cost <= 0){
-        return null;
-      }
-      return { currencyId: fallbackCurrencyId || 'VNT', amount: cost };
-    }
-    if (typeof cost === 'string'){
-      const parsed = Number(cost);
-      if (!Number.isNaN(parsed) && parsed > 0){
-        return { currencyId: fallbackCurrencyId || 'VNT', amount: parsed };
-      }
-      return { currencyId: cost, amount: 1 };
-    }
-    if (typeof cost === 'object'){
-      const currencyId = cost.currencyId || cost.id || cost.type || cost.code || fallbackCurrencyId || 'VNT';
-      const rawAmount = cost.amount ?? cost.value ?? cost.cost ?? cost.price ?? cost.count ?? null;
-      const amount = Number(rawAmount);
-      if (Number.isFinite(amount) && amount > 0){
-        return { currencyId: String(currencyId), amount };
-      }
-      if (Array.isArray(cost.values) && cost.values.length >= 2){
-        const [id, value] = cost.values;
-        const candidateAmount = Number(value);
-        if (Number.isFinite(candidateAmount) && candidateAmount > 0){
-          return { currencyId: id || currencyId, amount: candidateAmount };
-        }
-      }
-    }
-    return null;
-  }
-
-  function normalizeLineupEntry(entry, index, rosterIndex){
-    const id = entry?.id || entry?.key || `lineup-${index}`;
-    const name = entry?.title || entry?.name || `Đội hình #${index + 1}`;
-    const role = entry?.role || entry?.archetype || '';
-    const description = entry?.description || entry?.summary || '';
-    const rawSlots = Array.isArray(entry?.slots) ? entry.slots : [];
-    const memberList = Array.isArray(entry?.members) ? entry.members : [];
-    const defaultCurrencyId = entry?.unlockCurrency || entry?.currencyId || entry?.defaultCurrencyId || null;
-    const slotCosts = Array.isArray(entry?.slotCosts) ? entry.slotCosts : null;
-    const unlockCosts = Array.isArray(entry?.unlockCosts) ? entry.unlockCosts : slotCosts;
-    let unlockedCount = Math.min(3, 5);
-    if (Number.isFinite(entry?.initialUnlockedSlots)){
-      unlockedCount = Math.max(0, Math.min(5, Number(entry.initialUnlockedSlots)));
-    } else if (rawSlots.some(slot => slot && slot.unlocked === false)){
-      unlockedCount = rawSlots.filter(slot => slot && slot.unlocked !== false).length;
-    }
-    const slots = new Array(5).fill(null).map((_, slotIndex) => {
-      const source = rawSlots[slotIndex] ?? memberList[slotIndex] ?? null;
-      const { unitId, label } = normalizeAssignment(source, rosterIndex);
-      const slotUnlock = source && typeof source === 'object' && 'unlocked' in source ? source.unlocked : null;
-      const unlocked = slotUnlock != null ? Boolean(slotUnlock) : slotIndex < unlockedCount;
-      const costSource = source?.cost
-        ?? source?.unlockCost
-        ?? (Array.isArray(unlockCosts) ? unlockCosts[slotIndex] : null)
-        ?? entry?.slotCost
-        ?? entry?.unlockCost
-        ?? null;
-      const unlockCost = normalizeCost(costSource, defaultCurrencyId);
-      return {
-        index: slotIndex,
-        unitId: unitId || null,
-        label: label || null,
-        unlocked,
-        unlockCost,
-        meta: source && typeof source === 'object' ? { ...source } : null
-      };
-    });
-
-    const benchSource = Array.isArray(entry?.bench)
-      ? entry.bench
-      : Array.isArray(entry?.reserve)
-        ? entry.reserve
-        : Array.isArray(entry?.members)
-          ? entry.members.slice(5)
-          : [];
-    const bench = new Array(10).fill(null).map((_, benchIndex) => {
-      const source = benchSource[benchIndex] ?? null;
-      const { unitId, label } = normalizeAssignment(source, rosterIndex);
-      return {
-        index: benchIndex,
-        unitId: unitId || null,
-        label: label || null,
-        meta: source && typeof source === 'object' ? { ...source } : null
-      };
-    });
-
-    const passiveSource = Array.isArray(entry?.passives)
-      ? entry.passives
-      : Array.isArray(entry?.passiveSlots)
-        ? entry.passiveSlots
-        : [];
-    const passives = new Array(6).fill(null).map((_, passiveIndex) => {
-      const source = passiveSource[passiveIndex] ?? null;
-      if (!source){
-        return {
-          index: passiveIndex,
-          id: `passive-${passiveIndex}`,
-          name: 'Chưa thiết lập',
-          description: '',
-          requirement: '',
-          requiredUnitIds: [],
-          requiredTags: [],
-          isEmpty: true,
-          autoActive: false,
-          source: null
-        };
-      }
-      const id = source.id || source.key || `passive-${passiveIndex}`;
-      const name = source.name || source.title || `Passive #${passiveIndex + 1}`;
-      const description = source.description || source.effect || source.text || '';
-      const requirement = source.requirement || source.condition || source.prerequisite || '';
-      const requiredUnitIds = Array.isArray(source.requiredUnitIds)
-        ? source.requiredUnitIds.map(String)
-        : Array.isArray(source.requires)
-          ? source.requires.filter(item => typeof item === 'string').map(String)
-          : (typeof source.requiredUnitId === 'string' ? [source.requiredUnitId] : []);
-      const requiredTags = Array.isArray(source.requiredTags)
-        ? source.requiredTags.map(String)
-        : Array.isArray(source.tagsRequired)
-          ? source.tagsRequired.map(String)
-          : [];
-      const auto = source.autoActive === true || source.alwaysActive === true || source.isActive === true;
-      return {
-        index: passiveIndex,
-        id,
-        name,
-        description,
-        requirement: typeof requirement === 'string' ? requirement : '',
-        requiredUnitIds,
-        requiredTags,
-        isEmpty: false,
-        autoActive: Boolean(auto),
-        source
-      };
-    });
-
-    const leaderId = entry?.leaderId || entry?.leader || entry?.captainId || null;
-
-    const fallbackLeader = slots.find(slot => slot.unitId)?.unitId || null;
-
-    return {
-      id: String(id),
-      name,
-      role,
-      description,
-      slots,
-      bench,
-      passives,
-      leaderId: leaderId && rosterIndex.has(String(leaderId)) ? String(leaderId) : fallbackLeader,
-      defaultCurrencyId: defaultCurrencyId || null
-    };
-  }
-
-  function normalizeLineups(rawLineups, roster){
-    const rosterIndex = new Set(roster.map(unit => unit.id));
-    if (!Array.isArray(rawLineups) || rawLineups.length === 0){
-      const slots = new Array(5).fill(null).map((_, index) => ({
-        index,
-        unitId: null,
-        label: null,
-        unlocked: index < 3,
-        unlockCost: null,
-        meta: null
-      }));
-      const bench = new Array(10).fill(null).map((_, index) => ({
-        index,
-        unitId: null,
-        label: null,
-        meta: null
-      }));
-      const passives = new Array(6).fill(null).map((_, index) => ({
-        index,
-        id: `passive-${index}`,
-        name: 'Chưa thiết lập',
-        description: '',
-        requirement: '',
-        requiredUnitIds: [],
-        requiredTags: [],
-        isEmpty: true,
-        autoActive: false,
-        source: null
-      }));
-      return [{
-        id: 'lineup-default',
-        name: 'Đội hình mẫu',
-        role: '',
-        description: 'Thiết lập đội hình gồm tối đa 5 vị trí chủ lực và 10 vị trí dự bị.',
-        slots,
-        bench,
-        passives,
-        leaderId: null,
-        defaultCurrencyId: null
-      }];
-    }
-    return rawLineups.map((entry, index) => normalizeLineupEntry(entry || {}, index, rosterIndex));
-  }
-
-  function extractCurrencyBalances(source){
-    const balances = new Map();
-    if (!source){
-      return balances;
-    }
-    const apply = (id, value) => {
-      if (!id) return;
-      const amount = Number(value);
-      if (!Number.isNaN(amount)){
-        balances.set(String(id), amount);
-      }
-    };
-
-    if (Array.isArray(source)){
-      source.forEach(entry => {
-        if (!entry) return;
-        if (typeof entry === 'number'){ apply('VNT', entry); return; }
-        if (typeof entry === 'string'){
-          const [id, value] = entry.split(':');
-          if (id && value){
-            apply(id.trim(), Number(value));
-          }
-          return;
-        }
-        if (typeof entry === 'object'){
-          const id = entry.currencyId || entry.id || entry.key || entry.type;
-          const value = entry.balance ?? entry.amount ?? entry.value ?? entry.total ?? entry;
-          apply(id, value);
-        }
-      });
-      return balances;
-    }
-
-    if (typeof source === 'object'){
-      Object.entries(source).forEach(([key, value]) => {
-        if (value && typeof value === 'object' && ('balance' in value || 'amount' in value || 'value' in value || 'total' in value)){
-          const id = value.currencyId || value.id || value.key || key;
-          apply(id, value.balance ?? value.amount ?? value.value ?? value.total);
-        } else {
-          apply(key, value);
-        }
-      });
-      if (source.balances && typeof source.balances === 'object'){
-        Object.entries(source.balances).forEach(([key, value]) => apply(key, value));
-      }
-    }
-
-    return balances;
-  }
-
-  function createCurrencyBalances(primary, secondary){
-    const base = extractCurrencyBalances(primary);
-    const override = extractCurrencyBalances(secondary);
-    for (const [key, value] of override.entries()){
-      base.set(key, value);
-    }
-    currencyCatalog.forEach(currency => {
-      if (!base.has(currency.id)){
-        base.set(currency.id, 0);
-      }
-    });
-    return base;
-  }
-  function formatCurrencyBalance(amount, currencyId){
-    const currency = currencyIndex.get(currencyId);
-    const formatted = numberFormatter.format(Number.isFinite(amount) ? amount : 0);
-    const suffix = currency?.suffix || currencyId || '';
-    return suffix ? `${formatted} ${suffix}` : formatted;
-  }
-
-  function getInitials(name){
-    if (!name) return '';
-    const parts = String(name).trim().split(/\s+/);
+    const parts = name.trim().split(/\s+/);
     if (parts.length === 1){
       return parts[0].slice(0, 2).toUpperCase();
     }
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   }
 
-  function collectAssignedUnitIds(lineup){
-    const ids = new Set();
-    lineup.slots.forEach(slot => {
-      if (slot.unitId){
-        ids.add(slot.unitId);
-      }
-    });
-    lineup.bench.forEach(cell => {
-      if (cell.unitId){
-        ids.add(cell.unitId);
-      }
-    });
-    if (lineup.leaderId){
-      ids.add(lineup.leaderId);
-    }
-    return ids;
-  }
-
-  function evaluatePassive(passive, assignedUnitIds, rosterLookup){
-    if (!passive || passive.isEmpty){
-      return false;
-    }
-    if (passive.autoActive){
-      return true;
-    }
-    if (passive.requiredUnitIds && passive.requiredUnitIds.length > 0){
-      for (const required of passive.requiredUnitIds){
-        if (!assignedUnitIds.has(required)){
-          return false;
-        }
-      }
-    }
-    if (passive.requiredTags && passive.requiredTags.length > 0){
-      const availableTags = new Set();
-      assignedUnitIds.forEach(id => {
-        const unit = rosterLookup.get(id);
-        if (!unit) return;
-        if (unit.role) availableTags.add(unit.role);
-        if (unit.rank) availableTags.add(unit.rank);
-        (unit.tags || []).forEach(tag => availableTags.add(tag));
-      });
-      const hasAllTags = passive.requiredTags.every(tag => availableTags.has(tag));
-      if (!hasAllTags){
-        return false;
-      }
-    }
-    if (!passive.requiredUnitIds?.length && !passive.requiredTags?.length){
-      return assignedUnitIds.size > 0;
-    }
-    return true;
-  }
-
-  function createOverlay(){
-    const overlay = document.createElement('div');
-    overlay.className = 'lineup-overlay';
-    overlay.setAttribute('role', 'dialog');
-    overlay.setAttribute('aria-modal', 'true');
-    overlay.innerHTML = `
-      <div class="lineup-overlay__panel" role="document">
-        <button type="button" class="lineup-overlay__close" aria-label="Đóng">Đóng</button>
-        <div class="lineup-overlay__body"></div>
-      </div>
-    `;
-    return overlay;
-  }
-
-  function renderAvatar(container, avatarUrl, name){
+  function renderAvatar(container: HTMLElement, avatarUrl: string | null, name: string): void{
     container.innerHTML = '';
     if (avatarUrl){
       const img = document.createElement('img');
@@ -12421,137 +13860,71 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
     }
   }
 
-  function filterRoster(roster, filter){
-    if (!filter || filter.type === 'all' || !filter.value){
-      return roster;
-    }
-    const value = String(filter.value).toLowerCase();
-    if (filter.type === 'class'){
-      return roster.filter(unit => (unit.role || '').toLowerCase() === value);
-    }
-    if (filter.type === 'rank'){
-      return roster.filter(unit => (unit.rank || '').toLowerCase() === value);
-    }
-    if (filter.type === 'tag'){
-      return roster.filter(unit => unit.tags.some(tag => String(tag).toLowerCase() === value));
-    }
-    return roster;
+  function formatUnitPower(power: number | null): string{
+    return powerFormatter.format(Number.isFinite(power) ? Number(power) : 0);
   }
 
-  function createFilterOptions(roster){
-    const classes = new Set();
-    const ranks = new Set();
-    const tags = new Set();
-    roster.forEach(unit => {
-      if (unit.role) classes.add(unit.role);
-      if (unit.rank) ranks.add(unit.rank);
-      (unit.tags || []).forEach(tag => tags.add(tag));
-    });
-    return {
-      classes: Array.from(classes),
-      ranks: Array.from(ranks),
-      tags: Array.from(tags)
-    };
-  }
-  function removeUnitFromPlacements(lineup, unitId, options = {}){
-    if (!unitId) return;
-    const { keepLeader = false } = options;
-    lineup.slots.forEach(slot => {
-      if (slot.unitId === unitId){
-        slot.unitId = null;
-      }
-    });
-    lineup.bench.forEach(cell => {
-      if (cell.unitId === unitId){
-        cell.unitId = null;
-      }
-    });
-    if (!keepLeader && lineup.leaderId === unitId){
-      lineup.leaderId = null;
-    }
+  export interface LineupViewOptions {
+    root: HTMLElement;
+    shell?: { enterScreen?: (screenId: string, params?: unknown) => void } | null;
+    definition?: { label?: string; title?: string; description?: string } | null;
+    description?: string | null;
+    lineups?: ReadonlyArray<LineupDefinition | null | undefined> | null;
+    roster?: ReadonlyArray<RosterEntryLite> | null;
+    playerState?: UnknownRecord | null;
+    currencies?: LineupCurrencies | null;
   }
 
-  function assignUnitToSlot(lineup, slotIndex, unitId){
-    const slot = lineup.slots[slotIndex];
-    if (!slot){
-      return { ok: false, message: 'Không tìm thấy vị trí.' };
-    }
-    if (!slot.unlocked){
-      return { ok: false, message: 'Vị trí đang bị khóa.' };
-    }
-    if (slot.unitId === unitId){
-      return { ok: true };
-    }
-    removeUnitFromPlacements(lineup, unitId, { keepLeader: true });
-    slot.unitId = unitId;
-    slot.label = null;
-    return { ok: true };
+  export interface LineupViewHandle {
+    destroy(): void;
   }
 
-  function assignUnitToBench(lineup, benchIndex, unitId){
-    const cell = lineup.bench[benchIndex];
-    if (!cell){
-      return { ok: false, message: 'Không tìm thấy ô dự bị.' };
-    }
-    if (cell.unitId === unitId){
-      return { ok: true };
-    }
-    removeUnitFromPlacements(lineup, unitId, { keepLeader: true });
-    cell.unitId = unitId;
-    cell.label = null;
-    return { ok: true };
-  }
-
-  function removeUnitFromBench(lineup, benchIndex){
-    const cell = lineup.bench[benchIndex];
-    if (!cell) return;
-    cell.unitId = null;
-  }
-
-  function isUnitPlaced(lineup, unitId){
-    if (!unitId) return false;
-    if (lineup.leaderId === unitId) return true;
-    if (lineup.slots.some(slot => slot.unitId === unitId)) return true;
-    if (lineup.bench.some(cell => cell.unitId === unitId)) return true;
-    return false;
-  }
-  function renderLineupView(options = {}){
+  function renderLineupView(options: LineupViewOptions): LineupViewHandle{
     const {
       root,
-      shell,
-      definition,
-      description,
-      lineups,
-      roster,
-      playerState,
-      currencies
+      shell = null,
+      definition = null,
+      description = null,
+      lineups = null,
+      roster = null,
+      playerState = null,
+      currencies = null,
     } = options;
 
-    if (!root){
-      throw new Error('renderLineupView cần một phần tử root hợp lệ.');
-    }
+    const host = assertElement<HTMLElement>(root, {
+      guard: (node): node is HTMLElement => node instanceof HTMLElement,
+      message: 'renderLineupView cần một phần tử root hợp lệ.',
+    });
 
     ensureStyles();
 
-    const normalizedRoster = normalizeRoster(roster);
-    const normalizedLineups = normalizeLineups(lineups, normalizedRoster);
-    const rosterLookup = new Map(normalizedRoster.map(unit => [unit.id, unit]));
-    const lineupState = new Map();
+    const normalizedRoster = normalizeRoster(roster ?? null);
+    const normalizedLineups = normalizeLineups(lineups ?? null, normalizedRoster);
+    const rosterLookup = new Map<string, RosterUnit>(normalizedRoster.map(unit => [unit.id, unit] as const));
+
+    const lineupState = new Map<string, LineupState>();
     normalizedLineups.forEach(lineup => {
       lineupState.set(lineup.id, {
         ...lineup,
-        slots: lineup.slots.map(slot => ({ ...slot })),
-        bench: lineup.bench.map(cell => ({ ...cell })),
+        slots: lineup.slots.map(slot => ({
+          ...slot,
+          unlockCost: slot.unlockCost ? { ...slot.unlockCost } : null,
+          meta: slot.meta ? { ...slot.meta } : null,
+        })),
+        bench: lineup.bench.map(cell => ({
+          ...cell,
+          meta: cell.meta ? { ...cell.meta } : null,
+        })),
         passives: lineup.passives.map(passive => ({ ...passive })),
-        leaderId: lineup.leaderId || null
+        leaderId: lineup.leaderId || null,
       });
     });
 
-    const playerCurrencies = playerState?.currencies || null;
-    const currencyBalances = createCurrencyBalances(playerCurrencies, currencies);
+    const playerCurrencySource = normalizeCurrencyBalances(playerState ?? null);
+    const currencyBalances = createCurrencyBalances(playerCurrencySource, currencies);
 
-    const state = {
-      selectedLineupId: normalizedLineups[0]?.id || null,
+    const state: LineupViewState = {
+      selectedLineupId: normalizedLineups[0]?.id ?? null,
       selectedUnitId: null,
       activeBenchIndex: null,
       filter: { type: 'all', value: null },
@@ -12561,13 +13934,15 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
       lineupState,
       roster: normalizedRoster,
       rosterLookup,
-      filterOptions: createFilterOptions(normalizedRoster)
+      filterOptions: createFilterOptions(normalizedRoster),
     };
 
-    root.innerHTML = '';
     const container = document.createElement('div');
     container.className = 'lineup-view';
-    root.appendChild(container);
+    const mount = mountSection({
+      root: host,
+      section: container,
+    });
 
     const header = document.createElement('div');
     header.className = 'lineup-view__header';
@@ -12656,7 +14031,7 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
     benchDetails.className = 'lineup-bench__details is-empty';
     benchContent.appendChild(benchDetails);
 
-    function syncBenchDetailsHeight(){
+    function syncBenchDetailsHeight(): void{
       if (!benchDetails || !leaderSection || typeof leaderSection.getBoundingClientRect !== 'function'){
         benchDetails.style.maxHeight = '';
         return;
@@ -12682,21 +14057,53 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
 
     const passiveOverlay = createOverlay();
     passiveOverlay.classList.add('lineup-overlay--passive');
-    const passiveOverlayBody = passiveOverlay.querySelector('.lineup-overlay__body');
-    const passiveClose = passiveOverlay.querySelector('.lineup-overlay__close');
+    const passiveOverlayBody = assertElement<HTMLDivElement>(
+      passiveOverlay.querySelector('.lineup-overlay__body'),
+      {
+        guard: (node): node is HTMLDivElement => node instanceof HTMLDivElement,
+        message: 'Không thể khởi tạo overlay passive.',
+      },
+    );
+    const passiveClose = assertElement<HTMLButtonElement>(
+      passiveOverlay.querySelector('.lineup-overlay__close'),
+      {
+        guard: (node): node is HTMLButtonElement => node instanceof HTMLButtonElement,
+        message: 'Không thể khởi tạo overlay passive.',
+      },
+    );
     passiveOverlayBody.innerHTML = '';
-    document.body.appendChild(passiveOverlay);
+    if (document.body){
+      document.body.appendChild(passiveOverlay);
+    } else {
+      host.appendChild(passiveOverlay);
+    }
 
     const leaderOverlay = createOverlay();
     leaderOverlay.classList.add('lineup-overlay--leader');
-    const leaderOverlayBody = leaderOverlay.querySelector('.lineup-overlay__body');
-    const leaderClose = leaderOverlay.querySelector('.lineup-overlay__close');
+    const leaderOverlayBody = assertElement<HTMLDivElement>(
+      leaderOverlay.querySelector('.lineup-overlay__body'),
+      {
+        guard: (node): node is HTMLDivElement => node instanceof HTMLDivElement,
+        message: 'Không thể khởi tạo overlay leader.',
+      },
+    );
+    const leaderClose = assertElement<HTMLButtonElement>(
+      leaderOverlay.querySelector('.lineup-overlay__close'),
+      {
+        guard: (node): node is HTMLButtonElement => node instanceof HTMLButtonElement,
+        message: 'Không thể khởi tạo overlay leader.',
+      },
+    );
     leaderOverlayBody.innerHTML = '';
-    document.body.appendChild(leaderOverlay);
+    if (document.body){
+      document.body.appendChild(leaderOverlay);
+    } else {
+      host.appendChild(leaderOverlay);
+    }
 
-    let activeOverlay = null;
+    let activeOverlay: HTMLElement | null = null;
 
-    function closeOverlay(target){
+    function closeOverlay(target: HTMLElement | null): void{
       if (!target) return;
       target.classList.remove('is-open');
       if (activeOverlay === target){
@@ -12704,17 +14111,18 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
       }
     }
 
-    function openOverlay(target){
+    function openOverlay(target: HTMLElement | null): void{{
       if (!target) return;
       target.classList.add('is-open');
       activeOverlay = target;
     }
-    function getSelectedLineup(){
+
+    function getSelectedLineup(): LineupState | null{
       if (!state.selectedLineupId) return null;
-      return state.lineupState.get(state.selectedLineupId) || null;
+      return state.lineupState.get(state.selectedLineupId) ?? null;
     }
 
-    function setMessage(text, type = 'info'){
+    function setMessage(text: string, type: LineupMessageType = 'info'): void{
       state.message = text || '';
       state.messageType = type;
       messageEl.textContent = text || '';
@@ -12725,25 +14133,24 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
       }
     }
 
-    function refreshWallet(){
+    function refreshWallet(): void{
       walletEl.innerHTML = '';
       for (const [currencyId, balance] of state.currencyBalances.entries()){
         const item = document.createElement('div');
         item.className = 'lineup-wallet__item';
-        const name = document.createElement('p');
-        name.className = 'lineup-wallet__name';
-        const currency = currencyIndex.get(currencyId);
-        name.textContent = currency?.name || currencyId;
+        const nameEl = document.createElement('p');
+        nameEl.className = 'lineup-wallet__name';
+        nameEl.textContent = currencyId;
         const value = document.createElement('p');
         value.className = 'lineup-wallet__balance';
         value.textContent = formatCurrencyBalance(balance, currencyId);
-        item.appendChild(name);
+        item.appendChild(nameEl);
         item.appendChild(value);
         walletEl.appendChild(item);
       }
     }
 
-  function renderBenchDetails(){
+    function renderBenchDetails(): void{
       benchDetails.innerHTML = '';
       const lineup = getSelectedLineup();
       if (!lineup){
@@ -12793,21 +14200,22 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
 
       benchDetails.classList.remove('is-empty');
 
-      const kit = unit.raw?.kit || null;
+      const kit = (unit.raw as { kit?: unknown } | null)?.kit ?? null;
       const skillSet = unit.id ? getSkillSet(unit.id) : null;
 
-      const skills = Array.isArray(kit?.skills)
-        ? kit.skills
+      const skills = Array.isArray((kit as { skills?: unknown[] } | null)?.skills)
+        ? ((kit as { skills?: unknown[] }).skills ?? [])
             .filter(skill => {
-              const skillName = typeof skill?.name === 'string' ? skill.name.trim() : '';
-              const skillKey = typeof skill?.key === 'string' ? skill.key.trim() : '';
+              const skillRecord = skill as { name?: string; key?: string } | null;
+              const skillName = typeof skillRecord?.name === 'string' ? skillRecord.name.trim() : '';
+              const skillKey = typeof skillRecord?.key === 'string' ? skillRecord.key.trim() : '';
               return skillName !== 'Đánh Thường' && skillKey !== 'Đánh Thường';
             })
             .slice(0, 3)
         : [];
 
-      const kitUlt = kit?.ult || null;
-      const skillSetUlt = skillSet?.ult || null;
+      const kitUlt = (kit as { ult?: { name?: string; id?: string } } | null)?.ult ?? null;
+      const skillSetUlt = (skillSet as { ult?: { name?: string; id?: string } } | null)?.ult ?? null;
       const hasUlt = Boolean(kitUlt || skillSetUlt);
       const ultName = hasUlt
         ? (kitUlt?.name || skillSetUlt?.name || kitUlt?.id || 'Chưa đặt tên')
@@ -12830,15 +14238,16 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
           list.className = 'lineup-bench__details-list';
           skills.forEach((skill, idx) => {
             const item = document.createElement('li');
-            const name = skill?.name || skill?.key || `Kỹ năng #${idx + 1}`;
-            item.textContent = name;
+            const skillRecord = skill as { name?: string; key?: string } | null;
+            const nameText = skillRecord?.name || skillRecord?.key || `Kỹ năng #${idx + 1}`;
+            item.textContent = nameText;
             list.appendChild(item);
           });
           skillSection.appendChild(list);
           benchDetails.appendChild(skillSection);
         }
 
-        if (hasUlt){
+        if (hasUlt && ultName){
           const ultSection = document.createElement('div');
           ultSection.className = 'lineup-bench__details-section';
           const heading = document.createElement('p');
@@ -12852,12 +14261,12 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
           benchDetails.appendChild(ultSection);
         }
       }
-      
+
       syncBenchDetailsHeight();
     }
 
-    function updateActiveBenchHighlight(){
-      const cells = benchGrid.querySelectorAll('.lineup-bench__cell');
+    function updateActiveBenchHighlight(): void{
+      const cells = benchGrid.querySelectorAll<HTMLElement>('.lineup-bench__cell');
       cells.forEach(cell => {
         const idx = Number(cell.dataset.benchIndex);
         if (Number.isFinite(idx) && idx === state.activeBenchIndex){
@@ -12868,7 +14277,7 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
       });
     }
 
-    function renderBench(){
+    function renderBench(): void{
       const lineup = getSelectedLineup();
       benchGrid.innerHTML = '';
       if (!lineup){
@@ -12877,12 +14286,12 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
         return;
       }
 
-      if (!Number.isInteger(state.activeBenchIndex) || !lineup.bench[state.activeBenchIndex]){
+      if (!Number.isInteger(state.activeBenchIndex) || !lineup.bench[state.activeBenchIndex ?? -1]){
         state.activeBenchIndex = null;
       }
-      
+
       const columnCount = 5;
-      const columnEls = Array.from({ length: columnCount }, (_, idx) => {
+      const columnEls = Array.from({ length: columnCount }, () => {
         const columnEl = document.createElement('div');
         columnEl.className = 'lineup-bench__column';
         benchGrid.appendChild(columnEl);
@@ -12920,7 +14329,7 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
           : '';
         const avatarEl = document.createElement('div');
         avatarEl.className = 'lineup-bench__avatar';
-        const avatarSource = unit?.avatar || cell.meta?.avatar || null;
+        const avatarSource = unit?.avatar || (cell.meta as { avatar?: string } | null)?.avatar || null;
         const avatarLabel = unit?.name || cell.label || '';
         renderAvatar(avatarEl, avatarSource, avatarLabel);
         if (codeText){
@@ -12937,12 +14346,12 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
         const targetColumn = columnEls[columnIndex] || columnEls[0];
         targetColumn.appendChild(cellEl);
       });
-      
+
       updateActiveBenchHighlight();
       renderBenchDetails();
     }
 
-    function renderLeader(){
+    function renderLeader(): void{
       const lineup = getSelectedLineup();
       if (!lineup){
         renderAvatar(leaderAvatar, null, '');
@@ -12995,12 +14404,12 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
       });
     }
 
-    function renderFilters(){
+    function renderFilters(): void{
       rosterFilters.innerHTML = '';
       const filters = [
-        { type: 'all', value: null, label: 'Tất cả' },
-        ...state.filterOptions.classes.map(value => ({ type: 'class', value, label: value })),
-        ...state.filterOptions.ranks.map(value => ({ type: 'rank', value, label: value }))
+        { type: 'all' as const, value: null, label: 'Tất cả' },
+        ...state.filterOptions.classes.map(value => ({ type: 'class' as const, value, label: value })),
+        ...state.filterOptions.ranks.map(value => ({ type: 'rank' as const, value, label: value })),
       ];
       filters.forEach(filter => {
         const button = document.createElement('button');
@@ -13018,7 +14427,7 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
       });
     }
 
-    function renderRoster(){
+    function renderRoster(): void{
       rosterList.innerHTML = '';
       const lineup = getSelectedLineup();
       const filtered = filterRoster(state.roster, state.filter);
@@ -13031,7 +14440,7 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
         if (state.selectedUnitId === unit.id){
           button.classList.add('is-selected');
         }
-        if (lineup && isUnitPlaced(lineup, unit.id) && state.selectedUnitId !== unit.id){
+        if (lineup && (lineup.leaderId === unit.id || lineup.slots.some(slot => slot.unitId === unit.id) || lineup.bench.some(cell => cell.unitId === unit.id)) && state.selectedUnitId !== unit.id){
           button.classList.add('is-unavailable');
         }
         const avatar = document.createElement('div');
@@ -13040,10 +14449,10 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
         button.appendChild(avatar);
         const meta = document.createElement('div');
         meta.className = 'lineup-roster__meta';
-        const name = document.createElement('p');
-        name.className = 'lineup-roster__name';
-        name.textContent = unit.name;
-        meta.appendChild(name);
+        const nameEl = document.createElement('p');
+        nameEl.className = 'lineup-roster__name';
+        nameEl.textContent = unit.name;
+        meta.appendChild(nameEl);
         if (unit.role || unit.rank){
           const tag = document.createElement('p');
           tag.className = 'lineup-roster__tag';
@@ -13053,7 +14462,7 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
         if (unit.power != null){
           const extra = document.createElement('p');
           extra.className = 'lineup-roster__extra';
-          extra.textContent = `Chiến lực ${numberFormatter.format(unit.power)}`;
+          extra.textContent = `Chiến lực ${formatUnitPower(unit.power)}`;
           meta.appendChild(extra);
         }
         button.appendChild(meta);
@@ -13061,44 +14470,40 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
       });
     }
 
-    function openPassiveDetails(passive){
-      if (!passive || passive.isEmpty) return;
+    function openPassiveDetails(passive: LineupPassive): void{
       passiveOverlayBody.innerHTML = '';
       const title = document.createElement('h3');
       title.className = 'lineup-overlay__title';
       title.textContent = passive.name;
       passiveOverlayBody.appendChild(title);
-      const subtitle = document.createElement('p');
-      subtitle.className = 'lineup-overlay__subtitle';
-      subtitle.textContent = passive.description || 'Chưa có mô tả chi tiết.';
-      passiveOverlayBody.appendChild(subtitle);
       if (passive.requirement){
-        const requirement = document.createElement('p');
-        requirement.className = 'lineup-overlay__subtitle';
-        requirement.textContent = `Điều kiện: ${passive.requirement}`;
-        passiveOverlayBody.appendChild(requirement);
+        const subtitle = document.createElement('p');
+        subtitle.className = 'lineup-overlay__subtitle';
+        subtitle.textContent = passive.requirement;
+        passiveOverlayBody.appendChild(subtitle);
       }
-      if (passive.requiredUnitIds?.length){
-        const units = passive.requiredUnitIds
-          .map(id => rosterLookup.get(id)?.name || id)
-          .join(', ');
-        const reqUnits = document.createElement('p');
-        reqUnits.className = 'lineup-overlay__subtitle';
-        reqUnits.textContent = `Yêu cầu nhân vật: ${units}`;
-        passiveOverlayBody.appendChild(reqUnits);
+      if (passive.description){
+        const descriptionEl = document.createElement('p');
+        descriptionEl.className = 'lineup-overlay__subtitle';
+        descriptionEl.textContent = passive.description;
+        passiveOverlayBody.appendChild(descriptionEl);
       }
-      if (passive.requiredTags?.length){
-        const tags = passive.requiredTags.join(', ');
-        const reqTags = document.createElement('p');
-        reqTags.className = 'lineup-overlay__subtitle';
-        reqTags.textContent = `Yêu cầu tag: ${tags}`;
-        passiveOverlayBody.appendChild(reqTags);
+      if (passive.requiredUnitIds.length){
+        const list = document.createElement('ul');
+        list.className = 'lineup-overlay__list';
+        passive.requiredUnitIds.forEach(unitId => {
+          const item = document.createElement('li');
+          const unit = rosterLookup.get(unitId);
+          item.textContent = unit?.name || unitId;
+          list.appendChild(item);
+        });
+        passiveOverlayBody.appendChild(list);
       }
       openOverlay(passiveOverlay);
       passiveClose.focus();
     }
 
-    function openLeaderPicker(){
+    function openLeaderPicker(): void{
       const lineup = getSelectedLineup();
       if (!lineup) return;
       leaderOverlayBody.innerHTML = '';
@@ -13130,10 +14535,10 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
         renderAvatar(avatar, unit.avatar || null, unit.name);
         option.appendChild(avatar);
         const text = document.createElement('div');
-        const name = document.createElement('p');
-        name.className = 'lineup-overlay__option-name';
-        name.textContent = unit.name;
-        text.appendChild(name);
+        const nameEl = document.createElement('p');
+        nameEl.className = 'lineup-overlay__option-name';
+        nameEl.textContent = unit.name;
+        text.appendChild(nameEl);
         const meta = document.createElement('p');
         meta.className = 'lineup-overlay__option-meta';
         meta.textContent = [unit.role, unit.rank].filter(Boolean).join(' · ');
@@ -13150,235 +14555,47 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
       leaderClose.focus();
     }
 
-    function setLeader(lineup, unitId){
-      if (!lineup){
-        return { ok: false, message: 'Không tìm thấy đội hình.' };
-      }
-      if (!unitId){
-        lineup.leaderId = null;
-        return { ok: true };
-      }
-      const unit = rosterLookup.get(unitId);
-      if (!unit){
-        return { ok: false, message: 'Không tìm thấy nhân vật.' };
-      }
-      if (!isUnitPlaced(lineup, unitId)){
-        const slot = lineup.slots.find(entry => entry.unlocked && !entry.unitId);
-        if (slot){
-          assignUnitToSlot(lineup, slot.index, unitId);
-        } else {
-          const bench = lineup.bench.find(entry => !entry.unitId);
-          if (bench){
-            assignUnitToBench(lineup, bench.index, unitId);
-          } else {
-            return { ok: false, message: 'Không còn vị trí trống để gán leader.' };
-          }
-        }
-      }
-      lineup.leaderId = unitId;
-      return { ok: true };
-    }
+  const cleanup: Array<() => void> = [];
 
-    function handleBenchInteraction(event){
-      const benchEl = event.target.closest('.lineup-bench__cell');
-      if (!benchEl) return;
-      const lineup = getSelectedLineup();
-      if (!lineup) return;
-      const benchIndex = Number(benchEl.dataset.benchIndex);
-      if (!Number.isFinite(benchIndex)) return;
-      const cell = lineup.bench[benchIndex];
-      if (!cell) return;
-
-      if (state.selectedUnitId){
-        const result = assignUnitToBench(lineup, benchIndex, state.selectedUnitId);
-        if (!result.ok){
-          setMessage(result.message || 'Không thể gán nhân vật.', 'error');
-        } else {
-          setMessage('Đã thêm nhân vật vào dự bị.', 'info');
-        }
-        renderBench();
-        renderLeader();
-        renderPassives();
-        renderRoster();
-        return;
-      }
-
-      if (event.altKey || event.ctrlKey || event.metaKey){
-        if (cell.unitId){
-          removeUnitFromBench(lineup, benchIndex);
-          state.activeBenchIndex = benchIndex;
-          renderBench();
-          renderPassives();
-          renderRoster();
-          renderLeader();
-          setMessage('Đã bỏ nhân vật khỏi dự bị.', 'info');
-        }
-        return;
-      }
-     
-      state.activeBenchIndex = benchIndex;
-      updateActiveBenchHighlight();
-      renderBenchDetails();
-    }
-
-    function handleBenchFocus(event){
-      const benchEl = event.target.closest('.lineup-bench__cell');
-      if (!benchEl) return;
-      const lineup = getSelectedLineup();
-      if (!lineup) return;
-      const benchIndex = Number(benchEl.dataset.benchIndex);
-      if (!Number.isFinite(benchIndex)) return;
-      if (state.activeBenchIndex === benchIndex) return;
-      state.activeBenchIndex = benchIndex;
-      updateActiveBenchHighlight();
-      renderBenchDetails();
-    }
-
-    function handlePassiveClick(event){
-      const btn = event.target.closest('.lineup-passive');
-      if (!btn) return;
-      const lineup = getSelectedLineup();
-      if (!lineup) return;
-      const index = Number(btn.dataset.passiveIndex);
-      if (!Number.isFinite(index)) return;
-      const passive = lineup.passives[index];
-      if (!passive || passive.isEmpty) return;
-      openPassiveDetails(passive);
-    }
-
-    function handleRosterFilter(event){
-      const button = event.target.closest('.lineup-roster__filter');
-      if (!button) return;
-      const type = button.dataset.filterType || 'all';
-      const value = button.dataset.filterValue ?? null;
-      state.filter = { type, value };
-      renderFilters();
-      renderRoster();
-    }
-
-    function handleRosterSelect(event){
-      const entry = event.target.closest('.lineup-roster__entry');
-      if (!entry) return;
-      const unitId = entry.dataset.unitId;
-      if (!unitId) return;
-      if (state.selectedUnitId === unitId){
-        state.selectedUnitId = null;
-        setMessage('Đã bỏ chọn nhân vật.', 'info');
-      } else {
-        state.selectedUnitId = unitId;
-        const unit = rosterLookup.get(unitId);
-        setMessage(`Đã chọn ${unit?.name || 'nhân vật'}. Chạm ô dự bị hoặc leader để gán.`, 'info');
-      }
-      renderRoster();
-    }
-
-    function handleLeaderOption(event){
-      const option = event.target.closest('.lineup-overlay__option');
-      if (!option) return;
-      const lineup = getSelectedLineup();
-      if (!lineup) return;
-      const unitId = option.dataset.unitId || null;
-      const result = setLeader(lineup, unitId || null);
-      if (!result.ok){
-        setMessage(result.message || 'Không thể đặt leader.', 'error');
-      } else {
-        if (unitId){
-          const unit = rosterLookup.get(unitId);
-          setMessage(`Đã chọn ${unit?.name || 'leader'}.`, 'info');
-        } else {
-          setMessage('Đã bỏ chọn leader.', 'info');
-        }
-      }
-      renderLeader();
-      renderBench();
-      renderPassives();
-      renderRoster();
-      closeOverlay(leaderOverlay);
-    }
-
-    function handleGlobalKey(event){
-      if (event.key === 'Escape' && activeOverlay){
-        closeOverlay(activeOverlay);
-      }
-    }
-    const cleanup = [];
-
-  let leaderObserver = null;
-    if (typeof ResizeObserver === 'function'){
-      leaderObserver = new ResizeObserver(() => {
-        syncBenchDetailsHeight();
-      });
-      leaderObserver.observe(leaderSection);
-      cleanup.push(() => {
-        if (leaderObserver){
-          leaderObserver.disconnect();
-        }
-      });
-    }
-
-    const handleWindowResize = () => syncBenchDetailsHeight();
-    if (typeof window !== 'undefined'){
-      window.addEventListener('resize', handleWindowResize);
-      cleanup.push(() => window.removeEventListener('resize', handleWindowResize));
-    }
-
-    const handleBack = () => {
-      if (shell && typeof shell.enterScreen === 'function'){
-        shell.enterScreen('main-menu');
-      }
-    };
-    backButton.addEventListener('click', handleBack);
-    cleanup.push(() => backButton.removeEventListener('click', handleBack));
-
-    benchGrid.addEventListener('click', handleBenchInteraction);
-    cleanup.push(() => benchGrid.removeEventListener('click', handleBenchInteraction));
-    benchGrid.addEventListener('focusin', handleBenchFocus);
-    cleanup.push(() => benchGrid.removeEventListener('focusin', handleBenchFocus));
-    benchGrid.addEventListener('mouseenter', handleBenchFocus, true);
-    cleanup.push(() => benchGrid.removeEventListener('mouseenter', handleBenchFocus, true));
-
-    passiveGrid.addEventListener('click', handlePassiveClick);
-    cleanup.push(() => passiveGrid.removeEventListener('click', handlePassiveClick));
-
-    rosterFilters.addEventListener('click', handleRosterFilter);
-    cleanup.push(() => rosterFilters.removeEventListener('click', handleRosterFilter));
-
-    rosterList.addEventListener('click', handleRosterSelect);
-    cleanup.push(() => rosterList.removeEventListener('click', handleRosterSelect));
-
-    const handleLeaderOpen = () => openLeaderPicker();
-    leaderAvatar.addEventListener('click', handleLeaderOpen);
-    cleanup.push(() => leaderAvatar.removeEventListener('click', handleLeaderOpen));
-
-    const handlePassiveClose = () => closeOverlay(passiveOverlay);
-    passiveClose.addEventListener('click', handlePassiveClose);
-    cleanup.push(() => passiveClose.removeEventListener('click', handlePassiveClose));
-
-    const handleLeaderClose = () => closeOverlay(leaderOverlay);
-    leaderClose.addEventListener('click', handleLeaderClose);
-    cleanup.push(() => leaderClose.removeEventListener('click', handleLeaderClose));
-
-    const handlePassiveOverlayClick = event => {
-      if (event.target === passiveOverlay){
-        closeOverlay(passiveOverlay);
-      }
-    };
-    passiveOverlay.addEventListener('click', handlePassiveOverlayClick);
-    cleanup.push(() => passiveOverlay.removeEventListener('click', handlePassiveOverlayClick));
-
-    const handleLeaderOverlayClick = event => {
-      if (event.target === leaderOverlay){
-        closeOverlay(leaderOverlay);
-      }
-    };
-    leaderOverlay.addEventListener('click', handleLeaderOverlayClick);
-    cleanup.push(() => leaderOverlay.removeEventListener('click', handleLeaderOverlayClick));
-
-    leaderOverlayBody.addEventListener('click', handleLeaderOption);
-    cleanup.push(() => leaderOverlayBody.removeEventListener('click', handleLeaderOption));
-
-    document.addEventListener('keydown', handleGlobalKey);
-    cleanup.push(() => document.removeEventListener('keydown', handleGlobalKey));
+  const eventCleanup = bindLineupEvents({
+      shell,
+      state,
+      elements: {
+        backButton,
+        benchGrid,
+        benchDetails,
+        passiveGrid,
+        rosterFilters,
+        rosterList,
+        leaderAvatar,
+        leaderSection,
+        passiveOverlay,
+        passiveClose,
+        leaderOverlay,
+        leaderOverlayBody,
+        leaderClose,
+      },
+      overlays: {
+        getActive: () => activeOverlay,
+        close: overlay => closeOverlay(overlay),
+      },
+      helpers: {
+        getSelectedLineup,
+        setMessage,
+        renderBench,
+        renderBenchDetails,
+        renderLeader,
+        renderPassives,
+        renderFilters,
+        renderRoster,
+        updateActiveBenchHighlight,
+        syncBenchDetailsHeight,
+        openPassiveDetails,
+        openLeaderPicker,
+      },
+      rosterLookup,
+    });
+    cleanup.push(...eventCleanup);
 
     refreshWallet();
     renderBench();
@@ -13395,27 +14612,730 @@ __define('./screens/lineup/view.js', (exports, module, __require) => {
       destroy(){
         while (cleanup.length > 0){
           const fn = cleanup.pop();
+          if (!fn) continue;
           try {
-            if (typeof fn === 'function'){
-              fn();
-            }
-          } catch (error) {
+            fn();
+          } catch (error){
             console.error('[lineup] destroy error', error);
           }
         }
+        mount.destroy();
+      },
+    };
+   }
+  }
+  exports.renderLineupView = renderLineupView;
+});
+__define('./screens/lineup/view/state.ts', (exports, module, __require) => {
+  const __dep0 = __require('./catalog.ts');
+  const ROSTER = __dep0.ROSTER;
+  const __dep1 = __require('./data/economy.ts');
+  const listCurrencies = __dep1.listCurrencies;
+  const __dep2 = __require('./utils/format.ts');
+  const createNumberFormatter = __dep2.createNumberFormatter;
+
+
+
+  export interface RosterUnit {
+    id: string;
+    name: string;
+    role: string;
+    rank: string;
+    tags: string[];
+    power: number | null;
+    avatar: string | null;
+    passives: unknown[];
+    raw: Record<string, unknown> | null;
+  }
+
+  export interface LineupBenchCell {
+    index: number;
+    unitId: string | null;
+    label: string | null;
+    meta: Record<string, unknown> | null;
+  }
+
+  export interface LineupPassive {
+    index: number;
+    id: string;
+    name: string;
+    description: string;
+    requirement: string;
+    requiredUnitIds: string[];
+    requiredTags: string[];
+    isEmpty: boolean;
+    autoActive: boolean;
+    source: unknown;
+  }
+
+  export interface LineupFilter {
+    type: 'all' | 'class' | 'rank' | 'tag';
+    value: string | null;
+  }
+
+  export interface LineupFilterOptions {
+    classes: string[];
+    ranks: string[];
+    tags: string[];
+  }
+
+  export type CurrencyBalances = Map<string, number>;
+
+  export type LineupMessageType = 'info' | 'error';
+
+  export interface LineupViewState {
+    selectedLineupId: string | null;
+    selectedUnitId: string | null;
+    activeBenchIndex: number | null;
+    filter: LineupFilter;
+    message: string;
+    messageType: LineupMessageType;
+    currencyBalances: CurrencyBalances;
+    lineupState: Map<string, LineupState>;
+    roster: RosterUnit[];
+    rosterLookup: Map<string, RosterUnit>;
+    filterOptions: LineupFilterOptions;
+  }
+
+  interface AssignmentResult {
+    unitId: string | null;
+    label: string | null;
+  }
+
+  const currencyCatalog = listCurrencies();
+  const currencyIndex = new Map(currencyCatalog.map(currency => [currency.id, currency]));
+  const numberFormatter = createNumberFormatter('vi-VN');
+
+  const isObjectLike = (value: unknown): value is Record<string, unknown> => (
+    typeof value === 'object' && value !== null && !Array.isArray(value)
+  );
+
+  const isRosterEntryLite = (value: unknown): value is RosterEntryLite => isObjectLike(value);
+
+  const isLineupDefinition = (value: unknown): value is LineupDefinition => isObjectLike(value);
+
+  const isLineupMemberConfig = (value: unknown): value is LineupMemberConfig => isObjectLike(value);
+
+  const isLineupPassiveConfig = (value: unknown): value is LineupPassiveConfig => isObjectLike(value);
+
+  function cloneRoster(source: ReadonlyArray<RosterEntryLite> | null | undefined): RosterEntryLite[] {
+    if (Array.isArray(source) && source.length > 0){
+      const clones = source.filter(isRosterEntryLite).map(entry => ({ ...entry }));
+      if (clones.length > 0){
+        return clones;
       }
+    }
+    return ROSTER.map(entry => ({ ...entry }));
+  }
+
+  function normalizeRosterEntry(entry: RosterEntryLite | null | undefined, index: number): RosterUnit {
+    const source: RosterEntryLite = entry ?? {};
+    const id = source.id ?? source.key ?? `unit-${index}`;
+    const name = source.name ?? source.title ?? `Nhân vật #${index + 1}`;
+    const role = source.class ?? source.role ?? source.archetype ?? '';
+    const rank = source.rank ?? source.tier ?? '';
+    const tags = Array.isArray(source.tags)
+      ? source.tags.slice()
+      : Array.isArray(source.labels)
+        ? source.labels.slice()
+        : [];
+    const numericPower = Number(source.power);
+    const numericCp = Number(source.cp);
+    const power = Number.isFinite(numericPower)
+      ? numericPower
+      : (Number.isFinite(numericCp) ? numericCp : null);
+    const avatar = typeof source.avatar === 'string'
+      ? source.avatar
+      : typeof source.icon === 'string'
+        ? source.icon
+        : typeof source.portrait === 'string'
+          ? source.portrait
+          : null;
+    const passives = Array.isArray(source.passives) ? source.passives.slice() : [];
+    return {
+      id: String(id),
+      name: typeof name === 'string' ? name : `Nhân vật #${index + 1}`,
+      role: typeof role === 'string' ? role : '',
+      rank: typeof rank === 'string' ? rank : '',
+      tags: tags.map(tag => String(tag)),
+      power: power ?? null,
+      avatar,
+      passives,
+      raw: isObjectLike(source) ? { ...source } : null,
     };
   }
 
-  exports.renderLineupView = renderLineupView;
+  function normalizeRoster(source: ReadonlyArray<RosterEntryLite> | null | undefined): RosterUnit[] {
+    const cloned = cloneRoster(source);
+    return cloned.map((entry, index) => normalizeRosterEntry(entry, index));
+  }
+
+  function normalizeAssignment(input: unknown, rosterIndex: Set<string>): AssignmentResult {
+    if (!input){
+      return { unitId: null, label: null };
+    }
+    if (typeof input === 'string'){
+      const trimmed = input.trim();
+      if (trimmed && rosterIndex.has(trimmed)){
+        return { unitId: trimmed, label: null };
+      }
+      return { unitId: null, label: trimmed || null };
+    }
+    if (Array.isArray(input)){
+      if (input.length >= 2 && typeof input[0] === 'string' && rosterIndex.has(input[0])){
+        return { unitId: input[0], label: null };
+      }
+      if (input.length === 1){
+        return normalizeAssignment(input[0], rosterIndex);
+      }
+    }
+    if (typeof input === 'object'){
+      const record = input as Record<string, unknown>;
+      const candidateId = record.unitId ?? record.id ?? record.key ?? null;
+      const label = record.name ?? record.title ?? record.label ?? record.displayName ?? record.note ?? null;
+      if (candidateId && rosterIndex.has(String(candidateId))){
+        return { unitId: String(candidateId), label: typeof label === 'string' ? label : null };
+      }
+      if (typeof label === 'string' && label.trim()){
+        return { unitId: null, label };
+      }
+    }
+    return { unitId: null, label: null };
+  }
+
+  function normalizeCost(cost: unknown, fallbackCurrencyId: string | null): { currencyId: string; amount: number } | null {
+    if (cost == null){
+      return null;
+    }
+    if (Array.isArray(cost)){
+      if (cost.length >= 2 && typeof cost[0] === 'string' && !Number.isNaN(Number(cost[1]))){
+        const amount = Number(cost[1]);
+        if (Number.isFinite(amount) && amount > 0){
+          return { currencyId: cost[0], amount };
+        }
+      }
+      if (cost.length === 1){
+        return normalizeCost(cost[0], fallbackCurrencyId);
+      }
+    }
+    if (typeof cost === 'number'){
+      if (!Number.isFinite(cost) || cost <= 0){
+        return null;
+      }
+      return { currencyId: fallbackCurrencyId || 'VNT', amount: cost };
+    }
+    if (typeof cost === 'string'){
+      const parsed = Number(cost);
+      if (!Number.isNaN(parsed) && parsed > 0){
+        return { currencyId: fallbackCurrencyId || 'VNT', amount: parsed };
+      }
+      return { currencyId: cost, amount: 1 };
+    }
+    if (typeof cost === 'object'){
+      const record = cost as Record<string, unknown> & { values?: unknown[] };
+      const currencyId = record.currencyId ?? record.id ?? record.type ?? record.code ?? fallbackCurrencyId ?? 'VNT';
+      const rawAmount = record.amount ?? record.value ?? record.cost ?? record.price ?? record.count ?? null;
+      const amount = Number(rawAmount);
+      if (Number.isFinite(amount) && amount > 0){
+        return { currencyId: String(currencyId), amount };
+      }
+      if (Array.isArray(record.values) && record.values.length >= 2){
+        const [id, value] = record.values;
+        const candidateAmount = Number(value);
+        if (Number.isFinite(candidateAmount) && candidateAmount > 0){
+          const resolvedId = typeof id === 'string' && id ? id : String(currencyId);
+          return { currencyId: resolvedId, amount: candidateAmount };
+        }
+      }
+    }
+    return null;
+  }
+
+  function normalizeLineupEntry(entry: LineupDefinition | null | undefined, index: number, rosterIndex: Set<string>): LineupState {
+    const source: LineupDefinition = entry && isLineupDefinition(entry) ? entry : {};
+    const id = source.id ?? source.key ?? `lineup-${index}`;
+    const name = source.name ?? source.title ?? `Đội hình #${index + 1}`;
+    const role = source.role ?? source.type ?? '';
+    const description = source.description ?? source.summary ?? '';
+    const rawSlots = Array.isArray(source.slots) ? source.slots : [];
+    const memberList = Array.isArray(source.members) ? source.members : [];
+    const defaultCurrencyId = source.unlockCurrency ?? source.currencyId ?? source.defaultCurrencyId ?? null;
+    const slotCosts = Array.isArray(source.slotCosts) ? source.slotCosts : null;
+    const unlockCosts = Array.isArray(source.unlockCosts) ? source.unlockCosts : slotCosts;
+    let unlockedCount = Math.min(3, 5);
+    if (Number.isFinite(source.initialUnlockedSlots as number)){
+      unlockedCount = Math.max(0, Math.min(5, Number(source.initialUnlockedSlots)));
+    } else if (rawSlots.some(slot => isLineupMemberConfig(slot) && slot.unlocked === false)){
+      unlockedCount = rawSlots.filter(slot => isLineupMemberConfig(slot) && slot.unlocked !== false).length;
+    }
+    const slots: LineupSlot[] = new Array(5).fill(null).map((_, slotIndex) => {
+      const slotInput = rawSlots[slotIndex] ?? memberList[slotIndex] ?? null;
+      const { unitId, label } = normalizeAssignment(slotInput, rosterIndex);
+      const record = isLineupMemberConfig(slotInput) ? slotInput : null;
+      const slotUnlock = record?.unlocked ?? null;
+      const unlocked = slotUnlock != null ? Boolean(slotUnlock) : slotIndex < unlockedCount;
+      const costSource = record?.cost
+        ?? record?.unlockCost
+        ?? (Array.isArray(unlockCosts) ? unlockCosts[slotIndex] : null)
+        ?? source.slotCost
+        ?? source.unlockCost
+        ?? null;
+      const unlockCost = normalizeCost(costSource, typeof defaultCurrencyId === 'string' ? defaultCurrencyId : null);
+      const equipment = record?.equipment as EquipmentLoadout | null | undefined;
+      return {
+        index: slotIndex,
+        unitId: unitId || null,
+        label: label || null,
+        unlocked,
+        unlockCost,
+        equipment: equipment ?? null,
+        meta: record ? { ...record } : null,
+      };
+    });
+
+    const benchSource = Array.isArray(source.bench)
+      ? source.bench
+      : Array.isArray(source.reserve)
+        ? source.reserve
+        : Array.isArray(source.members)
+         ? source.members.slice(5)
+          : [];
+    const bench: LineupBenchCell[] = new Array(10).fill(null).map((_, benchIndex) => {
+      const benchInput = benchSource[benchIndex] ?? null;
+      const { unitId, label } = normalizeAssignment(benchInput, rosterIndex);
+      return {
+        index: benchIndex,
+        unitId,
+        label,
+        meta: isLineupMemberConfig(benchInput) ? { ...benchInput } : null,
+      };
+    });
+
+    const passiveSource = Array.isArray(source.passives)
+      ? source.passives
+      : Array.isArray(source.passiveSlots)
+        ? source.passiveSlots
+        : [];
+    const passives: LineupPassive[] = new Array(6).fill(null).map((_, passiveIndex) => {
+      const passiveInput = passiveSource[passiveIndex] ?? null;
+      if (!passiveInput){
+        return {
+          index: passiveIndex,
+          id: `passive-${passiveIndex}`,
+          name: 'Chưa thiết lập',
+          description: '',
+          requirement: '',
+          requiredUnitIds: [],
+          requiredTags: [],
+          isEmpty: true,
+          autoActive: false,
+          source: null,
+        };
+      }
+      const passive = isLineupPassiveConfig(passiveInput) ? passiveInput : {};
+      const idValue = passive.id ?? passive.key ?? `passive-${passiveIndex}`;
+      const nameValue = passive.name ?? passive.title ?? `Passive #${passiveIndex + 1}`;
+      const descriptionValue = passive.description ?? passive.effect ?? passive.text ?? '';
+      const requirementValue = passive.requirement ?? passive.condition ?? passive.prerequisite ?? '';
+      const requiredUnitIds = Array.isArray(passive.requiredUnitIds)
+        ? passive.requiredUnitIds.map(String)
+        : Array.isArray(passive.requires)
+          ? passive.requires.filter(item => typeof item === 'string').map(String)
+          : (typeof passive.requiredUnitId === 'string' ? [passive.requiredUnitId] : []);
+      const requiredTags = Array.isArray(passive.requiredTags)
+        ? passive.requiredTags.map(String)
+        : Array.isArray(passive.tagsRequired)
+          ? passive.tagsRequired.map(String)
+          : [];
+      const auto = passive.autoActive === true || passive.alwaysActive === true || passive.isActive === true;
+      return {
+        index: passiveIndex,
+        id: String(idValue),
+        name: typeof nameValue === 'string' ? nameValue : `Passive #${passiveIndex + 1}`,
+        description: typeof descriptionValue === 'string' ? descriptionValue : '',
+        requirement: typeof requirementValue === 'string' ? requirementValue : '',
+        requiredUnitIds,
+        requiredTags,
+        isEmpty: false,
+        autoActive: Boolean(auto),
+        source: isLineupPassiveConfig(passiveInput) ? passiveInput : null,
+      };
+    });
+
+    const leaderIdValue = source.leaderId ?? source.leader ?? source.captainId ?? null;
+    const fallbackLeader = slots.find(slot => slot.unitId)?.unitId ?? null;
+    const defaultCurrencyIdValue = defaultCurrencyId ?? source.currency ?? null;
+
+    return {
+      id: String(id),
+      name: typeof name === 'string' ? name : `Đội hình #${index + 1}`,
+      role: typeof role === 'string' ? role : '',
+      description: typeof description === 'string' ? description : '',
+      slots,
+      bench,
+      passives,
+      leaderId: (typeof leaderIdValue === 'string' && rosterIndex.has(leaderIdValue)) ? leaderIdValue : fallbackLeader,
+      defaultCurrencyId: typeof defaultCurrencyIdValue === 'string' ? defaultCurrencyIdValue : null,
+    };
+  }
+
+  function normalizeLineups(
+    rawLineups: ReadonlyArray<LineupDefinition | null | undefined> | null,
+    roster: RosterUnit[],
+  ): LineupState[] {
+    const rosterIndex = new Set(roster.map(unit => unit.id));
+    if (!Array.isArray(rawLineups) || rawLineups.length === 0){
+      const slots: LineupSlot[] = new Array(5).fill(null).map((_, index) => ({
+        index,
+        unitId: null,
+        label: null,
+        unlocked: index < 3,
+        unlockCost: null,
+        equipment: null,
+        meta: null,
+      }));
+      const bench: LineupBenchCell[] = new Array(10).fill(null).map((_, index) => ({
+        index,
+        unitId: null,
+        label: null,
+        meta: null,
+      }));
+      const passives: LineupPassive[] = new Array(6).fill(null).map((_, index) => ({
+        index,
+        id: `passive-${index}`,
+        name: 'Chưa thiết lập',
+        description: '',
+        requirement: '',
+        requiredUnitIds: [],
+        requiredTags: [],
+        isEmpty: true,
+        autoActive: false,
+        source: null,
+      }));
+      return [{
+        id: 'lineup-default',
+        name: 'Đội hình mẫu',
+        role: '',
+        description: 'Thiết lập đội hình gồm tối đa 5 vị trí chủ lực và 10 vị trí dự bị.',
+        slots,
+        bench,
+        passives,
+        leaderId: null,
+        defaultCurrencyId: null,
+      }];
+    }
+    return rawLineups.map((entry, index) => normalizeLineupEntry(entry ?? null, index, rosterIndex));
+  }
+
+  function extractCurrencyBalances(source: unknown): CurrencyBalances {
+    const balances: CurrencyBalances = new Map();
+    if (!source){
+      return balances;
+    }
+    const apply = (id: unknown, value: unknown) => {
+      if (!id) return;
+      const amount = Number(value);
+      if (!Number.isNaN(amount)){
+        balances.set(String(id), amount);
+      }
+    };
+
+    if (Array.isArray(source)){
+      source.forEach(entry => {
+        if (!entry) return;
+        if (typeof entry === 'number'){ apply('VNT', entry); return; }
+        if (typeof entry === 'string'){
+          const [id, value] = entry.split(':');
+          if (id && value){
+            apply(id.trim(), Number(value));
+          }
+          return;
+        }
+        if (typeof entry === 'object'){
+          const record = entry as Record<string, unknown>;
+          const id = record.currencyId ?? record.id ?? record.key ?? record.type;
+          const value = record.balance ?? record.amount ?? record.value ?? record.total ?? null;
+          apply(id, value);
+        }
+      });
+      return balances;
+    }
+
+    if (typeof source === 'object'){
+      Object.entries(source as Record<string, unknown>).forEach(([key, value]) => {
+        if (value && typeof value === 'object' && ('balance' in (value as Record<string, unknown>) || 'amount' in (value as Record<string, unknown>) || 'value' in (value as Record<string, unknown>) || 'total' in (value as Record<string, unknown>))){
+          const record = value as Record<string, unknown>;
+          const id = record.currencyId ?? record.id ?? record.key ?? key;
+          apply(id, record.balance ?? record.amount ?? record.value ?? record.total);
+        } else {
+          apply(key, value);
+        }
+      });
+      const record = (source as Record<string, unknown>).balances;
+      if (record && typeof record === 'object'){
+        Object.entries(record as Record<string, unknown>).forEach(([key, value]) => apply(key, value));
+      }
+    }
+
+    return balances;
+  }
+
+  function createCurrencyBalances(primary: unknown, secondary: unknown): CurrencyBalances {
+    const base = extractCurrencyBalances(primary);
+    const override = extractCurrencyBalances(secondary);
+    for (const [key, value] of override.entries()){
+      base.set(key, value);
+    }
+    currencyCatalog.forEach(currency => {
+      if (!base.has(currency.id)){
+        base.set(currency.id, 0);
+      }
+    });
+    return base;
+  }
+
+  function formatCurrencyBalance(amount: number | null | undefined, currencyId: string): string {
+    const currency = currencyIndex.get(currencyId);
+    const formatted = numberFormatter.format(Number.isFinite(amount) ? Number(amount) : 0);
+    const suffix = currency?.suffix || currencyId || '';
+    return suffix ? `${formatted} ${suffix}` : formatted;
+  }
+
+  function filterRoster(roster: RosterUnit[], filter: LineupFilter): RosterUnit[] {
+    if (!filter || filter.type === 'all' || !filter.value){
+      return roster;
+    }
+    const value = String(filter.value).toLowerCase();
+    if (filter.type === 'class'){
+      return roster.filter(unit => (unit.role || '').toLowerCase() === value);
+    }
+    if (filter.type === 'rank'){
+      return roster.filter(unit => (unit.rank || '').toLowerCase() === value);
+    }
+    if (filter.type === 'tag'){
+      return roster.filter(unit => unit.tags.some(tag => String(tag).toLowerCase() === value));
+    }
+    return roster;
+  }
+
+  function createFilterOptions(roster: RosterUnit[]): LineupFilterOptions {
+    const classes = new Set<string>();
+    const ranks = new Set<string>();
+    const tags = new Set<string>();
+    roster.forEach(unit => {
+      if (unit.role) classes.add(unit.role);
+      if (unit.rank) ranks.add(unit.rank);
+      (unit.tags || []).forEach(tag => tags.add(tag));
+    });
+    return {
+      classes: Array.from(classes),
+      ranks: Array.from(ranks),
+      tags: Array.from(tags),
+    };
+  }
+
+  function collectAssignedUnitIds(lineup: LineupState): Set<string> {
+    const ids = new Set<string>();
+    lineup.slots.forEach(slot => {
+      if (slot.unitId){
+        ids.add(slot.unitId);
+      }
+    });
+    lineup.bench.forEach(cell => {
+      if (cell.unitId){
+        ids.add(cell.unitId);
+      }
+    });
+    if (lineup.leaderId){
+      ids.add(lineup.leaderId);
+    }
+    return ids;
+  }
+
+  function evaluatePassive(
+    passive: LineupPassive,
+    assignedUnitIds: Set<string>,
+    rosterLookup: Map<string, RosterUnit>,
+  ): boolean {
+    if (!passive || passive.isEmpty){
+      return false;
+    }
+    if (passive.autoActive){
+      return true;
+    }
+    if (passive.requiredUnitIds && passive.requiredUnitIds.length > 0){
+      for (const required of passive.requiredUnitIds){
+        if (!assignedUnitIds.has(required)){
+          return false;
+        }
+      }
+    }
+    if (passive.requiredTags && passive.requiredTags.length > 0){
+      const availableTags = new Set<string>();
+      assignedUnitIds.forEach(id => {
+        const unit = rosterLookup.get(id);
+        if (!unit) return;
+        if (unit.role) availableTags.add(unit.role);
+        if (unit.rank) availableTags.add(unit.rank);
+        (unit.tags || []).forEach(tag => availableTags.add(tag));
+      });
+      const hasAllTags = passive.requiredTags.every(tag => availableTags.has(tag));
+      if (!hasAllTags){
+        return false;
+      }
+    }
+    if (!passive.requiredUnitIds?.length && !passive.requiredTags?.length){
+      return assignedUnitIds.size > 0;
+    }
+    return true;
+  }
+
+  function removeUnitFromPlacements(
+    lineup: LineupState,
+    unitId: string | null,
+    options: { keepLeader?: boolean } = {},
+  ): void {
+    if (!unitId) return;
+    const { keepLeader = false } = options;
+    lineup.slots.forEach(slot => {
+      if (slot.unitId === unitId){
+        slot.unitId = null;
+      }
+    });
+    lineup.bench.forEach(cell => {
+      if (cell.unitId === unitId){
+        cell.unitId = null;
+      }
+    });
+    if (!keepLeader && lineup.leaderId === unitId){
+      lineup.leaderId = null;
+    }
+  }
+
+  function assignUnitToSlot(
+    lineup: LineupState,
+    slotIndex: number,
+    unitId: string,
+  ): { ok: boolean; message?: string } {
+    const slot = lineup.slots[slotIndex];
+    if (!slot){
+      return { ok: false, message: 'Không tìm thấy vị trí.' };
+    }
+    if (!slot.unlocked){
+      return { ok: false, message: 'Vị trí đang bị khóa.' };
+    }
+    if (slot.unitId === unitId){
+      return { ok: true };
+    }
+    removeUnitFromPlacements(lineup, unitId, { keepLeader: true });
+    slot.unitId = unitId;
+    slot.label = null;
+    return { ok: true };
+  }
+
+  function assignUnitToBench(
+    lineup: LineupState,
+    benchIndex: number,
+    unitId: string,
+  ): { ok: boolean; message?: string } {
+    const cell = lineup.bench[benchIndex];
+    if (!cell){
+      return { ok: false, message: 'Không tìm thấy ô dự bị.' };
+    }
+    if (cell.unitId === unitId){
+      return { ok: true };
+    }
+    removeUnitFromPlacements(lineup, unitId, { keepLeader: true });
+    cell.unitId = unitId;
+    cell.label = null;
+    return { ok: true };
+  }
+
+  function removeUnitFromBench(lineup: LineupState, benchIndex: number): void {
+    const cell = lineup.bench[benchIndex];
+    if (!cell) return;
+    cell.unitId = null;
+  }
+
+  function isUnitPlaced(lineup: LineupState, unitId: string | null): boolean {
+    if (!unitId) return false;
+    if (lineup.leaderId === unitId) return true;
+    if (lineup.slots.some(slot => slot.unitId === unitId)) return true;
+    if (lineup.bench.some(cell => cell.unitId === unitId)) return true;
+    return false;
+  }
+
+  function setLeader(
+    lineup: LineupState | null,
+    unitId: string | null,
+    rosterLookup: Map<string, RosterUnit>,
+  ): { ok: boolean; message?: string } {
+    if (!lineup){
+      return { ok: false, message: 'Không tìm thấy đội hình.' };
+    }
+    if (!unitId){
+      lineup.leaderId = null;
+      return { ok: true };
+    }
+    const unit = rosterLookup.get(unitId);
+    if (!unit){
+      return { ok: false, message: 'Không tìm thấy nhân vật.' };
+    }
+    if (!isUnitPlaced(lineup, unitId)){
+      const slot = lineup.slots.find(entry => entry.unlocked && !entry.unitId);
+      if (slot){
+        assignUnitToSlot(lineup, slot.index, unitId);
+      } else {
+        const bench = lineup.bench.find(entry => !entry.unitId);
+        if (bench){
+          assignUnitToBench(lineup, bench.index, unitId);
+        } else {
+          return { ok: false, message: 'Không còn vị trí trống để gán leader.' };
+        }
+      }
+    }
+    lineup.leaderId = unitId;
+    return { ok: true };
+        }
+
+  exports.normalizeRoster = normalizeRoster;
+  exports.normalizeLineups = normalizeLineups;
+  exports.createCurrencyBalances = createCurrencyBalances;
+  exports.formatCurrencyBalance = formatCurrencyBalance;
+  exports.filterRoster = filterRoster;
+  exports.createFilterOptions = createFilterOptions;
+  exports.collectAssignedUnitIds = collectAssignedUnitIds;
+  exports.evaluatePassive = evaluatePassive;
+  exports.removeUnitFromPlacements = removeUnitFromPlacements;
+  exports.assignUnitToSlot = assignUnitToSlot;
+  exports.assignUnitToBench = assignUnitToBench;
+  exports.removeUnitFromBench = removeUnitFromBench;
+  exports.isUnitPlaced = isUnitPlaced;
+  exports.setLeader = setLeader;
 });
-__define('./screens/main-menu/dialogues.js', (exports, module, __require) => {
-  const __dep0 = __require('./art.js');
+__define('./screens/main-menu/dialogues.ts', (exports, module, __require) => {
+  const __dep0 = __require('./art.ts');
   const getUnitArt = __dep0.getUnitArt;
+
 
   const HERO_DEFAULT_ID = 'leaderA';
 
-  const HERO_LIBRARY = {
+  type HeroDialogueBuckets = Partial<Record<HeroGender | 'default', ReadonlyArray<HeroDialogueLine>>>;
+  type HeroDialogueTable = Partial<Record<HeroCue, HeroDialogueBuckets>>;
+
+  interface HeroProfileDefinition {
+    id: string;
+    name?: string;
+    title?: string;
+    faction?: string;
+    role?: string;
+    motto?: string;
+    portrait?: string;
+  }
+
+  const FALLBACK_HERO_KEY = 'default';
+
+  const HERO_PROFILES: Record<string, HeroProfileDefinition> = {
     leaderA: {
       id: 'leaderA',
       name: 'Uyên',
@@ -13423,84 +15343,7 @@ __define('./screens/main-menu/dialogues.js', (exports, module, __require) => {
       faction: 'Đoàn Thủ Hộ Lam Quang',
       role: 'Kỵ sĩ phòng tuyến',
       portrait: 'leaderA',
-      motto: 'Giữ vững ánh lam, bảo hộ tuyến đầu.',
-      hotspots: [
-        {
-          key: 'sigil',
-          label: 'Ấn Tịnh Quang',
-          description: 'Điều chỉnh giáp hộ thân – cực kỳ nhạy cảm.',
-          cue: 'sensitive',
-          type: 'sensitive'
-        }
-      ],
-      dialogues: {
-        intro: {
-          male: [
-            { text: 'Huynh đến đúng lúc, đội trinh sát đang chờ hiệu lệnh.', tone: 'greeting' },
-            { text: 'Sương sớm thuận lợi cho một trận phản công, huynh thấy sao?', tone: 'greeting' }
-          ],
-          female: [
-            { text: 'Tỷ về rồi à? Học viện chắc nhớ tỷ lắm.', tone: 'greeting' },
-            { text: 'Đại tỷ đến rồi, đội hình lập tức trật tự hơn hẳn.', tone: 'greeting' }
-          ],
-          neutral: [
-            { text: 'Ngày mới, chiến tuyến mới. Ta luôn sẵn sàng.', tone: 'greeting' },
-            { text: 'Chúng ta hành quân khi ánh lam còn phủ cả mặt đất.', tone: 'greeting' }
-          ]
-        },
-        hover: {
-          male: [
-            { text: 'Yên tâm, áo giáp đã được gia cố. Chỉ cần huynh ra hiệu.', tone: 'focus' },
-            { text: 'Huynh cứ nói, Uyên sẽ nghe.', tone: 'focus' }
-          ],
-          female: [
-            { text: 'Tỷ định thay đổi đội hình à? Uyên sẽ thích ứng ngay.', tone: 'focus' },
-            { text: 'Đừng quên khởi động, tỷ nhé. Giáp lam khá nặng đó.', tone: 'gentle' }
-          ],
-          neutral: [
-            { text: 'Tôi đang nghe chỉ huy. Có nhiệm vụ mới không?', tone: 'focus' }
-          ]
-        },
-        tap: {
-          male: [
-            { text: 'Cho Uyên tọa độ, huynh sẽ thấy tuyến đầu mở ra.', tone: 'motivate' },
-            { text: 'Một mệnh lệnh thôi, huynh.', tone: 'motivate' }
-          ],
-          female: [
-            { text: 'Uyên ổn cả, tỷ cứ tập trung chỉ huy.', tone: 'motivate' },
-            { text: 'Chúng ta sẽ thắng gọn, tỷ tin chứ?', tone: 'motivate' }
-          ],
-          neutral: [
-            { text: 'Chỉ cần hiệu lệnh, tôi sẽ dẫn đầu ngay.', tone: 'motivate' },
-            { text: 'Cả đội đang nhìn vào chỉ huy đấy.', tone: 'motivate' }
-          ]
-        },
-        sensitive: {
-          male: [
-            { text: 'Ấy! Đừng chạm vào ấn Tịnh Quang, dễ kích hoạt giáp hộ thân đó!', tone: 'warning' },
-            { text: 'Huynh nghịch thế là bộ giáp khóa cứng mất!', tone: 'warning' }
-          ],
-          female: [
-            { text: 'Khoan! Tỷ mà chạm nữa là cơ chế an toàn tự đóng lại đấy!', tone: 'warning' },
-            { text: 'Ấn ấy nối trực tiếp với mạch nguyên tinh, nhạy lắm!', tone: 'warning' }
-          ],
-          neutral: [
-            { text: 'Phần ấn điều khiển cực nhạy, xin đừng động vào.', tone: 'warning' },
-            { text: 'Chạm mạnh là hệ thống phòng ngự lập tức kích hoạt đấy!', tone: 'warning' }
-          ]
-        },
-        idle: {
-          male: [
-            { text: 'Bầu trời trong như vậy, chắc chắn là điềm tốt.', tone: 'calm' }
-          ],
-          female: [
-            { text: 'Uyên sẽ kiểm tra lại dây khóa. Tỷ cứ yên tâm.', tone: 'calm' }
-          ],
-          neutral: [
-            { text: 'Một hơi thở sâu trước trận chiến luôn giúp tinh thần vững hơn.', tone: 'calm' }
-          ]
-        }
-      }
+      motto: 'Giữ vững ánh lam, bảo hộ tuyến đầu.'
     },
     default: {
       id: HERO_DEFAULT_ID,
@@ -13509,47 +15352,130 @@ __define('./screens/main-menu/dialogues.js', (exports, module, __require) => {
       faction: 'Arclune',
       role: 'Đa năng',
       portrait: HERO_DEFAULT_ID,
-      motto: 'Vì ánh sáng Arclune.',
-      hotspots: [
-        {
-          key: 'sigil',
-          label: 'Phù hiệu chiến',
-          description: 'Điểm neo năng lượng cần tránh va chạm.',
-          cue: 'sensitive',
-          type: 'sensitive'
-        }
-      ],
-      dialogues: {
-        intro: {
-          neutral: [
-            { text: 'Sẵn sàng cho mọi nhiệm vụ.', tone: 'greeting' }
-          ]
-        },
-        hover: {
-          neutral: [
-            { text: 'Đợi lệnh từ chỉ huy.', tone: 'focus' }
-          ]
-        },
-        tap: {
-          neutral: [
-            { text: 'Tiến lên vì Arclune!', tone: 'motivate' }
-          ]
-        },
-        sensitive: {
-          neutral: [
-            { text: 'Điểm đó nhạy cảm đấy, xin nhẹ tay.', tone: 'warning' }
-          ]
-        },
-        idle: {
-          neutral: [
-            { text: 'Luôn giữ trạng thái chiến đấu.', tone: 'calm' }
-          ]
-        }
+      motto: 'Vì ánh sáng Arclune.'
+    }
+  };
+
+  const HERO_HOTSPOTS: Record<string, ReadonlyArray<HeroHotspot>> = {
+    leaderA: [
+      {
+        key: 'sigil',
+        label: 'Ấn Tịnh Quang',
+        description: 'Điều chỉnh giáp hộ thân – cực kỳ nhạy cảm.',
+        cue: 'sensitive',
+        type: 'sensitive'
+      }
+    ],
+    default: [
+      {
+        key: 'sigil',
+        label: 'Phù hiệu chiến',
+        description: 'Điểm neo năng lượng cần tránh va chạm.',
+        cue: 'sensitive',
+        type: 'sensitive'
+      }
+    ]
+  };
+
+  const HERO_DIALOGUES: Record<string, HeroDialogueTable> = {
+    leaderA: {
+      intro: {
+        male: [
+          { text: 'Huynh đến đúng lúc, đội trinh sát đang chờ hiệu lệnh.', tone: 'greeting' },
+          { text: 'Sương sớm thuận lợi cho một trận phản công, huynh thấy sao?', tone: 'greeting' }
+        ],
+        female: [
+          { text: 'Tỷ về rồi à? Học viện chắc nhớ tỷ lắm.', tone: 'greeting' },
+          { text: 'Đại tỷ đến rồi, đội hình lập tức trật tự hơn hẳn.', tone: 'greeting' }
+        ],
+        neutral: [
+          { text: 'Ngày mới, chiến tuyến mới. Ta luôn sẵn sàng.', tone: 'greeting' },
+          { text: 'Chúng ta hành quân khi ánh lam còn phủ cả mặt đất.', tone: 'greeting' }
+        ]
+      },
+      hover: {
+        male: [
+          { text: 'Yên tâm, áo giáp đã được gia cố. Chỉ cần huynh ra hiệu.', tone: 'focus' },
+          { text: 'Huynh cứ nói, Uyên sẽ nghe.', tone: 'focus' }
+        ],
+        female: [
+          { text: 'Tỷ định thay đổi đội hình à? Uyên sẽ thích ứng ngay.', tone: 'focus' },
+          { text: 'Đừng quên khởi động, tỷ nhé. Giáp lam khá nặng đó.', tone: 'gentle' }
+        ],
+        neutral: [
+          { text: 'Tôi đang nghe chỉ huy. Có nhiệm vụ mới không?', tone: 'focus' }
+        ]
+      },
+      tap: {
+        male: [
+          { text: 'Cho Uyên tọa độ, huynh sẽ thấy tuyến đầu mở ra.', tone: 'motivate' },
+          { text: 'Một mệnh lệnh thôi, huynh.', tone: 'motivate' }
+        ],
+        female: [
+          { text: 'Uyên ổn cả, tỷ cứ tập trung chỉ huy.', tone: 'motivate' },
+          { text: 'Chúng ta sẽ thắng gọn, tỷ tin chứ?', tone: 'motivate' }
+        ],
+        neutral: [
+          { text: 'Chỉ cần hiệu lệnh, tôi sẽ dẫn đầu ngay.', tone: 'motivate' },
+          { text: 'Cả đội đang nhìn vào chỉ huy đấy.', tone: 'motivate' }
+        ]
+      },
+      sensitive: {
+        male: [
+          { text: 'Ấy! Đừng chạm vào ấn Tịnh Quang, dễ kích hoạt giáp hộ thân đó!', tone: 'warning' },
+          { text: 'Huynh nghịch thế là bộ giáp khóa cứng mất!', tone: 'warning' }
+        ],
+        female: [
+          { text: 'Khoan! Tỷ mà chạm nữa là cơ chế an toàn tự đóng lại đấy!', tone: 'warning' },
+          { text: 'Ấn ấy nối trực tiếp với mạch nguyên tinh, nhạy lắm!', tone: 'warning' }
+        ],
+        neutral: [
+          { text: 'Phần ấn điều khiển cực nhạy, xin đừng động vào.', tone: 'warning' },
+          { text: 'Chạm mạnh là hệ thống phòng ngự lập tức kích hoạt đấy!', tone: 'warning' }
+        ]
+      },
+      idle: {
+        male: [
+          { text: 'Bầu trời trong như vậy, chắc chắn là điềm tốt.', tone: 'calm' }
+        ],
+        female: [
+          { text: 'Uyên sẽ kiểm tra lại dây khóa. Tỷ cứ yên tâm.', tone: 'calm' }
+        ],
+        neutral: [
+          { text: 'Một hơi thở sâu trước trận chiến luôn giúp tinh thần vững hơn.', tone: 'calm' }
+        ]
+      }
+    },
+    default: {
+      intro: {
+        neutral: [
+          { text: 'Sẵn sàng cho mọi nhiệm vụ.', tone: 'greeting' }
+        ]
+      },
+      hover: {
+        neutral: [
+          { text: 'Đợi lệnh từ chỉ huy.', tone: 'focus' }
+        ]
+      },
+      tap: {
+        neutral: [
+          { text: 'Tiến lên vì Arclune!', tone: 'motivate' }
+        ]
+      },
+      sensitive: {
+        neutral: [
+          { text: 'Điểm đó nhạy cảm đấy, xin nhẹ tay.', tone: 'warning' }
+        ]
+      },
+      idle: {
+        neutral: [
+          { text: 'Luôn giữ trạng thái chiến đấu.', tone: 'calm' }
+        ]
       }
     }
   };
 
-  const GENDER_MAP = {
+  const GENDER_MAP: Record<string, HeroGender> = {
     male: 'male',
     m: 'male',
     nam: 'male',
@@ -13564,7 +15490,7 @@ __define('./screens/main-menu/dialogues.js', (exports, module, __require) => {
     null: 'neutral'
   };
 
-  const CUE_LABELS = {
+  const CUE_LABELS: Record<HeroCue | string, string> = {
     intro: 'Chào hỏi',
     hover: 'Phản hồi',
     tap: 'Hiệu lệnh',
@@ -13572,7 +15498,7 @@ __define('./screens/main-menu/dialogues.js', (exports, module, __require) => {
     idle: 'Độc thoại'
   };
 
-  const CUE_TONES = {
+  const CUE_TONES: Partial<Record<HeroCue | HeroTone, HeroTone>> = {
     greeting: 'greeting',
     focus: 'focus',
     gentle: 'gentle',
@@ -13581,7 +15507,7 @@ __define('./screens/main-menu/dialogues.js', (exports, module, __require) => {
     calm: 'calm'
   };
 
-  const TONE_TO_CUE = {
+  const TONE_TO_CUE: Partial<Record<HeroCue, HeroTone>> = {
     intro: 'greeting',
     hover: 'focus',
     tap: 'motivate',
@@ -13589,64 +15515,104 @@ __define('./screens/main-menu/dialogues.js', (exports, module, __require) => {
     idle: 'calm'
   };
 
-  function normalizeGender(value){
+  function resolveHeroKey<T>(heroId: string | null | undefined, lookup: Record<string, T>): string {
+    if (heroId && heroId in lookup){
+      return heroId;
+    }
+    return FALLBACK_HERO_KEY;
+  }
+
+  function normalizeGender(value: unknown): HeroGender {
     if (typeof value === 'string'){
       const key = value.trim().toLowerCase();
-      if (key in GENDER_MAP) return GENDER_MAP[key];
+      if (key in GENDER_MAP){
+        return GENDER_MAP[key];
+      }
     }
     return 'neutral';
   }
 
-  function ensureArray(value){
+  function ensureArray<T>(value: T | ReadonlyArray<T> | null | undefined): ReadonlyArray<T> {
     if (!value) return [];
     return Array.isArray(value) ? value : [value];
   }
 
-  function pickLine(pool){
-    const list = ensureArray(pool).filter(Boolean);
+  function pickLine(pool: ReadonlyArray<HeroDialogueLine> | HeroDialogueLine | null | undefined): HeroDialogueLine | null {
+    const list = ensureArray(pool).filter(Boolean) as ReadonlyArray<HeroDialogueLine>;
     if (!list.length) return null;
     const index = Math.floor(Math.random() * list.length);
     const item = list[index];
-    if (item && typeof item === 'object'){ return { text: item.text || '', tone: item.tone || null, label: item.label || null }; }
-    return { text: String(item || ''), tone: null, label: null };
+    if (item && typeof item === 'object'){
+      return {
+        text: item.text || '',
+        tone: item.tone || null,
+        label: item.label || null
+      };
+    }
+    return { text: String(item ?? ''), tone: null, label: null };
   }
 
-  function inferTone(cue){
-    return CUE_TONES[cue] || TONE_TO_CUE[cue] || 'calm';
+  function inferTone(cue: HeroCue | string | null | undefined): HeroTone {
+    if (cue && CUE_TONES[cue]){
+      return CUE_TONES[cue] as HeroTone;
+    }
+    if (cue && TONE_TO_CUE[cue as HeroCue]){
+      return TONE_TO_CUE[cue as HeroCue] as HeroTone;
+    }
+    return 'calm';
   }
 
-  function inferLabel(cue){
-    return CUE_LABELS[cue] || 'Tương tác';
+  function inferLabel(cue: HeroCue | string | null | undefined): string {
+    if (cue && CUE_LABELS[cue]){
+      return CUE_LABELS[cue];
+    }
+    return 'Tương tác';
   }
 
-  function getHeroProfile(heroId = HERO_DEFAULT_ID){
-    const profile = HERO_LIBRARY[heroId] || HERO_LIBRARY.default;
-    const art = getUnitArt(profile.portrait || heroId || HERO_DEFAULT_ID) || null;
+  interface DialogueOptions {
+    gender?: string;
+    zone?: string | null;
+  }
+
+  function getHeroProfile(heroId: string | null | undefined = HERO_DEFAULT_ID): HeroProfile {
+    const resolvedKey = resolveHeroKey(heroId, HERO_PROFILES);
+    const profile = HERO_PROFILES[resolvedKey] ?? HERO_PROFILES[FALLBACK_HERO_KEY];
+    const portraitId = profile.portrait || heroId || HERO_DEFAULT_ID;
+    const art = getUnitArt(portraitId) || null;
+    const hotspots = HERO_HOTSPOTS[resolvedKey] ?? HERO_HOTSPOTS[FALLBACK_HERO_KEY] ?? [];
     return {
       id: profile.id,
-      name: profile.name,
-      title: profile.title,
-      faction: profile.faction,
-      role: profile.role,
-      motto: profile.motto,
-      portrait: profile.portrait || heroId || HERO_DEFAULT_ID,
-      hotspots: (profile.hotspots || []).map(item => ({ ...item })),
+      name: profile.name || null,
+      title: profile.title || null,
+      faction: profile.faction || null,
+      role: profile.role || null,
+      motto: profile.motto || null,
+      portrait: portraitId,
+      hotspots: hotspots.map(item => ({ ...item })),
       art
     };
   }
 
-  function getHeroHotspots(heroId = HERO_DEFAULT_ID){
-    const profile = HERO_LIBRARY[heroId] || HERO_LIBRARY.default;
-    return (profile.hotspots || []).map(item => ({ ...item }));
+  function getHeroHotspots(heroId: string | null | undefined = HERO_DEFAULT_ID): ReadonlyArray<HeroHotspot> {
+    const resolvedKey = resolveHeroKey(heroId, HERO_HOTSPOTS);
+    const hotspots = HERO_HOTSPOTS[resolvedKey] ?? HERO_HOTSPOTS[FALLBACK_HERO_KEY] ?? [];
+    return hotspots.map(item => ({ ...item }));
   }
 
-  function getHeroDialogue(heroId, cue, options = {}){
-    const targetCue = cue || 'intro';
+  function getHeroDialogue(
+    heroId: string | null | undefined,
+    cue: HeroCue | string | null | undefined,
+    options: DialogueOptions = {}
+  ): HeroDialogue {
+    const targetCue = (cue || 'intro') as HeroCue;
     const gender = normalizeGender(options.gender);
     const zone = options.zone || null;
-    const profile = HERO_LIBRARY[heroId] || HERO_LIBRARY.default;
-    const fallback = HERO_LIBRARY.default;
-    const table = profile.dialogues?.[targetCue] || fallback.dialogues?.[targetCue] || null;
+    const profileKey = resolveHeroKey(heroId, HERO_PROFILES);
+    const heroKey = resolveHeroKey(heroId, HERO_DIALOGUES);
+    const profile = HERO_PROFILES[profileKey] ?? HERO_PROFILES[FALLBACK_HERO_KEY];
+    const dialogues = HERO_DIALOGUES[heroKey] ?? {};
+    const fallbackDialogues = HERO_DIALOGUES[FALLBACK_HERO_KEY] ?? {};
+    const table = dialogues[targetCue] || fallbackDialogues[targetCue] || null;
     const pool = table ? (table[gender] || table.neutral || table.default || null) : null;
     const picked = pickLine(pool);
     const text = picked?.text?.trim() ? picked.text.trim() : '...';
@@ -13662,27 +15628,132 @@ __define('./screens/main-menu/dialogues.js', (exports, module, __require) => {
     };
   }
 
-  function listAvailableHeroes(){
-    return Object.keys(HERO_LIBRARY).filter(key => key !== 'default');
-  }
+  function listAvailableHeroes(): ReadonlyArray<string> {
+    return Object.keys(HERO_PROFILES).filter(key => key !== FALLBACK_HERO_KEY);
+            }
+
   exports.HERO_DEFAULT_ID = HERO_DEFAULT_ID;
+  exports.HERO_PROFILES = HERO_PROFILES;
+  exports.HERO_HOTSPOTS = HERO_HOTSPOTS;
+  exports.HERO_DIALOGUES = HERO_DIALOGUES;
   exports.getHeroProfile = getHeroProfile;
   exports.getHeroHotspots = getHeroHotspots;
   exports.getHeroDialogue = getHeroDialogue;
   exports.listAvailableHeroes = listAvailableHeroes;
 });
-__define('./screens/main-menu/view.js', (exports, module, __require) => {
-  const __dep0 = __require('./screens/main-menu/dialogues.js');
-  const getHeroDialogue = __dep0.getHeroDialogue;
-  const getHeroHotspots = __dep0.getHeroHotspots;
-  const getHeroProfile = __dep0.getHeroProfile;
-  const HERO_DEFAULT_ID = __dep0.HERO_DEFAULT_ID;
-  const __dep1 = __require('./data/announcements.js');
-  const getAllSidebarAnnouncements = __dep1.getAllSidebarAnnouncements;
+__define('./screens/main-menu/types.ts', (exports, module, __require) => {
 
-  const STYLE_ID = 'main-menu-view-style';
 
-  const TONE_ICONS = {
+  export type HeroCue = 'intro' | 'hover' | 'tap' | 'sensitive' | 'idle';
+
+  export type HeroTone = 'greeting' | 'focus' | 'gentle' | 'motivate' | 'warning' | 'calm';
+
+  export type HeroGender = 'male' | 'female' | 'neutral';
+
+  export interface HeroDialogue {
+    heroId: string;
+    cue: HeroCue;
+    zone: string | null;
+    text: string;
+    tone: HeroTone;
+    label: string;
+  }
+
+  export interface HeroDialogueLine {
+    text: string;
+    tone?: HeroTone | null;
+    label?: string | null;
+  }
+
+  export interface HeroHotspot {
+    key: string;
+    label?: string | null;
+    description?: string | null;
+    cue?: HeroCue;
+    type?: string | null;
+  }
+
+  export interface HeroProfile {
+    id: string;
+    name?: string | null;
+    title?: string | null;
+    faction?: string | null;
+    role?: string | null;
+    motto?: string | null;
+    portrait?: string | null;
+    art: UnitArt | null;
+    hotspots: ReadonlyArray<HeroHotspot>;
+  }
+
+  export interface MenuSectionEntry {
+    id: string;
+    type: string;
+    cardId?: string | null;
+    childModeIds?: ReadonlyArray<string>;
+  }
+
+  export interface MenuSection {
+    id: string;
+    title: string;
+    entries?: ReadonlyArray<MenuSectionEntry | null>;
+  }
+
+  export interface MenuCardMetadata {
+    key: string;
+    id?: string | null;
+    title?: string | null;
+    label?: string | null;
+    description?: string | null;
+    icon?: string | null;
+    tags?: ReadonlyArray<string> | null;
+    status?: string | null;
+    params?: Record<string, unknown> | null;
+    parentId?: string | null;
+    isGroup?: boolean;
+    childModeIds?: ReadonlyArray<string> | null;
+    extraClasses?: ReadonlyArray<string> | null;
+  }
+
+  export interface MainMenuShellTooltipOptions {
+    id?: string | null;
+    slot?: string | null;
+    title?: string | null;
+    description?: string | null;
+    reward?: string | null;
+    translationKey?: string | null;
+    startAt?: string | null;
+    endAt?: string | null;
+  }
+
+  export interface MainMenuShell {
+    enterScreen?: (screenId: string, params?: Record<string, unknown> | null) => void;
+    showTooltip?: (options: MainMenuShellTooltipOptions) => void;
+    hideTooltip?: (options: { id?: string | null; slot?: string | null }) => void;
+  }
+
+  export type ComingSoonHandler = (mode: MenuCardMetadata) => void;
+
+  export type CleanupFn = () => void;
+  export type CleanupRegistrar = (fn: CleanupFn) => void;
+
+  export interface MainMenuState {
+    root: HTMLElement | null;
+    shell?: MainMenuShell | null;
+    sections?: ReadonlyArray<MenuSection>;
+    metadata?: ReadonlyArray<MenuCardMetadata>;
+    heroId?: string;
+    playerGender?: string;
+    onShowComingSoon?: ComingSoonHandler;
+  }
+
+  export interface RenderedMainMenu {
+    destroy: () => void;
+  }
+});
+__define('./screens/main-menu/view/events.ts', (exports, module, __require) => {
+
+
+  const TONE_ICONS: Record<string, string> = {
     greeting: '✨',
     focus: '🎯',
     gentle: '🌬️',
@@ -13691,21 +15762,453 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
     calm: '🌙'
   };
 
-  const TAG_CLASS_MAP = new Map([
+  const TAG_CLASS_MAP = new Map<string, string>([
     ['PvE', 'mode-tag--pve'],
     ['PvP', 'mode-tag--pvp'],
     ['Coming soon', 'mode-tag--coming'],
     ['Kinh tế nguyên tinh', 'mode-tag--economy']
   ]);
 
-  function ensureStyles(){
-    let style = document.getElementById(STYLE_ID);
-    if (!style || style.tagName.toLowerCase() !== 'style'){
-      style = document.createElement('style');
-      style.id = STYLE_ID;
-      document.head.appendChild(style);
+  function cueTone(tone: string | null | undefined): { icon: string; tone: string } {
+    if (tone && TONE_ICONS[tone]){
+      return { icon: TONE_ICONS[tone], tone };
+    }
+    return { icon: '✦', tone: tone || 'calm' };
+  }
+
+  interface BuildModeCardOptions {
+    extraClasses?: ReadonlyArray<string>;
+    showStatus?: boolean;
+  }
+
+  function buildModeCardBase(
+    element: HTMLElement,
+    mode: MenuCardMetadata,
+    options: BuildModeCardOptions = {}
+  ): { statusEl: HTMLSpanElement | null }{
+    const { extraClasses = [], showStatus = true } = options;
+    element.classList.add('mode-card');
+    extraClasses.forEach(cls => element.classList.add(cls));
+    if (mode.key){
+      element.dataset.mode = mode.key;
     }
 
+    const icon = document.createElement('span');
+    icon.className = 'mode-card__icon';
+    icon.textContent = mode.icon || '◆';
+    element.appendChild(icon);
+
+    const title = document.createElement('h3');
+    title.className = 'mode-card__title';
+    title.textContent = mode.title || mode.label || mode.key || '';
+    element.appendChild(title);
+
+    if (mode.description){
+      const desc = document.createElement('p');
+      desc.className = 'mode-card__desc';
+      desc.textContent = mode.description;
+      element.appendChild(desc);
+    }
+
+    const tags = document.createElement('div');
+    tags.className = 'mode-card__tags';
+    (mode.tags || []).forEach(tag => {
+      if (!tag) return;
+      const chip = document.createElement('span');
+      chip.className = 'mode-tag';
+      chip.textContent = tag;
+      const mapped = TAG_CLASS_MAP.get(tag);
+      if (mapped){
+        chip.classList.add(mapped);
+      }
+      tags.appendChild(chip);
+    });
+    if (tags.childElementCount > 0){
+      element.appendChild(tags);
+    }
+
+    let statusEl: HTMLSpanElement | null = null;
+    if (showStatus && mode.status === 'coming-soon'){
+      element.classList.add('mode-card--coming');
+      if (mode.key){
+        element.setAttribute('aria-describedby', `${mode.key}-status`);
+      }
+      element.setAttribute('aria-disabled', 'true');
+      statusEl = document.createElement('span');
+      if (mode.key){
+        statusEl.id = `${mode.key}-status`;
+      }
+      statusEl.className = 'mode-card__status';
+      statusEl.textContent = 'Coming soon';
+      element.appendChild(statusEl);
+    }
+
+    return { statusEl };
+  }
+
+  interface ModeCardOptions {
+    extraClasses?: ReadonlyArray<string>;
+    extraClass?: string;
+    showStatus?: boolean;
+    onPrimaryAction?: (context: { mode: MenuCardMetadata; event: MouseEvent; element: HTMLButtonElement }) => void;
+    afterCreate?: (element: HTMLButtonElement) => void;
+  }
+
+  function createModeCard(
+    mode: MenuCardMetadata,
+    shell: MainMenuShell | null | undefined,
+    onShowComingSoon: ComingSoonHandler | undefined,
+    addCleanup: CleanupRegistrar,
+    options: ModeCardOptions = {}
+  ): HTMLButtonElement {
+    const button = document.createElement('button');
+    button.type = 'button';
+    const extraClasses = Array.isArray(options.extraClasses)
+      ? options.extraClasses
+      : options.extraClass
+        ? [options.extraClass]
+        : [];
+
+    buildModeCardBase(button, mode, {
+      extraClasses,
+      showStatus: options.showStatus !== false
+    });
+
+    const handleClick = (event: MouseEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (typeof options.onPrimaryAction === 'function'){
+        options.onPrimaryAction({ mode, event, element: button });
+        return;
+      }
+      if (!shell || typeof shell.enterScreen !== 'function') return;
+      if (mode.status === 'coming-soon'){
+        if (typeof onShowComingSoon === 'function'){
+          onShowComingSoon(mode);
+        }
+        shell.enterScreen(mode.id || 'main-menu', (mode.params as Record<string, unknown> | null) ?? null);
+        return;
+      }
+      shell.enterScreen(mode.id || 'main-menu', (mode.params as Record<string, unknown> | null) ?? null);
+    };
+
+    button.addEventListener('click', handleClick);
+    addCleanup(() => button.removeEventListener('click', handleClick));
+
+    if (typeof options.afterCreate === 'function'){
+      options.afterCreate(button);
+    }
+
+    return button;
+  }
+
+  function createModeGroupCard(
+    group: MenuCardMetadata,
+    childModes: ReadonlyArray<MenuCardMetadata>,
+    shell: MainMenuShell | null | undefined,
+    onShowComingSoon: ComingSoonHandler | undefined,
+    addCleanup: CleanupRegistrar
+  ): HTMLDivElement {
+    const wrapper = document.createElement('div');
+    const groupClasses = Array.isArray(group.extraClasses)
+      ? ['mode-card--group', ...group.extraClasses]
+      : ['mode-card--group'];
+    buildModeCardBase(wrapper, group, { extraClasses: groupClasses, showStatus: false });
+    wrapper.setAttribute('role', 'button');
+    wrapper.setAttribute('aria-haspopup', 'true');
+    wrapper.setAttribute('aria-expanded', 'false');
+    if (group.title){
+      wrapper.setAttribute('aria-label', `Chọn chế độ trong ${group.title}`);
+    }
+    wrapper.tabIndex = 0;
+
+    const infoBlock = document.createElement('div');
+    infoBlock.className = 'mode-card__group-info';
+    infoBlock.setAttribute('aria-hidden', 'false');
+    const existingIcon = wrapper.querySelector('.mode-card__icon');
+    const existingTitle = wrapper.querySelector('.mode-card__title');
+    const existingDesc = wrapper.querySelector('.mode-card__desc');
+    if (existingIcon){
+      infoBlock.appendChild(existingIcon);
+    }
+    if (existingTitle){
+      infoBlock.appendChild(existingTitle);
+    }
+    if (existingDesc){
+      infoBlock.appendChild(existingDesc);
+    }
+    wrapper.insertBefore(infoBlock, wrapper.firstChild);
+
+    const caret = document.createElement('span');
+    caret.className = 'mode-card__group-caret';
+    caret.setAttribute('aria-hidden', 'true');
+    caret.textContent = '▾';
+    wrapper.appendChild(caret);
+
+    const childrenGrid = document.createElement('div');
+    childrenGrid.className = 'mode-card__group-children';
+    childrenGrid.setAttribute('role', 'menu');
+    childrenGrid.setAttribute('aria-hidden', 'true');
+    childrenGrid.hidden = true;
+    wrapper.appendChild(childrenGrid);
+
+    let isOpen = false;
+    let documentListenerActive = false;
+
+    const close = () => {
+      if (!isOpen) return;
+      isOpen = false;
+      wrapper.classList.remove('is-open');
+      wrapper.setAttribute('aria-expanded', 'false');
+      infoBlock.hidden = false;
+      infoBlock.setAttribute('aria-hidden', 'false');
+      childrenGrid.hidden = true;
+      childrenGrid.setAttribute('aria-hidden', 'true');
+      if (documentListenerActive){
+        document.removeEventListener('click', handleDocumentClick, true);
+        documentListenerActive = false;
+      }
+    };
+
+    const open = () => {
+      if (isOpen) return;
+      isOpen = true;
+      wrapper.classList.add('is-open');
+      wrapper.setAttribute('aria-expanded', 'true');
+      infoBlock.hidden = true;
+      infoBlock.setAttribute('aria-hidden', 'true');
+      childrenGrid.hidden = false;
+      childrenGrid.setAttribute('aria-hidden', 'false');
+      if (!documentListenerActive){
+        document.addEventListener('click', handleDocumentClick, true);
+        documentListenerActive = true;
+      }
+    };
+
+    const toggle = () => {
+      if (isOpen){
+        close();
+      } else {
+        open();
+      }
+    };
+
+    function handleDocumentClick(event: MouseEvent): void{
+      if (!wrapper.contains(event.target as Node)){
+        close();
+      }
+    }
+
+    const handleToggle = (event: MouseEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
+      toggle();
+    };
+
+    const handleKeydown = (event: KeyboardEvent) => {
+      if (event.key === 'Enter' || event.key === ' '){
+        event.preventDefault();
+        toggle();
+        return;
+      }
+      if (event.key === 'Escape' && isOpen){
+        event.preventDefault();
+        close();
+        wrapper.focus({ preventScroll: true });
+      }
+    };
+
+    const handleFocusOut = (event: FocusEvent) => {
+      if (!isOpen) return;
+      if (!wrapper.contains(event.relatedTarget as Node | null)){
+        close();
+      }
+    };
+
+    wrapper.addEventListener('click', handleToggle);
+    wrapper.addEventListener('keydown', handleKeydown);
+    wrapper.addEventListener('focusout', handleFocusOut);
+
+    addCleanup(() => {
+      wrapper.removeEventListener('click', handleToggle);
+      wrapper.removeEventListener('keydown', handleKeydown);
+      wrapper.removeEventListener('focusout', handleFocusOut);
+      if (documentListenerActive){
+        document.removeEventListener('click', handleDocumentClick, true);
+        documentListenerActive = false;
+      }
+    });
+
+    childModes.forEach(child => {
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'mode-card__child';
+      if (child.key){
+        item.dataset.mode = child.key;
+      }
+      item.setAttribute('role', 'menuitem');
+      if (child.status === 'coming-soon'){
+        item.classList.add('mode-card__child--coming');
+      }
+
+      const icon = document.createElement('span');
+      icon.className = 'mode-card__child-icon';
+      icon.textContent = child.icon || '◆';
+      item.appendChild(icon);
+
+      const body = document.createElement('span');
+      body.className = 'mode-card__child-body';
+
+      const title = document.createElement('span');
+      title.className = 'mode-card__child-title';
+      title.textContent = child.title || child.label || child.key || '';
+      body.appendChild(title);
+
+      const status = document.createElement('span');
+      status.className = 'mode-card__child-status';
+      status.textContent = child.status === 'coming-soon' ? 'Coming soon' : 'Sẵn sàng';
+      body.appendChild(status);
+
+      if (child.description){
+        const desc = document.createElement('span');
+        desc.className = 'mode-card__child-desc';
+        desc.textContent = child.description;
+        body.appendChild(desc);
+      }
+
+      item.appendChild(body);
+
+      const handleSelect = (event: MouseEvent) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!shell || typeof shell.enterScreen !== 'function') return;
+        if (child.status === 'coming-soon' && typeof onShowComingSoon === 'function'){
+          onShowComingSoon(child);
+        }
+        shell.enterScreen(child.id || 'main-menu', (child.params as Record<string, unknown> | null) ?? null);
+        close();
+        wrapper.focus({ preventScroll: true });
+      };
+
+      item.addEventListener('click', handleSelect);
+      addCleanup(() => item.removeEventListener('click', handleSelect));
+
+      childrenGrid.appendChild(item);
+    });
+
+    return wrapper;
+        }
+
+  exports.cueTone = cueTone;
+  exports.createModeCard = createModeCard;
+  exports.createModeGroupCard = createModeGroupCard;
+});
+__define('./screens/main-menu/view/index.ts', (exports, module, __require) => {
+
+  const __dep1 = __require('./screens/main-menu/dialogues.ts');
+  const HERO_DEFAULT_ID = __dep1.HERO_DEFAULT_ID;
+  const __dep2 = __require('./ui/dom.ts');
+  const mountSection = __dep2.mountSection;
+  const __dep3 = __require('./screens/main-menu/view/layout.ts');
+  const ensureStyles = __dep3.ensureStyles;
+  const createHeader = __dep3.createHeader;
+  const createHeroSection = __dep3.createHeroSection;
+  const createModesSection = __dep3.createModesSection;
+  const createSidebar = __dep3.createSidebar;
+
+  function renderMainMenuView(state: MainMenuState): RenderedMainMenu | null {
+    const {
+      root,
+      shell = null,
+      sections = [],
+      metadata = [],
+      heroId = HERO_DEFAULT_ID,
+      playerGender = 'neutral',
+      onShowComingSoon
+    } = state;
+
+    if (!root) return null;
+
+    ensureStyles();
+
+    const cleanups: CleanupFn[] = [];
+    const addCleanup: CleanupRegistrar = fn => {
+      if (typeof fn === 'function'){
+        cleanups.push(fn);
+      }
+    };
+
+    const container = document.createElement('div');
+    container.className = 'main-menu-v2';
+    const mount = mountSection({
+      root,
+      section: container,
+      rootClasses: 'app--main-menu',
+      removeRootClasses: 'app--pve',
+    });
+
+    const header = createHeader();
+    container.appendChild(header);
+
+    const layout = document.createElement('div');
+    layout.className = 'main-menu-v2__layout';
+    container.appendChild(layout);
+
+    const primary = document.createElement('div');
+    primary.className = 'main-menu-v2__primary';
+    const hero = createHeroSection({ heroId, playerGender, addCleanup });
+    primary.appendChild(hero);
+    const modes = createModesSection({ sections, metadata, shell, onShowComingSoon, addCleanup });
+    primary.appendChild(modes);
+
+    const sidebar = createSidebar({ shell, addCleanup });
+
+    layout.appendChild(primary);
+    layout.appendChild(sidebar);
+
+    return {
+      destroy(){
+        cleanups.forEach(fn => {
+          try {
+            fn();
+          } catch (err) {
+            console.error('[main-menu] cleanup failed', err);
+          }
+        });
+        cleanups.length = 0;
+        mount.destroy();
+      }
+    };
+  }
+
+  const __reexport0 = __require('./screens/main-menu/view/layout.ts');
+  exports.ensureStyles = __reexport0.ensureStyles;
+  exports.createHeader = __reexport0.createHeader;
+  exports.createHeroSection = __reexport0.createHeroSection;
+  exports.createModesSection = __reexport0.createModesSection;
+  exports.createSidebar = __reexport0.createSidebar;
+  exports.renderMainMenuView = renderMainMenuView;
+});
+__define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
+  const __dep0 = __require('./data/announcements.ts');
+  const getAllSidebarAnnouncements = __dep0.getAllSidebarAnnouncements;
+  const __dep1 = __require('./ui/dom.ts');
+  const ensureStyleTag = __dep1.ensureStyleTag;
+  const __dep2 = __require('./screens/main-menu/dialogues.ts');
+  const getHeroDialogue = __dep2.getHeroDialogue;
+  const getHeroHotspots = __dep2.getHeroHotspots;
+  const getHeroProfile = __dep2.getHeroProfile;
+  const HERO_DEFAULT_ID = __dep2.HERO_DEFAULT_ID;
+
+
+  const __dep3 = __require('./screens/main-menu/view/events.ts');
+  const cueTone = __dep3.cueTone;
+  const createModeCard = __dep3.createModeCard;
+  const createModeGroupCard = __dep3.createModeGroupCard;
+
+  const STYLE_ID = 'main-menu-view-style';
+
+  function ensureStyles(): void {
     const css = `
       .app--main-menu{padding:32px 16px 64px;}
       .main-menu-v2{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:32px;color:inherit;}
@@ -13799,14 +16302,12 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
       @media(max-width:960px){.main-menu-v2__layout{grid-template-columns:1fr;}.main-menu-sidebar{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;}}
       @media(max-width:640px){.main-menu-v2{gap:24px;}.hero-panel__info{padding:24px;}.hero-panel__canvas{padding:20px;}.main-menu-v2__title{font-size:36px;}.mode-card{padding:20px;}}
     `;
-    
-    if (style.textContent !== css){
-      style.textContent = css;
-    }
+
+    ensureStyleTag(STYLE_ID, { css });
   }
 
-  function applyPalette(element, profile){
-    const palette = profile?.art?.palette || {};
+  function applyPalette(element: HTMLElement | null, profile: HeroProfile): void {
+    const palette = profile.art?.palette || {};
     if (!element) return;
     if (palette.primary) element.style.setProperty('--hero-primary', palette.primary);
     if (palette.secondary) element.style.setProperty('--hero-secondary', palette.secondary);
@@ -13814,283 +16315,15 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
     if (palette.outline) element.style.setProperty('--hero-outline', palette.outline);
   }
 
-  function buildModeCardBase(element, mode, options = {}){
-    if (!element || !mode) return null;
-    const { extraClasses = [], showStatus = true } = options;
-    element.classList.add('mode-card');
-    extraClasses.forEach(cls => element.classList.add(cls));
-    element.dataset.mode = mode.key;
-
-    const icon = document.createElement('span');
-    icon.className = 'mode-card__icon';
-    icon.textContent = mode.icon || '◆';
-    element.appendChild(icon);
-
-    const title = document.createElement('h3');
-    title.className = 'mode-card__title';
-    title.textContent = mode.title || mode.label || mode.key;
-    element.appendChild(title);
-
-    if (mode.description){
-      const desc = document.createElement('p');
-      desc.className = 'mode-card__desc';
-      desc.textContent = mode.description;
-      element.appendChild(desc);
-    }
-
-    const tags = document.createElement('div');
-    tags.className = 'mode-card__tags';
-    (mode.tags || []).forEach(tag => {
-      const chip = document.createElement('span');
-      chip.className = 'mode-tag';
-      chip.textContent = tag;
-      const mapped = TAG_CLASS_MAP.get(tag);
-      if (mapped) chip.classList.add(mapped);
-      tags.appendChild(chip);
-    });
-    if (tags.childElementCount > 0){
-      element.appendChild(tags);
-    }
-
-    let statusEl = null;
-    if (showStatus && mode.status === 'coming-soon'){
-      element.classList.add('mode-card--coming');
-      element.setAttribute('aria-describedby', `${mode.key}-status`);
-      element.setAttribute('aria-disabled', 'true');
-      statusEl = document.createElement('span');
-      statusEl.id = `${mode.key}-status`;
-      statusEl.className = 'mode-card__status';
-      statusEl.textContent = 'Coming soon';
-      element.appendChild(statusEl);
-    }
-
-    return { statusEl };
+  interface ModesSectionOptions {
+    sections: ReadonlyArray<MenuSection>;
+    metadata: ReadonlyArray<MenuCardMetadata>;
+    shell: MainMenuShell | null | undefined;
+    onShowComingSoon?: ComingSoonHandler;
+    addCleanup: CleanupRegistrar;
   }
 
-  function createModeCard(mode, shell, onShowComingSoon, addCleanup, options = {}){
-    const button = document.createElement('button');
-    button.type = 'button';
-    const extraClasses = Array.isArray(options.extraClasses)
-      ? options.extraClasses
-      : (options.extraClass ? [options.extraClass] : []);
-    buildModeCardBase(button, mode, {
-      extraClasses,
-      showStatus: options.showStatus !== false
-    });
-
-    const handleClick = event => {
-      event.preventDefault();
-      event.stopPropagation();
-      if (typeof options.onPrimaryAction === 'function'){
-        options.onPrimaryAction({ mode, event, element: button });
-        return;
-      }
-      if (!shell || typeof shell.enterScreen !== 'function') return;
-      if (mode.status === 'coming-soon'){
-        if (typeof onShowComingSoon === 'function'){
-          onShowComingSoon(mode);
-        }
-        shell.enterScreen(mode.id || 'main-menu', mode.params || null);
-        return;
-      }
-      shell.enterScreen(mode.id || 'main-menu', mode.params || null);
-    };
-    button.addEventListener('click', handleClick);
-    addCleanup(() => button.removeEventListener('click', handleClick));
-    if (typeof options.afterCreate === 'function'){
-      options.afterCreate(button);
-    }
-
-    return button;
-  }
-
-  function createModeGroupCard(group, childModes, shell, onShowComingSoon, addCleanup){
-    const wrapper = document.createElement('div');
-    const groupClasses = Array.isArray(group.extraClasses)
-      ? ['mode-card--group', ...group.extraClasses]
-      : ['mode-card--group'];
-    buildModeCardBase(wrapper, group, { extraClasses: groupClasses, showStatus: false });
-    wrapper.setAttribute('role', 'button');
-    wrapper.setAttribute('aria-haspopup', 'true');
-    wrapper.setAttribute('aria-expanded', 'false');
-    if (group.title){
-      wrapper.setAttribute('aria-label', `Chọn chế độ trong ${group.title}`);
-    }
-    wrapper.tabIndex = 0;
-    
-    const infoBlock = document.createElement('div');
-    infoBlock.className = 'mode-card__group-info';
-    infoBlock.setAttribute('aria-hidden', 'false');
-    const existingIcon = wrapper.querySelector('.mode-card__icon');
-    const existingTitle = wrapper.querySelector('.mode-card__title');
-    const existingDesc = wrapper.querySelector('.mode-card__desc');
-    if (existingIcon) infoBlock.appendChild(existingIcon);
-    if (existingTitle) infoBlock.appendChild(existingTitle);
-    if (existingDesc) infoBlock.appendChild(existingDesc);
-    wrapper.insertBefore(infoBlock, wrapper.firstChild);
-
-    const caret = document.createElement('span');
-    caret.className = 'mode-card__group-caret';
-    caret.setAttribute('aria-hidden', 'true');
-    caret.textContent = '▾';
-    wrapper.appendChild(caret);
-
-    const childrenGrid = document.createElement('div');
-    childrenGrid.className = 'mode-card__group-children';
-    childrenGrid.setAttribute('role', 'menu');
-    childrenGrid.setAttribute('aria-hidden', 'true');
-    childrenGrid.hidden = true;
-    wrapper.appendChild(childrenGrid);
-
-    let isOpen = false;
-    let documentListenerActive = false;
-
-    const handleDocumentClick = event => {
-      if (!wrapper.contains(event.target)){
-        close();
-      }
-    };
-
-    const bindOutsideClick = () => {
-      if (documentListenerActive) return;
-      document.addEventListener('click', handleDocumentClick);
-      documentListenerActive = true;
-    };
-
-    const unbindOutsideClick = () => {
-      if (!documentListenerActive) return;
-      document.removeEventListener('click', handleDocumentClick);
-      documentListenerActive = false;
-    };
-
-    const open = () => {
-      if (isOpen) return;
-      isOpen = true;
-      wrapper.classList.add('is-open');
-      wrapper.setAttribute('aria-expanded', 'true');
-      infoBlock.hidden = true;
-      infoBlock.setAttribute('aria-hidden', 'true');
-      childrenGrid.hidden = false;
-      childrenGrid.setAttribute('aria-hidden', 'false');
-      setTimeout(bindOutsideClick, 0);
-    };
-
-    const close = () => {
-      if (!isOpen) return;
-      isOpen = false;
-      wrapper.classList.remove('is-open');
-      wrapper.setAttribute('aria-expanded', 'false');
-      infoBlock.hidden = false;
-      infoBlock.setAttribute('aria-hidden', 'false');
-      childrenGrid.hidden = true;
-      childrenGrid.setAttribute('aria-hidden', 'true');
-      unbindOutsideClick();
-    };
-
-    const toggle = () => {
-      if (isOpen){
-        close();
-      } else {
-        open();
-      }
-    };
-
-    const handleToggle = event => {
-      event.preventDefault();
-      event.stopPropagation();
-      toggle();
-    };
-
-    const handleKeydown = event => {
-      if (event.key === 'Enter' || event.key === ' '){
-        event.preventDefault();
-        toggle();
-        return;
-      }
-      if (event.key === 'Escape' && isOpen){
-        event.preventDefault();
-        close();
-        wrapper.focus({ preventScroll: true });
-      }
-    };
-
-    const handleFocusOut = event => {
-      if (!isOpen) return;
-      if (!wrapper.contains(event.relatedTarget)){
-        close();
-      }
-    };
-
-    wrapper.addEventListener('click', handleToggle);
-    wrapper.addEventListener('keydown', handleKeydown);
-    wrapper.addEventListener('focusout', handleFocusOut);
-
-    addCleanup(() => {
-      wrapper.removeEventListener('click', handleToggle);
-      wrapper.removeEventListener('keydown', handleKeydown);
-      wrapper.removeEventListener('focusout', handleFocusOut);
-      unbindOutsideClick();
-    });
-
-    childModes.forEach(child => {
-      const item = document.createElement('button');
-      item.type = 'button';
-      item.className = 'mode-card__child';
-      item.dataset.mode = child.key;
-      item.setAttribute('role', 'menuitem');
-      if (child.status === 'coming-soon'){
-        item.classList.add('mode-card__child--coming');
-      }
-
-      const icon = document.createElement('span');
-      icon.className = 'mode-card__child-icon';
-      icon.textContent = child.icon || '◆';
-      item.appendChild(icon);
-
-      const body = document.createElement('span');
-      body.className = 'mode-card__child-body';
-
-      const title = document.createElement('span');
-      title.className = 'mode-card__child-title';
-      title.textContent = child.title || child.label || child.key;
-      body.appendChild(title);
-
-      const status = document.createElement('span');
-      status.className = 'mode-card__child-status';
-      status.textContent = child.status === 'coming-soon' ? 'Coming soon' : 'Sẵn sàng';
-      body.appendChild(status);
-
-      if (child.description){
-        const desc = document.createElement('span');
-        desc.className = 'mode-card__child-desc';
-        desc.textContent = child.description;
-        body.appendChild(desc);
-      }
-
-      item.appendChild(body);
-
-      const handleSelect = event => {
-        event.preventDefault();
-        event.stopPropagation();
-        if (!shell || typeof shell.enterScreen !== 'function') return;
-        if (child.status === 'coming-soon' && typeof onShowComingSoon === 'function'){
-          onShowComingSoon(child);
-        }
-        shell.enterScreen(child.id || 'main-menu', child.params || null);
-        close();
-        wrapper.focus({ preventScroll: true });
-      };
-
-      item.addEventListener('click', handleSelect);
-      addCleanup(() => item.removeEventListener('click', handleSelect));
-
-      childrenGrid.appendChild(item);
-    });
-
-    return wrapper;
-  }
-
-  function createModesSection(options){
+  function createModesSection(options: ModesSectionOptions): HTMLElement {
     const { sections = [], metadata = [], shell, onShowComingSoon, addCleanup } = options;
     const sectionEl = document.createElement('section');
     sectionEl.className = 'main-menu-modes';
@@ -14100,12 +16333,15 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
     title.textContent = 'Chế độ tác chiến';
     sectionEl.appendChild(title);
 
-    const metaByKey = new Map();
+    const metaByKey = new Map<string, MenuCardMetadata>();
     metadata.forEach(mode => {
-      metaByKey.set(mode.key, mode);
+      if (mode?.key){
+        metaByKey.set(mode.key, mode);
+      }
     });
 
     sections.forEach(section => {
+      if (!section) return;
       const sectionGroup = document.createElement('div');
       sectionGroup.className = 'mode-section';
 
@@ -14118,6 +16354,7 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
       grid.className = 'mode-grid';
 
       (section.entries || []).forEach(entry => {
+        if (!entry) return;
         const cardKey = entry.cardId || entry.id;
         if (!cardKey) return;
         const cardMeta = metaByKey.get(cardKey);
@@ -14125,8 +16362,8 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
 
         if (entry.type === 'group'){
           const childMetas = (entry.childModeIds || [])
-            .map(childId => metaByKey.get(childId))
-            .filter(Boolean);
+            .map(childId => (childId ? metaByKey.get(childId) : null))
+            .filter((item): item is MenuCardMetadata => Boolean(item));
           if (childMetas.length === 0) return;
           const groupCard = createModeGroupCard(cardMeta, childMetas, shell, onShowComingSoon, addCleanup);
           grid.appendChild(groupCard);
@@ -14144,11 +16381,13 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
     return sectionEl;
   }
 
-  function cueTone(tone){
-    return TONE_ICONS[tone] ? { icon: TONE_ICONS[tone], tone } : { icon: '✦', tone: tone || 'calm' };
+  interface HeroSectionOptions {
+    heroId?: string;
+    playerGender?: string;
+    addCleanup: CleanupRegistrar;
   }
 
-  function createHeroSection(options){
+  function createHeroSection(options: HeroSectionOptions): HTMLElement {
     const { heroId = HERO_DEFAULT_ID, playerGender = 'neutral', addCleanup } = options;
     const profile = getHeroProfile(heroId);
     const heroSection = document.createElement('section');
@@ -14156,7 +16395,7 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
 
     const panel = document.createElement('div');
     panel.className = 'hero-panel';
-      applyPalette(panel, profile);
+    applyPalette(panel, profile);
     heroSection.appendChild(panel);
 
     const info = document.createElement('div');
@@ -14219,6 +16458,7 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
 
     const hotspots = getHeroHotspots(profile.id);
     hotspots.forEach(spot => {
+      if (!spot) return;
       const hotspotBtn = document.createElement('button');
       hotspotBtn.type = 'button';
       hotspotBtn.className = 'hero-panel__hotspot';
@@ -14228,12 +16468,13 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
       const label = document.createElement('span');
       label.textContent = spot.label || 'Tương tác';
       hotspotBtn.appendChild(label);
-      const handleClick = event => {
+
+      const handleClick = (event: MouseEvent) => {
         event.preventDefault();
         event.stopPropagation();
         showDialogue(spot.cue || 'sensitive', { zone: spot.key });
         panel.classList.add('hero-panel--alert');
-        setTimeout(() => panel.classList.remove('hero-panel--alert'), 620);
+        window.setTimeout(() => panel.classList.remove('hero-panel--alert'), 620);
       };
       const handleHover = () => {
         panel.classList.add('is-hovered');
@@ -14241,6 +16482,7 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
       const handleLeave = () => {
         panel.classList.remove('is-hovered');
       };
+
       hotspotBtn.addEventListener('click', handleClick);
       hotspotBtn.addEventListener('mouseenter', handleHover);
       hotspotBtn.addEventListener('focus', handleHover);
@@ -14253,18 +16495,19 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
         hotspotBtn.removeEventListener('mouseleave', handleLeave);
         hotspotBtn.removeEventListener('blur', handleLeave);
       });
+
       canvas.appendChild(hotspotBtn);
     });
 
     panel.appendChild(canvas);
 
-    const updateTone = (tone, label) => {
+    const updateTone = (tone: string | null | undefined, label: string | null | undefined) => {
       const { icon, tone: normalizedTone } = cueTone(tone);
       toneEl.dataset.tone = normalizedTone;
       toneEl.textContent = `${icon} ${label || ''}`.trim();
     };
 
-    const showDialogue = (cue, extra = {}) => {
+    const showDialogue = (cue: string, extra: { zone?: string | null } = {}) => {
       const dialogueData = getHeroDialogue(profile.id, cue, { gender: playerGender, zone: extra.zone });
       textEl.textContent = dialogueData.text;
       updateTone(dialogueData.tone, dialogueData.label);
@@ -14278,16 +16521,19 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
       panel.classList.remove('is-hovered');
       showDialogue('idle');
     };
-    const handleClick = event => {
-      event.preventDefault();
+    const triggerTap = () => {
       panel.classList.add('is-pressed');
       showDialogue('tap');
-      setTimeout(() => panel.classList.remove('is-pressed'), 220);
+      window.setTimeout(() => panel.classList.remove('is-pressed'), 220);
     };
-    const handleKey = event => {
+    const handleClick = (event: MouseEvent) => {
+      event.preventDefault();
+      triggerTap();
+    };
+    const handleKey = (event: KeyboardEvent) => {
       if (event.key === 'Enter' || event.key === ' '){
         event.preventDefault();
-        handleClick(event);
+        triggerTap();
       }
     };
 
@@ -14312,19 +16558,31 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
     return heroSection;
   }
 
-  function createSidebar(options = {}){
+  interface SidebarOptions {
+    shell: MainMenuShell | null | undefined;
+    addCleanup: CleanupRegistrar;
+  }
+
+  type SidebarAnnouncement = {
+    key: string;
+    label: string;
+    entry: AnnouncementEntry;
+  };
+
+  function createSidebar(options: SidebarOptions): HTMLElement {
     const { shell, addCleanup } = options;
     const aside = document.createElement('aside');
     aside.className = 'main-menu-sidebar';
-    const announcements = getAllSidebarAnnouncements();
+    const announcements: ReadonlyArray<SidebarAnnouncement> = getAllSidebarAnnouncements();
 
-    const attachTooltipHandlers = (element, info) => {
-      if (!element) return;
-      const { slotKey, entry } = info || {};
-      if (!slotKey || !entry) return;
+    const attachTooltipHandlers = (element: HTMLElement | null, info: { slotKey: string; entry: AnnouncementEntry } | null) => {
+      if (!element || !info) return;
+      const { slotKey, entry } = info;
+      if (!slotKey) return;
       if (!shell || typeof shell.showTooltip !== 'function') return;
+
       const showTooltip = () => {
-        shell.showTooltip({
+        shell.showTooltip?.({
           id: entry.id,
           slot: slotKey,
           title: entry.title,
@@ -14337,7 +16595,7 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
       };
       const hideTooltip = () => {
         if (typeof shell.hideTooltip === 'function'){
-          shell.hideTooltip({ id: entry.id, slot: slotKey });
+          shell.hideTooltip({ id: entry.id || null, slot: slotKey });
         }
       };
 
@@ -14346,19 +16604,16 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
       element.addEventListener('focus', showTooltip);
       element.addEventListener('blur', hideTooltip);
 
-      if (typeof addCleanup === 'function'){
-        addCleanup(() => {
-          element.removeEventListener('mouseenter', showTooltip);
-          element.removeEventListener('mouseleave', hideTooltip);
-          element.removeEventListener('focus', showTooltip);
-          element.removeEventListener('blur', hideTooltip);
-        });
-      }
+      addCleanup(() => {
+        element.removeEventListener('mouseenter', showTooltip);
+        element.removeEventListener('mouseleave', hideTooltip);
+        element.removeEventListener('focus', showTooltip);
+        element.removeEventListener('blur', hideTooltip);
+      });
     };
 
-      announcements.forEach(item => {
+    announcements.forEach(item => {
       const { key, label, entry } = item;
-      if (!entry) return;
       const card = document.createElement('div');
       card.className = 'sidebar-slot';
       card.dataset.slot = key;
@@ -14374,11 +16629,11 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
 
       const titleEl = document.createElement('h4');
       titleEl.className = 'sidebar-slot__title';
-      titleEl.textContent = entry.title;
+      titleEl.textContent = entry.title || '';
 
       const descEl = document.createElement('p');
       descEl.className = 'sidebar-slot__desc';
-      descEl.textContent = entry.shortDescription;
+      descEl.textContent = entry.shortDescription || '';
 
       card.appendChild(labelEl);
       card.appendChild(titleEl);
@@ -14406,7 +16661,7 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
     return aside;
   }
 
-  function createHeader(){
+  function createHeader(): HTMLElement {
     const header = document.createElement('header');
     header.className = 'main-menu-v2__header';
 
@@ -14440,67 +16695,20 @@ __define('./screens/main-menu/view.js', (exports, module, __require) => {
     header.appendChild(meta);
     return header;
   }
-
-  function renderMainMenuView(options = {}){
-    const { root, shell, sections = [], metadata = [], heroId = HERO_DEFAULT_ID, playerGender = 'neutral', onShowComingSoon } = options;
-    if (!root) return null;
-    ensureStyles();
-    root.innerHTML = '';
-    root.classList.remove('app--pve');
-    root.classList.add('app--main-menu');
-
-    const cleanups = [];
-    const addCleanup = fn => {
-      if (typeof fn === 'function') cleanups.push(fn);
-    };
-
-    const container = document.createElement('div');
-    container.className = 'main-menu-v2';
-
-    const header = createHeader();
-    container.appendChild(header);
-
-    const layout = document.createElement('div');
-    layout.className = 'main-menu-v2__layout';
-    container.appendChild(layout);
-
-    const primary = document.createElement('div');
-    primary.className = 'main-menu-v2__primary';
-    const hero = createHeroSection({ heroId, playerGender, addCleanup });
-    primary.appendChild(hero);
-    const modes = createModesSection({ sections, metadata, shell, onShowComingSoon, addCleanup });
-    primary.appendChild(modes);
-
-    const sidebar = createSidebar({ shell, addCleanup });
-
-    layout.appendChild(primary);
-    layout.appendChild(sidebar);
-
-    root.appendChild(container);
-
-    return {
-      destroy(){
-        cleanups.forEach(fn => {
-          try {
-            fn();
-          } catch (err) {
-            console.error('[main-menu] cleanup failed', err);
-          }
-        });
-        cleanups.length = 0;
-        if (container.parentNode === root){
-          root.removeChild(container);
-        }
-        root.classList.remove('app--main-menu');
-      }
-    };
-  }
-  exports.renderMainMenuView = renderMainMenuView;
+  exports.ensureStyles = ensureStyles;
+  exports.createModesSection = createModesSection;
+  exports.createHeroSection = createHeroSection;
+  exports.createSidebar = createSidebar;
+  exports.createHeader = createHeader;
 });
 __define('./statuses.ts', (exports, module, __require) => {
-  const __dep0 = __require('./utils/fury.js');
-  const gainFury = __dep0.gainFury;
-  const finishFuryHit = __dep0.finishFuryHit;
+  const __dep0 = __require('./combat.ts');
+  const applyDamage = __dep0.applyDamage;
+  const __dep1 = __require('./utils/fury.ts');
+  const gainFury = __dep1.gainFury;
+  const finishFuryHit = __dep1.finishFuryHit;
+  const __dep2 = __require('./utils/time.ts');
+  const safeNow = __dep2.safeNow;
 
 
 
@@ -14720,7 +16928,8 @@ __define('./statuses.ts', (exports, module, __require) => {
       const bleed = this.get(unit, 'bleed');
       if (bleed) {
         const lost = Math.round((unit.hpMax ?? 0) * 0.05);
-        unit.hp = Math.max(0, (unit.hp ?? 0) - lost);
+        applyDamage(unit, lost);
+        hookOnLethalDamage(unit);
         if (ctx?.log && Array.isArray(ctx.log)) {
           ctx.log.push({ t: 'bleed', who: unit.name, lost });
         }
@@ -14841,7 +17050,8 @@ __define('./statuses.ts', (exports, module, __require) => {
       const reflect = this.get(target, 'reflect');
       if (reflect && dealt > 0) {
         const back = Math.round(dealt * clamp01(reflect.power ?? 0));
-        attacker.hp = Math.max(0, (attacker.hp ?? 0) - back);
+        applyDamage(attacker, back);
+        hookOnLethalDamage(attacker);
         if (back > 0) {
           gainFury(attacker, {
             type: 'damageTaken',
@@ -14856,7 +17066,8 @@ __define('./statuses.ts', (exports, module, __require) => {
       const venom = this.get(attacker, 'venom');
       if (venom && dealt > 0) {
         const extra = Math.round(dealt * clamp01(venom.power ?? 0));
-        target.hp = Math.max(0, (target.hp ?? 0) - extra);
+        applyDamage(target, extra);
+        hookOnLethalDamage(target);
         if (extra > 0) {
           gainFury(target, {
             type: 'damageTaken',
@@ -14871,6 +17082,11 @@ __define('./statuses.ts', (exports, module, __require) => {
       if (this.has(attacker, 'execute')) {
         if ((target.hp ?? 0) <= Math.ceil((target.hpMax ?? 0) * 0.1)) {
           target.hp = 0;
+          const revived = hookOnLethalDamage(target);
+          if (!revived) {
+            target.alive = false;
+            if (!target.deadAt) target.deadAt = safeNow();
+          }
         }
       }
 
@@ -14895,6 +17111,8 @@ __define('./statuses.ts', (exports, module, __require) => {
     if ((target.hp ?? 0) <= 0) {
       target.hp = 1;
       Statuses.remove(target, 'undying');
+      target.alive = true;
+      target.deadAt = undefined;
       return true;
     }
     return false;
@@ -14904,92 +17122,133 @@ __define('./statuses.ts', (exports, module, __require) => {
   exports.clearStatus = clearStatus;
   exports.hookOnLethalDamage = hookOnLethalDamage;
 });
-__define('./summon.js', (exports, module, __require) => {
+__define('./summon.ts', (exports, module, __require) => {
   // v0.7.3
   const __dep0 = __require('./engine.ts');
   const slotToCell = __dep0.slotToCell;
   const cellReserved = __dep0.cellReserved;
-  const __dep1 = __require('./vfx.js');
+  const __dep1 = __require('./vfx.ts');
   const vfxAddSpawn = __dep1.vfxAddSpawn;
-  const __dep2 = __require('./art.js');
+  const __dep2 = __require('./art.ts');
   const getUnitArt = __dep2.getUnitArt;
-  const __dep3 = __require('./utils/kit.js');
+  const __dep3 = __require('./utils/kit.ts');
   const kitSupportsSummon = __dep3.kitSupportsSummon;
   const __dep4 = __require('./passives.ts');
   const prepareUnitForPassives = __dep4.prepareUnitForPassives;
   const applyOnSpawnEffects = __dep4.applyOnSpawnEffects;
-  // local helper
-  const tokensAlive = (Game) => Game.tokens.filter(t => t.alive);
+
+
+
+
+
+  type SummonChainHooks = Pick<TurnHooks, 'allocIid' | 'doActionOrSkip' | 'performUlt' | 'getTurnOrderIndex'>;
+
+  const DEFAULT_SUMMON_UNIT: NonNullable<SummonRequest['unit']> = {
+    id: 'creep',
+    name: 'Creep',
+    color: '#ffd27d',
+  };
+
+  const tokensAlive = (Game: SessionState): UnitToken[] =>
+    Game.tokens.filter((t): t is UnitToken => t.alive);
 
   // en-queue các yêu cầu “Immediate” trong lúc 1 unit đang hành động
   // req: { by?:unitId, side:'ally'|'enemy', slot:1..9, unit:{...} }
-  function enqueueImmediate(Game, req){
+  function enqueueImmediate(Game: SessionState, req: SummonRequest): boolean {
     if (req.by){
-      const mm = Game.meta.get(req.by);
-      const ok = !!(mm && mm.class === 'Summoner' && kitSupportsSummon(mm));
+      const metaEntry =
+        typeof Game.meta?.get === 'function' ? Game.meta.get(req.by) : null;
+      const record = metaEntry && typeof metaEntry === 'object' ? metaEntry as Record<string, unknown> : null;
+      const ok = Boolean(
+        record
+          && record['class'] === 'Summoner'
+          && kitSupportsSummon(record),
+      );
       if (!ok) return false;
     }
     const { cx, cy } = slotToCell(req.side, req.slot);
     if (cellReserved(tokensAlive(Game), Game.queued, cx, cy)) return false;
 
-    Game.actionChain.push({
+    const entry: ActionChainEntry = {
       side: req.side,
       slot: req.slot,
-      unit: req.unit || { id:'creep', name:'Creep', color:'#ffd27d' }
-    });
+      unit: req.unit ?? DEFAULT_SUMMON_UNIT,
+    };
+    Game.actionChain.push(entry);
     return true;
   }
 
   // xử lý toàn bộ chain của 1 phe sau khi actor vừa hành động
   // trả về slot lớn nhất đã hành động trong chain để tiện logging
-  function processActionChain(Game, side, baseSlot, hooks){
-    const list = Game.actionChain.filter(x => x.side === side);
+  function processActionChain(
+    Game: SessionState,
+    side: Side,
+    baseSlot: number | null | undefined,
+    hooks: SummonChainHooks = {},
+  ): number | null {
+    const list = Game.actionChain.filter((x): x is ActionChainEntry => x.side === side);
     if (!list.length) return baseSlot ?? null;
 
-    list.sort((a,b)=> a.slot - b.slot);
+    list.sort((a, b) => a.slot - b.slot);
 
     let maxSlot = baseSlot ?? 0;
     for (const item of list){
       const { cx, cy } = slotToCell(side, item.slot);
       if (cellReserved(tokensAlive(Game), Game.queued, cx, cy)) continue;
 
-      // spawn creep immediate
-      const extra = item.unit || {};
-      const art = getUnitArt(extra.id || 'minion');
-      Game.tokens.push({
-        id: extra.id || 'creep', name: extra.name || 'Creep',
-        color: extra.color || art?.palette?.primary || '#ffd27d',
-        cx, cy, side, alive:true,
-        isMinion: !!extra.isMinion,
+      const extra = item.unit ?? {};
+      const art = getUnitArt(extra.id ?? 'minion');
+      const newToken: UnitToken = {
+        id: (extra.id ?? 'creep') as string,
+        name: extra.name ?? 'Creep',
+        color: extra.color ?? art?.palette.primary ?? '#ffd27d',
+        cx,
+        cy,
+        side,
+        alive: true,
+        isMinion: Boolean(extra.isMinion),
         ownerIid: extra.ownerIid,
         bornSerial: extra.bornSerial,
         ttlTurns: extra.ttlTurns,
-        hpMax: extra.hpMax, hp: extra.hp, atk: extra.atk,
+        hpMax: extra.hpMax,
+        hp: extra.hp,
+        atk: extra.atk,
         art,
-        skinKey: art?.skinKey
-      });
-      try { vfxAddSpawn(Game, cx, cy, side); } catch(_){}
-      // gắn instance id
-      const spawned = Game.tokens[Game.tokens.length - 1];
+        skinKey: art?.skinKey ?? null,
+        iid: extra.iid,
+      };
+      Game.tokens.push(newToken);
+      try {
+        vfxAddSpawn(Game, cx, cy, side);
+      } catch (_err) {
+        // bỏ qua lỗi hiệu ứng
+      }
+
+      const spawned = Game.tokens[Game.tokens.length - 1] ?? null;
       if (spawned){
-        const meta = (extra.id && Game.meta && typeof Game.meta.get === 'function') ? Game.meta.get(extra.id) : null;
-        const kit = meta?.kit;
+        const metaEntry =
+          extra.id && typeof Game.meta?.get === 'function'
+            ? Game.meta.get(extra.id)
+            : null;
+        const kit = (metaEntry && typeof metaEntry === 'object'
+          ? (metaEntry as Record<string, unknown>).kit
+          : null) as { onSpawn?: unknown } | null;
         prepareUnitForPassives(spawned);
         applyOnSpawnEffects(Game, spawned, kit?.onSpawn);
+        spawned.iid = hooks.allocIid?.() ?? spawned.iid ?? 0;
       }
-      spawned.iid = (hooks.allocIid?.()) ?? (spawned.iid || 0);
 
-      // creep hành động NGAY trong chain (1 lượt), chỉ basic theo spec creep cơ bản
-      // (nếu về sau cần hạn chế further — thêm flags trong meta.creep)
-      // gọi lại doActionOrSkip để dùng chung status/ult-guard (creep thường không có ult)
-      const creep = Game.tokens.find(t => t.alive && t.side===side && t.cx===cx && t.cy===cy);
+      const creep = Game.tokens.find((t): t is UnitToken => t.alive && t.side === side && t.cx === cx && t.cy === cy) ?? null;
       if (creep){
-        const turnContext = {
+        const turnSnapshot = Game.turn as Partial<{ order?: unknown[]; cycle?: number }> | null;
+        const orderLength = Array.isArray(turnSnapshot?.order) ? turnSnapshot!.order!.length : null;
+        const cycle = Number.isFinite(turnSnapshot?.cycle) ? (turnSnapshot?.cycle as number) : 0;
+        const turnContext: TurnContext = {
           side,
           slot: item.slot,
           orderIndex: hooks.getTurnOrderIndex?.(Game, side, item.slot) ?? -1,
-          orderLength: Array.isArray(Game.turn?.order) ? Game.turn.order.length : null,
-          cycle: Game.turn?.cycle ?? 0
+          orderLength,
+          cycle,
         };
         hooks.doActionOrSkip?.(Game, creep, { performUlt: hooks.performUlt, turnContext });
       }
@@ -14997,10 +17256,9 @@ __define('./summon.js', (exports, module, __require) => {
       if (item.slot > maxSlot) maxSlot = item.slot;
     }
 
-    Game.actionChain = Game.actionChain.filter(x => x.side !== side);
+    Game.actionChain = Game.actionChain.filter((x) => x.side !== side);
     return maxSlot;
   }
-
   exports.enqueueImmediate = enqueueImmediate;
   exports.processActionChain = processActionChain;
 });
@@ -15014,15 +17272,15 @@ __define('./turns.ts', (exports, module, __require) => {
 
   const __dep2 = __require('./combat.ts');
   const doBasicWithFollowups = __dep2.doBasicWithFollowups;
-  const __dep3 = __require('./config.js');
+  const __dep3 = __require('./config.ts');
   const CFG = __dep3.CFG;
-  const __dep4 = __require('./meta.js');
+  const __dep4 = __require('./meta.ts');
   const makeInstanceStats = __dep4.makeInstanceStats;
   const initialRageFor = __dep4.initialRageFor;
-  const __dep5 = __require('./vfx.js');
+  const __dep5 = __require('./vfx.ts');
   const vfxAddSpawn = __dep5.vfxAddSpawn;
   const vfxAddBloodPulse = __dep5.vfxAddBloodPulse;
-  const __dep6 = __require('./art.js');
+  const __dep6 = __require('./art.ts');
   const getUnitArt = __dep6.getUnitArt;
   const __dep7 = __require('./passives.ts');
   const emitPassiveEvent = __dep7.emitPassiveEvent;
@@ -15035,9 +17293,9 @@ __define('./turns.ts', (exports, module, __require) => {
   const ACTION_START = __dep8.ACTION_START;
   const ACTION_END = __dep8.ACTION_END;
   const TURN_REGEN = __dep8.TURN_REGEN;
-  const __dep9 = __require('./utils/time.js');
+  const __dep9 = __require('./utils/time.ts');
   const safeNow = __dep9.safeNow;
-  const __dep10 = __require('./utils/fury.js');
+  const __dep10 = __require('./utils/fury.ts');
   const initializeFury = __dep10.initializeFury;
   const startFuryTurn = __dep10.startFuryTurn;
   const spendFury = __dep10.spendFury;
@@ -15710,7 +17968,91 @@ __define('./turns/interleaved.ts', (exports, module, __require) => {
   exports.findNextOccupiedPos = findNextOccupiedPos;
   exports.nextTurnInterleaved = nextTurnInterleaved;
 });
+__define('./types/art.ts', (exports, module, __require) => {
+  export interface UnitArtPalette {
+    primary: string;
+    secondary: string;
+    accent: string;
+    outline: string;
+    [extra: string]: unknown;
+  }
+
+  export interface UnitArtShadowConfig {
+    color: string;
+    blur: number;
+    offsetX: number;
+    offsetY: number;
+  }
+
+  export type UnitArtShadow = UnitArtShadowConfig | string | null;
+
+  export interface UnitArtLayout {
+    anchor: number;
+    labelOffset: number;
+    labelFont: number;
+    hpOffset: number;
+    hpWidth: number;
+    hpHeight: number;
+    spriteAspect: number;
+    spriteHeight: number;
+    [extra: string]: unknown;
+  }
+
+  export interface UnitArtLabel {
+    bg: string;
+    text: string;
+    stroke: string;
+    [extra: string]: unknown;
+  }
+
+  export interface UnitArtHpBar {
+    bg: string;
+    fill: string;
+    border: string;
+    [extra: string]: unknown;
+  }
+
+  export interface UnitArtSprite {
+    key: string;
+    src: string;
+    anchor: number;
+    scale: number;
+    aspect: number | null;
+    shadow: UnitArtShadowConfig | null;
+    skinId: string | null;
+    cacheKey: string | null;
+    [extra: string]: unknown;
+  }
+
+  export interface UnitArtDefinition {
+    sprite: UnitArtSprite | null;
+    skins: Record<string, UnitArtSprite>;
+    defaultSkin: string;
+    palette: UnitArtPalette;
+    shape: string;
+    size: number;
+    shadow: UnitArtShadow;
+    glow: string;
+    mirror: boolean;
+    layout: UnitArtLayout;
+    label: UnitArtLabel;
+    hpBar: UnitArtHpBar;
+    skinKey?: string | null;
+    [extra: string]: unknown;
+  }
+
+  export interface UnitArt extends UnitArtDefinition {
+    skinKey: string | null;
+  }
+
+  export interface GetUnitArtOptions {
+    skinKey?: string | null;
+  }
+});
 __define('./types/combat.ts', (exports, module, __require) => {
+
+
+
 
 
 
@@ -15832,14 +18174,44 @@ __define('./types/combat.ts', (exports, module, __require) => {
     result: BattleResult | null;
   }
 
+  export interface AiDeckCard {
+    id: UnitId;
+    cost?: number | null;
+    name?: string | null;
+    [extra: string]: unknown;
+  }
+
+  export type AiDeckEntry = UnitId | AiDeckCard | UnitToken;
+
+  export interface AiCard extends AiDeckCard {
+    cost: number;
+  }
+
+  export type AiCardDeck = AiCard[];
+
+  export type AiDeckPool = AiCardDeck | ReadonlyArray<AiDeckEntry>;
+
+  export interface PveDeckEntry {
+    id: UnitId;
+    cost?: number | null;
+    name?: string | null;
+    art?: UnitArt | null;
+    skinKey?: string | null;
+    [extra: string]: unknown;
+  }
+
+  export type SessionRosterEntry = PveDeckEntry;
+
+  export type SessionRoster = ReadonlyArray<SessionRosterEntry>;
+
   export interface SessionAIState {
     cost: number;
     costCap: number;
     summoned: number;
     summonLimit: number;
-    unitsAll: UnitId[];
+    unitsAll: AiDeckPool;
     usedUnitIds: Set<UnitId>;
-    deck: UnitToken[] | { id: UnitId }[];
+    deck: AiDeckPool;
     selectedId: UnitId | null;
     lastThinkMs: number;
     lastDecision: Record<string, unknown> | null;
@@ -15854,25 +18226,58 @@ __define('./types/combat.ts', (exports, module, __require) => {
     costCap: number;
     summoned: number;
     summonLimit: number;
-    unitsAll: UnitId[];
+    unitsAll: ReadonlyArray<PveDeckEntry>;
     usedUnitIds: Set<UnitId>;
-    deck3: UnitToken[];
+    deck3: ReadonlyArray<PveDeckEntry>;
     selectedId: UnitId | null;
     ui: { bar: unknown };
     turn: TurnSnapshot | null;
     queued: QueuedSummonState;
     actionChain: ActionChainEntry[];
-    events: EventTarget;
+    events: GameEventTargetLike;
     sceneTheme?: string | null;
     backgroundKey?: string | null;
     battle: BattleState;
     result: BattleResult | null;
     ai: SessionAIState;
-    meta: { get(id: UnitId): Record<string, unknown> | null; [extra: string]: unknown };
+    meta: { get(id: UnitId): RosterUnitDefinition | null | undefined; [extra: string]: unknown };
     rng?: RngState;
     telemetryLog?: TelemetryEvent[];
     [extra: string]: unknown;
   }
+
+  export interface PassiveConditionObject {
+    selfHPAbove?: number | null;
+    selfHPBelow?: number | null;
+    hpAbove?: number | null;
+    hpBelow?: number | null;
+    requiresStatus?: string | ReadonlyArray<string | null | undefined> | null;
+    targetHasStatus?: string | ReadonlyArray<string | null | undefined> | null;
+    minMinions?: number | null;
+    maxStacks?: number | null;
+    stackId?: string | null;
+    [extra: string]: unknown;
+  }
+
+  export interface PassiveKitDefinition extends Record<string, unknown> {
+    passives?: ReadonlyArray<PassiveSpec | null | undefined> | null;
+  }
+
+  export interface PassiveMetaContext {
+    kit: PassiveKitDefinition | null;
+    meta: RosterUnitDefinition | null;
+  }
+
+  export interface PassiveConditionContext {
+    Game?: SessionState | null;
+    unit?: UnitToken | null;
+    ctx?: Record<string, unknown> | null;
+    passive?: PassiveSpec | null;
+  }
+
+  export type PassiveConditionFn = (context: PassiveConditionContext) => boolean;
+
+  export type PassiveCondition = string | PassiveConditionObject | PassiveConditionFn;
 
   export interface PassiveSpec {
     id: string;
@@ -15887,8 +18292,8 @@ __define('./types/combat.ts', (exports, module, __require) => {
           flatStats?: Record<string, number>;
         };
     params?: Record<string, unknown>;
-    condition?: Record<string, unknown>;
-    conditions?: Array<unknown> | unknown;
+    condition?: PassiveCondition | null;
+    conditions?: PassiveCondition[] | PassiveCondition | null;
   }
 
   export interface PassiveEffectArgs<
@@ -15905,9 +18310,45 @@ __define('./types/combat.ts', (exports, module, __require) => {
 
   export type PassiveRegistry = Record<string, PassiveDefinition>;
 });
+__define('./types/common.ts', (exports, module, __require) => {
+  export type UnknownRecord = Record<string, unknown>;
+
+});
 __define('./types/config.ts', (exports, module, __require) => {
 
 
+
+
+  export type TurnOrderSide = 'ally' | 'enemy';
+
+  export interface TurnOrderPairScanSlotFields {
+    slot?: number | string;
+    s?: number | string;
+    index?: number | string;
+  }
+
+  export interface TurnOrderPairScanSideObject extends TurnOrderPairScanSlotFields {
+    side: TurnOrderSide | (string & Record<never, never>);
+  }
+
+  export interface TurnOrderPairScanSlotObject extends TurnOrderPairScanSlotFields {
+    side?: unknown;
+  }
+
+  export type TurnOrderPairScanEntry =
+    | number
+    | ReadonlyArray<number>
+    | readonly [TurnOrderSide | (string & Record<never, never>), number]
+    | TurnOrderPairScanSideObject
+    | TurnOrderPairScanSlotObject;
+
+  export interface TurnOrderConfigDetails {
+    mode?: string | null;
+    sides?: ReadonlyArray<TurnOrderSide>;
+    pairScan?: ReadonlyArray<TurnOrderPairScanEntry>;
+  }
+
+  export type GameTurnOrderConfig = TurnOrderConfigSchema & TurnOrderConfigDetails;
 
   export interface CurrencyDefinition {
     id: string;
@@ -16078,6 +18519,39 @@ __define('./types/config.ts', (exports, module, __require) => {
     nameAlpha: number;
   }
 
+  export interface BackgroundPalette {
+    primary?: string;
+    secondary?: string;
+    accent?: string;
+    shadow?: string;
+    outline?: string;
+  }
+
+  export interface BackgroundFallback {
+    shape?: string;
+    [extra: string]: unknown;
+  }
+
+  export type BackgroundPropConfig = BackgroundProp & {
+    asset?: string | null;
+    fallback?: BackgroundFallback | null;
+    palette?: BackgroundPalette | null;
+    anchor?: { x?: number; y?: number } | null;
+    size?: { w?: number; h?: number } | null;
+    baseLift?: number;
+    pixelOffset?: { x?: number; y?: number } | null;
+    cell: BackgroundProp['cell'] & { depth?: number };
+    cx?: number;
+    cy?: number;
+    [extra: string]: unknown;
+  };
+
+  export type BackgroundDefinitionConfig = Omit<BackgroundDefinition, 'props'> & {
+    props: BackgroundPropConfig[];
+  };
+
+  export type BackgroundConfig = BackgroundDefinitionConfig | null;
+
   export type {
     GameConfig,
     CombatTuning,
@@ -16101,9 +18575,82 @@ __define('./types/config.ts', (exports, module, __require) => {
     WorldMapConfig,
   } from '../config/schema';
 });
+__define('./types/currency.ts', (exports, module, __require) => {
+
+
+  export interface LineupCurrencyEntry extends UnknownRecord {
+    id?: string;
+    currencyId?: string;
+    key?: string;
+    type?: string;
+    balance?: number | string | null;
+    amount?: number | string | null;
+    value?: number | string | null;
+    total?: number | string | null;
+  }
+
+  export type LineupCurrencyValue = number | string | null | undefined | LineupCurrencyEntry;
+
+  export interface LineupCurrencyConfig extends UnknownRecord {
+    [key: string]:
+      | LineupCurrencyValue
+      | ReadonlyArray<LineupCurrencyValue>
+      | Readonly<Record<string, LineupCurrencyValue>>
+      | null
+      | undefined;
+  }
+
+  export type LineupCurrencies = ReadonlyArray<LineupCurrencyValue> | LineupCurrencyConfig;
+
+  const isLineupCurrencyEntry = (value: unknown): value is LineupCurrencyEntry => (
+    value != null
+    && typeof value === 'object'
+    && !Array.isArray(value)
+  );
+
+  const isLineupCurrencyValue = (value: unknown): value is LineupCurrencyValue => (
+    value == null
+    || typeof value === 'number'
+    || typeof value === 'string'
+    || isLineupCurrencyEntry(value)
+  );
+
+  const isLineupCurrencyConfig = (value: unknown): value is LineupCurrencyConfig => (
+    value != null
+    && typeof value === 'object'
+    && !Array.isArray(value)
+  );
+
+  const isLineupCurrencies = (value: unknown): value is LineupCurrencies => {
+    if (Array.isArray(value)){
+      return value.every(isLineupCurrencyValue);
+    }
+    return isLineupCurrencyConfig(value);
+  };
+
+  const normalizeCurrencyBalances = (
+    playerState: UnknownRecord | null | undefined,
+  ): LineupCurrencies | null => {
+    if (!playerState || typeof playerState !== 'object'){
+      return null;
+    }
+    if (!('currencies' in playerState)){
+      return null;
+    }
+    const { currencies } = playerState as { currencies?: unknown };
+    return isLineupCurrencies(currencies) ? (currencies ?? null) : null;
+  };
+  exports.isLineupCurrencyConfig = isLineupCurrencyConfig;
+  exports.isLineupCurrencies = isLineupCurrencies;
+  exports.normalizeCurrencyBalances = normalizeCurrencyBalances;
+});
 __define('./types/index.ts', (exports, module, __require) => {
   export type * from './units';
+  export type * from './art';
+  export type * from './lineup';
   export type {
+    AiCard,
+    AiCardDeck,
     StatusEffect,
     StatusLifecyclePayload,
     StatusDefinition,
@@ -16127,6 +18674,7 @@ __define('./types/index.ts', (exports, module, __require) => {
   export type * from './config';
   export type * from './utils';
   export type * from './vfx';
+  export type * from './ui';
   export type {
     RewardRoll,
     WaveState,
@@ -16136,9 +18684,102 @@ __define('./types/index.ts', (exports, module, __require) => {
     SessionState,
   } from './pve';
 });
+__define('./types/lineup.ts', (exports, module, __require) => {
+
+
+
+  export interface RosterEntryLite extends UnknownRecord {
+    id?: string | number | null;
+    key?: string | number | null;
+    name?: string | null;
+    title?: string | null;
+    class?: string | null;
+    role?: string | null;
+    archetype?: string | null;
+    rank?: string | null;
+    tier?: string | null;
+    tags?: ReadonlyArray<unknown> | null;
+    labels?: ReadonlyArray<unknown> | null;
+    power?: number | string | null;
+    cp?: number | string | null;
+    avatar?: string | null;
+    icon?: string | null;
+    portrait?: string | null;
+    passives?: ReadonlyArray<unknown> | null;
+    kit?: UnknownRecord | null;
+  }
+
+  export interface LineupMemberConfig extends UnknownRecord {
+    unitId?: string | null;
+    id?: string | number | null;
+    key?: string | number | null;
+    name?: string | null;
+    title?: string | null;
+    label?: string | null;
+    unlocked?: boolean | null;
+    cost?: LineupCurrencyValue | ReadonlyArray<LineupCurrencyValue> | null;
+    unlockCost?: LineupCurrencyValue | ReadonlyArray<LineupCurrencyValue> | null;
+    equipment?: UnknownRecord | null;
+  }
+
+  export interface LineupPassiveConfig extends UnknownRecord {
+    id?: string | number | null;
+    key?: string | number | null;
+    name?: string | null;
+    title?: string | null;
+    description?: string | null;
+    effect?: string | null;
+    text?: string | null;
+    requirement?: string | null;
+    condition?: string | null;
+    prerequisite?: string | null;
+    requiredUnitIds?: ReadonlyArray<string | number | null | undefined> | null;
+    requiredUnitId?: string | number | null;
+    requires?: ReadonlyArray<unknown> | null;
+    requiredTags?: ReadonlyArray<unknown> | null;
+    tagsRequired?: ReadonlyArray<unknown> | null;
+    autoActive?: boolean | null;
+    alwaysActive?: boolean | null;
+    isActive?: boolean | null;
+  }
+
+  export interface LineupDefinition extends UnknownRecord {
+    id?: string | number | null;
+    key?: string | number | null;
+    name?: string | null;
+    title?: string | null;
+    role?: string | null;
+    type?: string | null;
+    description?: string | null;
+    summary?: string | null;
+    slots?: ReadonlyArray<LineupMemberConfig | string | null | undefined> | null;
+    members?: ReadonlyArray<LineupMemberConfig | string | null | undefined> | null;
+    bench?: ReadonlyArray<LineupMemberConfig | string | null | undefined> | null;
+    reserve?: ReadonlyArray<LineupMemberConfig | string | null | undefined> | null;
+    passives?: ReadonlyArray<LineupPassiveConfig | null | undefined> | null;
+    passiveSlots?: ReadonlyArray<LineupPassiveConfig | null | undefined> | null;
+    slotCosts?: ReadonlyArray<LineupCurrencyValue | null | undefined> | null;
+    unlockCosts?: ReadonlyArray<LineupCurrencyValue | null | undefined> | null;
+    slotCost?: LineupCurrencyValue | null;
+    unlockCost?: LineupCurrencyValue | null;
+    unlockCurrency?: string | null;
+    currencyId?: string | null;
+    defaultCurrencyId?: string | null;
+    benchSize?: number | string | null;
+    initialUnlockedSlots?: number | string | null;
+    leaderId?: string | null;
+    lineupId?: string | null;
+    leader?: string | null;
+    captainId?: string | null;
+    currency?: string | null;
+  }
+});
 __define('./types/pve.ts', (exports, module, __require) => {
 
 
+
+
+  export type MetaEntry = RosterUnitDefinition;
 
   export interface RewardRoll {
     id: string;
@@ -16174,10 +18815,10 @@ __define('./types/pve.ts', (exports, module, __require) => {
     modeKey?: string;
     sceneTheme?: string;
     backgroundKey?: string;
-    deck?: ReadonlyArray<UnitToken>;
+    deck?: ReadonlyArray<PveDeckEntry>;
     aiPreset?: {
-      deck?: ReadonlyArray<string>;
-      unitsAll?: ReadonlyArray<string>;
+      deck?: ReadonlyArray<PveDeckEntry>;
+      unitsAll?: ReadonlyArray<PveDeckEntry>;
       costCap?: number;
       summonLimit?: number;
       startingDeck?: ReadonlyArray<UnitToken>;
@@ -16295,7 +18936,75 @@ __define('./types/turn-order.ts', (exports, module, __require) => {
 
   export type TurnSnapshot = InterleavedTurnState | SequentialTurnState;
 });
+__define('./types/ui.ts', (exports, module, __require) => {
+
+
+  export interface HudHandles {
+    update(game: Pick<SessionState, 'cost' | 'costCap'> | { cost?: number | null; costCap?: number | null }): void;
+    cleanup(): void;
+  }
+
+  export interface SummonBarCard {
+    id: string;
+    cost?: number | null;
+    [extra: string]: unknown;
+  }
+
+  export interface SummonBarOptions<TCard extends SummonBarCard = SummonBarCard> {
+    onPick?: (card: TCard) => void;
+    canAfford?: (card: TCard) => boolean;
+    getDeck?: () => ReadonlyArray<TCard>;
+    getSelectedId?: () => TCard['id'] | null | undefined;
+  }
+
+  export interface SummonBarHandles {
+    render(): void;
+    cleanup(): void;
+  }
+
+  export interface EquipmentLoadout {
+    weaponId?: string | null;
+    artifactIds?: ReadonlyArray<string> | null;
+    relicIds?: ReadonlyArray<string> | null;
+    accessoryIds?: ReadonlyArray<string> | null;
+    [slot: string]: unknown;
+  }
+
+  export interface LineupSlot {
+    index: number;
+    unitId: string | null;
+    label: string | null;
+    unlocked: boolean;
+    unlockCost: { currencyId: string; amount: number } | null;
+    equipment: EquipmentLoadout | null;
+    meta: Record<string, unknown> | null;
+  }
+
+  export interface LineupState {
+    id: string;
+    name: string;
+    role: string;
+    description: string;
+    slots: LineupSlot[];
+    bench: Array<{ index: number; unitId: string | null; label: string | null; meta: Record<string, unknown> | null }>;
+    passives: Array<{
+      index: number;
+      id: string;
+      name: string;
+      description: string;
+      requirement: string;
+      requiredUnitIds: string[];
+      requiredTags: string[];
+      isEmpty: boolean;
+      autoActive: boolean;
+      source: unknown;
+    }>;
+    leaderId: string | null;
+    defaultCurrencyId: string | null;
+  }
+});
 __define('./types/units.ts', (exports, module, __require) => {
+
 
 
   export type UnitId = string;
@@ -16329,7 +19038,7 @@ __define('./types/units.ts', (exports, module, __require) => {
     hitGain: number;
     skillPerTargetGain: number;
     skillDrain: number;
-    turnStamp: number | null;
+    turnStamp: unknown;
     skillTag: string | null;
     freshSummon: boolean;
     lastStart: number;
@@ -16350,13 +19059,20 @@ __define('./types/units.ts', (exports, module, __require) => {
     ttlTurns?: number;
     statuses?: StatusEffect[];
     color?: string;
-    art?: Record<string, unknown> | null;
+    art?: UnitArt | null;
     skinKey?: string | null;
     furyMax?: number;
     fury?: number;
     rage?: number;
     _furyState?: FuryState;
     [extra: string]: unknown;
+  }
+
+  export interface SummonRequest {
+    by?: UnitId | null;
+    side: Side;
+    slot: number;
+    unit?: (Partial<UnitToken> & { art?: UnitArt | null }) | null;
   }
 
   export interface QueuedSummonRequest {
@@ -16373,9 +19089,15 @@ __define('./types/units.ts', (exports, module, __require) => {
     source?: string;
   }
 
+  export type SummonQueue = Map<number, QueuedSummonRequest>;
+
+  function createSummonQueue(): SummonQueue {
+    return new Map<number, QueuedSummonRequest>();
+  }
+
   export interface QueuedSummonState {
-    ally: Map<number, QueuedSummonRequest>;
-    enemy: Map<number, QueuedSummonRequest>;
+    ally: SummonQueue;
+    enemy: SummonQueue;
   }
 
   export interface ActionChainEntry {
@@ -16385,6 +19107,7 @@ __define('./types/units.ts', (exports, module, __require) => {
   }
 
   export type ActionChainProcessedResult = number | null;
+  exports.createSummonQueue = createSummonQueue;
 });
 __define('./types/utils.ts', (exports, module, __require) => {
   type Primitive = string | number | boolean | bigint | symbol | null | undefined;
@@ -16433,30 +19156,46 @@ __define('./types/vfx.ts', (exports, module, __require) => {
     vfxBindings: Record<string, VfxBinding>;
     ambientEffects: Record<string, VfxBinding>;
   };
+
 });
-__define('./ui.js', (exports, module, __require) => {
-  //v0.7.1
-  const __dep0 = __require('./config.js');
+__define('./ui.ts', (exports, module, __require) => {
+  // v0.7.1
+  const __dep0 = __require('./config.ts');
   const CFG = __dep0.CFG;
   const __dep1 = __require('./events.ts');
-  const gameEvents = __dep1.gameEvents;
-  const TURN_START = __dep1.TURN_START;
-  const TURN_END = __dep1.TURN_END;
   const ACTION_END = __dep1.ACTION_END;
+  const TURN_END = __dep1.TURN_END;
+  const TURN_START = __dep1.TURN_START;
+  const addGameEventListener = __dep1.addGameEventListener;
+  const gameEvents = __dep1.gameEvents;
 
-  function initHUD(doc, root){
-    const queryFromRoot = (id)=>{
-      if (root && typeof root.querySelector === 'function'){
-        const el = root.querySelector(`#${id}`);
+  const __dep2 = __require('./ui/dom.ts');
+  const assertElement = __dep2.assertElement;
+
+
+
+  type HudGameLike = { cost?: number | null; costCap?: number | null } | null | undefined;
+
+  type QueryableRoot = ParentNode & { querySelector?: typeof Document.prototype.querySelector };
+
+  function canQuery(node: unknown): node is QueryableRoot {
+    return !!node && typeof (node as QueryableRoot).querySelector === 'function';
+  }
+
+  function initHUD(doc: Document, root?: QueryableRoot | null): HudHandles {
+    const queryFromRoot = <T extends Element>(id: string): T | null => {
+      if (canQuery(root)){
+        const el = root.querySelector<T>(`#${id}`);
         if (el) return el;
       }
       return null;
     };
 
-    const costNow  = /** @type {HTMLElement|null} */ (queryFromRoot('costNow')  || doc.getElementById('costNow'));   // số cost hiện tại
-    const costRing = /** @type {HTMLElement|null} */ (queryFromRoot('costRing') || doc.getElementById('costRing'));  // vòng tròn tiến trình
-    const costChip = /** @type {HTMLElement|null} */ (queryFromRoot('costChip') || doc.getElementById('costChip'));  // chip bao ngoài
-    function update(Game){
+    const costNow = queryFromRoot<HTMLElement>('costNow') || doc.getElementById('costNow');
+    const costRing = queryFromRoot<HTMLElement>('costRing') || doc.getElementById('costRing');
+    const costChip = queryFromRoot<HTMLElement>('costChip') || doc.getElementById('costChip');
+
+    const update = (Game: HudGameLike): void => {
       if (!Game) return;
 
       const capRaw = Game.costCap ?? CFG.COST_CAP ?? 30;
@@ -16465,221 +19204,446 @@ __define('./ui.js', (exports, module, __require) => {
       const ratio = Math.max(0, Math.min(1, now / cap));
 
       if (costNow) costNow.textContent = String(now);
-      // Vòng tròn tiến trình n/30
       if (costRing){
-       const deg = (ratio * 360).toFixed(1) + 'deg';
-       costRing.style.setProperty('--deg', deg);
-     }
-      // Khi max cap, làm chip sáng hơn
+        const deg = `${(ratio * 360).toFixed(1)}deg`;
+        costRing.style.setProperty('--deg', deg);
+      }
       if (costChip){
         costChip.classList.toggle('full', now >= cap);
       }
-   }
-    const handleGameEvent = (ev)=>{
-      const state = ev?.detail?.game;
+    };
+
+    const handleGameEvent = (event: GameEventDetail<GameEventType>): void => {
+      const detail = event.detail as { game?: HudGameLike } | undefined;
+      const state = detail?.game ?? null;
       if (state) update(state);
     };
+
     let cleanedUp = false;
-    const cleanup = ()=>{
+    const disposers: Array<() => void> = [];
+    const cleanup = (): void => {
       if (cleanedUp) return;
       cleanedUp = true;
-      if (gameEvents && typeof gameEvents.removeEventListener === 'function'){
-        const types = [TURN_START, TURN_END, ACTION_END];
-        for (const type of types){
-          gameEvents.removeEventListener(type, handleGameEvent);
+      while (disposers.length > 0){
+        const dispose = disposers.pop();
+        if (dispose){
+          dispose();
         }
       }
     };
 
-    if (gameEvents && typeof gameEvents.addEventListener === 'function'){
-      const types = [TURN_START, TURN_END, ACTION_END];
+    if (gameEvents){
+      const types = [TURN_START, TURN_END, ACTION_END] as const;
       for (const type of types){
-        gameEvents.addEventListener(type, handleGameEvent);
+        disposers.push(addGameEventListener(type, handleGameEvent));
       }
     }
-   return { update, cleanup };
-  }
-  /* ---------- Summon Bar (deck-size = 4) ---------- */
-  function startSummonBar(doc, options, root){
-    options = options || {};
-    const onPick = options.onPick || (()=>{});
-    const canAfford = options.canAfford || (()=>true);
-    const getDeck = options.getDeck || (()=>[]);
-    const getSelectedId = options.getSelectedId || (()=>null);
 
-    const queryFromRoot = (selector, id)=>{
-      if (root && typeof root.querySelector === 'function'){
-        const el = root.querySelector(selector);
+    return { update, cleanup } satisfies HudHandles;
+  }
+
+  type Debounced<TArgs extends unknown[]> = {
+    (...args: TArgs): void;
+    cancel(): void;
+    flush(...args: TArgs): void;
+  };
+
+  function debounce<TArgs extends unknown[]>(fn: (...args: TArgs) => void, wait: number): Debounced<TArgs> {
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
+    const debounced = (...args: TArgs): void => {
+      if (timer){
+        clearTimeout(timer);
+      }
+      timer = setTimeout(() => {
+        timer = null;
+        fn(...args);
+      }, wait);
+    };
+
+    debounced.cancel = (): void => {
+      if (timer){
+        clearTimeout(timer);
+        timer = null;
+      }
+    };
+
+    debounced.flush = (...args: TArgs): void => {
+      if (timer){
+        clearTimeout(timer);
+        timer = null;
+      }
+      fn(...args);
+    };
+
+    return debounced;
+  }
+
+  function startSummonBar<TCard extends SummonBarCard = SummonBarCard>(
+    doc: Document,
+    options?: SummonBarOptions<TCard>,
+    root?: QueryableRoot | null,
+  ): SummonBarHandles {
+    const {
+      onPick = () => {},
+      canAfford = () => true,
+      getDeck = () => [] as ReadonlyArray<TCard>,
+      getSelectedId = () => null,
+    } = options ?? {};
+
+    const queryFromRoot = <T extends Element>(selector: string, id?: string): T | null => {
+      if (canQuery(root)){
+        const el = root.querySelector<T>(selector);
         if (el) return el;
       }
       if (id && typeof doc.getElementById === 'function'){
-        return doc.getElementById(id);
+        return doc.getElementById(id) as T | null;
       }
       return null;
     };
 
-    const host = /** @type {HTMLElement|null} */ (queryFromRoot('#cards', 'cards'));
-    if (!host){
-      return { render: ()=>{} };
+    const hostElement = queryFromRoot<HTMLElement>('#cards', 'cards');
+    if (!hostElement){
+      return { render: () => {}, cleanup: () => {} } satisfies SummonBarHandles;
     }
+    const host = assertElement<HTMLElement>(hostElement, {
+      guard: (node): node is HTMLElement => node instanceof HTMLElement,
+      message: 'Summon bar cần một phần tử host hợp lệ.',
+    });
 
-    if (host){
+    const btns: HTMLButtonElement[] = [];
+    const cleanupFns: Array<() => void> = [];
+    let cleanedUp = false;
+    const cleanup = (): void => {
+      if (cleanedUp) return;
+      cleanedUp = true;
+      while (cleanupFns.length > 0){
+        const dispose = cleanupFns.pop();
+        try {
+          dispose?.();
+        } catch {}
+      }
+    };
+
+    host.innerHTML = '';
+    cleanupFns.push(() => {
+      btns.length = 0;
       host.innerHTML = '';
-      host.addEventListener('click', (event) => {
-        const target = event.target instanceof Element
-          ? event.target
-          : event.currentTarget instanceof Element
-            ? event.currentTarget
-            : null;
-        const btn = target ? target.closest('button.card') : null;
-        if (!btn || btn.disabled || !host.contains(btn)) return;
+    });
 
-        const deck = getDeck() || [];
-        const targetId = btn.dataset.id;
-        if (!targetId) return;
-        const card = deck.find((c) => `${c.id}` === targetId);
-        if (!card || !canAfford(card)) return;
+    const handleHostClick = (event: Event): void => {
+      const target = event.target instanceof Element
+        ? event.target
+        : event.currentTarget instanceof Element
+          ? event.currentTarget
+          : null;
+      const btn = target ? target.closest<HTMLButtonElement>('button.card') : null;
+      if (!btn || btn.disabled || !host.contains(btn)) return;
 
-        onPick(card);
-        [...host.children].forEach((node) => node.classList.toggle('active', node === btn));
+      const deck = getDeck();
+      const targetId = btn.dataset.id;
+      if (!targetId) return;
+      const card = deck.find((c) => c.id === targetId);
+      if (!card || !canAfford(card)) return;
+
+      onPick(card);
+      Array.from(host.children).forEach((node) => {
+        if (node instanceof HTMLElement){
+          node.classList.toggle('active', node === btn);
+        }
       });
-    }
+    };
+    host.addEventListener('click', handleHostClick);
+    cleanupFns.push(() => host.removeEventListener('click', handleHostClick));
 
-  // C2: đồng bộ cỡ ô cost theo bề rộng sân (7 cột), lấy số từ CFG.UI
-    const _GAP = (CFG.UI?.CARD_GAP) ?? 12;     // khớp CSS khoảng cách
-    const _MIN = (CFG.UI?.CARD_MIN) ?? 40;     // cỡ tối thiểu
-    const boardEl = /** @type {HTMLElement|null} */ (queryFromRoot('#board', 'board')); // cache DOM
+    const gap = CFG.UI?.CARD_GAP ?? 12;
+    const minSize = CFG.UI?.CARD_MIN ?? 40;
+    const boardEl = queryFromRoot<HTMLElement>('#board', 'board');
 
-    function debounce(fn, wait){
-      let timer = null;
-      function debounced(...args){
-        if (timer){
-          clearTimeout(timer);
-        }
-        timer = setTimeout(()=>{
-          timer = null;
-          fn.apply(this, args);
-        }, wait);
-      }
-      debounced.cancel = ()=>{
-        if (timer){
-          clearTimeout(timer);
-          timer = null;
-        }
-      };
-
-      debounced.flush = (...args)=>{
-        if (timer){
-          clearTimeout(timer);
-          timer = null;
-        }
-        fn.apply(this, args);
-      };
-      return debounced;
-    }
-    const syncCardSize = debounce(()=>{
+    const syncCardSize = debounce(() => {
       if (!boardEl) return;
-      const w = boardEl.clientWidth || boardEl.getBoundingClientRect().width || 0;
-
-      // 7 cột -> 6 khoảng cách
-      const cell = Math.max(_MIN, Math.floor((w - _GAP * 6) / 7));
-      if (host){
-        host.style.setProperty('--cell', `${cell}px`);
-      }
+      const rect = boardEl.getBoundingClientRect();
+      const width = boardEl.clientWidth || rect.width || 0;
+      const cell = Math.max(minSize, Math.floor((width - gap * 6) / 7));
+      host.style.setProperty('--cell', `${cell}px`);
     }, 120);
     syncCardSize.flush();
 
-    let cleanupResize = ()=>{};
+    let cleanupResize: () => void = () => {};
     if (boardEl && typeof ResizeObserver === 'function'){
-      const observer = new ResizeObserver(()=> syncCardSize());
+      const observer = new ResizeObserver(() => syncCardSize());
       observer.observe(boardEl);
-      cleanupResize = ()=>{
+      cleanupResize = (): void => {
         observer.disconnect();
         syncCardSize.cancel();
       };
     } else {
-      const handleResize = ()=> syncCardSize();
-      window.addEventListener('resize', handleResize);
-      cleanupResize = ()=>{
-        window.removeEventListener('resize', handleResize);
-        syncCardSize.cancel();
-      };
+      const handleResize = (): void => syncCardSize();
+      if (typeof window !== 'undefined'){
+        window.addEventListener('resize', handleResize);
+        cleanupResize = (): void => {
+          if (typeof window !== 'undefined'){
+            window.removeEventListener('resize', handleResize);
+          }
+          syncCardSize.cancel();
+        };
+      } else {
+        cleanupResize = (): void => {
+          syncCardSize.cancel();
+        };
+      }
     }
+    cleanupFns.push(() => cleanupResize());
 
-  let removalObserver = null;
+    let removalObserver: MutationObserver | null = null;
     if (host && typeof MutationObserver === 'function'){
-      const target = doc.body || doc.documentElement;
-      if (target){
-        removalObserver = new MutationObserver(()=>{
+      const targetRoot = doc.body || doc.documentElement;
+      const observerTarget = targetRoot
+        ? assertElement<Element>(targetRoot, 'Cần một phần tử gốc để quan sát trạng thái kết nối.')
+        : null;
+      if (observerTarget){
+        removalObserver = new MutationObserver(() => {
           if (!host.isConnected){
-            cleanupResize();
-            removalObserver.disconnect();
-            removalObserver = null;
+            cleanup();
           }
         });
-        removalObserver.observe(target, { childList: true, subtree: true });
+        removalObserver.observe(observerTarget, { childList: true, subtree: true });
       }
-  }
+    }
+    if (removalObserver){
+      cleanupFns.push(() => {
+        removalObserver?.disconnect();
+        removalObserver = null;
+      });
+    }
 
-    // mỗi thẻ cost là 1 ô vuông, chỉ hiện cost
-    function makeBtn(c){
+    const resolveCardCost = (card: TCard | null | undefined): number => {
+      if (!card) return 0;
+      const raw = card.cost;
+      if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
+      if (typeof raw === 'string') {
+        const parsed = Number(raw);
+        return Number.isFinite(parsed) ? parsed : 0;
+      }
+      return 0;
+    };
+
+    const makeBtn = (card: TCard): HTMLButtonElement => {
       const btn = doc.createElement('button');
       btn.className = 'card';
-      btn.dataset.id = c.id;
-      // chỉ hiện cost, không hiện tên
-      btn.innerHTML = `<span class="cost">${c.cost}</span>`;
+      btn.dataset.id = card.id;
+      btn.innerHTML = `<span class="cost">${resolveCardCost(card)}</span>`;
+      const affordable = canAfford(card);
+      btn.disabled = !affordable;
+      btn.classList.toggle('disabled', !affordable);
+      return btn;
+    };
 
-  // trạng thái đủ/thiếu cost
-      const ok = canAfford(c);
-      btn.disabled = !ok;
-      btn.classList.toggle('disabled', !ok);  // chỉ để CSS quyết định độ sáng
-   return btn;
-    }
-  let btns = []; // sẽ chứa đúng 3 button được tạo bằng makeBtn
-
-    function render(){
-      const deck = getDeck();              // luôn gồm tối đa 3 thẻ hiện hành
-      // đảm bảo đủ số nút (tạo mới bằng makeBtn – chỉ hiện cost)
+    const render = (): void => {
+      const deck = getDeck();
       while (btns.length < deck.length){
         const btn = makeBtn(deck[btns.length]);
         host.appendChild(btn);
         btns.push(btn);
       }
-      // cập nhật trạng thái từng nút theo deck hiện tại
-      for (let i = 0; i < btns.length; i++){
-        const b = btns[i];
-        const c = deck[i];
-        if (!c){
-          b.hidden = true;
+      for (let i = 0; i < btns.length; i += 1){
+        const button = btns[i];
+        const card = deck[i];
+        if (!card){
+          button.hidden = true;
           continue;
         }
-        b.hidden = false;
-        b.dataset.id = c.id;
-
-        // cập nhật cost (giữ UI “chỉ cost”)
-        const span = b.querySelector('.cost');
-        if (span) span.textContent = String(c.cost);
-
-        const afford = canAfford(c);
-        b.disabled = !afford;
-        b.classList.toggle('disabled', !afford); // để CSS điều khiển độ sáng
-        b.style.opacity = ''; // xóa mọi inline opacity cũ nếu còn
-        b.classList.toggle('active', getSelectedId() === c.id);
+        button.hidden = false;
+        button.dataset.id = card.id;
+        const span = button.querySelector<HTMLSpanElement>('.cost');
+        if (span) span.textContent = String(resolveCardCost(card));
+        const affordable = canAfford(card);
+        button.disabled = !affordable;
+        button.classList.toggle('disabled', !affordable);
+        button.style.opacity = '';
+        button.classList.toggle('active', getSelectedId() === card.id);
       }
-    }
-    if (gameEvents && typeof gameEvents.addEventListener === 'function'){
-      const rerender = ()=> render();
-      const types = [TURN_START, TURN_END, ACTION_END];
+    };
+
+    if (gameEvents){
+      const rerender = (): void => render();
+      const types = [TURN_START, TURN_END, ACTION_END] as const;
       for (const type of types){
-        gameEvents.addEventListener(type, rerender);
+        const dispose = addGameEventListener(type, () => rerender());
+        if (typeof dispose === 'function'){
+          cleanupFns.push(() => dispose());
+        }
       }
     }
 
-    return { render };
+    return { render, cleanup } satisfies SummonBarHandles;
   }
-
   exports.initHUD = initHUD;
   exports.startSummonBar = startSummonBar;
+});
+__define('./ui/dom.ts', (exports, module, __require) => {
+  const DEFAULT_ASSERT_MESSAGE = 'Cần một phần tử DOM hợp lệ.';
+
+  export type ElementGuard<TElement extends Element> = (node: Element) => node is TElement;
+
+  export interface AssertElementOptions<TElement extends Element> {
+    guard?: ElementGuard<TElement>;
+    message?: string;
+  }
+
+  function assertElement<TElement extends Element>(
+    value: unknown,
+    options?: AssertElementOptions<TElement> | string,
+  ): TElement {
+    const message = typeof options === 'string'
+      ? options
+      : options?.message ?? DEFAULT_ASSERT_MESSAGE;
+    const guard = typeof options === 'object' && options ? options.guard : undefined;
+    const ElementConstructor = typeof Element === 'undefined' ? undefined : Element;
+    if (!ElementConstructor || !(value instanceof ElementConstructor)){
+      throw new Error(message);
+    }
+    if (guard && !guard(value)){
+      throw new Error(message);
+    }
+    return value as TElement;
+  }
+
+  export interface EnsureStyleTagOptions<TStyle extends HTMLStyleElement = HTMLStyleElement> {
+    doc?: Document | null;
+    css?: string | null;
+    target?: ParentNode | null;
+  }
+
+  function ensureStyleTag<TStyle extends HTMLStyleElement = HTMLStyleElement>(
+    id: string,
+    options: EnsureStyleTagOptions<TStyle> = {},
+  ): TStyle | null {
+    const doc = options.doc ?? (typeof document !== 'undefined' ? document : null);
+    if (!doc){
+      return null;
+    }
+    const appendTarget = options.target ?? doc.head ?? doc.documentElement ?? doc.body ?? null;
+    let style = doc.getElementById(id);
+    if (!(style instanceof HTMLStyleElement)){
+      style = doc.createElement('style');
+      style.id = id;
+      if (appendTarget){
+        appendTarget.appendChild(style);
+      } else {
+        doc.appendChild(style);
+      }
+    }
+    const css = options.css;
+    if (typeof css === 'string' && style.textContent !== css){
+      style.textContent = css;
+    }
+    return style as TStyle;
+  }
+
+  type ClassListInput = string | ReadonlyArray<string> | null | undefined;
+
+  function normalizeClasses(input: ClassListInput): string[] {
+    if (!input){
+      return [];
+    }
+    return (Array.isArray(input) ? input : [input]).filter((item): item is string => Boolean(item?.trim?.() ?? item));
+  }
+
+  export interface MountSectionOptions<
+    TRoot extends Element = HTMLElement,
+    TSection extends Element = HTMLElement,
+  > {
+    root: TRoot | null | undefined;
+    section: TSection;
+    replaceChildren?: boolean;
+    rootClasses?: ClassListInput;
+    removeRootClasses?: ClassListInput;
+    onDestroy?: (() => void) | null;
+    assertMessage?: string;
+  }
+
+  export interface MountedSection<
+    TRoot extends Element = HTMLElement,
+    TSection extends Element = HTMLElement,
+  > {
+    root: TRoot;
+    section: TSection;
+    destroy(): void;
+  }
+
+  function mountSection<
+    TRoot extends Element = HTMLElement,
+    TSection extends Element = HTMLElement,
+  >(options: MountSectionOptions<TRoot, TSection>): MountedSection<TRoot, TSection> {
+    const {
+      root,
+      section,
+      replaceChildren = true,
+      rootClasses,
+      removeRootClasses,
+      onDestroy = null,
+      assertMessage,
+    } = options;
+
+    const host = assertElement<TRoot>(root, assertMessage ?? 'Cần một phần tử root hợp lệ.');
+    const classesToAdd = normalizeClasses(rootClasses);
+    const classesToRemove = normalizeClasses(removeRootClasses);
+    const removedRootClasses: string[] = [];
+
+    if (replaceChildren){
+      if ('replaceChildren' in host && typeof host.replaceChildren === 'function'){
+        host.replaceChildren();
+      } else {
+        while (host.firstChild){
+          host.removeChild(host.firstChild);
+        }
+      }
+    }
+
+    if (classesToRemove.length > 0 && host.classList){
+      const seen = new Set<string>();
+      classesToRemove.forEach(cls => {
+        if (seen.has(cls)){
+          return;
+        }
+        seen.add(cls);
+        if (host.classList.contains(cls)){
+          removedRootClasses.push(cls);
+        }
+        host.classList.remove(cls);
+      });
+    }
+
+    if (classesToAdd.length > 0 && host.classList){
+      classesToAdd.forEach(cls => host.classList.add(cls));
+    }
+
+    host.appendChild(section);
+
+    return {
+      root: host,
+      section,
+      destroy(){
+        if (section.parentNode === host){
+          host.removeChild(section);
+        }
+        if (classesToAdd.length > 0 && host.classList){
+          classesToAdd.forEach(cls => host.classList.remove(cls));
+        }
+        if (removedRootClasses.length > 0 && host.classList){
+          removedRootClasses.forEach(cls => host.classList.add(cls));
+        }
+        if (typeof onDestroy === 'function'){
+          onDestroy();
+        }
+      }
+    } satisfies MountedSection<TRoot, TSection>;
+      }
+
+  exports.assertElement = assertElement;
+  exports.ensureStyleTag = ensureStyleTag;
+  exports.mountSection = mountSection;
 });
 __define('./units.ts', (exports, module, __require) => {
 
@@ -16719,51 +19683,44 @@ __define('./units.ts', (exports, module, __require) => {
   exports.UNIT_INDEX = UNIT_INDEX;
   exports.lookupUnit = lookupUnit;
 });
-__define('./utils/dummy.js', (exports, module, __require) => {
-  // @ts-check
-
-  /**
-   * @returns {true}
-   */
-  function ensureNestedModuleSupport(){
+__define('./utils/dummy.ts', (exports, module, __require) => {
+  function ensureNestedModuleSupport(): true {
     return true;
   }
-
   exports.ensureNestedModuleSupport = ensureNestedModuleSupport;
 });
-__define('./utils/format.js', (exports, module, __require) => {
-  // @ts-check
-
-  /**
-   * @typedef {number | string | { toLocaleString?: (locale?: string | string[], options?: Intl.NumberFormatOptions) => string }} NumberFormatInput
-   */
-
-  /**
-   * @typedef {{ format(value: NumberFormatInput | null | undefined): string }} PolyfillNumberFormatter
-   */
-
+__define('./utils/format.ts', (exports, module, __require) => {
   const HAS_INTL_NUMBER_FORMAT = typeof Intl === 'object' && typeof Intl.NumberFormat === 'function';
 
-  /**
-   * @param {string | string[] | undefined} locale
-   * @param {Intl.NumberFormatOptions | undefined} options
-   * @returns {Intl.NumberFormat | PolyfillNumberFormatter}
-   */
-  function createNumberFormatter(locale, options){
-    if (HAS_INTL_NUMBER_FORMAT){
+  type LocaleValue = string | ReadonlyArray<string>;
+
+  type NumberFormatInput =
+    | number
+    | string
+    | {
+        toLocaleString?: (locale?: LocaleValue, options?: Intl.NumberFormatOptions) => string;
+      };
+
+  interface PolyfillNumberFormatter {
+    format(value: NumberFormatInput | null | undefined): string;
+  }
+
+  type NumberFormatter = Intl.NumberFormat | PolyfillNumberFormatter;
+
+  function createNumberFormatter(
+    locale?: LocaleValue,
+    options?: Intl.NumberFormatOptions
+  ): NumberFormatter {
+    if (HAS_INTL_NUMBER_FORMAT) {
       return new Intl.NumberFormat(locale, options);
     }
 
     const hasLocaleString = typeof Number.prototype.toLocaleString === 'function';
 
     return {
-      /**
-       * @param {NumberFormatInput | null | undefined} value
-       * @returns {string}
-       */
-      format(value){
-        if (typeof value === 'number'){
-          if (hasLocaleString){
+      format(value) {
+        if (typeof value === 'number') {
+          if (hasLocaleString) {
             try {
               return value.toLocaleString();
             } catch (error) {
@@ -16773,11 +19730,11 @@ __define('./utils/format.js', (exports, module, __require) => {
           return String(value);
         }
 
-        if (value == null){
+        if (value == null) {
           return '';
         }
 
-        if (hasLocaleString && typeof value?.toLocaleString === 'function'){
+        if (hasLocaleString && typeof value?.toLocaleString === 'function') {
           try {
             return value.toLocaleString();
           } catch (error) {
@@ -16787,113 +19744,102 @@ __define('./utils/format.js', (exports, module, __require) => {
 
         return String(value);
       }
-    };
+    } satisfies PolyfillNumberFormatter;
   }
 
   exports.HAS_INTL_NUMBER_FORMAT = HAS_INTL_NUMBER_FORMAT;
   exports.createNumberFormatter = createNumberFormatter;
 });
-__define('./utils/fury.js', (exports, module, __require) => {
-  // @ts-check
-
-  const __dep0 = __require('./config.js');
+__define('./utils/fury.ts', (exports, module, __require) => {
+  const __dep0 = __require('./config.ts');
   const CFG = __dep0.CFG;
-  const __dep1 = __require('./utils/time.js');
+  const __dep1 = __require('./utils/time.ts');
   const safeNow = __dep1.safeNow;
 
-  /**
-   * @typedef {import('types/game-entities').UnitToken} UnitToken
-   * @typedef {import('types/game-entities').FuryState} FuryState
-   * @typedef {import('types/game-entities').UnitId} UnitId
-   */
+
 
   const DEFAULT_TURN_CAP = 40;
   const DEFAULT_SKILL_CAP = 30;
   const DEFAULT_HIT_CAP = 20;
   const TURN_GRANT_KEY = Symbol('turn');
 
-  /**
-   * @typedef {object} FuryGainSpec
-   * @property {number} [amount]
-   * @property {string} [type]
-   * @property {number} [base]
-   * @property {number} [bonus]
-   * @property {number} [multiplier]
-   * @property {number} [damageTaken]
-   * @property {number} [dealt]
-   * @property {number} [selfMaxHp]
-   * @property {number} [targetMaxHp]
-   * @property {boolean} [isAoE]
-   * @property {boolean} [isCrit]
-   * @property {boolean} [isKill]
-   * @property {number} [targetsHit]
-   */
+  type FuryGainSpec = {
+    amount?: number;
+    type?: string;
+    base?: number;
+    bonus?: number;
+    multiplier?: number;
+    damageTaken?: number;
+    dealt?: number;
+    selfMaxHp?: number;
+    targetMaxHp?: number;
+    isAoE?: boolean;
+    isCrit?: boolean;
+    isKill?: boolean;
+    targetsHit?: number;
+  };
 
-  /**
-   * @typedef {{ amount: number; perTarget: number }} FuryGainResult
-   */
+  type FuryGainResult = {
+    amount: number;
+    perTarget: number;
+  };
 
-  /**
-   * @typedef {object} FuryTurnOptions
-   * @property {boolean} [clearFresh]
-   * @property {unknown} [turnStamp]
-   * @property {unknown} [turnKey]
-   * @property {boolean} [grantStart]
-   * @property {number} [startAmount]
-   */
+  type FuryTurnOptions = {
+    clearFresh?: boolean;
+    turnStamp?: unknown;
+    turnKey?: unknown;
+    grantStart?: boolean;
+    startAmount?: number;
+  };
 
-  /**
-   * @typedef {object} FuryDrainOptions
-   * @property {number} [base]
-   * @property {number} [percent]
-   * @property {number} [skillTotalCap]
-   */
+  type FuryDrainOptions = {
+    base?: number;
+    percent?: number;
+    skillTotalCap?: number;
+  };
 
-  /**
-   * @param {unknown} value
-   * @returns {number}
-   */
-  function toNumber(value){
+  type FuryConfigLike = Partial<(typeof CFG)['fury']> & Record<string, unknown>;
+  type UnitTokenInternal = UnitToken & Record<string, unknown>;
+
+  const isFiniteNumber = (value: unknown): value is number =>
+    typeof value === 'number' && Number.isFinite(value);
+
+  function toNumber(value: unknown): number {
     const num = Number(value);
     return Number.isFinite(num) ? num : 0;
   }
 
-  /**
-   * @param {UnitToken | null | undefined} unit
-   * @returns {void}
-   */
-  function ensureAlias(unit){
+  function ensureAlias(unit: UnitToken | null | undefined): void {
     if (!unit) return;
-    if (typeof unit.fury !== 'number' && typeof unit.rage === 'number'){
-      unit.fury = unit.rage;
+    const internal = unit as UnitTokenInternal;
+    const rageValue = toNumber(internal.rage);
+    if (!isFiniteNumber(internal.fury) && Number.isFinite(rageValue)){
+      internal.fury = rageValue;
     }
-    if (typeof unit.fury !== 'number') unit.fury = 0;
+    if (!isFiniteNumber(internal.fury)) internal.fury = 0;
     try {
-      const desc = Object.getOwnPropertyDescriptor(unit, 'rage');
+      const desc = Object.getOwnPropertyDescriptor(internal, 'rage');
       if (!desc || (!desc.get && !desc.set)){
-        Object.defineProperty(unit, 'rage', {
+        Object.defineProperty(internal, 'rage', {
           configurable: true,
           enumerable: true,
-          get(){ return this.fury ?? 0; },
-          set(v){ this.fury = toNumber(v); }
+          get(){ return toNumber((internal as UnitTokenInternal).fury); },
+          set(v){ internal.fury = toNumber(v); }
         });
       } else {
-        unit.rage = unit.fury;
+        internal.rage = toNumber(internal.fury);
       }
     } catch (_) {
-      unit.rage = unit.fury;
+      internal.rage = toNumber(internal.fury);
     }
   }
 
-  /**
-   * @param {UnitToken | null | undefined} unit
-   * @returns {FuryState | null}
-   */
-  function ensureState(unit){
+  function ensureState(unit: UnitToken | null | undefined): FuryState | null {
     if (!unit) return null;
     ensureAlias(unit);
-    if (!unit._furyState){
-      unit._furyState = {
+    const internal = unit as UnitTokenInternal;
+    if (!internal._furyState){
+      internal._furyState = {
         turnGain: 0,
         skillGain: 0,
         hitGain: 0,
@@ -16903,60 +19849,51 @@ __define('./utils/fury.js', (exports, module, __require) => {
         skillTag: null,
         freshSummon: false,
         lastStart: safeNow()
-      };
+      } satisfies FuryState;
     }
-    return unit._furyState;
+    return internal._furyState ?? null;
   }
 
-  /**
-   * @param {UnitId | null | undefined} unitId
-   * @param {typeof CFG} [cfg]
-   * @returns {number}
-   */
-  function resolveMaxFury(unitId, cfg = CFG){
-    const furyCfg = cfg?.fury || {};
-    const special = furyCfg.specialMax || {};
+  function resolveMaxFury(unitId: UnitId | null | undefined, cfg: typeof CFG = CFG): number {
+    const furyCfg = ((cfg?.fury ?? {}) as FuryConfigLike);
+    const special = (furyCfg.specialMax as Record<string, unknown> | undefined) ?? {};
     const entry = unitId ? special[unitId] : null;
-    if (entry != null){
-      if (typeof entry === 'number') return entry;
-      if (typeof entry === 'object'){
-        if (Number.isFinite(entry.max)) return entry.max;
-        if (Number.isFinite(entry.value)) return entry.value;
-      }
+    if (isFiniteNumber(entry)) return entry;
+    if (entry && typeof entry === 'object'){
+      const entryObj = entry as Record<string, unknown>;
+      if (isFiniteNumber(entryObj.max)) return Math.floor(entryObj.max);
+      if (isFiniteNumber(entryObj.value)) return Math.floor(entryObj.value);
     }
-    if (Number.isFinite(furyCfg.max)) return furyCfg.max;
-    if (Number.isFinite(furyCfg.baseMax)) return furyCfg.baseMax;
+    if (isFiniteNumber(furyCfg.max)) return Math.floor(furyCfg.max);
+    const baseMaxValue = (furyCfg as Record<string, unknown>).baseMax;
+    if (isFiniteNumber(baseMaxValue)){
+      return Math.floor(Number(baseMaxValue));
+    }
     return 100;
   }
 
-  /**
-   * @param {UnitToken | null | undefined} unit
-   * @param {typeof CFG} [cfg]
-   * @returns {number}
-   */
-  function resolveUltCost(unit, cfg = CFG){
+  function resolveUltCost(unit: UnitToken | null | undefined, cfg: typeof CFG = CFG): number {
     if (!unit) return resolveMaxFury(null, cfg);
-    const furyCfg = cfg?.fury || {};
-    const special = furyCfg.specialMax || {};
+    const furyCfg = ((cfg?.fury ?? {}) as FuryConfigLike);
+    const special = (furyCfg.specialMax as Record<string, unknown> | undefined) ?? {};
     const entry = special[unit.id];
-    if (entry && typeof entry === 'object' && Number.isFinite(entry.ultCost)){
-      return entry.ultCost;
+    if (entry && typeof entry === 'object'){
+      const entryObj = entry as Record<string, unknown>;
+      if (isFiniteNumber(entryObj.ultCost)) return Math.floor(entryObj.ultCost);
     }
-    if (Number.isFinite(furyCfg.ultCost)) return furyCfg.ultCost;
-    return unit.furyMax ?? resolveMaxFury(unit.id, cfg);
+    if (isFiniteNumber(furyCfg.ultCost)) return Math.floor(furyCfg.ultCost);
+    return isFiniteNumber(unit.furyMax) ? Math.floor(unit.furyMax) : resolveMaxFury(unit.id, cfg);
   }
 
-  /**
-   * @param {UnitToken | null | undefined} unit
-   * @param {UnitId | null | undefined} unitId
-   * @param {number} [initial]
-   * @param {typeof CFG} [cfg]
-   * @returns {void}
-   */
-  function initializeFury(unit, unitId, initial = 0, cfg = CFG){
+  function initializeFury(
+    unit: UnitToken | null | undefined,
+    unitId: UnitId | null | undefined,
+    initial = 0,
+    cfg: typeof CFG = CFG
+  ): void {
     if (!unit) return;
     const max = resolveMaxFury(unitId, cfg);
-    unit.furyMax = Number.isFinite(max) && max > 0 ? Math.max(1, Math.floor(max)) : 100;
+    unit.furyMax = isFiniteNumber(max) && max > 0 ? Math.max(1, Math.floor(max)) : 100;
     ensureAlias(unit);
     setFury(unit, initial);
     const state = ensureState(unit);
@@ -16973,12 +19910,7 @@ __define('./utils/fury.js', (exports, module, __require) => {
     }
   }
 
-  /**
-   * @param {UnitToken | null | undefined} unit
-   * @param {boolean} [flag]
-   * @returns {void}
-   */
-  function markFreshSummon(unit, flag = true){
+  function markFreshSummon(unit: UnitToken | null | undefined, flag = true): void {
     const state = ensureState(unit);
     if (state){
       state.freshSummon = !!flag;
@@ -16986,113 +19918,117 @@ __define('./utils/fury.js', (exports, module, __require) => {
     }
   }
 
-  /**
-   * @param {UnitToken | null | undefined} unit
-   * @returns {void}
-   */
-  function clearFreshSummon(unit){
+  function clearFreshSummon(unit: UnitToken | null | undefined): void {
     const state = ensureState(unit);
     if (state){
       state.freshSummon = false;
     }
   }
 
-  /**
-   * @param {UnitToken | null | undefined} unit
-   * @param {unknown} value
-   * @returns {number}
-   */
-  function setFury(unit, value){
+  function setFury(unit: UnitToken | null | undefined, value: unknown): number {
     if (!unit) return 0;
     ensureAlias(unit);
-    const max = Number.isFinite(unit.furyMax) ? unit.furyMax : resolveMaxFury(unit.id, CFG);
+    const max = isFiniteNumber(unit.furyMax) ? unit.furyMax : resolveMaxFury(unit.id, CFG);
     const amount = Math.max(0, Math.min(max, Math.floor(toNumber(value))));
     unit.fury = amount;
     unit.rage = amount;
     return amount;
   }
 
-  /**
-   * @param {typeof CFG} cfg
-   * @returns {number}
-   */
-  function resolveTurnCap(cfg){
-    const furyCfg = cfg?.fury || {};
-    if (Number.isFinite(furyCfg.turnCap)) return furyCfg.turnCap;
-    if (Number.isFinite(furyCfg?.caps?.perTurn)) return furyCfg.caps.perTurn;
-    if (Number.isFinite(furyCfg?.turn?.cap)) return furyCfg.turn.cap;
+  function resolveTurnCap(cfg: typeof CFG): number {
+    const furyCfg = ((cfg?.fury ?? {}) as FuryConfigLike);
+    if (isFiniteNumber(furyCfg.turnCap)) return Math.floor(furyCfg.turnCap);
+    const caps = furyCfg.caps as Record<string, unknown> | undefined;
+    if (caps && isFiniteNumber(caps.perTurn)) return Math.floor(caps.perTurn);
+    const turn = furyCfg.turn as Record<string, unknown> | undefined;
+    if (turn && isFiniteNumber(turn.cap)) return Math.floor(turn.cap);
     return DEFAULT_TURN_CAP;
   }
 
-  /**
-   * @param {typeof CFG} cfg
-   * @returns {number}
-   */
-  function resolveSkillCap(cfg){
-    const furyCfg = cfg?.fury || {};
-    if (Number.isFinite(furyCfg.skillCap)) return furyCfg.skillCap;
-    if (Number.isFinite(furyCfg?.caps?.perSkill)) return furyCfg.caps.perSkill;
-    if (Number.isFinite(furyCfg?.skill?.cap)) return furyCfg.skill.cap;
+  function resolveSkillCap(cfg: typeof CFG): number {
+    const furyCfg = ((cfg?.fury ?? {}) as FuryConfigLike);
+    if (isFiniteNumber(furyCfg.skillCap)) return Math.floor(furyCfg.skillCap);
+    const caps = furyCfg.caps as Record<string, unknown> | undefined;
+    if (caps && isFiniteNumber(caps.perSkill)) return Math.floor(caps.perSkill);
+    const skill = furyCfg.skill as Record<string, unknown> | undefined;
+    if (skill && isFiniteNumber(skill.cap)) return Math.floor(skill.cap);
     return DEFAULT_SKILL_CAP;
   }
 
-  /**
-   * @param {typeof CFG} cfg
-   * @returns {number}
-   */
-  function resolveHitCap(cfg){
-    const furyCfg = cfg?.fury || {};
-    if (Number.isFinite(furyCfg.hitCap)) return furyCfg.hitCap;
-    if (Number.isFinite(furyCfg?.caps?.perHit)) return furyCfg.caps.perHit;
-    if (Number.isFinite(furyCfg?.hit?.cap)) return furyCfg.hit.cap;
+  function resolveHitCap(cfg: typeof CFG): number {
+    const furyCfg = ((cfg?.fury ?? {}) as FuryConfigLike);
+    if (isFiniteNumber(furyCfg.hitCap)) return Math.floor(furyCfg.hitCap);
+    const caps = furyCfg.caps as Record<string, unknown> | undefined;
+    if (caps && isFiniteNumber(caps.perHit)) return Math.floor(caps.perHit);
+    const hit = furyCfg.hit as Record<string, unknown> | undefined;
+    if (hit && isFiniteNumber(hit.cap)) return Math.floor(hit.cap);
     return DEFAULT_HIT_CAP;
   }
 
-  /**
-   * @param {FuryGainSpec} [spec]
-   * @param {typeof CFG} [cfg]
-   * @param {FuryState | null} [state]
-   * @returns {FuryGainResult}
-   */
-  function resolveGainAmount(spec = {}, cfg = CFG, state = null){
-    if (Number.isFinite(spec.amount)){
+  function resolveGainAmount(
+    spec: FuryGainSpec = {},
+    cfg: typeof CFG = CFG,
+    state: FuryState | null = null
+  ): FuryGainResult {
+    if (isFiniteNumber(spec.amount)){
       return { amount: Math.floor(spec.amount), perTarget: 0 };
     }
-    const furyCfg = cfg?.fury || {};
-    const table = furyCfg.gain || {};
-    const type = spec.type || 'generic';
+    const furyCfg = ((cfg?.fury ?? {}) as FuryConfigLike);
+    const table = (furyCfg.gain as Record<string, unknown> | undefined) ?? {};
+    const type = spec.type ?? 'generic';
 
     if (type === 'turnStart'){
-      const amount = Number.isFinite(table?.turnStart?.amount)
-        ? table.turnStart.amount
-        : (Number.isFinite(furyCfg?.turn?.startGain) ? furyCfg.turn.startGain : (furyCfg.startGain ?? 0));
-      return { amount: Math.floor(Math.max(0, amount)), perTarget: 0 };
+      const turnStart = table.turnStart as { amount?: unknown } | undefined;
+      const amount = isFiniteNumber(turnStart?.amount)
+        ? turnStart!.amount
+        : ((): number => {
+            const turn = furyCfg.turn as Record<string, unknown> | undefined;
+            if (turn && isFiniteNumber(turn.startGain)) return turn.startGain;
+            const fallback = (furyCfg as Record<string, unknown>).startGain;
+            if (isFiniteNumber(fallback)) return Number(fallback);
+            return 0;
+          })();
+      return { amount: Math.floor(Math.max(0, amount ?? 0)), perTarget: 0 };
     }
 
     if (type === 'damageTaken'){
-      const mode = table.damageTaken || {};
-      let total = Number.isFinite(spec.base) ? spec.base : (Number.isFinite(mode.base) ? mode.base : 0);
-      const ratio = Number.isFinite(mode.selfRatio) ? mode.selfRatio : 0;
-      const taken = Number.isFinite(spec.damageTaken) ? spec.damageTaken : spec.dealt;
-      if (ratio && Number.isFinite(taken) && Number.isFinite(spec.selfMaxHp) && (spec.selfMaxHp ?? 0) > 0){
+      const mode = (table.damageTaken as Record<string, unknown> | undefined) ?? {};
+      let total = isFiniteNumber(spec.base)
+        ? spec.base
+        : isFiniteNumber(mode.base)
+          ? Number(mode.base)
+          : 0;
+      const ratio = isFiniteNumber(mode.selfRatio) ? Number(mode.selfRatio) : 0;
+      const taken = isFiniteNumber(spec.damageTaken)
+        ? spec.damageTaken
+        : isFiniteNumber(spec.dealt)
+          ? spec.dealt
+          : undefined;
+      if (ratio && isFiniteNumber(taken) && isFiniteNumber(spec.selfMaxHp) && spec.selfMaxHp > 0){
         total += Math.round((ratio * Math.max(0, taken ?? 0)) / spec.selfMaxHp);
       }
-      if (Number.isFinite(mode.min)) total = Math.max(mode.min, total);
-      if (Number.isFinite(mode.max)) total = Math.min(mode.max, total);
-      if (Number.isFinite(spec.bonus)) total += spec.bonus;
-      if (Number.isFinite(spec.multiplier)) total *= spec.multiplier;
+      if (isFiniteNumber(mode.min)) total = Math.max(Number(mode.min), total);
+      if (isFiniteNumber(mode.max)) total = Math.min(Number(mode.max), total);
+      if (isFiniteNumber(spec.bonus)) total += spec.bonus;
+      if (isFiniteNumber(spec.multiplier)) total *= spec.multiplier;
       return { amount: Math.floor(Math.max(0, total)), perTarget: 0 };
     }
 
-    const isAoE = !!spec.isAoE || (Number.isFinite(spec.targetsHit) && (spec.targetsHit ?? 0) > 1);
-    const mode = isAoE ? (table.dealAoePerTarget || {}) : (table.dealSingle || {});
-    let total = Number.isFinite(spec.base) ? spec.base : (Number.isFinite(mode.base) ? mode.base : 0);
-    if (spec.isCrit && Number.isFinite(mode.crit)) total += mode.crit;
-    if (spec.isKill && Number.isFinite(mode.kill)) total += mode.kill;
+    const isAoE = !!spec.isAoE || (isFiniteNumber(spec.targetsHit) && (spec.targetsHit ?? 0) > 1);
+    const mode = (isAoE
+      ? (table.dealAoePerTarget as Record<string, unknown> | undefined)
+      : (table.dealSingle as Record<string, unknown> | undefined)) ?? {};
+    let total = isFiniteNumber(spec.base)
+      ? spec.base
+      : isFiniteNumber(mode.base)
+        ? Number(mode.base)
+        : 0;
+    if (spec.isCrit && isFiniteNumber(mode.crit)) total += Number(mode.crit);
+    if (spec.isKill && isFiniteNumber(mode.kill)) total += Number(mode.kill);
 
     let perTargetApplied = 0;
-    if (Number.isFinite(spec.targetsHit) && (spec.targetsHit ?? 0) > 0 && Number.isFinite(mode.perTarget)){
-      const desired = mode.perTarget * spec.targetsHit;
+    if (isFiniteNumber(spec.targetsHit) && spec.targetsHit > 0 && isFiniteNumber(mode.perTarget)){
+      const desired = Number(mode.perTarget) * spec.targetsHit;
       const used = state?.skillPerTargetGain ?? 0;
       const room = Math.max(0, 12 - used);
       const granted = Math.max(0, Math.min(desired, room));
@@ -17100,37 +20036,33 @@ __define('./utils/fury.js', (exports, module, __require) => {
       perTargetApplied = granted;
     }
 
-    const ratio = Number.isFinite(mode.targetRatio) ? mode.targetRatio : 0;
-    if (ratio && Number.isFinite(spec.dealt) && Number.isFinite(spec.targetMaxHp) && (spec.targetMaxHp ?? 0) > 0){
-      total += Math.round((ratio * Math.max(0, spec.dealt ?? 0)) / spec.targetMaxHp);;
+    const ratio = isFiniteNumber(mode.targetRatio) ? Number(mode.targetRatio) : 0;
+    if (
+      ratio &&
+      isFiniteNumber(spec.dealt) &&
+      isFiniteNumber(spec.targetMaxHp) &&
+      (spec.targetMaxHp ?? 0) > 0
+    ){
+      total += Math.round((ratio * Math.max(0, spec.dealt ?? 0)) / spec.targetMaxHp);
     }
 
-    if (Number.isFinite(mode.min)) total = Math.max(mode.min, total);
-    if (Number.isFinite(mode.max)) total = Math.min(mode.max, total);
-    if (Number.isFinite(spec.bonus)) total += spec.bonus;
-    if (Number.isFinite(spec.multiplier)) total *= spec.multiplier;
+    if (isFiniteNumber(mode.min)) total = Math.max(Number(mode.min), total);
+    if (isFiniteNumber(mode.max)) total = Math.min(Number(mode.max), total);
+    if (isFiniteNumber(spec.bonus)) total += spec.bonus;
+    if (isFiniteNumber(spec.multiplier)) total *= spec.multiplier;
 
     return { amount: Math.floor(Math.max(0, total)), perTarget: perTargetApplied };
-   }
+  }
 
-  /**
-   * @param {UnitToken | null | undefined} unit
-   * @param {number} amount
-   * @returns {number}
-   */
-  function applyBonuses(unit, amount){
+  function applyBonuses(unit: UnitToken | null | undefined, amount: number): number {
     if (!unit) return amount;
-    const bonus = toNumber(unit.furyGainBonus ?? unit.rageGainBonus);
+    const internal = unit as UnitTokenInternal;
+    const bonus = toNumber(internal.furyGainBonus ?? internal.rageGainBonus);
     if (bonus !== 0) return Math.floor(Math.max(0, amount * (1 + bonus)));
     return amount;
   }
 
-  /**
-   * @param {UnitToken | null | undefined} unit
-   * @param {FuryTurnOptions} [opts]
-   * @returns {void}
-   */
-  function startFuryTurn(unit, opts = {}){
+  function startFuryTurn(unit: UnitToken | null | undefined, opts: FuryTurnOptions = {}): void {
     const state = ensureState(unit);
     if (!state) return;
     if (opts.clearFresh !== false) state.freshSummon = false;
@@ -17145,23 +20077,30 @@ __define('./utils/fury.js', (exports, module, __require) => {
     state.skillPerTargetGain = 0;
     state.skillDrain = 0;
     if (opts.grantStart !== false){
-      const furyCfg = CFG?.fury || {};
-      const baseStart = Number.isFinite(furyCfg?.gain?.turnStart?.amount)
-        ? furyCfg.gain.turnStart.amount
-        : (Number.isFinite(furyCfg?.turn?.startGain) ? furyCfg.turn.startGain : (furyCfg.startGain ?? 3));
-      const startAmount = Number.isFinite(opts.startAmount) ? opts.startAmount : baseStart;
+      const furyCfg = ((CFG?.fury ?? {}) as FuryConfigLike);
+      const gainCfg = (furyCfg.gain as Record<string, unknown> | undefined)?.turnStart as
+        | { amount?: unknown }
+        | undefined;
+      const baseStart = isFiniteNumber(gainCfg?.amount)
+        ? gainCfg!.amount
+        : ((): number => {
+            const turn = furyCfg.turn as Record<string, unknown> | undefined;
+            if (turn && isFiniteNumber(turn.startGain)) return turn.startGain;
+            return isFiniteNumber((furyCfg as Record<string, unknown>).startGain)
+              ? Number((furyCfg as Record<string, unknown>).startGain)
+              : 3;
+          })();
+      const startAmount = isFiniteNumber(opts.startAmount) ? opts.startAmount : baseStart;
       if ((startAmount ?? 0) > 0){
         gainFury(unit, { amount: startAmount, type: 'turnStart' });
       }
     }
   }
 
-  /**
-   * @param {UnitToken | null | undefined} unit
-   * @param {{ tag?: string | null; forceReset?: boolean }} [options]
-   * @returns {void}
-   */
-  function startFurySkill(unit, { tag = null, forceReset = false } = {}){
+  function startFurySkill(
+    unit: UnitToken | null | undefined,
+    { tag = null, forceReset = false }: { tag?: string | null; forceReset?: boolean } = {}
+  ): void {
     const state = ensureState(unit);
     if (!state) return;
     const skillTag = tag || '__skill__';
@@ -17174,24 +20113,18 @@ __define('./utils/fury.js', (exports, module, __require) => {
     }
   }
 
-  /**
-   * @param {UnitToken | null | undefined} unit
-   * @returns {void}
-   */
-  function finishFuryHit(unit){
+  function finishFuryHit(unit: UnitToken | null | undefined): void {
     const state = ensureState(unit);
     if (state){
       state.hitGain = 0;
     }
   }
 
-  /**
-   * @param {UnitToken | null | undefined} unit
-   * @param {FuryGainSpec} [spec]
-   * @param {typeof CFG} [cfg]
-   * @returns {number}
-   */
-  function gainFury(unit, spec = {}, cfg = CFG){
+  function gainFury(
+    unit: UnitToken | null | undefined,
+    spec: FuryGainSpec = {},
+    cfg: typeof CFG = CFG
+  ): number {
     if (!unit) return 0;
     ensureAlias(unit);
     const state = ensureState(unit);
@@ -17212,9 +20145,10 @@ __define('./utils/fury.js', (exports, module, __require) => {
     let amount = applyBonuses(unit, rawBeforeBonus);
     if (amount <= 0) return 0;
 
-    const max = Number.isFinite(unit.furyMax) ? unit.furyMax : resolveMaxFury(unit.id, cfg);
-    const next = Math.max(0, Math.min(max, Math.floor(unit.fury ?? 0) + amount));
-    const gained = next - Math.floor(unit.fury ?? 0);
+    const max = isFiniteNumber(unit.furyMax) ? unit.furyMax : resolveMaxFury(unit.id, cfg);
+    const currentFury = Math.floor(unit.fury ?? 0);
+    const next = Math.max(0, Math.min(max, currentFury + amount));
+    const gained = next - currentFury;
     if (gained <= 0) return 0;
     unit.fury = next;
     unit.rage = next;
@@ -17231,13 +20165,7 @@ __define('./utils/fury.js', (exports, module, __require) => {
     return gained;
   }
 
-  /**
-   * @param {UnitToken | null | undefined} unit
-   * @param {unknown} amount
-   * @param {typeof CFG} [cfg]
-   * @returns {number}
-   */
-  function spendFury(unit, amount, cfg = CFG){
+  function spendFury(unit: UnitToken | null | undefined, amount: unknown, cfg: typeof CFG = CFG): number {
     if (!unit) return 0;
     ensureAlias(unit);
     const amt = Math.max(0, Math.floor(toNumber(amount)));
@@ -17248,29 +20176,33 @@ __define('./utils/fury.js', (exports, module, __require) => {
     return before - next;
   }
 
-  /**
-   * @param {UnitToken | null | undefined} source
-   * @param {UnitToken | null | undefined} target
-   * @param {FuryDrainOptions} [opts]
-   * @param {typeof CFG} [cfg]
-   * @returns {number}
-   */
-  function drainFury(source, target, opts = {}, cfg = CFG){
+  function drainFury(
+    source: UnitToken | null | undefined,
+    target: UnitToken | null | undefined,
+    opts: FuryDrainOptions = {},
+    cfg: typeof CFG = CFG
+  ): number {
     if (!target) return 0;
     ensureAlias(target);
     const targetState = ensureState(target);
     if (targetState?.freshSummon) return 0;
-    const furyCfg = cfg?.fury || {};
-    const drainCfg = furyCfg.drain || {};
-    const base = Number.isFinite(opts.base)
+    const furyCfg = ((cfg?.fury ?? {}) as FuryConfigLike);
+    const drainCfg = (furyCfg.drain as Record<string, unknown> | undefined) ?? {};
+    const base = isFiniteNumber(opts.base)
       ? opts.base
-      : (Number.isFinite(drainCfg.perTargetBase) ? drainCfg.perTargetBase : 0);
-    const percent = Number.isFinite(opts.percent)
+      : isFiniteNumber(drainCfg.perTargetBase)
+        ? Number(drainCfg.perTargetBase)
+        : 0;
+    const percent = isFiniteNumber(opts.percent)
       ? opts.percent
-      : (Number.isFinite(drainCfg.perTargetPct) ? drainCfg.perTargetPct : 0);
-    const skillCap = Number.isFinite(opts.skillTotalCap)
+      : isFiniteNumber(drainCfg.perTargetPct)
+        ? Number(drainCfg.perTargetPct)
+        : 0;
+    const skillCap = isFiniteNumber(opts.skillTotalCap)
       ? opts.skillTotalCap
-      : (Number.isFinite(drainCfg.skillTotalCap) ? drainCfg.skillTotalCap : null);
+      : isFiniteNumber(drainCfg.skillTotalCap)
+        ? Number(drainCfg.skillTotalCap)
+        : null;
 
     const current = Math.max(0, Math.floor(target.fury ?? 0));
     if (current <= 0) return 0;
@@ -17280,10 +20212,10 @@ __define('./utils/fury.js', (exports, module, __require) => {
     if (desired <= 0) return 0;
 
     let capRoom = desired;
-    let sourceState = null;
-    if (Number.isFinite(skillCap)){
+    let sourceState: FuryState | null = null;
+    if (isFiniteNumber(skillCap)){
       sourceState = ensureState(source);
-      const used = sourceState ? (sourceState.skillDrain ?? 0) : 0;
+      const used = sourceState ? sourceState.skillDrain ?? 0 : 0;
       capRoom = Math.max(0, Math.min(desired, skillCap - used));
     }
 
@@ -17293,39 +20225,27 @@ __define('./utils/fury.js', (exports, module, __require) => {
     target.fury = current - drained;
     target.rage = target.fury;
 
-    if (sourceState && Number.isFinite(skillCap)){
+    if (sourceState && isFiniteNumber(skillCap)){
       sourceState.skillDrain = (sourceState.skillDrain ?? 0) + drained;
     }
 
     return drained;
   }
 
-  /**
-   * @param {UnitToken | null | undefined} unit
-   * @returns {number}
-   */
-  function furyValue(unit){
+  function furyValue(unit: UnitToken | null | undefined): number {
     if (!unit) return 0;
     ensureAlias(unit);
     return Math.floor(unit.fury ?? 0);
   }
 
-  /**
-   * @param {UnitToken | null | undefined} unit
-   * @returns {number}
-   */
-  function furyRoom(unit){
+  function furyRoom(unit: UnitToken | null | undefined): number {
     if (!unit) return 0;
     ensureAlias(unit);
-    const max = Number.isFinite(unit.furyMax) ? unit.furyMax : resolveMaxFury(unit.id, CFG);
+    const max = isFiniteNumber(unit.furyMax) ? unit.furyMax : resolveMaxFury(unit.id, CFG);
     return Math.max(0, max - Math.floor(unit.fury ?? 0));
   }
 
-  /**
-   * @param {UnitToken | null | undefined} unit
-   * @returns {FuryState | null}
-   */
-  function furyState(unit){
+  function furyState(unit: UnitToken | null | undefined): FuryState | null {
     return ensureState(unit);
   }
 
@@ -17345,105 +20265,192 @@ __define('./utils/fury.js', (exports, module, __require) => {
   exports.furyRoom = furyRoom;
   exports.furyState = furyState;
 });
-__define('./utils/kit.js', (exports, module, __require) => {
-  // @ts-check
-
-  /**
-   * @typedef {Record<string, unknown> & { id?: string; key?: string; type?: string; name?: string; tags?: ReadonlyArray<string>; categories?: ReadonlyArray<string>; label?: string; [extra: string]: unknown; }} KitTraitObject
-   */
-
-  /**
-   * @typedef {ReadonlyArray<string | KitTraitObject | boolean | number | null | undefined> | Record<string, unknown> | null | undefined} KitTraits
-   */
-
-  /**
-   * @typedef {Record<string, unknown> & { type?: string; kind?: string; category?: string; tags?: ReadonlyArray<string>; categories?: ReadonlyArray<string>; label?: string; summon?: SummonSpecLike | null | undefined; revive?: Record<string, unknown> | null | undefined; instant?: boolean; instantCast?: boolean; cast?: string; immediate?: boolean; reduceDamage?: number; shield?: number; barrier?: number; buffs?: ReadonlyArray<Record<string, unknown>> | null | undefined; }} UltMetadata
-   */
-
-  /**
-   * @typedef {Record<string, unknown> & { pattern?: string; placement?: string; patternKey?: string; shape?: string; area?: string; slots?: ReadonlyArray<number | null | undefined>; count?: number; summonCount?: number; ttl?: number; ttlTurns?: number; inherit?: unknown; limit?: number; replace?: unknown; creep?: unknown; }} SummonSpecLike
-   */
-
-  /**
-   * @typedef {SummonSpecLike & { slots?: ReadonlyArray<number>; pattern?: string; ttl?: number; ttlTurns?: number; }} NormalizedSummonSpec
-   */
-
-  /**
-   * @typedef {Record<string, unknown> & { type?: string; kind?: string; category?: string; tags?: ReadonlyArray<string>; metadata?: UltMetadata | null | undefined; meta?: UltMetadata | null | undefined; summon?: SummonSpecLike | null | undefined; revive?: Record<string, unknown> | null | undefined; summonCount?: number; placement?: string; pattern?: string; ttl?: number; ttlTurns?: number; limit?: number; inherit?: unknown; replace?: unknown; creep?: unknown; }} UltSpec
-   */
-
-  /**
-   * @typedef {Record<string, unknown> & { kit?: KitData | null | undefined; traits?: KitTraits; ult?: UltSpec | null | undefined; }} KitMeta
-   */
-
-  /**
-   * @typedef {Record<string, unknown> & { traits?: KitTraits; ult?: UltSpec | null | undefined; }} KitData
-   */
-
-  /**
-   * @typedef {object} UltBehavior
-   * @property {ReadonlyArray<string>} tags
-   * @property {boolean} hasInstant
-   * @property {boolean} hasDefensive
-   * @property {boolean} hasRevive
-   * @property {Record<string, unknown> | null} revive
-   * @property {NormalizedSummonSpec | null} summon
-   */
-
-  /**
-   * @typedef {object} OnSpawnRageMap
-   * @property {number} [revive]
-   * @property {number} [leader]
-   * @property {number} [deck]
-   * @property {number} [nonLeader]
-   * @property {number} [default]
-   * @property {number} [value]
-   */
-
-  /**
-   * @typedef {Record<string, unknown> & { type?: string; kind?: string; effect?: string; phase?: string; stage?: string; when?: string; target?: string; amount?: number; value?: number; }} OnSpawnEffect
-   */
-
-  /**
-   * @typedef {Record<string, unknown> & { rage?: number | string | OnSpawnRageMap | null; effects?: ReadonlyArray<OnSpawnEffect | null | undefined>; revive?: { rage?: number } | null | undefined; onRevive?: { rage?: number } | null | undefined; revived?: { rage?: number } | null | undefined; deck?: { rage?: number } | null | undefined; default?: { rage?: number } | null | undefined; reviveRage?: number | null | undefined; defaultRage?: number | null | undefined; rageOnSummon?: number | null | undefined; }} OnSpawnConfig
-   */
-
-  /**
-   * @typedef {object} ExtractOnSpawnRageOptions
-   * @property {boolean} [isLeader]
-   * @property {boolean} [revive]
-   * @property {{ rage?: number } | null | undefined} [reviveSpec]
-   */
-
-  const KNOWN_SUMMON_KEYS = ['summon', 'summoner', 'immediateSummon'];
-  const KNOWN_REVIVE_KEYS = ['revive', 'reviver'];
-  const DEFENSIVE_TAGS = ['defense', 'defensive', 'protection', 'shield', 'barrier', 'support'];
-  const INSTANT_TAGS = ['instant', 'instant-cast', 'instantCast'];
-
-  /**
-   * @param {KitMeta | KitData | null | undefined} metaOrKit
-   * @returns {KitData | null}
-   */
-  function coerceKit(metaOrKit){
-    if (!metaOrKit) return null;
-    if ('kit' in metaOrKit && metaOrKit.kit) return /** @type {KitData} */ (metaOrKit.kit);
-    return /** @type {KitData} */ (metaOrKit);
+__define('./utils/kit.ts', (exports, module, __require) => {
+  interface KitTraitObject extends Record<string, unknown> {
+    id?: string;
+    key?: string;
+    type?: string;
+    name?: string;
+    tags?: ReadonlyArray<string>;
+    categories?: ReadonlyArray<string>;
+    label?: string;
   }
 
-  /**
-   * @param {unknown} key
-   * @returns {string}
-   */
-  function normalizeKey(key){
+  type KitTraitEntry = string | KitTraitObject | boolean | number | null | undefined;
+
+  type KitTraits =
+    | ReadonlyArray<KitTraitEntry>
+    | Record<string, unknown>
+    | null
+    | undefined;
+
+  type SummonSpec = Record<string, unknown>;
+
+  interface SummonSpecLike extends SummonSpec {
+    pattern?: string;
+    placement?: string;
+    patternKey?: string;
+    shape?: string;
+    area?: string;
+    slots?: ReadonlyArray<number | null | undefined>;
+    count?: number;
+    summonCount?: number;
+    ttl?: number;
+    ttlTurns?: number;
+    inherit?: unknown;
+    limit?: number;
+    replace?: unknown;
+    creep?: unknown;
+  }
+
+  interface NormalizedSummonSpec extends SummonSpecLike {
+    slots?: ReadonlyArray<number>;
+    pattern?: string;
+    ttl?: number;
+    ttlTurns?: number;
+  }
+
+  interface UltMetadata extends Record<string, unknown> {
+    type?: string;
+    kind?: string;
+    category?: string;
+    tags?: ReadonlyArray<string>;
+    categories?: ReadonlyArray<string>;
+    label?: string;
+    role?: string;
+    defensive?: boolean;
+    summon?: SummonSpecLike | null;
+    revive?: Record<string, unknown> | null;
+    instant?: boolean;
+    instantCast?: boolean;
+    cast?: string;
+    immediate?: boolean;
+    reduceDamage?: number;
+    shield?: number;
+    barrier?: number;
+    buffs?: ReadonlyArray<Record<string, unknown>> | null;
+  }
+
+  interface UltSpec extends Record<string, unknown> {
+    type?: string;
+    kind?: string;
+    category?: string;
+    tags?: ReadonlyArray<string>;
+    metadata?: UltMetadata | null;
+    meta?: UltMetadata | null;
+    summon?: SummonSpecLike | null;
+    revive?: Record<string, unknown> | null;
+    summonCount?: number;
+    placement?: string;
+    pattern?: string;
+    ttl?: number;
+    ttlTurns?: number;
+    count?: number;
+    limit?: number;
+    inherit?: unknown;
+    replace?: unknown;
+    creep?: unknown;
+    instant?: boolean;
+    instantCast?: boolean;
+    immediate?: boolean;
+    cast?: string;
+    reduceDamage?: number;
+    shield?: number;
+    barrier?: number;
+    buffs?: ReadonlyArray<Record<string, unknown>> | null;
+    shields?: ReadonlyArray<Record<string, unknown>> | null;
+  }
+
+  interface KitData extends Record<string, unknown> {
+    traits?: KitTraits;
+    ult?: UltSpec | null;
+  }
+
+  interface KitMeta extends Record<string, unknown> {
+    kit?: KitData | null;
+    traits?: KitTraits;
+    ult?: UltSpec | null;
+  }
+
+  interface UltBehavior {
+    tags: ReadonlyArray<string>;
+    hasInstant: boolean;
+    hasDefensive: boolean;
+    hasRevive: boolean;
+    revive: Record<string, unknown> | null;
+    summon: NormalizedSummonSpec | null;
+  }
+
+  interface OnSpawnRageMap {
+    revive?: number;
+    leader?: number;
+    deck?: number;
+    nonLeader?: number;
+    default?: number;
+    value?: number;
+  }
+
+  interface OnSpawnEffect extends Record<string, unknown> {
+    type?: string;
+    kind?: string;
+    effect?: string;
+    phase?: string;
+    stage?: string;
+    when?: string;
+    target?: string;
+    amount?: number;
+    value?: number;
+  }
+
+  interface OnSpawnConfig extends Record<string, unknown> {
+    rage?: number | string | OnSpawnRageMap | null;
+    effects?: ReadonlyArray<OnSpawnEffect | null | undefined>;
+    revive?: { rage?: number } | null;
+    onRevive?: { rage?: number } | null;
+    revived?: { rage?: number } | null;
+    deck?: { rage?: number } | null;
+    default?: { rage?: number } | null;
+    reviveRage?: number | null;
+    defaultRage?: number | null;
+    rageOnSummon?: number | null;
+  }
+
+  interface ExtractOnSpawnRageOptions {
+    isLeader?: boolean;
+    revive?: boolean;
+    reviveSpec?: { rage?: number } | null;
+  }
+
+  const KNOWN_SUMMON_KEYS = ['summon', 'summoner', 'immediateSummon'] satisfies ReadonlyArray<string>;
+  const KNOWN_REVIVE_KEYS = ['revive', 'reviver'] satisfies ReadonlyArray<string>;
+  const DEFENSIVE_TAGS = ['defense', 'defensive', 'protection', 'shield', 'barrier', 'support'] satisfies ReadonlyArray<string>;
+  const INSTANT_TAGS = ['instant', 'instant-cast', 'instantCast'] satisfies ReadonlyArray<string>;
+
+  type CloneableArray = ReadonlyArray<unknown>;
+  type CloneableRecord = Record<string, unknown>;
+
+  function isPlainRecord(value: unknown): value is CloneableRecord {
+    if (!value || typeof value !== 'object') return false;
+    if (Array.isArray(value)) return false;
+    const proto = Object.getPrototypeOf(value);
+    return proto === Object.prototype || proto === null;
+  }
+
+  function isCloneCandidate(value: unknown): value is CloneableArray | CloneableRecord {
+    return Array.isArray(value) || isPlainRecord(value);
+  }
+
+  function coerceKit(metaOrKit: KitMeta | KitData | null | undefined): KitData | null {
+    if (!metaOrKit) return null;
+    if ('kit' in metaOrKit && metaOrKit.kit) return metaOrKit.kit as KitData;
+    return metaOrKit as KitData;
+  }
+
+  function normalizeKey(key: unknown): string {
     return typeof key === 'string' ? key.trim().toLowerCase() : '';
   }
 
-  /**
-   * @param {KitTraits | null | undefined} traits
-   * @param {string} key
-   * @returns {boolean | KitTraitObject | string | number | null}
-   */
-  function readTrait(traits, key){
+  function readTrait(traits: KitTraits, key: string): boolean | KitTraitObject | string | number | null {
     if (!traits) return null;
     const target = normalizeKey(key);
     if (!target) return null;
@@ -17456,11 +20463,11 @@ __define('./utils/kit.js', (exports, module, __require) => {
           continue;
         }
         if (typeof entry === 'object'){
-          const candidate = /** @type {KitTraitObject} */ (entry);
+          const candidate = entry as KitTraitObject;
           const id = normalizeKey(candidate.id || candidate.key || candidate.type || candidate.name);
           if (id === target) return candidate;
           if (candidate[target] != null){
-            return /** @type {boolean | KitTraitObject | string | number | null} */ (candidate[target]);
+            return candidate[target] as boolean | KitTraitObject | string | number | null;
           }
         }
       }
@@ -17470,53 +20477,43 @@ __define('./utils/kit.js', (exports, module, __require) => {
     if (typeof traits === 'object'){
       for (const [k, value] of Object.entries(traits)){
         if (normalizeKey(k) === target){
-          return /** @type {boolean | KitTraitObject | string | number | null} */ (value);
+          return value as boolean | KitTraitObject | string | number | null;
         }
       }
     }
     return null;
   }
 
-  /**
-   * @template T
-   * @param {T | null | undefined} value
-   * @returns {T | null}
-   */
-  function cloneShallow(value){
-    if (value == null || typeof value !== 'object') return (value ?? null);
-    if (Array.isArray(value)) return /** @type {T | null} */ (value.map(cloneShallow));
-    const out = /** @type {Record<string, unknown>} */ ({ ...value });
-    for (const [k, v] of Object.entries(out)){
-      if (Array.isArray(v)){
-        out[k] = v.map(cloneShallow);
-        continue;
+  function cloneShallow<T extends CloneableArray>(value: T): T;
+  function cloneShallow<T extends CloneableRecord>(value: T): T;
+  function cloneShallow<T extends CloneableArray | CloneableRecord>(value: T): T;
+  function cloneShallow<T>(value: T | null | undefined): T | null {
+    if (value == null || typeof value !== 'object') return value ?? null;
+    if (!isCloneCandidate(value)) return value;
+    if (Array.isArray(value)){
+    const result = value.map((entry) => (isCloneCandidate(entry) ? cloneShallow(entry) : entry));
+      return result as T;
+    } else {
+      const out: CloneableRecord = { ...(value as CloneableRecord) };
+      for (const [key, entry] of Object.entries(out)){
+        if (isCloneCandidate(entry)){
+          out[key] = cloneShallow(entry);
+        }
       }
-      if (v && typeof v === 'object'){
-        out[k] = cloneShallow(v);
-      }
+      return out as T;
     }
-    return /** @type {T} */ (out);
   }
 
-  /**
-   * @param {UltSpec | null | undefined} ult
-   * @returns {Partial<NormalizedSummonSpec> | null}
-   */
-  function extractUltSummonFields(ult){
+  function extractUltSummonFields(ult: UltSpec | null | undefined): Partial<NormalizedSummonSpec> | null {
     if (!ult || typeof ult !== 'object') return null;
-  const out = /** @type {Partial<NormalizedSummonSpec> & Record<string, unknown>} */ ({});
+    const out: Partial<NormalizedSummonSpec> & Record<string, unknown> = {};
     let hasValue = false;
-    /**
-     * @param {keyof NormalizedSummonSpec} key
-     * @param {unknown} value
-     * @param {boolean} [clone]
-     */
-    const assign = (key, value, clone = false) => {
+    const assign = (key: keyof NormalizedSummonSpec, value: unknown, clone = false) => {
       if (value === undefined || value === null) return;
-  if (clone && value && typeof value === 'object'){
-        out[key] = Array.isArray(value) ? value.map(cloneShallow) : cloneShallow(value);
+      if (clone && isCloneCandidate(value)){
+        out[key] = cloneShallow(value);
       } else {
-        out[key] = value;
+        out[key] = value as NormalizedSummonSpec[typeof key];
       }
       hasValue = true;
     };
@@ -17535,47 +20532,34 @@ __define('./utils/kit.js', (exports, module, __require) => {
     assign('replace', ult.replace);
     assign('creep', ult.creep, true);
 
-    return hasValue ? /** @type {Partial<NormalizedSummonSpec>} */ (out) : null;
+    return hasValue ? out : null;
   }
 
-  /**
-   * @param {SummonSpecLike | null | undefined} spec
-   * @param {UltSpec | null | undefined} ult
-   * @returns {SummonSpecLike | null}
-   */
-  function applyUltSummonDefaults(spec, ult){
+  function applyUltSummonDefaults(
+    spec: SummonSpecLike | null | undefined,
+    ult: UltSpec | null | undefined
+  ): SummonSpecLike | null {
     const fields = extractUltSummonFields(ult);
     if (!fields) return spec ?? null;
-    const out = spec ?? /** @type {SummonSpecLike} */ ({});
-    const target = /** @type {SummonSpecLike & Record<string, unknown>} */ (out);
+    const out: SummonSpecLike = spec ?? {};
+    const target: SummonSpec = out;
     for (const [key, value] of Object.entries(fields)){
       const current = target[key];
       if (current === undefined || current === null){
-  target[key] = value;
+        target[key] = value;
       }
     }
     return out;
   }
 
-  /**
-   * @param {KitMeta | KitData | null | undefined} metaOrKit
-   * @returns {Set<string>}
-   */
-  function collectUltTags(metaOrKit){
+  function collectUltTags(metaOrKit: KitMeta | KitData | null | undefined): Set<string> {
     const kit = coerceKit(metaOrKit);
     const ult = kit?.ult;
-    /** @type {Set<string>} */
-    const tags = new Set();
-    /**
-     * @param {unknown} val
-     */
-    const add = (val) => {
+    const tags = new Set<string>();
+    const add = (val: unknown) => {
       if (typeof val === 'string' && val.trim() !== '') tags.add(val.trim());
     };
-      /**
-     * @param {unknown} vals
-     */
-    const addMany = (vals) => {
+    const addMany = (vals: unknown) => {
       if (!Array.isArray(vals)) return;
       for (const val of vals){ add(val); }
     };
@@ -17601,7 +20585,7 @@ __define('./utils/kit.js', (exports, module, __require) => {
       if (typeof traitUlt === 'string') add(traitUlt);
       if (Array.isArray(traitUlt)) addMany(traitUlt);
       if (traitUlt && typeof traitUlt === 'object'){
-        const traitObj = /** @type {KitTraitObject} */ (traitUlt);
+        const traitObj = traitUlt as KitTraitObject;
         add(traitObj.type);
         addMany(traitObj.tags);
         addMany(traitObj.categories);
@@ -17612,23 +20596,18 @@ __define('./utils/kit.js', (exports, module, __require) => {
     return tags;
   }
 
-  /**
-   * @param {KitMeta | KitData | null | undefined} metaOrKit
-   * @returns {NormalizedSummonSpec | null}
-   */
-  function getSummonSpec(metaOrKit){
+  function getSummonSpec(metaOrKit: KitMeta | KitData | null | undefined): NormalizedSummonSpec | null {
     const kit = coerceKit(metaOrKit);
     if (!kit) return null;
 
-  /** @type {SummonSpecLike | null} */
-    let spec = null;
+    let spec: SummonSpecLike | null = null;
     for (const key of KNOWN_SUMMON_KEYS){
       const trait = readTrait(kit.traits ?? null, key);
       if (trait){
         if (trait === true) {
           spec = {};
         } else if (typeof trait === 'object'){
-          spec = /** @type {SummonSpecLike | null} */ (cloneShallow(trait));
+          spec = cloneShallow(trait);
         } else if (typeof trait === 'number'){
           spec = { count: trait };
         } else {
@@ -17641,18 +20620,18 @@ __define('./utils/kit.js', (exports, module, __require) => {
     const ult = kit.ult || null;
     if (!spec && ult){
       if (ult.summon){
-        spec = /** @type {SummonSpecLike | null} */ (cloneShallow(ult.summon));
+        spec = cloneShallow(ult.summon);
       } else if (ult.metadata?.summon){
-        spec = /** @type {SummonSpecLike | null} */ (cloneShallow(ult.metadata.summon));
+        spec = cloneShallow(ult.metadata.summon);
       } else if (ult.meta?.summon){
-        spec = /** @type {SummonSpecLike | null} */ (cloneShallow(ult.meta.summon));
+        spec = cloneShallow(ult.meta.summon);;
       }
     }
 
     const tags = collectUltTags(kit);
     if (!spec && kitUltHasTag(kit, 'summon', tags)){
       if (ult?.summon){
-        spec = /** @type {SummonSpecLike | null} */ (cloneShallow(ult.summon));
+        spec = cloneShallow(ult.summon);
       }
       spec = applyUltSummonDefaults(spec, ult);
     }
@@ -17662,7 +20641,7 @@ __define('./utils/kit.js', (exports, module, __require) => {
 
     if (!spec) return null;
 
-    const normalized = /** @type {NormalizedSummonSpec} */ (cloneShallow(spec) || {});
+    const normalized = { ...(cloneShallow(spec) ?? spec ?? {}) } as NormalizedSummonSpec;
     if (!normalized.pattern && typeof normalized.placement === 'string'){
       normalized.pattern = normalized.placement;
     }
@@ -17676,50 +20655,41 @@ __define('./utils/kit.js', (exports, module, __require) => {
       normalized.ttlTurns = normalized.ttl;
     }
     if (Array.isArray(normalized.slots)){
-      normalized.slots = normalized.slots.filter((s) => Number.isFinite(s)).map((s) => Number(s));
+      normalized.slots = normalized.slots.filter((s): s is number => typeof s === 'number' && Number.isFinite(s)).map((s) => Number(s));
     }
     return normalized;
   }
 
-  /**
-   * @param {KitMeta | KitData | null | undefined} metaOrKit
-   * @returns {Record<string, unknown> | null}
-   */
-  function getReviveSpec(metaOrKit){
+  function getReviveSpec(metaOrKit: KitMeta | KitData | null | undefined): Record<string, unknown> | null {
     const kit = coerceKit(metaOrKit);
     if (!kit) return null;
     for (const key of KNOWN_REVIVE_KEYS){
-    const trait = readTrait(kit.traits ?? null, key);
+      const trait = readTrait(kit.traits ?? null, key);
       if (trait){
         if (trait === true) return {};
-        if (typeof trait === 'object') return /** @type {Record<string, unknown>} */ (cloneShallow(trait) || {});
+        if (typeof trait === 'object') return cloneShallow(trait);
         return {};
       }
     }
     const ult = kit.ult || null;
-    if (ult?.revive) return /** @type {Record<string, unknown>} */ (cloneShallow(ult.revive) || {});
-    if (ult?.metadata?.revive) return /** @type {Record<string, unknown>} */ (cloneShallow(ult.metadata.revive) || {});
+    if (ult?.revive) return cloneShallow(ult.revive);
+    if (ult?.metadata?.revive) return cloneShallow(ult.metadata.revive);
     if (kitUltHasTag(kit, 'revive')){
-      return /** @type {Record<string, unknown>} */ (cloneShallow(ult?.revive || {}) || {});
+      const revive = ult?.revive ?? {};
+      return cloneShallow(revive);
     }
     return null;
   }
 
-  /**
-   * @param {KitMeta | KitData | null | undefined} metaOrKit
-   * @returns {boolean}
-   */
-  function kitSupportsSummon(metaOrKit){
+  function kitSupportsSummon(metaOrKit: KitMeta | KitData | null | undefined): boolean {
     return getSummonSpec(metaOrKit) != null;
   }
 
-  /**
-   * @param {KitMeta | KitData | null | undefined} metaOrKit
-   * @param {string} tag
-   * @param {Set<string> | null} [precomputedTags]
-   * @returns {boolean}
-   */
-  function kitUltHasTag(metaOrKit, tag, precomputedTags = null){
+  function kitUltHasTag(
+    metaOrKit: KitMeta | KitData | null | undefined,
+    tag: string,
+    precomputedTags: Set<string> | null = null
+  ): boolean {
     if (!tag) return false;
     const tags = precomputedTags ?? collectUltTags(metaOrKit);
     const target = normalizeKey(tag);
@@ -17729,30 +20699,36 @@ __define('./utils/kit.js', (exports, module, __require) => {
     return false;
   }
 
-  /**
-   * @param {KitMeta | KitData | null | undefined} metaOrKit
-   * @returns {UltBehavior}
-   */
-  function detectUltBehavior(metaOrKit){
+  function detectUltBehavior(metaOrKit: KitMeta | KitData | null | undefined): UltBehavior {
     const kit = coerceKit(metaOrKit);
     const ult = kit?.ult;
     const tags = collectUltTags(kit);
-    const metadata = ult?.metadata || ult?.meta || /** @type {UltMetadata} */ ({});
+    const metadata = ult?.metadata || ult?.meta || ({} as UltMetadata);
     const traits = kit?.traits ?? null;
 
     const hasInstant = Boolean(
-      metadata.instant === true || metadata.instantCast === true || metadata.cast === 'instant'
-        || (ult && (ult.instant || ult.cast === 'instant' || ult.immediate === true))
-        || INSTANT_TAGS.some((tag) => kitUltHasTag(kit, tag))
-        || readTrait(traits, 'instantUlt') === true || readTrait(traits, 'instantUltimate') === true
+      metadata.instant === true ||
+        metadata.instantCast === true ||
+        metadata.cast === 'instant' ||
+        (ult && (ult.instant || ult.cast === 'instant' || ult.immediate === true)) ||
+        INSTANT_TAGS.some((instantTag) => kitUltHasTag(kit, instantTag)) ||
+        readTrait(traits, 'instantUlt') === true ||
+        readTrait(traits, 'instantUltimate') === true
     );
 
     const hasDefensive = Boolean(
-      metadata.defensive === true || metadata.role === 'defensive'
-        || DEFENSIVE_TAGS.some((tag) => kitUltHasTag(kit, tag))
-        || (ult && (typeof ult.reduceDamage === 'number' || typeof ult.shield === 'number' || typeof ult.barrier === 'number'
-          || Array.isArray(ult.shields) || Array.isArray(ult.buffs) && ult.buffs.some((b) => normalizeKey(b.effect) === 'shield')))
-        || readTrait(traits, 'defensiveUlt') === true || readTrait(traits, 'guardianUlt') === true
+      metadata.defensive === true ||
+        metadata.role === 'defensive' ||
+        DEFENSIVE_TAGS.some((defTag) => kitUltHasTag(kit, defTag)) ||
+        (ult && (
+          typeof ult.reduceDamage === 'number' ||
+          typeof ult.shield === 'number' ||
+          typeof ult.barrier === 'number' ||
+          Array.isArray(ult.shields) ||
+          (Array.isArray(ult.buffs) && ult.buffs.some((b) => normalizeKey((b as Record<string, unknown>).effect) === 'shield'))
+        )) ||
+        readTrait(traits, 'defensiveUlt') === true ||
+        readTrait(traits, 'guardianUlt') === true
     );
 
     const revive = getReviveSpec(kit);
@@ -17768,16 +20744,11 @@ __define('./utils/kit.js', (exports, module, __require) => {
     };
   }
 
-  /**
-   * @param {OnSpawnConfig | null | undefined} onSpawn
-   * @param {ExtractOnSpawnRageOptions} [opts]
-   * @returns {number | null}
-   */
-  function extractRageFromEffects(onSpawn, opts = {}){
+  function extractRageFromEffects(onSpawn: OnSpawnConfig | null | undefined, opts: ExtractOnSpawnRageOptions = {}): number | null {
     const effects = Array.isArray(onSpawn?.effects) ? onSpawn.effects : [];
     for (const effect of effects){
       if (!effect) continue;
-      const effectObj = /** @type {OnSpawnEffect} */ (effect);
+      const effectObj = effect as OnSpawnEffect;
       const type = normalizeKey(effectObj.type || effectObj.kind || effectObj.effect);
       if (!type) continue;
       if (type === 'setrage' || type === 'addrage' || type === 'giverage'){
@@ -17797,12 +20768,7 @@ __define('./utils/kit.js', (exports, module, __require) => {
     return null;
   }
 
-  /**
-   * @param {OnSpawnConfig | null | undefined} onSpawn
-   * @param {ExtractOnSpawnRageOptions} [opts]
-   * @returns {number | null}
-   */
-  function extractOnSpawnRage(onSpawn, opts = {}){
+  function extractOnSpawnRage(onSpawn: OnSpawnConfig | null | undefined, opts: ExtractOnSpawnRageOptions = {}): number | null {
     if (!onSpawn) return null;
     const { isLeader = false, revive = false, reviveSpec = null } = opts;
 
@@ -17817,14 +20783,14 @@ __define('./utils/kit.js', (exports, module, __require) => {
     const fromEffects = extractRageFromEffects(onSpawn, { isLeader, revive, reviveSpec });
     if (fromEffects != null) return Math.max(0, fromEffects);
 
-    const rage = onSpawn.rage;
+    const { rage } = onSpawn;
     if (typeof rage === 'number') return Math.max(0, rage);
     if (typeof rage === 'string' && rage.trim() !== ''){
       const parsed = Number(rage);
       if (!Number.isNaN(parsed)) return Math.max(0, parsed);
     }
     if (rage && typeof rage === 'object'){
-      const rageObj = /** @type {OnSpawnRageMap} */ (rage);
+      const rageObj = rage as OnSpawnRageMap;
       if (revive && typeof rageObj.revive === 'number') return Math.max(0, rageObj.revive);
       if (isLeader && typeof rageObj.leader === 'number') return Math.max(0, rageObj.leader);
       if (!isLeader){
@@ -17855,40 +20821,29 @@ __define('./utils/kit.js', (exports, module, __require) => {
     return null;
   }
 
-  /**
-   * @param {number} baseSlot
-   * @returns {ReadonlyArray<number>}
-   */
-  function verticalNeighbors(baseSlot){
+  function verticalNeighbors(baseSlot: number): ReadonlyArray<number> {
     const row = (baseSlot - 1) % 3;
-    /** @type {number[]} */
-    const list = [];
+    const list: number[] = [];
     if (row > 0) list.push(baseSlot - 1);
     if (row < 2) list.push(baseSlot + 1);
     return list;
   }
 
-  /**
-   * @param {number} baseSlot
-   * @returns {ReadonlyArray<number>}
-   */
-  function rowNeighbors(baseSlot){
+  function rowNeighbors(baseSlot: number): ReadonlyArray<number> {
     const col = Math.floor((baseSlot - 1) / 3);
     const row = (baseSlot - 1) % 3;
-    const left  = (col < 2) ? ((col + 1) * 3 + row + 1) : null;
-    const right = (col > 0) ? ((col - 1) * 3 + row + 1) : null;
-    return /** @type {ReadonlyArray<number>} */ ([right, left].filter(Boolean));
+    const left = col < 2 ? ((col + 1) * 3 + row + 1) : null;
+    const right = col > 0 ? ((col - 1) * 3 + row + 1) : null;
+    const neighbors = [right, left].filter((slot): slot is number => typeof slot === 'number' && Number.isFinite(slot));
+    return neighbors;
   }
 
-  /**
-   * @param {SummonSpecLike | null | undefined} spec
-   * @param {number} baseSlot
-   * @returns {ReadonlyArray<number>}
-   */
-  function resolveSummonSlots(spec, baseSlot){
+  function resolveSummonSlots(spec: SummonSpecLike | null | undefined, baseSlot: number): ReadonlyArray<number> {
     if (!spec || !Number.isFinite(baseSlot)) return [];
     if (Array.isArray(spec.slots) && spec.slots.length){
-      return spec.slots.filter((s) => Number.isFinite(s)).map((s) => Number(s));
+      return spec.slots
+        .filter((slot): slot is number => typeof slot === 'number' && Number.isFinite(slot))
+        .map((slot) => Number(slot));
     }
 
     const patternRaw = spec.pattern || spec.placement || spec.shape || spec.area;
@@ -17919,28 +20874,22 @@ __define('./utils/kit.js', (exports, module, __require) => {
         return verticalNeighbors(baseSlot);
     }
   }
-
-  exports.kitSupportsSummon = kitSupportsSummon;
+  exports.collectUltTags = collectUltTags;
   exports.getSummonSpec = getSummonSpec;
+  exports.getReviveSpec = getReviveSpec;
+  exports.kitSupportsSummon = kitSupportsSummon;
+  exports.kitUltHasTag = kitUltHasTag;
   exports.detectUltBehavior = detectUltBehavior;
   exports.extractOnSpawnRage = extractOnSpawnRage;
   exports.resolveSummonSlots = resolveSummonSlots;
-  exports.kitUltHasTag = kitUltHasTag;
-  exports.collectUltTags = collectUltTags;
-  exports.getReviveSpec = getReviveSpec;
 });
-__define('./utils/time.js', (exports, module, __require) => {
-  // @ts-check
-
+__define('./utils/time.ts', (exports, module, __require) => {
   const perf = typeof globalThis !== 'undefined' ? globalThis.performance : undefined;
   const hasPerfNow = !!(perf && typeof perf.now === 'function');
   let lastFallbackNow = 0;
 
-  /**
-   * @returns {number}
-   */
-  function safeNow(){
-    if (hasPerfNow) return perf.now();
+  function safeNow(): number {
+    if (hasPerfNow && perf) return perf.now();
     const current = Date.now();
     if (current <= lastFallbackNow) {
       lastFallbackNow += 1;
@@ -17951,7 +20900,7 @@ __define('./utils/time.js', (exports, module, __require) => {
   }
   exports.safeNow = safeNow;
 });
-__define('./vfx.js', (exports, module, __require) => {
+__define('./vfx.ts', (exports, module, __require) => {
   // 0.7 vfx.js
   // VFX layer: spawn pop, hit ring, ranged tracer, melee step-in/out
   // Không thay đổi logic combat/turn — chỉ vẽ đè.
@@ -17959,44 +20908,240 @@ __define('./vfx.js', (exports, module, __require) => {
 
   const __dep0 = __require('./engine.ts');
   const projectCellOblique = __dep0.projectCellOblique;
-  const __dep1 = __require('./config.js');
+  const __dep1 = __require('./config.ts');
   const CFG = __dep1.CFG;
   const CHIBI = __dep1.CHIBI;
-  const __dep2 = __require('./utils/time.js');
+  const __dep2 = __require('./utils/time.ts');
   const safeNow = __dep2.safeNow;
   const __dep3 = __require('./data/vfx_anchors/loithienanh.json');
   const loithienanhAnchors = __dep3.default ?? __dep3;
   const __dep4 = __require('./data/vfx_anchors/schema.ts');
   const parseVfxAnchorDataset = __dep4.parseVfxAnchorDataset;
 
-  /** @typedef {import('@types/vfx').VfxAnchorDataset} VfxAnchorDataset */
 
-  const now = () => safeNow();
-  const lerp = (a, b, t) => a + (b - a) * t;
-  const easeInOut = (t) => (1 - Math.cos(Math.PI * Math.max(0, Math.min(1, t)))) * 0.5;
-  const isFiniteCoord = (value) => Number.isFinite(value);
-  const hasFinitePoint = (obj) => obj && isFiniteCoord(obj.cx) && isFiniteCoord(obj.cy);
-  const warnInvalidArc = (label, data) => {
+
+
+
+  type GridSpec = Parameters<typeof projectCellOblique>[0];
+  type CameraOptions = Parameters<typeof projectCellOblique>[3];
+
+  type TokenRef = (Partial<UnitToken> & {
+    unitId?: string | null | undefined;
+  }) | null | undefined;
+
+  type AnchorDatasetEntry = Omit<VfxAnchorDataset, 'unitId'>;
+
+  type ResolvedAnchor = {
+    id: string;
+    radius: number | null;
+  };
+
+  type AnchorPoint = {
+    x: number;
+    y: number;
+  };
+
+  type AnchorProjection = AnchorPoint & {
+    r: number;
+    scale: number;
+  };
+
+  type BaseVfxEvent = {
+    t0: number;
+    dur: number;
+  };
+
+  type SpawnVfxEvent = BaseVfxEvent & {
+    type: 'spawn';
+    cx: number;
+    cy: number;
+    side: Side | null | undefined;
+  };
+
+  type HitVfxEvent = BaseVfxEvent & {
+    type: 'hit';
+    ref: TokenRef;
+    iid?: number | null;
+    cx?: number;
+    cy?: number;
+    side?: Side | string | null;
+    [extra: string]: unknown;
+  };
+
+  type TracerVfxEvent = BaseVfxEvent & {
+    type: 'tracer';
+    refA: TokenRef;
+    refB: TokenRef;
+  };
+
+  type MeleeVfxEvent = BaseVfxEvent & {
+    type: 'melee';
+    refA: TokenRef;
+    refB: TokenRef;
+  };
+
+  type LightningArcVfxEvent = BaseVfxEvent & {
+    type: 'lightning_arc';
+    refA: TokenRef;
+    refB: TokenRef;
+    anchorA: string;
+    anchorB: string | null;
+    radiusA?: number | null;
+    radiusB?: number | null;
+    color?: string;
+    thickness?: number;
+    jitter?: number;
+    pattern: number[];
+    segments?: number;
+    glow?: boolean;
+    glowScale?: number;
+    rayScale?: number;
+    alpha?: number;
+  };
+
+  type BloodPulseVfxEvent = BaseVfxEvent & {
+    type: 'blood_pulse';
+    refA: TokenRef;
+    anchorA: string;
+    radiusA?: number | null;
+    color?: string;
+    rings?: number;
+    maxScale?: number;
+    alpha?: number;
+  };
+
+  type ShieldWrapVfxEvent = BaseVfxEvent & {
+    type: 'shield_wrap';
+    refA: TokenRef;
+    anchorA: string;
+    anchorB: string | null;
+    radiusA?: number | null;
+    radiusB?: number | null;
+    color?: string;
+    alpha?: number;
+    thickness?: number;
+    heightScale?: number;
+    widthScale?: number;
+    wobble?: number;
+  };
+
+  type GroundBurstVfxEvent = BaseVfxEvent & {
+    type: 'ground_burst';
+    refA: TokenRef;
+    anchorA: string;
+    radiusA?: number | null;
+    color?: string;
+    shards?: number;
+    spread?: number;
+    alpha?: number;
+  };
+
+  export type LightningArcOptions = {
+    busyMs?: number;
+    anchorId?: string;
+    bindingKey?: string;
+    timing?: string | number;
+    ambientKey?: string;
+    anchorRadius?: number;
+    targetAnchorId?: string;
+    targetBindingKey?: string;
+    targetTiming?: string | number;
+    targetRadius?: number;
+    color?: string;
+    thickness?: number;
+    jitter?: number;
+    segments?: number;
+    glow?: boolean;
+    glowScale?: number;
+    rayScale?: number;
+  };
+
+  export type BloodPulseOptions = {
+    busyMs?: number;
+    anchorId?: string;
+    bindingKey?: string;
+    timing?: string | number;
+    ambientKey?: string;
+    anchorRadius?: number;
+    color?: string;
+    rings?: number;
+    maxScale?: number;
+    alpha?: number;
+  };
+
+  export type ShieldWrapOptions = {
+    busyMs?: number;
+    anchorId?: string;
+    bindingKey?: string;
+    timing?: string | number;
+    anchorRadius?: number;
+    backAnchorId?: string;
+    backTiming?: string | number;
+    backRadius?: number;
+    color?: string;
+    alpha?: number;
+    thickness?: number;
+    heightScale?: number;
+    widthScale?: number;
+    wobble?: number;
+  };
+
+  export type GroundBurstOptions = {
+    busyMs?: number;
+    anchorId?: string;
+    bindingKey?: string;
+    timing?: string | number;
+    anchorRadius?: number;
+    color?: string;
+    shards?: number;
+    spread?: number;
+    alpha?: number;
+  };
+
+  export type VfxEvent =
+    | SpawnVfxEvent
+    | HitVfxEvent
+    | TracerVfxEvent
+    | MeleeVfxEvent
+    | LightningArcVfxEvent
+    | BloodPulseVfxEvent
+    | ShieldWrapVfxEvent
+    | GroundBurstVfxEvent;
+
+  export type VfxEventList = VfxEvent[];
+
+  export type SessionWithVfx = SessionState & {
+    grid: GridSpec;
+    tokens: ReadonlyArray<UnitToken>;
+    vfx?: VfxEventList;
+  };
+
+  const now = (): number => safeNow();
+  const lerp = (a: number, b: number, t: number): number => a + (b - a) * t;
+  const easeInOut = (t: number): number => (1 - Math.cos(Math.PI * Math.max(0, Math.min(1, t)))) * 0.5;
+  const isFiniteCoord = (value: unknown): value is number => Number.isFinite(value);
+  const hasFinitePoint = (obj: TokenRef): obj is TokenRef & { cx: number; cy: number } =>
+    !!obj && isFiniteCoord(obj.cx) && isFiniteCoord(obj.cy);
+  const warnInvalidArc = (label: string, data: unknown): void => {
     if (typeof console !== 'undefined' && console?.warn) {
       console.warn(`[vfxDraw] Skipping ${label} arc due to invalid geometry`, data);
     }
   };
 
   const DEFAULT_ANCHOR_ID = 'root';
-  const DEFAULT_ANCHOR_POINT = { x: 0.5, y: 0.5 };
+  const DEFAULT_ANCHOR_POINT: AnchorPoint = { x: 0.5, y: 0.5 };
   const DEFAULT_ANCHOR_RADIUS = 0.2;
   const UNIT_WIDTH_RATIO = 0.9;
   const UNIT_HEIGHT_RATIO = 1.85;
   const DEFAULT_SEGMENTS = 6;
 
-  /** @type {Map<string, VfxAnchorDataset>} */
-  const VFX_ANCHOR_CACHE = new Map();
+  const VFX_ANCHOR_CACHE: Map<string, AnchorDatasetEntry> = new Map();
 
-  function registerAnchorDataset(dataset) {
+  function registerAnchorDataset(dataset: VfxAnchorDataset | null | undefined): void {
     if (!dataset || typeof dataset !== 'object') return;
     const unitId = dataset.unitId || null;
     if (!unitId) return;
-    const entry = {
+    const entry: AnchorDatasetEntry = {
       bodyAnchors: dataset.bodyAnchors || {},
       vfxBindings: dataset.vfxBindings || {},
       ambientEffects: dataset.ambientEffects || {}
@@ -18015,16 +21160,27 @@ __define('./vfx.js', (exports, module, __require) => {
     registerAnchorDataset(loithienanhAnchors);
   }
 
-  function getUnitAnchorDataset(unit) {
+  function getUnitAnchorDataset(unit: TokenRef): AnchorDatasetEntry | null {
     if (!unit) return null;
-    const id = unit.unitId || unit.id || unit.name || null;
+    const id = (unit.unitId as string | null | undefined)
+      || (typeof unit.id === 'string' ? unit.id : null)
+      || (typeof unit.name === 'string' ? unit.name : null);
     if (!id) return null;
     return VFX_ANCHOR_CACHE.get(id) || null;
   }
 
-  function resolveBindingAnchor(unit, { anchorId, bindingKey, timing, ambientKey, radius }) {
+  function resolveBindingAnchor(
+    unit: TokenRef,
+    { anchorId, bindingKey, timing, ambientKey, radius }: {
+      anchorId?: string;
+      bindingKey?: string;
+      timing?: string | number;
+      ambientKey?: string;
+      radius?: number;
+    },
+  ): ResolvedAnchor {
     const dataset = getUnitAnchorDataset(unit);
-    let picked = null;
+    let picked: (AnchorDatasetEntry['vfxBindings'][string]['anchors'][number]) | null = null;
 
     if (bindingKey && dataset?.vfxBindings?.[bindingKey]?.anchors) {
       const anchors = dataset.vfxBindings[bindingKey].anchors;
@@ -18051,10 +21207,10 @@ __define('./vfx.js', (exports, module, __require) => {
     const resolvedId = picked?.id || anchorId || DEFAULT_ANCHOR_ID;
     const resolvedRadius = Number.isFinite(radius) ? radius : (Number.isFinite(picked?.radius) ? picked.radius : null);
 
-    return { id: resolvedId, radius: resolvedRadius };
+    return { id: resolvedId, radius: resolvedRadius ?? null };
   }
 
-  function lookupBodyAnchor(unit, anchorId) {
+  function lookupBodyAnchor(unit: TokenRef, anchorId: string): AnchorPoint | null {
     const dataset = getUnitAnchorDataset(unit);
     if (!dataset) return null;
     const anchor = dataset.bodyAnchors?.[anchorId];
@@ -18065,20 +21221,28 @@ __define('./vfx.js', (exports, module, __require) => {
     return { x, y };
   }
 
-  function createRandomPattern(length = DEFAULT_SEGMENTS) {
-    const result = [];
+  function createRandomPattern(length = DEFAULT_SEGMENTS): number[] {
+    const result: number[] = [];
     for (let i = 0; i < length; i += 1) {
       result.push(Math.random() * 2 - 1);
     }
     return result;
   }
 
-  function computeAnchorCanvasPoint(Game, token, anchorId, radiusRatio, cam) {
+  function computeAnchorCanvasPoint(
+    Game: SessionWithVfx,
+    token: TokenRef,
+    anchorId: string | null | undefined,
+    radiusRatio: number | null | undefined,
+    cam: CameraOptions | null | undefined,
+  ): AnchorProjection | null {
     if (!Game?.grid || !token || !hasFinitePoint(token)) return null;
-    const projection = projectCellOblique(Game.grid, token.cx, token.cy, cam);
+    const projection = projectCellOblique(Game.grid, token.cx ?? 0, token.cy ?? 0, cam);
     if (!projection || !isFiniteCoord(projection.x) || !isFiniteCoord(projection.y) || !isFiniteCoord(projection.scale)) return null;
 
-    const anchor = lookupBodyAnchor(token, anchorId) || lookupBodyAnchor(token, DEFAULT_ANCHOR_ID) || DEFAULT_ANCHOR_POINT;
+    const anchor = lookupBodyAnchor(token, anchorId ?? DEFAULT_ANCHOR_ID)
+      || lookupBodyAnchor(token, DEFAULT_ANCHOR_ID)
+      || DEFAULT_ANCHOR_POINT;
     const ax = Number(anchor?.x);
     const ay = Number(anchor?.y);
     const validAnchor = Number.isFinite(ax) && Number.isFinite(ay);
@@ -18092,12 +21256,18 @@ __define('./vfx.js', (exports, module, __require) => {
 
     if (!isFiniteCoord(px) || !isFiniteCoord(py)) return null;
 
-    const rr = Number.isFinite(radiusRatio) ? radiusRatio : DEFAULT_ANCHOR_RADIUS;
+    const rr = Number.isFinite(radiusRatio) ? Number(radiusRatio) : DEFAULT_ANCHOR_RADIUS;
     const rPx = Math.max(2, Math.floor(rr * Game.grid.tile * projection.scale));
     return { x: px, y: py, r: rPx, scale: projection.scale };
   }
 
-  function drawLightningArc(ctx, start, end, event, progress) {
+  function drawLightningArc(
+    ctx: CanvasRenderingContext2D,
+    start: AnchorProjection | null,
+    end: AnchorProjection | null,
+    event: LightningArcVfxEvent,
+    progress: number,
+  ): void {
     if (!start) return;
     const segments = Math.max(2, event.segments || DEFAULT_SEGMENTS);
     const color = event.color || '#7de5ff';
@@ -18163,7 +21333,12 @@ __define('./vfx.js', (exports, module, __require) => {
     ctx.restore();
   }
 
-  function drawBloodPulse(ctx, anchor, event, progress) {
+  function drawBloodPulse(
+    ctx: CanvasRenderingContext2D,
+    anchor: AnchorProjection | null,
+    event: BloodPulseVfxEvent,
+    progress: number,
+  ): void {
     if (!anchor) return;
     const color = event.color || '#ff6b81';
     const rings = Math.max(1, event.rings || 2);
@@ -18186,7 +21361,13 @@ __define('./vfx.js', (exports, module, __require) => {
     ctx.restore();
   }
 
-  function drawShieldWrap(ctx, frontAnchor, backAnchor, event, progress) {
+  function drawShieldWrap(
+    ctx: CanvasRenderingContext2D,
+    frontAnchor: AnchorProjection | null,
+    backAnchor: AnchorProjection | null,
+    event: ShieldWrapVfxEvent,
+    progress: number,
+  ): void {
     if (!frontAnchor) return;
     const color = event.color || '#9bd8ff';
     const alpha = (event.alpha ?? 0.6) * (1 - progress * 0.7);
@@ -18229,7 +21410,12 @@ __define('./vfx.js', (exports, module, __require) => {
     ctx.restore();
   }
 
-  function drawGroundBurst(ctx, anchor, event, progress) {
+  function drawGroundBurst(
+    ctx: CanvasRenderingContext2D,
+    anchor: AnchorProjection | null,
+    event: GroundBurstVfxEvent,
+    progress: number,
+  ): void {
     if (!anchor) return;
     const color = event.color || '#ffa36e';
     const alpha = (event.alpha ?? 0.7) * (1 - progress);
@@ -18257,46 +21443,71 @@ __define('./vfx.js', (exports, module, __require) => {
     ctx.restore();
   }
 
-  function pool(Game) {
-    if (!Game.vfx) Game.vfx = [];
+  function pool(Game: SessionWithVfx): VfxEventList {
+    if (!Array.isArray(Game.vfx)) Game.vfx = [] as VfxEventList;
     return Game.vfx;
   }
 
   /* ------------------- Adders ------------------- */
-  function vfxAddSpawn(Game, cx, cy, side) {
-    const spawn = { type: 'spawn', t0: now(), dur: 500, cx, cy, side };
+  function vfxAddSpawn(Game: SessionWithVfx, cx: number, cy: number, side: Side | null | undefined): void {
+    const spawn: SpawnVfxEvent = { type: 'spawn', t0: now(), dur: 500, cx, cy, side };
     pool(Game).push(spawn);
   }
 
-  function vfxAddHit(Game, target, opts = {}) {
-    pool(Game).push({ type: 'hit', t0: now(), dur: 380, ref: target, ...opts });
+  type HitEventExtras = Partial<Omit<HitVfxEvent, 'type' | 't0' | 'dur' | 'ref'>>;
+
+  function vfxAddHit(Game: SessionWithVfx, target: TokenRef, opts: HitEventExtras = {}): void {
+    const event: HitVfxEvent = { type: 'hit', t0: now(), dur: 380, ref: target, ...opts };
+    pool(Game).push(event);
   }
 
-  function vfxAddTracer(Game, attacker, target, opts = {}) {
-    pool(Game).push({ type: 'tracer', t0: now(), dur: opts.dur || 400, refA: attacker, refB: target });
+  function vfxAddTracer(
+    Game: SessionWithVfx,
+    attacker: TokenRef,
+    target: TokenRef,
+    opts: { dur?: number } = {},
+  ): void {
+    const dur = Number.isFinite(opts?.dur) ? Number(opts.dur) : 400;
+    const event: TracerVfxEvent = { type: 'tracer', t0: now(), dur, refA: attacker, refB: target };
+    pool(Game).push(event);
   }
 
-  function vfxAddMelee(Game, attacker, target, { dur = CFG?.ANIMATION?.meleeDurationMs ?? 1100 } = {}) {
+  function vfxAddMelee(
+    Game: SessionWithVfx,
+    attacker: TokenRef,
+    target: TokenRef,
+    { dur = CFG?.ANIMATION?.meleeDurationMs ?? 1100 }: { dur?: number } = {},
+  ): void {
     // Overlay step-in/out (không di chuyển token thật)
-    pool(Game).push({ type: 'melee', t0: now(), dur, refA: attacker, refB: target });
+    const event: MeleeVfxEvent = { type: 'melee', t0: now(), dur, refA: attacker, refB: target };
+    pool(Game).push(event);
   }
 
-  function makeLightningEvent(Game, source, target, opts = {}) {
-    const busyMs = Number.isFinite(opts.busyMs) ? opts.busyMs : 420;
+  function makeLightningEvent(
+    Game: SessionWithVfx,
+    source: TokenRef,
+    target: TokenRef,
+    opts: LightningArcOptions = {},
+  ): number {
+    const busyMs = Number.isFinite(opts.busyMs) ? Number(opts.busyMs) : 420;
     const anchorA = resolveBindingAnchor(source, {
       anchorId: opts.anchorId,
       bindingKey: opts.bindingKey,
       timing: opts.timing,
+      ambientKey: opts.ambientKey,
       radius: opts.anchorRadius
     });
-    const anchorB = target ? resolveBindingAnchor(target, {
-      anchorId: opts.targetAnchorId,
-      bindingKey: opts.targetBindingKey,
-      timing: opts.targetTiming,
-      radius: opts.targetRadius
-    }) : null;
+    const anchorB = target
+      ? resolveBindingAnchor(target, {
+          anchorId: opts.targetAnchorId,
+          bindingKey: opts.targetBindingKey,
+          timing: opts.targetTiming,
+          ambientKey: undefined,
+          radius: opts.targetRadius,
+        })
+      : null;
 
-    pool(Game).push({
+    const event: LightningArcVfxEvent = {
       type: 'lightning_arc',
       t0: now(),
       dur: busyMs,
@@ -18313,17 +21524,23 @@ __define('./vfx.js', (exports, module, __require) => {
       segments: opts.segments,
       glow: opts.glow,
       glowScale: opts.glowScale,
-      rayScale: opts.rayScale
-    });
+      rayScale: opts.rayScale,
+    };
+    pool(Game).push(event);
     return busyMs;
   }
 
-  function vfxAddLightningArc(Game, source, target, opts = {}) {
+  function vfxAddLightningArc(
+    Game: SessionWithVfx,
+    source: TokenRef,
+    target: TokenRef,
+    opts: LightningArcOptions = {},
+  ): number {
     return makeLightningEvent(Game, source, target, opts);
   }
 
-  function vfxAddBloodPulse(Game, source, opts = {}) {
-    const busyMs = Number.isFinite(opts.busyMs) ? opts.busyMs : 560;
+  function vfxAddBloodPulse(Game: SessionWithVfx, source: TokenRef, opts: BloodPulseOptions = {}): number {
+    const busyMs = Number.isFinite(opts.busyMs) ? Number(opts.busyMs) : 560;
     const anchor = resolveBindingAnchor(source, {
       anchorId: opts.anchorId,
       bindingKey: opts.bindingKey,
@@ -18332,7 +21549,7 @@ __define('./vfx.js', (exports, module, __require) => {
       radius: opts.anchorRadius
     });
 
-    pool(Game).push({
+    const event: BloodPulseVfxEvent = {
       type: 'blood_pulse',
       t0: now(),
       dur: busyMs,
@@ -18342,28 +21559,33 @@ __define('./vfx.js', (exports, module, __require) => {
       color: opts.color,
       rings: opts.rings,
       maxScale: opts.maxScale,
-      alpha: opts.alpha
-    });
+      alpha: opts.alpha,
+    };
+    pool(Game).push(event);
     return busyMs;
   }
 
-  function vfxAddShieldWrap(Game, source, opts = {}) {
-    const busyMs = Number.isFinite(opts.busyMs) ? opts.busyMs : 900;
+  function vfxAddShieldWrap(Game: SessionWithVfx, source: TokenRef, opts: ShieldWrapOptions = {}): number {
+    const busyMs = Number.isFinite(opts.busyMs) ? Number(opts.busyMs) : 900;
     const front = resolveBindingAnchor(source, {
       anchorId: opts.anchorId,
       bindingKey: opts.bindingKey,
       timing: opts.timing,
+      ambientKey: undefined,
       radius: opts.anchorRadius
     });
     const wantsBack = opts.backAnchorId != null || opts.backTiming != null || Number.isFinite(opts.backRadius);
-    const back = wantsBack ? resolveBindingAnchor(source, {
-      anchorId: opts.backAnchorId,
-      bindingKey: opts.bindingKey,
-      timing: opts.backTiming,
-      radius: opts.backRadius
-    }) : null;
+    const back = wantsBack
+      ? resolveBindingAnchor(source, {
+          anchorId: opts.backAnchorId,
+          bindingKey: opts.bindingKey,
+          timing: opts.backTiming,
+          ambientKey: undefined,
+          radius: opts.backRadius,
+        })
+      : null;
 
-    pool(Game).push({
+    const event: ShieldWrapVfxEvent = {
       type: 'shield_wrap',
       t0: now(),
       dur: busyMs,
@@ -18377,21 +21599,23 @@ __define('./vfx.js', (exports, module, __require) => {
       thickness: opts.thickness,
       heightScale: opts.heightScale,
       widthScale: opts.widthScale,
-      wobble: opts.wobble
-    });
+      wobble: opts.wobble,
+    };
+    pool(Game).push(event);
     return busyMs;
   }
 
-  function vfxAddGroundBurst(Game, source, opts = {}) {
-    const busyMs = Number.isFinite(opts.busyMs) ? opts.busyMs : 640;
+  function vfxAddGroundBurst(Game: SessionWithVfx, source: TokenRef, opts: GroundBurstOptions = {}): number {
+    const busyMs = Number.isFinite(opts.busyMs) ? Number(opts.busyMs) : 640;
     const anchor = resolveBindingAnchor(source, {
       anchorId: opts.anchorId,
       bindingKey: opts.bindingKey,
       timing: opts.timing,
+      ambientKey: undefined,
       radius: opts.anchorRadius
     });
 
-    pool(Game).push({
+    const event: GroundBurstVfxEvent = {
       type: 'ground_burst',
       t0: now(),
       dur: busyMs,
@@ -18401,187 +21625,226 @@ __define('./vfx.js', (exports, module, __require) => {
       color: opts.color,
       shards: opts.shards,
       spread: opts.spread,
-      alpha: opts.alpha
-    });
+      alpha: opts.alpha,
+    };
+    pool(Game).push(event);
     return busyMs;
   }
-  function drawChibiOverlay(ctx, x, y, r, facing, color) {
-    const lw = Math.max(CHIBI.line, Math.floor(r*0.28));
-    const hr = Math.max(3, Math.floor(r*CHIBI.headR));
-    const torso = r*CHIBI.torso, arm=r*CHIBI.arm, leg=r*CHIBI.leg, wep=r*CHIBI.weapon;
 
-    ctx.save(); ctx.translate(x,y); ctx.lineCap='round'; ctx.lineJoin='round';
-    ctx.strokeStyle = color; ctx.lineWidth = lw;
+  function drawChibiOverlay(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    r: number,
+    facing: number,
+    color: string,
+  ): void {
+    const lw = Math.max(CHIBI.line, Math.floor(r * 0.28));
+    const hr = Math.max(3, Math.floor(r * CHIBI.headR));
+    const torso = r * CHIBI.torso;
+    const arm = r * CHIBI.arm;
+    const leg = r * CHIBI.leg;
+    const wep = r * CHIBI.weapon;
+
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lw;
 
     // đầu
-    ctx.beginPath(); ctx.arc(0, -torso-hr, hr, 0, Math.PI*2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(0, -torso - hr, hr, 0, Math.PI * 2); ctx.stroke();
     // thân
     ctx.beginPath(); ctx.moveTo(0, -torso); ctx.lineTo(0, 0); ctx.stroke();
     // tay (tay trước cầm kiếm theo hướng facing)
     ctx.beginPath();
-    ctx.moveTo(0, -torso*0.6); ctx.lineTo(-arm*0.8, -torso*0.2);
-    ctx.moveTo(0, -torso*0.6); ctx.lineTo( arm*0.8*facing, -torso*0.2);
+    ctx.moveTo(0, -torso * 0.6); ctx.lineTo(-arm * 0.8, -torso * 0.2);
+    ctx.moveTo(0, -torso * 0.6); ctx.lineTo(arm * 0.8 * facing, -torso * 0.2);
     ctx.stroke();
     // chân
     ctx.beginPath();
-    ctx.moveTo(0, 0); ctx.lineTo(-leg*0.6, leg*0.9);
-    ctx.moveTo(0, 0); ctx.lineTo( leg*0.6, leg*0.9);
+    ctx.moveTo(0, 0); ctx.lineTo(-leg * 0.6, leg * 0.9);
+    ctx.moveTo(0, 0); ctx.lineTo(leg * 0.6, leg * 0.9);
     ctx.stroke();
     // kiếm
-    const hx = arm*0.8*facing, hy = -torso*0.2;
-    ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(hx + wep*facing, hy); ctx.stroke();
+    const hx = arm * 0.8 * facing;
+    const hy = -torso * 0.2;
+    ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(hx + wep * facing, hy); ctx.stroke();
 
     ctx.restore();
   }
   /* ------------------- Drawer ------------------- */
-  function vfxDraw(ctx, Game, cam) {
+  function vfxDraw(
+    ctx: CanvasRenderingContext2D,
+    Game: SessionWithVfx,
+    cam: CameraOptions | null | undefined,
+  ): void {
     const list = pool(Game);
     if (!list.length || !Game.grid) return;
 
-    const keep = [];
+    const keep: VfxEventList = [];
     for (const e of list) {
       const t = (now() - e.t0) / e.dur;
       const done = t >= 1;
       const tt = Math.max(0, Math.min(1, t));
 
-      if (e.type === 'spawn') {
-        if (hasFinitePoint(e)) {
-          const p = projectCellOblique(Game.grid, e.cx, e.cy, cam);
-          const r0 = Math.max(8, Math.floor(Game.grid.tile * 0.22 * p.scale));
-          const r = r0 + Math.floor(r0 * 1.8 * tt);
-          if (isFiniteCoord(p.x) && isFiniteCoord(p.y) && isFiniteCoord(r) && r > 0) {
+      switch (e.type) {
+        case 'spawn': {
+          const { cx, cy } = e;
+          if (isFiniteCoord(cx) && isFiniteCoord(cy)) {
+            const p = projectCellOblique(Game.grid, cx, cy, cam);
+            const r0 = Math.max(8, Math.floor(Game.grid.tile * 0.22 * p.scale));
+            const r = r0 + Math.floor(r0 * 1.8 * tt);
+            if (isFiniteCoord(p.x) && isFiniteCoord(p.y) && isFiniteCoord(r) && r > 0) {
+              ctx.save();
+              ctx.globalAlpha = 1 - tt;
+              ctx.strokeStyle = e.side === 'ally' ? '#9ef0a4' : '#ffb4c0';
+              ctx.lineWidth = 3;
+              ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.stroke();
+              ctx.restore();
+            } else {
+              warnInvalidArc('spawn', { x: p?.x, y: p?.y, r });
+            }
+          }
+          break;
+        }
+
+        case 'hit': {
+          const tokens = Array.isArray(Game?.tokens) ? Game.tokens : null;
+          const updateFromToken = (token: TokenRef): void => {
+            if (!token) return;
+            if (token.iid != null && e.iid == null) e.iid = token.iid;
+            if (isFiniteCoord(token.cx)) e.cx = token.cx;
+            if (isFiniteCoord(token.cy)) e.cy = token.cy;
+          };
+
+          const initialRef = hasFinitePoint(e.ref) ? e.ref : null;
+          updateFromToken(initialRef);
+
+          const lookupLiveToken = (): UnitToken | null => {
+            if (!tokens) return null;
+            if (e.iid != null) {
+              return tokens.find(t => t && t.iid === e.iid) ?? null;
+            }
+            const ref = e.ref;
+            if (ref?.iid != null) {
+              return tokens.find(t => t && t.iid === ref.iid) ?? null;
+            }
+            if (typeof ref?.id === 'string') {
+              return tokens.find(t => t && t.id === ref.id) ?? null;
+            }
+            return null;
+          };
+
+          const hasCoords = isFiniteCoord(e.cx) && isFiniteCoord(e.cy);
+          if ((!hasCoords || !initialRef) && tokens) {
+            const live = lookupLiveToken();
+            if (live) {
+              e.ref = live;
+              updateFromToken(live);
+            }
+          }
+
+          if (isFiniteCoord(e.cx) && isFiniteCoord(e.cy)) {
+            const p = projectCellOblique(Game.grid, e.cx, e.cy, cam);
+            const r = Math.floor(Game.grid.tile * 0.25 * (0.6 + 1.1 * tt) * p.scale);
+            if (isFiniteCoord(p.x) && isFiniteCoord(p.y) && isFiniteCoord(r) && r > 0) {
+              ctx.save();
+              ctx.globalAlpha = 0.9 * (1 - tt);
+              ctx.strokeStyle = '#e6f2ff';
+              ctx.lineWidth = 2;
+              ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.stroke();
+              ctx.restore();
+            } else {
+              warnInvalidArc('hit', { x: p?.x, y: p?.y, r });
+            }
+          }
+          break;
+        }
+
+        case 'tracer': {
+          // disabled: không vẽ “đường trắng” nữa
+          break;
+        }
+
+        case 'melee': {
+          const A = e.refA;
+          const B = e.refB;
+          if (A && B && A.alive && B.alive && hasFinitePoint(A) && hasFinitePoint(B)) {
+            const pa = projectCellOblique(Game.grid, A.cx ?? 0, A.cy ?? 0, cam);
+            const pb = projectCellOblique(Game.grid, B.cx ?? 0, B.cy ?? 0, cam);
+
+            const tN = Math.max(0, Math.min(1, (now() - e.t0) / e.dur));
+            const k = easeInOut(tN) * 0.88;
+            const mx = lerp(pa.x, pb.x, k);
+            const my = lerp(pa.y, pb.y, k);
+
+            const depth = Game.grid.rows - 1 - (A.cy ?? 0);
+            const kDepth = cam?.depthScale ?? 0.94;
+            const r = Math.max(6, Math.floor(Game.grid.tile * 0.36 * Math.pow(kDepth, depth)));
+
+            const facing = A.side === 'ally' ? 1 : -1;
+            const color = A.color || (A.side === 'ally' ? '#9adcf0' : '#ffb4c0');
+
             ctx.save();
-            ctx.globalAlpha = 1 - tt;
-            ctx.strokeStyle = e.side === 'ally' ? '#9ef0a4' : '#ffb4c0';
-            ctx.lineWidth = 3;
-            ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.stroke();
+            ctx.globalAlpha = 0.95;
+            drawChibiOverlay(ctx, mx, my, r, facing, color);
             ctx.restore();
+          }
+          break;
+        }
+
+        case 'lightning_arc': {
+          const start = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, e.radiusA ?? null, cam);
+          const end = e.refB ? computeAnchorCanvasPoint(Game, e.refB, e.anchorB, e.radiusB ?? null, cam) : null;
+          if (start && (!e.refB || end)) {
+            drawLightningArc(ctx, start, end, e, tt);
           } else {
-            warnInvalidArc('spawn', { x: p?.x, y: p?.y, r });
+            warnInvalidArc('lightning', { start, end });
           }
-        }
-      }
-
-      else if (e.type === 'hit') {
-        const tokens = Array.isArray(Game?.tokens) ? Game.tokens : null;
-        const updateFromToken = (token) => {
-          if (!token) return;
-          if (token.iid != null && e.iid == null) e.iid = token.iid;
-          if (isFiniteCoord(token.cx)) e.cx = token.cx;
-          if (isFiniteCoord(token.cy)) e.cy = token.cy;
-        };
-
-        const initialRef = hasFinitePoint(e.ref) ? e.ref : null;
-        updateFromToken(initialRef);
-
-        const lookupLiveToken = () => {
-          if (!tokens) return null;
-          if (e.iid != null) {
-            return tokens.find(t => t && t.iid === e.iid);
-          }
-        const ref = e.ref;
-          if (ref?.iid != null) {
-            return tokens.find(t => t && t.iid === ref.iid);
-          }
-          if (ref?.id != null) {
-            return tokens.find(t => t && t.id === ref.id);
-          }
-          return null;
-        };
-
-          if ((!hasFinitePoint(e) || !initialRef) && tokens) {
-          const live = lookupLiveToken();
-          if (live) {
-            e.ref = live;
-            updateFromToken(live);
-          }
+          break;
         }
 
-        if (hasFinitePoint(e)) {
-          const p = projectCellOblique(Game.grid, e.cx, e.cy, cam);
-          const r = Math.floor(Game.grid.tile * 0.25 * (0.6 + 1.1 * tt) * p.scale);
-          if (isFiniteCoord(p.x) && isFiniteCoord(p.y) && isFiniteCoord(r) && r > 0) {
-            ctx.save();
-            ctx.globalAlpha = 0.9 * (1 - tt);
-            ctx.strokeStyle = '#e6f2ff';
-            ctx.lineWidth = 2;
-            ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.stroke();
-            ctx.restore();
+        case 'blood_pulse': {
+          const anchor = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, e.radiusA ?? null, cam);
+          if (anchor) {
+            drawBloodPulse(ctx, anchor, e, tt);
           } else {
-            warnInvalidArc('hit', { x: p?.x, y: p?.y, r });
+            warnInvalidArc('blood_pulse', { anchor });
           }
+          break;
         }
-      }
-      else if (e.type === 'tracer') {
-    // disabled: không vẽ “đường trắng” nữa
-  }
-      else if (e.type === 'melee') {
-    const A = e.refA, B = e.refB;
-    if (A && B && A.alive && B.alive && hasFinitePoint(A) && hasFinitePoint(B)) {
-      const pa = projectCellOblique(Game.grid, A.cx, A.cy, cam);
-      const pb = projectCellOblique(Game.grid, B.cx, B.cy, cam);
 
-      // Đi vào ~40%, dừng ngắn, rồi lùi về (easeInOut) – không chạm hẳn mục tiêu để đỡ che
-      const tN = Math.max(0, Math.min(1, (now() - e.t0) / e.dur));
-      const k = easeInOut(tN) * 0.88;
-      const mx = lerp(pa.x, pb.x, k);
-      const my = lerp(pa.y, pb.y, k);
-
-      // scale theo chiều sâu (khớp render token)
-      const depth = Game.grid.rows - 1 - A.cy;
-      const kDepth = ((cam?.depthScale) ?? 0.94);
-      const r = Math.max(6, Math.floor(Game.grid.tile * 0.36 * Math.pow(kDepth, depth)));
-
-      const facing = (A.side === 'ally') ? 1 : -1;
-      const color  = A.color || (A.side === 'ally' ? '#9adcf0' : '#ffb4c0');
-
-      ctx.save();
-      ctx.globalAlpha = 0.95;
-      drawChibiOverlay(ctx, mx, my, r, facing, color);
-      ctx.restore();
-    }
-  }
-
-  else if (e.type === 'lightning_arc') {
-        const start = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, e.radiusA, cam);
-        const end = e.refB ? computeAnchorCanvasPoint(Game, e.refB, e.anchorB, e.radiusB, cam) : null;
-        if (start && (!e.refB || end)) {
-          drawLightningArc(ctx, start, end, e, tt);
-        } else {
-          warnInvalidArc('lightning', { start, end });
+        case 'shield_wrap': {
+          const front = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, e.radiusA ?? null, cam);
+          const back = e.anchorB ? computeAnchorCanvasPoint(Game, e.refA, e.anchorB, e.radiusB ?? null, cam) : null;
+          if (front) {
+            drawShieldWrap(ctx, front, back, e, tt);
+          } else {
+            warnInvalidArc('shield_wrap', { front, back });
+          }
+          break;
         }
-      }
-      else if (e.type === 'blood_pulse') {
-        const anchor = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, e.radiusA, cam);
-        if (anchor) {
-          drawBloodPulse(ctx, anchor, e, tt);
-        } else {
-          warnInvalidArc('blood_pulse', { anchor });
+
+        case 'ground_burst': {
+          const anchor = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, e.radiusA ?? null, cam);
+          if (anchor) {
+            drawGroundBurst(ctx, anchor, e, tt);
+          } else {
+            warnInvalidArc('ground_burst', { anchor });
+          }
+          break;
         }
-      }
-      else if (e.type === 'shield_wrap') {
-        const front = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, e.radiusA, cam);
-        const back = e.anchorB ? computeAnchorCanvasPoint(Game, e.refA, e.anchorB, e.radiusB, cam) : null;
-        if (front) {
-          drawShieldWrap(ctx, front, back, e, tt);
-        } else {
-          warnInvalidArc('shield_wrap', { front, back });
-        }
-      }
-      else if (e.type === 'ground_burst') {
-        const anchor = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, e.radiusA, cam);
-        if (anchor) {
-          drawGroundBurst(ctx, anchor, e, tt);
-        } else {
-          warnInvalidArc('ground_burst', { anchor });
-        }
+
+        default:
+          break;
       }
 
       if (!done) keep.push(e);
     }
     Game.vfx = keep;
   }
-
   exports.vfxAddSpawn = vfxAddSpawn;
   exports.vfxAddHit = vfxAddHit;
   exports.vfxAddTracer = vfxAddTracer;
@@ -18592,8 +21855,193 @@ __define('./vfx.js', (exports, module, __require) => {
   exports.vfxAddGroundBurst = vfxAddGroundBurst;
   exports.vfxDraw = vfxDraw;
 });
+__define('./../tools/zod-stub/index.js', (exports, module, __require) => {
+  const objectProto = Object.prototype;
+
+  class ZodType {
+    optional() {
+      return new ZodOptional(this);
+    }
+
+    parse(value) {
+      return this._parse(value);
+    }
+
+    // eslint-disable-next-line class-methods-use-this
+    _parse() {
+      throw new TypeError('ZodType subclasses must implement _parse');
+    }
+  }
+
+  class ZodOptional extends ZodType {
+    constructor(inner) {
+      super();
+      this.inner = inner;
+    }
+
+    _parse(value) {
+      if (value === undefined) {
+        return undefined;
+      }
+      return this.inner.parse(value);
+    }
+  }
+
+  class ZodString extends ZodType {
+    _parse(value) {
+      if (typeof value !== 'string') {
+        throw new TypeError('Expected string');
+      }
+      return value;
+    }
+  }
+
+  class ZodNumber extends ZodType {
+    _parse(value) {
+      if (typeof value !== 'number' || Number.isNaN(value)) {
+        throw new TypeError('Expected number');
+      }
+      return value;
+    }
+  }
+
+  class ZodBoolean extends ZodType {
+    _parse(value) {
+      if (typeof value !== 'boolean') {
+        throw new TypeError('Expected boolean');
+      }
+      return value;
+    }
+  }
+
+  class ZodLiteral extends ZodType {
+    constructor(expected) {
+      super();
+      this.expected = expected;
+    }
+
+    _parse(value) {
+      if (value !== this.expected) {
+        throw new TypeError(`Expected literal ${String(this.expected)}`);
+      }
+      return value;
+    }
+  }
+
+  class ZodEnum extends ZodType {
+    constructor(values) {
+      super();
+      if (!Array.isArray(values) || values.length === 0) {
+        throw new TypeError('ZodEnum requires a non-empty array of values');
+      }
+      this.values = [...values];
+      this.valueSet = new Set(this.values);
+    }
+
+    _parse(value) {
+      if (typeof value !== 'string' || !this.valueSet.has(value)) {
+        throw new TypeError(`Expected one of: ${this.values.join(', ')}`);
+      }
+      return value;
+    }
+  }
+
+  class ZodArray extends ZodType {
+    constructor(itemSchema) {
+      super();
+      this.itemSchema = itemSchema;
+    }
+
+    _parse(value) {
+      if (!Array.isArray(value)) {
+        throw new TypeError('Expected array');
+      }
+      return value.map((item) => this.itemSchema.parse(item));
+    }
+  }
+
+  class ZodRecord extends ZodType {
+    constructor(valueSchema) {
+      super();
+      this.valueSchema = valueSchema;
+    }
+
+    _parse(value) {
+      if (!isPlainObject(value)) {
+        throw new TypeError('Expected object for record');
+      }
+      const result = {};
+      for (const key of Object.keys(value)) {
+        result[key] = this.valueSchema.parse(value[key]);
+      }
+      return result;
+    }
+  }
+
+  class ZodObject extends ZodType {
+    constructor(shape) {
+      super();
+      this.shape = { ...shape };
+    }
+
+    _parse(value) {
+      if (!isPlainObject(value)) {
+        throw new TypeError('Expected object');
+      }
+      const result = { ...value };
+      for (const key of Object.keys(this.shape)) {
+        const schema = this.shape[key];
+        const hasKey = objectProto.hasOwnProperty.call(value, key);
+        const fieldValue = hasKey ? value[key] : undefined;
+        if (!hasKey && !(schema instanceof ZodOptional)) {
+          throw new TypeError(`Missing required key "${key}"`);
+        }
+        result[key] = schema.parse(fieldValue);
+      }
+      return result;
+    }
+
+    merge(other) {
+      if (!(other instanceof ZodObject)) {
+        throw new TypeError('ZodObject.merge expects another ZodObject');
+      }
+      return new ZodObject({ ...this.shape, ...other.shape });
+    }
+  }
+
+  function isPlainObject(value) {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
+  }
+
+  const z = {
+    string: () => new ZodString(),
+    number: () => new ZodNumber(),
+    boolean: () => new ZodBoolean(),
+    literal: (value) => new ZodLiteral(value),
+    enum: (values) => new ZodEnum(values),
+    object: (shape) => new ZodObject(shape),
+    array: (schema) => new ZodArray(schema),
+    record: (schema) => new ZodRecord(schema)
+  };
+
+  exports.ZodType = ZodType;
+  exports.ZodOptional = ZodOptional;
+  exports.ZodString = ZodString;
+  exports.ZodNumber = ZodNumber;
+  exports.ZodBoolean = ZodBoolean;
+  exports.ZodLiteral = ZodLiteral;
+  exports.ZodEnum = ZodEnum;
+  exports.ZodArray = ZodArray;
+  exports.ZodRecord = ZodRecord;
+  exports.ZodObject = ZodObject;
+
+
+  exports.z = z;
+  exports.default = z;
+  module.exports.default = exports.default;
+});
 try {
-  __require('./entry.js');
+  __require('./entry.ts');
 } catch (err) {
   console.error('Failed to bootstrap Arclune bundle:', err);
   throw err;
