@@ -72,7 +72,7 @@ import type {
   CreateSessionOptions,
   SessionState,
 } from '@types/pve';
-import type { HudHandles } from '@types/ui';
+import type { HudHandles, SummonBarHandles } from '@types/ui';
 import type { NormalizedSessionConfig } from './session-state.ts';
 
 type RootLike = Element | Document | null | undefined;
@@ -198,6 +198,7 @@ type EnemyAIPreset = {
 let canvas: HTMLCanvasElement | null = null;
 let ctx: CanvasRenderingContext2D | null = null;
 let hud: HudHandles | null = null;
+let summonBarHandle: SummonBarHandles | null = null;
 let hudCleanup: (() => void) | null = null;
 const CAM_PRESET = CAM[CFG.CAMERA] || CAM.landscape_oblique;
 const HAND_SIZE  = CFG.HAND_SIZE ?? 4;
@@ -234,6 +235,18 @@ const renderSummonBar = (): void => {
   const bar = (Game?.ui?.bar ?? null) as { render?: () => void } | null;
   if (bar?.render) bar.render();
 };
+
+function cleanupSummonBar(): void {
+  if (summonBarHandle && typeof summonBarHandle.cleanup === 'function'){
+    try {
+      summonBarHandle.cleanup();
+    } catch {}
+  }
+  summonBarHandle = null;
+  if (Game?.ui){
+    Game.ui.bar = null;
+  }
+}
 
 function resetSessionState(options: StartConfigOverrides = {}): void {
   storedConfig = normalizeConfig({ ...storedConfig, ...options });
@@ -1237,7 +1250,8 @@ function init(): boolean {
   refillDeck();
   refillDeckEnemy(Game);
 
-  Game.ui.bar = startSummonBar(doc, {
+  cleanupSummonBar();
+  const barHandle = startSummonBar(doc, {
     onPick: (card): void => {
       const entry = asDeckEntry(card);
       Game.selectedId = entry.id;
@@ -1250,6 +1264,8 @@ function init(): boolean {
     getDeck: () => ensureDeck(),
     getSelectedId: () => Game.selectedId,
   }, root ?? undefined);
+  summonBarHandle = barHandle;
+  Game.ui.bar = barHandle;
 
   selectFirstAffordable();
   renderSummonBar();
@@ -1813,6 +1829,7 @@ function resetDomRefs(): void {
 function stopSession(): void {
   clearSessionTimers();
   clearSessionListeners();
+  cleanupSummonBar();
   if (Game){
     if (Game.queued?.ally?.clear) Game.queued.ally.clear();
     if (Game.queued?.enemy?.clear) Game.queued.enemy.clear();
