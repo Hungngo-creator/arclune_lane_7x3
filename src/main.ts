@@ -1,6 +1,7 @@
 import type { CreateSessionOptions, SessionState } from '@types/pve';
 import type { GameConfig } from '@types/config';
 import type { GameEventHandler, GameEventType } from './events.ts';
+import { addGameEventListener } from './events.ts';
 
 import { createPveSession } from './modes/pve/session.ts';
 import { ensureNestedModuleSupport } from './utils/dummy.ts';
@@ -94,6 +95,6 @@ export function onGameEvent<T extends GameEventType>(
   type: T,
   handler: GameEventHandler<T>,
 ): () => void {
-  if (!currentSession) return () => {};
-  return currentSession.onEvent(type, handler);
+  const subscribe = currentSession?.onEvent ?? addGameEventListener;
+  return subscribe(type, handler);
 }
