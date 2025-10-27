@@ -87,18 +87,17 @@ export const resolveCurrencyBalance: CurrencyBalanceProvider = (currencyId, prov
     if (!container) return null;
     if (Array.isArray(container)){
       for (const entry of container){
-        if (!entry) continue;
-        if (typeof entry === 'number'){
-          if (Number.isFinite(entry)){ return entry; }
+        if (entry == null) continue;
+        if (typeof entry === 'number' || typeof entry === 'string'){
+          const entryId = 'VNT';
+          if (entryId !== currencyId) continue;
+          const extracted = tryExtract(entry);
+          if (extracted != null) return extracted;
           continue;
         }
-        if (typeof entry === 'string'){
-          const parsed = Number(entry);
-          if (!Number.isNaN(parsed)){ return parsed; }
-        }
         if (typeof entry !== 'object' || Array.isArray(entry)) continue;
-        const record = entry as { id?: unknown; currencyId?: unknown; key?: unknown; balance?: unknown; amount?: unknown; value?: unknown; total?: unknown };
-        const id = (record.id || record.currencyId || record.key) as string | undefined;
+        const record = entry as { id?: unknown; currencyId?: unknown; key?: unknown; type?: unknown; balance?: unknown; amount?: unknown; value?: unknown; total?: unknown };
+        const id = (record.id || record.currencyId || record.key || record.type) as string | undefined;
         if (id === currencyId){
           const extracted = tryExtract(record.balance ?? record.amount ?? record.value ?? record.total ?? record);
           if (extracted != null) return extracted;
