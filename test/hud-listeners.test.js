@@ -45,7 +45,7 @@ function loadUiModule(deps){
     "const { gameEvents, TURN_START, TURN_END, ACTION_END } = __deps['./events.ts'];"
   );
   code = code.replace(
-    "import type { HudHandles, SummonBarCard, SummonBarHandles, SummonBarOptions } from './types/ui.ts';\n\n",
+    "import type { HudHandles, SummonBarCard, SummonBarHandles, SummonBarOptions } from '@types/ui';\n\n",
     ''
   );
   code = code.replace(/export function/g, 'function');
