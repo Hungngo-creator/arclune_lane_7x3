@@ -20,6 +20,7 @@ export interface SummonBarOptions<TCard extends SummonBarCard = SummonBarCard> {
 
 export interface SummonBarHandles {
   render(): void;
+  cleanup(): void;
 }
 
 export interface EquipmentLoadout {
