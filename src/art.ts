@@ -11,7 +11,7 @@ import type {
   UnitArtShadow,
   UnitArtShadowConfig,
   UnitArtSprite,
-} from './types/art.ts';
+} from '@types/art';
 
 type UnitArtSpriteInput =
   | string

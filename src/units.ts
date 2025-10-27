@@ -1,4 +1,4 @@
-import type { UnitId } from './types/units.ts';
+import type { UnitId } from '@types/units';
 
 export interface UnitDefinition {
   id: UnitId;

@@ -5,10 +5,10 @@ import { safeNow as sharedSafeNow } from './utils/time.ts';
 import { detectUltBehavior, getSummonSpec, resolveSummonSlots } from './utils/kit.ts';
 import { lookupUnit } from './units.ts';
 
-import type { AiCard, AiCardDeck, AiDeckEntry, AiDeckPool, SessionState } from './types/combat.ts';
-import type { RosterUnitDefinition } from './types/config.ts';
-import { createSummonQueue } from './types/units.ts';
-import type { SummonQueue, UnitId, UnitToken } from './types/units.ts';
+import type { AiCard, AiCardDeck, AiDeckEntry, AiDeckPool, SessionState } from '@types/combat';
+import type { RosterUnitDefinition } from '@types/config';
+import { createSummonQueue } from '@types/units';
+import type { SummonQueue, UnitId, UnitToken } from '@types/units';
 
 type CandidateCell = { s: number; cx: number; cy: number };
 type WeightKey =

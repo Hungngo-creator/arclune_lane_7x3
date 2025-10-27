@@ -5,7 +5,7 @@ import { kitSupportsSummon } from './utils/kit.ts';
 
 import type { CatalogStatBlock, RosterUnitDefinition } from '@types/config';
 import type { UnitId } from '@types/units';
-import type { UnknownRecord } from './types/common.ts';
+import type { UnknownRecord } from '@types/common';
 
 export interface RosterKitDefinition extends UnknownRecord {
   onSpawn?: UnknownRecord | null;
