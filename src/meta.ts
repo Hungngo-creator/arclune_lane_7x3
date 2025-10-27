@@ -74,16 +74,16 @@ export function makeInstanceStats(unitId: MetaId): InstanceStats | Record<string
   if (!base) return {};
   const fin = applyRankAndMods(base, entry.rank, entry.mods);
   return {
-    hpMax: fin.HP | 0,
-    hp: fin.HP | 0,
-    atk: fin.ATK | 0,
-    wil: fin.WIL | 0,
+    hpMax: Math.trunc(fin.HP ?? 0),
+    hp: Math.trunc(fin.HP ?? 0),
+    atk: Math.trunc(fin.ATK ?? 0),
+    wil: Math.trunc(fin.WIL ?? 0),
     arm: fin.ARM || 0,
     res: fin.RES || 0,
-    agi: fin.AGI | 0,
-    per: fin.PER | 0,
+    agi: Math.trunc(fin.AGI ?? 0),
+    per: Math.trunc(fin.PER ?? 0),
     spd: fin.SPD || 1,
-    aeMax: fin.AEmax | 0,
+    aeMax: Math.trunc(fin.AEmax ?? 0),
     ae: 0,
     aeRegen: fin.AEregen || 0,
     hpRegen: fin.HPregen || 0,
