@@ -1,4 +1,6 @@
+import { applyDamage } from './combat.ts';
 import { gainFury, finishFuryHit } from './utils/fury.ts';
+import { safeNow } from './utils/time.ts';
 
 import type { DamageContext, StatusEffect, StatusRegistry } from '@types/combat';
 import type { UnitToken } from '@types/units';
@@ -218,7 +220,8 @@ export const Statuses: StatusService = {
     const bleed = this.get(unit, 'bleed');
     if (bleed) {
       const lost = Math.round((unit.hpMax ?? 0) * 0.05);
-      unit.hp = Math.max(0, (unit.hp ?? 0) - lost);
+      applyDamage(unit, lost);
+      hookOnLethalDamage(unit);
       if (ctx?.log && Array.isArray(ctx.log)) {
         ctx.log.push({ t: 'bleed', who: unit.name, lost });
       }
@@ -339,7 +342,8 @@ export const Statuses: StatusService = {
     const reflect = this.get(target, 'reflect');
     if (reflect && dealt > 0) {
       const back = Math.round(dealt * clamp01(reflect.power ?? 0));
-      attacker.hp = Math.max(0, (attacker.hp ?? 0) - back);
+      applyDamage(attacker, back);
+      hookOnLethalDamage(attacker);
       if (back > 0) {
         gainFury(attacker, {
           type: 'damageTaken',
@@ -354,7 +358,8 @@ export const Statuses: StatusService = {
     const venom = this.get(attacker, 'venom');
     if (venom && dealt > 0) {
       const extra = Math.round(dealt * clamp01(venom.power ?? 0));
-      target.hp = Math.max(0, (target.hp ?? 0) - extra);
+      applyDamage(target, extra);
+      hookOnLethalDamage(target);
       if (extra > 0) {
         gainFury(target, {
           type: 'damageTaken',
@@ -369,6 +374,11 @@ export const Statuses: StatusService = {
     if (this.has(attacker, 'execute')) {
       if ((target.hp ?? 0) <= Math.ceil((target.hpMax ?? 0) * 0.1)) {
         target.hp = 0;
+        const revived = hookOnLethalDamage(target);
+        if (!revived) {
+          target.alive = false;
+          if (!target.deadAt) target.deadAt = safeNow();
+        }
       }
     }
 
@@ -393,6 +403,8 @@ export function hookOnLethalDamage(target: UnitToken): boolean {
   if ((target.hp ?? 0) <= 0) {
     target.hp = 1;
     Statuses.remove(target, 'undying');
+    target.alive = true;
+    target.deadAt = undefined;
     return true;
   }
   return false;
