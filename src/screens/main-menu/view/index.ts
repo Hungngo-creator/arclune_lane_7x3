@@ -1,6 +1,6 @@
 import type { CleanupFn, CleanupRegistrar, MainMenuState, RenderedMainMenu } from '../types.ts';
 import { HERO_DEFAULT_ID } from '../dialogues.ts';
-import { mountSection } from '../../../../ui/dom.ts';
+import { mountSection } from '../../../ui/dom.ts';
 import { ensureStyles, createHeader, createHeroSection, createModesSection, createSidebar } from './layout.ts';
 
 export function renderMainMenuView(state: MainMenuState): RenderedMainMenu | null {
