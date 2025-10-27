@@ -142,15 +142,34 @@ export function startSummonBar<TCard extends SummonBarCard = SummonBarCard>(
 
   const hostElement = queryFromRoot<HTMLElement>('#cards', 'cards');
   if (!hostElement){
-    return { render: () => {} } satisfies SummonBarHandles;
+    return { render: () => {}, cleanup: () => {} } satisfies SummonBarHandles;
   }
   const host = assertElement<HTMLElement>(hostElement, {
     guard: (node): node is HTMLElement => node instanceof HTMLElement,
     message: 'Summon bar cần một phần tử host hợp lệ.',
   });
 
+  const btns: HTMLButtonElement[] = [];
+  const cleanupFns: Array<() => void> = [];
+  let cleanedUp = false;
+  const cleanup = (): void => {
+    if (cleanedUp) return;
+    cleanedUp = true;
+    while (cleanupFns.length > 0){
+      const dispose = cleanupFns.pop();
+      try {
+        dispose?.();
+      } catch {}
+    }
+  };
+
   host.innerHTML = '';
-  host.addEventListener('click', (event: Event) => {
+  cleanupFns.push(() => {
+    btns.length = 0;
+    host.innerHTML = '';
+  });
+
+  const handleHostClick = (event: Event): void => {
     const target = event.target instanceof Element
       ? event.target
       : event.currentTarget instanceof Element
@@ -171,7 +190,9 @@ export function startSummonBar<TCard extends SummonBarCard = SummonBarCard>(
         node.classList.toggle('active', node === btn);
       }
     });
-  });
+  };
+  host.addEventListener('click', handleHostClick);
+  cleanupFns.push(() => host.removeEventListener('click', handleHostClick));
 
   const gap = CFG.UI?.CARD_GAP ?? 12;
   const minSize = CFG.UI?.CARD_MIN ?? 40;
@@ -202,6 +223,7 @@ export function startSummonBar<TCard extends SummonBarCard = SummonBarCard>(
       syncCardSize.cancel();
     };
   }
+  cleanupFns.push(() => cleanupResize());
 
   let removalObserver: MutationObserver | null = null;
   if (host && typeof MutationObserver === 'function'){
@@ -212,15 +234,19 @@ export function startSummonBar<TCard extends SummonBarCard = SummonBarCard>(
     if (observerTarget){
       removalObserver = new MutationObserver(() => {
         if (!host.isConnected){
-          cleanupResize();
-          removalObserver?.disconnect();
-          removalObserver = null;
+          cleanup();
         }
       });
       removalObserver.observe(observerTarget, { childList: true, subtree: true });
     }
   }
-  
+  if (removalObserver){
+    cleanupFns.push(() => {
+      removalObserver?.disconnect();
+      removalObserver = null;
+    });
+  }
+
   const resolveCardCost = (card: TCard | null | undefined): number => {
     if (!card) return 0;
     const raw = card.cost;
@@ -242,8 +268,6 @@ export function startSummonBar<TCard extends SummonBarCard = SummonBarCard>(
     btn.classList.toggle('disabled', !affordable);
     return btn;
   };
-
-  const btns: HTMLButtonElement[] = [];
 
   const render = (): void => {
     const deck = getDeck();
@@ -275,9 +299,12 @@ export function startSummonBar<TCard extends SummonBarCard = SummonBarCard>(
     const rerender = (): void => render();
     const types = [TURN_START, TURN_END, ACTION_END] as const;
     for (const type of types){
-      addGameEventListener(type, () => rerender());
+      const dispose = addGameEventListener(type, () => rerender());
+      if (typeof dispose === 'function'){
+        cleanupFns.push(() => dispose());
+      }
     }
   }
 
-  return { render } satisfies SummonBarHandles;
+  return { render, cleanup } satisfies SummonBarHandles;
 }
