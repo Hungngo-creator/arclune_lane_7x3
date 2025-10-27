@@ -1469,7 +1469,6 @@ function selectFirstAffordable(): void {
   for (const card of deck){
     if (!card) continue;
 
-    const rawCost = card.cost;
     const cardCost = getCardCost(card);
 
     if (cardCost < cheapestOverallCost){
@@ -1477,7 +1476,8 @@ function selectFirstAffordable(): void {
       cheapestOverallCost = cardCost;
     }
 
-    const affordable = !(typeof rawCost === 'number' && Number.isFinite(rawCost)) || cardCost <= Game.cost;
+    const costForComparison = Number.isFinite(cardCost) ? cardCost : 0;
+    const affordable = costForComparison <= Game.cost;
     if (affordable && cardCost < cheapestAffordableCost){
       cheapestAffordable = card;
       cheapestAffordableCost = cardCost;
