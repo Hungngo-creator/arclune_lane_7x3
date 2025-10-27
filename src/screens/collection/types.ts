@@ -1,9 +1,9 @@
-import type { CurrencyDefinition } from '../../types/config.ts';
-import type { UnknownRecord } from '../../types/common.ts';
-import type { LineupCurrencies } from '../../types/currency.ts';
-import type { RosterEntryLite } from '../../types/lineup.ts';
+import type { CurrencyDefinition } from '@types/config';
+import type { UnknownRecord } from '@types/common';
+import type { LineupCurrencies } from '@types/currency';
+import type { RosterEntryLite } from '@types/lineup';
 
-export type { UnknownRecord } from '../../types/common.ts';
+export type { UnknownRecord } from '@types/common';
 
 export type CollectionTabKey = 'awakening' | 'skills' | 'arts' | 'skins' | 'voice';
 
