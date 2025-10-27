@@ -22,7 +22,7 @@ import { bindLineupEvents } from './events.ts';
 import type { LineupState } from '@types/ui';
 import type { LineupCurrencies } from '@types/currency';
 import type { UnknownRecord } from '@types/common';
-import type { LineupDefinition, RosterEntryLite } from '@types/lineup'; from '../../../types/lineup.ts';
+import type { LineupDefinition, RosterEntryLite } from '@types/lineup';
 
 const STYLE_ID = 'lineup-view-style-v1';
 const powerFormatter = createNumberFormatter('vi-VN');
