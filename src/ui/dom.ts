@@ -104,6 +104,7 @@ export function mountSection<
   const host = assertElement<TRoot>(root, assertMessage ?? 'Cần một phần tử root hợp lệ.');
   const classesToAdd = normalizeClasses(rootClasses);
   const classesToRemove = normalizeClasses(removeRootClasses);
+  const removedRootClasses: string[] = [];
 
   if (replaceChildren){
     if ('replaceChildren' in host && typeof host.replaceChildren === 'function'){
@@ -116,7 +117,17 @@ export function mountSection<
   }
 
   if (classesToRemove.length > 0 && host.classList){
-    classesToRemove.forEach(cls => host.classList.remove(cls));
+    const seen = new Set<string>();
+    classesToRemove.forEach(cls => {
+      if (seen.has(cls)){
+        return;
+      }
+      seen.add(cls);
+      if (host.classList.contains(cls)){
+        removedRootClasses.push(cls);
+      }
+      host.classList.remove(cls);
+    });
   }
 
   if (classesToAdd.length > 0 && host.classList){
@@ -134,6 +145,9 @@ export function mountSection<
       }
       if (classesToAdd.length > 0 && host.classList){
         classesToAdd.forEach(cls => host.classList.remove(cls));
+      }
+      if (removedRootClasses.length > 0 && host.classList){
+        removedRootClasses.forEach(cls => host.classList.add(cls));
       }
       if (typeof onDestroy === 'function'){
         onDestroy();
