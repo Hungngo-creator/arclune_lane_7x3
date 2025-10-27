@@ -217,11 +217,19 @@ export function startSummonBar<TCard extends SummonBarCard = SummonBarCard>(
     };
   } else {
     const handleResize = (): void => syncCardSize();
-    window.addEventListener('resize', handleResize);
-    cleanupResize = (): void => {
-      window.removeEventListener('resize', handleResize);
-      syncCardSize.cancel();
-    };
+    if (typeof window !== 'undefined'){
+      window.addEventListener('resize', handleResize);
+      cleanupResize = (): void => {
+        if (typeof window !== 'undefined'){
+          window.removeEventListener('resize', handleResize);
+        }
+        syncCardSize.cancel();
+      };
+    } else {
+      cleanupResize = (): void => {
+        syncCardSize.cancel();
+      };
+    }
   }
   cleanupFns.push(() => cleanupResize());
 
