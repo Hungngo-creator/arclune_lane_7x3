@@ -16,6 +16,7 @@ beforeEach(() => {
 describe('renderMainMenuView', () => {
   it('khởi tạo giao diện menu chính và gắn callback Coming Soon', () => {
     const root = document.createElement('div');
+    root.classList.add('app--pve');
     document.body.appendChild(root);
 
     const sections: MenuSection[] = [
@@ -64,6 +65,8 @@ describe('renderMainMenuView', () => {
 
     expect(view).not.toBeNull();
     expect(root.querySelector('.main-menu-v2')).not.toBeNull();
+    expect(root.classList.contains('app--main-menu')).toBe(true);
+    expect(root.classList.contains('app--pve')).toBe(false);
 
     const buttons = root.querySelectorAll('.mode-card');
     expect(buttons).toHaveLength(2);
@@ -77,6 +80,8 @@ describe('renderMainMenuView', () => {
     expect(onShowComingSoon).toHaveBeenCalledWith(expect.objectContaining({ key: 'pvp-mode' }));
 
     view?.destroy();
+    expect(root.classList.contains('app--main-menu')).toBe(false);
+    expect(root.classList.contains('app--pve')).toBe(true);
   });
 });
 
