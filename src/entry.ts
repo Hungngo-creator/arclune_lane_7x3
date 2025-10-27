@@ -105,6 +105,7 @@ const LINEUP_SCREEN_MODULE_ID = '@screens/lineup/index.ts' as const;
 const APP_SCREEN_CLASSES = [
   `app--${SCREEN_MAIN_MENU}`,
   `app--${SCREEN_PVE}`,
+  'app--pve',
   `app--${SCREEN_COLLECTION}`,
   `app--${SCREEN_LINEUP}`
 ];
