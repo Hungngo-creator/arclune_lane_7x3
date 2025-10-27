@@ -1,4 +1,4 @@
-import type { UnitArt } from '../../types/art.ts';
+import type { UnitArt } from '@types/art';
 
 export type HeroCue = 'intro' | 'hover' | 'tap' | 'sensitive' | 'idle';
 
