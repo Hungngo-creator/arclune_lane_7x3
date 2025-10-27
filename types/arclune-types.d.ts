@@ -1,13 +1,14 @@
 declare module '@types/vfx' {
-  export type * from '../src/types/vfx';
+  export type * from '../src/types/vfx.ts';
 }
 
 declare module '@types/config' {
-  export { CatalogStatBlock, RosterUnitDefinition } from '../src/types/config.ts';
+  export type { CatalogStatBlock, RosterUnitDefinition } from '../src/types/config.ts';
 }
 
 declare module '@types/units' {
-  export { UnitId } from '../src/types/units.ts';
+  export type * from '../src/types/units.ts';
+  export { createSummonQueue } from '../src/types/units.ts';
 }
 
 declare module 'zod' {
