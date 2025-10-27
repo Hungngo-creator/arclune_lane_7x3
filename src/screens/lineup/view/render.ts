@@ -1,6 +1,6 @@
 import { getSkillSet } from '../../../data/skills.ts';
 import { createNumberFormatter } from '../../../utils/format.ts';
-import { assertElement, ensureStyleTag, mountSection } from '../../../../ui/dom.ts';
+import { assertElement, ensureStyleTag, mountSection } from '../../../ui/dom.ts';
 import { normalizeCurrencyBalances } from '@types/currency';
 import {
   normalizeRoster,
