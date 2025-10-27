@@ -15,7 +15,8 @@ export function assertElement<TElement extends Element>(
     ? options
     : options?.message ?? DEFAULT_ASSERT_MESSAGE;
   const guard = typeof options === 'object' && options ? options.guard : undefined;
-  if (!(value instanceof Element)){
+  const ElementConstructor = typeof Element === 'undefined' ? undefined : Element;
+  if (!ElementConstructor || !(value instanceof ElementConstructor)){
     throw new Error(message);
   }
   if (guard && !guard(value)){
