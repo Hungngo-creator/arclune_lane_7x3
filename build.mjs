@@ -17,6 +17,9 @@ const DIST_DIR = path.join(__dirname, 'dist');
 const ENTRY_ID = './entry.ts';
 const SOURCE_EXTENSIONS = ['.js', '.ts', '.tsx', '.json'];
 const SCRIPT_EXTENSIONS = new Set(['.js', '.ts', '.tsx']);
+const STUB_MODULE_SPECIFIERS = new Map([
+  ['zod', path.join(__dirname, 'tools/zod-stub/index.js')],
+]);
 function normalizeModuleId(id){
   if (!id){
     return id;
@@ -159,6 +162,11 @@ function toModuleId(filePath){
 }
 
 function resolveImport(fromId, specifier){
+  const stubPath = STUB_MODULE_SPECIFIERS.get(specifier);
+  if (stubPath){
+    const stubModuleId = toModuleId(stubPath);
+    return applyLegacyModuleAlias(stubModuleId);
+  }
   const aliasResolved = resolveAlias(specifier);
   if (aliasResolved){
     return applyLegacyModuleAlias(aliasResolved);
@@ -524,6 +532,28 @@ async function build(){
     }
     const transformed = transformModule(sourceCode, id);
     modules.push({ id, code: transformed });
+  }
+
+for (const [, stubPath] of STUB_MODULE_SPECIFIERS){
+    const moduleId = toModuleId(stubPath);
+    if (modules.some((mod) => mod.id === moduleId)){
+      continue;
+    }
+    const raw = await fs.readFile(stubPath, 'utf8');
+    const ext = path.extname(stubPath);
+    let sourceCode = raw;
+    if (SCRIPT_EXTENSIONS.has(ext)){
+      const loader = ext === '.ts' ? 'ts' : ext === '.tsx' ? 'tsx' : 'js';
+      const { code } = await esbuild.transform(raw, {
+        loader,
+        format: ESBUILD_BASE_OPTIONS.format,
+        target: ESBUILD_BASE_OPTIONS.target,
+        sourcemap: ESBUILD_BASE_OPTIONS.sourcemap,
+      });
+      sourceCode = code;
+    }
+    const transformed = transformModule(sourceCode, moduleId);
+    modules.push({ id: moduleId, code: transformed });
   }
 
   await fs.mkdir(DIST_DIR, { recursive: true });
