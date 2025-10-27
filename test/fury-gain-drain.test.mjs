@@ -189,3 +189,11 @@ test('trừ nộ dựa base + % và khóa tổng 40 mỗi kỹ năng, bỏ qua f
   assert.equal(skip, 0);
   assert.equal(fresh.fury, 50);
 });
+
+test('giữ nguyên rage dạng chuỗi số khi đồng bộ', async () => {
+  const { ensureAlias } = await furyHarnessPromise;
+  const unit = { id: 'string-rage', rage: '42', fury: undefined };
+  ensureAlias(unit);
+  assert.equal(unit.fury, 42);
+  assert.equal(unit.rage, 42);
+});
