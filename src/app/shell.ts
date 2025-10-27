@@ -31,12 +31,23 @@ export interface CreateAppShellOptions {
 
 const DEFAULT_SCREEN = 'main-menu';
 
+function cloneParams(params: ScreenParams | null): ScreenParams | null {
+  if (params === null) {
+    return null;
+  }
+
+  const cloned = { ...params };
+  return Object.freeze(cloned);
+}
+
 function cloneState(state: AppShellState): Readonly<AppShellState> {
-  return {
+  const snapshot: AppShellState = {
     screen: state.screen,
     activeSession: state.activeSession,
-    screenParams: state.screenParams,
+    screenParams: cloneParams(state.screenParams),
   };
+  
+  return Object.freeze(snapshot);
 }
 
 function normalizeScreen(screen: string | null | undefined): string {
@@ -50,7 +61,39 @@ function normalizeParams(params: ScreenParams | null | undefined): ScreenParams 
   if (params === null || params === undefined) {
     return null;
   }
-  return params;
+  
+  return cloneParams(params);
+}
+
+function areParamsShallowEqual(
+  current: ScreenParams | null,
+  next: ScreenParams | null
+): boolean {
+  if (current === next) {
+    return true;
+  }
+
+  if (current === null || next === null) {
+    return false;
+  }
+
+  const currentKeys = Object.keys(current);
+  const nextKeys = Object.keys(next);
+
+  if (currentKeys.length !== nextKeys.length) {
+    return false;
+  }
+
+  for (const key of currentKeys) {
+    if (!Object.prototype.hasOwnProperty.call(next, key)) {
+      return false;
+    }
+    if (current[key] !== next[key]) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 function normalizeSession(session: unknown | null | undefined): unknown | null {
@@ -114,10 +157,10 @@ export function createAppShell(options: CreateAppShellOptions = {}): AppShell {
       changed = true;
     }
 
-    const normalizedParams = normalizeParams(params);
+    const nextParams = params ?? null;
 
-    if (state.screenParams !== normalizedParams) {
-      state.screenParams = normalizedParams;
+    if (!areParamsShallowEqual(state.screenParams, nextParams)) {
+      state.screenParams = normalizeParams(nextParams);
       changed = true;
     }
 
@@ -184,4 +227,4 @@ export function createAppShell(options: CreateAppShellOptions = {}): AppShell {
   };
 
   return api;
-    }
+}
