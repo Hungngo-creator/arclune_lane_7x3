@@ -1,7 +1,7 @@
 import { readFile } from 'fs/promises';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import typescript from 'typescript';
+import typescript from 'typescript-transpiler';
 
 const projectRoot = path.resolve(process.cwd());
 let cachedTsCompilerOptions;
