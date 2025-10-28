@@ -10,6 +10,7 @@ const stubs = [
   { name: 'zod', source: join(projectRoot, 'tools', 'zod-stub') },
   { name: 'esbuild', source: join(projectRoot, 'tools', 'esbuild-stub') },
   { name: 'tsx', source: join(projectRoot, 'tools', 'tsx-stub') },
+  { name: 'typescript-transpiler', source: join(projectRoot, 'tools', 'typescript-transpiler') },
 ];
 
 function ensureDirectory(targetPath) {
