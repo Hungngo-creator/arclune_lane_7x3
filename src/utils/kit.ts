@@ -356,7 +356,7 @@ export function getSummonSpec(metaOrKit: KitMeta | KitData | null | undefined): 
     } else if (ult.metadata?.summon){
       spec = cloneShallow(ult.metadata.summon);
     } else if (ult.meta?.summon){
-      spec = cloneShallow(ult.meta.summon);;
+      spec = cloneShallow(ult.meta.summon);
     }
   }
 
