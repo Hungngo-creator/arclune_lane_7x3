@@ -1,28 +1,43 @@
 const path = require('path');
-const typescript = require('typescript');
 
-const DEFAULT_TARGET = typescript.ScriptTarget.ES2023;
+let cachedTypescript;
 
-function mapScriptTarget(target){
+function loadTypescript(){
+  if (cachedTypescript){
+    return cachedTypescript;
+  }
+  try {
+    cachedTypescript = require('typescript');
+    return cachedTypescript;
+  } catch (error){
+    const message = 'TypeScript loader requires the "typescript" package. Please run "npm install" (or install devDependencies) before building.';
+    const err = new Error(message);
+    err.cause = error;
+    throw err;
+  }
+}
+
+function mapScriptTarget(ts, target){
+  const defaultTarget = ts.ScriptTarget.ES2023;
   if (!target){
-    return DEFAULT_TARGET;
+    return defaultTarget;
   }
   const normalized = String(target).toLowerCase();
   const mapping = {
-    es3: typescript.ScriptTarget.ES3,
-    es5: typescript.ScriptTarget.ES5,
-    es2015: typescript.ScriptTarget.ES2015,
-    es2016: typescript.ScriptTarget.ES2016,
-    es2017: typescript.ScriptTarget.ES2017,
-    es2018: typescript.ScriptTarget.ES2018,
-    es2019: typescript.ScriptTarget.ES2019,
-    es2020: typescript.ScriptTarget.ES2020,
-    es2021: typescript.ScriptTarget.ES2021,
-    es2022: typescript.ScriptTarget.ES2022,
-    es2023: typescript.ScriptTarget.ES2023,
-    esnext: typescript.ScriptTarget.ESNext,
+    es3: ts.ScriptTarget.ES3,
+    es5: ts.ScriptTarget.ES5,
+    es2015: ts.ScriptTarget.ES2015,
+    es2016: ts.ScriptTarget.ES2016,
+    es2017: ts.ScriptTarget.ES2017,
+    es2018: ts.ScriptTarget.ES2018,
+    es2019: ts.ScriptTarget.ES2019,
+    es2020: ts.ScriptTarget.ES2020,
+    es2021: ts.ScriptTarget.ES2021,
+    es2022: ts.ScriptTarget.ES2022,
+    es2023: ts.ScriptTarget.ES2023,
+    esnext: ts.ScriptTarget.ESNext,
   };
-  return mapping[normalized] ?? DEFAULT_TARGET;
+  return mapping[normalized] ?? defaultTarget;
 }
 
 function shouldGenerateSourceMap(sourcemap){
@@ -52,9 +67,10 @@ async function transform(code, options = {}){
   const { loader, target, sourcemap, sourcefile } = options;
   const generateMap = shouldGenerateSourceMap(sourcemap);
   if (loader === 'ts' || loader === 'tsx'){
+    const typescript = loadTypescript();
     const compilerOptions = {
       module: typescript.ModuleKind.ESNext,
-      target: mapScriptTarget(target),
+      target: mapScriptTarget(typescript, target),
       sourceMap: generateMap && sourcemap !== 'inline',
       inlineSourceMap: sourcemap === 'inline',
       inlineSources: Boolean(sourcemap),
