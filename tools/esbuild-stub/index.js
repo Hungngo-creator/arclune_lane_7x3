@@ -1,6 +1,7 @@
 const path = require('path');
 
 let cachedTypescript;
+const TYPESCRIPT_INSTALL_ERROR = 'TypeScript loader requires the "typescript" package. Please install it (for example, "npm install typescript") before building.';
 
 function loadTypescript(){
   if (cachedTypescript){
@@ -10,8 +11,7 @@ function loadTypescript(){
     cachedTypescript = require('typescript');
     return cachedTypescript;
   } catch (error){
-    const message = 'TypeScript loader requires the "typescript" package. Please run "npm install" (or install devDependencies) before building.';
-    const err = new Error(message);
+    const err = new Error(TYPESCRIPT_INSTALL_ERROR);
     err.cause = error;
     throw err;
   }
@@ -68,6 +68,9 @@ async function transform(code, options = {}){
   const generateMap = shouldGenerateSourceMap(sourcemap);
   if (loader === 'ts' || loader === 'tsx'){
     const typescript = loadTypescript();
+    if (!typescript){
+      throw new Error(TYPESCRIPT_INSTALL_ERROR);
+    }
     const compilerOptions = {
       module: typescript.ModuleKind.ESNext,
       target: mapScriptTarget(typescript, target),
