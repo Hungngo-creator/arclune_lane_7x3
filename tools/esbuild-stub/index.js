@@ -1,62 +1,67 @@
 const path = require('path');
 
-const initializationError = () => new Error('esbuild stub initialization cycle');
-const exported = {
-  transform(){
-    return Promise.reject(initializationError());
-  },
-  transformSync(){
-    throw initializationError();
-  },
-  build(){
-    return Promise.reject(initializationError());
-  },
-};
-module.exports = exported;
-
-const {
-  transpileModule,
-  ModuleKind,
-  ScriptTarget,
-  DiagnosticCategory,
-  JsxEmit,
-  flattenDiagnosticMessageText,
-} = require('typescript-transpiler');
-
-function mapScriptTarget(target){
-  const defaultTarget = ScriptTarget.ES2023;
-  if (!target){
-    return defaultTarget;
-  }
-  const normalized = String(target).toLowerCase();
-  const mapping = {
-    es3: ScriptTarget.ES3,
-    es5: ScriptTarget.ES5,
-    es2015: ScriptTarget.ES2015,
-    es2016: ScriptTarget.ES2016,
-    es2017: ScriptTarget.ES2017,
-    es2018: ScriptTarget.ES2018,
-    es2019: ScriptTarget.ES2019,
-    es2020: ScriptTarget.ES2020,
-    es2021: ScriptTarget.ES2021,
-    es2022: ScriptTarget.ES2022,
-    es2023: ScriptTarget.ES2023,
-    esnext: ScriptTarget.ESNext,
-  };
-  return mapping[normalized] ?? defaultTarget;
+function initializationError() {
+  return new Error('esbuild stub initialization cycle');
 }
 
-function shouldGenerateSourceMap(sourcemap){
-  if (!sourcemap){
-    return false;
-  }
-  if (sourcemap === 'inline' || sourcemap === 'both' || sourcemap === 'external'){
-    return true;
-  }
-  return Boolean(sourcemap);
+function stripImportTypeStatements(code) {
+  return code.replace(/^\s*import\s+type\s+[^;]+;?\s*$/gm, '');
 }
 
-function createIdentitySourceMap(code, sourcefile = '<stdin>'){
+function stripTypeAndInterfaceDeclarations(code) {
+  let result = code;
+  result = result.replace(/^\s*export\s+type\s+[A-Za-z0-9_<>,\s]+\s*=\s*{[\s\S]*?};?\s*(?:\r?\n)?/gm, '');
+  result = result.replace(/^\s*export\s+type\s+[^{=;\n]+=[^;\n]+;?\s*$/gm, '');
+  result = result.replace(/^\s*type\s+[A-Za-z0-9_<>,\s]+\s*=\s*{[\s\S]*?};?\s*(?:\r?\n)?/gm, '');
+  result = result.replace(/^\s*type\s+[^;=\n]+=[^;\n]+;?\s*$/gm, '');
+  result = result.replace(/^\s*declare\s+[^;]+;?\s*$/gm, '');
+  result = result.replace(/^\s*interface\s+[^{]+{[\s\S]*?^\s*}\s*$/gm, '');
+  return result;
+}
+
+function stripImplementsAndModifiers(code) {
+  return code
+    .replace(/\s+implements\s+[^{]+(?={)/g, '')
+    .replace(/\breadonly\s+/g, '')
+    .replace(/\bpublic\s+/g, '')
+    .replace(/\bprivate\s+/g, '')
+    .replace(/\bprotected\s+/g, '')
+    .replace(/\babstract\s+/g, '');
+}
+
+function stripGenerics(code) {
+  return code
+    .replace(/([A-Za-z0-9_])<[^>]+>(?=\s*\()/g, '$1')
+    .replace(/new\s+([A-Za-z0-9_$.]+)<[^>]+>/g, 'new $1');
+}
+
+function stripTypeAnnotations(code) {
+  // Remove type annotations that appear after identifiers or destructured bindings.
+  return code
+    .replace(/(?<=[A-Za-z0-9_\]\}])\s*:\s*(?!['"{\[])([^=;,){}\]]+)(?=\s*(?:[=;,){}\]]|=>))/g, ' ')
+    .replace(/(?<=\))\s*:\s*([^=;,){}\]]+)(?=\s*(?:{\s|=>|{))/g, '')
+    .replace(/\)\s*:\s*([^=;,){}\]]+)(?=\s*=>)/g, ') =>');
+}
+
+function stripAssertions(code) {
+  return code
+    .replace(/\s+as\s+[^;\n,)]+/g, '')
+    .replace(/\s+satisfies\s+[^;\n,)]+/g, '')
+    .replace(/([A-Za-z0-9_\]])!\b/g, '$1');
+}
+
+function simpleTsTransform(code) {
+  let result = code;
+  result = stripImportTypeStatements(result);
+  result = stripTypeAndInterfaceDeclarations(result);
+  result = stripImplementsAndModifiers(result);
+  result = stripGenerics(result);
+  result = stripTypeAnnotations(result);
+  result = stripAssertions(result);
+  return result;
+}
+
+function createIdentitySourceMap(code, sourcefile = '<stdin>') {
   return JSON.stringify({
     version: 3,
     sources: [sourcefile],
@@ -66,34 +71,22 @@ function createIdentitySourceMap(code, sourcefile = '<stdin>'){
   });
 }
 
-function performTransform(code, options = {}){
-  if (typeof code !== 'string'){
+function performTransform(code, options = {}) {
+  if (typeof code !== 'string') {
     throw new TypeError('esbuild stub transform expects code string');
   }
-  const { loader, target, sourcemap, sourcefile } = options;
-  const generateMap = shouldGenerateSourceMap(sourcemap);
-  if (loader === 'ts' || loader === 'tsx'){
-    const compilerOptions = {
-      module: ModuleKind.ESNext,
-      target: mapScriptTarget(target),
-      sourceMap: generateMap && sourcemap !== 'inline',
-      inlineSourceMap: sourcemap === 'inline',
-      inlineSources: Boolean(sourcemap),
-      jsx: loader === 'tsx' ? JsxEmit.Preserve : undefined,
-    };
-    const transpileResult = transpileModule(code, { compilerOptions, fileName: sourcefile });
-    const diagnostics = transpileResult.diagnostics || [];
-    const errors = diagnostics.filter((diag) => diag.category === DiagnosticCategory.Error);
-    if (errors.length > 0){
-      const message = errors.map((diag) => flattenDiagnosticMessageText(diag.messageText, '\n')).join('\n');
-      throw new Error(`Internal TypeScript transpiler failure: ${message}`);
-    }
+  const { loader, sourcemap, sourcefile } = options;
+  const generateMap = Boolean(sourcemap);
+
+  if (loader === 'ts' || loader === 'tsx') {
+    const transformed = simpleTsTransform(code);
     return {
-      code: transpileResult.outputText,
-      map: transpileResult.sourceMapText ?? null,
+      code: transformed,
+      map: generateMap ? createIdentitySourceMap(transformed, sourcefile) : null,
       warnings: [],
     };
   }
+
   return {
     code,
     map: generateMap ? createIdentitySourceMap(code, sourcefile) : null,
@@ -101,34 +94,28 @@ function performTransform(code, options = {}){
   };
 }
 
- async function transform(code, options = {}){
+ async function transform(code, options = {}) {
   return performTransform(code, options);
 }
 
-function transformSync(code, options = {}){
+function transformSync(code, options = {}) {
   return performTransform(code, options);
 }
 
-async function build(options = {}){
+async function build(options = {}) {
   const { stdin, write = true, metafile } = options;
-  if (!stdin || typeof stdin.contents !== 'string'){
-    throw new Error('esbuild stub build currently only supports stdin.contents');
+  if (!stdin || typeof stdin.contents !== 'string') {
+    throw initializationError();
   }
-  if (write){
-    throw new Error('esbuild stub build does not support write=true');
+  if (write) {
+    throw initializationError();
   }
   const text = stdin.contents;
-  let transformed;
-  try {
-    transformed = await transform(text, {
-      loader: stdin.loader,
-      target: options.target,
-      sourcemap: options.sourcemap,
-      sourcefile: stdin.sourcefile,
-    });
-  } catch (err){
-    throw new Error(err?.message || 'esbuild stub transform failed');
-  }
+  const transformed = await transform(text, {
+    loader: stdin.loader,
+    sourcemap: options.sourcemap,
+    sourcefile: stdin.sourcefile,
+  });
   const outputText = transformed.code;
   const outputPath = options.outfile
     ? options.outfile
@@ -136,12 +123,14 @@ async function build(options = {}){
       ? path.join(options.outdir, stdin.sourcefile || 'stdin.js')
       : stdin.sourcefile || '<stdout>';
   const buffer = Buffer.from(outputText, 'utf8');
-  const outputFiles = [{
-    path: outputPath,
-    text: outputText,
-    contents: buffer,
-  }];
-  if (transformed.map && options.sourcemap === 'external'){
+  const outputFiles = [
+    {
+      path: outputPath,
+      text: outputText,
+      contents: buffer,
+    },
+  ];
+  if (transformed.map && options.sourcemap === 'external') {
     const mapPath = `${outputPath}.map`;
     outputFiles.push({
       path: mapPath,
@@ -153,7 +142,7 @@ async function build(options = {}){
     outputFiles,
     warnings: [],
   };
-  if (metafile){
+  if (metafile) {
     const inputPath = stdin.sourcefile || '<stdin>';
     result.metafile = {
       inputs: {
@@ -176,6 +165,8 @@ async function build(options = {}){
   return result;
 }
 
-exported.transform = transform;
-exported.transformSync = transformSync;
-exported.build = build;
+module.exports = {
+  transform,
+  transformSync,
+  build,
+};
