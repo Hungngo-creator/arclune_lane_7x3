@@ -13,7 +13,7 @@ import type { Side } from '@types/units';
 }
 
 declare module '../engine.ts' {
-  export * from './engine.ts';;
+  export * from './engine.ts';
 }
 
 declare module './statuses.ts' {
