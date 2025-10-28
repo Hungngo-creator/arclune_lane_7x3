@@ -1,64 +1,8 @@
 const path = require('path');
+const ts = require('typescript-transpiler');
 
 function initializationError() {
   return new Error('esbuild stub initialization cycle');
-}
-
-function stripImportTypeStatements(code) {
-  return code.replace(/^\s*import\s+type\s+[^;]+;?\s*$/gm, '');
-}
-
-function stripTypeAndInterfaceDeclarations(code) {
-  let result = code;
-  result = result.replace(/^\s*export\s+type\s+[A-Za-z0-9_<>,\s]+\s*=\s*{[\s\S]*?};?\s*(?:\r?\n)?/gm, '');
-  result = result.replace(/^\s*export\s+type\s+[^{=;\n]+=[^;\n]+;?\s*$/gm, '');
-  result = result.replace(/^\s*type\s+[A-Za-z0-9_<>,\s]+\s*=\s*{[\s\S]*?};?\s*(?:\r?\n)?/gm, '');
-  result = result.replace(/^\s*type\s+[^;=\n]+=[^;\n]+;?\s*$/gm, '');
-  result = result.replace(/^\s*declare\s+[^;]+;?\s*$/gm, '');
-  result = result.replace(/^\s*interface\s+[^{]+{[\s\S]*?^\s*}\s*$/gm, '');
-  return result;
-}
-
-function stripImplementsAndModifiers(code) {
-  return code
-    .replace(/\s+implements\s+[^{]+(?={)/g, '')
-    .replace(/\breadonly\s+/g, '')
-    .replace(/\bpublic\s+/g, '')
-    .replace(/\bprivate\s+/g, '')
-    .replace(/\bprotected\s+/g, '')
-    .replace(/\babstract\s+/g, '');
-}
-
-function stripGenerics(code) {
-  return code
-    .replace(/([A-Za-z0-9_])<[^>]+>(?=\s*\()/g, '$1')
-    .replace(/new\s+([A-Za-z0-9_$.]+)<[^>]+>/g, 'new $1');
-}
-
-function stripTypeAnnotations(code) {
-  // Remove type annotations that appear after identifiers or destructured bindings.
-  return code
-    .replace(/(?<=[A-Za-z0-9_\]\}])\s*:\s*(?!['"{\[])([^=;,){}\]]+)(?=\s*(?:[=;,){}\]]|=>))/g, ' ')
-    .replace(/(?<=\))\s*:\s*([^=;,){}\]]+)(?=\s*(?:{\s|=>|{))/g, '')
-    .replace(/\)\s*:\s*([^=;,){}\]]+)(?=\s*=>)/g, ') =>');
-}
-
-function stripAssertions(code) {
-  return code
-    .replace(/\s+as\s+[^;\n,)]+/g, '')
-    .replace(/\s+satisfies\s+[^;\n,)]+/g, '')
-    .replace(/([A-Za-z0-9_\]])!\b/g, '$1');
-}
-
-function simpleTsTransform(code) {
-  let result = code;
-  result = stripImportTypeStatements(result);
-  result = stripTypeAndInterfaceDeclarations(result);
-  result = stripImplementsAndModifiers(result);
-  result = stripGenerics(result);
-  result = stripTypeAnnotations(result);
-  result = stripAssertions(result);
-  return result;
 }
 
 function createIdentitySourceMap(code, sourcefile = '<stdin>') {
@@ -79,22 +23,72 @@ function performTransform(code, options = {}) {
   const generateMap = Boolean(sourcemap);
 
   if (loader === 'ts' || loader === 'tsx') {
-    const transformed = simpleTsTransform(code);
+    const compilerOptions = {
+      module: ts.ModuleKind.ESNext,
+      target: ts.ScriptTarget.ES2019,
+      sourceMap: generateMap,
+    };
+    if (loader === 'tsx') {
+      compilerOptions.jsx = ts.JsxEmit.React;
+    }
+    const fileName = sourcefile || (loader === 'tsx' ? 'stdin.tsx' : 'stdin.ts');
+    const transpileResult = ts.transpileModule(code, {
+      compilerOptions,
+      fileName,
+      reportDiagnostics: true,
+    });
+    const warnings = (transpileResult.diagnostics || []).map((diagnostic) => {
+      const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
+      let location = null;
+      if (diagnostic.file && typeof diagnostic.start === 'number') {
+        const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(
+          diagnostic.start
+        );
+        location = {
+          file: diagnostic.file.fileName,
+          line: line + 1,
+          column: character + 1,
+        };
+      } else if (sourcefile) {
+        location = {
+          file: sourcefile,
+          line: 1,
+          column: 1,
+        };
+      }
+      return {
+        text: message,
+        level: diagnostic.category === ts.DiagnosticCategory.Error ? 'error' : 'warning',
+        location,
+      };
+    });
+    let outputCode = transpileResult.outputText;
+    const mapText = generateMap ? transpileResult.sourceMapText || null : null;
+    if (mapText && sourcemap === 'inline') {
+      const inlineComment = `\n//# sourceMappingURL=data:application/json;base64,${Buffer.from(mapText, 'utf8').toString('base64')}`;
+      outputCode += inlineComment;
+    }
     return {
-      code: transformed,
-      map: generateMap ? createIdentitySourceMap(transformed, sourcefile) : null,
-      warnings: [],
+      code: outputCode,
+      map: mapText,
+      warnings,
     };
   }
 
+  const mapText = generateMap ? createIdentitySourceMap(code, sourcefile) : null;
+  let outputCode = code;
+  if (mapText && sourcemap === 'inline') {
+    const inlineComment = `\n//# sourceMappingURL=data:application/json;base64,${Buffer.from(mapText, 'utf8').toString('base64')}`;
+    outputCode += inlineComment;
+  }
   return {
-    code,
-    map: generateMap ? createIdentitySourceMap(code, sourcefile) : null,
+    code: outputCode,
+    map: mapText,
     warnings: [],
   };
 }
 
- async function transform(code, options = {}) {
+async function transform(code, options = {}) {
   return performTransform(code, options);
 }
 
@@ -140,7 +134,7 @@ async function build(options = {}) {
   }
   const result = {
     outputFiles,
-    warnings: [],
+    warnings: transformed.warnings || [],
   };
   if (metafile) {
     const inputPath = stdin.sourcefile || '<stdin>';
