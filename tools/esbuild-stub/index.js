@@ -1,5 +1,19 @@
 const path = require('path');
 
+const initializationError = () => new Error('esbuild stub initialization cycle');
+const exported = {
+  transform(){
+    return Promise.reject(initializationError());
+  },
+  transformSync(){
+    throw initializationError();
+  },
+  build(){
+    return Promise.reject(initializationError());
+  },
+};
+module.exports = exported;
+
 const {
   transpileModule,
   ModuleKind,
@@ -52,7 +66,7 @@ function createIdentitySourceMap(code, sourcefile = '<stdin>'){
   });
 }
 
-async function transform(code, options = {}){
+function performTransform(code, options = {}){
   if (typeof code !== 'string'){
     throw new TypeError('esbuild stub transform expects code string');
   }
@@ -87,7 +101,15 @@ async function transform(code, options = {}){
   };
 }
 
- async function build(options = {}){
+ async function transform(code, options = {}){
+  return performTransform(code, options);
+}
+
+function transformSync(code, options = {}){
+  return performTransform(code, options);
+}
+
+async function build(options = {}){
   const { stdin, write = true, metafile } = options;
   if (!stdin || typeof stdin.contents !== 'string'){
     throw new Error('esbuild stub build currently only supports stdin.contents');
@@ -154,4 +176,6 @@ async function transform(code, options = {}){
   return result;
 }
 
-module.exports = { transform, build };
+exported.transform = transform;
+exported.transformSync = transformSync;
+exported.build = build;
