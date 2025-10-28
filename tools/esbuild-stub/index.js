@@ -1,5 +1,12 @@
 const path = require('path');
-const ts = require('typescript-transpiler');
+let ts;
+
+function getTypeScriptTranspiler() {
+  if (!ts) {
+    ts = require('typescript-transpiler');
+  }
+  return ts;
+}
 
 function initializationError() {
   return new Error('esbuild stub initialization cycle');
@@ -23,6 +30,7 @@ function performTransform(code, options = {}) {
   const generateMap = Boolean(sourcemap);
 
   if (loader === 'ts' || loader === 'tsx') {
+    const ts = getTypeScriptTranspiler();
     const compilerOptions = {
       module: ts.ModuleKind.ESNext,
       target: ts.ScriptTarget.ES2019,
@@ -164,3 +172,5 @@ module.exports = {
   transformSync,
   build,
 };
+
+module.exports.__arcStub = true;
