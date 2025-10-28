@@ -4,7 +4,7 @@ export type ZodRawShape = { [key: string]: ZodTypeAny };
 declare type OutputOf<T extends ZodTypeAny> = T extends ZodType<infer Output> ? Output : never;
 
 export class ZodType<Output> {
-  protected _output!: Output;
+  protected _output: Output;
   parse(value: unknown): Output;
   optional(): ZodOptional<Output>;
 }
