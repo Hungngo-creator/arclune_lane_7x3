@@ -102,6 +102,55 @@ class ZodArray extends ZodType {
   }
 }
 
+class ZodUnion extends ZodType {
+  constructor(options) {
+    super();
+    if (!Array.isArray(options) || options.length === 0) {
+      throw new TypeError('ZodUnion requires a non-empty array of options');
+    }
+    this.options = [...options];
+  }
+
+  _parse(value) {
+    let lastError;
+    for (const option of this.options) {
+      try {
+        return option.parse(value);
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error));
+      }
+    }
+    if (lastError) {
+      throw lastError;
+    }
+    throw new TypeError('Invalid union: no options matched');
+  }
+}
+
+class ZodTuple extends ZodType {
+  constructor(items) {
+    super();
+    if (!Array.isArray(items)) {
+      throw new TypeError('ZodTuple requires an array of items');
+    }
+    this.items = [...items];
+  }
+
+  _parse(value) {
+    if (!Array.isArray(value)) {
+      throw new TypeError('Expected array for tuple');
+    }
+    if (value.length !== this.items.length) {
+      throw new TypeError(`Expected tuple of length ${this.items.length}`);
+    }
+    const result = new Array(this.items.length);
+    for (let index = 0; index < this.items.length; index += 1) {
+      result[index] = this.items[index].parse(value[index]);
+    }
+    return result;
+  }
+}
+
 class ZodRecord extends ZodType {
   constructor(valueSchema) {
     super();
@@ -163,7 +212,9 @@ export const z = {
   enum: (values) => new ZodEnum(values),
   object: (shape) => new ZodObject(shape),
   array: (schema) => new ZodArray(schema),
-  record: (schema) => new ZodRecord(schema)
+  record: (schema) => new ZodRecord(schema),
+  union: (schemas) => new ZodUnion(schemas),
+  tuple: (schemas) => new ZodTuple(schemas)
 };
 
 export {
@@ -175,6 +226,8 @@ export {
   ZodLiteral,
   ZodEnum,
   ZodArray,
+  ZodUnion,
+  ZodTuple,
   ZodRecord,
   ZodObject
 };

@@ -31,6 +31,14 @@ export class ZodArray<Item extends ZodTypeAny> extends ZodType<Array<OutputOf<It
   constructor(item: Item);
 }
 
+export class ZodUnion<Options extends [ZodTypeAny, ...ZodTypeAny[]]> extends ZodType<OutputOf<Options[number]>> {
+  constructor(options: Options);
+}
+
+export class ZodTuple<Items extends readonly ZodTypeAny[]> extends ZodType<{ [K in keyof Items]: Items[K] extends ZodTypeAny ? OutputOf<Items[K]> : never }> {
+  constructor(items: Items);
+}
+
 export class ZodRecord<Value extends ZodTypeAny> extends ZodType<Record<string, OutputOf<Value>>> {
   constructor(value: Value);
 }
@@ -50,6 +58,8 @@ export const z: {
   object<Shape extends ZodRawShape>(shape: Shape): ZodObject<Shape>;
   array<Item extends ZodTypeAny>(schema: Item): ZodArray<Item>;
   record<Value extends ZodTypeAny>(schema: Value): ZodRecord<Value>;
+  union<Options extends [ZodTypeAny, ...ZodTypeAny[]]>(schemas: Options): ZodUnion<Options>;
+  tuple<Items extends readonly ZodTypeAny[]>(schemas: Items): ZodTuple<Items>;
 };
 
 export type infer<T extends ZodTypeAny> = T extends ZodType<infer Output> ? Output : never;
