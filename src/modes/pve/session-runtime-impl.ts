@@ -1298,7 +1298,7 @@ function init(): boolean {
     canvasClickHandler = null;
   }
   canvasClickHandler = (ev: MouseEvent): void => {
-    if (!canvas || !Game.grid) return;;
+    if (!canvas || !Game.grid) return;
     const rect = canvas.getBoundingClientRect();
     const p = { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
     const cell = hitToCellOblique(Game.grid, p.x, p.y, CAM_PRESET);
