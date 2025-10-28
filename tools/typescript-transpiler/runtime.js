@@ -7,4 +7,8 @@ module.exports = {
   JsxEmit: ts.JsxEmit,
   DiagnosticCategory: ts.DiagnosticCategory,
   flattenDiagnosticMessageText: ts.flattenDiagnosticMessageText,
+  findConfigFile: ts.findConfigFile,
+  readConfigFile: ts.readConfigFile,
+  parseJsonConfigFileContent: ts.parseJsonConfigFileContent,
+  sys: ts.sys,
 };
