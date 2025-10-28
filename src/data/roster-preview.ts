@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { loadConfig } from './load-config.ts';
 import { CLASS_BASE, RANK_MULT, ROSTER } from '../catalog.ts';
+import rawRosterPreviewConfig from './roster-preview.config.ts';
 
 import type {
   CatalogStatBlock,
@@ -16,10 +16,7 @@ const RosterPreviewConfigSchema = z.object({
   precision: z.record(z.number())
 });
 
-const rosterPreviewConfig = await loadConfig(
-  new URL('./roster-preview.config.ts', import.meta.url),
-  RosterPreviewConfigSchema
-);
+const rosterPreviewConfig = RosterPreviewConfigSchema.parse(rawRosterPreviewConfig);
 
 // Talent Point (TP) deltas documented trong "ý tưởng nhân vật v3.txt".
 export const TP_DELTA: Readonly<Record<string, number>> = Object.freeze({

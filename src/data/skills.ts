@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { loadConfig } from './load-config.ts';
 import { ROSTER } from '../catalog.ts';
+import rawSkillSetsConfig from './skills.config.ts';
 
 import type { UnknownRecord } from '@types/common';
 import type { UnitId } from '@types/units';
@@ -73,10 +73,8 @@ type RawSkillSet = Readonly<
 const RawSkillSetSchema = z.object({
   unitId: z.string()
 });
-const rawSkillSets = await loadConfig(
-  new URL('./skills.config.ts', import.meta.url),
-  z.array(RawSkillSetSchema)
-) as ReadonlyArray<RawSkillSet>;
+const RawSkillSetListSchema = z.array(RawSkillSetSchema);
+const rawSkillSets = RawSkillSetListSchema.parse(rawSkillSetsConfig) as ReadonlyArray<RawSkillSet>;
 
 const SKILL_KEYS = ['basic', 'skill', 'skills', 'ult', 'talent', 'technique', 'notes'] as const satisfies ReadonlyArray<keyof SkillEntry | 'skill'>;
 

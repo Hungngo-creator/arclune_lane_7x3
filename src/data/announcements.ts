@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { loadConfig } from './load-config.ts';
 import { CURRENCY_IDS, convertCurrency, formatBalance, getLotterySplit } from './economy.ts';
+import rawAnnouncementsConfig from './announcements.config.ts';
 
 import type {
   AnnouncementEntry,
@@ -40,10 +40,7 @@ const TT_CONVERSION_CHAIN = [
   formatBalance(convertCurrency(1, CURRENCY_IDS.TT, CURRENCY_IDS.VNT), CURRENCY_IDS.VNT)
 ].join(' = ');
 
-const announcementConfig = await loadConfig(
-  new URL('./announcements.config.ts', import.meta.url),
-  AnnouncementsConfigSchema
-);
+const announcementConfig = AnnouncementsConfigSchema.parse(rawAnnouncementsConfig);
 
 const MACROS: Readonly<Record<string, string>> = Object.freeze({
   LOTTERY_PRIZE_PERCENT: `${LOTTERY_PRIZE_PERCENT}`,

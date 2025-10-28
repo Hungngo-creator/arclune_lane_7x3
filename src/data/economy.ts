@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { HAS_INTL_NUMBER_FORMAT, createNumberFormatter } from '../utils/format.ts';
-import { loadConfig } from './load-config.ts';
+import rawEconomyConfig from './economy.config.ts';
 
 import type {
   CurrencyDefinition,
@@ -60,10 +60,7 @@ const EconomyConfigSchema = z.object({
   lotterySplit: LotterySplitSchema
 });
 
-const economyConfig = await loadConfig(
-  new URL('./economy.config.ts', import.meta.url),
-  EconomyConfigSchema
-);
+const economyConfig = EconomyConfigSchema.parse(rawEconomyConfig);
 
 for (const [tier, entry] of Object.entries(economyConfig.pityConfig)){
   if (entry.tier !== tier){

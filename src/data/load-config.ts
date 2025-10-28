@@ -1,15 +1,9 @@
-export async function loadConfig<T>(
-  resource: URL | string,
-  schema: { parse(input: unknown): T }
-): Promise<T> {
-  const target = resource instanceof URL ? resource : new URL(resource, import.meta.url);
+export function loadConfig<T>(rawConfig: unknown, schema: { parse(input: unknown): T }): T {
   try {
-    const module = await import(target.href);
-    const value = 'default' in module ? module.default : module;
-    return schema.parse(value);
+    return schema.parse(rawConfig);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    throw new Error(`Không thể tải cấu hình từ ${target.href}: ${message}`, {
+    throw new Error(`Không thể tải cấu hình: ${message}`, {
       cause: error instanceof Error ? error : undefined
     });
   }
