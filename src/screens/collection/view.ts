@@ -740,7 +740,7 @@ const overlayDetailPanel = document.createElement('aside');
   tabsTitle.textContent = 'Danh sách tab';
   tabs.appendChild(tabsTitle);
 
-  const tabButtons = new Map<CollectionTabKey, HTMLButtonElement>();;
+  const tabButtons = new Map<CollectionTabKey, HTMLButtonElement>();
 
   const setActiveTab = (key: CollectionTabKey) => {
     updateActiveTab(filterState, key);
