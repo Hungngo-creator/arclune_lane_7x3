@@ -3,7 +3,7 @@ const assert = require('assert/strict');
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
-const ts = require('typescript');
+const ts = require('typescript-transpiler');
 
 function loadShell(){
   const filePath = path.resolve(__dirname, '../src/app/shell.ts');
