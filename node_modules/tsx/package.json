@@ -1,0 +1,9 @@
+{
+  "name": "tsx",
+  "version": "4.7.1",
+  "description": "Lightweight tsx stub for offline execution",
+  "main": "bin.js",
+  "bin": {
+    "tsx": "bin.js"
+  }
+}
