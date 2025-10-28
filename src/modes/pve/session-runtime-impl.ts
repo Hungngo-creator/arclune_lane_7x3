@@ -1236,7 +1236,7 @@ function init(): boolean {
     hudCleanup = null;
   }
   hud = initHUD(doc, root ?? undefined);
-  hudCleanup = hud ? () => hud.cleanup() : null;;
+  hudCleanup = hud ? () => hud.cleanup() : null;
   resize();
   if (Game.grid) spawnLeaders(Game.tokens, Game.grid);
 
