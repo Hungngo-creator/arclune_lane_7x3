@@ -2,7 +2,8 @@
 
 ## Cài đặt phụ thuộc
 1. Cài đặt Node.js phiên bản mới nhất.
-2. Chạy lệnh `npm install` tại thư mục gốc để tải `typescript`, `ts-node`, `jest`, `ts-jest`, `@types/jest` cùng các phụ thuộc cần thiết.
+2. Nếu môi trường không cho phép tạo symlink (ví dụ Windows không bật Developer Mode), tạo hoặc cập nhật tệp `.npmrc` tại thư mục gốc với cấu hình `install-links=false` rồi chạy `npm install`. Thiết lập này buộc npm sao chép gói stub thay vì liên kết tượng trưng, giúp quá trình cài đặt hoàn tất.
+3. Chạy lệnh `npm install` tại thư mục gốc để tải `typescript`, `ts-node`, `jest`, `ts-jest`, `@types/jest` cùng các phụ thuộc cần thiết.
 
 ## Build bundle
 - `npm run build:dev` hoặc `npm run build:prod` sẽ tạo `dist/app.js` và xuất thêm báo cáo `dist/build-report.json` chứa metafile của esbuild.
