@@ -336,6 +336,19 @@ function transformModule(code, id){
     }
     return lines.join('\n');
   });
+  
+  const reExportAllRegex = /export\s*\*\s*from\s*['\"](.+?)['\"];?/g;
+  code = code.replace(reExportAllRegex, (match, source) => {
+    const depId = resolveImport(id, source.trim());
+    const moduleVar = `__reexport${depIndex++}`;
+    const lines = [`const ${moduleVar} = __require('${depId}');`,
+      `for (const key of Object.keys(${moduleVar})) {`,
+      `  if (key === 'default') continue;`,
+      `  if (Object.prototype.hasOwnProperty.call(exports, key)) continue;`,
+      `  exports[key] = ${moduleVar}[key];`,
+      `}`];
+    return lines.join('\n');
+  });
 
   const importRegex = /import\s*([\s\S]*?)\s*from\s*['\"](.+?)['\"];?/g;
   const importTypeRegex = /import\s+type\s+([\s\S]*?)\s*from\s*['\"](.+?)['\"];?/g;
@@ -436,7 +449,7 @@ const exportDefaultNamedFunctionRegex = /export\s+default\s+function\s+([A-Za-z0
 
   const footerLines = exportsAssignments
     .filter((item, index, arr) => index === arr.findIndex((it) => it.alias === item.alias))
-    .map(({ alias, expr }) => `exports.${alias} = ${expr};`);
+    .map(({ alias, expr }) => `if (!Object.prototype.hasOwnProperty.call(exports, '${alias}')) exports.${alias} = ${expr};`);
     
  if (exportsAssignments.some((item) => item.alias === 'default')){
     footerLines.push('module.exports.default = exports.default;');
