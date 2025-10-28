@@ -32,7 +32,8 @@
       ],
       "@types/config": ["src/types/config.ts"],
       "@types/units": ["src/types/units.ts"],
-      "@types/*": ["src/types/*"]
+      "@types/*": ["src/types/*"],
+      "zod": ["tools/zod-stub/index.d.ts"]
     }
   },
   "include": ["src/**/*", "types/**/*"]

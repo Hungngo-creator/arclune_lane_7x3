@@ -6,26 +6,23 @@
     "build": "npm run build:prod",
     "build:dev": "node tools/generate-loithienanh-svg.mjs && node build.mjs --mode=development",
     "build:prod": "node tools/generate-loithienanh-svg.mjs && node build.mjs --mode=production",
-    "dev": "APP_ENTRY=${APP_ENTRY:-src/main.ts} tsx watch $APP_ENTRY",
-    "start": "NODE_ENV=${NODE_ENV:-production} APP_ENTRY=${APP_ENTRY:-src/main.ts} tsx $APP_ENTRY",
+    "dev": "APP_ENTRY=${APP_ENTRY:-src/main.ts} node tools/tsx-stub/bin.js watch $APP_ENTRY",
+    "start": "NODE_ENV=${NODE_ENV:-production} APP_ENTRY=${APP_ENTRY:-src/main.ts} node tools/tsx-stub/bin.js $APP_ENTRY",
     "test": "jest --runInBand",
     "ci": "npm run typecheck && npm test && npm run build",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "postinstall": "node tools/install-stubs.mjs"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
-  "dependencies": {
-    "zod": "file:tools/zod-stub"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/jest": "^29.5.12",
-    "esbuild": "file:tools/esbuild-stub",
     "jest": "^29.7.0",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
-    "tsx": "file:tools/tsx-stub",
     "typescript": "^5.4.0"
   }
 }

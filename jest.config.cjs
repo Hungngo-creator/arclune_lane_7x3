@@ -1,6 +1,10 @@
 const { pathsToModuleNameMapper } = require('ts-jest');
 const { compilerOptions } = require('./tsconfig.base.json');
 
+const aliasMapper = pathsToModuleNameMapper(compilerOptions.paths || {}, {
+  prefix: '<rootDir>/',
+});
+
 module.exports = {
   testEnvironment: 'node',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
@@ -14,7 +18,8 @@ module.exports = {
       },
     ],
   },
-  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths || {}, {
-    prefix: '<rootDir>/',
-  }),
+  moduleNameMapper: {
+    ...aliasMapper,
+    '^zod$': '<rootDir>/tools/zod-stub/index.js',
+  },
 };
