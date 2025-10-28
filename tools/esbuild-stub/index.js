@@ -1,41 +1,33 @@
 const path = require('path');
 
-let cachedTypescript;
-const TYPESCRIPT_INSTALL_ERROR = 'TypeScript loader requires the "typescript" package. Please install it (for example, "npm install typescript") before building.';
+const {
+  transpileModule,
+  ModuleKind,
+  ScriptTarget,
+  DiagnosticCategory,
+  JsxEmit,
+  flattenDiagnosticMessageText,
+} = require('typescript-transpiler');
 
-function loadTypescript(){
-  if (cachedTypescript){
-    return cachedTypescript;
-  }
-  try {
-    cachedTypescript = require('typescript');
-    return cachedTypescript;
-  } catch (error){
-    const err = new Error(TYPESCRIPT_INSTALL_ERROR);
-    err.cause = error;
-    throw err;
-  }
-}
-
-function mapScriptTarget(ts, target){
-  const defaultTarget = ts.ScriptTarget.ES2023;
+function mapScriptTarget(target){
+  const defaultTarget = ScriptTarget.ES2023;
   if (!target){
     return defaultTarget;
   }
   const normalized = String(target).toLowerCase();
   const mapping = {
-    es3: ts.ScriptTarget.ES3,
-    es5: ts.ScriptTarget.ES5,
-    es2015: ts.ScriptTarget.ES2015,
-    es2016: ts.ScriptTarget.ES2016,
-    es2017: ts.ScriptTarget.ES2017,
-    es2018: ts.ScriptTarget.ES2018,
-    es2019: ts.ScriptTarget.ES2019,
-    es2020: ts.ScriptTarget.ES2020,
-    es2021: ts.ScriptTarget.ES2021,
-    es2022: ts.ScriptTarget.ES2022,
-    es2023: ts.ScriptTarget.ES2023,
-    esnext: ts.ScriptTarget.ESNext,
+    es3: ScriptTarget.ES3,
+    es5: ScriptTarget.ES5,
+    es2015: ScriptTarget.ES2015,
+    es2016: ScriptTarget.ES2016,
+    es2017: ScriptTarget.ES2017,
+    es2018: ScriptTarget.ES2018,
+    es2019: ScriptTarget.ES2019,
+    es2020: ScriptTarget.ES2020,
+    es2021: ScriptTarget.ES2021,
+    es2022: ScriptTarget.ES2022,
+    es2023: ScriptTarget.ES2023,
+    esnext: ScriptTarget.ESNext,
   };
   return mapping[normalized] ?? defaultTarget;
 }
@@ -67,24 +59,20 @@ async function transform(code, options = {}){
   const { loader, target, sourcemap, sourcefile } = options;
   const generateMap = shouldGenerateSourceMap(sourcemap);
   if (loader === 'ts' || loader === 'tsx'){
-    const typescript = loadTypescript();
-    if (!typescript){
-      throw new Error(TYPESCRIPT_INSTALL_ERROR);
-    }
     const compilerOptions = {
-      module: typescript.ModuleKind.ESNext,
-      target: mapScriptTarget(typescript, target),
+      module: ModuleKind.ESNext,
+      target: mapScriptTarget(target),
       sourceMap: generateMap && sourcemap !== 'inline',
       inlineSourceMap: sourcemap === 'inline',
       inlineSources: Boolean(sourcemap),
-      jsx: loader === 'tsx' ? typescript.JsxEmit.Preserve : undefined,
+      jsx: loader === 'tsx' ? JsxEmit.Preserve : undefined,
     };
-    const transpileResult = typescript.transpileModule(code, { compilerOptions, fileName: sourcefile });
+    const transpileResult = transpileModule(code, { compilerOptions, fileName: sourcefile });
     const diagnostics = transpileResult.diagnostics || [];
-    const errors = diagnostics.filter((diag) => diag.category === typescript.DiagnosticCategory.Error);
+    const errors = diagnostics.filter((diag) => diag.category === DiagnosticCategory.Error);
     if (errors.length > 0){
-      const message = errors.map((diag) => typescript.flattenDiagnosticMessageText(diag.messageText, '\n')).join('\n');
-      throw new Error(`TypeScript transpile failed: ${message}`);
+      const message = errors.map((diag) => flattenDiagnosticMessageText(diag.messageText, '\n')).join('\n');
+      throw new Error(`Internal TypeScript transpiler failure: ${message}`);
     }
     return {
       code: transpileResult.outputText,
