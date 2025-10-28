@@ -9,23 +9,32 @@ try {
   realTypescript = null;
 }
 
- if (realTypescript && typeof realTypescript.transpileModule === "function") {
-  module.exports = {
-    transpileModule: realTypescript.transpileModule,
-    ModuleKind: realTypescript.ModuleKind,
-    ScriptTarget: realTypescript.ScriptTarget,
-    JsxEmit: realTypescript.JsxEmit,
-    DiagnosticCategory: realTypescript.DiagnosticCategory,
-    flattenDiagnosticMessageText: realTypescript.flattenDiagnosticMessageText,
-    findConfigFile: realTypescript.findConfigFile,
-    readConfigFile: realTypescript.readConfigFile,
-    parseJsonConfigFileContent: realTypescript.parseJsonConfigFileContent,
-    sys: realTypescript.sys,
-  };
+ let ModuleKind;
+let ScriptTarget;
+let JsxEmit;
+let DiagnosticCategory;
+let flattenDiagnosticMessageText;
+let transpileModule;
+let findConfigFile;
+let readConfigFile;
+let parseJsonConfigFileContent;
+let sys;
+
+if (realTypescript && typeof realTypescript.transpileModule === "function") {
+  ModuleKind = realTypescript.ModuleKind;
+  ScriptTarget = realTypescript.ScriptTarget;
+  JsxEmit = realTypescript.JsxEmit;
+  DiagnosticCategory = realTypescript.DiagnosticCategory;
+  flattenDiagnosticMessageText = realTypescript.flattenDiagnosticMessageText;
+  transpileModule = realTypescript.transpileModule;
+  findConfigFile = realTypescript.findConfigFile;
+  readConfigFile = realTypescript.readConfigFile;
+  parseJsonConfigFileContent = realTypescript.parseJsonConfigFileContent;
+  sys = realTypescript.sys;
 } else {
   const esbuild = require("esbuild");
 
-  const ModuleKind = Object.freeze({
+  ModuleKind = Object.freeze({
     None: "none",
     CommonJS: "commonjs",
     ES2015: "esm",
@@ -33,7 +42,7 @@ try {
     ES2022: "esm",
     ESNext: "esm",
   });
-  const ScriptTarget = Object.freeze({
+  ScriptTarget = Object.freeze({
     ES3: "es2015",
     ES5: "es2015",
     ES2015: "es2015",
@@ -46,7 +55,7 @@ try {
     ES2022: "es2022",
     ESNext: "esnext",
   });
-  const JsxEmit = Object.freeze({
+  JsxEmit = Object.freeze({
     None: "none",
     Preserve: "preserve",
     React: "transform",
@@ -54,30 +63,23 @@ try {
     ReactJSX: "automatic",
     ReactJSXDev: "automatic",
   });
-  const DiagnosticCategory = Object.freeze({
+  DiagnosticCategory = Object.freeze({
     Warning: 0,
     Error: 1,
     Suggestion: 2,
     Message: 3,
   });
-  function flattenDiagnosticMessageText(message) {
-    if (message == null) {
-      return "";
-    }
-    return Array.isArray(message) ? message.join(String.fromCharCode(10)) : String(message);
-  }
-function mapTarget(tsTarget) {
-    return ScriptTarget[tsTarget] || "esnext";
-  }
-  function mapModule(tsModule) {
+
+const mapTarget = (tsTarget) => ScriptTarget[tsTarget] || "esnext";
+  const mapModule = (tsModule) => {
     switch (tsModule) {
       case ModuleKind.CommonJS:
         return "cjs";
       default:
         return "esm";
     }
-  }
-  function mapJsx(tsJsx) {
+  };
+  const mapJsx = (tsJsx) => {
     switch (tsJsx) {
       case JsxEmit.Preserve:
         return "preserve";
@@ -90,8 +92,16 @@ function mapTarget(tsTarget) {
       default:
         return "none";
     }
-  }
-  function transpileModule(input, options = {}) {
+  };
+
+  flattenDiagnosticMessageText = (message) => {
+    if (message == null) {
+      return "";
+    }
+    return Array.isArray(message) ? message.join(String.fromCharCode(10)) : String(message);
+  };
+
+  transpileModule = (input, options = {}) => {
     const compilerOptions = options.compilerOptions || {};
     const format = mapModule(compilerOptions.module);
     const target = mapTarget(compilerOptions.target);
@@ -109,7 +119,7 @@ function mapTarget(tsTarget) {
       diagnostics: [],
       sourceMapText: result.map || undefined,
     };
-  }
+  };
 
   const defaultSys = {
     fileExists(fileName) {
@@ -128,7 +138,7 @@ function mapTarget(tsTarget) {
     },
   };
 
-  function findConfigFile(searchPath, fileExists = defaultSys.fileExists, configName = "tsconfig.json") {
+  findConfigFile = (searchPath, fileExists = defaultSys.fileExists, configName = "tsconfig.json") => {
     let current = searchPath;
     while (true) {
       const candidate = path.join(current, configName);
@@ -141,9 +151,9 @@ function mapTarget(tsTarget) {
       }
       current = parent;
     }
-  }
+  };
 
-  function readConfigFile(fileName, readFile = defaultSys.readFile) {
+  readConfigFile = (fileName, readFile = defaultSys.readFile) => {
     try {
       const text = readFile(fileName);
       const config = JSON.parse(text);
@@ -158,9 +168,9 @@ function mapTarget(tsTarget) {
         },
       };
     }
-  }
+  };
 
-  function parseJsonConfigFileContent(json, host = defaultSys, basePath = process.cwd()) {
+  parseJsonConfigFileContent = (json, host = defaultSys, basePath = process.cwd()) => {
     const effectiveHost = host || defaultSys;
     const compilerOptions = { ...(json && json.compilerOptions ? json.compilerOptions : {}) };
     const files = Array.isArray(json && json.files)
@@ -178,18 +188,20 @@ function mapTarget(tsTarget) {
       fileNames: files,
       errors: [],
     };
-  }
+};
 
-  module.exports = {
-    transpileModule,
-    ModuleKind,
-    ScriptTarget,
-    JsxEmit,
-    DiagnosticCategory,
-    flattenDiagnosticMessageText,
-    findConfigFile,
-    readConfigFile,
-    parseJsonConfigFileContent,
-    sys: defaultSys,
-  };
+sys = defaultSys;
 }
+
+module.exports = {
+  transpileModule,
+  ModuleKind,
+  ScriptTarget,
+  JsxEmit,
+  DiagnosticCategory,
+  flattenDiagnosticMessageText,
+  findConfigFile,
+  readConfigFile,
+  parseJsonConfigFileContent,
+  sys,
+};
