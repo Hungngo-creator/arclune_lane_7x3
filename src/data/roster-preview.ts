@@ -83,7 +83,7 @@ export function applyRankMultiplier(preRank: CatalogStatBlock, rank: keyof typeo
   const out: CatalogStatBlock = { ...preRank };
   for (const [stat, value] of Object.entries(preRank) as Array<[string, number]>) {
     if (stat === 'SPD') {
-      out[stat] = roundStat(stat, value ?? 0);;
+      out[stat] = roundStat(stat, value ?? 0);
       continue;
     }
     out[stat] = roundStat(stat, (value ?? 0) * multiplier);
