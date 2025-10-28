@@ -147,4 +147,4 @@ try {
   console.warn(`Failed to download TypeScript runtime: ${(error && error.message) || error}`);
   await writeFile(outputPath, FALLBACK_RUNTIME, 'utf8');
   console.log(`Wrote fallback runtime to ${outputPath}`);
-  }
+}
