@@ -2,6 +2,8 @@ import { describe, expect, it } from '@jest/globals';
 import { z } from 'zod';
 
 import { loadConfig } from '../src/data/load-config.ts';
+import rawSampleConfig from './helpers/sample-config.ts';
+import rawInvalidConfig from './helpers/sample-config-invalid.ts';
 
 const SampleSchema = z.object({
   name: z.string(),
@@ -10,11 +12,8 @@ const SampleSchema = z.object({
 });
 
 describe('loadConfig helper', () => {
-  it('tải cấu hình hợp lệ và trả về dữ liệu đã kiểm chứng', async () => {
-    const config = await loadConfig(
-      new URL('./helpers/sample-config.ts', import.meta.url),
-      SampleSchema
-    );
+  it('tải cấu hình hợp lệ và trả về dữ liệu đã kiểm chứng', () => {
+    const config = loadConfig(rawSampleConfig, SampleSchema);
 
     expect(config).toEqual({
       name: 'demo-config',
@@ -23,9 +22,7 @@ describe('loadConfig helper', () => {
     });
   });
 
-  it('ném lỗi khi dữ liệu không khớp schema', async () => {
-    await expect(
-      loadConfig(new URL('./helpers/sample-config-invalid.ts', import.meta.url), SampleSchema)
-    ).rejects.toThrow(/Không thể tải cấu hình/);
+  it('ném lỗi khi dữ liệu không khớp schema', () => {
+    expect(() => loadConfig(rawInvalidConfig, SampleSchema)).toThrow(/Không thể tải cấu hình/);
   });
 });
