@@ -8,7 +8,7 @@ try {
   const imported = await import('esbuild');
   esbuild = imported?.default ?? imported;
 } catch (err) {
-  const fallback = await import('./tools/esbuild-stub/index.ts');
+  const fallback = await import('./tools/esbuild-stub/index.js');
   esbuild = fallback?.default ?? fallback;
   console.warn('Sử dụng esbuild fallback từ tools/esbuild-stub do không thể tải gói esbuild chuẩn:', err?.message || err);
 }
