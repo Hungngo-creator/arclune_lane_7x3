@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const vm = require('vm');
-const ts = require('typescript');
+const ts = require('typescript-transpiler');
 
 const ROOT_DIR = path.resolve(__dirname, '..', '..');
 const SRC_DIR = path.join(ROOT_DIR, 'src');
