@@ -10,7 +10,10 @@ class ZodError extends TypeError {
     const message = formatIssueMessage(firstIssue);
     super(message);
     this.name = 'ZodError';
-    this.issues = issues.map((issue) => ({ ...issue, path: [...issue.path] }));
+    this.issues = issues.map((issue) => ({
+      ...issue,
+      path: Array.isArray(issue.path) ? [...issue.path] : []
+    }));
   }
 }
 
