@@ -49,7 +49,7 @@ function loadUiModule(deps){
     "const { assertElement } = __deps['./ui/dom.ts'];"
   );
   code = code.replace(
-    "import type { HudHandles, SummonBarCard, SummonBarHandles, SummonBarOptions } from '@types/ui';\n\n",
+    "import type { HudHandles, SummonBarCard, SummonBarHandles, SummonBarOptions } from '@shared-types/ui';\n\n",
     ''
   );
   code = code.replace(/import type [^;]+;\n*/g, '');
