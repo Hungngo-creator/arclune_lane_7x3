@@ -451,7 +451,7 @@ function pickFunctionFromSource(source: unknown, preferredKeys: ReadonlyArray<st
   if (!source) return null;
 
   if (typeof source === 'function'){
-    return source;
+    return source as AnyFunction;
   }
 
   if (source && typeof source === 'object'){
