@@ -1,5 +1,5 @@
-import type { CreateSessionOptions, SessionState } from '@types/pve';
-import type { GameConfig } from '@types/config';
+import type { CreateSessionOptions, SessionState } from '@shared-types/pve';
+import type { GameConfig } from '@shared-types/config';
 import type { GameEventHandler, GameEventType } from './events.ts';
 import { addGameEventListener } from './events.ts';
 

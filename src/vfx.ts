@@ -9,9 +9,9 @@ import { safeNow } from './utils/time.ts';
 import loithienanhAnchors from './data/vfx_anchors/loithienanh.json';
 import { parseVfxAnchorDataset } from './data/vfx_anchors/schema';
 
-import type { SessionState } from '@types/combat';
-import type { Side, UnitToken } from '@types/units';
-import type { VfxAnchorDataset } from '@types/vfx';
+import type { SessionState } from '@shared-types/combat';
+import type { Side, UnitToken } from '@shared-types/units';
+import type { VfxAnchorDataset } from '@shared-types/vfx';
 
 type GridSpec = Parameters<typeof projectCellOblique>[0];
 type CameraOptions = Parameters<typeof projectCellOblique>[3];

@@ -1,4 +1,4 @@
-import type { SceneTheme } from '@types/config';
+import type { SceneTheme } from '@shared-types/config';
 
 type SceneGrid = {
   cols: number;

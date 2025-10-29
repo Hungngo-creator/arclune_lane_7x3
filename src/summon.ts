@@ -5,9 +5,9 @@ import { getUnitArt } from './art.ts';
 import { kitSupportsSummon } from './utils/kit.ts';
 import { prepareUnitForPassives, applyOnSpawnEffects } from './passives.ts';
 
-import type { SessionState } from '@types/combat';
-import type { ActionChainEntry, Side, SummonRequest, UnitToken } from '@types/units';
-import type { TurnContext, TurnHooks } from '@types/turn-order';
+import type { SessionState } from '@shared-types/combat';
+import type { ActionChainEntry, Side, SummonRequest, UnitToken } from '@shared-types/units';
+import type { TurnContext, TurnHooks } from '@shared-types/turn-order';
 
 type SummonChainHooks = Pick<TurnHooks, 'allocIid' | 'doActionOrSkip' | 'performUlt' | 'getTurnOrderIndex'>;
 

@@ -7,9 +7,9 @@ import {
 } from './catalog.ts';
 import { extractOnSpawnRage, kitSupportsSummon } from './utils/kit.ts';
 
-import type { CatalogStatBlock } from '@types/config';
-import type { MetaEntry } from '@types/pve';
-import type { UnitId } from '@types/units';
+import type { CatalogStatBlock } from '@shared-types/config';
+import type { MetaEntry } from '@shared-types/pve';
+import type { UnitId } from '@shared-types/units';
 
 type MetaId = UnitId | string | null | undefined;
 

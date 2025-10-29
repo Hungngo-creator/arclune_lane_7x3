@@ -7,7 +7,7 @@ import type {
   BackgroundFallback,
   BackgroundPalette,
   BackgroundPropConfig,
-} from '@types/config';
+} from '@shared-types/config';
 
 type GridSpec = Parameters<typeof projectCellOblique>[0];
 type CameraOptions = Parameters<typeof projectCellOblique>[3];

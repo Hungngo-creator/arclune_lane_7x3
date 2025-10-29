@@ -6,7 +6,7 @@ import type {
   ChibiProportions,
   GameConfig,
   SceneTheme,
-} from '@types/config';
+} from '@shared-types/config';
 
 const daylightTheme = {
   sky: {

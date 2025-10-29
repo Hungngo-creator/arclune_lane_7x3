@@ -6,9 +6,9 @@ import { CFG } from './config.ts';
 import { gainFury, startFurySkill, finishFuryHit } from './utils/fury.ts';
 import { safeNow } from './utils/time.ts';
 
-import type { SessionState } from '@types/combat';
-import type { UnitToken } from '@types/units';
-import type { GameConfig } from '@types/config';
+import type { SessionState } from '@shared-types/combat';
+import type { UnitToken } from '@shared-types/units';
+import type { GameConfig } from '@shared-types/config';
 
 type TargetableGameState = SessionState | { tokens: ReadonlyArray<UnitToken> };
 

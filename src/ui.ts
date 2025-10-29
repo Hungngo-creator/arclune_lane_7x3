@@ -10,7 +10,7 @@ import {
 import type { GameEventDetail, GameEventType } from './events.ts';
 import { assertElement } from './ui/dom.ts';
 
-import type { HudHandles, SummonBarCard, SummonBarHandles, SummonBarOptions } from '@types/ui';
+import type { HudHandles, SummonBarCard, SummonBarHandles, SummonBarOptions } from '@shared-types/ui';
 
 type HudGameLike = { cost?: number | null; costCap?: number | null } | null | undefined;
 

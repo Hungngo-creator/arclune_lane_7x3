@@ -3,8 +3,8 @@ import type {
   BattleDetail,
   BattleResult,
   SessionState,
-} from '@types/combat';
-import type { Side, UnitToken } from '@types/units';
+} from '@shared-types/combat';
+import type { Side, UnitToken } from '@shared-types/units';
 
 export interface TurnEventDetail {
   game: SessionState;

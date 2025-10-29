@@ -13,9 +13,9 @@ import { safeNow } from './utils/time.ts';
 import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } from './utils/fury.ts';
 import { nextTurnInterleaved } from './turns/interleaved.ts';
 
-import type { ActionChainProcessedResult, SessionState } from '@types/combat';
-import type { QueuedSummonRequest, Side, UnitToken } from '@types/units';
-import type { InterleavedState, InterleavedTurnState, QueuedSummonEntry, SequentialTurnState, TurnContext, TurnHooks } from '@types/turn-order';
+import type { ActionChainProcessedResult, SessionState } from '@shared-types/combat';
+import type { QueuedSummonRequest, Side, UnitToken } from '@shared-types/units';
+import type { InterleavedState, InterleavedTurnState, QueuedSummonEntry, SequentialTurnState, TurnContext, TurnHooks } from '@shared-types/turn-order';
 
 interface SpawnResult {
   actor: UnitToken | null;

@@ -1,7 +1,7 @@
 import { TOKEN_STYLE, CHIBI, CFG } from './config.ts';
 import { getUnitArt, getUnitSkin } from './art.ts';
-import type { UnitToken, QueuedSummonState, QueuedSummonRequest, Side } from '@types/units';
-import type { UnitArt } from '@types/art';
+import type { UnitToken, QueuedSummonState, QueuedSummonRequest, Side } from '@shared-types/units';
+import type { UnitArt } from '@shared-types/art';
 
 type GridSpec = {
   cols: number;

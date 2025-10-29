@@ -2,8 +2,8 @@ import { applyDamage } from './combat.ts';
 import { gainFury, finishFuryHit } from './utils/fury.ts';
 import { safeNow } from './utils/time.ts';
 
-import type { DamageContext, StatusEffect, StatusRegistry } from '@types/combat';
-import type { UnitToken } from '@types/units';
+import type { DamageContext, StatusEffect, StatusRegistry } from '@shared-types/combat';
+import type { UnitToken } from '@shared-types/units';
 
 interface ShieldResult {
   remain: number;

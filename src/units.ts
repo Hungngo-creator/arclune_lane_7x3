@@ -1,4 +1,4 @@
-import type { UnitId } from '@types/units';
+import type { UnitId } from '@shared-types/units';
 
 export interface UnitDefinition {
   id: UnitId;

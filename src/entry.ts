@@ -1,7 +1,7 @@
 import { createAppShell } from './app/shell.ts';
 import { renderMainMenuView } from './screens/main-menu/view/index.ts';
 import { MODES, MODE_GROUPS, MODE_STATUS, getMenuSections } from './data/modes.ts';
-import type { ModeConfig, ModeGroup, ModeShellConfig } from '@types/config';
+import type { ModeConfig, ModeGroup, ModeShellConfig } from '@shared-types/config';
 import type { MenuCardMetadata, MenuSection, MenuSectionEntry } from './screens/main-menu/types.ts';
 import type { LineupViewHandle } from './screens/lineup/view/index.ts';
 
