@@ -56,11 +56,21 @@ export async function load(url, context, defaultLoad) {
           compilerOptions.jsx = compilerOptions.jsx ?? typescript.JsxEmit.ReactJSX;
         }
 
-        const transpiled = typescript.transpileModule(source, {
-          compilerOptions,
-          fileName: filename,
-          reportDiagnostics: false,
-        });
+        let transpiled;
+        try {
+          transpiled = typescript.transpileModule(source, {
+            compilerOptions,
+            fileName: filename,
+            reportDiagnostics: false,
+          });
+        } catch (err) {
+          if (err && err.code === 'MISSING_TYPESCRIPT_RUNTIME') {
+            throw new Error(
+              'tsx stub: thiếu thư viện TypeScript thật. Sao chép node_modules/typescript từ môi trường đã cài đặt hoặc kết nối mạng để chạy npm install.',
+            );
+          }
+          throw err;
+        }
 
         return {
           format: 'module',
