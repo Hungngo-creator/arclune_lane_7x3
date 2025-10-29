@@ -1,199 +1,135 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="320" height="400" viewBox="0 0 320 400">
-  <title>LA_base — Lôi Thiên Ảnh (semi-real 2D concept)</title>
-  <desc>Base layered SVG for rigging: head, torso, 2 arms, 2 legs, with FX groups. Size 320x400. Normal attack is punch; spear omitted.</desc>
+  <title>LA_base_v2 — Lôi Thiên Ảnh (semi-real 2D concept)</title>
+  <desc>Improved human proportions. Layers: head, torso, arm_front, arm_back, leg_front, leg_back, plus FX groups. No spear; punch basic.</desc>
 
-  <!-- =========================
-       Palette & Global Styles
-       ========================= -->
   <defs>
-    <!-- Color tokens -->
-    <linearGradient id="metalGrad" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="gradMetal" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#8bd1ff"/>
       <stop offset="55%" stop-color="#c7f1ff"/>
       <stop offset="100%" stop-color="#9acfff"/>
     </linearGradient>
-
-    <linearGradient id="darkSteel" x1="0" y1="0" x2="0" y2="1">
+    <linearGradient id="gradSteel" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#163044"/>
       <stop offset="100%" stop-color="#0f1f2c"/>
     </linearGradient>
-
-    <radialGradient id="skinGlow" cx="50%" cy="40%" r="70%">
-      <stop offset="0%" stop-color="#f4fbff" stop-opacity="1"/>
-      <stop offset="65%" stop-color="#d9f2ff" stop-opacity="0.95"/>
-      <stop offset="100%" stop-color="#cbe7ff" stop-opacity="0.9"/>
+    <radialGradient id="gradSkin" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#d1e8ff" stop-opacity="1"/>
+      <stop offset="75%" stop-color="#cbe7ff" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#b7daff" stop-opacity="0.9"/>
     </radialGradient>
-
     <filter id="fxSoftGlow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
-      <feColorMatrix type="matrix" values="
-        1 0 0 0 0
-        0 1 0 0 0
-        0 0 1 0 0
-        0 0 0 1 0" result="color"/>
-      <feBlend in="blur" in2="SourceGraphic" mode="screen"/>
+      <feGaussianBlur stdDeviation="3"/>
+      <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0"/>
     </filter>
-
     <filter id="heatDistort" x="-50%" y="-50%" width="200%" height="200%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.006" numOctaves="2" seed="3" result="noise"/>
-      <feDisplacementMap in="SourceGraphic" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.006" numOctaves="2" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="4" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
-
-    <!-- Electric arc symbol for reuse -->
     <symbol id="arcSmall" viewBox="0 0 40 40">
-      <path d="M5 22 L18 16 L14 24 L30 18 L22 28" fill="none" stroke="#a6ecff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M6 22 L18 16 L15 24 L30 18 L22 28" fill="none" stroke="#a6ecff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </symbol>
   </defs>
 
-  <style>
-    <![CDATA[
-      .outline { stroke: #1e3e53; stroke-width: 1.5; }
-      .outline-thin { stroke: #1e3e53; stroke-width: 1; }
-      .no-stroke { stroke: none; }
-      .fx-glow { filter: url(#fxSoftGlow); opacity: 0.75; }
-      .fx-heat { filter: url(#heatDistort); opacity: 0.4; mix-blend-mode: soft-light; }
-      .fx-ult  { opacity: 0.0; mix-blend-mode: screen; }
-      /* Idle breathing sway (subtle) */
-      @keyframes breathe {
-        0%   { transform: translateY(0px); }
-        50%  { transform: translateY(-1.2px); }
-        100% { transform: translateY(0px); }
-      }
-      /* Glow pulse for lôi văn */
-      @keyframes glowPulse {
-        0% { opacity: 0.55; }
-        50% { opacity: 0.85; }
-        100% { opacity: 0.55; }
-      }
-      /* Apply subtle idle to cape/torso if needed */
-      #LA_TORSO, #LA_HEAD { animation: breathe 2.8s ease-in-out infinite; }
-      #LA_FX_GLOW { animation: glowPulse 2.5s ease-in-out infinite; }
-    ]]>
-  </style>
+  <style><![CDATA[
+    .ol { stroke:#1e3e53; stroke-width:1.3; }
+    .ol2 { stroke:#1e3e53; stroke-width:1; }
+    .ns { stroke:none; }
+    .fx-glow { filter:url(#fxSoftGlow); opacity:0.75; }
+    .fx-heat { filter:url(#heatDistort); opacity:0.35; mix-blend-mode:soft-light; }
+    .fx-ult  { opacity:0.0; mix-blend-mode:screen; }
+    @keyframes breathe { 0%{transform:translateY(0)} 50%{transform:translateY(-1.2px)} 100%{transform:translateY(0)} }
+    @keyframes glowPulse { 0%{opacity:0.55} 50%{opacity:0.85} 100%{opacity:0.55} }
+    #LA_TORSO, #LA_HEAD { animation:breathe 2.8s ease-in-out infinite; }
+    #LA_FX_GLOW { animation:glowPulse 2.5s ease-in-out infinite; }
+  ]]></style>
 
-  <!-- =========== FX Layers (behind/over) =========== -->
-  <!-- Heat haze behind the body (default visible but subtle) -->
-  <g id="LA_FX_HEAT" class="fx-heat" data-pivot="160,200" style="display:inline">
-    <ellipse cx="160" cy="210" rx="120" ry="160" fill="#8bd1ff" opacity="0.08"/>
+  <!-- heat halo -->
+  <g id="LA_FX_HEAT" class="fx-heat" data-pivot="160,200">
+    <ellipse cx="160" cy="210" rx="116" ry="156" fill="#8bd1ff" opacity="0.09"/>
   </g>
 
-  <!-- ======== Back leg (right, farther) ======== -->
-  <g id="LA_LEG_BACK" data-pivot="184,260" transform-origin="184px 260px">
-    <!-- Thigh -->
-    <path class="outline" fill="url(#darkSteel)" d="M176,250 C170,270 172,304 186,310 C198,314 206,308 210,292 C214,276 206,252 198,246 C190,242 182,244 176,250 Z"/>
-    <!-- Knee guard -->
-    <path class="outline-thin" fill="url(#metalGrad)" d="M188,306 C182,308 180,314 184,320 C192,330 206,326 210,316 C212,310 206,304 198,304 C194,304 190,304 188,306 Z"/>
-    <!-- Shin & boot -->
-    <path class="outline" fill="url(#darkSteel)" d="M188,320 C184,332 184,350 188,364 C192,380 210,384 216,380 C222,376 220,364 214,356 C210,350 210,340 212,330 C214,322 206,318 198,318 C194,318 190,318 188,320 Z"/>
-    <path class="outline-thin" fill="#244a63" d="M188,366 L220,366 L218,378 C216,386 196,388 190,380 Z"/>
-    <!-- Rim highlight -->
-    <path class="no-stroke" fill="#8bd1ff" opacity="0.22" d="M206,250 C210,260 214,284 212,292 C210,300 206,300 206,292 C206,280 204,262 204,252 Z"/>
+  <!-- leg back (right/far) -->
+  <g id="LA_LEG_BACK" data-pivot="196,336" transform-origin="196px 336px">
+    <path class="ol" fill="url(#gradSteel)" d="M182,288 C174,302 174,330 186,344 C194,354 212,356 220,344 C226,334 222,312 214,300 C206,290 192,284 182,288 Z"/>
+    <path class="ol2" fill="url(#gradMetal)" d="M190,340 C184,342 182,348 186,354 C196,366 214,364 220,352 C222,346 216,340 206,340 C198,340 194,340 190,340 Z"/>
+    <path class="ol" fill="url(#gradSteel)" d="M190,356 C184,368 186,386 190,398 C196,412 216,412 222,402 C226,394 224,382 218,374 C214,368 214,358 216,350 C216,342 206,342 198,344 C194,346 192,350 190,356 Z"/>
+    <path class="ol2" fill="#244a63" d="M190,398 L224,398 L220,408 C216,416 194,418 190,408 Z"/>
+    <path class="ns" fill="#8bd1ff" opacity="0.2" d="M208,292 C214,308 216,330 214,340 C212,348 208,348 208,340 C208,326 206,306 206,296 Z"/>
   </g>
 
-  <!-- ======== Back arm (right, farther) ======== -->
-  <g id="LA_ARM_BACK" data-pivot="196,152" transform-origin="196px 152px">
-    <!-- Upper arm -->
-    <path class="outline" fill="url(#darkSteel)" d="M186,150 C182,162 184,180 196,186 C206,192 216,186 220,174 C224,162 216,150 206,148 C198,146 190,146 186,150 Z"/>
-    <!-- Forearm -->
-    <path class="outline" fill="url(#darkSteel)" d="M206,188 C198,194 196,210 202,222 C206,232 216,236 226,232 C236,228 238,212 232,204 C226,196 216,190 206,188 Z"/>
-    <!-- Gauntlet (simple) -->
-    <path class="outline-thin" fill="url(#metalGrad)" d="M222,224 C216,226 212,232 214,238 C216,244 224,246 232,244 C238,242 242,236 240,230 C238,226 230,222 222,224 Z"/>
-    <!-- Lôi văn hints -->
-    <path d="M198,156 C206,156 208,164 212,166" fill="none" stroke="#a6ecff" stroke-width="1.2" opacity="0.55"/>
+  <!-- arm back (right/far) -->
+  <g id="LA_ARM_BACK" data-pivot="198,170" transform-origin="198px 170px">
+    <path class="ol" fill="url(#gradSteel)" d="M186,160 C182,170 184,186 196,192 C208,198 222,192 226,180 C228,170 220,160 208,158 C198,156 190,156 186,160 Z"/>
+    <path class="ol" fill="url(#gradSteel)" d="M208,194 C200,200 198,218 204,230 C208,238 220,244 232,238 C244,232 246,216 238,206 C230,198 218,194 208,194 Z"/>
+    <path class="ol2" fill="url(#gradMetal)" d="M224,232 C216,234 212,240 214,246 C216,252 226,254 236,252 C244,250 248,244 246,238 C244,234 234,230 224,232 Z"/>
+    <path d="M198,166 C206,166 210,172 216,174" fill="none" stroke="#9df0ff" stroke-width="1.2" opacity="0.6"/>
   </g>
 
-  <!-- ======== Torso (center) ======== -->
-  <g id="LA_TORSO" data-pivot="162,256" transform-origin="162px 256px">
-    <!-- Abdomen cloth / skirt (split front) -->
-    <path class="outline" fill="url(#darkSteel)" d="M124,236 C132,270 130,296 132,312 C134,328 146,338 162,338 C178,338 190,328 192,312 C194,296 192,270 200,236 C184,242 170,246 162,246 C154,246 140,242 124,236 Z"/>
-    <!-- Chest armor -->
-    <path class="outline" fill="url(#metalGrad)" d="M122,192 C132,178 150,170 162,170 C174,170 192,178 202,192 C208,200 206,214 202,226 C198,236 184,244 162,244 C140,244 126,236 122,226 C118,214 116,200 122,192 Z"/>
-    <!-- Collar / neck guard -->
-    <path class="outline-thin" fill="#1e3e53" d="M144,170 C148,164 156,160 162,160 C168,160 176,164 180,170 C172,170 152,170 144,170 Z"/>
-    <!-- Belt -->
-    <rect x="128" y="232" width="68" height="10" fill="#244a63" class="outline-thin"/>
-    <!-- Lôi văn across chest -->
-    <path d="M130,210 C144,202 156,206 170,202 C182,198 192,198 202,206" fill="none" stroke="#9df0ff" stroke-width="1.4" opacity="0.65"/>
-    <!-- Right/left rib highlights -->
-    <path class="no-stroke" fill="#c7f1ff" opacity="0.25" d="M150,176 C156,172 170,172 176,176 C170,182 156,182 150,176 Z"/>
+  <!-- torso -->
+  <g id="LA_TORSO" data-pivot="160,260" transform-origin="160px 260px">
+    <path class="ol" fill="url(#gradSteel)" d="M126,264 C132,300 132,324 136,340 C140,356 152,366 160,366 C168,366 180,356 184,340 C188,324 188,300 194,264 C182,270 168,274 160,274 C152,274 140,270 126,264 Z"/>
+    <path class="ns" fill="#0f1f2c" opacity="0.6" d="M142,240 C148,268 172,268 178,240 C168,246 152,246 142,240 Z"/>
+    <path class="ol" fill="url(#gradMetal)" d="M120,206 C130,188 150,178 160,178 C170,178 190,188 200,206 C206,216 204,232 198,244 C192,254 178,262 160,262 C142,262 128,254 122,244 C116,232 114,216 120,206 Z"/>
+    <path class="ol2" fill="#1e3e53" d="M148,176 C152,170 158,166 160,166 C162,166 168,170 172,176 C164,176 156,176 148,176 Z"/>
+    <rect x="132" y="258" width="56" height="10" fill="#244a63" class="ol2"/>
+    <path d="M132,224 C146,216 158,220 172,216 C184,212 194,212 202,220" fill="none" stroke="#9df0ff" stroke-width="1.4" opacity="0.7"/>
   </g>
 
-  <!-- ======== Head (in front of torso) ======== -->
-  <g id="LA_HEAD" data-pivot="160,84" transform-origin="160px 84px">
-    <!-- Neck -->
-    <rect x="152" y="156" width="16" height="12" fill="url(#skinGlow)" class="outline-thin"/>
-    <!-- Face (semi-real oval) -->
-    <ellipse cx="160" cy="132" rx="22" ry="28" fill="url(#skinGlow)" class="outline"/>
-    <!-- Jaw hint -->
-    <path class="outline-thin" fill="none" d="M142,138 C146,152 174,152 178,138"/>
-    <!-- Eyes -->
-    <ellipse cx="152" cy="128" rx="4.2" ry="2.2" fill="#0f1f2c"/>
-    <ellipse cx="168" cy="128" rx="4.2" ry="2.2" fill="#0f1f2c"/>
-    <circle cx="152" cy="128" r="1.5" fill="#8bd1ff" opacity="0.75"/>
-    <circle cx="168" cy="128" r="1.5" fill="#8bd1ff" opacity="0.75"/>
-    <!-- Brows -->
-    <path d="M146,122 C150,120 154,120 158,122" stroke="#1e3e53" stroke-width="1.2" fill="none"/>
-    <path d="M162,122 C166,120 170,120 174,122" stroke="#1e3e53" stroke-width="1.2" fill="none"/>
-    <!-- Mouth (half-smile) -->
-    <path d="M150,142 C156,146 170,146 176,140" stroke="#1e3e53" stroke-width="1.2" fill="none" opacity="0.8"/>
-    <!-- Hair (short, layered, black with cool highlights) -->
-    <path class="outline" fill="#0b1822" d="M138,120 C140,106 150,96 160,96 C172,96 182,104 184,118 C182,128 172,118 160,118 C148,118 142,126 138,120 Z"/>
-    <path class="no-stroke" fill="#8bd1ff" opacity="0.18" d="M146,106 C152,100 168,100 174,108 C168,110 156,110 146,106 Z"/>
+  <!-- head -->
+  <g id="LA_HEAD" data-pivot="160,104" transform-origin="160px 104px">
+    <path class="ol2" fill="url(#gradSkin)" d="M152,168 L168,168 L168,180 C164,182 156,182 152,180 Z"/>
+    <path class="ol" fill="url(#gradSkin)" d="M140,140 C140,124 152,110 160,110 C168,110 180,124 180,140 C180,160 170,172 160,172 C150,172 140,160 140,140 Z"/>
+    <ellipse cx="138" cy="142" rx="3" ry="6" fill="url(#gradSkin)" class="ol2"/>
+    <ellipse cx="182" cy="142" rx="3" ry="6" fill="url(#gradSkin)" class="ol2"/>
+    <path d="M148,138 C152,136 156,136 160,138" stroke="#0f1f2c" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+    <path d="M164,138 C168,136 172,136 176,138" stroke="#0f1f2c" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+    <circle cx="156" cy="139" r="1.4" fill="#8bd1ff" opacity="0.75"/>
+    <circle cx="172" cy="139" r="1.4" fill="#8bd1ff" opacity="0.75"/>
+    <path d="M160,144 L160,148" stroke="#1e3e53" stroke-width="1.1"/>
+    <path d="M150,154 C156,158 170,158 176,152" stroke="#1e3e53" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+    <path class="ol" fill="#0b1822" d="M138,132 C142,118 152,110 160,108 C170,108 182,116 184,128 C184,132 184,140 180,142 C176,138 168,134 160,134 C150,134 144,138 138,132 Z"/>
+    <path class="ns" fill="#8bd1ff" opacity="0.18" d="M146,118 C154,114 168,114 174,122 C168,124 156,124 146,118 Z"/>
   </g>
 
-  <!-- ======== Front arm (left, closer) ======== -->
-  <g id="LA_ARM_FRONT" data-pivot="108,148" transform-origin="108px 148px">
-    <!-- Upper arm -->
-    <path class="outline" fill="url(#darkSteel)" d="M90,152 C88,168 96,184 110,188 C124,192 138,182 140,168 C142,154 132,144 116,144 C104,144 94,146 90,152 Z"/>
-    <!-- Forearm -->
-    <path class="outline" fill="url(#darkSteel)" d="M114,188 C100,192 92,210 98,224 C106,238 128,240 140,232 C152,224 154,206 144,198 C134,192 124,188 114,188 Z"/>
-    <!-- Gauntlet (electro fist) -->
+  <!-- arm front (left/near) -->
+  <g id="LA_ARM_FRONT" data-pivot="120,168" transform-origin="120px 168px">
+    <path class="ol" fill="url(#gradSteel)" d="M96,168 C96,186 110,198 124,200 C140,202 154,192 156,178 C158,164 146,154 128,154 C112,154 98,158 96,168 Z"/>
+    <path class="ol" fill="url(#gradSteel)" d="M126,200 C110,206 100,224 106,238 C114,254 138,256 152,246 C166,236 168,216 156,206 C146,200 136,198 126,200 Z"/>
     <g id="LA_GAUNTLET_FRONT">
-      <path class="outline" fill="url(#metalGrad)" d="M136,226 C122,228 116,238 120,246 C126,258 148,256 156,246 C162,238 156,226 144,224 C142,224 140,224 136,226 Z"/>
-      <!-- Knuckle caps -->
-      <circle cx="136" cy="238" r="3.2" fill="#c7f1ff" class="outline-thin"/>
-      <circle cx="144" cy="238" r="3.2" fill="#c7f1ff" class="outline-thin"/>
-      <circle cx="152" cy="238" r="3.2" fill="#c7f1ff" class="outline-thin"/>
-      <!-- Micro arcs in fist (subtle) -->
-      <path d="M130,234 C134,232 136,236 138,238" stroke="#a6ecff" stroke-width="1" fill="none" opacity="0.7"/>
-      <path d="M146,232 C150,232 152,236 154,238" stroke="#a6ecff" stroke-width="1" fill="none" opacity="0.7"/>
+      <path class="ol" fill="url(#gradMetal)" d="M148,242 C134,244 126,254 130,262 C136,274 160,272 168,262 C174,254 168,242 156,240 C154,240 152,240 148,242 Z"/>
+      <circle cx="144" cy="254" r="3.4" fill="#c7f1ff" class="ol2"/>
+      <circle cx="152" cy="254" r="3.4" fill="#c7f1ff" class="ol2"/>
+      <circle cx="160" cy="254" r="3.4" fill="#c7f1ff" class="ol2"/>
+      <path d="M138,250 C142,248 146,252 148,254" stroke="#a6ecff" stroke-width="1" fill="none" opacity="0.75"/>
+      <path d="M156,248 C160,248 162,252 164,254" stroke="#a6ecff" stroke-width="1" fill="none" opacity="0.75"/>
     </g>
   </g>
 
-  <!-- ======== Front leg (left, closer) ======== -->
-  <g id="LA_LEG_FRONT" data-pivot="140,252" transform-origin="140px 252px">
-    <!-- Thigh -->
-    <path class="outline" fill="url(#darkSteel)" d="M128,250 C120,268 126,300 142,306 C154,310 166,304 170,290 C174,276 168,252 158,246 C148,244 136,244 128,250 Z"/>
-    <!-- Knee guard -->
-    <path class="outline-thin" fill="url(#metalGrad)" d="M140,304 C132,306 128,312 132,320 C140,330 158,328 164,318 C166,312 160,306 152,304 C148,304 144,304 140,304 Z"/>
-    <!-- Shin & boot -->
-    <path class="outline" fill="url(#darkSteel)" d="M140,322 C136,336 138,354 142,366 C146,382 166,386 172,380 C178,374 174,364 166,356 C160,350 160,338 162,330 C164,322 156,320 150,320 C146,320 142,320 140,322 Z"/>
-    <path class="outline-thin" fill="#244a63" d="M140,368 L174,368 L170,382 C166,390 146,392 142,382 Z"/>
-    <!-- Rim highlight -->
-    <path class="no-stroke" fill="#8bd1ff" opacity="0.22" d="M160,248 C166,260 170,284 168,292 C166,300 162,300 160,292 C160,280 158,262 158,252 Z"/>
+  <!-- leg front (left/near) -->
+  <g id="LA_LEG_FRONT" data-pivot="148,336" transform-origin="148px 336px">
+    <path class="ol" fill="url(#gradSteel)" d="M132,288 C122,300 124,330 140,344 C152,356 174,356 182,340 C188,328 182,306 170,296 C158,286 142,284 132,288 Z"/>
+    <path class="ol2" fill="url(#gradMetal)" d="M144,340 C136,342 134,348 138,356 C148,368 168,366 174,354 C176,348 170,342 160,342 C152,342 148,340 144,340 Z"/>
+    <path class="ol" fill="url(#gradSteel)" d="M144,358 C138,370 140,388 144,400 C150,412 172,414 178,404 C184,394 180,382 172,374 C168,368 168,358 170,350 C170,342 160,342 152,344 C148,346 146,350 144,358 Z"/>
+    <path class="ol2" fill="#244a63" d="M144,400 L178,400 L174,412 C170,420 148,422 144,412 Z"/>
+    <path class="ns" fill="#8bd1ff" opacity="0.2" d="M162,292 C168,308 170,330 168,340 C166,348 162,348 162,340 C162,326 160,306 160,296 Z"/>
   </g>
 
-  <!-- ======== FX Glow (around fists & lôi văn strips) ======== -->
-  <g id="LA_FX_GLOW" class="fx-glow" data-pivot="156,256" transform-origin="156px 256px" style="display:inline">
-    <!-- Electric aura near front fist -->
-    <use href="#arcSmall" x="130" y="214"/>
-    <use href="#arcSmall" x="148" y="222" transform="scale(0.9)"/>
-    <use href="#arcSmall" x="120" y="232" transform="scale(0.8)"/>
-    <!-- Shoulder & chest lôi văn -->
-    <path d="M100,154 C112,150 126,154 134,160" stroke="#9df0ff" stroke-width="1.6" fill="none"/>
-    <path d="M124,206 C136,200 154,204 170,198" stroke="#a6ecff" stroke-width="1.4" fill="none" opacity="0.8"/>
+  <!-- FX glow -->
+  <g id="LA_FX_GLOW" class="fx-glow" data-pivot="156,256" transform-origin="156px 256px">
+    <use href="#arcSmall" x="132" y="228"/>
+    <use href="#arcSmall" x="150" y="236" transform="scale(0.9)"/>
+    <use href="#arcSmall" x="120" y="246" transform="scale(0.8)"/>
+    <path d="M100,164 C112,160 128,164 136,170" stroke="#9df0ff" stroke-width="1.6" fill="none"/>
+    <path d="M126,216 C138,210 156,214 172,208" stroke="#a6ecff" stroke-width="1.4" fill="none" opacity="0.85"/>
   </g>
 
-  <!-- ======== Ultimate overlay (off by default) ======== -->
+  <!-- ult overlay (off) -->
   <g id="LA_FX_ULT" class="fx-ult" data-pivot="160,200" style="display:none">
     <radialGradient id="ultBurst" cx="50%" cy="70%" r="60%">
       <stop offset="0%" stop-color="#ffd4a8" stop-opacity="0.45"/>
       <stop offset="80%" stop-color="#ff8055" stop-opacity="0.0"/>
     </radialGradient>
-    <ellipse cx="160" cy="260" rx="120" ry="90" fill="url(#ultBurst)"/>
+    <ellipse cx="160" cy="262" rx="120" ry="92" fill="url(#ultBurst)"/>
   </g>
-
-  <!-- Outlines helpers (optional, toggle visibility) -->
-  <!-- <rect x="0" y="0" width="320" height="400" fill="none" stroke="#00ff00" opacity="0.1"/> -->
 </svg>
