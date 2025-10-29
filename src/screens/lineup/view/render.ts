@@ -494,7 +494,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
     }
   }
 
-  function openOverlay(target: HTMLElement | null): void{{
+  function openOverlay(target: HTMLElement | null): void{
     if (!target) return;
     target.classList.add('is-open');
     activeOverlay = target;
