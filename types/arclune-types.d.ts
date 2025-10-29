@@ -1,13 +1,83 @@
 declare module '@shared-types/vfx' {
-  export * from '../src/types/vfx.ts';
+  export type {
+    VfxAnchor,
+    VfxBinding,
+    VfxAnchorDataset,
+  } from '../src/types/vfx.ts';
 }
 
 declare module '@shared-types/config' {
-  export * from '../src/types/config.ts';
+  export type {
+    TurnOrderSide,
+    TurnOrderPairScanSlotFields,
+    TurnOrderPairScanSideObject,
+    TurnOrderPairScanSlotObject,
+    TurnOrderPairScanEntry,
+    TurnOrderConfigDetails,
+    GameTurnOrderConfig,
+    CurrencyDefinition,
+    PityRule,
+    PityConfiguration,
+    ShopTaxBracket,
+    LotterySplit,
+    AnnouncementEntry,
+    AnnouncementSlot,
+    ModeShellConfig,
+    ModeConfig,
+    ModeGroup,
+    MenuSectionDefinition,
+    SkillSection,
+    SkillEntry,
+    SkillRegistry,
+    RosterPreview,
+    RosterPreviewRow,
+    CatalogStatBlock,
+    RosterUnitDefinition,
+    CameraPreset,
+    ChibiProportions,
+    BackgroundPalette,
+    BackgroundFallback,
+    BackgroundPropConfig,
+    BackgroundDefinitionConfig,
+    BackgroundConfig,
+    GameConfig,
+    CombatTuning,
+    FuryConfig,
+    FuryGainEntry,
+    FuryCaps,
+    TurnOrderConfig,
+    AiConfig,
+    AiWeights,
+    AiRoleWeight,
+    AnimationConfig,
+    UiConfig,
+    DebugFlags,
+    PerformanceConfig,
+    ColorPalette,
+    SceneLayer,
+    SceneTheme,
+    SceneConfig,
+    BackgroundProp,
+    BackgroundDefinition,
+    WorldMapConfig,
+  } from '../src/types/config.ts';
 }
 
 declare module '@shared-types/units' {
-  export * from '../src/types/units.ts';
+  export type {
+    UnitId,
+    Side,
+    StatBlock,
+    FuryState,
+    UnitToken,
+    SummonRequest,
+    QueuedSummonRequest,
+    SummonQueue,
+    QueuedSummonState,
+    ActionChainEntry,
+    ActionChainProcessedResult,
+  } from '../src/types/units.ts';
+  export { createSummonQueue } from '../src/types/units.ts';
 }
 
 declare module 'zod' {
