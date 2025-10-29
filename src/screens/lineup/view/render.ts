@@ -62,6 +62,7 @@ function ensureStyles(): void{
     .lineup-button:hover{transform:translateY(-1px);border-color:rgba(174,228,255,.5);box-shadow:0 10px 20px rgba(6,12,20,.4);}
     .lineup-button:focus-visible{outline:2px solid rgba(174,228,255,.72);outline-offset:3px;}
     .lineup-slot.is-locked{border-style:dashed;border-color:rgba(125,211,252,.35);background:rgba(12,22,34,.6);}
+    .lineup-slot.is-selected{border-color:rgba(174,228,255,.55);box-shadow:0 14px 32px rgba(6,12,20,.45);}
     .lineup-slot__cost{margin:0;font-size:12px;color:#ffd9a1;letter-spacing:.08em;text-transform:uppercase;}
     .lineup-slot__locked-note{margin:0;font-size:12px;color:#9cbcd9;line-height:1.5;}
     .lineup-bench{display:flex;flex-direction:column;gap:12px;min-height:100%;padding:0;border:none;background:none;}
@@ -397,6 +398,17 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   const mainColumn = document.createElement('div');
   mainColumn.className = 'lineup-main';
   mainArea.appendChild(mainColumn);
+  
+  const slotsSection = document.createElement('section');
+  slotsSection.className = 'lineup-slots';
+  const slotsTitle = document.createElement('p');
+  slotsTitle.className = 'lineup-slots__title';
+  slotsTitle.textContent = 'Vị trí chủ lực';
+  slotsSection.appendChild(slotsTitle);
+  const slotsGrid = document.createElement('div');
+  slotsGrid.className = 'lineup-slots__grid';
+  slotsSection.appendChild(slotsGrid);
+  mainColumn.appendChild(slotsSection);
 
   const benchSection = document.createElement('section');
   benchSection.className = 'lineup-bench';
@@ -646,6 +658,158 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
     }
 
     syncBenchDetailsHeight();
+  }
+
+  function renderSlots(): void{
+    slotsGrid.innerHTML = '';
+    const lineup = getSelectedLineup();
+    if (!lineup){
+      slotsSection.classList.add('is-empty');
+      for (let index = 0; index < 5; index += 1){
+        const slotEl = document.createElement('div');
+        slotEl.className = 'lineup-slot is-locked';
+        slotEl.dataset.slotIndex = String(index);
+        slotEl.tabIndex = 0;
+        slotEl.setAttribute('aria-label', `Vị trí ${index + 1} đang khóa.`);
+        const label = document.createElement('p');
+        label.className = 'lineup-slot__label';
+        label.textContent = `Vị trí ${index + 1}`;
+        slotEl.appendChild(label);
+        const avatar = document.createElement('div');
+        avatar.className = 'lineup-slot__avatar';
+        avatar.textContent = '🔒';
+        slotEl.appendChild(avatar);
+        const name = document.createElement('p');
+        name.className = 'lineup-slot__name';
+        name.textContent = 'Chưa có dữ liệu';
+        slotEl.appendChild(name);
+        const note = document.createElement('p');
+        note.className = 'lineup-slot__locked-note';
+        note.textContent = 'Vui lòng chọn đội hình để thao tác.';
+        slotEl.appendChild(note);
+        const actions = document.createElement('div');
+        actions.className = 'lineup-slot__actions';
+        slotEl.appendChild(actions);
+        slotsGrid.appendChild(slotEl);
+      }
+      return;
+    }
+
+    slotsSection.classList.remove('is-empty');
+    lineup.slots.forEach(slot => {
+      const slotEl = document.createElement('div');
+      slotEl.className = 'lineup-slot';
+      slotEl.dataset.slotIndex = String(slot.index);
+      slotEl.tabIndex = 0;
+      const unit = slot.unitId ? rosterLookup.get(slot.unitId) : null;
+      const selectedMatches = state.selectedUnitId && slot.unitId === state.selectedUnitId;
+      if (selectedMatches){
+        slotEl.classList.add('is-selected');
+      }
+      if (!slot.unlocked){
+        slotEl.classList.add('is-locked');
+      }
+      const label = document.createElement('p');
+      label.className = 'lineup-slot__label';
+      label.textContent = `Vị trí ${slot.index + 1}`;
+      slotEl.appendChild(label);
+      const avatar = document.createElement('div');
+      avatar.className = 'lineup-slot__avatar';
+      if (unit){
+        renderAvatar(avatar, unit.avatar || null, unit.name);
+      } else if (slot.label){
+        avatar.textContent = getInitials(slot.label);
+      } else if (!slot.unlocked){
+        avatar.textContent = '🔒';
+      } else {
+        avatar.textContent = '+';
+      }
+      slotEl.appendChild(avatar);
+      const name = document.createElement('p');
+      name.className = 'lineup-slot__name';
+      if (unit){
+        name.textContent = unit.name;
+      } else if (slot.label){
+        name.textContent = slot.label;
+      } else if (!slot.unlocked){
+        name.textContent = 'Vị trí bị khóa';
+      } else {
+        name.textContent = 'Chưa gán nhân vật';
+      }
+      slotEl.appendChild(name);
+
+      if (slot.unlocked){
+        const hint = document.createElement('p');
+        hint.className = 'lineup-slot__hint';
+        if (unit){
+          const powerText = unit.power != null
+            ? `Chiến lực ${formatUnitPower(unit.power)}`
+            : 'Đang tham gia đội hình';
+          hint.textContent = `${powerText}. Dùng "Bỏ" để trả vị trí.`;
+        } else if (state.selectedUnitId){
+          const selectedUnit = rosterLookup.get(state.selectedUnitId);
+          hint.textContent = selectedUnit
+            ? `Đã chọn ${selectedUnit.name}. Nhấn "Gán" để thêm.`
+            : 'Nhấn "Gán" để thêm nhân vật đã chọn.';
+        } else {
+          hint.textContent = 'Chọn nhân vật từ roster rồi nhấn "Gán" để thêm.';
+        }
+        slotEl.appendChild(hint);
+      } else {
+        if (slot.unlockCost){
+          const cost = document.createElement('p');
+          cost.className = 'lineup-slot__cost';
+          cost.textContent = `Chi phí mở khóa: ${formatCurrencyBalance(slot.unlockCost.amount, slot.unlockCost.currencyId)}`;
+          slotEl.appendChild(cost);
+        }
+        const note = document.createElement('p');
+        note.className = 'lineup-slot__locked-note';
+        note.textContent = 'Mở khóa để gán nhân vật vào vị trí này.';
+        slotEl.appendChild(note);
+      }
+
+      const actions = document.createElement('div');
+      actions.className = 'lineup-slot__actions';
+      if (slot.unlocked){
+        const assignButton = document.createElement('button');
+        assignButton.type = 'button';
+        assignButton.className = 'lineup-button';
+        assignButton.dataset.slotAction = 'assign';
+        assignButton.textContent = unit ? 'Đổi nhân vật' : 'Gán nhân vật';
+        actions.appendChild(assignButton);
+
+        const clearButton = document.createElement('button');
+        clearButton.type = 'button';
+        clearButton.className = 'lineup-button';
+        clearButton.dataset.slotAction = 'clear';
+        clearButton.textContent = 'Bỏ khỏi vị trí';
+        if (!unit){
+          clearButton.disabled = true;
+        }
+        actions.appendChild(clearButton);
+      } else {
+        const unlockButton = document.createElement('button');
+        unlockButton.type = 'button';
+        unlockButton.className = 'lineup-button';
+        unlockButton.dataset.slotAction = 'unlock';
+        unlockButton.textContent = 'Mở khóa vị trí';
+        actions.appendChild(unlockButton);
+      }
+      slotEl.appendChild(actions);
+
+      let ariaLabel = `Vị trí ${slot.index + 1}`;
+      if (unit){
+        ariaLabel += `: ${unit.name}`;
+      } else if (slot.label){
+        ariaLabel += `: ${slot.label}`;
+      }
+      if (!slot.unlocked){
+        ariaLabel += '. Đang khóa.';
+      }
+      slotEl.setAttribute('aria-label', ariaLabel);
+
+      slotsGrid.appendChild(slotEl);
+    });
   }
 
   function updateActiveBenchHighlight(): void{
@@ -945,6 +1109,7 @@ const eventCleanup = bindLineupEvents({
     state,
     elements: {
       backButton,
+      slotsGrid,
       benchGrid,
       benchDetails,
       passiveGrid,
@@ -965,6 +1130,7 @@ const eventCleanup = bindLineupEvents({
     helpers: {
       getSelectedLineup,
       setMessage,
+      renderSlots,
       renderBench,
       renderBenchDetails,
       renderLeader,
@@ -975,18 +1141,20 @@ const eventCleanup = bindLineupEvents({
       syncBenchDetailsHeight,
       openPassiveDetails,
       openLeaderPicker,
+      refreshWallet,
     },
     rosterLookup,
   });
   cleanup.push(...eventCleanup);
 
   refreshWallet();
+  renderSlots();
   renderBench();
   renderLeader();
   renderPassives();
   renderFilters();
   renderRoster();
-  setMessage('Chọn nhân vật từ danh sách để xây dựng đội hình.');
+  setMessage('Chọn nhân vật rồi gán vào các ô chủ lực hoặc dự bị để hoàn thiện đội hình.');
 
   cleanup.push(() => passiveOverlay.remove());
   cleanup.push(() => leaderOverlay.remove());
@@ -1006,4 +1174,3 @@ const eventCleanup = bindLineupEvents({
     },
   };
  }
-}

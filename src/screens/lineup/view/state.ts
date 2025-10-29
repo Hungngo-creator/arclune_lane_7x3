@@ -606,6 +606,45 @@ export function assignUnitToSlot(
   return { ok: true };
 }
 
+ export function removeUnitFromSlot(lineup: LineupState, slotIndex: number): void {
+  const slot = lineup.slots[slotIndex];
+  if (!slot) return;
+  const removedUnitId = slot.unitId;
+  slot.unitId = null;
+  slot.label = null;
+  if (removedUnitId && lineup.leaderId === removedUnitId){
+    lineup.leaderId = null;
+  }
+}
+
+export function unlockSlot(
+  lineup: LineupState,
+  slotIndex: number,
+  balances: CurrencyBalances,
+): { ok: boolean; message?: string; spent?: { currencyId: string; amount: number } | null } {
+  const slot = lineup.slots[slotIndex];
+  if (!slot){
+    return { ok: false, message: 'Không tìm thấy vị trí.' };
+  }
+  if (slot.unlocked){
+    return { ok: true, spent: null };
+  }
+  const cost = slot.unlockCost;
+  if (cost){
+    const current = balances.get(cost.currencyId) ?? 0;
+    if (current < cost.amount){
+      return {
+        ok: false,
+        message: `Không đủ ${formatCurrencyBalance(cost.amount, cost.currencyId)} để mở khóa vị trí này.`,
+      };
+    }
+    balances.set(cost.currencyId, current - cost.amount);
+  }
+  slot.unlocked = true;
+  slot.unlockCost = null;
+  return { ok: true, spent: cost ?? null };
+}
+
 export function assignUnitToBench(
   lineup: LineupState,
   benchIndex: number,
