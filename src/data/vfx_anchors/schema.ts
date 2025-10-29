@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import type { VfxAnchorDataset } from '@types/vfx';
+import type { VfxAnchorDataset } from '@shared-types/vfx';
 
 const AnchorPointSchema = z.object({
   x: z.number(),
