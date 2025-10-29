@@ -374,7 +374,7 @@ const healTeam = (
   const allies = (Game.tokens || []).filter(t => t && t.side === unit.side && t.alive);
   for (const ally of allies){
     if (!Number.isFinite(ally.hpMax)) continue;
-    const base = mode === 'casterMax' ? casterHpMax : ally.hpMax ?? 0;
+    const base = mode === 'casterMax' ? casterHpMax : (ally.hpMax ?? 0);
     if (!Number.isFinite(base) || base <= 0) continue;
     const healAmount = Math.max(0, Math.round(base * pct));
     if (healAmount <= 0) continue;
