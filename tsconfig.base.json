@@ -30,9 +30,9 @@
         "src/vfx/*",
         "src/art/*"
       ],
-      "@types/config": ["src/types/config.ts"],
-      "@types/units": ["src/types/units.ts"],
-      "@types/*": ["src/types/*"],
+      "@shared-types/config": ["src/types/config.ts"],
+      "@shared-types/units": ["src/types/units.ts"],
+      "@shared-types/*": ["src/types/*"],
       "zod": ["tools/zod-stub/index.d.ts"]
     }
   },

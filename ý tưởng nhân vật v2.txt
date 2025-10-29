@@ -1,38 +1,42 @@
-Vì tệp ý tưởng nhân vật v3 quá lag nên tao đã tạo tệp này.
+Vì tệp ý tưởng nhân vật v3 quá lag nên tao đã tạo tệp này. Mọi ult của tất cả nhân vật gacha lẫn npc pve đều là auto cast khi đầy nộ của nhân vật đó.
 A. Nhân vật gacha
 31 nằm ở ý tưởng nhân vật.txt
 32) Vũ Thiên
 Mô tả: một nam nhân cầm đinh ba, da ngâm nhẹ, ở trần và thích sống ở môi trường biển cả.
 
-Nội tại: khi vào sân + 5% atk và wil, không + dồn.
+Nội tại — Hải Triều Khai Trận: khi vào sân + 5% atk và wil, không + dồn.
 
-Kĩ năng 1: vận dụng bí thuật, năng lượng màu xanh biển chảy quanh thân, tăng 40% wil và atk trong 1 turn, 35 aether.
-Kĩ năng 2: 
+Kĩ năng 1 – Lam Triều Bộc Lực: vận dụng bí thuật, năng lượng màu xanh biển chảy quanh thân, tăng 40% wil và atk trong 1 turn, 35 aether.
+Kĩ năng 2 – Hải Mâu Phá Lãng: phóng mạnh đinh ba vào 1 mục tiêu gây sát thương = 150% đánh thường, 25 aether. (Phóng xong Vũ Thiên sẽ giơ tay và đinh ba bay trở về tay phải của hắn).
+Kĩ năng 3 – Triều Ảnh Hồi Kích: nội tại bị động, khi kích hoạt thì mỗi khi Vũ Thiên bị tấn công có 25% tỉ lệ né đòn và thực thi 1 đòn đánh thường lên kẻ tấn công, nếu chết thì cần kích hoạt lần nữa, 30 aether
 
-Ultimate: nhận 1 Thích Ứng, gây sát thương đơn mục tiêu = 300% đánh thường, áp Trầm Mặc lên mục tiêu trong 1 turn.
+Đánh thường: cầm đinh ba tán mạnh vào mặt của mục tiêu gây sát thương = 100% wil và atk.
+
+Ultimate — Hải Uy Trảm Ngôn: nhận 1 Thích Ứng, gây sát thương đơn mục tiêu = 300% đánh thường, áp Trầm Mặc lên mục tiêu trong 1 turn.
 
 Đánh thường: gây sát thương = 100% wil và atk lên 1 kẻ địch
 33) Anna
-Nội tại: mỗi khi dùng ultimate + 5% max hp/wil/atk của bản thân, cộng dồn tối đa 5 lần.
+Nội tại: Ấn Chú Thăng Hoa: mỗi khi dùng ultimate + 5% max hp/wil/atk của bản thân, cộng dồn tối đa 5 lần.
+Vfx: Mỗi lần dùng Ultimate và kích hoạt nội tại, dấu ấn trên người nàng bừng sáng
 
 Đánh thường: gây sát thương = 100% wil và atk lên 1 kẻ địch, hồi hp cho 1 đồng minh ngẫu nhiên = 3% max hp của Anna.
 
-Kĩ năng 1: + 20% res/arm trong 2 turn, 20 aether.
-Kĩ năng 2: - hp = 50% max hp, chuyển lượng hp bị trừ cho leader (không mất max hp), không thể dùng nếu hp hiện tại dưới 70% max hp, 25 aether.
-Kĩ năng 3: gây sát thương ngẫu nhiên lên 2 mục tiêu, mỗi kẻ nhận sát thương = 140% đánh thường, 20 aether.
+Kĩ năng 1: Aegis Tụ Linh: + 20% res/arm trong 2 turn, 20 aether.
+Kĩ năng 2: Huyết Tế Vương Tọa: - hp = 50% max hp, chuyển lượng hp bị trừ cho leader (không mất max hp), không thể dùng nếu hp hiện tại dưới 70% max hp, 25 aether.
+Kĩ năng 3: Hỗn Linh Trường Ca: gây sát thương ngẫu nhiên lên 2 mục tiêu, mỗi kẻ nhận sát thương = 140% đánh thường, 20 aether.
 
-Ultimate: hồi hp cho mọi đồng minh có mặt trên sân = 50% max hp + 20% wil và atk của Anna.
+Ultimate: Thánh Lễ Tái Sinh: hồi hp cho mọi đồng minh có mặt trên sân = 50% max hp + 20% wil và atk của Anna.
 
 34) Lão Khất Cái
-Nội tại: không bị ảnh hưởng bởi hiệu ứng khiêu khích từ kẻ thù, +2% atk/wil/agi cho mỗi đồng minh hiện hữu trên sân trừ leader.
+Nội tại: Tạp Dân Tụ Lực: không bị ảnh hưởng bởi hiệu ứng khiêu khích từ kẻ thù, +2% atk/wil/agi cho mỗi đồng minh hiện hữu trên sân trừ leader.
 
 Đánh thường: cầm gậy, bổ từ trên cao vào đầu mục tiêu gây sát thương = 100% atk và wil.
 
-Kĩ năng 1: chọt mạnh cây gậy vào bụng mục tiêu, gây 1 đòn đánh thường, kĩ năng này bỏ qua 15% res và arm của mục tiêu, 20 aether.
-Kĩ năng 2: khi bị đòn tấn công aoe cố định vị trí mà không phải ngẫu nhiên chọn mục tiêu đánh trúng có 25% tỉ lệ chạy khỏi ô đang đứng và đi đến ô gần nhất (trừ ô leader đứng), skill kích hoạt 1 lần dùng hết trận. Khi chạy thành công sẽ đứng luôn ở ô vừa chạy đến, nếu không có ô đồng minh nào trống thì không thể chạy, hoạt động đến hết trận kể cả chết rồi được hồi sinh vẫn hoạt động, kỹ năng dạng nội tại, 25 aether.
-Kĩ năng 3: loạn côn đánh ngẫu nhiên 3 mục tiêu, gây 3 đòn đánh thường, bỏ qua 20% res và arm của mục tiêu, 35 aether.
+Kĩ năng 1: Khất Côn Xuyên Tạng: chọt mạnh cây gậy vào bụng mục tiêu, gây 1 đòn đánh thường, kĩ năng này bỏ qua 15% res và arm của mục tiêu, 20 aether.
+Kỹ năng 2 – Tam Thập Lục Kế: Tẩu Vi Thượng: khi bị đòn tấn công aoe cố định vị trí mà không phải ngẫu nhiên chọn mục tiêu đánh trúng có 25% tỉ lệ chạy khỏi ô đang đứng và đi đến ô gần nhất (trừ ô leader đứng), skill kích hoạt 1 lần dùng hết trận. Khi chạy thành công sẽ đứng luôn ở ô vừa chạy đến, nếu không có ô đồng minh nào trống thì không thể chạy, hoạt động đến hết trận kể cả chết rồi được hồi sinh vẫn hoạt động, kỹ năng dạng nội tại, 25 aether.
+Kỹ năng 3 – Loạn Côn Tam Liên: loạn côn đánh ngẫu nhiên 3 mục tiêu, gây 3 đòn đánh thường, bỏ qua 20% res và arm của mục tiêu, 35 aether.
 
-Ultimate: gây sát thương = 250% đánh thường lên 1 mục tiêu, bỏ qua 10% res/arm của mục tiêu.
+Ultimate: Nhất Côn Đoạt Mệnh: gây sát thương = 250% đánh thường lên 1 mục tiêu, bỏ qua 10% res/arm của mục tiêu.
 
 35) 
 
@@ -43,18 +47,18 @@ Ultimate: gây sát thương=200% đánh thường lên toàn sân kẻ địch,
 Lai lịch: Thánh nữ của Giáo Hội Ánh Sáng
 Lore: Ái Lân từng là Thánh Nữ cao quý nhất của Giáo Hội Ánh Sáng, sở hữu sức mạnh chữa lành kỳ diệu. Nhưng trong một lần thanh tẩy một ngôi đền bị ma quỷ chiếm cứ, cô phát hiện ra sự thật kinh hoàng: Giáo Hội từng thực hiện những nghi lễ tàn bạo, hy sinh hàng nghìn người vô tội để duy trì sức mạnh. Bị phản bội bởi đức tin của mình, cô phá hủy thánh tích của Giáo Hội và trốn chạy. Trong lúc tuyệt vọng, cô ký kết khế ước với một Ác Ma tên D'moreth - nhận được "Chúc Phúc Hắc Ám" để chống lại chính tổ chức mình từng phục vụ. Giờ đây, cô sử dụng cả sức mạnh Ánh Sáng và Bóng Tối, trở thành một tồn tại mâu thuẫn giữa ánh sáng và bóng tối. Đặc điểm: Có thể chữa lành nhưng cũng có thể nguyền rủa. Cánh thiên thần của cô một bên trắng, một bên đen. Đang bị truy đuổi bởi cả Giáo Hội và các Ác Ma.
 
-Nội tại: chuyển đôi trạng thái ánh sáng và tối luân phiên, vào trận turn 1 là ánh sáng, turn 2 là bóng tối, turn 3 là ánh sáng cứ thế lặp lại đến hết trận.
+Nội tại, Thánh Ám Luân Chuyển (圣黯轮转): chuyển đôi trạng thái ánh sáng và tối luân phiên, vào trận turn 1 là ánh sáng, turn 2 là bóng tối, turn 3 là ánh sáng cứ thế lặp lại đến hết trận.
 Ánh sáng: đòn đánh lên kẻ định giảm 5% agi của mục tiêu trong 1 turn, hồi hp cho bản thân = 10% mọi sát thương gây ra trong turn đó.
 Bóng tối: đòn đánh bỏ qua 10% res và arm của mục tiêu trong turn đó.
 
-Kĩ năng 1: có thể dùng ở 2 trạng thái ánh sáng và bóng tối, chuyển hp = 20% max hp của Ái Lân cho leader đồng minh, chuyển hp = 10% max hp cho 1 đồng minh ngẫu nhiên (Ái Lân không mất max hp), leader và 1 đồng minh ngẫu nhiên đó nhận 1 tầng khiên = 10% max hp của Ái Lân, khiên đó tồn tại tối đa 2 turn, 25 aether. Không tính là đánh thường.
-Kĩ năng 2: chỉ có thể dùng ở trạng thái bóng tối, đứng yên tại chỗ, gõ pháp trượng xuống đấu trường và triệu hồi bóng tối dưới chân 3 kẻ địch, ăn mòn chúng và gây sát thương, mỗi kẻ nhận sát thương = 70% đánh thường của Ái Lân, 25 aether. Không tính là đánh thường.
-Kĩ năng 3: chỉ có thể dùng ở trạng thái ánh sáng, đứng tại chỗ giơ cao pháp trượng, hồi hp cho ái lân cùng 1 đồng minh ngẫu nhiên = 60% wil và atk của ái lân, 20 aether.
+Kỹ năng 1 – Song Cực Hiến Phúc (双极献福): có thể dùng ở 2 trạng thái ánh sáng và bóng tối, chuyển hp = 20% max hp của Ái Lân cho leader đồng minh, chuyển hp = 10% max hp cho 1 đồng minh ngẫu nhiên (Ái Lân không mất max hp), leader và 1 đồng minh ngẫu nhiên đó nhận 1 tầng khiên = 10% max hp của Ái Lân, khiên đó tồn tại tối đa 2 turn, 25 aether. Không tính là đánh thường.
+Kĩ năng 2 – D’moreth • Hắc Tế Tam Ấn (黑祭三印): chỉ có thể dùng ở trạng thái bóng tối, đứng yên tại chỗ, gõ pháp trượng xuống đấu trường và triệu hồi bóng tối dưới chân 3 kẻ địch, ăn mòn chúng và gây sát thương, mỗi kẻ nhận sát thương = 70% đánh thường của Ái Lân, 25 aether. Không tính là đánh thường.
+Kỹ năng 3 – Thánh Minh Trùng Tụ (圣明重聚): chỉ có thể dùng ở trạng thái ánh sáng, đứng tại chỗ giơ cao pháp trượng, hồi hp cho ái lân cùng 1 đồng minh ngẫu nhiên = 60% wil và atk của ái lân, 20 aether.
 
 Đánh thường: Ái Lân tiếp cận kẻ thù, gõ mạnh pháp trượng vào đầu đối phương gây sát thương = 100% wil và atk, mỗi lần đánh thường có 2% tỉ lệ gây debuff choáng lên mục tiêu.
 
-Ultimate: nếu dùng ở trạng thái ánh sáng: giơ cao pháp trượng, pháp trượng toả sáng và hồi hp cho 3 đồng minh ngẫu nhiên = 30% max hp + 5% wil và atk của bản thân Ái Lân.
-Nếu dùng ở trạng thái bóng tối: giơ pháp trượng, 4 luồng bóng tối lao đến 4 kẻ địch ngẫu nhiên trên sân, mỗi kẻ nhận sát thương = 75% đánh thường của Ái Lân. Không tính là đánh thường.
+Ultimate: nếu dùng ở trạng thái ánh sáng, Khải Minh Thánh Lễ (启明圣礼): giơ cao pháp trượng, pháp trượng toả sáng và hồi hp cho 3 đồng minh ngẫu nhiên = 30% max hp + 5% wil và atk của bản thân Ái Lân.
+Nếu dùng ở trạng thái bóng tối, Đọa Ảnh Tứ Hình (堕影四刑): giơ pháp trượng, 4 luồng bóng tối lao đến 4 kẻ địch ngẫu nhiên trên sân, mỗi kẻ nhận sát thương = 75% đánh thường của Ái Lân. Không tính là đánh thường.
  
 37) Từ Mặc Tẫn (徐墨尽) — Dạ Ảnh Cự Ly
 Hệ: Âm (bóng tối, tịnh lặng, linh cảm)
@@ -72,72 +76,322 @@ Khi một kẻ thù chết, chiếm giữ linh hồn của kẻ thù đó trong 
 Ultimate: nếu không có kẻ thù nào đang ở trạng thái ngủ trên sân: gây sát thương ngẫu nhiên lên 3 kẻ địch, mỗi kẻ nhận sát thương = 85% đánh thường của nhân vật này,
 
 
-39) Ngụy Thiên Sơ (魏天初) — Hồn Khí Sư Cuối CùngNăng lực: Linh khí nhập thể – Hồn dung vật
+39) Ngụy Thiên Sơ (魏天初) — Hồn Khí Sư Cuối Cùng
+Năng lực: Linh khí nhập thể – Hồn dung vật
 Hắn rèn pháp bảo không bằng kim loại, mà dùng linh hồn. Mỗi pháp khí hắn tạo ra là một linh thể tự nhận thức. Khi chiến đấu, hắn có thể triệu hồi "Cửu Vật Linh" — chín linh hồn pháp khí bị phong ấn trong cơ thể, nhưng nếu mất kiểm soát, chúng sẽ đồng loạt phản chủ.
 
 40) 
 Triệu hồi kĩ năng gây sát thương lên kẻ thù theo thời gian trên sân đồng minh, gây sát thương lên kẻ địch khi chúng tiếp cận bản thân, dạng bị động.
 
+41) Nam Tước Huyết Tộc
+Nội tại: ra sân tăng hp regen 30% và aether regen 20%
+
+42) Tử Tước Huyết Tộc
+Nội tại: ra sân tăng hp regen 70% và aether regen 40%
+
 41) Bá Tước Huyết Tộc - Charles
-Nội tại: ra sân tăng hp regen 300% và aether regen 100%
+Nội tại, Huyết Ấn Tịnh Dưỡng: ra sân tăng hp regen 120% và aether regen 70%
 
-Kĩ năng 1: mất 3% hp hiện có, ngưng tụ 3 mũi tên máu tấn công 1 mục tiêu, mỗi mũi tên gây 50% đánh thường, không tính là đánh thường, 20 aether.
-Kĩ năng 2: mất hp = 20% max hp, ngưng tụ ra 1 huyết phân thân kế thừa 20% mọi chỉ số hiện tại của Charles, tồn tại trong 3 turn, huyết phân thân chỉ có thể đánh thường, không thể hồi sinh, ra sân ngẫu nhiên ở vị trí trống trên sân đồng minh, 20 aether.
-Kĩ năng 3: đối với kẻ thù thuộc Huyết Tộc dưới bậc Bá Tước hút hp = 20% max hp của mục tiêu, không thể hút chết đối phương, lượng hp hút được sẽ chuyển thành khiên cho Charles, tối đa = 100% max hp. 25 aether.
+Kĩ năng 1, Huyết Tiễn Tam Liên: mất 3% hp hiện có, ngưng tụ 3 mũi tên máu tấn công 1 mục tiêu, mỗi mũi tên gây 50% đánh thường, không tính là đánh thường, 20 aether.
+Kĩ năng 2, Huyết Ảnh Phân Thân: mất hp = 20% max hp, ngưng tụ ra 1 huyết phân thân kế thừa 20% mọi chỉ số hiện tại của Charles, tồn tại trong 3 turn, huyết phân thân chỉ có thể đánh thường, không thể hồi sinh, ra sân ngẫu nhiên ở vị trí trống trên sân đồng minh, 20 aether.
+Kĩ năng 3 — Tước Lệnh: Huyết Quy Phục: đối với kẻ thù thuộc Huyết Tộc dưới bậc Bá Tước hút hp = 20% max hp của mục tiêu, không thể hút chết đối phương, lượng hp hút được sẽ chuyển thành khiên cho Charles, tối đa = 100% max hp. 25 aether.
 
-Ultimate: gây sát thương lên 1 mục tiêu = 300% đánh thường, tăng max hp = 6% sát thương gây ra sau đó hồi hp cho bản thân = 20% sát thương gây ra.
+Ultimate, Tước Lệnh • Huyết Tế Phong Thân: gây sát thương lên 1 mục tiêu = 250% đánh thường, tăng max hp = 6% sát thương gây ra sau đó hồi hp cho bản thân = 20% sát thương gây ra.
 
 Đánh thường: Gây sát thương = 100% wil và atk lên 1 mục tiêu.
 
-42) Faun
-Mô tả: một tinh linh có thể triệu hồi động vật.
-Nội tại: khi có một động vật trên sân đồng minh + 3% 10 chỉ số, tối đa 5 stack, thanh nộ của nhân vật này chỉ có 85 thay vì mặc định là 100.
+42) Hầu Tước Huyết Tộc 
+Nội tại: ra sân tăng hp regen 180% và aether regen 110%
+
+43) Công Tước Huyết Tộc
+Nội tại: ra sân tăng hp regen 250% và aether regen 160%
+
+44) Huyết Tộc Thân Vương
+Nội tại: ra sân tăng hp regen 330% và aether regen 220%
+
+45) Huyết Tộc Quốc Vương
+Nội tại: ra sân tăng hp regen 420% và aether regen 290%
+
+46) Faun
+Mô tả: một tinh linh hoạt bát sáng sủa, hay cười có thể triệu hồi động vật.
+Nội tại – Vạn Thú Đồng Hưởng: khi có một động vật trên sân đồng minh + 3% 10 chỉ số, tối đa 5 stack, thanh nộ của nhân vật này chỉ có 85 thay vì mặc định là 100.
 Sát thương nhận vào từ động vật từ Faun của kẻ thù giảm 20%.
 
 Đánh thường: Gây sát thương = 100% wil và atk lên 1 mục tiêu.
 
-Kĩ năng 1: Faun và động vật được triệu hồi từ ultimate thực hiện 1 lần đánh thường, không ảnh hưởng turn luân phiên hiện có, 25 aether.
-Kĩ năng 2: 5 động vật được triệu hồi tiếp theo từ ultimate của faun sẽ được tăng thừa hưởng chỉ số từ faun từ 50% lên 80%, 25 aether.
-Kĩ năng 3: khi kích hoạt kĩ năng này, hồi hp = 7% max hp bản thân và nhận 1 stack bất khuất, khi bất khuất từ kĩ năng này được kích hoạt thì 1 đơn vị động vật đồng minh từ ultimate của Faun sẽ chết, hp về 0 bất kể hp của động vật đó còn bao nhiêu, loại động vật đó cũng không thể triệu hồi đến hết trận, kĩ năng ưu tiên động vật có hp thấp nhất, nếu Faun có 2 stack bất khuất trở lên, ưu tiên kích hoạt bất khuất nhận được từ kĩ năng này, 25 aether.
+Kỹ năng 1 – Dã Linh Hiệp Kích: Faun và động vật được triệu hồi từ ultimate thực hiện 1 lần đánh thường, không ảnh hưởng turn luân phiên hiện có, 25 aether.
+Kỹ năng 2 – Ấn Khế Cường Thừa: 5 động vật được triệu hồi tiếp theo từ ultimate của faun sẽ được tăng thừa hưởng chỉ số từ faun từ 50% lên 80%, 25 aether.
+Kỹ năng 3 – Thú Tế Hộ Mệnh: khi kích hoạt kĩ năng này, hồi hp = 7% max hp bản thân và nhận 1 stack bất khuất, khi bất khuất từ kĩ năng này được kích hoạt thì 1 đơn vị động vật đồng minh từ ultimate của Faun sẽ chết, hp về 0 bất kể hp của động vật đó còn bao nhiêu, loại động vật đó cũng không thể triệu hồi đến hết trận, kĩ năng ưu tiên động vật có hp thấp nhất, nếu Faun có 2 stack bất khuất trở lên, ưu tiên kích hoạt bất khuất nhận được từ kĩ năng này, 25 aether.
 
-Ultimate: Triệu hồi 1 động vật trong các động vật ngẫu nhiên sau lên sân ở vị trí trống ngẫu nhiên trên sân đồng minh: ( mỗi động vật từ ultimate này không thể dùng ult, không có nộ, aether, kĩ năng và chỉ đánh thường). Mọi đánh thường của động vật trong ultimate này được tính là gây sát thương= 100% wil và atk của động vật đó, mỗi động vật không thể tồn tại 2 con trên sân đồng minh.
+Ultimate, Lâm Uyên Triệu Dã: Triệu hồi 1 động vật trong các động vật ngẫu nhiên sau lên sân ở vị trí trống ngẫu nhiên trên sân đồng minh: ( mỗi động vật từ ultimate này không thể dùng ult, không có nộ, aether, kĩ năng và chỉ đánh thường). Mọi đánh thường của động vật trong ultimate này được tính là gây sát thương= 100% wil và atk của động vật đó, mỗi động vật không thể tồn tại 2 con trên sân đồng minh.
 - Tiểu Hắc: một con báo đen nhanh nhẹn, thừa hưởng 50% mọi chỉ số từ Faun trừ aeregen, tồn tại tối đa 5 turn, đòn tấn công bỏ qua 10% arm của mục tiêu, tấn công dạng cắn và cào. Mô tả ngoại hình: ngầu.
 - Tiểu Bạch: một con hồ ly màu trắng, thừa hưởng chỉ số và turn tồn tại tối đa như tiểu hắc nhưng đánh thường gây thêm 5% sát thương và không bỏ qua arm như tiểu hắc. Mô tả ngoại hình: đáng yêu, lông trắng và có 3 đuôi.
 - Tiểu Hoàng: một con gà vàng thừa hưởng chỉ số và turn tồn tại tối đa như tiểu hắc, khi chết Faun sẽ ăn Tiểu Hoàng và Faun được hồi hp = 50% max hp của Tiểu Hoàng.
 - Tiểu Bất Điểm: một con sóc nhỏ thừa hưởng chỉ số và turn tồn tại tối đa như tiểu hắc, đánh thường không gây sát thương mà sẽ hồi hp cho động vật khác và Faun mỗi đơn vị = 30% wil và atk của bản thân Tiểu Bất Điểm. Mô tả ngoại hình: đáng yêu, lông trộn lẫn giữa trắng, nâu và xám.
 - Nhị Cẩu: một con chó nhà giống chó shiba, thừa hưởng 50% mọi chỉ số từ Faun trừ aeregen, tồn tại tối đa 5 turn, không tấn công mà mỗi turn sẽ hồi hp = 10% max hp của bản thân Nhị Cẩu, mỗi 2 turn nhận 1 turn khiêu khích. Mô tả ngoại hình: con chó này cần có ngoại hình cực kỳ muốn ăn đòn, người khác nhìn vào phải muốn đánh nó, hài hước mà phải khiêu khích người nhìn, gợi đòn.
 
-43) Huyết Tộc Thân Vương
+47) Basil Thorne
 
-44) Thiết Lang
+Nội tại, Gai Độc: bất kỳ nhân vật nào gây sát thương lên nhân vật này đều nhận 1 hiệu ứng độc, nội tại này có thể stack tối đa 10 lần lên 1 mục tiêu, không giới hạn lượng mục tiêu. Nội tại độc giới hạn gây 1 hiệu ứng độc/turn/mỗi kẻ tấn công, dù nhận bao nhiêu sát thương từ 1 kẻ tấn công thì nội tại chỉ gây 1 debuff độc lên kẻ tấn công đó/mỗi turn, không giới hạn gây bao nhiêu hiệu ứng độc/turn (có thể gây hiệu ứng độc lên nhiều kẻ tấn công trong 1 turn nhưng mỗi kẻ tấn công chỉ nhận tối đa 1 debuff độc/turn từ nội tại này). Nội tại này không thể lãng quên.
 
-Nội tại: bất kỳ nhân vật nào gây sát thương lên nhân vật này đều nhận 1 hiệu ứng độc, nội tại này có thể stack tối đa 10 lần lên 1 mục tiêu, không giới hạn lượng mục tiêu. Nội tại độc giới hạn gây 1 hiệu ứng độc/turn/mỗi kẻ tấn công, dù nhận bao nhiêu sát thương từ 1 kẻ tấn công thì nội tại chỉ gây 1 debuff độc lên kẻ tấn công đó/mỗi turn, không giới hạn gây bao nhiêu hiệu ứng độc/turn (có thể gây hiệu ứng độc lên nhiều kẻ tấn công trong 1 turn nhưng mỗi kẻ tấn công chỉ nhận tối đa 1 debuff độc từ nội tại này). Nội tại này không thể lãng quên.
+Kỹ năng 1 – Chiết Luyện Độc Tích: tăng 1,5% max hp/mỗi stack độc kẻ thù đang mắc phải tính cả hiệu ứng độc do đồng minh gây ra lên kẻ thù, sau khi dùng kỹ năng này tăng max hp thành công thì mọi hiệu ứng độc trên kẻ thù đứng trên sân sẽ biến mất, 30 aether.
 
-Kĩ năng 1: tăng 1,5% max hp/mỗi stack độc kẻ thù đang mắc phải tính cả hiệu ứng độc do đồng minh gây ra lên kẻ thù, sau khi dùng kỹ năng này tăng max hp thành công thì mọi hiệu ứng độc trên kẻ thù đứng trên sân sẽ biến mất, 30 aether.
+Kĩ năng 2 – Khế Ước Gai Huyết: giảm 10% max hp, nhận hiệu ứng phản sát thương trong 2 turn, 25 aether.
 
-Kĩ năng 2: giảm 10% max hp, nhận hiệu ứng phản sát thương trong 2 turn, 25 aether.
-
-Kĩ năng 3: gây 2 đòn đánh thường lên 1 mục tiêu, 20 aether.
+Kĩ năng 3 – Song Tiêm Trảm: gây 2 đòn đánh thường lên 1 mục tiêu, 20 aether.
 
 Đánh thường: Gây sát thương = 100% wil và atk lên 1 mục tiêu.
 
-Ultimate: Nhận hiệu ứng khiêu khích (taunt) trong 2 turn, trong quá trình nhận taunt này arm và res của nhân vật này tăng 20% tính từ lúc bắt đầu dùng ult, sau khi hết taunt hiệu ứng tăng res và arm này sẽ biến mất.
+Ultimate – Pháo Đài Gai Đen: Nhận hiệu ứng khiêu khích (taunt) trong 2 turn, trong quá trình nhận taunt này arm và res của nhân vật này tăng 20% tính từ lúc bắt đầu dùng ult, sau khi hết taunt hiệu ứng tăng res và arm này sẽ biến mất.
 
-45)
+48) Thạch Uy — Hộ Vệ Đá (SR) Class: Tanker
+Đánh thường: Gây sát thương = 100% ATK + 100% WIL lên 1 mục tiêu.
+Nội tại — Thạch Bì
+Vào trận: +10% ARM.
+Khi HP ≤ 50%, nhận thêm +10% RES (mất hiệu lực khi HP > 50%).
+
+Kỹ năng 1 — Khiên Đập (20 AE)
+Gây 140% đòn đánh thường lên 1 mục tiêu.
+20% tỉ lệ gây Daze 1 lượt.
+
+Kỹ năng 2 — Lập Trận (25 AE)
++20% ARM/RES cho bản thân trong 2 lượt.
+Nhận Khiên = 8% Max HP (tồn tại 2 lượt).
+
+Kỹ năng 3 — Quét Ngang (25 AE)
+Gây 110% đòn đánh thường lên 1 hàng ngang ngẫu nhiên (1–2–3 hoặc 4–5–6 hoặc 7–8–9).
+
+Ultimate (auto-cast khi đầy Nộ) — Địa Tâm Húc
+Lao húc 1 mục tiêu, gây 260% đòn đánh thường.
+Sau khi húc, nhận Taunt 1 lượt và –10% sát thương nhận vào 1 lượt.
+
+49) Phong Nhạn — Nữ Xạ Thủ (SR) Class: Ranger
+Đánh thường: Gây sát thương = 100% ATK + 100% WIL lên 1 mục tiêu.
+
+Nội tại — Dấu Chân Gió: Đứng hàng sau (ô 7/9): +5% ATK. (Mất hiệu lực nếu rời hàng sau.)
+
+Kỹ năng 1 — Song Tiễn Liên Kích (20 AE): Bắn 2 mũi vào 1 mục tiêu, mỗi mũi gây 80% đòn đánh thường.
+
+Kỹ năng 2 — Tiễn Xuyên Trận (25 AE): Bắn xuyên 1 cột dọc ngẫu nhiên (1–4–7 hoặc 2–5–8 hoặc 3–6–9), mỗi ô trúng nhận 120% đòn đánh thường.
+
+Kỹ năng 3 — Đón Gió (25 AE): +20% SPD và +10% ATK cho bản thân trong 2 lượt.
+
+Ultimate (auto-cast khi đầy Nộ) — Vũ Tiễn Mưa Rào
+Bắn 3 mũi vào 3 kẻ địch ngẫu nhiên (mỗi mục tiêu 1 mũi), mỗi mũi = 150% đòn đánh thường.
+Nếu mục tiêu đang có bất kỳ debuff nào, sát thương trên mục tiêu đó +10%.
+
+50) Tên: Ảnh Vị – Sát Thủ Bóng Đêm (SR)
+Class: Assassin (Sát thủ)
+Đánh thường: Gây sát thương = 100% ATK + 100% WIL lên 1 mục tiêu.
+
+Nội tại – Mảnh Ảnh
+Vào trận: tự cộng +8% SPD.
+Khi hạ gục 1 kẻ địch, hồi 5 Aether và nhận +5% ATK trong 2 lượt (không cộng dồn nhưng có thể làm mới thời gian).
+
+Kỹ năng 1 – Phantom Lunge (20 Aether)
+Lao tới và chém một mục tiêu, gây 140% đòn đánh thường. Nếu mục tiêu đang có debuff (bất kỳ loại), sát thương tăng thành 160%.
+
+Kỹ năng 2 – Phi Đao Vô Ảnh (25 Aether)
+Ném 3 phi đao vào tối đa 2 kẻ địch ngẫu nhiên.
+Mỗi phi đao gây 90% đòn đánh thường; nếu 2 phi đao trúng cùng 1 mục tiêu, phi đao thứ hai gây 50% sát thương. 20% xác suất gây Bleed 1 lượt cho kẻ địch bị trúng 2 phi đao.
+
+Kỹ năng 3 – Ẩn Thân (25 Aether, CD 3)
+Nhận Stealth trong 1 lượt: né hoàn toàn sát thương đến từ đòn đánh thường, đồng thời tăng +20% SPD trong lượt này. Khi hết stealth, đòn đánh thường kế tiếp của Ảnh Vị gây thêm 20% sát thương.
+
+Ultimate (auto-cast) – Ảo Ảnh Kết Liễu
+Khi đầy nộ, Ảnh Vị phân thân thành hai bóng, tấn công hai kẻ địch ngẫu nhiên. Mỗi phân thân gây 200% đòn đánh thường. Nếu mục tiêu còn lại <30% HP sau hit đầu, phân thân còn lại tự động chuyển sang kẻ địch khác.
+
+51) Tên nhân vật: Long Nhân — Vũ Hoang  (Chiến sĩ – SSR)
+Mô tả: Ma Long Vũ Tướng là một Long Nhân từng vẫy vùng trong hỗn mang. Hắn tin rằng chỉ bằng cách hy sinh huyết mạch của mình để đổi lấy sức mạnh, hắn mới có thể phá vỡ mọi giới hạn. Bộ kỹ năng của hắn xoay quanh việc giảm Max HP của chính mình để tăng sức mạnh, kháng debuff và tự hồi phục.
+
+Nội tại – Long Huyết
+Kháng tính: Có 30% tỉ lệ kháng hoàn toàn 9 debuff trong debuff pool trong 1 turn (không kích hoạt đối với các dấu ấn đặc biệt như Phệ Ấn, Sa Ấn, HVCP…). Khi kháng thành công, nhận buff Frenzy trong 2 lượt, tăng 20% sát thương từ đòn đánh thường (buff này làm mới thời gian nếu kích lại).
+Hồi phục: Mỗi khi sử dụng kỹ năng làm giảm Max HP, Ma Long Vũ Tướng lập tức tăng 3% Max HP hiện tại.
+Giảm sát thương: Khi HP ≤ 50%, giảm 10% sát thương nhận vào.
+Tự hồi máu: Mỗi lượt tự hồi hp = 2% Max HP.
+
+Kỹ năng
+1. Bạo Huyết (25 Aether)
+Giảm 10% Max HP hiện tại của Long Nhân để bộc phát cơn cuồng nộ:
+Nhận +20% ATK và +20% WIL trong 2 lượt.
+Nhận buff Frenzy trong 2 lượt (đòn đánh thường +20% sát thương).
+Đồng thời xóa 1 debuff đang có trên bản thân (nếu có).
+
+2. Thiên Long Trảm (30 Aether)
+Nhảy vút tới kẻ địch và chém 1 đòn mạnh:
+Gây 200% sát thương đòn đánh thường lên 1 mục tiêu. Áp Bleed trong 2 lượt (mỗi lượt mất 5% HP tối đa và giảm thời gian). Nếu mục tiêu ≤20% HP khi trúng chiêu, sát thương tăng lên +30% (cộng vào hệ số 200%).
+
+3. Giáp Ngân Long (25 Aether, hồi chiêu 3 lượt): Tạm thời bao phủ bởi lớp giáp vảy bạc:
+Nhận Khiên tương đương 15% Max HP (tồn tại tối đa 2 lượt).
+Giảm 20% sát thương nhận vào trong 2 lượt.
+Thanh tẩy 1 debuff trên bản thân.
+
+Ultimate (tự kích khi đầy nộ) – Long Hồn Quy Diệt
+Tập trung toàn bộ oai lực:
+Gây sát thương cực mạnh = 300% đòn đánh thường lên 1 mục tiêu.
+Bỏ qua 10% ARM và 10% RES của mục tiêu.
+Nếu Ma Long Vũ Tướng đã mất Max HP vì các kỹ năng của mình, đòn này gây thêm 20% của tổng lượng Max HP đã mất.
+Sau khi thi triển, tăng 4% Max HP cho bản thân
+
+52) Chúc Cửu Âm — UR (Support)
+
+Đánh thường – Long Tức: gây sát thương = 100% ATK + 100% WIL lên 1 mục tiêu.
+
+Nội tại — Nhật Dạ Chu Thiên
+Vào sân ở Giai đoạn I. Mỗi khi Chúc Cửu Âm kết thúc lượt của mình: +1 “Chu Thiên”.
+3 Chu Thiên → thăng Giai đoạn II.
+6 Chu Thiên → thăng Giai đoạn III.
+Thăng giai đoạn tăng nhẹ chỉ số toàn diện (áp vào bản thân, cộng dồn khi thăng):
+GĐ I: cơ bản.
+GĐ II: +8% WIL/ATK, +6% RES, +5% SPD.
+GĐ III: +15% WIL/ATK, +10% RES, +8% SPD.
+Một số kỹ năng (dưới đây) tăng thông số theo giai đoạn.
+> Ghi chú: rời sân → reset về GĐ I (không giữ Chu Thiên).
+
+Kỹ năng 1 — Thời Sa Phóng Quang (25 aether)
+Bắn tia thời sa vào 1 mục tiêu:
+Sát thương = 150% / 160% / 170% đòn đánh thường (theo GĐ I/II/III).
+Nếu mục tiêu đứng trong mask Minh Đăng (xem K3): thêm -1/-1/-2 aether và daze 1 turn.
+
+Kỹ năng 2 — Hô Hấp Chu Thiên (25 aether, CD 1)
+Tập trung hô hấp nhật–dạ 2 lượt:
+Bản thân: +pierce (bỏ qua 10% / 12% / 15% ARM & RES), +200% HP regen.
+Đồng minh cùng cột (ô 2/5/8 phía team mình): +1 aether ngay khi kích hoạt.
+Nếu Minh Đăng đang tồn tại: kéo dài thời lượng của Minh Đăng +1 lượt (không vượt quá 5).
+
+Kỹ năng 3 — Minh Đăng Trấn Giới (25 aether, CD 2): Đặt Minh Đăng tại ô trung tâm dải trung gian (giữa hai ô số 2; là địa vật, không phải unit, không thể bị chỉ định/nhận sát thương). Nếu đã có Minh Đăng của đội mình: dời đến vị trí mới và làm mới thời lượng.
+Vùng ảnh hưởng (mask): các ô {1,2,3,5} của cả hai bên (tổng 8 ô, đối xứng theo ảnh).
+Tick ở đầu lượt của Chúc Cửu Âm:
+Đồng minh trong mask: +HP regen và +aether/turn
+GĐ I: +12% regen, +1 aether
+GĐ II: +14% regen, +1 aether
+GĐ III: +16% regen, +2 aether
+Kẻ địch trong mask: giảm hồi phục nhận vào và hút aether
+GĐ I: -30% heal taken, -1 aether
+GĐ II: -40% heal taken, -1 aether
+GĐ III: -50% heal taken, -2 aether
+Không giảm aether xuống dưới 0; không cộng dồn nhiều lần nếu đứng yên nhiều lượt.
+Thời lượng Minh Đăng: 3 lượt (GĐ III: 4 lượt). Tối đa 1 nến/team.
+
+Ultimate — Khai–Bế Thiên Nhãn (auto-cast khi đầy nộ)
+Mỗi lần kích hoạt, xoay pha nhật–dạ và gia cường nhịp độ giao tranh 2 lượt:
+Hiệu ứng tức thời: toàn đội +1 aether, kẻ địch ngẫu nhiên 2 mục tiêu silence 1 lượt (boss chịu 50%).
+Trong 2 lượt:
+Đồng minh đứng trong mask Minh Đăng nhận thêm +10% sát thương gây ra (hybrid) và +10% heal received.
+Kẻ địch trong mask Minh Đăng chịu thêm +10% sát thương nhận vào (final inMul, không stack với chính nó).
+Nếu lúc ulting đang có Minh Đăng: gia cố nến (tức thì +1 lượt thời lượng, tối đa như trên).
+Nộ tiêu hao: theo chuẩn hệ thống của bạn (giữ như bản đã chốt trước đây).
+
+K3 chuyển thành địa vật trung tuyến + mask {1,2,3,5}: buộc giao tranh ở rìa giữa, rõ ràng, không “toàn sân” nên tránh snowball.
+K1/K2 được buộc chặt vào Minh Đăng và giai đoạn để khuyến khích nhịp: đặt nến → ép vị trí → rút aether/giảm hồi → ult bồi.
+Ult giữ vai trò “nhịp tổng”—buff phe ta, debuff phe địch trong chính mask nến → giúp đọc combat và phản khắc bằng di chuyển.
+
+Quy tắc tranh chấp Minh Đăng (đã rút gọn để code dễ)
+Một vị trí duy nhất: Minh Đăng chỉ có 1 ô trung tâm (giữa hai ô số 2). Trên sân tối đa 1 Minh Đăng đang hoạt động tại mọi thời điểm.
+Chủ sở hữu: Minh Đăng mang cờ owner = teamA | teamB.
+Đặt khi ô đã có nến:
+Nếu cùng team → chỉ làm mới thời lượng (và dời nến nếu đang ở trạng thái “đang bị tranh chấp”, xem dưới).
+
+Nếu khác team → tranh chấp:
+Nếu nến hiện tại đang trong trạng thái “Khóa 1 lượt” (vừa đặt xong ở lượt trước) → không thể bị thay thế. Caster mất aether, K3 vẫn vào cooldown (anti-ping-pong).
+
+Nếu không bị khóa → caster thay thế (nến đổi owner sang team caster, thời lượng reset).
+Khóa 1 lượt: Mỗi lần nến được đặt/thay thế thành công, nó nhận trạng thái Lock(1) → không thể bị cướp cho tới đầu lượt kế tiếp của chủ sở hữu nến.
+
+Đồng thời (cùng tick): So SPD tại thời điểm cast. Bên SPD cao hơn xử lý trước. Hòa SPD → ưu tiên phe thủ (bên đi sau trong lượt round) hoặc tung coin 50/50 (chọn 1 làm mặc định).
+Tick hiệu ứng: aura của nến chỉ áp dụng ở đầu lượt của Chúc Cửu Âm đang sở hữu nến. Nếu quyền sở hữu đổi giữa các lượt, hiệu ứng bắt đầu áp dụng từ tick kế tiếp (không hồi tố).
+K2 – Hô Hấp Chu Thiên: chỉ gia hạn nếu đội mình đang sở hữu Minh Đăng; nếu đối phương đang sở hữu → không gia hạn (không lỗi, chỉ không tác dụng phần “kéo dài nến”).
+Tồn tại duy nhất theo team: mỗi team vẫn “chỉ có 1 nến” theo nghĩa quyền sở hữu. Nhưng vì ô trung tâm là toàn cục, kết quả thực tế vẫn là 1 nến trên sân do bên nào đang nắm quyền.
+Chết/rời sân: nếu Chúc Cửu Âm của chủ sở hữu nến rời sân/chết → Minh Đăng giữ đến hết thời lượng còn lại, hết thì tắt (không đổi owner).
+
+53) Hóa Thân Huyết Chủ, Prime.
+
+Rank: Prime · Class: Mage · Tags: blood, prime, domain, no-buff. Rage/Ult: auto-cast khi Rage ≥ RageMax (theo engine chung)
+Ô mục tiêu dùng chuẩn 1–9 như ảnh (bên địch)
+Đánh thường – Huyết Đoạt
+Gây sát thương = 100% ATK + 100% WIL lên 1 mục tiêu. Đặt 1 stack Huyết Ấn lên mục tiêu.
+Nếu mục tiêu đang dính bleed: sát thương đòn đánh thường +10%.
+
+Nội tại – Bất Nhiễm Huyết Chủ
+Miễn buff & debuff: không thể nhận bất kỳ buff/debuff nào (ally/boss), không thể nhận shield/stealth/haste…; vẫn nhận hồi máu trực tiếp (heal không phải buff).
+Không thể hồi sinh.
+Huyết Thực: mỗi khi một kẻ địch đang dính bleed chết (nguồn sát thương nào cũng được), bản thân +5% MaxHP (cộng dồn tới +50% trong trận). Mất khi rời trận (nếu có cơ chế).
+Hạch Huyết Tái Sinh (failsafe 1 lần – innate, không phải buff): nếu số mạng do unit này kết liễu (sourceFlag = this) trong trận ≥ 5, khi nhận đòn chí tử: không chết, đặt HP = 1, xóa toàn bộ MaxHP cộng thêm từ Huyết Thực, hiệu ứng này sau đó tắt (mỗi trận 1 lần).
+> Quy tắc nguồn sát thương: mọi sát thương do kỹ năng/ult/aura/field của Huyết Thần gây ra gắn source=this. Reflect của mục tiêu không tính là source=this.
+Trạng thái riêng – Huyết Ấn (trên mục tiêu)
+type:"mark", stackable, maxStacks:5, tồn tại tới khi chết/cleanse.
+Nếu mục tiêu có ≥3 stacks:
+• sát thương từ bleed và execute lên mục tiêu +25% (nhân vào damage cuối cùng),
+• khi bước vào hành động trong Huyết Hải Lãnh Địa (xem S2) sẽ bị silence 1 lượt (mỗi mục tiêu chỉ bị 1 lần mỗi đợt Lãnh Địa).
+
+Kỹ năng 1 (25 AE) – Huyết Triều
+Phạm vi: quét hai đường chéo biên bên địch: các ô 1–4–7 và 3–6–9 (tối đa 6 mục tiêu).
+Sát thương: 140% đòn đánh thường lên mỗi mục tiêu trúng.
+Hiệu ứng: đặt bleed 2 lượt và +1 Huyết Ấn trên mỗi mục tiêu trúng.
+
+Kỹ năng 2 (0 AE, mỗi trận 1 lần) – Huyết Hải Lãnh Địa
+Cắm field effect tại ô giữa của 3 ô trống trung gian (giữa hai ô số 2) (ô 2/5/8). Thời lượng: 2 lượt (tính theo lượt của Huyết Thần).
+Hiệu ứng trong thời gian hoạt động:
+Toàn sân địch: -25% hiệu quả hồi phục (healing efficiency). Toàn sân đồng minh: +25% HP regen (không phải buff; là hiệu ứng môi trường).
+Kích hoạt im lặng có điều kiện: mỗi kẻ địch khi bắt đầu hành động và đang có ≥3 Huyết Ấn ⇒ silence 1 lượt ngay tức thì (mỗi mục tiêu chỉ 1 lần trong mỗi đợt Lãnh Địa).
+Stack/ghi đè: mỗi đội tối đa 1 field đang hoạt động; đặt mới ghi đè field cũ của cùng phe. Field không mất nếu Huyết Thần chết, tự hết khi hết lượt.
+
+Kỹ năng 3 (25 AE) – Huyết Tế
+Tiêu hao: 10% MaxHP của bản thân (true cost, không thể chặn).
+Hiệu ứng: toàn đội đồng minh +15 AE ngay lập tức.
+
+Tuyệt kỹ – Lũ Máu Quy Tông (auto-cast theo Rage)
+Phạm vi: toàn bộ địch trên sân.
+Sát thương: 220% đòn đánh thường (hybrid).
+Hiệu ứng thêm: mọi mục tiêu đang dính bleed lập tức kiểm tra tàn sát/execute theo luật game (≤10% MaxHP ⇒ ngã gục; vẫn bị chặn bởi cơ chế cứu tử nếu có).
+Sau cùng: cộng +1 Huyết Ấn lên mọi mục tiêu còn sống.
+
+Va chạm – mirror & edge-cases
+Mirror: mỗi team chỉ có 1 Huyết Thần; hai bên có thể cùng bật Lãnh Địa; hiệu ứng mỗi bên áp riêng lên đối phương/đồng minh của phe đó.
+Không nhận buff/debuff: không thể nhận shield/stealth/haste/venom/exalt/pierce/…; vẫn nhận heal trực tiếp và sát thương bình thường. Overheal → shield không áp lên Huyết Thần.
+Cleanse: xóa Huyết Ấn trên mục tiêu địch được phép (do skill khác), nhưng không thể xóa các hiệu ứng môi trường từ Lãnh Địa.
+Nguồn sát thương: tick từ bleed là source=bleed, kill do bleed không tính vào mốc “5 mạng” của failsafe; kill từ skill/ult hoặc field của Huyết Thần mới tính.
+
 
 B. Nhân vật npc pve không gacha. Hưởng lợi chỉ số từ miêu tả ở mục B trong ý tưởng nhân vật.txt
 
-1) Void Whisper - Xul'gathar (虚空低语者 - Xū Kōng Dī Yǔ Zhě)
+1) Bosss: Void Whisper - Xul'gathar (虚空低语者 - Xū Kōng Dī Yǔ Zhě)
 
 Nguồn gốc: Sinh vật từ Thứ Nguyên Trống Rỗng.
 Lore:
 Xul'gathar không có hình dạng vật chất - nó là một ý thức thuần túy lang thang trong Thứ Nguyên Trống Rỗng, nơi không có ánh sáng, âm thanh, hay bất cứ điều gì. Nó sinh ra từ sự cô đơn tuyệt đối của cái không, và khao khát được "tồn tại" như các sinh vật khác. Xul'gathar xâm nhập vào thế giới vật chất bằng cách thì thầm vào tâm trí những người cô đơn, hứa hẹn sẽ lấp đầy khoảng trống trong lòng họ. Nhưng một khi đã nghe thấy tiếng thì thầm, nạn nhân sẽ dần dần trở thành vật chủ cho ý thức của nó, cuối cùng biến thành một "Hồi Âm Trống Rỗng" - xác sống không có linh hồn nhưng phát tán ra tiếng thì thầm điên loạn. Đặc điểm:Không thể bị tấn công vật lý vì không có thể xác, Những ai nghe thấy thì thầm của nó sẽ dần mất đi ký ức về bản thân.
 
-Nội tại: mỗi khi nhận sát thương hay gây sát thương thì mục tiêu đều bị đánh dấu, đánh dấu này không thể xoá bỏ và khi đủ 7 đánh dấu lên 1 mục tiêu, mục tiêu sẽ chỉ đánh thường, không dùng kỹ năng, aether và thanh nộ sẽ bị đông cứng, trạng thái này chỉ mất khi mục tiêu chết.
+Nội tại – Thất Ấn Vô Niệm: mỗi khi nhận sát thương hay gây sát thương thì mục tiêu đều bị đánh dấu, đánh dấu này không thể xoá bỏ và khi đủ 7 đánh dấu lên 1 mục tiêu, mục tiêu sẽ chỉ đánh thường, không dùng kỹ năng, aether và thanh nộ sẽ bị đông cứng, trạng thái này chỉ mất khi mục tiêu chết.
+Xul'gathar không nhận sát thương atk nào mà chỉ nhận wil.
 
-Đánh thường: gầm thét, gây sát thương = 100% wil và atk lên toàn mục tiêu trên sân.
+Đánh thường – Hồi Âm Hư Không: gầm thét, gây sát thương = 100% wil và atk lên toàn mục tiêu trên sân.
 
-Ultimate: thực thi liên tiếp 3 lần đánh thường.
+Kỹ năng 1 — Vô Niệm Lan Tràn (25 Aether)
+Mục tiêu: 3 kẻ địch ngẫu nhiên trên sân (không cố định hàng/cột).
+Sát thương: 120% đòn đánh thường (chỉ tính WIL cho sát thương gây ra) lên từng mục tiêu.
+Hiệu ứng Thất Ấn: mỗi mục tiêu trúng đòn nhận thêm +1 dấu ngoài dấu mặc định do “chịu sát thương” từ nội tại (tức là đòn này thường khiến một mục tiêu nhận 2 dấu cùng lượt: 1 từ đòn đánh, 1 từ hiệu ứng kỹ năng).
+Ghi chú: nếu một mục tiêu đạt đủ 7 dấu vì kỹ năng này, trạng thái “đóng băng kỹ năng/aether/nộ, chỉ còn đánh thường” kích hoạt ngay (áp dụng từ lượt mục tiêu hành động kế tiếp theo luật engine của bạn).
+
+Kỹ năng 2 — Hư Không Tĩnh Vực (30 Aether, CD 2)
+Kiểu: Field effect đặt tại ô trung tâm của dải 3 ô trung gian (giữa hai ô số 2).
+Thời lượng: 2 lượt (đếm theo lượt của Xul’gathar). Mỗi đội tối đa 1 field đang hoạt động; đặt mới ghi đè field cũ của cùng phe.
+Vùng ảnh hưởng (mask): các ô {1,2,3,5} của cả hai bên (tổng 8 ô biên giữa).
+Tick thời gian: ở đầu lượt của Xul’gathar mỗi khi field còn hiệu lực:
+Kẻ địch trong mask:
+• +1 dấu một lần mỗi lượt (không cộng nhiều lần nếu đứng yên),
+• -1 Aether (không giảm dưới 0),
+• -30% hiệu quả hồi phục nhận vào trong lượt đó.
+Đồng minh (phe boss) trong mask: không có (giữ cân bằng và tránh snowball).
+Tương tác: field không phải unit, không thể bị chỉ định hoặc nhận sát thương; tự biến mất khi hết thời lượng.
+
+Kỹ năng 3 — Đồng Vọng Hư Vô (35 Aether, CD 2)
+Mục tiêu: toàn bộ kẻ địch hiện diện trên sân.
+Sát thương theo dấu: với mỗi mục tiêu, gây sát thương = 25% đòn đánh thường × số dấu đang có trên mục tiêu (tối đa tính 7 dấu ⇒ 175%).
+(Sát thương kỹ năng này chỉ dùng WIL để tính tác động, phù hợp “phi vật chất”.)
+Bảo toàn dấu: không tiêu dấu sau khi gây sát thương.
+Gia tốc khóa kỹ năng: nếu mục tiêu đã có ≥5 dấu trước khi nhận sát thương từ kỹ năng này, áp daze 1 lượt (choáng nhẹ) lên mục tiêu đó. Daze không chồng nếu đã ở trạng thái “7 dấu bị khóa” (tránh trùng cơ chế).
+
+Ultimate – Hư Không Tam Hồi: thực thi liên tiếp 3 lần đánh thường.
 
 2) Ur'zaloth - Kẻ Uốn Cong Thực Tại (现实扭曲者 - Xiàn Shí Niǔ Qǔ Zhě)
 
@@ -145,26 +399,40 @@ Nguồn gốc: Thực thể từ Thứ Nguyên Hỗn Loạn
 Lore:
 Ur'zaloth tồn tại trong Thứ Nguyên Hỗn Loạn - nơi các định luật vật lý không có nghĩa. Nó có khả năng "viết lại" các quy tắc của thực tại trong phạm vi giới hạn. Khi nó xuất hiện, trọng lực có thể đảo ngược, lửa có thể đóng băng, và cái chết có thể trở thành điểm khởi đầu của sự sống. Ur'zaloth không có mục đích rõ ràng - nó chỉ thích "thí nghiệm" với thực tại để xem điều gì sẽ xảy ra. Một số khu vực nơi nó từng xuất hiện vẫn còn bị biến dạng vĩnh viễn, với những hiện tượng kỳ lạ như nước chảy ngược, bầu trời biến thành đất, hay cây cối mọc ra thịt thay vì gỗ. Đặc điểm: Hình dạng luôn thay đổi - đôi khi là người, đôi khi là quái vật, đôi khi là hình học trừu tượng Có thể tạo ra "Vùng Dị Thường" nơi mọi thứ không tuân theo logic Những ai ở gần nó quá lâu sẽ bị biến dị về cả thể xác lẫn tinh thần.
 
-Nội tại: không thể bị chỉ định bởi kĩ năng, đánh thường hay ult có thiết lập tấn công aoe ngẫu nhiên mà không phải tấn công aoe vị trí cố định, nhân vật bất kỳ tấn công nhân vật này khi đạt 12 lần sẽ bị biến dị.
-Biến dị: ngoại hình trở nên mơ hồ, vặn vẹo và luôn thay đổi, da thịt thối rữa.
-aether và nộ bị đóng băng, không thể tăng, max hp giảm 20% tính từ lúc đánh Ur'zaloth 12 lần, mỗi lần hành động turn thành công hp của kẻ biến dị sẽ giảm hp = 10% max hp. Biến dị không phải là buff hay debuff, cách duy nhât thoát khỏi trạng thái này là chết và được hồi sinh, biến dị không có tác dụng với nhân vật thuộc bậc Prime.
+Nội tại – Định Luật Phản Thực:
+Không thể bị chỉ định bởi các đòn có thiết lập AOE ngẫu nhiên (không áp dụng cho AOE vị trí cố định).
+Bất kỳ đơn vị nào tấn công Ur’zaloth đủ 12 lần sẽ rơi vào Biến Dị: hình dạng vặn vẹo, Aether & Nộ bị đóng băng, Max HP -20% (tính từ lần thứ 12), mỗi lượt hành động mất 10% Max HP. Biến Dị không phải buff/debuff, chỉ hết khi chết rồi được hồi sinh; không tác dụng với bậc Prime.
 
-Đánh thường: Cách không triệu hồi 1 cánh cổng không gian trước mặt leader địch, thò tay vào cổng không gian trước mặt, bàn tay xuất hiện ở cổng không gian trước mặt leader địch, tát mục tiêu và gây sát thương = 100% wil và atk lên leader đối phương, đánh thường là sát thương đơn, cố định và luôn tấn công vào vị trí số 8 của kẻ địch là leader đối phương.
+Đánh thường – Tát Xuyên Không:
+Mở cổng không gian rồi giáng một cái tát qua cổng: gây sát thương = 100% WIL + ATK lên Leader đối phương (vị trí số 8). Đây là đơn mục tiêu cố định.
 
-Ultimate: Áp dụng ngẫu nhiên 1 trong các quy tắc sau trong 2 turn:
+Ultimate – Tái Viết Hiện Thực:
+Áp dụng ngẫu nhiên 1 quy tắc sau trong 2 lượt lên toàn bộ đơn vị trên chiến trường (cả mới ra sân cũng chịu):
 - Không thể chết: Bất kể là nhân vật đồng minh hay kẻ thù chỉ cần đứng trên sân đều không thể chết vì hp về 0 (đơn vị được triệu hồi không tính).
-- Không thể bị chỉ định: bất kể là đồng minh hay kẻ thù thì mỗi đơn vị đều không thể chỉ định mục tiêu bằng đòn tấn công aoe có thiết lập tấn công ngẫu nhiên mà không phải thiết lập tấn công aoe có vị trí cố định.
-- Không thể hồi phục: bất kể là đồng minh hay kẻ thù thì mỗi đơn vị đứng trên sân đều không thể hồi hp dưới mọi hình thức ( hp regen, kĩ năng, đánh thường, nội tại và ultimate đều không được).
-- Không thể gây sát thương lên mục tiêu vượt quá 3% max hp của mục tiêu, quy tắc này áp dụng toàn sân bất kể kẻ thù hay đồng minh.
-Lưu ý về ultimate này: quy tắc từ ultimate này áp dụng cho tất cả đơn vị trên chiến trường, nhân vật mới ra sân từ deck cũng sẽ bị quy tắc này ảnh hưởng, quy tắc từ kĩ năng này không phải là buff hay debuff, không thể miễn dịch, tiến hoá để không bị ảnh hưởng, quy tắc có độ ưu tiên cao nhất.
+- Vô Chỉ Định: bất kể là đồng minh hay kẻ thù thì mỗi đơn vị đều không thể chỉ định mục tiêu bằng đòn tấn công aoe có thiết lập tấn công ngẫu nhiên mà không phải thiết lập tấn công aoe có vị trí cố định.
+- Phong Hồi Phục: bất kể là đồng minh hay kẻ thù thì mỗi đơn vị đứng trên sân đều không thể hồi hp dưới mọi hình thức ( hp regen, kĩ năng, đánh thường, nội tại và ultimate đều không được).
+- Giới Hạn Tổn Thương 3%: Không thể gây sát thương lên mục tiêu vượt quá 3% max hp của mục tiêu, quy tắc này áp dụng toàn sân bất kể kẻ thù hay đồng minh.
+Ghi chú: các quy tắc trên không phải buff/debuff, không thể miễn dịch hay tiến hoá để né, và có độ ưu tiên cao nhất.
 
 3) Thâm Uyên Devourer - Shab'gorath (深渊吞噬者 - Shēn Yuān Tūn Shì Zhě)
 
 Nguồn gốc: Thực thể từ Chiều Không Gian Thứ 5
 Lore:
-Shab'gorath là một thực thể sống trong chiều không gian thứ năm, nơi mà khái niệm "hiện tại", "quá khứ", và "tương lai" đan xen lẫn nhau. Đối với các sinh vật ba chiều, Shab'gorath xuất hiện như những phần cơ thể rời rạc: một cái tay ở đây, một cái đầu ở kia, nhưng thực chất đó chỉ là những "lát cắt" của cơ thể đa chiều của nó. Nó nuôi sống bằng cách hấp thụ "thời gian sống" của sinh vật khác - những ai gần nó sẽ thấy tuổi tác tăng lên nhanh chóng. Một số giáo phái thờ nó như một vị thần, hy vọng đạt được sự bất tử bằng cách hiến tế thời gian của người khác. Đặc điểm: Có thể xuất hiện và biến mất mà không cần di chuyển trong không gian ba chiềuCó khả năng "thấy" mọi khả năng trong tương laiChạm vào nó có thể khiến người đó nhảy cóc qua thời gian một cách ngẫu nhiên.
+Shab'gorath là một thực thể sống trong chiều không gian thứ năm, nơi mà khái niệm "hiện tại", "quá khứ", và "tương lai" đan xen lẫn nhau. Đối với các sinh vật ba chiều, Shab'gorath xuất hiện như những phần cơ thể rời rạc: một cái tay ở đây, một cái đầu ở kia, nhưng thực chất đó chỉ là những "lát cắt" của cơ thể đa chiều của nó. Nó nuôi sống bằng cách hấp thụ "thời gian sống" của sinh vật khác - những ai gần nó sẽ thấy tuổi tác tăng lên nhanh chóng. Một số giáo phái thờ nó như một vị thần, hy vọng đạt được sự bất tử bằng cách hiến tế thời gian của người khác. Đặc điểm: Có thể xuất hiện và biến mất mà không cần di chuyển trong không gian ba chiều.
+Có khả năng "thấy" mọi khả năng trong tương laiChạm vào nó có thể khiến người đó nhảy cóc qua thời gian một cách ngẫu nhiên.
 
-Nội tại, mỗi khi bị tấn công, kẻ tấn công sẽ được ngẫu nhiên hồi hp hoặc trừ hp, cộng trừ tối đa 10% max hp của kẻ tấn công, có thể giết chết mục tiêu, tỉ lệ + hp là 40%, trừ hp là 60% trong 40% và 60% cộng trừ hp này thì lượng hp + - là ngẫu nhiên, cap = 10% max hp của mục tiêu. Mỗi khi bị tấn công, kẻ tấn công sẽ được xoá 1 buff hoặc 1 debuff ngẫu nhiên.
+Nội tại: mỗi khi bị tấn công, kẻ tấn công sẽ được ngẫu nhiên hồi hp hoặc trừ hp, cộng trừ tối đa 10% max hp của kẻ tấn công, có thể giết chết mục tiêu, tỉ lệ + hp là 40%, trừ hp là 60% trong 40% và 60% cộng trừ hp này thì lượng hp + - là ngẫu nhiên, cap = 10% max hp của mục tiêu. Mỗi khi bị tấn công, kẻ tấn công sẽ được xoá 1 buff hoặc 1 debuff ngẫu nhiên.
+Mỗi khi bị tấn công có 15% tỉ lệ miễn dịch hoàn toàn không nhận sát thương của đòn tấn công đó.
+Mỗi khi gây sát thương sẽ giảm 2% max hp của mục tiêu.
+
+Đánh thường: gây sát thương ngẫu nhiên theo tỉ lệ sau:
+1. Tấn công leader đối phương cùng 1 kẻ địch ngẫu nhiên với 40% tỉ lệ.
+2. Tấn công ngẫu nhiên 2 kẻ địch tên sân rồi hồi hp = 10% sát thương gây ra, 30% tỉ lệ.
+3. Tấn công ngẫu nhiên 3 kẻ địch, 20% tỉ lệ.
+4. Tấn công ngẫu nhiên 4 kẻ địch, 10% tỉ lệ
+Đánh thường 1 đến 4 đều gây sát thương lên mỗi kẻ địch = 100% wil và atk.
+
+Ultimate: thực thi 3 lần đánh thường.
 
 4) Ny'rakath - Chúa Tể Nghìn Mắt (千眼之主 - Qiān Yǎn Zhī Zhǔ)
 
@@ -174,9 +442,9 @@ Ny'rakath là một trong những Cổ Thần ra đời trước cả vũ trụ 
 
 5) Kerrath Mortalis — Hoàng Tử Của Sự Lãng Quên
 
-Người thừa kế cuối cùng của vương quốc bị xóa khỏi lịch sử. Cả thế giới không còn nhớ tên hắn, và chỉ hắn còn biết bản thân từng tồn tại. Mỗi khi Kerrath giết ai, nạn nhân cũng bị xóa sạch khỏi ký ức nhân loại. Hắn săn lùng chính “ký ức” của mình — hy vọng tìm lại đất nước trong bóng tối
+Người thừa kế cuối cùng của vương quốc bị xóa khỏi lịch sử. Cả thế giới không còn nhớ tên hắn, và chỉ hắn còn biết bản thân từng tồn tại. Mỗi khi Kerrath giết ai, nạn nhân cũng bị xóa sạch khỏi ký ức nhân loại. Hắn săn lùng chính “ký ức” của mình — hy vọng tìm lại đất nước trong bóng tối.
 
-Nội tại: kẻ bị Kerrath Mortalis giết không thể hồi sinh đến hết trận đấu.
+Nội tại: kẻ bị Kerrath Mortalis giết không thể hồi sinh trong vòng 4 turn kể từ lúc chết.
 
 6) Huyết Nô - James
 
@@ -193,7 +461,30 @@ C. Các hiệu ứng buff/debuff bổ sung nếu trong game chưa có hiệu ứ
 3) Thích Ứng: debuff đầu tiên nhận khi đã nhận Thích Ứng sẽ không thể áp dụng lên nhân vật có thích ứng sau 2 turn. Thích Ứng giúp kẻ có buff này không nhận 1 debuff khi có thích ứng, nếu nhân vật có thích ứng và đã không nhận debuff chết thì sau khi hồi sinh sẽ mất hiệu ứng không nhận debuff tương quan từ Thích Ứng. Buff.
 4) Phản Hồi Phục: mọi hiệu ứng hồi phục trừ hp regen của bản thân sẽ được chuyển thành sát thương nhận vào mà không hồi hp, bỏ qua res và arm.
 5) Phản Sát Thương: nhân vật có hiệu ứng này khi bị tấn công thì kẻ bị tấn công nhận sát thương = sát thương nhân vật đó gây ra lên kẻ có hiệu ứng này. Ví dụ, A đánh B gây 100 sát thương thì A và B đều nhận 100 sát thương. Res và arm vẫn giảm sát thương khi kẻ địch nhận vào sát thương khi tấn công kẻ có buff này.
-
+Buff/debuff
+Danh sách chi tiết
+Trạng thái	Loại	Tác dụng chính	Hiệu quả cụ thể	Thời lượng mặc định
+stun	Debuff	Ngăn hành động	Đơn vị mang stun không thể hành động.	1 lượt
+sleep	Debuff	Ngăn hành động	Giống stun, ngăn hành động.	1 lượt
+taunt	Debuff	Ép mục tiêu	Buộc kẻ địch dùng đánh thường vào mục tiêu gần nhất có taunt.	1 lượt
+reflect	Buff	Phản sát thương	Phản lại phần trăm sát thương đã nhận cho kẻ tấn công.	1 lượt
+bleed	Debuff	Mất máu theo lượt	Mỗi lượt mất 5% HP tối đa và giảm thời lượng.	2 lượt
+dmgCut	Buff	Giảm sát thương nhận	Giảm sát thương nhận theo power.	1 lượt
+fatigue	Debuff	Giảm sát thương gây	Giảm 10% sát thương gây ra.	2 lượt
+silence	Debuff	Chặn kỹ năng tối thượng	Ngăn dùng chiêu tối thượng (ult).	1 lượt
+shield	Buff	Khiên hấp thụ	Hấp thụ sát thương tới khi hết lượng khiên, sau đó bị loại bỏ.	Không có (tồn tại tới khi vỡ)
+exalt	Buff	Tăng sát thương gây	Tăng 10% sát thương gây ra.	2 lượt
+pierce	Buff	Xuyên thủ	Tăng phần trăm xuyên thủ phòng thủ.	2 lượt
+daze	Debuff	Giảm chỉ số tốc/né	Giảm 10% SPD và AGI.	1 lượt
+frenzy	Buff	Tăng sát thương đánh thường	Đánh thường gây thêm 20% sát thương.	2 lượt
+weaken	Debuff	Giảm sát thương theo cộng dồn	Mỗi cộng dồn giảm 10% sát thương (tối đa 5).	2 lượt, có cộng dồn
+fear	Debuff	Giảm tốc & sát thương	Giảm 10% SPD và sát thương gây ra.	1 lượt
+stealth	Buff	Né sát thương	Vô hiệu sát thương (inMul=0) và bỏ qua tất cả khi bị đánh.	1 lượt
+venom	Buff	Độc kích hoạt theo đòn	Gây thêm sát thương bằng phần trăm sát thương đã gây.	2 lượt
+execute	Buff	Kết liễu mục tiêu yếu	Nếu mục tiêu <=10% HP, hạ gục ngay sau đòn đánh.	2 lượt
+undying	Buff	Hồi sinh một lần	Khi chết sẽ hồi 1 HP, loại bỏ undying và sống lại.	Một lần kích hoạt
+allure	Buff	Né đánh thường	Loại khỏi danh sách mục tiêu của đòn đánh thường.	1 lượt
+haste	Buff	Tăng tốc độ	Tăng SPD theo power (mặc định +10%).	1 lượt
 
 
 
