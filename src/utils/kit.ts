@@ -219,21 +219,23 @@ function readTrait(traits: KitTraits, key: string): boolean | KitTraitObject | s
 function cloneShallow<T extends CloneableArray>(value: T): T;
 function cloneShallow<T extends CloneableRecord>(value: T): T;
 function cloneShallow<T extends CloneableArray | CloneableRecord>(value: T): T;
+function cloneShallow<T>(value: T | null | undefined): T | null;
 function cloneShallow<T>(value: T | null | undefined): T | null {
-  if (value == null || typeof value !== 'object') return value ?? null;
+  if (value === null || value === undefined) return null;
+  if (typeof value !== 'object') return value;
   if (!isCloneCandidate(value)) return value;
   if (Array.isArray(value)){
-  const result = value.map((entry) => (isCloneCandidate(entry) ? cloneShallow(entry) : entry));
+   const result = value.map((entry) => (isCloneCandidate(entry) ? cloneShallow(entry) : entry));
     return result as T;
-  } else {
-    const out: CloneableRecord = { ...(value as CloneableRecord) };
-    for (const [key, entry] of Object.entries(out)){
-      if (isCloneCandidate(entry)){
-        out[key] = cloneShallow(entry);
-      }
-    }
-    return out as T;
   }
+
+  const out: CloneableRecord = { ...(value as CloneableRecord) };
+  for (const [key, entry] of Object.entries(out)){
+    if (isCloneCandidate(entry)){
+      out[key] = cloneShallow(entry);
+    }
+  }
+  return out as T;
 }
 
 function extractUltSummonFields(ult: UltSpec | null | undefined): Partial<NormalizedSummonSpec> | null {
