@@ -283,7 +283,7 @@ function buildBoardState(
 }
 
 function drawFallback(
-  ctx: CanvasRenderingContext2D,
+  ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
   width: number,
   height: number,
   anchor: { x?: number | null; y?: number | null },
