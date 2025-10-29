@@ -159,7 +159,9 @@ class SimpleEventTarget {
 
   dispatchEvent<T extends GameEventType>(event: GameEventDetail<T>): boolean {
     if (!event || !event.type) return false;
-    const set = this.listeners.get(event.type);
+    const type = event.type as GameEventType;
+    if (!type) return false;
+    const set = this.listeners.get(type);
     if (!set || set.size === 0) return true;
     const snapshot = Array.from(set);
     const eventRecord = event as Record<string, unknown>;
