@@ -111,8 +111,16 @@ const APP_SCREEN_CLASSES = [
 ];
 
 async function loadBundledModule<TModule = unknown>(id: string): Promise<TModule>{
-  const loader = typeof __require === 'function'
-    ? Promise.resolve().then(() => __require(id))
+  const globalRequire = typeof globalThis !== 'undefined'
+    ? (globalThis as { __require?: unknown }).__require
+    : undefined;
+  const runtimeRequire = typeof __require === 'function'
+    ? __require
+    : typeof globalRequire === 'function'
+      ? globalRequire
+      : null;
+  const loader = runtimeRequire
+    ? Promise.resolve().then(() => runtimeRequire(id))
     : import(id);
 
   const resolved = await loader;
