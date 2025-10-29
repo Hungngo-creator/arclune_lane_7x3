@@ -93,6 +93,12 @@ export function bindLineupEvents(context: LineupEventContext): CleanupCallback[]
   const handleBack = () => {
     if (shell && typeof shell.enterScreen === 'function'){
       shell.enterScreen('main-menu');
+    } else if (typeof window !== 'undefined'){
+      if (window.history && typeof window.history.back === 'function'){
+        window.history.back();
+      } else {
+        window.dispatchEvent(new CustomEvent('lineup:back'));
+      }
     }
   };
   backButton.addEventListener('click', handleBack);
