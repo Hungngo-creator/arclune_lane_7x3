@@ -2,9 +2,9 @@
 import { slotIndex } from '../engine.ts';
 import { Statuses } from '../statuses.ts';
 
-import type { SessionState } from '@types/combat';
-import type { QueuedSummonRequest, Side, UnitToken } from '@types/units';
-import type { InterleavedState, InterleavedTurnState, TurnSideKey } from '@types/turn-order';
+import type { SessionState } from '@shared-types/combat';
+import type { QueuedSummonRequest, Side, UnitToken } from '@shared-types/units';
+import type { InterleavedState, InterleavedTurnState, TurnSideKey } from '@shared-types/turn-order';
 
 const SIDE_TO_LOWER: Record<TurnSideKey, Side> = { ALLY: 'ally', ENEMY: 'enemy' };
 const LOWER_TO_UPPER: Record<Side, TurnSideKey> = { ally: 'ALLY', enemy: 'ENEMY' };
