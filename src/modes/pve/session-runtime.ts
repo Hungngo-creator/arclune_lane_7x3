@@ -4,8 +4,8 @@ import type {
   SessionRuntimeState,
   SessionState,
   WaveState,
-} from '@types/pve';
-import type { TurnSnapshot } from '@types/turn-order';
+} from '@shared-types/pve';
+import type { TurnSnapshot } from '@shared-types/turn-order';
 import type { GameEventHandler, GameEventType } from '../../events.ts';
 
 import {

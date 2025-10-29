@@ -56,14 +56,14 @@ import {
   normalizeDeckEntries,
 } from './session-state.ts';
 
-import type { BattleDetail, BattleResult, BattleState, LeaderSnapshot, PveDeckEntry } from '@types/combat';
+import type { BattleDetail, BattleResult, BattleState, LeaderSnapshot, PveDeckEntry } from '@shared-types/combat';
 import type {
   UnitToken,
   ActionChainEntry,
   QueuedSummonRequest,
   Side,
-} from '@types/units';
-import type { TurnSnapshot } from '@types/turn-order';
+} from '@shared-types/units';
+import type { TurnSnapshot } from '@shared-types/turn-order';
 import type {
   RewardRoll,
   WaveState,
@@ -71,8 +71,8 @@ import type {
   SessionRuntimeState,
   CreateSessionOptions,
   SessionState,
-} from '@types/pve';
-import type { HudHandles, SummonBarHandles } from '@types/ui';
+} from '@shared-types/pve';
+import type { HudHandles, SummonBarHandles } from '@shared-types/ui';
 import type { NormalizedSessionConfig } from './session-state.ts';
 
 type RootLike = Element | Document | null | undefined;

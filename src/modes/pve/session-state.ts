@@ -1,4 +1,4 @@
-import type { CreateSessionOptions, SessionState } from '@types/pve';
+import type { CreateSessionOptions, SessionState } from '@shared-types/pve';
 import type {
   CameraPreset,
   GameConfig,
@@ -7,10 +7,10 @@ import type {
   TurnOrderPairScanSideObject,
   TurnOrderPairScanSlotObject,
   TurnOrderSide,
-} from '@types/config';
-import type { TurnSnapshot } from '@types/turn-order';
-import type { QueuedSummonState, ActionChainEntry, UnitId } from '@types/units';
-import { createSummonQueue } from '@types/units';
+} from '@shared-types/config';
+import type { TurnSnapshot } from '@shared-types/turn-order';
+import type { QueuedSummonState, ActionChainEntry, UnitId } from '@shared-types/units';
+import { createSummonQueue } from '@shared-types/units';
 
 import { CFG } from '../../config.ts';
 import { UNITS, lookupUnit } from '../../units.ts';
