@@ -5,3 +5,12 @@ node_modules/.bin/*
 !node_modules/typescript-transpiler/
 node_modules/typescript-transpiler/*
 !node_modules/typescript-transpiler/**
+!node_modules/esbuild/
+node_modules/esbuild/*
+!node_modules/esbuild/**
+!node_modules/tsx/
+node_modules/tsx/*
+!node_modules/tsx/**
+!node_modules/zod/
+node_modules/zod/*
+!node_modules/zod/**
