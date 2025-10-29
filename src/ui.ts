@@ -279,18 +279,25 @@ export function startSummonBar<TCard extends SummonBarCard = SummonBarCard>(
 
   const render = (): void => {
     const deck = getDeck();
-    while (btns.length < deck.length){
-      const btn = makeBtn(deck[btns.length]);
-      host.appendChild(btn);
-      btns.push(btn);
-    }
-    for (let i = 0; i < btns.length; i += 1){
-      const button = btns[i];
-      const card = deck[i];
+
+    for (const [index, card] of deck.entries()){
+      if (!btns[index] && card){
+        const btn = makeBtn(card);
+        host.appendChild(btn);
+        btns[index] = btn;
+      }
+
+      const button = btns[index];
+      if (!button) break;
+
       if (!card){
         button.hidden = true;
+        button.dataset.id = '';
+        button.disabled = true;
+        button.classList.remove('active');
         continue;
       }
+
       button.hidden = false;
       button.dataset.id = card.id;
       const span = button.querySelector<HTMLSpanElement>('.cost');
@@ -300,6 +307,20 @@ export function startSummonBar<TCard extends SummonBarCard = SummonBarCard>(
       button.classList.toggle('disabled', !affordable);
       button.style.opacity = '';
       button.classList.toggle('active', getSelectedId() === card.id);
+    }
+
+    const previousLength = btns.length;
+    if (previousLength > deck.length){
+      for (let i = deck.length; i < previousLength; i += 1){
+        const button = btns[i];
+        if (!button) continue;
+        button.hidden = true;
+        button.dataset.id = '';
+        button.disabled = true;
+        button.classList.remove('active');
+        button.remove();
+      }
+      btns.length = deck.length;
     }
   };
 
