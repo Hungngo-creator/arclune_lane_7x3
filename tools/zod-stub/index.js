@@ -1,5 +1,47 @@
 const objectProto = Object.prototype;
 
+const ZodIssueCode = Object.freeze({
+  custom: 'custom'
+});
+
+class ZodError extends TypeError {
+  constructor(issues) {
+    const firstIssue = issues[0];
+    const message = formatIssueMessage(firstIssue);
+    super(message);
+    this.name = 'ZodError';
+    this.issues = issues.map((issue) => ({ ...issue, path: [...issue.path] }));
+  }
+}
+
+function formatIssueMessage(issue) {
+  if (!issue) {
+    return 'Invalid input';
+  }
+  const pathSegment = Array.isArray(issue.path) && issue.path.length > 0 ? ` at ${issue.path.join('.')}` : '';
+  return typeof issue.message === 'string' && issue.message.length > 0
+    ? `${issue.message}${pathSegment}`
+    : `Invalid input${pathSegment}`;
+}
+
+function normalizeIssue(issue) {
+  if (!issue || typeof issue !== 'object') {
+    throw new TypeError('Issue must be an object');
+  }
+  const normalized = { ...issue };
+  normalized.path = Array.isArray(normalized.path) ? [...normalized.path] : [];
+  normalized.code = normalized.code ?? ZodIssueCode.custom;
+  normalized.message = typeof normalized.message === 'string' && normalized.message.length > 0
+    ? normalized.message
+    : 'Invalid input';
+  return normalized;
+}
+
+function createZodError(issues) {
+  const normalizedIssues = issues.map((issue) => normalizeIssue(issue));
+  return new ZodError(normalizedIssues);
+}
+
 class ZodType {
   optional() {
     return new ZodOptional(this);
@@ -170,9 +212,10 @@ class ZodRecord extends ZodType {
 }
 
 class ZodObject extends ZodType {
-  constructor(shape) {
+  constructor(shape, refiners = []) {
     super();
     this.shape = { ...shape };
+    this.refiners = [...refiners];
   }
 
   _parse(value) {
@@ -189,6 +232,22 @@ class ZodObject extends ZodType {
       }
       result[key] = schema.parse(fieldValue);
     }
+    if (this.refiners.length > 0) {
+      const issues = [];
+      const ctx = {
+        addIssue: (issue) => {
+          issues.push(issue);
+        },
+        path: [],
+        data: result
+      };
+      for (const refiner of this.refiners) {
+        refiner(result, ctx);
+      }
+      if (issues.length > 0) {
+        throw createZodError(issues);
+      }
+    }
     return result;
   }
 
@@ -196,7 +255,14 @@ class ZodObject extends ZodType {
     if (!(other instanceof ZodObject)) {
       throw new TypeError('ZodObject.merge expects another ZodObject');
     }
-    return new ZodObject({ ...this.shape, ...other.shape });
+    return new ZodObject({ ...this.shape, ...other.shape }, [...this.refiners, ...other.refiners]);
+  }
+
+  superRefine(refiner) {
+    if (typeof refiner !== 'function') {
+      throw new TypeError('ZodObject.superRefine expects a function');
+    }
+    return new ZodObject(this.shape, [...this.refiners, refiner]);
   }
 }
 
@@ -214,7 +280,9 @@ export const z = {
   array: (schema) => new ZodArray(schema),
   record: (schema) => new ZodRecord(schema),
   union: (schemas) => new ZodUnion(schemas),
-  tuple: (schemas) => new ZodTuple(schemas)
+  tuple: (schemas) => new ZodTuple(schemas),
+  ZodIssueCode,
+  ZodError,
 };
 
 export {
@@ -229,7 +297,9 @@ export {
   ZodUnion,
   ZodTuple,
   ZodRecord,
-  ZodObject
+  ZodObject,
+  ZodIssueCode,
+  ZodError
 };
 
 export default z;
