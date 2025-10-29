@@ -3,9 +3,9 @@ import { z } from 'zod';
 import { ROSTER } from '../catalog.ts';
 import rawSkillSetsConfig from './skills.config.ts';
 
-import type { UnknownRecord } from '@types/common';
-import type { UnitId } from '@types/units';
-import type { SkillEntry, SkillSection } from '@types/config';
+import type { UnknownRecord } from '@shared-types/common';
+import type { UnitId } from '@shared-types/units';
+import type { SkillEntry, SkillSection } from '@shared-types/config';
 
 function deepFreeze<T>(value: T): T{
   if (Array.isArray(value)){

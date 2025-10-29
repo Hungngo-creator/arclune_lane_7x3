@@ -8,7 +8,7 @@ import type {
   LotterySplit,
   PityConfiguration,
   ShopTaxBracket
-} from '@types/config';
+} from '@shared-types/config';
 
 type CurrencyId = 'VNT' | 'HNT' | 'TNT' | 'ThNT' | 'TT';
 const CurrencyIdSchema = z.enum(['VNT', 'HNT', 'TNT', 'ThNT', 'TT'] as [string, ...string[]]);

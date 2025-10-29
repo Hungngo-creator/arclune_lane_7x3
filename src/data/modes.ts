@@ -6,7 +6,7 @@ import type {
   ModeConfig,
   ModeGroup,
   PityConfiguration
-} from '@types/config';
+} from '@shared-types/config';
 
 const SSR_PITY: PityConfiguration | null = getPityConfig('SSR');
 const UR_PITY: PityConfiguration | null = getPityConfig('UR');

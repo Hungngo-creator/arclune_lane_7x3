@@ -7,7 +7,7 @@ import type {
   AnnouncementEntry,
   AnnouncementSlot,
   LotterySplit
-} from '@types/config';
+} from '@shared-types/config';
 
 const AnnouncementEntryConfigSchema = z.object({
   id: z.string(),

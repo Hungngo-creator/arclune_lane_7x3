@@ -8,7 +8,7 @@ import type {
   RosterPreview,
   RosterPreviewRow,
   RosterUnitDefinition
-} from '@types/config';
+} from '@shared-types/config';
 
 const RosterPreviewConfigSchema = z.object({
   tpDelta: z.record(z.number()),
