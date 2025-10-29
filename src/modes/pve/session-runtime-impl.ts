@@ -1230,7 +1230,11 @@ function init(): boolean {
   }
   canvas = boardEl;
   ctx = boardEl.getContext('2d') as CanvasRenderingContext2D | null;
-  
+  if (!ctx){
+    console.warn('[pve] Không thể lấy ngữ cảnh 2D cho canvas PvE.');
+    return false;
+  }
+
   if (typeof hudCleanup === 'function'){
     hudCleanup();
     hudCleanup = null;
