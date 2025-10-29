@@ -1,7 +1,7 @@
 import { CFG } from '../config.ts';
 import { safeNow } from './time.ts';
 
-import type { FuryState, UnitId, UnitToken } from '@types/units-export';
+import type { FuryState, UnitId, UnitToken } from '@shared-types/units-export';
 
 const DEFAULT_TURN_CAP = 40;
 const DEFAULT_SKILL_CAP = 30;
