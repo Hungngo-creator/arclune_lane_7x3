@@ -9,7 +9,7 @@ try {
   realTypescript = null;
 }
 
- let ModuleKind;
+let ModuleKind;
 let ScriptTarget;
 let JsxEmit;
 let DiagnosticCategory;
@@ -19,6 +19,14 @@ let findConfigFile;
 let readConfigFile;
 let parseJsonConfigFileContent;
 let sys;
+
+const createMissingTypescriptError = () => {
+  const error = new Error(
+    'Không tìm thấy runtime TypeScript thật. Hãy sao chép thư mục "node_modules/typescript" từ một máy đã cài đầy đủ hoặc cài TypeScript trước khi bundle.',
+  );
+  error.code = 'MISSING_TYPESCRIPT_RUNTIME';
+  return error;
+};
 
 if (realTypescript && typeof realTypescript.transpileModule === "function") {
   ModuleKind = realTypescript.ModuleKind;
@@ -32,8 +40,6 @@ if (realTypescript && typeof realTypescript.transpileModule === "function") {
   parseJsonConfigFileContent = realTypescript.parseJsonConfigFileContent;
   sys = realTypescript.sys;
 } else {
-  const esbuild = require("esbuild");
-
   ModuleKind = Object.freeze({
     None: "none",
     CommonJS: "commonjs",
@@ -70,55 +76,11 @@ if (realTypescript && typeof realTypescript.transpileModule === "function") {
     Message: 3,
   });
 
-const mapTarget = (tsTarget) => ScriptTarget[tsTarget] || "esnext";
-  const mapModule = (tsModule) => {
-    switch (tsModule) {
-      case ModuleKind.CommonJS:
-        return "cjs";
-      default:
-        return "esm";
-    }
-  };
-  const mapJsx = (tsJsx) => {
-    switch (tsJsx) {
-      case JsxEmit.Preserve:
-        return "preserve";
-      case JsxEmit.React:
-      case JsxEmit.ReactNative:
-        return "transform";
-      case JsxEmit.ReactJSX:
-      case JsxEmit.ReactJSXDev:
-        return "automatic";
-      default:
-        return "none";
-    }
-  };
-
   flattenDiagnosticMessageText = (message) => {
     if (message == null) {
       return "";
     }
     return Array.isArray(message) ? message.join(String.fromCharCode(10)) : String(message);
-  };
-
-  transpileModule = (input, options = {}) => {
-    const compilerOptions = options.compilerOptions || {};
-    const format = mapModule(compilerOptions.module);
-    const target = mapTarget(compilerOptions.target);
-    const jsx = mapJsx(compilerOptions.jsx);
-    const result = esbuild.transformSync(input, {
-      loader: options.fileName && options.fileName.endsWith(".tsx") ? "tsx" : "ts",
-      format,
-      target,
-      jsx,
-      sourcemap: compilerOptions.sourceMap || compilerOptions.inlineSourceMap || false,
-      sourcefile: options.fileName,
-    });
-    return {
-      outputText: result.code,
-      diagnostics: [],
-      sourceMapText: result.map || undefined,
-    };
   };
 
   const defaultSys = {
@@ -136,6 +98,14 @@ const mapTarget = (tsTarget) => ScriptTarget[tsTarget] || "esnext";
         return undefined;
       }
     },
+  };
+  
+  const throwMissing = () => {
+    throw createMissingTypescriptError();
+  };
+
+  transpileModule = () => {
+    throwMissing();
   };
 
   findConfigFile = (searchPath, fileExists = defaultSys.fileExists, configName = "tsconfig.json") => {
@@ -188,9 +158,9 @@ const mapTarget = (tsTarget) => ScriptTarget[tsTarget] || "esnext";
       fileNames: files,
       errors: [],
     };
-};
+  };
 
-sys = defaultSys;
+  sys = defaultSys;
 }
 
 module.exports = {
