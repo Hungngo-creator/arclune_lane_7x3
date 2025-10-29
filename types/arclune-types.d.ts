@@ -1,14 +1,13 @@
-declare module '@types/vfx' {
-  export type * from '../src/types/vfx.ts';
+declare module '@shared-types/vfx' {
+  export * from '../src/types/vfx.ts';
 }
 
-declare module '@types/config' {
-  export type { CatalogStatBlock, RosterUnitDefinition } from '../src/types/config.ts';
+declare module '@shared-types/config' {
+  export * from '../src/types/config.ts';
 }
 
-declare module '@types/units' {
-  export type * from '../src/types/units.ts';
-  export { createSummonQueue } from '../src/types/units.ts';
+declare module '@shared-types/units' {
+  export * from '../src/types/units.ts';
 }
 
 declare module 'zod' {

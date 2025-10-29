@@ -1,4 +1,4 @@
-declare module '@types/units-export' {
+declare module '@shared-types/units-export' {
   export type {
     FuryState,
     UnitId,

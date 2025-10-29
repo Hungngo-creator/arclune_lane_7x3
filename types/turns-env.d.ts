@@ -1,5 +1,5 @@
 declare module './engine.ts' {
-import type { Side } from '@types/units';
+import type { Side } from '@shared-types/units';
 
   type SlotSpecifier = Side | Uppercase<Side>;
 
@@ -17,8 +17,8 @@ declare module '../engine.ts' {
 }
 
 declare module './statuses.ts' {
-  import type { DamageContext, StatusEffect, StatusRegistry } from '@types/combat';
-  import type { UnitToken } from '@types/units';
+  import type { DamageContext, StatusEffect, StatusRegistry } from '@shared-types/combat';
+  import type { UnitToken } from '@shared-types/units';
 
   interface ShieldResult {
     remain: number;
@@ -72,20 +72,20 @@ declare module '../statuses.ts' {
 }
 
 declare module './combat.ts' {
-  import type { SessionState } from '@types/combat';
-  import type { UnitToken } from '@types/units';
+  import type { SessionState } from '@shared-types/combat';
+  import type { UnitToken } from '@shared-types/units';
 
   export function doBasicWithFollowups(Game: SessionState, unit: UnitToken, cap?: number): void;
 }
 
 declare module './config.ts' {
-  import type { GameConfig } from '@types/config';
+  import type { GameConfig } from '@shared-types/config';
 
   export const CFG: GameConfig;
 }
 
 declare module './meta.ts' {
-  import type { UnitId } from '@types/units';
+  import type { UnitId } from '@shared-types/units';
 
   export interface InstanceStats {
     hpMax: number;
@@ -158,8 +158,8 @@ declare module './art.ts' {
 }
 
 declare module './passives.ts' {
-  import type { SessionState } from '@types/combat';
-  import type { UnitToken } from '@types/units';
+  import type { SessionState } from '@shared-types/combat';
+  import type { UnitToken } from '@shared-types/units';
 
   export interface PassiveRuntimeContext extends Record<string, unknown> {
     afterHit?: Array<(afterCtx?: Record<string, unknown>) => void>;
@@ -190,8 +190,8 @@ declare module './events.ts' {
     BattleDetail,
     BattleResult,
     SessionState,
-  } from '@types/combat';
-  import type { Side, UnitToken } from '@types/units';
+  } from '@shared-types/combat';
+  import type { Side, UnitToken } from '@shared-types/units';
 
   export const TURN_START: 'turn:start';
   export const TURN_END: 'turn:end';
@@ -269,8 +269,8 @@ declare module './utils/time.ts' {
 }
 
 declare module './utils/fury.ts' {
-  import type { GameConfig } from '@types/config';
-  import type { UnitId, UnitToken } from '@types/units';
+  import type { GameConfig } from '@shared-types/config';
+  import type { UnitId, UnitToken } from '@shared-types/units';
 
   export interface FuryTurnOptions {
     clearFresh?: boolean;
