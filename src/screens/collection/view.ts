@@ -27,7 +27,7 @@ import type {
   FilterState,
   UnknownRecord,
 } from './types.ts';
-import type { CurrencyDefinition } from '@types/config';
+import type { CurrencyDefinition } from '@shared-types/config';
 
 const STYLE_ID = 'collection-view-style-v2';
 

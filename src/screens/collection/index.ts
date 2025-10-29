@@ -6,9 +6,9 @@ import type {
   CollectionScreenParams,
   UnknownRecord,
 } from './types.ts';
-import type { RosterEntryLite } from '@types/lineup';
-import type { LineupCurrencies } from '@types/currency';
-import { isLineupCurrencies, normalizeCurrencyBalances } from '@types/currency';
+import type { RosterEntryLite } from '@shared-types/lineup';
+import type { LineupCurrencies } from '@shared-types/currency';
+import { isLineupCurrencies, normalizeCurrencyBalances } from '@shared-types/currency';
 
 type Mergeable<TValue> = TValue | null | undefined;
 

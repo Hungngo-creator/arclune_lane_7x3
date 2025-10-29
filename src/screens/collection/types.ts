@@ -1,9 +1,9 @@
-import type { CurrencyDefinition } from '@types/config';
-import type { UnknownRecord } from '@types/common';
-import type { LineupCurrencies } from '@types/currency';
-import type { RosterEntryLite } from '@types/lineup';
+import type { CurrencyDefinition } from '@shared-types/config';
+import type { UnknownRecord } from '@shared-types/common';
+import type { LineupCurrencies } from '@shared-types/currency';
+import type { RosterEntryLite } from '@shared-types/lineup';
 
-export type { UnknownRecord } from '@types/common';
+export type { UnknownRecord } from '@shared-types/common';
 
 export type CollectionTabKey = 'awakening' | 'skills' | 'arts' | 'skins' | 'voice';
 

@@ -1,9 +1,9 @@
 import { ROSTER } from '../../catalog.ts';
 import { UNITS } from '../../units.ts';
 import type { UnitDefinition } from '../../units.ts';
-import type { RosterEntryLite } from '@types/lineup';
-import type { LineupCurrencies, LineupCurrencyConfig } from '@types/currency';
-import { normalizeCurrencyBalances } from '@types/currency';
+import type { RosterEntryLite } from '@shared-types/lineup';
+import type { LineupCurrencies, LineupCurrencyConfig } from '@shared-types/currency';
+import { normalizeCurrencyBalances } from '@shared-types/currency';
 import type { CollectionEntry, CurrencyCatalog, CurrencyBalanceProvider, UnknownRecord } from './types.ts';
 
 const isRosterEntryLite = (value: unknown): value is RosterEntryLite => (
