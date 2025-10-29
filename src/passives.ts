@@ -65,7 +65,7 @@ const STAT_ALIAS: Map<string, string> = new Map([
   ['hp_regen', 'hpRegen']
 ]);
 
-const BASE_STAT_KEYS: Array<keyof UnitToken> = [
+const BASE_STAT_KEYS: ReadonlyArray<Extract<keyof UnitToken, string>> = [
   'atk',
   'wil',
   'res',
@@ -204,9 +204,9 @@ const captureBaseStats = (unit: UnitToken | null | undefined): Record<string, nu
   const source = unit ?? ({} as UnitToken);
   const result: Record<string, number> = {};
   for (const key of BASE_STAT_KEYS){
-    const value = source[key];
+    const value = source[key as Extract<keyof UnitToken, string>];
     if (typeof value === 'number' && Number.isFinite(value)){
-      result[key] = value;
+      result[key as Extract<keyof UnitToken, string>] = value;
     }
   }
   return result;
