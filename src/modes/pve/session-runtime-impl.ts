@@ -232,7 +232,7 @@ let running = false;
 const hpBarGradientCache = new Map<string, GradientValue>();
 
 const renderSummonBar = (): void => {
-  const bar = (Game?.ui?.bar ?? null) as { render?: () => void } | null;
+  const bar = Game?.ui?.bar ?? null;
   if (bar?.render) bar.render();
 };
 
@@ -455,12 +455,12 @@ function setUnitSkinForSession(unitId: string, skinKey: string | null | undefine
   }
   if (Array.isArray(Game.deck3)){
     for (const entry of Game.deck3){
-      applyArtMetadata(entry as DeckEntry);
+      applyArtMetadata(entry);
     }
   }
   if (Array.isArray(Game.unitsAll)){
     for (const entry of Game.unitsAll){
-      applyArtMetadata(entry as DeckEntry);
+      applyArtMetadata(entry);
     }
   }
   refreshQueuedArtFor(unitId);
