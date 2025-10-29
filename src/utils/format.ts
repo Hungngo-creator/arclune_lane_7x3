@@ -1,6 +1,6 @@
 const HAS_INTL_NUMBER_FORMAT = typeof Intl === 'object' && typeof Intl.NumberFormat === 'function';
 
-type LocaleValue = string | ReadonlyArray<string>;
+type LocaleValue = string | string[];
 
 type NumberFormatInput =
   | number
