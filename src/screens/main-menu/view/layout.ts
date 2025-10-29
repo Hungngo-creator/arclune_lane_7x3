@@ -1,7 +1,7 @@
 import { getAllSidebarAnnouncements } from '../../../data/announcements.ts';
 import { ensureStyleTag } from '../../../ui/dom.ts';
 import { getHeroDialogue, getHeroHotspots, getHeroProfile, HERO_DEFAULT_ID } from '../dialogues.ts';
-import type { AnnouncementEntry } from '@types/config';
+import type { AnnouncementEntry } from '@shared-types/config';
 import type {
   CleanupRegistrar,
   ComingSoonHandler,
