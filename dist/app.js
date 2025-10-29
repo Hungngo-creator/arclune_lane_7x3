@@ -2525,7 +2525,7 @@ __define('./config/schema.ts', (exports, module, __require) => {
       tokenText: z.string()
   });
   const SceneLayerSchema = z.object({
-      top: z.string(),
+      top: z.string().optional(),
       mid: z.string().optional(),
       bottom: z.string().optional(),
       glow: z.string().optional(),
@@ -2538,10 +2538,20 @@ __define('./config/schema.ts', (exports, module, __require) => {
       bottomScale: z.number().optional(),
       highlight: z.string().optional()
   });
-  const SceneThemeSchema = z.object({
+  const SceneThemeSchema = z
+      .object({
       sky: SceneLayerSchema,
       horizon: SceneLayerSchema,
       ground: SceneLayerSchema
+  })
+      .superRefine((theme, ctx) => {
+      if (!theme.sky.top) {
+          ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: ['sky', 'top'],
+              message: 'sky.top is required'
+          });
+      }
   });
   const SceneConfigSchema = z.object({
       DEFAULT_THEME: z.string(),
@@ -11720,11 +11730,15 @@ __define('./screens/lineup/index.ts', (exports, module, __require) => {
 __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
   const __dep0 = __require('./screens/lineup/view/state.ts');
   const assignUnitToBench = __dep0.assignUnitToBench;
+  const assignUnitToSlot = __dep0.assignUnitToSlot;
   const removeUnitFromBench = __dep0.removeUnitFromBench;
+  const removeUnitFromSlot = __dep0.removeUnitFromSlot;
   const setLeader = __dep0.setLeader;
+  const unlockSlot = __dep0.unlockSlot;
+  const formatCurrencyBalance = __dep0.formatCurrencyBalance;
   function bindLineupEvents(context) {
       const { state, elements, helpers, overlays, rosterLookup, shell } = context;
-      const { backButton, benchGrid, benchDetails, passiveGrid, rosterFilters, rosterList, leaderAvatar, leaderSection, passiveOverlay, passiveClose, leaderOverlay, leaderOverlayBody, leaderClose, } = elements;
+      const { backButton, slotsGrid, benchGrid, benchDetails, passiveGrid, rosterFilters, rosterList, leaderAvatar, leaderSection, passiveOverlay, passiveClose, leaderOverlay, leaderOverlayBody, leaderClose, } = elements;
       const cleanup = [];
       let leaderObserver = null;
       if (typeof ResizeObserver === 'function') {
@@ -11782,7 +11796,9 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
               else {
                   helpers.setMessage('Đã thêm nhân vật vào dự bị.', 'info');
               }
+              helpers.renderSlots();
               helpers.renderBench();
+              helpers.renderBenchDetails();
               helpers.renderLeader();
               helpers.renderPassives();
               helpers.renderRoster();
@@ -11793,7 +11809,9 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
               if (cell.unitId) {
                   removeUnitFromBench(lineup, benchIndex);
                   state.activeBenchIndex = benchIndex;
+                  helpers.renderSlots();
                   helpers.renderBench();
+                  helpers.renderBenchDetails();
                   helpers.renderPassives();
                   helpers.renderRoster();
                   helpers.renderLeader();
@@ -11828,6 +11846,139 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
       cleanup.push(() => benchGrid.removeEventListener('focusin', handleBenchFocus));
       benchGrid.addEventListener('mouseenter', handleBenchFocus, true);
       cleanup.push(() => benchGrid.removeEventListener('mouseenter', handleBenchFocus, true));
+      const handleSlotInteraction = (event) => {
+          var _a, _b, _c;
+          const slotEl = (_a = event.target) === null || _a === void 0 ? void 0 : _a.closest('.lineup-slot');
+          if (!slotEl)
+              return;
+          const lineup = helpers.getSelectedLineup();
+          if (!lineup)
+              return;
+          const slotIndex = Number(slotEl.dataset.slotIndex);
+          if (!Number.isFinite(slotIndex))
+              return;
+          const slot = lineup.slots[slotIndex];
+          if (!slot)
+              return;
+          const actionButton = (_b = event.target) === null || _b === void 0 ? void 0 : _b.closest('.lineup-button');
+          const action = (_c = actionButton === null || actionButton === void 0 ? void 0 : actionButton.dataset.slotAction) !== null && _c !== void 0 ? _c : null;
+          if (action === 'unlock') {
+              const result = unlockSlot(lineup, slotIndex, state.currencyBalances);
+              if (!result.ok) {
+                  helpers.setMessage(result.message || 'Không thể mở khóa vị trí.', 'error');
+                  return;
+              }
+              const spentText = result.spent
+                  ? formatCurrencyBalance(result.spent.amount, result.spent.currencyId)
+                  : null;
+              helpers.setMessage(spentText
+                  ? `Đã mở khóa vị trí ${slotIndex + 1} (tốn ${spentText}).`
+                  : `Đã mở khóa vị trí ${slotIndex + 1}.`, 'info');
+              helpers.renderSlots();
+              helpers.renderBench();
+              helpers.renderBenchDetails();
+              helpers.renderLeader();
+              helpers.renderPassives();
+              helpers.renderRoster();
+              helpers.refreshWallet();
+              return;
+          }
+          if (!slot.unlocked) {
+              helpers.setMessage('Vị trí đang bị khóa.', 'error');
+              return;
+          }
+          const mouseEvent = event;
+          const isModifierClear = action === 'clear'
+              || (mouseEvent && (mouseEvent.altKey || mouseEvent.ctrlKey || mouseEvent.metaKey));
+          if (isModifierClear) {
+              if (!slot.unitId) {
+                  helpers.setMessage('Ô này đang trống.', 'info');
+                  return;
+              }
+              const removedUnitId = slot.unitId;
+              removeUnitFromSlot(lineup, slotIndex);
+              if (state.selectedUnitId === removedUnitId) {
+                  state.selectedUnitId = null;
+              }
+              helpers.setMessage('Đã bỏ nhân vật khỏi vị trí.', 'info');
+              helpers.renderSlots();
+              helpers.renderBench();
+              helpers.renderBenchDetails();
+              helpers.renderLeader();
+              helpers.renderPassives();
+              helpers.renderRoster();
+              return;
+          }
+          if (!state.selectedUnitId) {
+              if (slot.unitId) {
+                  state.selectedUnitId = slot.unitId;
+                  const unit = rosterLookup.get(slot.unitId);
+                  helpers.setMessage(`Đã chọn ${(unit === null || unit === void 0 ? void 0 : unit.name) || 'nhân vật'} đang ở vị trí ${slotIndex + 1}. Chọn ô khác để hoán đổi hoặc nhấn "Bỏ".`, 'info');
+                  helpers.renderRoster();
+                  helpers.renderSlots();
+              }
+              else {
+                  helpers.setMessage('Chọn nhân vật từ roster để gán vào vị trí này.', 'info');
+              }
+              return;
+          }
+          const result = assignUnitToSlot(lineup, slotIndex, state.selectedUnitId);
+          if (!result.ok) {
+              helpers.setMessage(result.message || 'Không thể gán nhân vật.', 'error');
+              return;
+          }
+          const unit = rosterLookup.get(state.selectedUnitId);
+          helpers.setMessage(`Đã gán ${(unit === null || unit === void 0 ? void 0 : unit.name) || 'nhân vật'} vào vị trí ${slotIndex + 1}.`, 'info');
+          state.selectedUnitId = null;
+          helpers.renderSlots();
+          helpers.renderBench();
+          helpers.renderBenchDetails();
+          helpers.renderLeader();
+          helpers.renderPassives();
+          helpers.renderRoster();
+      };
+      slotsGrid.addEventListener('click', handleSlotInteraction);
+      cleanup.push(() => slotsGrid.removeEventListener('click', handleSlotInteraction));
+      const handleSlotFocus = (event) => {
+          var _a;
+          const slotEl = (_a = event.target) === null || _a === void 0 ? void 0 : _a.closest('.lineup-slot');
+          if (!slotEl)
+              return;
+          const lineup = helpers.getSelectedLineup();
+          if (!lineup)
+              return;
+          const slotIndex = Number(slotEl.dataset.slotIndex);
+          if (!Number.isFinite(slotIndex))
+              return;
+          const slot = lineup.slots[slotIndex];
+          if (!slot)
+              return;
+          if (!slot.unlocked) {
+              const costText = slot.unlockCost
+                  ? formatCurrencyBalance(slot.unlockCost.amount, slot.unlockCost.currencyId)
+                  : null;
+              helpers.setMessage(costText
+                  ? `Vị trí ${slotIndex + 1} đang khóa. Cần ${costText} để mở khóa.`
+                  : `Vị trí ${slotIndex + 1} đang khóa.`, 'info');
+              return;
+          }
+          if (slot.unitId) {
+              const unit = rosterLookup.get(slot.unitId);
+              helpers.setMessage(`Vị trí ${slotIndex + 1}: ${(unit === null || unit === void 0 ? void 0 : unit.name) || 'đã có nhân vật'}. Dùng "Bỏ" để trả vị trí.`, 'info');
+              return;
+          }
+          if (state.selectedUnitId) {
+              const unit = rosterLookup.get(state.selectedUnitId);
+              helpers.setMessage(`Vị trí ${slotIndex + 1} trống. Đã chọn ${(unit === null || unit === void 0 ? void 0 : unit.name) || 'nhân vật'}. Nhấn "Gán" để thêm.`, 'info');
+          }
+          else {
+              helpers.setMessage(`Vị trí ${slotIndex + 1} trống. Chọn nhân vật từ roster rồi nhấn "Gán".`, 'info');
+          }
+      };
+      slotsGrid.addEventListener('focusin', handleSlotFocus);
+      cleanup.push(() => slotsGrid.removeEventListener('focusin', handleSlotFocus));
+      slotsGrid.addEventListener('mouseenter', handleSlotFocus, true);
+      cleanup.push(() => slotsGrid.removeEventListener('mouseenter', handleSlotFocus, true));
       const handlePassiveClick = (event) => {
           var _a;
           const btn = (_a = event.target) === null || _a === void 0 ? void 0 : _a.closest('.lineup-passive');
@@ -11874,9 +12025,10 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
           else {
               state.selectedUnitId = unitId;
               const unit = rosterLookup.get(unitId);
-              helpers.setMessage(`Đã chọn ${(unit === null || unit === void 0 ? void 0 : unit.name) || 'nhân vật'}. Chạm ô dự bị hoặc leader để gán.`, 'info');
+              helpers.setMessage(`Đã chọn ${(unit === null || unit === void 0 ? void 0 : unit.name) || 'nhân vật'}. Nhấn vào ô chủ lực, ô dự bị hoặc leader để gán.`, 'info');
           }
           helpers.renderRoster();
+          helpers.renderSlots();
       };
       rosterList.addEventListener('click', handleRosterSelect);
       cleanup.push(() => rosterList.removeEventListener('click', handleRosterSelect));
@@ -11932,6 +12084,7 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
               }
           }
           helpers.renderLeader();
+          helpers.renderSlots();
           helpers.renderBench();
           helpers.renderPassives();
           helpers.renderRoster();
@@ -12018,6 +12171,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       .lineup-button:hover{transform:translateY(-1px);border-color:rgba(174,228,255,.5);box-shadow:0 10px 20px rgba(6,12,20,.4);}
       .lineup-button:focus-visible{outline:2px solid rgba(174,228,255,.72);outline-offset:3px;}
       .lineup-slot.is-locked{border-style:dashed;border-color:rgba(125,211,252,.35);background:rgba(12,22,34,.6);}
+      .lineup-slot.is-selected{border-color:rgba(174,228,255,.55);box-shadow:0 14px 32px rgba(6,12,20,.45);}
       .lineup-slot__cost{margin:0;font-size:12px;color:#ffd9a1;letter-spacing:.08em;text-transform:uppercase;}
       .lineup-slot__locked-note{margin:0;font-size:12px;color:#9cbcd9;line-height:1.5;}
       .lineup-bench{display:flex;flex-direction:column;gap:12px;min-height:100%;padding:0;border:none;background:none;}
@@ -12308,6 +12462,16 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       const mainColumn = document.createElement('div');
       mainColumn.className = 'lineup-main';
       mainArea.appendChild(mainColumn);
+      const slotsSection = document.createElement('section');
+      slotsSection.className = 'lineup-slots';
+      const slotsTitle = document.createElement('p');
+      slotsTitle.className = 'lineup-slots__title';
+      slotsTitle.textContent = 'Vị trí chủ lực';
+      slotsSection.appendChild(slotsTitle);
+      const slotsGrid = document.createElement('div');
+      slotsGrid.className = 'lineup-slots__grid';
+      slotsSection.appendChild(slotsGrid);
+      mainColumn.appendChild(slotsSection);
       const benchSection = document.createElement('section');
       benchSection.className = 'lineup-bench';
       const benchTitle = document.createElement('p');
@@ -12390,498 +12554,656 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           }
       }
       function openOverlay(target) {
-          {
-              if (!target)
-                  return;
-              target.classList.add('is-open');
-              activeOverlay = target;
+          if (!target)
+              return;
+          target.classList.add('is-open');
+          activeOverlay = target;
+      }
+      function getSelectedLineup() {
+          var _a;
+          if (!state.selectedLineupId)
+              return null;
+          return (_a = state.lineupState.get(state.selectedLineupId)) !== null && _a !== void 0 ? _a : null;
+      }
+      function setMessage(text, type = 'info') {
+          state.message = text || '';
+          state.messageType = type;
+          messageEl.textContent = text || '';
+          if (type === 'error') {
+              messageEl.classList.add('is-error');
           }
-          function getSelectedLineup() {
-              var _a;
-              if (!state.selectedLineupId)
-                  return null;
-              return (_a = state.lineupState.get(state.selectedLineupId)) !== null && _a !== void 0 ? _a : null;
+          else {
+              messageEl.classList.remove('is-error');
           }
-          function setMessage(text, type = 'info') {
-              state.message = text || '';
-              state.messageType = type;
-              messageEl.textContent = text || '';
-              if (type === 'error') {
-                  messageEl.classList.add('is-error');
-              }
-              else {
-                  messageEl.classList.remove('is-error');
-              }
+      }
+      function refreshWallet() {
+          walletEl.innerHTML = '';
+          for (const [currencyId, balance] of state.currencyBalances.entries()) {
+              const item = document.createElement('div');
+              item.className = 'lineup-wallet__item';
+              const nameEl = document.createElement('p');
+              nameEl.className = 'lineup-wallet__name';
+              nameEl.textContent = currencyId;
+              const value = document.createElement('p');
+              value.className = 'lineup-wallet__balance';
+              value.textContent = formatCurrencyBalance(balance, currencyId);
+              item.appendChild(nameEl);
+              item.appendChild(value);
+              walletEl.appendChild(item);
           }
-          function refreshWallet() {
-              walletEl.innerHTML = '';
-              for (const [currencyId, balance] of state.currencyBalances.entries()) {
-                  const item = document.createElement('div');
-                  item.className = 'lineup-wallet__item';
-                  const nameEl = document.createElement('p');
-                  nameEl.className = 'lineup-wallet__name';
-                  nameEl.textContent = currencyId;
-                  const value = document.createElement('p');
-                  value.className = 'lineup-wallet__balance';
-                  value.textContent = formatCurrencyBalance(balance, currencyId);
-                  item.appendChild(nameEl);
-                  item.appendChild(value);
-                  walletEl.appendChild(item);
-              }
-          }
-          function renderBenchDetails() {
-              var _a, _b, _c, _d, _e;
-              benchDetails.innerHTML = '';
-              const lineup = getSelectedLineup();
-              if (!lineup) {
-                  benchDetails.classList.add('is-empty');
-                  const empty = document.createElement('p');
-                  empty.className = 'lineup-bench__details-empty';
-                  empty.textContent = 'Chưa có đội hình để hiển thị thông tin.';
-                  benchDetails.appendChild(empty);
-                  syncBenchDetailsHeight();
-                  return;
-              }
-              const index = Number.isFinite(state.activeBenchIndex) ? state.activeBenchIndex : null;
-              if (index == null) {
-                  benchDetails.classList.add('is-empty');
-                  const hint = document.createElement('p');
-                  hint.className = 'lineup-bench__details-empty';
-                  hint.textContent = 'Chọn một ô dự bị để xem mô tả kỹ năng.';
-                  benchDetails.appendChild(hint);
-                  syncBenchDetailsHeight();
-                  return;
-              }
-              const cell = lineup.bench[index];
-              if (!cell) {
-                  benchDetails.classList.add('is-empty');
-                  const missing = document.createElement('p');
-                  missing.className = 'lineup-bench__details-empty';
-                  missing.textContent = 'Không tìm thấy ô dự bị tương ứng.';
-                  benchDetails.appendChild(missing);
-                  syncBenchDetailsHeight();
-                  return;
-              }
-              const unit = cell.unitId ? rosterLookup.get(cell.unitId) : null;
-              if (!unit) {
-                  benchDetails.classList.add('is-empty');
-                  const empty = document.createElement('p');
-                  empty.className = 'lineup-bench__details-empty';
-                  empty.textContent = cell.label
-                      ? `Ô dự bị được ghi chú "${cell.label}".`
-                      : 'Ô dự bị hiện đang trống.';
-                  benchDetails.appendChild(empty);
-                  syncBenchDetailsHeight();
-                  return;
-              }
-              benchDetails.classList.remove('is-empty');
-              const kit = (_b = (_a = unit.raw) === null || _a === void 0 ? void 0 : _a.kit) !== null && _b !== void 0 ? _b : null;
-              const skillSet = unit.id ? getSkillSet(unit.id) : null;
-              const skills = Array.isArray(kit === null || kit === void 0 ? void 0 : kit.skills)
-                  ? ((_c = kit.skills) !== null && _c !== void 0 ? _c : [])
-                      .filter(skill => {
-                      const skillRecord = skill;
-                      const skillName = typeof (skillRecord === null || skillRecord === void 0 ? void 0 : skillRecord.name) === 'string' ? skillRecord.name.trim() : '';
-                      const skillKey = typeof (skillRecord === null || skillRecord === void 0 ? void 0 : skillRecord.key) === 'string' ? skillRecord.key.trim() : '';
-                      return skillName !== 'Đánh Thường' && skillKey !== 'Đánh Thường';
-                  })
-                      .slice(0, 3)
-                  : [];
-              const kitUlt = (_d = kit === null || kit === void 0 ? void 0 : kit.ult) !== null && _d !== void 0 ? _d : null;
-              const skillSetUlt = (_e = skillSet === null || skillSet === void 0 ? void 0 : skillSet.ult) !== null && _e !== void 0 ? _e : null;
-              const hasUlt = Boolean(kitUlt || skillSetUlt);
-              const ultName = hasUlt
-                  ? ((kitUlt === null || kitUlt === void 0 ? void 0 : kitUlt.name) || (skillSetUlt === null || skillSetUlt === void 0 ? void 0 : skillSetUlt.name) || (kitUlt === null || kitUlt === void 0 ? void 0 : kitUlt.id) || 'Chưa đặt tên')
-                  : null;
-              if (!skills.length && !hasUlt) {
-                  const fallback = document.createElement('p');
-                  fallback.className = 'lineup-bench__details-empty';
-                  fallback.textContent = 'Chưa có dữ liệu chi tiết cho nhân vật này.';
-                  benchDetails.appendChild(fallback);
-              }
-              else {
-                  if (skills.length) {
-                      const skillSection = document.createElement('div');
-                      skillSection.className = 'lineup-bench__details-section';
-                      const heading = document.createElement('p');
-                      heading.className = 'lineup-bench__details-heading';
-                      heading.textContent = 'Kỹ năng';
-                      skillSection.appendChild(heading);
-                      const list = document.createElement('ul');
-                      list.className = 'lineup-bench__details-list';
-                      skills.forEach((skill, idx) => {
-                          const item = document.createElement('li');
-                          const skillRecord = skill;
-                          const nameText = (skillRecord === null || skillRecord === void 0 ? void 0 : skillRecord.name) || (skillRecord === null || skillRecord === void 0 ? void 0 : skillRecord.key) || `Kỹ năng #${idx + 1}`;
-                          item.textContent = nameText;
-                          list.appendChild(item);
-                      });
-                      skillSection.appendChild(list);
-                      benchDetails.appendChild(skillSection);
-                  }
-                  if (hasUlt && ultName) {
-                      const ultSection = document.createElement('div');
-                      ultSection.className = 'lineup-bench__details-section';
-                      const heading = document.createElement('p');
-                      heading.className = 'lineup-bench__details-heading';
-                      heading.textContent = 'Tuyệt kỹ';
-                      ultSection.appendChild(heading);
-                      const text = document.createElement('p');
-                      text.className = 'lineup-bench__details-text';
-                      text.textContent = ultName;
-                      ultSection.appendChild(text);
-                      benchDetails.appendChild(ultSection);
-                  }
-              }
+      }
+      function renderBenchDetails() {
+          var _a, _b, _c, _d, _e;
+          benchDetails.innerHTML = '';
+          const lineup = getSelectedLineup();
+          if (!lineup) {
+              benchDetails.classList.add('is-empty');
+              const empty = document.createElement('p');
+              empty.className = 'lineup-bench__details-empty';
+              empty.textContent = 'Chưa có đội hình để hiển thị thông tin.';
+              benchDetails.appendChild(empty);
               syncBenchDetailsHeight();
+              return;
           }
-          function updateActiveBenchHighlight() {
-              const cells = benchGrid.querySelectorAll('.lineup-bench__cell');
-              cells.forEach(cell => {
-                  const idx = Number(cell.dataset.benchIndex);
-                  if (Number.isFinite(idx) && idx === state.activeBenchIndex) {
-                      cell.classList.add('is-active');
-                  }
-                  else {
-                      cell.classList.remove('is-active');
-                  }
-              });
-          }
-          function renderBench() {
-              var _a;
-              const lineup = getSelectedLineup();
-              benchGrid.innerHTML = '';
-              if (!lineup) {
-                  state.activeBenchIndex = null;
-                  renderBenchDetails();
-                  return;
-              }
-              if (!Number.isInteger(state.activeBenchIndex) || !lineup.bench[(_a = state.activeBenchIndex) !== null && _a !== void 0 ? _a : -1]) {
-                  state.activeBenchIndex = null;
-              }
-              const columnCount = 5;
-              const columnEls = Array.from({ length: columnCount }, () => {
-                  const columnEl = document.createElement('div');
-                  columnEl.className = 'lineup-bench__column';
-                  benchGrid.appendChild(columnEl);
-                  return columnEl;
-              });
-              lineup.bench.forEach(cell => {
-                  var _a;
-                  const cellEl = document.createElement('button');
-                  cellEl.type = 'button';
-                  cellEl.className = 'lineup-bench__cell';
-                  cellEl.dataset.benchIndex = String(cell.index);
-                  const unit = cell.unitId ? rosterLookup.get(cell.unitId) : null;
-                  const hasContent = Boolean(cell.unitId || cell.label);
-                  if (!hasContent) {
-                      cellEl.classList.add('is-empty');
-                  }
-                  const displayName = (unit === null || unit === void 0 ? void 0 : unit.name) || cell.label || '';
-                  let ariaLabel = `Ô dự bị ${cell.index + 1}`;
-                  if (displayName) {
-                      ariaLabel += `: ${displayName}`;
-                      if (cell.unitId) {
-                          ariaLabel += '. Giữ Alt và click để gỡ.';
-                      }
-                  }
-                  cellEl.setAttribute('aria-label', ariaLabel);
-                  if (displayName) {
-                      cellEl.title = cell.unitId
-                          ? `${displayName} — giữ Alt và click để gỡ.`
-                          : displayName;
-                  }
-                  else {
-                      cellEl.removeAttribute('title');
-                  }
-                  const codeText = (!cell.unitId && hasContent)
-                      ? getUnitCode(unit, cell.label || '')
-                      : '';
-                  const avatarEl = document.createElement('div');
-                  avatarEl.className = 'lineup-bench__avatar';
-                  const avatarSource = (unit === null || unit === void 0 ? void 0 : unit.avatar) || ((_a = cell.meta) === null || _a === void 0 ? void 0 : _a.avatar) || null;
-                  const avatarLabel = (unit === null || unit === void 0 ? void 0 : unit.name) || cell.label || '';
-                  renderAvatar(avatarEl, avatarSource, avatarLabel);
-                  if (codeText) {
-                      const codeEl = document.createElement('span');
-                      codeEl.className = 'lineup-bench__cell-code';
-                      codeEl.textContent = codeText;
-                      cellEl.appendChild(codeEl);
-                  }
-                  cellEl.appendChild(avatarEl);
-                  if (state.activeBenchIndex === cell.index) {
-                      cellEl.classList.add('is-active');
-                  }
-                  const columnIndex = cell.index % columnCount;
-                  const targetColumn = columnEls[columnIndex] || columnEls[0];
-                  targetColumn.appendChild(cellEl);
-              });
-              updateActiveBenchHighlight();
-              renderBenchDetails();
-          }
-          function renderLeader() {
-              const lineup = getSelectedLineup();
-              if (!lineup) {
-                  renderAvatar(leaderAvatar, null, '');
-                  leaderName.textContent = 'Chưa chọn leader';
-                  syncBenchDetailsHeight();
-                  return;
-              }
-              if (lineup.leaderId) {
-                  const unit = rosterLookup.get(lineup.leaderId);
-                  renderAvatar(leaderAvatar, (unit === null || unit === void 0 ? void 0 : unit.avatar) || null, (unit === null || unit === void 0 ? void 0 : unit.name) || '');
-                  leaderName.textContent = (unit === null || unit === void 0 ? void 0 : unit.name) || 'Leader';
-              }
-              else {
-                  renderAvatar(leaderAvatar, null, '');
-                  leaderName.textContent = 'Chưa chọn leader';
-              }
+          const index = Number.isFinite(state.activeBenchIndex) ? state.activeBenchIndex : null;
+          if (index == null) {
+              benchDetails.classList.add('is-empty');
+              const hint = document.createElement('p');
+              hint.className = 'lineup-bench__details-empty';
+              hint.textContent = 'Chọn một ô dự bị để xem mô tả kỹ năng.';
+              benchDetails.appendChild(hint);
               syncBenchDetailsHeight();
+              return;
           }
-          function renderPassives() {
-              const lineup = getSelectedLineup();
-              passiveGrid.innerHTML = '';
-              if (!lineup) {
-                  return;
-              }
-              const assignedIds = collectAssignedUnitIds(lineup);
-              lineup.passives.forEach(passive => {
-                  const btn = document.createElement('button');
-                  btn.type = 'button';
-                  btn.className = 'lineup-passive';
-                  btn.dataset.passiveIndex = String(passive.index);
-                  btn.setAttribute('aria-label', passive.isEmpty ? 'Ô passive trống' : `Xem passive ${passive.name}`);
-                  if (passive.isEmpty) {
-                      btn.classList.add('is-empty');
-                      btn.disabled = true;
-                  }
-                  if (evaluatePassive(passive, assignedIds, rosterLookup)) {
-                      btn.classList.add('is-active');
-                  }
-                  const title = document.createElement('p');
-                  title.className = 'lineup-passive__title';
-                  title.textContent = passive.name;
-                  btn.appendChild(title);
-                  if (!passive.isEmpty) {
-                      const condition = document.createElement('p');
-                      condition.className = 'lineup-passive__condition';
-                      condition.textContent = passive.requirement || 'Chạm để xem chi tiết.';
-                      btn.appendChild(condition);
-                  }
-                  passiveGrid.appendChild(btn);
-              });
+          const cell = lineup.bench[index];
+          if (!cell) {
+              benchDetails.classList.add('is-empty');
+              const missing = document.createElement('p');
+              missing.className = 'lineup-bench__details-empty';
+              missing.textContent = 'Không tìm thấy ô dự bị tương ứng.';
+              benchDetails.appendChild(missing);
+              syncBenchDetailsHeight();
+              return;
           }
-          function renderFilters() {
-              rosterFilters.innerHTML = '';
-              const filters = [
-                  { type: 'all', value: null, label: 'Tất cả' },
-                  ...state.filterOptions.classes.map(value => ({ type: 'class', value, label: value })),
-                  ...state.filterOptions.ranks.map(value => ({ type: 'rank', value, label: value })),
-              ];
-              filters.forEach(filter => {
-                  const button = document.createElement('button');
-                  button.type = 'button';
-                  button.className = 'lineup-roster__filter';
-                  button.dataset.filterType = filter.type;
-                  if (filter.value != null) {
-                      button.dataset.filterValue = filter.value;
-                  }
-                  button.textContent = filter.label;
-                  if (state.filter.type === filter.type && (state.filter.value || null) === (filter.value || null)) {
-                      button.classList.add('is-active');
-                  }
-                  rosterFilters.appendChild(button);
-              });
+          const unit = cell.unitId ? rosterLookup.get(cell.unitId) : null;
+          if (!unit) {
+              benchDetails.classList.add('is-empty');
+              const empty = document.createElement('p');
+              empty.className = 'lineup-bench__details-empty';
+              empty.textContent = cell.label
+                  ? `Ô dự bị được ghi chú "${cell.label}".`
+                  : 'Ô dự bị hiện đang trống.';
+              benchDetails.appendChild(empty);
+              syncBenchDetailsHeight();
+              return;
           }
-          function renderRoster() {
-              rosterList.innerHTML = '';
-              const lineup = getSelectedLineup();
-              const filtered = filterRoster(state.roster, state.filter);
-              filtered.forEach(unit => {
-                  const button = document.createElement('button');
-                  button.type = 'button';
-                  button.className = 'lineup-roster__entry';
-                  button.dataset.unitId = unit.id;
-                  button.setAttribute('aria-label', `Chọn ${unit.name}`);
-                  if (state.selectedUnitId === unit.id) {
-                      button.classList.add('is-selected');
-                  }
-                  if (lineup && (lineup.leaderId === unit.id || lineup.slots.some(slot => slot.unitId === unit.id) || lineup.bench.some(cell => cell.unitId === unit.id)) && state.selectedUnitId !== unit.id) {
-                      button.classList.add('is-unavailable');
-                  }
-                  const avatar = document.createElement('div');
-                  avatar.className = 'lineup-roster__avatar';
-                  renderAvatar(avatar, unit.avatar || null, unit.name);
-                  button.appendChild(avatar);
-                  const meta = document.createElement('div');
-                  meta.className = 'lineup-roster__meta';
-                  const nameEl = document.createElement('p');
-                  nameEl.className = 'lineup-roster__name';
-                  nameEl.textContent = unit.name;
-                  meta.appendChild(nameEl);
-                  if (unit.role || unit.rank) {
-                      const tag = document.createElement('p');
-                      tag.className = 'lineup-roster__tag';
-                      tag.textContent = [unit.role, unit.rank].filter(Boolean).join(' · ');
-                      meta.appendChild(tag);
-                  }
-                  if (unit.power != null) {
-                      const extra = document.createElement('p');
-                      extra.className = 'lineup-roster__extra';
-                      extra.textContent = `Chiến lực ${formatUnitPower(unit.power)}`;
-                      meta.appendChild(extra);
-                  }
-                  button.appendChild(meta);
-                  rosterList.appendChild(button);
-              });
+          benchDetails.classList.remove('is-empty');
+          const kit = (_b = (_a = unit.raw) === null || _a === void 0 ? void 0 : _a.kit) !== null && _b !== void 0 ? _b : null;
+          const skillSet = unit.id ? getSkillSet(unit.id) : null;
+          const skills = Array.isArray(kit === null || kit === void 0 ? void 0 : kit.skills)
+              ? ((_c = kit.skills) !== null && _c !== void 0 ? _c : [])
+                  .filter(skill => {
+                  const skillRecord = skill;
+                  const skillName = typeof (skillRecord === null || skillRecord === void 0 ? void 0 : skillRecord.name) === 'string' ? skillRecord.name.trim() : '';
+                  const skillKey = typeof (skillRecord === null || skillRecord === void 0 ? void 0 : skillRecord.key) === 'string' ? skillRecord.key.trim() : '';
+                  return skillName !== 'Đánh Thường' && skillKey !== 'Đánh Thường';
+              })
+                  .slice(0, 3)
+              : [];
+          const kitUlt = (_d = kit === null || kit === void 0 ? void 0 : kit.ult) !== null && _d !== void 0 ? _d : null;
+          const skillSetUlt = (_e = skillSet === null || skillSet === void 0 ? void 0 : skillSet.ult) !== null && _e !== void 0 ? _e : null;
+          const hasUlt = Boolean(kitUlt || skillSetUlt);
+          const ultName = hasUlt
+              ? ((kitUlt === null || kitUlt === void 0 ? void 0 : kitUlt.name) || (skillSetUlt === null || skillSetUlt === void 0 ? void 0 : skillSetUlt.name) || (kitUlt === null || kitUlt === void 0 ? void 0 : kitUlt.id) || 'Chưa đặt tên')
+              : null;
+          if (!skills.length && !hasUlt) {
+              const fallback = document.createElement('p');
+              fallback.className = 'lineup-bench__details-empty';
+              fallback.textContent = 'Chưa có dữ liệu chi tiết cho nhân vật này.';
+              benchDetails.appendChild(fallback);
           }
-          function openPassiveDetails(passive) {
-              passiveOverlayBody.innerHTML = '';
-              const title = document.createElement('h3');
-              title.className = 'lineup-overlay__title';
-              title.textContent = passive.name;
-              passiveOverlayBody.appendChild(title);
-              if (passive.requirement) {
-                  const subtitle = document.createElement('p');
-                  subtitle.className = 'lineup-overlay__subtitle';
-                  subtitle.textContent = passive.requirement;
-                  passiveOverlayBody.appendChild(subtitle);
-              }
-              if (passive.description) {
-                  const descriptionEl = document.createElement('p');
-                  descriptionEl.className = 'lineup-overlay__subtitle';
-                  descriptionEl.textContent = passive.description;
-                  passiveOverlayBody.appendChild(descriptionEl);
-              }
-              if (passive.requiredUnitIds.length) {
+          else {
+              if (skills.length) {
+                  const skillSection = document.createElement('div');
+                  skillSection.className = 'lineup-bench__details-section';
+                  const heading = document.createElement('p');
+                  heading.className = 'lineup-bench__details-heading';
+                  heading.textContent = 'Kỹ năng';
+                  skillSection.appendChild(heading);
                   const list = document.createElement('ul');
-                  list.className = 'lineup-overlay__list';
-                  passive.requiredUnitIds.forEach(unitId => {
+                  list.className = 'lineup-bench__details-list';
+                  skills.forEach((skill, idx) => {
                       const item = document.createElement('li');
-                      const unit = rosterLookup.get(unitId);
-                      item.textContent = (unit === null || unit === void 0 ? void 0 : unit.name) || unitId;
+                      const skillRecord = skill;
+                      const nameText = (skillRecord === null || skillRecord === void 0 ? void 0 : skillRecord.name) || (skillRecord === null || skillRecord === void 0 ? void 0 : skillRecord.key) || `Kỹ năng #${idx + 1}`;
+                      item.textContent = nameText;
                       list.appendChild(item);
                   });
-                  passiveOverlayBody.appendChild(list);
+                  skillSection.appendChild(list);
+                  benchDetails.appendChild(skillSection);
               }
-              openOverlay(passiveOverlay);
-              passiveClose.focus();
+              if (hasUlt && ultName) {
+                  const ultSection = document.createElement('div');
+                  ultSection.className = 'lineup-bench__details-section';
+                  const heading = document.createElement('p');
+                  heading.className = 'lineup-bench__details-heading';
+                  heading.textContent = 'Tuyệt kỹ';
+                  ultSection.appendChild(heading);
+                  const text = document.createElement('p');
+                  text.className = 'lineup-bench__details-text';
+                  text.textContent = ultName;
+                  ultSection.appendChild(text);
+                  benchDetails.appendChild(ultSection);
+              }
           }
-          function openLeaderPicker() {
-              const lineup = getSelectedLineup();
-              if (!lineup)
-                  return;
-              leaderOverlayBody.innerHTML = '';
-              const title = document.createElement('h3');
-              title.className = 'lineup-overlay__title';
-              title.textContent = 'Chọn leader';
-              leaderOverlayBody.appendChild(title);
+          syncBenchDetailsHeight();
+      }
+      function renderSlots() {
+          slotsGrid.innerHTML = '';
+          const lineup = getSelectedLineup();
+          if (!lineup) {
+              slotsSection.classList.add('is-empty');
+              for (let index = 0; index < 5; index += 1) {
+                  const slotEl = document.createElement('div');
+                  slotEl.className = 'lineup-slot is-locked';
+                  slotEl.dataset.slotIndex = String(index);
+                  slotEl.tabIndex = 0;
+                  slotEl.setAttribute('aria-label', `Vị trí ${index + 1} đang khóa.`);
+                  const label = document.createElement('p');
+                  label.className = 'lineup-slot__label';
+                  label.textContent = `Vị trí ${index + 1}`;
+                  slotEl.appendChild(label);
+                  const avatar = document.createElement('div');
+                  avatar.className = 'lineup-slot__avatar';
+                  avatar.textContent = '🔒';
+                  slotEl.appendChild(avatar);
+                  const name = document.createElement('p');
+                  name.className = 'lineup-slot__name';
+                  name.textContent = 'Chưa có dữ liệu';
+                  slotEl.appendChild(name);
+                  const note = document.createElement('p');
+                  note.className = 'lineup-slot__locked-note';
+                  note.textContent = 'Vui lòng chọn đội hình để thao tác.';
+                  slotEl.appendChild(note);
+                  const actions = document.createElement('div');
+                  actions.className = 'lineup-slot__actions';
+                  slotEl.appendChild(actions);
+                  slotsGrid.appendChild(slotEl);
+              }
+              return;
+          }
+          slotsSection.classList.remove('is-empty');
+          lineup.slots.forEach(slot => {
+              const slotEl = document.createElement('div');
+              slotEl.className = 'lineup-slot';
+              slotEl.dataset.slotIndex = String(slot.index);
+              slotEl.tabIndex = 0;
+              const unit = slot.unitId ? rosterLookup.get(slot.unitId) : null;
+              const selectedMatches = state.selectedUnitId && slot.unitId === state.selectedUnitId;
+              if (selectedMatches) {
+                  slotEl.classList.add('is-selected');
+              }
+              if (!slot.unlocked) {
+                  slotEl.classList.add('is-locked');
+              }
+              const label = document.createElement('p');
+              label.className = 'lineup-slot__label';
+              label.textContent = `Vị trí ${slot.index + 1}`;
+              slotEl.appendChild(label);
+              const avatar = document.createElement('div');
+              avatar.className = 'lineup-slot__avatar';
+              if (unit) {
+                  renderAvatar(avatar, unit.avatar || null, unit.name);
+              }
+              else if (slot.label) {
+                  avatar.textContent = getInitials(slot.label);
+              }
+              else if (!slot.unlocked) {
+                  avatar.textContent = '🔒';
+              }
+              else {
+                  avatar.textContent = '+';
+              }
+              slotEl.appendChild(avatar);
+              const name = document.createElement('p');
+              name.className = 'lineup-slot__name';
+              if (unit) {
+                  name.textContent = unit.name;
+              }
+              else if (slot.label) {
+                  name.textContent = slot.label;
+              }
+              else if (!slot.unlocked) {
+                  name.textContent = 'Vị trí bị khóa';
+              }
+              else {
+                  name.textContent = 'Chưa gán nhân vật';
+              }
+              slotEl.appendChild(name);
+              if (slot.unlocked) {
+                  const hint = document.createElement('p');
+                  hint.className = 'lineup-slot__hint';
+                  if (unit) {
+                      const powerText = unit.power != null
+                          ? `Chiến lực ${formatUnitPower(unit.power)}`
+                          : 'Đang tham gia đội hình';
+                      hint.textContent = `${powerText}. Dùng "Bỏ" để trả vị trí.`;
+                  }
+                  else if (state.selectedUnitId) {
+                      const selectedUnit = rosterLookup.get(state.selectedUnitId);
+                      hint.textContent = selectedUnit
+                          ? `Đã chọn ${selectedUnit.name}. Nhấn "Gán" để thêm.`
+                          : 'Nhấn "Gán" để thêm nhân vật đã chọn.';
+                  }
+                  else {
+                      hint.textContent = 'Chọn nhân vật từ roster rồi nhấn "Gán" để thêm.';
+                  }
+                  slotEl.appendChild(hint);
+              }
+              else {
+                  if (slot.unlockCost) {
+                      const cost = document.createElement('p');
+                      cost.className = 'lineup-slot__cost';
+                      cost.textContent = `Chi phí mở khóa: ${formatCurrencyBalance(slot.unlockCost.amount, slot.unlockCost.currencyId)}`;
+                      slotEl.appendChild(cost);
+                  }
+                  const note = document.createElement('p');
+                  note.className = 'lineup-slot__locked-note';
+                  note.textContent = 'Mở khóa để gán nhân vật vào vị trí này.';
+                  slotEl.appendChild(note);
+              }
+              const actions = document.createElement('div');
+              actions.className = 'lineup-slot__actions';
+              if (slot.unlocked) {
+                  const assignButton = document.createElement('button');
+                  assignButton.type = 'button';
+                  assignButton.className = 'lineup-button';
+                  assignButton.dataset.slotAction = 'assign';
+                  assignButton.textContent = unit ? 'Đổi nhân vật' : 'Gán nhân vật';
+                  actions.appendChild(assignButton);
+                  const clearButton = document.createElement('button');
+                  clearButton.type = 'button';
+                  clearButton.className = 'lineup-button';
+                  clearButton.dataset.slotAction = 'clear';
+                  clearButton.textContent = 'Bỏ khỏi vị trí';
+                  if (!unit) {
+                      clearButton.disabled = true;
+                  }
+                  actions.appendChild(clearButton);
+              }
+              else {
+                  const unlockButton = document.createElement('button');
+                  unlockButton.type = 'button';
+                  unlockButton.className = 'lineup-button';
+                  unlockButton.dataset.slotAction = 'unlock';
+                  unlockButton.textContent = 'Mở khóa vị trí';
+                  actions.appendChild(unlockButton);
+              }
+              slotEl.appendChild(actions);
+              let ariaLabel = `Vị trí ${slot.index + 1}`;
+              if (unit) {
+                  ariaLabel += `: ${unit.name}`;
+              }
+              else if (slot.label) {
+                  ariaLabel += `: ${slot.label}`;
+              }
+              if (!slot.unlocked) {
+                  ariaLabel += '. Đang khóa.';
+              }
+              slotEl.setAttribute('aria-label', ariaLabel);
+              slotsGrid.appendChild(slotEl);
+          });
+      }
+      function updateActiveBenchHighlight() {
+          const cells = benchGrid.querySelectorAll('.lineup-bench__cell');
+          cells.forEach(cell => {
+              const idx = Number(cell.dataset.benchIndex);
+              if (Number.isFinite(idx) && idx === state.activeBenchIndex) {
+                  cell.classList.add('is-active');
+              }
+              else {
+                  cell.classList.remove('is-active');
+              }
+          });
+      }
+      function renderBench() {
+          var _a;
+          const lineup = getSelectedLineup();
+          benchGrid.innerHTML = '';
+          if (!lineup) {
+              state.activeBenchIndex = null;
+              renderBenchDetails();
+              return;
+          }
+          if (!Number.isInteger(state.activeBenchIndex) || !lineup.bench[(_a = state.activeBenchIndex) !== null && _a !== void 0 ? _a : -1]) {
+              state.activeBenchIndex = null;
+          }
+          const columnCount = 5;
+          const columnEls = Array.from({ length: columnCount }, () => {
+              const columnEl = document.createElement('div');
+              columnEl.className = 'lineup-bench__column';
+              benchGrid.appendChild(columnEl);
+              return columnEl;
+          });
+          lineup.bench.forEach(cell => {
+              var _a;
+              const cellEl = document.createElement('button');
+              cellEl.type = 'button';
+              cellEl.className = 'lineup-bench__cell';
+              cellEl.dataset.benchIndex = String(cell.index);
+              const unit = cell.unitId ? rosterLookup.get(cell.unitId) : null;
+              const hasContent = Boolean(cell.unitId || cell.label);
+              if (!hasContent) {
+                  cellEl.classList.add('is-empty');
+              }
+              const displayName = (unit === null || unit === void 0 ? void 0 : unit.name) || cell.label || '';
+              let ariaLabel = `Ô dự bị ${cell.index + 1}`;
+              if (displayName) {
+                  ariaLabel += `: ${displayName}`;
+                  if (cell.unitId) {
+                      ariaLabel += '. Giữ Alt và click để gỡ.';
+                  }
+              }
+              cellEl.setAttribute('aria-label', ariaLabel);
+              if (displayName) {
+                  cellEl.title = cell.unitId
+                      ? `${displayName} — giữ Alt và click để gỡ.`
+                      : displayName;
+              }
+              else {
+                  cellEl.removeAttribute('title');
+              }
+              const codeText = (!cell.unitId && hasContent)
+                  ? getUnitCode(unit, cell.label || '')
+                  : '';
+              const avatarEl = document.createElement('div');
+              avatarEl.className = 'lineup-bench__avatar';
+              const avatarSource = (unit === null || unit === void 0 ? void 0 : unit.avatar) || ((_a = cell.meta) === null || _a === void 0 ? void 0 : _a.avatar) || null;
+              const avatarLabel = (unit === null || unit === void 0 ? void 0 : unit.name) || cell.label || '';
+              renderAvatar(avatarEl, avatarSource, avatarLabel);
+              if (codeText) {
+                  const codeEl = document.createElement('span');
+                  codeEl.className = 'lineup-bench__cell-code';
+                  codeEl.textContent = codeText;
+                  cellEl.appendChild(codeEl);
+              }
+              cellEl.appendChild(avatarEl);
+              if (state.activeBenchIndex === cell.index) {
+                  cellEl.classList.add('is-active');
+              }
+              const columnIndex = cell.index % columnCount;
+              const targetColumn = columnEls[columnIndex] || columnEls[0];
+              targetColumn.appendChild(cellEl);
+          });
+          updateActiveBenchHighlight();
+          renderBenchDetails();
+      }
+      function renderLeader() {
+          const lineup = getSelectedLineup();
+          if (!lineup) {
+              renderAvatar(leaderAvatar, null, '');
+              leaderName.textContent = 'Chưa chọn leader';
+              syncBenchDetailsHeight();
+              return;
+          }
+          if (lineup.leaderId) {
+              const unit = rosterLookup.get(lineup.leaderId);
+              renderAvatar(leaderAvatar, (unit === null || unit === void 0 ? void 0 : unit.avatar) || null, (unit === null || unit === void 0 ? void 0 : unit.name) || '');
+              leaderName.textContent = (unit === null || unit === void 0 ? void 0 : unit.name) || 'Leader';
+          }
+          else {
+              renderAvatar(leaderAvatar, null, '');
+              leaderName.textContent = 'Chưa chọn leader';
+          }
+          syncBenchDetailsHeight();
+      }
+      function renderPassives() {
+          const lineup = getSelectedLineup();
+          passiveGrid.innerHTML = '';
+          if (!lineup) {
+              return;
+          }
+          const assignedIds = collectAssignedUnitIds(lineup);
+          lineup.passives.forEach(passive => {
+              const btn = document.createElement('button');
+              btn.type = 'button';
+              btn.className = 'lineup-passive';
+              btn.dataset.passiveIndex = String(passive.index);
+              btn.setAttribute('aria-label', passive.isEmpty ? 'Ô passive trống' : `Xem passive ${passive.name}`);
+              if (passive.isEmpty) {
+                  btn.classList.add('is-empty');
+                  btn.disabled = true;
+              }
+              if (evaluatePassive(passive, assignedIds, rosterLookup)) {
+                  btn.classList.add('is-active');
+              }
+              const title = document.createElement('p');
+              title.className = 'lineup-passive__title';
+              title.textContent = passive.name;
+              btn.appendChild(title);
+              if (!passive.isEmpty) {
+                  const condition = document.createElement('p');
+                  condition.className = 'lineup-passive__condition';
+                  condition.textContent = passive.requirement || 'Chạm để xem chi tiết.';
+                  btn.appendChild(condition);
+              }
+              passiveGrid.appendChild(btn);
+          });
+      }
+      function renderFilters() {
+          rosterFilters.innerHTML = '';
+          const filters = [
+              { type: 'all', value: null, label: 'Tất cả' },
+              ...state.filterOptions.classes.map(value => ({ type: 'class', value, label: value })),
+              ...state.filterOptions.ranks.map(value => ({ type: 'rank', value, label: value })),
+          ];
+          filters.forEach(filter => {
+              const button = document.createElement('button');
+              button.type = 'button';
+              button.className = 'lineup-roster__filter';
+              button.dataset.filterType = filter.type;
+              if (filter.value != null) {
+                  button.dataset.filterValue = filter.value;
+              }
+              button.textContent = filter.label;
+              if (state.filter.type === filter.type && (state.filter.value || null) === (filter.value || null)) {
+                  button.classList.add('is-active');
+              }
+              rosterFilters.appendChild(button);
+          });
+      }
+      function renderRoster() {
+          rosterList.innerHTML = '';
+          const lineup = getSelectedLineup();
+          const filtered = filterRoster(state.roster, state.filter);
+          filtered.forEach(unit => {
+              const button = document.createElement('button');
+              button.type = 'button';
+              button.className = 'lineup-roster__entry';
+              button.dataset.unitId = unit.id;
+              button.setAttribute('aria-label', `Chọn ${unit.name}`);
+              if (state.selectedUnitId === unit.id) {
+                  button.classList.add('is-selected');
+              }
+              if (lineup && (lineup.leaderId === unit.id || lineup.slots.some(slot => slot.unitId === unit.id) || lineup.bench.some(cell => cell.unitId === unit.id)) && state.selectedUnitId !== unit.id) {
+                  button.classList.add('is-unavailable');
+              }
+              const avatar = document.createElement('div');
+              avatar.className = 'lineup-roster__avatar';
+              renderAvatar(avatar, unit.avatar || null, unit.name);
+              button.appendChild(avatar);
+              const meta = document.createElement('div');
+              meta.className = 'lineup-roster__meta';
+              const nameEl = document.createElement('p');
+              nameEl.className = 'lineup-roster__name';
+              nameEl.textContent = unit.name;
+              meta.appendChild(nameEl);
+              if (unit.role || unit.rank) {
+                  const tag = document.createElement('p');
+                  tag.className = 'lineup-roster__tag';
+                  tag.textContent = [unit.role, unit.rank].filter(Boolean).join(' · ');
+                  meta.appendChild(tag);
+              }
+              if (unit.power != null) {
+                  const extra = document.createElement('p');
+                  extra.className = 'lineup-roster__extra';
+                  extra.textContent = `Chiến lực ${formatUnitPower(unit.power)}`;
+                  meta.appendChild(extra);
+              }
+              button.appendChild(meta);
+              rosterList.appendChild(button);
+          });
+      }
+      function openPassiveDetails(passive) {
+          passiveOverlayBody.innerHTML = '';
+          const title = document.createElement('h3');
+          title.className = 'lineup-overlay__title';
+          title.textContent = passive.name;
+          passiveOverlayBody.appendChild(title);
+          if (passive.requirement) {
               const subtitle = document.createElement('p');
               subtitle.className = 'lineup-overlay__subtitle';
-              subtitle.textContent = 'Chỉ định leader sẽ kích hoạt buff đội hình và ưu tiên lượt đánh đầu.';
-              leaderOverlayBody.appendChild(subtitle);
-              const list = document.createElement('div');
-              list.className = 'lineup-overlay__list';
-              const clearOption = document.createElement('button');
-              clearOption.type = 'button';
-              clearOption.className = 'lineup-overlay__option';
-              clearOption.textContent = 'Bỏ chọn leader';
-              clearOption.dataset.unitId = '';
-              list.appendChild(clearOption);
-              state.roster.forEach(unit => {
-                  const option = document.createElement('button');
-                  option.type = 'button';
-                  option.className = 'lineup-overlay__option';
-                  option.dataset.unitId = unit.id;
-                  const avatar = document.createElement('div');
-                  avatar.className = 'lineup-overlay__option-avatar';
-                  renderAvatar(avatar, unit.avatar || null, unit.name);
-                  option.appendChild(avatar);
-                  const text = document.createElement('div');
-                  const nameEl = document.createElement('p');
-                  nameEl.className = 'lineup-overlay__option-name';
-                  nameEl.textContent = unit.name;
-                  text.appendChild(nameEl);
-                  const meta = document.createElement('p');
-                  meta.className = 'lineup-overlay__option-meta';
-                  meta.textContent = [unit.role, unit.rank].filter(Boolean).join(' · ');
-                  text.appendChild(meta);
-                  option.appendChild(text);
-                  if (lineup.leaderId === unit.id) {
-                      option.classList.add('is-active');
-                  }
-                  list.appendChild(option);
-              });
-              leaderOverlayBody.appendChild(list);
-              openOverlay(leaderOverlay);
-              leaderClose.focus();
+              subtitle.textContent = passive.requirement;
+              passiveOverlayBody.appendChild(subtitle);
           }
-          const cleanup = [];
-          const eventCleanup = bindLineupEvents({
-              shell,
-              state,
-              elements: {
-                  backButton,
-                  benchGrid,
-                  benchDetails,
-                  passiveGrid,
-                  rosterFilters,
-                  rosterList,
-                  leaderAvatar,
-                  leaderSection,
-                  passiveOverlay,
-                  passiveClose,
-                  leaderOverlay,
-                  leaderOverlayBody,
-                  leaderClose,
-              },
-              overlays: {
-                  getActive: () => activeOverlay,
-                  close: overlay => closeOverlay(overlay),
-              },
-              helpers: {
-                  getSelectedLineup,
-                  setMessage,
-                  renderBench,
-                  renderBenchDetails,
-                  renderLeader,
-                  renderPassives,
-                  renderFilters,
-                  renderRoster,
-                  updateActiveBenchHighlight,
-                  syncBenchDetailsHeight,
-                  openPassiveDetails,
-                  openLeaderPicker,
-              },
-              rosterLookup,
-          });
-          cleanup.push(...eventCleanup);
-          refreshWallet();
-          renderBench();
-          renderLeader();
-          renderPassives();
-          renderFilters();
-          renderRoster();
-          setMessage('Chọn nhân vật từ danh sách để xây dựng đội hình.');
-          cleanup.push(() => passiveOverlay.remove());
-          cleanup.push(() => leaderOverlay.remove());
-          return {
-              destroy() {
-                  while (cleanup.length > 0) {
-                      const fn = cleanup.pop();
-                      if (!fn)
-                          continue;
-                      try {
-                          fn();
-                      }
-                      catch (error) {
-                          console.error('[lineup] destroy error', error);
-                      }
-                  }
-                  mount.destroy();
-              },
-          };
+          if (passive.description) {
+              const descriptionEl = document.createElement('p');
+              descriptionEl.className = 'lineup-overlay__subtitle';
+              descriptionEl.textContent = passive.description;
+              passiveOverlayBody.appendChild(descriptionEl);
+          }
+          if (passive.requiredUnitIds.length) {
+              const list = document.createElement('ul');
+              list.className = 'lineup-overlay__list';
+              passive.requiredUnitIds.forEach(unitId => {
+                  const item = document.createElement('li');
+                  const unit = rosterLookup.get(unitId);
+                  item.textContent = (unit === null || unit === void 0 ? void 0 : unit.name) || unitId;
+                  list.appendChild(item);
+              });
+              passiveOverlayBody.appendChild(list);
+          }
+          openOverlay(passiveOverlay);
+          passiveClose.focus();
       }
+      function openLeaderPicker() {
+          const lineup = getSelectedLineup();
+          if (!lineup)
+              return;
+          leaderOverlayBody.innerHTML = '';
+          const title = document.createElement('h3');
+          title.className = 'lineup-overlay__title';
+          title.textContent = 'Chọn leader';
+          leaderOverlayBody.appendChild(title);
+          const subtitle = document.createElement('p');
+          subtitle.className = 'lineup-overlay__subtitle';
+          subtitle.textContent = 'Chỉ định leader sẽ kích hoạt buff đội hình và ưu tiên lượt đánh đầu.';
+          leaderOverlayBody.appendChild(subtitle);
+          const list = document.createElement('div');
+          list.className = 'lineup-overlay__list';
+          const clearOption = document.createElement('button');
+          clearOption.type = 'button';
+          clearOption.className = 'lineup-overlay__option';
+          clearOption.textContent = 'Bỏ chọn leader';
+          clearOption.dataset.unitId = '';
+          list.appendChild(clearOption);
+          state.roster.forEach(unit => {
+              const option = document.createElement('button');
+              option.type = 'button';
+              option.className = 'lineup-overlay__option';
+              option.dataset.unitId = unit.id;
+              const avatar = document.createElement('div');
+              avatar.className = 'lineup-overlay__option-avatar';
+              renderAvatar(avatar, unit.avatar || null, unit.name);
+              option.appendChild(avatar);
+              const text = document.createElement('div');
+              const nameEl = document.createElement('p');
+              nameEl.className = 'lineup-overlay__option-name';
+              nameEl.textContent = unit.name;
+              text.appendChild(nameEl);
+              const meta = document.createElement('p');
+              meta.className = 'lineup-overlay__option-meta';
+              meta.textContent = [unit.role, unit.rank].filter(Boolean).join(' · ');
+              text.appendChild(meta);
+              option.appendChild(text);
+              if (lineup.leaderId === unit.id) {
+                  option.classList.add('is-active');
+              }
+              list.appendChild(option);
+          });
+          leaderOverlayBody.appendChild(list);
+          openOverlay(leaderOverlay);
+          leaderClose.focus();
+      }
+      const cleanup = [];
+      const eventCleanup = bindLineupEvents({
+          shell,
+          state,
+          elements: {
+              backButton,
+              slotsGrid,
+              benchGrid,
+              benchDetails,
+              passiveGrid,
+              rosterFilters,
+              rosterList,
+              leaderAvatar,
+              leaderSection,
+              passiveOverlay,
+              passiveClose,
+              leaderOverlay,
+              leaderOverlayBody,
+              leaderClose,
+          },
+          overlays: {
+              getActive: () => activeOverlay,
+              close: overlay => closeOverlay(overlay),
+          },
+          helpers: {
+              getSelectedLineup,
+              setMessage,
+              renderSlots,
+              renderBench,
+              renderBenchDetails,
+              renderLeader,
+              renderPassives,
+              renderFilters,
+              renderRoster,
+              updateActiveBenchHighlight,
+              syncBenchDetailsHeight,
+              openPassiveDetails,
+              openLeaderPicker,
+              refreshWallet,
+          },
+          rosterLookup,
+      });
+      cleanup.push(...eventCleanup);
+      refreshWallet();
+      renderSlots();
+      renderBench();
+      renderLeader();
+      renderPassives();
+      renderFilters();
+      renderRoster();
+      setMessage('Chọn nhân vật rồi gán vào các ô chủ lực hoặc dự bị để hoàn thiện đội hình.');
+      cleanup.push(() => passiveOverlay.remove());
+      cleanup.push(() => leaderOverlay.remove());
+      return {
+          destroy() {
+              while (cleanup.length > 0) {
+                  const fn = cleanup.pop();
+                  if (!fn)
+                      continue;
+                  try {
+                      fn();
+                  }
+                  catch (error) {
+                      console.error('[lineup] destroy error', error);
+                  }
+              }
+              mount.destroy();
+          },
+      };
   }
 
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderLineupView')) exports.renderLineupView = renderLineupView;
@@ -13396,6 +13718,41 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
       slot.label = null;
       return { ok: true };
   }
+  function removeUnitFromSlot(lineup, slotIndex) {
+      const slot = lineup.slots[slotIndex];
+      if (!slot)
+          return;
+      const removedUnitId = slot.unitId;
+      slot.unitId = null;
+      slot.label = null;
+      if (removedUnitId && lineup.leaderId === removedUnitId) {
+          lineup.leaderId = null;
+      }
+  }
+  function unlockSlot(lineup, slotIndex, balances) {
+      var _a;
+      const slot = lineup.slots[slotIndex];
+      if (!slot) {
+          return { ok: false, message: 'Không tìm thấy vị trí.' };
+      }
+      if (slot.unlocked) {
+          return { ok: true, spent: null };
+      }
+      const cost = slot.unlockCost;
+      if (cost) {
+          const current = (_a = balances.get(cost.currencyId)) !== null && _a !== void 0 ? _a : 0;
+          if (current < cost.amount) {
+              return {
+                  ok: false,
+                  message: `Không đủ ${formatCurrencyBalance(cost.amount, cost.currencyId)} để mở khóa vị trí này.`,
+              };
+          }
+          balances.set(cost.currencyId, current - cost.amount);
+      }
+      slot.unlocked = true;
+      slot.unlockCost = null;
+      return { ok: true, spent: cost !== null && cost !== void 0 ? cost : null };
+  }
   function assignUnitToBench(lineup, benchIndex, unitId) {
       const cell = lineup.bench[benchIndex];
       if (!cell) {
@@ -13467,6 +13824,8 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'evaluatePassive')) exports.evaluatePassive = evaluatePassive;
   if (!Object.prototype.hasOwnProperty.call(exports, 'removeUnitFromPlacements')) exports.removeUnitFromPlacements = removeUnitFromPlacements;
   if (!Object.prototype.hasOwnProperty.call(exports, 'assignUnitToSlot')) exports.assignUnitToSlot = assignUnitToSlot;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'removeUnitFromSlot')) exports.removeUnitFromSlot = removeUnitFromSlot;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'unlockSlot')) exports.unlockSlot = unlockSlot;
   if (!Object.prototype.hasOwnProperty.call(exports, 'assignUnitToBench')) exports.assignUnitToBench = assignUnitToBench;
   if (!Object.prototype.hasOwnProperty.call(exports, 'removeUnitFromBench')) exports.removeUnitFromBench = removeUnitFromBench;
   if (!Object.prototype.hasOwnProperty.call(exports, 'isUnitPlaced')) exports.isUnitPlaced = isUnitPlaced;
