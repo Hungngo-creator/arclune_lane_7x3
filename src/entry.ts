@@ -236,6 +236,34 @@ let collectionRenderToken = 0;
 let lineupView: LineupViewHandle | null = null;
 let lineupRenderToken = 0;
 
+function areScreenParamsEqual(current: ScreenParams, next: ScreenParams): boolean{
+  if (current === next){
+    return true;
+  }
+
+  if (current === null || next === null){
+    return false;
+  }
+
+  const currentKeys = Object.keys(current);
+  const nextKeys = Object.keys(next);
+
+  if (currentKeys.length !== nextKeys.length){
+    return false;
+  }
+
+  for (const key of currentKeys){
+    if (!Object.prototype.hasOwnProperty.call(next, key)){
+      return false;
+    }
+    if (current[key] !== next[key]){
+      return false;
+    }
+  }
+
+  return true;
+}
+
 function dispatchLoaded(): void{
   try {
     window.dispatchEvent(new Event(SUCCESS_EVENT));
@@ -923,7 +951,7 @@ async function mountPveScreen(params: ScreenParams): Promise<void>{
       const nextScreen = state.screen;
       const nextParams = state.screenParams;
       const screenChanged = nextScreen !== lastScreen;
-      const paramsChanged = nextParams !== lastParams;
+      const paramsChanged = !areScreenParamsEqual(nextParams, lastParams);
 
       if (!screenChanged && !paramsChanged){
         return;
