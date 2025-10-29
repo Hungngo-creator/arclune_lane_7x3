@@ -11,7 +11,7 @@ import { parseVfxAnchorDataset } from './data/vfx_anchors/schema';
 
 import type { SessionState } from '@shared-types/combat';
 import type { Side, UnitToken } from '@shared-types/units';
-import type { VfxAnchorDataset } from '@shared-types/vfx';
+import type { VfxAnchor, VfxAnchorDataset } from '@shared-types/vfx';
 
 type GridSpec = Parameters<typeof projectCellOblique>[0];
 type CameraOptions = Parameters<typeof projectCellOblique>[3];
@@ -260,6 +260,51 @@ function getUnitAnchorDataset(unit: TokenRef): AnchorDatasetEntry | null {
   return VFX_ANCHOR_CACHE.get(id) || null;
 }
 
+function getBindingAnchors(
+  dataset: AnchorDatasetEntry | null | undefined,
+  bindingKey: string | null | undefined,
+  source: 'vfxBindings' | 'ambientEffects' = 'vfxBindings',
+): ReadonlyArray<VfxAnchor> {
+  if (!dataset || !bindingKey) return [];
+  const bindings = dataset[source];
+  const entry = bindings?.[bindingKey];
+  if (!entry || !Array.isArray(entry.anchors)) return [];
+  return entry.anchors;
+}
+
+function pickAnchorFromList(
+  anchors: ReadonlyArray<VfxAnchor>,
+  anchorId: string | undefined,
+  timing: string | number | undefined,
+  hasTiming: boolean,
+): VfxAnchor | null {
+  if (anchors.length === 0) return null;
+  if (hasTiming || anchorId) {
+    for (const anchor of anchors) {
+      const timingMatch = hasTiming && anchor.timing === timing;
+      const idMatch = !!anchorId && anchor.id === anchorId;
+      if (timingMatch || idMatch) {
+        return anchor;
+      }
+    }
+  }
+  if (hasTiming) {
+    for (const anchor of anchors) {
+      if (anchor.timing === timing) {
+        return anchor;
+      }
+    }
+  }
+  if (anchorId) {
+    for (const anchor of anchors) {
+      if (anchor.id === anchorId) {
+        return anchor;
+      }
+    }
+  }
+  return null;
+}
+
 function resolveBindingAnchor(
   unit: TokenRef,
   { anchorId, bindingKey, timing, ambientKey, radius }: {
@@ -271,28 +316,17 @@ function resolveBindingAnchor(
   },
 ): ResolvedAnchor {
   const dataset = getUnitAnchorDataset(unit);
-  let picked: (AnchorDatasetEntry['vfxBindings'][string]['anchors'][number]) | null = null;
+  const hasTiming = !!timing;
+  const timingValue = hasTiming ? timing : undefined;
 
-  if (bindingKey && dataset?.vfxBindings?.[bindingKey]?.anchors) {
-    const anchors = dataset.vfxBindings[bindingKey].anchors;
-    picked = anchors.find((item) => (timing && item.timing === timing) || (anchorId && item.id === anchorId)) || null;
-    if (!picked && timing) {
-      picked = anchors.find((item) => item.timing === timing) || null;
-    }
-    if (!picked && anchorId) {
-      picked = anchors.find((item) => item.id === anchorId) || null;
-    }
-  }
+  let picked: VfxAnchor | null = null;
 
-  if (!picked && ambientKey && dataset?.ambientEffects?.[ambientKey]?.anchors) {
-    const anchors = dataset.ambientEffects[ambientKey].anchors;
-    picked = anchors.find((item) => (timing && item.timing === timing) || (anchorId && item.id === anchorId)) || null;
-    if (!picked && timing) {
-      picked = anchors.find((item) => item.timing === timing) || null;
-    }
-    if (!picked && anchorId) {
-      picked = anchors.find((item) => item.id === anchorId) || null;
-    }
+  const primaryAnchors = getBindingAnchors(dataset, bindingKey);
+  picked = pickAnchorFromList(primaryAnchors, anchorId, timingValue, hasTiming);
+
+  if (!picked) {
+    const ambientAnchors = getBindingAnchors(dataset, ambientKey ?? null, 'ambientEffects');
+    picked = pickAnchorFromList(ambientAnchors, anchorId, timingValue, hasTiming);
   }
 
   const resolvedId = picked?.id || anchorId || DEFAULT_ANCHOR_ID;
