@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { HAS_INTL_NUMBER_FORMAT, createNumberFormatter } from '../utils/format.ts';
+import { assertDefined } from '../utils/assert.ts';
 import rawEconomyConfig from './economy.config.ts';
 
 import type {
@@ -62,7 +63,16 @@ const EconomyConfigSchema = z.object({
 
 const economyConfig = EconomyConfigSchema.parse(rawEconomyConfig);
 
-for (const [tier, entry] of Object.entries(economyConfig.pityConfig)){
+type PityConfigMap = typeof economyConfig.pityConfig;
+type PityConfigKey = Extract<keyof PityConfigMap, PityTier>;
+type PityConfigEntry = PityConfigMap[PityConfigKey];
+
+const pityEntries = Object.entries(economyConfig.pityConfig) as Array<[
+  PityConfigKey,
+  PityConfigEntry
+]>;
+
+for (const [tier, entry] of pityEntries){
   if (entry.tier !== tier){
     throw new Error(`Cấu hình pity cho tier "${tier}" không khớp giá trị nội tại (${entry.tier}).`);
   }
@@ -96,11 +106,8 @@ function listCurrencies(): CurrencyDefinition[] {
 }
 
 function convertCurrency(value: number, fromId: string, toId: string): number {
-  const from = getCurrency(fromId);
-  const to = getCurrency(toId);
-  if (!from || !to){
-    throw new Error(`Invalid currency conversion from ${fromId} to ${toId}`);
-  }
+  const from = assertDefined(getCurrency(fromId), `Invalid currency conversion from ${fromId} to ${toId}`);
+  const to = assertDefined(getCurrency(toId), `Invalid currency conversion from ${fromId} to ${toId}`);
   const valueInBase = value * from.ratioToBase;
   return valueInBase / to.ratioToBase;
 }
@@ -180,12 +187,12 @@ function formatBalance(value: number, currencyId: string, options: FormatBalance
 
 const PITY_CONFIG: Readonly<Record<PityTier, PityConfiguration>> = Object.freeze(
   Object.fromEntries(
-    Object.entries(economyConfig.pityConfig).map(([tier, config]) => [
+    pityEntries.map(([tier, config]) => [
       tier,
       {
         tier: config.tier,
         hardPity: config.hardPity,
-        softGuarantees: config.softGuarantees.map((rule) => ({ ...rule }))
+        softGuarantees: config.softGuarantees.map((rule): PityConfiguration['softGuarantees'][number] => ({ ...rule }))
       }
     ])
   ) as Record<PityTier, PityConfiguration>

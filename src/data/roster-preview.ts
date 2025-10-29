@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { CLASS_BASE, RANK_MULT, ROSTER } from '../catalog.ts';
+import { assertDefined } from '../utils/assert.ts';
 import rawRosterPreviewConfig from './roster-preview.config.ts';
 
 import type {
@@ -71,11 +72,10 @@ export function applyTpToBase(
 }
 
 function getRankMultiplier(rank: keyof typeof RANK_MULT) {
-  const multiplier = RANK_MULT[rank];
-  if (multiplier === undefined) {
-    throw new Error(`Missing rank multiplier for "${rank}"`);
-  }
-  return multiplier;
+  return assertDefined(
+    RANK_MULT[rank],
+    `Missing rank multiplier for "${rank}"`
+  );
 }
 
 export function applyRankMultiplier(preRank: CatalogStatBlock, rank: keyof typeof RANK_MULT): CatalogStatBlock {
@@ -96,10 +96,7 @@ export function computeFinalStats(
   rank: keyof typeof RANK_MULT,
   tpAlloc: Record<string, number | null | undefined> = {}
 ): CatalogStatBlock {
-  const base = CLASS_BASE[className];
-  if (!base) {
-    throw new Error(`Unknown class "${className}"`);
-  }
+  const base = assertDefined(CLASS_BASE[className], `Unknown class "${className}"`);
   const preRank = applyTpToBase(base, tpAlloc);
   return applyRankMultiplier(preRank, rank);
 }
@@ -110,7 +107,7 @@ export function deriveTpFromMods(
 ): Record<string, number> {
   if (!mods) return {};
   const tp: Record<string, number> = {};
-  for (const [stat, modValue] of Object.entries(mods)) {
+  for (const [stat, modValue] of Object.entries(mods) as Array<[string, number | null | undefined]>) {
     if (!(stat in TP_DELTA)) continue;
     const baseValue = base[stat];
     if (typeof baseValue !== 'number') continue;

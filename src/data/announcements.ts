@@ -96,7 +96,9 @@ export function selectAnnouncementEntry(
   const now = options.now instanceof Date ? options.now : new Date();
   const slot = SIDE_SLOT_ANNOUNCEMENTS.find(item => item.key === slotKey);
   if (!slot) return null;
-  const entry = slot.entries.find(item => isEntryActive(item, now)) || slot.entries[0] || null;
+  const entry = slot.entries.find((item: AnnouncementEntry) => isEntryActive(item, now))
+    ?? slot.entries.at(0)
+    ?? null;
   if (!entry) return null;
   return { slot, entry };
 }
@@ -104,7 +106,9 @@ export function selectAnnouncementEntry(
 export function getAllSidebarAnnouncements(options: { now?: Date } = {}){
   const now = options.now instanceof Date ? options.now : new Date();
   return SIDE_SLOT_ANNOUNCEMENTS.map(slot => {
-    const entry = slot.entries.find(item => isEntryActive(item, now)) || slot.entries[0] || null;
+    const entry = slot.entries.find((item: AnnouncementEntry) => isEntryActive(item, now))
+      ?? slot.entries.at(0)
+      ?? null;
     return {
       key: slot.key,
       label: slot.label,

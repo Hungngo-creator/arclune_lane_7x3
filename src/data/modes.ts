@@ -141,7 +141,7 @@ const MODES = [
     status: MODE_STATUS.COMING_SOON,
     icon: '🎲',
     shortDescription: `Quầy gacha phân tab Nhân Vật, Công Pháp, Vũ Khí, Sủng Thú với bảo hiểm ${SSR_PITY?.hardPity || 60}/${UR_PITY?.hardPity || 70}/${PRIME_PITY?.hardPity || 80} lượt cho các banner SSR/UR/Prime.`,
-    unlockNotes: `Banner UR bảo hiểm SSR ở lượt ${UR_PITY?.softGuarantees?.[0]?.pull || 50}; banner Prime lần lượt bảo hiểm SSR/UR ở ${PRIME_PITY?.softGuarantees?.map(({ pull }) => pull).join('/') || '40/60'} và Prime ở ${PRIME_PITY?.hardPity || 80}.`,
+    unlockNotes: `Banner UR bảo hiểm SSR ở lượt ${UR_PITY?.softGuarantees?.[0]?.pull || 50}; banner Prime lần lượt bảo hiểm SSR/UR ở ${PRIME_PITY?.softGuarantees?.map(({ pull }: PityConfiguration['softGuarantees'][number]) => pull).join('/') || '40/60'} và Prime ở ${PRIME_PITY?.hardPity || 80}.`,
     tags: ['Kinh tế nguyên tinh', 'Coming soon'],
     menuSections: ['economy'],
     shell: {
