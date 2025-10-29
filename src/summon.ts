@@ -9,7 +9,9 @@ import type { SessionState } from '@shared-types/combat';
 import type { ActionChainEntry, Side, SummonRequest, UnitToken } from '@shared-types/units';
 import type { TurnContext, TurnHooks } from '@shared-types/turn-order';
 
-type SummonChainHooks = Pick<TurnHooks, 'allocIid' | 'doActionOrSkip' | 'performUlt' | 'getTurnOrderIndex'>;
+type SummonChainHooks = Partial<
+  Pick<TurnHooks, 'allocIid' | 'doActionOrSkip' | 'performUlt' | 'getTurnOrderIndex'>
+>;
 
 const DEFAULT_SUMMON_UNIT: NonNullable<SummonRequest['unit']> = {
   id: 'creep',
