@@ -1,4 +1,4 @@
-import type { UnitArt } from '@types/art';
+import type { UnitArt } from '@shared-types/art';
 
 export type HeroCue = 'intro' | 'hover' | 'tap' | 'sensitive' | 'idle';
 
