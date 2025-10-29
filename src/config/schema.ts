@@ -139,7 +139,7 @@ const ColorPaletteSchema = z.object({
 export type ColorPalette = z.infer<typeof ColorPaletteSchema>;
 
 const SceneLayerSchema = z.object({
-  top: z.string(),
+  top: z.string().optional(),
   mid: z.string().optional(),
   bottom: z.string().optional(),
   glow: z.string().optional(),
@@ -154,11 +154,21 @@ const SceneLayerSchema = z.object({
 });
 export type SceneLayer = z.infer<typeof SceneLayerSchema>;
 
-const SceneThemeSchema = z.object({
-  sky: SceneLayerSchema,
-  horizon: SceneLayerSchema,
-  ground: SceneLayerSchema
-});
+const SceneThemeSchema = z
+  .object({
+    sky: SceneLayerSchema,
+    horizon: SceneLayerSchema,
+    ground: SceneLayerSchema
+  })
+  .superRefine((theme, ctx) => {
+    if (!theme.sky.top) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['sky', 'top'],
+        message: 'sky.top is required'
+      });
+    }
+  });
 export type SceneTheme = z.infer<typeof SceneThemeSchema>;
 
 const SceneConfigSchema = z.object({
