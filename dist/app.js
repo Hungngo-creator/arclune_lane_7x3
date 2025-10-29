@@ -1,6 +1,8 @@
 // Bundled by build.mjs
 const __modules = Object.create(null);
+if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
 const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/time.js":"./utils/time.ts","./vfx.js":"./vfx.ts"};
+if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }
 function __define(id, factory){ __modules[id] = { factory, exports: null, initialized: false }; }
 function __require(id){
@@ -16,6 +18,7 @@ function __require(id){
   }
   return mod.exports;
 }
+if (typeof globalThis !== "undefined" && typeof globalThis.__require === "undefined"){ globalThis.__require = __require; }
 __define('./ai.ts', (exports, module, __require) => {
   const __dep0 = __require('./engine.ts');
   const pickRandom = __dep0.pickRandom;
@@ -5194,8 +5197,16 @@ __define('./entry.ts', (exports, module, __require) => {
   ];
   async function loadBundledModule(id) {
       var _a, _b;
-      const loader = typeof __require === 'function'
-          ? Promise.resolve().then(() => __require(id))
+      const globalRequire = typeof globalThis !== 'undefined'
+          ? globalThis.__require
+          : undefined;
+      const runtimeRequire = typeof __require === 'function'
+          ? __require
+          : typeof globalRequire === 'function'
+              ? globalRequire
+              : null;
+      const loader = runtimeRequire
+          ? Promise.resolve().then(() => runtimeRequire(id))
           : import(id);
       const resolved = await loader;
       if (resolved && typeof resolved === 'object') {
@@ -10763,7 +10774,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
   const getSkillSet = __dep2.getSkillSet;
   const __dep3 = __require('./utils/format.ts');
   const createNumberFormatter = __dep3.createNumberFormatter;
-  const __dep4 = __require('./../ui/dom.ts');
+  const __dep4 = __require('./ui/dom.ts');
   const assertElement = __dep4.assertElement;
   const ensureStyleTag = __dep4.ensureStyleTag;
   const mountSection = __dep4.mountSection;
@@ -11737,6 +11748,14 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
       const handleBack = () => {
           if (shell && typeof shell.enterScreen === 'function') {
               shell.enterScreen('main-menu');
+          }
+          else if (typeof window !== 'undefined') {
+              if (window.history && typeof window.history.back === 'function') {
+                  window.history.back();
+              }
+              else {
+                  window.dispatchEvent(new CustomEvent('lineup:back'));
+              }
           }
       };
       backButton.addEventListener('click', handleBack);
