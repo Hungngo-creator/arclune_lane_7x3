@@ -44,7 +44,6 @@ function download(url, dest) {
 }
 
 const FALLBACK_RUNTIME = `"use strict";
-const esbuild = require("esbuild");
 const ModuleKind = Object.freeze({
   None: "none",
   CommonJS: "commonjs",
@@ -111,24 +110,15 @@ function mapJsx(tsJsx) {
       return "none";
   }
 }
-function transpileModule(input, options = {}) {
-  const compilerOptions = options.compilerOptions || {};
-  const format = mapModule(compilerOptions.module);
-  const target = mapTarget(compilerOptions.target);
-  const jsx = mapJsx(compilerOptions.jsx);
-  const result = esbuild.transformSync(input, {
-    loader: options.fileName && options.fileName.endsWith(".tsx") ? "tsx" : "ts",
-    format,
-    target,
-    jsx,
-    sourcemap: compilerOptions.sourceMap || compilerOptions.inlineSourceMap || false,
-    sourcefile: options.fileName,
-  });
-  return {
-    outputText: result.code,
-    diagnostics: [],
-    sourceMapText: result.map || undefined,
-  };
+function createMissingTypescriptError() {
+  const error = new Error(
+    'Không tìm thấy runtime TypeScript thật. Hãy sao chép thư mục "node_modules/typescript" từ một máy đã cài đầy đủ hoặc cài TypeScript trước khi bundle.',
+  );
+  error.code = "MISSING_TYPESCRIPT_RUNTIME";
+  return error;
+}
+function transpileModule() {
+  throw createMissingTypescriptError();
 }
 module.exports = {
   transpileModule,
