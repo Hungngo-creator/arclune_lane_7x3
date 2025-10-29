@@ -11,6 +11,8 @@ import type { TurnSnapshot } from './turn-order';
 import type { RngState } from './rng';
 import type { TelemetryEvent } from './telemetry';
 import type { GameEventTargetLike } from '../events';
+import type { SummonBarHandles } from './ui';
+import type { VfxEventList } from './vfx';
 
 export interface StatusEffect {
   id: string;
@@ -163,7 +165,7 @@ export interface SessionAIState {
   costCap: number;
   summoned: number;
   summonLimit: number;
-  unitsAll: AiDeckPool;
+  unitsAll: ReadonlyArray<PveDeckEntry>;
   usedUnitIds: Set<UnitId>;
   deck: AiDeckPool;
   selectedId: UnitId | null;
@@ -172,19 +174,48 @@ export interface SessionAIState {
   [extra: string]: unknown;
 }
 
+export interface BattleGrid {
+  cols: number;
+  rows: number;
+  tile: number;
+  ox: number;
+  oy: number;
+  w: number;
+  h: number;
+  pad: number;
+  dpr: number;
+  pixelW: number;
+  pixelH: number;
+  pixelArea: number;
+}
+
+export interface RuntimeUi {
+  bar: SummonBarHandles | null;
+  [extra: string]: unknown;
+}
+
+export interface MetaService {
+  get(id: UnitId | null | undefined): RosterUnitDefinition | null | undefined;
+  classOf?(id: UnitId | null | undefined): string | null;
+  rankOf?(id: UnitId | null | undefined): string | null;
+  kit?(id: UnitId | null | undefined): Record<string, unknown> | null;
+  isSummoner?(id: UnitId | null | undefined): boolean;
+  [extra: string]: unknown;
+}
+
 export interface SessionState {
   modeKey: string | null;
-  grid: unknown;
+  grid: BattleGrid | null;
   tokens: UnitToken[];
   cost: number;
   costCap: number;
   summoned: number;
   summonLimit: number;
-  unitsAll: ReadonlyArray<PveDeckEntry>;
+  unitsAll: PveDeckEntry[];
   usedUnitIds: Set<UnitId>;
-  deck3: ReadonlyArray<PveDeckEntry>;
+  deck3: PveDeckEntry[];
   selectedId: UnitId | null;
-  ui: { bar: unknown };
+  ui: RuntimeUi;
   turn: TurnSnapshot | null;
   queued: QueuedSummonState;
   actionChain: ActionChainEntry[];
@@ -194,9 +225,10 @@ export interface SessionState {
   battle: BattleState;
   result: BattleResult | null;
   ai: SessionAIState;
-  meta: { get(id: UnitId): RosterUnitDefinition | null | undefined; [extra: string]: unknown };
+  meta: MetaService;
   rng?: RngState;
   telemetryLog?: TelemetryEvent[];
+  vfx?: VfxEventList;
   [extra: string]: unknown;
 }
 

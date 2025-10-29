@@ -15,3 +15,12 @@ export type VfxAnchorDataset = {
   vfxBindings: Record<string, VfxBinding>;
   ambientEffects: Record<string, VfxBinding>;
 };
+
+export interface VfxEvent {
+  type: string;
+  t0: number;
+  dur: number;
+  [extra: string]: unknown;
+}
+
+export type VfxEventList = VfxEvent[];
