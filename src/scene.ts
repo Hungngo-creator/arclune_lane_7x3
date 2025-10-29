@@ -201,7 +201,7 @@ function mixHex(a: string | null | undefined, b: string | null | undefined, t: n
 }
 
 export function drawBattlefieldScene(
-  ctx: CanvasRenderingContext2D,
+  ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
   g: SceneGrid,
   theme: SceneTheme | null | undefined,
 ): void {
