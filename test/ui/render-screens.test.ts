@@ -7,8 +7,8 @@ import { renderLineupScreen } from '../../src/screens/lineup/index.ts';
 import { renderCollectionScreen } from '../../src/screens/collection/index.ts';
 import { resolveCurrencyBalance } from '../../src/screens/collection/helpers.ts';
 import type { MainMenuState, MenuCardMetadata, MenuSection } from '../../src/screens/main-menu/types.ts';
-import type { RosterEntryLite, LineupDefinition } from '@types/lineup';
-import type { LineupCurrencyConfig, LineupCurrencies } from '@types/currency';
+import type { RosterEntryLite, LineupDefinition } from '@shared-types/lineup';
+import type { LineupCurrencyConfig, LineupCurrencies } from '@shared-types/currency';
 
 beforeEach(() => {
   document.body.innerHTML = '';
