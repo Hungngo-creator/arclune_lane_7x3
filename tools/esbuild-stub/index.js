@@ -40,11 +40,24 @@ function performTransform(code, options = {}) {
       compilerOptions.jsx = ts.JsxEmit.React;
     }
     const fileName = sourcefile || (loader === 'tsx' ? 'stdin.tsx' : 'stdin.ts');
-    const transpileResult = ts.transpileModule(code, {
-      compilerOptions,
-      fileName,
-      reportDiagnostics: true,
-    });
+    let transpileResult;
+    try {
+      transpileResult = ts.transpileModule(code, {
+        compilerOptions,
+        fileName,
+        reportDiagnostics: true,
+      });
+    } catch (err) {
+      if (err && (err.code === 'MISSING_TYPESCRIPT_RUNTIME' || err.name === 'MISSING_TYPESCRIPT_RUNTIME')) {
+        throw Object.assign(
+          new Error(
+            'Không thể transpile TypeScript vì thiếu runtime TypeScript. Hãy sao chép thư mục "node_modules/typescript" từ một máy đã cài npm install hoặc cài đặt thủ công trước khi bundle.',
+          ),
+          { cause: err },
+        );
+      }
+      throw err;
+    }
     const warnings = (transpileResult.diagnostics || []).map((diagnostic) => {
       const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
       let location = null;
