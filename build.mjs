@@ -24,14 +24,32 @@ function normalizeModuleId(id){
   if (!id){
     return id;
   }
+  const normalizedSlashes = id.replace(/\\/g, '/');
   if (path.isAbsolute(id)){
     const rel = path.relative(SRC_DIR, id);
-    if (!rel.startsWith('..')){
+    if (rel && !rel.startsWith('..') && !path.isAbsolute(rel)){
       return `./${rel.split(path.sep).join('/')}`;
     }
-    return id.replace(/\\/g, '/');
+    return normalizedSlashes;
   }
-  return id.replace(/\\/g, '/');
+  if (!normalizedSlashes.startsWith('.')){
+    return normalizedSlashes;
+  }
+
+  const trimmed = normalizedSlashes.startsWith('./') ? normalizedSlashes.slice(2) : normalizedSlashes;
+  const candidateRel = trimmed.replace(/^(\.\.\/)+/, '');
+  if (candidateRel){
+    const candidatePath = path.join(SRC_DIR, candidateRel);
+    const resolved = resolveWithExtensions(candidatePath) ?? (fsSync.existsSync(candidatePath) ? candidatePath : null);
+    if (resolved){
+      const rel = path.relative(SRC_DIR, resolved);
+      if (rel && !rel.startsWith('..') && !path.isAbsolute(rel)){
+        return `./${rel.split(path.sep).join('/')}`;
+      }
+    }
+  }
+
+  return normalizedSlashes;
 }
 
 const LEGACY_MODULE_ID_ALIAS_ENTRIES = [
