@@ -227,6 +227,7 @@ let rootElement: HTMLElement | null = null;
 let pveRenderToken = 0;
 const bootstrapOptions: { isFileProtocol: boolean; playerGender?: string } = { isFileProtocol: false };
 let renderMessageRef: RenderMessage | null = null;
+let renderMessageIsExternal = false;
 let mainMenuView: MaybeViewController = null;
 let customScreenController: MaybeViewController = null;
 let customScreenId: string | null = null;
@@ -580,6 +581,59 @@ function showComingSoonModal(label?: string): void{
   activeModal = modal;
 }
 
+function showPveBoardMissingNotice(message: string): boolean{
+  const title = 'Không thể tải chế độ PvE';
+  if (renderMessageRef && renderMessageIsExternal){
+    try {
+      renderMessageRef({
+        title,
+        body: `<p>${message}</p>`
+      });
+      return true;
+    } catch (error) {
+      console.warn('Không thể sử dụng renderMessageRef để hiển thị thông báo PvE.', error);
+    }
+  }
+  if (typeof document === 'undefined' || !document.body){
+    return false;
+  }
+  const modalId = 'pve-board-error-modal';
+  const existing = document.getElementById(modalId);
+  if (existing && typeof existing.remove === 'function'){
+    existing.remove();
+  }
+  const modal = document.createElement('div');
+  modal.id = modalId;
+  modal.className = 'app-modal';
+  modal.setAttribute('role', 'alertdialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.style.position = 'fixed';
+  modal.style.inset = '0';
+  modal.style.display = 'flex';
+  modal.style.alignItems = 'center';
+  modal.style.justifyContent = 'center';
+  modal.style.padding = '16px';
+  modal.style.background = 'rgba(8, 12, 18, 0.82)';
+  modal.style.zIndex = '2147483647';
+  modal.innerHTML = `
+    <div class="app-modal__dialog" style="max-width:420px;width:100%;background:#0c1218;border:1px solid #2a3a4a;border-radius:16px;padding:24px;box-shadow:0 12px 32px rgba(0,0,0,0.45);text-align:center;">
+      <h3 class="app-modal__title" style="margin-top:0;margin-bottom:12px;color:#ffe066;">${title}</h3>
+      <p class="app-modal__body" style="margin:0 0 16px;color:#f1f3f5;line-height:1.6;">${message}</p>
+      <div class="app-modal__actions">
+        <button type="button" class="app-modal__button" data-action="close" style="min-width:120px;padding:8px 16px;border-radius:999px;background:#1f2c3a;color:#f1f3f5;border:1px solid #334559;cursor:pointer;">Đã hiểu</button>
+      </div>
+    </div>
+  `;
+  const closeButton = modal.querySelector('[data-action="close"]');
+  if (closeButton instanceof HTMLElement){
+    closeButton.addEventListener('click', () => {
+      modal.remove();
+    });
+  }
+  document.body.appendChild(modal);
+  return true;
+}
+
 async function renderCollectionScreen(params: ScreenParams): Promise<void>{
   if (!rootElement || !shellInstance) return;
   const token = ++collectionRenderToken;
@@ -870,7 +924,7 @@ async function mountPveScreen(params: ScreenParams): Promise<void>{
   const session = createPveSession(container, createSessionOptions) as PveSession;
   shellInstance.setActiveSession(session);
   if (typeof session.start === 'function'){
-   const scheduleRetry = (callback: () => void) => {
+    const scheduleRetry = (callback: () => void) => {
       if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function'){
         window.requestAnimationFrame(callback);
       } else {
@@ -892,10 +946,10 @@ async function mountPveScreen(params: ScreenParams): Promise<void>{
       }
     };
     const handleMissingBoard = () => {
-      if (typeof window !== 'undefined' && typeof window.alert === 'function'){
-        window.alert('Không thể tải bàn chơi PvE. Đang quay lại menu chính.');
-      } else {
-        console.warn('Không thể tải bàn chơi PvE. Đang quay lại menu chính.');
+      const message = 'Không thể tải bàn chơi PvE. Đang quay lại menu chính.';
+      const displayed = showPveBoardMissingNotice(message);
+      if (!displayed){
+        console.warn(message);
       }
       shellInstance.setActiveSession(null);
       shellInstance.enterScreen(SCREEN_MAIN_MENU);
@@ -935,6 +989,7 @@ async function mountPveScreen(params: ScreenParams): Promise<void>{
       throw new Error('Không tìm thấy phần tử #appRoot.');
     }
     renderMessageRef = renderMessage;
+    renderMessageIsExternal = typeof window !== 'undefined' && typeof window.arcluneRenderMessage === 'function';
     const handleShellError = (error: unknown) => {
       console.error('Arclune shell listener error', error);
       const renderer = renderMessageRef || renderMessage;
