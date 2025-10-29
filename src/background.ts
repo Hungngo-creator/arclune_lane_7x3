@@ -12,6 +12,30 @@ import type {
 type GridSpec = Parameters<typeof projectCellOblique>[0];
 type CameraOptions = Parameters<typeof projectCellOblique>[3];
 type SpriteCacheEntry = ReturnType<typeof ensureSpriteLoaded>;
+type EnsureSpriteArg = Parameters<typeof ensureSpriteLoaded>[0];
+
+const ENVIRONMENT_SPRITE_CACHE = new Map<string, SpriteCacheEntry | null>();
+
+function ensureEnvironmentSprite(asset: string): SpriteCacheEntry | null {
+  if (!asset) return null;
+  const cached = ENVIRONMENT_SPRITE_CACHE.get(asset);
+  if (cached !== undefined) return cached;
+  const descriptor = {
+    sprite: {
+      src: asset,
+      key: asset,
+      anchor: 1,
+      scale: 1,
+      aspect: null,
+      shadow: null,
+      skinId: null,
+      cacheKey: asset,
+    },
+  } as EnsureSpriteArg;
+  const entry = ensureSpriteLoaded(descriptor) ?? null;
+  ENVIRONMENT_SPRITE_CACHE.set(asset, entry);
+  return entry;
+}
 
 type EnvironmentPropDefaults = {
   asset?: string | null;
@@ -231,7 +255,7 @@ function getBackgroundPropCache(config: BackgroundDefinitionConfig | null): Back
       const prop = normalizePropConfig(rawProp);
       if (!prop) continue;
       const cyWithDepth = prop.cell.cy + prop.depth;
-      const spriteEntry = prop.asset ? ensureSpriteLoaded({ sprite: prop.asset }) : null;
+      const spriteEntry = ensureEnvironmentSprite(prop.asset ?? '');
       normalizedProps.push({
         prop,
         base: {
@@ -264,7 +288,7 @@ function buildBoardState(
     const { prop, base } = entry;
     const projection = projectCellOblique(g, base.cx, base.cyWithDepth, cam);
     const scale = projection.scale * prop.scale;
-    const spriteEntry = entry.spriteEntry ?? (prop.asset ? ensureSpriteLoaded({ sprite: prop.asset }) : null);
+    const spriteEntry = entry.spriteEntry ?? ensureEnvironmentSprite(prop.asset ?? '');
     entry.spriteEntry = spriteEntry;
     drawables.push({
       prop,
