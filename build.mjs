@@ -573,8 +573,10 @@ for (const [, stubPath] of STUB_MODULE_SPECIFIERS){
   const parts = [];
   parts.push('// Bundled by build.mjs');
   parts.push('const __modules = Object.create(null);');
+  parts.push('if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }');
   const legacyAliasObject = Object.fromEntries(LEGACY_MODULE_ID_ALIASES);
   parts.push(`const __legacyModuleAliases = ${JSON.stringify(legacyAliasObject)};`);
+  parts.push('if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }');
   parts.push('function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }');
   parts.push('function __define(id, factory){ __modules[id] = { factory, exports: null, initialized: false }; }');
   parts.push('function __require(id){');
@@ -590,6 +592,7 @@ for (const [, stubPath] of STUB_MODULE_SPECIFIERS){
   parts.push('  }');
   parts.push('  return mod.exports;');
   parts.push('}');
+  parts.push('if (typeof globalThis !== "undefined" && typeof globalThis.__require === "undefined"){ globalThis.__require = __require; }');
 
   for (const { id, code } of modules){
     parts.push(`__define('${id}', (exports, module, __require) => {`);
