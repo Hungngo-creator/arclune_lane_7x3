@@ -1,7 +1,7 @@
 import { getSkillSet } from '../../../data/skills.ts';
 import { createNumberFormatter } from '../../../utils/format.ts';
 import { assertElement, ensureStyleTag, mountSection } from '../../../ui/dom.ts';
-import { normalizeCurrencyBalances } from '@types/currency';
+import { normalizeCurrencyBalances } from '@shared-types/currency';
 import {
   normalizeRoster,
   normalizeLineups,
@@ -19,10 +19,10 @@ import type {
   RosterUnit,
 } from './state.ts';
 import { bindLineupEvents } from './events.ts';
-import type { LineupState } from '@types/ui';
-import type { LineupCurrencies } from '@types/currency';
-import type { UnknownRecord } from '@types/common';
-import type { LineupDefinition, RosterEntryLite } from '@types/lineup';
+import type { LineupState } from '@shared-types/ui';
+import type { LineupCurrencies } from '@shared-types/currency';
+import type { UnknownRecord } from '@shared-types/common';
+import type { LineupDefinition, RosterEntryLite } from '@shared-types/lineup';
 
 const STYLE_ID = 'lineup-view-style-v1';
 const powerFormatter = createNumberFormatter('vi-VN');

@@ -8,7 +8,7 @@ import {
   unlockSlot,
   formatCurrencyBalance,
 } from './state.ts';
-import type { LineupState } from '@types/ui';
+import type { LineupState } from '@shared-types/ui';
 
 export type CleanupCallback = () => void;
 

@@ -1,13 +1,13 @@
 import { ROSTER } from '../../../catalog.ts';
 import { listCurrencies } from '../../../data/economy.ts';
 import { createNumberFormatter } from '../../../utils/format.ts';
-import type { LineupSlot, LineupState, EquipmentLoadout } from '@types/ui';
+import type { LineupSlot, LineupState, EquipmentLoadout } from '@shared-types/ui';
 import type {
   LineupDefinition,
   LineupMemberConfig,
   LineupPassiveConfig,
   RosterEntryLite,
-} from '@types/lineup';
+} from '@shared-types/lineup';
 
 export interface RosterUnit {
   id: string;
