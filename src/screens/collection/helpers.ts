@@ -399,6 +399,10 @@ type NumberFormatterFactory = (
   options?: NumberFormatOptions,
 ) => NumberFormatter;
 
+type NumberRangeFormatSource = 'startRange' | 'endRange' | 'shared';
+
+type NumberRangeFormatPart = Intl.NumberFormatPart & { source: NumberRangeFormatSource };
+
 function toIntlNumberFormatter(
   formatter: NumberFormatter,
   locale: string,
@@ -455,11 +459,39 @@ function toIntlNumberFormatter(
       return `${formatValue(start)} – ${formatValue(end)}`;
     },
     formatRangeToParts(start: number | bigint, end: number | bigint){
-      return [
-        { type: 'startRange', value: formatValue(start) },
-        { type: 'literal', value: ' – ' },
-        { type: 'endRange', value: formatValue(end) },
-      ] as Intl.NumberFormatPart[];
+      const startValue = formatValue(start);
+      const endValue = formatValue(end);
+      
+       const buildPolyfillParts = (): NumberRangeFormatPart[] => [
+        { type: 'literal', value: startValue, source: 'startRange' },
+        { type: 'literal', value: ' – ', source: 'shared' },
+        { type: 'literal', value: endValue, source: 'endRange' },
+      ];
+
+      const resolveSource = (value: unknown): NumberRangeFormatSource | null => (
+        value === 'startRange' || value === 'endRange' || value === 'shared'
+          ? value
+          : null
+      );
+
+      if (typeof Intl === 'object' && typeof Intl.NumberFormat === 'function'){
+        try {
+          const nativeFormatter = new Intl.NumberFormat(locale, options);
+          if (typeof nativeFormatter.formatRangeToParts === 'function'){
+            const nativeParts = nativeFormatter.formatRangeToParts(start, end) as Array<Intl.NumberFormatPart & { source?: unknown }>;
+            if (nativeParts.every((part) => resolveSource(part.source) != null)){
+              return nativeParts.map((part) => ({
+                ...part,
+                source: resolveSource(part.source)!,
+              }));
+            }
+          }
+        } catch (error) {
+          // Bỏ qua và sử dụng polyfill.
+        }
+      }
+
+      return buildPolyfillParts();
     },
     [Symbol.toStringTag]: 'Intl.NumberFormat',
   };
