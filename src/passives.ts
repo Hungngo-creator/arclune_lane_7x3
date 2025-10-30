@@ -67,11 +67,16 @@ const collectPassiveEffects = (passive: PassiveSpec | null | undefined): Passive
   return out;
 };
 
+const defaultPassive: PassiveDefinition = ({ passive }) => {
+  const id = passive?.id ?? 'unknown';
+  throw new Error(`Passive handler not implemented: ${id}`);
+};
+
 const resolvePassiveEffect = (
   basePassive: PassiveSpec,
   effect: PassiveEffectCandidate,
 ): {
-  handler: PassiveDefinition | undefined;
+  handler: PassiveDefinition;
   passive: PassiveSpec | null;
   params: Record<string, unknown> | undefined;
   key: string | null;
@@ -82,15 +87,16 @@ const resolvePassiveEffect = (
       ? ((effect as PassiveEffectConfig).type || (effect as PassiveEffectConfig).kind || null)
       : null;
 
-  let handler: PassiveDefinition | undefined = key ? PASSIVES[key] : undefined;
+  let handler: PassiveDefinition | null = getRegisteredPassive(key);
   let params = basePassive.params as Record<string, unknown> | undefined;
   let resolved: PassiveSpec | null = basePassive;
 
   if (effect && typeof effect === 'object'){
     const spec = effect as PassiveEffectConfig;
     const type = spec.type || spec.kind;
-    if (type && PASSIVES[type]){
-      handler = PASSIVES[type];
+    if (type){
+      const candidate = getRegisteredPassive(type);
+      if (candidate) handler = candidate;
     }
     const mergedParams: Record<string, unknown> = {
       ...(basePassive.params || {}),
@@ -114,7 +120,7 @@ const resolvePassiveEffect = (
     handler = EFFECTS.gainStats;
   }
 
-  return { handler, passive: resolved, params, key };
+  return { handler: handler ?? defaultPassive, passive: resolved, params, key };
 };
 
 const STAT_ALIAS: Map<string, string> = new Map([
@@ -660,7 +666,7 @@ const EFFECTS: Record<string, PassiveDefinition> = {
 };
 
 /** @type {Record<string, PassiveEffectHandler>} */
-const PASSIVES: PassiveRegistry = {
+const PASSIVES = {
   placeMark: EFFECTS.placeMark,
   'gainATK%': EFFECTS.gainATKPercent,
   'gainWIL%': EFFECTS.gainWILPercent,
@@ -671,7 +677,13 @@ const PASSIVES: PassiveRegistry = {
   'gainStats%': EFFECTS.gainStats,
   statBuff: EFFECTS.gainStats,
   statGain: EFFECTS.gainStats,
-};
+} satisfies PassiveRegistry;
+
+function getRegisteredPassive(key: string | null | undefined): PassiveDefinition | null {
+  if (!key) return null;
+  const candidate = PASSIVES[key];
+  return typeof candidate === 'function' ? candidate : null;
+}
 
 /**
  * @param {SessionState | null | undefined} Game
