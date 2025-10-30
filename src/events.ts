@@ -90,6 +90,14 @@ export type GameEventHandler<T extends GameEventType = GameEventType> = (
   event: GameEventDetail<T>,
 ) => void;
 
+type CompatibleGameEventHandler<T extends GameEventType> = (
+  event: GameEventDetail<T>,
+) => unknown;
+
+const isCompatibleHandler = <T extends GameEventType>(
+  handler: unknown,
+): handler is CompatibleGameEventHandler<T> => typeof handler === 'function';
+
 const HAS_EVENT_TARGET = typeof EventTarget === 'function';
 
 type LegacyEvent = Event & {
@@ -265,41 +273,48 @@ export const dispatchGameEvent = <T extends GameEventType>(
   detail?: GameEventDetailMap[T],
 ): boolean => emitGameEvent(type, detail);
 
-export function addGameEventListener<T extends GameEventType>(
+export function addGameEventListener<T extends GameEventType, H extends CompatibleGameEventHandler<T>>(
   type: T,
-  handler: GameEventHandler<T>,
+  handler: H,
 ): () => void {
-  if (!type || typeof handler !== 'function' || !gameEvents){
+  if (!type || !isCompatibleHandler<T>(handler) || !gameEvents){
     return () => {};
   }
+  const normalizedHandler: GameEventHandler<T> = function (
+    this: unknown,
+    event: GameEventDetail<T>,
+  ): void {
+    handler.call(this, event);
+  };
   if (HAS_EVENT_TARGET && gameEvents instanceof EventTarget){
-    gameEvents.addEventListener(type, handler as EventListener);
+    const eventListener = normalizedHandler as unknown as EventListener;
+    gameEvents.addEventListener(type, eventListener);
     let disposed = false;
     return () => {
       if (disposed) return;
       disposed = true;
       if (HAS_EVENT_TARGET && gameEvents instanceof EventTarget){
-        gameEvents.removeEventListener(type, handler as EventListener);
+        gameEvents.removeEventListener(type, eventListener);
       }
     };
   }
   if (gameEvents instanceof SimpleEventTarget){
-    gameEvents.addEventListener(type, handler);
+    gameEvents.addEventListener(type, normalizedHandler);
     let disposed = false;
     return () => {
       if (disposed) return;
       disposed = true;
-      gameEvents.removeEventListener(type, handler);
+      gameEvents.removeEventListener(type, normalizedHandler);
     };
   }
   if (isEventEmitterLike(gameEvents)){
-    gameEvents.on(type, handler);
+    gameEvents.on(type, normalizedHandler);
     let disposed = false;
     return () => {
       if (disposed) return;
       disposed = true;
       if (typeof gameEvents.off === 'function'){
-        gameEvents.off(type, handler);
+        gameEvents.off(type, normalizedHandler);
       }
     };
   }

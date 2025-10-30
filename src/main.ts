@@ -1,10 +1,10 @@
 import type { CreateSessionOptions, SessionState } from '@shared-types/pve';
 import type { GameConfig } from '@shared-types/config';
-import type { GameEventHandler, GameEventType } from './events.ts';
-import { addGameEventListener } from './events.ts';
+import type { GameEventHandler, GameEventType } from './events';
+import { addGameEventListener } from './events';
 
-import { createPveSession } from './modes/pve/session.ts';
-import { ensureNestedModuleSupport } from './utils/dummy.ts';
+import { createPveSession } from '@modes/pve/session';
+import { ensureNestedModuleSupport } from './utils/dummy';
 
 export {
   gameEvents,
@@ -17,7 +17,7 @@ export {
   ACTION_END,
   TURN_REGEN,
   BATTLE_END,
-} from './events.ts';
+} from './events';
 
 type RootSource = Element | Document | null | undefined;
 type RootTarget = Element | Document | null;
@@ -44,6 +44,27 @@ export interface ActiveSessionHandle extends BaseSessionHandle {
 
 let currentSession: ActiveSessionHandle | null = null;
 
+const isPlainRecord = (value: unknown): value is Record<string, unknown> => (
+  !!value && typeof value === 'object'
+);
+
+const toRootSource = (value: unknown): RootSource => {
+  if (value == null) return value as null | undefined;
+  if (typeof Element !== 'undefined' && value instanceof Element) return value;
+  if (typeof Document !== 'undefined' && value instanceof Document) return value;
+  if (typeof (value as { nodeType?: unknown }).nodeType === 'number'){
+    return value as Element | Document;
+  }
+  return undefined;
+};
+
+const toSessionConfigOverrides = (value: unknown): SessionConfigOverrides => {
+  if (!isPlainRecord(value)){
+    return {} as SessionConfigOverrides;
+  }
+  return { ...(value as Record<string, unknown>) } as SessionConfigOverrides;
+};
+
 function resolveRoot(
   config: Pick<StartGameOptions, 'root' | 'rootEl' | 'element'> | null | undefined,
 ): RootTarget {
@@ -56,10 +77,14 @@ function resolveRoot(
 
 export function startGame(options?: StartGameOptions | null): SessionState {
   ensureNestedModuleSupport();
-  const sanitizedOptions = (options ?? {}) as StartGameOptions;
-  const { root, rootEl, element, ...rest } = sanitizedOptions;
-  const rootTarget = resolveRoot({ root, rootEl, element });
-  const initialConfig: SessionConfigOverrides = { ...rest };
+  const rawOptions = isPlainRecord(options) ? options : {};
+  const { root, rootEl, element, ...rest } = rawOptions as Record<string, unknown>;
+  const rootTarget = resolveRoot({
+    root: toRootSource(root),
+    rootEl: toRootSource(rootEl),
+    element: toRootSource(element),
+  });
+  const initialConfig = toSessionConfigOverrides(rest);
   if (!currentSession) {
     currentSession = createPveSession(rootTarget, initialConfig);
   }
