@@ -450,6 +450,7 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
     }
     const { order, indexMap } = buildTurnOrder();
     return {
+      mode: 'sequential',
       order,
       orderIndex: indexMap,
       cursor: 0,
