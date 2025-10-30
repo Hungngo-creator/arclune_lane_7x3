@@ -9,8 +9,9 @@ import {
 } from './catalog.ts';
 import { extractOnSpawnRage, kitSupportsSummon } from './utils/kit.ts';
 
-import type { CatalogStatBlock, UnitKitConfig } from './types/config.ts';
+import type { CatalogStatBlock, RosterUnitDefinition, UnitKitConfig } from './types/config.ts';
 import type { MetaEntry } from '@shared-types/pve';
+import type { MetaService as SessionMetaService } from '@shared-types/combat';
 import type { UnitId } from '@shared-types/units';
 
 import type { ClassName, RankName } from './catalog.ts';
@@ -41,7 +42,7 @@ export interface InitialRageOptions {
   [extra: string]: unknown;
 }
 
-interface MetaService {
+interface MetaLookupService {
   get(id: MetaId): MetaEntry | undefined;
   classOf(id: MetaId): MetaEntry['class'] | null;
   rankOf(id: MetaId): MetaEntry['rank'] | null;
@@ -51,7 +52,7 @@ interface MetaService {
 
 // Dùng trực tiếp catalog cho tra cứu
 export const Meta = {
-  get: getMetaById as MetaService['get'],
+  get: getMetaById as MetaLookupService['get'],
   classOf(id: MetaId) {
     const entry = getMetaById(id);
     return entry?.class ?? null;
@@ -67,7 +68,42 @@ export const Meta = {
     const entry = getMetaById(id);
     return !!(entry && entry.class === 'Summoner' && kitSupportsSummon(entry));
   },
-} satisfies MetaService;
+} satisfies MetaLookupService;
+
+const adaptMetaEntry = (
+  entry: MetaEntry | null | undefined,
+): RosterUnitDefinition | null => {
+  if (!entry) return null;
+  const resolvedKit: UnitKitConfig | null = entry.kit ?? getUnitKitById(entry.id);
+  if (!resolvedKit) return null;
+  const roster = { ...entry, kit: resolvedKit } as RosterUnitDefinition;
+  return roster;
+};
+
+export const metaServiceAdapter: SessionMetaService = {
+  get(id: UnitId | null | undefined): RosterUnitDefinition | null {
+    if (!id) return null;
+    return adaptMetaEntry(Meta.get(id));
+  },
+  classOf(id: UnitId | null | undefined): string | null {
+    if (!id) return null;
+    const value = Meta.classOf(id);
+    return typeof value === 'string' ? value : null;
+  },
+  rankOf(id: UnitId | null | undefined): string | null {
+    if (!id) return null;
+    const value = Meta.rankOf(id);
+    return typeof value === 'string' ? value : null;
+  },
+  kit(id: UnitId | null | undefined): Record<string, unknown> | null {
+    if (!id) return null;
+    return Meta.kit(id);
+  },
+  isSummoner(id: UnitId | null | undefined): boolean {
+    if (!id) return false;
+    return Meta.isSummoner(id);
+  },
+};
 
 // Tạo chỉ số instance theo class+rank+mods (SPD không nhân theo rank)
 const EMPTY_INSTANCE_STATS: InstanceStats = {
