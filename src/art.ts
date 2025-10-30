@@ -215,18 +215,20 @@ function hasArtEntry(key: string): boolean {
 }
 
 function getArtEntry(key: string): UnitArtDefinition {
+  const fallback = UNIT_ART.default as UnitArtDefinition;
   if (hasArtEntry(key)){
-    const entry = UNIT_ART[key] ?? UNIT_ART.default;
-    return entry;
+    const entry = UNIT_ART[key];
+    return entry ?? fallback;
   }
-  return UNIT_ART.default;
+  return fallback;
 }
 
 function getBaseArt(id: string | null | undefined): UnitArtDefinition {
-  const fallback = getArtEntry('default');
+  const fallback = UNIT_ART.default as UnitArtDefinition;
   if (!id) return fallback;
   if (hasArtEntry(id)){
-    return getArtEntry(id);
+    const baseArt = UNIT_ART[id];
+    return baseArt ?? fallback;
   }
   if (id.endsWith('_minion')){
     const base = id.replace(/_minion$/, '');
@@ -523,7 +525,9 @@ const basePalettes: Record<string, UnitArtPalette> = {
 };
 
 function getBasePalette(name: keyof typeof basePalettes): UnitArtPalette {
-  return basePalettes[name] ?? basePalettes.default;
+  const palette = basePalettes[name];
+  const fallback = basePalettes.default as UnitArtPalette;
+  return palette ?? fallback;
 }
 
 export const UNIT_ART: Record<string, UnitArtDefinition> = {
