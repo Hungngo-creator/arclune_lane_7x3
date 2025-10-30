@@ -166,6 +166,21 @@ export const HERO_DIALOGUES: Record<string, HeroDialogueTable> = {
   }
 };
 
+const HERO_PROFILE_FALLBACK: HeroProfileDefinition = HERO_PROFILES[FALLBACK_HERO_KEY]
+  || HERO_PROFILES[HERO_DEFAULT_ID]
+  || {
+    id: HERO_DEFAULT_ID,
+    name: 'Chiến binh Arclune',
+    title: 'Hộ vệ tiền tuyến',
+    faction: 'Arclune',
+    role: 'Đa năng',
+    motto: 'Vì ánh sáng Arclune.',
+    portrait: HERO_DEFAULT_ID,
+  };
+
+const HERO_DIALOGUE_FALLBACK = HERO_DIALOGUES[FALLBACK_HERO_KEY] || {};
+const HERO_HOTSPOT_FALLBACK = HERO_HOTSPOTS[FALLBACK_HERO_KEY] || [];
+
 const GENDER_MAP: Record<string, HeroGender> = {
   male: 'male',
   m: 'male',
@@ -216,20 +231,27 @@ function resolveHeroKey<T>(heroId: string | null | undefined, lookup: Record<str
 function normalizeGender(value: unknown): HeroGender {
   if (typeof value === 'string'){
     const key = value.trim().toLowerCase();
-    if (key in GENDER_MAP){
-      return GENDER_MAP[key];
+    const mapped = GENDER_MAP[key];
+    if (mapped){
+      return mapped;
     }
   }
   return 'neutral';
 }
 
 function ensureArray<T>(value: T | ReadonlyArray<T> | null | undefined): ReadonlyArray<T> {
-  if (!value) return [];
-  return Array.isArray(value) ? value : [value];
+  if (Array.isArray(value)){
+    return value as ReadonlyArray<T>;
+  }
+  if (value === null || value === undefined){
+    return [];
+  }
+  return [value] as ReadonlyArray<T>;
 }
 
 function pickLine(pool: ReadonlyArray<HeroDialogueLine> | HeroDialogueLine | null | undefined): HeroDialogueLine | null {
-  const list = ensureArray(pool).filter(Boolean) as ReadonlyArray<HeroDialogueLine>;
+  const list = ensureArray(pool)
+    .filter((item): item is HeroDialogueLine => Boolean(item));
   if (!list.length) return null;
   const index = Math.floor(Math.random() * list.length);
   const item = list[index];
@@ -244,11 +266,17 @@ function pickLine(pool: ReadonlyArray<HeroDialogueLine> | HeroDialogueLine | nul
 }
 
 function inferTone(cue: HeroCue | string | null | undefined): HeroTone {
-  if (cue && CUE_TONES[cue]){
-    return CUE_TONES[cue] as HeroTone;
+  if (cue && cue in CUE_TONES){
+    const mapped = CUE_TONES[cue as keyof typeof CUE_TONES];
+    if (mapped){
+      return mapped;
+    }
   }
-  if (cue && TONE_TO_CUE[cue as HeroCue]){
-    return TONE_TO_CUE[cue as HeroCue] as HeroTone;
+  if (cue && cue in TONE_TO_CUE){
+    const mapped = TONE_TO_CUE[cue as keyof typeof TONE_TO_CUE];
+    if (mapped){
+      return mapped;
+    }
   }
   return 'calm';
 }
@@ -267,10 +295,12 @@ interface DialogueOptions {
 
 export function getHeroProfile(heroId: string | null | undefined = HERO_DEFAULT_ID): HeroProfile {
   const resolvedKey = resolveHeroKey(heroId, HERO_PROFILES);
-  const profile = HERO_PROFILES[resolvedKey] ?? HERO_PROFILES[FALLBACK_HERO_KEY];
+  const profile: HeroProfileDefinition = HERO_PROFILES[resolvedKey]
+    ?? HERO_PROFILE_FALLBACK;
   const portraitId = profile.portrait || heroId || HERO_DEFAULT_ID;
-  const art = getUnitArt(portraitId) || null;
-  const hotspots = HERO_HOTSPOTS[resolvedKey] ?? HERO_HOTSPOTS[FALLBACK_HERO_KEY] ?? [];
+  const art = portraitId ? getUnitArt(portraitId) || null : null;
+  const hotspots = HERO_HOTSPOTS[resolvedKey]
+    ?? HERO_HOTSPOT_FALLBACK;
   return {
     id: profile.id,
     name: profile.name || null,
@@ -286,7 +316,8 @@ export function getHeroProfile(heroId: string | null | undefined = HERO_DEFAULT_
 
 export function getHeroHotspots(heroId: string | null | undefined = HERO_DEFAULT_ID): ReadonlyArray<HeroHotspot> {
   const resolvedKey = resolveHeroKey(heroId, HERO_HOTSPOTS);
-  const hotspots = HERO_HOTSPOTS[resolvedKey] ?? HERO_HOTSPOTS[FALLBACK_HERO_KEY] ?? [];
+  const hotspots = HERO_HOTSPOTS[resolvedKey]
+    ?? HERO_HOTSPOT_FALLBACK;
   return hotspots.map(item => ({ ...item }));
 }
 
@@ -300,9 +331,10 @@ export function getHeroDialogue(
   const zone = options.zone || null;
   const profileKey = resolveHeroKey(heroId, HERO_PROFILES);
   const heroKey = resolveHeroKey(heroId, HERO_DIALOGUES);
-  const profile = HERO_PROFILES[profileKey] ?? HERO_PROFILES[FALLBACK_HERO_KEY];
-  const dialogues = HERO_DIALOGUES[heroKey] ?? {};
-  const fallbackDialogues = HERO_DIALOGUES[FALLBACK_HERO_KEY] ?? {};
+  const profile: HeroProfileDefinition = HERO_PROFILES[profileKey]
+    ?? HERO_PROFILE_FALLBACK;
+  const dialogues = HERO_DIALOGUES[heroKey] ?? HERO_DIALOGUE_FALLBACK;
+  const fallbackDialogues = HERO_DIALOGUE_FALLBACK;
   const table = dialogues[targetCue] || fallbackDialogues[targetCue] || null;
   const pool = table ? (table[gender] || table.neutral || table.default || null) : null;
   const picked = pickLine(pool);
