@@ -210,26 +210,33 @@ function merge<T extends Record<string, unknown>>(target: T, source: Partial<T> 
 
 const UNIT_SKIN_SELECTION: Map<string, string> = new Map();
 
-function readUnitArt(key: string | null | undefined): UnitArtDefinition | null {
-  if (!key) return null;
-  if (Object.prototype.hasOwnProperty.call(UNIT_ART, key)){
-    const art = UNIT_ART[key as keyof typeof UNIT_ART];
-    if (art) return art;
+function hasArtEntry(key: string): boolean {
+  return Object.prototype.hasOwnProperty.call(UNIT_ART, key);
+}
+
+function getArtEntry(key: string): UnitArtDefinition {
+  if (hasArtEntry(key)){
+    const entry = UNIT_ART[key] ?? UNIT_ART.default;
+    return entry;
   }
-  return null;
+  return UNIT_ART.default;
 }
 
 function getBaseArt(id: string | null | undefined): UnitArtDefinition {
-  const fallback = UNIT_ART.default;
+  const fallback = getArtEntry('default');
   if (!id) return fallback;
-  const direct = readUnitArt(id);
-  if (direct) return direct;
+  if (hasArtEntry(id)){
+    return getArtEntry(id);
+  }
   if (id.endsWith('_minion')){
     const base = id.replace(/_minion$/, '');
-    const minionVariant = readUnitArt(`${base}_minion`);
-    if (minionVariant) return minionVariant;
-    const genericMinion = readUnitArt('minion');
-    if (genericMinion) return genericMinion;
+    const minionKey = `${base}_minion`;
+    if (hasArtEntry(minionKey)){
+      return getArtEntry(minionKey);
+    }
+    if (hasArtEntry('minion')){
+      return getArtEntry('minion');
+    }
   }
   return fallback;
 }
@@ -463,7 +470,7 @@ function makeArt(pattern: string, paletteInput: UnitArtPalette, opts: MakeArtOpt
       normalizedSkins[key] = {
         ...normalized,
         key,
-        skinId: normalized.skinId ?? key,
+        skinId: typeof normalized.skinId === 'string' ? normalized.skinId : key,
       };
     }
   } else if (opts.sprite !== null && spriteFactory){
@@ -472,7 +479,7 @@ function makeArt(pattern: string, paletteInput: UnitArtPalette, opts: MakeArtOpt
       normalizedSkins[defaultSkinKey] = {
         ...generated,
         key: defaultSkinKey,
-        skinId: generated.skinId ?? defaultSkinKey,
+        skinId: typeof generated.skinId === 'string' ? generated.skinId : defaultSkinKey,
       };
     }
   }
@@ -512,8 +519,12 @@ const basePalettes: Record<string, UnitArtPalette> = {
   minion:    { primary:'#ffd27d', secondary:'#5a3a17', accent:'#fff4cc', outline:'#452b0f' }
 };
 
+function getBasePalette(name: keyof typeof basePalettes): UnitArtPalette {
+  return basePalettes[name] ?? basePalettes.default;
+}
+
 export const UNIT_ART: Record<string, UnitArtDefinition> = {
-  default: makeArt('sentinel', basePalettes.default, {
+  default: makeArt('sentinel', getBasePalette('default'), {
     layout: { labelOffset: 1.1, hpOffset: 1.38, spriteAspect: 0.8 },
     skins: {
       default: {
@@ -525,7 +536,7 @@ export const UNIT_ART: Record<string, UnitArtDefinition> = {
       }
     }
   }),
-  leaderA: makeArt('shield', basePalettes.leaderA, {
+  leaderA: makeArt('shield', getBasePalette('leaderA'), {
     layout: { labelOffset: 1.24, hpOffset: 1.52, hpWidth: 2.6, spriteAspect: 0.8 },
     label: { text: '#e5f6ff', bg: 'rgba(12,30,44,0.88)' },
     hpBar: { fill: '#6ff0c0' },
@@ -546,7 +557,7 @@ export const UNIT_ART: Record<string, UnitArtDefinition> = {
       }
     }
   }),
-  leaderB: makeArt('wing', basePalettes.leaderB, {
+  leaderB: makeArt('wing', getBasePalette('leaderB'), {
     layout: { labelOffset: 1.3, hpOffset: 1.58, hpWidth: 2.6, spriteAspect: 0.8 },
     label: { text: '#ffe6ec', bg: 'rgba(46,16,24,0.88)' },
     hpBar: { fill: '#ff9aa0' },
@@ -567,7 +578,7 @@ export const UNIT_ART: Record<string, UnitArtDefinition> = {
       }
     }
   }),
-  phe: makeArt('rune', basePalettes.phe, {
+  phe: makeArt('rune', getBasePalette('phe'), {
     layout: { labelOffset: 1.2, hpOffset: 1.48, spriteAspect: 0.8 },
     hpBar: { fill: '#c19bff' },
     skins: {
@@ -580,7 +591,7 @@ export const UNIT_ART: Record<string, UnitArtDefinition> = {
       }
     }
   }),
-  kiemtruongda: makeArt('pike', basePalettes.kiem, {
+  kiemtruongda: makeArt('pike', getBasePalette('kiem'), {
     layout: { labelOffset: 1.22, hpOffset: 1.5, spriteAspect: 0.8 },
     hpBar: { fill: '#ffd37a' },
     skins: {
@@ -593,7 +604,7 @@ export const UNIT_ART: Record<string, UnitArtDefinition> = {
       }
     }
   }),
-  loithienanh: makeArt('sentinel', basePalettes.loithien, {
+  loithienanh: makeArt('sentinel', getBasePalette('loithien'), {
     layout: { labelOffset: 1.18, hpOffset: 1.46, spriteAspect: 0.8 },
     hpBar: { fill: '#80f2ff' },
     skins: {
@@ -606,7 +617,7 @@ export const UNIT_ART: Record<string, UnitArtDefinition> = {
       }
     }
   }),
-  laky: makeArt('bloom', basePalettes.laky, {
+  laky: makeArt('bloom', getBasePalette('laky'), {
     layout: { labelOffset: 1.18, hpOffset: 1.44, spriteAspect: 0.8 },
     hpBar: { fill: '#ffb8e9' },
     skins: {
@@ -619,7 +630,7 @@ export const UNIT_ART: Record<string, UnitArtDefinition> = {
       }
     }
   }),
-  kydieu: makeArt('rune', basePalettes.kydieu, {
+  kydieu: makeArt('rune', getBasePalette('kydieu'), {
     layout: { labelOffset: 1.16, hpOffset: 1.42, spriteAspect: 0.8 },
     hpBar: { fill: '#9af5d2' },
     skins: {
@@ -632,7 +643,7 @@ export const UNIT_ART: Record<string, UnitArtDefinition> = {
       }
     }
   }),
-  doanminh: makeArt('pike', basePalettes.doanminh, {
+  doanminh: makeArt('pike', getBasePalette('doanminh'), {
     layout: { labelOffset: 1.26, hpOffset: 1.54, spriteAspect: 0.8 },
     hpBar: { fill: '#ffe6a5' },
     skins: {
@@ -645,7 +656,7 @@ export const UNIT_ART: Record<string, UnitArtDefinition> = {
       }
     }
   }),
-  tranquat: makeArt('rune', basePalettes.tranquat, {
+  tranquat: makeArt('rune', getBasePalette('tranquat'), {
     layout: { labelOffset: 1.18, hpOffset: 1.46, spriteAspect: 0.8 },
     hpBar: { fill: '#7fe9ff' },
     skins: {
@@ -658,7 +669,7 @@ export const UNIT_ART: Record<string, UnitArtDefinition> = {
       }
     }
   }),
-  linhgac: makeArt('sentinel', basePalettes.linhgac, {
+  linhgac: makeArt('sentinel', getBasePalette('linhgac'), {
     layout: { labelOffset: 1.16, hpOffset: 1.42, spriteAspect: 0.8 },
     hpBar: { fill: '#a9d6ff' },
     skins: {
@@ -671,7 +682,7 @@ export const UNIT_ART: Record<string, UnitArtDefinition> = {
       }
     }
   }),
-  minion: makeArt('pike', basePalettes.minion, {
+  minion: makeArt('pike', getBasePalette('minion'), {
     layout: { labelOffset: 1.08, hpOffset: 1.32, hpWidth: 2.1, hpHeight: 0.38, spriteAspect: 0.8 },
     label: { text: '#fff1d0' },
     hpBar: { fill: '#ffd27d' },
