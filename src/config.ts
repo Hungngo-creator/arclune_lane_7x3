@@ -1,5 +1,5 @@
 // config.ts v0.7.5
-import { GameConfigSchema } from './config/schema';
+import { parseGameConfig } from './config/schema';
 import type {
   BackgroundDefinitionConfig,
   CameraPreset,
@@ -186,7 +186,7 @@ const rawConfig = {
   CAMERA: 'landscape_oblique',
 } satisfies GameConfig;
 
-const parsedConfig = GameConfigSchema.parse(rawConfig); // behavior-preserving validation
+const parsedConfig = parseGameConfig(rawConfig); // behavior-preserving validation
 Object.freeze(parsedConfig);
 
 export const CFG: GameConfig = parsedConfig;
