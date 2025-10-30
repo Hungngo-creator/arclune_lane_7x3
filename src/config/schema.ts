@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { ZodIssueCode, ZodObject, z } from 'zod';
 
 const SideSchema = z.enum(['ally', 'enemy']);
 
@@ -154,21 +154,28 @@ const SceneLayerSchema = z.object({
 });
 export type SceneLayer = z.infer<typeof SceneLayerSchema>;
 
-const SceneThemeSchema = z
-  .object({
-    sky: SceneLayerSchema,
-    horizon: SceneLayerSchema,
-    ground: SceneLayerSchema
-  })
-  .superRefine((theme, ctx) => {
-    if (!theme.sky.top) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['sky', 'top'],
-        message: 'sky.top is required'
-      });
-    }
-  });
+const SceneThemeObjectSchema: ZodObject<{
+  sky: typeof SceneLayerSchema;
+  horizon: typeof SceneLayerSchema;
+  ground: typeof SceneLayerSchema;
+}> = z.object({
+  sky: SceneLayerSchema,
+  horizon: SceneLayerSchema,
+  ground: SceneLayerSchema
+});
+
+const SceneThemeSchema = SceneThemeObjectSchema.superRefine<
+  z.infer<typeof SceneThemeObjectSchema>,
+  z.input<typeof SceneThemeObjectSchema>
+>((theme, ctx) => {
+  if (!theme.sky.top) {
+    ctx.addIssue({
+      code: ZodIssueCode.custom,
+      path: ['sky', 'top'],
+      message: 'sky.top is required'
+    });
+  }
+}) as z.ZodEffects<typeof SceneThemeObjectSchema>;
 export type SceneTheme = z.infer<typeof SceneThemeSchema>;
 
 const SceneConfigSchema = z.object({
