@@ -113,12 +113,14 @@ export function ensureStyles(): void {
 }
 
 function applyPalette(element: HTMLElement | null, profile: HeroProfile): void {
-  const palette = profile.art?.palette || {};
   if (!element) return;
-  if (palette.primary) element.style.setProperty('--hero-primary', palette.primary);
-  if (palette.secondary) element.style.setProperty('--hero-secondary', palette.secondary);
-  if (palette.accent) element.style.setProperty('--hero-accent', palette.accent);
-  if (palette.outline) element.style.setProperty('--hero-outline', palette.outline);
+  const palette = profile.art?.palette;
+  if (!palette) return;
+  const { primary, secondary, accent, outline } = palette;
+  if (primary) element.style.setProperty('--hero-primary', primary);
+  if (secondary) element.style.setProperty('--hero-secondary', secondary);
+  if (accent) element.style.setProperty('--hero-accent', accent);
+  if (outline) element.style.setProperty('--hero-outline', outline);
 }
 
 interface ModesSectionOptions {
@@ -159,7 +161,7 @@ export function createModesSection(options: ModesSectionOptions): HTMLElement {
     const grid = document.createElement('div');
     grid.className = 'mode-grid';
 
-    (section.entries || []).forEach(entry => {
+    section.entries.forEach(entry => {
       if (!entry) return;
       const cardKey = entry.cardId || entry.id;
       if (!cardKey) return;
@@ -167,7 +169,7 @@ export function createModesSection(options: ModesSectionOptions): HTMLElement {
       if (!cardMeta) return;
 
       if (entry.type === 'group'){
-        const childMetas = (entry.childModeIds || [])
+        const childMetas = entry.childModeIds
           .map(childId => (childId ? metaByKey.get(childId) : null))
           .filter((item): item is MenuCardMetadata => Boolean(item));
         if (childMetas.length === 0) return;
