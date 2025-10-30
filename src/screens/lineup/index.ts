@@ -32,7 +32,7 @@ const toLineupParams = (value: unknown): LineupScreenDefinitionParams | null => 
 
 const cloneMergeable = <T extends Mergeable>(value: T): T => {
   if (Array.isArray(value)){
-    return value.slice() as unknown as T;;
+    return value.slice() as unknown as T;
   }
   return { ...value } as T;
 };
