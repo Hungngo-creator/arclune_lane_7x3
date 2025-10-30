@@ -19,6 +19,10 @@ const isUnknownRecord = (value: unknown): value is UnknownRecord => (
   && !Array.isArray(value)
 );
 
+const toLineupParams = (value: unknown): LineupScreenDefinitionParams | null => (
+  isUnknownRecord(value) ? value as LineupScreenDefinitionParams : null
+);
+
 const cloneMergeable = <T extends Mergeable>(value: T): T => {
   if (Array.isArray(value)){
     return value.slice() as T;
@@ -92,18 +96,18 @@ const toMergeable = (value: unknown): Mergeable | null => {
 };
 
 interface LineupScreenDefinitionParams extends UnknownRecord {
-  lineups?: unknown;
-  roster?: unknown;
-  currencies?: LineupCurrencies | null;
-  shortDescription?: string;
-  playerState?: UnknownRecord | null;
+  readonly lineups?: unknown;
+  readonly roster?: unknown;
+  readonly currencies?: LineupCurrencies | null;
+  readonly shortDescription?: string;
+  readonly playerState?: UnknownRecord | null;
 }
 
 interface LineupScreenDefinition {
-  label?: string;
-  title?: string;
-  description?: string;
-  params?: LineupScreenDefinitionParams | null;
+  readonly label?: string;
+  readonly title?: string;
+  readonly description?: string;
+  readonly params?: LineupScreenDefinitionParams | null;
 }
 
 export interface RenderLineupScreenOptions {
@@ -130,18 +134,19 @@ export function renderLineupScreen(options: RenderLineupScreenOptions): LineupVi
     throw new Error('renderLineupScreen cần một phần tử root hợp lệ.');
   }
 
-  const defParams = definition?.params ?? null;
+  const defParams = toLineupParams(definition?.params ?? null);
+  const normalizedParams = toLineupParams(params);
   const mergedPlayerState = mergeParams<UnknownRecord>(
     defParams?.playerState ?? null,
-    params?.playerState ?? null,
+    normalizedParams?.playerState ?? null,
   ) || {};
-  const lineups = resolveLineups(defParams, params);
+  const lineups = resolveLineups(defParams, normalizedParams);
   const roster = mergeParams<Mergeable>(
     toMergeable(defParams?.roster),
-    toMergeable(params?.roster),
+    toMergeable(normalizedParams?.roster),
   );
   const baseCurrencies = isLineupCurrencies(defParams?.currencies) ? defParams?.currencies ?? null : null;
-  const overrideCurrencies = isLineupCurrencies(params?.currencies) ? params?.currencies ?? null : null;
+  const overrideCurrencies = isLineupCurrencies(normalizedParams?.currencies) ? normalizedParams?.currencies ?? null : null;
   const mergedCurrencySource = mergeParams<LineupCurrencies>(baseCurrencies, overrideCurrencies);
   const playerCurrencySource = normalizeCurrencyBalances(mergedPlayerState);
   const currencies = mergedCurrencySource
