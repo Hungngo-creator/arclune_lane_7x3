@@ -229,6 +229,8 @@ export interface SessionState {
   rng?: RngState;
   telemetryLog?: TelemetryEvent[];
   vfx?: VfxEventList;
+  passiveLog?: Array<Record<string, unknown>> | null;
+  runtime?: Record<string, unknown>;
   [extra: string]: unknown;
 }
 
@@ -247,6 +249,7 @@ export interface PassiveConditionObject {
 
 export interface PassiveKitDefinition extends Record<string, unknown> {
   passives?: ReadonlyArray<PassiveSpec | null | undefined> | null;
+  onSpawn?: Record<string, unknown> | null;
 }
 
 export interface PassiveMetaContext {
