@@ -64,7 +64,7 @@ export interface UnitArtDefinition {
   glow: string;
   mirror: boolean;
   layout: UnitArtLayout;
-  label: UnitArtLabel;
+  label: UnitArtLabel | false;
   hpBar: UnitArtHpBar;
   skinKey?: string | null;
   [extra: string]: unknown;
