@@ -51,6 +51,9 @@ const isEffectCandidate = (value: unknown): value is PassiveEffectCandidate => {
   return !!value && typeof value === 'object';
 };
 
+const hasOwn = <Obj extends object, Key extends PropertyKey>(object: Obj, key: Key): key is Key & keyof Obj =>
+  Object.prototype.hasOwnProperty.call(object, key);
+
 const collectPassiveEffects = (passive: PassiveSpec | null | undefined): PassiveEffectCandidate[] => {
   if (!passive) return [];
   const out: PassiveEffectCandidate[] = [];
@@ -680,7 +683,7 @@ const EFFECTS: Record<string, PassiveDefinition> = {
 };
 
 /** @type {Record<string, PassiveEffectHandler>} */
-const PASSIVES = {
+const PASSIVE_ENTRIES: Record<string, PassiveDefinition | null | undefined> = {
   placeMark: EFFECTS.placeMark,
   'gainATK%': EFFECTS.gainATKPercent,
   'gainWIL%': EFFECTS.gainWILPercent,
@@ -691,11 +694,20 @@ const PASSIVES = {
   'gainStats%': EFFECTS.gainStats,
   statBuff: EFFECTS.gainStats,
   statGain: EFFECTS.gainStats,
-} satisfies PassiveRegistry;
+};
+
+const PASSIVES: PassiveRegistry = Object.freeze(
+  Object.fromEntries(
+    Object.entries(PASSIVE_ENTRIES).map(([key, handler]) => [
+      key,
+      typeof handler === 'function' ? handler : defaultPassive,
+    ]),
+  ) as PassiveRegistry,
+);
 
 function getRegisteredPassive(key: string | null | undefined): PassiveDefinition | null {
   if (!key) return null;
-  const candidate = PASSIVES[key];
+  const candidate = hasOwn(PASSIVES, key) ? PASSIVES[key] : undefined;
   return typeof candidate === 'function' ? candidate : null;
 }
 
