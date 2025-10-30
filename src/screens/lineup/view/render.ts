@@ -1,5 +1,6 @@
 import { getSkillSet } from '../../../data/skills.ts';
 import { createNumberFormatter } from '../../../utils/format.ts';
+import { normalizeUnitId } from '../../../utils/unit-id.ts';
 import { assertElement, ensureStyleTag, mountSection } from '../../../ui/dom.ts';
 import { normalizeCurrencyBalances } from '@shared-types/currency';
 import {
@@ -291,7 +292,9 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
 
   const normalizedRoster = normalizeRoster(roster ?? null);
   const normalizedLineups = normalizeLineups(lineups ?? null, normalizedRoster);
-  const rosterLookup = new Map<string, RosterUnit>(normalizedRoster.map(unit => [unit.id, unit] as const));
+  const rosterLookup = new Map<string, RosterUnit>(
+    normalizedRoster.map(unit => [normalizeUnitId(unit.id), unit] as const),
+  );
 
   const lineupState = new Map<string, LineupState>();
   normalizedLineups.forEach(lineup => {
@@ -603,7 +606,8 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
     benchDetails.classList.remove('is-empty');
 
     const kit = (unit.raw as { kit?: unknown } | null)?.kit ?? null;
-    const skillSet = unit.id ? getSkillSet(unit.id) : null;
+    const skillSetId = normalizeUnitId(unit.id);
+    const skillSet = skillSetId ? getSkillSet(skillSetId) : null;
 
     const skills = Array.isArray((kit as { skills?: unknown[] } | null)?.skills)
       ? ((kit as { skills?: unknown[] }).skills ?? [])
@@ -988,15 +992,22 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
     const lineup = getSelectedLineup();
     const filtered = filterRoster(state.roster, state.filter);
     filtered.forEach(unit => {
+      const unitId = normalizeUnitId(unit.id);
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'lineup-roster__entry';
-      button.dataset.unitId = unit.id;
+      button.dataset.unitId = unitId;
       button.setAttribute('aria-label', `Chọn ${unit.name}`);
-      if (state.selectedUnitId === unit.id){
+      if (state.selectedUnitId === unitId){
         button.classList.add('is-selected');
       }
-      if (lineup && (lineup.leaderId === unit.id || lineup.slots.some(slot => slot.unitId === unit.id) || lineup.bench.some(cell => cell.unitId === unit.id)) && state.selectedUnitId !== unit.id){
+      const isAssigned = Boolean(
+        lineup
+        && (lineup.leaderId === unitId
+          || lineup.slots.some(slot => slot.unitId === unitId)
+          || lineup.bench.some(cell => cell.unitId === unitId))
+      );
+      if (isAssigned && state.selectedUnitId !== unitId){
         button.classList.add('is-unavailable');
       }
       const avatar = document.createElement('div');
@@ -1082,10 +1093,11 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
     list.appendChild(clearOption);
 
     state.roster.forEach(unit => {
+      const unitId = normalizeUnitId(unit.id);
       const option = document.createElement('button');
       option.type = 'button';
       option.className = 'lineup-overlay__option';
-      option.dataset.unitId = unit.id;
+      option.dataset.unitId = unitId;
       const avatar = document.createElement('div');
       avatar.className = 'lineup-overlay__option-avatar';
       renderAvatar(avatar, unit.avatar || null, unit.name);
@@ -1100,7 +1112,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       meta.textContent = [unit.role, unit.rank].filter(Boolean).join(' · ');
       text.appendChild(meta);
       option.appendChild(text);
-      if (lineup.leaderId === unit.id){
+      if (lineup.leaderId === unitId){
         option.classList.add('is-active');
       }
       list.appendChild(option);
