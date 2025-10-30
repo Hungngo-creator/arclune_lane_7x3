@@ -1,10 +1,5 @@
-import type {
-  ActionChainProcessedResult,
-  BattleDetail,
-  BattleResult,
-  SessionState,
-} from '@shared-types/combat';
-import type { Side, UnitToken } from '@shared-types/units';
+import type { BattleDetail, BattleResult, SessionState } from '@shared-types/combat';
+import type { ActionChainProcessedResult, Side, UnitToken } from '@shared-types/units';
 
 export interface TurnEventDetail {
   game: SessionState;
@@ -71,12 +66,6 @@ export interface GameEventDetailMap {
   [BATTLE_END]: BattleEndDetail;
 }
 
-export interface EventEmitterLike {
-  on: <T extends GameEventType>(type: T, listener: GameEventHandler<T>) => unknown;
-  off?: <T extends GameEventType>(type: T, listener: GameEventHandler<T>) => unknown;
-  emit: <T extends GameEventType>(type: T, detail?: GameEventDetailMap[T]) => unknown;
-}
-
 export type GameEventDetail<T extends GameEventType> =
   | (CustomEvent<GameEventDetailMap[T]> & { detail: GameEventDetailMap[T] })
   | {
@@ -86,6 +75,23 @@ export type GameEventDetail<T extends GameEventType> =
       currentTarget?: EventTarget | SimpleEventTarget | EventEmitterLike | null;
     };
 
+type EventEmitterPayload<T extends GameEventType> =
+  | GameEventDetail<T>
+  | GameEventDetailMap[T]
+  | undefined;
+
+export interface EventEmitterLike {
+  on: <T extends GameEventType>(
+    type: T,
+    listener: (payload?: EventEmitterPayload<T>) => unknown,
+  ) => unknown;
+  off?: <T extends GameEventType>(
+    type: T,
+    listener: (payload?: EventEmitterPayload<T>) => unknown,
+  ) => unknown;
+  emit: <T extends GameEventType>(type: T, payload?: EventEmitterPayload<T]) => unknown;
+}
+
 export type GameEventHandler<T extends GameEventType = GameEventType> = (
   event: GameEventDetail<T>,
 ) => void;
@@ -93,6 +99,14 @@ export type GameEventHandler<T extends GameEventType = GameEventType> = (
 type CompatibleGameEventHandler<T extends GameEventType> = (
   event: GameEventDetail<T>,
 ) => unknown;
+
+const isGameEventRecord = <T extends GameEventType>(
+  payload: unknown,
+): payload is GameEventDetail<T> => {
+  if (!payload || typeof payload !== 'object') return false;
+  const record = payload as Record<string, unknown>;
+  return typeof record.detail !== 'undefined' && typeof record.type === 'string';
+};
 
 const isCompatibleHandler = <T extends GameEventType>(
   handler: unknown,
@@ -308,13 +322,34 @@ export function addGameEventListener<T extends GameEventType, H extends Compatib
     };
   }
   if (isEventEmitterLike(gameEvents)){
-    gameEvents.on(type, normalizedHandler);
+    const emitterHandler = function (
+      this: unknown,
+      payload?: EventEmitterPayload<T>,
+    ): void {
+      const eventRecord = isGameEventRecord<T>(payload)
+        ? payload
+        : ({
+            type,
+            detail: payload as GameEventDetailMap[T],
+          } satisfies GameEventDetail<T>);
+      const record = eventRecord as Record<string, unknown>;
+      try {
+        if (typeof record.target === 'undefined'){
+          record.target = gameEvents;
+        }
+        record.currentTarget = gameEvents;
+      } catch (_err) {
+        // ignore assignment failures
+      }
+      handler.call(this, eventRecord);
+    };
+    gameEvents.on(type, emitterHandler);
     let disposed = false;
     return () => {
       if (disposed) return;
       disposed = true;
       if (typeof gameEvents.off === 'function'){
-        gameEvents.off(type, normalizedHandler);
+        gameEvents.off(type, emitterHandler);
       }
     };
   }
