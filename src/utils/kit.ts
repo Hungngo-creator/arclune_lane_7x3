@@ -1,3 +1,5 @@
+import type { UltMetadata, UltSkillConfig, UnitKitConfig } from '../types/config.ts';
+
 interface KitTraitObject extends Record<string, unknown> {
   id?: string;
   key?: string;
@@ -42,63 +44,18 @@ interface NormalizedSummonSpec extends SummonSpecLike {
   ttlTurns?: number;
 }
 
-interface UltMetadata extends Record<string, unknown> {
-  type?: string;
-  kind?: string;
-  category?: string;
-  tags?: ReadonlyArray<string>;
-  categories?: ReadonlyArray<string>;
-  label?: string;
-  role?: string;
-  defensive?: boolean;
+interface UltSpec extends UltSkillConfig {
+  metadata?: (UltMetadata & { summon?: SummonSpecLike | null }) | null;
+  meta?: (UltMetadata & { summon?: SummonSpecLike | null }) | null;
   summon?: SummonSpecLike | null;
-  revive?: Record<string, unknown> | null;
-  instant?: boolean;
-  instantCast?: boolean;
-  cast?: string;
-  immediate?: boolean;
-  reduceDamage?: number;
-  shield?: number;
-  barrier?: number;
-  buffs?: ReadonlyArray<Record<string, unknown>> | null;
 }
 
-interface UltSpec extends Record<string, unknown> {
-  type?: string;
-  kind?: string;
-  category?: string;
-  tags?: ReadonlyArray<string>;
-  metadata?: UltMetadata | null;
-  meta?: UltMetadata | null;
-  summon?: SummonSpecLike | null;
-  revive?: Record<string, unknown> | null;
-  summonCount?: number;
-  placement?: string;
-  pattern?: string;
-  ttl?: number;
-  ttlTurns?: number;
-  count?: number;
-  limit?: number;
-  inherit?: unknown;
-  replace?: unknown;
-  creep?: unknown;
-  instant?: boolean;
-  instantCast?: boolean;
-  immediate?: boolean;
-  cast?: string;
-  reduceDamage?: number;
-  shield?: number;
-  barrier?: number;
-  buffs?: ReadonlyArray<Record<string, unknown>> | null;
-  shields?: ReadonlyArray<Record<string, unknown>> | null;
-}
-
-interface KitData extends Record<string, unknown> {
+interface KitData extends UnitKitConfig {
   traits?: KitTraits;
   ult?: UltSpec | null;
 }
 
-interface KitMeta extends Record<string, unknown> {
+interface KitMeta extends UnitKitConfig {
   kit?: KitData | null;
   traits?: KitTraits;
   ult?: UltSpec | null;
