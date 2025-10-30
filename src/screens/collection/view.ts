@@ -980,3 +980,5 @@ const overlayDetailPanel = document.createElement('aside');
     }
   } satisfies CollectionViewHandle;
 }
+
+export type { CollectionViewHandle } from './types.ts';

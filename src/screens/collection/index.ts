@@ -102,5 +102,4 @@ export function renderCollectionScreen(options: CollectionScreenParams): Collect
   });
 }
 
-export { renderCollectionScreen };
 export { renderCollectionView } from './view.ts';
