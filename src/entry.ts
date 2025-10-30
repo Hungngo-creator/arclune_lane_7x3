@@ -2,12 +2,15 @@ import { createAppShell } from './app/shell.ts';
 import { renderMainMenuView } from './screens/main-menu/view/index.ts';
 import { MODES, MODE_GROUPS, MODE_STATUS, getMenuSections } from './data/modes.ts';
 import type { ModeConfig, ModeGroup, ModeShellConfig } from '@shared-types/config';
-import type { MenuCardMetadata, MenuSection, MenuSectionEntry } from './screens/main-menu/types.ts';
+import type { UnknownRecord } from '@shared-types/common';
+import type { MenuCardMetadata, MenuSection } from './screens/main-menu/types.ts';
 import type { LineupViewHandle } from './screens/lineup/view/index.ts';
 
-type UnknownRecord = Record<string, unknown>;
+export interface ScreenParamMap {
+  readonly [key: string]: unknown;
+}
 
-export type ScreenParams = UnknownRecord | null;
+export type ScreenParams = ScreenParamMap | null;
 
 export interface ShellState {
   screen: string;
@@ -44,7 +47,7 @@ export interface ModeDefinition {
   loader: ModuleLoader;
   screenId: string;
   icon?: string;
-  tags: string[];
+  tags: ReadonlyArray<string>;
   status: string;
   unlockNotes: string;
   params: ScreenParams;
@@ -62,7 +65,7 @@ export type ScreenRendererResult = MaybeViewController | void;
 
 export type ScreenRenderer = (context: ScreenRendererContext) => ScreenRendererResult;
 
-export type ModuleLoader<TModule = unknown> = () => Promise<TModule>;
+export type ModuleLoader<TModule = Record<string, unknown>> = () => Promise<TModule>;
 
 export interface RenderMessageOptions {
   title?: string;
@@ -71,7 +74,7 @@ export interface RenderMessageOptions {
 
 export type RenderMessage = (options?: RenderMessageOptions) => void;
 
-type AnyFunction = (...args: unknown[]) => unknown;
+type AnyFunction = (...args: any[]) => unknown;
 
 interface RenderPveLayoutOptions {
   title?: string;
@@ -83,6 +86,14 @@ interface PveSession {
   start?: (config: UnknownRecord) => unknown;
   stop?: () => void;
 }
+
+const isStoppableSession = (value: unknown): value is { stop: () => void } => (
+  Boolean(value) && typeof (value as { stop?: unknown }).stop === 'function'
+);
+
+const isStartableSession = (value: unknown): value is { start: (config: UnknownRecord) => unknown } => (
+  Boolean(value) && typeof (value as { start?: unknown }).start === 'function'
+);
 
 declare global {
   // eslint-disable-next-line no-var
@@ -134,14 +145,30 @@ async function loadBundledModule<TModule = unknown>(id: string): Promise<TModule
   return resolved as TModule;
 }
 
+function isScreenParamMap(value: unknown): value is ScreenParamMap {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
+function cloneScreenParamMap(source: ScreenParamMap): ScreenParamMap {
+  return { ...source };
+}
+
+function cloneScreenParams(params: ScreenParams): ScreenParams {
+  if (!params) {
+    return null;
+  }
+  return cloneScreenParamMap(params);
+}
+
 const MODE_DEFINITIONS: Record<string, ModeDefinition> = (MODES as ReadonlyArray<ModeConfig>).reduce<Record<string, ModeDefinition>>((acc, mode) => {
   const shell: ModeShellConfig | undefined = mode.shell;
   const screenId = shell?.screenId || SCREEN_MAIN_MENU;
   const moduleId = mode.status === MODE_STATUS.AVAILABLE && shell?.moduleId
     ? shell.moduleId
    : (shell?.fallbackModuleId || COMING_SOON_MODULE_ID);
-  const params: ScreenParams = mode.status === MODE_STATUS.AVAILABLE && shell?.defaultParams
-  ? { ...shell.defaultParams }
+  const defaultParams = shell?.defaultParams;
+  const params: ScreenParams = mode.status === MODE_STATUS.AVAILABLE && isScreenParamMap(defaultParams)
+    ? cloneScreenParamMap(defaultParams)
     : null;
 
   acc[mode.id] = {
@@ -191,13 +218,16 @@ const MODE_GROUP_METADATA = (MODE_GROUPS as ReadonlyArray<ModeGroup>).map(group 
     }
     return acc;
   }, new Set<string>());
-  let status = MODE_STATUS.PLANNED;
+  let status: string = MODE_STATUS.PLANNED;
   if (childStatuses.has(MODE_STATUS.AVAILABLE)){
     status = MODE_STATUS.AVAILABLE;
   } else if (childStatuses.has(MODE_STATUS.COMING_SOON)){
     status = MODE_STATUS.COMING_SOON;
   } else if (childStatuses.size > 0){
-    status = Array.from(childStatuses)[0];
+    const derivedStatus = Array.from(childStatuses)[0];
+    if (derivedStatus){
+      status = derivedStatus;
+    }
   }
   return {
     key: group.id,
@@ -215,11 +245,25 @@ const MODE_GROUP_METADATA = (MODE_GROUPS as ReadonlyArray<ModeGroup>).map(group 
   } satisfies MenuCardMetadata;
 }) satisfies ReadonlyArray<MenuCardMetadata>;
 
-const CARD_METADATA: ReadonlyArray<MenuCardMetadata> = [...MODE_METADATA, ...MODE_GROUP_METADATA];
+const CARD_METADATA: ReadonlyArray<MenuCardMetadata> = Object.freeze([
+  ...MODE_METADATA,
+  ...MODE_GROUP_METADATA
+]);
 
-const MENU_SECTIONS = getMenuSections({
-  includeStatuses: [MODE_STATUS.AVAILABLE, MODE_STATUS.COMING_SOON]
-}) as ReadonlyArray<MenuSection>;
+const MENU_SECTIONS: ReadonlyArray<MenuSection> = Object.freeze(
+  getMenuSections({
+    includeStatuses: [MODE_STATUS.AVAILABLE, MODE_STATUS.COMING_SOON]
+  }).map(section => Object.freeze({
+    id: section.id,
+    title: section.title,
+    entries: Object.freeze(section.entries.map(entry => Object.freeze({
+      id: entry.id,
+      type: entry.type,
+      cardId: entry.cardId,
+      childModeIds: Object.freeze([...entry.childModeIds])
+    })))
+  }))
+);
 
 let activeModal: HTMLElement | null = null;
 let shellInstance: Shell | null = null;
@@ -360,8 +404,9 @@ function dismissModal(): void{
 }
 
 function clearAppScreenClasses(): void{
-  if (!rootElement || !rootElement.classList) return;
-  APP_SCREEN_CLASSES.forEach(cls => rootElement.classList.remove(cls));
+  const root = rootElement;
+  if (!root || !root.classList) return;
+  APP_SCREEN_CLASSES.forEach(cls => root.classList.remove(cls));
 }
 
 function destroyCustomScreen(force = false): void{
@@ -378,12 +423,13 @@ function destroyCustomScreen(force = false): void{
   }
   customScreenController = null;
   customScreenId = null;
-  if (!rootElement) return;
-  if (rootElement.classList){
-    APP_SCREEN_CLASSES.forEach(cls => rootElement.classList.remove(cls));
+  const root = rootElement;
+  if (!root) return;
+  if (root.classList){
+    APP_SCREEN_CLASSES.forEach(cls => root.classList.remove(cls));
   }
-  if (typeof rootElement.innerHTML === 'string'){
-    rootElement.innerHTML = '';
+  if (typeof root.innerHTML === 'string'){
+    root.innerHTML = '';
   }
 }
 
@@ -409,49 +455,30 @@ function destroyLineupView(): void{
   lineupView = null;
 }
 
-function cloneParamValue<T>(value: T): T{
-  if (!value || typeof value !== 'object'){
-    return value;
-  }
-  if (Array.isArray(value)){
-    return [...value] as T;
-  }
- return { ...(value as UnknownRecord) } as T;
-}
-
 function mergeDefinitionParams(definition: ModeDefinition | null, params: ScreenParams): ScreenParams{
-  const baseValue = typeof definition?.params !== 'undefined'
-    ? cloneParamValue(definition.params)
-    : undefined;
-  const incomingValue = typeof params !== 'undefined'
-    ? cloneParamValue(params)
-    : undefined;
-  const baseIsObject = baseValue && typeof baseValue === 'object' && !Array.isArray(baseValue);
-  const incomingIsObject = incomingValue && typeof incomingValue === 'object' && !Array.isArray(incomingValue);
+  const baseValue = cloneScreenParams(definition?.params ?? null);
+  const incomingValue = cloneScreenParams(params);
 
-  if (baseIsObject || incomingIsObject){
-    return {
-      ...(baseIsObject ? baseValue as UnknownRecord : {}),
-      ...(incomingIsObject ? incomingValue as UnknownRecord : {})
-    };
+  if (!baseValue && !incomingValue){
+    return null;
   }
 
-  if (typeof incomingValue !== 'undefined'){
-    return incomingValue as ScreenParams;
+  if (!baseValue){
+    return incomingValue;
   }
 
-  if (typeof baseValue !== 'undefined'){
-    return baseValue as ScreenParams;
+  if (!incomingValue){
+    return baseValue;
   }
 
-  return null;
+  return { ...baseValue, ...incomingValue };
 }
 
-function pickFunctionFromSource(source: unknown, preferredKeys: ReadonlyArray<string> = [], fallbackKeys: ReadonlyArray<string> = []): AnyFunction | null{
+function pickFunctionFromSource<TFn extends AnyFunction>(source: unknown, preferredKeys: ReadonlyArray<string> = [], fallbackKeys: ReadonlyArray<string> = []): TFn | null{
   if (!source) return null;
 
   if (typeof source === 'function'){
-    return source as AnyFunction;
+    return source as TFn;
   }
 
   if (source && typeof source === 'object'){
@@ -459,13 +486,13 @@ function pickFunctionFromSource(source: unknown, preferredKeys: ReadonlyArray<st
     for (const key of preferredKeys){
       const value = record[key];
       if (typeof value === 'function'){
-        return value as AnyFunction;
+        return source as TFn;
       }
     }
     for (const key of fallbackKeys){
       const value = record[key];
       if (typeof value === 'function'){
-        return value as AnyFunction;
+        return source as TFn;
       }
     }
   }
@@ -473,18 +500,18 @@ function pickFunctionFromSource(source: unknown, preferredKeys: ReadonlyArray<st
   return null;
 }
 
-function resolveModuleFunction(module: unknown, preferredKeys: ReadonlyArray<string> = [], fallbackKeys: ReadonlyArray<string> = []): AnyFunction | null{
-  const candidate = pickFunctionFromSource(module, preferredKeys, fallbackKeys);
+function resolveModuleFunction<TFn extends AnyFunction>(module: unknown, preferredKeys: ReadonlyArray<string> = [], fallbackKeys: ReadonlyArray<string> = []): TFn | null{
+  const candidate = pickFunctionFromSource<TFn>(module, preferredKeys, fallbackKeys);
   return typeof candidate === 'function' ? candidate : null;
 }
 
 function resolveScreenRenderer(module: unknown): ScreenRenderer | null{
-  const candidate = resolveModuleFunction(
+  const candidate = resolveModuleFunction<ScreenRenderer>(
     module,
     ['renderCollectionScreen', 'renderScreen'],
     ['render']
   );
-  return typeof candidate === 'function' ? candidate as ScreenRenderer : null;
+  return typeof candidate === 'function' ? candidate : null;
 }
 
 function getDefinitionByScreen(screenId: string): ModeDefinition | null{
@@ -635,18 +662,20 @@ function showPveBoardMissingNotice(message: string): boolean{
 }
 
 async function renderCollectionScreen(params: ScreenParams): Promise<void>{
-  if (!rootElement || !shellInstance) return;
+  const root = rootElement;
+  const shell = shellInstance;
+  if (!root || !shell) return;
   const token = ++collectionRenderToken;
   dismissModal();
   clearAppScreenClasses();
   destroyCollectionView();
   lineupRenderToken += 1;
   destroyLineupView();
-  if (rootElement.classList){
-    rootElement.classList.add('app--collection');
+  if (root.classList){
+    root.classList.add('app--collection');
   }
-  if (typeof rootElement.innerHTML === 'string'){
-    rootElement.innerHTML = '<div class="app-loading">Đang tải bộ sưu tập...</div>';
+  if (typeof root.innerHTML === 'string'){
+    root.innerHTML = '<div class="app-loading">Đang tải bộ sưu tập...</div>';
   }
 
   let module: unknown;
@@ -673,26 +702,29 @@ async function renderCollectionScreen(params: ScreenParams): Promise<void>{
     throw new Error('Không tìm thấy định nghĩa màn hình bộ sưu tập.');
   }
   collectionView = (render({
-    root: rootElement,
-    shell: shellInstance,
+    root,
+    shell,
     definition,
-    params: params || null
+    params: params || null,
+    screenId: SCREEN_COLLECTION
   }) ?? null);
 }
 
 async function renderLineupScreen(params: ScreenParams): Promise<void>{
-  if (!rootElement || !shellInstance) return;
+  const root = rootElement;
+  const shell = shellInstance;
+  if (!root || !shell) return;
   const token = ++lineupRenderToken;
   dismissModal();
   clearAppScreenClasses();
   destroyLineupView();
   collectionRenderToken += 1;
   destroyCollectionView();
-  if (rootElement.classList){
-    rootElement.classList.add('app--lineup');
+  if (root.classList){
+    root.classList.add('app--lineup');
   }
-  if (typeof rootElement.innerHTML === 'string'){
-    rootElement.innerHTML = '<div class="app-loading">Đang tải đội hình...</div>';
+  if (typeof root.innerHTML === 'string'){
+    root.innerHTML = '<div class="app-loading">Đang tải đội hình...</div>';
   }
 
   let module: unknown;
@@ -719,11 +751,12 @@ async function renderLineupScreen(params: ScreenParams): Promise<void>{
     throw new Error('Không tìm thấy định nghĩa màn hình đội hình.');
   }
   const lineupResult = render({
-    root: rootElement,
-    shell: shellInstance,
+    root,
+    shell,
     definition,
-    params: params || null
-});
+    params: params || null,
+    screenId: SCREEN_LINEUP
+  });
   lineupView = (lineupResult as LineupViewHandle | void) ?? null;
 }
 
@@ -742,18 +775,7 @@ function renderMainMenuScreen(): void{
     mainMenuView.destroy();
     mainMenuView = null;
   }
-  const sections: ReadonlyArray<MenuSection> = MENU_SECTIONS.map(section => ({
-    id: section.id,
-    title: section.title,
-    entries: (section.entries || [])
-      .filter((entry): entry is MenuSectionEntry => !!entry)
-      .map(entry => ({
-        id: entry.id,
-        type: entry.type,
-        cardId: entry.cardId,
-        childModeIds: Array.isArray(entry.childModeIds) ? [...entry.childModeIds] : []
-      }))
-  }));
+  const sections: ReadonlyArray<MenuSection> = MENU_SECTIONS;
   mainMenuView = renderMainMenuView({
     root: rootElement,
     shell: shellInstance,
@@ -831,13 +853,18 @@ async function mountPveScreen(params: ScreenParams): Promise<void>{
   };
   teardownActiveSession();
   if (!shellInstance) return;
+  const shell = shellInstance;
   const candidateModeKey = params && typeof params === 'object' && !Array.isArray(params)
     ? (params as { modeKey?: unknown }).modeKey
     : undefined;
   const modeKey = typeof candidateModeKey === 'string' && MODE_DEFINITIONS[candidateModeKey]
     ? candidateModeKey
     : 'campaign';
-  const definition = MODE_DEFINITIONS[modeKey] || MODE_DEFINITIONS.campaign;
+  const fallbackDefinition = MODE_DEFINITIONS.campaign;
+  if (!fallbackDefinition){
+    throw new Error('Thiếu định nghĩa chế độ campaign.');
+  }
+  const definition: ModeDefinition = MODE_DEFINITIONS[modeKey] ?? fallbackDefinition;
   const rawParams = params && typeof params === 'object' && !Array.isArray(params)
     ? { ...(params as UnknownRecord) }
     : {};
@@ -883,7 +910,7 @@ async function mountPveScreen(params: ScreenParams): Promise<void>{
     if (token !== pveRenderToken) return;
     if (isMissingModuleError(error)){
       showComingSoonModal(definition.label);
-      shellInstance.enterScreen(SCREEN_MAIN_MENU);
+      shell.enterScreen(SCREEN_MAIN_MENU);
       return;
     }
     throw error;
@@ -891,7 +918,7 @@ async function mountPveScreen(params: ScreenParams): Promise<void>{
   if (token !== pveRenderToken) return;
   if (isComingSoonModule(module)){
     showComingSoonModal(definition.label);
-    shellInstance.enterScreen(SCREEN_MAIN_MENU);
+    shell.enterScreen(SCREEN_MAIN_MENU);
     return;
   }
   const createPveSession = resolveModuleFunction(
@@ -905,25 +932,25 @@ async function mountPveScreen(params: ScreenParams): Promise<void>{
     title: definition.label,
     modeKey: definition.key,
     onExit: ()=>{
-      const state = shellInstance.getState();
+      const state = shell.getState();
       const session = state?.activeSession;
-      if (session && typeof session.stop === 'function'){
+      if (isStoppableSession(session)){
         try {
           session.stop();
         } catch (err) {
           console.warn('[pve] stop session failed', err);
         }
       }
-      shellInstance.setActiveSession(null);
-      shellInstance.enterScreen(SCREEN_MAIN_MENU);
+      shell.setActiveSession(null);
+      shell.enterScreen(SCREEN_MAIN_MENU);
     }
   });
   if (!container){
     throw new Error('Không thể dựng giao diện PvE.');
   }
   const session = createPveSession(container, createSessionOptions) as PveSession;
-  shellInstance.setActiveSession(session);
-  if (typeof session.start === 'function'){
+  shell.setActiveSession(session);
+  if (isStartableSession(session)){
     const scheduleRetry = (callback: () => void) => {
       if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function'){
         window.requestAnimationFrame(callback);
@@ -941,7 +968,7 @@ async function mountPveScreen(params: ScreenParams): Promise<void>{
           handleMissingBoard();
         }
       } catch (err) {
-        shellInstance.setActiveSession(null);
+        shell.setActiveSession(null);
         throw err;
       }
     };
@@ -951,8 +978,8 @@ async function mountPveScreen(params: ScreenParams): Promise<void>{
       if (!displayed){
         console.warn(message);
       }
-      shellInstance.setActiveSession(null);
-      shellInstance.enterScreen(SCREEN_MAIN_MENU);
+      shell.setActiveSession(null);
+      shell.enterScreen(SCREEN_MAIN_MENU);
     };
     const attemptStart = (attempt = 0) => {
       if (token !== pveRenderToken) return;
