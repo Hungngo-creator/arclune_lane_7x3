@@ -1,7 +1,7 @@
 import { Statuses, hookOnLethalDamage } from './statuses.ts';
-import { vfxAddHit, vfxAddMelee, vfxAddLightningArc } from './vfx.ts';
+import { asSessionWithVfx, vfxAddHit, vfxAddMelee, vfxAddLightningArc } from './vfx.ts';
 import { slotToCell } from './engine.ts';
-import { emitPassiveEvent } from './passives.ts';
+import { emitPassiveEvent, type AfterHitHandler } from './passives.ts';
 import { CFG } from './config.ts';
 import { gainFury, startFurySkill, finishFuryHit } from './utils/fury.ts';
 import { safeNow } from './utils/time.ts';
@@ -49,9 +49,13 @@ export interface BasicAttackContext {
     baseMul: number;
     flatAdd: number;
   };
-  afterHit: BasicAttackAfterHitHandler[];
+  afterHit: AfterHitHandler[];
   log?: unknown;
 }
+
+export const isBasicAttackAfterHitHandler = (
+  handler: AfterHitHandler | BasicAttackAfterHitHandler | null | undefined,
+): handler is BasicAttackAfterHitHandler => typeof handler === 'function';
 
 interface ShieldAbsorptionResult {
   remain: number;
@@ -148,9 +152,11 @@ export function dealAbilityDamage(
 
   Statuses.afterDamage(attacker, target, { dealt: remain, absorbed: abs.absorbed, dtype });
 
-  if (Game) {
+  const sessionVfx = asSessionWithVfx(Game);
+
+  if (sessionVfx) {
     try {
-      vfxAddHit(Game, target);
+      vfxAddHit(sessionVfx, target);
     } catch {
       // bỏ qua lỗi VFX runtime
     }
@@ -233,6 +239,7 @@ export function basicAttack(Game: SessionState, unit: UnitToken): void {
   if (!resolved) return;
 
   const isLoithienanh = unit.id === 'loithienanh';
+  const sessionVfx = asSessionWithVfx(Game);
 
   const updateTurnBusy = (startedAt: number, busyMs: number): void => {
     if (!Game.turn) return;
@@ -242,10 +249,10 @@ export function basicAttack(Game: SessionState, unit: UnitToken): void {
   };
 
   const triggerLightningArc = (timing: string): void => {
-    if (!isLoithienanh) return;
+    if (!isLoithienanh || !sessionVfx) return;
     const arcStart = safeNow();
     try {
-      const busyMs = vfxAddLightningArc(Game, unit, resolved, {
+      const busyMs = vfxAddLightningArc(sessionVfx, unit, resolved, {
         bindingKey: 'basic_combo',
         timing,
       });
@@ -266,11 +273,13 @@ export function basicAttack(Game: SessionState, unit: UnitToken): void {
   const meleeDur = GAME_CONFIG.ANIMATION?.meleeDurationMs ?? 1100;
   const meleeStartMs = safeNow();
   let meleeTriggered = false;
-  try {
-    vfxAddMelee(Game, unit, resolved, { dur: meleeDur });
-    meleeTriggered = true;
-  } catch {
-    // bỏ qua lỗi VFX runtime
+  if (sessionVfx) {
+    try {
+      vfxAddMelee(sessionVfx, unit, resolved, { dur: meleeDur });
+      meleeTriggered = true;
+    } catch {
+      // bỏ qua lỗi VFX runtime
+    }
   }
   if (meleeTriggered && Game.turn) {
     const prevBusy = Number.isFinite(Game.turn.busyUntil) ? Number(Game.turn.busyUntil) : 0;
@@ -296,10 +305,12 @@ export function basicAttack(Game: SessionState, unit: UnitToken): void {
   triggerLightningArc('hit2');
   applyDamage(resolved, abs.remain);
 
-  try {
-    vfxAddHit(Game, resolved);
-  } catch {
-    // bỏ qua lỗi VFX runtime
+  if (sessionVfx) {
+    try {
+      vfxAddHit(sessionVfx, resolved);
+    } catch {
+      // bỏ qua lỗi VFX runtime
+    }
   }
   if (resolved.hp <= 0) {
     hookOnLethalDamage(resolved);
@@ -325,13 +336,15 @@ export function basicAttack(Game: SessionState, unit: UnitToken): void {
   finishFuryHit(resolved);
   finishFuryHit(unit);
 
-  if (passiveCtx.afterHit.length > 0) {
+  const afterHitHandlers = passiveCtx.afterHit.filter(isBasicAttackAfterHitHandler);
+
+  if (afterHitHandlers.length > 0) {
     const afterCtx: BasicAttackAfterHitArgs = {
       target: resolved,
       owner: unit,
       result: { dealt, absorbed: abs.absorbed },
     };
-    for (const fn of passiveCtx.afterHit) {
+    for (const fn of afterHitHandlers) {
       try {
         fn(afterCtx);
       } catch (err) {

@@ -239,10 +239,10 @@ interface ApplyStatMapOptions {
   stackFlat?: boolean;
 }
 
-type AfterHitHandler = (afterCtx?: Record<string, unknown>) => void;
+export type AfterHitHandler<T = Record<string, unknown>> = (afterCtx?: T) => void;
 
 type PassiveRuntimeContext = {
-  afterHit?: AfterHitHandler[];
+  afterHit?: AfterHitHandler<Record<string, unknown>>[];
   damage?: Record<string, unknown> & { baseMul?: number };
   log?: Array<Record<string, unknown>>;
   target?: UnitToken | null;
