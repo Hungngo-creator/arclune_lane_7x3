@@ -2,8 +2,16 @@ import { ROSTER } from '../../catalog.ts';
 import { UNITS } from '../../units.ts';
 import type { UnitDefinition } from '../../units.ts';
 import type { RosterEntryLite } from '@shared-types/lineup';
-import type { LineupCurrencies, LineupCurrencyConfig } from '@shared-types/currency';
-import { normalizeCurrencyBalances } from '@shared-types/currency';
+import type {
+  LineupCurrencies,
+  LineupCurrencyConfig,
+  LineupCurrencyValue,
+} from '@shared-types/currency';
+import {
+  isCurrencyEntry,
+  isLineupCurrencyConfig,
+  normalizeCurrencyBalances,
+} from '@shared-types/currency';
 import type { CollectionEntry, CurrencyCatalog, CurrencyBalanceProvider, UnknownRecord } from './types.ts';
 
 const isRosterEntryLite = (value: unknown): value is RosterEntryLite => (
@@ -67,53 +75,82 @@ export function buildRosterWithCost(rosterSource: ReadonlyArray<CollectionEntry>
 }
 
 export const resolveCurrencyBalance: CurrencyBalanceProvider = (currencyId, providedCurrencies, playerState) => {
-  const tryExtract = (candidate: unknown): number | null => {
-    if (candidate == null) return null;
-    if (typeof candidate === 'number' && Number.isFinite(candidate)) return candidate;
-    if (typeof candidate === 'string' && candidate.trim() !== '' && !Number.isNaN(Number(candidate))){
-      return Number(candidate);
+  const toFiniteNumber = (value: string | number | null | undefined): number | null => {
+    if (value == null) return null;
+    if (typeof value === 'number'){
+      return Number.isFinite(value) ? value : null;
     }
-    if (typeof candidate === 'object'){
-      const record = candidate as Record<string, unknown>;
-      const balance = record.balance ?? record.amount ?? record.value ?? null;
-      if (typeof balance === 'number' && Number.isFinite(balance)){
-        return balance;
-      }
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    const parsed = Number(trimmed);
+    return Number.isFinite(parsed) ? parsed : null;
+  };
+
+  const extractFromEntry = (entry: LineupCurrencyValue): number | null => {
+    if (!isCurrencyEntry(entry)){
+      return null;
+    }
+    return (
+      toFiniteNumber(entry.balance ?? null)
+      ?? toFiniteNumber(entry.amount ?? null)
+      ?? toFiniteNumber(entry.value ?? null)
+      ?? toFiniteNumber(entry.total ?? null)
+    );
+  };
+
+  const tryExtract = (candidate: unknown): number | null => {
+    if (typeof candidate === 'number' || typeof candidate === 'string'){
+      return toFiniteNumber(candidate);
+    }
+    if (isCurrencyEntry(candidate)){
+      return extractFromEntry(candidate);
     }
     return null;
   };
+
+  const isCurrencyValueRecord = (
+    value: unknown,
+  ): value is Record<string, LineupCurrencyValue> => (
+    value != null
+    && typeof value === 'object'
+    && !Array.isArray(value)
+  );
 
   const inspectContainer = (container: LineupCurrencies | null | undefined): number | null => {
     if (!container) return null;
     if (Array.isArray(container)){
       for (const entry of container){
         if (entry == null) continue;
-        if (typeof entry === 'number' || typeof entry === 'string'){
-          const entryId = 'VNT';
-          if (entryId !== currencyId) continue;
+        if (typeof entry === 'number'){
+          if (currencyId !== 'VNT') continue;
           const extracted = tryExtract(entry);
           if (extracted != null) return extracted;
           continue;
         }
-        if (typeof entry !== 'object' || Array.isArray(entry)) continue;
-        const record = entry as { id?: unknown; currencyId?: unknown; key?: unknown; type?: unknown; balance?: unknown; amount?: unknown; value?: unknown; total?: unknown };
-        const id = (record.id || record.currencyId || record.key || record.type) as string | undefined;
+        if (typeof entry === 'string'){
+          const [rawId, rawValue] = entry.split(':');
+          if (!rawId || !rawValue) continue;
+          if (rawId.trim() !== currencyId) continue;
+          const extracted = tryExtract(rawValue);
+          if (extracted != null) return extracted;
+          continue;
+        }
+        if (!isCurrencyEntry(entry)) continue;
+        const id = entry.currencyId || entry.id || entry.key || entry.type || null;
         if (id === currencyId){
-          const extracted = tryExtract(record.balance ?? record.amount ?? record.value ?? record.total ?? record);
+          const extracted = tryExtract(entry);
           if (extracted != null) return extracted;
         }
       }
       return null;
     }
-    if (typeof container === 'object'){
-      const record = container as LineupCurrencyConfig;
-      if (currencyId in record){
-        const extracted = tryExtract(record[currencyId]);
-        if (extracted != null) return extracted;
-      }
-      if (record.balances && currencyId in record.balances){
-        const extracted = tryExtract(record.balances[currencyId]);
-        if (extracted != null) return extracted;
+    if (isLineupCurrencyConfig(container)){
+      const directValue = container[currencyId];
+      const directExtracted = tryExtract(directValue ?? null);
+      if (directExtracted != null) return directExtracted;
+      if (isCurrencyValueRecord(container.balances)){
+        const balanceExtracted = tryExtract(container.balances[currencyId] ?? null);
+        if (balanceExtracted != null) return balanceExtracted;
       }
     }
     return null;
