@@ -203,26 +203,76 @@ function resolveSkinKey(id: string | null | undefined, baseArt: UnitArtDefinitio
   return keys[0] || null;
 }
 
-function instantiateArt(id: string | null | undefined, baseArt: UnitArtDefinition | null, skinKey: string | null): UnitArt | null {
-  if (!baseArt) return null;
-  const art: UnitArt = {
-    ...(baseArt as UnitArt),
-    layout: baseArt.layout ? { ...baseArt.layout } : ({} as UnitArtLayout),
-    label: baseArt.label ? { ...baseArt.label } : ({} as UnitArtLabel),
-    hpBar: baseArt.hpBar ? { ...baseArt.hpBar } : ({} as UnitArtHpBar),
-    sprite: null,
-    skinKey: skinKey ?? null,
+function cloneShadowConfig(shadow: UnitArtShadowConfig | null | undefined): UnitArtShadowConfig | null {
+  if (!shadow) return null;
+  return {
+    color: shadow.color,
+    blur: shadow.blur,
+    offsetX: shadow.offsetX,
+    offsetY: shadow.offsetY,
+  } satisfies UnitArtShadowConfig;
+}
+
+function cloneShadow(shadow: UnitArtShadow | undefined): UnitArtShadow {
+  if (shadow === null || shadow === undefined) return null;
+  if (typeof shadow === 'string') return shadow;
+  return cloneShadowConfig(shadow);
+}
+
+function cloneSpriteEntry(sprite: UnitArtSprite | null | undefined, fallbackKey: string | null): UnitArtSprite | null {
+  if (!sprite) return null;
+  const preferredKey =
+    typeof sprite.key === 'string' && sprite.key.length > 0
+      ? sprite.key
+      : typeof fallbackKey === 'string' && fallbackKey.length > 0
+        ? fallbackKey
+        : 'default';
+  const cloned: UnitArtSprite = {
+    ...sprite,
+    key: preferredKey,
+    aspect: sprite.aspect ?? null,
+    shadow: cloneShadowConfig(sprite.shadow),
+    skinId: sprite.skinId ?? fallbackKey ?? preferredKey,
+    cacheKey: sprite.cacheKey ?? null,
   };
-  const spriteDef = skinKey ? baseArt.skins[skinKey] : undefined;
-  if (spriteDef){
-    art.sprite = {
-      ...spriteDef,
-      key: skinKey,
-      skinId: spriteDef.skinId ?? skinKey,
-    };
-  } else {
-    art.sprite = null;
+  return cloned;
+}
+
+function instantiateArt(
+  _id: string | null | undefined,
+  baseArt: UnitArtDefinition | null,
+  skinKey: string | null,
+): UnitArt | null {
+  if (!baseArt) return null;
+  
+  const normalizedSkinKey = skinKey ?? baseArt.defaultSkin ?? null;
+  const clonedSkins: Record<string, UnitArtSprite> = {};
+  for (const [key, sprite] of Object.entries(baseArt.skins ?? {})) {
+    const clone = cloneSpriteEntry(sprite, key);
+    if (clone) clonedSkins[key] = clone;
   }
+
+  const sourceSprite = normalizedSkinKey && baseArt.skins
+    ? baseArt.skins[normalizedSkinKey] ?? baseArt.sprite
+    : baseArt.sprite;
+  const selectedSprite = cloneSpriteEntry(sourceSprite, normalizedSkinKey);
+  
+  const art: UnitArt = {
+    ...baseArt,
+    sprite: selectedSprite,
+    skins: clonedSkins,
+    defaultSkin: baseArt.defaultSkin,
+    palette: { ...baseArt.palette },
+    shape: baseArt.shape,
+    size: baseArt.size,
+    shadow: cloneShadow(baseArt.shadow),
+    glow: baseArt.glow,
+    mirror: baseArt.mirror,
+    layout: { ...baseArt.layout },
+    label: { ...baseArt.label },
+    hpBar: { ...baseArt.hpBar },
+    skinKey: normalizedSkinKey,
+  };
   return art;
 }
 

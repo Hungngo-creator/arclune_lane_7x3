@@ -92,6 +92,118 @@ interface BackgroundPropCacheEntry {
 
 const BACKGROUND_PROP_CACHE: WeakMap<BackgroundDefinitionConfig, BackgroundPropCacheEntry> = new WeakMap();
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  !!value && typeof value === 'object' && !Array.isArray(value);
+
+const isFiniteNumber = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value);
+
+const toNumberOr = (value: unknown, fallback: number): number => (isFiniteNumber(value) ? value : fallback);
+
+const toOptionalNumber = (value: unknown): number | undefined => (isFiniteNumber(value) ? value : undefined);
+
+const mergePalette = (
+  ...palettes: Array<BackgroundPalette | null | undefined>
+): BackgroundPalette => {
+  const result: BackgroundPalette = {};
+  for (const palette of palettes) {
+    if (!palette || !isRecord(palette)) continue;
+    if (typeof palette.primary === 'string') result.primary = palette.primary;
+    if (typeof palette.secondary === 'string') result.secondary = palette.secondary;
+    if (typeof palette.accent === 'string') result.accent = palette.accent;
+    if (typeof palette.shadow === 'string') result.shadow = palette.shadow;
+    if (typeof palette.outline === 'string') result.outline = palette.outline;
+  }
+  return result;
+};
+
+const cloneFallback = (fallback: BackgroundFallback | null | undefined): BackgroundFallback | null => {
+  if (!fallback || !isRecord(fallback)) return null;
+  const clone: BackgroundFallback = {};
+  if (typeof fallback.shape === 'string') clone.shape = fallback.shape;
+  return clone;
+};
+
+const normalizeVector = (
+  value: unknown,
+  fallbackX: number,
+  fallbackY: number,
+): { x: number; y: number } => {
+  const record = isRecord(value) ? value : {};
+  return {
+    x: toNumberOr(record.x, fallbackX),
+    y: toNumberOr(record.y, fallbackY),
+  };
+};
+
+const normalizeSize = (
+  value: unknown,
+  fallbackW: number,
+  fallbackH: number,
+): { w: number; h: number } => {
+  const record = isRecord(value) ? value : {};
+  return {
+    w: toNumberOr(record.w, fallbackW),
+    h: toNumberOr(record.h, fallbackH),
+  };
+};
+
+const normalizePropInput = (value: unknown): BackgroundPropConfig | null => {
+  if (!isRecord(value)) return null;
+  const type = typeof value.type === 'string' ? value.type : null;
+  if (!type) return null;
+
+  const cellRecord = isRecord(value.cell) ? value.cell : {};
+  const cx = toNumberOr(value.cx ?? cellRecord.cx, 0);
+  const cy = toNumberOr(value.cy ?? cellRecord.cy, 0);
+  const depth = toOptionalNumber((cellRecord as { depth?: unknown }).depth ?? value.depth);
+
+  const prop: BackgroundPropConfig = {
+    ...(value as BackgroundPropConfig),
+    type,
+    cell: { cx, cy, ...(depth !== undefined ? { depth } : {}) },
+    asset: typeof value.asset === 'string' ? value.asset : null,
+    fallback: cloneFallback(value.fallback as BackgroundFallback | null | undefined),
+    palette: mergePalette(value.palette as BackgroundPalette | null | undefined),
+    anchor: isRecord(value.anchor) ? { ...value.anchor } : null,
+    size: isRecord(value.size) ? { ...value.size } : null,
+    baseLift: toOptionalNumber(value.baseLift),
+    pixelOffset: isRecord(value.pixelOffset) ? { ...value.pixelOffset } : null,
+    cx: toOptionalNumber(value.cx),
+    cy: toOptionalNumber(value.cy),
+  };
+
+  return prop;
+};
+
+const normalizeBackgroundDefinition = (value: unknown): BackgroundDefinitionConfig | null => {
+  if (!isRecord(value)) return null;
+  const propsInput = Array.isArray(value.props) ? value.props : [];
+  const props: BackgroundPropConfig[] = [];
+  for (const prop of propsInput) {
+    const normalized = normalizePropInput(prop);
+    if (normalized) props.push(normalized);
+  }
+  return { props } satisfies BackgroundDefinitionConfig;
+};
+
+let BACKGROUND_CONFIG_MAP: Map<string, BackgroundDefinitionConfig> | null = null;
+
+function getBackgroundConfigMap(): Map<string, BackgroundDefinitionConfig> {
+  if (BACKGROUND_CONFIG_MAP) return BACKGROUND_CONFIG_MAP;
+  const map = new Map<string, BackgroundDefinitionConfig>();
+  const entries = CFG.BACKGROUNDS && typeof CFG.BACKGROUNDS === 'object'
+    ? Object.entries(CFG.BACKGROUNDS)
+    : [];
+  for (const [key, entry] of entries) {
+    const normalized = normalizeBackgroundDefinition(entry);
+    if (normalized) {
+      map.set(key, normalized);
+    }
+  }
+  BACKGROUND_CONFIG_MAP = map;
+  return map;
+}
+
 export const ENVIRONMENT_PROP_TYPES = {
   'stone-obelisk': {
     asset: 'dist/assets/environment/stone-obelisk.svg',
@@ -180,67 +292,76 @@ function getBoardSignature(g: GridSpec | null | undefined, cam: CameraOptions | 
 }
 
 function resolveBackground(backgroundKey: string | null | undefined): { key: string; config: BackgroundDefinitionConfig } | null {
-  const backgrounds = CFG.BACKGROUNDS as Record<string, BackgroundDefinitionConfig> | undefined;
-  if (!backgrounds || typeof backgrounds !== 'object') return null;
-  if (backgroundKey && backgrounds[backgroundKey]) {
-    return { key: backgroundKey, config: backgrounds[backgroundKey] };
-  }
-  const preferred = CFG.CURRENT_BACKGROUND || CFG.SCENE?.CURRENT_BACKGROUND;
-  if (preferred && backgrounds[preferred]) {
-    return { key: preferred, config: backgrounds[preferred] };
-  }
-  const themeKey = CFG.SCENE?.CURRENT_THEME || CFG.SCENE?.DEFAULT_THEME;
-  if (themeKey && backgrounds[themeKey]) {
-    return { key: themeKey, config: backgrounds[themeKey] };
-  }
-  const [fallbackKey] = Object.keys(backgrounds);
-  if (fallbackKey) {
-    return { key: fallbackKey, config: backgrounds[fallbackKey] };
+  const backgrounds = getBackgroundConfigMap();
+  if (backgrounds.size === 0) return null;
+
+  const tryResolve = (key: string | null | undefined): { key: string; config: BackgroundDefinitionConfig } | null => {
+    if (!key) return null;
+    const config = backgrounds.get(key);
+    return config ? { key, config } : null;
+  };
+
+  const direct = tryResolve(backgroundKey ?? null);
+  if (direct) return direct;
+
+  const preferred = typeof CFG.CURRENT_BACKGROUND === 'string'
+    ? CFG.CURRENT_BACKGROUND
+    : typeof CFG.SCENE?.CURRENT_BACKGROUND === 'string'
+      ? CFG.SCENE?.CURRENT_BACKGROUND
+      : null;
+  const preferredMatch = tryResolve(preferred);
+  if (preferredMatch) return preferredMatch;
+
+  const themeKey = typeof CFG.SCENE?.CURRENT_THEME === 'string'
+    ? CFG.SCENE?.CURRENT_THEME
+    : typeof CFG.SCENE?.DEFAULT_THEME === 'string'
+      ? CFG.SCENE?.DEFAULT_THEME
+      : null;
+  const themeMatch = tryResolve(themeKey);
+  if (themeMatch) return themeMatch;
+
+  const firstEntry = backgrounds.entries().next();
+  if (!firstEntry.done) {
+    const [key, config] = firstEntry.value;
+    return { key, config };
   }
   return null;
 }
 
 function normalizePropConfig(propCfg: BackgroundPropConfig | null | undefined): NormalizedPropConfig | null {
   if (!propCfg) return null;
-  const typeId = propCfg.type || (propCfg as { kind?: string }).kind || null;
-  const typeDef = typeId ? ENVIRONMENT_PROP_TYPES[typeId] : undefined;
-  const anchor = {
-    x: propCfg.anchor?.x ?? typeDef?.anchor?.x ?? 0.5,
-    y: propCfg.anchor?.y ?? typeDef?.anchor?.y ?? 1,
-  };
-  const size = {
-    w: propCfg.size?.w ?? typeDef?.size?.w ?? 120,
-    h: propCfg.size?.h ?? typeDef?.size?.h ?? 180,
-  };
-  const palette: BackgroundPalette = {
-    ...(typeDef?.palette ?? {}),
-    ...(propCfg.palette ?? {}),
-  };
-  const cellCx = propCfg.cx ?? propCfg.cell?.cx ?? 0;
-  const cellCy = propCfg.cy ?? propCfg.cell?.cy ?? 0;
-  const depth = propCfg.depth ?? propCfg.cell?.depth ?? 0;
+  const typeId = typeof propCfg.type === 'string' ? propCfg.type : null;
+  const typeDef = typeId ? ENVIRONMENT_PROP_TYPES[typeId] ?? null : null;
+  const anchorDefaults = typeDef?.anchor ?? null;
+  const sizeDefaults = typeDef?.size ?? null;
+  const anchor = normalizeVector(propCfg.anchor, anchorDefaults?.x ?? 0.5, anchorDefaults?.y ?? 1);
+  const size = normalizeSize(propCfg.size, sizeDefaults?.w ?? 120, sizeDefaults?.h ?? 180);
+  const palette = mergePalette(typeDef?.palette ?? null, propCfg.palette ?? null);
+  const cellCx = toNumberOr(propCfg.cx ?? propCfg.cell?.cx, 0);
+  const cellCy = toNumberOr(propCfg.cy ?? propCfg.cell?.cy, 0);
+  const depth = toNumberOr(propCfg.cell?.depth ?? propCfg.depth, 0);
   return {
     type: typeId,
-    asset: propCfg.asset ?? typeDef?.asset ?? null,
-    fallback: propCfg.fallback ?? typeDef?.fallback ?? null,
+    asset: typeof propCfg.asset === 'string' ? propCfg.asset : typeDef?.asset ?? null,
+    fallback: cloneFallback(propCfg.fallback) ?? cloneFallback(typeDef?.fallback) ?? null,
     palette,
     anchor,
     size,
     cell: { cx: cellCx, cy: cellCy },
     depth,
-    baseLift: propCfg.baseLift ?? typeDef?.baseLift ?? 0.5,
+    baseLift: toNumberOr(propCfg.baseLift, typeDef?.baseLift ?? 0.5),
     offset: {
-      x: propCfg.offset?.x ?? 0,
-      y: propCfg.offset?.y ?? 0,
+      x: toNumberOr(propCfg.offset?.x, 0),
+      y: toNumberOr(propCfg.offset?.y, 0),
     },
     pixelOffset: {
-      x: propCfg.pixelOffset?.x ?? 0,
-      y: propCfg.pixelOffset?.y ?? 0,
+      x: toNumberOr(propCfg.pixelOffset?.x, 0),
+      y: toNumberOr(propCfg.pixelOffset?.y, 0),
     },
-    scale: propCfg.scale ?? 1,
-    alpha: propCfg.alpha ?? 1,
-    flip: propCfg.flip ?? 1,
-    sortBias: propCfg.sortBias ?? 0,
+    scale: toNumberOr(propCfg.scale, 1),
+    alpha: toNumberOr(propCfg.alpha, 1),
+    flip: toNumberOr(propCfg.flip, 1),
+    sortBias: toNumberOr(propCfg.sortBias, 0),
   };
 }
 

@@ -38,7 +38,7 @@ interface StatusService {
   onPhaseEnd(side: string, ctx?: Record<string, unknown>): void;
   canAct(unit: UnitToken): boolean;
   blocks(unit: UnitToken, what: string): boolean;
-  resolveTarget(attacker: UnitToken, candidates: UnitToken[], ctx?: ResolveContext): UnitToken | null;
+  resolveTarget(attacker: UnitToken, candidates: ReadonlyArray<UnitToken>, ctx?: ResolveContext): UnitToken | null;
   modifyStats(unit: UnitToken, base: Record<string, number>): Record<string, number>;
   beforeDamage(
     attacker: UnitToken,
@@ -60,13 +60,24 @@ const ensureStatusList = (unit?: UnitToken | null): StatusEffect[] => {
   return unit.statuses;
 };
 
+const isTokenCandidate = (value: unknown): value is UnitToken => {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as UnitToken;
+  return (
+    typeof candidate.cx === 'number'
+    && typeof candidate.cy === 'number'
+    && typeof candidate.side === 'string'
+  );
+};
+
 function findStatus(
   unit: UnitToken | null | undefined,
   id: string,
 ): [StatusEffect[], number, StatusEffect | null] {
   const list = ensureStatusList(unit);
   const index = list.findIndex(status => status.id === id);
-  return [list, index, index >= 0 ? list[index] : null];
+  const found = index >= 0 ? list[index] ?? null : null;
+  return [list, index, found];
 }
 
 function decrementDuration(unit: UnitToken, status: StatusEffect): void {
@@ -248,9 +259,14 @@ export const Statuses: StatusService = {
   },
   resolveTarget(attacker, candidates, ctx = {}) {
     const attackType = ctx.attackType ?? 'basic';
-    let pool = candidates;
+    const candidatePool = Array.isArray(candidates)
+      ? candidates.filter(isTokenCandidate)
+      : [];
+    if (candidatePool.length === 0) return null;
+
+    let pool: ReadonlyArray<UnitToken> = candidatePool;
     if (attackType === 'basic') {
-      const filtered = candidates.filter(target => !this.has(target, 'allure'));
+      const filtered = candidatePool.filter(target => !this.has(target, 'allure'));
       if (filtered.length > 0) {
         pool = filtered;
       }
@@ -311,7 +327,7 @@ export const Statuses: StatusService = {
     const pierce = this.get(attacker, 'pierce');
     if (pierce) defPen = Math.max(defPen, clamp01(pierce.power ?? 0.1));
 
-    return {
+    const context: DamageContext = {
       ...ctx,
       attackType,
       dtype,
@@ -320,7 +336,8 @@ export const Statuses: StatusService = {
       inMul,
       defPen,
       ignoreAll,
-    } as DamageContext;
+    };
+    return context;
   },
   absorbShield(target, dmg, _ctx = {}) {
     const shield = this.get(target, 'shield');
