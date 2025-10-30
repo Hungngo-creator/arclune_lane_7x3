@@ -302,6 +302,8 @@ export interface UnitKitConfig extends Record<string, unknown> {
   onSpawn?: UnitKitOnSpawnConfig | null;
 }
 
+export type UnitKitMap = Readonly<Record<UnitId, UnitKitConfig | null>>;
+
 export interface RosterUnitDefinition {
   id: UnitId;
   name: string;
