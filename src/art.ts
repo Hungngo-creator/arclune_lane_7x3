@@ -29,7 +29,7 @@ type UnitArtSpriteInput =
 
 type MakeArtOptions = {
   layout?: Partial<UnitArtLayout> | null;
-  label?: Partial<UnitArtLabel> | null;
+  label?: Partial<UnitArtLabel> | null | false;
   hpBar?: Partial<UnitArtHpBar> | null;
   shadow?: UnitArtShadow;
   defaultSkin?: string | null;
@@ -318,7 +318,7 @@ function instantiateArt(
     glow: baseArt.glow,
     mirror: baseArt.mirror,
     layout: { ...baseArt.layout },
-    label: { ...baseArt.label },
+    label: baseArt.label === false ? false : { ...baseArt.label },
     hpBar: { ...baseArt.hpBar },
     skinKey: normalizedSkinKey,
   };
@@ -441,14 +441,17 @@ function makeArt(pattern: string, paletteInput: UnitArtPalette, opts: MakeArtOpt
     },
     (opts.layout ?? undefined) as Partial<UnitArtLayout>,
   );
-  const label = merge<UnitArtLabel>(
-    {
-      bg: 'rgba(12,20,30,0.82)',
-      text: '#f4f8ff',
-      stroke: 'rgba(255,255,255,0.08)',
-    },
-    (opts.label ?? undefined) as Partial<UnitArtLabel>,
-  );
+  const label =
+    opts.label === false
+      ? false
+      : merge<UnitArtLabel>(
+          {
+            bg: 'rgba(12,20,30,0.82)',
+            text: '#f4f8ff',
+            stroke: 'rgba(255,255,255,0.08)',
+          },
+          opts.label ?? undefined,
+        );
   const hpBar = merge<UnitArtHpBar>(
     {
       bg: 'rgba(9,14,21,0.74)',
