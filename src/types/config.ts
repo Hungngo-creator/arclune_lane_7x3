@@ -176,13 +176,95 @@ export interface CatalogStatBlock {
   [extra: string]: number;
 }
 
+export interface UltReviveConfig {
+  hpPercent?: number;
+  hpPct?: number;
+  rage?: number;
+  lockSkillsTurns?: number;
+  [extra: string]: unknown;
+}
+
+export interface UltMetadata extends Record<string, unknown> {
+  type?: string;
+  kind?: string;
+  category?: string;
+  tags?: ReadonlyArray<string>;
+  categories?: ReadonlyArray<string>;
+  label?: string;
+  role?: string;
+  defensive?: boolean;
+  summon?: Record<string, unknown> | null;
+  revive?: UltReviveConfig | null;
+  instant?: boolean;
+  instantCast?: boolean;
+  cast?: string;
+  immediate?: boolean;
+  reduceDamage?: number;
+  shield?: number;
+  barrier?: number;
+  buffs?: ReadonlyArray<Record<string, unknown>> | null;
+}
+
+export interface UltSkillConfig extends Record<string, unknown> {
+  type?: string;
+  kind?: string;
+  category?: string;
+  tags?: ReadonlyArray<string>;
+  metadata?: UltMetadata | null;
+  meta?: UltMetadata | null;
+  summon?: Record<string, unknown> | null;
+  revive?: Record<string, unknown> | null;
+  revived?: UltReviveConfig | null;
+  summonCount?: number;
+  placement?: string;
+  pattern?: string;
+  ttl?: number;
+  ttlTurns?: number;
+  count?: number;
+  limit?: number;
+  inherit?: unknown;
+  replace?: unknown;
+  creep?: unknown;
+  targets?: number | string | Record<string, unknown>;
+  turns?: number;
+  duration?: number | { turns?: number | string; [extra: string]: unknown };
+  hits?: number;
+  power?: number;
+  scale?: number;
+  bonusVsLeader?: number;
+  tagAsBasic?: boolean;
+  penRES?: number;
+  reduceDmg?: number;
+  reduceDamage?: number;
+  selfHPTrade?: number;
+  attackSpeed?: number;
+  allies?: number;
+  healLeader?: boolean;
+  hpTradePercent?: number;
+  hpTrade?: { percentMaxHP?: number; lethal?: boolean; minHP?: number; [extra: string]: unknown } | null;
+  debuffId?: string;
+  debuffAmount?: number;
+  debuffMaxStacks?: number;
+  debuffDuration?: number;
+  shield?: number;
+  barrier?: number;
+  buffs?: ReadonlyArray<Record<string, unknown>> | null;
+  shields?: ReadonlyArray<Record<string, unknown>> | null;
+}
+
+export interface UnitKitConfig extends Record<string, unknown> {
+  ult?: UltSkillConfig | null;
+  traits?: unknown;
+  onSpawn?: Record<string, unknown> | null;
+}
+
 export interface RosterUnitDefinition {
   id: UnitId;
   name: string;
   class: string;
   rank: string;
   mods?: Partial<Record<keyof CatalogStatBlock, number>>;
-  kit: Record<string, unknown>;
+  kit: UnitKitConfig;
   [extra: string]: unknown;
 }
 
