@@ -908,6 +908,7 @@ case 'hpTradeBurst': {
       });
       for (let i=0; i<take; i++){
         const tgt = foes[i];
+        if (!tgt) continue;
         Statuses.add(tgt, Statuses.make.sleep({ turns: u.turns || 1 }));
         try { vfxAddHit(Game, tgt); } catch(_){}
       }
@@ -923,16 +924,16 @@ case 'hpTradeBurst': {
       const take = Math.max(1, Math.min(fallen.length, (u.targets|0) || 1));
       for (let i=0; i<take; i++){
         const ally = fallen[i];
+        if (!ally) continue;
         ally.alive = true;
         ally.deadAt = 0;
         ally.hp = 0;
         Statuses.purge(ally);
-        const hpPct = Math.max(0, Math.min(1, (u.revived?.hpPct) ?? 0.5));
+        const revivedHp = u.revived?.hpPercent ?? u.revived?.hpPct ?? 0.5;
+        const hpPct = Math.max(0, Math.min(1, revivedHp));
         const healAmt = Math.max(1, Math.round((ally.hpMax || 0) * hpPct));
         healUnit(ally, healAmt);
-        if (ally){
-          setFury(ally, Math.max(0, (u.revived?.rage) ?? 0));
-        }
+        setFury(ally, Math.max(0, (u.revived?.rage) ?? 0));
         if (u.revived?.lockSkillsTurns){
           Statuses.add(ally, Statuses.make.silence({ turns: u.revived.lockSkillsTurns }));
         }
