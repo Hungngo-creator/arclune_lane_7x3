@@ -530,9 +530,28 @@ export const ART_SPRITE_EVENT = 'unit-art:sprite-loaded';
 const TOKEN_PROJECTION_CACHE = new WeakMap<UnitToken, TokenProjectionEntry>();
 const TOKEN_VISUAL_CACHE = new Map<string, TokenVisualEntry>();
 
+function joinSignatureParts(parts: Array<string | number | null | undefined>): string {
+  if (!Array.isArray(parts) || parts.length === 0) {
+    return '';
+  }
+  const normalized: string[] = [];
+  for (const part of parts) {
+    if (part == null) {
+      normalized.push('');
+      continue;
+    }
+    if (typeof part === 'number') {
+      normalized.push(Number.isFinite(part) ? String(part) : '');
+      continue;
+    }
+    normalized.push(String(part));
+  }
+  return normalized.join('|');
+}
+
 function contextSignature(g: GridSpec, cam: CameraOptions | null | undefined): string {
   const C = cam ?? {};
-  return [
+  return joinSignatureParts([
     g.cols,
     g.rows,
     g.tile,
@@ -541,7 +560,7 @@ function contextSignature(g: GridSpec, cam: CameraOptions | null | undefined): s
     C.rowGapRatio ?? 0.62,
     C.topScale ?? 0.8,
     C.depthScale ?? 0.94,
-  ].join('|');
+  ]);
 }
 
 function warnInvalidToken(context: string, token: unknown): void {

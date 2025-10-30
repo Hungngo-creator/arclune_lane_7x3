@@ -282,6 +282,25 @@ function computePropsSignature(props: ReadonlyArray<BackgroundPropConfig> | null
   }
 }
 
+function joinSignatureParts(parts: Array<string | number | null | undefined>): string {
+  if (!Array.isArray(parts) || parts.length === 0) {
+    return '';
+  }
+  const normalized: string[] = [];
+  for (const part of parts) {
+    if (part == null) {
+      normalized.push('');
+      continue;
+    }
+    if (typeof part === 'number') {
+      normalized.push(Number.isFinite(part) ? String(part) : '');
+      continue;
+    }
+    normalized.push(String(part));
+  }
+  return normalized.join('|');
+}
+
 function getBoardSignature(g: GridSpec | null | undefined, cam: CameraOptions | null | undefined): string {
   if (!g) return 'no-grid';
   const baseParts = [
@@ -300,7 +319,7 @@ function getBoardSignature(g: GridSpec | null | undefined, cam: CameraOptions | 
     cam?.topScale ?? 'ts',
     cam?.depthScale ?? 'ds',
   ];
-  return [...baseParts, ...camParts].join('|');
+  return joinSignatureParts([...baseParts, ...camParts]);
 }
 
 function resolveBackground(backgroundKey: string | null | undefined): { key: string; config: BackgroundDefinitionConfig } | null {

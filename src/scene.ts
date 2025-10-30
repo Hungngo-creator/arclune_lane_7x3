@@ -90,6 +90,25 @@ function themeSignature(theme: SceneTheme | null | undefined): string {
   }
 }
 
+function joinSignatureParts(parts: Array<string | number | null | undefined>): string {
+  if (!Array.isArray(parts) || parts.length === 0) {
+    return '';
+  }
+  const normalized: string[] = [];
+  for (const part of parts) {
+    if (part == null) {
+      normalized.push('');
+      continue;
+    }
+    if (typeof part === 'number') {
+      normalized.push(Number.isFinite(part) ? String(part) : '');
+      continue;
+    }
+    normalized.push(String(part));
+  }
+  return normalized.join('|');
+}
+
 function gridSignature(g: SceneGrid | null | undefined, cssWidth: number, cssHeight: number, dpr: number): string {
   if (!g) return 'no-grid';
   const parts = [
@@ -102,7 +121,7 @@ function gridSignature(g: SceneGrid | null | undefined, cssWidth: number, cssHei
     `h:${Math.round(cssHeight ?? 0)}`,
     `dpr:${Number.isFinite(dpr) ? dpr : 'na'}`,
   ];
-  return parts.join('|');
+  return joinSignatureParts(parts);
 }
 
 export function invalidateBattlefieldSceneCache(): void {
