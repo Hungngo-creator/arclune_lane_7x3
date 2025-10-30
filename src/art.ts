@@ -56,7 +56,31 @@ function sanitizeId(base: string, palette: UnitArtPalette): string {
   return `${base}${seed}` || `${base}0`;
 }
 
-function svgShield(palette: UnitArtPalette): string {
+const DEFAULT_PALETTE: UnitArtPalette = {
+  primary: '#7fa6c0',
+  secondary: '#1d2b38',
+  accent: '#d6f2ff',
+  outline: '#223548',
+};
+
+function normalizePalette(palette: UnitArtPalette | null | undefined): UnitArtPalette {
+  if (!palette) {
+    return { ...DEFAULT_PALETTE };
+  }
+  return {
+    primary: palette.primary ?? DEFAULT_PALETTE.primary,
+    secondary: palette.secondary ?? DEFAULT_PALETTE.secondary,
+    accent: palette.accent ?? DEFAULT_PALETTE.accent,
+    outline: palette.outline ?? DEFAULT_PALETTE.outline,
+  } satisfies UnitArtPalette;
+}
+
+function ensurePalette(palette: UnitArtPalette | null | undefined): UnitArtPalette {
+  return normalizePalette(palette);
+}
+
+function svgShield(paletteInput: UnitArtPalette): string {
+  const palette = ensurePalette(paletteInput);
   const gradId = sanitizeId('gradShield', palette);
   const light = palette.accent || '#f4f8ff';
   const outline = palette.outline || 'rgba(12,18,26,0.85)';
@@ -75,7 +99,8 @@ function svgShield(palette: UnitArtPalette): string {
   return svgData(96, 120, body);
 }
 
-function svgWing(palette: UnitArtPalette): string {
+function svgWing(paletteInput: UnitArtPalette): string {
+  const palette = ensurePalette(paletteInput);
   const gradId = sanitizeId('gradWing', palette);
   const accent = palette.accent || '#ffe2e6';
   const outline = palette.outline || 'rgba(24,12,16,0.85)';
@@ -93,7 +118,8 @@ function svgWing(palette: UnitArtPalette): string {
   return svgData(120, 128, body);
 }
 
-function svgRune(palette: UnitArtPalette): string {
+function svgRune(paletteInput: UnitArtPalette): string {
+  const palette = ensurePalette(paletteInput);
   const gradId = sanitizeId('gradRune', palette);
   const accent = palette.accent || '#f1dbff';
   const outline = palette.outline || 'rgba(22,15,35,0.85)';
@@ -112,7 +138,8 @@ function svgRune(palette: UnitArtPalette): string {
   return svgData(120, 120, body);
 }
 
-function svgBloom(palette: UnitArtPalette): string {
+function svgBloom(paletteInput: UnitArtPalette): string {
+  const palette = ensurePalette(paletteInput);
   const gradId = sanitizeId('gradBloom', palette);
   const accent = palette.accent || '#ffeef7';
   const outline = palette.outline || 'rgba(22,26,24,0.78)';
@@ -130,7 +157,8 @@ function svgBloom(palette: UnitArtPalette): string {
   return svgData(120, 128, body);
 }
 
-function svgPike(palette: UnitArtPalette): string {
+function svgPike(paletteInput: UnitArtPalette): string {
+  const palette = ensurePalette(paletteInput);
   const gradId = sanitizeId('gradPike', palette);
   const accent = palette.accent || '#f9f7e8';
   const outline = palette.outline || 'rgba(28,26,18,0.82)';
@@ -148,7 +176,8 @@ function svgPike(palette: UnitArtPalette): string {
   return svgData(120, 120, body);
 }
 
-function svgSentinel(palette: UnitArtPalette): string {
+function svgSentinel(paletteInput: UnitArtPalette): string {
+  const palette = ensurePalette(paletteInput);
   const gradId = sanitizeId('gradSentinel', palette);
   const accent = palette.accent || '#e1f7ff';
   const outline = palette.outline || 'rgba(18,25,32,0.85)';
@@ -181,15 +210,28 @@ function merge<T extends Record<string, unknown>>(target: T, source: Partial<T> 
 
 const UNIT_SKIN_SELECTION: Map<string, string> = new Map();
 
+function readUnitArt(key: string | null | undefined): UnitArtDefinition | null {
+  if (!key) return null;
+  if (Object.prototype.hasOwnProperty.call(UNIT_ART, key)){
+    const art = UNIT_ART[key as keyof typeof UNIT_ART];
+    if (art) return art;
+  }
+  return null;
+}
+
 function getBaseArt(id: string | null | undefined): UnitArtDefinition {
-  if (!id) return UNIT_ART.default;
-  if (UNIT_ART[id]) return UNIT_ART[id];
+  const fallback = UNIT_ART.default;
+  if (!id) return fallback;
+  const direct = readUnitArt(id);
+  if (direct) return direct;;
   if (id.endsWith('_minion')){
     const base = id.replace(/_minion$/, '');
-    if (UNIT_ART[`${base}_minion`]) return UNIT_ART[`${base}_minion`];
-    if (UNIT_ART.minion) return UNIT_ART.minion;
+    const minionVariant = readUnitArt(`${base}_minion`);
+    if (minionVariant) return minionVariant;
+    const genericMinion = readUnitArt('minion');
+    if (genericMinion) return genericMinion;
   }
-  return UNIT_ART.default;
+  return fallback;
 }
 
 function resolveSkinKey(id: string | null | undefined, baseArt: UnitArtDefinition | null, explicit?: string | null): string | null {
@@ -262,7 +304,7 @@ function instantiateArt(
     sprite: selectedSprite,
     skins: clonedSkins,
     defaultSkin: baseArt.defaultSkin,
-    palette: { ...baseArt.palette },
+    palette: ensurePalette(baseArt.palette),
     shape: baseArt.shape,
     size: baseArt.size,
     shadow: cloneShadow(baseArt.shadow),
@@ -376,8 +418,9 @@ function normalizeSpriteEntry(
   };
 }
 
-function makeArt(pattern: string, palette: UnitArtPalette, opts: MakeArtOptions = {}): UnitArtDefinition {
-  const spriteFactory = opts.spriteFactory ?? SPRITES[pattern];
+function makeArt(pattern: string, paletteInput: UnitArtPalette, opts: MakeArtOptions = {}): UnitArtDefinition {
+  const normalizedPalette = normalizePalette(paletteInput);
+  const spriteFactory = opts.spriteFactory ?? (pattern in SPRITES ? SPRITES[pattern] : null);
   const layout = merge<UnitArtLayout>(
     {
       anchor: 0.78,
@@ -402,7 +445,7 @@ function makeArt(pattern: string, palette: UnitArtPalette, opts: MakeArtOptions 
   const hpBar = merge<UnitArtHpBar>(
     {
       bg: 'rgba(9,14,21,0.74)',
-      fill: palette.accent || '#6ff0c0',
+      fill: normalizedPalette.accent || '#6ff0c0',
       border: 'rgba(0,0,0,0.55)',
     },
     (opts.hpBar ?? undefined) as Partial<UnitArtHpBar>,
@@ -424,7 +467,7 @@ function makeArt(pattern: string, palette: UnitArtPalette, opts: MakeArtOptions 
       };
     }
   } else if (opts.sprite !== null && spriteFactory){
-    const generated = normalizeSpriteEntry({ src: spriteFactory(palette) }, { anchor, shadow });
+    const generated = normalizeSpriteEntry({ src: spriteFactory(normalizedPalette) }, { anchor, shadow });
     if (generated){
       normalizedSkins[defaultSkinKey] = {
         ...generated,
@@ -442,11 +485,11 @@ function makeArt(pattern: string, palette: UnitArtPalette, opts: MakeArtOptions 
     sprite: normalizedSkins[preferredKey] ?? null,
     skins: normalizedSkins,
     defaultSkin: preferredKey,
-    palette,
+    palette: normalizedPalette,
     shape: opts.shape || pattern,
     size: opts.size ?? 1,
     shadow,
-    glow: opts.glow ?? palette.accent ?? '#8cf6ff',
+    glow: opts.glow ?? normalizedPalette.accent ?? '#8cf6ff',
     mirror: opts.mirror ?? true,
     layout,
     label,
