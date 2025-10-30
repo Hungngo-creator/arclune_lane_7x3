@@ -1,28 +1,28 @@
 //v0.7.7
-import { stepTurn, doActionOrSkip, predictSpawnCycle } from '../../turns.ts';
-import { enqueueImmediate, processActionChain } from '../../summon.ts';
-import { refillDeckEnemy, aiMaybeAct } from '../../ai.ts';
-import { Statuses } from '../../statuses.ts';
-import { CFG, CAM } from '../../config.ts';
-import { UNITS } from '../../units.ts';
-import { Meta, makeInstanceStats, initialRageFor } from '../../meta.ts';
-import { basicAttack, pickTarget, dealAbilityDamage, healUnit, grantShield, applyDamage } from '../../combat.ts';
-import { initializeFury, setFury, spendFury, resolveUltCost, gainFury, finishFuryHit } from '../../utils/fury.ts';
+import { stepTurn, doActionOrSkip, predictSpawnCycle } from '../../turns';
+import { enqueueImmediate, processActionChain } from '../../summon';
+import { refillDeckEnemy, aiMaybeAct } from '../../ai';
+import { Statuses } from '../../statuses';
+import { CFG, CAM } from '../../config';
+import { UNITS } from '../../units';
+import { Meta, makeInstanceStats, initialRageFor } from '../../meta';
+import { basicAttack, pickTarget, dealAbilityDamage, healUnit, grantShield, applyDamage } from '../../combat';
+import { initializeFury, setFury, spendFury, resolveUltCost, gainFury, finishFuryHit } from '../../utils/fury';
 import {
   ROSTER, ROSTER_MAP,
   CLASS_BASE, RANK_MULT,
   getMetaById, isSummoner, applyRankAndMods
-} from '../../catalog.ts';
+} from '../../catalog';
 import {
   makeGrid, drawGridOblique,
   drawTokensOblique, drawQueuedOblique,
   hitToCellOblique, projectCellOblique,
   cellOccupied, spawnLeaders, pickRandom, slotIndex, slotToCell, cellReserved, ORDER_ENEMY,
   ART_SPRITE_EVENT,
-} from '../../engine.ts';
-import { drawEnvironmentProps } from '../../background.ts';
-import { getUnitArt, setUnitSkin } from '../../art.ts';
-import { initHUD, startSummonBar } from '../../ui.ts';
+} from '../../engine';
+import { drawEnvironmentProps } from '../../background';
+import { getUnitArt, setUnitSkin } from '../../art';
+import { initHUD, startSummonBar } from '../../ui';
 import {
   vfxDraw,
   vfxAddSpawn,
@@ -33,8 +33,8 @@ import {
   vfxAddGroundBurst,
   vfxAddShieldWrap,
   asSessionWithVfx,
-} from '../../vfx.ts';
-import { drawBattlefieldScene } from '../../scene.ts';
+} from '../../vfx';
+import { drawBattlefieldScene } from '../../scene';
 import {
   gameEvents,
   TURN_START,
@@ -44,10 +44,10 @@ import {
   BATTLE_END,
   emitGameEvent,
   addGameEventListener,
-} from '../../events.ts';
-import { ensureNestedModuleSupport } from '../../utils/dummy.ts';
-import { safeNow } from '../../utils/time.ts';
-import { getSummonSpec, resolveSummonSlots } from '../../utils/kit.ts';
+} from '../../events';
+import { ensureNestedModuleSupport } from '../../utils/dummy';
+import { safeNow } from '../../utils/time';
+import { getSummonSpec, resolveSummonSlots } from '../../utils/kit';
 import {
   normalizeConfig,
   createSession,
@@ -55,7 +55,7 @@ import {
   ensureSceneCache,
   clearBackgroundSignatureCache,
   normalizeDeckEntries,
-} from './session-state.ts';
+} from './session-state';
 
 import type { BattleDetail, BattleResult, BattleState, LeaderSnapshot, PveDeckEntry } from '@shared-types/combat';
 import type {
@@ -74,7 +74,8 @@ import type {
   SessionState,
 } from '@shared-types/pve';
 import type { HudHandles, SummonBarHandles } from '@shared-types/ui';
-import type { NormalizedSessionConfig } from './session-state.ts';
+import type { CameraPreset } from '@shared-types/config';
+import type { NormalizedSessionConfig } from './session-state';
 
 type RootLike = Element | Document | null | undefined;
 type StartConfigOverrides = Partial<CreateSessionOptions> & Record<string, unknown>;
@@ -85,7 +86,7 @@ type PveSessionStartConfig = StartConfigOverrides & {
 
 type FrameHandle = number | ReturnType<typeof setTimeout>;
 type GradientValue = CanvasGradient | string | undefined;
-type CanvasClickHandler = ((event: Event) => void) | null;
+type CanvasClickHandler = (event: Event) => void;
 type ClockState = {
   startMs: number;
   lastTimerRemain: number;
@@ -100,8 +101,41 @@ type ExtendedQueuedSummon = (QueuedSummonRequest & {
   [extra: string]: unknown;
 }) | null;
 type DeckEntry = PveDeckEntry;
-type CameraPreset = { topScale?: number; rowGapRatio?: number; depthScale?: number } | null | undefined;
 type GridSpec = ReturnType<typeof makeGrid>;
+
+const isPlainRecord = (value: unknown): value is Record<string, unknown> => (
+  !!value && typeof value === 'object'
+);
+
+const isFiniteNumber = (value: unknown): value is number => (
+  typeof value === 'number' && Number.isFinite(value)
+);
+
+const parseFiniteNumber = (value: unknown): number | null => {
+  if (isFiniteNumber(value)) return value;
+  if (typeof value === 'string' && value.trim() !== ''){
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+};
+
+const toFiniteOrZero = (value: unknown): number => parseFiniteNumber(value) ?? 0;
+
+const toStartConfigOverrides = (value: unknown): StartConfigOverrides => {
+  if (!isPlainRecord(value)) return {};
+  return { ...(value as Record<string, unknown>) } as StartConfigOverrides;
+};
+
+const toRootLike = (value: unknown): RootLike => {
+  if (value == null) return value as null | undefined;
+  if (typeof Element !== 'undefined' && value instanceof Element) return value;
+  if (typeof Document !== 'undefined' && value instanceof Document) return value;
+  if (typeof (value as { nodeType?: unknown }).nodeType === 'number'){
+    return value as Element | Document;
+  }
+  return null;
+};
 
 const isDeckEntry = (value: unknown): value is DeckEntry => {
   if (!value || typeof value !== 'object') return false;
@@ -171,13 +205,16 @@ export type PveSessionHandle = {
 };
 
 function sanitizeStartConfig(
-  config: PveSessionStartConfig | null | undefined,
+  config: unknown,
 ): { rest: StartConfigOverrides; root: RootLike } {
-  const raw = (config ?? {}) as PveSessionStartConfig;
-  const { root, rootEl, ...rest } = raw;
+  if (!isPlainRecord(config)){
+    return { rest: {}, root: null };
+  }
+  const { root, rootEl, ...rest } = config as Record<string, unknown>;
+  const resolvedRoot = toRootLike(root) ?? toRootLike(rootEl) ?? null;
   return {
-    rest: rest as StartConfigOverrides,
-    root: (root ?? rootEl) ?? null,
+    rest: toStartConfigOverrides(rest),
+    root: resolvedRoot,
   };
 }
 
@@ -201,7 +238,13 @@ let ctx: CanvasRenderingContext2D | null = null;
 let hud: HudHandles | null = null;
 let summonBarHandle: SummonBarHandles | null = null;
 let hudCleanup: (() => void) | null = null;
-const CAM_PRESET = CAM[CFG.CAMERA] || CAM.landscape_oblique;
+const DEFAULT_CAMERA_KEY: keyof typeof CAM = 'landscape_oblique';
+const resolveCameraPreset = (): CameraPreset => {
+  const key = (CFG.CAMERA ?? DEFAULT_CAMERA_KEY) as keyof typeof CAM;
+  const preset = CAM[key];
+  return preset ?? CAM[DEFAULT_CAMERA_KEY];
+};
+const CAM_PRESET = resolveCameraPreset();
 const HAND_SIZE  = CFG.HAND_SIZE ?? 4;
 
 ensureNestedModuleSupport();
@@ -222,7 +265,7 @@ let visualViewportScrollHandler: (() => void) | null = null;
 let resizeSchedulerHandle: FrameHandle | null = null;
 let resizeSchedulerUsesTimeout = false;
 let pendingResize = false;
-let canvasClickHandler: CanvasClickHandler = null;
+let canvasClickHandler: CanvasClickHandler | null = null;
 let artSpriteHandler: (() => void) | null = null;
 let visibilityHandlerBound = false;
 let winRef: (Window & typeof globalThis) | null = null;
@@ -249,8 +292,9 @@ function cleanupSummonBar(): void {
   }
 }
 
-function resetSessionState(options: StartConfigOverrides = {}): void {
-  storedConfig = normalizeConfig({ ...storedConfig, ...options });
+function resetSessionState(options: StartConfigOverrides | null | undefined = {}): void {
+  const overrides = toStartConfigOverrides(options);
+  storedConfig = normalizeConfig({ ...storedConfig, ...overrides });
   Game = createSession(storedConfig);
   _IID = 1;
   _BORN = 1;
@@ -526,11 +570,21 @@ function creepStatsFromInherit(
   inherit: Record<string, unknown> | null | undefined,
 ): Partial<Pick<UnitToken, 'hpMax' | 'hp' | 'atk' | 'wil' | 'res' | 'arm'>> {
   if (!inherit || typeof inherit !== 'object') return {};
-  const hpMax = Math.round((masterUnit?.hpMax || 0) * ((inherit.HP ?? inherit.hp ?? inherit.HPMax ?? inherit.hpMax) || 0));
-  const atk   = Math.round((masterUnit?.atk   || 0) * ((inherit.ATK ?? inherit.atk) || 0));
-  const wil   = Math.round((masterUnit?.wil   || 0) * ((inherit.WIL ?? inherit.wil) || 0));
-  const res   = Math.round((masterUnit?.res   || 0) * ((inherit.RES ?? inherit.res) || 0));
-  const arm   = Math.round((masterUnit?.arm   || 0) * ((inherit.ARM ?? inherit.arm) || 0) * 100) / 100;
+  const hpRatio = parseFiniteNumber(inherit.HP ?? inherit.hp ?? inherit.HPMax ?? inherit.hpMax) ?? 0;
+  const atkRatio = parseFiniteNumber(inherit.ATK ?? inherit.atk) ?? 0;
+  const wilRatio = parseFiniteNumber(inherit.WIL ?? inherit.wil) ?? 0;
+  const resRatio = parseFiniteNumber(inherit.RES ?? inherit.res) ?? 0;
+  const armRatio = parseFiniteNumber(inherit.ARM ?? inherit.arm) ?? 0;
+  const hpMaxBase = toFiniteOrZero(masterUnit?.hpMax);
+  const atkBase = toFiniteOrZero(masterUnit?.atk);
+  const wilBase = toFiniteOrZero(masterUnit?.wil);
+  const resBase = toFiniteOrZero(masterUnit?.res);
+  const armBase = toFiniteOrZero(masterUnit?.arm);
+  const hpMax = Math.round(hpMaxBase * hpRatio);
+  const atk   = Math.round(atkBase * atkRatio);
+  const wil   = Math.round(wilBase * wilRatio);
+  const res   = Math.round(resBase * resRatio);
+  const arm   = Math.round(armBase * armRatio * 100) / 100;
   const stats: Partial<Pick<UnitToken, 'hpMax' | 'hp' | 'atk' | 'wil' | 'res' | 'arm'>> = {};
   if (hpMax > 0){ stats.hpMax = hpMax; stats.hp = hpMax; }
   if (atk > 0) stats.atk = atk;
@@ -588,12 +642,12 @@ function performUlt(unit: UnitToken): void {
       })
       .sort((a, b) => a - b);
 
-    const countRaw = Number(summonSpec.count);
-    const desired = Number.isFinite(countRaw) ? countRaw : (patternSlots.length || 1);
+    const countRaw = parseFiniteNumber(summonSpec.count);
+    const desired = countRaw ?? (patternSlots.length || 1);
     const need = Math.min(patternSlots.length, Math.max(0, desired));
 
     if (need > 0){
-      const limit = Number.isFinite(summonSpec.limit) ? summonSpec.limit : Infinity;
+      const limit = parseFiniteNumber(summonSpec.limit) ?? Infinity;
       const have  = getMinionsOf(unit.iid).length;
       const over  = Math.max(0, have + need - limit);
       const replacePolicy = typeof summonSpec.replace === 'string' ? summonSpec.replace.trim().toLowerCase() : null;
@@ -1932,9 +1986,9 @@ function bindSession(): void {
   }
 }
 
-function startSession(config: StartConfigOverrides = {}): SessionState | null {
+function startSession(config: StartConfigOverrides | null | undefined = {}): SessionState | null {
   configureRoot(rootElement);
-  const overrides = normalizeConfig(config);
+  const overrides = normalizeConfig(toStartConfigOverrides(config));
   if (running) stopSession();
   resetSessionState(overrides);
   resetDomRefs();
@@ -1996,8 +2050,8 @@ function applyConfigToRunningGame(cfg: NormalizedSessionConfig): void {
   }
 }
 
-function updateSessionConfig(next: StartConfigOverrides = {}): void {
-  const normalized = normalizeConfig(next);
+function updateSessionConfig(next: StartConfigOverrides | null | undefined = {}): void {
+  const normalized = normalizeConfig(toStartConfigOverrides(next));
   storedConfig = normalizeConfig({ ...storedConfig, ...normalized });
   applyConfigToRunningGame(normalized);
 }
@@ -2021,8 +2075,7 @@ export function createPveSession(
       stopSession();
     },
     updateConfig(next: StartConfigOverrides | null = null): void {
-      const overrides = (next ?? {}) as StartConfigOverrides;
-      updateSessionConfig(overrides);
+      updateSessionConfig(next);
     },
     setUnitSkin(unitId: string, skinKey: string | null | undefined): boolean {
       return setUnitSkinForSession(unitId, skinKey);
@@ -2039,5 +2092,5 @@ export function __getStoredConfig(): NormalizedSessionConfig {
 export function __getActiveGame(): SessionState | null {
   return Game;
 }
-export { gameEvents, emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN, BATTLE_END } from '../../events.ts';
-export { clearBackgroundSignatureCache, computeBackgroundSignature, __backgroundSignatureCache } from './session-state.ts';
+export { gameEvents, emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN, BATTLE_END } from '../../events';
+export { clearBackgroundSignatureCache, computeBackgroundSignature, __backgroundSignatureCache } from './session-state';
