@@ -89,7 +89,7 @@ export function createSummonQueue(): SummonQueue {
   return new Map<number, QueuedSummonRequest>();
 }
 
-export interface QueuedSummonState {
+export interface QueuedSummonState extends Record<Side, SummonQueue> {
   ally: SummonQueue;
   enemy: SummonQueue;
 }
