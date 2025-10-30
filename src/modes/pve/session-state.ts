@@ -20,15 +20,17 @@ import { getEnvironmentBackground, drawEnvironmentProps } from '../../background
 import { getCachedBattlefieldScene } from '../../scene.ts';
 import { Statuses } from '../../statuses.ts';
 import { getUnitArt } from '../../art.ts';
+import { normalizeUnitId } from '../../utils/unit-id.ts';
 
 void Statuses;
 
 type SceneConfigWithExtras = (SceneConfig & { CURRENT_BACKGROUND?: string | null | undefined }) | null;
 
 const DEFAULT_UNIT_ROSTER = UNITS.map((unit) => {
-  const art = getUnitArt(unit.id);
+  const unitId = normalizeUnitId(unit.id);
+  const art = getUnitArt(unitId);
   return {
-    id: unit.id,
+    id: unitId,
     name: unit.name,
     cost: Number.isFinite(unit.cost) ? unit.cost : null,
     art,
