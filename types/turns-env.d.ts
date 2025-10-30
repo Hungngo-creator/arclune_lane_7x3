@@ -136,6 +136,7 @@ declare module './vfx.ts' {
     vfxAddShieldWrap,
     vfxAddGroundBurst,
     vfxDraw,
+    asSessionWithVfx,
   } from '../src/vfx.ts';
 }
 
