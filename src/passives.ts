@@ -16,6 +16,7 @@ import type {
   StatusEffect,
 } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';
+import type { UnitKitConfig } from './types/config.ts';
 
 const clamp01 = (value: number): number => Math.max(0, Math.min(1, value));
 
@@ -652,53 +653,55 @@ export function emitPassiveEvent(
 /**
  * @param {SessionState | null | undefined} Game
  * @param {UnitToken | null | undefined} unit
- * @param {Record<string, unknown>} [onSpawn]
+ * @param {UnitKitConfig['onSpawn']} [onSpawn]
  * @returns {void}
  */
 export function applyOnSpawnEffects(
   Game: SessionState | null | undefined,
   unit: UnitToken | null | undefined,
-  onSpawn: Record<string, unknown> = {},
+  onSpawn?: UnitKitConfig['onSpawn'],
 ): void {
   if (!Game || !unit || !onSpawn) return;
+  const config = isRecord(onSpawn) ? onSpawn : null;
+  if (!config) return;
   ensureStatusContainer(unit);
 
   const effects: Array<Record<string, unknown>> = [];
-  if (Array.isArray(onSpawn.effects)){
-    for (const effect of onSpawn.effects){
+  if (Array.isArray(config.effects)){
+    for (const effect of config.effects){
       if (isRecord(effect)) effects.push(effect);
     }
   }
 
-  if (Number.isFinite(onSpawn.teamHealOnEntry) && Number(onSpawn.teamHealOnEntry) > 0){
-    effects.push({ type: 'teamHeal', amount: onSpawn.teamHealOnEntry, mode: 'targetMax' });
+  if (Number.isFinite(config.teamHealOnEntry) && Number(config.teamHealOnEntry) > 0){
+    effects.push({ type: 'teamHeal', amount: config.teamHealOnEntry, mode: 'targetMax' });
   }
-  const casterHeal = (onSpawn.teamHealPercentMaxHPOfCaster ?? onSpawn.teamHealPercentCasterMaxHP) as number | undefined;
+  const casterHeal = (config.teamHealPercentMaxHPOfCaster ?? config.teamHealPercentCasterMaxHP) as number | undefined;
   if (Number.isFinite(casterHeal) && Number(casterHeal) > 0){
     effects.push({ type: 'teamHeal', amount: casterHeal, mode: 'casterMax' });
   }
 
-  if (Array.isArray(onSpawn.statuses)){
-    for (const st of onSpawn.statuses){
+  if (Array.isArray(config.statuses)){
+    for (const st of config.statuses){
       if (!st || typeof st !== 'object') continue;
       effects.push({ type: 'status', status: st });
     }
   }
-  if (Array.isArray(onSpawn.addStatuses)){
-    for (const st of onSpawn.addStatuses){
+  if (Array.isArray(config.addStatuses)){
+    for (const st of config.addStatuses){
       if (!st || typeof st !== 'object') continue;
       effects.push({ type: 'status', status: st });
     }
   }
-  if (onSpawn.status && typeof onSpawn.status === 'object'){
-    effects.push({ type: 'status', status: onSpawn.status });
+  if (config.status && typeof config.status === 'object'){
+    effects.push({ type: 'status', status: config.status });
   }
 
-  if (onSpawn.stats && typeof onSpawn.stats === 'object'){
-    effects.push({ type: 'stats', stats: onSpawn.stats, mode: onSpawn.statsMode || onSpawn.mode, purgeable: onSpawn.purgeable });
+  if (config.stats && typeof config.stats === 'object'){
+    effects.push({ type: 'stats', stats: config.stats, mode: config.statsMode || config.mode, purgeable: config.purgeable });
   }
-  if (onSpawn.flatStats && typeof onSpawn.flatStats === 'object'){
-    effects.push({ type: 'stats', stats: onSpawn.flatStats, mode: 'flat', purgeable: onSpawn.purgeable, id: 'onSpawn_flat' });
+  if (config.flatStats && typeof config.flatStats === 'object'){
+    effects.push({ type: 'stats', stats: config.flatStats, mode: 'flat', purgeable: config.purgeable, id: 'onSpawn_flat' });
   }
 
   let statsChanged = false;

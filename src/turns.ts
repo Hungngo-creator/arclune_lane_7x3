@@ -13,8 +13,8 @@ import { safeNow } from './utils/time.ts';
 import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } from './utils/fury.ts';
 import { nextTurnInterleaved } from './turns/interleaved.ts';
 
-import type { ActionChainProcessedResult, SessionState } from '@shared-types/combat';
-import type { QueuedSummonRequest, Side, UnitToken } from '@shared-types/units';
+import type { SessionState } from '@shared-types/combat';
+import type { ActionChainProcessedResult, Side, UnitToken } from '@shared-types/units';
 import type { InterleavedState, InterleavedTurnState, QueuedSummonEntry, SequentialTurnState, TurnContext, TurnHooks } from '@shared-types/turn-order';
 
 interface SpawnResult {
@@ -23,6 +23,28 @@ interface SpawnResult {
 }
 
 type TurnOrderSide = Side | 'ALLY' | 'ENEMY';
+
+const toLowerSide = (side: TurnOrderSide): Side => {
+  if (side === 'ALLY') return 'ally';
+  if (side === 'ENEMY') return 'enemy';
+  return side;
+};
+
+const asSequentialTurn = (
+  turn: SequentialTurnState | InterleavedTurnState | null | undefined
+): SequentialTurnState | null => {
+  if (!turn) return null;
+  const candidate = turn as SequentialTurnState;
+  return Array.isArray(candidate.order) ? candidate : null;
+};
+
+const asInterleavedTurn = (
+  turn: SequentialTurnState | InterleavedTurnState | null | undefined
+): InterleavedTurnState | null => {
+  if (!turn) return null;
+  const candidate = turn as InterleavedTurnState;
+  return candidate.mode === 'interleaved_by_position' ? candidate : null;
+};
 
 const tokensAlive = (Game: SessionState): UnitToken[] =>
   Game.tokens.filter((t): t is UnitToken => t.alive);
@@ -34,7 +56,7 @@ function applyTurnRegen(
   if (!unit || !unit.alive) return { hpDelta: 0, aeDelta: 0 };
 
   const clampStat = (value: number, max: number | undefined): number => {
-    if (!Number.isFinite(max)){
+    if (typeof max !== 'number' || !Number.isFinite(max)){
       return Math.max(0, value);
     }
     const upper = Math.max(0, max);
@@ -113,11 +135,11 @@ export function getTurnOrderIndex(Game: SessionState, side: TurnOrderSide, slot:
 export function predictSpawnCycle(Game: SessionState, side: TurnOrderSide, slot: number): number {
   const turn = Game.turn;
   if (!turn) return 0;
-  if (!('order' in turn)){
+  const sequential = asSequentialTurn(turn);
+  if (!sequential){
     const cycle = Math.max(0, Number.isFinite(turn.cycle) ? turn.cycle : 0);
     return turn.mode === 'interleaved_by_position' ? cycle : cycle + 1;
   }
-  const sequential = turn as SequentialTurnState;
   const order = Array.isArray(sequential.order) ? sequential.order : [];
   const orderLen = order.length;
    const currentCycle = Math.max(0, Number.isFinite(sequential.cycle) ? sequential.cycle : 0);
@@ -137,10 +159,10 @@ export function spawnQueuedIfDue(
   { allocIid, performUlt }: Pick<TurnHooks, 'allocIid' | 'performUlt'> = {}
 ): SpawnResult {
   if (!entry) return { actor: null, spawned: false };
-  const side = entry.side;
   const slot = entry.slot;
-  const active = getActiveAt(Game, side, slot);
-  const queueMap = Game.queued?.[side as Side] as Map<number, QueuedSummonRequest> | undefined;
+  const sideLower = toLowerSide(entry.side);
+  const active = getActiveAt(Game, sideLower, slot);
+  const queueMap = sideLower === 'ally' ? Game.queued?.ally : Game.queued?.enemy;
   const p = queueMap?.get(slot);
   if (!p){
     return { actor: active || null, spawned: false };
@@ -156,16 +178,23 @@ export function spawnQueuedIfDue(
   const fromDeck = source === 'deck';
   const kit = meta?.kit;
   const initialFury = initialRageFor(p.unitId, { isLeader:false, revive: !!p.revive, reviveSpec: p.revived });
-  const obj = {
-    id: p.unitId, name: p.name, color: p.color || '#a9f58c',
-    cx: p.cx, cy: p.cy, side: p.side, alive: true
+  const stats = makeInstanceStats(p.unitId);
+  const baseStats = {
+    atk: stats.atk ?? 0,
+    res: stats.res ?? 0,
+    wil: stats.wil ?? 0,
   };
-  Object.assign(obj, makeInstanceStats(p.unitId));
-  obj.statuses = [];
-  obj.baseStats = {
-    atk: obj.atk,
-    res: obj.res,
-    wil: obj.wil
+  const obj: UnitToken = {
+    id: p.unitId,
+    name: p.name ?? undefined,
+    color: p.color || '#a9f58c',
+    cx: p.cx,
+    cy: p.cy,
+    side: p.side,
+    alive: true,
+    ...stats,
+    statuses: [],
+    baseStats,
   };
   obj.iid = typeof allocIid === 'function' ? allocIid() : obj.iid;
   obj.art = getUnitArt(p.unitId);
@@ -186,7 +215,7 @@ export function spawnQueuedIfDue(
       } catch (_) {}
     }
   }
-  const actor = getActiveAt(Game, side, slot);
+  const actor = getActiveAt(Game, sideLower, slot);
   const isLeader = actor?.id === 'leaderA' || actor?.id === 'leaderB';
   const canAutoUlt = fromDeck && !isLeader && actor && actor.alive && typeof performUlt === 'function';
   if (canAutoUlt && !Statuses.blocks(actor, 'ult')){
@@ -216,9 +245,11 @@ export function tickMinionTTL(Game: SessionState, side: Side): void {
     if (!t.alive) continue;
     if (t.side !== side) continue;
     if (!t.isMinion) continue;
-    if (!Number.isFinite(t.ttlTurns)) continue;
-    t.ttlTurns -= 1;
-    if (t.ttlTurns <= 0) toRemove.push(t);
+    const ttl = t.ttlTurns;
+    if (typeof ttl !== 'number' || !Number.isFinite(ttl)) continue;
+    const nextTtl = ttl - 1;
+    t.ttlTurns = nextTtl;
+    if (nextTtl <= 0) toRemove.push(t);
   }
   for (const t of toRemove){
     t.alive = false;
@@ -245,9 +276,10 @@ export function doActionOrSkip(
   const side: Side | null = turnContext?.side ?? unit?.side ?? null;
   const orderIndex = typeof turnContext?.orderIndex === 'number' ? turnContext.orderIndex : null;
   const cycle = typeof turnContext?.cycle === 'number' ? turnContext.cycle : Game.turn?.cycle ?? null;
+  const sequentialSnapshot = asSequentialTurn(Game.turn);
   const orderLength = typeof turnContext?.orderLength === 'number'
     ? turnContext.orderLength
-    : (Array.isArray(Game.turn?.order) ? Game.turn!.order.length : null);
+    : (sequentialSnapshot ? sequentialSnapshot.order.length : null);
 
   const baseDetail = {
     game: Game,
@@ -325,8 +357,8 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
   if (!turn) return;
   if (Game.battle?.over) return;
 
-  if ((turn as InterleavedState | InterleavedTurnState).mode === 'interleaved_by_position'){
-    const interleavedTurn = turn as InterleavedTurnState;
+  const interleavedTurn = asInterleavedTurn(turn);
+  if (interleavedTurn){
     let selection: InterleavedState | null = nextTurnInterleaved(Game, interleavedTurn);
     if (!selection) return;
 
@@ -411,7 +443,8 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
     return;
   }
 
-  const sequentialTurn = turn as SequentialTurnState;
+  const sequentialTurn = asSequentialTurn(turn);
+  if (!sequentialTurn) return;
   const order = Array.isArray(sequentialTurn?.order) ? sequentialTurn.order : [];
   if (!order.length) return;
 

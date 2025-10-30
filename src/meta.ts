@@ -69,11 +69,27 @@ export const Meta = {
 } satisfies MetaService;
 
 // Tạo chỉ số instance theo class+rank+mods (SPD không nhân theo rank)
-export function makeInstanceStats(unitId: MetaId): InstanceStats | Record<string, never> {
+const EMPTY_INSTANCE_STATS: InstanceStats = {
+  hpMax: 0,
+  hp: 0,
+  atk: 0,
+  wil: 0,
+  arm: 0,
+  res: 0,
+  agi: 0,
+  per: 0,
+  spd: 1,
+  aeMax: 0,
+  ae: 0,
+  aeRegen: 0,
+  hpRegen: 0,
+};
+
+export function makeInstanceStats(unitId: MetaId): InstanceStats {
   const entry = Meta.get(unitId);
-  if (!entry) return {};
+  if (!entry) return { ...EMPTY_INSTANCE_STATS };
   const base: CatalogStatBlock | undefined = CLASS_BASE[entry.class];
-  if (!base) return {};
+  if (!base) return { ...EMPTY_INSTANCE_STATS };
   const fin = applyRankAndMods(base, entry.rank, entry.mods);
   return {
     hpMax: Math.trunc(fin.HP ?? 0),
