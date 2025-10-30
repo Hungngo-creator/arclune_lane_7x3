@@ -1,7 +1,7 @@
 // Bundled by build.mjs
 const __modules = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/time.js":"./utils/time.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }
 function __define(id, factory){ __modules[id] = { factory, exports: null, initialized: false }; }
@@ -36,7 +36,7 @@ __define('./ai.ts', (exports, module, __require) => {
   const resolveSummonSlots = __dep4.resolveSummonSlots;
   const __dep5 = __require('./units.ts');
   const lookupUnit = __dep5.lookupUnit;
-  const __dep6 = __require('./types/units.ts');
+  const __dep6 = __require('./../types/@shared-types/units.d.ts');
   const createSummonQueue = __dep6.createSummonQueue;
   function toMetaEntry(value) {
       if (!value || typeof value !== 'object')
@@ -667,7 +667,29 @@ __define('./art.ts', (exports, module, __require) => {
       const seed = `${palette.primary || ''}${palette.secondary || ''}${palette.accent || ''}`.replace(/[^a-zA-Z0-9]/g, '').slice(0, 10);
       return `${base}${seed}` || `${base}0`;
   }
-  function svgShield(palette) {
+  const DEFAULT_PALETTE = {
+      primary: '#7fa6c0',
+      secondary: '#1d2b38',
+      accent: '#d6f2ff',
+      outline: '#223548',
+  };
+  function normalizePalette(palette) {
+      var _a, _b, _c, _d;
+      if (!palette) {
+          return { ...DEFAULT_PALETTE };
+      }
+      return {
+          primary: (_a = palette.primary) !== null && _a !== void 0 ? _a : DEFAULT_PALETTE.primary,
+          secondary: (_b = palette.secondary) !== null && _b !== void 0 ? _b : DEFAULT_PALETTE.secondary,
+          accent: (_c = palette.accent) !== null && _c !== void 0 ? _c : DEFAULT_PALETTE.accent,
+          outline: (_d = palette.outline) !== null && _d !== void 0 ? _d : DEFAULT_PALETTE.outline,
+      };
+  }
+  function ensurePalette(palette) {
+      return normalizePalette(palette);
+  }
+  function svgShield(paletteInput) {
+      const palette = ensurePalette(paletteInput);
       const gradId = sanitizeId('gradShield', palette);
       const light = palette.accent || '#f4f8ff';
       const outline = palette.outline || 'rgba(12,18,26,0.85)';
@@ -685,7 +707,8 @@ __define('./art.ts', (exports, module, __require) => {
     `;
       return svgData(96, 120, body);
   }
-  function svgWing(palette) {
+  function svgWing(paletteInput) {
+      const palette = ensurePalette(paletteInput);
       const gradId = sanitizeId('gradWing', palette);
       const accent = palette.accent || '#ffe2e6';
       const outline = palette.outline || 'rgba(24,12,16,0.85)';
@@ -702,7 +725,8 @@ __define('./art.ts', (exports, module, __require) => {
     `;
       return svgData(120, 128, body);
   }
-  function svgRune(palette) {
+  function svgRune(paletteInput) {
+      const palette = ensurePalette(paletteInput);
       const gradId = sanitizeId('gradRune', palette);
       const accent = palette.accent || '#f1dbff';
       const outline = palette.outline || 'rgba(22,15,35,0.85)';
@@ -720,7 +744,8 @@ __define('./art.ts', (exports, module, __require) => {
     `;
       return svgData(120, 120, body);
   }
-  function svgBloom(palette) {
+  function svgBloom(paletteInput) {
+      const palette = ensurePalette(paletteInput);
       const gradId = sanitizeId('gradBloom', palette);
       const accent = palette.accent || '#ffeef7';
       const outline = palette.outline || 'rgba(22,26,24,0.78)';
@@ -737,7 +762,8 @@ __define('./art.ts', (exports, module, __require) => {
     `;
       return svgData(120, 128, body);
   }
-  function svgPike(palette) {
+  function svgPike(paletteInput) {
+      const palette = ensurePalette(paletteInput);
       const gradId = sanitizeId('gradPike', palette);
       const accent = palette.accent || '#f9f7e8';
       const outline = palette.outline || 'rgba(28,26,18,0.82)';
@@ -754,7 +780,8 @@ __define('./art.ts', (exports, module, __require) => {
     `;
       return svgData(120, 120, body);
   }
-  function svgSentinel(palette) {
+  function svgSentinel(paletteInput) {
+      const palette = ensurePalette(paletteInput);
       const gradId = sanitizeId('gradSentinel', palette);
       const accent = palette.accent || '#e1f7ff';
       const outline = palette.outline || 'rgba(18,25,32,0.85)';
@@ -783,19 +810,35 @@ __define('./art.ts', (exports, module, __require) => {
       return Object.assign({}, target, source !== null && source !== void 0 ? source : {});
   }
   const UNIT_SKIN_SELECTION = new Map();
-  function getBaseArt(id) {
-      if (!id)
-          return UNIT_ART.default;
-      if (UNIT_ART[id])
-          return UNIT_ART[id];
-      if (id.endsWith('_minion')) {
-          const base = id.replace(/_minion$/, '');
-          if (UNIT_ART[`${base}_minion`])
-              return UNIT_ART[`${base}_minion`];
-          if (UNIT_ART.minion)
-              return UNIT_ART.minion;
+  function hasArtEntry(key) {
+      return Object.prototype.hasOwnProperty.call(UNIT_ART, key);
+  }
+  function getArtEntry(key) {
+      var _a;
+      if (hasArtEntry(key)) {
+          const entry = (_a = UNIT_ART[key]) !== null && _a !== void 0 ? _a : UNIT_ART.default;
+          return entry;
       }
       return UNIT_ART.default;
+  }
+  function getBaseArt(id) {
+      const fallback = getArtEntry('default');
+      if (!id)
+          return fallback;
+      if (hasArtEntry(id)) {
+          return getArtEntry(id);
+      }
+      if (id.endsWith('_minion')) {
+          const base = id.replace(/_minion$/, '');
+          const minionKey = `${base}_minion`;
+          if (hasArtEntry(minionKey)) {
+              return getArtEntry(minionKey);
+          }
+          if (hasArtEntry('minion')) {
+              return getArtEntry('minion');
+          }
+      }
+      return fallback;
   }
   function resolveSkinKey(id, baseArt, explicit) {
       var _a;
@@ -812,29 +855,73 @@ __define('./art.ts', (exports, module, __require) => {
       const keys = Object.keys((_a = baseArt.skins) !== null && _a !== void 0 ? _a : {});
       return keys[0] || null;
   }
-  function instantiateArt(id, baseArt, skinKey) {
-      var _a;
+  function cloneShadowConfig(shadow) {
+      if (!shadow)
+          return null;
+      return {
+          color: shadow.color,
+          blur: shadow.blur,
+          offsetX: shadow.offsetX,
+          offsetY: shadow.offsetY,
+      };
+  }
+  function cloneShadow(shadow) {
+      if (shadow === null || shadow === undefined)
+          return null;
+      if (typeof shadow === 'string')
+          return shadow;
+      return cloneShadowConfig(shadow);
+  }
+  function cloneSpriteEntry(sprite, fallbackKey) {
+      var _a, _b, _c, _d;
+      if (!sprite)
+          return null;
+      const preferredKey = typeof sprite.key === 'string' && sprite.key.length > 0
+          ? sprite.key
+          : typeof fallbackKey === 'string' && fallbackKey.length > 0
+              ? fallbackKey
+              : 'default';
+      const cloned = {
+          ...sprite,
+          key: preferredKey,
+          aspect: (_a = sprite.aspect) !== null && _a !== void 0 ? _a : null,
+          shadow: cloneShadowConfig(sprite.shadow),
+          skinId: (_c = (_b = sprite.skinId) !== null && _b !== void 0 ? _b : fallbackKey) !== null && _c !== void 0 ? _c : preferredKey,
+          cacheKey: (_d = sprite.cacheKey) !== null && _d !== void 0 ? _d : null,
+      };
+      return cloned;
+  }
+  function instantiateArt(_id, baseArt, skinKey) {
+      var _a, _b, _c;
       if (!baseArt)
           return null;
+      const normalizedSkinKey = (_a = skinKey !== null && skinKey !== void 0 ? skinKey : baseArt.defaultSkin) !== null && _a !== void 0 ? _a : null;
+      const clonedSkins = {};
+      for (const [key, sprite] of Object.entries((_b = baseArt.skins) !== null && _b !== void 0 ? _b : {})) {
+          const clone = cloneSpriteEntry(sprite, key);
+          if (clone)
+              clonedSkins[key] = clone;
+      }
+      const sourceSprite = normalizedSkinKey && baseArt.skins
+          ? (_c = baseArt.skins[normalizedSkinKey]) !== null && _c !== void 0 ? _c : baseArt.sprite
+          : baseArt.sprite;
+      const selectedSprite = cloneSpriteEntry(sourceSprite, normalizedSkinKey);
       const art = {
           ...baseArt,
-          layout: baseArt.layout ? { ...baseArt.layout } : {},
-          label: baseArt.label ? { ...baseArt.label } : {},
-          hpBar: baseArt.hpBar ? { ...baseArt.hpBar } : {},
-          sprite: null,
-          skinKey: skinKey !== null && skinKey !== void 0 ? skinKey : null,
+          sprite: selectedSprite,
+          skins: clonedSkins,
+          defaultSkin: baseArt.defaultSkin,
+          palette: ensurePalette(baseArt.palette),
+          shape: baseArt.shape,
+          size: baseArt.size,
+          shadow: cloneShadow(baseArt.shadow),
+          glow: baseArt.glow,
+          mirror: baseArt.mirror,
+          layout: { ...baseArt.layout },
+          label: baseArt.label === false ? false : { ...baseArt.label },
+          hpBar: { ...baseArt.hpBar },
+          skinKey: normalizedSkinKey,
       };
-      const spriteDef = skinKey ? baseArt.skins[skinKey] : undefined;
-      if (spriteDef) {
-          art.sprite = {
-              ...spriteDef,
-              key: skinKey,
-              skinId: (_a = spriteDef.skinId) !== null && _a !== void 0 ? _a : skinKey,
-          };
-      }
-      else {
-          art.sprite = null;
-      }
       return art;
   }
   function setUnitSkin(unitId, skinKey) {
@@ -932,9 +1019,10 @@ __define('./art.ts', (exports, module, __require) => {
           cacheKey: typeof input.cacheKey === 'string' ? input.cacheKey : null,
       };
   }
-  function makeArt(pattern, palette, opts = {}) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;
-      const spriteFactory = (_a = opts.spriteFactory) !== null && _a !== void 0 ? _a : SPRITES[pattern];
+  function makeArt(pattern, paletteInput, opts = {}) {
+      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+      const normalizedPalette = normalizePalette(paletteInput);
+      const spriteFactory = (_a = opts.spriteFactory) !== null && _a !== void 0 ? _a : (pattern in SPRITES ? SPRITES[pattern] : null);
       const layout = merge({
           anchor: 0.78,
           labelOffset: 1.18,
@@ -945,14 +1033,16 @@ __define('./art.ts', (exports, module, __require) => {
           spriteAspect: 0.78,
           spriteHeight: 2.4,
       }, ((_b = opts.layout) !== null && _b !== void 0 ? _b : undefined));
-      const label = merge({
-          bg: 'rgba(12,20,30,0.82)',
-          text: '#f4f8ff',
-          stroke: 'rgba(255,255,255,0.08)',
-      }, ((_c = opts.label) !== null && _c !== void 0 ? _c : undefined));
+      const label = opts.label === false
+          ? false
+          : merge({
+              bg: 'rgba(12,20,30,0.82)',
+              text: '#f4f8ff',
+              stroke: 'rgba(255,255,255,0.08)',
+          }, (_c = opts.label) !== null && _c !== void 0 ? _c : undefined);
       const hpBar = merge({
           bg: 'rgba(9,14,21,0.74)',
-          fill: palette.accent || '#6ff0c0',
+          fill: normalizedPalette.accent || '#6ff0c0',
           border: 'rgba(0,0,0,0.55)',
       }, ((_d = opts.hpBar) !== null && _d !== void 0 ? _d : undefined));
       const shadow = (_e = opts.shadow) !== null && _e !== void 0 ? _e : 'rgba(0,0,0,0.35)';
@@ -968,17 +1058,17 @@ __define('./art.ts', (exports, module, __require) => {
               normalizedSkins[key] = {
                   ...normalized,
                   key,
-                  skinId: (_h = normalized.skinId) !== null && _h !== void 0 ? _h : key,
+                  skinId: typeof normalized.skinId === 'string' ? normalized.skinId : key,
               };
           }
       }
       else if (opts.sprite !== null && spriteFactory) {
-          const generated = normalizeSpriteEntry({ src: spriteFactory(palette) }, { anchor, shadow });
+          const generated = normalizeSpriteEntry({ src: spriteFactory(normalizedPalette) }, { anchor, shadow });
           if (generated) {
               normalizedSkins[defaultSkinKey] = {
                   ...generated,
                   key: defaultSkinKey,
-                  skinId: (_j = generated.skinId) !== null && _j !== void 0 ? _j : defaultSkinKey,
+                  skinId: typeof generated.skinId === 'string' ? generated.skinId : defaultSkinKey,
               };
           }
       }
@@ -986,15 +1076,15 @@ __define('./art.ts', (exports, module, __require) => {
           ? defaultSkinKey
           : Object.keys(normalizedSkins)[0] || defaultSkinKey;
       return {
-          sprite: (_k = normalizedSkins[preferredKey]) !== null && _k !== void 0 ? _k : null,
+          sprite: (_h = normalizedSkins[preferredKey]) !== null && _h !== void 0 ? _h : null,
           skins: normalizedSkins,
           defaultSkin: preferredKey,
-          palette,
+          palette: normalizedPalette,
           shape: opts.shape || pattern,
-          size: (_l = opts.size) !== null && _l !== void 0 ? _l : 1,
+          size: (_j = opts.size) !== null && _j !== void 0 ? _j : 1,
           shadow,
-          glow: (_o = (_m = opts.glow) !== null && _m !== void 0 ? _m : palette.accent) !== null && _o !== void 0 ? _o : '#8cf6ff',
-          mirror: (_p = opts.mirror) !== null && _p !== void 0 ? _p : true,
+          glow: (_l = (_k = opts.glow) !== null && _k !== void 0 ? _k : normalizedPalette.accent) !== null && _l !== void 0 ? _l : '#8cf6ff',
+          mirror: (_m = opts.mirror) !== null && _m !== void 0 ? _m : true,
           layout,
           label,
           hpBar,
@@ -1014,8 +1104,12 @@ __define('./art.ts', (exports, module, __require) => {
       linhgac: { primary: '#9ec4ff', secondary: '#2a3f5c', accent: '#e4f1ff', outline: '#24364c' },
       minion: { primary: '#ffd27d', secondary: '#5a3a17', accent: '#fff4cc', outline: '#452b0f' }
   };
+  function getBasePalette(name) {
+      var _a;
+      return (_a = basePalettes[name]) !== null && _a !== void 0 ? _a : basePalettes.default;
+  }
   const UNIT_ART = {
-      default: makeArt('sentinel', basePalettes.default, {
+      default: makeArt('sentinel', getBasePalette('default'), {
           layout: { labelOffset: 1.1, hpOffset: 1.38, spriteAspect: 0.8 },
           skins: {
               default: {
@@ -1027,7 +1121,7 @@ __define('./art.ts', (exports, module, __require) => {
               }
           }
       }),
-      leaderA: makeArt('shield', basePalettes.leaderA, {
+      leaderA: makeArt('shield', getBasePalette('leaderA'), {
           layout: { labelOffset: 1.24, hpOffset: 1.52, hpWidth: 2.6, spriteAspect: 0.8 },
           label: { text: '#e5f6ff', bg: 'rgba(12,30,44,0.88)' },
           hpBar: { fill: '#6ff0c0' },
@@ -1048,7 +1142,7 @@ __define('./art.ts', (exports, module, __require) => {
               }
           }
       }),
-      leaderB: makeArt('wing', basePalettes.leaderB, {
+      leaderB: makeArt('wing', getBasePalette('leaderB'), {
           layout: { labelOffset: 1.3, hpOffset: 1.58, hpWidth: 2.6, spriteAspect: 0.8 },
           label: { text: '#ffe6ec', bg: 'rgba(46,16,24,0.88)' },
           hpBar: { fill: '#ff9aa0' },
@@ -1069,7 +1163,7 @@ __define('./art.ts', (exports, module, __require) => {
               }
           }
       }),
-      phe: makeArt('rune', basePalettes.phe, {
+      phe: makeArt('rune', getBasePalette('phe'), {
           layout: { labelOffset: 1.2, hpOffset: 1.48, spriteAspect: 0.8 },
           hpBar: { fill: '#c19bff' },
           skins: {
@@ -1082,7 +1176,7 @@ __define('./art.ts', (exports, module, __require) => {
               }
           }
       }),
-      kiemtruongda: makeArt('pike', basePalettes.kiem, {
+      kiemtruongda: makeArt('pike', getBasePalette('kiem'), {
           layout: { labelOffset: 1.22, hpOffset: 1.5, spriteAspect: 0.8 },
           hpBar: { fill: '#ffd37a' },
           skins: {
@@ -1095,7 +1189,7 @@ __define('./art.ts', (exports, module, __require) => {
               }
           }
       }),
-      loithienanh: makeArt('sentinel', basePalettes.loithien, {
+      loithienanh: makeArt('sentinel', getBasePalette('loithien'), {
           layout: { labelOffset: 1.18, hpOffset: 1.46, spriteAspect: 0.8 },
           hpBar: { fill: '#80f2ff' },
           skins: {
@@ -1108,7 +1202,7 @@ __define('./art.ts', (exports, module, __require) => {
               }
           }
       }),
-      laky: makeArt('bloom', basePalettes.laky, {
+      laky: makeArt('bloom', getBasePalette('laky'), {
           layout: { labelOffset: 1.18, hpOffset: 1.44, spriteAspect: 0.8 },
           hpBar: { fill: '#ffb8e9' },
           skins: {
@@ -1121,7 +1215,7 @@ __define('./art.ts', (exports, module, __require) => {
               }
           }
       }),
-      kydieu: makeArt('rune', basePalettes.kydieu, {
+      kydieu: makeArt('rune', getBasePalette('kydieu'), {
           layout: { labelOffset: 1.16, hpOffset: 1.42, spriteAspect: 0.8 },
           hpBar: { fill: '#9af5d2' },
           skins: {
@@ -1134,7 +1228,7 @@ __define('./art.ts', (exports, module, __require) => {
               }
           }
       }),
-      doanminh: makeArt('pike', basePalettes.doanminh, {
+      doanminh: makeArt('pike', getBasePalette('doanminh'), {
           layout: { labelOffset: 1.26, hpOffset: 1.54, spriteAspect: 0.8 },
           hpBar: { fill: '#ffe6a5' },
           skins: {
@@ -1147,7 +1241,7 @@ __define('./art.ts', (exports, module, __require) => {
               }
           }
       }),
-      tranquat: makeArt('rune', basePalettes.tranquat, {
+      tranquat: makeArt('rune', getBasePalette('tranquat'), {
           layout: { labelOffset: 1.18, hpOffset: 1.46, spriteAspect: 0.8 },
           hpBar: { fill: '#7fe9ff' },
           skins: {
@@ -1160,7 +1254,7 @@ __define('./art.ts', (exports, module, __require) => {
               }
           }
       }),
-      linhgac: makeArt('sentinel', basePalettes.linhgac, {
+      linhgac: makeArt('sentinel', getBasePalette('linhgac'), {
           layout: { labelOffset: 1.16, hpOffset: 1.42, spriteAspect: 0.8 },
           hpBar: { fill: '#a9d6ff' },
           skins: {
@@ -1173,7 +1267,7 @@ __define('./art.ts', (exports, module, __require) => {
               }
           }
       }),
-      minion: makeArt('pike', basePalettes.minion, {
+      minion: makeArt('pike', getBasePalette('minion'), {
           layout: { labelOffset: 1.08, hpOffset: 1.32, hpWidth: 2.1, hpHeight: 0.38, spriteAspect: 0.8 },
           label: { text: '#fff1d0' },
           hpBar: { fill: '#ffd27d' },
@@ -1206,8 +1300,77 @@ __define('./background.ts', (exports, module, __require) => {
   const __dep1 = __require('./engine.ts');
   const ensureSpriteLoaded = __dep1.ensureSpriteLoaded;
   const projectCellOblique = __dep1.projectCellOblique;
+  const ENVIRONMENT_SPRITE_CACHE = new Map();
+  function ensureEnvironmentSprite(asset) {
+      var _a;
+      if (!asset)
+          return null;
+      const cached = ENVIRONMENT_SPRITE_CACHE.get(asset);
+      if (cached !== undefined)
+          return cached;
+      const descriptor = {
+          sprite: {
+              src: asset,
+              key: asset,
+              anchor: 1,
+              scale: 1,
+              aspect: null,
+              shadow: null,
+              skinId: null,
+              cacheKey: asset,
+          },
+      };
+      const entry = (_a = ensureSpriteLoaded(descriptor)) !== null && _a !== void 0 ? _a : null;
+      ENVIRONMENT_SPRITE_CACHE.set(asset, entry);
+      return entry;
+  }
   const BACKGROUND_PROP_CACHE = new WeakMap();
-  const ENVIRONMENT_PROP_TYPES = {
+  const isRecord = (value) => !!value && typeof value === 'object' && !Array.isArray(value);
+  const isFiniteNumber = (value) => typeof value === 'number' && Number.isFinite(value);
+  const toNumberOr = (value, fallback) => (isFiniteNumber(value) ? value : fallback);
+  const toOptionalNumber = (value) => (isFiniteNumber(value) ? value : undefined);
+  const mergePalette = (...palettes) => {
+      const result = {};
+      for (const palette of palettes) {
+          if (!palette || !isRecord(palette))
+              continue;
+          if (typeof palette.primary === 'string')
+              result.primary = palette.primary;
+          if (typeof palette.secondary === 'string')
+              result.secondary = palette.secondary;
+          if (typeof palette.accent === 'string')
+              result.accent = palette.accent;
+          if (typeof palette.shadow === 'string')
+              result.shadow = palette.shadow;
+          if (typeof palette.outline === 'string')
+              result.outline = palette.outline;
+      }
+      return result;
+  };
+  const cloneFallback = (fallback) => {
+      if (!fallback || !isRecord(fallback))
+          return null;
+      const clone = {};
+      if (typeof fallback.shape === 'string')
+          clone.shape = fallback.shape;
+      return clone;
+  };
+  const normalizeVector = (value, fallbackX, fallbackY) => {
+      const record = isRecord(value) ? value : {};
+      return {
+          x: toNumberOr(record.x, fallbackX),
+          y: toNumberOr(record.y, fallbackY),
+      };
+  };
+  const normalizeSize = (value, fallbackW, fallbackH) => {
+      const record = isRecord(value) ? value : {};
+      return {
+          w: toNumberOr(record.w, fallbackW),
+          h: toNumberOr(record.h, fallbackH),
+      };
+  };
+  const hasOwn = (obj, key) => Object.prototype.hasOwnProperty.call(obj, key);
+  const SCENERY = {
       'stone-obelisk': {
           asset: 'dist/assets/environment/stone-obelisk.svg',
           size: { w: 120, h: 220 },
@@ -1237,7 +1400,66 @@ __define('./background.ts', (exports, module, __require) => {
           },
       },
   };
+  const ENVIRONMENT_PROP_TYPES = SCENERY;
+  const isSceneryKey = (value) => typeof value === 'string' && hasOwn(SCENERY, value);
+  const normalizePropInput = (value) => {
+      var _a, _b, _c;
+      if (!isRecord(value))
+          return null;
+      const type = typeof value.type === 'string' ? value.type : null;
+      if (!type)
+          return null;
+      const cellRecord = isRecord(value.cell) ? value.cell : {};
+      const cx = toNumberOr((_a = value.cx) !== null && _a !== void 0 ? _a : cellRecord.cx, 0);
+      const cy = toNumberOr((_b = value.cy) !== null && _b !== void 0 ? _b : cellRecord.cy, 0);
+      const depth = toOptionalNumber((_c = cellRecord.depth) !== null && _c !== void 0 ? _c : value.depth);
+      const prop = {
+          ...value,
+          type,
+          cell: { cx, cy, ...(depth !== undefined ? { depth } : {}) },
+          asset: typeof value.asset === 'string' ? value.asset : null,
+          fallback: cloneFallback(value.fallback),
+          palette: mergePalette(value.palette),
+          anchor: isRecord(value.anchor) ? { ...value.anchor } : null,
+          size: isRecord(value.size) ? { ...value.size } : null,
+          baseLift: toOptionalNumber(value.baseLift),
+          pixelOffset: isRecord(value.pixelOffset) ? { ...value.pixelOffset } : null,
+          cx: toOptionalNumber(value.cx),
+          cy: toOptionalNumber(value.cy),
+      };
+      return prop;
+  };
+  const normalizeBackgroundDefinition = (value) => {
+      if (!isRecord(value))
+          return null;
+      const propsInput = Array.isArray(value.props) ? value.props : [];
+      const props = [];
+      for (const prop of propsInput) {
+          const normalized = normalizePropInput(prop);
+          if (normalized)
+              props.push(normalized);
+      }
+      return { props };
+  };
+  let BACKGROUND_CONFIG_MAP = null;
+  function getBackgroundConfigMap() {
+      if (BACKGROUND_CONFIG_MAP)
+          return BACKGROUND_CONFIG_MAP;
+      const map = new Map();
+      const entries = CFG.BACKGROUNDS && typeof CFG.BACKGROUNDS === 'object'
+          ? Object.entries(CFG.BACKGROUNDS)
+          : [];
+      for (const [key, entry] of entries) {
+          const normalized = normalizeBackgroundDefinition(entry);
+          if (normalized) {
+              map.set(key, normalized);
+          }
+      }
+      BACKGROUND_CONFIG_MAP = map;
+      return map;
+  }
   function stableStringify(value, seen = new WeakSet()) {
+      var _a;
       if (value === null)
           return 'null';
       const type = typeof value;
@@ -1248,7 +1470,7 @@ __define('./background.ts', (exports, module, __require) => {
       if (type === 'string')
           return JSON.stringify(value);
       if (type === 'symbol')
-          return value.toString();
+          return (_a = value === null || value === void 0 ? void 0 : value.toString()) !== null && _a !== void 0 ? _a : '[symbol]';
       if (type === 'function') {
           const func = value;
           return `[Function:${func.name || 'anonymous'}]`;
@@ -1278,6 +1500,24 @@ __define('./background.ts', (exports, module, __require) => {
           return `len:${props.length}`;
       }
   }
+  function joinSignatureParts(parts) {
+      if (!Array.isArray(parts) || parts.length === 0) {
+          return '';
+      }
+      const normalized = [];
+      for (const part of parts) {
+          if (part == null) {
+              normalized.push('');
+              continue;
+          }
+          if (typeof part === 'number') {
+              normalized.push(Number.isFinite(part) ? String(part) : '');
+              continue;
+          }
+          normalized.push(String(part));
+      }
+      return normalized.join('|');
+  }
   function getBoardSignature(g, cam) {
       var _a, _b, _c;
       if (!g)
@@ -1298,76 +1538,86 @@ __define('./background.ts', (exports, module, __require) => {
           (_b = cam === null || cam === void 0 ? void 0 : cam.topScale) !== null && _b !== void 0 ? _b : 'ts',
           (_c = cam === null || cam === void 0 ? void 0 : cam.depthScale) !== null && _c !== void 0 ? _c : 'ds',
       ];
-      return [...baseParts, ...camParts].join('|');
+      return joinSignatureParts([...baseParts, ...camParts]);
   }
   function resolveBackground(backgroundKey) {
-      var _a, _b, _c;
-      const backgrounds = CFG.BACKGROUNDS;
-      if (!backgrounds || typeof backgrounds !== 'object')
+      var _a, _b, _c, _d, _e, _f;
+      const backgrounds = getBackgroundConfigMap();
+      if (backgrounds.size === 0)
           return null;
-      if (backgroundKey && backgrounds[backgroundKey]) {
-          return { key: backgroundKey, config: backgrounds[backgroundKey] };
-      }
-      const preferred = CFG.CURRENT_BACKGROUND || ((_a = CFG.SCENE) === null || _a === void 0 ? void 0 : _a.CURRENT_BACKGROUND);
-      if (preferred && backgrounds[preferred]) {
-          return { key: preferred, config: backgrounds[preferred] };
-      }
-      const themeKey = ((_b = CFG.SCENE) === null || _b === void 0 ? void 0 : _b.CURRENT_THEME) || ((_c = CFG.SCENE) === null || _c === void 0 ? void 0 : _c.DEFAULT_THEME);
-      if (themeKey && backgrounds[themeKey]) {
-          return { key: themeKey, config: backgrounds[themeKey] };
-      }
-      const [fallbackKey] = Object.keys(backgrounds);
-      if (fallbackKey) {
-          return { key: fallbackKey, config: backgrounds[fallbackKey] };
+      const tryResolve = (key) => {
+          if (!key)
+              return null;
+          const config = backgrounds.get(key);
+          return config ? { key, config } : null;
+      };
+      const direct = tryResolve(backgroundKey !== null && backgroundKey !== void 0 ? backgroundKey : null);
+      if (direct)
+          return direct;
+      const preferred = typeof CFG.CURRENT_BACKGROUND === 'string'
+          ? CFG.CURRENT_BACKGROUND
+          : typeof ((_a = CFG.SCENE) === null || _a === void 0 ? void 0 : _a.CURRENT_BACKGROUND) === 'string'
+              ? (_b = CFG.SCENE) === null || _b === void 0 ? void 0 : _b.CURRENT_BACKGROUND
+              : null;
+      const preferredMatch = tryResolve(preferred);
+      if (preferredMatch)
+          return preferredMatch;
+      const themeKey = typeof ((_c = CFG.SCENE) === null || _c === void 0 ? void 0 : _c.CURRENT_THEME) === 'string'
+          ? (_d = CFG.SCENE) === null || _d === void 0 ? void 0 : _d.CURRENT_THEME
+          : typeof ((_e = CFG.SCENE) === null || _e === void 0 ? void 0 : _e.DEFAULT_THEME) === 'string'
+              ? (_f = CFG.SCENE) === null || _f === void 0 ? void 0 : _f.DEFAULT_THEME
+              : null;
+      const themeMatch = tryResolve(themeKey);
+      if (themeMatch)
+          return themeMatch;
+      const firstEntry = backgrounds.entries().next();
+      if (!firstEntry.done) {
+          const [key, config] = firstEntry.value;
+          return { key, config };
       }
       return null;
   }
   function normalizePropConfig(propCfg) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20;
+      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x;
       if (!propCfg)
           return null;
-      const typeId = propCfg.type || propCfg.kind || null;
-      const typeDef = typeId ? ENVIRONMENT_PROP_TYPES[typeId] : undefined;
-      const anchor = {
-          x: (_d = (_b = (_a = propCfg.anchor) === null || _a === void 0 ? void 0 : _a.x) !== null && _b !== void 0 ? _b : (_c = typeDef === null || typeDef === void 0 ? void 0 : typeDef.anchor) === null || _c === void 0 ? void 0 : _c.x) !== null && _d !== void 0 ? _d : 0.5,
-          y: (_h = (_f = (_e = propCfg.anchor) === null || _e === void 0 ? void 0 : _e.y) !== null && _f !== void 0 ? _f : (_g = typeDef === null || typeDef === void 0 ? void 0 : typeDef.anchor) === null || _g === void 0 ? void 0 : _g.y) !== null && _h !== void 0 ? _h : 1,
-      };
-      const size = {
-          w: (_m = (_k = (_j = propCfg.size) === null || _j === void 0 ? void 0 : _j.w) !== null && _k !== void 0 ? _k : (_l = typeDef === null || typeDef === void 0 ? void 0 : typeDef.size) === null || _l === void 0 ? void 0 : _l.w) !== null && _m !== void 0 ? _m : 120,
-          h: (_r = (_p = (_o = propCfg.size) === null || _o === void 0 ? void 0 : _o.h) !== null && _p !== void 0 ? _p : (_q = typeDef === null || typeDef === void 0 ? void 0 : typeDef.size) === null || _q === void 0 ? void 0 : _q.h) !== null && _r !== void 0 ? _r : 180,
-      };
-      const palette = {
-          ...((_s = typeDef === null || typeDef === void 0 ? void 0 : typeDef.palette) !== null && _s !== void 0 ? _s : {}),
-          ...((_t = propCfg.palette) !== null && _t !== void 0 ? _t : {}),
-      };
-      const cellCx = (_w = (_u = propCfg.cx) !== null && _u !== void 0 ? _u : (_v = propCfg.cell) === null || _v === void 0 ? void 0 : _v.cx) !== null && _w !== void 0 ? _w : 0;
-      const cellCy = (_z = (_x = propCfg.cy) !== null && _x !== void 0 ? _x : (_y = propCfg.cell) === null || _y === void 0 ? void 0 : _y.cy) !== null && _z !== void 0 ? _z : 0;
-      const depth = (_2 = (_0 = propCfg.depth) !== null && _0 !== void 0 ? _0 : (_1 = propCfg.cell) === null || _1 === void 0 ? void 0 : _1.depth) !== null && _2 !== void 0 ? _2 : 0;
+      const typeId = typeof propCfg.type === 'string' ? propCfg.type : null;
+      const typeKey = typeId && isSceneryKey(typeId) ? typeId : null;
+      const typeDef = typeKey ? ENVIRONMENT_PROP_TYPES[typeKey] : null;
+      const anchorDefaults = (_a = typeDef === null || typeDef === void 0 ? void 0 : typeDef.anchor) !== null && _a !== void 0 ? _a : null;
+      const sizeDefaults = (_b = typeDef === null || typeDef === void 0 ? void 0 : typeDef.size) !== null && _b !== void 0 ? _b : null;
+      const anchor = normalizeVector(propCfg.anchor, (_c = anchorDefaults === null || anchorDefaults === void 0 ? void 0 : anchorDefaults.x) !== null && _c !== void 0 ? _c : 0.5, (_d = anchorDefaults === null || anchorDefaults === void 0 ? void 0 : anchorDefaults.y) !== null && _d !== void 0 ? _d : 1);
+      const size = normalizeSize(propCfg.size, (_e = sizeDefaults === null || sizeDefaults === void 0 ? void 0 : sizeDefaults.w) !== null && _e !== void 0 ? _e : 120, (_f = sizeDefaults === null || sizeDefaults === void 0 ? void 0 : sizeDefaults.h) !== null && _f !== void 0 ? _f : 180);
+      const palette = mergePalette((_g = typeDef === null || typeDef === void 0 ? void 0 : typeDef.palette) !== null && _g !== void 0 ? _g : null, (_h = propCfg.palette) !== null && _h !== void 0 ? _h : null);
+      const cellCx = toNumberOr((_j = propCfg.cx) !== null && _j !== void 0 ? _j : (_k = propCfg.cell) === null || _k === void 0 ? void 0 : _k.cx, 0);
+      const cellCy = toNumberOr((_l = propCfg.cy) !== null && _l !== void 0 ? _l : (_m = propCfg.cell) === null || _m === void 0 ? void 0 : _m.cy, 0);
+      const depth = toNumberOr((_p = (_o = propCfg.cell) === null || _o === void 0 ? void 0 : _o.depth) !== null && _p !== void 0 ? _p : propCfg.depth, 0);
       return {
           type: typeId,
-          asset: (_4 = (_3 = propCfg.asset) !== null && _3 !== void 0 ? _3 : typeDef === null || typeDef === void 0 ? void 0 : typeDef.asset) !== null && _4 !== void 0 ? _4 : null,
-          fallback: (_6 = (_5 = propCfg.fallback) !== null && _5 !== void 0 ? _5 : typeDef === null || typeDef === void 0 ? void 0 : typeDef.fallback) !== null && _6 !== void 0 ? _6 : null,
+          asset: typeof propCfg.asset === 'string' ? propCfg.asset : (_q = typeDef === null || typeDef === void 0 ? void 0 : typeDef.asset) !== null && _q !== void 0 ? _q : null,
+          fallback: (_s = (_r = cloneFallback(propCfg.fallback)) !== null && _r !== void 0 ? _r : cloneFallback(typeDef === null || typeDef === void 0 ? void 0 : typeDef.fallback)) !== null && _s !== void 0 ? _s : null,
           palette,
           anchor,
           size,
           cell: { cx: cellCx, cy: cellCy },
           depth,
-          baseLift: (_8 = (_7 = propCfg.baseLift) !== null && _7 !== void 0 ? _7 : typeDef === null || typeDef === void 0 ? void 0 : typeDef.baseLift) !== null && _8 !== void 0 ? _8 : 0.5,
+          baseLift: toNumberOr(propCfg.baseLift, (_t = typeDef === null || typeDef === void 0 ? void 0 : typeDef.baseLift) !== null && _t !== void 0 ? _t : 0.5),
           offset: {
-              x: (_10 = (_9 = propCfg.offset) === null || _9 === void 0 ? void 0 : _9.x) !== null && _10 !== void 0 ? _10 : 0,
-              y: (_12 = (_11 = propCfg.offset) === null || _11 === void 0 ? void 0 : _11.y) !== null && _12 !== void 0 ? _12 : 0,
+              x: toNumberOr((_u = propCfg.offset) === null || _u === void 0 ? void 0 : _u.x, 0),
+              y: toNumberOr((_v = propCfg.offset) === null || _v === void 0 ? void 0 : _v.y, 0),
           },
           pixelOffset: {
-              x: (_14 = (_13 = propCfg.pixelOffset) === null || _13 === void 0 ? void 0 : _13.x) !== null && _14 !== void 0 ? _14 : 0,
-              y: (_16 = (_15 = propCfg.pixelOffset) === null || _15 === void 0 ? void 0 : _15.y) !== null && _16 !== void 0 ? _16 : 0,
+              x: toNumberOr((_w = propCfg.pixelOffset) === null || _w === void 0 ? void 0 : _w.x, 0),
+              y: toNumberOr((_x = propCfg.pixelOffset) === null || _x === void 0 ? void 0 : _x.y, 0),
           },
-          scale: (_17 = propCfg.scale) !== null && _17 !== void 0 ? _17 : 1,
-          alpha: (_18 = propCfg.alpha) !== null && _18 !== void 0 ? _18 : 1,
-          flip: (_19 = propCfg.flip) !== null && _19 !== void 0 ? _19 : 1,
-          sortBias: (_20 = propCfg.sortBias) !== null && _20 !== void 0 ? _20 : 0,
+          scale: toNumberOr(propCfg.scale, 1),
+          alpha: toNumberOr(propCfg.alpha, 1),
+          flip: toNumberOr(propCfg.flip, 1),
+          sortBias: toNumberOr(propCfg.sortBias, 0),
       };
   }
   function getBackgroundPropCache(config) {
+      var _a;
       if (!config)
           return null;
       const props = Array.isArray(config.props) ? config.props : [];
@@ -1380,7 +1630,7 @@ __define('./background.ts', (exports, module, __require) => {
               if (!prop)
                   continue;
               const cyWithDepth = prop.cell.cy + prop.depth;
-              const spriteEntry = prop.asset ? ensureSpriteLoaded({ sprite: prop.asset }) : null;
+              const spriteEntry = ensureEnvironmentSprite((_a = prop.asset) !== null && _a !== void 0 ? _a : '');
               normalizedProps.push({
                   prop,
                   base: {
@@ -1400,9 +1650,9 @@ __define('./background.ts', (exports, module, __require) => {
       return cache;
   }
   function buildBoardState(normalizedProps, g, cam) {
-      var _a, _b;
+      var _a, _b, _c;
       if (!g)
-          return null;
+          return undefined;
       const rowGap = ((_a = (cam === null || cam === void 0 ? void 0 : cam.rowGapRatio)) !== null && _a !== void 0 ? _a : 0.62) * g.tile;
       const drawables = [];
       for (const entry of normalizedProps) {
@@ -1411,7 +1661,7 @@ __define('./background.ts', (exports, module, __require) => {
           const { prop, base } = entry;
           const projection = projectCellOblique(g, base.cx, base.cyWithDepth, cam);
           const scale = projection.scale * prop.scale;
-          const spriteEntry = (_b = entry.spriteEntry) !== null && _b !== void 0 ? _b : (prop.asset ? ensureSpriteLoaded({ sprite: prop.asset }) : null);
+          const spriteEntry = (_b = entry.spriteEntry) !== null && _b !== void 0 ? _b : ensureEnvironmentSprite((_c = prop.asset) !== null && _c !== void 0 ? _c : '');
           entry.spriteEntry = spriteEntry;
           drawables.push({
               prop,
@@ -1555,6 +1805,7 @@ __define('./background.ts', (exports, module, __require) => {
       return resolved ? resolved.config : null;
   }
 
+  if (!Object.prototype.hasOwnProperty.call(exports, 'SCENERY')) exports.SCENERY = SCENERY;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ENVIRONMENT_PROP_TYPES')) exports.ENVIRONMENT_PROP_TYPES = ENVIRONMENT_PROP_TYPES;
   if (!Object.prototype.hasOwnProperty.call(exports, 'drawEnvironmentProps')) exports.drawEnvironmentProps = drawEnvironmentProps;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getEnvironmentBackground')) exports.getEnvironmentBackground = getEnvironmentBackground;
@@ -1565,6 +1816,10 @@ __define('./catalog.ts', (exports, module, __require) => {
   // 1) Rank multiplier (đơn giản) — áp lên TẤT CẢ stat trừ SPD
   const __dep0 = __require('./utils/kit.ts');
   const kitSupportsSummon = __dep0.kitSupportsSummon;
+  const asUnknownRecord = (value) => value;
+  const asUnknownRecordArray = (value) => value;
+  const isObjectLike = (value) => (!!value && typeof value === 'object' && !Array.isArray(value));
+  const asUnitKitConfig = (value) => (isObjectLike(value) ? value : null);
   const RANK_MULT = {
       N: 0.80,
       R: 0.90,
@@ -1609,21 +1864,43 @@ __define('./catalog.ts', (exports, module, __require) => {
   const ROSTER = [
       {
           id: 'phe', name: 'Phệ', class: 'Mage', rank: 'Prime',
-          mods: { WIL: +0.10, AEregen: +0.10 }, // 20% tổng
+          mods: { WIL: 0.10, AEregen: 0.10 }, // 20% tổng
           kit: {
-              onSpawn: { rage: 100, exceptLeader: true },
-              basic: {
+              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+              basic: asUnknownRecord({
                   name: 'Đánh Thường',
                   tags: ['single-target', 'lifesteal', 'mark'],
                   lifesteal: 0.10,
                   mark: { id: 'mark_devour', maxStacks: 3, ttlTurns: 3 }
-              },
-              skills: [
-                  { key: 'skill1', name: 'Song Huyết Cầu', cost: { aether: 25 }, hits: 2, countsAsBasic: true, targets: 'randomEnemies', notes: 'Mỗi hit làm mới thời hạn Phệ Ấn.' },
-                  { key: 'skill2', name: 'Huyết Chướng', cost: { aether: 25 }, duration: 2, reduceDamage: 0.30, healPercentMaxHPPerTurn: 0.15, untargetable: true },
-                  { key: 'skill3', name: 'Huyết Thệ', cost: { aether: 40 }, duration: 5, link: { sharePercent: 0.5, maxLinks: 1 } }
-              ],
-              ult: {
+              }),
+              skills: asUnknownRecordArray([
+                  {
+                      key: 'skill1',
+                      name: 'Song Huyết Cầu',
+                      cost: { aether: 25 },
+                      hits: 2,
+                      countsAsBasic: true,
+                      targets: 'randomEnemies',
+                      notes: 'Mỗi hit làm mới thời hạn Phệ Ấn.'
+                  },
+                  {
+                      key: 'skill2',
+                      name: 'Huyết Chướng',
+                      cost: { aether: 25 },
+                      duration: 2,
+                      reduceDamage: 0.30,
+                      healPercentMaxHPPerTurn: 0.15,
+                      untargetable: true
+                  },
+                  {
+                      key: 'skill3',
+                      name: 'Huyết Thệ',
+                      cost: { aether: 40 },
+                      duration: 5,
+                      link: { sharePercent: 0.5, maxLinks: 1 }
+                  }
+              ]),
+              ult: asUnknownRecord({
                   type: 'drain',
                   countsAsBasic: true,
                   aoe: 'allEnemies',
@@ -1635,82 +1912,141 @@ __define('./catalog.ts', (exports, module, __require) => {
                   selfBuff: { stat: 'WIL', amount: 0.20, turns: 2 },
                   marksPerTarget: 1,
                   notes: 'Không thể né; mỗi mục tiêu nhận thêm 1 Phệ Ấn.'
-              },
-              talent: {
+              }),
+              talent: asUnknownRecord({
                   name: 'Phệ Ấn',
                   id: 'mark_devour',
                   maxStacks: 3,
                   ttlTurns: 3,
                   explosion: { scaleWIL: 0.50 },
                   blessing: { hpMax: 0.15, hpRegen: 0.50 }
-              },
+              }),
               technique: null,
-              passives: [
-                  { id: 'mark_devour', name: 'Phệ Ấn', when: 'onBasicHit', effect: 'placeMark', params: { stacksToExplode: 3, ttlTurns: 3, dmgFromWIL: 0.5, purgeable: false } }
-              ],
-              traits: [
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'mark_devour',
+                      name: 'Phệ Ấn',
+                      when: 'onBasicHit',
+                      effect: 'placeMark',
+                      params: { stacksToExplode: 3, ttlTurns: 3, dmgFromWIL: 0.5, purgeable: false }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
                   { id: 'mark_cap', text: 'Phệ Ấn tối đa 3 tầng và tự kích nổ vào lượt của mục tiêu.' },
                   { id: 'overheal_cap', text: 'Hút máu dư chuyển thành Giáp Máu tối đa bằng 100% Máu tối đa.' },
                   { id: 'link_limit', text: 'Chỉ duy trì 1 liên kết Huyết Thệ cùng lúc.' }
-              ]
+              ])
           }
       },
       {
           id: 'kiemtruongda', name: 'Kiếm Trường Dạ', class: 'Warrior', rank: 'Prime',
-          mods: { ATK: +0.12, PER: +0.08 },
+          mods: { ATK: 0.12, PER: 0.08 },
           kit: {
-              onSpawn: { rage: 100, exceptLeader: true },
-              basic: {
+              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+              basic: asUnknownRecord({
                   name: 'Đánh Thường',
                   tags: ['single-target', 'armor-pierce'],
                   piercePercent: 0.05
-              },
-              skills: [
-                  { key: 'skill1', name: 'Loạn Trảm Dạ Hành', cost: { aether: 25 }, countsAsBasic: true, targets: 'randomRow', damageMultiplier: 1.50 },
-                  { key: 'skill2', name: 'Ngũ Kiếm Huyền Ấn', cost: { aether: 20 }, duration: 'battle', randomStance: ['Kiếm Sinh', 'Kiếm Ma', 'Kiếm Thổ', 'Kiếm Hỏa', 'Kiếm Hư'] },
-                  { key: 'skill3', name: 'Kiếm Ý Tinh Luyện', cost: { aether: 25 }, delayTurns: 1, duration: 3, buffStats: { ATK: 0.20, WIL: 0.20 } }
-              ],
-              ult: {
+              }),
+              skills: asUnknownRecordArray([
+                  {
+                      key: 'skill1',
+                      name: 'Loạn Trảm Dạ Hành',
+                      cost: { aether: 25 },
+                      countsAsBasic: true,
+                      targets: 'randomRow',
+                      damageMultiplier: 1.50
+                  },
+                  {
+                      key: 'skill2',
+                      name: 'Ngũ Kiếm Huyền Ấn',
+                      cost: { aether: 20 },
+                      duration: 'battle',
+                      randomStance: ['Kiếm Sinh', 'Kiếm Ma', 'Kiếm Thổ', 'Kiếm Hỏa', 'Kiếm Hư']
+                  },
+                  {
+                      key: 'skill3',
+                      name: 'Kiếm Ý Tinh Luyện',
+                      cost: { aether: 25 },
+                      delayTurns: 1,
+                      duration: 3,
+                      buffStats: { ATK: 0.20, WIL: 0.20 }
+                  }
+              ]),
+              ult: asUnknownRecord({
                   type: 'strikeLaneMid',
                   countsAsBasic: true,
                   hits: 4,
                   penRES: 0.30,
                   bonusVsLeader: 0.20,
                   targets: 'columnMid'
-              },
-              talent: {
+              }),
+              talent: asUnknownRecord({
                   name: 'Kiếm Tâm',
                   scaling: { stats: { ATK: 0.05, WIL: 0.05 }, basedOn: 'battleStart' }
-              },
+              }),
               technique: null,
-              passives: [
-                  { id: 'atk_on_ult', name: 'Kiếm Tâm - ATK', when: 'onUltCast', effect: 'gainATK%', params: { amount: +0.05, duration: 'perm', stack: true, purgeable: false } },
-                  { id: 'wil_on_ult', name: 'Kiếm Tâm - WIL', when: 'onUltCast', effect: 'gainWIL%', params: { amount: +0.05, duration: 'perm', stack: true, purgeable: false } }
-              ],
-              traits: [
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'atk_on_ult',
+                      name: 'Kiếm Tâm - ATK',
+                      when: 'onUltCast',
+                      effect: 'gainATK%',
+                      params: { amount: 0.05, duration: 'perm', stack: true, purgeable: false }
+                  },
+                  {
+                      id: 'wil_on_ult',
+                      name: 'Kiếm Tâm - WIL',
+                      when: 'onUltCast',
+                      effect: 'gainWIL%',
+                      params: { amount: 0.05, duration: 'perm', stack: true, purgeable: false }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
                   { id: 'stance_unique', text: 'Ngũ Kiếm Huyền Ấn chỉ chọn 1 trạng thái cho tới hết trận.' },
                   { id: 'refine_delay', text: 'Kiếm Ý Tinh Luyện kích hoạt sau 1 lượt trì hoãn.' },
                   { id: 'ult_scaling', text: 'Mỗi lần dùng Vạn Kiếm Quy Tông cộng vĩnh viễn +5% ATK/WIL (không giới hạn).' }
-              ]
+              ])
           }
       },
       {
           id: 'loithienanh', name: 'Lôi Thiên Ảnh', class: 'Tanker', rank: 'SSR',
-          mods: { RES: +0.10, WIL: +0.10 },
+          mods: { RES: 0.10, WIL: 0.10 },
           kit: {
-              onSpawn: { rage: 100, exceptLeader: true },
-              basic: {
+              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+              basic: asUnknownRecord({
                   name: 'Đánh Thường',
                   hits: 2,
                   tags: ['multi-hit', 'spd-debuff'],
                   debuff: { stat: 'SPD', amount: -0.02, maxStacks: 5 }
-              },
-              skills: [
-                  { key: 'skill1', name: 'Lôi Ảnh Tam Kích', cost: { aether: 25 }, hits: 3, countsAsBasic: true, targets: 'randomEnemies', bonusIfAdjacent: 0.10 },
-                  { key: 'skill2', name: 'Ngũ Lôi Phệ Thân', cost: { aether: 35 }, hpTradePercent: 0.05, hits: 5, targets: 'randomEnemies' },
-                  { key: 'skill3', name: 'Lôi Thể Bách Chiến', cost: { aether: 30 }, bonusMaxHPBase: 0.20, limitUses: 3 }
-              ],
-              ult: {
+              }),
+              skills: asUnknownRecordArray([
+                  {
+                      key: 'skill1',
+                      name: 'Lôi Ảnh Tam Kích',
+                      cost: { aether: 25 },
+                      hits: 3,
+                      countsAsBasic: true,
+                      targets: 'randomEnemies',
+                      bonusIfAdjacent: 0.10
+                  },
+                  {
+                      key: 'skill2',
+                      name: 'Ngũ Lôi Phệ Thân',
+                      cost: { aether: 35 },
+                      hpTradePercent: 0.05,
+                      hits: 5,
+                      targets: 'randomEnemies'
+                  },
+                  {
+                      key: 'skill3',
+                      name: 'Lôi Thể Bách Chiến',
+                      cost: { aether: 30 },
+                      bonusMaxHPBase: 0.20,
+                      limitUses: 3
+                  }
+              ]),
+              ult: asUnknownRecord({
                   type: 'hpTradeBurst',
                   countsAsBasic: true,
                   hpTradePercent: 0.15,
@@ -1720,161 +2056,242 @@ __define('./catalog.ts', (exports, module, __require) => {
                   duration: 2,
                   appliesDebuff: { stat: 'SPD', amount: -0.02, maxStacks: 5 },
                   notes: 'Không tự sát, tối thiểu còn 1 HP.'
-              },
-              talent: {
+              }),
+              talent: asUnknownRecord({
                   name: 'Song Thể Lôi Đạo',
                   conditional: {
                       ifHPAbove: 0.5,
                       stats: { ARM: 0.20, RES: 0.20 },
                       elseStats: { ATK: 0.20, WIL: 0.20 }
                   }
-              },
+              }),
               technique: null,
-              passives: [{ id: 'swap_res_wil', name: 'Song Thể Lôi Đạo', when: 'onTurnStart', effect: 'conditionalBuff',
-                      params: { ifHPgt: 0.5, RES: +0.20, ARM: +0.20, elseATK: +0.20, elseWIL: +0.20, purgeable: false } }],
-              traits: [
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'swap_res_wil',
+                      name: 'Song Thể Lôi Đạo',
+                      when: 'onTurnStart',
+                      effect: 'conditionalBuff',
+                      params: { ifHPgt: 0.5, RES: 0.20, ARM: 0.20, elseATK: 0.20, elseWIL: 0.20, purgeable: false }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
                   { id: 'hp_trade_limits', text: 'Mọi kỹ năng đốt máu không thể khiến Lôi Thiên Ảnh tự sát (tối thiểu còn 1 HP).' },
                   { id: 'spd_burn', text: 'Giảm SPD cộng dồn tối đa 5 tầng từ đòn đánh thường và tuyệt kỹ.' },
                   { id: 'body_fortify_lock', text: 'Lôi Thể Bách Chiến bị khoá vĩnh viễn sau 3 lần sử dụng.' }
-              ]
+              ])
           }
       },
       {
           id: 'laky', name: 'La Kỳ', class: 'Support', rank: 'SSR',
-          mods: { WIL: +0.10, PER: +0.10 },
+          mods: { WIL: 0.10, PER: 0.10 },
           kit: {
-              onSpawn: { rage: 100, exceptLeader: true },
-              basic: {
+              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+              basic: asUnknownRecord({
                   name: 'Đánh Thường',
                   tags: ['single-target', 'sleep-setup'],
                   debuff: { id: 'me_hoac', stacks: 1, maxStacks: 4 }
-              },
-              skills: [
-                  { key: 'skill1', name: 'Mộng Trảo', cost: { aether: 25 }, hits: 3, countsAsBasic: true, targets: 'randomEnemies' },
-                  { key: 'skill2', name: 'Vạn Mộng Trận', cost: { aether: 35 }, hits: 5, countsAsBasic: true, targets: 'randomEnemies' },
-                  { key: 'skill3', name: 'Mộng Giới Hộ Thân', cost: { aether: 20 }, duration: 3, reduceDamage: 0.20 }
-              ],
-              ult: { type: 'sleep', targets: 3, turns: 2, bossModifier: 0.5 },
-              talent: {
+              }),
+              skills: asUnknownRecordArray([
+                  {
+                      key: 'skill1',
+                      name: 'Mộng Trảo',
+                      cost: { aether: 25 },
+                      hits: 3,
+                      countsAsBasic: true,
+                      targets: 'randomEnemies'
+                  },
+                  {
+                      key: 'skill2',
+                      name: 'Vạn Mộng Trận',
+                      cost: { aether: 35 },
+                      hits: 5,
+                      countsAsBasic: true,
+                      targets: 'randomEnemies'
+                  },
+                  {
+                      key: 'skill3',
+                      name: 'Mộng Giới Hộ Thân',
+                      cost: { aether: 20 },
+                      duration: 3,
+                      reduceDamage: 0.20
+                  }
+              ]),
+              ult: asUnknownRecord({ type: 'sleep', targets: 3, turns: 2, bossModifier: 0.5 }),
+              talent: asUnknownRecord({
                   name: 'Mê Mộng Chú',
                   resPerSleeping: 0.02
-              },
+              }),
               technique: null,
-              passives: [{ id: 'res_per_sleeping_enemy', name: 'Mê Mộng Chú', when: 'onTurnStart', effect: 'gainRES%', params: { perTarget: +0.02, unlimited: true } }],
-              traits: [
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'res_per_sleeping_enemy',
+                      name: 'Mê Mộng Chú',
+                      when: 'onTurnStart',
+                      effect: 'gainRES%',
+                      params: { perTarget: 0.02, unlimited: true }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
                   { id: 'me_hoac_limit', text: 'Tối đa 4 tầng Mê Hoặc, kích hoạt ngủ trong 1 lượt rồi đặt lại.' },
                   { id: 'boss_sleep_half', text: 'Boss PvE chỉ ngủ nửa thời gian (làm tròn xuống).' }
-              ]
+              ])
           }
       },
       {
           id: 'kydieu', name: 'Kỳ Diêu', class: 'Support', rank: 'SR',
-          mods: { WIL: +0.10, RES: +0.10 },
+          mods: { WIL: 0.10, RES: 0.10 },
           kit: {
-              onSpawn: { rage: 100, exceptLeader: true },
-              basic: {
+              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+              basic: asUnknownRecord({
                   name: 'Đánh Thường',
                   tags: ['single-target']
-              },
-              skills: [
+              }),
+              skills: asUnknownRecordArray([
                   { key: 'skill1', name: 'Tế Lễ Phản Hồn', cost: { aether: 20 }, duration: 3, selfRegenPercent: 0.08 },
-                  { key: 'skill2', name: 'Thí Thân Hộ Chủ', cost: { aether: 15 }, sacrifice: true, reviveDelayTurns: 4, reviveReturn: { hpPercent: 0.5, ragePercent: 0.5, aether: 0 }, grantLeader: { buff: 'indomitability', stacks: 1 } },
+                  {
+                      key: 'skill2',
+                      name: 'Thí Thân Hộ Chủ',
+                      cost: { aether: 15 },
+                      sacrifice: true,
+                      reviveDelayTurns: 4,
+                      reviveReturn: { hpPercent: 0.5, ragePercent: 0.5, aether: 0 },
+                      grantLeader: { buff: 'indomitability', stacks: 1 }
+                  },
                   { key: 'skill3', name: 'Tế Vũ Tăng Bão', cost: { aether: 20 }, duration: 4, rageGainBonus: 0.50 }
-              ],
-              ult: { type: 'revive', targets: 1, revived: { rage: 0, lockSkillsTurns: 1, hpPercent: 0.15 } },
-              talent: {
+              ]),
+              ult: asUnknownRecord({ type: 'revive', targets: 1, revived: { rage: 0, lockSkillsTurns: 1, hpPercent: 0.15 } }),
+              talent: asUnknownRecord({
                   name: 'Phục Tế Khôi Minh',
                   perActionStacks: { ARM: 0.03, RES: 0.03 }
-              },
+              }),
               technique: null,
-              passives: [{ id: 'res_stack_per_action', name: 'Phục Tế Khôi Minh', when: 'onActionEnd', effect: 'gainRES%', params: { amount: +0.01, stack: true, purgeable: false } }],
-              traits: [
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'res_stack_per_action',
+                      name: 'Phục Tế Khôi Minh',
+                      when: 'onActionEnd',
+                      effect: 'gainRES%',
+                      params: { amount: 0.01, stack: true, purgeable: false }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
                   { id: 'self_sacrifice_return', text: 'Sau 4 lượt tự hiến, Kỳ Diêu hồi sinh với 50% HP, 50% nộ và 0 Aether; sân kín thì biến mất.' },
                   { id: 'revive_lock', text: 'Đồng minh do tuyệt kỹ hồi sinh bị khoá kỹ năng 1 lượt và nộ về 0.' }
-              ]
+              ])
           }
       },
       {
           id: 'doanminh', name: 'Doãn Minh', class: 'Support', rank: 'SR',
-          mods: { WIL: +0.10, AEmax: +0.10 },
+          mods: { WIL: 0.10, AEmax: 0.10 },
           kit: {
-              onSpawn: { rage: 100, exceptLeader: true, teamHealOnEntry: 0.05 },
-              basic: {
+              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, teamHealOnEntry: 0.05 }),
+              basic: asUnknownRecord({
                   name: 'Đánh Thường',
                   tags: ['single-target']
-              },
-              skills: [
+              }),
+              skills: asUnknownRecordArray([
                   { key: 'skill1', name: 'Cán Cân Giáng Phạt', cost: { aether: 20 }, countsAsBasic: true, damageMultiplier: 1.50 },
                   { key: 'skill2', name: 'Phán Xét Cứu Rỗi', cost: { aether: 15 }, healPercentCasterMaxHP: 0.10, targets: 3 },
                   { key: 'skill3', name: 'Cân Bằng Sinh Mệnh', cost: { aether: 15 }, bonusMaxHPBase: 0.10, limitUses: 5 }
-              ],
-              ult: { type: 'equalizeHP', allies: 3, healLeader: true, leaderHealPercentCasterMaxHP: 0.10 },
-              talent: {
+              ]),
+              ult: asUnknownRecord({ type: 'equalizeHP', allies: 3, healLeader: true, leaderHealPercentCasterMaxHP: 0.10 }),
+              talent: asUnknownRecord({
                   name: 'Thăng Bình Pháp Lực',
                   onSpawnHealPercent: 0.05
-              },
+              }),
               technique: null,
-              passives: [],
-              traits: [
+              passives: asUnknownRecordArray([]),
+              traits: asUnknownRecordArray([
                   { id: 'hp_balance', text: 'Cân bằng HP không vượt quá ngưỡng tối đa và bỏ qua Leader.' },
                   { id: 'hp_gain_cap', text: 'Cân Bằng Sinh Mệnh chỉ dùng tối đa 5 lần mỗi trận.' }
-              ]
+              ])
           }
       },
       {
           id: 'tranquat', name: 'Trần Quát', class: 'Summoner', rank: 'R',
-          mods: { ATK: +0.10, PER: +0.10 },
+          mods: { ATK: 0.10, PER: 0.10 },
           kit: {
-              onSpawn: { rage: 100, exceptLeader: true },
-              basic: {
+              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+              basic: asUnknownRecord({
                   name: 'Đánh Thường',
                   tags: ['single-target']
-              },
-              skills: [
+              }),
+              skills: asUnknownRecordArray([
                   { key: 'skill1', name: 'Sai Khiển Tiểu Đệ', cost: { aether: 15 }, ordersMinions: 2 },
                   { key: 'skill2', name: 'Khiên Mộc Dẫn Địch', cost: { aether: 20 }, duration: 3, applyTauntToMinions: true },
-                  { key: 'skill3', name: 'Tăng Cường Tòng Bộc', cost: { aether: 20 }, inheritBonus: { HP: 0.20, ATK: 0.20, WIL: 0.20 }, limitUses: 5 }
-              ],
-              ult: { type: 'summon', pattern: 'verticalNeighbors', count: 2, ttl: 4, inherit: { HP: 0.50, ATK: 0.50, WIL: 0.50 }, limit: 2, replace: 'oldest', creep: { hasRage: false, canChain: false, basicOnly: true } },
-              talent: {
+                  {
+                      key: 'skill3',
+                      name: 'Tăng Cường Tòng Bộc',
+                      cost: { aether: 20 },
+                      inheritBonus: { HP: 0.20, ATK: 0.20, WIL: 0.20 },
+                      limitUses: 5
+                  }
+              ]),
+              ult: asUnknownRecord({
+                  type: 'summon',
+                  pattern: 'verticalNeighbors',
+                  count: 2,
+                  ttl: 4,
+                  inherit: { HP: 0.50, ATK: 0.50, WIL: 0.50 },
+                  limit: 2,
+                  replace: 'oldest',
+                  creep: { hasRage: false, canChain: false, basicOnly: true }
+              }),
+              talent: asUnknownRecord({
                   name: 'Đại Ca Đầu Đàn',
                   perMinionBasicBonus: 0.15,
                   onMinionDeath: { stats: { ATK: 0.05, WIL: 0.05 }, maxStacks: 3 }
-              },
+              }),
               technique: null,
-              passives: [{ id: 'basic_dmg_per_minion', name: 'Đại Ca Đầu Đàn', when: 'onBasicHit', effect: 'gainBonus', params: { perMinion: +0.02 } }],
-              traits: [
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'basic_dmg_per_minion',
+                      name: 'Đại Ca Đầu Đàn',
+                      when: 'onBasicHit',
+                      effect: 'gainBonus',
+                      params: { perMinion: 0.02 }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
                   { id: 'summon_ttl', text: 'Tiểu đệ tồn tại tối đa 4 lượt và không thể hồi sinh.' },
                   { id: 'summon_limit', text: 'Chỉ duy trì tối đa 2 tiểu đệ; triệu hồi mới thay thế đơn vị tồn tại lâu nhất.' },
                   { id: 'boost_lock', text: 'Tăng Cường Tòng Bộc khóa sau 5 lần sử dụng và chỉ ảnh hưởng tiểu đệ triệu hồi sau đó.' }
-              ]
+              ])
           }
       },
       {
           id: 'linhgac', name: 'Lính Gác', class: 'Warrior', rank: 'N',
-          mods: { ARM: +0.10, ATK: +0.10 },
+          mods: { ARM: 0.10, ATK: 0.10 },
           kit: {
-              onSpawn: { rage: 100, exceptLeader: true },
-              basic: {
+              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+              basic: asUnknownRecord({
                   name: 'Đánh Thường',
                   tags: ['single-target']
-              },
-              skills: [
+              }),
+              skills: asUnknownRecordArray([
                   { key: 'skill1', name: 'Trảm Cảnh Giới', cost: { aether: 20 }, countsAsBasic: true, damageMultiplier: 1.50 },
                   { key: 'skill2', name: 'Thành Lũy Tạm Thời', cost: { aether: 15 }, duration: 3, buffStats: { RES: 0.20, ARM: 0.20 } },
-                  { key: 'skill3', name: 'Kiên Cố Trường Kỳ', cost: { aether: 20 }, permanent: true, buffStats: { RES: 0.05, ARM: 0.05 }, lowHPBonus: { threshold: 0.30, stats: { RES: 0.15, ARM: 0.15 } } }
-              ],
-              ult: { type: 'haste', targets: 'self+2allies', attackSpeed: +0.20, turns: 2, selfBasicBonus: 0.05 },
-              talent: {
+                  {
+                      key: 'skill3',
+                      name: 'Kiên Cố Trường Kỳ',
+                      cost: { aether: 20 },
+                      permanent: true,
+                      buffStats: { RES: 0.05, ARM: 0.05 },
+                      lowHPBonus: { threshold: 0.30, stats: { RES: 0.15, ARM: 0.15 } }
+                  }
+              ]),
+              ult: asUnknownRecord({ type: 'haste', targets: 'self+2allies', attackSpeed: 0.20, turns: 2, selfBasicBonus: 0.05 }),
+              talent: asUnknownRecord({
                   name: 'Cảnh Giới Bất Biến',
                   onSpawnStats: { AGI: 0.05, ATK: 0.05 }
-              },
+              }),
               technique: null,
-              passives: [],
-              traits: [
+              passives: asUnknownRecordArray([]),
+              traits: asUnknownRecordArray([
                   { id: 'permanent_stack', text: 'Kiên Cố Trường Kỳ cộng dồn vĩnh viễn, mạnh hơn khi HP < 30%.' },
                   { id: 'ult_damage_bonus', text: 'Trong thời gian Còi Tăng Tốc, đòn đánh thường gây thêm 5% sát thương.' }
-              ]
+              ])
           }
       }
   ];
@@ -1898,6 +2315,15 @@ __define('./catalog.ts', (exports, module, __require) => {
           return undefined;
       return ROSTER_MAP.get(id);
   };
+  const unitKitEntries = ROSTER.map((entry) => [entry.id, asUnitKitConfig(entry.kit)]);
+  const UNIT_KITS = Object.freeze(Object.fromEntries(unitKitEntries));
+  const getUnitKitById = (id) => {
+      var _a;
+      if (typeof id !== 'string')
+          return null;
+      const kit = (_a = UNIT_KITS[id]) !== null && _a !== void 0 ? _a : null;
+      return asUnitKitConfig(kit);
+  };
   const isSummoner = (id) => {
       const m = getMetaById(id);
       return !!(m && m.class === 'Summoner' && kitSupportsSummon(m));
@@ -1909,6 +2335,8 @@ __define('./catalog.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'UNIT_BASE')) exports.UNIT_BASE = UNIT_BASE;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ROSTER_MAP')) exports.ROSTER_MAP = ROSTER_MAP;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getMetaById')) exports.getMetaById = getMetaById;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'UNIT_KITS')) exports.UNIT_KITS = UNIT_KITS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getUnitKitById')) exports.getUnitKitById = getUnitKitById;
   if (!Object.prototype.hasOwnProperty.call(exports, 'isSummoner')) exports.isSummoner = isSummoner;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyRankAndMods')) exports.applyRankAndMods = applyRankAndMods;
 });
@@ -1917,6 +2345,7 @@ __define('./combat.ts', (exports, module, __require) => {
   const Statuses = __dep0.Statuses;
   const hookOnLethalDamage = __dep0.hookOnLethalDamage;
   const __dep1 = __require('./vfx.ts');
+  const asSessionWithVfx = __dep1.asSessionWithVfx;
   const vfxAddHit = __dep1.vfxAddHit;
   const vfxAddMelee = __dep1.vfxAddMelee;
   const vfxAddLightningArc = __dep1.vfxAddLightningArc;
@@ -1924,6 +2353,7 @@ __define('./combat.ts', (exports, module, __require) => {
   const slotToCell = __dep2.slotToCell;
   const __dep3 = __require('./passives.ts');
   const emitPassiveEvent = __dep3.emitPassiveEvent;
+  const getPassiveLog = __dep3.getPassiveLog;
   const __dep4 = __require('./config.ts');
   const CFG = __dep4.CFG;
   const __dep5 = __require('./utils/fury.ts');
@@ -1932,6 +2362,7 @@ __define('./combat.ts', (exports, module, __require) => {
   const finishFuryHit = __dep5.finishFuryHit;
   const __dep6 = __require('./utils/time.ts');
   const safeNow = __dep6.safeNow;
+  const isBasicAttackAfterHitHandler = (handler) => typeof handler === 'function';
   const GAME_CONFIG = CFG;
   function pickTarget(Game, attacker) {
       var _a;
@@ -2004,10 +2435,12 @@ __define('./combat.ts', (exports, module, __require) => {
       if (target.hp <= 0) {
           hookOnLethalDamage(target);
       }
-      Statuses.afterDamage(attacker, target, { dealt: remain, absorbed: abs.absorbed, dtype });
-      if (Game) {
+      const damageResult = { dealt: remain, absorbed: abs.absorbed, dtype };
+      Statuses.afterDamage(attacker, target, damageResult);
+      const sessionVfx = asSessionWithVfx(Game);
+      if (sessionVfx) {
           try {
-              vfxAddHit(Game, target);
+              vfxAddHit(sessionVfx, target);
           }
           catch {
               // bỏ qua lỗi VFX runtime
@@ -2078,6 +2511,7 @@ __define('./combat.ts', (exports, module, __require) => {
       if (!resolved)
           return;
       const isLoithienanh = unit.id === 'loithienanh';
+      const sessionVfx = asSessionWithVfx(Game);
       const updateTurnBusy = (startedAt, busyMs) => {
           if (!Game.turn)
               return;
@@ -2087,11 +2521,11 @@ __define('./combat.ts', (exports, module, __require) => {
           Game.turn.busyUntil = Math.max(prevBusy, startedAt + busyMs);
       };
       const triggerLightningArc = (timing) => {
-          if (!isLoithienanh)
+          if (!isLoithienanh || !sessionVfx)
               return;
           const arcStart = safeNow();
           try {
-              const busyMs = vfxAddLightningArc(Game, unit, resolved, {
+              const busyMs = vfxAddLightningArc(sessionVfx, unit, resolved, {
                   bindingKey: 'basic_combo',
                   timing,
               });
@@ -2105,18 +2539,20 @@ __define('./combat.ts', (exports, module, __require) => {
           target: resolved,
           damage: { baseMul: 1, flatAdd: 0 },
           afterHit: [],
-          log: Game === null || Game === void 0 ? void 0 : Game.passiveLog,
+          log: getPassiveLog(Game),
       };
       emitPassiveEvent(Game, unit, 'onBasicHit', passiveCtx);
       const meleeDur = (_c = (_b = GAME_CONFIG.ANIMATION) === null || _b === void 0 ? void 0 : _b.meleeDurationMs) !== null && _c !== void 0 ? _c : 1100;
       const meleeStartMs = safeNow();
       let meleeTriggered = false;
-      try {
-          vfxAddMelee(Game, unit, resolved, { dur: meleeDur });
-          meleeTriggered = true;
-      }
-      catch {
-          // bỏ qua lỗi VFX runtime
+      if (sessionVfx) {
+          try {
+              vfxAddMelee(sessionVfx, unit, resolved, { dur: meleeDur });
+              meleeTriggered = true;
+          }
+          catch {
+              // bỏ qua lỗi VFX runtime
+          }
       }
       if (meleeTriggered && Game.turn) {
           const prevBusy = Number.isFinite(Game.turn.busyUntil) ? Number(Game.turn.busyUntil) : 0;
@@ -2134,17 +2570,20 @@ __define('./combat.ts', (exports, module, __require) => {
       const abs = Statuses.absorbShield(resolved, dmg, { dtype });
       triggerLightningArc('hit2');
       applyDamage(resolved, abs.remain);
-      try {
-          vfxAddHit(Game, resolved);
-      }
-      catch {
-          // bỏ qua lỗi VFX runtime
+      if (sessionVfx) {
+          try {
+              vfxAddHit(sessionVfx, resolved);
+          }
+          catch {
+              // bỏ qua lỗi VFX runtime
+          }
       }
       if (resolved.hp <= 0) {
           hookOnLethalDamage(resolved);
       }
       const dealt = Math.max(0, Math.min(dmg, (_m = abs.remain) !== null && _m !== void 0 ? _m : 0));
-      Statuses.afterDamage(unit, resolved, { dealt, absorbed: abs.absorbed, dtype });
+      const damageResult = { dealt, absorbed: abs.absorbed, dtype };
+      Statuses.afterDamage(unit, resolved, damageResult);
       const isKill = resolved.hp <= 0;
       gainFury(unit, {
           type: 'basic',
@@ -2161,13 +2600,14 @@ __define('./combat.ts', (exports, module, __require) => {
       });
       finishFuryHit(resolved);
       finishFuryHit(unit);
-      if (passiveCtx.afterHit.length > 0) {
+      const afterHitHandlers = passiveCtx.afterHit.filter(isBasicAttackAfterHitHandler);
+      if (afterHitHandlers.length > 0) {
           const afterCtx = {
               target: resolved,
               owner: unit,
               result: { dealt, absorbed: abs.absorbed },
           };
-          for (const fn of passiveCtx.afterHit) {
+          for (const fn of afterHitHandlers) {
               try {
                   fn(afterCtx);
               }
@@ -2192,6 +2632,7 @@ __define('./combat.ts', (exports, module, __require) => {
       }
   }
 
+  if (!Object.prototype.hasOwnProperty.call(exports, 'isBasicAttackAfterHitHandler')) exports.isBasicAttackAfterHitHandler = isBasicAttackAfterHitHandler;
   if (!Object.prototype.hasOwnProperty.call(exports, 'pickTarget')) exports.pickTarget = pickTarget;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyDamage')) exports.applyDamage = applyDamage;
   if (!Object.prototype.hasOwnProperty.call(exports, 'dealAbilityDamage')) exports.dealAbilityDamage = dealAbilityDamage;
@@ -2203,7 +2644,7 @@ __define('./combat.ts', (exports, module, __require) => {
 __define('./config.ts', (exports, module, __require) => {
   // config.ts v0.7.5
   const __dep0 = __require('./config/schema.ts');
-  const GameConfigSchema = __dep0.GameConfigSchema;
+  const parseGameConfig = __dep0.parseGameConfig;
   const daylightTheme = {
       sky: {
           top: '#1b2434',
@@ -2375,10 +2816,9 @@ __define('./config.ts', (exports, module, __require) => {
       BACKGROUNDS: backgroundDefinitions,
       CAMERA: 'landscape_oblique',
   };
-  const parsedConfig = GameConfigSchema.parse(rawConfig); // behavior-preserving validation
+  const parsedConfig = parseGameConfig(rawConfig); // behavior-preserving validation
   Object.freeze(parsedConfig);
   const CFG = parsedConfig;
-  // Camera presets (giữ nguyên)
   const CAM = {
       landscape_oblique: { rowGapRatio: 0.62, topScale: 0.80, depthScale: 0.94 },
       portrait_leader45: { rowGapRatio: 0.72, topScale: 0.86, depthScale: 0.96 },
@@ -2538,26 +2978,37 @@ __define('./config/schema.ts', (exports, module, __require) => {
       bottomScale: z.number().optional(),
       highlight: z.string().optional()
   });
-  const SceneThemeSchema = z
-      .object({
+  const SceneThemeObjectSchema = z.object({
       sky: SceneLayerSchema,
       horizon: SceneLayerSchema,
       ground: SceneLayerSchema
-  })
-      .superRefine((theme, ctx) => {
-      if (!theme.sky.top) {
-          ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              path: ['sky', 'top'],
-              message: 'sky.top is required'
-          });
-      }
   });
+  function assertSceneTheme(theme, themeName) {
+      if (typeof theme.sky.top !== 'string' || theme.sky.top.length === 0) {
+          const themeLabel = themeName ? `SCENE.THEMES["${themeName}"]` : 'Scene theme';
+          throw new TypeError(`${themeLabel} is missing sky.top`);
+      }
+  }
+  function assertSceneThemeRecord(themes) {
+      for (const [name, theme] of Object.entries(themes)) {
+          assertSceneTheme(theme, name);
+      }
+  }
+  function parseSceneTheme(value, themeName) {
+      const parsed = SceneThemeObjectSchema.parse(value);
+      assertSceneTheme(parsed, themeName);
+      return parsed;
+  }
   const SceneConfigSchema = z.object({
       DEFAULT_THEME: z.string(),
       CURRENT_THEME: z.string(),
-      THEMES: z.record(SceneThemeSchema)
+      THEMES: z.record(SceneThemeObjectSchema)
   });
+  function parseSceneConfig(value) {
+      const parsed = SceneConfigSchema.parse(value);
+      assertSceneThemeRecord(parsed.THEMES);
+      return parsed;
+  }
   const BackgroundPropSchema = z.object({
       type: z.string(),
       cell: z.object({ cx: z.number(), cy: z.number() }),
@@ -2577,6 +3028,11 @@ __define('./config/schema.ts', (exports, module, __require) => {
       BACKGROUNDS: z.record(BackgroundDefinitionSchema),
       CAMERA: z.string()
   });
+  function parseWorldMapConfig(value) {
+      const parsed = WorldMapConfigSchema.parse(value);
+      assertSceneThemeRecord(parsed.SCENE.THEMES);
+      return parsed;
+  }
   const CombatTuningSchema = z.object({
       GRID_COLS: z.number(),
       GRID_ROWS: z.number(),
@@ -2599,8 +3055,17 @@ __define('./config/schema.ts', (exports, module, __require) => {
       COLORS: ColorPaletteSchema
   }))
       .merge(WorldMapConfigSchema);
+  function parseGameConfig(value) {
+      const parsed = GameConfigSchema.parse(value);
+      assertSceneThemeRecord(parsed.SCENE.THEMES);
+      return parsed;
+  }
 
   if (!Object.prototype.hasOwnProperty.call(exports, 'GameConfigSchema')) exports.GameConfigSchema = GameConfigSchema;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'parseSceneTheme')) exports.parseSceneTheme = parseSceneTheme;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'parseSceneConfig')) exports.parseSceneConfig = parseSceneConfig;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'parseWorldMapConfig')) exports.parseWorldMapConfig = parseWorldMapConfig;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'parseGameConfig')) exports.parseGameConfig = parseGameConfig;
 });
 __define('./data/announcements.config.ts', (exports, module, __require) => {
   const announcementsConfig = [
@@ -2780,11 +3245,12 @@ __define('./data/announcements.ts', (exports, module, __require) => {
    * @returns {{ slot: AnnouncementSlot; entry: AnnouncementEntry } | null}
    */
   function selectAnnouncementEntry(slotKey, options = {}) {
+      var _a, _b;
       const now = options.now instanceof Date ? options.now : new Date();
       const slot = SIDE_SLOT_ANNOUNCEMENTS.find(item => item.key === slotKey);
       if (!slot)
           return null;
-      const entry = slot.entries.find(item => isEntryActive(item, now)) || slot.entries[0] || null;
+      const entry = (_b = (_a = slot.entries.find((item) => isEntryActive(item, now))) !== null && _a !== void 0 ? _a : slot.entries.at(0)) !== null && _b !== void 0 ? _b : null;
       if (!entry)
           return null;
       return { slot, entry };
@@ -2792,7 +3258,8 @@ __define('./data/announcements.ts', (exports, module, __require) => {
   function getAllSidebarAnnouncements(options = {}) {
       const now = options.now instanceof Date ? options.now : new Date();
       return SIDE_SLOT_ANNOUNCEMENTS.map(slot => {
-          const entry = slot.entries.find(item => isEntryActive(item, now)) || slot.entries[0] || null;
+          var _a, _b;
+          const entry = (_b = (_a = slot.entries.find((item) => isEntryActive(item, now))) !== null && _a !== void 0 ? _a : slot.entries.at(0)) !== null && _b !== void 0 ? _b : null;
           return {
               key: slot.key,
               label: slot.label,
@@ -2895,8 +3362,10 @@ __define('./data/economy.ts', (exports, module, __require) => {
   const __dep1 = __require('./utils/format.ts');
   const HAS_INTL_NUMBER_FORMAT = __dep1.HAS_INTL_NUMBER_FORMAT;
   const createNumberFormatter = __dep1.createNumberFormatter;
-  const __dep2 = __require('./data/economy.config.ts');
-  const rawEconomyConfig = __dep2.default ?? __dep2;
+  const __dep2 = __require('./utils/assert.ts');
+  const assertDefined = __dep2.assertDefined;
+  const __dep3 = __require('./data/economy.config.ts');
+  const rawEconomyConfig = __dep3.default ?? __dep3;
   const CurrencyIdSchema = z.enum(['VNT', 'HNT', 'TNT', 'ThNT', 'TT']);
   const currencyIdValues = ['VNT', 'HNT', 'TNT', 'ThNT', 'TT'];
   const CurrencySchema = z.object({
@@ -2936,7 +3405,8 @@ __define('./data/economy.ts', (exports, module, __require) => {
       lotterySplit: LotterySplitSchema
   });
   const economyConfig = EconomyConfigSchema.parse(rawEconomyConfig);
-  for (const [tier, entry] of Object.entries(economyConfig.pityConfig)) {
+  const pityEntries = Object.entries(economyConfig.pityConfig);
+  for (const [tier, entry] of pityEntries) {
       if (entry.tier !== tier) {
           throw new Error(`Cấu hình pity cho tier "${tier}" không khớp giá trị nội tại (${entry.tier}).`);
       }
@@ -2962,11 +3432,8 @@ __define('./data/economy.ts', (exports, module, __require) => {
       return [...CURRENCIES];
   }
   function convertCurrency(value, fromId, toId) {
-      const from = getCurrency(fromId);
-      const to = getCurrency(toId);
-      if (!from || !to) {
-          throw new Error(`Invalid currency conversion from ${fromId} to ${toId}`);
-      }
+      const from = assertDefined(getCurrency(fromId), `Invalid currency conversion from ${fromId} to ${toId}`);
+      const to = assertDefined(getCurrency(toId), `Invalid currency conversion from ${fromId} to ${toId}`);
       const valueInBase = value * from.ratioToBase;
       return valueInBase / to.ratioToBase;
   }
@@ -3024,7 +3491,7 @@ __define('./data/economy.ts', (exports, module, __require) => {
       const formatted = formatter.format(amount);
       return includeSuffix ? `${formatted} ${suffix}` : formatted;
   }
-  const PITY_CONFIG = Object.freeze(Object.fromEntries(Object.entries(economyConfig.pityConfig).map(([tier, config]) => [
+  const PITY_CONFIG = Object.freeze(Object.fromEntries(pityEntries.map(([tier, config]) => [
       tier,
       {
           tier: config.tier,
@@ -3464,8 +3931,10 @@ __define('./data/roster-preview.ts', (exports, module, __require) => {
   const CLASS_BASE = __dep1.CLASS_BASE;
   const RANK_MULT = __dep1.RANK_MULT;
   const ROSTER = __dep1.ROSTER;
-  const __dep2 = __require('./data/roster-preview.config.ts');
-  const rawRosterPreviewConfig = __dep2.default ?? __dep2;
+  const __dep2 = __require('./utils/assert.ts');
+  const assertDefined = __dep2.assertDefined;
+  const __dep3 = __require('./data/roster-preview.config.ts');
+  const rawRosterPreviewConfig = __dep3.default ?? __dep3;
   const RosterPreviewConfigSchema = z.object({
       tpDelta: z.record(z.number()),
       statOrder: z.array(z.string()),
@@ -3519,11 +3988,7 @@ __define('./data/roster-preview.ts', (exports, module, __require) => {
       return out;
   }
   function getRankMultiplier(rank) {
-      const multiplier = RANK_MULT[rank];
-      if (multiplier === undefined) {
-          throw new Error(`Missing rank multiplier for "${rank}"`);
-      }
-      return multiplier;
+      return assertDefined(RANK_MULT[rank], `Missing rank multiplier for "${rank}"`);
   }
   function applyRankMultiplier(preRank, rank) {
       const multiplier = getRankMultiplier(rank);
@@ -3538,10 +4003,7 @@ __define('./data/roster-preview.ts', (exports, module, __require) => {
       return out;
   }
   function computeFinalStats(className, rank, tpAlloc = {}) {
-      const base = CLASS_BASE[className];
-      if (!base) {
-          throw new Error(`Unknown class "${className}"`);
-      }
+      const base = assertDefined(CLASS_BASE[className], `Unknown class "${className}"`);
       const preRank = applyTpToBase(base, tpAlloc);
       return applyRankMultiplier(preRank, rank);
   }
@@ -4310,30 +4772,35 @@ __define('./engine.ts', (exports, module, __require) => {
   };
   const CHIBI_PROPS = CHIBI;
   const TOKEN_STYLE_VALUE = TOKEN_STYLE;
+  function coerceFinite(value, fallback) {
+      const candidate = typeof value === 'number'
+          ? value
+          : typeof value === 'string'
+              ? Number.parseFloat(value)
+              : Number(value);
+      return Number.isFinite(candidate) ? candidate : fallback;
+  }
   /* ---------- Grid ---------- */
   function makeGrid(canvas, cols, rows) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
-      const pad = (_b = (_a = CFG.UI) === null || _a === void 0 ? void 0 : _a.PAD) !== null && _b !== void 0 ? _b : 12;
-      let viewportW = null;
+      var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+      const pad = coerceFinite((_a = CFG.UI) === null || _a === void 0 ? void 0 : _a.PAD, 12);
+      const boardMaxW = coerceFinite((_b = CFG.UI) === null || _b === void 0 ? void 0 : _b.BOARD_MAX_W, 900);
+      let viewportW = boardMaxW + pad * 2;
       if (typeof window !== 'undefined') {
           const { innerWidth, visualViewport } = window;
-          if (Number.isFinite(innerWidth))
-              viewportW = viewportW === null ? innerWidth : Math.min(viewportW, innerWidth);
-          const vvWidth = visualViewport === null || visualViewport === void 0 ? void 0 : visualViewport.width;
-          if (Number.isFinite(vvWidth))
-              viewportW = viewportW === null ? vvWidth : Math.min(viewportW, vvWidth);
+          viewportW = Math.min(viewportW, coerceFinite(innerWidth, viewportW));
+          const vvWidth = visualViewport ? coerceFinite(visualViewport.width, viewportW) : viewportW;
+          viewportW = Math.min(viewportW, vvWidth);
       }
       if (typeof document !== 'undefined') {
-          const docWidth = (_c = document.documentElement) === null || _c === void 0 ? void 0 : _c.clientWidth;
-          if (Number.isFinite(docWidth))
-              viewportW = viewportW === null ? docWidth : Math.min(viewportW, docWidth);
+          const docWidth = coerceFinite((_c = document.documentElement) === null || _c === void 0 ? void 0 : _c.clientWidth, viewportW);
+          viewportW = Math.min(viewportW, docWidth);
       }
-      const boardMaxW = (_e = (_d = CFG.UI) === null || _d === void 0 ? void 0 : _d.BOARD_MAX_W) !== null && _e !== void 0 ? _e : 900;
-      const viewportSafeW = viewportW === null ? boardMaxW + pad * 2 : viewportW;
+      const viewportSafeW = viewportW;
       const availableW = Math.max(1, viewportSafeW - pad * 2);
       const w = Math.min(availableW, boardMaxW);
-      const h = Math.max(Math.floor(w * ((_g = (_f = CFG.UI) === null || _f === void 0 ? void 0 : _f.BOARD_H_RATIO) !== null && _g !== void 0 ? _g : 3 / 7)), (_j = (_h = CFG.UI) === null || _h === void 0 ? void 0 : _h.BOARD_MIN_H) !== null && _j !== void 0 ? _j : 220);
-      const maxDprCfg = (_k = CFG.UI) === null || _k === void 0 ? void 0 : _k.MAX_DPR;
+      const h = Math.max(Math.floor(w * ((_e = (_d = CFG.UI) === null || _d === void 0 ? void 0 : _d.BOARD_H_RATIO) !== null && _e !== void 0 ? _e : 3 / 7)), (_g = (_f = CFG.UI) === null || _f === void 0 ? void 0 : _f.BOARD_MIN_H) !== null && _g !== void 0 ? _g : 220);
+      const maxDprCfg = (_h = CFG.UI) === null || _h === void 0 ? void 0 : _h.MAX_DPR;
       const dprClamp = Number.isFinite(maxDprCfg) && maxDprCfg > 0 ? maxDprCfg : 2;
       const dprRaw = typeof window !== 'undefined' && Number.isFinite(window.devicePixelRatio)
           ? window.devicePixelRatio
@@ -4351,7 +4818,7 @@ __define('./engine.ts', (exports, module, __require) => {
       }
       const displayW = w;
       const displayH = h;
-      const maxPixelAreaCfg = (_l = CFG.UI) === null || _l === void 0 ? void 0 : _l.MAX_PIXEL_AREA;
+      const maxPixelAreaCfg = (_j = CFG.UI) === null || _j === void 0 ? void 0 : _j.MAX_PIXEL_AREA;
       const pixelAreaLimit = Number.isFinite(maxPixelAreaCfg) && maxPixelAreaCfg > 0 ? maxPixelAreaCfg : null;
       if (pixelAreaLimit) {
           const cssArea = displayW * displayH;
@@ -4366,11 +4833,14 @@ __define('./engine.ts', (exports, module, __require) => {
           dpr = 1;
       }
       if (typeof window !== 'undefined') {
-          const vvScale = (_m = window.visualViewport) === null || _m === void 0 ? void 0 : _m.scale;
-          if (Number.isFinite(vvScale) && vvScale > 0) {
-              const scaledDpr = dpr * vvScale;
-              if (Number.isFinite(scaledDpr) && scaledDpr > 0) {
-                  dpr = Math.min(dpr, scaledDpr);
+          const visualViewport = window.visualViewport;
+          if (visualViewport) {
+              const vvScale = coerceFinite(visualViewport.scale, 1);
+              if (vvScale > 0) {
+                  const scaledDpr = dpr * vvScale;
+                  if (Number.isFinite(scaledDpr) && scaledDpr > 0) {
+                      dpr = Math.min(dpr, scaledDpr);
+                  }
               }
           }
       }
@@ -4498,7 +4968,11 @@ __define('./engine.ts', (exports, module, __require) => {
   }
   /* ---------- Helper ---------- */
   function pickRandom(pool, excludeSet, n = 4) {
-      const remain = pool.filter((u) => {
+      const remain = pool
+          .filter((u) => {
+          if (typeof u === 'undefined') {
+              return false;
+          }
           if (u && typeof u === 'object') {
               const candidate = u;
               const id = candidate.id;
@@ -4511,9 +4985,10 @@ __define('./engine.ts', (exports, module, __require) => {
               return !excludeSet.has(u);
           }
           return true;
-      });
+      })
+          .slice();
       for (let i = remain.length - 1; i > 0; i--) {
-          const j = (Math.random() * (i + 1)) | 0;
+          const j = Math.floor(Math.random() * (i + 1));
           const temp = remain[i];
           remain[i] = remain[j];
           remain[j] = temp;
@@ -4663,10 +5138,28 @@ __define('./engine.ts', (exports, module, __require) => {
   const ART_SPRITE_EVENT = 'unit-art:sprite-loaded';
   const TOKEN_PROJECTION_CACHE = new WeakMap();
   const TOKEN_VISUAL_CACHE = new Map();
+  function joinSignatureParts(parts) {
+      if (!Array.isArray(parts) || parts.length === 0) {
+          return '';
+      }
+      const normalized = [];
+      for (const part of parts) {
+          if (part == null) {
+              normalized.push('');
+              continue;
+          }
+          if (typeof part === 'number') {
+              normalized.push(Number.isFinite(part) ? String(part) : '');
+              continue;
+          }
+          normalized.push(String(part));
+      }
+      return normalized.join('|');
+  }
   function contextSignature(g, cam) {
       var _a, _b, _c;
       const C = cam !== null && cam !== void 0 ? cam : {};
-      return [
+      return joinSignatureParts([
           g.cols,
           g.rows,
           g.tile,
@@ -4675,7 +5168,7 @@ __define('./engine.ts', (exports, module, __require) => {
           (_a = C.rowGapRatio) !== null && _a !== void 0 ? _a : 0.62,
           (_b = C.topScale) !== null && _b !== void 0 ? _b : 0.8,
           (_c = C.depthScale) !== null && _c !== void 0 ? _c : 0.94,
-      ].join('|');
+      ]);
   }
   function warnInvalidToken(context, token) {
       if (!CFG.DEBUG)
@@ -4723,27 +5216,51 @@ __define('./engine.ts', (exports, module, __require) => {
       TOKEN_VISUAL_CACHE.delete(cacheKey);
   }
   function normalizeSpriteDescriptor(sprite) {
+      var _a, _b;
       if (!sprite)
           return null;
       if (typeof sprite === 'string') {
           return { src: sprite };
       }
-      return sprite;
+      const descriptor = {};
+      if (typeof sprite.src === 'string') {
+          descriptor.src = sprite.src;
+      }
+      if (typeof sprite.cacheKey === 'string') {
+          descriptor.cacheKey = sprite.cacheKey;
+      }
+      if (sprite.skinId !== undefined) {
+          descriptor.skinId = (_a = sprite.skinId) !== null && _a !== void 0 ? _a : null;
+      }
+      if (sprite.shadow !== undefined) {
+          descriptor.shadow = (_b = sprite.shadow) !== null && _b !== void 0 ? _b : null;
+      }
+      if (Number.isFinite(sprite.scale)) {
+          descriptor.scale = sprite.scale;
+      }
+      const aspect = typeof sprite.aspect === 'number' ? sprite.aspect : null;
+      if (aspect !== null && Number.isFinite(aspect)) {
+          descriptor.aspect = aspect;
+      }
+      if (Number.isFinite(sprite.anchor)) {
+          descriptor.anchor = sprite.anchor;
+      }
+      return descriptor;
   }
   function getTokenVisual(token, art) {
-      var _a, _b, _c, _d, _e, _f, _g, _h;
+      var _a, _b, _c, _d, _e, _f, _g, _h, _j;
       if (!token) {
           return { spriteKey: null, spriteEntry: null, shadowCfg: null };
       }
       const skinKey = (_b = (_a = art === null || art === void 0 ? void 0 : art.skinKey) !== null && _a !== void 0 ? _a : token.skinKey) !== null && _b !== void 0 ? _b : null;
       const cacheKey = `${(_c = token.id) !== null && _c !== void 0 ? _c : '__anon__'}::${skinKey !== null && skinKey !== void 0 ? skinKey : ''}`;
-      const descriptor = normalizeSpriteDescriptor(art === null || art === void 0 ? void 0 : art.sprite);
-      const spriteSrc = (_d = descriptor === null || descriptor === void 0 ? void 0 : descriptor.src) !== null && _d !== void 0 ? _d : null;
-      const spriteKey = (descriptor === null || descriptor === void 0 ? void 0 : descriptor.cacheKey) || (spriteSrc ? `${spriteSrc}::${(_f = (_e = descriptor === null || descriptor === void 0 ? void 0 : descriptor.skinId) !== null && _e !== void 0 ? _e : skinKey) !== null && _f !== void 0 ? _f : ''}` : null);
+      const descriptor = normalizeSpriteDescriptor((_d = art === null || art === void 0 ? void 0 : art.sprite) !== null && _d !== void 0 ? _d : null);
+      const spriteSrc = (_e = descriptor === null || descriptor === void 0 ? void 0 : descriptor.src) !== null && _e !== void 0 ? _e : null;
+      const spriteKey = (descriptor === null || descriptor === void 0 ? void 0 : descriptor.cacheKey) || (spriteSrc ? `${spriteSrc}::${(_g = (_f = descriptor === null || descriptor === void 0 ? void 0 : descriptor.skinId) !== null && _f !== void 0 ? _f : skinKey) !== null && _g !== void 0 ? _g : ''}` : null);
       let entry = TOKEN_VISUAL_CACHE.get(cacheKey);
       if (!entry || entry.spriteKey !== spriteKey) {
           const spriteEntry = spriteSrc ? ensureSpriteLoaded(art) : null;
-          const shadowCfg = (_h = (_g = descriptor === null || descriptor === void 0 ? void 0 : descriptor.shadow) !== null && _g !== void 0 ? _g : art === null || art === void 0 ? void 0 : art.shadow) !== null && _h !== void 0 ? _h : null;
+          const shadowCfg = (_j = (_h = descriptor === null || descriptor === void 0 ? void 0 : descriptor.shadow) !== null && _h !== void 0 ? _h : art === null || art === void 0 ? void 0 : art.shadow) !== null && _j !== void 0 ? _j : null;
           entry = {
               spriteKey,
               spriteEntry,
@@ -4800,16 +5317,17 @@ __define('./engine.ts', (exports, module, __require) => {
       return entry;
   }
   function drawStylizedShape(ctx, width, height, anchor, art) {
-      var _a, _b, _c, _d, _e, _f;
-      const palette = (_a = art === null || art === void 0 ? void 0 : art.palette) !== null && _a !== void 0 ? _a : {};
-      const primary = (_b = palette.primary) !== null && _b !== void 0 ? _b : '#86c4ff';
-      const secondary = (_c = palette.secondary) !== null && _c !== void 0 ? _c : '#1f3242';
-      const accent = (_d = palette.accent) !== null && _d !== void 0 ? _d : '#d2f4ff';
-      const outline = (_e = palette.outline) !== null && _e !== void 0 ? _e : 'rgba(0,0,0,0.55)';
+      var _a, _b;
+      const paletteSource = (_a = art === null || art === void 0 ? void 0 : art.palette) !== null && _a !== void 0 ? _a : null;
+      const palette = paletteSource ? { ...paletteSource } : {};
+      const primary = typeof palette.primary === 'string' ? palette.primary : '#86c4ff';
+      const secondary = typeof palette.secondary === 'string' ? palette.secondary : '#1f3242';
+      const accent = typeof palette.accent === 'string' ? palette.accent : '#d2f4ff';
+      const outline = typeof palette.outline === 'string' ? palette.outline : 'rgba(0,0,0,0.55)';
       const top = -height * anchor;
       const bottom = height - height * anchor;
       const halfW = width / 2;
-      const shape = (_f = art === null || art === void 0 ? void 0 : art.shape) !== null && _f !== void 0 ? _f : 'sentinel';
+      const shape = (_b = art === null || art === void 0 ? void 0 : art.shape) !== null && _b !== void 0 ? _b : 'sentinel';
       const gradient = ctx.createLinearGradient(0, top, 0, bottom);
       gradient.addColorStop(0, primary);
       gradient.addColorStop(1, secondary);
@@ -4945,7 +5463,7 @@ __define('./engine.ts', (exports, module, __require) => {
       ctx.restore();
   }
   function drawTokensOblique(ctx, g, tokens, cam) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
+      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;
       const C = cam !== null && cam !== void 0 ? cam : DEFAULT_OBLIQUE_CAMERA;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -5014,13 +5532,13 @@ __define('./engine.ts', (exports, module, __require) => {
           const facing = t.side === 'ally' ? 1 : -1;
           const art = ensureTokenArt(t);
           const layout = (_b = art === null || art === void 0 ? void 0 : art.layout) !== null && _b !== void 0 ? _b : {};
-          const spriteCfg = (_c = normalizeSpriteDescriptor(art === null || art === void 0 ? void 0 : art.sprite)) !== null && _c !== void 0 ? _c : {};
-          const spriteHeightMult = (_d = layout.spriteHeight) !== null && _d !== void 0 ? _d : 2.4;
+          const spriteCfg = (_d = normalizeSpriteDescriptor((_c = art === null || art === void 0 ? void 0 : art.sprite) !== null && _c !== void 0 ? _c : null)) !== null && _d !== void 0 ? _d : {};
+          const spriteHeightMult = (_e = layout.spriteHeight) !== null && _e !== void 0 ? _e : 2.4;
           const spriteScale = Number.isFinite(spriteCfg.scale) ? spriteCfg.scale : 1;
-          const spriteHeight = r * spriteHeightMult * ((_e = art === null || art === void 0 ? void 0 : art.size) !== null && _e !== void 0 ? _e : 1) * spriteScale;
-          const spriteAspect = (_g = (_f = (Number.isFinite(spriteCfg.aspect) ? spriteCfg.aspect : null)) !== null && _f !== void 0 ? _f : layout.spriteAspect) !== null && _g !== void 0 ? _g : 0.78;
+          const spriteHeight = r * spriteHeightMult * ((_f = art === null || art === void 0 ? void 0 : art.size) !== null && _f !== void 0 ? _f : 1) * spriteScale;
+          const spriteAspect = (_h = (_g = (Number.isFinite(spriteCfg.aspect) ? spriteCfg.aspect : null)) !== null && _g !== void 0 ? _g : layout.spriteAspect) !== null && _h !== void 0 ? _h : 0.78;
           const spriteWidth = spriteHeight * spriteAspect;
-          const anchor = Number.isFinite(spriteCfg.anchor) ? spriteCfg.anchor : (_h = layout.anchor) !== null && _h !== void 0 ? _h : 0.78;
+          const anchor = Number.isFinite(spriteCfg.anchor) ? spriteCfg.anchor : (_j = layout.anchor) !== null && _j !== void 0 ? _j : 0.78;
           const hasRichArt = !!(art && ((spriteCfg && spriteCfg.src) || art.shape));
           if (hasRichArt) {
               const { spriteEntry, shadowCfg } = getTokenVisual(t, art);
@@ -5029,14 +5547,14 @@ __define('./engine.ts', (exports, module, __require) => {
               ctx.translate(p.x, p.y);
               if (facing === -1 && (art === null || art === void 0 ? void 0 : art.mirror) !== false)
                   ctx.scale(-1, 1);
-              const rawShadow = (_j = shadowCfg !== null && shadowCfg !== void 0 ? shadowCfg : art === null || art === void 0 ? void 0 : art.shadow) !== null && _j !== void 0 ? _j : null;
+              const rawShadow = (_k = shadowCfg !== null && shadowCfg !== void 0 ? shadowCfg : art === null || art === void 0 ? void 0 : art.shadow) !== null && _k !== void 0 ? _k : null;
               const shadowObject = rawShadow && typeof rawShadow === 'object' ? rawShadow : {};
               const shadowColorFallback = typeof rawShadow === 'string'
                   ? rawShadow
                   : typeof (art === null || art === void 0 ? void 0 : art.shadow) === 'string'
                       ? art.shadow
                       : undefined;
-              let shadowColor = (_m = (_l = (_k = shadowObject.color) !== null && _k !== void 0 ? _k : art === null || art === void 0 ? void 0 : art.glow) !== null && _l !== void 0 ? _l : shadowColorFallback) !== null && _m !== void 0 ? _m : 'rgba(0,0,0,0.35)';
+              let shadowColor = (_o = (_m = (_l = shadowObject.color) !== null && _l !== void 0 ? _l : art === null || art === void 0 ? void 0 : art.glow) !== null && _m !== void 0 ? _m : shadowColorFallback) !== null && _o !== void 0 ? _o : 'rgba(0,0,0,0.35)';
               let shadowBlur = Number.isFinite(shadowObject.blur) ? shadowObject.blur : Math.max(6, r * 0.7);
               let shadowOffsetX = Number.isFinite(shadowObject.offsetX) ? shadowObject.offsetX : 0;
               let shadowOffsetY = Number.isFinite(shadowObject.offsetY) ? shadowObject.offsetY : Math.max(2, r * 0.2);
@@ -5084,7 +5602,7 @@ __define('./engine.ts', (exports, module, __require) => {
           }
           if ((art === null || art === void 0 ? void 0 : art.label) !== false) {
               const name = formatName(t.name || t.id);
-              const offset = (_o = layout.labelOffset) !== null && _o !== void 0 ? _o : 1.2;
+              const offset = (_p = layout.labelOffset) !== null && _p !== void 0 ? _p : 1.2;
               drawNameplate(ctx, name, p.x, p.y + r * offset, r, art);
           }
       }
@@ -5190,6 +5708,8 @@ __define('./entry.ts', (exports, module, __require) => {
   const MODE_GROUPS = __dep2.MODE_GROUPS;
   const MODE_STATUS = __dep2.MODE_STATUS;
   const getMenuSections = __dep2.getMenuSections;
+  const isStoppableSession = (value) => (Boolean(value) && typeof value.stop === 'function');
+  const isStartableSession = (value) => (Boolean(value) && typeof value.start === 'function');
   const SUCCESS_EVENT = 'arclune:loaded';
   const SCREEN_MAIN_MENU = 'main-menu';
   const SCREEN_PVE = 'pve-session';
@@ -5228,14 +5748,27 @@ __define('./entry.ts', (exports, module, __require) => {
       }
       return resolved;
   }
+  function isScreenParamMap(value) {
+      return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+  }
+  function cloneScreenParamMap(source) {
+      return { ...source };
+  }
+  function cloneScreenParams(params) {
+      if (!params) {
+          return null;
+      }
+      return cloneScreenParamMap(params);
+  }
   const MODE_DEFINITIONS = MODES.reduce((acc, mode) => {
       const shell = mode.shell;
       const screenId = (shell === null || shell === void 0 ? void 0 : shell.screenId) || SCREEN_MAIN_MENU;
       const moduleId = mode.status === MODE_STATUS.AVAILABLE && (shell === null || shell === void 0 ? void 0 : shell.moduleId)
           ? shell.moduleId
           : ((shell === null || shell === void 0 ? void 0 : shell.fallbackModuleId) || COMING_SOON_MODULE_ID);
-      const params = mode.status === MODE_STATUS.AVAILABLE && (shell === null || shell === void 0 ? void 0 : shell.defaultParams)
-          ? { ...shell.defaultParams }
+      const defaultParams = shell === null || shell === void 0 ? void 0 : shell.defaultParams;
+      const params = mode.status === MODE_STATUS.AVAILABLE && isScreenParamMap(defaultParams)
+          ? cloneScreenParamMap(defaultParams)
           : null;
       acc[mode.id] = {
           key: mode.id,
@@ -5289,7 +5822,10 @@ __define('./entry.ts', (exports, module, __require) => {
           status = MODE_STATUS.COMING_SOON;
       }
       else if (childStatuses.size > 0) {
-          status = Array.from(childStatuses)[0];
+          const derivedStatus = Array.from(childStatuses)[0];
+          if (derivedStatus) {
+              status = derivedStatus;
+          }
       }
       return {
           key: group.id,
@@ -5306,16 +5842,29 @@ __define('./entry.ts', (exports, module, __require) => {
           extraClasses: Array.isArray(group.extraClasses) ? [...group.extraClasses] : []
       };
   });
-  const CARD_METADATA = [...MODE_METADATA, ...MODE_GROUP_METADATA];
-  const MENU_SECTIONS = getMenuSections({
+  const CARD_METADATA = Object.freeze([
+      ...MODE_METADATA,
+      ...MODE_GROUP_METADATA
+  ]);
+  const MENU_SECTIONS = Object.freeze(getMenuSections({
       includeStatuses: [MODE_STATUS.AVAILABLE, MODE_STATUS.COMING_SOON]
-  });
+  }).map(section => Object.freeze({
+      id: section.id,
+      title: section.title,
+      entries: Object.freeze(section.entries.map(entry => Object.freeze({
+          id: entry.id,
+          type: entry.type,
+          cardId: entry.cardId,
+          childModeIds: Object.freeze([...entry.childModeIds])
+      })))
+  })));
   let activeModal = null;
   let shellInstance = null;
   let rootElement = null;
   let pveRenderToken = 0;
   const bootstrapOptions = { isFileProtocol: false };
   let renderMessageRef = null;
+  let renderMessageIsExternal = false;
   let mainMenuView = null;
   let customScreenController = null;
   let customScreenId = null;
@@ -5324,6 +5873,28 @@ __define('./entry.ts', (exports, module, __require) => {
   let collectionRenderToken = 0;
   let lineupView = null;
   let lineupRenderToken = 0;
+  function areScreenParamsEqual(current, next) {
+      if (current === next) {
+          return true;
+      }
+      if (current === null || next === null) {
+          return false;
+      }
+      const currentKeys = Object.keys(current);
+      const nextKeys = Object.keys(next);
+      if (currentKeys.length !== nextKeys.length) {
+          return false;
+      }
+      for (const key of currentKeys) {
+          if (!Object.prototype.hasOwnProperty.call(next, key)) {
+              return false;
+          }
+          if (current[key] !== next[key]) {
+              return false;
+          }
+      }
+      return true;
+  }
   function dispatchLoaded() {
       try {
           window.dispatchEvent(new Event(SUCCESS_EVENT));
@@ -5419,9 +5990,10 @@ __define('./entry.ts', (exports, module, __require) => {
       activeModal = null;
   }
   function clearAppScreenClasses() {
-      if (!rootElement || !rootElement.classList)
+      const root = rootElement;
+      if (!root || !root.classList)
           return;
-      APP_SCREEN_CLASSES.forEach(cls => rootElement.classList.remove(cls));
+      APP_SCREEN_CLASSES.forEach(cls => root.classList.remove(cls));
   }
   function destroyCustomScreen(force = false) {
       const hasActiveScreen = !!(customScreenController || customScreenId);
@@ -5438,13 +6010,14 @@ __define('./entry.ts', (exports, module, __require) => {
       }
       customScreenController = null;
       customScreenId = null;
-      if (!rootElement)
+      const root = rootElement;
+      if (!root)
           return;
-      if (rootElement.classList) {
-          APP_SCREEN_CLASSES.forEach(cls => rootElement.classList.remove(cls));
+      if (root.classList) {
+          APP_SCREEN_CLASSES.forEach(cls => root.classList.remove(cls));
       }
-      if (typeof rootElement.innerHTML === 'string') {
-          rootElement.innerHTML = '';
+      if (typeof root.innerHTML === 'string') {
+          root.innerHTML = '';
       }
   }
   function destroyCollectionView() {
@@ -5469,37 +6042,20 @@ __define('./entry.ts', (exports, module, __require) => {
       }
       lineupView = null;
   }
-  function cloneParamValue(value) {
-      if (!value || typeof value !== 'object') {
-          return value;
-      }
-      if (Array.isArray(value)) {
-          return [...value];
-      }
-      return { ...value };
-  }
   function mergeDefinitionParams(definition, params) {
-      const baseValue = typeof (definition === null || definition === void 0 ? void 0 : definition.params) !== 'undefined'
-          ? cloneParamValue(definition.params)
-          : undefined;
-      const incomingValue = typeof params !== 'undefined'
-          ? cloneParamValue(params)
-          : undefined;
-      const baseIsObject = baseValue && typeof baseValue === 'object' && !Array.isArray(baseValue);
-      const incomingIsObject = incomingValue && typeof incomingValue === 'object' && !Array.isArray(incomingValue);
-      if (baseIsObject || incomingIsObject) {
-          return {
-              ...(baseIsObject ? baseValue : {}),
-              ...(incomingIsObject ? incomingValue : {})
-          };
+      var _a;
+      const baseValue = cloneScreenParams((_a = definition === null || definition === void 0 ? void 0 : definition.params) !== null && _a !== void 0 ? _a : null);
+      const incomingValue = cloneScreenParams(params);
+      if (!baseValue && !incomingValue) {
+          return null;
       }
-      if (typeof incomingValue !== 'undefined') {
+      if (!baseValue) {
           return incomingValue;
       }
-      if (typeof baseValue !== 'undefined') {
+      if (!incomingValue) {
           return baseValue;
       }
-      return null;
+      return { ...baseValue, ...incomingValue };
   }
   function pickFunctionFromSource(source, preferredKeys = [], fallbackKeys = []) {
       if (!source)
@@ -5512,13 +6068,13 @@ __define('./entry.ts', (exports, module, __require) => {
           for (const key of preferredKeys) {
               const value = record[key];
               if (typeof value === 'function') {
-                  return value;
+                  return source;
               }
           }
           for (const key of fallbackKeys) {
               const value = record[key];
               if (typeof value === 'function') {
-                  return value;
+                  return source;
               }
           }
       }
@@ -5619,9 +6175,64 @@ __define('./entry.ts', (exports, module, __require) => {
       rootElement.appendChild(modal);
       activeModal = modal;
   }
+  function showPveBoardMissingNotice(message) {
+      const title = 'Không thể tải chế độ PvE';
+      if (renderMessageRef && renderMessageIsExternal) {
+          try {
+              renderMessageRef({
+                  title,
+                  body: `<p>${message}</p>`
+              });
+              return true;
+          }
+          catch (error) {
+              console.warn('Không thể sử dụng renderMessageRef để hiển thị thông báo PvE.', error);
+          }
+      }
+      if (typeof document === 'undefined' || !document.body) {
+          return false;
+      }
+      const modalId = 'pve-board-error-modal';
+      const existing = document.getElementById(modalId);
+      if (existing && typeof existing.remove === 'function') {
+          existing.remove();
+      }
+      const modal = document.createElement('div');
+      modal.id = modalId;
+      modal.className = 'app-modal';
+      modal.setAttribute('role', 'alertdialog');
+      modal.setAttribute('aria-modal', 'true');
+      modal.style.position = 'fixed';
+      modal.style.inset = '0';
+      modal.style.display = 'flex';
+      modal.style.alignItems = 'center';
+      modal.style.justifyContent = 'center';
+      modal.style.padding = '16px';
+      modal.style.background = 'rgba(8, 12, 18, 0.82)';
+      modal.style.zIndex = '2147483647';
+      modal.innerHTML = `
+      <div class="app-modal__dialog" style="max-width:420px;width:100%;background:#0c1218;border:1px solid #2a3a4a;border-radius:16px;padding:24px;box-shadow:0 12px 32px rgba(0,0,0,0.45);text-align:center;">
+        <h3 class="app-modal__title" style="margin-top:0;margin-bottom:12px;color:#ffe066;">${title}</h3>
+        <p class="app-modal__body" style="margin:0 0 16px;color:#f1f3f5;line-height:1.6;">${message}</p>
+        <div class="app-modal__actions">
+          <button type="button" class="app-modal__button" data-action="close" style="min-width:120px;padding:8px 16px;border-radius:999px;background:#1f2c3a;color:#f1f3f5;border:1px solid #334559;cursor:pointer;">Đã hiểu</button>
+        </div>
+      </div>
+    `;
+      const closeButton = modal.querySelector('[data-action="close"]');
+      if (closeButton instanceof HTMLElement) {
+          closeButton.addEventListener('click', () => {
+              modal.remove();
+          });
+      }
+      document.body.appendChild(modal);
+      return true;
+  }
   async function renderCollectionScreen(params) {
       var _a;
-      if (!rootElement || !shellInstance)
+      const root = rootElement;
+      const shell = shellInstance;
+      if (!root || !shell)
           return;
       const token = ++collectionRenderToken;
       dismissModal();
@@ -5629,11 +6240,11 @@ __define('./entry.ts', (exports, module, __require) => {
       destroyCollectionView();
       lineupRenderToken += 1;
       destroyLineupView();
-      if (rootElement.classList) {
-          rootElement.classList.add('app--collection');
+      if (root.classList) {
+          root.classList.add('app--collection');
       }
-      if (typeof rootElement.innerHTML === 'string') {
-          rootElement.innerHTML = '<div class="app-loading">Đang tải bộ sưu tập...</div>';
+      if (typeof root.innerHTML === 'string') {
+          root.innerHTML = '<div class="app-loading">Đang tải bộ sưu tập...</div>';
       }
       let module;
       try {
@@ -5655,15 +6266,18 @@ __define('./entry.ts', (exports, module, __require) => {
           throw new Error('Không tìm thấy định nghĩa màn hình bộ sưu tập.');
       }
       collectionView = ((_a = render({
-          root: rootElement,
-          shell: shellInstance,
+          root,
+          shell,
           definition,
-          params: params || null
+          params: params || null,
+          screenId: SCREEN_COLLECTION
       })) !== null && _a !== void 0 ? _a : null);
   }
   async function renderLineupScreen(params) {
       var _a;
-      if (!rootElement || !shellInstance)
+      const root = rootElement;
+      const shell = shellInstance;
+      if (!root || !shell)
           return;
       const token = ++lineupRenderToken;
       dismissModal();
@@ -5671,11 +6285,11 @@ __define('./entry.ts', (exports, module, __require) => {
       destroyLineupView();
       collectionRenderToken += 1;
       destroyCollectionView();
-      if (rootElement.classList) {
-          rootElement.classList.add('app--lineup');
+      if (root.classList) {
+          root.classList.add('app--lineup');
       }
-      if (typeof rootElement.innerHTML === 'string') {
-          rootElement.innerHTML = '<div class="app-loading">Đang tải đội hình...</div>';
+      if (typeof root.innerHTML === 'string') {
+          root.innerHTML = '<div class="app-loading">Đang tải đội hình...</div>';
       }
       let module;
       try {
@@ -5697,10 +6311,11 @@ __define('./entry.ts', (exports, module, __require) => {
           throw new Error('Không tìm thấy định nghĩa màn hình đội hình.');
       }
       const lineupResult = render({
-          root: rootElement,
-          shell: shellInstance,
+          root,
+          shell,
           definition,
-          params: params || null
+          params: params || null,
+          screenId: SCREEN_LINEUP
       });
       lineupView = (_a = lineupResult) !== null && _a !== void 0 ? _a : null;
   }
@@ -5718,18 +6333,7 @@ __define('./entry.ts', (exports, module, __require) => {
           mainMenuView.destroy();
           mainMenuView = null;
       }
-      const sections = MENU_SECTIONS.map(section => ({
-          id: section.id,
-          title: section.title,
-          entries: (section.entries || [])
-              .filter((entry) => !!entry)
-              .map(entry => ({
-              id: entry.id,
-              type: entry.type,
-              cardId: entry.cardId,
-              childModeIds: Array.isArray(entry.childModeIds) ? [...entry.childModeIds] : []
-          }))
-      }));
+      const sections = MENU_SECTIONS;
       mainMenuView = renderMainMenuView({
           root: rootElement,
           shell: shellInstance,
@@ -5797,7 +6401,7 @@ __define('./entry.ts', (exports, module, __require) => {
       shellInstance.setActiveSession(null);
   }
   async function mountPveScreen(params) {
-      var _a;
+      var _a, _b;
       const token = ++pveRenderToken;
       const extractStartConfig = (source) => {
           if (!source || typeof source !== 'object')
@@ -5811,13 +6415,18 @@ __define('./entry.ts', (exports, module, __require) => {
       teardownActiveSession();
       if (!shellInstance)
           return;
+      const shell = shellInstance;
       const candidateModeKey = params && typeof params === 'object' && !Array.isArray(params)
           ? params.modeKey
           : undefined;
       const modeKey = typeof candidateModeKey === 'string' && MODE_DEFINITIONS[candidateModeKey]
           ? candidateModeKey
           : 'campaign';
-      const definition = MODE_DEFINITIONS[modeKey] || MODE_DEFINITIONS.campaign;
+      const fallbackDefinition = MODE_DEFINITIONS.campaign;
+      if (!fallbackDefinition) {
+          throw new Error('Thiếu định nghĩa chế độ campaign.');
+      }
+      const definition = (_a = MODE_DEFINITIONS[modeKey]) !== null && _a !== void 0 ? _a : fallbackDefinition;
       const rawParams = params && typeof params === 'object' && !Array.isArray(params)
           ? { ...params }
           : {};
@@ -5825,7 +6434,7 @@ __define('./entry.ts', (exports, module, __require) => {
           ? { ...definition.params }
           : {};
       const mergedParams = { ...defaultParams, ...rawParams };
-      const definitionConfig = extractStartConfig((_a = definition === null || definition === void 0 ? void 0 : definition.params) !== null && _a !== void 0 ? _a : null);
+      const definitionConfig = extractStartConfig((_b = definition === null || definition === void 0 ? void 0 : definition.params) !== null && _b !== void 0 ? _b : null);
       const incomingConfig = extractStartConfig(params);
       const mergedStartConfig = {
           ...(definitionConfig || {}),
@@ -5865,7 +6474,7 @@ __define('./entry.ts', (exports, module, __require) => {
               return;
           if (isMissingModuleError(error)) {
               showComingSoonModal(definition.label);
-              shellInstance.enterScreen(SCREEN_MAIN_MENU);
+              shell.enterScreen(SCREEN_MAIN_MENU);
               return;
           }
           throw error;
@@ -5874,7 +6483,7 @@ __define('./entry.ts', (exports, module, __require) => {
           return;
       if (isComingSoonModule(module)) {
           showComingSoonModal(definition.label);
-          shellInstance.enterScreen(SCREEN_MAIN_MENU);
+          shell.enterScreen(SCREEN_MAIN_MENU);
           return;
       }
       const createPveSession = resolveModuleFunction(module, ['createPveSession']);
@@ -5885,9 +6494,9 @@ __define('./entry.ts', (exports, module, __require) => {
           title: definition.label,
           modeKey: definition.key,
           onExit: () => {
-              const state = shellInstance.getState();
+              const state = shell.getState();
               const session = state === null || state === void 0 ? void 0 : state.activeSession;
-              if (session && typeof session.stop === 'function') {
+              if (isStoppableSession(session)) {
                   try {
                       session.stop();
                   }
@@ -5895,16 +6504,16 @@ __define('./entry.ts', (exports, module, __require) => {
                       console.warn('[pve] stop session failed', err);
                   }
               }
-              shellInstance.setActiveSession(null);
-              shellInstance.enterScreen(SCREEN_MAIN_MENU);
+              shell.setActiveSession(null);
+              shell.enterScreen(SCREEN_MAIN_MENU);
           }
       });
       if (!container) {
           throw new Error('Không thể dựng giao diện PvE.');
       }
       const session = createPveSession(container, createSessionOptions);
-      shellInstance.setActiveSession(session);
-      if (typeof session.start === 'function') {
+      shell.setActiveSession(session);
+      if (isStartableSession(session)) {
           const scheduleRetry = (callback) => {
               if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
                   window.requestAnimationFrame(callback);
@@ -5925,19 +6534,18 @@ __define('./entry.ts', (exports, module, __require) => {
                   }
               }
               catch (err) {
-                  shellInstance.setActiveSession(null);
+                  shell.setActiveSession(null);
                   throw err;
               }
           };
           const handleMissingBoard = () => {
-              if (typeof window !== 'undefined' && typeof window.alert === 'function') {
-                  window.alert('Không thể tải bàn chơi PvE. Đang quay lại menu chính.');
+              const message = 'Không thể tải bàn chơi PvE. Đang quay lại menu chính.';
+              const displayed = showPveBoardMissingNotice(message);
+              if (!displayed) {
+                  console.warn(message);
               }
-              else {
-                  console.warn('Không thể tải bàn chơi PvE. Đang quay lại menu chính.');
-              }
-              shellInstance.setActiveSession(null);
-              shellInstance.enterScreen(SCREEN_MAIN_MENU);
+              shell.setActiveSession(null);
+              shell.enterScreen(SCREEN_MAIN_MENU);
           };
           const attemptStart = (attempt = 0) => {
               if (token !== pveRenderToken)
@@ -5976,6 +6584,7 @@ __define('./entry.ts', (exports, module, __require) => {
               throw new Error('Không tìm thấy phần tử #appRoot.');
           }
           renderMessageRef = renderMessage;
+          renderMessageIsExternal = typeof window !== 'undefined' && typeof window.arcluneRenderMessage === 'function';
           const handleShellError = (error) => {
               console.error('Arclune shell listener error', error);
               const renderer = renderMessageRef || renderMessage;
@@ -5991,7 +6600,7 @@ __define('./entry.ts', (exports, module, __require) => {
               const nextScreen = state.screen;
               const nextParams = state.screenParams;
               const screenChanged = nextScreen !== lastScreen;
-              const paramsChanged = nextParams !== lastParams;
+              const paramsChanged = !areScreenParamsEqual(nextParams, lastParams);
               if (!screenChanged && !paramsChanged) {
                   return;
               }
@@ -6111,6 +6720,13 @@ __define('./events.ts', (exports, module, __require) => {
   const ACTION_END = 'action:end';
   const TURN_REGEN = 'turn:regen';
   const BATTLE_END = 'battle:end';
+  const isGameEventRecord = (payload) => {
+      if (!payload || typeof payload !== 'object')
+          return false;
+      const record = payload;
+      return typeof record.detail !== 'undefined' && typeof record.type === 'string';
+  };
+  const isCompatibleHandler = (handler) => typeof handler === 'function';
   const HAS_EVENT_TARGET = typeof EventTarget === 'function';
   function createNativeEvent(type, detail) {
       if (!type)
@@ -6179,7 +6795,10 @@ __define('./events.ts', (exports, module, __require) => {
       dispatchEvent(event) {
           if (!event || !event.type)
               return false;
-          const set = this.listeners.get(event.type);
+          const type = event.type;
+          if (!type)
+              return false;
+          const set = this.listeners.get(type);
           if (!set || set.size === 0)
               return true;
           const snapshot = Array.from(set);
@@ -6278,40 +6897,63 @@ __define('./events.ts', (exports, module, __require) => {
   }
   const dispatchGameEvent = (type, detail) => emitGameEvent(type, detail);
   function addGameEventListener(type, handler) {
-      if (!type || typeof handler !== 'function' || !gameEvents) {
+      if (!type || !isCompatibleHandler(handler) || !gameEvents) {
           return () => { };
       }
+      const normalizedHandler = function (event) {
+          handler.call(this, event);
+      };
       if (HAS_EVENT_TARGET && gameEvents instanceof EventTarget) {
-          gameEvents.addEventListener(type, handler);
+          const eventListener = normalizedHandler;
+          gameEvents.addEventListener(type, eventListener);
           let disposed = false;
           return () => {
               if (disposed)
                   return;
               disposed = true;
               if (HAS_EVENT_TARGET && gameEvents instanceof EventTarget) {
-                  gameEvents.removeEventListener(type, handler);
+                  gameEvents.removeEventListener(type, eventListener);
               }
           };
       }
       if (gameEvents instanceof SimpleEventTarget) {
-          gameEvents.addEventListener(type, handler);
+          gameEvents.addEventListener(type, normalizedHandler);
           let disposed = false;
           return () => {
               if (disposed)
                   return;
               disposed = true;
-              gameEvents.removeEventListener(type, handler);
+              gameEvents.removeEventListener(type, normalizedHandler);
           };
       }
       if (isEventEmitterLike(gameEvents)) {
-          gameEvents.on(type, handler);
+          const emitterHandler = function (payload) {
+              const eventRecord = isGameEventRecord(payload)
+                  ? payload
+                  : {
+                      type,
+                      detail: payload,
+                  };
+              const record = eventRecord;
+              try {
+                  if (typeof record.target === 'undefined') {
+                      record.target = gameEvents;
+                  }
+                  record.currentTarget = gameEvents;
+              }
+              catch (_err) {
+                  // ignore assignment failures
+              }
+              handler.call(this, eventRecord);
+          };
+          gameEvents.on(type, emitterHandler);
           let disposed = false;
           return () => {
               if (disposed)
                   return;
               disposed = true;
               if (typeof gameEvents.off === 'function') {
-                  gameEvents.off(type, handler);
+                  gameEvents.off(type, emitterHandler);
               }
           };
       }
@@ -6339,6 +6981,25 @@ __define('./main.ts', (exports, module, __require) => {
   const ensureNestedModuleSupport = __dep3.ensureNestedModuleSupport;
   const __reexport0 = __require('./events.ts');
   let currentSession = null;
+  const isPlainRecord = (value) => (!!value && typeof value === 'object');
+  const toRootSource = (value) => {
+      if (value == null)
+          return value;
+      if (typeof Element !== 'undefined' && value instanceof Element)
+          return value;
+      if (typeof Document !== 'undefined' && value instanceof Document)
+          return value;
+      if (typeof value.nodeType === 'number') {
+          return value;
+      }
+      return undefined;
+  };
+  const toSessionConfigOverrides = (value) => {
+      if (!isPlainRecord(value)) {
+          return {};
+      }
+      return { ...value };
+  };
   function resolveRoot(config) {
       if (!config)
           return typeof document !== 'undefined' ? document : null;
@@ -6352,10 +7013,14 @@ __define('./main.ts', (exports, module, __require) => {
   }
   function startGame(options) {
       ensureNestedModuleSupport();
-      const sanitizedOptions = (options !== null && options !== void 0 ? options : {});
-      const { root, rootEl, element, ...rest } = sanitizedOptions;
-      const rootTarget = resolveRoot({ root, rootEl, element });
-      const initialConfig = { ...rest };
+      const rawOptions = isPlainRecord(options) ? options : {};
+      const { root, rootEl, element, ...rest } = rawOptions;
+      const rootTarget = resolveRoot({
+          root: toRootSource(root),
+          rootEl: toRootSource(rootEl),
+          element: toRootSource(element),
+      });
+      const initialConfig = toSessionConfigOverrides(rest);
       if (!currentSession) {
           currentSession = createPveSession(rootTarget, initialConfig);
       }
@@ -6413,8 +7078,10 @@ __define('./meta.ts', (exports, module, __require) => {
   // meta.ts — gom lookup + stat khởi tạo + nộ khởi điểm
   const __dep0 = __require('./catalog.ts');
   const CLASS_BASE = __dep0.CLASS_BASE;
+  const RANK_MULT = __dep0.RANK_MULT;
   const applyRankAndMods = __dep0.applyRankAndMods;
   const getMetaById = __dep0.getMetaById;
+  const getUnitKitById = __dep0.getUnitKitById;
   const __dep1 = __require('./utils/kit.ts');
   const extractOnSpawnRage = __dep1.extractOnSpawnRage;
   const kitSupportsSummon = __dep1.kitSupportsSummon;
@@ -6432,25 +7099,96 @@ __define('./meta.ts', (exports, module, __require) => {
           return (_a = entry === null || entry === void 0 ? void 0 : entry.rank) !== null && _a !== void 0 ? _a : null;
       },
       kit(id) {
-          var _a;
-          const entry = getMetaById(id);
-          return ((_a = entry === null || entry === void 0 ? void 0 : entry.kit) !== null && _a !== void 0 ? _a : null);
+          return getUnitKitById(id);
       },
       isSummoner(id) {
           const entry = getMetaById(id);
           return !!(entry && entry.class === 'Summoner' && kitSupportsSummon(entry));
       },
   };
+  const adaptMetaEntry = (entry) => {
+      var _a;
+      if (!entry)
+          return null;
+      const resolvedKit = (_a = entry.kit) !== null && _a !== void 0 ? _a : getUnitKitById(entry.id);
+      if (!resolvedKit)
+          return null;
+      const roster = { ...entry, kit: resolvedKit };
+      return roster;
+  };
+  const metaServiceAdapter = {
+      get(id) {
+          if (!id)
+              return null;
+          return adaptMetaEntry(Meta.get(id));
+      },
+      classOf(id) {
+          if (!id)
+              return null;
+          const value = Meta.classOf(id);
+          return typeof value === 'string' ? value : null;
+      },
+      rankOf(id) {
+          if (!id)
+              return null;
+          const value = Meta.rankOf(id);
+          return typeof value === 'string' ? value : null;
+      },
+      kit(id) {
+          if (!id)
+              return null;
+          return Meta.kit(id);
+      },
+      isSummoner(id) {
+          if (!id)
+              return false;
+          return Meta.isSummoner(id);
+      },
+  };
   // Tạo chỉ số instance theo class+rank+mods (SPD không nhân theo rank)
+  const EMPTY_INSTANCE_STATS = {
+      hpMax: 0,
+      hp: 0,
+      atk: 0,
+      wil: 0,
+      arm: 0,
+      res: 0,
+      agi: 0,
+      per: 0,
+      spd: 1,
+      aeMax: 0,
+      ae: 0,
+      aeRegen: 0,
+      hpRegen: 0,
+  };
+  const isRankName = (value) => (typeof value === 'string' && value in RANK_MULT);
+  const isClassName = (value) => (typeof value === 'string' && value in CLASS_BASE);
+  const coerceStatMods = (mods) => {
+      if (!mods || typeof mods !== 'object')
+          return undefined;
+      const out = {};
+      for (const [key, raw] of Object.entries(mods)) {
+          if (typeof raw !== 'number' || !Number.isFinite(raw))
+              continue;
+          out[key] = raw;
+      }
+      return out;
+  };
   function makeInstanceStats(unitId) {
       var _a, _b, _c, _d, _e, _f, _g;
       const entry = Meta.get(unitId);
       if (!entry)
-          return {};
-      const base = CLASS_BASE[entry.class];
+          return { ...EMPTY_INSTANCE_STATS };
+      const className = entry.class;
+      if (!isClassName(className))
+          return { ...EMPTY_INSTANCE_STATS };
+      const rank = entry.rank;
+      if (!isRankName(rank))
+          return { ...EMPTY_INSTANCE_STATS };
+      const base = CLASS_BASE[className];
       if (!base)
-          return {};
-      const fin = applyRankAndMods(base, entry.rank, entry.mods);
+          return { ...EMPTY_INSTANCE_STATS };
+      const fin = applyRankAndMods(base, rank, coerceStatMods(entry.mods));
       return {
           hpMax: Math.trunc((_a = fin.HP) !== null && _a !== void 0 ? _a : 0),
           hp: Math.trunc((_b = fin.HP) !== null && _b !== void 0 ? _b : 0),
@@ -6486,6 +7224,7 @@ __define('./meta.ts', (exports, module, __require) => {
   }
 
   if (!Object.prototype.hasOwnProperty.call(exports, 'Meta')) exports.Meta = Meta;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'metaServiceAdapter')) exports.metaServiceAdapter = metaServiceAdapter;
   if (!Object.prototype.hasOwnProperty.call(exports, 'makeInstanceStats')) exports.makeInstanceStats = makeInstanceStats;
   if (!Object.prototype.hasOwnProperty.call(exports, 'initialRageFor')) exports.initialRageFor = initialRageFor;
 });
@@ -6558,6 +7297,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   const vfxAddBloodPulse = __dep13.vfxAddBloodPulse;
   const vfxAddGroundBurst = __dep13.vfxAddGroundBurst;
   const vfxAddShieldWrap = __dep13.vfxAddShieldWrap;
+  const baseAsSessionWithVfx = __dep13.asSessionWithVfx;
   const __dep14 = __require('./scene.ts');
   const drawBattlefieldScene = __dep14.drawBattlefieldScene;
   const __dep15 = __require('./events.ts');
@@ -6582,6 +7322,250 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   const ensureSceneCache = __dep19.ensureSceneCache;
   const clearBackgroundSignatureCache = __dep19.clearBackgroundSignatureCache;
   const normalizeDeckEntries = __dep19.normalizeDeckEntries;
+  const isPlainRecord = (value) => (!!value && typeof value === 'object');
+  const isFiniteNumber = (value) => (typeof value === 'number' && Number.isFinite(value));
+  const parseFiniteNumber = (value) => {
+      if (isFiniteNumber(value))
+          return value;
+      if (typeof value === 'string' && value.trim() !== '') {
+          const parsed = Number(value);
+          return Number.isFinite(parsed) ? parsed : null;
+      }
+      return null;
+  };
+  const toFiniteOrZero = (value) => { var _a; return (_a = parseFiniteNumber(value)) !== null && _a !== void 0 ? _a : 0; };
+  const toStartConfigOverrides = (value) => {
+      if (!isPlainRecord(value))
+          return {};
+      return { ...value };
+  };
+  const toRootLike = (value) => {
+      if (value == null)
+          return value;
+      if (typeof Element !== 'undefined' && value instanceof Element)
+          return value;
+      if (typeof Document !== 'undefined' && value instanceof Document)
+          return value;
+      if (typeof value.nodeType === 'number') {
+          return value;
+      }
+      return null;
+  };
+  const isInitializedGame = (game = Game) => Boolean(game && game._inited);
+  const getInitializedGame = () => (isInitializedGame() ? Game : null);
+  const coerceSkillRuntime = (value) => {
+      if (!isPlainRecord(value))
+          return null;
+      const record = value;
+      const normalized = { ...record };
+      const numericKeys = [
+          'hits',
+          'hitCount',
+          'count',
+          'targets',
+          'targetCount',
+          'duration',
+          'durationTurns',
+          'turns',
+          'busyMs',
+          'durationMs',
+      ];
+      for (const key of numericKeys) {
+          const parsed = parseFiniteNumber(record[key]);
+          if (parsed != null)
+              normalized[key] = parsed;
+      }
+      return normalized;
+  };
+  const coerceSummonCreep = (value) => {
+      var _a;
+      if (!isPlainRecord(value))
+          return null;
+      const record = value;
+      const creep = { ...record };
+      const ttlTurns = parseFiniteNumber((_a = record.ttlTurns) !== null && _a !== void 0 ? _a : record.ttl);
+      if (ttlTurns != null)
+          creep.ttlTurns = ttlTurns;
+      return creep;
+  };
+  const coerceSummonSpec = (value) => {
+      var _a;
+      if (!value || typeof value !== 'object')
+          return null;
+      const spec = { ...value };
+      if (Array.isArray(spec.slots)) {
+          spec.slots = spec.slots
+              .map((slot) => parseFiniteNumber(slot))
+              .filter((slot) => slot != null);
+      }
+      const count = parseFiniteNumber(spec.count);
+      const summonCount = parseFiniteNumber(spec.summonCount);
+      const resolvedCount = count !== null && count !== void 0 ? count : summonCount;
+      if (resolvedCount != null) {
+          spec.count = resolvedCount;
+          spec.summonCount = resolvedCount;
+      }
+      const ttl = parseFiniteNumber(spec.ttl);
+      const ttlTurns = parseFiniteNumber((_a = spec.ttlTurns) !== null && _a !== void 0 ? _a : ttl);
+      if (ttlTurns != null) {
+          spec.ttlTurns = ttlTurns;
+          if (ttl == null)
+              spec.ttl = ttlTurns;
+      }
+      else if (ttl != null) {
+          spec.ttl = ttl;
+      }
+      const limit = parseFiniteNumber(spec.limit);
+      if (limit != null)
+          spec.limit = limit;
+      spec.inherit = isPlainRecord(spec.inherit) ? spec.inherit : null;
+      spec.creep = coerceSummonCreep(spec.creep);
+      return spec;
+  };
+  const isDamageSpec = (value) => isPlainRecord(value);
+  const coerceDamageSpec = (value) => {
+      if (!isDamageSpec(value))
+          return null;
+      const record = value;
+      const damage = { ...record };
+      const numericKeys = [
+          'scaleWIL',
+          'scaleWil',
+          'flat',
+          'flatAdd',
+          'percentTargetMaxHP',
+          'basePercentMaxHPTarget',
+          'bossPercent',
+          'defPen',
+          'pen',
+      ];
+      for (const key of numericKeys) {
+          const parsed = parseFiniteNumber(record[key]);
+          if (parsed != null)
+              damage[key] = parsed;
+      }
+      if (typeof record.type === 'string')
+          damage.type = record.type;
+      return damage;
+  };
+  const coerceUlt = (value) => {
+      var _a, _b, _c, _d, _e, _f;
+      if (!value || typeof value !== 'object')
+          return null;
+      const record = value;
+      const ult = { ...record };
+      const numericKeys = [
+          'power',
+          'hpTradePercent',
+          'hits',
+          'scale',
+          'duration',
+          'turns',
+          'reduceDmg',
+          'bonusVsLeader',
+          'penRES',
+          'selfHPTrade',
+          'attackSpeed',
+      ];
+      for (const key of numericKeys) {
+          const parsed = parseFiniteNumber(record[key]);
+          if (parsed != null)
+              ult[key] = parsed;
+      }
+      const targetsParsed = parseFiniteNumber(record.targets);
+      if (targetsParsed != null)
+          ult.targets = targetsParsed;
+      const alliesParsed = parseFiniteNumber(record.allies);
+      if (alliesParsed != null)
+          ult.allies = alliesParsed;
+      ult.runtime = coerceSkillRuntime(record.runtime);
+      const resolvedSummon = (_c = (_a = coerceSummonSpec(record.summon)) !== null && _a !== void 0 ? _a : coerceSummonSpec((_b = record.metadata) === null || _b === void 0 ? void 0 : _b.summon)) !== null && _c !== void 0 ? _c : coerceSummonSpec((_d = record.meta) === null || _d === void 0 ? void 0 : _d.summon);
+      if (resolvedSummon)
+          ult.summon = resolvedSummon;
+      if ((_e = ult.metadata) === null || _e === void 0 ? void 0 : _e.summon) {
+          ult.metadata = { ...ult.metadata, summon: coerceSummonSpec(ult.metadata.summon) };
+      }
+      if ((_f = ult.meta) === null || _f === void 0 ? void 0 : _f.summon) {
+          ult.meta = { ...ult.meta, summon: coerceSummonSpec(ult.meta.summon) };
+      }
+      ult.damage = coerceDamageSpec(record.damage);
+      return ult;
+  };
+  const readCountCandidate = (value) => {
+      const numeric = parseFiniteNumber(value);
+      if (numeric != null)
+          return numeric;
+      if (typeof value === 'string') {
+          const match = value.match(/(\d+)/);
+          if (match && match[1]) {
+              const parsed = Number(match[1]);
+              if (Number.isFinite(parsed))
+                  return parsed;
+          }
+      }
+      return null;
+  };
+  const resolveCount = (candidates, fallback, { min, max } = {}) => {
+      for (const candidate of candidates) {
+          const value = readCountCandidate(candidate);
+          if (value != null) {
+              let resolved = Math.round(value);
+              if (typeof min === 'number')
+                  resolved = Math.max(min, resolved);
+              if (typeof max === 'number')
+                  resolved = Math.min(max, resolved);
+              return resolved;
+          }
+      }
+      return fallback;
+  };
+  const getUltHitCount = (ult) => {
+      const runtime = ult === null || ult === void 0 ? void 0 : ult.runtime;
+      const resolved = resolveCount([
+          ult === null || ult === void 0 ? void 0 : ult.hits,
+          runtime === null || runtime === void 0 ? void 0 : runtime.hits,
+          runtime === null || runtime === void 0 ? void 0 : runtime.hitCount,
+          runtime === null || runtime === void 0 ? void 0 : runtime.count,
+      ], 1, { min: 1 });
+      return Math.max(1, resolved);
+  };
+  const getUltTargetCount = (ult, fallback) => {
+      const runtime = ult === null || ult === void 0 ? void 0 : ult.runtime;
+      return resolveCount([
+          ult === null || ult === void 0 ? void 0 : ult.targets,
+          runtime === null || runtime === void 0 ? void 0 : runtime.targets,
+          runtime === null || runtime === void 0 ? void 0 : runtime.targetCount,
+          runtime === null || runtime === void 0 ? void 0 : runtime.count,
+      ], fallback, { min: 0 });
+  };
+  const getUltAlliesCount = (ult, fallback) => {
+      var _a, _b;
+      return resolveCount([
+          ult === null || ult === void 0 ? void 0 : ult.allies,
+          (_a = ult === null || ult === void 0 ? void 0 : ult.runtime) === null || _a === void 0 ? void 0 : _a.targets,
+          (_b = ult === null || ult === void 0 ? void 0 : ult.runtime) === null || _b === void 0 ? void 0 : _b.count,
+      ], fallback, { min: 0 });
+  };
+  const getUltDurationTurns = (ult, fallback) => {
+      const runtime = ult === null || ult === void 0 ? void 0 : ult.runtime;
+      const resolved = resolveCount([
+          ult === null || ult === void 0 ? void 0 : ult.duration,
+          ult === null || ult === void 0 ? void 0 : ult.turns,
+          runtime === null || runtime === void 0 ? void 0 : runtime.duration,
+          runtime === null || runtime === void 0 ? void 0 : runtime.turns,
+          runtime === null || runtime === void 0 ? void 0 : runtime.durationTurns,
+      ], fallback, { min: 1 });
+      return Math.max(1, resolved);
+  };
+  const ensureSessionWithVfx = (game, options) => {
+      const session = baseAsSessionWithVfx(game, options);
+      if (!session)
+          return null;
+      if (!Array.isArray(session.vfx)) {
+          session.vfx = [];
+      }
+      return session;
+  };
   const isDeckEntry = (value) => {
       if (!value || typeof value !== 'object')
           return false;
@@ -6613,22 +7597,24 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       return changed ? normalized : value;
   }
   function ensureDeck() {
-      if (!Game)
+      const game = getInitializedGame();
+      if (!game)
           return [];
-      const deck = sanitizeDeckEntries(Game.deck3);
-      if (deck !== Game.deck3) {
-          Game.deck3 = deck;
+      const deck = sanitizeDeckEntries(game.deck3);
+      if (deck !== game.deck3) {
+          game.deck3 = deck;
       }
       return deck;
   }
   function ensureRoster() {
-      if (!Game)
+      const game = getInitializedGame();
+      if (!game)
           return [];
-      const roster = sanitizeDeckEntries(Game.unitsAll);
-      if (roster !== Game.unitsAll) {
-          Game.unitsAll = roster;
+      const roster = sanitizeDeckEntries(game.unitsAll);
+      if (roster !== game.unitsAll) {
+          game.unitsAll = roster;
       }
-      return Game.unitsAll;
+      return game.unitsAll;
   }
   const getCardCost = (card) => {
       if (!card)
@@ -6643,12 +7629,15 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       return 0;
   };
   function sanitizeStartConfig(config) {
-      var _a;
-      const raw = (config !== null && config !== void 0 ? config : {});
-      const { root, rootEl, ...rest } = raw;
+      var _a, _b;
+      if (!isPlainRecord(config)) {
+          return { rest: {}, root: null };
+      }
+      const { root, rootEl, ...rest } = config;
+      const resolvedRoot = (_b = (_a = toRootLike(root)) !== null && _a !== void 0 ? _a : toRootLike(rootEl)) !== null && _b !== void 0 ? _b : null;
       return {
-          rest: rest,
-          root: (_a = (root !== null && root !== void 0 ? root : rootEl)) !== null && _a !== void 0 ? _a : null,
+          rest: toStartConfigOverrides(rest),
+          root: resolvedRoot,
       };
   }
   let canvas = null;
@@ -6656,7 +7645,14 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   let hud = null;
   let summonBarHandle = null;
   let hudCleanup = null;
-  const CAM_PRESET = CAM[CFG.CAMERA] || CAM.landscape_oblique;
+  const DEFAULT_CAMERA_KEY = 'landscape_oblique';
+  const resolveCameraPreset = () => {
+      var _a;
+      const key = ((_a = CFG.CAMERA) !== null && _a !== void 0 ? _a : DEFAULT_CAMERA_KEY);
+      const preset = CAM[key];
+      return preset !== null && preset !== void 0 ? preset : CAM[DEFAULT_CAMERA_KEY];
+  };
+  const CAM_PRESET = resolveCameraPreset();
   const HAND_SIZE = (_a = CFG.HAND_SIZE) !== null && _a !== void 0 ? _a : 4;
   ensureNestedModuleSupport();
   const getNow = () => safeNow();
@@ -6684,7 +7680,8 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   const hpBarGradientCache = new Map();
   const renderSummonBar = () => {
       var _a, _b;
-      const bar = ((_b = (_a = Game === null || Game === void 0 ? void 0 : Game.ui) === null || _a === void 0 ? void 0 : _a.bar) !== null && _b !== void 0 ? _b : null);
+      const game = getInitializedGame();
+      const bar = (_b = (_a = game === null || game === void 0 ? void 0 : game.ui) === null || _a === void 0 ? void 0 : _a.bar) !== null && _b !== void 0 ? _b : null;
       if (bar === null || bar === void 0 ? void 0 : bar.render)
           bar.render();
   };
@@ -6696,12 +7693,14 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           catch { }
       }
       summonBarHandle = null;
-      if (Game === null || Game === void 0 ? void 0 : Game.ui) {
-          Game.ui.bar = null;
+      const game = getInitializedGame();
+      if (game === null || game === void 0 ? void 0 : game.ui) {
+          game.ui.bar = null;
       }
   }
   function resetSessionState(options = {}) {
-      storedConfig = normalizeConfig({ ...storedConfig, ...options });
+      const overrides = toStartConfigOverrides(options);
+      storedConfig = normalizeConfig({ ...storedConfig, ...overrides });
       Game = createSession(storedConfig);
       _IID = 1;
       _BORN = 1;
@@ -6709,11 +7708,10 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       invalidateSceneCache();
   }
   if ((_b = CFG === null || CFG === void 0 ? void 0 : CFG.DEBUG) === null || _b === void 0 ? void 0 : _b.LOG_EVENTS) {
-      const logEvent = (type) => (ev) => {
-          var _a, _b, _c;
-          const detailRaw = (_a = ev === null || ev === void 0 ? void 0 : ev.detail) !== null && _a !== void 0 ? _a : {};
-          const detail = detailRaw;
-          const unitRaw = detail['unit'];
+      const logEvent = (type) => (event) => {
+          var _a, _b, _c, _d;
+          const detail = ((_a = event === null || event === void 0 ? void 0 : event.detail) !== null && _a !== void 0 ? _a : {});
+          const unitRaw = ((_b = detail['unit']) !== null && _b !== void 0 ? _b : null);
           const readString = (value) => (typeof value === 'string' ? value : null);
           const readNumber = (value) => {
               if (typeof value === 'number' && Number.isFinite(value))
@@ -6731,11 +7729,11 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               orderIndex: readNumber(detail['orderIndex']),
               orderLength: readNumber(detail['orderLength']),
               phase: readString(detail['phase']),
-              unit: (_b = readString(unitRaw === null || unitRaw === void 0 ? void 0 : unitRaw.id)) !== null && _b !== void 0 ? _b : readString(unitRaw === null || unitRaw === void 0 ? void 0 : unitRaw.name),
+              unit: (_c = readString(unitRaw === null || unitRaw === void 0 ? void 0 : unitRaw.id)) !== null && _c !== void 0 ? _c : readString(unitRaw === null || unitRaw === void 0 ? void 0 : unitRaw.name),
               action: readString(detail['action']),
               skipped: Boolean(detail['skipped']),
               reason: readString(detail['reason']),
-              processedChain: (_c = detail['processedChain']) !== null && _c !== void 0 ? _c : null,
+              processedChain: (_d = detail['processedChain']) !== null && _d !== void 0 ? _d : null,
           };
           console.debug(`[events] ${type}`, info);
       };
@@ -7000,14 +7998,24 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   }
   // LẤY TỪ INSTANCE đang đứng trên sân (đúng spec: thừa hưởng % chỉ số hiện tại của chủ)
   function creepStatsFromInherit(masterUnit, inherit) {
-      var _a, _b, _c, _d, _e, _f, _g;
+      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
       if (!inherit || typeof inherit !== 'object')
           return {};
-      const hpMax = Math.round(((masterUnit === null || masterUnit === void 0 ? void 0 : masterUnit.hpMax) || 0) * (((_c = (_b = (_a = inherit.HP) !== null && _a !== void 0 ? _a : inherit.hp) !== null && _b !== void 0 ? _b : inherit.HPMax) !== null && _c !== void 0 ? _c : inherit.hpMax) || 0));
-      const atk = Math.round(((masterUnit === null || masterUnit === void 0 ? void 0 : masterUnit.atk) || 0) * (((_d = inherit.ATK) !== null && _d !== void 0 ? _d : inherit.atk) || 0));
-      const wil = Math.round(((masterUnit === null || masterUnit === void 0 ? void 0 : masterUnit.wil) || 0) * (((_e = inherit.WIL) !== null && _e !== void 0 ? _e : inherit.wil) || 0));
-      const res = Math.round(((masterUnit === null || masterUnit === void 0 ? void 0 : masterUnit.res) || 0) * (((_f = inherit.RES) !== null && _f !== void 0 ? _f : inherit.res) || 0));
-      const arm = Math.round(((masterUnit === null || masterUnit === void 0 ? void 0 : masterUnit.arm) || 0) * (((_g = inherit.ARM) !== null && _g !== void 0 ? _g : inherit.arm) || 0) * 100) / 100;
+      const hpRatio = (_d = parseFiniteNumber((_c = (_b = (_a = inherit.HP) !== null && _a !== void 0 ? _a : inherit.hp) !== null && _b !== void 0 ? _b : inherit.HPMax) !== null && _c !== void 0 ? _c : inherit.hpMax)) !== null && _d !== void 0 ? _d : 0;
+      const atkRatio = (_f = parseFiniteNumber((_e = inherit.ATK) !== null && _e !== void 0 ? _e : inherit.atk)) !== null && _f !== void 0 ? _f : 0;
+      const wilRatio = (_h = parseFiniteNumber((_g = inherit.WIL) !== null && _g !== void 0 ? _g : inherit.wil)) !== null && _h !== void 0 ? _h : 0;
+      const resRatio = (_k = parseFiniteNumber((_j = inherit.RES) !== null && _j !== void 0 ? _j : inherit.res)) !== null && _k !== void 0 ? _k : 0;
+      const armRatio = (_m = parseFiniteNumber((_l = inherit.ARM) !== null && _l !== void 0 ? _l : inherit.arm)) !== null && _m !== void 0 ? _m : 0;
+      const hpMaxBase = toFiniteOrZero(masterUnit === null || masterUnit === void 0 ? void 0 : masterUnit.hpMax);
+      const atkBase = toFiniteOrZero(masterUnit === null || masterUnit === void 0 ? void 0 : masterUnit.atk);
+      const wilBase = toFiniteOrZero(masterUnit === null || masterUnit === void 0 ? void 0 : masterUnit.wil);
+      const resBase = toFiniteOrZero(masterUnit === null || masterUnit === void 0 ? void 0 : masterUnit.res);
+      const armBase = toFiniteOrZero(masterUnit === null || masterUnit === void 0 ? void 0 : masterUnit.arm);
+      const hpMax = Math.round(hpMaxBase * hpRatio);
+      const atk = Math.round(atkBase * atkRatio);
+      const wil = Math.round(wilBase * wilRatio);
+      const res = Math.round(resBase * resRatio);
+      const arm = Math.round(armBase * armRatio * 100) / 100;
       const stats = {};
       if (hpMax > 0) {
           stats.hpMax = hpMax;
@@ -7043,68 +8051,74 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       }
   }
   function extendBusy(duration) {
-      if (!Game || !Game.turn)
+      const game = getInitializedGame();
+      if (!game || !game.turn)
           return;
       const now = getNow();
-      const prev = Number.isFinite(Game.turn.busyUntil) ? Game.turn.busyUntil : now;
+      const prev = Number.isFinite(game.turn.busyUntil) ? game.turn.busyUntil : now;
       const dur = Math.max(0, duration | 0);
-      Game.turn.busyUntil = Math.max(prev, now + dur);
+      game.turn.busyUntil = Math.max(prev, now + dur);
   }
   // Thực thi Ult: Summoner -> Immediate Summon theo meta; class khác: trừ nộ
   function performUlt(unit) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v;
-      if (!Game) {
+      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, _23, _24, _25, _26;
+      const game = getInitializedGame();
+      if (!game) {
           setFury(unit, 0);
           return;
       }
-      const metaGetter = (_a = Game.meta) === null || _a === void 0 ? void 0 : _a.get;
-      const meta = typeof metaGetter === 'function' ? metaGetter.call(Game.meta, unit.id) : null;
+      const metaGetter = (_a = game.meta) === null || _a === void 0 ? void 0 : _a.get;
+      const meta = typeof metaGetter === 'function' ? metaGetter.call(game.meta, unit.id) : null;
       if (!meta) {
           setFury(unit, 0);
           return;
       }
       const slot = slotIndex(unit.side, unit.cx, unit.cy);
-      const summonSpec = meta.class === 'Summoner' ? getSummonSpec(meta) : null;
+      const summonSpecRaw = meta.class === 'Summoner' ? getSummonSpec(meta) : null;
+      const summonSpec = meta.class === 'Summoner' ? coerceSummonSpec(summonSpecRaw) : null;
       if (meta.class === 'Summoner' && summonSpec) {
           const aliveNow = tokensAlive();
-          const queued = Game.queued || { ally: new Map(), enemy: new Map() };
+          const queued = game.queued || { ally: new Map(), enemy: new Map() };
           const patternSlots = resolveSummonSlots(summonSpec, slot)
-              .filter(Boolean)
-              .filter(s => {
+              .filter((s) => typeof s === 'number' && Number.isFinite(s))
+              .filter((s) => {
               const { cx, cy } = slotToCell(unit.side, s);
               return !cellReserved(aliveNow, queued, cx, cy);
           })
               .sort((a, b) => a - b);
-          const countRaw = Number(summonSpec.count);
-          const desired = Number.isFinite(countRaw) ? countRaw : (patternSlots.length || 1);
+          const desired = (_b = parseFiniteNumber(summonSpec.count)) !== null && _b !== void 0 ? _b : (patternSlots.length || 1);
           const need = Math.min(patternSlots.length, Math.max(0, desired));
           if (need > 0) {
-              const limit = Number.isFinite(summonSpec.limit) ? summonSpec.limit : Infinity;
+              const limit = (_c = parseFiniteNumber(summonSpec.limit)) !== null && _c !== void 0 ? _c : Infinity;
               const have = getMinionsOf(unit.iid).length;
               const over = Math.max(0, have + need - limit);
               const replacePolicy = typeof summonSpec.replace === 'string' ? summonSpec.replace.trim().toLowerCase() : null;
               if (over > 0 && replacePolicy === 'oldest')
                   removeOldestMinions(unit.iid, over);
               const inheritStats = creepStatsFromInherit(unit, summonSpec.inherit);
-              const ttl = Number.isFinite(summonSpec.ttlTurns)
-                  ? summonSpec.ttlTurns
-                  : (Number.isFinite(summonSpec.ttl) ? summonSpec.ttl : null);
+              const ttlBase = parseFiniteNumber((_d = summonSpec.ttlTurns) !== null && _d !== void 0 ? _d : summonSpec.ttl);
               for (let i = 0; i < need; i++) {
                   const s = patternSlots[i];
-                  const base = summonSpec.creep || {};
-                  const spawnTtl = Number.isFinite(base.ttlTurns) ? base.ttlTurns : ttl;
-                  enqueueImmediate(Game, {
+                  const base = ((_e = summonSpec.creep) !== null && _e !== void 0 ? _e : {});
+                  const spawnTtl = (_g = parseFiniteNumber((_f = base.ttlTurns) !== null && _f !== void 0 ? _f : base.ttl)) !== null && _g !== void 0 ? _g : ttlBase;
+                  const creepId = typeof base.id === 'string' && base.id.trim() ? base.id : `${unit.id}_minion`;
+                  const creepName = typeof base.name === 'string' && base.name.trim()
+                      ? base.name
+                      : (typeof base.label === 'string' && base.label.trim() ? base.label : 'Creep');
+                  const creepColor = typeof base.color === 'string' && base.color.trim() ? base.color : '#ffd27d';
+                  const ttlTurns = Math.max(1, Math.round((_h = parseFiniteNumber(spawnTtl)) !== null && _h !== void 0 ? _h : 3));
+                  enqueueImmediate(game, {
                       by: unit.id,
                       side: unit.side,
                       slot: s,
                       unit: {
-                          id: base.id || `${unit.id}_minion`,
-                          name: base.name || base.label || 'Creep',
-                          color: base.color || '#ffd27d',
+                          id: creepId,
+                          name: creepName,
+                          color: creepColor,
                           isMinion: base.isMinion !== false,
                           ownerIid: unit.iid,
                           bornSerial: _BORN++,
-                          ttlTurns: Number.isFinite(spawnTtl) ? spawnTtl : 3,
+                          ttlTurns,
                           ...inheritStats
                       }
                   });
@@ -7113,7 +8127,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           setFury(unit, 0);
           return;
       }
-      const u = (_b = meta.kit) === null || _b === void 0 ? void 0 : _b.ult;
+      const u = coerceUlt((_j = meta.kit) === null || _j === void 0 ? void 0 : _j.ult);
       if (!u) {
           spendFury(unit, resolveUltCost(unit));
           return;
@@ -7126,13 +8140,13 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               const foes = aliveNow.filter(t => t.side === foeSide);
               if (!foes.length)
                   break;
-              const scale = typeof u.power === 'number' ? u.power : 1.2;
+              const scale = (_k = parseFiniteNumber(u.power)) !== null && _k !== void 0 ? _k : 1.2;
               let totalDrain = 0;
               for (const tgt of foes) {
                   if (!tgt.alive)
                       continue;
                   const base = Math.max(1, Math.round((unit.wil || 0) * scale));
-                  const { dealt } = dealAbilityDamage(Game, unit, tgt, {
+                  const { dealt } = dealAbilityDamage(game, unit, tgt, {
                       base,
                       dtype: 'arcane',
                       attackType: 'skill'
@@ -7148,8 +8162,8 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               break;
           }
           case 'hpTradeBurst': {
-              const hpTradePctRaw = Number.isFinite(u.hpTradePercent) ? u.hpTradePercent : ((_d = (_c = u.hpTrade) === null || _c === void 0 ? void 0 : _c.percentMaxHP) !== null && _d !== void 0 ? _d : 0);
-              const hpTradePct = Math.max(0, Math.min(0.95, hpTradePctRaw || 0));
+              const hpTradePctRaw = (_o = parseFiniteNumber((_l = u.hpTradePercent) !== null && _l !== void 0 ? _l : (_m = u.hpTrade) === null || _m === void 0 ? void 0 : _m.percentMaxHP)) !== null && _o !== void 0 ? _o : 0;
+              const hpTradePct = Math.max(0, Math.min(0.95, hpTradePctRaw));
               const hpMax = Number.isFinite(unit.hpMax) ? unit.hpMax : 0;
               const currentHp = Number.isFinite(unit.hp) ? unit.hp : 0;
               const desiredTrade = Math.round(hpMax * hpTradePct);
@@ -7166,15 +8180,15 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   finishFuryHit(unit);
               }
               const aliveNow = tokensAlive();
-              const foes = aliveNow.filter(t => t.side === foeSide && t.alive);
-              const hits = Math.max(1, (u.hits | 0) || 1);
+              const foes = aliveNow.filter((t) => t.side === foeSide && t.alive);
+              const hits = getUltHitCount(u);
               const selected = [];
               if (foes.length) {
-                  const primary = pickTarget(Game, unit);
+                  const primary = pickTarget(game, unit);
                   if (primary) {
                       selected.push(primary);
                   }
-                  const pool = foes.filter(t => !selected.includes(t));
+                  const pool = foes.filter((t) => !selected.includes(t));
                   pool.sort((a, b) => {
                       const da = Math.abs(a.cx - unit.cx) + Math.abs(a.cy - unit.cy);
                       const db = Math.abs(b.cx - unit.cx) + Math.abs(b.cy - unit.cy);
@@ -7194,71 +8208,72 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               const applyBusyFromVfx = (startedAt, duration) => {
                   if (!Number.isFinite(startedAt) || !Number.isFinite(duration))
                       return;
-                  busyMs = Math.max(busyMs, duration);
-                  if (Game === null || Game === void 0 ? void 0 : Game.turn) {
-                      const prev = Number.isFinite(Game.turn.busyUntil) ? Game.turn.busyUntil : startedAt;
-                      Game.turn.busyUntil = Math.max(prev, startedAt + duration);
+                  const resolved = duration;
+                  busyMs = Math.max(busyMs, resolved);
+                  if (game.turn) {
+                      const prev = Number.isFinite(game.turn.busyUntil) ? game.turn.busyUntil : startedAt;
+                      game.turn.busyUntil = Math.max(prev, startedAt + resolved);
                   }
               };
               const bindingKey = 'huyet_hon_loi_quyet';
               {
                   const startedAt = getNow();
-                  try {
-                      const dur = vfxAddBloodPulse(Game, unit, {
-                          bindingKey,
-                          timing: 'charge_up'
-                      });
-                      applyBusyFromVfx(startedAt, dur);
-                  }
-                  catch (_) { }
-              }
-              const damageSpec = u.damage || {};
-              const dtype = damageSpec.type || 'arcane';
-              const attackType = u.countsAsBasic ? 'basic' : 'skill';
-              const wilScale = Number.isFinite(damageSpec.scaleWIL) ? damageSpec.scaleWIL : ((_e = damageSpec.scaleWil) !== null && _e !== void 0 ? _e : 0);
-              const flatAdd = Number.isFinite(damageSpec.flat) ? damageSpec.flat : ((_f = damageSpec.flatAdd) !== null && _f !== void 0 ? _f : 0);
-              const debuffSpec = u.appliesDebuff || null;
-              const debuffId = (debuffSpec === null || debuffSpec === void 0 ? void 0 : debuffSpec.id) || 'loithienanh_spd_burn';
-              const debuffAmount = Number.isFinite(debuffSpec === null || debuffSpec === void 0 ? void 0 : debuffSpec.amount)
-                  ? debuffSpec.amount
-                  : (Number.isFinite(debuffSpec === null || debuffSpec === void 0 ? void 0 : debuffSpec.amountPercent) ? debuffSpec.amountPercent : 0);
-              const debuffMaxStacks = Math.max(1, ((debuffSpec === null || debuffSpec === void 0 ? void 0 : debuffSpec.maxStacks) | 0) || 1);
-              const debuffDuration = Number.isFinite(debuffSpec === null || debuffSpec === void 0 ? void 0 : debuffSpec.turns)
-                  ? debuffSpec.turns
-                  : (Number.isFinite(u.duration) ? u.duration : (u.turns || 1));
-              for (const tgt of selected) {
-                  if (!tgt || !tgt.alive)
-                      continue;
-                  const tgtRank = ((_h = (_g = Game === null || Game === void 0 ? void 0 : Game.meta) === null || _g === void 0 ? void 0 : _g.rankOf) === null || _h === void 0 ? void 0 : _h.call(_g, tgt.id)) || (tgt === null || tgt === void 0 ? void 0 : tgt.rank) || '';
-                  const isBoss = typeof tgtRank === 'string' && tgtRank.toLowerCase() === 'boss';
-                  const pctDefault = Number.isFinite(damageSpec.percentTargetMaxHP)
-                      ? damageSpec.percentTargetMaxHP
-                      : (Number.isFinite(damageSpec.basePercentMaxHPTarget) ? damageSpec.basePercentMaxHPTarget : 0);
-                  const pct = isBoss
-                      ? (Number.isFinite(damageSpec.bossPercent) ? damageSpec.bossPercent : pctDefault)
-                      : pctDefault;
-                  const baseFromPct = Math.round(Math.max(0, pct) * Math.max(0, tgt.hpMax || 0));
-                  const baseFromWil = Math.round(Math.max(0, wilScale || 0) * Math.max(0, unit.wil || 0));
-                  const baseFlat = Math.round(Math.max(0, flatAdd || 0));
-                  const base = Math.max(1, baseFromPct + baseFromWil + baseFlat);
-                  dealAbilityDamage(Game, unit, tgt, {
-                      base,
-                      dtype,
-                      attackType,
-                      defPen: Number.isFinite(damageSpec.defPen) ? damageSpec.defPen : ((_j = damageSpec.pen) !== null && _j !== void 0 ? _j : 0)
-                  });
-                  {
-                      const startedAt = getNow();
+                  const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
+                  if (sessionVfx) {
                       try {
-                          const dur = vfxAddLightningArc(Game, unit, tgt, {
+                          const dur = vfxAddBloodPulse(sessionVfx, unit, {
                               bindingKey,
-                              timing: 'burst_core',
-                              targetBindingKey: bindingKey,
-                              targetTiming: 'burst_core'
+                              timing: 'charge_up'
                           });
                           applyBusyFromVfx(startedAt, dur);
                       }
                       catch (_) { }
+                  }
+              }
+              const damageSpec = ((_p = u.damage) !== null && _p !== void 0 ? _p : {});
+              const dtype = typeof damageSpec.type === 'string' && damageSpec.type ? damageSpec.type : 'arcane';
+              const attackType = u.countsAsBasic ? 'basic' : 'skill';
+              const wilScale = (_r = parseFiniteNumber((_q = damageSpec.scaleWIL) !== null && _q !== void 0 ? _q : damageSpec.scaleWil)) !== null && _r !== void 0 ? _r : 0;
+              const flatAdd = (_t = parseFiniteNumber((_s = damageSpec.flat) !== null && _s !== void 0 ? _s : damageSpec.flatAdd)) !== null && _t !== void 0 ? _t : 0;
+              const debuffSpec = (_u = u.appliesDebuff) !== null && _u !== void 0 ? _u : null;
+              const debuffId = typeof (debuffSpec === null || debuffSpec === void 0 ? void 0 : debuffSpec.id) === 'string' && debuffSpec.id ? debuffSpec.id : 'loithienanh_spd_burn';
+              const debuffAmount = (_w = parseFiniteNumber((_v = debuffSpec === null || debuffSpec === void 0 ? void 0 : debuffSpec.amount) !== null && _v !== void 0 ? _v : debuffSpec === null || debuffSpec === void 0 ? void 0 : debuffSpec.amountPercent)) !== null && _w !== void 0 ? _w : 0;
+              const debuffMaxStacks = Math.max(1, Math.round((_x = parseFiniteNumber(debuffSpec === null || debuffSpec === void 0 ? void 0 : debuffSpec.maxStacks)) !== null && _x !== void 0 ? _x : 1));
+              const debuffDuration = Math.max(1, Math.round((_y = parseFiniteNumber(debuffSpec === null || debuffSpec === void 0 ? void 0 : debuffSpec.turns)) !== null && _y !== void 0 ? _y : getUltDurationTurns(u, (_z = parseFiniteNumber(u.turns)) !== null && _z !== void 0 ? _z : 1)));
+              for (const tgt of selected) {
+                  if (!tgt || !tgt.alive)
+                      continue;
+                  const tgtRank = ((_1 = (_0 = game.meta) === null || _0 === void 0 ? void 0 : _0.rankOf) === null || _1 === void 0 ? void 0 : _1.call(_0, tgt.id)) || (tgt === null || tgt === void 0 ? void 0 : tgt.rank) || '';
+                  const isBoss = typeof tgtRank === 'string' && tgtRank.toLowerCase() === 'boss';
+                  const pctDefault = (_3 = parseFiniteNumber((_2 = damageSpec.percentTargetMaxHP) !== null && _2 !== void 0 ? _2 : damageSpec.basePercentMaxHPTarget)) !== null && _3 !== void 0 ? _3 : 0;
+                  const pct = isBoss
+                      ? (_4 = parseFiniteNumber(damageSpec.bossPercent)) !== null && _4 !== void 0 ? _4 : pctDefault
+                      : pctDefault;
+                  const baseFromPct = Math.round(Math.max(0, pct) * Math.max(0, tgt.hpMax || 0));
+                  const baseFromWil = Math.round(Math.max(0, wilScale) * Math.max(0, unit.wil || 0));
+                  const baseFlat = Math.round(Math.max(0, flatAdd));
+                  const base = Math.max(1, baseFromPct + baseFromWil + baseFlat);
+                  dealAbilityDamage(game, unit, tgt, {
+                      base,
+                      dtype,
+                      attackType,
+                      defPen: (_6 = parseFiniteNumber((_5 = damageSpec.defPen) !== null && _5 !== void 0 ? _5 : damageSpec.pen)) !== null && _6 !== void 0 ? _6 : 0
+                  });
+                  {
+                      const startedAt = getNow();
+                      const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
+                      if (sessionVfx) {
+                          try {
+                              const dur = vfxAddLightningArc(sessionVfx, unit, tgt, {
+                                  bindingKey,
+                                  timing: 'burst_core',
+                                  targetBindingKey: bindingKey,
+                                  targetTiming: 'burst_core'
+                              });
+                              applyBusyFromVfx(startedAt, dur);
+                          }
+                          catch (_) { }
+                      }
                   }
                   if (debuffAmount && tgt.alive) {
                       const existing = Statuses.get(tgt, debuffId);
@@ -7287,61 +8302,74 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               }
               {
                   const startedAt = getNow();
-                  try {
-                      const dur = vfxAddGroundBurst(Game, unit, {
-                          bindingKey,
-                          anchorId: 'right_foot',
-                          timing: 'ground_crack'
-                      });
-                      applyBusyFromVfx(startedAt, dur);
+                  const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
+                  if (sessionVfx) {
+                      try {
+                          const dur = vfxAddGroundBurst(sessionVfx, unit, {
+                              bindingKey,
+                              anchorId: 'right_foot',
+                              timing: 'ground_crack'
+                          });
+                          applyBusyFromVfx(startedAt, dur);
+                      }
+                      catch (_) { }
                   }
-                  catch (_) { }
               }
               {
                   const startedAt = getNow();
-                  try {
-                      const dur = vfxAddGroundBurst(Game, unit, {
-                          bindingKey,
-                          anchorId: 'left_foot',
-                          timing: 'ground_crack'
-                      });
-                      applyBusyFromVfx(startedAt, dur);
+                  const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
+                  if (sessionVfx) {
+                      try {
+                          const dur = vfxAddGroundBurst(sessionVfx, unit, {
+                              bindingKey,
+                              anchorId: 'left_foot',
+                              timing: 'ground_crack'
+                          });
+                          applyBusyFromVfx(startedAt, dur);
+                      }
+                      catch (_) { }
                   }
-                  catch (_) { }
               }
               {
                   const startedAt = getNow();
-                  try {
-                      const dur = vfxAddShieldWrap(Game, unit, {
-                          bindingKey,
-                          anchorId: 'root',
-                          timing: 'burst_core'
-                      });
-                      applyBusyFromVfx(startedAt, dur);
+                  const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
+                  if (sessionVfx) {
+                      try {
+                          const dur = vfxAddShieldWrap(sessionVfx, unit, {
+                              bindingKey,
+                              anchorId: 'root',
+                              timing: 'burst_core'
+                          });
+                          applyBusyFromVfx(startedAt, dur);
+                      }
+                      catch (_) { }
                   }
-                  catch (_) { }
               }
-              if (Number.isFinite(u.reduceDmg) && u.reduceDmg > 0) {
-                  const turns = Number.isFinite(u.duration) ? u.duration : (u.turns || 1);
-                  Statuses.add(unit, Statuses.make.damageCut({ pct: u.reduceDmg, turns }));
+              const reduceDmg = parseFiniteNumber(u.reduceDmg);
+              if (reduceDmg && reduceDmg > 0) {
+                  const turns = getUltDurationTurns(u, (_7 = parseFiniteNumber(u.turns)) !== null && _7 !== void 0 ? _7 : 1);
+                  Statuses.add(unit, Statuses.make.damageCut({ pct: reduceDmg, turns }));
               }
               busyMs = Math.max(busyMs, 1600);
               break;
           }
           case 'strikeLaneMid': {
-              const primary = pickTarget(Game, unit);
+              const primary = pickTarget(game, unit);
               if (!primary)
                   break;
               const laneX = primary.cx;
               const aliveNow = tokensAlive();
               const laneTargets = aliveNow.filter(t => t.side === foeSide && t.cx === laneX);
-              const hits = Math.max(1, (u.hits | 0) || 1);
-              const scale = typeof u.scale === 'number' ? u.scale : 0.9;
-              const meleeDur = (_l = (_k = CFG === null || CFG === void 0 ? void 0 : CFG.ANIMATION) === null || _k === void 0 ? void 0 : _k.meleeDurationMs) !== null && _l !== void 0 ? _l : 1100;
-              try {
-                  vfxAddMelee(Game, unit, primary, { dur: meleeDur });
+              const hits = getUltHitCount(u);
+              const scale = (_8 = parseFiniteNumber(u.scale)) !== null && _8 !== void 0 ? _8 : 0.9;
+              const meleeDur = (_10 = parseFiniteNumber((_9 = CFG === null || CFG === void 0 ? void 0 : CFG.ANIMATION) === null || _9 === void 0 ? void 0 : _9.meleeDurationMs)) !== null && _10 !== void 0 ? _10 : 1100;
+              const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
+              if (sessionVfx) {
+                  try {
+                      vfxAddMelee(sessionVfx, unit, primary, { dur: meleeDur });
+                  }
+                  catch (_) { }
               }
-              catch (_) { }
               busyMs = Math.max(busyMs, meleeDur);
               for (const enemy of laneTargets) {
                   if (!enemy.alive)
@@ -7350,21 +8378,22 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                       if (!enemy.alive)
                           break;
                       let base = Math.max(1, Math.round((unit.atk || 0) * scale));
-                      if (u.bonusVsLeader && (enemy.id === 'leaderA' || enemy.id === 'leaderB')) {
-                          base = Math.round(base * (1 + u.bonusVsLeader));
+                      const bonusVsLeader = (_11 = parseFiniteNumber(u.bonusVsLeader)) !== null && _11 !== void 0 ? _11 : 0;
+                      if (bonusVsLeader && (enemy.id === 'leaderA' || enemy.id === 'leaderB')) {
+                          base = Math.round(base * (1 + bonusVsLeader));
                       }
-                      dealAbilityDamage(Game, unit, enemy, {
+                      dealAbilityDamage(game, unit, enemy, {
                           base,
                           dtype: 'arcane',
                           attackType: u.tagAsBasic ? 'basic' : 'skill',
-                          defPen: (_m = u.penRES) !== null && _m !== void 0 ? _m : 0
+                          defPen: (_12 = parseFiniteNumber(u.penRES)) !== null && _12 !== void 0 ? _12 : 0
                       });
                   }
               }
               break;
           }
           case 'selfBuff': {
-              const tradePct = Math.max(0, Math.min(0.9, (_o = u.selfHPTrade) !== null && _o !== void 0 ? _o : 0));
+              const tradePct = Math.max(0, Math.min(0.9, (_13 = parseFiniteNumber(u.selfHPTrade)) !== null && _13 !== void 0 ? _13 : 0));
               const pay = Math.round((unit.hpMax || 0) * tradePct);
               const maxPay = Math.max(0, Math.min(pay, Math.max(0, (unit.hp || 0) - 1)));
               if (maxPay > 0) {
@@ -7377,14 +8406,20 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   });
                   finishFuryHit(unit);
               }
-              const reduce = Math.max(0, (_p = u.reduceDmg) !== null && _p !== void 0 ? _p : 0);
+              const reduce = Math.max(0, (_14 = parseFiniteNumber(u.reduceDmg)) !== null && _14 !== void 0 ? _14 : 0);
               if (reduce > 0) {
-                  Statuses.add(unit, Statuses.make.damageCut({ pct: reduce, turns: u.turns || 1 }));
+                  const turns = getUltDurationTurns(u, (_15 = parseFiniteNumber(u.turns)) !== null && _15 !== void 0 ? _15 : 1);
+                  Statuses.add(unit, Statuses.make.damageCut({ pct: reduce, turns }));
               }
-              try {
-                  vfxAddHit(Game, unit);
+              {
+                  const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
+                  if (sessionVfx) {
+                      try {
+                          vfxAddHit(sessionVfx, unit);
+                      }
+                      catch (_) { }
+                  }
               }
-              catch (_) { }
               busyMs = 800;
               break;
           }
@@ -7393,7 +8428,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               const foes = aliveNow.filter(t => t.side === foeSide);
               if (!foes.length)
                   break;
-              const take = Math.max(1, Math.min(foes.length, (u.targets | 0) || foes.length));
+              const take = Math.max(1, Math.min(foes.length, getUltTargetCount(u, foes.length)));
               foes.sort((a, b) => {
                   const da = Math.abs(a.cx - unit.cx) + Math.abs(a.cy - unit.cy);
                   const db = Math.abs(b.cx - unit.cx) + Math.abs(b.cy - unit.cy);
@@ -7401,41 +8436,52 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               });
               for (let i = 0; i < take; i++) {
                   const tgt = foes[i];
-                  Statuses.add(tgt, Statuses.make.sleep({ turns: u.turns || 1 }));
-                  try {
-                      vfxAddHit(Game, tgt);
+                  if (!tgt)
+                      continue;
+                  const turns = getUltDurationTurns(u, (_16 = parseFiniteNumber(u.turns)) !== null && _16 !== void 0 ? _16 : 1);
+                  Statuses.add(tgt, Statuses.make.sleep({ turns }));
+                  const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
+                  if (sessionVfx) {
+                      try {
+                          vfxAddHit(sessionVfx, tgt);
+                      }
+                      catch (_) { }
                   }
-                  catch (_) { }
               }
               busyMs = 1000;
               break;
           }
           case 'revive': {
-              const tokens = (Game === null || Game === void 0 ? void 0 : Game.tokens) || [];
+              const tokens = game.tokens || [];
               const fallen = tokens.filter(t => t.side === unit.side && !t.alive);
               if (!fallen.length)
                   break;
               fallen.sort((a, b) => (b.deadAt || 0) - (a.deadAt || 0));
-              const take = Math.max(1, Math.min(fallen.length, (u.targets | 0) || 1));
+              const take = Math.max(1, Math.min(fallen.length, getUltTargetCount(u, 1)));
               for (let i = 0; i < take; i++) {
                   const ally = fallen[i];
+                  if (!ally)
+                      continue;
                   ally.alive = true;
                   ally.deadAt = 0;
                   ally.hp = 0;
                   Statuses.purge(ally);
-                  const hpPct = Math.max(0, Math.min(1, (_r = ((_q = u.revived) === null || _q === void 0 ? void 0 : _q.hpPct)) !== null && _r !== void 0 ? _r : 0.5));
+                  const revivedHp = (_20 = parseFiniteNumber((_18 = (_17 = u.revived) === null || _17 === void 0 ? void 0 : _17.hpPercent) !== null && _18 !== void 0 ? _18 : (_19 = u.revived) === null || _19 === void 0 ? void 0 : _19.hpPct)) !== null && _20 !== void 0 ? _20 : 0.5;
+                  const hpPct = Math.max(0, Math.min(1, revivedHp));
                   const healAmt = Math.max(1, Math.round((ally.hpMax || 0) * hpPct));
                   healUnit(ally, healAmt);
-                  if (ally) {
-                      setFury(ally, Math.max(0, (_t = ((_s = u.revived) === null || _s === void 0 ? void 0 : _s.rage)) !== null && _t !== void 0 ? _t : 0));
+                  setFury(ally, Math.max(0, (_22 = parseFiniteNumber((_21 = u.revived) === null || _21 === void 0 ? void 0 : _21.rage)) !== null && _22 !== void 0 ? _22 : 0));
+                  if ((_23 = u.revived) === null || _23 === void 0 ? void 0 : _23.lockSkillsTurns) {
+                      const silenceTurns = Math.max(1, Math.round((_24 = parseFiniteNumber(u.revived.lockSkillsTurns)) !== null && _24 !== void 0 ? _24 : 1));
+                      Statuses.add(ally, Statuses.make.silence({ turns: silenceTurns }));
                   }
-                  if ((_u = u.revived) === null || _u === void 0 ? void 0 : _u.lockSkillsTurns) {
-                      Statuses.add(ally, Statuses.make.silence({ turns: u.revived.lockSkillsTurns }));
+                  const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
+                  if (sessionVfx) {
+                      try {
+                          vfxAddSpawn(sessionVfx, ally.cx, ally.cy, ally.side);
+                      }
+                      catch (_) { }
                   }
-                  try {
-                      vfxAddSpawn(Game, ally.cx, ally.cy, ally.side);
-                  }
-                  catch (_) { }
               }
               busyMs = 1500;
               break;
@@ -7450,11 +8496,11 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   const rb = (b.hpMax || 1) ? (b.hp || 0) / b.hpMax : 0;
                   return ra - rb;
               });
-              const count = Math.max(1, Math.min(allies.length, (u.allies | 0) || allies.length));
+              const count = Math.max(1, Math.min(allies.length, getUltAlliesCount(u, allies.length)));
               const selected = allies.slice(0, count);
               if (u.healLeader) {
                   const leaderId = unit.side === 'ally' ? 'leaderA' : 'leaderB';
-                  const tokens = (Game === null || Game === void 0 ? void 0 : Game.tokens) || [];
+                  const tokens = game.tokens || [];
                   const leader = tokens.find(t => t.id === leaderId && t.alive);
                   if (leader && !selected.includes(leader))
                       selected.push(leader);
@@ -7469,10 +8515,13 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   const goal = Math.min(tgt.hpMax || 0, Math.round((tgt.hpMax || 0) * ratio));
                   if (goal > (tgt.hp || 0)) {
                       healUnit(tgt, goal - (tgt.hp || 0));
-                      try {
-                          vfxAddHit(Game, tgt);
+                      const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
+                      if (sessionVfx) {
+                          try {
+                              vfxAddHit(sessionVfx, tgt);
+                          }
+                          catch (_) { }
                       }
-                      catch (_) { }
                   }
               }
               busyMs = 1000;
@@ -7481,16 +8530,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           case 'haste': {
               const targets = new Set();
               targets.add(unit);
-              const extraAllies = (() => {
-                  if (typeof u.targets === 'number')
-                      return Math.max(0, (u.targets | 0) - 1);
-                  if (typeof u.targets === 'string') {
-                      const m = u.targets.match(/(\d+)/);
-                      if (m && m[1])
-                          return Math.max(0, parseInt(m[1], 10));
-                  }
-                  return 0;
-              })();
+              const extraAllies = Math.max(0, getUltTargetCount(u, 1) - 1);
               const aliveNow = tokensAlive();
               const others = aliveNow.filter(t => t.side === unit.side && t !== unit);
               others.sort((a, b) => (a.spd || 0) - (b.spd || 0));
@@ -7499,13 +8539,17 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                       break;
                   targets.add(ally);
               }
-              const pct = (_v = u.attackSpeed) !== null && _v !== void 0 ? _v : 0.1;
+              const pct = (_25 = parseFiniteNumber(u.attackSpeed)) !== null && _25 !== void 0 ? _25 : 0.1;
               for (const tgt of targets) {
-                  Statuses.add(tgt, Statuses.make.haste({ pct, turns: u.turns || 1 }));
-                  try {
-                      vfxAddHit(Game, tgt);
+                  const turns = getUltDurationTurns(u, (_26 = parseFiniteNumber(u.turns)) !== null && _26 !== void 0 ? _26 : 1);
+                  Statuses.add(tgt, Statuses.make.haste({ pct, turns }));
+                  const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
+                  if (sessionVfx) {
+                      try {
+                          vfxAddHit(sessionVfx, tgt);
+                      }
+                      catch (_) { }
                   }
-                  catch (_) { }
               }
               busyMs = 900;
               break;
@@ -7751,6 +8795,10 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       }
       canvas = boardEl;
       ctx = boardEl.getContext('2d');
+      if (!ctx) {
+          console.warn('[pve] Không thể lấy ngữ cảnh 2D cho canvas PvE.');
+          return false;
+      }
       if (typeof hudCleanup === 'function') {
           hudCleanup();
           hudCleanup = null;
@@ -7761,9 +8809,15 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       if (Game.grid)
           spawnLeaders(Game.tokens, Game.grid);
       const tokens = Game.tokens || [];
-      for (const t of tokens) {
-          if (t.id === 'leaderA' || t.id === 'leaderB') {
-              vfxAddSpawn(Game, t.cx, t.cy, t.side);
+      const sessionVfx = ensureSessionWithVfx(Game, { requireGrid: true });
+      if (sessionVfx) {
+          for (const t of tokens) {
+              if (t.id === 'leaderA' || t.id === 'leaderB') {
+                  try {
+                      vfxAddSpawn(sessionVfx, t.cx, t.cy, t.side);
+                  }
+                  catch (_) { }
+              }
           }
       }
       for (const t of tokens) {
@@ -7817,30 +8871,31 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       }
       canvasClickHandler = (ev) => {
           var _a, _b, _c;
-          if (!canvas || !Game.grid)
+          const game = getInitializedGame();
+          if (!canvas || !(game === null || game === void 0 ? void 0 : game.grid))
               return;
           const rect = canvas.getBoundingClientRect();
           const p = { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
-          const cell = hitToCellOblique(Game.grid, p.x, p.y, CAM_PRESET);
+          const cell = hitToCellOblique(game.grid, p.x, p.y, CAM_PRESET);
           if (!cell)
               return;
           if (cell.cx >= CFG.ALLY_COLS)
               return;
           const deck = ensureDeck();
-          const card = (_a = deck.find((u) => u.id === Game.selectedId)) !== null && _a !== void 0 ? _a : null;
+          const card = (_a = deck.find((u) => u.id === game.selectedId)) !== null && _a !== void 0 ? _a : null;
           if (!card)
               return;
-          if (cellReserved(tokensAlive(), Game.queued, cell.cx, cell.cy))
+          if (cellReserved(tokensAlive(), game.queued, cell.cx, cell.cy))
               return;
           const cardCost = getCardCost(card);
-          if (Game.cost < cardCost)
+          if (game.cost < cardCost)
               return;
-          if (Game.summoned >= Game.summonLimit)
+          if (game.summoned >= game.summonLimit)
               return;
           const slot = slotIndex('ally', cell.cx, cell.cy);
-          if (Game.queued.ally.has(slot))
+          if (game.queued.ally.has(slot))
               return;
-          const spawnCycle = predictSpawnCycle(Game, 'ally', slot);
+          const spawnCycle = predictSpawnCycle(game, 'ally', slot);
           const pendingArt = getUnitArt(card.id);
           const pending = {
               unitId: card.id,
@@ -7855,14 +8910,14 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               art: pendingArt !== null && pendingArt !== void 0 ? pendingArt : null,
               skinKey: (_c = pendingArt === null || pendingArt === void 0 ? void 0 : pendingArt.skinKey) !== null && _c !== void 0 ? _c : null,
           };
-          Game.queued.ally.set(slot, pending);
-          Game.cost = Math.max(0, Game.cost - cardCost);
-          if (hud && Game)
-              hud.update(Game);
-          Game.summoned += 1;
-          Game.usedUnitIds.add(card.id);
-          Game.deck3 = deck.filter((u) => u.id !== card.id);
-          Game.selectedId = null;
+          game.queued.ally.set(slot, pending);
+          game.cost = Math.max(0, game.cost - cardCost);
+          if (hud && game)
+              hud.update(game);
+          game.summoned += 1;
+          game.usedUnitIds.add(card.id);
+          game.deck3 = deck.filter((u) => u.id !== card.id);
+          game.selectedId = null;
           refillDeck();
           selectFirstAffordable();
           renderSummonBar();
@@ -8221,9 +9276,12 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           const art = t.art || getUnitArt(t.id, { skinKey: t.skinKey });
           const layout = (art === null || art === void 0 ? void 0 : art.layout) || {};
           const r = Math.max(6, Math.floor(baseR * (p.scale || 1)));
-          const barWidth = Math.max(28, Math.floor(r * ((_a = layout.hpWidth) !== null && _a !== void 0 ? _a : 2.4)));
-          const barHeight = Math.max(5, Math.floor(r * ((_b = layout.hpHeight) !== null && _b !== void 0 ? _b : 0.42)));
-          const offset = (_c = layout.hpOffset) !== null && _c !== void 0 ? _c : 1.46;
+          const widthRatio = (_a = parseFiniteNumber(layout.hpWidth)) !== null && _a !== void 0 ? _a : 2.4;
+          const heightRatio = (_b = parseFiniteNumber(layout.hpHeight)) !== null && _b !== void 0 ? _b : 0.42;
+          const offsetRatio = (_c = parseFiniteNumber(layout.hpOffset)) !== null && _c !== void 0 ? _c : 1.46;
+          const barWidth = Math.max(28, Math.floor(r * widthRatio));
+          const barHeight = Math.max(5, Math.floor(r * heightRatio));
+          const offset = offsetRatio;
           const x = Math.round(p.x - barWidth / 2);
           const y = Math.round(p.y + r * offset - barHeight / 2);
           const ratio = Math.max(0, Math.min(1, (t.hp || 0) / (t.hpMax || 1)));
@@ -8401,7 +9459,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   }
   function startSession(config = {}) {
       configureRoot(rootElement);
-      const overrides = normalizeConfig(config);
+      const overrides = normalizeConfig(toStartConfigOverrides(config));
       if (running)
           stopSession();
       resetSessionState(overrides);
@@ -8472,7 +9530,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       }
   }
   function updateSessionConfig(next = {}) {
-      const normalized = normalizeConfig(next);
+      const normalized = normalizeConfig(toStartConfigOverrides(next));
       storedConfig = normalizeConfig({ ...storedConfig, ...normalized });
       applyConfigToRunningGame(normalized);
   }
@@ -8493,8 +9551,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               stopSession();
           },
           updateConfig(next = null) {
-              const overrides = (next !== null && next !== void 0 ? next : {});
-              updateSessionConfig(overrides);
+              updateSessionConfig(next);
           },
           setUnitSkin(unitId, skinKey) {
               return setUnitSkinForSession(unitId, skinKey);
@@ -8709,7 +9766,7 @@ __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'createPveSession')) exports.createPveSession = createPveSession;
 });
 __define('./modes/pve/session-state.ts', (exports, module, __require) => {
-  const __dep0 = __require('./types/units.ts');
+  const __dep0 = __require('./../types/@shared-types/units.d.ts');
   const createSummonQueue = __dep0.createSummonQueue;
   const __dep1 = __require('./config.ts');
   const CFG = __dep1.CFG;
@@ -8717,7 +9774,7 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
   const UNITS = __dep2.UNITS;
   const lookupUnit = __dep2.lookupUnit;
   const __dep3 = __require('./meta.ts');
-  const Meta = __dep3.Meta;
+  const metaServiceAdapter = __dep3.metaServiceAdapter;
   const __dep4 = __require('./events.ts');
   const gameEvents = __dep4.gameEvents;
   const __dep5 = __require('./background.ts');
@@ -8729,12 +9786,15 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
   const Statuses = __dep7.Statuses;
   const __dep8 = __require('./art.ts');
   const getUnitArt = __dep8.getUnitArt;
+  const __dep9 = __require('./utils/unit-id.ts');
+  const normalizeUnitId = __dep9.normalizeUnitId;
   void Statuses;
   const DEFAULT_UNIT_ROSTER = UNITS.map((unit) => {
       var _a;
-      const art = getUnitArt(unit.id);
+      const unitId = normalizeUnitId(unit.id);
+      const art = getUnitArt(unitId);
       return {
-          id: unit.id,
+          id: unitId,
           name: unit.name,
           cost: Number.isFinite(unit.cost) ? unit.cost : null,
           art,
@@ -8823,7 +9883,7 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
           },
           result: null,
           ai: params.ai,
-          meta: Meta,
+          meta: metaServiceAdapter,
           runtime: {
               encounter: null,
               wave: null,
@@ -9014,7 +10074,7 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
           ? rawSides.filter((side) => isTurnOrderSide(side))
           : ['ally', 'enemy'];
       const order = [];
-      const scan = Array.isArray(cfg.pairScan) ? cfg.pairScan : [];
+      const scan = Array.isArray(cfg.pairScan) ? [...cfg.pairScan] : [];
       for (const entry of scan) {
           const normalized = normalizePairScanEntry(entry, sides);
           if (normalized.length)
@@ -9042,14 +10102,14 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
       const sceneTheme = (_c = (_b = (_a = normalized.sceneTheme) !== null && _a !== void 0 ? _a : sceneCfg === null || sceneCfg === void 0 ? void 0 : sceneCfg.CURRENT_THEME) !== null && _b !== void 0 ? _b : sceneCfg === null || sceneCfg === void 0 ? void 0 : sceneCfg.DEFAULT_THEME) !== null && _c !== void 0 ? _c : null;
       const backgroundKey = (_h = (_g = (_f = (_e = (_d = normalized.backgroundKey) !== null && _d !== void 0 ? _d : CFG.CURRENT_BACKGROUND) !== null && _e !== void 0 ? _e : sceneCfg === null || sceneCfg === void 0 ? void 0 : sceneCfg.CURRENT_BACKGROUND) !== null && _f !== void 0 ? _f : sceneCfg === null || sceneCfg === void 0 ? void 0 : sceneCfg.CURRENT_THEME) !== null && _g !== void 0 ? _g : sceneCfg === null || sceneCfg === void 0 ? void 0 : sceneCfg.DEFAULT_THEME) !== null && _h !== void 0 ? _h : null;
       const allyUnits = Array.isArray(normalized.deck) && normalized.deck.length
-          ? normalized.deck.slice()
-          : DEFAULT_UNIT_ROSTER;
+          ? Array.from(normalized.deck)
+          : Array.from(DEFAULT_UNIT_ROSTER);
       const enemyPreset = (_j = normalized.aiPreset) !== null && _j !== void 0 ? _j : null;
       const enemyUnits = Array.isArray(enemyPreset === null || enemyPreset === void 0 ? void 0 : enemyPreset.deck) && enemyPreset.deck.length
-          ? [...enemyPreset.deck]
+          ? Array.from(enemyPreset.deck)
           : Array.isArray(enemyPreset === null || enemyPreset === void 0 ? void 0 : enemyPreset.unitsAll) && enemyPreset.unitsAll.length
-              ? [...enemyPreset.unitsAll]
-              : DEFAULT_UNIT_ROSTER;
+              ? Array.from(enemyPreset.unitsAll)
+              : Array.from(DEFAULT_UNIT_ROSTER);
       const requestedTurnMode = (_q = (_o = (_m = (_k = normalized.turnMode) !== null && _k !== void 0 ? _k : (_l = normalized.turn) === null || _l === void 0 ? void 0 : _l.mode) !== null && _m !== void 0 ? _m : normalized.turnOrderMode) !== null && _o !== void 0 ? _o : (_p = normalized.turnOrder) === null || _p === void 0 ? void 0 : _p.mode) !== null && _q !== void 0 ? _q : getTurnOrderMode(CFG);
       const useInterleaved = requestedTurnMode === 'interleaved_by_position';
       const allyColsRaw = CFG.ALLY_COLS;
@@ -9072,6 +10132,7 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
           }
           const { order, indexMap } = buildTurnOrder();
           return {
+              mode: 'sequential',
               order,
               orderIndex: indexMap,
               cursor: 0,
@@ -9324,7 +10385,12 @@ __define('./passives.ts', (exports, module, __require) => {
       if (!isRecord(value))
           return false;
       const passives = value.passives;
-      return passives == null || Array.isArray(passives);
+      if (passives != null && !Array.isArray(passives))
+          return false;
+      const onSpawn = value.onSpawn;
+      if (onSpawn != null && (typeof onSpawn !== 'object' || Array.isArray(onSpawn)))
+          return false;
+      return true;
   };
   const coercePassiveMeta = (value) => {
       if (!isRecord(value))
@@ -9336,6 +10402,87 @@ __define('./passives.ts', (exports, module, __require) => {
           meta,
           kit,
       };
+  };
+  const isEffectCandidate = (value) => {
+      if (typeof value === 'string')
+          return true;
+      return !!value && typeof value === 'object';
+  };
+  const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
+  const collectPassiveEffects = (passive) => {
+      if (!passive)
+          return [];
+      const out = [];
+      const effects = Array.isArray(passive.effects) ? passive.effects : null;
+      if (effects) {
+          for (const entry of effects) {
+              if (!isEffectCandidate(entry))
+                  continue;
+              out.push(entry);
+          }
+      }
+      if (!out.length && isEffectCandidate(passive.effect)) {
+          out.push(passive.effect);
+      }
+      return out;
+  };
+  const getPassiveLog = (Game) => {
+      const logCandidate = Game === null || Game === void 0 ? void 0 : Game.passiveLog;
+      if (!Array.isArray(logCandidate))
+          return [];
+      const result = [];
+      for (const entry of logCandidate) {
+          if (isRecord(entry)) {
+              result.push(entry);
+          }
+      }
+      return result;
+  };
+  const defaultPassive = ({ passive }) => {
+      var _a;
+      const id = (_a = passive === null || passive === void 0 ? void 0 : passive.id) !== null && _a !== void 0 ? _a : 'unknown';
+      throw new Error(`Passive handler not implemented: ${id}`);
+  };
+  const resolvePassiveEffect = (basePassive, effect) => {
+      const key = typeof effect === 'string'
+          ? effect
+          : effect && typeof effect === 'object'
+              ? (effect.type || effect.kind || null)
+              : null;
+      let handler = getRegisteredPassive(key);
+      let params = basePassive.params;
+      let resolved = basePassive;
+      if (effect && typeof effect === 'object') {
+          const spec = effect;
+          const type = spec.type || spec.kind;
+          if (type) {
+              const candidate = getRegisteredPassive(type);
+              if (candidate)
+                  handler = candidate;
+          }
+          const mergedParams = {
+              ...(basePassive.params || {}),
+              ...(spec.params || {}),
+          };
+          if (spec.stats && typeof spec.stats === 'object') {
+              mergedParams.stats = spec.stats;
+          }
+          if (spec.flatStats && typeof spec.flatStats === 'object') {
+              mergedParams.flatStats = spec.flatStats;
+          }
+          resolved = { ...basePassive, params: mergedParams };
+          if (spec.id && typeof spec.id === 'string' && spec.id.trim()) {
+              resolved.id = spec.id;
+          }
+          params = mergedParams;
+          if (!handler && (mergedParams.stats || mergedParams.flatStats)) {
+              handler = EFFECTS.gainStats;
+          }
+      }
+      else if (!handler && basePassive.params && (basePassive.params.stats || basePassive.params.flatStats)) {
+          handler = EFFECTS.gainStats;
+      }
+      return { handler: handler !== null && handler !== void 0 ? handler : defaultPassive, passive: resolved, params, key };
   };
   const STAT_ALIAS = new Map([
       ['atk', 'atk'],
@@ -9512,8 +10659,11 @@ __define('./passives.ts', (exports, module, __require) => {
           }
       }
       if (condition.minMinions != null) {
+          const ownerIid = unit === null || unit === void 0 ? void 0 : unit.iid;
+          if (ownerIid == null)
+              return false;
           const tokens = (Game === null || Game === void 0 ? void 0 : Game.tokens) || [];
-          const count = tokens.filter(t => t && t.alive && t.isMinion && t.ownerIid === unit.iid).length;
+          const count = tokens.filter(t => t && t.alive && t.isMinion && t.ownerIid === ownerIid).length;
           if (count < Number(condition.minMinions))
               return false;
       }
@@ -9531,11 +10681,12 @@ __define('./passives.ts', (exports, module, __require) => {
   const isPassiveConditionFn = (cond) => typeof cond === 'function';
   const isPassiveConditionObject = (cond) => !!cond && typeof cond === 'object' && !Array.isArray(cond);
   const passiveConditionsOk = ({ Game, unit, passive, ctx, }) => {
-      const conditions = passive === null || passive === void 0 ? void 0 : passive.conditions;
-      if (!conditions)
+      var _a;
+      const conditionsCandidate = passive ? ((_a = passive.conditions) !== null && _a !== void 0 ? _a : null) : null;
+      if (!conditionsCandidate)
           return true;
-      const list = Array.isArray(conditions) ? conditions : [conditions];
-      for (const cond of list) {
+      const conditions = Array.isArray(conditionsCandidate) ? conditionsCandidate : [conditionsCandidate];
+      for (const cond of conditions) {
           if (!cond)
               continue;
           if (isPassiveConditionFn(cond)) {
@@ -9586,12 +10737,12 @@ __define('./passives.ts', (exports, module, __require) => {
           store.set(attr, prev + amount);
       }
       for (const [key, baseValue] of Object.entries(unit.baseStats)) {
-          if (!Number.isFinite(baseValue))
+          if (typeof baseValue !== 'number' || !Number.isFinite(baseValue))
               continue;
           const attr = normalizeStatKey(key) || key;
-          const pct = (_f = (_e = percent.get(attr)) !== null && _e !== void 0 ? _e : percent.get(key)) !== null && _f !== void 0 ? _f : 0;
-          const add = (_h = (_g = flat.get(attr)) !== null && _g !== void 0 ? _g : flat.get(key)) !== null && _h !== void 0 ? _h : 0;
-          let next = (baseValue !== null && baseValue !== void 0 ? baseValue : 0) * (1 + pct) + add;
+          const pct = Number((_f = (_e = percent.get(attr)) !== null && _e !== void 0 ? _e : percent.get(key)) !== null && _f !== void 0 ? _f : 0);
+          const add = Number((_h = (_g = flat.get(attr)) !== null && _g !== void 0 ? _g : flat.get(key)) !== null && _h !== void 0 ? _h : 0);
+          let next = baseValue * (1 + pct) + add;
           if (attr === 'arm' || attr === 'res') {
               unit[attr] = clamp01(next);
               continue;
@@ -9623,7 +10774,7 @@ __define('./passives.ts', (exports, module, __require) => {
       for (const ally of allies) {
           if (!Number.isFinite(ally.hpMax))
               continue;
-          const base = mode === 'casterMax' ? casterHpMax : (_b = ally.hpMax) !== null && _b !== void 0 ? _b : 0;
+          const base = mode === 'casterMax' ? casterHpMax : ((_b = ally.hpMax) !== null && _b !== void 0 ? _b : 0);
           if (!Number.isFinite(base) || base <= 0)
               continue;
           const healAmount = Math.max(0, Math.round(base * pct));
@@ -9851,7 +11002,7 @@ __define('./passives.ts', (exports, module, __require) => {
       },
   };
   /** @type {Record<string, PassiveEffectHandler>} */
-  const PASSIVES = {
+  const PASSIVE_ENTRIES = {
       placeMark: EFFECTS.placeMark,
       'gainATK%': EFFECTS.gainATKPercent,
       'gainWIL%': EFFECTS.gainWILPercent,
@@ -9863,6 +11014,16 @@ __define('./passives.ts', (exports, module, __require) => {
       statBuff: EFFECTS.gainStats,
       statGain: EFFECTS.gainStats,
   };
+  const PASSIVES = Object.freeze(Object.fromEntries(Object.entries(PASSIVE_ENTRIES).map(([key, handler]) => [
+      key,
+      typeof handler === 'function' ? handler : defaultPassive,
+  ])));
+  function getRegisteredPassive(key) {
+      if (!key)
+          return null;
+      const candidate = hasOwn(PASSIVES, key) ? PASSIVES[key] : undefined;
+      return typeof candidate === 'function' ? candidate : null;
+  }
   /**
    * @param {SessionState | null | undefined} Game
    * @param {UnitToken | null | undefined} unit
@@ -9871,7 +11032,7 @@ __define('./passives.ts', (exports, module, __require) => {
    * @returns {void}
    */
   function emitPassiveEvent(Game, unit, when, ctx = {}) {
-      var _a, _b, _c, _d;
+      var _a, _b;
       if (!Game || !unit)
           return;
       const metaValue = Game.meta && typeof Game.meta.get === 'function' ? Game.meta.get(unit.id) : null;
@@ -9884,88 +11045,76 @@ __define('./passives.ts', (exports, module, __require) => {
       for (const passive of kit.passives) {
           if (!passive || passive.when !== when)
               continue;
-          const effectKey = typeof passive.effect === 'string'
-              ? passive.effect
-              : (((_c = passive.effect) === null || _c === void 0 ? void 0 : _c.type) || ((_d = passive.effect) === null || _d === void 0 ? void 0 : _d.kind) || null);
-          let handler = effectKey ? PASSIVES[effectKey] : undefined;
-          let effectivePassive = passive;
-          if (passive && typeof passive.effect === 'object' && passive.effect !== null) {
-              const spec = passive.effect;
-              const type = spec.type || spec.kind;
-              if (type && PASSIVES[type])
-                  handler = PASSIVES[type];
-              const mergedParams = {
-                  ...(spec.params || {}),
-                  ...(passive.params || {}),
-                  ...(spec.stats ? { stats: spec.stats } : {}),
-                  ...(spec.flatStats ? { flatStats: spec.flatStats } : {}),
-              };
-              effectivePassive = { ...passive, params: mergedParams };
-              if (!handler && (mergedParams.stats || mergedParams.flatStats)) {
-                  handler = EFFECTS.gainStats;
-              }
-          }
-          else if (!handler && (passive === null || passive === void 0 ? void 0 : passive.params) && (passive.params.stats || passive.params.flatStats)) {
-              handler = EFFECTS.gainStats;
-          }
-          const params = effectivePassive === null || effectivePassive === void 0 ? void 0 : effectivePassive.params;
-          if (effectKey === 'gainRES%' && params && params.perTarget != null) {
-              handler = EFFECTS.resPerSleeping;
-          }
-          if (typeof handler !== 'function')
+          const effects = collectPassiveEffects(passive);
+          if (!effects.length)
               continue;
-          if (!passiveConditionsOk({ Game, unit, passive: effectivePassive, ctx }))
-              continue;
-          handler({ Game: Game !== null && Game !== void 0 ? Game : null, unit: unit !== null && unit !== void 0 ? unit : null, passive: effectivePassive !== null && effectivePassive !== void 0 ? effectivePassive : null, ctx });
+          for (const effect of effects) {
+              const { handler, passive: effectivePassive, params, key } = resolvePassiveEffect(passive, effect);
+              if (typeof handler !== 'function')
+                  continue;
+              if (!effectivePassive)
+                  continue;
+              const handlerToUse = key === 'gainRES%' && params && params.perTarget != null
+                  ? EFFECTS.resPerSleeping
+                  : handler;
+              if (typeof handlerToUse !== 'function')
+                  continue;
+              if (!passiveConditionsOk({ Game, unit, passive: effectivePassive, ctx }))
+                  continue;
+              handlerToUse({ Game: Game !== null && Game !== void 0 ? Game : null, unit: unit !== null && unit !== void 0 ? unit : null, passive: effectivePassive !== null && effectivePassive !== void 0 ? effectivePassive : null, ctx });
+          }
       }
   }
   /**
    * @param {SessionState | null | undefined} Game
    * @param {UnitToken | null | undefined} unit
-   * @param {Record<string, unknown>} [onSpawn]
+   * @param {UnitKitConfig['onSpawn']} [onSpawn]
    * @returns {void}
    */
-  function applyOnSpawnEffects(Game, unit, onSpawn = {}) {
+  function applyOnSpawnEffects(Game, unit, onSpawn) {
       var _a, _b, _c, _d, _e;
       if (!Game || !unit || !onSpawn)
           return;
+      const config = isRecord(onSpawn) ? onSpawn : null;
+      if (!config)
+          return;
       ensureStatusContainer(unit);
       const effects = [];
-      if (Array.isArray(onSpawn.effects)) {
-          for (const effect of onSpawn.effects) {
+      if (Array.isArray(config.effects)) {
+          for (const effect of config.effects) {
               if (isRecord(effect))
                   effects.push(effect);
           }
       }
-      if (Number.isFinite(onSpawn.teamHealOnEntry) && Number(onSpawn.teamHealOnEntry) > 0) {
-          effects.push({ type: 'teamHeal', amount: onSpawn.teamHealOnEntry, mode: 'targetMax' });
+      if (Number.isFinite(config.teamHealOnEntry) && Number(config.teamHealOnEntry) > 0) {
+          effects.push({ type: 'teamHeal', amount: config.teamHealOnEntry, mode: 'targetMax' });
       }
-      const casterHeal = ((_a = onSpawn.teamHealPercentMaxHPOfCaster) !== null && _a !== void 0 ? _a : onSpawn.teamHealPercentCasterMaxHP);
+      const casterHeal = ((_a = config.teamHealPercentMaxHPOfCaster) !== null && _a !== void 0 ? _a : config.teamHealPercentCasterMaxHP);
       if (Number.isFinite(casterHeal) && Number(casterHeal) > 0) {
           effects.push({ type: 'teamHeal', amount: casterHeal, mode: 'casterMax' });
       }
-      if (Array.isArray(onSpawn.statuses)) {
-          for (const st of onSpawn.statuses) {
+      if (Array.isArray(config.statuses)) {
+          for (const st of config.statuses) {
               if (!st || typeof st !== 'object')
                   continue;
               effects.push({ type: 'status', status: st });
           }
       }
-      if (Array.isArray(onSpawn.addStatuses)) {
-          for (const st of onSpawn.addStatuses) {
+      if (Array.isArray(config.addStatuses)) {
+          for (const st of config.addStatuses) {
               if (!st || typeof st !== 'object')
                   continue;
               effects.push({ type: 'status', status: st });
           }
       }
-      if (onSpawn.status && typeof onSpawn.status === 'object') {
-          effects.push({ type: 'status', status: onSpawn.status });
+      if (config.status && typeof config.status === 'object') {
+          effects.push({ type: 'status', status: config.status });
       }
-      if (onSpawn.stats && typeof onSpawn.stats === 'object') {
-          effects.push({ type: 'stats', stats: onSpawn.stats, mode: onSpawn.statsMode || onSpawn.mode, purgeable: onSpawn.purgeable });
+      if (config.stats && typeof config.stats === 'object') {
+          effects.push({ type: 'stats', stats: config.stats, mode: config.statsMode || config.mode, purgeable: config.purgeable });
       }
-      if (onSpawn.flatStats && typeof onSpawn.flatStats === 'object') {
-          effects.push({ type: 'stats', stats: onSpawn.flatStats, mode: 'flat', purgeable: onSpawn.purgeable, id: 'onSpawn_flat' });
+      if (config.flatStats && typeof config.flatStats === 'object') {
+          effects.push({ type: 'stats', stats: config.flatStats, mode: 'flat', purgeable: config.purgeable, id: 'onSpawn_flat' });
       }
       let statsChanged = false;
       for (const effect of effects) {
@@ -10043,6 +11192,7 @@ __define('./passives.ts', (exports, module, __require) => {
   exports.recomputeUnitStats = recomputeFromStatuses;
   exports.stacksOf = stacksOf;
 
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getPassiveLog')) exports.getPassiveLog = getPassiveLog;
   if (!Object.prototype.hasOwnProperty.call(exports, 'emitPassiveEvent')) exports.emitPassiveEvent = emitPassiveEvent;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyOnSpawnEffects')) exports.applyOnSpawnEffects = applyOnSpawnEffects;
   if (!Object.prototype.hasOwnProperty.call(exports, 'prepareUnitForPassives')) exports.prepareUnitForPassives = prepareUnitForPassives;
@@ -10107,6 +11257,24 @@ __define('./scene.ts', (exports, module, __require) => {
           return 'default-theme';
       }
   }
+  function joinSignatureParts(parts) {
+      if (!Array.isArray(parts) || parts.length === 0) {
+          return '';
+      }
+      const normalized = [];
+      for (const part of parts) {
+          if (part == null) {
+              normalized.push('');
+              continue;
+          }
+          if (typeof part === 'number') {
+              normalized.push(Number.isFinite(part) ? String(part) : '');
+              continue;
+          }
+          normalized.push(String(part));
+      }
+      return normalized.join('|');
+  }
   function gridSignature(g, cssWidth, cssHeight, dpr) {
       var _a, _b, _c, _d, _e;
       if (!g)
@@ -10121,7 +11289,7 @@ __define('./scene.ts', (exports, module, __require) => {
           `h:${Math.round(cssHeight !== null && cssHeight !== void 0 ? cssHeight : 0)}`,
           `dpr:${Number.isFinite(dpr) ? dpr : 'na'}`,
       ];
-      return parts.join('|');
+      return joinSignatureParts(parts);
   }
   function invalidateBattlefieldSceneCache() {
       battlefieldSceneCache.clear();
@@ -10320,8 +11488,14 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
   const ROSTER = __dep0.ROSTER;
   const __dep1 = __require('./units.ts');
   const UNITS = __dep1.UNITS;
-  const __dep2 = __require('./types/currency.ts');
-  const normalizeCurrencyBalances = __dep2.normalizeCurrencyBalances;
+  const __dep2 = __require('./utils/unit-id.ts');
+  const normalizeUnitId = __dep2.normalizeUnitId;
+  const __dep3 = __require('./types/currency.ts');
+  const isCurrencyEntry = __dep3.isCurrencyEntry;
+  const isLineupCurrencyConfig = __dep3.isLineupCurrencyConfig;
+  const normalizeCurrencyBalances = __dep3.normalizeCurrencyBalances;
+  const __dep4 = __require('./utils/format.ts');
+  const HAS_INTL_NUMBER_FORMAT = __dep4.HAS_INTL_NUMBER_FORMAT;
   const isRosterEntryLite = (value) => (typeof value === 'object'
       && value !== null
       && !Array.isArray(value));
@@ -10357,79 +11531,100 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
       return ROSTER.map((unit) => ({ ...unit }));
   }
   function buildRosterWithCost(rosterSource) {
-      const costs = new Map(UNITS.map((unit) => [unit.id, unit.cost]));
+      const costs = new Map(UNITS.map((unit) => [normalizeUnitId(unit.id), unit.cost]));
       return rosterSource.map((entry) => {
-          var _a, _b, _c;
-          return ({
+          var _a;
+          const entryId = normalizeUnitId(entry.id);
+          return {
               ...entry,
-              id: typeof entry.id === 'string' ? entry.id : String((_a = entry.id) !== null && _a !== void 0 ? _a : ''),
+              id: entryId,
               cost: typeof entry.cost === 'number' && Number.isFinite(entry.cost)
                   ? entry.cost
                   : entry.cost === null
                       ? null
-                      : (_c = costs.get(typeof entry.id === 'string' ? entry.id : String((_b = entry.id) !== null && _b !== void 0 ? _b : ''))) !== null && _c !== void 0 ? _c : null,
-          });
+                      : (_a = costs.get(entryId)) !== null && _a !== void 0 ? _a : null,
+          };
       });
   }
   const resolveCurrencyBalance = (currencyId, providedCurrencies, playerState) => {
-      const tryExtract = (candidate) => {
-          var _a, _b, _c;
-          if (candidate == null)
+      const toFiniteNumber = (value) => {
+          if (value == null)
               return null;
-          if (typeof candidate === 'number' && Number.isFinite(candidate))
-              return candidate;
-          if (typeof candidate === 'string' && candidate.trim() !== '' && !Number.isNaN(Number(candidate))) {
-              return Number(candidate);
+          if (typeof value === 'number') {
+              return Number.isFinite(value) ? value : null;
           }
-          if (typeof candidate === 'object') {
-              const record = candidate;
-              const balance = (_c = (_b = (_a = record.balance) !== null && _a !== void 0 ? _a : record.amount) !== null && _b !== void 0 ? _b : record.value) !== null && _c !== void 0 ? _c : null;
-              if (typeof balance === 'number' && Number.isFinite(balance)) {
-                  return balance;
-              }
+          const trimmed = value.trim();
+          if (!trimmed)
+              return null;
+          const parsed = Number(trimmed);
+          return Number.isFinite(parsed) ? parsed : null;
+      };
+      const extractFromEntry = (entry) => {
+          var _a, _b, _c, _d, _e, _f, _g;
+          if (!isCurrencyEntry(entry)) {
+              return null;
+          }
+          return ((_f = (_d = (_b = toFiniteNumber((_a = entry.balance) !== null && _a !== void 0 ? _a : null)) !== null && _b !== void 0 ? _b : toFiniteNumber((_c = entry.amount) !== null && _c !== void 0 ? _c : null)) !== null && _d !== void 0 ? _d : toFiniteNumber((_e = entry.value) !== null && _e !== void 0 ? _e : null)) !== null && _f !== void 0 ? _f : toFiniteNumber((_g = entry.total) !== null && _g !== void 0 ? _g : null));
+      };
+      const tryExtract = (candidate) => {
+          if (typeof candidate === 'number' || typeof candidate === 'string') {
+              return toFiniteNumber(candidate);
+          }
+          if (isCurrencyEntry(candidate)) {
+              return extractFromEntry(candidate);
           }
           return null;
       };
+      const isCurrencyValueRecord = (value) => (value != null
+          && typeof value === 'object'
+          && !Array.isArray(value));
       const inspectContainer = (container) => {
-          var _a, _b, _c, _d;
+          var _a;
           if (!container)
               return null;
           if (Array.isArray(container)) {
               for (const entry of container) {
                   if (entry == null)
                       continue;
-                  if (typeof entry === 'number' || typeof entry === 'string') {
-                      const entryId = 'VNT';
-                      if (entryId !== currencyId)
+                  if (typeof entry === 'number') {
+                      if (currencyId !== 'VNT')
                           continue;
                       const extracted = tryExtract(entry);
                       if (extracted != null)
                           return extracted;
                       continue;
                   }
-                  if (typeof entry !== 'object' || Array.isArray(entry))
+                  if (typeof entry === 'string') {
+                      const [rawId, rawValue] = entry.split(':');
+                      if (!rawId || !rawValue)
+                          continue;
+                      if (rawId.trim() !== currencyId)
+                          continue;
+                      const extracted = tryExtract(rawValue);
+                      if (extracted != null)
+                          return extracted;
                       continue;
-                  const record = entry;
-                  const id = (record.id || record.currencyId || record.key || record.type);
+                  }
+                  if (!isCurrencyEntry(entry))
+                      continue;
+                  const id = entry.currencyId || entry.id || entry.key || entry.type || null;
                   if (id === currencyId) {
-                      const extracted = tryExtract((_d = (_c = (_b = (_a = record.balance) !== null && _a !== void 0 ? _a : record.amount) !== null && _b !== void 0 ? _b : record.value) !== null && _c !== void 0 ? _c : record.total) !== null && _d !== void 0 ? _d : record);
+                      const extracted = tryExtract(entry);
                       if (extracted != null)
                           return extracted;
                   }
               }
               return null;
           }
-          if (typeof container === 'object') {
-              const record = container;
-              if (currencyId in record) {
-                  const extracted = tryExtract(record[currencyId]);
-                  if (extracted != null)
-                      return extracted;
-              }
-              if (record.balances && currencyId in record.balances) {
-                  const extracted = tryExtract(record.balances[currencyId]);
-                  if (extracted != null)
-                      return extracted;
+          if (isLineupCurrencyConfig(container)) {
+              const directValue = container[currencyId];
+              const directExtracted = tryExtract(directValue !== null && directValue !== void 0 ? directValue : null);
+              if (directExtracted != null)
+                  return directExtracted;
+              if (isCurrencyValueRecord(container.balances)) {
+                  const balanceExtracted = tryExtract((_a = container.balances[currencyId]) !== null && _a !== void 0 ? _a : null);
+                  if (balanceExtracted != null)
+                      return balanceExtracted;
               }
           }
           return null;
@@ -10665,8 +11860,92 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
       }
       return [];
   }
+  function toIntlNumberFormatter(formatter, locale, options) {
+      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+      if (HAS_INTL_NUMBER_FORMAT && formatter instanceof Intl.NumberFormat) {
+          return formatter;
+      }
+      const fallback = typeof formatter === 'object' && formatter && 'format' in formatter
+          ? formatter.format.bind(formatter)
+          : (value) => String(value !== null && value !== void 0 ? value : '');
+      const formatValue = (value) => {
+          const normalized = typeof value === 'bigint' ? Number(value) : value;
+          try {
+              return fallback(normalized);
+          }
+          catch (error) {
+              return String(normalized !== null && normalized !== void 0 ? normalized : '');
+          }
+      };
+      const resolvedOptions = {
+          locale: locale && locale.trim() ? locale : 'en',
+          numberingSystem: (_a = options === null || options === void 0 ? void 0 : options.numberingSystem) !== null && _a !== void 0 ? _a : 'latn',
+          style: (_b = options === null || options === void 0 ? void 0 : options.style) !== null && _b !== void 0 ? _b : 'decimal',
+          useGrouping: (_c = options === null || options === void 0 ? void 0 : options.useGrouping) !== null && _c !== void 0 ? _c : true,
+          minimumIntegerDigits: (_d = options === null || options === void 0 ? void 0 : options.minimumIntegerDigits) !== null && _d !== void 0 ? _d : 1,
+          minimumFractionDigits: (_e = options === null || options === void 0 ? void 0 : options.minimumFractionDigits) !== null && _e !== void 0 ? _e : 0,
+          maximumFractionDigits: (_f = options === null || options === void 0 ? void 0 : options.maximumFractionDigits) !== null && _f !== void 0 ? _f : 3,
+          minimumSignificantDigits: options === null || options === void 0 ? void 0 : options.minimumSignificantDigits,
+          maximumSignificantDigits: options === null || options === void 0 ? void 0 : options.maximumSignificantDigits,
+          notation: (_g = options === null || options === void 0 ? void 0 : options.notation) !== null && _g !== void 0 ? _g : 'standard',
+          signDisplay: (_h = options === null || options === void 0 ? void 0 : options.signDisplay) !== null && _h !== void 0 ? _h : 'auto',
+          compactDisplay: (_j = options === null || options === void 0 ? void 0 : options.compactDisplay) !== null && _j !== void 0 ? _j : 'short',
+          currency: options === null || options === void 0 ? void 0 : options.currency,
+          currencyDisplay: (_k = options === null || options === void 0 ? void 0 : options.currencyDisplay) !== null && _k !== void 0 ? _k : 'symbol',
+          currencySign: (_l = options === null || options === void 0 ? void 0 : options.currencySign) !== null && _l !== void 0 ? _l : 'standard',
+          unit: options === null || options === void 0 ? void 0 : options.unit,
+          unitDisplay: (_m = options === null || options === void 0 ? void 0 : options.unitDisplay) !== null && _m !== void 0 ? _m : 'short',
+      };
+      const adapter = {
+          format(value) {
+              return formatValue(value);
+          },
+          formatToParts(value) {
+              return [{ type: 'literal', value: formatValue(value) }];
+          },
+          resolvedOptions() {
+              return resolvedOptions;
+          },
+          formatRange(start, end) {
+              return `${formatValue(start)} – ${formatValue(end)}`;
+          },
+          formatRangeToParts(start, end) {
+              const startValue = formatValue(start);
+              const endValue = formatValue(end);
+              const buildPolyfillParts = () => [
+                  { type: 'literal', value: startValue, source: 'startRange' },
+                  { type: 'literal', value: ' – ', source: 'shared' },
+                  { type: 'literal', value: endValue, source: 'endRange' },
+              ];
+              const resolveSource = (value) => (value === 'startRange' || value === 'endRange' || value === 'shared'
+                  ? value
+                  : null);
+              if (typeof Intl === 'object' && typeof Intl.NumberFormat === 'function') {
+                  try {
+                      const nativeFormatter = new Intl.NumberFormat(locale, options);
+                      if (typeof nativeFormatter.formatRangeToParts === 'function') {
+                          const nativeParts = nativeFormatter.formatRangeToParts(start, end);
+                          if (nativeParts.every((part) => resolveSource(part.source) != null)) {
+                              return nativeParts.map((part) => ({
+                                  ...part,
+                                  source: resolveSource(part.source),
+                              }));
+                          }
+                      }
+                  }
+                  catch (error) {
+                      // Bỏ qua và sử dụng polyfill.
+                  }
+              }
+              return buildPolyfillParts();
+          },
+          [Symbol.toStringTag]: 'Intl.NumberFormat',
+      };
+      return adapter;
+  }
   function ensureNumberFormatter(createNumberFormatter, locale, options) {
-      return createNumberFormatter(locale, options);
+      const formatter = createNumberFormatter(locale, options);
+      return toIntlNumberFormatter(formatter, locale, options);
   }
 
   if (!Object.prototype.hasOwnProperty.call(exports, 'ABILITY_TYPE_LABELS')) exports.ABILITY_TYPE_LABELS = ABILITY_TYPE_LABELS;
@@ -10687,26 +11966,34 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureNumberFormatter')) exports.ensureNumberFormatter = ensureNumberFormatter;
 });
 __define('./screens/collection/index.ts', (exports, module, __require) => {
-  const __dep0 = __require('./screens/collection/view.ts');
-  const renderCollectionView = __dep0.renderCollectionView;
-  const __dep1 = __require('./types/currency.ts');
-  const isLineupCurrencies = __dep1.isLineupCurrencies;
-  const normalizeCurrencyBalances = __dep1.normalizeCurrencyBalances;
+  const __dep1 = __require('./screens/collection/view.ts');
+  const renderCollectionView = __dep1.renderCollectionView;
+  const __dep2 = __require('./types/currency.ts');
+  const isLineupCurrencies = __dep2.isLineupCurrencies;
+  const normalizeCurrencyBalances = __dep2.normalizeCurrencyBalances;
+  const isUnknownRecord = (value) => (typeof value === 'object' && value !== null && !Array.isArray(value));
+  const toClonedRecord = (value) => ({ ...value });
   function mergeParams(base, override) {
       if (!base && !override)
           return null;
-      if (!base)
-          return typeof override === 'object' ? { ...override } : override !== null && override !== void 0 ? override : null;
-      if (!override)
-          return typeof base === 'object' ? { ...base } : base !== null && base !== void 0 ? base : null;
-      if (typeof base === 'object'
-          && typeof override === 'object'
-          && !Array.isArray(base)
-          && !Array.isArray(override)) {
+      if (!base) {
+          if (isUnknownRecord(override)) {
+              return toClonedRecord(override);
+          }
+          return override !== null && override !== void 0 ? override : null;
+      }
+      if (!override) {
+          if (isUnknownRecord(base)) {
+              return toClonedRecord(base);
+          }
+          return base !== null && base !== void 0 ? base : null;
+      }
+      if (isUnknownRecord(base) && isUnknownRecord(override)) {
           return { ...base, ...override };
       }
       return override !== null && override !== void 0 ? override : null;
   }
+  const toCollectionParams = (value) => (isUnknownRecord(value) ? value : null);
   function mergePlayerState(definitionParams, params) {
       var _a, _b;
       const merged = mergeParams((_a = definitionParams === null || definitionParams === void 0 ? void 0 : definitionParams.playerState) !== null && _a !== void 0 ? _a : null, (_b = params === null || params === void 0 ? void 0 : params.playerState) !== null && _b !== void 0 ? _b : null);
@@ -10735,10 +12022,11 @@ __define('./screens/collection/index.ts', (exports, module, __require) => {
       if (!root) {
           throw new Error('renderCollectionScreen cần một phần tử root hợp lệ.');
       }
-      const definitionParams = (_a = definition === null || definition === void 0 ? void 0 : definition.params) !== null && _a !== void 0 ? _a : null;
-      const playerState = mergePlayerState(definitionParams, params);
-      const roster = resolveRoster(definitionParams, params);
-      const currencies = resolveCurrencies(definitionParams, params, playerState);
+      const definitionParams = toCollectionParams((_a = definition === null || definition === void 0 ? void 0 : definition.params) !== null && _a !== void 0 ? _a : null);
+      const normalizedParams = toCollectionParams(params);
+      const playerState = mergePlayerState(definitionParams, normalizedParams);
+      const roster = resolveRoster(definitionParams, normalizedParams);
+      const currencies = resolveCurrencies(definitionParams, normalizedParams, playerState);
       return renderCollectionView({
           root,
           shell,
@@ -10748,8 +12036,9 @@ __define('./screens/collection/index.ts', (exports, module, __require) => {
           currencies,
       });
   }
-  exports.renderCollectionView = renderCollectionView;
+  const __reexport0 = __require('./screens/collection/view.ts');
 
+  if (!Object.prototype.hasOwnProperty.call(exports, 'renderCollectionView')) exports.renderCollectionView = __reexport0.renderCollectionView;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderCollectionScreen')) exports.renderCollectionScreen = renderCollectionScreen;
 });
 __define('./screens/collection/state.ts', (exports, module, __require) => {
@@ -10778,30 +12067,32 @@ __define('./screens/collection/types.ts', (exports, module, __require) => {
 __define('./screens/collection/view.ts', (exports, module, __require) => {
   const __dep0 = __require('./art.ts');
   const getUnitArt = __dep0.getUnitArt;
-  const __dep1 = __require('./data/economy.ts');
-  const listCurrencies = __dep1.listCurrencies;
-  const __dep2 = __require('./data/skills.ts');
-  const getSkillSet = __dep2.getSkillSet;
-  const __dep3 = __require('./utils/format.ts');
-  const createNumberFormatter = __dep3.createNumberFormatter;
-  const __dep4 = __require('./ui/dom.ts');
-  const assertElement = __dep4.assertElement;
-  const ensureStyleTag = __dep4.ensureStyleTag;
-  const mountSection = __dep4.mountSection;
-  const __dep5 = __require('./screens/collection/helpers.ts');
-  const ABILITY_TYPE_LABELS = __dep5.ABILITY_TYPE_LABELS;
-  const buildRosterWithCost = __dep5.buildRosterWithCost;
-  const cloneRoster = __dep5.cloneRoster;
-  const collectAbilityFacts = __dep5.collectAbilityFacts;
-  const describeUlt = __dep5.describeUlt;
-  const labelForAbility = __dep5.labelForAbility;
-  const resolveCurrencyBalance = __dep5.resolveCurrencyBalance;
-  const getCurrencyCatalog = __dep5.getCurrencyCatalog;
-  const ensureNumberFormatter = __dep5.ensureNumberFormatter;
-  const __dep6 = __require('./screens/collection/state.ts');
-  const createFilterState = __dep6.createFilterState;
-  const updateActiveTab = __dep6.updateActiveTab;
-  const updateSelectedUnit = __dep6.updateSelectedUnit;
+  const __dep1 = __require('./utils/unit-id.ts');
+  const normalizeUnitId = __dep1.normalizeUnitId;
+  const __dep2 = __require('./data/economy.ts');
+  const listCurrencies = __dep2.listCurrencies;
+  const __dep3 = __require('./data/skills.ts');
+  const getSkillSet = __dep3.getSkillSet;
+  const __dep4 = __require('./utils/format.ts');
+  const createNumberFormatter = __dep4.createNumberFormatter;
+  const __dep5 = __require('./ui/dom.ts');
+  const assertElement = __dep5.assertElement;
+  const ensureStyleTag = __dep5.ensureStyleTag;
+  const mountSection = __dep5.mountSection;
+  const __dep6 = __require('./screens/collection/helpers.ts');
+  const ABILITY_TYPE_LABELS = __dep6.ABILITY_TYPE_LABELS;
+  const buildRosterWithCost = __dep6.buildRosterWithCost;
+  const cloneRoster = __dep6.cloneRoster;
+  const collectAbilityFacts = __dep6.collectAbilityFacts;
+  const describeUlt = __dep6.describeUlt;
+  const labelForAbility = __dep6.labelForAbility;
+  const resolveCurrencyBalance = __dep6.resolveCurrencyBalance;
+  const getCurrencyCatalog = __dep6.getCurrencyCatalog;
+  const ensureNumberFormatter = __dep6.ensureNumberFormatter;
+  const __dep7 = __require('./screens/collection/state.ts');
+  const createFilterState = __dep7.createFilterState;
+  const updateActiveTab = __dep7.updateActiveTab;
+  const updateSelectedUnit = __dep7.updateSelectedUnit;
   const STYLE_ID = 'collection-view-style-v2';
   const TAB_DEFINITIONS = [
       { key: 'awakening', label: 'Thức Tỉnh', hint: 'Theo dõi mốc thức tỉnh, sao và điểm đột phá của nhân vật đã sở hữu.' },
@@ -10812,6 +12103,15 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
   ];
   const currencyCatalog = getCurrencyCatalog(listCurrencies);
   const currencyFormatter = ensureNumberFormatter(createNumberFormatter, 'vi-VN');
+  function toSafeText(value) {
+      if (value == null) {
+          return '';
+      }
+      if (typeof value === 'number') {
+          return Number.isFinite(value) ? String(value) : '';
+      }
+      return value;
+  }
   function ensureStyles() {
       const css = `
       .app--collection{padding:32px 16px 64px;}
@@ -10947,7 +12247,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       ensureStyleTag(STYLE_ID, { css });
   }
   function renderAbilityCard(entry, options = {}) {
-      var _a, _b;
+      var _a, _b, _c;
       const { typeLabel = null, unitId = null } = options;
       const card = document.createElement('article');
       card.className = 'collection-skill-card';
@@ -10955,16 +12255,16 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       header.className = 'collection-skill-card__header';
       const title = document.createElement('h4');
       title.className = 'collection-skill-card__title';
-      title.textContent = (entry === null || entry === void 0 ? void 0 : entry.name) || 'Kĩ năng';
+      title.textContent = toSafeText((_a = entry === null || entry === void 0 ? void 0 : entry.name) !== null && _a !== void 0 ? _a : 'Kĩ năng');
       header.appendChild(title);
       const actions = document.createElement('div');
       actions.className = 'collection-skill-card__actions';
       const resolvedTypeLabel = typeLabel || labelForAbility(entry);
       const badge = document.createElement('span');
       badge.className = 'collection-skill-card__badge';
-      badge.textContent = resolvedTypeLabel;
+      badge.textContent = toSafeText(resolvedTypeLabel);
       actions.appendChild(badge);
-      const abilityId = (_b = (_a = entry === null || entry === void 0 ? void 0 : entry.id) !== null && _a !== void 0 ? _a : entry === null || entry === void 0 ? void 0 : entry.abilityId) !== null && _b !== void 0 ? _b : null;
+      const abilityId = (_c = (_b = entry === null || entry === void 0 ? void 0 : entry.id) !== null && _b !== void 0 ? _b : entry === null || entry === void 0 ? void 0 : entry.abilityId) !== null && _c !== void 0 ? _c : null;
       const upgradeButton = document.createElement('button');
       upgradeButton.type = 'button';
       upgradeButton.className = 'collection-skill-card__upgrade';
@@ -11088,22 +12388,23 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       const rosterSource = buildRosterWithCost(cloneRoster(roster));
       const rosterEntries = new Map();
       for (const unit of rosterSource) {
+          const unitId = normalizeUnitId(unit.id);
           const item = document.createElement('li');
           const button = document.createElement('button');
           button.type = 'button';
           button.className = 'collection-roster__entry';
-          button.dataset.unitId = unit.id;
+          button.dataset.unitId = unitId;
           button.dataset.rank = unit.rank || 'unknown';
           const avatar = document.createElement('div');
           avatar.className = 'collection-roster__avatar';
           const aura = document.createElement('div');
           aura.className = 'collection-roster__aura';
           avatar.appendChild(aura);
-          const art = getUnitArt(unit.id);
+          const art = getUnitArt(unitId);
           if ((_a = art === null || art === void 0 ? void 0 : art.sprite) === null || _a === void 0 ? void 0 : _a.src) {
               const img = document.createElement('img');
               img.src = art.sprite.src;
-              img.alt = unit.name || unit.id;
+              img.alt = unit.name || unitId;
               avatar.appendChild(img);
           }
           else {
@@ -11115,7 +12416,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           cost.className = 'collection-roster__cost';
           const costValue = Number.isFinite(unit.cost) ? unit.cost : '—';
           cost.textContent = `Cost ${costValue}`;
-          const tooltipParts = [unit.name || unit.id];
+          const tooltipParts = [unit.name || unitId];
           if (unit.rank) {
               tooltipParts.push(`Rank ${unit.rank}`);
           }
@@ -11127,13 +12428,13 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           button.appendChild(avatar);
           button.appendChild(cost);
           const handleSelect = () => {
-              selectUnit(unit.id);
+              selectUnit(unitId);
           };
           button.addEventListener('click', handleSelect);
           addCleanup(() => button.removeEventListener('click', handleSelect));
           item.appendChild(button);
           rosterList.appendChild(item);
-          rosterEntries.set(unit.id, { button, costEl: cost, meta: unit });
+          rosterEntries.set(unitId, { button, costEl: cost, meta: unit });
       }
       rosterPanel.appendChild(rosterList);
       const stage = document.createElement('section');
@@ -11279,12 +12580,12 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           activeAbilityCard = card;
           activeAbilityCard.classList.add('is-expanded');
           const abilityName = (ability === null || ability === void 0 ? void 0 : ability.name) || 'Kĩ năng';
-          detailTitle.textContent = abilityName;
+          detailTitle.textContent = toSafeText(abilityName);
           const typeLabel = (payload === null || payload === void 0 ? void 0 : payload.typeLabel)
               || card.dataset.typeLabel
               || labelForAbility(ability);
           if (typeLabel) {
-              detailBadge.textContent = typeLabel;
+              detailBadge.textContent = toSafeText(typeLabel);
               detailBadge.style.display = '';
           }
           else {
@@ -11294,7 +12595,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           const description = (ability === null || ability === void 0 ? void 0 : ability.description) && String(ability.description).trim() !== ''
               ? String(ability.description)
               : card.dataset.description || 'Chưa có mô tả chi tiết.';
-          detailDescription.textContent = description;
+          detailDescription.textContent = toSafeText(description);
           while (detailFacts.firstChild) {
               detailFacts.removeChild(detailFacts.firstChild);
           }
@@ -11306,19 +12607,19 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
                   if (fact.icon) {
                       const iconEl = document.createElement('span');
                       iconEl.className = 'collection-skill-detail__fact-icon';
-                      iconEl.textContent = fact.icon;
+                      iconEl.textContent = toSafeText(fact.icon);
                       item.appendChild(iconEl);
                   }
                   const factBody = document.createElement('div');
                   if (fact.label) {
                       const labelEl = document.createElement('div');
                       labelEl.className = 'collection-skill-detail__fact-label';
-                      labelEl.textContent = fact.label;
+                      labelEl.textContent = toSafeText(fact.label);
                       factBody.appendChild(labelEl);
                   }
                   const valueEl = document.createElement('div');
                   valueEl.className = 'collection-skill-detail__fact-value';
-                  valueEl.textContent = fact.value;
+                  valueEl.textContent = toSafeText(fact.value);
                   factBody.appendChild(valueEl);
                   if (fact.tooltip) {
                       valueEl.title = fact.tooltip;
@@ -11349,7 +12650,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           if (mergedNotes.length) {
               for (const note of mergedNotes) {
                   const noteItem = document.createElement('li');
-                  noteItem.textContent = note;
+                  noteItem.textContent = toSafeText(note);
                   detailNotes.appendChild(noteItem);
               }
               detailEmpty.style.display = 'none';
@@ -11463,7 +12764,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           root.appendChild(container);
       }
       const selectUnit = (unitId) => {
-          var _a, _b, _c, _d;
+          var _a, _b, _c, _d, _e, _f;
           if (!unitId || !rosterEntries.has(unitId))
               return;
           updateSelectedUnit(filterState, unitId);
@@ -11485,28 +12786,28 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
               }
           }
           const unit = ((_a = rosterEntries.get(unitId)) === null || _a === void 0 ? void 0 : _a.meta) || null;
-          stageName.textContent = (unit === null || unit === void 0 ? void 0 : unit.name) || unitId;
+          stageName.textContent = toSafeText((_b = unit === null || unit === void 0 ? void 0 : unit.name) !== null && _b !== void 0 ? _b : unitId);
           while (stageTags.firstChild) {
               stageTags.removeChild(stageTags.firstChild);
           }
           if (unit === null || unit === void 0 ? void 0 : unit.rank) {
               const rankTag = document.createElement('span');
               rankTag.className = 'collection-stage__tag';
-              rankTag.textContent = `Rank ${unit.rank}`;
+              rankTag.textContent = toSafeText(`Rank ${unit.rank}`);
               stageTags.appendChild(rankTag);
           }
           if (unit === null || unit === void 0 ? void 0 : unit.class) {
               const classTag = document.createElement('span');
               classTag.className = 'collection-stage__tag';
-              classTag.textContent = unit.class;
+              classTag.textContent = toSafeText(unit.class);
               stageTags.appendChild(classTag);
           }
-          const costValue = Number.isFinite(unit === null || unit === void 0 ? void 0 : unit.cost) ? unit.cost : '—';
-          stageCost.textContent = `Cost ${costValue}`;
+          const costValue = unit && Number.isFinite(unit.cost) ? unit.cost : '—';
+          stageCost.textContent = `Cost ${toSafeText(costValue)}`;
           const art = getUnitArt(unitId);
-          if ((_b = art === null || art === void 0 ? void 0 : art.sprite) === null || _b === void 0 ? void 0 : _b.src) {
+          if ((_c = art === null || art === void 0 ? void 0 : art.sprite) === null || _c === void 0 ? void 0 : _c.src) {
               stageSprite.src = art.sprite.src;
-              stageSprite.alt = (unit === null || unit === void 0 ? void 0 : unit.name) || unitId;
+              stageSprite.alt = toSafeText((_d = unit === null || unit === void 0 ? void 0 : unit.name) !== null && _d !== void 0 ? _d : unitId);
               stageSprite.style.opacity = '1';
           }
           else {
@@ -11514,11 +12815,11 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
               stageSprite.alt = '';
               stageSprite.style.opacity = '0';
           }
-          overlayTitle.textContent = (unit === null || unit === void 0 ? void 0 : unit.name) ? `Kĩ năng · ${unit.name}` : 'Kĩ năng';
+          overlayTitle.textContent = toSafeText((unit === null || unit === void 0 ? void 0 : unit.name) ? `Kĩ năng · ${unit.name}` : 'Kĩ năng');
           const skillSet = getSkillSet(unitId);
-          overlaySubtitle.textContent = describeUlt(unit);
-          const summaryNote = (_d = (_c = skillSet === null || skillSet === void 0 ? void 0 : skillSet.notes) === null || _c === void 0 ? void 0 : _c[0]) !== null && _d !== void 0 ? _d : '';
-          overlaySummary.textContent = summaryNote;
+          overlaySubtitle.textContent = toSafeText(describeUlt(unit));
+          const summaryNote = (_f = (_e = skillSet === null || skillSet === void 0 ? void 0 : skillSet.notes) === null || _e === void 0 ? void 0 : _e[0]) !== null && _f !== void 0 ? _f : '';
+          overlaySummary.textContent = toSafeText(summaryNote);
           overlaySummary.style.display = summaryNote ? '' : 'none';
           while (overlayNotesList.firstChild) {
               overlayNotesList.removeChild(overlayNotesList.firstChild);
@@ -11530,7 +12831,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
                   if (!note)
                       continue;
                   const item = document.createElement('li');
-                  item.textContent = note;
+                  item.textContent = toSafeText(note);
                   overlayNotesList.appendChild(item);
               }
           }
@@ -11608,11 +12909,13 @@ __define('./screens/lineup/index.ts', (exports, module, __require) => {
   const __dep1 = __require('./screens/lineup/view/index.ts');
   const renderLineupView = __dep1.renderLineupView;
   const __dep2 = __require('./types/currency.ts');
+  const isCurrencyEntry = __dep2.isCurrencyEntry;
   const isLineupCurrencies = __dep2.isLineupCurrencies;
   const normalizeCurrencyBalances = __dep2.normalizeCurrencyBalances;
   const isUnknownRecord = (value) => (typeof value === 'object'
       && value !== null
       && !Array.isArray(value));
+  const toLineupParams = (value) => (isUnknownRecord(value) ? value : null);
   const cloneMergeable = (value) => {
       if (Array.isArray(value)) {
           return value.slice();
@@ -11635,10 +12938,22 @@ __define('./screens/lineup/index.ts', (exports, module, __require) => {
       return cloneMergeable(override);
   };
   const cloneCurrencyValue = (value) => {
-      if (value && typeof value === 'object') {
+      if (isCurrencyEntry(value)) {
           return { ...value };
       }
       return value;
+  };
+  const isCurrencyValueRecord = (value) => (value != null
+      && typeof value === 'object'
+      && !Array.isArray(value));
+  const cloneCurrencyRecord = (source) => {
+      if (!source) {
+          return {};
+      }
+      return Object.fromEntries(Object.entries(source).map(([id, entry]) => [
+          id,
+          cloneCurrencyValue(entry),
+      ]));
   };
   const cloneLineupCurrencies = (source) => {
       var _a;
@@ -11649,11 +12964,8 @@ __define('./screens/lineup/index.ts', (exports, module, __require) => {
       const clone = {};
       Object.entries(mapSource).forEach(([key, value]) => {
           if (key === 'balances') {
-              if (value && typeof value === 'object' && !Array.isArray(value)) {
-                  clone.balances = Object.fromEntries(Object.entries(value).map(([id, entry]) => [
-                      id,
-                      cloneCurrencyValue(entry),
-                  ]));
+              if (isCurrencyValueRecord(value)) {
+                  clone.balances = cloneCurrencyRecord(value);
               }
               else if (value == null) {
                   clone.balances = null;
@@ -11664,7 +12976,7 @@ __define('./screens/lineup/index.ts', (exports, module, __require) => {
               clone[key] = value.map(item => cloneCurrencyValue(item));
               return;
           }
-          if (value && typeof value === 'object') {
+          if (isCurrencyEntry(value)) {
               clone[key] = { ...value };
               return;
           }
@@ -11682,6 +12994,15 @@ __define('./screens/lineup/index.ts', (exports, module, __require) => {
           return value;
       return null;
   };
+  const toRosterSource = (value) => {
+      if (Array.isArray(value)) {
+          return value;
+      }
+      if (value == null) {
+          return value !== null && value !== void 0 ? value : undefined;
+      }
+      return null;
+  };
   function resolveLineups(definitionParams, params) {
       const base = Array.isArray(definitionParams === null || definitionParams === void 0 ? void 0 : definitionParams.lineups) ? definitionParams === null || definitionParams === void 0 ? void 0 : definitionParams.lineups : null;
       const override = Array.isArray(params === null || params === void 0 ? void 0 : params.lineups) ? params === null || params === void 0 ? void 0 : params.lineups : null;
@@ -11697,12 +13018,14 @@ __define('./screens/lineup/index.ts', (exports, module, __require) => {
       if (!root) {
           throw new Error('renderLineupScreen cần một phần tử root hợp lệ.');
       }
-      const defParams = (_a = definition === null || definition === void 0 ? void 0 : definition.params) !== null && _a !== void 0 ? _a : null;
-      const mergedPlayerState = mergeParams((_b = defParams === null || defParams === void 0 ? void 0 : defParams.playerState) !== null && _b !== void 0 ? _b : null, (_c = params === null || params === void 0 ? void 0 : params.playerState) !== null && _c !== void 0 ? _c : null) || {};
-      const lineups = resolveLineups(defParams, params);
-      const roster = mergeParams(toMergeable(defParams === null || defParams === void 0 ? void 0 : defParams.roster), toMergeable(params === null || params === void 0 ? void 0 : params.roster));
+      const defParams = toLineupParams((_a = definition === null || definition === void 0 ? void 0 : definition.params) !== null && _a !== void 0 ? _a : null);
+      const normalizedParams = toLineupParams(params);
+      const mergedPlayerState = mergeParams((_b = defParams === null || defParams === void 0 ? void 0 : defParams.playerState) !== null && _b !== void 0 ? _b : null, (_c = normalizedParams === null || normalizedParams === void 0 ? void 0 : normalizedParams.playerState) !== null && _c !== void 0 ? _c : null) || {};
+      const lineups = resolveLineups(defParams, normalizedParams);
+      const mergedRosterSource = mergeParams(toMergeable(defParams === null || defParams === void 0 ? void 0 : defParams.roster), toMergeable(normalizedParams === null || normalizedParams === void 0 ? void 0 : normalizedParams.roster));
+      const roster = toRosterSource(mergedRosterSource);
       const baseCurrencies = isLineupCurrencies(defParams === null || defParams === void 0 ? void 0 : defParams.currencies) ? (_d = defParams === null || defParams === void 0 ? void 0 : defParams.currencies) !== null && _d !== void 0 ? _d : null : null;
-      const overrideCurrencies = isLineupCurrencies(params === null || params === void 0 ? void 0 : params.currencies) ? (_e = params === null || params === void 0 ? void 0 : params.currencies) !== null && _e !== void 0 ? _e : null : null;
+      const overrideCurrencies = isLineupCurrencies(normalizedParams === null || normalizedParams === void 0 ? void 0 : normalizedParams.currencies) ? (_e = normalizedParams === null || normalizedParams === void 0 ? void 0 : normalizedParams.currencies) !== null && _e !== void 0 ? _e : null : null;
       const mergedCurrencySource = mergeParams(baseCurrencies, overrideCurrencies);
       const playerCurrencySource = normalizeCurrencyBalances(mergedPlayerState);
       const currencies = mergedCurrencySource
@@ -12117,23 +13440,25 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
   const getSkillSet = __dep0.getSkillSet;
   const __dep1 = __require('./utils/format.ts');
   const createNumberFormatter = __dep1.createNumberFormatter;
-  const __dep2 = __require('./ui/dom.ts');
-  const assertElement = __dep2.assertElement;
-  const ensureStyleTag = __dep2.ensureStyleTag;
-  const mountSection = __dep2.mountSection;
-  const __dep3 = __require('./types/currency.ts');
-  const normalizeCurrencyBalances = __dep3.normalizeCurrencyBalances;
-  const __dep4 = __require('./screens/lineup/view/state.ts');
-  const normalizeRoster = __dep4.normalizeRoster;
-  const normalizeLineups = __dep4.normalizeLineups;
-  const createCurrencyBalances = __dep4.createCurrencyBalances;
-  const createFilterOptions = __dep4.createFilterOptions;
-  const formatCurrencyBalance = __dep4.formatCurrencyBalance;
-  const collectAssignedUnitIds = __dep4.collectAssignedUnitIds;
-  const evaluatePassive = __dep4.evaluatePassive;
-  const filterRoster = __dep4.filterRoster;
-  const __dep5 = __require('./screens/lineup/view/events.ts');
-  const bindLineupEvents = __dep5.bindLineupEvents;
+  const __dep2 = __require('./utils/unit-id.ts');
+  const normalizeUnitId = __dep2.normalizeUnitId;
+  const __dep3 = __require('./ui/dom.ts');
+  const assertElement = __dep3.assertElement;
+  const ensureStyleTag = __dep3.ensureStyleTag;
+  const mountSection = __dep3.mountSection;
+  const __dep4 = __require('./types/currency.ts');
+  const normalizeCurrencyBalances = __dep4.normalizeCurrencyBalances;
+  const __dep5 = __require('./screens/lineup/view/state.ts');
+  const normalizeRoster = __dep5.normalizeRoster;
+  const normalizeLineups = __dep5.normalizeLineups;
+  const createCurrencyBalances = __dep5.createCurrencyBalances;
+  const createFilterOptions = __dep5.createFilterOptions;
+  const formatCurrencyBalance = __dep5.formatCurrencyBalance;
+  const collectAssignedUnitIds = __dep5.collectAssignedUnitIds;
+  const evaluatePassive = __dep5.evaluatePassive;
+  const filterRoster = __dep5.filterRoster;
+  const __dep6 = __require('./screens/lineup/view/events.ts');
+  const bindLineupEvents = __dep6.bindLineupEvents;
   const STYLE_ID = 'lineup-view-style-v1';
   const powerFormatter = createNumberFormatter('vi-VN');
   function ensureStyles() {
@@ -12283,13 +13608,14 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       return trimmed.normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
   }
   function extractCodeFromNormalized(normalized) {
+      var _a, _b, _c;
       if (!normalized) {
           return '';
       }
       const tokens = normalized.split(/[\s\-_/]+/).filter(Boolean);
       if (tokens.length >= 2) {
-          const firstToken = sanitizeCodeToken(tokens[0]);
-          const lastToken = sanitizeCodeToken(tokens[tokens.length - 1]);
+          const firstToken = sanitizeCodeToken((_a = tokens[0]) !== null && _a !== void 0 ? _a : '');
+          const lastToken = sanitizeCodeToken((_b = tokens[tokens.length - 1]) !== null && _b !== void 0 ? _b : '');
           let letters = '';
           if (firstToken) {
               letters += firstToken[0];
@@ -12298,7 +13624,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               letters += lastToken[0];
           }
           if (tokens.length > 2 && letters.length < 3) {
-              const extraToken = sanitizeCodeToken(tokens[1]);
+              const extraToken = sanitizeCodeToken((_c = tokens[1]) !== null && _c !== void 0 ? _c : '');
               if (extraToken) {
                   letters += extraToken[0];
               }
@@ -12323,15 +13649,21 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       }
       return code ? code.toLocaleUpperCase('vi-VN') : '';
   }
-  function getInitials(name) {
-      if (!name) {
+  function getInitials(parts) {
+      if (!parts[0]) {
           return '';
       }
-      const parts = name.trim().split(/\s+/);
       if (parts.length === 1) {
           return parts[0].slice(0, 2).toUpperCase();
       }
       return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  function getNameInitials(name) {
+      if (!name) {
+          return '';
+      }
+      const parts = name.trim().split(/\s+/);
+      return getInitials(parts);
   }
   function renderAvatar(container, avatarUrl, name) {
       container.innerHTML = '';
@@ -12342,7 +13674,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           container.appendChild(img);
       }
       else {
-          container.textContent = getInitials(name || '');
+          container.textContent = getNameInitials(name || '');
       }
   }
   function formatUnitPower(power) {
@@ -12358,7 +13690,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       ensureStyles();
       const normalizedRoster = normalizeRoster(roster !== null && roster !== void 0 ? roster : null);
       const normalizedLineups = normalizeLineups(lineups !== null && lineups !== void 0 ? lineups : null, normalizedRoster);
-      const rosterLookup = new Map(normalizedRoster.map(unit => [unit.id, unit]));
+      const rosterLookup = new Map(normalizedRoster.map(unit => [normalizeUnitId(unit.id), unit]));
       const lineupState = new Map();
       normalizedLineups.forEach(lineup => {
           lineupState.set(lineup.id, {
@@ -12639,7 +13971,8 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           }
           benchDetails.classList.remove('is-empty');
           const kit = (_b = (_a = unit.raw) === null || _a === void 0 ? void 0 : _a.kit) !== null && _b !== void 0 ? _b : null;
-          const skillSet = unit.id ? getSkillSet(unit.id) : null;
+          const skillSetId = normalizeUnitId(unit.id);
+          const skillSet = skillSetId ? getSkillSet(skillSetId) : null;
           const skills = Array.isArray(kit === null || kit === void 0 ? void 0 : kit.skills)
               ? ((_c = kit.skills) !== null && _c !== void 0 ? _c : [])
                   .filter(skill => {
@@ -12756,7 +14089,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
                   renderAvatar(avatar, unit.avatar || null, unit.name);
               }
               else if (slot.label) {
-                  avatar.textContent = getInitials(slot.label);
+                  avatar.textContent = getNameInitials(slot.label);
               }
               else if (!slot.unlocked) {
                   avatar.textContent = '🔒';
@@ -12932,8 +14265,10 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
                   cellEl.classList.add('is-active');
               }
               const columnIndex = cell.index % columnCount;
-              const targetColumn = columnEls[columnIndex] || columnEls[0];
-              targetColumn.appendChild(cellEl);
+              const targetColumn = columnEls[columnIndex] || columnEls[0] || null;
+              if (targetColumn) {
+                  targetColumn.appendChild(cellEl);
+              }
           });
           updateActiveBenchHighlight();
           renderBenchDetails();
@@ -13017,15 +14352,20 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           const lineup = getSelectedLineup();
           const filtered = filterRoster(state.roster, state.filter);
           filtered.forEach(unit => {
+              const unitId = normalizeUnitId(unit.id);
               const button = document.createElement('button');
               button.type = 'button';
               button.className = 'lineup-roster__entry';
-              button.dataset.unitId = unit.id;
+              button.dataset.unitId = unitId;
               button.setAttribute('aria-label', `Chọn ${unit.name}`);
-              if (state.selectedUnitId === unit.id) {
+              if (state.selectedUnitId === unitId) {
                   button.classList.add('is-selected');
               }
-              if (lineup && (lineup.leaderId === unit.id || lineup.slots.some(slot => slot.unitId === unit.id) || lineup.bench.some(cell => cell.unitId === unit.id)) && state.selectedUnitId !== unit.id) {
+              const isAssigned = Boolean(lineup
+                  && (lineup.leaderId === unitId
+                      || lineup.slots.some(slot => slot.unitId === unitId)
+                      || lineup.bench.some(cell => cell.unitId === unitId)));
+              if (isAssigned && state.selectedUnitId !== unitId) {
                   button.classList.add('is-unavailable');
               }
               const avatar = document.createElement('div');
@@ -13108,10 +14448,11 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           clearOption.dataset.unitId = '';
           list.appendChild(clearOption);
           state.roster.forEach(unit => {
+              const unitId = normalizeUnitId(unit.id);
               const option = document.createElement('button');
               option.type = 'button';
               option.className = 'lineup-overlay__option';
-              option.dataset.unitId = unit.id;
+              option.dataset.unitId = unitId;
               const avatar = document.createElement('div');
               avatar.className = 'lineup-overlay__option-avatar';
               renderAvatar(avatar, unit.avatar || null, unit.name);
@@ -13126,7 +14467,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               meta.textContent = [unit.role, unit.rank].filter(Boolean).join(' · ');
               text.appendChild(meta);
               option.appendChild(text);
-              if (lineup.leaderId === unit.id) {
+              if (lineup.leaderId === unitId) {
                   option.classList.add('is-active');
               }
               list.appendChild(option);
@@ -13973,6 +15314,19 @@ __define('./screens/main-menu/dialogues.ts', (exports, module, __require) => {
           }
       }
   };
+  const HERO_PROFILE_FALLBACK = HERO_PROFILES[FALLBACK_HERO_KEY]
+      || HERO_PROFILES[HERO_DEFAULT_ID]
+      || {
+          id: HERO_DEFAULT_ID,
+          name: 'Chiến binh Arclune',
+          title: 'Hộ vệ tiền tuyến',
+          faction: 'Arclune',
+          role: 'Đa năng',
+          motto: 'Vì ánh sáng Arclune.',
+          portrait: HERO_DEFAULT_ID,
+      };
+  const HERO_DIALOGUE_FALLBACK = HERO_DIALOGUES[FALLBACK_HERO_KEY] || {};
+  const HERO_HOTSPOT_FALLBACK = HERO_HOTSPOTS[FALLBACK_HERO_KEY] || [];
   const GENDER_MAP = {
       male: 'male',
       m: 'male',
@@ -14018,19 +15372,25 @@ __define('./screens/main-menu/dialogues.ts', (exports, module, __require) => {
   function normalizeGender(value) {
       if (typeof value === 'string') {
           const key = value.trim().toLowerCase();
-          if (key in GENDER_MAP) {
-              return GENDER_MAP[key];
+          const mapped = GENDER_MAP[key];
+          if (mapped) {
+              return mapped;
           }
       }
       return 'neutral';
   }
   function ensureArray(value) {
-      if (!value)
+      if (Array.isArray(value)) {
+          return value;
+      }
+      if (value === null || value === undefined) {
           return [];
-      return Array.isArray(value) ? value : [value];
+      }
+      return [value];
   }
   function pickLine(pool) {
-      const list = ensureArray(pool).filter(Boolean);
+      const list = ensureArray(pool)
+          .filter((item) => Boolean(item));
       if (!list.length)
           return null;
       const index = Math.floor(Math.random() * list.length);
@@ -14045,11 +15405,17 @@ __define('./screens/main-menu/dialogues.ts', (exports, module, __require) => {
       return { text: String(item !== null && item !== void 0 ? item : ''), tone: null, label: null };
   }
   function inferTone(cue) {
-      if (cue && CUE_TONES[cue]) {
-          return CUE_TONES[cue];
+      if (cue && cue in CUE_TONES) {
+          const mapped = CUE_TONES[cue];
+          if (mapped) {
+              return mapped;
+          }
       }
-      if (cue && TONE_TO_CUE[cue]) {
-          return TONE_TO_CUE[cue];
+      if (cue && cue in TONE_TO_CUE) {
+          const mapped = TONE_TO_CUE[cue];
+          if (mapped) {
+              return mapped;
+          }
       }
       return 'calm';
   }
@@ -14060,12 +15426,12 @@ __define('./screens/main-menu/dialogues.ts', (exports, module, __require) => {
       return 'Tương tác';
   }
   function getHeroProfile(heroId = HERO_DEFAULT_ID) {
-      var _a, _b, _c;
+      var _a, _b;
       const resolvedKey = resolveHeroKey(heroId, HERO_PROFILES);
-      const profile = (_a = HERO_PROFILES[resolvedKey]) !== null && _a !== void 0 ? _a : HERO_PROFILES[FALLBACK_HERO_KEY];
+      const profile = (_a = HERO_PROFILES[resolvedKey]) !== null && _a !== void 0 ? _a : HERO_PROFILE_FALLBACK;
       const portraitId = profile.portrait || heroId || HERO_DEFAULT_ID;
-      const art = getUnitArt(portraitId) || null;
-      const hotspots = (_c = (_b = HERO_HOTSPOTS[resolvedKey]) !== null && _b !== void 0 ? _b : HERO_HOTSPOTS[FALLBACK_HERO_KEY]) !== null && _c !== void 0 ? _c : [];
+      const art = portraitId ? getUnitArt(portraitId) || null : null;
+      const hotspots = (_b = HERO_HOTSPOTS[resolvedKey]) !== null && _b !== void 0 ? _b : HERO_HOTSPOT_FALLBACK;
       return {
           id: profile.id,
           name: profile.name || null,
@@ -14079,25 +15445,25 @@ __define('./screens/main-menu/dialogues.ts', (exports, module, __require) => {
       };
   }
   function getHeroHotspots(heroId = HERO_DEFAULT_ID) {
-      var _a, _b;
+      var _a;
       const resolvedKey = resolveHeroKey(heroId, HERO_HOTSPOTS);
-      const hotspots = (_b = (_a = HERO_HOTSPOTS[resolvedKey]) !== null && _a !== void 0 ? _a : HERO_HOTSPOTS[FALLBACK_HERO_KEY]) !== null && _b !== void 0 ? _b : [];
+      const hotspots = (_a = HERO_HOTSPOTS[resolvedKey]) !== null && _a !== void 0 ? _a : HERO_HOTSPOT_FALLBACK;
       return hotspots.map(item => ({ ...item }));
   }
   function getHeroDialogue(heroId, cue, options = {}) {
-      var _a, _b, _c, _d;
+      var _a, _b, _c;
       const targetCue = (cue || 'intro');
       const gender = normalizeGender(options.gender);
       const zone = options.zone || null;
       const profileKey = resolveHeroKey(heroId, HERO_PROFILES);
       const heroKey = resolveHeroKey(heroId, HERO_DIALOGUES);
-      const profile = (_a = HERO_PROFILES[profileKey]) !== null && _a !== void 0 ? _a : HERO_PROFILES[FALLBACK_HERO_KEY];
-      const dialogues = (_b = HERO_DIALOGUES[heroKey]) !== null && _b !== void 0 ? _b : {};
-      const fallbackDialogues = (_c = HERO_DIALOGUES[FALLBACK_HERO_KEY]) !== null && _c !== void 0 ? _c : {};
+      const profile = (_a = HERO_PROFILES[profileKey]) !== null && _a !== void 0 ? _a : HERO_PROFILE_FALLBACK;
+      const dialogues = (_b = HERO_DIALOGUES[heroKey]) !== null && _b !== void 0 ? _b : HERO_DIALOGUE_FALLBACK;
+      const fallbackDialogues = HERO_DIALOGUE_FALLBACK;
       const table = dialogues[targetCue] || fallbackDialogues[targetCue] || null;
       const pool = table ? (table[gender] || table.neutral || table.default || null) : null;
       const picked = pickLine(pool);
-      const text = ((_d = picked === null || picked === void 0 ? void 0 : picked.text) === null || _d === void 0 ? void 0 : _d.trim()) ? picked.text.trim() : '...';
+      const text = ((_c = picked === null || picked === void 0 ? void 0 : picked.text) === null || _c === void 0 ? void 0 : _c.trim()) ? picked.text.trim() : '...';
       const tone = (picked === null || picked === void 0 ? void 0 : picked.tone) || inferTone(targetCue);
       const label = (picked === null || picked === void 0 ? void 0 : picked.label) || inferLabel(targetCue);
       return {
@@ -14598,17 +15964,20 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
   }
   function applyPalette(element, profile) {
       var _a;
-      const palette = ((_a = profile.art) === null || _a === void 0 ? void 0 : _a.palette) || {};
       if (!element)
           return;
-      if (palette.primary)
-          element.style.setProperty('--hero-primary', palette.primary);
-      if (palette.secondary)
-          element.style.setProperty('--hero-secondary', palette.secondary);
-      if (palette.accent)
-          element.style.setProperty('--hero-accent', palette.accent);
-      if (palette.outline)
-          element.style.setProperty('--hero-outline', palette.outline);
+      const palette = (_a = profile.art) === null || _a === void 0 ? void 0 : _a.palette;
+      if (!palette)
+          return;
+      const { primary, secondary, accent, outline } = palette;
+      if (primary)
+          element.style.setProperty('--hero-primary', primary);
+      if (secondary)
+          element.style.setProperty('--hero-secondary', secondary);
+      if (accent)
+          element.style.setProperty('--hero-accent', accent);
+      if (outline)
+          element.style.setProperty('--hero-outline', outline);
   }
   function createModesSection(options) {
       const { sections = [], metadata = [], shell, onShowComingSoon, addCleanup } = options;
@@ -14635,7 +16004,7 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
           sectionGroup.appendChild(heading);
           const grid = document.createElement('div');
           grid.className = 'mode-grid';
-          (section.entries || []).forEach(entry => {
+          section.entries.forEach(entry => {
               if (!entry)
                   return;
               const cardKey = entry.cardId || entry.id;
@@ -14645,7 +16014,7 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
               if (!cardMeta)
                   return;
               if (entry.type === 'group') {
-                  const childMetas = (entry.childModeIds || [])
+                  const childMetas = entry.childModeIds
                       .map(childId => (childId ? metaByKey.get(childId) : null))
                       .filter((item) => Boolean(item));
                   if (childMetas.length === 0)
@@ -14950,10 +16319,20 @@ __define('./statuses.ts', (exports, module, __require) => {
       }
       return unit.statuses;
   };
+  const isTokenCandidate = (value) => {
+      if (!value || typeof value !== 'object')
+          return false;
+      const candidate = value;
+      return (typeof candidate.cx === 'number'
+          && typeof candidate.cy === 'number'
+          && typeof candidate.side === 'string');
+  };
   function findStatus(unit, id) {
+      var _a;
       const list = ensureStatusList(unit);
       const index = list.findIndex(status => status.id === id);
-      return [list, index, index >= 0 ? list[index] : null];
+      const found = index >= 0 ? (_a = list[index]) !== null && _a !== void 0 ? _a : null : null;
+      return [list, index, found];
   }
   function decrementDuration(unit, status) {
       if (typeof status.dur === 'number') {
@@ -15143,9 +16522,14 @@ __define('./statuses.ts', (exports, module, __require) => {
       resolveTarget(attacker, candidates, ctx = {}) {
           var _a;
           const attackType = (_a = ctx.attackType) !== null && _a !== void 0 ? _a : 'basic';
-          let pool = candidates;
+          const candidatePool = Array.isArray(candidates)
+              ? candidates.filter(isTokenCandidate)
+              : [];
+          if (candidatePool.length === 0)
+              return null;
+          let pool = candidatePool;
           if (attackType === 'basic') {
-              const filtered = candidates.filter(target => !this.has(target, 'allure'));
+              const filtered = candidatePool.filter(target => !this.has(target, 'allure'));
               if (filtered.length > 0) {
                   pool = filtered;
               }
@@ -15212,7 +16596,7 @@ __define('./statuses.ts', (exports, module, __require) => {
           const pierce = this.get(attacker, 'pierce');
           if (pierce)
               defPen = Math.max(defPen, clamp01((_f = pierce.power) !== null && _f !== void 0 ? _f : 0.1));
-          return {
+          const context = {
               ...ctx,
               attackType,
               dtype,
@@ -15222,6 +16606,7 @@ __define('./statuses.ts', (exports, module, __require) => {
               defPen,
               ignoreAll,
           };
+          return context;
       },
       absorbShield(target, dmg, _ctx = {}) {
           var _a, _b;
@@ -15323,6 +16708,7 @@ __define('./summon.ts', (exports, module, __require) => {
   const slotToCell = __dep0.slotToCell;
   const cellReserved = __dep0.cellReserved;
   const __dep1 = __require('./vfx.ts');
+  const asSessionWithVfx = __dep1.asSessionWithVfx;
   const vfxAddSpawn = __dep1.vfxAddSpawn;
   const __dep2 = __require('./art.ts');
   const getUnitArt = __dep2.getUnitArt;
@@ -15337,6 +16723,29 @@ __define('./summon.ts', (exports, module, __require) => {
       color: '#ffd27d',
   };
   const tokensAlive = (Game) => Game.tokens.filter((t) => t.alive);
+  const isRecord = (value) => !!value && typeof value === 'object' && !Array.isArray(value);
+  const isPassiveKit = (value) => {
+      if (!isRecord(value))
+          return false;
+      const passives = value.passives;
+      return passives == null || Array.isArray(passives);
+  };
+  const getKitDefinition = (metaEntry) => {
+      if (!isRecord(metaEntry))
+          return null;
+      const kitCandidate = 'kit' in metaEntry ? metaEntry.kit : null;
+      return isPassiveKit(kitCandidate) ? kitCandidate : null;
+  };
+  const isSequentialTurn = (turn) => !!turn && Array.isArray(turn.order);
+  const getTurnSnapshotInfo = (turn) => {
+      if (!turn)
+          return { orderLength: null, cycle: 0 };
+      const cycle = Number.isFinite(turn.cycle) ? turn.cycle : 0;
+      if (isSequentialTurn(turn)) {
+          return { orderLength: turn.order.length, cycle };
+      }
+      return { orderLength: null, cycle };
+  };
   // en-queue các yêu cầu “Immediate” trong lúc 1 unit đang hành động
   // req: { by?:unitId, side:'ally'|'enemy', slot:1..9, unit:{...} }
   function enqueueImmediate(Game, req) {
@@ -15397,7 +16806,10 @@ __define('./summon.ts', (exports, module, __require) => {
           };
           Game.tokens.push(newToken);
           try {
-              vfxAddSpawn(Game, cx, cy, side);
+              const sessionVfx = asSessionWithVfx(Game);
+              if (sessionVfx) {
+                  vfxAddSpawn(sessionVfx, cx, cy, side);
+              }
           }
           catch (_err) {
               // bỏ qua lỗi hiệu ứng
@@ -15407,18 +16819,15 @@ __define('./summon.ts', (exports, module, __require) => {
               const metaEntry = extra.id && typeof ((_j = Game.meta) === null || _j === void 0 ? void 0 : _j.get) === 'function'
                   ? Game.meta.get(extra.id)
                   : null;
-              const kit = (metaEntry && typeof metaEntry === 'object'
-                  ? metaEntry.kit
-                  : null);
+              const kit = getKitDefinition(metaEntry);
+              const onSpawnConfig = (kit === null || kit === void 0 ? void 0 : kit.onSpawn) && isRecord(kit.onSpawn) ? kit.onSpawn : null;
               prepareUnitForPassives(spawned);
-              applyOnSpawnEffects(Game, spawned, kit === null || kit === void 0 ? void 0 : kit.onSpawn);
+              applyOnSpawnEffects(Game, spawned, onSpawnConfig !== null && onSpawnConfig !== void 0 ? onSpawnConfig : undefined);
               spawned.iid = (_m = (_l = (_k = hooks.allocIid) === null || _k === void 0 ? void 0 : _k.call(hooks)) !== null && _l !== void 0 ? _l : spawned.iid) !== null && _m !== void 0 ? _m : 0;
           }
           const creep = (_o = Game.tokens.find((t) => t.alive && t.side === side && t.cx === cx && t.cy === cy)) !== null && _o !== void 0 ? _o : null;
           if (creep) {
-              const turnSnapshot = Game.turn;
-              const orderLength = Array.isArray(turnSnapshot === null || turnSnapshot === void 0 ? void 0 : turnSnapshot.order) ? turnSnapshot.order.length : null;
-              const cycle = Number.isFinite(turnSnapshot === null || turnSnapshot === void 0 ? void 0 : turnSnapshot.cycle) ? turnSnapshot === null || turnSnapshot === void 0 ? void 0 : turnSnapshot.cycle : 0;
+              const { orderLength, cycle } = getTurnSnapshotInfo(Game.turn);
               const turnContext = {
                   side,
                   slot: item.slot,
@@ -15455,11 +16864,13 @@ __define('./turns.ts', (exports, module, __require) => {
   const __dep5 = __require('./vfx.ts');
   const vfxAddSpawn = __dep5.vfxAddSpawn;
   const vfxAddBloodPulse = __dep5.vfxAddBloodPulse;
+  const asSessionWithVfx = __dep5.asSessionWithVfx;
   const __dep6 = __require('./art.ts');
   const getUnitArt = __dep6.getUnitArt;
   const __dep7 = __require('./passives.ts');
   const emitPassiveEvent = __dep7.emitPassiveEvent;
   const applyOnSpawnEffects = __dep7.applyOnSpawnEffects;
+  const getPassiveLog = __dep7.getPassiveLog;
   const prepareUnitForPassives = __dep7.prepareUnitForPassives;
   const __dep8 = __require('./events.ts');
   const emitGameEvent = __dep8.emitGameEvent;
@@ -15479,12 +16890,31 @@ __define('./turns.ts', (exports, module, __require) => {
   const clearFreshSummon = __dep10.clearFreshSummon;
   const __dep11 = __require('./turns/interleaved.ts');
   const nextTurnInterleaved = __dep11.nextTurnInterleaved;
+  const toLowerSide = (side) => {
+      if (side === 'ALLY')
+          return 'ally';
+      if (side === 'ENEMY')
+          return 'enemy';
+      return side;
+  };
+  const asSequentialTurn = (turn) => {
+      if (!turn)
+          return null;
+      const candidate = turn;
+      return Array.isArray(candidate.order) ? candidate : null;
+  };
+  const asInterleavedTurn = (turn) => {
+      if (!turn)
+          return null;
+      const candidate = turn;
+      return candidate.mode === 'interleaved_by_position' ? candidate : null;
+  };
   const tokensAlive = (Game) => Game.tokens.filter((t) => t.alive);
   function applyTurnRegen(Game, unit) {
       if (!unit || !unit.alive)
           return { hpDelta: 0, aeDelta: 0 };
       const clampStat = (value, max) => {
-          if (!Number.isFinite(max)) {
+          if (typeof max !== 'number' || !Number.isFinite(max)) {
               return Math.max(0, value);
           }
           const upper = Math.max(0, max);
@@ -15509,10 +16939,13 @@ __define('./turns.ts', (exports, module, __require) => {
       if (hpDelta !== 0 || aeDelta !== 0) {
           emitGameEvent(TURN_REGEN, { game: Game, unit, hpDelta, aeDelta });
           if (hpDelta > 0) {
-              try {
-                  vfxAddBloodPulse(Game, unit, { color: '#7ef7c1', alpha: 0.65, maxScale: 2.4 });
+              const sessionVfx = asSessionWithVfx(Game, { requireGrid: true });
+              if (sessionVfx) {
+                  try {
+                      vfxAddBloodPulse(sessionVfx, unit, { color: '#7ef7c1', alpha: 0.65, maxScale: 2.4 });
+                  }
+                  catch (_) { }
               }
-              catch (_) { }
           }
       }
       return { hpDelta, aeDelta };
@@ -15552,11 +16985,11 @@ __define('./turns.ts', (exports, module, __require) => {
       const turn = Game.turn;
       if (!turn)
           return 0;
-      if (!('order' in turn)) {
+      const sequential = asSequentialTurn(turn);
+      if (!sequential) {
           const cycle = Math.max(0, Number.isFinite(turn.cycle) ? turn.cycle : 0);
           return turn.mode === 'interleaved_by_position' ? cycle : cycle + 1;
       }
-      const sequential = turn;
       const order = Array.isArray(sequential.order) ? sequential.order : [];
       const orderLen = order.length;
       const currentCycle = Math.max(0, Number.isFinite(sequential.cycle) ? sequential.cycle : 0);
@@ -15571,18 +17004,18 @@ __define('./turns.ts', (exports, module, __require) => {
       return idx >= cursor ? currentCycle : currentCycle + 1;
   }
   function spawnQueuedIfDue(Game, entry, { allocIid, performUlt } = {}) {
-      var _a, _b, _c, _d, _e, _f, _g;
+      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
       if (!entry)
           return { actor: null, spawned: false };
-      const side = entry.side;
       const slot = entry.slot;
-      const active = getActiveAt(Game, side, slot);
-      const queueMap = (_a = Game.queued) === null || _a === void 0 ? void 0 : _a[side];
+      const sideLower = toLowerSide(entry.side);
+      const active = getActiveAt(Game, sideLower, slot);
+      const queueMap = sideLower === 'ally' ? (_a = Game.queued) === null || _a === void 0 ? void 0 : _a.ally : (_b = Game.queued) === null || _b === void 0 ? void 0 : _b.enemy;
       const p = queueMap === null || queueMap === void 0 ? void 0 : queueMap.get(slot);
       if (!p) {
           return { actor: active || null, spawned: false };
       }
-      if (((_b = p.spawnCycle) !== null && _b !== void 0 ? _b : 0) > ((_d = (_c = Game === null || Game === void 0 ? void 0 : Game.turn) === null || _c === void 0 ? void 0 : _c.cycle) !== null && _d !== void 0 ? _d : 0)) {
+      if (((_c = p.spawnCycle) !== null && _c !== void 0 ? _c : 0) > ((_e = (_d = Game === null || Game === void 0 ? void 0 : Game.turn) === null || _d === void 0 ? void 0 : _d.cycle) !== null && _e !== void 0 ? _e : 0)) {
           return { actor: active || null, spawned: false };
       }
       queueMap === null || queueMap === void 0 ? void 0 : queueMap.delete(slot);
@@ -15591,33 +17024,45 @@ __define('./turns.ts', (exports, module, __require) => {
       const fromDeck = source === 'deck';
       const kit = meta === null || meta === void 0 ? void 0 : meta.kit;
       const initialFury = initialRageFor(p.unitId, { isLeader: false, revive: !!p.revive, reviveSpec: p.revived });
-      const obj = {
-          id: p.unitId, name: p.name, color: p.color || '#a9f58c',
-          cx: p.cx, cy: p.cy, side: p.side, alive: true
+      const stats = makeInstanceStats(p.unitId);
+      const baseStats = {
+          atk: (_f = stats.atk) !== null && _f !== void 0 ? _f : 0,
+          res: (_g = stats.res) !== null && _g !== void 0 ? _g : 0,
+          wil: (_h = stats.wil) !== null && _h !== void 0 ? _h : 0,
       };
-      Object.assign(obj, makeInstanceStats(p.unitId));
-      obj.statuses = [];
-      obj.baseStats = {
-          atk: obj.atk,
-          res: obj.res,
-          wil: obj.wil
+      const obj = {
+          id: p.unitId,
+          name: (_j = p.name) !== null && _j !== void 0 ? _j : undefined,
+          color: p.color || '#a9f58c',
+          cx: p.cx,
+          cy: p.cy,
+          side: p.side,
+          alive: true,
+          ...stats,
+          statuses: [],
+          baseStats,
       };
       obj.iid = typeof allocIid === 'function' ? allocIid() : obj.iid;
       obj.art = getUnitArt(p.unitId);
-      obj.skinKey = (_e = obj.art) === null || _e === void 0 ? void 0 : _e.skinKey;
-      obj.color = obj.color || ((_g = (_f = obj.art) === null || _f === void 0 ? void 0 : _f.palette) === null || _g === void 0 ? void 0 : _g.primary) || '#a9f58c';
+      obj.skinKey = (_k = obj.art) === null || _k === void 0 ? void 0 : _k.skinKey;
+      obj.color = obj.color || ((_m = (_l = obj.art) === null || _l === void 0 ? void 0 : _l.palette) === null || _m === void 0 ? void 0 : _m.primary) || '#a9f58c';
       initializeFury(obj, p.unitId, initialFury, CFG);
       if (fromDeck) {
           setFury(obj, obj.furyMax);
       }
       prepareUnitForPassives(obj);
       Game.tokens.push(obj);
-      applyOnSpawnEffects(Game, obj, kit === null || kit === void 0 ? void 0 : kit.onSpawn);
-      try {
-          vfxAddSpawn(Game, p.cx, p.cy, p.side);
+      applyOnSpawnEffects(Game, obj, (_o = kit === null || kit === void 0 ? void 0 : kit.onSpawn) !== null && _o !== void 0 ? _o : undefined);
+      {
+          const sessionVfx = asSessionWithVfx(Game, { requireGrid: true });
+          if (sessionVfx) {
+              try {
+                  vfxAddSpawn(sessionVfx, p.cx, p.cy, p.side);
+              }
+              catch (_) { }
+          }
       }
-      catch (_) { }
-      const actor = getActiveAt(Game, side, slot);
+      const actor = getActiveAt(Game, sideLower, slot);
       const isLeader = (actor === null || actor === void 0 ? void 0 : actor.id) === 'leaderA' || (actor === null || actor === void 0 ? void 0 : actor.id) === 'leaderB';
       const canAutoUlt = fromDeck && !isLeader && actor && actor.alive && typeof performUlt === 'function';
       if (canAutoUlt && !Statuses.blocks(actor, 'ult')) {
@@ -15650,10 +17095,12 @@ __define('./turns.ts', (exports, module, __require) => {
               continue;
           if (!t.isMinion)
               continue;
-          if (!Number.isFinite(t.ttlTurns))
+          const ttl = t.ttlTurns;
+          if (typeof ttl !== 'number' || !Number.isFinite(ttl))
               continue;
-          t.ttlTurns -= 1;
-          if (t.ttlTurns <= 0)
+          const nextTtl = ttl - 1;
+          t.ttlTurns = nextTtl;
+          if (nextTtl <= 0)
               toRemove.push(t);
       }
       for (const t of toRemove) {
@@ -15665,7 +17112,7 @@ __define('./turns.ts', (exports, module, __require) => {
   }
   // hành động 1 unit (ưu tiên ult nếu đủ nộ & không bị chặn)
   function doActionOrSkip(Game, unit, { performUlt, turnContext } = {}) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+      var _a, _b, _c, _d, _e, _f, _g, _h;
       const ensureBusyReset = () => {
           if (!Game.turn)
               return;
@@ -15678,9 +17125,10 @@ __define('./turns.ts', (exports, module, __require) => {
       const side = (_c = (_b = turnContext === null || turnContext === void 0 ? void 0 : turnContext.side) !== null && _b !== void 0 ? _b : unit === null || unit === void 0 ? void 0 : unit.side) !== null && _c !== void 0 ? _c : null;
       const orderIndex = typeof (turnContext === null || turnContext === void 0 ? void 0 : turnContext.orderIndex) === 'number' ? turnContext.orderIndex : null;
       const cycle = typeof (turnContext === null || turnContext === void 0 ? void 0 : turnContext.cycle) === 'number' ? turnContext.cycle : (_e = (_d = Game.turn) === null || _d === void 0 ? void 0 : _d.cycle) !== null && _e !== void 0 ? _e : null;
+      const sequentialSnapshot = asSequentialTurn(Game.turn);
       const orderLength = typeof (turnContext === null || turnContext === void 0 ? void 0 : turnContext.orderLength) === 'number'
           ? turnContext.orderLength
-          : (Array.isArray((_f = Game.turn) === null || _f === void 0 ? void 0 : _f.order) ? Game.turn.order.length : null);
+          : (sequentialSnapshot ? sequentialSnapshot.order.length : null);
       const baseDetail = {
           game: Game,
           unit: unit !== null && unit !== void 0 ? unit : null,
@@ -15704,9 +17152,9 @@ __define('./turns.ts', (exports, module, __require) => {
           return;
       }
       const meta = Game.meta.get(unit.id);
-      emitPassiveEvent(Game, unit, 'onTurnStart', {});
+      emitPassiveEvent(Game, unit, 'onTurnStart', { log: getPassiveLog(Game) });
       const turnStamp = `${side !== null && side !== void 0 ? side : ''}:${slot !== null && slot !== void 0 ? slot : ''}:${cycle !== null && cycle !== void 0 ? cycle : 0}`;
-      startFuryTurn(unit, { turnStamp, startAmount: (_h = (_g = CFG === null || CFG === void 0 ? void 0 : CFG.fury) === null || _g === void 0 ? void 0 : _g.turn) === null || _h === void 0 ? void 0 : _h.startGain, grantStart: true });
+      startFuryTurn(unit, { turnStamp, startAmount: (_g = (_f = CFG === null || CFG === void 0 ? void 0 : CFG.fury) === null || _f === void 0 ? void 0 : _f.turn) === null || _g === void 0 ? void 0 : _g.startGain, grantStart: true });
       applyTurnRegen(Game, unit);
       Statuses.onTurnStart(unit, {});
       emitGameEvent(ACTION_START, baseDetail);
@@ -15717,7 +17165,7 @@ __define('./turns.ts', (exports, module, __require) => {
           return;
       }
       const ultCost = resolveUltCost(unit, CFG);
-      if (meta && ((_j = unit.fury) !== null && _j !== void 0 ? _j : 0) >= ultCost && !Statuses.blocks(unit, 'ult')) {
+      if (meta && ((_h = unit.fury) !== null && _h !== void 0 ? _h : 0) >= ultCost && !Statuses.blocks(unit, 'ult')) {
           let ultOk = false;
           try {
               performUlt(unit);
@@ -15729,7 +17177,7 @@ __define('./turns.ts', (exports, module, __require) => {
           }
           if (ultOk) {
               spendFury(unit, ultCost, CFG);
-              emitPassiveEvent(Game, unit, 'onUltCast', {});
+              emitPassiveEvent(Game, unit, 'onUltCast', { log: getPassiveLog(Game) });
           }
           Statuses.onTurnEnd(unit, {});
           ensureBusyReset();
@@ -15738,7 +17186,7 @@ __define('./turns.ts', (exports, module, __require) => {
       }
       const cap = typeof (meta === null || meta === void 0 ? void 0 : meta.followupCap) === 'number' ? (meta.followupCap | 0) : (CFG.FOLLOWUP_CAP_DEFAULT | 0);
       doBasicWithFollowups(Game, unit, cap);
-      emitPassiveEvent(Game, unit, 'onActionEnd', {});
+      emitPassiveEvent(Game, unit, 'onActionEnd', { log: getPassiveLog(Game) });
       Statuses.onTurnEnd(unit, {});
       ensureBusyReset();
       finishAction({ action: 'basic' });
@@ -15752,8 +17200,8 @@ __define('./turns.ts', (exports, module, __require) => {
           return;
       if ((_a = Game.battle) === null || _a === void 0 ? void 0 : _a.over)
           return;
-      if (turn.mode === 'interleaved_by_position') {
-          const interleavedTurn = turn;
+      const interleavedTurn = asInterleavedTurn(turn);
+      if (interleavedTurn) {
           let selection = nextTurnInterleaved(Game, interleavedTurn);
           if (!selection)
               return;
@@ -15835,7 +17283,9 @@ __define('./turns.ts', (exports, module, __require) => {
               return;
           return;
       }
-      const sequentialTurn = turn;
+      const sequentialTurn = asSequentialTurn(turn);
+      if (!sequentialTurn)
+          return;
       const order = Array.isArray(sequentialTurn === null || sequentialTurn === void 0 ? void 0 : sequentialTurn.order) ? sequentialTurn.order : [];
       if (!order.length)
           return;
@@ -15985,14 +17435,14 @@ __define('./turns/interleaved.ts', (exports, module, __require) => {
       return map;
   }
   function isQueueDue(state, sideLower, slot, cycle) {
-      var _a, _b;
-      const queued = (_a = state.queued) === null || _a === void 0 ? void 0 : _a[sideLower];
+      var _a, _b, _c;
+      const queued = sideLower === 'ally' ? (_a = state.queued) === null || _a === void 0 ? void 0 : _a.ally : (_b = state.queued) === null || _b === void 0 ? void 0 : _b.enemy;
       if (!queued)
           return false;
       const entry = queued.get(slot);
       if (!entry)
           return false;
-      return ((_b = entry.spawnCycle) !== null && _b !== void 0 ? _b : 0) <= cycle;
+      return ((_c = entry.spawnCycle) !== null && _c !== void 0 ? _c : 0) <= cycle;
   }
   function makeWrappedFlag(start, pos) {
       if (!Number.isFinite(start) || start <= 0)
@@ -16017,6 +17467,7 @@ __define('./turns/interleaved.ts', (exports, module, __require) => {
           const queued = isQueueDue(state, sideLower, pos, cycle);
           if (unit && unit.alive && Statuses.canAct(unit)) {
               return {
+                  mode: 'interleaved_by_position',
                   side: sideLower,
                   pos,
                   unit,
@@ -16029,6 +17480,7 @@ __define('./turns/interleaved.ts', (exports, module, __require) => {
           }
           if (queued) {
               return {
+                  mode: 'interleaved_by_position',
                   side: sideLower,
                   pos,
                   unit: null,
@@ -16108,13 +17560,13 @@ __define('./types/config.ts', (exports, module, __require) => {
 
 });
 __define('./types/currency.ts', (exports, module, __require) => {
-  const isLineupCurrencyEntry = (value) => (value != null
+  const isCurrencyEntry = (value) => (value != null
       && typeof value === 'object'
       && !Array.isArray(value));
   const isLineupCurrencyValue = (value) => (value == null
       || typeof value === 'number'
       || typeof value === 'string'
-      || isLineupCurrencyEntry(value));
+      || isCurrencyEntry(value));
   const isLineupCurrencyConfig = (value) => (value != null
       && typeof value === 'object'
       && !Array.isArray(value));
@@ -16135,6 +17587,7 @@ __define('./types/currency.ts', (exports, module, __require) => {
       return isLineupCurrencies(currencies) ? (currencies !== null && currencies !== void 0 ? currencies : null) : null;
   };
 
+  if (!Object.prototype.hasOwnProperty.call(exports, 'isCurrencyEntry')) exports.isCurrencyEntry = isCurrencyEntry;
   if (!Object.prototype.hasOwnProperty.call(exports, 'isLineupCurrencyConfig')) exports.isLineupCurrencyConfig = isLineupCurrencyConfig;
   if (!Object.prototype.hasOwnProperty.call(exports, 'isLineupCurrencies')) exports.isLineupCurrencies = isLineupCurrencies;
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeCurrencyBalances')) exports.normalizeCurrencyBalances = normalizeCurrencyBalances;
@@ -16432,16 +17885,20 @@ __define('./ui.ts', (exports, module, __require) => {
       };
       const render = () => {
           const deck = getDeck();
-          while (btns.length < deck.length) {
-              const btn = makeBtn(deck[btns.length]);
-              host.appendChild(btn);
-              btns.push(btn);
-          }
-          for (let i = 0; i < btns.length; i += 1) {
-              const button = btns[i];
-              const card = deck[i];
+          for (const [index, card] of deck.entries()) {
+              if (!btns[index] && card) {
+                  const btn = makeBtn(card);
+                  host.appendChild(btn);
+                  btns[index] = btn;
+              }
+              const button = btns[index];
+              if (!button)
+                  break;
               if (!card) {
                   button.hidden = true;
+                  button.dataset.id = '';
+                  button.disabled = true;
+                  button.classList.remove('active');
                   continue;
               }
               button.hidden = false;
@@ -16454,6 +17911,20 @@ __define('./ui.ts', (exports, module, __require) => {
               button.classList.toggle('disabled', !affordable);
               button.style.opacity = '';
               button.classList.toggle('active', getSelectedId() === card.id);
+          }
+          const previousLength = btns.length;
+          if (previousLength > deck.length) {
+              for (let i = deck.length; i < previousLength; i += 1) {
+                  const button = btns[i];
+                  if (!button)
+                      continue;
+                  button.hidden = true;
+                  button.dataset.id = '';
+                  button.disabled = true;
+                  button.classList.remove('active');
+                  button.remove();
+              }
+              btns.length = deck.length;
           }
       };
       if (gameEvents) {
@@ -16598,6 +18069,16 @@ __define('./units.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'UNITS')) exports.UNITS = UNITS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'UNIT_INDEX')) exports.UNIT_INDEX = UNIT_INDEX;
   if (!Object.prototype.hasOwnProperty.call(exports, 'lookupUnit')) exports.lookupUnit = lookupUnit;
+});
+__define('./utils/assert.ts', (exports, module, __require) => {
+  function assertDefined(value, message) {
+      if (value === undefined || value === null) {
+          throw new Error(message !== null && message !== void 0 ? message : 'Giá trị mong đợi phải được định nghĩa.');
+      }
+      return value;
+  }
+
+  if (!Object.prototype.hasOwnProperty.call(exports, 'assertDefined')) exports.assertDefined = assertDefined;
 });
 __define('./utils/dummy.ts', (exports, module, __require) => {
   function ensureNestedModuleSupport() {
@@ -17185,23 +18666,23 @@ __define('./utils/kit.ts', (exports, module, __require) => {
       return null;
   }
   function cloneShallow(value) {
-      if (value == null || typeof value !== 'object')
-          return value !== null && value !== void 0 ? value : null;
+      if (value === null || value === undefined)
+          return null;
+      if (typeof value !== 'object')
+          return value;
       if (!isCloneCandidate(value))
           return value;
       if (Array.isArray(value)) {
           const result = value.map((entry) => (isCloneCandidate(entry) ? cloneShallow(entry) : entry));
           return result;
       }
-      else {
-          const out = { ...value };
-          for (const [key, entry] of Object.entries(out)) {
-              if (isCloneCandidate(entry)) {
-                  out[key] = cloneShallow(entry);
-              }
+      const out = { ...value };
+      for (const [key, entry] of Object.entries(out)) {
+          if (isCloneCandidate(entry)) {
+              out[key] = cloneShallow(entry);
           }
-          return out;
       }
+      return out;
   }
   function extractUltSummonFields(ult) {
       var _a, _b, _c, _d;
@@ -17610,6 +19091,23 @@ __define('./utils/time.ts', (exports, module, __require) => {
 
   if (!Object.prototype.hasOwnProperty.call(exports, 'safeNow')) exports.safeNow = safeNow;
 });
+__define('./utils/unit-id.ts', (exports, module, __require) => {
+  function normalizeUnitId(id) {
+      if (typeof id === 'string') {
+          return id;
+      }
+      if (typeof id === 'number') {
+          return Number.isFinite(id) ? String(id) : '';
+      }
+      if (id == null) {
+          return '';
+      }
+      const value = String(id);
+      return typeof value === 'string' ? value : '';
+  }
+
+  if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeUnitId')) exports.normalizeUnitId = normalizeUnitId;
+});
 __define('./vfx.ts', (exports, module, __require) => {
   // 0.7 vfx.js
   // VFX layer: spawn pop, hit ring, ranged tracer, melee step-in/out
@@ -17626,6 +19124,13 @@ __define('./vfx.ts', (exports, module, __require) => {
   const loithienanhAnchors = __dep3.default ?? __dep3;
   const __dep4 = __require('./data/vfx_anchors/schema.ts');
   const parseVfxAnchorDataset = __dep4.parseVfxAnchorDataset;
+  function asSessionWithVfx(game, { requireGrid = false } = {}) {
+      if (!game || !Array.isArray(game.tokens))
+          return null;
+      if (requireGrid && !game.grid)
+          return null;
+      return game;
+  }
   const now = () => safeNow();
   const lerp = (a, b, t) => a + (b - a) * t;
   const easeInOut = (t) => (1 - Math.cos(Math.PI * Math.max(0, Math.min(1, t)))) * 0.5;
@@ -17677,29 +19182,53 @@ __define('./vfx.ts', (exports, module, __require) => {
           return null;
       return VFX_ANCHOR_CACHE.get(id) || null;
   }
-  function resolveBindingAnchor(unit, { anchorId, bindingKey, timing, ambientKey, radius }) {
-      var _a, _b, _c, _d;
-      const dataset = getUnitAnchorDataset(unit);
-      let picked = null;
-      if (bindingKey && ((_b = (_a = dataset === null || dataset === void 0 ? void 0 : dataset.vfxBindings) === null || _a === void 0 ? void 0 : _a[bindingKey]) === null || _b === void 0 ? void 0 : _b.anchors)) {
-          const anchors = dataset.vfxBindings[bindingKey].anchors;
-          picked = anchors.find((item) => (timing && item.timing === timing) || (anchorId && item.id === anchorId)) || null;
-          if (!picked && timing) {
-              picked = anchors.find((item) => item.timing === timing) || null;
-          }
-          if (!picked && anchorId) {
-              picked = anchors.find((item) => item.id === anchorId) || null;
+  function getBindingAnchors(dataset, bindingKey, source = 'vfxBindings') {
+      if (!dataset || !bindingKey)
+          return [];
+      const bindings = dataset[source];
+      const entry = bindings === null || bindings === void 0 ? void 0 : bindings[bindingKey];
+      if (!entry || !Array.isArray(entry.anchors))
+          return [];
+      return entry.anchors;
+  }
+  function pickAnchorFromList(anchors, anchorId, timing, hasTiming) {
+      if (anchors.length === 0)
+          return null;
+      if (hasTiming || anchorId) {
+          for (const anchor of anchors) {
+              const timingMatch = hasTiming && anchor.timing === timing;
+              const idMatch = !!anchorId && anchor.id === anchorId;
+              if (timingMatch || idMatch) {
+                  return anchor;
+              }
           }
       }
-      if (!picked && ambientKey && ((_d = (_c = dataset === null || dataset === void 0 ? void 0 : dataset.ambientEffects) === null || _c === void 0 ? void 0 : _c[ambientKey]) === null || _d === void 0 ? void 0 : _d.anchors)) {
-          const anchors = dataset.ambientEffects[ambientKey].anchors;
-          picked = anchors.find((item) => (timing && item.timing === timing) || (anchorId && item.id === anchorId)) || null;
-          if (!picked && timing) {
-              picked = anchors.find((item) => item.timing === timing) || null;
+      if (hasTiming) {
+          for (const anchor of anchors) {
+              if (anchor.timing === timing) {
+                  return anchor;
+              }
           }
-          if (!picked && anchorId) {
-              picked = anchors.find((item) => item.id === anchorId) || null;
+      }
+      if (anchorId) {
+          for (const anchor of anchors) {
+              if (anchor.id === anchorId) {
+                  return anchor;
+              }
           }
+      }
+      return null;
+  }
+  function resolveBindingAnchor(unit, { anchorId, bindingKey, timing, ambientKey, radius }) {
+      const dataset = getUnitAnchorDataset(unit);
+      const hasTiming = !!timing;
+      const timingValue = hasTiming ? timing : undefined;
+      let picked = null;
+      const primaryAnchors = getBindingAnchors(dataset, bindingKey);
+      picked = pickAnchorFromList(primaryAnchors, anchorId, timingValue, hasTiming);
+      if (!picked) {
+          const ambientAnchors = getBindingAnchors(dataset, ambientKey !== null && ambientKey !== void 0 ? ambientKey : null, 'ambientEffects');
+          picked = pickAnchorFromList(ambientAnchors, anchorId, timingValue, hasTiming);
       }
       const resolvedId = (picked === null || picked === void 0 ? void 0 : picked.id) || anchorId || DEFAULT_ANCHOR_ID;
       const resolvedRadius = Number.isFinite(radius) ? radius : (Number.isFinite(picked === null || picked === void 0 ? void 0 : picked.radius) ? picked.radius : null);
@@ -18275,6 +19804,7 @@ __define('./vfx.ts', (exports, module, __require) => {
       Game.vfx = keep;
   }
 
+  if (!Object.prototype.hasOwnProperty.call(exports, 'asSessionWithVfx')) exports.asSessionWithVfx = asSessionWithVfx;
   if (!Object.prototype.hasOwnProperty.call(exports, 'vfxAddSpawn')) exports.vfxAddSpawn = vfxAddSpawn;
   if (!Object.prototype.hasOwnProperty.call(exports, 'vfxAddHit')) exports.vfxAddHit = vfxAddHit;
   if (!Object.prototype.hasOwnProperty.call(exports, 'vfxAddTracer')) exports.vfxAddTracer = vfxAddTracer;
