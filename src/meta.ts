@@ -7,7 +7,7 @@ import {
 } from './catalog.ts';
 import { extractOnSpawnRage, kitSupportsSummon } from './utils/kit.ts';
 
-import type { CatalogStatBlock } from '@shared-types/config';
+import type { CatalogStatBlock, UnitKitConfig } from '@shared-types/config';
 import type { MetaEntry } from '@shared-types/pve';
 import type { UnitId } from '@shared-types/units';
 
@@ -41,7 +41,7 @@ interface MetaService {
   get(id: MetaId): MetaEntry | undefined;
   classOf(id: MetaId): MetaEntry['class'] | null;
   rankOf(id: MetaId): MetaEntry['rank'] | null;
-  kit(id: MetaId): MetaEntry['kit'] | null;
+  kit(id: MetaId): UnitKitConfig | null;
   isSummoner(id: MetaId): boolean;
 }
 
@@ -58,7 +58,9 @@ export const Meta = {
   },
   kit(id: MetaId) {
     const entry = getMetaById(id);
-    return (entry?.kit ?? null) as MetaEntry['kit'] | null;
+    if (!entry) return null;
+    const kit = entry.kit;
+    return kit && typeof kit === 'object' ? (kit as UnitKitConfig) : null;
   },
   isSummoner(id: MetaId) {
     const entry = getMetaById(id);
