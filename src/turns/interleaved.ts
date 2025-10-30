@@ -60,7 +60,7 @@ function buildSlotMap(tokens: ReadonlyArray<UnitToken> | null | undefined, sideL
 }
 
 function isQueueDue(state: SessionState, sideLower: Side, slot: number, cycle: number): boolean {
-  const queued = state.queued?.[sideLower] as Map<number, QueuedSummonRequest> | undefined;
+  const queued = sideLower === 'ally' ? state.queued?.ally : state.queued?.enemy;
   if (!queued) return false;
   const entry = queued.get(slot);
   if (!entry) return false;
