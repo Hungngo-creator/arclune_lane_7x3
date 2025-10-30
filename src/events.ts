@@ -89,7 +89,7 @@ export interface EventEmitterLike {
     type: T,
     listener: (payload?: EventEmitterPayload<T>) => unknown,
   ) => unknown;
-  emit: <T extends GameEventType>(type: T, payload?: EventEmitterPayload<T]) => unknown;
+  emit: <T extends GameEventType>(type: T, payload?: EventEmitterPayload<T>) => unknown;
 }
 
 export type GameEventHandler<T extends GameEventType = GameEventType> = (
