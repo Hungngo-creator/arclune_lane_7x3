@@ -2,15 +2,18 @@
 // meta.ts — gom lookup + stat khởi tạo + nộ khởi điểm
 import {
   CLASS_BASE,
+  RANK_MULT,
   applyRankAndMods,
   getMetaById,
   getUnitKitById,
 } from './catalog.ts';
 import { extractOnSpawnRage, kitSupportsSummon } from './utils/kit.ts';
 
-import type { CatalogStatBlock, UnitKitConfig } from '@shared-types/config';
+import type { CatalogStatBlock, UnitKitConfig } from './types/config.ts';
 import type { MetaEntry } from '@shared-types/pve';
 import type { UnitId } from '@shared-types/units';
+
+import type { ClassName, RankName } from './catalog.ts';
 
 type MetaId = UnitId | string | null | undefined;
 
@@ -83,12 +86,36 @@ const EMPTY_INSTANCE_STATS: InstanceStats = {
   hpRegen: 0,
 };
 
+const isRankName = (value: unknown): value is RankName => (
+  typeof value === 'string' && value in RANK_MULT
+);
+
+const isClassName = (value: unknown): value is ClassName => (
+  typeof value === 'string' && value in CLASS_BASE
+);
+
+const coerceStatMods = (
+  mods: MetaEntry['mods'],
+): Partial<Record<keyof CatalogStatBlock, number>> | undefined => {
+  if (!mods || typeof mods !== 'object') return undefined;
+  const out: Partial<Record<keyof CatalogStatBlock, number>> = {};
+  for (const [key, raw] of Object.entries(mods)) {
+    if (typeof raw !== 'number' || !Number.isFinite(raw)) continue;
+    out[key as keyof CatalogStatBlock] = raw;
+  }
+  return out;
+};
+
 export function makeInstanceStats(unitId: MetaId): InstanceStats {
   const entry = Meta.get(unitId);
   if (!entry) return { ...EMPTY_INSTANCE_STATS };
-  const base: CatalogStatBlock | undefined = CLASS_BASE[entry.class];
+  const className = entry.class;
+  if (!isClassName(className)) return { ...EMPTY_INSTANCE_STATS };
+  const rank = entry.rank;
+  if (!isRankName(rank)) return { ...EMPTY_INSTANCE_STATS };
+  const base: CatalogStatBlock | undefined = CLASS_BASE[className];
   if (!base) return { ...EMPTY_INSTANCE_STATS };
-  const fin = applyRankAndMods(base, entry.rank, entry.mods);
+  const fin = applyRankAndMods(base, rank, coerceStatMods(entry.mods));
   return {
     hpMax: Math.trunc(fin.HP ?? 0),
     hp: Math.trunc(fin.HP ?? 0),

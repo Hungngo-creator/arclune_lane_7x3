@@ -8,11 +8,13 @@ import type {
   RosterUnitDefinition,
   UnitKitConfig,
   UnitKitMap,
-} from '@shared-types/config';
+} from './types/config.ts';
 import type { UnitId } from '@shared-types/units';
 import type { UnknownRecord } from '@shared-types/common';
 
-export interface RosterKitDefinition extends UnitKitConfig, UnknownRecord {
+export interface RosterKitDefinition
+  extends Omit<UnitKitConfig, 'ult' | 'onSpawn' | 'passives' | 'traits'>,
+    UnknownRecord {
   onSpawn?: UnknownRecord | null;
   basic?: UnknownRecord | null;
   skills?: ReadonlyArray<UnknownRecord> | null;
