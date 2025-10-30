@@ -1,6 +1,7 @@
 import { ROSTER } from '../../catalog.ts';
 import { UNITS } from '../../units.ts';
 import type { UnitDefinition } from '../../units.ts';
+import { normalizeUnitId } from '../../utils/unit-id.ts';
 import type { RosterEntryLite } from '@shared-types/lineup';
 import type {
   LineupCurrencies,
@@ -64,16 +65,21 @@ export function cloneRoster(input: ReadonlyArray<RosterEntryLite> | null | undef
 }
 
 export function buildRosterWithCost(rosterSource: ReadonlyArray<CollectionEntry>): CollectionEntry[]{
-  const costs = new Map<string, number>(UNITS.map((unit: UnitDefinition) => [unit.id, unit.cost] as const));
-  return rosterSource.map((entry) => ({
-    ...entry,
-    id: typeof entry.id === 'string' ? entry.id : String(entry.id ?? ''),
-    cost: typeof entry.cost === 'number' && Number.isFinite(entry.cost)
-      ? entry.cost
-      : entry.cost === null
-        ? null
-        : costs.get(typeof entry.id === 'string' ? entry.id : String(entry.id ?? '')) ?? null,
-  }));
+  const costs = new Map<string, number>(
+    UNITS.map((unit: UnitDefinition) => [normalizeUnitId(unit.id), unit.cost] as const),
+  );
+  return rosterSource.map((entry) => {
+    const entryId = normalizeUnitId(entry.id);
+    return {
+      ...entry,
+      id: entryId,
+      cost: typeof entry.cost === 'number' && Number.isFinite(entry.cost)
+        ? entry.cost
+        : entry.cost === null
+          ? null
+          : costs.get(entryId) ?? null,
+    };
+  });
 }
 
 export const resolveCurrencyBalance: CurrencyBalanceProvider = (currencyId, providedCurrencies, playerState) => {

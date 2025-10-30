@@ -1,4 +1,5 @@
 import { getUnitArt } from '../../art.ts';
+import { normalizeUnitId } from '../../utils/unit-id.ts';
 import { listCurrencies } from '../../data/economy.ts';
 import { getSkillSet } from '../../data/skills.ts';
 import { createNumberFormatter } from '../../utils/format.ts';
@@ -390,12 +391,13 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
   const rosterEntries = new Map<string, { button: HTMLButtonElement; costEl: HTMLElement | null; meta: CollectionEntry }>();
 
   for (const unit of rosterSource){
+    const unitId = normalizeUnitId(unit.id);
     const item = document.createElement('li');
 
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'collection-roster__entry';
-    button.dataset.unitId = unit.id;
+    button.dataset.unitId = unitId;
     button.dataset.rank = unit.rank || 'unknown';
 
     const avatar = document.createElement('div');
@@ -403,11 +405,11 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
     const aura = document.createElement('div');
     aura.className = 'collection-roster__aura';
     avatar.appendChild(aura);
-    const art = getUnitArt(unit.id);
+    const art = getUnitArt(unitId);
     if (art?.sprite?.src){
       const img = document.createElement('img');
       img.src = art.sprite.src;
-      img.alt = unit.name || unit.id;
+      img.alt = unit.name || unitId;
       avatar.appendChild(img);
     } else {
       const fallback = document.createElement('span');
@@ -420,7 +422,7 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
     const costValue = Number.isFinite(unit.cost) ? unit.cost : '—';
     cost.textContent = `Cost ${costValue}`;
 
-    const tooltipParts = [unit.name || unit.id];
+    const tooltipParts = [unit.name || unitId];
     if (unit.rank){
       tooltipParts.push(`Rank ${unit.rank}`);
     }
@@ -434,7 +436,7 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
     button.appendChild(cost);
 
     const handleSelect = () => {
-      selectUnit(unit.id);
+      selectUnit(unitId);
     };
     button.addEventListener('click', handleSelect);
     addCleanup(() => button.removeEventListener('click', handleSelect));
@@ -442,7 +444,7 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
     item.appendChild(button);
     rosterList.appendChild(item);
 
-    rosterEntries.set(unit.id, { button, costEl: cost, meta: unit });
+    rosterEntries.set(unitId, { button, costEl: cost, meta: unit });
   }
 
   rosterPanel.appendChild(rosterList);
