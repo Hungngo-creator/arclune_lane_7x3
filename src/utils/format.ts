@@ -1,6 +1,8 @@
 const HAS_INTL_NUMBER_FORMAT = typeof Intl === 'object' && typeof Intl.NumberFormat === 'function';
 
-type LocaleValue = string | string[];
+export type LocaleValue = string | string[];
+
+export type NumberFormatOptions = Intl.NumberFormatOptions;
 
 type NumberFormatInput =
   | number
@@ -13,11 +15,11 @@ interface PolyfillNumberFormatter {
   format(value: NumberFormatInput | null | undefined): string;
 }
 
-type NumberFormatter = Intl.NumberFormat | PolyfillNumberFormatter;
+export type NumberFormatter = Intl.NumberFormat | PolyfillNumberFormatter;
 
 export function createNumberFormatter(
   locale?: LocaleValue,
-  options?: Intl.NumberFormatOptions
+  options?: NumberFormatOptions
 ): NumberFormatter {
   if (HAS_INTL_NUMBER_FORMAT) {
     return new Intl.NumberFormat(locale, options);
