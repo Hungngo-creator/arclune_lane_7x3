@@ -94,6 +94,7 @@ export function findNextOccupiedPos(
     const queued = isQueueDue(state, sideLower, pos, cycle);
     if (unit && unit.alive && Statuses.canAct(unit)){
       return {
+        mode: 'interleaved_by_position',
         side: sideLower,
         pos,
         unit,
@@ -106,6 +107,7 @@ export function findNextOccupiedPos(
     }
     if (queued){
       return {
+        mode: 'interleaved_by_position',
         side: sideLower,
         pos,
         unit: null,
