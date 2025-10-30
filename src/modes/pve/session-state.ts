@@ -9,12 +9,12 @@ import type {
   TurnOrderSide,
 } from '@shared-types/config';
 import type { TurnSnapshot } from '@shared-types/turn-order';
-import type { QueuedSummonState, ActionChainEntry, UnitId } from '@shared-types/units';
+import type { QueuedSummonState, ActionChainEntry, UnitId, Side } from '@shared-types/units';
 import { createSummonQueue } from '@shared-types/units';
 
 import { CFG } from '../../config.ts';
 import { UNITS, lookupUnit } from '../../units.ts';
-import { Meta } from '../../meta.ts';
+import { metaServiceAdapter } from '../../meta.ts';
 import { gameEvents } from '../../events.ts';
 import { getEnvironmentBackground, drawEnvironmentProps } from '../../background.ts';
 import { getCachedBattlefieldScene } from '../../scene.ts';
@@ -50,7 +50,7 @@ export type NormalizedSessionConfig = (CreateSessionOptions & {
   backgroundKey?: string;
 }) & Record<string, unknown>;
 
-type TurnOrderEntry = { side: 'ally' | 'enemy'; slot: number };
+type TurnOrderEntry = { side: Side; slot: number };
 
 type BackgroundConfig = ReturnType<typeof getEnvironmentBackground>;
 
@@ -158,7 +158,7 @@ function buildBaseState(params: BuildBaseStateParams): SessionState {
     },
     result: null,
     ai: params.ai,
-    meta: Meta,
+    meta: metaServiceAdapter,
     runtime: {
       encounter: null,
       wave: null,
@@ -325,14 +325,14 @@ function normalizePairScanEntry(
   const pushPair = (side: TurnOrderSide, slot: number): void => {
     normalized.push({ side, slot: clampTurnOrderSlot(slot) });
   };
-const pushForSides = (slot: number, targetSides?: readonly TurnOrderSide[]): void => {
+  const pushForSides = (slot: number, targetSides?: readonly TurnOrderSide[]): void => {
     const resolvedSides = targetSides && targetSides.length ? targetSides : sides;
     for (const side of resolvedSides) {
       pushPair(side, slot);
     }
-};
+  };
 
-if (typeof entry === 'number') {
+  if (typeof entry === 'number') {
     if (Number.isFinite(entry)) pushForSides(entry);
     return normalized;
   }
@@ -340,7 +340,7 @@ if (typeof entry === 'number') {
   if (Array.isArray(entry)) {
     if (isPairScanTuple(entry)) {
       const [, slot] = entry;
-      const side = entry[0] === 'enemy' ? 'enemy' : 'ally';
+      const side: Side = entry[0] === 'enemy' ? 'enemy' : 'ally';
       pushPair(side, slot);
       return normalized;
     }
@@ -353,7 +353,7 @@ if (typeof entry === 'number') {
   if (isPairScanObjectWithSide(entry)) {
     const slot = parseSlotValue(entry);
     if (slot !== null) {
-      const side = entry.side === 'enemy' ? 'enemy' : 'ally';
+      const side: Side = entry.side === 'enemy' ? 'enemy' : 'ally';
       pushPair(side, slot);
     }
     return normalized;
@@ -371,16 +371,16 @@ export function buildTurnOrder(): { order: TurnOrderEntry[]; indexMap: Map<strin
   const cfg = CFG.turnOrder;
   const rawSides = Array.isArray(cfg.sides) ? cfg.sides : null;
   const sides = rawSides && rawSides.length
-    ? rawSides.filter((side): side is TurnOrderSide => isTurnOrderSide(side))
+    ? rawSides.filter((side: unknown): side is TurnOrderSide => isTurnOrderSide(side))
     : (['ally', 'enemy'] as const satisfies ReadonlyArray<TurnOrderSide>);
   const order: TurnOrderEntry[] = [];
-  const scan = Array.isArray(cfg.pairScan) ? cfg.pairScan : [];
+  const scan = Array.isArray(cfg.pairScan) ? [...cfg.pairScan] : [];
   for (const entry of scan) {
     const normalized = normalizePairScanEntry(entry, sides);
     if (normalized.length) order.push(...normalized);
   }
-    if (!order.length) {
-      const fallback = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
+  if (!order.length) {
+    const fallback = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
     for (const slot of fallback) {
       order.push(...normalizePairScanEntry(slot, sides));
     }
@@ -404,7 +404,7 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
     ?? sceneCfg?.DEFAULT_THEME
     ?? null;
   const backgroundKey = normalized.backgroundKey
-  ?? CFG.CURRENT_BACKGROUND
+    ?? CFG.CURRENT_BACKGROUND
     ?? sceneCfg?.CURRENT_BACKGROUND
     ?? sceneCfg?.CURRENT_THEME
     ?? sceneCfg?.DEFAULT_THEME
@@ -412,16 +412,16 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
 
   const allyUnits: SessionState['unitsAll'] =
     Array.isArray(normalized.deck) && normalized.deck.length
-      ? normalized.deck.slice()
-      : DEFAULT_UNIT_ROSTER;
+      ? Array.from(normalized.deck)
+      : Array.from(DEFAULT_UNIT_ROSTER);;
 
   const enemyPreset = normalized.aiPreset ?? null;
   const enemyUnits: SessionState['ai']['unitsAll'] =
     Array.isArray(enemyPreset?.deck) && enemyPreset.deck.length
-      ? [...enemyPreset.deck]
+      ? Array.from(enemyPreset.deck)
       : Array.isArray(enemyPreset?.unitsAll) && enemyPreset.unitsAll.length
-        ? [...enemyPreset.unitsAll]
-        : DEFAULT_UNIT_ROSTER;
+        ? Array.from(enemyPreset.unitsAll)
+        : Array.from(DEFAULT_UNIT_ROSTER);
 
   const requestedTurnMode = normalized.turnMode
     ?? normalized.turn?.mode
