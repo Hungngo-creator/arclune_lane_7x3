@@ -413,7 +413,7 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
   const allyUnits: SessionState['unitsAll'] =
     Array.isArray(normalized.deck) && normalized.deck.length
       ? Array.from(normalized.deck)
-      : Array.from(DEFAULT_UNIT_ROSTER);;
+      : Array.from(DEFAULT_UNIT_ROSTER);
 
   const enemyPreset = normalized.aiPreset ?? null;
   const enemyUnits: SessionState['ai']['unitsAll'] =
