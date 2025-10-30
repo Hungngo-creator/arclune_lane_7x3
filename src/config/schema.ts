@@ -1,4 +1,4 @@
-import { ZodIssueCode, ZodObject, z } from 'zod';
+import { z } from 'zod';
 
 const SideSchema = z.enum(['ally', 'enemy']);
 
@@ -154,36 +154,61 @@ const SceneLayerSchema = z.object({
 });
 export type SceneLayer = z.infer<typeof SceneLayerSchema>;
 
-const SceneThemeObjectSchema: ZodObject<{
-  sky: typeof SceneLayerSchema;
-  horizon: typeof SceneLayerSchema;
-  ground: typeof SceneLayerSchema;
-}> = z.object({
+const SceneThemeObjectSchema = z.object({
   sky: SceneLayerSchema,
   horizon: SceneLayerSchema,
   ground: SceneLayerSchema
 });
 
-const SceneThemeSchema = SceneThemeObjectSchema.superRefine<
-  z.infer<typeof SceneThemeObjectSchema>,
-  z.input<typeof SceneThemeObjectSchema>
->((theme, ctx) => {
-  if (!theme.sky.top) {
-    ctx.addIssue({
-      code: ZodIssueCode.custom,
-      path: ['sky', 'top'],
-      message: 'sky.top is required'
-    });
+type SceneThemeObject = z.infer<typeof SceneThemeObjectSchema>;
+
+export type SceneTheme = SceneThemeObject & {
+  sky: SceneThemeObject['sky'] & { top: string };
+};
+
+function assertSceneTheme(
+  theme: SceneThemeObject,
+  themeName?: string
+): asserts theme is SceneTheme {
+  if (typeof theme.sky.top !== 'string' || theme.sky.top.length === 0) {
+    const themeLabel = themeName ? `SCENE.THEMES["${themeName}"]` : 'Scene theme';
+    throw new TypeError(`${themeLabel} is missing sky.top`);
   }
-}) as z.ZodEffects<typeof SceneThemeObjectSchema>;
-export type SceneTheme = z.infer<typeof SceneThemeSchema>;
+}
+
+function assertSceneThemeRecord(
+  themes: Record<string, SceneThemeObject>
+): asserts themes is Record<string, SceneTheme> {
+  for (const [name, theme] of Object.entries(themes)) {
+    assertSceneTheme(theme, name);
+  }
+}
+
+export function parseSceneTheme(
+  value: unknown,
+  themeName?: string
+): SceneTheme {
+  const parsed = SceneThemeObjectSchema.parse(value);
+  assertSceneTheme(parsed, themeName);
+  return parsed;
+}
 
 const SceneConfigSchema = z.object({
   DEFAULT_THEME: z.string(),
   CURRENT_THEME: z.string(),
-  THEMES: z.record(SceneThemeSchema)
+  THEMES: z.record(SceneThemeObjectSchema)
 });
-export type SceneConfig = z.infer<typeof SceneConfigSchema>;
+
+type SceneConfigBase = z.infer<typeof SceneConfigSchema>;
+export type SceneConfig = SceneConfigBase & {
+  THEMES: Record<string, SceneTheme>;
+};
+
+export function parseSceneConfig(value: unknown): SceneConfig {
+  const parsed = SceneConfigSchema.parse(value);
+  assertSceneThemeRecord(parsed.THEMES);
+  return parsed as SceneConfig;
+}
 
 const BackgroundPropSchema = z.object({
   type: z.string(),
@@ -208,7 +233,17 @@ const WorldMapConfigSchema = z.object({
   BACKGROUNDS: z.record(BackgroundDefinitionSchema),
   CAMERA: z.string()
 });
-export type WorldMapConfig = z.infer<typeof WorldMapConfigSchema>;
+
+type WorldMapConfigBase = z.infer<typeof WorldMapConfigSchema>;
+export type WorldMapConfig = WorldMapConfigBase & {
+  SCENE: SceneConfig;
+};
+
+export function parseWorldMapConfig(value: unknown): WorldMapConfig {
+  const parsed = WorldMapConfigSchema.parse(value);
+  assertSceneThemeRecord(parsed.SCENE.THEMES);
+  return parsed as WorldMapConfig;
+}
 
 const CombatTuningSchema = z.object({
   GRID_COLS: z.number(),
@@ -237,4 +272,13 @@ export const GameConfigSchema = CombatTuningSchema
   )
   .merge(WorldMapConfigSchema);
 
-export type GameConfig = z.infer<typeof GameConfigSchema>;
+type GameConfigBase = z.infer<typeof GameConfigSchema>;
+export type GameConfig = GameConfigBase & {
+  SCENE: SceneConfig;
+};
+
+export function parseGameConfig(value: unknown): GameConfig {
+  const parsed = GameConfigSchema.parse(value);
+  assertSceneThemeRecord(parsed.SCENE.THEMES);
+  return parsed as GameConfig;
+}
