@@ -67,6 +67,20 @@ const collectPassiveEffects = (passive: PassiveSpec | null | undefined): Passive
   return out;
 };
 
+export const getPassiveLog = (
+  Game: SessionState | null | undefined,
+): Array<Record<string, unknown>> => {
+  const logCandidate = Game?.passiveLog;
+  if (!Array.isArray(logCandidate)) return [];
+  const result: Array<Record<string, unknown>> = [];
+  for (const entry of logCandidate){
+    if (isRecord(entry)){
+      result.push(entry);
+    }
+  }
+  return result;
+};
+
 const defaultPassive: PassiveDefinition = ({ passive }) => {
   const id = passive?.id ?? 'unknown';
   throw new Error(`Passive handler not implemented: ${id}`);

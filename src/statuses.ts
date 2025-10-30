@@ -11,7 +11,7 @@ interface ShieldResult {
   broke: boolean;
 }
 
-interface DamageResult {
+export interface DamageResult {
   dealt?: number;
   absorbed?: number;
   dtype?: string;

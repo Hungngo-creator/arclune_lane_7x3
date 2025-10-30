@@ -7,7 +7,7 @@ import { CFG } from './config.ts';
 import { makeInstanceStats, initialRageFor } from './meta.ts';
 import { vfxAddSpawn, vfxAddBloodPulse, asSessionWithVfx } from './vfx.ts';
 import { getUnitArt } from './art.ts';
-import { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } from './passives.ts';
+import { emitPassiveEvent, applyOnSpawnEffects, getPassiveLog, prepareUnitForPassives } from './passives.ts';
 import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } from './events.ts';
 import { safeNow } from './utils/time.ts';
 import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } from './utils/fury.ts';
@@ -307,7 +307,7 @@ export function doActionOrSkip(
   }
 
   const meta = Game.meta.get(unit.id);
-  emitPassiveEvent(Game, unit, 'onTurnStart', {});
+  emitPassiveEvent(Game, unit, 'onTurnStart', { log: getPassiveLog(Game) });
 
   const turnStamp = `${side ?? ''}:${slot ?? ''}:${cycle ?? 0}`;
   startFuryTurn(unit, { turnStamp, startAmount: CFG?.fury?.turn?.startGain, grantStart: true });
@@ -334,7 +334,7 @@ export function doActionOrSkip(
     }
     if (ultOk) {
       spendFury(unit, ultCost, CFG);
-      emitPassiveEvent(Game, unit, 'onUltCast', {});
+      emitPassiveEvent(Game, unit, 'onUltCast', { log: getPassiveLog(Game) });
     }
     Statuses.onTurnEnd(unit, {});
     ensureBusyReset();
@@ -344,7 +344,7 @@ export function doActionOrSkip(
 
   const cap = typeof meta?.followupCap === 'number' ? (meta.followupCap | 0) : (CFG.FOLLOWUP_CAP_DEFAULT | 0);
   doBasicWithFollowups(Game, unit, cap);
-  emitPassiveEvent(Game, unit, 'onActionEnd', {});
+  emitPassiveEvent(Game, unit, 'onActionEnd', { log: getPassiveLog(Game) });
   Statuses.onTurnEnd(unit, {});
   ensureBusyReset();
   finishAction({ action: 'basic' });

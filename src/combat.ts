@@ -1,11 +1,12 @@
 import { Statuses, hookOnLethalDamage } from './statuses.ts';
 import { asSessionWithVfx, vfxAddHit, vfxAddMelee, vfxAddLightningArc } from './vfx.ts';
 import { slotToCell } from './engine.ts';
-import { emitPassiveEvent, type AfterHitHandler } from './passives.ts';
+import { emitPassiveEvent, getPassiveLog, type AfterHitHandler } from './passives.ts';
 import { CFG } from './config.ts';
 import { gainFury, startFurySkill, finishFuryHit } from './utils/fury.ts';
 import { safeNow } from './utils/time.ts';
 
+import type { DamageResult } from './statuses.ts';
 import type { SessionState } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';
 import type { GameConfig } from '@shared-types/config';
@@ -50,7 +51,7 @@ export interface BasicAttackContext {
     flatAdd: number;
   };
   afterHit: AfterHitHandler[];
-  log?: unknown;
+  log?: Array<Record<string, unknown>>;
 }
 
 export const isBasicAttackAfterHitHandler = (
@@ -150,7 +151,8 @@ export function dealAbilityDamage(
     hookOnLethalDamage(target);
   }
 
-  Statuses.afterDamage(attacker, target, { dealt: remain, absorbed: abs.absorbed, dtype });
+  const damageResult: DamageResult = { dealt: remain, absorbed: abs.absorbed, dtype };
+  Statuses.afterDamage(attacker, target, damageResult);
 
   const sessionVfx = asSessionWithVfx(Game);
 
@@ -266,7 +268,7 @@ export function basicAttack(Game: SessionState, unit: UnitToken): void {
     target: resolved,
     damage: { baseMul: 1, flatAdd: 0 },
     afterHit: [],
-    log: Game?.passiveLog,
+    log: getPassiveLog(Game),
   };
   emitPassiveEvent(Game, unit, 'onBasicHit', passiveCtx);
 
@@ -317,7 +319,8 @@ export function basicAttack(Game: SessionState, unit: UnitToken): void {
   }
 
   const dealt = Math.max(0, Math.min(dmg, abs.remain ?? 0));
-  Statuses.afterDamage(unit, resolved, { dealt, absorbed: abs.absorbed, dtype });
+  const damageResult: DamageResult = { dealt, absorbed: abs.absorbed, dtype };
+  Statuses.afterDamage(unit, resolved, damageResult);
 
   const isKill = resolved.hp <= 0;
   gainFury(unit, {
