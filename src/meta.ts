@@ -4,6 +4,7 @@ import {
   CLASS_BASE,
   applyRankAndMods,
   getMetaById,
+  getUnitKitById,
 } from './catalog.ts';
 import { extractOnSpawnRage, kitSupportsSummon } from './utils/kit.ts';
 
@@ -57,10 +58,7 @@ export const Meta = {
     return entry?.rank ?? null;
   },
   kit(id: MetaId) {
-    const entry = getMetaById(id);
-    if (!entry) return null;
-    const kit = entry.kit;
-    return kit && typeof kit === 'object' ? (kit as UnitKitConfig) : null;
+    return getUnitKitById(id);
   },
   isSummoner(id: MetaId) {
     const entry = getMetaById(id);

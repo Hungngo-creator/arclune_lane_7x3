@@ -223,7 +223,7 @@ function getBaseArt(id: string | null | undefined): UnitArtDefinition {
   const fallback = UNIT_ART.default;
   if (!id) return fallback;
   const direct = readUnitArt(id);
-  if (direct) return direct;;
+  if (direct) return direct;
   if (id.endsWith('_minion')){
     const base = id.replace(/_minion$/, '');
     const minionVariant = readUnitArt(`${base}_minion`);

@@ -3,7 +3,12 @@
 // 1) Rank multiplier (đơn giản) — áp lên TẤT CẢ stat trừ SPD
 import { kitSupportsSummon } from './utils/kit.ts';
 
-import type { CatalogStatBlock, RosterUnitDefinition, UnitKitConfig } from '@shared-types/config';
+import type {
+  CatalogStatBlock,
+  RosterUnitDefinition,
+  UnitKitConfig,
+  UnitKitMap,
+} from '@shared-types/config';
 import type { UnitId } from '@shared-types/units';
 import type { UnknownRecord } from '@shared-types/common';
 
@@ -27,6 +32,14 @@ const asUnknownRecord = <T extends UnknownRecord>(value: T): UnknownRecord => va
 const asUnknownRecordArray = <T extends UnknownRecord>(
   value: ReadonlyArray<T>,
 ): ReadonlyArray<UnknownRecord> => value;
+
+const isObjectLike = (value: unknown): value is Record<string, unknown> => (
+  !!value && typeof value === 'object' && !Array.isArray(value)
+);
+
+const asUnitKitConfig = (value: unknown): UnitKitConfig | null => (
+  isObjectLike(value) ? (value as UnitKitConfig) : null
+);
 
 export const RANK_MULT = {
   N: 0.80,
@@ -542,6 +555,18 @@ export const ROSTER_MAP = new Map<UnitId, RosterEntry>(
 export const getMetaById = (id: MaybeUnitId): RosterEntry | undefined => {
   if (typeof id !== 'string') return undefined;
   return ROSTER_MAP.get(id);
+};
+
+const unitKitEntries = ROSTER.map((entry) => [entry.id, asUnitKitConfig(entry.kit)] as const);
+
+export const UNIT_KITS = Object.freeze(
+  Object.fromEntries(unitKitEntries),
+) as UnitKitMap;
+
+export const getUnitKitById = (id: MaybeUnitId): UnitKitConfig | null => {
+  if (typeof id !== 'string') return null;
+  const kit = UNIT_KITS[id as UnitId] ?? null;
+  return asUnitKitConfig(kit);
 };
 
 export const isSummoner = (id: MaybeUnitId): boolean => {

@@ -139,7 +139,7 @@ export function processActionChain(
 
     const creep = Game.tokens.find((t): t is UnitToken => t.alive && t.side === side && t.cx === cx && t.cy === cy) ?? null;
     if (creep){
-      const { orderLength, cycle } = getTurnSnapshotInfo(Game.turn);;
+      const { orderLength, cycle } = getTurnSnapshotInfo(Game.turn);
       const turnContext: TurnContext = {
         side,
         slot: item.slot,
