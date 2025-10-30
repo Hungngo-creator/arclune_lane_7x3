@@ -31,7 +31,8 @@ import {
   vfxAddLightningArc,
   vfxAddBloodPulse,
   vfxAddGroundBurst,
-  vfxAddShieldWrap
+  vfxAddShieldWrap,
+  asSessionWithVfx,
 } from '../../vfx.ts';
 import { drawBattlefieldScene } from '../../scene.ts';
 import {
@@ -717,13 +718,16 @@ case 'hpTradeBurst': {
 
       {
         const startedAt = getNow();
-        try {
-          const dur = vfxAddBloodPulse(Game, unit, {
-            bindingKey,
-            timing: 'charge_up'
-          });
-          applyBusyFromVfx(startedAt, dur);
-        } catch (_) {}
+        const GameVfx = asSessionWithVfx(Game, { requireGrid: true });
+        if (GameVfx) {
+          try {
+            const dur = vfxAddBloodPulse(GameVfx, unit, {
+              bindingKey,
+              timing: 'charge_up'
+            });
+            applyBusyFromVfx(startedAt, dur);
+          } catch (_) {}
+        }
       }
 
       const damageSpec = u.damage || {};
@@ -764,8 +768,10 @@ case 'hpTradeBurst': {
 
         {
           const startedAt = getNow();
+        const GameVfx = asSessionWithVfx(Game, { requireGrid: true });
+        if (GameVfx) {
           try {
-            const dur = vfxAddLightningArc(Game, unit, tgt, {
+            const dur = vfxAddLightningArc(GameVfx, unit, tgt, {
               bindingKey,
               timing: 'burst_core',
               targetBindingKey: bindingKey,
@@ -774,6 +780,7 @@ case 'hpTradeBurst': {
             applyBusyFromVfx(startedAt, dur);
           } catch (_) {}
         }
+      }
 
         if (debuffAmount && tgt.alive){
           const existing = Statuses.get(tgt, debuffId);
@@ -800,38 +807,47 @@ case 'hpTradeBurst': {
 
       {
         const startedAt = getNow();
-        try {
-          const dur = vfxAddGroundBurst(Game, unit, {
-            bindingKey,
-            anchorId: 'right_foot',
-            timing: 'ground_crack'
-          });
-          applyBusyFromVfx(startedAt, dur);
-        } catch (_) {}
+        const GameVfx = asSessionWithVfx(Game, { requireGrid: true });
+        if (GameVfx) {
+          try {
+            const dur = vfxAddGroundBurst(GameVfx, unit, {
+              bindingKey,
+              anchorId: 'right_foot',
+              timing: 'ground_crack'
+            });
+            applyBusyFromVfx(startedAt, dur);
+          } catch (_) {}
+        }
       }
 
       {
         const startedAt = getNow();
-        try {
-          const dur = vfxAddGroundBurst(Game, unit, {
-            bindingKey,
-            anchorId: 'left_foot',
-            timing: 'ground_crack'
-          });
-          applyBusyFromVfx(startedAt, dur);
-        } catch (_) {}
+        const GameVfx = asSessionWithVfx(Game, { requireGrid: true });
+        if (GameVfx) {
+          try {
+            const dur = vfxAddGroundBurst(GameVfx, unit, {
+              bindingKey,
+              anchorId: 'left_foot',
+              timing: 'ground_crack'
+            });
+            applyBusyFromVfx(startedAt, dur);
+          } catch (_) {}
+        }
       }
 
       {
        const startedAt = getNow();
-        try {
-          const dur = vfxAddShieldWrap(Game, unit, {
-            bindingKey,
-            anchorId: 'root',
-            timing: 'burst_core'
-          });
-          applyBusyFromVfx(startedAt, dur);
-        } catch (_) {}
+        const GameVfx = asSessionWithVfx(Game, { requireGrid: true });
+        if (GameVfx) {
+          try {
+            const dur = vfxAddShieldWrap(GameVfx, unit, {
+              bindingKey,
+              anchorId: 'root',
+              timing: 'burst_core'
+            });
+            applyBusyFromVfx(startedAt, dur);
+          } catch (_) {}
+        }
       }
 
       if (Number.isFinite(u.reduceDmg) && u.reduceDmg > 0){
@@ -852,7 +868,10 @@ case 'hpTradeBurst': {
       const hits = Math.max(1, (u.hits|0) || 1);
       const scale = typeof u.scale === 'number' ? u.scale : 0.9;
       const meleeDur = CFG?.ANIMATION?.meleeDurationMs ?? 1100;
-      try { vfxAddMelee(Game, unit, primary, { dur: meleeDur }); } catch(_){}
+      const GameVfx = asSessionWithVfx(Game, { requireGrid: true });
+      if (GameVfx) {
+        try { vfxAddMelee(GameVfx, unit, primary, { dur: meleeDur }); } catch(_){}
+      }
       busyMs = Math.max(busyMs, meleeDur);
       for (const enemy of laneTargets){
         if (!enemy.alive) continue;
@@ -891,7 +910,12 @@ case 'hpTradeBurst': {
       if (reduce > 0){
         Statuses.add(unit, Statuses.make.damageCut({ pct: reduce, turns: u.turns || 1 }));
       }
-      try { vfxAddHit(Game, unit); } catch(_){}
+      {
+        const sessionVfx = asSessionWithVfx(Game, { requireGrid: true });
+        if (sessionVfx) {
+          try { vfxAddHit(sessionVfx, unit); } catch(_){}
+        }
+      }
       busyMs = 800;
       break;
     }
@@ -910,7 +934,10 @@ case 'hpTradeBurst': {
         const tgt = foes[i];
         if (!tgt) continue;
         Statuses.add(tgt, Statuses.make.sleep({ turns: u.turns || 1 }));
-        try { vfxAddHit(Game, tgt); } catch(_){}
+        const sessionVfx = asSessionWithVfx(Game, { requireGrid: true });
+        if (sessionVfx) {
+          try { vfxAddHit(sessionVfx, tgt); } catch(_){}
+        }
       }
       busyMs = 1000;
       break;
@@ -937,7 +964,10 @@ case 'hpTradeBurst': {
         if (u.revived?.lockSkillsTurns){
           Statuses.add(ally, Statuses.make.silence({ turns: u.revived.lockSkillsTurns }));
         }
-        try { vfxAddSpawn(Game, ally.cx, ally.cy, ally.side); } catch(_){}
+        const sessionVfx = asSessionWithVfx(Game, { requireGrid: true });
+        if (sessionVfx) {
+          try { vfxAddSpawn(sessionVfx, ally.cx, ally.cy, ally.side); } catch(_){}
+        }
       }
       busyMs = 1500;
       break;
@@ -969,7 +999,10 @@ case 'hpTradeBurst': {
         const goal = Math.min(tgt.hpMax || 0, Math.round((tgt.hpMax || 0) * ratio));
         if (goal > (tgt.hp || 0)){
           healUnit(tgt, goal - (tgt.hp || 0));
-          try { vfxAddHit(Game, tgt); } catch(_){}
+          const sessionVfx = asSessionWithVfx(Game, { requireGrid: true });
+          if (sessionVfx) {
+            try { vfxAddHit(sessionVfx, tgt); } catch(_){}
+          }
         }
       }
       busyMs = 1000;
@@ -997,7 +1030,10 @@ case 'hpTradeBurst': {
       const pct = u.attackSpeed ?? 0.1;
       for (const tgt of targets){
         Statuses.add(tgt, Statuses.make.haste({ pct, turns: u.turns || 1 }));
-        try { vfxAddHit(Game, tgt); } catch(_){}
+        const sessionVfx = asSessionWithVfx(Game, { requireGrid: true });
+        if (sessionVfx) {
+          try { vfxAddHit(sessionVfx, tgt); } catch(_){}
+        }
       }
       busyMs = 900;
       break;
@@ -1246,11 +1282,14 @@ function init(): boolean {
   if (Game.grid) spawnLeaders(Game.tokens, Game.grid);
 
   const tokens = Game.tokens || [];
-  for (const t of tokens){
-    if (t.id === 'leaderA' || t.id === 'leaderB'){
-      vfxAddSpawn(Game, t.cx, t.cy, t.side);
+  const sessionVfx = asSessionWithVfx(Game, { requireGrid: true });
+  if (sessionVfx){
+    for (const t of tokens){
+      if (t.id === 'leaderA' || t.id === 'leaderB'){
+        try { vfxAddSpawn(sessionVfx, t.cx, t.cy, t.side); } catch(_){}
+      }
     }
-}
+  }
   for (const t of tokens){
     if (!t.iid) t.iid = nextIid();
     if (t.id === 'leaderA' || t.id === 'leaderB'){
