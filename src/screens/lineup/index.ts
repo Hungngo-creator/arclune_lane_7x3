@@ -6,7 +6,10 @@ import type {
   LineupCurrencyConfig,
   LineupCurrencyValue,
 } from '@shared-types/currency';
-import type { LineupDefinition as LineupDefinitionInput } from '@shared-types/lineup';
+import type {
+  LineupDefinition as LineupDefinitionInput,
+  RosterEntryLite,
+} from '@shared-types/lineup';
 import {
   isCurrencyEntry,
   isLineupCurrencies,
@@ -29,7 +32,7 @@ const toLineupParams = (value: unknown): LineupScreenDefinitionParams | null => 
 
 const cloneMergeable = <T extends Mergeable>(value: T): T => {
   if (Array.isArray(value)){
-    return value.slice() as T;
+    return value.slice() as unknown as T;;
   }
   return { ...value } as T;
 };
@@ -116,6 +119,18 @@ const toMergeable = (value: unknown): Mergeable | null => {
   return null;
 };
 
+const toRosterSource = (
+  value: Mergeable | null | undefined,
+): ReadonlyArray<RosterEntryLite> | null | undefined => {
+  if (Array.isArray(value)){
+    return value as ReadonlyArray<RosterEntryLite>;
+  }
+  if (value == null){
+    return value ?? undefined;
+  }
+  return null;
+};
+
 interface LineupScreenDefinitionParams extends UnknownRecord {
   readonly lineups?: unknown;
   readonly roster?: unknown;
@@ -162,10 +177,11 @@ export function renderLineupScreen(options: RenderLineupScreenOptions): LineupVi
     normalizedParams?.playerState ?? null,
   ) || {};
   const lineups = resolveLineups(defParams, normalizedParams);
-  const roster = mergeParams<Mergeable>(
+  const mergedRosterSource = mergeParams<Mergeable>(
     toMergeable(defParams?.roster),
     toMergeable(normalizedParams?.roster),
   );
+  const roster = toRosterSource(mergedRosterSource);
   const baseCurrencies = isLineupCurrencies(defParams?.currencies) ? defParams?.currencies ?? null : null;
   const overrideCurrencies = isLineupCurrencies(normalizedParams?.currencies) ? normalizedParams?.currencies ?? null : null;
   const mergedCurrencySource = mergeParams<LineupCurrencies>(baseCurrencies, overrideCurrencies);
