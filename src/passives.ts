@@ -8,6 +8,7 @@ import type {
   PassiveConditionFn,
   PassiveConditionObject,
   PassiveDefinition,
+  PassiveEffectConfig,
   PassiveKitDefinition,
   PassiveMetaContext,
   PassiveRegistry,
@@ -26,7 +27,10 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 const isPassiveKitDefinition = (value: unknown): value is PassiveKitDefinition => {
   if (!isRecord(value)) return false;
   const passives = (value as { passives?: unknown }).passives;
-  return passives == null || Array.isArray(passives);
+  if (passives != null && !Array.isArray(passives)) return false;
+  const onSpawn = (value as { onSpawn?: unknown }).onSpawn;
+  if (onSpawn != null && (typeof onSpawn !== 'object' || Array.isArray(onSpawn))) return false;
+  return true;
 };
 
 const coercePassiveMeta = (value: unknown): PassiveMetaContext | null => {
@@ -38,6 +42,79 @@ const coercePassiveMeta = (value: unknown): PassiveMetaContext | null => {
     meta,
     kit,
   } satisfies PassiveMetaContext;
+};
+
+type PassiveEffectCandidate = PassiveSpec['effect'];
+
+const isEffectCandidate = (value: unknown): value is PassiveEffectCandidate => {
+  if (typeof value === 'string') return true;
+  return !!value && typeof value === 'object';
+};
+
+const collectPassiveEffects = (passive: PassiveSpec | null | undefined): PassiveEffectCandidate[] => {
+  if (!passive) return [];
+  const out: PassiveEffectCandidate[] = [];
+  const effects = Array.isArray(passive.effects) ? passive.effects : null;
+  if (effects){
+    for (const entry of effects){
+      if (!isEffectCandidate(entry)) continue;
+      out.push(entry);
+    }
+  }
+  if (!out.length && isEffectCandidate(passive.effect)){
+    out.push(passive.effect);
+  }
+  return out;
+};
+
+const resolvePassiveEffect = (
+  basePassive: PassiveSpec,
+  effect: PassiveEffectCandidate,
+): {
+  handler: PassiveDefinition | undefined;
+  passive: PassiveSpec | null;
+  params: Record<string, unknown> | undefined;
+  key: string | null;
+} => {
+  const key = typeof effect === 'string'
+    ? effect
+    : effect && typeof effect === 'object'
+      ? ((effect as PassiveEffectConfig).type || (effect as PassiveEffectConfig).kind || null)
+      : null;
+
+  let handler: PassiveDefinition | undefined = key ? PASSIVES[key] : undefined;
+  let params = basePassive.params as Record<string, unknown> | undefined;
+  let resolved: PassiveSpec | null = basePassive;
+
+  if (effect && typeof effect === 'object'){
+    const spec = effect as PassiveEffectConfig;
+    const type = spec.type || spec.kind;
+    if (type && PASSIVES[type]){
+      handler = PASSIVES[type];
+    }
+    const mergedParams: Record<string, unknown> = {
+      ...(basePassive.params || {}),
+      ...(spec.params || {}),
+    };
+    if (spec.stats && typeof spec.stats === 'object'){
+      mergedParams.stats = spec.stats;
+    }
+    if (spec.flatStats && typeof spec.flatStats === 'object'){
+      mergedParams.flatStats = spec.flatStats;
+    }
+    resolved = { ...basePassive, params: mergedParams };
+    if (spec.id && typeof spec.id === 'string' && spec.id.trim()){
+      resolved.id = spec.id;
+    }
+    params = mergedParams;
+    if (!handler && (mergedParams.stats || mergedParams.flatStats)){
+      handler = EFFECTS.gainStats;
+    }
+  } else if (!handler && basePassive.params && (basePassive.params.stats || basePassive.params.flatStats)){
+    handler = EFFECTS.gainStats;
+  }
+
+  return { handler, passive: resolved, params, key };
 };
 
 const STAT_ALIAS: Map<string, string> = new Map([
@@ -256,8 +333,10 @@ const evaluateConditionObject = (
   }
 
   if (condition.minMinions != null){
+    const ownerIid = unit?.iid;
+    if (ownerIid == null) return false;
     const tokens = Game?.tokens || [];
-    const count = tokens.filter(t => t && t.alive && t.isMinion && t.ownerIid === unit.iid).length;
+    const count = tokens.filter(t => t && t.alive && t.isMinion && t.ownerIid === ownerIid).length;
     if (count < Number(condition.minMinions)) return false;
   }
 
@@ -289,10 +368,10 @@ const passiveConditionsOk = ({
   passive?: PassiveSpec | null;
   ctx?: PassiveRuntimeContext | null;
 }): boolean => {
-  const conditions = passive?.conditions;
-  if (!conditions) return true;
-  const list = Array.isArray(conditions) ? conditions : [conditions];
-  for (const cond of list){
+  const conditionsCandidate = passive ? (passive.conditions ?? null) : null;
+  if (!conditionsCandidate) return true;
+  const conditions = Array.isArray(conditionsCandidate) ? conditionsCandidate : [conditionsCandidate];
+  for (const cond of conditions){
     if (!cond) continue;
     if (isPassiveConditionFn(cond)){
       try {
@@ -336,11 +415,11 @@ const recomputeFromStatuses = (unit: UnitToken | null | undefined): void => {
   }
 
   for (const [key, baseValue] of Object.entries(unit.baseStats)){
-    if (!Number.isFinite(baseValue)) continue;
+    if (typeof baseValue !== 'number' || !Number.isFinite(baseValue)) continue;
     const attr = normalizeStatKey(key) || key;
-    const pct = percent.get(attr) ?? percent.get(key) ?? 0;
-    const add = flat.get(attr) ?? flat.get(key) ?? 0;
-    let next = (baseValue ?? 0) * (1 + pct) + add;
+    const pct = Number(percent.get(attr) ?? percent.get(key) ?? 0);
+    const add = Number(flat.get(attr) ?? flat.get(key) ?? 0);
+    let next = baseValue * (1 + pct) + add;
 
     if (attr === 'arm' || attr === 'res'){
       unit[attr] = clamp01(next);
@@ -581,7 +660,7 @@ const EFFECTS: Record<string, PassiveDefinition> = {
 };
 
 /** @type {Record<string, PassiveEffectHandler>} */
-const PASSIVES = {
+const PASSIVES: PassiveRegistry = {
   placeMark: EFFECTS.placeMark,
   'gainATK%': EFFECTS.gainATKPercent,
   'gainWIL%': EFFECTS.gainWILPercent,
@@ -592,7 +671,7 @@ const PASSIVES = {
   'gainStats%': EFFECTS.gainStats,
   statBuff: EFFECTS.gainStats,
   statGain: EFFECTS.gainStats,
-} satisfies PassiveRegistry;
+};
 
 /**
  * @param {SessionState | null | undefined} Game
@@ -616,37 +695,19 @@ export function emitPassiveEvent(
   if (!kit || !Array.isArray(kit.passives)) return;
   for (const passive of kit.passives as Array<PassiveSpec | null | undefined>){
     if (!passive || passive.when !== when) continue;
-    const effectKey = typeof passive.effect === 'string'
-      ? passive.effect
-      : (passive.effect?.type || passive.effect?.kind || null);
-    let handler: PassiveDefinition | undefined = effectKey ? PASSIVES[effectKey] : undefined;
-    let effectivePassive: PassiveSpec | null = passive;
-
-    if (passive && typeof passive.effect === 'object' && passive.effect !== null){
-      const spec = passive.effect;
-      const type = spec.type || spec.kind;
-      if (type && PASSIVES[type]) handler = PASSIVES[type];
-      const mergedParams = {
-        ...(spec.params || {}),
-        ...(passive.params || {}),
-        ...(spec.stats ? { stats: spec.stats } : {}),
-        ...(spec.flatStats ? { flatStats: spec.flatStats } : {}),
-      };
-      effectivePassive = { ...passive, params: mergedParams };
-      if (!handler && ((mergedParams as Record<string, unknown>).stats || (mergedParams as Record<string, unknown>).flatStats)){
-        handler = EFFECTS.gainStats;
-      }
-    } else if (!handler && passive?.params && (passive.params.stats || passive.params.flatStats)){
-      handler = EFFECTS.gainStats;
+    const effects = collectPassiveEffects(passive);
+    if (!effects.length) continue;
+    for (const effect of effects){
+      const { handler, passive: effectivePassive, params, key } = resolvePassiveEffect(passive, effect);
+      if (typeof handler !== 'function') continue;
+      if (!effectivePassive) continue;
+      const handlerToUse = key === 'gainRES%' && params && params.perTarget != null
+        ? EFFECTS.resPerSleeping
+        : handler;
+      if (typeof handlerToUse !== 'function') continue;
+      if (!passiveConditionsOk({ Game, unit, passive: effectivePassive, ctx })) continue;
+      handlerToUse({ Game: Game ?? null, unit: unit ?? null, passive: effectivePassive ?? null, ctx });
     }
-
-    const params = effectivePassive?.params as Record<string, unknown> | undefined;
-    if (effectKey === 'gainRES%' && params && params.perTarget != null){
-      handler = EFFECTS.resPerSleeping;
-    }
-    if (typeof handler !== 'function') continue;
-    if (!passiveConditionsOk({ Game, unit, passive: effectivePassive, ctx })) continue;
-    handler({ Game: Game ?? null, unit: unit ?? null, passive: effectivePassive ?? null, ctx });
   }
 }
 
