@@ -184,8 +184,8 @@ function extractCodeFromNormalized(normalized: string): string{
   }
   const tokens = normalized.split(/[\s\-_/]+/).filter(Boolean);
   if (tokens.length >= 2){
-    const firstToken = sanitizeCodeToken(tokens[0]);
-    const lastToken = sanitizeCodeToken(tokens[tokens.length - 1]);
+    const firstToken = sanitizeCodeToken(tokens[0] ?? '');
+    const lastToken = sanitizeCodeToken(tokens[tokens.length - 1] ?? '');
     let letters = '';
     if (firstToken){
       letters += firstToken[0];
@@ -194,7 +194,7 @@ function extractCodeFromNormalized(normalized: string): string{
       letters += lastToken[0];
     }
     if (tokens.length > 2 && letters.length < 3){
-      const extraToken = sanitizeCodeToken(tokens[1]);
+      const extraToken = sanitizeCodeToken(tokens[1] ?? '');
       if (extraToken){
         letters += extraToken[0];
       }
@@ -221,15 +221,22 @@ function getUnitCode(unit: RosterUnit | null | undefined, fallbackLabel: string)
   return code ? code.toLocaleUpperCase('vi-VN') : '';
 }
 
-function getInitials(name: string): string{
-  if (!name){
+function getInitials(parts: string[]): string{
+  if (!parts[0]){
     return '';
   }
-  const parts = name.trim().split(/\s+/);
   if (parts.length === 1){
     return parts[0].slice(0, 2).toUpperCase();
   }
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+function getNameInitials(name: string): string{
+  if (!name){
+    return '';
+  }
+  const parts = name.trim().split(/\s+/);
+  return getInitials(parts);
 }
 
 function renderAvatar(container: HTMLElement, avatarUrl: string | null, name: string): void{
@@ -240,7 +247,7 @@ function renderAvatar(container: HTMLElement, avatarUrl: string | null, name: st
     img.alt = name || '';
     container.appendChild(img);
   } else {
-    container.textContent = getInitials(name || '');
+    container.textContent = getNameInitials(name || '');
   }
 }
 
@@ -718,7 +725,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       if (unit){
         renderAvatar(avatar, unit.avatar || null, unit.name);
       } else if (slot.label){
-        avatar.textContent = getInitials(slot.label);
+        avatar.textContent = getNameInitials(slot.label);
       } else if (!slot.unlocked){
         avatar.textContent = '🔒';
       } else {
@@ -890,8 +897,10 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
         cellEl.classList.add('is-active');
       }
       const columnIndex = cell.index % columnCount;
-      const targetColumn = columnEls[columnIndex] || columnEls[0];
-      targetColumn.appendChild(cellEl);
+      const targetColumn = columnEls[columnIndex] || columnEls[0] || null;
+      if (targetColumn){
+        targetColumn.appendChild(cellEl);
+      }
     });
 
     updateActiveBenchHighlight();
