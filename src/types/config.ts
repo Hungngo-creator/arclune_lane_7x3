@@ -1,4 +1,4 @@
-import type { SkillDefinition } from './combat';
+import type { PassiveSpec, SkillDefinition } from './combat';
 import type { UnitId } from './units';
 import type { BackgroundDefinition, BackgroundProp, TurnOrderConfig as TurnOrderConfigSchema } from '../config/schema';
 
@@ -252,10 +252,54 @@ export interface UltSkillConfig extends Record<string, unknown> {
   shields?: ReadonlyArray<Record<string, unknown>> | null;
 }
 
+export interface UnitKitOnSpawnEffect extends Record<string, unknown> {
+  type?: string;
+  kind?: string;
+  effect?: string;
+  id?: string;
+  mode?: string;
+  phase?: string;
+  stage?: string;
+  when?: string;
+  target?: string;
+  amount?: number;
+  value?: number;
+  percent?: number;
+  stats?: Record<string, number>;
+  flatStats?: Record<string, number>;
+  status?: Record<string, unknown> | null;
+  stack?: boolean;
+  stacks?: number;
+  maxStacks?: number;
+  purgeable?: boolean;
+}
+
+export interface UnitKitOnSpawnConfig extends Record<string, unknown> {
+  rage?: number | string | Record<string, unknown> | null;
+  exceptLeader?: boolean;
+  effects?: ReadonlyArray<UnitKitOnSpawnEffect | null | undefined> | null;
+  teamHealOnEntry?: number | null;
+  teamHealPercentMaxHPOfCaster?: number | null;
+  teamHealPercentCasterMaxHP?: number | null;
+  statuses?: ReadonlyArray<Record<string, unknown> | null | undefined> | null;
+  addStatuses?: ReadonlyArray<Record<string, unknown> | null | undefined> | null;
+  status?: Record<string, unknown> | null;
+  stats?: Record<string, number> | null;
+  flatStats?: Record<string, number> | null;
+  statsMode?: string | null;
+  mode?: string | null;
+  purgeable?: boolean;
+  id?: string | null;
+  stack?: boolean;
+  stacks?: number | null;
+  maxStacks?: number | null;
+}
+
 export interface UnitKitConfig extends Record<string, unknown> {
   ult?: UltSkillConfig | null;
   traits?: unknown;
-  onSpawn?: Record<string, unknown> | null;
+  passives?: ReadonlyArray<PassiveSpec | null | undefined> | null;
+  onSpawn?: UnitKitOnSpawnConfig | null;
 }
 
 export interface RosterUnitDefinition {

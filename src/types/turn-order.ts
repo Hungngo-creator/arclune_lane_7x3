@@ -13,6 +13,7 @@ export interface InterleavedTurnState {
   cycle: number;
   busyUntil: number;
   completed?: boolean;
+  order?: undefined;
 }
 
 export interface SequentialTurnStateEntry {
@@ -21,7 +22,7 @@ export interface SequentialTurnStateEntry {
 }
 
 export interface SequentialTurnState {
-  mode?: string;
+  mode?: string | null;
   order: SequentialTurnStateEntry[];
   orderIndex: Map<string, number>;
   cursor: number;
@@ -52,6 +53,8 @@ export interface InterleavedState {
   wrapped: boolean;
   sideKey: TurnSideKey;
   spawnOnly: boolean;
+  mode?: 'interleaved_by_position';
+  order?: undefined;
 }
 
 export type GetTurnOrderIndexHook = (

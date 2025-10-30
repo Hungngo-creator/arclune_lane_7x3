@@ -23,7 +23,7 @@ export interface StatBlock {
   furyMax?: number;
   rage?: number;
   /** Các chỉ số cơ sở trước khi áp buff/debuff */
-  baseStats?: Partial<Pick<StatBlock, 'atk' | 'wil' | 'res'>>;
+  baseStats?: Record<string, number>;
 }
 
 export interface FuryState {

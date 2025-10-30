@@ -6,7 +6,7 @@ import type {
   UnitToken,
 } from './units';
 import type { UnitArt } from './art';
-import type { RosterUnitDefinition } from './config';
+import type { RosterUnitDefinition, UnitKitConfig, UnitKitOnSpawnConfig } from './config';
 import type { TurnSnapshot } from './turn-order';
 import type { RngState } from './rng';
 import type { TelemetryEvent } from './telemetry';
@@ -247,9 +247,18 @@ export interface PassiveConditionObject {
   [extra: string]: unknown;
 }
 
-export interface PassiveKitDefinition extends Record<string, unknown> {
+export interface PassiveEffectConfig extends Record<string, unknown> {
+  type?: string;
+  kind?: string;
+  id?: string;
+  params?: Record<string, unknown> | null;
+  stats?: Record<string, number> | null;
+  flatStats?: Record<string, number> | null;
+}
+
+export interface PassiveKitDefinition extends UnitKitConfig {
   passives?: ReadonlyArray<PassiveSpec | null | undefined> | null;
-  onSpawn?: Record<string, unknown> | null;
+  onSpawn?: UnitKitOnSpawnConfig | null;
 }
 
 export interface PassiveMetaContext {
@@ -268,18 +277,14 @@ export type PassiveConditionFn = (context: PassiveConditionContext) => boolean;
 
 export type PassiveCondition = string | PassiveConditionObject | PassiveConditionFn;
 
-export interface PassiveSpec {
+export interface PassiveSpec extends Record<string, unknown> {
   id: string;
   when?: string;
   effect?:
     | string
-    | {
-        type?: string;
-        kind?: string;
-        params?: Record<string, unknown>;
-        stats?: Record<string, number>;
-        flatStats?: Record<string, number>;
-      };
+    | PassiveEffectConfig
+    | null;
+  effects?: ReadonlyArray<string | PassiveEffectConfig | null | undefined> | null;
   params?: Record<string, unknown>;
   condition?: PassiveCondition | null;
   conditions?: PassiveCondition[] | PassiveCondition | null;

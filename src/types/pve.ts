@@ -1,8 +1,10 @@
-import type { PveDeckEntry, SessionState as CoreSessionState } from './combat';
+import type { PassiveKitDefinition, PveDeckEntry, SessionState as CoreSessionState } from './combat';
 import type { UnitToken } from './units';
 import type { RosterUnitDefinition } from './config';
 
-export type MetaEntry = RosterUnitDefinition;
+export type MetaEntry = Omit<RosterUnitDefinition, 'kit'> & {
+  kit: PassiveKitDefinition | null;
+};
 
 export interface RewardRoll {
   id: string;

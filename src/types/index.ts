@@ -16,6 +16,8 @@ export type {
   BattleResult,
   BattleState,
   SessionAIState,
+  PassiveEffectConfig,
+  PassiveKitDefinition,
   PassiveSpec,
   PassiveEffectArgs,
   PassiveDefinition,
