@@ -1,7 +1,7 @@
 import { TOKEN_STYLE, CHIBI, CFG } from './config.ts';
 import { getUnitArt, getUnitSkin } from './art.ts';
 import type { UnitToken, QueuedSummonState, QueuedSummonRequest, Side } from '@shared-types/units';
-import type { UnitArt } from '@shared-types/art';
+import type { UnitArt, UnitArtPalette } from '@shared-types/art';
 
 type GridSpec = {
   cols: number;
@@ -123,24 +123,34 @@ const DEFAULT_OBLIQUE_CAMERA = {
 const CHIBI_PROPS: ChibiProportions = CHIBI as ChibiProportions;
 const TOKEN_STYLE_VALUE = TOKEN_STYLE as 'chibi' | 'disk';
 
+function coerceFinite(value: unknown, fallback: number): number {
+  const candidate =
+    typeof value === 'number'
+      ? value
+      : typeof value === 'string'
+        ? Number.parseFloat(value)
+        : Number(value);
+  return Number.isFinite(candidate) ? candidate : fallback;
+}
+
 /* ---------- Grid ---------- */
 export function makeGrid(canvas: HTMLCanvasElement | null | undefined, cols: number, rows: number): GridSpec {
-  const pad = CFG.UI?.PAD ?? 12;
-  let viewportW: number | null = null;
+  const pad = coerceFinite(CFG.UI?.PAD, 12);
+  const boardMaxW = coerceFinite(CFG.UI?.BOARD_MAX_W, 900);
+  let viewportW = boardMaxW + pad * 2;
 
   if (typeof window !== 'undefined') {
     const { innerWidth, visualViewport } = window;
-    if (Number.isFinite(innerWidth)) viewportW = viewportW === null ? innerWidth : Math.min(viewportW, innerWidth);
-    const vvWidth = visualViewport?.width;
-    if (Number.isFinite(vvWidth)) viewportW = viewportW === null ? vvWidth : Math.min(viewportW, vvWidth);
+    viewportW = Math.min(viewportW, coerceFinite(innerWidth, viewportW));
+    const vvWidth = visualViewport ? coerceFinite(visualViewport.width, viewportW) : viewportW;
+    viewportW = Math.min(viewportW, vvWidth);
   }
   if (typeof document !== 'undefined') {
-    const docWidth = document.documentElement?.clientWidth;
-    if (Number.isFinite(docWidth)) viewportW = viewportW === null ? docWidth : Math.min(viewportW, docWidth);
+    const docWidth = coerceFinite(document.documentElement?.clientWidth, viewportW);
+    viewportW = Math.min(viewportW, docWidth);
   }
 
-  const boardMaxW = CFG.UI?.BOARD_MAX_W ?? 900;
-  const viewportSafeW = viewportW === null ? boardMaxW + pad * 2 : viewportW;
+  const viewportSafeW = viewportW;
   const availableW = Math.max(1, viewportSafeW - pad * 2);
   const w = Math.min(availableW, boardMaxW);
   const h = Math.max(Math.floor(w * (CFG.UI?.BOARD_H_RATIO ?? 3 / 7)), CFG.UI?.BOARD_MIN_H ?? 220);
@@ -182,11 +192,14 @@ export function makeGrid(canvas: HTMLCanvasElement | null | undefined, cols: num
   }
 
   if (typeof window !== 'undefined') {
-    const vvScale = window.visualViewport?.scale;
-    if (Number.isFinite(vvScale) && vvScale > 0) {
-      const scaledDpr = dpr * vvScale;
-      if (Number.isFinite(scaledDpr) && scaledDpr > 0) {
-        dpr = Math.min(dpr, scaledDpr);
+    const visualViewport = window.visualViewport;
+    if (visualViewport) {
+      const vvScale = coerceFinite(visualViewport.scale, 1);
+      if (vvScale > 0) {
+        const scaledDpr = dpr * vvScale;
+        if (Number.isFinite(scaledDpr) && scaledDpr > 0) {
+          dpr = Math.min(dpr, scaledDpr);
+        }
       }
     }
   }
@@ -313,25 +326,30 @@ export function spawnLeaders(tokens: TokenWithArt[], g: GridSpec): void {
 
 /* ---------- Helper ---------- */
 export function pickRandom<T>(pool: readonly T[], excludeSet: ReadonlySet<string>, n = 4): T[] {
-  const remain = pool.filter((u) => {
-    if (u && typeof u === 'object') {
-      const candidate = u as { id?: unknown };
-      const id = candidate.id;
-      if (id !== undefined && id !== null) {
-        return !excludeSet.has(String(id));
+  const remain = pool
+    .filter((u): u is T => {
+      if (typeof u === 'undefined') {
+        return false;
+      }
+      if (u && typeof u === 'object') {
+        const candidate = u as { id?: unknown };
+        const id = candidate.id;
+        if (id !== undefined && id !== null) {
+          return !excludeSet.has(String(id));
+        }
+        return true;
+      }
+      if (typeof u === 'string') {
+        return !excludeSet.has(u);
       }
       return true;
-    }
-    if (typeof u === 'string') {
-      return !excludeSet.has(u);
-    }
-    return true;
-  });
+     })
+    .slice();
 
   for (let i = remain.length - 1; i > 0; i--) {
-    const j = (Math.random() * (i + 1)) | 0;
-    const temp = remain[i];
-    remain[i] = remain[j];
+    const j = Math.floor(Math.random() * (i + 1));
+    const temp = remain[i]!;
+    remain[i] = remain[j]!;
     remain[j] = temp;
   }
   return remain.slice(0, n);
@@ -581,7 +599,31 @@ function normalizeSpriteDescriptor(sprite: UnitArtDescriptor['sprite']): SpriteD
   if (typeof sprite === 'string') {
     return { src: sprite };
   }
-  return sprite;
+
+  const descriptor: SpriteDescriptor = {};
+  if (typeof sprite.src === 'string') {
+    descriptor.src = sprite.src;
+  }
+  if (typeof sprite.cacheKey === 'string') {
+    descriptor.cacheKey = sprite.cacheKey;
+  }
+  if (sprite.skinId !== undefined) {
+    descriptor.skinId = sprite.skinId ?? null;
+  }
+  if (sprite.shadow !== undefined) {
+    descriptor.shadow = sprite.shadow ?? null;
+  }
+  if (Number.isFinite(sprite.scale)) {
+    descriptor.scale = sprite.scale;
+  }
+  const aspect = typeof sprite.aspect === 'number' ? sprite.aspect : null;
+  if (aspect !== null && Number.isFinite(aspect)) {
+    descriptor.aspect = aspect;
+  }
+  if (Number.isFinite(sprite.anchor)) {
+    descriptor.anchor = sprite.anchor;
+  }
+  return descriptor;
 }
 
 function getTokenVisual(token: TokenWithArt | null | undefined, art: UnitArtDescriptor | null | undefined): TokenVisualEntry {
@@ -590,7 +632,7 @@ function getTokenVisual(token: TokenWithArt | null | undefined, art: UnitArtDesc
   }
   const skinKey = art?.skinKey ?? token.skinKey ?? null;
   const cacheKey = `${token.id ?? '__anon__'}::${skinKey ?? ''}`;
-  const descriptor = normalizeSpriteDescriptor(art?.sprite);
+  const descriptor = normalizeSpriteDescriptor(art?.sprite ?? null);
   const spriteSrc = descriptor?.src ?? null;
   const spriteKey = descriptor?.cacheKey || (spriteSrc ? `${spriteSrc}::${descriptor?.skinId ?? skinKey ?? ''}` : null);
 
@@ -655,11 +697,12 @@ function drawStylizedShape(
   anchor: number,
   art: UnitArtDescriptor | null | undefined,
 ): void {
-  const palette = art?.palette ?? {};
-  const primary = palette.primary ?? '#86c4ff';
-  const secondary = palette.secondary ?? '#1f3242';
-  const accent = palette.accent ?? '#d2f4ff';
-  const outline = palette.outline ?? 'rgba(0,0,0,0.55)';
+  const paletteSource = art?.palette ?? null;
+  const palette: Partial<UnitArtPalette> = paletteSource ? { ...paletteSource } : {};
+  const primary = typeof palette.primary === 'string' ? palette.primary : '#86c4ff';
+  const secondary = typeof palette.secondary === 'string' ? palette.secondary : '#1f3242';
+  const accent = typeof palette.accent === 'string' ? palette.accent : '#d2f4ff';
+  const outline = typeof palette.outline === 'string' ? palette.outline : 'rgba(0,0,0,0.55)';
   const top = -height * anchor;
   const bottom = height - height * anchor;
   const halfW = width / 2;
@@ -886,7 +929,7 @@ export function drawTokensOblique(
 
     const art = ensureTokenArt(t);
     const layout: LayoutConfig = art?.layout ?? {};
-    const spriteCfg = normalizeSpriteDescriptor(art?.sprite) ?? {};
+    const spriteCfg = normalizeSpriteDescriptor(art?.sprite ?? null) ?? {};
     const spriteHeightMult = layout.spriteHeight ?? 2.4;
     const spriteScale = Number.isFinite(spriteCfg.scale) ? spriteCfg.scale! : 1;
     const spriteHeight = r * spriteHeightMult * (art?.size ?? 1) * spriteScale;
