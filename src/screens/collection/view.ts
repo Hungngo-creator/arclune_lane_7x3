@@ -963,4 +963,4 @@ const overlayDetailPanel = document.createElement('aside');
   } satisfies CollectionViewHandle;
 }
 
-export { renderCollectionView };
+export type { CollectionViewHandle } from './types.ts';

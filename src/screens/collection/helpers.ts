@@ -13,6 +13,8 @@ import {
   normalizeCurrencyBalances,
 } from '@shared-types/currency';
 import type { CollectionEntry, CurrencyCatalog, CurrencyBalanceProvider, UnknownRecord } from './types.ts';
+import { HAS_INTL_NUMBER_FORMAT } from '../../utils/format.ts';
+import type { NumberFormatter, NumberFormatOptions } from '../../utils/format.ts';
 
 const isRosterEntryLite = (value: unknown): value is RosterEntryLite => (
   typeof value === 'object'
@@ -392,10 +394,84 @@ export function getCurrencyCatalog(listCurrencies: () => unknown): CurrencyCatal
   return [];
 }
 
-export function ensureNumberFormatter(
-  createNumberFormatter: (locale: string, options?: Intl.NumberFormatOptions) => Intl.NumberFormat,
+type NumberFormatterFactory = (
   locale: string,
-  options?: Intl.NumberFormatOptions,
+  options?: NumberFormatOptions,
+) => NumberFormatter;
+
+function toIntlNumberFormatter(
+  formatter: NumberFormatter,
+  locale: string,
+  options?: NumberFormatOptions,
 ): Intl.NumberFormat{
-  return createNumberFormatter(locale, options);
+  if (HAS_INTL_NUMBER_FORMAT && formatter instanceof Intl.NumberFormat){
+    return formatter;
+  }
+
+  const fallback = typeof formatter === 'object' && formatter && 'format' in formatter
+    ? formatter.format.bind(formatter)
+    : (value: unknown) => String(value ?? '');
+
+  const formatValue = (value: number | bigint): string => {
+    const normalized = typeof value === 'bigint' ? Number(value) : value;
+    try {
+      return fallback(normalized);
+    } catch (error) {
+      return String(normalized ?? '');
+    }
+  };
+
+  const resolvedOptions = {
+    locale: locale && locale.trim() ? locale : 'en',
+    numberingSystem: (options as { numberingSystem?: string } | undefined)?.numberingSystem ?? 'latn',
+    style: options?.style ?? 'decimal',
+    useGrouping: options?.useGrouping ?? true,
+    minimumIntegerDigits: options?.minimumIntegerDigits ?? 1,
+    minimumFractionDigits: options?.minimumFractionDigits ?? 0,
+    maximumFractionDigits: options?.maximumFractionDigits ?? 3,
+    minimumSignificantDigits: options?.minimumSignificantDigits,
+    maximumSignificantDigits: options?.maximumSignificantDigits,
+    notation: options?.notation ?? 'standard',
+    signDisplay: options?.signDisplay ?? 'auto',
+    compactDisplay: options?.compactDisplay ?? 'short',
+    currency: options?.currency,
+    currencyDisplay: options?.currencyDisplay ?? 'symbol',
+    currencySign: options?.currencySign ?? 'standard',
+    unit: options?.unit,
+    unitDisplay: options?.unitDisplay ?? 'short',
+  } as Intl.ResolvedNumberFormatOptions;
+
+  const adapter: Intl.NumberFormat = {
+    format(value: number | bigint){
+      return formatValue(value);
+    },
+    formatToParts(value: number | bigint){
+      return [{ type: 'literal', value: formatValue(value) }] as Intl.NumberFormatPart[];
+    },
+    resolvedOptions(){
+      return resolvedOptions;
+    },
+    formatRange(start: number | bigint, end: number | bigint){
+      return `${formatValue(start)} – ${formatValue(end)}`;
+    },
+    formatRangeToParts(start: number | bigint, end: number | bigint){
+      return [
+        { type: 'startRange', value: formatValue(start) },
+        { type: 'literal', value: ' – ' },
+        { type: 'endRange', value: formatValue(end) },
+      ] as Intl.NumberFormatPart[];
+    },
+    [Symbol.toStringTag]: 'Intl.NumberFormat',
+  };
+
+  return adapter;
+}
+
+export function ensureNumberFormatter(
+  createNumberFormatter: NumberFormatterFactory,
+  locale: string,
+  options?: NumberFormatOptions,
+): Intl.NumberFormat{
+  const formatter = createNumberFormatter(locale, options);
+  return toIntlNumberFormatter(formatter, locale, options);
 }
