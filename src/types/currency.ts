@@ -24,7 +24,7 @@ export interface LineupCurrencyConfig extends UnknownRecord {
 
 export type LineupCurrencies = ReadonlyArray<LineupCurrencyValue> | LineupCurrencyConfig;
 
-const isLineupCurrencyEntry = (value: unknown): value is LineupCurrencyEntry => (
+export const isCurrencyEntry = (value: unknown): value is LineupCurrencyEntry => (
   value != null
   && typeof value === 'object'
   && !Array.isArray(value)
@@ -34,7 +34,7 @@ const isLineupCurrencyValue = (value: unknown): value is LineupCurrencyValue => 
   value == null
   || typeof value === 'number'
   || typeof value === 'string'
-  || isLineupCurrencyEntry(value)
+  || isCurrencyEntry(value)
 );
 
 export const isLineupCurrencyConfig = (value: unknown): value is LineupCurrencyConfig => (
