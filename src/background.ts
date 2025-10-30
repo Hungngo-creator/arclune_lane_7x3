@@ -147,6 +147,49 @@ const normalizeSize = (
   };
 };
 
+const hasOwn = <Obj extends object, Key extends PropertyKey>(
+  obj: Obj,
+  key: Key,
+): key is Key & keyof Obj => Object.prototype.hasOwnProperty.call(obj, key);
+
+export const SCENERY = {
+  'stone-obelisk': {
+    asset: 'dist/assets/environment/stone-obelisk.svg',
+    size: { w: 120, h: 220 },
+    anchor: { x: 0.5, y: 1 },
+    baseLift: 0.52,
+    fallback: { shape: 'obelisk' },
+    palette: {
+      primary: '#d6e2fb',
+      secondary: '#7d8ba9',
+      accent: '#f7fbff',
+      shadow: '#2c3346',
+      outline: 'rgba(16,20,32,0.78)',
+    },
+  },
+  'sun-banner': {
+    asset: 'dist/assets/environment/sun-banner.svg',
+    size: { w: 140, h: 200 },
+    anchor: { x: 0.5, y: 1 },
+    baseLift: 0.56,
+    fallback: { shape: 'banner' },
+    palette: {
+      primary: '#ffe3a6',
+      secondary: '#d47b3a',
+      accent: '#fff4d1',
+      shadow: '#6d3218',
+      outline: 'rgba(46,23,11,0.78)',
+    },
+  },
+} as const satisfies Record<string, EnvironmentPropDefaults>;
+
+export type SceneryKey = keyof typeof SCENERY;
+
+export const ENVIRONMENT_PROP_TYPES: Record<SceneryKey, EnvironmentPropDefaults> = SCENERY;
+
+const isSceneryKey = (value: unknown): value is SceneryKey =>
+  typeof value === 'string' && hasOwn(SCENERY, value);
+
 const normalizePropInput = (value: unknown): BackgroundPropConfig | null => {
   if (!isRecord(value)) return null;
   const type = typeof value.type === 'string' ? value.type : null;
@@ -203,37 +246,6 @@ function getBackgroundConfigMap(): Map<string, BackgroundDefinitionConfig> {
   BACKGROUND_CONFIG_MAP = map;
   return map;
 }
-
-export const ENVIRONMENT_PROP_TYPES = {
-  'stone-obelisk': {
-    asset: 'dist/assets/environment/stone-obelisk.svg',
-    size: { w: 120, h: 220 },
-    anchor: { x: 0.5, y: 1 },
-    baseLift: 0.52,
-    fallback: { shape: 'obelisk' },
-    palette: {
-      primary: '#d6e2fb',
-      secondary: '#7d8ba9',
-      accent: '#f7fbff',
-      shadow: '#2c3346',
-      outline: 'rgba(16,20,32,0.78)',
-    },
-  },
-  'sun-banner': {
-    asset: 'dist/assets/environment/sun-banner.svg',
-    size: { w: 140, h: 200 },
-    anchor: { x: 0.5, y: 1 },
-    baseLift: 0.56,
-    fallback: { shape: 'banner' },
-    palette: {
-      primary: '#ffe3a6',
-      secondary: '#d47b3a',
-      accent: '#fff4d1',
-      shadow: '#6d3218',
-      outline: 'rgba(46,23,11,0.78)',
-    },
-  },
-} satisfies Record<string, EnvironmentPropDefaults>;
 
 function stableStringify(value: unknown, seen: WeakSet<object> = new WeakSet()): string {
   if (value === null) return 'null';
@@ -331,7 +343,8 @@ function resolveBackground(backgroundKey: string | null | undefined): { key: str
 function normalizePropConfig(propCfg: BackgroundPropConfig | null | undefined): NormalizedPropConfig | null {
   if (!propCfg) return null;
   const typeId = typeof propCfg.type === 'string' ? propCfg.type : null;
-  const typeDef = typeId ? ENVIRONMENT_PROP_TYPES[typeId] ?? null : null;
+  const typeKey = typeId && isSceneryKey(typeId) ? typeId : null;
+  const typeDef = typeKey ? ENVIRONMENT_PROP_TYPES[typeKey] : null;
   const anchorDefaults = typeDef?.anchor ?? null;
   const sizeDefaults = typeDef?.size ?? null;
   const anchor = normalizeVector(propCfg.anchor, anchorDefaults?.x ?? 0.5, anchorDefaults?.y ?? 1);
@@ -400,8 +413,8 @@ function buildBoardState(
   normalizedProps: readonly NormalizedPropEntry[],
   g: GridSpec | null | undefined,
   cam: CameraOptions | null | undefined,
-): BoardState | null {
-  if (!g) return null;
+): BoardState | undefined {
+  if (!g) return undefined;
   const rowGap = ((cam?.rowGapRatio) ?? 0.62) * g.tile;
   const drawables: DrawableEntry[] = [];
   for (const entry of normalizedProps) {
