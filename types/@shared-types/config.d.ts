@@ -27,6 +27,7 @@ export type {
   UltMetadata,
   UltSkillConfig,
   UnitKitConfig,
+  UnitKitMap,
   RosterUnitDefinition,
   CameraPreset,
   ChibiProportions,
