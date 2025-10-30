@@ -7,7 +7,11 @@ import type {
   LineupCurrencyValue,
 } from '@shared-types/currency';
 import type { LineupDefinition as LineupDefinitionInput } from '@shared-types/lineup';
-import { isLineupCurrencies, normalizeCurrencyBalances } from '@shared-types/currency';
+import {
+  isCurrencyEntry,
+  isLineupCurrencies,
+  normalizeCurrencyBalances,
+} from '@shared-types/currency';
 
 export type { LineupCurrencies } from '@shared-types/currency';
 
@@ -47,10 +51,32 @@ const mergeParams = <T extends Mergeable>(
 };
 
 const cloneCurrencyValue = (value: LineupCurrencyValue): LineupCurrencyValue => {
-  if (value && typeof value === 'object'){
-    return { ...(value as UnknownRecord) };
+  if (isCurrencyEntry(value)){
+    return { ...value };
   }
   return value;
+};
+
+const isCurrencyValueRecord = (
+  value: unknown,
+): value is Readonly<Record<string, LineupCurrencyValue>> => (
+  value != null
+  && typeof value === 'object'
+  && !Array.isArray(value)
+);
+
+const cloneCurrencyRecord = (
+  source: Readonly<Record<string, LineupCurrencyValue>> | null | undefined,
+): Record<string, LineupCurrencyValue> => {
+  if (!source){
+    return {};
+  }
+  return Object.fromEntries(
+    Object.entries(source).map(([id, entry]) => [
+      id,
+      cloneCurrencyValue(entry),
+    ]),
+  );
 };
 
 const cloneLineupCurrencies = (source: LineupCurrencies): LineupCurrencies => {
@@ -61,13 +87,8 @@ const cloneLineupCurrencies = (source: LineupCurrencies): LineupCurrencies => {
   const clone: LineupCurrencyConfig = {};
   Object.entries(mapSource).forEach(([key, value]) => {
     if (key === 'balances'){
-      if (value && typeof value === 'object' && !Array.isArray(value)){
-        clone.balances = Object.fromEntries(
-          Object.entries(value as Record<string, LineupCurrencyValue>).map(([id, entry]) => [
-            id,
-            cloneCurrencyValue(entry),
-          ]),
-        );
+      if (isCurrencyValueRecord(value)){
+        clone.balances = cloneCurrencyRecord(value);
       } else if (value == null){
         clone.balances = null;
       }
@@ -77,8 +98,8 @@ const cloneLineupCurrencies = (source: LineupCurrencies): LineupCurrencies => {
       clone[key] = value.map(item => cloneCurrencyValue(item));
       return;
     }
-    if (value && typeof value === 'object'){
-      clone[key] = { ...(value as UnknownRecord) };
+    if (isCurrencyEntry(value)){
+      clone[key] = { ...value };
       return;
     }
     clone[key] = value as LineupCurrencyValue;
