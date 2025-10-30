@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="320" height="400" viewBox="0 0 320 400" xmlns="http://www.w3.org/2000/svg">
+  <title>Lôi Thiên Ảnh — hybrid SVG rig (WEBP clipped)</title>
+
+  <defs>
+    <!-- Ảnh nguồn (liên kết file J.webp đặt cạnh SVG) -->
+    <image id="LA_SRC" href="J.webp" x="0" y="0" width="320" height="400"
+           preserveAspectRatio="xMidYMax meet"/>
+
+    <!-- ClipPaths sơ bộ (chỉnh tọa độ cho khớp người thật trong ảnh) -->
+    <clipPath id="clip_head"><ellipse cx="160" cy="90" rx="34" ry="40"/></clipPath>
+    <clipPath id="clip_torso">
+      <path d="M120,116 C138,96 182,96 200,118 206,148 204,178 198,196
+               176,206 144,206 122,196 118,174 118,142 120,116 Z"/>
+    </clipPath>
+    <clipPath id="clip_arm_front">
+      <path d="M90,128 C98,144 114,170 120,188 110,200 94,198 84,184
+               82,166 84,146 90,128 Z"/>
+    </clipPath>
+    <clipPath id="clip_arm_back">
+      <path d="M206,128 C214,146 222,170 226,186 218,198 202,198 192,186
+               190,166 196,146 206,128 Z"/>
+    </clipPath>
+    <clipPath id="clip_leg_front">
+      <path d="M132,200 C148,202 156,230 156,264 156,296 150,326 144,344
+               130,344 122,332 122,312 124,268 126,230 132,200 Z"/>
+    </clipPath>
+    <clipPath id="clip_leg_back">
+      <path d="M182,204 C196,210 202,236 202,268 202,298 196,328 190,346
+               176,346 168,334 168,316 170,270 174,234 182,204 Z"/>
+    </clipPath>
+    <clipPath id="clip_cape_front">
+      <path d="M96,162 C124,152 156,154 184,170 174,212 160,248 132,280
+               112,266 104,238 96,162 Z"/>
+    </clipPath>
+    <clipPath id="clip_cape_back">
+      <path d="M186,168 C208,172 226,192 232,220 224,270 196,300 168,320
+               160,296 168,260 180,220 184,198 186,182 186,168 Z"/>
+    </clipPath>
+
+    <!-- Aura -->
+    <radialGradient id="grad_glow" cx="50%" cy="38%" r="60%">
+      <stop offset="0%" stop-color="#aee6ff" stop-opacity="0.85"/>
+      <stop offset="65%" stop-color="#8bd1ff" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#8bd1ff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <style>
+    .fx-glow{opacity:.7;animation:glow 2.5s ease-in-out infinite}
+    .fx-heat{opacity:.25;mix-blend-mode:soft-light;filter:blur(8px)}
+    @keyframes glow{0%{opacity:.55}50%{opacity:.85}100%{opacity:.55}}
+    g[data-pivot]{transform-box:fill-box}
+  </style>
+
+  <!-- nền tối nhẹ -->
+  <rect width="320" height="400" fill="#0b1520"/>
+
+  <!-- Thứ tự lớp và pivot để rig -->
+  <g id="LA_CAPE_BACK"  data-pivot="184,200"><g clip-path="url(#clip_cape_back)"><use href="#LA_SRC"/></g></g>
+  <g id="LA_ARM_BACK"   data-pivot="196,152"><g clip-path="url(#clip_arm_back)"><use href="#LA_SRC"/></g></g>
+  <g id="LA_LEG_BACK"   data-pivot="196,336"><g clip-path="url(#clip_leg_back)"><use href="#LA_SRC"/></g></g>
+
+  <g id="LA_TORSO"      data-pivot="140,160"><g clip-path="url(#clip_torso)"><use href="#LA_SRC"/></g></g>
+  <g id="LA_HEAD"       data-pivot="140,124"><g clip-path="url(#clip_head)"><use href="#LA_SRC"/></g></g>
+
+  <g id="LA_CAPE_FRONT" data-pivot="140,180"><g clip-path="url(#clip_cape_front)"><use href="#LA_SRC"/></g></g>
+  <g id="LA_ARM_FRONT"  data-pivot="108,148"><g clip-path="url(#clip_arm_front)"><use href="#LA_SRC"/></g></g>
+  <g id="LA_LEG_FRONT"  data-pivot="144,324"><g clip-path="url(#clip_leg_front)"><use href="#LA_SRC"/></g></g>
+
+  <g id="LA_FX_GLOW" class="fx-glow">
+    <ellipse cx="160" cy="170" rx="110" ry="130" fill="url(#grad_glow)"/>
+  </g>
+  <g id="LA_FX_HEAT" class="fx-heat">
+    <path d="M40,360 C140,312 220,348 300,320" fill="none" stroke="#ff9a66" stroke-width="18" opacity=".18"/>
+  </g>
+</svg>
