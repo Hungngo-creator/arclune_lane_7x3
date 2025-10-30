@@ -32,7 +32,7 @@ import {
   vfxAddBloodPulse,
   vfxAddGroundBurst,
   vfxAddShieldWrap,
-  asSessionWithVfx,
+  asSessionWithVfx as baseAsSessionWithVfx,
 } from '../../vfx';
 import { drawBattlefieldScene } from '../../scene';
 import {
@@ -76,6 +76,8 @@ import type {
 import type { HudHandles, SummonBarHandles } from '@shared-types/ui';
 import type { CameraPreset } from '@shared-types/config';
 import type { NormalizedSessionConfig } from './session-state';
+import type { SessionWithVfx } from '../../vfx';
+import type { GameEventDetailMap, GameEventHandler, GameEventType } from '../../events';
 
 type RootLike = Element | Document | null | undefined;
 type StartConfigOverrides = Partial<CreateSessionOptions> & Record<string, unknown>;
@@ -86,7 +88,7 @@ type PveSessionStartConfig = StartConfigOverrides & {
 
 type FrameHandle = number | ReturnType<typeof setTimeout>;
 type GradientValue = CanvasGradient | string | undefined;
-type CanvasClickHandler = (event: Event) => void;
+type CanvasClickHandler = (event: MouseEvent) => void;
 type ClockState = {
   startMs: number;
   lastTimerRemain: number;
@@ -102,6 +104,120 @@ type ExtendedQueuedSummon = (QueuedSummonRequest & {
 }) | null;
 type DeckEntry = PveDeckEntry;
 type GridSpec = ReturnType<typeof makeGrid>;
+
+type InitializedSessionState = SessionState & { _inited: true };
+
+interface SummonInheritSpec extends Record<string, unknown> {
+  HP?: number | string | null;
+  hp?: number | string | null;
+  HPMax?: number | string | null;
+  hpMax?: number | string | null;
+  ATK?: number | string | null;
+  atk?: number | string | null;
+  WIL?: number | string | null;
+  wil?: number | string | null;
+  RES?: number | string | null;
+  res?: number | string | null;
+  ARM?: number | string | null;
+  arm?: number | string | null;
+}
+
+interface SummonCreepSpec extends Record<string, unknown> {
+  id?: string | null;
+  name?: string | null;
+  label?: string | null;
+  color?: string | null;
+  isMinion?: boolean | null;
+  ttl?: number | string | null;
+  ttlTurns?: number | string | null;
+  skinKey?: string | null;
+}
+
+interface SummonSpec extends Record<string, unknown> {
+  pattern?: string | null;
+  placement?: string | null;
+  patternKey?: string | null;
+  shape?: string | null;
+  area?: string | null;
+  slots?: ReadonlyArray<number> | null;
+  count?: number | string | null;
+  summonCount?: number | string | null;
+  ttl?: number | string | null;
+  ttlTurns?: number | string | null;
+  inherit?: SummonInheritSpec | null;
+  limit?: number | string | null;
+  replace?: string | null;
+  creep?: SummonCreepSpec | null;
+}
+
+interface SkillRuntime extends Record<string, unknown> {
+  hits?: number | string | null;
+  hitCount?: number | string | null;
+  count?: number | string | null;
+  targets?: number | string | null;
+  targetCount?: number | string | null;
+  duration?: number | string | null;
+  durationTurns?: number | string | null;
+  turns?: number | string | null;
+  busyMs?: number | string | null;
+  durationMs?: number | string | null;
+}
+
+interface UltDamageSpec extends Record<string, unknown> {
+  type?: string | null;
+  scaleWIL?: number | string | null;
+  scaleWil?: number | string | null;
+  flat?: number | string | null;
+  flatAdd?: number | string | null;
+  percentTargetMaxHP?: number | string | null;
+  basePercentMaxHPTarget?: number | string | null;
+  bossPercent?: number | string | null;
+  defPen?: number | string | null;
+  pen?: number | string | null;
+}
+
+interface UltDebuffSpec extends Record<string, unknown> {
+  id?: string | null;
+  amount?: number | string | null;
+  amountPercent?: number | string | null;
+  maxStacks?: number | string | null;
+  turns?: number | string | null;
+}
+
+interface UltReviveSpec extends Record<string, unknown> {
+  hpPercent?: number | string | null;
+  hpPct?: number | string | null;
+  rage?: number | string | null;
+  lockSkillsTurns?: number | string | null;
+}
+
+interface UltSpec extends Record<string, unknown> {
+  type?: string | null;
+  power?: number | string | null;
+  hpTradePercent?: number | string | null;
+  hpTrade?: { percentMaxHP?: number | string | null } | null;
+  hits?: number | string | null;
+  scale?: number | string | null;
+  countsAsBasic?: boolean | null;
+  tagAsBasic?: boolean | null;
+  damage?: UltDamageSpec | null;
+  appliesDebuff?: UltDebuffSpec | null;
+  duration?: number | string | null;
+  turns?: number | string | null;
+  reduceDmg?: number | string | null;
+  bonusVsLeader?: number | string | null;
+  penRES?: number | string | null;
+  selfHPTrade?: number | string | null;
+  targets?: number | string | null;
+  revived?: UltReviveSpec | null;
+  allies?: number | string | null;
+  healLeader?: boolean | null;
+  attackSpeed?: number | string | null;
+  runtime?: SkillRuntime | null;
+  metadata?: { summon?: SummonSpec | null } | null;
+  meta?: { summon?: SummonSpec | null } | null;
+  summon?: SummonSpec | null;
+}
 
 const isPlainRecord = (value: unknown): value is Record<string, unknown> => (
   !!value && typeof value === 'object'
@@ -137,6 +253,232 @@ const toRootLike = (value: unknown): RootLike => {
   return null;
 };
 
+const isInitializedGame = (
+  game: SessionState | null | undefined = Game,
+): game is InitializedSessionState => Boolean(game && game._inited);
+
+const getInitializedGame = (): InitializedSessionState | null => (
+  isInitializedGame() ? (Game as InitializedSessionState) : null
+);
+
+const coerceSkillRuntime = (value: unknown): SkillRuntime | null => {
+  if (!isPlainRecord(value)) return null;
+  const record = value as SkillRuntime;
+  const normalized: SkillRuntime = { ...record };
+  const numericKeys: ReadonlyArray<keyof SkillRuntime> = [
+    'hits',
+    'hitCount',
+    'count',
+    'targets',
+    'targetCount',
+    'duration',
+    'durationTurns',
+    'turns',
+    'busyMs',
+    'durationMs',
+  ];
+  for (const key of numericKeys){
+    const parsed = parseFiniteNumber(record[key]);
+    if (parsed != null) normalized[key] = parsed;
+  }
+  return normalized;
+};
+
+const coerceSummonCreep = (value: unknown): SummonCreepSpec | null => {
+  if (!isPlainRecord(value)) return null;
+  const record = value as SummonCreepSpec;
+  const creep: SummonCreepSpec = { ...record };
+  const ttlTurns = parseFiniteNumber(record.ttlTurns ?? record.ttl);
+  if (ttlTurns != null) creep.ttlTurns = ttlTurns;
+  return creep;
+};
+
+const coerceSummonSpec = (value: unknown): SummonSpec | null => {
+  if (!value || typeof value !== 'object') return null;
+  const spec = { ...(value as SummonSpec) };
+  if (Array.isArray(spec.slots)){
+    spec.slots = spec.slots
+      .map((slot) => parseFiniteNumber(slot))
+      .filter((slot): slot is number => slot != null);
+  }
+  const count = parseFiniteNumber(spec.count);
+  const summonCount = parseFiniteNumber(spec.summonCount);
+  const resolvedCount = count ?? summonCount;
+  if (resolvedCount != null){
+    spec.count = resolvedCount;
+    spec.summonCount = resolvedCount;
+  }
+  const ttl = parseFiniteNumber(spec.ttl);
+  const ttlTurns = parseFiniteNumber(spec.ttlTurns ?? ttl);
+  if (ttlTurns != null){
+    spec.ttlTurns = ttlTurns;
+    if (ttl == null) spec.ttl = ttlTurns;
+  } else if (ttl != null){
+    spec.ttl = ttl;
+  }
+  const limit = parseFiniteNumber(spec.limit);
+  if (limit != null) spec.limit = limit;
+  spec.inherit = isPlainRecord(spec.inherit) ? (spec.inherit as SummonInheritSpec) : null;
+  spec.creep = coerceSummonCreep(spec.creep);
+  return spec;
+};
+
+const isDamageSpec = (value: unknown): value is UltDamageSpec => isPlainRecord(value);
+
+const coerceDamageSpec = (value: unknown): UltDamageSpec | null => {
+  if (!isDamageSpec(value)) return null;
+  const record = value as UltDamageSpec;
+  const damage: UltDamageSpec = { ...record };
+  const numericKeys: ReadonlyArray<keyof UltDamageSpec> = [
+    'scaleWIL',
+    'scaleWil',
+    'flat',
+    'flatAdd',
+    'percentTargetMaxHP',
+    'basePercentMaxHPTarget',
+    'bossPercent',
+    'defPen',
+    'pen',
+  ];
+  for (const key of numericKeys){
+    const parsed = parseFiniteNumber(record[key]);
+    if (parsed != null) damage[key] = parsed;
+  }
+  if (typeof record.type === 'string') damage.type = record.type;
+  return damage;
+};
+
+const coerceUlt = (value: unknown): UltSpec | null => {
+  if (!value || typeof value !== 'object') return null;
+  const record = value as UltSpec;
+  const ult: UltSpec = { ...record };
+  const numericKeys: ReadonlyArray<keyof UltSpec> = [
+    'power',
+    'hpTradePercent',
+    'hits',
+    'scale',
+    'duration',
+    'turns',
+    'reduceDmg',
+    'bonusVsLeader',
+    'penRES',
+    'selfHPTrade',
+    'attackSpeed',
+  ];
+  for (const key of numericKeys){
+    const parsed = parseFiniteNumber(record[key]);
+    if (parsed != null) ult[key] = parsed;
+  }
+  const targetsParsed = parseFiniteNumber(record.targets);
+  if (targetsParsed != null) ult.targets = targetsParsed;
+  const alliesParsed = parseFiniteNumber(record.allies);
+  if (alliesParsed != null) ult.allies = alliesParsed;
+  ult.runtime = coerceSkillRuntime(record.runtime);
+  const resolvedSummon =
+    coerceSummonSpec(record.summon)
+    ?? coerceSummonSpec(record.metadata?.summon)
+    ?? coerceSummonSpec(record.meta?.summon);
+  if (resolvedSummon) ult.summon = resolvedSummon;
+  if (ult.metadata?.summon){
+    ult.metadata = { ...ult.metadata, summon: coerceSummonSpec(ult.metadata.summon) };
+  }
+  if (ult.meta?.summon){
+    ult.meta = { ...ult.meta, summon: coerceSummonSpec(ult.meta.summon) };
+  }
+  ult.damage = coerceDamageSpec(record.damage);
+  return ult;
+};
+
+const readCountCandidate = (value: unknown): number | null => {
+  const numeric = parseFiniteNumber(value);
+  if (numeric != null) return numeric;
+  if (typeof value === 'string'){
+    const match = value.match(/(\d+)/);
+    if (match && match[1]){
+      const parsed = Number(match[1]);
+      if (Number.isFinite(parsed)) return parsed;
+    }
+  }
+  return null;
+};
+
+const resolveCount = (
+  candidates: ReadonlyArray<unknown>,
+  fallback: number,
+  { min, max }: { min?: number; max?: number } = {},
+): number => {
+  for (const candidate of candidates){
+    const value = readCountCandidate(candidate);
+    if (value != null){
+      let resolved = Math.round(value);
+      if (typeof min === 'number') resolved = Math.max(min, resolved);
+      if (typeof max === 'number') resolved = Math.min(max, resolved);
+      return resolved;
+    }
+  }
+  return fallback;
+};
+
+const getUltHitCount = (ult: UltSpec | null | undefined): number => {
+  const runtime = ult?.runtime;
+  const resolved = resolveCount([
+    ult?.hits,
+    runtime?.hits,
+    runtime?.hitCount,
+    runtime?.count,
+  ], 1, { min: 1 });
+  return Math.max(1, resolved);
+};
+
+const getUltTargetCount = (
+  ult: UltSpec | null | undefined,
+  fallback: number,
+): number => {
+  const runtime = ult?.runtime;
+  return resolveCount([
+    ult?.targets,
+    runtime?.targets,
+    runtime?.targetCount,
+    runtime?.count,
+  ], fallback, { min: 0 });
+};
+
+const getUltAlliesCount = (
+  ult: UltSpec | null | undefined,
+  fallback: number,
+): number => resolveCount([
+  ult?.allies,
+  ult?.runtime?.targets,
+  ult?.runtime?.count,
+], fallback, { min: 0 });
+
+const getUltDurationTurns = (
+  ult: UltSpec | null | undefined,
+  fallback: number,
+): number => {
+  const runtime = ult?.runtime;
+  const resolved = resolveCount([
+    ult?.duration,
+    ult?.turns,
+    runtime?.duration,
+    runtime?.turns,
+    runtime?.durationTurns,
+  ], fallback, { min: 1 });
+  return Math.max(1, resolved);
+};
+
+const ensureSessionWithVfx = (
+  game: SessionState | SessionWithVfx | null | undefined,
+  options?: { requireGrid?: boolean },
+): SessionWithVfx | null => {
+  const session = baseAsSessionWithVfx(game, options);
+  if (!session) return null;
+  if (!Array.isArray(session.vfx)){
+    session.vfx = [];
+  }
+  return session;
+};
+
 const isDeckEntry = (value: unknown): value is DeckEntry => {
   if (!value || typeof value !== 'object') return false;
   const candidate = value as { id?: unknown };
@@ -169,21 +511,23 @@ function sanitizeDeckEntries(value: unknown): DeckEntry[] {
 }
 
 function ensureDeck(): DeckEntry[] {
-  if (!Game) return [];
-  const deck = sanitizeDeckEntries(Game.deck3);
-  if (deck !== Game.deck3) {
-    Game.deck3 = deck;
+  const game = getInitializedGame();
+  if (!game) return [];
+  const deck = sanitizeDeckEntries(game.deck3);
+  if (deck !== game.deck3) {
+    game.deck3 = deck;
   }
   return deck;
 }
 
 function ensureRoster(): ReadonlyArray<DeckEntry> {
-  if (!Game) return [];
-  const roster = sanitizeDeckEntries(Game.unitsAll);
-  if (roster !== Game.unitsAll) {
-    Game.unitsAll = roster;
+  const game = getInitializedGame();
+  if (!game) return [];
+  const roster = sanitizeDeckEntries(game.unitsAll);
+  if (roster !== game.unitsAll) {
+    game.unitsAll = roster;
   }
-  return Game.unitsAll;
+  return game.unitsAll;
 }
 
 const getCardCost = (card: DeckEntry | null | undefined): number => {
@@ -276,7 +620,8 @@ let running = false;
 const hpBarGradientCache = new Map<string, GradientValue>();
 
 const renderSummonBar = (): void => {
-  const bar = Game?.ui?.bar ?? null;
+  const game = getInitializedGame();
+  const bar = game?.ui?.bar ?? null;
   if (bar?.render) bar.render();
 };
 
@@ -287,8 +632,9 @@ function cleanupSummonBar(): void {
     } catch {}
   }
   summonBarHandle = null;
-  if (Game?.ui){
-    Game.ui.bar = null;
+  const game = getInitializedGame();
+  if (game?.ui){
+    game.ui.bar = null;
   }
 }
 
@@ -303,10 +649,9 @@ function resetSessionState(options: StartConfigOverrides | null | undefined = {}
 }
 
 if (CFG?.DEBUG?.LOG_EVENTS) {
-  const logEvent = (type: string) => (ev: Event): void => {
-    const detailRaw = (ev as CustomEvent<Record<string, unknown>> | null)?.detail ?? {};
-    const detail = detailRaw as Record<string, unknown>;
-    const unitRaw = detail['unit'] as { id?: string; name?: string } | null | undefined;
+  const logEvent = <T extends GameEventType>(type: T): GameEventHandler<T> => (event) => {
+    const detail = (event?.detail ?? {}) as GameEventDetailMap[T] & Record<string, unknown>;
+    const unitRaw = (detail['unit'] ?? null) as { id?: string; name?: string } | null | undefined;
     const readString = (value: unknown): string | null => (typeof value === 'string' ? value : null);
     const readNumber = (value: unknown): number | null => {
       if (typeof value === 'number' && Number.isFinite(value)) return value;
@@ -317,21 +662,21 @@ if (CFG?.DEBUG?.LOG_EVENTS) {
       return null;
     };
     const info = {
-      side: readString(detail['side']),
-      slot: readNumber(detail['slot']),
-      cycle: readNumber(detail['cycle']),
-      orderIndex: readNumber(detail['orderIndex']),
-      orderLength: readNumber(detail['orderLength']),
-      phase: readString(detail['phase']),
+      side: readString(detail['side'] as unknown),
+      slot: readNumber(detail['slot'] as unknown),
+      cycle: readNumber(detail['cycle'] as unknown),
+      orderIndex: readNumber(detail['orderIndex'] as unknown),
+      orderLength: readNumber(detail['orderLength'] as unknown),
+      phase: readString(detail['phase'] as unknown),
       unit: readString(unitRaw?.id) ?? readString(unitRaw?.name),
-      action: readString(detail['action']),
+      action: readString(detail['action'] as unknown),
       skipped: Boolean(detail['skipped']),
-      reason: readString(detail['reason']),
+      reason: readString(detail['reason'] as unknown),
       processedChain: detail['processedChain'] ?? null,
     };
     console.debug(`[events] ${type}`, info);
   };
-  const types = [TURN_START, TURN_END, ACTION_START, ACTION_END] as const;
+  const types: ReadonlyArray<GameEventType> = [TURN_START, TURN_END, ACTION_START, ACTION_END];
   for (const type of types){
     try {
       addGameEventListener(type, logEvent(type));
@@ -567,7 +912,7 @@ function cleanupDead(now: number): void {
 // LẤY TỪ INSTANCE đang đứng trên sân (đúng spec: thừa hưởng % chỉ số hiện tại của chủ)
 function creepStatsFromInherit(
   masterUnit: UnitToken | null | undefined,
-  inherit: Record<string, unknown> | null | undefined,
+  inherit: SummonInheritSpec | null | undefined,
 ): Partial<Pick<UnitToken, 'hpMax' | 'hp' | 'atk' | 'wil' | 'res' | 'arm'>> {
   if (!inherit || typeof inherit !== 'object') return {};
   const hpRatio = parseFiniteNumber(inherit.HP ?? inherit.hp ?? inherit.HPMax ?? inherit.hpMax) ?? 0;
@@ -611,39 +956,41 @@ function removeOldestMinions(masterIid: number, count: number): void {
   }
 }
 function extendBusy(duration: number): void {
-  if (!Game || !Game.turn) return;
+  const game = getInitializedGame();
+  if (!game || !game.turn) return;
   const now = getNow();
-  const prev = Number.isFinite(Game.turn.busyUntil) ? Game.turn.busyUntil : now;
+  const prev = Number.isFinite(game.turn.busyUntil) ? game.turn.busyUntil : now;
   const dur = Math.max(0, duration|0);
-  Game.turn.busyUntil = Math.max(prev, now + dur);
+  game.turn.busyUntil = Math.max(prev, now + dur);
 }
 
 // Thực thi Ult: Summoner -> Immediate Summon theo meta; class khác: trừ nộ
 function performUlt(unit: UnitToken): void {
-  if (!Game){
+  const game = getInitializedGame();
+  if (!game){
     setFury(unit, 0);
     return;
   }
-  const metaGetter = Game.meta?.get;
-  const meta = typeof metaGetter === 'function' ? metaGetter.call(Game.meta, unit.id) : null;
+  const metaGetter = game.meta?.get;
+  const meta = typeof metaGetter === 'function' ? metaGetter.call(game.meta, unit.id) : null;
   if (!meta) { setFury(unit, 0); return; }
 
   const slot = slotIndex(unit.side, unit.cx, unit.cy);
 
-  const summonSpec = meta.class === 'Summoner' ? getSummonSpec(meta) : null;
+  const summonSpecRaw = meta.class === 'Summoner' ? getSummonSpec(meta) : null;
+  const summonSpec = meta.class === 'Summoner' ? coerceSummonSpec(summonSpecRaw) : null;
   if (meta.class === 'Summoner' && summonSpec){
     const aliveNow = tokensAlive();
-    const queued = Game.queued || { ally: new Map(), enemy: new Map() };
+    const queued = game.queued || { ally: new Map(), enemy: new Map() };
     const patternSlots = resolveSummonSlots(summonSpec, slot)
-      .filter(Boolean)
-      .filter(s => {
+      .filter((s): s is number => typeof s === 'number' && Number.isFinite(s))
+      .filter((s) => {
         const { cx, cy } = slotToCell(unit.side, s);
         return !cellReserved(aliveNow, queued, cx, cy);
       })
       .sort((a, b) => a - b);
 
-    const countRaw = parseFiniteNumber(summonSpec.count);
-    const desired = countRaw ?? (patternSlots.length || 1);
+    const desired = parseFiniteNumber(summonSpec.count) ?? (patternSlots.length || 1);
     const need = Math.min(patternSlots.length, Math.max(0, desired));
 
     if (need > 0){
@@ -654,26 +1001,30 @@ function performUlt(unit: UnitToken): void {
       if (over > 0 && replacePolicy === 'oldest') removeOldestMinions(unit.iid, over);
 
       const inheritStats = creepStatsFromInherit(unit, summonSpec.inherit);
-      const ttl = Number.isFinite(summonSpec.ttlTurns)
-        ? summonSpec.ttlTurns
-        : (Number.isFinite(summonSpec.ttl) ? summonSpec.ttl : null);
+      const ttlBase = parseFiniteNumber(summonSpec.ttlTurns ?? summonSpec.ttl);
 
       for (let i = 0; i < need; i++){
         const s = patternSlots[i];
-        const base = summonSpec.creep || {};
-        const spawnTtl = Number.isFinite(base.ttlTurns) ? base.ttlTurns : ttl;
-        enqueueImmediate(Game, {
+        const base = (summonSpec.creep ?? {}) as SummonCreepSpec;
+        const spawnTtl = parseFiniteNumber(base.ttlTurns ?? base.ttl) ?? ttlBase;
+        const creepId = typeof base.id === 'string' && base.id.trim() ? base.id : `${unit.id}_minion`;
+        const creepName = typeof base.name === 'string' && base.name.trim()
+          ? base.name
+          : (typeof base.label === 'string' && base.label.trim() ? base.label : 'Creep');
+        const creepColor = typeof base.color === 'string' && base.color.trim() ? base.color : '#ffd27d';
+        const ttlTurns = Math.max(1, Math.round(parseFiniteNumber(spawnTtl) ?? 3));
+        enqueueImmediate(game, {
           by: unit.id,
           side: unit.side,
           slot: s,
           unit: {
-            id: base.id || `${unit.id}_minion`,
-            name: base.name || base.label || 'Creep',
-            color: base.color || '#ffd27d',
+            id: creepId,
+            name: creepName,
+            color: creepColor,
             isMinion: base.isMinion !== false,
             ownerIid: unit.iid,
             bornSerial: _BORN++,
-            ttlTurns: Number.isFinite(spawnTtl) ? spawnTtl : 3,
+            ttlTurns,
             ...inheritStats
           }
         });
@@ -683,7 +1034,7 @@ function performUlt(unit: UnitToken): void {
     return;
   }
 
-  const u = meta.kit?.ult;
+  const u = coerceUlt(meta.kit?.ult);
   if (!u){ spendFury(unit, resolveUltCost(unit)); return; }
 
   const foeSide = unit.side === 'ally' ? 'enemy' : 'ally';
@@ -694,12 +1045,12 @@ function performUlt(unit: UnitToken): void {
       const aliveNow = tokensAlive();
       const foes = aliveNow.filter(t => t.side === foeSide);
       if (!foes.length) break;
-      const scale = typeof u.power === 'number' ? u.power : 1.2;
+      const scale = parseFiniteNumber(u.power) ?? 1.2;
       let totalDrain = 0;
       for (const tgt of foes){
         if (!tgt.alive) continue;
         const base = Math.max(1, Math.round((unit.wil || 0) * scale));
-        const { dealt } = dealAbilityDamage(Game, unit, tgt, {
+        const { dealt } = dealAbilityDamage(game, unit, tgt, {
           base,
           dtype: 'arcane',
           attackType: 'skill'
@@ -714,9 +1065,9 @@ function performUlt(unit: UnitToken): void {
       break;
     }
 
-case 'hpTradeBurst': {
-      const hpTradePctRaw = Number.isFinite(u.hpTradePercent) ? u.hpTradePercent : (u.hpTrade?.percentMaxHP ?? 0);
-      const hpTradePct = Math.max(0, Math.min(0.95, hpTradePctRaw || 0));
+    case 'hpTradeBurst': {
+      const hpTradePctRaw = parseFiniteNumber(u.hpTradePercent ?? u.hpTrade?.percentMaxHP) ?? 0;
+      const hpTradePct = Math.max(0, Math.min(0.95, hpTradePctRaw));
       const hpMax = Number.isFinite(unit.hpMax) ? unit.hpMax : 0;
       const currentHp = Number.isFinite(unit.hp) ? unit.hp : 0;
       const desiredTrade = Math.round(hpMax * hpTradePct);
@@ -734,16 +1085,16 @@ case 'hpTradeBurst': {
       }
 
       const aliveNow = tokensAlive();
-      const foes = aliveNow.filter(t => t.side === foeSide && t.alive);
+      const foes = aliveNow.filter((t) => t.side === foeSide && t.alive);
 
-      const hits = Math.max(1, (u.hits | 0) || 1);
-      const selected = [];
+      const hits = getUltHitCount(u);
+      const selected: UnitToken[] = [];
       if (foes.length){
-        const primary = pickTarget(Game, unit);
+        const primary = pickTarget(game, unit);
         if (primary){
           selected.push(primary);
         }
-        const pool = foes.filter(t => !selected.includes(t));
+        const pool = foes.filter((t) => !selected.includes(t));
         pool.sort((a, b) => {
           const da = Math.abs(a.cx - unit.cx) + Math.abs(a.cy - unit.cy);
           const db = Math.abs(b.cx - unit.cx) + Math.abs(b.cy - unit.cy);
@@ -761,10 +1112,11 @@ case 'hpTradeBurst': {
 
       const applyBusyFromVfx = (startedAt: number, duration: number | null | undefined): void => {
         if (!Number.isFinite(startedAt) || !Number.isFinite(duration)) return;
-        busyMs = Math.max(busyMs, duration);
-        if (Game?.turn){
-          const prev = Number.isFinite(Game.turn.busyUntil) ? Game.turn.busyUntil : startedAt;
-          Game.turn.busyUntil = Math.max(prev, startedAt + duration);
+        const resolved = duration as number;
+        busyMs = Math.max(busyMs, resolved);
+        if (game.turn){
+          const prev = Number.isFinite(game.turn.busyUntil) ? game.turn.busyUntil : startedAt;
+          game.turn.busyUntil = Math.max(prev, startedAt + resolved);
         }
       };
 
@@ -772,10 +1124,10 @@ case 'hpTradeBurst': {
 
       {
         const startedAt = getNow();
-        const GameVfx = asSessionWithVfx(Game, { requireGrid: true });
-        if (GameVfx) {
+        const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
+        if (sessionVfx) {
           try {
-            const dur = vfxAddBloodPulse(GameVfx, unit, {
+            const dur = vfxAddBloodPulse(sessionVfx, unit, {
               bindingKey,
               timing: 'charge_up'
             });
@@ -784,57 +1136,51 @@ case 'hpTradeBurst': {
         }
       }
 
-      const damageSpec = u.damage || {};
-      const dtype = damageSpec.type || 'arcane';
+      const damageSpec = (u.damage ?? {}) as UltDamageSpec;
+      const dtype = typeof damageSpec.type === 'string' && damageSpec.type ? damageSpec.type : 'arcane';
       const attackType = u.countsAsBasic ? 'basic' : 'skill';
-      const wilScale = Number.isFinite(damageSpec.scaleWIL) ? damageSpec.scaleWIL : (damageSpec.scaleWil ?? 0);
-      const flatAdd = Number.isFinite(damageSpec.flat) ? damageSpec.flat : (damageSpec.flatAdd ?? 0);
-      const debuffSpec = u.appliesDebuff || null;
-      const debuffId = debuffSpec?.id || 'loithienanh_spd_burn';
-      const debuffAmount = Number.isFinite(debuffSpec?.amount)
-        ? debuffSpec.amount
-        : (Number.isFinite(debuffSpec?.amountPercent) ? debuffSpec.amountPercent : 0);
-      const debuffMaxStacks = Math.max(1, (debuffSpec?.maxStacks | 0) || 1);
-      const debuffDuration = Number.isFinite(debuffSpec?.turns)
-        ? debuffSpec.turns
-        : (Number.isFinite(u.duration) ? u.duration : (u.turns || 1));
+      const wilScale = parseFiniteNumber(damageSpec.scaleWIL ?? damageSpec.scaleWil) ?? 0;
+      const flatAdd = parseFiniteNumber(damageSpec.flat ?? damageSpec.flatAdd) ?? 0;
+      const debuffSpec = u.appliesDebuff ?? null;
+      const debuffId = typeof debuffSpec?.id === 'string' && debuffSpec.id ? debuffSpec.id : 'loithienanh_spd_burn';
+      const debuffAmount = parseFiniteNumber(debuffSpec?.amount ?? debuffSpec?.amountPercent) ?? 0;
+      const debuffMaxStacks = Math.max(1, Math.round(parseFiniteNumber(debuffSpec?.maxStacks) ?? 1));
+      const debuffDuration = Math.max(1, Math.round(parseFiniteNumber(debuffSpec?.turns) ?? getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1)));
 
       for (const tgt of selected){
         if (!tgt || !tgt.alive) continue;
-        const tgtRank = Game?.meta?.rankOf?.(tgt.id) || tgt?.rank || '';
+        const tgtRank = game.meta?.rankOf?.(tgt.id) || tgt?.rank || '';
         const isBoss = typeof tgtRank === 'string' && tgtRank.toLowerCase() === 'boss';
-        const pctDefault = Number.isFinite(damageSpec.percentTargetMaxHP)
-          ? damageSpec.percentTargetMaxHP
-          : (Number.isFinite(damageSpec.basePercentMaxHPTarget) ? damageSpec.basePercentMaxHPTarget : 0);
+        const pctDefault = parseFiniteNumber(damageSpec.percentTargetMaxHP ?? damageSpec.basePercentMaxHPTarget) ?? 0;
         const pct = isBoss
-          ? (Number.isFinite(damageSpec.bossPercent) ? damageSpec.bossPercent : pctDefault)
+          ? parseFiniteNumber(damageSpec.bossPercent) ?? pctDefault
           : pctDefault;
         const baseFromPct = Math.round(Math.max(0, pct) * Math.max(0, tgt.hpMax || 0));
-        const baseFromWil = Math.round(Math.max(0, wilScale || 0) * Math.max(0, unit.wil || 0));
-        const baseFlat = Math.round(Math.max(0, flatAdd || 0));
+        const baseFromWil = Math.round(Math.max(0, wilScale) * Math.max(0, unit.wil || 0));
+        const baseFlat = Math.round(Math.max(0, flatAdd));
         const base = Math.max(1, baseFromPct + baseFromWil + baseFlat);
-        dealAbilityDamage(Game, unit, tgt, {
+        dealAbilityDamage(game, unit, tgt, {
           base,
           dtype,
           attackType,
-          defPen: Number.isFinite(damageSpec.defPen) ? damageSpec.defPen : (damageSpec.pen ?? 0)
+          defPen: parseFiniteNumber(damageSpec.defPen ?? damageSpec.pen) ?? 0
         });
 
         {
           const startedAt = getNow();
-        const GameVfx = asSessionWithVfx(Game, { requireGrid: true });
-        if (GameVfx) {
-          try {
-            const dur = vfxAddLightningArc(GameVfx, unit, tgt, {
-              bindingKey,
-              timing: 'burst_core',
-              targetBindingKey: bindingKey,
-              targetTiming: 'burst_core'
-            });
-            applyBusyFromVfx(startedAt, dur);
-          } catch (_) {}
+        const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
+          if (sessionVfx) {
+            try {
+              const dur = vfxAddLightningArc(sessionVfx, unit, tgt, {
+                bindingKey,
+                timing: 'burst_core',
+                targetBindingKey: bindingKey,
+                targetTiming: 'burst_core'
+              });
+              applyBusyFromVfx(startedAt, dur);
+            } catch (_) {}
+          }
         }
-      }
 
         if (debuffAmount && tgt.alive){
           const existing = Statuses.get(tgt, debuffId);
@@ -861,10 +1207,10 @@ case 'hpTradeBurst': {
 
       {
         const startedAt = getNow();
-        const GameVfx = asSessionWithVfx(Game, { requireGrid: true });
-        if (GameVfx) {
+        const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
+        if (sessionVfx) {
           try {
-            const dur = vfxAddGroundBurst(GameVfx, unit, {
+            const dur = vfxAddGroundBurst(sessionVfx, unit, {
               bindingKey,
               anchorId: 'right_foot',
               timing: 'ground_crack'
@@ -876,10 +1222,10 @@ case 'hpTradeBurst': {
 
       {
         const startedAt = getNow();
-        const GameVfx = asSessionWithVfx(Game, { requireGrid: true });
-        if (GameVfx) {
+        const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
+        if (sessionVfx) {
           try {
-            const dur = vfxAddGroundBurst(GameVfx, unit, {
+            const dur = vfxAddGroundBurst(sessionVfx, unit, {
               bindingKey,
               anchorId: 'left_foot',
               timing: 'ground_crack'
@@ -890,11 +1236,11 @@ case 'hpTradeBurst': {
       }
 
       {
-       const startedAt = getNow();
-        const GameVfx = asSessionWithVfx(Game, { requireGrid: true });
-        if (GameVfx) {
+        const startedAt = getNow();
+        const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
+        if (sessionVfx) {
           try {
-            const dur = vfxAddShieldWrap(GameVfx, unit, {
+            const dur = vfxAddShieldWrap(sessionVfx, unit, {
               bindingKey,
               anchorId: 'root',
               timing: 'burst_core'
@@ -904,9 +1250,10 @@ case 'hpTradeBurst': {
         }
       }
 
-      if (Number.isFinite(u.reduceDmg) && u.reduceDmg > 0){
-        const turns = Number.isFinite(u.duration) ? u.duration : (u.turns || 1);
-        Statuses.add(unit, Statuses.make.damageCut({ pct: u.reduceDmg, turns }));
+      const reduceDmg = parseFiniteNumber(u.reduceDmg);
+      if (reduceDmg && reduceDmg > 0){
+        const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
+        Statuses.add(unit, Statuses.make.damageCut({ pct: reduceDmg, turns }));
       }
 
       busyMs = Math.max(busyMs, 1600);
@@ -914,17 +1261,17 @@ case 'hpTradeBurst': {
     }
 
     case 'strikeLaneMid': {
-      const primary = pickTarget(Game, unit);
+      const primary = pickTarget(game, unit);
       if (!primary) break;
       const laneX = primary.cx;
       const aliveNow = tokensAlive();
       const laneTargets = aliveNow.filter(t => t.side === foeSide && t.cx === laneX);
-      const hits = Math.max(1, (u.hits|0) || 1);
-      const scale = typeof u.scale === 'number' ? u.scale : 0.9;
-      const meleeDur = CFG?.ANIMATION?.meleeDurationMs ?? 1100;
-      const GameVfx = asSessionWithVfx(Game, { requireGrid: true });
-      if (GameVfx) {
-        try { vfxAddMelee(GameVfx, unit, primary, { dur: meleeDur }); } catch(_){}
+      const hits = getUltHitCount(u);
+      const scale = parseFiniteNumber(u.scale) ?? 0.9;
+      const meleeDur = parseFiniteNumber(CFG?.ANIMATION?.meleeDurationMs) ?? 1100;
+      const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
+      if (sessionVfx) {
+        try { vfxAddMelee(sessionVfx, unit, primary, { dur: meleeDur }); } catch(_){}
       }
       busyMs = Math.max(busyMs, meleeDur);
       for (const enemy of laneTargets){
@@ -932,14 +1279,15 @@ case 'hpTradeBurst': {
         for (let h=0; h<hits; h++){
           if (!enemy.alive) break;
           let base = Math.max(1, Math.round((unit.atk || 0) * scale));
-          if (u.bonusVsLeader && (enemy.id === 'leaderA' || enemy.id === 'leaderB')){
-            base = Math.round(base * (1 + u.bonusVsLeader));
+          const bonusVsLeader = parseFiniteNumber(u.bonusVsLeader) ?? 0;
+          if (bonusVsLeader && (enemy.id === 'leaderA' || enemy.id === 'leaderB')){
+            base = Math.round(base * (1 + bonusVsLeader));
           }
-          dealAbilityDamage(Game, unit, enemy, {
+          dealAbilityDamage(game, unit, enemy, {
             base,
             dtype: 'arcane',
             attackType: u.tagAsBasic ? 'basic' : 'skill',
-            defPen: u.penRES ?? 0
+            defPen: parseFiniteNumber(u.penRES) ?? 0
           });
         }
       }
@@ -947,7 +1295,7 @@ case 'hpTradeBurst': {
     }
 
     case 'selfBuff': {
-      const tradePct = Math.max(0, Math.min(0.9, u.selfHPTrade ?? 0));
+      const tradePct = Math.max(0, Math.min(0.9, parseFiniteNumber(u.selfHPTrade) ?? 0));
       const pay = Math.round((unit.hpMax || 0) * tradePct);
       const maxPay = Math.max(0, Math.min(pay, Math.max(0, (unit.hp || 0) - 1)));
       if (maxPay > 0){
@@ -960,12 +1308,13 @@ case 'hpTradeBurst': {
         });
         finishFuryHit(unit);
       }
-      const reduce = Math.max(0, u.reduceDmg ?? 0);
+      const reduce = Math.max(0, parseFiniteNumber(u.reduceDmg) ?? 0);
       if (reduce > 0){
-        Statuses.add(unit, Statuses.make.damageCut({ pct: reduce, turns: u.turns || 1 }));
+        const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
+        Statuses.add(unit, Statuses.make.damageCut({ pct: reduce, turns }));
       }
       {
-        const sessionVfx = asSessionWithVfx(Game, { requireGrid: true });
+        const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
         if (sessionVfx) {
           try { vfxAddHit(sessionVfx, unit); } catch(_){}
         }
@@ -978,7 +1327,7 @@ case 'hpTradeBurst': {
       const aliveNow = tokensAlive();
       const foes = aliveNow.filter(t => t.side === foeSide);
       if (!foes.length) break;
-      const take = Math.max(1, Math.min(foes.length, (u.targets|0) || foes.length));
+      const take = Math.max(1, Math.min(foes.length, getUltTargetCount(u, foes.length)));
       foes.sort((a,b)=>{
         const da = Math.abs(a.cx - unit.cx) + Math.abs(a.cy - unit.cy);
         const db = Math.abs(b.cx - unit.cx) + Math.abs(b.cy - unit.cy);
@@ -987,8 +1336,9 @@ case 'hpTradeBurst': {
       for (let i=0; i<take; i++){
         const tgt = foes[i];
         if (!tgt) continue;
-        Statuses.add(tgt, Statuses.make.sleep({ turns: u.turns || 1 }));
-        const sessionVfx = asSessionWithVfx(Game, { requireGrid: true });
+        const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
+        Statuses.add(tgt, Statuses.make.sleep({ turns }));
+        const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
         if (sessionVfx) {
           try { vfxAddHit(sessionVfx, tgt); } catch(_){}
         }
@@ -998,11 +1348,11 @@ case 'hpTradeBurst': {
     }
 
     case 'revive': {
-      const tokens = Game?.tokens || [];
+      const tokens = game.tokens || [];
       const fallen = tokens.filter(t => t.side === unit.side && !t.alive);
       if (!fallen.length) break;
       fallen.sort((a,b)=> (b.deadAt||0) - (a.deadAt||0));
-      const take = Math.max(1, Math.min(fallen.length, (u.targets|0) || 1));
+      const take = Math.max(1, Math.min(fallen.length, getUltTargetCount(u, 1)));
       for (let i=0; i<take; i++){
         const ally = fallen[i];
         if (!ally) continue;
@@ -1010,15 +1360,16 @@ case 'hpTradeBurst': {
         ally.deadAt = 0;
         ally.hp = 0;
         Statuses.purge(ally);
-        const revivedHp = u.revived?.hpPercent ?? u.revived?.hpPct ?? 0.5;
+        const revivedHp = parseFiniteNumber(u.revived?.hpPercent ?? u.revived?.hpPct) ?? 0.5;
         const hpPct = Math.max(0, Math.min(1, revivedHp));
         const healAmt = Math.max(1, Math.round((ally.hpMax || 0) * hpPct));
         healUnit(ally, healAmt);
-        setFury(ally, Math.max(0, (u.revived?.rage) ?? 0));
+        setFury(ally, Math.max(0, parseFiniteNumber(u.revived?.rage) ?? 0));
         if (u.revived?.lockSkillsTurns){
-          Statuses.add(ally, Statuses.make.silence({ turns: u.revived.lockSkillsTurns }));
+          const silenceTurns = Math.max(1, Math.round(parseFiniteNumber(u.revived.lockSkillsTurns) ?? 1));
+          Statuses.add(ally, Statuses.make.silence({ turns: silenceTurns }));
         }
-        const sessionVfx = asSessionWithVfx(Game, { requireGrid: true });
+        const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
         if (sessionVfx) {
           try { vfxAddSpawn(sessionVfx, ally.cx, ally.cy, ally.side); } catch(_){}
         }
@@ -1036,11 +1387,11 @@ case 'hpTradeBurst': {
         const rb = (b.hpMax || 1) ? (b.hp || 0) / b.hpMax : 0;
         return ra - rb;
       });
-      const count = Math.max(1, Math.min(allies.length, (u.allies|0) || allies.length));
+      const count = Math.max(1, Math.min(allies.length, getUltAlliesCount(u, allies.length)));
       const selected = allies.slice(0, count);
       if (u.healLeader){
         const leaderId = unit.side === 'ally' ? 'leaderA' : 'leaderB';
-        const tokens = Game?.tokens || [];
+        const tokens = game.tokens || [];
         const leader = tokens.find(t => t.id === leaderId && t.alive);
         if (leader && !selected.includes(leader)) selected.push(leader);
       }
@@ -1053,7 +1404,7 @@ case 'hpTradeBurst': {
         const goal = Math.min(tgt.hpMax || 0, Math.round((tgt.hpMax || 0) * ratio));
         if (goal > (tgt.hp || 0)){
           healUnit(tgt, goal - (tgt.hp || 0));
-          const sessionVfx = asSessionWithVfx(Game, { requireGrid: true });
+          const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
           if (sessionVfx) {
             try { vfxAddHit(sessionVfx, tgt); } catch(_){}
           }
@@ -1066,14 +1417,7 @@ case 'hpTradeBurst': {
     case 'haste': {
       const targets = new Set();
       targets.add(unit);
-      const extraAllies = (()=>{
-        if (typeof u.targets === 'number') return Math.max(0, (u.targets|0) - 1);
-        if (typeof u.targets === 'string'){
-          const m = u.targets.match(/(\d+)/);
-          if (m && m[1]) return Math.max(0, parseInt(m[1], 10));
-        }
-        return 0;
-      })();
+      const extraAllies = Math.max(0, getUltTargetCount(u, 1) - 1);
       const aliveNow = tokensAlive();
       const others = aliveNow.filter(t => t.side === unit.side && t !== unit);
       others.sort((a,b)=> (a.spd||0) - (b.spd||0));
@@ -1081,10 +1425,11 @@ case 'hpTradeBurst': {
         if (targets.size >= extraAllies + 1) break;
         targets.add(ally);
       }
-      const pct = u.attackSpeed ?? 0.1;
+      const pct = parseFiniteNumber(u.attackSpeed) ?? 0.1;
       for (const tgt of targets){
-        Statuses.add(tgt, Statuses.make.haste({ pct, turns: u.turns || 1 }));
-        const sessionVfx = asSessionWithVfx(Game, { requireGrid: true });
+        const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
+        Statuses.add(tgt, Statuses.make.haste({ pct, turns }));
+        const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
         if (sessionVfx) {
           try { vfxAddHit(sessionVfx, tgt); } catch(_){}
         }
@@ -1336,7 +1681,7 @@ function init(): boolean {
   if (Game.grid) spawnLeaders(Game.tokens, Game.grid);
 
   const tokens = Game.tokens || [];
-  const sessionVfx = asSessionWithVfx(Game, { requireGrid: true });
+  const sessionVfx = ensureSessionWithVfx(Game, { requireGrid: true });
   if (sessionVfx){
     for (const t of tokens){
       if (t.id === 'leaderA' || t.id === 'leaderB'){
@@ -1396,27 +1741,28 @@ function init(): boolean {
     canvasClickHandler = null;
   }
   canvasClickHandler = (ev: MouseEvent): void => {
-    if (!canvas || !Game.grid) return;
+    const game = getInitializedGame();
+    if (!canvas || !game?.grid) return;
     const rect = canvas.getBoundingClientRect();
     const p = { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
-    const cell = hitToCellOblique(Game.grid, p.x, p.y, CAM_PRESET);
+    const cell = hitToCellOblique(game.grid, p.x, p.y, CAM_PRESET);
     if (!cell) return;
 
     if (cell.cx >= CFG.ALLY_COLS) return;
 
     const deck = ensureDeck();
-    const card = deck.find((u) => u.id === Game.selectedId) ?? null;
+    const card = deck.find((u) => u.id === game.selectedId) ?? null;
     if (!card) return;
 
-    if (cellReserved(tokensAlive(), Game.queued, cell.cx, cell.cy)) return;
+    if (cellReserved(tokensAlive(), game.queued, cell.cx, cell.cy)) return;
     const cardCost = getCardCost(card);
-    if (Game.cost < cardCost) return;
-    if (Game.summoned >= Game.summonLimit) return;
+    if (game.cost < cardCost) return;
+    if (game.summoned >= game.summonLimit) return;
 
     const slot = slotIndex('ally', cell.cx, cell.cy);
-    if (Game.queued.ally.has(slot)) return;
+    if (game.queued.ally.has(slot)) return;
 
-    const spawnCycle = predictSpawnCycle(Game, 'ally', slot);
+    const spawnCycle = predictSpawnCycle(game, 'ally', slot);
     const pendingArt = getUnitArt(card.id);
     const pending: QueuedSummonRequest & {
       art?: ReturnType<typeof getUnitArt> | null;
@@ -1434,15 +1780,15 @@ function init(): boolean {
       art: pendingArt ?? null,
       skinKey: pendingArt?.skinKey ?? null,
     };
-    Game.queued.ally.set(slot, pending);
+    game.queued.ally.set(slot, pending);
 
-    Game.cost = Math.max(0, Game.cost - cardCost);
-    if (hud && Game) hud.update(Game);
-    Game.summoned += 1;
-    Game.usedUnitIds.add(card.id);
+    game.cost = Math.max(0, game.cost - cardCost);
+    if (hud && game) hud.update(game);
+    game.summoned += 1;
+    game.usedUnitIds.add(card.id);
 
-    Game.deck3 = deck.filter((u) => u.id !== card.id);
-    Game.selectedId = null;
+    game.deck3 = deck.filter((u) => u.id !== card.id);
+    game.selectedId = null;
     refillDeck();
     selectFirstAffordable();
     renderSummonBar();
@@ -1815,9 +2161,12 @@ function drawHPBars(): void {
     const art = t.art || getUnitArt(t.id, { skinKey: t.skinKey });
     const layout = art?.layout || {};
     const r = Math.max(6, Math.floor(baseR * (p.scale || 1)));
-    const barWidth = Math.max(28, Math.floor(r * (layout.hpWidth ?? 2.4)));
-    const barHeight = Math.max(5, Math.floor(r * (layout.hpHeight ?? 0.42)));
-    const offset = layout.hpOffset ?? 1.46;
+    const widthRatio = parseFiniteNumber(layout.hpWidth) ?? 2.4;
+    const heightRatio = parseFiniteNumber(layout.hpHeight) ?? 0.42;
+    const offsetRatio = parseFiniteNumber(layout.hpOffset) ?? 1.46;
+    const barWidth = Math.max(28, Math.floor(r * widthRatio));
+    const barHeight = Math.max(5, Math.floor(r * heightRatio));
+    const offset = offsetRatio;
     const x = Math.round(p.x - barWidth / 2);
     const y = Math.round(p.y + r * offset - barHeight / 2);
     const ratio = Math.max(0, Math.min(1, (t.hp || 0) / (t.hpMax || 1)));
