@@ -42,6 +42,16 @@ const TAB_DEFINITIONS = [
 const currencyCatalog: CurrencyCatalog = getCurrencyCatalog(listCurrencies as () => ReadonlyArray<CurrencyDefinition>);
 const currencyFormatter = ensureNumberFormatter(createNumberFormatter, 'vi-VN');
 
+function toSafeText(value: string | number | null | undefined): string{
+  if (value == null){
+    return '';
+  }
+  if (typeof value === 'number'){
+    return Number.isFinite(value) ? String(value) : '';
+  }
+  return value;
+}
+
 function ensureStyles(){
   const css = `
     .app--collection{padding:32px 16px 64px;}
@@ -187,6 +197,14 @@ type AbilityEntry = Record<string, unknown> & {
   type?: string;
 };
 
+type SkillDetailEventDetail = UnknownRecord;
+
+declare global {
+  interface HTMLElementEventMap {
+    'collection:toggle-skill-detail': CustomEvent<SkillDetailEventDetail>;
+  }
+}
+
 interface AbilityCardOptions {
   typeLabel?: string | null;
   unitId?: string | null;
@@ -202,7 +220,7 @@ function renderAbilityCard(entry: AbilityEntry | null | undefined, options: Abil
 
   const title = document.createElement('h4');
   title.className = 'collection-skill-card__title';
-  title.textContent = entry?.name || 'Kĩ năng';
+  title.textContent = toSafeText(entry?.name ?? 'Kĩ năng');
   header.appendChild(title);
   
   const actions = document.createElement('div');
@@ -212,7 +230,7 @@ function renderAbilityCard(entry: AbilityEntry | null | undefined, options: Abil
 
   const badge = document.createElement('span');
   badge.className = 'collection-skill-card__badge';
-  badge.textContent = resolvedTypeLabel;
+  badge.textContent = toSafeText(resolvedTypeLabel);
   actions.appendChild(badge);
 
   const abilityId = entry?.id ?? entry?.abilityId ?? null;
@@ -594,7 +612,7 @@ const overlayDetailPanel = document.createElement('aside');
     detailEmpty.style.display = 'none';
   };
 
-  const populateSkillDetail = (card: HTMLElement, payload: Record<string, unknown> | null | undefined): void => {
+  const populateSkillDetail = (card: HTMLElement, payload: UnknownRecord | null | undefined): void => {
     const ability = (payload?.ability ?? null) as AbilityEntry | null;
     if (!ability){
       clearSkillDetail();
@@ -613,13 +631,13 @@ const overlayDetailPanel = document.createElement('aside');
     activeAbilityCard.classList.add('is-expanded');
 
     const abilityName = ability?.name || 'Kĩ năng';
-    detailTitle.textContent = abilityName;
+    detailTitle.textContent = toSafeText(abilityName);
 
     const typeLabel = (payload?.typeLabel as string | null | undefined)
       || card.dataset.typeLabel
       || labelForAbility(ability);
     if (typeLabel){
-      detailBadge.textContent = typeLabel;
+      detailBadge.textContent = toSafeText(typeLabel);
       detailBadge.style.display = '';
     } else {
       detailBadge.textContent = '';
@@ -629,7 +647,7 @@ const overlayDetailPanel = document.createElement('aside');
     const description = ability?.description && String(ability.description).trim() !== ''
       ? String(ability.description)
       : card.dataset.description || 'Chưa có mô tả chi tiết.';
-    detailDescription.textContent = description;
+    detailDescription.textContent = toSafeText(description);
 
     while (detailFacts.firstChild){
       detailFacts.removeChild(detailFacts.firstChild);
@@ -643,7 +661,7 @@ const overlayDetailPanel = document.createElement('aside');
         if (fact.icon){
           const iconEl = document.createElement('span');
           iconEl.className = 'collection-skill-detail__fact-icon';
-          iconEl.textContent = fact.icon;
+          iconEl.textContent = toSafeText(fact.icon);
           item.appendChild(iconEl);
         }
 
@@ -652,13 +670,13 @@ const overlayDetailPanel = document.createElement('aside');
         if (fact.label){
           const labelEl = document.createElement('div');
           labelEl.className = 'collection-skill-detail__fact-label';
-          labelEl.textContent = fact.label;
+          labelEl.textContent = toSafeText(fact.label);
           factBody.appendChild(labelEl);
         }
 
         const valueEl = document.createElement('div');
         valueEl.className = 'collection-skill-detail__fact-value';
-        valueEl.textContent = fact.value;
+        valueEl.textContent = toSafeText(fact.value);
         factBody.appendChild(valueEl);
 
         if (fact.tooltip){
@@ -693,7 +711,7 @@ const overlayDetailPanel = document.createElement('aside');
     if (mergedNotes.length){
       for (const note of mergedNotes){
         const noteItem = document.createElement('li');
-        noteItem.textContent = note;
+        noteItem.textContent = toSafeText(note);
         detailNotes.appendChild(noteItem);
       }
       detailEmpty.style.display = 'none';
@@ -707,13 +725,13 @@ const overlayDetailPanel = document.createElement('aside');
     overlayContent.classList.add('has-detail');
   };
 
-  const handleSkillDetailToggle = (event: CustomEvent): void => {
+  const handleSkillDetailToggle = (event: CustomEvent<SkillDetailEventDetail>): void => {
     const target = event.target as HTMLElement | null;
     const card = target?.closest('.collection-skill-card') as HTMLElement | null;
     if (!card){
       return;
     }
-    populateSkillDetail(card, event.detail as Record<string, unknown>);
+    populateSkillDetail(card, event.detail);
   };
 
   overlay.addEventListener('collection:toggle-skill-detail', handleSkillDetailToggle);
@@ -839,7 +857,7 @@ const overlayDetailPanel = document.createElement('aside');
     }
 
     const unit = rosterEntries.get(unitId)?.meta || null;
-    stageName.textContent = unit?.name || unitId;
+    stageName.textContent = toSafeText(unit?.name ?? unitId);
 
     while (stageTags.firstChild){
       stageTags.removeChild(stageTags.firstChild);
@@ -847,23 +865,23 @@ const overlayDetailPanel = document.createElement('aside');
     if (unit?.rank){
       const rankTag = document.createElement('span');
       rankTag.className = 'collection-stage__tag';
-      rankTag.textContent = `Rank ${unit.rank}`;
+      rankTag.textContent = toSafeText(`Rank ${unit.rank}`);
       stageTags.appendChild(rankTag);
     }
     if (unit?.class){
       const classTag = document.createElement('span');
       classTag.className = 'collection-stage__tag';
-      classTag.textContent = unit.class;
+      classTag.textContent = toSafeText(unit.class);
       stageTags.appendChild(classTag);
     }
 
-    const costValue = Number.isFinite(unit?.cost) ? unit.cost : '—';
-    stageCost.textContent = `Cost ${costValue}`;
+    const costValue = unit && Number.isFinite(unit.cost) ? unit.cost : '—';
+    stageCost.textContent = `Cost ${toSafeText(costValue)}`;
 
     const art = getUnitArt(unitId);
     if (art?.sprite?.src){
       stageSprite.src = art.sprite.src;
-      stageSprite.alt = unit?.name || unitId;
+      stageSprite.alt = toSafeText(unit?.name ?? unitId);
       stageSprite.style.opacity = '1';
     } else {
       stageSprite.removeAttribute('src');
@@ -871,12 +889,12 @@ const overlayDetailPanel = document.createElement('aside');
       stageSprite.style.opacity = '0';
     }
 
-    overlayTitle.textContent = unit?.name ? `Kĩ năng · ${unit.name}` : 'Kĩ năng';
+    overlayTitle.textContent = toSafeText(unit?.name ? `Kĩ năng · ${unit.name}` : 'Kĩ năng');
     
     const skillSet = getSkillSet(unitId);
-    overlaySubtitle.textContent = describeUlt(unit);
+    overlaySubtitle.textContent = toSafeText(describeUlt(unit));
     const summaryNote = skillSet?.notes?.[0] ?? '';
-    overlaySummary.textContent = summaryNote;
+    overlaySummary.textContent = toSafeText(summaryNote);
     overlaySummary.style.display = summaryNote ? '' : 'none';
 
     while (overlayNotesList.firstChild){
@@ -888,7 +906,7 @@ const overlayDetailPanel = document.createElement('aside');
       for (const note of extraNotes){
         if (!note) continue;
         const item = document.createElement('li');
-        item.textContent = note;
+        item.textContent = toSafeText(note);
         overlayNotesList.appendChild(item);
       }
     } else {
@@ -903,7 +921,7 @@ const overlayDetailPanel = document.createElement('aside');
       abilityEntries.push({ entry: skillSet.basic, label: ABILITY_TYPE_LABELS.basic });
     }
     if (Array.isArray(skillSet?.skills)){
-      skillSet.skills.forEach((skill, index) => {
+      skillSet.skills.forEach((skill: AbilityEntry | null | undefined, index: number) => {
         if (!skill) return;
         abilityEntries.push({ entry: skill, label: `Kĩ năng ${index + 1}` });
       });
@@ -962,5 +980,3 @@ const overlayDetailPanel = document.createElement('aside');
     }
   } satisfies CollectionViewHandle;
 }
-
-export type { CollectionViewHandle } from './types.ts';
