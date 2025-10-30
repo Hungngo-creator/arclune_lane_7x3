@@ -202,10 +202,19 @@ export type VfxEvent =
 export type VfxEventList = VfxEvent[];
 
 export type SessionWithVfx = SessionState & {
-  grid: GridSpec;
+  grid: GridSpec | null;
   tokens: ReadonlyArray<UnitToken>;
   vfx?: VfxEventList;
 };
+
+export function asSessionWithVfx(
+  game: SessionState | SessionWithVfx | null | undefined,
+  { requireGrid = false }: { requireGrid?: boolean } = {},
+): SessionWithVfx | null {
+  if (!game || !Array.isArray(game.tokens)) return null;
+  if (requireGrid && !game.grid) return null;
+  return game as SessionWithVfx;
+}
 
 const now = (): number => safeNow();
 const lerp = (a: number, b: number, t: number): number => a + (b - a) * t;

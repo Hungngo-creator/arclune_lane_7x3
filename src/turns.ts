@@ -5,7 +5,7 @@ import { Statuses } from './statuses.ts';
 import { doBasicWithFollowups } from './combat.ts';
 import { CFG } from './config.ts';
 import { makeInstanceStats, initialRageFor } from './meta.ts';
-import { vfxAddSpawn, vfxAddBloodPulse } from './vfx.ts';
+import { vfxAddSpawn, vfxAddBloodPulse, asSessionWithVfx } from './vfx.ts';
 import { getUnitArt } from './art.ts';
 import { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } from './passives.ts';
 import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } from './events.ts';
@@ -62,9 +62,12 @@ function applyTurnRegen(
   if (hpDelta !== 0 || aeDelta !== 0){
     emitGameEvent(TURN_REGEN, { game: Game, unit, hpDelta, aeDelta });
     if (hpDelta > 0){
-      try {
-        vfxAddBloodPulse(Game, unit, { color: '#7ef7c1', alpha: 0.65, maxScale: 2.4 });
-      } catch (_) {}
+      const sessionVfx = asSessionWithVfx(Game, { requireGrid: true });
+      if (sessionVfx){
+        try {
+          vfxAddBloodPulse(sessionVfx, unit, { color: '#7ef7c1', alpha: 0.65, maxScale: 2.4 });
+        } catch (_) {}
+      }
     }
   }
 
@@ -174,10 +177,15 @@ export function spawnQueuedIfDue(
   }
   prepareUnitForPassives(obj);
   Game.tokens.push(obj);
-  applyOnSpawnEffects(Game, obj, kit?.onSpawn);
-  try {
-    vfxAddSpawn(Game, p.cx, p.cy, p.side);
-  } catch (_) {}
+  applyOnSpawnEffects(Game, obj, kit?.onSpawn ?? undefined);
+  {
+    const sessionVfx = asSessionWithVfx(Game, { requireGrid: true });
+    if (sessionVfx){
+      try {
+        vfxAddSpawn(sessionVfx, p.cx, p.cy, p.side);
+      } catch (_) {}
+    }
+  }
   const actor = getActiveAt(Game, side, slot);
   const isLeader = actor?.id === 'leaderA' || actor?.id === 'leaderB';
   const canAutoUlt = fromDeck && !isLeader && actor && actor.alive && typeof performUlt === 'function';
