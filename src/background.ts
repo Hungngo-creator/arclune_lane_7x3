@@ -253,7 +253,7 @@ function stableStringify(value: unknown, seen: WeakSet<object> = new WeakSet()):
   if (type === 'undefined') return 'undefined';
   if (type === 'number' || type === 'boolean' || type === 'bigint') return String(value);
   if (type === 'string') return JSON.stringify(value);
-  if (type === 'symbol') return value.toString();
+  if (type === 'symbol') return value?.toString() ?? '[symbol]';
   if (type === 'function') {
     const func = value as { name?: string };
     return `[Function:${func.name || 'anonymous'}]`;
