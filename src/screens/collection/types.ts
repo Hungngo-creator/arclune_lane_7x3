@@ -17,16 +17,16 @@ export interface CollectionEntry extends RosterEntryLite {
 }
 
 export interface CollectionDefinitionParams extends UnknownRecord {
-  roster?: ReadonlyArray<RosterEntryLite> | null;
-  currencies?: LineupCurrencies | null;
-  playerState?: UnknownRecord | null;
+  readonly roster?: ReadonlyArray<RosterEntryLite> | null;
+  readonly currencies?: LineupCurrencies | null;
+  readonly playerState?: UnknownRecord | null;
 }
 
 export interface CollectionDefinition {
-  label?: string;
-  title?: string;
-  description?: string;
-  params?: CollectionDefinitionParams | null;
+  readonly label?: string;
+  readonly title?: string;
+  readonly description?: string;
+  readonly params?: CollectionDefinitionParams | null;
 }
 
 export interface CollectionScreenParams {

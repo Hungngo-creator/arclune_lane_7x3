@@ -12,22 +12,35 @@ import { isLineupCurrencies, normalizeCurrencyBalances } from '@shared-types/cur
 
 type Mergeable<TValue> = TValue | null | undefined;
 
-type MaybeRecord = Record<string, unknown>;
+const isUnknownRecord = (value: unknown): value is UnknownRecord => (
+  typeof value === 'object' && value !== null && !Array.isArray(value)
+);
+
+const toClonedRecord = (value: UnknownRecord): UnknownRecord => ({ ...value });
 
 function mergeParams<TValue>(base: Mergeable<TValue>, override: Mergeable<TValue>): TValue | null{
   if (!base && !override) return null;
-  if (!base) return typeof override === 'object' ? { ...(override as MaybeRecord) } as TValue : override ?? null;
-  if (!override) return typeof base === 'object' ? { ...(base as MaybeRecord) } as TValue : base ?? null;
-  if (
-    typeof base === 'object'
-    && typeof override === 'object'
-    && !Array.isArray(base)
-    && !Array.isArray(override)
-  ){
-    return { ...(base as MaybeRecord), ...(override as MaybeRecord) } as TValue;
+  if (!base){
+    if (isUnknownRecord(override)){
+      return toClonedRecord(override) as TValue;
+    }
+    return override ?? null;
+  }
+  if (!override){
+    if (isUnknownRecord(base)){
+      return toClonedRecord(base as unknown as UnknownRecord) as TValue;
+    }
+    return base ?? null;
+  }
+  if (isUnknownRecord(base) && isUnknownRecord(override)){
+    return { ...base, ...override } as TValue;
   }
   return override ?? null;
 }
+
+const toCollectionParams = (value: unknown): CollectionDefinitionParams | null => (
+  isUnknownRecord(value) ? value as CollectionDefinitionParams : null
+);
 
 function mergePlayerState(
   definitionParams: CollectionDefinitionParams | null | undefined,
@@ -73,10 +86,11 @@ export function renderCollectionScreen(options: CollectionScreenParams): Collect
     throw new Error('renderCollectionScreen cần một phần tử root hợp lệ.');
   }
 
-  const definitionParams: CollectionDefinition['params'] = definition?.params ?? null;
-  const playerState = mergePlayerState(definitionParams, params);
-  const roster = resolveRoster(definitionParams, params);
-  const currencies = resolveCurrencies(definitionParams, params, playerState);
+  const definitionParams = toCollectionParams(definition?.params ?? null);
+  const normalizedParams = toCollectionParams(params);
+  const playerState = mergePlayerState(definitionParams, normalizedParams);
+  const roster = resolveRoster(definitionParams, normalizedParams);
+  const currencies = resolveCurrencies(definitionParams, normalizedParams, playerState);
 
   return renderCollectionView({
     root,
