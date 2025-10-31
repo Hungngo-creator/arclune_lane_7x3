@@ -409,7 +409,7 @@ type NumberRangeFormatSource = 'startRange' | 'endRange' | 'shared';
 
 type NumberRangeFormatPart = Intl.NumberFormatPart & { source: NumberRangeFormatSource };
 
-function toIntlNumberFormatter(
+export function toIntlNumberFormatter(
   formatter: NumberFormatter,
   locale: string,
   options?: NumberFormatOptions,
@@ -499,8 +499,9 @@ function toIntlNumberFormatter(
 
       return buildPolyfillParts();
     },
-    [Symbol.toStringTag]: 'Intl.NumberFormat',
-  };
+ };
+
+  Object.defineProperty(adapter, Symbol.toStringTag, { value: 'Intl.NumberFormat' });
 
   return adapter;
 }
