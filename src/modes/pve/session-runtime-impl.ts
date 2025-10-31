@@ -1897,125 +1897,104 @@ function init(): boolean {
       if (!CLOCK || !Game) return;
       if (Game.battle?.over) return;
 
-      const pickNow = (ts: number | undefined): number => {
-        const fallbackNow = getNow();
-        if (!isFiniteNumber(ts)) return fallbackNow;
-        const rafTs = Number(ts);
-        if (!SUPPORTS_PERF_NOW && (rafTs < 0 || rafTs > RAF_TIMESTAMP_MAX)) return fallbackNow;
-        const normalized = normalizeAnimationFrameTimestamp(rafTs);
-       if (SUPPORTS_PERF_NOW && Math.abs(normalized - fallbackNow) > RAF_DRIFT_TOLERANCE_MS){
-          return fallbackNow;
+      if (isFiniteNumber(timestamp)){
+        const rafTs = Number(timestamp);
+        if (SUPPORTS_PERF_NOW || (rafTs >= 0 && rafTs <= RAF_TIMESTAMP_MAX)){
+          normalizeAnimationFrameTimestamp(rafTs);
         }
-        return normalized;
-      };
+    }
 
-    const now = pickNow(timestamp);
     const sessionNowMs = getNow();
-    const elapsedSec = Math.floor((sessionNowMs - CLOCK.startMs) / 1000);
+      const elapsedSec = Math.floor((sessionNowMs - CLOCK.startMs) / 1000);
 
-    const prevRemain = Number.isFinite(CLOCK.lastTimerRemain) ? CLOCK.lastTimerRemain : 0;
-    const remain = Math.max(0, 240 - elapsedSec);
-    if (remain !== CLOCK.lastTimerRemain){
-      CLOCK.lastTimerRemain = remain;
-      const mm = String(Math.floor(remain / 60)).padStart(2, '0');
-      const ss = String(remain % 60).padStart(2, '0');
-      const tEl = (queryFromRoot('#timer') || doc.getElementById('timer')) as HTMLElement | null;
-      if (tEl) tEl.textContent = `${mm}:${ss}`;
-    }
-
-    if (remain <= 0 && prevRemain > 0){
-      const timeoutResult = checkBattleEndResult(Game, { trigger: 'timeout', remain, timestamp: sessionNowMs });
-      if (timeoutResult) return;
-    }
-
-    const deltaSec = elapsedSec - CLOCK.lastCostCreditedSec;
-    if (deltaSec > 0) {
-      if (Game.cost < Game.costCap) {
-        Game.cost = Math.min(Game.costCap, Game.cost + deltaSec);
+      const prevRemain = Number.isFinite(CLOCK.lastTimerRemain) ? CLOCK.lastTimerRemain : 0;
+      const remain = Math.max(0, 240 - elapsedSec);
+      if (remain !== CLOCK.lastTimerRemain){
+        CLOCK.lastTimerRemain = remain;
+        const mm = String(Math.floor(remain / 60)).padStart(2, '0');
+        const ss = String(remain % 60).padStart(2, '0');
+        const tEl = (queryFromRoot('#timer') || doc.getElementById('timer')) as HTMLElement | null;
+        if (tEl) tEl.textContent = `${mm}:${ss}`;
       }
-      if (Game.ai.cost < Game.ai.costCap) {
-        Game.ai.cost = Math.min(Game.ai.costCap, Game.ai.cost + deltaSec);
+      
+      if (remain <= 0 && prevRemain > 0){
+        const timeoutResult = checkBattleEndResult(Game, { trigger: 'timeout', remain, timestamp: sessionNowMs });
+        if (timeoutResult) return;
       }
+
+      const deltaSec = elapsedSec - CLOCK.lastCostCreditedSec;
+      if (deltaSec > 0) {
+        if (Game.cost < Game.costCap) {
+          Game.cost = Math.min(Game.costCap, Game.cost + deltaSec);
+        }
+        if (Game.ai.cost < Game.ai.costCap) {
+          Game.ai.cost = Math.min(Game.ai.costCap, Game.ai.cost + deltaSec);
+        }
 
       CLOCK.lastCostCreditedSec = elapsedSec;
 
-      if (hud && Game) hud.update(Game);
-      if (!Game.selectedId) selectFirstAffordable();
-      renderSummonBar();
-      aiMaybeAct(Game, 'cost');
-    }
+    if (hud && Game) hud.update(Game);
+        if (!Game.selectedId) selectFirstAffordable();
+        renderSummonBar();
+        aiMaybeAct(Game, 'cost');
+      }
 
-    if (Game.battle?.over) return;
+      if (Game.battle?.over) return;
 
     const turnState = Game.turn ?? null;
-    let busyUntil = 0;
-    if (turnState){
-      const rawBusy = turnState.busyUntil;
-      busyUntil = isFiniteNumber(rawBusy) && rawBusy > 0 ? rawBusy : 0;
-      if (!isFiniteNumber(rawBusy) || rawBusy <= 0){
-        turnState.busyUntil = busyUntil;
-      }
-    }
-
-    const cfgTurnEvery = CFG?.ANIMATION?.turnIntervalMs;
-    const defaultTurnEveryMs = Number.isFinite(cfgTurnEvery) && cfgTurnEvery && cfgTurnEvery > 0
-      ? cfgTurnEvery
-      : 600;
-    let turnEveryMs = CLOCK.turnEveryMs;
-    if (!Number.isFinite(turnEveryMs) || turnEveryMs <= 0){
-      turnEveryMs = defaultTurnEveryMs;
-      CLOCK.turnEveryMs = turnEveryMs;
-    }
-
-    const guardReferenceNow = Number.isFinite(now) ? now : sessionNowMs;
-    if (!Number.isFinite(CLOCK.lastTurnStepMs)){
-      CLOCK.lastTurnStepMs = guardReferenceNow - turnEveryMs;
-    }
-
-    const stallDeltaEpsilon = 1;
-    const stallDriftTolerance = Math.max(
-      stallDeltaEpsilon,
-      Math.min(turnEveryMs * 0.5, 240)
-    );
-
-    const rawElapsed = guardReferenceNow - CLOCK.lastTurnStepMs;
-    const sessionElapsed = sessionNowMs - CLOCK.lastTurnStepMs;
-    const readyBySession = sessionElapsed >= (turnEveryMs - stallDeltaEpsilon);
-    const readyByBusy = sessionNowMs >= busyUntil;
-
-    if (readyByBusy){
-      if (!Number.isFinite(rawElapsed) || rawElapsed < -stallDeltaEpsilon){
-        CLOCK.lastTurnStepMs = guardReferenceNow - turnEveryMs;
-      } else if ((rawElapsed + stallDeltaEpsilon) < turnEveryMs){
-        const sessionLead = sessionElapsed - rawElapsed;
-        if (readyBySession || sessionLead > stallDriftTolerance){
-          CLOCK.lastTurnStepMs = guardReferenceNow - turnEveryMs;
+      let busyUntil = 0;
+      if (turnState){
+        const rawBusy = turnState.busyUntil;
+        busyUntil = isFiniteNumber(rawBusy) && rawBusy > 0 ? rawBusy : 0;
+        if (!isFiniteNumber(rawBusy) || rawBusy <= 0){
+          turnState.busyUntil = busyUntil;
         }
       }
-    }
 
-    const elapsedForTurn = guardReferenceNow - CLOCK.lastTurnStepMs;
-
-    if (readyByBusy && elapsedForTurn >= turnEveryMs){
-      CLOCK.lastTurnStepMs = guardReferenceNow;
-      stepTurn(Game, {
-        performUlt,
-        processActionChain,
-        allocIid: nextIid,
-        doActionOrSkip,
-        checkBattleEnd(gameState, info) {
-          return Boolean(checkBattleEndResult(gameState, info));
-        },
-      });
-      cleanupDead(sessionNowMs);
-      const postTurnResult = checkBattleEndResult(Game, { trigger: 'post-turn', timestamp: sessionNowMs });
-      if (postTurnResult){
-        scheduleDraw();
-        return;
+      const cfgTurnEvery = CFG?.ANIMATION?.turnIntervalMs;
+      const defaultTurnEveryMs = Number.isFinite(cfgTurnEvery) && cfgTurnEvery && cfgTurnEvery > 0
+        ? cfgTurnEvery
+        : 600;
+      let turnEveryMs = CLOCK.turnEveryMs;
+      if (!Number.isFinite(turnEveryMs) || turnEveryMs <= 0){
+        turnEveryMs = defaultTurnEveryMs;
+        CLOCK.turnEveryMs = turnEveryMs;
       }
-      scheduleDraw();
-      aiMaybeAct(Game, 'board');
-    }
+
+    if (!Number.isFinite(CLOCK.lastTurnStepMs)){
+        CLOCK.lastTurnStepMs = sessionNowMs - turnEveryMs;
+      }
+
+    const stallDeltaEpsilon = 1;
+      const sessionElapsed = sessionNowMs - CLOCK.lastTurnStepMs;
+      const readyByBusy = sessionNowMs >= busyUntil;
+
+      if (readyByBusy && (!Number.isFinite(sessionElapsed) || sessionElapsed < -stallDeltaEpsilon)){
+        CLOCK.lastTurnStepMs = sessionNowMs - turnEveryMs;
+        }
+
+       const elapsedForTurn = sessionNowMs - CLOCK.lastTurnStepMs;
+
+      if (readyByBusy && elapsedForTurn >= turnEveryMs){
+        CLOCK.lastTurnStepMs = sessionNowMs;
+        stepTurn(Game, {
+          performUlt,
+          processActionChain,
+          allocIid: nextIid,
+          doActionOrSkip,
+          checkBattleEnd(gameState, info) {
+            return Boolean(checkBattleEndResult(gameState, info));
+          },
+        });
+        cleanupDead(sessionNowMs);
+        const postTurnResult = checkBattleEndResult(Game, { trigger: 'post-turn', timestamp: sessionNowMs });
+        if (postTurnResult){
+          scheduleDraw();
+          return;
+        }
+        scheduleDraw();
+        aiMaybeAct(Game, 'board');
+      }
   };
 
   const runTickLoop = (timestamp?: number): void => {
