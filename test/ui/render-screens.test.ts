@@ -25,8 +25,8 @@ describe('renderMainMenuView', () => {
         id: 'primary',
         title: 'Tác chiến',
         entries: [
-          { id: 'pve-entry', type: 'mode', cardId: 'pve-mode' },
-          { id: 'pvp-entry', type: 'mode', cardId: 'pvp-mode' },
+         { id: 'pve-entry', type: 'mode', cardId: 'pve-mode', childModeIds: [] },
+        { id: 'pvp-entry', type: 'mode', cardId: 'pvp-mode', childModeIds: [] },
         ],
       },
     ];
