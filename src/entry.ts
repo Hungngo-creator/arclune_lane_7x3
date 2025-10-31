@@ -1,6 +1,7 @@
 import { createAppShell } from './app/shell.ts';
 import { renderMainMenuView } from './screens/main-menu/view/index.ts';
 import { MODES, MODE_GROUPS, MODE_STATUS, getMenuSections } from './data/modes.ts';
+import { resolveModuleFunction } from './utils/module-resolution.ts';
 import type { ModeConfig, ModeGroup, ModeShellConfig } from '@shared-types/config';
 import type { UnknownRecord } from '@shared-types/common';
 import type { MenuCardMetadata, MenuSection } from './screens/main-menu/types.ts';
@@ -73,8 +74,6 @@ export interface RenderMessageOptions {
 }
 
 export type RenderMessage = (options?: RenderMessageOptions) => void;
-
-type AnyFunction = (...args: any[]) => unknown;
 
 interface RenderPveLayoutOptions {
   title?: string;
@@ -472,37 +471,6 @@ function mergeDefinitionParams(definition: ModeDefinition | null, params: Screen
   }
 
   return { ...baseValue, ...incomingValue };
-}
-
-function pickFunctionFromSource<TFn extends AnyFunction>(source: unknown, preferredKeys: ReadonlyArray<string> = [], fallbackKeys: ReadonlyArray<string> = []): TFn | null{
-  if (!source) return null;
-
-  if (typeof source === 'function'){
-    return source as TFn;
-  }
-
-  if (source && typeof source === 'object'){
-    const record = source as Record<string, unknown>;
-    for (const key of preferredKeys){
-      const value = record[key];
-      if (typeof value === 'function'){
-        return source as TFn;
-      }
-    }
-    for (const key of fallbackKeys){
-      const value = record[key];
-      if (typeof value === 'function'){
-        return source as TFn;
-      }
-    }
-  }
-
-  return null;
-}
-
-function resolveModuleFunction<TFn extends AnyFunction>(module: unknown, preferredKeys: ReadonlyArray<string> = [], fallbackKeys: ReadonlyArray<string> = []): TFn | null{
-  const candidate = pickFunctionFromSource<TFn>(module, preferredKeys, fallbackKeys);
-  return typeof candidate === 'function' ? candidate : null;
 }
 
 function resolveScreenRenderer(module: unknown): ScreenRenderer | null{
