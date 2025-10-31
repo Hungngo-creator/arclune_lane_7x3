@@ -57,7 +57,14 @@ import {
   normalizeDeckEntries,
 } from './session-state';
 
-import type { BattleDetail, BattleResult, BattleState, LeaderSnapshot, PveDeckEntry } from '@shared-types/combat';
+import type {
+  BattleDetail,
+  BattleResult,
+  BattleState,
+  LeaderSnapshot,
+  PveDeckEntry,
+  SessionState as CombatSessionState,
+} from '@shared-types/combat';
 import type {
   UnitToken,
   ActionChainEntry,
@@ -81,6 +88,7 @@ import type { CameraPreset } from '@shared-types/config';
 import type { NormalizedSessionConfig } from './session-state';
 import type { SessionWithVfx } from '../../vfx';
 import type { GameEventDetailMap, GameEventHandler, GameEventType } from '../../events';
+import type { UnitArtLayout } from '@shared-types/art';
 
 type RootLike = Element | Document | null | undefined;
 type StartConfigOverrides = Partial<CreateSessionOptions> & Record<string, unknown>;
@@ -90,7 +98,7 @@ type PveSessionStartConfig = StartConfigOverrides & {
 };
 
 type FrameHandle = number | ReturnType<typeof setTimeout>;
-type GradientValue = CanvasGradient | string | undefined;
+type GradientValue = CanvasGradient | string;
 type CanvasClickHandler = (event: MouseEvent) => void;
 type ClockState = {
   startMs: number;
@@ -967,7 +975,8 @@ function performUlt(unit: UnitToken): void {
   if (meta.class === 'Summoner' && summonSpec){
     const aliveNow = tokensAlive();
     const queued = game.queued || { ally: new Map(), enemy: new Map() };
-    const patternSlots = resolveSummonSlots(summonSpec, slot)
+    const slotsSource = summonSpec as Parameters<typeof resolveSummonSlots>[0];
+    const patternSlots = resolveSummonSlots(slotsSource, slot)
       .filter((s): s is number => typeof s === 'number' && Number.isFinite(s))
       .filter((s) => {
         const { cx, cy } = slotToCell(unit.side, s);
@@ -1447,7 +1456,7 @@ function performUlt(unit: UnitToken): void {
 }
 const tokensAlive = (): UnitToken[] => (Game?.tokens || []).filter((t) => t.alive);
 
-function ensureBattleState(game: SessionState | null): BattleState | null {
+function ensureBattleState(game: (SessionState | CombatSessionState) | null): BattleState | null {
   if (!game || typeof game !== 'object') return null;
   if (!game.battle || typeof game.battle !== 'object'){
     game.battle = {
@@ -1498,7 +1507,10 @@ function snapshotLeader(unit: UnitToken | null | undefined): LeaderSnapshot | nu
   };
 }
 
-function isBossToken(game: SessionState | null, token: UnitToken | null | undefined): boolean {
+function isBossToken(
+  game: (SessionState | CombatSessionState) | null,
+  token: UnitToken | null | undefined,
+): boolean {
   if (!token) return false;
   if (token.isBoss) return true;
   const rankRaw = typeof token.rank === 'string' && token.rank ? token.rank : (game?.meta?.rankOf?.(token.id) || '');
@@ -1506,7 +1518,7 @@ function isBossToken(game: SessionState | null, token: UnitToken | null | undefi
   return rank === 'boss';
 }
 
-function isPvpMode(game: SessionState | null): boolean {
+function isPvpMode(game: (SessionState | CombatSessionState) | null): boolean {
   const key = (game?.modeKey || '').toString().toLowerCase();
   if (!key) return false;
   if (key === 'ares') return true;
@@ -1514,7 +1526,7 @@ function isPvpMode(game: SessionState | null): boolean {
 }
 
 function finalizeBattle(
-  game: SessionState | null,
+  game: (SessionState | CombatSessionState) | null,
   payload: BattleFinalizePayload,
   context: Record<string, unknown>,
 ): BattleResult | null {
@@ -1555,8 +1567,8 @@ function finalizeBattle(
   return result;
 }
 
-function checkBattleEnd(
-  game: SessionState | null,
+function checkBattleEndResult(
+  game: (SessionState | CombatSessionState) | null,
   context: Record<string, unknown> = {},
 ): BattleResult | null {
   if (!game) return null;
@@ -1866,7 +1878,7 @@ function init(): boolean {
     }
 
     if (remain <= 0 && prevRemain > 0){
-      const timeoutResult = checkBattleEnd(Game, { trigger: 'timeout', remain, timestamp: now });
+      const timeoutResult = checkBattleEndResult(Game, { trigger: 'timeout', remain, timestamp: now });
       if (timeoutResult) return;
     }
 
@@ -1897,10 +1909,12 @@ function init(): boolean {
         processActionChain,
         allocIid: nextIid,
         doActionOrSkip,
-        checkBattleEnd,
+        checkBattleEnd(gameState, info) {
+          return Boolean(checkBattleEndResult(gameState, info));
+        },
       });
       cleanupDead(now);
-      const postTurnResult = checkBattleEnd(Game, { trigger: 'post-turn', timestamp: now });
+      const postTurnResult = checkBattleEndResult(Game, { trigger: 'post-turn', timestamp: now });
       if (postTurnResult){
         scheduleDraw();
         return;
@@ -2006,10 +2020,11 @@ function resize(): void {
   if (ctx && Game.grid){
     const maxDprCfg = CFG.UI?.MAX_DPR;
     const maxDpr = Number.isFinite(maxDprCfg) && maxDprCfg > 0 ? maxDprCfg : 3;
-    const view = winRef || (typeof window !== 'undefined' ? window : null);
-    const viewDprRaw = Number.isFinite(view?.devicePixelRatio) && (view?.devicePixelRatio || 0) > 0
-      ? view.devicePixelRatio
-      : 1;
+    const view = winRef ?? (typeof window !== 'undefined' ? window : null);
+    let viewDprRaw = 1;
+    if (view && Number.isFinite(view.devicePixelRatio) && view.devicePixelRatio > 0){
+      viewDprRaw = view.devicePixelRatio;
+    }
     const fallbackDpr = Math.min(maxDpr, viewDprRaw);
     const gridDpr = Number.isFinite(Game.grid.dpr) && Game.grid.dpr > 0
       ? Math.min(maxDpr, Game.grid.dpr)
@@ -2065,7 +2080,10 @@ function draw(): void {
     const tokens = Game.tokens || [];
     drawTokensOblique(ctx, Game.grid, tokens, CAM_PRESET);
   }
-  vfxDraw(ctx, Game, CAM_PRESET);
+  const sessionVfx = ensureSessionWithVfx(Game, { requireGrid: true });
+  if (sessionVfx){
+    vfxDraw(ctx, sessionVfx, CAM_PRESET);
+  }
   drawHPBars();
 }
 function cellCenterObliqueLocal(g: GridSpec, cx: number, cy: number, C: CameraPreset): { x: number; y: number; scale: number } {
@@ -2125,7 +2143,7 @@ function lightenColor(color: string | null | undefined, amount: number): string 
   const r = parseInt(hex.slice(0, 2), 16);
   const g = parseInt(hex.slice(2, 4), 16);
   const b = parseInt(hex.slice(4, 6), 16);
-  const mix = (c)=> Math.min(255, Math.round(c + (255 - c) * amount));
+  const mix = (c: number)=> Math.min(255, Math.round(c + (255 - c) * amount));
   return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
 }
 
@@ -2152,19 +2170,20 @@ function ensureHpBarGradient(
   const key = normalizeHpBarCacheKey(fillColor, innerHeight, innerRadius, startY);
   const cached = hpBarGradientCache.get(key);
   if (cached) return cached;
+  const baseFill = typeof fillColor === 'string' ? fillColor : '#6ff0c0';
   if (!ctx || !Number.isFinite(innerHeight) || innerHeight <= 0){
-    hpBarGradientCache.set(key, fillColor);
-    return fillColor;
+    hpBarGradientCache.set(key, baseFill);
+    return baseFill;
   }
   const startYSafe = Number.isFinite(startY) ? startY : 0;
   const gradient = ctx.createLinearGradient(x, startYSafe, x, startYSafe + innerHeight);
   if (!gradient){
-    hpBarGradientCache.set(key, fillColor);
-    return fillColor;
+    hpBarGradientCache.set(key, baseFill);
+    return baseFill;
   }
-  const topFill = lightenColor(fillColor, 0.25);
+  const topFill = lightenColor(baseFill, 0.25) ?? baseFill;
   gradient.addColorStop(0, topFill);
-  gradient.addColorStop(1, fillColor);
+  gradient.addColorStop(1, baseFill);
   hpBarGradientCache.set(key, gradient);
   return gradient;
 }
@@ -2177,11 +2196,12 @@ function drawHPBars(): void {
     if (!t.alive || !Number.isFinite(t.hpMax)) continue;
     const p = cellCenterObliqueLocal(Game.grid, t.cx, t.cy, CAM_PRESET);
     const art = t.art || getUnitArt(t.id, { skinKey: t.skinKey });
-    const layout = art?.layout || {};
+    const layout = (art?.layout as UnitArtLayout | Record<string, unknown>) ?? {};
+    const layoutRecord = layout as Record<string, unknown>;
     const r = Math.max(6, Math.floor(baseR * (p.scale || 1)));
-    const widthRatio = parseFiniteNumber(layout.hpWidth) ?? 2.4;
-    const heightRatio = parseFiniteNumber(layout.hpHeight) ?? 0.42;
-    const offsetRatio = parseFiniteNumber(layout.hpOffset) ?? 1.46;
+    const widthRatio = parseFiniteNumber(layoutRecord.hpWidth) ?? 2.4;
+    const heightRatio = parseFiniteNumber(layoutRecord.hpHeight) ?? 0.42;
+    const offsetRatio = parseFiniteNumber(layoutRecord.hpOffset) ?? 1.46;
     const barWidth = Math.max(28, Math.floor(r * widthRatio));
     const barHeight = Math.max(5, Math.floor(r * heightRatio));
     const offset = offsetRatio;
@@ -2408,8 +2428,10 @@ function applyConfigToRunningGame(cfg: NormalizedSessionConfig): void {
       const enemyPool = normalizeDeckEntries(preset.unitsAll);
       if (enemyPool.length) Game.ai.unitsAll = enemyPool;
     }
-    if (Number.isFinite(preset.costCap)) Game.ai.costCap = preset.costCap;
-    if (Number.isFinite(preset.summonLimit)) Game.ai.summonLimit = preset.summonLimit;
+    const parsedCostCap = parseFiniteNumber(preset.costCap);
+    if (parsedCostCap !== null) Game.ai.costCap = parsedCostCap;
+    const parsedSummonLimit = parseFiniteNumber(preset.summonLimit);
+    if (parsedSummonLimit !== null) Game.ai.summonLimit = parsedSummonLimit;
   }
   if (sceneChanged){
     invalidateSceneCache();
