@@ -1,4 +1,4 @@
-import { Statuses } from '../src/statuses.ts';
+import { Statuses, makeStatusEffect } from '../src/statuses.ts';
 
 import type { UnitToken } from '../src/types/units.ts';
 
@@ -26,13 +26,25 @@ describe('Statuses lethal handling', () => {
     return unit;
   };
 
+const addStatus = <K extends keyof typeof Statuses.make>(
+    unit: UnitToken,
+    key: K,
+    spec?: Parameters<(typeof Statuses.make)[K]>[0],
+  ): void => {
+    const status = makeStatusEffect(key, spec);
+    if (!status) {
+      throw new Error(`Không thể tạo hiệu ứng trạng thái "${String(key)}".`);
+    }
+    Statuses.add(unit, status);
+  };
+
   beforeEach(() => {
     counter = 0;
   });
 
   it('bleed damage marks units dead without undying', () => {
     const unit = createUnit({ hp: 5, hpMax: 100 });
-    Statuses.add(unit, Statuses.make.bleed({ turns: 1 }));
+    addStatus(unit, 'bleed', { turns: 1 });
 
     Statuses.onTurnEnd(unit, { log: [] });
 
@@ -43,8 +55,8 @@ describe('Statuses lethal handling', () => {
 
   it('bleed damage triggers undying revive', () => {
     const unit = createUnit({ hp: 5, hpMax: 100 });
-    Statuses.add(unit, Statuses.make.bleed({ turns: 1 }));
-    Statuses.add(unit, Statuses.make.undying());
+    addStatus(unit, 'bleed', { turns: 1 });
+    addStatus(unit, 'undying');
 
     Statuses.onTurnEnd(unit, { log: [] });
 
@@ -57,8 +69,8 @@ describe('Statuses lethal handling', () => {
   it('reflect lethal damage respects undying revive', () => {
     const attacker = createUnit({ hp: 4, hpMax: 20 });
     const target = createUnit({ side: 'enemy' });
-    Statuses.add(attacker, Statuses.make.undying());
-    Statuses.add(target, Statuses.make.reflect({ pct: 1, turns: 1 }));
+    addStatus(attacker, 'undying');
+    addStatus(target, 'reflect', { pct: 1, turns: 1 });
 
     Statuses.afterDamage(attacker, target, { dealt: 4 });
 
@@ -71,7 +83,7 @@ describe('Statuses lethal handling', () => {
   it('venom lethal damage marks targets dead', () => {
     const attacker = createUnit();
     const target = createUnit({ side: 'enemy', hp: 5, hpMax: 30 });
-    Statuses.add(attacker, Statuses.make.venom({ pct: 1, turns: 1 }));
+    addStatus(attacker, 'venom', { pct: 1, turns: 1 });
 
     Statuses.afterDamage(attacker, target, { dealt: 5 });
 
@@ -83,8 +95,8 @@ describe('Statuses lethal handling', () => {
   it('venom lethal damage triggers undying revive', () => {
     const attacker = createUnit();
     const target = createUnit({ side: 'enemy', hp: 5, hpMax: 30 });
-    Statuses.add(attacker, Statuses.make.venom({ pct: 1, turns: 1 }));
-    Statuses.add(target, Statuses.make.undying());
+    addStatus(attacker, 'venom', { pct: 1, turns: 1 });
+    addStatus(target, 'undying');
 
     Statuses.afterDamage(attacker, target, { dealt: 5 });
 
@@ -97,7 +109,7 @@ describe('Statuses lethal handling', () => {
   it('execute kills targets without undying', () => {
     const attacker = createUnit();
     const target = createUnit({ side: 'enemy', hp: 4, hpMax: 40 });
-    Statuses.add(attacker, Statuses.make.execute({ turns: 1 }));
+    addStatus(attacker, 'execute', { turns: 1 });
 
     Statuses.afterDamage(attacker, target, { dealt: 1 });
 
@@ -109,8 +121,8 @@ describe('Statuses lethal handling', () => {
   it('execute respects undying revive', () => {
     const attacker = createUnit();
     const target = createUnit({ side: 'enemy', hp: 4, hpMax: 40 });
-    Statuses.add(attacker, Statuses.make.execute({ turns: 1 }));
-    Statuses.add(target, Statuses.make.undying());
+    addStatus(attacker, 'execute', { turns: 1 });
+    addStatus(target, 'undying');
 
     Statuses.afterDamage(attacker, target, { dealt: 1 });
 
