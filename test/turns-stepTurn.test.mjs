@@ -6,6 +6,7 @@ import path from 'node:path';
 import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
+import loaderModule from './helpers/pve-session-loader.js';
 
 async function loadTurnsHarness(overrides = {}){
   const here = path.dirname(fileURLToPath(import.meta.url));
@@ -225,6 +226,120 @@ test('slot 8 leader takes consecutive turns when order is mostly empty', async (
   assert.strictEqual(turnStarts.length, 2);
   assert(turnStarts.every(detail => detail?.slot === 8 && detail?.side === 'enemy'));
   assert.deepStrictEqual(turnStarts.map(detail => detail?.cycle), [0, 1]);
+});
+
+test('PvE session spawn leader và stepTurn chọn được actor ngay sau khi khởi tạo', async () => {
+  const { loadSessionModule, clearModuleCache } = loaderModule;
+  clearModuleCache();
+
+  const noop = () => {};
+  const gradientStub = { addColorStop: noop };
+  const boardContext = {
+    canvas: null,
+    setTransform: noop,
+    resetTransform: noop,
+    scale: noop,
+    clearRect: noop,
+    drawImage: noop,
+    beginPath: noop,
+    closePath: noop,
+    moveTo: noop,
+    lineTo: noop,
+    stroke: noop,
+    fill: noop,
+    save: noop,
+    restore: noop,
+    fillRect: noop,
+    strokeRect: noop,
+    createLinearGradient: () => gradientStub,
+    createRadialGradient: () => gradientStub,
+    measureText: () => ({ width: 0 }),
+    font: '',
+    textAlign: 'left',
+    textBaseline: 'alphabetic',
+    globalAlpha: 1,
+  };
+  const board = {
+    width: 700,
+    height: 600,
+    addEventListener: noop,
+    removeEventListener: noop,
+    getContext: (type) => (type === '2d' ? boardContext : null),
+    getBoundingClientRect: () => ({ left: 0, top: 0, width: 700, height: 600 }),
+  };
+  boardContext.canvas = board;
+
+  const viewportStub = {
+    addEventListener: noop,
+    removeEventListener: noop,
+  };
+  const rafQueue = [];
+  const view = {
+    devicePixelRatio: 1,
+    requestAnimationFrame: (cb) => {
+      rafQueue.push(cb);
+      return rafQueue.length;
+    },
+    cancelAnimationFrame: noop,
+    addEventListener: noop,
+    removeEventListener: noop,
+    visualViewport: viewportStub,
+  };
+
+  const documentStub = {
+    querySelector: (selector) => (selector === '#board' ? board : null),
+    getElementById: (id) => (id === 'board' ? board : null),
+    addEventListener: noop,
+    removeEventListener: noop,
+    defaultView: view,
+    hidden: false,
+    documentElement: { clientWidth: 700 },
+  };
+  board.ownerDocument = documentStub;
+
+  const root = {
+    ownerDocument: documentStub,
+    querySelector: (selector) => documentStub.querySelector(selector),
+  };
+
+  const sessionModule = loadSessionModule();
+  const { createPveSession, __getActiveGame } = sessionModule;
+
+  const session = createPveSession(root);
+  let game = null;
+
+  try {
+    game = session.start();
+    assert.ok(game, 'Session phải khởi tạo thành công');
+    assert.equal(__getActiveGame(), game);
+
+    const tokens = Array.isArray(game?.tokens) ? game.tokens : [];
+    const tokenIds = tokens.map((token) => token?.id);
+    assert.ok(tokenIds.includes('leaderA'), 'leaderA phải có trong Game.tokens sau khi start');
+    assert.ok(tokenIds.includes('leaderB'), 'leaderB phải có trong Game.tokens sau khi start');
+
+    if (game?.turn){
+      game.turn.busyUntil = 0;
+    }
+
+    const { stepTurn } = await loadTurnsHarness();
+    let actedUnit = null;
+    stepTurn(game, {
+      doActionOrSkip(_game, unit){
+        actedUnit = unit;
+      },
+      processActionChain(){
+        return null;
+      },
+    });
+
+    assert.ok(actedUnit, 'stepTurn phải chọn được 1 actor hợp lệ');
+    assert.equal(typeof actedUnit.id, 'string');
+    assert.notEqual(actedUnit.id.length, 0);
+  } finally {
+    session.stop();
+    clearModuleCache();
+  }
 });
 
 test('sparse turn order keeps alternating across cycles', async () => {
