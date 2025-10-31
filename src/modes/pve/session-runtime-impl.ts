@@ -2,7 +2,7 @@
 import { stepTurn, doActionOrSkip, predictSpawnCycle } from '../../turns';
 import { enqueueImmediate, processActionChain } from '../../summon';
 import { refillDeckEnemy, aiMaybeAct } from '../../ai';
-import { Statuses } from '../../statuses';
+import { Statuses, makeStatusEffect } from '../../statuses';
 import { CFG, CAM } from '../../config';
 import { UNITS } from '../../units';
 import { Meta, makeInstanceStats, initialRageFor } from '../../meta';
@@ -1238,7 +1238,10 @@ function performUlt(unit: UnitToken): void {
       const reduceDmg = parseFiniteNumber(u.reduceDmg);
       if (reduceDmg && reduceDmg > 0){
         const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
-        Statuses.add(unit, Statuses.make.damageCut({ pct: reduceDmg, turns }));
+        const damageCut = makeStatusEffect('damageCut', { pct: reduceDmg, turns });
+        if (damageCut) {
+          Statuses.add(unit, damageCut);
+        }
       }
 
       busyMs = Math.max(busyMs, 1600);
@@ -1296,7 +1299,10 @@ function performUlt(unit: UnitToken): void {
       const reduce = Math.max(0, parseFiniteNumber(u.reduceDmg) ?? 0);
       if (reduce > 0){
         const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
-        Statuses.add(unit, Statuses.make.damageCut({ pct: reduce, turns }));
+        const damageCut = makeStatusEffect('damageCut', { pct: reduce, turns });
+        if (damageCut) {
+          Statuses.add(unit, damageCut);
+        }
       }
       {
         const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
@@ -1322,7 +1328,10 @@ function performUlt(unit: UnitToken): void {
         const tgt = foes[i];
         if (!tgt) continue;
         const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
-        Statuses.add(tgt, Statuses.make.sleep({ turns }));
+        const sleep = makeStatusEffect('sleep', { turns });
+        if (sleep) {
+          Statuses.add(tgt, sleep);
+        }
         const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
         if (sessionVfx) {
           try { vfxAddHit(sessionVfx, tgt); } catch(_){}
@@ -1352,7 +1361,10 @@ function performUlt(unit: UnitToken): void {
         setFury(ally, Math.max(0, parseFiniteNumber(u.revived?.rage) ?? 0));
         if (u.revived?.lockSkillsTurns){
           const silenceTurns = Math.max(1, Math.round(parseFiniteNumber(u.revived.lockSkillsTurns) ?? 1));
-          Statuses.add(ally, Statuses.make.silence({ turns: silenceTurns }));
+          const silence = makeStatusEffect('silence', { turns: silenceTurns });
+          if (silence) {
+            Statuses.add(ally, silence);
+          }
         }
         const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
         if (sessionVfx) {
@@ -1413,7 +1425,10 @@ function performUlt(unit: UnitToken): void {
       const pct = parseFiniteNumber(u.attackSpeed) ?? 0.1;
       for (const tgt of targets){
         const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
-        Statuses.add(tgt, Statuses.make.haste({ pct, turns }));
+        const haste = makeStatusEffect('haste', { pct, turns });
+        if (haste) {
+          Statuses.add(tgt, haste);
+        }
         const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
         if (sessionVfx) {
           try { vfxAddHit(sessionVfx, tgt); } catch(_){}
@@ -1618,10 +1633,12 @@ function tickMinionTTL(side: Side): void {
     if (!t.alive) continue;
     if (t.side !== side) continue;
     if (!t.isMinion) continue;
-    if (!Number.isFinite(t.ttlTurns)) continue;
+    const ttl = t.ttlTurns;
+    if (typeof ttl !== 'number' || !Number.isFinite(ttl)) continue;
 
-    t.ttlTurns -= 1;
-    if (t.ttlTurns <= 0) toRemove.push(t);
+    const nextTtl = ttl - 1;
+    t.ttlTurns = nextTtl;
+    if (nextTtl <= 0) toRemove.push(t);
   }
   // xoá ra khỏi tokens để không còn được vẽ/đi lượt
   for (const t of toRemove){
