@@ -15,7 +15,7 @@ import { nextTurnInterleaved } from './turns/interleaved.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { ActionChainProcessedResult, Side, UnitToken } from '@shared-types/units';
-import type { InterleavedState, InterleavedTurnState, QueuedSummonEntry, SequentialTurnState, TurnContext, TurnHooks } from '@shared-types/turn-order';
+import type { ActionResolution, InterleavedState, InterleavedTurnState, QueuedSummonEntry, SequentialTurnState, TurnContext, TurnHooks } from '@shared-types/turn-order';
 
 interface SpawnResult {
   actor: UnitToken | null;
@@ -233,13 +233,20 @@ export function spawnQueuedIfDue(
   return { actor: actor || null, spawned: true };
 }
 
+interface TickMinionTtlOptions {
+  consumed?: boolean;
+}
+
 // giảm TTL minion sau khi phe đó hoàn tất lượt của mình
 /**
  * @param {SessionState} Game
  * @param {string} side
+ * @param {TickMinionTtlOptions} options
  * @returns {void}
  */
-export function tickMinionTTL(Game: SessionState, side: Side): void {
+export function tickMinionTTL(Game: SessionState, side: Side, options: TickMinionTtlOptions = {}): void {
+  const consumed = options?.consumed ?? true;
+  if (!consumed) return;
   const toRemove: UnitToken[] = [];
   for (const t of Game.tokens){
     if (!t.alive) continue;
@@ -258,12 +265,54 @@ export function tickMinionTTL(Game: SessionState, side: Side): void {
   }
 }
 
+interface StrictActionResolution {
+  consumedTurn: boolean;
+  acted: boolean;
+  skipped: boolean;
+  reason: string | null;
+}
+
+const normalizeActionResolution = (outcome: unknown): StrictActionResolution | null => {
+  if (outcome == null) return null;
+  if (typeof outcome === 'boolean'){
+    const consumed = outcome;
+    return {
+      consumedTurn: consumed,
+      acted: consumed,
+      skipped: !consumed,
+      reason: null
+    };
+  }
+  if (typeof outcome !== 'object') return null;
+  const raw = outcome as ActionResolution & { action?: string | null };
+  const consumed = typeof raw.consumedTurn === 'boolean' ? raw.consumedTurn : true;
+  const acted = typeof raw.acted === 'boolean'
+    ? raw.acted
+    : (raw.action === 'basic' || raw.action === 'ult');
+  const skipped = typeof raw.skipped === 'boolean' ? raw.skipped : !acted;
+  const reason = typeof raw.reason === 'string' ? raw.reason : null;
+  return {
+    consumedTurn: consumed,
+    acted,
+    skipped,
+    reason
+  };
+};
+
+const consumedTurnFromOutcome = (outcome: StrictActionResolution | null, hadHook: boolean): boolean => {
+  if (!hadHook) return false;
+  if (!outcome) return true;
+  if (!outcome.consumedTurn) return false;
+  if (outcome.skipped && outcome.reason === 'systemError') return false;
+  return true;
+};
+
 // hành động 1 unit (ưu tiên ult nếu đủ nộ & không bị chặn)
 export function doActionOrSkip(
   Game: SessionState,
   unit: UnitToken | null | undefined,
   { performUlt, turnContext }: { performUlt?: TurnHooks['performUlt']; turnContext?: TurnContext } = {}
-): void {
+): ActionResolution {
   const ensureBusyReset = (): void => {
     if (!Game.turn) return;
     const now = safeNow();
@@ -280,6 +329,13 @@ export function doActionOrSkip(
   const orderLength = typeof turnContext?.orderLength === 'number'
     ? turnContext.orderLength
     : (sequentialSnapshot ? sequentialSnapshot.order.length : null);
+  
+  const resolution: ActionResolution = {
+    consumedTurn: true,
+    acted: false,
+    skipped: false,
+    reason: null
+  };
 
   const baseDetail = {
     game: Game,
@@ -302,8 +358,11 @@ export function doActionOrSkip(
   if (!unit || !unit.alive) {
     emitGameEvent(ACTION_START, baseDetail);
     ensureBusyReset();
+    resolution.acted = false;
+    resolution.skipped = true;
+    resolution.reason = 'missingUnit';
     finishAction({ skipped: true, reason: 'missingUnit' });
-    return;
+    return resolution;
   }
 
   const meta = Game.meta.get(unit.id);
@@ -318,8 +377,11 @@ export function doActionOrSkip(
   if (!Statuses.canAct(unit)) {
     Statuses.onTurnEnd(unit, {});
     ensureBusyReset();
+    resolution.acted = false;
+    resolution.skipped = true;
+    resolution.reason = 'status';
     finishAction({ skipped: true, reason: 'status' });
-    return;
+    return resolution;
   }
 
   const ultCost = resolveUltCost(unit, CFG);
@@ -338,8 +400,21 @@ export function doActionOrSkip(
     }
     Statuses.onTurnEnd(unit, {});
     ensureBusyReset();
-    finishAction({ action: 'ult', ultOk });
-    return;
+    const actionDetail: Record<string, unknown> = { action: 'ult', ultOk };
+    if (ultOk){
+      resolution.acted = true;
+      resolution.skipped = false;
+      resolution.reason = null;
+    } else {
+      resolution.acted = false;
+      resolution.skipped = true;
+      resolution.reason = 'ultFailed';
+      resolution.consumedTurn = false;
+      actionDetail.skipped = true;
+      actionDetail.reason = 'ultFailed';
+    }
+    finishAction(actionDetail);
+    return resolution;
   }
 
   const cap = typeof meta?.followupCap === 'number' ? (meta.followupCap | 0) : (CFG.FOLLOWUP_CAP_DEFAULT | 0);
@@ -347,7 +422,11 @@ export function doActionOrSkip(
   emitPassiveEvent(Game, unit, 'onActionEnd', { log: getPassiveLog(Game) });
   Statuses.onTurnEnd(unit, {});
   ensureBusyReset();
+  resolution.acted = true;
+  resolution.skipped = false;
+  resolution.reason = null;
   finishAction({ action: 'basic' });
+  return resolution;
 }
 
 // Bước con trỏ lượt (sparse-cursor) đúng đặc tả
@@ -421,8 +500,13 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
 
     emitGameEvent(TURN_START, turnDetail);
 
+  const actionHook = hooks.doActionOrSkip;
+    let actionOutcome: StrictActionResolution | null = null;
     try {
-      hooks.doActionOrSkip?.(Game, active, { performUlt: hooks.performUlt, turnContext });
+      if (typeof actionHook === 'function'){
+        const rawOutcome = actionHook(Game, active, { performUlt: hooks.performUlt, turnContext });
+        actionOutcome = normalizeActionResolution(rawOutcome);
+      }
       const chainHooks = { ...hooks, getTurnOrderIndex };
       const processed = hooks.processActionChain?.(Game, entry.side, entry.slot, chainHooks);
       turnDetail.processedChain = processed ?? null;
@@ -430,7 +514,8 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
       emitGameEvent(TURN_END, turnDetail);
     }
 
-    tickMinionTTL(Game, entry.side);
+    const consumed = consumedTurnFromOutcome(actionOutcome, typeof actionHook === 'function');
+    tickMinionTTL(Game, entry.side, { consumed });
     const ended = hooks.checkBattleEnd?.(Game, {
       trigger: 'interleaved',
       side: entry.side,
@@ -505,8 +590,13 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
     };
     emitGameEvent(TURN_START, turnDetail);
 
+  const actionHook = hooks.doActionOrSkip;
+    let actionOutcome: StrictActionResolution | null = null;
     try {
-      hooks.doActionOrSkip?.(Game, active, { performUlt: hooks.performUlt, turnContext });
+      if (typeof actionHook === 'function'){
+        const rawOutcome = actionHook(Game, active, { performUlt: hooks.performUlt, turnContext });
+        actionOutcome = normalizeActionResolution(rawOutcome);
+      }
       const chainHooks = { ...hooks, getTurnOrderIndex };
       const processed = hooks.processActionChain?.(Game, entry.side, entry.slot, chainHooks);
       turnDetail.processedChain = processed ?? null;
@@ -514,7 +604,8 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
       emitGameEvent(TURN_END, turnDetail);
     }
 
-    tickMinionTTL(Game, entry.side);
+    const consumed = consumedTurnFromOutcome(actionOutcome, typeof actionHook === 'function');
+    tickMinionTTL(Game, entry.side, { consumed });
 
     const ended = hooks.checkBattleEnd?.(Game, {
       trigger: 'sequential',
