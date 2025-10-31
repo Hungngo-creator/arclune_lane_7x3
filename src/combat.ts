@@ -4,7 +4,7 @@ import { slotToCell } from './engine.ts';
 import { emitPassiveEvent, getPassiveLog, type AfterHitHandler } from './passives.ts';
 import { CFG } from './config.ts';
 import { gainFury, startFurySkill, finishFuryHit } from './utils/fury.ts';
-import { safeNow } from './utils/time.ts';
+import { mergeBusyUntil, sessionNow } from './utils/time.ts';
 
 import type { DamageResult } from './statuses.ts';
 import type { SessionState } from '@shared-types/combat';
@@ -102,7 +102,7 @@ export function applyDamage(target: UnitToken, amount: number): void {
 
   if (target.hp <= 0) {
     if (target.alive !== false && !target.deadAt) {
-      target.deadAt = safeNow();
+      target.deadAt = sessionNow();
     }
     target.alive = false;
   }
@@ -246,13 +246,12 @@ export function basicAttack(Game: SessionState, unit: UnitToken): void {
   const updateTurnBusy = (startedAt: number, busyMs: number): void => {
     if (!Game.turn) return;
     if (!Number.isFinite(startedAt) || !Number.isFinite(busyMs)) return;
-    const prevBusy = Number.isFinite(Game.turn.busyUntil) ? Number(Game.turn.busyUntil) : 0;
-    Game.turn.busyUntil = Math.max(prevBusy, startedAt + busyMs);
+    Game.turn.busyUntil = mergeBusyUntil(Game.turn.busyUntil, startedAt, busyMs);
   };
 
   const triggerLightningArc = (timing: string): void => {
     if (!isLoithienanh || !sessionVfx) return;
-    const arcStart = safeNow();
+    const arcStart = sessionNow();
     try {
       const busyMs = vfxAddLightningArc(sessionVfx, unit, resolved, {
         bindingKey: 'basic_combo',
@@ -273,7 +272,7 @@ export function basicAttack(Game: SessionState, unit: UnitToken): void {
   emitPassiveEvent(Game, unit, 'onBasicHit', passiveCtx);
 
   const meleeDur = GAME_CONFIG.ANIMATION?.meleeDurationMs ?? 1100;
-  const meleeStartMs = safeNow();
+  const meleeStartMs = sessionNow();
   let meleeTriggered = false;
   if (sessionVfx) {
     try {
@@ -284,8 +283,7 @@ export function basicAttack(Game: SessionState, unit: UnitToken): void {
     }
   }
   if (meleeTriggered && Game.turn) {
-    const prevBusy = Number.isFinite(Game.turn.busyUntil) ? Number(Game.turn.busyUntil) : 0;
-    Game.turn.busyUntil = Math.max(prevBusy, meleeStartMs + meleeDur);
+    Game.turn.busyUntil = mergeBusyUntil(Game.turn.busyUntil, meleeStartMs, meleeDur);
   }
 
   const dtype = 'physical' as const;
