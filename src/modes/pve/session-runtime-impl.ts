@@ -46,7 +46,12 @@ import {
   addGameEventListener,
 } from '../../events';
 import { ensureNestedModuleSupport } from '../../utils/dummy';
-import { safeNow } from '../../utils/time';
+import {
+  mergeBusyUntil,
+  normalizeAnimationFrameTimestamp,
+  resetSessionTimeBase,
+  sessionNow,
+} from '../../utils/time';
 import { getSummonSpec, resolveSummonSlots } from '../../utils/kit';
 import {
   normalizeConfig,
@@ -572,7 +577,7 @@ const HAND_SIZE  = CFG.HAND_SIZE ?? 4;
 
 ensureNestedModuleSupport();
 
-const getNow = (): number => safeNow();
+const getNow = (): number => sessionNow();
 const SUPPORTS_PERF_NOW = typeof globalThis !== 'undefined'
   && !!globalThis.performance
   && typeof globalThis.performance.now === 'function';
@@ -625,6 +630,7 @@ function cleanupSummonBar(): void {
 function resetSessionState(options: StartConfigOverrides | null | undefined = {}): void {
   const overrides = toStartConfigOverrides(options);
   storedConfig = normalizeConfig({ ...storedConfig, ...overrides });
+  resetSessionTimeBase();
   Game = createSession(storedConfig);
   _IID = 1;
   _BORN = 1;
@@ -952,9 +958,8 @@ function extendBusy(duration: number): void {
   const game = getInitializedGame();
   if (!game || !game.turn) return;
   const now = getNow();
-  const prev = Number.isFinite(game.turn.busyUntil) ? game.turn.busyUntil : now;
   const dur = Math.max(0, duration|0);
-  game.turn.busyUntil = Math.max(prev, now + dur);
+  game.turn.busyUntil = mergeBusyUntil(game.turn.busyUntil, now, dur);
 }
 
 // Thực thi Ult: Summoner -> Immediate Summon theo meta; class khác: trừ nộ
@@ -1114,8 +1119,7 @@ function performUlt(unit: UnitToken): void {
         const resolved = duration as number;
         busyMs = Math.max(busyMs, resolved);
         if (game.turn){
-          const prev = Number.isFinite(game.turn.busyUntil) ? game.turn.busyUntil : startedAt;
-          game.turn.busyUntil = Math.max(prev, startedAt + resolved);
+          game.turn.busyUntil = mergeBusyUntil(game.turn.busyUntil, startedAt, resolved);
         }
       };
 
@@ -1556,7 +1560,7 @@ function finalizeBattle(
   if (game) game.result = result;
   if (game?.turn){
     game.turn.completed = true;
-    game.turn.busyUntil = finishedAt;
+    game.turn.busyUntil = mergeBusyUntil(game.turn.busyUntil, finishedAt, 0);
   }
   if (game === Game){
     running = false;
@@ -1896,9 +1900,12 @@ function init(): boolean {
       const fallbackNow = getNow();
       if (!isFiniteNumber(ts)) return fallbackNow;
       const rafTs = Number(ts);
-      if (rafTs < 0 || rafTs > RAF_TIMESTAMP_MAX) return fallbackNow;
-      if (!SUPPORTS_PERF_NOW) return fallbackNow;
-      return Math.abs(rafTs - fallbackNow) <= RAF_DRIFT_TOLERANCE_MS ? rafTs : fallbackNow;
+      if (!SUPPORTS_PERF_NOW && (rafTs < 0 || rafTs > RAF_TIMESTAMP_MAX)) return fallbackNow;
+      const normalized = normalizeAnimationFrameTimestamp(rafTs);
+      if (SUPPORTS_PERF_NOW && Math.abs(normalized - fallbackNow) > RAF_DRIFT_TOLERANCE_MS){
+        return fallbackNow;
+      }
+      return normalized;
     };
 
     const now = pickNow(timestamp);
