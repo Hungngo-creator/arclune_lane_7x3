@@ -824,13 +824,21 @@ function setUnitSkinForSession(unitId: string, skinKey: string | null | undefine
   if (!ok) return false;
   const art = getUnitArt(unitId);
   const resolvedSkin = art?.skinKey ?? null;
-  const primaryColor = art?.palette?.primary ?? null;
-  const resolveColor = (current: string | null | undefined): string => {
-    return primaryColor ?? current ?? DEFAULT_TOKEN_COLOR;
+  const palettePrimary = art?.palette?.primary;
+  const primaryColor = typeof palettePrimary === 'string' ? palettePrimary : null;
+  const resolveColor = (current: unknown): string => {
+    if (typeof primaryColor === 'string' && primaryColor.length > 0){
+      return primaryColor;
+    }
+    if (typeof current === 'string' && current.length > 0){
+      return current;
+    }
+    return DEFAULT_TOKEN_COLOR;
   };
   const applyArtMetadata = (entry: DeckEntry | null | undefined): void => {
     if (!entry || entry.id !== unitId) return;
-    const nextColor = resolveColor(entry.color);
+    const color = typeof entry.color === 'string' ? entry.color : null;
+    const nextColor = resolveColor(color);
     entry.art = art ?? null;
     entry.skinKey = resolvedSkin;
     entry.color = nextColor;
@@ -838,7 +846,8 @@ function setUnitSkinForSession(unitId: string, skinKey: string | null | undefine
   const tokens = Game.tokens || [];
   for (const token of tokens){
     if (!token || token.id !== unitId) continue;
-    const nextColor = resolveColor(token.color);
+    const color = typeof token.color === 'string' ? token.color : null;
+    const nextColor = resolveColor(color);
     token.art = art;
     token.skinKey = resolvedSkin;
     token.color = nextColor;
