@@ -21,10 +21,10 @@ let parseJsonConfigFileContent;
 let sys;
 
 const createMissingTypescriptError = () => {
-  const error = new Error(
-    'Không tìm thấy runtime TypeScript thật. Hãy sao chép thư mục "node_modules/typescript" từ một máy đã cài đầy đủ hoặc cài TypeScript trước khi bundle.',
-  );
+  const message = 'Không tìm thấy runtime TypeScript thật. Hãy sao chép thư mục "node_modules/typescript" từ một máy đã cài đầy đủ hoặc cài TypeScript trước khi bundle.';
+  const error = new Error(message);
   error.code = 'MISSING_TYPESCRIPT_RUNTIME';
+  error.help = 'Nếu đang làm việc ngoại tuyến, hãy sao chép thư viện TypeScript rồi chạy `node tools/install-stubs.mjs` để đảm bảo các stub được thiết lập đúng.';
   return error;
 };
 
