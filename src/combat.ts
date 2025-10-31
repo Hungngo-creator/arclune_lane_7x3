@@ -31,12 +31,12 @@ export interface AbilityDamageResult {
   total: number;
 }
 
-export interface BasicAttackAfterHitResult {
+export interface BasicAttackAfterHitResult extends Record<string, unknown> {
   dealt: number;
   absorbed: number;
 }
 
-export interface BasicAttackAfterHitArgs {
+export interface BasicAttackAfterHitArgs extends Record<string, unknown> {
   target: UnitToken;
   owner: UnitToken;
   result: BasicAttackAfterHitResult;
@@ -44,13 +44,13 @@ export interface BasicAttackAfterHitArgs {
 
 export type BasicAttackAfterHitHandler = (ctx: BasicAttackAfterHitArgs) => void;
 
-export interface BasicAttackContext {
+export interface BasicAttackContext extends Record<string, unknown> {
   target: UnitToken;
-  damage: {
+  damage: Record<string, unknown> & {
     baseMul: number;
     flatAdd: number;
   };
-  afterHit: AfterHitHandler[];
+  afterHit: Array<AfterHitHandler<Record<string, unknown>>>;
   log?: Array<Record<string, unknown>>;
 }
 
