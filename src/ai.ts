@@ -7,7 +7,7 @@ import { lookupUnit } from './units.ts';
 
 import type { AiCard, AiCardDeck, AiDeckEntry, AiDeckPool, SessionState } from '@shared-types/combat';
 import type { RosterUnitDefinition } from '@shared-types/config';
-import { createSummonQueue } from '@shared-types/units';
+import { createSummonQueue } from '@shared-types/units.ts';
 import type { SummonQueue, UnitId, UnitToken } from '@shared-types/units';
 
 type CandidateCell = { s: number; cx: number; cy: number };
