@@ -541,7 +541,7 @@ export const UNIT_ART: Record<string, UnitArtDefinition> = {
         anchor: 0.86,
         scale: 1.02,
         aspect: 0.8,
-        shadow: { color: 'rgba(18,28,38,0.55)', blur: 22, offsetY: 10 }
+        shadow: { color: 'rgba(18,28,38,0.55)', blur: 22, offsetX: 0, offsetY: 10 }
       }
     }
   }),
@@ -555,14 +555,14 @@ export const UNIT_ART: Record<string, UnitArtDefinition> = {
         anchor: 0.86,
         scale: 1.08,
         aspect: 0.8,
-        shadow: { color: 'rgba(20,62,84,0.6)', blur: 26, offsetY: 12 }
+        shadow: { color: 'rgba(20,62,84,0.6)', blur: 26, offsetX: 0, offsetY: 12 }
       },
       ascendant: {
         src: './dist/assets/units/leaderA/ascendant.svg',
         anchor: 0.86,
         scale: 1.08,
         aspect: 0.8,
-        shadow: { color: 'rgba(26,112,138,0.58)', blur: 28, offsetY: 12 }
+        shadow: { color: 'rgba(26,112,138,0.58)', blur: 28, offsetX: 0, offsetY: 12 }
       }
     }
   }),
@@ -576,14 +576,14 @@ export const UNIT_ART: Record<string, UnitArtDefinition> = {
         anchor: 0.88,
         scale: 1.12,
         aspect: 0.8,
-        shadow: { color: 'rgba(58,16,28,0.6)', blur: 28, offsetY: 12 }
+        shadow: { color: 'rgba(58,16,28,0.6)', blur: 28, offsetX: 0, offsetY: 12 }
       },
       nightfall: {
         src: './dist/assets/units/leaderB/nightfall.svg',
         anchor: 0.88,
         scale: 1.12,
         aspect: 0.8,
-        shadow: { color: 'rgba(48,12,44,0.6)', blur: 30, offsetY: 14 }
+        shadow: { color: 'rgba(48,12,44,0.6)', blur: 30, offsetX: 0, offsetY: 14 }
       }
     }
   }),
@@ -596,7 +596,7 @@ export const UNIT_ART: Record<string, UnitArtDefinition> = {
         anchor: 0.86,
         scale: 1.04,
         aspect: 0.8,
-        shadow: { color: 'rgba(34,20,68,0.55)', blur: 22, offsetY: 10 }
+        shadow: { color: 'rgba(34,20,68,0.55)', blur: 22, offsetX: 0, offsetY: 10 }
       }
     }
   }),
@@ -609,7 +609,7 @@ export const UNIT_ART: Record<string, UnitArtDefinition> = {
         anchor: 0.86,
         scale: 1.06,
         aspect: 0.8,
-        shadow: { color: 'rgba(64,32,14,0.58)', blur: 24, offsetY: 12 }
+        shadow: { color: 'rgba(64,32,14,0.58)', blur: 24, offsetX: 0, offsetY: 12 }
       }
     }
   }),
@@ -622,7 +622,7 @@ export const UNIT_ART: Record<string, UnitArtDefinition> = {
         anchor: 0.88,
         scale: 1.08,
         aspect: 0.8,
-        shadow: { color: 'rgba(22,52,70,0.55)', blur: 26, offsetY: 12 }
+        shadow: { color: 'rgba(22,52,70,0.55)', blur: 26, offsetX: 0, offsetY: 12 }
       }
     }
   }),
@@ -635,7 +635,7 @@ export const UNIT_ART: Record<string, UnitArtDefinition> = {
         anchor: 0.9,
         scale: 1.12,
         aspect: 0.8,
-        shadow: { color: 'rgba(86,34,82,0.55)', blur: 28, offsetY: 12 }
+        shadow: { color: 'rgba(86,34,82,0.55)', blur: 28, offsetX: 0, offsetY: 12 }
       }
     }
   }),
@@ -648,7 +648,7 @@ export const UNIT_ART: Record<string, UnitArtDefinition> = {
         anchor: 0.86,
         scale: 1.04,
         aspect: 0.8,
-        shadow: { color: 'rgba(28,78,70,0.55)', blur: 22, offsetY: 10 }
+        shadow: { color: 'rgba(28,78,70,0.55)', blur: 22, offsetX: 0, offsetY: 10 }
       }
     }
   }),
@@ -661,7 +661,7 @@ export const UNIT_ART: Record<string, UnitArtDefinition> = {
         anchor: 0.86,
         scale: 1.08,
         aspect: 0.8,
-        shadow: { color: 'rgba(52,36,14,0.58)', blur: 24, offsetY: 12 }
+        shadow: { color: 'rgba(52,36,14,0.58)', blur: 24, offsetX: 0, offsetY: 12 }
       }
     }
   }),
@@ -674,7 +674,7 @@ export const UNIT_ART: Record<string, UnitArtDefinition> = {
         anchor: 0.86,
         scale: 1.04,
         aspect: 0.8,
-        shadow: { color: 'rgba(26,60,88,0.55)', blur: 22, offsetY: 10 }
+        shadow: { color: 'rgba(26,60,88,0.55)', blur: 22, offsetX: 0, offsetY: 10 }
       }
     }
   }),
@@ -687,7 +687,7 @@ export const UNIT_ART: Record<string, UnitArtDefinition> = {
         anchor: 0.88,
         scale: 1.06,
         aspect: 0.8,
-        shadow: { color: 'rgba(32,54,76,0.55)', blur: 24, offsetY: 12 }
+        shadow: { color: 'rgba(32,54,76,0.55)', blur: 24, offsetX: 0, offsetY: 12 }
       }
     }
   }),
@@ -701,7 +701,7 @@ export const UNIT_ART: Record<string, UnitArtDefinition> = {
         anchor: 0.84,
         scale: 1,
         aspect: 0.8,
-        shadow: { color: 'rgba(58,42,20,0.58)', blur: 20, offsetY: 10 }
+        shadow: { color: 'rgba(58,42,20,0.58)', blur: 20, offsetX: 0, offsetY: 10 }
       }
     }
   })
