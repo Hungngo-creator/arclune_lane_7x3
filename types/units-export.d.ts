@@ -3,5 +3,5 @@ declare module '@shared-types/units-export' {
     FuryState,
     UnitId,
     UnitToken,
-  } from '../src/types/units.ts';
+  } from '../src/shared-types/units.ts';
 }

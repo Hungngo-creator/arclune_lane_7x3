@@ -76,8 +76,8 @@ declare module '@shared-types/units' {
     QueuedSummonState,
     ActionChainEntry,
     ActionChainProcessedResult,
-  } from '../src/types/units.ts';
-  export { createSummonQueue } from '../src/types/units.ts';
+  } from '../src/shared-types/units.ts';
+  export { createSummonQueue } from '../src/shared-types/units.ts';
 }
 
 declare module 'zod' {
