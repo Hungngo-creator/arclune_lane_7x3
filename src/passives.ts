@@ -104,6 +104,9 @@ const resolvePassiveEffect = (
       ? ((effect as PassiveEffectConfig).type || (effect as PassiveEffectConfig).kind || null)
       : null;
 
+  const gainStatsHandler: PassiveDefinition | null =
+    typeof EFFECTS.gainStats === 'function' ? EFFECTS.gainStats : null;
+
   let handler: PassiveDefinition | null = getRegisteredPassive(key);
   let params = basePassive.params as Record<string, unknown> | undefined;
   let resolved: PassiveSpec | null = basePassive;
@@ -131,10 +134,10 @@ const resolvePassiveEffect = (
     }
     params = mergedParams;
     if (!handler && (mergedParams.stats || mergedParams.flatStats)){
-      handler = EFFECTS.gainStats;
+      handler = gainStatsHandler;
     }
   } else if (!handler && basePassive.params && (basePassive.params.stats || basePassive.params.flatStats)){
-    handler = EFFECTS.gainStats;
+    handler = gainStatsHandler;
   }
 
   return { handler: handler ?? defaultPassive, passive: resolved, params, key };
