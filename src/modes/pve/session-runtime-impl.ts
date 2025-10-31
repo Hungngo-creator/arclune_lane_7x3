@@ -1894,23 +1894,24 @@ function init(): boolean {
   };
 
     const updateTimerAndCost = (timestamp?: number): void => {
-    if (!CLOCK || !Game) return;
-    if (Game.battle?.over) return;
+      if (!CLOCK || !Game) return;
+      if (Game.battle?.over) return;
 
-    const pickNow = (ts: number | undefined): number => {
-      const fallbackNow = getNow();
-      if (!isFiniteNumber(ts)) return fallbackNow;
-      const rafTs = Number(ts);
-      if (!SUPPORTS_PERF_NOW && (rafTs < 0 || rafTs > RAF_TIMESTAMP_MAX)) return fallbackNow;
-      const normalized = normalizeAnimationFrameTimestamp(rafTs);
-      if (SUPPORTS_PERF_NOW && Math.abs(normalized - fallbackNow) > RAF_DRIFT_TOLERANCE_MS){
-        return fallbackNow;
-      }
-      return normalized;
-    };
+      const pickNow = (ts: number | undefined): number => {
+        const fallbackNow = getNow();
+        if (!isFiniteNumber(ts)) return fallbackNow;
+        const rafTs = Number(ts);
+        if (!SUPPORTS_PERF_NOW && (rafTs < 0 || rafTs > RAF_TIMESTAMP_MAX)) return fallbackNow;
+        const normalized = normalizeAnimationFrameTimestamp(rafTs);
+       if (SUPPORTS_PERF_NOW && Math.abs(normalized - fallbackNow) > RAF_DRIFT_TOLERANCE_MS){
+          return fallbackNow;
+        }
+        return normalized;
+      };
 
     const now = pickNow(timestamp);
-    const elapsedSec = Math.floor((now - CLOCK.startMs) / 1000);
+    const sessionNowMs = getNow();
+    const elapsedSec = Math.floor((sessionNowMs - CLOCK.startMs) / 1000);
 
     const prevRemain = Number.isFinite(CLOCK.lastTimerRemain) ? CLOCK.lastTimerRemain : 0;
     const remain = Math.max(0, 240 - elapsedSec);
@@ -1923,7 +1924,7 @@ function init(): boolean {
     }
 
     if (remain <= 0 && prevRemain > 0){
-      const timeoutResult = checkBattleEndResult(Game, { trigger: 'timeout', remain, timestamp: now });
+      const timeoutResult = checkBattleEndResult(Game, { trigger: 'timeout', remain, timestamp: sessionNowMs });
       if (timeoutResult) return;
     }
 
@@ -1944,7 +1945,7 @@ function init(): boolean {
       aiMaybeAct(Game, 'cost');
     }
 
-   if (Game.battle?.over) return;
+    if (Game.battle?.over) return;
 
     const turnState = Game.turn ?? null;
     let busyUntil = 0;
@@ -1966,8 +1967,37 @@ function init(): boolean {
       CLOCK.turnEveryMs = turnEveryMs;
     }
 
-    if (now >= busyUntil && now - CLOCK.lastTurnStepMs >= turnEveryMs){
-      CLOCK.lastTurnStepMs = now;
+    const guardReferenceNow = Number.isFinite(now) ? now : sessionNowMs;
+    if (!Number.isFinite(CLOCK.lastTurnStepMs)){
+      CLOCK.lastTurnStepMs = guardReferenceNow - turnEveryMs;
+    }
+
+    const stallDeltaEpsilon = 1;
+    const stallDriftTolerance = Math.max(
+      stallDeltaEpsilon,
+      Math.min(turnEveryMs * 0.5, 240)
+    );
+
+    const rawElapsed = guardReferenceNow - CLOCK.lastTurnStepMs;
+    const sessionElapsed = sessionNowMs - CLOCK.lastTurnStepMs;
+    const readyBySession = sessionElapsed >= (turnEveryMs - stallDeltaEpsilon);
+    const readyByBusy = sessionNowMs >= busyUntil;
+
+    if (readyByBusy){
+      if (!Number.isFinite(rawElapsed) || rawElapsed < -stallDeltaEpsilon){
+        CLOCK.lastTurnStepMs = guardReferenceNow - turnEveryMs;
+      } else if ((rawElapsed + stallDeltaEpsilon) < turnEveryMs){
+        const sessionLead = sessionElapsed - rawElapsed;
+        if (readyBySession || sessionLead > stallDriftTolerance){
+          CLOCK.lastTurnStepMs = guardReferenceNow - turnEveryMs;
+        }
+      }
+    }
+
+    const elapsedForTurn = guardReferenceNow - CLOCK.lastTurnStepMs;
+
+    if (readyByBusy && elapsedForTurn >= turnEveryMs){
+      CLOCK.lastTurnStepMs = guardReferenceNow;
       stepTurn(Game, {
         performUlt,
         processActionChain,
@@ -1977,8 +2007,8 @@ function init(): boolean {
           return Boolean(checkBattleEndResult(gameState, info));
         },
       });
-      cleanupDead(now);
-      const postTurnResult = checkBattleEndResult(Game, { trigger: 'post-turn', timestamp: now });
+      cleanupDead(sessionNowMs);
+      const postTurnResult = checkBattleEndResult(Game, { trigger: 'post-turn', timestamp: sessionNowMs });
       if (postTurnResult){
         scheduleDraw();
         return;
