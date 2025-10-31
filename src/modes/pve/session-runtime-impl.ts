@@ -1549,7 +1549,9 @@ function finalizeBattle(
     } catch (_) {}
     scheduleDraw();
   }
-  emitGameEvent(BATTLE_END, { game, result, context });
+  if (game){
+    emitGameEvent(BATTLE_END, { game, result, context });
+  }
   return result;
 }
 
@@ -1678,7 +1680,8 @@ function init(): boolean {
     hudCleanup = null;
   }
   hud = initHUD(doc, root ?? undefined);
-  hudCleanup = hud ? () => hud.cleanup() : null;
+  const currentHud = hud;
+  hudCleanup = currentHud ? () => currentHud.cleanup() : null;
   resize();
   if (Game.grid) spawnLeaders(Game.tokens, Game.grid);
 
@@ -1721,16 +1724,27 @@ function init(): boolean {
   cleanupSummonBar();
   const barHandle = startSummonBar(doc, {
     onPick: (card): void => {
+      const game = getInitializedGame();
+      if (!game) return;
       const entry = asDeckEntry(card);
-      Game.selectedId = entry.id;
+      game.selectedId = entry.id;
       renderSummonBar();
     },
     canAfford: (card): boolean => {
+      const game = getInitializedGame();
+      if (!game) return false;
       const entry = asDeckEntry(card);
-      return Game.cost >= getCardCost(entry);
+      return game.cost >= getCardCost(entry);
     },
-    getDeck: () => ensureDeck(),
-    getSelectedId: () => Game.selectedId,
+    getDeck: (): DeckEntry[] => {
+      const game = getInitializedGame();
+      if (!game) return [] as DeckEntry[];
+      return ensureDeck();
+    },
+    getSelectedId: (): string | null => {
+      const game = getInitializedGame();
+      return game ? game.selectedId : null;
+    },
   }, root ?? undefined);
   summonBarHandle = barHandle;
   Game.ui.bar = barHandle;
@@ -1744,10 +1758,12 @@ function init(): boolean {
   }
   canvasClickHandler = (ev: MouseEvent): void => {
     const game = getInitializedGame();
-    if (!canvas || !game?.grid) return;
+    if (!canvas || !game) return;
+    const { grid } = game;
+    if (!grid) return;
     const rect = canvas.getBoundingClientRect();
     const p = { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
-    const cell = hitToCellOblique(game.grid, p.x, p.y, CAM_PRESET);
+    const cell = hitToCellOblique(grid, p.x, p.y, CAM_PRESET);
     if (!cell) return;
 
     if (cell.cx >= CFG.ALLY_COLS) return;
