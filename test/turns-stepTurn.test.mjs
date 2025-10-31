@@ -186,6 +186,100 @@ async function loadTurnsHarness(overrides = {}){
   return { ...context.module.exports, deps, eventLog };
 }
 
+async function loadSummonHarness(overrides = {}){
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  const filePath = path.resolve(here, '../src/summon.ts');
+  let code = await fs.readFile(filePath, 'utf8');
+
+  const replacements = new Map([
+    ["import { slotToCell, cellReserved } from './engine.ts';", "const { slotToCell, cellReserved } = __deps['./engine.js'];"],
+    ["import { asSessionWithVfx, vfxAddSpawn } from './vfx.ts';", "const { asSessionWithVfx, vfxAddSpawn } = __deps['./vfx.ts'];"],
+    ["import { getUnitArt } from './art.ts';", "const { getUnitArt } = __deps['./art.ts'];"],
+    ["import { kitSupportsSummon } from './utils/kit.ts';", "const { kitSupportsSummon } = __deps['./utils/kit.ts'];"],
+    ["import { prepareUnitForPassives, applyOnSpawnEffects } from './passives.ts';", "const { prepareUnitForPassives, applyOnSpawnEffects } = __deps['./passives.ts'];"],
+    ["import { prepareUnitForPassives, applyOnSpawnEffects } from './passives.js';", "const { prepareUnitForPassives, applyOnSpawnEffects } = __deps['./passives.ts'];"],
+  ]);
+
+  for (const [needle, replacement] of replacements.entries()){
+    code = code.replace(needle, replacement);
+  }
+
+  code = code.replace(/export function /g, 'function ');
+  code = code.replace(/export const /g, 'const ');
+  const transpiled = ts.transpileModule(code, {
+    compilerOptions: {
+      module: ts.ModuleKind.CommonJS,
+      target: ts.ScriptTarget.ES2020,
+      importsNotUsedAsValues: ts.ImportsNotUsedAsValues.Remove,
+      esModuleInterop: true
+    },
+    fileName: 'summon.ts'
+  });
+  code = transpiled.outputText;
+  code += '\nmodule.exports = { enqueueImmediate, processActionChain };\n';
+
+  const defaultDeps = {
+    './engine.js': {
+      slotToCell(side, slot){
+        const index = Math.max(0, (slot|0) - 1);
+        const baseCol = Math.floor(index / 3);
+        const cy = index % 3;
+        const cx = side === 'enemy' ? baseCol + 3 : baseCol;
+        return { cx, cy };
+      },
+      cellReserved(tokens = [], queued = { ally: new Map(), enemy: new Map() }, cx, cy){
+        const occupied = Array.isArray(tokens)
+          && tokens.some(t => t && t.alive && t.cx === cx && t.cy === cy);
+        if (occupied) return true;
+        const checkQueued = (sideMap) => {
+          if (!sideMap || typeof sideMap.forEach !== 'function') return false;
+          let found = false;
+          sideMap.forEach((entries) => {
+            if (found) return;
+            if (!Array.isArray(entries)) return;
+            for (const item of entries){
+              if (item && item.cx === cx && item.cy === cy){
+                found = true;
+                break;
+              }
+            }
+          });
+          return found;
+        };
+        return checkQueued(queued?.ally) || checkQueued(queued?.enemy);
+      }
+    },
+    './vfx.ts': {
+      asSessionWithVfx(){ return null; },
+      vfxAddSpawn(){ }
+    },
+    './art.ts': {
+      getUnitArt(){ return {}; }
+    },
+    './utils/kit.ts': {
+      kitSupportsSummon(){ return true; }
+    },
+    './passives.ts': {
+      prepareUnitForPassives(){ },
+      applyOnSpawnEffects(){ }
+    }
+  };
+
+  const deps = { ...defaultDeps, ...overrides };
+  deps['../engine.js'] = deps['../engine.js'] || deps['./engine.js'];
+  deps['../passives.ts'] = deps['../passives.ts'] || deps['./passives.ts'];
+
+  const context = {
+    module: { exports: {} },
+    exports: {},
+    __deps: deps
+  };
+  vm.createContext(context);
+  const script = new vm.Script(code, { filename: 'summon.ts' });
+  script.runInContext(context);
+  return { ...context.module.exports, deps };
+}
+
 test('slot 8 leader takes consecutive turns when order is mostly empty', async () => {
   const harness = await loadTurnsHarness();
   const { stepTurn, deps, eventLog } = harness;
@@ -340,6 +434,138 @@ test('PvE session spawn leader và stepTurn chọn được actor ngay sau khi k
     session.stop();
     clearModuleCache();
   }
+});
+
+test('leader trao đổi đòn đánh thường khi stepTurn chạy nhiều lượt', async () => {
+  const damageLog = [];
+  const harness = await loadTurnsHarness({
+    './combat.js': {
+      doBasicWithFollowups(Game, unit){
+        const opponent = Game.tokens.find((t) => t.alive && t.side !== unit.side);
+        if (!opponent) return;
+        opponent.hp = (opponent.hp ?? 0) - 10;
+        damageLog.push({ attacker: unit.id, target: opponent.id, hp: opponent.hp });
+      }
+    }
+  });
+
+  const { stepTurn, doActionOrSkip, deps, eventLog } = harness;
+  const allyPos = deps['./engine.js'].slotToCell('ally', 5);
+  const enemyPos = deps['./engine.js'].slotToCell('enemy', 5);
+  const leaderA = { id: 'leaderA', side: 'ally', alive: true, hp: 100, hpMax: 100, ...allyPos };
+  const leaderB = { id: 'leaderB', side: 'enemy', alive: true, hp: 100, hpMax: 100, ...enemyPos };
+
+  const Game = {
+    tokens: [leaderA, leaderB],
+    meta: new Map(),
+    queued: { ally: new Map(), enemy: new Map() },
+    actionChain: [],
+    turn: {
+      order: [
+        { side: 'ally', slot: 5 },
+        { side: 'enemy', slot: 5 }
+      ],
+      cursor: 0,
+      cycle: 0,
+      orderIndex: new Map()
+    }
+  };
+
+  const actionHook = (game, unit, ctx) => doActionOrSkip(game, unit, ctx);
+
+  stepTurn(Game, {
+    doActionOrSkip: actionHook,
+    processActionChain(){
+      return null;
+    }
+  });
+
+  stepTurn(Game, {
+    doActionOrSkip: actionHook,
+    processActionChain(){
+      return null;
+    }
+  });
+
+  const allyEnd = eventLog.filter((ev) => ev.type === 'ACTION_END' && ev.detail?.unit?.id === 'leaderA');
+  const enemyEnd = eventLog.filter((ev) => ev.type === 'ACTION_END' && ev.detail?.unit?.id === 'leaderB');
+
+  assert.ok(damageLog.length >= 1, 'Phải có ít nhất một hành động BASIC gây sát thương');
+  assert.ok(leaderA.hp < 100 || leaderB.hp < 100, 'HP của một leader phải giảm sau đòn đánh');
+  assert.ok(
+    allyEnd.some((ev) => ev.detail?.action === 'basic')
+      || enemyEnd.some((ev) => ev.detail?.action === 'basic'),
+    'eventLog phải ghi nhận ACTION_END với action="basic" cho leader'
+  );
+});
+
+test('creep triệu hồi hành động trước khi TTL bị trừ', async () => {
+  const turnsHarness = await loadTurnsHarness();
+  const { stepTurn, doActionOrSkip, deps } = turnsHarness;
+  const summonHarness = await loadSummonHarness({
+    './engine.js': deps['./engine.js'],
+    './art.ts': deps['./art.ts'],
+    './passives.ts': deps['./passives.ts']
+  });
+
+  const { enqueueImmediate, processActionChain } = summonHarness;
+  const slotToCell = deps['./engine.js'].slotToCell;
+
+  const allyLeader = { id: 'leaderA', side: 'ally', alive: true, ...slotToCell('ally', 1) };
+  const enemyLeader = { id: 'leaderB', side: 'enemy', alive: true, ...slotToCell('enemy', 1) };
+
+  const Game = {
+    tokens: [allyLeader, enemyLeader],
+    meta: new Map(),
+    queued: { ally: new Map(), enemy: new Map() },
+    actionChain: [],
+    turn: {
+      order: [
+        { side: 'ally', slot: 1 },
+        { side: 'enemy', slot: 1 }
+      ],
+      cursor: 0,
+      cycle: 0,
+      orderIndex: new Map()
+    }
+  };
+
+  const initialTtl = 2;
+  const enqueueOk = enqueueImmediate(Game, {
+    side: 'ally',
+    slot: 2,
+    unit: {
+      id: 'creepAlpha',
+      name: 'Creep',
+      isMinion: true,
+      ttlTurns: initialTtl,
+      hp: 5,
+      hpMax: 5
+    }
+  });
+  assert.ok(enqueueOk, 'enqueueImmediate phải trả về true khi slot còn trống');
+  assert.strictEqual(Game.actionChain.length, 1, 'actionChain phải chứa yêu cầu summon vừa thêm');
+
+  let ttlDuringAction = null;
+  const actionHook = (game, unit, ctx) => {
+    if (unit?.id === 'creepAlpha'){
+      ttlDuringAction = unit.ttlTurns;
+    }
+    return doActionOrSkip(game, unit, ctx);
+  };
+
+  stepTurn(Game, {
+    doActionOrSkip: actionHook,
+    processActionChain(Game, side, slot, chainHooks){
+      return processActionChain(Game, side, slot, chainHooks);
+    }
+  });
+
+  const creepToken = Game.tokens.find((t) => t.id === 'creepAlpha');
+  assert.ok(creepToken, 'Creep phải tồn tại trong Game.tokens sau processActionChain');
+  assert.strictEqual(ttlDuringAction, initialTtl, 'TTL phải được kiểm tra trước khi bị trừ');
+  assert.strictEqual(creepToken.ttlTurns, initialTtl - 1, 'TTL phải giảm sau khi phe hoàn tất lượt');
+  assert.strictEqual(Game.actionChain.length, 0, 'actionChain phải được dọn sạch sau khi xử lý');
 });
 
 test('sparse turn order keeps alternating across cycles', async () => {
