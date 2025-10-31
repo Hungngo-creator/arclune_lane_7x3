@@ -1,0 +1,61 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "useDefineForClassFields": true,
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@core/*": ["src/core/*", "src/*"],
+      "@combat/*": ["src/combat/*"],
+      "@data/*": ["src/data/*"],
+      "@utils/*": ["src/utils/*"],
+      "@screens/*": ["src/screens/*"],
+      "@modes/*": ["src/modes/*"],
+      "@app/*": ["src/app/*"],
+      "@ui/*": [
+        "src/ui/*",
+        "src/scene/*",
+        "src/background/*",
+        "src/vfx/*",
+        "src/art/*"
+      ],
+      "@shared-types/config": [
+        "types/@shared-types/config.d.ts",
+        "src/types/config.ts"
+      ],
+      "@shared-types/units": [
+        "types/@shared-types/units.d.ts",
+        "src/types/units.ts"
+      ],
+      "@shared-types/vfx": [
+        "types/@shared-types/vfx.d.ts",
+        "src/types/vfx.ts"
+      ],
+      "@shared-types/*": [
+        "types/@shared-types/*.d.ts",
+        "types/*.d.ts",
+        "src/types/*"
+      ],
+      "zod": ["tools/zod-stub/index.d.ts"]
+    }
+  },
+  "include": [
+    "src/**/*",
+    "types/**/*",
+    "test/**/*",
+    "simulations/**/*",
+    "coming-soon.stub.ts"
+  ]
+}

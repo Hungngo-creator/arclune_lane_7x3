@@ -11,7 +11,8 @@
     "test": "jest --runInBand",
     "ci": "npm run typecheck && npm test && npm run build",
     "typecheck": "tsc --noEmit",
-    "postinstall": "node tools/install-stubs.mjs"
+    "postinstall": "node tools/install-stubs.mjs",
+    "typecheck:all": "tsc --noEmit -p tsconfig.all.json"
   },
   "keywords": [],
   "author": "",
