@@ -13,6 +13,7 @@ describe('PvE RAF fallback khi thiếu performance.now()', () => {
   const originalCancelAnimationFrame = global.cancelAnimationFrame;
   const originalTimeModule = stubModules.get(TIME_MODULE_KEY);
   const originalTurnsModule = stubModules.get(TURNS_MODULE_KEY);
+  const configModule = stubModules.get('./config.js');
 
   let currentTime;
   let usePerfNow;
@@ -23,6 +24,8 @@ describe('PvE RAF fallback khi thiếu performance.now()', () => {
   let stepTurnSpy;
   let rafCallbacks;
   let view;
+  let freezeRafTimestamp;
+  let frozenRafValue;
 
   beforeEach(() => {
     clearModuleCache();
@@ -37,6 +40,8 @@ describe('PvE RAF fallback khi thiếu performance.now()', () => {
     let sessionOffset = 0;
     let sessionReady = false;
     let rafOffset = null;
+    freezeRafTimestamp = false;
+    frozenRafValue = null;
 
     const safeNowImpl = (): number => {
       if (usePerfNow) {
@@ -91,6 +96,12 @@ describe('PvE RAF fallback khi thiếu performance.now()', () => {
       const fallback = sessionNowStub();
       if (!Number.isFinite(timestamp)) return fallback;
       const numeric = Number(timestamp);
+      if (freezeRafTimestamp){
+        if (!Number.isFinite(frozenRafValue)){
+          frozenRafValue = fallback;
+        }
+        return frozenRafValue;
+      }
       if (rafOffset === null){
         rafOffset = fallback - numeric;
         return fallback;
@@ -126,6 +137,12 @@ describe('PvE RAF fallback khi thiếu performance.now()', () => {
     global.cancelAnimationFrame = undefined;
 
     rafCallbacks = [];
+    if (configModule?.CFG){
+      if (!configModule.CFG.ANIMATION){
+        configModule.CFG.ANIMATION = {};
+      }
+      configModule.CFG.ANIMATION.turnIntervalMs = 600;
+    }
     view = {
       requestAnimationFrame: jest.fn((cb) => {
         rafCallbacks.push(cb);
@@ -283,6 +300,156 @@ describe('PvE RAF fallback khi thiếu performance.now()', () => {
         game.turn.busyUntil = 0;
       }
       current += 800;
+      tick?.(current);
+      expect(stepTurnSpy).toHaveBeenCalledTimes(round);
+      expect(view.requestAnimationFrame).toHaveBeenCalledTimes(round + 1);
+      expect(rafCallbacks.length).toBeGreaterThan(0);
+    }
+
+    session.stop();
+  });
+  
+  it('khôi phục turn interval mặc định khi cấu hình lỗi', () => {
+    if (configModule?.CFG?.ANIMATION){
+      configModule.CFG.ANIMATION.turnIntervalMs = 0;
+    }
+
+    const boardContext = {
+      canvas: null,
+      setTransform: jest.fn(),
+      resetTransform: jest.fn(),
+      scale: jest.fn(),
+      clearRect: jest.fn(),
+      drawImage: jest.fn(),
+    };
+    const board = {
+      width: 700,
+      height: 600,
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      getContext: jest.fn(() => boardContext),
+      getBoundingClientRect: jest.fn(() => ({ left: 0, top: 0 })),
+    };
+    boardContext.canvas = board;
+
+    const timerEl = { textContent: '' };
+
+    const documentStub = {
+      querySelector: jest.fn((selector) => {
+        if (selector === '#board') return board;
+        if (selector === '#timer') return timerEl;
+        return null;
+      }),
+      getElementById: jest.fn((id) => {
+        if (id === 'board') return board;
+        if (id === 'timer') return timerEl;
+        return null;
+      }),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      defaultView: view,
+      hidden: false,
+    };
+    const root = {
+      ownerDocument: documentStub,
+      querySelector: (selector) => documentStub.querySelector(selector),
+    };
+    board.ownerDocument = documentStub;
+
+    const sessionModule = loadSessionModule();
+    const { createPveSession, __getActiveGame } = sessionModule;
+
+    const session = createPveSession(root);
+    const game = session.start();
+
+    expect(game).not.toBeNull();
+    expect(__getActiveGame()).toBe(game);
+    expect(view.requestAnimationFrame).toHaveBeenCalled();
+    expect(rafCallbacks.length).toBeGreaterThan(0);
+
+    if (game?.turn){
+      game.turn.busyUntil = 0;
+    }
+
+    const tick = rafCallbacks.shift();
+    expect(typeof tick).toBe('function');
+
+    let current = Number(safeNowStub.mock.results[0]?.value ?? 0);
+    current += 800;
+    currentTime = current;
+    tick?.(current);
+
+    expect(stepTurnSpy).toHaveBeenCalledTimes(1);
+
+    session.stop();
+  });
+
+  it('reset nhịp khi timestamp requestAnimationFrame đứng yên', () => {
+    const boardContext = {
+      canvas: null,
+      setTransform: jest.fn(),
+      resetTransform: jest.fn(),
+      scale: jest.fn(),
+      clearRect: jest.fn(),
+      drawImage: jest.fn(),
+    };
+    const board = {
+      width: 700,
+      height: 600,
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      getContext: jest.fn(() => boardContext),
+      getBoundingClientRect: jest.fn(() => ({ left: 0, top: 0 })),
+    };
+    boardContext.canvas = board;
+
+    const timerEl = { textContent: '' };
+
+    const documentStub = {
+      querySelector: jest.fn((selector) => {
+        if (selector === '#board') return board;
+        if (selector === '#timer') return timerEl;
+        return null;
+      }),
+      getElementById: jest.fn((id) => {
+        if (id === 'board') return board;
+        if (id === 'timer') return timerEl;
+        return null;
+      }),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      defaultView: view,
+      hidden: false,
+    };
+    const root = {
+      ownerDocument: documentStub,
+      querySelector: (selector) => documentStub.querySelector(selector),
+    };
+    board.ownerDocument = documentStub;
+
+    freezeRafTimestamp = true;
+
+    const sessionModule = loadSessionModule();
+    const { createPveSession, __getActiveGame } = sessionModule;
+
+    const session = createPveSession(root);
+    const game = session.start();
+
+    expect(game).not.toBeNull();
+    expect(__getActiveGame()).toBe(game);
+    expect(view.requestAnimationFrame).toHaveBeenCalled();
+    expect(rafCallbacks.length).toBeGreaterThan(0);
+
+    let current = Number(safeNowStub.mock.results[0]?.value ?? 0);
+
+    for (let round = 1; round <= 2; round += 1){
+      const tick = rafCallbacks.shift();
+      expect(typeof tick).toBe('function');
+      if (game?.turn){
+        game.turn.busyUntil = 0;
+      }
+      current += 650;
+      currentTime = current;
       tick?.(current);
       expect(stepTurnSpy).toHaveBeenCalledTimes(round);
       expect(view.requestAnimationFrame).toHaveBeenCalledTimes(round + 1);
