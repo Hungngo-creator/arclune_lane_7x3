@@ -1699,10 +1699,33 @@ function init(): boolean {
   hud = initHUD(doc, root ?? undefined);
   const currentHud = hud;
   hudCleanup = currentHud ? () => currentHud.cleanup() : null;
-  resize();
-  if (Game.grid) spawnLeaders(Game.tokens, Game.grid);
+  const tokens = Array.isArray(Game.tokens) ? Game.tokens : [];
+  if (!Array.isArray(Game.tokens)){
+    Game.tokens = tokens;
+  }
 
-  const tokens = Game.tokens || [];
+  resize();
+
+  let spawnGrid: GridSpec | null = (Game.grid ?? null) as GridSpec | null;
+  if (!spawnGrid){
+    const parsedCols = parseFiniteNumber(CFG?.GRID_COLS);
+    const parsedRows = parseFiniteNumber(CFG?.GRID_ROWS);
+    const fallbackCols = parsedCols !== null && parsedCols > 0
+      ? Math.max(1, Math.floor(parsedCols))
+      : 7;
+    const fallbackRows = parsedRows !== null && parsedRows > 0
+      ? Math.max(1, Math.floor(parsedRows))
+      : 3;
+    spawnGrid = makeGrid(canvas ?? null, fallbackCols, fallbackRows);
+  }
+
+  if (spawnGrid){
+    spawnLeaders(tokens, spawnGrid);
+    if (!Game.grid){
+      Game.grid = spawnGrid;
+    }
+  }
+
   const sessionVfx = ensureSessionWithVfx(Game, { requireGrid: true });
   if (sessionVfx){
     for (const t of tokens){
