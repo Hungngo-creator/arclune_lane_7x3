@@ -72,6 +72,9 @@ import type {
   SessionRuntimeState,
   CreateSessionOptions,
   SessionState,
+  SummonSpec,
+  SummonCreepSpec,
+  SummonInheritSpec,
 } from '@shared-types/pve';
 import type { HudHandles, SummonBarHandles } from '@shared-types/ui';
 import type { CameraPreset } from '@shared-types/config';
@@ -106,49 +109,6 @@ type DeckEntry = PveDeckEntry;
 type GridSpec = ReturnType<typeof makeGrid>;
 
 type InitializedSessionState = SessionState & { _inited: true };
-
-interface SummonInheritSpec extends Record<string, unknown> {
-  HP?: number | string | null;
-  hp?: number | string | null;
-  HPMax?: number | string | null;
-  hpMax?: number | string | null;
-  ATK?: number | string | null;
-  atk?: number | string | null;
-  WIL?: number | string | null;
-  wil?: number | string | null;
-  RES?: number | string | null;
-  res?: number | string | null;
-  ARM?: number | string | null;
-  arm?: number | string | null;
-}
-
-interface SummonCreepSpec extends Record<string, unknown> {
-  id?: string | null;
-  name?: string | null;
-  label?: string | null;
-  color?: string | null;
-  isMinion?: boolean | null;
-  ttl?: number | string | null;
-  ttlTurns?: number | string | null;
-  skinKey?: string | null;
-}
-
-interface SummonSpec extends Record<string, unknown> {
-  pattern?: string | null;
-  placement?: string | null;
-  patternKey?: string | null;
-  shape?: string | null;
-  area?: string | null;
-  slots?: ReadonlyArray<number> | null;
-  count?: number | string | null;
-  summonCount?: number | string | null;
-  ttl?: number | string | null;
-  ttlTurns?: number | string | null;
-  inherit?: SummonInheritSpec | null;
-  limit?: number | string | null;
-  replace?: string | null;
-  creep?: SummonCreepSpec | null;
-}
 
 interface SkillRuntime extends Record<string, unknown> {
   hits?: number | string | null;
@@ -296,6 +256,17 @@ const coerceSummonCreep = (value: unknown): SummonCreepSpec | null => {
 const coerceSummonSpec = (value: unknown): SummonSpec | null => {
   if (!value || typeof value !== 'object') return null;
   const spec = { ...(value as SummonSpec) };
+  const sanitizeString = (input: unknown): string | undefined => {
+    if (typeof input !== 'string') return undefined;
+    const trimmed = input.trim();
+    return trimmed ? trimmed : undefined;
+  };
+  spec.pattern = sanitizeString(spec.pattern);
+  spec.placement = sanitizeString(spec.placement);
+  spec.patternKey = sanitizeString(spec.patternKey);
+  spec.shape = sanitizeString(spec.shape);
+  spec.area = sanitizeString(spec.area);
+  spec.replace = sanitizeString(spec.replace);
   if (Array.isArray(spec.slots)){
     spec.slots = spec.slots
       .map((slot) => parseFiniteNumber(slot))
@@ -988,6 +959,11 @@ function performUlt(unit: UnitToken): void {
 
   const summonSpecRaw = meta.class === 'Summoner' ? getSummonSpec(meta) : null;
   const summonSpec = meta.class === 'Summoner' ? coerceSummonSpec(summonSpecRaw) : null;
+  if (summonSpec){
+    summonSpec.pattern = typeof summonSpec.pattern === 'string'
+      ? (summonSpec.pattern.trim() || undefined)
+      : undefined;
+  }
   if (meta.class === 'Summoner' && summonSpec){
     const aliveNow = tokensAlive();
     const queued = game.queued || { ally: new Map(), enemy: new Map() };
