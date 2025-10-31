@@ -69,3 +69,78 @@ describe('Ulti Trần Quát - TTL creep', () => {
     expect(creep).toBeUndefined();
   });
 });
+
+it('không trừ TTL creep của Trần Quát khi lượt ult bị bỏ qua vì lỗi đồng hồ', async () => {
+  const turnsHarness = await loadTurnsHarness();
+  const { stepTurn, doActionOrSkip: realDoActionOrSkip, deps } = turnsHarness;
+  const slotToCell = deps['./engine.js'].slotToCell;
+
+  const tranQuat = {
+    id: 'tranquat',
+    side: 'ally',
+    alive: true,
+    fury: 100,
+    ...slotToCell('ally', 1)
+  };
+  const enemyLeader = {
+    id: 'enemyLeader',
+    side: 'enemy',
+    alive: true,
+    ...slotToCell('enemy', 1)
+  };
+  const creep = {
+    id: 'creepFollower',
+    side: 'ally',
+    alive: true,
+    isMinion: true,
+    ttlTurns: 3,
+    ...slotToCell('ally', 2)
+  };
+
+  const Game = {
+    tokens: [tranQuat, enemyLeader, creep],
+    meta: new Map([[tranQuat.id, {}]]),
+    queued: { ally: new Map(), enemy: new Map() },
+    turn: {
+      order: [
+        { side: 'ally', slot: 1 },
+        { side: 'enemy', slot: 1 },
+      ],
+      cursor: 0,
+      cycle: 0,
+      orderIndex: new Map(),
+    },
+  };
+
+  let glitch = true;
+  let ultCasted = 0;
+  const hooks = {
+    performUlt(unit){
+      if (unit?.id === tranQuat.id){
+        ultCasted += 1;
+      }
+    },
+    doActionOrSkip(game, unit, options = {}){
+      if (unit?.id === tranQuat.id && glitch){
+        glitch = false;
+        return { consumedTurn: false, skipped: true, reason: 'systemError' };
+      }
+      return realDoActionOrSkip(game, unit, options);
+    },
+    processActionChain(){
+      return null;
+    },
+  };
+
+  const initialTtl = creep.ttlTurns;
+
+  stepTurn(Game, hooks);
+  expect(creep.ttlTurns).toBe(initialTtl);
+
+  stepTurn(Game, hooks);
+  expect(creep.ttlTurns).toBe(initialTtl);
+
+  stepTurn(Game, hooks);
+  expect(creep.ttlTurns).toBe(initialTtl - 1);
+  expect(ultCasted).toBe(1);
+});
