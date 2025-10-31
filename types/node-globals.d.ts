@@ -21,35 +21,38 @@ interface ReadFileOptions {
 }
 
 declare module 'fs/promises' {
-  const fsPromises: {
-    readdir(path: string, options: { withFileTypes: true }): Promise<DirentLike[]>;
-    readdir(path: string, options?: ReaddirOptions): Promise<string[]>;
-    readFile(path: string, options: ReadFileOptions | string): Promise<string>;
-    writeFile(path: string, data: string, options?: WriteFileOptions | string): Promise<void>;
-    mkdir(path: string, options?: MkdirOptions): Promise<void>;
-  };
-  export default fsPromises;
+  const fsPromises: any;
+  export = fsPromises;
 }
 
 declare module 'path' {
-  function join(...parts: string[]): string;
-  function resolve(...parts: string[]): string;
-  function dirname(path: string): string;
-  function relative(from: string, to: string): string;
-  const sep: string;
-  export { dirname, join, relative, resolve, sep };
-  export default {
-    join,
-    resolve,
-    dirname,
-    relative,
-    sep,
-  };
+  const pathModule: any;
+  export = pathModule;
 }
 
 declare module 'url' {
-  function fileURLToPath(url: string | URL): string;
-  export { fileURLToPath };
+  const urlModule: any;
+  export = urlModule;
+}
+
+declare module 'vm' {
+  const vmModule: any;
+  export = vmModule;
+}
+
+declare module 'assert/strict' {
+  const assert: any;
+  export = assert;
+}
+
+declare module 'child_process' {
+  const childProcess: any;
+  export = childProcess;
+}
+
+declare module 'node:*' {
+  const value: any;
+  export = value;
 }
 
 declare namespace NodeJS {
