@@ -573,6 +573,11 @@ const HAND_SIZE  = CFG.HAND_SIZE ?? 4;
 ensureNestedModuleSupport();
 
 const getNow = (): number => safeNow();
+const SUPPORTS_PERF_NOW = typeof globalThis !== 'undefined'
+  && !!globalThis.performance
+  && typeof globalThis.performance.now === 'function';
+const RAF_TIMESTAMP_MAX = 2_147_483_647; // ~24 ngày tính từ mốc điều hướng
+const RAF_DRIFT_TOLERANCE_MS = 120_000;   // 2 phút – đủ rộng cho mọi sai lệch hợp lệ
 
 // --- Instance counters (để gắn id cho token/minion) ---
 let _IID = 1;
@@ -1864,7 +1869,16 @@ function init(): boolean {
     if (!CLOCK || !Game) return;
     if (Game.battle?.over) return;
 
-    const now = Number.isFinite(timestamp) ? Number(timestamp) : getNow();
+    const pickNow = (ts: number | undefined): number => {
+      const fallbackNow = getNow();
+      if (!isFiniteNumber(ts)) return fallbackNow;
+      const rafTs = Number(ts);
+      if (rafTs < 0 || rafTs > RAF_TIMESTAMP_MAX) return fallbackNow;
+      if (!SUPPORTS_PERF_NOW) return fallbackNow;
+      return Math.abs(rafTs - fallbackNow) <= RAF_DRIFT_TOLERANCE_MS ? rafTs : fallbackNow;
+    };
+
+    const now = pickNow(timestamp);
     const elapsedSec = Math.floor((now - CLOCK.startMs) / 1000);
 
     const prevRemain = Number.isFinite(CLOCK.lastTimerRemain) ? CLOCK.lastTimerRemain : 0;
@@ -1901,8 +1915,27 @@ function init(): boolean {
 
    if (Game.battle?.over) return;
 
-    const busyUntil = Game.turn?.busyUntil ?? 0;
-    if (now >= busyUntil && now - CLOCK.lastTurnStepMs >= CLOCK.turnEveryMs){
+    const turnState = Game.turn ?? null;
+    let busyUntil = 0;
+    if (turnState){
+      const rawBusy = turnState.busyUntil;
+      busyUntil = isFiniteNumber(rawBusy) && rawBusy > 0 ? rawBusy : 0;
+      if (!isFiniteNumber(rawBusy) || rawBusy <= 0){
+        turnState.busyUntil = busyUntil;
+      }
+    }
+
+    const cfgTurnEvery = CFG?.ANIMATION?.turnIntervalMs;
+    const defaultTurnEveryMs = Number.isFinite(cfgTurnEvery) && cfgTurnEvery && cfgTurnEvery > 0
+      ? cfgTurnEvery
+      : 600;
+    let turnEveryMs = CLOCK.turnEveryMs;
+    if (!Number.isFinite(turnEveryMs) || turnEveryMs <= 0){
+      turnEveryMs = defaultTurnEveryMs;
+      CLOCK.turnEveryMs = turnEveryMs;
+    }
+
+    if (now >= busyUntil && now - CLOCK.lastTurnStepMs >= turnEveryMs){
       CLOCK.lastTurnStepMs = now;
       stepTurn(Game, {
         performUlt,
