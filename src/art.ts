@@ -468,24 +468,26 @@ function makeArt(pattern: string, paletteInput: UnitArtPalette, opts: MakeArtOpt
   const skinsInput = opts.skins ?? (opts.sprite ? { [defaultSkinKey]: opts.sprite } : null);
   const normalizedSkins: Record<string, UnitArtSprite> = {};
   const anchor = layout.anchor ?? 0.78;
-  if (skinsInput){
-    for (const [key, conf] of Object.entries(skinsInput)){
+  if (skinsInput) {
+    for (const [key, conf] of Object.entries(skinsInput)) {
       const normalized = normalizeSpriteEntry(conf, { anchor, shadow });
       if (!normalized) continue;
-      normalizedSkins[key] = {
+      const sprite = {
         ...normalized,
         key,
         skinId: typeof normalized.skinId === 'string' ? normalized.skinId : key,
-      };
+      }as UnitArtSprite;
+      normalizedSkins[key] = sprite;
     }
-  } else if (opts.sprite !== null && spriteFactory){
+  } else if (opts.sprite !== null && spriteFactory) {
     const generated = normalizeSpriteEntry({ src: spriteFactory(normalizedPalette) }, { anchor, shadow });
-    if (generated){
-      normalizedSkins[defaultSkinKey] = {
+    if (generated) {
+      const sprite = {
         ...generated,
         key: defaultSkinKey,
         skinId: typeof generated.skinId === 'string' ? generated.skinId : defaultSkinKey,
-      };
+      }as UnitArtSprite;
+      normalizedSkins[defaultSkinKey] = sprite;
     }
   }
 
