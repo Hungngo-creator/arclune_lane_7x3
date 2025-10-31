@@ -23,6 +23,14 @@ describe('loadConfig helper', () => {
   });
 
   it('ném lỗi khi dữ liệu không khớp schema', () => {
-    expect(() => loadConfig(rawInvalidConfig, SampleSchema)).toThrow(/Không thể tải cấu hình/);
+    let captured: unknown;
+    try {
+      loadConfig(rawInvalidConfig, SampleSchema);
+    } catch (error) {
+      captured = error;
+    }
+
+    expect(captured).not.toBeUndefined();
+    expect(String(captured)).toContain('Không thể tải cấu hình');
   });
 });

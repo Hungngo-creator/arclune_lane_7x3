@@ -26,7 +26,7 @@ describe('basic attack afterHit type guard', () => {
     const owner = makeUnit('owner');
     const captured: BasicAttackAfterHitArgs[] = [];
 
-    const handler: AfterHitHandler = ctx => {
+    const handler: AfterHitHandler = (ctx: unknown) => {
       const record = (ctx ?? {}) as Record<string, unknown>;
       captured.push({
         target: (record.target as UnitToken) ?? target,
@@ -50,7 +50,9 @@ describe('basic attack afterHit type guard', () => {
       result: { dealt: 10, absorbed: 2 },
     };
 
-    filtered[0](args);
+    const [firstHandler] = filtered;
+    expect(firstHandler).not.toBeUndefined();
+    firstHandler?.(args);
 
     expect(captured).toEqual([args]);
   });

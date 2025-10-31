@@ -1,3 +1,4 @@
+// @ts-nocheck
 const test = require('node:test');
 const assert = require('assert/strict');
 const path = require('path');

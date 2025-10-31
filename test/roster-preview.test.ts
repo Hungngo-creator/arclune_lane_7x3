@@ -1,4 +1,4 @@
-import { strict as assert } from 'node:assert/strict';
+import assert from 'node:assert/strict';
 
 import {
   CLASS_BASE,
@@ -39,13 +39,18 @@ describe('roster preview data integrity', () => {
   test('final stat computation khớp catalog', () => {
     for (const id of SAMPLE_IDS) {
       const meta = ROSTER.find((unit) => unit.id === id);
-      assert.ok(meta, `Thiếu roster entry cho ${id}`);
+      if (!meta) {
+        throw new Error(`Thiếu roster entry cho ${id}`);
+      }
       const expected = applyRankAndMods(
         CLASS_BASE[meta.class as keyof typeof CLASS_BASE],
         meta.rank as keyof typeof RANK_MULT,
         meta.mods,
       );
       const allocation = ROSTER_TP_ALLOCATIONS[id];
+      if (!allocation) {
+        throw new Error(`Thiếu TP allocation cho ${id}`);
+      }
       const finalFromTp = computeFinalStats(
         meta.class as keyof typeof CLASS_BASE,
         meta.rank as keyof typeof RANK_MULT,
@@ -71,6 +76,9 @@ describe('roster preview data integrity', () => {
       const base = CLASS_BASE[unit.class as keyof typeof CLASS_BASE];
       const derived = deriveTpFromMods(base, unit.mods);
       const allocation = ROSTER_TP_ALLOCATIONS[unit.id];
+      if (!allocation) {
+        throw new Error(`Thiếu TP allocation cho ${unit.id}`);
+      }
       for (const stat of Object.keys(derived)) {
         assert.ok(stat in allocation, `Thiếu TP stat ${stat} cho ${unit.id}`);
       }
@@ -81,7 +89,9 @@ describe('roster preview data integrity', () => {
     for (const row of ROSTER_PREVIEW_ROWS) {
       for (const entry of row.values) {
         const preview = ROSTER_PREVIEWS[entry.id];
-        assert.ok(preview, `Thiếu preview cho ${entry.id}`);
+        if (!preview) {
+          throw new Error(`Thiếu preview cho ${entry.id}`);
+        }
         assert.strictEqual(
           entry.value,
           preview.final[row.stat],
@@ -94,7 +104,9 @@ describe('roster preview data integrity', () => {
   test('rank multiplier trong preview khớp catalog', () => {
     for (const unit of ROSTER) {
       const preview = ROSTER_PREVIEWS[unit.id];
-      assert.ok(preview, `Thiếu preview cho ${unit.id}`);
+      if (!preview) {
+        throw new Error(`Thiếu preview cho ${unit.id}`);
+      }
       assert.strictEqual(
         preview.rankMultiplier,
         RANK_MULT[unit.rank as keyof typeof RANK_MULT],
