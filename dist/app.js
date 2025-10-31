@@ -7648,6 +7648,11 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   const HAND_SIZE = (_a = CFG.HAND_SIZE) !== null && _a !== void 0 ? _a : 4;
   ensureNestedModuleSupport();
   const getNow = () => safeNow();
+  const SUPPORTS_PERF_NOW = typeof globalThis !== 'undefined'
+      && !!globalThis.performance
+      && typeof globalThis.performance.now === 'function';
+  const RAF_TIMESTAMP_MAX = 2147483647; // ~24 ngày tính từ mốc điều hướng
+  const RAF_DRIFT_TOLERANCE_MS = 120000; // 2 phút – đủ rộng cho mọi sai lệch hợp lệ
   // --- Instance counters (để gắn id cho token/minion) ---
   let _IID = 1;
   let _BORN = 1;
@@ -9004,7 +9009,18 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               return;
           if ((_a = Game.battle) === null || _a === void 0 ? void 0 : _a.over)
               return;
-          const now = Number.isFinite(timestamp) ? Number(timestamp) : getNow();
+          const pickNow = (ts) => {
+              const fallbackNow = getNow();
+              if (!isFiniteNumber(ts))
+                  return fallbackNow;
+              const rafTs = Number(ts);
+              if (rafTs < 0 || rafTs > RAF_TIMESTAMP_MAX)
+                  return fallbackNow;
+              if (!SUPPORTS_PERF_NOW)
+                  return fallbackNow;
+              return Math.abs(rafTs - fallbackNow) <= RAF_DRIFT_TOLERANCE_MS ? rafTs : fallbackNow;
+          };
+          const now = pickNow(timestamp);
           const elapsedSec = Math.floor((now - CLOCK.startMs) / 1000);
           const prevRemain = Number.isFinite(CLOCK.lastTimerRemain) ? CLOCK.lastTimerRemain : 0;
           const remain = Math.max(0, 240 - elapsedSec);
@@ -9039,8 +9055,25 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           }
           if ((_b = Game.battle) === null || _b === void 0 ? void 0 : _b.over)
               return;
-          const busyUntil = (_d = (_c = Game.turn) === null || _c === void 0 ? void 0 : _c.busyUntil) !== null && _d !== void 0 ? _d : 0;
-          if (now >= busyUntil && now - CLOCK.lastTurnStepMs >= CLOCK.turnEveryMs) {
+          const turnState = (_c = Game.turn) !== null && _c !== void 0 ? _c : null;
+          let busyUntil = 0;
+          if (turnState) {
+              const rawBusy = turnState.busyUntil;
+              busyUntil = isFiniteNumber(rawBusy) && rawBusy > 0 ? rawBusy : 0;
+              if (!isFiniteNumber(rawBusy) || rawBusy <= 0) {
+                  turnState.busyUntil = busyUntil;
+              }
+          }
+          const cfgTurnEvery = (_d = CFG === null || CFG === void 0 ? void 0 : CFG.ANIMATION) === null || _d === void 0 ? void 0 : _d.turnIntervalMs;
+          const defaultTurnEveryMs = Number.isFinite(cfgTurnEvery) && cfgTurnEvery && cfgTurnEvery > 0
+              ? cfgTurnEvery
+              : 600;
+          let turnEveryMs = CLOCK.turnEveryMs;
+          if (!Number.isFinite(turnEveryMs) || turnEveryMs <= 0) {
+              turnEveryMs = defaultTurnEveryMs;
+              CLOCK.turnEveryMs = turnEveryMs;
+          }
+          if (now >= busyUntil && now - CLOCK.lastTurnStepMs >= turnEveryMs) {
               CLOCK.lastTurnStepMs = now;
               stepTurn(Game, {
                   performUlt,
