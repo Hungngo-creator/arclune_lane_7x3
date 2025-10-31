@@ -404,6 +404,20 @@ export const Statuses: StatusService = {
   make: statusFactories,
 };
 
+export function makeStatusEffect<K extends keyof StatusRegistry>(
+  key: K,
+  spec?: Parameters<StatusRegistry[K]>[0],
+): ReturnType<StatusRegistry[K]> | null {
+  const factory = Statuses.make[key];
+  if (typeof factory === 'function') {
+    return factory(spec);
+  }
+  if (typeof console !== 'undefined' && typeof console.warn === 'function') {
+    console.warn(`[Statuses] Không tìm thấy factory cho hiệu ứng "${String(key)}".`);
+  }
+  return null;
+}
+
 export function applyStatus(unit: UnitToken | null | undefined, status: StatusEffect): StatusEffect | null {
   if (!unit) return null;
   return Statuses.add(unit, status);
