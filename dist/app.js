@@ -814,19 +814,20 @@ __define('./art.ts', (exports, module, __require) => {
       return Object.prototype.hasOwnProperty.call(UNIT_ART, key);
   }
   function getArtEntry(key) {
-      var _a;
+      const fallback = UNIT_ART.default;
       if (hasArtEntry(key)) {
-          const entry = (_a = UNIT_ART[key]) !== null && _a !== void 0 ? _a : UNIT_ART.default;
-          return entry;
+          const entry = UNIT_ART[key];
+          return entry !== null && entry !== void 0 ? entry : fallback;
       }
-      return UNIT_ART.default;
+      return fallback;
   }
   function getBaseArt(id) {
-      const fallback = getArtEntry('default');
+      const fallback = UNIT_ART.default;
       if (!id)
           return fallback;
       if (hasArtEntry(id)) {
-          return getArtEntry(id);
+          const baseArt = UNIT_ART[id];
+          return baseArt !== null && baseArt !== void 0 ? baseArt : fallback;
       }
       if (id.endsWith('_minion')) {
           const base = id.replace(/_minion$/, '');
@@ -1055,21 +1056,23 @@ __define('./art.ts', (exports, module, __require) => {
               const normalized = normalizeSpriteEntry(conf, { anchor, shadow });
               if (!normalized)
                   continue;
-              normalizedSkins[key] = {
+              const sprite = {
                   ...normalized,
                   key,
                   skinId: typeof normalized.skinId === 'string' ? normalized.skinId : key,
               };
+              normalizedSkins[key] = sprite;
           }
       }
       else if (opts.sprite !== null && spriteFactory) {
           const generated = normalizeSpriteEntry({ src: spriteFactory(normalizedPalette) }, { anchor, shadow });
           if (generated) {
-              normalizedSkins[defaultSkinKey] = {
+              const sprite = {
                   ...generated,
                   key: defaultSkinKey,
                   skinId: typeof generated.skinId === 'string' ? generated.skinId : defaultSkinKey,
               };
+              normalizedSkins[defaultSkinKey] = sprite;
           }
       }
       const preferredKey = normalizedSkins[defaultSkinKey]
@@ -1105,8 +1108,9 @@ __define('./art.ts', (exports, module, __require) => {
       minion: { primary: '#ffd27d', secondary: '#5a3a17', accent: '#fff4cc', outline: '#452b0f' }
   };
   function getBasePalette(name) {
-      var _a;
-      return (_a = basePalettes[name]) !== null && _a !== void 0 ? _a : basePalettes.default;
+      const palette = basePalettes[name];
+      const fallback = basePalettes.default;
+      return palette !== null && palette !== void 0 ? palette : fallback;
   }
   const UNIT_ART = {
       default: makeArt('sentinel', getBasePalette('default'), {
@@ -1117,7 +1121,7 @@ __define('./art.ts', (exports, module, __require) => {
                   anchor: 0.86,
                   scale: 1.02,
                   aspect: 0.8,
-                  shadow: { color: 'rgba(18,28,38,0.55)', blur: 22, offsetY: 10 }
+                  shadow: { color: 'rgba(18,28,38,0.55)', blur: 22, offsetX: 0, offsetY: 10 }
               }
           }
       }),
@@ -1131,14 +1135,14 @@ __define('./art.ts', (exports, module, __require) => {
                   anchor: 0.86,
                   scale: 1.08,
                   aspect: 0.8,
-                  shadow: { color: 'rgba(20,62,84,0.6)', blur: 26, offsetY: 12 }
+                  shadow: { color: 'rgba(20,62,84,0.6)', blur: 26, offsetX: 0, offsetY: 12 }
               },
               ascendant: {
                   src: './dist/assets/units/leaderA/ascendant.svg',
                   anchor: 0.86,
                   scale: 1.08,
                   aspect: 0.8,
-                  shadow: { color: 'rgba(26,112,138,0.58)', blur: 28, offsetY: 12 }
+                  shadow: { color: 'rgba(26,112,138,0.58)', blur: 28, offsetX: 0, offsetY: 12 }
               }
           }
       }),
@@ -1152,14 +1156,14 @@ __define('./art.ts', (exports, module, __require) => {
                   anchor: 0.88,
                   scale: 1.12,
                   aspect: 0.8,
-                  shadow: { color: 'rgba(58,16,28,0.6)', blur: 28, offsetY: 12 }
+                  shadow: { color: 'rgba(58,16,28,0.6)', blur: 28, offsetX: 0, offsetY: 12 }
               },
               nightfall: {
                   src: './dist/assets/units/leaderB/nightfall.svg',
                   anchor: 0.88,
                   scale: 1.12,
                   aspect: 0.8,
-                  shadow: { color: 'rgba(48,12,44,0.6)', blur: 30, offsetY: 14 }
+                  shadow: { color: 'rgba(48,12,44,0.6)', blur: 30, offsetX: 0, offsetY: 14 }
               }
           }
       }),
@@ -1172,7 +1176,7 @@ __define('./art.ts', (exports, module, __require) => {
                   anchor: 0.86,
                   scale: 1.04,
                   aspect: 0.8,
-                  shadow: { color: 'rgba(34,20,68,0.55)', blur: 22, offsetY: 10 }
+                  shadow: { color: 'rgba(34,20,68,0.55)', blur: 22, offsetX: 0, offsetY: 10 }
               }
           }
       }),
@@ -1185,7 +1189,7 @@ __define('./art.ts', (exports, module, __require) => {
                   anchor: 0.86,
                   scale: 1.06,
                   aspect: 0.8,
-                  shadow: { color: 'rgba(64,32,14,0.58)', blur: 24, offsetY: 12 }
+                  shadow: { color: 'rgba(64,32,14,0.58)', blur: 24, offsetX: 0, offsetY: 12 }
               }
           }
       }),
@@ -1198,7 +1202,7 @@ __define('./art.ts', (exports, module, __require) => {
                   anchor: 0.88,
                   scale: 1.08,
                   aspect: 0.8,
-                  shadow: { color: 'rgba(22,52,70,0.55)', blur: 26, offsetY: 12 }
+                  shadow: { color: 'rgba(22,52,70,0.55)', blur: 26, offsetX: 0, offsetY: 12 }
               }
           }
       }),
@@ -1211,7 +1215,7 @@ __define('./art.ts', (exports, module, __require) => {
                   anchor: 0.9,
                   scale: 1.12,
                   aspect: 0.8,
-                  shadow: { color: 'rgba(86,34,82,0.55)', blur: 28, offsetY: 12 }
+                  shadow: { color: 'rgba(86,34,82,0.55)', blur: 28, offsetX: 0, offsetY: 12 }
               }
           }
       }),
@@ -1224,7 +1228,7 @@ __define('./art.ts', (exports, module, __require) => {
                   anchor: 0.86,
                   scale: 1.04,
                   aspect: 0.8,
-                  shadow: { color: 'rgba(28,78,70,0.55)', blur: 22, offsetY: 10 }
+                  shadow: { color: 'rgba(28,78,70,0.55)', blur: 22, offsetX: 0, offsetY: 10 }
               }
           }
       }),
@@ -1237,7 +1241,7 @@ __define('./art.ts', (exports, module, __require) => {
                   anchor: 0.86,
                   scale: 1.08,
                   aspect: 0.8,
-                  shadow: { color: 'rgba(52,36,14,0.58)', blur: 24, offsetY: 12 }
+                  shadow: { color: 'rgba(52,36,14,0.58)', blur: 24, offsetX: 0, offsetY: 12 }
               }
           }
       }),
@@ -1250,7 +1254,7 @@ __define('./art.ts', (exports, module, __require) => {
                   anchor: 0.86,
                   scale: 1.04,
                   aspect: 0.8,
-                  shadow: { color: 'rgba(26,60,88,0.55)', blur: 22, offsetY: 10 }
+                  shadow: { color: 'rgba(26,60,88,0.55)', blur: 22, offsetX: 0, offsetY: 10 }
               }
           }
       }),
@@ -1263,7 +1267,7 @@ __define('./art.ts', (exports, module, __require) => {
                   anchor: 0.88,
                   scale: 1.06,
                   aspect: 0.8,
-                  shadow: { color: 'rgba(32,54,76,0.55)', blur: 24, offsetY: 12 }
+                  shadow: { color: 'rgba(32,54,76,0.55)', blur: 24, offsetX: 0, offsetY: 12 }
               }
           }
       }),
@@ -1277,7 +1281,7 @@ __define('./art.ts', (exports, module, __require) => {
                   anchor: 0.84,
                   scale: 1,
                   aspect: 0.8,
-                  shadow: { color: 'rgba(58,42,20,0.58)', blur: 20, offsetY: 10 }
+                  shadow: { color: 'rgba(58,42,20,0.58)', blur: 20, offsetX: 0, offsetY: 10 }
               }
           }
       })
@@ -7252,6 +7256,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   const aiMaybeAct = __dep4.aiMaybeAct;
   const __dep5 = __require('./statuses.ts');
   const Statuses = __dep5.Statuses;
+  const makeStatusEffect = __dep5.makeStatusEffect;
   const __dep6 = __require('./config.ts');
   const CFG = __dep6.CFG;
   const CAM = __dep6.CAM;
@@ -7393,6 +7398,18 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       if (!value || typeof value !== 'object')
           return null;
       const spec = { ...value };
+      const sanitizeString = (input) => {
+          if (typeof input !== 'string')
+              return undefined;
+          const trimmed = input.trim();
+          return trimmed ? trimmed : undefined;
+      };
+      spec.pattern = sanitizeString(spec.pattern);
+      spec.placement = sanitizeString(spec.placement);
+      spec.patternKey = sanitizeString(spec.patternKey);
+      spec.shape = sanitizeString(spec.shape);
+      spec.area = sanitizeString(spec.area);
+      spec.replace = sanitizeString(spec.replace);
       if (Array.isArray(spec.slots)) {
           spec.slots = spec.slots
               .map((slot) => parseFiniteNumber(slot))
@@ -7891,7 +7908,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       apply(Game.queued.enemy);
   }
   function setUnitSkinForSession(unitId, skinKey) {
-      var _a, _b, _c;
+      var _a, _b;
       if (!Game)
           return false;
       const ok = setUnitSkin(unitId, skinKey);
@@ -7899,15 +7916,22 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           return false;
       const art = getUnitArt(unitId);
       const resolvedSkin = (_a = art === null || art === void 0 ? void 0 : art.skinKey) !== null && _a !== void 0 ? _a : null;
-      const primaryColor = (_c = (_b = art === null || art === void 0 ? void 0 : art.palette) === null || _b === void 0 ? void 0 : _b.primary) !== null && _c !== void 0 ? _c : null;
+      const palettePrimary = (_b = art === null || art === void 0 ? void 0 : art.palette) === null || _b === void 0 ? void 0 : _b.primary;
+      const primaryColor = typeof palettePrimary === 'string' ? palettePrimary : null;
       const resolveColor = (current) => {
-          var _a;
-          return (_a = primaryColor !== null && primaryColor !== void 0 ? primaryColor : current) !== null && _a !== void 0 ? _a : DEFAULT_TOKEN_COLOR;
+          if (typeof primaryColor === 'string' && primaryColor.length > 0) {
+              return primaryColor;
+          }
+          if (typeof current === 'string' && current.length > 0) {
+              return current;
+          }
+          return DEFAULT_TOKEN_COLOR;
       };
       const applyArtMetadata = (entry) => {
           if (!entry || entry.id !== unitId)
               return;
-          const nextColor = resolveColor(entry.color);
+          const color = typeof entry.color === 'string' ? entry.color : null;
+          const nextColor = resolveColor(color);
           entry.art = art !== null && art !== void 0 ? art : null;
           entry.skinKey = resolvedSkin;
           entry.color = nextColor;
@@ -7916,7 +7940,8 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       for (const token of tokens) {
           if (!token || token.id !== unitId)
               continue;
-          const nextColor = resolveColor(token.color);
+          const color = typeof token.color === 'string' ? token.color : null;
+          const nextColor = resolveColor(color);
           token.art = art;
           token.skinKey = resolvedSkin;
           token.color = nextColor;
@@ -8076,10 +8101,16 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       const slot = slotIndex(unit.side, unit.cx, unit.cy);
       const summonSpecRaw = meta.class === 'Summoner' ? getSummonSpec(meta) : null;
       const summonSpec = meta.class === 'Summoner' ? coerceSummonSpec(summonSpecRaw) : null;
+      if (summonSpec) {
+          summonSpec.pattern = typeof summonSpec.pattern === 'string'
+              ? (summonSpec.pattern.trim() || undefined)
+              : undefined;
+      }
       if (meta.class === 'Summoner' && summonSpec) {
           const aliveNow = tokensAlive();
           const queued = game.queued || { ally: new Map(), enemy: new Map() };
-          const patternSlots = resolveSummonSlots(summonSpec, slot)
+          const slotsSource = summonSpec;
+          const patternSlots = resolveSummonSlots(slotsSource, slot)
               .filter((s) => typeof s === 'number' && Number.isFinite(s))
               .filter((s) => {
               const { cx, cy } = slotToCell(unit.side, s);
@@ -8348,7 +8379,10 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               const reduceDmg = parseFiniteNumber(u.reduceDmg);
               if (reduceDmg && reduceDmg > 0) {
                   const turns = getUltDurationTurns(u, (_7 = parseFiniteNumber(u.turns)) !== null && _7 !== void 0 ? _7 : 1);
-                  Statuses.add(unit, Statuses.make.damageCut({ pct: reduceDmg, turns }));
+                  const damageCut = makeStatusEffect('damageCut', { pct: reduceDmg, turns });
+                  if (damageCut) {
+                      Statuses.add(unit, damageCut);
+                  }
               }
               busyMs = Math.max(busyMs, 1600);
               break;
@@ -8409,7 +8443,10 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               const reduce = Math.max(0, (_14 = parseFiniteNumber(u.reduceDmg)) !== null && _14 !== void 0 ? _14 : 0);
               if (reduce > 0) {
                   const turns = getUltDurationTurns(u, (_15 = parseFiniteNumber(u.turns)) !== null && _15 !== void 0 ? _15 : 1);
-                  Statuses.add(unit, Statuses.make.damageCut({ pct: reduce, turns }));
+                  const damageCut = makeStatusEffect('damageCut', { pct: reduce, turns });
+                  if (damageCut) {
+                      Statuses.add(unit, damageCut);
+                  }
               }
               {
                   const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
@@ -8439,7 +8476,10 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   if (!tgt)
                       continue;
                   const turns = getUltDurationTurns(u, (_16 = parseFiniteNumber(u.turns)) !== null && _16 !== void 0 ? _16 : 1);
-                  Statuses.add(tgt, Statuses.make.sleep({ turns }));
+                  const sleep = makeStatusEffect('sleep', { turns });
+                  if (sleep) {
+                      Statuses.add(tgt, sleep);
+                  }
                   const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
                   if (sessionVfx) {
                       try {
@@ -8473,7 +8513,10 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   setFury(ally, Math.max(0, (_22 = parseFiniteNumber((_21 = u.revived) === null || _21 === void 0 ? void 0 : _21.rage)) !== null && _22 !== void 0 ? _22 : 0));
                   if ((_23 = u.revived) === null || _23 === void 0 ? void 0 : _23.lockSkillsTurns) {
                       const silenceTurns = Math.max(1, Math.round((_24 = parseFiniteNumber(u.revived.lockSkillsTurns)) !== null && _24 !== void 0 ? _24 : 1));
-                      Statuses.add(ally, Statuses.make.silence({ turns: silenceTurns }));
+                      const silence = makeStatusEffect('silence', { turns: silenceTurns });
+                      if (silence) {
+                          Statuses.add(ally, silence);
+                      }
                   }
                   const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
                   if (sessionVfx) {
@@ -8542,7 +8585,10 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               const pct = (_25 = parseFiniteNumber(u.attackSpeed)) !== null && _25 !== void 0 ? _25 : 0.1;
               for (const tgt of targets) {
                   const turns = getUltDurationTurns(u, (_26 = parseFiniteNumber(u.turns)) !== null && _26 !== void 0 ? _26 : 1);
-                  Statuses.add(tgt, Statuses.make.haste({ pct, turns }));
+                  const haste = makeStatusEffect('haste', { pct, turns });
+                  if (haste) {
+                      Statuses.add(tgt, haste);
+                  }
                   const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
                   if (sessionVfx) {
                       try {
@@ -8668,10 +8714,12 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           catch (_) { }
           scheduleDraw();
       }
-      emitGameEvent(BATTLE_END, { game, result, context });
+      if (game) {
+          emitGameEvent(BATTLE_END, { game, result, context });
+      }
       return result;
   }
-  function checkBattleEnd(game, context = {}) {
+  function checkBattleEndResult(game, context = {}) {
       if (!game)
           return null;
       const battle = ensureBattleState(game);
@@ -8757,10 +8805,12 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               continue;
           if (!t.isMinion)
               continue;
-          if (!Number.isFinite(t.ttlTurns))
+          const ttl = t.ttlTurns;
+          if (typeof ttl !== 'number' || !Number.isFinite(ttl))
               continue;
-          t.ttlTurns -= 1;
-          if (t.ttlTurns <= 0)
+          const nextTtl = ttl - 1;
+          t.ttlTurns = nextTtl;
+          if (nextTtl <= 0)
               toRemove.push(t);
       }
       // xoá ra khỏi tokens để không còn được vẽ/đi lượt
@@ -8804,7 +8854,8 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           hudCleanup = null;
       }
       hud = initHUD(doc, root !== null && root !== void 0 ? root : undefined);
-      hudCleanup = hud ? () => hud.cleanup() : null;
+      const currentHud = hud;
+      hudCleanup = currentHud ? () => currentHud.cleanup() : null;
       resize();
       if (Game.grid)
           spawnLeaders(Game.tokens, Game.grid);
@@ -8850,16 +8901,30 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       cleanupSummonBar();
       const barHandle = startSummonBar(doc, {
           onPick: (card) => {
+              const game = getInitializedGame();
+              if (!game)
+                  return;
               const entry = asDeckEntry(card);
-              Game.selectedId = entry.id;
+              game.selectedId = entry.id;
               renderSummonBar();
           },
           canAfford: (card) => {
+              const game = getInitializedGame();
+              if (!game)
+                  return false;
               const entry = asDeckEntry(card);
-              return Game.cost >= getCardCost(entry);
+              return game.cost >= getCardCost(entry);
           },
-          getDeck: () => ensureDeck(),
-          getSelectedId: () => Game.selectedId,
+          getDeck: () => {
+              const game = getInitializedGame();
+              if (!game)
+                  return [];
+              return ensureDeck();
+          },
+          getSelectedId: () => {
+              const game = getInitializedGame();
+              return game ? game.selectedId : null;
+          },
       }, root !== null && root !== void 0 ? root : undefined);
       summonBarHandle = barHandle;
       Game.ui.bar = barHandle;
@@ -8872,11 +8937,14 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       canvasClickHandler = (ev) => {
           var _a, _b, _c;
           const game = getInitializedGame();
-          if (!canvas || !(game === null || game === void 0 ? void 0 : game.grid))
+          if (!canvas || !game)
+              return;
+          const { grid } = game;
+          if (!grid)
               return;
           const rect = canvas.getBoundingClientRect();
           const p = { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
-          const cell = hitToCellOblique(game.grid, p.x, p.y, CAM_PRESET);
+          const cell = hitToCellOblique(grid, p.x, p.y, CAM_PRESET);
           if (!cell)
               return;
           if (cell.cx >= CFG.ALLY_COLS)
@@ -8974,7 +9042,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   tEl.textContent = `${mm}:${ss}`;
           }
           if (remain <= 0 && prevRemain > 0) {
-              const timeoutResult = checkBattleEnd(Game, { trigger: 'timeout', remain, timestamp: now });
+              const timeoutResult = checkBattleEndResult(Game, { trigger: 'timeout', remain, timestamp: now });
               if (timeoutResult)
                   return;
           }
@@ -9004,10 +9072,12 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   processActionChain,
                   allocIid: nextIid,
                   doActionOrSkip,
-                  checkBattleEnd,
+                  checkBattleEnd(gameState, info) {
+                      return Boolean(checkBattleEndResult(gameState, info));
+                  },
               });
               cleanupDead(now);
-              const postTurnResult = checkBattleEnd(Game, { trigger: 'post-turn', timestamp: now });
+              const postTurnResult = checkBattleEndResult(Game, { trigger: 'post-turn', timestamp: now });
               if (postTurnResult) {
                   scheduleDraw();
                   return;
@@ -9109,10 +9179,11 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       if (ctx && Game.grid) {
           const maxDprCfg = (_a = CFG.UI) === null || _a === void 0 ? void 0 : _a.MAX_DPR;
           const maxDpr = Number.isFinite(maxDprCfg) && maxDprCfg > 0 ? maxDprCfg : 3;
-          const view = winRef || (typeof window !== 'undefined' ? window : null);
-          const viewDprRaw = Number.isFinite(view === null || view === void 0 ? void 0 : view.devicePixelRatio) && ((view === null || view === void 0 ? void 0 : view.devicePixelRatio) || 0) > 0
-              ? view.devicePixelRatio
-              : 1;
+          const view = winRef !== null && winRef !== void 0 ? winRef : (typeof window !== 'undefined' ? window : null);
+          let viewDprRaw = 1;
+          if (view && Number.isFinite(view.devicePixelRatio) && view.devicePixelRatio > 0) {
+              viewDprRaw = view.devicePixelRatio;
+          }
           const fallbackDpr = Math.min(maxDpr, viewDprRaw);
           const gridDpr = Number.isFinite(Game.grid.dpr) && Game.grid.dpr > 0
               ? Math.min(maxDpr, Game.grid.dpr)
@@ -9174,7 +9245,10 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           const tokens = Game.tokens || [];
           drawTokensOblique(ctx, Game.grid, tokens, CAM_PRESET);
       }
-      vfxDraw(ctx, Game, CAM_PRESET);
+      const sessionVfx = ensureSessionWithVfx(Game, { requireGrid: true });
+      if (sessionVfx) {
+          vfxDraw(ctx, sessionVfx, CAM_PRESET);
+      }
       drawHPBars();
   }
   function cellCenterObliqueLocal(g, cx, cy, C) {
@@ -9243,28 +9317,30 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       return `${color}|h:${height}|r:${radius}|y:${start}`;
   }
   function ensureHpBarGradient(fillColor, innerHeight, innerRadius, startY, x) {
+      var _a;
       const key = normalizeHpBarCacheKey(fillColor, innerHeight, innerRadius, startY);
       const cached = hpBarGradientCache.get(key);
       if (cached)
           return cached;
+      const baseFill = typeof fillColor === 'string' ? fillColor : '#6ff0c0';
       if (!ctx || !Number.isFinite(innerHeight) || innerHeight <= 0) {
-          hpBarGradientCache.set(key, fillColor);
-          return fillColor;
+          hpBarGradientCache.set(key, baseFill);
+          return baseFill;
       }
       const startYSafe = Number.isFinite(startY) ? startY : 0;
       const gradient = ctx.createLinearGradient(x, startYSafe, x, startYSafe + innerHeight);
       if (!gradient) {
-          hpBarGradientCache.set(key, fillColor);
-          return fillColor;
+          hpBarGradientCache.set(key, baseFill);
+          return baseFill;
       }
-      const topFill = lightenColor(fillColor, 0.25);
+      const topFill = (_a = lightenColor(baseFill, 0.25)) !== null && _a !== void 0 ? _a : baseFill;
       gradient.addColorStop(0, topFill);
-      gradient.addColorStop(1, fillColor);
+      gradient.addColorStop(1, baseFill);
       hpBarGradientCache.set(key, gradient);
       return gradient;
   }
   function drawHPBars() {
-      var _a, _b, _c, _d, _e, _f;
+      var _a, _b, _c, _d, _e, _f, _g;
       if (!ctx || !(Game === null || Game === void 0 ? void 0 : Game.grid))
           return;
       const baseR = Math.floor(Game.grid.tile * 0.36);
@@ -9274,20 +9350,21 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               continue;
           const p = cellCenterObliqueLocal(Game.grid, t.cx, t.cy, CAM_PRESET);
           const art = t.art || getUnitArt(t.id, { skinKey: t.skinKey });
-          const layout = (art === null || art === void 0 ? void 0 : art.layout) || {};
+          const layout = (_a = art === null || art === void 0 ? void 0 : art.layout) !== null && _a !== void 0 ? _a : {};
+          const layoutRecord = layout;
           const r = Math.max(6, Math.floor(baseR * (p.scale || 1)));
-          const widthRatio = (_a = parseFiniteNumber(layout.hpWidth)) !== null && _a !== void 0 ? _a : 2.4;
-          const heightRatio = (_b = parseFiniteNumber(layout.hpHeight)) !== null && _b !== void 0 ? _b : 0.42;
-          const offsetRatio = (_c = parseFiniteNumber(layout.hpOffset)) !== null && _c !== void 0 ? _c : 1.46;
+          const widthRatio = (_b = parseFiniteNumber(layoutRecord.hpWidth)) !== null && _b !== void 0 ? _b : 2.4;
+          const heightRatio = (_c = parseFiniteNumber(layoutRecord.hpHeight)) !== null && _c !== void 0 ? _c : 0.42;
+          const offsetRatio = (_d = parseFiniteNumber(layoutRecord.hpOffset)) !== null && _d !== void 0 ? _d : 1.46;
           const barWidth = Math.max(28, Math.floor(r * widthRatio));
           const barHeight = Math.max(5, Math.floor(r * heightRatio));
           const offset = offsetRatio;
           const x = Math.round(p.x - barWidth / 2);
           const y = Math.round(p.y + r * offset - barHeight / 2);
           const ratio = Math.max(0, Math.min(1, (t.hp || 0) / (t.hpMax || 1)));
-          const bgColor = ((_d = art === null || art === void 0 ? void 0 : art.hpBar) === null || _d === void 0 ? void 0 : _d.bg) || 'rgba(9,14,21,0.74)';
-          const fillColor = ((_e = art === null || art === void 0 ? void 0 : art.hpBar) === null || _e === void 0 ? void 0 : _e.fill) || '#6ff0c0';
-          const borderColor = ((_f = art === null || art === void 0 ? void 0 : art.hpBar) === null || _f === void 0 ? void 0 : _f.border) || 'rgba(0,0,0,0.55)';
+          const bgColor = ((_e = art === null || art === void 0 ? void 0 : art.hpBar) === null || _e === void 0 ? void 0 : _e.bg) || 'rgba(9,14,21,0.74)';
+          const fillColor = ((_f = art === null || art === void 0 ? void 0 : art.hpBar) === null || _f === void 0 ? void 0 : _f.fill) || '#6ff0c0';
+          const borderColor = ((_g = art === null || art === void 0 ? void 0 : art.hpBar) === null || _g === void 0 ? void 0 : _g.border) || 'rgba(0,0,0,0.55)';
           const radius = Math.max(2, Math.floor(barHeight / 2));
           ctx.save();
           ctx.shadowColor = 'transparent';
@@ -9519,10 +9596,12 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               if (enemyPool.length)
                   Game.ai.unitsAll = enemyPool;
           }
-          if (Number.isFinite(preset.costCap))
-              Game.ai.costCap = preset.costCap;
-          if (Number.isFinite(preset.summonLimit))
-              Game.ai.summonLimit = preset.summonLimit;
+          const parsedCostCap = parseFiniteNumber(preset.costCap);
+          if (parsedCostCap !== null)
+              Game.ai.costCap = parsedCostCap;
+          const parsedSummonLimit = parseFiniteNumber(preset.summonLimit);
+          if (parsedSummonLimit !== null)
+              Game.ai.summonLimit = parsedSummonLimit;
       }
       if (sceneChanged) {
           invalidateSceneCache();
@@ -10449,6 +10528,7 @@ __define('./passives.ts', (exports, module, __require) => {
           : effect && typeof effect === 'object'
               ? (effect.type || effect.kind || null)
               : null;
+      const gainStatsHandler = typeof EFFECTS.gainStats === 'function' ? EFFECTS.gainStats : null;
       let handler = getRegisteredPassive(key);
       let params = basePassive.params;
       let resolved = basePassive;
@@ -10476,11 +10556,11 @@ __define('./passives.ts', (exports, module, __require) => {
           }
           params = mergedParams;
           if (!handler && (mergedParams.stats || mergedParams.flatStats)) {
-              handler = EFFECTS.gainStats;
+              handler = gainStatsHandler;
           }
       }
       else if (!handler && basePassive.params && (basePassive.params.stats || basePassive.params.flatStats)) {
-          handler = EFFECTS.gainStats;
+          handler = gainStatsHandler;
       }
       return { handler: handler !== null && handler !== void 0 ? handler : defaultPassive, passive: resolved, params, key };
   };
@@ -11939,8 +12019,8 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
               }
               return buildPolyfillParts();
           },
-          [Symbol.toStringTag]: 'Intl.NumberFormat',
       };
+      Object.defineProperty(adapter, Symbol.toStringTag, { value: 'Intl.NumberFormat' });
       return adapter;
   }
   function ensureNumberFormatter(createNumberFormatter, locale, options) {
@@ -11963,6 +12043,7 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'labelForAbility')) exports.labelForAbility = labelForAbility;
   if (!Object.prototype.hasOwnProperty.call(exports, 'collectAbilityFacts')) exports.collectAbilityFacts = collectAbilityFacts;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getCurrencyCatalog')) exports.getCurrencyCatalog = getCurrencyCatalog;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'toIntlNumberFormatter')) exports.toIntlNumberFormatter = toIntlNumberFormatter;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureNumberFormatter')) exports.ensureNumberFormatter = ensureNumberFormatter;
 });
 __define('./screens/collection/index.ts', (exports, module, __require) => {
@@ -13650,13 +13731,21 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       return code ? code.toLocaleUpperCase('vi-VN') : '';
   }
   function getInitials(parts) {
-      if (!parts[0]) {
+      var _a, _b;
+      if (!Array.isArray(parts) || parts.length === 0) {
           return '';
       }
+      const firstPart = (_a = parts[0]) !== null && _a !== void 0 ? _a : '';
+      const lastPart = (_b = parts[parts.length - 1]) !== null && _b !== void 0 ? _b : '';
       if (parts.length === 1) {
-          return parts[0].slice(0, 2).toUpperCase();
+          return firstPart ? firstPart.slice(0, 2).toUpperCase() : '';
       }
-      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+      const firstInitial = firstPart === null || firstPart === void 0 ? void 0 : firstPart[0];
+      const lastInitial = lastPart === null || lastPart === void 0 ? void 0 : lastPart[0];
+      if (!firstInitial || !lastInitial) {
+          return '';
+      }
+      return (firstInitial + lastInitial).toUpperCase();
   }
   function getNameInitials(name) {
       if (!name) {
@@ -16672,6 +16761,16 @@ __define('./statuses.ts', (exports, module, __require) => {
       },
       make: statusFactories,
   };
+  function makeStatusEffect(key, spec) {
+      const factory = Statuses.make[key];
+      if (typeof factory === 'function') {
+          return factory(spec);
+      }
+      if (typeof console !== 'undefined' && typeof console.warn === 'function') {
+          console.warn(`[Statuses] Không tìm thấy factory cho hiệu ứng "${String(key)}".`);
+      }
+      return null;
+  }
   function applyStatus(unit, status) {
       if (!unit)
           return null;
@@ -16698,6 +16797,7 @@ __define('./statuses.ts', (exports, module, __require) => {
   }
 
   if (!Object.prototype.hasOwnProperty.call(exports, 'Statuses')) exports.Statuses = Statuses;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'makeStatusEffect')) exports.makeStatusEffect = makeStatusEffect;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyStatus')) exports.applyStatus = applyStatus;
   if (!Object.prototype.hasOwnProperty.call(exports, 'clearStatus')) exports.clearStatus = clearStatus;
   if (!Object.prototype.hasOwnProperty.call(exports, 'hookOnLethalDamage')) exports.hookOnLethalDamage = hookOnLethalDamage;
