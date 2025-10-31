@@ -1641,8 +1641,9 @@ function checkBattleEndResult(
   if (!winner) return null;
 
   const timestampRaw = contextDetail['timestamp'];
-  const finishedAt = typeof timestampRaw === 'number' && Number.isFinite(timestampRaw)
-    ? timestampRaw
+  const timestampCandidate = typeof timestampRaw === 'number' ? timestampRaw : Number(timestampRaw);
+  const finishedAt = Number.isFinite(timestampCandidate)
+    ? normalizeAnimationFrameTimestamp(timestampCandidate)
     : undefined;
   return finalizeBattle(game, { winner, reason, detail, finishedAt }, contextDetail);
 }
