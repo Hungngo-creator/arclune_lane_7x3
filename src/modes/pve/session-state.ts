@@ -10,7 +10,7 @@ import type {
 } from '@shared-types/config';
 import type { TurnSnapshot } from '@shared-types/turn-order';
 import type { QueuedSummonState, ActionChainEntry, UnitId, Side } from '@shared-types/units';
-import { createSummonQueue } from '@shared-types/units';
+import { createSummonQueue } from '@shared-types/units.ts';
 
 import { CFG } from '../../config.ts';
 import { UNITS, lookupUnit } from '../../units.ts';
