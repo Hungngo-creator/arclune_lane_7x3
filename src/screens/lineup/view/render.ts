@@ -223,13 +223,20 @@ function getUnitCode(unit: RosterUnit | null | undefined, fallbackLabel: string)
 }
 
 function getInitials(parts: string[]): string{
-  if (!parts[0]){
+  if (!Array.isArray(parts) || parts.length === 0){
     return '';
   }
+  const firstPart = parts[0] ?? '';
+  const lastPart = parts[parts.length - 1] ?? '';
   if (parts.length === 1){
-    return parts[0].slice(0, 2).toUpperCase();
+    return firstPart ? firstPart.slice(0, 2).toUpperCase() : '';
   }
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  const firstInitial = firstPart?.[0];
+  const lastInitial = lastPart?.[0];
+  if (!firstInitial || !lastInitial){
+    return '';
+  }
+  return (firstInitial + lastInitial).toUpperCase();
 }
 
 function getNameInitials(name: string): string{
