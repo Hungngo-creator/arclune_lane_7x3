@@ -9055,12 +9055,79 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           return null;
       };
       const updateTimerAndCost = (timestamp) => {
-          var _a, _b, _c, _d;
+          var _a, _b, _c, _d, _e;
           if (!CLOCK || !Game)
               return;
           if ((_a = Game.battle) === null || _a === void 0 ? void 0 : _a.over)
               return;
           const safeNowMs = safeNow();
+          const sessionNowMsRaw = sessionNow();
+          let forcedElapsedSec = null;
+          const safeDelta = safeNowMs - CLOCK.startSafeMs;
+          const previousStartMs = Number.isFinite(CLOCK.startMs) ? CLOCK.startMs : null;
+          const sessionWentBack = previousStartMs !== null
+              && Number.isFinite(sessionNowMsRaw)
+              && sessionNowMsRaw < previousStartMs;
+          if (safeDelta < -CLOCK_DRIFT_TOLERANCE_MS || sessionWentBack) {
+              const previousElapsedSec = Number.isFinite(CLOCK.lastCostCreditedSec)
+                  ? Math.max(0, CLOCK.lastCostCreditedSec)
+                  : Math.max(0, 240 - (Number.isFinite(CLOCK.lastTimerRemain) ? CLOCK.lastTimerRemain : 240));
+              const previousRemain = Number.isFinite(CLOCK.lastTimerRemain)
+                  ? Math.max(0, CLOCK.lastTimerRemain)
+                  : Math.max(0, 240 - previousElapsedSec);
+              const previousTurnStep = Number.isFinite(CLOCK.lastTurnStepMs)
+                  ? CLOCK.lastTurnStepMs
+                  : null;
+              let turnEveryMs = CLOCK.turnEveryMs;
+              const cfgTurnEvery = (_b = CFG === null || CFG === void 0 ? void 0 : CFG.ANIMATION) === null || _b === void 0 ? void 0 : _b.turnIntervalMs;
+              const parsedTurnEvery = Number(cfgTurnEvery);
+              if (!Number.isFinite(turnEveryMs) || turnEveryMs <= 0) {
+                  turnEveryMs = Number.isFinite(parsedTurnEvery) && parsedTurnEvery > 0
+                      ? parsedTurnEvery
+                      : 600;
+                  CLOCK.turnEveryMs = turnEveryMs;
+              }
+              const previousElapsedMs = Math.max(0, previousElapsedSec) * 1000;
+              let sessionForRebase = sessionNowMsRaw;
+              if (!Number.isFinite(sessionForRebase)) {
+                  sessionForRebase = previousStartMs !== null
+                      ? previousStartMs + previousElapsedMs
+                      : safeNowMs;
+              }
+              let normalizedStart = Number.isFinite(sessionForRebase)
+                  ? sessionForRebase - previousElapsedMs
+                  : sessionForRebase;
+              if (!Number.isFinite(normalizedStart)) {
+                  normalizedStart = sessionForRebase;
+              }
+              CLOCK.startMs = Number.isFinite(normalizedStart)
+                  ? normalizedStart
+                  : sessionForRebase;
+              if (!Number.isFinite(CLOCK.startMs)) {
+                  CLOCK.startMs = sessionForRebase;
+              }
+              CLOCK.startSafeMs = safeNowMs;
+              forcedElapsedSec = previousElapsedSec;
+              CLOCK.lastCostCreditedSec = previousElapsedSec;
+              CLOCK.lastTimerRemain = previousRemain;
+              const minTurnStep = Number.isFinite(sessionForRebase)
+                  ? sessionForRebase - turnEveryMs
+                  : previousTurnStep !== null && previousTurnStep !== void 0 ? previousTurnStep : CLOCK.startMs - turnEveryMs;
+              const maxTurnStep = Number.isFinite(sessionForRebase)
+                  ? sessionForRebase
+                  : CLOCK.startMs;
+              let normalizedTurnStep = previousTurnStep !== null && previousTurnStep !== void 0 ? previousTurnStep : minTurnStep;
+              if (!Number.isFinite(normalizedTurnStep)) {
+                  normalizedTurnStep = minTurnStep;
+              }
+              if (Number.isFinite(minTurnStep) && normalizedTurnStep < minTurnStep) {
+                  normalizedTurnStep = minTurnStep;
+              }
+              if (Number.isFinite(maxTurnStep) && normalizedTurnStep > maxTurnStep) {
+                  normalizedTurnStep = maxTurnStep;
+              }
+              CLOCK.lastTurnStepMs = normalizedTurnStep;
+          }
           const expectedSessionMs = safeNowMs - CLOCK.startSafeMs + CLOCK.startMs;
           let sessionNowMs = getNow();
           const needRebase = !Number.isFinite(sessionNowMs)
@@ -9081,7 +9148,16 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   }
               }
           }
-          const elapsedSec = Math.floor((sessionNowMs - CLOCK.startMs) / 1000);
+          let elapsedSec = Math.floor((sessionNowMs - CLOCK.startMs) / 1000);
+          if (!Number.isFinite(elapsedSec)) {
+              elapsedSec = forcedElapsedSec !== null && forcedElapsedSec !== void 0 ? forcedElapsedSec : 0;
+          }
+          if (elapsedSec < 0) {
+              elapsedSec = 0;
+          }
+          if (forcedElapsedSec !== null && elapsedSec < forcedElapsedSec) {
+              elapsedSec = forcedElapsedSec;
+          }
           const prevRemain = Number.isFinite(CLOCK.lastTimerRemain) ? CLOCK.lastTimerRemain : 0;
           const remain = Math.max(0, 240 - elapsedSec);
           if (remain !== CLOCK.lastTimerRemain) {
@@ -9113,9 +9189,9 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               renderSummonBar();
               aiMaybeAct(Game, 'cost');
           }
-          if ((_b = Game.battle) === null || _b === void 0 ? void 0 : _b.over)
+          if ((_c = Game.battle) === null || _c === void 0 ? void 0 : _c.over)
               return;
-          const turnState = (_c = Game.turn) !== null && _c !== void 0 ? _c : null;
+          const turnState = (_d = Game.turn) !== null && _d !== void 0 ? _d : null;
           let busyUntil = 0;
           if (turnState) {
               const rawBusy = turnState.busyUntil;
@@ -9124,7 +9200,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   turnState.busyUntil = busyUntil;
               }
           }
-          const cfgTurnEvery = (_d = CFG === null || CFG === void 0 ? void 0 : CFG.ANIMATION) === null || _d === void 0 ? void 0 : _d.turnIntervalMs;
+          const cfgTurnEvery = (_e = CFG === null || CFG === void 0 ? void 0 : CFG.ANIMATION) === null || _e === void 0 ? void 0 : _e.turnIntervalMs;
           const defaultTurnEveryMs = Number.isFinite(cfgTurnEvery) && cfgTurnEvery && cfgTurnEvery > 0
               ? cfgTurnEvery
               : 600;
