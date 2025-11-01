@@ -10,25 +10,21 @@
   z-index: 1;
   --rarity-color: #ffffff;
   --rarity-ring-scale: 1;
+  --rarity-glow-base: 1;
+  --rarity-glow-low: calc(var(--rarity-glow-base) * 0.7);
+  --rarity-glow-active: var(--rarity-glow-base);
+  --rarity-spark-count: 0;
   --rarity-ring-opacity: 0.85;
   --rarity-glow-opacity: 0.65;
   --rarity-glow-scale: 1;
-  --rarity-glow-blur: 9px;
-  --rarity-glow-blur-collection: 8px;
-  --rarity-glow-blur-deck: 7px;
-  --rarity-pre-ring-opacity: 0.4;
-  --rarity-pre-glow-opacity: 0.33;
-  --rarity-pre-glow-scale: 0.92;
-  --rarity-bloom-ring-scale: 1.08;
-  --rarity-bloom-glow-opacity: 0.78;
-  --rarity-bloom-glow-scale: 1.08;
-  --rarity-spark-count: 0;
-  --rarity-sweep-opacity: 0.65;
+  --rarity-glow-blur: calc(9px * var(--rarity-glow-active));
   --rarity-shimmer-period: 6s;
   --rarity-shimmer-delay: 0s;
+  --rarity-sweep-opacity: 0.65;
 }
 
 body.low-power .rarity-aura {
+  --rarity-glow-active: var(--rarity-glow-low);
   --rarity-spark-count: 0;
   --rarity-sweep-opacity: 0;
 }
@@ -52,26 +48,21 @@ body.low-power .rarity-aura {
 }
 
 .rarity-aura .ring {
+  opacity: 0.85;
+  opacity: var(--rarity-ring-opacity);
   box-shadow: 0 0 0 2px var(--rarity-color) inset, 0 0 0 1px rgba(0, 0, 0, 0.35);
-  opacity: var(--rarity-ring-opacity, 0.85);
-  transform: scale(var(--rarity-ring-scale, 1));
+  transform: scale(var(--rarity-ring-scale));
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .rarity-aura .glow {
-  background: radial-gradient(62% 62% at 50% 50%, var(--rarity-color) 0%, rgba(0, 0, 0, 0) 72%);
-  filter: blur(var(--rarity-glow-blur, 9px));
-  opacity: var(--rarity-glow-opacity, 0.65);
-  transform: scale(var(--rarity-glow-scale, 1));
+  opacity: 0.65;
+  opacity: var(--rarity-glow-opacity);
+  background: radial-gradient(62% 62% at 50% 50%, color-mix(in srgb, var(--rarity-color) 65%, transparent), transparent 72%);
+  filter: blur(9px);
+  filter: blur(var(--rarity-glow-blur));
+  transform: scale(var(--rarity-glow-scale));
   transition: opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease;
-}
-
-.rarity-aura[data-variant="collection"] .glow {
-  filter: blur(var(--rarity-glow-blur-collection, var(--rarity-glow-blur, 9px)));
-}
-
-.rarity-aura[data-variant="deck"] .glow {
-  filter: blur(var(--rarity-glow-blur-deck, var(--rarity-glow-blur, 9px)));
 }
 
 .rarity-aura .badge {
@@ -92,6 +83,7 @@ body.low-power .rarity-aura {
   align-items: center;
   justify-content: center;
   min-width: 36px;
+  pointer-events: none;
 }
 
 .rarity-aura[data-variant="deck"] .badge {
@@ -143,7 +135,8 @@ body.low-power .rarity-aura {
   display: none;
   overflow: hidden;
   mix-blend-mode: screen;
-  opacity: var(--rarity-sweep-opacity, 0.65);
+  opacity: 0.65;
+  opacity: var(--rarity-sweep-opacity);
 }
 
 .rarity-aura .sweep::before {
@@ -201,16 +194,16 @@ body.low-power .rarity-aura.prism::after {
 
 @keyframes shimmer-cycle {
   0% {
-    opacity: var(--rarity-glow-opacity, 0.65);
+    opacity: var(--rarity-glow-opacity);
   }
   6% {
-    opacity: var(--rarity-bloom-glow-opacity, 0.78);
+    opacity: calc(var(--rarity-glow-opacity) + 0.2);
   }
   12% {
-    opacity: var(--rarity-glow-opacity, 0.65);
+    opacity: var(--rarity-glow-opacity);
   }
   100% {
-    opacity: var(--rarity-glow-opacity, 0.65);
+    opacity: var(--rarity-glow-opacity);
   }
 }
 
@@ -229,31 +222,31 @@ body.low-power .rarity-aura.prism::after {
 }
 
 .rarity-aura.is-pre .ring {
-  opacity: var(--rarity-pre-ring-opacity, 0.4);
+  opacity: 0.4;
 }
 
 .rarity-aura.is-pre .glow {
-  opacity: var(--rarity-pre-glow-opacity, 0.33);
-  transform: scale(var(--rarity-pre-glow-scale, 0.92));
+  opacity: calc(var(--rarity-glow-opacity) * 0.5);
+  transform: scale(0.92);
 }
 
 .rarity-aura.is-bloom .ring {
-  transform: scale(var(--rarity-bloom-ring-scale, 1.08));
+  transform: scale(calc(var(--rarity-ring-scale) * 1.08));
 }
 
 .rarity-aura.is-bloom .glow {
-  opacity: var(--rarity-bloom-glow-opacity, 0.78);
-  transform: scale(var(--rarity-bloom-glow-scale, 1.08));
+  opacity: min(1, calc(var(--rarity-glow-opacity) * 1.2));
+  transform: scale(1.08);
 }
 
 .rarity-aura.is-reveal .ring {
-  transform: scale(var(--rarity-ring-scale, 1));
-  opacity: var(--rarity-ring-opacity, 0.85);
+  transform: scale(var(--rarity-ring-scale));
+  opacity: var(--rarity-ring-opacity);
 }
 
 .rarity-aura.is-reveal .glow {
-  opacity: var(--rarity-glow-opacity, 0.65);
-  transform: scale(var(--rarity-glow-scale, 1));
+  opacity: var(--rarity-glow-opacity);
+  transform: scale(1);
 }
 
 .rarity-aura.has-sweep.is-reveal .sweep::before {
@@ -322,13 +315,21 @@ body.low-power .rarity-aura.has-spark .spark-layer {
   opacity: 0.7;
 }
 
+.rarity-aura[data-variant="collection"] .glow {
+  filter: blur(calc(8px * var(--rarity-glow-active)));
+}
+
 .rarity-aura[data-variant="deck"] .ring {
   opacity: 0.75;
 }
 
+.rarity-aura[data-variant="deck"] .glow {
+  filter: blur(calc(7px * var(--rarity-glow-active)));
+}
+
 .rarity-aura[data-variant="deck"].is-hovered .glow,
 .rarity-aura[data-variant="deck"].is-selected .glow {
-  opacity: var(--rarity-bloom-glow-opacity, 0.78);
+  opacity: min(1, calc(var(--rarity-glow-opacity) * 1.2));
 }
 
 .rarity-aura[data-variant="collection"].has-sweep .sweep,
