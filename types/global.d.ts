@@ -11,3 +11,8 @@ declare module "*.glsl";
 declare module "*.frag";
 declare module "*.vert";
 declare module "*.json";
+
+declare module "*.css" {
+  const css: string;
+  export default css;
+}
