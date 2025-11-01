@@ -574,16 +574,25 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       const empty = document.createElement('p');
       empty.className = 'lineup-grid__details-empty';
       empty.textContent = cell.label
-     ? `Ô được ghi chú "${cell.label}".`
+      ? `Ô được ghi chú "${cell.label}".`
         : cell.section === 'formation'
           ? 'Ô ra trận hiện đang trống.'
           : 'Ô dự phòng hiện đang trống.';
       cellDetails.appendChild(empty);
+      const hint = document.createElement('p');
+      hint.className = 'lineup-grid__details-empty';
+      hint.textContent = 'Chọn nhân vật từ roster rồi nhấp vào ô để gán. Giữ Alt và nhấp ô đã có nhân vật để bỏ.';
+      cellDetails.appendChild(hint);
       syncGridDetailsHeight();
       return;
     }
 
     cellDetails.classList.remove('is-empty');
+
+    const interactionHint = document.createElement('p');
+    interactionHint.className = 'lineup-grid__details-text';
+    interactionHint.textContent = 'Nhấp trực tiếp vào ô để xem nhân vật này. Giữ Alt rồi nhấp để bỏ khỏi ô.';
+    cellDetails.appendChild(interactionHint);
 
     const kit = (unit.raw as { kit?: unknown } | null)?.kit ?? null;
     const skillSetId = normalizeUnitId(unit.id);
@@ -699,8 +708,19 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       if (!cell.unlocked){
         cellEl.classList.add('is-locked');
         cellEl.dataset.cellAction = 'unlock';
+        cellEl.dataset.cellDefaultAction = 'unlock';
+        delete cellEl.dataset.cellAltAction;
       } else {
         cellEl.removeAttribute('data-cell-action');
+        cellEl.dataset.cellDefaultAction = state.selectedUnitId ? 'assign'
+          : cell.unitId
+            ? 'select'
+            : 'focus';
+        if (cell.unitId){
+          cellEl.dataset.cellAltAction = 'clear';
+        } else {
+          delete cellEl.dataset.cellAltAction;
+        }
       }
 
       const displayIndex = cell.section === 'formation'
@@ -1023,7 +1043,7 @@ const eventCleanup = bindLineupEvents({
   renderPassives();
   renderFilters();
   renderRoster();
-  setMessage('Chọn nhân vật rồi gán vào các ô đội hình để hoàn thiện đội hình.');
+  setMessage('Chọn nhân vật rồi nhấp vào ô để gán. Giữ Alt và nhấp ô đã có nhân vật để bỏ.');
 
   cleanup.push(() => passiveOverlay.remove());
   cleanup.push(() => leaderOverlay.remove());

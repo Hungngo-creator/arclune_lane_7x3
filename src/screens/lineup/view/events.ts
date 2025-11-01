@@ -129,7 +129,7 @@ const handleCellInteraction = (event: Event) => {
     if (!cellEl) return;
     const lineup = helpers.getSelectedLineup();
     if (!lineup) return;
-   const cellIndex = Number(cellEl.dataset.cellIndex);
+    const cellIndex = Number(cellEl.dataset.cellIndex);
     if (!Number.isFinite(cellIndex)) return;
     const cell = lineup.cells[cellIndex];
     if (!cell) return;
@@ -138,9 +138,25 @@ const handleCellInteraction = (event: Event) => {
     helpers.updateActiveCellHighlight();
     helpers.renderCellDetails();
 
+const targetEl = event.target as HTMLElement | null;
+    const actionable = targetEl?.closest<HTMLElement>('[data-cell-action]');
+    const mouseEvent = event as MouseEvent | null;
+    const hasModifier = Boolean(mouseEvent && (mouseEvent.altKey || mouseEvent.ctrlKey || mouseEvent.metaKey));
+    let action = actionable?.dataset.cellAction ?? null;
+
+    if (!action && hasModifier){
+      action = cellEl.dataset.cellAltAction ?? (cell.unitId ? 'clear' : null);
+    }
+
+    if (!action){
+      action = cellEl.dataset.cellAction ?? null;
+    }
+
+    if (!action){
+      action = cellEl.dataset.cellDefaultAction ?? null;
+    }
+
     const label = getCellLabel(lineup, cellIndex);
-    const actionButton = (event.target as HTMLElement | null)?.closest<HTMLButtonElement>('.lineup-button');
-    const action = actionButton?.dataset.cellAction ?? null;
 
     if (action === 'unlock'){
       const result = unlockCell(lineup, cellIndex, state.currencyBalances);
@@ -170,10 +186,7 @@ const handleCellInteraction = (event: Event) => {
       return;
     }
 
-    const mouseEvent = event as MouseEvent;
-    const isModifierClear = action === 'clear'
-      || (mouseEvent && (mouseEvent.altKey || mouseEvent.ctrlKey || mouseEvent.metaKey));
-    if (isModifierClear){
+    if (action === 'clear'){
       if (!cell.unitId){
         helpers.setMessage('Ô này đang trống.', 'info');
         return;
@@ -201,7 +214,7 @@ const handleCellInteraction = (event: Event) => {
         helpers.setMessage(assignResult.message || 'Không thể gán nhân vật.', 'error');
         return;
       }
-     const unit = rosterLookup.get(state.selectedUnitId);
+      const unit = rosterLookup.get(state.selectedUnitId);
       helpers.setMessage(`Đã gán ${unit?.name || 'nhân vật'} vào ${label}.`, 'info');
       state.selectedUnitId = null;
       helpers.renderCells();
@@ -230,7 +243,7 @@ const handleCellInteraction = (event: Event) => {
     if (cell.unitId){
       state.selectedUnitId = cell.unitId;
       const unit = rosterLookup.get(cell.unitId);
-      helpers.setMessage(`Đã chọn ${unit?.name || 'nhân vật'} đang ở ${label}. Chọn ô khác để hoán đổi hoặc nhấn "Bỏ".`, 'info');
+      helpers.setMessage(`Đã chọn ${unit?.name || 'nhân vật'} đang ở ${label}. Chọn ô khác để hoán đổi hoặc dùng Alt+nhấp để bỏ.`, 'info');
       helpers.renderRoster();
       helpers.renderCells();
     } else {
@@ -264,8 +277,8 @@ const handleCellInteraction = (event: Event) => {
         : null;
       helpers.setMessage(
         costText
-        ? `${label} đang khóa. Cần ${costText} để mở khóa.`
-          : `${label} đang khóa.`,
+        ? `${label} đang khóa. Cần ${costText} để mở khóa. Nhấp để xác nhận.`
+          : `${label} đang khóa. Nhấp để mở khóa.`,
         'info',
       );
       return;
@@ -273,15 +286,15 @@ const handleCellInteraction = (event: Event) => {
 
     if (cell.unitId){
       const unit = rosterLookup.get(cell.unitId);
-      helpers.setMessage(`${label}: ${unit?.name || 'đã có nhân vật'}. Dùng "Bỏ" để trả ô.`, 'info');
+      helpers.setMessage(`${label}: ${unit?.name || 'đã có nhân vật'}. Dùng Alt+nhấp để trả ô.`, 'info');
       return;
     }
 
     if (state.selectedUnitId){
       const unit = rosterLookup.get(state.selectedUnitId);
-      helpers.setMessage(`${label} trống. Đã chọn ${unit?.name || 'nhân vật'}. Nhấn "Gán" để thêm.`, 'info');
+      helpers.setMessage(`${label} trống. Đã chọn ${unit?.name || 'nhân vật'}. Nhấp để gán.`, 'info');
     } else {
-      helpers.setMessage(`${label} trống. Chọn nhân vật từ roster rồi nhấn "Gán".`, 'info');
+      helpers.setMessage(`${label} trống. Chọn nhân vật từ roster rồi nhấp để gán.`, 'info');
     }
   };
   cellsGrid.addEventListener('focusin', handleCellFocus);
