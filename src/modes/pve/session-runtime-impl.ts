@@ -1907,11 +1907,15 @@ function init(): boolean {
       if (!CLOCK || !Game) return;
       if (Game.battle?.over) return;
 
-   const safeNowMs = safeNow();
+      const safeNowMs = safeNow();
+      const sessionNowMsRaw = sessionNow();
       let forcedElapsedSec: number | null = null;
       const safeDelta = safeNowMs - CLOCK.startSafeMs;
-      if (safeDelta < -CLOCK_DRIFT_TOLERANCE_MS){
-        const sessionNowMs = sessionNow();
+      const previousStartMs = Number.isFinite(CLOCK.startMs) ? CLOCK.startMs : null;
+      const sessionWentBack = previousStartMs !== null
+        && Number.isFinite(sessionNowMsRaw)
+        && sessionNowMsRaw < previousStartMs;
+      if (safeDelta < -CLOCK_DRIFT_TOLERANCE_MS || sessionWentBack){
         const previousElapsedSec = Number.isFinite(CLOCK.lastCostCreditedSec)
           ? Math.max(0, CLOCK.lastCostCreditedSec)
           : Math.max(
@@ -1925,18 +1929,6 @@ function init(): boolean {
           ? CLOCK.lastTurnStepMs
           : null;
 
-        CLOCK.startMs = Number.isFinite(CLOCK.startMs)
-          ? CLOCK.startMs + safeDelta
-          : sessionNowMs;
-        if (!Number.isFinite(CLOCK.startMs)){
-          CLOCK.startMs = sessionNowMs;
-        }
-        CLOCK.startSafeMs = safeNowMs;
-
-        forcedElapsedSec = previousElapsedSec;
-        CLOCK.lastCostCreditedSec = previousElapsedSec;
-        CLOCK.lastTimerRemain = previousRemain;
-
         let turnEveryMs = CLOCK.turnEveryMs;
         const cfgTurnEvery = CFG?.ANIMATION?.turnIntervalMs;
         const parsedTurnEvery = Number(cfgTurnEvery);
@@ -1946,8 +1938,39 @@ function init(): boolean {
             : 600;
           CLOCK.turnEveryMs = turnEveryMs;
         }
-        const minTurnStep = sessionNowMs - turnEveryMs;
-        const maxTurnStep = sessionNowMs;
+
+        const previousElapsedMs = Math.max(0, previousElapsedSec) * 1000;
+        let sessionForRebase = sessionNowMsRaw;
+        if (!Number.isFinite(sessionForRebase)){
+          sessionForRebase = previousStartMs !== null
+            ? previousStartMs + previousElapsedMs
+            : safeNowMs;
+        }
+
+        let normalizedStart = Number.isFinite(sessionForRebase)
+          ? sessionForRebase - previousElapsedMs
+          : sessionForRebase;
+        if (!Number.isFinite(normalizedStart)){
+          normalizedStart = sessionForRebase;
+        }
+        CLOCK.startMs = Number.isFinite(normalizedStart)
+          ? normalizedStart
+          : sessionForRebase;
+        if (!Number.isFinite(CLOCK.startMs)){
+          CLOCK.startMs = sessionForRebase;
+        }
+        CLOCK.startSafeMs = safeNowMs;
+
+        forcedElapsedSec = previousElapsedSec;
+        CLOCK.lastCostCreditedSec = previousElapsedSec;
+        CLOCK.lastTimerRemain = previousRemain;
+
+        const minTurnStep = Number.isFinite(sessionForRebase)
+          ? sessionForRebase - turnEveryMs
+          : previousTurnStep ?? CLOCK.startMs - turnEveryMs;
+        const maxTurnStep = Number.isFinite(sessionForRebase)
+          ? sessionForRebase
+          : CLOCK.startMs;
         let normalizedTurnStep = previousTurnStep ?? minTurnStep;
         if (!Number.isFinite(normalizedTurnStep)){
           normalizedTurnStep = minTurnStep;
@@ -1982,6 +2005,12 @@ function init(): boolean {
         }
       }
       let elapsedSec = Math.floor((sessionNowMs - CLOCK.startMs) / 1000);
+      if (!Number.isFinite(elapsedSec)){
+        elapsedSec = forcedElapsedSec ?? 0;
+      }
+      if (elapsedSec < 0){
+        elapsedSec = 0;
+      }
       if (forcedElapsedSec !== null && elapsedSec < forcedElapsedSec){
         elapsedSec = forcedElapsedSec;
       }
