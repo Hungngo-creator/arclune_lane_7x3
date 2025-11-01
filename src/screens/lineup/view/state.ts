@@ -8,6 +8,8 @@ import type {
   LineupPassiveConfig,
   RosterEntryLite,
 } from '@shared-types/lineup';
+import type { Rarity } from '../../../ui/rarity/rarity.ts';
+import { normalizeRarity } from '../../../ui/rarity/rarity.ts';
 
 export interface RosterUnit {
   id: string;
@@ -71,6 +73,8 @@ interface AssignmentResult {
 const currencyCatalog = listCurrencies();
 const currencyIndex = new Map(currencyCatalog.map(currency => [currency.id, currency]));
 const numberFormatter = createNumberFormatter('vi-VN');
+
+const DEFAULT_RARITY: Rarity = 'N';
 
 const FORMATION_CELL_COUNT = 5;
 const RESERVE_CELL_COUNT = 5;
@@ -137,6 +141,40 @@ function normalizeRosterEntry(entry: RosterEntryLite | null | undefined, index: 
 export function normalizeRoster(source: ReadonlyArray<RosterEntryLite> | null | undefined): RosterUnit[] {
   const cloned = cloneRoster(source);
   return cloned.map((entry, index) => normalizeRosterEntry(entry, index));
+}
+
+function getRawRarityString(raw: Record<string, unknown> | null | undefined, key: string): string | null {
+  if (!raw){
+    return null;
+  }
+  const value = raw[key];
+  return typeof value === 'string' ? value : null;
+}
+
+export function getUnitRarity(unit: RosterUnit | null | undefined): Rarity {
+  if (!unit){
+    return DEFAULT_RARITY;
+  }
+
+  const candidates: Array<string | null | undefined> = [
+    unit.rank,
+    getRawRarityString(unit.raw, 'rank'),
+    getRawRarityString(unit.raw, 'rarity'),
+    getRawRarityString(unit.raw, 'tier'),
+    getRawRarityString(unit.raw, 'grade'),
+  ];
+
+  for (const candidate of candidates){
+    if (typeof candidate === 'string' && candidate.trim()){
+      try {
+        return normalizeRarity(candidate);
+      } catch (error) {
+        continue;
+      }
+    }
+  }
+
+  return DEFAULT_RARITY;
 }
 
 function normalizeAssignment(input: unknown, rosterIndex: Set<string>): AssignmentResult {
