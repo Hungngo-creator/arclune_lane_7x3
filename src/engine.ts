@@ -300,12 +300,14 @@ export function cellReserved(tokens: readonly UnitToken[], queued: QueuedSummonS
 export function spawnLeaders(tokens: TokenWithArt[], g: GridSpec): void {
   const artAlly = getUnitArt('leaderA') as UnitArtDescriptor | null;
   const artEnemy = getUnitArt('leaderB') as UnitArtDescriptor | null;
+  const allyCell = slotToCell('ally', 5);
+  const enemyCell = slotToCell('enemy', 5);
   tokens.push({
     id: 'leaderA',
     name: 'Uyên',
     color: '#6cc8ff',
-    cx: 0,
-    cy: 1,
+    cx: allyCell.cx,
+    cy: allyCell.cy,
     side: 'ally',
     alive: true,
     art: artAlly,
@@ -315,8 +317,8 @@ export function spawnLeaders(tokens: TokenWithArt[], g: GridSpec): void {
     id: 'leaderB',
     name: 'Địch',
     color: '#ff9aa0',
-    cx: g.cols - 1,
-    cy: 1,
+    cx: enemyCell.cx,
+    cy: enemyCell.cy,
     side: 'enemy',
     alive: true,
     art: artEnemy,
