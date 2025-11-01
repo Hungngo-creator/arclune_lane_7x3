@@ -300,8 +300,8 @@ export function cellReserved(tokens: readonly UnitToken[], queued: QueuedSummonS
 export function spawnLeaders(tokens: TokenWithArt[], g: GridSpec): void {
   const artAlly = getUnitArt('leaderA') as UnitArtDescriptor | null;
   const artEnemy = getUnitArt('leaderB') as UnitArtDescriptor | null;
-  const allyCell = slotToCell('ally', 5);
-  const enemyCell = slotToCell('enemy', 5);
+  const allyCell = slotToCell('ally', 8);
+  const enemyCell = slotToCell('enemy', 8);
   tokens.push({
     id: 'leaderA',
     name: 'Uyên',
