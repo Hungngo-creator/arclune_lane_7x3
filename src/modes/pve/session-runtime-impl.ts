@@ -883,12 +883,17 @@ let CLOCK: ClockState | null = null;
 
 function createClock(): ClockState {
   const now = getNow();
+  const intervalCandidate = CFG?.ANIMATION?.turnIntervalMs;
+  const parsedInterval = Number(intervalCandidate);
+  const turnEveryMs = Number.isFinite(parsedInterval) && parsedInterval > 0
+    ? parsedInterval
+    : 600;
   return {
     startMs: now,
     lastTimerRemain: 240,
     lastCostCreditedSec: 0,
-    turnEveryMs: CFG?.ANIMATION?.turnIntervalMs ?? 600,
-    lastTurnStepMs: now
+    turnEveryMs,
+    lastTurnStepMs: now - turnEveryMs,
   };
 }
 
@@ -1961,17 +1966,29 @@ function init(): boolean {
         CLOCK.turnEveryMs = turnEveryMs;
       }
 
-    if (!Number.isFinite(CLOCK.lastTurnStepMs)){
-        CLOCK.lastTurnStepMs = sessionNowMs - turnEveryMs;
+    const stallDeltaEpsilon = 1;
+      const initialTurnBaseline = Number.isFinite(CLOCK.startMs)
+        ? CLOCK.startMs - turnEveryMs
+        : sessionNowMs - turnEveryMs;
+      if (!Number.isFinite(CLOCK.lastTurnStepMs)){
+        CLOCK.lastTurnStepMs = initialTurnBaseline;
       }
 
-    const stallDeltaEpsilon = 1;
-      const sessionElapsed = sessionNowMs - CLOCK.lastTurnStepMs;
       const readyByBusy = sessionNowMs >= busyUntil;
+      const sessionElapsed = sessionNowMs - CLOCK.lastTurnStepMs;
 
       if (readyByBusy && (!Number.isFinite(sessionElapsed) || sessionElapsed < -stallDeltaEpsilon)){
         CLOCK.lastTurnStepMs = sessionNowMs - turnEveryMs;
-        }
+      }
+
+    let hasTurnStepped = false;
+      if (Number.isFinite(CLOCK.lastTurnStepMs)){
+        hasTurnStepped = CLOCK.lastTurnStepMs > (initialTurnBaseline + stallDeltaEpsilon);
+      }
+
+      if (readyByBusy && !hasTurnStepped){
+        CLOCK.lastTurnStepMs = sessionNowMs - turnEveryMs;
+      }
 
        const elapsedForTurn = sessionNowMs - CLOCK.lastTurnStepMs;
 
