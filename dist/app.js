@@ -8008,6 +8008,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           lastCostCreditedSec: 0,
           turnEveryMs,
           lastTurnStepMs: now - turnEveryMs,
+          lastFrameMs: now,
       };
   }
   // Xác chết chờ vanish (để sau này thay bằng dead-animation)
@@ -9127,6 +9128,12 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   normalizedTurnStep = maxTurnStep;
               }
               CLOCK.lastTurnStepMs = normalizedTurnStep;
+              const rebaseFrame = Number.isFinite(sessionForRebase)
+                  ? sessionForRebase
+                  : CLOCK.startMs;
+              CLOCK.lastFrameMs = Number.isFinite(rebaseFrame)
+                  ? rebaseFrame
+                  : CLOCK.startMs;
           }
           const expectedSessionMs = safeNowMs - CLOCK.startSafeMs + CLOCK.startMs;
           let sessionNowMs = getNow();
@@ -9148,6 +9155,22 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   }
               }
           }
+          if (!Number.isFinite(CLOCK.lastFrameMs)) {
+              CLOCK.lastFrameMs = Number.isFinite(CLOCK.startMs)
+                  ? CLOCK.startMs
+                  : expectedSessionMs;
+          }
+          const lastFrameMs = Number.isFinite(CLOCK.lastFrameMs)
+              ? CLOCK.lastFrameMs
+              : expectedSessionMs;
+          if (!Number.isFinite(sessionNowMs)) {
+              sessionNowMs = expectedSessionMs;
+          }
+          if (Number.isFinite(lastFrameMs) && sessionNowMs <= lastFrameMs) {
+              const fallbackFrame = Math.max(expectedSessionMs, lastFrameMs + 1);
+              sessionNowMs = fallbackFrame;
+          }
+          CLOCK.lastFrameMs = Number.isFinite(sessionNowMs) ? sessionNowMs : expectedSessionMs;
           let elapsedSec = Math.floor((sessionNowMs - CLOCK.startMs) / 1000);
           if (!Number.isFinite(elapsedSec)) {
               elapsedSec = forcedElapsedSec !== null && forcedElapsedSec !== void 0 ? forcedElapsedSec : 0;
@@ -9247,8 +9270,22 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           }
       };
       const runTickLoop = (timestamp) => {
+          var _a, _b;
           tickLoopHandle = null;
-          updateTimerAndCost(timestamp);
+          try {
+              updateTimerAndCost(timestamp);
+          }
+          catch (err) {
+              console.error('[pve] tick loop error', err);
+              if (hud && typeof hud.update === 'function') {
+                  try {
+                      hud.update({ cost: (_a = Game === null || Game === void 0 ? void 0 : Game.cost) !== null && _a !== void 0 ? _a : null, costCap: (_b = Game === null || Game === void 0 ? void 0 : Game.costCap) !== null && _b !== void 0 ? _b : null });
+                  }
+                  catch (hudErr) {
+                      console.error('[pve] HUD update fallback sau lỗi tick thất bại', hudErr);
+                  }
+              }
+          }
           if (!running || !CLOCK)
               return;
           scheduleTickLoop();
@@ -9267,10 +9304,10 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           }
           else {
               tickLoopUsesTimeout = true;
-              tickLoopHandle = setTimeout(() => runTickLoop(getNow()), 16);
+              tickLoopHandle = setTimeout(() => runTickLoop(), 16);
           }
       }
-      updateTimerAndCost(getNow());
+      updateTimerAndCost();
       scheduleTickLoop();
       return true;
   }
