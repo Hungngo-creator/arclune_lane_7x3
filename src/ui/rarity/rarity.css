@@ -1,28 +1,34 @@
 .rarity-aura {
   position: absolute;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   pointer-events: none;
   border-radius: inherit;
-  contain: layout style paint;
   display: block;
   z-index: 1;
   --rarity-color: #ffffff;
   --rarity-ring-scale: 1;
-  --rarity-glow-base: 1;
-  --rarity-glow-low: calc(var(--rarity-glow-base) * 0.7);
-  --rarity-glow-active: var(--rarity-glow-base);
-  --rarity-spark-count: 0;
   --rarity-ring-opacity: 0.85;
   --rarity-glow-opacity: 0.65;
   --rarity-glow-scale: 1;
-  --rarity-glow-blur: calc(9px * var(--rarity-glow-active));
+  --rarity-glow-blur: 9px;
+  --rarity-glow-blur-collection: 8px;
+  --rarity-glow-blur-deck: 7px;
+  --rarity-pre-ring-opacity: 0.4;
+  --rarity-pre-glow-opacity: 0.33;
+  --rarity-pre-glow-scale: 0.92;
+  --rarity-bloom-ring-scale: 1.08;
+  --rarity-bloom-glow-opacity: 0.78;
+  --rarity-bloom-glow-scale: 1.08;
+  --rarity-spark-count: 0;
+  --rarity-sweep-opacity: 0.65;
   --rarity-shimmer-period: 6s;
   --rarity-shimmer-delay: 0s;
-  --rarity-sweep-opacity: 0.65;
 }
 
 body.low-power .rarity-aura {
-  --rarity-glow-active: var(--rarity-glow-low);
   --rarity-spark-count: 0;
   --rarity-sweep-opacity: 0;
 }
@@ -37,28 +43,42 @@ body.low-power .rarity-aura {
 .rarity-aura .spark-layer,
 .rarity-aura .badge {
   position: absolute;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   border-radius: inherit;
   pointer-events: none;
 }
 
 .rarity-aura .ring {
   box-shadow: 0 0 0 2px var(--rarity-color) inset, 0 0 0 1px rgba(0, 0, 0, 0.35);
-  opacity: var(--rarity-ring-opacity);
-  transform: scale(var(--rarity-ring-scale));
+  opacity: var(--rarity-ring-opacity, 0.85);
+  transform: scale(var(--rarity-ring-scale, 1));
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .rarity-aura .glow {
-  background: radial-gradient(62% 62% at 50% 50%, color-mix(in srgb, var(--rarity-color) 65%, transparent), transparent 72%);
-  filter: blur(var(--rarity-glow-blur));
-  opacity: var(--rarity-glow-opacity);
-  transform: scale(var(--rarity-glow-scale));
+  background: radial-gradient(62% 62% at 50% 50%, var(--rarity-color) 0%, rgba(0, 0, 0, 0) 72%);
+  filter: blur(var(--rarity-glow-blur, 9px));
+  opacity: var(--rarity-glow-opacity, 0.65);
+  transform: scale(var(--rarity-glow-scale, 1));
   transition: opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease;
 }
 
+.rarity-aura[data-variant="collection"] .glow {
+  filter: blur(var(--rarity-glow-blur-collection, var(--rarity-glow-blur, 9px)));
+}
+
+.rarity-aura[data-variant="deck"] .glow {
+  filter: blur(var(--rarity-glow-blur-deck, var(--rarity-glow-blur, 9px)));
+}
+
 .rarity-aura .badge {
-  inset: auto auto 6px 6px;
+  top: auto;
+  right: auto;
+  bottom: 6px;
+  left: 6px;
   width: auto;
   padding: 2px 6px;
   font-weight: 700;
@@ -72,7 +92,6 @@ body.low-power .rarity-aura {
   align-items: center;
   justify-content: center;
   min-width: 36px;
-  pointer-events: none;
 }
 
 .rarity-aura[data-variant="deck"] .badge {
@@ -124,13 +143,16 @@ body.low-power .rarity-aura {
   display: none;
   overflow: hidden;
   mix-blend-mode: screen;
-  opacity: var(--rarity-sweep-opacity);
+  opacity: var(--rarity-sweep-opacity, 0.65);
 }
 
 .rarity-aura .sweep::before {
   content: "";
   position: absolute;
-  inset: -12%;
+  top: -12%;
+  right: -12%;
+  bottom: -12%;
+  left: -12%;
   background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0));
   transform: translateX(-120%) skewX(-10deg);
   filter: blur(2px);
@@ -144,7 +166,10 @@ body.low-power .rarity-aura {
 .rarity-aura.prism::after {
   content: "";
   position: absolute;
-  inset: -3px;
+  top: -3px;
+  right: -3px;
+  bottom: -3px;
+  left: -3px;
   border-radius: inherit;
   mix-blend-mode: screen;
   opacity: 0.9;
@@ -176,16 +201,16 @@ body.low-power .rarity-aura.prism::after {
 
 @keyframes shimmer-cycle {
   0% {
-    opacity: var(--rarity-glow-opacity);
+    opacity: var(--rarity-glow-opacity, 0.65);
   }
   6% {
-    opacity: calc(var(--rarity-glow-opacity) + 0.2);
+    opacity: var(--rarity-bloom-glow-opacity, 0.78);
   }
   12% {
-    opacity: var(--rarity-glow-opacity);
+    opacity: var(--rarity-glow-opacity, 0.65);
   }
   100% {
-    opacity: var(--rarity-glow-opacity);
+    opacity: var(--rarity-glow-opacity, 0.65);
   }
 }
 
@@ -204,31 +229,31 @@ body.low-power .rarity-aura.prism::after {
 }
 
 .rarity-aura.is-pre .ring {
-  opacity: 0.4;
+  opacity: var(--rarity-pre-ring-opacity, 0.4);
 }
 
 .rarity-aura.is-pre .glow {
-  opacity: calc(var(--rarity-glow-opacity) * 0.5);
-  transform: scale(0.92);
+  opacity: var(--rarity-pre-glow-opacity, 0.33);
+  transform: scale(var(--rarity-pre-glow-scale, 0.92));
 }
 
 .rarity-aura.is-bloom .ring {
-  transform: scale(calc(var(--rarity-ring-scale) * 1.08));
+  transform: scale(var(--rarity-bloom-ring-scale, 1.08));
 }
 
 .rarity-aura.is-bloom .glow {
-  opacity: min(1, calc(var(--rarity-glow-opacity) * 1.2));
-  transform: scale(1.08);
+  opacity: var(--rarity-bloom-glow-opacity, 0.78);
+  transform: scale(var(--rarity-bloom-glow-scale, 1.08));
 }
 
 .rarity-aura.is-reveal .ring {
-  transform: scale(var(--rarity-ring-scale));
-  opacity: var(--rarity-ring-opacity);
+  transform: scale(var(--rarity-ring-scale, 1));
+  opacity: var(--rarity-ring-opacity, 0.85);
 }
 
 .rarity-aura.is-reveal .glow {
-  opacity: var(--rarity-glow-opacity);
-  transform: scale(1);
+  opacity: var(--rarity-glow-opacity, 0.65);
+  transform: scale(var(--rarity-glow-scale, 1));
 }
 
 .rarity-aura.has-sweep.is-reveal .sweep::before {
@@ -244,27 +269,27 @@ body.low-power .rarity-aura.has-spark .spark-layer {
 }
 
 .rarity-N {
-  --rarity-color: #9AA3AF;
+  --rarity-color: #9aa3af;
 }
 
 .rarity-R {
-  --rarity-color: #2ED3A0;
+  --rarity-color: #2ed3a0;
 }
 
 .rarity-SR {
-  --rarity-color: #00E5FF;
+  --rarity-color: #00e5ff;
 }
 
 .rarity-SSR {
-  --rarity-color: #7C4DFF;
+  --rarity-color: #7c4dff;
 }
 
 .rarity-UR {
-  --rarity-color: #FFD773;
+  --rarity-color: #ffd773;
 }
 
 .rarity-PRIME {
-  --rarity-color: #FFFFFF;
+  --rarity-color: #ffffff;
 }
 
 .rarity-aura[data-variant="deck"],
@@ -297,21 +322,13 @@ body.low-power .rarity-aura.has-spark .spark-layer {
   opacity: 0.7;
 }
 
-.rarity-aura[data-variant="collection"] .glow {
-  filter: blur(calc(8px * var(--rarity-glow-active)));
-}
-
 .rarity-aura[data-variant="deck"] .ring {
   opacity: 0.75;
 }
 
-.rarity-aura[data-variant="deck"] .glow {
-  filter: blur(calc(7px * var(--rarity-glow-active)));
-}
-
 .rarity-aura[data-variant="deck"].is-hovered .glow,
 .rarity-aura[data-variant="deck"].is-selected .glow {
-  opacity: min(1, calc(var(--rarity-glow-opacity) * 1.2));
+  opacity: var(--rarity-bloom-glow-opacity, 0.78);
 }
 
 .rarity-aura[data-variant="collection"].has-sweep .sweep,
