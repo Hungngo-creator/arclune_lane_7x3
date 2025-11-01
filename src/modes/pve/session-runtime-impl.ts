@@ -1902,14 +1902,13 @@ function init(): boolean {
       if (!CLOCK || !Game) return;
       if (Game.battle?.over) return;
 
+      let sessionNowMs = getNow();
       if (isFiniteNumber(timestamp)){
         const rafTs = Number(timestamp);
         if (SUPPORTS_PERF_NOW || (rafTs >= 0 && rafTs <= RAF_TIMESTAMP_MAX)){
-          normalizeAnimationFrameTimestamp(rafTs);
+          sessionNowMs = normalizeAnimationFrameTimestamp(rafTs);
         }
-    }
-
-    const sessionNowMs = getNow();
+      }
       const elapsedSec = Math.floor((sessionNowMs - CLOCK.startMs) / 1000);
 
       const prevRemain = Number.isFinite(CLOCK.lastTimerRemain) ? CLOCK.lastTimerRemain : 0;
@@ -1936,9 +1935,9 @@ function init(): boolean {
           Game.ai.cost = Math.min(Game.ai.costCap, Game.ai.cost + deltaSec);
         }
 
-      CLOCK.lastCostCreditedSec = elapsedSec;
+       CLOCK.lastCostCreditedSec = elapsedSec;
 
-    if (hud && Game) hud.update(Game);
+       if (hud && Game) hud.update(Game);
         if (!Game.selectedId) selectFirstAffordable();
         renderSummonBar();
         aiMaybeAct(Game, 'cost');
@@ -1946,7 +1945,7 @@ function init(): boolean {
 
       if (Game.battle?.over) return;
 
-    const turnState = Game.turn ?? null;
+      const turnState = Game.turn ?? null;
       let busyUntil = 0;
       if (turnState){
         const rawBusy = turnState.busyUntil;
@@ -1966,22 +1965,23 @@ function init(): boolean {
         CLOCK.turnEveryMs = turnEveryMs;
       }
 
-    const stallDeltaEpsilon = 1;
+      const stallDeltaEpsilon = 1;
       const initialTurnBaseline = Number.isFinite(CLOCK.startMs)
         ? CLOCK.startMs - turnEveryMs
         : sessionNowMs - turnEveryMs;
       if (!Number.isFinite(CLOCK.lastTurnStepMs)){
         CLOCK.lastTurnStepMs = initialTurnBaseline;
-      }
-
-      const readyByBusy = sessionNowMs >= busyUntil;
-      const sessionElapsed = sessionNowMs - CLOCK.lastTurnStepMs;
-
-      if (readyByBusy && (!Number.isFinite(sessionElapsed) || sessionElapsed < -stallDeltaEpsilon)){
+      } else if (CLOCK.lastTurnStepMs > sessionNowMs){
         CLOCK.lastTurnStepMs = sessionNowMs - turnEveryMs;
       }
 
-    const elapsedForTurn = sessionNowMs - CLOCK.lastTurnStepMs;
+      const readyByBusy = sessionNowMs >= busyUntil;
+      let elapsedForTurn = sessionNowMs - CLOCK.lastTurnStepMs;
+
+      if (readyByBusy && (!Number.isFinite(elapsedForTurn) || elapsedForTurn < -stallDeltaEpsilon)){
+        CLOCK.lastTurnStepMs = sessionNowMs - turnEveryMs;
+        elapsedForTurn = turnEveryMs;
+      }
 
       if (readyByBusy && elapsedForTurn >= turnEveryMs){
         CLOCK.lastTurnStepMs = sessionNowMs;
