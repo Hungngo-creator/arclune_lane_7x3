@@ -26,6 +26,7 @@ describe('PvE RAF fallback khi thiếu performance.now()', () => {
   let view;
   let freezeRafTimestamp;
   let frozenRafValue;
+  let setSessionOffset;
 
   beforeEach(() => {
     clearModuleCache();
@@ -38,6 +39,9 @@ describe('PvE RAF fallback khi thiếu performance.now()', () => {
 
     let lastFallbackNow = 0;
     let sessionOffset = 0;
+    setSessionOffset = (value) => {
+      sessionOffset = value;
+    };
     let sessionReady = false;
     let rafOffset = null;
     freezeRafTimestamp = false;
@@ -164,6 +168,7 @@ describe('PvE RAF fallback khi thiếu performance.now()', () => {
     stubModules.set(TIME_MODULE_KEY, originalTimeModule);
     stubModules.set(TURNS_MODULE_KEY, originalTurnsModule);
     clearModuleCache();
+    setSessionOffset = null;
   });
 
   it('tiếp tục kích hoạt lượt đánh với requestAnimationFrame', () => {
@@ -537,6 +542,87 @@ describe('PvE RAF fallback khi thiếu performance.now()', () => {
     tick?.(currentTime);
 
     expect(stepTurnSpy).toHaveBeenCalled();
+
+    session.stop();
+  });
+
+it('giữ đồng hồ & cost ổn định khi session offset giảm mạnh', () => {
+    const boardContext = {
+      canvas: null,
+      setTransform: jest.fn(),
+      resetTransform: jest.fn(),
+      scale: jest.fn(),
+      clearRect: jest.fn(),
+      drawImage: jest.fn(),
+    };
+    const board = {
+      width: 700,
+      height: 600,
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      getContext: jest.fn(() => boardContext),
+      getBoundingClientRect: jest.fn(() => ({ left: 0, top: 0 })),
+    };
+    boardContext.canvas = board;
+
+    const timerEl = { textContent: '04:00' };
+
+    const documentStub = {
+      querySelector: jest.fn((selector) => {
+        if (selector === '#board') return board;
+        if (selector === '#timer') return timerEl;
+        return null;
+      }),
+      getElementById: jest.fn((id) => {
+        if (id === 'board') return board;
+        if (id === 'timer') return timerEl;
+        return null;
+      }),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      defaultView: view,
+      hidden: false,
+    };
+    const root = {
+      ownerDocument: documentStub,
+      querySelector: (selector) => documentStub.querySelector(selector),
+    };
+    board.ownerDocument = documentStub;
+
+    usePerfNow = true;
+    const origin = 1_000_000_000_000;
+    perfNowValue = 0;
+    perfNowMock.mockImplementation(() => perfNowValue);
+    global.performance = {
+      now: perfNowMock,
+      timeOrigin: origin,
+    };
+
+    const sessionModule = loadSessionModule();
+    const { createPveSession, __getActiveGame } = sessionModule;
+
+    const session = createPveSession(root);
+    const game = session.start();
+
+    expect(game).not.toBeNull();
+    expect(__getActiveGame()).toBe(game);
+    expect(view.requestAnimationFrame).toHaveBeenCalled();
+    expect(rafCallbacks.length).toBeGreaterThan(0);
+
+    setSessionOffset?.(0);
+    perfNowValue = 1_500;
+
+    if (game?.turn){
+      game.turn.busyUntil = 0;
+    }
+
+    const tick = rafCallbacks.shift();
+    expect(typeof tick).toBe('function');
+
+    tick?.(perfNowValue);
+
+    expect(timerEl.textContent).toBe('03:59');
+    expect(game?.cost ?? 0).toBeGreaterThan(0);
 
     session.stop();
   });
