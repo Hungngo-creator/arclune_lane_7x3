@@ -671,6 +671,82 @@ describe('PvE RAF fallback khi thiếu performance.now()', () => {
     session.stop();
   });
 
+it('cost và lượt vẫn tăng khi requestAnimationFrame trả 0 liên tục', () => {
+    const boardContext = {
+      canvas: null,
+      setTransform: jest.fn(),
+      resetTransform: jest.fn(),
+      scale: jest.fn(),
+      clearRect: jest.fn(),
+      drawImage: jest.fn(),
+    };
+    const board = {
+      width: 700,
+      height: 600,
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      getContext: jest.fn(() => boardContext),
+      getBoundingClientRect: jest.fn(() => ({ left: 0, top: 0 })),
+    };
+    boardContext.canvas = board;
+
+    const timerEl = { textContent: '' };
+
+    const documentStub = {
+      querySelector: jest.fn((selector) => {
+        if (selector === '#board') return board;
+        if (selector === '#timer') return timerEl;
+        return null;
+      }),
+      getElementById: jest.fn((id) => {
+        if (id === 'board') return board;
+        if (id === 'timer') return timerEl;
+        return null;
+      }),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      defaultView: view,
+      hidden: false,
+    };
+    const root = {
+      ownerDocument: documentStub,
+      querySelector: (selector) => documentStub.querySelector(selector),
+    };
+    board.ownerDocument = documentStub;
+
+    const sessionModule = loadSessionModule();
+    const { createPveSession } = sessionModule;
+
+    const session = createPveSession(root);
+    const game = session.start();
+
+    expect(game).not.toBeNull();
+    expect(view.requestAnimationFrame).toHaveBeenCalled();
+    expect(rafCallbacks.length).toBeGreaterThan(0);
+
+    const initialCost = Number(game?.cost ?? 0);
+    let current = Number(safeNowStub.mock.results[0]?.value ?? 0);
+
+    for (let round = 1; round <= 3; round += 1){
+      const tick = rafCallbacks.shift();
+      expect(typeof tick).toBe('function');
+      if (game?.turn){
+        game.turn.busyUntil = 0;
+      }
+      current += 800;
+      currentTime = current;
+      tick?.(0);
+      expect(stepTurnSpy).toHaveBeenCalledTimes(round);
+      expect(view.requestAnimationFrame).toHaveBeenCalledTimes(round + 1);
+      expect(rafCallbacks.length).toBeGreaterThan(0);
+    }
+
+    const costAfter = Number(game?.cost ?? 0);
+    expect(costAfter).toBeGreaterThan(initialCost);
+
+    session.stop();
+  });
+
   it('chuẩn hóa timestamp requestAnimationFrame khác gốc', () => {
     const boardContext = {
       canvas: null,
