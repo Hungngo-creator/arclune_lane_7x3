@@ -402,7 +402,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   gridSection.className = 'lineup-grid';
   const gridTitle = document.createElement('p');
   gridTitle.className = 'lineup-grid__title';
-  gridTitle.textContent = 'Ô đội hình';
+  gridTitle.textContent = 'Bố cục đội hình 5x2';
   gridSection.appendChild(gridTitle);
   const gridContent = document.createElement('div');
   gridContent.className = 'lineup-grid__content';
@@ -542,6 +542,10 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       empty.className = 'lineup-grid__details-empty';
       empty.textContent = 'Chưa có đội hình để hiển thị thông tin.';
       cellDetails.appendChild(empty);
+      const hint = document.createElement('p');
+      hint.className = 'lineup-grid__details-empty';
+      hint.textContent = 'Tạo hoặc chọn một đội hình để xem bố cục 5x2.';
+      cellDetails.appendChild(hint);
       syncGridDetailsHeight();
       return;
     }
@@ -551,7 +555,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       cellDetails.classList.add('is-empty');
       const hint = document.createElement('p');
       hint.className = 'lineup-grid__details-empty';
-      hint.textContent = 'Chọn một ô để xem mô tả kỹ năng.';
+      hint.textContent = 'Chọn một ô trong lưới 5x2 để xem mô tả chi tiết.';
       cellDetails.appendChild(hint);
       syncGridDetailsHeight();
       return;
@@ -564,6 +568,49 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       missing.className = 'lineup-grid__details-empty';
       missing.textContent = 'Không tìm thấy ô tương ứng.';
       cellDetails.appendChild(missing);
+      const retry = document.createElement('p');
+      retry.className = 'lineup-grid__details-empty';
+      retry.textContent = 'Hãy chọn lại một vị trí hợp lệ trong bố cục 5x2.';
+      cellDetails.appendChild(retry);
+      syncGridDetailsHeight();
+      return;
+    }
+
+    const firstReserveIndex = lineup.cells.find(entry => entry.section === 'reserve')?.index ?? lineup.cells.length;
+    const sectionName = cell.section === 'formation' ? 'Ô ra trận' : 'Ô dự phòng';
+    const displayIndex = cell.section === 'formation'
+      ? cell.index + 1
+      : (cell.index - firstReserveIndex + 1);
+    const labelText = `${sectionName} #${Math.max(displayIndex, 1)}`;
+
+    const heading = document.createElement('p');
+    heading.className = 'lineup-grid__details-heading';
+    heading.textContent = labelText;
+    cellDetails.appendChild(heading);
+
+    if (cell.label){
+      const note = document.createElement('p');
+      note.className = 'lineup-grid__details-text';
+      note.textContent = `Ghi chú: ${cell.label}`;
+      cellDetails.appendChild(note);
+    }
+
+    if (!cell.unlocked){
+      cellDetails.classList.add('is-empty');
+      const locked = document.createElement('p');
+      locked.className = 'lineup-grid__details-empty';
+      locked.textContent = 'Ô này đang bị khóa. Mở khóa để sử dụng vị trí trong đội hình.';
+      cellDetails.appendChild(locked);
+      if (cell.unlockCost){
+        const cost = document.createElement('p');
+        cost.className = 'lineup-grid__details-empty';
+        cost.textContent = `Chi phí mở khóa: ${formatCurrencyBalance(cell.unlockCost.amount, cell.unlockCost.currencyId)}.`;
+        cellDetails.appendChild(cost);
+      }
+      const hint = document.createElement('p');
+      hint.className = 'lineup-grid__details-empty';
+      hint.textContent = 'Nhấp vào ô để xác nhận mở khóa, sau đó chọn nhân vật và nhấp lại để gán.';
+      cellDetails.appendChild(hint);
       syncGridDetailsHeight();
       return;
     }
@@ -573,11 +620,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       cellDetails.classList.add('is-empty');
       const empty = document.createElement('p');
       empty.className = 'lineup-grid__details-empty';
-      empty.textContent = cell.label
-      ? `Ô được ghi chú "${cell.label}".`
-        : cell.section === 'formation'
-          ? 'Ô ra trận hiện đang trống.'
-          : 'Ô dự phòng hiện đang trống.';
+      empty.textContent = `${labelText} hiện đang trống.`;
       cellDetails.appendChild(empty);
       const hint = document.createElement('p');
       hint.className = 'lineup-grid__details-empty';
