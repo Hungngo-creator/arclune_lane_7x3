@@ -4965,8 +4965,8 @@ __define('./engine.ts', (exports, module, __require) => {
       var _a, _b;
       const artAlly = getUnitArt('leaderA');
       const artEnemy = getUnitArt('leaderB');
-      const allyCell = slotToCell('ally', 5);
-      const enemyCell = slotToCell('enemy', 5);
+      const allyCell = slotToCell('ally', 8);
+      const enemyCell = slotToCell('enemy', 8);
       tokens.push({
           id: 'leaderA',
           name: 'Uyên',
@@ -7314,6 +7314,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   const mergeBusyUntil = __dep17.mergeBusyUntil;
   const normalizeAnimationFrameTimestamp = __dep17.normalizeAnimationFrameTimestamp;
   const resetSessionTimeBase = __dep17.resetSessionTimeBase;
+  const safeNow = __dep17.safeNow;
   const sessionNow = __dep17.sessionNow;
   const __dep18 = __require('./utils/kit.ts');
   const getSummonSpec = __dep18.getSummonSpec;
@@ -7676,6 +7677,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       && typeof globalThis.performance.now === 'function';
   const RAF_TIMESTAMP_MAX = 2147483647; // ~24 ngày tính từ mốc điều hướng
   const RAF_DRIFT_TOLERANCE_MS = 120000; // 2 phút – đủ rộng cho mọi sai lệch hợp lệ
+  const CLOCK_DRIFT_TOLERANCE_MS = RAF_DRIFT_TOLERANCE_MS;
   // --- Instance counters (để gắn id cho token/minion) ---
   let _IID = 1;
   let _BORN = 1;
@@ -7992,6 +7994,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   let CLOCK = null;
   function createClock() {
       var _a;
+      const safe = safeNow();
       const now = getNow();
       const intervalCandidate = (_a = CFG === null || CFG === void 0 ? void 0 : CFG.ANIMATION) === null || _a === void 0 ? void 0 : _a.turnIntervalMs;
       const parsedInterval = Number(intervalCandidate);
@@ -8000,6 +8003,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           : 600;
       return {
           startMs: now,
+          startSafeMs: safe,
           lastTimerRemain: 240,
           lastCostCreditedSec: 0,
           turnEveryMs,
@@ -9056,11 +9060,25 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               return;
           if ((_a = Game.battle) === null || _a === void 0 ? void 0 : _a.over)
               return;
+          const safeNowMs = safeNow();
+          const expectedSessionMs = safeNowMs - CLOCK.startSafeMs + CLOCK.startMs;
           let sessionNowMs = getNow();
+          const needRebase = !Number.isFinite(sessionNowMs)
+              || Math.abs(sessionNowMs - expectedSessionMs) > CLOCK_DRIFT_TOLERANCE_MS;
+          if (needRebase) {
+              sessionNowMs = expectedSessionMs;
+          }
           if (isFiniteNumber(timestamp)) {
               const rafTs = Number(timestamp);
               if (SUPPORTS_PERF_NOW || (rafTs >= 0 && rafTs <= RAF_TIMESTAMP_MAX)) {
                   sessionNowMs = normalizeAnimationFrameTimestamp(rafTs);
+              }
+              if (needRebase) {
+                  const adjusted = expectedSessionMs;
+                  if (!Number.isFinite(sessionNowMs)
+                      || Math.abs(sessionNowMs - adjusted) > CLOCK_DRIFT_TOLERANCE_MS) {
+                      sessionNowMs = adjusted;
+                  }
               }
           }
           const elapsedSec = Math.floor((sessionNowMs - CLOCK.startMs) / 1000);
