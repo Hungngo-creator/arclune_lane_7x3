@@ -1981,16 +1981,7 @@ function init(): boolean {
         CLOCK.lastTurnStepMs = sessionNowMs - turnEveryMs;
       }
 
-    let hasTurnStepped = false;
-      if (Number.isFinite(CLOCK.lastTurnStepMs)){
-        hasTurnStepped = CLOCK.lastTurnStepMs > (initialTurnBaseline + stallDeltaEpsilon);
-      }
-
-      if (readyByBusy && !hasTurnStepped){
-        CLOCK.lastTurnStepMs = sessionNowMs - turnEveryMs;
-      }
-
-       const elapsedForTurn = sessionNowMs - CLOCK.lastTurnStepMs;
+    const elapsedForTurn = sessionNowMs - CLOCK.lastTurnStepMs;
 
       if (readyByBusy && elapsedForTurn >= turnEveryMs){
         CLOCK.lastTurnStepMs = sessionNowMs;
