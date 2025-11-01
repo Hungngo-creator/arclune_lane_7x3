@@ -15,7 +15,7 @@ try {
 const SRC_DIR = path.join(__dirname, 'src');
 const DIST_DIR = path.join(__dirname, 'dist');
 const ENTRY_ID = './entry.ts';
-const SOURCE_EXTENSIONS = ['.js', '.ts', '.tsx', '.json'];
+const SOURCE_EXTENSIONS = ['.js', '.ts', '.tsx', '.json', '.css'];
 const SCRIPT_EXTENSIONS = new Set(['.js', '.ts', '.tsx']);
 const STUB_MODULE_SPECIFIERS = new Map([
   ['zod', path.join(__dirname, 'tools/zod-stub/index.js')],
@@ -546,6 +546,23 @@ async function build(){
         `const data = JSON.parse('${escaped}');`,
         'module.exports = data;',
         'module.exports.default = data;',
+      ].join('\n');
+      modules.push({ id, code: moduleCode });
+      continue;
+    }
+    if (ext === '.css'){
+      const escapedCss = raw
+        .replace(/\\/g, '\\\\')
+        .replace(/`/g, '\\`')
+        .replace(/\$/g, '\\\$')
+        .replace(/\r/g, '\\r')
+        .replace(/\n/g, '\\n')
+        .replace(/\u2028/g, '\\u2028')
+        .replace(/\u2029/g, '\\u2029');
+      const moduleCode = [
+        `const css = \`${escapedCss}\`;`,
+        'module.exports = css;',
+        'module.exports.default = css;',
       ].join('\n');
       modules.push({ id, code: moduleCode });
       continue;
