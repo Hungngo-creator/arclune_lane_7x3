@@ -87,7 +87,7 @@ describe('renderMainMenuView', () => {
 });
 
 describe('renderLineupScreen', () => {
-  it('hiển thị bố cục lineup với đủ số ô bench mặc định', () => {
+  it('hiển thị bố cục lineup với đủ số ô trên lưới 5x2', () => {
     const root = document.createElement('div');
     document.body.appendChild(root);
 
@@ -98,7 +98,11 @@ describe('renderLineupScreen', () => {
 
     expect(root.querySelector('.lineup-view')).not.toBeNull();
 
-    const benchCells = root.querySelectorAll('.lineup-bench__cell');
+    const gridTitle = root.querySelector('.lineup-grid__title');
+    expect(gridTitle?.textContent).toContain('5x2');
+
+    const gridCells = root.querySelectorAll('.lineup-grid__cells .lineup-cell');
+    expect(gridCells).toHaveLength(10);
     expect(benchCells).toHaveLength(5);
 
     const backButton = root.querySelector<HTMLButtonElement>('.lineup-view__back');
@@ -107,6 +111,33 @@ describe('renderLineupScreen', () => {
     handle.destroy();
   });
   
+  it('snapshot bố cục mặc định của lưới 5x2', () => {
+    const root = document.createElement('div');
+    document.body.appendChild(root);
+
+    const handle = renderLineupScreen({
+      root,
+      definition: { label: 'Đội hình snapshot' },
+    });
+
+    const grid = root.querySelector('.lineup-grid__cells');
+    expect(grid).not.toBeNull();
+
+    const cells = Array.from(grid?.querySelectorAll<HTMLElement>('.lineup-cell') ?? []).map(cell => ({
+      index: cell.dataset.cellIndex ?? null,
+      isLocked: cell.classList.contains('is-locked'),
+      defaultAction: cell.dataset.cellDefaultAction ?? null,
+      primaryAction: cell.dataset.cellAction ?? null,
+      altAction: cell.dataset.cellAltAction ?? null,
+      avatar: cell.querySelector('.lineup-cell__avatar')?.textContent ?? '',
+      ariaLabel: cell.getAttribute('aria-label'),
+    }));
+
+    expect(cells).toMatchSnapshot();
+
+    handle.destroy();
+  });
+
   it('khởi tạo lineup với roster và currencies typed', () => {
     const root = document.createElement('div');
     document.body.appendChild(root);
