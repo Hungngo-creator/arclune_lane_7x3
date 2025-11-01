@@ -73,7 +73,7 @@ const currencyIndex = new Map(currencyCatalog.map(currency => [currency.id, curr
 const numberFormatter = createNumberFormatter('vi-VN');
 
 const FORMATION_CELL_COUNT = 5;
-const RESERVE_CELL_COUNT = 10;
+const RESERVE_CELL_COUNT = 5;
 
 const isObjectLike = (value: unknown): value is Record<string, unknown> => (
   typeof value === 'object' && value !== null && !Array.isArray(value)
