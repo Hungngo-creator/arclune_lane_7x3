@@ -14437,7 +14437,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           if (!lineup) {
               renderAvatar(leaderAvatar, null, '');
               leaderName.textContent = 'Chưa chọn leader';
-              syncBenchDetailsHeight();
+              syncGridDetailsHeight();
               return;
           }
           if (lineup.leaderId) {
@@ -14449,7 +14449,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               renderAvatar(leaderAvatar, null, '');
               leaderName.textContent = 'Chưa chọn leader';
           }
-          syncBenchDetailsHeight();
+          syncGridDetailsHeight();
       }
       function renderPassives() {
           const lineup = getSelectedLineup();
