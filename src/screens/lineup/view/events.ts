@@ -1,11 +1,9 @@
 import type { LineupViewState, LineupMessageType, LineupPassive, RosterUnit } from './state.ts';
 import {
-  assignUnitToBench,
-  assignUnitToSlot,
-  removeUnitFromBench,
-  removeUnitFromSlot,
+  assignUnitToCell,
+  removeUnitFromCell,
   setLeader,
-  unlockSlot,
+  unlockCell,
   formatCurrencyBalance,
 } from './state.ts';
 import type { LineupState } from '@shared-types/ui';
@@ -14,9 +12,8 @@ export type CleanupCallback = () => void;
 
 export interface LineupEventElements {
   backButton: HTMLButtonElement;
-  slotsGrid: HTMLElement;
-  benchGrid: HTMLElement;
-  benchDetails: HTMLElement;
+  cellsGrid: HTMLElement;
+  cellDetails: HTMLElement;
   passiveGrid: HTMLElement;
   rosterFilters: HTMLElement;
   rosterList: HTMLElement;
@@ -37,15 +34,14 @@ export interface OverlayController {
 export interface LineupEventHelpers {
   getSelectedLineup: () => LineupState | null;
   setMessage: (text: string, type?: LineupMessageType) => void;
-  renderSlots: () => void;
-  renderBench: () => void;
-  renderBenchDetails: () => void;
+  renderCells: () => void;
+  renderCellDetails: () => void;
   renderLeader: () => void;
   renderPassives: () => void;
   renderFilters: () => void;
   renderRoster: () => void;
-  updateActiveBenchHighlight: () => void;
-  syncBenchDetailsHeight: () => void;
+  updateActiveCellHighlight: () => void;
+  syncGridDetailsHeight: () => void;
   openPassiveDetails: (passive: LineupPassive) => void;
   openLeaderPicker: () => void;
   refreshWallet: () => void;
@@ -64,9 +60,8 @@ export function bindLineupEvents(context: LineupEventContext): CleanupCallback[]
   const { state, elements, helpers, overlays, rosterLookup, shell } = context;
   const {
     backButton,
-    slotsGrid,
-    benchGrid,
-    benchDetails,
+    cellsGrid,
+    cellDetails: _cellDetails,
     passiveGrid,
     rosterFilters,
     rosterList,
@@ -84,7 +79,7 @@ export function bindLineupEvents(context: LineupEventContext): CleanupCallback[]
   let leaderObserver: ResizeObserver | null = null;
   if (typeof ResizeObserver === 'function'){
     leaderObserver = new ResizeObserver(() => {
-      helpers.syncBenchDetailsHeight();
+      helpers.syncGridDetailsHeight();
     });
     leaderObserver.observe(leaderSection);
     cleanup.push(() => {
@@ -94,7 +89,7 @@ export function bindLineupEvents(context: LineupEventContext): CleanupCallback[]
     });
   }
 
-  const handleWindowResize = () => helpers.syncBenchDetailsHeight();
+  const handleWindowResize = () => helpers.syncGridDetailsHeight();
   if (typeof window !== 'undefined'){
     window.addEventListener('resize', handleWindowResize);
     cleanup.push(() => {
@@ -116,89 +111,41 @@ export function bindLineupEvents(context: LineupEventContext): CleanupCallback[]
   backButton.addEventListener('click', handleBack);
   cleanup.push(() => backButton.removeEventListener('click', handleBack));
 
-  const handleBenchInteraction = (event: Event) => {
-    const benchEl = (event.target as HTMLElement | null)?.closest<HTMLElement>('.lineup-bench__cell');
-    if (!benchEl) return;
+const getCellLabel = (lineup: LineupState, cellIndex: number): string => {
+    const cell = lineup.cells[cellIndex];
+    if (!cell){
+      return 'Ô đội hình';
+  }
+const firstReserveIndex = lineup.cells.find(entry => entry.section === 'reserve')?.index ?? lineup.cells.length;
+    const displayIndex = cell.section === 'formation'
+      ? cell.index + 1
+      : (cell.index - firstReserveIndex + 1);
+    const sectionName = cell.section === 'formation' ? 'Ô ra trận' : 'Ô dự phòng';
+    return `${sectionName} #${Math.max(displayIndex, 1)}`;
+};
+
+const handleCellInteraction = (event: Event) => {
+    const cellEl = (event.target as HTMLElement | null)?.closest<HTMLElement>('.lineup-cell');
+    if (!cellEl) return;
     const lineup = helpers.getSelectedLineup();
     if (!lineup) return;
-    const benchIndex = Number(benchEl.dataset.benchIndex);
-    if (!Number.isFinite(benchIndex)) return;
-    const cell = lineup.bench[benchIndex];
+   const cellIndex = Number(cellEl.dataset.cellIndex);
+    if (!Number.isFinite(cellIndex)) return;
+    const cell = lineup.cells[cellIndex];
     if (!cell) return;
+    
+    state.activeCellIndex = cellIndex;
+    helpers.updateActiveCellHighlight();
+    helpers.renderCellDetails();
 
-    if (state.selectedUnitId){
-      const result = assignUnitToBench(lineup, benchIndex, state.selectedUnitId);
-      if (!result.ok){
-        helpers.setMessage(result.message || 'Không thể gán nhân vật.', 'error');
-      } else {
-        helpers.setMessage('Đã thêm nhân vật vào dự bị.', 'info');
-      }
-      helpers.renderSlots();
-      helpers.renderBench();
-      helpers.renderBenchDetails();
-      helpers.renderLeader();
-      helpers.renderPassives();
-      helpers.renderRoster();
-      return;
-    }
-
-    const mouseEvent = event as MouseEvent;
-    if (mouseEvent.altKey || mouseEvent.ctrlKey || mouseEvent.metaKey){
-      if (cell.unitId){
-        removeUnitFromBench(lineup, benchIndex);
-        state.activeBenchIndex = benchIndex;
-        helpers.renderSlots();
-        helpers.renderBench();
-        helpers.renderBenchDetails();
-        helpers.renderPassives();
-        helpers.renderRoster();
-        helpers.renderLeader();
-        helpers.setMessage('Đã bỏ nhân vật khỏi dự bị.', 'info');
-      }
-      return;
-    }
-
-    state.activeBenchIndex = benchIndex;
-    helpers.updateActiveBenchHighlight();
-    helpers.renderBenchDetails();
-  };
-  benchGrid.addEventListener('click', handleBenchInteraction);
-  cleanup.push(() => benchGrid.removeEventListener('click', handleBenchInteraction));
-
-  const handleBenchFocus = (event: Event) => {
-    const benchEl = (event.target as HTMLElement | null)?.closest<HTMLElement>('.lineup-bench__cell');
-    if (!benchEl) return;
-    const lineup = helpers.getSelectedLineup();
-    if (!lineup) return;
-    const benchIndex = Number(benchEl.dataset.benchIndex);
-    if (!Number.isFinite(benchIndex)) return;
-    if (state.activeBenchIndex === benchIndex) return;
-    state.activeBenchIndex = benchIndex;
-    helpers.updateActiveBenchHighlight();
-    helpers.renderBenchDetails();
-  };
-  benchGrid.addEventListener('focusin', handleBenchFocus);
-  cleanup.push(() => benchGrid.removeEventListener('focusin', handleBenchFocus));
-  benchGrid.addEventListener('mouseenter', handleBenchFocus, true);
-  cleanup.push(() => benchGrid.removeEventListener('mouseenter', handleBenchFocus, true));
-
-  const handleSlotInteraction = (event: Event) => {
-    const slotEl = (event.target as HTMLElement | null)?.closest<HTMLElement>('.lineup-slot');
-    if (!slotEl) return;
-    const lineup = helpers.getSelectedLineup();
-    if (!lineup) return;
-    const slotIndex = Number(slotEl.dataset.slotIndex);
-    if (!Number.isFinite(slotIndex)) return;
-    const slot = lineup.slots[slotIndex];
-    if (!slot) return;
-
+    const label = getCellLabel(lineup, cellIndex);
     const actionButton = (event.target as HTMLElement | null)?.closest<HTMLButtonElement>('.lineup-button');
-    const action = actionButton?.dataset.slotAction ?? null;
+    const action = actionButton?.dataset.cellAction ?? null;
 
     if (action === 'unlock'){
-      const result = unlockSlot(lineup, slotIndex, state.currencyBalances);
+      const result = unlockCell(lineup, cellIndex, state.currencyBalances);
       if (!result.ok){
-        helpers.setMessage(result.message || 'Không thể mở khóa vị trí.', 'error');
+        helpers.setMessage(result.message || 'Không thể mở khóa ô.', 'error');
         return;
       }
       const spentText = result.spent
@@ -206,13 +153,11 @@ export function bindLineupEvents(context: LineupEventContext): CleanupCallback[]
         : null;
       helpers.setMessage(
         spentText
-          ? `Đã mở khóa vị trí ${slotIndex + 1} (tốn ${spentText}).`
-          : `Đã mở khóa vị trí ${slotIndex + 1}.`,
+         ? `Đã mở khóa ${label} (tốn ${spentText}).`
+          : `Đã mở khóa ${label}.`,
         'info',
       );
-      helpers.renderSlots();
-      helpers.renderBench();
-      helpers.renderBenchDetails();
+      helpers.renderCells();
       helpers.renderLeader();
       helpers.renderPassives();
       helpers.renderRoster();
@@ -220,8 +165,8 @@ export function bindLineupEvents(context: LineupEventContext): CleanupCallback[]
       return;
     }
 
-    if (!slot.unlocked){
-      helpers.setMessage('Vị trí đang bị khóa.', 'error');
+    if (!cell.unlocked){
+      helpers.setMessage('Ô đang bị khóa.', 'error');
       return;
     }
 
@@ -229,96 +174,120 @@ export function bindLineupEvents(context: LineupEventContext): CleanupCallback[]
     const isModifierClear = action === 'clear'
       || (mouseEvent && (mouseEvent.altKey || mouseEvent.ctrlKey || mouseEvent.metaKey));
     if (isModifierClear){
-      if (!slot.unitId){
+      if (!cell.unitId){
         helpers.setMessage('Ô này đang trống.', 'info');
         return;
       }
-      const removedUnitId = slot.unitId;
-      removeUnitFromSlot(lineup, slotIndex);
+      const removedUnitId = cell.unitId;
+      removeUnitFromCell(lineup, cellIndex);
       if (state.selectedUnitId === removedUnitId){
         state.selectedUnitId = null;
       }
-      helpers.setMessage('Đã bỏ nhân vật khỏi vị trí.', 'info');
-      helpers.renderSlots();
-      helpers.renderBench();
-      helpers.renderBenchDetails();
+      helpers.setMessage('Đã bỏ nhân vật khỏi ô.', 'info');
+      helpers.renderCells();
       helpers.renderLeader();
       helpers.renderPassives();
       helpers.renderRoster();
       return;
     }
 
-    if (!state.selectedUnitId){
-      if (slot.unitId){
-        state.selectedUnitId = slot.unitId;
-        const unit = rosterLookup.get(slot.unitId);
-        helpers.setMessage(`Đã chọn ${unit?.name || 'nhân vật'} đang ở vị trí ${slotIndex + 1}. Chọn ô khác để hoán đổi hoặc nhấn "Bỏ".`, 'info');
-        helpers.renderRoster();
-        helpers.renderSlots();
-      } else {
-        helpers.setMessage('Chọn nhân vật từ roster để gán vào vị trí này.', 'info');
+    if (action === 'assign'){
+      if (!state.selectedUnitId){
+        helpers.setMessage('Chọn nhân vật từ roster trước.', 'info');
+        return;
       }
+      const assignResult = assignUnitToCell(lineup, cellIndex, state.selectedUnitId);
+      if (!assignResult.ok){
+        helpers.setMessage(assignResult.message || 'Không thể gán nhân vật.', 'error');
+        return;
+      }
+     const unit = rosterLookup.get(state.selectedUnitId);
+      helpers.setMessage(`Đã gán ${unit?.name || 'nhân vật'} vào ${label}.`, 'info');
+      state.selectedUnitId = null;
+      helpers.renderCells();
+      helpers.renderLeader();
+      helpers.renderPassives();
+      helpers.renderRoster();
       return;
     }
 
-    const result = assignUnitToSlot(lineup, slotIndex, state.selectedUnitId);
-    if (!result.ok){
-      helpers.setMessage(result.message || 'Không thể gán nhân vật.', 'error');
+    if (state.selectedUnitId){
+      const result = assignUnitToCell(lineup, cellIndex, state.selectedUnitId);
+      if (!result.ok){
+        helpers.setMessage(result.message || 'Không thể gán nhân vật.', 'error');
+        return;
+      }
+      const unit = rosterLookup.get(state.selectedUnitId);
+      helpers.setMessage(`Đã gán ${unit?.name || 'nhân vật'} vào ${label}.`, 'info');
+      state.selectedUnitId = null;
+      helpers.renderCells();
+      helpers.renderLeader();
+      helpers.renderPassives();
+      helpers.renderRoster();
       return;
     }
-    const unit = rosterLookup.get(state.selectedUnitId);
-    helpers.setMessage(`Đã gán ${unit?.name || 'nhân vật'} vào vị trí ${slotIndex + 1}.`, 'info');
-    state.selectedUnitId = null;
-    helpers.renderSlots();
-    helpers.renderBench();
-    helpers.renderBenchDetails();
-    helpers.renderLeader();
-    helpers.renderPassives();
-    helpers.renderRoster();
+
+    if (cell.unitId){
+      state.selectedUnitId = cell.unitId;
+      const unit = rosterLookup.get(cell.unitId);
+      helpers.setMessage(`Đã chọn ${unit?.name || 'nhân vật'} đang ở ${label}. Chọn ô khác để hoán đổi hoặc nhấn "Bỏ".`, 'info');
+      helpers.renderRoster();
+      helpers.renderCells();
+    } else {
+      helpers.setMessage('Chọn nhân vật từ roster để gán vào ô này.', 'info');
+    }
   };
-  slotsGrid.addEventListener('click', handleSlotInteraction);
-  cleanup.push(() => slotsGrid.removeEventListener('click', handleSlotInteraction));
+  cellsGrid.addEventListener('click', handleCellInteraction);
+  cleanup.push(() => cellsGrid.removeEventListener('click', handleCellInteraction));
 
-  const handleSlotFocus = (event: Event) => {
-    const slotEl = (event.target as HTMLElement | null)?.closest<HTMLElement>('.lineup-slot');
-    if (!slotEl) return;
+  const handleCellFocus = (event: Event) => {
+    const cellEl = (event.target as HTMLElement | null)?.closest<HTMLElement>('.lineup-cell');
+    if (!cellEl) return;
     const lineup = helpers.getSelectedLineup();
     if (!lineup) return;
-    const slotIndex = Number(slotEl.dataset.slotIndex);
-    if (!Number.isFinite(slotIndex)) return;
-    const slot = lineup.slots[slotIndex];
-    if (!slot) return;
+    const cellIndex = Number(cellEl.dataset.cellIndex);
+    if (!Number.isFinite(cellIndex)) return;
+    const cell = lineup.cells[cellIndex];
+    if (!cell) return;
 
-    if (!slot.unlocked){
-      const costText = slot.unlockCost
-        ? formatCurrencyBalance(slot.unlockCost.amount, slot.unlockCost.currencyId)
+    if (state.activeCellIndex !== cellIndex){
+      state.activeCellIndex = cellIndex;
+      helpers.updateActiveCellHighlight();
+      helpers.renderCellDetails();
+    }
+
+    const label = getCellLabel(lineup, cellIndex);
+
+    if (!cell.unlocked){
+      const costText = cell.unlockCost
+        ? formatCurrencyBalance(cell.unlockCost.amount, cell.unlockCost.currencyId)
         : null;
       helpers.setMessage(
         costText
-          ? `Vị trí ${slotIndex + 1} đang khóa. Cần ${costText} để mở khóa.`
-          : `Vị trí ${slotIndex + 1} đang khóa.`,
+        ? `${label} đang khóa. Cần ${costText} để mở khóa.`
+          : `${label} đang khóa.`,
         'info',
       );
       return;
     }
 
-    if (slot.unitId){
-      const unit = rosterLookup.get(slot.unitId);
-      helpers.setMessage(`Vị trí ${slotIndex + 1}: ${unit?.name || 'đã có nhân vật'}. Dùng "Bỏ" để trả vị trí.`, 'info');
+    if (cell.unitId){
+      const unit = rosterLookup.get(cell.unitId);
+      helpers.setMessage(`${label}: ${unit?.name || 'đã có nhân vật'}. Dùng "Bỏ" để trả ô.`, 'info');
       return;
     }
 
     if (state.selectedUnitId){
       const unit = rosterLookup.get(state.selectedUnitId);
-      helpers.setMessage(`Vị trí ${slotIndex + 1} trống. Đã chọn ${unit?.name || 'nhân vật'}. Nhấn "Gán" để thêm.`, 'info');
+      helpers.setMessage(`${label} trống. Đã chọn ${unit?.name || 'nhân vật'}. Nhấn "Gán" để thêm.`, 'info');
     } else {
-      helpers.setMessage(`Vị trí ${slotIndex + 1} trống. Chọn nhân vật từ roster rồi nhấn "Gán".`, 'info');
+      helpers.setMessage(`${label} trống. Chọn nhân vật từ roster rồi nhấn "Gán".`, 'info');
     }
   };
-  slotsGrid.addEventListener('focusin', handleSlotFocus);
-  cleanup.push(() => slotsGrid.removeEventListener('focusin', handleSlotFocus));
-  slotsGrid.addEventListener('mouseenter', handleSlotFocus, true);
-  cleanup.push(() => slotsGrid.removeEventListener('mouseenter', handleSlotFocus, true));
+  cellsGrid.addEventListener('focusin', handleCellFocus);
+  cleanup.push(() => cellsGrid.removeEventListener('focusin', handleCellFocus));
+  cellsGrid.addEventListener('mouseenter', handleCellFocus, true);
+  cleanup.push(() => cellsGrid.removeEventListener('mouseenter', handleCellFocus, true));
 
   const handlePassiveClick = (event: Event) => {
     const btn = (event.target as HTMLElement | null)?.closest<HTMLElement>('.lineup-passive');
@@ -357,10 +326,10 @@ export function bindLineupEvents(context: LineupEventContext): CleanupCallback[]
     } else {
       state.selectedUnitId = unitId;
       const unit = rosterLookup.get(unitId);
-      helpers.setMessage(`Đã chọn ${unit?.name || 'nhân vật'}. Nhấn vào ô chủ lực, ô dự bị hoặc leader để gán.`, 'info');
+      helpers.setMessage(`Đã chọn ${unit?.name || 'nhân vật'}. Nhấn vào ô đội hình hoặc leader để gán.`, 'info');
     }
     helpers.renderRoster();
-    helpers.renderSlots();
+    helpers.renderCells();
   };
   rosterList.addEventListener('click', handleRosterSelect);
   cleanup.push(() => rosterList.removeEventListener('click', handleRosterSelect));
@@ -417,8 +386,7 @@ export function bindLineupEvents(context: LineupEventContext): CleanupCallback[]
       }
     }
     helpers.renderLeader();
-    helpers.renderSlots();
-    helpers.renderBench();
+    helpers.renderCells();
     helpers.renderPassives();
     helpers.renderRoster();
     overlays.close(leaderOverlay);

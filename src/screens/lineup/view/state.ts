@@ -1,7 +1,7 @@
 import { ROSTER } from '../../../catalog.ts';
 import { listCurrencies } from '../../../data/economy.ts';
 import { createNumberFormatter } from '../../../utils/format.ts';
-import type { LineupSlot, LineupState, EquipmentLoadout } from '@shared-types/ui';
+import type { LineupCell, LineupState, EquipmentLoadout } from '@shared-types/ui';
 import type {
   LineupDefinition,
   LineupMemberConfig,
@@ -19,13 +19,6 @@ export interface RosterUnit {
   avatar: string | null;
   passives: unknown[];
   raw: Record<string, unknown> | null;
-}
-
-export interface LineupBenchCell {
-  index: number;
-  unitId: string | null;
-  label: string | null;
-  meta: Record<string, unknown> | null;
 }
 
 export interface LineupPassive {
@@ -59,7 +52,7 @@ export type LineupMessageType = 'info' | 'error';
 export interface LineupViewState {
   selectedLineupId: string | null;
   selectedUnitId: string | null;
-  activeBenchIndex: number | null;
+  activeCellIndex: number | null;
   filter: LineupFilter;
   message: string;
   messageType: LineupMessageType;
@@ -78,6 +71,9 @@ interface AssignmentResult {
 const currencyCatalog = listCurrencies();
 const currencyIndex = new Map(currencyCatalog.map(currency => [currency.id, currency]));
 const numberFormatter = createNumberFormatter('vi-VN');
+
+const FORMATION_CELL_COUNT = 5;
+const RESERVE_CELL_COUNT = 10;
 
 const isObjectLike = (value: unknown): value is Record<string, unknown> => (
   typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -235,13 +231,13 @@ function normalizeLineupEntry(entry: LineupDefinition | null | undefined, index:
   const defaultCurrencyId = source.unlockCurrency ?? source.currencyId ?? source.defaultCurrencyId ?? null;
   const slotCosts = Array.isArray(source.slotCosts) ? source.slotCosts : null;
   const unlockCosts = Array.isArray(source.unlockCosts) ? source.unlockCosts : slotCosts;
-  let unlockedCount = Math.min(3, 5);
+  let unlockedCount = Math.min(3, FORMATION_CELL_COUNT);
   if (Number.isFinite(source.initialUnlockedSlots as number)){
-    unlockedCount = Math.max(0, Math.min(5, Number(source.initialUnlockedSlots)));
+    unlockedCount = Math.max(0, Math.min(FORMATION_CELL_COUNT, Number(source.initialUnlockedSlots)));
   } else if (rawSlots.some(slot => isLineupMemberConfig(slot) && slot.unlocked === false)){
     unlockedCount = rawSlots.filter(slot => isLineupMemberConfig(slot) && slot.unlocked !== false).length;
   }
-  const slots: LineupSlot[] = new Array(5).fill(null).map((_, slotIndex) => {
+  const formationCells: LineupCell[] = new Array(FORMATION_CELL_COUNT).fill(null).map((_, slotIndex) => {
     const slotInput = rawSlots[slotIndex] ?? memberList[slotIndex] ?? null;
     const { unitId, label } = normalizeAssignment(slotInput, rosterIndex);
     const record = isLineupMemberConfig(slotInput) ? slotInput : null;
@@ -257,13 +253,14 @@ function normalizeLineupEntry(entry: LineupDefinition | null | undefined, index:
     const equipment = record?.equipment as EquipmentLoadout | null | undefined;
     return {
       index: slotIndex,
+      section: 'formation',
       unitId: unitId || null,
       label: label || null,
       unlocked,
       unlockCost,
       equipment: equipment ?? null,
       meta: record ? { ...record } : null,
-    };
+    } satisfies LineupCell;
   });
 
   const benchSource = Array.isArray(source.bench)
@@ -271,18 +268,23 @@ function normalizeLineupEntry(entry: LineupDefinition | null | undefined, index:
     : Array.isArray(source.reserve)
       ? source.reserve
       : Array.isArray(source.members)
-       ? source.members.slice(5)
+       ? source.members.slice(FORMATION_CELL_COUNT)
         : [];
-  const bench: LineupBenchCell[] = new Array(10).fill(null).map((_, benchIndex) => {
-    const benchInput = benchSource[benchIndex] ?? null;
+  const reserveCells: LineupCell[] = new Array(RESERVE_CELL_COUNT).fill(null).map((_, reserveIndex) => {
+    const benchInput = benchSource[reserveIndex] ?? null;
     const { unitId, label } = normalizeAssignment(benchInput, rosterIndex);
     return {
-      index: benchIndex,
+      index: FORMATION_CELL_COUNT + reserveIndex,
+      section: 'reserve',
       unitId,
       label,
+      unlocked: true,
+      unlockCost: null,
+      equipment: null,
       meta: isLineupMemberConfig(benchInput) ? { ...benchInput } : null,
-    };
+    } satisfies LineupCell;
   });
+  const cells: LineupCell[] = formationCells.concat(reserveCells);
 
   const passiveSource = Array.isArray(source.passives)
     ? source.passives
@@ -336,7 +338,9 @@ function normalizeLineupEntry(entry: LineupDefinition | null | undefined, index:
   });
 
   const leaderIdValue = source.leaderId ?? source.leader ?? source.captainId ?? null;
-  const fallbackLeader = slots.find(slot => slot.unitId)?.unitId ?? null;
+  const fallbackLeader = cells.find(cell => cell.section === 'formation' && cell.unitId)?.unitId
+    ?? cells.find(cell => cell.unitId)?.unitId
+    ?? null;
   const defaultCurrencyIdValue = defaultCurrencyId ?? source.currency ?? null;
 
   return {
@@ -344,8 +348,7 @@ function normalizeLineupEntry(entry: LineupDefinition | null | undefined, index:
     name: typeof name === 'string' ? name : `Đội hình #${index + 1}`,
     role: typeof role === 'string' ? role : '',
     description: typeof description === 'string' ? description : '',
-    slots,
-    bench,
+    cells,
     passives,
     leaderId: (typeof leaderIdValue === 'string' && rosterIndex.has(leaderIdValue)) ? leaderIdValue : fallbackLeader,
     defaultCurrencyId: typeof defaultCurrencyIdValue === 'string' ? defaultCurrencyIdValue : null,
@@ -358,19 +361,14 @@ export function normalizeLineups(
 ): LineupState[] {
   const rosterIndex = new Set(roster.map(unit => unit.id));
   if (!Array.isArray(rawLineups) || rawLineups.length === 0){
-    const slots: LineupSlot[] = new Array(5).fill(null).map((_, index) => ({
+    const cells: LineupCell[] = new Array(FORMATION_CELL_COUNT + RESERVE_CELL_COUNT).fill(null).map((_, index) => ({
       index,
+      section: index < FORMATION_CELL_COUNT ? 'formation' : 'reserve',
       unitId: null,
       label: null,
       unlocked: index < 3,
       unlockCost: null,
       equipment: null,
-      meta: null,
-    }));
-    const bench: LineupBenchCell[] = new Array(10).fill(null).map((_, index) => ({
-      index,
-      unitId: null,
-      label: null,
       meta: null,
     }));
     const passives: LineupPassive[] = new Array(6).fill(null).map((_, index) => ({
@@ -389,9 +387,8 @@ export function normalizeLineups(
       id: 'lineup-default',
       name: 'Đội hình mẫu',
       role: '',
-      description: 'Thiết lập đội hình gồm tối đa 5 vị trí chủ lực và 10 vị trí dự bị.',
-      slots,
-      bench,
+      description: 'Thiết lập đội hình với tối đa 10 ô linh hoạt.',
+      cells,
       passives,
       leaderId: null,
       defaultCurrencyId: null,
@@ -509,12 +506,7 @@ export function createFilterOptions(roster: RosterUnit[]): LineupFilterOptions {
 
 export function collectAssignedUnitIds(lineup: LineupState): Set<string> {
   const ids = new Set<string>();
-  lineup.slots.forEach(slot => {
-    if (slot.unitId){
-      ids.add(slot.unitId);
-    }
-  });
-  lineup.bench.forEach(cell => {
+  lineup.cells.forEach(cell => {
     if (cell.unitId){
       ids.add(cell.unitId);
     }
@@ -570,14 +562,10 @@ export function removeUnitFromPlacements(
 ): void {
   if (!unitId) return;
   const { keepLeader = false } = options;
-  lineup.slots.forEach(slot => {
-    if (slot.unitId === unitId){
-      slot.unitId = null;
-    }
-  });
-  lineup.bench.forEach(cell => {
+  lineup.cells.forEach(cell => {
     if (cell.unitId === unitId){
       cell.unitId = null;
+      cell.label = null;
     }
   });
   if (!keepLeader && lineup.leaderId === unitId){
@@ -585,74 +573,17 @@ export function removeUnitFromPlacements(
   }
 }
 
-export function assignUnitToSlot(
+export function assignUnitToCell(
   lineup: LineupState,
-  slotIndex: number,
+  cellIndex: number,
   unitId: string,
 ): { ok: boolean; message?: string } {
-  const slot = lineup.slots[slotIndex];
-  if (!slot){
-    return { ok: false, message: 'Không tìm thấy vị trí.' };
-  }
-  if (!slot.unlocked){
-    return { ok: false, message: 'Vị trí đang bị khóa.' };
-  }
-  if (slot.unitId === unitId){
-    return { ok: true };
-  }
-  removeUnitFromPlacements(lineup, unitId, { keepLeader: true });
-  slot.unitId = unitId;
-  slot.label = null;
-  return { ok: true };
-}
-
- export function removeUnitFromSlot(lineup: LineupState, slotIndex: number): void {
-  const slot = lineup.slots[slotIndex];
-  if (!slot) return;
-  const removedUnitId = slot.unitId;
-  slot.unitId = null;
-  slot.label = null;
-  if (removedUnitId && lineup.leaderId === removedUnitId){
-    lineup.leaderId = null;
-  }
-}
-
-export function unlockSlot(
-  lineup: LineupState,
-  slotIndex: number,
-  balances: CurrencyBalances,
-): { ok: boolean; message?: string; spent?: { currencyId: string; amount: number } | null } {
-  const slot = lineup.slots[slotIndex];
-  if (!slot){
-    return { ok: false, message: 'Không tìm thấy vị trí.' };
-  }
-  if (slot.unlocked){
-    return { ok: true, spent: null };
-  }
-  const cost = slot.unlockCost;
-  if (cost){
-    const current = balances.get(cost.currencyId) ?? 0;
-    if (current < cost.amount){
-      return {
-        ok: false,
-        message: `Không đủ ${formatCurrencyBalance(cost.amount, cost.currencyId)} để mở khóa vị trí này.`,
-      };
-    }
-    balances.set(cost.currencyId, current - cost.amount);
-  }
-  slot.unlocked = true;
-  slot.unlockCost = null;
-  return { ok: true, spent: cost ?? null };
-}
-
-export function assignUnitToBench(
-  lineup: LineupState,
-  benchIndex: number,
-  unitId: string,
-): { ok: boolean; message?: string } {
-  const cell = lineup.bench[benchIndex];
+  const cell = lineup.cells[cellIndex];
   if (!cell){
-    return { ok: false, message: 'Không tìm thấy ô dự bị.' };
+    return { ok: false, message: 'Không tìm thấy ô đội hình.' };
+  }
+  if (!cell.unlocked){
+    return { ok: false, message: 'Ô đang bị khóa.' };
   }
   if (cell.unitId === unitId){
     return { ok: true };
@@ -663,17 +594,49 @@ export function assignUnitToBench(
   return { ok: true };
 }
 
-export function removeUnitFromBench(lineup: LineupState, benchIndex: number): void {
-  const cell = lineup.bench[benchIndex];
+ export function removeUnitFromCell(lineup: LineupState, cellIndex: number): void {
+  const cell = lineup.cells[cellIndex];
   if (!cell) return;
+  const removedUnitId = cell.unitId;
   cell.unitId = null;
+  cell.label = null;
+  if (removedUnitId && lineup.leaderId === removedUnitId){
+    lineup.leaderId = null;
+  }
+}
+
+export function unlockCell(
+  lineup: LineupState,
+  cellIndex: number,
+  balances: CurrencyBalances,
+): { ok: boolean; message?: string; spent?: { currencyId: string; amount: number } | null } {
+  const cell = lineup.cells[cellIndex];
+  if (!cell){
+    return { ok: false, message: 'Không tìm thấy ô đội hình.' };
+  }
+  if (cell.unlocked){
+    return { ok: true, spent: null };
+  }
+  const cost = cell.unlockCost;
+  if (cost){
+    const current = balances.get(cost.currencyId) ?? 0;
+    if (current < cost.amount){
+      return {
+        ok: false,
+        message: `Không đủ ${formatCurrencyBalance(cost.amount, cost.currencyId)} để mở khóa ô này.`,
+      };
+    }
+    balances.set(cost.currencyId, current - cost.amount);
+  }
+  cell.unlocked = true;
+  cell.unlockCost = null;
+  return { ok: true, spent: cost ?? null };
 }
 
 export function isUnitPlaced(lineup: LineupState, unitId: string | null): boolean {
   if (!unitId) return false;
   if (lineup.leaderId === unitId) return true;
-  if (lineup.slots.some(slot => slot.unitId === unitId)) return true;
-  if (lineup.bench.some(cell => cell.unitId === unitId)) return true;
+  if (lineup.cells.some(cell => cell.unitId === unitId)) return true;
   return false;
 }
 
@@ -694,18 +657,14 @@ export function setLeader(
     return { ok: false, message: 'Không tìm thấy nhân vật.' };
   }
   if (!isUnitPlaced(lineup, unitId)){
-    const slot = lineup.slots.find(entry => entry.unlocked && !entry.unitId);
-    if (slot){
-      assignUnitToSlot(lineup, slot.index, unitId);
+    const primary = lineup.cells.find(entry => entry.section === 'formation' && entry.unlocked && !entry.unitId)
+      ?? lineup.cells.find(entry => entry.unlocked && !entry.unitId);
+    if (primary){
+      assignUnitToCell(lineup, primary.index, unitId);
     } else {
-      const bench = lineup.bench.find(entry => !entry.unitId);
-      if (bench){
-        assignUnitToBench(lineup, bench.index, unitId);
-      } else {
-        return { ok: false, message: 'Không còn vị trí trống để gán leader.' };
-      }
+      return { ok: false, message: 'Không còn ô trống để gán leader.' };
     }
   }
   lineup.leaderId = unitId;
   return { ok: true };
-      }
+}

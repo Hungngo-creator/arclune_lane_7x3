@@ -5,7 +5,6 @@ export type {
   LineupMessageType,
   LineupFilter,
   LineupFilterOptions,
-  LineupBenchCell,
   LineupPassive,
   RosterUnit,
 } from './state.ts';

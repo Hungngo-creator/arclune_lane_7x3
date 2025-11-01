@@ -31,7 +31,7 @@ const powerFormatter = createNumberFormatter('vi-VN');
 function ensureStyles(): void{
   const css = `
     .app--lineup{padding:32px 16px 72px;}
-    .lineup-view{max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:28px;color:inherit;--lineup-bench-slot-size:64px;--lineup-bench-slot-gap:12px;}
+    .lineup-view{max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:28px;color:inherit;}
     .lineup-view__header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px;}
     .lineup-view__actions{display:flex;flex-direction:column;align-items:flex-end;gap:12px;}
     .lineup-view__title-group{display:flex;flex-direction:column;gap:8px;}
@@ -49,48 +49,32 @@ function ensureStyles(): void{
     .lineup-view__layout{display:grid;grid-template-columns:minmax(280px,1fr) minmax(0,3fr);gap:24px;align-items:start;}
     .lineup-main-area{display:grid;grid-template-columns:minmax(0,1fr);gap:24px;align-items:start;}
     .lineup-main{display:flex;flex-direction:column;gap:20px;}
-    .lineup-slots{border-radius:24px;border:1px solid rgba(125,211,252,.24);background:linear-gradient(160deg,rgba(12,20,30,.92),rgba(8,16,24,.78));padding:20px;display:flex;flex-direction:column;gap:14px;}
-    .lineup-slots__title{margin:0;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
-    .lineup-slots__grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:16px;}
-    .lineup-slot{position:relative;padding:14px;border-radius:16px;border:1px solid rgba(125,211,252,.22);background:rgba(8,16,26,.82);display:flex;flex-direction:column;gap:10px;align-items:flex-start;}
-    .lineup-slot__label{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#7da0c7;margin:0;}
-    .lineup-slot__avatar{width:72px;height:72px;border-radius:18px;background:rgba(24,34,44,.85);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:600;color:#aee4ff;overflow:hidden;position:relative;}
-    .lineup-slot__avatar img{width:100%;height:100%;object-fit:cover;}
-    .lineup-slot__name{margin:0;font-size:14px;color:#e6f2ff;line-height:1.4;min-height:20px;}
-    .lineup-slot__hint{margin:0;font-size:12px;color:#9cbcd9;}
-    .lineup-slot__actions{display:flex;gap:8px;flex-wrap:wrap;}
+    .lineup-grid{border-radius:24px;border:1px solid rgba(125,211,252,.24);background:linear-gradient(160deg,rgba(12,20,30,.92),rgba(8,16,24,.78));padding:20px;display:flex;flex-direction:column;gap:14px;}
+    .lineup-grid__title{margin:0;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
+    .lineup-grid__content{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,320px);align-items:flex-start;gap:14px;flex:1;}
+    .lineup-grid__cells{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;}
+    .lineup-cell{position:relative;padding:14px;border-radius:16px;border:1px solid rgba(125,211,252,.22);background:rgba(8,16,26,.82);display:flex;flex-direction:column;gap:10px;align-items:flex-start;transition:border-color .16s ease,box-shadow .16s ease,background .16s ease;}
+    .lineup-cell__label{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#7da0c7;margin:0;}
+    .lineup-cell__avatar{width:72px;height:72px;border-radius:18px;background:rgba(24,34,44,.85);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:600;color:#aee4ff;overflow:hidden;position:relative;}
+    .lineup-cell__avatar img{width:100%;height:100%;object-fit:cover;}
+    .lineup-cell__name{margin:0;font-size:14px;color:#e6f2ff;line-height:1.4;min-height:20px;}
+    .lineup-cell__hint{margin:0;font-size:12px;color:#9cbcd9;}
+    .lineup-cell__actions{display:flex;gap:8px;flex-wrap:wrap;}
     .lineup-button{padding:8px 12px;border-radius:12px;border:1px solid rgba(125,211,252,.28);background:rgba(12,22,32,.9);color:#aee4ff;font-size:12px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;}
     .lineup-button:hover{transform:translateY(-1px);border-color:rgba(174,228,255,.5);box-shadow:0 10px 20px rgba(6,12,20,.4);}
     .lineup-button:focus-visible{outline:2px solid rgba(174,228,255,.72);outline-offset:3px;}
-    .lineup-slot.is-locked{border-style:dashed;border-color:rgba(125,211,252,.35);background:rgba(12,22,34,.6);}
-    .lineup-slot.is-selected{border-color:rgba(174,228,255,.55);box-shadow:0 14px 32px rgba(6,12,20,.45);}
-    .lineup-slot__cost{margin:0;font-size:12px;color:#ffd9a1;letter-spacing:.08em;text-transform:uppercase;}
-    .lineup-slot__locked-note{margin:0;font-size:12px;color:#9cbcd9;line-height:1.5;}
-    .lineup-bench{display:flex;flex-direction:column;gap:12px;min-height:100%;padding:0;border:none;background:none;}
-    .lineup-bench__title{margin:0;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
-    .lineup-bench__content{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,320px);align-items:flex-start;gap:12px;flex:1;padding:0;border:none;background:none;}
-    .lineup-bench__grid{display:flex;align-items:flex-start;justify-content:flex-start;gap:var(--lineup-bench-slot-gap);flex:1;min-height:0;align-self:stretch;}
-    .lineup-bench__column{display:flex;flex-direction:column;gap:var(--lineup-bench-slot-gap);}
-    .lineup-bench__column:first-child{margin-left:0;}
-    .lineup-bench__cell{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;background:none;border:none;padding:0;width:var(--lineup-bench-slot-size);}
-    .lineup-bench__cell:focus{outline:none;}
-    .lineup-bench__cell:focus-visible{outline:none;}
-    .lineup-bench__cell:hover .lineup-bench__avatar,
-    .lineup-bench__cell:focus-visible .lineup-bench__avatar{transform:translateY(-2px);border-color:rgba(125,211,252,.45);background:rgba(16,28,40,.9);box-shadow:0 12px 28px rgba(6,12,20,.4);}
-    .lineup-bench__cell:focus-visible .lineup-bench__avatar{outline:2px solid rgba(125,211,252,.65);outline-offset:3px;}
-    .lineup-bench__cell.is-active .lineup-bench__avatar{border-color:rgba(174,228,255,.6);box-shadow:0 12px 28px rgba(6,12,20,.4);transform:translateY(-2px);}
-    .lineup-bench__cell.is-empty{opacity:0.6;}
-    .lineup-bench__cell-code{margin:0;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#7da0c7;text-align:center;line-height:1.2;font-weight:600;}
-    .lineup-bench__avatar{width:48px;height:48px;border-radius:14px;background:rgba(24,34,44,.82);display:flex;align-items:center;justify-content:center;font-size:18px;color:#aee4ff;margin:0;overflow:hidden;border:1px solid rgba(125,211,252,.2);transition:transform .16s ease,border-color .16s ease,background .16s ease,box-shadow .16s ease;}
-    .lineup-bench__avatar img{width:100%;height:100%;object-fit:cover;}
-    .lineup-bench__details{border-radius:18px;border:1px solid rgba(125,211,252,.18);background:rgba(12,22,32,.78);padding:12px 14px;display:flex;flex-direction:column;gap:12px;align-self:flex-start;height:fit-content;overflow:auto;}
-    .lineup-bench__details.is-empty{opacity:0.85;}
-    .lineup-bench__details-section{display:flex;flex-direction:column;gap:4px;}
-    .lineup-bench__details-heading{margin:0;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#7da0c7;}
-    .lineup-bench__details-text{margin:0;font-size:13px;color:#c8deff;line-height:1.5;}
-    .lineup-bench__details-list{margin:0;padding-left:18px;font-size:13px;color:#c8deff;line-height:1.5;display:flex;flex-direction:column;gap:2px;}
-    .lineup-bench__details-list li{margin:0;}
-    .lineup-bench__details-empty{margin:0;font-size:13px;color:#9cbcd9;line-height:1.6;}
+    .lineup-cell.is-locked{border-style:dashed;border-color:rgba(125,211,252,.35);background:rgba(12,22,34,.6);}
+    .lineup-cell.is-selected,.lineup-cell.is-active{border-color:rgba(174,228,255,.55);box-shadow:0 14px 32px rgba(6,12,20,.45);}
+    .lineup-cell__cost{margin:0;font-size:12px;color:#ffd9a1;letter-spacing:.08em;text-transform:uppercase;}
+    .lineup-cell__locked-note{margin:0;font-size:12px;color:#9cbcd9;line-height:1.5;}
+    .lineup-grid__details{border-radius:18px;border:1px solid rgba(125,211,252,.18);background:rgba(12,22,32,.78);padding:12px 14px;display:flex;flex-direction:column;gap:12px;align-self:flex-start;height:fit-content;overflow:auto;}
+    .lineup-grid__details.is-empty{opacity:0.85;}
+    .lineup-grid__details-section{display:flex;flex-direction:column;gap:4px;}
+    .lineup-grid__details-heading{margin:0;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#7da0c7;}
+    .lineup-grid__details-text{margin:0;font-size:13px;color:#c8deff;line-height:1.5;}
+    .lineup-grid__details-list{margin:0;padding-left:18px;font-size:13px;color:#c8deff;line-height:1.5;display:flex;flex-direction:column;gap:2px;}
+    .lineup-grid__details-list li{margin:0;}
+    .lineup-grid__details-empty{margin:0;font-size:13px;color:#9cbcd9;line-height:1.6;}
     .lineup-leader{border-radius:24px;border:1px solid rgba(255,209,132,.42);background:linear-gradient(150deg,rgba(36,26,12,.88),rgba(18,12,6,.92));padding:14px 16px;display:grid;grid-template-columns:minmax(0,120px) minmax(0,1fr);gap:12px;align-items:start;position:relative;overflow:hidden;}
     .lineup-leader__badge{position:absolute;top:12px;right:-18px;background:rgba(255,209,132,.16);color:#ffd184;padding:4px 26px;border-radius:999px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;transform:rotate(20deg);}
     .lineup-leader__main{display:flex;flex-direction:column;align-items:flex-start;gap:8px;}
@@ -143,8 +127,8 @@ function ensureStyles(): void{
     .lineup-overlay__option-avatar{width:48px;height:48px;border-radius:14px;background:rgba(24,34,44,.82);display:flex;align-items:center;justify-content:center;color:#aee4ff;font-size:18px;overflow:hidden;}
     .lineup-overlay__option-name{margin:0;font-size:14px;color:#e6f2ff;}
     .lineup-overlay__option-meta{margin:0;font-size:12px;color:#9cbcd9;}
-    @media(max-width:1080px){.lineup-view__layout{grid-template-columns:1fr;}.lineup-main-area{grid-template-columns:1fr;}.lineup-bench__content{grid-template-columns:1fr;}.lineup-leader{grid-template-columns:1fr;}.lineup-leader__badge{display:none;}}
-    @media(max-width:720px){.lineup-view__title{font-size:30px;}.lineup-view__header{flex-direction:column;align-items:flex-start;}.lineup-main-area{gap:18px;}.lineup-bench__content{grid-template-columns:1fr;}.lineup-bench__grid{flex-wrap:wrap;}.lineup-slot__avatar{width:64px;height:64px;}.lineup-roster__list{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}}
+    @media(max-width:1080px){.lineup-view__layout{grid-template-columns:1fr;}.lineup-main-area{grid-template-columns:1fr;}.lineup-grid__content{grid-template-columns:1fr;}.lineup-leader{grid-template-columns:1fr;}.lineup-leader__badge{display:none;}}
+    @media(max-width:720px){.lineup-view__title{font-size:30px;}.lineup-view__header{flex-direction:column;align-items:flex-start;}.lineup-main-area{gap:18px;}.lineup-grid__content{grid-template-columns:1fr;}.lineup-grid__cells{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));}.lineup-cell__avatar{width:64px;height:64px;}.lineup-roster__list{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}}
   `;
 
   ensureStyleTag(STYLE_ID, { css });
@@ -307,13 +291,10 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   normalizedLineups.forEach(lineup => {
     lineupState.set(lineup.id, {
       ...lineup,
-      slots: lineup.slots.map(slot => ({
-        ...slot,
-        unlockCost: slot.unlockCost ? { ...slot.unlockCost } : null,
-        meta: slot.meta ? { ...slot.meta } : null,
-      })),
-      bench: lineup.bench.map(cell => ({
+      cells: lineup.cells.map(cell => ({
         ...cell,
+        unlockCost: cell.unlockCost ? { ...cell.unlockCost } : null,
+        equipment: cell.equipment ? { ...cell.equipment } : null,
         meta: cell.meta ? { ...cell.meta } : null,
       })),
       passives: lineup.passives.map(passive => ({ ...passive })),
@@ -327,7 +308,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   const state: LineupViewState = {
     selectedLineupId: normalizedLineups[0]?.id ?? null,
     selectedUnitId: null,
-    activeBenchIndex: null,
+    activeCellIndex: null,
     filter: { type: 'all', value: null },
     message: '',
     messageType: 'info',
@@ -416,46 +397,35 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   mainColumn.className = 'lineup-main';
   mainArea.appendChild(mainColumn);
   
-  const slotsSection = document.createElement('section');
-  slotsSection.className = 'lineup-slots';
-  const slotsTitle = document.createElement('p');
-  slotsTitle.className = 'lineup-slots__title';
-  slotsTitle.textContent = 'Vị trí chủ lực';
-  slotsSection.appendChild(slotsTitle);
-  const slotsGrid = document.createElement('div');
-  slotsGrid.className = 'lineup-slots__grid';
-  slotsSection.appendChild(slotsGrid);
-  mainColumn.appendChild(slotsSection);
+  const gridSection = document.createElement('section');
+  gridSection.className = 'lineup-grid';
+  const gridTitle = document.createElement('p');
+  gridTitle.className = 'lineup-grid__title';
+  gridTitle.textContent = 'Ô đội hình';
+  gridSection.appendChild(gridTitle);
+  const gridContent = document.createElement('div');
+  gridContent.className = 'lineup-grid__content';
+  gridSection.appendChild(gridContent);
+  const cellsGrid = document.createElement('div');
+  cellsGrid.className = 'lineup-grid__cells';
+  gridContent.appendChild(cellsGrid);
+  const cellDetails = document.createElement('aside');
+  cellDetails.className = 'lineup-grid__details is-empty';
+  gridContent.appendChild(cellDetails);
 
-  const benchSection = document.createElement('section');
-  benchSection.className = 'lineup-bench';
-  const benchTitle = document.createElement('p');
-  benchTitle.className = 'lineup-bench__title';
-  benchTitle.textContent = 'Đội hình';
-  benchSection.appendChild(benchTitle);
-  const benchContent = document.createElement('div');
-  benchContent.className = 'lineup-bench__content';
-  benchSection.appendChild(benchContent);
-  const benchGrid = document.createElement('div');
-  benchGrid.className = 'lineup-bench__grid';
-  benchContent.appendChild(benchGrid);
-  const benchDetails = document.createElement('aside');
-  benchDetails.className = 'lineup-bench__details is-empty';
-  benchContent.appendChild(benchDetails);
-
-  function syncBenchDetailsHeight(): void{
-    if (!benchDetails || !leaderSection || typeof leaderSection.getBoundingClientRect !== 'function'){
-      benchDetails.style.maxHeight = '';
+  function syncGridDetailsHeight(): void{
+    if (!cellDetails || !leaderSection || typeof leaderSection.getBoundingClientRect !== 'function'){
+      cellDetails.style.maxHeight = '';
       return;
     }
     const rect = leaderSection.getBoundingClientRect();
     if (rect && Number.isFinite(rect.height)){
-      benchDetails.style.maxHeight = `${rect.height}px`;
+      cellDetails.style.maxHeight = `${rect.height}px`;
     } else {
-      benchDetails.style.maxHeight = '';
+      cellDetails.style.maxHeight = '';
     }
   }
-  mainArea.appendChild(benchSection);
+  mainColumn.appendChild(gridSection);
 
   const rosterSection = document.createElement('section');
   rosterSection.className = 'lineup-roster';
@@ -562,55 +532,57 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
     }
   }
 
-  function renderBenchDetails(): void{
-    benchDetails.innerHTML = '';
+  function renderCellDetails(): void{
+    cellDetails.innerHTML = '';
     const lineup = getSelectedLineup();
     if (!lineup){
-      benchDetails.classList.add('is-empty');
+      cellDetails.classList.add('is-empty');
       const empty = document.createElement('p');
-      empty.className = 'lineup-bench__details-empty';
+      empty.className = 'lineup-grid__details-empty';
       empty.textContent = 'Chưa có đội hình để hiển thị thông tin.';
-      benchDetails.appendChild(empty);
-      syncBenchDetailsHeight();
+      cellDetails.appendChild(empty);
+      syncGridDetailsHeight();
       return;
     }
 
-    const index = Number.isFinite(state.activeBenchIndex) ? state.activeBenchIndex : null;
+    const index = Number.isFinite(state.activeCellIndex) ? state.activeCellIndex : null;
     if (index == null){
-      benchDetails.classList.add('is-empty');
+      cellDetails.classList.add('is-empty');
       const hint = document.createElement('p');
-      hint.className = 'lineup-bench__details-empty';
-      hint.textContent = 'Chọn một ô dự bị để xem mô tả kỹ năng.';
-      benchDetails.appendChild(hint);
-      syncBenchDetailsHeight();
+      hint.className = 'lineup-grid__details-empty';
+      hint.textContent = 'Chọn một ô để xem mô tả kỹ năng.';
+      cellDetails.appendChild(hint);
+      syncGridDetailsHeight();
       return;
     }
 
-    const cell = lineup.bench[index];
+    const cell = lineup.cells[index];
     if (!cell){
-      benchDetails.classList.add('is-empty');
+      cellDetails.classList.add('is-empty');
       const missing = document.createElement('p');
-      missing.className = 'lineup-bench__details-empty';
-      missing.textContent = 'Không tìm thấy ô dự bị tương ứng.';
-      benchDetails.appendChild(missing);
-      syncBenchDetailsHeight();
+      missing.className = 'lineup-grid__details-empty';
+      missing.textContent = 'Không tìm thấy ô tương ứng.';
+      cellDetails.appendChild(missing);
+      syncGridDetailsHeight();
       return;
     }
 
     const unit = cell.unitId ? rosterLookup.get(cell.unitId) : null;
     if (!unit){
-      benchDetails.classList.add('is-empty');
+      cellDetails.classList.add('is-empty');
       const empty = document.createElement('p');
-      empty.className = 'lineup-bench__details-empty';
+      empty.className = 'lineup-grid__details-empty';
       empty.textContent = cell.label
-        ? `Ô dự bị được ghi chú "${cell.label}".`
-        : 'Ô dự bị hiện đang trống.';
-      benchDetails.appendChild(empty);
-      syncBenchDetailsHeight();
+     ? `Ô được ghi chú "${cell.label}".`
+        : cell.section === 'formation'
+          ? 'Ô ra trận hiện đang trống.'
+          : 'Ô dự phòng hiện đang trống.';
+      cellDetails.appendChild(empty);
+      syncGridDetailsHeight();
       return;
     }
 
-    benchDetails.classList.remove('is-empty');
+    cellDetails.classList.remove('is-empty');
 
     const kit = (unit.raw as { kit?: unknown } | null)?.kit ?? null;
     const skillSetId = normalizeUnitId(unit.id);
@@ -636,19 +608,19 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
 
     if (!skills.length && !hasUlt){
       const fallback = document.createElement('p');
-      fallback.className = 'lineup-bench__details-empty';
+      fallback.className = 'lineup-grid__details-empty';
       fallback.textContent = 'Chưa có dữ liệu chi tiết cho nhân vật này.';
-      benchDetails.appendChild(fallback);
+      cellDetails.appendChild(fallback);
     } else {
       if (skills.length){
         const skillSection = document.createElement('div');
-        skillSection.className = 'lineup-bench__details-section';
+        skillSection.className = 'lineup-grid__details-section';
         const heading = document.createElement('p');
-        heading.className = 'lineup-bench__details-heading';
+        heading.className = 'lineup-grid__details-heading';
         heading.textContent = 'Kỹ năng';
         skillSection.appendChild(heading);
         const list = document.createElement('ul');
-        list.className = 'lineup-bench__details-list';
+        list.className = 'lineup-grid__details-list';
         skills.forEach((skill, idx) => {
           const item = document.createElement('li');
           const skillRecord = skill as { name?: string; key?: string } | null;
@@ -657,113 +629,128 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
           list.appendChild(item);
         });
         skillSection.appendChild(list);
-        benchDetails.appendChild(skillSection);
+        cellDetails.appendChild(skillSection);
       }
 
       if (hasUlt && ultName){
         const ultSection = document.createElement('div');
-        ultSection.className = 'lineup-bench__details-section';
+        ultSection.className = 'lineup-grid__details-section';
         const heading = document.createElement('p');
-        heading.className = 'lineup-bench__details-heading';
+        heading.className = 'lineup-grid__details-heading';
         heading.textContent = 'Tuyệt kỹ';
         ultSection.appendChild(heading);
         const text = document.createElement('p');
-        text.className = 'lineup-bench__details-text';
+        text.className = 'lineup-grid__details-text';
         text.textContent = ultName;
         ultSection.appendChild(text);
-        benchDetails.appendChild(ultSection);
+        cellDetails.appendChild(ultSection);
       }
     }
 
-    syncBenchDetailsHeight();
+    syncGridDetailsHeight();
   }
 
-  function renderSlots(): void{
-    slotsGrid.innerHTML = '';
+  function renderCells(): void{
+    cellsGrid.innerHTML = '';;
     const lineup = getSelectedLineup();
     if (!lineup){
-      slotsSection.classList.add('is-empty');
-      for (let index = 0; index < 5; index += 1){
-        const slotEl = document.createElement('div');
-        slotEl.className = 'lineup-slot is-locked';
-        slotEl.dataset.slotIndex = String(index);
-        slotEl.tabIndex = 0;
-        slotEl.setAttribute('aria-label', `Vị trí ${index + 1} đang khóa.`);
+      gridSection.classList.add('is-empty');
+      for (let index = 0; index < 6; index += 1){
+        const cellEl = document.createElement('div');
+        cellEl.className = 'lineup-cell is-locked';
+        cellEl.dataset.cellIndex = String(index);
+        cellEl.tabIndex = 0;
         const label = document.createElement('p');
-        label.className = 'lineup-slot__label';
-        label.textContent = `Vị trí ${index + 1}`;
-        slotEl.appendChild(label);
+        label.className = 'lineup-cell__label';
+        label.textContent = `Ô đội hình #${index + 1}`;
+        cellEl.appendChild(label);
         const avatar = document.createElement('div');
-        avatar.className = 'lineup-slot__avatar';
+        avatar.className = 'lineup-cell__avatar';
         avatar.textContent = '🔒';
-        slotEl.appendChild(avatar);
+        cellEl.appendChild(avatar);
         const name = document.createElement('p');
-        name.className = 'lineup-slot__name';
+        name.className = 'lineup-cell__name';
         name.textContent = 'Chưa có dữ liệu';
-        slotEl.appendChild(name);
+        cellEl.appendChild(name);
         const note = document.createElement('p');
-        note.className = 'lineup-slot__locked-note';
+        note.className = 'lineup-cell__locked-note';
         note.textContent = 'Vui lòng chọn đội hình để thao tác.';
-        slotEl.appendChild(note);
-        const actions = document.createElement('div');
-        actions.className = 'lineup-slot__actions';
-        slotEl.appendChild(actions);
-        slotsGrid.appendChild(slotEl);
+        cellEl.appendChild(note);
+        cellsGrid.appendChild(cellEl);
       }
+      state.activeCellIndex = null;
+      renderCellDetails();
+      syncGridDetailsHeight();
       return;
     }
 
-    slotsSection.classList.remove('is-empty');
-    lineup.slots.forEach(slot => {
-      const slotEl = document.createElement('div');
-      slotEl.className = 'lineup-slot';
-      slotEl.dataset.slotIndex = String(slot.index);
-      slotEl.tabIndex = 0;
-      const unit = slot.unitId ? rosterLookup.get(slot.unitId) : null;
-      const selectedMatches = state.selectedUnitId && slot.unitId === state.selectedUnitId;
-      if (selectedMatches){
-        slotEl.classList.add('is-selected');
+    gridSection.classList.remove('is-empty');
+
+    const firstReserveIndex = lineup.cells.find(cell => cell.section === 'reserve')?.index ?? lineup.cells.length;
+
+    if (!Number.isInteger(state.activeCellIndex) || !lineup.cells[state.activeCellIndex ?? -1]){
+      state.activeCellIndex = null;
+    }
+
+    lineup.cells.forEach(cell => {
+      const cellEl = document.createElement('div');
+      cellEl.className = 'lineup-cell';
+      cellEl.dataset.cellIndex = String(cell.index);
+      cellEl.tabIndex = 0;
+      const unit = cell.unitId ? rosterLookup.get(cell.unitId) : null;
+      if (state.selectedUnitId && cell.unitId === state.selectedUnitId){
+        cellEl.classList.add('is-selected');
       }
-      if (!slot.unlocked){
-        slotEl.classList.add('is-locked');
+      if (state.activeCellIndex === cell.index){
+        cellEl.classList.add('is-active');
       }
+      if (!cell.unlocked){
+        cellEl.classList.add('is-locked');
+      }
+
       const label = document.createElement('p');
-      label.className = 'lineup-slot__label';
-      label.textContent = `Vị trí ${slot.index + 1}`;
-      slotEl.appendChild(label);
+      label.className = 'lineup-cell__label';
+      const displayIndex = cell.section === 'formation'
+        ? cell.index + 1
+        : (cell.index - firstReserveIndex + 1);
+      const sectionName = cell.section === 'formation' ? 'Ô ra trận' : 'Ô dự phòng';
+      label.textContent = `${sectionName} #${Math.max(displayIndex, 1)}`;
+      cellEl.appendChild(label);
+
       const avatar = document.createElement('div');
-      avatar.className = 'lineup-slot__avatar';
+      avatar.className = 'lineup-cell__avatar';
       if (unit){
         renderAvatar(avatar, unit.avatar || null, unit.name);
-      } else if (slot.label){
-        avatar.textContent = getNameInitials(slot.label);
-      } else if (!slot.unlocked){
+      } else if (cell.label){
+        avatar.textContent = getNameInitials(cell.label);
+      } else if (!cell.unlocked){
         avatar.textContent = '🔒';
       } else {
         avatar.textContent = '+';
       }
-      slotEl.appendChild(avatar);
+      cellEl.appendChild(avatar)
+
       const name = document.createElement('p');
-      name.className = 'lineup-slot__name';
+      name.className = 'lineup-cell__name';
       if (unit){
         name.textContent = unit.name;
-      } else if (slot.label){
-        name.textContent = slot.label;
-      } else if (!slot.unlocked){
-        name.textContent = 'Vị trí bị khóa';
+      } else if (cell.label){
+        name.textContent = cell.label;
+      } else if (!cell.unlocked){
+        name.textContent = 'Ô đang khóa';
       } else {
         name.textContent = 'Chưa gán nhân vật';
       }
-      slotEl.appendChild(name);
+      cellEl.appendChild(name);
 
-      if (slot.unlocked){
+      if (cell.unlocked){
         const hint = document.createElement('p');
-        hint.className = 'lineup-slot__hint';
+        hint.className = 'lineup-cell__hint';
         if (unit){
           const powerText = unit.power != null
             ? `Chiến lực ${formatUnitPower(unit.power)}`
             : 'Đang tham gia đội hình';
-          hint.textContent = `${powerText}. Dùng "Bỏ" để trả vị trí.`;
+          hint.textContent = `${powerText}. Dùng "Bỏ" để trả ô.`;
         } else if (state.selectedUnitId){
           const selectedUnit = rosterLookup.get(state.selectedUnitId);
           hint.textContent = selectedUnit
@@ -772,35 +759,35 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
         } else {
           hint.textContent = 'Chọn nhân vật từ roster rồi nhấn "Gán" để thêm.';
         }
-        slotEl.appendChild(hint);
+        cellEl.appendChild(hint);
       } else {
-        if (slot.unlockCost){
+        if (cell.unlockCost){
           const cost = document.createElement('p');
-          cost.className = 'lineup-slot__cost';
-          cost.textContent = `Chi phí mở khóa: ${formatCurrencyBalance(slot.unlockCost.amount, slot.unlockCost.currencyId)}`;
-          slotEl.appendChild(cost);
+          cost.className = 'lineup-cell__cost';
+          cost.textContent = `Chi phí mở khóa: ${formatCurrencyBalance(cell.unlockCost.amount, cell.unlockCost.currencyId)}`;
+          cellEl.appendChild(cost);
         }
         const note = document.createElement('p');
-        note.className = 'lineup-slot__locked-note';
-        note.textContent = 'Mở khóa để gán nhân vật vào vị trí này.';
-        slotEl.appendChild(note);
+        note.className = 'lineup-cell__locked-note';
+        note.textContent = 'Mở khóa để gán nhân vật vào ô này.';
+        cellEl.appendChild(note);
       }
 
       const actions = document.createElement('div');
-      actions.className = 'lineup-slot__actions';
-      if (slot.unlocked){
+      actions.className = 'lineup-cell__actions';
+      if (cell.unlocked){
         const assignButton = document.createElement('button');
         assignButton.type = 'button';
         assignButton.className = 'lineup-button';
-        assignButton.dataset.slotAction = 'assign';
+        assignButton.dataset.cellAction = 'assign';
         assignButton.textContent = unit ? 'Đổi nhân vật' : 'Gán nhân vật';
         actions.appendChild(assignButton);
 
         const clearButton = document.createElement('button');
         clearButton.type = 'button';
         clearButton.className = 'lineup-button';
-        clearButton.dataset.slotAction = 'clear';
-        clearButton.textContent = 'Bỏ khỏi vị trí';
+        clearButton.dataset.cellAction = 'clear';
+        clearButton.textContent = 'Bỏ khỏi ô';
         if (!unit){
           clearButton.disabled = true;
         }
@@ -809,114 +796,41 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
         const unlockButton = document.createElement('button');
         unlockButton.type = 'button';
         unlockButton.className = 'lineup-button';
-        unlockButton.dataset.slotAction = 'unlock';
-        unlockButton.textContent = 'Mở khóa vị trí';
+        unlockButton.dataset.cellAction = 'unlock';
+        unlockButton.textContent = 'Mở khóa ô';
         actions.appendChild(unlockButton);
       }
-      slotEl.appendChild(actions);
+      cellEl.appendChild(actions);
 
-      let ariaLabel = `Vị trí ${slot.index + 1}`;
+      let ariaLabel = `${sectionName} #${Math.max(displayIndex, 1)}`;
       if (unit){
         ariaLabel += `: ${unit.name}`;
-      } else if (slot.label){
-        ariaLabel += `: ${slot.label}`;
+      } else if (cell.label){
+        ariaLabel += `: ${cell.label}`;
       }
-      if (!slot.unlocked){
+      if (!cell.unlocked){
         ariaLabel += '. Đang khóa.';
       }
-      slotEl.setAttribute('aria-label', ariaLabel);
-
-      slotsGrid.appendChild(slotEl);
-    });
-  }
-
-  function updateActiveBenchHighlight(): void{
-    const cells = benchGrid.querySelectorAll<HTMLElement>('.lineup-bench__cell');
-    cells.forEach(cell => {
-      const idx = Number(cell.dataset.benchIndex);
-      if (Number.isFinite(idx) && idx === state.activeBenchIndex){
-        cell.classList.add('is-active');
-      } else {
-        cell.classList.remove('is-active');
-      }
-    });
-  }
-
-  function renderBench(): void{
-    const lineup = getSelectedLineup();
-    benchGrid.innerHTML = '';
-    if (!lineup){
-      state.activeBenchIndex = null;
-      renderBenchDetails();
-      return;
-    }
-
-    if (!Number.isInteger(state.activeBenchIndex) || !lineup.bench[state.activeBenchIndex ?? -1]){
-      state.activeBenchIndex = null;
-    }
-
-    const columnCount = 5;
-    const columnEls = Array.from({ length: columnCount }, () => {
-      const columnEl = document.createElement('div');
-      columnEl.className = 'lineup-bench__column';
-      benchGrid.appendChild(columnEl);
-      return columnEl;
-    });
-
-    lineup.bench.forEach(cell => {
-      const cellEl = document.createElement('button');
-      cellEl.type = 'button';
-      cellEl.className = 'lineup-bench__cell';
-      cellEl.dataset.benchIndex = String(cell.index);
-      const unit = cell.unitId ? rosterLookup.get(cell.unitId) : null;
-      const hasContent = Boolean(cell.unitId || cell.label);
-      if (!hasContent){
-        cellEl.classList.add('is-empty');
-      }
-      const displayName = unit?.name || cell.label || '';
-      let ariaLabel = `Ô dự bị ${cell.index + 1}`;
-      if (displayName){
-        ariaLabel += `: ${displayName}`;
-        if (cell.unitId){
-          ariaLabel += '. Giữ Alt và click để gỡ.';
-        }
-      }
       cellEl.setAttribute('aria-label', ariaLabel);
-      if (displayName){
-        cellEl.title = cell.unitId
-          ? `${displayName} — giữ Alt và click để gỡ.`
-          : displayName;
-      } else {
-        cellEl.removeAttribute('title');
-      }
-      const codeText = (!cell.unitId && hasContent)
-        ? getUnitCode(unit, cell.label || '')
-        : '';
-      const avatarEl = document.createElement('div');
-      avatarEl.className = 'lineup-bench__avatar';
-      const avatarSource = unit?.avatar || (cell.meta as { avatar?: string } | null)?.avatar || null;
-      const avatarLabel = unit?.name || cell.label || '';
-      renderAvatar(avatarEl, avatarSource, avatarLabel);
-      if (codeText){
-        const codeEl = document.createElement('span');
-        codeEl.className = 'lineup-bench__cell-code';
-        codeEl.textContent = codeText;
-        cellEl.appendChild(codeEl);
-      }
-      cellEl.appendChild(avatarEl);
-      if (state.activeBenchIndex === cell.index){
-        cellEl.classList.add('is-active');
-      }
-      const columnIndex = cell.index % columnCount;
-      const targetColumn = columnEls[columnIndex] || columnEls[0] || null;
-      if (targetColumn){
-        targetColumn.appendChild(cellEl);
-      }
+
+      cellsGrid.appendChild(cellEl);
     });
 
-    updateActiveBenchHighlight();
-    renderBenchDetails();
+updateActiveCellHighlight();
+    renderCellDetails();
   }
+
+function updateActiveCellHighlight(): void{
+    const entries = cellsGrid.querySelectorAll<HTMLElement>('.lineup-cell');
+    entries.forEach(entry => {
+      const idx = Number(entry.dataset.cellIndex);
+      if (Number.isFinite(idx) && idx === state.activeCellIndex){
+        entry.classList.add('is-active');
+      } else {
+        entry.classList.remove('is-active');
+      }
+    });
+ }
 
   function renderLeader(): void{
     const lineup = getSelectedLineup();
@@ -1011,8 +925,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       const isAssigned = Boolean(
         lineup
         && (lineup.leaderId === unitId
-          || lineup.slots.some(slot => slot.unitId === unitId)
-          || lineup.bench.some(cell => cell.unitId === unitId))
+       || lineup.cells.some(cell => cell.unitId === unitId))
       );
       if (isAssigned && state.selectedUnitId !== unitId){
         button.classList.add('is-unavailable');
@@ -1137,9 +1050,8 @@ const eventCleanup = bindLineupEvents({
     state,
     elements: {
       backButton,
-      slotsGrid,
-      benchGrid,
-      benchDetails,
+      cellsGrid,
+      cellDetails,
       passiveGrid,
       rosterFilters,
       rosterList,
@@ -1158,15 +1070,14 @@ const eventCleanup = bindLineupEvents({
     helpers: {
       getSelectedLineup,
       setMessage,
-      renderSlots,
-      renderBench,
-      renderBenchDetails,
+      renderCells,
+      renderCellDetails,
       renderLeader,
       renderPassives,
       renderFilters,
       renderRoster,
-      updateActiveBenchHighlight,
-      syncBenchDetailsHeight,
+      updateActiveCellHighlight,
+      syncGridDetailsHeight,
       openPassiveDetails,
       openLeaderPicker,
       refreshWallet,
@@ -1176,13 +1087,12 @@ const eventCleanup = bindLineupEvents({
   cleanup.push(...eventCleanup);
 
   refreshWallet();
-  renderSlots();
-  renderBench();
+  renderCells();
   renderLeader();
   renderPassives();
   renderFilters();
   renderRoster();
-  setMessage('Chọn nhân vật rồi gán vào các ô chủ lực hoặc dự bị để hoàn thiện đội hình.');
+  setMessage('Chọn nhân vật rồi gán vào các ô đội hình để hoàn thiện đội hình.');
 
   cleanup.push(() => passiveOverlay.remove());
   cleanup.push(() => leaderOverlay.remove());
