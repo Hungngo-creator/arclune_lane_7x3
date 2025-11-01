@@ -413,6 +413,113 @@ describe('PvE RAF fallback khi thiếu performance.now()', () => {
 
     session.stop();
   });
+  
+  it('khôi phục timer sau khi safeNow tụt hàng triệu ms và vẫn tick cost/lượt', () => {
+    usePerfNow = true;
+    perfNowValue = 0;
+
+    const boardContext = {
+      canvas: null,
+      setTransform: jest.fn(),
+      resetTransform: jest.fn(),
+      scale: jest.fn(),
+      clearRect: jest.fn(),
+      drawImage: jest.fn(),
+    };
+    const board = {
+      width: 700,
+      height: 600,
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      getContext: jest.fn(() => boardContext),
+      getBoundingClientRect: jest.fn(() => ({ left: 0, top: 0 })),
+    };
+    boardContext.canvas = board;
+
+    const timerEl = { textContent: '' };
+
+    const documentStub = {
+      querySelector: jest.fn((selector) => {
+        if (selector === '#board') return board;
+        if (selector === '#timer') return timerEl;
+        return null;
+      }),
+      getElementById: jest.fn((id) => {
+        if (id === 'board') return board;
+        if (id === 'timer') return timerEl;
+        return null;
+      }),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      defaultView: view,
+      hidden: false,
+    };
+    const root = {
+      ownerDocument: documentStub,
+      querySelector: (selector) => documentStub.querySelector(selector),
+    };
+    board.ownerDocument = documentStub;
+
+    const sessionModule = loadSessionModule();
+    const { createPveSession } = sessionModule;
+
+    const session = createPveSession(root);
+    const game = session.start();
+
+    expect(game).not.toBeNull();
+    expect(view.requestAnimationFrame).toHaveBeenCalled();
+    expect(rafCallbacks.length).toBeGreaterThan(0);
+
+    const parseTimerRemain = () => {
+      const text = timerEl.textContent ?? '';
+      const parts = text.split(':');
+      if (parts.length !== 2) return Infinity;
+      const mm = Number(parts[0]);
+      const ss = Number(parts[1]);
+      if (!Number.isFinite(mm) || !Number.isFinite(ss)) return Infinity;
+      return Math.max(0, mm * 60 + ss);
+    };
+
+    const runTick = (value) => {
+      const tick = rafCallbacks.shift();
+      expect(typeof tick).toBe('function');
+      if (game?.turn){
+        game.turn.busyUntil = 0;
+      }
+      perfNowValue = value;
+      tick?.(value);
+      expect(view.requestAnimationFrame).toHaveBeenCalled();
+    };
+
+    runTick(5000);
+
+    const remainAfterForward = parseTimerRemain();
+    expect(remainAfterForward).toBeLessThan(240);
+    const costAfterForward = Number(game?.cost ?? 0);
+
+    const rewindValue = -1_995_000;
+    runTick(rewindValue);
+
+    const remainAfterRewind = parseTimerRemain();
+    expect(remainAfterRewind).toBeGreaterThanOrEqual(220);
+    expect(remainAfterRewind).toBeLessThanOrEqual(240);
+    const costAfterRewind = Number(game?.cost ?? 0);
+    expect(costAfterRewind).toBeGreaterThanOrEqual(costAfterForward);
+
+    const stepTurnBefore = stepTurnSpy.mock.calls.length;
+    let latestValue = rewindValue;
+    const expectedCostGain = 3;
+    for (let i = 0; i < expectedCostGain; i += 1){
+      latestValue += 1000;
+      runTick(latestValue);
+    }
+
+    const costAfterRecovery = Number(game?.cost ?? 0);
+    expect(costAfterRecovery).toBeGreaterThanOrEqual(costAfterRewind + expectedCostGain);
+    expect(stepTurnSpy.mock.calls.length).toBeGreaterThan(stepTurnBefore);
+
+    session.stop();
+  });
 
   it('khôi phục turn interval mặc định khi cấu hình lỗi', () => {
     if (configModule?.CFG?.ANIMATION){
