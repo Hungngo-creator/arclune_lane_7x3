@@ -113,6 +113,7 @@ type ClockState = {
   lastCostCreditedSec: number;
   turnEveryMs: number;
   lastTurnStepMs: number;
+  lastFrameMs: number;
 };
 type ExtendedQueuedSummon = (QueuedSummonRequest & {
   art?: ReturnType<typeof getUnitArt> | null;
@@ -899,6 +900,7 @@ function createClock(): ClockState {
     lastCostCreditedSec: 0,
     turnEveryMs,
     lastTurnStepMs: now - turnEveryMs,
+    lastFrameMs: now,
   };
 }
 
@@ -1982,6 +1984,13 @@ function init(): boolean {
           normalizedTurnStep = maxTurnStep;
         }
         CLOCK.lastTurnStepMs = normalizedTurnStep;
+
+        const rebaseFrame = Number.isFinite(sessionForRebase)
+          ? sessionForRebase
+          : CLOCK.startMs;
+        CLOCK.lastFrameMs = Number.isFinite(rebaseFrame)
+          ? rebaseFrame
+          : CLOCK.startMs;
       }
 
       const expectedSessionMs = safeNowMs - CLOCK.startSafeMs + CLOCK.startMs;
@@ -2004,6 +2013,25 @@ function init(): boolean {
           }
         }
       }
+
+      if (!Number.isFinite(CLOCK.lastFrameMs)){
+        CLOCK.lastFrameMs = Number.isFinite(CLOCK.startMs)
+          ? CLOCK.startMs
+          : expectedSessionMs;
+      }
+
+      const lastFrameMs = Number.isFinite(CLOCK.lastFrameMs)
+        ? CLOCK.lastFrameMs
+        : expectedSessionMs;
+      if (!Number.isFinite(sessionNowMs)){
+        sessionNowMs = expectedSessionMs;
+      }
+      if (Number.isFinite(lastFrameMs) && sessionNowMs <= lastFrameMs){
+        const fallbackFrame = Math.max(expectedSessionMs, lastFrameMs + 1);
+        sessionNowMs = fallbackFrame;
+      }
+      CLOCK.lastFrameMs = Number.isFinite(sessionNowMs) ? sessionNowMs : expectedSessionMs;
+
       let elapsedSec = Math.floor((sessionNowMs - CLOCK.startMs) / 1000);
       if (!Number.isFinite(elapsedSec)){
         elapsedSec = forcedElapsedSec ?? 0;
