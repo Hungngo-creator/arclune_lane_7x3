@@ -1,0 +1,8 @@
+{
+  "N":   { "hex": "#9AA3AF", "glow": 0.6, "ring": 1.0, "spark": 0 },
+  "R":   { "hex": "#2ED3A0", "glow": 0.8, "ring": 1.0, "spark": 4 },
+  "SR":  { "hex": "#00E5FF", "glow": 1.0, "ring": 1.05, "spark": 6 },
+  "SSR": { "hex": "#7C4DFF", "glow": 1.15, "ring": 1.1, "spark": 8 },
+  "UR":  { "hex": "#FFD773", "glow": 1.25, "ring": 1.15, "spark": 12 },
+  "PRIME": { "hex": "#FFFFFF", "glow": 1.35, "ring": 1.2, "spark": 16, "prism": true }
+}
