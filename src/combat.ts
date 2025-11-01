@@ -243,7 +243,7 @@ export function basicAttack(Game: SessionState, unit: UnitToken): void {
   };
   emitPassiveEvent(Game, unit, 'onBasicHit', passiveCtx);
 
-  const meleeDur = GAME_CONFIG.ANIMATION?.meleeDurationMs ?? 1100;
+  const meleeDur = GAME_CONFIG.ANIMATION?.meleeDurationMs ?? 2000;
   const meleeStartMs = sessionNow();
   let meleeTriggered = false;
   if (sessionVfx) {

@@ -148,7 +148,7 @@ const rawConfig = {
   },
   ANIMATION: {
     turnIntervalMs: 480,
-    meleeDurationMs: 1100
+    meleeDurationMs: 2000
   },
 // === Debug flags (W0-J1) ===
   DEBUG: {
