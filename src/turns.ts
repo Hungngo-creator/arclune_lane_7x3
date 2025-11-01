@@ -235,6 +235,8 @@ export function spawnQueuedIfDue(
 
 interface TickMinionTtlOptions {
   consumed?: boolean;
+  skipped?: boolean;
+  reason?: string | null;
 }
 
 // giảm TTL minion sau khi phe đó hoàn tất lượt của mình
@@ -247,6 +249,9 @@ interface TickMinionTtlOptions {
 export function tickMinionTTL(Game: SessionState, side: Side, options: TickMinionTtlOptions = {}): void {
   const consumed = options?.consumed ?? true;
   if (!consumed) return;
+  const reason = typeof options?.reason === 'string' ? options.reason : null;
+  const skipped = options?.skipped ?? false;
+  if (skipped && reason === 'systemError') return;
   const toRemove: UnitToken[] = [];
   for (const t of Game.tokens){
     if (!t.alive) continue;
@@ -299,12 +304,21 @@ const normalizeActionResolution = (outcome: unknown): StrictActionResolution | n
   };
 };
 
-const consumedTurnFromOutcome = (outcome: StrictActionResolution | null, hadHook: boolean): boolean => {
-  if (!hadHook) return false;
-  if (!outcome) return true;
-  if (!outcome.consumedTurn) return false;
-  if (outcome.skipped && outcome.reason === 'systemError') return false;
-  return true;
+const consumedTurnFromOutcome = (outcome: StrictActionResolution | null, hadHook: boolean): TickMinionTtlOptions => {
+  if (!hadHook){
+    return { consumed: false, skipped: false, reason: null };
+  }
+  if (!outcome){
+    return { consumed: true, skipped: false, reason: null };
+  }
+  const { consumedTurn, skipped, reason } = outcome;
+  if (!consumedTurn){
+    return { consumed: false, skipped, reason };
+  }
+  if (skipped && reason === 'systemError'){
+    return { consumed: false, skipped, reason };
+  }
+  return { consumed: true, skipped, reason };
 };
 
 // hành động 1 unit (ưu tiên ult nếu đủ nộ & không bị chặn)
@@ -528,8 +542,8 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
       emitGameEvent(TURN_END, turnDetail);
     }
 
-    const consumed = consumedTurnFromOutcome(actionOutcome, typeof actionHook === 'function');
-    tickMinionTTL(Game, entry.side, { consumed });
+    const consumption = consumedTurnFromOutcome(actionOutcome, typeof actionHook === 'function');
+    tickMinionTTL(Game, entry.side, consumption);
     const ended = hooks.checkBattleEnd?.(Game, {
       trigger: 'interleaved',
       side: entry.side,
@@ -618,8 +632,8 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
       emitGameEvent(TURN_END, turnDetail);
     }
 
-    const consumed = consumedTurnFromOutcome(actionOutcome, typeof actionHook === 'function');
-    tickMinionTTL(Game, entry.side, { consumed });
+    const consumption = consumedTurnFromOutcome(actionOutcome, typeof actionHook === 'function');
+    tickMinionTTL(Game, entry.side, consumption);
 
     const ended = hooks.checkBattleEnd?.(Game, {
       trigger: 'sequential',
