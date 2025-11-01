@@ -358,6 +358,7 @@ export function doActionOrSkip(
   if (!unit || !unit.alive) {
     emitGameEvent(ACTION_START, baseDetail);
     ensureBusyReset();
+    resolution.consumedTurn = false;
     resolution.acted = false;
     resolution.skipped = true;
     resolution.reason = 'missingUnit';
@@ -377,6 +378,7 @@ export function doActionOrSkip(
   if (!Statuses.canAct(unit)) {
     Statuses.onTurnEnd(unit, {});
     ensureBusyReset();
+    resolution.consumedTurn = false;
     resolution.acted = false;
     resolution.skipped = true;
     resolution.reason = 'status';
@@ -418,7 +420,19 @@ export function doActionOrSkip(
   }
 
   const cap = typeof meta?.followupCap === 'number' ? (meta.followupCap | 0) : (CFG.FOLLOWUP_CAP_DEFAULT | 0);
-  doBasicWithFollowups(Game, unit, cap);
+  try {
+    doBasicWithFollowups(Game, unit, cap);
+  } catch (err) {
+    console.error('[doActionOrSkip.basic]', err);
+    Statuses.onTurnEnd(unit, {});
+    ensureBusyReset();
+    resolution.consumedTurn = false;
+    resolution.acted = false;
+    resolution.skipped = true;
+    resolution.reason = 'systemError';
+    finishAction({ skipped: true, reason: 'systemError' });
+    return resolution;
+  }
   emitPassiveEvent(Game, unit, 'onActionEnd', { log: getPassiveLog(Game) });
   Statuses.onTurnEnd(unit, {});
   ensureBusyReset();
