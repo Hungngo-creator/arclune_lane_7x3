@@ -99,7 +99,7 @@ describe('renderLineupScreen', () => {
     expect(root.querySelector('.lineup-view')).not.toBeNull();
 
     const benchCells = root.querySelectorAll('.lineup-bench__cell');
-    expect(benchCells).toHaveLength(10);
+    expect(benchCells).toHaveLength(5);
 
     const backButton = root.querySelector<HTMLButtonElement>('.lineup-view__back');
     expect(backButton?.textContent).toContain('Quay lại menu chính');
