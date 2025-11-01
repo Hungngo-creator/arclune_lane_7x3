@@ -31,8 +31,11 @@ export interface EquipmentLoadout {
   [slot: string]: unknown;
 }
 
-export interface LineupSlot {
+export type LineupCellSection = 'formation' | 'reserve';
+
+export interface LineupCell {
   index: number;
+  section: LineupCellSection;
   unitId: string | null;
   label: string | null;
   unlocked: boolean;
@@ -46,8 +49,7 @@ export interface LineupState {
   name: string;
   role: string;
   description: string;
-  slots: LineupSlot[];
-  bench: Array<{ index: number; unitId: string | null; label: string | null; meta: Record<string, unknown> | null }>;
+  cells: LineupCell[];
   passives: Array<{
     index: number;
     id: string;
