@@ -1,10 +1,13 @@
 import { Statuses, hookOnLethalDamage } from './statuses.ts';
+import { applyDamage, grantShield } from './combat/apply-damage.ts';
 import { asSessionWithVfx, vfxAddHit, vfxAddMelee, vfxAddLightningArc } from './vfx.ts';
 import { slotToCell } from './engine.ts';
 import { emitPassiveEvent, getPassiveLog, type AfterHitHandler } from './passives.ts';
 import { CFG } from './config.ts';
 import { gainFury, startFurySkill, finishFuryHit } from './utils/fury.ts';
 import { mergeBusyUntil, sessionNow } from './utils/time.ts';
+
+export { applyDamage, grantShield };
 
 import type { DamageResult } from './statuses.ts';
 import type { SessionState } from '@shared-types/combat';
@@ -90,22 +93,6 @@ export function pickTarget(Game: TargetableGameState, attacker: UnitToken): Unit
   });
 
   return sorted[0] ?? null;
-}
-
-export function applyDamage(target: UnitToken, amount: number): void {
-  if (!Number.isFinite(target.hpMax)) return;
-
-  const currentHp = target.hp ?? 0;
-  const maxHp = target.hpMax ?? 0;
-  const newHp = Math.max(0, Math.min(maxHp, Math.floor(currentHp) - Math.floor(amount)));
-  target.hp = newHp;
-
-  if (target.hp <= 0) {
-    if (target.alive !== false && !target.deadAt) {
-      target.deadAt = sessionNow();
-    }
-    target.alive = false;
-  }
 }
 
 export function dealAbilityDamage(
@@ -212,21 +199,6 @@ export function healUnit(target: UnitToken | null | undefined, amount: number): 
   target.hp = before + healed;
 
   return { healed, overheal: Math.max(0, amt - healed) };
-}
-
-export function grantShield(target: UnitToken | null | undefined, amount: number): number {
-  if (!target) return 0;
-
-  const amt = Math.max(0, Math.floor(amount ?? 0));
-  if (amt <= 0) return 0;
-
-  const current = Statuses.get(target, 'shield');
-  if (current) {
-    current.amount = (current.amount ?? 0) + amt;
-  } else {
-    Statuses.add(target, { id: 'shield', kind: 'buff', tag: 'shield', amount: amt });
-  }
-  return amt;
 }
 
 export function basicAttack(Game: SessionState, unit: UnitToken): void {
