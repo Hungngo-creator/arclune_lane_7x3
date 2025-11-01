@@ -17,6 +17,10 @@
 ## Kiểm thử
 - Thực thi `npm test` để chạy bộ kiểm thử Jest trong chế độ `--runInBand`, đảm bảo khả năng biên dịch và chạy các tệp TypeScript.
 
+## Aura hiếm trong UI
+- Module `src/ui/rarity/rarity.ts` cung cấp API `mountRarityAura`, `updateRarity`, `unmountRarity`, `setPowerMode` và `playGachaReveal` để dựng hiệu ứng aura theo bậc hiếm cho các màn Gacha, Deck và Collection.
+- Tệp cấu hình `src/ui/rarity/rarity_tokens.json` chứa token màu/glow cho từng bậc; stylesheet `src/ui/rarity/rarity.css` được nạp tự động khi import module giúp tái sử dụng trong toàn bộ UI.
+
 ## Trận mô phỏng C1-1 (NORMAL)
 - Đội hình yêu cầu: Vanguard Astra, Guardian Lumen, Tactician Arclight, Hexseer Mira, Chanter Lys.
 - Bố trí: hai đơn vị tiền tuyến (Vanguard Astra, Guardian Lumen), một đơn vị trung tuyến (Tactician Arclight) và hai đơn vị hậu tuyến (Hexseer Mira, Chanter Lys).
