@@ -9,7 +9,7 @@ import { vfxAddSpawn, vfxAddBloodPulse, asSessionWithVfx } from './vfx.ts';
 import { getUnitArt } from './art.ts';
 import { emitPassiveEvent, applyOnSpawnEffects, getPassiveLog, prepareUnitForPassives } from './passives.ts';
 import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } from './events.ts';
-import { safeNow } from './utils/time.ts';
+import { safeNow, sessionNow } from './utils/time.ts';
 import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } from './utils/fury.ts';
 import { nextTurnInterleaved } from './turns/interleaved.ts';
 
@@ -315,7 +315,7 @@ export function doActionOrSkip(
 ): ActionResolution {
   const ensureBusyReset = (): void => {
     if (!Game.turn) return;
-    const now = safeNow();
+    const now = sessionNow();
     if (!Number.isFinite(Game.turn.busyUntil) || Game.turn.busyUntil < now) {
       Game.turn.busyUntil = now;
     }
