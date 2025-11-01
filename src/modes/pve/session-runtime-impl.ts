@@ -2138,11 +2138,11 @@ function init(): boolean {
       tickLoopHandle = raf(runTickLoop);
     } else {
       tickLoopUsesTimeout = true;
-      tickLoopHandle = setTimeout(() => runTickLoop(getNow()), 16);
+      tickLoopHandle = setTimeout(() => runTickLoop(), 16);
     }
   }
 
-  updateTimerAndCost(getNow());
+  updateTimerAndCost();
   scheduleTickLoop();
   return true;
 }
