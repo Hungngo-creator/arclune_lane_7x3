@@ -2111,7 +2111,18 @@ function init(): boolean {
 
   const runTickLoop = (timestamp?: number): void => {
     tickLoopHandle = null;
-    updateTimerAndCost(timestamp);
+    try {
+      updateTimerAndCost(timestamp);
+    } catch (err) {
+      console.error('[pve] tick loop error', err);
+      if (hud && typeof hud.update === 'function'){
+        try {
+          hud.update({ cost: Game?.cost ?? null, costCap: Game?.costCap ?? null });
+        } catch (hudErr) {
+          console.error('[pve] HUD update fallback sau lỗi tick thất bại', hudErr);
+        }
+      }
+    }
     if (!running || !CLOCK) return;
     scheduleTickLoop();
   };
