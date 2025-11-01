@@ -64,6 +64,18 @@ function normalizeRarityInput(input: string | Rarity): Rarity {
   throw new Error(`Rarity không hợp lệ: ${input}`);
 }
 
+export function normalizeRarity(value: unknown): Rarity {
+  return normalizeRarityInput(value as string | Rarity);
+}
+
+export function coerceRarity(value: unknown, fallback: Rarity = 'N'): Rarity {
+  try {
+    return normalizeRarity(value);
+  } catch (error) {
+    return fallback;
+  }
+}
+
 function createTokenConfig(input: TokenConfigInput): TokenConfig {
   const { hex, glow, ring, spark, prism = false } = input;
   return Object.freeze({
@@ -390,7 +402,7 @@ body.low-power .rarity-aura.has-spark .spark-layer {
 
 .rarity-aura[data-variant="collection"] .ring {
   opacity: 0.7;
-      }
+}
 
 .rarity-aura[data-variant="collection"] .glow {
   filter: blur(calc(8px * var(--rarity-glow-active)));
@@ -788,4 +800,4 @@ export function playGachaReveal(cards: RevealCard[], options?: RevealOptions): v
   } else {
     startTimeline();
   }
-                                  }
+}
