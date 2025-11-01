@@ -1,7 +1,7 @@
 // Bundled by build.mjs
 const __modules = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }
 function __define(id, factory){ __modules[id] = { factory, exports: null, initialized: false }; }
@@ -2348,25 +2348,30 @@ __define('./combat.ts', (exports, module, __require) => {
   const __dep0 = __require('./statuses.ts');
   const Statuses = __dep0.Statuses;
   const hookOnLethalDamage = __dep0.hookOnLethalDamage;
-  const __dep1 = __require('./vfx.ts');
-  const asSessionWithVfx = __dep1.asSessionWithVfx;
-  const vfxAddHit = __dep1.vfxAddHit;
-  const vfxAddMelee = __dep1.vfxAddMelee;
-  const vfxAddLightningArc = __dep1.vfxAddLightningArc;
-  const __dep2 = __require('./engine.ts');
-  const slotToCell = __dep2.slotToCell;
-  const __dep3 = __require('./passives.ts');
-  const emitPassiveEvent = __dep3.emitPassiveEvent;
-  const getPassiveLog = __dep3.getPassiveLog;
-  const __dep4 = __require('./config.ts');
-  const CFG = __dep4.CFG;
-  const __dep5 = __require('./utils/fury.ts');
-  const gainFury = __dep5.gainFury;
-  const startFurySkill = __dep5.startFurySkill;
-  const finishFuryHit = __dep5.finishFuryHit;
-  const __dep6 = __require('./utils/time.ts');
-  const mergeBusyUntil = __dep6.mergeBusyUntil;
-  const sessionNow = __dep6.sessionNow;
+  const __dep1 = __require('./combat/apply-damage.ts');
+  const applyDamage = __dep1.applyDamage;
+  const grantShield = __dep1.grantShield;
+  const __dep2 = __require('./vfx.ts');
+  const asSessionWithVfx = __dep2.asSessionWithVfx;
+  const vfxAddHit = __dep2.vfxAddHit;
+  const vfxAddMelee = __dep2.vfxAddMelee;
+  const vfxAddLightningArc = __dep2.vfxAddLightningArc;
+  const __dep3 = __require('./engine.ts');
+  const slotToCell = __dep3.slotToCell;
+  const __dep4 = __require('./passives.ts');
+  const emitPassiveEvent = __dep4.emitPassiveEvent;
+  const getPassiveLog = __dep4.getPassiveLog;
+  const __dep5 = __require('./config.ts');
+  const CFG = __dep5.CFG;
+  const __dep6 = __require('./utils/fury.ts');
+  const gainFury = __dep6.gainFury;
+  const startFurySkill = __dep6.startFurySkill;
+  const finishFuryHit = __dep6.finishFuryHit;
+  const __dep7 = __require('./utils/time.ts');
+  const mergeBusyUntil = __dep7.mergeBusyUntil;
+  const sessionNow = __dep7.sessionNow;
+  exports.applyDamage = applyDamage;
+  exports.grantShield = grantShield;
   const isBasicAttackAfterHitHandler = (handler) => typeof handler === 'function';
   const GAME_CONFIG = CFG;
   function pickTarget(Game, attacker) {
@@ -2392,21 +2397,6 @@ __define('./combat.ts', (exports, module, __require) => {
           return distanceA - distanceB;
       });
       return (_a = sorted[0]) !== null && _a !== void 0 ? _a : null;
-  }
-  function applyDamage(target, amount) {
-      var _a, _b;
-      if (!Number.isFinite(target.hpMax))
-          return;
-      const currentHp = (_a = target.hp) !== null && _a !== void 0 ? _a : 0;
-      const maxHp = (_b = target.hpMax) !== null && _b !== void 0 ? _b : 0;
-      const newHp = Math.max(0, Math.min(maxHp, Math.floor(currentHp) - Math.floor(amount)));
-      target.hp = newHp;
-      if (target.hp <= 0) {
-          if (target.alive !== false && !target.deadAt) {
-              target.deadAt = sessionNow();
-          }
-          target.alive = false;
-      }
   }
   function dealAbilityDamage(Game, attacker, target, opts = {}) {
       var _a, _b, _c, _d, _e, _f;
@@ -2487,22 +2477,6 @@ __define('./combat.ts', (exports, module, __require) => {
       const healed = Math.min(amt, healCap);
       target.hp = before + healed;
       return { healed, overheal: Math.max(0, amt - healed) };
-  }
-  function grantShield(target, amount) {
-      var _a;
-      if (!target)
-          return 0;
-      const amt = Math.max(0, Math.floor(amount !== null && amount !== void 0 ? amount : 0));
-      if (amt <= 0)
-          return 0;
-      const current = Statuses.get(target, 'shield');
-      if (current) {
-          current.amount = ((_a = current.amount) !== null && _a !== void 0 ? _a : 0) + amt;
-      }
-      else {
-          Statuses.add(target, { id: 'shield', kind: 'buff', tag: 'shield', amount: amt });
-      }
-      return amt;
   }
   function basicAttack(Game, unit) {
       var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
@@ -2637,12 +2611,57 @@ __define('./combat.ts', (exports, module, __require) => {
 
   if (!Object.prototype.hasOwnProperty.call(exports, 'isBasicAttackAfterHitHandler')) exports.isBasicAttackAfterHitHandler = isBasicAttackAfterHitHandler;
   if (!Object.prototype.hasOwnProperty.call(exports, 'pickTarget')) exports.pickTarget = pickTarget;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'applyDamage')) exports.applyDamage = applyDamage;
   if (!Object.prototype.hasOwnProperty.call(exports, 'dealAbilityDamage')) exports.dealAbilityDamage = dealAbilityDamage;
   if (!Object.prototype.hasOwnProperty.call(exports, 'healUnit')) exports.healUnit = healUnit;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'grantShield')) exports.grantShield = grantShield;
   if (!Object.prototype.hasOwnProperty.call(exports, 'basicAttack')) exports.basicAttack = basicAttack;
   if (!Object.prototype.hasOwnProperty.call(exports, 'doBasicWithFollowups')) exports.doBasicWithFollowups = doBasicWithFollowups;
+});
+__define('./combat/apply-damage.ts', (exports, module, __require) => {
+  const __dep0 = __require('./utils/time.ts');
+  const sessionNow = __dep0.sessionNow;
+  const ensureStatusList = (unit) => {
+      if (!unit)
+          return [];
+      if (!Array.isArray(unit.statuses)) {
+          unit.statuses = [];
+      }
+      return unit.statuses;
+  };
+  function applyDamage(target, amount) {
+      var _a, _b;
+      if (!Number.isFinite(target.hpMax))
+          return;
+      const currentHp = (_a = target.hp) !== null && _a !== void 0 ? _a : 0;
+      const maxHp = (_b = target.hpMax) !== null && _b !== void 0 ? _b : 0;
+      const newHp = Math.max(0, Math.min(maxHp, Math.floor(currentHp) - Math.floor(amount)));
+      target.hp = newHp;
+      if (target.hp <= 0) {
+          if (target.alive !== false && !target.deadAt) {
+              target.deadAt = sessionNow();
+          }
+          target.alive = false;
+      }
+  }
+  function grantShield(target, amount) {
+      var _a;
+      if (!target)
+          return 0;
+      const amt = Math.max(0, Math.floor(amount !== null && amount !== void 0 ? amount : 0));
+      if (amt <= 0)
+          return 0;
+      const list = ensureStatusList(target);
+      const shield = list.find(status => status.id === 'shield');
+      if (shield) {
+          shield.amount = ((_a = shield.amount) !== null && _a !== void 0 ? _a : 0) + amt;
+      }
+      else {
+          list.push({ id: 'shield', kind: 'buff', tag: 'shield', amount: amt });
+      }
+      return amt;
+  }
+
+  if (!Object.prototype.hasOwnProperty.call(exports, 'applyDamage')) exports.applyDamage = applyDamage;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'grantShield')) exports.grantShield = grantShield;
 });
 __define('./config.ts', (exports, module, __require) => {
   // config.ts v0.7.5
@@ -4946,12 +4965,14 @@ __define('./engine.ts', (exports, module, __require) => {
       var _a, _b;
       const artAlly = getUnitArt('leaderA');
       const artEnemy = getUnitArt('leaderB');
+      const allyCell = slotToCell('ally', 5);
+      const enemyCell = slotToCell('enemy', 5);
       tokens.push({
           id: 'leaderA',
           name: 'Uyên',
           color: '#6cc8ff',
-          cx: 0,
-          cy: 1,
+          cx: allyCell.cx,
+          cy: allyCell.cy,
           side: 'ally',
           alive: true,
           art: artAlly,
@@ -4961,8 +4982,8 @@ __define('./engine.ts', (exports, module, __require) => {
           id: 'leaderB',
           name: 'Địch',
           color: '#ff9aa0',
-          cx: g.cols - 1,
-          cy: 1,
+          cx: enemyCell.cx,
+          cy: enemyCell.cy,
           side: 'enemy',
           alive: true,
           art: artEnemy,
@@ -7970,14 +7991,19 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   // Master clock theo timestamp – tránh drift giữa nhiều interval
   let CLOCK = null;
   function createClock() {
-      var _a, _b;
+      var _a;
       const now = getNow();
+      const intervalCandidate = (_a = CFG === null || CFG === void 0 ? void 0 : CFG.ANIMATION) === null || _a === void 0 ? void 0 : _a.turnIntervalMs;
+      const parsedInterval = Number(intervalCandidate);
+      const turnEveryMs = Number.isFinite(parsedInterval) && parsedInterval > 0
+          ? parsedInterval
+          : 600;
       return {
           startMs: now,
           lastTimerRemain: 240,
           lastCostCreditedSec: 0,
-          turnEveryMs: (_b = (_a = CFG === null || CFG === void 0 ? void 0 : CFG.ANIMATION) === null || _a === void 0 ? void 0 : _a.turnIntervalMs) !== null && _b !== void 0 ? _b : 600,
-          lastTurnStepMs: now
+          turnEveryMs,
+          lastTurnStepMs: now - turnEveryMs,
       };
   }
   // Xác chết chờ vanish (để sau này thay bằng dead-animation)
@@ -9030,13 +9056,13 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               return;
           if ((_a = Game.battle) === null || _a === void 0 ? void 0 : _a.over)
               return;
+          let sessionNowMs = getNow();
           if (isFiniteNumber(timestamp)) {
               const rafTs = Number(timestamp);
               if (SUPPORTS_PERF_NOW || (rafTs >= 0 && rafTs <= RAF_TIMESTAMP_MAX)) {
-                  normalizeAnimationFrameTimestamp(rafTs);
+                  sessionNowMs = normalizeAnimationFrameTimestamp(rafTs);
               }
           }
-          const sessionNowMs = getNow();
           const elapsedSec = Math.floor((sessionNowMs - CLOCK.startMs) / 1000);
           const prevRemain = Number.isFinite(CLOCK.lastTimerRemain) ? CLOCK.lastTimerRemain : 0;
           const remain = Math.max(0, 240 - elapsedSec);
@@ -9089,16 +9115,22 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               turnEveryMs = defaultTurnEveryMs;
               CLOCK.turnEveryMs = turnEveryMs;
           }
-          if (!Number.isFinite(CLOCK.lastTurnStepMs)) {
-              CLOCK.lastTurnStepMs = sessionNowMs - turnEveryMs;
-          }
           const stallDeltaEpsilon = 1;
-          const sessionElapsed = sessionNowMs - CLOCK.lastTurnStepMs;
-          const readyByBusy = sessionNowMs >= busyUntil;
-          if (readyByBusy && (!Number.isFinite(sessionElapsed) || sessionElapsed < -stallDeltaEpsilon)) {
+          const initialTurnBaseline = Number.isFinite(CLOCK.startMs)
+              ? CLOCK.startMs - turnEveryMs
+              : sessionNowMs - turnEveryMs;
+          if (!Number.isFinite(CLOCK.lastTurnStepMs)) {
+              CLOCK.lastTurnStepMs = initialTurnBaseline;
+          }
+          else if (CLOCK.lastTurnStepMs > sessionNowMs) {
               CLOCK.lastTurnStepMs = sessionNowMs - turnEveryMs;
           }
-          const elapsedForTurn = sessionNowMs - CLOCK.lastTurnStepMs;
+          const readyByBusy = sessionNowMs >= busyUntil;
+          let elapsedForTurn = sessionNowMs - CLOCK.lastTurnStepMs;
+          if (readyByBusy && (!Number.isFinite(elapsedForTurn) || elapsedForTurn < -stallDeltaEpsilon)) {
+              CLOCK.lastTurnStepMs = sessionNowMs - turnEveryMs;
+              elapsedForTurn = turnEveryMs;
+          }
           if (readyByBusy && elapsedForTurn >= turnEveryMs) {
               CLOCK.lastTurnStepMs = sessionNowMs;
               stepTurn(Game, {
@@ -16435,7 +16467,7 @@ __define('./shared-types/units.ts', (exports, module, __require) => {
 
 });
 __define('./statuses.ts', (exports, module, __require) => {
-  const __dep0 = __require('./combat.ts');
+  const __dep0 = __require('./combat/apply-damage.ts');
   const applyDamage = __dep0.applyDamage;
   const __dep1 = __require('./utils/fury.ts');
   const gainFury = __dep1.gainFury;
@@ -17024,6 +17056,7 @@ __define('./turns.ts', (exports, module, __require) => {
   const TURN_REGEN = __dep8.TURN_REGEN;
   const __dep9 = __require('./utils/time.ts');
   const safeNow = __dep9.safeNow;
+  const sessionNow = __dep9.sessionNow;
   const __dep10 = __require('./utils/fury.ts');
   const initializeFury = __dep10.initializeFury;
   const startFuryTurn = __dep10.startFuryTurn;
@@ -17231,9 +17264,13 @@ __define('./turns.ts', (exports, module, __require) => {
    * @returns {void}
    */
   function tickMinionTTL(Game, side, options = {}) {
-      var _a;
+      var _a, _b;
       const consumed = (_a = options === null || options === void 0 ? void 0 : options.consumed) !== null && _a !== void 0 ? _a : true;
       if (!consumed)
+          return;
+      const reason = typeof (options === null || options === void 0 ? void 0 : options.reason) === 'string' ? options.reason : null;
+      const skipped = (_b = options === null || options === void 0 ? void 0 : options.skipped) !== null && _b !== void 0 ? _b : false;
+      if (skipped && reason === 'systemError')
           return;
       const toRemove = [];
       for (const t of Game.tokens) {
@@ -17287,15 +17324,20 @@ __define('./turns.ts', (exports, module, __require) => {
       };
   };
   const consumedTurnFromOutcome = (outcome, hadHook) => {
-      if (!hadHook)
-          return false;
-      if (!outcome)
-          return true;
-      if (!outcome.consumedTurn)
-          return false;
-      if (outcome.skipped && outcome.reason === 'systemError')
-          return false;
-      return true;
+      if (!hadHook) {
+          return { consumed: false, skipped: false, reason: null };
+      }
+      if (!outcome) {
+          return { consumed: true, skipped: false, reason: null };
+      }
+      const { consumedTurn, skipped, reason } = outcome;
+      if (!consumedTurn) {
+          return { consumed: false, skipped, reason };
+      }
+      if (skipped && reason === 'systemError') {
+          return { consumed: false, skipped, reason };
+      }
+      return { consumed: true, skipped, reason };
   };
   // hành động 1 unit (ưu tiên ult nếu đủ nộ & không bị chặn)
   function doActionOrSkip(Game, unit, { performUlt, turnContext } = {}) {
@@ -17303,7 +17345,7 @@ __define('./turns.ts', (exports, module, __require) => {
       const ensureBusyReset = () => {
           if (!Game.turn)
               return;
-          const now = safeNow();
+          const now = sessionNow();
           if (!Number.isFinite(Game.turn.busyUntil) || Game.turn.busyUntil < now) {
               Game.turn.busyUntil = now;
           }
@@ -17341,6 +17383,7 @@ __define('./turns.ts', (exports, module, __require) => {
       if (!unit || !unit.alive) {
           emitGameEvent(ACTION_START, baseDetail);
           ensureBusyReset();
+          resolution.consumedTurn = false;
           resolution.acted = false;
           resolution.skipped = true;
           resolution.reason = 'missingUnit';
@@ -17357,6 +17400,7 @@ __define('./turns.ts', (exports, module, __require) => {
       if (!Statuses.canAct(unit)) {
           Statuses.onTurnEnd(unit, {});
           ensureBusyReset();
+          resolution.consumedTurn = false;
           resolution.acted = false;
           resolution.skipped = true;
           resolution.reason = 'status';
@@ -17398,7 +17442,20 @@ __define('./turns.ts', (exports, module, __require) => {
           return resolution;
       }
       const cap = typeof (meta === null || meta === void 0 ? void 0 : meta.followupCap) === 'number' ? (meta.followupCap | 0) : (CFG.FOLLOWUP_CAP_DEFAULT | 0);
-      doBasicWithFollowups(Game, unit, cap);
+      try {
+          doBasicWithFollowups(Game, unit, cap);
+      }
+      catch (err) {
+          console.error('[doActionOrSkip.basic]', err);
+          Statuses.onTurnEnd(unit, {});
+          ensureBusyReset();
+          resolution.consumedTurn = false;
+          resolution.acted = false;
+          resolution.skipped = true;
+          resolution.reason = 'systemError';
+          finishAction({ skipped: true, reason: 'systemError' });
+          return resolution;
+      }
       emitPassiveEvent(Game, unit, 'onActionEnd', { log: getPassiveLog(Game) });
       Statuses.onTurnEnd(unit, {});
       ensureBusyReset();
@@ -17492,8 +17549,8 @@ __define('./turns.ts', (exports, module, __require) => {
           finally {
               emitGameEvent(TURN_END, turnDetail);
           }
-          const consumed = consumedTurnFromOutcome(actionOutcome, typeof actionHook === 'function');
-          tickMinionTTL(Game, entry.side, { consumed });
+          const consumption = consumedTurnFromOutcome(actionOutcome, typeof actionHook === 'function');
+          tickMinionTTL(Game, entry.side, consumption);
           const ended = (_d = hooks.checkBattleEnd) === null || _d === void 0 ? void 0 : _d.call(hooks, Game, {
               trigger: 'interleaved',
               side: entry.side,
@@ -17575,8 +17632,8 @@ __define('./turns.ts', (exports, module, __require) => {
           finally {
               emitGameEvent(TURN_END, turnDetail);
           }
-          const consumed = consumedTurnFromOutcome(actionOutcome, typeof actionHook === 'function');
-          tickMinionTTL(Game, entry.side, { consumed });
+          const consumption = consumedTurnFromOutcome(actionOutcome, typeof actionHook === 'function');
+          tickMinionTTL(Game, entry.side, consumption);
           const ended = (_f = hooks.checkBattleEnd) === null || _f === void 0 ? void 0 : _f.call(hooks, Game, {
               trigger: 'sequential',
               side: entry.side,
