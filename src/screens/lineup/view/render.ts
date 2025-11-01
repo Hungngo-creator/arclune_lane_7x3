@@ -3,6 +3,7 @@ import { createNumberFormatter } from '../../../utils/format.ts';
 import { normalizeUnitId } from '../../../utils/unit-id.ts';
 import { assertElement, ensureStyleTag, mountSection } from '../../../ui/dom.ts';
 import { normalizeCurrencyBalances } from '@shared-types/currency';
+import { mountRarityAura, updateRarity, unmountRarity } from '../../../ui/rarity/rarity.ts';
 import {
   normalizeRoster,
   normalizeLineups,
@@ -12,6 +13,7 @@ import {
   collectAssignedUnitIds,
   evaluatePassive,
   filterRoster,
+  getUnitRarity,
 } from './state.ts';
 import type {
   LineupViewState,
@@ -233,6 +235,10 @@ function getNameInitials(name: string): string{
 }
 
 function renderAvatar(container: HTMLElement, avatarUrl: string | null, name: string): void{
+  const auraOverlay = container.querySelector<HTMLElement>(':scope > .rarity-aura');
+  if (auraOverlay){
+    container.removeChild(auraOverlay);
+  }
   container.innerHTML = '';
   if (avatarUrl){
     const img = document.createElement('img');
@@ -241,6 +247,9 @@ function renderAvatar(container: HTMLElement, avatarUrl: string | null, name: st
     container.appendChild(img);
   } else {
     container.textContent = getNameInitials(name || '');
+  }
+ if (auraOverlay){
+    container.appendChild(auraOverlay);
   }
 }
 
@@ -704,6 +713,10 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   }
 
   function renderCells(): void{
+    const previousAvatars = cellsGrid.querySelectorAll<HTMLElement>('.lineup-cell__avatar');
+    previousAvatars.forEach(avatar => {
+      unmountRarity(avatar);
+    });
     cellsGrid.innerHTML = '';
     const lineup = getSelectedLineup();
     if (!lineup){
@@ -716,6 +729,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
         cellEl.setAttribute('role', 'button');
         const avatar = document.createElement('div');
         avatar.className = 'lineup-cell__avatar';
+        unmountRarity(avatar);
         avatar.textContent = '🔒';
         cellEl.appendChild(avatar);
         cellEl.setAttribute('aria-label', `Ô đội hình #${index + 1}. Chưa có dữ liệu.`);
@@ -775,11 +789,15 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       avatar.className = 'lineup-cell__avatar';
       if (unit){
         renderAvatar(avatar, unit.avatar || null, unit.name);
+        mountRarityAura(avatar, getUnitRarity(unit), 'deck', { label: false });
       } else if (cell.label){
+        unmountRarity(avatar);
         avatar.textContent = getNameInitials(cell.label);
       } else if (!cell.unlocked){
+        unmountRarity(avatar);
         avatar.textContent = '🔒';
       } else {
+        unmountRarity(avatar);
         avatar.textContent = '+';
       }
       cellEl.appendChild(avatar);
@@ -829,6 +847,7 @@ function updateActiveCellHighlight(): void{
   function renderLeader(): void{
     const lineup = getSelectedLineup();
     if (!lineup){
+      unmountRarity(leaderAvatar);
       renderAvatar(leaderAvatar, null, '');
       leaderName.textContent = 'Chưa chọn leader';
       syncGridDetailsHeight();
@@ -836,9 +855,22 @@ function updateActiveCellHighlight(): void{
     }
     if (lineup.leaderId){
       const unit = rosterLookup.get(lineup.leaderId);
-      renderAvatar(leaderAvatar, unit?.avatar || null, unit?.name || '');
-      leaderName.textContent = unit?.name || 'Leader';
+      if (unit){
+        renderAvatar(leaderAvatar, unit.avatar || null, unit.name);
+        const rarity = getUnitRarity(unit);
+        if (leaderAvatar.querySelector(':scope > .rarity-aura')){
+          updateRarity(leaderAvatar, rarity);
+        } else {
+          mountRarityAura(leaderAvatar, rarity, 'deck', { label: false, rounded: true });
+        }
+        leaderName.textContent = unit.name;
+      } else {
+        unmountRarity(leaderAvatar);
+        renderAvatar(leaderAvatar, null, '');
+        leaderName.textContent = 'Leader';
+      }
     } else {
+      unmountRarity(leaderAvatar);
       renderAvatar(leaderAvatar, null, '');
       leaderName.textContent = 'Chưa chọn leader';
     }
