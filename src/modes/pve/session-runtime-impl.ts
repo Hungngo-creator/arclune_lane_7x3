@@ -50,6 +50,7 @@ import {
   mergeBusyUntil,
   normalizeAnimationFrameTimestamp,
   resetSessionTimeBase,
+  safeNow,
   sessionNow,
 } from '../../utils/time';
 import { getSummonSpec, resolveSummonSlots } from '../../utils/kit';
@@ -107,6 +108,7 @@ type GradientValue = CanvasGradient | string;
 type CanvasClickHandler = (event: MouseEvent) => void;
 type ClockState = {
   startMs: number;
+  startSafeMs: number;
   lastTimerRemain: number;
   lastCostCreditedSec: number;
   turnEveryMs: number;
@@ -583,6 +585,7 @@ const SUPPORTS_PERF_NOW = typeof globalThis !== 'undefined'
   && typeof globalThis.performance.now === 'function';
 const RAF_TIMESTAMP_MAX = 2_147_483_647; // ~24 ngày tính từ mốc điều hướng
 const RAF_DRIFT_TOLERANCE_MS = 120_000;   // 2 phút – đủ rộng cho mọi sai lệch hợp lệ
+const CLOCK_DRIFT_TOLERANCE_MS = RAF_DRIFT_TOLERANCE_MS;
 
 // --- Instance counters (để gắn id cho token/minion) ---
 let _IID = 1;
@@ -882,6 +885,7 @@ function unbindArtSpriteListener(): void {
 let CLOCK: ClockState | null = null;
 
 function createClock(): ClockState {
+  const safe = safeNow();
   const now = getNow();
   const intervalCandidate = CFG?.ANIMATION?.turnIntervalMs;
   const parsedInterval = Number(intervalCandidate);
@@ -890,6 +894,7 @@ function createClock(): ClockState {
     : 600;
   return {
     startMs: now,
+    startSafeMs: safe,
     lastTimerRemain: 240,
     lastCostCreditedSec: 0,
     turnEveryMs,
@@ -1902,11 +1907,25 @@ function init(): boolean {
       if (!CLOCK || !Game) return;
       if (Game.battle?.over) return;
 
+   const safeNowMs = safeNow();
+      const expectedSessionMs = safeNowMs - CLOCK.startSafeMs + CLOCK.startMs;
       let sessionNowMs = getNow();
+      const needRebase = !Number.isFinite(sessionNowMs)
+        || Math.abs(sessionNowMs - expectedSessionMs) > CLOCK_DRIFT_TOLERANCE_MS;
+      if (needRebase){
+        sessionNowMs = expectedSessionMs;
+      }
       if (isFiniteNumber(timestamp)){
         const rafTs = Number(timestamp);
         if (SUPPORTS_PERF_NOW || (rafTs >= 0 && rafTs <= RAF_TIMESTAMP_MAX)){
           sessionNowMs = normalizeAnimationFrameTimestamp(rafTs);
+        }
+        if (needRebase){
+          const adjusted = expectedSessionMs;
+          if (!Number.isFinite(sessionNowMs)
+            || Math.abs(sessionNowMs - adjusted) > CLOCK_DRIFT_TOLERANCE_MS){
+            sessionNowMs = adjusted;
+          }
         }
       }
       const elapsedSec = Math.floor((sessionNowMs - CLOCK.startMs) / 1000);
@@ -1935,9 +1954,9 @@ function init(): boolean {
           Game.ai.cost = Math.min(Game.ai.costCap, Game.ai.cost + deltaSec);
         }
 
-       CLOCK.lastCostCreditedSec = elapsedSec;
+        CLOCK.lastCostCreditedSec = elapsedSec;
 
-       if (hud && Game) hud.update(Game);
+        if (hud && Game) hud.update(Game);
         if (!Game.selectedId) selectFirstAffordable();
         renderSummonBar();
         aiMaybeAct(Game, 'cost');
