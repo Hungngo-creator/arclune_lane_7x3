@@ -1286,7 +1286,7 @@ function performUlt(unit: UnitToken): void {
       const laneTargets = aliveNow.filter(t => t.side === foeSide && t.cx === laneX);
       const hits = getUltHitCount(u);
       const scale = parseFiniteNumber(u.scale) ?? 0.9;
-      const meleeDur = parseFiniteNumber(CFG?.ANIMATION?.meleeDurationMs) ?? 1100;
+      const meleeDur = parseFiniteNumber(CFG?.ANIMATION?.meleeDurationMs) ?? 2000;
       const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
       if (sessionVfx) {
         try { vfxAddMelee(sessionVfx, unit, primary, { dur: meleeDur }); } catch(_){}
