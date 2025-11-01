@@ -153,6 +153,11 @@ const stubModules = new Map([
 
 const moduleCache = new Map();
 
+function getCachedModule(id) {
+  if (!moduleCache.has(id)) return null;
+  return moduleCache.get(id);
+}
+
 function transpileSource(code, filename) {
   const result = ts.transpileModule(code, {
     compilerOptions: {
@@ -301,15 +306,17 @@ function loadModule(id) {
   if (stubModules.has(id)) {
     return stubModules.get(id);
   }
-  if (moduleCache.has(id)) {
-    return moduleCache.get(id).exports;
+  const cached = getCachedModule(id);
+  if (cached) {
+    return cached.module.exports;
   }
   const filename = path.join(SRC_DIR, id.slice(2));
   const source = fs.readFileSync(filename, 'utf8');
   const transpiled = transpileSource(source, filename);
   const transformed = transformModule(transpiled, id);
-  const module = { exports: {} };
-  moduleCache.set(id, module);
+  const moduleRecord = { module: { exports: {} }, context: null };
+  moduleCache.set(id, moduleRecord);
+  const module = moduleRecord.module;
 
   const context = vm.createContext({
     module,
@@ -348,11 +355,17 @@ function loadModule(id) {
 
   const script = new vm.Script(transformed, { filename });
   script.runInContext(context);
+  moduleRecord.context = context;
   return module.exports;
 }
 
 function clearModuleCache() {
   moduleCache.clear();
+}
+
+function getModuleContext(id) {
+  const cached = getCachedModule(id);
+  return cached ? cached.context : null;
 }
 
 function loadSessionModule() {
@@ -363,5 +376,6 @@ module.exports = {
   loadSessionModule,
   clearModuleCache,
   backgroundModule,
-  stubModules
+  stubModules,
+  getModuleContext
 };
