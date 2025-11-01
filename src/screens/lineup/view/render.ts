@@ -837,7 +837,7 @@ function updateActiveCellHighlight(): void{
     if (!lineup){
       renderAvatar(leaderAvatar, null, '');
       leaderName.textContent = 'Chưa chọn leader';
-      syncBenchDetailsHeight();
+      syncGridDetailsHeight();
       return;
     }
     if (lineup.leaderId){
@@ -848,7 +848,7 @@ function updateActiveCellHighlight(): void{
       renderAvatar(leaderAvatar, null, '');
       leaderName.textContent = 'Chưa chọn leader';
     }
-    syncBenchDetailsHeight();
+    syncGridDetailsHeight();
   }
 
   function renderPassives(){
