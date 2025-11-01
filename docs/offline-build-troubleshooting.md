@@ -17,6 +17,8 @@ node build.mjs --mode=production
 ```
 Lúc này `typescript-transpiler` sẽ ưu tiên dùng bộ TypeScript thật, tránh vòng lặp giữa hai stub và build sẽ tạo được `dist/app.js`.
 
+> **Lưu ý:** bộ stub `typescript-transpiler` đi kèm script `tools/install-stubs.mjs` đã được cập nhật để luôn cung cấp hằng số `ImportsNotUsedAsValues` (các giá trị `Remove`, `Preserve`, `Error`). Nếu tự chỉnh sửa hoặc cài đặt thủ công, hãy chắc chắn phần xuất của stub vẫn giữ nguyên hằng số này để các bài kiểm thử PvE không gặp lỗi thiếu thuộc tính.
+
 ## Ghi đè `app.js` trong bộ nhớ điện thoại
 File bundle kết quả luôn nằm ở `dist/app.js`. Bạn có thể sao chép file này sang bộ nhớ chung để ghi đè bản cũ:
 ```bash
