@@ -23,6 +23,10 @@ export async function loadTurnsHarness(overrides = {}){
     ["import { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } from './passives.js';", "const { emitPassiveEvent, applyOnSpawnEffects, prepareUnitForPassives } = __deps['./passives.ts'];"],
     ["import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } from './events.js';", "const { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } = __deps['./events.ts'];"],
     ["import { safeNow } from './utils/time.js';", "const { safeNow } = __deps['./utils/time.js'];"],
+    ["import { safeNow } from './utils/time.ts';", "const { safeNow } = __deps['./utils/time.js'];"],
+    ["import { safeNow, sessionNow } from './utils/time.js';", "const { safeNow, sessionNow } = __deps['./utils/time.js'];"],
+    ["import { safeNow, sessionNow } from './utils/time.ts';", "const { safeNow, sessionNow } = __deps['./utils/time.js'];"],
+    ["import { sessionNow } from './utils/time.ts';", "const { sessionNow } = __deps['./utils/time.js'];"],
     ["import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } from './utils/fury.js';", "const { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } = __deps['./utils/fury.js'];"],
     ["import { nextTurnInterleaved } from './turns/interleaved.ts';", "const { nextTurnInterleaved } = __deps['./turns/interleaved.js'];"],
     ['import { nextTurnInterleaved } from "./turns/interleaved.ts";', "const { nextTurnInterleaved } = __deps['./turns/interleaved.js'];"],
@@ -109,7 +113,8 @@ export async function loadTurnsHarness(overrides = {}){
       TURN_REGEN: 'turn:regen'
     },
     './utils/time.js': {
-      safeNow(){ return 0; }
+      safeNow(){ return 0; },
+      sessionNow(){ return 0; }
     },
     './utils/fury.js': {
       initializeFury(){ },
@@ -275,4 +280,4 @@ export async function loadSummonHarness(overrides = {}){
   const script = new vm.Script(code, { filename: 'summon.ts' });
   script.runInContext(context);
   return { ...context.module.exports, deps };
-    }
+}
