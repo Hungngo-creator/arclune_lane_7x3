@@ -1,4 +1,5 @@
 import { createAppShell } from './app/shell.ts';
+import { CFG } from './config.ts';
 import { renderMainMenuView } from './screens/main-menu/view/index.ts';
 import { MODES, MODE_GROUPS, MODE_STATUS, getMenuSections } from './data/modes.ts';
 import { resolveModuleFunction } from './utils/module-resolution.ts';
@@ -6,6 +7,7 @@ import type { ModeConfig, ModeGroup, ModeShellConfig } from '@shared-types/confi
 import type { UnknownRecord } from '@shared-types/common';
 import type { MenuCardMetadata, MenuSection } from './screens/main-menu/types.ts';
 import type { LineupViewHandle } from './screens/lineup/view/index.ts';
+import { setPowerMode } from './ui/rarity/rarity.ts';
 
 export interface ScreenParamMap {
   readonly [key: string]: unknown;
@@ -993,6 +995,10 @@ async function mountPveScreen(params: ScreenParams): Promise<void>{
       }
     };
     shellInstance = createAppShell({ onError: handleShellError });
+    if (typeof document !== 'undefined'){
+      const lowPowerEnabled = Boolean(CFG?.PERFORMANCE?.LOW_POWER_MODE ?? false);
+      setPowerMode(lowPowerEnabled ? 'low' : 'normal');
+    }
     bootstrapOptions.isFileProtocol = isFileProtocol;
     let lastScreen: string | null = null;
     let lastParams: ScreenParams = null;
