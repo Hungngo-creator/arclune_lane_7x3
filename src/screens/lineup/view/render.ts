@@ -52,10 +52,10 @@ function ensureStyles(): void{
     .lineup-grid{border-radius:24px;border:1px solid rgba(125,211,252,.24);background:linear-gradient(160deg,rgba(12,20,30,.92),rgba(8,16,24,.78));padding:20px;display:flex;flex-direction:column;gap:14px;}
     .lineup-grid__title{margin:0;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
     .lineup-grid__content{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,320px);align-items:flex-start;gap:14px;flex:1;}
-    .lineup-grid__cells{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;}
-    .lineup-cell{position:relative;padding:14px;border-radius:16px;border:1px solid rgba(125,211,252,.22);background:rgba(8,16,26,.82);display:flex;flex-direction:column;gap:10px;align-items:flex-start;transition:border-color .16s ease,box-shadow .16s ease,background .16s ease;}
+    .lineup-grid__cells{--lineup-cell-size:clamp(96px,14vw,132px);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-rows:var(--lineup-cell-size);gap:min(12px,calc(var(--lineup-cell-size)*.08));align-items:stretch;justify-items:center;}
+    .lineup-cell{position:relative;padding:12px;border-radius:16px;border:1px solid rgba(125,211,252,.22);background:rgba(8,16,26,.82);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;transition:border-color .16s ease,box-shadow .16s ease,background .16s ease;height:100%;width:100%;max-width:var(--lineup-cell-size);aspect-ratio:1/1;text-align:center;}
     .lineup-cell__label{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#7da0c7;margin:0;}
-    .lineup-cell__avatar{width:72px;height:72px;border-radius:18px;background:rgba(24,34,44,.85);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:600;color:#aee4ff;overflow:hidden;position:relative;}
+    .lineup-cell__avatar{width:calc(var(--lineup-cell-size)*.62);height:calc(var(--lineup-cell-size)*.62);border-radius:16px;background:rgba(24,34,44,.85);display:flex;align-items:center;justify-content:center;font-size:clamp(18px,2.2vw,26px);font-weight:600;color:#aee4ff;overflow:hidden;position:relative;}
     .lineup-cell__avatar img{width:100%;height:100%;object-fit:cover;}
     .lineup-cell__name{margin:0;font-size:14px;color:#e6f2ff;line-height:1.4;min-height:20px;}
     .lineup-cell__hint{margin:0;font-size:12px;color:#9cbcd9;}
@@ -127,8 +127,9 @@ function ensureStyles(): void{
     .lineup-overlay__option-avatar{width:48px;height:48px;border-radius:14px;background:rgba(24,34,44,.82);display:flex;align-items:center;justify-content:center;color:#aee4ff;font-size:18px;overflow:hidden;}
     .lineup-overlay__option-name{margin:0;font-size:14px;color:#e6f2ff;}
     .lineup-overlay__option-meta{margin:0;font-size:12px;color:#9cbcd9;}
-    @media(max-width:1080px){.lineup-view__layout{grid-template-columns:1fr;}.lineup-main-area{grid-template-columns:1fr;}.lineup-grid__content{grid-template-columns:1fr;}.lineup-leader{grid-template-columns:1fr;}.lineup-leader__badge{display:none;}}
-    @media(max-width:720px){.lineup-view__title{font-size:30px;}.lineup-view__header{flex-direction:column;align-items:flex-start;}.lineup-main-area{gap:18px;}.lineup-grid__content{grid-template-columns:1fr;}.lineup-grid__cells{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));}.lineup-cell__avatar{width:64px;height:64px;}.lineup-roster__list{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}}
+    @media(max-width:1080px){.lineup-view__layout{grid-template-columns:1fr;}.lineup-main-area{grid-template-columns:1fr;}.lineup-grid__content{grid-template-columns:1fr;}.lineup-grid__cells{grid-template-columns:repeat(4,minmax(0,1fr));}.lineup-leader{grid-template-columns:1fr;}.lineup-leader__badge{display:none;}}
+    @media(max-width:720px){.lineup-view__title{font-size:30px;}.lineup-view__header{flex-direction:column;align-items:flex-start;}.lineup-main-area{gap:18px;}.lineup-grid__content{grid-template-columns:1fr;}.lineup-grid__cells{--lineup-cell-size:clamp(88px,28vw,112px);grid-template-columns:repeat(3,minmax(0,1fr));gap:min(10px,calc(var(--lineup-cell-size)*.08));}.lineup-cell__avatar{width:calc(var(--lineup-cell-size)*.68);height:calc(var(--lineup-cell-size)*.68);}.lineup-roster__list{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}}
+    @media(max-width:520px){.lineup-grid__cells{--lineup-cell-size:clamp(82px,38vw,108px);grid-template-columns:repeat(2,minmax(0,1fr));gap:min(8px,calc(var(--lineup-cell-size)*.08));}.lineup-cell__avatar{width:calc(var(--lineup-cell-size)*.7);height:calc(var(--lineup-cell-size)*.7);}}
   `;
 
   ensureStyleTag(STYLE_ID, { css });
@@ -651,7 +652,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   }
 
   function renderCells(): void{
-    cellsGrid.innerHTML = '';;
+    cellsGrid.innerHTML = '';
     const lineup = getSelectedLineup();
     if (!lineup){
       gridSection.classList.add('is-empty');
@@ -660,22 +661,12 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
         cellEl.className = 'lineup-cell is-locked';
         cellEl.dataset.cellIndex = String(index);
         cellEl.tabIndex = 0;
-        const label = document.createElement('p');
-        label.className = 'lineup-cell__label';
-        label.textContent = `Ô đội hình #${index + 1}`;
-        cellEl.appendChild(label);
+        cellEl.setAttribute('role', 'button');
         const avatar = document.createElement('div');
         avatar.className = 'lineup-cell__avatar';
         avatar.textContent = '🔒';
         cellEl.appendChild(avatar);
-        const name = document.createElement('p');
-        name.className = 'lineup-cell__name';
-        name.textContent = 'Chưa có dữ liệu';
-        cellEl.appendChild(name);
-        const note = document.createElement('p');
-        note.className = 'lineup-cell__locked-note';
-        note.textContent = 'Vui lòng chọn đội hình để thao tác.';
-        cellEl.appendChild(note);
+        cellEl.setAttribute('aria-label', `Ô đội hình #${index + 1}. Chưa có dữ liệu.`);
         cellsGrid.appendChild(cellEl);
       }
       state.activeCellIndex = null;
@@ -697,6 +688,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       cellEl.className = 'lineup-cell';
       cellEl.dataset.cellIndex = String(cell.index);
       cellEl.tabIndex = 0;
+      cellEl.setAttribute('role', 'button');
       const unit = cell.unitId ? rosterLookup.get(cell.unitId) : null;
       if (state.selectedUnitId && cell.unitId === state.selectedUnitId){
         cellEl.classList.add('is-selected');
@@ -706,16 +698,15 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       }
       if (!cell.unlocked){
         cellEl.classList.add('is-locked');
+        cellEl.dataset.cellAction = 'unlock';
+      } else {
+        cellEl.removeAttribute('data-cell-action');
       }
 
-      const label = document.createElement('p');
-      label.className = 'lineup-cell__label';
       const displayIndex = cell.section === 'formation'
         ? cell.index + 1
         : (cell.index - firstReserveIndex + 1);
       const sectionName = cell.section === 'formation' ? 'Ô ra trận' : 'Ô dự phòng';
-      label.textContent = `${sectionName} #${Math.max(displayIndex, 1)}`;
-      cellEl.appendChild(label);
 
       const avatar = document.createElement('div');
       avatar.className = 'lineup-cell__avatar';
@@ -728,79 +719,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       } else {
         avatar.textContent = '+';
       }
-      cellEl.appendChild(avatar)
-
-      const name = document.createElement('p');
-      name.className = 'lineup-cell__name';
-      if (unit){
-        name.textContent = unit.name;
-      } else if (cell.label){
-        name.textContent = cell.label;
-      } else if (!cell.unlocked){
-        name.textContent = 'Ô đang khóa';
-      } else {
-        name.textContent = 'Chưa gán nhân vật';
-      }
-      cellEl.appendChild(name);
-
-      if (cell.unlocked){
-        const hint = document.createElement('p');
-        hint.className = 'lineup-cell__hint';
-        if (unit){
-          const powerText = unit.power != null
-            ? `Chiến lực ${formatUnitPower(unit.power)}`
-            : 'Đang tham gia đội hình';
-          hint.textContent = `${powerText}. Dùng "Bỏ" để trả ô.`;
-        } else if (state.selectedUnitId){
-          const selectedUnit = rosterLookup.get(state.selectedUnitId);
-          hint.textContent = selectedUnit
-            ? `Đã chọn ${selectedUnit.name}. Nhấn "Gán" để thêm.`
-            : 'Nhấn "Gán" để thêm nhân vật đã chọn.';
-        } else {
-          hint.textContent = 'Chọn nhân vật từ roster rồi nhấn "Gán" để thêm.';
-        }
-        cellEl.appendChild(hint);
-      } else {
-        if (cell.unlockCost){
-          const cost = document.createElement('p');
-          cost.className = 'lineup-cell__cost';
-          cost.textContent = `Chi phí mở khóa: ${formatCurrencyBalance(cell.unlockCost.amount, cell.unlockCost.currencyId)}`;
-          cellEl.appendChild(cost);
-        }
-        const note = document.createElement('p');
-        note.className = 'lineup-cell__locked-note';
-        note.textContent = 'Mở khóa để gán nhân vật vào ô này.';
-        cellEl.appendChild(note);
-      }
-
-      const actions = document.createElement('div');
-      actions.className = 'lineup-cell__actions';
-      if (cell.unlocked){
-        const assignButton = document.createElement('button');
-        assignButton.type = 'button';
-        assignButton.className = 'lineup-button';
-        assignButton.dataset.cellAction = 'assign';
-        assignButton.textContent = unit ? 'Đổi nhân vật' : 'Gán nhân vật';
-        actions.appendChild(assignButton);
-
-        const clearButton = document.createElement('button');
-        clearButton.type = 'button';
-        clearButton.className = 'lineup-button';
-        clearButton.dataset.cellAction = 'clear';
-        clearButton.textContent = 'Bỏ khỏi ô';
-        if (!unit){
-          clearButton.disabled = true;
-        }
-        actions.appendChild(clearButton);
-      } else {
-        const unlockButton = document.createElement('button');
-        unlockButton.type = 'button';
-        unlockButton.className = 'lineup-button';
-        unlockButton.dataset.cellAction = 'unlock';
-        unlockButton.textContent = 'Mở khóa ô';
-        actions.appendChild(unlockButton);
-      }
-      cellEl.appendChild(actions);
+      cellEl.appendChild(avatar);
 
       let ariaLabel = `${sectionName} #${Math.max(displayIndex, 1)}`;
       if (unit){
@@ -809,7 +728,19 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
         ariaLabel += `: ${cell.label}`;
       }
       if (!cell.unlocked){
-        ariaLabel += '. Đang khóa.';
+        ariaLabel += '. Đang khóa. Nhấp để mở khóa.';
+        if (cell.unlockCost){
+          ariaLabel += ` Chi phí: ${formatCurrencyBalance(cell.unlockCost.amount, cell.unlockCost.currencyId)}.`;
+        }
+      } else if (unit){
+        ariaLabel += '. Nhấp để chọn. Dùng Alt+nhấp để bỏ nhân vật.';
+      } else if (state.selectedUnitId){
+        const selectedUnit = rosterLookup.get(state.selectedUnitId);
+        ariaLabel += selectedUnit
+          ? `. Đã chọn ${selectedUnit.name}. Nhấp để gán.`
+          : '. Nhấp để gán nhân vật đã chọn.';
+      } else {
+        ariaLabel += '. Ô trống. Chọn nhân vật trong roster rồi nhấp để gán.';
       }
       cellEl.setAttribute('aria-label', ariaLabel);
 
