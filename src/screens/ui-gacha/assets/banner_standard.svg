@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-labelledby="title" fill="none">
+  <title id="title">Triệu Hồi Chuẩn</title>
+  <defs>
+    <linearGradient id="gradStd" x1="0" y1="0" x2="960" y2="540" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0B0F14"/>
+      <stop offset="1" stop-color="#1B2A3C"/>
+    </linearGradient>
+    <radialGradient id="flareStd" cx="480" cy="200" r="360" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7C4DFF" stop-opacity="0.65"/>
+      <stop offset="1" stop-color="#0B0F14" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="960" height="540" fill="url(#gradStd)"/>
+  <circle cx="480" cy="220" r="320" fill="url(#flareStd)"/>
+  <path d="M160 420c100-180 540-180 640 0" stroke="#AEE4FF" stroke-width="14" stroke-opacity="0.18" stroke-linecap="round"/>
