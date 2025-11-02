@@ -98,8 +98,15 @@ function createTokenConfig(input: TokenConfigInput): TokenConfig {
 function normalizeTokenMap(source: Record<string, TokenConfigInput>): Record<Rarity, TokenConfig> {
   const tokens = new Map<Rarity, TokenConfig>();
   Object.entries(source ?? {}).forEach(([rawKey, rawValue]) => {
-    const rarity = normalizeRarityInput(rawKey);
-    tokens.set(rarity, createTokenConfig(rawValue));
+    if (rawKey === 'default' || rawKey === '__esModule'){
+      return;
+    }
+    try {
+      const rarity = normalizeRarityInput(rawKey);
+      tokens.set(rarity, createTokenConfig(rawValue));
+    } catch (error) {
+      console.warn('Bỏ qua token hiếm không hợp lệ:', rawKey, error);
+    }
   });
   RARITY_SEQUENCE.forEach(key => {
     if (!tokens.has(key)){
