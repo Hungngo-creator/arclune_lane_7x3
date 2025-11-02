@@ -15,6 +15,16 @@ beforeEach(() => {
   document.body.innerHTML = '';
 });
 
+function getAvatarText(cell: Element): string {
+  const avatar = cell.querySelector<HTMLElement>('.lineup-cell__avatar');
+  if (!avatar){
+    return '';
+  }
+  const clone = avatar.cloneNode(true) as HTMLElement;
+  clone.querySelectorAll('.rarity-aura').forEach(node => node.remove());
+  return clone.textContent?.trim() ?? '';
+}
+
 describe('renderMainMenuView', () => {
   it('khởi tạo giao diện menu chính và gắn callback Coming Soon', () => {
     const root = document.createElement('div');
@@ -103,6 +113,7 @@ describe('renderLineupScreen', () => {
     expect(gridTitle?.textContent).toContain('5x2');
 
     const gridCells = root.querySelectorAll('.lineup-grid__cells .lineup-cell');
+    const benchCells = root.querySelectorAll('.lineup-bench__slots .lineup-cell');
     expect(gridCells).toHaveLength(10);
     expect(benchCells).toHaveLength(5);
 
@@ -130,7 +141,7 @@ describe('renderLineupScreen', () => {
       defaultAction: cell.dataset.cellDefaultAction ?? null,
       primaryAction: cell.dataset.cellAction ?? null,
       altAction: cell.dataset.cellAltAction ?? null,
-      avatar: cell.querySelector('.lineup-cell__avatar')?.textContent ?? '',
+      avatar: getAvatarText(cell),
       ariaLabel: cell.getAttribute('aria-label'),
     }));
 
