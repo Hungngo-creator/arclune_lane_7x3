@@ -20,6 +20,10 @@
 ## Aura hiếm trong UI
 - Module `src/ui/rarity/rarity.ts` cung cấp API `mountRarityAura`, `updateRarity`, `unmountRarity`, `setPowerMode` và `playGachaReveal` để dựng hiệu ứng aura theo bậc hiếm cho các màn Gacha, Deck và Collection.
 - Tệp cấu hình `src/ui/rarity/rarity_tokens.json` chứa token màu/glow cho từng bậc; stylesheet `src/ui/rarity/rarity.css` được nạp tự động khi import module giúp tái sử dụng trong toàn bộ UI.
+ Sử dụng nhanh:
+  - Gọi `mountRarityAura(host, rarity, variant, options)` ngay sau khi render thẻ hiếm. Hàm sẽ thêm overlay, badge (nếu cần) và đảm bảo CSS được chèn vào document một lần duy nhất.
+  - Điều chỉnh cường độ hiệu ứng toàn cục với `setPowerMode('normal' | 'low')`. Chế độ `low` hạ độ sáng và vô hiệu hóa lớp spark nhằm tiết kiệm pin và giảm tải cho thiết bị yếu; chuyển lại `normal` để khôi phục hiệu ứng đầy đủ.
+  - Với màn Gacha, chuẩn bị danh sách `{ el, rarity }` cho từng lá thẻ rồi truyền vào `playGachaReveal(cards, { staggerMs, onDone })`. Hàm sẽ tự động kích hoạt chuỗi chuyển cảnh (pre → bloom → reveal), tương thích với cấu hình low-power hiện tại.
 
 ## Trận mô phỏng C1-1 (NORMAL)
 - Đội hình yêu cầu: Vanguard Astra, Guardian Lumen, Tactician Arclight, Hexseer Mira, Chanter Lys.
