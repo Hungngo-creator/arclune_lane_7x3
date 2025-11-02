@@ -13,3 +13,4 @@
   <rect width="960" height="540" fill="url(#gradStd)"/>
   <circle cx="480" cy="220" r="320" fill="url(#flareStd)"/>
   <path d="M160 420c100-180 540-180 640 0" stroke="#AEE4FF" stroke-width="14" stroke-opacity="0.18" stroke-linecap="round"/>
+</svg>
