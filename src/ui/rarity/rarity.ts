@@ -691,6 +691,20 @@ interface RevealOptions {
   onDone?: () => void;
 }
 
+export interface PrepareGachaRevealOptions {
+  label?: boolean;
+  rounded?: boolean;
+  getRarity?: (host: HTMLElement) => string | Rarity | null | undefined;
+  staggerMs?: number;
+  onDone?: () => void;
+}
+
+export interface GachaRevealController {
+  reveal(): void;
+  update(host: HTMLElement, rarity: Rarity | string): void;
+  dispose(): void;
+}
+
 function scheduleTimeout(state: AuraState, delay: number, cb: () => void): void {
   const id = setTimeout(cb, delay);
   state.revealTimers.push(id);
@@ -800,4 +814,66 @@ export function playGachaReveal(cards: RevealCard[], options?: RevealOptions): v
   } else {
     startTimeline();
   }
+}
+
+export function prepareGachaReveal(hosts: Iterable<HTMLElement>, options?: PrepareGachaRevealOptions): GachaRevealController {
+  if (typeof document === 'undefined'){
+    return {
+      reveal(){},
+      update(){},
+      dispose(){},
+    };
+  }
+
+  const label = options?.label ?? true;
+  const rounded = options?.rounded ?? true;
+  const resolveRarity = options?.getRarity ?? ((host: HTMLElement) => host.dataset.rarity);
+  const mounted = new Map<HTMLElement, Rarity>();
+
+  for (const rawHost of hosts ?? []){
+    if (!(rawHost instanceof HTMLElement)){
+      continue;
+    }
+    const rarity = coerceRarity(resolveRarity(rawHost), 'N');
+    mounted.set(rawHost, rarity);
+    rawHost.dataset.rarity = rarity;
+    mountRarityAura(rawHost, rarity, 'gacha', { label, rounded });
+  }
+
+  let disposed = false;
+  const revealOptions: RevealOptions = {
+    staggerMs: options?.staggerMs,
+    onDone: options?.onDone,
+  };
+
+  const controller: GachaRevealController = {
+    reveal() {
+      if (disposed || mounted.size === 0){
+        return;
+      }
+      const cards = Array.from(mounted.entries()).map(([el, rarity]) => ({ el, rarity }));
+      playGachaReveal(cards, revealOptions);
+    },
+    update(host, rarityInput) {
+      if (disposed || !mounted.has(host)){
+        return;
+      }
+      const rarity = normalizeRarity(rarityInput);
+      mounted.set(host, rarity);
+      host.dataset.rarity = rarity;
+      updateRarity(host, rarity);
+    },
+    dispose() {
+      if (disposed){
+        return;
+      }
+      disposed = true;
+      mounted.forEach((_rarity, host) => {
+        unmountRarity(host);
+      });
+      mounted.clear();
+    },
+  };
+
+  return controller;
 }
