@@ -123,8 +123,11 @@ body.low-power .rarity-aura {
 .rarity-aura .sweep {
   display: none;
   overflow: hidden;
-  mix-blend-mode: screen;
   opacity: var(--rarity-sweep-opacity);
+}
+
+.rarity-aura.prism .sweep {
+  mix-blend-mode: screen;
 }
 
 .rarity-aura .sweep::before {
