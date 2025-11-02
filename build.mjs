@@ -551,16 +551,8 @@ async function build(){
       continue;
     }
     if (ext === '.css'){
-      const escapedCss = raw
-        .replace(/\\/g, '\\\\')
-        .replace(/`/g, '\\`')
-        .replace(/\$/g, '\\\$')
-        .replace(/\r/g, '\\r')
-        .replace(/\n/g, '\\n')
-        .replace(/\u2028/g, '\\u2028')
-        .replace(/\u2029/g, '\\u2029');
       const moduleCode = [
-        `const css = \`${escapedCss}\`;`,
+        `const css = ${JSON.stringify(raw)};`,
         'module.exports = css;',
         'module.exports.default = css;',
       ].join('\n');
