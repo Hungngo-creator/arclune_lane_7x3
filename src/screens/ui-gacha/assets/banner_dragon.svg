@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-labelledby="title" fill="none">
+  <title id="title">Giới Hạn: Huyễn Long</title>
+  <defs>
+    <linearGradient id="gradDragon" x1="120" y1="40" x2="840" y2="500" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0B0F14"/>
+      <stop offset="1" stop-color="#1C2F44"/>
+    </linearGradient>
+    <radialGradient id="flareDragon" cx="580" cy="180" r="360" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#00E5FF" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#0B0F14" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="960" height="540" fill="url(#gradDragon)"/>
+  <circle cx="580" cy="200" r="300" fill="url(#flareDragon)"/>
+  <path d="M220 420c120-160 420-160 520 0" stroke="#7C4DFF" stroke-width="12" stroke-linecap="round" stroke-opacity="0.22"/>
+  <path d="M320 180c80-120 240-120 320 0" stroke="#AEE4FF" stroke-width="8" stroke-dasharray="22 18" opacity="0.3"/>
+</svg>
