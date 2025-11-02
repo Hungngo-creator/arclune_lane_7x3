@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-labelledby="title" fill="none">
+  <title id="title">Giới Hạn: Hư Chủ</title>
+  <defs>
+    <linearGradient id="gradVoid" x1="80" y1="40" x2="880" y2="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#150628"/>
+      <stop offset="1" stop-color="#001B2E"/>
+    </linearGradient>
+    <radialGradient id="flareVoid" cx="420" cy="200" r="360" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6A00FF" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#00E5FF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="960" height="540" fill="url(#gradVoid)"/>
+  <circle cx="420" cy="220" r="320" fill="url(#flareVoid)"/>
+  <path d="M180 430c120-200 480-200 620 0" stroke="#C4E4FF" stroke-width="14" stroke-linecap="round" stroke-opacity="0.2"/>
+  <path d="M280 180c140-220 420-220 560 0" stroke="#6A00FF" stroke-width="10" stroke-dasharray="28 22" stroke-opacity="0.35"/>
+</svg>
