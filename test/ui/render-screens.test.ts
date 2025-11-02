@@ -2,6 +2,7 @@
  * @jest-environment jsdom
  */
 
+import * as artModule from '../../src/art.ts';
 import { renderMainMenuView } from '../../src/screens/main-menu/view/index.ts';
 import { renderLineupScreen } from '../../src/screens/lineup/index.ts';
 import { renderCollectionScreen } from '../../src/screens/collection/index.ts';
@@ -232,6 +233,40 @@ describe('renderCollectionScreen', () => {
     expect(walletItems.length).toBeGreaterThan(0);
 
     handle.destroy();
+  });
+  
+  it('gắn rarity aura cho avatar roster và giữ nguyên text fallback', () => {
+    const root = document.createElement('div');
+    document.body.appendChild(root);
+
+    const roster: RosterEntryLite[] = [
+      { id: 'omega', name: 'Omega', rank: 'SSR' },
+    ];
+
+    const artSpy = jest.spyOn(artModule, 'getUnitArt').mockReturnValue(null);
+
+    const handle = renderCollectionScreen({
+      root,
+      params: { roster },
+    });
+
+    try {
+      const avatar = root.querySelector<HTMLElement>('.collection-roster__avatar');
+      expect(avatar).not.toBeNull();
+
+      const aura = avatar?.querySelector<HTMLElement>('.rarity-aura');
+      expect(aura).not.toBeNull();
+      expect(aura?.dataset.variant).toBe('collection');
+
+      const badge = aura?.querySelector<HTMLElement>('.badge');
+      expect(badge?.textContent?.trim()).toBe('SSR');
+
+      const fallbackText = avatar?.querySelector('span');
+      expect(fallbackText?.textContent).toBe('—');
+    } finally {
+      handle.destroy();
+      artSpy.mockRestore();
+    }
   });
 });
 
