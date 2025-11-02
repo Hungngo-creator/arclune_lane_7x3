@@ -189,6 +189,59 @@ describe('renderLineupScreen', () => {
 
     handle.destroy();
   });
+  
+  it('áp dụng avatar tròn cho leader/collection và vuông cho ô lineup', () => {
+    const lineupRoot = document.createElement('div');
+    document.body.appendChild(lineupRoot);
+
+    const roster: RosterEntryLite[] = [
+      { id: 'omega', name: 'Omega', rank: 'UR' },
+    ];
+    const lineups: LineupDefinition[] = [
+      {
+        id: 'lineup-rounded',
+        name: 'Đội hình vòng',
+        members: ['omega'],
+        leaderId: 'omega',
+        passives: [],
+      },
+    ];
+
+    const lineupHandle = renderLineupScreen({
+      root: lineupRoot,
+      definition: {
+        label: 'Đội hình bo góc',
+        params: { roster, lineups },
+      },
+    });
+
+    const cellAura = lineupRoot.querySelector<HTMLElement>('.lineup-cell__avatar .rarity-aura');
+    expect(cellAura).not.toBeNull();
+    expect(cellAura?.dataset.variant).toBe('deck');
+    expect(cellAura?.classList.contains('is-rounded')).toBe(false);
+
+    const leaderAura = lineupRoot.querySelector<HTMLElement>('.lineup-leader__avatar .rarity-aura');
+    expect(leaderAura).not.toBeNull();
+    expect(leaderAura?.classList.contains('is-rounded')).toBe(true);
+
+    lineupHandle.destroy();
+    document.body.removeChild(lineupRoot);
+
+    const collectionRoot = document.createElement('div');
+    document.body.appendChild(collectionRoot);
+
+    const collectionHandle = renderCollectionScreen({
+      root: collectionRoot,
+      params: { roster },
+    });
+
+    const collectionAura = collectionRoot.querySelector<HTMLElement>('.collection-roster__avatar .rarity-aura');
+    expect(collectionAura).not.toBeNull();
+    expect(collectionAura?.classList.contains('is-rounded')).toBe(true);
+
+    collectionHandle.destroy();
+    document.body.removeChild(collectionRoot);
+  });
 });
 
 describe('renderCollectionScreen', () => {
