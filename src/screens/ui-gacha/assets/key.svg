@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title" fill="none">
+  <title id="title">Chìa Khoá Sự Kiện</title>
+  <defs>
+    <linearGradient id="gradKey" x1="10" y1="54" x2="58" y2="10" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#00E5FF"/>
+      <stop offset="1" stop-color="#6A00FF"/>
+    </linearGradient>
+  </defs>
+  <circle cx="22" cy="22" r="12" stroke="#E6F0FF" stroke-width="4" fill="rgba(10,18,40,0.6)"/>
+  <path d="M30 30l22 22-4 4-6-6-4 4-4-4 4-4-4-4z" fill="url(#gradKey)" stroke="#E6F0FF" stroke-width="3" stroke-linejoin="round"/>
+</svg>
