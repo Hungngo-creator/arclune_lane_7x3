@@ -9,7 +9,7 @@ import {
   setPowerMode,
   playGachaReveal,
 } from '../../src/ui/rarity/rarity';
-import type { Rarity } from '../../src/ui/rarity/rarity';
+import type { PowerMode, Rarity } from '../../src/ui/rarity/rarity';
 
 const flushMutations = async (): Promise<void> => new Promise(resolve => {
   if (typeof queueMicrotask === 'function'){
@@ -65,10 +65,42 @@ describe('rarity aura', () => {
     const overlay = host.querySelector('.rarity-aura') as HTMLElement;
     expect(overlay.classList.contains('rarity-UR')).toBe(true);
     expect(overlay.classList.contains('rarity-SR')).toBe(false);
-    expect(overlay.style.getPropertyValue('--rarity-spark-count')).toBe('12');
+    expect(overlay.style.getPropertyValue('--rarity-spark-count')).toBe('0');
 
     const badge = overlay.querySelector('.badge');
     expect(badge?.textContent).toBe('UR');
+  });
+
+test('deck variant không bật spark và sweep', () => {
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+
+    mountRarityAura(host, 'UR', 'deck');
+
+    const overlay = host.querySelector('.rarity-aura') as HTMLElement;
+    expect(overlay.style.getPropertyValue('--rarity-spark-count')).toBe('0');
+    expect(overlay.style.getPropertyValue('--rarity-sweep-opacity')).toBe('0');
+
+    setPowerMode('low');
+    expect(overlay.style.getPropertyValue('--rarity-spark-count')).toBe('0');
+    expect(overlay.style.getPropertyValue('--rarity-sweep-opacity')).toBe('0');
+  });
+
+  test('gacha variant giữ spark khi bình thường và tắt ở low-power', () => {
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+
+    mountRarityAura(host, 'UR', 'gacha');
+
+    const overlay = host.querySelector('.rarity-aura') as HTMLElement;
+    expect(overlay.style.getPropertyValue('--rarity-spark-count')).toBe('12');
+    expect(overlay.style.getPropertyValue('--rarity-sweep-opacity')).toBe('0.65');
+
+    setPowerMode('low');
+    expect(overlay.style.getPropertyValue('--rarity-spark-count')).toBe('0');
+    expect(overlay.style.getPropertyValue('--rarity-sweep-opacity')).toBe('0');
+
+    setPowerMode('normal');
   });
 
 test('biến CSS shimmer cho deck và collection được cấu hình đúng', () => {
@@ -151,7 +183,27 @@ test('overlay phản ánh lớp tương tác của host', async () => {
     expect(overlay.classList.contains('has-sweep')).toBe(false);
     expect(overlay.style.getPropertyValue('--rarity-glow-active')).toBe('0.875');
   });
-  
+
+  test('setPowerMode bỏ qua mode trùng lặp và chuẩn hóa giá trị', () => {
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+
+    mountRarityAura(host, 'UR', 'gacha');
+    const overlay = host.querySelector('.rarity-aura') as HTMLElement;
+
+    setPowerMode('low');
+    expect(document.body.classList.contains('low-power')).toBe(true);
+    expect(overlay.style.getPropertyValue('--rarity-spark-count')).toBe('0');
+
+    setPowerMode('low');
+    expect(document.body.classList.contains('low-power')).toBe(true);
+    expect(overlay.style.getPropertyValue('--rarity-spark-count')).toBe('0');
+
+    setPowerMode('invalid' as PowerMode);
+    expect(document.body.classList.contains('low-power')).toBe(false);
+    expect(overlay.style.getPropertyValue('--rarity-spark-count')).toBe('12');
+  });
+
   test('collection badge giữ tương phản cao với nền', () => {
     const host = document.createElement('div');
     document.body.appendChild(host);
