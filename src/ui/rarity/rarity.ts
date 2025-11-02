@@ -59,6 +59,10 @@ interface AuraState {
 
 const RARITY_SEQUENCE: Rarity[] = ['N', 'R', 'SR', 'SSR', 'UR', 'PRIME'];
 
+function normalizePowerMode(input: unknown): PowerMode {
+  return input === 'low' ? 'low' : 'normal';
+}
+
 function normalizeRarityInput(input: string | Rarity): Rarity {
   const key = String(input).trim().toUpperCase();
   if (RARITY_SEQUENCE.includes(key as Rarity)){
@@ -165,14 +169,18 @@ function clearSparks(state: AuraState): void {
 }
 
 function applyCssVariables(state: AuraState): void {
-  const { overlay, token } = state;
+  const { overlay, token, variant } = state;
   overlay.style.setProperty('--rarity-color', token.hex);
   overlay.style.setProperty('--rarity-ring-scale', token.ring.toString());
   overlay.style.setProperty('--rarity-glow-base', token.glow.toString());
   overlay.style.setProperty('--rarity-glow-low', token.glowLow.toString());
   overlay.style.setProperty('--rarity-glow-active', currentPowerMode === 'low' ? token.glowLow.toString() : token.glow.toString());
-  overlay.style.setProperty('--rarity-spark-count', (currentPowerMode === 'low' ? 0 : token.spark).toString());
-  overlay.style.setProperty('--rarity-sweep-opacity', token.prism ? '0.75' : '0.65');
+  const sparkCount = variant === 'gacha' && currentPowerMode !== 'low' ? token.spark : 0;
+  overlay.style.setProperty('--rarity-spark-count', sparkCount.toString());
+  const sweepOpacity = variant === 'gacha'
+    ? (token.prism ? '0.75' : '0.65')
+    : '0';
+  overlay.style.setProperty('--rarity-sweep-opacity', sweepOpacity);
 }
 
 function ensureSparkLayer(state: AuraState): HTMLDivElement {
@@ -386,16 +394,20 @@ export function unmountRarity(host: HTMLElement): void {
 }
 
 export function setPowerMode(mode: PowerMode): void {
-  currentPowerMode = mode;
+  const normalizedMode = normalizePowerMode(mode);
+  if (normalizedMode === currentPowerMode){
+    return;
+  }
+  currentPowerMode = normalizedMode;
   const doc = typeof document !== 'undefined' ? document : null;
   const body = doc?.body ?? null;
   if (body){
-    body.classList.toggle('low-power', mode === 'low');
+    body.classList.toggle('low-power', normalizedMode === 'low');
   }
   activeStates.forEach(state => {
     applyCssVariables(state);
     applyClasses(state);
-    if (mode === 'low'){
+    if (normalizedMode === 'low'){
       clearSparks(state);
     }
   });
