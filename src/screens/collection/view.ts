@@ -4,6 +4,7 @@ import { listCurrencies } from '../../data/economy.ts';
 import { getSkillSet } from '../../data/skills.ts';
 import { createNumberFormatter } from '../../utils/format.ts';
 import { assertElement, ensureStyleTag, mountSection } from '../../ui/dom.ts';
+import { mountRarityAura, unmountRarity, normalizeRarity } from '@ui/rarity/rarity.ts';
 
 import {
   ABILITY_TYPE_LABELS,
@@ -29,6 +30,7 @@ import type {
   UnknownRecord,
 } from './types.ts';
 import type { CurrencyDefinition } from '@shared-types/config';
+import type { Rarity } from '@ui/rarity/rarity.ts';
 
 const STYLE_ID = 'collection-view-style-v2';
 
@@ -81,17 +83,7 @@ function ensureStyles(){
     .collection-roster__entry[data-rank="D"]{--entry-bg:rgba(48,34,24,.78);--entry-bg-hover:rgba(60,42,30,.9);--entry-bg-selected:rgba(70,48,36,.95);--entry-border:rgba(255,170,108,.3);--entry-border-hover:rgba(255,188,138,.46);--entry-border-selected:rgba(255,208,170,.6);--entry-shadow:0 0 0 1px rgba(255,182,132,.14);--entry-shadow-hover:0 10px 22px rgba(168,88,42,.36);--entry-shadow-selected:0 18px 32px rgba(168,88,42,.45);}
     .collection-roster__entry[data-rank="unknown"],
     .collection-roster__entry:not([data-rank]){--entry-bg:rgba(12,20,28,.72);--entry-bg-hover:rgba(16,26,36,.9);--entry-bg-selected:rgba(18,30,42,.95);--entry-border:rgba(125,211,252,.2);--entry-border-hover:rgba(125,211,252,.35);--entry-border-selected:rgba(125,211,252,.55);--entry-shadow:none;--entry-shadow-hover:0 10px 20px rgba(6,12,20,.35);--entry-shadow-selected:0 16px 36px rgba(6,12,20,.45);}
-    .collection-roster__avatar{width:48px;height:48px;border-radius:14px;background:rgba(24,34,44,.85);overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;--aura-background:radial-gradient(circle at 50% 50%,rgba(174,228,255,.6),rgba(16,26,36,0));--aura-shadow:0 0 0 rgba(0,0,0,0);}
-    .collection-roster__entry[data-rank="S"] .collection-roster__avatar{--aura-background:radial-gradient(circle at 50% 45%,rgba(255,210,255,.9),rgba(120,24,160,0));--aura-shadow:0 0 22px rgba(214,118,255,.65);}
-    .collection-roster__entry[data-rank="A"] .collection-roster__avatar{--aura-background:radial-gradient(circle at 50% 45%,rgba(170,210,255,.85),rgba(32,68,160,0));--aura-shadow:0 0 20px rgba(104,162,255,.55);}
-    .collection-roster__entry[data-rank="B"] .collection-roster__avatar{--aura-background:radial-gradient(circle at 50% 45%,rgba(160,240,210,.85),rgba(16,94,72,0));--aura-shadow:0 0 18px rgba(92,206,162,.5);}
-    .collection-roster__entry[data-rank="C"] .collection-roster__avatar{--aura-background:radial-gradient(circle at 50% 45%,rgba(244,226,150,.82),rgba(120,94,20,0));--aura-shadow:0 0 16px rgba(204,172,68,.48);}
-    .collection-roster__entry[data-rank="D"] .collection-roster__avatar{--aura-background:radial-gradient(circle at 50% 45%,rgba(255,196,150,.8),rgba(122,52,14,0));--aura-shadow:0 0 14px rgba(202,108,52,.45);}
-    .collection-roster__entry[data-rank="unknown"] .collection-roster__avatar,
-    .collection-roster__entry:not([data-rank]) .collection-roster__avatar{--aura-background:radial-gradient(circle at 50% 45%,rgba(174,228,255,.6),rgba(16,26,36,0));--aura-shadow:0 0 12px rgba(6,12,20,.35);}
-    .collection-roster__aura{position:absolute;inset:-6px;border-radius:inherit;background:var(--aura-background);box-shadow:var(--aura-shadow);opacity:.92;pointer-events:none;filter:saturate(1.15);transition:opacity .2s ease,transform .2s ease;z-index:0;}
-    .collection-roster__entry:hover .collection-roster__aura{opacity:1;}
-    .collection-roster__entry.is-selected .collection-roster__aura{opacity:1;transform:scale(1.02);}
+    .collection-roster__avatar{width:48px;height:48px;border-radius:14px;background:rgba(24,34,44,.85);overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;}
     .collection-roster__avatar img{width:58px;height:58px;object-fit:contain;filter:drop-shadow(0 8px 16px rgba(0,0,0,.55));position:relative;z-index:1;}
     .collection-roster__avatar span{position:relative;z-index:1;color:#aee4ff;font-weight:600;letter-spacing:.08em;}
     .collection-roster__cost{margin-left:auto;padding:5px 9px;border-radius:11px;background:rgba(36,18,12,.72);color:#ffd9a1;font-size:11px;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:6px;}
@@ -388,7 +380,35 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
   rosterList.className = 'collection-roster__list';
 
   const rosterSource = buildRosterWithCost(cloneRoster(roster));
-  const rosterEntries = new Map<string, { button: HTMLButtonElement; costEl: HTMLElement | null; meta: CollectionEntry }>();
+  const rosterEntries = new Map<string, {
+    button: HTMLButtonElement;
+    costEl: HTMLElement | null;
+    avatar: HTMLElement;
+    meta: CollectionEntry;
+    rarity: Rarity | null;
+  }>();
+
+  const teardownRarityOverlays = (node: Node) => {
+    if (!(node instanceof HTMLElement)){
+      return;
+    }
+    if (node.classList.contains('collection-roster__avatar')){
+      unmountRarity(node);
+    }
+    const avatars = node.querySelectorAll<HTMLElement>('.collection-roster__avatar');
+    avatars.forEach(avatarNode => unmountRarity(avatarNode));
+  };
+
+  let rosterObserver: MutationObserver | null = null;
+  if (typeof MutationObserver === 'function'){
+    rosterObserver = new MutationObserver(mutations => {
+      for (const mutation of mutations){
+        mutation.removedNodes.forEach(teardownRarityOverlays);
+      }
+    });
+    rosterObserver.observe(rosterList, { childList: true, subtree: true });
+    addCleanup(() => rosterObserver?.disconnect());
+  }
 
   for (const unit of rosterSource){
     const unitId = normalizeUnitId(unit.id);
@@ -398,13 +418,35 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
     button.type = 'button';
     button.className = 'collection-roster__entry';
     button.dataset.unitId = unitId;
-    button.dataset.rank = unit.rank || 'unknown';
+    const rawRank = typeof unit.rank === 'string' ? unit.rank : null;
+    let rawMetaRank: string | null = null;
+    if (unit.raw && typeof unit.raw === 'object'){
+      const rankValue = (unit.raw as Record<string, unknown>).rank;
+      rawMetaRank = typeof rankValue === 'string' ? rankValue : null;
+    }
+
+    let normalizedRank: Rarity | null = null;
+    const rankCandidates: Array<string | null> = [rawRank, rawMetaRank];
+    for (const candidate of rankCandidates){
+      if (typeof candidate !== 'string' || !candidate.trim()){
+        continue;
+      }
+      try {
+        normalizedRank = normalizeRarity(candidate);
+        break;
+      } catch (error) {
+        continue;
+      }
+    }
+
+    const displayRank = normalizedRank ?? rawRank ?? rawMetaRank ?? null;
+    button.dataset.rank = displayRank ?? 'unknown';
 
     const avatar = document.createElement('div');
     avatar.className = 'collection-roster__avatar';
-    const aura = document.createElement('div');
-    aura.className = 'collection-roster__aura';
-    avatar.appendChild(aura);
+    if (normalizedRank){
+      mountRarityAura(avatar, normalizedRank, 'collection', { label: true, rounded: true });
+    }
     const art = getUnitArt(unitId);
     if (art?.sprite?.src){
       const img = document.createElement('img');
@@ -423,8 +465,8 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
     cost.textContent = `Cost ${costValue}`;
 
     const tooltipParts = [unit.name || unitId];
-    if (unit.rank){
-      tooltipParts.push(`Rank ${unit.rank}`);
+    if (displayRank){
+      tooltipParts.push(`Rank ${displayRank}`);
     }
     if (unit.class){
       tooltipParts.push(unit.class);
@@ -444,7 +486,9 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
     item.appendChild(button);
     rosterList.appendChild(item);
 
-    rosterEntries.set(unitId, { button, costEl: cost, meta: unit });
+    addCleanup(() => unmountRarity(avatar));
+
+    rosterEntries.set(unitId, { button, costEl: cost, avatar, meta: unit, rarity: normalizedRank });
   }
 
   rosterPanel.appendChild(rosterList);
@@ -858,13 +902,20 @@ const overlayDetailPanel = document.createElement('aside');
       }
     }
 
-    const unit = rosterEntries.get(unitId)?.meta || null;
+    const selectedEntry = rosterEntries.get(unitId) || null;
+    const unit = selectedEntry?.meta || null;
+    const unitRarity = selectedEntry?.rarity || null;
     stageName.textContent = toSafeText(unit?.name ?? unitId);
 
     while (stageTags.firstChild){
       stageTags.removeChild(stageTags.firstChild);
     }
-    if (unit?.rank){
+    if (unitRarity){
+      const rankTag = document.createElement('span');
+      rankTag.className = 'collection-stage__tag';
+      rankTag.textContent = toSafeText(`Rank ${unitRarity}`);
+      stageTags.appendChild(rankTag);
+    } else if (unit?.rank){
       const rankTag = document.createElement('span');
       rankTag.className = 'collection-stage__tag';
       rankTag.textContent = toSafeText(`Rank ${unit.rank}`);
