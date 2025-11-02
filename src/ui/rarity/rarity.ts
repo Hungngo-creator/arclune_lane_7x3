@@ -53,6 +53,8 @@ interface AuraState {
   revealTimers: number[];
   revealRaf: number | null;
   sparkTimers: number[];
+  classObserver: MutationObserver | null;
+  classPoller: number | null;
 }
 
 const RARITY_SEQUENCE: Rarity[] = ['N', 'R', 'SR', 'SSR', 'UR', 'PRIME'];
@@ -228,6 +230,44 @@ function applyClasses(state: AuraState): void {
   }
 }
 
+function syncInteractionClasses(state: AuraState): void {
+  const { host, overlay } = state;
+  overlay.classList.toggle('is-hovered', host.classList.contains('is-hovered'));
+  overlay.classList.toggle('is-selected', host.classList.contains('is-selected'));
+}
+
+function stopInteractionSync(state: AuraState): void {
+  if (state.classObserver){
+    state.classObserver.disconnect();
+    state.classObserver = null;
+  }
+  if (state.classPoller !== null){
+    clearInterval(state.classPoller);
+    state.classPoller = null;
+  }
+}
+
+function startInteractionSync(state: AuraState): void {
+  stopInteractionSync(state);
+  syncInteractionClasses(state);
+  if (typeof MutationObserver === 'function'){
+    const observer = new MutationObserver(mutations => {
+      for (const mutation of mutations){
+        if (mutation.type === 'attributes' && mutation.attributeName === 'class'){
+          syncInteractionClasses(state);
+          break;
+        }
+      }
+    });
+    observer.observe(state.host, { attributes: true, attributeFilter: ['class'] });
+    state.classObserver = observer;
+    return;
+  }
+  if (typeof window !== 'undefined' && typeof window.setInterval === 'function'){
+    state.classPoller = window.setInterval(() => syncInteractionClasses(state), 250);
+  }
+}
+
 function setupOverlay(host: HTMLElement, variant: AuraVariant): AuraState {
   const existing = auraStates.get(host);
   if (existing){
@@ -269,6 +309,8 @@ function setupOverlay(host: HTMLElement, variant: AuraVariant): AuraState {
     revealTimers: [],
     revealRaf: null,
     sparkTimers: [],
+    classObserver: null,
+    classPoller: null,
   };
 
   const computedPosition = typeof window !== 'undefined' && window?.getComputedStyle
@@ -306,6 +348,7 @@ export function mountRarityAura(host: HTMLElement, rarity: Rarity, variant: Aura
   const normalizedOptions = normalizeOptions(variant, options);
   const state = setupOverlay(host, variant);
   updateState(state, normalizedRarity, variant, normalizedOptions);
+  startInteractionSync(state);
 }
 
 export function updateRarity(host: HTMLElement, rarity: Rarity): void {
@@ -327,6 +370,7 @@ export function unmountRarity(host: HTMLElement): void {
   }
   clearReveal(state);
   clearSparks(state);
+  stopInteractionSync(state);
   if (state.overlay.parentNode === host){
     host.removeChild(state.overlay);
   }
