@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title" fill="none">
+  <title id="title">Tinh Thạch</title>
+  <defs>
+    <linearGradient id="grad" x1="12" y1="6" x2="52" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7C4DFF"/>
+      <stop offset="1" stop-color="#00E5FF"/>
+    </linearGradient>
+  </defs>
+  <path d="M12 20 32 4l20 16-8 32H20z" fill="url(#grad)" stroke="#E6F0FF" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M12 20h40L32 58z" fill="rgba(255,255,255,0.12)"/>
+</svg>
