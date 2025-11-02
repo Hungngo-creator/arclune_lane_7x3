@@ -1,7 +1,7 @@
 // Bundled by build.mjs
 const __modules = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }
 function __define(id, factory){ __modules[id] = { factory, exports: null, initialized: false }; }
@@ -5725,15 +5725,19 @@ __define('./engine.ts', (exports, module, __require) => {
 __define('./entry.ts', (exports, module, __require) => {
   const __dep0 = __require('./app/shell.ts');
   const createAppShell = __dep0.createAppShell;
-  const __dep1 = __require('./screens/main-menu/view/index.ts');
-  const renderMainMenuView = __dep1.renderMainMenuView;
-  const __dep2 = __require('./data/modes.ts');
-  const MODES = __dep2.MODES;
-  const MODE_GROUPS = __dep2.MODE_GROUPS;
-  const MODE_STATUS = __dep2.MODE_STATUS;
-  const getMenuSections = __dep2.getMenuSections;
-  const __dep3 = __require('./utils/module-resolution.ts');
-  const resolveModuleFunction = __dep3.resolveModuleFunction;
+  const __dep1 = __require('./config.ts');
+  const CFG = __dep1.CFG;
+  const __dep2 = __require('./screens/main-menu/view/index.ts');
+  const renderMainMenuView = __dep2.renderMainMenuView;
+  const __dep3 = __require('./data/modes.ts');
+  const MODES = __dep3.MODES;
+  const MODE_GROUPS = __dep3.MODE_GROUPS;
+  const MODE_STATUS = __dep3.MODE_STATUS;
+  const getMenuSections = __dep3.getMenuSections;
+  const __dep4 = __require('./utils/module-resolution.ts');
+  const resolveModuleFunction = __dep4.resolveModuleFunction;
+  const __dep5 = __require('./ui/rarity/rarity.ts');
+  const setPowerMode = __dep5.setPowerMode;
   const isStoppableSession = (value) => (Boolean(value) && typeof value.stop === 'function');
   const isStartableSession = (value) => (Boolean(value) && typeof value.start === 'function');
   const SUCCESS_EVENT = 'arclune:loaded';
@@ -6570,7 +6574,7 @@ __define('./entry.ts', (exports, module, __require) => {
       }
   }
   (function bootstrap() {
-      var _a;
+      var _a, _b, _c;
       const renderMessage = ensureRenderer();
       const protocol = (_a = window === null || window === void 0 ? void 0 : window.location) === null || _a === void 0 ? void 0 : _a.protocol;
       const isFileProtocol = protocol === 'file:';
@@ -6592,6 +6596,10 @@ __define('./entry.ts', (exports, module, __require) => {
               }
           };
           shellInstance = createAppShell({ onError: handleShellError });
+          if (typeof document !== 'undefined') {
+              const lowPowerEnabled = Boolean((_c = (_b = CFG === null || CFG === void 0 ? void 0 : CFG.PERFORMANCE) === null || _b === void 0 ? void 0 : _b.LOW_POWER_MODE) !== null && _c !== void 0 ? _c : false);
+              setPowerMode(lowPowerEnabled ? 'low' : 'normal');
+          }
           bootstrapOptions.isFileProtocol = isFileProtocol;
           let lastScreen = null;
           let lastParams = null;
@@ -12357,20 +12365,24 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
   const assertElement = __dep5.assertElement;
   const ensureStyleTag = __dep5.ensureStyleTag;
   const mountSection = __dep5.mountSection;
-  const __dep6 = __require('./screens/collection/helpers.ts');
-  const ABILITY_TYPE_LABELS = __dep6.ABILITY_TYPE_LABELS;
-  const buildRosterWithCost = __dep6.buildRosterWithCost;
-  const cloneRoster = __dep6.cloneRoster;
-  const collectAbilityFacts = __dep6.collectAbilityFacts;
-  const describeUlt = __dep6.describeUlt;
-  const labelForAbility = __dep6.labelForAbility;
-  const resolveCurrencyBalance = __dep6.resolveCurrencyBalance;
-  const getCurrencyCatalog = __dep6.getCurrencyCatalog;
-  const ensureNumberFormatter = __dep6.ensureNumberFormatter;
-  const __dep7 = __require('./screens/collection/state.ts');
-  const createFilterState = __dep7.createFilterState;
-  const updateActiveTab = __dep7.updateActiveTab;
-  const updateSelectedUnit = __dep7.updateSelectedUnit;
+  const __dep6 = __require('./ui/rarity/rarity.ts');
+  const mountRarityAura = __dep6.mountRarityAura;
+  const unmountRarity = __dep6.unmountRarity;
+  const normalizeRarity = __dep6.normalizeRarity;
+  const __dep7 = __require('./screens/collection/helpers.ts');
+  const ABILITY_TYPE_LABELS = __dep7.ABILITY_TYPE_LABELS;
+  const buildRosterWithCost = __dep7.buildRosterWithCost;
+  const cloneRoster = __dep7.cloneRoster;
+  const collectAbilityFacts = __dep7.collectAbilityFacts;
+  const describeUlt = __dep7.describeUlt;
+  const labelForAbility = __dep7.labelForAbility;
+  const resolveCurrencyBalance = __dep7.resolveCurrencyBalance;
+  const getCurrencyCatalog = __dep7.getCurrencyCatalog;
+  const ensureNumberFormatter = __dep7.ensureNumberFormatter;
+  const __dep8 = __require('./screens/collection/state.ts');
+  const createFilterState = __dep8.createFilterState;
+  const updateActiveTab = __dep8.updateActiveTab;
+  const updateSelectedUnit = __dep8.updateSelectedUnit;
   const STYLE_ID = 'collection-view-style-v2';
   const TAB_DEFINITIONS = [
       { key: 'awakening', label: 'Thức Tỉnh', hint: 'Theo dõi mốc thức tỉnh, sao và điểm đột phá của nhân vật đã sở hữu.' },
@@ -12418,17 +12430,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       .collection-roster__entry[data-rank="D"]{--entry-bg:rgba(48,34,24,.78);--entry-bg-hover:rgba(60,42,30,.9);--entry-bg-selected:rgba(70,48,36,.95);--entry-border:rgba(255,170,108,.3);--entry-border-hover:rgba(255,188,138,.46);--entry-border-selected:rgba(255,208,170,.6);--entry-shadow:0 0 0 1px rgba(255,182,132,.14);--entry-shadow-hover:0 10px 22px rgba(168,88,42,.36);--entry-shadow-selected:0 18px 32px rgba(168,88,42,.45);}
       .collection-roster__entry[data-rank="unknown"],
       .collection-roster__entry:not([data-rank]){--entry-bg:rgba(12,20,28,.72);--entry-bg-hover:rgba(16,26,36,.9);--entry-bg-selected:rgba(18,30,42,.95);--entry-border:rgba(125,211,252,.2);--entry-border-hover:rgba(125,211,252,.35);--entry-border-selected:rgba(125,211,252,.55);--entry-shadow:none;--entry-shadow-hover:0 10px 20px rgba(6,12,20,.35);--entry-shadow-selected:0 16px 36px rgba(6,12,20,.45);}
-      .collection-roster__avatar{width:48px;height:48px;border-radius:14px;background:rgba(24,34,44,.85);overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;--aura-background:radial-gradient(circle at 50% 50%,rgba(174,228,255,.6),rgba(16,26,36,0));--aura-shadow:0 0 0 rgba(0,0,0,0);}
-      .collection-roster__entry[data-rank="S"] .collection-roster__avatar{--aura-background:radial-gradient(circle at 50% 45%,rgba(255,210,255,.9),rgba(120,24,160,0));--aura-shadow:0 0 22px rgba(214,118,255,.65);}
-      .collection-roster__entry[data-rank="A"] .collection-roster__avatar{--aura-background:radial-gradient(circle at 50% 45%,rgba(170,210,255,.85),rgba(32,68,160,0));--aura-shadow:0 0 20px rgba(104,162,255,.55);}
-      .collection-roster__entry[data-rank="B"] .collection-roster__avatar{--aura-background:radial-gradient(circle at 50% 45%,rgba(160,240,210,.85),rgba(16,94,72,0));--aura-shadow:0 0 18px rgba(92,206,162,.5);}
-      .collection-roster__entry[data-rank="C"] .collection-roster__avatar{--aura-background:radial-gradient(circle at 50% 45%,rgba(244,226,150,.82),rgba(120,94,20,0));--aura-shadow:0 0 16px rgba(204,172,68,.48);}
-      .collection-roster__entry[data-rank="D"] .collection-roster__avatar{--aura-background:radial-gradient(circle at 50% 45%,rgba(255,196,150,.8),rgba(122,52,14,0));--aura-shadow:0 0 14px rgba(202,108,52,.45);}
-      .collection-roster__entry[data-rank="unknown"] .collection-roster__avatar,
-      .collection-roster__entry:not([data-rank]) .collection-roster__avatar{--aura-background:radial-gradient(circle at 50% 45%,rgba(174,228,255,.6),rgba(16,26,36,0));--aura-shadow:0 0 12px rgba(6,12,20,.35);}
-      .collection-roster__aura{position:absolute;inset:-6px;border-radius:inherit;background:var(--aura-background);box-shadow:var(--aura-shadow);opacity:.92;pointer-events:none;filter:saturate(1.15);transition:opacity .2s ease,transform .2s ease;z-index:0;}
-      .collection-roster__entry:hover .collection-roster__aura{opacity:1;}
-      .collection-roster__entry.is-selected .collection-roster__aura{opacity:1;transform:scale(1.02);}
+      .collection-roster__avatar{width:48px;height:48px;border-radius:14px;background:rgba(24,34,44,.85);overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;}
       .collection-roster__avatar img{width:58px;height:58px;object-fit:contain;filter:drop-shadow(0 8px 16px rgba(0,0,0,.55));position:relative;z-index:1;}
       .collection-roster__avatar span{position:relative;z-index:1;color:#aee4ff;font-weight:600;letter-spacing:.08em;}
       .collection-roster__cost{margin-left:auto;padding:5px 9px;border-radius:11px;background:rgba(36,18,12,.72);color:#ffd9a1;font-size:11px;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:6px;}
@@ -12598,7 +12600,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       return card;
   }
   function renderCollectionView(options) {
-      var _a;
+      var _a, _b, _c;
       const { root, shell = null, playerState = {}, roster = null, currencies = null, } = options;
       const host = assertElement(root, {
           guard: (node) => node instanceof HTMLElement,
@@ -12665,6 +12667,26 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       rosterList.className = 'collection-roster__list';
       const rosterSource = buildRosterWithCost(cloneRoster(roster));
       const rosterEntries = new Map();
+      const teardownRarityOverlays = (node) => {
+          if (!(node instanceof HTMLElement)) {
+              return;
+          }
+          if (node.classList.contains('collection-roster__avatar')) {
+              unmountRarity(node);
+          }
+          const avatars = node.querySelectorAll('.collection-roster__avatar');
+          avatars.forEach(avatarNode => unmountRarity(avatarNode));
+      };
+      let rosterObserver = null;
+      if (typeof MutationObserver === 'function') {
+          rosterObserver = new MutationObserver(mutations => {
+              for (const mutation of mutations) {
+                  mutation.removedNodes.forEach(teardownRarityOverlays);
+              }
+          });
+          rosterObserver.observe(rosterList, { childList: true, subtree: true });
+          addCleanup(() => rosterObserver === null || rosterObserver === void 0 ? void 0 : rosterObserver.disconnect());
+      }
       for (const unit of rosterSource) {
           const unitId = normalizeUnitId(unit.id);
           const item = document.createElement('li');
@@ -12672,14 +12694,35 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           button.type = 'button';
           button.className = 'collection-roster__entry';
           button.dataset.unitId = unitId;
-          button.dataset.rank = unit.rank || 'unknown';
+          const rawRank = typeof unit.rank === 'string' ? unit.rank : null;
+          let rawMetaRank = null;
+          if (unit.raw && typeof unit.raw === 'object') {
+              const rankValue = unit.raw.rank;
+              rawMetaRank = typeof rankValue === 'string' ? rankValue : null;
+          }
+          let normalizedRank = null;
+          const rankCandidates = [rawRank, rawMetaRank];
+          for (const candidate of rankCandidates) {
+              if (typeof candidate !== 'string' || !candidate.trim()) {
+                  continue;
+              }
+              try {
+                  normalizedRank = normalizeRarity(candidate);
+                  break;
+              }
+              catch (error) {
+                  continue;
+              }
+          }
+          const displayRank = (_b = (_a = normalizedRank !== null && normalizedRank !== void 0 ? normalizedRank : rawRank) !== null && _a !== void 0 ? _a : rawMetaRank) !== null && _b !== void 0 ? _b : null;
+          button.dataset.rank = displayRank !== null && displayRank !== void 0 ? displayRank : 'unknown';
           const avatar = document.createElement('div');
           avatar.className = 'collection-roster__avatar';
-          const aura = document.createElement('div');
-          aura.className = 'collection-roster__aura';
-          avatar.appendChild(aura);
+          if (normalizedRank) {
+              mountRarityAura(avatar, normalizedRank, 'collection', { label: true, rounded: true });
+          }
           const art = getUnitArt(unitId);
-          if ((_a = art === null || art === void 0 ? void 0 : art.sprite) === null || _a === void 0 ? void 0 : _a.src) {
+          if ((_c = art === null || art === void 0 ? void 0 : art.sprite) === null || _c === void 0 ? void 0 : _c.src) {
               const img = document.createElement('img');
               img.src = art.sprite.src;
               img.alt = unit.name || unitId;
@@ -12695,8 +12738,8 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           const costValue = Number.isFinite(unit.cost) ? unit.cost : '—';
           cost.textContent = `Cost ${costValue}`;
           const tooltipParts = [unit.name || unitId];
-          if (unit.rank) {
-              tooltipParts.push(`Rank ${unit.rank}`);
+          if (displayRank) {
+              tooltipParts.push(`Rank ${displayRank}`);
           }
           if (unit.class) {
               tooltipParts.push(unit.class);
@@ -12712,7 +12755,8 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           addCleanup(() => button.removeEventListener('click', handleSelect));
           item.appendChild(button);
           rosterList.appendChild(item);
-          rosterEntries.set(unitId, { button, costEl: cost, meta: unit });
+          addCleanup(() => unmountRarity(avatar));
+          rosterEntries.set(unitId, { button, costEl: cost, avatar, meta: unit, rarity: normalizedRank });
       }
       rosterPanel.appendChild(rosterList);
       const stage = document.createElement('section');
@@ -13042,7 +13086,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           root.appendChild(container);
       }
       const selectUnit = (unitId) => {
-          var _a, _b, _c, _d, _e, _f;
+          var _a, _b, _c, _d, _e;
           if (!unitId || !rosterEntries.has(unitId))
               return;
           updateSelectedUnit(filterState, unitId);
@@ -13063,12 +13107,20 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
                   }
               }
           }
-          const unit = ((_a = rosterEntries.get(unitId)) === null || _a === void 0 ? void 0 : _a.meta) || null;
-          stageName.textContent = toSafeText((_b = unit === null || unit === void 0 ? void 0 : unit.name) !== null && _b !== void 0 ? _b : unitId);
+          const selectedEntry = rosterEntries.get(unitId) || null;
+          const unit = (selectedEntry === null || selectedEntry === void 0 ? void 0 : selectedEntry.meta) || null;
+          const unitRarity = (selectedEntry === null || selectedEntry === void 0 ? void 0 : selectedEntry.rarity) || null;
+          stageName.textContent = toSafeText((_a = unit === null || unit === void 0 ? void 0 : unit.name) !== null && _a !== void 0 ? _a : unitId);
           while (stageTags.firstChild) {
               stageTags.removeChild(stageTags.firstChild);
           }
-          if (unit === null || unit === void 0 ? void 0 : unit.rank) {
+          if (unitRarity) {
+              const rankTag = document.createElement('span');
+              rankTag.className = 'collection-stage__tag';
+              rankTag.textContent = toSafeText(`Rank ${unitRarity}`);
+              stageTags.appendChild(rankTag);
+          }
+          else if (unit === null || unit === void 0 ? void 0 : unit.rank) {
               const rankTag = document.createElement('span');
               rankTag.className = 'collection-stage__tag';
               rankTag.textContent = toSafeText(`Rank ${unit.rank}`);
@@ -13083,9 +13135,9 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           const costValue = unit && Number.isFinite(unit.cost) ? unit.cost : '—';
           stageCost.textContent = `Cost ${toSafeText(costValue)}`;
           const art = getUnitArt(unitId);
-          if ((_c = art === null || art === void 0 ? void 0 : art.sprite) === null || _c === void 0 ? void 0 : _c.src) {
+          if ((_b = art === null || art === void 0 ? void 0 : art.sprite) === null || _b === void 0 ? void 0 : _b.src) {
               stageSprite.src = art.sprite.src;
-              stageSprite.alt = toSafeText((_d = unit === null || unit === void 0 ? void 0 : unit.name) !== null && _d !== void 0 ? _d : unitId);
+              stageSprite.alt = toSafeText((_c = unit === null || unit === void 0 ? void 0 : unit.name) !== null && _c !== void 0 ? _c : unitId);
               stageSprite.style.opacity = '1';
           }
           else {
@@ -13096,7 +13148,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           overlayTitle.textContent = toSafeText((unit === null || unit === void 0 ? void 0 : unit.name) ? `Kĩ năng · ${unit.name}` : 'Kĩ năng');
           const skillSet = getSkillSet(unitId);
           overlaySubtitle.textContent = toSafeText(describeUlt(unit));
-          const summaryNote = (_f = (_e = skillSet === null || skillSet === void 0 ? void 0 : skillSet.notes) === null || _e === void 0 ? void 0 : _e[0]) !== null && _f !== void 0 ? _f : '';
+          const summaryNote = (_e = (_d = skillSet === null || skillSet === void 0 ? void 0 : skillSet.notes) === null || _d === void 0 ? void 0 : _d[0]) !== null && _e !== void 0 ? _e : '';
           overlaySummary.textContent = toSafeText(summaryNote);
           overlaySummary.style.display = summaryNote ? '' : 'none';
           while (overlayNotesList.firstChild) {
@@ -13182,6 +13234,191 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
   }
 
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderCollectionView')) exports.renderCollectionView = renderCollectionView;
+});
+__define('./screens/gacha/view.ts', (exports, module, __require) => {
+  const __dep0 = __require('./ui/dom.ts');
+  const assertElement = __dep0.assertElement;
+  const ensureStyleTag = __dep0.ensureStyleTag;
+  const mountSection = __dep0.mountSection;
+  const __dep1 = __require('./ui/rarity/rarity.ts');
+  const mountRarityAura = __dep1.mountRarityAura;
+  const unmountRarity = __dep1.unmountRarity;
+  const normalizeRarity = __dep1.normalizeRarity;
+  const playGachaReveal = __dep1.playGachaReveal;
+  const STYLE_ID = 'gacha-view-style';
+  function ensureStyles() {
+      const css = `
+      .app--gacha{padding:32px 16px 64px;background:linear-gradient(160deg,rgba(6,10,16,.94),rgba(12,18,28,.88));min-height:100vh;box-sizing:border-box;}
+      .gacha-view{display:flex;flex-direction:column;gap:24px;margin:0 auto;max-width:1280px;color:#e8f3ff;}
+      .gacha-view__header{display:flex;flex-direction:column;gap:6px;align-items:flex-start;}
+      .gacha-view__title{margin:0;font-size:34px;letter-spacing:.08em;text-transform:uppercase;}
+      .gacha-view__subtitle{margin:0;font-size:15px;color:rgba(174,228,255,.82);letter-spacing:.04em;}
+      .gacha-view__actions{display:flex;gap:12px;align-items:center;}
+      .gacha-view__reveal{padding:11px 22px;border-radius:999px;border:1px solid rgba(174,228,255,.38);background:rgba(16,28,42,.86);color:#aee4ff;letter-spacing:.12em;text-transform:uppercase;font-size:12px;font-weight:600;cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;}
+      .gacha-view__reveal:hover:enabled{transform:translateY(-2px);border-color:rgba(174,228,255,.56);box-shadow:0 14px 32px rgba(6,12,20,.45);}
+      .gacha-view__reveal:disabled{opacity:.55;cursor:not-allowed;}
+      .gacha-view__results{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:18px;}
+      .gacha-card{position:relative;min-height:220px;border-radius:22px;padding:16px;background:rgba(10,18,30,.88);border:1px solid rgba(125,211,252,.18);overflow:hidden;display:flex;flex-direction:column;gap:12px;justify-content:flex-end;box-shadow:0 18px 42px rgba(6,12,20,.4);}
+      .gacha-card__art{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:.18;}
+      .gacha-card__art img{width:120%;height:120%;object-fit:cover;filter:blur(2px);}
+      .gacha-card__content{position:relative;z-index:1;display:flex;flex-direction:column;gap:6px;}
+      .gacha-card__name{margin:0;font-size:18px;font-weight:600;letter-spacing:.04em;}
+      .gacha-card__desc{margin:0;font-size:13px;line-height:1.5;color:rgba(196,228,255,.84);}
+      @media(max-width:720px){
+        .app--gacha{padding:24px 12px 48px;}
+        .gacha-view__title{font-size:28px;}
+        .gacha-card{min-height:200px;padding:14px;}
+      }
+    `;
+      ensureStyleTag(STYLE_ID, { css });
+  }
+  function toNormalizedCard(card, index) {
+      var _a, _b, _c, _d, _e;
+      const rarity = normalizeRarity(card.rarity);
+      const idSource = (_a = card.id) !== null && _a !== void 0 ? _a : `gacha-card-${index}`;
+      const id = String(idSource);
+      const rawName = (_c = (_b = card.name) !== null && _b !== void 0 ? _b : card.title) !== null && _c !== void 0 ? _c : card.label;
+      const name = rawName && rawName.trim().length > 0 ? rawName.trim() : `Thẻ #${index + 1}`;
+      const description = ((_e = (_d = card.description) === null || _d === void 0 ? void 0 : _d.trim) === null || _e === void 0 ? void 0 : _e.call(_d)) ? card.description.trim() : null;
+      const artwork = card.artwork && card.artwork.trim().length > 0 ? card.artwork.trim() : null;
+      return { id, name, rarity, description, artwork };
+  }
+  function renderGachaView(options) {
+      var _a, _b;
+      const host = assertElement(options.root, {
+          guard: (node) => node instanceof HTMLElement,
+          message: 'renderGachaView cần một phần tử root hợp lệ.',
+      });
+      ensureStyles();
+      const section = document.createElement('section');
+      section.className = 'gacha-view';
+      section.dataset.view = 'gacha';
+      const header = document.createElement('header');
+      header.className = 'gacha-view__header';
+      const title = document.createElement('h1');
+      title.className = 'gacha-view__title';
+      title.textContent = ((_a = options.title) === null || _a === void 0 ? void 0 : _a.trim()) || 'Kết Quả Gacha';
+      header.appendChild(title);
+      if (options.subtitle) {
+          const subtitle = document.createElement('p');
+          subtitle.className = 'gacha-view__subtitle';
+          subtitle.textContent = options.subtitle;
+          header.appendChild(subtitle);
+      }
+      const actions = document.createElement('div');
+      actions.className = 'gacha-view__actions';
+      const revealButton = document.createElement('button');
+      revealButton.type = 'button';
+      revealButton.className = 'gacha-view__reveal';
+      revealButton.textContent = 'Bật Hiệu Ứng';
+      actions.appendChild(revealButton);
+      header.appendChild(actions);
+      section.appendChild(header);
+      const grid = document.createElement('div');
+      grid.className = 'gacha-view__results';
+      section.appendChild(grid);
+      const mount = mountSection({
+          root: host,
+          section,
+          rootClasses: 'app--gacha',
+      });
+      const auraEntries = [];
+      let revealDoneCallback = typeof options.onRevealDone === 'function' ? options.onRevealDone : null;
+      let isRevealing = false;
+      const cleanupCallbacks = [];
+      const addCleanup = (fn) => {
+          if (typeof fn === 'function') {
+              cleanupCallbacks.push(fn);
+          }
+      };
+      function updateRevealButtonState() {
+          revealButton.disabled = isRevealing || auraEntries.length === 0;
+      }
+      function disposeCardEntries() {
+          while (auraEntries.length > 0) {
+              const entry = auraEntries.pop();
+              if (entry) {
+                  unmountRarity(entry.el);
+              }
+          }
+      }
+      function renderCards(cards) {
+          disposeCardEntries();
+          grid.replaceChildren();
+          cards.forEach((card, index) => {
+              const normalized = toNormalizedCard(card, index);
+              const cardEl = document.createElement('article');
+              cardEl.className = 'gacha-card';
+              cardEl.dataset.cardId = normalized.id;
+              cardEl.dataset.rarity = normalized.rarity;
+              cardEl.tabIndex = 0;
+              if (normalized.artwork) {
+                  const art = document.createElement('div');
+                  art.className = 'gacha-card__art';
+                  const img = document.createElement('img');
+                  img.alt = normalized.name;
+                  img.src = normalized.artwork;
+                  art.appendChild(img);
+                  cardEl.appendChild(art);
+              }
+              const content = document.createElement('div');
+              content.className = 'gacha-card__content';
+              const name = document.createElement('h3');
+              name.className = 'gacha-card__name';
+              name.textContent = normalized.name;
+              content.appendChild(name);
+              if (normalized.description) {
+                  const desc = document.createElement('p');
+                  desc.className = 'gacha-card__desc';
+                  desc.textContent = normalized.description;
+                  content.appendChild(desc);
+              }
+              cardEl.appendChild(content);
+              mountRarityAura(cardEl, normalized.rarity, 'gacha', { label: true });
+              auraEntries.push({ id: normalized.id, el: cardEl, rarity: normalized.rarity });
+              grid.appendChild(cardEl);
+          });
+          updateRevealButtonState();
+      }
+      function handleReveal() {
+          if (isRevealing || auraEntries.length === 0) {
+              return;
+          }
+          isRevealing = true;
+          updateRevealButtonState();
+          const cards = auraEntries.map(entry => ({ el: entry.el, rarity: entry.rarity }));
+          const onDone = () => {
+              isRevealing = false;
+              updateRevealButtonState();
+              if (revealDoneCallback) {
+                  revealDoneCallback();
+              }
+          };
+          playGachaReveal(cards, { onDone });
+      }
+      revealButton.addEventListener('click', handleReveal);
+      addCleanup(() => revealButton.removeEventListener('click', handleReveal));
+      renderCards((_b = options.cards) !== null && _b !== void 0 ? _b : []);
+      return {
+          root: mount.root,
+          section: mount.section,
+          reveal: handleReveal,
+          updateCards(nextCards) {
+              renderCards(nextCards);
+          },
+          setRevealDoneCallback(callback) {
+              revealDoneCallback = typeof callback === 'function' ? callback : null;
+          },
+          destroy() {
+              cleanupCallbacks.forEach(fn => fn());
+              cleanupCallbacks.length = 0;
+              disposeCardEntries();
+              mount.destroy();
+          },
+      };
+  }
+
+  if (!Object.prototype.hasOwnProperty.call(exports, 'renderGachaView')) exports.renderGachaView = renderGachaView;
 });
 __define('./screens/lineup/index.ts', (exports, module, __require) => {
   const __dep1 = __require('./screens/lineup/view/index.ts');
@@ -13696,17 +13933,22 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
   const mountSection = __dep3.mountSection;
   const __dep4 = __require('./types/currency.ts');
   const normalizeCurrencyBalances = __dep4.normalizeCurrencyBalances;
-  const __dep5 = __require('./screens/lineup/view/state.ts');
-  const normalizeRoster = __dep5.normalizeRoster;
-  const normalizeLineups = __dep5.normalizeLineups;
-  const createCurrencyBalances = __dep5.createCurrencyBalances;
-  const createFilterOptions = __dep5.createFilterOptions;
-  const formatCurrencyBalance = __dep5.formatCurrencyBalance;
-  const collectAssignedUnitIds = __dep5.collectAssignedUnitIds;
-  const evaluatePassive = __dep5.evaluatePassive;
-  const filterRoster = __dep5.filterRoster;
-  const __dep6 = __require('./screens/lineup/view/events.ts');
-  const bindLineupEvents = __dep6.bindLineupEvents;
+  const __dep5 = __require('./ui/rarity/rarity.ts');
+  const mountRarityAura = __dep5.mountRarityAura;
+  const updateRarity = __dep5.updateRarity;
+  const unmountRarity = __dep5.unmountRarity;
+  const __dep6 = __require('./screens/lineup/view/state.ts');
+  const normalizeRoster = __dep6.normalizeRoster;
+  const normalizeLineups = __dep6.normalizeLineups;
+  const createCurrencyBalances = __dep6.createCurrencyBalances;
+  const createFilterOptions = __dep6.createFilterOptions;
+  const formatCurrencyBalance = __dep6.formatCurrencyBalance;
+  const collectAssignedUnitIds = __dep6.collectAssignedUnitIds;
+  const evaluatePassive = __dep6.evaluatePassive;
+  const filterRoster = __dep6.filterRoster;
+  const getUnitRarity = __dep6.getUnitRarity;
+  const __dep7 = __require('./screens/lineup/view/events.ts');
+  const bindLineupEvents = __dep7.bindLineupEvents;
   const STYLE_ID = 'lineup-view-style-v1';
   const powerFormatter = createNumberFormatter('vi-VN');
   function ensureStyles() {
@@ -13907,6 +14149,10 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       return getInitials(parts);
   }
   function renderAvatar(container, avatarUrl, name) {
+      const auraOverlay = container.querySelector(':scope > .rarity-aura');
+      if (auraOverlay) {
+          container.removeChild(auraOverlay);
+      }
       container.innerHTML = '';
       if (avatarUrl) {
           const img = document.createElement('img');
@@ -13916,6 +14162,9 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       }
       else {
           container.textContent = getNameInitials(name || '');
+      }
+      if (auraOverlay) {
+          container.appendChild(auraOverlay);
       }
   }
   function formatUnitPower(power) {
@@ -14310,6 +14559,10 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       }
       function renderCells() {
           var _a, _b, _c;
+          const previousAvatars = cellsGrid.querySelectorAll('.lineup-cell__avatar');
+          previousAvatars.forEach(avatar => {
+              unmountRarity(avatar);
+          });
           cellsGrid.innerHTML = '';
           const lineup = getSelectedLineup();
           if (!lineup) {
@@ -14322,6 +14575,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
                   cellEl.setAttribute('role', 'button');
                   const avatar = document.createElement('div');
                   avatar.className = 'lineup-cell__avatar';
+                  unmountRarity(avatar);
                   avatar.textContent = '🔒';
                   cellEl.appendChild(avatar);
                   cellEl.setAttribute('aria-label', `Ô đội hình #${index + 1}. Chưa có dữ liệu.`);
@@ -14377,14 +14631,18 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               avatar.className = 'lineup-cell__avatar';
               if (unit) {
                   renderAvatar(avatar, unit.avatar || null, unit.name);
+                  mountRarityAura(avatar, getUnitRarity(unit), 'deck', { label: false });
               }
               else if (cell.label) {
+                  unmountRarity(avatar);
                   avatar.textContent = getNameInitials(cell.label);
               }
               else if (!cell.unlocked) {
+                  unmountRarity(avatar);
                   avatar.textContent = '🔒';
               }
               else {
+                  unmountRarity(avatar);
                   avatar.textContent = '+';
               }
               cellEl.appendChild(avatar);
@@ -14434,6 +14692,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       function renderLeader() {
           const lineup = getSelectedLineup();
           if (!lineup) {
+              unmountRarity(leaderAvatar);
               renderAvatar(leaderAvatar, null, '');
               leaderName.textContent = 'Chưa chọn leader';
               syncGridDetailsHeight();
@@ -14441,10 +14700,25 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           }
           if (lineup.leaderId) {
               const unit = rosterLookup.get(lineup.leaderId);
-              renderAvatar(leaderAvatar, (unit === null || unit === void 0 ? void 0 : unit.avatar) || null, (unit === null || unit === void 0 ? void 0 : unit.name) || '');
-              leaderName.textContent = (unit === null || unit === void 0 ? void 0 : unit.name) || 'Leader';
+              if (unit) {
+                  renderAvatar(leaderAvatar, unit.avatar || null, unit.name);
+                  const rarity = getUnitRarity(unit);
+                  if (leaderAvatar.querySelector(':scope > .rarity-aura')) {
+                      updateRarity(leaderAvatar, rarity);
+                  }
+                  else {
+                      mountRarityAura(leaderAvatar, rarity, 'deck', { label: false, rounded: true });
+                  }
+                  leaderName.textContent = unit.name;
+              }
+              else {
+                  unmountRarity(leaderAvatar);
+                  renderAvatar(leaderAvatar, null, '');
+                  leaderName.textContent = 'Leader';
+              }
           }
           else {
+              unmountRarity(leaderAvatar);
               renderAvatar(leaderAvatar, null, '');
               leaderName.textContent = 'Chưa chọn leader';
           }
@@ -14710,9 +14984,12 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
   const listCurrencies = __dep1.listCurrencies;
   const __dep2 = __require('./utils/format.ts');
   const createNumberFormatter = __dep2.createNumberFormatter;
+  const __dep3 = __require('./ui/rarity/rarity.ts');
+  const normalizeRarity = __dep3.normalizeRarity;
   const currencyCatalog = listCurrencies();
   const currencyIndex = new Map(currencyCatalog.map(currency => [currency.id, currency]));
   const numberFormatter = createNumberFormatter('vi-VN');
+  const DEFAULT_RARITY = 'N';
   const FORMATION_CELL_COUNT = 5;
   const RESERVE_CELL_COUNT = 5;
   const isObjectLike = (value) => (typeof value === 'object' && value !== null && !Array.isArray(value));
@@ -14769,6 +15046,36 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
   function normalizeRoster(source) {
       const cloned = cloneRoster(source);
       return cloned.map((entry, index) => normalizeRosterEntry(entry, index));
+  }
+  function getRawRarityString(raw, key) {
+      if (!raw) {
+          return null;
+      }
+      const value = raw[key];
+      return typeof value === 'string' ? value : null;
+  }
+  function getUnitRarity(unit) {
+      if (!unit) {
+          return DEFAULT_RARITY;
+      }
+      const candidates = [
+          unit.rank,
+          getRawRarityString(unit.raw, 'rank'),
+          getRawRarityString(unit.raw, 'rarity'),
+          getRawRarityString(unit.raw, 'tier'),
+          getRawRarityString(unit.raw, 'grade'),
+      ];
+      for (const candidate of candidates) {
+          if (typeof candidate === 'string' && candidate.trim()) {
+              try {
+                  return normalizeRarity(candidate);
+              }
+              catch (error) {
+                  continue;
+              }
+          }
+      }
+      return DEFAULT_RARITY;
   }
   function normalizeAssignment(input, rosterIndex) {
       var _a, _b, _c, _d, _e, _f, _g, _h;
@@ -15276,6 +15583,7 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
   }
 
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeRoster')) exports.normalizeRoster = normalizeRoster;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getUnitRarity')) exports.getUnitRarity = getUnitRarity;
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeLineups')) exports.normalizeLineups = normalizeLineups;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createCurrencyBalances')) exports.createCurrencyBalances = createCurrencyBalances;
   if (!Object.prototype.hasOwnProperty.call(exports, 'formatCurrencyBalance')) exports.formatCurrencyBalance = formatCurrencyBalance;
@@ -18295,6 +18603,545 @@ __define('./ui/dom.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'assertElement')) exports.assertElement = assertElement;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureStyleTag')) exports.ensureStyleTag = ensureStyleTag;
   if (!Object.prototype.hasOwnProperty.call(exports, 'mountSection')) exports.mountSection = mountSection;
+});
+__define('./ui/rarity/rarity.css', (exports, module, __require) => {
+  const css = ".rarity-aura {\n  position: absolute;\n  inset: 0;\n  pointer-events: none;\n  border-radius: inherit;\n  contain: layout style paint;\n  display: block;\n  z-index: 1;\n  --rarity-color: #ffffff;\n  --rarity-ring-scale: 1;\n  --rarity-glow-base: 1;\n  --rarity-glow-low: calc(var(--rarity-glow-base) * 0.7);\n  --rarity-glow-active: var(--rarity-glow-base);\n  --rarity-spark-count: 0;\n  --rarity-ring-opacity: 0.85;\n  --rarity-glow-opacity: 0.65;\n  --rarity-glow-scale: 1;\n  --rarity-glow-blur: calc(9px * var(--rarity-glow-active));\n  --rarity-shimmer-period: 6s;\n  --rarity-shimmer-delay: 0s;\n  --rarity-sweep-opacity: 0.65;\n}\n\nbody.low-power .rarity-aura {\n  --rarity-glow-active: var(--rarity-glow-low);\n  --rarity-spark-count: 0;\n  --rarity-sweep-opacity: 0;\n}\n\n.rarity-aura.is-rounded {\n  border-radius: 9999px;\n}\n\n.rarity-aura .ring,\n.rarity-aura .glow,\n.rarity-aura .sweep,\n.rarity-aura .spark-layer,\n.rarity-aura .badge {\n  position: absolute;\n  inset: 0;\n  border-radius: inherit;\n  pointer-events: none;\n}\n\n.rarity-aura .ring {\n  box-shadow: 0 0 0 2px var(--rarity-color) inset, 0 0 0 1px rgba(0, 0, 0, 0.35);\n  opacity: var(--rarity-ring-opacity);\n  transform: scale(var(--rarity-ring-scale));\n  transition: transform 0.3s ease, opacity 0.3s ease;\n}\n\n.rarity-aura .glow {\n  background: radial-gradient(62% 62% at 50% 50%, color-mix(in srgb, var(--rarity-color) 65%, transparent), transparent 72%);\n  filter: blur(var(--rarity-glow-blur));\n  opacity: var(--rarity-glow-opacity);\n  transform: scale(var(--rarity-glow-scale));\n  transition: opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease;\n}\n\n.rarity-aura .badge {\n  inset: auto auto 6px 6px;\n  width: auto;\n  padding: 2px 6px;\n  font-weight: 700;\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.5px;\n  border-radius: 8px;\n  background: rgba(0, 0, 0, 0.35);\n  color: #fff;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  min-width: 36px;\n  pointer-events: none;\n}\n\n.rarity-aura[data-variant=\"deck\"] .badge {\n  display: none;\n}\n\n.rarity-aura[data-variant=\"gacha\"] .badge {\n  font-size: 14px;\n}\n\n.rarity-aura .spark-layer {\n  display: none;\n  overflow: visible;\n}\n\n.rarity-aura .spark {\n  position: absolute;\n  width: 6px;\n  height: 18px;\n  border-radius: 999px;\n  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0));\n  opacity: 0;\n  transform-origin: center;\n  animation: spark-flare var(--spark-duration, 900ms) ease-out var(--spark-delay, 0ms) forwards;\n}\n\n.rarity-aura.has-spark .spark-layer {\n  display: block;\n}\n\n@keyframes spark-flare {\n  0% {\n    opacity: 0;\n    transform: translate(var(--spark-x, 0), var(--spark-y, 0)) scale(0.6) rotate(0deg);\n  }\n  10% {\n    opacity: 1;\n  }\n  50% {\n    opacity: 0.75;\n  }\n  100% {\n    opacity: 0;\n    transform: translate(var(--spark-x, 0), var(--spark-y, 0)) scale(1.2) rotate(12deg);\n  }\n}\n\n.rarity-aura .sweep {\n  display: none;\n  overflow: hidden;\n  opacity: var(--rarity-sweep-opacity);\n}\n\n.rarity-aura.prism .sweep {\n  mix-blend-mode: screen;\n}\n\n.rarity-aura .sweep::before {\n  content: \"\";\n  position: absolute;\n  inset: -12%;\n  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0));\n  transform: translateX(-120%) skewX(-10deg);\n  filter: blur(2px);\n  animation: sweep 1.4s ease-in-out var(--sweep-delay, 0ms) 1;\n}\n\n.rarity-aura.has-sweep .sweep {\n  display: block;\n}\n\n.rarity-aura.prism::after {\n  content: \"\";\n  position: absolute;\n  inset: -3px;\n  border-radius: inherit;\n  mix-blend-mode: screen;\n  opacity: 0.9;\n  background: linear-gradient(90deg, #ff7ab6, #ffffff, #7ecbff, #f8d66d, #ff7ab6);\n  animation: prism-cycle 2.4s linear infinite;\n}\n\nbody.low-power .rarity-aura.prism::after {\n  display: none;\n}\n\n@keyframes sweep {\n  from {\n    transform: translateX(-120%) skewX(-8deg);\n  }\n  to {\n    transform: translateX(120%) skewX(-8deg);\n  }\n}\n\n@keyframes prism-cycle {\n  0% {\n    transform: rotate(0deg);\n  }\n  100% {\n    transform: rotate(360deg);\n  }\n}\n\n@keyframes shimmer-cycle {\n  0% {\n    opacity: var(--rarity-glow-opacity);\n  }\n  6% {\n    opacity: calc(var(--rarity-glow-opacity) + 0.2);\n  }\n  12% {\n    opacity: var(--rarity-glow-opacity);\n  }\n  100% {\n    opacity: var(--rarity-glow-opacity);\n  }\n}\n\n.rarity-aura[data-variant=\"deck\"] .glow {\n  --rarity-shimmer-period: 6s;\n  animation: shimmer-cycle var(--rarity-shimmer-period) ease-in-out infinite;\n}\n\n.rarity-aura[data-variant=\"collection\"] .glow {\n  --rarity-shimmer-period: 10s;\n  animation: shimmer-cycle var(--rarity-shimmer-period) ease-in-out infinite;\n}\n\n.rarity-aura[data-variant=\"gacha\"] .glow {\n  animation: none;\n}\n\n.rarity-aura.is-pre .ring {\n  opacity: 0.4;\n}\n\n.rarity-aura.is-pre .glow {\n  opacity: calc(var(--rarity-glow-opacity) * 0.5);\n  transform: scale(0.92);\n}\n\n.rarity-aura.is-bloom .ring {\n  transform: scale(calc(var(--rarity-ring-scale) * 1.08));\n}\n\n.rarity-aura.is-bloom .glow {\n  opacity: min(1, calc(var(--rarity-glow-opacity) * 1.2));\n  transform: scale(1.08);\n}\n\n.rarity-aura.is-reveal .ring {\n  transform: scale(var(--rarity-ring-scale));\n  opacity: var(--rarity-ring-opacity);\n}\n\n.rarity-aura.is-reveal .glow {\n  opacity: var(--rarity-glow-opacity);\n  transform: scale(1);\n}\n\n.rarity-aura.has-sweep.is-reveal .sweep::before {\n  animation-play-state: running;\n}\n\nbody.low-power .rarity-aura.has-sweep .sweep::before {\n  display: none;\n}\n\nbody.low-power .rarity-aura.has-spark .spark-layer {\n  display: none;\n}\n\n.rarity-N {\n  --rarity-color: #9AA3AF;\n}\n\n.rarity-R {\n  --rarity-color: #2ED3A0;\n}\n\n.rarity-SR {\n  --rarity-color: #00E5FF;\n}\n\n.rarity-SSR {\n  --rarity-color: #7C4DFF;\n}\n\n.rarity-UR {\n  --rarity-color: #FFD773;\n}\n\n.rarity-PRIME {\n  --rarity-color: #FFFFFF;\n}\n\n.rarity-aura[data-variant=\"deck\"],\n.rarity-aura[data-variant=\"collection\"] {\n  mix-blend-mode: normal;\n}\n\n.rarity-aura[data-variant=\"gacha\"] {\n  mix-blend-mode: normal;\n}\n\n.rarity-aura.is-muted .ring,\n.rarity-aura.is-muted .glow {\n  opacity: 0;\n}\n\n.rarity-aura.has-sweep .sweep::before {\n  animation-duration: 1.6s;\n}\n\n.rarity-aura[data-variant=\"gacha\"].has-sweep .sweep::before {\n  animation-duration: 1.8s;\n}\n\n.rarity-aura[data-variant=\"gacha\"].prism.has-sweep .sweep::before {\n  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0));\n}\n\n.rarity-aura[data-variant=\"collection\"] .ring {\n  opacity: 0.7;\n}\n\n.rarity-aura[data-variant=\"collection\"] .glow {\n  filter: blur(calc(8px * var(--rarity-glow-active)));\n}\n\n.rarity-aura[data-variant=\"deck\"] .ring {\n  opacity: 0.75;\n}\n\n.rarity-aura[data-variant=\"deck\"] .glow {\n  filter: blur(calc(7px * var(--rarity-glow-active)));\n}\n\n.rarity-aura[data-variant=\"deck\"].is-hovered .glow,\n.rarity-aura[data-variant=\"deck\"].is-selected .glow {\n  opacity: min(1, calc(var(--rarity-glow-opacity) * 1.2));\n}\n\n.rarity-aura[data-variant=\"collection\"].has-sweep .sweep,\n.rarity-aura[data-variant=\"deck\"].has-sweep .sweep {\n  display: none;\n}\n\nbody.low-power .rarity-aura.is-bloom .glow {\n  transform: scale(1.02);\n}";
+  module.exports = css;
+  module.exports.default = css;
+});
+__define('./ui/rarity/rarity.ts', (exports, module, __require) => {
+  const __dep0 = __require('./ui/rarity/rarity_tokens.json');
+  const rarityTokensSource = __dep0.default ?? __dep0;
+  const __dep1 = __require('./ui/rarity/rarity.css');
+  const rarityCss = __dep1.default ?? __dep1;
+  const __dep2 = __require('./ui/dom.ts');
+  const ensureStyleTag = __dep2.ensureStyleTag;
+  const STYLE_ID = 'ui-rarity-style';
+  const RARITY_SEQUENCE = ['N', 'R', 'SR', 'SSR', 'UR', 'PRIME'];
+  function normalizePowerMode(input) {
+      return input === 'low' ? 'low' : 'normal';
+  }
+  function normalizeRarityInput(input) {
+      const key = String(input).trim().toUpperCase();
+      if (RARITY_SEQUENCE.includes(key)) {
+          return key;
+      }
+      throw new Error(`Rarity không hợp lệ: ${input}`);
+  }
+  function normalizeRarity(value) {
+      return normalizeRarityInput(value);
+  }
+  function coerceRarity(value, fallback = 'N') {
+      try {
+          return normalizeRarity(value);
+      }
+      catch (error) {
+          return fallback;
+      }
+  }
+  function createTokenConfig(input) {
+      const { hex, glow, ring, spark, prism = false } = input;
+      return Object.freeze({
+          hex,
+          glow,
+          glowLow: glow * 0.7,
+          ring,
+          spark,
+          prism,
+      });
+  }
+  function normalizeTokenMap(source) {
+      const tokens = new Map();
+      Object.entries(source !== null && source !== void 0 ? source : {}).forEach(([rawKey, rawValue]) => {
+          if (rawKey === 'default' || rawKey === '__esModule') {
+              return;
+          }
+          try {
+              const rarity = normalizeRarityInput(rawKey);
+              tokens.set(rarity, createTokenConfig(rawValue));
+          }
+          catch (error) {
+              console.warn('Bỏ qua token hiếm không hợp lệ:', rawKey, error);
+          }
+      });
+      RARITY_SEQUENCE.forEach(key => {
+          if (!tokens.has(key)) {
+              throw new Error(`Thiếu token cho bậc ${key}`);
+          }
+      });
+      return Object.freeze(Object.fromEntries(tokens));
+  }
+  const RARITY_TOKENS = normalizeTokenMap(rarityTokensSource);
+  ensureStyleTag(STYLE_ID, { css: rarityCss });
+  const auraStates = new WeakMap();
+  const activeStates = new Set();
+  const sparkUsage = new WeakMap();
+  let currentPowerMode = 'normal';
+  let activeSparkCount = 0;
+  const MAX_ACTIVE_SPARKS = 16;
+  const SPARK_DURATION = 900;
+  const BLOOM_DELAY = 300;
+  const REVEAL_DELAY = 900;
+  const TIMELINE_TOTAL = 1300;
+  function getToken(rarity) {
+      return RARITY_TOKENS[rarity];
+  }
+  function normalizeOptions(variant, options) {
+      var _a;
+      return {
+          label: (_a = options === null || options === void 0 ? void 0 : options.label) !== null && _a !== void 0 ? _a : variant !== 'deck',
+          rounded: Boolean(options === null || options === void 0 ? void 0 : options.rounded),
+      };
+  }
+  function getRarityClass(rarity) {
+      return `rarity-${rarity}`;
+  }
+  function clearTimers(ids, clearFn) {
+      ids.splice(0, ids.length).forEach(id => clearFn(id));
+  }
+  function clearReveal(state) {
+      if (typeof cancelAnimationFrame === 'function' && state.revealRaf !== null) {
+          cancelAnimationFrame(state.revealRaf);
+      }
+      else if (state.revealRaf !== null) {
+          clearTimeout(state.revealRaf);
+      }
+      state.revealRaf = null;
+      clearTimers(state.revealTimers, clearTimeout);
+      state.overlay.classList.remove('is-pre', 'is-bloom', 'is-reveal');
+  }
+  function clearSparks(state) {
+      if (state.sparkLayer) {
+          sparkUsage.delete(state.sparkLayer);
+          while (state.sparkLayer.firstChild) {
+              state.sparkLayer.removeChild(state.sparkLayer.firstChild);
+          }
+      }
+      activeSparkCount = Math.max(0, activeSparkCount - state.sparkTimers.length);
+      clearTimers(state.sparkTimers, clearTimeout);
+      state.sparkTimers.length = 0;
+  }
+  function applyCssVariables(state) {
+      const { overlay, token, variant } = state;
+      overlay.style.setProperty('--rarity-color', token.hex);
+      overlay.style.setProperty('--rarity-ring-scale', token.ring.toString());
+      overlay.style.setProperty('--rarity-glow-base', token.glow.toString());
+      overlay.style.setProperty('--rarity-glow-low', token.glowLow.toString());
+      overlay.style.setProperty('--rarity-glow-active', currentPowerMode === 'low' ? token.glowLow.toString() : token.glow.toString());
+      const sparkCount = variant === 'gacha' && currentPowerMode !== 'low' ? token.spark : 0;
+      overlay.style.setProperty('--rarity-spark-count', sparkCount.toString());
+      const sweepOpacity = variant === 'gacha'
+          ? (token.prism ? '0.75' : '0.65')
+          : '0';
+      overlay.style.setProperty('--rarity-sweep-opacity', sweepOpacity);
+  }
+  function ensureSparkLayer(state) {
+      if (!state.sparkLayer) {
+          const layer = document.createElement('div');
+          layer.className = 'spark-layer';
+          state.overlay.appendChild(layer);
+          state.sparkLayer = layer;
+      }
+      return state.sparkLayer;
+  }
+  function ensureBadge(state) {
+      if (!state.label) {
+          if (state.badge && state.badge.parentNode) {
+              state.badge.parentNode.removeChild(state.badge);
+          }
+          state.badge = null;
+          state.overlay.classList.remove('has-badge');
+          return null;
+      }
+      if (!state.badge) {
+          const badge = document.createElement('div');
+          badge.className = 'badge';
+          state.overlay.appendChild(badge);
+          state.badge = badge;
+      }
+      state.overlay.classList.add('has-badge');
+      state.badge.textContent = state.rarity;
+      return state.badge;
+  }
+  function applyClasses(state) {
+      const { overlay, rarity, variant, token } = state;
+      RARITY_SEQUENCE.forEach(key => {
+          const className = getRarityClass(key);
+          if (key === rarity) {
+              overlay.classList.add(className);
+          }
+          else {
+              overlay.classList.remove(className);
+          }
+      });
+      overlay.dataset.variant = variant;
+      overlay.classList.toggle('prism', token.prism);
+      overlay.classList.toggle('is-rounded', state.rounded);
+      const wantsSweep = variant === 'gacha' && (rarity === 'UR' || rarity === 'PRIME');
+      const wantsSpark = variant === 'gacha' && token.spark > 0 && currentPowerMode !== 'low';
+      overlay.classList.toggle('has-sweep', wantsSweep && currentPowerMode !== 'low');
+      overlay.classList.toggle('has-spark', wantsSpark);
+      if (!overlay.classList.contains('has-spark')) {
+          clearSparks(state);
+      }
+      if (!overlay.classList.contains('has-sweep') && state.sweep.parentNode === state.overlay) {
+          state.sweep.classList.remove('active');
+      }
+  }
+  function syncInteractionClasses(state) {
+      const { host, overlay } = state;
+      overlay.classList.toggle('is-hovered', host.classList.contains('is-hovered'));
+      overlay.classList.toggle('is-selected', host.classList.contains('is-selected'));
+  }
+  function stopInteractionSync(state) {
+      if (state.classObserver) {
+          state.classObserver.disconnect();
+          state.classObserver = null;
+      }
+      if (state.classPoller !== null) {
+          clearInterval(state.classPoller);
+          state.classPoller = null;
+      }
+  }
+  function startInteractionSync(state) {
+      stopInteractionSync(state);
+      syncInteractionClasses(state);
+      if (typeof MutationObserver === 'function') {
+          const observer = new MutationObserver(mutations => {
+              for (const mutation of mutations) {
+                  if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                      syncInteractionClasses(state);
+                      break;
+                  }
+              }
+          });
+          observer.observe(state.host, { attributes: true, attributeFilter: ['class'] });
+          state.classObserver = observer;
+          return;
+      }
+      if (typeof window !== 'undefined' && typeof window.setInterval === 'function') {
+          state.classPoller = window.setInterval(() => syncInteractionClasses(state), 250);
+      }
+  }
+  function setupOverlay(host, variant) {
+      const existing = auraStates.get(host);
+      if (existing) {
+          existing.variant = variant;
+          return existing;
+      }
+      const overlay = document.createElement('div');
+      overlay.className = 'rarity-aura';
+      overlay.dataset.variant = variant;
+      const glow = document.createElement('div');
+      glow.className = 'glow';
+      overlay.appendChild(glow);
+      const ring = document.createElement('div');
+      ring.className = 'ring';
+      overlay.appendChild(ring);
+      const sweep = document.createElement('div');
+      sweep.className = 'sweep';
+      overlay.appendChild(sweep);
+      const state = {
+          host,
+          overlay,
+          ring,
+          glow,
+          sweep,
+          sparkLayer: null,
+          badge: null,
+          rarity: 'N',
+          variant,
+          label: false,
+          rounded: false,
+          token: getToken('N'),
+          originalPosition: null,
+          didSetPosition: false,
+          revealTimers: [],
+          revealRaf: null,
+          sparkTimers: [],
+          classObserver: null,
+          classPoller: null,
+      };
+      const computedPosition = typeof window !== 'undefined' && (window === null || window === void 0 ? void 0 : window.getComputedStyle)
+          ? window.getComputedStyle(host).position
+          : host.style.position;
+      const inlinePosition = host.style.position;
+      if (!computedPosition || computedPosition === 'static') {
+          host.style.position = 'relative';
+          state.didSetPosition = true;
+      }
+      state.originalPosition = inlinePosition || null;
+      host.appendChild(overlay);
+      auraStates.set(host, state);
+      activeStates.add(state);
+      return state;
+  }
+  function updateState(state, rarity, variant, options) {
+      state.rarity = rarity;
+      state.variant = variant;
+      state.label = options.label;
+      state.rounded = options.rounded;
+      state.token = getToken(rarity);
+      applyCssVariables(state);
+      applyClasses(state);
+      ensureBadge(state);
+  }
+  function mountRarityAura(host, rarity, variant, options) {
+      if (!host || typeof document === 'undefined') {
+          return;
+      }
+      const normalizedRarity = normalizeRarityInput(rarity);
+      const normalizedOptions = normalizeOptions(variant, options);
+      const state = setupOverlay(host, variant);
+      updateState(state, normalizedRarity, variant, normalizedOptions);
+      startInteractionSync(state);
+  }
+  function updateRarity(host, rarity) {
+      const state = auraStates.get(host);
+      if (!state) {
+          return;
+      }
+      const normalizedRarity = normalizeRarityInput(rarity);
+      updateState(state, normalizedRarity, state.variant, {
+          label: state.label,
+          rounded: state.rounded,
+      });
+  }
+  function unmountRarity(host) {
+      const state = auraStates.get(host);
+      if (!state) {
+          return;
+      }
+      clearReveal(state);
+      clearSparks(state);
+      stopInteractionSync(state);
+      if (state.overlay.parentNode === host) {
+          host.removeChild(state.overlay);
+      }
+      if (state.didSetPosition) {
+          if (state.originalPosition) {
+              host.style.position = state.originalPosition;
+          }
+          else {
+              host.style.removeProperty('position');
+          }
+      }
+      auraStates.delete(host);
+      activeStates.delete(state);
+  }
+  function setPowerMode(mode) {
+      var _a;
+      const normalizedMode = normalizePowerMode(mode);
+      if (normalizedMode === currentPowerMode) {
+          return;
+      }
+      currentPowerMode = normalizedMode;
+      const doc = typeof document !== 'undefined' ? document : null;
+      const body = (_a = doc === null || doc === void 0 ? void 0 : doc.body) !== null && _a !== void 0 ? _a : null;
+      if (body) {
+          body.classList.toggle('low-power', normalizedMode === 'low');
+      }
+      activeStates.forEach(state => {
+          applyCssVariables(state);
+          applyClasses(state);
+          if (normalizedMode === 'low') {
+              clearSparks(state);
+          }
+      });
+  }
+  function scheduleTimeout(state, delay, cb) {
+      const id = setTimeout(cb, delay);
+      state.revealTimers.push(id);
+  }
+  function spawnSparks(state) {
+      var _a, _b;
+      const token = state.token;
+      if (currentPowerMode === 'low' || token.spark <= 0 || state.variant !== 'gacha') {
+          return;
+      }
+      const availableGlobal = Math.max(0, MAX_ACTIVE_SPARKS - activeSparkCount);
+      if (availableGlobal <= 0) {
+          return;
+      }
+      const layer = ensureSparkLayer(state);
+      const existingForLayer = (_a = sparkUsage.get(layer)) !== null && _a !== void 0 ? _a : 0;
+      const availableForLayer = Math.max(0, token.spark - existingForLayer);
+      const spawnCount = Math.min(availableForLayer, availableGlobal);
+      if (spawnCount <= 0) {
+          return;
+      }
+      for (let index = 0; index < spawnCount; index += 1) {
+          const spark = document.createElement('div');
+          spark.className = 'spark';
+          const angle = Math.random() * Math.PI * 2;
+          const radius = Math.random() * 45 + 10;
+          const offsetX = Math.cos(angle) * radius;
+          const offsetY = Math.sin(angle) * radius;
+          spark.style.setProperty('--spark-x', `${offsetX}px`);
+          spark.style.setProperty('--spark-y', `${offsetY}px`);
+          spark.style.setProperty('--spark-delay', `${Math.random() * 120}ms`);
+          spark.style.setProperty('--spark-duration', `${SPARK_DURATION + Math.random() * 300}ms`);
+          layer.appendChild(spark);
+          activeSparkCount += 1;
+          const currentLayerCount = ((_b = sparkUsage.get(layer)) !== null && _b !== void 0 ? _b : 0) + 1;
+          sparkUsage.set(layer, currentLayerCount);
+          const cleanupId = setTimeout(() => {
+              var _a;
+              if (spark.parentNode === layer) {
+                  layer.removeChild(spark);
+              }
+              activeSparkCount = Math.max(0, activeSparkCount - 1);
+              const remaining = Math.max(0, ((_a = sparkUsage.get(layer)) !== null && _a !== void 0 ? _a : 0) - 1);
+              if (remaining <= 0) {
+                  sparkUsage.delete(layer);
+              }
+              else {
+                  sparkUsage.set(layer, remaining);
+              }
+              const timerIndex = state.sparkTimers.indexOf(cleanupId);
+              if (timerIndex >= 0) {
+                  state.sparkTimers.splice(timerIndex, 1);
+              }
+          }, SPARK_DURATION + 320);
+          state.sparkTimers.push(cleanupId);
+      }
+  }
+  function requestFrame(callback) {
+      if (typeof requestAnimationFrame === 'function') {
+          return requestAnimationFrame(callback);
+      }
+      const getNow = typeof performance !== 'undefined' && typeof performance.now === 'function'
+          ? () => performance.now()
+          : () => Date.now();
+      return setTimeout(() => callback(getNow()), 16);
+  }
+  function playGachaReveal(cards, options) {
+      var _a, _b, _c, _d;
+      if (!Array.isArray(cards) || typeof document === 'undefined') {
+          (_a = options === null || options === void 0 ? void 0 : options.onDone) === null || _a === void 0 ? void 0 : _a.call(options);
+          return;
+      }
+      const stagger = (_b = options === null || options === void 0 ? void 0 : options.staggerMs) !== null && _b !== void 0 ? _b : 120;
+      const states = cards
+          .map(card => ({ card, state: auraStates.get(card.el) }))
+          .filter((entry) => Boolean(entry.state));
+      if (states.length === 0) {
+          (_c = options === null || options === void 0 ? void 0 : options.onDone) === null || _c === void 0 ? void 0 : _c.call(options);
+          return;
+      }
+      let completed = 0;
+      const total = states.length;
+      const startTimeline = () => {
+          states.forEach((entry, index) => {
+              const { state } = entry;
+              clearReveal(state);
+              state.overlay.classList.add('is-pre');
+              state.overlay.classList.remove('is-bloom', 'is-reveal');
+              const delayBase = index * stagger;
+              scheduleTimeout(state, delayBase + BLOOM_DELAY, () => {
+                  state.overlay.classList.remove('is-pre');
+                  state.overlay.classList.add('is-bloom');
+                  spawnSparks(state);
+              });
+              scheduleTimeout(state, delayBase + REVEAL_DELAY, () => {
+                  state.overlay.classList.remove('is-bloom');
+                  state.overlay.classList.add('is-reveal');
+              });
+              scheduleTimeout(state, delayBase + TIMELINE_TOTAL, () => {
+                  var _a;
+                  state.overlay.classList.add('is-reveal');
+                  completed += 1;
+                  if (completed === total) {
+                      (_a = options === null || options === void 0 ? void 0 : options.onDone) === null || _a === void 0 ? void 0 : _a.call(options);
+                  }
+              });
+          });
+      };
+      const stateForRaf = (_d = states[0]) === null || _d === void 0 ? void 0 : _d.state;
+      if (stateForRaf) {
+          stateForRaf.revealRaf = requestFrame(() => {
+              stateForRaf.revealRaf = null;
+              states.forEach(entry => {
+                  entry.state.overlay.classList.add('is-pre');
+              });
+              startTimeline();
+          });
+      }
+      else {
+          startTimeline();
+      }
+  }
+  function prepareGachaReveal(hosts, options) {
+      var _a, _b, _c;
+      if (typeof document === 'undefined') {
+          return {
+              reveal() { },
+              update() { },
+              dispose() { },
+          };
+      }
+      const label = (_a = options === null || options === void 0 ? void 0 : options.label) !== null && _a !== void 0 ? _a : true;
+      const rounded = (_b = options === null || options === void 0 ? void 0 : options.rounded) !== null && _b !== void 0 ? _b : true;
+      const resolveRarity = (_c = options === null || options === void 0 ? void 0 : options.getRarity) !== null && _c !== void 0 ? _c : ((host) => host.dataset.rarity);
+      const mounted = new Map();
+      for (const rawHost of hosts !== null && hosts !== void 0 ? hosts : []) {
+          if (!(rawHost instanceof HTMLElement)) {
+              continue;
+          }
+          const rarity = coerceRarity(resolveRarity(rawHost), 'N');
+          mounted.set(rawHost, rarity);
+          rawHost.dataset.rarity = rarity;
+          mountRarityAura(rawHost, rarity, 'gacha', { label, rounded });
+      }
+      let disposed = false;
+      const revealOptions = {
+          staggerMs: options === null || options === void 0 ? void 0 : options.staggerMs,
+          onDone: options === null || options === void 0 ? void 0 : options.onDone,
+      };
+      const controller = {
+          reveal() {
+              if (disposed || mounted.size === 0) {
+                  return;
+              }
+              const cards = Array.from(mounted.entries()).map(([el, rarity]) => ({ el, rarity }));
+              playGachaReveal(cards, revealOptions);
+          },
+          update(host, rarityInput) {
+              if (disposed || !mounted.has(host)) {
+                  return;
+              }
+              const rarity = normalizeRarity(rarityInput);
+              mounted.set(host, rarity);
+              host.dataset.rarity = rarity;
+              updateRarity(host, rarity);
+          },
+          dispose() {
+              if (disposed) {
+                  return;
+              }
+              disposed = true;
+              mounted.forEach((_rarity, host) => {
+                  unmountRarity(host);
+              });
+              mounted.clear();
+          },
+      };
+      return controller;
+  }
+
+  if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeRarity')) exports.normalizeRarity = normalizeRarity;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'coerceRarity')) exports.coerceRarity = coerceRarity;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'mountRarityAura')) exports.mountRarityAura = mountRarityAura;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'updateRarity')) exports.updateRarity = updateRarity;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'unmountRarity')) exports.unmountRarity = unmountRarity;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'setPowerMode')) exports.setPowerMode = setPowerMode;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'playGachaReveal')) exports.playGachaReveal = playGachaReveal;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'prepareGachaReveal')) exports.prepareGachaReveal = prepareGachaReveal;
+});
+__define('./ui/rarity/rarity_tokens.json', (exports, module, __require) => {
+  const data = JSON.parse('{"N":{"hex":"#9AA3AF","glow":0.6,"ring":1,"spark":0},"R":{"hex":"#2ED3A0","glow":0.8,"ring":1,"spark":4},"SR":{"hex":"#00E5FF","glow":1,"ring":1.05,"spark":6},"SSR":{"hex":"#7C4DFF","glow":1.15,"ring":1.1,"spark":8},"UR":{"hex":"#FFD773","glow":1.25,"ring":1.15,"spark":12},"PRIME":{"hex":"#FFFFFF","glow":1.35,"ring":1.2,"spark":16,"prism":true}}');
+  module.exports = data;
+  module.exports.default = data;
 });
 __define('./units.ts', (exports, module, __require) => {
   const UNIT_LIST = [
