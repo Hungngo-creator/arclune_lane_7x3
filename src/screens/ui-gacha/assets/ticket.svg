@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 32" role="img" aria-labelledby="title" fill="none">
+  <title id="title">Vé Triệu Hồi</title>
+  <defs>
+    <linearGradient id="gradTicket" x1="4" y1="4" x2="60" y2="28" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFB74D"/>
+      <stop offset="1" stop-color="#FF6F91"/>
+    </linearGradient>
+  </defs>
+  <path d="M6 4h52v6a4 4 0 0 0 0 12v6H6v-6a4 4 0 0 0 0-12z" fill="url(#gradTicket)" stroke="#2F1B3A" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M20 6h24v20H20z" fill="rgba(11,15,20,0.2)" stroke="#FFF" stroke-opacity="0.3" stroke-width="1.5" stroke-dasharray="4 3"/>
+</svg>
