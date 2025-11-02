@@ -1,11 +1,9 @@
 .rarity-aura {
   position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  inset: 0;
   pointer-events: none;
   border-radius: inherit;
+  contain: layout style paint;
   display: block;
   z-index: 1;
   --rarity-color: #ffffff;
@@ -39,37 +37,28 @@ body.low-power .rarity-aura {
 .rarity-aura .spark-layer,
 .rarity-aura .badge {
   position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  inset: 0;
   border-radius: inherit;
   pointer-events: none;
 }
 
 .rarity-aura .ring {
-  opacity: 0.85;
-  opacity: var(--rarity-ring-opacity);
   box-shadow: 0 0 0 2px var(--rarity-color) inset, 0 0 0 1px rgba(0, 0, 0, 0.35);
+  opacity: var(--rarity-ring-opacity);
   transform: scale(var(--rarity-ring-scale));
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .rarity-aura .glow {
-  opacity: 0.65;
-  opacity: var(--rarity-glow-opacity);
   background: radial-gradient(62% 62% at 50% 50%, color-mix(in srgb, var(--rarity-color) 65%, transparent), transparent 72%);
-  filter: blur(9px);
   filter: blur(var(--rarity-glow-blur));
+  opacity: var(--rarity-glow-opacity);
   transform: scale(var(--rarity-glow-scale));
   transition: opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease;
 }
 
 .rarity-aura .badge {
-  top: auto;
-  right: auto;
-  bottom: 6px;
-  left: 6px;
+  inset: auto auto 6px 6px;
   width: auto;
   padding: 2px 6px;
   font-weight: 700;
@@ -135,17 +124,13 @@ body.low-power .rarity-aura {
   display: none;
   overflow: hidden;
   mix-blend-mode: screen;
-  opacity: 0.65;
   opacity: var(--rarity-sweep-opacity);
 }
 
 .rarity-aura .sweep::before {
   content: "";
   position: absolute;
-  top: -12%;
-  right: -12%;
-  bottom: -12%;
-  left: -12%;
+  inset: -12%;
   background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0));
   transform: translateX(-120%) skewX(-10deg);
   filter: blur(2px);
@@ -159,10 +144,7 @@ body.low-power .rarity-aura {
 .rarity-aura.prism::after {
   content: "";
   position: absolute;
-  top: -3px;
-  right: -3px;
-  bottom: -3px;
-  left: -3px;
+  inset: -3px;
   border-radius: inherit;
   mix-blend-mode: screen;
   opacity: 0.9;
@@ -262,27 +244,27 @@ body.low-power .rarity-aura.has-spark .spark-layer {
 }
 
 .rarity-N {
-  --rarity-color: #9aa3af;
+  --rarity-color: #9AA3AF;
 }
 
 .rarity-R {
-  --rarity-color: #2ed3a0;
+  --rarity-color: #2ED3A0;
 }
 
 .rarity-SR {
-  --rarity-color: #00e5ff;
+  --rarity-color: #00E5FF;
 }
 
 .rarity-SSR {
-  --rarity-color: #7c4dff;
+  --rarity-color: #7C4DFF;
 }
 
 .rarity-UR {
-  --rarity-color: #ffd773;
+  --rarity-color: #FFD773;
 }
 
 .rarity-PRIME {
-  --rarity-color: #ffffff;
+  --rarity-color: #FFFFFF;
 }
 
 .rarity-aura[data-variant="deck"],
