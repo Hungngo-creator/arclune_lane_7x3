@@ -9,6 +9,17 @@ try {
   realTypescript = null;
 }
 
+if (!realTypescript) {
+  try {
+    const nodeBinDir = path.dirname(process.execPath);
+    const globalTypescriptPath = path.resolve(nodeBinDir, "..", "lib", "node_modules", "typescript");
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    realTypescript = require(globalTypescriptPath);
+  } catch (err) {
+    realTypescript = null;
+  }
+}
+
 let ModuleKind;
 let ScriptTarget;
 let JsxEmit;
