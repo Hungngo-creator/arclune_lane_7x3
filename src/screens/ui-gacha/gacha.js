@@ -9,6 +9,7 @@ const DEFAULT_CURRENCIES = [
 ];
 
 const RANKS = ['N', 'R', 'SR', 'SSR', 'UR', 'Prime'];
+const RARITY_PRIORITY = [...RANKS].reverse();
 
 const DEFAULT_BANNERS = [
   {
@@ -95,6 +96,8 @@ const CURRENCY_FALLBACK_ID = {
 
 let CURRENCIES = cloneDefaultCurrencies();
 let BANNERS = cloneDefaultBanners();
+
+const pityStates = new Map();
 
 const DEFAULT_ICON = 'assets/gem.svg';
 
@@ -354,6 +357,8 @@ const elements = {
   heroRateUp: document.querySelector('[data-slot="hero-rateup"]'),
   heroTimer: document.querySelector('[data-slot="hero-timer"]'),
   pityPills: document.querySelector('[data-slot="pity-pills"]'),
+  pityBar: document.querySelector('.pity__bar'),
+  pityNote: document.querySelector('.pity__note'),
   featuredList: document.querySelector('[data-slot="featured-list"]'),
   detailsButtons: document.querySelectorAll('[data-action="open-rates"]'),
   ctaSingle: document.querySelector('[data-action="summon-single"]'),
@@ -387,6 +392,273 @@ let currentOpenModal = null;
 
 function getCurrencyEntry(id) {
   return CURRENCIES.find((currency) => currency.id === id) ?? null;
+}
+
+function normalizeRankKey(value) {
+  if (typeof value !== 'string') {
+    return null;
+  }
+  const upper = value.trim().toUpperCase();
+  return RANKS.find((rank) => rank.toUpperCase() === upper) ?? null;
+}
+
+function getMappedValue(source, rank) {
+  if (!source) {
+    return null;
+  }
+  const normalized = normalizeRankKey(rank);
+  if (!normalized) {
+    return null;
+  }
+  if (typeof source[normalized] === 'number') {
+    return source[normalized];
+  }
+  const entryKey = Object.keys(source).find(
+    (key) => normalizeRankKey(key) === normalized && typeof source[key] === 'number',
+  );
+  return entryKey ? source[entryKey] : null;
+}
+
+function getPityState(bannerId) {
+  if (!bannerId) {
+    return {
+      counters: Object.fromEntries(RANKS.map((rank) => [rank, 0])),
+      total: 0,
+    };
+  }
+  let state = pityStates.get(bannerId);
+  if (!state) {
+    state = {
+      counters: Object.fromEntries(RANKS.map((rank) => [rank, 0])),
+      total: 0,
+    };
+    pityStates.set(bannerId, state);
+  }
+  return state;
+}
+
+function updatePityCounters(pityState, rarity) {
+  const normalized = normalizeRankKey(rarity);
+  if (!normalized) {
+    return;
+  }
+  pityState.total += 1;
+  const resultIndex = RANKS.indexOf(normalized);
+  RANKS.forEach((rank) => {
+    const rankIndex = RANKS.indexOf(rank);
+    if (resultIndex >= rankIndex) {
+      pityState.counters[rank] = 0;
+    } else {
+      const current = pityState.counters[rank] ?? 0;
+      pityState.counters[rank] = current + 1;
+    }
+  });
+}
+
+function selectHardPityRank(banner, pityState) {
+  const hardMap = banner?.pity?.hard;
+  if (!hardMap) {
+    return null;
+  }
+  const counters = pityState.counters;
+  for (const rarity of RARITY_PRIORITY) {
+    const threshold = getMappedValue(hardMap, rarity);
+    if (typeof threshold !== 'number' || threshold <= 0) {
+      continue;
+    }
+    const normalized = normalizeRankKey(rarity);
+    if (!normalized) {
+      continue;
+    }
+    const current = counters[normalized] ?? 0;
+    if (current + 1 >= threshold) {
+      return normalized;
+    }
+  }
+  return null;
+}
+
+function applySoftPityBonus(baseRate, rarity, pityState, banner) {
+  const softMap = banner?.pity?.soft;
+  if (!softMap) {
+    return baseRate;
+  }
+  const normalized = normalizeRankKey(rarity);
+  if (!normalized) {
+    return baseRate;
+  }
+  const threshold = getMappedValue(softMap, normalized);
+  if (typeof threshold !== 'number' || threshold <= 0) {
+    return baseRate;
+  }
+  const pulls = (pityState.counters[normalized] ?? 0) + 1;
+  if (pulls < threshold) {
+    return baseRate;
+  }
+  const hardThreshold = getMappedValue(banner?.pity?.hard ?? null, normalized);
+  if (typeof hardThreshold === 'number' && hardThreshold <= threshold) {
+    return 1;
+  }
+  if (typeof hardThreshold === 'number' && hardThreshold > threshold) {
+    const span = hardThreshold - threshold;
+    if (span <= 0) {
+      return 1;
+    }
+    const progress = Math.min(span, pulls - threshold + 1);
+    const ratio = progress / span;
+    const bonus = (1 - baseRate) * ratio;
+    return Math.min(1, baseRate + bonus);
+  }
+  const extra = Math.max(0, pulls - threshold + 1);
+  const bonus = baseRate * 0.1 * extra;
+  return Math.min(1, baseRate + bonus);
+}
+
+function computeAdjustedRates(banner, pityState) {
+  const adjusted = {};
+  let total = 0;
+  RANKS.forEach((rank) => {
+    const basePercent = getMappedValue(banner?.rates ?? null, rank);
+    const baseRate = Math.max(0, (typeof basePercent === 'number' ? basePercent : 0) / 100);
+    const withSoftPity = applySoftPityBonus(baseRate, rank, pityState, banner);
+    adjusted[rank] = withSoftPity;
+    total += withSoftPity;
+  });
+  if (total <= 0) {
+    adjusted[RANKS[0]] = 1;
+    total = 1;
+  }
+  const normalized = {};
+  RANKS.forEach((rank) => {
+    const value = adjusted[rank] ?? 0;
+    normalized[rank] = value / total;
+  });
+  return normalized;
+}
+
+function sampleRarityByRate(banner, pityState, rng) {
+  const rates = computeAdjustedRates(banner, pityState);
+  const randomSource = typeof rng === 'function' ? rng : Math.random;
+  let roll = randomSource();
+  if (!Number.isFinite(roll)) {
+    roll = Math.random();
+  }
+  roll = Math.min(Math.max(roll, 0), 0.999999);
+  let cumulative = 0;
+  for (const rank of RANKS) {
+    const portion = rates[rank] ?? 0;
+    cumulative += portion;
+    if (roll <= cumulative) {
+      return rank;
+    }
+  }
+  return RANKS[RANKS.length - 1];
+}
+
+function rollRarity(banner, pityState, rng) {
+  const forced = selectHardPityRank(banner, pityState);
+  const rarity = forced ?? sampleRarityByRate(banner, pityState, rng);
+  updatePityCounters(pityState, rarity);
+  return rarity;
+}
+
+function createSummonCard(banner, rarity, index, rng) {
+  const normalized = normalizeRankKey(rarity) ?? RANKS[0];
+  const pool = Array.isArray(banner?.featured)
+    ? banner.featured.filter((unit) => normalizeRankKey(unit?.rank) === normalized)
+    : [];
+  let chosen = null;
+  if (pool.length > 0) {
+    const randomSource = typeof rng === 'function' ? rng : Math.random;
+    let roll = randomSource();
+    if (!Number.isFinite(roll)) {
+      roll = Math.random();
+    }
+    roll = Math.min(Math.max(roll, 0), 0.999999);
+    const pickIndex = Math.floor(roll * pool.length);
+    chosen = pool[pickIndex] ?? pool[0];
+  }
+  const fallbackName = `Đối tác ${normalized} #${index + 1}`;
+  const uniqueId = chosen?.id ? `${chosen.id}-${Date.now()}-${index}` : `summon-${banner.id}-${Date.now()}-${index}`;
+  return {
+    id: uniqueId,
+    name: chosen?.name ?? fallbackName,
+    description: chosen
+      ? `${chosen.name} (${normalized}) xuất hiện từ ${banner.name}.`
+      : `Triệu hồi hạng ${normalized} từ ${banner.name}.`,
+    rarity: normalized,
+    artwork: chosen?.portrait ?? null,
+  };
+}
+
+async function createSummonResults(banner, amount, options = {}) {
+  const pulls = Math.max(1, Number.isFinite(Number(amount)) ? Number(amount) : 1);
+  const pityState = getPityState(banner?.id ?? null);
+  const payload = options?.payload;
+  const payloadEntries = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.results)
+      ? payload.results
+      : Array.isArray(payload?.cards)
+        ? payload.cards
+        : null;
+  if (payloadEntries) {
+    return payloadEntries.slice(0, pulls).map((entry, index) => {
+      const rarity = normalizeRankKey(entry?.rarity ?? entry?.rank ?? entry?.tier) ?? RANKS[0];
+      updatePityCounters(pityState, rarity);
+      return {
+        id: entry?.id ? String(entry.id) : `summon-${banner.id}-${Date.now()}-${index}`,
+        name: entry?.name ?? entry?.title ?? `Đối tác ${rarity} #${index + 1}`,
+        description:
+          entry?.description ?? entry?.note ?? `Triệu hồi hạng ${rarity} từ ${banner?.name ?? 'Banner'}!`,
+        rarity,
+        artwork: entry?.artwork ?? entry?.icon ?? null,
+      };
+    });
+  }
+
+  const rng = typeof options?.rng === 'function' ? options.rng : Math.random;
+  const cards = [];
+  for (let index = 0; index < pulls; index += 1) {
+    const rarity = rollRarity(banner, pityState, rng);
+    cards.push(createSummonCard(banner, rarity, index, rng));
+  }
+  return cards;
+}
+
+function createPlaceholderResults(banner, amount) {
+  const rarities = RANKS.filter((rank) => (banner.rates?.[rank] ?? 0) > 0);
+  if (!rarities.length) {
+    rarities.push('N');
+  }
+  const cards = [];
+  const featured = Array.isArray(banner.featured) ? banner.featured : [];
+  for (let index = 0; index < Math.max(10, amount); index += 1) {
+    const base = featured.length > 0 ? featured[index % featured.length] : null;
+    const rarity = base?.rank ?? rarities[index % rarities.length];
+    cards.push({
+      id: `fallback-${banner.id}-${index}`,
+      name: base?.name ?? `Đơn vị ${index + 1}`,
+      description: base ? `${base.name} đang được rate-up.` : 'Kết quả minh hoạ.',
+      rarity,
+      artwork: base?.portrait ?? null,
+    });
+  }
+  return cards;
+}
+
+function applySummonCost(cost, status) {
+  if (!cost || !status?.enough) {
+    return null;
+  }
+  const target = status.useFallback && cost.fallback ? cost.fallback : cost;
+  const wallet = getCurrencyEntry(target.currency);
+  if (!wallet) {
+    console.warn('[Gacha] Không tìm thấy loại tiền tệ để trừ chi phí:', target.currency);
+    return null;
+  }
+  wallet.amount = Math.max(0, wallet.amount - target.amount);
+  return { wallet, deducted: target };
 }
 
 function formatNumber(value) {
@@ -632,6 +904,7 @@ function updateHeroSection(banner) {
   }
 
   renderPityPills(banner);
+  updatePityDisplay(banner);
   renderFeatured(banner);
 }
 
@@ -653,6 +926,56 @@ function renderPityPills(banner) {
     pill.className = 'pity-pill';
     pill.textContent = 'Không có bảo hiểm đặc biệt';
     elements.pityPills.appendChild(pill);
+  }
+}
+
+function updatePityDisplay(banner) {
+  if (!elements.pityBar || !elements.pityNote) {
+    return;
+  }
+  if (!banner?.pity) {
+    elements.pityBar.style.setProperty('--pity-progress', '0');
+    elements.pityBar.setAttribute('aria-valuenow', '0');
+    elements.pityBar.setAttribute('aria-valuemax', '100');
+    elements.pityNote.textContent = 'Banner này không thiết lập bảo hiểm.';
+    return;
+  }
+
+  const state = getPityState(banner.id);
+  const { soft, hard } = banner.pity;
+  let targetRank = null;
+  let threshold = null;
+  for (const rank of RARITY_PRIORITY) {
+    const hardValue = getMappedValue(hard ?? null, rank);
+    const softValue = getMappedValue(soft ?? null, rank);
+    const candidate = typeof hardValue === 'number' && hardValue > 0 ? hardValue : softValue;
+    if (typeof candidate === 'number' && candidate > 0) {
+      targetRank = normalizeRankKey(rank);
+      threshold = candidate;
+      break;
+    }
+  }
+
+  if (!targetRank || !threshold) {
+    elements.pityBar.style.setProperty('--pity-progress', '0');
+    elements.pityBar.setAttribute('aria-valuenow', '0');
+    elements.pityBar.setAttribute('aria-valuemax', '100');
+    elements.pityNote.textContent = 'Banner này không thiết lập bảo hiểm.';
+    return;
+  }
+
+  const pullsSince = state.counters[targetRank] ?? 0;
+  const progressRatio = threshold > 0 ? Math.min(1, pullsSince / threshold) : 0;
+  elements.pityBar.style.setProperty('--pity-progress', `${progressRatio}`);
+  elements.pityBar.setAttribute('aria-valuemin', '0');
+  elements.pityBar.setAttribute('aria-valuemax', String(threshold));
+  elements.pityBar.setAttribute('aria-valuenow', String(Math.min(pullsSince, threshold)));
+
+  if (pullsSince >= threshold) {
+    elements.pityNote.textContent = `Đã đạt bảo hiểm ${targetRank}!`;
+  } else {
+    const remaining = Math.max(0, threshold - pullsSince);
+    elements.pityNote.textContent = `Còn ${remaining} lượt tới bảo hiểm ${targetRank}.`;
   }
 }
 
@@ -979,48 +1302,76 @@ function handleTabClick(event) {
   activateTab(tab);
 }
 
-function onClickSummon(type) {
+async function onClickSummon(type) {
   const banner = BANNERS.find((entry) => entry.id === state.selectedBannerId) ?? BANNERS[0];
   const amount = type === 'multi' ? 10 : 1;
+  const cost = banner.cost?.[type] ?? null;
+  const status = cost ? hasEnoughCurrency(cost) : null;
+  if (cost && !status?.enough) {
+    updateCurrencyHighlight(banner);
+    return;
+  }
+
   elements.confirmTitle.textContent = `${banner.name} — Summon x${amount}`;
   openModal(modals.confirm);
-  renderConfirmGacha(banner, amount);
+
+  try {
+    await renderConfirmGacha(banner, amount, { cost, status });
+  } catch (error) {
+    console.error('[Gacha] Không thể hiển thị kết quả triệu hồi:', error);
+  }
 }
 
-function renderConfirmGacha(banner, amount) {
-  const cards = createMockResults(banner, amount);
+async function renderConfirmGacha(banner, amount, options = {}) {
+  const { cost = null, status = null, payload = null, rng = null, onRevealDone = null } = options;
+
+  let cards;
+  try {
+    cards = await createSummonResults(banner, amount, { payload, rng });
+  } catch (error) {
+    console.error('[Gacha] Lỗi khi tạo kết quả triệu hồi:', error);
+    cards = createPlaceholderResults(banner, amount);
+  }
+
+  const titleText = `Kết quả triệu hồi x${amount}`;
+  const handleRevealDone = () => {
+    updatePityDisplay(banner);
+    if (typeof onRevealDone === 'function') {
+      onRevealDone();
+    }
+  };
+
   if (!confirmViewHandle) {
     confirmViewHandle = renderGachaView({
       root: elements.confirmRoot,
-      title: `Kết quả mô phỏng x${amount}`,
+      title: titleText,
       subtitle: banner.name,
       cards,
-      onRevealDone: null,
+      onRevealDone: handleRevealDone,
     });
   } else {
     confirmViewHandle.updateCards(cards);
   }
-}
 
-function createMockResults(banner, amount) {
-  const rarities = RANKS.filter((rank) => (banner.rates?.[rank] ?? 0) > 0);
-  if (!rarities.length) {
-    rarities.push('N');
+const titleEl = confirmViewHandle.section.querySelector('.gacha-view__title');
+  if (titleEl) {
+    titleEl.textContent = titleText;
   }
-  const cards = [];
-  const featured = Array.isArray(banner.featured) ? banner.featured : [];
-  for (let index = 0; index < Math.max(10, amount); index += 1) {
-    const base = featured.length > 0 ? featured[index % featured.length] : null;
-    const rarity = base?.rank ?? rarities[index % rarities.length];
-    cards.push({
-      id: `demo-${index}`,
-      name: base?.name ?? `Đơn vị ${index + 1}`,
-      description: base ? `${base.name} đang được rate-up.` : 'Kết quả minh hoạ.',
-      rarity,
-      artwork: base?.portrait ?? null,
-    });
+  const subtitleEl = confirmViewHandle.section.querySelector('.gacha-view__subtitle');
+  if (subtitleEl) {
+    subtitleEl.textContent = banner.name;
   }
-  return cards;
+
+  confirmViewHandle.setRevealDoneCallback(handleRevealDone);
+
+  if (cost && status?.enough) {
+    applySummonCost(cost, status);
+    renderCurrencies(CURRENCIES);
+    updateCTASection(banner);
+  }
+
+  updatePityDisplay(banner);
+  confirmViewHandle?.reveal();
 }
 
 function activateTab(tabId) {

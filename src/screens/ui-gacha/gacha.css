@@ -448,8 +448,9 @@ button {
   position: absolute;
   inset: 0;
   background: linear-gradient(90deg, rgba(124, 77, 255, 0.4), rgba(0, 229, 255, 0.35));
-  transform: scaleX(0);
+  transform: scaleX(var(--pity-progress, 0));
   transform-origin: left;
+  transition: transform 0.3s ease;
 }
 
 .pity__note {
