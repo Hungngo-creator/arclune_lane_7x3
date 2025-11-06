@@ -107,7 +107,13 @@ export const ROSTER = [
         name: 'Đánh Thường',
         tags: ['single-target', 'lifesteal', 'mark'],
         lifesteal: 0.10,
-        mark: { id: 'mark_devour', maxStacks: 3, ttlTurns: 3 }
+        mark: {
+          id: 'mark_devour',
+          maxStacks: 3,
+          ttlTurns: 3,
+          perTurnLimit: 2,
+          explosion: { trigger: 'targetTurnStart', scaleWIL: 0.5 }
+        }
       }),
       skills: asUnknownRecordArray([
         {
@@ -117,44 +123,50 @@ export const ROSTER = [
           hits: 2,
           countsAsBasic: true,
           targets: 'randomEnemies',
-          notes: 'Mỗi hit làm mới thời hạn Phệ Ấn.'
+          damageMultiplier: 1.30,
+          notes: 'Mỗi hit tính là đòn đánh thường, làm mới thời hạn Phệ Ấn và tôn trọng trần 2 Ấn / mục tiêu / lượt.'
         },
         {
           key: 'skill2',
           name: 'Huyết Chướng',
-          cost: { aether: 25 },
+          cost: { aether: 20 },
           duration: 2,
           reduceDamage: 0.30,
           healPercentMaxHPPerTurn: 0.15,
-          untargetable: true
+          untargetable: { singleTargetOnly: true },
+          damageDealtModifier: -0.30,
+          notes: 'Giảm 30% sát thương gây ra trong thời gian hiệu lực và chỉ miễn khỏi việc bị chỉ định bởi đòn đơn mục tiêu.'
         },
         {
           key: 'skill3',
           name: 'Huyết Thệ',
-          cost: { aether: 40 },
-          duration: 5,
-          link: { sharePercent: 0.5, maxLinks: 1 }
+          cost: { aether: 35 },
+          duration: 4,
+          link: { sharePercent: 0.5, maxLinks: 1 },
+          notes: 'Liên kết tự chấm dứt nếu mục tiêu rời sân; sát thương chuyển tiếp không thể bị chuyển lần hai.'
         }
       ]),
       ult: asUnknownRecord({
         type: 'drain',
         countsAsBasic: true,
         aoe: 'allEnemies',
-        hpDrainPercentCurrent: 0.07,
-        damageScaleWIL: 0.80,
-        healSelfFromTotal: 0.40,
-        healAlliesFromTotal: 0.30,
-        overhealShieldCap: 1.0,
+        hpDrainPercentCurrent: 0.08,
+        damageScaleWIL: 0.65,
+        healSelfFromTotal: 0.35,
+        healAlliesFromTotal: { percent: 0.25, targets: 2 },
+        overhealShieldCap: 0.6,
         selfBuff: { stat: 'WIL', amount: 0.20, turns: 2 },
         marksPerTarget: 1,
-        notes: 'Không thể né; mỗi mục tiêu nhận thêm 1 Phệ Ấn.'
+        notes: 'Không thể né; mỗi mục tiêu nhận thêm 1 Phệ Ấn (tuân thủ giới hạn 2 Ấn mỗi lượt).' 
       }),
       talent: asUnknownRecord({
         name: 'Phệ Ấn',
         id: 'mark_devour',
         maxStacks: 3,
         ttlTurns: 3,
-        explosion: { scaleWIL: 0.50 },
+        perTurnLimit: 2,
+        explosion: { scaleWIL: 0.50, trigger: 'targetTurnStart' },
+        decayIfNoRefreshTurns: 3,
         blessing: { hpMax: 0.15, hpRegen: 0.50 }
       }),
       technique: null,
@@ -162,15 +174,22 @@ export const ROSTER = [
         {
           id: 'mark_devour',
           name: 'Phệ Ấn',
-          when: 'onBasicHit',
+          when: 'onAbilityHit',
           effect: 'placeMark',
-          params: { stacksToExplode: 3, ttlTurns: 3, dmgFromWIL: 0.5, purgeable: false }
+          params: {
+            stacksToExplode: 3,
+            ttlTurns: 3,
+            dmgFromWIL: 0.5,
+            perTargetPerTurn: 2,
+            purgeable: false,
+            decayIfNoRefreshTurns: 3
+          }
         }
       ]),
       traits: asUnknownRecordArray([
-        { id: 'mark_cap', text: 'Phệ Ấn tối đa 3 tầng và tự kích nổ vào lượt của mục tiêu.' },
-        { id: 'overheal_cap', text: 'Hút máu dư chuyển thành Giáp Máu tối đa bằng 100% Máu tối đa.' },
-        { id: 'link_limit', text: 'Chỉ duy trì 1 liên kết Huyết Thệ cùng lúc.' }
+        { id: 'mark_cap', text: 'Mỗi mục tiêu chỉ nhận tối đa 2 Phệ Ấn mỗi lượt; đạt 3 tầng sẽ nổ ở đầu lượt của chính mục tiêu.' },
+        { id: 'overheal_cap', text: 'Hút máu dư chuyển thành Giáp Máu với trần +60% Máu tối đa.' },
+        { id: 'link_limit', text: 'Chỉ duy trì 1 liên kết Huyết Thệ cùng lúc; liên kết tự hủy khi mục tiêu rời sân.' }
       ])
     }
   },
@@ -206,7 +225,8 @@ export const ROSTER = [
           cost: { aether: 25 },
           delayTurns: 1,
           duration: 3,
-          buffStats: { ATK: 0.20, WIL: 0.20 }
+          buffStats: { ATK: 0.23, WIL: 0.23 },
+          notes: 'Hiệu lực bắt đầu từ lượt kế tiếp và dựa trên chỉ số hiện có khi kích hoạt.'
         }
       ]),
       ult: asUnknownRecord({
@@ -239,9 +259,9 @@ export const ROSTER = [
         }
       ]),
       traits: asUnknownRecordArray([
-        { id: 'stance_unique', text: 'Ngũ Kiếm Huyền Ấn chỉ chọn 1 trạng thái cho tới hết trận.' },
-        { id: 'refine_delay', text: 'Kiếm Ý Tinh Luyện kích hoạt sau 1 lượt trì hoãn.' },
-        { id: 'ult_scaling', text: 'Mỗi lần dùng Vạn Kiếm Quy Tông cộng vĩnh viễn +5% ATK/WIL (không giới hạn).' }
+        { id: 'stance_unique', text: 'Ngũ Kiếm Huyền Ấn chỉ duy trì một Ấn Kiếm duy nhất tới hết trận.' },
+        { id: 'refine_delay', text: 'Kiếm Ý Tinh Luyện kích hoạt sau 1 lượt trì hoãn dựa trên chỉ số hiện có.' },
+        { id: 'ult_scaling', text: 'Mỗi lần dùng Vạn Kiếm Quy Tông cộng vĩnh viễn +5% ATK/WIL dựa trên chỉ số khởi trận.' }
       ])
     }
   },
@@ -264,7 +284,9 @@ export const ROSTER = [
           hits: 3,
           countsAsBasic: true,
           targets: 'randomEnemies',
-          bonusIfAdjacent: 0.10
+          damageMultiplier: 1.10,
+          bonusIfAdjacent: 0.10,
+          notes: 'Được tính là đòn đánh thường; nếu 3 mục tiêu đứng liền kề sẽ nhận thêm 10% sát thương.'
         },
         {
           key: 'skill2',
@@ -272,7 +294,9 @@ export const ROSTER = [
           cost: { aether: 35 },
           hpTradePercent: 0.05,
           hits: 5,
-          targets: 'randomEnemies'
+          targets: 'randomEnemies',
+          damageMultiplier: 1.30,
+          notes: 'Không tính là đòn đánh thường; vẫn kích hoạt thiêu đốt HP và giữ giới hạn tối thiểu 1 HP.'
         },
         {
           key: 'skill3',
@@ -291,7 +315,7 @@ export const ROSTER = [
         reduceDmg: 0.30,
         duration: 2,
         appliesDebuff: { stat: 'SPD', amount: -0.02, maxStacks: 5 },
-        notes: 'Không tự sát, tối thiểu còn 1 HP.'
+        notes: 'Không tự sát, tối thiểu còn 1 HP; mỗi hit tính là đòn đánh thường và cộng tầng giảm SPD.'
       }),
       talent: asUnknownRecord({
         name: 'Song Thể Lôi Đạo',
@@ -335,7 +359,8 @@ export const ROSTER = [
           cost: { aether: 25 },
           hits: 3,
           countsAsBasic: true,
-          targets: 'randomEnemies'
+          targets: 'randomEnemies',
+          notes: 'Mỗi hit cộng 1 tầng Mê Hoặc lên mục tiêu trúng đòn.'
         },
         {
           key: 'skill2',
@@ -343,7 +368,8 @@ export const ROSTER = [
           cost: { aether: 35 },
           hits: 5,
           countsAsBasic: true,
-          targets: 'randomEnemies'
+          targets: 'randomEnemies',
+          notes: 'Mỗi hit cộng 1 tầng Mê Hoặc lên mục tiêu trúng đòn.'
         },
         {
           key: 'skill3',
@@ -369,7 +395,7 @@ export const ROSTER = [
         }
       ]),
       traits: asUnknownRecordArray([
-        { id: 'me_hoac_limit', text: 'Tối đa 4 tầng Mê Hoặc, kích hoạt ngủ trong 1 lượt rồi đặt lại.' },
+        { id: 'me_hoac_limit', text: 'Tối đa 4 tầng Mê Hoặc, kích hoạt ngủ trong 1 lượt rồi đặt lại (không thể bị xoá trước khi kích hoạt).' },
         { id: 'boss_sleep_half', text: 'Boss PvE chỉ ngủ nửa thời gian (làm tròn xuống).' }
       ])
     }
@@ -408,7 +434,7 @@ export const ROSTER = [
           name: 'Phục Tế Khôi Minh',
           when: 'onActionEnd',
           effect: 'gainRES%',
-          params: { amount: 0.01, stack: true, purgeable: false }
+          params: { amount: 0.03, stack: true, purgeable: false }
         }
       ]),
       traits: asUnknownRecordArray([
@@ -439,8 +465,8 @@ export const ROSTER = [
       technique: null,
       passives: asUnknownRecordArray([]),
       traits: asUnknownRecordArray([
-      { id: 'hp_balance', text: 'Cân bằng HP không vượt quá ngưỡng tối đa và bỏ qua Leader.' },
-      { id: 'hp_gain_cap', text: 'Cân Bằng Sinh Mệnh chỉ dùng tối đa 5 lần mỗi trận.' }
+       { id: 'hp_balance', text: 'Cân bằng HP không vượt quá ngưỡng tối đa và bỏ qua Leader.' },
+       { id: 'hp_gain_cap', text: 'Cân Bằng Sinh Mệnh chỉ dùng tối đa 5 lần mỗi trận.' }
       ])
     }
   },
@@ -477,7 +503,7 @@ export const ROSTER = [
       talent: asUnknownRecord({
         name: 'Đại Ca Đầu Đàn',
         perMinionBasicBonus: 0.15,
-        onMinionDeath: { stats: { ATK: 0.05, WIL: 0.05 }, maxStacks: 3 }
+        onMinionDeath: { stats: { ATK: 0.05, WIL: 0.05 }, maxStacks: null }
       }),
       technique: null,
       passives: asUnknownRecordArray([
@@ -486,7 +512,7 @@ export const ROSTER = [
           name: 'Đại Ca Đầu Đàn',
           when: 'onBasicHit',
           effect: 'gainBonus',
-          params: { perMinion: 0.02 }
+          params: { perMinion: 0.15 }
         }
       ]),
       traits: asUnknownRecordArray([
