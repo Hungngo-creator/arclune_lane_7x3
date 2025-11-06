@@ -345,42 +345,54 @@ async function loadEconomyFromConfig() {
   }
 }
 
-const elements = {
-  app: document.querySelector('[data-app-root]'),
-  currencyHeader: document.querySelector('[data-slot="currencies"]'),
-  bannerList: document.querySelector('[data-slot="banner-list"]'),
-  hero: document.querySelector('[data-slot="hero"]'),
-  heroBackground: document.querySelector('.hero__background'),
-  heroType: document.querySelector('[data-slot="hero-type"]'),
-  heroTitle: document.querySelector('[data-slot="hero-title"]'),
-  heroSubtitle: document.querySelector('[data-slot="hero-subtitle"]'),
-  heroRateUp: document.querySelector('[data-slot="hero-rateup"]'),
-  heroTimer: document.querySelector('[data-slot="hero-timer"]'),
-  pityPills: document.querySelector('[data-slot="pity-pills"]'),
-  pityBar: document.querySelector('.pity__bar'),
-  pityNote: document.querySelector('.pity__note'),
-  featuredList: document.querySelector('[data-slot="featured-list"]'),
-  detailsButtons: document.querySelectorAll('[data-action="open-rates"]'),
-  ctaSingle: document.querySelector('[data-action="summon-single"]'),
-  ctaMulti: document.querySelector('[data-action="summon-multi"]'),
-  confirmTitle: document.querySelector('[data-slot="confirm-title"]'),
-  confirmRoot: document.querySelector('[data-gacha-root]'),
-  helpButton: document.querySelector('.help-button'),
-  drawerToggle: document.querySelector('[data-action="toggle-drawer"]'),
-};
+const AUTO_BOOT_FLAG = '__ARC_GACHA_EMBED__';
 
-const modals = {
-  rates: document.querySelector('[data-modal="rates"]'),
-  confirm: document.querySelector('[data-modal="confirm"]'),
-};
+function createEmptyElements() {
+  return {
+    app: null,
+    currencyHeader: null,
+    bannerList: null,
+    hero: null,
+    heroBackground: null,
+    heroType: null,
+    heroTitle: null,
+    heroSubtitle: null,
+    heroRateUp: null,
+    heroTimer: null,
+    pityPills: null,
+    pityBar: null,
+    pityNote: null,
+    featuredList: null,
+    detailsButtons: [],
+    ctaSingle: null,
+    ctaMulti: null,
+    confirmTitle: null,
+    confirmRoot: null,
+    helpButton: null,
+    drawerToggle: null,
+  };
+}
 
-const panels = {
-  rates: modals.rates.querySelector('[data-panel="rates"]'),
-  pity: modals.rates.querySelector('[data-panel="pity"]'),
-  featured: modals.rates.querySelector('[data-panel="featured"]'),
-};
+function createEmptyModals() {
+  return {
+    rates: null,
+    confirm: null,
+  };
+}
 
-const tabs = Array.from(modals.rates.querySelectorAll('.modal__tabs [role="tab"]'));
+function createEmptyPanels() {
+  return {
+    rates: null,
+    pity: null,
+    featured: null,
+  };
+}
+
+let currentScope = null;
+let elements = createEmptyElements();
+let modals = createEmptyModals();
+let panels = createEmptyPanels();
+let tabs = [];
 
 let state = {
   selectedBannerId: BANNERS[0]?.id ?? null,
@@ -390,6 +402,105 @@ let state = {
 let confirmViewHandle = null;
 let currentOpenModal = null;
 let confirmFlowCompleteHandler = null;
+let trackedListeners = [];
+let mounted = false;
+
+function toQueryRoot(scope) {
+  if (scope && typeof scope.querySelector === 'function') {
+    return scope;
+  }
+  if (scope && typeof scope.getRootNode === 'function') {
+    const rootNode = scope.getRootNode();
+    if (rootNode && typeof rootNode.querySelector === 'function') {
+      return rootNode;
+    }
+  }
+  if (typeof document !== 'undefined') {
+    return document;
+  }
+  return scope;
+}
+
+function captureElements(scope) {
+  const root = toQueryRoot(scope);
+  return {
+    app: root?.querySelector?.('[data-app-root]') ?? null,
+    currencyHeader: root?.querySelector?.('[data-slot="currencies"]') ?? null,
+    bannerList: root?.querySelector?.('[data-slot="banner-list"]') ?? null,
+    hero: root?.querySelector?.('[data-slot="hero"]') ?? null,
+    heroBackground: root?.querySelector?.('.hero__background') ?? null,
+    heroType: root?.querySelector?.('[data-slot="hero-type"]') ?? null,
+    heroTitle: root?.querySelector?.('[data-slot="hero-title"]') ?? null,
+    heroSubtitle: root?.querySelector?.('[data-slot="hero-subtitle"]') ?? null,
+    heroRateUp: root?.querySelector?.('[data-slot="hero-rateup"]') ?? null,
+    heroTimer: root?.querySelector?.('[data-slot="hero-timer"]') ?? null,
+    pityPills: root?.querySelector?.('[data-slot="pity-pills"]') ?? null,
+    pityBar: root?.querySelector?.('.pity__bar') ?? null,
+    pityNote: root?.querySelector?.('.pity__note') ?? null,
+    featuredList: root?.querySelector?.('[data-slot="featured-list"]') ?? null,
+    detailsButtons: Array.from(root?.querySelectorAll?.('[data-action="open-rates"]') ?? []),
+    ctaSingle: root?.querySelector?.('[data-action="summon-single"]') ?? null,
+    ctaMulti: root?.querySelector?.('[data-action="summon-multi"]') ?? null,
+    confirmTitle: root?.querySelector?.('[data-slot="confirm-title"]') ?? null,
+    confirmRoot: root?.querySelector?.('[data-gacha-root]') ?? null,
+    helpButton: root?.querySelector?.('.help-button') ?? null,
+    drawerToggle: root?.querySelector?.('[data-action="toggle-drawer"]') ?? null,
+  };
+}
+
+function captureModals(scope) {
+  const root = toQueryRoot(scope);
+  return {
+    rates: root?.querySelector?.('[data-modal="rates"]') ?? null,
+    confirm: root?.querySelector?.('[data-modal="confirm"]') ?? null,
+  };
+}
+
+function capturePanels(modalRefs) {
+  const ratesModal = modalRefs.rates;
+  return {
+    rates: ratesModal?.querySelector?.('[data-panel="rates"]') ?? null,
+    pity: ratesModal?.querySelector?.('[data-panel="pity"]') ?? null,
+    featured: ratesModal?.querySelector?.('[data-panel="featured"]') ?? null,
+  };
+}
+
+function captureTabs(modalRefs) {
+  return Array.from(modalRefs.rates?.querySelectorAll?.('.modal__tabs [role="tab"]') ?? []);
+}
+
+function resetDomReferences(scope) {
+  currentScope = scope;
+  elements = captureElements(scope);
+  modals = captureModals(scope);
+  panels = capturePanels(modals);
+  tabs = captureTabs(modals);
+}
+
+function trackListener(target, type, handler) {
+  if (!target || typeof target.addEventListener !== 'function' || typeof handler !== 'function') {
+    return;
+  }
+  target.addEventListener(type, handler);
+  trackedListeners.push(() => {
+    try {
+      target.removeEventListener(type, handler);
+    } catch (error) {
+      console.warn('[Gacha UI] Không thể gỡ listener:', error);
+    }
+  });
+}
+
+function resetListeners() {
+  trackedListeners.forEach((remove) => {
+    try {
+      remove();
+    } catch (error) {
+      console.warn('[Gacha UI] Lỗi khi gỡ listener:', error);
+    }
+  });
+  trackedListeners = [];
+}
 
 function ensureSelectedBanner(preferredId = null) {
   if (!Array.isArray(BANNERS) || BANNERS.length === 0) {
@@ -1548,32 +1659,36 @@ function setupEventListeners() {
   const handleSummonFlowComplete = () => closeModal(modals.confirm);
   confirmFlowCompleteHandler = handleSummonFlowComplete;
 
-  elements.confirmRoot?.addEventListener('summon:flow-complete', handleSummonFlowComplete);
+  trackListener(elements.confirmRoot, 'summon:flow-complete', handleSummonFlowComplete);
 
   elements.detailsButtons.forEach((button) => {
-    button.addEventListener('click', () => {
+    trackListener(button, 'click', () => {
       const banner = ensureSelectedBanner(state.selectedBannerId) ?? BANNERS[0];
       populateRatesModal(banner);
       openModal(modals.rates);
     });
   });
 
-  modals.rates.querySelectorAll('[data-action="close-modal"]').forEach((button) => {
-    button.addEventListener('click', () => closeModal(modals.rates));
+  Array.from(modals.rates?.querySelectorAll?.('[data-action="close-modal"]') ?? []).forEach((button) => {
+    trackListener(button, 'click', () => closeModal(modals.rates));
   });
-  modals.confirm.querySelectorAll('[data-action="close-modal"]').forEach((button) => {
-    button.addEventListener('click', () => closeModal(modals.confirm));
+  Array.from(modals.confirm?.querySelectorAll?.('[data-action="close-modal"]') ?? []).forEach((button) => {
+    trackListener(button, 'click', () => closeModal(modals.confirm));
   });
 
-  modals.rates.querySelector('.modal__overlay')?.addEventListener('click', () => closeModal(modals.rates));
-  modals.confirm.querySelector('.modal__overlay')?.addEventListener('click', () => closeModal(modals.confirm));
+  const ratesOverlay = modals.rates?.querySelector?.('.modal__overlay');
+  const confirmOverlay = modals.confirm?.querySelector?.('.modal__overlay');
+  trackListener(ratesOverlay, 'click', () => closeModal(modals.rates));
+  trackListener(confirmOverlay, 'click', () => closeModal(modals.confirm));
 
-  tabs.forEach((tab) => tab.addEventListener('click', handleTabClick));
+  tabs.forEach((tab) => {
+    trackListener(tab, 'click', handleTabClick);
+  });
 
-  elements.ctaSingle?.addEventListener('click', () => onClickSummon('single'));
-  elements.ctaMulti?.addEventListener('click', () => onClickSummon('multi'));
+  trackListener(elements.ctaSingle, 'click', () => onClickSummon('single'));
+  trackListener(elements.ctaMulti, 'click', () => onClickSummon('multi'));
 
-  elements.drawerToggle?.addEventListener('click', () => toggleDrawer());
+  trackListener(elements.drawerToggle, 'click', () => toggleDrawer());
 }
 
 async function init() {
@@ -1604,6 +1719,61 @@ async function init() {
   }
 }
 
-init().catch((error) => {
-  console.error('[Gacha UI] Lỗi khi khởi tạo giao diện gacha:', error);
-});
+function destroyGachaUIInternal() {
+  if (currentOpenModal) {
+    closeModal(currentOpenModal);
+  }
+  resetListeners();
+  if (typeof document !== 'undefined') {
+    document.removeEventListener('keydown', handleGlobalKeyDown);
+  }
+  if (confirmViewHandle && typeof confirmViewHandle.destroy === 'function') {
+    confirmViewHandle.destroy();
+  }
+  confirmViewHandle = null;
+  confirmFlowCompleteHandler = null;
+  currentOpenModal = null;
+  if (elements.app) {
+    elements.app.removeAttribute('data-drawer-open');
+  }
+  elements = createEmptyElements();
+  modals = createEmptyModals();
+  panels = createEmptyPanels();
+  tabs = [];
+  state = {
+    selectedBannerId: BANNERS[0]?.id ?? null,
+    drawerOpen: false,
+  };
+  currentScope = null;
+  mounted = false;
+}
+
+export async function mountGachaUI(scope = null) {
+  destroyGachaUIInternal();
+  resetDomReferences(scope);
+  if (!elements.app) {
+    throw new Error('[Gacha UI] Không tìm thấy phần tử gacha-app để khởi tạo.');
+  }
+
+  try {
+    await init();
+    mounted = true;
+  } catch (error) {
+    destroyGachaUIInternal();
+    throw error;
+  }
+
+  return {
+    destroy: destroyGachaUIInternal,
+  };
+}
+
+export function destroyGachaUI() {
+  destroyGachaUIInternal();
+}
+
+if (typeof window !== 'undefined' && !(window?.[AUTO_BOOT_FLAG])) {
+  mountGachaUI(document).catch((error) => {
+    console.error('[Gacha UI] Lỗi khi khởi tạo giao diện gacha:', error);
+  });
+}

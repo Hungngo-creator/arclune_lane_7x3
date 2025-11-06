@@ -25,7 +25,8 @@
   box-sizing: border-box;
 }
 
-body.gacha-page {
+body.gacha-page,
+.gacha-page {
   margin: 0;
   background: var(--bg-page);
   color: var(--text-main);
@@ -887,7 +888,8 @@ button {
 }
 
 @media (max-width: 960px) {
-  body.gacha-page {
+  body.gacha-page,
+  .gacha-page {
     padding: 16px;
   }
 
@@ -921,7 +923,8 @@ button {
 }
 
 @media (max-width: 720px) {
-  body.gacha-page {
+  body.gacha-page,
+  .gacha-page {
     padding: 12px;
   }
 
