@@ -62,6 +62,7 @@ const LEGACY_MODULE_ID_ALIAS_ENTRIES = [
   ['./screens/gacha/view.js', './screens/gacha/view.ts'],
   ['./screens/lineup/index.js', './screens/lineup/index.ts'],
   ['./screens/ui-gacha/index.js', './screens/ui-gacha/index.ts'],
+  ['./screens/ui-gacha/gacha.js', './screens/ui-gacha/gacha.ts'],
   ['@modes/coming-soon.stub.ts', './modes/coming-soon.stub.ts'],
   ['@modes/pve/session.ts', './modes/pve/session.ts'],
   ['@screens/gacha/view.js', './screens/gacha/view.ts'],
