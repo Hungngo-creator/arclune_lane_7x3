@@ -389,6 +389,33 @@ let state = {
 
 let confirmViewHandle = null;
 let currentOpenModal = null;
+let confirmFlowCompleteHandler = null;
+
+function ensureSelectedBanner(preferredId = null) {
+  if (!Array.isArray(BANNERS) || BANNERS.length === 0) {
+    if (state.selectedBannerId !== null) {
+      state = { ...state, selectedBannerId: null };
+    }
+    return null;
+  }
+
+  const preferred = preferredId ? BANNERS.find((banner) => banner.id === preferredId) : null;
+  const current = preferred ?? BANNERS.find((banner) => banner.id === state.selectedBannerId) ?? BANNERS[0] ?? null;
+  const nextId = current?.id ?? null;
+  if (nextId !== state.selectedBannerId) {
+    state = { ...state, selectedBannerId: nextId };
+  }
+  return current;
+}
+
+function pruneStalePityStates() {
+  const validIds = new Set(BANNERS.map((banner) => banner.id));
+  Array.from(pityStates.keys()).forEach((bannerId) => {
+    if (!validIds.has(bannerId)) {
+      pityStates.delete(bannerId);
+    }
+  });
+}
 
 function getCurrencyEntry(id) {
   return CURRENCIES.find((currency) => currency.id === id) ?? null;
@@ -770,6 +797,7 @@ function getBannerAuraClass(banner) {
 
 function renderBannerList(banners) {
   elements.bannerList.replaceChildren();
+  ensureSelectedBanner();
   banners.forEach((banner) => {
     const card = document.createElement('button');
     card.type = 'button';
@@ -849,8 +877,11 @@ function renderBannerList(banners) {
 }
 
 function selectBanner(id, options = { focus: true }) {
-  const banner = BANNERS.find((entry) => entry.id === id) ?? BANNERS[0];
-  state = { ...state, selectedBannerId: banner.id };
+  const banner = ensureSelectedBanner(id);
+  if (!banner) {
+    updateBannerSelection();
+    return;
+  }
   updateBannerSelection();
   updateHeroSection(banner);
   updateCTASection(banner);
@@ -875,6 +906,22 @@ function updateBannerSelection() {
 }
 
 function updateHeroSection(banner) {
+  if (!banner) {
+    elements.heroType.textContent = '';
+    elements.heroTitle.textContent = 'Không có banner khả dụng';
+    elements.heroSubtitle.textContent = '';
+    elements.heroBackground.style.backgroundImage = '';
+    elements.heroTimer.textContent = '';
+    elements.heroTimer.style.display = 'none';
+    elements.heroRateUp.classList.remove('is-visible');
+    elements.heroRateUp.textContent = 'Rate UP';
+    elements.heroRateUp.removeAttribute('title');
+    elements.heroRateUp.removeAttribute('aria-label');
+    renderPityPills(null);
+    updatePityDisplay(null);
+    renderFeatured(null);
+    return;
+  }
   elements.heroType.textContent = bannerTypeLabel(banner);
   elements.heroTitle.textContent = banner.name;
   elements.heroSubtitle.textContent = banner.subtitle ?? '';
@@ -910,17 +957,25 @@ function updateHeroSection(banner) {
 
 function renderPityPills(banner) {
   elements.pityPills.replaceChildren();
-  const { soft, hard } = banner.pity;
-  if (soft) {
-    Object.entries(soft).forEach(([rank, value]) => {
-      elements.pityPills.appendChild(createPityPill(rank, value, 'Soft pity'));
-    });
+  if (!banner?.pity) {
+    const pill = document.createElement('span');
+    pill.className = 'pity-pill';
+    pill.textContent = 'Không có bảo hiểm đặc biệt';
+    elements.pityPills.appendChild(pill);
+    return;
   }
-  if (hard) {
-    Object.entries(hard).forEach(([rank, value]) => {
-      elements.pityPills.appendChild(createPityPill(rank, value, 'Hard pity'));
+
+  const state = banner?.id ? getPityState(banner.id) : { counters: {} };
+  const appendEntries = (entries, kind) => {
+    if (!entries) return;
+    Object.entries(entries).forEach(([rank, value]) => {
+      elements.pityPills.appendChild(createPityPill(rank, value, kind, state));
     });
-  }
+  };
+
+  appendEntries(banner.pity.soft, 'Soft pity');
+  appendEntries(banner.pity.hard, 'Hard pity');
+
   if (!elements.pityPills.childElementCount) {
     const pill = document.createElement('span');
     pill.className = 'pity-pill';
@@ -931,6 +986,17 @@ function renderPityPills(banner) {
 
 function updatePityDisplay(banner) {
   if (!elements.pityBar || !elements.pityNote) {
+    return;
+  }
+  if (!banner) {
+    elements.pityBar.style.setProperty('--pity-progress', '0');
+    elements.pityBar.setAttribute('aria-valuenow', '0');
+    elements.pityBar.setAttribute('aria-valuemax', '100');
+    elements.pityBar.removeAttribute('aria-valuetext');
+    elements.pityBar.dataset.rank = '';
+    elements.pityBar.dataset.threshold = '';
+    elements.pityBar.dataset.progress = '';
+    elements.pityNote.textContent = 'Chưa có banner được chọn.';
     return;
   }
   if (!banner?.pity) {
@@ -965,31 +1031,72 @@ function updatePityDisplay(banner) {
   }
 
   const pullsSince = state.counters[targetRank] ?? 0;
-  const progressRatio = threshold > 0 ? Math.min(1, pullsSince / threshold) : 0;
+  const thresholdValue = Number(threshold) > 0 ? Number(threshold) : 0;
+  const cappedProgress = thresholdValue > 0 ? Math.min(pullsSince, thresholdValue) : pullsSince;
+  const progressRatio = thresholdValue > 0 ? Math.min(1, cappedProgress / thresholdValue) : 0;
   elements.pityBar.style.setProperty('--pity-progress', `${progressRatio}`);
+  elements.pityBar.dataset.rank = targetRank;
+  elements.pityBar.dataset.threshold = String(thresholdValue);
+  elements.pityBar.dataset.progress = String(pullsSince);
   elements.pityBar.setAttribute('aria-valuemin', '0');
-  elements.pityBar.setAttribute('aria-valuemax', String(threshold));
-  elements.pityBar.setAttribute('aria-valuenow', String(Math.min(pullsSince, threshold)));
-
-  if (pullsSince >= threshold) {
-    elements.pityNote.textContent = `Đã đạt bảo hiểm ${targetRank}!`;
+  elements.pityBar.setAttribute('aria-valuemax', String(thresholdValue || 0));
+  elements.pityBar.setAttribute('aria-valuenow', String(cappedProgress));
+  if (thresholdValue > 0) {
+    elements.pityBar.setAttribute(
+      'aria-valuetext',
+      `Đã quay ${cappedProgress}/${thresholdValue} lượt cho bảo hiểm ${targetRank}`,
+    );
   } else {
-    const remaining = Math.max(0, threshold - pullsSince);
-    elements.pityNote.textContent = `Còn ${remaining} lượt tới bảo hiểm ${targetRank}.`;
+    elements.pityBar.removeAttribute('aria-valuetext');
+  }
+
+  if (pullsSince <= 0) {
+    elements.pityNote.textContent = `Chưa có lượt nào cộng dồn cho bảo hiểm ${targetRank}.`;
+    return;
+  }
+
+  if (thresholdValue > 0 && pullsSince >= thresholdValue) {
+    elements.pityNote.textContent = `Đã đạt bảo hiểm ${targetRank}!`;
+    return;
+  }
+
+  if (thresholdValue > 0) {
+    const remaining = Math.max(0, thresholdValue - pullsSince);
+    elements.pityNote.textContent = `Đã quay ${pullsSince}/${thresholdValue} lượt — còn ${remaining} lượt tới bảo hiểm ${targetRank}.`;
+  } else {
+    elements.pityNote.textContent = `Đang cộng dồn bảo hiểm ${targetRank}: ${pullsSince} lượt.`;
   }
 }
 
-function createPityPill(rank, value, kind) {
+function createPityPill(rank, value, kind, state) {
   const pill = document.createElement('span');
   pill.className = 'pity-pill';
-  pill.dataset.rank = rank;
+  const normalized = normalizeRankKey(rank) ?? rank;
+  pill.dataset.rank = normalized;
+  pill.dataset.kind = kind;
+
+  const threshold = typeof value === 'number' ? value : Number.parseInt(value, 10);
+  const current = normalized && state?.counters ? state.counters[normalized] ?? 0 : 0;
+  pill.dataset.threshold = Number.isFinite(threshold) ? String(threshold) : '';
+  pill.dataset.progress = String(current);
 
   const label = document.createElement('span');
   label.className = 'pity-pill__label';
   label.textContent = `${kind}`;
 
   const text = document.createElement('span');
-  text.textContent = `${rank}: ${value}`;
+  text.className = 'pity-pill__value';
+  const target = normalized ?? rank;
+  if (Number.isFinite(threshold) && threshold > 0) {
+    text.textContent = `${target}: ${current}/${threshold}`;
+    const remaining = Math.max(0, threshold - current);
+    pill.title = remaining > 0
+      ? `Còn ${remaining} lượt để đạt ${kind.toLowerCase()} ${target}.`
+      : `Đã đạt ngưỡng ${kind.toLowerCase()} ${target}.`;
+  } else {
+    text.textContent = `${target}: ${value}`;
+    pill.title = `Đang theo dõi ${kind.toLowerCase()} ${target}.`;
+  }
 
   pill.appendChild(label);
   pill.appendChild(text);
@@ -998,7 +1105,7 @@ function createPityPill(rank, value, kind) {
 
 function renderFeatured(banner) {
   elements.featuredList.replaceChildren();
-  if (!banner.featured || banner.featured.length === 0) {
+  if (!banner?.featured || banner.featured.length === 0) {
     const placeholder = document.createElement('p');
     placeholder.className = 'featured__empty';
     placeholder.textContent = 'Không có đối tác rate-up cụ thể.';
@@ -1277,6 +1384,15 @@ function closeModal(modal) {
   }
 }
 
+function emitConfirmEvent(type, detail = null) {
+  if (!elements.confirmRoot) {
+    return;
+  }
+  const payload = detail === undefined ? null : detail;
+  const event = new CustomEvent(type, { detail: payload, bubbles: false });
+  elements.confirmRoot.dispatchEvent(event);
+}
+
 function handleGlobalKeyDown(event) {
   if (event.key === 'Escape' && currentOpenModal) {
     event.preventDefault();
@@ -1289,10 +1405,23 @@ function handleGlobalKeyDown(event) {
 }
 
 function rotateBanner(step) {
-  if (!state.selectedBannerId) return;
-  const index = BANNERS.findIndex((banner) => banner.id === state.selectedBannerId);
+  const currentBanner = ensureSelectedBanner();
+  if (!currentBanner || !Array.isArray(BANNERS) || BANNERS.length === 0) {
+    return;
+  }
+  const index = BANNERS.findIndex((banner) => banner.id === currentBanner.id);
+  if (index === -1) {
+    const fallback = ensureSelectedBanner(BANNERS[0]?.id ?? null);
+    if (fallback) {
+      selectBanner(fallback.id, { focus: true });
+    }
+    return;
+  }
   const nextIndex = (index + step + BANNERS.length) % BANNERS.length;
-  selectBanner(BANNERS[nextIndex].id, { focus: true });
+  const targetBanner = BANNERS[nextIndex];
+  if (targetBanner) {
+    selectBanner(targetBanner.id, { focus: true });
+  }
 }
 
 function handleTabClick(event) {
@@ -1303,7 +1432,11 @@ function handleTabClick(event) {
 }
 
 async function onClickSummon(type) {
-  const banner = BANNERS.find((entry) => entry.id === state.selectedBannerId) ?? BANNERS[0];
+  const banner = ensureSelectedBanner(state.selectedBannerId) ?? BANNERS[0];
+  if (!banner) {
+    console.warn('[Gacha] Không có banner khả dụng để triệu hồi.');
+    return;
+  }
   const amount = type === 'multi' ? 10 : 1;
   const cost = banner.cost?.[type] ?? null;
   const status = cost ? hasEnoughCurrency(cost) : null;
@@ -1315,8 +1448,10 @@ async function onClickSummon(type) {
   elements.confirmTitle.textContent = `${banner.name} — Summon x${amount}`;
   openModal(modals.confirm);
 
+  const flowComplete = confirmFlowCompleteHandler ?? (() => closeModal(modals.confirm));
+
   try {
-    await renderConfirmGacha(banner, amount, { cost, status });
+    await renderConfirmGacha(banner, amount, { cost, status, onRevealDone: flowComplete });
   } catch (error) {
     console.error('[Gacha] Không thể hiển thị kết quả triệu hồi:', error);
   }
@@ -1336,9 +1471,19 @@ async function renderConfirmGacha(banner, amount, options = {}) {
   const titleText = `Kết quả triệu hồi x${amount}`;
   const handleRevealDone = () => {
     updatePityDisplay(banner);
+    renderPityPills(banner);
     if (typeof onRevealDone === 'function') {
       onRevealDone();
     }
+    const pityState = getPityState(banner.id);
+    emitConfirmEvent('summon:flow-complete', {
+      bannerId: banner.id,
+      amount,
+      pity: {
+        counters: { ...pityState.counters },
+        total: pityState.total,
+      },
+    });
   };
 
   if (!confirmViewHandle) {
@@ -1371,6 +1516,7 @@ const titleEl = confirmViewHandle.section.querySelector('.gacha-view__title');
   }
 
   updatePityDisplay(banner);
+  renderPityPills(banner);
   confirmViewHandle?.reveal();
 }
 
@@ -1386,6 +1532,7 @@ function activateTab(tabId) {
 }
 
 function toggleDrawer(forceState) {
+  ensureSelectedBanner();
   const nextState = typeof forceState === 'boolean' ? forceState : !state.drawerOpen;
   state = { ...state, drawerOpen: nextState };
   elements.app?.setAttribute('data-drawer-open', nextState ? 'true' : 'false');
@@ -1398,9 +1545,14 @@ function toggleDrawer(forceState) {
 }
 
 function setupEventListeners() {
+  const handleSummonFlowComplete = () => closeModal(modals.confirm);
+  confirmFlowCompleteHandler = handleSummonFlowComplete;
+
+  elements.confirmRoot?.addEventListener('summon:flow-complete', handleSummonFlowComplete);
+
   elements.detailsButtons.forEach((button) => {
     button.addEventListener('click', () => {
-      const banner = BANNERS.find((entry) => entry.id === state.selectedBannerId) ?? BANNERS[0];
+      const banner = ensureSelectedBanner(state.selectedBannerId) ?? BANNERS[0];
       populateRatesModal(banner);
       openModal(modals.rates);
     });
@@ -1428,15 +1580,17 @@ async function init() {
   const { currencies, banners } = await loadEconomyFromConfig();
   CURRENCIES = currencies;
   BANNERS = banners;
-
-  if (!state.selectedBannerId || !BANNERS.some((banner) => banner.id === state.selectedBannerId)) {
-    state = { ...state, selectedBannerId: BANNERS[0]?.id ?? null };
-  }
+  pruneStalePityStates();
+  const initialBanner = ensureSelectedBanner();
 
   renderCurrencies(CURRENCIES);
   renderBannerList(BANNERS);
-  if (state.selectedBannerId) {
-    selectBanner(state.selectedBannerId, { focus: false });
+  if (initialBanner?.id) {
+    selectBanner(initialBanner.id, { focus: false });
+  } else if (BANNERS[0]?.id) {
+    selectBanner(BANNERS[0].id, { focus: false });
+  } else {
+    updateHeroSection(null);
   }
   setupEventListeners();
   if (elements.helpButton) {
