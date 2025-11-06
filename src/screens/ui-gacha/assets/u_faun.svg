@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 200" preserveAspectRatio="xMidYMid meet">
+  <rect width="160" height="200" rx="22" fill="rgba(16,44,28,0.95)"/>
+  <circle cx="80" cy="78" r="48" fill="rgba(132,212,172,0.62)"/>
+  <path d="M24 148 C44 122 116 122 136 148 L136 190 L24 190 Z" fill="rgba(80,160,110,0.65)"/>
+  <text x="80" y="178" font-family="sans-serif" font-size="28" text-anchor="middle" fill="rgba(226,250,234,0.9)">FA</text>
+</svg>

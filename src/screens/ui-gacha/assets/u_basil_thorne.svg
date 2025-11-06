@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 200" preserveAspectRatio="xMidYMid meet">
+  <rect width="160" height="200" rx="22" fill="rgba(18,30,26,0.95)"/>
+  <path d="M20 160 C48 120 112 120 140 160 L140 190 L20 190 Z" fill="rgba(60,120,90,0.7)"/>
+  <polygon points="80,30 112,110 48,110" fill="rgba(160,210,180,0.55)"/>
+  <text x="80" y="178" font-family="sans-serif" font-size="26" text-anchor="middle" fill="rgba(232,248,238,0.88)">BT</text>
+</svg>

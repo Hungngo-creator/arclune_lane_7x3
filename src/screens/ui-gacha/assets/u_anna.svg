@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 200" preserveAspectRatio="xMidYMid meet">
+  <rect width="160" height="200" rx="22" fill="rgba(30,18,36,0.94)"/>
+  <ellipse cx="80" cy="82" rx="52" ry="48" fill="rgba(226,178,196,0.68)"/>
+  <path d="M34 132 C52 112 108 112 126 132 L126 190 L34 190 Z" fill="rgba(168,90,140,0.6)"/>
+  <text x="80" y="178" font-family="serif" font-size="30" text-anchor="middle" fill="rgba(252,236,248,0.9)">AN</text>
+</svg>

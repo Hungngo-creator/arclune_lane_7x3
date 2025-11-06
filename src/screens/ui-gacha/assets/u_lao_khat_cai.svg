@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 200" preserveAspectRatio="xMidYMid meet">
+  <rect width="160" height="200" rx="22" fill="rgba(28,24,18,0.95)"/>
+  <path d="M20 146 L140 146 L140 190 L20 190 Z" fill="rgba(140,104,58,0.7)"/>
+  <path d="M70 36 L90 36 L110 96 L50 96 Z" fill="rgba(214,198,152,0.62)"/>
+  <text x="80" y="178" font-family="sans-serif" font-size="26" text-anchor="middle" fill="rgba(254,244,220,0.88)">LKC</text>
+</svg>

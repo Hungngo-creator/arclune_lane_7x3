@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 200" preserveAspectRatio="xMidYMid meet">
+  <rect width="160" height="200" rx="22" fill="rgba(10,24,42,0.95)"/>
+  <path d="M12 150 C32 120 72 118 108 136 C128 146 148 142 148 142 L148 188 L12 188 Z" fill="rgba(32,132,196,0.65)"/>
+  <path d="M82 40 L98 128 L66 128 Z" fill="rgba(180,236,255,0.55)"/>
+  <circle cx="80" cy="84" r="30" fill="rgba(58,184,230,0.55)"/>
+  <text x="80" y="178" font-family="sans-serif" font-size="28" text-anchor="middle" fill="rgba(224,244,255,0.86)">VT</text>
+</svg>

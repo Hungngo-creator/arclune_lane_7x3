@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 200" preserveAspectRatio="xMidYMid meet">
+  <rect width="160" height="200" rx="22" fill="rgba(14,20,42,0.96)"/>
+  <defs>
+    <linearGradient id="aiLanAura" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="rgba(248,242,252,0.75)"/>
+      <stop offset="100%" stop-color="rgba(66,70,120,0.75)"/>
+    </linearGradient>
+  </defs>
+  <circle cx="56" cy="78" r="34" fill="url(#aiLanAura)"/>
+  <circle cx="108" cy="94" r="36" fill="rgba(32,26,60,0.72)"/>
+  <text x="80" y="178" font-family="sans-serif" font-size="28" text-anchor="middle" fill="rgba(240,232,255,0.9)">AL</text>
+</svg>
