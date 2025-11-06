@@ -1,5 +1,370 @@
 const skillsConfig = [
   {
+    unitId: 'mong_yem',
+    basic: {
+      name: 'Đánh Thường',
+      type: 'basic',
+      tags: ['single-target', 'sleep-setup'],
+      debuffs: [{ id: 'me_hoac', stacks: 1, maxStacks: 3, purgeable: false }],
+      description: 'Tấn công một mục tiêu bằng 100% WIL + ATK và đặt 1 tầng Mê Hoặc (tối đa 3, không thể bị thanh tẩy). Đạt 3 tầng khiến mục tiêu ngủ 1 lượt và đặt lại số tầng.'
+    },
+    skills: [
+      {
+        key: 'skill1',
+        name: 'Huyễn Ảnh Che Màn',
+        type: 'active',
+        cost: { aether: 30 },
+        duration: { turns: 3 },
+        buffs: [{ effect: 'dodgeBasic', amount: 0.50 }],
+        description: 'Bao phủ bản thân bằng ảo ảnh trong 3 lượt: giảm 50% tỉ lệ bị trúng bởi đòn đánh thường. Không ảnh hưởng tới kỹ năng hay tuyệt kỹ của địch.'
+      },
+      {
+        key: 'skill2',
+        name: 'Thụy Ca Tự Miên',
+        type: 'active',
+        cost: { aether: 35 },
+        duration: { turns: 3 },
+        selfStatus: { id: 'tu_mien', kind: 'sleep', cannotAct: true },
+        buffs: [{ effect: 'damageTaken', amount: -0.50 }],
+        stackingBuffs: [{ stats: { ATK: 0.07, WIL: 0.07 }, trigger: 'turnEnd' }],
+        description: 'Ru mình vào giấc ngủ trong tối đa 3 lượt: không thể hành động khi ngủ, sát thương nhận vào giảm 50% và mỗi lượt đang ngủ cộng 7% ATK/WIL. Tự thức khi HP ≤ 30% hoặc người chơi hủy thủ công.'
+      },
+      {
+        key: 'skill3',
+        name: 'Phá Mộng Tàn Ca',
+        type: 'active',
+        cost: { aether: 25 },
+        tags: ['burst'],
+        damage: { multiplier: 1.80 },
+        bonusDamage: { perMark: { id: 'me_hoac', amount: 0.20, maxStacks: 3 } },
+        pierce: { whenTargetSleeping: { arm: 0.30, res: 0.30 } },
+        marks: [{ id: 'me_hoac', stacks: 1, targets: 2, transfer: true }],
+        description: 'Gây 180% sát thương đòn đánh thường lên một mục tiêu. Mỗi tầng Mê Hoặc trên mục tiêu tăng 20% sát thương (tối đa +60%). Nếu mục tiêu đang ngủ, bỏ qua 30% ARM/RES và lan 1 tầng Mê Hoặc sang tối đa 2 kẻ địch khác.'
+      }
+    ],
+    ult: {
+      name: 'Thế Giới Thứ Hai',
+      type: 'ultimate',
+      tags: ['field', 'support'],
+      duration: { turns: 3 },
+      randomBuffs: { allies: 1, enemies: 1 },
+      description: 'Kéo toàn bộ chiến trường vào “Thế Giới Thứ Hai” trong 3 lượt: mỗi đồng minh hiện tại và đồng minh vào sân trong thời gian này nhận một buff ngẫu nhiên; mỗi kẻ địch nhận một debuff ngẫu nhiên. Không gây sát thương trực tiếp.'
+    },
+    talent: {
+      name: 'Mê Ca Dẫn Thụy',
+      type: 'talent',
+      maxStacks: 3,
+      sleepOnCap: { turns: 1 },
+      purgeable: false,
+      description: 'Mọi nguồn sát thương của Mộng Yểm đặt 1 tầng Mê Hoặc (tối đa 3). Đạt 3 tầng khiến mục tiêu ngủ 1 lượt rồi đặt lại về 0 tầng; Mê Hoặc chỉ mất khi ngủ kích hoạt hoặc bị thanh tẩy.'
+    },
+    technique: null,
+    notes: [
+      'Mê Hoặc không tự rơi theo thời gian nhưng bị reset mỗi khi ngủ kích hoạt.',
+      'Thụy Ca Tự Miên cho phép người chơi chạm hai lần vào thẻ nhân vật ở lượt địch để đánh thức sớm.'
+    ]
+  },
+  {
+    unitId: 'chan_nga',
+    basic: {
+      name: 'Đánh Thường',
+      type: 'basic',
+      tags: ['single-target'],
+      description: 'Gây sát thương 100% ATK + WIL lên một mục tiêu.'
+    },
+    skills: [
+      {
+        key: 'skill1',
+        name: 'Liên Ảnh Hồi Tức',
+        type: 'active',
+        cost: { aether: 30 },
+        heals: { selfPercentMaxHP: 0.06, clonePercentMaxHP: 0.04 },
+        description: 'Hồi phục 10% Max HP chia làm hai phần: bản thể nhận 6%, clone nhận 4%. Nếu không có clone, chỉ hồi cho bản thể.'
+      },
+      {
+        key: 'skill2',
+        name: 'Cộng Lực Ảnh Thân',
+        type: 'active',
+        cost: { aether: 25 },
+        duration: { turns: 3 },
+        buffs: [{ stats: { ATK: 0.10, WIL: 0.10 }, targets: 'self+clone' }],
+        description: 'Tăng 10% ATK/WIL cho bản thể và clone trong 3 lượt. Tái kích hoạt chỉ làm mới thời gian.'
+      },
+      {
+        key: 'skill3',
+        name: 'Quy Nhất Bản Ảnh',
+        type: 'active',
+        cost: { aether: 40 },
+        cooldown: 3,
+        requirements: { adjacentClone: true },
+        shields: [{ percentMaxHP: 0.50, duration: { turns: 3 } }],
+        buffs: [{ stats: { ATK: 0.15, WIL: 0.15 }, duration: { turns: 2 } }],
+        description: 'Tiêu biến clone đứng kề để hợp nhất cùng bản thể: nhận khiên bằng 50% Max HP trong 3 lượt và +15% ATK/WIL trong 2 lượt. Không tiêu hao Aether nếu không đáp ứng điều kiện.'
+      }
+    ],
+    ult: {
+      name: 'Thứ Hai Chân Thân',
+      type: 'ultimate',
+      tags: ['summon', 'clone'],
+      hpTrade: { percentCurrentHP: 0.50 },
+      summon: {
+        id: 'chan_nga_clone',
+        inheritPercent: 0.85,
+        ttl: 6,
+        forbiddenSkills: ['Quy Nhất Bản Ảnh'],
+        rageLocked: true
+      },
+      description: 'Chỉ thi triển khi không có clone và HP ≥ 60%. Giảm 50% HP hiện có để triệu hồi “Thứ Hai Chân Thân” với 85% chỉ số hiện tại. Clone tồn tại tối đa 6 lượt, không thể dùng Quy Nhất Bản Ảnh và không tích nộ.'
+    },
+    talent: {
+      name: 'Dự Phòng Chân Thể',
+      type: 'talent',
+      description: 'Vào trận nhận +10% Max HP (không áp dụng cho clone). Khi bản thể tử vong khi clone còn sống, đoạt xá vào clone, đồng thời chịu trạng thái Linh Mệt 3 lượt (khóa tuyệt kỹ, -50% hồi Aether).'
+    },
+    technique: null,
+    notes: [
+      'Clone copy 85% chỉ số tại thời điểm triệu hồi (snapshot buff/debuff).',
+      'Nếu không còn ô trống bên phe mình khi cast ult, kỹ năng thất bại và hoàn lại 50% nộ.'
+    ]
+  },
+  {
+    unitId: 'ma_ton_diep_lam',
+    basic: {
+      name: 'Đánh Thường',
+      type: 'basic',
+      tags: ['single-target', 'mark-builder'],
+      debuffs: [{ id: 'ma_chung', stacks: 1, purgeable: false }],
+      description: 'Gây 100% ATK + WIL lên một mục tiêu và cấy 1 Ma Chủng (không thể bị thanh tẩy, mất sau 3 lượt không được làm mới). Vào trận +10% SPD.'
+    },
+    skills: [
+      {
+        key: 'skill1',
+        name: 'Thôn Chủng Dưỡng Thể',
+        type: 'active',
+        cost: { aether: 30 },
+        consumeMarks: { id: 'ma_chung', scope: 'all' },
+        buffs: [{ effect: 'maxHP', amountPerStack: 0.05 }],
+        description: 'Thu hồi tất cả Ma Chủng trên chiến trường. Mỗi tầng chuyển thành +5% Max HP tạm thời cho Diệp Lâm.'
+      },
+      {
+        key: 'skill2',
+        name: 'Ma Chủ Hiển Thân',
+        type: 'active',
+        cost: { aether: 25 },
+        requirements: { totalMarks: { id: 'ma_chung', amount: 12 } },
+        stanceChange: 'ma_chu',
+        description: 'Khi tổng Ma Chủng trên chiến trường ≥ 12, thu hồi toàn bộ Ma Chủng trên một mục tiêu để hóa thành Ma Chủ. Khi ở trạng thái Ma Chủ, mất quyền dùng tuyệt kỹ và mỗi Ma Chủng cấy tiếp gây thêm +2% sát thương cuối dạng Thuật.'
+      },
+      {
+        key: 'skill3',
+        name: 'Nhiếp Chủng Song Chưởng',
+        type: 'active',
+        cost: { aether: 25 },
+        hits: 2,
+        tags: ['counts-as-basic', 'splash'],
+        targets: 'markPriority',
+        splash: { ratio: 0.70, maxTargets: 2 },
+        description: 'Lao đến kẻ địch có Ma Chủng gần nhất và tung hai chưởng liên tiếp, mỗi hit 100% sát thương đòn đánh thường và lan 70% sang tối đa hai kẻ địch lân cận.'
+      }
+    ],
+    ult: {
+      name: 'Ma Chủng Phán Quyết',
+      type: 'ultimate',
+      tags: ['aoe', 'mark-detonation'],
+      damage: { percentTargetMaxHPPerStack: 0.05, scaleWIL: 0 },
+      debuffs: [{ id: 'fear', turns: 1, thresholdStacks: 2 }, { id: 'bleed', turns: 1, thresholdStacks: 2 }],
+      description: 'Kích hoạt toàn bộ Ma Chủng trên kẻ địch, mỗi tầng gây 5% Max HP của mục tiêu dưới dạng sát thương WIL. Với mỗi 2 tầng trên cùng mục tiêu, áp Sợ Hãi và Chảy Máu 1 lượt. Các Ma Chủng được kích hoạt sẽ bị tiêu hao.'
+    },
+    talent: {
+      name: 'Chú Ấn Ma Chủng',
+      type: 'talent',
+      purgeable: false,
+      decay: { turns: 3 },
+      description: 'Đánh thường cấy 1 Ma Chủng lên mục tiêu (không giới hạn cộng dồn). Nếu 3 lượt không cấy thêm, toàn bộ Ma Chủng trên mục tiêu đó biến mất.'
+    },
+    technique: null,
+    notes: [
+      'Ở trạng thái Ma Chủ, thanh tuyệt kỹ bị khoá cho đến khi trận đấu kết thúc hoặc trạng thái bị gỡ bỏ.',
+      'Ma Chủng là dấu không thể bị đánh cắp, chỉ biến mất khi hết hạn hoặc bị kích nổ.'
+    ]
+  },
+  {
+    unitId: 'mo_da',
+    basic: {
+      name: 'Đánh Thường',
+      type: 'basic',
+      tags: ['single-target'],
+      description: 'Gây 100% ATK + WIL lên một mục tiêu.'
+    },
+    skills: [
+      {
+        key: 'skill1',
+        name: 'U Trào Tụ Lực',
+        type: 'active',
+        cost: { aether: 20 },
+        duration: { turns: 3 },
+        buffs: [{ stats: { ATK: 0.10, WIL: 0.10 }, stackLimit: 3 }],
+        description: 'Tăng 10% ATK/WIL trong 3 lượt. Có thể cộng dồn tối đa 3 tầng.'
+      },
+      {
+        key: 'skill2',
+        name: 'Huyết Tế Cuồng Khí',
+        type: 'active',
+        cost: { aether: 15 },
+        hpTrade: { percentCurrentHP: 0.35, lethal: false },
+        duration: { turns: 3 },
+        buffs: [{ stats: { ATK: 0.25, WIL: 0.25 }, stackLimit: 2 }],
+        description: 'Hiến 35% HP hiện có (không thể tự sát) để nhận +25% ATK/WIL trong 3 lượt. Có thể cộng dồn tối đa 2 lần nếu dùng khi hiệu ứng còn.'
+      },
+      {
+        key: 'skill3',
+        name: 'Mộ Vực Trảm',
+        type: 'active',
+        cost: { aether: 15 },
+        tags: ['counts-as-basic'],
+        damage: { multiplier: 1.50 },
+        description: 'Chém một mục tiêu gây 150% sát thương đòn đánh thường. Được tính như đòn đánh thường.'
+      }
+    ],
+    ult: {
+      name: 'Hồn Về Mộ',
+      type: 'ultimate',
+      tags: ['single-target', 'counts-as-basic'],
+      damage: { multiplier: 2.00, piercePercent: { arm: 0.30, res: 0.30 } },
+      buffs: [
+        { id: 'bat_khuat', turns: 1 },
+        { id: 'tan_sat', turns: 2 },
+        { effect: 'untargetable', turns: 2, scope: 'singleTarget' }
+      ],
+      description: 'Gây 200% sát thương hỗn hợp lên một mục tiêu, bỏ qua 30% ARM/RES. Nhận hiệu ứng Bất Khuất + Tàn Sát và không thể bị chỉ định bởi đòn đơn trong 2 lượt kế tiếp.'
+    },
+    talent: {
+      name: 'Dạ Mộ Nhị Cực',
+      type: 'talent',
+      description: 'Khi HP ≥ 70% nhận +10% WIL; khi HP < 70% chuyển thành +5% ARM/RES. Hiệu ứng luôn hoạt động và không thể bị xoá.'
+    },
+    technique: null,
+    notes: [
+      'Các kỹ năng hiến máu của Mộ Dạ không thể khiến nhân vật tự sát (tối thiểu còn 1 HP).',
+      'Trong thời gian được buff Tàn Sát, các đòn đánh thường vẫn có thể thực thi dù đang miễn bị chỉ định.'
+    ]
+  },
+  {
+    unitId: 'ngao_binh',
+    basic: {
+      name: 'Đánh Thường',
+      type: 'basic',
+      tags: ['single-target', 'form-scaling'],
+      description: 'Tấn công 1 mục tiêu với sát thương lai. Phụ thuộc trạng thái: Ấu Long (cơ bản), Thành Niên +20% sát thương, Trưởng Thành +30% sát thương, Long Thần +40% sát thương và lan thêm 40% lên mục tiêu phụ.'
+    },
+    skills: [
+      {
+        key: 'skill1',
+        name: 'Long Trảo Song Trảm',
+        type: 'active',
+        cost: { aether: 25 },
+        tags: ['counts-as-basic', 'multi-hit'],
+        hits: 2,
+        description: 'Tung hai đòn chém liên tiếp, mỗi hit gây 100% sát thương đòn đánh thường dựa trên trạng thái hiện tại.'
+      },
+      {
+        key: 'skill2',
+        name: 'Long Huyết Phẫn Viêm',
+        type: 'active',
+        cost: { aether: 25 },
+        hpTrade: { percentMaxHP: 0.25, lethal: false },
+        duration: { turns: 3 },
+        buffs: [{ effect: 'basicDamage', amount: 0.50 }],
+        debuffs: [{ stats: { ARM: -0.10, RES: -0.10 }, duration: { turns: 3 } }],
+        description: 'Thiêu đốt 25% Max HP của bản thân để tăng 50% sát thương đòn đánh thường trong 3 lượt, đồng thời giảm 10% ARM/RES trong cùng thời gian.'
+      },
+      {
+        key: 'skill3',
+        name: 'Long Ảnh Truy Kích',
+        type: 'active',
+        cost: { aether: 25 },
+        damage: { multiplier: 1.40 },
+        splash: { ratioByForm: { au_long: 0.30, thanh_nien: 0.40, truong_thanh: 0.50, long_than: 0.60 }, maxTargets: 2 },
+        description: 'Lao kích một mục tiêu gây 140% sát thương đòn đánh thường, sau đó lan sát thương phụ thuộc trạng thái lên kẻ đứng kề.'
+      }
+    ],
+    ult: {
+      name: 'Tam Chuyển Long Thai',
+      type: 'ultimate',
+      tags: ['evolution'],
+      description: 'Mỗi lần thi triển, Ngao Bính hóa trứng 1 lượt (không thể tấn công, giảm sát thương nhận 40%/50%/60% tùy lần) rồi phá xác nâng trạng thái: Thành Niên → Trưởng Thành → Long Thần. Sau phá xác, đòn đánh thường mạnh hơn, tăng xuyên giáp, giảm sát thương nhận và tăng hồi phục mỗi lượt. Mỗi lần chuyển hóa hoàn tất nhận thêm 15 nộ.'
+    },
+    talent: {
+      name: 'Long Cốt Bất Diệt',
+      type: 'talent',
+      description: 'Xác định các chỉ số nền cho từng trạng thái: Ấu Long (+2% xuyên, -8% sát thương nhận, +5% AGI, hồi 0.5% Max HP/lượt); Thành Niên (+5% xuyên, -11% sát thương, +10% AGI, hồi 1%); Trưởng Thành (+9% xuyên, -15%, +15% AGI, hồi 1.7%); Long Thần (+14% xuyên, -22%, +20% AGI, hồi 3%).'
+    },
+    technique: null,
+    notes: [
+      'Trong lượt Hoá Trứng, Ngao Bính không thể ra đòn nhưng vẫn có thể bị tấn công (đã giảm sát thương theo cấp).',
+      'Đòn đánh thường ở trạng thái Long Thần biến thành Long Tức tầm xa và lan 40% sát thương lên các mục tiêu xung quanh.'
+    ]
+  },
+  {
+    unitId: 'lau_khac_ma_chu',
+    basic: {
+      name: 'Đánh Thường',
+      type: 'basic',
+      tags: ['single-target', 'mark-builder'],
+      debuffs: [{ id: 'sa_an', stacks: 1, maxStacks: 5, purgeable: false }],
+      description: 'Gây 100% ATK + WIL lên một mục tiêu và đặt 1 Sa Ấn (tối đa 5). Đạt 5 tầng khiến mục tiêu bỏ qua lượt kế tiếp rồi đặt lại số tầng.'
+    },
+    skills: [
+      {
+        key: 'skill1',
+        name: 'Hắc Sa Song Chưởng',
+        type: 'active',
+        cost: { aether: 25 },
+        tags: ['counts-as-basic', 'multi-hit'],
+        hits: 2,
+        targets: 'randomEnemies',
+        description: 'Tung hai chưởng vào hai mục tiêu ngẫu nhiên, mỗi hit gây 100% sát thương đòn đánh thường và đặt Sa Ấn.'
+      },
+      {
+        key: 'skill2',
+        name: 'Trùng Ấn Lậu Khắc',
+        type: 'active',
+        cost: { aether: 25 },
+        duration: { turns: 3, start: 'nextTurn' },
+        buffs: [{ effect: 'extraMarks', id: 'sa_an', amount: 1 }],
+        description: 'Trong 3 lượt bắt đầu từ lượt kế, mỗi đòn đánh thường/kỹ năng áp 2 tầng Sa Ấn thay vì 1.'
+      },
+      {
+        key: 'skill3',
+        name: 'Tam Luân Tán Chưởng',
+        type: 'active',
+        cost: { aether: 35 },
+        hits: 3,
+        targets: 'randomEnemies',
+        description: 'Tung ba chưởng liên tiếp vào ba kẻ địch ngẫu nhiên, mỗi hit gây 100% sát thương đòn đánh thường và đặt Sa Ấn.'
+      }
+    ],
+    ult: {
+      name: 'Thiên Mệnh Lậu Khắc Ma Kinh',
+      type: 'ultimate',
+      tags: ['time'],
+      description: 'Vận hành Lậu Khắc Ma Sa, thời sa chảy ngẫu nhiên 50% giữa hai kết quả: Nghịch Lưu – đưa toàn bộ phe đồng minh về trạng thái của 1 lượt trước (vị trí, HP, buff/debuff; đơn vị mới triệu hồi trong lượt hiện tại trở về deck và hoàn cost); Thuận Lưu – sau khi ult hoàn tất, mọi đồng minh ngay lập tức thực thi 1 đòn đánh thường.'
+    },
+    talent: {
+      name: 'Lậu Ấn Trói Thời',
+      type: 'talent',
+      maxStacks: 5,
+      skipTurnOnCap: true,
+      purgeable: false,
+      description: 'Mỗi đòn đánh thường hoặc kỹ năng đặt 1 Sa Ấn lên mục tiêu. Đủ 5 tầng khiến mục tiêu bỏ qua lượt kế tiếp rồi đặt lại Sa Ấn về 0.'
+    },
+    technique: null,
+    notes: [
+      'Sa Ấn tồn tại tới hết trận trừ khi bị thanh tẩy hoặc kích hoạt bỏ lượt.',
+      'Các đòn đánh thường/kỹ năng có nhiều hit vẫn đếm số tầng riêng cho từng hit.'
+    ]
+  },
+  {
     unitId: 'phe',
     basic: {
       name: 'Đánh Thường',
