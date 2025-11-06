@@ -9,7 +9,7 @@ const skillsConfig = [
         lifesteal: { percentOfDamage: 0.10 },
         applyMark: { id: 'mark_devour', stacks: 1, maxStacks: 3, ttlTurns: 3, refreshOnHit: true }
       },
-      description: 'Gây sát thương theo n% WIL + x% ATK lên một mục tiêu, hồi lại 10% lượng sát thương gây ra và đặt 1 tầng Phệ Ấn lên mục tiêu (tối đa 3 tầng, làm mới thời gian tồn tại mỗi khi cộng dồn).'
+      description: 'Gây sát thương 100% WIL + ATK lên một mục tiêu, hồi lại 10% lượng sát thương gây ra và đặt 1 tầng Phệ Ấn (tối đa 3 tầng). Mỗi mục tiêu chỉ nhận tối đa 2 Phệ Ấn trong một lượt; đạt 3 tầng sẽ nổ ở đầu lượt của mục tiêu, gây 50% WIL của Phệ. Dấu ấn tự mất nếu 3 lượt không được làm mới.'
     },
     skills: [
       {
@@ -20,26 +20,26 @@ const skillsConfig = [
         tags: ['counts-as-basic', 'multi-hit'],
         hits: 2,
         targets: 'randomEnemies',
-        description: 'Phóng hai huyết cầu vào hai kẻ địch ngẫu nhiên. Mỗi hit gây 150% sát thương đòn đánh thường, được tính như đòn đánh thường để kích hoạt hút máu và Phệ Ấn, đồng thời làm mới thời hạn dấu ấn trên mục tiêu trúng đòn.'
+        description: 'Phóng hai huyết cầu vào hai kẻ địch ngẫu nhiên. Mỗi hit gây 130% sát thương đòn đánh thường, được tính như đòn đánh thường để kích hoạt hút máu và Phệ Ấn, đồng thời làm mới thời hạn dấu ấn trên mục tiêu trúng đòn nhưng vẫn tôn trọng giới hạn 2 Phệ Ấn mỗi lượt.'
       },
       {
         key: 'skill2',
         name: 'Huyết Chướng',
         type: 'active',
-        cost: { aether: 25 },
+        cost: { aether: 20 },
         duration: { turns: 2 },
         buffs: [{ stat: 'damageTaken', type: 'multiplier', amount: -0.30 }],
         shields: [{ stat: 'hpRegen', amountPercentMaxHP: 0.15, perTurn: true }],
-        description: 'Tạo màn huyết chướng trong 2 lượt: Phệ giảm 30% sát thương phải chịu, nhận hồi phục 15% Máu tối đa mỗi lượt và không thể bị chỉ định bởi đòn đơn mục tiêu. Hiệu ứng duy trì kể cả khi đang bị khống chế.'
+        description: 'Tạo màn huyết chướng trong 2 lượt: Phệ giảm 30% sát thương phải chịu, nhận hồi phục 15% Máu tối đa mỗi lượt, sát thương gây ra giảm 30% và không thể bị chỉ định bởi đòn đơn mục tiêu. Hiệu ứng duy trì kể cả khi đang bị khống chế.'
       },
       {
         key: 'skill3',
         name: 'Huyết Thệ',
         type: 'active',
-        cost: { aether: 40 },
-        duration: { turns: 5 },
+        cost: { aether: 35 },
+        duration: { turns: 4 },
         links: { maxConcurrent: 1, sharePercent: 0.5 },
-        description: 'Liên kết thanh HP với một đồng minh ngẫu nhiên (có thể là Leader) trong 5 lượt. 50% sát thương đồng minh phải nhận sẽ chuyển sang Phệ; chỉ duy trì một mối liên kết cùng lúc và thay thế liên kết cũ nếu dùng lại.'
+        description: 'Liên kết thanh HP với một đồng minh do người chơi chọn trong 4 lượt. 50% sát thương đồng minh phải nhận sẽ chuyển sang Phệ; chỉ duy trì một mối liên kết cùng lúc, liên kết tự hủy nếu mục tiêu rời sân và sát thương chuyển tiếp không thể chuyển lần hai.'
       }
     ],
     ult: {
@@ -47,13 +47,13 @@ const skillsConfig = [
       type: 'ultimate',
       tags: ['aoe', 'hp-drain', 'counts-as-basic'],
       duration: { turns: 2, affectedStat: 'WIL' },
-      hpDrain: { percentCurrentHP: 0.07, perBoss: 0.07 },
-      damage: { scaleWIL: 0.80, type: 'arcane', unavoidable: true },
-      heals: { selfPercentTotalDamage: 0.40, allies: { targets: 2, percentTotalDamage: 0.30 } },
-      overhealToShield: { capPercentMaxHP: 1.0 },
+      hpDrain: { percentCurrentHP: 0.08, perBoss: 0.08 },
+      damage: { scaleWIL: 0.65, type: 'arcane', unavoidable: true },
+      heals: { selfPercentTotalDamage: 0.35, allies: { targets: 2, percentTotalDamage: 0.25 } },
+      overhealToShield: { capPercentMaxHP: 0.6 },
       postBuff: { stat: 'WIL', percent: 0.20, turns: 2 },
       marksApplied: { stacks: 1, maxPerTarget: 3 },
-      description: 'Hút máu toàn bộ kẻ địch: mỗi mục tiêu mất 7% HP hiện tại + 80% WIL của Phệ (Thuật, không thể né tránh, vẫn chịu kháng). Phần sát thương gây ra hồi cho Phệ 40% và hồi cho hai đồng minh ngẫu nhiên mỗi người 30%, phần vượt trần chuyển thành Giáp Máu tới tối đa +100% Máu tối đa. Sau khi thi triển nhận thêm 20% WIL trong 2 lượt và đặt 1 tầng Phệ Ấn lên các mục tiêu bị hút.'
+      description: 'Hút máu toàn bộ kẻ địch: mỗi mục tiêu mất 8% HP hiện tại + 65% WIL của Phệ (Thuật, không thể né tránh, vẫn chịu kháng). Phần sát thương gây ra hồi cho Phệ 35% và hồi cho hai đồng minh ngẫu nhiên mỗi người 25%; phần vượt trần chuyển thành Giáp Máu tới tối đa +60% Máu tối đa. Sau khi thi triển nhận thêm 20% WIL trong 2 lượt và đặt 1 tầng Phệ Ấn lên các mục tiêu bị hút (giới hạn 2 Phệ Ấn mỗi lượt mỗi mục tiêu).'
     },
     talent: {
       name: 'Phệ Ấn',
@@ -62,11 +62,11 @@ const skillsConfig = [
       explosion: { damageScaleWIL: 0.50, trigger: 'onTurnStartTarget' },
       ttl: { turns: 3, refreshOnApply: true },
       purgeable: false,
-      description: 'Mỗi đòn đánh thường/kỹ năng/tuyệt kỹ trúng mục tiêu đặt 1 Phệ Ấn (tối đa 3 cộng dồn). Khi đạt 3 cộng dồn, Phệ Ấn tự kích nổ trong lượt của mục tiêu, gây sát thương bằng 50% WIL của Phệ. Dấu ấn tồn tại tối đa 3 lượt nếu không được làm mới và không thể bị xoá bỏ, lãng quên hoặc cướp. Chúc Phúc Của Huyết Chủ: khi vào trận nhận thêm 15% Máu tối đa và +50% hồi HP.'
+      description: 'Mỗi đòn đánh thường/kỹ năng/tuyệt kỹ trúng mục tiêu đặt 1 Phệ Ấn (tối đa 3 cộng dồn, mỗi mục tiêu chỉ nhận 2 Ấn trong một lượt). Khi đạt 3 cộng dồn, Phệ Ấn tự kích nổ ở đầu lượt của mục tiêu, gây sát thương bằng 50% WIL của Phệ. Dấu ấn tồn tại tối đa 3 lượt nếu không được làm mới và không thể bị xoá bỏ, lãng quên hoặc cướp. Chúc Phúc Của Huyết Chủ: khi vào trận nhận thêm 15% Máu tối đa và +50% hồi HP.'
     },
     technique: null,
     notes: [
-      'Song Huyết Cầu và mọi hit từ tuyệt kỹ đều được tính như đòn đánh thường để cộng Phệ Ấn và hút máu.',
+      'Song Huyết Cầu và mọi hit từ tuyệt kỹ đều được tính như đòn đánh thường để cộng Phệ Ấn và hút máu, vẫn tuân theo giới hạn 2 Phệ Ấn mỗi lượt.',
       'Huyết Thệ chuyển hướng sát thương nhưng Phệ vẫn chịu sát thương nên cần giữ lượng hồi phục luôn sẵn sàng.'
     ]
   },
@@ -111,8 +111,8 @@ const skillsConfig = [
         type: 'active',
         cost: { aether: 25 },
         duration: { turns: 3, start: 'nextTurn' },
-        buffs: [{ stats: { ATK: 0.20, WIL: 0.20 }, delayTurns: 1 }],
-        description: 'Tăng 20% ATK/WIL dựa trên chỉ số hiện tại trong 3 lượt, hiệu lực bắt đầu từ lượt kế tiếp sau khi thi triển. Có thể cộng dồn với các nguồn buff khác.'
+        buffs: [{ stats: { ATK: 0.23, WIL: 0.23 }, delayTurns: 1 }],
+        description: 'Tăng 23% ATK/WIL dựa trên chỉ số hiện tại trong 3 lượt, hiệu lực bắt đầu từ lượt kế tiếp sau khi thi triển. Có thể cộng dồn với các nguồn buff khác.'
       }
     ],
     ult: {
@@ -417,8 +417,8 @@ const skillsConfig = [
     talent: {
       name: 'Đại Ca Đầu Đàn',
       type: 'talent',
-      bonuses: { perMinion: { basicDamagePercent: 0.15 }, onMinionDeath: { stats: { ATK: 0.05, WIL: 0.05 }, maxStacks: 3 } },
-      description: 'Mỗi tiểu đệ hiện diện trên sân giúp Trần Quát nhận thêm 15% tổng sát thương đòn đánh thường. Khi một tiểu đệ bị hạ gục, Trần Quát nhận thêm 5% ATK/WIL (tối đa 3 lần trong trận).'
+      bonuses: { perMinion: { basicDamagePercent: 0.15 }, onMinionDeath: { stats: { ATK: 0.05, WIL: 0.05 }, maxStacks: null } },
+      description: 'Mỗi tiểu đệ hiện diện trên sân giúp Trần Quát nhận thêm 15% tổng sát thương đòn đánh thường. Khi một tiểu đệ bị kẻ địch hạ gục, Trần Quát nhận thêm 5% ATK/WIL (mỗi tiểu đệ chỉ cộng một lần).'
     },
     technique: null,
     notes: [
