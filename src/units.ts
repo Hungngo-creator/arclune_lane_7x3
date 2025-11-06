@@ -9,6 +9,12 @@ export interface UnitDefinition {
 }
 
 const UNIT_LIST = [
+  { id: 'diep_minh', name: 'Diệp Minh', cost: 17, rank: 'SSR', role: 'Support' },
+  { id: 'nguyet_san', name: 'Nguyệt San', cost: 20, rank: 'UR', role: 'Assassin' },
+  { id: 'trung_lam', name: 'Trùng Lâm', cost: 18, rank: 'SSR', role: 'Summoner' },
+  { id: 'huyet_tich', name: 'Huyết Tịch', cost: 20, rank: 'UR', role: 'Mage' },
+  { id: 'khai_nguyen_tu', name: 'Khai Nguyên Tử', cost: 21, rank: 'UR', role: 'Mage' },
+  { id: 'thien_luu', name: 'Thiên Lưu', cost: 17, rank: 'SSR', role: 'Ranger' },
   { id: 'vu_thien', name: 'Vũ Thiên', cost: 17, rank: 'SSR', role: 'Warrior' },
   { id: 'anna', name: 'Anna', cost: 17, rank: 'SSR', role: 'Support' },
   { id: 'lao_khat_cai', name: 'Lão Khất Cái', cost: 12, rank: 'SR', role: 'Warrior' },

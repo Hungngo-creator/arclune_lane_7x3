@@ -99,6 +99,480 @@ export function applyRankAndMods(
 //  - kit.traits.summon / kit.ult.summon đánh dấu Summoner -> kích hoạt Immediate Summon (action-chain).
 export const ROSTER = [
   {
+    id: 'diep_minh', name: 'Diệp Minh', class: 'Support', rank: 'SSR',
+    mods: { HP: 0.06, WIL: 0.10, RES: 0.08, AEregen: 0.05 },
+    kit: {
+      onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, aura: { id: 'thien_diep', regenPercentMaxHPPerTurn: 0.02 } }),
+      basic: asUnknownRecord({
+        name: 'Thảo Kiếm Đoạt',
+        tags: ['single-target', 'seed'],
+        damageMultiplier: 1.00,
+        mark: { id: 'thuc_mach', maxStacks: 3, purgeable: false }
+      }),
+      skills: asUnknownRecordArray([
+        {
+          key: 'skill1',
+          name: 'Vệ Mộc Trấn Hộ',
+          cost: { aether: 20 },
+          targets: 'ally',
+          shieldPercentMaxHP: 0.25,
+          healPercentMaxHP: 0.06,
+          duration: 2,
+          notes: 'Gieo mộc khí thành khiên ôm lấy đồng minh, hồi 6% Max HP và tạo lá chắn bằng 25% Max HP trong 2 lượt.'
+        },
+        {
+          key: 'skill2',
+          name: 'Thực Linh Dẫn Lộ',
+          cost: { aether: 25 },
+          duration: 3,
+          field: { id: 'thuc_linh_tran', affects: 'team', regenPercentMaxHPPerTurn: 0.04, bonusRES: 0.12 },
+          notes: 'Trải thảm thực linh 3 lượt, cấp mọi đồng minh hồi phục 4% Max HP mỗi lượt và +12% RES.'
+        },
+        {
+          key: 'skill3',
+          name: 'Liên Đằng Phong Tỏa',
+          cost: { aether: 30 },
+          aoe: 'line',
+          damageMultiplier: 1.10,
+          root: { turns: 1 },
+          spreadMark: { id: 'thuc_mach', stacks: 1, targets: 2 },
+          notes: 'Chém quét thành dây leo siết chặt, gây 110% sát thương đòn đánh thường, trói chân 1 lượt và lan 1 tầng Thực Mạch sang tối đa 2 kẻ địch.'
+        }
+      ]),
+      ult: asUnknownRecord({
+        type: 'field',
+        duration: 3,
+        aura: {
+          allies: { healPercentMaxHPPerTurn: 0.05, shieldPercentMaxHP: 0.12 },
+          enemies: { damageTaken: 0.12, rootOnEntryTurns: 1 }
+        },
+        notes: 'Khai mở “Thiên Diệp Bảo Hộ” trong 3 lượt: đồng minh trong vùng nhận hồi 5% Max HP và lá chắn 12% Max HP mỗi lượt; kẻ địch lần đầu bước vào bị trói 1 lượt và tăng 12% sát thương gánh chịu.'
+      }),
+      talent: asUnknownRecord({
+        name: 'Lâm Ý Vĩnh Thịnh',
+        mark: {
+          id: 'thuc_mach',
+          kind: 'mark',
+          maxStacks: 3,
+          purgeable: false,
+          onCap: { immobilize: { turns: 1 } }
+        },
+        aura: { regenPercentMaxHPPerTurn: 0.02, bonusShieldPower: 0.10 }
+      }),
+      technique: null,
+      passives: asUnknownRecordArray([
+        {
+          id: 'thuc_mach_basic',
+          name: 'Ấn Mộc Gieo Hạt',
+          when: 'onBasicHit',
+          effect: 'placeMark',
+          params: { id: 'thuc_mach', stacks: 1, maxStacks: 3, purgeable: false }
+        },
+        {
+          id: 'thien_diep_aura',
+          name: 'Thực Mộc Gia Trì',
+          when: 'onBattlefield',
+          effect: 'teamAura',
+          params: { affects: 'adjacentAllies', regenPercentMaxHPPerTurn: 0.02, bonusRES: 0.08 }
+        }
+      ]),
+      traits: asUnknownRecordArray([
+        { id: 'auto_cast_ult', text: 'Ultimate auto-cast khi đầy nộ theo luật chung.' },
+        { id: 'lore_lam_aura', text: 'Aura thực vật bao phủ thân kiếm, SVG cần hiệu ứng sương lá chuyển động quanh áo choàng.' }
+      ])
+    }
+  },
+  {
+    id: 'nguyet_san', name: 'Nguyệt San', class: 'Assassin', rank: 'UR',
+    mods: { ATK: 0.10, PER: 0.12, SPD: 0.10 },
+    kit: {
+      onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, stealth: { turns: 1 } }),
+      basic: asUnknownRecord({
+        name: 'Ảnh Nguyệt Đoạn',
+        tags: ['single-target', 'blink'],
+        damageMultiplier: 1.05,
+        reposition: { type: 'behindTarget' },
+        notes: 'Đột kích phía sau mục tiêu với 105% sát thương và lùi về vị trí cũ.'
+      }),
+      skills: asUnknownRecordArray([
+        {
+          key: 'skill1',
+          name: 'Huyền Nguyệt Ẩn Tích',
+          cost: { aether: 25 },
+          duration: 2,
+          stealth: { turns: 2, breakOnAttack: false },
+          dodgeAll: 0.30,
+          notes: 'Tàng hình 2 lượt, tăng 30% né mọi đòn. Không mất tàng hình khi dùng kỹ năng dịch chuyển.'
+        },
+        {
+          key: 'skill2',
+          name: 'Nguyệt Ảnh Hoán Thân',
+          cost: { aether: 30 },
+          teleport: { range: 'anyShadow', createsShadow: true },
+          buffStats: { SPD: 0.15, PER: 0.10 },
+          duration: 2,
+          notes: 'Đặt dấu ấn bóng tại vị trí hiện tại, dịch chuyển đến mục tiêu tùy chọn rồi +15% SPD, +10% PER trong 2 lượt.'
+        },
+        {
+          key: 'skill3',
+          name: 'Nguyệt Diệt Ảnh Phạt',
+          cost: { aether: 35 },
+          aoe: 'circle',
+          damageMultiplier: 1.60,
+          executesBelowPercentHP: 0.25,
+          nightmarkDetonation: { id: 'nguyet_an', bonusDamage: 0.30 },
+          notes: 'Bùng nổ ánh trăng quanh bóng đứng, gây 160% sát thương; mục tiêu dưới 25% HP bị kết liễu. Kích nổ mọi Nguyệt Ấn gây thêm 30% sát thương.'
+        }
+      ]),
+      ult: asUnknownRecord({
+        type: 'blink-assassinate',
+        damageMultiplier: 3.20,
+        pierce: { ARM: 0.30, RES: 0.30 },
+        guaranteeCrit: true,
+        refundsStealth: true,
+        notes: '“Huyết Nguyệt Định Mệnh”: lao qua bóng tối đến kẻ thù có Nguyệt Ấn gần nhất, gây 320% sát thương xuyên 30% ARM/RES và tái kích hoạt trạng thái ẩn thân.'
+      }),
+      talent: asUnknownRecord({
+        name: 'Nguyệt Ảnh Ấn',
+        mark: { id: 'nguyet_an', kind: 'mark', maxStacks: 5, purgeable: false, decayIfNoRefreshTurns: 2 },
+        shadowRecall: { cooldown: 2 }
+      }),
+      technique: null,
+      passives: asUnknownRecordArray([
+        {
+          id: 'nguyet_an_basic',
+          name: 'Ảnh Nguyệt Lưu Tích',
+          when: 'onHit',
+          effect: 'placeMark',
+          params: { id: 'nguyet_an', stacks: 1, maxStacks: 5, purgeable: false, decayIfNoRefreshTurns: 2 }
+        },
+        {
+          id: 'shadow_gate',
+          name: 'Liên Ảnh Môn',
+          when: 'onShadowRecall',
+          effect: 'resetCooldown',
+          params: { skills: ['skill1'], bonusDamageNextHit: 0.25 }
+        }
+      ]),
+      traits: asUnknownRecordArray([
+        { id: 'auto_cast_ult', text: 'Ultimate auto-cast khi đầy nộ theo luật chung.' },
+        { id: 'lore_nguyet', text: 'SVG cần haze trăng chuyển động che mặt và váy tầng bóng tối, kèm hiệu ứng dịch chuyển.' }
+      ])
+    }
+  },
+  {
+    id: 'trung_lam', name: 'Trùng Lâm', class: 'Summoner', rank: 'SSR',
+    mods: { HP: 0.12, ATK: 0.06, ARM: 0.10 },
+    kit: {
+      onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, bonusSummonArmor: 0.10 }),
+      basic: asUnknownRecord({
+        name: 'Sừng Lâm Trảm',
+        tags: ['single-target', 'beast'],
+        damageMultiplier: 1.10,
+        knockback: 1,
+        notes: 'Húc bằng sừng lá, gây 110% sát thương và đẩy lùi mục tiêu 1 ô nếu có.'
+      }),
+      skills: asUnknownRecordArray([
+        {
+          key: 'skill1',
+          name: 'Hống Lâm Triệu Tập',
+          cost: { aether: 25 },
+          summon: {
+            id: 'lam_ho_ve',
+            inherit: { HP: 0.60, ATK: 0.60, ARM: 0.20 },
+            ttl: 4,
+            limit: 1,
+            replace: 'refresh'
+          },
+          notes: 'Triệu hồi Lâm Hộ Vệ trong 4 lượt, thừa hưởng 60% chỉ số và 20% ARM bonus. Nếu đã tồn tại sẽ làm mới thời gian.'
+        },
+        {
+          key: 'skill2',
+          name: 'Giáp Gai Nguyên Sinh',
+          cost: { aether: 20 },
+          duration: 3,
+          buffStats: { ARM: 0.25, RES: 0.15 },
+          thorns: { percentDamage: 0.20 },
+          appliesToSummons: true,
+          notes: 'Phủ giáp gai cho bản thân và Lâm Hộ Vệ, +25% ARM, +15% RES và phản 20% sát thương cận chiến trong 3 lượt.'
+        },
+        {
+          key: 'skill3',
+          name: 'Sinh Lâm Hồi Sinh',
+          cost: { aether: 30 },
+          healPercentMaxHP: 0.18,
+          reviveSummon: true,
+          buffStats: { ATK: 0.12 },
+          duration: 2,
+          notes: 'Hấp thụ aether rừng để hồi 18% Max HP cho bản thân, hồi sinh Lâm Hộ Vệ đã ngã gục và tăng 12% ATK cho cả hai trong 2 lượt.'
+        }
+      ]),
+      ult: asUnknownRecord({
+        type: 'roar',
+        aoe: 'allEnemies',
+        debuffs: [{ id: 'weaken', amount: 0.15, turns: 2 }, { id: 'slow', amount: 0.20, turns: 2 }],
+        summonEmpower: { id: 'lam_ho_ve', bonus: { damage: 0.25, lifesteal: 0.15 }, turns: 2 },
+        notes: '“Vương Lâm Thú Khiếu” làm run sợ toàn chiến trường: mọi địch -15% sát thương, -20% SPD trong 2 lượt; Lâm Hộ Vệ nhận +25% sát thương và 15% hút máu.'
+      }),
+      talent: asUnknownRecord({
+        name: 'Lâm Uy Ngự Địa',
+        summonBond: { id: 'lam_ho_ve', sharedHP: 0.20 },
+        aura: { allies: 'nature', stats: { ATK: 0.08 } }
+      }),
+      technique: null,
+      passives: asUnknownRecordArray([
+        {
+          id: 'lam_ho_ve_guard',
+          name: 'Thú Hộ Vệ',
+          when: 'onAllyTargeted',
+          effect: 'intercept',
+          params: { summonId: 'lam_ho_ve', chance: 0.30 }
+        }
+      ]),
+      traits: asUnknownRecordArray([
+        { id: 'auto_cast_ult', text: 'Ultimate auto-cast khi đầy nộ theo luật chung.' },
+        { id: 'svg_beast', text: 'SVG cần thể hiện hình thái dị thú bốn chân và tách riêng companion “Lâm Hộ Vệ”.' }
+      ])
+    }
+  },
+  {
+    id: 'huyet_tich', name: 'Huyết Tịch', class: 'Mage', rank: 'UR',
+    mods: { WIL: 0.14, AEregen: 0.12, HP: 0.08 },
+    kit: {
+      onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, bloodReserve: 40 }),
+      basic: asUnknownRecord({
+        name: 'Huyết Đoạt',
+        tags: ['single-target', 'drain'],
+        lifesteal: 0.15,
+        damageMultiplier: 1.00,
+        notes: 'Mỗi đòn đánh thường hút 15% sát thương gây ra để nuôi hồ huyết.'
+      }),
+      skills: asUnknownRecordArray([
+        {
+          key: 'skill1',
+          name: 'Huyết Trướng Bảo Hộ',
+          cost: { aether: 25 },
+          duration: 2,
+          shieldPercentCasterMaxHP: 0.35,
+          convertDamageToBlood: 0.30,
+          notes: 'Tạo màn huyết bảo hộ 2 lượt: nhận lá chắn 35% Max HP của Huyết Tịch, 30% sát thương nhận vào chuyển thành tích lũy huyết hồ.'
+        },
+        {
+          key: 'skill2',
+          name: 'Huyết Chú Phản Hồi',
+          cost: { aether: 30 },
+          duration: 3,
+          link: { sharePercent: 0.35, targets: 1 },
+          healPercentDamage: 0.30,
+          notes: 'Kết huyết với một đồng minh: chuyển 35% sát thương họ nhận sang Huyết Tịch và hồi lại 30% lượng đó.'
+        },
+        {
+          key: 'skill3',
+          name: 'Huyết Độc Triều',
+          cost: { aether: 35 },
+          aoe: 'cone',
+          damageMultiplier: 1.40,
+          applyPoison: { id: 'huyet_doc', stacks: 2, maxStacks: 6 },
+          notes: 'Phun huyết độc phạm vi hình nón, gây 140% sát thương và đặt 2 tầng Huyết Độc (tối đa 6).' 
+        }
+      ]),
+      ult: asUnknownRecord({
+        type: 'bloodstorm',
+        aoe: 'allEnemies',
+        damageMultiplier: 2.20,
+        detonatePoison: { id: 'huyet_doc', bonusPerStack: 0.12 },
+        healAlliesFromTotal: { percent: 0.30, distribute: 'lowestHP' },
+        notes: '“Huyết Tịch Chiến Vũ” dâng bão máu quét toàn chiến trường: gây 220% sát thương, kích nổ Huyết Độc mỗi tầng thêm 12% sát thương và chữa 30% tổng sát thương cho đồng minh HP thấp nhất.'
+      }),
+      talent: asUnknownRecord({
+        name: 'Nguyên Huyết Chi Chủ',
+        resource: { id: 'blood_reserve', max: 100 },
+        conversion: { per10: { healPercentMaxHP: 0.03, damageBonus: 0.04 } },
+        mark: { id: 'huyet_doc', kind: 'poison', maxStacks: 6, purgeable: true }
+      }),
+      technique: null,
+      passives: asUnknownRecordArray([
+        {
+          id: 'blood_reserve_gain',
+          name: 'Hồ Huyết Vô Tận',
+          when: 'onDamageDealt',
+          effect: 'gainResource',
+          params: { resourceId: 'blood_reserve', amountPerPercentHP: 2 }
+        },
+        {
+          id: 'blood_reserve_spend',
+          name: 'Tế Huyết Cường Hoá',
+          when: 'onUltCast',
+          effect: 'convertResource',
+          params: { resourceId: 'blood_reserve', spendAll: true, bonusDamagePer10: 0.04 }
+        }
+      ]),
+      traits: asUnknownRecordArray([
+        { id: 'auto_cast_ult', text: 'Ultimate auto-cast khi đầy nộ theo luật chung.' },
+        { id: 'svg_blood', text: 'SVG bổ sung huyết cầu động quanh đầu và haze đỏ trắng bao phủ khuôn mặt.' }
+      ])
+    }
+  },
+  {
+    id: 'khai_nguyen_tu', name: 'Khai Nguyên Tử', class: 'Mage', rank: 'UR',
+    mods: { WIL: 0.12, AEmax: 0.15, AEregen: 0.12 },
+    kit: {
+      onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, portalCharges: 2 }),
+      basic: asUnknownRecord({
+        name: 'Pháp Trượng Khai Thiên',
+        tags: ['single-target', 'arcane'],
+        damageMultiplier: 1.15,
+        bonus: { aetherGain: 6 },
+        notes: 'Đòn đánh thường chuyển hoá aether, hoàn lại 6 Aether khi trúng mục tiêu.'
+      }),
+      skills: asUnknownRecordArray([
+        {
+          key: 'skill1',
+          name: 'Nguyên Môn Huyễn Giới',
+          cost: { aether: 20 },
+          teleportAlly: { range: 'any', cleanseDebuff: 1 },
+          buffStats: { RES: 0.15 },
+          duration: 2,
+          notes: 'Mở cổng dịch chuyển đồng minh đến vị trí bất kỳ và thanh tẩy 1 hiệu ứng xấu, +15% RES trong 2 lượt.'
+        },
+        {
+          key: 'skill2',
+          name: 'Triệu Hoán Nguyên Khí',
+          cost: { aether: 25 },
+          summon: {
+            id: 'nguyen_khi_thap',
+            inherit: { WIL: 0.70 },
+            ttl: 3,
+            limit: 1,
+            forbiddenSkills: ['ult']
+          },
+          notes: 'Triệu hồi “Nguyên Khí Tháp” trong 3 lượt, khuếch đại đòn phép với 70% WIL của Khai Nguyên Tử.'
+        },
+        {
+          key: 'skill3',
+          name: 'Huyễn Thuật Đa Tầng',
+          cost: { aether: 35 },
+          duration: 3,
+          stackingBuffs: [{ stats: { WIL: 0.08 }, trigger: 'turnEnd', maxStacks: 3 }],
+          cooldown: 3,
+          notes: 'Thi triển tầng phép liên hoàn: mỗi lượt cuối tăng 8% WIL (tối đa 3 tầng), tái sử dụng làm mới thời gian nhưng không vượt quá giới hạn.'
+        }
+      ]),
+      ult: asUnknownRecord({
+        type: 'time-stop',
+        duration: 1,
+        skipEnemyTurns: 1,
+        bonusAether: 30,
+        summonEmpower: { id: 'nguyen_khi_thap', bonus: { pierceRES: 0.25 } },
+        notes: '“Khai Thiên Định Cực” tạm dừng thời gian 1 lượt địch, hoàn trả 30 Aether cho phe ta và khiến Nguyên Khí Tháp xuyên 25% RES.'
+      }),
+      talent: asUnknownRecord({
+        name: 'Nguyên Chú Khai Thế',
+        portalCharges: 2,
+        rechargePerTurn: 1,
+        bonusAetherPerCharge: 5
+      }),
+      technique: null,
+      passives: asUnknownRecordArray([
+        {
+          id: 'portal_charge_gain',
+          name: 'Tụ Khí Pháp Ấn',
+          when: 'onTurnStart',
+          effect: 'gainPortalCharge',
+          params: { amount: 1, max: 3 }
+        },
+        {
+          id: 'portal_spend_bonus',
+          name: 'Chuyển Dịch Định Luật',
+          when: 'onPortalUse',
+          effect: 'grantBuff',
+          params: { stats: { AEregen: 0.20 }, turns: 1 }
+        }
+      ]),
+      traits: asUnknownRecordArray([
+        { id: 'auto_cast_ult', text: 'Ultimate auto-cast khi đầy nộ theo luật chung.' },
+        { id: 'svg_portal', text: 'SVG cần phù văn bạc chuyển động quanh áo choàng và hiệu ứng cổng không gian phía sau.' }
+      ])
+    }
+  },
+  {
+    id: 'thien_luu', name: 'Thiên Lưu', class: 'Ranger', rank: 'SSR',
+    mods: { ATK: 0.08, PER: 0.08, SPD: 0.08 },
+    kit: {
+      onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, weatherState: 'clear' }),
+      basic: asUnknownRecord({
+        name: 'Thiên Kiếm Thuần Quang',
+        tags: ['single-target', 'flying'],
+        damageMultiplier: 1.05,
+        bonus: { accuracy: 0.15 },
+        notes: 'Chém kiếm khí tinh khiết từ trên cao, +15% chính xác khi mục tiêu đang chịu debuff thời tiết.'
+      }),
+      skills: asUnknownRecordArray([
+        {
+          key: 'skill1',
+          name: 'Phong Vũ Dẫn Hướng',
+          cost: { aether: 20 },
+          duration: 2,
+          weatherShift: 'storm',
+          buffStats: { SPD: 0.12 },
+          notes: 'Gọi gió mưa tạo trạng thái Bão trong 2 lượt và tăng 12% SPD cho bản thân.'
+        },
+        {
+          key: 'skill2',
+          name: 'Thiên Quang Liên Xạ',
+          cost: { aether: 25 },
+          hits: 3,
+          targets: 'randomEnemies',
+          damageMultiplier: 0.75,
+          bonusDamageIfWeather: { weather: 'storm', amount: 0.20 },
+          notes: 'Bắn ba luồng kiếm quang vào kẻ địch ngẫu nhiên, mỗi luồng 75% sát thương; nếu đang Bão, mỗi hit thêm 20% sát thương.'
+        },
+        {
+          key: 'skill3',
+          name: 'Tinh Không Phi Hành',
+          cost: { aether: 30 },
+          duration: 2,
+          flying: true,
+          dodgeRanged: 0.35,
+          grantAlly: { shieldPercentMaxHP: 0.18, targets: 1 },
+          notes: 'Bay lên tinh không 2 lượt, tăng 35% né đòn tầm xa và cấp 18% lá chắn Max HP cho 1 đồng minh bất kỳ.'
+        }
+      ]),
+      ult: asUnknownRecord({
+        type: 'weather-control',
+        weatherShift: 'aurora',
+        damageMultiplier: 2.60,
+        aoe: 'allEnemies',
+        debuffs: [{ id: 'accuracy_down', amount: 0.20, turns: 2 }],
+        alliesBuff: { critRate: 0.20, turns: 2 },
+        notes: '“Thiên Lưu Tụ Quang” triệu hồi cực quang: gây 260% sát thương toàn địch, giảm 20% chính xác của chúng trong 2 lượt và ban +20% tỉ lệ chí mạng cho đồng minh.'
+      }),
+      talent: asUnknownRecord({
+        name: 'Sứ Mệnh Khí Tượng',
+        weatherCycle: ['clear', 'storm', 'aurora'],
+        bonusPerWeather: {
+          clear: { ATK: 0.05 },
+          storm: { SPD: 0.08 },
+          aurora: { critDamage: 0.20 }
+        }
+      }),
+      technique: null,
+      passives: asUnknownRecordArray([
+        {
+          id: 'weather_followup',
+          name: 'Lạc Không Hồi Âm',
+          when: 'onWeatherShift',
+          effect: 'grantFollowUp',
+          params: { damageMultiplier: 1.00, expiresAfter: 1 }
+        }
+      ]),
+      traits: asUnknownRecordArray([
+        { id: 'auto_cast_ult', text: 'Ultimate auto-cast khi đầy nộ theo luật chung.' },
+        { id: 'svg_weather', text: 'SVG cần mũ ánh sáng và aurora, bổ sung tia sét quanh áo choàng trong suốt.' }
+      ])
+    }
+  },
+  {
     id: 'mong_yem', name: 'Mộng Yểm', class: 'Support', rank: 'UR',
     mods: { WIL: 0.12, AEregen: 0.08 },
     kit: {
