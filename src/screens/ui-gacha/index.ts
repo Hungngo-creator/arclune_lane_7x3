@@ -1,5 +1,9 @@
 import './gacha.css';
 
+type MaybeRequire = ((id: string) => unknown) | undefined;
+
+declare const __require: MaybeRequire;
+
 interface RenderContext {
   readonly root: HTMLElement;
   readonly shell?: { enterScreen?: (screenId: string, params?: unknown) => void } | null;
@@ -124,6 +128,41 @@ const GACHA_TEMPLATE = /* html */ `
   </div>
 `;
 
+const GACHA_MODULE_ID = './screens/ui-gacha/gacha.js' as const;
+
+type MaybePromise<T> = Promise<T> | T;
+
+interface GachaModule {
+  readonly mountGachaUI?: (scope?: HTMLElement | Document | null) => MaybePromise<GachaHandle>;
+}
+
+function getRuntimeRequire(): ((id: string) => unknown) | null {
+  if (typeof __require === 'function') {
+    return __require;
+  }
+  if (typeof globalThis !== 'undefined') {
+    const candidate = (globalThis as { __require?: unknown }).__require;
+    if (typeof candidate === 'function') {
+      return candidate;
+    }
+  }
+  return null;
+}
+
+async function loadGachaModule(): Promise<GachaModule> {
+  const runtimeRequire = getRuntimeRequire();
+  if (runtimeRequire) {
+    return runtimeRequire(GACHA_MODULE_ID) as GachaModule;
+  }
+  if (typeof window !== 'undefined') {
+    const fromWindow = (window as { __require?: unknown }).__require;
+    if (typeof fromWindow === 'function') {
+      return fromWindow(GACHA_MODULE_ID) as GachaModule;
+    }
+  }
+  return import('./gacha.js');
+}
+
 function createContainer(): HTMLElement {
   const wrapper = document.createElement('div');
   wrapper.className = 'gacha-page';
@@ -149,8 +188,13 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
 
   root.appendChild(container);
 
-  void import('./gacha.js')
-    .then((module) => module.mountGachaUI(container))
+  loadGachaModule()
+    .then(async (module) => {
+      if (!module || typeof module.mountGachaUI !== 'function') {
+        throw new Error('Module gacha không xuất mountGachaUI.');
+      }
+      return module.mountGachaUI(container);
+    })
     .then((result) => {
       if (disposed) {
         result?.destroy?.();

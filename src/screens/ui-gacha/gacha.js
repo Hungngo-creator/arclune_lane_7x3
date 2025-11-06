@@ -1,4 +1,16 @@
-const { renderGachaView } = window.__require('./screens/gacha/view.ts');
+const runtimeRequire = typeof __require === 'function'
+  ? __require
+  : typeof globalThis !== 'undefined' && typeof (globalThis.__require) === 'function'
+    ? globalThis.__require
+    : typeof window !== 'undefined' && typeof window.__require === 'function'
+      ? window.__require
+      : null;
+
+if (!runtimeRequire) {
+  throw new Error('[Gacha UI] Không tìm thấy hàm require runtime để tải view.');
+}
+
+const { renderGachaView } = runtimeRequire('./screens/gacha/view.ts');
 
 const DEFAULT_CURRENCIES = [
   { id: 'gem', name: 'Tinh Thạch', icon: 'assets/gem.svg', amount: 12345 },
