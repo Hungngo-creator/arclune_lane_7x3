@@ -1,7 +1,7 @@
 // Bundled by build.mjs
 const __modules = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }
 function __define(id, factory){ __modules[id] = { factory, exports: null, initialized: false }; }
@@ -3598,6 +3598,7 @@ __define('./data/modes.ts', (exports, module, __require) => {
   const COMING_SOON_MODULE_ID = '@modes/coming-soon.stub.ts';
   const LINEUP_SCREEN_MODULE_ID = '@screens/lineup/index.ts';
   const COLLECTION_SCREEN_MODULE_ID = '@screens/collection/index.ts';
+  const GACHA_SCREEN_MODULE_ID = '@screens/ui-gacha/index.ts';
   const MODE_TYPES = {
       PVE: 'PvE',
       PVP: 'PvP',
@@ -3711,15 +3712,15 @@ __define('./data/modes.ts', (exports, module, __require) => {
           id: 'gacha',
           title: 'Gacha',
           type: MODE_TYPES.ECONOMY,
-          status: MODE_STATUS.COMING_SOON,
+          status: MODE_STATUS.AVAILABLE,
           icon: '🎲',
           shortDescription: `Quầy gacha phân tab Nhân Vật, Công Pháp, Vũ Khí, Sủng Thú với bảo hiểm ${(SSR_PITY === null || SSR_PITY === void 0 ? void 0 : SSR_PITY.hardPity) || 60}/${(UR_PITY === null || UR_PITY === void 0 ? void 0 : UR_PITY.hardPity) || 70}/${(PRIME_PITY === null || PRIME_PITY === void 0 ? void 0 : PRIME_PITY.hardPity) || 80} lượt cho các banner SSR/UR/Prime.`,
           unlockNotes: `Banner UR bảo hiểm SSR ở lượt ${((_b = (_a = UR_PITY === null || UR_PITY === void 0 ? void 0 : UR_PITY.softGuarantees) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.pull) || 50}; banner Prime lần lượt bảo hiểm SSR/UR ở ${((_c = PRIME_PITY === null || PRIME_PITY === void 0 ? void 0 : PRIME_PITY.softGuarantees) === null || _c === void 0 ? void 0 : _c.map(({ pull }) => pull).join('/')) || '40/60'} và Prime ở ${(PRIME_PITY === null || PRIME_PITY === void 0 ? void 0 : PRIME_PITY.hardPity) || 80}.`,
-          tags: ['Kinh tế nguyên tinh', 'Coming soon'],
+          tags: ['Kinh tế nguyên tinh'],
           menuSections: ['economy'],
           shell: {
-              screenId: 'main-menu',
-              fallbackModuleId: COMING_SOON_MODULE_ID
+              screenId: 'gacha',
+              moduleId: GACHA_SCREEN_MODULE_ID
           }
       },
       {
@@ -5745,6 +5746,7 @@ __define('./entry.ts', (exports, module, __require) => {
   const SCREEN_PVE = 'pve-session';
   const SCREEN_COLLECTION = 'collection';
   const SCREEN_LINEUP = 'lineup';
+  const SCREEN_GACHA = 'gacha';
   const COMING_SOON_MODULE_ID = '@modes/coming-soon.stub.ts';
   const COLLECTION_SCREEN_MODULE_ID = '@screens/collection/index.ts';
   const LINEUP_SCREEN_MODULE_ID = '@screens/lineup/index.ts';
@@ -5753,7 +5755,8 @@ __define('./entry.ts', (exports, module, __require) => {
       `app--${SCREEN_PVE}`,
       'app--pve',
       `app--${SCREEN_COLLECTION}`,
-      `app--${SCREEN_LINEUP}`
+      `app--${SCREEN_LINEUP}`,
+      `app--${SCREEN_GACHA}`,
   ];
   async function loadBundledModule(id) {
       var _a, _b;
@@ -16729,7 +16732,7 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'createHeader')) exports.createHeader = createHeader;
 });
 __define('./screens/ui-gacha/gacha.css', (exports, module, __require) => {
-  const css = ":root {\n  color-scheme: dark;\n  --bg-page: #0b0f14;\n  --bg-panel: rgba(14, 20, 32, 0.88);\n  --text-main: #e6f0ff;\n  --text-muted: rgba(190, 216, 240, 0.82);\n  --outline-strong: rgba(174, 228, 255, 0.38);\n  --gradient-hero: linear-gradient(135deg, rgba(124, 77, 255, 0.45), rgba(0, 229, 255, 0.25));\n  --hero-art: url('assets/banner_standard.svg');\n  --transition-base: 0.22s ease;\n  --drawer-width: 320px;\n  font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;\n\n  --rank-n: #9aa0a6;\n  --rank-r: #42a5f5;\n  --rank-sr: #7c4dff;\n  --rank-ssr-a: #ff2d55;\n  --rank-ssr-b: #ffb300;\n  --rank-ur: #ffda6b;\n  --rank-prime-a: #6a00ff;\n  --rank-prime-b: #00e5ff;\n}\n\n* {\n  box-sizing: border-box;\n}\n\nbody.gacha-page {\n  margin: 0;\n  background: var(--bg-page);\n  color: var(--text-main);\n  min-height: 100vh;\n  display: flex;\n  justify-content: center;\n  padding: 24px;\n}\n\nbutton {\n  font-family: inherit;\n  color: inherit;\n}\n\n.gacha-app {\n  width: min(100%, 1600px);\n  display: flex;\n  flex-direction: column;\n  gap: 24px;\n}\n\n.gacha-topbar {\n  display: flex;\n  align-items: center;\n  gap: 16px;\n  position: relative;\n}\n\n.banner-drawer-toggle {\n  display: none;\n  align-items: center;\n  gap: 6px;\n  padding: 10px 14px;\n  border-radius: 999px;\n  border: 1px solid rgba(174, 228, 255, 0.35);\n  background: rgba(8, 12, 18, 0.72);\n  color: var(--text-main);\n  font-weight: 600;\n  cursor: pointer;\n}\n\n.banner-drawer-toggle:focus-visible,\n.help-button:focus-visible,\n.currency-item:focus-visible,\n.banner-card:focus-visible,\n.hero__details:focus-visible,\n.cta__button:focus-visible,\n.modal__close:focus-visible,\n.modal__close-btn:focus-visible,\n.modal__tabs button:focus-visible {\n  outline: 2px solid #00e5ff;\n  outline-offset: 2px;\n}\n\n.currency-header {\n  display: flex;\n  gap: 10px;\n  padding: 10px 16px;\n  border-radius: 18px;\n  background: rgba(11, 17, 26, 0.82);\n  border: 1px solid rgba(126, 206, 255, 0.18);\n  flex: 1;\n  min-height: 64px;\n}\n\n.currency-item {\n  display: inline-flex;\n  align-items: center;\n  gap: 10px;\n  padding: 8px 12px;\n  border-radius: 14px;\n  background: rgba(16, 28, 42, 0.72);\n  border: 1px solid transparent;\n  position: relative;\n}\n\n.currency-item__text {\n  display: flex;\n  flex-direction: column;\n  align-items: flex-start;\n  gap: 2px;\n}\n\n.currency-item__label {\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.1em;\n  color: rgba(190, 216, 240, 0.75);\n}\n\n.currency-item__icon {\n  width: 32px;\n  height: 32px;\n  border-radius: 999px;\n  background: rgba(174, 228, 255, 0.1);\n  display: grid;\n  place-items: center;\n}\n\n.currency-item__icon img {\n  width: 24px;\n  height: 24px;\n}\n\n.currency-item__amount {\n  font-variant-numeric: tabular-nums;\n  font-weight: 600;\n}\n\n.currency-item--insufficient {\n  border-color: rgba(255, 77, 109, 0.5);\n  background: rgba(255, 77, 109, 0.12);\n}\n\n.help-button {\n  width: 42px;\n  height: 42px;\n  border-radius: 50%;\n  border: 1px solid rgba(174, 228, 255, 0.4);\n  background: rgba(12, 20, 30, 0.8);\n  color: var(--text-main);\n  font-size: 18px;\n  font-weight: 700;\n  cursor: pointer;\n  transition: transform var(--transition-base);\n}\n\n.help-button:hover {\n  transform: translateY(-2px);\n}\n\n.gacha-layout {\n  display: grid;\n  grid-template-columns: 320px 1fr;\n  gap: 24px;\n  min-height: 560px;\n}\n\n.banner-list {\n  display: flex;\n  flex-direction: column;\n  gap: 14px;\n  padding: 20px 18px;\n  border-radius: 26px;\n  background: linear-gradient(160deg, rgba(9, 14, 22, 0.82), rgba(14, 22, 34, 0.68));\n  border: 1px solid rgba(124, 200, 255, 0.24);\n  backdrop-filter: blur(18px) saturate(125%);\n  overflow-y: auto;\n  max-height: calc(100vh - 220px);\n}\n\n.banner-card {\n  display: grid;\n  grid-template-columns: 96px 1fr;\n  gap: 16px;\n  background: rgba(8, 13, 20, 0.82);\n  border-radius: 20px;\n  padding: 16px;\n  border: 1px solid rgba(124, 200, 255, 0.16);\n  cursor: pointer;\n  position: relative;\n  transition: border-color var(--transition-base), transform var(--transition-base), box-shadow var(--transition-base);\n  overflow: hidden;\n  isolation: isolate;\n}\n\n.banner-card:hover {\n  transform: translateX(6px);\n  box-shadow: 0 18px 48px rgba(0, 229, 255, 0.16);\n}\n\n.banner-card__thumb {\n  width: 96px;\n  height: 96px;\n  border-radius: 18px;\n  overflow: hidden;\n  background: rgba(124, 77, 255, 0.18);\n  display: grid;\n  place-items: center;\n  position: relative;\n}\n\n.banner-card__thumb img {\n  width: 100%;\n  height: 100%;\n  object-fit: cover;\n}\n\n.banner-card__thumb::after {\n  content: '';\n  position: absolute;\n  inset: 0;\n  background: linear-gradient(140deg, rgba(8, 12, 18, 0.15), rgba(8, 12, 18, 0));\n}\n\n.banner-card__texts {\n  display: flex;\n  flex-direction: column;\n  gap: 6px;\n}\n\n.banner-card__name {\n  margin: 0;\n  font-size: 17px;\n  font-weight: 700;\n}\n\n.banner-card__subtitle {\n  margin: 0;\n  font-size: 13px;\n  color: rgba(190, 216, 240, 0.78);\n}\n\n.banner-card__subtitle.is-empty {\n  display: none;\n}\n\n.banner-card__tag {\n  font-size: 12px;\n  font-weight: 600;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n  color: rgba(230, 240, 255, 0.82);\n}\n\n.banner-card__badge {\n  position: absolute;\n  top: 14px;\n  left: 18px;\n  font-size: 11px;\n  letter-spacing: 0.08em;\n  text-transform: uppercase;\n  padding: 4px 10px;\n  border-radius: 999px;\n  background: rgba(255, 221, 105, 0.22);\n  border: 1px solid rgba(255, 221, 105, 0.4);\n  color: #ffe27a;\n  z-index: 1;\n}\n\n.banner-card__timer {\n  position: absolute;\n  top: 14px;\n  right: 16px;\n  font-size: 12px;\n  padding: 4px 12px;\n  border-radius: 999px;\n  background: rgba(0, 229, 255, 0.18);\n  border: 1px solid rgba(0, 229, 255, 0.45);\n  color: #c6f6ff;\n  z-index: 1;\n}\n\n.banner-card--selected {\n  border-color: rgba(0, 229, 255, 0.6);\n  background: linear-gradient(135deg, rgba(0, 229, 255, 0.18), rgba(124, 77, 255, 0.18));\n  box-shadow: 0 20px 56px rgba(0, 229, 255, 0.24);\n}\n\n.hero {\n  position: relative;\n  border-radius: 32px;\n  overflow: hidden;\n  display: flex;\n  min-height: 640px;\n  background: var(--gradient-hero);\n  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.45);\n  isolation: isolate;\n}\n\n.hero__background {\n  position: absolute;\n  inset: 0;\n  background-image: var(--hero-art);\n  background-size: cover;\n  background-position: center;\n  opacity: 0.72;\n  transform: scale(1.04);\n  filter: saturate(110%);\n}\n\n.hero__background::after {\n  content: '';\n  position: absolute;\n  inset: 0;\n  background: linear-gradient(120deg, rgba(8, 12, 18, 0.92) 0%, rgba(8, 12, 18, 0.55) 48%, rgba(8, 12, 18, 0.9) 100%);\n}\n\n.hero__content {\n  position: relative;\n  z-index: 1;\n  padding: 48px 56px;\n  display: flex;\n  flex-direction: column;\n  gap: 28px;\n  width: 100%;\n}\n\n.hero__header {\n  display: flex;\n  justify-content: space-between;\n  gap: 24px;\n  align-items: flex-start;\n}\n\n.hero__title-group {\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n}\n\n.hero__title {\n  margin: 0;\n  font-size: clamp(32px, 3vw, 44px);\n  letter-spacing: 0.06em;\n  text-transform: uppercase;\n}\n\n.hero__subtitle {\n  margin: 0;\n  color: var(--text-muted);\n  font-size: 16px;\n}\n\n.hero__type-chip {\n  padding: 6px 14px;\n  border-radius: 999px;\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.12em;\n  border: 1px solid rgba(230, 240, 255, 0.4);\n  background: rgba(11, 17, 26, 0.6);\n  width: fit-content;\n}\n\n.hero__meta {\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n  align-items: flex-end;\n}\n\n.hero__rateup {\n  padding: 8px 16px;\n  border-radius: 999px;\n  font-weight: 700;\n  font-size: 12px;\n  letter-spacing: 0.1em;\n  background: rgba(255, 221, 105, 0.24);\n  color: #ffe27a;\n  border: 1px solid rgba(255, 221, 105, 0.55);\n  display: none;\n  align-items: center;\n  gap: 8px;\n}\n\n.hero__rateup::before {\n  content: '★';\n  font-size: 12px;\n}\n\n.hero__rateup.is-visible {\n  display: inline-flex;\n}\n\n.hero__timer {\n  padding: 8px 14px;\n  border-radius: 999px;\n  background: rgba(0, 229, 255, 0.18);\n  color: #bdf6ff;\n  font-size: 12px;\n  letter-spacing: 0.06em;\n  border: 1px solid rgba(0, 229, 255, 0.45);\n}\n\n.pity {\n  display: flex;\n  flex-direction: column;\n  gap: 16px;\n  }\n\n.pity__pills {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 12px;\n}\n\n.pity-pill {\n  padding: 8px 14px;\n  border-radius: 999px;\n  background: rgba(12, 20, 30, 0.72);\n  border: 1px solid rgba(174, 228, 255, 0.3);\n  font-size: 13px;\n  display: inline-flex;\n  align-items: center;\n  gap: 8px;\n}\n\n.pity-pill__label {\n  font-weight: 600;\n}\n\n.pity__progress {\n  display: flex;\n  align-items: center;\n  gap: 18px;\n}\n\n.pity__bar {\n  flex: 1;\n  height: 10px;\n  border-radius: 999px;\n  background: rgba(11, 17, 26, 0.6);\n  position: relative;\n  overflow: hidden;\n}\n\n.pity__bar::after {\n  content: '';\n  position: absolute;\n  inset: 0;\n  background: linear-gradient(90deg, rgba(124, 77, 255, 0.4), rgba(0, 229, 255, 0.35));\n  transform: scaleX(var(--pity-progress, 0));\n  transform-origin: left;\n  transition: transform 0.3s ease;\n}\n\n.pity__note {\n  font-size: 12px;\n  color: var(--text-muted);\n}\n\n.featured__list {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));\n  gap: 18px;\n}\n\n.featured__empty {\n  margin: 0;\n  color: var(--text-muted);\n  font-size: 14px;\n}\n\n.featured-card {\n  position: relative;\n  border-radius: 20px;\n  overflow: hidden;\n  background: rgba(11, 17, 26, 0.55);\n  min-height: 240px;\n  display: flex;\n  flex-direction: column;\n  justify-content: flex-end;\n  color: var(--text-main);\n}\n\n.featured-card__art {\n  position: absolute;\n  inset: 0;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  pointer-events: none;\n}\n\n.featured-card__art img {\n  width: 100%;\n  height: 100%;\n  object-fit: cover;\n}\n\n.featured-card__footer {\n  position: relative;\n  z-index: 1;\n  padding: 16px;\n  background: linear-gradient(0deg, rgba(11, 15, 20, 0.86), rgba(11, 15, 20, 0));\n  font-weight: 600;\n  letter-spacing: 0.02em;\n}\n\n.rank-chip {\n  font: 600 12px/1 'Inter', sans-serif;\n  padding: 2px 8px;\n  border-radius: 999px;\n  color: #0b0f14;\n  background: #fff;\n  position: absolute;\n  top: 12px;\n  left: 12px;\n  z-index: 2;\n  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);\n}\n\n.aura {\n  position: relative;\n  border-radius: 16px;\n}\n\n.aura::after {\n  content: '';\n  position: absolute;\n  inset: -4px;\n  border-radius: inherit;\n  pointer-events: none;\n  filter: blur(4px);\n}\n\n.aura--N::after {\n  box-shadow: 0 0 0 1px var(--rank-n), 0 0 6px rgba(154, 160, 166, 0.3);\n}\n\n.aura--R::after {\n  box-shadow: 0 0 0 2px var(--rank-r), 0 0 10px rgba(66, 165, 245, 0.4);\n}\n\n.aura--SR::after {\n  box-shadow: 0 0 0 2px var(--rank-sr), 0 0 12px rgba(124, 77, 255, 0.45);\n  animation: pulse 3s infinite;\n}\n\n.aura--SSR::after {\n  box-shadow: 0 0 0 2px var(--rank-ssr-a), 0 0 0 4px var(--rank-ssr-b), 0 0 16px rgba(255, 179, 0, 0.45);\n}\n\n.aura--UR::after {\n  box-shadow: 0 0 0 2px #fff, 0 0 0 5px var(--rank-ur), 0 0 18px rgba(255, 218, 107, 0.5);\n}\n\n.aura--Prime::after {\n  box-shadow: 0 0 0 2px var(--rank-prime-a), 0 0 0 6px var(--rank-prime-b), 0 0 24px rgba(0, 229, 255, 0.5);\n  animation: twinkle 10s infinite linear;\n}\n\n@keyframes pulse {\n  50% {\n    filter: blur(6px) brightness(1.1);\n  }\n}\n\n@keyframes twinkle {\n  0% {\n    opacity: 0.9;\n  }\n  50% {\n    opacity: 0.7;\n  }\n  100% {\n    opacity: 0.9;\n  }\n}\n\n.hero__details {\n  align-self: flex-start;\n  padding: 12px 22px;\n  border-radius: 999px;\n  border: 1px solid rgba(174, 228, 255, 0.42);\n  background: rgba(12, 20, 30, 0.72);\n  color: var(--text-main);\n  font-weight: 600;\n  letter-spacing: 0.08em;\n  text-transform: uppercase;\n  cursor: pointer;\n  transition: transform var(--transition-base), border-color var(--transition-base);\n}\n\n.hero__details:hover {\n  transform: translateY(-2px);\n  border-color: rgba(174, 228, 255, 0.7);\n}\n\n.cta {\n  display: flex;\n  flex-direction: column;\n  gap: 18px;\n  align-items: center;\n  text-align: center;\n}\n\n.cta__note {\n  font-size: 13px;\n  color: var(--text-muted);\n}\n\n.cta__buttons {\n  display: flex;\n  gap: 24px;\n  flex-wrap: wrap;\n  justify-content: center;\n}\n\n.cta__button {\n  min-width: 220px;\n  padding: 18px 24px 12px;\n  border-radius: 22px;\n  border: 1px solid rgba(174, 228, 255, 0.4);\n  background: rgba(11, 17, 26, 0.82);\n  color: var(--text-main);\n  font-size: 18px;\n  font-weight: 700;\n  text-transform: uppercase;\n  letter-spacing: 0.12em;\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n  cursor: pointer;\n  transition: transform var(--transition-base), border-color var(--transition-base), box-shadow var(--transition-base);\n}\n\n.cta__button--affordable {\n  border-color: rgba(0, 229, 255, 0.55);\n  box-shadow: 0 14px 34px rgba(0, 229, 255, 0.18);\n}\n\n.cta__button:hover:enabled {\n  transform: translateY(-4px);\n  border-color: rgba(0, 229, 255, 0.7);\n  box-shadow: 0 18px 48px rgba(0, 229, 255, 0.2);\n}\n\n.cta__button:disabled {\n  cursor: not-allowed;\n  opacity: 0.6;\n  border-color: rgba(255, 102, 126, 0.45);\n  background: rgba(255, 102, 126, 0.1);\n}\n\n.cta__label {\n  font-size: 16px;\n}\n\n.cta__cost {\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n  font-size: 14px;\n  color: var(--text-muted);\n}\n\n.cta__cost-line {\n  display: inline-flex;\n  align-items: center;\n  gap: 8px;\n}\n\n.cta__cost-line img {\n  width: 20px;\n  height: 20px;\n}\n\n.cta__cost-line--fallback {\n  font-size: 12px;\n  opacity: 0.8;\n}\n\n.modal {\n  position: fixed;\n  inset: 0;\n  display: none;\n  align-items: center;\n  justify-content: center;\n  padding: 32px;\n  z-index: 100;\n}\n\n.modal.is-open {\n  display: flex;\n}\n\n.modal__overlay {\n  position: absolute;\n  inset: 0;\n  background: rgba(4, 6, 10, 0.75);\n}\n\n.modal__dialog {\n  position: relative;\n  z-index: 1;\n  background: rgba(11, 17, 26, 0.95);\n  border-radius: 24px;\n  padding: 24px;\n  border: 1px solid rgba(174, 228, 255, 0.3);\n  width: min(720px, 100%);\n  display: flex;\n  flex-direction: column;\n  gap: 18px;\n}\n\n.modal__dialog--wide {\n  width: min(960px, 100%);\n}\n\n.modal__header {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  gap: 12px;\n}\n\n.modal__title {\n  margin: 0;\n  font-size: 22px;\n  letter-spacing: 0.06em;\n}\n\n.modal__close {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  border: 1px solid rgba(174, 228, 255, 0.4);\n  background: rgba(12, 20, 30, 0.8);\n  cursor: pointer;\n  position: relative;\n}\n\n.modal__close::before,\n.modal__close::after {\n  content: '';\n  position: absolute;\n  top: 50%;\n  left: 50%;\n  width: 14px;\n  height: 2px;\n  background: var(--text-main);\n  transform: translate(-50%, -50%) rotate(45deg);\n}\n\n.modal__close::after {\n  transform: translate(-50%, -50%) rotate(-45deg);\n}\n\n.modal__tabs {\n  display: flex;\n  gap: 12px;\n}\n\n.modal__tabs button {\n  flex: 1;\n  padding: 10px 14px;\n  border-radius: 12px;\n  border: 1px solid rgba(174, 228, 255, 0.28);\n  background: rgba(12, 20, 30, 0.7);\n  color: var(--text-main);\n  font-weight: 600;\n  cursor: pointer;\n}\n\n.modal__tabs button[aria-selected='true'] {\n  border-color: rgba(0, 229, 255, 0.6);\n  box-shadow: 0 12px 32px rgba(0, 229, 255, 0.2);\n}\n\n.modal__body {\n  display: flex;\n  flex-direction: column;\n  gap: 18px;\n}\n\n.modal__panel {\n  display: flex;\n  flex-direction: column;\n  gap: 16px;\n}\n\n.featured-list {\n  list-style: none;\n  margin: 0;\n  padding: 0;\n  display: flex;\n  flex-direction: column;\n  gap: 12px;\n}\n\n.featured-list__item {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  padding: 10px 14px;\n  border-radius: 12px;\n  background: rgba(12, 20, 30, 0.65);\n  border: 1px solid rgba(174, 228, 255, 0.22);\n}\n\n.rates-table {\n  width: 100%;\n  border-collapse: collapse;\n  font-size: 15px;\n}\n\n.rates-table thead {\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n  color: var(--text-muted);\n}\n\n.rates-table th,\n.rates-table td {\n  padding: 12px 14px;\n  border-bottom: 1px solid rgba(174, 228, 255, 0.2);\n}\n\n.pity-list {\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n  font-size: 14px;\n}\n\n.pity-list__row {\n  padding: 10px 14px;\n  border-radius: 12px;\n  background: rgba(12, 20, 30, 0.6);\n  border: 1px solid rgba(174, 228, 255, 0.2);\n}\n\n.pity-list__carry {\n  font-size: 13px;\n  color: var(--text-muted);\n}\n\n.modal__description {\n  margin: 0;\n  color: var(--text-muted);\n}\n\n.confirm__grid {\n  border-radius: 18px;\n  padding: 18px;\n  background: rgba(11, 17, 26, 0.72);\n  border: 1px solid rgba(174, 228, 255, 0.2);\n}\n\n.confirm__gacha {\n  min-height: 320px;\n}\n\n.modal__footer {\n  display: flex;\n  justify-content: flex-end;\n}\n\n.modal__close-btn {\n  padding: 10px 18px;\n  border-radius: 12px;\n  border: 1px solid rgba(174, 228, 255, 0.4);\n  background: rgba(12, 20, 30, 0.7);\n  color: var(--text-main);\n  cursor: pointer;\n}\n\n.banner-list__drawer {\n  display: none;\n}\n\n@media (max-width: 1280px) {\n  .gacha-layout {\n    grid-template-columns: 280px 1fr;\n  }\n}\n\n@media (max-width: 960px) {\n  body.gacha-page {\n    padding: 16px;\n  }\n\n  .gacha-layout {\n    grid-template-columns: 1fr;\n  }\n\n  .banner-list {\n    position: fixed;\n    top: 0;\n    bottom: 0;\n    left: 0;\n    width: var(--drawer-width);\n    max-height: none;\n    transform: translateX(-100%);\n    transition: transform var(--transition-base);\n    z-index: 90;\n  }\n\n  .gacha-app[data-drawer-open='true'] .banner-list {\n    transform: translateX(0);\n  }\n\n  .banner-drawer-toggle {\n    display: inline-flex;\n  }\n\n  .hero {\n    min-height: 520px;\n  }\n}\n\n@media (max-width: 720px) {\n  body.gacha-page {\n    padding: 12px;\n  }\n\n  .gacha-app {\n    gap: 18px;\n  }\n\n  .banner-card {\n    grid-template-columns: 80px 1fr;\n    padding: 14px;\n  }\n\n  .banner-card__thumb {\n    width: 80px;\n    height: 80px;\n  }\n\n  .banner-card__badge {\n    top: 12px;\n    left: 14px;\n  }\n\n  .banner-card__timer {\n    top: 12px;\n    right: 14px;\n  }\n\n  .hero__content {\n    padding: 28px;\n    gap: 22px;\n  }\n\n  .hero__header {\n    flex-direction: column;\n    align-items: flex-start;\n  }\n\n  .hero__meta {\n    flex-direction: row;\n    align-items: center;\n  }\n\n  .currency-header {\n    flex-wrap: wrap;\n  }\n\n  .banner-list {\n    width: calc(100% - 48px);\n  }\n\n  .cta__button {\n    min-width: 180px;\n    font-size: 16px;\n  }\n}\n\n@media (max-width: 480px) {\n  .hero {\n    min-height: 480px;\n  }\n\n  .hero__content {\n    padding: 24px;\n  }\n\n  .currency-header {\n    padding: 10px 12px;\n  }\n\n  .currency-item {\n    padding: 6px 10px;\n  }\n}\n";
+  const css = ":root {\n  color-scheme: dark;\n  --bg-page: #0b0f14;\n  --bg-panel: rgba(14, 20, 32, 0.88);\n  --text-main: #e6f0ff;\n  --text-muted: rgba(190, 216, 240, 0.82);\n  --outline-strong: rgba(174, 228, 255, 0.38);\n  --gradient-hero: linear-gradient(135deg, rgba(124, 77, 255, 0.45), rgba(0, 229, 255, 0.25));\n  --hero-art: url('assets/banner_standard.svg');\n  --transition-base: 0.22s ease;\n  --drawer-width: 320px;\n  font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;\n\n  --rank-n: #9aa0a6;\n  --rank-r: #42a5f5;\n  --rank-sr: #7c4dff;\n  --rank-ssr-a: #ff2d55;\n  --rank-ssr-b: #ffb300;\n  --rank-ur: #ffda6b;\n  --rank-prime-a: #6a00ff;\n  --rank-prime-b: #00e5ff;\n}\n\n* {\n  box-sizing: border-box;\n}\n\nbody.gacha-page,\n.gacha-page {\n  margin: 0;\n  background: var(--bg-page);\n  color: var(--text-main);\n  min-height: 100vh;\n  display: flex;\n  justify-content: center;\n  padding: 24px;\n}\n\nbutton {\n  font-family: inherit;\n  color: inherit;\n}\n\n.gacha-app {\n  width: min(100%, 1600px);\n  display: flex;\n  flex-direction: column;\n  gap: 24px;\n}\n\n.gacha-topbar {\n  display: flex;\n  align-items: center;\n  gap: 16px;\n  position: relative;\n}\n\n.banner-drawer-toggle {\n  display: none;\n  align-items: center;\n  gap: 6px;\n  padding: 10px 14px;\n  border-radius: 999px;\n  border: 1px solid rgba(174, 228, 255, 0.35);\n  background: rgba(8, 12, 18, 0.72);\n  color: var(--text-main);\n  font-weight: 600;\n  cursor: pointer;\n}\n\n.banner-drawer-toggle:focus-visible,\n.help-button:focus-visible,\n.currency-item:focus-visible,\n.banner-card:focus-visible,\n.hero__details:focus-visible,\n.cta__button:focus-visible,\n.modal__close:focus-visible,\n.modal__close-btn:focus-visible,\n.modal__tabs button:focus-visible {\n  outline: 2px solid #00e5ff;\n  outline-offset: 2px;\n}\n\n.currency-header {\n  display: flex;\n  gap: 10px;\n  padding: 10px 16px;\n  border-radius: 18px;\n  background: rgba(11, 17, 26, 0.82);\n  border: 1px solid rgba(126, 206, 255, 0.18);\n  flex: 1;\n  min-height: 64px;\n}\n\n.currency-item {\n  display: inline-flex;\n  align-items: center;\n  gap: 10px;\n  padding: 8px 12px;\n  border-radius: 14px;\n  background: rgba(16, 28, 42, 0.72);\n  border: 1px solid transparent;\n  position: relative;\n}\n\n.currency-item__text {\n  display: flex;\n  flex-direction: column;\n  align-items: flex-start;\n  gap: 2px;\n}\n\n.currency-item__label {\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.1em;\n  color: rgba(190, 216, 240, 0.75);\n}\n\n.currency-item__icon {\n  width: 32px;\n  height: 32px;\n  border-radius: 999px;\n  background: rgba(174, 228, 255, 0.1);\n  display: grid;\n  place-items: center;\n}\n\n.currency-item__icon img {\n  width: 24px;\n  height: 24px;\n}\n\n.currency-item__amount {\n  font-variant-numeric: tabular-nums;\n  font-weight: 600;\n}\n\n.currency-item--insufficient {\n  border-color: rgba(255, 77, 109, 0.5);\n  background: rgba(255, 77, 109, 0.12);\n}\n\n.help-button {\n  width: 42px;\n  height: 42px;\n  border-radius: 50%;\n  border: 1px solid rgba(174, 228, 255, 0.4);\n  background: rgba(12, 20, 30, 0.8);\n  color: var(--text-main);\n  font-size: 18px;\n  font-weight: 700;\n  cursor: pointer;\n  transition: transform var(--transition-base);\n}\n\n.help-button:hover {\n  transform: translateY(-2px);\n}\n\n.gacha-layout {\n  display: grid;\n  grid-template-columns: 320px 1fr;\n  gap: 24px;\n  min-height: 560px;\n}\n\n.banner-list {\n  display: flex;\n  flex-direction: column;\n  gap: 14px;\n  padding: 20px 18px;\n  border-radius: 26px;\n  background: linear-gradient(160deg, rgba(9, 14, 22, 0.82), rgba(14, 22, 34, 0.68));\n  border: 1px solid rgba(124, 200, 255, 0.24);\n  backdrop-filter: blur(18px) saturate(125%);\n  overflow-y: auto;\n  max-height: calc(100vh - 220px);\n}\n\n.banner-card {\n  display: grid;\n  grid-template-columns: 96px 1fr;\n  gap: 16px;\n  background: rgba(8, 13, 20, 0.82);\n  border-radius: 20px;\n  padding: 16px;\n  border: 1px solid rgba(124, 200, 255, 0.16);\n  cursor: pointer;\n  position: relative;\n  transition: border-color var(--transition-base), transform var(--transition-base), box-shadow var(--transition-base);\n  overflow: hidden;\n  isolation: isolate;\n}\n\n.banner-card:hover {\n  transform: translateX(6px);\n  box-shadow: 0 18px 48px rgba(0, 229, 255, 0.16);\n}\n\n.banner-card__thumb {\n  width: 96px;\n  height: 96px;\n  border-radius: 18px;\n  overflow: hidden;\n  background: rgba(124, 77, 255, 0.18);\n  display: grid;\n  place-items: center;\n  position: relative;\n}\n\n.banner-card__thumb img {\n  width: 100%;\n  height: 100%;\n  object-fit: cover;\n}\n\n.banner-card__thumb::after {\n  content: '';\n  position: absolute;\n  inset: 0;\n  background: linear-gradient(140deg, rgba(8, 12, 18, 0.15), rgba(8, 12, 18, 0));\n}\n\n.banner-card__texts {\n  display: flex;\n  flex-direction: column;\n  gap: 6px;\n}\n\n.banner-card__name {\n  margin: 0;\n  font-size: 17px;\n  font-weight: 700;\n}\n\n.banner-card__subtitle {\n  margin: 0;\n  font-size: 13px;\n  color: rgba(190, 216, 240, 0.78);\n}\n\n.banner-card__subtitle.is-empty {\n  display: none;\n}\n\n.banner-card__tag {\n  font-size: 12px;\n  font-weight: 600;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n  color: rgba(230, 240, 255, 0.82);\n}\n\n.banner-card__badge {\n  position: absolute;\n  top: 14px;\n  left: 18px;\n  font-size: 11px;\n  letter-spacing: 0.08em;\n  text-transform: uppercase;\n  padding: 4px 10px;\n  border-radius: 999px;\n  background: rgba(255, 221, 105, 0.22);\n  border: 1px solid rgba(255, 221, 105, 0.4);\n  color: #ffe27a;\n  z-index: 1;\n}\n\n.banner-card__timer {\n  position: absolute;\n  top: 14px;\n  right: 16px;\n  font-size: 12px;\n  padding: 4px 12px;\n  border-radius: 999px;\n  background: rgba(0, 229, 255, 0.18);\n  border: 1px solid rgba(0, 229, 255, 0.45);\n  color: #c6f6ff;\n  z-index: 1;\n}\n\n.banner-card--selected {\n  border-color: rgba(0, 229, 255, 0.6);\n  background: linear-gradient(135deg, rgba(0, 229, 255, 0.18), rgba(124, 77, 255, 0.18));\n  box-shadow: 0 20px 56px rgba(0, 229, 255, 0.24);\n}\n\n.hero {\n  position: relative;\n  border-radius: 32px;\n  overflow: hidden;\n  display: flex;\n  min-height: 640px;\n  background: var(--gradient-hero);\n  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.45);\n  isolation: isolate;\n}\n\n.hero__background {\n  position: absolute;\n  inset: 0;\n  background-image: var(--hero-art);\n  background-size: cover;\n  background-position: center;\n  opacity: 0.72;\n  transform: scale(1.04);\n  filter: saturate(110%);\n}\n\n.hero__background::after {\n  content: '';\n  position: absolute;\n  inset: 0;\n  background: linear-gradient(120deg, rgba(8, 12, 18, 0.92) 0%, rgba(8, 12, 18, 0.55) 48%, rgba(8, 12, 18, 0.9) 100%);\n}\n\n.hero__content {\n  position: relative;\n  z-index: 1;\n  padding: 48px 56px;\n  display: flex;\n  flex-direction: column;\n  gap: 28px;\n  width: 100%;\n}\n\n.hero__header {\n  display: flex;\n  justify-content: space-between;\n  gap: 24px;\n  align-items: flex-start;\n}\n\n.hero__title-group {\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n}\n\n.hero__title {\n  margin: 0;\n  font-size: clamp(32px, 3vw, 44px);\n  letter-spacing: 0.06em;\n  text-transform: uppercase;\n}\n\n.hero__subtitle {\n  margin: 0;\n  color: var(--text-muted);\n  font-size: 16px;\n}\n\n.hero__type-chip {\n  padding: 6px 14px;\n  border-radius: 999px;\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.12em;\n  border: 1px solid rgba(230, 240, 255, 0.4);\n  background: rgba(11, 17, 26, 0.6);\n  width: fit-content;\n}\n\n.hero__meta {\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n  align-items: flex-end;\n}\n\n.hero__rateup {\n  padding: 8px 16px;\n  border-radius: 999px;\n  font-weight: 700;\n  font-size: 12px;\n  letter-spacing: 0.1em;\n  background: rgba(255, 221, 105, 0.24);\n  color: #ffe27a;\n  border: 1px solid rgba(255, 221, 105, 0.55);\n  display: none;\n  align-items: center;\n  gap: 8px;\n}\n\n.hero__rateup::before {\n  content: '★';\n  font-size: 12px;\n}\n\n.hero__rateup.is-visible {\n  display: inline-flex;\n}\n\n.hero__timer {\n  padding: 8px 14px;\n  border-radius: 999px;\n  background: rgba(0, 229, 255, 0.18);\n  color: #bdf6ff;\n  font-size: 12px;\n  letter-spacing: 0.06em;\n  border: 1px solid rgba(0, 229, 255, 0.45);\n}\n\n.pity {\n  display: flex;\n  flex-direction: column;\n  gap: 16px;\n  }\n\n.pity__pills {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 12px;\n}\n\n.pity-pill {\n  padding: 8px 14px;\n  border-radius: 999px;\n  background: rgba(12, 20, 30, 0.72);\n  border: 1px solid rgba(174, 228, 255, 0.3);\n  font-size: 13px;\n  display: inline-flex;\n  align-items: center;\n  gap: 8px;\n}\n\n.pity-pill__label {\n  font-weight: 600;\n}\n\n.pity__progress {\n  display: flex;\n  align-items: center;\n  gap: 18px;\n}\n\n.pity__bar {\n  flex: 1;\n  height: 10px;\n  border-radius: 999px;\n  background: rgba(11, 17, 26, 0.6);\n  position: relative;\n  overflow: hidden;\n}\n\n.pity__bar::after {\n  content: '';\n  position: absolute;\n  inset: 0;\n  background: linear-gradient(90deg, rgba(124, 77, 255, 0.4), rgba(0, 229, 255, 0.35));\n  transform: scaleX(var(--pity-progress, 0));\n  transform-origin: left;\n  transition: transform 0.3s ease;\n}\n\n.pity__note {\n  font-size: 12px;\n  color: var(--text-muted);\n}\n\n.featured__list {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));\n  gap: 18px;\n}\n\n.featured__empty {\n  margin: 0;\n  color: var(--text-muted);\n  font-size: 14px;\n}\n\n.featured-card {\n  position: relative;\n  border-radius: 20px;\n  overflow: hidden;\n  background: rgba(11, 17, 26, 0.55);\n  min-height: 240px;\n  display: flex;\n  flex-direction: column;\n  justify-content: flex-end;\n  color: var(--text-main);\n}\n\n.featured-card__art {\n  position: absolute;\n  inset: 0;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  pointer-events: none;\n}\n\n.featured-card__art img {\n  width: 100%;\n  height: 100%;\n  object-fit: cover;\n}\n\n.featured-card__footer {\n  position: relative;\n  z-index: 1;\n  padding: 16px;\n  background: linear-gradient(0deg, rgba(11, 15, 20, 0.86), rgba(11, 15, 20, 0));\n  font-weight: 600;\n  letter-spacing: 0.02em;\n}\n\n.rank-chip {\n  font: 600 12px/1 'Inter', sans-serif;\n  padding: 2px 8px;\n  border-radius: 999px;\n  color: #0b0f14;\n  background: #fff;\n  position: absolute;\n  top: 12px;\n  left: 12px;\n  z-index: 2;\n  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);\n}\n\n.aura {\n  position: relative;\n  border-radius: 16px;\n}\n\n.aura::after {\n  content: '';\n  position: absolute;\n  inset: -4px;\n  border-radius: inherit;\n  pointer-events: none;\n  filter: blur(4px);\n}\n\n.aura--N::after {\n  box-shadow: 0 0 0 1px var(--rank-n), 0 0 6px rgba(154, 160, 166, 0.3);\n}\n\n.aura--R::after {\n  box-shadow: 0 0 0 2px var(--rank-r), 0 0 10px rgba(66, 165, 245, 0.4);\n}\n\n.aura--SR::after {\n  box-shadow: 0 0 0 2px var(--rank-sr), 0 0 12px rgba(124, 77, 255, 0.45);\n  animation: pulse 3s infinite;\n}\n\n.aura--SSR::after {\n  box-shadow: 0 0 0 2px var(--rank-ssr-a), 0 0 0 4px var(--rank-ssr-b), 0 0 16px rgba(255, 179, 0, 0.45);\n}\n\n.aura--UR::after {\n  box-shadow: 0 0 0 2px #fff, 0 0 0 5px var(--rank-ur), 0 0 18px rgba(255, 218, 107, 0.5);\n}\n\n.aura--Prime::after {\n  box-shadow: 0 0 0 2px var(--rank-prime-a), 0 0 0 6px var(--rank-prime-b), 0 0 24px rgba(0, 229, 255, 0.5);\n  animation: twinkle 10s infinite linear;\n}\n\n@keyframes pulse {\n  50% {\n    filter: blur(6px) brightness(1.1);\n  }\n}\n\n@keyframes twinkle {\n  0% {\n    opacity: 0.9;\n  }\n  50% {\n    opacity: 0.7;\n  }\n  100% {\n    opacity: 0.9;\n  }\n}\n\n.hero__details {\n  align-self: flex-start;\n  padding: 12px 22px;\n  border-radius: 999px;\n  border: 1px solid rgba(174, 228, 255, 0.42);\n  background: rgba(12, 20, 30, 0.72);\n  color: var(--text-main);\n  font-weight: 600;\n  letter-spacing: 0.08em;\n  text-transform: uppercase;\n  cursor: pointer;\n  transition: transform var(--transition-base), border-color var(--transition-base);\n}\n\n.hero__details:hover {\n  transform: translateY(-2px);\n  border-color: rgba(174, 228, 255, 0.7);\n}\n\n.cta {\n  display: flex;\n  flex-direction: column;\n  gap: 18px;\n  align-items: center;\n  text-align: center;\n}\n\n.cta__note {\n  font-size: 13px;\n  color: var(--text-muted);\n}\n\n.cta__buttons {\n  display: flex;\n  gap: 24px;\n  flex-wrap: wrap;\n  justify-content: center;\n}\n\n.cta__button {\n  min-width: 220px;\n  padding: 18px 24px 12px;\n  border-radius: 22px;\n  border: 1px solid rgba(174, 228, 255, 0.4);\n  background: rgba(11, 17, 26, 0.82);\n  color: var(--text-main);\n  font-size: 18px;\n  font-weight: 700;\n  text-transform: uppercase;\n  letter-spacing: 0.12em;\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n  cursor: pointer;\n  transition: transform var(--transition-base), border-color var(--transition-base), box-shadow var(--transition-base);\n}\n\n.cta__button--affordable {\n  border-color: rgba(0, 229, 255, 0.55);\n  box-shadow: 0 14px 34px rgba(0, 229, 255, 0.18);\n}\n\n.cta__button:hover:enabled {\n  transform: translateY(-4px);\n  border-color: rgba(0, 229, 255, 0.7);\n  box-shadow: 0 18px 48px rgba(0, 229, 255, 0.2);\n}\n\n.cta__button:disabled {\n  cursor: not-allowed;\n  opacity: 0.6;\n  border-color: rgba(255, 102, 126, 0.45);\n  background: rgba(255, 102, 126, 0.1);\n}\n\n.cta__label {\n  font-size: 16px;\n}\n\n.cta__cost {\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n  font-size: 14px;\n  color: var(--text-muted);\n}\n\n.cta__cost-line {\n  display: inline-flex;\n  align-items: center;\n  gap: 8px;\n}\n\n.cta__cost-line img {\n  width: 20px;\n  height: 20px;\n}\n\n.cta__cost-line--fallback {\n  font-size: 12px;\n  opacity: 0.8;\n}\n\n.modal {\n  position: fixed;\n  inset: 0;\n  display: none;\n  align-items: center;\n  justify-content: center;\n  padding: 32px;\n  z-index: 100;\n}\n\n.modal.is-open {\n  display: flex;\n}\n\n.modal__overlay {\n  position: absolute;\n  inset: 0;\n  background: rgba(4, 6, 10, 0.75);\n}\n\n.modal__dialog {\n  position: relative;\n  z-index: 1;\n  background: rgba(11, 17, 26, 0.95);\n  border-radius: 24px;\n  padding: 24px;\n  border: 1px solid rgba(174, 228, 255, 0.3);\n  width: min(720px, 100%);\n  display: flex;\n  flex-direction: column;\n  gap: 18px;\n}\n\n.modal__dialog--wide {\n  width: min(960px, 100%);\n}\n\n.modal__header {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  gap: 12px;\n}\n\n.modal__title {\n  margin: 0;\n  font-size: 22px;\n  letter-spacing: 0.06em;\n}\n\n.modal__close {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  border: 1px solid rgba(174, 228, 255, 0.4);\n  background: rgba(12, 20, 30, 0.8);\n  cursor: pointer;\n  position: relative;\n}\n\n.modal__close::before,\n.modal__close::after {\n  content: '';\n  position: absolute;\n  top: 50%;\n  left: 50%;\n  width: 14px;\n  height: 2px;\n  background: var(--text-main);\n  transform: translate(-50%, -50%) rotate(45deg);\n}\n\n.modal__close::after {\n  transform: translate(-50%, -50%) rotate(-45deg);\n}\n\n.modal__tabs {\n  display: flex;\n  gap: 12px;\n}\n\n.modal__tabs button {\n  flex: 1;\n  padding: 10px 14px;\n  border-radius: 12px;\n  border: 1px solid rgba(174, 228, 255, 0.28);\n  background: rgba(12, 20, 30, 0.7);\n  color: var(--text-main);\n  font-weight: 600;\n  cursor: pointer;\n}\n\n.modal__tabs button[aria-selected='true'] {\n  border-color: rgba(0, 229, 255, 0.6);\n  box-shadow: 0 12px 32px rgba(0, 229, 255, 0.2);\n}\n\n.modal__body {\n  display: flex;\n  flex-direction: column;\n  gap: 18px;\n}\n\n.modal__panel {\n  display: flex;\n  flex-direction: column;\n  gap: 16px;\n}\n\n.featured-list {\n  list-style: none;\n  margin: 0;\n  padding: 0;\n  display: flex;\n  flex-direction: column;\n  gap: 12px;\n}\n\n.featured-list__item {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  padding: 10px 14px;\n  border-radius: 12px;\n  background: rgba(12, 20, 30, 0.65);\n  border: 1px solid rgba(174, 228, 255, 0.22);\n}\n\n.rates-table {\n  width: 100%;\n  border-collapse: collapse;\n  font-size: 15px;\n}\n\n.rates-table thead {\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n  color: var(--text-muted);\n}\n\n.rates-table th,\n.rates-table td {\n  padding: 12px 14px;\n  border-bottom: 1px solid rgba(174, 228, 255, 0.2);\n}\n\n.pity-list {\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n  font-size: 14px;\n}\n\n.pity-list__row {\n  padding: 10px 14px;\n  border-radius: 12px;\n  background: rgba(12, 20, 30, 0.6);\n  border: 1px solid rgba(174, 228, 255, 0.2);\n}\n\n.pity-list__carry {\n  font-size: 13px;\n  color: var(--text-muted);\n}\n\n.modal__description {\n  margin: 0;\n  color: var(--text-muted);\n}\n\n.confirm__grid {\n  border-radius: 18px;\n  padding: 18px;\n  background: rgba(11, 17, 26, 0.72);\n  border: 1px solid rgba(174, 228, 255, 0.2);\n}\n\n.confirm__gacha {\n  min-height: 320px;\n}\n\n.modal__footer {\n  display: flex;\n  justify-content: flex-end;\n}\n\n.modal__close-btn {\n  padding: 10px 18px;\n  border-radius: 12px;\n  border: 1px solid rgba(174, 228, 255, 0.4);\n  background: rgba(12, 20, 30, 0.7);\n  color: var(--text-main);\n  cursor: pointer;\n}\n\n.banner-list__drawer {\n  display: none;\n}\n\n@media (max-width: 1280px) {\n  .gacha-layout {\n    grid-template-columns: 280px 1fr;\n  }\n}\n\n@media (max-width: 960px) {\n  body.gacha-page,\n  .gacha-page {\n    padding: 16px;\n  }\n\n  .gacha-layout {\n    grid-template-columns: 1fr;\n  }\n\n  .banner-list {\n    position: fixed;\n    top: 0;\n    bottom: 0;\n    left: 0;\n    width: var(--drawer-width);\n    max-height: none;\n    transform: translateX(-100%);\n    transition: transform var(--transition-base);\n    z-index: 90;\n  }\n\n  .gacha-app[data-drawer-open='true'] .banner-list {\n    transform: translateX(0);\n  }\n\n  .banner-drawer-toggle {\n    display: inline-flex;\n  }\n\n  .hero {\n    min-height: 520px;\n  }\n}\n\n@media (max-width: 720px) {\n  body.gacha-page,\n  .gacha-page {\n    padding: 12px;\n  }\n\n  .gacha-app {\n    gap: 18px;\n  }\n\n  .banner-card {\n    grid-template-columns: 80px 1fr;\n    padding: 14px;\n  }\n\n  .banner-card__thumb {\n    width: 80px;\n    height: 80px;\n  }\n\n  .banner-card__badge {\n    top: 12px;\n    left: 14px;\n  }\n\n  .banner-card__timer {\n    top: 12px;\n    right: 14px;\n  }\n\n  .hero__content {\n    padding: 28px;\n    gap: 22px;\n  }\n\n  .hero__header {\n    flex-direction: column;\n    align-items: flex-start;\n  }\n\n  .hero__meta {\n    flex-direction: row;\n    align-items: center;\n  }\n\n  .currency-header {\n    flex-wrap: wrap;\n  }\n\n  .banner-list {\n    width: calc(100% - 48px);\n  }\n\n  .cta__button {\n    min-width: 180px;\n    font-size: 16px;\n  }\n}\n\n@media (max-width: 480px) {\n  .hero {\n    min-height: 480px;\n  }\n\n  .hero__content {\n    padding: 24px;\n  }\n\n  .currency-header {\n    padding: 10px 12px;\n  }\n\n  .currency-item {\n    padding: 6px 10px;\n  }\n}\n";
   module.exports = css;
   module.exports.default = css;
 });
@@ -17081,42 +17084,54 @@ __define('./screens/ui-gacha/gacha.js', (exports, module, __require) => {
     }
   }
 
-  const elements = {
-    app: document.querySelector('[data-app-root]'),
-    currencyHeader: document.querySelector('[data-slot="currencies"]'),
-    bannerList: document.querySelector('[data-slot="banner-list"]'),
-    hero: document.querySelector('[data-slot="hero"]'),
-    heroBackground: document.querySelector('.hero__background'),
-    heroType: document.querySelector('[data-slot="hero-type"]'),
-    heroTitle: document.querySelector('[data-slot="hero-title"]'),
-    heroSubtitle: document.querySelector('[data-slot="hero-subtitle"]'),
-    heroRateUp: document.querySelector('[data-slot="hero-rateup"]'),
-    heroTimer: document.querySelector('[data-slot="hero-timer"]'),
-    pityPills: document.querySelector('[data-slot="pity-pills"]'),
-    pityBar: document.querySelector('.pity__bar'),
-    pityNote: document.querySelector('.pity__note'),
-    featuredList: document.querySelector('[data-slot="featured-list"]'),
-    detailsButtons: document.querySelectorAll('[data-action="open-rates"]'),
-    ctaSingle: document.querySelector('[data-action="summon-single"]'),
-    ctaMulti: document.querySelector('[data-action="summon-multi"]'),
-    confirmTitle: document.querySelector('[data-slot="confirm-title"]'),
-    confirmRoot: document.querySelector('[data-gacha-root]'),
-    helpButton: document.querySelector('.help-button'),
-    drawerToggle: document.querySelector('[data-action="toggle-drawer"]'),
-  };
+  const AUTO_BOOT_FLAG = '__ARC_GACHA_EMBED__';
 
-  const modals = {
-    rates: document.querySelector('[data-modal="rates"]'),
-    confirm: document.querySelector('[data-modal="confirm"]'),
-  };
+  function createEmptyElements() {
+    return {
+      app: null,
+      currencyHeader: null,
+      bannerList: null,
+      hero: null,
+      heroBackground: null,
+      heroType: null,
+      heroTitle: null,
+      heroSubtitle: null,
+      heroRateUp: null,
+      heroTimer: null,
+      pityPills: null,
+      pityBar: null,
+      pityNote: null,
+      featuredList: null,
+      detailsButtons: [],
+      ctaSingle: null,
+      ctaMulti: null,
+      confirmTitle: null,
+      confirmRoot: null,
+      helpButton: null,
+      drawerToggle: null,
+    };
+  }
 
-  const panels = {
-    rates: modals.rates.querySelector('[data-panel="rates"]'),
-    pity: modals.rates.querySelector('[data-panel="pity"]'),
-    featured: modals.rates.querySelector('[data-panel="featured"]'),
-  };
+  function createEmptyModals() {
+    return {
+      rates: null,
+      confirm: null,
+    };
+  }
 
-  const tabs = Array.from(modals.rates.querySelectorAll('.modal__tabs [role="tab"]'));
+  function createEmptyPanels() {
+    return {
+      rates: null,
+      pity: null,
+      featured: null,
+    };
+  }
+
+  let currentScope = null;
+  let elements = createEmptyElements();
+  let modals = createEmptyModals();
+  let panels = createEmptyPanels();
+  let tabs = [];
 
   let state = {
     selectedBannerId: BANNERS[0]?.id ?? null,
@@ -17126,6 +17141,105 @@ __define('./screens/ui-gacha/gacha.js', (exports, module, __require) => {
   let confirmViewHandle = null;
   let currentOpenModal = null;
   let confirmFlowCompleteHandler = null;
+  let trackedListeners = [];
+  let mounted = false;
+
+  function toQueryRoot(scope) {
+    if (scope && typeof scope.querySelector === 'function') {
+      return scope;
+    }
+    if (scope && typeof scope.getRootNode === 'function') {
+      const rootNode = scope.getRootNode();
+      if (rootNode && typeof rootNode.querySelector === 'function') {
+        return rootNode;
+      }
+    }
+    if (typeof document !== 'undefined') {
+      return document;
+    }
+    return scope;
+  }
+
+  function captureElements(scope) {
+    const root = toQueryRoot(scope);
+    return {
+      app: root?.querySelector?.('[data-app-root]') ?? null,
+      currencyHeader: root?.querySelector?.('[data-slot="currencies"]') ?? null,
+      bannerList: root?.querySelector?.('[data-slot="banner-list"]') ?? null,
+      hero: root?.querySelector?.('[data-slot="hero"]') ?? null,
+      heroBackground: root?.querySelector?.('.hero__background') ?? null,
+      heroType: root?.querySelector?.('[data-slot="hero-type"]') ?? null,
+      heroTitle: root?.querySelector?.('[data-slot="hero-title"]') ?? null,
+      heroSubtitle: root?.querySelector?.('[data-slot="hero-subtitle"]') ?? null,
+      heroRateUp: root?.querySelector?.('[data-slot="hero-rateup"]') ?? null,
+      heroTimer: root?.querySelector?.('[data-slot="hero-timer"]') ?? null,
+      pityPills: root?.querySelector?.('[data-slot="pity-pills"]') ?? null,
+      pityBar: root?.querySelector?.('.pity__bar') ?? null,
+      pityNote: root?.querySelector?.('.pity__note') ?? null,
+      featuredList: root?.querySelector?.('[data-slot="featured-list"]') ?? null,
+      detailsButtons: Array.from(root?.querySelectorAll?.('[data-action="open-rates"]') ?? []),
+      ctaSingle: root?.querySelector?.('[data-action="summon-single"]') ?? null,
+      ctaMulti: root?.querySelector?.('[data-action="summon-multi"]') ?? null,
+      confirmTitle: root?.querySelector?.('[data-slot="confirm-title"]') ?? null,
+      confirmRoot: root?.querySelector?.('[data-gacha-root]') ?? null,
+      helpButton: root?.querySelector?.('.help-button') ?? null,
+      drawerToggle: root?.querySelector?.('[data-action="toggle-drawer"]') ?? null,
+    };
+  }
+
+  function captureModals(scope) {
+    const root = toQueryRoot(scope);
+    return {
+      rates: root?.querySelector?.('[data-modal="rates"]') ?? null,
+      confirm: root?.querySelector?.('[data-modal="confirm"]') ?? null,
+    };
+  }
+
+  function capturePanels(modalRefs) {
+    const ratesModal = modalRefs.rates;
+    return {
+      rates: ratesModal?.querySelector?.('[data-panel="rates"]') ?? null,
+      pity: ratesModal?.querySelector?.('[data-panel="pity"]') ?? null,
+      featured: ratesModal?.querySelector?.('[data-panel="featured"]') ?? null,
+    };
+  }
+
+  function captureTabs(modalRefs) {
+    return Array.from(modalRefs.rates?.querySelectorAll?.('.modal__tabs [role="tab"]') ?? []);
+  }
+
+  function resetDomReferences(scope) {
+    currentScope = scope;
+    elements = captureElements(scope);
+    modals = captureModals(scope);
+    panels = capturePanels(modals);
+    tabs = captureTabs(modals);
+  }
+
+  function trackListener(target, type, handler) {
+    if (!target || typeof target.addEventListener !== 'function' || typeof handler !== 'function') {
+      return;
+    }
+    target.addEventListener(type, handler);
+    trackedListeners.push(() => {
+      try {
+        target.removeEventListener(type, handler);
+      } catch (error) {
+        console.warn('[Gacha UI] Không thể gỡ listener:', error);
+      }
+    });
+  }
+
+  function resetListeners() {
+    trackedListeners.forEach((remove) => {
+      try {
+        remove();
+      } catch (error) {
+        console.warn('[Gacha UI] Lỗi khi gỡ listener:', error);
+      }
+    });
+    trackedListeners = [];
+  }
 
   function ensureSelectedBanner(preferredId = null) {
     if (!Array.isArray(BANNERS) || BANNERS.length === 0) {
@@ -18284,32 +18398,36 @@ __define('./screens/ui-gacha/gacha.js', (exports, module, __require) => {
     const handleSummonFlowComplete = () => closeModal(modals.confirm);
     confirmFlowCompleteHandler = handleSummonFlowComplete;
 
-    elements.confirmRoot?.addEventListener('summon:flow-complete', handleSummonFlowComplete);
+    trackListener(elements.confirmRoot, 'summon:flow-complete', handleSummonFlowComplete);
 
     elements.detailsButtons.forEach((button) => {
-      button.addEventListener('click', () => {
+      trackListener(button, 'click', () => {
         const banner = ensureSelectedBanner(state.selectedBannerId) ?? BANNERS[0];
         populateRatesModal(banner);
         openModal(modals.rates);
       });
     });
 
-    modals.rates.querySelectorAll('[data-action="close-modal"]').forEach((button) => {
-      button.addEventListener('click', () => closeModal(modals.rates));
+    Array.from(modals.rates?.querySelectorAll?.('[data-action="close-modal"]') ?? []).forEach((button) => {
+      trackListener(button, 'click', () => closeModal(modals.rates));
     });
-    modals.confirm.querySelectorAll('[data-action="close-modal"]').forEach((button) => {
-      button.addEventListener('click', () => closeModal(modals.confirm));
+    Array.from(modals.confirm?.querySelectorAll?.('[data-action="close-modal"]') ?? []).forEach((button) => {
+      trackListener(button, 'click', () => closeModal(modals.confirm));
     });
 
-    modals.rates.querySelector('.modal__overlay')?.addEventListener('click', () => closeModal(modals.rates));
-    modals.confirm.querySelector('.modal__overlay')?.addEventListener('click', () => closeModal(modals.confirm));
+    const ratesOverlay = modals.rates?.querySelector?.('.modal__overlay');
+    const confirmOverlay = modals.confirm?.querySelector?.('.modal__overlay');
+    trackListener(ratesOverlay, 'click', () => closeModal(modals.rates));
+    trackListener(confirmOverlay, 'click', () => closeModal(modals.confirm));
 
-    tabs.forEach((tab) => tab.addEventListener('click', handleTabClick));
+    tabs.forEach((tab) => {
+      trackListener(tab, 'click', handleTabClick);
+    });
 
-    elements.ctaSingle?.addEventListener('click', () => onClickSummon('single'));
-    elements.ctaMulti?.addEventListener('click', () => onClickSummon('multi'));
+    trackListener(elements.ctaSingle, 'click', () => onClickSummon('single'));
+    trackListener(elements.ctaMulti, 'click', () => onClickSummon('multi'));
 
-    elements.drawerToggle?.addEventListener('click', () => toggleDrawer());
+    trackListener(elements.drawerToggle, 'click', () => toggleDrawer());
   }
 
   async function init() {
@@ -18340,10 +18458,242 @@ __define('./screens/ui-gacha/gacha.js', (exports, module, __require) => {
     }
   }
 
-  init().catch((error) => {
-    console.error('[Gacha UI] Lỗi khi khởi tạo giao diện gacha:', error);
-  });
+  function destroyGachaUIInternal() {
+    if (currentOpenModal) {
+      closeModal(currentOpenModal);
+    }
+    resetListeners();
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('keydown', handleGlobalKeyDown);
+    }
+    if (confirmViewHandle && typeof confirmViewHandle.destroy === 'function') {
+      confirmViewHandle.destroy();
+    }
+    confirmViewHandle = null;
+    confirmFlowCompleteHandler = null;
+    currentOpenModal = null;
+    if (elements.app) {
+      elements.app.removeAttribute('data-drawer-open');
+    }
+    elements = createEmptyElements();
+    modals = createEmptyModals();
+    panels = createEmptyPanels();
+    tabs = [];
+    state = {
+      selectedBannerId: BANNERS[0]?.id ?? null,
+      drawerOpen: false,
+    };
+    currentScope = null;
+    mounted = false;
+  }
 
+  export async function mountGachaUI(scope = null) {
+    destroyGachaUIInternal();
+    resetDomReferences(scope);
+    if (!elements.app) {
+      throw new Error('[Gacha UI] Không tìm thấy phần tử gacha-app để khởi tạo.');
+    }
+
+    try {
+      await init();
+      mounted = true;
+    } catch (error) {
+      destroyGachaUIInternal();
+      throw error;
+    }
+
+    return {
+      destroy: destroyGachaUIInternal,
+    };
+  }
+
+  function destroyGachaUI() {
+    destroyGachaUIInternal();
+  }
+
+  if (typeof window !== 'undefined' && !(window?.[AUTO_BOOT_FLAG])) {
+    mountGachaUI(document).catch((error) => {
+      console.error('[Gacha UI] Lỗi khi khởi tạo giao diện gacha:', error);
+    });
+  }
+
+  if (!Object.prototype.hasOwnProperty.call(exports, 'destroyGachaUI')) exports.destroyGachaUI = destroyGachaUI;
+});
+__define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
+  import './gacha.css';
+  const GACHA_TEMPLATE = /* html */ `
+    <div class="gacha-app" data-app-root>
+      <header class="gacha-topbar" data-section="topbar">
+        <button
+          class="banner-drawer-toggle"
+          type="button"
+          aria-label="Mở danh sách banner"
+          title="Mở danh sách banner"
+          data-action="toggle-drawer"
+        >
+          <span aria-hidden="true">☰</span>
+          <span class="banner-drawer-toggle__label">Banner</span>
+        </button>
+        <div class="currency-header" data-slot="currencies" aria-label="Tiền tệ đang có"></div>
+        <button
+          class="help-button"
+          type="button"
+          aria-haspopup="dialog"
+          aria-expanded="false"
+          aria-label="Xem tỉ lệ và bảo hiểm gacha"
+          title="Xem tỉ lệ và bảo hiểm gacha"
+          data-action="open-rates"
+        >
+          ?
+        </button>
+      </header>
+
+      <div class="gacha-layout">
+        <aside class="banner-list" data-slot="banner-list" aria-label="Danh sách banner"></aside>
+        <main class="hero" data-slot="hero" aria-live="polite">
+          <div class="hero__background" aria-hidden="true"></div>
+          <div class="hero__content">
+            <div class="hero__header">
+              <div class="hero__title-group">
+                <div class="hero__type-chip" data-slot="hero-type"></div>
+                <h1 class="hero__title" data-slot="hero-title"></h1>
+                <p class="hero__subtitle" data-slot="hero-subtitle"></p>
+              </div>
+              <div class="hero__meta">
+                <span class="hero__rateup" data-slot="hero-rateup">Rate UP</span>
+                <span class="hero__timer" data-slot="hero-timer"></span>
+              </div>
+            </div>
+
+            <section class="pity" aria-label="Thông tin bảo hiểm">
+              <div class="pity__pills" data-slot="pity-pills"></div>
+              <div class="pity__progress">
+                <div class="pity__bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                <span class="pity__note">Chưa có dữ liệu bảo hiểm.</span>
+              </div>
+            </section>
+
+            <section class="featured" aria-label="Đối tác nổi bật">
+              <div class="featured__list" data-slot="featured-list"></div>
+            </section>
+
+            <button class="hero__details" type="button" data-action="open-rates">Xem chi tiết tỉ lệ &amp; bảo hiểm</button>
+          </div>
+        </main>
+      </div>
+
+      <footer class="cta" data-section="cta">
+        <div class="cta__note">UI-only: Nhấn sẽ mở modal xác nhận (không quay).</div>
+        <div class="cta__buttons">
+          <button class="cta__button" type="button" data-test="summon-x1" data-action="summon-single"></button>
+          <button class="cta__button" type="button" data-test="summon-x10" data-action="summon-multi"></button>
+        </div>
+      </footer>
+    </div>
+
+    <div class="modal" data-modal="rates" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Tỉ lệ &amp; bảo hiểm">
+      <div class="modal__overlay" data-action="close-modal"></div>
+      <div class="modal__dialog" role="document">
+        <header class="modal__header">
+          <h2 class="modal__title">Tỉ lệ &amp; bảo hiểm</h2>
+          <button class="modal__close" type="button" data-action="close-modal" aria-label="Đóng"></button>
+        </header>
+        <div class="modal__tabs" role="tablist">
+          <button role="tab" aria-selected="true" data-tab="rates">Tỉ lệ</button>
+          <button role="tab" aria-selected="false" data-tab="pity">Bảo hiểm</button>
+          <button role="tab" aria-selected="false" data-tab="featured">Rate-up</button>
+        </div>
+        <div class="modal__body">
+          <section class="modal__panel" data-panel="rates" role="tabpanel"></section>
+          <section class="modal__panel" data-panel="pity" role="tabpanel" hidden></section>
+          <section class="modal__panel" data-panel="featured" role="tabpanel" hidden></section>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" data-modal="confirm" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Xác nhận triệu hồi">
+      <div class="modal__overlay" data-action="close-modal"></div>
+      <div class="modal__dialog modal__dialog--wide" role="document">
+        <header class="modal__header">
+          <h2 class="modal__title" data-slot="confirm-title">Xác nhận triệu hồi</h2>
+          <button class="modal__close" type="button" data-action="close-modal" aria-label="Đóng"></button>
+        </header>
+        <p class="modal__description">Demo UI — chưa có quay thật.</p>
+        <div class="confirm__grid" data-slot="confirm-grid">
+          <div class="confirm__gacha" data-gacha-root></div>
+        </div>
+        <footer class="modal__footer">
+          <button class="modal__close-btn" type="button" data-action="close-modal">Đóng</button>
+        </footer>
+      </div>
+    </div>
+  `;
+  function createContainer() {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'gacha-page';
+      wrapper.dataset.gachaScreenRoot = 'true';
+      wrapper.innerHTML = GACHA_TEMPLATE;
+      return wrapper;
+  }
+  function renderScreen(context) {
+      const { root } = context;
+      if (!root) {
+          throw new Error('renderScreen cần root hợp lệ.');
+      }
+      const container = createContainer();
+      let disposed = false;
+      let handle = null;
+      const previousFlag = typeof window !== 'undefined' ? window.__ARC_GACHA_EMBED__ : undefined;
+      if (typeof window !== 'undefined') {
+          window.__ARC_GACHA_EMBED__ = true;
+      }
+      root.appendChild(container);
+      void import('./gacha.js')
+          .then((module) => module.mountGachaUI(container))
+          .then((result) => {
+          var _a;
+          if (disposed) {
+              (_a = result === null || result === void 0 ? void 0 : result.destroy) === null || _a === void 0 ? void 0 : _a.call(result);
+              return;
+          }
+          handle = result;
+      })
+          .catch((error) => {
+          console.error('[Gacha UI] Không thể khởi tạo module gacha:', error);
+      });
+      function cleanup() {
+          var _a;
+          disposed = true;
+          try {
+              (_a = handle === null || handle === void 0 ? void 0 : handle.destroy) === null || _a === void 0 ? void 0 : _a.call(handle);
+          }
+          catch (error) {
+              console.warn('[Gacha UI] Lỗi khi huỷ module gacha:', error);
+          }
+          handle = null;
+          if (container.parentElement === root) {
+              root.removeChild(container);
+          }
+          else {
+              container.remove();
+          }
+          if (typeof window !== 'undefined') {
+              if (previousFlag === undefined) {
+                  delete window.__ARC_GACHA_EMBED__;
+              }
+              else {
+                  window.__ARC_GACHA_EMBED__ = previousFlag;
+              }
+          }
+      }
+      return {
+          destroy: cleanup,
+      };
+  }
+  const render = renderScreen;
+
+  if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
 });
 __define('./shared-types/units.ts', (exports, module, __require) => {
   const __reexport0 = __require('./types/units.ts');
