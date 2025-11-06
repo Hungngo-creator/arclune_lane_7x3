@@ -9,12 +9,26 @@
   <body class="gacha-page">
     <div class="gacha-app" data-app-root>
       <header class="gacha-topbar" data-section="topbar">
-        <button class="banner-drawer-toggle" type="button" aria-label="Mở danh sách banner" data-action="toggle-drawer">
+        <button
+          class="banner-drawer-toggle"
+          type="button"
+          aria-label="Mở danh sách banner"
+          title="Mở danh sách banner"
+          data-action="toggle-drawer"
+        >
           <span aria-hidden="true">☰</span>
           <span class="banner-drawer-toggle__label">Banner</span>
         </button>
         <div class="currency-header" data-slot="currencies" aria-label="Tiền tệ đang có"></div>
-        <button class="help-button" type="button" aria-haspopup="dialog" aria-expanded="false" data-action="open-rates">
+        <button
+          class="help-button"
+          type="button"
+          aria-haspopup="dialog"
+          aria-expanded="false"
+          aria-label="Xem tỉ lệ và bảo hiểm gacha"
+          title="Xem tỉ lệ và bảo hiểm gacha"
+          data-action="open-rates"
+        >
           ?
         </button>
       </header>
@@ -102,4 +116,4 @@
     <script src="../dist/app.js"></script>
     <script type="module" src="gacha.js"></script>
   </body>
-            </html>
+</html>

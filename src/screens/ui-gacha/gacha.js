@@ -98,6 +98,15 @@ let BANNERS = cloneDefaultBanners();
 
 const DEFAULT_ICON = 'assets/gem.svg';
 
+const AURA_CLASS_BY_RANK = {
+  N: 'N',
+  R: 'R',
+  SR: 'SR',
+  SSR: 'SSR',
+  UR: 'UR',
+  PRIME: 'Prime',
+};
+
 function cloneDefaultCurrencies() {
   return DEFAULT_CURRENCIES.map((entry) => ({ ...entry }));
 }
@@ -445,6 +454,48 @@ function getCurrencyShortName(currency) {
   return short.length <= 8 ? short : currency.name;
 }
 
+function hasRateUpUnits(banner) {
+  return Array.isArray(banner?.featured) && banner.featured.length > 0;
+}
+
+function getRateUpSummary(banner) {
+  if (!hasRateUpUnits(banner)) {
+    return null;
+  }
+  const names = banner.featured.map((unit) => unit?.name).filter(Boolean);
+  if (names.length === 0) {
+    return null;
+  }
+  if (names.length === 1) {
+    return names[0];
+  }
+  return names.slice(0, 2).join(' • ') + (names.length > 2 ? '…' : '');
+}
+
+function formatBannerTimer(banner, options = {}) {
+  const { short = false } = options;
+  if (!banner) {
+    return '';
+  }
+  if (banner.type !== 'limited') {
+    return short ? '' : 'Gacha sẽ đóng: Không giới hạn';
+  }
+  const closesIn = typeof banner.closesIn === 'string' ? banner.closesIn.trim() : '';
+  if (!closesIn || closesIn === '--') {
+    return short ? 'Đang cập nhật' : 'Gacha sẽ đóng: Đang cập nhật';
+  }
+  return short ? closesIn : `Gacha sẽ đóng ${closesIn}`;
+}
+
+function getBannerAuraClass(banner) {
+  const baseRank = banner?.featured?.[0]?.rank ?? (banner?.type === 'limited' ? 'UR' : 'SR');
+  if (typeof baseRank !== 'string') {
+    return 'SR';
+  }
+  const normalized = baseRank.trim().toUpperCase();
+  return AURA_CLASS_BY_RANK[normalized] ?? 'SR';
+}
+
 function renderBannerList(banners) {
   elements.bannerList.replaceChildren();
   banners.forEach((banner) => {
@@ -456,10 +507,12 @@ function renderBannerList(banners) {
     card.setAttribute('aria-pressed', 'false');
 
     const thumb = document.createElement('div');
-    thumb.className = 'banner-card__thumb aura aura--SR';
+    thumb.className = `banner-card__thumb aura aura--${getBannerAuraClass(banner)}`;
     const img = document.createElement('img');
-    img.src = banner.thumbnail;
+    img.src = banner.thumbnail ?? banner.heroArt ?? 'assets/banner_standard.svg';
     img.alt = `Hình minh hoạ ${banner.name}`;
+    img.loading = 'lazy';
+    img.decoding = 'async';
     thumb.appendChild(img);
 
     const texts = document.createElement('div');
@@ -475,10 +528,17 @@ function renderBannerList(banners) {
 
     const subtitle = document.createElement('p');
     subtitle.className = 'banner-card__subtitle';
-    if (banner.featured?.length) {
-      subtitle.textContent = banner.subtitle ?? '';
+    const rateUpSummary = getRateUpSummary(banner);
+    if (banner.subtitle) {
+      subtitle.textContent = banner.subtitle;
+    } else if (rateUpSummary) {
+      subtitle.textContent = `Rate UP: ${rateUpSummary}`;
     } else {
-      subtitle.textContent = banner.type === 'limited' ? 'Không có rate-up cụ thể' : banner.subtitle ?? '';
+      subtitle.textContent = banner.type === 'limited' ? 'Không có rate-up cụ thể' : '';
+    }
+    if (!subtitle.textContent.trim()) {
+      subtitle.classList.add('is-empty');
+      subtitle.setAttribute('aria-hidden', 'true');
     }
 
     texts.appendChild(tag);
@@ -488,10 +548,20 @@ function renderBannerList(banners) {
     card.appendChild(thumb);
     card.appendChild(texts);
 
-    if (banner.type === 'limited' && banner.closesIn) {
+    if (hasRateUpUnits(banner)) {
+      const badge = document.createElement('span');
+      badge.className = 'banner-card__badge';
+      badge.textContent = `Rate UP ×${banner.featured.length}`;
+      badge.setAttribute('aria-hidden', 'true');
+      card.appendChild(badge);
+    }
+
+    const timerText = formatBannerTimer(banner, { short: true });
+    if (timerText) {
       const timer = document.createElement('span');
       timer.className = 'banner-card__timer';
-      timer.textContent = banner.closesIn;
+      timer.textContent = timerText;
+      timer.setAttribute('aria-label', formatBannerTimer(banner));
       card.appendChild(timer);
     }
 
@@ -538,20 +608,27 @@ function updateHeroSection(banner) {
   elements.heroSubtitle.textContent = banner.subtitle ?? '';
   elements.heroBackground.style.backgroundImage = `url("${banner.heroArt}")`;
 
-  if (banner.type === 'limited' && banner.closesIn && banner.closesIn !== '--') {
-    elements.heroTimer.textContent = `Còn ${banner.closesIn}`;
+  const heroTimerText = formatBannerTimer(banner);
+  if (heroTimerText) {
+    elements.heroTimer.textContent = heroTimerText;
     elements.heroTimer.style.display = 'inline-flex';
   } else {
-    elements.heroTimer.textContent = 'Luôn mở';
-    elements.heroTimer.style.display = banner.type === 'limited' ? 'inline-flex' : 'none';
+    elements.heroTimer.textContent = '';
+    elements.heroTimer.style.display = 'none';
   }
 
-  if (banner.featured && banner.featured.length > 0) {
+  if (hasRateUpUnits(banner)) {
     elements.heroRateUp.classList.add('is-visible');
-    elements.heroRateUp.setAttribute('title', 'Banner có nhân vật được tăng tỉ lệ');
+    const summary = getRateUpSummary(banner);
+    const label = summary ? `Rate UP: ${summary}` : 'Banner có nhân vật được tăng tỉ lệ';
+    elements.heroRateUp.textContent = label;
+    elements.heroRateUp.setAttribute('title', label);
+    elements.heroRateUp.setAttribute('aria-label', label);
   } else {
     elements.heroRateUp.classList.remove('is-visible');
+    elements.heroRateUp.textContent = 'Rate UP';
     elements.heroRateUp.removeAttribute('title');
+    elements.heroRateUp.removeAttribute('aria-label');
   }
 
   renderPityPills(banner);
@@ -1011,7 +1088,15 @@ async function init() {
     selectBanner(state.selectedBannerId, { focus: false });
   }
   setupEventListeners();
-  elements.helpButton?.setAttribute('title', 'Hướng dẫn tỉ lệ & bảo hiểm');
+  if (elements.helpButton) {
+    const helpLabel = 'Xem tỉ lệ và bảo hiểm gacha';
+    elements.helpButton.setAttribute('title', helpLabel);
+    elements.helpButton.setAttribute('aria-label', helpLabel);
+  }
+  if (elements.drawerToggle) {
+    elements.drawerToggle.setAttribute('title', 'Mở danh sách banner');
+    elements.drawerToggle.setAttribute('aria-label', 'Mở danh sách banner');
+  }
 }
 
 init().catch((error) => {

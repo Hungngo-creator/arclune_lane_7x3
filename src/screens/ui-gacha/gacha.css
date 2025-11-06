@@ -167,40 +167,45 @@ button {
 .banner-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
-  border-radius: 24px;
-  background: rgba(11, 17, 26, 0.78);
-  border: 1px solid rgba(124, 200, 255, 0.18);
+  gap: 14px;
+  padding: 20px 18px;
+  border-radius: 26px;
+  background: linear-gradient(160deg, rgba(9, 14, 22, 0.82), rgba(14, 22, 34, 0.68));
+  border: 1px solid rgba(124, 200, 255, 0.24);
+  backdrop-filter: blur(18px) saturate(125%);
   overflow-y: auto;
   max-height: calc(100vh - 220px);
 }
 
 .banner-card {
   display: grid;
-  grid-template-columns: 72px 1fr;
-  gap: 12px;
-  background: rgba(10, 18, 30, 0.7);
-  border-radius: 18px;
-  padding: 12px;
-  border: 1px solid transparent;
+  grid-template-columns: 96px 1fr;
+  gap: 16px;
+  background: rgba(8, 13, 20, 0.82);
+  border-radius: 20px;
+  padding: 16px;
+  border: 1px solid rgba(124, 200, 255, 0.16);
   cursor: pointer;
   position: relative;
-  transition: border-color var(--transition-base), transform var(--transition-base);
+  transition: border-color var(--transition-base), transform var(--transition-base), box-shadow var(--transition-base);
+  overflow: hidden;
+  isolation: isolate;
 }
 
 .banner-card:hover {
-  transform: translateX(4px);
+  transform: translateX(6px);
+  box-shadow: 0 18px 48px rgba(0, 229, 255, 0.16);
 }
 
 .banner-card__thumb {
-  width: 72px;
-  height: 72px;
-  border-radius: 16px;
+  width: 96px;
+  height: 96px;
+  border-radius: 18px;
   overflow: hidden;
   background: rgba(124, 77, 255, 0.18);
   display: grid;
   place-items: center;
+  position: relative;
 }
 
 .banner-card__thumb img {
@@ -209,22 +214,33 @@ button {
   object-fit: cover;
 }
 
+.banner-card__thumb::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(140deg, rgba(8, 12, 18, 0.15), rgba(8, 12, 18, 0));
+}
+
 .banner-card__texts {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .banner-card__name {
   margin: 0;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 17px;
+  font-weight: 700;
 }
 
 .banner-card__subtitle {
   margin: 0;
   font-size: 13px;
-  color: var(--text-muted);
+  color: rgba(190, 216, 240, 0.78);
+}
+
+.banner-card__subtitle.is-empty {
+  display: none;
 }
 
 .banner-card__tag {
@@ -232,25 +248,41 @@ button {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: rgba(230, 240, 255, 0.78);
+  color: rgba(230, 240, 255, 0.82);
+}
+
+.banner-card__badge {
+  position: absolute;
+  top: 14px;
+  left: 18px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 221, 105, 0.22);
+  border: 1px solid rgba(255, 221, 105, 0.4);
+  color: #ffe27a;
+  z-index: 1;
 }
 
 .banner-card__timer {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 14px;
+  right: 16px;
   font-size: 12px;
-  padding: 4px 10px;
+  padding: 4px 12px;
   border-radius: 999px;
-  background: rgba(0, 229, 255, 0.16);
-  border: 1px solid rgba(0, 229, 255, 0.4);
+  background: rgba(0, 229, 255, 0.18);
+  border: 1px solid rgba(0, 229, 255, 0.45);
   color: #c6f6ff;
+  z-index: 1;
 }
 
 .banner-card--selected {
   border-color: rgba(0, 229, 255, 0.6);
   background: linear-gradient(135deg, rgba(0, 229, 255, 0.18), rgba(124, 77, 255, 0.18));
-  box-shadow: 0 18px 48px rgba(0, 229, 255, 0.18);
+  box-shadow: 0 20px 56px rgba(0, 229, 255, 0.24);
 }
 
 .hero {
@@ -260,6 +292,8 @@ button {
   display: flex;
   min-height: 640px;
   background: var(--gradient-hero);
+  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.45);
+  isolation: isolate;
 }
 
 .hero__background {
@@ -268,14 +302,22 @@ button {
   background-image: var(--hero-art);
   background-size: cover;
   background-position: center;
-  opacity: 0.4;
-  filter: blur(6px);
+  opacity: 0.72;
+  transform: scale(1.04);
+  filter: saturate(110%);
+}
+
+.hero__background::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(8, 12, 18, 0.92) 0%, rgba(8, 12, 18, 0.55) 48%, rgba(8, 12, 18, 0.9) 100%);
 }
 
 .hero__content {
   position: relative;
   z-index: 1;
-  padding: 40px;
+  padding: 48px 56px;
   display: flex;
   flex-direction: column;
   gap: 28px;
@@ -322,20 +364,27 @@ button {
 .hero__meta {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   align-items: flex-end;
 }
 
 .hero__rateup {
-  padding: 6px 14px;
+  padding: 8px 16px;
   border-radius: 999px;
   font-weight: 700;
   font-size: 12px;
   letter-spacing: 0.1em;
-  background: rgba(255, 221, 105, 0.22);
+  background: rgba(255, 221, 105, 0.24);
   color: #ffe27a;
-  border: 1px solid rgba(255, 221, 105, 0.5);
+  border: 1px solid rgba(255, 221, 105, 0.55);
   display: none;
+  align-items: center;
+  gap: 8px;
+}
+
+.hero__rateup::before {
+  content: '★';
+  font-size: 12px;
 }
 
 .hero__rateup.is-visible {
@@ -343,12 +392,13 @@ button {
 }
 
 .hero__timer {
-  padding: 6px 12px;
+  padding: 8px 14px;
   border-radius: 999px;
   background: rgba(0, 229, 255, 0.18);
   color: #bdf6ff;
   font-size: 12px;
   letter-spacing: 0.06em;
+  border: 1px solid rgba(0, 229, 255, 0.45);
 }
 
 .pity {
@@ -876,6 +926,26 @@ button {
 
   .gacha-app {
     gap: 18px;
+  }
+
+  .banner-card {
+    grid-template-columns: 80px 1fr;
+    padding: 14px;
+  }
+
+  .banner-card__thumb {
+    width: 80px;
+    height: 80px;
+  }
+
+  .banner-card__badge {
+    top: 12px;
+    left: 14px;
+  }
+
+  .banner-card__timer {
+    top: 12px;
+    right: 14px;
   }
 
   .hero__content {
