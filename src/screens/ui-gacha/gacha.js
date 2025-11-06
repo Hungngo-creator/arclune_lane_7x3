@@ -1,16 +1,112 @@
-const runtimeRequire = typeof __require === 'function'
-  ? __require
-  : typeof globalThis !== 'undefined' && typeof (globalThis.__require) === 'function'
-    ? globalThis.__require
-    : typeof window !== 'undefined' && typeof window.__require === 'function'
-      ? window.__require
-      : null;
+const GACHA_VIEW_MODULE_ID = './screens/gacha/view.ts';
 
-if (!runtimeRequire) {
-  throw new Error('[Gacha UI] Không tìm thấy hàm require runtime để tải view.');
+function sanitizeModuleId(moduleId) {
+  return typeof moduleId === 'string' ? moduleId.replace(/\\/g, '/') : moduleId;
 }
 
-const { renderGachaView } = runtimeRequire('./screens/gacha/view.ts');
+function getLegacyModuleGlobal() {
+  if (typeof globalThis !== 'undefined') {
+    return globalThis;
+  }
+  if (typeof window !== 'undefined') {
+    return window;
+  }
+  return null;
+}
+
+function getLegacyModuleAliases() {
+  const legacyGlobal = getLegacyModuleGlobal();
+  const aliases = legacyGlobal && typeof legacyGlobal.__legacyModuleAliases === 'object'
+    ? legacyGlobal.__legacyModuleAliases
+    : null;
+  return aliases;
+}
+
+function normalizeRuntimeModuleId(moduleId) {
+  const sanitized = sanitizeModuleId(moduleId);
+  const legacyGlobal = getLegacyModuleGlobal();
+  const normalizer = legacyGlobal && typeof legacyGlobal.__normalizeModuleId === 'function'
+    ? legacyGlobal.__normalizeModuleId
+    : null;
+  if (normalizer) {
+    try {
+      const normalized = normalizer(sanitized);
+      if (typeof normalized === 'string' && normalized.length > 0) {
+        return sanitizeModuleId(normalized);
+      }
+    } catch (error) {
+      console.warn('[Gacha UI] Không thể dùng __normalizeModuleId:', error);
+    }
+  }
+  const aliases = getLegacyModuleAliases();
+  if (aliases) {
+    const candidate = aliases[sanitized];
+    if (typeof candidate === 'string' && candidate.length > 0) {
+      return sanitizeModuleId(candidate);
+    }
+  }
+  return sanitized;
+}
+
+function resolveNormalizedModuleHref(normalizedId) {
+  if (typeof normalizedId !== 'string' || normalizedId.length === 0) {
+    return normalizedId;
+  }
+  if (normalizedId.startsWith('./screens/')) {
+    const relative = `../${normalizedId.slice('./screens/'.length)}`;
+    return new URL(relative, import.meta.url).href;
+  }
+  if (normalizedId.startsWith('./')) {
+    const relative = normalizedId.slice(2);
+    return new URL(relative, import.meta.url).href;
+  }
+  return normalizedId;
+}
+
+function getRuntimeRequire() {
+  if (typeof __require === 'function') {
+    return __require;
+  }
+  const legacyGlobal = getLegacyModuleGlobal();
+  if (legacyGlobal && typeof legacyGlobal.__require === 'function') {
+    return legacyGlobal.__require;
+  }
+  if (typeof window !== 'undefined' && typeof window.__require === 'function') {
+    return window.__require;
+  }
+  return null;
+}
+
+let gachaViewModulePromise = null;
+
+async function loadGachaViewModule() {
+  if (!gachaViewModulePromise) {
+    gachaViewModulePromise = (async () => {
+      const normalizedId = normalizeRuntimeModuleId(GACHA_VIEW_MODULE_ID);
+      const runtimeRequire = getRuntimeRequire();
+      if (runtimeRequire) {
+        return runtimeRequire(normalizedId);
+      }
+      const href = resolveNormalizedModuleHref(normalizedId);
+      return import(/* @vite-ignore */ href);
+    })();
+  }
+  try {
+    return await gachaViewModulePromise;
+  } catch (error) {
+    gachaViewModulePromise = null;
+    throw error;
+  }
+}
+
+async function resolveRenderGachaView() {
+  const module = await loadGachaViewModule();
+  const render = module && module.renderGachaView;
+  if (typeof render !== 'function') {
+    throw new Error('[Gacha UI] Module gacha view không cung cấp renderGachaView.');
+  }
+  return render;
+}
 
 const DEFAULT_CURRENCIES = [
   { id: 'gem', name: 'Tinh Thạch', icon: 'assets/gem.svg', amount: 12345 },
@@ -1591,6 +1687,8 @@ async function renderConfirmGacha(banner, amount, options = {}) {
     cards = createPlaceholderResults(banner, amount);
   }
 
+  const renderGachaView = await resolveRenderGachaView();
+
   const titleText = `Kết quả triệu hồi x${amount}`;
   const handleRevealDone = () => {
     updatePityDisplay(banner);
@@ -1621,7 +1719,7 @@ async function renderConfirmGacha(banner, amount, options = {}) {
     confirmViewHandle.updateCards(cards);
   }
 
-const titleEl = confirmViewHandle.section.querySelector('.gacha-view__title');
+  const titleEl = confirmViewHandle.section.querySelector('.gacha-view__title');
   if (titleEl) {
     titleEl.textContent = titleText;
   }

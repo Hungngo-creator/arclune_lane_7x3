@@ -132,35 +132,105 @@ const GACHA_MODULE_ID = './screens/ui-gacha/gacha.js' as const;
 
 type MaybePromise<T> = Promise<T> | T;
 
+interface LegacyModuleAliases {
+  readonly [key: string]: string | undefined;
+}
+
+interface LegacyModuleGlobal {
+  readonly __require?: ((id: string) => unknown) | null;
+  readonly __legacyModuleAliases?: LegacyModuleAliases | null;
+  readonly __normalizeModuleId?: ((id: string) => unknown) | null;
+}
+
 interface GachaModule {
   readonly mountGachaUI?: (scope?: HTMLElement | Document | null) => MaybePromise<GachaHandle>;
+}
+
+function sanitizeModuleId(moduleId: string): string {
+  return moduleId.replace(/\\/g, '/');
+}
+
+function getLegacyModuleGlobal(): (LegacyModuleGlobal & typeof globalThis) | null {
+  if (typeof globalThis !== 'undefined') {
+    return globalThis as LegacyModuleGlobal & typeof globalThis;
+  }
+  if (typeof window !== 'undefined') {
+    return window as unknown as LegacyModuleGlobal & typeof globalThis;
+  }
+  return null;
+}
+
+function getLegacyModuleAliases(): LegacyModuleAliases | null {
+  const legacyGlobal = getLegacyModuleGlobal();
+  const aliases = legacyGlobal?.__legacyModuleAliases;
+  if (aliases && typeof aliases === 'object') {
+    return aliases as LegacyModuleAliases;
+  }
+  return null;
+}
+
+function normalizeRuntimeModuleId(moduleId: string): string {
+  const sanitized = sanitizeModuleId(moduleId);
+  const legacyGlobal = getLegacyModuleGlobal();
+  const normalizer = legacyGlobal?.__normalizeModuleId;
+  if (typeof normalizer === 'function') {
+    try {
+      const normalized = normalizer(sanitized);
+      if (typeof normalized === 'string' && normalized.length > 0) {
+        return sanitizeModuleId(normalized);
+      }
+    } catch {
+      // Bỏ qua lỗi từ hàm normalize tuỳ biến.
+    }
+  }
+  const aliases = getLegacyModuleAliases();
+  if (aliases) {
+    const candidate = aliases[sanitized];
+    if (typeof candidate === 'string' && candidate.length > 0) {
+      return sanitizeModuleId(candidate);
+    }
+  }
+  return sanitized;
+}
+
+function resolveNormalizedModuleHref(normalizedId: string): string {
+  if (normalizedId.startsWith('./screens/')) {
+    const relative = `../${normalizedId.slice('./screens/'.length)}`;
+    return new URL(relative, import.meta.url).href;
+  }
+  if (normalizedId.startsWith('./')) {
+    const relative = normalizedId.slice(2);
+    return new URL(relative, import.meta.url).href;
+  }
+  return normalizedId;
 }
 
 function getRuntimeRequire(): ((id: string) => unknown) | null {
   if (typeof __require === 'function') {
     return __require;
   }
-  if (typeof globalThis !== 'undefined') {
-    const candidate = (globalThis as { __require?: unknown }).__require;
-    if (typeof candidate === 'function') {
-      return candidate;
+  const legacyGlobal = getLegacyModuleGlobal();
+  const candidate = legacyGlobal?.__require;
+  if (typeof candidate === 'function') {
+    return candidate;
+  }
+  if (typeof window !== 'undefined') {
+    const fromWindow = (window as { __require?: unknown }).__require;
+    if (typeof fromWindow === 'function') {
+      return fromWindow;
     }
   }
   return null;
 }
 
 async function loadGachaModule(): Promise<GachaModule> {
+  const normalizedId = normalizeRuntimeModuleId(GACHA_MODULE_ID);
   const runtimeRequire = getRuntimeRequire();
   if (runtimeRequire) {
-    return runtimeRequire(GACHA_MODULE_ID) as GachaModule;
+    return runtimeRequire(normalizedId) as GachaModule;
   }
-  if (typeof window !== 'undefined') {
-    const fromWindow = (window as { __require?: unknown }).__require;
-    if (typeof fromWindow === 'function') {
-      return fromWindow(GACHA_MODULE_ID) as GachaModule;
-    }
-  }
-  return import('./gacha.js');
+  const href = resolveNormalizedModuleHref(normalizedId);
+  return import(/* @vite-ignore */ href) as Promise<GachaModule>;
 }
 
 function createContainer(): HTMLElement {
