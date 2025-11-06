@@ -1,0 +1,78 @@
+Danh Sách Nhân Vật & Lore
+1. Diệp Minh (Kiếm Tu Đại Diệp) Tính cách: Trầm lặng, lạnh lùng, tôn trọng kỷ luật, yêu thích cây cối.
+Ngoại hình: Cao, tóc xanh rêu, quấn áo choàng lá, tay cầm trường kiếm bằng cành nguyệt quang, trên vai có bắp tay chắc khỏe, cẳng tay tách biệt, chân đi guốc gỗ, bắp chân vạm vỡ, cẳng chân xương lá.
+Aura: Vầng ánh sáng xanh lá lẫn sương mù mỏng quanh mặt.
+Lore: Truyền nhân của Kiếm đạo Sinh Mệnh, trấn giữ lâm địa ngàn năm. Có khả năng triệu hồi rừng cấm, điều khiển thực vật bảo vệ đồng đội và tấn công kẻ thù.
+Vũ khí: Kiếm lá nguyệt quang.
+2. Nguyệt San (Thần Dị Biến – Công Pháp Âm Ảnh)
+Tính cách: Bí ẩn, lặng lẽ, thường không lên tiếng trừ khi cần thiết.
+Ngoại hình: Thân hình mảnh mai, tóc dài trắng như nguyệt, khuôn mặt luôn mờ ảo với haze chuyển động trắng, tay ngọc với bắp tay nhẹ và cẳng tay phủ từng lớp aura phát sáng, váy áo xếp tầng bóng đêm, chân như không chạm đất.
+Aura: Trăng và bóng tối chuyển động bao phủ toàn thân.Lore: Hậu duệ của tộc nguyệt ảnh, có khả năng thao túng ánh trăng, di chuyển tức thời giữa không gian tối, xuất kích thần tốc trong trận chiến.
+Vũ khí: Quạt nguyệt ảnh.
+3. Trùng Lâm (Dị Thú – Vương Giả Rừng Sinh) Tính cách: Hoang dã, trung tính, mạnh mẽ, bảo vệ lãnh địa.
+Ngoại hình: Hóa hình linh thú: Thân ngựa rừng tách từng bắp và cẳng chi, đầu sừng lá, lưng mọc cánh cứng, mắt lục sáng, bốn chân cơ bắp cuồn cuộn.
+Aura: Quầng sáng lục mờ chuyển động mạnh quanh thân.
+Lore: Dị thú thống lĩnh Trùng Sinh Lâm, trấn giữ nguồn aether, biết nói tiếng người. Có thể tăng cường sức mạnh đồng minh thuộc hệ sinh mệnh.
+Vũ khí: Sừng lá nguyên sinh.SVG bổ sung: Linh thú hóa hình đầy đủ 4 chi độc lập.
+4. Huyết Tịch (Thần Máu – Kiểm Soát Sinh Mệnh) Tính cách: Nghiêm nghị, sắc sảo, đôi lúc tàn nhẫn.
+Ngoại hình: Mặc giáp đỏ thẫm, tóc ngắn đỏ lửa. Hai tay nhỏ, bắp tay cuồn cuộn, cẳng tay gân máu nổi, mặt bị haze huyết bọc trắng đỏ luôn chuyển động, chân dày, đùi và cẳng chân như dòng máu cuồn cuộn.
+Aura: Dải aura đỏ máu quấn quanh thân, lấp lánh như huyết cầu động.
+Lore: Huyết Thần nguyên thủy, điều khiển sinh huyết trên chiến trường. Có thể chữa lành hoặc gây hiệu ứng trúng độc lên kẻ địch��.Vũ khí: Gậy huyết chế.
+SVG bổ sung: Hiệu ứng huyết cầu động quanh đầu.
+5. Khai Nguyên Tử (Pháp Sư Cổ – Tối Thượng Pháp Thuật) Tính cách: Thông thái, điềm đạm, thích nghiên cứu.
+Ngoại hình: Áo choàng dài xanh tím, tóc dài bạc cài đá, tay mang găng phép, mỗi khúc xương bàn tay và bàn chân tách biệt lấp lánh phù văn, khuôn mặt phủ haze trắng bạc uốn lượn thay hình động.
+Aura: Aura phù văn phép luân chuyển quanh người.
+Lore: Người đầu tiên phát minh công pháp "Khai Nguyên" chuyển hóa aether, có thể tạo cổng không gian và triệu hồi khí cụ hỗ trợ chiến đấu.
+Vũ khí: Đũa phép truy mệnh.
+6. Thiên Lưu (Kiếm Linh Bầu Trời – Sứ Mệnh Minh Triết) Tính cách: Lạc quan, hướng ngoại, kiên trì, thích khám phá.
+Ngoại hình: Thân hình rắn chắc, áo choàng trong suốt sắc trời. Hai tay mạnh mẽ, cẳng tay mang phong ấn bầu trời, đầu đội mũ ánh sáng, mặt phủ haze xanh lam. Aura: Sấm sét và aurora xung quanh cơ thể.
+Lore: Người giám hộ bầu trời Quang Minh, khả năng triệu hồi kiếm khí tinh khiết, bay lượn điều hướng thời tiết trong trận chiến.
+Vũ khí: Kiếm thiên quang.
+7. Sa Nương (Dị Nhân – Chúa Cát) Tính cách: Cao ngạo, ít nói, thích ẩn nấp.
+Ngoại hình: Da nâu vàng, tóc xoăn và dài như cát, mặc áo khoác vải mỏng xếp lớp, hai tay thô ráp tách từng lớp, chân dài, bắp và cẳng chân uốn lượn như dòng cát.
+Aura: Vòng xoáy cát rực quanh toàn bộ thân hình.
+Lore: Là dị nhân Sa Mạc, điều khiển địa hình cát, tạo ảo ảnh, áp chế tốc độ địch bằng "Cát Mê" và vũ khí sand blade xếp lớp.
+Vũ khí: Sai cát biến thể.8. Thạch Phách (Thú Linh – Cường Địa Thạch Hồn) Tính cách: Trầm lặng, kiên định, khó lay chuyển.Ngoại hình: Thân hình rắn chắc, da đá, hai tay và chân nặng nề tách biệt từng khúc như phiến đá, đầu có sừng đá xếp tầng, khuôn mặt haze trắng xám chuyển động dày.
+Aura: Aura đá hoá cứng xung quanh, hiệu ứng quang vỡ vụn quanh thân.
+Lore: Linh thú bảo hộ dãy núi, sức mạnh phòng thủ cực mạnh, có kỹ năng phản lại sát thương và tạo rung chuyển mặt đất.
+Vũ khí: Chùy đá cổ.9. Minh Nguyệt (Kiếm Tiên – Sứ Giả Ánh Trăng) Tính cách: Dịu dàng, đôi lúc lạnh giá, cực kỳ tự tin.
+Ngoại hình: Mặc áo choàng trắng bạc, tóc dài ánh xanh dương, cánh tay thanh mảnh chia rõ bắp tay và cẳng tay, chân nhẹ nhàng, cẳng và đùi trong suốt như tia sáng lung linh, khuôn mặt haze mỏng chuyển động theo nhịp thở.
+Aura: Tầng aura ánh trăng động lượn quanh thân.Lore: Kiếm tiên Minh Nguyệt cai trị vương quốc đêm, khả năng điều khiển không gian ánh sáng, chữa lành vết thương vực sâu.
+Vũ khí: Kiếm nguyệt quang.10. Nhật Hoa (Thần Quang – Người Mang Hy Vọng) Tính cách: Sôi nổi, lạc quan, dũng cảm trước hiểm nguy.Ngoại hình: Tóc vàng óng, da sáng, mặc áo choàng ánh kim, cơ thể chia rõ tỉ lệ từng bộ phận, hai tay tách rời bắp và cẳng tay, chân mang giày chiến ánh sáng, mặt phủ haze sáng vàng liên tục chuyển động.
+Aura: Vầng hào quang rực phát quanh đầu và lưng.Lore: Nhật thần bảo hộ Quang Minh, tạo khiên ánh sáng, bắn tia năng lượng chữa thương hoặc gây sát thương diện rộng.
+Vũ khí: Mặt trời ngưng tụ.11. Hắc Viêm (Ma Hỏa Biến Dị) Tính cách: Độc đoán, lãnh đạm, đôi khi bạo liệt.
+Ngoại hình: Thân hình lửa đen uốn lượn chia từng phần cẳng tay và chân, tóc lửa cháy bập bùng, mặt phủ haze đen tím động liên tục, toàn thân bao phủ bụi khói.
+Aura: Aura lửa đen động quanh thân, hiệu ứng bùng nổ từng nhịp.Lore: Chủ nhân ma hỏa, phá huỷ mọi thứ chạm vào, khả năng chuyển hoá năng lượng thành bộc phát sát thương.
+Vũ khí: Lưỡi hái lửa đen.12. Thanh Vân (Kiếm Tu Luyện Khí) Tính cách: Điềm đạm, ham học hỏi, yêu thích sự hoàn mỹ.Ngoại hình: Áo choàng xanh nhạt, tóc dài buộc cao, hai tay chia rõ từng bắp, khuôn mặt haze mỏng xanh chuyển động nhẹ, chân mang giày vải, các khúc chi tách bạch cho SVG.
+Aura: Aura khí xanh nhẹ bao quanh thân thể.Lore: Kiếm tu hệ khí, có khả năng phi hành, điều khiển các pha khí hóa thành binh khí hoặc khiên bảo vệ đồng đội.
+Vũ khí: Kiếm khí thuần.13. Cẩm Nhi (Dị Nhân – Biến Dị Đô Thị) Tính cách: Năng động, thông minh, đôi lúc mỉa mai.Ngoại hình: Tóc ngắn, mắt tím, da bạc, mặc áo khoác da nổi bật, hai tay đeo găng công nghệ, chân mang ủng punk tách rời bắp và cẳng chân, khuôn mặt phủ haze bạc chuyển động hình tam giác.
+Aura: Aura điện tử chuyển động quanh cơ thể.Lore: Dị nhân đô thị, chuyên hack và điều khiển thiết bị công nghệ, khả năng triệu hồi drone chiến đấu hỗ trợ đồng minh.
+Vũ khí: Găng tay điện tử.14. Băng Lan (Nữ Hoàng Băng Giá – Thần Biến Dị) Tính cách: Lạnh lùng, kiêu sa.Ngoại hình: Áo choàng băng, tóc xanh tím, cánh tay và chân như đá băng tách từng bắp nhỏ, mặt phủ haze trắng xanh liên tục chuyển động, thân hình như khắc từ băng. Aura: Aura băng giá lan tỏa, đám mây tuyết bay quanh.
+Lore: Nữ thần băng trấn giữ phương Bắc, khả năng đóng băng diện rộng và bẻ cong ánh sáng��.Vũ khí: Trượng băng tinh.
+15. Kỳ Phong (Kiếm Sĩ – Lãng Khách Hỏa Phong) Tính cách: Phiêu lưu, hào hiệp, hay giúp người yếu thế.
+Ngoại hình: Áo sơ mi tung bay, tóc đỏ cam, hai tay to, bắp và cẳng tay nổi rõ sức mạnh, chân dài, bắp chân chắc khỏe, mặt haze cam đỏ chuyển động.
+Aura: Aura gió lửa cuộn quanh toàn bộ thân thể.Lore: Kiếm sĩ Kỳ Phong, điều khiển gió và lửa, di chuyển nhanh như chớp, chém kiếm tạo lốc hoả.
+Vũ khí: Kiếm cuồng phong.16. Hàn Quang (Thần Ám Quang – Bóng Tối Quyền Thế) Tính cách: Trầm ngâm, bí hiểm, đôi lúc xuất hiện như ma quỷ.
+Ngoại hình: Thân hình bọc giáp đen bạc, tóc ngắn xám tro, mặt phủ haze trắng bạc chuyển động, các chi tối màu tách biệt rõ để vẽ SVG, áo choàng bóng đêm phủ kín. Aura: Khí aura bóng tối và tia sáng giao động liên tục quanh mặt và lưng.
+Lore: Ám thần bóng tối, khi ẩn hiện có thể xâm nhập vào tâm trí đối phương hoặc bẻ cong thực tại.
+Vũ khí: Kiếm bóng tối.17. Mộc Quán (Kiếm Tiên Dị Thú Thái Cổ) Tính cách: Khó đoán, đôi lúc dại khờ, tâm hồn trẻ con.
+Ngoại hình: Thân hình như lai giữa người và thú cổ đại, lông xanh lá, tay chân to và chia nhỏ rõ từng bắp, mặt phủ haze xanh lá động, đuôi dài lắc lư. Aura: Aura thực vật cổ đại quấn quanh thân.
+Lore: Chúa tể thú cổ, truyền nhân kiếm tu nguyên thủy, có thể giao tiếp với mọi loài thú và triệu hồi sủng thú hỗ trợ.SVG bổ sung: Sủng thú – “Khuyển Mộc” ngoại hình chó rừng cổ với lông lá xù, chân tay chia rõ từng bộ phận.
+18. Quỷ Câu (Thần Ma – Người Vượt Thời Không) Tính cách: Bí ẩn, khó gần, tự cô lập.Ngoại hình: Da xám tro, tóc đen dài phủ mặt, hai tay trắng nhợt, bắp và cẳng tay từng đoạn xương xám, chân thon dài, mặt haze trắng xám động chuyển.
+Aura: Aura sương tro cuộn quanh thân, cực kỳ động quanh mặt.
+Lore: Thần ma vượt thời không, khả năng biến hoá thực tại, di chuyển xuyên không gian đến các thế giới song song.Vũ khí: Trượng thời không.
+19. Lan Phượng (Dị Thú – Linh Điểu Thượng Cổ) Tính cách: Tự hào, sinh động, thích ca hát.Ngoại hình: Hóa hình linh điểu, bộ lông xanh lam ánh vàng, đầu chim to, chân dài chia rõ từng đoạn, cánh tay giống cánh chim, mặt haze vàng xanh động.
+Aura: Aura ánh sáng và lông vũ động quanh thân.Lore: Linh điểu bảo hộ bầu trời, gọi mưa gió, truyền cảm hứng khí hậu và điều khiển thông tin di chuyển.
+SVG bổ sung: Sủng thú – “Phượng Linh” hình chim lạ cỡ nhỏ với các chi rõ ràng.20. Hoàng Ẩn (Thần Vương Cổ Đại – Chủ Nhân Mê Vụ) Tính cách: Quyền uy, trầm tư, uy nghiêm tuyệt đối.
+Ngoại hình: Mặc long bào cổ, tóc dài vàng óng, tay và chân tách thấp, đầu phủ haze trắng dày liên tục đổi hình, mắt phủ haze không thấy rõ, thân hình to cao thần thánh.
+Aura: Lớp haze trắng vàng động quanh đầu và aura vàng rực rỡ phủ kín thân.
+Lore: Thần Vương cổ đại quản trị thế giới Arclune, mặt luôn phủ haze mơ hồ trắng động, khi xuất hiện gây áp đảo thần thức mọi sinh vật xung quanh.
+Vũ khí: Quyền trượng vương giả.
+Kết Nối & Liên Minh
+Nhóm Kiếm Tu: Diệp Minh, Minh Nguyệt, Thanh Vân, Kỳ Phong, Mộc Quán – cùng tu luyện kiếm khí, bảo vệ và mâu thuẫn theo trường phái; thường đối đầu nhóm Thần Biến Dị.
+Nhóm Thần – Dị Biến: Nguyệt San, Huyết Tịch, Nhật Hoa, Băng Lan, Hắc Viêm, Hàn Quang – kiểm soát các nguồn năng lượng thượng cổ, là đích đến của các cuộc truy tầm thần diệu.
+Nhóm Dị Thú: Trùng Lâm, Thạch Phách, Lan Phượng – bảo vệ vùng đất thiêng, thường hợp tác với kiếm tu, giữ cân bằng hệ aether.
+Nhóm Đô Thị – Biến Dị: Cẩm Nhi, Sa Nương – kiểm soát tri thức và sức mạnh mới, là lực lượng mâu thuẫn với thần cổ.
+Nhóm Thần Vương & Ma Pháp Sư: Khai Nguyên Tử, Quỷ Câu, Hoàng Ẩn – đứng ngoài trật tự, có thể liên kết bất cứ phe phái nào khi nhận thấy thời điểm.
+SVG Định Dạng Chuẩn
+Mỗi SVG cần: tách rõ đầu, hai tay (bắp tay, cẳng tay), hai chân (bắp chân, cẳng chân), thân thể, aura/vầng hào quang động quanh người (hoặc haze động quanh mặt thần), vũ khí đặc trưng. Các thần, thần thú nếu có sủng thú, cần thêm SVG riêng với cấu trúc tách chi, tỉ lệ quy chuẩn để dễ dùng trong gameplay. Nếu nhân vật là thần mặt mù, SVG mặt luôn phủ haze trắng động, aura xung quanh rõ ràng. Toàn bộ phải đảm bảo dung lượng tối thiểu 150kb/nhân vật, chuẩn màu – sắc nét – chi tiết đúng phong cách Sword of Convallaria

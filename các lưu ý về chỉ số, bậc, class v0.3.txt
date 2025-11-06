@@ -1,16 +1,13 @@
-
 1) Hệ chỉ số
 Cơ bản (8 cái):
-
 HP - máu.
-
 ATK - sát thương vật lý cơ bản.
 WIL - sức mạnh phép/linh (tăng dmg skill, hồi AE).
 ARM - giáp (giảm dmg vật lý %).
 RES - kháng linh/phép (giảm dmg phép %).
 AGI - nhanh nhẹn (né + một ít tốc đánh).
 PER - tri giác (chính xác, chí mạng).
-SPD - tốc độ ra đòn (giây/đòn) hoặc đòn/giây.
+SPD - tốc độ ra đòn (turn/đòn) hoặc đòn/turn.
 
 Năng lượng:
 
@@ -19,8 +16,7 @@ Nộ: 0-100 (auto dùng Ult khi đầy).
 
 2) Bậc (Rarity) multiplier
 
-Rank Multiplier (áp lên TẤT CẢ chỉ số trừ SPD): N:0.8, R:0.9, SR:1.05, SSR:1.25, UR:1.5, Prime:1.8. (đã chỉnh để giảm chênh lệch cơ bản giữa các bậc)
-
+Rank Multiplier (áp lên TẤT CẢ chỉ số trừ SPD): N:0.8, R:0.9, SR:1.05, SSR:1.25, UR:1.5, Prime:1.8.
 (Sau này khi có level: cộng tăng trưởng riêng từng class; giờ test lv1 nên chỉ cần basexrarity.)
 
 Tham khảo thôi không cần áp dụng 100%.
@@ -90,28 +86,192 @@ VFX placeholder: chibi có quần áo/vũ khí; nền sân có texture.
 
 6) Leader:
 Mặc định: luôn có trên sân, không tốn cost, có thanh Nộ riêng.
+PvE boss có thể gọi là “Leader”, nhưng không có 3 ult lựa chọn như player (chỉ có 1 ult riêng của boss).
 Cơ chế “Ult chọn 1 trong 3": khi đầy nộ (≥ RageMax hoặc đủ nộ để dùng ult), sáng 3 nút; bấm 1 cái thì 2 cái tắt cho tới khi nộ lại đầy. Mọi ultimate chủ động của leader muốn dùng cần tích tổi thiểu 100 nộ để sử dụng, 1 turn chỉ được dùng 1 ult. Vào trận với 0 nộ/rage base.
+Có mặt trên sân khi vào trận, Có thể đổi leader trong "Đội Hình" trước khi vào trận, không tốn cost. Mặc định
+Có thanh Nộ riêng. Vào trận: 0 Nộ.
+Cơ chế “Ult chọn 1 trong 3”: khi Nộ ≥ RageMax hoặc đủ Nộ cho Ult cụ thể, hiển thị 3 nút, chỉ được bấm 1 (2 cái còn lại tắt cho đến khi đủ Nộ lần sau).
+Mỗi lượt chỉ dùng 1 Ult.
 
-1. Uyên.
-Rage base: 100
-Nội tại: mỗi lần triệu hồi 1 đồng minh lên sân (chiến trường) Uyên được + 5 nộ/lần, tác dụng kể cả đồng minh được hồi sinh (tối đa 5 lần/trận cho cộng nộ từ hồi sinh), vật triệu hồi của đồng minh không tính, nội tại luôn hoạt động suốt trận đấu và không thể bị xoá, cướp, sao chép hay lãng quên.
+1. Leader — Uyên (ô cố định: vị trí 8)
+RageBase (RageMax khởi điểm): 100.
+Nộ vẫn tăng theo luật chung của game (gây/nhận sát thương…); riêng Uyên còn có nội tại tăng Nộ khi triệu hồi (bên dưới).
+
+Nội tại — Lệnh Chủ Triệu Tập
+Mỗi lần triệu hồi 1 đồng minh lên sân, Uyên +5 Nộ. Hồi sinh đồng minh cũng tính: tối đa 5 lần/trận cho nguồn hồi sinh. Vật triệu hồi (pet/construct) không tính. Không thể bị xoá, cướp, sao chép hay lãng quên. Luôn hoạt động suốt trận.
+
+Đánh thường — Lệnh Trảm
+Gây 100% ATK + 100% WIL lên 1 mục tiêu.
+Nếu mục tiêu < 30% HP khi trúng đòn: Uyên +5 Nộ (tối đa 1 lần mỗi lượt của Uyên).
+Nếu hạ gục mục tiêu: Uyên hồi 5% Max HP.
 
 3 skill chủ động, chỉ được chọn 1 kill khi đầy nộ:
+A. Thiên Mệnh Gia Phúc (tiêu 100 Nộ — chọn ngẫu nhiên 1 trong 3 hiệu ứng)
+1. Huyết Khí Tăng Tốc (stacking, vĩnh viễn)
+→ +3 Nộ mỗi đòn đánh thường của Uyên. Tối đa 10 stack. (Không thể xoá)
+2. Lệnh Bạt Phong (toàn đội, 3 lượt)
+→ +25% SPD cho toàn đội (sử dụng SPD/AGI của engine để đồng bộ hệ thống lượt).
+3. Định Mạch (stacking, vĩnh viễn)
+→ +10% Max HP cho Uyên. Tối đa 3 stack. (Cộng dồn theo % trên Max HP hiện tại lúc nhận, không thể xoá). Khi đạt 3 stack thì dùng ult A sẽ không random ra hiệu ứng định mạch nữa.
 
-A. Thiên Mệnh Gia Phúc (tiêu 100 nộ) Nhận ngẫu nhiên 1 trong 3 buff:
+B. Tàng Nộ Thượng Hạn (tiêu 40% Nộ hiện tại)
+Giữ lại 60% Nộ; tăng RageMax ×1.3 (nhân chuỗi).
+Ví dụ: 100→130 (còn 60/130); lần 2: 130→169 (còn 78/169); …
+Hồi 5% Max HP ngay khi dùng.
+Mốc cộng thêm: đạt 3/6/10 lần → mỗi mốc +5% Max HP (vĩnh viễn trận đó).
+Giới hạn kích hoạt: 10 lần/trận.
+Synergy: mỗi lần B đã kích hoạt → +5% damage cho Ult C (tối đa +35%).
+> Lưu ý: RageMax tăng không làm cản trở việc dùng A/C (vì A/C chỉ đòi 100 Nộ). Điều kiện hiển thị nút là Nộ ≥ RageMax hoặc đủ Nộ cho ult đang xét.
 
-Huyết Khí Tăng Tốc: +3 nộ mỗi đòn đánh (áp dụng đến hết trận, không thể xoá). Giới hạn tối đa 10 stack.
-
-Lệnh Bạt Phong: +25% tốc đánh cho toàn đội trong 3 turn.
-
-Định Mạch: +10% Max HP cho bản thân (áp dụng đến hết trận, không thể xoá). Tối đa 10 stack. Ví dụ: lần 1 +10% max hp hiện có, lần 2 +10% max hp hiện có lúc đó, các lần tiếp theo cũng vậy, 100hp +10% = 110hp, 110hp +10% = 121hp, 121hp +10% = 133.1 hp, cứ thế mà tính tới, dĩ nhiên chỉ là ví dụ cho dễ hình dung.
-
-B. Tàng Nộ Thượng Hạn (tiêu 40% nộ hiện tại) Giữ lại 60%, tăng RageMax ×1.3. Ví dụ: 100-130 (còn 60/130); lần 2: 130-169 (còn 78/169) cứ thế tính tới, hồi phục hp = 5% max hp. Khi đạt mốc 3/6/10 lần thì mỗi mốc + 5% max hp.
-Giới hạn kích hoạt tối đa là 10 lần.
-
-C. Song Diệt Ấn (tiêu 100 nộ) Gây sát thương toàn bộ địch: = 50% max hp bản thân + 60% ATK + 60% WIL (hybrid), xuyên 10% ARM & 10% RES.
+C. Song Diệt Ấn (tiêu 100 Nộ)
+Aoe toàn bộ địch: sát thương = (50% Max HP của Uyên) + (60% ATK) + (60% WIL) (hybrid).
+Xuyên 10% ARM & 10% RES.
+Nhận bonus Synergy từ B: +5% sát thương mỗi lần B, tối đa +35%.
+Rào chắn cân bằng khuyến nghị (đã tính sẵn, để tránh one-shot bất thường):
+Thành phần “50% Max HP của Uyên” chỉ tính vào mục tiêu không phải Leader; với Leader địch, clamp phần này ở ≤ 10% Max HP của Uyên (phần ATK/WIL vẫn giữ nguyên).
+Tổng ignore (xuyên) tuân theo trần ignore chung của game (nếu có).
 
 Synergy: mỗi stack từ ult Chủ động B +5% dmg cho ult chủ động C (tối đa +35%).
+
+Gợi ý triển khai này chỉ mang tính tham khảo:
+// ==== LEADER UYÊN – RAGE & ULT ====
+
+Uyên.position   = 8
+Uyên.rage       = 0
+Uyên.rageMax    = 100
+
+// ---- Counters / Stacks ----
+state = {
+  gainedRageOnBasicThisTurn: false,
+  reviveRageCount: 0,
+  A1_stacks_HuyetKhi: 0,  // +3 rage per basic (Uyên) – max 10
+  A3_stacks_DinhMach: 0,  // +10% MaxHP (Uyên)   – max 3  <<<< CHỈNH
+  B_uses: 0,               // số lần đã dùng Ult B
+  C_bonus: 0.0             // +5%/B_use, cap 35%
+}
+
+// ---- Passive: Summon → +5 Rage (revive tính tối đa 5 lần) ----
+onAllySummoned():
+  Uyen.rage += 5
+
+onAllyRevived():
+  if state.reviveRageCount < 5:
+     Uyen.rage += 5
+     state.reviveRageCount++
+
+// ---- Basic Attack: Lệnh Trảm ----
+Basic_Attack(target):
+  dealDamage(target, 1.0*ATK + 1.0*WIL)
+  if target.hpPercent < 0.30 and not state.gainedRageOnBasicThisTurn:
+     Uyen.rage += 5
+     state.gainedRageOnBasicThisTurn = true
+  if target.died:
+     Uyen.heal(0.05 * Uyen.maxHP)
+
+// Reset flag mỗi lượt của Uyên
+onTurnEnd(Uyen):
+  state.gainedRageOnBasicThisTurn = false
+
+// ---- Ult visibility condition ----
+Ult_Ready():
+  return (Uyen.rage >= Uyen.rageMax) || (Uyen.rage >= 100)  // A/C yêu cầu 100
+
+// ===============================================================
+// ULT A – Thiên Mệnh Gia Phúc (tiêu 100 nộ) – roll 1 trong 3,
+// nhưng NẾU Định Mạch (A3) đã đủ 3 stack thì KHÔNG roll A3 nữa.
+// ===============================================================
+Ult_A():
+  if Uyen.rage < 100: return
+  spendRage(100)
+
+  // Tạo danh sách ứng viên theo trạng thái stack hiện có
+  candidates = []
+
+  // A1: Huyết Khí Tăng Tốc – max 10 stack
+  if state.A1_stacks_HuyetKhi < 10:
+     candidates.push("A1")
+
+  // A2: Lệnh Bạt Phong – luôn hợp lệ
+  candidates.push("A2")
+
+  // A3: Định Mạch – max 3 stack  <<<< CHỈNH
+  if state.A3_stacks_DinhMach < 3:
+     candidates.push("A3")
+
+  // Nếu vì lý do nào đó chỉ còn A2 thì vẫn chọn A2 bình thường
+  choice = randomChoice(candidates)
+
+  if choice == "A1":
+     state.A1_stacks_HuyetKhi++
+     addPermanentEffect("HuyetKhiTangToc", { +3_rage_per_basic: true }, maxStacks=10)
+     // hiệu ứng vĩnh viễn, không thể xóa
+
+  else if choice == "A2":
+     teamBuff("SPD", +0.25, duration=3) // +25% SPD toàn đội trong 3 lượt
+
+  else if choice == "A3":
+     state.A3_stacks_DinhMach++
+     // +10% MaxHP theo MaxHP hiện tại tại thời điểm nhận
+     Uyen.maxHP *= 1.10
+     // vĩnh viễn trận này, không thể xóa; cap logic ở điều kiện candidates
+
+// ===============================================================
+// ULT B – Tàng Nộ Thượng Hạn (tiêu 40% nộ hiện tại)
+// Giữ 60% nộ, tăng RageMax x1.3; hồi 5% MaxHP.
+// Mốc 3/6/10 lần: +5% MaxHP mỗi mốc.
+// Synergy: mỗi lần B → +5% dmg cho Ult C (cap 35%).
+// ===============================================================
+Ult_B():
+  if Uyen.rage <= 0: return
+  cost = floor(0.40 * Uyen.rage)
+  spendRage(cost)
+
+  // tăng trần nộ
+  Uyen.rageMax = round(Uyen.rageMax * 1.30)
+
+  // hồi máu tức thì
+  Uyen.heal(0.05 * Uyen.maxHP)
+
+  // đếm lần dùng & thưởng mốc
+  state.B_uses++
+  if state.B_uses == 3 or state.B_uses == 6 or state.B_uses == 10:
+     Uyen.maxHP *= 1.05
+
+  // C synergy
+  state.C_bonus = min(state.B_uses * 0.05, 0.35)
+
+// ===============================================================
+// ULT C – Song Diệt Ấn (tiêu 100 nộ)
+// Gây lên toàn bộ địch: 50% MaxHP(Uyên) + 60% ATK + 60% WIL (hybrid)
+// Xuyên 10% ARM & 10% RES
+// Nhận bonus từ B: +5% mỗi lần B, cap 35%.
+// Clamp phần “50% MaxHP” trên mục tiêu Leader địch xuống 10% MaxHP(Uyên).
+// ===============================================================
+Ult_C():
+  if Uyen.rage < 100: return
+  spendRage(100)
+
+  for enemy in allEnemies:
+    hpComp = 0.50 * Uyen.maxHP
+    if enemy.isLeader:
+       hpComp = min(hpComp, 0.10 * Uyen.maxHP)  // clamp trên Leader
+
+    base = hpComp + 0.60*ATK + 0.60*WIL
+    dmg  = base * (1.0 + state.C_bonus)
+
+    applyHybridDamageWithIgnore(
+      target=enemy,
+      amount=dmg,
+      ignoreArm=0.10,
+      ignoreRes=0.10
+    )
+
+// ===============================================================
+// Hệ số nộ từ A1 – xử lý lúc Uyên đánh thường
+// ===============================================================
+onUyensBasicHit():
+  if state.A1_stacks_HuyetKhi > 0:
+     Uyen.rage += 3
 
 7) Giải thích về góc nhìn và lượt đánh trong trận đấu:
 

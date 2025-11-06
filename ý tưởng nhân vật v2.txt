@@ -352,6 +352,56 @@ Không nhận buff/debuff: không thể nhận shield/stealth/haste/venom/exalt/
 Cleanse: xóa Huyết Ấn trên mục tiêu địch được phép (do skill khác), nhưng không thể xóa các hiệu ứng môi trường từ Lãnh Địa.
 Nguồn sát thương: tick từ bleed là source=bleed, kill do bleed không tính vào mốc “5 mạng” của failsafe; kill từ skill/ult hoặc field của Huyết Thần mới tính.
 
+54) Mộng Tim — UR • Class: Hỗ trợ
+
+Đánh thường: gây 100% ATK + 100% WIL lên 1 mục tiêu. (On-hit: áp 1 stack Dị Tâm — xem dưới.)
+
+Cơ chế debuff riêng: Dị Tâm (Mindworm)
+Loại: Debuff có stack.
+Áp dụng bởi: Đánh thường, Kỹ năng, Ult của Mộng Tim (trừ khi ghi chú khác).
+Tác dụng mỗi stack: −1% ATK và −1% WIL của mục tiêu (cộng dồn; tối đa 5 stack trên 1 mục tiêu).
+Kích nổ: Khi mục tiêu đạt 5 stack, ngay lập tức Choáng (Daze) 1 turn, rồi xoá toàn bộ stack Dị Tâm trên mục tiêu đó.
+Rơi rụng: Nếu mục tiêu không nhận thêm stack trong 2 turn liên tiếp, toàn bộ stack Dị Tâm trên mục tiêu biến mất.
+Thanh tẩy: Có thể bị xoá bởi hiệu ứng “cleanse” tiêu chuẩn.
+PvE Boss: thay vì Daze, chuyển thành Silence 1 turn khi đạt 5 stack (khống chế nhẹ hơn để cân bằng boss).
+
+Nội tại — #1 Quỷ Tâm Đồng Cư
+Mỗi khi Mộng Tim gây sát thương (đánh thường/kỹ năng/ult), áp 1 stack Dị Tâm lên mục tiêu trúng hit (mỗi mục tiêu tối đa 1 lần áp thêm/turn từ Nội tại này, để tránh spam vượt kiểm soát).
+Khi một mục tiêu nổ Dị Tâm (đạt 5 stack và bị Daze/Silence), kẻ địch đứng gần nhất với mục tiêu đó nhận 1 stack Dị Tâm lan (nếu có nhiều mục tiêu ngang khoảng cách, ưu tiên mục tiêu có WIL cao nhất).
+Miễn nhiễm Khiêu khích (Taunt) — “quỷ tâm” không tuân lệnh.
+
+> Tag: on-hit, spread-on-trigger, anti-taunt
+
+Kỹ năng 1 — Lệch Nhịp Hắc Khúc (25 aether)
+Đơn mục tiêu. Gây sát thương = 150% đòn đánh thường.
+Nếu mục tiêu đang có ≥3 stack Dị Tâm, gắn thêm Silence 1 turn (không ảnh hưởng boss miễn dịch Silence theo rule riêng).
+> Tính là Kỹ năng, không tính là đòn đánh thường. single-target, control-conditional
+
+Kỹ năng 2 — Mở Phong Ấn: Quỷ Tâm (30 aether, hồi chiêu 3 turn)
+Tự cường hoá trong 2 turn:
++25% ATK/WIL, −15% ARM/RES (đánh mạnh nhưng mỏng).
+Đánh thường biến thành 2 hit chuỗi lên 2 mục tiêu ngẫu nhiên gần nhất (mỗi hit = 100% đòn đánh thường).
+Mỗi hit áp thêm 1 stack Dị Tâm (ngoài Nội tại).
+> Hết 2 turn, trở lại trạng thái thường. Buff này không cộng dồn với lần dùng tiếp theo; tái kích hoạt khi hết thời gian và hết hồi chiêu.
+
+self-buff, burst-window, risk-reward
+
+Kỹ năng 3 — Đan Tâm Ảnh Chuyển (25 aether)
+Bảo hộ đồng minh đơn. Chọn 1 đồng minh:
+Hút tối đa 6 stack Dị Tâm từ toàn bộ kẻ địch (ưu tiên hút từ mục tiêu đang nhiều stack nhất) và chuyển hóa thành Khiên Đen lên đồng minh được chọn: +4% Max HP mỗi stack hút được (tối đa +24% Max HP), tồn tại 2 turn.
+Đồng minh đó đồng thời Miễn nhiễm Fear/Daze trong 1 turn.
+> Stack bị hút biến mất khỏi kẻ địch (không kích nổ). Nếu không hút được stack nào, vẫn cấp Miễn nhiễm Fear/Daze 1 turn (không có khiên).
+
+ally-shield, stack-consume, utility
+
+Ultimate — Dạ Tâm Hợp Tấu
+Auto-cast khi đầy nộ. AOE toàn sân địch:
+Gây sát thương = 180% đòn đánh thường lên tất cả kẻ địch.
+Mỗi mục tiêu nhận thêm +10% sát thương cho mỗi stack Dị Tâm đang có trên chính mục tiêu đó (cộng dồn, tối đa +50%).
+Sau khi gây sát thương, nếu mục tiêu đang có ≥4 stack, áp thêm 1 stack Dị Tâm (có thể đẩy mục tiêu lên 5 để kích nổ bằng cơ chế Nội tại ở lượt sau).
+> Không tiêu thụ stack. aoe-global, scales-with-stacks
+
+Đạo hữu xin dừng bước!
 
 B. Nhân vật npc pve không gacha. Hưởng lợi chỉ số từ miêu tả ở mục B trong ý tưởng nhân vật.txt
 
@@ -413,19 +463,54 @@ Ultimate – Tái Viết Hiện Thực:
 - Phong Hồi Phục: bất kể là đồng minh hay kẻ thù thì mỗi đơn vị đứng trên sân đều không thể hồi hp dưới mọi hình thức ( hp regen, kĩ năng, đánh thường, nội tại và ultimate đều không được).
 - Giới Hạn Tổn Thương 3%: Không thể gây sát thương lên mục tiêu vượt quá 3% max hp của mục tiêu, quy tắc này áp dụng toàn sân bất kể kẻ thù hay đồng minh.
 Ghi chú: các quy tắc trên không phải buff/debuff, không thể miễn dịch hay tiến hoá để né, và có độ ưu tiên cao nhất.
+Ur'zaloth — bộ kỹ năng:
+
+Kĩ năng 1 — Bẻ Cong Trục Không
+Loại/Phạm vi: cố định, quay một cụm 2×2 bên địch.
+Hiệu ứng: chọn cụm 2×2 có nhiều đơn vị địch nhất (nếu hòa, ưu tiên cụm gần Leader đối phương). Xoay theo chiều kim đồng hồ; mọi đơn vị trong cụm nhận sát thương = 120% đòn đánh thường và daze (–10% SPD & AGI, 1 lượt).
+Tương tác: mỗi đòn đánh vào Ur’zaloth trong lượt bị daze đếm 2 lần vào mốc Biến Dị.
+Cost/CD: 25 aether, CD 2.
+Telegraph: highlight khung 2×2 nhấp nháy 0.6s trước khi xoay.
+
+Kĩ năng 2 — Ô Nhiễm Quy Tắc
+Loại/Phạm vi: toàn sân, 2 lượt.
+Hiệu ứng toàn cục trong 2 lượt:
+1. Hồi thành Hại: lượng hồi HP (mọi nguồn) bị đảo thành sát thương chuẩn = 60% giá trị lẽ ra hồi.
+2. Dẫn Xuất Năng Lượng: Aether/Nộ nhận được –50% cho tất cả đơn vị.
+3. Trong thời gian hiệu lực, mỗi lần một đơn vị tấn công Ur’zaloth, mốc Biến Dị của đơn vị đó +2 (tăng tốc tiến trình biến dị).
+Không phải buff/debuff, tuân theo cùng cấp ưu tiên như ult (không thể miễn dịch/tiến hoá né).
+Cost/CD: 30 aether, CD 3.
+Telegraph: vân không gian đảo màu phủ toàn màn hình 0.4s.
+
+Kĩ năng 3 — Điểm Kỳ Dị: Hố Đen Phản Lý
+Loại/Phạm vi: tạo nút dị thường ở ô trung tâm của 3 ô trung gian (giữa hai ô số 2); hiệu lực 3 lượt.
+Vùng ảnh hưởng: bốn ô lân cận nút theo trục thẳng — ô 1, 2, 3, 5 của cả hai bên.
+Hiệu ứng trên các ô chịu ảnh hưởng:
+Khi bước vào vùng: nhận 100% đòn đánh thường (nguồn sát thương: Ur’zaloth).
+Đứng trong vùng: SPD –20%, hồi HP nhận –30%, Aether/Nộ –50% (mọi hình thức).
+Cuối lượt của chính đơn vị: nếu ô trước mặt (hướng về ô số 2 bên mình) trống, bị kéo 1 ô vào gần tâm; nếu bị kéo, nhận thêm 50% đòn đánh thường.
+Giới hạn: chỉ tồn tại 1 nút cùng lúc. Tái thi triển gia hạn thời gian và kích nổ nút cũ gây 150% đòn đánh thường lên các ô đang bị ảnh hưởng thời điểm nổ.
+Cost/CD: 35 aether, CD 4.
+Telegraph: dựng cột xoáy tím ở tâm; viền các ô 1/2/3/5 hai bên loé lên mỗi khi kéo.
+
+Ghi chú cân bằng & triển khai nhanh
+Tất cả sát thương từ skill đều là nguồn Ur’zaloth (tuân “Quy tắc nguồn sát thương”).
+Các hiệu ứng toàn cục của Ô Nhiễm Quy Tắc là quy tắc (không phải buff/debuff), ưu tiên ngang ult của boss bạn đã mô tả.
+Leader ở vị trí 8 không bị kéo bởi Hố Đen vì không đứng trên các ô 1/2/3/5.
+Nếu sân có <2 địch trong bất kỳ cụm 2×2 khi dùng Bẻ Cong Trục Không, chọn cụm có ít nhất 2; nếu không có, skill chuyển thành đẩy lùi 1 ô mỗi mục tiêu hiện hữu trong cụm giả lập và vẫn gây dmg+daze.
 
 3) Thâm Uyên Devourer - Shab'gorath (深渊吞噬者 - Shēn Yuān Tūn Shì Zhě)
 
 Nguồn gốc: Thực thể từ Chiều Không Gian Thứ 5
 Lore:
 Shab'gorath là một thực thể sống trong chiều không gian thứ năm, nơi mà khái niệm "hiện tại", "quá khứ", và "tương lai" đan xen lẫn nhau. Đối với các sinh vật ba chiều, Shab'gorath xuất hiện như những phần cơ thể rời rạc: một cái tay ở đây, một cái đầu ở kia, nhưng thực chất đó chỉ là những "lát cắt" của cơ thể đa chiều của nó. Nó nuôi sống bằng cách hấp thụ "thời gian sống" của sinh vật khác - những ai gần nó sẽ thấy tuổi tác tăng lên nhanh chóng. Một số giáo phái thờ nó như một vị thần, hy vọng đạt được sự bất tử bằng cách hiến tế thời gian của người khác. Đặc điểm: Có thể xuất hiện và biến mất mà không cần di chuyển trong không gian ba chiều.
-Có khả năng "thấy" mọi khả năng trong tương laiChạm vào nó có thể khiến người đó nhảy cóc qua thời gian một cách ngẫu nhiên.
+Có khả năng "thấy" mọi khả năng trong tương lai, Chạm vào nó có thể khiến người đó nhảy cóc qua thời gian một cách ngẫu nhiên.
 
 Nội tại: mỗi khi bị tấn công, kẻ tấn công sẽ được ngẫu nhiên hồi hp hoặc trừ hp, cộng trừ tối đa 10% max hp của kẻ tấn công, có thể giết chết mục tiêu, tỉ lệ + hp là 40%, trừ hp là 60% trong 40% và 60% cộng trừ hp này thì lượng hp + - là ngẫu nhiên, cap = 10% max hp của mục tiêu. Mỗi khi bị tấn công, kẻ tấn công sẽ được xoá 1 buff hoặc 1 debuff ngẫu nhiên.
 Mỗi khi bị tấn công có 15% tỉ lệ miễn dịch hoàn toàn không nhận sát thương của đòn tấn công đó.
 Mỗi khi gây sát thương sẽ giảm 2% max hp của mục tiêu.
 
-Đánh thường: gây sát thương ngẫu nhiên theo tỉ lệ sau:
+Đánh thường: gây sát thương theo tỉ lệ ngẫu nhiên sau:
 1. Tấn công leader đối phương cùng 1 kẻ địch ngẫu nhiên với 40% tỉ lệ.
 2. Tấn công ngẫu nhiên 2 kẻ địch tên sân rồi hồi hp = 10% sát thương gây ra, 30% tỉ lệ.
 3. Tấn công ngẫu nhiên 3 kẻ địch, 20% tỉ lệ.
