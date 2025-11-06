@@ -1,5 +1,386 @@
 const skillsConfig = [
   {
+    unitId: 'diep_minh',
+    basic: {
+      name: 'Thảo Kiếm Đoạt',
+      type: 'basic',
+      tags: ['single-target', 'seed'],
+      damage: { multiplier: 1.0 },
+      marks: [{ id: 'thuc_mach', stacks: 1, maxStacks: 3, purgeable: false }],
+      description: 'Vung kiếm lá gây sát thương 100% ATK+WIL và gieo 1 tầng Thực Mạch (tối đa 3, không thể thanh tẩy).'
+    },
+    skills: [
+      {
+        key: 'skill1',
+        name: 'Vệ Mộc Trấn Hộ',
+        type: 'active',
+        cost: { aether: 20 },
+        targets: 'ally',
+        shields: [{ percentMaxHP: 0.25, duration: { turns: 2 } }],
+        heals: [{ percentMaxHP: 0.06 }],
+        description: 'Gieo mộc khí thành khiên, hồi 6% Max HP và tạo lá chắn bằng 25% Max HP cho một đồng minh trong 2 lượt.'
+      },
+      {
+        key: 'skill2',
+        name: 'Thực Linh Dẫn Lộ',
+        type: 'active',
+        cost: { aether: 25 },
+        duration: { turns: 3 },
+        field: { id: 'thuc_linh_tran', effects: [{ regenPercentMaxHP: 0.04 }, { stat: 'RES', amount: 0.12 }] },
+        description: 'Trải kết giới thực linh 3 lượt: mọi đồng minh trong trận hồi 4% Max HP mỗi lượt và nhận +12% RES.'
+      },
+      {
+        key: 'skill3',
+        name: 'Liên Đằng Phong Tỏa',
+        type: 'active',
+        cost: { aether: 30 },
+        tags: ['line', 'control'],
+        damage: { multiplier: 1.10 },
+        crowdControl: { type: 'root', turns: 1 },
+        marks: [{ id: 'thuc_mach', stacks: 1, targets: 2, transfer: true }],
+        description: 'Tạo dây leo quất thẳng, gây 110% sát thương, trói chân 1 lượt và lan 1 tầng Thực Mạch sang tối đa 2 kẻ địch khác.'
+      }
+    ],
+    ult: {
+      name: 'Thiên Diệp Bảo Hộ',
+      type: 'ultimate',
+      tags: ['field', 'support'],
+      duration: { turns: 3 },
+      description: 'Gọi thiên diệp che chở 3 lượt: đồng minh nhận hồi 5% Max HP và lá chắn 12% Max HP mỗi lượt; kẻ địch lần đầu bước vào bị trói 1 lượt và tăng 12% sát thương gánh chịu.'
+    },
+    talent: {
+      name: 'Lâm Ý Vĩnh Thịnh',
+      type: 'talent',
+      maxStacks: 3,
+      immobilizeOnCap: { turns: 1 },
+      description: 'Thực Mạch đạt 3 tầng trói mục tiêu 1 lượt. Aura của Diệp Minh tăng 10% hiệu quả lá chắn và hồi 2% Max HP mỗi lượt cho đồng minh lân cận.'
+    },
+    technique: null,
+    notes: [
+      'Aura mặc định hồi 2% Max HP mỗi lượt cho đồng minh đứng cạnh.',
+      'Thực Linh Dẫn Lộ cộng dồn với aura cơ bản nhưng không nhân đôi hồi máu.'
+    ]
+  },
+  {
+    unitId: 'nguyet_san',
+    basic: {
+      name: 'Ảnh Nguyệt Đoạn',
+      type: 'basic',
+      tags: ['single-target', 'blink'],
+      damage: { multiplier: 1.05 },
+      reposition: { type: 'behindTarget' },
+      description: 'Dịch chuyển ra sau mục tiêu, chém 105% sát thương rồi quay lại vị trí ban đầu.'
+    },
+    skills: [
+      {
+        key: 'skill1',
+        name: 'Huyền Nguyệt Ẩn Tích',
+        type: 'active',
+        cost: { aether: 25 },
+        duration: { turns: 2 },
+        stealth: { turns: 2, breakOnAttack: false },
+        buffs: [{ effect: 'dodgeAll', amount: 0.30 }],
+        description: 'Ẩn mình 2 lượt, tăng 30% né mọi đòn; không bị lộ khi dùng kỹ năng dịch chuyển.'
+      },
+      {
+        key: 'skill2',
+        name: 'Nguyệt Ảnh Hoán Thân',
+        type: 'active',
+        cost: { aether: 30 },
+        teleport: { range: 'anyShadow', leaveShadow: true },
+        buffs: [{ stats: { SPD: 0.15, PER: 0.10 }, duration: { turns: 2 } }],
+        description: 'Đặt dấu bóng tại chỗ và dịch chuyển tới vị trí đã chọn, +15% SPD, +10% PER trong 2 lượt.'
+      },
+      {
+        key: 'skill3',
+        name: 'Nguyệt Diệt Ảnh Phạt',
+        type: 'active',
+        cost: { aether: 35 },
+        tags: ['aoe', 'burst'],
+        damage: { multiplier: 1.60 },
+        executes: { belowPercentHP: 0.25 },
+        detonateMarks: [{ id: 'nguyet_an', bonusDamage: 0.30 }],
+        description: 'Kích nổ vùng bóng quanh dấu ấn, gây 160% sát thương; mục tiêu dưới 25% HP bị kết liễu, mỗi Nguyệt Ấn kích hoạt thêm 30% sát thương.'
+      }
+    ],
+    ult: {
+      name: 'Huyết Nguyệt Định Mệnh',
+      type: 'ultimate',
+      tags: ['blink', 'execute'],
+      damage: { multiplier: 3.20 },
+      pierce: { arm: 0.30, res: 0.30 },
+      description: 'Lướt qua bóng tối đến kẻ có Nguyệt Ấn gần nhất, gây 320% sát thương xuyên 30% ARM/RES, chắc chắn chí mạng và hồi trạng thái ẩn thân.'
+    },
+    talent: {
+      name: 'Nguyệt Ảnh Ấn',
+      type: 'talent',
+      maxStacks: 5,
+      decay: { turns: 2 },
+      description: 'Đòn đánh tạo Nguyệt Ấn (tối đa 5). Có thể kích hoạt “Quay Về Bóng” mỗi 2 lượt để trở lại dấu bóng gần nhất.'
+    },
+    technique: null,
+    notes: [
+      'Trúng mục tiêu không có Nguyệt Ấn vẫn ưu tiên đặt 1 tầng trước khi tính thiệt hại của tuyệt kỹ.',
+      'Blink của ult ưu tiên bóng gần nhất, nếu không có sẽ chọn vị trí hiện tại.'
+    ]
+  },
+  {
+    unitId: 'trung_lam',
+    basic: {
+      name: 'Sừng Lâm Trảm',
+      type: 'basic',
+      tags: ['single-target', 'beast'],
+      damage: { multiplier: 1.10 },
+      knockback: 1,
+      description: 'Húc bằng sừng lá gây 110% sát thương và đẩy mục tiêu lùi 1 ô nếu có khoảng trống.'
+    },
+    skills: [
+      {
+        key: 'skill1',
+        name: 'Hống Lâm Triệu Tập',
+        type: 'active',
+        cost: { aether: 25 },
+        summon: {
+          id: 'lam_ho_ve',
+          inherit: { HP: 0.60, ATK: 0.60, ARM: 0.20 },
+          ttl: { turns: 4 },
+          limit: 1,
+          replace: 'refresh'
+        },
+        description: 'Triệu hồi Lâm Hộ Vệ tồn tại 4 lượt với 60% chỉ số của Trùng Lâm và +20% ARM; triệu hồi lại làm mới thời gian.'
+      },
+      {
+        key: 'skill2',
+        name: 'Giáp Gai Nguyên Sinh',
+        type: 'active',
+        cost: { aether: 20 },
+        duration: { turns: 3 },
+        buffs: [{ stats: { ARM: 0.25, RES: 0.15 } }],
+        thorns: { percentDamage: 0.20 },
+        appliesTo: 'self+summons',
+        description: 'Phủ giáp gai lên bản thân và Lâm Hộ Vệ: +25% ARM, +15% RES và phản 20% sát thương cận chiến trong 3 lượt.'
+      },
+      {
+        key: 'skill3',
+        name: 'Sinh Lâm Hồi Sinh',
+        type: 'active',
+        cost: { aether: 30 },
+        heals: [{ target: 'self', percentMaxHP: 0.18 }],
+        revive: { summonId: 'lam_ho_ve' },
+        buffs: [{ stats: { ATK: 0.12 }, duration: { turns: 2 }, appliesTo: 'self+summon' }],
+        description: 'Hấp thụ aether rừng: hồi 18% Max HP, hồi sinh Lâm Hộ Vệ đã ngã gục và tăng 12% ATK cho cả hai trong 2 lượt.'
+      }
+    ],
+    ult: {
+      name: 'Vương Lâm Thú Khiếu',
+      type: 'ultimate',
+      tags: ['aoe', 'support'],
+      debuffs: [{ id: 'weaken', amount: 0.15, turns: 2 }, { id: 'slow', amount: 0.20, turns: 2 }],
+      summonBuffs: [{ id: 'lam_ho_ve', buffs: { damage: 0.25, lifesteal: 0.15 }, duration: { turns: 2 } }],
+      description: 'Gầm vang khiến toàn địch -15% sát thương, -20% SPD trong 2 lượt; Lâm Hộ Vệ được cường hóa +25% sát thương và 15% hút máu.'
+    },
+    talent: {
+      name: 'Lâm Uy Ngự Địa',
+      type: 'talent',
+      description: 'Trùng Lâm và Lâm Hộ Vệ chia sẻ 20% sát thương nhận vào. Đồng minh thuộc hệ tự nhiên nhận thêm 8% ATK khi cùng sân.'
+    },
+    technique: null,
+    notes: [
+      'Lâm Hộ Vệ được xem như summon hạng nặng, ưu tiên đỡ đòn khi cùng hàng với Trùng Lâm.',
+      'Các buff áp lên Trùng Lâm được snapshot cho Lâm Hộ Vệ khi được triệu hồi.'
+    ]
+  },
+  {
+    unitId: 'huyet_tich',
+    basic: {
+      name: 'Huyết Đoạt',
+      type: 'basic',
+      tags: ['single-target', 'drain'],
+      damage: { multiplier: 1.0 },
+      lifesteal: 0.15,
+      description: 'Rút huyết của địch, gây sát thương 100% và hút 15% lượng gây ra để tích hồ huyết.'
+    },
+    skills: [
+      {
+        key: 'skill1',
+        name: 'Huyết Trướng Bảo Hộ',
+        type: 'active',
+        cost: { aether: 25 },
+        duration: { turns: 2 },
+        shields: [{ target: 'self', percentMaxHP: 0.35 }],
+        resource: { gain: { resourceId: 'blood_reserve', percentDamage: 0.30 } },
+        description: 'Tạo màn huyết trong 2 lượt: nhận lá chắn 35% Max HP và chuyển 30% sát thương nhận vào thành Hồ Huyết.'
+      },
+      {
+        key: 'skill2',
+        name: 'Huyết Chú Phản Hồi',
+        type: 'active',
+        cost: { aether: 30 },
+        duration: { turns: 3 },
+        link: { sharePercent: 0.35, healPercentTransfer: 0.30 },
+        description: 'Liên kết với một đồng minh 3 lượt: hấp thu 35% sát thương của họ và hồi lại 30% lượng chuyển tới Huyết Tịch.'
+      },
+      {
+        key: 'skill3',
+        name: 'Huyết Độc Triều',
+        type: 'active',
+        cost: { aether: 35 },
+        tags: ['cone', 'poison'],
+        damage: { multiplier: 1.40 },
+        debuffs: [{ id: 'huyet_doc', stacks: 2, maxStacks: 6 }],
+        description: 'Phóng máu độc hình nón, gây 140% sát thương và đặt 2 tầng Huyết Độc (tối đa 6) lên tất cả mục tiêu trúng.'
+      }
+    ],
+    ult: {
+      name: 'Huyết Tịch Chiến Vũ',
+      type: 'ultimate',
+      tags: ['aoe', 'drain'],
+      damage: { multiplier: 2.20 },
+      detonate: { id: 'huyet_doc', bonusPerStack: 0.12 },
+      heals: [{ target: 'lowestAllies', percentDamage: 0.30, count: 2 }],
+      description: 'Triệu hồi bão máu gây 220% sát thương toàn địch, mỗi tầng Huyết Độc nổ thêm 12% sát thương và chữa 30% tổng sát thương cho 2 đồng minh thấp HP nhất.'
+    },
+    talent: {
+      name: 'Nguyên Huyết Chi Chủ',
+      type: 'talent',
+      resource: { id: 'blood_reserve', max: 100 },
+      conversion: { per10: { healPercentMaxHP: 0.03, damageBonus: 0.04 } },
+      description: 'Tích Hồ Huyết tối đa 100. Tiêu hao mỗi 10 điểm khi tung tuyệt kỹ để tăng 4% sát thương và chữa 3% Max HP cho Huyết Tịch.'
+    },
+    technique: null,
+    notes: [
+      'Lượng sát thương hút được trước khi trừ lá chắn kẻ địch.',
+      'Huyết Độc có thể bị thanh tẩy bình thường.'
+    ]
+  },
+  {
+    unitId: 'khai_nguyen_tu',
+    basic: {
+      name: 'Pháp Trượng Khai Thiên',
+      type: 'basic',
+      tags: ['single-target', 'arcane'],
+      damage: { multiplier: 1.15 },
+      resource: { gain: { aether: 6 } },
+      description: 'Đánh phép 115% sát thương và hoàn lại 6 Aether nhờ chuyển hoá Nguyên Khí.'
+    },
+    skills: [
+      {
+        key: 'skill1',
+        name: 'Nguyên Môn Huyễn Giới',
+        type: 'active',
+        cost: { aether: 20 },
+        teleport: { target: 'ally', range: 'any', cleanseDebuff: 1 },
+        buffs: [{ stats: { RES: 0.15 }, duration: { turns: 2 } }],
+        description: 'Mở cổng di chuyển đồng minh tới vị trí chỉ định, thanh tẩy 1 debuff và +15% RES trong 2 lượt.'
+      },
+      {
+        key: 'skill2',
+        name: 'Triệu Hoán Nguyên Khí',
+        type: 'active',
+        cost: { aether: 25 },
+        summon: {
+          id: 'nguyen_khi_thap',
+          inherit: { WIL: 0.70 },
+          ttl: { turns: 3 },
+          limit: 1
+        },
+        description: 'Triệu hồi Nguyên Khí Tháp tồn tại 3 lượt với 70% WIL hiện tại, tăng sát thương phép của phe ta.'
+      },
+      {
+        key: 'skill3',
+        name: 'Huyễn Thuật Đa Tầng',
+        type: 'active',
+        cost: { aether: 35 },
+        duration: { turns: 3 },
+        stackingBuffs: [{ stats: { WIL: 0.08 }, trigger: 'turnEnd', maxStacks: 3 }],
+        cooldown: 3,
+        description: 'Duy trì vòng phép 3 lượt: mỗi lượt cuối tăng 8% WIL (tối đa 3 tầng). Tái sử dụng làm mới thời gian chứ không vượt mức cộng dồn.'
+      }
+    ],
+    ult: {
+      name: 'Khai Thiên Định Cực',
+      type: 'ultimate',
+      tags: ['control', 'support'],
+      description: 'Đóng băng thời gian 1 lượt địch, hoàn lại 30 Aether cho đội và khiến Nguyên Khí Tháp xuyên 25% RES trong thời gian hiệu lực.'
+    },
+    talent: {
+      name: 'Nguyên Chú Khai Thế',
+      type: 'talent',
+      charges: 2,
+      recharge: 1,
+      description: 'Bắt đầu trận với 2 Ấn Cổng. Mỗi lượt hồi 1 Ấn (tối đa 3) giúp kỹ năng dịch chuyển hoàn lại thêm 5 Aether khi sử dụng.'
+    },
+    technique: null,
+    notes: [
+      'Ult bỏ qua miễn khống thời gian nhưng không chồng với các hiệu ứng skip khác.',
+      'Triệu hồi Nguyên Khí Tháp không chiếm slot nếu đã có cổng mở (tự ưu tiên hàng sau).'
+    ]
+  },
+  {
+    unitId: 'thien_luu',
+    basic: {
+      name: 'Thiên Kiếm Thuần Quang',
+      type: 'basic',
+      tags: ['single-target', 'flying'],
+      damage: { multiplier: 1.05 },
+      description: 'Phóng kiếm khí tinh khiết từ trên cao, gây 105% sát thương. Nếu mục tiêu chịu ảnh hưởng thời tiết, cộng thêm 15% chính xác.'
+    },
+    skills: [
+      {
+        key: 'skill1',
+        name: 'Phong Vũ Dẫn Hướng',
+        type: 'active',
+        cost: { aether: 20 },
+        duration: { turns: 2 },
+        weather: 'storm',
+        buffs: [{ stats: { SPD: 0.12 } }],
+        description: 'Điều chỉnh khí tượng sang trạng thái Bão trong 2 lượt và tăng 12% SPD cho Thiên Lưu.'
+      },
+      {
+        key: 'skill2',
+        name: 'Thiên Quang Liên Xạ',
+        type: 'active',
+        cost: { aether: 25 },
+        hits: 3,
+        targets: 'randomEnemies',
+        damage: { multiplier: 0.75 },
+        bonusDamage: { condition: 'storm', amount: 0.20 },
+        description: 'Bắn ba tia kiếm quang ngẫu nhiên, mỗi tia 75% sát thương; khi trời Bão, mỗi tia cộng thêm 20% sát thương.'
+      },
+      {
+        key: 'skill3',
+        name: 'Tinh Không Phi Hành',
+        type: 'active',
+        cost: { aether: 30 },
+        duration: { turns: 2 },
+        flying: true,
+        buffs: [{ effect: 'dodgeRanged', amount: 0.35 }],
+        shields: [{ target: 'ally', percentMaxHP: 0.18 }],
+        description: 'Bay lên không trung 2 lượt, tăng 35% né đòn tầm xa và cấp lá chắn 18% Max HP cho một đồng minh bất kỳ.'
+      }
+    ],
+    ult: {
+      name: 'Thiên Lưu Tụ Quang',
+      type: 'ultimate',
+      tags: ['aoe', 'weather'],
+      damage: { multiplier: 2.60 },
+      weather: 'aurora',
+      debuffs: [{ id: 'accuracy_down', amount: 0.20, turns: 2 }],
+      buffs: [{ target: 'allies', effect: 'critRate', amount: 0.20, duration: { turns: 2 } }],
+      description: 'Gọi cực quang phủ chiến trường: gây 260% sát thương toàn địch, giảm 20% chính xác của chúng 2 lượt và ban +20% tỉ lệ chí mạng cho đồng minh.'
+    },
+    talent: {
+      name: 'Sứ Mệnh Khí Tượng',
+      type: 'talent',
+      description: 'Thiên Lưu xoay vòng thời tiết giữa Quang Đãng → Bão → Cực Quang; mỗi trạng thái cấp lần lượt +5% ATK, +8% SPD, +20% chí mạng cộng thêm.'
+    },
+    technique: null,
+    notes: [
+      'Ult tự chuyển thời tiết sang Cực Quang dù đang trạng thái khác.',
+      'Theo vòng khí tượng, nếu bị tái thiết lập sẽ bắt đầu từ Quang Đãng.'
+    ]
+  },
+  {
     unitId: 'mong_yem',
     basic: {
       name: 'Đánh Thường',
