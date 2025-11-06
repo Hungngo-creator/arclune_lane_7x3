@@ -217,7 +217,7 @@ function getRuntimeRequire(): ((id: string) => unknown) | null {
   if (typeof window !== 'undefined') {
     const fromWindow = (window as { __require?: unknown }).__require;
     if (typeof fromWindow === 'function') {
-      return fromWindow;
+      return fromWindow as (id: string) => unknown;
     }
   }
   return null;

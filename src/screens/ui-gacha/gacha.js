@@ -129,7 +129,9 @@ const DEFAULT_BANNERS = [
     heroArt: 'assets/banner_standard.svg',
     thumbnail: 'assets/banner_standard.svg',
     featured: [
-      { id: 'mo_da', name: 'Mộ Dạ', rank: 'SSR', portrait: 'assets/u_mo_da.svg' }
+      { id: 'mo_da', name: 'Mộ Dạ', rank: 'SSR', portrait: 'assets/u_mo_da.svg' },
+      { id: 'vu_thien', name: 'Vũ Thiên', rank: 'SSR', portrait: 'assets/u_vu_thien.svg' },
+      { id: 'anna', name: 'Anna', rank: 'SSR', portrait: 'assets/u_anna.svg' }
     ],
     rates: { N: 60, R: 25, SR: 12, SSR: 3, UR: 0, Prime: 0 },
     pity: {
@@ -154,7 +156,8 @@ const DEFAULT_BANNERS = [
       { id: 'mong_yem', name: 'Mộng Yểm', rank: 'UR', portrait: 'assets/u_mong_yem.svg' },
       { id: 'chan_nga', name: 'Chân Ngã', rank: 'UR', portrait: 'assets/u_chan_nga.svg' },
       { id: 'ma_ton_diep_lam', name: 'Ma Tôn - Diệp Lâm', rank: 'UR', portrait: 'assets/u_ma_ton_diep_lam.svg' },
-      { id: 'ngao_binh', name: 'Ngao Bính', rank: 'UR', portrait: 'assets/u_ngao_binh.svg' }
+      { id: 'ngao_binh', name: 'Ngao Bính', rank: 'UR', portrait: 'assets/u_ngao_binh.svg' },
+      { id: 'ai_lan', name: 'Ái Lân', rank: 'UR', portrait: 'assets/u_ai_lan.svg' }
     ],
     rates: { N: 55, R: 23, SR: 12, SSR: 7.5, UR: 2.2, Prime: 0.3 },
     pity: {
@@ -187,6 +190,30 @@ const DEFAULT_BANNERS = [
     cost: {
       single: { currency: 'key', amount: 1, fallback: { currency: 'gem', amount: 300 } },
       multi: { currency: 'key', amount: 10, fallback: { currency: 'gem', amount: 3000 } },
+    },
+  },
+  {
+    id: 'bloodline',
+    type: 'event',
+    name: 'Sự Kiện: Gai Độc & Thú Linh',
+    subtitle: 'Faun & Basil Thorne xuất hiện với tỉ lệ tăng',
+    closesIn: '9d 5h',
+    heroArt: 'assets/banner_bloodline.svg',
+    thumbnail: 'assets/banner_bloodline.svg',
+    featured: [
+      { id: 'faun', name: 'Faun', rank: 'SSR', portrait: 'assets/u_faun.svg' },
+      { id: 'basil_thorne', name: 'Basil Thorne', rank: 'SR', portrait: 'assets/u_basil_thorne.svg' },
+      { id: 'lao_khat_cai', name: 'Lão Khất Cái', rank: 'SR', portrait: 'assets/u_lao_khat_cai.svg' }
+    ],
+    rates: { N: 50, R: 22, SR: 16, SSR: 10, UR: 2, Prime: 0 },
+    pity: {
+      soft: { SSR: 60 },
+      hard: { SSR: 90 },
+      carryOverPerBanner: false,
+    },
+    cost: {
+      single: { currency: 'gem', amount: 200 },
+      multi: { currency: 'gem', amount: 2000 },
     },
   },
 ];
