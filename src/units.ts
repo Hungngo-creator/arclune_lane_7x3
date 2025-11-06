@@ -9,6 +9,12 @@ export interface UnitDefinition {
 }
 
 const UNIT_LIST = [
+  { id: 'mong_yem', name: 'Mộng Yểm', cost: 18 },
+  { id: 'chan_nga', name: 'Chân Ngã', cost: 18 },
+  { id: 'ma_ton_diep_lam', name: 'Ma Tôn - Diệp Lâm', cost: 19 },
+  { id: 'mo_da', name: 'Mộ Dạ', cost: 15 },
+  { id: 'ngao_binh', name: 'Ngao Bính', cost: 18 },
+  { id: 'lau_khac_ma_chu', name: 'Lậu Khắc Ma Chủ', cost: 21 },
   { id: 'phe', name: 'Phệ', cost: 20 },
   { id: 'kiemtruongda', name: 'Kiếm Trường Dạ', cost: 16 },
   { id: 'loithienanh', name: 'Lôi Thiên Ảnh', cost: 18 },

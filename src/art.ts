@@ -516,6 +516,12 @@ const basePalettes: Record<string, UnitArtPalette> = {
   leaderA:   { primary:'#74cfff', secondary:'#123c55', accent:'#dff7ff', outline:'#1a4d68' },
   leaderB:   { primary:'#ff9aa0', secondary:'#4a1921', accent:'#ffd9dd', outline:'#571f28' },
   phe:       { primary:'#a884ff', secondary:'#2b1954', accent:'#f1ddff', outline:'#3a2366' },
+  mong_yem:  { primary:'#cbb4ff', secondary:'#2f1f4a', accent:'#f4ecff', outline:'#221435' },
+  chan_nga:  { primary:'#b8f8ff', secondary:'#1d4854', accent:'#e5fdff', outline:'#14333c' },
+  ma_ton:    { primary:'#f6b3a1', secondary:'#3b1c1f', accent:'#ffe3d6', outline:'#2a1214' },
+  mo_da:     { primary:'#f59ac1', secondary:'#33101e', accent:'#ffd7e9', outline:'#250a14' },
+  ngao_binh: { primary:'#8fe7ff', secondary:'#143345', accent:'#d6f6ff', outline:'#0e2330' },
+  laukhac:   { primary:'#7fc7ff', secondary:'#152a41', accent:'#d4f0ff', outline:'#0d1d2d' },
   kiem:      { primary:'#ffd37a', secondary:'#5b2f12', accent:'#fff3c3', outline:'#4a260f' },
   loithien:  { primary:'#8bd1ff', secondary:'#163044', accent:'#c7f1ff', outline:'#1e3e53' },
   laky:      { primary:'#ffc9ec', secondary:'#7c336a', accent:'#ffeef9', outline:'#5a214b' },
@@ -584,6 +590,78 @@ export const UNIT_ART: Record<string, UnitArtDefinition> = {
         scale: 1.12,
         aspect: 0.8,
         shadow: { color: 'rgba(48,12,44,0.6)', blur: 30, offsetX: 0, offsetY: 14 }
+      }
+    }
+  }),
+  mong_yem: makeArt('bloom', getBasePalette('mong_yem'), {
+    layout: { labelOffset: 1.18, hpOffset: 1.46 },
+    skins: {
+      default: {
+        src: './dist/assets/units/mong_yem/default.svg',
+        anchor: 0.86,
+        scale: 1.04,
+        aspect: 0.82,
+        shadow: { color: 'rgba(24,16,42,0.58)', blur: 26, offsetX: 0, offsetY: 12 }
+      }
+    }
+  }),
+  chan_nga: makeArt('rune', getBasePalette('chan_nga'), {
+    layout: { labelOffset: 1.16, hpOffset: 1.42 },
+    skins: {
+      default: {
+        src: './dist/assets/units/chan_nga/default.svg',
+        anchor: 0.84,
+        scale: 1.02,
+        aspect: 0.8,
+        shadow: { color: 'rgba(14,40,46,0.58)', blur: 24, offsetX: 0, offsetY: 12 }
+      }
+    }
+  }),
+  ma_ton_diep_lam: makeArt('rune', getBasePalette('ma_ton'), {
+    layout: { labelOffset: 1.2, hpOffset: 1.48 },
+    skins: {
+      default: {
+        src: './dist/assets/units/ma_ton_diep_lam/default.svg',
+        anchor: 0.88,
+        scale: 1.05,
+        aspect: 0.82,
+        shadow: { color: 'rgba(40,18,22,0.6)', blur: 26, offsetX: 0, offsetY: 12 }
+      }
+    }
+  }),
+  mo_da: makeArt('pike', getBasePalette('mo_da'), {
+    layout: { labelOffset: 1.14, hpOffset: 1.40 },
+    skins: {
+      default: {
+        src: './dist/assets/units/mo_da/default.svg',
+        anchor: 0.84,
+        scale: 1.00,
+        aspect: 0.78,
+        shadow: { color: 'rgba(42,12,22,0.6)', blur: 24, offsetX: 0, offsetY: 11 }
+      }
+    }
+  }),
+  ngao_binh: makeArt('sentinel', getBasePalette('ngao_binh'), {
+    layout: { labelOffset: 1.2, hpOffset: 1.48 },
+    skins: {
+      default: {
+        src: './dist/assets/units/ngao_binh/default.svg',
+        anchor: 0.9,
+        scale: 1.06,
+        aspect: 0.82,
+        shadow: { color: 'rgba(12,32,44,0.6)', blur: 26, offsetX: 0, offsetY: 12 }
+      }
+    }
+  }),
+  lau_khac_ma_chu: makeArt('rune', getBasePalette('laukhac'), {
+    layout: { labelOffset: 1.22, hpOffset: 1.5 },
+    skins: {
+      default: {
+        src: './dist/assets/units/lau_khac_ma_chu/default.svg',
+        anchor: 0.88,
+        scale: 1.04,
+        aspect: 0.82,
+        shadow: { color: 'rgba(10,28,44,0.6)', blur: 28, offsetX: 0, offsetY: 13 }
       }
     }
   }),

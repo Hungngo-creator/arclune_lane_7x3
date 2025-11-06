@@ -99,6 +99,500 @@ export function applyRankAndMods(
 //  - kit.traits.summon / kit.ult.summon đánh dấu Summoner -> kích hoạt Immediate Summon (action-chain).
 export const ROSTER = [
   {
+    id: 'mong_yem', name: 'Mộng Yểm', class: 'Support', rank: 'UR',
+    mods: { WIL: 0.12, AEregen: 0.08 },
+    kit: {
+      onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+      basic: asUnknownRecord({
+        name: 'Đánh Thường',
+        tags: ['single-target', 'sleep-setup'],
+        debuff: { id: 'me_hoac', stacks: 1, maxStacks: 3, purgeable: false }
+      }),
+      skills: asUnknownRecordArray([
+        {
+          key: 'skill1',
+          name: 'Huyễn Ảnh Che Màn',
+          cost: { aether: 30 },
+          duration: 3,
+          selfBuff: { dodgeBasic: 0.50 },
+          notes: 'Giảm 50% tỉ lệ bị đòn đánh thường trúng trong 3 lượt (tính cả lượt kích hoạt).'
+        },
+        {
+          key: 'skill2',
+          name: 'Thụy Ca Tự Miên',
+          cost: { aether: 35 },
+          duration: 3,
+          delayTurns: 0,
+          selfSleep: true,
+          reduceDamage: 0.50,
+          perTurnBuffStats: { ATK: 0.07, WIL: 0.07 },
+          notes: 'Trong thời gian ngủ không thể hành động; mỗi lượt đang ngủ cộng 7% ATK/WIL. Tự thức khi HP ≤ 30% hoặc người chơi huỷ thủ công.'
+        },
+        {
+          key: 'skill3',
+          name: 'Phá Mộng Tàn Ca',
+          cost: { aether: 25 },
+          damageMultiplier: 1.80,
+          bonusPerMark: { id: 'me_hoac', amount: 0.20, max: 0.60 },
+          pierceIfSleeping: { ARM: 0.30, RES: 0.30 },
+          spreadMark: { id: 'me_hoac', stacks: 1, targets: 2 },
+          notes: 'Không tính là đòn đánh thường; ưu tiên mục tiêu đang có Mê Hoặc. Nếu mục tiêu ngủ, bỏ qua 30% ARM/RES và lan 1 tầng Mê Hoặc sang tối đa 2 kẻ địch khác.'
+        }
+      ]),
+      ult: asUnknownRecord({
+        type: 'worldshift',
+        duration: 3,
+        randomBuffs: { allies: 1, enemies: 1 },
+        notes: 'Tạo “Thế Giới Thứ Hai” trong 3 lượt: mỗi đồng minh hiện hữu và khi vào sân nhận 1 buff ngẫu nhiên; mỗi kẻ địch nhận 1 debuff ngẫu nhiên.'
+      }),
+      talent: asUnknownRecord({
+        name: 'Mê Ca Dẫn Thụy',
+        mark: {
+          id: 'me_hoac',
+          kind: 'mark',
+          maxStacks: 3,
+          purgeable: false,
+          onCap: { sleep: { turns: 1 } },
+          decayIfNoRefreshTurns: null
+        }
+      }),
+      technique: null,
+      passives: asUnknownRecordArray([
+        {
+          id: 'me_hoac_apply',
+          name: 'Mê Ca Dẫn Thụy',
+          when: 'onAbilityHit',
+          effect: 'placeMark',
+          params: {
+            id: 'me_hoac',
+            stacks: 1,
+            maxStacks: 3,
+            purgeable: false,
+            sleepTurnsOnCap: 1
+          }
+        }
+      ]),
+      traits: asUnknownRecordArray([
+        { id: 'sleep_reset', text: 'Khi đạt 3 tầng Mê Hoặc, mục tiêu ngủ 1 lượt rồi đặt lại về 0 tầng.' },
+        { id: 'self_sleep_control', text: 'Thụy Ca Tự Miên có thể được hủy sớm bằng thao tác thủ công; tự thức khi HP ≤ 30%.' }
+      ])
+    }
+  },
+  {
+    id: 'chan_nga', name: 'Chân Ngã', class: 'Summoner', rank: 'UR',
+    mods: { HP: 0.10, WIL: 0.10 },
+    kit: {
+      onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, bonusMaxHPPercent: 0.10 }),
+      basic: asUnknownRecord({
+        name: 'Đánh Thường',
+        tags: ['single-target']
+      }),
+      skills: asUnknownRecordArray([
+        {
+          key: 'skill1',
+          name: 'Liên Ảnh Hồi Tức',
+          cost: { aether: 30 },
+          healSelfPercentMaxHP: 0.06,
+          healClonePercentMaxHP: 0.04,
+          notes: 'Chia 10% hồi máu dựa trên Max HP: 6% cho bản thể, 4% cho clone nếu tồn tại.'
+        },
+        {
+          key: 'skill2',
+          name: 'Cộng Lực Ảnh Thân',
+          cost: { aether: 25 },
+          duration: 3,
+          buffStats: { ATK: 0.10, WIL: 0.10 },
+          appliesToClone: true,
+          notes: 'Buff đồng thời bản thể và clone; tái kích hoạt làm mới thời gian.'
+        },
+        {
+          key: 'skill3',
+          name: 'Quy Nhất Bản Ảnh',
+          cost: { aether: 40 },
+          cooldown: 3,
+          requiresCloneAdjacent: true,
+          shieldPercentMaxHP: 0.50,
+          duration: 3,
+          burstBuff: { stats: { ATK: 0.15, WIL: 0.15 }, turns: 2 },
+          notes: 'Tiêu biến clone đứng kề, hợp nhất để nhận khiên = 50% Max HP trong 3 lượt và +15% ATK/WIL trong 2 lượt.'
+        }
+      ]),
+      ult: asUnknownRecord({
+        type: 'clone-summon',
+        conditions: { requiresNoClone: true, minHpPercent: 0.60 },
+        summon: {
+          id: 'chan_nga_clone',
+          inheritPercent: 0.85,
+          forbiddenSkills: ['skill3'],
+          ttl: 6,
+          locksUlt: true,
+          rageLocked: true
+        },
+        hpTradePercentCurrent: 0.50,
+        notes: 'Giảm 50% HP hiện tại của bản thể để triệu hồi clone 85% chỉ số. Clone tồn tại tối đa 6 lượt, không thể dùng Quy Nhất Bản Ảnh, không tích nộ.'
+      }),
+      talent: asUnknownRecord({
+        name: 'Dự Phòng Chân Thể',
+        cloneSnapshotPercent: 0.85,
+        cloneTtlTurns: 6,
+        postDeathTransfer: { status: 'doat_xa', debuff: { id: 'linh_met', turns: 3, aetherRegen: -0.50 }, lockUlt: true }
+      }),
+      technique: null,
+      passives: asUnknownRecordArray([
+        {
+          id: 'clone_on_ult',
+          name: 'Thứ Hai Chân Thân',
+          when: 'onUltCast',
+          effect: 'summonClone',
+          params: {
+            inheritPercent: 0.85,
+            ttl: 6,
+            forbiddenSkills: ['skill3'],
+            rageLocked: true
+          }
+        }
+      ]),
+      traits: asUnknownRecordArray([
+        { id: 'clone_limit', text: 'Chỉ duy trì 1 clone cùng lúc; ult thất bại nếu không còn ô trống.' },
+        { id: 'doat_xa', text: 'Nếu bản thể tử vong khi có clone, đoạt xá vào clone và chịu Linh Mệt 3 lượt (khóa Ultimate, -50% hồi Aether).' }
+      ])
+    }
+  },
+  {
+    id: 'ma_ton_diep_lam', name: 'Ma Tôn - Diệp Lâm', class: 'Mage', rank: 'UR',
+    mods: { WIL: 0.12, AEmax: 0.08 },
+    kit: {
+      onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, bonusSPDPercent: 0.10 }),
+      basic: asUnknownRecord({
+        name: 'Đánh Thường',
+        tags: ['single-target', 'mark-builder'],
+        debuff: { id: 'ma_chung', stacks: 1, purgeable: false }
+      }),
+      skills: asUnknownRecordArray([
+        {
+          key: 'skill1',
+          name: 'Thôn Chủng Dưỡng Thể',
+          cost: { aether: 30 },
+          consumeMarks: { id: 'ma_chung', scope: 'all' },
+          bonusPerMark: { stat: 'HP', amount: 0.05 },
+          notes: 'Thu hồi toàn bộ Ma Chủng trên chiến trường, mỗi tầng chuyển thành +5% Max HP tạm thời.'
+        },
+        {
+          key: 'skill2',
+          name: 'Ma Chủ Hiển Thân',
+          cost: { aether: 25 },
+          requiresTotalMarks: { id: 'ma_chung', amount: 12 },
+          stance: 'ma_chu',
+          notes: 'Khi tổng Ma Chủng ≥ 12, thu hồi Ma Chủng trên một mục tiêu để hoá Ma Chủ: mất quyền dùng Ultimate và mọi Ma Chủng cấy tiếp gây thêm +2% sát thương cuối dạng Thuật.'
+        },
+        {
+          key: 'skill3',
+          name: 'Nhiếp Chủng Song Chưởng',
+          cost: { aether: 25 },
+          countsAsBasic: true,
+          hits: 2,
+          damageMultiplier: 1.00,
+          priorityTarget: 'ma_chung',
+          splash: { ratio: 0.70, maxTargets: 2 },
+          notes: 'Đánh hai lần vào mục tiêu có Ma Chủng gần nhất, mỗi lần lan 70% sát thương sang tối đa 2 kẻ địch lân cận.'
+        }
+      ]),
+      ult: asUnknownRecord({
+        type: 'mark-detonation',
+        aoe: 'allEnemies',
+        markId: 'ma_chung',
+        damagePerMark: { percentTargetMaxHP: 0.05, scaleWIL: 0.00 },
+        debuffPerThreshold: { stacks: 2, effects: [{ id: 'fear', turns: 1 }, { id: 'bleed', turns: 1 }] },
+        notes: 'Kích hoạt toàn bộ Ma Chủng trên kẻ địch, mỗi tầng gây 5% Max HP của mục tiêu dưới dạng sát thương WIL. Mỗi 2 tầng áp Sợ Hãi và Chảy Máu 1 lượt; Ma Chủng bị tiêu hao.'
+      }),
+      talent: asUnknownRecord({
+        name: 'Chú Ấn Ma Chủng',
+        mark: {
+          id: 'ma_chung',
+          kind: 'mark',
+          maxStacks: null,
+          purgeable: false,
+          decayIfNoRefreshTurns: 3
+        }
+      }),
+      technique: null,
+      passives: asUnknownRecordArray([
+        {
+          id: 'ma_chung_apply',
+          name: 'Chú Ấn Ma Chủng',
+          when: 'onBasicHit',
+          effect: 'placeMark',
+          params: { id: 'ma_chung', stacks: 1, purgeable: false, decayIfNoRefreshTurns: 3 }
+        },
+        {
+          id: 'ma_chu_bonus',
+          name: 'Ma Chủ Hiển Thân',
+          when: 'onMarkApplied',
+          effect: 'gainDamageBonus',
+          params: { markId: 'ma_chung', amount: 0.02, type: 'arcane', stance: 'ma_chu' }
+        }
+      ]),
+      traits: asUnknownRecordArray([
+        { id: 'ma_chung_decay', text: 'Ma Chủng mất sau 3 lượt không được cấy thêm; không có trần cộng dồn.' },
+        { id: 'ma_chu_lock', text: 'Ở trạng thái Ma Chủ, Diệp Lâm không thể dùng Tuyệt kỹ.' }
+      ])
+    }
+  },
+  {
+    id: 'mo_da', name: 'Mộ Dạ', class: 'Warrior', rank: 'SSR',
+    mods: { ATK: 0.10, WIL: 0.10 },
+    kit: {
+      onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+      basic: asUnknownRecord({
+        name: 'Đánh Thường',
+        tags: ['single-target']
+      }),
+      skills: asUnknownRecordArray([
+        {
+          key: 'skill1',
+          name: 'U Trào Tụ Lực',
+          cost: { aether: 20 },
+          duration: 3,
+          buffStats: { ATK: 0.10, WIL: 0.10 },
+          maxStacks: 3
+        },
+        {
+          key: 'skill2',
+          name: 'Huyết Tế Cuồng Khí',
+          cost: { aether: 15 },
+          hpTradePercentCurrent: 0.35,
+          duration: 3,
+          buffStats: { ATK: 0.25, WIL: 0.25 },
+          maxStacks: 2,
+          notes: 'Hiến 35% HP hiện có (không giảm trần), cộng dồn tối đa 2 lần nếu tái kích hoạt khi hiệu ứng còn.'
+        },
+        {
+          key: 'skill3',
+          name: 'Mộ Vực Trảm',
+          cost: { aether: 15 },
+          countsAsBasic: true,
+          damageMultiplier: 1.50
+        }
+      ]),
+      ult: asUnknownRecord({
+        type: 'executioner',
+        countsAsBasic: true,
+        untargetable: { singleTargetOnly: true, turns: 2 },
+        pierce: { ARM: 0.30, RES: 0.30 },
+        damageMultiplier: 2.00,
+        target: 'single',
+        buffs: [{ id: 'bat_khuat', turns: 1 }, { id: 'tan_sat', turns: 2 }],
+        notes: 'Gây 200% sát thương hỗn hợp lên một mục tiêu, bỏ qua 30% ARM/RES và nhận hiệu ứng Bất Khuất + Tàn Sát; miễn bị chỉ định bởi đòn đơn trong 2 lượt.'
+      }),
+      talent: asUnknownRecord({
+        name: 'Dạ Mộ Nhị Cực',
+        conditional: {
+          ifHPAbove: 0.70,
+          stats: { WIL: 0.10 },
+          elseStats: { ARM: 0.05, RES: 0.05 }
+        }
+      }),
+      technique: null,
+      passives: asUnknownRecordArray([
+        {
+          id: 'night_duality',
+          name: 'Dạ Mộ Nhị Cực',
+          when: 'onTurnStart',
+          effect: 'conditionalBuff',
+          params: { ifHPgt: 0.70, WIL: 0.10, elseARM: 0.05, elseRES: 0.05, purgeable: false }
+        }
+      ]),
+      traits: asUnknownRecordArray([
+        { id: 'blood_trade', text: 'Huyết Tế Cuồng Khí không thể tự sát và chỉ tiêu hao HP hiện có.' },
+        { id: 'sleep_proof', text: 'Trong Tàn Sát, Mộ Dạ vẫn có thể thực thi đòn đánh thường dù đang không thể bị chọn bởi đòn đơn.' }
+      ])
+    }
+  },
+  {
+    id: 'ngao_binh', name: 'Ngao Bính', class: 'Warrior', rank: 'UR',
+    mods: { HP: 0.10, ATK: 0.10 },
+    kit: {
+      onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, form: 'au_long' }),
+      basic: asUnknownRecord({
+        name: 'Đánh Thường',
+        tags: ['single-target', 'form-scaling'],
+        hits: 1,
+        piercePercent: 0.02,
+        damageModifiersByForm: {
+          au_long: { bonus: 0 },
+          thanh_nien: { bonus: 0.20 },
+          truong_thanh: { bonus: 0.30 },
+          long_than: { bonus: 0.40, splash: 0.40 }
+        }
+      }),
+      skills: asUnknownRecordArray([
+        {
+          key: 'skill1',
+          name: 'Long Trảo Song Trảm',
+          cost: { aether: 25 },
+          countsAsBasic: true,
+          hits: 2,
+          damageMultiplier: 1.00
+        },
+        {
+          key: 'skill2',
+          name: 'Long Huyết Phẫn Viêm',
+          cost: { aether: 25 },
+          hpTradePercentMaxHP: 0.25,
+          duration: 3,
+          selfDebuff: { RES: -0.10, ARM: -0.10 },
+          basicDamageBonus: 0.50,
+          notes: 'Thiêu đốt 25% Max HP bản thân; giảm 10% ARM/RES và tăng 50% sát thương đòn đánh thường trong 3 lượt.'
+        },
+        {
+          key: 'skill3',
+          name: 'Long Ảnh Truy Kích',
+          cost: { aether: 25 },
+          countsAsBasic: false,
+          damageMultiplier: 1.40,
+          splash: { ratioByForm: { au_long: 0.30, thanh_nien: 0.40, truong_thanh: 0.50, long_than: 0.60 }, maxTargets: 2 }
+        }
+      ]),
+      ult: asUnknownRecord({
+        type: 'evolution',
+        sequence: [
+          {
+            form: 'thanh_nien',
+            cocoonTurns: 1,
+            reduceDamage: 0.40,
+            postBuffs: { piercePercent: 0.05, reduceDamageTaken: 0.11, agi: 0.10, hpRegenPercentMaxHP: 0.01 }
+          },
+          {
+            form: 'truong_thanh',
+            cocoonTurns: 1,
+            reduceDamage: 0.50,
+            postBuffs: { piercePercent: 0.09, reduceDamageTaken: 0.15, agi: 0.15, hpRegenPercentMaxHP: 0.017 }
+          },
+          {
+            form: 'long_than',
+            cocoonTurns: 1,
+            reduceDamage: 0.60,
+            postBuffs: { piercePercent: 0.14, reduceDamageTaken: 0.22, agi: 0.20, hpRegenPercentMaxHP: 0.03, basicTransforms: 'long_tuc' }
+          }
+        ],
+        rageBonusPerBreak: 15,
+        notes: 'Mỗi lần dùng Tuyệt kỹ, Ngao Bính hóa trứng 1 lượt (không thể tấn công, giảm sát thương nhận theo cấp) rồi phá xác nâng trạng thái. Sau khi phá xác nhận thêm nộ để duy trì nhịp tiến hóa.'
+      }),
+      talent: asUnknownRecord({
+        name: 'Long Cốt Bất Diệt',
+        forms: {
+          au_long: { piercePercent: 0.02, damageTakenReduce: 0.08, agi: 0.05, hpRegenPercentMaxHP: 0.005 },
+          thanh_nien: { piercePercent: 0.05, damageTakenReduce: 0.11, agi: 0.10, hpRegenPercentMaxHP: 0.01 },
+          truong_thanh: { piercePercent: 0.09, damageTakenReduce: 0.15, agi: 0.15, hpRegenPercentMaxHP: 0.017 },
+          long_than: { piercePercent: 0.14, damageTakenReduce: 0.22, agi: 0.20, hpRegenPercentMaxHP: 0.03 }
+        }
+      }),
+      technique: null,
+      passives: asUnknownRecordArray([
+        {
+          id: 'dragon_form_scaling',
+          name: 'Long Cốt Bất Diệt',
+          when: 'onTurnEnd',
+          effect: 'applyFormRegen',
+          params: {
+            forms: {
+              au_long: 0.005,
+              thanh_nien: 0.01,
+              truong_thanh: 0.017,
+              long_than: 0.03
+            }
+          }
+        }
+      ]),
+      traits: asUnknownRecordArray([
+        { id: 'form_progression', text: 'Khởi đầu ở Ấu Long; mỗi lần Tam Chuyển Long Thai nâng trạng thái theo thứ tự và không thể đảo ngược.' },
+        { id: 'egg_turn', text: 'Trong lượt Hoá Trứng, Ngao Bính không thể tấn công nhưng giảm sát thương nhận tùy cấp.' }
+      ])
+    }
+  },
+  {
+    id: 'lau_khac_ma_chu', name: 'Lậu Khắc Ma Chủ', class: 'Mage', rank: 'Prime',
+    mods: { WIL: 0.12, AEregen: 0.08 },
+    kit: {
+      onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+      basic: asUnknownRecord({
+        name: 'Đánh Thường',
+        tags: ['single-target', 'mark-builder'],
+        debuff: { id: 'sa_an', stacks: 1, maxStacks: 5, purgeable: false }
+      }),
+      skills: asUnknownRecordArray([
+        {
+          key: 'skill1',
+          name: 'Hắc Sa Song Chưởng',
+          cost: { aether: 25 },
+          hits: 2,
+          countsAsBasic: true,
+          damageMultiplier: 1.00,
+          targets: 'randomEnemies',
+          notes: 'Tung hai chưởng vào hai mục tiêu ngẫu nhiên, mỗi hit 100% sát thương đòn đánh thường và đặt Sa Ấn.'
+        },
+        {
+          key: 'skill2',
+          name: 'Trùng Ấn Lậu Khắc',
+          cost: { aether: 25 },
+          duration: 3,
+          delayTurns: 1,
+          markBonus: { id: 'sa_an', extraStacks: 1 },
+          notes: 'Bắt đầu từ lượt kế tiếp trong 3 lượt, mỗi đòn đánh thường/kỹ năng áp 2 tầng Sa Ấn thay vì 1.'
+        },
+        {
+          key: 'skill3',
+          name: 'Tam Luân Tán Chưởng',
+          cost: { aether: 35 },
+          hits: 3,
+          countsAsBasic: false,
+          damageMultiplier: 1.00,
+          targets: 'randomEnemies',
+          notes: 'Gây 3 hit liên tiếp vào 3 kẻ địch ngẫu nhiên, mỗi hit 100% sát thương đòn đánh thường và đặt Sa Ấn.'
+        }
+      ]),
+      ult: asUnknownRecord({
+        type: 'time-rift',
+        randomOutcome: 0.5,
+        outcomes: {
+          nghich: {
+            rewindAllies: 1,
+            notes: 'Nghịch Lưu: đồng minh trở về trạng thái của 1 lượt trước (vị trí, HP, buff/debuff; đơn vị mới triệu hồi trong lượt hiện tại quay về deck và hoàn cost).'
+          },
+          thuan: {
+            grantExtraBasic: true,
+            notes: 'Thuận Lưu: sau khi thi triển, mọi đồng minh lập tức thực thi 1 lượt đánh thường.'
+          }
+        },
+        notes: 'Thiên Mệnh Lậu Khắc Ma Kinh: thời sa chọn ngẫu nhiên Nghịch Lưu hoặc Thuận Lưu (50%).'
+      }),
+      talent: asUnknownRecord({
+        name: 'Lậu Ấn Trói Thời',
+        mark: {
+          id: 'sa_an',
+          kind: 'mark',
+          maxStacks: 5,
+          purgeable: false,
+          onCap: { skipTurn: 1 }
+        }
+      }),
+      technique: null,
+      passives: asUnknownRecordArray([
+        {
+          id: 'sa_an_apply',
+          name: 'Lậu Ấn Trói Thời',
+          when: 'onAbilityHit',
+          effect: 'placeMark',
+          params: { id: 'sa_an', stacks: 1, maxStacks: 5, purgeable: false, skipTurnOnCap: true }
+        }
+      ]),
+      traits: asUnknownRecordArray([
+        { id: 'sa_an_reset', text: 'Sa Ấn tồn tại tới hết trận trừ khi bị thanh tẩy hoặc đạt 5 tầng gây bỏ lượt và đặt lại về 0.' },
+        { id: 'time_rift', text: 'Thiên Mệnh Lậu Khắc Ma Kinh chọn ngẫu nhiên Nghịch Lưu hoặc Thuận Lưu với xác suất 50%.' }
+      ])
+    }
+  },
+  {
     id: 'phe', name: 'Phệ', class: 'Mage', rank: 'Prime',
     mods: { WIL: 0.10, AEregen: 0.10 }, // 20% tổng
     kit: {
