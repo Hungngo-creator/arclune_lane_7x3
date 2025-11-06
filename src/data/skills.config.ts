@@ -846,6 +846,342 @@ const skillsConfig = [
       'Kiên Cố Trường Kỳ giúp tích lũy phòng thủ cao hơn khi Lính Gác ở ngưỡng máu nguy hiểm.',
       'Còi Tăng Tốc ưu tiên đồng minh ngẫu nhiên; hiệu ứng có thể trùng lặp với các nguồn tăng tốc khác.'
     ]
+  },
+  {
+    unitId: 'vu_thien',
+    basic: {
+      name: 'Đánh Thường',
+      type: 'basic',
+      tags: ['single-target'],
+      description: 'Vung đinh ba gây sát thương 100% ATK + 100% WIL lên một mục tiêu. Nếu Vũ Thiên đang ở trạng thái Ánh Sáng (kích hoạt bởi kỹ năng hoặc nội tại), hồi lại 10% sát thương gây ra.'
+    },
+    skills: [
+      {
+        key: 'skill1',
+        name: 'Lam Triều Bộc Lực',
+        type: 'active',
+        cost: { aether: 35 },
+        duration: { turns: 1 },
+        buffs: [{ stats: { ATK: 0.40, WIL: 0.40 } }],
+        description: 'Tăng 40% ATK/WIL trong 1 lượt. Kỹ năng lý tưởng để mở chuỗi burst hoặc phản công khi có trạng thái phản kích.'
+      },
+      {
+        key: 'skill2',
+        name: 'Hải Mâu Phá Lãng',
+        type: 'active',
+        cost: { aether: 25 },
+        tags: ['burst'],
+        damage: { multiplier: 1.5 },
+        description: 'Phóng đinh ba gây 150% sát thương đòn đánh thường lên một kẻ địch rồi thu hồi vũ khí. Được tính là kỹ năng chủ động, không kích hoạt nội tại phản kích.'
+      },
+      {
+        key: 'skill3',
+        name: 'Triều Ảnh Hồi Kích',
+        type: 'active',
+        cost: { aether: 30 },
+        duration: { turns: 1 },
+        buffs: [{ effect: 'dodgeBasic', amount: 0.25 }],
+        counters: [{ chance: 0.25, type: 'basic' }],
+        description: 'Kích hoạt trạng thái phản công 1 lượt: mỗi khi bị tấn công có 25% né và phản đòn đánh thường. Nếu Vũ Thiên bị hạ gục, hiệu ứng kết thúc và phải tái kích hoạt.'
+      }
+    ],
+    ult: {
+      name: 'Hải Uy Trảm Ngôn',
+      type: 'ultimate',
+      tags: ['burst', 'silence'],
+      damage: { multiplier: 3.0 },
+      debuffs: [{ id: 'tram_mac', turns: 1 }],
+      buffs: [{ effect: 'adaptive', duration: { turns: 1 } }],
+      description: 'Chém một kẻ địch gây 300% sát thương, áp Trầm Mặc 1 lượt và nhận buff Thích Ứng (giảm sát thương, kháng hất tung theo chuẩn hệ thống) trong 1 lượt.'
+    },
+    talent: {
+      name: 'Hải Triều Khai Trận',
+      type: 'talent',
+      onSpawn: { stats: { ATK: 0.05, WIL: 0.05 } },
+      description: 'Khi vào trận lập tức tăng 5% ATK/WIL (không cộng dồn). Buff này mất khi rời trận.'
+    },
+    technique: null,
+    notes: [
+      'Triều Ảnh Hồi Kích chỉ phản công khi né thành công hoặc khi bị đánh thường trúng nhưng hệ thống cho phép phản kích (tùy vào thiết lập combat).',
+      'VFX đề xuất: dòng nước bao lấy thân thể khi bật phản kích.'
+    ]
+  },
+  {
+    unitId: 'anna',
+    basic: {
+      name: 'Đánh Thường',
+      type: 'basic',
+      tags: ['single-target', 'heal'],
+      description: 'Tấn công một mục tiêu gây 100% ATK + 100% WIL, đồng thời hồi 3% Max HP của Anna cho một đồng minh ngẫu nhiên.'
+    },
+    skills: [
+      {
+        key: 'skill1',
+        name: 'Aegis Tụ Linh',
+        type: 'active',
+        cost: { aether: 20 },
+        duration: { turns: 2 },
+        buffs: [{ stats: { ARM: 0.20, RES: 0.20 } }],
+        description: 'Gây dựng áo giáp linh lực, tăng 20% ARM/RES cho bản thân trong 2 lượt.'
+      },
+      {
+        key: 'skill2',
+        name: 'Huyết Tế Vương Tọa',
+        type: 'active',
+        cost: { aether: 25 },
+        requirements: { casterHpPercentMin: 0.70 },
+        sacrifices: [{ percentMaxHP: 0.50, target: 'self', transferTo: 'leader' }],
+        description: 'Hiến 50% Max HP hiện tại (không giảm Max HP) cho Leader đồng minh. Chỉ thi triển khi HP ≥ 70% Max HP, không chịu ảnh hưởng bởi buff hồi máu của Anna nhưng chịu modifier của người nhận.'
+      },
+      {
+        key: 'skill3',
+        name: 'Hỗn Linh Trường Ca',
+        type: 'active',
+        cost: { aether: 20 },
+        tags: ['multi-target'],
+        damage: { multiplier: 1.4, targets: 2 },
+        description: 'Ngân trường ca hỗn linh, gây sát thương 140% đánh thường lên 2 kẻ địch ngẫu nhiên.'
+      }
+    ],
+    ult: {
+      name: 'Thánh Lễ Tái Sinh',
+      type: 'ultimate',
+      tags: ['team-heal'],
+      heals: { percentMaxHP: 0.50, scale: { ATK: 0.20, WIL: 0.20 }, targets: 'allAllies' },
+      description: 'Thực hiện nghi thức tái sinh, hồi 50% Max HP cộng thêm 20% ATK/WIL của Anna cho toàn bộ đồng minh.'
+    },
+    talent: {
+      name: 'Ấn Chú Thăng Hoa',
+      type: 'talent',
+      stacks: 5,
+      description: 'Mỗi lần thi triển Ultimate cộng dồn +5% ATK/WIL/Max HP (tối đa 5 tầng). Tầng không tự mất trong trận.'
+    },
+    technique: null,
+    notes: [
+      'Huyết Tế Vương Tọa không kích hoạt hiệu ứng “giảm sát thương tự gây” vì được tính như chuyển HP.',
+      'Nội tại Ấn Chú Thăng Hoa nên hiển thị số tầng ngay trên khung buff của Anna để tiện theo dõi.'
+    ]
+  },
+  {
+    unitId: 'lao_khat_cai',
+    basic: {
+      name: 'Đánh Thường',
+      type: 'basic',
+      tags: ['single-target'],
+      description: 'Đánh gậy vào kẻ địch gây 100% ATK + 100% WIL.'
+    },
+    skills: [
+      {
+        key: 'skill1',
+        name: 'Khất Côn Xuyên Tạng',
+        type: 'active',
+        cost: { aether: 20 },
+        tags: ['pierce'],
+        damage: { multiplier: 1.0 },
+        pierce: { arm: 0.15, res: 0.15 },
+        description: 'Đâm gậy xuyên giáp, gây sát thương tương đương đòn đánh thường và bỏ qua 15% ARM/RES mục tiêu.'
+      },
+      {
+        key: 'skill2',
+        name: 'Tam Thập Lục Kế: Tẩu Vi Thượng',
+        type: 'active',
+        cost: { aether: 25 },
+        duration: { turns: null },
+        unique: true,
+        utility: { evadeTargetedAoEChance: 0.25 },
+        description: 'Kích hoạt kế sách chạy là thượng sách: trong phần còn lại của trận, lần đầu chịu kỹ năng AOE chọn mục tiêu sẽ có 25% chạy sang ô đồng minh trống gần nhất (nếu có).'
+      },
+      {
+        key: 'skill3',
+        name: 'Loạn Côn Tam Liên',
+        type: 'active',
+        cost: { aether: 35 },
+        tags: ['multi-target'],
+        damage: { multiplier: 1.0, hits: 3 },
+        pierce: { arm: 0.20, res: 0.20 },
+        description: 'Vung gậy hỗn loạn vào 3 kẻ địch ngẫu nhiên, mỗi hit là một đòn đánh thường bỏ qua 20% ARM/RES.'
+      }
+    ],
+    ult: {
+      name: 'Nhất Côn Đoạt Mệnh',
+      type: 'ultimate',
+      tags: ['finisher'],
+      damage: { multiplier: 2.5 },
+      pierce: { arm: 0.10, res: 0.10 },
+      description: 'Dồn lực đánh chí mạng 250% sát thương, xuyên 10% phòng thủ của mục tiêu.'
+    },
+    talent: {
+      name: 'Tạp Dân Tụ Lực',
+      type: 'talent',
+      description: 'Miễn nhiễm Khiêu Khích và nhận +2% ATK/WIL/AGI cho mỗi đồng minh (trừ Leader) đang hiện diện.'
+    },
+    technique: null,
+    notes: [
+      'Tẩu Vi Thượng chỉ xét kỹ năng AOE định vị (line, cone, hình chữ thập...). Với AOE ngẫu nhiên hoặc chiêu mục tiêu đơn không kích hoạt.',
+      'Hiển thị buff bị động để người chơi biết đã tiêu hao cơ hội trốn hay chưa.'
+    ]
+  },
+  {
+    unitId: 'ai_lan',
+    basic: {
+      name: 'Đánh Thường',
+      type: 'basic',
+      tags: ['single-target'],
+      description: 'Đánh bằng pháp trượng gây 100% ATK + 100% WIL. Ở Ánh Sáng: giảm 5% AGI mục tiêu và hồi 10% sát thương gây ra. Ở Bóng Tối: bỏ qua 10% ARM/RES. Đòn đánh có 2% làm Choáng.'
+    },
+    skills: [
+      {
+        key: 'skill1',
+        name: 'Song Cực Hiến Phúc',
+        type: 'active',
+        cost: { aether: 25 },
+        tags: ['support'],
+        usableIn: ['light', 'dark'],
+        description: 'Chuyển 20% Max HP cho Leader và 10% Max HP cho một đồng minh ngẫu nhiên (Ái Lân không mất Max HP). Cả hai mục tiêu nhận thêm khiên =10% Max HP của Ái Lân trong 2 lượt.'
+      },
+      {
+        key: 'skill2',
+        name: 'D’moreth • Hắc Tế Tam Ấn',
+        type: 'active',
+        cost: { aether: 25 },
+        tags: ['aoe'],
+        usableIn: ['dark'],
+        damage: { multiplier: 0.7, targets: 3 },
+        description: 'Chỉ dùng ở trạng thái Bóng Tối: gây 70% sát thương đánh thường lên 3 kẻ địch ngẫu nhiên, không tính là đòn đánh thường (không kích hoạt on-hit).' 
+      },
+      {
+        key: 'skill3',
+        name: 'Thánh Minh Trùng Tụ',
+        type: 'active',
+        cost: { aether: 20 },
+        usableIn: ['light'],
+        tags: ['heal'],
+        heals: { self: { scale: { ATK: 0.60, WIL: 0.60 } }, randomAlly: { scale: { ATK: 0.60, WIL: 0.60 } } },
+        description: 'Chỉ dùng ở trạng thái Ánh Sáng: hồi 60% tổng ATK+WIL cho bản thân và 1 đồng minh ngẫu nhiên.'
+      }
+    ],
+    ult: {
+      name: 'Khải Minh / Đọa Ảnh',
+      type: 'ultimate',
+      tags: ['stance'],
+      description: 'Nếu thi triển trong Ánh Sáng: “Khải Minh Thánh Lễ” hồi 30% Max HP + 5% ATK/WIL cho 3 đồng minh ngẫu nhiên. Nếu thi triển trong Bóng Tối: “Đọa Ảnh Tứ Hình” gây 75% sát thương đánh thường lên 4 kẻ địch ngẫu nhiên (không tính là đòn đánh thường).'
+    },
+    talent: {
+      name: 'Thánh Ám Luân Chuyển',
+      type: 'talent',
+      description: 'Bắt đầu trận ở Ánh Sáng, mỗi lượt tự luân phiên Ánh Sáng ↔ Bóng Tối. Ánh Sáng thêm hồi phục và giảm AGI, Bóng Tối tăng xuyên giáp.'
+    },
+    technique: null,
+    notes: [
+      'UI cần hiển thị biểu tượng trạng thái hiện tại để người chơi biết kỹ năng nào khả dụng.',
+      'Các kỹ năng kiểm tra stance; nếu điều kiện không đạt cần xám nút và hiện tooltip.'
+    ]
+  },
+  {
+    unitId: 'faun',
+    basic: {
+      name: 'Đánh Thường',
+      type: 'basic',
+      tags: ['single-target'],
+      description: 'Tấn công gây 100% ATK + 100% WIL. Thú triệu hồi kế thừa hệ số này khi tấn công.'
+    },
+    skills: [
+      {
+        key: 'skill1',
+        name: 'Dã Linh Hiệp Kích',
+        type: 'active',
+        cost: { aether: 25 },
+        tags: ['chain'],
+        description: 'Faun và mọi thú triệu hồi đang tồn tại lần lượt tung một đòn đánh thường ngay lập tức, không tiêu lượt hiện tại.'
+      },
+      {
+        key: 'skill2',
+        name: 'Ấn Khế Cường Thừa',
+        type: 'active',
+        cost: { aether: 25 },
+        tags: ['buff'],
+        description: 'Đánh dấu 5 lần triệu hồi tiếp theo từ Ultimate để mỗi thú nhận 80% chỉ số của Faun (thay vì 50%).'
+      },
+      {
+        key: 'skill3',
+        name: 'Thú Tế Hộ Mệnh',
+        type: 'active',
+        cost: { aether: 25 },
+        tags: ['heal', 'defense'],
+        heals: { selfPercentMaxHP: 0.07 },
+        description: 'Hồi 7% Max HP và nhận 1 lớp Bất Khuất. Khi lớp Bất Khuất kích hoạt, hy sinh thú có HP thấp nhất (ưu tiên thú được đánh dấu bởi kỹ năng này) và chặn sát thương.'
+      }
+    ],
+    ult: {
+      name: 'Lâm Uyên Triệu Dã',
+      type: 'ultimate',
+      tags: ['summon'],
+      description: 'Triệu hồi ngẫu nhiên 1 trong 5 thú (Tiểu Hắc, Tiểu Bạch, Tiểu Hoàng, Tiểu Bất Điểm, Nhị Cẩu). Mỗi thú tồn tại tối đa 5 lượt, không trùng lặp, với hiệu ứng riêng: xuyên giáp, tăng sát thương, chết hồi máu cho Faun, hồi máu cho thú khác, hoặc hỗ trợ khiêu khích + hồi máu định kỳ.'
+    },
+    talent: {
+      name: 'Vạn Thú Đồng Hưởng',
+      type: 'talent',
+      description: 'Mỗi thú đồng minh trên sân tăng 3% mọi chỉ số cho Faun (tối đa 5 tầng). Đồng thời giảm 20% sát thương nhận từ thú thuộc Faun.'
+    },
+    technique: null,
+    notes: [
+      'Thanh nộ tối đa chỉ 85; nhớ cập nhật UI fury bar.',
+      'Khi hy sinh thú bởi Thú Tế Hộ Mệnh, cần thông báo trong log để người chơi hiểu vì sao thú biến mất.'
+    ]
+  },
+  {
+    unitId: 'basil_thorne',
+    basic: {
+      name: 'Đánh Thường',
+      type: 'basic',
+      tags: ['single-target'],
+      description: 'Đâm gai gây 100% ATK + 100% WIL lên 1 mục tiêu.'
+    },
+    skills: [
+      {
+        key: 'skill1',
+        name: 'Chiết Luyện Độc Tích',
+        type: 'active',
+        cost: { aether: 30 },
+        tags: ['self-buff'],
+        description: 'Tính tổng số stack Độc trên toàn sân, mỗi stack chuyển thành +1,5% Max HP tạm thời cho Basil rồi xóa toàn bộ Độc khỏi địch.'
+      },
+      {
+        key: 'skill2',
+        name: 'Khế Ước Gai Huyết',
+        type: 'active',
+        cost: { aether: 25 },
+        duration: { turns: 2 },
+        tags: ['reflect'],
+        description: 'Giảm 10% Max HP (thật) để nhận hiệu ứng phản sát thương trong 2 lượt. Lượng HP mất không được khiên ngăn chặn.'
+      },
+      {
+        key: 'skill3',
+        name: 'Song Tiêm Trảm',
+        type: 'active',
+        cost: { aether: 20 },
+        tags: ['multi-hit'],
+        damage: { multiplier: 1.0, hits: 2 },
+        description: 'Đâm hai lần liên tiếp vào một mục tiêu, mỗi hit là đòn đánh thường.'
+      }
+    ],
+    ult: {
+      name: 'Pháo Đài Gai Đen',
+      type: 'ultimate',
+      tags: ['taunt', 'defense'],
+      duration: { turns: 2 },
+      description: 'Bao phủ cơ thể bằng gai đen: nhận Khiêu Khích 2 lượt và tăng 20% ARM/RES trong thời gian đó.'
+    },
+    talent: {
+      name: 'Gai Độc',
+      type: 'talent',
+      description: 'Khi bị tấn công, kẻ gây sát thương nhận 1 stack Độc (tối đa 10 stack/mục tiêu, 1 lần mỗi lượt/mỗi nguồn). Độc có thể bị thanh tẩy.'
+    },
+    technique: null,
+    notes: [
+      'Nội tại áp Độc nên hiển thị số stack trên mục tiêu để người chơi nhận biết.',
+      'Khế Ước Gai Huyết khiến Basil mất Max HP ngay khi dùng, cần hiển thị thông báo rõ ràng.'
+    ]
   }
 ] as const;
 
