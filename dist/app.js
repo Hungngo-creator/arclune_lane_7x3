@@ -1,7 +1,7 @@
 // Bundled by build.mjs
 const __modules = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }
 function __define(id, factory){ __modules[id] = { factory, exports: null, initialized: false }; }
@@ -1098,6 +1098,12 @@ __define('./art.ts', (exports, module, __require) => {
       leaderA: { primary: '#74cfff', secondary: '#123c55', accent: '#dff7ff', outline: '#1a4d68' },
       leaderB: { primary: '#ff9aa0', secondary: '#4a1921', accent: '#ffd9dd', outline: '#571f28' },
       phe: { primary: '#a884ff', secondary: '#2b1954', accent: '#f1ddff', outline: '#3a2366' },
+      mong_yem: { primary: '#cbb4ff', secondary: '#2f1f4a', accent: '#f4ecff', outline: '#221435' },
+      chan_nga: { primary: '#b8f8ff', secondary: '#1d4854', accent: '#e5fdff', outline: '#14333c' },
+      ma_ton: { primary: '#f6b3a1', secondary: '#3b1c1f', accent: '#ffe3d6', outline: '#2a1214' },
+      mo_da: { primary: '#f59ac1', secondary: '#33101e', accent: '#ffd7e9', outline: '#250a14' },
+      ngao_binh: { primary: '#8fe7ff', secondary: '#143345', accent: '#d6f6ff', outline: '#0e2330' },
+      laukhac: { primary: '#7fc7ff', secondary: '#152a41', accent: '#d4f0ff', outline: '#0d1d2d' },
       kiem: { primary: '#ffd37a', secondary: '#5b2f12', accent: '#fff3c3', outline: '#4a260f' },
       loithien: { primary: '#8bd1ff', secondary: '#163044', accent: '#c7f1ff', outline: '#1e3e53' },
       laky: { primary: '#ffc9ec', secondary: '#7c336a', accent: '#ffeef9', outline: '#5a214b' },
@@ -1164,6 +1170,78 @@ __define('./art.ts', (exports, module, __require) => {
                   scale: 1.12,
                   aspect: 0.8,
                   shadow: { color: 'rgba(48,12,44,0.6)', blur: 30, offsetX: 0, offsetY: 14 }
+              }
+          }
+      }),
+      mong_yem: makeArt('bloom', getBasePalette('mong_yem'), {
+          layout: { labelOffset: 1.18, hpOffset: 1.46 },
+          skins: {
+              default: {
+                  src: './dist/assets/units/mong_yem/default.svg',
+                  anchor: 0.86,
+                  scale: 1.04,
+                  aspect: 0.82,
+                  shadow: { color: 'rgba(24,16,42,0.58)', blur: 26, offsetX: 0, offsetY: 12 }
+              }
+          }
+      }),
+      chan_nga: makeArt('rune', getBasePalette('chan_nga'), {
+          layout: { labelOffset: 1.16, hpOffset: 1.42 },
+          skins: {
+              default: {
+                  src: './dist/assets/units/chan_nga/default.svg',
+                  anchor: 0.84,
+                  scale: 1.02,
+                  aspect: 0.8,
+                  shadow: { color: 'rgba(14,40,46,0.58)', blur: 24, offsetX: 0, offsetY: 12 }
+              }
+          }
+      }),
+      ma_ton_diep_lam: makeArt('rune', getBasePalette('ma_ton'), {
+          layout: { labelOffset: 1.2, hpOffset: 1.48 },
+          skins: {
+              default: {
+                  src: './dist/assets/units/ma_ton_diep_lam/default.svg',
+                  anchor: 0.88,
+                  scale: 1.05,
+                  aspect: 0.82,
+                  shadow: { color: 'rgba(40,18,22,0.6)', blur: 26, offsetX: 0, offsetY: 12 }
+              }
+          }
+      }),
+      mo_da: makeArt('pike', getBasePalette('mo_da'), {
+          layout: { labelOffset: 1.14, hpOffset: 1.40 },
+          skins: {
+              default: {
+                  src: './dist/assets/units/mo_da/default.svg',
+                  anchor: 0.84,
+                  scale: 1.00,
+                  aspect: 0.78,
+                  shadow: { color: 'rgba(42,12,22,0.6)', blur: 24, offsetX: 0, offsetY: 11 }
+              }
+          }
+      }),
+      ngao_binh: makeArt('sentinel', getBasePalette('ngao_binh'), {
+          layout: { labelOffset: 1.2, hpOffset: 1.48 },
+          skins: {
+              default: {
+                  src: './dist/assets/units/ngao_binh/default.svg',
+                  anchor: 0.9,
+                  scale: 1.06,
+                  aspect: 0.82,
+                  shadow: { color: 'rgba(12,32,44,0.6)', blur: 26, offsetX: 0, offsetY: 12 }
+              }
+          }
+      }),
+      lau_khac_ma_chu: makeArt('rune', getBasePalette('laukhac'), {
+          layout: { labelOffset: 1.22, hpOffset: 1.5 },
+          skins: {
+              default: {
+                  src: './dist/assets/units/lau_khac_ma_chu/default.svg',
+                  anchor: 0.88,
+                  scale: 1.04,
+                  aspect: 0.82,
+                  shadow: { color: 'rgba(10,28,44,0.6)', blur: 28, offsetX: 0, offsetY: 13 }
               }
           }
       }),
@@ -1867,6 +1945,1418 @@ __define('./catalog.ts', (exports, module, __require) => {
   //  - kit.traits.summon / kit.ult.summon đánh dấu Summoner -> kích hoạt Immediate Summon (action-chain).
   const ROSTER = [
       {
+          id: 'diep_minh', name: 'Diệp Minh', class: 'Support', rank: 'SSR',
+          mods: { HP: 0.06, WIL: 0.10, RES: 0.08, AEregen: 0.05 },
+          kit: {
+              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, aura: { id: 'thien_diep', regenPercentMaxHPPerTurn: 0.02 } }),
+              basic: asUnknownRecord({
+                  name: 'Thảo Kiếm Đoạt',
+                  tags: ['single-target', 'seed'],
+                  damageMultiplier: 1.00,
+                  mark: { id: 'thuc_mach', maxStacks: 3, purgeable: false }
+              }),
+              skills: asUnknownRecordArray([
+                  {
+                      key: 'skill1',
+                      name: 'Vệ Mộc Trấn Hộ',
+                      cost: { aether: 20 },
+                      targets: 'ally',
+                      shieldPercentMaxHP: 0.25,
+                      healPercentMaxHP: 0.06,
+                      duration: 2,
+                      notes: 'Gieo mộc khí thành khiên ôm lấy đồng minh, hồi 6% Max HP và tạo lá chắn bằng 25% Max HP trong 2 lượt.'
+                  },
+                  {
+                      key: 'skill2',
+                      name: 'Thực Linh Dẫn Lộ',
+                      cost: { aether: 25 },
+                      duration: 3,
+                      field: { id: 'thuc_linh_tran', affects: 'team', regenPercentMaxHPPerTurn: 0.04, bonusRES: 0.12 },
+                      notes: 'Trải thảm thực linh 3 lượt, cấp mọi đồng minh hồi phục 4% Max HP mỗi lượt và +12% RES.'
+                  },
+                  {
+                      key: 'skill3',
+                      name: 'Liên Đằng Phong Tỏa',
+                      cost: { aether: 30 },
+                      aoe: 'line',
+                      damageMultiplier: 1.10,
+                      root: { turns: 1 },
+                      spreadMark: { id: 'thuc_mach', stacks: 1, targets: 2 },
+                      notes: 'Chém quét thành dây leo siết chặt, gây 110% sát thương đòn đánh thường, trói chân 1 lượt và lan 1 tầng Thực Mạch sang tối đa 2 kẻ địch.'
+                  }
+              ]),
+              ult: asUnknownRecord({
+                  type: 'field',
+                  duration: 3,
+                  aura: {
+                      allies: { healPercentMaxHPPerTurn: 0.05, shieldPercentMaxHP: 0.12 },
+                      enemies: { damageTaken: 0.12, rootOnEntryTurns: 1 }
+                  },
+                  notes: 'Khai mở “Thiên Diệp Bảo Hộ” trong 3 lượt: đồng minh trong vùng nhận hồi 5% Max HP và lá chắn 12% Max HP mỗi lượt; kẻ địch lần đầu bước vào bị trói 1 lượt và tăng 12% sát thương gánh chịu.'
+              }),
+              talent: asUnknownRecord({
+                  name: 'Lâm Ý Vĩnh Thịnh',
+                  mark: {
+                      id: 'thuc_mach',
+                      kind: 'mark',
+                      maxStacks: 3,
+                      purgeable: false,
+                      onCap: { immobilize: { turns: 1 } }
+                  },
+                  aura: { regenPercentMaxHPPerTurn: 0.02, bonusShieldPower: 0.10 }
+              }),
+              technique: null,
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'thuc_mach_basic',
+                      name: 'Ấn Mộc Gieo Hạt',
+                      when: 'onBasicHit',
+                      effect: 'placeMark',
+                      params: { id: 'thuc_mach', stacks: 1, maxStacks: 3, purgeable: false }
+                  },
+                  {
+                      id: 'thien_diep_aura',
+                      name: 'Thực Mộc Gia Trì',
+                      when: 'onBattlefield',
+                      effect: 'teamAura',
+                      params: { affects: 'adjacentAllies', regenPercentMaxHPPerTurn: 0.02, bonusRES: 0.08 }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
+                  { id: 'auto_cast_ult', text: 'Ultimate auto-cast khi đầy nộ theo luật chung.' },
+                  { id: 'lore_lam_aura', text: 'Aura thực vật bao phủ thân kiếm, SVG cần hiệu ứng sương lá chuyển động quanh áo choàng.' }
+              ])
+          }
+      },
+      {
+          id: 'nguyet_san', name: 'Nguyệt San', class: 'Assassin', rank: 'UR',
+          mods: { ATK: 0.10, PER: 0.12, SPD: 0.10 },
+          kit: {
+              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, stealth: { turns: 1 } }),
+              basic: asUnknownRecord({
+                  name: 'Ảnh Nguyệt Đoạn',
+                  tags: ['single-target', 'blink'],
+                  damageMultiplier: 1.05,
+                  reposition: { type: 'behindTarget' },
+                  notes: 'Đột kích phía sau mục tiêu với 105% sát thương và lùi về vị trí cũ.'
+              }),
+              skills: asUnknownRecordArray([
+                  {
+                      key: 'skill1',
+                      name: 'Huyền Nguyệt Ẩn Tích',
+                      cost: { aether: 25 },
+                      duration: 2,
+                      stealth: { turns: 2, breakOnAttack: false },
+                      dodgeAll: 0.30,
+                      notes: 'Tàng hình 2 lượt, tăng 30% né mọi đòn. Không mất tàng hình khi dùng kỹ năng dịch chuyển.'
+                  },
+                  {
+                      key: 'skill2',
+                      name: 'Nguyệt Ảnh Hoán Thân',
+                      cost: { aether: 30 },
+                      teleport: { range: 'anyShadow', createsShadow: true },
+                      buffStats: { SPD: 0.15, PER: 0.10 },
+                      duration: 2,
+                      notes: 'Đặt dấu ấn bóng tại vị trí hiện tại, dịch chuyển đến mục tiêu tùy chọn rồi +15% SPD, +10% PER trong 2 lượt.'
+                  },
+                  {
+                      key: 'skill3',
+                      name: 'Nguyệt Diệt Ảnh Phạt',
+                      cost: { aether: 35 },
+                      aoe: 'circle',
+                      damageMultiplier: 1.60,
+                      executesBelowPercentHP: 0.25,
+                      nightmarkDetonation: { id: 'nguyet_an', bonusDamage: 0.30 },
+                      notes: 'Bùng nổ ánh trăng quanh bóng đứng, gây 160% sát thương; mục tiêu dưới 25% HP bị kết liễu. Kích nổ mọi Nguyệt Ấn gây thêm 30% sát thương.'
+                  }
+              ]),
+              ult: asUnknownRecord({
+                  type: 'blink-assassinate',
+                  damageMultiplier: 3.20,
+                  pierce: { ARM: 0.30, RES: 0.30 },
+                  guaranteeCrit: true,
+                  refundsStealth: true,
+                  notes: '“Huyết Nguyệt Định Mệnh”: lao qua bóng tối đến kẻ thù có Nguyệt Ấn gần nhất, gây 320% sát thương xuyên 30% ARM/RES và tái kích hoạt trạng thái ẩn thân.'
+              }),
+              talent: asUnknownRecord({
+                  name: 'Nguyệt Ảnh Ấn',
+                  mark: { id: 'nguyet_an', kind: 'mark', maxStacks: 5, purgeable: false, decayIfNoRefreshTurns: 2 },
+                  shadowRecall: { cooldown: 2 }
+              }),
+              technique: null,
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'nguyet_an_basic',
+                      name: 'Ảnh Nguyệt Lưu Tích',
+                      when: 'onHit',
+                      effect: 'placeMark',
+                      params: { id: 'nguyet_an', stacks: 1, maxStacks: 5, purgeable: false, decayIfNoRefreshTurns: 2 }
+                  },
+                  {
+                      id: 'shadow_gate',
+                      name: 'Liên Ảnh Môn',
+                      when: 'onShadowRecall',
+                      effect: 'resetCooldown',
+                      params: { skills: ['skill1'], bonusDamageNextHit: 0.25 }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
+                  { id: 'auto_cast_ult', text: 'Ultimate auto-cast khi đầy nộ theo luật chung.' },
+                  { id: 'lore_nguyet', text: 'SVG cần haze trăng chuyển động che mặt và váy tầng bóng tối, kèm hiệu ứng dịch chuyển.' }
+              ])
+          }
+      },
+      {
+          id: 'trung_lam', name: 'Trùng Lâm', class: 'Summoner', rank: 'SSR',
+          mods: { HP: 0.12, ATK: 0.06, ARM: 0.10 },
+          kit: {
+              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, bonusSummonArmor: 0.10 }),
+              basic: asUnknownRecord({
+                  name: 'Sừng Lâm Trảm',
+                  tags: ['single-target', 'beast'],
+                  damageMultiplier: 1.10,
+                  knockback: 1,
+                  notes: 'Húc bằng sừng lá, gây 110% sát thương và đẩy lùi mục tiêu 1 ô nếu có.'
+              }),
+              skills: asUnknownRecordArray([
+                  {
+                      key: 'skill1',
+                      name: 'Hống Lâm Triệu Tập',
+                      cost: { aether: 25 },
+                      summon: {
+                          id: 'lam_ho_ve',
+                          inherit: { HP: 0.60, ATK: 0.60, ARM: 0.20 },
+                          ttl: 4,
+                          limit: 1,
+                          replace: 'refresh'
+                      },
+                      notes: 'Triệu hồi Lâm Hộ Vệ trong 4 lượt, thừa hưởng 60% chỉ số và 20% ARM bonus. Nếu đã tồn tại sẽ làm mới thời gian.'
+                  },
+                  {
+                      key: 'skill2',
+                      name: 'Giáp Gai Nguyên Sinh',
+                      cost: { aether: 20 },
+                      duration: 3,
+                      buffStats: { ARM: 0.25, RES: 0.15 },
+                      thorns: { percentDamage: 0.20 },
+                      appliesToSummons: true,
+                      notes: 'Phủ giáp gai cho bản thân và Lâm Hộ Vệ, +25% ARM, +15% RES và phản 20% sát thương cận chiến trong 3 lượt.'
+                  },
+                  {
+                      key: 'skill3',
+                      name: 'Sinh Lâm Hồi Sinh',
+                      cost: { aether: 30 },
+                      healPercentMaxHP: 0.18,
+                      reviveSummon: true,
+                      buffStats: { ATK: 0.12 },
+                      duration: 2,
+                      notes: 'Hấp thụ aether rừng để hồi 18% Max HP cho bản thân, hồi sinh Lâm Hộ Vệ đã ngã gục và tăng 12% ATK cho cả hai trong 2 lượt.'
+                  }
+              ]),
+              ult: asUnknownRecord({
+                  type: 'roar',
+                  aoe: 'allEnemies',
+                  debuffs: [{ id: 'weaken', amount: 0.15, turns: 2 }, { id: 'slow', amount: 0.20, turns: 2 }],
+                  summonEmpower: { id: 'lam_ho_ve', bonus: { damage: 0.25, lifesteal: 0.15 }, turns: 2 },
+                  notes: '“Vương Lâm Thú Khiếu” làm run sợ toàn chiến trường: mọi địch -15% sát thương, -20% SPD trong 2 lượt; Lâm Hộ Vệ nhận +25% sát thương và 15% hút máu.'
+              }),
+              talent: asUnknownRecord({
+                  name: 'Lâm Uy Ngự Địa',
+                  summonBond: { id: 'lam_ho_ve', sharedHP: 0.20 },
+                  aura: { allies: 'nature', stats: { ATK: 0.08 } }
+              }),
+              technique: null,
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'lam_ho_ve_guard',
+                      name: 'Thú Hộ Vệ',
+                      when: 'onAllyTargeted',
+                      effect: 'intercept',
+                      params: { summonId: 'lam_ho_ve', chance: 0.30 }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
+                  { id: 'auto_cast_ult', text: 'Ultimate auto-cast khi đầy nộ theo luật chung.' },
+                  { id: 'svg_beast', text: 'SVG cần thể hiện hình thái dị thú bốn chân và tách riêng companion “Lâm Hộ Vệ”.' }
+              ])
+          }
+      },
+      {
+          id: 'huyet_tich', name: 'Huyết Tịch', class: 'Mage', rank: 'UR',
+          mods: { WIL: 0.14, AEregen: 0.12, HP: 0.08 },
+          kit: {
+              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, bloodReserve: 40 }),
+              basic: asUnknownRecord({
+                  name: 'Huyết Đoạt',
+                  tags: ['single-target', 'drain'],
+                  lifesteal: 0.15,
+                  damageMultiplier: 1.00,
+                  notes: 'Mỗi đòn đánh thường hút 15% sát thương gây ra để nuôi hồ huyết.'
+              }),
+              skills: asUnknownRecordArray([
+                  {
+                      key: 'skill1',
+                      name: 'Huyết Trướng Bảo Hộ',
+                      cost: { aether: 25 },
+                      duration: 2,
+                      shieldPercentCasterMaxHP: 0.35,
+                      convertDamageToBlood: 0.30,
+                      notes: 'Tạo màn huyết bảo hộ 2 lượt: nhận lá chắn 35% Max HP của Huyết Tịch, 30% sát thương nhận vào chuyển thành tích lũy huyết hồ.'
+                  },
+                  {
+                      key: 'skill2',
+                      name: 'Huyết Chú Phản Hồi',
+                      cost: { aether: 30 },
+                      duration: 3,
+                      link: { sharePercent: 0.35, targets: 1 },
+                      healPercentDamage: 0.30,
+                      notes: 'Kết huyết với một đồng minh: chuyển 35% sát thương họ nhận sang Huyết Tịch và hồi lại 30% lượng đó.'
+                  },
+                  {
+                      key: 'skill3',
+                      name: 'Huyết Độc Triều',
+                      cost: { aether: 35 },
+                      aoe: 'cone',
+                      damageMultiplier: 1.40,
+                      applyPoison: { id: 'huyet_doc', stacks: 2, maxStacks: 6 },
+                      notes: 'Phun huyết độc phạm vi hình nón, gây 140% sát thương và đặt 2 tầng Huyết Độc (tối đa 6).'
+                  }
+              ]),
+              ult: asUnknownRecord({
+                  type: 'bloodstorm',
+                  aoe: 'allEnemies',
+                  damageMultiplier: 2.20,
+                  detonatePoison: { id: 'huyet_doc', bonusPerStack: 0.12 },
+                  healAlliesFromTotal: { percent: 0.30, distribute: 'lowestHP' },
+                  notes: '“Huyết Tịch Chiến Vũ” dâng bão máu quét toàn chiến trường: gây 220% sát thương, kích nổ Huyết Độc mỗi tầng thêm 12% sát thương và chữa 30% tổng sát thương cho đồng minh HP thấp nhất.'
+              }),
+              talent: asUnknownRecord({
+                  name: 'Nguyên Huyết Chi Chủ',
+                  resource: { id: 'blood_reserve', max: 100 },
+                  conversion: { per10: { healPercentMaxHP: 0.03, damageBonus: 0.04 } },
+                  mark: { id: 'huyet_doc', kind: 'poison', maxStacks: 6, purgeable: true }
+              }),
+              technique: null,
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'blood_reserve_gain',
+                      name: 'Hồ Huyết Vô Tận',
+                      when: 'onDamageDealt',
+                      effect: 'gainResource',
+                      params: { resourceId: 'blood_reserve', amountPerPercentHP: 2 }
+                  },
+                  {
+                      id: 'blood_reserve_spend',
+                      name: 'Tế Huyết Cường Hoá',
+                      when: 'onUltCast',
+                      effect: 'convertResource',
+                      params: { resourceId: 'blood_reserve', spendAll: true, bonusDamagePer10: 0.04 }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
+                  { id: 'auto_cast_ult', text: 'Ultimate auto-cast khi đầy nộ theo luật chung.' },
+                  { id: 'svg_blood', text: 'SVG bổ sung huyết cầu động quanh đầu và haze đỏ trắng bao phủ khuôn mặt.' }
+              ])
+          }
+      },
+      {
+          id: 'khai_nguyen_tu', name: 'Khai Nguyên Tử', class: 'Mage', rank: 'UR',
+          mods: { WIL: 0.12, AEmax: 0.15, AEregen: 0.12 },
+          kit: {
+              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, portalCharges: 2 }),
+              basic: asUnknownRecord({
+                  name: 'Pháp Trượng Khai Thiên',
+                  tags: ['single-target', 'arcane'],
+                  damageMultiplier: 1.15,
+                  bonus: { aetherGain: 6 },
+                  notes: 'Đòn đánh thường chuyển hoá aether, hoàn lại 6 Aether khi trúng mục tiêu.'
+              }),
+              skills: asUnknownRecordArray([
+                  {
+                      key: 'skill1',
+                      name: 'Nguyên Môn Huyễn Giới',
+                      cost: { aether: 20 },
+                      teleportAlly: { range: 'any', cleanseDebuff: 1 },
+                      buffStats: { RES: 0.15 },
+                      duration: 2,
+                      notes: 'Mở cổng dịch chuyển đồng minh đến vị trí bất kỳ và thanh tẩy 1 hiệu ứng xấu, +15% RES trong 2 lượt.'
+                  },
+                  {
+                      key: 'skill2',
+                      name: 'Triệu Hoán Nguyên Khí',
+                      cost: { aether: 25 },
+                      summon: {
+                          id: 'nguyen_khi_thap',
+                          inherit: { WIL: 0.70 },
+                          ttl: 3,
+                          limit: 1,
+                          forbiddenSkills: ['ult']
+                      },
+                      notes: 'Triệu hồi “Nguyên Khí Tháp” trong 3 lượt, khuếch đại đòn phép với 70% WIL của Khai Nguyên Tử.'
+                  },
+                  {
+                      key: 'skill3',
+                      name: 'Huyễn Thuật Đa Tầng',
+                      cost: { aether: 35 },
+                      duration: 3,
+                      stackingBuffs: [{ stats: { WIL: 0.08 }, trigger: 'turnEnd', maxStacks: 3 }],
+                      cooldown: 3,
+                      notes: 'Thi triển tầng phép liên hoàn: mỗi lượt cuối tăng 8% WIL (tối đa 3 tầng), tái sử dụng làm mới thời gian nhưng không vượt quá giới hạn.'
+                  }
+              ]),
+              ult: asUnknownRecord({
+                  type: 'time-stop',
+                  duration: 1,
+                  skipEnemyTurns: 1,
+                  bonusAether: 30,
+                  summonEmpower: { id: 'nguyen_khi_thap', bonus: { pierceRES: 0.25 } },
+                  notes: '“Khai Thiên Định Cực” tạm dừng thời gian 1 lượt địch, hoàn trả 30 Aether cho phe ta và khiến Nguyên Khí Tháp xuyên 25% RES.'
+              }),
+              talent: asUnknownRecord({
+                  name: 'Nguyên Chú Khai Thế',
+                  portalCharges: 2,
+                  rechargePerTurn: 1,
+                  bonusAetherPerCharge: 5
+              }),
+              technique: null,
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'portal_charge_gain',
+                      name: 'Tụ Khí Pháp Ấn',
+                      when: 'onTurnStart',
+                      effect: 'gainPortalCharge',
+                      params: { amount: 1, max: 3 }
+                  },
+                  {
+                      id: 'portal_spend_bonus',
+                      name: 'Chuyển Dịch Định Luật',
+                      when: 'onPortalUse',
+                      effect: 'grantBuff',
+                      params: { stats: { AEregen: 0.20 }, turns: 1 }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
+                  { id: 'auto_cast_ult', text: 'Ultimate auto-cast khi đầy nộ theo luật chung.' },
+                  { id: 'svg_portal', text: 'SVG cần phù văn bạc chuyển động quanh áo choàng và hiệu ứng cổng không gian phía sau.' }
+              ])
+          }
+      },
+      {
+          id: 'thien_luu', name: 'Thiên Lưu', class: 'Ranger', rank: 'SSR',
+          mods: { ATK: 0.08, PER: 0.08, SPD: 0.08 },
+          kit: {
+              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, weatherState: 'clear' }),
+              basic: asUnknownRecord({
+                  name: 'Thiên Kiếm Thuần Quang',
+                  tags: ['single-target', 'flying'],
+                  damageMultiplier: 1.05,
+                  bonus: { accuracy: 0.15 },
+                  notes: 'Chém kiếm khí tinh khiết từ trên cao, +15% chính xác khi mục tiêu đang chịu debuff thời tiết.'
+              }),
+              skills: asUnknownRecordArray([
+                  {
+                      key: 'skill1',
+                      name: 'Phong Vũ Dẫn Hướng',
+                      cost: { aether: 20 },
+                      duration: 2,
+                      weatherShift: 'storm',
+                      buffStats: { SPD: 0.12 },
+                      notes: 'Gọi gió mưa tạo trạng thái Bão trong 2 lượt và tăng 12% SPD cho bản thân.'
+                  },
+                  {
+                      key: 'skill2',
+                      name: 'Thiên Quang Liên Xạ',
+                      cost: { aether: 25 },
+                      hits: 3,
+                      targets: 'randomEnemies',
+                      damageMultiplier: 0.75,
+                      bonusDamageIfWeather: { weather: 'storm', amount: 0.20 },
+                      notes: 'Bắn ba luồng kiếm quang vào kẻ địch ngẫu nhiên, mỗi luồng 75% sát thương; nếu đang Bão, mỗi hit thêm 20% sát thương.'
+                  },
+                  {
+                      key: 'skill3',
+                      name: 'Tinh Không Phi Hành',
+                      cost: { aether: 30 },
+                      duration: 2,
+                      flying: true,
+                      dodgeRanged: 0.35,
+                      grantAlly: { shieldPercentMaxHP: 0.18, targets: 1 },
+                      notes: 'Bay lên tinh không 2 lượt, tăng 35% né đòn tầm xa và cấp 18% lá chắn Max HP cho 1 đồng minh bất kỳ.'
+                  }
+              ]),
+              ult: asUnknownRecord({
+                  type: 'weather-control',
+                  weatherShift: 'aurora',
+                  damageMultiplier: 2.60,
+                  aoe: 'allEnemies',
+                  debuffs: [{ id: 'accuracy_down', amount: 0.20, turns: 2 }],
+                  alliesBuff: { critRate: 0.20, turns: 2 },
+                  notes: '“Thiên Lưu Tụ Quang” triệu hồi cực quang: gây 260% sát thương toàn địch, giảm 20% chính xác của chúng trong 2 lượt và ban +20% tỉ lệ chí mạng cho đồng minh.'
+              }),
+              talent: asUnknownRecord({
+                  name: 'Sứ Mệnh Khí Tượng',
+                  weatherCycle: ['clear', 'storm', 'aurora'],
+                  bonusPerWeather: {
+                      clear: { ATK: 0.05 },
+                      storm: { SPD: 0.08 },
+                      aurora: { critDamage: 0.20 }
+                  }
+              }),
+              technique: null,
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'weather_followup',
+                      name: 'Lạc Không Hồi Âm',
+                      when: 'onWeatherShift',
+                      effect: 'grantFollowUp',
+                      params: { damageMultiplier: 1.00, expiresAfter: 1 }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
+                  { id: 'auto_cast_ult', text: 'Ultimate auto-cast khi đầy nộ theo luật chung.' },
+                  { id: 'svg_weather', text: 'SVG cần mũ ánh sáng và aurora, bổ sung tia sét quanh áo choàng trong suốt.' }
+              ])
+          }
+      },
+      {
+          id: 'mong_yem', name: 'Mộng Yểm', class: 'Support', rank: 'UR',
+          mods: { WIL: 0.12, AEregen: 0.08 },
+          kit: {
+              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+              basic: asUnknownRecord({
+                  name: 'Đánh Thường',
+                  tags: ['single-target', 'sleep-setup'],
+                  debuff: { id: 'me_hoac', stacks: 1, maxStacks: 3, purgeable: false }
+              }),
+              skills: asUnknownRecordArray([
+                  {
+                      key: 'skill1',
+                      name: 'Huyễn Ảnh Che Màn',
+                      cost: { aether: 30 },
+                      duration: 3,
+                      selfBuff: { dodgeBasic: 0.50 },
+                      notes: 'Giảm 50% tỉ lệ bị đòn đánh thường trúng trong 3 lượt (tính cả lượt kích hoạt).'
+                  },
+                  {
+                      key: 'skill2',
+                      name: 'Thụy Ca Tự Miên',
+                      cost: { aether: 35 },
+                      duration: 3,
+                      delayTurns: 0,
+                      selfSleep: true,
+                      reduceDamage: 0.50,
+                      perTurnBuffStats: { ATK: 0.07, WIL: 0.07 },
+                      notes: 'Trong thời gian ngủ không thể hành động; mỗi lượt đang ngủ cộng 7% ATK/WIL. Tự thức khi HP ≤ 30% hoặc người chơi huỷ thủ công.'
+                  },
+                  {
+                      key: 'skill3',
+                      name: 'Phá Mộng Tàn Ca',
+                      cost: { aether: 25 },
+                      damageMultiplier: 1.80,
+                      bonusPerMark: { id: 'me_hoac', amount: 0.20, max: 0.60 },
+                      pierceIfSleeping: { ARM: 0.30, RES: 0.30 },
+                      spreadMark: { id: 'me_hoac', stacks: 1, targets: 2 },
+                      notes: 'Không tính là đòn đánh thường; ưu tiên mục tiêu đang có Mê Hoặc. Nếu mục tiêu ngủ, bỏ qua 30% ARM/RES và lan 1 tầng Mê Hoặc sang tối đa 2 kẻ địch khác.'
+                  }
+              ]),
+              ult: asUnknownRecord({
+                  type: 'worldshift',
+                  duration: 3,
+                  randomBuffs: { allies: 1, enemies: 1 },
+                  notes: 'Tạo “Thế Giới Thứ Hai” trong 3 lượt: mỗi đồng minh hiện hữu và khi vào sân nhận 1 buff ngẫu nhiên; mỗi kẻ địch nhận 1 debuff ngẫu nhiên.'
+              }),
+              talent: asUnknownRecord({
+                  name: 'Mê Ca Dẫn Thụy',
+                  mark: {
+                      id: 'me_hoac',
+                      kind: 'mark',
+                      maxStacks: 3,
+                      purgeable: false,
+                      onCap: { sleep: { turns: 1 } },
+                      decayIfNoRefreshTurns: null
+                  }
+              }),
+              technique: null,
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'me_hoac_apply',
+                      name: 'Mê Ca Dẫn Thụy',
+                      when: 'onAbilityHit',
+                      effect: 'placeMark',
+                      params: {
+                          id: 'me_hoac',
+                          stacks: 1,
+                          maxStacks: 3,
+                          purgeable: false,
+                          sleepTurnsOnCap: 1
+                      }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
+                  { id: 'sleep_reset', text: 'Khi đạt 3 tầng Mê Hoặc, mục tiêu ngủ 1 lượt rồi đặt lại về 0 tầng.' },
+                  { id: 'self_sleep_control', text: 'Thụy Ca Tự Miên có thể được hủy sớm bằng thao tác thủ công; tự thức khi HP ≤ 30%.' }
+              ])
+          }
+      },
+      {
+          id: 'chan_nga', name: 'Chân Ngã', class: 'Summoner', rank: 'UR',
+          mods: { HP: 0.10, WIL: 0.10 },
+          kit: {
+              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, bonusMaxHPPercent: 0.10 }),
+              basic: asUnknownRecord({
+                  name: 'Đánh Thường',
+                  tags: ['single-target']
+              }),
+              skills: asUnknownRecordArray([
+                  {
+                      key: 'skill1',
+                      name: 'Liên Ảnh Hồi Tức',
+                      cost: { aether: 30 },
+                      healSelfPercentMaxHP: 0.06,
+                      healClonePercentMaxHP: 0.04,
+                      notes: 'Chia 10% hồi máu dựa trên Max HP: 6% cho bản thể, 4% cho clone nếu tồn tại.'
+                  },
+                  {
+                      key: 'skill2',
+                      name: 'Cộng Lực Ảnh Thân',
+                      cost: { aether: 25 },
+                      duration: 3,
+                      buffStats: { ATK: 0.10, WIL: 0.10 },
+                      appliesToClone: true,
+                      notes: 'Buff đồng thời bản thể và clone; tái kích hoạt làm mới thời gian.'
+                  },
+                  {
+                      key: 'skill3',
+                      name: 'Quy Nhất Bản Ảnh',
+                      cost: { aether: 40 },
+                      cooldown: 3,
+                      requiresCloneAdjacent: true,
+                      shieldPercentMaxHP: 0.50,
+                      duration: 3,
+                      burstBuff: { stats: { ATK: 0.15, WIL: 0.15 }, turns: 2 },
+                      notes: 'Tiêu biến clone đứng kề, hợp nhất để nhận khiên = 50% Max HP trong 3 lượt và +15% ATK/WIL trong 2 lượt.'
+                  }
+              ]),
+              ult: asUnknownRecord({
+                  type: 'clone-summon',
+                  conditions: { requiresNoClone: true, minHpPercent: 0.60 },
+                  summon: {
+                      id: 'chan_nga_clone',
+                      inheritPercent: 0.85,
+                      forbiddenSkills: ['skill3'],
+                      ttl: 6,
+                      locksUlt: true,
+                      rageLocked: true
+                  },
+                  hpTradePercentCurrent: 0.50,
+                  notes: 'Giảm 50% HP hiện tại của bản thể để triệu hồi clone 85% chỉ số. Clone tồn tại tối đa 6 lượt, không thể dùng Quy Nhất Bản Ảnh, không tích nộ.'
+              }),
+              talent: asUnknownRecord({
+                  name: 'Dự Phòng Chân Thể',
+                  cloneSnapshotPercent: 0.85,
+                  cloneTtlTurns: 6,
+                  postDeathTransfer: { status: 'doat_xa', debuff: { id: 'linh_met', turns: 3, aetherRegen: -0.50 }, lockUlt: true }
+              }),
+              technique: null,
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'clone_on_ult',
+                      name: 'Thứ Hai Chân Thân',
+                      when: 'onUltCast',
+                      effect: 'summonClone',
+                      params: {
+                          inheritPercent: 0.85,
+                          ttl: 6,
+                          forbiddenSkills: ['skill3'],
+                          rageLocked: true
+                      }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
+                  { id: 'clone_limit', text: 'Chỉ duy trì 1 clone cùng lúc; ult thất bại nếu không còn ô trống.' },
+                  { id: 'doat_xa', text: 'Nếu bản thể tử vong khi có clone, đoạt xá vào clone và chịu Linh Mệt 3 lượt (khóa Ultimate, -50% hồi Aether).' }
+              ])
+          }
+      },
+      {
+          id: 'ma_ton_diep_lam', name: 'Ma Tôn - Diệp Lâm', class: 'Mage', rank: 'UR',
+          mods: { WIL: 0.12, AEmax: 0.08 },
+          kit: {
+              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, bonusSPDPercent: 0.10 }),
+              basic: asUnknownRecord({
+                  name: 'Đánh Thường',
+                  tags: ['single-target', 'mark-builder'],
+                  debuff: { id: 'ma_chung', stacks: 1, purgeable: false }
+              }),
+              skills: asUnknownRecordArray([
+                  {
+                      key: 'skill1',
+                      name: 'Thôn Chủng Dưỡng Thể',
+                      cost: { aether: 30 },
+                      consumeMarks: { id: 'ma_chung', scope: 'all' },
+                      bonusPerMark: { stat: 'HP', amount: 0.05 },
+                      notes: 'Thu hồi toàn bộ Ma Chủng trên chiến trường, mỗi tầng chuyển thành +5% Max HP tạm thời.'
+                  },
+                  {
+                      key: 'skill2',
+                      name: 'Ma Chủ Hiển Thân',
+                      cost: { aether: 25 },
+                      requiresTotalMarks: { id: 'ma_chung', amount: 12 },
+                      stance: 'ma_chu',
+                      notes: 'Khi tổng Ma Chủng ≥ 12, thu hồi Ma Chủng trên một mục tiêu để hoá Ma Chủ: mất quyền dùng Ultimate và mọi Ma Chủng cấy tiếp gây thêm +2% sát thương cuối dạng Thuật.'
+                  },
+                  {
+                      key: 'skill3',
+                      name: 'Nhiếp Chủng Song Chưởng',
+                      cost: { aether: 25 },
+                      countsAsBasic: true,
+                      hits: 2,
+                      damageMultiplier: 1.00,
+                      priorityTarget: 'ma_chung',
+                      splash: { ratio: 0.70, maxTargets: 2 },
+                      notes: 'Đánh hai lần vào mục tiêu có Ma Chủng gần nhất, mỗi lần lan 70% sát thương sang tối đa 2 kẻ địch lân cận.'
+                  }
+              ]),
+              ult: asUnknownRecord({
+                  type: 'mark-detonation',
+                  aoe: 'allEnemies',
+                  markId: 'ma_chung',
+                  damagePerMark: { percentTargetMaxHP: 0.05, scaleWIL: 0.00 },
+                  debuffPerThreshold: { stacks: 2, effects: [{ id: 'fear', turns: 1 }, { id: 'bleed', turns: 1 }] },
+                  notes: 'Kích hoạt toàn bộ Ma Chủng trên kẻ địch, mỗi tầng gây 5% Max HP của mục tiêu dưới dạng sát thương WIL. Mỗi 2 tầng áp Sợ Hãi và Chảy Máu 1 lượt; Ma Chủng bị tiêu hao.'
+              }),
+              talent: asUnknownRecord({
+                  name: 'Chú Ấn Ma Chủng',
+                  mark: {
+                      id: 'ma_chung',
+                      kind: 'mark',
+                      maxStacks: null,
+                      purgeable: false,
+                      decayIfNoRefreshTurns: 3
+                  }
+              }),
+              technique: null,
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'ma_chung_apply',
+                      name: 'Chú Ấn Ma Chủng',
+                      when: 'onBasicHit',
+                      effect: 'placeMark',
+                      params: { id: 'ma_chung', stacks: 1, purgeable: false, decayIfNoRefreshTurns: 3 }
+                  },
+                  {
+                      id: 'ma_chu_bonus',
+                      name: 'Ma Chủ Hiển Thân',
+                      when: 'onMarkApplied',
+                      effect: 'gainDamageBonus',
+                      params: { markId: 'ma_chung', amount: 0.02, type: 'arcane', stance: 'ma_chu' }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
+                  { id: 'ma_chung_decay', text: 'Ma Chủng mất sau 3 lượt không được cấy thêm; không có trần cộng dồn.' },
+                  { id: 'ma_chu_lock', text: 'Ở trạng thái Ma Chủ, Diệp Lâm không thể dùng Tuyệt kỹ.' }
+              ])
+          }
+      },
+      {
+          id: 'vu_thien', name: 'Vũ Thiên', class: 'Warrior', rank: 'SSR',
+          mods: { HP: 0.05, ATK: 0.08, WIL: 0.06 },
+          kit: {
+              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+              basic: asUnknownRecord({
+                  name: 'Đánh Thường',
+                  tags: ['single-target'],
+                  damageMultiplier: 1.00,
+                  notes: 'Vung đinh ba gây 100% ATK + 100% WIL. Ở trạng thái Ánh Sáng, đòn đánh thường hồi 10% sát thương gây ra.'
+              }),
+              skills: asUnknownRecordArray([
+                  {
+                      key: 'skill1',
+                      name: 'Lam Triều Bộc Lực',
+                      cost: { aether: 35 },
+                      duration: 1,
+                      buffStats: { ATK: 0.40, WIL: 0.40 },
+                      notes: 'Tăng 40% ATK/WIL trong 1 lượt, thích hợp mở chuỗi burst.'
+                  },
+                  {
+                      key: 'skill2',
+                      name: 'Hải Mâu Phá Lãng',
+                      cost: { aether: 25 },
+                      damageMultiplier: 1.50,
+                      tags: ['single-target'],
+                      notes: 'Phóng đinh ba gây 150% đòn đánh thường lên 1 mục tiêu rồi thu hồi vũ khí.'
+                  },
+                  {
+                      key: 'skill3',
+                      name: 'Triều Ảnh Hồi Kích',
+                      cost: { aether: 30 },
+                      duration: 1,
+                      counterChance: 0.25,
+                      dodgeBasicChance: 0.25,
+                      counterType: 'basic',
+                      notes: 'Kích hoạt trạng thái phản công: trong 1 lượt, mỗi lần bị đánh có 25% né và phản đòn cơ bản. Nếu ngã gục phải kích lại.'
+                  }
+              ]),
+              ult: asUnknownRecord({
+                  type: 'burst',
+                  tags: ['single-target'],
+                  damageMultiplier: 3.00,
+                  debuffs: [{ id: 'tram_mac', turns: 1 }],
+                  selfBuff: { adaptive: true, turns: 1 },
+                  notes: 'Hải Uy Trảm Ngôn gây 300% sát thương, đặt Trầm Mặc 1 lượt và cấp "Thích Ứng" cho bản thân.'
+              }),
+              talent: null,
+              technique: null,
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'hai_trieu_khai_tran',
+                      name: 'Hải Triều Khai Trận',
+                      when: 'onSpawn',
+                      effect: 'grantStats',
+                      params: { stats: { ATK: 0.05, WIL: 0.05 }, stackable: false }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
+                  { id: 'counter_mode', text: 'Triều Ảnh Hồi Kích là hiệu ứng duy trì 1 lượt, mất khi bị hạ gục.' },
+                  { id: 'adaptive_buff', text: 'Thích Ứng dùng thông số phòng thủ chuẩn của hệ thống.' }
+              ])
+          }
+      },
+      {
+          id: 'anna', name: 'Anna', class: 'Support', rank: 'SSR',
+          mods: { HP: 0.08, WIL: 0.06, AEmax: 0.05 },
+          kit: {
+              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+              basic: asUnknownRecord({
+                  name: 'Đánh Thường',
+                  tags: ['single-target', 'heal'],
+                  damageMultiplier: 1.00,
+                  healRandomAllyPercentMaxHP: 0.03,
+                  notes: 'Gây sát thương 100% ATK + WIL và hồi 3% Max HP của Anna cho 1 đồng minh ngẫu nhiên.'
+              }),
+              skills: asUnknownRecordArray([
+                  {
+                      key: 'skill1',
+                      name: 'Aegis Tụ Linh',
+                      cost: { aether: 20 },
+                      duration: 2,
+                      buffStats: { ARM: 0.20, RES: 0.20 },
+                      notes: 'Tăng 20% ARM/RES trong 2 lượt.'
+                  },
+                  {
+                      key: 'skill2',
+                      name: 'Huyết Tế Vương Tọa',
+                      cost: { aether: 25 },
+                      hpSacrificePercentMax: 0.50,
+                      transferToLeader: true,
+                      minHpPercentToCast: 0.70,
+                      notes: 'Hiến 50% Max HP hiện tại (không giảm Max HP) cho Leader, chỉ dùng khi HP ≥ 70%.'
+                  },
+                  {
+                      key: 'skill3',
+                      name: 'Hỗn Linh Trường Ca',
+                      cost: { aether: 20 },
+                      targets: 2,
+                      damageMultiplier: 1.40,
+                      tags: ['multi-target'],
+                      notes: 'Đánh ngẫu nhiên 2 kẻ địch, mỗi mục tiêu nhận 140% đòn đánh thường.'
+                  }
+              ]),
+              ult: asUnknownRecord({
+                  type: 'heal',
+                  tags: ['team-heal'],
+                  healPercentMaxHP: 0.50,
+                  healScale: { ATK: 0.20, WIL: 0.20 },
+                  affects: 'allAllies',
+                  notes: 'Thánh Lễ Tái Sinh hồi 50% Max HP + 20% ATK/WIL cho toàn bộ đồng minh.'
+              }),
+              talent: asUnknownRecord({
+                  name: 'Ấn Chú Thăng Hoa',
+                  stacks: 5,
+                  perStack: { HP: 0.05, ATK: 0.05, WIL: 0.05 },
+                  trigger: 'onUltCast'
+              }),
+              technique: null,
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'an_chu_thang_hoa',
+                      name: 'Ấn Chú Thăng Hoa',
+                      when: 'onUltCast',
+                      effect: 'stackBuff',
+                      params: { stats: { HP: 0.05, ATK: 0.05, WIL: 0.05 }, maxStacks: 5 }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
+                  { id: 'blood_transfer', text: 'Huyết Tế Vương Tọa chuyển thẳng HP nên chịu các hệ số tăng/giảm hồi máu của người nhận.' },
+                  { id: 'auto_cast_ult', text: 'Ultimate auto-cast khi đầy nộ theo luật chung.' }
+              ])
+          }
+      },
+      {
+          id: 'lao_khat_cai', name: 'Lão Khất Cái', class: 'Warrior', rank: 'SR',
+          mods: { ATK: 0.06, AGI: 0.05 },
+          kit: {
+              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+              basic: asUnknownRecord({
+                  name: 'Đánh Thường',
+                  tags: ['single-target'],
+                  damageMultiplier: 1.00,
+                  notes: 'Đánh gậy gây 100% ATK + WIL lên 1 mục tiêu.'
+              }),
+              skills: asUnknownRecordArray([
+                  {
+                      key: 'skill1',
+                      name: 'Khất Côn Xuyên Tạng',
+                      cost: { aether: 20 },
+                      countsAsBasic: true,
+                      damageMultiplier: 1.00,
+                      pierce: { ARM: 0.15, RES: 0.15 },
+                      notes: 'Đòn đánh thường gia tăng, bỏ qua 15% ARM/RES.'
+                  },
+                  {
+                      key: 'skill2',
+                      name: 'Tam Thập Lục Kế: Tẩu Vi Thượng',
+                      cost: { aether: 25 },
+                      duration: null,
+                      oneTime: true,
+                      evadeAoEChance: 0.25,
+                      reposition: { pattern: 'nearestAllySlot' },
+                      notes: 'Áp dụng hiệu ứng trốn AOE 1 lần: khi bị skill AOE nhắm trực tiếp có 25% chạy sang ô đồng minh trống gần nhất.'
+                  },
+                  {
+                      key: 'skill3',
+                      name: 'Loạn Côn Tam Liên',
+                      cost: { aether: 35 },
+                      hits: 3,
+                      randomTargets: 3,
+                      countsAsBasic: true,
+                      damageMultiplier: 1.00,
+                      pierce: { ARM: 0.20, RES: 0.20 },
+                      notes: 'Đánh ngẫu nhiên 3 mục tiêu, mỗi hit bỏ qua 20% ARM/RES.'
+                  }
+              ]),
+              ult: asUnknownRecord({
+                  type: 'finisher',
+                  tags: ['single-target'],
+                  damageMultiplier: 2.50,
+                  pierce: { ARM: 0.10, RES: 0.10 },
+                  notes: 'Nhất Côn Đoạt Mệnh gây 250% sát thương và xuyên 10% phòng thủ.'
+              }),
+              talent: null,
+              technique: null,
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'tap_dan_tu_luc',
+                      name: 'Tạp Dân Tụ Lực',
+                      when: 'onBattlefield',
+                      effect: 'allyScaling',
+                      params: { excludeLeader: true, perAllyStats: { ATK: 0.02, WIL: 0.02, AGI: 0.02 } }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
+                  { id: 'taunt_immunity', text: 'Miễn nhiễm Khiêu Khích đến từ địch.' },
+                  { id: 'aoe_escape', text: 'Tẩu Vi Thượng không kích hoạt với AOE chọn mục tiêu ngẫu nhiên hay đòn đơn mục tiêu.' }
+              ])
+          }
+      },
+      {
+          id: 'ai_lan', name: 'Ái Lân', class: 'Support', rank: 'UR',
+          mods: { WIL: 0.12, AEregen: 0.10, HP: 0.06 },
+          kit: {
+              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, startingStance: 'light' }),
+              basic: asUnknownRecord({
+                  name: 'Đánh Thường',
+                  tags: ['single-target'],
+                  damageMultiplier: 1.00,
+                  debuffs: [{ id: 'agi_down', amount: 0.05, turns: 1, whenStance: 'light' }],
+                  pierce: { ARM: 0.10, RES: 0.10, whenStance: 'dark' },
+                  bonus: { dazeChance: 0.02 },
+                  notes: 'Ở Ánh Sáng: giảm 5% AGI và hồi 10% sát thương gây ra. Ở Bóng Tối: bỏ qua 10% ARM/RES. Đòn đánh có 2% làm Choáng.'
+              }),
+              skills: asUnknownRecordArray([
+                  {
+                      key: 'skill1',
+                      name: 'Song Cực Hiến Phúc',
+                      cost: { aether: 25 },
+                      usableIn: ['light', 'dark'],
+                      transferHp: { toLeaderPercentMax: 0.20, toRandomAllyPercentMax: 0.10 },
+                      shields: [
+                          { target: 'leader', percentCasterMaxHP: 0.10, turns: 2 },
+                          { target: 'randomAlly', percentCasterMaxHP: 0.10, turns: 2 }
+                      ],
+                      notes: 'Chuyển HP cho Leader và 1 đồng minh ngẫu nhiên, đồng thời cấp khiên =10% Max HP bản thân trong 2 lượt.'
+                  },
+                  {
+                      key: 'skill2',
+                      name: 'D’moreth • Hắc Tế Tam Ấn',
+                      cost: { aether: 25 },
+                      usableIn: ['dark'],
+                      pattern: 'random3',
+                      damageMultiplier: 0.70,
+                      tags: ['aoe'],
+                      notes: 'Chỉ dùng ở Bóng Tối: gây 70% đòn đánh thường lên 3 kẻ địch ngẫu nhiên, không tính là đòn đánh thường.'
+                  },
+                  {
+                      key: 'skill3',
+                      name: 'Thánh Minh Trùng Tụ',
+                      cost: { aether: 20 },
+                      usableIn: ['light'],
+                      healSelfScale: { ATK: 0.60, WIL: 0.60 },
+                      healRandomAllyScale: { ATK: 0.60, WIL: 0.60 },
+                      notes: 'Chỉ dùng ở Ánh Sáng: hồi 60% tổng ATK+WIL cho bản thân và 1 đồng minh ngẫu nhiên.'
+                  }
+              ]),
+              ult: asUnknownRecord({
+                  type: 'dual-stance',
+                  light: {
+                      name: 'Khải Minh Thánh Lễ',
+                      healTargets: 3,
+                      healPercentMaxHP: 0.30,
+                      healScale: { ATK: 0.05, WIL: 0.05 }
+                  },
+                  dark: {
+                      name: 'Đọa Ảnh Tứ Hình',
+                      targets: 4,
+                      damageMultiplier: 0.75,
+                      countsAsBasic: false
+                  },
+                  notes: 'Ultimate phụ thuộc trạng thái hiện tại: Ánh Sáng hồi máu 3 đồng minh, Bóng Tối gây sát thương lên 4 kẻ địch ngẫu nhiên.'
+              }),
+              talent: asUnknownRecord({
+                  name: 'Thánh Ám Luân Chuyển',
+                  stanceCycle: ['light', 'dark'],
+                  turnOrder: 'alternate',
+                  lightEffects: { basicHealPercentDamage: 0.10, agiDownPercent: 0.05 },
+                  darkEffects: { pierce: 0.10 }
+              }),
+              technique: null,
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'stance_cycle',
+                      name: 'Thánh Ám Luân Chuyển',
+                      when: 'turnStart',
+                      effect: 'swapStance',
+                      params: { cycle: ['light', 'dark'], start: 'light' }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
+                  { id: 'stance_rules', text: 'Kỹ năng kiểm tra stance: nếu không đúng trạng thái sẽ bị vô hiệu.' },
+                  { id: 'dual_ult', text: 'Ultimate dùng biến thể tương ứng với stance tại thời điểm auto-cast.' }
+              ])
+          }
+      },
+      {
+          id: 'faun', name: 'Faun', class: 'Summoner', rank: 'SSR',
+          mods: { WIL: 0.08, AEregen: 0.08, HP: 0.04 },
+          kit: {
+              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, furyMax: 85 }),
+              basic: asUnknownRecord({
+                  name: 'Đánh Thường',
+                  tags: ['single-target'],
+                  damageMultiplier: 1.00,
+                  notes: 'Tấn công một mục tiêu bằng 100% ATK + WIL; thú triệu hồi kế thừa cách tính này.'
+              }),
+              skills: asUnknownRecordArray([
+                  {
+                      key: 'skill1',
+                      name: 'Dã Linh Hiệp Kích',
+                      cost: { aether: 25 },
+                      chainAttack: true,
+                      summonFollowUp: true,
+                      notes: 'Faun và mỗi thú đang tồn tại lần lượt thực hiện 1 đòn đánh thường ngay lập tức, không tiêu lượt hiện tại.'
+                  },
+                  {
+                      key: 'skill2',
+                      name: 'Ấn Khế Cường Thừa',
+                      cost: { aether: 25 },
+                      empoweredSummons: { count: 5, inheritPercent: 0.80 },
+                      notes: '5 thú tiếp theo triệu hồi từ Ultimate được thừa hưởng 80% chỉ số của Faun thay vì 50%.'
+                  },
+                  {
+                      key: 'skill3',
+                      name: 'Thú Tế Hộ Mệnh',
+                      cost: { aether: 25 },
+                      healSelfPercentMaxHP: 0.07,
+                      gainTenacity: 1,
+                      deathTrigger: { sacrificeSummon: 'lowestHP', preferMarked: true },
+                      notes: 'Hồi 7% Max HP và nhận 1 Bất Khuất; khi Bất Khuất kích hoạt sẽ hi sinh thú HP thấp nhất (ưu tiên thú đã dính dấu từ kỹ năng này).'
+                  }
+              ]),
+              ult: asUnknownRecord({
+                  type: 'summon-random',
+                  summon: {
+                      pool: [
+                          { id: 'faun_tieu_hac', inheritPercent: 0.50, ttl: 5, traits: ['pierce_arm_0_10'], tag: 'faun_beast' },
+                          { id: 'faun_tieu_bach', inheritPercent: 0.50, ttl: 5, traits: ['bonus_damage_0_05'], tag: 'faun_beast' },
+                          { id: 'faun_tieu_hoang', inheritPercent: 0.50, ttl: 5, traits: ['on_death_heal_faun_0_50'], tag: 'faun_beast' },
+                          { id: 'faun_tieu_bat_diem', inheritPercent: 0.50, ttl: 5, traits: ['heal_allies_0_30'], basicDealsDamage: false, tag: 'faun_beast' },
+                          { id: 'faun_nhi_cau', inheritPercent: 0.50, ttl: 5, traits: ['heal_self_0_10', 'periodic_taunt'], basicDealsDamage: false, tag: 'faun_beast' }
+                      ],
+                      limit: 1,
+                      uniquePerType: true
+                  },
+                  summonPool: [
+                      { id: 'faun_tieu_hac', inheritPercent: 0.50, ttl: 5, traits: ['pierce_arm_0_10'], tag: 'faun_beast' },
+                      { id: 'faun_tieu_bach', inheritPercent: 0.50, ttl: 5, traits: ['bonus_damage_0_05'], tag: 'faun_beast' },
+                      { id: 'faun_tieu_hoang', inheritPercent: 0.50, ttl: 5, traits: ['on_death_heal_faun_0_50'], tag: 'faun_beast' },
+                      { id: 'faun_tieu_bat_diem', inheritPercent: 0.50, ttl: 5, traits: ['heal_allies_0_30'], basicDealsDamage: false, tag: 'faun_beast' },
+                      { id: 'faun_nhi_cau', inheritPercent: 0.50, ttl: 5, traits: ['heal_self_0_10', 'periodic_taunt'], basicDealsDamage: false, tag: 'faun_beast' }
+                  ],
+                  limit: 1,
+                  uniquePerType: true,
+                  notes: 'Triệu hồi ngẫu nhiên 1 thú trong 5 loại, mỗi loại tồn tại tối đa 5 lượt và không trùng lặp.'
+              }),
+              talent: asUnknownRecord({
+                  name: 'Vạn Thú Đồng Hưởng',
+                  perSummonStats: { HP: 0.03, ATK: 0.03, WIL: 0.03, ARM: 0.03, RES: 0.03, AEregen: 0.03, AEmax: 0.03 },
+                  maxStacks: 5
+              }),
+              technique: null,
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'summon_synergy',
+                      name: 'Vạn Thú Đồng Hưởng',
+                      when: 'onSummonStateChange',
+                      effect: 'scalePerSummon',
+                      params: { perSummonStats: { HP: 0.03, ATK: 0.03, WIL: 0.03, ARM: 0.03, RES: 0.03, AEregen: 0.03, AEmax: 0.03 }, maxStacks: 5 }
+                  },
+                  {
+                      id: 'faun_beast_resist',
+                      name: 'Đồng Bộ Thú Linh',
+                      when: 'onDamageTaken',
+                      effect: 'reduceDamageFromTag',
+                      params: { tag: 'faun_beast', amount: 0.20 }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
+                  { id: 'summon_limitations', text: 'Không thể tồn tại hai thú cùng loại; triệu hồi mới sẽ thay thế thú cũ.' },
+                  { id: 'rage_cap', text: 'Thanh nộ tối đa của Faun là 85.' }
+              ])
+          }
+      },
+      {
+          id: 'basil_thorne', name: 'Basil Thorne', class: 'Tanker', rank: 'SR',
+          mods: { HP: 0.08, ARM: 0.08, RES: 0.06 },
+          kit: {
+              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+              basic: asUnknownRecord({
+                  name: 'Đánh Thường',
+                  tags: ['single-target'],
+                  damageMultiplier: 1.00,
+                  notes: 'Đâm gai gây 100% ATK + WIL lên 1 địch.'
+              }),
+              skills: asUnknownRecordArray([
+                  {
+                      key: 'skill1',
+                      name: 'Chiết Luyện Độc Tích',
+                      cost: { aether: 30 },
+                      convertDebuff: { id: 'doc', stat: 'HP', amountPerStack: 0.015 },
+                      removeDebuff: { id: 'doc', scope: 'all' },
+                      notes: 'Mỗi stack Độc trên kẻ địch tăng 1,5% Max HP cho Basil rồi xóa toàn bộ Độc.'
+                  },
+                  {
+                      key: 'skill2',
+                      name: 'Khế Ước Gai Huyết',
+                      cost: { aether: 25 },
+                      duration: 2,
+                      sacrificeMaxHPPercent: 0.10,
+                      reflectDamage: 0.30,
+                      notes: 'Giảm 10% Max HP thực để nhận hiệu ứng phản sát thương trong 2 lượt.'
+                  },
+                  {
+                      key: 'skill3',
+                      name: 'Song Tiêm Trảm',
+                      cost: { aether: 20 },
+                      countsAsBasic: true,
+                      hits: 2,
+                      damageMultiplier: 1.00,
+                      tags: ['multi-hit'],
+                      notes: 'Gây 2 đòn đánh thường liên tiếp lên cùng mục tiêu.'
+                  }
+              ]),
+              ult: asUnknownRecord({
+                  type: 'fortify',
+                  tags: ['taunt'],
+                  duration: 2,
+                  taunt: true,
+                  buffStats: { ARM: 0.20, RES: 0.20 },
+                  notes: 'Pháo Đài Gai Đen: nhận Khiêu Khích 2 lượt và tăng 20% ARM/RES trong thời gian này.'
+              }),
+              talent: asUnknownRecord({
+                  name: 'Gai Độc',
+                  mark: { id: 'doc', maxStacks: 10, purgeable: true }
+              }),
+              technique: null,
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'toxic_thorns',
+                      name: 'Gai Độc',
+                      when: 'onHitByEnemy',
+                      effect: 'applyDebuff',
+                      params: { id: 'doc', stacks: 1, maxStacksPerTarget: 10, perTurnLimit: 1 }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
+                  { id: 'poison_cap', text: 'Mỗi kẻ địch chỉ nhận tối đa 1 stack Độc từ nội tại mỗi lượt.' },
+                  { id: 'reflect_cost', text: 'Khế Ước Gai Huyết trừ Max HP thật, khiên không chặn được chi phí.' }
+              ])
+          }
+      },
+      {
+          id: 'mo_da', name: 'Mộ Dạ', class: 'Warrior', rank: 'SSR',
+          mods: { ATK: 0.10, WIL: 0.10 },
+          kit: {
+              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+              basic: asUnknownRecord({
+                  name: 'Đánh Thường',
+                  tags: ['single-target']
+              }),
+              skills: asUnknownRecordArray([
+                  {
+                      key: 'skill1',
+                      name: 'U Trào Tụ Lực',
+                      cost: { aether: 20 },
+                      duration: 3,
+                      buffStats: { ATK: 0.10, WIL: 0.10 },
+                      maxStacks: 3
+                  },
+                  {
+                      key: 'skill2',
+                      name: 'Huyết Tế Cuồng Khí',
+                      cost: { aether: 15 },
+                      hpTradePercentCurrent: 0.35,
+                      duration: 3,
+                      buffStats: { ATK: 0.25, WIL: 0.25 },
+                      maxStacks: 2,
+                      notes: 'Hiến 35% HP hiện có (không giảm trần), cộng dồn tối đa 2 lần nếu tái kích hoạt khi hiệu ứng còn.'
+                  },
+                  {
+                      key: 'skill3',
+                      name: 'Mộ Vực Trảm',
+                      cost: { aether: 15 },
+                      countsAsBasic: true,
+                      damageMultiplier: 1.50
+                  }
+              ]),
+              ult: asUnknownRecord({
+                  type: 'executioner',
+                  countsAsBasic: true,
+                  untargetable: { singleTargetOnly: true, turns: 2 },
+                  pierce: { ARM: 0.30, RES: 0.30 },
+                  damageMultiplier: 2.00,
+                  target: 'single',
+                  buffs: [{ id: 'bat_khuat', turns: 1 }, { id: 'tan_sat', turns: 2 }],
+                  notes: 'Gây 200% sát thương hỗn hợp lên một mục tiêu, bỏ qua 30% ARM/RES và nhận hiệu ứng Bất Khuất + Tàn Sát; miễn bị chỉ định bởi đòn đơn trong 2 lượt.'
+              }),
+              talent: asUnknownRecord({
+                  name: 'Dạ Mộ Nhị Cực',
+                  conditional: {
+                      ifHPAbove: 0.70,
+                      stats: { WIL: 0.10 },
+                      elseStats: { ARM: 0.05, RES: 0.05 }
+                  }
+              }),
+              technique: null,
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'night_duality',
+                      name: 'Dạ Mộ Nhị Cực',
+                      when: 'onTurnStart',
+                      effect: 'conditionalBuff',
+                      params: { ifHPgt: 0.70, WIL: 0.10, elseARM: 0.05, elseRES: 0.05, purgeable: false }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
+                  { id: 'blood_trade', text: 'Huyết Tế Cuồng Khí không thể tự sát và chỉ tiêu hao HP hiện có.' },
+                  { id: 'sleep_proof', text: 'Trong Tàn Sát, Mộ Dạ vẫn có thể thực thi đòn đánh thường dù đang không thể bị chọn bởi đòn đơn.' }
+              ])
+          }
+      },
+      {
+          id: 'ngao_binh', name: 'Ngao Bính', class: 'Warrior', rank: 'UR',
+          mods: { HP: 0.10, ATK: 0.10 },
+          kit: {
+              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, form: 'au_long' }),
+              basic: asUnknownRecord({
+                  name: 'Đánh Thường',
+                  tags: ['single-target', 'form-scaling'],
+                  hits: 1,
+                  piercePercent: 0.02,
+                  damageModifiersByForm: {
+                      au_long: { bonus: 0 },
+                      thanh_nien: { bonus: 0.20 },
+                      truong_thanh: { bonus: 0.30 },
+                      long_than: { bonus: 0.40, splash: 0.40 }
+                  }
+              }),
+              skills: asUnknownRecordArray([
+                  {
+                      key: 'skill1',
+                      name: 'Long Trảo Song Trảm',
+                      cost: { aether: 25 },
+                      countsAsBasic: true,
+                      hits: 2,
+                      damageMultiplier: 1.00
+                  },
+                  {
+                      key: 'skill2',
+                      name: 'Long Huyết Phẫn Viêm',
+                      cost: { aether: 25 },
+                      hpTradePercentMaxHP: 0.25,
+                      duration: 3,
+                      selfDebuff: { RES: -0.10, ARM: -0.10 },
+                      basicDamageBonus: 0.50,
+                      notes: 'Thiêu đốt 25% Max HP bản thân; giảm 10% ARM/RES và tăng 50% sát thương đòn đánh thường trong 3 lượt.'
+                  },
+                  {
+                      key: 'skill3',
+                      name: 'Long Ảnh Truy Kích',
+                      cost: { aether: 25 },
+                      countsAsBasic: false,
+                      damageMultiplier: 1.40,
+                      splash: { ratioByForm: { au_long: 0.30, thanh_nien: 0.40, truong_thanh: 0.50, long_than: 0.60 }, maxTargets: 2 }
+                  }
+              ]),
+              ult: asUnknownRecord({
+                  type: 'evolution',
+                  sequence: [
+                      {
+                          form: 'thanh_nien',
+                          cocoonTurns: 1,
+                          reduceDamage: 0.40,
+                          postBuffs: { piercePercent: 0.05, reduceDamageTaken: 0.11, agi: 0.10, hpRegenPercentMaxHP: 0.01 }
+                      },
+                      {
+                          form: 'truong_thanh',
+                          cocoonTurns: 1,
+                          reduceDamage: 0.50,
+                          postBuffs: { piercePercent: 0.09, reduceDamageTaken: 0.15, agi: 0.15, hpRegenPercentMaxHP: 0.017 }
+                      },
+                      {
+                          form: 'long_than',
+                          cocoonTurns: 1,
+                          reduceDamage: 0.60,
+                          postBuffs: { piercePercent: 0.14, reduceDamageTaken: 0.22, agi: 0.20, hpRegenPercentMaxHP: 0.03, basicTransforms: 'long_tuc' }
+                      }
+                  ],
+                  rageBonusPerBreak: 15,
+                  notes: 'Mỗi lần dùng Tuyệt kỹ, Ngao Bính hóa trứng 1 lượt (không thể tấn công, giảm sát thương nhận theo cấp) rồi phá xác nâng trạng thái. Sau khi phá xác nhận thêm nộ để duy trì nhịp tiến hóa.'
+              }),
+              talent: asUnknownRecord({
+                  name: 'Long Cốt Bất Diệt',
+                  forms: {
+                      au_long: { piercePercent: 0.02, damageTakenReduce: 0.08, agi: 0.05, hpRegenPercentMaxHP: 0.005 },
+                      thanh_nien: { piercePercent: 0.05, damageTakenReduce: 0.11, agi: 0.10, hpRegenPercentMaxHP: 0.01 },
+                      truong_thanh: { piercePercent: 0.09, damageTakenReduce: 0.15, agi: 0.15, hpRegenPercentMaxHP: 0.017 },
+                      long_than: { piercePercent: 0.14, damageTakenReduce: 0.22, agi: 0.20, hpRegenPercentMaxHP: 0.03 }
+                  }
+              }),
+              technique: null,
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'dragon_form_scaling',
+                      name: 'Long Cốt Bất Diệt',
+                      when: 'onTurnEnd',
+                      effect: 'applyFormRegen',
+                      params: {
+                          forms: {
+                              au_long: 0.005,
+                              thanh_nien: 0.01,
+                              truong_thanh: 0.017,
+                              long_than: 0.03
+                          }
+                      }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
+                  { id: 'form_progression', text: 'Khởi đầu ở Ấu Long; mỗi lần Tam Chuyển Long Thai nâng trạng thái theo thứ tự và không thể đảo ngược.' },
+                  { id: 'egg_turn', text: 'Trong lượt Hoá Trứng, Ngao Bính không thể tấn công nhưng giảm sát thương nhận tùy cấp.' }
+              ])
+          }
+      },
+      {
+          id: 'lau_khac_ma_chu', name: 'Lậu Khắc Ma Chủ', class: 'Mage', rank: 'Prime',
+          mods: { WIL: 0.12, AEregen: 0.08 },
+          kit: {
+              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+              basic: asUnknownRecord({
+                  name: 'Đánh Thường',
+                  tags: ['single-target', 'mark-builder'],
+                  debuff: { id: 'sa_an', stacks: 1, maxStacks: 5, purgeable: false }
+              }),
+              skills: asUnknownRecordArray([
+                  {
+                      key: 'skill1',
+                      name: 'Hắc Sa Song Chưởng',
+                      cost: { aether: 25 },
+                      hits: 2,
+                      countsAsBasic: true,
+                      damageMultiplier: 1.00,
+                      targets: 'randomEnemies',
+                      notes: 'Tung hai chưởng vào hai mục tiêu ngẫu nhiên, mỗi hit 100% sát thương đòn đánh thường và đặt Sa Ấn.'
+                  },
+                  {
+                      key: 'skill2',
+                      name: 'Trùng Ấn Lậu Khắc',
+                      cost: { aether: 25 },
+                      duration: 3,
+                      delayTurns: 1,
+                      markBonus: { id: 'sa_an', extraStacks: 1 },
+                      notes: 'Bắt đầu từ lượt kế tiếp trong 3 lượt, mỗi đòn đánh thường/kỹ năng áp 2 tầng Sa Ấn thay vì 1.'
+                  },
+                  {
+                      key: 'skill3',
+                      name: 'Tam Luân Tán Chưởng',
+                      cost: { aether: 35 },
+                      hits: 3,
+                      countsAsBasic: false,
+                      damageMultiplier: 1.00,
+                      targets: 'randomEnemies',
+                      notes: 'Gây 3 hit liên tiếp vào 3 kẻ địch ngẫu nhiên, mỗi hit 100% sát thương đòn đánh thường và đặt Sa Ấn.'
+                  }
+              ]),
+              ult: asUnknownRecord({
+                  type: 'time-rift',
+                  randomOutcome: 0.5,
+                  outcomes: {
+                      nghich: {
+                          rewindAllies: 1,
+                          notes: 'Nghịch Lưu: đồng minh trở về trạng thái của 1 lượt trước (vị trí, HP, buff/debuff; đơn vị mới triệu hồi trong lượt hiện tại quay về deck và hoàn cost).'
+                      },
+                      thuan: {
+                          grantExtraBasic: true,
+                          notes: 'Thuận Lưu: sau khi thi triển, mọi đồng minh lập tức thực thi 1 lượt đánh thường.'
+                      }
+                  },
+                  notes: 'Thiên Mệnh Lậu Khắc Ma Kinh: thời sa chọn ngẫu nhiên Nghịch Lưu hoặc Thuận Lưu (50%).'
+              }),
+              talent: asUnknownRecord({
+                  name: 'Lậu Ấn Trói Thời',
+                  mark: {
+                      id: 'sa_an',
+                      kind: 'mark',
+                      maxStacks: 5,
+                      purgeable: false,
+                      onCap: { skipTurn: 1 }
+                  }
+              }),
+              technique: null,
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'sa_an_apply',
+                      name: 'Lậu Ấn Trói Thời',
+                      when: 'onAbilityHit',
+                      effect: 'placeMark',
+                      params: { id: 'sa_an', stacks: 1, maxStacks: 5, purgeable: false, skipTurnOnCap: true }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
+                  { id: 'sa_an_reset', text: 'Sa Ấn tồn tại tới hết trận trừ khi bị thanh tẩy hoặc đạt 5 tầng gây bỏ lượt và đặt lại về 0.' },
+                  { id: 'time_rift', text: 'Thiên Mệnh Lậu Khắc Ma Kinh chọn ngẫu nhiên Nghịch Lưu hoặc Thuận Lưu với xác suất 50%.' }
+              ])
+          }
+      },
+      {
           id: 'phe', name: 'Phệ', class: 'Mage', rank: 'Prime',
           mods: { WIL: 0.10, AEregen: 0.10 }, // 20% tổng
           kit: {
@@ -1875,7 +3365,13 @@ __define('./catalog.ts', (exports, module, __require) => {
                   name: 'Đánh Thường',
                   tags: ['single-target', 'lifesteal', 'mark'],
                   lifesteal: 0.10,
-                  mark: { id: 'mark_devour', maxStacks: 3, ttlTurns: 3 }
+                  mark: {
+                      id: 'mark_devour',
+                      maxStacks: 3,
+                      ttlTurns: 3,
+                      perTurnLimit: 2,
+                      explosion: { trigger: 'targetTurnStart', scaleWIL: 0.5 }
+                  }
               }),
               skills: asUnknownRecordArray([
                   {
@@ -1885,44 +3381,50 @@ __define('./catalog.ts', (exports, module, __require) => {
                       hits: 2,
                       countsAsBasic: true,
                       targets: 'randomEnemies',
-                      notes: 'Mỗi hit làm mới thời hạn Phệ Ấn.'
+                      damageMultiplier: 1.30,
+                      notes: 'Mỗi hit tính là đòn đánh thường, làm mới thời hạn Phệ Ấn và tôn trọng trần 2 Ấn / mục tiêu / lượt.'
                   },
                   {
                       key: 'skill2',
                       name: 'Huyết Chướng',
-                      cost: { aether: 25 },
+                      cost: { aether: 20 },
                       duration: 2,
                       reduceDamage: 0.30,
                       healPercentMaxHPPerTurn: 0.15,
-                      untargetable: true
+                      untargetable: { singleTargetOnly: true },
+                      damageDealtModifier: -0.30,
+                      notes: 'Giảm 30% sát thương gây ra trong thời gian hiệu lực và chỉ miễn khỏi việc bị chỉ định bởi đòn đơn mục tiêu.'
                   },
                   {
                       key: 'skill3',
                       name: 'Huyết Thệ',
-                      cost: { aether: 40 },
-                      duration: 5,
-                      link: { sharePercent: 0.5, maxLinks: 1 }
+                      cost: { aether: 35 },
+                      duration: 4,
+                      link: { sharePercent: 0.5, maxLinks: 1 },
+                      notes: 'Liên kết tự chấm dứt nếu mục tiêu rời sân; sát thương chuyển tiếp không thể bị chuyển lần hai.'
                   }
               ]),
               ult: asUnknownRecord({
                   type: 'drain',
                   countsAsBasic: true,
                   aoe: 'allEnemies',
-                  hpDrainPercentCurrent: 0.07,
-                  damageScaleWIL: 0.80,
-                  healSelfFromTotal: 0.40,
-                  healAlliesFromTotal: 0.30,
-                  overhealShieldCap: 1.0,
+                  hpDrainPercentCurrent: 0.08,
+                  damageScaleWIL: 0.65,
+                  healSelfFromTotal: 0.35,
+                  healAlliesFromTotal: { percent: 0.25, targets: 2 },
+                  overhealShieldCap: 0.6,
                   selfBuff: { stat: 'WIL', amount: 0.20, turns: 2 },
                   marksPerTarget: 1,
-                  notes: 'Không thể né; mỗi mục tiêu nhận thêm 1 Phệ Ấn.'
+                  notes: 'Không thể né; mỗi mục tiêu nhận thêm 1 Phệ Ấn (tuân thủ giới hạn 2 Ấn mỗi lượt).'
               }),
               talent: asUnknownRecord({
                   name: 'Phệ Ấn',
                   id: 'mark_devour',
                   maxStacks: 3,
                   ttlTurns: 3,
-                  explosion: { scaleWIL: 0.50 },
+                  perTurnLimit: 2,
+                  explosion: { scaleWIL: 0.50, trigger: 'targetTurnStart' },
+                  decayIfNoRefreshTurns: 3,
                   blessing: { hpMax: 0.15, hpRegen: 0.50 }
               }),
               technique: null,
@@ -1930,15 +3432,22 @@ __define('./catalog.ts', (exports, module, __require) => {
                   {
                       id: 'mark_devour',
                       name: 'Phệ Ấn',
-                      when: 'onBasicHit',
+                      when: 'onAbilityHit',
                       effect: 'placeMark',
-                      params: { stacksToExplode: 3, ttlTurns: 3, dmgFromWIL: 0.5, purgeable: false }
+                      params: {
+                          stacksToExplode: 3,
+                          ttlTurns: 3,
+                          dmgFromWIL: 0.5,
+                          perTargetPerTurn: 2,
+                          purgeable: false,
+                          decayIfNoRefreshTurns: 3
+                      }
                   }
               ]),
               traits: asUnknownRecordArray([
-                  { id: 'mark_cap', text: 'Phệ Ấn tối đa 3 tầng và tự kích nổ vào lượt của mục tiêu.' },
-                  { id: 'overheal_cap', text: 'Hút máu dư chuyển thành Giáp Máu tối đa bằng 100% Máu tối đa.' },
-                  { id: 'link_limit', text: 'Chỉ duy trì 1 liên kết Huyết Thệ cùng lúc.' }
+                  { id: 'mark_cap', text: 'Mỗi mục tiêu chỉ nhận tối đa 2 Phệ Ấn mỗi lượt; đạt 3 tầng sẽ nổ ở đầu lượt của chính mục tiêu.' },
+                  { id: 'overheal_cap', text: 'Hút máu dư chuyển thành Giáp Máu với trần +60% Máu tối đa.' },
+                  { id: 'link_limit', text: 'Chỉ duy trì 1 liên kết Huyết Thệ cùng lúc; liên kết tự hủy khi mục tiêu rời sân.' }
               ])
           }
       },
@@ -1974,7 +3483,8 @@ __define('./catalog.ts', (exports, module, __require) => {
                       cost: { aether: 25 },
                       delayTurns: 1,
                       duration: 3,
-                      buffStats: { ATK: 0.20, WIL: 0.20 }
+                      buffStats: { ATK: 0.23, WIL: 0.23 },
+                      notes: 'Hiệu lực bắt đầu từ lượt kế tiếp và dựa trên chỉ số hiện có khi kích hoạt.'
                   }
               ]),
               ult: asUnknownRecord({
@@ -2007,9 +3517,9 @@ __define('./catalog.ts', (exports, module, __require) => {
                   }
               ]),
               traits: asUnknownRecordArray([
-                  { id: 'stance_unique', text: 'Ngũ Kiếm Huyền Ấn chỉ chọn 1 trạng thái cho tới hết trận.' },
-                  { id: 'refine_delay', text: 'Kiếm Ý Tinh Luyện kích hoạt sau 1 lượt trì hoãn.' },
-                  { id: 'ult_scaling', text: 'Mỗi lần dùng Vạn Kiếm Quy Tông cộng vĩnh viễn +5% ATK/WIL (không giới hạn).' }
+                  { id: 'stance_unique', text: 'Ngũ Kiếm Huyền Ấn chỉ duy trì một Ấn Kiếm duy nhất tới hết trận.' },
+                  { id: 'refine_delay', text: 'Kiếm Ý Tinh Luyện kích hoạt sau 1 lượt trì hoãn dựa trên chỉ số hiện có.' },
+                  { id: 'ult_scaling', text: 'Mỗi lần dùng Vạn Kiếm Quy Tông cộng vĩnh viễn +5% ATK/WIL dựa trên chỉ số khởi trận.' }
               ])
           }
       },
@@ -2032,7 +3542,9 @@ __define('./catalog.ts', (exports, module, __require) => {
                       hits: 3,
                       countsAsBasic: true,
                       targets: 'randomEnemies',
-                      bonusIfAdjacent: 0.10
+                      damageMultiplier: 1.10,
+                      bonusIfAdjacent: 0.10,
+                      notes: 'Được tính là đòn đánh thường; nếu 3 mục tiêu đứng liền kề sẽ nhận thêm 10% sát thương.'
                   },
                   {
                       key: 'skill2',
@@ -2040,7 +3552,9 @@ __define('./catalog.ts', (exports, module, __require) => {
                       cost: { aether: 35 },
                       hpTradePercent: 0.05,
                       hits: 5,
-                      targets: 'randomEnemies'
+                      targets: 'randomEnemies',
+                      damageMultiplier: 1.30,
+                      notes: 'Không tính là đòn đánh thường; vẫn kích hoạt thiêu đốt HP và giữ giới hạn tối thiểu 1 HP.'
                   },
                   {
                       key: 'skill3',
@@ -2059,7 +3573,7 @@ __define('./catalog.ts', (exports, module, __require) => {
                   reduceDmg: 0.30,
                   duration: 2,
                   appliesDebuff: { stat: 'SPD', amount: -0.02, maxStacks: 5 },
-                  notes: 'Không tự sát, tối thiểu còn 1 HP.'
+                  notes: 'Không tự sát, tối thiểu còn 1 HP; mỗi hit tính là đòn đánh thường và cộng tầng giảm SPD.'
               }),
               talent: asUnknownRecord({
                   name: 'Song Thể Lôi Đạo',
@@ -2103,7 +3617,8 @@ __define('./catalog.ts', (exports, module, __require) => {
                       cost: { aether: 25 },
                       hits: 3,
                       countsAsBasic: true,
-                      targets: 'randomEnemies'
+                      targets: 'randomEnemies',
+                      notes: 'Mỗi hit cộng 1 tầng Mê Hoặc lên mục tiêu trúng đòn.'
                   },
                   {
                       key: 'skill2',
@@ -2111,7 +3626,8 @@ __define('./catalog.ts', (exports, module, __require) => {
                       cost: { aether: 35 },
                       hits: 5,
                       countsAsBasic: true,
-                      targets: 'randomEnemies'
+                      targets: 'randomEnemies',
+                      notes: 'Mỗi hit cộng 1 tầng Mê Hoặc lên mục tiêu trúng đòn.'
                   },
                   {
                       key: 'skill3',
@@ -2137,7 +3653,7 @@ __define('./catalog.ts', (exports, module, __require) => {
                   }
               ]),
               traits: asUnknownRecordArray([
-                  { id: 'me_hoac_limit', text: 'Tối đa 4 tầng Mê Hoặc, kích hoạt ngủ trong 1 lượt rồi đặt lại.' },
+                  { id: 'me_hoac_limit', text: 'Tối đa 4 tầng Mê Hoặc, kích hoạt ngủ trong 1 lượt rồi đặt lại (không thể bị xoá trước khi kích hoạt).' },
                   { id: 'boss_sleep_half', text: 'Boss PvE chỉ ngủ nửa thời gian (làm tròn xuống).' }
               ])
           }
@@ -2176,7 +3692,7 @@ __define('./catalog.ts', (exports, module, __require) => {
                       name: 'Phục Tế Khôi Minh',
                       when: 'onActionEnd',
                       effect: 'gainRES%',
-                      params: { amount: 0.01, stack: true, purgeable: false }
+                      params: { amount: 0.03, stack: true, purgeable: false }
                   }
               ]),
               traits: asUnknownRecordArray([
@@ -2245,7 +3761,7 @@ __define('./catalog.ts', (exports, module, __require) => {
               talent: asUnknownRecord({
                   name: 'Đại Ca Đầu Đàn',
                   perMinionBasicBonus: 0.15,
-                  onMinionDeath: { stats: { ATK: 0.05, WIL: 0.05 }, maxStacks: 3 }
+                  onMinionDeath: { stats: { ATK: 0.05, WIL: 0.05 }, maxStacks: null }
               }),
               technique: null,
               passives: asUnknownRecordArray([
@@ -2254,7 +3770,7 @@ __define('./catalog.ts', (exports, module, __require) => {
                       name: 'Đại Ca Đầu Đàn',
                       when: 'onBasicHit',
                       effect: 'gainBonus',
-                      params: { perMinion: 0.02 }
+                      params: { perMinion: 0.15 }
                   }
               ]),
               traits: asUnknownRecordArray([
@@ -4123,6 +5639,752 @@ __define('./data/roster-preview.ts', (exports, module, __require) => {
 __define('./data/skills.config.ts', (exports, module, __require) => {
   const skillsConfig = [
       {
+          unitId: 'diep_minh',
+          basic: {
+              name: 'Thảo Kiếm Đoạt',
+              type: 'basic',
+              tags: ['single-target', 'seed'],
+              damage: { multiplier: 1.0 },
+              marks: [{ id: 'thuc_mach', stacks: 1, maxStacks: 3, purgeable: false }],
+              description: 'Vung kiếm lá gây sát thương 100% ATK+WIL và gieo 1 tầng Thực Mạch (tối đa 3, không thể thanh tẩy).'
+          },
+          skills: [
+              {
+                  key: 'skill1',
+                  name: 'Vệ Mộc Trấn Hộ',
+                  type: 'active',
+                  cost: { aether: 20 },
+                  targets: 'ally',
+                  shields: [{ percentMaxHP: 0.25, duration: { turns: 2 } }],
+                  heals: [{ percentMaxHP: 0.06 }],
+                  description: 'Gieo mộc khí thành khiên, hồi 6% Max HP và tạo lá chắn bằng 25% Max HP cho một đồng minh trong 2 lượt.'
+              },
+              {
+                  key: 'skill2',
+                  name: 'Thực Linh Dẫn Lộ',
+                  type: 'active',
+                  cost: { aether: 25 },
+                  duration: { turns: 3 },
+                  field: { id: 'thuc_linh_tran', effects: [{ regenPercentMaxHP: 0.04 }, { stat: 'RES', amount: 0.12 }] },
+                  description: 'Trải kết giới thực linh 3 lượt: mọi đồng minh trong trận hồi 4% Max HP mỗi lượt và nhận +12% RES.'
+              },
+              {
+                  key: 'skill3',
+                  name: 'Liên Đằng Phong Tỏa',
+                  type: 'active',
+                  cost: { aether: 30 },
+                  tags: ['line', 'control'],
+                  damage: { multiplier: 1.10 },
+                  crowdControl: { type: 'root', turns: 1 },
+                  marks: [{ id: 'thuc_mach', stacks: 1, targets: 2, transfer: true }],
+                  description: 'Tạo dây leo quất thẳng, gây 110% sát thương, trói chân 1 lượt và lan 1 tầng Thực Mạch sang tối đa 2 kẻ địch khác.'
+              }
+          ],
+          ult: {
+              name: 'Thiên Diệp Bảo Hộ',
+              type: 'ultimate',
+              tags: ['field', 'support'],
+              duration: { turns: 3 },
+              description: 'Gọi thiên diệp che chở 3 lượt: đồng minh nhận hồi 5% Max HP và lá chắn 12% Max HP mỗi lượt; kẻ địch lần đầu bước vào bị trói 1 lượt và tăng 12% sát thương gánh chịu.'
+          },
+          talent: {
+              name: 'Lâm Ý Vĩnh Thịnh',
+              type: 'talent',
+              maxStacks: 3,
+              immobilizeOnCap: { turns: 1 },
+              description: 'Thực Mạch đạt 3 tầng trói mục tiêu 1 lượt. Aura của Diệp Minh tăng 10% hiệu quả lá chắn và hồi 2% Max HP mỗi lượt cho đồng minh lân cận.'
+          },
+          technique: null,
+          notes: [
+              'Aura mặc định hồi 2% Max HP mỗi lượt cho đồng minh đứng cạnh.',
+              'Thực Linh Dẫn Lộ cộng dồn với aura cơ bản nhưng không nhân đôi hồi máu.'
+          ]
+      },
+      {
+          unitId: 'nguyet_san',
+          basic: {
+              name: 'Ảnh Nguyệt Đoạn',
+              type: 'basic',
+              tags: ['single-target', 'blink'],
+              damage: { multiplier: 1.05 },
+              reposition: { type: 'behindTarget' },
+              description: 'Dịch chuyển ra sau mục tiêu, chém 105% sát thương rồi quay lại vị trí ban đầu.'
+          },
+          skills: [
+              {
+                  key: 'skill1',
+                  name: 'Huyền Nguyệt Ẩn Tích',
+                  type: 'active',
+                  cost: { aether: 25 },
+                  duration: { turns: 2 },
+                  stealth: { turns: 2, breakOnAttack: false },
+                  buffs: [{ effect: 'dodgeAll', amount: 0.30 }],
+                  description: 'Ẩn mình 2 lượt, tăng 30% né mọi đòn; không bị lộ khi dùng kỹ năng dịch chuyển.'
+              },
+              {
+                  key: 'skill2',
+                  name: 'Nguyệt Ảnh Hoán Thân',
+                  type: 'active',
+                  cost: { aether: 30 },
+                  teleport: { range: 'anyShadow', leaveShadow: true },
+                  buffs: [{ stats: { SPD: 0.15, PER: 0.10 }, duration: { turns: 2 } }],
+                  description: 'Đặt dấu bóng tại chỗ và dịch chuyển tới vị trí đã chọn, +15% SPD, +10% PER trong 2 lượt.'
+              },
+              {
+                  key: 'skill3',
+                  name: 'Nguyệt Diệt Ảnh Phạt',
+                  type: 'active',
+                  cost: { aether: 35 },
+                  tags: ['aoe', 'burst'],
+                  damage: { multiplier: 1.60 },
+                  executes: { belowPercentHP: 0.25 },
+                  detonateMarks: [{ id: 'nguyet_an', bonusDamage: 0.30 }],
+                  description: 'Kích nổ vùng bóng quanh dấu ấn, gây 160% sát thương; mục tiêu dưới 25% HP bị kết liễu, mỗi Nguyệt Ấn kích hoạt thêm 30% sát thương.'
+              }
+          ],
+          ult: {
+              name: 'Huyết Nguyệt Định Mệnh',
+              type: 'ultimate',
+              tags: ['blink', 'execute'],
+              damage: { multiplier: 3.20 },
+              pierce: { arm: 0.30, res: 0.30 },
+              description: 'Lướt qua bóng tối đến kẻ có Nguyệt Ấn gần nhất, gây 320% sát thương xuyên 30% ARM/RES, chắc chắn chí mạng và hồi trạng thái ẩn thân.'
+          },
+          talent: {
+              name: 'Nguyệt Ảnh Ấn',
+              type: 'talent',
+              maxStacks: 5,
+              decay: { turns: 2 },
+              description: 'Đòn đánh tạo Nguyệt Ấn (tối đa 5). Có thể kích hoạt “Quay Về Bóng” mỗi 2 lượt để trở lại dấu bóng gần nhất.'
+          },
+          technique: null,
+          notes: [
+              'Trúng mục tiêu không có Nguyệt Ấn vẫn ưu tiên đặt 1 tầng trước khi tính thiệt hại của tuyệt kỹ.',
+              'Blink của ult ưu tiên bóng gần nhất, nếu không có sẽ chọn vị trí hiện tại.'
+          ]
+      },
+      {
+          unitId: 'trung_lam',
+          basic: {
+              name: 'Sừng Lâm Trảm',
+              type: 'basic',
+              tags: ['single-target', 'beast'],
+              damage: { multiplier: 1.10 },
+              knockback: 1,
+              description: 'Húc bằng sừng lá gây 110% sát thương và đẩy mục tiêu lùi 1 ô nếu có khoảng trống.'
+          },
+          skills: [
+              {
+                  key: 'skill1',
+                  name: 'Hống Lâm Triệu Tập',
+                  type: 'active',
+                  cost: { aether: 25 },
+                  summon: {
+                      id: 'lam_ho_ve',
+                      inherit: { HP: 0.60, ATK: 0.60, ARM: 0.20 },
+                      ttl: { turns: 4 },
+                      limit: 1,
+                      replace: 'refresh'
+                  },
+                  description: 'Triệu hồi Lâm Hộ Vệ tồn tại 4 lượt với 60% chỉ số của Trùng Lâm và +20% ARM; triệu hồi lại làm mới thời gian.'
+              },
+              {
+                  key: 'skill2',
+                  name: 'Giáp Gai Nguyên Sinh',
+                  type: 'active',
+                  cost: { aether: 20 },
+                  duration: { turns: 3 },
+                  buffs: [{ stats: { ARM: 0.25, RES: 0.15 } }],
+                  thorns: { percentDamage: 0.20 },
+                  appliesTo: 'self+summons',
+                  description: 'Phủ giáp gai lên bản thân và Lâm Hộ Vệ: +25% ARM, +15% RES và phản 20% sát thương cận chiến trong 3 lượt.'
+              },
+              {
+                  key: 'skill3',
+                  name: 'Sinh Lâm Hồi Sinh',
+                  type: 'active',
+                  cost: { aether: 30 },
+                  heals: [{ target: 'self', percentMaxHP: 0.18 }],
+                  revive: { summonId: 'lam_ho_ve' },
+                  buffs: [{ stats: { ATK: 0.12 }, duration: { turns: 2 }, appliesTo: 'self+summon' }],
+                  description: 'Hấp thụ aether rừng: hồi 18% Max HP, hồi sinh Lâm Hộ Vệ đã ngã gục và tăng 12% ATK cho cả hai trong 2 lượt.'
+              }
+          ],
+          ult: {
+              name: 'Vương Lâm Thú Khiếu',
+              type: 'ultimate',
+              tags: ['aoe', 'support'],
+              debuffs: [{ id: 'weaken', amount: 0.15, turns: 2 }, { id: 'slow', amount: 0.20, turns: 2 }],
+              summonBuffs: [{ id: 'lam_ho_ve', buffs: { damage: 0.25, lifesteal: 0.15 }, duration: { turns: 2 } }],
+              description: 'Gầm vang khiến toàn địch -15% sát thương, -20% SPD trong 2 lượt; Lâm Hộ Vệ được cường hóa +25% sát thương và 15% hút máu.'
+          },
+          talent: {
+              name: 'Lâm Uy Ngự Địa',
+              type: 'talent',
+              description: 'Trùng Lâm và Lâm Hộ Vệ chia sẻ 20% sát thương nhận vào. Đồng minh thuộc hệ tự nhiên nhận thêm 8% ATK khi cùng sân.'
+          },
+          technique: null,
+          notes: [
+              'Lâm Hộ Vệ được xem như summon hạng nặng, ưu tiên đỡ đòn khi cùng hàng với Trùng Lâm.',
+              'Các buff áp lên Trùng Lâm được snapshot cho Lâm Hộ Vệ khi được triệu hồi.'
+          ]
+      },
+      {
+          unitId: 'huyet_tich',
+          basic: {
+              name: 'Huyết Đoạt',
+              type: 'basic',
+              tags: ['single-target', 'drain'],
+              damage: { multiplier: 1.0 },
+              lifesteal: 0.15,
+              description: 'Rút huyết của địch, gây sát thương 100% và hút 15% lượng gây ra để tích hồ huyết.'
+          },
+          skills: [
+              {
+                  key: 'skill1',
+                  name: 'Huyết Trướng Bảo Hộ',
+                  type: 'active',
+                  cost: { aether: 25 },
+                  duration: { turns: 2 },
+                  shields: [{ target: 'self', percentMaxHP: 0.35 }],
+                  resource: { gain: { resourceId: 'blood_reserve', percentDamage: 0.30 } },
+                  description: 'Tạo màn huyết trong 2 lượt: nhận lá chắn 35% Max HP và chuyển 30% sát thương nhận vào thành Hồ Huyết.'
+              },
+              {
+                  key: 'skill2',
+                  name: 'Huyết Chú Phản Hồi',
+                  type: 'active',
+                  cost: { aether: 30 },
+                  duration: { turns: 3 },
+                  link: { sharePercent: 0.35, healPercentTransfer: 0.30 },
+                  description: 'Liên kết với một đồng minh 3 lượt: hấp thu 35% sát thương của họ và hồi lại 30% lượng chuyển tới Huyết Tịch.'
+              },
+              {
+                  key: 'skill3',
+                  name: 'Huyết Độc Triều',
+                  type: 'active',
+                  cost: { aether: 35 },
+                  tags: ['cone', 'poison'],
+                  damage: { multiplier: 1.40 },
+                  debuffs: [{ id: 'huyet_doc', stacks: 2, maxStacks: 6 }],
+                  description: 'Phóng máu độc hình nón, gây 140% sát thương và đặt 2 tầng Huyết Độc (tối đa 6) lên tất cả mục tiêu trúng.'
+              }
+          ],
+          ult: {
+              name: 'Huyết Tịch Chiến Vũ',
+              type: 'ultimate',
+              tags: ['aoe', 'drain'],
+              damage: { multiplier: 2.20 },
+              detonate: { id: 'huyet_doc', bonusPerStack: 0.12 },
+              heals: [{ target: 'lowestAllies', percentDamage: 0.30, count: 2 }],
+              description: 'Triệu hồi bão máu gây 220% sát thương toàn địch, mỗi tầng Huyết Độc nổ thêm 12% sát thương và chữa 30% tổng sát thương cho 2 đồng minh thấp HP nhất.'
+          },
+          talent: {
+              name: 'Nguyên Huyết Chi Chủ',
+              type: 'talent',
+              resource: { id: 'blood_reserve', max: 100 },
+              conversion: { per10: { healPercentMaxHP: 0.03, damageBonus: 0.04 } },
+              description: 'Tích Hồ Huyết tối đa 100. Tiêu hao mỗi 10 điểm khi tung tuyệt kỹ để tăng 4% sát thương và chữa 3% Max HP cho Huyết Tịch.'
+          },
+          technique: null,
+          notes: [
+              'Lượng sát thương hút được trước khi trừ lá chắn kẻ địch.',
+              'Huyết Độc có thể bị thanh tẩy bình thường.'
+          ]
+      },
+      {
+          unitId: 'khai_nguyen_tu',
+          basic: {
+              name: 'Pháp Trượng Khai Thiên',
+              type: 'basic',
+              tags: ['single-target', 'arcane'],
+              damage: { multiplier: 1.15 },
+              resource: { gain: { aether: 6 } },
+              description: 'Đánh phép 115% sát thương và hoàn lại 6 Aether nhờ chuyển hoá Nguyên Khí.'
+          },
+          skills: [
+              {
+                  key: 'skill1',
+                  name: 'Nguyên Môn Huyễn Giới',
+                  type: 'active',
+                  cost: { aether: 20 },
+                  teleport: { target: 'ally', range: 'any', cleanseDebuff: 1 },
+                  buffs: [{ stats: { RES: 0.15 }, duration: { turns: 2 } }],
+                  description: 'Mở cổng di chuyển đồng minh tới vị trí chỉ định, thanh tẩy 1 debuff và +15% RES trong 2 lượt.'
+              },
+              {
+                  key: 'skill2',
+                  name: 'Triệu Hoán Nguyên Khí',
+                  type: 'active',
+                  cost: { aether: 25 },
+                  summon: {
+                      id: 'nguyen_khi_thap',
+                      inherit: { WIL: 0.70 },
+                      ttl: { turns: 3 },
+                      limit: 1
+                  },
+                  description: 'Triệu hồi Nguyên Khí Tháp tồn tại 3 lượt với 70% WIL hiện tại, tăng sát thương phép của phe ta.'
+              },
+              {
+                  key: 'skill3',
+                  name: 'Huyễn Thuật Đa Tầng',
+                  type: 'active',
+                  cost: { aether: 35 },
+                  duration: { turns: 3 },
+                  stackingBuffs: [{ stats: { WIL: 0.08 }, trigger: 'turnEnd', maxStacks: 3 }],
+                  cooldown: 3,
+                  description: 'Duy trì vòng phép 3 lượt: mỗi lượt cuối tăng 8% WIL (tối đa 3 tầng). Tái sử dụng làm mới thời gian chứ không vượt mức cộng dồn.'
+              }
+          ],
+          ult: {
+              name: 'Khai Thiên Định Cực',
+              type: 'ultimate',
+              tags: ['control', 'support'],
+              description: 'Đóng băng thời gian 1 lượt địch, hoàn lại 30 Aether cho đội và khiến Nguyên Khí Tháp xuyên 25% RES trong thời gian hiệu lực.'
+          },
+          talent: {
+              name: 'Nguyên Chú Khai Thế',
+              type: 'talent',
+              charges: 2,
+              recharge: 1,
+              description: 'Bắt đầu trận với 2 Ấn Cổng. Mỗi lượt hồi 1 Ấn (tối đa 3) giúp kỹ năng dịch chuyển hoàn lại thêm 5 Aether khi sử dụng.'
+          },
+          technique: null,
+          notes: [
+              'Ult bỏ qua miễn khống thời gian nhưng không chồng với các hiệu ứng skip khác.',
+              'Triệu hồi Nguyên Khí Tháp không chiếm slot nếu đã có cổng mở (tự ưu tiên hàng sau).'
+          ]
+      },
+      {
+          unitId: 'thien_luu',
+          basic: {
+              name: 'Thiên Kiếm Thuần Quang',
+              type: 'basic',
+              tags: ['single-target', 'flying'],
+              damage: { multiplier: 1.05 },
+              description: 'Phóng kiếm khí tinh khiết từ trên cao, gây 105% sát thương. Nếu mục tiêu chịu ảnh hưởng thời tiết, cộng thêm 15% chính xác.'
+          },
+          skills: [
+              {
+                  key: 'skill1',
+                  name: 'Phong Vũ Dẫn Hướng',
+                  type: 'active',
+                  cost: { aether: 20 },
+                  duration: { turns: 2 },
+                  weather: 'storm',
+                  buffs: [{ stats: { SPD: 0.12 } }],
+                  description: 'Điều chỉnh khí tượng sang trạng thái Bão trong 2 lượt và tăng 12% SPD cho Thiên Lưu.'
+              },
+              {
+                  key: 'skill2',
+                  name: 'Thiên Quang Liên Xạ',
+                  type: 'active',
+                  cost: { aether: 25 },
+                  hits: 3,
+                  targets: 'randomEnemies',
+                  damage: { multiplier: 0.75 },
+                  bonusDamage: { condition: 'storm', amount: 0.20 },
+                  description: 'Bắn ba tia kiếm quang ngẫu nhiên, mỗi tia 75% sát thương; khi trời Bão, mỗi tia cộng thêm 20% sát thương.'
+              },
+              {
+                  key: 'skill3',
+                  name: 'Tinh Không Phi Hành',
+                  type: 'active',
+                  cost: { aether: 30 },
+                  duration: { turns: 2 },
+                  flying: true,
+                  buffs: [{ effect: 'dodgeRanged', amount: 0.35 }],
+                  shields: [{ target: 'ally', percentMaxHP: 0.18 }],
+                  description: 'Bay lên không trung 2 lượt, tăng 35% né đòn tầm xa và cấp lá chắn 18% Max HP cho một đồng minh bất kỳ.'
+              }
+          ],
+          ult: {
+              name: 'Thiên Lưu Tụ Quang',
+              type: 'ultimate',
+              tags: ['aoe', 'weather'],
+              damage: { multiplier: 2.60 },
+              weather: 'aurora',
+              debuffs: [{ id: 'accuracy_down', amount: 0.20, turns: 2 }],
+              buffs: [{ target: 'allies', effect: 'critRate', amount: 0.20, duration: { turns: 2 } }],
+              description: 'Gọi cực quang phủ chiến trường: gây 260% sát thương toàn địch, giảm 20% chính xác của chúng 2 lượt và ban +20% tỉ lệ chí mạng cho đồng minh.'
+          },
+          talent: {
+              name: 'Sứ Mệnh Khí Tượng',
+              type: 'talent',
+              description: 'Thiên Lưu xoay vòng thời tiết giữa Quang Đãng → Bão → Cực Quang; mỗi trạng thái cấp lần lượt +5% ATK, +8% SPD, +20% chí mạng cộng thêm.'
+          },
+          technique: null,
+          notes: [
+              'Ult tự chuyển thời tiết sang Cực Quang dù đang trạng thái khác.',
+              'Theo vòng khí tượng, nếu bị tái thiết lập sẽ bắt đầu từ Quang Đãng.'
+          ]
+      },
+      {
+          unitId: 'mong_yem',
+          basic: {
+              name: 'Đánh Thường',
+              type: 'basic',
+              tags: ['single-target', 'sleep-setup'],
+              debuffs: [{ id: 'me_hoac', stacks: 1, maxStacks: 3, purgeable: false }],
+              description: 'Tấn công một mục tiêu bằng 100% WIL + ATK và đặt 1 tầng Mê Hoặc (tối đa 3, không thể bị thanh tẩy). Đạt 3 tầng khiến mục tiêu ngủ 1 lượt và đặt lại số tầng.'
+          },
+          skills: [
+              {
+                  key: 'skill1',
+                  name: 'Huyễn Ảnh Che Màn',
+                  type: 'active',
+                  cost: { aether: 30 },
+                  duration: { turns: 3 },
+                  buffs: [{ effect: 'dodgeBasic', amount: 0.50 }],
+                  description: 'Bao phủ bản thân bằng ảo ảnh trong 3 lượt: giảm 50% tỉ lệ bị trúng bởi đòn đánh thường. Không ảnh hưởng tới kỹ năng hay tuyệt kỹ của địch.'
+              },
+              {
+                  key: 'skill2',
+                  name: 'Thụy Ca Tự Miên',
+                  type: 'active',
+                  cost: { aether: 35 },
+                  duration: { turns: 3 },
+                  selfStatus: { id: 'tu_mien', kind: 'sleep', cannotAct: true },
+                  buffs: [{ effect: 'damageTaken', amount: -0.50 }],
+                  stackingBuffs: [{ stats: { ATK: 0.07, WIL: 0.07 }, trigger: 'turnEnd' }],
+                  description: 'Ru mình vào giấc ngủ trong tối đa 3 lượt: không thể hành động khi ngủ, sát thương nhận vào giảm 50% và mỗi lượt đang ngủ cộng 7% ATK/WIL. Tự thức khi HP ≤ 30% hoặc người chơi hủy thủ công.'
+              },
+              {
+                  key: 'skill3',
+                  name: 'Phá Mộng Tàn Ca',
+                  type: 'active',
+                  cost: { aether: 25 },
+                  tags: ['burst'],
+                  damage: { multiplier: 1.80 },
+                  bonusDamage: { perMark: { id: 'me_hoac', amount: 0.20, maxStacks: 3 } },
+                  pierce: { whenTargetSleeping: { arm: 0.30, res: 0.30 } },
+                  marks: [{ id: 'me_hoac', stacks: 1, targets: 2, transfer: true }],
+                  description: 'Gây 180% sát thương đòn đánh thường lên một mục tiêu. Mỗi tầng Mê Hoặc trên mục tiêu tăng 20% sát thương (tối đa +60%). Nếu mục tiêu đang ngủ, bỏ qua 30% ARM/RES và lan 1 tầng Mê Hoặc sang tối đa 2 kẻ địch khác.'
+              }
+          ],
+          ult: {
+              name: 'Thế Giới Thứ Hai',
+              type: 'ultimate',
+              tags: ['field', 'support'],
+              duration: { turns: 3 },
+              randomBuffs: { allies: 1, enemies: 1 },
+              description: 'Kéo toàn bộ chiến trường vào “Thế Giới Thứ Hai” trong 3 lượt: mỗi đồng minh hiện tại và đồng minh vào sân trong thời gian này nhận một buff ngẫu nhiên; mỗi kẻ địch nhận một debuff ngẫu nhiên. Không gây sát thương trực tiếp.'
+          },
+          talent: {
+              name: 'Mê Ca Dẫn Thụy',
+              type: 'talent',
+              maxStacks: 3,
+              sleepOnCap: { turns: 1 },
+              purgeable: false,
+              description: 'Mọi nguồn sát thương của Mộng Yểm đặt 1 tầng Mê Hoặc (tối đa 3). Đạt 3 tầng khiến mục tiêu ngủ 1 lượt rồi đặt lại về 0 tầng; Mê Hoặc chỉ mất khi ngủ kích hoạt hoặc bị thanh tẩy.'
+          },
+          technique: null,
+          notes: [
+              'Mê Hoặc không tự rơi theo thời gian nhưng bị reset mỗi khi ngủ kích hoạt.',
+              'Thụy Ca Tự Miên cho phép người chơi chạm hai lần vào thẻ nhân vật ở lượt địch để đánh thức sớm.'
+          ]
+      },
+      {
+          unitId: 'chan_nga',
+          basic: {
+              name: 'Đánh Thường',
+              type: 'basic',
+              tags: ['single-target'],
+              description: 'Gây sát thương 100% ATK + WIL lên một mục tiêu.'
+          },
+          skills: [
+              {
+                  key: 'skill1',
+                  name: 'Liên Ảnh Hồi Tức',
+                  type: 'active',
+                  cost: { aether: 30 },
+                  heals: { selfPercentMaxHP: 0.06, clonePercentMaxHP: 0.04 },
+                  description: 'Hồi phục 10% Max HP chia làm hai phần: bản thể nhận 6%, clone nhận 4%. Nếu không có clone, chỉ hồi cho bản thể.'
+              },
+              {
+                  key: 'skill2',
+                  name: 'Cộng Lực Ảnh Thân',
+                  type: 'active',
+                  cost: { aether: 25 },
+                  duration: { turns: 3 },
+                  buffs: [{ stats: { ATK: 0.10, WIL: 0.10 }, targets: 'self+clone' }],
+                  description: 'Tăng 10% ATK/WIL cho bản thể và clone trong 3 lượt. Tái kích hoạt chỉ làm mới thời gian.'
+              },
+              {
+                  key: 'skill3',
+                  name: 'Quy Nhất Bản Ảnh',
+                  type: 'active',
+                  cost: { aether: 40 },
+                  cooldown: 3,
+                  requirements: { adjacentClone: true },
+                  shields: [{ percentMaxHP: 0.50, duration: { turns: 3 } }],
+                  buffs: [{ stats: { ATK: 0.15, WIL: 0.15 }, duration: { turns: 2 } }],
+                  description: 'Tiêu biến clone đứng kề để hợp nhất cùng bản thể: nhận khiên bằng 50% Max HP trong 3 lượt và +15% ATK/WIL trong 2 lượt. Không tiêu hao Aether nếu không đáp ứng điều kiện.'
+              }
+          ],
+          ult: {
+              name: 'Thứ Hai Chân Thân',
+              type: 'ultimate',
+              tags: ['summon', 'clone'],
+              hpTrade: { percentCurrentHP: 0.50 },
+              summon: {
+                  id: 'chan_nga_clone',
+                  inheritPercent: 0.85,
+                  ttl: 6,
+                  forbiddenSkills: ['Quy Nhất Bản Ảnh'],
+                  rageLocked: true
+              },
+              description: 'Chỉ thi triển khi không có clone và HP ≥ 60%. Giảm 50% HP hiện có để triệu hồi “Thứ Hai Chân Thân” với 85% chỉ số hiện tại. Clone tồn tại tối đa 6 lượt, không thể dùng Quy Nhất Bản Ảnh và không tích nộ.'
+          },
+          talent: {
+              name: 'Dự Phòng Chân Thể',
+              type: 'talent',
+              description: 'Vào trận nhận +10% Max HP (không áp dụng cho clone). Khi bản thể tử vong khi clone còn sống, đoạt xá vào clone, đồng thời chịu trạng thái Linh Mệt 3 lượt (khóa tuyệt kỹ, -50% hồi Aether).'
+          },
+          technique: null,
+          notes: [
+              'Clone copy 85% chỉ số tại thời điểm triệu hồi (snapshot buff/debuff).',
+              'Nếu không còn ô trống bên phe mình khi cast ult, kỹ năng thất bại và hoàn lại 50% nộ.'
+          ]
+      },
+      {
+          unitId: 'ma_ton_diep_lam',
+          basic: {
+              name: 'Đánh Thường',
+              type: 'basic',
+              tags: ['single-target', 'mark-builder'],
+              debuffs: [{ id: 'ma_chung', stacks: 1, purgeable: false }],
+              description: 'Gây 100% ATK + WIL lên một mục tiêu và cấy 1 Ma Chủng (không thể bị thanh tẩy, mất sau 3 lượt không được làm mới). Vào trận +10% SPD.'
+          },
+          skills: [
+              {
+                  key: 'skill1',
+                  name: 'Thôn Chủng Dưỡng Thể',
+                  type: 'active',
+                  cost: { aether: 30 },
+                  consumeMarks: { id: 'ma_chung', scope: 'all' },
+                  buffs: [{ effect: 'maxHP', amountPerStack: 0.05 }],
+                  description: 'Thu hồi tất cả Ma Chủng trên chiến trường. Mỗi tầng chuyển thành +5% Max HP tạm thời cho Diệp Lâm.'
+              },
+              {
+                  key: 'skill2',
+                  name: 'Ma Chủ Hiển Thân',
+                  type: 'active',
+                  cost: { aether: 25 },
+                  requirements: { totalMarks: { id: 'ma_chung', amount: 12 } },
+                  stanceChange: 'ma_chu',
+                  description: 'Khi tổng Ma Chủng trên chiến trường ≥ 12, thu hồi toàn bộ Ma Chủng trên một mục tiêu để hóa thành Ma Chủ. Khi ở trạng thái Ma Chủ, mất quyền dùng tuyệt kỹ và mỗi Ma Chủng cấy tiếp gây thêm +2% sát thương cuối dạng Thuật.'
+              },
+              {
+                  key: 'skill3',
+                  name: 'Nhiếp Chủng Song Chưởng',
+                  type: 'active',
+                  cost: { aether: 25 },
+                  hits: 2,
+                  tags: ['counts-as-basic', 'splash'],
+                  targets: 'markPriority',
+                  splash: { ratio: 0.70, maxTargets: 2 },
+                  description: 'Lao đến kẻ địch có Ma Chủng gần nhất và tung hai chưởng liên tiếp, mỗi hit 100% sát thương đòn đánh thường và lan 70% sang tối đa hai kẻ địch lân cận.'
+              }
+          ],
+          ult: {
+              name: 'Ma Chủng Phán Quyết',
+              type: 'ultimate',
+              tags: ['aoe', 'mark-detonation'],
+              damage: { percentTargetMaxHPPerStack: 0.05, scaleWIL: 0 },
+              debuffs: [{ id: 'fear', turns: 1, thresholdStacks: 2 }, { id: 'bleed', turns: 1, thresholdStacks: 2 }],
+              description: 'Kích hoạt toàn bộ Ma Chủng trên kẻ địch, mỗi tầng gây 5% Max HP của mục tiêu dưới dạng sát thương WIL. Với mỗi 2 tầng trên cùng mục tiêu, áp Sợ Hãi và Chảy Máu 1 lượt. Các Ma Chủng được kích hoạt sẽ bị tiêu hao.'
+          },
+          talent: {
+              name: 'Chú Ấn Ma Chủng',
+              type: 'talent',
+              purgeable: false,
+              decay: { turns: 3 },
+              description: 'Đánh thường cấy 1 Ma Chủng lên mục tiêu (không giới hạn cộng dồn). Nếu 3 lượt không cấy thêm, toàn bộ Ma Chủng trên mục tiêu đó biến mất.'
+          },
+          technique: null,
+          notes: [
+              'Ở trạng thái Ma Chủ, thanh tuyệt kỹ bị khoá cho đến khi trận đấu kết thúc hoặc trạng thái bị gỡ bỏ.',
+              'Ma Chủng là dấu không thể bị đánh cắp, chỉ biến mất khi hết hạn hoặc bị kích nổ.'
+          ]
+      },
+      {
+          unitId: 'mo_da',
+          basic: {
+              name: 'Đánh Thường',
+              type: 'basic',
+              tags: ['single-target'],
+              description: 'Gây 100% ATK + WIL lên một mục tiêu.'
+          },
+          skills: [
+              {
+                  key: 'skill1',
+                  name: 'U Trào Tụ Lực',
+                  type: 'active',
+                  cost: { aether: 20 },
+                  duration: { turns: 3 },
+                  buffs: [{ stats: { ATK: 0.10, WIL: 0.10 }, stackLimit: 3 }],
+                  description: 'Tăng 10% ATK/WIL trong 3 lượt. Có thể cộng dồn tối đa 3 tầng.'
+              },
+              {
+                  key: 'skill2',
+                  name: 'Huyết Tế Cuồng Khí',
+                  type: 'active',
+                  cost: { aether: 15 },
+                  hpTrade: { percentCurrentHP: 0.35, lethal: false },
+                  duration: { turns: 3 },
+                  buffs: [{ stats: { ATK: 0.25, WIL: 0.25 }, stackLimit: 2 }],
+                  description: 'Hiến 35% HP hiện có (không thể tự sát) để nhận +25% ATK/WIL trong 3 lượt. Có thể cộng dồn tối đa 2 lần nếu dùng khi hiệu ứng còn.'
+              },
+              {
+                  key: 'skill3',
+                  name: 'Mộ Vực Trảm',
+                  type: 'active',
+                  cost: { aether: 15 },
+                  tags: ['counts-as-basic'],
+                  damage: { multiplier: 1.50 },
+                  description: 'Chém một mục tiêu gây 150% sát thương đòn đánh thường. Được tính như đòn đánh thường.'
+              }
+          ],
+          ult: {
+              name: 'Hồn Về Mộ',
+              type: 'ultimate',
+              tags: ['single-target', 'counts-as-basic'],
+              damage: { multiplier: 2.00, piercePercent: { arm: 0.30, res: 0.30 } },
+              buffs: [
+                  { id: 'bat_khuat', turns: 1 },
+                  { id: 'tan_sat', turns: 2 },
+                  { effect: 'untargetable', turns: 2, scope: 'singleTarget' }
+              ],
+              description: 'Gây 200% sát thương hỗn hợp lên một mục tiêu, bỏ qua 30% ARM/RES. Nhận hiệu ứng Bất Khuất + Tàn Sát và không thể bị chỉ định bởi đòn đơn trong 2 lượt kế tiếp.'
+          },
+          talent: {
+              name: 'Dạ Mộ Nhị Cực',
+              type: 'talent',
+              description: 'Khi HP ≥ 70% nhận +10% WIL; khi HP < 70% chuyển thành +5% ARM/RES. Hiệu ứng luôn hoạt động và không thể bị xoá.'
+          },
+          technique: null,
+          notes: [
+              'Các kỹ năng hiến máu của Mộ Dạ không thể khiến nhân vật tự sát (tối thiểu còn 1 HP).',
+              'Trong thời gian được buff Tàn Sát, các đòn đánh thường vẫn có thể thực thi dù đang miễn bị chỉ định.'
+          ]
+      },
+      {
+          unitId: 'ngao_binh',
+          basic: {
+              name: 'Đánh Thường',
+              type: 'basic',
+              tags: ['single-target', 'form-scaling'],
+              description: 'Tấn công 1 mục tiêu với sát thương lai. Phụ thuộc trạng thái: Ấu Long (cơ bản), Thành Niên +20% sát thương, Trưởng Thành +30% sát thương, Long Thần +40% sát thương và lan thêm 40% lên mục tiêu phụ.'
+          },
+          skills: [
+              {
+                  key: 'skill1',
+                  name: 'Long Trảo Song Trảm',
+                  type: 'active',
+                  cost: { aether: 25 },
+                  tags: ['counts-as-basic', 'multi-hit'],
+                  hits: 2,
+                  description: 'Tung hai đòn chém liên tiếp, mỗi hit gây 100% sát thương đòn đánh thường dựa trên trạng thái hiện tại.'
+              },
+              {
+                  key: 'skill2',
+                  name: 'Long Huyết Phẫn Viêm',
+                  type: 'active',
+                  cost: { aether: 25 },
+                  hpTrade: { percentMaxHP: 0.25, lethal: false },
+                  duration: { turns: 3 },
+                  buffs: [{ effect: 'basicDamage', amount: 0.50 }],
+                  debuffs: [{ stats: { ARM: -0.10, RES: -0.10 }, duration: { turns: 3 } }],
+                  description: 'Thiêu đốt 25% Max HP của bản thân để tăng 50% sát thương đòn đánh thường trong 3 lượt, đồng thời giảm 10% ARM/RES trong cùng thời gian.'
+              },
+              {
+                  key: 'skill3',
+                  name: 'Long Ảnh Truy Kích',
+                  type: 'active',
+                  cost: { aether: 25 },
+                  damage: { multiplier: 1.40 },
+                  splash: { ratioByForm: { au_long: 0.30, thanh_nien: 0.40, truong_thanh: 0.50, long_than: 0.60 }, maxTargets: 2 },
+                  description: 'Lao kích một mục tiêu gây 140% sát thương đòn đánh thường, sau đó lan sát thương phụ thuộc trạng thái lên kẻ đứng kề.'
+              }
+          ],
+          ult: {
+              name: 'Tam Chuyển Long Thai',
+              type: 'ultimate',
+              tags: ['evolution'],
+              description: 'Mỗi lần thi triển, Ngao Bính hóa trứng 1 lượt (không thể tấn công, giảm sát thương nhận 40%/50%/60% tùy lần) rồi phá xác nâng trạng thái: Thành Niên → Trưởng Thành → Long Thần. Sau phá xác, đòn đánh thường mạnh hơn, tăng xuyên giáp, giảm sát thương nhận và tăng hồi phục mỗi lượt. Mỗi lần chuyển hóa hoàn tất nhận thêm 15 nộ.'
+          },
+          talent: {
+              name: 'Long Cốt Bất Diệt',
+              type: 'talent',
+              description: 'Xác định các chỉ số nền cho từng trạng thái: Ấu Long (+2% xuyên, -8% sát thương nhận, +5% AGI, hồi 0.5% Max HP/lượt); Thành Niên (+5% xuyên, -11% sát thương, +10% AGI, hồi 1%); Trưởng Thành (+9% xuyên, -15%, +15% AGI, hồi 1.7%); Long Thần (+14% xuyên, -22%, +20% AGI, hồi 3%).'
+          },
+          technique: null,
+          notes: [
+              'Trong lượt Hoá Trứng, Ngao Bính không thể ra đòn nhưng vẫn có thể bị tấn công (đã giảm sát thương theo cấp).',
+              'Đòn đánh thường ở trạng thái Long Thần biến thành Long Tức tầm xa và lan 40% sát thương lên các mục tiêu xung quanh.'
+          ]
+      },
+      {
+          unitId: 'lau_khac_ma_chu',
+          basic: {
+              name: 'Đánh Thường',
+              type: 'basic',
+              tags: ['single-target', 'mark-builder'],
+              debuffs: [{ id: 'sa_an', stacks: 1, maxStacks: 5, purgeable: false }],
+              description: 'Gây 100% ATK + WIL lên một mục tiêu và đặt 1 Sa Ấn (tối đa 5). Đạt 5 tầng khiến mục tiêu bỏ qua lượt kế tiếp rồi đặt lại số tầng.'
+          },
+          skills: [
+              {
+                  key: 'skill1',
+                  name: 'Hắc Sa Song Chưởng',
+                  type: 'active',
+                  cost: { aether: 25 },
+                  tags: ['counts-as-basic', 'multi-hit'],
+                  hits: 2,
+                  targets: 'randomEnemies',
+                  description: 'Tung hai chưởng vào hai mục tiêu ngẫu nhiên, mỗi hit gây 100% sát thương đòn đánh thường và đặt Sa Ấn.'
+              },
+              {
+                  key: 'skill2',
+                  name: 'Trùng Ấn Lậu Khắc',
+                  type: 'active',
+                  cost: { aether: 25 },
+                  duration: { turns: 3, start: 'nextTurn' },
+                  buffs: [{ effect: 'extraMarks', id: 'sa_an', amount: 1 }],
+                  description: 'Trong 3 lượt bắt đầu từ lượt kế, mỗi đòn đánh thường/kỹ năng áp 2 tầng Sa Ấn thay vì 1.'
+              },
+              {
+                  key: 'skill3',
+                  name: 'Tam Luân Tán Chưởng',
+                  type: 'active',
+                  cost: { aether: 35 },
+                  hits: 3,
+                  targets: 'randomEnemies',
+                  description: 'Tung ba chưởng liên tiếp vào ba kẻ địch ngẫu nhiên, mỗi hit gây 100% sát thương đòn đánh thường và đặt Sa Ấn.'
+              }
+          ],
+          ult: {
+              name: 'Thiên Mệnh Lậu Khắc Ma Kinh',
+              type: 'ultimate',
+              tags: ['time'],
+              description: 'Vận hành Lậu Khắc Ma Sa, thời sa chảy ngẫu nhiên 50% giữa hai kết quả: Nghịch Lưu – đưa toàn bộ phe đồng minh về trạng thái của 1 lượt trước (vị trí, HP, buff/debuff; đơn vị mới triệu hồi trong lượt hiện tại trở về deck và hoàn cost); Thuận Lưu – sau khi ult hoàn tất, mọi đồng minh ngay lập tức thực thi 1 đòn đánh thường.'
+          },
+          talent: {
+              name: 'Lậu Ấn Trói Thời',
+              type: 'talent',
+              maxStacks: 5,
+              skipTurnOnCap: true,
+              purgeable: false,
+              description: 'Mỗi đòn đánh thường hoặc kỹ năng đặt 1 Sa Ấn lên mục tiêu. Đủ 5 tầng khiến mục tiêu bỏ qua lượt kế tiếp rồi đặt lại Sa Ấn về 0.'
+          },
+          technique: null,
+          notes: [
+              'Sa Ấn tồn tại tới hết trận trừ khi bị thanh tẩy hoặc kích hoạt bỏ lượt.',
+              'Các đòn đánh thường/kỹ năng có nhiều hit vẫn đếm số tầng riêng cho từng hit.'
+          ]
+      },
+      {
           unitId: 'phe',
           basic: {
               name: 'Đánh Thường',
@@ -4132,7 +6394,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   lifesteal: { percentOfDamage: 0.10 },
                   applyMark: { id: 'mark_devour', stacks: 1, maxStacks: 3, ttlTurns: 3, refreshOnHit: true }
               },
-              description: 'Gây sát thương theo n% WIL + x% ATK lên một mục tiêu, hồi lại 10% lượng sát thương gây ra và đặt 1 tầng Phệ Ấn lên mục tiêu (tối đa 3 tầng, làm mới thời gian tồn tại mỗi khi cộng dồn).'
+              description: 'Gây sát thương 100% WIL + ATK lên một mục tiêu, hồi lại 10% lượng sát thương gây ra và đặt 1 tầng Phệ Ấn (tối đa 3 tầng). Mỗi mục tiêu chỉ nhận tối đa 2 Phệ Ấn trong một lượt; đạt 3 tầng sẽ nổ ở đầu lượt của mục tiêu, gây 50% WIL của Phệ. Dấu ấn tự mất nếu 3 lượt không được làm mới.'
           },
           skills: [
               {
@@ -4143,26 +6405,26 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   tags: ['counts-as-basic', 'multi-hit'],
                   hits: 2,
                   targets: 'randomEnemies',
-                  description: 'Phóng hai huyết cầu vào hai kẻ địch ngẫu nhiên. Mỗi hit gây 150% sát thương đòn đánh thường, được tính như đòn đánh thường để kích hoạt hút máu và Phệ Ấn, đồng thời làm mới thời hạn dấu ấn trên mục tiêu trúng đòn.'
+                  description: 'Phóng hai huyết cầu vào hai kẻ địch ngẫu nhiên. Mỗi hit gây 130% sát thương đòn đánh thường, được tính như đòn đánh thường để kích hoạt hút máu và Phệ Ấn, đồng thời làm mới thời hạn dấu ấn trên mục tiêu trúng đòn nhưng vẫn tôn trọng giới hạn 2 Phệ Ấn mỗi lượt.'
               },
               {
                   key: 'skill2',
                   name: 'Huyết Chướng',
                   type: 'active',
-                  cost: { aether: 25 },
+                  cost: { aether: 20 },
                   duration: { turns: 2 },
                   buffs: [{ stat: 'damageTaken', type: 'multiplier', amount: -0.30 }],
                   shields: [{ stat: 'hpRegen', amountPercentMaxHP: 0.15, perTurn: true }],
-                  description: 'Tạo màn huyết chướng trong 2 lượt: Phệ giảm 30% sát thương phải chịu, nhận hồi phục 15% Máu tối đa mỗi lượt và không thể bị chỉ định bởi đòn đơn mục tiêu. Hiệu ứng duy trì kể cả khi đang bị khống chế.'
+                  description: 'Tạo màn huyết chướng trong 2 lượt: Phệ giảm 30% sát thương phải chịu, nhận hồi phục 15% Máu tối đa mỗi lượt, sát thương gây ra giảm 30% và không thể bị chỉ định bởi đòn đơn mục tiêu. Hiệu ứng duy trì kể cả khi đang bị khống chế.'
               },
               {
                   key: 'skill3',
                   name: 'Huyết Thệ',
                   type: 'active',
-                  cost: { aether: 40 },
-                  duration: { turns: 5 },
+                  cost: { aether: 35 },
+                  duration: { turns: 4 },
                   links: { maxConcurrent: 1, sharePercent: 0.5 },
-                  description: 'Liên kết thanh HP với một đồng minh ngẫu nhiên (có thể là Leader) trong 5 lượt. 50% sát thương đồng minh phải nhận sẽ chuyển sang Phệ; chỉ duy trì một mối liên kết cùng lúc và thay thế liên kết cũ nếu dùng lại.'
+                  description: 'Liên kết thanh HP với một đồng minh do người chơi chọn trong 4 lượt. 50% sát thương đồng minh phải nhận sẽ chuyển sang Phệ; chỉ duy trì một mối liên kết cùng lúc, liên kết tự hủy nếu mục tiêu rời sân và sát thương chuyển tiếp không thể chuyển lần hai.'
               }
           ],
           ult: {
@@ -4170,13 +6432,13 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
               type: 'ultimate',
               tags: ['aoe', 'hp-drain', 'counts-as-basic'],
               duration: { turns: 2, affectedStat: 'WIL' },
-              hpDrain: { percentCurrentHP: 0.07, perBoss: 0.07 },
-              damage: { scaleWIL: 0.80, type: 'arcane', unavoidable: true },
-              heals: { selfPercentTotalDamage: 0.40, allies: { targets: 2, percentTotalDamage: 0.30 } },
-              overhealToShield: { capPercentMaxHP: 1.0 },
+              hpDrain: { percentCurrentHP: 0.08, perBoss: 0.08 },
+              damage: { scaleWIL: 0.65, type: 'arcane', unavoidable: true },
+              heals: { selfPercentTotalDamage: 0.35, allies: { targets: 2, percentTotalDamage: 0.25 } },
+              overhealToShield: { capPercentMaxHP: 0.6 },
               postBuff: { stat: 'WIL', percent: 0.20, turns: 2 },
               marksApplied: { stacks: 1, maxPerTarget: 3 },
-              description: 'Hút máu toàn bộ kẻ địch: mỗi mục tiêu mất 7% HP hiện tại + 80% WIL của Phệ (Thuật, không thể né tránh, vẫn chịu kháng). Phần sát thương gây ra hồi cho Phệ 40% và hồi cho hai đồng minh ngẫu nhiên mỗi người 30%, phần vượt trần chuyển thành Giáp Máu tới tối đa +100% Máu tối đa. Sau khi thi triển nhận thêm 20% WIL trong 2 lượt và đặt 1 tầng Phệ Ấn lên các mục tiêu bị hút.'
+              description: 'Hút máu toàn bộ kẻ địch: mỗi mục tiêu mất 8% HP hiện tại + 65% WIL của Phệ (Thuật, không thể né tránh, vẫn chịu kháng). Phần sát thương gây ra hồi cho Phệ 35% và hồi cho hai đồng minh ngẫu nhiên mỗi người 25%; phần vượt trần chuyển thành Giáp Máu tới tối đa +60% Máu tối đa. Sau khi thi triển nhận thêm 20% WIL trong 2 lượt và đặt 1 tầng Phệ Ấn lên các mục tiêu bị hút (giới hạn 2 Phệ Ấn mỗi lượt mỗi mục tiêu).'
           },
           talent: {
               name: 'Phệ Ấn',
@@ -4185,11 +6447,11 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
               explosion: { damageScaleWIL: 0.50, trigger: 'onTurnStartTarget' },
               ttl: { turns: 3, refreshOnApply: true },
               purgeable: false,
-              description: 'Mỗi đòn đánh thường/kỹ năng/tuyệt kỹ trúng mục tiêu đặt 1 Phệ Ấn (tối đa 3 cộng dồn). Khi đạt 3 cộng dồn, Phệ Ấn tự kích nổ trong lượt của mục tiêu, gây sát thương bằng 50% WIL của Phệ. Dấu ấn tồn tại tối đa 3 lượt nếu không được làm mới và không thể bị xoá bỏ, lãng quên hoặc cướp. Chúc Phúc Của Huyết Chủ: khi vào trận nhận thêm 15% Máu tối đa và +50% hồi HP.'
+              description: 'Mỗi đòn đánh thường/kỹ năng/tuyệt kỹ trúng mục tiêu đặt 1 Phệ Ấn (tối đa 3 cộng dồn, mỗi mục tiêu chỉ nhận 2 Ấn trong một lượt). Khi đạt 3 cộng dồn, Phệ Ấn tự kích nổ ở đầu lượt của mục tiêu, gây sát thương bằng 50% WIL của Phệ. Dấu ấn tồn tại tối đa 3 lượt nếu không được làm mới và không thể bị xoá bỏ, lãng quên hoặc cướp. Chúc Phúc Của Huyết Chủ: khi vào trận nhận thêm 15% Máu tối đa và +50% hồi HP.'
           },
           technique: null,
           notes: [
-              'Song Huyết Cầu và mọi hit từ tuyệt kỹ đều được tính như đòn đánh thường để cộng Phệ Ấn và hút máu.',
+              'Song Huyết Cầu và mọi hit từ tuyệt kỹ đều được tính như đòn đánh thường để cộng Phệ Ấn và hút máu, vẫn tuân theo giới hạn 2 Phệ Ấn mỗi lượt.',
               'Huyết Thệ chuyển hướng sát thương nhưng Phệ vẫn chịu sát thương nên cần giữ lượng hồi phục luôn sẵn sàng.'
           ]
       },
@@ -4234,8 +6496,8 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   type: 'active',
                   cost: { aether: 25 },
                   duration: { turns: 3, start: 'nextTurn' },
-                  buffs: [{ stats: { ATK: 0.20, WIL: 0.20 }, delayTurns: 1 }],
-                  description: 'Tăng 20% ATK/WIL dựa trên chỉ số hiện tại trong 3 lượt, hiệu lực bắt đầu từ lượt kế tiếp sau khi thi triển. Có thể cộng dồn với các nguồn buff khác.'
+                  buffs: [{ stats: { ATK: 0.23, WIL: 0.23 }, delayTurns: 1 }],
+                  description: 'Tăng 23% ATK/WIL dựa trên chỉ số hiện tại trong 3 lượt, hiệu lực bắt đầu từ lượt kế tiếp sau khi thi triển. Có thể cộng dồn với các nguồn buff khác.'
               }
           ],
           ult: {
@@ -4540,8 +6802,8 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
           talent: {
               name: 'Đại Ca Đầu Đàn',
               type: 'talent',
-              bonuses: { perMinion: { basicDamagePercent: 0.15 }, onMinionDeath: { stats: { ATK: 0.05, WIL: 0.05 }, maxStacks: 3 } },
-              description: 'Mỗi tiểu đệ hiện diện trên sân giúp Trần Quát nhận thêm 15% tổng sát thương đòn đánh thường. Khi một tiểu đệ bị hạ gục, Trần Quát nhận thêm 5% ATK/WIL (tối đa 3 lần trong trận).'
+              bonuses: { perMinion: { basicDamagePercent: 0.15 }, onMinionDeath: { stats: { ATK: 0.05, WIL: 0.05 }, maxStacks: null } },
+              description: 'Mỗi tiểu đệ hiện diện trên sân giúp Trần Quát nhận thêm 15% tổng sát thương đòn đánh thường. Khi một tiểu đệ bị kẻ địch hạ gục, Trần Quát nhận thêm 5% ATK/WIL (mỗi tiểu đệ chỉ cộng một lần).'
           },
           technique: null,
           notes: [
@@ -4603,6 +6865,342 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
           notes: [
               'Kiên Cố Trường Kỳ giúp tích lũy phòng thủ cao hơn khi Lính Gác ở ngưỡng máu nguy hiểm.',
               'Còi Tăng Tốc ưu tiên đồng minh ngẫu nhiên; hiệu ứng có thể trùng lặp với các nguồn tăng tốc khác.'
+          ]
+      },
+      {
+          unitId: 'vu_thien',
+          basic: {
+              name: 'Đánh Thường',
+              type: 'basic',
+              tags: ['single-target'],
+              description: 'Vung đinh ba gây sát thương 100% ATK + 100% WIL lên một mục tiêu. Nếu Vũ Thiên đang ở trạng thái Ánh Sáng (kích hoạt bởi kỹ năng hoặc nội tại), hồi lại 10% sát thương gây ra.'
+          },
+          skills: [
+              {
+                  key: 'skill1',
+                  name: 'Lam Triều Bộc Lực',
+                  type: 'active',
+                  cost: { aether: 35 },
+                  duration: { turns: 1 },
+                  buffs: [{ stats: { ATK: 0.40, WIL: 0.40 } }],
+                  description: 'Tăng 40% ATK/WIL trong 1 lượt. Kỹ năng lý tưởng để mở chuỗi burst hoặc phản công khi có trạng thái phản kích.'
+              },
+              {
+                  key: 'skill2',
+                  name: 'Hải Mâu Phá Lãng',
+                  type: 'active',
+                  cost: { aether: 25 },
+                  tags: ['burst'],
+                  damage: { multiplier: 1.5 },
+                  description: 'Phóng đinh ba gây 150% sát thương đòn đánh thường lên một kẻ địch rồi thu hồi vũ khí. Được tính là kỹ năng chủ động, không kích hoạt nội tại phản kích.'
+              },
+              {
+                  key: 'skill3',
+                  name: 'Triều Ảnh Hồi Kích',
+                  type: 'active',
+                  cost: { aether: 30 },
+                  duration: { turns: 1 },
+                  buffs: [{ effect: 'dodgeBasic', amount: 0.25 }],
+                  counters: [{ chance: 0.25, type: 'basic' }],
+                  description: 'Kích hoạt trạng thái phản công 1 lượt: mỗi khi bị tấn công có 25% né và phản đòn đánh thường. Nếu Vũ Thiên bị hạ gục, hiệu ứng kết thúc và phải tái kích hoạt.'
+              }
+          ],
+          ult: {
+              name: 'Hải Uy Trảm Ngôn',
+              type: 'ultimate',
+              tags: ['burst', 'silence'],
+              damage: { multiplier: 3.0 },
+              debuffs: [{ id: 'tram_mac', turns: 1 }],
+              buffs: [{ effect: 'adaptive', duration: { turns: 1 } }],
+              description: 'Chém một kẻ địch gây 300% sát thương, áp Trầm Mặc 1 lượt và nhận buff Thích Ứng (giảm sát thương, kháng hất tung theo chuẩn hệ thống) trong 1 lượt.'
+          },
+          talent: {
+              name: 'Hải Triều Khai Trận',
+              type: 'talent',
+              onSpawn: { stats: { ATK: 0.05, WIL: 0.05 } },
+              description: 'Khi vào trận lập tức tăng 5% ATK/WIL (không cộng dồn). Buff này mất khi rời trận.'
+          },
+          technique: null,
+          notes: [
+              'Triều Ảnh Hồi Kích chỉ phản công khi né thành công hoặc khi bị đánh thường trúng nhưng hệ thống cho phép phản kích (tùy vào thiết lập combat).',
+              'VFX đề xuất: dòng nước bao lấy thân thể khi bật phản kích.'
+          ]
+      },
+      {
+          unitId: 'anna',
+          basic: {
+              name: 'Đánh Thường',
+              type: 'basic',
+              tags: ['single-target', 'heal'],
+              description: 'Tấn công một mục tiêu gây 100% ATK + 100% WIL, đồng thời hồi 3% Max HP của Anna cho một đồng minh ngẫu nhiên.'
+          },
+          skills: [
+              {
+                  key: 'skill1',
+                  name: 'Aegis Tụ Linh',
+                  type: 'active',
+                  cost: { aether: 20 },
+                  duration: { turns: 2 },
+                  buffs: [{ stats: { ARM: 0.20, RES: 0.20 } }],
+                  description: 'Gây dựng áo giáp linh lực, tăng 20% ARM/RES cho bản thân trong 2 lượt.'
+              },
+              {
+                  key: 'skill2',
+                  name: 'Huyết Tế Vương Tọa',
+                  type: 'active',
+                  cost: { aether: 25 },
+                  requirements: { casterHpPercentMin: 0.70 },
+                  sacrifices: [{ percentMaxHP: 0.50, target: 'self', transferTo: 'leader' }],
+                  description: 'Hiến 50% Max HP hiện tại (không giảm Max HP) cho Leader đồng minh. Chỉ thi triển khi HP ≥ 70% Max HP, không chịu ảnh hưởng bởi buff hồi máu của Anna nhưng chịu modifier của người nhận.'
+              },
+              {
+                  key: 'skill3',
+                  name: 'Hỗn Linh Trường Ca',
+                  type: 'active',
+                  cost: { aether: 20 },
+                  tags: ['multi-target'],
+                  damage: { multiplier: 1.4, targets: 2 },
+                  description: 'Ngân trường ca hỗn linh, gây sát thương 140% đánh thường lên 2 kẻ địch ngẫu nhiên.'
+              }
+          ],
+          ult: {
+              name: 'Thánh Lễ Tái Sinh',
+              type: 'ultimate',
+              tags: ['team-heal'],
+              heals: { percentMaxHP: 0.50, scale: { ATK: 0.20, WIL: 0.20 }, targets: 'allAllies' },
+              description: 'Thực hiện nghi thức tái sinh, hồi 50% Max HP cộng thêm 20% ATK/WIL của Anna cho toàn bộ đồng minh.'
+          },
+          talent: {
+              name: 'Ấn Chú Thăng Hoa',
+              type: 'talent',
+              stacks: 5,
+              description: 'Mỗi lần thi triển Ultimate cộng dồn +5% ATK/WIL/Max HP (tối đa 5 tầng). Tầng không tự mất trong trận.'
+          },
+          technique: null,
+          notes: [
+              'Huyết Tế Vương Tọa không kích hoạt hiệu ứng “giảm sát thương tự gây” vì được tính như chuyển HP.',
+              'Nội tại Ấn Chú Thăng Hoa nên hiển thị số tầng ngay trên khung buff của Anna để tiện theo dõi.'
+          ]
+      },
+      {
+          unitId: 'lao_khat_cai',
+          basic: {
+              name: 'Đánh Thường',
+              type: 'basic',
+              tags: ['single-target'],
+              description: 'Đánh gậy vào kẻ địch gây 100% ATK + 100% WIL.'
+          },
+          skills: [
+              {
+                  key: 'skill1',
+                  name: 'Khất Côn Xuyên Tạng',
+                  type: 'active',
+                  cost: { aether: 20 },
+                  tags: ['pierce'],
+                  damage: { multiplier: 1.0 },
+                  pierce: { arm: 0.15, res: 0.15 },
+                  description: 'Đâm gậy xuyên giáp, gây sát thương tương đương đòn đánh thường và bỏ qua 15% ARM/RES mục tiêu.'
+              },
+              {
+                  key: 'skill2',
+                  name: 'Tam Thập Lục Kế: Tẩu Vi Thượng',
+                  type: 'active',
+                  cost: { aether: 25 },
+                  duration: { turns: null },
+                  unique: true,
+                  utility: { evadeTargetedAoEChance: 0.25 },
+                  description: 'Kích hoạt kế sách chạy là thượng sách: trong phần còn lại của trận, lần đầu chịu kỹ năng AOE chọn mục tiêu sẽ có 25% chạy sang ô đồng minh trống gần nhất (nếu có).'
+              },
+              {
+                  key: 'skill3',
+                  name: 'Loạn Côn Tam Liên',
+                  type: 'active',
+                  cost: { aether: 35 },
+                  tags: ['multi-target'],
+                  damage: { multiplier: 1.0, hits: 3 },
+                  pierce: { arm: 0.20, res: 0.20 },
+                  description: 'Vung gậy hỗn loạn vào 3 kẻ địch ngẫu nhiên, mỗi hit là một đòn đánh thường bỏ qua 20% ARM/RES.'
+              }
+          ],
+          ult: {
+              name: 'Nhất Côn Đoạt Mệnh',
+              type: 'ultimate',
+              tags: ['finisher'],
+              damage: { multiplier: 2.5 },
+              pierce: { arm: 0.10, res: 0.10 },
+              description: 'Dồn lực đánh chí mạng 250% sát thương, xuyên 10% phòng thủ của mục tiêu.'
+          },
+          talent: {
+              name: 'Tạp Dân Tụ Lực',
+              type: 'talent',
+              description: 'Miễn nhiễm Khiêu Khích và nhận +2% ATK/WIL/AGI cho mỗi đồng minh (trừ Leader) đang hiện diện.'
+          },
+          technique: null,
+          notes: [
+              'Tẩu Vi Thượng chỉ xét kỹ năng AOE định vị (line, cone, hình chữ thập...). Với AOE ngẫu nhiên hoặc chiêu mục tiêu đơn không kích hoạt.',
+              'Hiển thị buff bị động để người chơi biết đã tiêu hao cơ hội trốn hay chưa.'
+          ]
+      },
+      {
+          unitId: 'ai_lan',
+          basic: {
+              name: 'Đánh Thường',
+              type: 'basic',
+              tags: ['single-target'],
+              description: 'Đánh bằng pháp trượng gây 100% ATK + 100% WIL. Ở Ánh Sáng: giảm 5% AGI mục tiêu và hồi 10% sát thương gây ra. Ở Bóng Tối: bỏ qua 10% ARM/RES. Đòn đánh có 2% làm Choáng.'
+          },
+          skills: [
+              {
+                  key: 'skill1',
+                  name: 'Song Cực Hiến Phúc',
+                  type: 'active',
+                  cost: { aether: 25 },
+                  tags: ['support'],
+                  usableIn: ['light', 'dark'],
+                  description: 'Chuyển 20% Max HP cho Leader và 10% Max HP cho một đồng minh ngẫu nhiên (Ái Lân không mất Max HP). Cả hai mục tiêu nhận thêm khiên =10% Max HP của Ái Lân trong 2 lượt.'
+              },
+              {
+                  key: 'skill2',
+                  name: 'D’moreth • Hắc Tế Tam Ấn',
+                  type: 'active',
+                  cost: { aether: 25 },
+                  tags: ['aoe'],
+                  usableIn: ['dark'],
+                  damage: { multiplier: 0.7, targets: 3 },
+                  description: 'Chỉ dùng ở trạng thái Bóng Tối: gây 70% sát thương đánh thường lên 3 kẻ địch ngẫu nhiên, không tính là đòn đánh thường (không kích hoạt on-hit).'
+              },
+              {
+                  key: 'skill3',
+                  name: 'Thánh Minh Trùng Tụ',
+                  type: 'active',
+                  cost: { aether: 20 },
+                  usableIn: ['light'],
+                  tags: ['heal'],
+                  heals: { self: { scale: { ATK: 0.60, WIL: 0.60 } }, randomAlly: { scale: { ATK: 0.60, WIL: 0.60 } } },
+                  description: 'Chỉ dùng ở trạng thái Ánh Sáng: hồi 60% tổng ATK+WIL cho bản thân và 1 đồng minh ngẫu nhiên.'
+              }
+          ],
+          ult: {
+              name: 'Khải Minh / Đọa Ảnh',
+              type: 'ultimate',
+              tags: ['stance'],
+              description: 'Nếu thi triển trong Ánh Sáng: “Khải Minh Thánh Lễ” hồi 30% Max HP + 5% ATK/WIL cho 3 đồng minh ngẫu nhiên. Nếu thi triển trong Bóng Tối: “Đọa Ảnh Tứ Hình” gây 75% sát thương đánh thường lên 4 kẻ địch ngẫu nhiên (không tính là đòn đánh thường).'
+          },
+          talent: {
+              name: 'Thánh Ám Luân Chuyển',
+              type: 'talent',
+              description: 'Bắt đầu trận ở Ánh Sáng, mỗi lượt tự luân phiên Ánh Sáng ↔ Bóng Tối. Ánh Sáng thêm hồi phục và giảm AGI, Bóng Tối tăng xuyên giáp.'
+          },
+          technique: null,
+          notes: [
+              'UI cần hiển thị biểu tượng trạng thái hiện tại để người chơi biết kỹ năng nào khả dụng.',
+              'Các kỹ năng kiểm tra stance; nếu điều kiện không đạt cần xám nút và hiện tooltip.'
+          ]
+      },
+      {
+          unitId: 'faun',
+          basic: {
+              name: 'Đánh Thường',
+              type: 'basic',
+              tags: ['single-target'],
+              description: 'Tấn công gây 100% ATK + 100% WIL. Thú triệu hồi kế thừa hệ số này khi tấn công.'
+          },
+          skills: [
+              {
+                  key: 'skill1',
+                  name: 'Dã Linh Hiệp Kích',
+                  type: 'active',
+                  cost: { aether: 25 },
+                  tags: ['chain'],
+                  description: 'Faun và mọi thú triệu hồi đang tồn tại lần lượt tung một đòn đánh thường ngay lập tức, không tiêu lượt hiện tại.'
+              },
+              {
+                  key: 'skill2',
+                  name: 'Ấn Khế Cường Thừa',
+                  type: 'active',
+                  cost: { aether: 25 },
+                  tags: ['buff'],
+                  description: 'Đánh dấu 5 lần triệu hồi tiếp theo từ Ultimate để mỗi thú nhận 80% chỉ số của Faun (thay vì 50%).'
+              },
+              {
+                  key: 'skill3',
+                  name: 'Thú Tế Hộ Mệnh',
+                  type: 'active',
+                  cost: { aether: 25 },
+                  tags: ['heal', 'defense'],
+                  heals: { selfPercentMaxHP: 0.07 },
+                  description: 'Hồi 7% Max HP và nhận 1 lớp Bất Khuất. Khi lớp Bất Khuất kích hoạt, hy sinh thú có HP thấp nhất (ưu tiên thú được đánh dấu bởi kỹ năng này) và chặn sát thương.'
+              }
+          ],
+          ult: {
+              name: 'Lâm Uyên Triệu Dã',
+              type: 'ultimate',
+              tags: ['summon'],
+              description: 'Triệu hồi ngẫu nhiên 1 trong 5 thú (Tiểu Hắc, Tiểu Bạch, Tiểu Hoàng, Tiểu Bất Điểm, Nhị Cẩu). Mỗi thú tồn tại tối đa 5 lượt, không trùng lặp, với hiệu ứng riêng: xuyên giáp, tăng sát thương, chết hồi máu cho Faun, hồi máu cho thú khác, hoặc hỗ trợ khiêu khích + hồi máu định kỳ.'
+          },
+          talent: {
+              name: 'Vạn Thú Đồng Hưởng',
+              type: 'talent',
+              description: 'Mỗi thú đồng minh trên sân tăng 3% mọi chỉ số cho Faun (tối đa 5 tầng). Đồng thời giảm 20% sát thương nhận từ thú thuộc Faun.'
+          },
+          technique: null,
+          notes: [
+              'Thanh nộ tối đa chỉ 85; nhớ cập nhật UI fury bar.',
+              'Khi hy sinh thú bởi Thú Tế Hộ Mệnh, cần thông báo trong log để người chơi hiểu vì sao thú biến mất.'
+          ]
+      },
+      {
+          unitId: 'basil_thorne',
+          basic: {
+              name: 'Đánh Thường',
+              type: 'basic',
+              tags: ['single-target'],
+              description: 'Đâm gai gây 100% ATK + 100% WIL lên 1 mục tiêu.'
+          },
+          skills: [
+              {
+                  key: 'skill1',
+                  name: 'Chiết Luyện Độc Tích',
+                  type: 'active',
+                  cost: { aether: 30 },
+                  tags: ['self-buff'],
+                  description: 'Tính tổng số stack Độc trên toàn sân, mỗi stack chuyển thành +1,5% Max HP tạm thời cho Basil rồi xóa toàn bộ Độc khỏi địch.'
+              },
+              {
+                  key: 'skill2',
+                  name: 'Khế Ước Gai Huyết',
+                  type: 'active',
+                  cost: { aether: 25 },
+                  duration: { turns: 2 },
+                  tags: ['reflect'],
+                  description: 'Giảm 10% Max HP (thật) để nhận hiệu ứng phản sát thương trong 2 lượt. Lượng HP mất không được khiên ngăn chặn.'
+              },
+              {
+                  key: 'skill3',
+                  name: 'Song Tiêm Trảm',
+                  type: 'active',
+                  cost: { aether: 20 },
+                  tags: ['multi-hit'],
+                  damage: { multiplier: 1.0, hits: 2 },
+                  description: 'Đâm hai lần liên tiếp vào một mục tiêu, mỗi hit là đòn đánh thường.'
+              }
+          ],
+          ult: {
+              name: 'Pháo Đài Gai Đen',
+              type: 'ultimate',
+              tags: ['taunt', 'defense'],
+              duration: { turns: 2 },
+              description: 'Bao phủ cơ thể bằng gai đen: nhận Khiêu Khích 2 lượt và tăng 20% ARM/RES trong thời gian đó.'
+          },
+          talent: {
+              name: 'Gai Độc',
+              type: 'talent',
+              description: 'Khi bị tấn công, kẻ gây sát thương nhận 1 stack Độc (tối đa 10 stack/mục tiêu, 1 lần mỗi lượt/mỗi nguồn). Độc có thể bị thanh tẩy.'
+          },
+          technique: null,
+          notes: [
+              'Nội tại áp Độc nên hiển thị số stack trên mục tiêu để người chơi nhận biết.',
+              'Khế Ước Gai Huyết khiến Basil mất Max HP ngay khi dùng, cần hiển thị thông báo rõ ràng.'
           ]
       }
   ];
@@ -16732,1804 +19330,399 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'createHeader')) exports.createHeader = createHeader;
 });
 __define('./screens/ui-gacha/gacha.css', (exports, module, __require) => {
-  const css = ":root {\n  color-scheme: dark;\n  --bg-page: #0b0f14;\n  --bg-panel: rgba(14, 20, 32, 0.88);\n  --text-main: #e6f0ff;\n  --text-muted: rgba(190, 216, 240, 0.82);\n  --outline-strong: rgba(174, 228, 255, 0.38);\n  --gradient-hero: linear-gradient(135deg, rgba(124, 77, 255, 0.45), rgba(0, 229, 255, 0.25));\n  --hero-art: url('assets/banner_standard.svg');\n  --transition-base: 0.22s ease;\n  --drawer-width: 320px;\n  font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;\n\n  --rank-n: #9aa0a6;\n  --rank-r: #42a5f5;\n  --rank-sr: #7c4dff;\n  --rank-ssr-a: #ff2d55;\n  --rank-ssr-b: #ffb300;\n  --rank-ur: #ffda6b;\n  --rank-prime-a: #6a00ff;\n  --rank-prime-b: #00e5ff;\n}\n\n* {\n  box-sizing: border-box;\n}\n\nbody.gacha-page,\n.gacha-page {\n  margin: 0;\n  background: var(--bg-page);\n  color: var(--text-main);\n  min-height: 100vh;\n  display: flex;\n  justify-content: center;\n  padding: 24px;\n}\n\nbutton {\n  font-family: inherit;\n  color: inherit;\n}\n\n.gacha-app {\n  width: min(100%, 1600px);\n  display: flex;\n  flex-direction: column;\n  gap: 24px;\n}\n\n.gacha-topbar {\n  display: flex;\n  align-items: center;\n  gap: 16px;\n  position: relative;\n}\n\n.banner-drawer-toggle {\n  display: none;\n  align-items: center;\n  gap: 6px;\n  padding: 10px 14px;\n  border-radius: 999px;\n  border: 1px solid rgba(174, 228, 255, 0.35);\n  background: rgba(8, 12, 18, 0.72);\n  color: var(--text-main);\n  font-weight: 600;\n  cursor: pointer;\n}\n\n.banner-drawer-toggle:focus-visible,\n.help-button:focus-visible,\n.currency-item:focus-visible,\n.banner-card:focus-visible,\n.hero__details:focus-visible,\n.cta__button:focus-visible,\n.modal__close:focus-visible,\n.modal__close-btn:focus-visible,\n.modal__tabs button:focus-visible {\n  outline: 2px solid #00e5ff;\n  outline-offset: 2px;\n}\n\n.currency-header {\n  display: flex;\n  gap: 10px;\n  padding: 10px 16px;\n  border-radius: 18px;\n  background: rgba(11, 17, 26, 0.82);\n  border: 1px solid rgba(126, 206, 255, 0.18);\n  flex: 1;\n  min-height: 64px;\n}\n\n.currency-item {\n  display: inline-flex;\n  align-items: center;\n  gap: 10px;\n  padding: 8px 12px;\n  border-radius: 14px;\n  background: rgba(16, 28, 42, 0.72);\n  border: 1px solid transparent;\n  position: relative;\n}\n\n.currency-item__text {\n  display: flex;\n  flex-direction: column;\n  align-items: flex-start;\n  gap: 2px;\n}\n\n.currency-item__label {\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.1em;\n  color: rgba(190, 216, 240, 0.75);\n}\n\n.currency-item__icon {\n  width: 32px;\n  height: 32px;\n  border-radius: 999px;\n  background: rgba(174, 228, 255, 0.1);\n  display: grid;\n  place-items: center;\n}\n\n.currency-item__icon img {\n  width: 24px;\n  height: 24px;\n}\n\n.currency-item__amount {\n  font-variant-numeric: tabular-nums;\n  font-weight: 600;\n}\n\n.currency-item--insufficient {\n  border-color: rgba(255, 77, 109, 0.5);\n  background: rgba(255, 77, 109, 0.12);\n}\n\n.help-button {\n  width: 42px;\n  height: 42px;\n  border-radius: 50%;\n  border: 1px solid rgba(174, 228, 255, 0.4);\n  background: rgba(12, 20, 30, 0.8);\n  color: var(--text-main);\n  font-size: 18px;\n  font-weight: 700;\n  cursor: pointer;\n  transition: transform var(--transition-base);\n}\n\n.help-button:hover {\n  transform: translateY(-2px);\n}\n\n.gacha-layout {\n  display: grid;\n  grid-template-columns: 320px 1fr;\n  gap: 24px;\n  min-height: 560px;\n}\n\n.banner-list {\n  display: flex;\n  flex-direction: column;\n  gap: 14px;\n  padding: 20px 18px;\n  border-radius: 26px;\n  background: linear-gradient(160deg, rgba(9, 14, 22, 0.82), rgba(14, 22, 34, 0.68));\n  border: 1px solid rgba(124, 200, 255, 0.24);\n  backdrop-filter: blur(18px) saturate(125%);\n  overflow-y: auto;\n  max-height: calc(100vh - 220px);\n}\n\n.banner-card {\n  display: grid;\n  grid-template-columns: 96px 1fr;\n  gap: 16px;\n  background: rgba(8, 13, 20, 0.82);\n  border-radius: 20px;\n  padding: 16px;\n  border: 1px solid rgba(124, 200, 255, 0.16);\n  cursor: pointer;\n  position: relative;\n  transition: border-color var(--transition-base), transform var(--transition-base), box-shadow var(--transition-base);\n  overflow: hidden;\n  isolation: isolate;\n}\n\n.banner-card:hover {\n  transform: translateX(6px);\n  box-shadow: 0 18px 48px rgba(0, 229, 255, 0.16);\n}\n\n.banner-card__thumb {\n  width: 96px;\n  height: 96px;\n  border-radius: 18px;\n  overflow: hidden;\n  background: rgba(124, 77, 255, 0.18);\n  display: grid;\n  place-items: center;\n  position: relative;\n}\n\n.banner-card__thumb img {\n  width: 100%;\n  height: 100%;\n  object-fit: cover;\n}\n\n.banner-card__thumb::after {\n  content: '';\n  position: absolute;\n  inset: 0;\n  background: linear-gradient(140deg, rgba(8, 12, 18, 0.15), rgba(8, 12, 18, 0));\n}\n\n.banner-card__texts {\n  display: flex;\n  flex-direction: column;\n  gap: 6px;\n}\n\n.banner-card__name {\n  margin: 0;\n  font-size: 17px;\n  font-weight: 700;\n}\n\n.banner-card__subtitle {\n  margin: 0;\n  font-size: 13px;\n  color: rgba(190, 216, 240, 0.78);\n}\n\n.banner-card__subtitle.is-empty {\n  display: none;\n}\n\n.banner-card__tag {\n  font-size: 12px;\n  font-weight: 600;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n  color: rgba(230, 240, 255, 0.82);\n}\n\n.banner-card__badge {\n  position: absolute;\n  top: 14px;\n  left: 18px;\n  font-size: 11px;\n  letter-spacing: 0.08em;\n  text-transform: uppercase;\n  padding: 4px 10px;\n  border-radius: 999px;\n  background: rgba(255, 221, 105, 0.22);\n  border: 1px solid rgba(255, 221, 105, 0.4);\n  color: #ffe27a;\n  z-index: 1;\n}\n\n.banner-card__timer {\n  position: absolute;\n  top: 14px;\n  right: 16px;\n  font-size: 12px;\n  padding: 4px 12px;\n  border-radius: 999px;\n  background: rgba(0, 229, 255, 0.18);\n  border: 1px solid rgba(0, 229, 255, 0.45);\n  color: #c6f6ff;\n  z-index: 1;\n}\n\n.banner-card--selected {\n  border-color: rgba(0, 229, 255, 0.6);\n  background: linear-gradient(135deg, rgba(0, 229, 255, 0.18), rgba(124, 77, 255, 0.18));\n  box-shadow: 0 20px 56px rgba(0, 229, 255, 0.24);\n}\n\n.hero {\n  position: relative;\n  border-radius: 32px;\n  overflow: hidden;\n  display: flex;\n  min-height: 640px;\n  background: var(--gradient-hero);\n  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.45);\n  isolation: isolate;\n}\n\n.hero__background {\n  position: absolute;\n  inset: 0;\n  background-image: var(--hero-art);\n  background-size: cover;\n  background-position: center;\n  opacity: 0.72;\n  transform: scale(1.04);\n  filter: saturate(110%);\n}\n\n.hero__background::after {\n  content: '';\n  position: absolute;\n  inset: 0;\n  background: linear-gradient(120deg, rgba(8, 12, 18, 0.92) 0%, rgba(8, 12, 18, 0.55) 48%, rgba(8, 12, 18, 0.9) 100%);\n}\n\n.hero__content {\n  position: relative;\n  z-index: 1;\n  padding: 48px 56px;\n  display: flex;\n  flex-direction: column;\n  gap: 28px;\n  width: 100%;\n}\n\n.hero__header {\n  display: flex;\n  justify-content: space-between;\n  gap: 24px;\n  align-items: flex-start;\n}\n\n.hero__title-group {\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n}\n\n.hero__title {\n  margin: 0;\n  font-size: clamp(32px, 3vw, 44px);\n  letter-spacing: 0.06em;\n  text-transform: uppercase;\n}\n\n.hero__subtitle {\n  margin: 0;\n  color: var(--text-muted);\n  font-size: 16px;\n}\n\n.hero__type-chip {\n  padding: 6px 14px;\n  border-radius: 999px;\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.12em;\n  border: 1px solid rgba(230, 240, 255, 0.4);\n  background: rgba(11, 17, 26, 0.6);\n  width: fit-content;\n}\n\n.hero__meta {\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n  align-items: flex-end;\n}\n\n.hero__rateup {\n  padding: 8px 16px;\n  border-radius: 999px;\n  font-weight: 700;\n  font-size: 12px;\n  letter-spacing: 0.1em;\n  background: rgba(255, 221, 105, 0.24);\n  color: #ffe27a;\n  border: 1px solid rgba(255, 221, 105, 0.55);\n  display: none;\n  align-items: center;\n  gap: 8px;\n}\n\n.hero__rateup::before {\n  content: '★';\n  font-size: 12px;\n}\n\n.hero__rateup.is-visible {\n  display: inline-flex;\n}\n\n.hero__timer {\n  padding: 8px 14px;\n  border-radius: 999px;\n  background: rgba(0, 229, 255, 0.18);\n  color: #bdf6ff;\n  font-size: 12px;\n  letter-spacing: 0.06em;\n  border: 1px solid rgba(0, 229, 255, 0.45);\n}\n\n.pity {\n  display: flex;\n  flex-direction: column;\n  gap: 16px;\n  }\n\n.pity__pills {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 12px;\n}\n\n.pity-pill {\n  padding: 8px 14px;\n  border-radius: 999px;\n  background: rgba(12, 20, 30, 0.72);\n  border: 1px solid rgba(174, 228, 255, 0.3);\n  font-size: 13px;\n  display: inline-flex;\n  align-items: center;\n  gap: 8px;\n}\n\n.pity-pill__label {\n  font-weight: 600;\n}\n\n.pity__progress {\n  display: flex;\n  align-items: center;\n  gap: 18px;\n}\n\n.pity__bar {\n  flex: 1;\n  height: 10px;\n  border-radius: 999px;\n  background: rgba(11, 17, 26, 0.6);\n  position: relative;\n  overflow: hidden;\n}\n\n.pity__bar::after {\n  content: '';\n  position: absolute;\n  inset: 0;\n  background: linear-gradient(90deg, rgba(124, 77, 255, 0.4), rgba(0, 229, 255, 0.35));\n  transform: scaleX(var(--pity-progress, 0));\n  transform-origin: left;\n  transition: transform 0.3s ease;\n}\n\n.pity__note {\n  font-size: 12px;\n  color: var(--text-muted);\n}\n\n.featured__list {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));\n  gap: 18px;\n}\n\n.featured__empty {\n  margin: 0;\n  color: var(--text-muted);\n  font-size: 14px;\n}\n\n.featured-card {\n  position: relative;\n  border-radius: 20px;\n  overflow: hidden;\n  background: rgba(11, 17, 26, 0.55);\n  min-height: 240px;\n  display: flex;\n  flex-direction: column;\n  justify-content: flex-end;\n  color: var(--text-main);\n}\n\n.featured-card__art {\n  position: absolute;\n  inset: 0;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  pointer-events: none;\n}\n\n.featured-card__art img {\n  width: 100%;\n  height: 100%;\n  object-fit: cover;\n}\n\n.featured-card__footer {\n  position: relative;\n  z-index: 1;\n  padding: 16px;\n  background: linear-gradient(0deg, rgba(11, 15, 20, 0.86), rgba(11, 15, 20, 0));\n  font-weight: 600;\n  letter-spacing: 0.02em;\n}\n\n.rank-chip {\n  font: 600 12px/1 'Inter', sans-serif;\n  padding: 2px 8px;\n  border-radius: 999px;\n  color: #0b0f14;\n  background: #fff;\n  position: absolute;\n  top: 12px;\n  left: 12px;\n  z-index: 2;\n  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);\n}\n\n.aura {\n  position: relative;\n  border-radius: 16px;\n}\n\n.aura::after {\n  content: '';\n  position: absolute;\n  inset: -4px;\n  border-radius: inherit;\n  pointer-events: none;\n  filter: blur(4px);\n}\n\n.aura--N::after {\n  box-shadow: 0 0 0 1px var(--rank-n), 0 0 6px rgba(154, 160, 166, 0.3);\n}\n\n.aura--R::after {\n  box-shadow: 0 0 0 2px var(--rank-r), 0 0 10px rgba(66, 165, 245, 0.4);\n}\n\n.aura--SR::after {\n  box-shadow: 0 0 0 2px var(--rank-sr), 0 0 12px rgba(124, 77, 255, 0.45);\n  animation: pulse 3s infinite;\n}\n\n.aura--SSR::after {\n  box-shadow: 0 0 0 2px var(--rank-ssr-a), 0 0 0 4px var(--rank-ssr-b), 0 0 16px rgba(255, 179, 0, 0.45);\n}\n\n.aura--UR::after {\n  box-shadow: 0 0 0 2px #fff, 0 0 0 5px var(--rank-ur), 0 0 18px rgba(255, 218, 107, 0.5);\n}\n\n.aura--Prime::after {\n  box-shadow: 0 0 0 2px var(--rank-prime-a), 0 0 0 6px var(--rank-prime-b), 0 0 24px rgba(0, 229, 255, 0.5);\n  animation: twinkle 10s infinite linear;\n}\n\n@keyframes pulse {\n  50% {\n    filter: blur(6px) brightness(1.1);\n  }\n}\n\n@keyframes twinkle {\n  0% {\n    opacity: 0.9;\n  }\n  50% {\n    opacity: 0.7;\n  }\n  100% {\n    opacity: 0.9;\n  }\n}\n\n.hero__details {\n  align-self: flex-start;\n  padding: 12px 22px;\n  border-radius: 999px;\n  border: 1px solid rgba(174, 228, 255, 0.42);\n  background: rgba(12, 20, 30, 0.72);\n  color: var(--text-main);\n  font-weight: 600;\n  letter-spacing: 0.08em;\n  text-transform: uppercase;\n  cursor: pointer;\n  transition: transform var(--transition-base), border-color var(--transition-base);\n}\n\n.hero__details:hover {\n  transform: translateY(-2px);\n  border-color: rgba(174, 228, 255, 0.7);\n}\n\n.cta {\n  display: flex;\n  flex-direction: column;\n  gap: 18px;\n  align-items: center;\n  text-align: center;\n}\n\n.cta__note {\n  font-size: 13px;\n  color: var(--text-muted);\n}\n\n.cta__buttons {\n  display: flex;\n  gap: 24px;\n  flex-wrap: wrap;\n  justify-content: center;\n}\n\n.cta__button {\n  min-width: 220px;\n  padding: 18px 24px 12px;\n  border-radius: 22px;\n  border: 1px solid rgba(174, 228, 255, 0.4);\n  background: rgba(11, 17, 26, 0.82);\n  color: var(--text-main);\n  font-size: 18px;\n  font-weight: 700;\n  text-transform: uppercase;\n  letter-spacing: 0.12em;\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n  cursor: pointer;\n  transition: transform var(--transition-base), border-color var(--transition-base), box-shadow var(--transition-base);\n}\n\n.cta__button--affordable {\n  border-color: rgba(0, 229, 255, 0.55);\n  box-shadow: 0 14px 34px rgba(0, 229, 255, 0.18);\n}\n\n.cta__button:hover:enabled {\n  transform: translateY(-4px);\n  border-color: rgba(0, 229, 255, 0.7);\n  box-shadow: 0 18px 48px rgba(0, 229, 255, 0.2);\n}\n\n.cta__button:disabled {\n  cursor: not-allowed;\n  opacity: 0.6;\n  border-color: rgba(255, 102, 126, 0.45);\n  background: rgba(255, 102, 126, 0.1);\n}\n\n.cta__label {\n  font-size: 16px;\n}\n\n.cta__cost {\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n  font-size: 14px;\n  color: var(--text-muted);\n}\n\n.cta__cost-line {\n  display: inline-flex;\n  align-items: center;\n  gap: 8px;\n}\n\n.cta__cost-line img {\n  width: 20px;\n  height: 20px;\n}\n\n.cta__cost-line--fallback {\n  font-size: 12px;\n  opacity: 0.8;\n}\n\n.modal {\n  position: fixed;\n  inset: 0;\n  display: none;\n  align-items: center;\n  justify-content: center;\n  padding: 32px;\n  z-index: 100;\n}\n\n.modal.is-open {\n  display: flex;\n}\n\n.modal__overlay {\n  position: absolute;\n  inset: 0;\n  background: rgba(4, 6, 10, 0.75);\n}\n\n.modal__dialog {\n  position: relative;\n  z-index: 1;\n  background: rgba(11, 17, 26, 0.95);\n  border-radius: 24px;\n  padding: 24px;\n  border: 1px solid rgba(174, 228, 255, 0.3);\n  width: min(720px, 100%);\n  display: flex;\n  flex-direction: column;\n  gap: 18px;\n}\n\n.modal__dialog--wide {\n  width: min(960px, 100%);\n}\n\n.modal__header {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  gap: 12px;\n}\n\n.modal__title {\n  margin: 0;\n  font-size: 22px;\n  letter-spacing: 0.06em;\n}\n\n.modal__close {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  border: 1px solid rgba(174, 228, 255, 0.4);\n  background: rgba(12, 20, 30, 0.8);\n  cursor: pointer;\n  position: relative;\n}\n\n.modal__close::before,\n.modal__close::after {\n  content: '';\n  position: absolute;\n  top: 50%;\n  left: 50%;\n  width: 14px;\n  height: 2px;\n  background: var(--text-main);\n  transform: translate(-50%, -50%) rotate(45deg);\n}\n\n.modal__close::after {\n  transform: translate(-50%, -50%) rotate(-45deg);\n}\n\n.modal__tabs {\n  display: flex;\n  gap: 12px;\n}\n\n.modal__tabs button {\n  flex: 1;\n  padding: 10px 14px;\n  border-radius: 12px;\n  border: 1px solid rgba(174, 228, 255, 0.28);\n  background: rgba(12, 20, 30, 0.7);\n  color: var(--text-main);\n  font-weight: 600;\n  cursor: pointer;\n}\n\n.modal__tabs button[aria-selected='true'] {\n  border-color: rgba(0, 229, 255, 0.6);\n  box-shadow: 0 12px 32px rgba(0, 229, 255, 0.2);\n}\n\n.modal__body {\n  display: flex;\n  flex-direction: column;\n  gap: 18px;\n}\n\n.modal__panel {\n  display: flex;\n  flex-direction: column;\n  gap: 16px;\n}\n\n.featured-list {\n  list-style: none;\n  margin: 0;\n  padding: 0;\n  display: flex;\n  flex-direction: column;\n  gap: 12px;\n}\n\n.featured-list__item {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  padding: 10px 14px;\n  border-radius: 12px;\n  background: rgba(12, 20, 30, 0.65);\n  border: 1px solid rgba(174, 228, 255, 0.22);\n}\n\n.rates-table {\n  width: 100%;\n  border-collapse: collapse;\n  font-size: 15px;\n}\n\n.rates-table thead {\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n  color: var(--text-muted);\n}\n\n.rates-table th,\n.rates-table td {\n  padding: 12px 14px;\n  border-bottom: 1px solid rgba(174, 228, 255, 0.2);\n}\n\n.pity-list {\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n  font-size: 14px;\n}\n\n.pity-list__row {\n  padding: 10px 14px;\n  border-radius: 12px;\n  background: rgba(12, 20, 30, 0.6);\n  border: 1px solid rgba(174, 228, 255, 0.2);\n}\n\n.pity-list__carry {\n  font-size: 13px;\n  color: var(--text-muted);\n}\n\n.modal__description {\n  margin: 0;\n  color: var(--text-muted);\n}\n\n.confirm__grid {\n  border-radius: 18px;\n  padding: 18px;\n  background: rgba(11, 17, 26, 0.72);\n  border: 1px solid rgba(174, 228, 255, 0.2);\n}\n\n.confirm__gacha {\n  min-height: 320px;\n}\n\n.modal__footer {\n  display: flex;\n  justify-content: flex-end;\n}\n\n.modal__close-btn {\n  padding: 10px 18px;\n  border-radius: 12px;\n  border: 1px solid rgba(174, 228, 255, 0.4);\n  background: rgba(12, 20, 30, 0.7);\n  color: var(--text-main);\n  cursor: pointer;\n}\n\n.banner-list__drawer {\n  display: none;\n}\n\n@media (max-width: 1280px) {\n  .gacha-layout {\n    grid-template-columns: 280px 1fr;\n  }\n}\n\n@media (max-width: 960px) {\n  body.gacha-page,\n  .gacha-page {\n    padding: 16px;\n  }\n\n  .gacha-layout {\n    grid-template-columns: 1fr;\n  }\n\n  .banner-list {\n    position: fixed;\n    top: 0;\n    bottom: 0;\n    left: 0;\n    width: var(--drawer-width);\n    max-height: none;\n    transform: translateX(-100%);\n    transition: transform var(--transition-base);\n    z-index: 90;\n  }\n\n  .gacha-app[data-drawer-open='true'] .banner-list {\n    transform: translateX(0);\n  }\n\n  .banner-drawer-toggle {\n    display: inline-flex;\n  }\n\n  .hero {\n    min-height: 520px;\n  }\n}\n\n@media (max-width: 720px) {\n  body.gacha-page,\n  .gacha-page {\n    padding: 12px;\n  }\n\n  .gacha-app {\n    gap: 18px;\n  }\n\n  .banner-card {\n    grid-template-columns: 80px 1fr;\n    padding: 14px;\n  }\n\n  .banner-card__thumb {\n    width: 80px;\n    height: 80px;\n  }\n\n  .banner-card__badge {\n    top: 12px;\n    left: 14px;\n  }\n\n  .banner-card__timer {\n    top: 12px;\n    right: 14px;\n  }\n\n  .hero__content {\n    padding: 28px;\n    gap: 22px;\n  }\n\n  .hero__header {\n    flex-direction: column;\n    align-items: flex-start;\n  }\n\n  .hero__meta {\n    flex-direction: row;\n    align-items: center;\n  }\n\n  .currency-header {\n    flex-wrap: wrap;\n  }\n\n  .banner-list {\n    width: calc(100% - 48px);\n  }\n\n  .cta__button {\n    min-width: 180px;\n    font-size: 16px;\n  }\n}\n\n@media (max-width: 480px) {\n  .hero {\n    min-height: 480px;\n  }\n\n  .hero__content {\n    padding: 24px;\n  }\n\n  .currency-header {\n    padding: 10px 12px;\n  }\n\n  .currency-item {\n    padding: 6px 10px;\n  }\n}\n";
+  const css = ":root {\n  color-scheme: dark;\n  font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;\n  --bg-page: #05090f;\n  --bg-panel: rgba(12, 18, 28, 0.88);\n  --bg-accent: rgba(16, 28, 42, 0.74);\n  --border-accent: rgba(120, 196, 255, 0.28);\n  --text-main: #e9f2ff;\n  --text-muted: rgba(192, 220, 244, 0.8);\n  --primary: #76d4ff;\n  --highlight: linear-gradient(135deg, rgba(118, 212, 255, 0.45), rgba(255, 154, 255, 0.4));\n  --rarity-n: #7b869a;\n  --rarity-r: #57a8ff;\n  --rarity-sr: #a47dff;\n  --rarity-ssr: #ffc866;\n  --rarity-ur: #ff6a9f;\n  --rarity-prime: #6cffeb;\n}\n\n* {\n  box-sizing: border-box;\n}\n\nbody.gacha-ui {\n  margin: 0;\n  min-height: 100vh;\n  background: radial-gradient(circle at top left, rgba(118, 212, 255, 0.18), transparent 45%),\n    radial-gradient(circle at bottom right, rgba(255, 154, 255, 0.2), transparent 50%), var(--bg-page);\n  color: var(--text-main);\n  display: flex;\n  justify-content: center;\n  padding: 32px;\n}\n\nbutton {\n  font-family: inherit;\n  color: inherit;\n}\n\n.gacha-ui-root {\n  width: min(1280px, 100%);;\n  display: flex;\n  flex-direction: column;\n  gap: 24px;\n}\n\n.gacha-header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 16px;\n}\n\n.currency-bar {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));\n  gap: 12px;\n  background: var(--bg-panel);\n  padding: 14px 18px;\n  border-radius: 20px;\n  border: 1px solid var(--border-accent);\n  box-shadow: 0 18px 48px rgba(5, 12, 20, 0.45);\n}\n\n.currency-chip {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 12px;\n  padding: 10px 14px;\n  border-radius: 16px;\n  border: 1px solid transparent;\n  background: var(--bg-accent);\n  cursor: pointer;\n  transition: transform 0.16s ease, border-color 0.16s ease;\n}\n\n.currency-chip:hover,\n.currency-chip:focus-visible {\n  transform: translateY(-3px);\n  border-color: rgba(118, 212, 255, 0.65);\n  outline: none;\n}\n\n.currency-chip__icon {\n  width: 36px;\n  height: 36px;\n  border-radius: 50%;\n  background: rgba(118, 212, 255, 0.18);\n  display: grid;\n  place-items: center;\n}\n\n.currency-chip__icon img {\n  width: 24px;\n  height: 24px;\n}\n\n.currency-chip__info {\n  display: flex;\n  flex-direction: column;\n  align-items: flex-start;\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n  color: var(--text-muted);\n}\n\n.currency-chip__code {\n  font-weight: 600;\n  color: var(--text-main);\n}\n\n.currency-chip__value {\n  font-weight: 600;\n  font-variant-numeric: tabular-nums;\n}\n\n.rules-button {\n  padding: 12px 18px;\n  border-radius: 16px;\n  border: 1px solid rgba(118, 212, 255, 0.5);\n  background: rgba(10, 16, 24, 0.86);\n  cursor: pointer;\n  text-transform: uppercase;\n  letter-spacing: 0.12em;\n  font-size: 12px;\n}\n\n.gacha-body {\n  display: grid;\n  grid-template-columns: 280px 1fr;\n  gap: 24px;\n}\n\n.banner-sidebar {\n  background: var(--bg-panel);\n  border-radius: 24px;\n  border: 1px solid var(--border-accent);\n  padding: 18px;\n  display: flex;\n  flex-direction: column;\n  gap: 12px;\n  overflow-y: auto;\n  max-height: calc(100vh - 220px);\n}\n\n.banner-entry {\n  width: 100%;\n  text-align: left;\n  padding: 14px 16px;\n  border-radius: 18px;\n  border: 1px solid transparent;\n  background: rgba(16, 26, 40, 0.88);\n  cursor: pointer;\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n  transition: transform 0.18s ease, border-color 0.18s ease;\n}\n\n.banner-entry__title {;\n  font-weight: 600;\n}\n\n.banner-entry__timer {\n  font-size: 12px;\n  color: var(--text-muted);\n}\n\n.banner-entry:hover,\n.banner-entry:focus-visible {\n  transform: translateX(6px);\n  border-color: rgba(118, 212, 255, 0.6);\n  outline: none;\n}\n\n.banner-entry.is-active {\n  border-color: rgba(255, 154, 255, 0.65);\n  background: linear-gradient(135deg, rgba(118, 212, 255, 0.22), rgba(255, 154, 255, 0.16));\n}\n\n.banner-panel {\n  background: var(--bg-panel);\n  border-radius: 28px;\n  border: 1px solid var(--border-accent);\n  padding: 24px;\n  display: grid;\n  gap: 18px;\n  position: relative;\n  overflow: hidden;\n}\n\n.banner-panel__header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n}\n\n.banner-title {\n  margin: 0;\n  font-size: 26px;\n  letter-spacing: 0.04em;\n  text-transform: uppercase;\n}\n\n.banner-desc {\n  margin: 6px 0 0;\n  color: var(--text-muted);\n}\n\n.banner-timer {\n  font-size: 13px;\n  color: var(--primary);\n}\n\n.banner-panel__art {\n  border-radius: 22px;\n  background: rgba(10, 16, 24, 0.7);\n  overflow: hidden;\n  min-height: 180px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.banner-panel__art img {\n  width: 100%;\n  height: 100%;\n  object-fit: cover;\n  filter: saturate(120%);\n}\n\n.rate-list {\n  display: grid;\n  grid-template-columns: repeat(3, minmax(0, 1fr));\n  gap: 8px 16px;\n  margin: 0;\n}\n\n.hrate-list dt {\n  font-weight: 600;\n}\n\n.rate-list dd {\n  margin: 0;\n  color: var(--text-muted);\n}\n\n.banner-panel__pity {\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n}\n\n.pity-meter {\n  display: grid;\n  grid-template-columns: 80px 1fr 80px;\n  align-items: center;\n  gap: 12px;\n}\n\n.pity-meter__label {\n  font-size: 12px;\n  text-transform: uppercase;\n  color: var(--text-muted);\n}\n\n.pity-meter__bar {\n  position: relative;\n  height: 8px;\n  border-radius: 999px;\n  background: rgba(118, 212, 255, 0.15);\n  overflow: hidden;\n}\n\n.pity-meter__progress {\n  position: absolute;\n  inset: 0;\n  border-radius: 999px;\n  background: var(--highlight);\n}\n\n.pity-meter__value {\n  font-variant-numeric: tabular-nums;\n  justify-self: end;\n}\n\n.featured__heading {\n  margin: 0;\n  font-size: 16px;\n  letter-spacing: 0.08em;\n  text-transform: uppercase;\n}\n\n.featured__note {\n  margin: 2px 0 12px;\n  color: var(--text-muted);\n  font-size: 12px;\n}\n\n.featured-card {\n  display: flex;\n  gap: 10px;\n  align-items: center;\n  padding: 10px 14px;\n  border-radius: 16px;\n  background: rgba(20, 32, 48, 0.9);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n  font-weight: 600;\n}\n\n.featured-card + .featured-card {\n  margin-top: 8px;\n}\n\n.featured-card__rarity {\n  font-size: 13px;\n  padding: 4px 8px;\n  border-radius: 999px;\n  background: rgba(118, 212, 255, 0.18);\n}\n\n.featured-card__name {\n  font-size: 15px;\n}\n\n.banner-panel__cost {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));\n  gap: 12px;\n}\n\n.cost-entry {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding: 12px 14px;\n  border-radius: 16px;\n  background: rgba(20, 32, 48, 0.86);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n}\n\n.cost-entry__value {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  font-weight: 600;\n}\n\n.cost-entry__value img {\n  width: 18px;\n  height: 18px;\n}\n\n.banner-panel__actions {\n  display: flex;\n  gap: 12px;\n}\n\n.banner-panel__actions button {\n  flex: 1;\n  padding: 14px 18px;\n  border-radius: 18px;\n  border: 1px solid rgba(118, 212, 255, 0.45);\n  background: rgba(16, 28, 42, 0.9);\n  text-transform: uppercase;\n  letter-spacing: 0.12em;\n  cursor: pointer;\n  transition: transform 0.16s ease, border-color 0.16s ease;\n}\n\n.banner-panel__actions button:hover,\n.banner-panel__actions button:focus-visible {\n  transform: translateY(-2px);\n  border-color: rgba(255, 154, 255, 0.6);\n  outline: none;\n}\n\n.banner-panel__results {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));\n  gap: 10px;\n}\n\n.result-entry {\n  padding: 12px 14px;\n  border-radius: 16px;\n  background: rgba(16, 28, 42, 0.82);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n  display: grid;\n  gap: 6px;\n}\n\n.result-entry__rarity {\n  font-weight: 700;\n  text-transform: uppercase;\n}\n\n.result-entry__name {\n  color: var(--text-muted);\n}\n\n.result-entry__pity {\n  font-size: 12px;\n  color: var(--primary);\n}\n\n.modal-overlay {\n  position: fixed;\n  inset: 0;\n  backdrop-filter: blur(12px);\n  background: rgba(5, 10, 18, 0.68);\n  display: grid;\n  place-items: center;\n  z-index: 2000;\n}\n\n.modal-content {\n  width: min(420px, 92vw);\n  background: rgba(10, 16, 24, 0.92);\n  border-radius: 20px;\n  border: 1px solid rgba(118, 212, 255, 0.3);\n  padding: 24px;\n  color: var(--text-main);\n  box-shadow: 0 24px 64px rgba(5, 12, 20, 0.55);\n}\n\n.modal-content h2 {\n  margin-top: 0;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n}\n\n.modal-content ul {\n  margin: 12px 0 0;\n  padding-left: 20px;\n  color: var(--text-muted);\n}\n\n.gacha-toast {\n  position: fixed;\n  right: 24px;\n  bottom: 24px;\n  background: rgba(16, 28, 42, 0.92);\n  border-radius: 16px;\n  padding: 12px 18px;\n  border: 1px solid rgba(118, 212, 255, 0.35);\n  opacity: 0;\n  transform: translateY(12px);\n  transition: opacity 0.2s ease, transform 0.2s ease;\n  pointer-events: none;\n}\n\ngacha-toast.is-visible {\n  opacity: 1;\n  transform: translateY(0);\n}\n\n@media (max-width: 960px) {\n  .gacha-body {\n    grid-template-columns: 1fr;\n  }\n\n  .banner-sidebar {\n    flex-direction: row;\n    overflow-x: auto;\n    max-height: none;\n  }\n\n  .banner-entry {\n    min-width: 220px;\n  }\n}\n\n@media (max-width: 720px) {\n  body.gacha-ui {\n    padding: 24px 16px;\n}\n\n.currency-bar {\n    grid-template-columns: repeat(2, minmax(0, 1fr));\n  }\n}";
   module.exports = css;
   module.exports.default = css;
 });
-__define('./screens/ui-gacha/gacha.js', (exports, module, __require) => {
-  const runtimeRequire = typeof __require === 'function'
-    ? __require
-    : typeof globalThis !== 'undefined' && typeof (globalThis.__require) === 'function'
-      ? globalThis.__require
-      : typeof window !== 'undefined' && typeof window.__require === 'function'
-        ? window.__require
-        : null;
-
-  if (!runtimeRequire) {
-    throw new Error('[Gacha UI] Không tìm thấy hàm require runtime để tải view.');
-  }
-
-  const { renderGachaView } = runtimeRequire('./screens/gacha/view.ts');
-
-  const DEFAULT_CURRENCIES = [
-    { id: 'gem', name: 'Tinh Thạch', icon: 'assets/gem.svg', amount: 12345 },
-    { id: 'ticket', name: 'Vé Triệu Hồi', icon: 'assets/ticket.svg', amount: 7 },
-    { id: 'coin', name: 'Đồng Vận', icon: 'assets/coin.svg', amount: 99800 },
-    { id: 'dust', name: 'Bụi Hư Ảnh', icon: 'assets/dust.svg', amount: 420 },
-    { id: 'key', name: 'Chìa Khoá Sự Kiện', icon: 'assets/key.svg', amount: 1 },
-  ];
-
-  const RANKS = ['N', 'R', 'SR', 'SSR', 'UR', 'Prime'];
-  const RARITY_PRIORITY = [...RANKS].reverse();
-
-  const DEFAULT_BANNERS = [
-    {
-      id: 'SSR',
-      type: 'standard',
-      name: 'Triệu Hồi Chuẩn',
-      subtitle: 'Chỉ xuất hiện N / R / SR / SSR',
-      closesIn: '--',
-      heroArt: 'assets/banner_standard.svg',
-      thumbnail: 'assets/banner_standard.svg',
-      featured: [],
-      rates: { N: 60, R: 25, SR: 12, SSR: 3, UR: 0, Prime: 0 },
-      pity: {
-        soft: null,
-        hard: { SSR: 80 },
-        carryOverPerBanner: true,
-      },
-      cost: {
-        single: { currency: 'ticket', amount: 1, fallback: { currency: 'gem', amount: 250 } },
-        multi: { currency: 'ticket', amount: 10, fallback: { currency: 'gem', amount: 2500 } },
-      },
-    },
-    {
-      id: 'UR',
-      type: 'limited',
-      name: 'Giới Hạn: Huyễn Long',
-      subtitle: "Selected Partners' Summon Rate UP",
-      closesIn: '6d 23h',
-      heroArt: 'assets/banner_dragon.svg',
-      thumbnail: 'assets/banner_dragon.svg',
-      featured: [
-        { id: 'unit-aurora', name: 'Aurora', rank: 'UR', portrait: 'assets/u_aurora.svg' },
-        { id: 'unit-veil', name: 'Veil', rank: 'SSR', portrait: 'assets/u_veil.svg' },
-      ],
-      rates: { N: 55, R: 23, SR: 12, SSR: 7.5, UR: 2.2, Prime: 0.3 },
-      pity: {
-        soft: { UR: 65 },
-        hard: { UR: 90, Prime: 200 },
-        carryOverPerBanner: false,
-      },
-      cost: {
-        single: { currency: 'gem', amount: 250 },
-        multi: { currency: 'gem', amount: 2500 },
-      },
-    },
-    {
-      id: 'Prime',
-      type: 'limited',
-      name: 'Giới Hạn: Hư Chủ',
-      subtitle: 'Prime focus',
-      closesIn: '3d 12h',
-      heroArt: 'assets/banner_void.svg',
-      thumbnail: 'assets/banner_void.svg',
-      featured: [{ id: 'unit-void-lord', name: 'Hư Chủ', rank: 'Prime', portrait: 'assets/u_void.svg' }],
-      rates: { N: 54, R: 24, SR: 12, SSR: 8.5, UR: 1.0, Prime: 0.5 },
-      pity: {
-        soft: { UR: 60 },
-        hard: { UR: 90, Prime: 180 },
-        carryOverPerBanner: false,
-      },
-      cost: {
-        single: { currency: 'key', amount: 1, fallback: { currency: 'gem', amount: 300 } },
-        multi: { currency: 'key', amount: 10, fallback: { currency: 'gem', amount: 3000 } },
-      },
-    },
-  ];
-
-  const CURRENCY_ICON_MAP = {
-    TT: 'assets/gem.svg',
-    THUONG: 'assets/ticket.svg',
-    TRUNG: 'assets/coin.svg',
-    HA: 'assets/key.svg',
-    VUN: 'assets/dust.svg',
+__define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
+  const __dep0 = __require('./screens/ui-gacha/logic/config.ts');
+  const CURRENCY_LABELS = __dep0.CURRENCY_LABELS;
+  const createWallet = __dep0.createWallet;
+  const GACHA_CONFIG = __dep0.GACHA_CONFIG;
+  const __dep1 = __require('./screens/ui-gacha/logic/currency.ts');
+  const payForRoll = __dep1.payForRoll;
+  const __dep2 = __require('./screens/ui-gacha/logic/gacha.ts');
+  const getBannerById = __dep2.getBannerById;
+  const multiRoll = __dep2.multiRoll;
+  const rollBanner = __dep2.rollBanner;
+  const __dep3 = __require('./screens/ui-gacha/logic/pity.ts');
+  const getBannerState = __dep3.getBannerState;
+  const __dep4 = __require('./screens/ui-gacha/logic/types.ts');
+  const CURRENCY_ORDER = __dep4.CURRENCY_ORDER;
+  const NUMBER_FORMAT = new Intl.NumberFormat('vi-VN');
+  const TIME_FORMAT = new Intl.RelativeTimeFormat('vi', { style: 'short', numeric: 'auto' });
+  const CURRENCY_ICONS = {
+      VNT: 'assets/dust.svg',
+      HNT: 'assets/coin.svg',
+      TNT: 'assets/ticket.svg',
+      ThNT: 'assets/key.svg',
+      TT: 'assets/gem.svg',
   };
-
-  const CURRENCY_FALLBACK_ID = {
-    TT: 'gem',
-    THUONG: 'ticket',
-    TRUNG: 'coin',
-    HA: 'dust',
-    VUN: 'key',
-    THANH_TINH: 'gem',
-  };
-
-  let CURRENCIES = cloneDefaultCurrencies();
-  let BANNERS = cloneDefaultBanners();
-
-  const pityStates = new Map();
-
-  const DEFAULT_ICON = 'assets/gem.svg';
-
-  const AURA_CLASS_BY_RANK = {
-    N: 'N',
-    R: 'R',
-    SR: 'SR',
-    SSR: 'SSR',
-    UR: 'UR',
-    PRIME: 'Prime',
-  };
-
-  function cloneDefaultCurrencies() {
-    return DEFAULT_CURRENCIES.map((entry) => ({ ...entry }));
-  }
-
-  function cloneDefaultBanners() {
-    return DEFAULT_BANNERS.map((entry) => ({
-      ...entry,
-      featured: Array.isArray(entry.featured) ? entry.featured.map((unit) => ({ ...unit })) : [],
-      cost: entry.cost
-        ? {
-            single: entry.cost.single ? { ...entry.cost.single, fallback: entry.cost.single.fallback ? { ...entry.cost.single.fallback } : undefined } : null,
-            multi: entry.cost.multi ? { ...entry.cost.multi, fallback: entry.cost.multi.fallback ? { ...entry.cost.multi.fallback } : undefined } : null,
-          }
-        : null,
-      pity: entry.pity
-        ? {
-            soft: entry.pity.soft ? { ...entry.pity.soft } : entry.pity.soft,
-            hard: entry.pity.hard ? { ...entry.pity.hard } : entry.pity.hard,
-            carryOverPerBanner: entry.pity.carryOverPerBanner,
-          }
-        : null,
-    }));
-  }
-
-  function warnConfig(path, message) {
-    const detail = message ? ` (${message})` : '';
-    console.warn(`[Gacha Config] Thiếu hoặc lỗi dữ liệu tại "${path}"${detail}. Dùng giá trị mặc định.`);
-  }
-
-  function toPercent(value) {
-    if (typeof value !== 'number' || Number.isNaN(value)) {
-      return null;
-    }
-    return Math.round(value * 10000) / 100;
-  }
-
-  function mapCurrencyIcon(code, fallbackIcon) {
-    if (!code) {
-      return fallbackIcon ?? DEFAULT_ICON;
-    }
-    return CURRENCY_ICON_MAP[code] ?? fallbackIcon ?? DEFAULT_ICON;
-  }
-
-  function buildCurrenciesFromConfig(config) {
-    const currenciesConfig = config?.economy?.currencies;
-    if (!currenciesConfig || typeof currenciesConfig !== 'object') {
-      warnConfig('economy.currencies');
-      return cloneDefaultCurrencies();
-    }
-
-    const defaultsById = new Map(DEFAULT_CURRENCIES.map((currency) => [currency.id, currency]));
-    const result = Object.entries(currenciesConfig).map(([key, currencyConfig]) => {
-      const code = currencyConfig?.code ?? key;
-      if (!currencyConfig?.code) {
-        warnConfig(`economy.currencies.${key}.code`);
-      }
-      const fallbackId = CURRENCY_FALLBACK_ID[code] ?? CURRENCY_FALLBACK_ID[key] ?? code;
-      const fallback = defaultsById.get(code) ?? defaultsById.get(fallbackId) ?? defaultsById.get(key) ?? null;
-      const name = currencyConfig?.name ?? fallback?.name ?? key;
-      if (!currencyConfig?.name) {
-        warnConfig(`economy.currencies.${key}.name`);
-      }
-      const icon = mapCurrencyIcon(code, fallback?.icon);
-      const amount = fallback?.amount ?? 0;
-      return {
-        id: code,
-        name,
-        icon,
-        amount,
-        tier: currencyConfig?.tier ?? fallback?.tier ?? null,
-      };
-    });
-
-    result.sort((a, b) => (b.tier ?? 0) - (a.tier ?? 0));
-    return result.slice(0, 5);
-  }
-
-  function isValidCostEntry(entry) {
-    return entry && typeof entry.currency === 'string' && typeof entry.amount === 'number';
-  }
-
-  function mapCost(entries, fallbackCost, path) {
-    if (!Array.isArray(entries) || entries.length === 0) {
-      if (path) {
-        warnConfig(path, 'thiếu danh sách giá');
-      }
-      return fallbackCost ? { ...fallbackCost, fallback: fallbackCost.fallback ? { ...fallbackCost.fallback } : undefined } : null;
-    }
-
-    const [primary, secondary] = entries;
-    if (!isValidCostEntry(primary)) {
-      warnConfig(path ? `${path}[0]` : 'cost', 'thiếu currency hoặc amount');
-      return fallbackCost ? { ...fallbackCost, fallback: fallbackCost.fallback ? { ...fallbackCost.fallback } : undefined } : null;
-    }
-
-    const cost = {
-      currency: primary.currency,
-      amount: primary.amount,
-    };
-
-    if (isValidCostEntry(secondary)) {
-      cost.fallback = {
-        currency: secondary.currency,
-        amount: secondary.amount,
-      };
-    } else if (fallbackCost?.fallback) {
-      cost.fallback = { ...fallbackCost.fallback };
-    }
-
-    return cost;
-  }
-
-  function mapPity(configPity, configRateUpRule, fallbackPity, bannerId) {
-    const fallbackSoft = fallbackPity?.soft ? { ...fallbackPity.soft } : null;
-    const fallbackHard = fallbackPity?.hard ? { ...fallbackPity.hard } : null;
-    const fallbackSoftKeys = fallbackSoft ? Object.keys(fallbackSoft) : [];
-    const fallbackHardKeys = fallbackHard ? Object.keys(fallbackHard) : [];
-    const targetRarity = configRateUpRule?.onHitRarity ?? fallbackHardKeys[0] ?? fallbackSoftKeys[0] ?? bannerId;
-
-    let soft = fallbackSoft;
-    if (configPity?.softPity?.startAtPull) {
-      const key = configRateUpRule?.onHitRarity ?? fallbackSoftKeys[0] ?? targetRarity;
-      soft = { ...(soft ?? {}), [key]: configPity.softPity.startAtPull };
-    }
-
-    let hard = fallbackHard;
-    if (typeof configPity?.hardPity === 'number') {
-      hard = { ...(hard ?? {}), [targetRarity]: configPity.hardPity };
-    }
-
-    return {
-      soft: soft ?? null,
-      hard: hard ?? null,
-      carryOverPerBanner: fallbackPity?.carryOverPerBanner ?? false,
-    };
-  }
-
-  function buildRates(baseRates, fallbackRates) {
-    const result = { ...fallbackRates };
-    if (!baseRates || typeof baseRates !== 'object') {
-      return result;
-    }
-
-    RANKS.forEach((rank) => {
-      const value = toPercent(baseRates[rank]);
-      if (value === null) {
-        return;
-      }
-      result[rank] = value;
-    });
-    return result;
-  }
-
-  function mergeBannerWithConfig(bannerId, bannerConfig, fallback, baseRates) {
-    const rates = buildRates(baseRates, fallback.rates);
-    const pity = mapPity(
-      { softPity: bannerConfig?.softPity, hardPity: bannerConfig?.hardPity },
-      bannerConfig?.rateUpRule,
-      fallback.pity,
-      bannerId,
-    );
-
-    const singleCost = mapCost(bannerConfig?.costPerPull, fallback.cost?.single, `gacha.banners.${bannerId}.costPerPull`);
-    const multiCost = mapCost(bannerConfig?.bundle10, fallback.cost?.multi, `gacha.banners.${bannerId}.bundle10`);
-
-    return {
-      id: bannerId,
-      type: fallback.type,
-      name: fallback.name,
-      subtitle: fallback.subtitle,
-      closesIn: fallback.closesIn,
-      heroArt: fallback.heroArt,
-      thumbnail: fallback.thumbnail,
-      featured: Array.isArray(fallback.featured) ? fallback.featured.map((unit) => ({ ...unit })) : [],
-      rates,
-      pity,
-      cost: {
-        single: singleCost,
-        multi: multiCost,
-      },
-    };
-  }
-
-  function buildBannersFromConfig(config) {
-    const bannersConfig = config?.gacha?.banners;
-    if (!bannersConfig || typeof bannersConfig !== 'object') {
-      warnConfig('gacha.banners');
-      return cloneDefaultBanners();
-    }
-
-    const baseRates = config?.gacha?.rarityRatesBase;
-    const defaults = cloneDefaultBanners();
-    const defaultsById = new Map(DEFAULT_BANNERS.map((banner) => [banner.id, banner]));
-
-    const merged = defaults.map((fallback) => {
-      const bannerConfig = bannersConfig[fallback.id];
-      if (!bannerConfig) {
-        warnConfig(`gacha.banners.${fallback.id}`, 'không tìm thấy cấu hình, giữ mặc định');
-        return fallback;
-      }
-      return mergeBannerWithConfig(fallback.id, bannerConfig, fallback, baseRates);
-    });
-
-    Object.entries(bannersConfig).forEach(([bannerId, bannerConfig]) => {
-      if (merged.some((banner) => banner.id === bannerId)) {
-        return;
-      }
-      warnConfig(`gacha.banners.${bannerId}`, 'không có fallback UI, sử dụng cấu hình chuẩn');
-      const fallback = defaultsById.get('SSR') ?? DEFAULT_BANNERS[0];
-      merged.push(mergeBannerWithConfig(bannerId, bannerConfig, fallback, baseRates));
-    });
-
-    return merged;
-  }
-
-  async function loadEconomyFromConfig() {
-    try {
-      const response = await fetch('./gacha_config_v1.3.0.json', { cache: 'no-cache' });
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-      const data = await response.json();
-      return {
-        currencies: buildCurrenciesFromConfig(data),
-        banners: buildBannersFromConfig(data),
-      };
-    } catch (error) {
-      console.warn('[Gacha Config] Không thể tải gacha_config_v1.3.0.json:', error);
-      return {
-        currencies: cloneDefaultCurrencies(),
-        banners: cloneDefaultBanners(),
-      };
-    }
-  }
-
-  const AUTO_BOOT_FLAG = '__ARC_GACHA_EMBED__';
-
-  function createEmptyElements() {
-    return {
-      app: null,
-      currencyHeader: null,
-      bannerList: null,
-      hero: null,
-      heroBackground: null,
-      heroType: null,
-      heroTitle: null,
-      heroSubtitle: null,
-      heroRateUp: null,
-      heroTimer: null,
-      pityPills: null,
-      pityBar: null,
-      pityNote: null,
-      featuredList: null,
-      detailsButtons: [],
-      ctaSingle: null,
-      ctaMulti: null,
-      confirmTitle: null,
-      confirmRoot: null,
-      helpButton: null,
-      drawerToggle: null,
-    };
-  }
-
-  function createEmptyModals() {
-    return {
-      rates: null,
-      confirm: null,
-    };
-  }
-
-  function createEmptyPanels() {
-    return {
-      rates: null,
-      pity: null,
-      featured: null,
-    };
-  }
-
-  let currentScope = null;
-  let elements = createEmptyElements();
-  let modals = createEmptyModals();
-  let panels = createEmptyPanels();
-  let tabs = [];
-
-  let state = {
-    selectedBannerId: BANNERS[0]?.id ?? null,
-    drawerOpen: false,
-  };
-
-  let confirmViewHandle = null;
-  let currentOpenModal = null;
-  let confirmFlowCompleteHandler = null;
-  let trackedListeners = [];
-  let mounted = false;
-
-  function toQueryRoot(scope) {
-    if (scope && typeof scope.querySelector === 'function') {
-      return scope;
-    }
-    if (scope && typeof scope.getRootNode === 'function') {
-      const rootNode = scope.getRootNode();
-      if (rootNode && typeof rootNode.querySelector === 'function') {
-        return rootNode;
-      }
-    }
-    if (typeof document !== 'undefined') {
-      return document;
-    }
-    return scope;
-  }
-
-  function captureElements(scope) {
-    const root = toQueryRoot(scope);
-    return {
-      app: root?.querySelector?.('[data-app-root]') ?? null,
-      currencyHeader: root?.querySelector?.('[data-slot="currencies"]') ?? null,
-      bannerList: root?.querySelector?.('[data-slot="banner-list"]') ?? null,
-      hero: root?.querySelector?.('[data-slot="hero"]') ?? null,
-      heroBackground: root?.querySelector?.('.hero__background') ?? null,
-      heroType: root?.querySelector?.('[data-slot="hero-type"]') ?? null,
-      heroTitle: root?.querySelector?.('[data-slot="hero-title"]') ?? null,
-      heroSubtitle: root?.querySelector?.('[data-slot="hero-subtitle"]') ?? null,
-      heroRateUp: root?.querySelector?.('[data-slot="hero-rateup"]') ?? null,
-      heroTimer: root?.querySelector?.('[data-slot="hero-timer"]') ?? null,
-      pityPills: root?.querySelector?.('[data-slot="pity-pills"]') ?? null,
-      pityBar: root?.querySelector?.('.pity__bar') ?? null,
-      pityNote: root?.querySelector?.('.pity__note') ?? null,
-      featuredList: root?.querySelector?.('[data-slot="featured-list"]') ?? null,
-      detailsButtons: Array.from(root?.querySelectorAll?.('[data-action="open-rates"]') ?? []),
-      ctaSingle: root?.querySelector?.('[data-action="summon-single"]') ?? null,
-      ctaMulti: root?.querySelector?.('[data-action="summon-multi"]') ?? null,
-      confirmTitle: root?.querySelector?.('[data-slot="confirm-title"]') ?? null,
-      confirmRoot: root?.querySelector?.('[data-gacha-root]') ?? null,
-      helpButton: root?.querySelector?.('.help-button') ?? null,
-      drawerToggle: root?.querySelector?.('[data-action="toggle-drawer"]') ?? null,
-    };
-  }
-
-  function captureModals(scope) {
-    const root = toQueryRoot(scope);
-    return {
-      rates: root?.querySelector?.('[data-modal="rates"]') ?? null,
-      confirm: root?.querySelector?.('[data-modal="confirm"]') ?? null,
-    };
-  }
-
-  function capturePanels(modalRefs) {
-    const ratesModal = modalRefs.rates;
-    return {
-      rates: ratesModal?.querySelector?.('[data-panel="rates"]') ?? null,
-      pity: ratesModal?.querySelector?.('[data-panel="pity"]') ?? null,
-      featured: ratesModal?.querySelector?.('[data-panel="featured"]') ?? null,
-    };
-  }
-
-  function captureTabs(modalRefs) {
-    return Array.from(modalRefs.rates?.querySelectorAll?.('.modal__tabs [role="tab"]') ?? []);
-  }
-
-  function resetDomReferences(scope) {
-    currentScope = scope;
-    elements = captureElements(scope);
-    modals = captureModals(scope);
-    panels = capturePanels(modals);
-    tabs = captureTabs(modals);
-  }
-
-  function trackListener(target, type, handler) {
-    if (!target || typeof target.addEventListener !== 'function' || typeof handler !== 'function') {
-      return;
-    }
-    target.addEventListener(type, handler);
-    trackedListeners.push(() => {
-      try {
-        target.removeEventListener(type, handler);
-      } catch (error) {
-        console.warn('[Gacha UI] Không thể gỡ listener:', error);
-      }
-    });
-  }
-
-  function resetListeners() {
-    trackedListeners.forEach((remove) => {
-      try {
-        remove();
-      } catch (error) {
-        console.warn('[Gacha UI] Lỗi khi gỡ listener:', error);
-      }
-    });
-    trackedListeners = [];
-  }
-
-  function ensureSelectedBanner(preferredId = null) {
-    if (!Array.isArray(BANNERS) || BANNERS.length === 0) {
-      if (state.selectedBannerId !== null) {
-        state = { ...state, selectedBannerId: null };
-      }
-      return null;
-    }
-
-    const preferred = preferredId ? BANNERS.find((banner) => banner.id === preferredId) : null;
-    const current = preferred ?? BANNERS.find((banner) => banner.id === state.selectedBannerId) ?? BANNERS[0] ?? null;
-    const nextId = current?.id ?? null;
-    if (nextId !== state.selectedBannerId) {
-      state = { ...state, selectedBannerId: nextId };
-    }
-    return current;
-  }
-
-  function pruneStalePityStates() {
-    const validIds = new Set(BANNERS.map((banner) => banner.id));
-    Array.from(pityStates.keys()).forEach((bannerId) => {
-      if (!validIds.has(bannerId)) {
-        pityStates.delete(bannerId);
-      }
-    });
-  }
-
-  function getCurrencyEntry(id) {
-    return CURRENCIES.find((currency) => currency.id === id) ?? null;
-  }
-
-  function normalizeRankKey(value) {
-    if (typeof value !== 'string') {
-      return null;
-    }
-    const upper = value.trim().toUpperCase();
-    return RANKS.find((rank) => rank.toUpperCase() === upper) ?? null;
-  }
-
-  function getMappedValue(source, rank) {
-    if (!source) {
-      return null;
-    }
-    const normalized = normalizeRankKey(rank);
-    if (!normalized) {
-      return null;
-    }
-    if (typeof source[normalized] === 'number') {
-      return source[normalized];
-    }
-    const entryKey = Object.keys(source).find(
-      (key) => normalizeRankKey(key) === normalized && typeof source[key] === 'number',
-    );
-    return entryKey ? source[entryKey] : null;
-  }
-
-  function getPityState(bannerId) {
-    if (!bannerId) {
-      return {
-        counters: Object.fromEntries(RANKS.map((rank) => [rank, 0])),
-        total: 0,
-      };
-    }
-    let state = pityStates.get(bannerId);
-    if (!state) {
-      state = {
-        counters: Object.fromEntries(RANKS.map((rank) => [rank, 0])),
-        total: 0,
-      };
-      pityStates.set(bannerId, state);
-    }
-    return state;
-  }
-
-  function updatePityCounters(pityState, rarity) {
-    const normalized = normalizeRankKey(rarity);
-    if (!normalized) {
-      return;
-    }
-    pityState.total += 1;
-    const resultIndex = RANKS.indexOf(normalized);
-    RANKS.forEach((rank) => {
-      const rankIndex = RANKS.indexOf(rank);
-      if (resultIndex >= rankIndex) {
-        pityState.counters[rank] = 0;
-      } else {
-        const current = pityState.counters[rank] ?? 0;
-        pityState.counters[rank] = current + 1;
-      }
-    });
-  }
-
-  function selectHardPityRank(banner, pityState) {
-    const hardMap = banner?.pity?.hard;
-    if (!hardMap) {
-      return null;
-    }
-    const counters = pityState.counters;
-    for (const rarity of RARITY_PRIORITY) {
-      const threshold = getMappedValue(hardMap, rarity);
-      if (typeof threshold !== 'number' || threshold <= 0) {
-        continue;
-      }
-      const normalized = normalizeRankKey(rarity);
-      if (!normalized) {
-        continue;
-      }
-      const current = counters[normalized] ?? 0;
-      if (current + 1 >= threshold) {
-        return normalized;
-      }
-    }
-    return null;
-  }
-
-  function applySoftPityBonus(baseRate, rarity, pityState, banner) {
-    const softMap = banner?.pity?.soft;
-    if (!softMap) {
-      return baseRate;
-    }
-    const normalized = normalizeRankKey(rarity);
-    if (!normalized) {
-      return baseRate;
-    }
-    const threshold = getMappedValue(softMap, normalized);
-    if (typeof threshold !== 'number' || threshold <= 0) {
-      return baseRate;
-    }
-    const pulls = (pityState.counters[normalized] ?? 0) + 1;
-    if (pulls < threshold) {
-      return baseRate;
-    }
-    const hardThreshold = getMappedValue(banner?.pity?.hard ?? null, normalized);
-    if (typeof hardThreshold === 'number' && hardThreshold <= threshold) {
-      return 1;
-    }
-    if (typeof hardThreshold === 'number' && hardThreshold > threshold) {
-      const span = hardThreshold - threshold;
-      if (span <= 0) {
-        return 1;
-      }
-      const progress = Math.min(span, pulls - threshold + 1);
-      const ratio = progress / span;
-      const bonus = (1 - baseRate) * ratio;
-      return Math.min(1, baseRate + bonus);
-    }
-    const extra = Math.max(0, pulls - threshold + 1);
-    const bonus = baseRate * 0.1 * extra;
-    return Math.min(1, baseRate + bonus);
-  }
-
-  function computeAdjustedRates(banner, pityState) {
-    const adjusted = {};
-    let total = 0;
-    RANKS.forEach((rank) => {
-      const basePercent = getMappedValue(banner?.rates ?? null, rank);
-      const baseRate = Math.max(0, (typeof basePercent === 'number' ? basePercent : 0) / 100);
-      const withSoftPity = applySoftPityBonus(baseRate, rank, pityState, banner);
-      adjusted[rank] = withSoftPity;
-      total += withSoftPity;
-    });
-    if (total <= 0) {
-      adjusted[RANKS[0]] = 1;
-      total = 1;
-    }
-    const normalized = {};
-    RANKS.forEach((rank) => {
-      const value = adjusted[rank] ?? 0;
-      normalized[rank] = value / total;
-    });
-    return normalized;
-  }
-
-  function sampleRarityByRate(banner, pityState, rng) {
-    const rates = computeAdjustedRates(banner, pityState);
-    const randomSource = typeof rng === 'function' ? rng : Math.random;
-    let roll = randomSource();
-    if (!Number.isFinite(roll)) {
-      roll = Math.random();
-    }
-    roll = Math.min(Math.max(roll, 0), 0.999999);
-    let cumulative = 0;
-    for (const rank of RANKS) {
-      const portion = rates[rank] ?? 0;
-      cumulative += portion;
-      if (roll <= cumulative) {
-        return rank;
-      }
-    }
-    return RANKS[RANKS.length - 1];
-  }
-
-  function rollRarity(banner, pityState, rng) {
-    const forced = selectHardPityRank(banner, pityState);
-    const rarity = forced ?? sampleRarityByRate(banner, pityState, rng);
-    updatePityCounters(pityState, rarity);
-    return rarity;
-  }
-
-  function createSummonCard(banner, rarity, index, rng) {
-    const normalized = normalizeRankKey(rarity) ?? RANKS[0];
-    const pool = Array.isArray(banner?.featured)
-      ? banner.featured.filter((unit) => normalizeRankKey(unit?.rank) === normalized)
-      : [];
-    let chosen = null;
-    if (pool.length > 0) {
-      const randomSource = typeof rng === 'function' ? rng : Math.random;
-      let roll = randomSource();
-      if (!Number.isFinite(roll)) {
-        roll = Math.random();
-      }
-      roll = Math.min(Math.max(roll, 0), 0.999999);
-      const pickIndex = Math.floor(roll * pool.length);
-      chosen = pool[pickIndex] ?? pool[0];
-    }
-    const fallbackName = `Đối tác ${normalized} #${index + 1}`;
-    const uniqueId = chosen?.id ? `${chosen.id}-${Date.now()}-${index}` : `summon-${banner.id}-${Date.now()}-${index}`;
-    return {
-      id: uniqueId,
-      name: chosen?.name ?? fallbackName,
-      description: chosen
-        ? `${chosen.name} (${normalized}) xuất hiện từ ${banner.name}.`
-        : `Triệu hồi hạng ${normalized} từ ${banner.name}.`,
-      rarity: normalized,
-      artwork: chosen?.portrait ?? null,
-    };
-  }
-
-  async function createSummonResults(banner, amount, options = {}) {
-    const pulls = Math.max(1, Number.isFinite(Number(amount)) ? Number(amount) : 1);
-    const pityState = getPityState(banner?.id ?? null);
-    const payload = options?.payload;
-    const payloadEntries = Array.isArray(payload)
-      ? payload
-      : Array.isArray(payload?.results)
-        ? payload.results
-        : Array.isArray(payload?.cards)
-          ? payload.cards
-          : null;
-    if (payloadEntries) {
-      return payloadEntries.slice(0, pulls).map((entry, index) => {
-        const rarity = normalizeRankKey(entry?.rarity ?? entry?.rank ?? entry?.tier) ?? RANKS[0];
-        updatePityCounters(pityState, rarity);
-        return {
-          id: entry?.id ? String(entry.id) : `summon-${banner.id}-${Date.now()}-${index}`,
-          name: entry?.name ?? entry?.title ?? `Đối tác ${rarity} #${index + 1}`,
-          description:
-            entry?.description ?? entry?.note ?? `Triệu hồi hạng ${rarity} từ ${banner?.name ?? 'Banner'}!`,
-          rarity,
-          artwork: entry?.artwork ?? entry?.icon ?? null,
-        };
-      });
-    }
-
-    const rng = typeof options?.rng === 'function' ? options.rng : Math.random;
-    const cards = [];
-    for (let index = 0; index < pulls; index += 1) {
-      const rarity = rollRarity(banner, pityState, rng);
-      cards.push(createSummonCard(banner, rarity, index, rng));
-    }
-    return cards;
-  }
-
-  function createPlaceholderResults(banner, amount) {
-    const rarities = RANKS.filter((rank) => (banner.rates?.[rank] ?? 0) > 0);
-    if (!rarities.length) {
-      rarities.push('N');
-    }
-    const cards = [];
-    const featured = Array.isArray(banner.featured) ? banner.featured : [];
-    for (let index = 0; index < Math.max(10, amount); index += 1) {
-      const base = featured.length > 0 ? featured[index % featured.length] : null;
-      const rarity = base?.rank ?? rarities[index % rarities.length];
-      cards.push({
-        id: `fallback-${banner.id}-${index}`,
-        name: base?.name ?? `Đơn vị ${index + 1}`,
-        description: base ? `${base.name} đang được rate-up.` : 'Kết quả minh hoạ.',
-        rarity,
-        artwork: base?.portrait ?? null,
-      });
-    }
-    return cards;
-  }
-
-  function applySummonCost(cost, status) {
-    if (!cost || !status?.enough) {
-      return null;
-    }
-    const target = status.useFallback && cost.fallback ? cost.fallback : cost;
-    const wallet = getCurrencyEntry(target.currency);
-    if (!wallet) {
-      console.warn('[Gacha] Không tìm thấy loại tiền tệ để trừ chi phí:', target.currency);
-      return null;
-    }
-    wallet.amount = Math.max(0, wallet.amount - target.amount);
-    return { wallet, deducted: target };
-  }
-
   function formatNumber(value) {
-    if (value >= 1_000_000_000) {
-      return `${(value / 1_000_000_000).toFixed(1).replace(/\.0$/, '')}B`;
-    }
-    if (value >= 1_000_000) {
-      return `${(value / 1_000_000).toFixed(1).replace(/\.0$/, '')}M`;
-    }
-    return value.toLocaleString('en-US');
+      return NUMBER_FORMAT.format(Math.max(0, Math.trunc(value)));
   }
-
-  function renderCurrencies(currencies) {
-    elements.currencyHeader.replaceChildren();
-    currencies.forEach((currency) => {
-      const item = document.createElement('button');
-      item.type = 'button';
-      item.className = 'currency-item';
-      item.title = currency.name;
-      item.setAttribute('aria-label', `${currency.name}: ${formatNumber(currency.amount)}`);
-      item.dataset.currencyId = currency.id;
-
-      const icon = document.createElement('span');
-      icon.className = 'currency-item__icon';
-      const img = document.createElement('img');
-      img.src = currency.icon;
-      img.alt = '';
-      img.setAttribute('aria-hidden', 'true');
-      icon.appendChild(img);
-
-      const text = document.createElement('div');
-      text.className = 'currency-item__text';
-      const label = document.createElement('span');
-      label.className = 'currency-item__label';
-      label.textContent = getCurrencyShortName(currency);
-      const amount = document.createElement('span');
-      amount.className = 'currency-item__amount';
-      amount.textContent = formatNumber(currency.amount);
-
-      text.appendChild(label);
-      text.appendChild(amount);
-
-      item.appendChild(icon);
-      item.appendChild(text);
-      elements.currencyHeader.appendChild(item);
-    });
-  }
-
-  function bannerTypeLabel(banner) {
-    if (banner.type === 'limited') {
-      return 'Limited Banner';
-    }
-    return 'Standard Banner';
-  }
-
-  function getCurrencyShortName(currency) {
-    if (!currency?.name) {
-      return currency?.id ?? '';
-    }
-    const parts = currency.name.split(' ');
-    if (parts.length === 1) {
-      return currency.name;
-    }
-    const short = parts[0];
-    return short.length <= 8 ? short : currency.name;
-  }
-
-  function hasRateUpUnits(banner) {
-    return Array.isArray(banner?.featured) && banner.featured.length > 0;
-  }
-
-  function getRateUpSummary(banner) {
-    if (!hasRateUpUnits(banner)) {
-      return null;
-    }
-    const names = banner.featured.map((unit) => unit?.name).filter(Boolean);
-    if (names.length === 0) {
-      return null;
-    }
-    if (names.length === 1) {
-      return names[0];
-    }
-    return names.slice(0, 2).join(' • ') + (names.length > 2 ? '…' : '');
-  }
-
-  function formatBannerTimer(banner, options = {}) {
-    const { short = false } = options;
-    if (!banner) {
-      return '';
-    }
-    if (banner.type !== 'limited') {
-      return short ? '' : 'Gacha sẽ đóng: Không giới hạn';
-    }
-    const closesIn = typeof banner.closesIn === 'string' ? banner.closesIn.trim() : '';
-    if (!closesIn || closesIn === '--') {
-      return short ? 'Đang cập nhật' : 'Gacha sẽ đóng: Đang cập nhật';
-    }
-    return short ? closesIn : `Gacha sẽ đóng ${closesIn}`;
-  }
-
-  function getBannerAuraClass(banner) {
-    const baseRank = banner?.featured?.[0]?.rank ?? (banner?.type === 'limited' ? 'UR' : 'SR');
-    if (typeof baseRank !== 'string') {
-      return 'SR';
-    }
-    const normalized = baseRank.trim().toUpperCase();
-    return AURA_CLASS_BY_RANK[normalized] ?? 'SR';
-  }
-
-  function renderBannerList(banners) {
-    elements.bannerList.replaceChildren();
-    ensureSelectedBanner();
-    banners.forEach((banner) => {
-      const card = document.createElement('button');
-      card.type = 'button';
-      card.className = 'banner-card';
-      card.dataset.bannerId = banner.id;
-      card.title = banner.name;
-      card.setAttribute('aria-pressed', 'false');
-
-      const thumb = document.createElement('div');
-      thumb.className = `banner-card__thumb aura aura--${getBannerAuraClass(banner)}`;
-      const img = document.createElement('img');
-      img.src = banner.thumbnail ?? banner.heroArt ?? 'assets/banner_standard.svg';
-      img.alt = `Hình minh hoạ ${banner.name}`;
-      img.loading = 'lazy';
-      img.decoding = 'async';
-      thumb.appendChild(img);
-
-      const texts = document.createElement('div');
-      texts.className = 'banner-card__texts';
-
-      const tag = document.createElement('span');
-      tag.className = 'banner-card__tag';
-      tag.textContent = banner.type === 'limited' ? 'Limited' : 'Standard';
-
-      const name = document.createElement('h3');
-      name.className = 'banner-card__name';
-      name.textContent = banner.name;
-
-      const subtitle = document.createElement('p');
-      subtitle.className = 'banner-card__subtitle';
-      const rateUpSummary = getRateUpSummary(banner);
-      if (banner.subtitle) {
-        subtitle.textContent = banner.subtitle;
-      } else if (rateUpSummary) {
-        subtitle.textContent = `Rate UP: ${rateUpSummary}`;
-      } else {
-        subtitle.textContent = banner.type === 'limited' ? 'Không có rate-up cụ thể' : '';
+  function formatRemainingTime(banner) {
+      if (!banner.expiresAt) {
+          return 'Vĩnh viễn';
       }
-      if (!subtitle.textContent.trim()) {
-        subtitle.classList.add('is-empty');
-        subtitle.setAttribute('aria-hidden', 'true');
+      const diff = banner.expiresAt - Date.now();
+      const days = Math.round(diff / (24 * 3600 * 1000));
+      if (Math.abs(days) >= 1) {
+          return TIME_FORMAT.format(days, 'day');
       }
-
-      texts.appendChild(tag);
-      texts.appendChild(name);
-      texts.appendChild(subtitle);
-
-      card.appendChild(thumb);
-      card.appendChild(texts);
-
-      if (hasRateUpUnits(banner)) {
-        const badge = document.createElement('span');
-        badge.className = 'banner-card__badge';
-        badge.textContent = `Rate UP ×${banner.featured.length}`;
-        badge.setAttribute('aria-hidden', 'true');
-        card.appendChild(badge);
+      const hours = Math.round(diff / (3600 * 1000));
+      if (Math.abs(hours) >= 1) {
+          return TIME_FORMAT.format(hours, 'hour');
       }
-
-      const timerText = formatBannerTimer(banner, { short: true });
-      if (timerText) {
-        const timer = document.createElement('span');
-        timer.className = 'banner-card__timer';
-        timer.textContent = timerText;
-        timer.setAttribute('aria-label', formatBannerTimer(banner));
-        card.appendChild(timer);
+      const minutes = Math.round(diff / (60 * 1000));
+      return TIME_FORMAT.format(minutes, 'minute');
+  }
+  function getBannerCost(banner, type) {
+      const amount = type === 'x1' ? banner.cost.x1 : banner.cost.x10;
+      return { currency: banner.cost.unit, amount };
+  }
+  function renderWalletChip(code, amount) {
+      const chip = document.createElement('button');
+      chip.className = 'currency-chip';
+      chip.type = 'button';
+      chip.dataset.currency = code;
+      chip.title = 'Nhấn để xem quy tắc & thuế đổi';
+      chip.innerHTML = `
+      <span class="currency-chip__icon"><img src="${CURRENCY_ICONS[code]}" alt="${code}" /></span>
+      <span class="currency-chip__info">
+        <span class="currency-chip__code">${code}</span>
+        <span class="currency-chip__label">${CURRENCY_LABELS[code]}</span>
+      </span>
+      <span class="currency-chip__value">${formatNumber(amount)}</span>
+    `;
+      return chip;
+  }
+  function renderCurrencyHeader(container, wallet, onOpenRules) {
+      container.replaceChildren();
+      for (const code of CURRENCY_ORDER) {
+          const chip = renderWalletChip(code, wallet[code]);
+          chip.addEventListener('click', onOpenRules);
+          container.appendChild(chip);
       }
-
-      card.addEventListener('click', () => {
-        selectBanner(banner.id, { focus: false });
-        if (state.drawerOpen) {
-          toggleDrawer(false);
-        }
+  }
+  function createBannerButton(banner, isActive) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'banner-entry';
+      if (isActive) {
+          button.classList.add('is-active');
+      }
+      button.dataset.bannerId = banner.id;
+      button.innerHTML = `
+      <span class="banner-entry__title">${banner.label}</span>
+      <span class="banner-entry__timer">${formatRemainingTime(banner)}</span>
+    `;
+      return button;
+  }
+  function renderBannerList(container, banners, activeId, onSelect) {
+      container.replaceChildren();
+      for (const banner of banners) {
+          const button = createBannerButton(banner, banner.id === activeId);
+          button.addEventListener('click', () => onSelect(banner.id));
+          container.appendChild(button);
+      }
+  }
+  function renderRates(container, banner) {
+      container.replaceChildren();
+      const list = document.createElement('dl');
+      list.className = 'rate-list';
+      const entries = Object.entries(banner.rates).sort(([, a], [, b]) => b - a);
+      for (const [rarity, rate] of entries) {
+          const term = document.createElement('dt');
+          term.textContent = rarity;
+          const detail = document.createElement('dd');
+          detail.textContent = `${(rate * 100).toFixed(2)}%`;
+          list.appendChild(term);
+          list.appendChild(detail);
+      }
+      container.appendChild(list);
+  }
+  function renderPity(container, banner, states) {
+      container.replaceChildren();
+      const state = getBannerState(states, banner);
+      const sections = [
+          { label: 'SR sàn', value: state.pity.sr, max: banner.pity.srFloor },
+      ];
+      if (banner.pity.ssr) {
+          sections.push({ label: 'SSR', value: state.pity.ssr, max: banner.pity.ssr.hard });
+      }
+      if (banner.pity.ur) {
+          sections.push({ label: 'UR', value: state.pity.ur, max: banner.pity.ur.hard });
+      }
+      if (banner.pity.prime) {
+          sections.push({ label: 'Prime', value: state.pity.prime, max: banner.pity.prime.hard });
+      }
+      for (const entry of sections) {
+          const item = document.createElement('div');
+          item.className = 'pity-meter';
+          const label = document.createElement('span');
+          label.className = 'pity-meter__label';
+          label.textContent = entry.label;
+          const bar = document.createElement('div');
+          bar.className = 'pity-meter__bar';
+          const progress = document.createElement('div');
+          progress.className = 'pity-meter__progress';
+          let percent = 0;
+          if (entry.max && entry.max > 0) {
+              percent = Math.min(99, Math.floor((entry.value / entry.max) * 100));
+          }
+          progress.style.width = `${percent}%`;
+          bar.appendChild(progress);
+          const value = document.createElement('span');
+          value.className = 'pity-meter__value';
+          value.textContent = entry.max ? `${entry.value}/${entry.max}` : `${entry.value}`;
+          item.appendChild(label);
+          item.appendChild(bar);
+          item.appendChild(value);
+          container.appendChild(item);
+      }
+  }
+  function renderFeatured(container, banner) {
+      container.replaceChildren();
+      const heading = document.createElement('h3');
+      heading.className = 'featured__heading';
+      heading.textContent = 'Rate-up';
+      container.appendChild(heading);
+      const note = document.createElement('p');
+      note.className = 'featured__note';
+      note.textContent = '70% tỷ lệ nếu trúng hạng tương ứng.';
+      container.appendChild(note);
+      for (const unit of banner.featured) {
+          const card = document.createElement('article');
+          card.className = 'featured-card';
+          card.innerHTML = `
+        <span class="featured-card__rarity">${unit.rarity}</span>
+        <strong class="featured-card__name">${unit.name}</strong>
+      `;
+          container.appendChild(card);
+      }
+  }
+  function createModal(content) {
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-overlay';
+      overlay.appendChild(content);
+      return overlay;
+  }
+  function openModal(root, content) {
+      const modal = createModal(content);
+      root.appendChild(modal);
+      const close = () => {
+          modal.remove();
+      };
+      modal.addEventListener('click', (event) => {
+          if (event.target === modal) {
+              close();
+          }
       });
-
-      elements.bannerList.appendChild(card);
-    });
+      return close;
   }
-
-  function selectBanner(id, options = { focus: true }) {
-    const banner = ensureSelectedBanner(id);
-    if (!banner) {
-      updateBannerSelection();
-      return;
-    }
-    updateBannerSelection();
-    updateHeroSection(banner);
-    updateCTASection(banner);
-    populateRatesModal(banner);
-    if (options.focus) {
-      const selectedCard = elements.bannerList.querySelector(`[data-banner-id="${banner.id}"]`);
-      selectedCard?.focus();
-    }
+  function createRulesContent() {
+      const dialog = document.createElement('div');
+      dialog.className = 'modal-content';
+      dialog.innerHTML = `
+      <h2>Quy tắc & Thuế đổi</h2>
+      <p>100 đơn vị bậc thấp = 1 đơn vị bậc cao. Thuế tối đa 10% khi đổi lên, không thuế khi đổi xuống.</p>
+      <p>Thuế tăng dần theo bậc và độ giàu, nhưng miễn thuế nếu đổi &lt; 100 đơn vị.</p>
+      <ul>
+        <li>VNT → HNT: thuế gốc 0.5%</li>
+        <li>HNT → TNT: thuế gốc 1.0%</li>
+        <li>TNT → ThNT: thuế gốc 1.5%</li>
+        <li>TT chỉ đổi xuống, không thuế.</li>
+      </ul>
+    `;
+      return dialog;
   }
-
-  function updateBannerSelection() {
-    const cards = elements.bannerList.querySelectorAll('.banner-card');
-    cards.forEach((card) => {
-      if (card.dataset.bannerId === state.selectedBannerId) {
-        card.classList.add('banner-card--selected');
-        card.setAttribute('aria-pressed', 'true');
-      } else {
-        card.classList.remove('banner-card--selected');
-        card.setAttribute('aria-pressed', 'false');
+  function renderCosts(container, banner) {
+      container.replaceChildren();
+      const single = getBannerCost(banner, 'x1');
+      const multi = getBannerCost(banner, 'x10');
+      const singleEl = document.createElement('div');
+      singleEl.className = 'cost-entry';
+      singleEl.innerHTML = `
+      <span>Triệu hồi x1</span>
+      <span class="cost-entry__value"><img src="${CURRENCY_ICONS[single.currency]}" alt="${single.currency}" />${formatNumber(single.amount)}</span>
+    `;
+      const multiEl = document.createElement('div');
+      multiEl.className = 'cost-entry';
+      multiEl.innerHTML = `
+      <span>Triệu hồi x10</span>
+      <span class="cost-entry__value"><img src="${CURRENCY_ICONS[multi.currency]}" alt="${multi.currency}" />${formatNumber(multi.amount)}</span>
+    `;
+      container.appendChild(singleEl);
+      container.appendChild(multiEl);
+  }
+  function renderResults(container, results) {
+      container.replaceChildren();
+      for (const result of results) {
+          const item = document.createElement('div');
+          item.className = 'result-entry';
+          const pityLabel = result.pity ? `<span class="result-entry__pity">${result.pity}</span>` : '';
+          item.innerHTML = `
+        <span class="result-entry__rarity">${result.rarity}</span>
+        <span class="result-entry__name">${result.featured ? 'Rate-up' : 'Thường'}</span>
+        ${pityLabel}
+      `;
+          container.appendChild(item);
       }
-    });
   }
-
-  function updateHeroSection(banner) {
-    if (!banner) {
-      elements.heroType.textContent = '';
-      elements.heroTitle.textContent = 'Không có banner khả dụng';
-      elements.heroSubtitle.textContent = '';
-      elements.heroBackground.style.backgroundImage = '';
-      elements.heroTimer.textContent = '';
-      elements.heroTimer.style.display = 'none';
-      elements.heroRateUp.classList.remove('is-visible');
-      elements.heroRateUp.textContent = 'Rate UP';
-      elements.heroRateUp.removeAttribute('title');
-      elements.heroRateUp.removeAttribute('aria-label');
-      renderPityPills(null);
-      updatePityDisplay(null);
-      renderFeatured(null);
-      return;
-    }
-    elements.heroType.textContent = bannerTypeLabel(banner);
-    elements.heroTitle.textContent = banner.name;
-    elements.heroSubtitle.textContent = banner.subtitle ?? '';
-    elements.heroBackground.style.backgroundImage = `url("${banner.heroArt}")`;
-
-    const heroTimerText = formatBannerTimer(banner);
-    if (heroTimerText) {
-      elements.heroTimer.textContent = heroTimerText;
-      elements.heroTimer.style.display = 'inline-flex';
-    } else {
-      elements.heroTimer.textContent = '';
-      elements.heroTimer.style.display = 'none';
-    }
-
-    if (hasRateUpUnits(banner)) {
-      elements.heroRateUp.classList.add('is-visible');
-      const summary = getRateUpSummary(banner);
-      const label = summary ? `Rate UP: ${summary}` : 'Banner có nhân vật được tăng tỉ lệ';
-      elements.heroRateUp.textContent = label;
-      elements.heroRateUp.setAttribute('title', label);
-      elements.heroRateUp.setAttribute('aria-label', label);
-    } else {
-      elements.heroRateUp.classList.remove('is-visible');
-      elements.heroRateUp.textContent = 'Rate UP';
-      elements.heroRateUp.removeAttribute('title');
-      elements.heroRateUp.removeAttribute('aria-label');
-    }
-
-    renderPityPills(banner);
-    updatePityDisplay(banner);
-    renderFeatured(banner);
-  }
-
-  function renderPityPills(banner) {
-    elements.pityPills.replaceChildren();
-    if (!banner?.pity) {
-      const pill = document.createElement('span');
-      pill.className = 'pity-pill';
-      pill.textContent = 'Không có bảo hiểm đặc biệt';
-      elements.pityPills.appendChild(pill);
-      return;
-    }
-
-    const state = banner?.id ? getPityState(banner.id) : { counters: {} };
-    const appendEntries = (entries, kind) => {
-      if (!entries) return;
-      Object.entries(entries).forEach(([rank, value]) => {
-        elements.pityPills.appendChild(createPityPill(rank, value, kind, state));
-      });
-    };
-
-    appendEntries(banner.pity.soft, 'Soft pity');
-    appendEntries(banner.pity.hard, 'Hard pity');
-
-    if (!elements.pityPills.childElementCount) {
-      const pill = document.createElement('span');
-      pill.className = 'pity-pill';
-      pill.textContent = 'Không có bảo hiểm đặc biệt';
-      elements.pityPills.appendChild(pill);
-    }
-  }
-
-  function updatePityDisplay(banner) {
-    if (!elements.pityBar || !elements.pityNote) {
-      return;
-    }
-    if (!banner) {
-      elements.pityBar.style.setProperty('--pity-progress', '0');
-      elements.pityBar.setAttribute('aria-valuenow', '0');
-      elements.pityBar.setAttribute('aria-valuemax', '100');
-      elements.pityBar.removeAttribute('aria-valuetext');
-      elements.pityBar.dataset.rank = '';
-      elements.pityBar.dataset.threshold = '';
-      elements.pityBar.dataset.progress = '';
-      elements.pityNote.textContent = 'Chưa có banner được chọn.';
-      return;
-    }
-    if (!banner?.pity) {
-      elements.pityBar.style.setProperty('--pity-progress', '0');
-      elements.pityBar.setAttribute('aria-valuenow', '0');
-      elements.pityBar.setAttribute('aria-valuemax', '100');
-      elements.pityNote.textContent = 'Banner này không thiết lập bảo hiểm.';
-      return;
-    }
-
-    const state = getPityState(banner.id);
-    const { soft, hard } = banner.pity;
-    let targetRank = null;
-    let threshold = null;
-    for (const rank of RARITY_PRIORITY) {
-      const hardValue = getMappedValue(hard ?? null, rank);
-      const softValue = getMappedValue(soft ?? null, rank);
-      const candidate = typeof hardValue === 'number' && hardValue > 0 ? hardValue : softValue;
-      if (typeof candidate === 'number' && candidate > 0) {
-        targetRank = normalizeRankKey(rank);
-        threshold = candidate;
-        break;
-      }
-    }
-
-    if (!targetRank || !threshold) {
-      elements.pityBar.style.setProperty('--pity-progress', '0');
-      elements.pityBar.setAttribute('aria-valuenow', '0');
-      elements.pityBar.setAttribute('aria-valuemax', '100');
-      elements.pityNote.textContent = 'Banner này không thiết lập bảo hiểm.';
-      return;
-    }
-
-    const pullsSince = state.counters[targetRank] ?? 0;
-    const thresholdValue = Number(threshold) > 0 ? Number(threshold) : 0;
-    const cappedProgress = thresholdValue > 0 ? Math.min(pullsSince, thresholdValue) : pullsSince;
-    const progressRatio = thresholdValue > 0 ? Math.min(1, cappedProgress / thresholdValue) : 0;
-    elements.pityBar.style.setProperty('--pity-progress', `${progressRatio}`);
-    elements.pityBar.dataset.rank = targetRank;
-    elements.pityBar.dataset.threshold = String(thresholdValue);
-    elements.pityBar.dataset.progress = String(pullsSince);
-    elements.pityBar.setAttribute('aria-valuemin', '0');
-    elements.pityBar.setAttribute('aria-valuemax', String(thresholdValue || 0));
-    elements.pityBar.setAttribute('aria-valuenow', String(cappedProgress));
-    if (thresholdValue > 0) {
-      elements.pityBar.setAttribute(
-        'aria-valuetext',
-        `Đã quay ${cappedProgress}/${thresholdValue} lượt cho bảo hiểm ${targetRank}`,
-      );
-    } else {
-      elements.pityBar.removeAttribute('aria-valuetext');
-    }
-
-    if (pullsSince <= 0) {
-      elements.pityNote.textContent = `Chưa có lượt nào cộng dồn cho bảo hiểm ${targetRank}.`;
-      return;
-    }
-
-    if (thresholdValue > 0 && pullsSince >= thresholdValue) {
-      elements.pityNote.textContent = `Đã đạt bảo hiểm ${targetRank}!`;
-      return;
-    }
-
-    if (thresholdValue > 0) {
-      const remaining = Math.max(0, thresholdValue - pullsSince);
-      elements.pityNote.textContent = `Đã quay ${pullsSince}/${thresholdValue} lượt — còn ${remaining} lượt tới bảo hiểm ${targetRank}.`;
-    } else {
-      elements.pityNote.textContent = `Đang cộng dồn bảo hiểm ${targetRank}: ${pullsSince} lượt.`;
-    }
-  }
-
-  function createPityPill(rank, value, kind, state) {
-    const pill = document.createElement('span');
-    pill.className = 'pity-pill';
-    const normalized = normalizeRankKey(rank) ?? rank;
-    pill.dataset.rank = normalized;
-    pill.dataset.kind = kind;
-
-    const threshold = typeof value === 'number' ? value : Number.parseInt(value, 10);
-    const current = normalized && state?.counters ? state.counters[normalized] ?? 0 : 0;
-    pill.dataset.threshold = Number.isFinite(threshold) ? String(threshold) : '';
-    pill.dataset.progress = String(current);
-
-    const label = document.createElement('span');
-    label.className = 'pity-pill__label';
-    label.textContent = `${kind}`;
-
-    const text = document.createElement('span');
-    text.className = 'pity-pill__value';
-    const target = normalized ?? rank;
-    if (Number.isFinite(threshold) && threshold > 0) {
-      text.textContent = `${target}: ${current}/${threshold}`;
-      const remaining = Math.max(0, threshold - current);
-      pill.title = remaining > 0
-        ? `Còn ${remaining} lượt để đạt ${kind.toLowerCase()} ${target}.`
-        : `Đã đạt ngưỡng ${kind.toLowerCase()} ${target}.`;
-    } else {
-      text.textContent = `${target}: ${value}`;
-      pill.title = `Đang theo dõi ${kind.toLowerCase()} ${target}.`;
-    }
-
-    pill.appendChild(label);
-    pill.appendChild(text);
-    return pill;
-  }
-
-  function renderFeatured(banner) {
-    elements.featuredList.replaceChildren();
-    if (!banner?.featured || banner.featured.length === 0) {
-      const placeholder = document.createElement('p');
-      placeholder.className = 'featured__empty';
-      placeholder.textContent = 'Không có đối tác rate-up cụ thể.';
-      elements.featuredList.appendChild(placeholder);
-      return;
-    }
-
-    banner.featured.slice(0, 3).forEach((unit) => {
-      const card = document.createElement('article');
-      card.className = `featured-card aura aura--${unit.rank ?? 'SSR'}`;
-      card.tabIndex = 0;
-      card.title = `${unit.name} — ${unit.rank}`;
-
-      const chip = document.createElement('span');
-      chip.className = 'rank-chip';
-      chip.textContent = unit.rank;
-      card.appendChild(chip);
-
-      const art = document.createElement('div');
-      art.className = 'featured-card__art';
-      const img = document.createElement('img');
-      img.src = unit.portrait;
-      img.alt = unit.name;
-      art.appendChild(img);
-
-      const footer = document.createElement('div');
-      footer.className = 'featured-card__footer';
-      footer.textContent = unit.name;
-
-      card.appendChild(art);
-      card.appendChild(footer);
-      elements.featuredList.appendChild(card);
-    });
-  }
-
-  function hasEnoughCurrency(cost) {
-    const primary = getCurrencyEntry(cost.currency);
-    const primaryEnough = primary ? primary.amount >= cost.amount : false;
-    if (primaryEnough) {
-      return { enough: true, via: primary, useFallback: false };
-    }
-    if (cost.fallback) {
-      const fallback = getCurrencyEntry(cost.fallback.currency);
-      const fallbackEnough = fallback ? fallback.amount >= cost.fallback.amount : false;
-      if (fallbackEnough) {
-        return { enough: true, via: fallback, useFallback: true };
-      }
-      return { enough: false, via: fallback ?? primary, useFallback: true };
-    }
-    return { enough: false, via: primary, useFallback: false };
-  }
-
-  function createCostLines(cost, button) {
-    if (!cost) {
-      const placeholder = document.createElement('span');
-      placeholder.className = 'cta__cost-line';
-      placeholder.textContent = 'Không khả dụng';
-      button.appendChild(placeholder);
-      return;
-    }
-
-    const wrapper = document.createElement('div');
-    wrapper.className = 'cta__cost';
-
-    const primaryLine = document.createElement('span');
-    primaryLine.className = 'cta__cost-line';
-    const primaryCurrency = getCurrencyEntry(cost.currency);
-    if (primaryCurrency) {
-      const icon = document.createElement('img');
-      icon.src = primaryCurrency.icon;
-      icon.alt = '';
-      icon.setAttribute('aria-hidden', 'true');
-      primaryLine.appendChild(icon);
-      const text = document.createElement('span');
-      text.textContent = `${cost.amount.toLocaleString('en-US')} ${primaryCurrency.name}`;
-      primaryLine.appendChild(text);
-    } else {
-      primaryLine.textContent = `${cost.amount} ${cost.currency}`;
-    }
-    wrapper.appendChild(primaryLine);
-
-    if (cost.fallback) {
-      const fallbackLine = document.createElement('span');
-      fallbackLine.className = 'cta__cost-line cta__cost-line--fallback';
-      const fallbackCurrency = getCurrencyEntry(cost.fallback.currency);
-      if (fallbackCurrency) {
-        fallbackLine.textContent = `hoặc ${cost.fallback.amount.toLocaleString('en-US')} ${fallbackCurrency.name}`;
-      } else {
-        fallbackLine.textContent = `hoặc ${cost.fallback.amount} ${cost.fallback.currency}`;
-      }
-      wrapper.appendChild(fallbackLine);
-    }
-
-    button.appendChild(wrapper);
-  }
-
-  function updateCTAButton(button, label, cost, summonType) {
-    button.replaceChildren();
-    const title = document.createElement('span');
-    title.className = 'cta__label';
-    title.textContent = label;
-    button.appendChild(title);
-    createCostLines(cost, button);
-
-  if (!cost) {
-      button.disabled = true;
-      button.classList.remove('cta__button--affordable');
-      button.title = 'Tạm khoá';
-      button.setAttribute('aria-disabled', 'true');
-      button.dataset.summonType = summonType;
-      return;
-    }
-
-    const status = hasEnoughCurrency(cost);
-    button.disabled = !status.enough;
-    button.classList.toggle('cta__button--affordable', status.enough);
-    if (!status.enough) {
-      const targetName = status.via?.name ?? (cost.fallback ? getCurrencyEntry(cost.fallback.currency)?.name : getCurrencyEntry(cost.currency)?.name);
-      button.title = targetName ? `Không đủ ${targetName}` : 'Không đủ tài nguyên';
-      button.setAttribute('aria-disabled', 'true');
-    } else {
-      button.title = '';
-      button.removeAttribute('aria-disabled');
-    }
-    button.dataset.summonType = summonType;
-  }
-
-  function updateCTASection(banner) {
-    updateCTAButton(elements.ctaSingle, 'Summon x1', banner.cost.single, 'single');
-    updateCTAButton(elements.ctaMulti, 'Summon x10', banner.cost.multi, 'multi');
-    updateCurrencyHighlight(banner);
-  }
-
-  function updateCurrencyHighlight(banner) {
-    const summary = new Map();
-    ['single', 'multi'].forEach((key) => {
-      const cost = banner.cost?.[key];
-      if (!cost) return;
-      const info = summary.get(cost.currency) ?? { canAfford: false };
-      const wallet = getCurrencyEntry(cost.currency);
-      if (wallet && wallet.amount >= cost.amount) {
-        info.canAfford = true;
-      }
-      summary.set(cost.currency, info);
-    });
-
-    elements.currencyHeader.querySelectorAll('.currency-item').forEach((item) => {
-      const id = item.dataset.currencyId;
-      if (!id) {
-        item.classList.remove('currency-item--insufficient');
-        return;
-      }
-      const info = summary.get(id);
-      if (info && !info.canAfford) {
-        item.classList.add('currency-item--insufficient');
-      } else {
-        item.classList.remove('currency-item--insufficient');
-      }
-    });
-  }
-
-  function populateRatesModal(banner) {
-    panels.rates.replaceChildren();
-    const table = document.createElement('table');
-    table.className = 'rates-table';
-    const thead = document.createElement('thead');
-    const headRow = document.createElement('tr');
-    const rankHeader = document.createElement('th');
-    rankHeader.textContent = 'Rank';
-    const rateHeader = document.createElement('th');
-    rateHeader.textContent = 'Tỉ lệ %';
-    headRow.appendChild(rankHeader);
-    headRow.appendChild(rateHeader);
-    thead.appendChild(headRow);
-    table.appendChild(thead);
-
-    const tbody = document.createElement('tbody');
-    RANKS.forEach((rank) => {
-      const value = banner.rates?.[rank];
-      if (value === undefined) return;
-      if (banner.type === 'standard' && (rank === 'UR' || rank === 'Prime') && value === 0) {
-        return;
-      }
-      const row = document.createElement('tr');
-      const rankCell = document.createElement('td');
-      rankCell.textContent = rank;
-      const valueCell = document.createElement('td');
-      valueCell.textContent = `${value}%`;
-      row.appendChild(rankCell);
-      row.appendChild(valueCell);
-      tbody.appendChild(row);
-    });
-    table.appendChild(tbody);
-    panels.rates.appendChild(table);
-
-    panels.pity.replaceChildren();
-    const pityList = document.createElement('div');
-    pityList.className = 'pity-list';
-    const { soft, hard, carryOverPerBanner } = banner.pity;
-    if (soft) {
-      Object.entries(soft).forEach(([rank, value]) => {
-        const row = document.createElement('div');
-        row.className = 'pity-list__row';
-        row.textContent = `Soft pity ${rank}: ${value} lượt`;
-        pityList.appendChild(row);
-      });
-    }
-    if (hard) {
-      Object.entries(hard).forEach(([rank, value]) => {
-        const row = document.createElement('div');
-        row.className = 'pity-list__row';
-        row.textContent = `Hard pity ${rank}: ${value} lượt`;
-        pityList.appendChild(row);
-      });
-    }
-    if (!pityList.childElementCount) {
-      const row = document.createElement('div');
-      row.className = 'pity-list__row';
-      row.textContent = 'Banner này không có hệ thống bảo hiểm đặc biệt.';
-      pityList.appendChild(row);
-    }
-    const carry = document.createElement('div');
-    carry.className = 'pity-list__carry';
-    carry.textContent = carryOverPerBanner
-      ? 'Tiến trình bảo hiểm được cộng dồn giữa các banner.'
-      : 'Tiến trình bảo hiểm reset khi banner kết thúc.';
-    pityList.appendChild(carry);
-    panels.pity.appendChild(pityList);
-
-    panels.featured.replaceChildren();
-    if (banner.featured && banner.featured.length > 0) {
-      const list = document.createElement('ul');
-      list.className = 'featured-list';
-      banner.featured.forEach((unit) => {
-        const item = document.createElement('li');
-        item.className = 'featured-list__item';
-        const chip = document.createElement('span');
-        chip.className = 'rank-chip';
-        chip.textContent = unit.rank;
-        const name = document.createElement('span');
-        name.textContent = `${unit.name} — rate tăng`; // số cụ thể được điều chỉnh trong config nếu cần
-        item.appendChild(chip);
-        item.appendChild(name);
-        list.appendChild(item);
-      });
-      panels.featured.appendChild(list);
-    } else {
-      const empty = document.createElement('p');
-      empty.textContent = 'Không có nhân vật rate-up riêng.';
-      panels.featured.appendChild(empty);
-    }
-    activateTab('rates');
-  }
-
-  function openModal(modal) {
-    if (!modal) return;
-    modal.classList.add('is-open');
-    modal.setAttribute('aria-hidden', 'false');
-    currentOpenModal = modal;
-    document.addEventListener('keydown', handleGlobalKeyDown);
-    if (modal === modals.rates) {
-      elements.helpButton?.setAttribute('aria-expanded', 'true');
-    }
-  }
-
-  function closeModal(modal) {
-    if (!modal) return;
-    modal.classList.remove('is-open');
-    modal.setAttribute('aria-hidden', 'true');
-    if (modal === currentOpenModal) {
-      currentOpenModal = null;
-      document.removeEventListener('keydown', handleGlobalKeyDown);
-    }
-    if (modal === modals.rates) {
-      elements.helpButton?.setAttribute('aria-expanded', 'false');
-    }
-  }
-
-  function emitConfirmEvent(type, detail = null) {
-    if (!elements.confirmRoot) {
-      return;
-    }
-    const payload = detail === undefined ? null : detail;
-    const event = new CustomEvent(type, { detail: payload, bubbles: false });
-    elements.confirmRoot.dispatchEvent(event);
-  }
-
-  function handleGlobalKeyDown(event) {
-    if (event.key === 'Escape' && currentOpenModal) {
-      event.preventDefault();
-      closeModal(currentOpenModal);
-    }
-    if ((event.key === 'ArrowRight' || event.key === 'ArrowLeft') && !currentOpenModal) {
-      const direction = event.key === 'ArrowRight' ? 1 : -1;
-      rotateBanner(direction);
-    }
-  }
-
-  function rotateBanner(step) {
-    const currentBanner = ensureSelectedBanner();
-    if (!currentBanner || !Array.isArray(BANNERS) || BANNERS.length === 0) {
-      return;
-    }
-    const index = BANNERS.findIndex((banner) => banner.id === currentBanner.id);
-    if (index === -1) {
-      const fallback = ensureSelectedBanner(BANNERS[0]?.id ?? null);
-      if (fallback) {
-        selectBanner(fallback.id, { focus: true });
-      }
-      return;
-    }
-    const nextIndex = (index + step + BANNERS.length) % BANNERS.length;
-    const targetBanner = BANNERS[nextIndex];
-    if (targetBanner) {
-      selectBanner(targetBanner.id, { focus: true });
-    }
-  }
-
-  function handleTabClick(event) {
-    const button = event.currentTarget;
-    const tab = button.dataset.tab;
-    if (!tab) return;
-    activateTab(tab);
-  }
-
-  async function onClickSummon(type) {
-    const banner = ensureSelectedBanner(state.selectedBannerId) ?? BANNERS[0];
-    if (!banner) {
-      console.warn('[Gacha] Không có banner khả dụng để triệu hồi.');
-      return;
-    }
-    const amount = type === 'multi' ? 10 : 1;
-    const cost = banner.cost?.[type] ?? null;
-    const status = cost ? hasEnoughCurrency(cost) : null;
-    if (cost && !status?.enough) {
-      updateCurrencyHighlight(banner);
-      return;
-    }
-
-    elements.confirmTitle.textContent = `${banner.name} — Summon x${amount}`;
-    openModal(modals.confirm);
-
-    const flowComplete = confirmFlowCompleteHandler ?? (() => closeModal(modals.confirm));
-
-    try {
-      await renderConfirmGacha(banner, amount, { cost, status, onRevealDone: flowComplete });
-    } catch (error) {
-      console.error('[Gacha] Không thể hiển thị kết quả triệu hồi:', error);
-    }
-  }
-
-  async function renderConfirmGacha(banner, amount, options = {}) {
-    const { cost = null, status = null, payload = null, rng = null, onRevealDone = null } = options;
-
-    let cards;
-    try {
-      cards = await createSummonResults(banner, amount, { payload, rng });
-    } catch (error) {
-      console.error('[Gacha] Lỗi khi tạo kết quả triệu hồi:', error);
-      cards = createPlaceholderResults(banner, amount);
-    }
-
-    const titleText = `Kết quả triệu hồi x${amount}`;
-    const handleRevealDone = () => {
-      updatePityDisplay(banner);
-      renderPityPills(banner);
-      if (typeof onRevealDone === 'function') {
-        onRevealDone();
-      }
-      const pityState = getPityState(banner.id);
-      emitConfirmEvent('summon:flow-complete', {
-        bannerId: banner.id,
-        amount,
-        pity: {
-          counters: { ...pityState.counters },
-          total: pityState.total,
-        },
-      });
-    };
-
-    if (!confirmViewHandle) {
-      confirmViewHandle = renderGachaView({
-        root: elements.confirmRoot,
-        title: titleText,
-        subtitle: banner.name,
-        cards,
-        onRevealDone: handleRevealDone,
-      });
-    } else {
-      confirmViewHandle.updateCards(cards);
-    }
-
-  const titleEl = confirmViewHandle.section.querySelector('.gacha-view__title');
-    if (titleEl) {
-      titleEl.textContent = titleText;
-    }
-    const subtitleEl = confirmViewHandle.section.querySelector('.gacha-view__subtitle');
-    if (subtitleEl) {
-      subtitleEl.textContent = banner.name;
-    }
-
-    confirmViewHandle.setRevealDoneCallback(handleRevealDone);
-
-    if (cost && status?.enough) {
-      applySummonCost(cost, status);
-      renderCurrencies(CURRENCIES);
-      updateCTASection(banner);
-    }
-
-    updatePityDisplay(banner);
-    renderPityPills(banner);
-    confirmViewHandle?.reveal();
-  }
-
-  function activateTab(tabId) {
-    tabs.forEach((item) => {
-      const isActive = item.dataset.tab === tabId;
-      item.setAttribute('aria-selected', isActive ? 'true' : 'false');
-      const panel = panels[item.dataset.tab];
-      if (panel) {
-        panel.toggleAttribute('hidden', !isActive);
-      }
-    });
-  }
-
-  function toggleDrawer(forceState) {
-    ensureSelectedBanner();
-    const nextState = typeof forceState === 'boolean' ? forceState : !state.drawerOpen;
-    state = { ...state, drawerOpen: nextState };
-    elements.app?.setAttribute('data-drawer-open', nextState ? 'true' : 'false');
-    if (nextState) {
+  function createToast(message) {
+      const toast = document.createElement('div');
+      toast.className = 'gacha-toast';
+      toast.textContent = message;
       setTimeout(() => {
-        const selected = elements.bannerList.querySelector('.banner-card--selected');
-        selected?.focus();
-      }, 120);
-    }
+          toast.classList.add('is-visible');
+      }, 16);
+      setTimeout(() => {
+          toast.classList.remove('is-visible');
+          toast.remove();
+      }, 4000);
+      return toast;
   }
-
-  function setupEventListeners() {
-    const handleSummonFlowComplete = () => closeModal(modals.confirm);
-    confirmFlowCompleteHandler = handleSummonFlowComplete;
-
-    trackListener(elements.confirmRoot, 'summon:flow-complete', handleSummonFlowComplete);
-
-    elements.detailsButtons.forEach((button) => {
-      trackListener(button, 'click', () => {
-        const banner = ensureSelectedBanner(state.selectedBannerId) ?? BANNERS[0];
-        populateRatesModal(banner);
-        openModal(modals.rates);
-      });
-    });
-
-    Array.from(modals.rates?.querySelectorAll?.('[data-action="close-modal"]') ?? []).forEach((button) => {
-      trackListener(button, 'click', () => closeModal(modals.rates));
-    });
-    Array.from(modals.confirm?.querySelectorAll?.('[data-action="close-modal"]') ?? []).forEach((button) => {
-      trackListener(button, 'click', () => closeModal(modals.confirm));
-    });
-
-    const ratesOverlay = modals.rates?.querySelector?.('.modal__overlay');
-    const confirmOverlay = modals.confirm?.querySelector?.('.modal__overlay');
-    trackListener(ratesOverlay, 'click', () => closeModal(modals.rates));
-    trackListener(confirmOverlay, 'click', () => closeModal(modals.confirm));
-
-    tabs.forEach((tab) => {
-      trackListener(tab, 'click', handleTabClick);
-    });
-
-    trackListener(elements.ctaSingle, 'click', () => onClickSummon('single'));
-    trackListener(elements.ctaMulti, 'click', () => onClickSummon('multi'));
-
-    trackListener(elements.drawerToggle, 'click', () => toggleDrawer());
-  }
-
-  async function init() {
-    const { currencies, banners } = await loadEconomyFromConfig();
-    CURRENCIES = currencies;
-    BANNERS = banners;
-    pruneStalePityStates();
-    const initialBanner = ensureSelectedBanner();
-
-    renderCurrencies(CURRENCIES);
-    renderBannerList(BANNERS);
-    if (initialBanner?.id) {
-      selectBanner(initialBanner.id, { focus: false });
-    } else if (BANNERS[0]?.id) {
-      selectBanner(BANNERS[0].id, { focus: false });
-    } else {
-      updateHeroSection(null);
-    }
-    setupEventListeners();
-    if (elements.helpButton) {
-      const helpLabel = 'Xem tỉ lệ và bảo hiểm gacha';
-      elements.helpButton.setAttribute('title', helpLabel);
-      elements.helpButton.setAttribute('aria-label', helpLabel);
-    }
-    if (elements.drawerToggle) {
-      elements.drawerToggle.setAttribute('title', 'Mở danh sách banner');
-      elements.drawerToggle.setAttribute('aria-label', 'Mở danh sách banner');
-    }
-  }
-
-  function destroyGachaUIInternal() {
-    if (currentOpenModal) {
-      closeModal(currentOpenModal);
-    }
-    resetListeners();
-    if (typeof document !== 'undefined') {
-      document.removeEventListener('keydown', handleGlobalKeyDown);
-    }
-    if (confirmViewHandle && typeof confirmViewHandle.destroy === 'function') {
-      confirmViewHandle.destroy();
-    }
-    confirmViewHandle = null;
-    confirmFlowCompleteHandler = null;
-    currentOpenModal = null;
-    if (elements.app) {
-      elements.app.removeAttribute('data-drawer-open');
-    }
-    elements = createEmptyElements();
-    modals = createEmptyModals();
-    panels = createEmptyPanels();
-    tabs = [];
-    state = {
-      selectedBannerId: BANNERS[0]?.id ?? null,
-      drawerOpen: false,
-    };
-    currentScope = null;
-    mounted = false;
-  }
-
   export async function mountGachaUI(scope = null) {
-    destroyGachaUIInternal();
-    resetDomReferences(scope);
-    if (!elements.app) {
-      throw new Error('[Gacha UI] Không tìm thấy phần tử gacha-app để khởi tạo.');
-    }
-
-    try {
-      await init();
-      mounted = true;
-    } catch (error) {
-      destroyGachaUIInternal();
-      throw error;
-    }
-
-    return {
-      destroy: destroyGachaUIInternal,
-    };
+      var _a, _b;
+      const host = scope instanceof Document ? scope.body : scope !== null && scope !== void 0 ? scope : document.body;
+      if (!host) {
+          throw new Error('Không tìm thấy vùng mount cho gacha UI.');
+      }
+      if (host === document.body) {
+          document.body.classList.add('gacha-ui');
+      }
+      if (host instanceof HTMLElement) {
+          host.replaceChildren();
+      }
+      const container = document.createElement('div');
+      container.className = 'gacha-ui-root';
+      container.innerHTML = `
+      <div class="gacha-header">
+        <div class="currency-bar" data-slot="currencies"></div>
+        <button class="rules-button" type="button">Quy tắc &amp; Thuế</button>
+      </div>
+      <div class="gacha-body">
+        <aside class="banner-sidebar" data-slot="banner-list"></aside>
+        <main class="banner-panel">
+          <header class="banner-panel__header">
+            <div>
+              <h1 class="banner-title" data-slot="hero-title"></h1>
+              <p class="banner-desc" data-slot="hero-subtitle"></p>
+            </div>
+            <span class="banner-timer" data-slot="hero-timer"></span>
+          </header>
+          <section class="banner-panel__art" data-slot="hero-art"></section>
+          <section class="banner-panel__rates" data-slot="rates"></section>
+          <section class="banner-panel__pity" data-slot="pity"></section>
+          <section class="banner-panel__featured" data-slot="featured"></section>
+          <section class="banner-panel__cost" data-slot="cost"></section>
+          <footer class="banner-panel__actions">
+            <button type="button" data-action="summon-x1">Triệu hồi x1</button>
+            <button type="button" data-action="summon-x10">Triệu hồi x10</button>
+          </footer>
+          <section class="banner-panel__results" data-slot="results"></section>
+        </main>
+      </div>
+    `;
+      host.appendChild(container);
+      const state = {
+          wallet: createWallet(),
+          bannerId: (_b = (_a = GACHA_CONFIG.banners[0]) === null || _a === void 0 ? void 0 : _a.id) !== null && _b !== void 0 ? _b : 'permanent',
+          states: new Map(),
+      };
+      const currencySlot = container.querySelector('[data-slot="currencies"]');
+      const bannerList = container.querySelector('[data-slot="banner-list"]');
+      const titleSlot = container.querySelector('[data-slot="hero-title"]');
+      const subtitleSlot = container.querySelector('[data-slot="hero-subtitle"]');
+      const timerSlot = container.querySelector('[data-slot="hero-timer"]');
+      const artSlot = container.querySelector('[data-slot="hero-art"]');
+      const ratesSlot = container.querySelector('[data-slot="rates"]');
+      const pitySlot = container.querySelector('[data-slot="pity"]');
+      const featuredSlot = container.querySelector('[data-slot="featured"]');
+      const costSlot = container.querySelector('[data-slot="cost"]');
+      const resultsSlot = container.querySelector('[data-slot="results"]');
+      const rulesButton = container.querySelector('.rules-button');
+      const summonOne = container.querySelector('[data-action="summon-x1"]');
+      const summonTen = container.querySelector('[data-action="summon-x10"]');
+      if (!currencySlot || !bannerList || !titleSlot || !subtitleSlot || !timerSlot || !artSlot || !ratesSlot || !pitySlot || !featuredSlot || !costSlot || !resultsSlot || !rulesButton || !summonOne || !summonTen) {
+          throw new Error('Thiếu phần tử UI cần thiết.');
+      }
+      const renderBanner = () => {
+          var _a, _b;
+          const banner = (_a = getBannerById(state.bannerId)) !== null && _a !== void 0 ? _a : GACHA_CONFIG.banners[0];
+          if (!banner)
+              return;
+          titleSlot.textContent = banner.label;
+          subtitleSlot.textContent = (_b = banner.description) !== null && _b !== void 0 ? _b : '';
+          timerSlot.textContent = formatRemainingTime(banner);
+          artSlot.innerHTML = banner.background ? `<img src="${banner.background}" alt="${banner.label}" />` : '';
+          renderRates(ratesSlot, banner);
+          renderPity(pitySlot, banner, state.states);
+          renderFeatured(featuredSlot, banner);
+          renderCosts(costSlot, banner);
+      };
+      const openRules = () => {
+          const rulesContent = createRulesContent();
+          openModal(container, rulesContent);
+      };
+      const renderWallet = () => {
+          renderCurrencyHeader(currencySlot, state.wallet, openRules);
+      };
+      const updateBannerList = () => {
+          renderBannerList(bannerList, GACHA_CONFIG.banners, state.bannerId, (id) => {
+              state.bannerId = id;
+              updateBannerList();
+              renderBanner();
+          });
+      };
+      const renderAll = () => {
+          renderWallet();
+          updateBannerList();
+          renderBanner();
+      };
+      const performSummon = (count) => {
+          const banner = getBannerById(state.bannerId);
+          if (!banner) {
+              return;
+          }
+          const cost = count === 10 ? banner.cost.x10 : banner.cost.x1;
+          const payment = payForRoll(state.wallet, banner.cost.unit, cost);
+          if (!payment.ok) {
+              const toast = createToast('Không đủ tiền tệ sau khi auto-convert.');
+              container.appendChild(toast);
+              return;
+          }
+          state.wallet = payment.wallet;
+          renderWallet();
+          const results = [];
+          const rolls = count === 10 ? multiRoll(banner, state.states, 10) : [rollBanner(banner, state.states)];
+          for (const roll of rolls) {
+              results.push({
+                  rarity: roll.outcome.rarity,
+                  featured: roll.outcome.featured,
+                  pity: roll.outcome.pityTriggered === 'hard' ? 'Hard pity' : roll.outcome.pityTriggered === 'soft' ? 'Soft pity' : roll.outcome.pityTriggered === 'srFloor' ? 'SR floor' : null,
+              });
+          }
+          renderResults(resultsSlot, results);
+          renderPity(pitySlot, banner, state.states);
+          const toast = createToast(`Đã triệu hồi ${count} lần.`);
+          container.appendChild(toast);
+      };
+      rulesButton.addEventListener('click', openRules);
+      summonOne.addEventListener('click', () => performSummon(1));
+      summonTen.addEventListener('click', () => performSummon(10));
+      renderAll();
+      return {
+          destroy() {
+              if (host === document.body) {
+                  document.body.classList.remove('gacha-ui');
+              }
+              container.remove();
+          },
+      };
   }
 
-  function destroyGachaUI() {
-    destroyGachaUIInternal();
-  }
-
-  if (typeof window !== 'undefined' && !(window?.[AUTO_BOOT_FLAG])) {
-    mountGachaUI(document).catch((error) => {
-      console.error('[Gacha UI] Lỗi khi khởi tạo giao diện gacha:', error);
-    });
-  }
-
-  if (!Object.prototype.hasOwnProperty.call(exports, 'destroyGachaUI')) exports.destroyGachaUI = destroyGachaUI;
 });
 __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
   import './gacha.css';
@@ -18641,30 +19834,86 @@ __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
     </div>
   `;
   const GACHA_MODULE_ID = './screens/ui-gacha/gacha.js';
+  function sanitizeModuleId(moduleId) {
+      return moduleId.replace(/\\/g, '/');
+  }
+  function getLegacyModuleGlobal() {
+      if (typeof globalThis !== 'undefined') {
+          return globalThis;
+      }
+      if (typeof window !== 'undefined') {
+          return window;
+      }
+      return null;
+  }
+  function getLegacyModuleAliases() {
+      const legacyGlobal = getLegacyModuleGlobal();
+      const aliases = legacyGlobal === null || legacyGlobal === void 0 ? void 0 : legacyGlobal.__legacyModuleAliases;
+      if (aliases && typeof aliases === 'object') {
+          return aliases;
+      }
+      return null;
+  }
+  function normalizeRuntimeModuleId(moduleId) {
+      const sanitized = sanitizeModuleId(moduleId);
+      const legacyGlobal = getLegacyModuleGlobal();
+      const normalizer = legacyGlobal === null || legacyGlobal === void 0 ? void 0 : legacyGlobal.__normalizeModuleId;
+      if (typeof normalizer === 'function') {
+          try {
+              const normalized = normalizer(sanitized);
+              if (typeof normalized === 'string' && normalized.length > 0) {
+                  return sanitizeModuleId(normalized);
+              }
+          }
+          catch {
+              // Bỏ qua lỗi từ hàm normalize tuỳ biến.
+          }
+      }
+      const aliases = getLegacyModuleAliases();
+      if (aliases) {
+          const candidate = aliases[sanitized];
+          if (typeof candidate === 'string' && candidate.length > 0) {
+              return sanitizeModuleId(candidate);
+          }
+      }
+      return sanitized;
+  }
+  function resolveNormalizedModuleHref(normalizedId) {
+      if (normalizedId.startsWith('./screens/')) {
+          const relative = `../${normalizedId.slice('./screens/'.length)}`;
+          return new URL(relative, import.meta.url).href;
+      }
+      if (normalizedId.startsWith('./')) {
+          const relative = normalizedId.slice(2);
+          return new URL(relative, import.meta.url).href;
+      }
+      return normalizedId;
+  }
   function getRuntimeRequire() {
       if (typeof __require === 'function') {
           return __require;
       }
-      if (typeof globalThis !== 'undefined') {
-          const candidate = globalThis.__require;
-          if (typeof candidate === 'function') {
-              return candidate;
+      const legacyGlobal = getLegacyModuleGlobal();
+      const candidate = legacyGlobal === null || legacyGlobal === void 0 ? void 0 : legacyGlobal.__require;
+      if (typeof candidate === 'function') {
+          return candidate;
+      }
+      if (typeof window !== 'undefined') {
+          const fromWindow = window.__require;
+          if (typeof fromWindow === 'function') {
+              return fromWindow;
           }
       }
       return null;
   }
   async function loadGachaModule() {
+      const normalizedId = normalizeRuntimeModuleId(GACHA_MODULE_ID);
       const runtimeRequire = getRuntimeRequire();
       if (runtimeRequire) {
-          return runtimeRequire(GACHA_MODULE_ID);
+          return runtimeRequire(normalizedId);
       }
-      if (typeof window !== 'undefined') {
-          const fromWindow = window.__require;
-          if (typeof fromWindow === 'function') {
-              return fromWindow(GACHA_MODULE_ID);
-          }
-      }
-      return import('./gacha.js');
+      const href = resolveNormalizedModuleHref(normalizedId);
+      return import(/* @vite-ignore */ href);
   }
   function createContainer() {
       const wrapper = document.createElement('div');
@@ -18737,6 +19986,650 @@ __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
 
   if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
+});
+__define('./screens/ui-gacha/logic/config.ts', (exports, module, __require) => {
+  const DEFAULT_WALLET = {
+      VNT: 125000,
+      HNT: 5200,
+      TNT: 620,
+      ThNT: 120,
+      TT: 18,
+  };
+  const now = Date.now();
+  const day = 24 * 60 * 60 * 1000;
+  const BANNERS = [
+      {
+          id: 'permanent',
+          label: 'Triệu Hồi Chung',
+          type: 'Permanent',
+          description: 'Danh sách N / R / SR / SSR toàn bộ.',
+          cost: { unit: 'HNT', x1: 250, x10: 2500 },
+          rates: { N: 0.6, R: 0.25, SR: 0.12, SSR: 0.03 },
+          pity: {
+              srFloor: 10,
+              ssr: { soft: 60, softStep: 0.005, hard: 80, hardGuaranteeFeatured: false, carryOver: true },
+          },
+          featured: [
+              { id: 'permanent-01', name: 'Diệp Minh', rarity: 'SSR', portrait: 'assets/u_diep_minh.svg' },
+              { id: 'permanent-02', name: 'Thiên Lưu', rarity: 'SSR', portrait: 'assets/u_thien_luu.svg' },
+              { id: 'permanent-03', name: 'Mộ Dạ', rarity: 'SSR', portrait: 'assets/u_mo_da.svg' },
+          ],
+          background: 'assets/banner_standard.svg',
+      },
+      {
+          id: 'limited-ur',
+          label: 'Giới Hạn UR',
+          type: 'LimitedUR',
+          description: 'UR rate-up, pity hard bảo đảm UR featured.',
+          cost: { unit: 'TNT', x1: 250, x10: 2500 },
+          rates: { N: 0.586, R: 0.244, SR: 0.117, SSR: 0.03, UR: 0.015, Prime: 0.0075 },
+          pity: {
+              srFloor: 10,
+              ur: { soft: 70, softStep: 0.003, hard: 90, hardGuaranteeFeatured: true },
+              ssr: { soft: 60, softStep: 0.005, hard: 80, hardGuaranteeFeatured: false },
+          },
+          featured: [
+              { id: 'limited-ur-01', name: 'Nguyệt San', rarity: 'UR', portrait: 'assets/u_nguyet_san.svg' },
+              { id: 'limited-ur-02', name: 'Huyết Tịch', rarity: 'UR', portrait: 'assets/u_huyet_tich.svg' },
+              { id: 'limited-ur-03', name: 'Khai Nguyên Tử', rarity: 'UR', portrait: 'assets/u_khai_nguyen_tu.svg' },
+              { id: 'limited-ur-04', name: 'Mộng Yểm', rarity: 'UR', portrait: 'assets/u_mong_yem.svg' },
+          ],
+          expiresAt: now + 7 * day,
+          background: 'assets/banner_dragon.svg',
+      },
+      {
+          id: 'limited-prime',
+          label: 'Giới Hạn Prime',
+          type: 'LimitedPrime',
+          description: 'Prime rate-up, pity bảo đảm Prime featured.',
+          cost: { unit: 'ThNT', x1: 300, x10: 3000 },
+          rates: { N: 0.586, R: 0.244, SR: 0.117, SSR: 0.03, UR: 0.015, Prime: 0.0075 },
+          pity: {
+              srFloor: 10,
+              prime: { soft: 130, softStep: 0.001, hard: 180, hardGuaranteeFeatured: true },
+              ur: { soft: 70, softStep: 0.003, hard: 90, hardGuaranteeFeatured: true },
+          },
+          featured: [
+              { id: 'limited-prime-01', name: 'Lậu Khắc Ma Chủ', rarity: 'Prime', portrait: 'assets/u_lau_khac_ma_chu.svg' },
+              { id: 'limited-prime-02', name: 'Dạ Nhạc', rarity: 'Prime', portrait: 'assets/u_chan_nga.svg' },
+          ],
+          expiresAt: now + 3 * day,
+          background: 'assets/banner_void.svg',
+      },
+  ];
+  const GACHA_CONFIG = {
+      currencies: ['VNT', 'HNT', 'TNT', 'ThNT', 'TT'],
+      costs: {
+          Permanent: { unit: 'HNT', x1: 250, x10: 2500 },
+          LimitedUR: { unit: 'TNT', x1: 250, x10: 2500 },
+          LimitedPrime: { unit: 'ThNT', x1: 300, x10: 3000 },
+      },
+      rateUpShare: 0.7,
+      banners: BANNERS,
+  };
+  const CURRENCY_LABELS = {
+      VNT: 'Vụn',
+      HNT: 'Hạ',
+      TNT: 'Trung',
+      ThNT: 'Thượng',
+      TT: 'Thần Tinh',
+  };
+  function createWallet(initial) {
+      var _a, _b, _c, _d, _e;
+      return {
+          VNT: Math.max(0, Math.trunc((_a = initial === null || initial === void 0 ? void 0 : initial.VNT) !== null && _a !== void 0 ? _a : DEFAULT_WALLET.VNT)),
+          HNT: Math.max(0, Math.trunc((_b = initial === null || initial === void 0 ? void 0 : initial.HNT) !== null && _b !== void 0 ? _b : DEFAULT_WALLET.HNT)),
+          TNT: Math.max(0, Math.trunc((_c = initial === null || initial === void 0 ? void 0 : initial.TNT) !== null && _c !== void 0 ? _c : DEFAULT_WALLET.TNT)),
+          ThNT: Math.max(0, Math.trunc((_d = initial === null || initial === void 0 ? void 0 : initial.ThNT) !== null && _d !== void 0 ? _d : DEFAULT_WALLET.ThNT)),
+          TT: Math.max(0, Math.trunc((_e = initial === null || initial === void 0 ? void 0 : initial.TT) !== null && _e !== void 0 ? _e : DEFAULT_WALLET.TT)),
+      };
+  }
+
+  if (!Object.prototype.hasOwnProperty.call(exports, 'DEFAULT_WALLET')) exports.DEFAULT_WALLET = DEFAULT_WALLET;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'GACHA_CONFIG')) exports.GACHA_CONFIG = GACHA_CONFIG;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'CURRENCY_LABELS')) exports.CURRENCY_LABELS = CURRENCY_LABELS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'createWallet')) exports.createWallet = createWallet;
+});
+__define('./screens/ui-gacha/logic/currency.ts', (exports, module, __require) => {
+  const __dep0 = __require('./screens/ui-gacha/logic/types.ts');
+  const CURRENCY_ORDER = __dep0.CURRENCY_ORDER;
+  const BASE_TAX = {
+      'VNT->HNT': 0.005,
+      'HNT->TNT': 0.01,
+      'TNT->ThNT': 0.015,
+  };
+  const TAX_CAP = 0.1;
+  const WEALTH_PIVOT_TT = 100;
+  const ALPHA = 2;
+  function cloneWallet(wallet) {
+      var _a, _b, _c, _d, _e;
+      return {
+          VNT: Math.max(0, Math.trunc((_a = wallet.VNT) !== null && _a !== void 0 ? _a : 0)),
+          HNT: Math.max(0, Math.trunc((_b = wallet.HNT) !== null && _b !== void 0 ? _b : 0)),
+          TNT: Math.max(0, Math.trunc((_c = wallet.TNT) !== null && _c !== void 0 ? _c : 0)),
+          ThNT: Math.max(0, Math.trunc((_d = wallet.ThNT) !== null && _d !== void 0 ? _d : 0)),
+          TT: Math.max(0, Math.trunc((_e = wallet.TT) !== null && _e !== void 0 ? _e : 0)),
+      };
+  }
+  function getIndex(code) {
+      const idx = CURRENCY_ORDER.indexOf(code);
+      return idx === -1 ? 0 : idx;
+  }
+  function isHigherTier(from, to) {
+      return getIndex(from) > getIndex(to);
+  }
+  function isLowerTier(from, to) {
+      return getIndex(from) < getIndex(to);
+  }
+  function totalTTEquivalent(wallet) {
+      const normalized = cloneWallet(wallet);
+      const hnt = normalized.VNT / 100;
+      const tnt = (normalized.HNT + hnt) / 100;
+      const thnt = (normalized.TNT + tnt) / 100;
+      return normalized.TT + (normalized.ThNT + thnt) / 100;
+  }
+  function dynamicTaxRate(stepKey, wallet) {
+      var _a;
+      const base = (_a = BASE_TAX[stepKey]) !== null && _a !== void 0 ? _a : 0.01;
+      const wealthIdx = Math.min(1, totalTTEquivalent(wallet) / WEALTH_PIVOT_TT);
+      const candidate = base * (1 + ALPHA * wealthIdx);
+      return Math.min(TAX_CAP, candidate);
+  }
+  function findStepKey(from, to) {
+      if (isLowerTier(from, to)) {
+          const higher = `${from}->${to}`;
+          return higher;
+      }
+      if (isHigherTier(from, to)) {
+          const lower = `${to}->${from}`;
+          return lower;
+      }
+      return null;
+  }
+  function convertUp(wallet, from, to, amount) {
+      const step = findStepKey(from, to);
+      if (!step) {
+          return { wallet: cloneWallet(wallet), units: 0, tax: 0, spent: 0 };
+      }
+      if (to === 'TT') {
+          return { wallet: cloneWallet(wallet), units: 0, tax: 0, spent: 0 };
+      }
+      const normalized = cloneWallet(wallet);
+      const available = Math.max(0, Math.trunc(amount));
+      if (available < 100) {
+          return { wallet: normalized, units: 0, tax: 0, spent: available };
+      }
+      const rate = dynamicTaxRate(step, normalized);
+      const tax = Math.ceil(available * rate);
+      const usable = available - tax;
+      const units = Math.floor(usable / 100);
+      const spent = units * 100 + tax;
+      if (!units) {
+          return { wallet: normalized, units: 0, tax, spent: tax };
+      }
+      normalized[from] = Math.max(0, normalized[from] - spent);
+      normalized[to] = Math.max(0, normalized[to] + units);
+      return { wallet: normalized, units, tax, spent };
+  }
+  function convertDown(wallet, from, to, units) {
+      const normalized = cloneWallet(wallet);
+      if (units <= 0) {
+          return { wallet: normalized, amount: 0 };
+      }
+      const amount = units * 100;
+      normalized[from] = Math.max(0, normalized[from] - units);
+      normalized[to] = Math.max(0, normalized[to] + amount);
+      return { wallet: normalized, amount };
+  }
+  function convertCurrency(wallet, from, to, amount, options = {}) {
+      var _a;
+      const normalized = cloneWallet(wallet);
+      if (amount <= 0) {
+          return {
+              ok: false,
+              wallet: normalized,
+              tax: 0,
+              received: 0,
+              spent: 0,
+              step: `${from}->${to}`,
+          };
+      }
+      if (from === to) {
+          return {
+              ok: true,
+              wallet: normalized,
+              tax: 0,
+              received: amount,
+              spent: amount,
+              step: `${from}->${to}`,
+          };
+      }
+      if (isLowerTier(from, to)) {
+          if (to === 'TT') {
+              return {
+                  ok: false,
+                  wallet: normalized,
+                  tax: 0,
+                  received: 0,
+                  spent: 0,
+                  step: `${from}->${to}`,
+              };
+          }
+          if (!options.allowTax && amount % 100 !== 0) {
+              return {
+                  ok: false,
+                  wallet: normalized,
+                  tax: 0,
+                  received: 0,
+                  spent: 0,
+                  step: `${from}->${to}`,
+              };
+          }
+          const { wallet: nextWallet, units, tax, spent } = convertUp(normalized, from, to, amount);
+          return {
+              ok: units > 0,
+              wallet: nextWallet,
+              tax,
+              received: units,
+              spent,
+              step: `${from}->${to}`,
+          };
+      }
+      if (isHigherTier(from, to)) {
+          let state = cloneWallet(normalized);
+          let currentFrom = from;
+          let currentIndex = getIndex(from);
+          const targetIndex = getIndex(to);
+          let unitsRemaining = Math.min(Math.trunc(amount), state[currentFrom]);
+          let totalAmount = 0;
+          while (unitsRemaining > 0 && currentIndex > targetIndex) {
+              const nextCode = (_a = CURRENCY_ORDER[currentIndex - 1]) !== null && _a !== void 0 ? _a : to;
+              const { wallet: nextWallet, amount: produced } = convertDown(state, currentFrom, nextCode, unitsRemaining);
+              state = nextWallet;
+              totalAmount = produced;
+              currentFrom = nextCode;
+              currentIndex -= 1;
+              unitsRemaining = Math.floor(totalAmount / 100);
+          }
+          return {
+              ok: currentFrom === to,
+              wallet: state,
+              tax: 0,
+              received: totalAmount,
+              spent: amount,
+              step: `${from}->${to}`,
+          };
+      }
+      return {
+          ok: false,
+          wallet: normalized,
+          tax: 0,
+          received: 0,
+          spent: 0,
+          step: `${from}->${to}`,
+      };
+  }
+  function convertStepDown(wallet, fromIndex, toIndex, units, detail) {
+      var _a, _b, _c, _d, _e;
+      const initialCode = ((_b = (_a = CURRENCY_ORDER[fromIndex]) !== null && _a !== void 0 ? _a : CURRENCY_ORDER[CURRENCY_ORDER.length - 1]) !== null && _b !== void 0 ? _b : CURRENCY_ORDER[0]);
+      let state = cloneWallet(wallet);
+      let currentIndex = fromIndex;
+      let currentUnits = Math.min(units, state[initialCode]);
+      while (currentUnits > 0 && currentIndex > toIndex) {
+          const from = (_c = CURRENCY_ORDER[currentIndex]) !== null && _c !== void 0 ? _c : initialCode;
+          const to = ((_e = (_d = CURRENCY_ORDER[currentIndex - 1]) !== null && _d !== void 0 ? _d : CURRENCY_ORDER[Math.max(currentIndex - 1, 0)]) !== null && _e !== void 0 ? _e : CURRENCY_ORDER[0]);
+          const { wallet: next, amount } = convertDown(state, from, to, currentUnits);
+          detail.push({ from, to, units: currentUnits, amount });
+          state = next;
+          currentUnits = Math.floor(amount / 100);
+          currentIndex -= 1;
+      }
+      return state;
+  }
+  function ensureFunds(wallet, currency, cost, allowTT, detail) {
+      let state = cloneWallet(wallet);
+      let available = state[currency];
+      if (available >= cost) {
+          return state;
+      }
+      const targetIndex = getIndex(currency);
+      for (let idx = targetIndex + 1; idx < CURRENCY_ORDER.length; idx += 1) {
+          const code = CURRENCY_ORDER[idx];
+          if (!code) {
+              continue;
+          }
+          if (!allowTT && code === 'TT') {
+              continue;
+          }
+          const higherAvailable = state[code];
+          if (higherAvailable <= 0) {
+              continue;
+          }
+          const multiplier = 100 ** (idx - targetIndex);
+          const shortfall = Math.max(0, cost - available);
+          const neededUnits = Math.ceil(shortfall / multiplier);
+          if (neededUnits <= 0) {
+              continue;
+          }
+          const unitsToUse = Math.min(higherAvailable, neededUnits);
+          state = convertStepDown(state, idx, targetIndex, unitsToUse, detail);
+          available = state[currency];
+          if (available >= cost) {
+              return state;
+          }
+      }
+      return state[currency] >= cost ? state : null;
+  }
+  function payForRoll(wallet, bannerUnit, cost, options = {}) {
+      const allowTT = options.allowTT !== false;
+      const allowDown = options.allowDownFromHigher !== false;
+      const detail = [];
+      const normalized = cloneWallet(wallet);
+      if (cost <= 0) {
+          return {
+              ok: true,
+              wallet: normalized,
+              detail: {
+                  currency: bannerUnit,
+                  cost,
+                  usedDirect: 0,
+                  conversions: detail,
+                  usedFromHigher: 0,
+                  remaining: normalized[bannerUnit],
+              },
+          };
+      }
+      let working = cloneWallet(normalized);
+      if (allowDown) {
+          const ensured = ensureFunds(working, bannerUnit, cost, allowTT, detail);
+          if (!ensured) {
+              return { ok: false, wallet: normalized, detail: null };
+          }
+          working = ensured;
+      }
+      if (working[bannerUnit] < cost) {
+          return { ok: false, wallet: normalized, detail: null };
+      }
+      const usedDirect = Math.min(cost, normalized[bannerUnit]);
+      const usedFromHigher = cost - usedDirect;
+      working[bannerUnit] -= cost;
+      return {
+          ok: true,
+          wallet: working,
+          detail: {
+              currency: bannerUnit,
+              cost,
+              usedDirect,
+              conversions: detail,
+              usedFromHigher,
+              remaining: working[bannerUnit],
+          },
+      };
+  }
+  exports.cloneWallet = cloneWallet;
+
+  if (!Object.prototype.hasOwnProperty.call(exports, 'totalTTEquivalent')) exports.totalTTEquivalent = totalTTEquivalent;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'convertCurrency')) exports.convertCurrency = convertCurrency;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'payForRoll')) exports.payForRoll = payForRoll;
+});
+__define('./screens/ui-gacha/logic/gacha.ts', (exports, module, __require) => {
+  const __dep0 = __require('./screens/ui-gacha/logic/config.ts');
+  const GACHA_CONFIG = __dep0.GACHA_CONFIG;
+  const __dep1 = __require('./screens/ui-gacha/logic/pity.ts');
+  const applyRoll = __dep1.applyRoll;
+  const getBannerState = __dep1.getBannerState;
+  const DEFAULT_RANDOM = () => Math.random();
+  function shouldHitFeatured(banner, rarity, forced, rng) {
+      const featured = banner.featured.filter((entry) => entry.rarity === rarity);
+      if (featured.length === 0) {
+          return false;
+      }
+      if (forced) {
+          return true;
+      }
+      const share = GACHA_CONFIG.rateUpShare;
+      const roll = rng();
+      return roll < share;
+  }
+  function rollBanner(banner, stateMap, options = {}) {
+      var _a, _b;
+      const rng = (_a = options.rng) !== null && _a !== void 0 ? _a : DEFAULT_RANDOM;
+      const featuredRng = (_b = options.featuredRng) !== null && _b !== void 0 ? _b : DEFAULT_RANDOM;
+      const state = getBannerState(stateMap, banner);
+      return applyRoll(banner, state, rng, (rarity, forced) => shouldHitFeatured(banner, rarity, forced, featuredRng));
+  }
+  function multiRoll(banner, stateMap, count, options = {}) {
+      const results = [];
+      for (let i = 0; i < count; i += 1) {
+          results.push(rollBanner(banner, stateMap, options));
+      }
+      return results;
+  }
+  function getBannerById(id) {
+      var _a;
+      return (_a = GACHA_CONFIG.banners.find((entry) => entry.id === id)) !== null && _a !== void 0 ? _a : null;
+  }
+
+  if (!Object.prototype.hasOwnProperty.call(exports, 'rollBanner')) exports.rollBanner = rollBanner;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'multiRoll')) exports.multiRoll = multiRoll;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getBannerById')) exports.getBannerById = getBannerById;
+});
+__define('./screens/ui-gacha/logic/pity.ts', (exports, module, __require) => {
+  const __dep0 = __require('./screens/ui-gacha/logic/types.ts');
+  const RARITY_ORDER = __dep0.RARITY_ORDER;
+  const RARITY_INDEX = new Map(RARITY_ORDER.map((rarity, index) => [rarity, index]));
+  function rarityAtLeast(rarity, threshold) {
+      var _a, _b;
+      const rarityIndex = (_a = RARITY_INDEX.get(rarity)) !== null && _a !== void 0 ? _a : 0;
+      const thresholdIndex = (_b = RARITY_INDEX.get(threshold)) !== null && _b !== void 0 ? _b : 0;
+      return rarityIndex >= thresholdIndex;
+  }
+  function createEmptyPity() {
+      return { sr: 0, ssr: 0, ur: 0, prime: 0 };
+  }
+  function createBannerState() {
+      return { pulls: 0, pity: createEmptyPity() };
+  }
+  function getStateKey(banner) {
+      var _a;
+      if (banner.type === 'Permanent' && ((_a = banner.pity.ssr) === null || _a === void 0 ? void 0 : _a.carryOver)) {
+          return 'Permanent';
+      }
+      return banner.id;
+  }
+  function getBannerState(map, banner) {
+      const key = getStateKey(banner);
+      const existing = map.get(key);
+      if (existing) {
+          return existing;
+      }
+      const state = createBannerState();
+      map.set(key, state);
+      return state;
+  }
+  function ensureRates(banner) {
+      const rates = {
+          N: 0,
+          R: 0,
+          SR: 0,
+          SSR: 0,
+          UR: 0,
+          Prime: 0,
+      };
+      for (const rarity of Object.keys(banner.rates)) {
+          const value = banner.rates[rarity];
+          if (typeof value === 'number' && Number.isFinite(value) && value >= 0) {
+              rates[rarity] = value;
+          }
+      }
+      return rates;
+  }
+  function computeSoftBonus(pulls, soft, step) {
+      if (!Number.isFinite(soft) || !Number.isFinite(step)) {
+          return 0;
+      }
+      if (pulls + 1 <= soft) {
+          return 0;
+      }
+      const extraPulls = pulls + 1 - soft;
+      return extraPulls * step;
+  }
+  function applySoftPity(rarity, pulls, rates, soft, step) {
+      var _a;
+      if (!soft || !step) {
+          return;
+      }
+      const bonus = computeSoftBonus(pulls, soft, step);
+      if (bonus <= 0) {
+          return;
+      }
+      const current = (_a = rates[rarity]) !== null && _a !== void 0 ? _a : 0;
+      const next = Math.min(1, current + bonus);
+      rates[rarity] = next;
+  }
+  function normalizeRates(rates) {
+      var _a, _b;
+      let total = 0;
+      for (const rarity of RARITY_ORDER) {
+          total += (_a = rates[rarity]) !== null && _a !== void 0 ? _a : 0;
+      }
+      if (total <= 0) {
+          return { ...rates };
+      }
+      const normalized = { ...rates };
+      for (const rarity of RARITY_ORDER) {
+          normalized[rarity] = ((_b = rates[rarity]) !== null && _b !== void 0 ? _b : 0) / total;
+      }
+      return normalized;
+  }
+  function computeEffectiveRates(banner, state) {
+      const baseRates = ensureRates(banner);
+      const pity = state.pity;
+      const srFloor = pity.sr >= (banner.pity.srFloor - 1);
+      const ssrRule = banner.pity.ssr;
+      const urRule = banner.pity.ur;
+      const primeRule = banner.pity.prime;
+      const nextSSR = pity.ssr + 1;
+      const nextUR = pity.ur + 1;
+      const nextPrime = pity.prime + 1;
+      if ((primeRule === null || primeRule === void 0 ? void 0 : primeRule.hard) && nextPrime >= primeRule.hard) {
+          return {
+              forced: 'Prime',
+              srFloor,
+              rates: baseRates,
+              guaranteeFeatured: Boolean(primeRule.hardGuaranteeFeatured),
+          };
+      }
+      if ((urRule === null || urRule === void 0 ? void 0 : urRule.hard) && nextUR >= urRule.hard) {
+          return {
+              forced: 'UR',
+              srFloor,
+              rates: baseRates,
+              guaranteeFeatured: Boolean(urRule.hardGuaranteeFeatured),
+          };
+      }
+      if ((ssrRule === null || ssrRule === void 0 ? void 0 : ssrRule.hard) && nextSSR >= ssrRule.hard) {
+          return { forced: 'SSR', srFloor, rates: baseRates, guaranteeFeatured: false };
+      }
+      const workingRates = { ...baseRates };
+      if (srFloor) {
+          workingRates.N = 0;
+          workingRates.R = 0;
+      }
+      if (primeRule) {
+          applySoftPity('Prime', pity.prime, workingRates, primeRule.soft, primeRule.softStep);
+      }
+      if (urRule) {
+          applySoftPity('UR', pity.ur, workingRates, urRule.soft, urRule.softStep);
+      }
+      if (ssrRule) {
+          applySoftPity('SSR', pity.ssr, workingRates, ssrRule.soft, ssrRule.softStep);
+      }
+      const normalized = normalizeRates(workingRates);
+      return { forced: null, srFloor, rates: normalized, guaranteeFeatured: false };
+  }
+  function pickRarity(rates, random) {
+      var _a;
+      let cumulative = 0;
+      for (const rarity of RARITY_ORDER) {
+          const value = (_a = rates[rarity]) !== null && _a !== void 0 ? _a : 0;
+          cumulative += value;
+          if (random <= cumulative + 1e-8) {
+              return rarity;
+          }
+      }
+      return 'N';
+  }
+  function rollOnce(banner, state, rng) {
+      const effective = computeEffectiveRates(banner, state);
+      let rarity;
+      let pityTriggered = null;
+      let guaranteedFeatured = false;
+      if (effective.forced) {
+          rarity = effective.forced;
+          pityTriggered = 'hard';
+          guaranteedFeatured = effective.guaranteeFeatured;
+      }
+      else {
+          const randomValue = Math.max(0, Math.min(0.999999, rng()));
+          rarity = pickRarity(effective.rates, randomValue);
+          if (effective.srFloor && !rarityAtLeast(rarity, 'SR')) {
+              rarity = 'SR';
+              pityTriggered = 'srFloor';
+          }
+          if (!pityTriggered && rarity === 'SSR' && banner.pity.ssr && state.pity.ssr + 1 > banner.pity.ssr.soft) {
+              pityTriggered = 'soft';
+          }
+          if (!pityTriggered && rarity === 'UR' && banner.pity.ur && state.pity.ur + 1 > banner.pity.ur.soft) {
+              pityTriggered = 'soft';
+          }
+          if (!pityTriggered && rarity === 'Prime' && banner.pity.prime && state.pity.prime + 1 > banner.pity.prime.soft) {
+              pityTriggered = 'soft';
+          }
+      }
+      return { rarity, featured: false, pityTriggered, guaranteedFeatured };
+  }
+  function resetCountersAfterHit(state, rarity) {
+      state.pity.sr += 1;
+      if (rarityAtLeast(rarity, 'SR')) {
+          state.pity.sr = 0;
+      }
+      state.pity.ssr += 1;
+      if (rarity === 'SSR' || rarity === 'UR' || rarity === 'Prime') {
+          state.pity.ssr = 0;
+      }
+      state.pity.ur += 1;
+      if (rarity === 'UR' || rarity === 'Prime') {
+          state.pity.ur = 0;
+      }
+      state.pity.prime += 1;
+      if (rarity === 'Prime') {
+          state.pity.prime = 0;
+      }
+  }
+  function applyRoll(banner, state, rng, pickFeatured) {
+      const outcome = rollOnce(banner, state, rng);
+      resetCountersAfterHit(state, outcome.rarity);
+      state.pulls += 1;
+      const featured = pickFeatured(outcome.rarity, outcome.guaranteedFeatured === true);
+      return {
+          outcome: { ...outcome, featured },
+          pity: { ...state.pity },
+      };
+  }
+
+  if (!Object.prototype.hasOwnProperty.call(exports, 'createEmptyPity')) exports.createEmptyPity = createEmptyPity;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'createBannerState')) exports.createBannerState = createBannerState;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getBannerState')) exports.getBannerState = getBannerState;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'rollOnce')) exports.rollOnce = rollOnce;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'applyRoll')) exports.applyRoll = applyRoll;
+});
+__define('./screens/ui-gacha/logic/types.ts', (exports, module, __require) => {
+  const CURRENCY_ORDER = ['VNT', 'HNT', 'TNT', 'ThNT', 'TT'];
+  const RARITY_ORDER = ['N', 'R', 'SR', 'SSR', 'UR', 'Prime'];
+
+  if (!Object.prototype.hasOwnProperty.call(exports, 'CURRENCY_ORDER')) exports.CURRENCY_ORDER = CURRENCY_ORDER;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'RARITY_ORDER')) exports.RARITY_ORDER = RARITY_ORDER;
 });
 __define('./shared-types/units.ts', (exports, module, __require) => {
   const __reexport0 = __require('./types/units.ts');
@@ -21155,6 +23048,24 @@ __define('./ui/rarity/rarity_tokens.json', (exports, module, __require) => {
 });
 __define('./units.ts', (exports, module, __require) => {
   const UNIT_LIST = [
+      { id: 'diep_minh', name: 'Diệp Minh', cost: 17, rank: 'SSR', role: 'Support' },
+      { id: 'nguyet_san', name: 'Nguyệt San', cost: 20, rank: 'UR', role: 'Assassin' },
+      { id: 'trung_lam', name: 'Trùng Lâm', cost: 18, rank: 'SSR', role: 'Summoner' },
+      { id: 'huyet_tich', name: 'Huyết Tịch', cost: 20, rank: 'UR', role: 'Mage' },
+      { id: 'khai_nguyen_tu', name: 'Khai Nguyên Tử', cost: 21, rank: 'UR', role: 'Mage' },
+      { id: 'thien_luu', name: 'Thiên Lưu', cost: 17, rank: 'SSR', role: 'Ranger' },
+      { id: 'vu_thien', name: 'Vũ Thiên', cost: 17, rank: 'SSR', role: 'Warrior' },
+      { id: 'anna', name: 'Anna', cost: 17, rank: 'SSR', role: 'Support' },
+      { id: 'lao_khat_cai', name: 'Lão Khất Cái', cost: 12, rank: 'SR', role: 'Warrior' },
+      { id: 'ai_lan', name: 'Ái Lân', cost: 20, rank: 'UR', role: 'Support' },
+      { id: 'faun', name: 'Faun', cost: 18, rank: 'SSR', role: 'Summoner' },
+      { id: 'basil_thorne', name: 'Basil Thorne', cost: 13, rank: 'SR', role: 'Tanker' },
+      { id: 'mong_yem', name: 'Mộng Yểm', cost: 18 },
+      { id: 'chan_nga', name: 'Chân Ngã', cost: 18 },
+      { id: 'ma_ton_diep_lam', name: 'Ma Tôn - Diệp Lâm', cost: 19 },
+      { id: 'mo_da', name: 'Mộ Dạ', cost: 15 },
+      { id: 'ngao_binh', name: 'Ngao Bính', cost: 18 },
+      { id: 'lau_khac_ma_chu', name: 'Lậu Khắc Ma Chủ', cost: 21 },
       { id: 'phe', name: 'Phệ', cost: 20 },
       { id: 'kiemtruongda', name: 'Kiếm Trường Dạ', cost: 16 },
       { id: 'loithienanh', name: 'Lôi Thiên Ảnh', cost: 18 },
