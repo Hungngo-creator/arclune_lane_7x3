@@ -339,6 +339,450 @@ export const ROSTER = [
     }
   },
   {
+    id: 'vu_thien', name: 'Vũ Thiên', class: 'Warrior', rank: 'SSR',
+    mods: { HP: 0.05, ATK: 0.08, WIL: 0.06 },
+    kit: {
+      onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+      basic: asUnknownRecord({
+        name: 'Đánh Thường',
+        tags: ['single-target'],
+        damageMultiplier: 1.00,
+        notes: 'Vung đinh ba gây 100% ATK + 100% WIL. Ở trạng thái Ánh Sáng, đòn đánh thường hồi 10% sát thương gây ra.'
+      }),
+      skills: asUnknownRecordArray([
+        {
+          key: 'skill1',
+          name: 'Lam Triều Bộc Lực',
+          cost: { aether: 35 },
+          duration: 1,
+          buffStats: { ATK: 0.40, WIL: 0.40 },
+          notes: 'Tăng 40% ATK/WIL trong 1 lượt, thích hợp mở chuỗi burst.'
+        },
+        {
+          key: 'skill2',
+          name: 'Hải Mâu Phá Lãng',
+          cost: { aether: 25 },
+          damageMultiplier: 1.50,
+          tags: ['single-target'],
+          notes: 'Phóng đinh ba gây 150% đòn đánh thường lên 1 mục tiêu rồi thu hồi vũ khí.'
+        },
+        {
+          key: 'skill3',
+          name: 'Triều Ảnh Hồi Kích',
+          cost: { aether: 30 },
+          duration: 1,
+          counterChance: 0.25,
+          dodgeBasicChance: 0.25,
+          counterType: 'basic',
+          notes: 'Kích hoạt trạng thái phản công: trong 1 lượt, mỗi lần bị đánh có 25% né và phản đòn cơ bản. Nếu ngã gục phải kích lại.'
+        }
+      ]),
+      ult: asUnknownRecord({
+        type: 'burst',
+        tags: ['single-target'],
+        damageMultiplier: 3.00,
+        debuffs: [{ id: 'tram_mac', turns: 1 }],
+        selfBuff: { adaptive: true, turns: 1 },
+        notes: 'Hải Uy Trảm Ngôn gây 300% sát thương, đặt Trầm Mặc 1 lượt và cấp "Thích Ứng" cho bản thân.'
+      }),
+      talent: null,
+      technique: null,
+      passives: asUnknownRecordArray([
+        {
+          id: 'hai_trieu_khai_tran',
+          name: 'Hải Triều Khai Trận',
+          when: 'onSpawn',
+          effect: 'grantStats',
+          params: { stats: { ATK: 0.05, WIL: 0.05 }, stackable: false }
+        }
+      ]),
+      traits: asUnknownRecordArray([
+        { id: 'counter_mode', text: 'Triều Ảnh Hồi Kích là hiệu ứng duy trì 1 lượt, mất khi bị hạ gục.' },
+        { id: 'adaptive_buff', text: 'Thích Ứng dùng thông số phòng thủ chuẩn của hệ thống.' }
+      ])
+    }
+  },
+  {
+    id: 'anna', name: 'Anna', class: 'Support', rank: 'SSR',
+    mods: { HP: 0.08, WIL: 0.06, AEmax: 0.05 },
+    kit: {
+      onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+      basic: asUnknownRecord({
+        name: 'Đánh Thường',
+        tags: ['single-target', 'heal'],
+        damageMultiplier: 1.00,
+        healRandomAllyPercentMaxHP: 0.03,
+        notes: 'Gây sát thương 100% ATK + WIL và hồi 3% Max HP của Anna cho 1 đồng minh ngẫu nhiên.'
+      }),
+      skills: asUnknownRecordArray([
+        {
+          key: 'skill1',
+          name: 'Aegis Tụ Linh',
+          cost: { aether: 20 },
+          duration: 2,
+          buffStats: { ARM: 0.20, RES: 0.20 },
+          notes: 'Tăng 20% ARM/RES trong 2 lượt.'
+        },
+        {
+          key: 'skill2',
+          name: 'Huyết Tế Vương Tọa',
+          cost: { aether: 25 },
+          hpSacrificePercentMax: 0.50,
+          transferToLeader: true,
+          minHpPercentToCast: 0.70,
+          notes: 'Hiến 50% Max HP hiện tại (không giảm Max HP) cho Leader, chỉ dùng khi HP ≥ 70%.'
+        },
+        {
+          key: 'skill3',
+          name: 'Hỗn Linh Trường Ca',
+          cost: { aether: 20 },
+          targets: 2,
+          damageMultiplier: 1.40,
+          tags: ['multi-target'],
+          notes: 'Đánh ngẫu nhiên 2 kẻ địch, mỗi mục tiêu nhận 140% đòn đánh thường.'
+        }
+      ]),
+      ult: asUnknownRecord({
+        type: 'heal',
+        tags: ['team-heal'],
+        healPercentMaxHP: 0.50,
+        healScale: { ATK: 0.20, WIL: 0.20 },
+        affects: 'allAllies',
+        notes: 'Thánh Lễ Tái Sinh hồi 50% Max HP + 20% ATK/WIL cho toàn bộ đồng minh.'
+      }),
+      talent: asUnknownRecord({
+        name: 'Ấn Chú Thăng Hoa',
+        stacks: 5,
+        perStack: { HP: 0.05, ATK: 0.05, WIL: 0.05 },
+        trigger: 'onUltCast'
+      }),
+      technique: null,
+      passives: asUnknownRecordArray([
+        {
+          id: 'an_chu_thang_hoa',
+          name: 'Ấn Chú Thăng Hoa',
+          when: 'onUltCast',
+          effect: 'stackBuff',
+          params: { stats: { HP: 0.05, ATK: 0.05, WIL: 0.05 }, maxStacks: 5 }
+        }
+      ]),
+      traits: asUnknownRecordArray([
+        { id: 'blood_transfer', text: 'Huyết Tế Vương Tọa chuyển thẳng HP nên chịu các hệ số tăng/giảm hồi máu của người nhận.' },
+        { id: 'auto_cast_ult', text: 'Ultimate auto-cast khi đầy nộ theo luật chung.' }
+      ])
+    }
+  },
+  {
+    id: 'lao_khat_cai', name: 'Lão Khất Cái', class: 'Warrior', rank: 'SR',
+    mods: { ATK: 0.06, AGI: 0.05 },
+    kit: {
+      onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+      basic: asUnknownRecord({
+        name: 'Đánh Thường',
+        tags: ['single-target'],
+        damageMultiplier: 1.00,
+        notes: 'Đánh gậy gây 100% ATK + WIL lên 1 mục tiêu.'
+      }),
+      skills: asUnknownRecordArray([
+        {
+          key: 'skill1',
+          name: 'Khất Côn Xuyên Tạng',
+          cost: { aether: 20 },
+          countsAsBasic: true,
+          damageMultiplier: 1.00,
+          pierce: { ARM: 0.15, RES: 0.15 },
+          notes: 'Đòn đánh thường gia tăng, bỏ qua 15% ARM/RES.'
+        },
+        {
+          key: 'skill2',
+          name: 'Tam Thập Lục Kế: Tẩu Vi Thượng',
+          cost: { aether: 25 },
+          duration: null,
+          oneTime: true,
+          evadeAoEChance: 0.25,
+          reposition: { pattern: 'nearestAllySlot' },
+          notes: 'Áp dụng hiệu ứng trốn AOE 1 lần: khi bị skill AOE nhắm trực tiếp có 25% chạy sang ô đồng minh trống gần nhất.'
+        },
+        {
+          key: 'skill3',
+          name: 'Loạn Côn Tam Liên',
+          cost: { aether: 35 },
+          hits: 3,
+          randomTargets: 3,
+          countsAsBasic: true,
+          damageMultiplier: 1.00,
+          pierce: { ARM: 0.20, RES: 0.20 },
+          notes: 'Đánh ngẫu nhiên 3 mục tiêu, mỗi hit bỏ qua 20% ARM/RES.'
+        }
+      ]),
+      ult: asUnknownRecord({
+        type: 'finisher',
+        tags: ['single-target'],
+        damageMultiplier: 2.50,
+        pierce: { ARM: 0.10, RES: 0.10 },
+        notes: 'Nhất Côn Đoạt Mệnh gây 250% sát thương và xuyên 10% phòng thủ.'
+      }),
+      talent: null,
+      technique: null,
+      passives: asUnknownRecordArray([
+        {
+          id: 'tap_dan_tu_luc',
+          name: 'Tạp Dân Tụ Lực',
+          when: 'onBattlefield',
+          effect: 'allyScaling',
+          params: { excludeLeader: true, perAllyStats: { ATK: 0.02, WIL: 0.02, AGI: 0.02 } }
+        }
+      ]),
+      traits: asUnknownRecordArray([
+        { id: 'taunt_immunity', text: 'Miễn nhiễm Khiêu Khích đến từ địch.' },
+        { id: 'aoe_escape', text: 'Tẩu Vi Thượng không kích hoạt với AOE chọn mục tiêu ngẫu nhiên hay đòn đơn mục tiêu.' }
+      ])
+    }
+  },
+  {
+    id: 'ai_lan', name: 'Ái Lân', class: 'Support', rank: 'UR',
+    mods: { WIL: 0.12, AEregen: 0.10, HP: 0.06 },
+    kit: {
+      onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, startingStance: 'light' }),
+      basic: asUnknownRecord({
+        name: 'Đánh Thường',
+        tags: ['single-target'],
+        damageMultiplier: 1.00,
+        debuffs: [{ id: 'agi_down', amount: 0.05, turns: 1, whenStance: 'light' }],
+        pierce: { ARM: 0.10, RES: 0.10, whenStance: 'dark' },
+        bonus: { dazeChance: 0.02 },
+        notes: 'Ở Ánh Sáng: giảm 5% AGI và hồi 10% sát thương gây ra. Ở Bóng Tối: bỏ qua 10% ARM/RES. Đòn đánh có 2% làm Choáng.'
+      }),
+      skills: asUnknownRecordArray([
+        {
+          key: 'skill1',
+          name: 'Song Cực Hiến Phúc',
+          cost: { aether: 25 },
+          usableIn: ['light', 'dark'],
+          transferHp: { toLeaderPercentMax: 0.20, toRandomAllyPercentMax: 0.10 },
+          shields: [
+            { target: 'leader', percentCasterMaxHP: 0.10, turns: 2 },
+            { target: 'randomAlly', percentCasterMaxHP: 0.10, turns: 2 }
+          ],
+          notes: 'Chuyển HP cho Leader và 1 đồng minh ngẫu nhiên, đồng thời cấp khiên =10% Max HP bản thân trong 2 lượt.'
+        },
+        {
+          key: 'skill2',
+          name: 'D’moreth • Hắc Tế Tam Ấn',
+          cost: { aether: 25 },
+          usableIn: ['dark'],
+          pattern: 'random3',
+          damageMultiplier: 0.70,
+          tags: ['aoe'],
+          notes: 'Chỉ dùng ở Bóng Tối: gây 70% đòn đánh thường lên 3 kẻ địch ngẫu nhiên, không tính là đòn đánh thường.'
+        },
+        {
+          key: 'skill3',
+          name: 'Thánh Minh Trùng Tụ',
+          cost: { aether: 20 },
+          usableIn: ['light'],
+          healSelfScale: { ATK: 0.60, WIL: 0.60 },
+          healRandomAllyScale: { ATK: 0.60, WIL: 0.60 },
+          notes: 'Chỉ dùng ở Ánh Sáng: hồi 60% tổng ATK+WIL cho bản thân và 1 đồng minh ngẫu nhiên.'
+        }
+      ]),
+      ult: asUnknownRecord({
+        type: 'dual-stance',
+        light: {
+          name: 'Khải Minh Thánh Lễ',
+          healTargets: 3,
+          healPercentMaxHP: 0.30,
+          healScale: { ATK: 0.05, WIL: 0.05 }
+        },
+        dark: {
+          name: 'Đọa Ảnh Tứ Hình',
+          targets: 4,
+          damageMultiplier: 0.75,
+          countsAsBasic: false
+        },
+        notes: 'Ultimate phụ thuộc trạng thái hiện tại: Ánh Sáng hồi máu 3 đồng minh, Bóng Tối gây sát thương lên 4 kẻ địch ngẫu nhiên.'
+      }),
+      talent: asUnknownRecord({
+        name: 'Thánh Ám Luân Chuyển',
+        stanceCycle: ['light', 'dark'],
+        turnOrder: 'alternate',
+        lightEffects: { basicHealPercentDamage: 0.10, agiDownPercent: 0.05 },
+        darkEffects: { pierce: 0.10 }
+      }),
+      technique: null,
+      passives: asUnknownRecordArray([
+        {
+          id: 'stance_cycle',
+          name: 'Thánh Ám Luân Chuyển',
+          when: 'turnStart',
+          effect: 'swapStance',
+          params: { cycle: ['light', 'dark'], start: 'light' }
+        }
+      ]),
+      traits: asUnknownRecordArray([
+        { id: 'stance_rules', text: 'Kỹ năng kiểm tra stance: nếu không đúng trạng thái sẽ bị vô hiệu.' },
+        { id: 'dual_ult', text: 'Ultimate dùng biến thể tương ứng với stance tại thời điểm auto-cast.' }
+      ])
+    }
+  },
+  {
+    id: 'faun', name: 'Faun', class: 'Summoner', rank: 'SSR',
+    mods: { WIL: 0.08, AEregen: 0.08, HP: 0.04 },
+    kit: {
+      onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, furyMax: 85 }),
+      basic: asUnknownRecord({
+        name: 'Đánh Thường',
+        tags: ['single-target'],
+        damageMultiplier: 1.00,
+        notes: 'Tấn công một mục tiêu bằng 100% ATK + WIL; thú triệu hồi kế thừa cách tính này.'
+      }),
+      skills: asUnknownRecordArray([
+        {
+          key: 'skill1',
+          name: 'Dã Linh Hiệp Kích',
+          cost: { aether: 25 },
+          chainAttack: true,
+          summonFollowUp: true,
+          notes: 'Faun và mỗi thú đang tồn tại lần lượt thực hiện 1 đòn đánh thường ngay lập tức, không tiêu lượt hiện tại.'
+        },
+        {
+          key: 'skill2',
+          name: 'Ấn Khế Cường Thừa',
+          cost: { aether: 25 },
+          empoweredSummons: { count: 5, inheritPercent: 0.80 },
+          notes: '5 thú tiếp theo triệu hồi từ Ultimate được thừa hưởng 80% chỉ số của Faun thay vì 50%.'
+        },
+        {
+          key: 'skill3',
+          name: 'Thú Tế Hộ Mệnh',
+          cost: { aether: 25 },
+          healSelfPercentMaxHP: 0.07,
+          gainTenacity: 1,
+          deathTrigger: { sacrificeSummon: 'lowestHP', preferMarked: true },
+          notes: 'Hồi 7% Max HP và nhận 1 Bất Khuất; khi Bất Khuất kích hoạt sẽ hi sinh thú HP thấp nhất (ưu tiên thú đã dính dấu từ kỹ năng này).' 
+        }
+      ]),
+      ult: asUnknownRecord({
+        type: 'summon-random',
+        summon: {
+          pool: [
+            { id: 'faun_tieu_hac', inheritPercent: 0.50, ttl: 5, traits: ['pierce_arm_0_10'], tag: 'faun_beast' },
+            { id: 'faun_tieu_bach', inheritPercent: 0.50, ttl: 5, traits: ['bonus_damage_0_05'], tag: 'faun_beast' },
+            { id: 'faun_tieu_hoang', inheritPercent: 0.50, ttl: 5, traits: ['on_death_heal_faun_0_50'], tag: 'faun_beast' },
+            { id: 'faun_tieu_bat_diem', inheritPercent: 0.50, ttl: 5, traits: ['heal_allies_0_30'], basicDealsDamage: false, tag: 'faun_beast' },
+            { id: 'faun_nhi_cau', inheritPercent: 0.50, ttl: 5, traits: ['heal_self_0_10', 'periodic_taunt'], basicDealsDamage: false, tag: 'faun_beast' }
+          ],
+          limit: 1,
+          uniquePerType: true
+        },
+        summonPool: [
+          { id: 'faun_tieu_hac', inheritPercent: 0.50, ttl: 5, traits: ['pierce_arm_0_10'], tag: 'faun_beast' },
+          { id: 'faun_tieu_bach', inheritPercent: 0.50, ttl: 5, traits: ['bonus_damage_0_05'], tag: 'faun_beast' },
+          { id: 'faun_tieu_hoang', inheritPercent: 0.50, ttl: 5, traits: ['on_death_heal_faun_0_50'], tag: 'faun_beast' },
+          { id: 'faun_tieu_bat_diem', inheritPercent: 0.50, ttl: 5, traits: ['heal_allies_0_30'], basicDealsDamage: false, tag: 'faun_beast' },
+          { id: 'faun_nhi_cau', inheritPercent: 0.50, ttl: 5, traits: ['heal_self_0_10', 'periodic_taunt'], basicDealsDamage: false, tag: 'faun_beast' }
+        ],
+        limit: 1,
+        uniquePerType: true,
+        notes: 'Triệu hồi ngẫu nhiên 1 thú trong 5 loại, mỗi loại tồn tại tối đa 5 lượt và không trùng lặp.'
+      }),
+      talent: asUnknownRecord({
+        name: 'Vạn Thú Đồng Hưởng',
+        perSummonStats: { HP: 0.03, ATK: 0.03, WIL: 0.03, ARM: 0.03, RES: 0.03, AEregen: 0.03, AEmax: 0.03 },
+        maxStacks: 5
+      }),
+      technique: null,
+      passives: asUnknownRecordArray([
+        {
+          id: 'summon_synergy',
+          name: 'Vạn Thú Đồng Hưởng',
+          when: 'onSummonStateChange',
+          effect: 'scalePerSummon',
+          params: { perSummonStats: { HP: 0.03, ATK: 0.03, WIL: 0.03, ARM: 0.03, RES: 0.03, AEregen: 0.03, AEmax: 0.03 }, maxStacks: 5 }
+        },
+        {
+          id: 'faun_beast_resist',
+          name: 'Đồng Bộ Thú Linh',
+          when: 'onDamageTaken',
+          effect: 'reduceDamageFromTag',
+          params: { tag: 'faun_beast', amount: 0.20 }
+        }
+      ]),
+      traits: asUnknownRecordArray([
+        { id: 'summon_limitations', text: 'Không thể tồn tại hai thú cùng loại; triệu hồi mới sẽ thay thế thú cũ.' },
+        { id: 'rage_cap', text: 'Thanh nộ tối đa của Faun là 85.' }
+      ])
+    }
+  },
+  {
+    id: 'basil_thorne', name: 'Basil Thorne', class: 'Tanker', rank: 'SR',
+    mods: { HP: 0.08, ARM: 0.08, RES: 0.06 },
+    kit: {
+      onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+      basic: asUnknownRecord({
+        name: 'Đánh Thường',
+        tags: ['single-target'],
+        damageMultiplier: 1.00,
+        notes: 'Đâm gai gây 100% ATK + WIL lên 1 địch.'
+      }),
+      skills: asUnknownRecordArray([
+        {
+          key: 'skill1',
+          name: 'Chiết Luyện Độc Tích',
+          cost: { aether: 30 },
+          convertDebuff: { id: 'doc', stat: 'HP', amountPerStack: 0.015 },
+          removeDebuff: { id: 'doc', scope: 'all' },
+          notes: 'Mỗi stack Độc trên kẻ địch tăng 1,5% Max HP cho Basil rồi xóa toàn bộ Độc.'
+        },
+        {
+          key: 'skill2',
+          name: 'Khế Ước Gai Huyết',
+          cost: { aether: 25 },
+          duration: 2,
+          sacrificeMaxHPPercent: 0.10,
+          reflectDamage: 0.30,
+          notes: 'Giảm 10% Max HP thực để nhận hiệu ứng phản sát thương trong 2 lượt.'
+        },
+        {
+          key: 'skill3',
+          name: 'Song Tiêm Trảm',
+          cost: { aether: 20 },
+          countsAsBasic: true,
+          hits: 2,
+          damageMultiplier: 1.00,
+          tags: ['multi-hit'],
+          notes: 'Gây 2 đòn đánh thường liên tiếp lên cùng mục tiêu.'
+        }
+      ]),
+      ult: asUnknownRecord({
+        type: 'fortify',
+        tags: ['taunt'],
+        duration: 2,
+        taunt: true,
+        buffStats: { ARM: 0.20, RES: 0.20 },
+        notes: 'Pháo Đài Gai Đen: nhận Khiêu Khích 2 lượt và tăng 20% ARM/RES trong thời gian này.'
+      }),
+      talent: asUnknownRecord({
+        name: 'Gai Độc',
+        mark: { id: 'doc', maxStacks: 10, purgeable: true }
+      }),
+      technique: null,
+      passives: asUnknownRecordArray([
+        {
+          id: 'toxic_thorns',
+          name: 'Gai Độc',
+          when: 'onHitByEnemy',
+          effect: 'applyDebuff',
+          params: { id: 'doc', stacks: 1, maxStacksPerTarget: 10, perTurnLimit: 1 }
+        }
+      ]),
+      traits: asUnknownRecordArray([
+        { id: 'poison_cap', text: 'Mỗi kẻ địch chỉ nhận tối đa 1 stack Độc từ nội tại mỗi lượt.' },
+        { id: 'reflect_cost', text: 'Khế Ước Gai Huyết trừ Max HP thật, khiên không chặn được chi phí.' }
+      ])
+    }
+  },
+  {
     id: 'mo_da', name: 'Mộ Dạ', class: 'Warrior', rank: 'SSR',
     mods: { ATK: 0.10, WIL: 0.10 },
     kit: {
