@@ -128,7 +128,9 @@ const DEFAULT_BANNERS = [
     closesIn: '--',
     heroArt: 'assets/banner_standard.svg',
     thumbnail: 'assets/banner_standard.svg',
-    featured: [],
+    featured: [
+      { id: 'mo_da', name: 'Mộ Dạ', rank: 'SSR', portrait: 'assets/u_mo_da.svg' }
+    ],
     rates: { N: 60, R: 25, SR: 12, SSR: 3, UR: 0, Prime: 0 },
     pity: {
       soft: null,
@@ -143,14 +145,16 @@ const DEFAULT_BANNERS = [
   {
     id: 'UR',
     type: 'limited',
-    name: 'Giới Hạn: Huyễn Long',
-    subtitle: "Selected Partners' Summon Rate UP",
+    name: 'Giới Hạn: Thế Giới Mộng',
+    subtitle: 'UR mới xuất hiện trong banner này',
     closesIn: '6d 23h',
     heroArt: 'assets/banner_dragon.svg',
     thumbnail: 'assets/banner_dragon.svg',
     featured: [
-      { id: 'unit-aurora', name: 'Aurora', rank: 'UR', portrait: 'assets/u_aurora.svg' },
-      { id: 'unit-veil', name: 'Veil', rank: 'SSR', portrait: 'assets/u_veil.svg' },
+      { id: 'mong_yem', name: 'Mộng Yểm', rank: 'UR', portrait: 'assets/u_mong_yem.svg' },
+      { id: 'chan_nga', name: 'Chân Ngã', rank: 'UR', portrait: 'assets/u_chan_nga.svg' },
+      { id: 'ma_ton_diep_lam', name: 'Ma Tôn - Diệp Lâm', rank: 'UR', portrait: 'assets/u_ma_ton_diep_lam.svg' },
+      { id: 'ngao_binh', name: 'Ngao Bính', rank: 'UR', portrait: 'assets/u_ngao_binh.svg' }
     ],
     rates: { N: 55, R: 23, SR: 12, SSR: 7.5, UR: 2.2, Prime: 0.3 },
     pity: {
@@ -166,12 +170,14 @@ const DEFAULT_BANNERS = [
   {
     id: 'Prime',
     type: 'limited',
-    name: 'Giới Hạn: Hư Chủ',
+    name: 'Giới Hạn: Lậu Khắc',
     subtitle: 'Prime focus',
     closesIn: '3d 12h',
     heroArt: 'assets/banner_void.svg',
     thumbnail: 'assets/banner_void.svg',
-    featured: [{ id: 'unit-void-lord', name: 'Hư Chủ', rank: 'Prime', portrait: 'assets/u_void.svg' }],
+    featured: [
+      { id: 'lau_khac_ma_chu', name: 'Lậu Khắc Ma Chủ', rank: 'Prime', portrait: 'assets/u_lau_khac_ma_chu.svg' }
+    ],
     rates: { N: 54, R: 24, SR: 12, SSR: 8.5, UR: 1.0, Prime: 0.5 },
     pity: {
       soft: { UR: 60 },
