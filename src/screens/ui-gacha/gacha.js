@@ -129,9 +129,9 @@ const DEFAULT_BANNERS = [
     heroArt: 'assets/banner_standard.svg',
     thumbnail: 'assets/banner_standard.svg',
     featured: [
+      { id: 'diep_minh', name: 'Diệp Minh', rank: 'SSR', portrait: 'assets/u_diep_minh.svg' },
+      { id: 'thien_luu', name: 'Thiên Lưu', rank: 'SSR', portrait: 'assets/u_thien_luu.svg' },
       { id: 'mo_da', name: 'Mộ Dạ', rank: 'SSR', portrait: 'assets/u_mo_da.svg' },
-      { id: 'vu_thien', name: 'Vũ Thiên', rank: 'SSR', portrait: 'assets/u_vu_thien.svg' },
-      { id: 'anna', name: 'Anna', rank: 'SSR', portrait: 'assets/u_anna.svg' }
     ],
     rates: { N: 60, R: 25, SR: 12, SSR: 3, UR: 0, Prime: 0 },
     pity: {
@@ -153,11 +153,11 @@ const DEFAULT_BANNERS = [
     heroArt: 'assets/banner_dragon.svg',
     thumbnail: 'assets/banner_dragon.svg',
     featured: [
+      { id: 'nguyet_san', name: 'Nguyệt San', rank: 'UR', portrait: 'assets/u_nguyet_san.svg' },
+      { id: 'huyet_tich', name: 'Huyết Tịch', rank: 'UR', portrait: 'assets/u_huyet_tich.svg' },
+      { id: 'khai_nguyen_tu', name: 'Khai Nguyên Tử', rank: 'UR', portrait: 'assets/u_khai_nguyen_tu.svg' },
       { id: 'mong_yem', name: 'Mộng Yểm', rank: 'UR', portrait: 'assets/u_mong_yem.svg' },
-      { id: 'chan_nga', name: 'Chân Ngã', rank: 'UR', portrait: 'assets/u_chan_nga.svg' },
-      { id: 'ma_ton_diep_lam', name: 'Ma Tôn - Diệp Lâm', rank: 'UR', portrait: 'assets/u_ma_ton_diep_lam.svg' },
-      { id: 'ngao_binh', name: 'Ngao Bính', rank: 'UR', portrait: 'assets/u_ngao_binh.svg' },
-      { id: 'ai_lan', name: 'Ái Lân', rank: 'UR', portrait: 'assets/u_ai_lan.svg' }
+      { id: 'chan_nga', name: 'Chân Ngã', rank: 'UR', portrait: 'assets/u_chan_nga.svg' }
     ],
     rates: { N: 55, R: 23, SR: 12, SSR: 7.5, UR: 2.2, Prime: 0.3 },
     pity: {
@@ -195,15 +195,15 @@ const DEFAULT_BANNERS = [
   {
     id: 'bloodline',
     type: 'event',
-    name: 'Sự Kiện: Gai Độc & Thú Linh',
-    subtitle: 'Faun & Basil Thorne xuất hiện với tỉ lệ tăng',
+    name: 'Sự Kiện: Vương Lâm Hộ Pháp',
+    subtitle: 'Trùng Lâm dẫn đầu rừng sinh mệnh',
     closesIn: '9d 5h',
     heroArt: 'assets/banner_bloodline.svg',
     thumbnail: 'assets/banner_bloodline.svg',
     featured: [
+      { id: 'trung_lam', name: 'Trùng Lâm', rank: 'SSR', portrait: 'assets/u_trung_lam.svg' },
       { id: 'faun', name: 'Faun', rank: 'SSR', portrait: 'assets/u_faun.svg' },
       { id: 'basil_thorne', name: 'Basil Thorne', rank: 'SR', portrait: 'assets/u_basil_thorne.svg' },
-      { id: 'lao_khat_cai', name: 'Lão Khất Cái', rank: 'SR', portrait: 'assets/u_lao_khat_cai.svg' }
     ],
     rates: { N: 50, R: 22, SR: 16, SSR: 10, UR: 2, Prime: 0 },
     pity: {
