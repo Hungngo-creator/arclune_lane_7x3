@@ -1,6 +1,6 @@
 const { renderGachaView } = window.__require('./screens/gacha/view.ts');
 
-const CURRENCIES = [
+const DEFAULT_CURRENCIES = [
   { id: 'gem', name: 'Tinh Thạch', icon: 'assets/gem.svg', amount: 12345 },
   { id: 'ticket', name: 'Vé Triệu Hồi', icon: 'assets/ticket.svg', amount: 7 },
   { id: 'coin', name: 'Đồng Vận', icon: 'assets/coin.svg', amount: 99800 },
@@ -10,9 +10,9 @@ const CURRENCIES = [
 
 const RANKS = ['N', 'R', 'SR', 'SSR', 'UR', 'Prime'];
 
-const BANNERS = [
+const DEFAULT_BANNERS = [
   {
-    id: 'std',
+    id: 'SSR',
     type: 'standard',
     name: 'Triệu Hồi Chuẩn',
     subtitle: 'Chỉ xuất hiện N / R / SR / SSR',
@@ -32,7 +32,7 @@ const BANNERS = [
     },
   },
   {
-    id: 'lt-ur',
+    id: 'UR',
     type: 'limited',
     name: 'Giới Hạn: Huyễn Long',
     subtitle: "Selected Partners' Summon Rate UP",
@@ -55,7 +55,7 @@ const BANNERS = [
     },
   },
   {
-    id: 'lt-prime',
+    id: 'Prime',
     type: 'limited',
     name: 'Giới Hạn: Hư Chủ',
     subtitle: 'Prime focus',
@@ -75,6 +75,263 @@ const BANNERS = [
     },
   },
 ];
+
+const CURRENCY_ICON_MAP = {
+  TT: 'assets/gem.svg',
+  THUONG: 'assets/ticket.svg',
+  TRUNG: 'assets/coin.svg',
+  HA: 'assets/key.svg',
+  VUN: 'assets/dust.svg',
+};
+
+const CURRENCY_FALLBACK_ID = {
+  TT: 'gem',
+  THUONG: 'ticket',
+  TRUNG: 'coin',
+  HA: 'dust',
+  VUN: 'key',
+  THANH_TINH: 'gem',
+};
+
+let CURRENCIES = cloneDefaultCurrencies();
+let BANNERS = cloneDefaultBanners();
+
+const DEFAULT_ICON = 'assets/gem.svg';
+
+function cloneDefaultCurrencies() {
+  return DEFAULT_CURRENCIES.map((entry) => ({ ...entry }));
+}
+
+function cloneDefaultBanners() {
+  return DEFAULT_BANNERS.map((entry) => ({
+    ...entry,
+    featured: Array.isArray(entry.featured) ? entry.featured.map((unit) => ({ ...unit })) : [],
+    cost: entry.cost
+      ? {
+          single: entry.cost.single ? { ...entry.cost.single, fallback: entry.cost.single.fallback ? { ...entry.cost.single.fallback } : undefined } : null,
+          multi: entry.cost.multi ? { ...entry.cost.multi, fallback: entry.cost.multi.fallback ? { ...entry.cost.multi.fallback } : undefined } : null,
+        }
+      : null,
+    pity: entry.pity
+      ? {
+          soft: entry.pity.soft ? { ...entry.pity.soft } : entry.pity.soft,
+          hard: entry.pity.hard ? { ...entry.pity.hard } : entry.pity.hard,
+          carryOverPerBanner: entry.pity.carryOverPerBanner,
+        }
+      : null,
+  }));
+}
+
+function warnConfig(path, message) {
+  const detail = message ? ` (${message})` : '';
+  console.warn(`[Gacha Config] Thiếu hoặc lỗi dữ liệu tại "${path}"${detail}. Dùng giá trị mặc định.`);
+}
+
+function toPercent(value) {
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    return null;
+  }
+  return Math.round(value * 10000) / 100;
+}
+
+function mapCurrencyIcon(code, fallbackIcon) {
+  if (!code) {
+    return fallbackIcon ?? DEFAULT_ICON;
+  }
+  return CURRENCY_ICON_MAP[code] ?? fallbackIcon ?? DEFAULT_ICON;
+}
+
+function buildCurrenciesFromConfig(config) {
+  const currenciesConfig = config?.economy?.currencies;
+  if (!currenciesConfig || typeof currenciesConfig !== 'object') {
+    warnConfig('economy.currencies');
+    return cloneDefaultCurrencies();
+  }
+
+  const defaultsById = new Map(DEFAULT_CURRENCIES.map((currency) => [currency.id, currency]));
+  const result = Object.entries(currenciesConfig).map(([key, currencyConfig]) => {
+    const code = currencyConfig?.code ?? key;
+    if (!currencyConfig?.code) {
+      warnConfig(`economy.currencies.${key}.code`);
+    }
+    const fallbackId = CURRENCY_FALLBACK_ID[code] ?? CURRENCY_FALLBACK_ID[key] ?? code;
+    const fallback = defaultsById.get(code) ?? defaultsById.get(fallbackId) ?? defaultsById.get(key) ?? null;
+    const name = currencyConfig?.name ?? fallback?.name ?? key;
+    if (!currencyConfig?.name) {
+      warnConfig(`economy.currencies.${key}.name`);
+    }
+    const icon = mapCurrencyIcon(code, fallback?.icon);
+    const amount = fallback?.amount ?? 0;
+    return {
+      id: code,
+      name,
+      icon,
+      amount,
+      tier: currencyConfig?.tier ?? fallback?.tier ?? null,
+    };
+  });
+
+  result.sort((a, b) => (b.tier ?? 0) - (a.tier ?? 0));
+  return result.slice(0, 5);
+}
+
+function isValidCostEntry(entry) {
+  return entry && typeof entry.currency === 'string' && typeof entry.amount === 'number';
+}
+
+function mapCost(entries, fallbackCost, path) {
+  if (!Array.isArray(entries) || entries.length === 0) {
+    if (path) {
+      warnConfig(path, 'thiếu danh sách giá');
+    }
+    return fallbackCost ? { ...fallbackCost, fallback: fallbackCost.fallback ? { ...fallbackCost.fallback } : undefined } : null;
+  }
+
+  const [primary, secondary] = entries;
+  if (!isValidCostEntry(primary)) {
+    warnConfig(path ? `${path}[0]` : 'cost', 'thiếu currency hoặc amount');
+    return fallbackCost ? { ...fallbackCost, fallback: fallbackCost.fallback ? { ...fallbackCost.fallback } : undefined } : null;
+  }
+
+  const cost = {
+    currency: primary.currency,
+    amount: primary.amount,
+  };
+
+  if (isValidCostEntry(secondary)) {
+    cost.fallback = {
+      currency: secondary.currency,
+      amount: secondary.amount,
+    };
+  } else if (fallbackCost?.fallback) {
+    cost.fallback = { ...fallbackCost.fallback };
+  }
+
+  return cost;
+}
+
+function mapPity(configPity, configRateUpRule, fallbackPity, bannerId) {
+  const fallbackSoft = fallbackPity?.soft ? { ...fallbackPity.soft } : null;
+  const fallbackHard = fallbackPity?.hard ? { ...fallbackPity.hard } : null;
+  const fallbackSoftKeys = fallbackSoft ? Object.keys(fallbackSoft) : [];
+  const fallbackHardKeys = fallbackHard ? Object.keys(fallbackHard) : [];
+  const targetRarity = configRateUpRule?.onHitRarity ?? fallbackHardKeys[0] ?? fallbackSoftKeys[0] ?? bannerId;
+
+  let soft = fallbackSoft;
+  if (configPity?.softPity?.startAtPull) {
+    const key = configRateUpRule?.onHitRarity ?? fallbackSoftKeys[0] ?? targetRarity;
+    soft = { ...(soft ?? {}), [key]: configPity.softPity.startAtPull };
+  }
+
+  let hard = fallbackHard;
+  if (typeof configPity?.hardPity === 'number') {
+    hard = { ...(hard ?? {}), [targetRarity]: configPity.hardPity };
+  }
+
+  return {
+    soft: soft ?? null,
+    hard: hard ?? null,
+    carryOverPerBanner: fallbackPity?.carryOverPerBanner ?? false,
+  };
+}
+
+function buildRates(baseRates, fallbackRates) {
+  const result = { ...fallbackRates };
+  if (!baseRates || typeof baseRates !== 'object') {
+    return result;
+  }
+
+  RANKS.forEach((rank) => {
+    const value = toPercent(baseRates[rank]);
+    if (value === null) {
+      return;
+    }
+    result[rank] = value;
+  });
+  return result;
+}
+
+function mergeBannerWithConfig(bannerId, bannerConfig, fallback, baseRates) {
+  const rates = buildRates(baseRates, fallback.rates);
+  const pity = mapPity(
+    { softPity: bannerConfig?.softPity, hardPity: bannerConfig?.hardPity },
+    bannerConfig?.rateUpRule,
+    fallback.pity,
+    bannerId,
+  );
+
+  const singleCost = mapCost(bannerConfig?.costPerPull, fallback.cost?.single, `gacha.banners.${bannerId}.costPerPull`);
+  const multiCost = mapCost(bannerConfig?.bundle10, fallback.cost?.multi, `gacha.banners.${bannerId}.bundle10`);
+
+  return {
+    id: bannerId,
+    type: fallback.type,
+    name: fallback.name,
+    subtitle: fallback.subtitle,
+    closesIn: fallback.closesIn,
+    heroArt: fallback.heroArt,
+    thumbnail: fallback.thumbnail,
+    featured: Array.isArray(fallback.featured) ? fallback.featured.map((unit) => ({ ...unit })) : [],
+    rates,
+    pity,
+    cost: {
+      single: singleCost,
+      multi: multiCost,
+    },
+  };
+}
+
+function buildBannersFromConfig(config) {
+  const bannersConfig = config?.gacha?.banners;
+  if (!bannersConfig || typeof bannersConfig !== 'object') {
+    warnConfig('gacha.banners');
+    return cloneDefaultBanners();
+  }
+
+  const baseRates = config?.gacha?.rarityRatesBase;
+  const defaults = cloneDefaultBanners();
+  const defaultsById = new Map(DEFAULT_BANNERS.map((banner) => [banner.id, banner]));
+
+  const merged = defaults.map((fallback) => {
+    const bannerConfig = bannersConfig[fallback.id];
+    if (!bannerConfig) {
+      warnConfig(`gacha.banners.${fallback.id}`, 'không tìm thấy cấu hình, giữ mặc định');
+      return fallback;
+    }
+    return mergeBannerWithConfig(fallback.id, bannerConfig, fallback, baseRates);
+  });
+
+  Object.entries(bannersConfig).forEach(([bannerId, bannerConfig]) => {
+    if (merged.some((banner) => banner.id === bannerId)) {
+      return;
+    }
+    warnConfig(`gacha.banners.${bannerId}`, 'không có fallback UI, sử dụng cấu hình chuẩn');
+    const fallback = defaultsById.get('SSR') ?? DEFAULT_BANNERS[0];
+    merged.push(mergeBannerWithConfig(bannerId, bannerConfig, fallback, baseRates));
+  });
+
+  return merged;
+}
+
+async function loadEconomyFromConfig() {
+  try {
+    const response = await fetch('./gacha_config_v1.3.0.json', { cache: 'no-cache' });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    const data = await response.json();
+    return {
+      currencies: buildCurrenciesFromConfig(data),
+      banners: buildBannersFromConfig(data),
+    };
+  } catch (error) {
+    console.warn('[Gacha Config] Không thể tải gacha_config_v1.3.0.json:', error);
+    return {
+      currencies: cloneDefaultCurrencies(),
+      banners: cloneDefaultBanners(),
+    };
+  }
+}
 
 const elements = {
   app: document.querySelector('[data-app-root]'),
@@ -395,6 +652,14 @@ function hasEnoughCurrency(cost) {
 }
 
 function createCostLines(cost, button) {
+  if (!cost) {
+    const placeholder = document.createElement('span');
+    placeholder.className = 'cta__cost-line';
+    placeholder.textContent = 'Không khả dụng';
+    button.appendChild(placeholder);
+    return;
+  }
+
   const wrapper = document.createElement('div');
   wrapper.className = 'cta__cost';
 
@@ -438,7 +703,16 @@ function updateCTAButton(button, label, cost, summonType) {
   button.appendChild(title);
   createCostLines(cost, button);
 
-const status = hasEnoughCurrency(cost);
+if (!cost) {
+    button.disabled = true;
+    button.classList.remove('cta__button--affordable');
+    button.title = 'Tạm khoá';
+    button.setAttribute('aria-disabled', 'true');
+    button.dataset.summonType = summonType;
+    return;
+  }
+
+  const status = hasEnoughCurrency(cost);
   button.disabled = !status.enough;
   button.classList.toggle('cta__button--affordable', status.enough);
   if (!status.enough) {
@@ -722,12 +996,24 @@ function setupEventListeners() {
   elements.drawerToggle?.addEventListener('click', () => toggleDrawer());
 }
 
-function init() {
+async function init() {
+  const { currencies, banners } = await loadEconomyFromConfig();
+  CURRENCIES = currencies;
+  BANNERS = banners;
+
+  if (!state.selectedBannerId || !BANNERS.some((banner) => banner.id === state.selectedBannerId)) {
+    state = { ...state, selectedBannerId: BANNERS[0]?.id ?? null };
+  }
+
   renderCurrencies(CURRENCIES);
   renderBannerList(BANNERS);
-  selectBanner(state.selectedBannerId ?? BANNERS[0]?.id ?? '', { focus: false });
+  if (state.selectedBannerId) {
+    selectBanner(state.selectedBannerId, { focus: false });
+  }
   setupEventListeners();
   elements.helpButton?.setAttribute('title', 'Hướng dẫn tỉ lệ & bảo hiểm');
 }
 
-init();
+init().catch((error) => {
+  console.error('[Gacha UI] Lỗi khi khởi tạo giao diện gacha:', error);
+});
