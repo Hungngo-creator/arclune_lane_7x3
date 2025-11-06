@@ -18,6 +18,7 @@ const PVE_SESSION_MODULE_ID = '@modes/pve/session.ts' as const;
 const COMING_SOON_MODULE_ID = '@modes/coming-soon.stub.ts' as const;
 const LINEUP_SCREEN_MODULE_ID = '@screens/lineup/index.ts' as const;
 const COLLECTION_SCREEN_MODULE_ID = '@screens/collection/index.ts' as const;
+const GACHA_SCREEN_MODULE_ID = '@screens/ui-gacha/index.ts' as const;
 
 const MODE_TYPES = {
   PVE: 'PvE',
@@ -138,15 +139,15 @@ const MODES = [
     id: 'gacha',
     title: 'Gacha',
     type: MODE_TYPES.ECONOMY,
-    status: MODE_STATUS.COMING_SOON,
+    status: MODE_STATUS.AVAILABLE,
     icon: '🎲',
     shortDescription: `Quầy gacha phân tab Nhân Vật, Công Pháp, Vũ Khí, Sủng Thú với bảo hiểm ${SSR_PITY?.hardPity || 60}/${UR_PITY?.hardPity || 70}/${PRIME_PITY?.hardPity || 80} lượt cho các banner SSR/UR/Prime.`,
     unlockNotes: `Banner UR bảo hiểm SSR ở lượt ${UR_PITY?.softGuarantees?.[0]?.pull || 50}; banner Prime lần lượt bảo hiểm SSR/UR ở ${PRIME_PITY?.softGuarantees?.map(({ pull }: PityConfiguration['softGuarantees'][number]) => pull).join('/') || '40/60'} và Prime ở ${PRIME_PITY?.hardPity || 80}.`,
-    tags: ['Kinh tế nguyên tinh', 'Coming soon'],
+    tags: ['Kinh tế nguyên tinh'],
     menuSections: ['economy'],
     shell: {
-      screenId: 'main-menu',
-      fallbackModuleId: COMING_SOON_MODULE_ID
+      screenId: 'gacha',
+      moduleId: GACHA_SCREEN_MODULE_ID
     }
   },
   {
