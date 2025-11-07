@@ -19725,7 +19725,11 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
 
 });
 __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
-  import './gacha.css';
+  const __dep0 = __require('./screens/ui-gacha/gacha.css');
+  const gachaStyles = __dep0.default ?? __dep0;
+  const __dep1 = __require('./ui/dom.ts');
+  const ensureStyleTag = __dep1.ensureStyleTag;
+  const STYLE_ID = 'ui-gacha-screen-style';
   const GACHA_TEMPLATE = /* html */ `
     <div class="gacha-app" data-app-root>
       <header class="gacha-topbar" data-section="topbar">
@@ -19833,7 +19837,7 @@ __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
       </div>
     </div>
   `;
-  const GACHA_MODULE_ID = './screens/ui-gacha/gacha.js';
+  const GACHA_MODULE_ID = './screens/ui-gacha/gacha.ts';
   function sanitizeModuleId(moduleId) {
       return moduleId.replace(/\\/g, '/');
   }
@@ -19879,13 +19883,28 @@ __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
       return sanitized;
   }
   function resolveNormalizedModuleHref(normalizedId) {
+      var _a;
+      const baseUrl = (_a = (typeof document !== 'undefined' ? document.baseURI : undefined)) !== null && _a !== void 0 ? _a : (typeof window !== 'undefined' ? window.location.href : undefined);
+      if (!baseUrl) {
+          return normalizedId;
+      }
       if (normalizedId.startsWith('./screens/')) {
-          const relative = `../${normalizedId.slice('./screens/'.length)}`;
-          return new URL(relative, import.meta.url).href;
+          const relative = `screens/${normalizedId.slice('./screens/'.length)}`;
+          try {
+              return new URL(relative, baseUrl).href;
+          }
+          catch {
+              return normalizedId;
+          }
       }
       if (normalizedId.startsWith('./')) {
           const relative = normalizedId.slice(2);
-          return new URL(relative, import.meta.url).href;
+          try {
+              return new URL(relative, baseUrl).href;
+          }
+          catch {
+              return normalizedId;
+          }
       }
       return normalizedId;
   }
@@ -19912,8 +19931,38 @@ __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
       if (runtimeRequire) {
           return runtimeRequire(normalizedId);
       }
-      const href = resolveNormalizedModuleHref(normalizedId);
-      return import(/* @vite-ignore */ href);
+      const attempted = new Set();
+      const candidates = [];
+      function pushCandidate(id) {
+          const sanitized = sanitizeModuleId(id);
+          if (!attempted.has(sanitized)) {
+              attempted.add(sanitized);
+              candidates.push(sanitized);
+          }
+      }
+      function withExtension(id, extension) {
+          const knownExtensions = ['.ts', '.js', '.mjs', '.cjs'];
+          for (const known of knownExtensions) {
+              if (id.endsWith(known)) {
+                  return `${id.slice(0, -known.length)}${extension}`;
+              }
+          }
+          return `${id}${extension}`;
+      }
+      pushCandidate(withExtension(normalizedId, '.ts'));
+      pushCandidate(normalizedId);
+      pushCandidate(withExtension(normalizedId, '.js'));
+      let lastError = null;
+      for (const candidate of candidates) {
+          try {
+              const href = resolveNormalizedModuleHref(candidate);
+              return (await import(/* @vite-ignore */ href));
+          }
+          catch (error) {
+              lastError = error;
+          }
+      }
+      throw lastError !== null && lastError !== void 0 ? lastError : new Error('Không thể tải module gacha.');
   }
   function createContainer() {
       const wrapper = document.createElement('div');
@@ -19927,6 +19976,7 @@ __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
       if (!root) {
           throw new Error('renderScreen cần root hợp lệ.');
       }
+      ensureStyleTag(STYLE_ID, { css: gachaStyles });
       const container = createContainer();
       let disposed = false;
       let handle = null;
@@ -20274,14 +20324,18 @@ __define('./screens/ui-gacha/logic/currency.ts', (exports, module, __require) =>
       const initialCode = ((_b = (_a = CURRENCY_ORDER[fromIndex]) !== null && _a !== void 0 ? _a : CURRENCY_ORDER[CURRENCY_ORDER.length - 1]) !== null && _b !== void 0 ? _b : CURRENCY_ORDER[0]);
       let state = cloneWallet(wallet);
       let currentIndex = fromIndex;
-      let currentUnits = Math.min(units, state[initialCode]);
-      while (currentUnits > 0 && currentIndex > toIndex) {
+      let carry = Math.min(units, state[initialCode]);
+      while (carry > 0 && currentIndex > toIndex) {
           const from = (_c = CURRENCY_ORDER[currentIndex]) !== null && _c !== void 0 ? _c : initialCode;
           const to = ((_e = (_d = CURRENCY_ORDER[currentIndex - 1]) !== null && _d !== void 0 ? _d : CURRENCY_ORDER[Math.max(currentIndex - 1, 0)]) !== null && _e !== void 0 ? _e : CURRENCY_ORDER[0]);
-          const { wallet: next, amount } = convertDown(state, from, to, currentUnits);
-          detail.push({ from, to, units: currentUnits, amount });
+          const usable = Math.min(carry, state[from]);
+          if (usable <= 0) {
+              break;
+          }
+          const { wallet: next, amount: produced } = convertDown(state, from, to, usable);
+          detail.push({ from, to, units: usable, amount: produced });
           state = next;
-          currentUnits = Math.floor(amount / 100);
+          carry = produced;
           currentIndex -= 1;
       }
       return state;
