@@ -128,7 +128,7 @@ const GACHA_TEMPLATE = /* html */ `
   </div>
 `;
 
-const GACHA_MODULE_ID = './screens/ui-gacha/gacha.js' as const;
+const GACHA_MODULE_ID = './screens/ui-gacha/gacha.ts' as const;
 
 type MaybePromise<T> = Promise<T> | T;
 
@@ -229,8 +229,44 @@ async function loadGachaModule(): Promise<GachaModule> {
   if (runtimeRequire) {
     return runtimeRequire(normalizedId) as GachaModule;
   }
-  const href = resolveNormalizedModuleHref(normalizedId);
-  return import(/* @vite-ignore */ href) as Promise<GachaModule>;
+
+  const attempted = new Set<string>();
+  const candidates: string[] = [];
+
+  function pushCandidate(id: string): void {
+    const sanitized = sanitizeModuleId(id);
+    if (!attempted.has(sanitized)) {
+      attempted.add(sanitized);
+      candidates.push(sanitized);
+    }
+  }
+
+  function withExtension(id: string, extension: '.ts' | '.js'): string {
+    const knownExtensions = ['.ts', '.js', '.mjs', '.cjs'];
+    for (const known of knownExtensions) {
+      if (id.endsWith(known)) {
+        return `${id.slice(0, -known.length)}${extension}`;
+      }
+    }
+    return `${id}${extension}`;
+  }
+
+  pushCandidate(withExtension(normalizedId, '.ts'));
+  pushCandidate(normalizedId);
+  pushCandidate(withExtension(normalizedId, '.js'));
+
+  let lastError: unknown = null;
+
+  for (const candidate of candidates) {
+    try {
+      const href = resolveNormalizedModuleHref(candidate);
+      return (await import(/* @vite-ignore */ href)) as GachaModule;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  throw lastError ?? new Error('Không thể tải module gacha.');
 }
 
 function createContainer(): HTMLElement {
