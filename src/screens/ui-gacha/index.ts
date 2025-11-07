@@ -1,4 +1,5 @@
-import './gacha.css';
+import gachaStyles from './gacha.css';
+import { ensureStyleTag } from '../../ui/dom.ts';
 
 type MaybeRequire = ((id: string) => unknown) | undefined;
 
@@ -19,6 +20,8 @@ declare global {
     __ARC_GACHA_EMBED__?: boolean;
   }
 }
+
+const STYLE_ID = 'ui-gacha-screen-style';
 
 const GACHA_TEMPLATE = /* html */ `
   <div class="gacha-app" data-app-root>
@@ -282,6 +285,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   if (!root) {
     throw new Error('renderScreen cần root hợp lệ.');
   }
+
+ensureStyleTag(STYLE_ID, { css: gachaStyles });
 
   const container = createContainer();
   let disposed = false;
