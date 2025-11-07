@@ -43,6 +43,25 @@ describe('Hệ tiền tệ', () => {
     const remaining = payment.wallet.HNT;
     expect(remaining).toBeGreaterThanOrEqual(0);
   });
+  
+ test('payForRoll 10x Limited UR dùng TT quy đổi đủ', () => {
+    const wallet = createWallet({ VNT: 0, HNT: 0, TNT: 0, ThNT: 0, TT: 1 });
+    const banner = GACHA_CONFIG.banners.find((item) => item.id === 'limited-ur');
+    expect(banner).toBeTruthy();
+    const costUnit = banner!.cost.unit;
+    const costAmount = banner!.cost.x10;
+    const payment = payForRoll(wallet, costUnit, costAmount);
+    expect(payment.ok).toBe(true);
+    expect(payment.wallet.TT).toBe(0);
+    expect(payment.wallet.TNT).toBe(10_000 - costAmount);
+    expect(payment.detail?.usedDirect).toBe(0);
+    expect(payment.detail?.usedFromHigher).toBe(costAmount);
+    expect(payment.detail?.remaining).toBe(10_000 - costAmount);
+    const conversions = payment.detail?.conversions ?? [];
+    expect(conversions.length).toBeGreaterThanOrEqual(2);
+    expect(conversions[0]).toEqual(expect.objectContaining({ from: 'TT', to: 'ThNT', units: 1, amount: 100 }));
+    expect(conversions[1]).toEqual(expect.objectContaining({ from: 'ThNT', to: 'TNT', units: 100, amount: 10_000 }));
+  });
 });
 
 describe('Pity & bảo hiểm', () => {
