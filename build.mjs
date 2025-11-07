@@ -376,7 +376,12 @@ function transformModule(code, id){
 
   const importRegex = /import\s*([\s\S]*?)\s*from\s*['\"](.+?)['\"];?/g;
   const importTypeRegex = /import\s+type\s+([\s\S]*?)\s*from\s*['\"](.+?)['\"];?/g;
+  const importSideEffectRegex = /import\s*['\"](.+?)['\"];?/g;
   code = code.replace(importTypeRegex, () => '');
+  code = code.replace(importSideEffectRegex, (match, source) => {
+    const depId = resolveImport(id, source.trim());
+    return `__require('${depId}');`;
+  });
   code = code.replace(importRegex, (match, clause, source) => {
     const depId = resolveImport(id, source.trim());
     const moduleVar = `__dep${depIndex++}`;
