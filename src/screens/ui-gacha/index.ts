@@ -197,14 +197,32 @@ function normalizeRuntimeModuleId(moduleId: string): string {
 }
 
 function resolveNormalizedModuleHref(normalizedId: string): string {
-  if (normalizedId.startsWith('./screens/')) {
-    const relative = `../${normalizedId.slice('./screens/'.length)}`;
-    return new URL(relative, import.meta.url).href;
+  const baseUrl =
+    (typeof document !== 'undefined' ? document.baseURI : undefined) ??
+    (typeof window !== 'undefined' ? window.location.href : undefined);
+
+  if (!baseUrl) {
+    return normalizedId;
   }
+
+  if (normalizedId.startsWith('./screens/')) {
+    const relative = `screens/${normalizedId.slice('./screens/'.length)}`;
+    try {
+      return new URL(relative, baseUrl).href;
+    } catch {
+      return normalizedId;
+    }
+  }
+
   if (normalizedId.startsWith('./')) {
     const relative = normalizedId.slice(2);
-    return new URL(relative, import.meta.url).href;
+    try {
+      return new URL(relative, baseUrl).href;
+    } catch {
+      return normalizedId;
+    }
   }
+
   return normalizedId;
 }
 
