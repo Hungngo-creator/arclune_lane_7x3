@@ -230,14 +230,18 @@ function convertStepDown(
   const initialCode = (CURRENCY_ORDER[fromIndex] ?? CURRENCY_ORDER[CURRENCY_ORDER.length - 1] ?? CURRENCY_ORDER[0]) as CurrencyCode;
   let state = cloneWallet(wallet);
   let currentIndex = fromIndex;
-  let currentUnits = Math.min(units, state[initialCode]);
-  while (currentUnits > 0 && currentIndex > toIndex) {
+  let carry = Math.min(units, state[initialCode]);
+  while (carry > 0 && currentIndex > toIndex) {
     const from: CurrencyCode = CURRENCY_ORDER[currentIndex] ?? initialCode;
     const to = (CURRENCY_ORDER[currentIndex - 1] ?? CURRENCY_ORDER[Math.max(currentIndex - 1, 0)] ?? CURRENCY_ORDER[0]) as CurrencyCode;
-    const { wallet: next, amount } = convertDown(state, from, to, currentUnits);
-    detail.push({ from, to, units: currentUnits, amount });
+    const usable = Math.min(carry, state[from]);
+    if (usable <= 0) {
+      break;
+    }
+    const { wallet: next, amount: produced } = convertDown(state, from, to, usable);
+    detail.push({ from, to, units: usable, amount: produced });
     state = next;
-    currentUnits = Math.floor(amount / 100);
+    carry = produced;
     currentIndex -= 1;
   }
   return state;
