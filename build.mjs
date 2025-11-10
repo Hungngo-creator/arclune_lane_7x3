@@ -14,12 +14,44 @@ try {
 }
 const SRC_DIR = path.join(__dirname, 'src');
 const DIST_DIR = path.join(__dirname, 'dist');
+const ASSETS_SOURCE_DIR = path.join(__dirname, 'assets');
 const ENTRY_ID = './entry.ts';
 const SOURCE_EXTENSIONS = ['.js', '.ts', '.tsx', '.json', '.css'];
 const SCRIPT_EXTENSIONS = new Set(['.js', '.ts', '.tsx']);
 const STUB_MODULE_SPECIFIERS = new Map([
   ['zod', path.join(__dirname, 'tools/zod-stub/index.js')],
 ]);
+
+async function copyStaticAssets(){
+  try {
+    const stats = await fs.stat(ASSETS_SOURCE_DIR);
+    if (!stats.isDirectory()){
+      return;
+    }
+  } catch (err) {
+    if (err && err.code !== 'ENOENT'){
+      console.warn('Không thể truy cập thư mục assets, bỏ qua bước sao chép:', err);
+    }
+    return;
+  }
+
+  async function copyRecursive(fromDir, toDir){
+    const entries = await fs.readdir(fromDir, { withFileTypes: true });
+    await fs.mkdir(toDir, { recursive: true });
+    for (const entry of entries){
+      const sourcePath = path.join(fromDir, entry.name);
+      const targetPath = path.join(toDir, entry.name);
+      if (entry.isDirectory()){
+        await copyRecursive(sourcePath, targetPath);
+      } else if (entry.isFile()){
+        await fs.copyFile(sourcePath, targetPath);
+      }
+    }
+  }
+
+  const targetRoot = path.join(DIST_DIR, 'assets');
+  await copyRecursive(ASSETS_SOURCE_DIR, targetRoot);
+}
 function normalizeModuleId(id){
   if (!id){
     return id;
@@ -608,6 +640,7 @@ for (const [, stubPath] of STUB_MODULE_SPECIFIERS){
   }
 
   await fs.mkdir(DIST_DIR, { recursive: true });
+  await copyStaticAssets();
   const parts = [];
   parts.push('// Bundled by build.mjs');
   parts.push('const __modules = Object.create(null);');
