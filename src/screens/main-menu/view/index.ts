@@ -1,7 +1,6 @@
 import type { CleanupFn, CleanupRegistrar, MainMenuState, RenderedMainMenu } from '../types.ts';
-import { HERO_DEFAULT_ID } from '../dialogues.ts';
 import { mountSection } from '../../../ui/dom.ts';
-import { ensureStyles, createHeader, createHeroSection, createModesSection, createSidebar } from './layout.ts';
+import { ensureStyles, createHeader, createModesSection, createSidebar } from './layout.ts';
 
 export function renderMainMenuView(state: MainMenuState): RenderedMainMenu | null {
   const {
@@ -9,8 +8,6 @@ export function renderMainMenuView(state: MainMenuState): RenderedMainMenu | nul
     shell = null,
     sections = [],
     metadata = [],
-    heroId = HERO_DEFAULT_ID,
-    playerGender = 'neutral',
     onShowComingSoon
   } = state;
 
@@ -43,8 +40,6 @@ export function renderMainMenuView(state: MainMenuState): RenderedMainMenu | nul
 
   const primary = document.createElement('div');
   primary.className = 'main-menu-v2__primary';
-  const hero = createHeroSection({ heroId, playerGender, addCleanup });
-  primary.appendChild(hero);
   const modes = createModesSection({ sections, metadata, shell, onShowComingSoon, addCleanup });
   primary.appendChild(modes);
 
@@ -71,7 +66,6 @@ export function renderMainMenuView(state: MainMenuState): RenderedMainMenu | nul
 export {
   ensureStyles,
   createHeader,
-  createHeroSection,
   createModesSection,
   createSidebar
 } from './layout.ts';
