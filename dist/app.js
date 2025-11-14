@@ -7431,6 +7431,17 @@ __define('./engine.ts', (exports, module, __require) => {
   };
   const CHIBI_PROPS = CHIBI;
   const TOKEN_STYLE_VALUE = TOKEN_STYLE;
+  const tokenVisualKey = (token) => {
+      if (!token)
+          return null;
+      if (Number.isFinite(token.iid)) {
+          return `iid:${token.iid}`;
+      }
+      if (typeof token.id === 'string' && token.id.length > 0) {
+          return `id:${token.id}`;
+      }
+      return null;
+  };
   function coerceFinite(value, fallback) {
       const candidate = typeof value === 'number'
           ? value
@@ -8146,13 +8157,14 @@ __define('./engine.ts', (exports, module, __require) => {
       ctx.fillText(text, x, boxY + height / 2);
       ctx.restore();
   }
-  function drawTokensOblique(ctx, g, tokens, cam) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;
+  function drawTokensOblique(ctx, g, tokens, cam, options = {}) {
+      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r;
       const C = cam !== null && cam !== void 0 ? cam : DEFAULT_OBLIQUE_CAMERA;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       const baseR = Math.floor(g.tile * 0.36);
       const sig = contextSignature(g, C);
+      const meleeOffsets = (_a = options === null || options === void 0 ? void 0 : options.meleeOffsets) !== null && _a !== void 0 ? _a : null;
       const alive = [];
       for (const token of tokens) {
           if (!token || !token.alive) {
@@ -8169,7 +8181,12 @@ __define('./engine.ts', (exports, module, __require) => {
           const projection = getTokenProjection(token, g, C, sig);
           if (!projection)
               continue;
-          alive.push({ token, projection });
+          const key = tokenVisualKey(token);
+          const offset = key && meleeOffsets instanceof Map ? (_b = meleeOffsets.get(key)) !== null && _b !== void 0 ? _b : null : null;
+          const adjusted = offset
+              ? { x: projection.x + offset.x, y: projection.y + offset.y, scale: projection.scale }
+              : projection;
+          alive.push({ token, projection: adjusted });
       }
       alive.sort((a, b) => {
           const ya = a.projection.y;
@@ -8211,18 +8228,18 @@ __define('./engine.ts', (exports, module, __require) => {
       }
       const reduceShadows = shadowPreset !== null;
       for (const { token: t, projection: p } of alive) {
-          const scale = (_a = p.scale) !== null && _a !== void 0 ? _a : 1;
+          const scale = (_c = p.scale) !== null && _c !== void 0 ? _c : 1;
           const r = Math.max(6, Math.floor(baseR * scale));
           const facing = t.side === 'ally' ? 1 : -1;
           const art = ensureTokenArt(t);
-          const layout = (_b = art === null || art === void 0 ? void 0 : art.layout) !== null && _b !== void 0 ? _b : {};
-          const spriteCfg = (_d = normalizeSpriteDescriptor((_c = art === null || art === void 0 ? void 0 : art.sprite) !== null && _c !== void 0 ? _c : null)) !== null && _d !== void 0 ? _d : {};
-          const spriteHeightMult = (_e = layout.spriteHeight) !== null && _e !== void 0 ? _e : 2.4;
+          const layout = (_d = art === null || art === void 0 ? void 0 : art.layout) !== null && _d !== void 0 ? _d : {};
+          const spriteCfg = (_f = normalizeSpriteDescriptor((_e = art === null || art === void 0 ? void 0 : art.sprite) !== null && _e !== void 0 ? _e : null)) !== null && _f !== void 0 ? _f : {};
+          const spriteHeightMult = (_g = layout.spriteHeight) !== null && _g !== void 0 ? _g : 2.4;
           const spriteScale = Number.isFinite(spriteCfg.scale) ? spriteCfg.scale : 1;
-          const spriteHeight = r * spriteHeightMult * ((_f = art === null || art === void 0 ? void 0 : art.size) !== null && _f !== void 0 ? _f : 1) * spriteScale;
-          const spriteAspect = (_h = (_g = (Number.isFinite(spriteCfg.aspect) ? spriteCfg.aspect : null)) !== null && _g !== void 0 ? _g : layout.spriteAspect) !== null && _h !== void 0 ? _h : 0.78;
+          const spriteHeight = r * spriteHeightMult * ((_h = art === null || art === void 0 ? void 0 : art.size) !== null && _h !== void 0 ? _h : 1) * spriteScale;
+          const spriteAspect = (_k = (_j = (Number.isFinite(spriteCfg.aspect) ? spriteCfg.aspect : null)) !== null && _j !== void 0 ? _j : layout.spriteAspect) !== null && _k !== void 0 ? _k : 0.78;
           const spriteWidth = spriteHeight * spriteAspect;
-          const anchor = Number.isFinite(spriteCfg.anchor) ? spriteCfg.anchor : (_j = layout.anchor) !== null && _j !== void 0 ? _j : 0.78;
+          const anchor = Number.isFinite(spriteCfg.anchor) ? spriteCfg.anchor : (_l = layout.anchor) !== null && _l !== void 0 ? _l : 0.78;
           const hasRichArt = !!(art && ((spriteCfg && spriteCfg.src) || art.shape));
           if (hasRichArt) {
               const { spriteEntry, shadowCfg } = getTokenVisual(t, art);
@@ -8231,14 +8248,14 @@ __define('./engine.ts', (exports, module, __require) => {
               ctx.translate(p.x, p.y);
               if (facing === -1 && (art === null || art === void 0 ? void 0 : art.mirror) !== false)
                   ctx.scale(-1, 1);
-              const rawShadow = (_k = shadowCfg !== null && shadowCfg !== void 0 ? shadowCfg : art === null || art === void 0 ? void 0 : art.shadow) !== null && _k !== void 0 ? _k : null;
+              const rawShadow = (_m = shadowCfg !== null && shadowCfg !== void 0 ? shadowCfg : art === null || art === void 0 ? void 0 : art.shadow) !== null && _m !== void 0 ? _m : null;
               const shadowObject = rawShadow && typeof rawShadow === 'object' ? rawShadow : {};
               const shadowColorFallback = typeof rawShadow === 'string'
                   ? rawShadow
                   : typeof (art === null || art === void 0 ? void 0 : art.shadow) === 'string'
                       ? art.shadow
                       : undefined;
-              let shadowColor = (_o = (_m = (_l = shadowObject.color) !== null && _l !== void 0 ? _l : art === null || art === void 0 ? void 0 : art.glow) !== null && _m !== void 0 ? _m : shadowColorFallback) !== null && _o !== void 0 ? _o : 'rgba(0,0,0,0.35)';
+              let shadowColor = (_q = (_p = (_o = shadowObject.color) !== null && _o !== void 0 ? _o : art === null || art === void 0 ? void 0 : art.glow) !== null && _p !== void 0 ? _p : shadowColorFallback) !== null && _q !== void 0 ? _q : 'rgba(0,0,0,0.35)';
               let shadowBlur = Number.isFinite(shadowObject.blur) ? shadowObject.blur : Math.max(6, r * 0.7);
               let shadowOffsetX = Number.isFinite(shadowObject.offsetX) ? shadowObject.offsetX : 0;
               let shadowOffsetY = Number.isFinite(shadowObject.offsetY) ? shadowObject.offsetY : Math.max(2, r * 0.2);
@@ -8286,7 +8303,7 @@ __define('./engine.ts', (exports, module, __require) => {
           }
           if ((art === null || art === void 0 ? void 0 : art.label) !== false) {
               const name = formatName(t.name || t.id);
-              const offset = (_p = layout.labelOffset) !== null && _p !== void 0 ? _p : 1.2;
+              const offset = (_r = layout.labelOffset) !== null && _r !== void 0 ? _r : 1.2;
               drawNameplate(ctx, name, p.x, p.y + r * offset, r, art);
           }
       }
@@ -9971,6 +9988,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   const vfxAddBloodPulse = __dep13.vfxAddBloodPulse;
   const vfxAddGroundBurst = __dep13.vfxAddGroundBurst;
   const vfxAddShieldWrap = __dep13.vfxAddShieldWrap;
+  const computeMeleeOffsets = __dep13.computeMeleeOffsets;
   const baseAsSessionWithVfx = __dep13.asSessionWithVfx;
   const __dep14 = __require('./scene.ts');
   const drawBattlefieldScene = __dep14.drawBattlefieldScene;
@@ -12239,15 +12257,28 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               gridDrawnViaScene = true;
           }
       }
+      let sessionVfx = null;
+      let meleeOffsets = null;
+      if (Game.grid) {
+          sessionVfx = ensureSessionWithVfx(Game, { requireGrid: true });
+          if (sessionVfx) {
+              const computedOffsets = computeMeleeOffsets(sessionVfx, CAM_PRESET);
+              meleeOffsets = computedOffsets.size ? computedOffsets : null;
+          }
+      }
       if (Game.grid) {
           if (!gridDrawnViaScene) {
               drawGridOblique(ctx, Game.grid, CAM_PRESET);
           }
           drawQueuedOblique(ctx, Game.grid, Game.queued, CAM_PRESET);
           const tokens = Game.tokens || [];
-          drawTokensOblique(ctx, Game.grid, tokens, CAM_PRESET);
+          if (meleeOffsets) {
+              drawTokensOblique(ctx, Game.grid, tokens, CAM_PRESET, { meleeOffsets });
+          }
+          else {
+              drawTokensOblique(ctx, Game.grid, tokens, CAM_PRESET);
+          }
       }
-      const sessionVfx = ensureSessionWithVfx(Game, { requireGrid: true });
       if (sessionVfx) {
           vfxDraw(ctx, sessionVfx, CAM_PRESET);
       }
@@ -24629,6 +24660,91 @@ __define('./vfx.ts', (exports, module, __require) => {
           console.warn(`[vfxDraw] Skipping ${label} arc due to invalid geometry`, data);
       }
   };
+  const clamp01 = (value) => Math.max(0, Math.min(1, value));
+  const makeTokenKey = (parts) => {
+      if (!parts)
+          return null;
+      if (Number.isFinite(parts.iid)) {
+          return `iid:${parts.iid}`;
+      }
+      if (typeof parts.id === 'string' && parts.id.length > 0) {
+          return `id:${parts.id}`;
+      }
+      return null;
+  };
+  const findTokenByKey = (tokens, key) => {
+      var _a, _b;
+      if (!key || !Array.isArray(tokens))
+          return null;
+      if (key.startsWith('iid:')) {
+          const iid = Number.parseInt(key.slice(4), 10);
+          if (Number.isFinite(iid)) {
+              return (_a = tokens.find(t => t && Number.isFinite(t.iid) && t.iid === iid)) !== null && _a !== void 0 ? _a : null;
+          }
+      }
+      if (key.startsWith('id:')) {
+          const id = key.slice(3);
+          return (_b = tokens.find(t => t && typeof t.id === 'string' && t.id === id)) !== null && _b !== void 0 ? _b : null;
+      }
+      return null;
+  };
+  const resolveTokenKey = (token, fallback = {}) => { var _a, _b; return makeTokenKey({ iid: (_a = token === null || token === void 0 ? void 0 : token.iid) !== null && _a !== void 0 ? _a : fallback.iid, id: (_b = token === null || token === void 0 ? void 0 : token.id) !== null && _b !== void 0 ? _b : fallback.id }); };
+  const resolveTokenFromEvent = (tokens, eventToken, fallback) => {
+      const key = resolveTokenKey(eventToken, fallback);
+      return findTokenByKey(tokens, key);
+  };
+  function computeMeleeOffsets(Game, cam) {
+      var _a, _b;
+      const offsets = new Map();
+      if (!(Game === null || Game === void 0 ? void 0 : Game.grid))
+          return offsets;
+      const tokens = Array.isArray(Game.tokens) ? Game.tokens : [];
+      const events = Array.isArray(Game.vfx) ? Game.vfx : [];
+      if (events.length === 0 || tokens.length === 0)
+          return offsets;
+      for (const e of events) {
+          if (!e || e.type !== 'melee')
+              continue;
+          const duration = Number.isFinite(e.dur) ? e.dur : 0;
+          if (!duration)
+              continue;
+          const elapsed = now() - e.t0;
+          const tt = clamp01(elapsed / duration);
+          if (tt <= 0 || tt >= 1)
+              continue;
+          const attacker = resolveTokenFromEvent(tokens, e.refA, { iid: e.iidA, id: e.idA });
+          if (!attacker || !attacker.alive)
+              continue;
+          const target = resolveTokenFromEvent(tokens, e.refB, { iid: e.iidB, id: e.idB });
+          const originCx = Number.isFinite(e.originCx) ? e.originCx : attacker.cx;
+          const originCy = Number.isFinite(e.originCy) ? e.originCy : attacker.cy;
+          const targetCx = Number.isFinite(e.targetCx)
+              ? e.targetCx
+              : (_a = target === null || target === void 0 ? void 0 : target.cx) !== null && _a !== void 0 ? _a : attacker.cx;
+          const targetCy = Number.isFinite(e.targetCy)
+              ? e.targetCy
+              : (_b = target === null || target === void 0 ? void 0 : target.cy) !== null && _b !== void 0 ? _b : attacker.cy;
+          if (!Number.isFinite(originCx) || !Number.isFinite(originCy))
+              continue;
+          const pa = projectCellOblique(Game.grid, originCx, originCy, cam);
+          const pb = projectCellOblique(Game.grid, targetCx, targetCy, cam);
+          if (!isFiniteCoord(pa.x) || !isFiniteCoord(pa.y) || !isFiniteCoord(pb.x) || !isFiniteCoord(pb.y)) {
+              continue;
+          }
+          const travelForward = tt <= 0.5;
+          const localT = travelForward ? tt / 0.5 : (tt - 0.5) / 0.5;
+          const eased = easeInOut(clamp01(localT));
+          const maxTravel = 0.88;
+          const travel = travelForward ? eased * maxTravel : (1 - eased) * maxTravel;
+          const mx = lerp(pa.x, pb.x, travel);
+          const my = lerp(pa.y, pb.y, travel);
+          const key = resolveTokenKey(attacker, { iid: e.iidA, id: e.idA });
+          if (!key)
+              continue;
+          offsets.set(key, { x: mx - pa.x, y: my - pa.y });
+      }
+      return offsets;
+  }
   const DEFAULT_ANCHOR_ID = 'root';
   const DEFAULT_ANCHOR_POINT = { x: 0.5, y: 0.5 };
   const DEFAULT_ANCHOR_RADIUS = 0.2;
@@ -24946,8 +25062,29 @@ __define('./vfx.ts', (exports, module, __require) => {
   function vfxAddMelee(Game, attacker, target, _a) {
       var _b, _c;
       var { dur = (_c = (_b = CFG === null || CFG === void 0 ? void 0 : CFG.ANIMATION) === null || _b === void 0 ? void 0 : _b.meleeDurationMs) !== null && _c !== void 0 ? _c : 2000 } = _a === void 0 ? {} : _a;
-      // Overlay step-in/out (không di chuyển token thật)
-      const event = { type: 'melee', t0: now(), dur, refA: attacker, refB: target };
+      const iidA = typeof (attacker === null || attacker === void 0 ? void 0 : attacker.iid) === 'number' ? attacker.iid : null;
+      const iidB = typeof (target === null || target === void 0 ? void 0 : target.iid) === 'number' ? target.iid : null;
+      const idA = typeof (attacker === null || attacker === void 0 ? void 0 : attacker.id) === 'string' ? attacker.id : null;
+      const idB = typeof (target === null || target === void 0 ? void 0 : target.id) === 'string' ? target.id : null;
+      const originCx = typeof (attacker === null || attacker === void 0 ? void 0 : attacker.cx) === 'number' ? attacker.cx : null;
+      const originCy = typeof (attacker === null || attacker === void 0 ? void 0 : attacker.cy) === 'number' ? attacker.cy : null;
+      const targetCx = typeof (target === null || target === void 0 ? void 0 : target.cx) === 'number' ? target.cx : null;
+      const targetCy = typeof (target === null || target === void 0 ? void 0 : target.cy) === 'number' ? target.cy : null;
+      const event = {
+          type: 'melee',
+          t0: now(),
+          dur,
+          refA: attacker,
+          refB: target,
+          iidA,
+          iidB,
+          idA,
+          idB,
+          originCx,
+          originCy,
+          targetCx,
+          targetCy,
+      };
       pool(Game).push(event);
   }
   function makeLightningEvent(Game, source, target, opts = {}) {
@@ -25126,7 +25263,7 @@ __define('./vfx.ts', (exports, module, __require) => {
   }
   /* ------------------- Drawer ------------------- */
   function vfxDraw(ctx, Game, cam) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+      var _a, _b, _c, _d, _e, _f;
       const list = pool(Game);
       if (!list.length || !Game.grid)
           return;
@@ -25219,31 +25356,12 @@ __define('./vfx.ts', (exports, module, __require) => {
                   // disabled: không vẽ “đường trắng” nữa
                   break;
               }
-              case 'melee': {
-                  const A = e.refA;
-                  const B = e.refB;
-                  if (A && B && A.alive && B.alive && hasFinitePoint(A) && hasFinitePoint(B)) {
-                      const pa = projectCellOblique(Game.grid, (_a = A.cx) !== null && _a !== void 0 ? _a : 0, (_b = A.cy) !== null && _b !== void 0 ? _b : 0, cam);
-                      const pb = projectCellOblique(Game.grid, (_c = B.cx) !== null && _c !== void 0 ? _c : 0, (_d = B.cy) !== null && _d !== void 0 ? _d : 0, cam);
-                      const tN = Math.max(0, Math.min(1, (now() - e.t0) / e.dur));
-                      const k = easeInOut(tN) * 0.88;
-                      const mx = lerp(pa.x, pb.x, k);
-                      const my = lerp(pa.y, pb.y, k);
-                      const depth = Game.grid.rows - 1 - ((_e = A.cy) !== null && _e !== void 0 ? _e : 0);
-                      const kDepth = (_f = cam === null || cam === void 0 ? void 0 : cam.depthScale) !== null && _f !== void 0 ? _f : 0.94;
-                      const r = Math.max(6, Math.floor(Game.grid.tile * 0.36 * Math.pow(kDepth, depth)));
-                      const facing = A.side === 'ally' ? 1 : -1;
-                      const color = A.color || (A.side === 'ally' ? '#9adcf0' : '#ffb4c0');
-                      ctx.save();
-                      ctx.globalAlpha = 0.95;
-                      drawChibiOverlay(ctx, mx, my, r, facing, color);
-                      ctx.restore();
-                  }
+              case 'melee':
+                  // Đã thay bằng chuyển động trực tiếp của token (không vẽ overlay riêng).
                   break;
-              }
               case 'lightning_arc': {
-                  const start = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, (_g = e.radiusA) !== null && _g !== void 0 ? _g : null, cam);
-                  const end = e.refB ? computeAnchorCanvasPoint(Game, e.refB, e.anchorB, (_h = e.radiusB) !== null && _h !== void 0 ? _h : null, cam) : null;
+                  const start = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, (_a = e.radiusA) !== null && _a !== void 0 ? _a : null, cam);
+                  const end = e.refB ? computeAnchorCanvasPoint(Game, e.refB, e.anchorB, (_b = e.radiusB) !== null && _b !== void 0 ? _b : null, cam) : null;
                   if (start && (!e.refB || end)) {
                       drawLightningArc(ctx, start, end, e, tt);
                   }
@@ -25253,7 +25371,7 @@ __define('./vfx.ts', (exports, module, __require) => {
                   break;
               }
               case 'blood_pulse': {
-                  const anchor = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, (_j = e.radiusA) !== null && _j !== void 0 ? _j : null, cam);
+                  const anchor = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, (_c = e.radiusA) !== null && _c !== void 0 ? _c : null, cam);
                   if (anchor) {
                       drawBloodPulse(ctx, anchor, e, tt);
                   }
@@ -25263,8 +25381,8 @@ __define('./vfx.ts', (exports, module, __require) => {
                   break;
               }
               case 'shield_wrap': {
-                  const front = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, (_k = e.radiusA) !== null && _k !== void 0 ? _k : null, cam);
-                  const back = e.anchorB ? computeAnchorCanvasPoint(Game, e.refA, e.anchorB, (_l = e.radiusB) !== null && _l !== void 0 ? _l : null, cam) : null;
+                  const front = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, (_d = e.radiusA) !== null && _d !== void 0 ? _d : null, cam);
+                  const back = e.anchorB ? computeAnchorCanvasPoint(Game, e.refA, e.anchorB, (_e = e.radiusB) !== null && _e !== void 0 ? _e : null, cam) : null;
                   if (front) {
                       drawShieldWrap(ctx, front, back, e, tt);
                   }
@@ -25274,7 +25392,7 @@ __define('./vfx.ts', (exports, module, __require) => {
                   break;
               }
               case 'ground_burst': {
-                  const anchor = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, (_m = e.radiusA) !== null && _m !== void 0 ? _m : null, cam);
+                  const anchor = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, (_f = e.radiusA) !== null && _f !== void 0 ? _f : null, cam);
                   if (anchor) {
                       drawGroundBurst(ctx, anchor, e, tt);
                   }
@@ -25293,6 +25411,7 @@ __define('./vfx.ts', (exports, module, __require) => {
   }
 
   if (!Object.prototype.hasOwnProperty.call(exports, 'asSessionWithVfx')) exports.asSessionWithVfx = asSessionWithVfx;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'computeMeleeOffsets')) exports.computeMeleeOffsets = computeMeleeOffsets;
   if (!Object.prototype.hasOwnProperty.call(exports, 'vfxAddSpawn')) exports.vfxAddSpawn = vfxAddSpawn;
   if (!Object.prototype.hasOwnProperty.call(exports, 'vfxAddHit')) exports.vfxAddHit = vfxAddHit;
   if (!Object.prototype.hasOwnProperty.call(exports, 'vfxAddTracer')) exports.vfxAddTracer = vfxAddTracer;
