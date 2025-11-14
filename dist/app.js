@@ -1,7 +1,7 @@
 // Bundled by build.mjs
 const __modules = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }
 function __define(id, factory){ __modules[id] = { factory, exports: null, initialized: false }; }
@@ -4946,8 +4946,8 @@ __define('./data/economy.ts', (exports, module, __require) => {
   const assertDefined = __dep2.assertDefined;
   const __dep3 = __require('./data/economy.config.ts');
   const rawEconomyConfig = __dep3.default ?? __dep3;
-  const CurrencyIdSchema = z.enum(['VNT', 'HNT', 'TNT', 'ThNT', 'TT']);
   const currencyIdValues = ['VNT', 'HNT', 'TNT', 'ThNT', 'TT'];
+  const CurrencyIdSchema = z.enum([...currencyIdValues]);
   const CurrencySchema = z.object({
       id: CurrencyIdSchema,
       name: z.string(),
@@ -4995,6 +4995,7 @@ __define('./data/economy.ts', (exports, module, __require) => {
   for (const id of currencyIdValues) {
       currencyIdMap[id] = id;
   }
+  const CURRENCY_ORDER = Object.freeze([...currencyIdValues]);
   const CURRENCY_IDS = Object.freeze({
       ...currencyIdMap,
       THNT: currencyIdMap.ThNT
@@ -5124,6 +5125,7 @@ __define('./data/economy.ts', (exports, module, __require) => {
   exports.LOTTERY_SPLIT = LOTTERY_SPLIT;
   exports.getLotterySplit = getLotterySplit;
 
+  if (!Object.prototype.hasOwnProperty.call(exports, 'CURRENCY_ORDER')) exports.CURRENCY_ORDER = CURRENCY_ORDER;
 });
 __define('./data/load-config.ts', (exports, module, __require) => {
   function loadConfig(rawConfig, schema) {
@@ -5159,7 +5161,7 @@ __define('./data/modes.ts', (exports, module, __require) => {
   const GACHA_SCREEN_MODULE_ID = '@screens/ui-gacha/index.ts';
   const ARENA_HUB_SCREEN_MODULE_ID = '@screens/arena-hub/index.ts';
   const MODE_TYPES = {
-      PVE: 'PvE',
+      PVE: '',
       PVP: 'PvP',
       ECONOMY: 'Kinh tế'
   };
@@ -5169,8 +5171,8 @@ __define('./data/modes.ts', (exports, module, __require) => {
       PLANNED: 'planned'
   };
   const MENU_SECTION_DEFINITIONS = [
-      { id: 'core-pve', title: 'PvE' },
-      { id: 'economy', title: 'Kinh tế & Hạ tầng' }
+      { id: 'core-pve', title: '' },
+      { id: 'economy', title: '' }
   ];
   const MODE_GROUPS = [];
   const MODES = [
@@ -9671,6 +9673,7 @@ __define('./main.ts', (exports, module, __require) => {
   const ensureNestedModuleSupport = __dep3.ensureNestedModuleSupport;
   const __reexport0 = __require('./events.ts');
   let currentSession = null;
+  const pendingSkins = new Map();
   const isPlainRecord = (value) => (!!value && typeof value === 'object');
   const toRootSource = (value) => {
       if (value == null)
@@ -9719,6 +9722,22 @@ __define('./main.ts', (exports, module, __require) => {
       if (!session) {
           throw new Error('PvE board markup not found; render the layout before calling startGame');
       }
+      if (currentSession && pendingSkins.size > 0) {
+          const appliedUnitIds = [];
+          pendingSkins.forEach((skinKey, unitId) => {
+              var _a;
+              const applied = (_a = currentSession === null || currentSession === void 0 ? void 0 : currentSession.setUnitSkin(unitId, skinKey)) !== null && _a !== void 0 ? _a : false;
+              if (applied) {
+                  appliedUnitIds.push(unitId);
+              }
+          });
+          if (appliedUnitIds.length === pendingSkins.size) {
+              pendingSkins.clear();
+          }
+          else {
+              appliedUnitIds.forEach((unitId) => pendingSkins.delete(unitId));
+          }
+      }
       return session;
   }
   function stopGame() {
@@ -9736,9 +9755,16 @@ __define('./main.ts', (exports, module, __require) => {
       return currentSession;
   }
   function setUnitSkin(unitId, skinKey) {
-      if (!currentSession)
-          return false;
-      return currentSession.setUnitSkin(unitId, skinKey);
+      const normalizedSkinKey = skinKey !== null && skinKey !== void 0 ? skinKey : null;
+      if (!currentSession) {
+          pendingSkins.set(unitId, normalizedSkinKey);
+          return true;
+      }
+      const applied = currentSession.setUnitSkin(unitId, skinKey);
+      if (applied) {
+          pendingSkins.set(unitId, normalizedSkinKey);
+      }
+      return applied;
   }
   function onGameEvent(type, handler) {
       var _a;
@@ -10418,6 +10444,25 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   let storedConfig = normalizeConfig();
   let running = false;
   const hpBarGradientCache = new Map();
+  const meleeOffsetTokenKeys = new Set();
+  const makeMeleeTokenKey = (token) => {
+      if (Number.isFinite(token === null || token === void 0 ? void 0 : token.iid)) {
+          return `iid:${token === null || token === void 0 ? void 0 : token.iid}`;
+      }
+      if (typeof (token === null || token === void 0 ? void 0 : token.id) === 'string' && token.id.length > 0) {
+          return `id:${token.id}`;
+      }
+      return null;
+  };
+  const syncMeleeOffsetTokens = (offsets) => {
+      meleeOffsetTokenKeys.clear();
+      if (!offsets || !offsets.size)
+          return null;
+      for (const key of offsets.keys()) {
+          meleeOffsetTokenKeys.add(key);
+      }
+      return offsets;
+  };
   const renderSummonBar = () => {
       var _a, _b;
       const game = getInitializedGame();
@@ -10447,6 +10492,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       _BORN = 1;
       CLOCK = createClock();
       invalidateSceneCache();
+      meleeOffsetTokenKeys.clear();
   }
   if ((_b = CFG === null || CFG === void 0 ? void 0 : CFG.DEBUG) === null || _b === void 0 ? void 0 : _b.LOG_EVENTS) {
       const logEvent = (type) => (event) => {
@@ -12263,8 +12309,14 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           sessionVfx = ensureSessionWithVfx(Game, { requireGrid: true });
           if (sessionVfx) {
               const computedOffsets = computeMeleeOffsets(sessionVfx, CAM_PRESET);
-              meleeOffsets = computedOffsets.size ? computedOffsets : null;
+              meleeOffsets = syncMeleeOffsetTokens(computedOffsets);
           }
+          else {
+              meleeOffsetTokenKeys.clear();
+          }
+      }
+      else {
+          meleeOffsetTokenKeys.clear();
       }
       if (Game.grid) {
           if (!gridDrawnViaScene) {
@@ -12380,6 +12432,9 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       const tokens = Game.tokens || [];
       for (const t of tokens) {
           if (!t.alive || !Number.isFinite(t.hpMax))
+              continue;
+          const meleeKey = makeMeleeTokenKey(t);
+          if (meleeKey && meleeOffsetTokenKeys.has(meleeKey))
               continue;
           const p = cellCenterObliqueLocal(Game.grid, t.cx, t.cy, CAM_PRESET);
           const art = t.art || getUnitArt(t.id, { skinKey: t.skinKey });
@@ -14832,6 +14887,8 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
   const normalizeCurrencyBalances = __dep3.normalizeCurrencyBalances;
   const __dep4 = __require('./utils/format.ts');
   const HAS_INTL_NUMBER_FORMAT = __dep4.HAS_INTL_NUMBER_FORMAT;
+  const __dep5 = __require('./utils/currency.ts');
+  const getCurrencyDefinitions = __dep5.getCurrencyDefinitions;
   const isRosterEntryLite = (value) => (typeof value === 'object'
       && value !== null
       && !Array.isArray(value));
@@ -15189,12 +15246,8 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
       }
       return facts;
   }
-  function getCurrencyCatalog(listCurrencies) {
-      const catalog = listCurrencies();
-      if (Array.isArray(catalog)) {
-          return catalog;
-      }
-      return [];
+  function getCurrencyCatalog() {
+      return getCurrencyDefinitions();
   }
   function toIntlNumberFormatter(formatter, locale, options) {
       var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
@@ -15406,34 +15459,32 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
   const getUnitArt = __dep0.getUnitArt;
   const __dep1 = __require('./utils/unit-id.ts');
   const normalizeUnitId = __dep1.normalizeUnitId;
-  const __dep2 = __require('./data/economy.ts');
-  const listCurrencies = __dep2.listCurrencies;
-  const __dep3 = __require('./data/skills.ts');
-  const getSkillSet = __dep3.getSkillSet;
-  const __dep4 = __require('./utils/format.ts');
-  const createNumberFormatter = __dep4.createNumberFormatter;
-  const __dep5 = __require('./ui/dom.ts');
-  const assertElement = __dep5.assertElement;
-  const ensureStyleTag = __dep5.ensureStyleTag;
-  const mountSection = __dep5.mountSection;
-  const __dep6 = __require('./ui/rarity/rarity.ts');
-  const mountRarityAura = __dep6.mountRarityAura;
-  const unmountRarity = __dep6.unmountRarity;
-  const normalizeRarity = __dep6.normalizeRarity;
-  const __dep7 = __require('./screens/collection/helpers.ts');
-  const ABILITY_TYPE_LABELS = __dep7.ABILITY_TYPE_LABELS;
-  const buildRosterWithCost = __dep7.buildRosterWithCost;
-  const cloneRoster = __dep7.cloneRoster;
-  const collectAbilityFacts = __dep7.collectAbilityFacts;
-  const describeUlt = __dep7.describeUlt;
-  const labelForAbility = __dep7.labelForAbility;
-  const resolveCurrencyBalance = __dep7.resolveCurrencyBalance;
-  const getCurrencyCatalog = __dep7.getCurrencyCatalog;
-  const ensureNumberFormatter = __dep7.ensureNumberFormatter;
-  const __dep8 = __require('./screens/collection/state.ts');
-  const createFilterState = __dep8.createFilterState;
-  const updateActiveTab = __dep8.updateActiveTab;
-  const updateSelectedUnit = __dep8.updateSelectedUnit;
+  const __dep2 = __require('./data/skills.ts');
+  const getSkillSet = __dep2.getSkillSet;
+  const __dep3 = __require('./utils/format.ts');
+  const createNumberFormatter = __dep3.createNumberFormatter;
+  const __dep4 = __require('./ui/dom.ts');
+  const assertElement = __dep4.assertElement;
+  const ensureStyleTag = __dep4.ensureStyleTag;
+  const mountSection = __dep4.mountSection;
+  const __dep5 = __require('./ui/rarity/rarity.ts');
+  const mountRarityAura = __dep5.mountRarityAura;
+  const unmountRarity = __dep5.unmountRarity;
+  const normalizeRarity = __dep5.normalizeRarity;
+  const __dep6 = __require('./screens/collection/helpers.ts');
+  const ABILITY_TYPE_LABELS = __dep6.ABILITY_TYPE_LABELS;
+  const buildRosterWithCost = __dep6.buildRosterWithCost;
+  const cloneRoster = __dep6.cloneRoster;
+  const collectAbilityFacts = __dep6.collectAbilityFacts;
+  const describeUlt = __dep6.describeUlt;
+  const labelForAbility = __dep6.labelForAbility;
+  const resolveCurrencyBalance = __dep6.resolveCurrencyBalance;
+  const getCurrencyCatalog = __dep6.getCurrencyCatalog;
+  const ensureNumberFormatter = __dep6.ensureNumberFormatter;
+  const __dep7 = __require('./screens/collection/state.ts');
+  const createFilterState = __dep7.createFilterState;
+  const updateActiveTab = __dep7.updateActiveTab;
+  const updateSelectedUnit = __dep7.updateSelectedUnit;
   const STYLE_ID = 'collection-view-style-v2';
   const TAB_DEFINITIONS = [
       { key: 'awakening', label: 'Thức Tỉnh', hint: 'Theo dõi mốc thức tỉnh, sao và điểm đột phá của nhân vật đã sở hữu.' },
@@ -15442,7 +15493,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       { key: 'skins', label: 'Skin', hint: 'Quản lý skin đã mở khóa và áp dụng bảng phối màu yêu thích.' },
       { key: 'voice', label: 'Giọng Nói', hint: 'Nghe thử voice line, thiết lập voice pack và gợi ý mở khóa.' }
   ];
-  const currencyCatalog = getCurrencyCatalog(listCurrencies);
+  const currencyCatalog = getCurrencyCatalog();
   const currencyFormatter = ensureNumberFormatter(createNumberFormatter, 'vi-VN');
   function toSafeText(value) {
       if (value == null) {
@@ -18031,13 +18082,14 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
 __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
   const __dep0 = __require('./catalog.ts');
   const ROSTER = __dep0.ROSTER;
-  const __dep1 = __require('./data/economy.ts');
-  const listCurrencies = __dep1.listCurrencies;
-  const __dep2 = __require('./utils/format.ts');
-  const createNumberFormatter = __dep2.createNumberFormatter;
+  const __dep1 = __require('./utils/format.ts');
+  const createNumberFormatter = __dep1.createNumberFormatter;
+  const __dep2 = __require('./utils/currency.ts');
+  const formatCurrencyAmount = __dep2.formatCurrencyAmount;
+  const getCurrencyDefinitions = __dep2.getCurrencyDefinitions;
   const __dep3 = __require('./ui/rarity/rarity.ts');
   const normalizeRarity = __dep3.normalizeRarity;
-  const currencyCatalog = listCurrencies();
+  const currencyCatalog = getCurrencyDefinitions();
   const currencyIndex = new Map(currencyCatalog.map(currency => [currency.id, currency]));
   const numberFormatter = createNumberFormatter('vi-VN');
   const DEFAULT_RARITY = 'N';
@@ -18446,10 +18498,13 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
       return base;
   }
   function formatCurrencyBalance(amount, currencyId) {
+      const numericAmount = Number.isFinite(Number(amount)) ? Number(amount) : 0;
       const currency = currencyIndex.get(currencyId);
-      const formatted = numberFormatter.format(Number.isFinite(amount) ? Number(amount) : 0);
-      const suffix = (currency === null || currency === void 0 ? void 0 : currency.suffix) || currencyId || '';
-      return suffix ? `${formatted} ${suffix}` : formatted;
+      if (currency) {
+          return formatCurrencyAmount(numericAmount, currency.id);
+      }
+      const formatted = numberFormatter.format(numericAmount);
+      return currencyId ? `${formatted} ${currencyId}` : formatted;
   }
   function filterRoster(roster, filter) {
       if (!filter || filter.type === 'all' || !filter.value) {
@@ -19463,7 +19518,7 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
       sectionEl.className = 'main-menu-modes';
       const title = document.createElement('h2');
       title.className = 'main-menu-modes__title';
-      title.textContent = 'Chế độ tác chiến';
+      title.textContent = '';
       sectionEl.appendChild(title);
       const metaByKey = new Map();
       metadata.forEach(mode => {
@@ -19611,7 +19666,7 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'createHeader')) exports.createHeader = createHeader;
 });
 __define('./screens/ui-gacha/gacha.css', (exports, module, __require) => {
-  const css = ":root {\n  color-scheme: dark;\n  font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;\n  --bg-page: #05090f;\n  --bg-panel: rgba(12, 18, 28, 0.88);\n  --bg-accent: rgba(16, 28, 42, 0.74);\n  --border-accent: rgba(120, 196, 255, 0.28);\n  --text-main: #e9f2ff;\n  --text-muted: rgba(192, 220, 244, 0.8);\n  --primary: #76d4ff;\n  --highlight: linear-gradient(135deg, rgba(118, 212, 255, 0.45), rgba(255, 154, 255, 0.4));\n  --rarity-n: #7b869a;\n  --rarity-r: #57a8ff;\n  --rarity-sr: #a47dff;\n  --rarity-ssr: #ffc866;\n  --rarity-ur: #ff6a9f;\n  --rarity-prime: #6cffeb;\n}\n\n* {\n  box-sizing: border-box;\n}\n\nbody.gacha-ui {\n  margin: 0;\n  min-height: 100vh;\n  background: radial-gradient(circle at top left, rgba(118, 212, 255, 0.18), transparent 45%),\n    radial-gradient(circle at bottom right, rgba(255, 154, 255, 0.2), transparent 50%), var(--bg-page);\n  color: var(--text-main);\n  display: flex;\n  justify-content: center;\n  padding: 32px;\n}\n\nbutton {\n  font-family: inherit;\n  color: inherit;\n}\n\n.gacha-topbar {\n  display: grid;\n  grid-template-columns: auto auto 1fr auto;\n  align-items: center;\n  gap: 16px;\n  padding: 16px 20px;\n  border-radius: 24px;\n  border: 1px solid var(--border-accent);\n  background: var(--bg-panel);\n  box-shadow: 0 18px 48px rgba(5, 12, 20, 0.45);\n}\n\n.gacha-topbar__back-button {\n  display: inline-flex;\n  align-items: center;\n  gap: 8px;\n  padding: 10px 18px;\n  border-radius: 999px;\n  border: 1px solid rgba(118, 212, 255, 0.32);\n  background: rgba(12, 18, 28, 0.78);\n  color: var(--text-main);\n  font-size: 14px;\n  font-weight: 600;\n  letter-spacing: 0.02em;\n  cursor: pointer;\n  text-decoration: none;\n  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease,\n    box-shadow 0.18s ease;\n}\n\n.gacha-topbar__back-button:hover,\n.gacha-topbar__back-button:focus-visible {\n  background: rgba(18, 28, 42, 0.92);\n  border-color: rgba(118, 212, 255, 0.68);\n  transform: translateY(-1px);\n  box-shadow: 0 0 0 3px rgba(118, 212, 255, 0.24);\n  outline: none;\n}\n\n.gacha-topbar__back-button:active {\n  background: rgba(10, 18, 30, 0.95);\n  border-color: rgba(118, 212, 255, 0.8);\n  transform: translateY(0);\n  box-shadow: 0 0 0 2px rgba(118, 212, 255, 0.18);\n}\n\n.gacha-ui-root {\n  width: min(1280px, 100%);;\n  display: flex;\n  flex-direction: column;\n  gap: 24px;\n}\n\n.gacha-header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 16px;\n}\n\n.currency-bar {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));\n  gap: 12px;\n  background: var(--bg-panel);\n  padding: 14px 18px;\n  border-radius: 20px;\n  border: 1px solid var(--border-accent);\n  box-shadow: 0 18px 48px rgba(5, 12, 20, 0.45);\n}\n\n.currency-chip {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 12px;\n  padding: 10px 14px;\n  border-radius: 16px;\n  border: 1px solid transparent;\n  background: var(--bg-accent);\n  cursor: pointer;\n  transition: transform 0.16s ease, border-color 0.16s ease;\n}\n\n.currency-chip:hover,\n.currency-chip:focus-visible {\n  transform: translateY(-3px);\n  border-color: rgba(118, 212, 255, 0.65);\n  outline: none;\n}\n\n.currency-chip__icon {\n  width: 36px;\n  height: 36px;\n  border-radius: 50%;\n  background: rgba(118, 212, 255, 0.18);\n  display: grid;\n  place-items: center;\n}\n\n.currency-chip__icon img {\n  width: 24px;\n  height: 24px;\n}\n\n.currency-chip__info {\n  display: flex;\n  flex-direction: column;\n  align-items: flex-start;\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n  color: var(--text-muted);\n}\n\n.currency-chip__code {\n  font-weight: 600;\n  color: var(--text-main);\n}\n\n.currency-chip__value {\n  font-weight: 600;\n  font-variant-numeric: tabular-nums;\n}\n\n.rules-button {\n  padding: 12px 18px;\n  border-radius: 16px;\n  border: 1px solid rgba(118, 212, 255, 0.5);\n  background: rgba(10, 16, 24, 0.86);\n  cursor: pointer;\n  text-transform: uppercase;\n  letter-spacing: 0.12em;\n  font-size: 12px;\n}\n\n.gacha-body {\n  display: grid;\n  grid-template-columns: 280px 1fr;\n  gap: 24px;\n}\n\n.banner-sidebar {\n  background: var(--bg-panel);\n  border-radius: 24px;\n  border: 1px solid var(--border-accent);\n  padding: 18px;\n  display: flex;\n  flex-direction: column;\n  gap: 12px;\n  overflow-y: auto;\n  max-height: calc(100vh - 220px);\n}\n\n.banner-entry {\n  width: 100%;\n  text-align: left;\n  padding: 14px 16px;\n  border-radius: 18px;\n  border: 1px solid transparent;\n  background: rgba(16, 26, 40, 0.88);\n  cursor: pointer;\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n  transition: transform 0.18s ease, border-color 0.18s ease;\n}\n\n.banner-entry__title {;\n  font-weight: 600;\n}\n\n.banner-entry__timer {\n  font-size: 12px;\n  color: var(--text-muted);\n}\n\n.banner-entry:hover,\n.banner-entry:focus-visible {\n  transform: translateX(6px);\n  border-color: rgba(118, 212, 255, 0.6);\n  outline: none;\n}\n\n.banner-entry.is-active {\n  border-color: rgba(255, 154, 255, 0.65);\n  background: linear-gradient(135deg, rgba(118, 212, 255, 0.22), rgba(255, 154, 255, 0.16));\n}\n\n.banner-panel {\n  background: var(--bg-panel);\n  border-radius: 28px;\n  border: 1px solid var(--border-accent);\n  padding: 24px;\n  display: grid;\n  gap: 18px;\n  position: relative;\n  overflow: hidden;\n}\n\n.banner-panel__header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n}\n\n.banner-title {\n  margin: 0;\n  font-size: 26px;\n  letter-spacing: 0.04em;\n  text-transform: uppercase;\n}\n\n.banner-desc {\n  margin: 6px 0 0;\n  color: var(--text-muted);\n}\n\n.banner-timer {\n  font-size: 13px;\n  color: var(--primary);\n}\n\n.banner-panel__art {\n  border-radius: 22px;\n  background: rgba(10, 16, 24, 0.7);\n  overflow: hidden;\n  min-height: 180px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.banner-panel__art img {\n  width: 100%;\n  height: 100%;\n  object-fit: cover;\n  filter: saturate(120%);\n}\n\n.rate-list {\n  display: grid;\n  grid-template-columns: repeat(3, minmax(0, 1fr));\n  gap: 8px 16px;\n  margin: 0;\n}\n\n.hrate-list dt {\n  font-weight: 600;\n}\n\n.rate-list dd {\n  margin: 0;\n  color: var(--text-muted);\n}\n\n.banner-panel__pity {\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n}\n\n.pity-meter {\n  display: grid;\n  grid-template-columns: 80px 1fr 80px;\n  align-items: center;\n  gap: 12px;\n}\n\n.pity-meter__label {\n  font-size: 12px;\n  text-transform: uppercase;\n  color: var(--text-muted);\n}\n\n.pity-meter__bar {\n  position: relative;\n  height: 8px;\n  border-radius: 999px;\n  background: rgba(118, 212, 255, 0.15);\n  overflow: hidden;\n}\n\n.pity-meter__progress {\n  position: absolute;\n  inset: 0;\n  border-radius: 999px;\n  background: var(--highlight);\n}\n\n.pity-meter__value {\n  font-variant-numeric: tabular-nums;\n  justify-self: end;\n}\n\n.featured__heading {\n  margin: 0;\n  font-size: 16px;\n  letter-spacing: 0.08em;\n  text-transform: uppercase;\n}\n\n.featured__note {\n  margin: 2px 0 12px;\n  color: var(--text-muted);\n  font-size: 12px;\n}\n\n.featured-card {\n  display: flex;\n  gap: 10px;\n  align-items: center;\n  padding: 10px 14px;\n  border-radius: 16px;\n  background: rgba(20, 32, 48, 0.9);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n  font-weight: 600;\n}\n\n.featured-card + .featured-card {\n  margin-top: 8px;\n}\n\n.featured-card__rarity {\n  font-size: 13px;\n  padding: 4px 8px;\n  border-radius: 999px;\n  background: rgba(118, 212, 255, 0.18);\n}\n\n.featured-card__name {\n  font-size: 15px;\n}\n\n.banner-panel__cost {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));\n  gap: 12px;\n}\n\n.cost-entry {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding: 12px 14px;\n  border-radius: 16px;\n  background: rgba(20, 32, 48, 0.86);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n}\n\n.cost-entry__value {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  font-weight: 600;\n}\n\n.cost-entry__value img {\n  width: 18px;\n  height: 18px;\n}\n\n.banner-panel__actions {\n  display: flex;\n  gap: 12px;\n}\n\n.banner-panel__actions button {\n  flex: 1;\n  padding: 14px 18px;\n  border-radius: 18px;\n  border: 1px solid rgba(118, 212, 255, 0.45);\n  background: rgba(16, 28, 42, 0.9);\n  text-transform: uppercase;\n  letter-spacing: 0.12em;\n  cursor: pointer;\n  transition: transform 0.16s ease, border-color 0.16s ease;\n}\n\n.banner-panel__actions button:hover,\n.banner-panel__actions button:focus-visible {\n  transform: translateY(-2px);\n  border-color: rgba(255, 154, 255, 0.6);\n  outline: none;\n}\n\n.banner-panel__results {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));\n  gap: 10px;\n}\n\n.result-entry {\n  padding: 12px 14px;\n  border-radius: 16px;\n  background: rgba(16, 28, 42, 0.82);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n  display: grid;\n  gap: 6px;\n}\n\n.result-entry__rarity {\n  font-weight: 700;\n  text-transform: uppercase;\n}\n\n.result-entry__name {\n  color: var(--text-muted);\n}\n\n.result-entry__pity {\n  font-size: 12px;\n  color: var(--primary);\n}\n\n.modal-overlay {\n  position: fixed;\n  inset: 0;\n  backdrop-filter: blur(12px);\n  background: rgba(5, 10, 18, 0.68);\n  display: grid;\n  place-items: center;\n  z-index: 2000;\n}\n\n.modal-content {\n  width: min(420px, 92vw);\n  background: rgba(10, 16, 24, 0.92);\n  border-radius: 20px;\n  border: 1px solid rgba(118, 212, 255, 0.3);\n  padding: 24px;\n  color: var(--text-main);\n  box-shadow: 0 24px 64px rgba(5, 12, 20, 0.55);\n}\n\n.modal-content h2 {\n  margin-top: 0;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n}\n\n.modal-content ul {\n  margin: 12px 0 0;\n  padding-left: 20px;\n  color: var(--text-muted);\n}\n\n.gacha-toast {\n  position: fixed;\n  right: 24px;\n  bottom: 24px;\n  background: rgba(16, 28, 42, 0.92);\n  border-radius: 16px;\n  padding: 12px 18px;\n  border: 1px solid rgba(118, 212, 255, 0.35);\n  opacity: 0;\n  transform: translateY(12px);\n  transition: opacity 0.2s ease, transform 0.2s ease;\n  pointer-events: none;\n}\n\ngacha-toast.is-visible {\n  opacity: 1;\n  transform: translateY(0);\n}\n\n@media (max-width: 960px) {\n  .gacha-body {\n    grid-template-columns: 1fr;\n  }\n\n  .banner-sidebar {\n    flex-direction: row;\n    overflow-x: auto;\n    max-height: none;\n  }\n\n  .banner-entry {\n    min-width: 220px;\n  }\n}\n\n@media (max-width: 720px) {\n  body.gacha-ui {\n    padding: 24px 16px;\n}\n\n.currency-bar {\n    grid-template-columns: repeat(2, minmax(0, 1fr));\n  }\n}";
+  const css = ":root {\n  color-scheme: dark;\n  font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;\n  --bg-page: #05090f;\n  --bg-panel: rgba(12, 18, 28, 0.88);\n  --bg-accent: rgba(16, 28, 42, 0.74);\n  --border-accent: rgba(120, 196, 255, 0.28);\n  --text-main: #e9f2ff;\n  --text-muted: rgba(192, 220, 244, 0.8);\n  --primary: #76d4ff;\n  --highlight: linear-gradient(135deg, rgba(118, 212, 255, 0.45), rgba(255, 154, 255, 0.4));\n  --rarity-n: #7b869a;\n  --rarity-r: #57a8ff;\n  --rarity-sr: #a47dff;\n  --rarity-ssr: #ffc866;\n  --rarity-ur: #ff6a9f;\n  --rarity-prime: #6cffeb;\n}\n\n* {\n  box-sizing: border-box;\n}\n\nbody.gacha-ui {\n  margin: 0;\n  min-height: 100vh;\n  background: radial-gradient(circle at top left, rgba(118, 212, 255, 0.18), transparent 45%),\n    radial-gradient(circle at bottom right, rgba(255, 154, 255, 0.2), transparent 50%), var(--bg-page);\n  color: var(--text-main);\n  display: flex;\n  justify-content: center;\n  padding: 32px;\n}\n\nbutton {\n  font-family: inherit;\n  color: inherit;\n}\n\n.gacha-topbar {\n  display: grid;\n  grid-template-columns: auto auto 1fr auto;\n  align-items: center;\n  gap: 16px;\n  padding: 16px 20px;\n  border-radius: 24px;\n  border: 1px solid var(--border-accent);\n  background: var(--bg-panel);\n  box-shadow: 0 18px 48px rgba(5, 12, 20, 0.45);\n}\n\n.gacha-topbar__back-button {\n  display: inline-flex;\n  align-items: center;\n  gap: 8px;\n  padding: 10px 18px;\n  border-radius: 999px;\n  border: 1px solid rgba(118, 212, 255, 0.32);\n  background: rgba(12, 18, 28, 0.78);\n  color: var(--text-main);\n  font-size: 14px;\n  font-weight: 600;\n  letter-spacing: 0.02em;\n  cursor: pointer;\n  text-decoration: none;\n  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease,\n    box-shadow 0.18s ease;\n}\n\n.gacha-topbar__back-button:hover,\n.gacha-topbar__back-button:focus-visible {\n  background: rgba(18, 28, 42, 0.92);\n  border-color: rgba(118, 212, 255, 0.68);\n  transform: translateY(-1px);\n  box-shadow: 0 0 0 3px rgba(118, 212, 255, 0.24);\n  outline: none;\n}\n\n.gacha-topbar__back-button:active {\n  background: rgba(10, 18, 30, 0.95);\n  border-color: rgba(118, 212, 255, 0.8);\n  transform: translateY(0);\n  box-shadow: 0 0 0 2px rgba(118, 212, 255, 0.18);\n}\n\n.gacha-ui-root {\n  width: min(1280px, 100%);\n  display: flex;\n  flex-direction: column;\n  gap: 24px;\n}\n\n.gacha-header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 16px;\n}\n\n.currency-bar {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));\n  gap: 12px;\n  background: var(--bg-panel);\n  padding: 14px 18px;\n  border-radius: 20px;\n  border: 1px solid var(--border-accent);\n  box-shadow: 0 18px 48px rgba(5, 12, 20, 0.45);\n}\n\n.currency-chip {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 12px;\n  padding: 10px 14px;\n  border-radius: 16px;\n  border: 1px solid transparent;\n  background: var(--bg-accent);\n  cursor: pointer;\n  transition: transform 0.16s ease, border-color 0.16s ease;\n}\n\n.currency-chip:hover,\n.currency-chip:focus-visible {\n  transform: translateY(-3px);\n  border-color: rgba(118, 212, 255, 0.65);\n  outline: none;\n}\n\n.currency-chip__icon {\n  width: 36px;\n  height: 36px;\n  border-radius: 50%;\n  background: rgba(118, 212, 255, 0.18);\n  display: grid;\n  place-items: center;\n}\n\n.currency-chip__icon img {\n  width: 24px;\n  height: 24px;\n}\n\n.currency-chip__info {\n  display: flex;\n  flex-direction: column;\n  align-items: flex-start;\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n  color: var(--text-muted);\n}\n\n.currency-chip__code {\n  font-weight: 600;\n  color: var(--text-main);\n}\n\n.currency-chip__value {\n  font-weight: 600;\n  font-variant-numeric: tabular-nums;\n}\n\n.rules-button {\n  padding: 12px 18px;\n  border-radius: 16px;\n  border: 1px solid rgba(118, 212, 255, 0.5);\n  background: rgba(10, 16, 24, 0.86);\n  cursor: pointer;\n  text-transform: uppercase;\n  letter-spacing: 0.12em;\n  font-size: 12px;\n}\n\n.gacha-body {\n  display: grid;\n  grid-template-columns: 280px 1fr;\n  gap: 24px;\n}\n\n.banner-sidebar {\n  background: var(--bg-panel);\n  border-radius: 24px;\n  border: 1px solid var(--border-accent);\n  padding: 18px;\n  display: flex;\n  flex-direction: column;\n  gap: 12px;\n  overflow-y: auto;\n  max-height: calc(100vh - 220px);\n}\n\n.banner-entry {\n  width: 100%;\n  text-align: left;\n  padding: 14px 16px;\n  border-radius: 18px;\n  border: 1px solid transparent;\n  background: rgba(16, 26, 40, 0.88);\n  cursor: pointer;\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n  transition: transform 0.18s ease, border-color 0.18s ease;\n}\n\n.banner-entry__title {;\n  font-weight: 600;\n}\n\n.banner-entry__timer {\n  font-size: 12px;\n  color: var(--text-muted);\n}\n\n.banner-entry:hover,\n.banner-entry:focus-visible {\n  transform: translateX(6px);\n  border-color: rgba(118, 212, 255, 0.6);\n  outline: none;\n}\n\n.banner-entry.is-active {\n  border-color: rgba(255, 154, 255, 0.65);\n  background: linear-gradient(135deg, rgba(118, 212, 255, 0.22), rgba(255, 154, 255, 0.16));\n}\n\n.banner-panel {\n  background: var(--bg-panel);\n  border-radius: 28px;\n  border: 1px solid var(--border-accent);\n  padding: 24px;\n  display: grid;\n  gap: 18px;\n  position: relative;\n  overflow: hidden;\n}\n\n.banner-panel__header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n}\n\n.banner-title {\n  margin: 0;\n  font-size: 26px;\n  letter-spacing: 0.04em;\n  text-transform: uppercase;\n}\n\n.banner-desc {\n  margin: 6px 0 0;\n  color: var(--text-muted);\n}\n\n.banner-timer {\n  font-size: 13px;\n  color: var(--primary);\n}\n\n.banner-panel__art {\n  border-radius: 22px;\n  background: rgba(10, 16, 24, 0.7);\n  overflow: hidden;\n  min-height: 180px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.banner-panel__art img {\n  width: 100%;\n  height: 100%;\n  object-fit: cover;\n  filter: saturate(120%);\n}\n\n.rate-list {\n  display: grid;\n  grid-template-columns: repeat(3, minmax(0, 1fr));\n  gap: 8px 16px;\n  margin: 0;\n}\n\n.hrate-list dt {\n  font-weight: 600;\n}\n\n.rate-list dd {\n  margin: 0;\n  color: var(--text-muted);\n}\n\n.banner-panel__pity {\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n}\n\n.pity-meter {\n  display: grid;\n  grid-template-columns: 80px 1fr 80px;\n  align-items: center;\n  gap: 12px;\n}\n\n.pity-meter__label {\n  font-size: 12px;\n  text-transform: uppercase;\n  color: var(--text-muted);\n}\n\n.pity-meter__bar {\n  position: relative;\n  height: 8px;\n  border-radius: 999px;\n  background: rgba(118, 212, 255, 0.15);\n  overflow: hidden;\n}\n\n.pity-meter__progress {\n  position: absolute;\n  inset: 0;\n  border-radius: 999px;\n  background: var(--highlight);\n}\n\n.pity-meter__value {\n  font-variant-numeric: tabular-nums;\n  justify-self: end;\n}\n\n.featured__heading {\n  margin: 0;\n  font-size: 16px;\n  letter-spacing: 0.08em;\n  text-transform: uppercase;\n}\n\n.featured__note {\n  margin: 2px 0 12px;\n  color: var(--text-muted);\n  font-size: 12px;\n}\n\n.featured-card {\n  display: flex;\n  gap: 10px;\n  align-items: center;\n  padding: 10px 14px;\n  border-radius: 16px;\n  background: rgba(20, 32, 48, 0.9);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n  font-weight: 600;\n}\n\n.featured-card + .featured-card {\n  margin-top: 8px;\n}\n\n.featured-card__rarity {\n  font-size: 13px;\n  padding: 4px 8px;\n  border-radius: 999px;\n  background: rgba(118, 212, 255, 0.18);\n}\n\n.featured-card__name {\n  font-size: 15px;\n}\n\n.banner-panel__cost {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));\n  gap: 12px;\n}\n\n.cost-entry {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding: 12px 14px;\n  border-radius: 16px;\n  background: rgba(20, 32, 48, 0.86);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n}\n\n.cost-entry__value {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  font-weight: 600;\n}\n\n.cost-entry__value img {\n  width: 18px;\n  height: 18px;\n}\n\n.banner-panel__actions {\n  display: flex;\n  gap: 12px;\n}\n\n.banner-panel__actions button {\n  flex: 1;\n  padding: 14px 18px;\n  border-radius: 18px;\n  border: 1px solid rgba(118, 212, 255, 0.45);\n  background: rgba(16, 28, 42, 0.9);\n  text-transform: uppercase;\n  letter-spacing: 0.12em;\n  cursor: pointer;\n  transition: transform 0.16s ease, border-color 0.16s ease;\n}\n\n.banner-panel__actions button:hover,\n.banner-panel__actions button:focus-visible {\n  transform: translateY(-2px);\n  border-color: rgba(255, 154, 255, 0.6);\n  outline: none;\n}\n\n.banner-panel__results {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));\n  gap: 10px;\n}\n\n.result-entry {\n  padding: 12px 14px;\n  border-radius: 16px;\n  background: rgba(16, 28, 42, 0.82);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n  display: grid;\n  gap: 6px;\n}\n\n.result-entry__rarity {\n  font-weight: 700;\n  text-transform: uppercase;\n}\n\n.result-entry__name {\n  color: var(--text-muted);\n}\n\n.result-entry__pity {\n  font-size: 12px;\n  color: var(--primary);\n}\n\n.modal-overlay {\n  position: fixed;\n  inset: 0;\n  backdrop-filter: blur(12px);\n  background: rgba(5, 10, 18, 0.68);\n  display: grid;\n  place-items: center;\n  z-index: 2000;\n}\n\n.modal-content {\n  width: min(420px, 92vw);\n  background: rgba(10, 16, 24, 0.92);\n  border-radius: 20px;\n  border: 1px solid rgba(118, 212, 255, 0.3);\n  padding: 24px;\n  color: var(--text-main);\n  box-shadow: 0 24px 64px rgba(5, 12, 20, 0.55);\n}\n\n.modal-content h2 {\n  margin-top: 0;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n}\n\n.modal-content ul {\n  margin: 12px 0 0;\n  padding-left: 20px;\n  color: var(--text-muted);\n}\n\n.gacha-toast {\n  position: fixed;\n  right: 24px;\n  bottom: 24px;\n  background: rgba(16, 28, 42, 0.92);\n  border-radius: 16px;\n  padding: 12px 18px;\n  border: 1px solid rgba(118, 212, 255, 0.35);\n  opacity: 0;\n  transform: translateY(12px);\n  transition: opacity 0.2s ease, transform 0.2s ease;\n  pointer-events: none;\n}\n\ngacha-toast.is-visible {\n  opacity: 1;\n  transform: translateY(0);\n}\n\n@media (max-width: 960px) {\n  .gacha-body {\n    grid-template-columns: 1fr;\n  }\n\n  .banner-sidebar {\n    flex-direction: row;\n    overflow-x: auto;\n    max-height: none;\n  }\n\n  .banner-entry {\n    min-width: 220px;\n  }\n}\n\n@media (max-width: 720px) {\n  body.gacha-ui {\n    padding: 24px 16px;\n}\n\n.currency-bar {\n    grid-template-columns: repeat(2, minmax(0, 1fr));\n  }\n}";
   module.exports = css;
   module.exports.default = css;
 });
@@ -20380,6 +20435,8 @@ __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
 });
 __define('./screens/ui-gacha/logic/config.ts', (exports, module, __require) => {
+  const __dep0 = __require('./screens/ui-gacha/logic/types.ts');
+  const CURRENCY_ORDER = __dep0.CURRENCY_ORDER;
   const DEFAULT_WALLET = {
       VNT: 125000,
       HNT: 5200,
@@ -20467,14 +20524,13 @@ __define('./screens/ui-gacha/logic/config.ts', (exports, module, __require) => {
       TT: 'Thần Tinh',
   };
   function createWallet(initial) {
-      var _a, _b, _c, _d, _e;
-      return {
-          VNT: Math.max(0, Math.trunc((_a = initial === null || initial === void 0 ? void 0 : initial.VNT) !== null && _a !== void 0 ? _a : DEFAULT_WALLET.VNT)),
-          HNT: Math.max(0, Math.trunc((_b = initial === null || initial === void 0 ? void 0 : initial.HNT) !== null && _b !== void 0 ? _b : DEFAULT_WALLET.HNT)),
-          TNT: Math.max(0, Math.trunc((_c = initial === null || initial === void 0 ? void 0 : initial.TNT) !== null && _c !== void 0 ? _c : DEFAULT_WALLET.TNT)),
-          ThNT: Math.max(0, Math.trunc((_d = initial === null || initial === void 0 ? void 0 : initial.ThNT) !== null && _d !== void 0 ? _d : DEFAULT_WALLET.ThNT)),
-          TT: Math.max(0, Math.trunc((_e = initial === null || initial === void 0 ? void 0 : initial.TT) !== null && _e !== void 0 ? _e : DEFAULT_WALLET.TT)),
-      };
+      var _a, _b, _c;
+      const wallet = {};
+      for (const code of CURRENCY_ORDER) {
+          const fallback = (_a = DEFAULT_WALLET[code]) !== null && _a !== void 0 ? _a : 0;
+          wallet[code] = Math.max(0, Math.trunc((_c = ((_b = initial === null || initial === void 0 ? void 0 : initial[code]) !== null && _b !== void 0 ? _b : fallback)) !== null && _c !== void 0 ? _c : 0));
+      }
+      return wallet;
   }
 
   if (!Object.prototype.hasOwnProperty.call(exports, 'DEFAULT_WALLET')) exports.DEFAULT_WALLET = DEFAULT_WALLET;
@@ -20485,6 +20541,8 @@ __define('./screens/ui-gacha/logic/config.ts', (exports, module, __require) => {
 __define('./screens/ui-gacha/logic/currency.ts', (exports, module, __require) => {
   const __dep0 = __require('./screens/ui-gacha/logic/types.ts');
   const CURRENCY_ORDER = __dep0.CURRENCY_ORDER;
+  const __dep1 = __require('./utils/currency.ts');
+  const convertCurrencyAmount = __dep1.convertCurrencyAmount;
   const BASE_TAX = {
       'VNT->HNT': 0.005,
       'HNT->TNT': 0.01,
@@ -20494,14 +20552,12 @@ __define('./screens/ui-gacha/logic/currency.ts', (exports, module, __require) =>
   const WEALTH_PIVOT_TT = 100;
   const ALPHA = 2;
   function cloneWallet(wallet) {
-      var _a, _b, _c, _d, _e;
-      return {
-          VNT: Math.max(0, Math.trunc((_a = wallet.VNT) !== null && _a !== void 0 ? _a : 0)),
-          HNT: Math.max(0, Math.trunc((_b = wallet.HNT) !== null && _b !== void 0 ? _b : 0)),
-          TNT: Math.max(0, Math.trunc((_c = wallet.TNT) !== null && _c !== void 0 ? _c : 0)),
-          ThNT: Math.max(0, Math.trunc((_d = wallet.ThNT) !== null && _d !== void 0 ? _d : 0)),
-          TT: Math.max(0, Math.trunc((_e = wallet.TT) !== null && _e !== void 0 ? _e : 0)),
-      };
+      var _a;
+      const normalized = {};
+      for (const code of CURRENCY_ORDER) {
+          normalized[code] = Math.max(0, Math.trunc((_a = wallet[code]) !== null && _a !== void 0 ? _a : 0));
+      }
+      return normalized;
   }
   function getIndex(code) {
       const idx = CURRENCY_ORDER.indexOf(code);
@@ -20514,11 +20570,15 @@ __define('./screens/ui-gacha/logic/currency.ts', (exports, module, __require) =>
       return getIndex(from) < getIndex(to);
   }
   function totalTTEquivalent(wallet) {
+      var _a, _b;
       const normalized = cloneWallet(wallet);
-      const hnt = normalized.VNT / 100;
-      const tnt = (normalized.HNT + hnt) / 100;
-      const thnt = (normalized.TNT + tnt) / 100;
-      return normalized.TT + (normalized.ThNT + thnt) / 100;
+      const highestCurrency = ((_a = CURRENCY_ORDER[CURRENCY_ORDER.length - 1]) !== null && _a !== void 0 ? _a : 'TT');
+      let total = 0;
+      for (const code of CURRENCY_ORDER) {
+          const amount = (_b = normalized[code]) !== null && _b !== void 0 ? _b : 0;
+          total += convertCurrencyAmount(amount, code, highestCurrency);
+      }
+      return total;
   }
   function dynamicTaxRate(stepKey, wallet) {
       var _a;
@@ -20548,17 +20608,25 @@ __define('./screens/ui-gacha/logic/currency.ts', (exports, module, __require) =>
       }
       const normalized = cloneWallet(wallet);
       const available = Math.max(0, Math.trunc(amount));
-      if (available < 100) {
+      const unitCost = convertCurrencyAmount(1, to, from);
+      if (!Number.isFinite(unitCost) || unitCost <= 0) {
+          return { wallet: normalized, units: 0, tax: 0, spent: 0 };
+      }
+      if (available < unitCost) {
           return { wallet: normalized, units: 0, tax: 0, spent: available };
       }
       const rate = dynamicTaxRate(step, normalized);
       const tax = Math.ceil(available * rate);
       const usable = available - tax;
-      const units = Math.floor(usable / 100);
-      const spent = units * 100 + tax;
-      if (!units) {
-          return { wallet: normalized, units: 0, tax, spent: tax };
+      if (usable < unitCost) {
+          return { wallet: normalized, units: 0, tax, spent: Math.min(available, tax) };
       }
+      const units = Math.floor(usable / unitCost);
+      if (!units) {
+          return { wallet: normalized, units: 0, tax, spent: Math.min(available, tax) };
+      }
+      const spentWithoutTax = convertCurrencyAmount(units, to, from);
+      const spent = Math.min(available, Math.trunc(spentWithoutTax + tax));
       normalized[from] = Math.max(0, normalized[from] - spent);
       normalized[to] = Math.max(0, normalized[to] + units);
       return { wallet: normalized, units, tax, spent };
@@ -20568,13 +20636,12 @@ __define('./screens/ui-gacha/logic/currency.ts', (exports, module, __require) =>
       if (units <= 0) {
           return { wallet: normalized, amount: 0 };
       }
-      const amount = units * 100;
+      const amount = convertCurrencyAmount(units, from, to);
       normalized[from] = Math.max(0, normalized[from] - units);
       normalized[to] = Math.max(0, normalized[to] + amount);
       return { wallet: normalized, amount };
   }
   function convertCurrency(wallet, from, to, amount, options = {}) {
-      var _a;
       const normalized = cloneWallet(wallet);
       if (amount <= 0) {
           return {
@@ -20628,27 +20695,26 @@ __define('./screens/ui-gacha/logic/currency.ts', (exports, module, __require) =>
           };
       }
       if (isHigherTier(from, to)) {
-          let state = cloneWallet(normalized);
-          let currentFrom = from;
-          let currentIndex = getIndex(from);
-          const targetIndex = getIndex(to);
-          let unitsRemaining = Math.min(Math.trunc(amount), state[currentFrom]);
-          let totalAmount = 0;
-          while (unitsRemaining > 0 && currentIndex > targetIndex) {
-              const nextCode = (_a = CURRENCY_ORDER[currentIndex - 1]) !== null && _a !== void 0 ? _a : to;
-              const { wallet: nextWallet, amount: produced } = convertDown(state, currentFrom, nextCode, unitsRemaining);
-              state = nextWallet;
-              totalAmount = produced;
-              currentFrom = nextCode;
-              currentIndex -= 1;
-              unitsRemaining = Math.floor(totalAmount / 100);
+          const availableUnits = Math.min(Math.trunc(amount), normalized[from]);
+          if (availableUnits <= 0) {
+              return {
+                  ok: false,
+                  wallet: normalized,
+                  tax: 0,
+                  received: 0,
+                  spent: 0,
+                  step: `${from}->${to}`,
+              };
           }
+          const produced = convertCurrencyAmount(availableUnits, from, to);
+          normalized[from] = Math.max(0, normalized[from] - availableUnits);
+          normalized[to] = Math.max(0, normalized[to] + produced);
           return {
-              ok: currentFrom === to,
-              wallet: state,
+              ok: availableUnits >= Math.trunc(amount),
+              wallet: normalized,
               tax: 0,
-              received: totalAmount,
-              spent: amount,
+              received: produced,
+              spent: availableUnits,
               step: `${from}->${to}`,
           };
       }
@@ -20701,9 +20767,12 @@ __define('./screens/ui-gacha/logic/currency.ts', (exports, module, __require) =>
           if (higherAvailable <= 0) {
               continue;
           }
-          const multiplier = 100 ** (idx - targetIndex);
+          const producedPerUnit = convertCurrencyAmount(1, code, currency);
           const shortfall = Math.max(0, cost - available);
-          const neededUnits = Math.ceil(shortfall / multiplier);
+          if (producedPerUnit <= 0) {
+              continue;
+          }
+          const neededUnits = Math.ceil(shortfall / producedPerUnit);
           if (neededUnits <= 0) {
               continue;
           }
@@ -21021,7 +21090,9 @@ __define('./screens/ui-gacha/logic/pity.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyRoll')) exports.applyRoll = applyRoll;
 });
 __define('./screens/ui-gacha/logic/types.ts', (exports, module, __require) => {
-  const CURRENCY_ORDER = ['VNT', 'HNT', 'TNT', 'ThNT', 'TT'];
+  const __dep0 = __require('./utils/currency.ts');
+  const getCurrencyOrder = __dep0.getCurrencyOrder;
+  const CURRENCY_ORDER = getCurrencyOrder();
   const RARITY_ORDER = ['N', 'R', 'SR', 'SSR', 'UR', 'Prime'];
 
   if (!Object.prototype.hasOwnProperty.call(exports, 'CURRENCY_ORDER')) exports.CURRENCY_ORDER = CURRENCY_ORDER;
@@ -21749,8 +21820,9 @@ __define('./turns.ts', (exports, module, __require) => {
       const cursor = Math.max(0, Math.min(orderLen - 1, cursorRaw));
       return idx >= cursor ? currentCycle : currentCycle + 1;
   }
-  function spawnQueuedIfDue(Game, entry, { allocIid, performUlt } = {}) {
+  function spawnQueuedIfDue(Game, entry, hooks) {
       var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
+      const { allocIid, performUlt } = hooks !== null && hooks !== void 0 ? hooks : {};
       if (!entry)
           return { actor: null, spawned: false };
       const slot = entry.slot;
@@ -22078,9 +22150,6 @@ __define('./turns.ts', (exports, module, __require) => {
           else {
               active = (_b = getActiveAt(Game, entry.side, entry.slot)) !== null && _b !== void 0 ? _b : null; // behavior-preserving
           }
-          if (spawned && actor && actor.alive) {
-              return;
-          }
           if (!active || !active.alive) {
               return;
           }
@@ -22165,10 +22234,6 @@ __define('./turns.ts', (exports, module, __require) => {
               cycle
           };
           const { actor, spawned } = spawnQueuedIfDue(Game, entry, hooks);
-          if (spawned && actor && actor.alive) {
-              advanceCursor();
-              return;
-          }
           const active = actor && actor.alive ? actor : getActiveAt(Game, entry.side, entry.slot);
           const hasActive = !!(active && active.alive);
           if (!hasActive) {
@@ -23495,6 +23560,35 @@ __define('./utils/assert.ts', (exports, module, __require) => {
   }
 
   if (!Object.prototype.hasOwnProperty.call(exports, 'assertDefined')) exports.assertDefined = assertDefined;
+});
+__define('./utils/currency.ts', (exports, module, __require) => {
+  const __dep0 = __require('./data/economy.ts');
+  const CURRENCY_ORDER = __dep0.CURRENCY_ORDER;
+  const convertCurrencyInternal = __dep0.convertCurrency;
+  const formatBalance = __dep0.formatBalance;
+  const getCurrency = __dep0.getCurrency;
+  const listCurrencies = __dep0.listCurrencies;
+  function getCurrencyDefinitions() {
+      return listCurrencies();
+  }
+  function findCurrencyDefinition(currencyId) {
+      return getCurrency(currencyId);
+  }
+  function getCurrencyOrder() {
+      return CURRENCY_ORDER;
+  }
+  function convertCurrencyAmount(value, from, to) {
+      return convertCurrencyInternal(value, from, to);
+  }
+  function formatCurrencyAmount(value, currencyId, options = {}) {
+      return formatBalance(value, currencyId, options);
+  }
+
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getCurrencyDefinitions')) exports.getCurrencyDefinitions = getCurrencyDefinitions;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'findCurrencyDefinition')) exports.findCurrencyDefinition = findCurrencyDefinition;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getCurrencyOrder')) exports.getCurrencyOrder = getCurrencyOrder;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'convertCurrencyAmount')) exports.convertCurrencyAmount = convertCurrencyAmount;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'formatCurrencyAmount')) exports.formatCurrencyAmount = formatCurrencyAmount;
 });
 __define('./utils/dummy.ts', (exports, module, __require) => {
   function ensureNestedModuleSupport() {
