@@ -1,7 +1,7 @@
 // Bundled by build.mjs
 const __modules = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }
 function __define(id, factory){ __modules[id] = { factory, exports: null, initialized: false }; }
@@ -19077,7 +19077,7 @@ __define('./screens/main-menu/view/events.ts', (exports, module, __require) => {
           showStatus: options.showStatus !== false
       });
       const handleClick = (event) => {
-          var _a, _b;
+          var _a, _b, _c, _d;
           event.preventDefault();
           event.stopPropagation();
           if (typeof options.onPrimaryAction === 'function') {
@@ -19086,14 +19086,15 @@ __define('./screens/main-menu/view/events.ts', (exports, module, __require) => {
           }
           if (!shell || typeof shell.enterScreen !== 'function')
               return;
+          const targetScreen = (_b = (_a = mode.id) !== null && _a !== void 0 ? _a : mode.key) !== null && _b !== void 0 ? _b : 'main-menu';
           if (mode.status === 'coming-soon') {
               if (typeof onShowComingSoon === 'function') {
                   onShowComingSoon(mode);
               }
-              shell.enterScreen(mode.id || 'main-menu', (_a = mode.params) !== null && _a !== void 0 ? _a : null);
+              shell.enterScreen(targetScreen, (_c = mode.params) !== null && _c !== void 0 ? _c : null);
               return;
           }
-          shell.enterScreen(mode.id || 'main-menu', (_b = mode.params) !== null && _b !== void 0 ? _b : null);
+          shell.enterScreen(targetScreen, (_d = mode.params) !== null && _d !== void 0 ? _d : null);
       };
       button.addEventListener('click', handleClick);
       addCleanup(() => button.removeEventListener('click', handleClick));
@@ -19257,7 +19258,7 @@ __define('./screens/main-menu/view/events.ts', (exports, module, __require) => {
           }
           item.appendChild(body);
           const handleSelect = (event) => {
-              var _a;
+              var _a, _b, _c;
               event.preventDefault();
               event.stopPropagation();
               if (!shell || typeof shell.enterScreen !== 'function')
@@ -19265,7 +19266,8 @@ __define('./screens/main-menu/view/events.ts', (exports, module, __require) => {
               if (child.status === 'coming-soon' && typeof onShowComingSoon === 'function') {
                   onShowComingSoon(child);
               }
-              shell.enterScreen(child.id || 'main-menu', (_a = child.params) !== null && _a !== void 0 ? _a : null);
+              const targetScreen = (_b = (_a = child.id) !== null && _a !== void 0 ? _a : child.key) !== null && _b !== void 0 ? _b : 'main-menu';
+              shell.enterScreen(targetScreen, (_c = child.params) !== null && _c !== void 0 ? _c : null);
               close();
               wrapper.focus({ preventScroll: true });
           };
@@ -19833,15 +19835,17 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
   }
   async function mountGachaUI(scope = null) {
       var _a, _b;
-      const host = scope instanceof Document ? scope.body : scope !== null && scope !== void 0 ? scope : document.body;
-      if (!host) {
+      const hostElement = scope instanceof Document ? scope.body : scope !== null && scope !== void 0 ? scope : document.body;
+      if (!hostElement) {
           throw new Error('Không tìm thấy vùng mount cho gacha UI.');
       }
-      if (host === document.body) {
+      const isBodyHost = hostElement === document.body;
+      const preservedChildren = Array.from(hostElement.childNodes);
+      if (isBodyHost) {
           document.body.classList.add('gacha-ui');
       }
-      if (host instanceof HTMLElement) {
-          host.replaceChildren();
+      for (const child of preservedChildren) {
+          hostElement.removeChild(child);
       }
       const container = document.createElement('div');
       container.className = 'gacha-ui-root';
@@ -19873,7 +19877,7 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
         </main>
       </div>
     `;
-      host.appendChild(container);
+      hostElement.appendChild(container);
       const state = {
           wallet: createWallet(),
           bannerId: (_b = (_a = GACHA_CONFIG.banners[0]) === null || _a === void 0 ? void 0 : _a.id) !== null && _b !== void 0 ? _b : 'permanent',
@@ -19961,12 +19965,25 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
       summonOne.addEventListener('click', () => performSummon(1));
       summonTen.addEventListener('click', () => performSummon(10));
       renderAll();
+      let destroyed = false;
       return {
           destroy() {
-              if (host === document.body) {
+              if (destroyed) {
+                  return;
+              }
+              destroyed = true;
+              if (isBodyHost) {
                   document.body.classList.remove('gacha-ui');
               }
               container.remove();
+              if (preservedChildren.length > 0) {
+                  const fragment = document.createDocumentFragment();
+                  for (const child of preservedChildren) {
+                      fragment.appendChild(child);
+                  }
+                  hostElement.appendChild(fragment);
+                  preservedChildren.length = 0;
+              }
           },
       };
   }
@@ -19982,7 +19999,7 @@ __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
   const GACHA_TEMPLATE = /* html */ `
     <div class="gacha-app" data-app-root>
       <header class="gacha-topbar" data-section="topbar">
-      <button
+        <button
           class="gacha-topbar__back"
           type="button"
           aria-label="Trở về menu chính"
@@ -20015,47 +20032,49 @@ __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
         </button>
       </header>
 
-      <div class="gacha-layout">
-        <aside class="banner-list" data-slot="banner-list" aria-label="Danh sách banner"></aside>
-        <main class="hero" data-slot="hero" aria-live="polite">
-          <div class="hero__background" aria-hidden="true"></div>
-          <div class="hero__content">
-            <div class="hero__header">
-              <div class="hero__title-group">
-                <div class="hero__type-chip" data-slot="hero-type"></div>
-                <h1 class="hero__title" data-slot="hero-title"></h1>
-                <p class="hero__subtitle" data-slot="hero-subtitle"></p>
+          <div data-gacha-content>
+        <div class="gacha-layout">
+          <aside class="banner-list" data-slot="banner-list" aria-label="Danh sách banner"></aside>
+          <main class="hero" data-slot="hero" aria-live="polite">
+            <div class="hero__background" aria-hidden="true"></div>
+            <div class="hero__content">
+              <div class="hero__header">
+                <div class="hero__title-group">
+                  <div class="hero__type-chip" data-slot="hero-type"></div>
+                  <h1 class="hero__title" data-slot="hero-title"></h1>
+                  <p class="hero__subtitle" data-slot="hero-subtitle"></p>
+                </div>
+                <div class="hero__meta">
+                  <span class="hero__rateup" data-slot="hero-rateup">Rate UP</span>
+                  <span class="hero__timer" data-slot="hero-timer"></span>
+                </div>
               </div>
-              <div class="hero__meta">
-                <span class="hero__rateup" data-slot="hero-rateup">Rate UP</span>
-                <span class="hero__timer" data-slot="hero-timer"></span>
-              </div>
-            </div>
 
-            <section class="pity" aria-label="Thông tin bảo hiểm">
-              <div class="pity__pills" data-slot="pity-pills"></div>
-              <div class="pity__progress">
-                <div class="pity__bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                <span class="pity__note">Chưa có dữ liệu bảo hiểm.</span>
-              </div>
-            </section>
+             <section class="pity" aria-label="Thông tin bảo hiểm">
+               <div class="pity__pills" data-slot="pity-pills"></div>
+               <div class="pity__progress">
+                 <div class="pity__bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                 <span class="pity__note">Chưa có dữ liệu bảo hiểm.</span>
+               </div>
+             </section>
 
-            <section class="featured" aria-label="Đối tác nổi bật">
-              <div class="featured__list" data-slot="featured-list"></div>
-            </section>
+             <section class="featured" aria-label="Đối tác nổi bật">
+               <div class="featured__list" data-slot="featured-list"></div>
+             </section>
 
             <button class="hero__details" type="button" data-action="open-rates">Xem chi tiết tỉ lệ &amp; bảo hiểm</button>
-          </div>
-        </main>
-      </div>
-
-      <footer class="cta" data-section="cta">
-        <div class="cta__note">UI-only: Nhấn sẽ mở modal xác nhận (không quay).</div>
-        <div class="cta__buttons">
-          <button class="cta__button" type="button" data-test="summon-x1" data-action="summon-single"></button>
-          <button class="cta__button" type="button" data-test="summon-x10" data-action="summon-multi"></button>
+            </div>
+          </main>
         </div>
-      </footer>
+
+        <footer class="cta" data-section="cta">
+          <div class="cta__note">UI-only: Nhấn sẽ mở modal xác nhận (không quay).</div>
+          <div class="cta__buttons">
+            <button class="cta__button" type="button" data-test="summon-x1" data-action="summon-single"></button>
+            <button class="cta__button" type="button" data-test="summon-x10" data-action="summon-multi"></button>
+          </div>
+        </footer>
+      </div>
     </div>
 
     <div class="modal" data-modal="rates" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Tỉ lệ &amp; bảo hiểm">
@@ -20236,17 +20255,38 @@ __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
       }
       ensureStyleTag(STYLE_ID, { css: gachaStyles });
       const container = createContainer();
+      const mountTarget = container.querySelector('[data-gacha-content]');
+      if (!(mountTarget instanceof HTMLElement)) {
+          throw new Error('Không tìm thấy vùng mount cho gacha UI.');
+      }
       let disposed = false;
       let handle = null;
       const previousFlag = typeof window !== 'undefined' ? window.__ARC_GACHA_EMBED__ : undefined;
       const goBackButton = container.querySelector('[data-action="go-back"]');
+      const hasShellNavigation = Boolean(shell && typeof shell.enterScreen === 'function');
       const handleGoBack = (event) => {
+          var _a;
           event.preventDefault();
           if (shell && typeof shell.enterScreen === 'function') {
-              shell.enterScreen('main-menu');
+              (_a = shell.clearActiveSession) === null || _a === void 0 ? void 0 : _a.call(shell);
+              shell.enterScreen('main-menu', null);
+              return;
+          }
+          const exitEvent = new CustomEvent('arclune:exit-gacha', {
+              bubbles: true,
+              cancelable: true,
+          });
+          root.dispatchEvent(exitEvent);
+          if (!exitEvent.defaultPrevented && typeof history !== 'undefined' && typeof history.back === 'function') {
+              history.back();
           }
       };
       if (goBackButton instanceof HTMLButtonElement) {
+          if (!hasShellNavigation) {
+              goBackButton.setAttribute('aria-disabled', 'true');
+              goBackButton.classList.add('is-fallback');
+              goBackButton.title = 'Sử dụng điều hướng trình duyệt để quay lại';
+          }
           goBackButton.addEventListener('click', handleGoBack);
       }
       if (typeof window !== 'undefined') {
@@ -20258,7 +20298,7 @@ __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
           if (!module || typeof module.mountGachaUI !== 'function') {
               throw new Error('Module gacha không xuất mountGachaUI.');
           }
-          return module.mountGachaUI(container);
+          return module.mountGachaUI(mountTarget);
       })
           .then((result) => {
           var _a;
