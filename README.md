@@ -3,7 +3,7 @@
 ## Cài đặt phụ thuộc
 1. Cài đặt Node.js phiên bản mới nhất.
 2. Chạy `npm install` tại thư mục gốc. Lệnh này vừa tải các phụ thuộc chính (`typescript`, `ts-node`, `jest`, `ts-jest`, `@types/jest`, ...) vừa kích hoạt script `postinstall` nội bộ.
-3. Sau khi cài đặt hoàn tất, kiểm tra thư mục `node_modules` để xác nhận các stub `zod`, `esbuild`, `tsx` đã được sao chép (không phải symlink) từ `tools/*-stub`. Script `postinstall` (`node tools/install-stubs.mjs`) sẽ tự động lặp lại thao tác này mỗi lần chạy `npm install`, nên không cần thiết lập `install-links=false` trong `.npmrc` nữa.
+3. Sau khi cài đặt hoàn tất, kiểm tra thư mục `node_modules` để xác nhận các stub `zod`, `esbuild`, `tsx` đã được sao chép (không phải symlink) từ `tools/*-stub`. Script `postinstall` (`node tools/install-stubs.mjs`) sẽ tự động lặp lại thao tác này mỗi lần chạy `npm install`. Kho repo hiện bật lại cấu hình mặc định `install-links=true` trong `.npmrc`, vì vậy không cần (và cũng không nên) ghi đè sang `install-links=false` nữa.
 
 ## Build bundle
 - `npm run build:dev` hoặc `npm run build:prod` sẽ tạo `dist/app.js` và xuất thêm báo cáo `dist/build-report.json` chứa metafile của esbuild.
