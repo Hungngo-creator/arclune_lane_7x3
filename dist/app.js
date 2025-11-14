@@ -4347,7 +4347,7 @@ __define('./config.ts', (exports, module, __require) => {
       // === UI constants (C2) ===
       UI: {
           PAD: 12,
-          BOARD_MAX_W: 900,
+          BOARD_MAX_W: 1144,
           BOARD_MIN_H: 220,
           BOARD_H_RATIO: 3 / 7,
           MAX_DPR: 2.5,
@@ -5172,7 +5172,6 @@ __define('./data/modes.ts', (exports, module, __require) => {
   const MODE_GROUPS = [
       {
           id: 'arena-hub',
-          title: 'Chiến Trường',
           shortDescription: 'Tụ điểm tổng hợp các hoạt động chiến đấu luân phiên để người chơi bước vào chiến dịch, thử thách và mùa giải.',
           icon: '🏟️',
           tags: ['PvE', 'PvP'],
@@ -5184,7 +5183,6 @@ __define('./data/modes.ts', (exports, module, __require) => {
   const MODES = [
       {
           id: 'campaign',
-          title: 'Chiến Dịch',
           type: MODE_TYPES.PVE,
           status: MODE_STATUS.AVAILABLE,
           icon: '🛡️',
@@ -5201,7 +5199,6 @@ __define('./data/modes.ts', (exports, module, __require) => {
       },
       {
           id: 'challenge',
-          title: 'Thử Thách',
           type: MODE_TYPES.PVE,
           status: MODE_STATUS.AVAILABLE,
           icon: '🎯',
@@ -5218,7 +5215,6 @@ __define('./data/modes.ts', (exports, module, __require) => {
       },
       {
           id: 'arena',
-          title: 'Đấu Trường',
           type: MODE_TYPES.PVE,
           status: MODE_STATUS.AVAILABLE,
           icon: '🏟️',
@@ -5235,7 +5231,6 @@ __define('./data/modes.ts', (exports, module, __require) => {
       },
       {
           id: 'ares',
-          title: 'Ares',
           type: MODE_TYPES.PVP,
           status: MODE_STATUS.COMING_SOON,
           icon: '⚔️',
@@ -7443,10 +7438,19 @@ __define('./engine.ts', (exports, module, __require) => {
   }
   /* ---------- Grid ---------- */
   function makeGrid(canvas, cols, rows) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
       const pad = coerceFinite((_a = CFG.UI) === null || _a === void 0 ? void 0 : _a.PAD, 12);
-      const boardMaxW = coerceFinite((_b = CFG.UI) === null || _b === void 0 ? void 0 : _b.BOARD_MAX_W, 900);
+      const boardMaxW = coerceFinite((_b = CFG.UI) === null || _b === void 0 ? void 0 : _b.BOARD_MAX_W, 1144);
       let viewportW = boardMaxW + pad * 2;
+      const parentElement = ((_c = canvas === null || canvas === void 0 ? void 0 : canvas.parentElement) !== null && _c !== void 0 ? _c : null);
+      let parentClientW = null;
+      if (parentElement && typeof parentElement.clientWidth === 'number') {
+          const cw = parentElement.clientWidth;
+          if (Number.isFinite(cw) && cw > 0) {
+              parentClientW = cw;
+              viewportW = Math.min(viewportW, cw);
+          }
+      }
       if (typeof window !== 'undefined') {
           const { innerWidth, visualViewport } = window;
           viewportW = Math.min(viewportW, coerceFinite(innerWidth, viewportW));
@@ -7454,14 +7458,14 @@ __define('./engine.ts', (exports, module, __require) => {
           viewportW = Math.min(viewportW, vvWidth);
       }
       if (typeof document !== 'undefined') {
-          const docWidth = coerceFinite((_c = document.documentElement) === null || _c === void 0 ? void 0 : _c.clientWidth, viewportW);
+          const docWidth = coerceFinite((_d = document.documentElement) === null || _d === void 0 ? void 0 : _d.clientWidth, viewportW);
           viewportW = Math.min(viewportW, docWidth);
       }
-      const viewportSafeW = viewportW;
+      const viewportSafeW = parentClientW ? Math.min(viewportW, parentClientW) : viewportW;
       const availableW = Math.max(1, viewportSafeW - pad * 2);
       const w = Math.min(availableW, boardMaxW);
-      const h = Math.max(Math.floor(w * ((_e = (_d = CFG.UI) === null || _d === void 0 ? void 0 : _d.BOARD_H_RATIO) !== null && _e !== void 0 ? _e : 3 / 7)), (_g = (_f = CFG.UI) === null || _f === void 0 ? void 0 : _f.BOARD_MIN_H) !== null && _g !== void 0 ? _g : 220);
-      const maxDprCfg = (_h = CFG.UI) === null || _h === void 0 ? void 0 : _h.MAX_DPR;
+      const h = Math.max(Math.floor(w * ((_f = (_e = CFG.UI) === null || _e === void 0 ? void 0 : _e.BOARD_H_RATIO) !== null && _f !== void 0 ? _f : 3 / 7)), (_h = (_g = CFG.UI) === null || _g === void 0 ? void 0 : _g.BOARD_MIN_H) !== null && _h !== void 0 ? _h : 220);
+      const maxDprCfg = (_j = CFG.UI) === null || _j === void 0 ? void 0 : _j.MAX_DPR;
       const dprClamp = Number.isFinite(maxDprCfg) && maxDprCfg > 0 ? maxDprCfg : 2;
       const dprRaw = typeof window !== 'undefined' && Number.isFinite(window.devicePixelRatio)
           ? window.devicePixelRatio
@@ -7479,7 +7483,7 @@ __define('./engine.ts', (exports, module, __require) => {
       }
       const displayW = w;
       const displayH = h;
-      const maxPixelAreaCfg = (_j = CFG.UI) === null || _j === void 0 ? void 0 : _j.MAX_PIXEL_AREA;
+      const maxPixelAreaCfg = (_k = CFG.UI) === null || _k === void 0 ? void 0 : _k.MAX_PIXEL_AREA;
       const pixelAreaLimit = Number.isFinite(maxPixelAreaCfg) && maxPixelAreaCfg > 0 ? maxPixelAreaCfg : null;
       if (pixelAreaLimit) {
           const cssArea = displayW * displayH;
@@ -9010,17 +9014,19 @@ __define('./entry.ts', (exports, module, __require) => {
           <button type="button" class="pve-toolbar__button" data-action="exit">Thoát</button>
         </div>
       </div>
-      <div id="boardWrap">
-        <canvas id="board"></canvas>
-      </div>
-      <div id="bottomHUD" class="hud-bottom">
-        <div id="timer" class="chip chip-timer">04:00</div>
-        <div id="costChip" class="chip chip-cost">
-          <div id="costRing"></div>
-          <div id="costNow">0</div>
+      <div class="pve-stage">
+        <div id="boardWrap">
+          <canvas id="board"></canvas>
         </div>
+        <div id="bottomHUD" class="hud-bottom">
+          <div id="timer" class="chip chip-timer">04:00</div>
+          <div id="costChip" class="chip chip-cost">
+            <div id="costRing"></div>
+            <div id="costNow">0</div>
+          </div>
+        </div>
+        <div id="cards"></div>
       </div>
-      <div id="cards"></div>
     `;
       rootElement.appendChild(container);
       const exitButton = container.querySelector('[data-action="exit"]');
@@ -10318,6 +10324,29 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       return preset !== null && preset !== void 0 ? preset : CAM[DEFAULT_CAMERA_KEY];
   };
   const CAM_PRESET = resolveCameraPreset();
+  const getCameraPresetSignature = (preset) => {
+      if (!preset)
+          return 'null';
+      const record = preset;
+      return Object.keys(record)
+          .sort()
+          .map((key) => {
+          const value = record[key];
+          if (typeof value === 'number')
+              return `${key}:${Number.isFinite(value) ? value : 'NaN'}`;
+          if (typeof value === 'boolean')
+              return `${key}:${value ? 'true' : 'false'}`;
+          if (typeof value === 'string')
+              return `${key}:"${value}"`;
+          if (value === null)
+              return `${key}:null`;
+          if (typeof value === 'undefined')
+              return `${key}:undefined`;
+          return `${key}:${String(value)}`;
+      })
+          .join('|');
+  };
+  let lastCamPresetSignature = getCameraPresetSignature(CAM_PRESET);
   const HAND_SIZE = (_a = CFG.HAND_SIZE) !== null && _a !== void 0 ? _a : 4;
   ensureNestedModuleSupport();
   const getNow = () => sessionNow();
@@ -10328,6 +10357,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   const RAF_DRIFT_TOLERANCE_MS = 120000; // 2 phút – đủ rộng cho mọi sai lệch hợp lệ
   const CLOCK_DRIFT_TOLERANCE_MS = RAF_DRIFT_TOLERANCE_MS;
   const LOGIC_MIN_INTERVAL_MS = 40;
+  const MAX_TURNS_PER_TICK = 6;
   // --- Instance counters (để gắn id cho token/minion) ---
   let _IID = 1;
   let _BORN = 1;
@@ -10347,6 +10377,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   let winRef = null;
   let docRef = null;
   let rootElement = null;
+  let timerElement = null;
   let storedConfig = normalizeConfig();
   let running = false;
   const hpBarGradientCache = new Map();
@@ -11708,6 +11739,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           }
           return null;
       };
+      timerElement = (queryFromRoot('#timer') || doc.getElementById('timer'));
       const updateTimerAndCost = (timestamp) => {
           var _a, _b, _c, _d, _e;
           if (!CLOCK || !Game)
@@ -11858,7 +11890,12 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           const ss = String(remainDisplay % 60).padStart(2, '0');
           const nextTimerText = `${mm}:${ss}`;
           if (nextTimerText !== CLOCK.lastTimerText) {
-              const tEl = (queryFromRoot('#timer') || doc.getElementById('timer'));
+              let tEl = timerElement;
+              if (!tEl || !tEl.isConnected) {
+                  const refreshed = (queryFromRoot('#timer') || doc.getElementById('timer'));
+                  timerElement = refreshed !== null && refreshed !== void 0 ? refreshed : null;
+                  tEl = timerElement;
+              }
               if (tEl)
                   tEl.textContent = nextTimerText;
               CLOCK.lastTimerText = nextTimerText;
@@ -11954,24 +11991,28 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               elapsedForTurn = turnEveryMs;
           }
           if (readyByBusy && elapsedForTurn >= turnEveryMs) {
-              CLOCK.lastTurnStepMs = sessionNowMs;
-              stepTurn(Game, {
-                  performUlt,
-                  processActionChain,
-                  allocIid: nextIid,
-                  doActionOrSkip,
-                  checkBattleEnd(gameState, info) {
-                      return Boolean(checkBattleEndResult(gameState, info));
-                  },
-              });
-              cleanupDead(sessionNowMs);
-              const postTurnResult = checkBattleEndResult(Game, { trigger: 'post-turn', timestamp: sessionNowMs });
-              if (postTurnResult) {
+              let turnsProcessed = 0;
+              while (readyByBusy && elapsedForTurn >= turnEveryMs && turnsProcessed < MAX_TURNS_PER_TICK) {
+                  CLOCK.lastTurnStepMs += turnEveryMs;
+                  elapsedForTurn -= turnEveryMs;
+                  turnsProcessed += 1;
+                  stepTurn(Game, {
+                      performUlt,
+                      processActionChain,
+                      allocIid: nextIid,
+                      doActionOrSkip,
+                      checkBattleEnd(gameState, info) {
+                          return Boolean(checkBattleEndResult(gameState, info));
+                      },
+                  });
+                  cleanupDead(sessionNowMs);
+                  const postTurnResult = checkBattleEndResult(Game, { trigger: 'post-turn', timestamp: sessionNowMs });
                   scheduleDraw();
-                  return;
+                  if (postTurnResult) {
+                      return;
+                  }
+                  aiMaybeAct(Game, 'board');
               }
-              scheduleDraw();
-              aiMaybeAct(Game, 'board');
           }
       };
       const runTickLoop = (timestamp) => {
@@ -12080,7 +12121,13 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           dpr: Game.grid.dpr,
           cols: Game.grid.cols,
           rows: Game.grid.rows,
-          tile: Game.grid.tile
+          tile: Game.grid.tile,
+          ox: Game.grid.ox,
+          oy: Game.grid.oy,
+          pad: Game.grid.pad,
+          pixelW: Game.grid.pixelW,
+          pixelH: Game.grid.pixelH,
+          pixelArea: Game.grid.pixelArea,
       } : null;
       Game.grid = makeGrid(canvas, CFG.GRID_COLS, CFG.GRID_ROWS);
       if (ctx && Game.grid) {
@@ -12115,7 +12162,13 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           || prevGrid.dpr !== g.dpr
           || prevGrid.cols !== g.cols
           || prevGrid.rows !== g.rows
-          || prevGrid.tile !== g.tile;
+          || prevGrid.tile !== g.tile
+          || prevGrid.ox !== g.ox
+          || prevGrid.oy !== g.oy
+          || prevGrid.pad !== g.pad
+          || prevGrid.pixelW !== g.pixelW
+          || prevGrid.pixelH !== g.pixelH
+          || prevGrid.pixelArea !== g.pixelArea;
       if (gridChanged) {
           hpBarGradientCache.clear();
           invalidateSceneCache();
@@ -12128,26 +12181,37 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       const clearW = (_b = (_a = Game.grid) === null || _a === void 0 ? void 0 : _a.w) !== null && _b !== void 0 ? _b : canvas.width;
       const clearH = (_d = (_c = Game.grid) === null || _c === void 0 ? void 0 : _c.h) !== null && _d !== void 0 ? _d : canvas.height;
       ctx.clearRect(0, 0, clearW, clearH);
+      const camSignature = getCameraPresetSignature(CAM_PRESET);
+      if (camSignature !== lastCamPresetSignature) {
+          lastCamPresetSignature = camSignature;
+          invalidateSceneCache();
+      }
       const cache = ensureSceneCache({
           game: Game,
           canvas,
           documentRef: docRef,
           camPreset: CAM_PRESET
       });
+      let gridDrawnViaScene = false;
       if (cache && cache.canvas) {
           ctx.drawImage(cache.canvas, 0, 0, cache.pixelWidth, cache.pixelHeight, 0, 0, cache.cssWidth, cache.cssHeight);
+          gridDrawnViaScene = !!cache.includesGrid;
       }
       else {
           const sceneCfg = CFG.SCENE || {};
           const themeKey = Game.sceneTheme || sceneCfg.CURRENT_THEME || sceneCfg.DEFAULT_THEME;
           const theme = (sceneCfg.THEMES && themeKey) ? sceneCfg.THEMES[themeKey] : null;
-          if (Game.grid)
+          if (Game.grid) {
               drawBattlefieldScene(ctx, Game.grid, theme);
-          if (Game.grid)
               drawEnvironmentProps(ctx, Game.grid, CAM_PRESET, Game.backgroundKey);
+              drawGridOblique(ctx, Game.grid, CAM_PRESET);
+              gridDrawnViaScene = true;
+          }
       }
       if (Game.grid) {
-          drawGridOblique(ctx, Game.grid, CAM_PRESET);
+          if (!gridDrawnViaScene) {
+              drawGridOblique(ctx, Game.grid, CAM_PRESET);
+          }
           drawQueuedOblique(ctx, Game.grid, Game.queued, CAM_PRESET);
           const tokens = Game.tokens || [];
           drawTokensOblique(ctx, Game.grid, tokens, CAM_PRESET);
@@ -12327,6 +12391,23 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       }
       visibilityHandlerBound = false;
   }
+  function resolveTimerElement() {
+      const doc = docRef !== null && docRef !== void 0 ? docRef : (typeof document !== 'undefined' ? document : null);
+      const root = rootElement !== null && rootElement !== void 0 ? rootElement : null;
+      if (!doc) {
+          timerElement = null;
+          return;
+      }
+      const queryFromRoot = (selector) => {
+          if (root && typeof root.querySelector === 'function') {
+              const el = root.querySelector(selector);
+              if (el)
+                  return el;
+          }
+          return null;
+      };
+      timerElement = (queryFromRoot('#timer') || doc.getElementById('timer'));
+  }
   function configureRoot(root) {
       var _a;
       rootElement = root || null;
@@ -12340,6 +12421,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           docRef = typeof document !== 'undefined' ? document : null;
       }
       winRef = (_a = docRef === null || docRef === void 0 ? void 0 : docRef.defaultView) !== null && _a !== void 0 ? _a : (typeof window !== 'undefined' ? window : null);
+      resolveTimerElement();
   }
   function clearSessionTimers() {
       if (tickLoopHandle !== null) {
@@ -12393,6 +12475,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       ctx = null;
       hud = null;
       hudCleanup = null;
+      timerElement = null;
       hpBarGradientCache.clear();
       invalidateSceneCache();
   }
@@ -12426,6 +12509,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           Game._inited = false;
       }
       resetDomRefs();
+      timerElement = null;
       CLOCK = null;
       Game = null;
       running = false;
@@ -12443,6 +12527,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   }
   function startSession(config = {}) {
       configureRoot(rootElement);
+      resolveTimerElement();
       const overrides = normalizeConfig(toStartConfigOverrides(config));
       if (running)
           stopSession();
@@ -12766,14 +12851,16 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
   const __dep5 = __require('./background.ts');
   const getEnvironmentBackground = __dep5.getEnvironmentBackground;
   const drawEnvironmentProps = __dep5.drawEnvironmentProps;
-  const __dep6 = __require('./scene.ts');
-  const getCachedBattlefieldScene = __dep6.getCachedBattlefieldScene;
-  const __dep7 = __require('./statuses.ts');
-  const Statuses = __dep7.Statuses;
-  const __dep8 = __require('./art.ts');
-  const getUnitArt = __dep8.getUnitArt;
-  const __dep9 = __require('./utils/unit-id.ts');
-  const normalizeUnitId = __dep9.normalizeUnitId;
+  const __dep6 = __require('./engine.ts');
+  const drawGridOblique = __dep6.drawGridOblique;
+  const __dep7 = __require('./scene.ts');
+  const getCachedBattlefieldScene = __dep7.getCachedBattlefieldScene;
+  const __dep8 = __require('./statuses.ts');
+  const Statuses = __dep8.Statuses;
+  const __dep9 = __require('./art.ts');
+  const getUnitArt = __dep9.getUnitArt;
+  const __dep10 = __require('./utils/unit-id.ts');
+  const normalizeUnitId = __dep10.normalizeUnitId;
   void Statuses;
   const DEFAULT_UNIT_ROSTER = UNITS.map((unit) => {
       var _a;
@@ -13196,6 +13283,7 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
       const theme = themeKey ? (_e = (_d = sceneCfg === null || sceneCfg === void 0 ? void 0 : sceneCfg.THEMES) === null || _d === void 0 ? void 0 : _d[themeKey]) !== null && _e !== void 0 ? _e : null : null;
       const backgroundKey = (_f = game.backgroundKey) !== null && _f !== void 0 ? _f : null;
       const backgroundSignature = computeBackgroundSignature(backgroundKey);
+      const camPresetSignature = stableStringify(camPreset !== null && camPreset !== void 0 ? camPreset : null);
       const baseScene = getCachedBattlefieldScene(grid, theme, { width: cssWidth, height: cssHeight, dpr: dprRaw });
       const baseKey = (_g = baseScene === null || baseScene === void 0 ? void 0 : baseScene.cacheKey) !== null && _g !== void 0 ? _g : null;
       if (!baseScene) {
@@ -13214,6 +13302,10 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
       else if (sceneCache.dpr !== dprRaw)
           needsRebuild = true;
       else if (sceneCache.baseKey !== baseKey)
+          needsRebuild = true;
+      else if (sceneCache.camPresetSignature !== camPresetSignature)
+          needsRebuild = true;
+      else if (!sceneCache.includesGrid)
           needsRebuild = true;
       if (!needsRebuild)
           return sceneCache;
@@ -13245,6 +13337,7 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
       }
       try {
           drawEnvironmentProps(cacheCtx, grid, camPreset, backgroundKey !== null && backgroundKey !== void 0 ? backgroundKey : undefined);
+          drawGridOblique(cacheCtx, grid, camPreset);
       }
       catch (err) {
           console.error('[scene-cache]', err);
@@ -13261,6 +13354,8 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
           backgroundSignature,
           dpr: dprRaw,
           baseKey,
+          includesGrid: true,
+          camPresetSignature,
       };
       return sceneCache;
   }
@@ -18641,6 +18736,20 @@ __define('./screens/main-menu/view/events.ts', (exports, module, __require) => {
       }
       return { icon: '✦', tone: tone || 'calm' };
   }
+  function resolveModeHeading(mode) {
+      if (typeof mode.title === 'string') {
+          const trimmedTitle = mode.title.trim();
+          return trimmedTitle.length > 0 ? trimmedTitle : null;
+      }
+      if (typeof mode.label === 'string') {
+          const trimmedLabel = mode.label.trim();
+          if (trimmedLabel.length > 0) {
+              return trimmedLabel;
+          }
+      }
+      const trimmedKey = typeof mode.key === 'string' ? mode.key.trim() : '';
+      return trimmedKey.length > 0 ? trimmedKey : null;
+  }
   function buildModeCardBase(element, mode, options = {}) {
       const { extraClasses = [], showStatus = true } = options;
       element.classList.add('mode-card');
@@ -18652,10 +18761,13 @@ __define('./screens/main-menu/view/events.ts', (exports, module, __require) => {
       icon.className = 'mode-card__icon';
       icon.textContent = mode.icon || '◆';
       element.appendChild(icon);
-      const title = document.createElement('h3');
-      title.className = 'mode-card__title';
-      title.textContent = mode.title || mode.label || mode.key || '';
-      element.appendChild(title);
+      const headingText = resolveModeHeading(mode);
+      if (headingText) {
+          const title = document.createElement('h3');
+          title.className = 'mode-card__title';
+          title.textContent = headingText;
+          element.appendChild(title);
+      }
       if (mode.description) {
           const desc = document.createElement('p');
           desc.className = 'mode-card__desc';
@@ -18743,8 +18855,9 @@ __define('./screens/main-menu/view/events.ts', (exports, module, __require) => {
       wrapper.setAttribute('role', 'button');
       wrapper.setAttribute('aria-haspopup', 'true');
       wrapper.setAttribute('aria-expanded', 'false');
-      if (group.title) {
-          wrapper.setAttribute('aria-label', `Chọn chế độ trong ${group.title}`);
+      const groupHeadingText = resolveModeHeading(group);
+      if (groupHeadingText) {
+          wrapper.setAttribute('aria-label', `Chọn chế độ trong ${groupHeadingText}`);
       }
       wrapper.tabIndex = 0;
       const infoBlock = document.createElement('div');
@@ -22458,24 +22571,27 @@ __define('./ui.ts', (exports, module, __require) => {
       cleanupFns.push(() => cleanupResize());
       let removalObserver = null;
       if (host && typeof MutationObserver === 'function') {
-          const targetRoot = doc.body || doc.documentElement;
-          const observerTarget = targetRoot
-              ? assertElement(targetRoot, 'Cần một phần tử gốc để quan sát trạng thái kết nối.')
-              : null;
+          const parentNode = host.parentNode;
+          const rootNode = typeof host.getRootNode === 'function' ? host.getRootNode() : null;
+          let observerTarget = null;
+          if (parentNode && parentNode.nodeType !== Node.DOCUMENT_NODE) {
+              observerTarget = parentNode;
+          }
+          else if (rootNode instanceof ShadowRoot || rootNode instanceof DocumentFragment) {
+              observerTarget = rootNode;
+          }
           if (observerTarget) {
               removalObserver = new MutationObserver(() => {
                   if (!host.isConnected) {
                       cleanup();
                   }
               });
-              removalObserver.observe(observerTarget, { childList: true, subtree: true });
+              removalObserver.observe(observerTarget, { childList: true });
+              cleanupFns.push(() => {
+                  removalObserver === null || removalObserver === void 0 ? void 0 : removalObserver.disconnect();
+                  removalObserver = null;
+              });
           }
-      }
-      if (removalObserver) {
-          cleanupFns.push(() => {
-              removalObserver === null || removalObserver === void 0 ? void 0 : removalObserver.disconnect();
-              removalObserver = null;
-          });
       }
       const resolveCardCost = (card) => {
           if (!card)
