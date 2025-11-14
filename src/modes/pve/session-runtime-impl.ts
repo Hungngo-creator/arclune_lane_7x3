@@ -114,6 +114,9 @@ type ClockState = {
   turnEveryMs: number;
   lastTurnStepMs: number;
   lastFrameMs: number;
+  lastLogicMs: number;
+  costAccumulator: number;
+  lastTimerText: string | null;
 };
 type ExtendedQueuedSummon = (QueuedSummonRequest & {
   art?: ReturnType<typeof getUnitArt> | null;
@@ -587,6 +590,7 @@ const SUPPORTS_PERF_NOW = typeof globalThis !== 'undefined'
 const RAF_TIMESTAMP_MAX = 2_147_483_647; // ~24 ngày tính từ mốc điều hướng
 const RAF_DRIFT_TOLERANCE_MS = 120_000;   // 2 phút – đủ rộng cho mọi sai lệch hợp lệ
 const CLOCK_DRIFT_TOLERANCE_MS = RAF_DRIFT_TOLERANCE_MS;
+const LOGIC_MIN_INTERVAL_MS = 40;
 
 // --- Instance counters (để gắn id cho token/minion) ---
 let _IID = 1;
@@ -901,6 +905,9 @@ function createClock(): ClockState {
     turnEveryMs,
     lastTurnStepMs: now - turnEveryMs,
     lastFrameMs: now,
+    lastLogicMs: now - LOGIC_MIN_INTERVAL_MS,
+    costAccumulator: 0,
+    lastTimerText: null,
   };
 }
 
@@ -1991,6 +1998,11 @@ function init(): boolean {
         CLOCK.lastFrameMs = Number.isFinite(rebaseFrame)
           ? rebaseFrame
           : CLOCK.startMs;
+          CLOCK.lastLogicMs = Number.isFinite(rebaseFrame)
+          ? rebaseFrame - LOGIC_MIN_INTERVAL_MS
+          : CLOCK.startMs - LOGIC_MIN_INTERVAL_MS;
+        CLOCK.costAccumulator = 0;
+        CLOCK.lastTimerText = null;
       }
 
       const expectedSessionMs = safeNowMs - CLOCK.startSafeMs + CLOCK.startMs;
@@ -2032,48 +2044,98 @@ function init(): boolean {
       }
       CLOCK.lastFrameMs = Number.isFinite(sessionNowMs) ? sessionNowMs : expectedSessionMs;
 
-      let elapsedSec = Math.floor((sessionNowMs - CLOCK.startMs) / 1000);
-      if (!Number.isFinite(elapsedSec)){
-        elapsedSec = forcedElapsedSec ?? 0;
-      }
-      if (elapsedSec < 0){
-        elapsedSec = 0;
-      }
-      if (forcedElapsedSec !== null && elapsedSec < forcedElapsedSec){
-        elapsedSec = forcedElapsedSec;
+      if (!Number.isFinite(CLOCK.lastLogicMs)){
+        CLOCK.lastLogicMs = sessionNowMs - LOGIC_MIN_INTERVAL_MS;
       }
 
-      const prevRemain = Number.isFinite(CLOCK.lastTimerRemain) ? CLOCK.lastTimerRemain : 0;
-      const remain = Math.max(0, 240 - elapsedSec);
-      if (remain !== CLOCK.lastTimerRemain){
-        CLOCK.lastTimerRemain = remain;
-        const mm = String(Math.floor(remain / 60)).padStart(2, '0');
-        const ss = String(remain % 60).padStart(2, '0');
-        const tEl = (queryFromRoot('#timer') || doc.getElementById('timer')) as HTMLElement | null;
-        if (tEl) tEl.textContent = `${mm}:${ss}`;
+      const logicSinceMs = sessionNowMs - CLOCK.lastLogicMs;
+      if (Number.isFinite(logicSinceMs) && logicSinceMs < LOGIC_MIN_INTERVAL_MS){
+        return;
       }
-      
-      if (remain <= 0 && prevRemain > 0){
-        const timeoutResult = checkBattleEndResult(Game, { trigger: 'timeout', remain, timestamp: sessionNowMs });
+
+      const startMs = Number.isFinite(CLOCK.startMs) ? CLOCK.startMs : CLOCK.lastFrameMs;
+      let elapsedMsPrecise = Number.isFinite(startMs) ? sessionNowMs - startMs : 0;
+      if (!Number.isFinite(elapsedMsPrecise)){
+        elapsedMsPrecise = (forcedElapsedSec ?? 0) * 1000;
+      }
+      if (elapsedMsPrecise < 0){
+        elapsedMsPrecise = 0;
+      }
+      let elapsedSecPrecise = elapsedMsPrecise / 1000;
+      if (forcedElapsedSec !== null && elapsedSecPrecise < forcedElapsedSec){
+        elapsedSecPrecise = forcedElapsedSec;
+        elapsedMsPrecise = elapsedSecPrecise * 1000;
+      }
+
+      const prevRemainDisplay = Number.isFinite(CLOCK.lastTimerRemain)
+        ? CLOCK.lastTimerRemain
+        : Math.max(0, 240 - Math.floor(elapsedSecPrecise));
+      const remainSecPrecise = Math.max(0, 240 - elapsedSecPrecise);
+      const remainDisplay = Math.max(0, Math.floor(remainSecPrecise));
+      const mm = String(Math.floor(remainDisplay / 60)).padStart(2, '0');
+      const ss = String(remainDisplay % 60).padStart(2, '0');
+      const nextTimerText = `${mm}:${ss}`;
+      if (nextTimerText !== CLOCK.lastTimerText){
+        const tEl = (queryFromRoot('#timer') || doc.getElementById('timer')) as HTMLElement | null;
+        if (tEl) tEl.textContent = nextTimerText;
+        CLOCK.lastTimerText = nextTimerText;
+      }
+      CLOCK.lastTimerRemain = remainDisplay;
+      if (CLOCK.lastTimerText === null){
+        CLOCK.lastTimerText = nextTimerText;
+      }
+
+      if (remainSecPrecise <= 0 && prevRemainDisplay > 0){
+        const timeoutResult = checkBattleEndResult(Game, { trigger: 'timeout', remain: remainDisplay, timestamp: sessionNowMs });
         if (timeoutResult) return;
       }
 
-      const deltaSec = elapsedSec - CLOCK.lastCostCreditedSec;
-      if (deltaSec > 0) {
-        if (Game.cost < Game.costCap) {
-          Game.cost = Math.min(Game.costCap, Game.cost + deltaSec);
-        }
-        if (Game.ai.cost < Game.ai.costCap) {
-          Game.ai.cost = Math.min(Game.ai.costCap, Game.ai.cost + deltaSec);
-        }
+      const lastCredited = Number.isFinite(CLOCK.lastCostCreditedSec)
+        ? CLOCK.lastCostCreditedSec
+        : 0;
+      let deltaSec = elapsedSecPrecise - lastCredited;
+      if (!Number.isFinite(deltaSec) || deltaSec < 0){
+        deltaSec = 0;
+      }
+      const accumulatorBase = Number.isFinite(CLOCK.costAccumulator) ? CLOCK.costAccumulator : 0;
+      let nextAccumulator = accumulatorBase + deltaSec;
+      let costGranted = 0;
+      if (nextAccumulator >= 1){
+        costGranted = Math.floor(nextAccumulator);
+        nextAccumulator -= costGranted;
+      }
+      if (!Number.isFinite(nextAccumulator) || nextAccumulator < 0){
+        nextAccumulator = 0;
+      }
+      CLOCK.costAccumulator = nextAccumulator;
+      CLOCK.lastCostCreditedSec = Math.max(lastCredited, elapsedSecPrecise);
 
-        CLOCK.lastCostCreditedSec = elapsedSec;
+      let costChanged = false;
+      if (costGranted > 0){
+        if (Game.cost < Game.costCap){
+          const nextCost = Math.min(Game.costCap, Game.cost + costGranted);
+          if (nextCost !== Game.cost){
+            Game.cost = nextCost;
+            costChanged = true;
+          }
+        }
+        if (Game.ai.cost < Game.ai.costCap){
+          const nextAiCost = Math.min(Game.ai.costCap, Game.ai.cost + costGranted);
+          if (nextAiCost !== Game.ai.cost){
+            Game.ai.cost = nextAiCost;
+            costChanged = true;
+          }
+        }
+      }
 
+        if (costChanged){
         if (hud && Game) hud.update(Game);
         if (!Game.selectedId) selectFirstAffordable();
         renderSummonBar();
         aiMaybeAct(Game, 'cost');
       }
+
+      CLOCK.lastLogicMs = sessionNowMs;
 
       if (Game.battle?.over) return;
 
@@ -2166,7 +2228,12 @@ function init(): boolean {
       tickLoopHandle = raf(runTickLoop);
     } else {
       tickLoopUsesTimeout = true;
-      tickLoopHandle = setTimeout(() => runTickLoop(), 16);
+      const turnMs = Number.isFinite(CLOCK.turnEveryMs) && CLOCK.turnEveryMs > 0
+        ? CLOCK.turnEveryMs
+        : LOGIC_MIN_INTERVAL_MS;
+      const turnSlice = Math.max(1, Math.floor(turnMs / 4));
+      const timeoutDelay = Math.max(8, Math.min(LOGIC_MIN_INTERVAL_MS, turnSlice || LOGIC_MIN_INTERVAL_MS));
+      tickLoopHandle = setTimeout(() => runTickLoop(), timeoutDelay);
     }
   }
 
