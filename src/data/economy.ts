@@ -11,9 +11,9 @@ import type {
   ShopTaxBracket
 } from '@shared-types/config';
 
-type CurrencyId = 'VNT' | 'HNT' | 'TNT' | 'ThNT' | 'TT';
-const CurrencyIdSchema = z.enum(['VNT', 'HNT', 'TNT', 'ThNT', 'TT'] as [string, ...string[]]);
-const currencyIdValues: CurrencyId[] = ['VNT', 'HNT', 'TNT', 'ThNT', 'TT'];
+const currencyIdValues = ['VNT', 'HNT', 'TNT', 'ThNT', 'TT'] as const;
+export type CurrencyId = typeof currencyIdValues[number];
+const CurrencyIdSchema = z.enum([...currencyIdValues] as [CurrencyId, ...CurrencyId[]]);
 
 const CurrencySchema = z.object({
   id: CurrencyIdSchema,
@@ -83,6 +83,8 @@ for (const id of currencyIdValues){
   currencyIdMap[id] = id;
 }
 
+export const CURRENCY_ORDER: ReadonlyArray<CurrencyId> = Object.freeze([...currencyIdValues]);
+
 const CURRENCY_IDS = Object.freeze({
   ...currencyIdMap,
   THNT: currencyIdMap.ThNT
@@ -130,7 +132,7 @@ if (HAS_INTL_NUMBER_FORMAT){
   }
 }
 
-interface FormatBalanceOptions {
+export interface FormatBalanceOptions {
   notation?: 'standard' | 'compact';
   includeSuffix?: boolean;
   precision?: number;
