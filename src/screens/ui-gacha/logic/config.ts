@@ -1,4 +1,5 @@
 import type { BannerDefinition, CurrencyCode, GachaConfig, Wallet } from './types.ts';
+import { CURRENCY_ORDER } from './types.ts';
 
 export const DEFAULT_WALLET: Wallet = {
   VNT: 125_000,
@@ -92,11 +93,10 @@ export const CURRENCY_LABELS: Record<CurrencyCode, string> = {
 };
 
 export function createWallet(initial?: Partial<Wallet>): Wallet {
-  return {
-    VNT: Math.max(0, Math.trunc(initial?.VNT ?? DEFAULT_WALLET.VNT)),
-    HNT: Math.max(0, Math.trunc(initial?.HNT ?? DEFAULT_WALLET.HNT)),
-    TNT: Math.max(0, Math.trunc(initial?.TNT ?? DEFAULT_WALLET.TNT)),
-    ThNT: Math.max(0, Math.trunc(initial?.ThNT ?? DEFAULT_WALLET.ThNT)),
-    TT: Math.max(0, Math.trunc(initial?.TT ?? DEFAULT_WALLET.TT)),
-  };
-    }
+  const wallet: Partial<Wallet> = {};
+  for (const code of CURRENCY_ORDER){
+    const fallback = DEFAULT_WALLET[code] ?? 0;
+    wallet[code] = Math.max(0, Math.trunc((initial?.[code] ?? fallback) ?? 0));
+  }
+  return wallet as Wallet;
+}

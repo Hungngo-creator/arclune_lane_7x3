@@ -7,6 +7,10 @@ import {
   type PaymentResult,
   type Wallet,
 } from './types.ts';
+import {
+  convertCurrencyAmount,
+  type CurrencyId,
+} from '../../../utils/currency.ts';
 
 const BASE_TAX: Partial<Record<CurrencyConversionStep, number>> = {
   'VNT->HNT': 0.005,
@@ -19,13 +23,11 @@ const WEALTH_PIVOT_TT = 100;
 const ALPHA = 2;
 
 function cloneWallet(wallet: Wallet): Wallet {
-  return {
-    VNT: Math.max(0, Math.trunc(wallet.VNT ?? 0)),
-    HNT: Math.max(0, Math.trunc(wallet.HNT ?? 0)),
-    TNT: Math.max(0, Math.trunc(wallet.TNT ?? 0)),
-    ThNT: Math.max(0, Math.trunc(wallet.ThNT ?? 0)),
-    TT: Math.max(0, Math.trunc(wallet.TT ?? 0)),
-  };
+  const normalized: Partial<Wallet> = {};
+  for (const code of CURRENCY_ORDER){
+    normalized[code] = Math.max(0, Math.trunc(wallet[code] ?? 0));
+  }
+  return normalized as Wallet;
 }
 
 function getIndex(code: CurrencyCode): number {
@@ -43,10 +45,13 @@ function isLowerTier(from: CurrencyCode, to: CurrencyCode): boolean {
 
 export function totalTTEquivalent(wallet: Wallet): number {
   const normalized = cloneWallet(wallet);
-  const hnt = normalized.VNT / 100;
-  const tnt = (normalized.HNT + hnt) / 100;
-  const thnt = (normalized.TNT + tnt) / 100;
-  return normalized.TT + (normalized.ThNT + thnt) / 100;
+  const highestCurrency = (CURRENCY_ORDER[CURRENCY_ORDER.length - 1] ?? 'TT') as CurrencyId;
+  let total = 0;
+  for (const code of CURRENCY_ORDER){
+    const amount = normalized[code] ?? 0;
+    total += convertCurrencyAmount(amount, code as CurrencyId, highestCurrency);
+  }
+  return total;
 }
 
 function dynamicTaxRate(stepKey: CurrencyConversionStep, wallet: Wallet): number {
@@ -84,17 +89,25 @@ function convertUp(
 
   const normalized = cloneWallet(wallet);
   const available = Math.max(0, Math.trunc(amount));
-  if (available < 100) {
+  const unitCost = convertCurrencyAmount(1, to as CurrencyId, from as CurrencyId);
+  if (!Number.isFinite(unitCost) || unitCost <= 0) {
+    return { wallet: normalized, units: 0, tax: 0, spent: 0 };
+  }
+  if (available < unitCost) {
     return { wallet: normalized, units: 0, tax: 0, spent: available };
   }
   const rate = dynamicTaxRate(step, normalized);
   const tax = Math.ceil(available * rate);
   const usable = available - tax;
-  const units = Math.floor(usable / 100);
-  const spent = units * 100 + tax;
-  if (!units) {
-    return { wallet: normalized, units: 0, tax, spent: tax };
+  if (usable < unitCost) {
+    return { wallet: normalized, units: 0, tax, spent: Math.min(available, tax) };
   }
+  const units = Math.floor(usable / unitCost);
+  if (!units) {
+    return { wallet: normalized, units: 0, tax, spent: Math.min(available, tax) };
+  }
+  const spentWithoutTax = convertCurrencyAmount(units, to as CurrencyId, from as CurrencyId);
+  const spent = Math.min(available, Math.trunc(spentWithoutTax + tax));
 
   normalized[from] = Math.max(0, normalized[from] - spent);
   normalized[to] = Math.max(0, normalized[to] + units);
@@ -111,7 +124,7 @@ function convertDown(
   if (units <= 0) {
     return { wallet: normalized, amount: 0 };
   }
-  const amount = units * 100;
+  const amount = convertCurrencyAmount(units, from as CurrencyId, to as CurrencyId);
   normalized[from] = Math.max(0, normalized[from] - units);
   normalized[to] = Math.max(0, normalized[to] + amount);
   return { wallet: normalized, amount };
@@ -181,27 +194,26 @@ export function convertCurrency(
     };
   }
   if (isHigherTier(from, to)) {
-    let state = cloneWallet(normalized);
-    let currentFrom: CurrencyCode = from;
-    let currentIndex = getIndex(from);
-    const targetIndex = getIndex(to);
-    let unitsRemaining = Math.min(Math.trunc(amount), state[currentFrom]);
-    let totalAmount = 0;
-    while (unitsRemaining > 0 && currentIndex > targetIndex) {
-      const nextCode = CURRENCY_ORDER[currentIndex - 1] ?? to;
-      const { wallet: nextWallet, amount: produced } = convertDown(state, currentFrom, nextCode, unitsRemaining);
-      state = nextWallet;
-      totalAmount = produced;
-      currentFrom = nextCode;
-      currentIndex -= 1;
-      unitsRemaining = Math.floor(totalAmount / 100);
+    const availableUnits = Math.min(Math.trunc(amount), normalized[from]);
+    if (availableUnits <= 0) {
+      return {
+        ok: false,
+        wallet: normalized,
+        tax: 0,
+        received: 0,
+        spent: 0,
+        step: `${from}->${to}` as CurrencyConversionStep,
+      };
     }
+    const produced = convertCurrencyAmount(availableUnits, from as CurrencyId, to as CurrencyId);
+    normalized[from] = Math.max(0, normalized[from] - availableUnits);
+    normalized[to] = Math.max(0, normalized[to] + produced);
     return {
-      ok: currentFrom === to,
-      wallet: state,
+      ok: availableUnits >= Math.trunc(amount),
+      wallet: normalized,
       tax: 0,
-      received: totalAmount,
-      spent: amount,
+      received: produced,
+      spent: availableUnits,
       step: `${from}->${to}` as CurrencyConversionStep,
     };
   }
@@ -272,9 +284,12 @@ function ensureFunds(
     if (higherAvailable <= 0) {
       continue;
     }
-    const multiplier = 100 ** (idx - targetIndex);
+    const producedPerUnit = convertCurrencyAmount(1, code as CurrencyId, currency as CurrencyId);
     const shortfall = Math.max(0, cost - available);
-    const neededUnits = Math.ceil(shortfall / multiplier);
+    if (producedPerUnit <= 0) {
+      continue;
+    }
+    const neededUnits = Math.ceil(shortfall / producedPerUnit);
     if (neededUnits <= 0) {
       continue;
     }

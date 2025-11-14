@@ -1,6 +1,8 @@
-export type CurrencyCode = 'VNT' | 'HNT' | 'TNT' | 'ThNT' | 'TT';
+import { getCurrencyOrder, type CurrencyId } from '../../../utils/currency.ts';
 
-export const CURRENCY_ORDER: readonly CurrencyCode[] = ['VNT', 'HNT', 'TNT', 'ThNT', 'TT'];
+export type CurrencyCode = CurrencyId;
+
+export const CURRENCY_ORDER: readonly CurrencyCode[] = getCurrencyOrder();
 
 export type Wallet = Record<CurrencyCode, number>;
 
