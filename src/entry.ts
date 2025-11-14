@@ -780,17 +780,19 @@ function renderPveLayout(options: RenderPveLayoutOptions): HTMLElement | null{
         <button type="button" class="pve-toolbar__button" data-action="exit">Thoát</button>
       </div>
     </div>
-    <div id="boardWrap">
-      <canvas id="board"></canvas>
-    </div>
-    <div id="bottomHUD" class="hud-bottom">
-      <div id="timer" class="chip chip-timer">04:00</div>
-      <div id="costChip" class="chip chip-cost">
-        <div id="costRing"></div>
-        <div id="costNow">0</div>
+    <div class="pve-stage">
+      <div id="boardWrap">
+        <canvas id="board"></canvas>
       </div>
+      <div id="bottomHUD" class="hud-bottom">
+        <div id="timer" class="chip chip-timer">04:00</div>
+        <div id="costChip" class="chip chip-cost">
+          <div id="costRing"></div>
+          <div id="costNow">0</div>
+        </div>
+      </div>
+      <div id="cards"></div>
     </div>
-    <div id="cards"></div>
   `;
   rootElement.appendChild(container);
   const exitButton = container.querySelector('[data-action="exit"]');
