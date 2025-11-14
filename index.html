@@ -59,17 +59,19 @@
 
     .app--pve{padding:16px 0 56px;}
     .pve-screen{max-width:1200px;margin:0 auto;padding:0 16px;}
+    .app--pve .pve-stage{display:flex;flex-direction:column;align-items:center;gap:32px;width:100%;max-width:1200px;margin:0 auto;}
     .pve-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px;}
     .pve-toolbar__title{margin:0;font-size:24px;letter-spacing:.04em;text-transform:uppercase;}
     .pve-toolbar__actions{display:flex;gap:12px;}
     .pve-toolbar__button{padding:10px 16px;border-radius:12px;border:1px solid rgba(125,211,252,.28);background:rgba(15,24,32,.72);color:inherit;font-weight:600;cursor:pointer;transition:background .18s ease,transform .18s ease;}
     .pve-toolbar__button:hover{transform:translateY(-1px);background:rgba(20,30,40,.9);}
 
-.app--pve #boardWrap{background:var(--panel);border-top:1px solid #0b1218;border-bottom:1px solid #0b1218;border-radius:12px;margin:0 auto 12px;padding:24px 28px;display:flex;justify-content:center;width:100%;max-width:1200px;}
+.app--pve #boardWrap{background:var(--panel);border-top:1px solid #0b1218;border-bottom:1px solid #0b1218;border-radius:12px;margin:0 auto;padding:24px 28px;display:flex;justify-content:center;width:100%;max-width:1200px;}
     .app--pve canvas{display:block;width:100%;height:auto;}
     .app--pve #board{height:auto;margin:0 auto;max-width:100%;}
-    .app--pve #bottomHUD{width:100%;display:flex;align-items:center;justify-content:center;gap:16px;margin-top:8px;position:relative;}
-    .app--pve #cards{display:grid;grid-template-columns:repeat(4,var(--cell,72px));gap:12px;place-content:center;margin:12px auto 0;width:fit-content;}
+    .app--pve .hud-bottom{width:100%;max-width:720px;margin:0 auto;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;gap:12px 16px;align-items:center;}
+    .app--pve #timer{grid-column:1 / -1;justify-self:center;}
+    .app--pve #cards{display:grid;grid-template-columns:repeat(4,var(--cell,72px));gap:12px;place-content:center;margin:0 auto;width:fit-content;padding:0 8px;}
     .app--pve #cards .card{width:var(--cell,72px);aspect-ratio:1/1;border-radius:12px;background:var(--card-bg);border:1px solid var(--card-border);position:relative;box-shadow:0 0 0 2px rgba(255,255,255,.06) inset;}
     .app--pve #cards .card.active{outline:2px solid #57ffa0;outline-offset:-2px;}
     .app--pve #cards .card .cost{position:absolute;right:8px;bottom:6px;font-weight:800;font-size:15px;color:var(--card-cost);text-shadow:0 0 6px rgba(125,211,252,.28);}
@@ -80,9 +82,8 @@
     .app--pve #cards .card:not(.disabled):not(:disabled){background:var(--card-bg-on);border-color:var(--card-border-on);box-shadow:0 0 0 2px rgba(125,211,252,.10) inset,0 4px 18px rgba(125,211,252,.12);}
     .app--pve #cards .card:not(.disabled):not(:disabled) .cost{color:var(--card-cost-on);text-shadow:0 0 10px rgba(125,211,252,.45);}
     .app--pve #cards .card.active:not(.disabled):not(:disabled){outline:2px solid #57ffa0;outline-offset:-2px;box-shadow:0 0 0 2px rgba(87,255,160,.25),0 6px 22px rgba(87,255,160,.22),0 0 0 2px rgba(125,211,252,.12) inset;}
-    .app--pve .hud-bottom{width:100%;display:flex;align-items:center;justify-content:center;gap:16px;margin-top:8px;position:relative;}
     .app--pve .chip-timer{min-width:108px;padding:10px 14px;border-radius:14px;background:#0e1620;box-shadow:inset 0 0 0 1px #1e293b;text-align:center;}
-    .app--pve .chip-cost{position:absolute;right:16px;bottom:0;width:48px;height:48px;border-radius:9999px;background:var(--chip-bg);box-shadow:inset 0 0 0 1px #284055;}
+    .app--pve .chip-cost{position:relative;width:56px;height:56px;border-radius:9999px;background:var(--chip-bg);box-shadow:inset 0 0 0 1px #284055;display:grid;place-items:center;padding:0;justify-self:end;align-self:end;grid-column:2;grid-row:2;}
     .app--pve #costNow{position:absolute;inset:0;display:grid;place-items:center;font-size:16px;font-weight:700;}
     .app--pve #costRing{position:absolute;inset:-2px;border-radius:50%;background:radial-gradient(closest-side,var(--chip-bg) 72%,transparent 73% 100%),conic-gradient(var(--cost-fill) var(--deg,0deg),var(--cost-rest) 0);}
     .app--pve .chip-cost.full{box-shadow:inset 0 0 0 2px var(--cost-fill),0 0 14px var(--chip-glow);filter:brightness(1.12);}
