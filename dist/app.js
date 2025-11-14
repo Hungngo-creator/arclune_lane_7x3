@@ -1,7 +1,7 @@
 // Bundled by build.mjs
 const __modules = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }
 function __define(id, factory){ __modules[id] = { factory, exports: null, initialized: false }; }
@@ -5156,6 +5156,7 @@ __define('./data/modes.ts', (exports, module, __require) => {
   const COMING_SOON_MODULE_ID = '@modes/coming-soon.stub.ts';
   const LINEUP_SCREEN_MODULE_ID = '@screens/lineup/index.ts';
   const COLLECTION_SCREEN_MODULE_ID = '@screens/collection/index.ts';
+  const ARENA_HUB_SCREEN_MODULE_ID = '@screens/arena-hub/index.ts';
   const GACHA_SCREEN_MODULE_ID = '@screens/ui-gacha/index.ts';
   const MODE_TYPES = {
       PVE: 'PvE',
@@ -5171,18 +5172,22 @@ __define('./data/modes.ts', (exports, module, __require) => {
       { id: 'core-pve', title: 'PvE' },
       { id: 'economy', title: 'Kinh tế & Hạ tầng' }
   ];
-  const MODE_GROUPS = [
+  const MODE_GROUPS = [];
+  const MODES = [
       {
           id: 'arena-hub',
-          shortDescription: 'Tụ điểm tổng hợp các hoạt động chiến đấu luân phiên để người chơi bước vào chiến dịch, thử thách và mùa giải.',
+          title: 'Chiến Trường',
+          type: MODE_TYPES.PVE,
+          status: MODE_STATUS.AVAILABLE,
           icon: '🏟️',
+          shortDescription: 'Tụ điểm tổng hợp các hoạt động chiến đấu luân phiên để người chơi bước vào chiến dịch, thử thách và mùa giải.',
           tags: ['PvE', 'PvP'],
           menuSections: ['core-pve'],
-          childModeIds: ['arena', 'beast-arena', 'ares', 'challenge', 'campaign'],
-          extraClasses: ['mode-card--wide']
-      }
-  ];
-  const MODES = [
+          shell: {
+              screenId: 'arena-hub',
+              moduleId: ARENA_HUB_SCREEN_MODULE_ID
+          }
+      },
       {
           id: 'campaign',
           type: MODE_TYPES.PVE,
@@ -14593,6 +14598,152 @@ __define('./scene.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'getCachedBattlefieldScene')) exports.getCachedBattlefieldScene = getCachedBattlefieldScene;
   if (!Object.prototype.hasOwnProperty.call(exports, 'drawBattlefieldScene')) exports.drawBattlefieldScene = drawBattlefieldScene;
 });
+__define('./screens/arena-hub/index.ts', (exports, module, __require) => {
+  const __dep0 = __require('./data/modes.ts');
+  const MODE_INDEX = __dep0.MODE_INDEX;
+  const MODE_STATUS = __dep0.MODE_STATUS;
+  const __dep1 = __require('./ui/dom.ts');
+  const ensureStyleTag = __dep1.ensureStyleTag;
+  const mountSection = __dep1.mountSection;
+  const __dep2 = __require('./screens/main-menu/view/events.ts');
+  const createModeCard = __dep2.createModeCard;
+  const STYLE_ID = 'arena-hub-screen-style';
+  const CHILD_MODE_IDS = ['arena', 'beast-arena', 'ares', 'challenge', 'campaign'];
+  const DEFAULT_TITLE = 'Arena Hub';
+  const DEFAULT_DESCRIPTION = 'Tụ điểm tổng hợp các hoạt động chiến đấu luân phiên để người chơi bước vào chiến dịch, thử thách và mùa giải.';
+  function ensureStyles() {
+      const css = `
+      .app--arena-hub{padding:32px 16px 64px;}
+      .arena-hub{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:32px;color:inherit;}
+      .arena-hub__header{display:flex;flex-direction:column;gap:18px;}
+      .arena-hub__title{margin:0;font-size:40px;letter-spacing:.08em;text-transform:uppercase;}
+      .arena-hub__description{margin:0;color:#9cbcd9;line-height:1.6;font-size:16px;}
+      .arena-hub__back{align-self:flex-start;padding:10px 18px;border-radius:999px;border:1px solid rgba(125,211,252,.32);background:rgba(12,22,32,.82);color:#aee4ff;letter-spacing:.08em;text-transform:uppercase;font-size:12px;cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;}
+      .arena-hub__back:hover{transform:translateY(-2px);border-color:rgba(174,228,255,.52);box-shadow:0 12px 26px rgba(6,12,20,.4);}
+      .arena-hub__back:focus-visible{outline:2px solid rgba(174,228,255,.75);outline-offset:3px;}
+      .arena-hub__content{display:flex;flex-direction:column;gap:24px;}
+      .arena-hub__cards{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));}
+      .arena-hub__cards .mode-card{width:100%;}
+      .arena-hub__cards .mode-card__status{top:16px;right:16px;}
+      .arena-hub__cards .mode-card:hover{transform:translateY(-2px);}
+      .arena-hub__empty{margin:0;color:#9cbcd9;font-size:14px;line-height:1.6;}
+      @media(max-width:640px){
+        .arena-hub__title{font-size:32px;}
+        .arena-hub__cards{grid-template-columns:minmax(0,1fr);}
+      }
+    `;
+      ensureStyleTag(STYLE_ID, { css });
+  }
+  function cloneParams(params) {
+      if (!params) {
+          return null;
+      }
+      return { ...params };
+  }
+  function toMenuCardMetadata(mode) {
+      var _a, _b, _c;
+      const params = mode.status === MODE_STATUS.AVAILABLE
+          ? cloneParams((_a = mode.shell) === null || _a === void 0 ? void 0 : _a.defaultParams)
+          : null;
+      return {
+          key: mode.id,
+          id: ((_b = mode.shell) === null || _b === void 0 ? void 0 : _b.screenId) || mode.id,
+          title: mode.title,
+          description: mode.shortDescription,
+          icon: mode.icon,
+          tags: Array.isArray(mode.tags) ? [...mode.tags] : [],
+          status: mode.status,
+          params,
+          parentId: (_c = mode.parentId) !== null && _c !== void 0 ? _c : null,
+      };
+  }
+  function render(options) {
+      const { root, shell = null, definition = null } = options !== null && options !== void 0 ? options : { root: null };
+      if (!root) {
+          throw new Error('render Arena Hub cần một phần tử root hợp lệ.');
+      }
+      ensureStyles();
+      const cleanups = [];
+      const addCleanup = fn => {
+          if (typeof fn === 'function') {
+              cleanups.push(fn);
+          }
+      };
+      const container = document.createElement('div');
+      container.className = 'arena-hub';
+      const mount = mountSection({
+          root,
+          section: container,
+          rootClasses: 'app--arena-hub',
+      });
+      const header = document.createElement('header');
+      header.className = 'arena-hub__header';
+      container.appendChild(header);
+      const backButton = document.createElement('button');
+      backButton.type = 'button';
+      backButton.className = 'arena-hub__back';
+      backButton.textContent = '← Trở về menu chính';
+      const handleBack = (event) => {
+          event.preventDefault();
+          if (shell && typeof shell.enterScreen === 'function') {
+              shell.enterScreen('main-menu');
+          }
+      };
+      backButton.addEventListener('click', handleBack);
+      addCleanup(() => backButton.removeEventListener('click', handleBack));
+      header.appendChild(backButton);
+      const title = document.createElement('h1');
+      title.className = 'arena-hub__title';
+      const normalizedTitle = (definition === null || definition === void 0 ? void 0 : definition.label) && definition.label.trim().length
+          ? definition.label.trim()
+          : DEFAULT_TITLE;
+      title.textContent = normalizedTitle;
+      header.appendChild(title);
+      const descriptionText = (definition === null || definition === void 0 ? void 0 : definition.description) && definition.description.trim().length
+          ? definition.description
+          : DEFAULT_DESCRIPTION;
+      const description = document.createElement('p');
+      description.className = 'arena-hub__description';
+      description.textContent = descriptionText;
+      header.appendChild(description);
+      const content = document.createElement('section');
+      content.className = 'arena-hub__content';
+      container.appendChild(content);
+      const cardsWrapper = document.createElement('div');
+      cardsWrapper.className = 'arena-hub__cards';
+      content.appendChild(cardsWrapper);
+      const childMetadata = CHILD_MODE_IDS.map(childId => MODE_INDEX[childId]).filter((mode) => Boolean(mode));
+      if (childMetadata.length === 0) {
+          const emptyMessage = document.createElement('p');
+          emptyMessage.className = 'arena-hub__empty';
+          emptyMessage.textContent = 'Chưa có chế độ nào khả dụng.';
+          content.appendChild(emptyMessage);
+      }
+      else {
+          childMetadata.forEach(mode => {
+              const metadata = toMenuCardMetadata(mode);
+              const card = createModeCard(metadata, shell, undefined, addCleanup);
+              cardsWrapper.appendChild(card);
+          });
+      }
+      return {
+          destroy() {
+              cleanups.forEach(fn => {
+                  try {
+                      fn();
+                  }
+                  catch (error) {
+                      console.error('[arena-hub] cleanup failed', error);
+                  }
+              });
+              cleanups.length = 0;
+              mount.destroy();
+          },
+      };
+  }
+
+  if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
+});
 __define('./screens/collection/helpers.ts', (exports, module, __require) => {
   const __dep0 = __require('./catalog.ts');
   const ROSTER = __dep0.ROSTER;
@@ -19383,7 +19534,7 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'createHeader')) exports.createHeader = createHeader;
 });
 __define('./screens/ui-gacha/gacha.css', (exports, module, __require) => {
-  const css = ":root {\n  color-scheme: dark;\n  font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;\n  --bg-page: #05090f;\n  --bg-panel: rgba(12, 18, 28, 0.88);\n  --bg-accent: rgba(16, 28, 42, 0.74);\n  --border-accent: rgba(120, 196, 255, 0.28);\n  --text-main: #e9f2ff;\n  --text-muted: rgba(192, 220, 244, 0.8);\n  --primary: #76d4ff;\n  --highlight: linear-gradient(135deg, rgba(118, 212, 255, 0.45), rgba(255, 154, 255, 0.4));\n  --rarity-n: #7b869a;\n  --rarity-r: #57a8ff;\n  --rarity-sr: #a47dff;\n  --rarity-ssr: #ffc866;\n  --rarity-ur: #ff6a9f;\n  --rarity-prime: #6cffeb;\n}\n\n* {\n  box-sizing: border-box;\n}\n\nbody.gacha-ui {\n  margin: 0;\n  min-height: 100vh;\n  background: radial-gradient(circle at top left, rgba(118, 212, 255, 0.18), transparent 45%),\n    radial-gradient(circle at bottom right, rgba(255, 154, 255, 0.2), transparent 50%), var(--bg-page);\n  color: var(--text-main);\n  display: flex;\n  justify-content: center;\n  padding: 32px;\n}\n\nbutton {\n  font-family: inherit;\n  color: inherit;\n}\n\n.gacha-ui-root {\n  width: min(1280px, 100%);;\n  display: flex;\n  flex-direction: column;\n  gap: 24px;\n}\n\n.gacha-header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 16px;\n}\n\n.currency-bar {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));\n  gap: 12px;\n  background: var(--bg-panel);\n  padding: 14px 18px;\n  border-radius: 20px;\n  border: 1px solid var(--border-accent);\n  box-shadow: 0 18px 48px rgba(5, 12, 20, 0.45);\n}\n\n.currency-chip {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 12px;\n  padding: 10px 14px;\n  border-radius: 16px;\n  border: 1px solid transparent;\n  background: var(--bg-accent);\n  cursor: pointer;\n  transition: transform 0.16s ease, border-color 0.16s ease;\n}\n\n.currency-chip:hover,\n.currency-chip:focus-visible {\n  transform: translateY(-3px);\n  border-color: rgba(118, 212, 255, 0.65);\n  outline: none;\n}\n\n.currency-chip__icon {\n  width: 36px;\n  height: 36px;\n  border-radius: 50%;\n  background: rgba(118, 212, 255, 0.18);\n  display: grid;\n  place-items: center;\n}\n\n.currency-chip__icon img {\n  width: 24px;\n  height: 24px;\n}\n\n.currency-chip__info {\n  display: flex;\n  flex-direction: column;\n  align-items: flex-start;\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n  color: var(--text-muted);\n}\n\n.currency-chip__code {\n  font-weight: 600;\n  color: var(--text-main);\n}\n\n.currency-chip__value {\n  font-weight: 600;\n  font-variant-numeric: tabular-nums;\n}\n\n.rules-button {\n  padding: 12px 18px;\n  border-radius: 16px;\n  border: 1px solid rgba(118, 212, 255, 0.5);\n  background: rgba(10, 16, 24, 0.86);\n  cursor: pointer;\n  text-transform: uppercase;\n  letter-spacing: 0.12em;\n  font-size: 12px;\n}\n\n.gacha-body {\n  display: grid;\n  grid-template-columns: 280px 1fr;\n  gap: 24px;\n}\n\n.banner-sidebar {\n  background: var(--bg-panel);\n  border-radius: 24px;\n  border: 1px solid var(--border-accent);\n  padding: 18px;\n  display: flex;\n  flex-direction: column;\n  gap: 12px;\n  overflow-y: auto;\n  max-height: calc(100vh - 220px);\n}\n\n.banner-entry {\n  width: 100%;\n  text-align: left;\n  padding: 14px 16px;\n  border-radius: 18px;\n  border: 1px solid transparent;\n  background: rgba(16, 26, 40, 0.88);\n  cursor: pointer;\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n  transition: transform 0.18s ease, border-color 0.18s ease;\n}\n\n.banner-entry__title {;\n  font-weight: 600;\n}\n\n.banner-entry__timer {\n  font-size: 12px;\n  color: var(--text-muted);\n}\n\n.banner-entry:hover,\n.banner-entry:focus-visible {\n  transform: translateX(6px);\n  border-color: rgba(118, 212, 255, 0.6);\n  outline: none;\n}\n\n.banner-entry.is-active {\n  border-color: rgba(255, 154, 255, 0.65);\n  background: linear-gradient(135deg, rgba(118, 212, 255, 0.22), rgba(255, 154, 255, 0.16));\n}\n\n.banner-panel {\n  background: var(--bg-panel);\n  border-radius: 28px;\n  border: 1px solid var(--border-accent);\n  padding: 24px;\n  display: grid;\n  gap: 18px;\n  position: relative;\n  overflow: hidden;\n}\n\n.banner-panel__header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n}\n\n.banner-title {\n  margin: 0;\n  font-size: 26px;\n  letter-spacing: 0.04em;\n  text-transform: uppercase;\n}\n\n.banner-desc {\n  margin: 6px 0 0;\n  color: var(--text-muted);\n}\n\n.banner-timer {\n  font-size: 13px;\n  color: var(--primary);\n}\n\n.banner-panel__art {\n  border-radius: 22px;\n  background: rgba(10, 16, 24, 0.7);\n  overflow: hidden;\n  min-height: 180px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.banner-panel__art img {\n  width: 100%;\n  height: 100%;\n  object-fit: cover;\n  filter: saturate(120%);\n}\n\n.rate-list {\n  display: grid;\n  grid-template-columns: repeat(3, minmax(0, 1fr));\n  gap: 8px 16px;\n  margin: 0;\n}\n\n.hrate-list dt {\n  font-weight: 600;\n}\n\n.rate-list dd {\n  margin: 0;\n  color: var(--text-muted);\n}\n\n.banner-panel__pity {\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n}\n\n.pity-meter {\n  display: grid;\n  grid-template-columns: 80px 1fr 80px;\n  align-items: center;\n  gap: 12px;\n}\n\n.pity-meter__label {\n  font-size: 12px;\n  text-transform: uppercase;\n  color: var(--text-muted);\n}\n\n.pity-meter__bar {\n  position: relative;\n  height: 8px;\n  border-radius: 999px;\n  background: rgba(118, 212, 255, 0.15);\n  overflow: hidden;\n}\n\n.pity-meter__progress {\n  position: absolute;\n  inset: 0;\n  border-radius: 999px;\n  background: var(--highlight);\n}\n\n.pity-meter__value {\n  font-variant-numeric: tabular-nums;\n  justify-self: end;\n}\n\n.featured__heading {\n  margin: 0;\n  font-size: 16px;\n  letter-spacing: 0.08em;\n  text-transform: uppercase;\n}\n\n.featured__note {\n  margin: 2px 0 12px;\n  color: var(--text-muted);\n  font-size: 12px;\n}\n\n.featured-card {\n  display: flex;\n  gap: 10px;\n  align-items: center;\n  padding: 10px 14px;\n  border-radius: 16px;\n  background: rgba(20, 32, 48, 0.9);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n  font-weight: 600;\n}\n\n.featured-card + .featured-card {\n  margin-top: 8px;\n}\n\n.featured-card__rarity {\n  font-size: 13px;\n  padding: 4px 8px;\n  border-radius: 999px;\n  background: rgba(118, 212, 255, 0.18);\n}\n\n.featured-card__name {\n  font-size: 15px;\n}\n\n.banner-panel__cost {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));\n  gap: 12px;\n}\n\n.cost-entry {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding: 12px 14px;\n  border-radius: 16px;\n  background: rgba(20, 32, 48, 0.86);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n}\n\n.cost-entry__value {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  font-weight: 600;\n}\n\n.cost-entry__value img {\n  width: 18px;\n  height: 18px;\n}\n\n.banner-panel__actions {\n  display: flex;\n  gap: 12px;\n}\n\n.banner-panel__actions button {\n  flex: 1;\n  padding: 14px 18px;\n  border-radius: 18px;\n  border: 1px solid rgba(118, 212, 255, 0.45);\n  background: rgba(16, 28, 42, 0.9);\n  text-transform: uppercase;\n  letter-spacing: 0.12em;\n  cursor: pointer;\n  transition: transform 0.16s ease, border-color 0.16s ease;\n}\n\n.banner-panel__actions button:hover,\n.banner-panel__actions button:focus-visible {\n  transform: translateY(-2px);\n  border-color: rgba(255, 154, 255, 0.6);\n  outline: none;\n}\n\n.banner-panel__results {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));\n  gap: 10px;\n}\n\n.result-entry {\n  padding: 12px 14px;\n  border-radius: 16px;\n  background: rgba(16, 28, 42, 0.82);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n  display: grid;\n  gap: 6px;\n}\n\n.result-entry__rarity {\n  font-weight: 700;\n  text-transform: uppercase;\n}\n\n.result-entry__name {\n  color: var(--text-muted);\n}\n\n.result-entry__pity {\n  font-size: 12px;\n  color: var(--primary);\n}\n\n.modal-overlay {\n  position: fixed;\n  inset: 0;\n  backdrop-filter: blur(12px);\n  background: rgba(5, 10, 18, 0.68);\n  display: grid;\n  place-items: center;\n  z-index: 2000;\n}\n\n.modal-content {\n  width: min(420px, 92vw);\n  background: rgba(10, 16, 24, 0.92);\n  border-radius: 20px;\n  border: 1px solid rgba(118, 212, 255, 0.3);\n  padding: 24px;\n  color: var(--text-main);\n  box-shadow: 0 24px 64px rgba(5, 12, 20, 0.55);\n}\n\n.modal-content h2 {\n  margin-top: 0;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n}\n\n.modal-content ul {\n  margin: 12px 0 0;\n  padding-left: 20px;\n  color: var(--text-muted);\n}\n\n.gacha-toast {\n  position: fixed;\n  right: 24px;\n  bottom: 24px;\n  background: rgba(16, 28, 42, 0.92);\n  border-radius: 16px;\n  padding: 12px 18px;\n  border: 1px solid rgba(118, 212, 255, 0.35);\n  opacity: 0;\n  transform: translateY(12px);\n  transition: opacity 0.2s ease, transform 0.2s ease;\n  pointer-events: none;\n}\n\ngacha-toast.is-visible {\n  opacity: 1;\n  transform: translateY(0);\n}\n\n@media (max-width: 960px) {\n  .gacha-body {\n    grid-template-columns: 1fr;\n  }\n\n  .banner-sidebar {\n    flex-direction: row;\n    overflow-x: auto;\n    max-height: none;\n  }\n\n  .banner-entry {\n    min-width: 220px;\n  }\n}\n\n@media (max-width: 720px) {\n  body.gacha-ui {\n    padding: 24px 16px;\n}\n\n.currency-bar {\n    grid-template-columns: repeat(2, minmax(0, 1fr));\n  }\n}";
+  const css = ":root {\n  color-scheme: dark;\n  font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;\n  --bg-page: #05090f;\n  --bg-panel: rgba(12, 18, 28, 0.88);\n  --bg-accent: rgba(16, 28, 42, 0.74);\n  --border-accent: rgba(120, 196, 255, 0.28);\n  --text-main: #e9f2ff;\n  --text-muted: rgba(192, 220, 244, 0.8);\n  --primary: #76d4ff;\n  --highlight: linear-gradient(135deg, rgba(118, 212, 255, 0.45), rgba(255, 154, 255, 0.4));\n  --rarity-n: #7b869a;\n  --rarity-r: #57a8ff;\n  --rarity-sr: #a47dff;\n  --rarity-ssr: #ffc866;\n  --rarity-ur: #ff6a9f;\n  --rarity-prime: #6cffeb;\n}\n\n* {\n  box-sizing: border-box;\n}\n\nbody.gacha-ui {\n  margin: 0;\n  min-height: 100vh;\n  background: radial-gradient(circle at top left, rgba(118, 212, 255, 0.18), transparent 45%),\n    radial-gradient(circle at bottom right, rgba(255, 154, 255, 0.2), transparent 50%), var(--bg-page);\n  color: var(--text-main);\n  display: flex;\n  justify-content: center;\n  padding: 32px;\n}\n\nbutton {\n  font-family: inherit;\n  color: inherit;\n}\n\n.gacha-topbar {\n  display: grid;\n  grid-template-columns: auto auto 1fr auto;\n  align-items: center;\n  gap: 16px;\n  padding: 16px 20px;\n  border-radius: 24px;\n  border: 1px solid var(--border-accent);\n  background: var(--bg-panel);\n  box-shadow: 0 18px 48px rgba(5, 12, 20, 0.45);\n}\n\n.gacha-topbar__back-button {\n  display: inline-flex;\n  align-items: center;\n  gap: 8px;\n  padding: 10px 18px;\n  border-radius: 999px;\n  border: 1px solid rgba(118, 212, 255, 0.32);\n  background: rgba(12, 18, 28, 0.78);\n  color: var(--text-main);\n  font-size: 14px;\n  font-weight: 600;\n  letter-spacing: 0.02em;\n  cursor: pointer;\n  text-decoration: none;\n  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease,\n    box-shadow 0.18s ease;\n}\n\n.gacha-topbar__back-button:hover,\n.gacha-topbar__back-button:focus-visible {\n  background: rgba(18, 28, 42, 0.92);\n  border-color: rgba(118, 212, 255, 0.68);\n  transform: translateY(-1px);\n  box-shadow: 0 0 0 3px rgba(118, 212, 255, 0.24);\n  outline: none;\n}\n\n.gacha-topbar__back-button:active {\n  background: rgba(10, 18, 30, 0.95);\n  border-color: rgba(118, 212, 255, 0.8);\n  transform: translateY(0);\n  box-shadow: 0 0 0 2px rgba(118, 212, 255, 0.18);\n}\n\n.gacha-ui-root {\n  width: min(1280px, 100%);;\n  display: flex;\n  flex-direction: column;\n  gap: 24px;\n}\n\n.gacha-header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 16px;\n}\n\n.currency-bar {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));\n  gap: 12px;\n  background: var(--bg-panel);\n  padding: 14px 18px;\n  border-radius: 20px;\n  border: 1px solid var(--border-accent);\n  box-shadow: 0 18px 48px rgba(5, 12, 20, 0.45);\n}\n\n.currency-chip {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 12px;\n  padding: 10px 14px;\n  border-radius: 16px;\n  border: 1px solid transparent;\n  background: var(--bg-accent);\n  cursor: pointer;\n  transition: transform 0.16s ease, border-color 0.16s ease;\n}\n\n.currency-chip:hover,\n.currency-chip:focus-visible {\n  transform: translateY(-3px);\n  border-color: rgba(118, 212, 255, 0.65);\n  outline: none;\n}\n\n.currency-chip__icon {\n  width: 36px;\n  height: 36px;\n  border-radius: 50%;\n  background: rgba(118, 212, 255, 0.18);\n  display: grid;\n  place-items: center;\n}\n\n.currency-chip__icon img {\n  width: 24px;\n  height: 24px;\n}\n\n.currency-chip__info {\n  display: flex;\n  flex-direction: column;\n  align-items: flex-start;\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n  color: var(--text-muted);\n}\n\n.currency-chip__code {\n  font-weight: 600;\n  color: var(--text-main);\n}\n\n.currency-chip__value {\n  font-weight: 600;\n  font-variant-numeric: tabular-nums;\n}\n\n.rules-button {\n  padding: 12px 18px;\n  border-radius: 16px;\n  border: 1px solid rgba(118, 212, 255, 0.5);\n  background: rgba(10, 16, 24, 0.86);\n  cursor: pointer;\n  text-transform: uppercase;\n  letter-spacing: 0.12em;\n  font-size: 12px;\n}\n\n.gacha-body {\n  display: grid;\n  grid-template-columns: 280px 1fr;\n  gap: 24px;\n}\n\n.banner-sidebar {\n  background: var(--bg-panel);\n  border-radius: 24px;\n  border: 1px solid var(--border-accent);\n  padding: 18px;\n  display: flex;\n  flex-direction: column;\n  gap: 12px;\n  overflow-y: auto;\n  max-height: calc(100vh - 220px);\n}\n\n.banner-entry {\n  width: 100%;\n  text-align: left;\n  padding: 14px 16px;\n  border-radius: 18px;\n  border: 1px solid transparent;\n  background: rgba(16, 26, 40, 0.88);\n  cursor: pointer;\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n  transition: transform 0.18s ease, border-color 0.18s ease;\n}\n\n.banner-entry__title {;\n  font-weight: 600;\n}\n\n.banner-entry__timer {\n  font-size: 12px;\n  color: var(--text-muted);\n}\n\n.banner-entry:hover,\n.banner-entry:focus-visible {\n  transform: translateX(6px);\n  border-color: rgba(118, 212, 255, 0.6);\n  outline: none;\n}\n\n.banner-entry.is-active {\n  border-color: rgba(255, 154, 255, 0.65);\n  background: linear-gradient(135deg, rgba(118, 212, 255, 0.22), rgba(255, 154, 255, 0.16));\n}\n\n.banner-panel {\n  background: var(--bg-panel);\n  border-radius: 28px;\n  border: 1px solid var(--border-accent);\n  padding: 24px;\n  display: grid;\n  gap: 18px;\n  position: relative;\n  overflow: hidden;\n}\n\n.banner-panel__header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n}\n\n.banner-title {\n  margin: 0;\n  font-size: 26px;\n  letter-spacing: 0.04em;\n  text-transform: uppercase;\n}\n\n.banner-desc {\n  margin: 6px 0 0;\n  color: var(--text-muted);\n}\n\n.banner-timer {\n  font-size: 13px;\n  color: var(--primary);\n}\n\n.banner-panel__art {\n  border-radius: 22px;\n  background: rgba(10, 16, 24, 0.7);\n  overflow: hidden;\n  min-height: 180px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.banner-panel__art img {\n  width: 100%;\n  height: 100%;\n  object-fit: cover;\n  filter: saturate(120%);\n}\n\n.rate-list {\n  display: grid;\n  grid-template-columns: repeat(3, minmax(0, 1fr));\n  gap: 8px 16px;\n  margin: 0;\n}\n\n.hrate-list dt {\n  font-weight: 600;\n}\n\n.rate-list dd {\n  margin: 0;\n  color: var(--text-muted);\n}\n\n.banner-panel__pity {\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n}\n\n.pity-meter {\n  display: grid;\n  grid-template-columns: 80px 1fr 80px;\n  align-items: center;\n  gap: 12px;\n}\n\n.pity-meter__label {\n  font-size: 12px;\n  text-transform: uppercase;\n  color: var(--text-muted);\n}\n\n.pity-meter__bar {\n  position: relative;\n  height: 8px;\n  border-radius: 999px;\n  background: rgba(118, 212, 255, 0.15);\n  overflow: hidden;\n}\n\n.pity-meter__progress {\n  position: absolute;\n  inset: 0;\n  border-radius: 999px;\n  background: var(--highlight);\n}\n\n.pity-meter__value {\n  font-variant-numeric: tabular-nums;\n  justify-self: end;\n}\n\n.featured__heading {\n  margin: 0;\n  font-size: 16px;\n  letter-spacing: 0.08em;\n  text-transform: uppercase;\n}\n\n.featured__note {\n  margin: 2px 0 12px;\n  color: var(--text-muted);\n  font-size: 12px;\n}\n\n.featured-card {\n  display: flex;\n  gap: 10px;\n  align-items: center;\n  padding: 10px 14px;\n  border-radius: 16px;\n  background: rgba(20, 32, 48, 0.9);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n  font-weight: 600;\n}\n\n.featured-card + .featured-card {\n  margin-top: 8px;\n}\n\n.featured-card__rarity {\n  font-size: 13px;\n  padding: 4px 8px;\n  border-radius: 999px;\n  background: rgba(118, 212, 255, 0.18);\n}\n\n.featured-card__name {\n  font-size: 15px;\n}\n\n.banner-panel__cost {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));\n  gap: 12px;\n}\n\n.cost-entry {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding: 12px 14px;\n  border-radius: 16px;\n  background: rgba(20, 32, 48, 0.86);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n}\n\n.cost-entry__value {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  font-weight: 600;\n}\n\n.cost-entry__value img {\n  width: 18px;\n  height: 18px;\n}\n\n.banner-panel__actions {\n  display: flex;\n  gap: 12px;\n}\n\n.banner-panel__actions button {\n  flex: 1;\n  padding: 14px 18px;\n  border-radius: 18px;\n  border: 1px solid rgba(118, 212, 255, 0.45);\n  background: rgba(16, 28, 42, 0.9);\n  text-transform: uppercase;\n  letter-spacing: 0.12em;\n  cursor: pointer;\n  transition: transform 0.16s ease, border-color 0.16s ease;\n}\n\n.banner-panel__actions button:hover,\n.banner-panel__actions button:focus-visible {\n  transform: translateY(-2px);\n  border-color: rgba(255, 154, 255, 0.6);\n  outline: none;\n}\n\n.banner-panel__results {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));\n  gap: 10px;\n}\n\n.result-entry {\n  padding: 12px 14px;\n  border-radius: 16px;\n  background: rgba(16, 28, 42, 0.82);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n  display: grid;\n  gap: 6px;\n}\n\n.result-entry__rarity {\n  font-weight: 700;\n  text-transform: uppercase;\n}\n\n.result-entry__name {\n  color: var(--text-muted);\n}\n\n.result-entry__pity {\n  font-size: 12px;\n  color: var(--primary);\n}\n\n.modal-overlay {\n  position: fixed;\n  inset: 0;\n  backdrop-filter: blur(12px);\n  background: rgba(5, 10, 18, 0.68);\n  display: grid;\n  place-items: center;\n  z-index: 2000;\n}\n\n.modal-content {\n  width: min(420px, 92vw);\n  background: rgba(10, 16, 24, 0.92);\n  border-radius: 20px;\n  border: 1px solid rgba(118, 212, 255, 0.3);\n  padding: 24px;\n  color: var(--text-main);\n  box-shadow: 0 24px 64px rgba(5, 12, 20, 0.55);\n}\n\n.modal-content h2 {\n  margin-top: 0;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n}\n\n.modal-content ul {\n  margin: 12px 0 0;\n  padding-left: 20px;\n  color: var(--text-muted);\n}\n\n.gacha-toast {\n  position: fixed;\n  right: 24px;\n  bottom: 24px;\n  background: rgba(16, 28, 42, 0.92);\n  border-radius: 16px;\n  padding: 12px 18px;\n  border: 1px solid rgba(118, 212, 255, 0.35);\n  opacity: 0;\n  transform: translateY(12px);\n  transition: opacity 0.2s ease, transform 0.2s ease;\n  pointer-events: none;\n}\n\ngacha-toast.is-visible {\n  opacity: 1;\n  transform: translateY(0);\n}\n\n@media (max-width: 960px) {\n  .gacha-body {\n    grid-template-columns: 1fr;\n  }\n\n  .banner-sidebar {\n    flex-direction: row;\n    overflow-x: auto;\n    max-height: none;\n  }\n\n  .banner-entry {\n    min-width: 220px;\n  }\n}\n\n@media (max-width: 720px) {\n  body.gacha-ui {\n    padding: 24px 16px;\n}\n\n.currency-bar {\n    grid-template-columns: repeat(2, minmax(0, 1fr));\n  }\n}";
   module.exports = css;
   module.exports.default = css;
 });
@@ -19787,6 +19938,15 @@ __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
   const GACHA_TEMPLATE = /* html */ `
     <div class="gacha-app" data-app-root>
       <header class="gacha-topbar" data-section="topbar">
+      <button
+          class="gacha-topbar__back-button"
+          type="button"
+          aria-label="Trở về"
+          title="Trở về"
+          data-action="go-back"
+        >
+          ← Trở về 
+        </button>
         <button
           class="banner-drawer-toggle"
           type="button"
