@@ -4350,6 +4350,7 @@ __define('./config.ts', (exports, module, __require) => {
           BOARD_MAX_W: 1144,
           BOARD_MIN_H: 220,
           BOARD_H_RATIO: 3 / 7,
+          BOARD_VERTICAL_ALIGN: 0.7,
           MAX_DPR: 2.5,
           MAX_PIXEL_AREA: 2400000,
           CARD_GAP: 12,
@@ -4513,6 +4514,7 @@ __define('./config/schema.ts', (exports, module, __require) => {
       BOARD_MAX_W: z.number(),
       BOARD_MIN_H: z.number(),
       BOARD_H_RATIO: z.number(),
+      BOARD_VERTICAL_ALIGN: z.number(),
       MAX_DPR: z.number(),
       MAX_PIXEL_AREA: z.number(),
       CARD_GAP: z.number(),
@@ -5295,13 +5297,7 @@ __define('./data/modes.ts', (exports, module, __require) => {
                           title: 'Khởi đầu Cân bằng',
                           role: 'PvE cốt truyện',
                           description: 'Đội hình 3 DPS linh hoạt kèm 1 hỗ trợ buff và 1 tanker giữ aggro cho các màn đầu.',
-                          members: [
-                              'Thần Kiếm Lục Ảnh · DPS',
-                              'Huyền Chân Đan Sư · Hỗ trợ',
-                              'Thiên Khuyết Long Ẩn · DPS',
-                              'Thánh Hộ Vệ Viêm Lân · Tank',
-                              'Thái Âm Tuyết Hồ · DPS phụ'
-                          ]
+                          members: []
                       }
                   ]
               }
@@ -7418,6 +7414,7 @@ __define('./engine.ts', (exports, module, __require) => {
   const TOKEN_STYLE = __dep0.TOKEN_STYLE;
   const CHIBI = __dep0.CHIBI;
   const CFG = __dep0.CFG;
+  const CAM = __dep0.CAM;
   const __dep1 = __require('./art.ts');
   const getUnitArt = __dep1.getUnitArt;
   const getUnitSkin = __dep1.getUnitSkin;
@@ -7438,7 +7435,7 @@ __define('./engine.ts', (exports, module, __require) => {
   }
   /* ---------- Grid ---------- */
   function makeGrid(canvas, cols, rows) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
+      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;
       const pad = coerceFinite((_a = CFG.UI) === null || _a === void 0 ? void 0 : _a.PAD, 12);
       const boardMaxW = coerceFinite((_b = CFG.UI) === null || _b === void 0 ? void 0 : _b.BOARD_MAX_W, 1144);
       let viewportW = boardMaxW + pad * 2;
@@ -7526,7 +7523,21 @@ __define('./engine.ts', (exports, module, __require) => {
       const usableH = displayH - pad * 2;
       const tile = Math.floor(Math.min(usableW / cols, usableH / rows));
       const ox = Math.floor((displayW - tile * cols) / 2);
-      const oy = Math.floor((displayH - tile * rows) / 2);
+      const cameraKey = ((_l = CFG.CAMERA) !== null && _l !== void 0 ? _l : 'landscape_oblique');
+      const cameraPreset = (_o = (_m = CAM === null || CAM === void 0 ? void 0 : CAM[cameraKey]) !== null && _m !== void 0 ? _m : CAM === null || CAM === void 0 ? void 0 : CAM.landscape_oblique) !== null && _o !== void 0 ? _o : null;
+      const rawRowGapRatio = cameraPreset && typeof cameraPreset.rowGapRatio === 'number'
+          ? cameraPreset.rowGapRatio
+          : DEFAULT_OBLIQUE_CAMERA.rowGapRatio;
+      const rowGapRatio = Number.isFinite(rawRowGapRatio) && rawRowGapRatio > 0
+          ? rawRowGapRatio
+          : 1;
+      const alignRaw = (_p = CFG.UI) === null || _p === void 0 ? void 0 : _p.BOARD_VERTICAL_ALIGN;
+      const align = Number.isFinite(alignRaw)
+          ? Math.min(Math.max(alignRaw, 0), 1)
+          : 0.5;
+      const boardVisualHeight = Math.max(0, tile * rows * rowGapRatio);
+      const verticalFree = Math.max(0, displayH - boardVisualHeight);
+      const oy = Math.floor(verticalFree * align);
       return {
           cols,
           rows,
@@ -18747,6 +18758,33 @@ __define('./screens/main-menu/view/events.ts', (exports, module, __require) => {
       ['Coming soon', 'mode-tag--coming'],
       ['Kinh tế nguyên tinh', 'mode-tag--economy']
   ]);
+  const ECONOMY_COMPACT_KEYS = new Set([
+      'tongmon',
+      'gacha',
+      'lineup',
+      'collection',
+      'market',
+      'events',
+      'social'
+  ]);
+  function resolveDisplaySettings(mode) {
+      if ((mode === null || mode === void 0 ? void 0 : mode.key) && ECONOMY_COMPACT_KEYS.has(mode.key)) {
+          const filteredTags = (mode.tags || []).filter(tag => tag && tag !== 'Kinh tế nguyên tinh' && tag !== 'Coming soon');
+          const compactMode = {
+              ...mode,
+              description: undefined,
+              tags: filteredTags
+          };
+          return {
+              displayMode: compactMode,
+              extraClasses: ['mode-card--compact']
+          };
+      }
+      return {
+          displayMode: mode,
+          extraClasses: []
+      };
+  }
   function cueTone(tone) {
       if (tone && TONE_ICONS[tone]) {
           return { icon: TONE_ICONS[tone], tone };
@@ -18828,12 +18866,18 @@ __define('./screens/main-menu/view/events.ts', (exports, module, __require) => {
   function createModeCard(mode, shell, onShowComingSoon, addCleanup, options = {}) {
       const button = document.createElement('button');
       button.type = 'button';
+      const { displayMode, extraClasses: displayExtraClasses } = resolveDisplaySettings(mode);
       const extraClasses = Array.isArray(options.extraClasses)
-          ? options.extraClasses
+          ? [...options.extraClasses]
           : options.extraClass
               ? [options.extraClass]
               : [];
-      buildModeCardBase(button, mode, {
+      displayExtraClasses.forEach(cls => {
+          if (!extraClasses.includes(cls)) {
+              extraClasses.push(cls);
+          }
+      });
+      buildModeCardBase(button, displayMode, {
           extraClasses,
           showStatus: options.showStatus !== false
       });
@@ -19128,7 +19172,7 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
       const css = `
       .app--main-menu{padding:32px 16px 64px;}
       .main-menu-v2{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:32px;color:inherit;}
-      .main-menu-v2__header{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-end;justify-content:space-between;}
+      .main-menu-v2__header{display:none;}
       .main-menu-v2__brand{display:flex;flex-direction:column;gap:10px;max-width:520px;}
       .main-menu-v2__title{margin:0;font-size:44px;letter-spacing:.08em;text-transform:uppercase;}
       .main-menu-v2__subtitle{margin:0;color:#9cbcd9;line-height:1.6;font-size:17px;}
@@ -19185,6 +19229,15 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
       .mode-tag--coming{color:#ffe066;border-color:rgba(255,224,102,.35);background:rgba(36,26,12,.82);}
       .mode-tag--economy{color:#ffd9a1;border-color:rgba(255,195,128,.35);background:rgba(36,24,12,.82);}
       .mode-card__status{position:absolute;top:18px;right:18px;padding:6px 12px;border-radius:999px;border:1px solid rgba(255,224,102,.42);background:rgba(36,26,12,.78);color:#ffe066;font-size:11px;letter-spacing:.16em;text-transform:uppercase;}
+      .mode-card--compact{padding:16px 14px;gap:10px;min-height:0;align-items:center;text-align:center;}
+      .mode-card--compact .mode-card__icon{font-size:24px;}
+      .mode-card--compact .mode-card__title{font-size:14px;letter-spacing:.1em;}
+      .mode-card--compact .mode-card__tags{display:none;}
+      .mode-card--compact .mode-card__status{left:14px;right:auto;top:14px;padding:4px 10px;}
+      .mode-grid--economy{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:16px;padding-bottom:4px;}
+      .mode-grid--economy > *{flex:0 0 140px;}
+      .mode-grid--economy::-webkit-scrollbar{height:6px;}
+      .mode-grid--economy::-webkit-scrollbar-thumb{background:rgba(125,211,252,.24);border-radius:999px;}
       .mode-card--coming{border-style:dashed;opacity:.88;}
       .mode-card--group{position:relative;cursor:pointer;z-index:1;}
       .mode-card--group:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:4px;}
@@ -19262,6 +19315,9 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
           sectionGroup.appendChild(heading);
           const grid = document.createElement('div');
           grid.className = 'mode-grid';
+          if (section.id === 'economy') {
+              grid.classList.add('mode-grid--economy');
+          }
           section.entries.forEach(entry => {
               if (!entry)
                   return;
@@ -19529,28 +19585,6 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
   function createHeader() {
       const header = document.createElement('header');
       header.className = 'main-menu-v2__header';
-      const brand = document.createElement('div');
-      brand.className = 'main-menu-v2__brand';
-      const title = document.createElement('h1');
-      title.className = 'main-menu-v2__title';
-      title.textContent = 'Arclune';
-      const subtitle = document.createElement('p');
-      subtitle.className = 'main-menu-v2__subtitle';
-      subtitle.textContent = 'Chiến thuật sân 7x3. Chọn chế độ để khởi động đội hình, tương tác với hộ vệ để nghe lời nhắc nhở.';
-      brand.appendChild(title);
-      brand.appendChild(subtitle);
-      const meta = document.createElement('div');
-      meta.className = 'main-menu-v2__meta';
-      const chipAlpha = document.createElement('span');
-      chipAlpha.className = 'main-menu-v2__meta-chip';
-      chipAlpha.textContent = 'Alpha preview';
-      const chipBuild = document.createElement('span');
-      chipBuild.className = 'main-menu-v2__meta-chip';
-      chipBuild.textContent = 'v0.7.4';
-      meta.appendChild(chipAlpha);
-      meta.appendChild(chipBuild);
-      header.appendChild(brand);
-      header.appendChild(meta);
       return header;
   }
 
