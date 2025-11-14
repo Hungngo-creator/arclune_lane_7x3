@@ -156,8 +156,9 @@ export function predictSpawnCycle(Game: SessionState, side: TurnOrderSide, slot:
 export function spawnQueuedIfDue(
   Game: SessionState,
   entry: QueuedSummonEntry | { side: TurnOrderSide; slot: number } | null | undefined,
-  { allocIid, performUlt }: Pick<TurnHooks, 'allocIid' | 'performUlt'> = {}
+  hooks?: Pick<TurnHooks, 'allocIid' | 'performUlt'>
 ): SpawnResult {
+  const { allocIid, performUlt } = hooks ?? {};
   if (!entry) return { actor: null, spawned: false };
   const slot = entry.slot;
   const sideLower = toLowerSide(entry.side);
