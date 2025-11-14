@@ -1,6 +1,10 @@
 import { ROSTER } from '../../../catalog.ts';
-import { listCurrencies } from '../../../data/economy.ts';
 import { createNumberFormatter } from '../../../utils/format.ts';
+import {
+  formatCurrencyAmount,
+  getCurrencyDefinitions,
+  type CurrencyId,
+} from '../../../utils/currency.ts';
 import type { LineupCell, LineupState, EquipmentLoadout } from '@shared-types/ui';
 import type {
   LineupDefinition,
@@ -70,7 +74,7 @@ interface AssignmentResult {
   label: string | null;
 }
 
-const currencyCatalog = listCurrencies();
+const currencyCatalog = getCurrencyDefinitions();
 const currencyIndex = new Map(currencyCatalog.map(currency => [currency.id, currency]));
 const numberFormatter = createNumberFormatter('vi-VN');
 
@@ -503,10 +507,13 @@ export function createCurrencyBalances(primary: unknown, secondary: unknown): Cu
 }
 
 export function formatCurrencyBalance(amount: number | null | undefined, currencyId: string): string {
+  const numericAmount = Number.isFinite(Number(amount)) ? Number(amount) : 0;
   const currency = currencyIndex.get(currencyId);
-  const formatted = numberFormatter.format(Number.isFinite(amount) ? Number(amount) : 0);
-  const suffix = currency?.suffix || currencyId || '';
-  return suffix ? `${formatted} ${suffix}` : formatted;
+  if (currency){
+    return formatCurrencyAmount(numericAmount, currency.id as CurrencyId);
+  }
+  const formatted = numberFormatter.format(numericAmount);
+  return currencyId ? `${formatted} ${currencyId}` : formatted;
 }
 
 export function filterRoster(roster: RosterUnit[], filter: LineupFilter): RosterUnit[] {
