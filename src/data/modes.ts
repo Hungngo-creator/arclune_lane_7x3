@@ -18,8 +18,8 @@ const PVE_SESSION_MODULE_ID = '@modes/pve/session.ts' as const;
 const COMING_SOON_MODULE_ID = '@modes/coming-soon.stub.ts' as const;
 const LINEUP_SCREEN_MODULE_ID = '@screens/lineup/index.ts' as const;
 const COLLECTION_SCREEN_MODULE_ID = '@screens/collection/index.ts' as const;
-const ARENA_HUB_SCREEN_MODULE_ID = '@screens/arena-hub/index.ts' as const;
 const GACHA_SCREEN_MODULE_ID = '@screens/ui-gacha/index.ts' as const;
+const ARENA_HUB_SCREEN_MODULE_ID = '@screens/arena-hub/index.ts' as const;
 
 const MODE_TYPES = {
   PVE: 'PvE',
@@ -50,6 +50,7 @@ const MODES = [
     status: MODE_STATUS.AVAILABLE,
     icon: '🏟️',
     shortDescription: 'Tụ điểm tổng hợp các hoạt động chiến đấu luân phiên để người chơi bước vào chiến dịch, thử thách và mùa giải.',
+    unlockNotes: 'Cung cấp lối vào nhanh tới chiến dịch, thử thách, đấu trường PvE/PvP và các mùa giải đặc biệt.',
     tags: ['PvE', 'PvP'],
     menuSections: ['core-pve'],
     shell: {
