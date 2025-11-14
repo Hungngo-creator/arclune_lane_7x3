@@ -18,6 +18,7 @@ import { metaServiceAdapter } from '../../meta.ts';
 import { gameEvents } from '../../events.ts';
 import { getEnvironmentBackground, drawEnvironmentProps } from '../../background.ts';
 import { getCachedBattlefieldScene } from '../../scene.ts';
+import { drawGridOblique } from '../../engine.ts';
 import { Statuses } from '../../statuses.ts';
 import { getUnitArt } from '../../art.ts';
 import { normalizeUnitId } from '../../utils/unit-id.ts';
@@ -180,6 +181,8 @@ export interface SceneCacheEntry {
   backgroundSignature: string;
   dpr: number;
   baseKey: string | null | undefined;
+  includesGrid: boolean;
+  camPresetSignature: string;
 }
 
 export interface EnsureSceneCacheArgs {
@@ -534,6 +537,7 @@ export function ensureSceneCache(args: EnsureSceneCacheArgs): SceneCacheEntry | 
   const theme = themeKey ? sceneCfg?.THEMES?.[themeKey] ?? null : null;
   const backgroundKey = game.backgroundKey ?? null;
   const backgroundSignature = computeBackgroundSignature(backgroundKey);
+  const camPresetSignature = stableStringify(camPreset ?? null);
 
   const baseScene = getCachedBattlefieldScene(
     grid as Parameters<typeof getCachedBattlefieldScene>[0],
@@ -553,6 +557,8 @@ export function ensureSceneCache(args: EnsureSceneCacheArgs): SceneCacheEntry | 
   else if (sceneCache.backgroundSignature !== backgroundSignature) needsRebuild = true;
   else if (sceneCache.dpr !== dprRaw) needsRebuild = true;
   else if (sceneCache.baseKey !== baseKey) needsRebuild = true;
+  else if (sceneCache.camPresetSignature !== camPresetSignature) needsRebuild = true;
+  else if (!sceneCache.includesGrid) needsRebuild = true;
 
   if (!needsRebuild) return sceneCache;
 
@@ -581,8 +587,10 @@ export function ensureSceneCache(args: EnsureSceneCacheArgs): SceneCacheEntry | 
     cacheCtx.scale(dprRaw, dprRaw);
   }
 
+const drawCtx = cacheCtx as CanvasRenderingContext2D;
   try {
-    drawEnvironmentProps(cacheCtx, grid, camPreset, backgroundKey ?? undefined);
+    drawEnvironmentProps(drawCtx, grid, camPreset, backgroundKey ?? undefined);
+    drawGridOblique(drawCtx, grid, camPreset);
   } catch (err) {
     console.error('[scene-cache]', err);
     return null;
@@ -599,6 +607,8 @@ export function ensureSceneCache(args: EnsureSceneCacheArgs): SceneCacheEntry | 
     backgroundSignature,
     dpr: dprRaw,
     baseKey,
+    includesGrid: true,
+    camPresetSignature,
   };
   return sceneCache;
 }

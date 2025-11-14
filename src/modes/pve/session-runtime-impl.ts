@@ -2639,17 +2639,22 @@ function resolveTimerElement(): void {
   timerElement = (queryFromRoot('#timer') || doc.getElementById('timer')) as HTMLElement | null;
 }
 
+function isDocumentNode(value: Element | Document): value is Document {
+  const documentNodeType = typeof Node !== 'undefined' ? Node.DOCUMENT_NODE : 9;
+  return value.nodeType === documentNodeType;
+}
+
 function configureRoot(root: RootLike): void {
   rootElement = root || null;
   if (rootElement && rootElement.ownerDocument){
     docRef = rootElement.ownerDocument;
-  } else if (rootElement && rootElement.nodeType === 9){
+  } else if (rootElement && isDocumentNode(rootElement)){
     docRef = rootElement;
   } else {
     docRef = typeof document !== 'undefined' ? document : null;
   }
   winRef = docRef?.defaultView ?? (typeof window !== 'undefined' ? window : null);
-resolveTimerElement();
+ resolveTimerElement();
 }
 
 function clearSessionTimers(): void {
