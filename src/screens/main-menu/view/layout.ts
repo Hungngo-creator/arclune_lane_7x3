@@ -102,7 +102,7 @@ export function createModesSection(options: ModesSectionOptions): HTMLElement {
 
   const title = document.createElement('h2');
   title.className = 'main-menu-modes__title';
-  title.textContent = 'Chế độ tác chiến';
+  title.textContent = '';
   sectionEl.appendChild(title);
 
   const metaByKey = new Map<string, MenuCardMetadata>();
