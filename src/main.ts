@@ -43,6 +43,7 @@ export interface ActiveSessionHandle extends BaseSessionHandle {
 }
 
 let currentSession: ActiveSessionHandle | null = null;
+const pendingSkins = new Map<string, string | null>();
 
 const isPlainRecord = (value: unknown): value is Record<string, unknown> => (
   !!value && typeof value === 'object'
@@ -93,6 +94,20 @@ export function startGame(options?: StartGameOptions | null): SessionState {
   if (!session) {
     throw new Error('PvE board markup not found; render the layout before calling startGame');
   }
+  if (currentSession && pendingSkins.size > 0) {
+    const appliedUnitIds: string[] = [];
+    pendingSkins.forEach((skinKey, unitId) => {
+      const applied = currentSession?.setUnitSkin(unitId, skinKey) ?? false;
+      if (applied) {
+        appliedUnitIds.push(unitId);
+      }
+    });
+    if (appliedUnitIds.length === pendingSkins.size) {
+      pendingSkins.clear();
+    } else {
+      appliedUnitIds.forEach((unitId) => pendingSkins.delete(unitId));
+    }
+  }
   return session;
 }
 
@@ -112,8 +127,16 @@ export function getCurrentSession(): ActiveSessionHandle | null {
 }
 
 export function setUnitSkin(unitId: string, skinKey: string | null | undefined): boolean {
-  if (!currentSession) return false;
-  return currentSession.setUnitSkin(unitId, skinKey);
+ const normalizedSkinKey = skinKey ?? null;
+  if (!currentSession) {
+    pendingSkins.set(unitId, normalizedSkinKey);
+    return true;
+  }
+  const applied = currentSession.setUnitSkin(unitId, skinKey);
+  if (applied) {
+    pendingSkins.set(unitId, normalizedSkinKey);
+  }
+  return applied;
 }
 
 export function onGameEvent<T extends GameEventType>(

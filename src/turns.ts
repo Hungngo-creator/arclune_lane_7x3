@@ -496,10 +496,6 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
       active = getActiveAt(Game, entry.side, entry.slot) ?? null; // behavior-preserving
     }
 
-    if (spawned && actor && actor.alive){
-      return;
-    }
-
     if (!active || !active.alive){
       return;
     }
@@ -591,10 +587,6 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
     };
 
     const { actor, spawned } = spawnQueuedIfDue(Game, entry, hooks);
-    if (spawned && actor && actor.alive){
-      advanceCursor();
-      return;
-    }
 
     const active = actor && actor.alive ? actor : getActiveAt(Game, entry.side, entry.slot);
     const hasActive = !!(active && active.alive);
