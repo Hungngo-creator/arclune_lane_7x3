@@ -235,24 +235,28 @@ export function startSummonBar<TCard extends SummonBarCard = SummonBarCard>(
 
   let removalObserver: MutationObserver | null = null;
   if (host && typeof MutationObserver === 'function'){
-    const targetRoot = doc.body || doc.documentElement;
-    const observerTarget = targetRoot
-      ? assertElement<Element>(targetRoot, 'Cần một phần tử gốc để quan sát trạng thái kết nối.')
-      : null;
+    const parentNode = host.parentNode;
+    const rootNode = typeof host.getRootNode === 'function' ? host.getRootNode() : null;
+
+    let observerTarget: Node | null = null;
+    if (parentNode && parentNode.nodeType !== Node.DOCUMENT_NODE){
+      observerTarget = parentNode;
+    } else if (rootNode instanceof ShadowRoot || rootNode instanceof DocumentFragment){
+      observerTarget = rootNode;
+    }
+
     if (observerTarget){
       removalObserver = new MutationObserver(() => {
         if (!host.isConnected){
           cleanup();
         }
       });
-      removalObserver.observe(observerTarget, { childList: true, subtree: true });
+      removalObserver.observe(observerTarget, { childList: true });
+      cleanupFns.push(() => {
+        removalObserver?.disconnect();
+        removalObserver = null;
+      });
     }
-  }
-  if (removalObserver){
-    cleanupFns.push(() => {
-      removalObserver?.disconnect();
-      removalObserver = null;
-    });
   }
 
   const resolveCardCost = (card: TCard | null | undefined): number => {
