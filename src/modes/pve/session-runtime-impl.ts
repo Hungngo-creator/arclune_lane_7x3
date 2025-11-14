@@ -2165,7 +2165,7 @@ function init(): boolean {
 
       if (Game.battle?.over) return;
 
-      const turnState = Game.turn ?? null;
+      let turnState = Game.turn ?? null;
       let busyUntil = 0;
       if (turnState){
         const rawBusy = turnState.busyUntil;
@@ -2195,7 +2195,7 @@ function init(): boolean {
         CLOCK.lastTurnStepMs = sessionNowMs - turnEveryMs;
       }
 
-      const readyByBusy = sessionNowMs >= busyUntil;
+      let readyByBusy = sessionNowMs >= busyUntil;
       let elapsedForTurn = sessionNowMs - CLOCK.lastTurnStepMs;
 
       if (readyByBusy && (!Number.isFinite(elapsedForTurn) || elapsedForTurn < -stallDeltaEpsilon)){
@@ -2225,6 +2225,17 @@ function init(): boolean {
             return;
           }
           aiMaybeAct(Game, 'board');
+          turnState = Game.turn ?? null;
+          if (turnState){
+            const rawBusyAfter = turnState.busyUntil;
+            busyUntil = isFiniteNumber(rawBusyAfter) && rawBusyAfter > 0 ? rawBusyAfter : 0;
+            if (!isFiniteNumber(rawBusyAfter) || rawBusyAfter <= 0){
+              turnState.busyUntil = busyUntil;
+            }
+          } else {
+            busyUntil = 0;
+          }
+          readyByBusy = sessionNowMs >= busyUntil;
         }
       }
   };
