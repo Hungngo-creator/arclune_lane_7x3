@@ -608,6 +608,7 @@ const RAF_TIMESTAMP_MAX = 2_147_483_647; // ~24 ngày tính từ mốc điều h
 const RAF_DRIFT_TOLERANCE_MS = 120_000;   // 2 phút – đủ rộng cho mọi sai lệch hợp lệ
 const CLOCK_DRIFT_TOLERANCE_MS = RAF_DRIFT_TOLERANCE_MS;
 const LOGIC_MIN_INTERVAL_MS = 40;
+const MAX_TURNS_PER_TICK = 6;
 
 // --- Instance counters (để gắn id cho token/minion) ---
 let _IID = 1;
@@ -2195,24 +2196,28 @@ function init(): boolean {
       }
 
       if (readyByBusy && elapsedForTurn >= turnEveryMs){
-        CLOCK.lastTurnStepMs = sessionNowMs;
-        stepTurn(Game, {
-          performUlt,
-          processActionChain,
-          allocIid: nextIid,
-          doActionOrSkip,
-          checkBattleEnd(gameState, info) {
-            return Boolean(checkBattleEndResult(gameState, info));
-          },
-        });
-        cleanupDead(sessionNowMs);
-        const postTurnResult = checkBattleEndResult(Game, { trigger: 'post-turn', timestamp: sessionNowMs });
-        if (postTurnResult){
+        let turnsProcessed = 0;
+        while (readyByBusy && elapsedForTurn >= turnEveryMs && turnsProcessed < MAX_TURNS_PER_TICK){
+          CLOCK.lastTurnStepMs += turnEveryMs;
+          elapsedForTurn -= turnEveryMs;
+          turnsProcessed += 1;
+          stepTurn(Game, {
+            performUlt,
+            processActionChain,
+            allocIid: nextIid,
+            doActionOrSkip,
+            checkBattleEnd(gameState, info) {
+              return Boolean(checkBattleEndResult(gameState, info));
+            },
+          });
+          cleanupDead(sessionNowMs);
+          const postTurnResult = checkBattleEndResult(Game, { trigger: 'post-turn', timestamp: sessionNowMs });
           scheduleDraw();
-          return;
+          if (postTurnResult){
+            return;
+          }
+          aiMaybeAct(Game, 'board');
         }
-        scheduleDraw();
-        aiMaybeAct(Game, 'board');
       }
   };
 
