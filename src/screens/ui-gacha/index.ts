@@ -7,7 +7,10 @@ declare const __require: MaybeRequire;
 
 interface RenderContext {
   readonly root: HTMLElement;
-  readonly shell?: { enterScreen?: (screenId: string, params?: unknown) => void } | null;
+  readonly shell?: {
+    enterScreen?: (screenId: string, params?: unknown) => void;
+    clearActiveSession?: () => void;
+  } | null;
   readonly definition?: { label?: string | null } | null;
   readonly params?: unknown;
   readonly screenId?: string;
@@ -315,7 +318,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     throw new Error('renderScreen cần root hợp lệ.');
   }
 
-ensureStyleTag(STYLE_ID, { css: gachaStyles });
+  ensureStyleTag(STYLE_ID, { css: gachaStyles });
 
   const container = createContainer();
   const mountTarget = container.querySelector('[data-gacha-content]');
@@ -327,13 +330,29 @@ ensureStyleTag(STYLE_ID, { css: gachaStyles });
   const previousFlag = typeof window !== 'undefined' ? window.__ARC_GACHA_EMBED__ : undefined;
 
 const goBackButton = container.querySelector('[data-action="go-back"]');
+  const hasShellNavigation = Boolean(shell && typeof shell.enterScreen === 'function');
   const handleGoBack = (event: Event) => {
     event.preventDefault();
     if (shell && typeof shell.enterScreen === 'function') {
-      shell.enterScreen('main-menu');
+      shell.clearActiveSession?.();
+      shell.enterScreen('main-menu', null);
+      return;
+    }
+    const exitEvent = new CustomEvent('arclune:exit-gacha', {
+      bubbles: true,
+      cancelable: true,
+    });
+    root.dispatchEvent(exitEvent);
+    if (!exitEvent.defaultPrevented && typeof history !== 'undefined' && typeof history.back === 'function') {
+      history.back();
     }
   };
   if (goBackButton instanceof HTMLButtonElement) {
+    if (!hasShellNavigation) {
+      goBackButton.setAttribute('aria-disabled', 'true');
+      goBackButton.classList.add('is-fallback');
+      goBackButton.title = 'Sử dụng điều hướng trình duyệt để quay lại';
+    }
     goBackButton.addEventListener('click', handleGoBack);
   }
 
