@@ -28,6 +28,21 @@ export function cueTone(tone: string | null | undefined): { icon: string; tone: 
   return { icon: '✦', tone: tone || 'calm' };
 }
 
+function resolveModeHeading(mode: MenuCardMetadata): string | null {
+  if (typeof mode.title === 'string'){
+    const trimmedTitle = mode.title.trim();
+    return trimmedTitle.length > 0 ? trimmedTitle : null;
+  }
+  if (typeof mode.label === 'string'){
+    const trimmedLabel = mode.label.trim();
+    if (trimmedLabel.length > 0){
+      return trimmedLabel;
+    }
+  }
+  const trimmedKey = typeof mode.key === 'string' ? mode.key.trim() : '';
+  return trimmedKey.length > 0 ? trimmedKey : null;
+}
+
 interface BuildModeCardOptions {
   extraClasses?: ReadonlyArray<string>;
   showStatus?: boolean;
@@ -50,10 +65,13 @@ function buildModeCardBase(
   icon.textContent = mode.icon || '◆';
   element.appendChild(icon);
 
-  const title = document.createElement('h3');
-  title.className = 'mode-card__title';
-  title.textContent = mode.title || mode.label || mode.key || '';
-  element.appendChild(title);
+  const headingText = resolveModeHeading(mode);
+  if (headingText){
+    const title = document.createElement('h3');
+    title.className = 'mode-card__title';
+    title.textContent = headingText;
+    element.appendChild(title);
+  }
 
   if (mode.description){
     const desc = document.createElement('p');
@@ -169,8 +187,9 @@ export function createModeGroupCard(
   wrapper.setAttribute('role', 'button');
   wrapper.setAttribute('aria-haspopup', 'true');
   wrapper.setAttribute('aria-expanded', 'false');
-  if (group.title){
-    wrapper.setAttribute('aria-label', `Chọn chế độ trong ${group.title}`);
+  const groupHeadingText = resolveModeHeading(group);
+  if (groupHeadingText){
+    wrapper.setAttribute('aria-label', `Chọn chế độ trong ${groupHeadingText}`);
   }
   wrapper.tabIndex = 0;
 
