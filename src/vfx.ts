@@ -69,6 +69,14 @@ type MeleeVfxEvent = BaseVfxEvent & {
   type: 'melee';
   refA: TokenRef;
   refB: TokenRef;
+  iidA?: number | null;
+  iidB?: number | null;
+  idA?: string | null;
+  idB?: string | null;
+  originCx?: number | null;
+  originCy?: number | null;
+  targetCx?: number | null;
+  targetCy?: number | null;
 };
 
 type LightningArcVfxEvent = BaseVfxEvent & {
@@ -207,6 +215,9 @@ export type SessionWithVfx = SessionState & {
   vfx?: VfxEventList;
 };
 
+export type TokenMeleeOffset = { x: number; y: number };
+export type TokenMeleeOffsetMap = Map<string, TokenMeleeOffset>;
+
 export function asSessionWithVfx(
   game: SessionState | SessionWithVfx | null | undefined,
   { requireGrid = false }: { requireGrid?: boolean } = {},
@@ -227,6 +238,107 @@ const warnInvalidArc = (label: string, data: unknown): void => {
     console.warn(`[vfxDraw] Skipping ${label} arc due to invalid geometry`, data);
   }
 };
+
+const clamp01 = (value: number): number => Math.max(0, Math.min(1, value));
+
+const makeTokenKey = (parts: { iid?: number | null; id?: string | null } | null | undefined): string | null => {
+  if (!parts) return null;
+  if (Number.isFinite(parts.iid)) {
+    return `iid:${parts.iid}`;
+  }
+  if (typeof parts.id === 'string' && parts.id.length > 0) {
+    return `id:${parts.id}`;
+  }
+  return null;
+};
+
+const findTokenByKey = (tokens: ReadonlyArray<UnitToken> | null | undefined, key: string | null): UnitToken | null => {
+  if (!key || !Array.isArray(tokens)) return null;
+  if (key.startsWith('iid:')) {
+    const iid = Number.parseInt(key.slice(4), 10);
+    if (Number.isFinite(iid)) {
+      return tokens.find(t => t && Number.isFinite(t.iid) && (t.iid as number) === iid) ?? null;
+    }
+  }
+  if (key.startsWith('id:')) {
+    const id = key.slice(3);
+    return tokens.find(t => t && typeof t.id === 'string' && t.id === id) ?? null;
+  }
+  return null;
+};
+
+const resolveTokenKey = (
+  token: Partial<UnitToken> | null | undefined,
+  fallback: { iid?: number | null; id?: string | null } = {},
+): string | null => makeTokenKey({ iid: token?.iid ?? fallback.iid, id: token?.id ?? fallback.id });
+
+const resolveTokenFromEvent = (
+  tokens: ReadonlyArray<UnitToken>,
+  eventToken: Partial<UnitToken> | null | undefined,
+  fallback: { iid?: number | null; id?: string | null },
+): UnitToken | null => {
+  const key = resolveTokenKey(eventToken, fallback);
+  return findTokenByKey(tokens, key);
+};
+
+export function computeMeleeOffsets(
+  Game: SessionWithVfx,
+  cam: CameraOptions | null | undefined,
+): TokenMeleeOffsetMap {
+  const offsets: TokenMeleeOffsetMap = new Map();
+  if (!Game?.grid) return offsets;
+  const tokens = Array.isArray(Game.tokens) ? Game.tokens : [];
+  const events = Array.isArray(Game.vfx) ? Game.vfx : [];
+  if (events.length === 0 || tokens.length === 0) return offsets;
+
+  for (const e of events) {
+    if (!e || e.type !== 'melee') continue;
+    const duration = Number.isFinite(e.dur) ? e.dur : 0;
+    if (!duration) continue;
+
+    const elapsed = now() - e.t0;
+    const tt = clamp01(elapsed / duration);
+    if (tt <= 0 || tt >= 1) continue;
+
+    const attacker = resolveTokenFromEvent(tokens, e.refA, { iid: e.iidA, id: e.idA });
+    if (!attacker || !attacker.alive) continue;
+
+    const target = resolveTokenFromEvent(tokens, e.refB, { iid: e.iidB, id: e.idB });
+
+    const originCx = Number.isFinite(e.originCx) ? (e.originCx as number) : attacker.cx;
+    const originCy = Number.isFinite(e.originCy) ? (e.originCy as number) : attacker.cy;
+    const targetCx = Number.isFinite(e.targetCx)
+      ? (e.targetCx as number)
+      : target?.cx ?? attacker.cx;
+    const targetCy = Number.isFinite(e.targetCy)
+      ? (e.targetCy as number)
+      : target?.cy ?? attacker.cy;
+
+    if (!Number.isFinite(originCx) || !Number.isFinite(originCy)) continue;
+
+    const pa = projectCellOblique(Game.grid, originCx, originCy, cam);
+    const pb = projectCellOblique(Game.grid, targetCx, targetCy, cam);
+    if (!isFiniteCoord(pa.x) || !isFiniteCoord(pa.y) || !isFiniteCoord(pb.x) || !isFiniteCoord(pb.y)) {
+      continue;
+    }
+
+    const travelForward = tt <= 0.5;
+    const localT = travelForward ? tt / 0.5 : (tt - 0.5) / 0.5;
+    const eased = easeInOut(clamp01(localT));
+    const maxTravel = 0.88;
+    const travel = travelForward ? eased * maxTravel : (1 - eased) * maxTravel;
+
+    const mx = lerp(pa.x, pb.x, travel);
+    const my = lerp(pa.y, pb.y, travel);
+
+    const key = resolveTokenKey(attacker, { iid: e.iidA, id: e.idA });
+    if (!key) continue;
+
+    offsets.set(key, { x: mx - pa.x, y: my - pa.y });
+  }
+
+  return offsets;
+}
 
 const DEFAULT_ANCHOR_ID = 'root';
 const DEFAULT_ANCHOR_POINT: AnchorPoint = { x: 0.5, y: 0.5 };
@@ -612,8 +724,30 @@ export function vfxAddMelee(
   target: TokenRef,
   { dur = CFG?.ANIMATION?.meleeDurationMs ?? 2000 }: { dur?: number } = {},
 ): void {
-  // Overlay step-in/out (không di chuyển token thật)
-  const event: MeleeVfxEvent = { type: 'melee', t0: now(), dur, refA: attacker, refB: target };
+const iidA = typeof attacker?.iid === 'number' ? attacker.iid : null;
+  const iidB = typeof target?.iid === 'number' ? target.iid : null;
+  const idA = typeof attacker?.id === 'string' ? attacker.id : null;
+  const idB = typeof target?.id === 'string' ? target.id : null;
+  const originCx = typeof attacker?.cx === 'number' ? attacker.cx : null;
+  const originCy = typeof attacker?.cy === 'number' ? attacker.cy : null;
+  const targetCx = typeof target?.cx === 'number' ? target.cx : null;
+  const targetCy = typeof target?.cy === 'number' ? target.cy : null;
+
+  const event: MeleeVfxEvent = {
+    type: 'melee',
+    t0: now(),
+    dur,
+    refA: attacker,
+    refB: target,
+    iidA,
+    iidB,
+    idA,
+    idB,
+    originCx,
+    originCy,
+    targetCx,
+    targetCy,
+  };
   pool(Game).push(event);
 }
 
@@ -902,32 +1036,9 @@ export function vfxDraw(
         break;
       }
 
-      case 'melee': {
-        const A = e.refA;
-        const B = e.refB;
-        if (A && B && A.alive && B.alive && hasFinitePoint(A) && hasFinitePoint(B)) {
-          const pa = projectCellOblique(Game.grid, A.cx ?? 0, A.cy ?? 0, cam);
-          const pb = projectCellOblique(Game.grid, B.cx ?? 0, B.cy ?? 0, cam);
-
-          const tN = Math.max(0, Math.min(1, (now() - e.t0) / e.dur));
-          const k = easeInOut(tN) * 0.88;
-          const mx = lerp(pa.x, pb.x, k);
-          const my = lerp(pa.y, pb.y, k);
-
-          const depth = Game.grid.rows - 1 - (A.cy ?? 0);
-          const kDepth = cam?.depthScale ?? 0.94;
-          const r = Math.max(6, Math.floor(Game.grid.tile * 0.36 * Math.pow(kDepth, depth)));
-
-          const facing = A.side === 'ally' ? 1 : -1;
-          const color = A.color || (A.side === 'ally' ? '#9adcf0' : '#ffb4c0');
-
-          ctx.save();
-          ctx.globalAlpha = 0.95;
-          drawChibiOverlay(ctx, mx, my, r, facing, color);
-          ctx.restore();
-        }
+      case 'melee':
+        // Đã thay bằng chuyển động trực tiếp của token (không vẽ overlay riêng).
         break;
-      }
 
       case 'lightning_arc': {
         const start = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, e.radiusA ?? null, cam);

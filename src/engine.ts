@@ -68,6 +68,13 @@ type TokenWithArt = UnitToken & {
   skinKey?: string | null;
 };
 
+type TokenMeleeOffset = { x: number; y: number };
+type TokenOffsetMap = Map<string, TokenMeleeOffset> | null | undefined;
+
+type TokenDrawOptions = {
+  meleeOffsets?: TokenOffsetMap;
+};
+
 type SpriteCacheEntry = {
   status: 'loading' | 'ready' | 'error';
   img: HTMLImageElement;
@@ -122,6 +129,17 @@ const DEFAULT_OBLIQUE_CAMERA = {
 
 const CHIBI_PROPS: ChibiProportions = CHIBI as ChibiProportions;
 const TOKEN_STYLE_VALUE = TOKEN_STYLE as 'chibi' | 'disk';
+
+const tokenVisualKey = (token: Pick<UnitToken, 'iid' | 'id'> | null | undefined): string | null => {
+  if (!token) return null;
+  if (Number.isFinite(token.iid)) {
+    return `iid:${token.iid}`;
+  }
+  if (typeof token.id === 'string' && token.id.length > 0) {
+    return `id:${token.id}`;
+  }
+  return null;
+};
 
 function coerceFinite(value: unknown, fallback: number): number {
   const candidate =
@@ -900,6 +918,7 @@ export function drawTokensOblique(
   g: GridSpec,
   tokens: readonly TokenWithArt[],
   cam: CameraOptions | null | undefined,
+  options: TokenDrawOptions = {},
 ): void {
   const C = cam ?? DEFAULT_OBLIQUE_CAMERA;
   ctx.textAlign = 'center';
@@ -907,6 +926,7 @@ export function drawTokensOblique(
 
   const baseR = Math.floor(g.tile * 0.36);
   const sig = contextSignature(g, C);
+  const meleeOffsets = options?.meleeOffsets ?? null;
 
   const alive: Array<{ token: TokenWithArt; projection: ProjectionState }> = [];
   for (const token of tokens) {
@@ -922,7 +942,12 @@ export function drawTokensOblique(
     }
     const projection = getTokenProjection(token, g, C, sig);
     if (!projection) continue;
-    alive.push({ token, projection });
+    const key = tokenVisualKey(token);
+    const offset = key && meleeOffsets instanceof Map ? meleeOffsets.get(key) ?? null : null;
+    const adjusted: ProjectionState = offset
+      ? { x: projection.x + offset.x, y: projection.y + offset.y, scale: projection.scale }
+      : projection;
+    alive.push({ token, projection: adjusted });
   }
 
   alive.sort((a, b) => {
