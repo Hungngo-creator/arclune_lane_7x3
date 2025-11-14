@@ -32,6 +32,7 @@ import {
   vfxAddBloodPulse,
   vfxAddGroundBurst,
   vfxAddShieldWrap,
+  computeMeleeOffsets,
   asSessionWithVfx as baseAsSessionWithVfx,
 } from '../../vfx';
 import { drawBattlefieldScene } from '../../scene';
@@ -92,7 +93,7 @@ import type {
 import type { HudHandles, SummonBarHandles } from '@shared-types/ui';
 import type { CameraPreset } from '@shared-types/config';
 import type { NormalizedSessionConfig } from './session-state';
-import type { SessionWithVfx } from '../../vfx';
+import type { SessionWithVfx, TokenMeleeOffsetMap } from '../../vfx';
 import type { GameEventDetailMap, GameEventHandler, GameEventType } from '../../events';
 import type { UnitArtLayout } from '@shared-types/art';
 
@@ -2429,15 +2430,27 @@ function draw(): void {
       gridDrawnViaScene = true;
     }
   }
+  let sessionVfx: SessionWithVfx | null = null;
+  let meleeOffsets: TokenMeleeOffsetMap | null = null;
+  if (Game.grid){
+    sessionVfx = ensureSessionWithVfx(Game, { requireGrid: true });
+    if (sessionVfx){
+      const computedOffsets = computeMeleeOffsets(sessionVfx, CAM_PRESET);
+      meleeOffsets = computedOffsets.size ? computedOffsets : null;
+    }
+  }
   if (Game.grid){
     if (!gridDrawnViaScene) {
       drawGridOblique(ctx, Game.grid, CAM_PRESET);
     }
     drawQueuedOblique(ctx, Game.grid, Game.queued, CAM_PRESET);
     const tokens = Game.tokens || [];
-    drawTokensOblique(ctx, Game.grid, tokens, CAM_PRESET);
+    if (meleeOffsets){
+      drawTokensOblique(ctx, Game.grid, tokens, CAM_PRESET, { meleeOffsets });
+    } else {
+      drawTokensOblique(ctx, Game.grid, tokens, CAM_PRESET);
+    }
   }
-  const sessionVfx = ensureSessionWithVfx(Game, { requireGrid: true });
   if (sessionVfx){
     vfxDraw(ctx, sessionVfx, CAM_PRESET);
   }
