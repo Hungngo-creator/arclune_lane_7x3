@@ -22,7 +22,7 @@ const GACHA_SCREEN_MODULE_ID = '@screens/ui-gacha/index.ts' as const;
 const ARENA_HUB_SCREEN_MODULE_ID = '@screens/arena-hub/index.ts' as const;
 
 const MODE_TYPES = {
-  PVE: 'PvE',
+  PVE: '',
   PVP: 'PvP',
   ECONOMY: 'Kinh tế'
 } as const satisfies Readonly<Record<'PVE' | 'PVP' | 'ECONOMY', string>>;
@@ -36,8 +36,8 @@ const MODE_STATUS = {
 type ModeStatus = typeof MODE_STATUS[keyof typeof MODE_STATUS];
 
 const MENU_SECTION_DEFINITIONS = [
-  { id: 'core-pve', title: 'PvE' },
-  { id: 'economy', title: 'Kinh tế & Hạ tầng' }
+  { id: 'core-pve', title: '' },
+  { id: 'economy', title: '' }
 ] satisfies ReadonlyArray<MenuSectionDefinition>;
 
 const MODE_GROUPS: ReadonlyArray<ModeGroup> = [];
