@@ -26,6 +26,15 @@ const STYLE_ID = 'ui-gacha-screen-style';
 const GACHA_TEMPLATE = /* html */ `
   <div class="gacha-app" data-app-root>
     <header class="gacha-topbar" data-section="topbar">
+    <button
+        class="gacha-topbar__back-button"
+        type="button"
+        aria-label="Trở về"
+        title="Trở về"
+        data-action="go-back"
+      >
+        ← Trở về 
+      </button>
       <button
         class="banner-drawer-toggle"
         type="button"

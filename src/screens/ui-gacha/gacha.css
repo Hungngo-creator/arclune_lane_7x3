@@ -37,6 +37,52 @@ button {
   color: inherit;
 }
 
+.gacha-topbar {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: 24px;
+  border: 1px solid var(--border-accent);
+  background: var(--bg-panel);
+  box-shadow: 0 18px 48px rgba(5, 12, 20, 0.45);
+}
+
+.gacha-topbar__back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(118, 212, 255, 0.32);
+  background: rgba(12, 18, 28, 0.78);
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.gacha-topbar__back-button:hover,
+.gacha-topbar__back-button:focus-visible {
+  background: rgba(18, 28, 42, 0.92);
+  border-color: rgba(118, 212, 255, 0.68);
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 3px rgba(118, 212, 255, 0.24);
+  outline: none;
+}
+
+.gacha-topbar__back-button:active {
+  background: rgba(10, 18, 30, 0.95);
+  border-color: rgba(118, 212, 255, 0.8);
+  transform: translateY(0);
+  box-shadow: 0 0 0 2px rgba(118, 212, 255, 0.18);
+}
+
 .gacha-ui-root {
   width: min(1280px, 100%);;
   display: flex;
