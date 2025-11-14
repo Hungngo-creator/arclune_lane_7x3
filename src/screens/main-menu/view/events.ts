@@ -192,14 +192,15 @@ export function createModeCard(
       return;
     }
     if (!shell || typeof shell.enterScreen !== 'function') return;
+    const targetScreen = mode.id ?? mode.key ?? 'main-menu';
     if (mode.status === 'coming-soon'){
       if (typeof onShowComingSoon === 'function'){
         onShowComingSoon(mode);
       }
-      shell.enterScreen(mode.id || 'main-menu', (mode.params as Record<string, unknown> | null) ?? null);
+      shell.enterScreen(targetScreen, (mode.params as Record<string, unknown> | null) ?? null);
       return;
     }
-    shell.enterScreen(mode.id || 'main-menu', (mode.params as Record<string, unknown> | null) ?? null);
+    shell.enterScreen(targetScreen, (mode.params as Record<string, unknown> | null) ?? null);
   };
 
   button.addEventListener('click', handleClick);
@@ -396,7 +397,8 @@ export function createModeGroupCard(
       if (child.status === 'coming-soon' && typeof onShowComingSoon === 'function'){
         onShowComingSoon(child);
       }
-      shell.enterScreen(child.id || 'main-menu', (child.params as Record<string, unknown> | null) ?? null);
+      const targetScreen = child.id ?? child.key ?? 'main-menu';
+      shell.enterScreen(targetScreen, (child.params as Record<string, unknown> | null) ?? null);
       close();
       wrapper.focus({ preventScroll: true });
     };
