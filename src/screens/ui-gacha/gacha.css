@@ -84,7 +84,7 @@ button {
 }
 
 .gacha-ui-root {
-  width: min(1280px, 100%);;
+  width: min(1280px, 100%);
   display: flex;
   flex-direction: column;
   gap: 24px;
