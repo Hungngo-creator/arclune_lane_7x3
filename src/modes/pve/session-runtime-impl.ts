@@ -630,6 +630,7 @@ let visibilityHandlerBound = false;
 let winRef: (Window & typeof globalThis) | null = null;
 let docRef: Document | null = null;
 let rootElement: Element | Document | null = null;
+let timerElement: HTMLElement | null = null;
 let storedConfig: NormalizedSessionConfig = normalizeConfig();
 let running = false;
 const hpBarGradientCache = new Map<string, GradientValue>();
@@ -1930,31 +1931,33 @@ function init(): boolean {
     return null;
   };
 
-    const updateTimerAndCost = (timestamp?: number): void => {
-      if (!CLOCK || !Game) return;
-      if (Game.battle?.over) return;
+    timerElement = (queryFromRoot('#timer') || doc.getElementById('timer')) as HTMLElement | null;
 
-      const safeNowMs = safeNow();
-      const sessionNowMsRaw = sessionNow();
-      let forcedElapsedSec: number | null = null;
-      const safeDelta = safeNowMs - CLOCK.startSafeMs;
-      const previousStartMs = Number.isFinite(CLOCK.startMs) ? CLOCK.startMs : null;
-      const sessionWentBack = previousStartMs !== null
-        && Number.isFinite(sessionNowMsRaw)
-        && sessionNowMsRaw < previousStartMs;
-      if (safeDelta < -CLOCK_DRIFT_TOLERANCE_MS || sessionWentBack){
-        const previousElapsedSec = Number.isFinite(CLOCK.lastCostCreditedSec)
-          ? Math.max(0, CLOCK.lastCostCreditedSec)
-          : Math.max(
-            0,
-            240 - (Number.isFinite(CLOCK.lastTimerRemain) ? CLOCK.lastTimerRemain : 240),
-          );
-        const previousRemain = Number.isFinite(CLOCK.lastTimerRemain)
-          ? Math.max(0, CLOCK.lastTimerRemain)
-          : Math.max(0, 240 - previousElapsedSec);
-        const previousTurnStep = Number.isFinite(CLOCK.lastTurnStepMs)
-          ? CLOCK.lastTurnStepMs
-          : null;
+  const updateTimerAndCost = (timestamp?: number): void => {
+    if (!CLOCK || !Game) return;
+    if (Game.battle?.over) return;
+
+    const safeNowMs = safeNow();
+    const sessionNowMsRaw = sessionNow();
+    let forcedElapsedSec: number | null = null;
+    const safeDelta = safeNowMs - CLOCK.startSafeMs;
+    const previousStartMs = Number.isFinite(CLOCK.startMs) ? CLOCK.startMs : null;
+    const sessionWentBack = previousStartMs !== null
+      && Number.isFinite(sessionNowMsRaw)
+      && sessionNowMsRaw < previousStartMs;
+    if (safeDelta < -CLOCK_DRIFT_TOLERANCE_MS || sessionWentBack){
+      const previousElapsedSec = Number.isFinite(CLOCK.lastCostCreditedSec)
+        ? Math.max(0, CLOCK.lastCostCreditedSec)
+        : Math.max(
+          0,
+          240 - (Number.isFinite(CLOCK.lastTimerRemain) ? CLOCK.lastTimerRemain : 240),
+        );
+      const previousRemain = Number.isFinite(CLOCK.lastTimerRemain)
+        ? Math.max(0, CLOCK.lastTimerRemain)
+        : Math.max(0, 240 - previousElapsedSec);
+      const previousTurnStep = Number.isFinite(CLOCK.lastTurnStepMs)
+        ? CLOCK.lastTurnStepMs
+        : null;
 
         let turnEveryMs = CLOCK.turnEveryMs;
         const cfgTurnEvery = CFG?.ANIMATION?.turnIntervalMs;
@@ -2094,7 +2097,12 @@ function init(): boolean {
       const ss = String(remainDisplay % 60).padStart(2, '0');
       const nextTimerText = `${mm}:${ss}`;
       if (nextTimerText !== CLOCK.lastTimerText){
-        const tEl = (queryFromRoot('#timer') || doc.getElementById('timer')) as HTMLElement | null;
+        let tEl = timerElement;
+        if (!tEl || !tEl.isConnected){
+          const refreshed = (queryFromRoot('#timer') || doc.getElementById('timer')) as HTMLElement | null;
+          timerElement = refreshed ?? null;
+          tEl = timerElement;
+        }
         if (tEl) tEl.textContent = nextTimerText;
         CLOCK.lastTimerText = nextTimerText;
       }
@@ -2603,6 +2611,23 @@ function unbindVisibility(): void {
   visibilityHandlerBound = false;
 }
 
+function resolveTimerElement(): void {
+  const doc = docRef ?? (typeof document !== 'undefined' ? document : null);
+  const root = rootElement ?? null;
+  if (!doc){
+    timerElement = null;
+    return;
+  }
+  const queryFromRoot = (selector: string): Element | null => {
+    if (root && typeof (root as ParentNode).querySelector === 'function'){
+      const el = (root as ParentNode).querySelector(selector);
+      if (el) return el;
+    }
+    return null;
+  };
+  timerElement = (queryFromRoot('#timer') || doc.getElementById('timer')) as HTMLElement | null;
+}
+
 function configureRoot(root: RootLike): void {
   rootElement = root || null;
   if (rootElement && rootElement.ownerDocument){
@@ -2613,6 +2638,7 @@ function configureRoot(root: RootLike): void {
     docRef = typeof document !== 'undefined' ? document : null;
   }
   winRef = docRef?.defaultView ?? (typeof window !== 'undefined' ? window : null);
+resolveTimerElement();
 }
 
 function clearSessionTimers(): void {
@@ -2668,6 +2694,7 @@ function resetDomRefs(): void {
   ctx = null;
   hud = null;
   hudCleanup = null;
+  timerElement = null;
   hpBarGradientCache.clear();
   invalidateSceneCache();
 }
@@ -2695,6 +2722,7 @@ function stopSession(): void {
     Game._inited = false;
   }
   resetDomRefs();
+  timerElement = null;
   CLOCK = null;
   Game = null;
   running = false;
@@ -2713,6 +2741,7 @@ function bindSession(): void {
 
 function startSession(config: StartConfigOverrides | null | undefined = {}): SessionState | null {
   configureRoot(rootElement);
+  resolveTimerElement();
   const overrides = normalizeConfig(toStartConfigOverrides(config));
   if (running) stopSession();
   resetSessionState(overrides);
