@@ -100,6 +100,7 @@ const UiConfigSchema = z.object({
   BOARD_MAX_W: z.number(),
   BOARD_MIN_H: z.number(),
   BOARD_H_RATIO: z.number(),
+  BOARD_VERTICAL_ALIGN: z.number(),
   MAX_DPR: z.number(),
   MAX_PIXEL_AREA: z.number(),
   CARD_GAP: z.number(),
