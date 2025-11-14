@@ -42,7 +42,6 @@ const MENU_SECTION_DEFINITIONS = [
 const MODE_GROUPS = [
   {
     id: 'arena-hub',
-    title: 'Chiến Trường',
     shortDescription: 'Tụ điểm tổng hợp các hoạt động chiến đấu luân phiên để người chơi bước vào chiến dịch, thử thách và mùa giải.',
     icon: '🏟️',
     tags: ['PvE', 'PvP'],
@@ -55,7 +54,6 @@ const MODE_GROUPS = [
 const MODES = [
   {
     id: 'campaign',
-    title: 'Chiến Dịch',
     type: MODE_TYPES.PVE,
     status: MODE_STATUS.AVAILABLE,
     icon: '🛡️',
@@ -72,7 +70,6 @@ const MODES = [
   },
   {
     id: 'challenge',
-    title: 'Thử Thách',
     type: MODE_TYPES.PVE,
     status: MODE_STATUS.AVAILABLE,
     icon: '🎯',
@@ -89,7 +86,6 @@ const MODES = [
   },
   {
     id: 'arena',
-    title: 'Đấu Trường',
     type: MODE_TYPES.PVE,
     status: MODE_STATUS.AVAILABLE,
     icon: '🏟️',
@@ -106,7 +102,6 @@ const MODES = [
   },
   {
     id: 'ares',
-    title: 'Ares',
     type: MODE_TYPES.PVP,
     status: MODE_STATUS.COMING_SOON,
     icon: '⚔️',
