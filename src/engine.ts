@@ -1,4 +1,4 @@
-import { TOKEN_STYLE, CHIBI, CFG } from './config.ts';
+import { TOKEN_STYLE, CHIBI, CFG, CAM } from './config.ts';
 import { getUnitArt, getUnitSkin } from './art.ts';
 import type { UnitToken, QueuedSummonState, QueuedSummonRequest, Side } from '@shared-types/units';
 import type { UnitArt, UnitArtPalette } from '@shared-types/art';
@@ -230,7 +230,22 @@ export function makeGrid(canvas: HTMLCanvasElement | null | undefined, cols: num
   const usableH = displayH - pad * 2;
   const tile = Math.floor(Math.min(usableW / cols, usableH / rows));
   const ox = Math.floor((displayW - tile * cols) / 2);
-  const oy = Math.floor((displayH - tile * rows) / 2);
+
+  const cameraKey = (CFG.CAMERA ?? 'landscape_oblique') as keyof typeof CAM;
+  const cameraPreset = CAM?.[cameraKey] ?? CAM?.landscape_oblique ?? null;
+  const rawRowGapRatio = cameraPreset && typeof cameraPreset.rowGapRatio === 'number'
+    ? cameraPreset.rowGapRatio
+    : DEFAULT_OBLIQUE_CAMERA.rowGapRatio;
+  const rowGapRatio = Number.isFinite(rawRowGapRatio) && rawRowGapRatio > 0
+    ? rawRowGapRatio
+    : 1;
+  const alignRaw = CFG.UI?.BOARD_VERTICAL_ALIGN;
+  const align = Number.isFinite(alignRaw)
+    ? Math.min(Math.max((alignRaw as number), 0), 1)
+    : 0.5;
+  const boardVisualHeight = Math.max(0, tile * rows * rowGapRatio);
+  const verticalFree = Math.max(0, displayH - boardVisualHeight);
+  const oy = Math.floor(verticalFree * align);
 
   return {
     cols,

@@ -141,6 +141,7 @@ const rawConfig = {
     BOARD_MAX_W: 1144,
     BOARD_MIN_H: 220,
     BOARD_H_RATIO: 3/7,
+    BOARD_VERTICAL_ALIGN: 0.7,
     MAX_DPR: 2.5,
     MAX_PIXEL_AREA: 2_400_000,
     CARD_GAP: 12,
