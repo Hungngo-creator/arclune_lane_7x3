@@ -579,6 +579,23 @@ const resolveCameraPreset = (): CameraPreset => {
   return preset ?? CAM[DEFAULT_CAMERA_KEY];
 };
 const CAM_PRESET = resolveCameraPreset();
+const getCameraPresetSignature = (preset: CameraPreset | null | undefined): string => {
+  if (!preset) return 'null';
+  const record = preset as Record<string, unknown>;
+  return Object.keys(record)
+    .sort()
+    .map((key) => {
+      const value = record[key];
+      if (typeof value === 'number') return `${key}:${Number.isFinite(value) ? value : 'NaN'}`;
+      if (typeof value === 'boolean') return `${key}:${value ? 'true' : 'false'}`;
+      if (typeof value === 'string') return `${key}:"${value}"`;
+      if (value === null) return `${key}:null`;
+      if (typeof value === 'undefined') return `${key}:undefined`;
+      return `${key}:${String(value)}`;
+    })
+    .join('|');
+};
+let lastCamPresetSignature = getCameraPresetSignature(CAM_PRESET);
 const HAND_SIZE  = CFG.HAND_SIZE ?? 4;
 
 ensureNestedModuleSupport();
@@ -2305,7 +2322,13 @@ function resize(): void {
     dpr: Game.grid.dpr,
     cols: Game.grid.cols,
     rows: Game.grid.rows,
-    tile: Game.grid.tile
+    tile: Game.grid.tile,
+    ox: Game.grid.ox,
+    oy: Game.grid.oy,
+    pad: Game.grid.pad,
+    pixelW: Game.grid.pixelW,
+    pixelH: Game.grid.pixelH,
+    pixelArea: Game.grid.pixelArea,
   } : null;
   Game.grid = makeGrid(canvas, CFG.GRID_COLS, CFG.GRID_ROWS);
   if (ctx && Game.grid){
@@ -2339,7 +2362,13 @@ function resize(): void {
     || prevGrid.dpr !== g.dpr
     || prevGrid.cols !== g.cols
     || prevGrid.rows !== g.rows
-    || prevGrid.tile !== g.tile;
+    || prevGrid.tile !== g.tile
+    || prevGrid.ox !== g.ox
+    || prevGrid.oy !== g.oy
+    || prevGrid.pad !== g.pad
+    || prevGrid.pixelW !== g.pixelW
+    || prevGrid.pixelH !== g.pixelH
+    || prevGrid.pixelArea !== g.pixelArea;
   if (gridChanged){
     hpBarGradientCache.clear();
     invalidateSceneCache();
@@ -2350,23 +2379,36 @@ function draw(): void {
   const clearW = Game.grid?.w ?? canvas.width;
   const clearH = Game.grid?.h ?? canvas.height;
   ctx.clearRect(0, 0, clearW, clearH);
+  const camSignature = getCameraPresetSignature(CAM_PRESET);
+  if (camSignature !== lastCamPresetSignature) {
+    lastCamPresetSignature = camSignature;
+    invalidateSceneCache();
+  }
   const cache = ensureSceneCache({
     game: Game,
     canvas,
     documentRef: docRef,
     camPreset: CAM_PRESET
   });
+  let gridDrawnViaScene = false;
   if (cache && cache.canvas){
     ctx.drawImage(cache.canvas, 0, 0, cache.pixelWidth, cache.pixelHeight, 0, 0, cache.cssWidth, cache.cssHeight);
+    gridDrawnViaScene = !!cache.includesGrid;
   } else {
     const sceneCfg = CFG.SCENE || {};
     const themeKey = Game.sceneTheme || sceneCfg.CURRENT_THEME || sceneCfg.DEFAULT_THEME;
     const theme = (sceneCfg.THEMES && themeKey) ? sceneCfg.THEMES[themeKey] : null;
-    if (Game.grid) drawBattlefieldScene(ctx, Game.grid, theme);
-    if (Game.grid) drawEnvironmentProps(ctx, Game.grid, CAM_PRESET, Game.backgroundKey);
+    if (Game.grid) {
+      drawBattlefieldScene(ctx, Game.grid, theme);
+      drawEnvironmentProps(ctx, Game.grid, CAM_PRESET, Game.backgroundKey);
+      drawGridOblique(ctx, Game.grid, CAM_PRESET);
+      gridDrawnViaScene = true;
+    }
   }
   if (Game.grid){
-    drawGridOblique(ctx, Game.grid, CAM_PRESET);
+    if (!gridDrawnViaScene) {
+      drawGridOblique(ctx, Game.grid, CAM_PRESET);
+    }
     drawQueuedOblique(ctx, Game.grid, Game.queued, CAM_PRESET);
     const tokens = Game.tokens || [];
     drawTokensOblique(ctx, Game.grid, tokens, CAM_PRESET);
