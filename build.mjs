@@ -449,29 +449,32 @@ function transformModule(code, id){
     return `${kind} ${name}`;
   });
 
-  const exportFunctionRegex = /export\s+function\s+([A-Za-z0-9_$]+)/g;
-  code = code.replace(exportFunctionRegex, (match, name) => {
+  const exportFunctionRegex = /export\s+(async\s+)?function\s+([A-Za-z0-9_$]+)/g;
+  code = code.replace(exportFunctionRegex, (match, asyncKeyword = '', name) => {
     if (!usedAliases.has(name)){
       usedAliases.add(name);
       exportsAssignments.push({ alias: name, expr: name });
     }
-    return `function ${name}`;
+    const prefix = asyncKeyword || '';
+    return `${prefix}function ${name}`;
   });
 
-const exportDefaultNamedFunctionRegex = /export\s+default\s+function\s+([A-Za-z0-9_$]+)/g;
-  code = code.replace(exportDefaultNamedFunctionRegex, (match, name) => {
+  const exportDefaultNamedFunctionRegex = /export\s+default\s+(async\s+)?function\s+([A-Za-z0-9_$]+)/g;
+  code = code.replace(exportDefaultNamedFunctionRegex, (match, asyncKeyword = '', name) => {
     ensureDefaultExport(name);
-    return `function ${name}`;
+    const prefix = asyncKeyword || '';
+    return `${prefix}function ${name}`;
   });
 
-  const exportDefaultAnonFunctionRegex = /export\s+default\s+function(\s*\()/g;
-  code = code.replace(exportDefaultAnonFunctionRegex, (match, afterParen) => {
+  const exportDefaultAnonFunctionRegex = /export\s+default\s+(async\s+)?function(\s*\()/g;
+  code = code.replace(exportDefaultAnonFunctionRegex, (match, asyncKeyword = '', afterParen) => {
     if (!defaultLocalName){
       defaultLocalName = generateDefaultLocal();
     }
     const local = defaultLocalName;
     ensureDefaultExport(local);
-    return `function ${local}${afterParen}`;
+    const prefix = asyncKeyword || '';
+    return `${prefix}function ${local}${afterParen}`;
   });
 
   const exportDefaultNamedClassRegex = /export\s+default\s+class\s+([A-Za-z0-9_$]+)/g;
@@ -512,7 +515,7 @@ const exportDefaultNamedFunctionRegex = /export\s+default\s+function\s+([A-Za-z0
     .filter((item, index, arr) => index === arr.findIndex((it) => it.alias === item.alias))
     .map(({ alias, expr }) => `if (!Object.prototype.hasOwnProperty.call(exports, '${alias}')) exports.${alias} = ${expr};`);
     
- if (exportsAssignments.some((item) => item.alias === 'default')){
+  if (exportsAssignments.some((item) => item.alias === 'default')){
     footerLines.push('module.exports.default = exports.default;');
   }
 
