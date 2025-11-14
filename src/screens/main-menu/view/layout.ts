@@ -18,7 +18,7 @@ export function ensureStyles(): void {
   const css = `
     .app--main-menu{padding:32px 16px 64px;}
     .main-menu-v2{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:32px;color:inherit;}
-    .main-menu-v2__header{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-end;justify-content:space-between;}
+    .main-menu-v2__header{display:none;}
     .main-menu-v2__brand{display:flex;flex-direction:column;gap:10px;max-width:520px;}
     .main-menu-v2__title{margin:0;font-size:44px;letter-spacing:.08em;text-transform:uppercase;}
     .main-menu-v2__subtitle{margin:0;color:#9cbcd9;line-height:1.6;font-size:17px;}
@@ -75,6 +75,15 @@ export function ensureStyles(): void {
     .mode-tag--coming{color:#ffe066;border-color:rgba(255,224,102,.35);background:rgba(36,26,12,.82);}
     .mode-tag--economy{color:#ffd9a1;border-color:rgba(255,195,128,.35);background:rgba(36,24,12,.82);}
     .mode-card__status{position:absolute;top:18px;right:18px;padding:6px 12px;border-radius:999px;border:1px solid rgba(255,224,102,.42);background:rgba(36,26,12,.78);color:#ffe066;font-size:11px;letter-spacing:.16em;text-transform:uppercase;}
+    .mode-card--compact{padding:16px 14px;gap:10px;min-height:0;align-items:center;text-align:center;}
+    .mode-card--compact .mode-card__icon{font-size:24px;}
+    .mode-card--compact .mode-card__title{font-size:14px;letter-spacing:.1em;}
+    .mode-card--compact .mode-card__tags{display:none;}
+    .mode-card--compact .mode-card__status{left:14px;right:auto;top:14px;padding:4px 10px;}
+    .mode-grid--economy{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:16px;padding-bottom:4px;}
+    .mode-grid--economy > *{flex:0 0 140px;}
+    .mode-grid--economy::-webkit-scrollbar{height:6px;}
+    .mode-grid--economy::-webkit-scrollbar-thumb{background:rgba(125,211,252,.24);border-radius:999px;}
     .mode-card--coming{border-style:dashed;opacity:.88;}
     .mode-card--group{position:relative;cursor:pointer;z-index:1;}
     .mode-card--group:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:4px;}
@@ -160,6 +169,9 @@ export function createModesSection(options: ModesSectionOptions): HTMLElement {
 
     const grid = document.createElement('div');
     grid.className = 'mode-grid';
+    if (section.id === 'economy'){
+      grid.classList.add('mode-grid--economy');
+    }
 
     section.entries.forEach(entry => {
       if (!entry) return;
@@ -472,34 +484,5 @@ export function createSidebar(options: SidebarOptions): HTMLElement {
 export function createHeader(): HTMLElement {
   const header = document.createElement('header');
   header.className = 'main-menu-v2__header';
-
-  const brand = document.createElement('div');
-  brand.className = 'main-menu-v2__brand';
-
-  const title = document.createElement('h1');
-  title.className = 'main-menu-v2__title';
-  title.textContent = 'Arclune';
-  const subtitle = document.createElement('p');
-  subtitle.className = 'main-menu-v2__subtitle';
-  subtitle.textContent = 'Chiến thuật sân 7x3. Chọn chế độ để khởi động đội hình, tương tác với hộ vệ để nghe lời nhắc nhở.';
-
-  brand.appendChild(title);
-  brand.appendChild(subtitle);
-
-  const meta = document.createElement('div');
-  meta.className = 'main-menu-v2__meta';
-
-  const chipAlpha = document.createElement('span');
-  chipAlpha.className = 'main-menu-v2__meta-chip';
-  chipAlpha.textContent = 'Alpha preview';
-  const chipBuild = document.createElement('span');
-  chipBuild.className = 'main-menu-v2__meta-chip';
-  chipBuild.textContent = 'v0.7.4';
-
-  meta.appendChild(chipAlpha);
-  meta.appendChild(chipBuild);
-
-  header.appendChild(brand);
-  header.appendChild(meta);
   return header;
 }

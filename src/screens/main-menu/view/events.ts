@@ -21,6 +21,40 @@ const TAG_CLASS_MAP = new Map<string, string>([
   ['Kinh tế nguyên tinh', 'mode-tag--economy']
 ]);
 
+const ECONOMY_COMPACT_KEYS = new Set<string>([
+  'tongmon',
+  'gacha',
+  'lineup',
+  'collection',
+  'market',
+  'events',
+  'social'
+]);
+
+interface ModeDisplaySettings {
+  displayMode: MenuCardMetadata;
+  extraClasses: ReadonlyArray<string>;
+}
+
+function resolveDisplaySettings(mode: MenuCardMetadata): ModeDisplaySettings {
+  if (mode?.key && ECONOMY_COMPACT_KEYS.has(mode.key)){
+    const filteredTags = (mode.tags || []).filter(tag => tag && tag !== 'Kinh tế nguyên tinh' && tag !== 'Coming soon');
+    const compactMode: MenuCardMetadata = {
+      ...mode,
+      description: undefined,
+      tags: filteredTags
+    };
+    return {
+      displayMode: compactMode,
+      extraClasses: ['mode-card--compact']
+    };
+  }
+  return {
+    displayMode: mode,
+    extraClasses: []
+  };
+}
+
 export function cueTone(tone: string | null | undefined): { icon: string; tone: string } {
   if (tone && TONE_ICONS[tone]){
     return { icon: TONE_ICONS[tone], tone };
@@ -133,13 +167,19 @@ export function createModeCard(
 ): HTMLButtonElement {
   const button = document.createElement('button');
   button.type = 'button';
+  const { displayMode, extraClasses: displayExtraClasses } = resolveDisplaySettings(mode);
   const extraClasses = Array.isArray(options.extraClasses)
-    ? options.extraClasses
+    ? [...options.extraClasses]
     : options.extraClass
       ? [options.extraClass]
       : [];
+    displayExtraClasses.forEach(cls => {
+    if (!extraClasses.includes(cls)){
+      extraClasses.push(cls);
+    }
+  });
 
-  buildModeCardBase(button, mode, {
+  buildModeCardBase(button, displayMode, {
     extraClasses,
     showStatus: options.showStatus !== false
   });
