@@ -40,7 +40,7 @@ const MENU_SECTION_DEFINITIONS = [
   { id: 'economy', title: 'Kinh tế & Hạ tầng' }
 ] satisfies ReadonlyArray<MenuSectionDefinition>;
 
-const MODE_GROUPS = [] satisfies ReadonlyArray<ModeGroup>;
+const MODE_GROUPS: ReadonlyArray<ModeGroup> = [];
 
 const MODES = [
   {
