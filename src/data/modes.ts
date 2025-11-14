@@ -18,6 +18,7 @@ const PVE_SESSION_MODULE_ID = '@modes/pve/session.ts' as const;
 const COMING_SOON_MODULE_ID = '@modes/coming-soon.stub.ts' as const;
 const LINEUP_SCREEN_MODULE_ID = '@screens/lineup/index.ts' as const;
 const COLLECTION_SCREEN_MODULE_ID = '@screens/collection/index.ts' as const;
+const ARENA_HUB_SCREEN_MODULE_ID = '@screens/arena-hub/index.ts' as const;
 const GACHA_SCREEN_MODULE_ID = '@screens/ui-gacha/index.ts' as const;
 
 const MODE_TYPES = {
@@ -39,19 +40,23 @@ const MENU_SECTION_DEFINITIONS = [
   { id: 'economy', title: 'Kinh tế & Hạ tầng' }
 ] satisfies ReadonlyArray<MenuSectionDefinition>;
 
-const MODE_GROUPS = [
-  {
-    id: 'arena-hub',
-    shortDescription: 'Tụ điểm tổng hợp các hoạt động chiến đấu luân phiên để người chơi bước vào chiến dịch, thử thách và mùa giải.',
-    icon: '🏟️',
-    tags: ['PvE', 'PvP'],
-    menuSections: ['core-pve'],
-    childModeIds: ['arena', 'beast-arena', 'ares', 'challenge', 'campaign'],
-    extraClasses: ['mode-card--wide']
-  }
-] satisfies ReadonlyArray<ModeGroup>;
+const MODE_GROUPS = [] satisfies ReadonlyArray<ModeGroup>;
 
 const MODES = [
+  {
+    id: 'arena-hub',
+    title: 'Chiến Trường',
+    type: MODE_TYPES.PVE,
+    status: MODE_STATUS.AVAILABLE,
+    icon: '🏟️',
+    shortDescription: 'Tụ điểm tổng hợp các hoạt động chiến đấu luân phiên để người chơi bước vào chiến dịch, thử thách và mùa giải.',
+    tags: ['PvE', 'PvP'],
+    menuSections: ['core-pve'],
+    shell: {
+      screenId: 'arena-hub',
+      moduleId: ARENA_HUB_SCREEN_MODULE_ID
+    }
+  },
   {
     id: 'campaign',
     type: MODE_TYPES.PVE,
