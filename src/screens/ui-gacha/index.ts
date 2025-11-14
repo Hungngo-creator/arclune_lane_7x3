@@ -26,7 +26,7 @@ const STYLE_ID = 'ui-gacha-screen-style';
 const GACHA_TEMPLATE = /* html */ `
   <div class="gacha-app" data-app-root>
     <header class="gacha-topbar" data-section="topbar">
-    <button
+      <button
         class="gacha-topbar__back"
         type="button"
         aria-label="Trở về menu chính"
@@ -59,47 +59,49 @@ const GACHA_TEMPLATE = /* html */ `
       </button>
     </header>
 
-    <div class="gacha-layout">
-      <aside class="banner-list" data-slot="banner-list" aria-label="Danh sách banner"></aside>
-      <main class="hero" data-slot="hero" aria-live="polite">
-        <div class="hero__background" aria-hidden="true"></div>
-        <div class="hero__content">
-          <div class="hero__header">
-            <div class="hero__title-group">
-              <div class="hero__type-chip" data-slot="hero-type"></div>
-              <h1 class="hero__title" data-slot="hero-title"></h1>
-              <p class="hero__subtitle" data-slot="hero-subtitle"></p>
+        <div data-gacha-content>
+      <div class="gacha-layout">
+        <aside class="banner-list" data-slot="banner-list" aria-label="Danh sách banner"></aside>
+        <main class="hero" data-slot="hero" aria-live="polite">
+          <div class="hero__background" aria-hidden="true"></div>
+          <div class="hero__content">
+            <div class="hero__header">
+              <div class="hero__title-group">
+                <div class="hero__type-chip" data-slot="hero-type"></div>
+                <h1 class="hero__title" data-slot="hero-title"></h1>
+                <p class="hero__subtitle" data-slot="hero-subtitle"></p>
+              </div>
+              <div class="hero__meta">
+                <span class="hero__rateup" data-slot="hero-rateup">Rate UP</span>
+                <span class="hero__timer" data-slot="hero-timer"></span>
+              </div>
             </div>
-            <div class="hero__meta">
-              <span class="hero__rateup" data-slot="hero-rateup">Rate UP</span>
-              <span class="hero__timer" data-slot="hero-timer"></span>
-            </div>
-          </div>
 
-          <section class="pity" aria-label="Thông tin bảo hiểm">
-            <div class="pity__pills" data-slot="pity-pills"></div>
-            <div class="pity__progress">
-              <div class="pity__bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-              <span class="pity__note">Chưa có dữ liệu bảo hiểm.</span>
-            </div>
-          </section>
+           <section class="pity" aria-label="Thông tin bảo hiểm">
+             <div class="pity__pills" data-slot="pity-pills"></div>
+             <div class="pity__progress">
+               <div class="pity__bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+               <span class="pity__note">Chưa có dữ liệu bảo hiểm.</span>
+             </div>
+           </section>
 
-          <section class="featured" aria-label="Đối tác nổi bật">
-            <div class="featured__list" data-slot="featured-list"></div>
-          </section>
+           <section class="featured" aria-label="Đối tác nổi bật">
+             <div class="featured__list" data-slot="featured-list"></div>
+           </section>
 
           <button class="hero__details" type="button" data-action="open-rates">Xem chi tiết tỉ lệ &amp; bảo hiểm</button>
-        </div>
-      </main>
-    </div>
-
-    <footer class="cta" data-section="cta">
-      <div class="cta__note">UI-only: Nhấn sẽ mở modal xác nhận (không quay).</div>
-      <div class="cta__buttons">
-        <button class="cta__button" type="button" data-test="summon-x1" data-action="summon-single"></button>
-        <button class="cta__button" type="button" data-test="summon-x10" data-action="summon-multi"></button>
+          </div>
+        </main>
       </div>
-    </footer>
+
+      <footer class="cta" data-section="cta">
+        <div class="cta__note">UI-only: Nhấn sẽ mở modal xác nhận (không quay).</div>
+        <div class="cta__buttons">
+          <button class="cta__button" type="button" data-test="summon-x1" data-action="summon-single"></button>
+          <button class="cta__button" type="button" data-test="summon-x10" data-action="summon-multi"></button>
+        </div>
+      </footer>
+    </div>
   </div>
 
   <div class="modal" data-modal="rates" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Tỉ lệ &amp; bảo hiểm">
@@ -316,6 +318,10 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
 ensureStyleTag(STYLE_ID, { css: gachaStyles });
 
   const container = createContainer();
+  const mountTarget = container.querySelector('[data-gacha-content]');
+  if (!(mountTarget instanceof HTMLElement)) {
+    throw new Error('Không tìm thấy vùng mount cho gacha UI.');
+  }
   let disposed = false;
   let handle: GachaHandle = null;
   const previousFlag = typeof window !== 'undefined' ? window.__ARC_GACHA_EMBED__ : undefined;
@@ -342,7 +348,7 @@ const goBackButton = container.querySelector('[data-action="go-back"]');
       if (!module || typeof module.mountGachaUI !== 'function') {
         throw new Error('Module gacha không xuất mountGachaUI.');
       }
-      return module.mountGachaUI(container);
+      return module.mountGachaUI(mountTarget);
     })
     .then((result) => {
       if (disposed) {

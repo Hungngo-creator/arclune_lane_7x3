@@ -281,17 +281,22 @@ function createToast(message: string): HTMLElement {
 }
 
 export async function mountGachaUI(scope: HTMLElement | Document | null = null) {
-  const host = scope instanceof Document ? scope.body : scope ?? document.body;
-  if (!host) {
+  const hostElement: HTMLElement | null =
+    scope instanceof Document ? scope.body : scope ?? document.body;
+
+  if (!hostElement) {
     throw new Error('Không tìm thấy vùng mount cho gacha UI.');
   }
 
-  if (host === document.body) {
+  const isBodyHost = hostElement === document.body;
+  const preservedChildren: ChildNode[] = Array.from(hostElement.childNodes);
+
+  if (isBodyHost) {
     document.body.classList.add('gacha-ui');
   }
 
-  if (host instanceof HTMLElement) {
-    host.replaceChildren();
+  for (const child of preservedChildren) {
+    hostElement.removeChild(child);
   }
 
   const container = document.createElement('div');
@@ -325,7 +330,7 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
     </div>
   `;
 
-  host.appendChild(container);
+  hostElement.appendChild(container);
 
   const state: GachaUIState = {
     wallet: createWallet(),
@@ -423,12 +428,26 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
 
   renderAll();
 
+  let destroyed = false;
+
   return {
     destroy() {
-      if (host === document.body) {
+      if (destroyed) {
+        return;
+      }
+      destroyed = true;
+      if (isBodyHost) {
         document.body.classList.remove('gacha-ui');
       }
       container.remove();
+      if (preservedChildren.length > 0) {
+        const fragment = document.createDocumentFragment();
+        for (const child of preservedChildren) {
+          fragment.appendChild(child);
+        }
+        hostElement.appendChild(fragment);
+        preservedChildren.length = 0;
+      }
     },
   };
-    }
+}
