@@ -635,6 +635,28 @@ let timerElement: HTMLElement | null = null;
 let storedConfig: NormalizedSessionConfig = normalizeConfig();
 let running = false;
 const hpBarGradientCache = new Map<string, GradientValue>();
+const meleeOffsetTokenKeys = new Set<string>();
+
+const makeMeleeTokenKey = (token: Partial<UnitToken> | null | undefined): string | null => {
+  if (Number.isFinite(token?.iid)){
+    return `iid:${token?.iid}`;
+  }
+  if (typeof token?.id === 'string' && token.id.length > 0){
+    return `id:${token.id}`;
+  }
+  return null;
+};
+
+const syncMeleeOffsetTokens = (
+  offsets: TokenMeleeOffsetMap | null | undefined,
+): TokenMeleeOffsetMap | null => {
+  meleeOffsetTokenKeys.clear();
+  if (!offsets || !offsets.size) return null;
+  for (const key of offsets.keys()){
+    meleeOffsetTokenKeys.add(key);
+  }
+  return offsets;
+};
 
 const renderSummonBar = (): void => {
   const game = getInitializedGame();
@@ -664,6 +686,7 @@ function resetSessionState(options: StartConfigOverrides | null | undefined = {}
   _BORN = 1;
   CLOCK = createClock();
   invalidateSceneCache();
+  meleeOffsetTokenKeys.clear();
 }
 
 if (CFG?.DEBUG?.LOG_EVENTS) {
@@ -2436,9 +2459,13 @@ function draw(): void {
     sessionVfx = ensureSessionWithVfx(Game, { requireGrid: true });
     if (sessionVfx){
       const computedOffsets = computeMeleeOffsets(sessionVfx, CAM_PRESET);
-      meleeOffsets = computedOffsets.size ? computedOffsets : null;
+      meleeOffsets = syncMeleeOffsetTokens(computedOffsets);
+    } else {
+      meleeOffsetTokenKeys.clear();
     }
-  }
+  } else {
+    meleeOffsetTokenKeys.clear();
+}
   if (Game.grid){
     if (!gridDrawnViaScene) {
       drawGridOblique(ctx, Game.grid, CAM_PRESET);
@@ -2564,6 +2591,8 @@ function drawHPBars(): void {
   const tokens = Game.tokens || [];
   for (const t of tokens){
     if (!t.alive || !Number.isFinite(t.hpMax)) continue;
+    const meleeKey = makeMeleeTokenKey(t);
+    if (meleeKey && meleeOffsetTokenKeys.has(meleeKey)) continue;
     const p = cellCenterObliqueLocal(Game.grid, t.cx, t.cy, CAM_PRESET);
     const art = t.art || getUnitArt(t.id, { skinKey: t.skinKey });
     const layout = (art?.layout as UnitArtLayout | Record<string, unknown>) ?? {};
