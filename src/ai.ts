@@ -467,6 +467,29 @@ export function aiMaybeAct(Game: SessionState, reason: AI_REASON): void {
   }
 
   const evaluations: CandidateEvaluation[] = [];
+  let bestEvaluation: CandidateEvaluation | null = null;
+  const keepTop = dbgCfg.keepTop;
+  const trackTopCandidates = keepTop > 0;
+  const topCandidates: CandidateEvaluation[] = [];
+
+  const insertTopCandidate = trackTopCandidates
+    ? (entry: CandidateEvaluation): void => {
+        let inserted = false;
+        for (let i = 0; i < topCandidates.length; i += 1) {
+          const current = topCandidates[i];
+          if (!current || entry.score > current.score) {
+            topCandidates.splice(i, 0, entry);
+            inserted = true;
+            break;
+          }
+        }
+        if (!inserted) {
+          if (topCandidates.length < keepTop) topCandidates.push(entry);
+          return;
+        }
+        if (topCandidates.length > keepTop) topCandidates.length = keepTop;
+      }
+    : null;
   for (const card of hand) {
     const meta = toMetaEntry(Game.meta.get(card.id));
     const kitTraits = detectKitTraits(meta);
@@ -495,7 +518,7 @@ export function aiMaybeAct(Game: SessionState, reason: AI_REASON): void {
       const roleFactor = roleBias(meta?.class, cell.cx);
       const finalScore = baseScore * rowFactor * roleFactor;
 
-      evaluations.push({
+      const evaluation: CandidateEvaluation = {
         card,
         meta,
         cell,
@@ -512,7 +535,11 @@ export function aiMaybeAct(Game: SessionState, reason: AI_REASON): void {
           kitRevive: kitReviveScore,
         },
         multipliers: { row: rowFactor, role: roleFactor },
-      });
+      };
+
+      evaluations.push(evaluation);
+      if (!bestEvaluation || evaluation.score > bestEvaluation.score) bestEvaluation = evaluation;
+      insertTopCandidate?.(evaluation);
     }
   }
 
@@ -530,24 +557,33 @@ export function aiMaybeAct(Game: SessionState, reason: AI_REASON): void {
     return;
   }
 
-  evaluations.sort((a, b) => b.score - a.score);
-
   let chosen: CandidateEvaluation | null = null;
-  for (const entry of evaluations) {
-    const blocked = candidateBlocked(Game, entry, alive);
+  const findNextCandidate = (): CandidateEvaluation | null => {
+    let next: CandidateEvaluation | null = null;
+    for (const entry of evaluations) {
+      if (entry.blockedReason) continue;
+      if (!next || entry.score > next.score) next = entry;
+    }
+    return next;
+  };
+
+  let current = bestEvaluation ?? findNextCandidate();
+  while (!chosen && current) {
+    const blocked = candidateBlocked(Game, current, alive);
     if (blocked) {
-      entry.blockedReason = blocked;
-      continue;
+      current.blockedReason = blocked;
+    } else {
+      const ok = queueEnemyAt(Game, current.card, current.cell.s, current.cell.cx, current.cell.cy, alive);
+      if (ok) {
+        chosen = current;
+        break;
+      }
+      current.blockedReason = 'queueFailed';
     }
-    const ok = queueEnemyAt(Game, entry.card, entry.cell.s, entry.cell.cx, entry.cell.cy, alive);
-    if (ok) {
-      chosen = entry;
-      break;
-    }
-    entry.blockedReason = 'queueFailed';
+    current = findNextCandidate();
   }
 
-  const considered = dbgCfg.keepTop > 0 ? evaluations.slice(0, dbgCfg.keepTop).map(exportCandidateDebug).filter(Boolean) : [];
+  const considered = trackTopCandidates ? topCandidates.map(exportCandidateDebug).filter(Boolean) : [];
 
   const decision: AiDecision = {
     reason,
