@@ -27,13 +27,13 @@ const GACHA_TEMPLATE = /* html */ `
   <div class="gacha-app" data-app-root>
     <header class="gacha-topbar" data-section="topbar">
     <button
-        class="gacha-topbar__back-button"
+        class="gacha-topbar__back"
         type="button"
-        aria-label="Trở về"
-        title="Trở về"
+        aria-label="Trở về menu chính"
+        title="Trở về menu chính"
         data-action="go-back"
       >
-        ← Trở về 
+        ← <span class="gacha-topbar__back-label">Menu chính</span>
       </button>
       <button
         class="banner-drawer-toggle"
@@ -308,7 +308,7 @@ function createContainer(): HTMLElement {
 }
 
 export function renderScreen(context: RenderContext): { destroy: () => void } {
-  const { root } = context;
+  const { root, shell = null } = context;
   if (!root) {
     throw new Error('renderScreen cần root hợp lệ.');
   }
@@ -319,6 +319,17 @@ ensureStyleTag(STYLE_ID, { css: gachaStyles });
   let disposed = false;
   let handle: GachaHandle = null;
   const previousFlag = typeof window !== 'undefined' ? window.__ARC_GACHA_EMBED__ : undefined;
+
+const goBackButton = container.querySelector('[data-action="go-back"]');
+  const handleGoBack = (event: Event) => {
+    event.preventDefault();
+    if (shell && typeof shell.enterScreen === 'function') {
+      shell.enterScreen('main-menu');
+    }
+  };
+  if (goBackButton instanceof HTMLButtonElement) {
+    goBackButton.addEventListener('click', handleGoBack);
+  }
 
   if (typeof window !== 'undefined') {
     window.__ARC_GACHA_EMBED__ = true;
@@ -352,6 +363,9 @@ ensureStyleTag(STYLE_ID, { css: gachaStyles });
       console.warn('[Gacha UI] Lỗi khi huỷ module gacha:', error);
     }
     handle = null;
+    if (goBackButton instanceof HTMLButtonElement) {
+      goBackButton.removeEventListener('click', handleGoBack);
+    }
     if (container.parentElement === root) {
       root.removeChild(container);
     } else {
