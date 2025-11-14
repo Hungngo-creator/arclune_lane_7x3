@@ -404,6 +404,30 @@ __define('./ai.ts', (exports, module, __require) => {
           return;
       }
       const evaluations = [];
+      let bestEvaluation = null;
+      const keepTop = dbgCfg.keepTop;
+      const trackTopCandidates = keepTop > 0;
+      const topCandidates = [];
+      const insertTopCandidate = trackTopCandidates
+          ? (entry) => {
+              let inserted = false;
+              for (let i = 0; i < topCandidates.length; i += 1) {
+                  const current = topCandidates[i];
+                  if (!current || entry.score > current.score) {
+                      topCandidates.splice(i, 0, entry);
+                      inserted = true;
+                      break;
+                  }
+              }
+              if (!inserted) {
+                  if (topCandidates.length < keepTop)
+                      topCandidates.push(entry);
+                  return;
+              }
+              if (topCandidates.length > keepTop)
+                  topCandidates.length = keepTop;
+          }
+          : null;
       for (const card of hand) {
           const meta = toMetaEntry(Game.meta.get(card.id));
           const kitTraits = detectKitTraits(meta);
@@ -428,7 +452,7 @@ __define('./ai.ts', (exports, module, __require) => {
               const rowFactor = rowCrowdingFactor(Game, cell.cy, aliveEnemies);
               const roleFactor = roleBias(meta === null || meta === void 0 ? void 0 : meta.class, cell.cx);
               const finalScore = baseScore * rowFactor * roleFactor;
-              evaluations.push({
+              const evaluation = {
                   card,
                   meta,
                   cell,
@@ -445,7 +469,11 @@ __define('./ai.ts', (exports, module, __require) => {
                       kitRevive: kitReviveScore,
                   },
                   multipliers: { row: rowFactor, role: roleFactor },
-              });
+              };
+              evaluations.push(evaluation);
+              if (!bestEvaluation || evaluation.score > bestEvaluation.score)
+                  bestEvaluation = evaluation;
+              insertTopCandidate === null || insertTopCandidate === void 0 ? void 0 : insertTopCandidate(evaluation);
           }
       }
       if (!evaluations.length) {
@@ -461,22 +489,34 @@ __define('./ai.ts', (exports, module, __require) => {
           Game.ai.lastThinkMs = now;
           return;
       }
-      evaluations.sort((a, b) => b.score - a.score);
       let chosen = null;
-      for (const entry of evaluations) {
-          const blocked = candidateBlocked(Game, entry, alive);
+      const findNextCandidate = () => {
+          let next = null;
+          for (const entry of evaluations) {
+              if (entry.blockedReason)
+                  continue;
+              if (!next || entry.score > next.score)
+                  next = entry;
+          }
+          return next;
+      };
+      let current = bestEvaluation !== null && bestEvaluation !== void 0 ? bestEvaluation : findNextCandidate();
+      while (!chosen && current) {
+          const blocked = candidateBlocked(Game, current, alive);
           if (blocked) {
-              entry.blockedReason = blocked;
-              continue;
+              current.blockedReason = blocked;
           }
-          const ok = queueEnemyAt(Game, entry.card, entry.cell.s, entry.cell.cx, entry.cell.cy, alive);
-          if (ok) {
-              chosen = entry;
-              break;
+          else {
+              const ok = queueEnemyAt(Game, current.card, current.cell.s, current.cell.cx, current.cell.cy, alive);
+              if (ok) {
+                  chosen = current;
+                  break;
+              }
+              current.blockedReason = 'queueFailed';
           }
-          entry.blockedReason = 'queueFailed';
+          current = findNextCandidate();
       }
-      const considered = dbgCfg.keepTop > 0 ? evaluations.slice(0, dbgCfg.keepTop).map(exportCandidateDebug).filter(Boolean) : [];
+      const considered = trackTopCandidates ? topCandidates.map(exportCandidateDebug).filter(Boolean) : [];
       const decision = {
           reason,
           at: now,
@@ -10287,6 +10327,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   const RAF_TIMESTAMP_MAX = 2147483647; // ~24 ngày tính từ mốc điều hướng
   const RAF_DRIFT_TOLERANCE_MS = 120000; // 2 phút – đủ rộng cho mọi sai lệch hợp lệ
   const CLOCK_DRIFT_TOLERANCE_MS = RAF_DRIFT_TOLERANCE_MS;
+  const LOGIC_MIN_INTERVAL_MS = 40;
   // --- Instance counters (để gắn id cho token/minion) ---
   let _IID = 1;
   let _BORN = 1;
@@ -10618,6 +10659,9 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           turnEveryMs,
           lastTurnStepMs: now - turnEveryMs,
           lastFrameMs: now,
+          lastLogicMs: now - LOGIC_MIN_INTERVAL_MS,
+          costAccumulator: 0,
+          lastTimerText: null,
       };
   }
   // Xác chết chờ vanish (để sau này thay bằng dead-animation)
@@ -11743,6 +11787,11 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               CLOCK.lastFrameMs = Number.isFinite(rebaseFrame)
                   ? rebaseFrame
                   : CLOCK.startMs;
+              CLOCK.lastLogicMs = Number.isFinite(rebaseFrame)
+                  ? rebaseFrame - LOGIC_MIN_INTERVAL_MS
+                  : CLOCK.startMs - LOGIC_MIN_INTERVAL_MS;
+              CLOCK.costAccumulator = 0;
+              CLOCK.lastTimerText = null;
           }
           const expectedSessionMs = safeNowMs - CLOCK.startSafeMs + CLOCK.startMs;
           let sessionNowMs = getNow();
@@ -11780,40 +11829,86 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               sessionNowMs = fallbackFrame;
           }
           CLOCK.lastFrameMs = Number.isFinite(sessionNowMs) ? sessionNowMs : expectedSessionMs;
-          let elapsedSec = Math.floor((sessionNowMs - CLOCK.startMs) / 1000);
-          if (!Number.isFinite(elapsedSec)) {
-              elapsedSec = forcedElapsedSec !== null && forcedElapsedSec !== void 0 ? forcedElapsedSec : 0;
+          if (!Number.isFinite(CLOCK.lastLogicMs)) {
+              CLOCK.lastLogicMs = sessionNowMs - LOGIC_MIN_INTERVAL_MS;
           }
-          if (elapsedSec < 0) {
-              elapsedSec = 0;
+          const logicSinceMs = sessionNowMs - CLOCK.lastLogicMs;
+          if (Number.isFinite(logicSinceMs) && logicSinceMs < LOGIC_MIN_INTERVAL_MS) {
+              return;
           }
-          if (forcedElapsedSec !== null && elapsedSec < forcedElapsedSec) {
-              elapsedSec = forcedElapsedSec;
+          const startMs = Number.isFinite(CLOCK.startMs) ? CLOCK.startMs : CLOCK.lastFrameMs;
+          let elapsedMsPrecise = Number.isFinite(startMs) ? sessionNowMs - startMs : 0;
+          if (!Number.isFinite(elapsedMsPrecise)) {
+              elapsedMsPrecise = (forcedElapsedSec !== null && forcedElapsedSec !== void 0 ? forcedElapsedSec : 0) * 1000;
           }
-          const prevRemain = Number.isFinite(CLOCK.lastTimerRemain) ? CLOCK.lastTimerRemain : 0;
-          const remain = Math.max(0, 240 - elapsedSec);
-          if (remain !== CLOCK.lastTimerRemain) {
-              CLOCK.lastTimerRemain = remain;
-              const mm = String(Math.floor(remain / 60)).padStart(2, '0');
-              const ss = String(remain % 60).padStart(2, '0');
+          if (elapsedMsPrecise < 0) {
+              elapsedMsPrecise = 0;
+          }
+          let elapsedSecPrecise = elapsedMsPrecise / 1000;
+          if (forcedElapsedSec !== null && elapsedSecPrecise < forcedElapsedSec) {
+              elapsedSecPrecise = forcedElapsedSec;
+              elapsedMsPrecise = elapsedSecPrecise * 1000;
+          }
+          const prevRemainDisplay = Number.isFinite(CLOCK.lastTimerRemain)
+              ? CLOCK.lastTimerRemain
+              : Math.max(0, 240 - Math.floor(elapsedSecPrecise));
+          const remainSecPrecise = Math.max(0, 240 - elapsedSecPrecise);
+          const remainDisplay = Math.max(0, Math.floor(remainSecPrecise));
+          const mm = String(Math.floor(remainDisplay / 60)).padStart(2, '0');
+          const ss = String(remainDisplay % 60).padStart(2, '0');
+          const nextTimerText = `${mm}:${ss}`;
+          if (nextTimerText !== CLOCK.lastTimerText) {
               const tEl = (queryFromRoot('#timer') || doc.getElementById('timer'));
               if (tEl)
-                  tEl.textContent = `${mm}:${ss}`;
+                  tEl.textContent = nextTimerText;
+              CLOCK.lastTimerText = nextTimerText;
           }
-          if (remain <= 0 && prevRemain > 0) {
-              const timeoutResult = checkBattleEndResult(Game, { trigger: 'timeout', remain, timestamp: sessionNowMs });
+          CLOCK.lastTimerRemain = remainDisplay;
+          if (CLOCK.lastTimerText === null) {
+              CLOCK.lastTimerText = nextTimerText;
+          }
+          if (remainSecPrecise <= 0 && prevRemainDisplay > 0) {
+              const timeoutResult = checkBattleEndResult(Game, { trigger: 'timeout', remain: remainDisplay, timestamp: sessionNowMs });
               if (timeoutResult)
                   return;
           }
-          const deltaSec = elapsedSec - CLOCK.lastCostCreditedSec;
-          if (deltaSec > 0) {
+          const lastCredited = Number.isFinite(CLOCK.lastCostCreditedSec)
+              ? CLOCK.lastCostCreditedSec
+              : 0;
+          let deltaSec = elapsedSecPrecise - lastCredited;
+          if (!Number.isFinite(deltaSec) || deltaSec < 0) {
+              deltaSec = 0;
+          }
+          const accumulatorBase = Number.isFinite(CLOCK.costAccumulator) ? CLOCK.costAccumulator : 0;
+          let nextAccumulator = accumulatorBase + deltaSec;
+          let costGranted = 0;
+          if (nextAccumulator >= 1) {
+              costGranted = Math.floor(nextAccumulator);
+              nextAccumulator -= costGranted;
+          }
+          if (!Number.isFinite(nextAccumulator) || nextAccumulator < 0) {
+              nextAccumulator = 0;
+          }
+          CLOCK.costAccumulator = nextAccumulator;
+          CLOCK.lastCostCreditedSec = Math.max(lastCredited, elapsedSecPrecise);
+          let costChanged = false;
+          if (costGranted > 0) {
               if (Game.cost < Game.costCap) {
-                  Game.cost = Math.min(Game.costCap, Game.cost + deltaSec);
+                  const nextCost = Math.min(Game.costCap, Game.cost + costGranted);
+                  if (nextCost !== Game.cost) {
+                      Game.cost = nextCost;
+                      costChanged = true;
+                  }
               }
               if (Game.ai.cost < Game.ai.costCap) {
-                  Game.ai.cost = Math.min(Game.ai.costCap, Game.ai.cost + deltaSec);
+                  const nextAiCost = Math.min(Game.ai.costCap, Game.ai.cost + costGranted);
+                  if (nextAiCost !== Game.ai.cost) {
+                      Game.ai.cost = nextAiCost;
+                      costChanged = true;
+                  }
               }
-              CLOCK.lastCostCreditedSec = elapsedSec;
+          }
+          if (costChanged) {
               if (hud && Game)
                   hud.update(Game);
               if (!Game.selectedId)
@@ -11821,6 +11916,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               renderSummonBar();
               aiMaybeAct(Game, 'cost');
           }
+          CLOCK.lastLogicMs = sessionNowMs;
           if ((_c = Game.battle) === null || _c === void 0 ? void 0 : _c.over)
               return;
           const turnState = (_d = Game.turn) !== null && _d !== void 0 ? _d : null;
@@ -11913,7 +12009,12 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           }
           else {
               tickLoopUsesTimeout = true;
-              tickLoopHandle = setTimeout(() => runTickLoop(), 16);
+              const turnMs = Number.isFinite(CLOCK.turnEveryMs) && CLOCK.turnEveryMs > 0
+                  ? CLOCK.turnEveryMs
+                  : LOGIC_MIN_INTERVAL_MS;
+              const turnSlice = Math.max(1, Math.floor(turnMs / 4));
+              const timeoutDelay = Math.max(8, Math.min(LOGIC_MIN_INTERVAL_MS, turnSlice || LOGIC_MIN_INTERVAL_MS));
+              tickLoopHandle = setTimeout(() => runTickLoop(), timeoutDelay);
           }
       }
       updateTimerAndCost();
@@ -19583,7 +19684,7 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
       }, 4000);
       return toast;
   }
-  export async function mountGachaUI(scope = null) {
+  async function mountGachaUI(scope = null) {
       var _a, _b;
       const host = scope instanceof Document ? scope.body : scope !== null && scope !== void 0 ? scope : document.body;
       if (!host) {
@@ -19723,6 +19824,7 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
       };
   }
 
+  if (!Object.prototype.hasOwnProperty.call(exports, 'mountGachaUI')) exports.mountGachaUI = mountGachaUI;
 });
 __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
   const __dep0 = __require('./screens/ui-gacha/gacha.css');
