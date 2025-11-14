@@ -166,13 +166,7 @@ const MODES = [
             title: 'Khởi đầu Cân bằng',
             role: 'PvE cốt truyện',
             description: 'Đội hình 3 DPS linh hoạt kèm 1 hỗ trợ buff và 1 tanker giữ aggro cho các màn đầu.',
-            members: [
-              'Thần Kiếm Lục Ảnh · DPS',
-              'Huyền Chân Đan Sư · Hỗ trợ',
-              'Thiên Khuyết Long Ẩn · DPS',
-              'Thánh Hộ Vệ Viêm Lân · Tank',
-              'Thái Âm Tuyết Hồ · DPS phụ'
-            ]
+            members: []
           }
         ]
       }
