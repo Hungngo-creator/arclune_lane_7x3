@@ -136,8 +136,17 @@ function coerceFinite(value: unknown, fallback: number): number {
 /* ---------- Grid ---------- */
 export function makeGrid(canvas: HTMLCanvasElement | null | undefined, cols: number, rows: number): GridSpec {
   const pad = coerceFinite(CFG.UI?.PAD, 12);
-  const boardMaxW = coerceFinite(CFG.UI?.BOARD_MAX_W, 900);
+  const boardMaxW = coerceFinite(CFG.UI?.BOARD_MAX_W, 1144);
   let viewportW = boardMaxW + pad * 2;
+  const parentElement = (canvas?.parentElement ?? null) as HTMLElement | null;
+  let parentClientW: number | null = null;
+  if (parentElement && typeof parentElement.clientWidth === 'number') {
+    const cw = parentElement.clientWidth;
+    if (Number.isFinite(cw) && cw > 0) {
+      parentClientW = cw;
+      viewportW = Math.min(viewportW, cw);
+    }
+  }
 
   if (typeof window !== 'undefined') {
     const { innerWidth, visualViewport } = window;
@@ -150,7 +159,7 @@ export function makeGrid(canvas: HTMLCanvasElement | null | undefined, cols: num
     viewportW = Math.min(viewportW, docWidth);
   }
 
-  const viewportSafeW = viewportW;
+  const viewportSafeW = parentClientW ? Math.min(viewportW, parentClientW) : viewportW;
   const availableW = Math.max(1, viewportSafeW - pad * 2);
   const w = Math.min(availableW, boardMaxW);
   const h = Math.max(Math.floor(w * (CFG.UI?.BOARD_H_RATIO ?? 3 / 7)), CFG.UI?.BOARD_MIN_H ?? 220);

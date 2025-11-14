@@ -138,7 +138,7 @@ const rawConfig = {
   // === UI constants (C2) ===
   UI: {                           // <-- bỏ dấu phẩy ở đầu
     PAD: 12,
-    BOARD_MAX_W: 900,
+    BOARD_MAX_W: 1144,
     BOARD_MIN_H: 220,
     BOARD_H_RATIO: 3/7,
     MAX_DPR: 2.5,
