@@ -5156,8 +5156,8 @@ __define('./data/modes.ts', (exports, module, __require) => {
   const COMING_SOON_MODULE_ID = '@modes/coming-soon.stub.ts';
   const LINEUP_SCREEN_MODULE_ID = '@screens/lineup/index.ts';
   const COLLECTION_SCREEN_MODULE_ID = '@screens/collection/index.ts';
-  const ARENA_HUB_SCREEN_MODULE_ID = '@screens/arena-hub/index.ts';
   const GACHA_SCREEN_MODULE_ID = '@screens/ui-gacha/index.ts';
+  const ARENA_HUB_SCREEN_MODULE_ID = '@screens/arena-hub/index.ts';
   const MODE_TYPES = {
       PVE: 'PvE',
       PVP: 'PvP',
@@ -5181,6 +5181,7 @@ __define('./data/modes.ts', (exports, module, __require) => {
           status: MODE_STATUS.AVAILABLE,
           icon: '🏟️',
           shortDescription: 'Tụ điểm tổng hợp các hoạt động chiến đấu luân phiên để người chơi bước vào chiến dịch, thử thách và mùa giải.',
+          unlockNotes: 'Cung cấp lối vào nhanh tới chiến dịch, thử thách, đấu trường PvE/PvP và các mùa giải đặc biệt.',
           tags: ['PvE', 'PvP'],
           menuSections: ['core-pve'],
           shell: {
@@ -8405,6 +8406,7 @@ __define('./entry.ts', (exports, module, __require) => {
   const SCREEN_COLLECTION = 'collection';
   const SCREEN_LINEUP = 'lineup';
   const SCREEN_GACHA = 'gacha';
+  const SCREEN_ARENA_HUB = 'arena-hub';
   const COMING_SOON_MODULE_ID = '@modes/coming-soon.stub.ts';
   const COLLECTION_SCREEN_MODULE_ID = '@screens/collection/index.ts';
   const LINEUP_SCREEN_MODULE_ID = '@screens/lineup/index.ts';
@@ -8415,6 +8417,7 @@ __define('./entry.ts', (exports, module, __require) => {
       `app--${SCREEN_COLLECTION}`,
       `app--${SCREEN_LINEUP}`,
       `app--${SCREEN_GACHA}`,
+      `app--${SCREEN_ARENA_HUB}`,
   ];
   async function loadBundledModule(id) {
       var _a, _b;
@@ -14599,68 +14602,121 @@ __define('./scene.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'drawBattlefieldScene')) exports.drawBattlefieldScene = drawBattlefieldScene;
 });
 __define('./screens/arena-hub/index.ts', (exports, module, __require) => {
-  const __dep0 = __require('./data/modes.ts');
-  const MODE_INDEX = __dep0.MODE_INDEX;
-  const MODE_STATUS = __dep0.MODE_STATUS;
-  const __dep1 = __require('./ui/dom.ts');
-  const ensureStyleTag = __dep1.ensureStyleTag;
-  const mountSection = __dep1.mountSection;
-  const __dep2 = __require('./screens/main-menu/view/events.ts');
-  const createModeCard = __dep2.createModeCard;
+  const __dep0 = __require('./ui/dom.ts');
+  const ensureStyleTag = __dep0.ensureStyleTag;
+  const mountSection = __dep0.mountSection;
+  const __dep1 = __require('./screens/main-menu/view/events.ts');
+  const createModeCard = __dep1.createModeCard;
+  const __dep2 = __require('./data/modes.ts');
+  const MODE_INDEX = __dep2.MODE_INDEX;
+  const MODES = __dep2.MODES;
   const STYLE_ID = 'arena-hub-screen-style';
-  const CHILD_MODE_IDS = ['arena', 'beast-arena', 'ares', 'challenge', 'campaign'];
-  const DEFAULT_TITLE = 'Arena Hub';
-  const DEFAULT_DESCRIPTION = 'Tụ điểm tổng hợp các hoạt động chiến đấu luân phiên để người chơi bước vào chiến dịch, thử thách và mùa giải.';
+  const ARENA_HUB_ID = 'arena-hub';
+  const CHILD_ORDER = ['arena', 'beast-arena', 'ares', 'challenge', 'campaign'];
+  const CSS = /* css */ `
+    .app--arena-hub{
+      padding:32px 16px 64px;
+    }
+    .arena-hub{
+      max-width:1040px;
+      margin:0 auto;
+      display:flex;
+      flex-direction:column;
+      gap:32px;
+      color:inherit;
+    }
+    .arena-hub__header{
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+    }
+    .arena-hub__back{
+      align-self:flex-start;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 18px;
+      border-radius:999px;
+      border:1px solid rgba(125,211,252,0.45);
+      background:rgba(15,26,40,0.85);
+      color:#d7ecff;
+      cursor:pointer;
+      font-size:13px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      transition:background 0.2s ease,border-color 0.2s ease,color 0.2s ease;
+    }
+    .arena-hub__back:hover,
+    .arena-hub__back:focus-visible{
+      background:rgba(18,32,48,0.95);
+      border-color:rgba(125,211,252,0.75);
+      color:#f1fbff;
+      outline:none;
+    }
+    .arena-hub__titles{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      max-width:640px;
+    }
+    .arena-hub__title{
+      margin:0;
+      font-size:40px;
+      text-transform:uppercase;
+      letter-spacing:.1em;
+    }
+    .arena-hub__subtitle{
+      margin:0;
+      color:#9cbcd9;
+      line-height:1.6;
+      font-size:16px;
+    }
+    .arena-hub__grid{
+      display:grid;
+      gap:20px;
+    }
+    @media(min-width:720px){
+      .arena-hub__grid{
+        grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      }
+    }
+    .arena-hub__card{
+      width:100%;
+    }
+  `;
   function ensureStyles() {
-      const css = `
-      .app--arena-hub{padding:32px 16px 64px;}
-      .arena-hub{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:32px;color:inherit;}
-      .arena-hub__header{display:flex;flex-direction:column;gap:18px;}
-      .arena-hub__title{margin:0;font-size:40px;letter-spacing:.08em;text-transform:uppercase;}
-      .arena-hub__description{margin:0;color:#9cbcd9;line-height:1.6;font-size:16px;}
-      .arena-hub__back{align-self:flex-start;padding:10px 18px;border-radius:999px;border:1px solid rgba(125,211,252,.32);background:rgba(12,22,32,.82);color:#aee4ff;letter-spacing:.08em;text-transform:uppercase;font-size:12px;cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;}
-      .arena-hub__back:hover{transform:translateY(-2px);border-color:rgba(174,228,255,.52);box-shadow:0 12px 26px rgba(6,12,20,.4);}
-      .arena-hub__back:focus-visible{outline:2px solid rgba(174,228,255,.75);outline-offset:3px;}
-      .arena-hub__content{display:flex;flex-direction:column;gap:24px;}
-      .arena-hub__cards{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));}
-      .arena-hub__cards .mode-card{width:100%;}
-      .arena-hub__cards .mode-card__status{top:16px;right:16px;}
-      .arena-hub__cards .mode-card:hover{transform:translateY(-2px);}
-      .arena-hub__empty{margin:0;color:#9cbcd9;font-size:14px;line-height:1.6;}
-      @media(max-width:640px){
-        .arena-hub__title{font-size:32px;}
-        .arena-hub__cards{grid-template-columns:minmax(0,1fr);}
-      }
-    `;
-      ensureStyleTag(STYLE_ID, { css });
+      ensureStyleTag(STYLE_ID, { css: CSS });
   }
-  function cloneParams(params) {
-      if (!params) {
-          return null;
-      }
-      return { ...params };
-  }
-  function toMenuCardMetadata(mode) {
+  function toMetadata(mode) {
       var _a, _b, _c;
-      const params = mode.status === MODE_STATUS.AVAILABLE
-          ? cloneParams((_a = mode.shell) === null || _a === void 0 ? void 0 : _a.defaultParams)
+      const params = (_a = mode.shell) === null || _a === void 0 ? void 0 : _a.defaultParams;
+      const normalizedParams = params && typeof params === 'object' && !Array.isArray(params)
+          ? { ...params }
           : null;
       return {
           key: mode.id,
           id: ((_b = mode.shell) === null || _b === void 0 ? void 0 : _b.screenId) || mode.id,
-          title: mode.title,
+          title: mode.title || mode.id,
           description: mode.shortDescription,
           icon: mode.icon,
           tags: Array.isArray(mode.tags) ? [...mode.tags] : [],
           status: mode.status,
-          params,
+          params: normalizedParams,
           parentId: (_c = mode.parentId) !== null && _c !== void 0 ? _c : null,
       };
   }
-  function render(options) {
-      const { root, shell = null, definition = null } = options !== null && options !== void 0 ? options : { root: null };
+  function getChildModes() {
+      const ordered = CHILD_ORDER
+          .map(id => MODE_INDEX[id])
+          .filter((mode) => Boolean(mode) && mode.parentId === ARENA_HUB_ID);
+      const seen = new Set(ordered.map(mode => mode.id));
+      const extras = MODES.filter(mode => mode.parentId === ARENA_HUB_ID && !seen.has(mode.id));
+      return [...ordered, ...extras];
+  }
+  function renderScreen(context) {
+      const { root, shell = null, definition = null } = context;
       if (!root) {
-          throw new Error('render Arena Hub cần một phần tử root hợp lệ.');
+          throw new Error('renderScreen cần root hợp lệ.');
       }
       ensureStyles();
       const cleanups = [];
@@ -14671,17 +14727,13 @@ __define('./screens/arena-hub/index.ts', (exports, module, __require) => {
       };
       const container = document.createElement('div');
       container.className = 'arena-hub';
-      const mount = mountSection({
-          root,
-          section: container,
-          rootClasses: 'app--arena-hub',
-      });
+      const mount = mountSection({ root, section: container });
       const header = document.createElement('header');
       header.className = 'arena-hub__header';
-      container.appendChild(header);
       const backButton = document.createElement('button');
       backButton.type = 'button';
       backButton.className = 'arena-hub__back';
+      backButton.setAttribute('aria-label', 'Trở về menu chính');
       backButton.textContent = '← Trở về menu chính';
       const handleBack = (event) => {
           event.preventDefault();
@@ -14692,40 +14744,30 @@ __define('./screens/arena-hub/index.ts', (exports, module, __require) => {
       backButton.addEventListener('click', handleBack);
       addCleanup(() => backButton.removeEventListener('click', handleBack));
       header.appendChild(backButton);
+      const titles = document.createElement('div');
+      titles.className = 'arena-hub__titles';
       const title = document.createElement('h1');
       title.className = 'arena-hub__title';
-      const normalizedTitle = (definition === null || definition === void 0 ? void 0 : definition.label) && definition.label.trim().length
-          ? definition.label.trim()
-          : DEFAULT_TITLE;
-      title.textContent = normalizedTitle;
-      header.appendChild(title);
-      const descriptionText = (definition === null || definition === void 0 ? void 0 : definition.description) && definition.description.trim().length
-          ? definition.description
-          : DEFAULT_DESCRIPTION;
-      const description = document.createElement('p');
-      description.className = 'arena-hub__description';
-      description.textContent = descriptionText;
-      header.appendChild(description);
-      const content = document.createElement('section');
-      content.className = 'arena-hub__content';
-      container.appendChild(content);
-      const cardsWrapper = document.createElement('div');
-      cardsWrapper.className = 'arena-hub__cards';
-      content.appendChild(cardsWrapper);
-      const childMetadata = CHILD_MODE_IDS.map(childId => MODE_INDEX[childId]).filter((mode) => Boolean(mode));
-      if (childMetadata.length === 0) {
-          const emptyMessage = document.createElement('p');
-          emptyMessage.className = 'arena-hub__empty';
-          emptyMessage.textContent = 'Chưa có chế độ nào khả dụng.';
-          content.appendChild(emptyMessage);
+      title.textContent = (definition === null || definition === void 0 ? void 0 : definition.label) || 'Arena Hub';
+      titles.appendChild(title);
+      if (definition === null || definition === void 0 ? void 0 : definition.description) {
+          const subtitle = document.createElement('p');
+          subtitle.className = 'arena-hub__subtitle';
+          subtitle.textContent = definition.description;
+          titles.appendChild(subtitle);
       }
-      else {
-          childMetadata.forEach(mode => {
-              const metadata = toMenuCardMetadata(mode);
-              const card = createModeCard(metadata, shell, undefined, addCleanup);
-              cardsWrapper.appendChild(card);
-          });
-      }
+      header.appendChild(titles);
+      container.appendChild(header);
+      const grid = document.createElement('div');
+      grid.className = 'arena-hub__grid';
+      const childModes = getChildModes();
+      childModes.forEach(mode => {
+          const metadata = toMetadata(mode);
+          const card = createModeCard(metadata, shell, undefined, addCleanup, { extraClass: 'arena-hub__card' });
+          card.classList.add('arena-hub__card');
+          grid.appendChild(card);
+      });
+      container.appendChild(grid);
       return {
           destroy() {
               cleanups.forEach(fn => {
@@ -14738,11 +14780,13 @@ __define('./screens/arena-hub/index.ts', (exports, module, __require) => {
               });
               cleanups.length = 0;
               mount.destroy();
-          },
+          }
       };
   }
+  const render = renderScreen;
 
   if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
 });
 __define('./screens/collection/helpers.ts', (exports, module, __require) => {
   const __dep0 = __require('./catalog.ts');
@@ -19939,13 +19983,13 @@ __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
     <div class="gacha-app" data-app-root>
       <header class="gacha-topbar" data-section="topbar">
       <button
-          class="gacha-topbar__back-button"
+          class="gacha-topbar__back"
           type="button"
-          aria-label="Trở về"
-          title="Trở về"
+          aria-label="Trở về menu chính"
+          title="Trở về menu chính"
           data-action="go-back"
         >
-          ← Trở về 
+          ← <span class="gacha-topbar__back-label">Menu chính</span>
         </button>
         <button
           class="banner-drawer-toggle"
@@ -20186,7 +20230,7 @@ __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
       return wrapper;
   }
   function renderScreen(context) {
-      const { root } = context;
+      const { root, shell = null } = context;
       if (!root) {
           throw new Error('renderScreen cần root hợp lệ.');
       }
@@ -20195,6 +20239,16 @@ __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
       let disposed = false;
       let handle = null;
       const previousFlag = typeof window !== 'undefined' ? window.__ARC_GACHA_EMBED__ : undefined;
+      const goBackButton = container.querySelector('[data-action="go-back"]');
+      const handleGoBack = (event) => {
+          event.preventDefault();
+          if (shell && typeof shell.enterScreen === 'function') {
+              shell.enterScreen('main-menu');
+          }
+      };
+      if (goBackButton instanceof HTMLButtonElement) {
+          goBackButton.addEventListener('click', handleGoBack);
+      }
       if (typeof window !== 'undefined') {
           window.__ARC_GACHA_EMBED__ = true;
       }
@@ -20227,6 +20281,9 @@ __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
               console.warn('[Gacha UI] Lỗi khi huỷ module gacha:', error);
           }
           handle = null;
+          if (goBackButton instanceof HTMLButtonElement) {
+              goBackButton.removeEventListener('click', handleGoBack);
+          }
           if (container.parentElement === root) {
               root.removeChild(container);
           }
