@@ -16,6 +16,7 @@ import {
 import type { CollectionEntry, CurrencyCatalog, CurrencyBalanceProvider, UnknownRecord } from './types.ts';
 import { HAS_INTL_NUMBER_FORMAT } from '../../utils/format.ts';
 import type { NumberFormatter, NumberFormatOptions } from '../../utils/format.ts';
+import { getCurrencyDefinitions } from '../../utils/currency.ts';
 
 const isRosterEntryLite = (value: unknown): value is RosterEntryLite => (
   typeof value === 'object'
@@ -392,12 +393,8 @@ export function collectAbilityFacts(entry: unknown): AbilityFact[]{
   return facts;
 }
 
-export function getCurrencyCatalog(listCurrencies: () => unknown): CurrencyCatalog{
-  const catalog = listCurrencies();
-  if (Array.isArray(catalog)){
-    return catalog as CurrencyCatalog;
-  }
-  return [];
+export function getCurrencyCatalog(): CurrencyCatalog{
+  return getCurrencyDefinitions();
 }
 
 type NumberFormatterFactory = (

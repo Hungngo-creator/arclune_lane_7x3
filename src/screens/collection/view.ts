@@ -1,6 +1,5 @@
 import { getUnitArt } from '../../art.ts';
 import { normalizeUnitId } from '../../utils/unit-id.ts';
-import { listCurrencies } from '../../data/economy.ts';
 import { getSkillSet } from '../../data/skills.ts';
 import { createNumberFormatter } from '../../utils/format.ts';
 import { assertElement, ensureStyleTag, mountSection } from '../../ui/dom.ts';
@@ -42,7 +41,7 @@ const TAB_DEFINITIONS = [
   { key: 'voice', label: 'Giọng Nói', hint: 'Nghe thử voice line, thiết lập voice pack và gợi ý mở khóa.' }
 ] satisfies ReadonlyArray<{ key: CollectionTabKey; label: string; hint: string }>;
 
-const currencyCatalog: CurrencyCatalog = getCurrencyCatalog(listCurrencies as () => ReadonlyArray<CurrencyDefinition>);
+const currencyCatalog: CurrencyCatalog = getCurrencyCatalog();
 const currencyFormatter = ensureNumberFormatter(createNumberFormatter, 'vi-VN');
 
 function toSafeText(value: string | number | null | undefined): string{
