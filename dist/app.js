@@ -11741,7 +11741,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       };
       timerElement = (queryFromRoot('#timer') || doc.getElementById('timer'));
       const updateTimerAndCost = (timestamp) => {
-          var _a, _b, _c, _d, _e;
+          var _a, _b, _c, _d, _e, _f;
           if (!CLOCK || !Game)
               return;
           if ((_a = Game.battle) === null || _a === void 0 ? void 0 : _a.over)
@@ -11956,7 +11956,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           CLOCK.lastLogicMs = sessionNowMs;
           if ((_c = Game.battle) === null || _c === void 0 ? void 0 : _c.over)
               return;
-          const turnState = (_d = Game.turn) !== null && _d !== void 0 ? _d : null;
+          let turnState = (_d = Game.turn) !== null && _d !== void 0 ? _d : null;
           let busyUntil = 0;
           if (turnState) {
               const rawBusy = turnState.busyUntil;
@@ -11984,7 +11984,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           else if (CLOCK.lastTurnStepMs > sessionNowMs) {
               CLOCK.lastTurnStepMs = sessionNowMs - turnEveryMs;
           }
-          const readyByBusy = sessionNowMs >= busyUntil;
+          let readyByBusy = sessionNowMs >= busyUntil;
           let elapsedForTurn = sessionNowMs - CLOCK.lastTurnStepMs;
           if (readyByBusy && (!Number.isFinite(elapsedForTurn) || elapsedForTurn < -stallDeltaEpsilon)) {
               CLOCK.lastTurnStepMs = sessionNowMs - turnEveryMs;
@@ -12012,6 +12012,18 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                       return;
                   }
                   aiMaybeAct(Game, 'board');
+                  turnState = (_f = Game.turn) !== null && _f !== void 0 ? _f : null;
+                  if (turnState) {
+                      const rawBusyAfter = turnState.busyUntil;
+                      busyUntil = isFiniteNumber(rawBusyAfter) && rawBusyAfter > 0 ? rawBusyAfter : 0;
+                      if (!isFiniteNumber(rawBusyAfter) || rawBusyAfter <= 0) {
+                          turnState.busyUntil = busyUntil;
+                      }
+                  }
+                  else {
+                      busyUntil = 0;
+                  }
+                  readyByBusy = sessionNowMs >= busyUntil;
               }
           }
       };
@@ -12408,13 +12420,17 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       };
       timerElement = (queryFromRoot('#timer') || doc.getElementById('timer'));
   }
+  function isDocumentNode(value) {
+      const documentNodeType = typeof Node !== 'undefined' ? Node.DOCUMENT_NODE : 9;
+      return value.nodeType === documentNodeType;
+  }
   function configureRoot(root) {
       var _a;
       rootElement = root || null;
       if (rootElement && rootElement.ownerDocument) {
           docRef = rootElement.ownerDocument;
       }
-      else if (rootElement && rootElement.nodeType === 9) {
+      else if (rootElement && isDocumentNode(rootElement)) {
           docRef = rootElement;
       }
       else {
@@ -12851,10 +12867,10 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
   const __dep5 = __require('./background.ts');
   const getEnvironmentBackground = __dep5.getEnvironmentBackground;
   const drawEnvironmentProps = __dep5.drawEnvironmentProps;
-  const __dep6 = __require('./engine.ts');
-  const drawGridOblique = __dep6.drawGridOblique;
-  const __dep7 = __require('./scene.ts');
-  const getCachedBattlefieldScene = __dep7.getCachedBattlefieldScene;
+  const __dep6 = __require('./scene.ts');
+  const getCachedBattlefieldScene = __dep6.getCachedBattlefieldScene;
+  const __dep7 = __require('./engine.ts');
+  const drawGridOblique = __dep7.drawGridOblique;
   const __dep8 = __require('./statuses.ts');
   const Statuses = __dep8.Statuses;
   const __dep9 = __require('./art.ts');
@@ -13335,9 +13351,10 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
       else if (dprRaw !== 1 && typeof cacheCtx.scale === 'function') {
           cacheCtx.scale(dprRaw, dprRaw);
       }
+      const drawCtx = cacheCtx;
       try {
-          drawEnvironmentProps(cacheCtx, grid, camPreset, backgroundKey !== null && backgroundKey !== void 0 ? backgroundKey : undefined);
-          drawGridOblique(cacheCtx, grid, camPreset);
+          drawEnvironmentProps(drawCtx, grid, camPreset, backgroundKey !== null && backgroundKey !== void 0 ? backgroundKey : undefined);
+          drawGridOblique(drawCtx, grid, camPreset);
       }
       catch (err) {
           console.error('[scene-cache]', err);
