@@ -19086,18 +19086,15 @@ __define('./screens/main-menu/view/events.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'createModeGroupCard')) exports.createModeGroupCard = createModeGroupCard;
 });
 __define('./screens/main-menu/view/index.ts', (exports, module, __require) => {
-  const __dep1 = __require('./screens/main-menu/dialogues.ts');
-  const HERO_DEFAULT_ID = __dep1.HERO_DEFAULT_ID;
-  const __dep2 = __require('./ui/dom.ts');
-  const mountSection = __dep2.mountSection;
-  const __dep3 = __require('./screens/main-menu/view/layout.ts');
-  const ensureStyles = __dep3.ensureStyles;
-  const createHeader = __dep3.createHeader;
-  const createHeroSection = __dep3.createHeroSection;
-  const createModesSection = __dep3.createModesSection;
-  const createSidebar = __dep3.createSidebar;
+  const __dep1 = __require('./ui/dom.ts');
+  const mountSection = __dep1.mountSection;
+  const __dep2 = __require('./screens/main-menu/view/layout.ts');
+  const ensureStyles = __dep2.ensureStyles;
+  const createHeader = __dep2.createHeader;
+  const createModesSection = __dep2.createModesSection;
+  const createSidebar = __dep2.createSidebar;
   function renderMainMenuView(state) {
-      const { root, shell = null, sections = [], metadata = [], heroId = HERO_DEFAULT_ID, playerGender = 'neutral', onShowComingSoon } = state;
+      const { root, shell = null, sections = [], metadata = [], onShowComingSoon } = state;
       if (!root)
           return null;
       ensureStyles();
@@ -19122,8 +19119,6 @@ __define('./screens/main-menu/view/index.ts', (exports, module, __require) => {
       container.appendChild(layout);
       const primary = document.createElement('div');
       primary.className = 'main-menu-v2__primary';
-      const hero = createHeroSection({ heroId, playerGender, addCleanup });
-      primary.appendChild(hero);
       const modes = createModesSection({ sections, metadata, shell, onShowComingSoon, addCleanup });
       primary.appendChild(modes);
       const sidebar = createSidebar({ shell, addCleanup });
@@ -19148,7 +19143,6 @@ __define('./screens/main-menu/view/index.ts', (exports, module, __require) => {
 
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureStyles')) exports.ensureStyles = __reexport0.ensureStyles;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createHeader')) exports.createHeader = __reexport0.createHeader;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'createHeroSection')) exports.createHeroSection = __reexport0.createHeroSection;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createModesSection')) exports.createModesSection = __reexport0.createModesSection;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createSidebar')) exports.createSidebar = __reexport0.createSidebar;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderMainMenuView')) exports.renderMainMenuView = renderMainMenuView;
@@ -19158,15 +19152,9 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
   const getAllSidebarAnnouncements = __dep0.getAllSidebarAnnouncements;
   const __dep1 = __require('./ui/dom.ts');
   const ensureStyleTag = __dep1.ensureStyleTag;
-  const __dep2 = __require('./screens/main-menu/dialogues.ts');
-  const getHeroDialogue = __dep2.getHeroDialogue;
-  const getHeroHotspots = __dep2.getHeroHotspots;
-  const getHeroProfile = __dep2.getHeroProfile;
-  const HERO_DEFAULT_ID = __dep2.HERO_DEFAULT_ID;
-  const __dep3 = __require('./screens/main-menu/view/events.ts');
-  const cueTone = __dep3.cueTone;
-  const createModeCard = __dep3.createModeCard;
-  const createModeGroupCard = __dep3.createModeGroupCard;
+  const __dep2 = __require('./screens/main-menu/view/events.ts');
+  const createModeCard = __dep2.createModeCard;
+  const createModeGroupCard = __dep2.createModeGroupCard;
   const STYLE_ID = 'main-menu-view-style';
   function ensureStyles() {
       const css = `
@@ -19180,42 +19168,11 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
       .main-menu-v2__meta-chip{padding:8px 16px;border-radius:999px;border:1px solid rgba(125,211,252,.32);background:rgba(18,28,38,.68);letter-spacing:.12em;font-size:12px;text-transform:uppercase;color:#aee4ff;}
       .main-menu-v2__layout{display:grid;grid-template-columns:minmax(0,3fr) minmax(240px,1fr);gap:32px;align-items:start;}
       .main-menu-v2__primary{display:flex;flex-direction:column;gap:32px;}
-      .hero-section{display:flex;flex-direction:column;gap:16px;}
-      .hero-panel{position:relative;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);border-radius:26px;overflow:hidden;border:1px solid rgba(125,211,252,.32);background:linear-gradient(135deg,var(--hero-secondary,rgba(20,32,44,.92)),rgba(12,20,28,.75));box-shadow:0 32px 68px rgba(3,8,16,.55);min-height:340px;transition:box-shadow .3s ease,border-color .3s ease;}
-      .hero-panel::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 18% 24%,rgba(255,255,255,.18),transparent 58%);opacity:.6;pointer-events:none;}
-      .hero-panel__info{position:relative;z-index:2;padding:32px;display:flex;flex-direction:column;gap:18px;background:linear-gradient(180deg,rgba(12,18,24,.85),rgba(12,18,24,.35));}
-      .hero-panel__identity{display:flex;flex-direction:column;gap:6px;}
-      .hero-panel__role{margin:0;font-size:13px;text-transform:uppercase;letter-spacing:.16em;color:rgba(174,228,255,.68);}
-      .hero-panel__name{margin:0;font-size:26px;letter-spacing:.06em;}
-      .hero-panel__motto{margin:0;font-size:14px;color:#9cbcd9;line-height:1.6;}
-      .hero-dialogue{position:relative;background:rgba(12,24,34,.88);border:1px solid rgba(125,211,252,.28);border-radius:18px;padding:18px 22px;box-shadow:0 18px 42px rgba(6,10,16,.55);display:flex;flex-direction:column;gap:10px;min-height:96px;}
-      .hero-dialogue__tone{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;display:flex;align-items:center;gap:6px;}
-      .hero-dialogue__tone[data-tone="warning"]{color:#ffe066;}
-      .hero-dialogue__tone[data-tone="motivate"]{color:#9fffe0;}
-      .hero-dialogue__tone[data-tone="greeting"]{color:#aee4ff;}
-      .hero-dialogue__tone[data-tone="gentle"]{color:#ffc9ec;}
-      .hero-dialogue__tone[data-tone="focus"]{color:#7dd3fc;}
-      .hero-dialogue__tone[data-tone="calm"]{color:#9cbcd9;}
-      .hero-dialogue__text{margin:0;font-size:16px;line-height:1.6;color:#e6f2ff;}
-      .hero-panel__canvas{position:relative;z-index:1;border:none;outline:none;background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(9,15,21,.72));display:flex;align-items:flex-end;justify-content:center;cursor:pointer;overflow:hidden;padding:24px;min-height:340px;}
-      .hero-panel__canvas img{width:92%;max-width:420px;height:auto;filter:drop-shadow(0 24px 48px rgba(0,0,0,.6));transition:transform .3s ease,filter .3s ease;}
-      .hero-panel__glow{position:absolute;bottom:-38%;left:50%;transform:translateX(-50%);width:160%;height:160%;background:radial-gradient(circle,var(--hero-accent,rgba(125,211,252,.65)) 0%,transparent 65%);opacity:.45;transition:opacity .3s ease,transform .3s ease;pointer-events:none;}
-      .hero-panel.is-hovered{border-color:rgba(125,211,252,.5);box-shadow:0 36px 72px rgba(6,12,20,.65);}
-      .hero-panel.is-hovered .hero-panel__canvas img{transform:translateY(-8px) scale(1.04);filter:drop-shadow(0 28px 52px rgba(0,0,0,.7));}
-      .hero-panel.is-hovered .hero-panel__glow{opacity:.72;}
-      .hero-panel.is-pressed .hero-panel__canvas img{transform:translateY(2px) scale(.98);}
-      .hero-panel--alert{animation:hero-alert .8s ease;}
-      @keyframes hero-alert{0%{box-shadow:0 34px 76px rgba(40,10,10,.65);}40%{box-shadow:0 20px 56px rgba(120,40,20,.55);}100%{box-shadow:0 32px 68px rgba(3,8,16,.55);}}
-      .hero-panel__hotspot{position:absolute;border:1px dashed rgba(255,255,255,.42);background:rgba(125,211,252,.16);backdrop-filter:blur(2px);border-radius:50%;width:30%;height:30%;top:24%;right:18%;opacity:0;transform:scale(.9);transition:opacity .2s ease,transform .2s ease,border-color .2s ease;background-clip:padding-box;}
-      .hero-panel__hotspot span{position:absolute;bottom:-36px;left:50%;transform:translateX(-50%);background:rgba(8,16,24,.92);padding:6px 12px;border-radius:12px;border:1px solid rgba(125,211,252,.4);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#c8e7ff;white-space:nowrap;opacity:0;transition:opacity .2s ease,transform .2s ease;pointer-events:none;}
-      .hero-panel.is-hovered .hero-panel__hotspot,.hero-panel__hotspot:focus-visible,.hero-panel__hotspot:hover{opacity:1;transform:scale(1);}
-      .hero-panel__hotspot:hover span,.hero-panel__hotspot:focus-visible span{opacity:1;transform:translate(-50%,-6px);}
-      .hero-panel__hotspot:focus-visible{outline:2px solid var(--hero-accent,#7dd3fc);outline-offset:4px;}
       .main-menu-modes{display:flex;flex-direction:column;gap:24px;}
       .main-menu-modes__title{margin:0;font-size:24px;letter-spacing:.1em;text-transform:uppercase;color:#aee4ff;}
       .mode-section{display:flex;flex-direction:column;gap:18px;}
       .mode-section__name{margin:0;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
-      .mode-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}
+      .mode-grid{display:flex;flex-direction:column;gap:16px;}
       .mode-card{position:relative;display:flex;flex-direction:column;gap:12px;align-items:flex-start;padding:24px;border-radius:20px;border:1px solid rgba(125,211,252,.24);background:linear-gradient(150deg,rgba(16,26,36,.92),rgba(18,30,42,.65));color:inherit;cursor:pointer;transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;}
       .mode-card:hover{transform:translateY(-4px);box-shadow:0 20px 44px rgba(6,12,18,.55);border-color:rgba(125,211,252,.46);}
       .mode-card:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:4px;}
@@ -19234,7 +19191,7 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
       .mode-card--compact .mode-card__title{font-size:14px;letter-spacing:.1em;}
       .mode-card--compact .mode-card__tags{display:none;}
       .mode-card--compact .mode-card__status{left:14px;right:auto;top:14px;padding:4px 10px;}
-      .mode-grid--economy{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:16px;padding-bottom:4px;}
+      .mode-grid--economy{flex-direction:row;flex-wrap:nowrap;overflow-x:auto;gap:16px;padding-bottom:4px;}
       .mode-grid--economy > *{flex:0 0 140px;}
       .mode-grid--economy::-webkit-scrollbar{height:6px;}
       .mode-grid--economy::-webkit-scrollbar-thumb{background:rgba(125,211,252,.24);border-radius:999px;}
@@ -19267,28 +19224,10 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
       .sidebar-slot__desc{margin:0;font-size:13px;color:#9cbcd9;line-height:1.5;}
       .sidebar-slot__reward{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#ffe066;}
       .sidebar-slot:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:4px;}
-      @media(max-width:1080px){.hero-panel{grid-template-columns:1fr;}.hero-panel__canvas{min-height:300px;}}
       @media(max-width:960px){.main-menu-v2__layout{grid-template-columns:1fr;}.main-menu-sidebar{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;}}
-      @media(max-width:640px){.main-menu-v2{gap:24px;}.hero-panel__info{padding:24px;}.hero-panel__canvas{padding:20px;}.main-menu-v2__title{font-size:36px;}.mode-card{padding:20px;}}
+      @media(max-width:640px){.main-menu-v2{gap:24px;}.main-menu-v2__title{font-size:36px;}.mode-card{padding:20px;}}
     `;
       ensureStyleTag(STYLE_ID, { css });
-  }
-  function applyPalette(element, profile) {
-      var _a;
-      if (!element)
-          return;
-      const palette = (_a = profile.art) === null || _a === void 0 ? void 0 : _a.palette;
-      if (!palette)
-          return;
-      const { primary, secondary, accent, outline } = palette;
-      if (primary)
-          element.style.setProperty('--hero-primary', primary);
-      if (secondary)
-          element.style.setProperty('--hero-secondary', secondary);
-      if (accent)
-          element.style.setProperty('--hero-accent', accent);
-      if (outline)
-          element.style.setProperty('--hero-outline', outline);
   }
   function createModesSection(options) {
       const { sections = [], metadata = [], shell, onShowComingSoon, addCleanup } = options;
@@ -19344,156 +19283,6 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
           sectionEl.appendChild(sectionGroup);
       });
       return sectionEl;
-  }
-  function createHeroSection(options) {
-      var _a, _b;
-      const { heroId = HERO_DEFAULT_ID, playerGender = 'neutral', addCleanup } = options;
-      const profile = getHeroProfile(heroId);
-      const heroSection = document.createElement('section');
-      heroSection.className = 'hero-section';
-      const panel = document.createElement('div');
-      panel.className = 'hero-panel';
-      applyPalette(panel, profile);
-      heroSection.appendChild(panel);
-      const info = document.createElement('div');
-      info.className = 'hero-panel__info';
-      const dialogue = document.createElement('div');
-      dialogue.className = 'hero-dialogue';
-      const toneEl = document.createElement('div');
-      toneEl.className = 'hero-dialogue__tone';
-      dialogue.appendChild(toneEl);
-      const textEl = document.createElement('p');
-      textEl.className = 'hero-dialogue__text';
-      dialogue.appendChild(textEl);
-      info.appendChild(dialogue);
-      const identity = document.createElement('div');
-      identity.className = 'hero-panel__identity';
-      const role = document.createElement('p');
-      role.className = 'hero-panel__role';
-      role.textContent = `${profile.faction || 'Arclune'} — ${profile.role || 'Tiên phong'}`;
-      const name = document.createElement('h2');
-      name.className = 'hero-panel__name';
-      name.textContent = profile.name || 'Anh hùng';
-      identity.appendChild(role);
-      identity.appendChild(name);
-      if (profile.title) {
-          const title = document.createElement('p');
-          title.className = 'hero-panel__motto';
-          title.textContent = profile.title;
-          identity.appendChild(title);
-      }
-      if (profile.motto) {
-          const motto = document.createElement('p');
-          motto.className = 'hero-panel__motto';
-          motto.textContent = profile.motto;
-          identity.appendChild(motto);
-      }
-      info.appendChild(identity);
-      panel.appendChild(info);
-      const canvas = document.createElement('button');
-      canvas.type = 'button';
-      canvas.className = 'hero-panel__canvas';
-      canvas.setAttribute('aria-label', `Tương tác với ${profile.name || 'nhân vật chính'}`);
-      if ((_b = (_a = profile.art) === null || _a === void 0 ? void 0 : _a.sprite) === null || _b === void 0 ? void 0 : _b.src) {
-          const img = document.createElement('img');
-          img.src = profile.art.sprite.src;
-          img.alt = profile.name || 'Anh hùng Arclune';
-          canvas.appendChild(img);
-      }
-      const glow = document.createElement('div');
-      glow.className = 'hero-panel__glow';
-      canvas.appendChild(glow);
-      const hotspots = getHeroHotspots(profile.id);
-      hotspots.forEach(spot => {
-          if (!spot)
-              return;
-          const hotspotBtn = document.createElement('button');
-          hotspotBtn.type = 'button';
-          hotspotBtn.className = 'hero-panel__hotspot';
-          hotspotBtn.dataset.cue = spot.cue || 'sensitive';
-          hotspotBtn.dataset.zone = spot.key;
-          hotspotBtn.setAttribute('aria-label', spot.label || 'Điểm tương tác đặc biệt');
-          const label = document.createElement('span');
-          label.textContent = spot.label || 'Tương tác';
-          hotspotBtn.appendChild(label);
-          const handleClick = (event) => {
-              event.preventDefault();
-              event.stopPropagation();
-              showDialogue(spot.cue || 'sensitive', { zone: spot.key });
-              panel.classList.add('hero-panel--alert');
-              window.setTimeout(() => panel.classList.remove('hero-panel--alert'), 620);
-          };
-          const handleHover = () => {
-              panel.classList.add('is-hovered');
-          };
-          const handleLeave = () => {
-              panel.classList.remove('is-hovered');
-          };
-          hotspotBtn.addEventListener('click', handleClick);
-          hotspotBtn.addEventListener('mouseenter', handleHover);
-          hotspotBtn.addEventListener('focus', handleHover);
-          hotspotBtn.addEventListener('mouseleave', handleLeave);
-          hotspotBtn.addEventListener('blur', handleLeave);
-          addCleanup(() => {
-              hotspotBtn.removeEventListener('click', handleClick);
-              hotspotBtn.removeEventListener('mouseenter', handleHover);
-              hotspotBtn.removeEventListener('focus', handleHover);
-              hotspotBtn.removeEventListener('mouseleave', handleLeave);
-              hotspotBtn.removeEventListener('blur', handleLeave);
-          });
-          canvas.appendChild(hotspotBtn);
-      });
-      panel.appendChild(canvas);
-      const updateTone = (tone, label) => {
-          const { icon, tone: normalizedTone } = cueTone(tone);
-          toneEl.dataset.tone = normalizedTone;
-          toneEl.textContent = `${icon} ${label || ''}`.trim();
-      };
-      const showDialogue = (cue, extra = {}) => {
-          const dialogueData = getHeroDialogue(profile.id, cue, { gender: playerGender, zone: extra.zone });
-          textEl.textContent = dialogueData.text;
-          updateTone(dialogueData.tone, dialogueData.label);
-      };
-      const handleEnter = () => {
-          panel.classList.add('is-hovered');
-          showDialogue('hover');
-      };
-      const handleLeave = () => {
-          panel.classList.remove('is-hovered');
-          showDialogue('idle');
-      };
-      const triggerTap = () => {
-          panel.classList.add('is-pressed');
-          showDialogue('tap');
-          window.setTimeout(() => panel.classList.remove('is-pressed'), 220);
-      };
-      const handleClick = (event) => {
-          event.preventDefault();
-          triggerTap();
-      };
-      const handleKey = (event) => {
-          if (event.key === 'Enter' || event.key === ' ') {
-              event.preventDefault();
-              triggerTap();
-          }
-      };
-      canvas.addEventListener('mouseenter', handleEnter);
-      canvas.addEventListener('focus', handleEnter);
-      canvas.addEventListener('mouseleave', handleLeave);
-      canvas.addEventListener('blur', handleLeave);
-      canvas.addEventListener('click', handleClick);
-      canvas.addEventListener('keydown', handleKey);
-      addCleanup(() => {
-          canvas.removeEventListener('mouseenter', handleEnter);
-          canvas.removeEventListener('focus', handleEnter);
-          canvas.removeEventListener('mouseleave', handleLeave);
-          canvas.removeEventListener('blur', handleLeave);
-          canvas.removeEventListener('click', handleClick);
-          canvas.removeEventListener('keydown', handleKey);
-      });
-      showDialogue('intro');
-      heroSection.appendChild(panel);
-      return heroSection;
   }
   function createSidebar(options) {
       const { shell, addCleanup } = options;
@@ -19590,7 +19379,6 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
 
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureStyles')) exports.ensureStyles = ensureStyles;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createModesSection')) exports.createModesSection = createModesSection;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'createHeroSection')) exports.createHeroSection = createHeroSection;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createSidebar')) exports.createSidebar = createSidebar;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createHeader')) exports.createHeader = createHeader;
 });
