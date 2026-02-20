@@ -65,6 +65,17 @@ export const CLASS_BASE = {
   Assassin: { HP:320, ATK:36, WIL:16, ARM:0.06, RES:0.08, AGI:14, PER:16, SPD:1.25, AEmax: 65, AEregen: 6.0, HPregen:10 }
 } satisfies Readonly<Record<'Mage' | 'Tanker' | 'Ranger' | 'Warrior' | 'Summoner' | 'Support' | 'Assassin', CatalogStatBlock>>;
 
+// src/catalog.ts
+export const AE_CLASS_COEFF = {
+  Support: 1.5,
+  Summoner: 1.3,
+  Mage: 1.2,
+  Tanker: 0.55,
+  Warrior: 0.55,
+  Ranger: 0.55,
+  Assassin: 0.22
+} as const;
+
 export type ClassName = keyof typeof CLASS_BASE;
 
 const isRankName = (value: string): value is RankName => value in RANK_MULT;

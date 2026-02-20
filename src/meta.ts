@@ -142,30 +142,44 @@ const coerceStatMods = (
   return out;
 };
 
-export function makeInstanceStats(unitId: MetaId): InstanceStats {
+export function makeInstanceStats(unitId: MetaId, level: number = 1, stars: number = 0): InstanceStats {
   const entry = Meta.get(unitId);
   if (!entry) return { ...EMPTY_INSTANCE_STATS };
-  const className = entry.class;
-  if (!isClassName(className)) return { ...EMPTY_INSTANCE_STATS };
-  const rank = entry.rank;
-  if (!isRankName(rank)) return { ...EMPTY_INSTANCE_STATS };
-  const base: CatalogStatBlock | undefined = CLASS_BASE[className];
-  if (!base) return { ...EMPTY_INSTANCE_STATS };
-  const fin = applyRankAndMods(base, rank, coerceStatMods(entry.mods));
+
+  const className = entry.class as ClassName;
+  const rank = entry.rank as RankName;
+
+  const base = CLASS_BASE[className];
+  // Delta tăng trưởng (Laser)
+  const delta = (CLASS_GROWTH as any)[className];
+
+  // 1. TÍNH CHỈ SỐ GỐC THEO LEVEL (TIA LASER)
+  const currentBase = {
+    HP:  base.HP  + (level - 1) * (delta?.HP || 0),
+    ATK: base.ATK + (level - 1) * (delta?.ATK || 0),
+    WIL: base.WIL + (level - 1) * (delta?.WIL || 0),
+    ARM: base.ARM + (level - 1) * (delta?.ARM || 0),
+    RES: base.RES + (level - 1) * (delta?.RES || 0)
+  };
+
+  // 2. TÍNH HỆ SỐ (THẤU KÍNH) = RANK + SAO
+  const rankMult = RANK_MULT[rank] + (stars * 0.05);
+
+  // 3. XUẤT CHỈ SỐ CUỐI (LASER x THẤU KÍNH)
   return {
-    hpMax: Math.trunc(fin.HP ?? 0),
-    hp: Math.trunc(fin.HP ?? 0),
-    atk: Math.trunc(fin.ATK ?? 0),
-    wil: Math.trunc(fin.WIL ?? 0),
-    arm: fin.ARM || 0,
-    res: fin.RES || 0,
-    agi: Math.trunc(fin.AGI ?? 0),
-    per: Math.trunc(fin.PER ?? 0),
-    spd: fin.SPD || 1,
-    aeMax: Math.trunc(fin.AEmax ?? 0),
+    hpMax: Math.trunc(currentBase.HP * rankMult),
+    hp: Math.trunc(currentBase.HP * rankMult),
+    atk: Math.trunc(currentBase.ATK * rankMult),
+    wil: Math.trunc(currentBase.WIL * rankMult),
+    arm: Number((currentBase.ARM * rankMult).toFixed(4)),
+    res: Number((currentBase.RES * rankMult).toFixed(4)),
+    agi: Math.trunc(base.AGI ?? 0),
+    per: Math.trunc(base.PER ?? 0),
+    spd: base.SPD || 1,
+    aeMax: Math.trunc(base.AEmax ?? 0),
     ae: 0,
-    aeRegen: fin.AEregen || 0,
-    hpRegen: fin.HPregen || 0,
+    aeRegen: base.AEregen || 0,
+    hpRegen: base.HPregen || 0,
   } satisfies InstanceStats;
 }
 
