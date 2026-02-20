@@ -1,3 +1,4 @@
+import { globalAetherPool } from './aether.ts';
 import type { CreateSessionOptions, SessionState } from '@shared-types/pve';
 import type { GameConfig } from '@shared-types/config';
 import type { GameEventHandler, GameEventType } from './events';
