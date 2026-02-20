@@ -461,6 +461,16 @@ function transformModule(code, id){
     return `${prefix}function ${name}`;
   });
 
+  const exportClassRegex = /export\s+(abstract\s+)?class\s+([A-Za-z0-9_$]+)/g;
+  code = code.replace(exportClassRegex, (match, abstractKeyword = '', name) => {
+    if (!usedAliases.has(name)){
+      usedAliases.add(name);
+      exportsAssignments.push({ alias: name, expr: name });
+    }
+    const prefix = abstractKeyword || '';
+    return `${prefix}class ${name}`;
+  });
+
   const exportDefaultNamedFunctionRegex = /export\s+default\s+(async\s+)?function\s+([A-Za-z0-9_$]+)/g;
   code = code.replace(exportDefaultNamedFunctionRegex, (match, asyncKeyword = '', name) => {
     ensureDefaultExport(name);
