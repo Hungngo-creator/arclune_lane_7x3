@@ -2024,3 +2024,23 @@ export const isSummoner = (id: MaybeUnitId): boolean => {
   const m = getMetaById(id);
   return !!(m && m.class === 'Summoner' && kitSupportsSummon(m));
 };
+// Dán vào cuối cùng của src/catalog.ts
+export const AE_CLASS_COEFF = {
+  Support: 1.5,
+  Summoner: 1.3,
+  Mage: 1.2,
+  Tanker: 0.55,
+  Warrior: 0.55,
+  Ranger: 0.55,
+  Assassin: 0.22
+} as const;
+
+export const CLASS_GROWTH = {
+  Tanker:   { HP: 25, ATK: 0.5, WIL: 0.5, ARM: 0.01,  RES: 0.005 },
+  Warrior:  { HP: 20, ATK: 1.2, WIL: 0.8, ARM: 0.008, RES: 0.008 },
+  Mage:     { HP: 15, ATK: 0.5, WIL: 1.5, ARM: 0.005, RES: 0.01  },
+  Support:  { HP: 15, ATK: 0.5, WIL: 1.2, ARM: 0.005, RES: 0.01  },
+  Ranger:   { HP: 15, ATK: 1.5, WIL: 0.5, ARM: 0.005, RES: 0.005 },
+  Assassin: { HP: 12, ATK: 1.8, WIL: 0.5, ARM: 0.004, RES: 0.004 },
+  Summoner: { HP: 18, ATK: 0.8, WIL: 1.2, ARM: 0.006, RES: 0.008 }
+} as const;

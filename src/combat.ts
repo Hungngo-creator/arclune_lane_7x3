@@ -1,3 +1,4 @@
+import { SharedAetherPool } from './aether.ts'
 import { Statuses, hookOnLethalDamage } from './statuses.ts';
 import { applyDamage, grantShield } from './combat/apply-damage.ts';
 import { asSessionWithVfx, vfxAddHit, vfxAddMelee, vfxAddLightningArc } from './vfx.ts';

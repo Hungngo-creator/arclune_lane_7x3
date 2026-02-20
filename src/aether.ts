@@ -1,6 +1,6 @@
 // FILE: src/aether.ts
-import { AE_CLASS_COEFF } from './catalog'; // Điều chỉnh đường dẫn import nếu cần
-import type { InstanceStats } from './meta'; // Import type để chuẩn TypeScript
+import { AE_CLASS_COEFF } from './catalog.ts'; // Điều chỉnh đường dẫn import nếu cần
+import type { InstanceStats } from './meta.ts'; // Import type để chuẩn TypeScript
 
 export class SharedAetherPool {
   public max: number = 0;

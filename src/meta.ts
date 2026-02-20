@@ -3,6 +3,7 @@
 import {
   CLASS_BASE,
   RANK_MULT,
+  CLASS_GROWTH,
   applyRankAndMods,
   getMetaById,
   getUnitKitById,
