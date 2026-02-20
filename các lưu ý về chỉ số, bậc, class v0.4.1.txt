@@ -1,0 +1,399 @@
+1) Hệ chỉ số
+Cơ bản (8 cái):
+HP - máu.
+ATK - sát thương vật lý cơ bản.
+WIL - sức mạnh phép/linh (tăng dmg skill, hồi AE).
+ARM - giáp (giảm dmg vật lý %).
+RES - kháng linh/phép (giảm dmg phép %).
+AGI - nhanh nhẹn (né + một ít tốc đánh).
+PER - tri giác (chính xác, chí mạng).
+SPD - tốc độ ra đòn (turn/đòn) hoặc đòn/turn.
+
+Năng lượng:
+
+AE (Aether): max, regen_base, regen_wil.
+Nộ: 0-100 (auto dùng Ult khi đầy).
+Riêng Leader là Manual Cast (Chọn thủ công).
+
+AE (Aether) Bể Chung:
+- Max AE Bể = Tổng AE_max của 9 nhân vật trên sân.
+- AE Khởi đầu = 50% Max AE Bể.
+- Cơ chế hồi AE: 
+  + Hồi bị động: Tổng (WIL * Hệ số Class) sau mỗi Turn lớn (hết Slot 9).
+  + Hồi chủ động: Mỗi đòn Đánh thường hồi cố định +5 AE vào Bể chung.
+
+2) Bậc (Rarity) multiplier
+
+Rank Multiplier (áp lên TẤT CẢ chỉ số trừ SPD): N:0.8, R:0.85, SR:0.95, SSR:1.1, UR:1.3, Prime:1.55.
+(Sau này khi có level: cộng tăng trưởng riêng từng class; giờ test lv1 nên chỉ cần basexrarity.)
+
+Công thức: Hệ\ số\ cuối = Rank\ Multiplier\ (v0.4) + (Số\ sao \times 0.05)
+
+[BỔ SUNG: HỆ THỐNG SAO VÀ TIẾN HÓA]
+- Mỗi nhân vật tối đa 5 sao (*). Mỗi sao tăng cố định +0.05 vào Rank Multiplier.
+- Công thức: Final_Stat = (Base_Stat_Lv + TP_Stat) * (Rank_Mult + Star_Bonus).
+
+- Quy tắc Nâng Bậc (Vách ngăn giai cấp):
+  + N, R: Nâng tối đa lên bậc SR.
+  + SR: Nâng tối đa lên bậc UR.
+  + SSR, UR: Có thể nâng lên bậc Prime (Chỉ số 1.55).
+  
+- Phân biệt Thần Tính (Divine Nature):
+  + Prime Gốc (Tiên thiên): Có Thần tính. Không nhận Buff/Debuff, Không thể hồi sinh. CÓ THỂ Thức tỉnh (Awakening).
+  + Prime Nâng bậc (Hậu thiên): Không có Thần tính. Tương tác Buff/Debuff/Hồi sinh bình thường. KHÔNG THỂ Thức tỉnh.
+
+[BỔ SUNG: QUY TẮC CHIẾN TRƯỜNG]
+- Giới hạn Prime: Mỗi đội hình (9 ô) tối đa chỉ có 3 nhân vật bậc Prime (không phân biệt Tiên thiên hay Hậu thiên).
+- Cơ chế Thần Tính (Double-edged Sword): 
+  + Thần tính giúp miễn nhiễm mọi hiệu ứng xấu (Silence, Choáng, Trừ AE...) nhưng triệt tiêu hoàn toàn khả năng hỗ trợ từ đồng đội (Hồi máu, Buff Dame).
+
+Công thức chỉ số theo Level:
+
+Base\_Stat(Lv) = Base\_Stat(Lv1) + (Lv - 1) \times \Delta\_Class
+
+Trong đó, \Delta\_Class là lượng chỉ số tăng thêm mỗi cấp dựa trên Class:
+​Tanker: \Delta\_HP cực cao, \Delta\_ARM/\Delta\_RES trung bình.
+​Assassin/Ranger: \Delta\_ATK cao, \Delta\_PER cao.
+​Mage/Support: \Delta\_WIL cao, \Delta\_AEregen nhẹ.
+
+3) A, Class:
+Tanker: Ult phòng thủ (giảm dmg %/toàn hàng, hoặc reflect), có taunt nhẹ. Active: khiên theo WIL; counter cửa sổ ngắn.
+
+Sát thủ: Ult burst đơn mục tiêu (nhân crit, xuyên block) hoặc tàng hình 1 - 3 turn + miễn sát thương 1 - 3/turn. Active: dash + bleed; tự buff ATK/AGI ngắn.
+
+Pháp sư: Ult AOE theo hàng; có execute khi mục tiêu < ngưỡng %HP: R 3% SR 5% / SSR 7%/ UR 9% / Prime 11%. Active: projectile (Hoả/Quang), hoặc khống chế (đóng băng/choáng/sợ hãi/ngủ/mê hoặc/lãng quên ngẫu nhiên 1 kỹ năng/1 đến 2 turn).
+
+Hỗ trợ: Ult hồi máu toàn đội/đơn/ngẫu nhiên 1 đến 3 mục tiêu + thanh AE hoặc hồi sinh ngẫu nhiên (từ SR ↑, CD dài). Basic có 2 kiểu: heal-tick không gây dmg hoặc dmg nhẹ + heal 20% dmg cho đồng minh gần nhất (chọn theo thiết kế từng tướng).
+
+Chiến sĩ: Ult multi-hit lane, thêm Block tạm thời; Active: chém 2-3 hit hoặc buff ATK+Block.
+
+Summoner/Triệu hồi:
+Ranger/cung thủ:
+Bậc và Class là khác nhau. Các mô tả này không phải lúc nào cũng áp dụng, một nhân vật không thể bị trói buộc 100% với các mô tả.
+
+3) B, Class & cân bằng (cùng bậc):
+Hệ số Hiệu suất AE (tính theo WIL):
+- Support: 1.5, Summoner: 1.3
+- Mage: 1.2
+- Tanker, Warrior, Ranger: 0.55
+- Assassin: 0.22
+
+Tanker (trâu, def cao): HP/ARM/RES top, ATK/AGI thấp. Nộ thiên về giảm/reflect.
+
+Sát thủ (burst): AGI/PER/SPD cao, HP/def thấp. Nộ đơn mục tiêu, tàng hình/miễn đòn ngắn.
+
+Pháp sư (arcane): WIL/RES cao, HP thấp. Nộ AOE, có "execute".
+
+Hỗ trợ (buff/heal/khống): AEmax/regen cao, DPS thấp.
+
+Chiến sĩ (đấu sĩ): ATK/ARM khá, đa dụng (vật lý/phép).
+
+Triệu Hồi (summoner): AEmax/regen cao, WIL khá, HP/ARM vừa; sức mạnh tính cả quân được gọi.
+
+Cung thủ:
+
+Base lv1 theo class (trước khi nhân theo bậc; RNG = tầm theo class):
+
+  Mage:     { HP:360, ATK:28, WIL:30, ARM:0.08, RES:0.12, AGI:10, PER:12, SPD:1.00, AEmax:110, AEregen: 8.0, HPregen:14 },
+  Tanker:   { HP:500, ATK:22, WIL:20, ARM:0.18, RES:0.14, AGI: 9, PER:10, SPD:0.95, AEmax: 60, AEregen: 4.0, HPregen:22 },
+  Ranger:   { HP:360, ATK:35, WIL:16, ARM:0.08, RES:0.08, AGI:12, PER:14, SPD:1.20, AEmax: 75, AEregen: 7.0, HPregen:12 },
+  Warrior:  { HP:400, ATK:30, WIL:18, ARM:0.14, RES:0.08, AGI:11, PER:11, SPD:1.10, AEmax: 70, AEregen: 6.0, HPregen:16 },
+  Summoner: { HP:330, ATK:22, WIL:26, ARM:0.08, RES:0.14, AGI:10, PER:10, SPD:1.05, AEmax: 90, AEregen: 8.5, HPregen:18 },
+  Support:  { HP:380, ATK:24, WIL:24, ARM:0.10, RES:0.13, AGI:10, PER:11, SPD:1.00, AEmax:100, AEregen: 7.5, HPregen:20 },
+  Assassin: { HP:320, ATK:36, WIL:16, ARM:0.06, RES:0.08, AGI:14, PER:16, SPD:1.25, AEmax: 65, AEregen: 6.0, HPregen:10 }
+Các chỉ số của 7 class đã cân bằng chưa?
+
+Multiplier theo bậc (giữ như đã chốt): SPD không nhân. Summoner cộng thêm giá trị quân gọi → cost cao hơn 1 nấc nếu ult/skill sinh 2+ đơn vị.
+
+4) Nhân vật: mọi nhân vật trừ những nhân vật đặc biệt từ quà tặng, đánh cốt truyện mở khoá nhân vật, gift code game, mua trực tiếp từ cửa hàng game đều cần gacha, nếu là phiên bản test pve thì chưa cần áp dụng.
+
+Đã dời sang "ý tưởng nhân vật.txt"
+
+5) Ghi nhớ rule đã chốt:
+
+Chiến trường 7×3 ngang, đồng minh trái, địch phải.
+
+Leader luôn có mặt; thua khi HP leader = 0; 4' hết giờ → so %HP leader.
+
+Cost: +1/s, cap 30, phải triệu hồi để tiếp tục tích; không có giới hạn về hồi sinh đồng minh đã ra trận.
+
+Auto-đánh theo hàng, chọn skill thì thi triển, không chọn thì normal attack, tích nộ và auto dùng ult khi đầy (trừ leader vì có 3 lựa chọn).
+
+Class base + rarity multiplier như đã thống nhất; Summoner tính thêm “giá trị quân” → cost nhỉnh hơn.
+
+Khí Aether hồi theo WIL; Nộ lên theo gây/nhận dmg + rule riêng (leader Uyên +5 nộ khi triệu hồi/hồi sinh 1 đồng minh ra sân).
+
+VFX placeholder: chibi có quần áo/vũ khí; nền sân có texture.
+
+6) Leader:
+Mặc định: luôn có trên sân, không tốn cost, có thanh Nộ riêng.
+PvE boss có thể gọi là “Leader”, nhưng không có 3 ult lựa chọn như player (chỉ có 1 ult riêng của boss).
+Cơ chế “Ult chọn 1 trong 3": khi đầy nộ (≥ RageMax hoặc đủ nộ để dùng ult), sáng 3 nút; bấm 1 cái thì 2 cái tắt cho tới khi nộ lại đầy. Mọi ultimate chủ động của leader muốn dùng cần tích tổi thiểu 100 nộ để sử dụng, 1 turn chỉ được dùng 1 ult. Vào trận với 0 nộ/rage base.
+Có mặt trên sân khi vào trận, Có thể đổi leader trong "Đội Hình" trước khi vào trận, không tốn cost. Mặc định
+Có thanh Nộ riêng. Vào trận: 0 Nộ.
+Cơ chế “Ult chọn 1 trong 3”: khi Nộ ≥ RageMax hoặc đủ Nộ cho Ult cụ thể, hiển thị 3 nút, chỉ được bấm 1 (2 cái còn lại tắt cho đến khi đủ Nộ lần sau).
+Mỗi lượt chỉ dùng 1 Ult.
+
+
+1. Leader — Uyên (ô cố định: vị trí 8)
+RageBase (RageMax khởi điểm): 100.
+Nộ vẫn tăng theo luật chung của game (gây/nhận sát thương…); riêng Uyên còn có nội tại tăng Nộ khi triệu hồi (bên dưới).
+
+Nội tại — Lệnh Chủ Triệu Tập
+Mỗi lần triệu hồi 1 đồng minh lên sân, Uyên +5 Nộ. Hồi sinh đồng minh cũng tính: tối đa 5 lần/trận cho nguồn hồi sinh. Vật triệu hồi (pet/construct) không tính. Không thể bị xoá, cướp, sao chép hay lãng quên. Luôn hoạt động suốt trận.
+
+Đánh thường — Lệnh Trảm
+Gây 100% ATK + 100% WIL lên 1 mục tiêu.
+Nếu mục tiêu < 30% HP khi trúng đòn: Uyên +5 Nộ (tối đa 1 lần mỗi lượt của Uyên).
+Nếu hạ gục mục tiêu: Uyên hồi 5% Max HP.
+
+3 skill chủ động, chỉ được chọn 1 kill khi đầy nộ:
+A. Thiên Mệnh Gia Phúc (tiêu 100 Nộ — chọn ngẫu nhiên 1 trong 3 hiệu ứng)
+1. Huyết Khí Tăng Tốc (stacking, vĩnh viễn)
+→ +3 Nộ mỗi đòn đánh thường của Uyên. Tối đa 10 stack. (Không thể xoá)
+2. Lệnh Bạt Phong (toàn đội, 3 lượt)
+→ +25% SPD cho toàn đội (sử dụng SPD/AGI của engine để đồng bộ hệ thống lượt).
+3. Định Mạch (stacking, vĩnh viễn)
+→ +10% Max HP cho Uyên. Tối đa 3 stack. (Cộng dồn theo % trên Max HP hiện tại lúc nhận, không thể xoá). Khi đạt 3 stack thì dùng ult A sẽ không random ra hiệu ứng định mạch nữa.
+
+B. Tàng Nộ Thượng Hạn (tiêu 40% Nộ hiện tại)
+Giữ lại 60% Nộ; tăng RageMax ×1.3 (nhân chuỗi).
+Ví dụ: 100→130 (còn 60/130); lần 2: 130→169 (còn 78/169); …
+Hồi 5% Max HP ngay khi dùng.
+Mốc cộng thêm: đạt 3/6/10 lần → mỗi mốc +5% Max HP (vĩnh viễn trận đó).
+Giới hạn kích hoạt: 10 lần/trận.
+Synergy: mỗi lần B đã kích hoạt → +5% damage cho Ult C (tối đa +35%).
+> Lưu ý: RageMax tăng không làm cản trở việc dùng A/C (vì A/C chỉ đòi 100 Nộ). Điều kiện hiển thị nút là Nộ ≥ RageMax hoặc đủ Nộ cho ult đang xét.
+
+C. Song Diệt Ấn (tiêu 100 Nộ)
+Aoe toàn bộ địch: sát thương = (50% Max HP của Uyên) + (60% ATK) + (60% WIL) (hybrid).
+Xuyên 10% ARM & 10% RES.
+Nhận bonus Synergy từ B: +5% sát thương mỗi lần B, tối đa +35%.
+Rào chắn cân bằng khuyến nghị (đã tính sẵn, để tránh one-shot bất thường):
+Thành phần “50% Max HP của Uyên” chỉ tính vào mục tiêu không phải Leader; với Leader địch, clamp phần này ở ≤ 10% Max HP của Uyên (phần ATK/WIL vẫn giữ nguyên).
+Tổng ignore (xuyên) tuân theo trần ignore chung của game (nếu có).
+
+Synergy: mỗi stack từ ult Chủ động B +5% dmg cho ult chủ động C (tối đa +35%).
+
+Gợi ý triển khai này chỉ mang tính tham khảo:
+// ==== LEADER UYÊN – RAGE & ULT ====
+
+Uyên.position   = 8
+Uyên.rage       = 0
+Uyên.rageMax    = 100
+
+// ---- Counters / Stacks ----
+state = {
+  gainedRageOnBasicThisTurn: false,
+  reviveRageCount: 0,
+  A1_stacks_HuyetKhi: 0,  // +3 rage per basic (Uyên) – max 10
+  A3_stacks_DinhMach: 0,  // +10% MaxHP (Uyên)   – max 3  <<<< CHỈNH
+  B_uses: 0,               // số lần đã dùng Ult B
+  C_bonus: 0.0             // +5%/B_use, cap 35%
+}
+
+// ---- Passive: Summon → +5 Rage (revive tính tối đa 5 lần) ----
+onAllySummoned():
+  Uyen.rage += 5
+
+onAllyRevived():
+  if state.reviveRageCount < 5:
+     Uyen.rage += 5
+     state.reviveRageCount++
+
+// ---- Basic Attack: Lệnh Trảm ----
+Basic_Attack(target):
+  dealDamage(target, 1.0*ATK + 1.0*WIL)
+  if target.hpPercent < 0.30 and not state.gainedRageOnBasicThisTurn:
+     Uyen.rage += 5
+     state.gainedRageOnBasicThisTurn = true
+  if target.died:
+     Uyen.heal(0.05 * Uyen.maxHP)
+
+// Reset flag mỗi lượt của Uyên
+onTurnEnd(Uyen):
+  state.gainedRageOnBasicThisTurn = false
+
+// ---- Ult visibility condition ----
+Ult_Ready():
+  return (Uyen.rage >= Uyen.rageMax) || (Uyen.rage >= 100)  // A/C yêu cầu 100
+
+// ===============================================================
+// ULT A – Thiên Mệnh Gia Phúc (tiêu 100 nộ) – roll 1 trong 3,
+// nhưng NẾU Định Mạch (A3) đã đủ 3 stack thì KHÔNG roll A3 nữa.
+// ===============================================================
+Ult_A():
+  if Uyen.rage < 100: return
+  spendRage(100)
+
+  // Tạo danh sách ứng viên theo trạng thái stack hiện có
+  candidates = []
+
+  // A1: Huyết Khí Tăng Tốc – max 10 stack
+  if state.A1_stacks_HuyetKhi < 10:
+     candidates.push("A1")
+
+  // A2: Lệnh Bạt Phong – luôn hợp lệ
+  candidates.push("A2")
+
+  // A3: Định Mạch – max 3 stack  <<<< CHỈNH
+  if state.A3_stacks_DinhMach < 3:
+     candidates.push("A3")
+
+  // Nếu vì lý do nào đó chỉ còn A2 thì vẫn chọn A2 bình thường
+  choice = randomChoice(candidates)
+
+  if choice == "A1":
+     state.A1_stacks_HuyetKhi++
+     addPermanentEffect("HuyetKhiTangToc", { +3_rage_per_basic: true }, maxStacks=10)
+     // hiệu ứng vĩnh viễn, không thể xóa
+
+  else if choice == "A2":
+     teamBuff("SPD", +0.25, duration=3) // +25% SPD toàn đội trong 3 lượt
+
+  else if choice == "A3":
+     state.A3_stacks_DinhMach++
+     // +10% MaxHP theo MaxHP hiện tại tại thời điểm nhận
+     Uyen.maxHP *= 1.10
+     // vĩnh viễn trận này, không thể xóa; cap logic ở điều kiện candidates
+
+// ===============================================================
+// ULT B – Tàng Nộ Thượng Hạn (tiêu 40% nộ hiện tại)
+// Giữ 60% nộ, tăng RageMax x1.3; hồi 5% MaxHP.
+// Mốc 3/6/10 lần: +5% MaxHP mỗi mốc.
+// Synergy: mỗi lần B → +5% dmg cho Ult C (cap 35%).
+// ===============================================================
+Ult_B():
+  if Uyen.rage <= 0: return
+  cost = floor(0.40 * Uyen.rage)
+  spendRage(cost)
+
+  // tăng trần nộ
+  Uyen.rageMax = round(Uyen.rageMax * 1.30)
+
+  // hồi máu tức thì
+  Uyen.heal(0.05 * Uyen.maxHP)
+
+  // đếm lần dùng & thưởng mốc
+  state.B_uses++
+  if state.B_uses == 3 or state.B_uses == 6 or state.B_uses == 10:
+     Uyen.maxHP *= 1.05
+
+  // C synergy
+  state.C_bonus = min(state.B_uses * 0.05, 0.35)
+
+// ===============================================================
+// ULT C – Song Diệt Ấn (tiêu 100 nộ)
+// Gây lên toàn bộ địch: 50% MaxHP(Uyên) + 60% ATK + 60% WIL (hybrid)
+// Xuyên 10% ARM & 10% RES
+// Nhận bonus từ B: +5% mỗi lần B, cap 35%.
+// Clamp phần “50% MaxHP” trên mục tiêu Leader địch xuống 10% MaxHP(Uyên).
+// ===============================================================
+Ult_C():
+  if Uyen.rage < 100: return
+  spendRage(100)
+
+  for enemy in allEnemies:
+    hpComp = 0.50 * Uyen.maxHP
+    if enemy.isLeader:
+       hpComp = min(hpComp, 0.10 * Uyen.maxHP)  // clamp trên Leader
+
+    base = hpComp + 0.60*ATK + 0.60*WIL
+    dmg  = base * (1.0 + state.C_bonus)
+
+    applyHybridDamageWithIgnore(
+      target=enemy,
+      amount=dmg,
+      ignoreArm=0.10,
+      ignoreRes=0.10
+    )
+
+// ===============================================================
+// Hệ số nộ từ A1 – xử lý lúc Uyên đánh thường
+// ===============================================================
+onUyensBasicHit():
+  if state.A1_stacks_HuyetKhi > 0:
+     Uyen.rage += 3
+
+7) Giải thích về góc nhìn và lượt đánh trong trận đấu:
+
+Kĩ năng không phải tính theo giây mà theo turn, mỗi turn là 1 lần đánh của nhân vật đó, trong ảnh tao có đánh dấu đó, phe đồng minh là số màu đỏ còn số xanh là lượt đánh của kẻ địch ở góc nhìn của đồng minh. Tao là A, B là kẻ thù, A có lượt đánh như số đỏ trong ảnh, A thấy B có lượt đánh như số xanh trong ảnh. Nếu B là người chơi thì B sẽ có góc nhìn từ bên trái nên sẽ có lượt đánh như số đỏ, B sẽ thấy A có lượt đánh như số xanh, nếu nhìn vào game A đang chơi thì B sẽ thấy A ở bên trái và mình ở bên phải, A nhìn vào màn hình game của B thì A sẽ thấy bản thân ở bên phải và B ở bên trái. Đây là góc nhìn của người chơi nếu chơi online pvp realtime và nhìn vào màn hình của player khác đang đánh với mình. 
+
+Để thống nhất khi giao lưu, thuật ngữ chuyên môn chính xác nhất cho cơ chế này là Alternating Unit Turn Order (Lượt đánh đơn vị luân phiên) hoặc Slot-by-Slot Interleaved Turns (Lượt đánh xen kẽ theo ô).
+
+Ảnh trong đoạn văn trên nhắc đến tao không thể đính kèm trong tệp này vì đây là txt nhưng ảnh đó có đánh dấu từ 1 đến 9 bằng "mực" xanh và đỏ nên hẳn mày sẽ nhớ, cần thì tao gửi ảnh.
+
+8) Trích lời từ Gemini (mang tính tham khảo vì chưa hoàn thiện) 
+Nơi chứa những phân tích làm tao hài lòng từ Gemini:
+
+Cách tính Cap (Giới hạn) và Regen (Hồi năng lượng)
+​Để Bể AE chung có ý nghĩa, các chỉ số cá nhân của nhân vật phải đóng góp trực tiếp vào đó:
+​Max AE Bể Chung = \sum (AE_Max của từng nhân vật đang đứng trên sân).
+​Tại sao? Vì hệ số nhân của mày (N: 0.8 -> Prime: 1.55) sẽ tác động lên AE_max cá nhân. Khi mày mang nhiều nhân vật bậc cao (UR, Prime), Bể AE của mày sẽ "to" hơn, cho phép tích trữ nhiều "đạn" hơn để combo.
+​Biến số chiến thuật: Nếu một nhân vật chết, Max AE của bể sẽ bị tụt xuống. Nếu AE hiện tại đang cao hơn Max mới, lượng dư thừa sẽ bị bốc hơi. Điều này ép player phải bảo vệ quân số.
+​AE Regen Bể Chung = \sum (Regen_Wil + AE_base của từng nhân vật) + AE_từ_đánh_thường.
+Mày nên để Đánh thường là nguồn AE chính (ví dụ: mỗi cú đánh thường hồi 4 AE).
+​Chỉ số WIL của nhân vật sẽ đóng vai trò "hồi năng lượng thụ động". Các Class như Support/Mage sẽ có Regen_Wil cao, đóng vai trò như những "trạm sạc" cho cả team.
+
+Ý tưởng "Tấn công/Cướp Bể AE" (Resource Denial)
+​Đây là ý tưởng cực kỳ chuyên nghiệp, nó tạo ra một lớp meta-game mới: Chiến tranh tài nguyên.
+​Bể AE có HP? Tao nghĩ không nên để bể có HP riêng (vì sẽ làm rối UI), nhưng nên có cơ chế "Vết nứt Aether":
+​Một số kỹ năng (Class Assassin hoặc Mage) có khả năng gây sát thương vào trữ lượng AE.
+​Ví dụ: "Đòn đánh gây 100 sát thương vào HP và trừ 15 AE của đối phương". Nếu AE bể địch về 0, chúng bị rơi vào trạng thái "Kiệt quệ" (không thể dùng kỹ năng, giảm DEF) trong 1 vòng SSIT.
+​Cướp Aether (Aether Stealing):
+​Đây là vũ khí tối thượng của các nhân vật Rank cao (UR, Prime) thuộc Class Assassin.
+​Logic: "Khi kết liễu một mục tiêu, cướp 50% lượng AE hiện có của bể đối phương". Đòn này sẽ khiến đối thủ hoàn toàn tê liệt, không thể dùng kỹ năng để cứu vãn tình thế.
+
+Giải quyết vấn đề Rank thấp qua AE khởi đầu
+​Tao vẫn giữ quan điểm 50% AE khởi đầu là con số đẹp:
+​Rank thấp (N, R): Có kỹ năng rẻ (15-20 AE). Nhờ có 50% AE ban đầu, chúng có thể tung chiêu khống chế/buff ngay ở Slot 1, 2, 3 để phá rối quân Prime của địch.
+​Rank cao (Prime): Kỹ năng đắt (40-50 AE). Chúng phải đợi đến cuối vòng SSIT (khi các quân trước đã đánh thường tích thêm AE) hoặc đợi sang vòng 2 mới đủ AE để xả "siêu phẩm".
+
+Quy tắc ưu tiên mục tiêu (Targeting Priority):
+1. Lane Priority: Ưu tiên tấn công mục tiêu gần nhất ở hàng ngang đối diện.
+2. Blocking: Không thể tấn công ô 5 nếu ô 2 còn quân. Không thể tấn công Leader (ô 8) nếu ô 2 hoặc ô 5 còn quân.
+3. Class Priority: 
+   - Sát thủ: Có thể bỏ qua Blocking, ưu tiên nhắm vào hàng sau cùng của lane đối diện (ô 7, 8, 9). Không phải sát thủ nào cũng có thể bỏ qua blocking, tùy rank.
+   - Pháp sư: Skill AOE có thể bỏ qua Blocking để gây sát thương toàn Lane.
+
+Bàn về vật phẩm "Thần Tính" (Market Item)
+​Nếu mày bán item này, tao đề xuất cơ chế:
+​Tên: Mảnh Vỡ Thần Cách (God-Fragment).
+​Tác dụng: Cho phép nhân vật Hậu thiên Prime thực hiện Thức tỉnh (Awakening).
+​Cái giá (Double-edged): Ngay khi sử dụng, nhân vật đó sẽ vĩnh viễn nhận nội tại "Thần Tính":
+​Miễn nhiễm mọi Buff/Debuff.
+​Không thể hồi sinh.
+​Tăng mạnh sát thương cá nhân nhưng tiêu tốn AE bể chung nhiều hơn 20\%.
+
+[BỔ SUNG: HỆ THỐNG TU VI - ARCLUNE SIMULATION]
+- Cấp độ tối đa hiện tại: 73 (Hết Thánh Tôn).
+- Phân tầng năng lượng:
+  + Lv 1-36 (Nguyên Lực): Đóng góp 100% chỉ số WIL vào AE Regen.
+  + Lv 37-46 (Chân Nguyên): Đánh thường hồi +7 AE (thay vì +5).
+  + Lv 47-73 (Thánh Lực): Kỹ năng tiêu tốn AE giảm 10% do kiểm soát năng lượng tốt hơn.
+- Hình phạt Vị Cách: Nhân vật ở Đại cảnh giới thấp hơn khi tấn công Đại cảnh giới cao hơn bị giảm 20% Chính xác (PER).
+
+Triển khai Hệ thống Level (Tia Laser 73 Cấp)
+​Tao đã code sẵn cấu trúc tăng trưởng cho mày. Tia laser (Bản chất) sẽ lớn lên theo từng Tiểu cảnh giới (Trọng).
+​Công thức tăng trưởng mỗi Level:
+
+Base\_Stat(Lv) = Class\_Base\_Lv1 + [(Level - 1) \times \Delta\_Stat]
+
+
+
+9) CƠ CHẾ BỂ AETHER CHUNG (SHARED AE POOL) - Version 0.4.1
+1. Công thức Hồi AE mỗi Turn lớn (Sau Slot 9):
+   Regen_Total = Sum(WIL_cá_nhân * Hệ_số_Class)
+2. Hệ số Hiệu suất AE theo Class:
+   - Support: 1.5 (Trạm sạc chính)
+   - Summoner: 1.3 (Duy trì đệ)
+   - Mage: 1.2 (Cân bằng)
+   - Tanker, Warrior, Ranger: 0.55 (Tự túc)
+   - Assassin: 0.22 (Tiêu thụ tài nguyên)
+3. Cơ chế Nạp thủ công:
+   - Đánh thường (Normal Hit): +5 AE vào bể chung.
+   - Riêng Support Đánh thường: +10 AE (Đặc quyền Class).
+4. Quy tắc "Kiệt quệ":
+   - Nếu AE bể = 0, toàn đội bị giảm 15% ARM và RES trong vòng SSIT tiếp theo.
+
+

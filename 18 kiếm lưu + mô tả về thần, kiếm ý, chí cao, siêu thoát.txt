@@ -1,3 +1,32 @@
+Hiểu biết của Gemini về arclune:
+Tao đã hiểu trọn vẹn "tầng đáy" của thế giới quan này. Đây không chỉ là một game gacha thông thường, mà là một "Mô phỏng chân thực" (Simulation) do Kẻ Lập Chỉ (KLC) tạo ra để tìm kiếm những kẻ đủ tư cách chạm đến Chân Giới.
+Phép ẩn dụ về Vị Cách (leo núi) và Bản Chất (người tập gym) của mày là mảnh ghép cuối cùng để giải thích tại sao hệ thống chỉ số trong game lại vận hành như vậy. Hãy cùng mổ xẻ sự tương quan giữa Thế giới quan Arclune và Hệ thống game (v0.4.x) mà chúng ta đang xây dựng:
+1. Bản Chất vs. Vị Cách (Laser vs. Thấu Kính)
+Sự kết hợp này tạo ra một hệ thống chiến đấu cực kỳ phân cấp:
+ * Bản Chất (Essence) = Hệ thống Level + TP: Đây chính là "nội lực" của người tập gym. Một kẻ có bản chất tốt (Level cao, dồn nhiều điểm TP) khi leo núi sẽ bền bỉ và ra đòn nặng hơn hẳn kẻ yếu ớt.
+ * Vị Cách (Position/Status) = Rank + Sao: Đây là "độ cao" trên núi. Kẻ đứng trên cao (Rank Prime) khi tấn công kẻ ở dưới (Rank N) sẽ có ưu thế nghiền ép tuyệt đối nhờ trọng lực (hệ số nhân 1.55).
+ * Sự cộng hưởng: Kể cả khi mày là "người tập gym" (Lv cao) nhưng nếu "Vị cách" thấp (Rank N), mày vẫn phải ngước nhìn "kẻ bình thường" (Lv thấp) nhưng có "Vị cách" Thần linh (Rank Prime) vì khoảng cách độ cao quá lớn.
+2. Tại sao Prime Gốc (Divine Nature) lại "Cô độc"?
+Dựa trên thiết lập "Nghi thức Bằng" và "Điểm neo Arclune", tao đã hiểu tại sao Prime gốc trong game lại có đặc tính Thần Tính (Divine Nature):
+ * Không nhận Buff/Debuff: Vì họ là ảo ảnh của Thượng Vị Thần hoặc Bán Thần thực thụ. Vị cách của họ quá cao so với các thực thể phàm nhân (Support/Mage rank thấp) trong ảo ảnh, khiến các phép bổ trợ hay nguyền rủa của phàm nhân không thể "neo" vào thực thể của họ.
+ * Không thể hồi sinh: "Điểm neo" của họ là Đại thế giới Arclune hoặc Thần Quốc của chính họ ở Chân Giới, chứ không phải là logic hồi sinh rẻ tiền trong ảo ảnh của KLC. Một khi "ảo ảnh" này tan biến (HP về 0), nó cần thời gian để Ý chí Arclune tái tạo, không thể dùng kỹ năng Support để kéo lại ngay lập tức.
+3. Aether và Hệ thống Bể chung
+Sự kết hợp giữa Anima (Linh lực) và Umbra (Ma lực) thành Aether giải thích hoàn hảo tại sao chúng ta dùng Bể AE chung:
+ * Aether là năng lượng nền tảng của cả thế giới ảo ảnh này.
+ * Việc các nhân vật đóng góp WIL vào bể chung chính là cách họ điều tiết "nồng độ Aether" xung quanh để thi triển kỹ năng.
+ * Thần (Prime) tiêu tốn AE nhiều hơn vì mỗi chiêu thức của họ tiêu hao mật độ Aether cực lớn để duy trì Vị cách của chiêu thức đó.
+4. Hệ thống Level (Tăng trưởng Bản chất)
+Để chuẩn hóa phần "Tia Laser" (Bản chất) trước khi bị "Gọt" bởi Thấu kính (Vị cách), chúng ta sẽ dùng bảng tăng trưởng Class \Delta (Delta) như sau:
+| Class | Bản chất tăng trưởng chính (\Delta) | Giải thích theo thế giới quan |
+|---|---|---|
+| Warrior/Tanker | HP +20, ARM/RES +0.01 | Rèn luyện "Bản chất" cơ thể để chống chịu áp lực Vị cách. |
+| Mage/Support | WIL +1, AEmax +10 | Mở rộng khả năng tương tác với Aether (Anima + Umbra). |
+| Assassin/Ranger | ATK +1, PER +1 | Tối ưu hóa "Điểm neo" tấn công để xuyên phá Vị cách địch. |
+5. Giới hạn 3 Prime: Sự cân bằng của Kẻ Lập Chỉ
+KLC chỉ là Bán Chí Cao, hắn tạo ra ảo ảnh này để tìm kiếm kẻ kế thừa. Việc giới hạn 3 Prime trong lineup (9 ô) có thể giải thích bằng:
+ * Sự ổn định của ảo ảnh: Nếu có quá nhiều thực thể mang Vị cách "Thần" xuất hiện cùng lúc, ảo ảnh sẽ bị sụp đổ (Crash) vì không gánh nổi lượng Thần lực tinh luyện.
+ * Thử thách cho kẻ leo núi: KLC muốn thấy cách mày phối hợp giữa "Bản chất" của phàm nhân và "Vị cách" của Thần để chiến thắng, thay vì chỉ dùng sức mạnh thuần túy của các vị Thần.
+
 1. Hệ thống tu luyện kiếm đạo
 
 Mỗi kiếm tu sẽ song song rèn luyện cảnh giới khí tu và cảnh giới kiếm đạo.
