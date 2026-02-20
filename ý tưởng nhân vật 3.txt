@@ -1,0 +1,68 @@
+
+1) 
+Nội tại: mỗi khi gây sát thương tăng vĩnh viễn 1% atk và wil, res và arm giảm 0,5%, khi chết và được hồi sinh hiệu ứng từ nội tại này giảm 50%, bất kể gây bao nhiêu sát thương hoặc nhiều lần lên mục tiêu lên 1 turn nội tại này đều chỉ tính 1 lần/turn/mục tiêu. hiệu ứng từ nội tại này mang tag tuyệt đối, bản thân, đơn mục tiêu cố định. Số lần kích hoạt / turn tối đa là 9 lần, số lần kích hoạt trên 1 mục tiêu/ turn là 1 lần, không có cap max stack, tức là giới hạn kích hoạt/ 1 turn là 9 lần nhưng có thể lặp lại nhiều lần nhiều turn. 
+Nhân vật này không thể được hồi sinh từ bất kỳ kỹ năng, ultimate hay nội tại nào trừ kỹ năng, nội tại hoặc ultimate có tag Quy Tắc hoặc từ kỹ năng 2 của bản thân. 
++30% hp regen dựa vào hp regen nhân vật này đang có sau khi giết 1 mục tiêu. Cộng dồn tối đa 7 lần. 
+
+Kĩ năng 1: gây sát thương aoe cố định toàn sân, mỗi kẻ địch nhận sát thương = 75% wil và atk. Tag Kẻ địch, cost - 5% hp ( không giảm max hp), 20 Aether. Nếu full sân thì có 9 kẻ địch, sau khi dùng skill này nhân vật này được +9% wil/atk, - 4,5% res/arm.
+
+Kĩ năng 2: khi hp về 0, tử vong, reset all nội tại, xóa mọi buff và debuff, biến mất trong 3 turn sau đó xuất hiện lại sau 3 turn đó với đầy hp, 50% Aether, 0 nộ, res và arm bị giảm vĩnh viễn 15% sau khi kích hoạt kỹ năng này ( trừ ngay lập tức sau khi kích hoạt kỹ năng, cái trừ 15% này sẽ không reset sau khi nhân vật này được hồi sinh từ kỹ năng này lẫn kỹ năng, nội tại hay ultimate có tag quy tắc) , cost là 100% Aether hiện có. Bản thân, nội tại, tuyệt đối. Nội tại từ kỹ năng này không thể xóa bỏ. 
+
+Kĩ năng 3: sau khi thực thi 1 turn thành công, bất kể thế nào nhân vật này đều nhận 1 lớp khiên tương đương 5% max hp của bản thân và +2 nộ, kích hoạt 1 lần dùng hết đời cho đến khi hp về 0, sau khi được hồi sinh cần kích hoạt lần nữa để hoạt động. tag bản thân, hiệu ứng đơn mục tiêu cố định, nội tại. cost 15 Aether/ lần kích hoạt, không tốn Aether để duy trì khiên. 
+
+Ultimate: lao đến mục tiêu, đấm vào bụng mục tiêu, vừa hất tung lên không vừa gây sát thương đơn mục tiêu cố định = 1 đòn đánh thường của bản thân, sau đó đá bụng mục tiêu đang trên không, khi vfx mục tiêu tiếp đất sẽ gây sát thương aoe toàn sân cố định = 1 đòn đánh thường của nhân vật này. Tổng sát thương mục tiêu chính nhận là 2 đòn đánh thường, nếu đầy sân thì 8 kẻ còn lại nhận sát thương aoe cố định = 1 đòn đánh thường. Kẻ địch. 
+
+Đánh thường: gây sát thương = 100% wil và atk
+
+2) 
+Nội tại: tạo khiên cho bản thân và đồng minh thuộc hàng dọc nhân vật này đứng ( ô 1,4,7; 2,5,8; 3,6,9) = 15% max hp của bản thân nhân vật này sau khi nhân vật này thực thi 1 turn thành công. Miễn nhân vật này còn sống thì bản thân và 2 đồng minh khác đứng cùng hàng dọc nhận hiệu ứng giảm 35% sát thương aoe cố định lẫn aoe ngẫu nhiên.
+
+Đánh thường: gây sát thương lên 1 mục tiêu = 100% wil / atk. 
+
+Kỹ năng 1: khi kích hoạt, liên kết bản thân với tối đa 4 đồng minh xung quanh (hình dấu +, nếu nhân vật này đứng ở ô số 5 sẽ liên kết với nhân vật đứng ở ô số 2/4/6/8 nếu 4 ô đều có nhân vật đứng) mọi sát thương từ nhân vật được liên kết nhận vào giảm 30%, số sát thương từ tối đa 4 nhân vật liên kết nhân vào được giảm 30% đó sẽ được tích, khi tổng sát thương đó vượt quá 70% max hp của nhân vật này thì sẽ gây sát thương = 70% tổng sát thương đó lên nhân vật này, chỉ số res và arm của nhân vật này vẫn có tác dụng giảm sát thương. Ví dụ: nhân vật này đứng ô số 5, liên kết 4 nhân vật khác đang đứng ô số 2,4,6,8 mỗi nhân vật đó đều nhận aoe cố định = 100 sát thương ( mặc định bỏ qua res/arm cho dễ tính), nhân vật ô 4 và 6 dựa theo skill 1 này nhận 70 sát thương, nhân vật ô 2 và 8 vì nội tại của nhân vật này + skill này nên nhận 35 sát thương, lúc này nếu tổng sát thương giảm từ skill này hơn hoặc = 70% max hp của nhân vật này thì bản thân nhân vật này nhận sát thương = 30x4=120 sau đó giảm 30% rồi lại giảm nhờ res và arm của nhân vật này sau đó mới gây sát thương lên nhân vật này, ví dụ này bỏ qua res và arm của tất cả nhân vật để dễ tính toán. Kỹ năng này tác dụng lập tức khi kích hoạt, hiệu ứng liên kết này luôn tác dụng sau kích hoạt trừ nhân vật này chết, nói chính xác hơn là liên kết nhân vật này với 4 ô 2/4/6/8 nếu nhân vật này đứng ô 5 bất kể 4 ô đó có nhân vật đứng hay không, nếu nhân vật này đứng ô 7/4 mà kích hoạt kỹ năng này thì hiệu ứng chỉ tác dụng lên ô 4 và 8/ 1 và 5 cùng 7. 25 Aether. 
+
+Đại khái là sàn đấu thế này:
+    /7/4/1/   \1\4\7\
+  /8/5/2/       \2\5\8\
+/9/6/3/           \3\6\9\
+
+đánh theo thứ tự 1 đến 9, ô nào không có nhân vật đứng sẽ bỏ qua, nhưng là đánh luân phiên, ô 1 bên trái đánh trước vì phía này là sân của player, bên kia là AI hoặc sân của player khác theo góc nhìn của bản thân player, tức mọi player đều thấy sân của bản thân bên trái và của kẻ thù bên phải, đầu trận sẽ random xem phe nào đánh trước, mỗi phe đều có leader là nhân vật đại diện cho player/AI đứng ở ô 8 nên nếu leader hp về 0 trận đấu sẽ kết thúc ngay lập tức. Ví dụ phe đồng minh có nhân vật đứng ô 4/6/7/8, kẻ thù có nhân vật đứng ô 2/5/8 thì nếu đầu trận random phe kẻ thù đánh trước thì thứ tự đánh là ô 2 kẻ thù >4 đồng minh >5 kẻ thù> 6 đồng minh > 8 kẻ thù > 8 đồng minh > 2 kẻ thù rồi lặp lại nếu trong quá trình này không có thay đổi về quân số như nhân vật 2 bên chết hoặc player hay AI triệu hồi thêm nhân vật vào game. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

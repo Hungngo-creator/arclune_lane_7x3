@@ -3193,9 +3193,9 @@ dính **điều phối Địa thần**.
 
 (chậm thêm 9000 năm).
 
-**Gợi ý câu văn (cắm thẳng vào truyện):**
+Gợi ý câu văn (cắm thẳng vào truyện):
 
-(cid:127) • “Đầm sâu thở mùi lá ướt; **hai đoá** đứng đối, thân sen sáng như giữ đèn — chỗ
+(cid:127) • “Đầm sâu thở mùi lá ướt; hai đoá đứng đối, thân sen sáng như giữ đèn — chỗ
 
 này **có Ấn**, nói khẽ thôi.”
 
@@ -3890,4 +3890,3 @@ crowd & thuế map). Đổi vụn → thỏi hao 1–2 thành. • Tiền phàm:
 kim = 10 vàng = 1 bí ngân. Hàng aether định giá bằng VNT/HNT; đồ phàm định giá bằng
 tiền phàm.
 
-

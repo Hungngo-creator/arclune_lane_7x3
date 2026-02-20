@@ -1,46 +1,69 @@
+Lập kế hoạch gắn tag tương tác cho các kĩ năng, nội tại, ultimate và đánh thường cho mọi nhân vật, việc phân tag sẽ rất có ích khi hệ thống sức mạnh quá đồ sộ và tránh xung đột kỹ năng.
+
+Tag: Lập tức: Hiệu ứng/sát thương từ kĩ năng, ult, đánh thường hay nội tại có tag này sẽ có tác dụng ngay lập tức. 
+Hồi phục:Hiệu ứng/sát thương từ kĩ năng, ult, đánh thường hay nội tại có tag này sẽ được tính là hồi phục. 
+Không phải hồi phục: Hiệu ứng/sát thương từ kĩ năng, ult, đánh thường hay nội tại có tag này không tính là hồi phục dù có tăng hp hoặc max hp. 
+Tag: nội tại: mọi nhân vật đều có nội tại, tag này không nói về chúng mà nói về 1 số nhân vật có kĩ năng nội tại cần kích hoạt để có tác dụng. 
+Tuyệt đối: Hiệu ứng/sát thương từ kĩ năng, ult, đánh thường hay nội tại có tag này sẽ có độ ưu tiên cao nhất khi giao tranh. 
+Hiệu ứng/sát thương Đơn mục tiêu: Hiệu ứng/sát thương từ kĩ năng, ult, đánh thường hay nội tại có tag này sẽ được tính là sát thương/ hiệu ứng đơn mục tiêu cố định. 
+
+Hiệu ứng/sát thương Đơn mục tiêu ngẫu nhiên: Hiệu ứng/sát thương từ kĩ năng, ult, đánh thường hay nội tại có tag này sẽ được tính là sát thương/hiệu ứng đơn mục tiêu ngẫu nhiên mà không phải cố định. 
+
+Hiệu ứng/sát thương Aoe: hiệu ứng/ sát thương từ kĩ năng, ult, đánh thường hay nội tại có tag này sẽ được tính là hiệu ứng/sát thương aoe cố định mà không phải ngẫu nhiên. 
+Hiệu ứng/ sát thương Aoe ngẫu nhiên: hiệu ứng/ sát thương từ kĩ năng, ult, đánh thường hay nội tại có tag này sẽ được tính là hiệu ứng/sát thương aoe ngẫu nhiên mà không phải aoe cố định. 
+Quy tắc: hiệu ứng/ sát thương từ kĩ năng, ult, đánh thường hay nội tại có tag này sẽ áp dụng toàn sân không phân địch ta. 
+Bản thân: hiệu ứng/ sát thương từ kĩ năng, ult, đánh thường hay nội tại có tag này sẽ chỉ có tác dụng lên bản thân nhân vật mà không thể tác dụng lên nhân vật khác.
+Bản thân lẫn đồng minh: hiệu ứng/ sát thương từ kĩ năng, ult, đánh thường hay nội tại có tag này sẽ chỉ có tác dụng lên bản thân nhân vật và đồng minh của nhân vật đó mà không thể tác dụng lên kẻ địch. 
+Kẻ địch: hiệu ứng/ sát thương từ kĩ năng, ult, đánh thường hay nội tại có tag này sẽ chỉ có tác dụng lên kẻ địch Mà không tác dụng lên đồng minh. 
+
 Vì tệp ý tưởng nhân vật v3 quá lag nên tao đã tạo tệp này. Mọi ult của tất cả nhân vật gacha lẫn npc pve đều là auto cast khi đầy nộ của nhân vật đó.
 A. Nhân vật gacha
 31 nằm ở ý tưởng nhân vật.txt
 32) Vũ Thiên
 Mô tả: một nam nhân cầm đinh ba, da ngâm nhẹ, ở trần và thích sống ở môi trường biển cả.
 
-Nội tại — Hải Triều Khai Trận: khi vào sân + 5% atk và wil, không + dồn.
+Nội tại — Hải Triều Khai Trận: khi vào sân + 5% atk và wil, không + dồn. Bản thân. 
 
-Kĩ năng 1 – Lam Triều Bộc Lực: vận dụng bí thuật, năng lượng màu xanh biển chảy quanh thân, tăng 40% wil và atk trong 1 turn, 35 aether.
-Kĩ năng 2 – Hải Mâu Phá Lãng: phóng mạnh đinh ba vào 1 mục tiêu gây sát thương = 150% đánh thường, 25 aether. (Phóng xong Vũ Thiên sẽ giơ tay và đinh ba bay trở về tay phải của hắn).
-Kĩ năng 3 – Triều Ảnh Hồi Kích: nội tại bị động, khi kích hoạt thì mỗi khi Vũ Thiên bị tấn công có 25% tỉ lệ né đòn và thực thi 1 đòn đánh thường lên kẻ tấn công, nếu chết thì cần kích hoạt lần nữa, 30 aether
+Kĩ năng 1 – Lam Triều Bộc Lực: vận dụng bí thuật, năng lượng màu xanh biển chảy quanh thân, tăng 40% wil và atk trong 1 turn, 35 aether. Lập tức, Hiệu ứng đơn mục tiêu cố định. Bản thân. 
+Kĩ năng 2 – Hải Mâu Phá Lãng: phóng mạnh đinh ba vào 1 mục tiêu gây sát thương = 150% đánh thường, 25 aether. (Phóng xong Vũ Thiên sẽ giơ tay và đinh ba bay trở về tay phải của hắn). Kẻ địch,  Sát thương/hiệu ứng đơn mục tiêu cố định. 
+Kĩ năng 3 – Triều Ảnh Hồi Kích: nội tại bị động, khi kích hoạt thì mỗi khi Vũ Thiên bị tấn công có 25% tỉ lệ né đòn và thực thi 1 đòn đánh thường lên kẻ tấn công, nếu chết thì cần kích hoạt lần nữa, 30 aether.  Nội tại
 
-Đánh thường: cầm đinh ba tán mạnh vào mặt của mục tiêu gây sát thương = 100% wil và atk.
+Đánh thường: cầm đinh ba tán mạnh vào mặt của mục tiêu gây sát thương = 100% wil và atk. Sát thương/hiệu ứng đơn mục tiêu cố định. Kẻ địch. 
 
-Ultimate — Hải Uy Trảm Ngôn: nhận 1 Thích Ứng, gây sát thương đơn mục tiêu = 300% đánh thường, áp Trầm Mặc lên mục tiêu trong 1 turn.
+Ultimate — Hải Uy Trảm Ngôn: nhận 1 Thích Ứng, gây sát thương đơn mục tiêu = 300% đánh thường, áp Trầm Mặc lên mục tiêu trong 1 turn. Sát thương/hiệu ứng đơn mục tiêu cố định. Kẻ địch
 
-Đánh thường: gây sát thương = 100% wil và atk lên 1 kẻ địch
 33) Anna
-Nội tại: Ấn Chú Thăng Hoa: mỗi khi dùng ultimate + 5% max hp/wil/atk của bản thân, cộng dồn tối đa 5 lần.
+Nội tại: Ấn Chú Thăng Hoa: mỗi khi dùng ultimate + 5% max hp/wil/atk của bản thân, cộng dồn tối đa 5 lần. Bản thân. 
 Vfx: Mỗi lần dùng Ultimate và kích hoạt nội tại, dấu ấn trên người nàng bừng sáng
 
-Đánh thường: gây sát thương = 100% wil và atk lên 1 kẻ địch, hồi hp cho 1 đồng minh ngẫu nhiên = 3% max hp của Anna.
+Đánh thường: gây sát thương = 100% wil và atk lên 1 kẻ địch, hồi hp cho 1 đồng minh ngẫu nhiên = 3% max hp của Anna. Hồi phục, sát thương đơn cố định. 
 
-Kĩ năng 1: Aegis Tụ Linh: + 20% res/arm trong 2 turn, 20 aether.
-Kĩ năng 2: Huyết Tế Vương Tọa: - hp = 50% max hp, chuyển lượng hp bị trừ cho leader (không mất max hp), không thể dùng nếu hp hiện tại dưới 70% max hp, 25 aether.
-Kĩ năng 3: Hỗn Linh Trường Ca: gây sát thương ngẫu nhiên lên 2 mục tiêu, mỗi kẻ nhận sát thương = 140% đánh thường, 20 aether.
+Kĩ năng 1: Aegis Tụ Linh: + 20% res/arm trong 2 turn, 20 aether. Bản thân. 
+Kĩ năng 2: Huyết Tế Vương Tọa: - hp = 50% max hp, chuyển lượng hp bị trừ cho leader (không mất max hp), không thể dùng nếu hp hiện tại dưới 70% max hp, 25 aether. Bản thân lẫn đồng minh. 
+Kĩ năng 3: Hỗn Linh Trường Ca: gây sát thương ngẫu nhiên lên 2 mục tiêu, mỗi kẻ nhận sát thương = 140% đánh thường, 20 aether. Sát thương aoe ngẫu nhiên, kẻ địch
 
-Ultimate: Thánh Lễ Tái Sinh: hồi hp cho mọi đồng minh có mặt trên sân = 50% max hp + 20% wil và atk của Anna.
+Ultimate: Thánh Lễ Tái Sinh: hồi hp cho mọi đồng minh có mặt trên sân = 50% max hp + 20% wil và atk của Anna. Bản thân lẫn đồng minh. Hiệu ứng hồi phục aoe cố định full sân. 
 
 34) Lão Khất Cái
-Nội tại: Tạp Dân Tụ Lực: không bị ảnh hưởng bởi hiệu ứng khiêu khích từ kẻ thù, +2% atk/wil/agi cho mỗi đồng minh hiện hữu trên sân trừ leader.
+Nội tại: Tạp Dân Tụ Lực: không bị ảnh hưởng bởi hiệu ứng khiêu khích từ kẻ thù, +2% atk/wil/agi cho mỗi đồng minh hiện hữu trên sân trừ leader. Bản thân. Hiệu ứng đơn cố định. 
 
-Đánh thường: cầm gậy, bổ từ trên cao vào đầu mục tiêu gây sát thương = 100% atk và wil.
+Đánh thường: cầm gậy, bổ từ trên cao vào đầu mục tiêu gây sát thương = 100% atk và wil. Kẻ địch, sát thương đơn cố định. 
 
-Kĩ năng 1: Khất Côn Xuyên Tạng: chọt mạnh cây gậy vào bụng mục tiêu, gây 1 đòn đánh thường, kĩ năng này bỏ qua 15% res và arm của mục tiêu, 20 aether.
-Kỹ năng 2 – Tam Thập Lục Kế: Tẩu Vi Thượng: khi bị đòn tấn công aoe cố định vị trí mà không phải ngẫu nhiên chọn mục tiêu đánh trúng có 25% tỉ lệ chạy khỏi ô đang đứng và đi đến ô gần nhất (trừ ô leader đứng), skill kích hoạt 1 lần dùng hết trận. Khi chạy thành công sẽ đứng luôn ở ô vừa chạy đến, nếu không có ô đồng minh nào trống thì không thể chạy, hoạt động đến hết trận kể cả chết rồi được hồi sinh vẫn hoạt động, kỹ năng dạng nội tại, 25 aether.
-Kỹ năng 3 – Loạn Côn Tam Liên: loạn côn đánh ngẫu nhiên 3 mục tiêu, gây 3 đòn đánh thường, bỏ qua 20% res và arm của mục tiêu, 35 aether.
+Kĩ năng 1: Khất Côn Xuyên Tạng: chọt mạnh cây gậy vào bụng mục tiêu, gây 1 đòn đánh thường, kĩ năng này bỏ qua 15% res và arm của mục tiêu, 20 aether. Kẻ địch, hiệu ứng/ sát thương đơn cố định. 
+Kỹ năng 2 – Tam Thập Lục Kế: Tẩu Vi Thượng: khi bị đòn tấn công aoe cố định vị trí mà không phải ngẫu nhiên chọn mục tiêu đánh trúng có 25% tỉ lệ chạy khỏi ô đang đứng và đi đến ô gần nhất (trừ ô leader đứng), skill kích hoạt 1 lần dùng hết trận. Khi chạy thành công sẽ đứng luôn ở ô vừa chạy đến, nếu không có ô đồng minh nào trống thì không thể chạy, hoạt động đến hết trận kể cả chết rồi được hồi sinh vẫn hoạt động, kỹ năng dạng nội tại, 25 aether. Bản thân, hiệu ứng đơn mục tiêu cố định, kích hoạt tối đa 1 lần/ turn. 
+Kỹ năng 3 – Loạn Côn Tam Liên: loạn côn đánh ngẫu nhiên 3 mục tiêu, gây 3 đòn đánh thường, bỏ qua 20% res và arm của mục tiêu, 35 aether. Kẻ địch, sát thương/hiệu ứng aoe ngẫu nhiên. 
 
-Ultimate: Nhất Côn Đoạt Mệnh: gây sát thương = 250% đánh thường lên 1 mục tiêu, bỏ qua 10% res/arm của mục tiêu.
+Ultimate: Nhất Côn Đoạt Mệnh: gây sát thương = 250% đánh thường lên 1 mục tiêu, bỏ qua 10% res/arm của mục tiêu. Kẻ địch, sát thương/ hiệu ứng đơn cố định
 
-35) 
+35) Hoa Vị Ương
 
-Ultimate: gây sát thương=200% đánh thường lên toàn sân kẻ địch, áp dụng hiệu ứng Phản Hồi Phục lên kẻ chịu sát thương từ ultimate trong 1 turn kể từ lúc kẻ thù dính debuff này.
+Nội tại: mỗi khi nhận hồi phục từ nguồn không phải từ bản thân, tăng 30% hiệu ứng hồi phục đó, lượng hồi phục vượt max hp sẽ tạo khiên tối đa 100% max hp. 
+
+Kĩ năng 1: giảm 20% sát thương nhận vào trong 3 turn, 25 Aether. 
+Kĩ năng 2: tăng 50% max hp đến hết trận đổi lại mọi hiệu ứng hồi phục nhận vào từ mọi nguồn sau khi được tăng từ nội tại sẽ bị giảm 50%. Có thể dùng 2 lần/trận, 5 Aether. 
+Kĩ năng 3: khi nhận sát thương vượt ngưỡng 15% max hp/ lần sẽ tăng hp và max hp lên 5%, kĩ năng nội tại, sau khi thanh toán 15 Aether thì kĩ năng này sẽ áp dụng ngay lập tức và mỗi turn chỉ có thể kích hoạt 1 lần, sau tử vong cần kích hoạt lần nữa. Hiệu ứng tăng hp và max hp từ kĩ năng này không tính là hồi phục. 
+
+Ultimate: gây sát thương = 200% đánh thường lên toàn sân kẻ địch, áp dụng hiệu ứng Phản Hồi Phục lên kẻ chịu sát thương từ ultimate trong 1 turn kể từ lúc kẻ thù dính debuff này.
 
 36) The Fallen Saint" - Thanh Thánh Nữ Sa Đọa (堕落圣女 - Duò Luò Shèng Nǚ) - Ái Lân (艾琳 - Ài Lín)
 
@@ -78,7 +101,28 @@ Ultimate: nếu không có kẻ thù nào đang ở trạng thái ngủ trên s�
 
 39) Ngụy Thiên Sơ (魏天初) — Hồn Khí Sư Cuối Cùng
 Năng lực: Linh khí nhập thể – Hồn dung vật
-Hắn rèn pháp bảo không bằng kim loại, mà dùng linh hồn. Mỗi pháp khí hắn tạo ra là một linh thể tự nhận thức. Khi chiến đấu, hắn có thể triệu hồi "Cửu Vật Linh" — chín linh hồn pháp khí bị phong ấn trong cơ thể, nhưng nếu mất kiểm soát, chúng sẽ đồng loạt phản chủ.
+Hắn rèn pháp bảo không chỉ bằng kim loại, mà còn dùng linh hồn. Mỗi pháp khí hắn tạo ra là một linh thể tự nhận thức. Hồn khí không cần tay chân để dùng, chúng sẽ bay lơ lửng và tấn công theo ý niệm của chủ nhân.
+
+Nội tại:
+Vào trận với 1 hồn khí cơ bản kiếm gỗ, không có tăng thêm từ hồn khí, mỗi khi có một nhân vật kẻ địch có thể hồi sinh bị giết chết, bắt lấy linh hồn của đối phương dung luyện linh hồn đó vào một Hồn Khí của bản thân, kẻ địch bị bắt linh hồn và dung luyện thành công sẽ không thể hồi sinh đến hết trận, kích hoạt tối đa 3 lần. Tăng 5% WIL + ATK/1 linh hồn.
+Nếu có hồn khí thì mỗi khi bị tấn công 1 hồn khí sẽ tự động bay đến tấn công kẻ tấn công ngụy thiên sơ 1 đòn đánh thường và áp dụng nội tại của hồn khí. Sau khi chết hồn khí sẽ bay loạn xạ và tiếp cận kẻ thù lẫn đồng minh rồi phát nổ, gây sát thương không phân địch ta, mỗi hồn khí gây sát thương= 1 đòn đánh thường của ngụy thiên sơ, nếu khi chết đạt 4 hồn khí thì chỉ có 1 hồn khí ngẫu nhiên tiếp cận đồng minh và phát nổ, 3 hồn khí còn lại sẽ tiếp cận kẻ thù.
+Nhân vật này sau khi chết sẽ chỉ có thể hồi sinh 1 lần/trận vì hồn khí cần dung nhập linh hồn của bản thân vào chế tạo, quá trình chế tạo không có mất hp đơn giản như vậy. (Trong 1 trận tối đa tồn tại 2 ngụy thiên sơ nên mỗi ngụy thiên sơ có thể hồi sinh 1 lần/trận).
+
+Đánh thường: điều khiển hồn khí tấn công 1 mục tiêu, mỗi hồn khí gây sát thương (trừ hồ lô) = 100% wil và atk hiện có của ngụy thiên sơ, đánh thường của nhân vật này không thể kích hoạt follow up attack.
+
+Kĩ năng 1: điều khiển hồn khí tiếp cận kẻ địch, nổ tung 1 hồn khí ngẫu nhiên hiện có gây sát thương lên ô 2/4/5/6/8, mỗi ô nhận sát thương = 100% wil và atk hiện có của ngụy thiên sơ, 30 aether.
+Kĩ năng 2: chỉ có thể dùng khi có hồn khí hồ lô, bắt lấy hồ lô, uống cạn thần thủy trong đó, sau khi kích hoạt kĩ năng này 3 turn tiếp theo sẽ được hồi hp = 6% max hp/turn (chỉ tăng hp mà không tăng max hp), hồ lô sẽ biến mất và cần rèn hồ lô lần nữa để dùng, 25 aether.
+Kĩ năng 3: cầm lấy hồn khí huyết kiếm đâm vào tim của bản thân, huyết kiếm sẽ hút hp cố định = 35% max hp của hắn, hồi hp = 90% mọi sát thương gây ra sau khi dùng kĩ năng này trong 3 turn (3 turn tính từ turn tiếp theo sau khi dùng skill 3), nếu lượng hồi hp từ kỹ năng này dư sẽ được chuyển thành khiên máu, tối đa = 100% max hp của ngụy thiên sơ, chỉ có thể dùng khi hp tối thiểu còn 36%, và có hồn khí huyết kiếm, sau khi hết 3 turn thì huyết kiếm sẽ rời cơ thể ngụy thiên sơ và bay lơ lửng như cũ. 20 aether.
+
+Ultimate: mất hp = 10% max hp hiện có (có thể hồi) rèn một hồn khí ngẫu nhiên trong các loại sau:
+Cần đặt tên: một thanh đao sắt bén vô cùng, nhìn vào cũng thấy đau mắt, khi tấn công bỏ qua 5/10/15% res, 15/20/25% arm và áp 1 hiệu ứng chảy máu lên mục tiêu. 15% tỉ lệ rèn ra.
+Cần đặt tên: một thanh thước to, nặng nề, nhìn như ngọc nhưng không phải ngọc, bóng loáng mà rắn chắc, khi tấn công có 25/45/70% gây 1 hiệu ứng choáng lên mục tiêu. 15% tỉ lệ rèn ra.
+Cần đặt tên: một thanh hắc kiếm toả ra hắc khí đen kịt làm người bất an sợ hãi khi đến gần, khi tấn công bỏ qua 5/10/15% res và arm, gây 1 hiệu ứng sợ hãi lên mục tiêu. 15% tỉ lệ rèn ra.
+Cần đặt tên: một cái hồ lô bằng gỗ, nâu nhạt trông cũ kỹ, mang bề ngoài tuế nguyệt tẩy lễ, không thể dùng hồn khí này để tấn công, mỗi khi ngụy thiên sơ có hồn khí này thì sau khi hắn thực thi turn thành công hồ lô sẽ đổ thần thủy lên người hắn, hắn được hồi hp cố định = 3/3.5/4% max hp hắn hiện có. 10% tỉ lệ rèn ra.
+Cần đặt tên: 1 thanh huyết kiếm, đối ngụy thiên sơ hút 2/3/4% max hp của hắn khi đến đầu turn của hắn, đổi lại khi hết turn ngụy thiên sơ sẽ được hồi hp = 15/25/40% sát thương gây ra trong turn đó. 20% tỉ lệ rèn ra.
+Cần đặt tên: một thanh búa loé ra tia điện, mỗi khi tấn công tăng 5% sát thương do búa này gây ra và có 50% tỉ lệ gây choáng mục tiêu. 25% tỉ lệ rèn ra.
+Sở hữu tối đa 4 hồn khí cùng lúc. Hồn khí có thể trùng lặp.
+Khi dùng ultimate khi đã đạt 4 hồn khí thì thay vì triệu hồi hồn khí ngụy thiên sơ sẽ cường hoá ngẫu nhiên 1 hồn khí hiện có 1 lần, 1 hồn khí được cường hoá tối đa 3 lần, hiệu ứng cường hoá đã được định sẵn. Bất kể thế nào mỗi turn hành động thành công ngụy thiên sơ sẽ mất 1% max hp/1 hồn khí/turn, tức là khi đạt 4 hồn khí thì sau mỗi turn hắn sẽ mất 4% max hp. Sau khi dùng ultimate thì hồn khí kiếm gỗ đầu game sẽ biến mất.
 
 40) 
 Triệu hồi kĩ năng gây sát thương lên kẻ thù theo thời gian trên sân đồng minh, gây sát thương lên kẻ địch khi chúng tiếp cận bản thân, dạng bị động.
@@ -363,7 +407,7 @@ Tác dụng mỗi stack: −1% ATK và −1% WIL của mục tiêu (cộng dồn
 Kích nổ: Khi mục tiêu đạt 5 stack, ngay lập tức Choáng (Daze) 1 turn, rồi xoá toàn bộ stack Dị Tâm trên mục tiêu đó.
 Rơi rụng: Nếu mục tiêu không nhận thêm stack trong 2 turn liên tiếp, toàn bộ stack Dị Tâm trên mục tiêu biến mất.
 Thanh tẩy: Có thể bị xoá bởi hiệu ứng “cleanse” tiêu chuẩn.
-PvE Boss: thay vì Daze, chuyển thành Silence 1 turn khi đạt 5 stack (khống chế nhẹ hơn để cân bằng boss).
+PvE Boss: thay vì Daze, chuyển thành Silence 1 turn khi đạt 5 stack (khống chế nhẹ hơn để cân bằng boss). Nội tại không thể bị cướp.
 
 Nội tại — #1 Quỷ Tâm Đồng Cư
 Mỗi khi Mộng Tim gây sát thương (đánh thường/kỹ năng/ult), áp 1 stack Dị Tâm lên mục tiêu trúng hit (mỗi mục tiêu tối đa 1 lần áp thêm/turn từ Nội tại này, để tránh spam vượt kiểm soát).
@@ -400,6 +444,67 @@ Gây sát thương = 180% đòn đánh thường lên tất cả kẻ địch.
 Mỗi mục tiêu nhận thêm +10% sát thương cho mỗi stack Dị Tâm đang có trên chính mục tiêu đó (cộng dồn, tối đa +50%).
 Sau khi gây sát thương, nếu mục tiêu đang có ≥4 stack, áp thêm 1 stack Dị Tâm (có thể đẩy mục tiêu lên 5 để kích nổ bằng cơ chế Nội tại ở lượt sau).
 > Không tiêu thụ stack. aoe-global, scales-with-stacks
+
+55) 
+Mô tả: một nữ pháp sư hoạt bát thích giúp người làm niềm vui. Nàng thích cầm pháp trượng nhưng sẽ không dùng phép.
+Nội tại: khi ra sân mọi đồng minh trên sân nhận buff giảm 20% sát thương nhận vào trong 2 turn tính từ lúc nhân vật này ra sân là 1 turn. Sau khi chết linh hồn tiêu thất, không thể bị bắt cũng không thể hồi sinh. Nội tại không thể bị cướp.
+
+Kĩ năng 1: hp về 0 rời sân về deck, giảm 3 cost của bản thân, 0 aether. Chỉ có thể dùng khi trên sân và hp tối thiểu còn = hoặc hơn 20% max hp. Mỗi nhân vật này dùng tối đa skill 1 3 lần/trận.
+Kĩ năng 2: hồi hp cho bản thân cùng 2 đồng minh ngẫu nhiên lần 1 = 100% wil và atk cùng lần 2 sau 1s = % cost của bản thân khi ra sân x lượng hp hồi của lần 1. Ví dụ khi ra sân nhân vật này có 15/12/9 cost thì hồi cho bản thân và 2 đồng minh ngẫu nhiên 100% wil và atk của nhân vật này sau đó + thêm 15/12/9%. Kĩ năng 2 này được tính là 2 lần hồi hp dù cả 2 chỉ cách nhau 1s. 25 aether.
+Kĩ năng 3: truyền toàn bộ aether còn lại của nhân vật này cho 1 đồng minh ngẫu nhiên, nếu lượng aether truyền bị dư sẽ truyền ngẫu nhiên cho 1 đồng minh khác cho đến khi aether còn lại sau khi dùng skill 3 của nhân vật này hết, 10 aether.
+
+Đánh thường: dùng pháp trượng tán đầu đối phương gây sát thương = 100% wil và atk.
+
+Ultimate: thực thi 3 lần đánh thường lên 1 mục tiêu.
+
+56)
+Nội tại: tỉ lệ phản đòn bằng đòn đánh thường khi bị tấn công bằng đòn sát thương đơn cận thân là 100%.
+
+57)
+Nội tại: mọi đòn aoe gây sát thương cố định lẫn ngẫu nhiên nhận vào bị giảm 50%. Hiệu ứng từ nội tại này không phải buff hay debuff, không thể xoá nhưng có thể cộng dồn hoặc bị trừ bởi skill/ultimate/nội tại hoặc đánh thừa của nhân vật khác nếu có.
+
+Kĩ năng 1: tăng gấp đôi hiệu quả của nội tại từ lúc dùng kỹ năng tính là 1 turn, tác dụng trong 3 turn, 25 aether. Tương tác với skill 2.
+
+Kĩ năng 2: giảm 10% max hp, hàng dọc mà nhân vật này đứng (hàng dọc 1/4/7, 2/5/8 hoặc 3/6/9) cùng hưởng hiệu ứng từ nội tại của nhân vật này trong 5 turn, turn dùng skill này tính là 1 turn, 25 aether.
+
+
+
+
+59) 
+Nội tại: bất kể sát thương nào nhận vào đều sẽ hồi hp = 1% max hp của bản thân/1 lần nhận sát thương.
+
+60)
+Nội tại: tỉ lệ né tránh khi bị tấn công bằng đòn sát thương đơn cận thân là 100%.
+
+61)
+Nội tại: mỗi lần tấn công nhất định trúng mục tiêu dù mục tiêu có tỉ lệ né tránh là 100%.
+
+62)
+Nội tại: khi có mặt trên sân sẽ giảm 5 nộ/1 turn của bản thân để mọi đồng minh có mặt trên sân được giảm 10% sát thương nhận vào. Hiệu ứng giảm này không tính là debuff hay buff, không tương tác với các debuff hoặc buff của các nhân vật khác, không thể bị ảnh hưởng nhưng có thể cộng dồn với hiệu ứng giảm % sát thương từ skill, ult, đánh thường hay passive của nhân vật khác. Nội tại này không thể xoá bỏ.
+
+Kĩ năng 1: sau khi kích hoạt, bắt đầu tính từ turn tiếp theo nhân vật này khi nhận nộ sẽ được +50% nộ, tác dụng trong 3 turn, 20 aether.
+
+Kĩ năng 2: tăng 20% res và arm sau đó áp dụng hiệu ứng khiêu kích lên bản thân trong 3 turn, tác dụng ngay khi dùng kỹ năng này, 25 aether.
+
+Kĩ năng 3: sau khi kích hoạt kĩ năng này thì trong vòng 3 turn kể từ lúc kích hoạt mỗi khi nhận sát thương sẽ được hồi hp = 3,5% max hp/1 lần nhận sát thương, ví dụ: nếu skill của kẻ thù gây 3 lần sát thương thì được hồi hp = 3,5% x3 max hp của nhân vật này, 20 aether.
+
+Ultimate: gây sát thương đơn mục tiêu = 3 đòn đánh thường lên 1 kẻ địch, ult được tính là 1 lần gây sát thương.
+
+Đánh thường: gây sát thương = 100% wil và atk lên 1 mục tiêu.
+
+63) cần đặt tên, 24 cost.
+Mô tả: đây là 2 chị em song sinh nhưng được tính chung là 1 đơn vị dù khi vào trận trong deck sẽ hiện 2 thẻ gồm chị và em, có thể thanh toán cost để triệu hồi riêng. Khi gacha sẽ được chị & em, trong bộ sưu tập và đội hình chỉ hiện 1 ô mà không phải 2 ô nhân vật. Nếu 1 trong 2 chị em dùng skill hay ultimate thì vì cả 2 cùng cast nên người còn lại sẽ mất 1 turn vì đã cùng cast để cân bằng, ví dụ em/chị dùng skill 1 thì nếu 2 chị em có trên sân sẽ cùng cast, cast xong con chị/em vì chưa tới turn nhưng cùng cast với con em/chị là nhảy turn nên khi cùng cast xong sẽ mất 1 turn.
+
+Nội tại: khi vào trận 2 chị em sẽ chia 2 thẻ hiện trong deck, khi 1 trong 2 đầy cost thì người còn lại cũng sẽ đồng bộ dùng ult, nếu có 1 trong 2 đã có trên sân và player triệu hồi người còn lại vào sân thì cả 2 sẽ dùng ult luôn vì kẻ vừa được triệu hồi (chị hoặc em) ra sân có đầy nộ. 2 chị em cùng hưởng aether, khi 1 trong 2 sài kỹ năng bị trừ aether thì người còn lại cũng sẽ bị trừ tương ứng. Khi vào sân chia ra 2 thẻ chị em trong deck thay vì 1, tức là game sẽ có tối thiểu 11 thẻ thay vì 10 thẻ, mỗi thẻ 12 cost.
+
+Kĩ năng 1: thi pháp tạo 2 quả cầu lửa gây sát thương ngẫu nhiên lên 2 mục tiêu, mỗi kẻ nhận sát thương = 100% đánh thường. 
+Logic cùng cast: nếu dùng skill/ultimate khi có đủ 2 chị em trên sân thì cả 2 sẽ cùng cast skill, ultimate 1 trong 2 thi triển ra đổi lại sẽ mất 1 turn như phần mô tả và nội tại, ví dụ cho skill 1: cùng hưởng random target 2 mục tiêu, vì cùng cast nên mỗi kẻ địch sẽ nhận sát thương = 200% đánh thường, 25 aether.
+
+Kĩ năng 2: tạo 1 cốt thứ từ dưới đất đâm lên tấn công 1 mục tiêu gây sát thương = 150% đánh thường, áp dụng cùng cast nếu có 2 chị em đứng trên sân (đồng minh), nếu cùng cast thì kẻ địch nhận sát thương = 300% đánh thường, 20 aether.
+
+Kĩ năng 3: thi pháp, bấm pháp quyết hồi hp = 140% atk và wil lên bản thân, sau đó tăng 10% res và arm sau khi hồi hp, tác dụng trong 1 turn, nếu 2 chị em có trên sân thì khi dùng skill này sẽ cùng cast, 20 aether.
+
+Ultimate: thi pháp triệu hồi 1 sao băng nện từ vũ trụ xuống gây sát thương aoe cố định toàn sân, mỗi kẻ nhận sát thương = 200% will và atk, khi cùng cast vẫn chỉ triệu hồi 1 sao băng nhưng gây 400% wil và atk. Nếu 2 chị em có trên sân (đồng minh) thì khi 1 trong 2 đầy nộ sẽ cùng cast ultimate, cast xong nộ của cả 2 sẽ về 0 và cần tích lại từ đầu như bao char khác.
 
 Đạo hữu xin dừng bước!
 

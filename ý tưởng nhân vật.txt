@@ -212,8 +212,7 @@ Hát đoản khúc phá mộng, gây 180% đánh thường đơn mục tiêu.
 
 Ult: Thế Giới Thứ Hai: Kéo chiến trường hiện tại vào một thế giới khác, mỗi đơn vị đồng minh/kẻ thù đã đứng trên sân và khi vào sân nhận 1 buff/debuff ngẫu nhiên từ bể buff/debuff. Tác dụng trong 3 turn, nếu Mộng Yểm chết trong 3 turn này thì Thế Giới Thứ Hai vẫn hoạt động bình thường. ( đồng minh nhận buff, kẻ thù nhận debuff). (ult không gây sát thương nhưng thay đổi vfx của thế giới và cho đồng minh/kẻ thù buff/debuff) nói đơn giản là nhỏ này dùng ultimate, ban cho tất cả đồng minh mỗi người 1 buff, kẻ thù mỗi người nhận 1 debuff, "thế giới khác" chỉ là đổi vfx chiến trường thôi.
 
-2) Chân Ngã
-Bậc tối thiểu: UR (hoặc cao hơn)
+2) Chân Ngã, UR
 Ghi chú: Clone = “Thứ Hai Chân Thân” (đơn vị riêng)
 Nội tại — Dự Phòng Chân Thể
 Khi vào trận: +10% Max HP (chỉ áp bản thể, không áp clone).
@@ -225,7 +224,7 @@ Ultimate — Thứ Hai Chân Thân
 Kích hoạt điều kiện:
 Chỉ dùng khi không có clone và HP hiện tại ≥ 60%. Nếu không còn ô trống ở tuyến đồng minh: ult thất bại, hoàn 50% Nộ.
 Hiệu ứng: Giảm 50% HP hiện có của bản thể (không giảm Max HP). Triệu hồi 1 clone vào ô trống ngẫu nhiên phía đồng minh.
-Thuộc tính clone (Option B):
+Thuộc tính clone:
 85% mọi chỉ số hiện tại của bản thể khi tạo (snapshot buff/debuff/trang bị/kỹ năng tại thời điểm tạo; sau đó không tự đồng bộ). Khóa Nộ (Nộ = 0, không tích). Không thể dùng Kỹ năng 3 (Quy Nhất Bản Ảnh). Tồn tại tối đa 6 lượt (hết thời gian → tiêu biến). (Aether & kỹ năng khác: được phép dùng theo luật chung của đội). Đoạt xá (khi bản thể chết trong lúc có clone): Bản thể không tử vong, đoạt xá vào clone (clone trở thành bản thể mới). Áp Linh Mệt 3 lượt: khóa Ultimate, Aether Regen -50%. Sau khi hết Linh Mệt, có thể tạo clone mới nếu đủ điều kiện.
 
 3) Nhân vật: Ma Tôn - Diệp Lâm
