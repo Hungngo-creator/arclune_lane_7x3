@@ -20,54 +20,66 @@ function __require(id){
 }
 if (typeof globalThis !== "undefined" && typeof globalThis.__require === "undefined"){ globalThis.__require = __require; }
 __define('./aether.ts', (exports, module, __require) => {
-  // FILE: src/aether.ts
-  const __dep0 = __require('./catalog.ts');
-  const AE_CLASS_COEFF = __dep0.AE_CLASS_COEFF; // Điều chỉnh đường dẫn import nếu cần
   class SharedAetherPool {
-      max = 0;
-      current = 0;
-      regenPerTurn = 0;
-      /**
-       * Khởi tạo Bể AE dựa trên 9 nhân vật trong đội hình
-       * @param teamUnits Mảng chứa thông số (InstanceStats) của 9 ô
-       */
-      init(teamUnits) {
-          this.max = 0;
-          this.regenPerTurn = 0;
-          for (const unit of teamUnits) {
-              if (!unit)
-                  continue;
-              // Cộng dồn Max AE
-              this.max += (unit.aeMax || 0);
-              // Tính Regen theo Hệ số Class (Laser WIL x Thấu kính Class)
-              const coeff = AE_CLASS_COEFF[unit.className] || 0.55;
-              this.regenPerTurn += (unit.wil * coeff);
-          }
-          // Luật v0.4.1: Khởi đầu trận có sẵn 50% AE
-          this.current = Math.floor(this.max / 2);
-          // Đảm bảo số tròn
-          this.regenPerTurn = Math.floor(this.regenPerTurn);
-      }
-      /** Gọi hàm này sau mỗi vòng SSIT (khi Slot 9 đánh xong) */
-      onTurnEnd() {
-          this.current += this.regenPerTurn;
-          if (this.current > this.max) {
-              this.current = this.max;
-          }
-      }
-      /** Dùng kỹ năng: Trả về true nếu đủ AE, false nếu thiếu */
-      consume(cost) {
-          if (this.current >= cost) {
-              this.current -= cost;
-              return true;
-          }
-          return false;
+      max = 100; // Mặc định để test
+      current = 50;
+      regenPerTurn = 10;
+      uiFill = null;
+      constructor() {
+          this.initUI();
       }
   }
-  if (!Object.prototype.hasOwnProperty.call(exports, 'SharedAetherPool'))
-      exports.SharedAetherPool = SharedAetherPool;
-  ;
+  exports.SharedAetherPool = SharedAetherPool;
+  initUI();
+  {
+      // Đảm bảo code chỉ chạy trên trình duyệt
+      if (typeof document === 'undefined')
+          return;
+      let container = document.getElementById('aether-pillar-container');
+      if (!container) {
+          // 1. Tạo vỏ cột trụ
+          container = document.createElement('div');
+          container.id = 'aether-pillar-container';
+          // CSS gắn thẳng vào code (PA1: Sau lưng ô Leader)
+          container.style.cssText = 'position: fixed; bottom: 15%; left: 50%; transform: translateX(-50%); width: 25px; height: 150px; background: rgba(10, 10, 30, 0.7); border: 2px solid #00ffff; border-radius: 5px; z-index: 9999; box-shadow: 0 0 15px rgba(0,255,255,0.3); pointer-events: none;';
+          // 2. Tạo lõi dung dịch Aether
+          this.uiFill = document.createElement('div');
+          this.uiFill.style.cssText = 'position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, #8a2be2, #00ffff); transition: height 0.4s ease-out; box-shadow: 0 0 10px #00ffff;';
+          // Gắn vào Body
+          container.appendChild(this.uiFill);
+          document.body.appendChild(container);
+      }
+      else {
+          this.uiFill = container.firstElementChild;
+      }
+      this.updateUI();
+  }
+  updateUI();
+  {
+      if (!this.uiFill)
+          return;
+      const percent = this.max > 0 ? (this.current / this.max) * 100 : 0;
+      this.uiFill.style.height = `${Math.max(0, Math.min(100, percent))}%`;
+  }
+  onTurnEnd();
+  {
+      this.current = Math.min(this.max, this.current + this.regenPerTurn);
+      this.updateUI();
+  }
+  consume(cost, number);
+  boolean;
+  {
+      if (this.current >= cost) {
+          this.current -= cost;
+          this.updateUI();
+          return true;
+      }
+      return false;
+  }
+  // KHỞI TẠO NGAY LẬP TỨC ĐỂ HIỂN THỊ UI
+  const globalAetherPool = new SharedAetherPool();
   //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'globalAetherPool')) exports.globalAetherPool = globalAetherPool;
 });
 __define('./ai.ts', (exports, module, __require) => {
   const __dep0 = __require('./engine.ts');
