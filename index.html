@@ -95,7 +95,55 @@
     .app-modal__actions{margin-top:28px;}
     .app-modal__button{padding:10px 18px;border-radius:12px;border:1px solid rgba(125,211,252,.45);background:rgba(16,28,40,.9);color:inherit;font-weight:600;cursor:pointer;}
     .app-modal__button:hover{background:rgba(24,36,48,.95);}
-  </style>
+    /* CHÈN VÀO FILE CSS CHÍNH CỦA GAME */
+
+.aether-pillar-container {
+  position: absolute;
+  /* Đặt vị trí tương đối phía sau ô Leader (Ô số 8) */
+  bottom: 10px; 
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 150px;
+  background: rgba(20, 20, 40, 0.8);
+  border: 2px solid #4a4e69;
+  border-radius: 5px;
+  overflow: hidden;
+  z-index: 0; /* Nằm dưới nhân vật (z-index nhân vật thường > 1) */
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+}
+
+.aether-pillar-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  /* Hiệu ứng gradient Anima (Xanh) + Umbra (Tím) */
+  background: linear-gradient(to top, #8a2be2, #00ffff);
+  transition: height 0.3s ease-in-out;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+}
+
+/* Hiệu ứng khi Bể AE cạn kiệt (Bị trừ/Cướp) */
+.aether-pillar-empty {
+  filter: grayscale(100%);
+  animation: shake 0.5s infinite;
+}
+
+@keyframes shake {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  10% { transform: translate(-1px, -2px) rotate(-1deg); }
+  20% { transform: translate(-3px, 0px) rotate(1deg); }
+  30% { transform: translate(3px, 2px) rotate(0deg); }
+  40% { transform: translate(1px, -1px) rotate(1deg); }
+  50% { transform: translate(-1px, 2px) rotate(-1deg); }
+  60% { transform: translate(-3px, 1px) rotate(0deg); }
+  70% { transform: translate(3px, 1px) rotate(-1deg); }
+  80% { transform: translate(-1px, -1px) rotate(1deg); }
+  90% { transform: translate(1px, 2px) rotate(0deg); }
+  100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+ </style>
 </head>
 <body>
 <div id="appRoot" class="app-shell"></div>
