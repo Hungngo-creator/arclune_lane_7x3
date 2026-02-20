@@ -1,66 +1,127 @@
 // FILE: src/aether.ts
 import { AE_CLASS_COEFF } from './catalog.ts';
 
-class SharedAetherPool {
-  public max: number = 100; // Mặc định để test
+export class SharedAetherPool {
+  public max: number = 100;
   public current: number = 50;
-  public regenPerTurn: number = 10;
+  public regenPerTurn: number = 0;
+
   private uiFill: HTMLElement | null = null;
+  private side: 'ally' | 'enemy';
 
-  constructor() {
-    this.initUI();
+  constructor(side: 'ally' | 'enemy') {
+    this.side = side;
+    // Chờ HTML load xong mới vẽ để chống crash
+    if (typeof window !== 'undefined') {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => this.initUI());
+      } else {
+        this.initUI();
+      }
+    }
   }
-export { SharedAetherPool }; 
 
-  /** Tự động vẽ Cột Trụ lên màn hình mà không cần chạm vào HTML */
+  // --- LOGIC GAME CỦA NÍ ĐƯỢC GIỮ NGUYÊN ---
+  public init(teamUnits: any[]) {
+      this.max = 0;
+      this.regenPerTurn = 0;
+      for (const unit of teamUnits) {
+          if (!unit) continue;
+          this.max += (unit.aeMax || 0);
+          const coeff = AE_CLASS_COEFF[unit.className as keyof typeof AE_CLASS_COEFF] || 0.55;
+          this.regenPerTurn += ((unit.wil || 0) * coeff);
+      }
+      this.current = Math.floor(this.max / 2);
+      this.regenPerTurn = Math.floor(this.regenPerTurn);
+      this.updateUI();
+  }
+
+  public onTurnEnd() {
+      this.current += this.regenPerTurn;
+      if (this.current > this.max) {
+          this.current = this.max;
+      }
+      this.updateUI();
+  }
+
+  public consume(cost: number): boolean {
+      if (this.current >= cost) {
+          this.current -= cost;
+          this.updateUI();
+          return true;
+      }
+      return false;
+  }
+
+  // --- LOGIC GIAO DIỆN MỚI ---
   private initUI() {
-    // Đảm bảo code chỉ chạy trên trình duyệt
     if (typeof document === 'undefined') return;
 
-    let container = document.getElementById('aether-pillar-container');
+    const containerId = `aether-pillar-${this.side}`;
+    let container = document.getElementById(containerId);
+
     if (!container) {
-      // 1. Tạo vỏ cột trụ
       container = document.createElement('div');
-      container.id = 'aether-pillar-container';
-      // CSS gắn thẳng vào code (PA1: Sau lưng ô Leader)
-      container.style.cssText = 'position: fixed; bottom: 15%; left: 50%; transform: translateX(-50%); width: 25px; height: 150px; background: rgba(10, 10, 30, 0.7); border: 2px solid #00ffff; border-radius: 5px; z-index: 9999; box-shadow: 0 0 15px rgba(0,255,255,0.3); pointer-events: none;';
+      container.id = containerId;
+
+      const positionCss = this.side === 'ally' 
+        ? 'left: 8%; transform: translateY(-50%);' 
+        : 'right: 8%; transform: translateY(-50%);';
+
+      const glowColor = this.side === 'ally' ? '#00ffff' : '#ff0055';
+      const gradient = this.side === 'ally' 
+        ? 'linear-gradient(to top, #0055ff, #00ffff)' 
+        : 'linear-gradient(to top, #550000, #ff0055)';
+
+      // Z-INDEX LÀ 9999 ĐỂ NỔI LÊN TRÊN MỌI THỨ
+      container.style.cssText = `position: fixed; top: 50%; ${positionCss} width: 40px; height: 220px; background: rgba(10, 10, 30, 0.8); border: 2px solid ${glowColor}; border-radius: 8px; z-index: 99999; box-shadow: 0 0 15px ${glowColor}40; pointer-events: none;`;
       
-      // 2. Tạo lõi dung dịch Aether
       this.uiFill = document.createElement('div');
-      this.uiFill.style.cssText = 'position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, #8a2be2, #00ffff); transition: height 0.4s ease-out; box-shadow: 0 0 10px #00ffff;';
+      this.uiFill.style.cssText = `position: absolute; bottom: 0; left: 0; width: 100%; background: ${gradient}; transition: height 0.4s ease-out; box-shadow: 0 0 10px ${glowColor};`;
       
-      // Gắn vào Body
       container.appendChild(this.uiFill);
-      document.body.appendChild(container);
+      
+       document.body.appendChild(container);
     } else {
       this.uiFill = container.firstElementChild as HTMLElement;
     }
-
-    this.updateUI();
   }
 
-  /** Cập nhật chiều cao của dung dịch Aether */
   public updateUI() {
+    if (!document.getElementById(`aether-pillar-${this.side}`)) {
+        this.initUI(); 
+    }
     if (!this.uiFill) return;
     const percent = this.max > 0 ? (this.current / this.max) * 100 : 0;
     this.uiFill.style.height = `${Math.max(0, Math.min(100, percent))}%`;
   }
-
-  // --- CÁC HÀM LOGIC ---
-  public onTurnEnd() {
-    this.current = Math.min(this.max, this.current + this.regenPerTurn);
-    this.updateUI();
-  }
-
-  public consume(cost: number): boolean {
-    if (this.current >= cost) {
-      this.current -= cost;
-      this.updateUI();
-      return true;
-    }
-    return false;
-  }
 }
 
-// KHỞI TẠO NGAY LẬP TỨC ĐỂ HIỂN THỊ UI
-export const globalAetherPool = new SharedAetherPool();
+// 1. Tạo 2 trụ cho 2 bên
+export const allyAetherPool = new SharedAetherPool('ally');
+export const enemyAetherPool = new SharedAetherPool('enemy');
+
+// 2. MÁNH KHÓE: Giữ lại biến globalAetherPool cũ để các file khác gọi không bị lỗi
+export const globalAetherPool = {
+  init: (units: any[]) => {
+    allyAetherPool.init(units);
+    // Khởi tạo tạm cho Kẻ thù để trụ Đỏ hiện lên
+    if (enemyAetherPool.max === 0) {
+        enemyAetherPool.max = 100;
+        enemyAetherPool.current = 50;
+        enemyAetherPool.updateUI();
+    }
+  },
+  onTurnEnd: () => {
+    allyAetherPool.onTurnEnd();
+    enemyAetherPool.onTurnEnd();
+  },
+  consume: (cost: number) => allyAetherPool.consume(cost),
+  updateUI: () => {
+    allyAetherPool.updateUI();
+    enemyAetherPool.updateUI();
+  },
+  get current() { return allyAetherPool.current; },
+  get max() { return allyAetherPool.max; },
+  get regenPerTurn() { return allyAetherPool.regenPerTurn; }
+};
