@@ -2,7 +2,7 @@
 import { AE_CLASS_COEFF } from './catalog.ts'; // Điều chỉnh đường dẫn import nếu cần
 import type { InstanceStats } from './meta.ts'; // Import type để chuẩn TypeScript
 
-export class SharedAetherPool {
+class SharedAetherPool {
   public max: number = 0;
   public current: number = 0;
   public regenPerTurn: number = 0;
@@ -50,3 +50,6 @@ export class SharedAetherPool {
     return false;
   }
 }
+
+if (!Object.prototype.hasOwnProperty.call(exports, 'SharedAetherPool')) exports.SharedAetherPool = SharedAetherPool;
+});
