@@ -1,7 +1,7 @@
 // Bundled by build.mjs
 const __modules = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }
 function __define(id, factory){ __modules[id] = { factory, exports: null, initialized: false }; }
@@ -19,6 +19,55 @@ function __require(id){
   return mod.exports;
 }
 if (typeof globalThis !== "undefined" && typeof globalThis.__require === "undefined"){ globalThis.__require = __require; }
+__define('./aether.ts', (exports, module, __require) => {
+  // FILE: src/aether.ts
+  const __dep0 = __require('./catalog.ts');
+  const AE_CLASS_COEFF = __dep0.AE_CLASS_COEFF; // Điều chỉnh đường dẫn import nếu cần
+  export class SharedAetherPool {
+      constructor() {
+          this.max = 0;
+          this.current = 0;
+          this.regenPerTurn = 0;
+      }
+      /**
+       * Khởi tạo Bể AE dựa trên 9 nhân vật trong đội hình
+       * @param teamUnits Mảng chứa thông số (InstanceStats) của 9 ô
+       */
+      init(teamUnits) {
+          this.max = 0;
+          this.regenPerTurn = 0;
+          for (const unit of teamUnits) {
+              if (!unit)
+                  continue;
+              // Cộng dồn Max AE
+              this.max += (unit.aeMax || 0);
+              // Tính Regen theo Hệ số Class (Laser WIL x Thấu kính Class)
+              const coeff = AE_CLASS_COEFF[unit.className] || 0.55;
+              this.regenPerTurn += (unit.wil * coeff);
+          }
+          // Luật v0.4.1: Khởi đầu trận có sẵn 50% AE
+          this.current = Math.floor(this.max / 2);
+          // Đảm bảo số tròn
+          this.regenPerTurn = Math.floor(this.regenPerTurn);
+      }
+      /** Gọi hàm này sau mỗi vòng SSIT (khi Slot 9 đánh xong) */
+      onTurnEnd() {
+          this.current += this.regenPerTurn;
+          if (this.current > this.max) {
+              this.current = this.max;
+          }
+      }
+      /** Dùng kỹ năng: Trả về true nếu đủ AE, false nếu thiếu */
+      consume(cost) {
+          if (this.current >= cost) {
+              this.current -= cost;
+              return true;
+          }
+          return false;
+      }
+  }
+  //# sourceMappingURL=stdin.js.map
+});
 __define('./ai.ts', (exports, module, __require) => {
   const __dep0 = __require('./engine.ts');
   const pickRandom = __dep0.pickRandom;
@@ -528,7 +577,7 @@ __define('./ai.ts', (exports, module, __require) => {
       Game.ai.lastDecision = decision;
       Game.ai.lastThinkMs = now;
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'refillDeckEnemy')) exports.refillDeckEnemy = refillDeckEnemy;
   if (!Object.prototype.hasOwnProperty.call(exports, 'queueEnemyAt')) exports.queueEnemyAt = queueEnemyAt;
   if (!Object.prototype.hasOwnProperty.call(exports, 'aiMaybeAct')) exports.aiMaybeAct = aiMaybeAct;
@@ -694,7 +743,7 @@ __define('./app/shell.ts', (exports, module, __require) => {
       };
       return api;
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'createAppShell')) exports.createAppShell = createAppShell;
 });
 __define('./art.ts', (exports, module, __require) => {
@@ -1410,7 +1459,7 @@ __define('./art.ts', (exports, module, __require) => {
       const skinKey = resolveSkinKey(id, baseArt, (_a = opts.skinKey) !== null && _a !== void 0 ? _a : null);
       return instantiateArt(id, baseArt, skinKey);
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'UNIT_ART')) exports.UNIT_ART = UNIT_ART;
   if (!Object.prototype.hasOwnProperty.call(exports, 'setUnitSkin')) exports.setUnitSkin = setUnitSkin;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getUnitSkin')) exports.getUnitSkin = getUnitSkin;
@@ -1926,7 +1975,7 @@ __define('./background.ts', (exports, module, __require) => {
       const resolved = resolveBackground(backgroundKey !== null && backgroundKey !== void 0 ? backgroundKey : null);
       return resolved ? resolved.config : null;
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'SCENERY')) exports.SCENERY = SCENERY;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ENVIRONMENT_PROP_TYPES')) exports.ENVIRONMENT_PROP_TYPES = ENVIRONMENT_PROP_TYPES;
   if (!Object.prototype.hasOwnProperty.call(exports, 'drawEnvironmentProps')) exports.drawEnvironmentProps = drawEnvironmentProps;
@@ -1959,6 +2008,27 @@ __define('./catalog.ts', (exports, module, __require) => {
       Summoner: { HP: 330, ATK: 22, WIL: 26, ARM: 0.08, RES: 0.14, AGI: 10, PER: 10, SPD: 1.05, AEmax: 90, AEregen: 8.5, HPregen: 18 },
       Support: { HP: 380, ATK: 24, WIL: 24, ARM: 0.10, RES: 0.13, AGI: 10, PER: 11, SPD: 1.00, AEmax: 100, AEregen: 7.5, HPregen: 20 },
       Assassin: { HP: 320, ATK: 36, WIL: 16, ARM: 0.06, RES: 0.08, AGI: 14, PER: 16, SPD: 1.25, AEmax: 65, AEregen: 6.0, HPregen: 10 }
+  };
+  // src/catalog.ts
+  const AE_CLASS_COEFF = {
+      Support: 1.5,
+      Summoner: 1.3,
+      Mage: 1.2,
+      Tanker: 0.55,
+      Warrior: 0.55,
+      Ranger: 0.55,
+      Assassin: 0.22
+  };
+  // Chèn vào catalog.ts, sau AE_CLASS_COEFF
+  /** Chỉ số tăng trưởng mỗi Level (Tia Laser Delta) */
+  const CLASS_GROWTH = {
+      Tanker: { HP: 25, ATK: 0.5, WIL: 0.5, ARM: 0.01, RES: 0.005 },
+      Warrior: { HP: 20, ATK: 1.2, WIL: 0.8, ARM: 0.008, RES: 0.008 },
+      Mage: { HP: 15, ATK: 0.5, WIL: 1.5, ARM: 0.005, RES: 0.01 },
+      Support: { HP: 15, ATK: 0.5, WIL: 1.2, ARM: 0.005, RES: 0.01 },
+      Ranger: { HP: 15, ATK: 1.5, WIL: 0.5, ARM: 0.005, RES: 0.005 },
+      Assassin: { HP: 12, ATK: 1.8, WIL: 0.5, ARM: 0.004, RES: 0.004 },
+      Summoner: { HP: 18, ATK: 0.8, WIL: 1.2, ARM: 0.006, RES: 0.008 }
   };
   const isRankName = (value) => value in RANK_MULT;
   const isClassName = (value) => value in CLASS_BASE;
@@ -3888,9 +3958,30 @@ __define('./catalog.ts', (exports, module, __require) => {
       const m = getMetaById(id);
       return !!(m && m.class === 'Summoner' && kitSupportsSummon(m));
   };
-
+  // Dán vào cuối cùng của src/catalog.ts
+  const AE_CLASS_COEFF = {
+      Support: 1.5,
+      Summoner: 1.3,
+      Mage: 1.2,
+      Tanker: 0.55,
+      Warrior: 0.55,
+      Ranger: 0.55,
+      Assassin: 0.22
+  };
+  const CLASS_GROWTH = {
+      Tanker: { HP: 25, ATK: 0.5, WIL: 0.5, ARM: 0.01, RES: 0.005 },
+      Warrior: { HP: 20, ATK: 1.2, WIL: 0.8, ARM: 0.008, RES: 0.008 },
+      Mage: { HP: 15, ATK: 0.5, WIL: 1.5, ARM: 0.005, RES: 0.01 },
+      Support: { HP: 15, ATK: 0.5, WIL: 1.2, ARM: 0.005, RES: 0.01 },
+      Ranger: { HP: 15, ATK: 1.5, WIL: 0.5, ARM: 0.005, RES: 0.005 },
+      Assassin: { HP: 12, ATK: 1.8, WIL: 0.5, ARM: 0.004, RES: 0.004 },
+      Summoner: { HP: 18, ATK: 0.8, WIL: 1.2, ARM: 0.006, RES: 0.008 }
+  };
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'RANK_MULT')) exports.RANK_MULT = RANK_MULT;
   if (!Object.prototype.hasOwnProperty.call(exports, 'CLASS_BASE')) exports.CLASS_BASE = CLASS_BASE;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'AE_CLASS_COEFF')) exports.AE_CLASS_COEFF = AE_CLASS_COEFF;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'CLASS_GROWTH')) exports.CLASS_GROWTH = CLASS_GROWTH;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ROSTER')) exports.ROSTER = ROSTER;
   if (!Object.prototype.hasOwnProperty.call(exports, 'UNIT_BASE')) exports.UNIT_BASE = UNIT_BASE;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ROSTER_MAP')) exports.ROSTER_MAP = ROSTER_MAP;
@@ -4164,7 +4255,7 @@ __define('./combat.ts', (exports, module, __require) => {
           console.error('[doBasicWithFollowups]', error);
       }
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'isBasicAttackAfterHitHandler')) exports.isBasicAttackAfterHitHandler = isBasicAttackAfterHitHandler;
   if (!Object.prototype.hasOwnProperty.call(exports, 'pickTarget')) exports.pickTarget = pickTarget;
   if (!Object.prototype.hasOwnProperty.call(exports, 'dealAbilityDamage')) exports.dealAbilityDamage = dealAbilityDamage;
@@ -4215,7 +4306,7 @@ __define('./combat/apply-damage.ts', (exports, module, __require) => {
       }
       return amt;
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyDamage')) exports.applyDamage = applyDamage;
   if (!Object.prototype.hasOwnProperty.call(exports, 'grantShield')) exports.grantShield = grantShield;
 });
@@ -4415,7 +4506,7 @@ __define('./config.ts', (exports, module, __require) => {
       weapon: 0.78, // vũ khí ngắn hơn để cân đối
       nameAlpha: 0.7
   };
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'CFG')) exports.CFG = CFG;
   if (!Object.prototype.hasOwnProperty.call(exports, 'CAM')) exports.CAM = CAM;
   if (!Object.prototype.hasOwnProperty.call(exports, 'TOKEN_STYLE')) exports.TOKEN_STYLE = TOKEN_STYLE;
@@ -4640,7 +4731,7 @@ __define('./config/schema.ts', (exports, module, __require) => {
       assertSceneThemeRecord(parsed.SCENE.THEMES);
       return parsed;
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'GameConfigSchema')) exports.GameConfigSchema = GameConfigSchema;
   if (!Object.prototype.hasOwnProperty.call(exports, 'parseSceneTheme')) exports.parseSceneTheme = parseSceneTheme;
   if (!Object.prototype.hasOwnProperty.call(exports, 'parseSceneConfig')) exports.parseSceneConfig = parseSceneConfig;
@@ -4736,7 +4827,7 @@ __define('./data/announcements.config.ts', (exports, module, __require) => {
       }
   ];
 
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'default')) exports.default = announcementsConfig;
   module.exports.default = exports.default;
 });
@@ -4847,7 +4938,7 @@ __define('./data/announcements.ts', (exports, module, __require) => {
           };
       }).filter((item) => Boolean(item.entry));
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'SIDE_SLOT_ANNOUNCEMENTS')) exports.SIDE_SLOT_ANNOUNCEMENTS = SIDE_SLOT_ANNOUNCEMENTS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'selectAnnouncementEntry')) exports.selectAnnouncementEntry = selectAnnouncementEntry;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getAllSidebarAnnouncements')) exports.getAllSidebarAnnouncements = getAllSidebarAnnouncements;
@@ -4932,7 +5023,7 @@ __define('./data/economy.config.ts', (exports, module, __require) => {
       }
   };
 
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'default')) exports.default = economyConfig;
   module.exports.default = exports.default;
 });
@@ -5124,7 +5215,7 @@ __define('./data/economy.ts', (exports, module, __require) => {
   exports.getShopTaxRate = getShopTaxRate;
   exports.LOTTERY_SPLIT = LOTTERY_SPLIT;
   exports.getLotterySplit = getLotterySplit;
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'CURRENCY_ORDER')) exports.CURRENCY_ORDER = CURRENCY_ORDER;
 });
 __define('./data/load-config.ts', (exports, module, __require) => {
@@ -5139,7 +5230,7 @@ __define('./data/load-config.ts', (exports, module, __require) => {
           });
       }
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'loadConfig')) exports.loadConfig = loadConfig;
 });
 __define('./data/modes.ts', (exports, module, __require) => {
@@ -5461,7 +5552,7 @@ __define('./data/modes.ts', (exports, module, __require) => {
   exports.MODE_INDEX = MODE_INDEX;
   exports.listModesForSection = listModesForSection;
   exports.getMenuSections = getMenuSections;
-
+  //# sourceMappingURL=stdin.js.map
 });
 __define('./data/roster-preview.config.ts', (exports, module, __require) => {
   const rosterPreviewConfig = {
@@ -5498,7 +5589,7 @@ __define('./data/roster-preview.config.ts', (exports, module, __require) => {
       }
   };
 
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'default')) exports.default = rosterPreviewConfig;
   module.exports.default = exports.default;
 });
@@ -5662,7 +5753,7 @@ __define('./data/roster-preview.ts', (exports, module, __require) => {
   const ROSTER_PREVIEWS = buildRosterPreviews(ROSTER_TP_ALLOCATIONS);
   const ROSTER_PREVIEW_ROWS = buildPreviewRows(ROSTER_PREVIEWS);
   const STAT_KEYS = [...STAT_ORDER];
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'TP_DELTA')) exports.TP_DELTA = TP_DELTA;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ROSTER_TP_ALLOCATIONS')) exports.ROSTER_TP_ALLOCATIONS = ROSTER_TP_ALLOCATIONS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ROSTER_PREVIEWS')) exports.ROSTER_PREVIEWS = ROSTER_PREVIEWS;
@@ -7244,7 +7335,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
       }
   ];
 
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'default')) exports.default = skillsConfig;
   module.exports.default = exports.default;
 });
@@ -7370,7 +7461,7 @@ __define('./data/skills.ts', (exports, module, __require) => {
       }
       return true;
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'getSkillSet')) exports.getSkillSet = getSkillSet;
   if (!Object.prototype.hasOwnProperty.call(exports, 'listSkillSets')) exports.listSkillSets = listSkillSets;
   if (!Object.prototype.hasOwnProperty.call(exports, 'hasSkillSet')) exports.hasSkillSet = hasSkillSet;
@@ -7414,7 +7505,7 @@ __define('./data/vfx_anchors/schema.ts', (exports, module, __require) => {
           ambientEffects: (_c = dataset.ambientEffects) !== null && _c !== void 0 ? _c : {}
       };
   };
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'parseVfxAnchorDataset')) exports.parseVfxAnchorDataset = parseVfxAnchorDataset;
 });
 __define('./engine.ts', (exports, module, __require) => {
@@ -8378,7 +8469,7 @@ __define('./engine.ts', (exports, module, __require) => {
   }
   const ORDER_ALLY = Array.from({ length: 9 }, (_, i) => slotToCell(SIDE.ALLY, i + 1));
   const ORDER_ENEMY = Array.from({ length: 9 }, (_, i) => slotToCell(SIDE.ENEMY, i + 1));
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'pick3Random')) exports.pick3Random = pick3Random;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ART_SPRITE_EVENT')) exports.ART_SPRITE_EVENT = ART_SPRITE_EVENT;
   if (!Object.prototype.hasOwnProperty.call(exports, 'SIDE')) exports.SIDE = SIDE;
@@ -9403,7 +9494,7 @@ __define('./entry.ts', (exports, module, __require) => {
           }
       }
   })();
-
+  //# sourceMappingURL=stdin.js.map
 });
 __define('./events.ts', (exports, module, __require) => {
   const TURN_START = 'turn:start';
@@ -9651,7 +9742,7 @@ __define('./events.ts', (exports, module, __require) => {
       }
       return () => { };
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'TURN_START')) exports.TURN_START = TURN_START;
   if (!Object.prototype.hasOwnProperty.call(exports, 'TURN_END')) exports.TURN_END = TURN_END;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ACTION_START')) exports.ACTION_START = ACTION_START;
@@ -9771,7 +9862,7 @@ __define('./main.ts', (exports, module, __require) => {
       const subscribe = (_a = currentSession === null || currentSession === void 0 ? void 0 : currentSession.onEvent) !== null && _a !== void 0 ? _a : addGameEventListener;
       return subscribe(type, handler);
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'gameEvents')) exports.gameEvents = __reexport0.gameEvents;
   if (!Object.prototype.hasOwnProperty.call(exports, 'emitGameEvent')) exports.emitGameEvent = __reexport0.emitGameEvent;
   if (!Object.prototype.hasOwnProperty.call(exports, 'dispatchGameEvent')) exports.dispatchGameEvent = __reexport0.dispatchGameEvent;
@@ -9795,7 +9886,7 @@ __define('./meta.ts', (exports, module, __require) => {
   const __dep0 = __require('./catalog.ts');
   const CLASS_BASE = __dep0.CLASS_BASE;
   const RANK_MULT = __dep0.RANK_MULT;
-  const applyRankAndMods = __dep0.applyRankAndMods;
+  const CLASS_GROWTH = __dep0.CLASS_GROWTH;
   const getMetaById = __dep0.getMetaById;
   const getUnitKitById = __dep0.getUnitKitById;
   const __dep1 = __require('./utils/kit.ts');
@@ -9890,35 +9981,41 @@ __define('./meta.ts', (exports, module, __require) => {
       }
       return out;
   };
-  function makeInstanceStats(unitId) {
-      var _a, _b, _c, _d, _e, _f, _g;
+  function makeInstanceStats(unitId, level = 1, stars = 0) {
+      var _a, _b, _c;
       const entry = Meta.get(unitId);
       if (!entry)
           return { ...EMPTY_INSTANCE_STATS };
       const className = entry.class;
-      if (!isClassName(className))
-          return { ...EMPTY_INSTANCE_STATS };
       const rank = entry.rank;
-      if (!isRankName(rank))
-          return { ...EMPTY_INSTANCE_STATS };
       const base = CLASS_BASE[className];
-      if (!base)
-          return { ...EMPTY_INSTANCE_STATS };
-      const fin = applyRankAndMods(base, rank, coerceStatMods(entry.mods));
+      // Delta tăng trưởng (Laser)
+      const delta = CLASS_GROWTH[className];
+      // 1. TÍNH CHỈ SỐ GỐC THEO LEVEL (TIA LASER)
+      const currentBase = {
+          HP: base.HP + (level - 1) * ((delta === null || delta === void 0 ? void 0 : delta.HP) || 0),
+          ATK: base.ATK + (level - 1) * ((delta === null || delta === void 0 ? void 0 : delta.ATK) || 0),
+          WIL: base.WIL + (level - 1) * ((delta === null || delta === void 0 ? void 0 : delta.WIL) || 0),
+          ARM: base.ARM + (level - 1) * ((delta === null || delta === void 0 ? void 0 : delta.ARM) || 0),
+          RES: base.RES + (level - 1) * ((delta === null || delta === void 0 ? void 0 : delta.RES) || 0)
+      };
+      // 2. TÍNH HỆ SỐ (THẤU KÍNH) = RANK + SAO
+      const rankMult = RANK_MULT[rank] + (stars * 0.05);
+      // 3. XUẤT CHỈ SỐ CUỐI (LASER x THẤU KÍNH)
       return {
-          hpMax: Math.trunc((_a = fin.HP) !== null && _a !== void 0 ? _a : 0),
-          hp: Math.trunc((_b = fin.HP) !== null && _b !== void 0 ? _b : 0),
-          atk: Math.trunc((_c = fin.ATK) !== null && _c !== void 0 ? _c : 0),
-          wil: Math.trunc((_d = fin.WIL) !== null && _d !== void 0 ? _d : 0),
-          arm: fin.ARM || 0,
-          res: fin.RES || 0,
-          agi: Math.trunc((_e = fin.AGI) !== null && _e !== void 0 ? _e : 0),
-          per: Math.trunc((_f = fin.PER) !== null && _f !== void 0 ? _f : 0),
-          spd: fin.SPD || 1,
-          aeMax: Math.trunc((_g = fin.AEmax) !== null && _g !== void 0 ? _g : 0),
+          hpMax: Math.trunc(currentBase.HP * rankMult),
+          hp: Math.trunc(currentBase.HP * rankMult),
+          atk: Math.trunc(currentBase.ATK * rankMult),
+          wil: Math.trunc(currentBase.WIL * rankMult),
+          arm: Number((currentBase.ARM * rankMult).toFixed(4)),
+          res: Number((currentBase.RES * rankMult).toFixed(4)),
+          agi: Math.trunc((_a = base.AGI) !== null && _a !== void 0 ? _a : 0),
+          per: Math.trunc((_b = base.PER) !== null && _b !== void 0 ? _b : 0),
+          spd: base.SPD || 1,
+          aeMax: Math.trunc((_c = base.AEmax) !== null && _c !== void 0 ? _c : 0),
           ae: 0,
-          aeRegen: fin.AEregen || 0,
-          hpRegen: fin.HPregen || 0,
+          aeRegen: base.AEregen || 0,
+          hpRegen: base.HPregen || 0,
       };
   }
   // Nộ khi vào sân (trừ leader). Revive: theo spec của skill.
@@ -9938,7 +10035,7 @@ __define('./meta.ts', (exports, module, __require) => {
           return Math.max(0, (_c = (_b = opts.reviveSpec) === null || _b === void 0 ? void 0 : _b.rage) !== null && _c !== void 0 ? _c : 0);
       return 0;
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'Meta')) exports.Meta = Meta;
   if (!Object.prototype.hasOwnProperty.call(exports, 'metaServiceAdapter')) exports.metaServiceAdapter = metaServiceAdapter;
   if (!Object.prototype.hasOwnProperty.call(exports, 'makeInstanceStats')) exports.makeInstanceStats = makeInstanceStats;
@@ -9949,7 +10046,7 @@ __define('./modes/coming-soon.stub.ts', (exports, module, __require) => {
   const COMING_SOON_MODULE = {
       comingSoon,
   };
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'comingSoon')) exports.comingSoon = comingSoon;
   if (!Object.prototype.hasOwnProperty.call(exports, 'COMING_SOON_MODULE')) exports.COMING_SOON_MODULE = COMING_SOON_MODULE;
 });
@@ -12759,7 +12856,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   }
   const __reexport0 = __require('./events.ts');
   const __reexport1 = __require('./modes/pve/session-state.ts');
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'gameEvents')) exports.gameEvents = __reexport0.gameEvents;
   if (!Object.prototype.hasOwnProperty.call(exports, 'emitGameEvent')) exports.emitGameEvent = __reexport0.emitGameEvent;
   if (!Object.prototype.hasOwnProperty.call(exports, 'TURN_START')) exports.TURN_START = __reexport0.TURN_START;
@@ -12951,7 +13048,7 @@ __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
   exports.ACTION_END = ACTION_END;
   exports.TURN_REGEN = TURN_REGEN;
   exports.BATTLE_END = BATTLE_END;
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'advanceSession')) exports.advanceSession = advanceSession;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyReward')) exports.applyReward = applyReward;
   if (!Object.prototype.hasOwnProperty.call(exports, 'onSessionEvent')) exports.onSessionEvent = onSessionEvent;
@@ -13549,7 +13646,7 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
       }
       return normalized;
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'clearBackgroundSignatureCache')) exports.clearBackgroundSignatureCache = clearBackgroundSignatureCache;
   if (!Object.prototype.hasOwnProperty.call(exports, 'computeBackgroundSignature')) exports.computeBackgroundSignature = computeBackgroundSignature;
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeConfig')) exports.normalizeConfig = normalizeConfig;
@@ -13573,7 +13670,7 @@ __define('./modes/pve/session.ts', (exports, module, __require) => {
     if (Object.prototype.hasOwnProperty.call(exports, key)) continue;
     exports[key] = __reexport1[key];
   }
-
+  //# sourceMappingURL=stdin.js.map
 });
 __define('./passives.ts', (exports, module, __require) => {
   // passives.ts — passive event dispatch & helpers v0.7
@@ -14395,7 +14492,7 @@ __define('./passives.ts', (exports, module, __require) => {
   }
   exports.recomputeUnitStats = recomputeFromStatuses;
   exports.stacksOf = stacksOf;
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'getPassiveLog')) exports.getPassiveLog = getPassiveLog;
   if (!Object.prototype.hasOwnProperty.call(exports, 'emitPassiveEvent')) exports.emitPassiveEvent = emitPassiveEvent;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyOnSpawnEffects')) exports.applyOnSpawnEffects = applyOnSpawnEffects;
@@ -14682,7 +14779,7 @@ __define('./scene.ts', (exports, module, __require) => {
       ctx.fill();
       ctx.restore();
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'invalidateBattlefieldSceneCache')) exports.invalidateBattlefieldSceneCache = invalidateBattlefieldSceneCache;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getCachedBattlefieldScene')) exports.getCachedBattlefieldScene = getCachedBattlefieldScene;
   if (!Object.prototype.hasOwnProperty.call(exports, 'drawBattlefieldScene')) exports.drawBattlefieldScene = drawBattlefieldScene;
@@ -14870,7 +14967,7 @@ __define('./screens/arena-hub/index.ts', (exports, module, __require) => {
       };
   }
   const render = renderScreen;
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
 });
@@ -15336,7 +15433,7 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
       const formatter = createNumberFormatter(locale, options);
       return toIntlNumberFormatter(formatter, locale, options);
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'ABILITY_TYPE_LABELS')) exports.ABILITY_TYPE_LABELS = ABILITY_TYPE_LABELS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveCurrencyBalance')) exports.resolveCurrencyBalance = resolveCurrencyBalance;
   if (!Object.prototype.hasOwnProperty.call(exports, 'cloneRoster')) exports.cloneRoster = cloneRoster;
@@ -15427,7 +15524,7 @@ __define('./screens/collection/index.ts', (exports, module, __require) => {
       });
   }
   const __reexport0 = __require('./screens/collection/view.ts');
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderCollectionView')) exports.renderCollectionView = __reexport0.renderCollectionView;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderCollectionScreen')) exports.renderCollectionScreen = renderCollectionScreen;
 });
@@ -15445,14 +15542,14 @@ __define('./screens/collection/state.ts', (exports, module, __require) => {
   function updateSelectedUnit(state, unitId) {
       state.selectedUnitId = unitId;
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'createFilterState')) exports.createFilterState = createFilterState;
   if (!Object.prototype.hasOwnProperty.call(exports, 'updateActiveTab')) exports.updateActiveTab = updateActiveTab;
   if (!Object.prototype.hasOwnProperty.call(exports, 'updateSelectedUnit')) exports.updateSelectedUnit = updateSelectedUnit;
 });
 __define('./screens/collection/types.ts', (exports, module, __require) => {
 
-
+  //# sourceMappingURL=stdin.js.map
 });
 __define('./screens/collection/view.ts', (exports, module, __require) => {
   const __dep0 = __require('./art.ts');
@@ -16334,7 +16431,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           }
       };
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderCollectionView')) exports.renderCollectionView = renderCollectionView;
 });
 __define('./screens/gacha/view.ts', (exports, module, __require) => {
@@ -16519,7 +16616,7 @@ __define('./screens/gacha/view.ts', (exports, module, __require) => {
           },
       };
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderGachaView')) exports.renderGachaView = renderGachaView;
 });
 __define('./screens/lineup/index.ts', (exports, module, __require) => {
@@ -16663,7 +16760,7 @@ __define('./screens/lineup/index.ts', (exports, module, __require) => {
       });
   }
   const __reexport0 = __require('./screens/lineup/view/index.ts');
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderLineupView')) exports.renderLineupView = __reexport0.renderLineupView;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderLineupScreen')) exports.renderLineupScreen = renderLineupScreen;
 });
@@ -17014,12 +17111,12 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
       cleanup.push(() => document.removeEventListener('keydown', handleGlobalKey));
       return cleanup;
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'bindLineupEvents')) exports.bindLineupEvents = bindLineupEvents;
 });
 __define('./screens/lineup/view/index.ts', (exports, module, __require) => {
   const __reexport0 = __require('./screens/lineup/view/render.ts');
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderLineupView')) exports.renderLineupView = __reexport0.renderLineupView;
 });
 __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
@@ -18076,7 +18173,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           },
       };
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderLineupView')) exports.renderLineupView = renderLineupView;
 });
 __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
@@ -18687,7 +18784,7 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
       lineup.leaderId = unitId;
       return { ok: true };
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeRoster')) exports.normalizeRoster = normalizeRoster;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getUnitRarity')) exports.getUnitRarity = getUnitRarity;
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeLineups')) exports.normalizeLineups = normalizeLineups;
@@ -19010,7 +19107,7 @@ __define('./screens/main-menu/dialogues.ts', (exports, module, __require) => {
   function listAvailableHeroes() {
       return Object.keys(HERO_PROFILES).filter(key => key !== FALLBACK_HERO_KEY);
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'HERO_DEFAULT_ID')) exports.HERO_DEFAULT_ID = HERO_DEFAULT_ID;
   if (!Object.prototype.hasOwnProperty.call(exports, 'HERO_PROFILES')) exports.HERO_PROFILES = HERO_PROFILES;
   if (!Object.prototype.hasOwnProperty.call(exports, 'HERO_HOTSPOTS')) exports.HERO_HOTSPOTS = HERO_HOTSPOTS;
@@ -19022,7 +19119,7 @@ __define('./screens/main-menu/dialogues.ts', (exports, module, __require) => {
 });
 __define('./screens/main-menu/types.ts', (exports, module, __require) => {
 
-
+  //# sourceMappingURL=stdin.js.map
 });
 __define('./screens/main-menu/view/events.ts', (exports, module, __require) => {
   const TONE_ICONS = {
@@ -19363,7 +19460,7 @@ __define('./screens/main-menu/view/events.ts', (exports, module, __require) => {
       });
       return wrapper;
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'cueTone')) exports.cueTone = cueTone;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createModeCard')) exports.createModeCard = createModeCard;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createModeGroupCard')) exports.createModeGroupCard = createModeGroupCard;
@@ -19423,7 +19520,7 @@ __define('./screens/main-menu/view/index.ts', (exports, module, __require) => {
       };
   }
   const __reexport0 = __require('./screens/main-menu/view/layout.ts');
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureStyles')) exports.ensureStyles = __reexport0.ensureStyles;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createHeader')) exports.createHeader = __reexport0.createHeader;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createModesSection')) exports.createModesSection = __reexport0.createModesSection;
@@ -19659,7 +19756,7 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
       header.className = 'main-menu-v2__header';
       return header;
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureStyles')) exports.ensureStyles = ensureStyles;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createModesSection')) exports.createModesSection = createModesSection;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createSidebar')) exports.createSidebar = createSidebar;
@@ -20073,7 +20170,7 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
           },
       };
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'mountGachaUI')) exports.mountGachaUI = mountGachaUI;
 });
 __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
@@ -20430,7 +20527,7 @@ __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
       };
   }
   const render = renderScreen;
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
 });
@@ -20532,7 +20629,7 @@ __define('./screens/ui-gacha/logic/config.ts', (exports, module, __require) => {
       }
       return wallet;
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'DEFAULT_WALLET')) exports.DEFAULT_WALLET = DEFAULT_WALLET;
   if (!Object.prototype.hasOwnProperty.call(exports, 'GACHA_CONFIG')) exports.GACHA_CONFIG = GACHA_CONFIG;
   if (!Object.prototype.hasOwnProperty.call(exports, 'CURRENCY_LABELS')) exports.CURRENCY_LABELS = CURRENCY_LABELS;
@@ -20832,7 +20929,7 @@ __define('./screens/ui-gacha/logic/currency.ts', (exports, module, __require) =>
       };
   }
   exports.cloneWallet = cloneWallet;
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'totalTTEquivalent')) exports.totalTTEquivalent = totalTTEquivalent;
   if (!Object.prototype.hasOwnProperty.call(exports, 'convertCurrency')) exports.convertCurrency = convertCurrency;
   if (!Object.prototype.hasOwnProperty.call(exports, 'payForRoll')) exports.payForRoll = payForRoll;
@@ -20874,7 +20971,7 @@ __define('./screens/ui-gacha/logic/gacha.ts', (exports, module, __require) => {
       var _a;
       return (_a = GACHA_CONFIG.banners.find((entry) => entry.id === id)) !== null && _a !== void 0 ? _a : null;
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'rollBanner')) exports.rollBanner = rollBanner;
   if (!Object.prototype.hasOwnProperty.call(exports, 'multiRoll')) exports.multiRoll = multiRoll;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getBannerById')) exports.getBannerById = getBannerById;
@@ -21082,7 +21179,7 @@ __define('./screens/ui-gacha/logic/pity.ts', (exports, module, __require) => {
           pity: { ...state.pity },
       };
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'createEmptyPity')) exports.createEmptyPity = createEmptyPity;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createBannerState')) exports.createBannerState = createBannerState;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getBannerState')) exports.getBannerState = getBannerState;
@@ -21094,7 +21191,7 @@ __define('./screens/ui-gacha/logic/types.ts', (exports, module, __require) => {
   const getCurrencyOrder = __dep0.getCurrencyOrder;
   const CURRENCY_ORDER = getCurrencyOrder();
   const RARITY_ORDER = ['N', 'R', 'SR', 'SSR', 'UR', 'Prime'];
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'CURRENCY_ORDER')) exports.CURRENCY_ORDER = CURRENCY_ORDER;
   if (!Object.prototype.hasOwnProperty.call(exports, 'RARITY_ORDER')) exports.RARITY_ORDER = RARITY_ORDER;
 });
@@ -21105,7 +21202,7 @@ __define('./shared-types/units.ts', (exports, module, __require) => {
     if (Object.prototype.hasOwnProperty.call(exports, key)) continue;
     exports[key] = __reexport0[key];
   }
-
+  //# sourceMappingURL=stdin.js.map
 });
 __define('./statuses.ts', (exports, module, __require) => {
   const __dep0 = __require('./combat/apply-damage.ts');
@@ -21511,7 +21608,7 @@ __define('./statuses.ts', (exports, module, __require) => {
       }
       return false;
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'Statuses')) exports.Statuses = Statuses;
   if (!Object.prototype.hasOwnProperty.call(exports, 'makeStatusEffect')) exports.makeStatusEffect = makeStatusEffect;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyStatus')) exports.applyStatus = applyStatus;
@@ -21659,7 +21756,7 @@ __define('./summon.ts', (exports, module, __require) => {
       Game.actionChain = Game.actionChain.filter((x) => x.side !== side);
       return maxSlot;
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'enqueueImmediate')) exports.enqueueImmediate = enqueueImmediate;
   if (!Object.prototype.hasOwnProperty.call(exports, 'processActionChain')) exports.processActionChain = processActionChain;
 });
@@ -22283,7 +22380,7 @@ __define('./turns.ts', (exports, module, __require) => {
           return;
       }
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'getActiveAt')) exports.getActiveAt = getActiveAt;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getTurnOrderIndex')) exports.getTurnOrderIndex = getTurnOrderIndex;
   if (!Object.prototype.hasOwnProperty.call(exports, 'predictSpawnCycle')) exports.predictSpawnCycle = predictSpawnCycle;
@@ -22460,25 +22557,25 @@ __define('./turns/interleaved.ts', (exports, module, __require) => {
       }
       return selection;
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'findNextOccupiedPos')) exports.findNextOccupiedPos = findNextOccupiedPos;
   if (!Object.prototype.hasOwnProperty.call(exports, 'nextTurnInterleaved')) exports.nextTurnInterleaved = nextTurnInterleaved;
 });
 __define('./types/art.ts', (exports, module, __require) => {
 
-
+  //# sourceMappingURL=stdin.js.map
 });
 __define('./types/combat.ts', (exports, module, __require) => {
 
-
+  //# sourceMappingURL=stdin.js.map
 });
 __define('./types/common.ts', (exports, module, __require) => {
 
-
+  //# sourceMappingURL=stdin.js.map
 });
 __define('./types/config.ts', (exports, module, __require) => {
 
-
+  //# sourceMappingURL=stdin.js.map
 });
 __define('./types/currency.ts', (exports, module, __require) => {
   const isCurrencyEntry = (value) => (value != null
@@ -22507,7 +22604,7 @@ __define('./types/currency.ts', (exports, module, __require) => {
       const { currencies } = playerState;
       return isLineupCurrencies(currencies) ? (currencies !== null && currencies !== void 0 ? currencies : null) : null;
   };
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'isCurrencyEntry')) exports.isCurrencyEntry = isCurrencyEntry;
   if (!Object.prototype.hasOwnProperty.call(exports, 'isLineupCurrencyConfig')) exports.isLineupCurrencyConfig = isLineupCurrencyConfig;
   if (!Object.prototype.hasOwnProperty.call(exports, 'isLineupCurrencies')) exports.isLineupCurrencies = isLineupCurrencies;
@@ -22515,46 +22612,46 @@ __define('./types/currency.ts', (exports, module, __require) => {
 });
 __define('./types/index.ts', (exports, module, __require) => {
 
-
+  //# sourceMappingURL=stdin.js.map
 });
 __define('./types/lineup.ts', (exports, module, __require) => {
 
-
+  //# sourceMappingURL=stdin.js.map
 });
 __define('./types/pve.ts', (exports, module, __require) => {
 
-
+  //# sourceMappingURL=stdin.js.map
 });
 __define('./types/rng.ts', (exports, module, __require) => {
 
-
+  //# sourceMappingURL=stdin.js.map
 });
 __define('./types/telemetry.ts', (exports, module, __require) => {
 
-
+  //# sourceMappingURL=stdin.js.map
 });
 __define('./types/turn-order.ts', (exports, module, __require) => {
 
-
+  //# sourceMappingURL=stdin.js.map
 });
 __define('./types/ui.ts', (exports, module, __require) => {
 
-
+  //# sourceMappingURL=stdin.js.map
 });
 __define('./types/units.ts', (exports, module, __require) => {
   function createSummonQueue() {
       return new Map();
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'createSummonQueue')) exports.createSummonQueue = createSummonQueue;
 });
 __define('./types/utils.ts', (exports, module, __require) => {
 
-
+  //# sourceMappingURL=stdin.js.map
 });
 __define('./types/vfx.ts', (exports, module, __require) => {
 
-
+  //# sourceMappingURL=stdin.js.map
 });
 __define('./ui.ts', (exports, module, __require) => {
   // v0.7.1
@@ -22863,7 +22960,7 @@ __define('./ui.ts', (exports, module, __require) => {
       }
       return { render, cleanup };
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'initHUD')) exports.initHUD = initHUD;
   if (!Object.prototype.hasOwnProperty.call(exports, 'startSummonBar')) exports.startSummonBar = startSummonBar;
 });
@@ -22966,7 +23063,7 @@ __define('./ui/dom.ts', (exports, module, __require) => {
           }
       };
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'assertElement')) exports.assertElement = assertElement;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureStyleTag')) exports.ensureStyleTag = ensureStyleTag;
   if (!Object.prototype.hasOwnProperty.call(exports, 'mountSection')) exports.mountSection = mountSection;
@@ -23495,7 +23592,7 @@ __define('./ui/rarity/rarity.ts', (exports, module, __require) => {
       };
       return controller;
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeRarity')) exports.normalizeRarity = normalizeRarity;
   if (!Object.prototype.hasOwnProperty.call(exports, 'coerceRarity')) exports.coerceRarity = coerceRarity;
   if (!Object.prototype.hasOwnProperty.call(exports, 'mountRarityAura')) exports.mountRarityAura = mountRarityAura;
@@ -23546,7 +23643,7 @@ __define('./units.ts', (exports, module, __require) => {
       const unit = UNIT_INDEX_INTERNAL.get(unitId);
       return unit ? { ...unit } : null;
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'UNITS')) exports.UNITS = UNITS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'UNIT_INDEX')) exports.UNIT_INDEX = UNIT_INDEX;
   if (!Object.prototype.hasOwnProperty.call(exports, 'lookupUnit')) exports.lookupUnit = lookupUnit;
@@ -23558,7 +23655,7 @@ __define('./utils/assert.ts', (exports, module, __require) => {
       }
       return value;
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'assertDefined')) exports.assertDefined = assertDefined;
 });
 __define('./utils/currency.ts', (exports, module, __require) => {
@@ -23583,7 +23680,7 @@ __define('./utils/currency.ts', (exports, module, __require) => {
   function formatCurrencyAmount(value, currencyId, options = {}) {
       return formatBalance(value, currencyId, options);
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'getCurrencyDefinitions')) exports.getCurrencyDefinitions = getCurrencyDefinitions;
   if (!Object.prototype.hasOwnProperty.call(exports, 'findCurrencyDefinition')) exports.findCurrencyDefinition = findCurrencyDefinition;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getCurrencyOrder')) exports.getCurrencyOrder = getCurrencyOrder;
@@ -23594,7 +23691,7 @@ __define('./utils/dummy.ts', (exports, module, __require) => {
   function ensureNestedModuleSupport() {
       return true;
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureNestedModuleSupport')) exports.ensureNestedModuleSupport = ensureNestedModuleSupport;
 });
 __define('./utils/format.ts', (exports, module, __require) => {
@@ -23633,7 +23730,7 @@ __define('./utils/format.ts', (exports, module, __require) => {
       };
   }
   exports.HAS_INTL_NUMBER_FORMAT = HAS_INTL_NUMBER_FORMAT;
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'createNumberFormatter')) exports.createNumberFormatter = createNumberFormatter;
 });
 __define('./utils/fury.ts', (exports, module, __require) => {
@@ -24096,7 +24193,7 @@ __define('./utils/fury.ts', (exports, module, __require) => {
   function furyState(unit) {
       return ensureState(unit);
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveMaxFury')) exports.resolveMaxFury = resolveMaxFury;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveUltCost')) exports.resolveUltCost = resolveUltCost;
   if (!Object.prototype.hasOwnProperty.call(exports, 'initializeFury')) exports.initializeFury = initializeFury;
@@ -24573,7 +24670,7 @@ __define('./utils/kit.ts', (exports, module, __require) => {
               return verticalNeighbors(baseSlot);
       }
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'collectUltTags')) exports.collectUltTags = collectUltTags;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getSummonSpec')) exports.getSummonSpec = getSummonSpec;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getReviveSpec')) exports.getReviveSpec = getReviveSpec;
@@ -24611,7 +24708,7 @@ __define('./utils/module-resolution.ts', (exports, module, __require) => {
       const candidate = pickFunctionFromSource(module, preferredKeys, fallbackKeys);
       return typeof candidate === 'function' ? candidate : null;
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'pickFunctionFromSource')) exports.pickFunctionFromSource = pickFunctionFromSource;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveModuleFunction')) exports.resolveModuleFunction = resolveModuleFunction;
 });
@@ -24696,7 +24793,7 @@ __define('./utils/time.ts', (exports, module, __require) => {
       const prev = Number.isFinite(previous) ? Number(previous) : start;
       return Math.max(prev, start + dur);
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'resetSessionTimeBase')) exports.resetSessionTimeBase = resetSessionTimeBase;
   if (!Object.prototype.hasOwnProperty.call(exports, 'safeNow')) exports.safeNow = safeNow;
   if (!Object.prototype.hasOwnProperty.call(exports, 'sessionNow')) exports.sessionNow = sessionNow;
@@ -24718,7 +24815,7 @@ __define('./utils/unit-id.ts', (exports, module, __require) => {
       const value = String(id);
       return typeof value === 'string' ? value : '';
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeUnitId')) exports.normalizeUnitId = normalizeUnitId;
 });
 __define('./vfx.ts', (exports, module, __require) => {
@@ -25503,7 +25600,7 @@ __define('./vfx.ts', (exports, module, __require) => {
       }
       Game.vfx = keep;
   }
-
+  //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'asSessionWithVfx')) exports.asSessionWithVfx = asSessionWithVfx;
   if (!Object.prototype.hasOwnProperty.call(exports, 'computeMeleeOffsets')) exports.computeMeleeOffsets = computeMeleeOffsets;
   if (!Object.prototype.hasOwnProperty.call(exports, 'vfxAddSpawn')) exports.vfxAddSpawn = vfxAddSpawn;
