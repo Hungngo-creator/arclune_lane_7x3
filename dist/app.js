@@ -23,12 +23,10 @@ __define('./aether.ts', (exports, module, __require) => {
   // FILE: src/aether.ts
   const __dep0 = __require('./catalog.ts');
   const AE_CLASS_COEFF = __dep0.AE_CLASS_COEFF; // Điều chỉnh đường dẫn import nếu cần
-  export class SharedAetherPool {
-      constructor() {
-          this.max = 0;
-          this.current = 0;
-          this.regenPerTurn = 0;
-      }
+  class SharedAetherPool {
+      max = 0;
+      current = 0;
+      regenPerTurn = 0;
       /**
        * Khởi tạo Bể AE dựa trên 9 nhân vật trong đội hình
        * @param teamUnits Mảng chứa thông số (InstanceStats) của 9 ô
@@ -66,6 +64,9 @@ __define('./aether.ts', (exports, module, __require) => {
           return false;
       }
   }
+  if (!Object.prototype.hasOwnProperty.call(exports, 'SharedAetherPool'))
+      exports.SharedAetherPool = SharedAetherPool;
+  ;
   //# sourceMappingURL=stdin.js.map
 });
 __define('./ai.ts', (exports, module, __require) => {
@@ -114,8 +115,7 @@ __define('./ai.ts', (exports, module, __require) => {
   const DEFAULT_DEBUG_KEEP = 6;
   const tokensAlive = (Game) => Game.tokens.filter((t) => t.alive);
   function mergedWeights() {
-      var _a, _b;
-      const cfg = (_b = (_a = CFG.AI) === null || _a === void 0 ? void 0 : _a.WEIGHTS) !== null && _b !== void 0 ? _b : {};
+      const cfg = CFG.AI?.WEIGHTS ?? {};
       const out = { ...DEFAULT_WEIGHTS };
       for (const [key, val] of Object.entries(cfg)) {
           if (typeof val === 'number' && Number.isFinite(val))
@@ -124,19 +124,17 @@ __define('./ai.ts', (exports, module, __require) => {
       return out;
   }
   function debugConfig() {
-      var _a, _b, _c, _d;
-      const cfg = (_b = (_a = CFG.AI) === null || _a === void 0 ? void 0 : _a.DEBUG) !== null && _b !== void 0 ? _b : {};
-      const keepTopRaw = (_d = (_c = cfg.keepTop) !== null && _c !== void 0 ? _c : cfg.KEEP_TOP) !== null && _d !== void 0 ? _d : DEFAULT_DEBUG_KEEP;
+      const cfg = CFG.AI?.DEBUG ?? {};
+      const keepTopRaw = cfg.keepTop ?? cfg.KEEP_TOP ?? DEFAULT_DEBUG_KEEP;
       const keepTopNum = Number(keepTopRaw);
       return {
           keepTop: Math.max(0, Math.floor(Number.isFinite(keepTopNum) ? keepTopNum : DEFAULT_DEBUG_KEEP)),
       };
   }
   function detectKitTraits(meta) {
-      var _a, _b;
-      const kitSource = (_b = (_a = meta === null || meta === void 0 ? void 0 : meta.kit) !== null && _a !== void 0 ? _a : meta) !== null && _b !== void 0 ? _b : {};
+      const kitSource = meta?.kit ?? meta ?? {};
       const analysis = detectUltBehavior(kitSource);
-      const hasInstant = Boolean(analysis.hasInstant) || ((meta === null || meta === void 0 ? void 0 : meta.class) === 'Summoner' && Boolean(analysis.summon));
+      const hasInstant = Boolean(analysis.hasInstant) || (meta?.class === 'Summoner' && Boolean(analysis.summon));
       return {
           hasInstant,
           hasDefBuff: Boolean(analysis.hasDefensive),
@@ -144,22 +142,21 @@ __define('./ai.ts', (exports, module, __require) => {
       };
   }
   function exportCandidateDebug(entry) {
-      var _a, _b, _c, _d, _e, _f, _g, _h;
       if (!entry)
           return null;
       return {
-          cardId: (_a = entry.card) === null || _a === void 0 ? void 0 : _a.id,
-          cardName: (_c = (_b = entry.card) === null || _b === void 0 ? void 0 : _b.name) !== null && _c !== void 0 ? _c : null,
-          cost: (_d = entry.card) === null || _d === void 0 ? void 0 : _d.cost,
-          slot: (_e = entry.cell) === null || _e === void 0 ? void 0 : _e.s,
-          cx: (_f = entry.cell) === null || _f === void 0 ? void 0 : _f.cx,
-          cy: (_g = entry.cell) === null || _g === void 0 ? void 0 : _g.cy,
+          cardId: entry.card?.id,
+          cardName: entry.card?.name ?? null,
+          cost: entry.card?.cost,
+          slot: entry.cell?.s,
+          cx: entry.cell?.cx,
+          cy: entry.cell?.cy,
           score: entry.score,
           baseScore: entry.baseScore,
           contributions: entry.contributions,
           raw: entry.raw,
           multipliers: entry.multipliers,
-          blocked: (_h = entry.blockedReason) !== null && _h !== void 0 ? _h : null,
+          blocked: entry.blockedReason ?? null,
       };
   }
   function isAiCard(value) {
@@ -169,7 +166,6 @@ __define('./ai.ts', (exports, module, __require) => {
       return typeof candidate.id === 'string' && candidate.id !== '' && typeof candidate.cost === 'number' && Number.isFinite(candidate.cost);
   }
   function normalizeDeckEntry(entry) {
-      var _a;
       if (typeof entry === 'string') {
           const def = lookupUnit(entry);
           return def ? { ...def } : null;
@@ -184,7 +180,7 @@ __define('./ai.ts', (exports, module, __require) => {
           if (!idRaw || idRaw.trim() === '')
               return null;
           const def = lookupUnit(idRaw);
-          const fallbackCost = def === null || def === void 0 ? void 0 : def.cost;
+          const fallbackCost = def?.cost;
           const candidateCost = 'cost' in candidate ? candidate.cost : undefined;
           const cost = typeof candidateCost === 'number' && Number.isFinite(candidateCost)
               ? candidateCost
@@ -196,9 +192,9 @@ __define('./ai.ts', (exports, module, __require) => {
           const candidateName = 'name' in candidate ? candidate.name : undefined;
           const name = typeof candidateName === 'string' && candidateName.trim() !== ''
               ? candidateName
-              : (_a = def === null || def === void 0 ? void 0 : def.name) !== null && _a !== void 0 ? _a : null;
+              : def?.name ?? null;
           const card = {
-              ...(def !== null && def !== void 0 ? def : { id: idRaw, cost }),
+              ...(def ?? { id: idRaw, cost }),
               id: idRaw,
               cost,
           };
@@ -238,8 +234,7 @@ __define('./ai.ts', (exports, module, __require) => {
       return out;
   }
   function etaScoreEnemy(Game, slot) {
-      var _a, _b;
-      return predictSpawnCycle(Game, 'enemy', slot) === ((_b = (_a = Game.turn) === null || _a === void 0 ? void 0 : _a.cycle) !== null && _b !== void 0 ? _b : 0) ? 1 : 0.5;
+      return predictSpawnCycle(Game, 'enemy', slot) === (Game.turn?.cycle ?? 0) ? 1 : 0.5;
   }
   function pressureScore(cx, cy) {
       const dist = Math.abs(cx - 0) + Math.abs(cy - 1);
@@ -269,13 +264,12 @@ __define('./ai.ts', (exports, module, __require) => {
       return Math.min(1, candidateSlots.length / need);
   }
   function candidateBlocked(Game, entry, aliveTokens) {
-      var _a, _b, _c;
       if (!entry)
           return 'invalid';
-      const alive = aliveTokens !== null && aliveTokens !== void 0 ? aliveTokens : tokensAlive(Game);
-      const slot = (_a = entry.cell) === null || _a === void 0 ? void 0 : _a.s;
-      const cx = (_b = entry.cell) === null || _b === void 0 ? void 0 : _b.cx;
-      const cy = (_c = entry.cell) === null || _c === void 0 ? void 0 : _c.cy;
+      const alive = aliveTokens ?? tokensAlive(Game);
+      const slot = entry.cell?.s;
+      const cx = entry.cell?.cx;
+      const cy = entry.cell?.cy;
       if (!Number.isFinite(slot) || !Number.isFinite(cx) || !Number.isFinite(cy))
           return 'invalid';
       const enemyQueue = Game.queued.enemy;
@@ -305,7 +299,6 @@ __define('./ai.ts', (exports, module, __require) => {
       return null;
   }
   function rowCrowdingFactor(Game, cy, enemyTokens) {
-      var _a, _b;
       const ours = (Array.isArray(enemyTokens) ? enemyTokens : tokensAlive(Game).filter((t) => t.side === 'enemy')).filter((t) => t.cy === cy).length;
       let queued = 0;
       const queue = Game.queued.enemy;
@@ -317,13 +310,12 @@ __define('./ai.ts', (exports, module, __require) => {
       if (n >= 3)
           return 0.7;
       if (n === 2)
-          return (_b = (_a = CFG.AI) === null || _a === void 0 ? void 0 : _a.ROW_CROWDING_PENALTY) !== null && _b !== void 0 ? _b : 0.85;
+          return CFG.AI?.ROW_CROWDING_PENALTY ?? 0.85;
       return 1;
   }
   function roleBias(className, cx) {
-      var _a, _b, _c;
       const front = cx <= CFG.GRID_COLS - CFG.ENEMY_COLS;
-      const roleCfg = (_c = (_b = (_a = CFG.AI) === null || _a === void 0 ? void 0 : _a.ROLE) === null || _b === void 0 ? void 0 : _b[typeof className === 'string' ? className : '']) !== null && _c !== void 0 ? _c : {};
+      const roleCfg = CFG.AI?.ROLE?.[typeof className === 'string' ? className : ''] ?? {};
       let factor = 1;
       if (front && typeof roleCfg.front === 'number')
           factor *= 1 + roleCfg.front;
@@ -355,9 +347,8 @@ __define('./ai.ts', (exports, module, __require) => {
       return created;
   }
   function refillDeckEnemy(Game) {
-      var _a;
       const deck = getDeck(Game);
-      const handSize = (_a = CFG.HAND_SIZE) !== null && _a !== void 0 ? _a : 4;
+      const handSize = CFG.HAND_SIZE ?? 4;
       const need = handSize - deck.length;
       if (need <= 0)
           return;
@@ -414,7 +405,6 @@ __define('./ai.ts', (exports, module, __require) => {
       return true;
   }
   function aiMaybeAct(Game, reason) {
-      var _a, _b, _c, _d, _e, _f, _g;
       const now = safeNow();
       if (now - (Game.ai.lastThinkMs || 0) < 120)
           return;
@@ -489,17 +479,17 @@ __define('./ai.ts', (exports, module, __require) => {
               const kitDefenseScore = kitTraits.hasDefBuff ? 1 - s : 0;
               const kitReviveScore = kitTraits.hasRevive ? s : 0;
               const contributions = {
-                  pressure: ((_a = weights.pressure) !== null && _a !== void 0 ? _a : 0) * p,
-                  safety: ((_b = weights.safety) !== null && _b !== void 0 ? _b : 0) * s,
-                  eta: ((_c = weights.eta) !== null && _c !== void 0 ? _c : 0) * e,
-                  summon: ((_d = weights.summon) !== null && _d !== void 0 ? _d : 0) * sf,
-                  kitInstant: ((_e = weights.kitInstant) !== null && _e !== void 0 ? _e : 0) * kitInstantScore,
-                  kitDefense: ((_f = weights.kitDefense) !== null && _f !== void 0 ? _f : 0) * kitDefenseScore,
-                  kitRevive: ((_g = weights.kitRevive) !== null && _g !== void 0 ? _g : 0) * kitReviveScore,
+                  pressure: (weights.pressure ?? 0) * p,
+                  safety: (weights.safety ?? 0) * s,
+                  eta: (weights.eta ?? 0) * e,
+                  summon: (weights.summon ?? 0) * sf,
+                  kitInstant: (weights.kitInstant ?? 0) * kitInstantScore,
+                  kitDefense: (weights.kitDefense ?? 0) * kitDefenseScore,
+                  kitRevive: (weights.kitRevive ?? 0) * kitReviveScore,
               };
               const baseScore = Object.values(contributions).reduce((acc, val) => acc + val, 0);
               const rowFactor = rowCrowdingFactor(Game, cell.cy, aliveEnemies);
-              const roleFactor = roleBias(meta === null || meta === void 0 ? void 0 : meta.class, cell.cx);
+              const roleFactor = roleBias(meta?.class, cell.cx);
               const finalScore = baseScore * rowFactor * roleFactor;
               const evaluation = {
                   card,
@@ -522,7 +512,7 @@ __define('./ai.ts', (exports, module, __require) => {
               evaluations.push(evaluation);
               if (!bestEvaluation || evaluation.score > bestEvaluation.score)
                   bestEvaluation = evaluation;
-              insertTopCandidate === null || insertTopCandidate === void 0 ? void 0 : insertTopCandidate(evaluation);
+              insertTopCandidate?.(evaluation);
           }
       }
       if (!evaluations.length) {
@@ -549,7 +539,7 @@ __define('./ai.ts', (exports, module, __require) => {
           }
           return next;
       };
-      let current = bestEvaluation !== null && bestEvaluation !== void 0 ? bestEvaluation : findNextCandidate();
+      let current = bestEvaluation ?? findNextCandidate();
       while (!chosen && current) {
           const blocked = candidateBlocked(Game, current, alive);
           if (blocked) {
@@ -640,9 +630,8 @@ __define('./app/shell.ts', (exports, module, __require) => {
       return session;
   }
   function createAppShell(options = {}) {
-      var _a;
       const initialScreen = normalizeScreen(options.screen);
-      const initialSession = normalizeSession((_a = options.activeSession) !== null && _a !== void 0 ? _a : null);
+      const initialSession = normalizeSession(options.activeSession ?? null);
       const initialParams = normalizeParams(options.screenParams);
       const state = {
           screen: initialScreen,
@@ -656,7 +645,7 @@ __define('./app/shell.ts', (exports, module, __require) => {
           if (!errorHandler) {
               return;
           }
-          const normalizedContext = context !== null && context !== void 0 ? context : null;
+          const normalizedContext = context ?? null;
           try {
               errorHandler(error, normalizedContext);
           }
@@ -682,7 +671,7 @@ __define('./app/shell.ts', (exports, module, __require) => {
               state.screen = target;
               changed = true;
           }
-          const nextParams = params !== null && params !== void 0 ? params : null;
+          const nextParams = params ?? null;
           if (!areParamsShallowEqual(state.screenParams, nextParams)) {
               state.screenParams = normalizeParams(nextParams);
               changed = true;
@@ -763,15 +752,14 @@ __define('./art.ts', (exports, module, __require) => {
       outline: '#223548',
   };
   function normalizePalette(palette) {
-      var _a, _b, _c, _d;
       if (!palette) {
           return { ...DEFAULT_PALETTE };
       }
       return {
-          primary: (_a = palette.primary) !== null && _a !== void 0 ? _a : DEFAULT_PALETTE.primary,
-          secondary: (_b = palette.secondary) !== null && _b !== void 0 ? _b : DEFAULT_PALETTE.secondary,
-          accent: (_c = palette.accent) !== null && _c !== void 0 ? _c : DEFAULT_PALETTE.accent,
-          outline: (_d = palette.outline) !== null && _d !== void 0 ? _d : DEFAULT_PALETTE.outline,
+          primary: palette.primary ?? DEFAULT_PALETTE.primary,
+          secondary: palette.secondary ?? DEFAULT_PALETTE.secondary,
+          accent: palette.accent ?? DEFAULT_PALETTE.accent,
+          outline: palette.outline ?? DEFAULT_PALETTE.outline,
       };
   }
   function ensurePalette(palette) {
@@ -896,7 +884,7 @@ __define('./art.ts', (exports, module, __require) => {
       sentinel: svgSentinel
   };
   function merge(target, source) {
-      return Object.assign({}, target, source !== null && source !== void 0 ? source : {});
+      return Object.assign({}, target, source ?? {});
   }
   const UNIT_SKIN_SELECTION = new Map();
   function hasArtEntry(key) {
@@ -906,7 +894,7 @@ __define('./art.ts', (exports, module, __require) => {
       const fallback = UNIT_ART.default;
       if (hasArtEntry(key)) {
           const entry = UNIT_ART[key];
-          return entry !== null && entry !== void 0 ? entry : fallback;
+          return entry ?? fallback;
       }
       return fallback;
   }
@@ -916,7 +904,7 @@ __define('./art.ts', (exports, module, __require) => {
           return fallback;
       if (hasArtEntry(id)) {
           const baseArt = UNIT_ART[id];
-          return baseArt !== null && baseArt !== void 0 ? baseArt : fallback;
+          return baseArt ?? fallback;
       }
       if (id.endsWith('_minion')) {
           const base = id.replace(/_minion$/, '');
@@ -931,18 +919,17 @@ __define('./art.ts', (exports, module, __require) => {
       return fallback;
   }
   function resolveSkinKey(id, baseArt, explicit) {
-      var _a;
       if (!baseArt)
           return null;
       if (explicit && baseArt.skins[explicit])
           return explicit;
-      const idKey = id !== null && id !== void 0 ? id : '';
+      const idKey = id ?? '';
       const override = UNIT_SKIN_SELECTION.get(idKey);
       if (override && baseArt.skins[override])
           return override;
       if (baseArt.defaultSkin && baseArt.skins[baseArt.defaultSkin])
           return baseArt.defaultSkin;
-      const keys = Object.keys((_a = baseArt.skins) !== null && _a !== void 0 ? _a : {});
+      const keys = Object.keys(baseArt.skins ?? {});
       return keys[0] || null;
   }
   function cloneShadowConfig(shadow) {
@@ -963,7 +950,6 @@ __define('./art.ts', (exports, module, __require) => {
       return cloneShadowConfig(shadow);
   }
   function cloneSpriteEntry(sprite, fallbackKey) {
-      var _a, _b, _c, _d;
       if (!sprite)
           return null;
       const preferredKey = typeof sprite.key === 'string' && sprite.key.length > 0
@@ -974,26 +960,25 @@ __define('./art.ts', (exports, module, __require) => {
       const cloned = {
           ...sprite,
           key: preferredKey,
-          aspect: (_a = sprite.aspect) !== null && _a !== void 0 ? _a : null,
+          aspect: sprite.aspect ?? null,
           shadow: cloneShadowConfig(sprite.shadow),
-          skinId: (_c = (_b = sprite.skinId) !== null && _b !== void 0 ? _b : fallbackKey) !== null && _c !== void 0 ? _c : preferredKey,
-          cacheKey: (_d = sprite.cacheKey) !== null && _d !== void 0 ? _d : null,
+          skinId: sprite.skinId ?? fallbackKey ?? preferredKey,
+          cacheKey: sprite.cacheKey ?? null,
       };
       return cloned;
   }
   function instantiateArt(_id, baseArt, skinKey) {
-      var _a, _b, _c;
       if (!baseArt)
           return null;
-      const normalizedSkinKey = (_a = skinKey !== null && skinKey !== void 0 ? skinKey : baseArt.defaultSkin) !== null && _a !== void 0 ? _a : null;
+      const normalizedSkinKey = skinKey ?? baseArt.defaultSkin ?? null;
       const clonedSkins = {};
-      for (const [key, sprite] of Object.entries((_b = baseArt.skins) !== null && _b !== void 0 ? _b : {})) {
+      for (const [key, sprite] of Object.entries(baseArt.skins ?? {})) {
           const clone = cloneSpriteEntry(sprite, key);
           if (clone)
               clonedSkins[key] = clone;
       }
       const sourceSprite = normalizedSkinKey && baseArt.skins
-          ? (_c = baseArt.skins[normalizedSkinKey]) !== null && _c !== void 0 ? _c : baseArt.sprite
+          ? baseArt.skins[normalizedSkinKey] ?? baseArt.sprite
           : baseArt.sprite;
       const selectedSprite = cloneSpriteEntry(sourceSprite, normalizedSkinKey);
       const art = {
@@ -1031,7 +1016,6 @@ __define('./art.ts', (exports, module, __require) => {
       return false;
   }
   function getUnitSkin(unitId) {
-      var _a;
       if (!unitId)
           return null;
       const baseArt = getBaseArt(unitId);
@@ -1042,11 +1026,10 @@ __define('./art.ts', (exports, module, __require) => {
           return override;
       if (baseArt.defaultSkin && baseArt.skins[baseArt.defaultSkin])
           return baseArt.defaultSkin;
-      const keys = Object.keys((_a = baseArt.skins) !== null && _a !== void 0 ? _a : {});
+      const keys = Object.keys(baseArt.skins ?? {});
       return keys[0] || null;
   }
   function normalizeShadow(shadow, fallback) {
-      var _a, _b, _c;
       if (shadow === null)
           return null;
       const base = {
@@ -1058,7 +1041,7 @@ __define('./art.ts', (exports, module, __require) => {
       const fallbackColor = typeof fallback === 'string'
           ? fallback
           : fallback && typeof fallback === 'object'
-              ? (_a = fallback.color) !== null && _a !== void 0 ? _a : null
+              ? fallback.color ?? null
               : null;
       if (fallbackColor) {
           base.color = fallbackColor;
@@ -1068,7 +1051,7 @@ __define('./art.ts', (exports, module, __require) => {
       }
       if (shadow && typeof shadow === 'object') {
           return {
-              color: (_b = shadow.color) !== null && _b !== void 0 ? _b : base.color,
+              color: shadow.color ?? base.color,
               blur: Number.isFinite(shadow.blur) ? shadow.blur : base.blur,
               offsetX: Number.isFinite(shadow.offsetX) ? shadow.offsetX : base.offsetX,
               offsetY: Number.isFinite(shadow.offsetY) ? shadow.offsetY : base.offsetY,
@@ -1076,7 +1059,7 @@ __define('./art.ts', (exports, module, __require) => {
       }
       if (fallback && typeof fallback === 'object') {
           return {
-              color: (_c = fallback.color) !== null && _c !== void 0 ? _c : base.color,
+              color: fallback.color ?? base.color,
               blur: Number.isFinite(fallback.blur) ? fallback.blur : base.blur,
               offsetX: Number.isFinite(fallback.offsetX) ? fallback.offsetX : base.offsetX,
               offsetY: Number.isFinite(fallback.offsetY) ? fallback.offsetY : base.offsetY,
@@ -1085,11 +1068,10 @@ __define('./art.ts', (exports, module, __require) => {
       return { ...base };
   }
   function normalizeSpriteEntry(conf, context) {
-      var _a, _b;
       if (!conf)
           return null;
       const input = typeof conf === 'string' ? { src: conf } : conf;
-      const srcCandidate = (_b = (_a = input.src) !== null && _a !== void 0 ? _a : input.url) !== null && _b !== void 0 ? _b : null;
+      const srcCandidate = input.src ?? input.url ?? null;
       if (!srcCandidate)
           return null;
       const normalizedShadow = normalizeShadow(input.shadow, context.shadow);
@@ -1110,9 +1092,8 @@ __define('./art.ts', (exports, module, __require) => {
       };
   }
   function makeArt(pattern, paletteInput, opts = {}) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
       const normalizedPalette = normalizePalette(paletteInput);
-      const spriteFactory = (_a = opts.spriteFactory) !== null && _a !== void 0 ? _a : (pattern in SPRITES ? SPRITES[pattern] : null);
+      const spriteFactory = opts.spriteFactory ?? (pattern in SPRITES ? SPRITES[pattern] : null);
       const layout = merge({
           anchor: 0.78,
           labelOffset: 1.18,
@@ -1122,24 +1103,24 @@ __define('./art.ts', (exports, module, __require) => {
           hpHeight: 0.42,
           spriteAspect: 0.78,
           spriteHeight: 2.4,
-      }, ((_b = opts.layout) !== null && _b !== void 0 ? _b : undefined));
+      }, (opts.layout ?? undefined));
       const label = opts.label === false
           ? false
           : merge({
               bg: 'rgba(12,20,30,0.82)',
               text: '#f4f8ff',
               stroke: 'rgba(255,255,255,0.08)',
-          }, (_c = opts.label) !== null && _c !== void 0 ? _c : undefined);
+          }, opts.label ?? undefined);
       const hpBar = merge({
           bg: 'rgba(9,14,21,0.74)',
           fill: normalizedPalette.accent || '#6ff0c0',
           border: 'rgba(0,0,0,0.55)',
-      }, ((_d = opts.hpBar) !== null && _d !== void 0 ? _d : undefined));
-      const shadow = (_e = opts.shadow) !== null && _e !== void 0 ? _e : 'rgba(0,0,0,0.35)';
+      }, (opts.hpBar ?? undefined));
+      const shadow = opts.shadow ?? 'rgba(0,0,0,0.35)';
       const defaultSkinKey = opts.defaultSkin || 'default';
-      const skinsInput = (_f = opts.skins) !== null && _f !== void 0 ? _f : (opts.sprite ? { [defaultSkinKey]: opts.sprite } : null);
+      const skinsInput = opts.skins ?? (opts.sprite ? { [defaultSkinKey]: opts.sprite } : null);
       const normalizedSkins = {};
-      const anchor = (_g = layout.anchor) !== null && _g !== void 0 ? _g : 0.78;
+      const anchor = layout.anchor ?? 0.78;
       if (skinsInput) {
           for (const [key, conf] of Object.entries(skinsInput)) {
               const normalized = normalizeSpriteEntry(conf, { anchor, shadow });
@@ -1168,15 +1149,15 @@ __define('./art.ts', (exports, module, __require) => {
           ? defaultSkinKey
           : Object.keys(normalizedSkins)[0] || defaultSkinKey;
       return {
-          sprite: (_h = normalizedSkins[preferredKey]) !== null && _h !== void 0 ? _h : null,
+          sprite: normalizedSkins[preferredKey] ?? null,
           skins: normalizedSkins,
           defaultSkin: preferredKey,
           palette: normalizedPalette,
           shape: opts.shape || pattern,
-          size: (_j = opts.size) !== null && _j !== void 0 ? _j : 1,
+          size: opts.size ?? 1,
           shadow,
-          glow: (_l = (_k = opts.glow) !== null && _k !== void 0 ? _k : normalizedPalette.accent) !== null && _l !== void 0 ? _l : '#8cf6ff',
-          mirror: (_m = opts.mirror) !== null && _m !== void 0 ? _m : true,
+          glow: opts.glow ?? normalizedPalette.accent ?? '#8cf6ff',
+          mirror: opts.mirror ?? true,
           layout,
           label,
           hpBar,
@@ -1205,7 +1186,7 @@ __define('./art.ts', (exports, module, __require) => {
   function getBasePalette(name) {
       const palette = basePalettes[name];
       const fallback = basePalettes.default;
-      return palette !== null && palette !== void 0 ? palette : fallback;
+      return palette ?? fallback;
   }
   const UNIT_ART = {
       default: makeArt('sentinel', getBasePalette('default'), {
@@ -1454,9 +1435,8 @@ __define('./art.ts', (exports, module, __require) => {
       })
   };
   function getUnitArt(id, opts = {}) {
-      var _a;
       const baseArt = getBaseArt(id);
-      const skinKey = resolveSkinKey(id, baseArt, (_a = opts.skinKey) !== null && _a !== void 0 ? _a : null);
+      const skinKey = resolveSkinKey(id, baseArt, opts.skinKey ?? null);
       return instantiateArt(id, baseArt, skinKey);
   }
   //# sourceMappingURL=stdin.js.map
@@ -1473,7 +1453,6 @@ __define('./background.ts', (exports, module, __require) => {
   const projectCellOblique = __dep1.projectCellOblique;
   const ENVIRONMENT_SPRITE_CACHE = new Map();
   function ensureEnvironmentSprite(asset) {
-      var _a;
       if (!asset)
           return null;
       const cached = ENVIRONMENT_SPRITE_CACHE.get(asset);
@@ -1491,7 +1470,7 @@ __define('./background.ts', (exports, module, __require) => {
               cacheKey: asset,
           },
       };
-      const entry = (_a = ensureSpriteLoaded(descriptor)) !== null && _a !== void 0 ? _a : null;
+      const entry = ensureSpriteLoaded(descriptor) ?? null;
       ENVIRONMENT_SPRITE_CACHE.set(asset, entry);
       return entry;
   }
@@ -1574,16 +1553,15 @@ __define('./background.ts', (exports, module, __require) => {
   const ENVIRONMENT_PROP_TYPES = SCENERY;
   const isSceneryKey = (value) => typeof value === 'string' && hasOwn(SCENERY, value);
   const normalizePropInput = (value) => {
-      var _a, _b, _c;
       if (!isRecord(value))
           return null;
       const type = typeof value.type === 'string' ? value.type : null;
       if (!type)
           return null;
       const cellRecord = isRecord(value.cell) ? value.cell : {};
-      const cx = toNumberOr((_a = value.cx) !== null && _a !== void 0 ? _a : cellRecord.cx, 0);
-      const cy = toNumberOr((_b = value.cy) !== null && _b !== void 0 ? _b : cellRecord.cy, 0);
-      const depth = toOptionalNumber((_c = cellRecord.depth) !== null && _c !== void 0 ? _c : value.depth);
+      const cx = toNumberOr(value.cx ?? cellRecord.cx, 0);
+      const cy = toNumberOr(value.cy ?? cellRecord.cy, 0);
+      const depth = toOptionalNumber(cellRecord.depth ?? value.depth);
       const prop = {
           ...value,
           type,
@@ -1630,7 +1608,6 @@ __define('./background.ts', (exports, module, __require) => {
       return map;
   }
   function stableStringify(value, seen = new WeakSet()) {
-      var _a;
       if (value === null)
           return 'null';
       const type = typeof value;
@@ -1641,7 +1618,7 @@ __define('./background.ts', (exports, module, __require) => {
       if (type === 'string')
           return JSON.stringify(value);
       if (type === 'symbol')
-          return (_a = value === null || value === void 0 ? void 0 : value.toString()) !== null && _a !== void 0 ? _a : '[symbol]';
+          return value?.toString() ?? '[symbol]';
       if (type === 'function') {
           const func = value;
           return `[Function:${func.name || 'anonymous'}]`;
@@ -1690,7 +1667,6 @@ __define('./background.ts', (exports, module, __require) => {
       return normalized.join('|');
   }
   function getBoardSignature(g, cam) {
-      var _a, _b, _c;
       if (!g)
           return 'no-grid';
       const baseParts = [
@@ -1705,14 +1681,13 @@ __define('./background.ts', (exports, module, __require) => {
           g.dpr,
       ];
       const camParts = [
-          (_a = cam === null || cam === void 0 ? void 0 : cam.rowGapRatio) !== null && _a !== void 0 ? _a : 'rg',
-          (_b = cam === null || cam === void 0 ? void 0 : cam.topScale) !== null && _b !== void 0 ? _b : 'ts',
-          (_c = cam === null || cam === void 0 ? void 0 : cam.depthScale) !== null && _c !== void 0 ? _c : 'ds',
+          cam?.rowGapRatio ?? 'rg',
+          cam?.topScale ?? 'ts',
+          cam?.depthScale ?? 'ds',
       ];
       return joinSignatureParts([...baseParts, ...camParts]);
   }
   function resolveBackground(backgroundKey) {
-      var _a, _b, _c, _d, _e, _f;
       const backgrounds = getBackgroundConfigMap();
       if (backgrounds.size === 0)
           return null;
@@ -1722,21 +1697,21 @@ __define('./background.ts', (exports, module, __require) => {
           const config = backgrounds.get(key);
           return config ? { key, config } : null;
       };
-      const direct = tryResolve(backgroundKey !== null && backgroundKey !== void 0 ? backgroundKey : null);
+      const direct = tryResolve(backgroundKey ?? null);
       if (direct)
           return direct;
       const preferred = typeof CFG.CURRENT_BACKGROUND === 'string'
           ? CFG.CURRENT_BACKGROUND
-          : typeof ((_a = CFG.SCENE) === null || _a === void 0 ? void 0 : _a.CURRENT_BACKGROUND) === 'string'
-              ? (_b = CFG.SCENE) === null || _b === void 0 ? void 0 : _b.CURRENT_BACKGROUND
+          : typeof CFG.SCENE?.CURRENT_BACKGROUND === 'string'
+              ? CFG.SCENE?.CURRENT_BACKGROUND
               : null;
       const preferredMatch = tryResolve(preferred);
       if (preferredMatch)
           return preferredMatch;
-      const themeKey = typeof ((_c = CFG.SCENE) === null || _c === void 0 ? void 0 : _c.CURRENT_THEME) === 'string'
-          ? (_d = CFG.SCENE) === null || _d === void 0 ? void 0 : _d.CURRENT_THEME
-          : typeof ((_e = CFG.SCENE) === null || _e === void 0 ? void 0 : _e.DEFAULT_THEME) === 'string'
-              ? (_f = CFG.SCENE) === null || _f === void 0 ? void 0 : _f.DEFAULT_THEME
+      const themeKey = typeof CFG.SCENE?.CURRENT_THEME === 'string'
+          ? CFG.SCENE?.CURRENT_THEME
+          : typeof CFG.SCENE?.DEFAULT_THEME === 'string'
+              ? CFG.SCENE?.DEFAULT_THEME
               : null;
       const themeMatch = tryResolve(themeKey);
       if (themeMatch)
@@ -1749,37 +1724,36 @@ __define('./background.ts', (exports, module, __require) => {
       return null;
   }
   function normalizePropConfig(propCfg) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x;
       if (!propCfg)
           return null;
       const typeId = typeof propCfg.type === 'string' ? propCfg.type : null;
       const typeKey = typeId && isSceneryKey(typeId) ? typeId : null;
       const typeDef = typeKey ? ENVIRONMENT_PROP_TYPES[typeKey] : null;
-      const anchorDefaults = (_a = typeDef === null || typeDef === void 0 ? void 0 : typeDef.anchor) !== null && _a !== void 0 ? _a : null;
-      const sizeDefaults = (_b = typeDef === null || typeDef === void 0 ? void 0 : typeDef.size) !== null && _b !== void 0 ? _b : null;
-      const anchor = normalizeVector(propCfg.anchor, (_c = anchorDefaults === null || anchorDefaults === void 0 ? void 0 : anchorDefaults.x) !== null && _c !== void 0 ? _c : 0.5, (_d = anchorDefaults === null || anchorDefaults === void 0 ? void 0 : anchorDefaults.y) !== null && _d !== void 0 ? _d : 1);
-      const size = normalizeSize(propCfg.size, (_e = sizeDefaults === null || sizeDefaults === void 0 ? void 0 : sizeDefaults.w) !== null && _e !== void 0 ? _e : 120, (_f = sizeDefaults === null || sizeDefaults === void 0 ? void 0 : sizeDefaults.h) !== null && _f !== void 0 ? _f : 180);
-      const palette = mergePalette((_g = typeDef === null || typeDef === void 0 ? void 0 : typeDef.palette) !== null && _g !== void 0 ? _g : null, (_h = propCfg.palette) !== null && _h !== void 0 ? _h : null);
-      const cellCx = toNumberOr((_j = propCfg.cx) !== null && _j !== void 0 ? _j : (_k = propCfg.cell) === null || _k === void 0 ? void 0 : _k.cx, 0);
-      const cellCy = toNumberOr((_l = propCfg.cy) !== null && _l !== void 0 ? _l : (_m = propCfg.cell) === null || _m === void 0 ? void 0 : _m.cy, 0);
-      const depth = toNumberOr((_p = (_o = propCfg.cell) === null || _o === void 0 ? void 0 : _o.depth) !== null && _p !== void 0 ? _p : propCfg.depth, 0);
+      const anchorDefaults = typeDef?.anchor ?? null;
+      const sizeDefaults = typeDef?.size ?? null;
+      const anchor = normalizeVector(propCfg.anchor, anchorDefaults?.x ?? 0.5, anchorDefaults?.y ?? 1);
+      const size = normalizeSize(propCfg.size, sizeDefaults?.w ?? 120, sizeDefaults?.h ?? 180);
+      const palette = mergePalette(typeDef?.palette ?? null, propCfg.palette ?? null);
+      const cellCx = toNumberOr(propCfg.cx ?? propCfg.cell?.cx, 0);
+      const cellCy = toNumberOr(propCfg.cy ?? propCfg.cell?.cy, 0);
+      const depth = toNumberOr(propCfg.cell?.depth ?? propCfg.depth, 0);
       return {
           type: typeId,
-          asset: typeof propCfg.asset === 'string' ? propCfg.asset : (_q = typeDef === null || typeDef === void 0 ? void 0 : typeDef.asset) !== null && _q !== void 0 ? _q : null,
-          fallback: (_s = (_r = cloneFallback(propCfg.fallback)) !== null && _r !== void 0 ? _r : cloneFallback(typeDef === null || typeDef === void 0 ? void 0 : typeDef.fallback)) !== null && _s !== void 0 ? _s : null,
+          asset: typeof propCfg.asset === 'string' ? propCfg.asset : typeDef?.asset ?? null,
+          fallback: cloneFallback(propCfg.fallback) ?? cloneFallback(typeDef?.fallback) ?? null,
           palette,
           anchor,
           size,
           cell: { cx: cellCx, cy: cellCy },
           depth,
-          baseLift: toNumberOr(propCfg.baseLift, (_t = typeDef === null || typeDef === void 0 ? void 0 : typeDef.baseLift) !== null && _t !== void 0 ? _t : 0.5),
+          baseLift: toNumberOr(propCfg.baseLift, typeDef?.baseLift ?? 0.5),
           offset: {
-              x: toNumberOr((_u = propCfg.offset) === null || _u === void 0 ? void 0 : _u.x, 0),
-              y: toNumberOr((_v = propCfg.offset) === null || _v === void 0 ? void 0 : _v.y, 0),
+              x: toNumberOr(propCfg.offset?.x, 0),
+              y: toNumberOr(propCfg.offset?.y, 0),
           },
           pixelOffset: {
-              x: toNumberOr((_w = propCfg.pixelOffset) === null || _w === void 0 ? void 0 : _w.x, 0),
-              y: toNumberOr((_x = propCfg.pixelOffset) === null || _x === void 0 ? void 0 : _x.y, 0),
+              x: toNumberOr(propCfg.pixelOffset?.x, 0),
+              y: toNumberOr(propCfg.pixelOffset?.y, 0),
           },
           scale: toNumberOr(propCfg.scale, 1),
           alpha: toNumberOr(propCfg.alpha, 1),
@@ -1788,7 +1762,6 @@ __define('./background.ts', (exports, module, __require) => {
       };
   }
   function getBackgroundPropCache(config) {
-      var _a;
       if (!config)
           return null;
       const props = Array.isArray(config.props) ? config.props : [];
@@ -1801,7 +1774,7 @@ __define('./background.ts', (exports, module, __require) => {
               if (!prop)
                   continue;
               const cyWithDepth = prop.cell.cy + prop.depth;
-              const spriteEntry = ensureEnvironmentSprite((_a = prop.asset) !== null && _a !== void 0 ? _a : '');
+              const spriteEntry = ensureEnvironmentSprite(prop.asset ?? '');
               normalizedProps.push({
                   prop,
                   base: {
@@ -1821,18 +1794,17 @@ __define('./background.ts', (exports, module, __require) => {
       return cache;
   }
   function buildBoardState(normalizedProps, g, cam) {
-      var _a, _b, _c;
       if (!g)
           return undefined;
-      const rowGap = ((_a = (cam === null || cam === void 0 ? void 0 : cam.rowGapRatio)) !== null && _a !== void 0 ? _a : 0.62) * g.tile;
+      const rowGap = ((cam?.rowGapRatio) ?? 0.62) * g.tile;
       const drawables = [];
       for (const entry of normalizedProps) {
-          if (!(entry === null || entry === void 0 ? void 0 : entry.prop))
+          if (!entry?.prop)
               continue;
           const { prop, base } = entry;
           const projection = projectCellOblique(g, base.cx, base.cyWithDepth, cam);
           const scale = projection.scale * prop.scale;
-          const spriteEntry = (_b = entry.spriteEntry) !== null && _b !== void 0 ? _b : ensureEnvironmentSprite((_c = prop.asset) !== null && _c !== void 0 ? _c : '');
+          const spriteEntry = entry.spriteEntry ?? ensureEnvironmentSprite(prop.asset ?? '');
           entry.spriteEntry = spriteEntry;
           drawables.push({
               prop,
@@ -1850,18 +1822,17 @@ __define('./background.ts', (exports, module, __require) => {
       };
   }
   function drawFallback(ctx, width, height, anchor, palette, fallback) {
-      var _a;
-      const primary = (palette === null || palette === void 0 ? void 0 : palette.primary) || '#ccd7ec';
-      const secondary = (palette === null || palette === void 0 ? void 0 : palette.secondary) || '#7b86a1';
-      const accent = (palette === null || palette === void 0 ? void 0 : palette.accent) || '#f4f7ff';
-      const shadow = (palette === null || palette === void 0 ? void 0 : palette.shadow) || 'rgba(18,22,34,0.65)';
-      const outline = (palette === null || palette === void 0 ? void 0 : palette.outline) || 'rgba(12,18,28,0.9)';
-      const top = -height * ((_a = anchor === null || anchor === void 0 ? void 0 : anchor.y) !== null && _a !== void 0 ? _a : 1);
+      const primary = palette?.primary || '#ccd7ec';
+      const secondary = palette?.secondary || '#7b86a1';
+      const accent = palette?.accent || '#f4f7ff';
+      const shadow = palette?.shadow || 'rgba(18,22,34,0.65)';
+      const outline = palette?.outline || 'rgba(12,18,28,0.9)';
+      const top = -height * (anchor?.y ?? 1);
       const bottom = top + height;
       const halfW = width / 2;
       ctx.save();
       ctx.beginPath();
-      switch (fallback === null || fallback === void 0 ? void 0 : fallback.shape) {
+      switch (fallback?.shape) {
           case 'banner': {
               ctx.moveTo(-halfW * 0.65, top + height * 0.08);
               ctx.lineTo(halfW * 0.65, top + height * 0.08);
@@ -1922,17 +1893,16 @@ __define('./background.ts', (exports, module, __require) => {
       ctx.restore();
   }
   function drawEnvironmentProps(ctx, g, cam, backgroundKey) {
-      var _a, _b;
       if (!ctx || !g)
           return;
-      const resolved = resolveBackground(backgroundKey !== null && backgroundKey !== void 0 ? backgroundKey : null);
+      const resolved = resolveBackground(backgroundKey ?? null);
       if (!resolved)
           return;
       const { config } = resolved;
       if (!config || config.enabled === false)
           return;
       const cache = getBackgroundPropCache(config);
-      const normalizedProps = cache === null || cache === void 0 ? void 0 : cache.normalizedProps;
+      const normalizedProps = cache?.normalizedProps;
       if (!normalizedProps || !normalizedProps.length)
           return;
       const boardSignature = getBoardSignature(g, cam);
@@ -1960,8 +1930,8 @@ __define('./background.ts', (exports, module, __require) => {
           if (prop.flip === -1) {
               ctx.scale(-1, 1);
           }
-          const drawX = -width * ((_a = prop.anchor.x) !== null && _a !== void 0 ? _a : 0.5);
-          const drawY = -height * ((_b = prop.anchor.y) !== null && _b !== void 0 ? _b : 1);
+          const drawX = -width * (prop.anchor.x ?? 0.5);
+          const drawY = -height * (prop.anchor.y ?? 1);
           if (spriteEntry && spriteEntry.status === 'ready' && spriteEntry.img) {
               ctx.drawImage(spriteEntry.img, drawX, drawY, width, height);
           }
@@ -1972,7 +1942,7 @@ __define('./background.ts', (exports, module, __require) => {
       }
   }
   function getEnvironmentBackground(backgroundKey) {
-      const resolved = resolveBackground(backgroundKey !== null && backgroundKey !== void 0 ? backgroundKey : null);
+      const resolved = resolveBackground(backgroundKey ?? null);
       return resolved ? resolved.config : null;
   }
   //# sourceMappingURL=stdin.js.map
@@ -2019,28 +1989,16 @@ __define('./catalog.ts', (exports, module, __require) => {
       Ranger: 0.55,
       Assassin: 0.22
   };
-  // Chèn vào catalog.ts, sau AE_CLASS_COEFF
-  /** Chỉ số tăng trưởng mỗi Level (Tia Laser Delta) */
-  const CLASS_GROWTH = {
-      Tanker: { HP: 25, ATK: 0.5, WIL: 0.5, ARM: 0.01, RES: 0.005 },
-      Warrior: { HP: 20, ATK: 1.2, WIL: 0.8, ARM: 0.008, RES: 0.008 },
-      Mage: { HP: 15, ATK: 0.5, WIL: 1.5, ARM: 0.005, RES: 0.01 },
-      Support: { HP: 15, ATK: 0.5, WIL: 1.2, ARM: 0.005, RES: 0.01 },
-      Ranger: { HP: 15, ATK: 1.5, WIL: 0.5, ARM: 0.005, RES: 0.005 },
-      Assassin: { HP: 12, ATK: 1.8, WIL: 0.5, ARM: 0.004, RES: 0.004 },
-      Summoner: { HP: 18, ATK: 0.8, WIL: 1.2, ARM: 0.006, RES: 0.008 }
-  };
   const isRankName = (value) => value in RANK_MULT;
   const isClassName = (value) => value in CLASS_BASE;
   // 3) Helper: áp rank & mod (mods không áp vào SPD)
   function applyRankAndMods(base, rank, mods = {}) {
-      var _a, _b, _c;
-      const multiplier = (_a = RANK_MULT[rank]) !== null && _a !== void 0 ? _a : 1;
+      const multiplier = RANK_MULT[rank] ?? 1;
       const out = { ...base };
       const keys = Object.keys(base);
       for (const key of keys) {
-          const baseValue = (_b = base[key]) !== null && _b !== void 0 ? _b : 0;
-          const mod = 1 + ((_c = mods === null || mods === void 0 ? void 0 : mods[key]) !== null && _c !== void 0 ? _c : 0);
+          const baseValue = base[key] ?? 0;
+          const mod = 1 + (mods?.[key] ?? 0);
           if (key === 'SPD') { // SPD không nhân theo bậc
               out[key] = Math.round(baseValue * mod * 100) / 100;
               continue;
@@ -3948,25 +3906,14 @@ __define('./catalog.ts', (exports, module, __require) => {
   const unitKitEntries = ROSTER.map((entry) => [entry.id, asUnitKitConfig(entry.kit)]);
   const UNIT_KITS = Object.freeze(Object.fromEntries(unitKitEntries));
   const getUnitKitById = (id) => {
-      var _a;
       if (typeof id !== 'string')
           return null;
-      const kit = (_a = UNIT_KITS[id]) !== null && _a !== void 0 ? _a : null;
+      const kit = UNIT_KITS[id] ?? null;
       return asUnitKitConfig(kit);
   };
   const isSummoner = (id) => {
       const m = getMetaById(id);
       return !!(m && m.class === 'Summoner' && kitSupportsSummon(m));
-  };
-  // Dán vào cuối cùng của src/catalog.ts
-  const AE_CLASS_COEFF = {
-      Support: 1.5,
-      Summoner: 1.3,
-      Mage: 1.2,
-      Tanker: 0.55,
-      Warrior: 0.55,
-      Ranger: 0.55,
-      Assassin: 0.22
   };
   const CLASS_GROWTH = {
       Tanker: { HP: 25, ATK: 0.5, WIL: 0.5, ARM: 0.01, RES: 0.005 },
@@ -3981,7 +3928,6 @@ __define('./catalog.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'RANK_MULT')) exports.RANK_MULT = RANK_MULT;
   if (!Object.prototype.hasOwnProperty.call(exports, 'CLASS_BASE')) exports.CLASS_BASE = CLASS_BASE;
   if (!Object.prototype.hasOwnProperty.call(exports, 'AE_CLASS_COEFF')) exports.AE_CLASS_COEFF = AE_CLASS_COEFF;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'CLASS_GROWTH')) exports.CLASS_GROWTH = CLASS_GROWTH;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ROSTER')) exports.ROSTER = ROSTER;
   if (!Object.prototype.hasOwnProperty.call(exports, 'UNIT_BASE')) exports.UNIT_BASE = UNIT_BASE;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ROSTER_MAP')) exports.ROSTER_MAP = ROSTER_MAP;
@@ -3989,6 +3935,7 @@ __define('./catalog.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'UNIT_KITS')) exports.UNIT_KITS = UNIT_KITS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getUnitKitById')) exports.getUnitKitById = getUnitKitById;
   if (!Object.prototype.hasOwnProperty.call(exports, 'isSummoner')) exports.isSummoner = isSummoner;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'CLASS_GROWTH')) exports.CLASS_GROWTH = CLASS_GROWTH;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyRankAndMods')) exports.applyRankAndMods = applyRankAndMods;
 });
 __define('./combat.ts', (exports, module, __require) => {
@@ -4022,7 +3969,6 @@ __define('./combat.ts', (exports, module, __require) => {
   const isBasicAttackAfterHitHandler = (handler) => typeof handler === 'function';
   const GAME_CONFIG = CFG;
   function pickTarget(Game, attacker) {
-      var _a;
       const foeSide = attacker.side === 'ally' ? 'enemy' : 'ally';
       const pool = Game.tokens.filter((t) => t.side === foeSide && t.alive);
       if (pool.length === 0)
@@ -4043,10 +3989,9 @@ __define('./combat.ts', (exports, module, __require) => {
           const distanceB = Math.abs(b.cx - attacker.cx) + Math.abs(b.cy - attacker.cy);
           return distanceA - distanceB;
       });
-      return (_a = sorted[0]) !== null && _a !== void 0 ? _a : null;
+      return sorted[0] ?? null;
   }
   function dealAbilityDamage(Game, attacker, target, opts = {}) {
-      var _a, _b, _c, _d, _e, _f;
       if (!attacker || !target || !target.alive) {
           return { dealt: 0, absorbed: 0, total: 0 };
       }
@@ -4054,12 +3999,12 @@ __define('./combat.ts', (exports, module, __require) => {
       const dtype = typeof opts.dtype === 'string' ? opts.dtype : 'physical';
       const attackType = typeof opts.attackType === 'string' ? opts.attackType : 'skill';
       const baseDefault = dtype === 'arcane'
-          ? Math.max(0, Math.floor((_a = attacker.wil) !== null && _a !== void 0 ? _a : 0))
-          : Math.max(0, Math.floor((_b = attacker.atk) !== null && _b !== void 0 ? _b : 0));
+          ? Math.max(0, Math.floor(attacker.wil ?? 0))
+          : Math.max(0, Math.floor(attacker.atk ?? 0));
       const base = Math.max(0, opts.base != null ? Math.floor(Number(opts.base)) : baseDefault);
       const pre = Statuses.beforeDamage(attacker, target, { dtype, base, attackType });
-      const combinedPen = Math.max(0, Math.min(1, Math.max((_c = pre.defPen) !== null && _c !== void 0 ? _c : 0, (_d = opts.defPen) !== null && _d !== void 0 ? _d : 0)));
-      const defenseStat = dtype === 'arcane' ? (_e = target.res) !== null && _e !== void 0 ? _e : 0 : (_f = target.arm) !== null && _f !== void 0 ? _f : 0;
+      const combinedPen = Math.max(0, Math.min(1, Math.max(pre.defPen ?? 0, opts.defPen ?? 0)));
+      const defenseStat = dtype === 'arcane' ? target.res ?? 0 : target.arm ?? 0;
       let dmg = Math.max(0, Math.floor(pre.base * pre.outMul));
       if (pre.ignoreAll) {
           dmg = 0;
@@ -4111,29 +4056,27 @@ __define('./combat.ts', (exports, module, __require) => {
       return { dealt: remain, absorbed: abs.absorbed, total: dmg };
   }
   function healUnit(target, amount) {
-      var _a, _b;
       if (!target || !Number.isFinite(target.hpMax)) {
           return { healed: 0, overheal: 0 };
       }
-      const amt = Math.max(0, Math.floor(amount !== null && amount !== void 0 ? amount : 0));
+      const amt = Math.max(0, Math.floor(amount ?? 0));
       if (amt <= 0) {
           return { healed: 0, overheal: 0 };
       }
-      const before = Math.max(0, Math.floor((_a = target.hp) !== null && _a !== void 0 ? _a : 0));
-      const healCap = Math.max(0, ((_b = target.hpMax) !== null && _b !== void 0 ? _b : 0) - before);
+      const before = Math.max(0, Math.floor(target.hp ?? 0));
+      const healCap = Math.max(0, (target.hpMax ?? 0) - before);
       const healed = Math.min(amt, healCap);
       target.hp = before + healed;
       return { healed, overheal: Math.max(0, amt - healed) };
   }
   function basicAttack(Game, unit) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
       const foeSide = unit.side === 'ally' ? 'enemy' : 'ally';
       const pool = Game.tokens.filter((t) => t.side === foeSide && t.alive);
       if (pool.length === 0)
           return;
       startFurySkill(unit, { tag: 'basic' });
       const fallback = pickTarget(Game, unit);
-      const resolved = (_a = Statuses.resolveTarget(unit, pool, { attackType: 'basic' })) !== null && _a !== void 0 ? _a : fallback;
+      const resolved = Statuses.resolveTarget(unit, pool, { attackType: 'basic' }) ?? fallback;
       if (!resolved)
           return;
       const isLoithienanh = unit.id === 'loithienanh';
@@ -4167,7 +4110,7 @@ __define('./combat.ts', (exports, module, __require) => {
           log: getPassiveLog(Game),
       };
       emitPassiveEvent(Game, unit, 'onBasicHit', passiveCtx);
-      const meleeDur = (_c = (_b = GAME_CONFIG.ANIMATION) === null || _b === void 0 ? void 0 : _b.meleeDurationMs) !== null && _c !== void 0 ? _c : 2000;
+      const meleeDur = GAME_CONFIG.ANIMATION?.meleeDurationMs ?? 2000;
       const meleeStartMs = sessionNow();
       let meleeTriggered = false;
       if (sessionVfx) {
@@ -4183,11 +4126,11 @@ __define('./combat.ts', (exports, module, __require) => {
           Game.turn.busyUntil = mergeBusyUntil(Game.turn.busyUntil, meleeStartMs, meleeDur);
       }
       const dtype = 'physical';
-      const rawBase = Math.max(1, Math.floor(((_d = unit.atk) !== null && _d !== void 0 ? _d : 0) + ((_e = unit.wil) !== null && _e !== void 0 ? _e : 0)));
-      const modBase = Math.max(1, Math.floor(rawBase * ((_g = (_f = passiveCtx.damage) === null || _f === void 0 ? void 0 : _f.baseMul) !== null && _g !== void 0 ? _g : 1) + ((_j = (_h = passiveCtx.damage) === null || _h === void 0 ? void 0 : _h.flatAdd) !== null && _j !== void 0 ? _j : 0)));
+      const rawBase = Math.max(1, Math.floor((unit.atk ?? 0) + (unit.wil ?? 0)));
+      const modBase = Math.max(1, Math.floor(rawBase * (passiveCtx.damage?.baseMul ?? 1) + (passiveCtx.damage?.flatAdd ?? 0)));
       const pre = Statuses.beforeDamage(unit, resolved, { dtype, base: modBase, attackType: 'basic' });
       let dmg = Math.max(1, Math.floor(pre.base * pre.outMul));
-      const def = Math.max(0, ((_k = resolved.arm) !== null && _k !== void 0 ? _k : 0) * (1 - ((_l = pre.defPen) !== null && _l !== void 0 ? _l : 0)));
+      const def = Math.max(0, (resolved.arm ?? 0) * (1 - (pre.defPen ?? 0)));
       dmg = Math.max(0, Math.floor(dmg * (1 - def)));
       dmg = Math.max(0, Math.floor(dmg * pre.inMul));
       triggerLightningArc('hit1');
@@ -4205,7 +4148,7 @@ __define('./combat.ts', (exports, module, __require) => {
       if (resolved.hp <= 0) {
           hookOnLethalDamage(resolved);
       }
-      const dealt = Math.max(0, Math.min(dmg, (_m = abs.remain) !== null && _m !== void 0 ? _m : 0));
+      const dealt = Math.max(0, Math.min(dmg, abs.remain ?? 0));
       const damageResult = { dealt, absorbed: abs.absorbed, dtype };
       Statuses.afterDamage(unit, resolved, damageResult);
       const isKill = resolved.hp <= 0;
@@ -4275,11 +4218,10 @@ __define('./combat/apply-damage.ts', (exports, module, __require) => {
       return unit.statuses;
   };
   function applyDamage(target, amount) {
-      var _a, _b;
       if (!Number.isFinite(target.hpMax))
           return;
-      const currentHp = (_a = target.hp) !== null && _a !== void 0 ? _a : 0;
-      const maxHp = (_b = target.hpMax) !== null && _b !== void 0 ? _b : 0;
+      const currentHp = target.hp ?? 0;
+      const maxHp = target.hpMax ?? 0;
       const newHp = Math.max(0, Math.min(maxHp, Math.floor(currentHp) - Math.floor(amount)));
       target.hp = newHp;
       if (target.hp <= 0) {
@@ -4290,16 +4232,15 @@ __define('./combat/apply-damage.ts', (exports, module, __require) => {
       }
   }
   function grantShield(target, amount) {
-      var _a;
       if (!target)
           return 0;
-      const amt = Math.max(0, Math.floor(amount !== null && amount !== void 0 ? amount : 0));
+      const amt = Math.max(0, Math.floor(amount ?? 0));
       if (amt <= 0)
           return 0;
       const list = ensureStatusList(target);
       const shield = list.find(status => status.id === 'shield');
       if (shield) {
-          shield.amount = ((_a = shield.amount) !== null && _a !== void 0 ? _a : 0) + amt;
+          shield.amount = (shield.amount ?? 0) + amt;
       }
       else {
           list.push({ id: 'shield', kind: 'buff', tag: 'shield', amount: amt });
@@ -4443,7 +4384,7 @@ __define('./config.ts', (exports, module, __require) => {
           BOARD_H_RATIO: 3 / 7,
           BOARD_VERTICAL_ALIGN: 0.7,
           MAX_DPR: 2.5,
-          MAX_PIXEL_AREA: 2400000,
+          MAX_PIXEL_AREA: 2_400_000,
           CARD_GAP: 12,
           CARD_MIN: 40
       },
@@ -4898,17 +4839,14 @@ __define('./data/announcements.ts', (exports, module, __require) => {
   const SIDE_SLOT_ANNOUNCEMENTS = Object.freeze(announcementConfig.map((slot) => ({
       key: slot.key,
       label: slot.label,
-      entries: Object.freeze(slot.entries.map((entry) => {
-          var _a, _b, _c, _d, _e;
-          return Object.freeze({
-              ...entry,
-              shortDescription: (_a = applyMacros(entry.shortDescription)) !== null && _a !== void 0 ? _a : entry.shortDescription,
-              tooltip: (_b = applyMacros(entry.tooltip)) !== null && _b !== void 0 ? _b : undefined,
-              rewardCallout: (_c = applyMacros(entry.rewardCallout)) !== null && _c !== void 0 ? _c : undefined,
-              startAt: (_d = entry.startAt) !== null && _d !== void 0 ? _d : null,
-              endAt: (_e = entry.endAt) !== null && _e !== void 0 ? _e : null
-          });
-      }))
+      entries: Object.freeze(slot.entries.map((entry) => Object.freeze({
+          ...entry,
+          shortDescription: applyMacros(entry.shortDescription) ?? entry.shortDescription,
+          tooltip: applyMacros(entry.tooltip) ?? undefined,
+          rewardCallout: applyMacros(entry.rewardCallout) ?? undefined,
+          startAt: entry.startAt ?? null,
+          endAt: entry.endAt ?? null
+      })))
   })));
   /**
    * @param {string} slotKey
@@ -4916,12 +4854,13 @@ __define('./data/announcements.ts', (exports, module, __require) => {
    * @returns {{ slot: AnnouncementSlot; entry: AnnouncementEntry } | null}
    */
   function selectAnnouncementEntry(slotKey, options = {}) {
-      var _a, _b;
       const now = options.now instanceof Date ? options.now : new Date();
       const slot = SIDE_SLOT_ANNOUNCEMENTS.find(item => item.key === slotKey);
       if (!slot)
           return null;
-      const entry = (_b = (_a = slot.entries.find((item) => isEntryActive(item, now))) !== null && _a !== void 0 ? _a : slot.entries.at(0)) !== null && _b !== void 0 ? _b : null;
+      const entry = slot.entries.find((item) => isEntryActive(item, now))
+          ?? slot.entries.at(0)
+          ?? null;
       if (!entry)
           return null;
       return { slot, entry };
@@ -4929,8 +4868,9 @@ __define('./data/announcements.ts', (exports, module, __require) => {
   function getAllSidebarAnnouncements(options = {}) {
       const now = options.now instanceof Date ? options.now : new Date();
       return SIDE_SLOT_ANNOUNCEMENTS.map(slot => {
-          var _a, _b;
-          const entry = (_b = (_a = slot.entries.find((item) => isEntryActive(item, now))) !== null && _a !== void 0 ? _a : slot.entries.at(0)) !== null && _b !== void 0 ? _b : null;
+          const entry = slot.entries.find((item) => isEntryActive(item, now))
+              ?? slot.entries.at(0)
+              ?? null;
           return {
               key: slot.key,
               label: slot.label,
@@ -5097,8 +5037,7 @@ __define('./data/economy.ts', (exports, module, __require) => {
       return acc;
   }, {});
   function getCurrency(currencyId) {
-      var _a;
-      return (_a = CURRENCY_INDEX[currencyId]) !== null && _a !== void 0 ? _a : null;
+      return CURRENCY_INDEX[currencyId] ?? null;
   }
   function listCurrencies() {
       return [...CURRENCIES];
@@ -5175,9 +5114,8 @@ __define('./data/economy.ts', (exports, module, __require) => {
       return tier in PITY_CONFIG;
   }
   function getPityConfig(tier) {
-      var _a;
       if (isPityTier(tier)) {
-          return (_a = PITY_CONFIG[tier]) !== null && _a !== void 0 ? _a : null;
+          return PITY_CONFIG[tier] ?? null;
       }
       return null;
   }
@@ -5190,8 +5128,7 @@ __define('./data/economy.ts', (exports, module, __require) => {
       return acc;
   }, {});
   function getShopTaxBracket(rank) {
-      var _a;
-      return (_a = SHOP_TAX_INDEX[rank]) !== null && _a !== void 0 ? _a : null;
+      return SHOP_TAX_INDEX[rank] ?? null;
   }
   function getShopTaxRate(rank) {
       const bracket = getShopTaxBracket(rank);
@@ -5234,7 +5171,6 @@ __define('./data/load-config.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'loadConfig')) exports.loadConfig = loadConfig;
 });
 __define('./data/modes.ts', (exports, module, __require) => {
-  var _a, _b, _c;
   const __dep0 = __require('./data/economy.ts');
   const getLotterySplit = __dep0.getLotterySplit;
   const getPityConfig = __dep0.getPityConfig;
@@ -5366,8 +5302,8 @@ __define('./data/modes.ts', (exports, module, __require) => {
           type: MODE_TYPES.ECONOMY,
           status: MODE_STATUS.AVAILABLE,
           icon: '🎲',
-          shortDescription: `Quầy gacha phân tab Nhân Vật, Công Pháp, Vũ Khí, Sủng Thú với bảo hiểm ${(SSR_PITY === null || SSR_PITY === void 0 ? void 0 : SSR_PITY.hardPity) || 60}/${(UR_PITY === null || UR_PITY === void 0 ? void 0 : UR_PITY.hardPity) || 70}/${(PRIME_PITY === null || PRIME_PITY === void 0 ? void 0 : PRIME_PITY.hardPity) || 80} lượt cho các banner SSR/UR/Prime.`,
-          unlockNotes: `Banner UR bảo hiểm SSR ở lượt ${((_b = (_a = UR_PITY === null || UR_PITY === void 0 ? void 0 : UR_PITY.softGuarantees) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.pull) || 50}; banner Prime lần lượt bảo hiểm SSR/UR ở ${((_c = PRIME_PITY === null || PRIME_PITY === void 0 ? void 0 : PRIME_PITY.softGuarantees) === null || _c === void 0 ? void 0 : _c.map(({ pull }) => pull).join('/')) || '40/60'} và Prime ở ${(PRIME_PITY === null || PRIME_PITY === void 0 ? void 0 : PRIME_PITY.hardPity) || 80}.`,
+          shortDescription: `Quầy gacha phân tab Nhân Vật, Công Pháp, Vũ Khí, Sủng Thú với bảo hiểm ${SSR_PITY?.hardPity || 60}/${UR_PITY?.hardPity || 70}/${PRIME_PITY?.hardPity || 80} lượt cho các banner SSR/UR/Prime.`,
+          unlockNotes: `Banner UR bảo hiểm SSR ở lượt ${UR_PITY?.softGuarantees?.[0]?.pull || 50}; banner Prime lần lượt bảo hiểm SSR/UR ở ${PRIME_PITY?.softGuarantees?.map(({ pull }) => pull).join('/') || '40/60'} và Prime ở ${PRIME_PITY?.hardPity || 80}.`,
           tags: ['Kinh tế nguyên tinh'],
           menuSections: ['economy'],
           shell: {
@@ -5621,8 +5557,7 @@ __define('./data/roster-preview.ts', (exports, module, __require) => {
       ...rosterPreviewConfig.precision
   });
   function roundStat(stat, value) {
-      var _a;
-      const precision = (_a = PRECISION[stat]) !== null && _a !== void 0 ? _a : 1;
+      const precision = PRECISION[stat] ?? 1;
       return Math.round(value * precision) / precision;
   }
   function roundTpValue(value) {
@@ -5633,7 +5568,7 @@ __define('./data/roster-preview.ts', (exports, module, __require) => {
       for (const [stat, value] of Object.entries(tpAlloc)) {
           if (!(stat in TP_DELTA))
               continue;
-          const rounded = roundTpValue(value !== null && value !== void 0 ? value : 0);
+          const rounded = roundTpValue(value ?? 0);
           if (rounded !== 0) {
               clean[stat] = rounded;
           }
@@ -5641,14 +5576,13 @@ __define('./data/roster-preview.ts', (exports, module, __require) => {
       return clean;
   }
   function applyTpToBase(base, tpAlloc = {}) {
-      var _a;
       const cleanTp = sanitizeTpAllocation(tpAlloc);
       const out = { ...base };
       for (const [stat, baseValue] of Object.entries(base)) {
           const delta = TP_DELTA[stat];
           if (delta) {
-              const tp = (_a = cleanTp[stat]) !== null && _a !== void 0 ? _a : 0;
-              out[stat] = (baseValue !== null && baseValue !== void 0 ? baseValue : 0) + delta * tp;
+              const tp = cleanTp[stat] ?? 0;
+              out[stat] = (baseValue ?? 0) + delta * tp;
           }
           else {
               out[stat] = baseValue;
@@ -5664,10 +5598,10 @@ __define('./data/roster-preview.ts', (exports, module, __require) => {
       const out = { ...preRank };
       for (const [stat, value] of Object.entries(preRank)) {
           if (stat === 'SPD') {
-              out[stat] = roundStat(stat, value !== null && value !== void 0 ? value : 0);
+              out[stat] = roundStat(stat, value ?? 0);
               continue;
           }
-          out[stat] = roundStat(stat, (value !== null && value !== void 0 ? value : 0) * multiplier);
+          out[stat] = roundStat(stat, (value ?? 0) * multiplier);
       }
       return out;
   }
@@ -5687,7 +5621,7 @@ __define('./data/roster-preview.ts', (exports, module, __require) => {
           if (typeof baseValue !== 'number')
               continue;
           const delta = TP_DELTA[stat];
-          const raw = delta ? (baseValue * (modValue !== null && modValue !== void 0 ? modValue : 0)) / delta : 0;
+          const raw = delta ? (baseValue * (modValue ?? 0)) / delta : 0;
           const rounded = roundTpValue(raw);
           if (rounded !== 0) {
               tp[stat] = rounded;
@@ -5699,13 +5633,12 @@ __define('./data/roster-preview.ts', (exports, module, __require) => {
       return roundTpValue(Object.values(tpAlloc).reduce((sum, value) => sum + value, 0));
   }
   function buildRosterPreviews(tpAllocations = undefined) {
-      var _a;
       const result = {};
       for (const unit of ROSTER) {
           const base = CLASS_BASE[unit.class];
           if (!base)
               continue;
-          const derivedTp = (_a = tpAllocations === null || tpAllocations === void 0 ? void 0 : tpAllocations[unit.id]) !== null && _a !== void 0 ? _a : deriveTpFromMods(base, unit.mods);
+          const derivedTp = tpAllocations?.[unit.id] ?? deriveTpFromMods(base, unit.mods);
           const cleanTp = sanitizeTpAllocation(derivedTp);
           const preRank = applyTpToBase(base, cleanTp);
           const rankKey = unit.rank;
@@ -5734,14 +5667,13 @@ __define('./data/roster-preview.ts', (exports, module, __require) => {
       return statsOrder.map((stat) => ({
           stat,
           values: ROSTER.map((unit) => {
-              var _a, _b, _c, _d, _e, _f;
               const preview = previews[unit.id];
               return {
                   id: unit.id,
                   name: unit.name,
-                  value: (_b = (_a = preview === null || preview === void 0 ? void 0 : preview.final) === null || _a === void 0 ? void 0 : _a[stat]) !== null && _b !== void 0 ? _b : null,
-                  preRank: (_d = (_c = preview === null || preview === void 0 ? void 0 : preview.preRank) === null || _c === void 0 ? void 0 : _c[stat]) !== null && _d !== void 0 ? _d : null,
-                  tp: (_f = (_e = preview === null || preview === void 0 ? void 0 : preview.tp) === null || _e === void 0 ? void 0 : _e[stat]) !== null && _f !== void 0 ? _f : 0
+                  value: preview?.final?.[stat] ?? null,
+                  preRank: preview?.preRank?.[stat] ?? null,
+                  tp: preview?.tp?.[stat] ?? 0
               };
           })
       }));
@@ -7402,11 +7334,10 @@ __define('./data/skills.ts', (exports, module, __require) => {
   const rawSkillSets = RawSkillSetListSchema.parse(rawSkillSetsConfig);
   const SKILL_KEYS = ['basic', 'skill', 'skills', 'ult', 'talent', 'technique', 'notes'];
   const skillSets = rawSkillSets.reduce((acc, entry) => {
-      var _a;
       const skills = Array.isArray(entry.skills)
           ? entry.skills.map(normalizeSkillEntry).filter(isSkillSection)
           : [];
-      const skill = entry.skill ? normalizeSkillEntry(entry.skill) : ((_a = skills[0]) !== null && _a !== void 0 ? _a : null);
+      const skill = entry.skill ? normalizeSkillEntry(entry.skill) : (skills[0] ?? null);
       const normalized = {
           unitId: entry.unitId,
           basic: normalizeSection(entry.basic),
@@ -7430,10 +7361,9 @@ __define('./data/skills.ts', (exports, module, __require) => {
       return Boolean(entry);
   }
   function getSkillSet(unitId) {
-      var _a;
       if (!unitId)
           return null;
-      return (_a = skillSets[unitId]) !== null && _a !== void 0 ? _a : null;
+      return skillSets[unitId] ?? null;
   }
   function listSkillSets() {
       return ROSTER
@@ -7496,13 +7426,12 @@ __define('./data/vfx_anchors/schema.ts', (exports, module, __require) => {
       ambientEffects: BindingMapSchema.optional()
   });
   const parseVfxAnchorDataset = (input) => {
-      var _a, _b, _c;
       const dataset = VfxAnchorDatasetSchema.parse(input);
       return {
           unitId: dataset.unitId,
-          bodyAnchors: (_a = dataset.bodyAnchors) !== null && _a !== void 0 ? _a : {},
-          vfxBindings: (_b = dataset.vfxBindings) !== null && _b !== void 0 ? _b : {},
-          ambientEffects: (_c = dataset.ambientEffects) !== null && _c !== void 0 ? _c : {}
+          bodyAnchors: dataset.bodyAnchors ?? {},
+          vfxBindings: dataset.vfxBindings ?? {},
+          ambientEffects: dataset.ambientEffects ?? {}
       };
   };
   //# sourceMappingURL=stdin.js.map
@@ -7545,11 +7474,10 @@ __define('./engine.ts', (exports, module, __require) => {
   }
   /* ---------- Grid ---------- */
   function makeGrid(canvas, cols, rows) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;
-      const pad = coerceFinite((_a = CFG.UI) === null || _a === void 0 ? void 0 : _a.PAD, 12);
-      const boardMaxW = coerceFinite((_b = CFG.UI) === null || _b === void 0 ? void 0 : _b.BOARD_MAX_W, 1144);
+      const pad = coerceFinite(CFG.UI?.PAD, 12);
+      const boardMaxW = coerceFinite(CFG.UI?.BOARD_MAX_W, 1144);
       let viewportW = boardMaxW + pad * 2;
-      const parentElement = ((_c = canvas === null || canvas === void 0 ? void 0 : canvas.parentElement) !== null && _c !== void 0 ? _c : null);
+      const parentElement = (canvas?.parentElement ?? null);
       let parentClientW = null;
       if (parentElement && typeof parentElement.clientWidth === 'number') {
           const cw = parentElement.clientWidth;
@@ -7565,14 +7493,14 @@ __define('./engine.ts', (exports, module, __require) => {
           viewportW = Math.min(viewportW, vvWidth);
       }
       if (typeof document !== 'undefined') {
-          const docWidth = coerceFinite((_d = document.documentElement) === null || _d === void 0 ? void 0 : _d.clientWidth, viewportW);
+          const docWidth = coerceFinite(document.documentElement?.clientWidth, viewportW);
           viewportW = Math.min(viewportW, docWidth);
       }
       const viewportSafeW = parentClientW ? Math.min(viewportW, parentClientW) : viewportW;
       const availableW = Math.max(1, viewportSafeW - pad * 2);
       const w = Math.min(availableW, boardMaxW);
-      const h = Math.max(Math.floor(w * ((_f = (_e = CFG.UI) === null || _e === void 0 ? void 0 : _e.BOARD_H_RATIO) !== null && _f !== void 0 ? _f : 3 / 7)), (_h = (_g = CFG.UI) === null || _g === void 0 ? void 0 : _g.BOARD_MIN_H) !== null && _h !== void 0 ? _h : 220);
-      const maxDprCfg = (_j = CFG.UI) === null || _j === void 0 ? void 0 : _j.MAX_DPR;
+      const h = Math.max(Math.floor(w * (CFG.UI?.BOARD_H_RATIO ?? 3 / 7)), CFG.UI?.BOARD_MIN_H ?? 220);
+      const maxDprCfg = CFG.UI?.MAX_DPR;
       const dprClamp = Number.isFinite(maxDprCfg) && maxDprCfg > 0 ? maxDprCfg : 2;
       const dprRaw = typeof window !== 'undefined' && Number.isFinite(window.devicePixelRatio)
           ? window.devicePixelRatio
@@ -7590,7 +7518,7 @@ __define('./engine.ts', (exports, module, __require) => {
       }
       const displayW = w;
       const displayH = h;
-      const maxPixelAreaCfg = (_k = CFG.UI) === null || _k === void 0 ? void 0 : _k.MAX_PIXEL_AREA;
+      const maxPixelAreaCfg = CFG.UI?.MAX_PIXEL_AREA;
       const pixelAreaLimit = Number.isFinite(maxPixelAreaCfg) && maxPixelAreaCfg > 0 ? maxPixelAreaCfg : null;
       if (pixelAreaLimit) {
           const cssArea = displayW * displayH;
@@ -7633,15 +7561,15 @@ __define('./engine.ts', (exports, module, __require) => {
       const usableH = displayH - pad * 2;
       const tile = Math.floor(Math.min(usableW / cols, usableH / rows));
       const ox = Math.floor((displayW - tile * cols) / 2);
-      const cameraKey = ((_l = CFG.CAMERA) !== null && _l !== void 0 ? _l : 'landscape_oblique');
-      const cameraPreset = (_o = (_m = CAM === null || CAM === void 0 ? void 0 : CAM[cameraKey]) !== null && _m !== void 0 ? _m : CAM === null || CAM === void 0 ? void 0 : CAM.landscape_oblique) !== null && _o !== void 0 ? _o : null;
+      const cameraKey = (CFG.CAMERA ?? 'landscape_oblique');
+      const cameraPreset = CAM?.[cameraKey] ?? CAM?.landscape_oblique ?? null;
       const rawRowGapRatio = cameraPreset && typeof cameraPreset.rowGapRatio === 'number'
           ? cameraPreset.rowGapRatio
           : DEFAULT_OBLIQUE_CAMERA.rowGapRatio;
       const rowGapRatio = Number.isFinite(rawRowGapRatio) && rawRowGapRatio > 0
           ? rawRowGapRatio
           : 1;
-      const alignRaw = (_p = CFG.UI) === null || _p === void 0 ? void 0 : _p.BOARD_VERTICAL_ALIGN;
+      const alignRaw = CFG.UI?.BOARD_VERTICAL_ALIGN;
       const align = Number.isFinite(alignRaw)
           ? Math.min(Math.max(alignRaw, 0), 1)
           : 0.5;
@@ -7681,16 +7609,15 @@ __define('./engine.ts', (exports, module, __require) => {
       ctx.textBaseline = 'middle';
       const fs = Math.floor(g.tile * 0.28);
       tokens.forEach((t) => {
-          var _a, _b;
           const { x, y } = cellCenter(g, t.cx, t.cy);
           const r = Math.floor(g.tile * 0.36);
-          ctx.fillStyle = (_a = t.color) !== null && _a !== void 0 ? _a : '#9adcf0';
+          ctx.fillStyle = t.color ?? '#9adcf0';
           ctx.beginPath();
           ctx.arc(x, y, r, 0, Math.PI * 2);
           ctx.fill();
           ctx.fillStyle = CFG.COLORS.tokenText;
           ctx.font = `${fs}px system-ui`;
-          ctx.fillText(String((_b = t.name) !== null && _b !== void 0 ? _b : ''), x, y);
+          ctx.fillText(String(t.name ?? ''), x, y);
       });
   }
   function cellOccupied(tokens, cx, cy) {
@@ -7726,7 +7653,6 @@ __define('./engine.ts', (exports, module, __require) => {
       return false;
   }
   function spawnLeaders(tokens, g) {
-      var _a, _b;
       const artAlly = getUnitArt('leaderA');
       const artEnemy = getUnitArt('leaderB');
       const allyCell = slotToCell('ally', 8);
@@ -7740,7 +7666,7 @@ __define('./engine.ts', (exports, module, __require) => {
           side: 'ally',
           alive: true,
           art: artAlly,
-          skinKey: (_a = artAlly === null || artAlly === void 0 ? void 0 : artAlly.skinKey) !== null && _a !== void 0 ? _a : null,
+          skinKey: artAlly?.skinKey ?? null,
       });
       tokens.push({
           id: 'leaderB',
@@ -7751,7 +7677,7 @@ __define('./engine.ts', (exports, module, __require) => {
           side: 'enemy',
           alive: true,
           art: artEnemy,
-          skinKey: (_b = artEnemy === null || artEnemy === void 0 ? void 0 : artEnemy.skinKey) !== null && _b !== void 0 ? _b : null,
+          skinKey: artEnemy?.skinKey ?? null,
       });
   }
   /* ---------- Helper ---------- */
@@ -7786,9 +7712,8 @@ __define('./engine.ts', (exports, module, __require) => {
   const pick3Random = (pool, excludeSet) => pickRandom(pool, excludeSet, 3);
   /* ---------- Oblique grid helpers ---------- */
   function rowLR(g, r, C) {
-      var _a;
       const colsW = g.tile * g.cols;
-      const topScale = (_a = C.topScale) !== null && _a !== void 0 ? _a : 0.8;
+      const topScale = C.topScale ?? 0.8;
       const pinch = (1 - topScale) * colsW;
       const t = r / g.rows;
       const width = colsW - pinch * (1 - t);
@@ -7797,16 +7722,15 @@ __define('./engine.ts', (exports, module, __require) => {
       return { left, right };
   }
   function drawGridOblique(ctx, g, cam, opts = {}) {
-      var _a, _b;
-      const C = cam !== null && cam !== void 0 ? cam : DEFAULT_OBLIQUE_CAMERA;
+      const C = cam ?? DEFAULT_OBLIQUE_CAMERA;
       const colors = {
           ally: CFG.COLORS.ally,
           enemy: CFG.COLORS.enemy,
           mid: CFG.COLORS.mid,
           line: CFG.COLORS.line,
-          ...((_a = opts.colors) !== null && _a !== void 0 ? _a : {}),
+          ...(opts.colors ?? {}),
       };
-      const rowGap = ((_b = C.rowGapRatio) !== null && _b !== void 0 ? _b : 0.62) * g.tile;
+      const rowGap = (C.rowGapRatio ?? 0.62) * g.tile;
       for (let cy = 0; cy < g.rows; cy++) {
           const yTop = g.oy + cy * rowGap;
           const yBot = g.oy + (cy + 1) * rowGap;
@@ -7839,9 +7763,8 @@ __define('./engine.ts', (exports, module, __require) => {
       }
   }
   function hitToCellOblique(g, px, py, cam) {
-      var _a;
-      const C = cam !== null && cam !== void 0 ? cam : DEFAULT_OBLIQUE_CAMERA;
-      const rowGap = ((_a = C.rowGapRatio) !== null && _a !== void 0 ? _a : 0.62) * g.tile;
+      const C = cam ?? DEFAULT_OBLIQUE_CAMERA;
+      const rowGap = (C.rowGapRatio ?? 0.62) * g.tile;
       const r = (py - g.oy) / rowGap;
       if (r < 0 || r >= g.rows)
           return null;
@@ -7854,8 +7777,7 @@ __define('./engine.ts', (exports, module, __require) => {
       return { cx, cy };
   }
   function cellQuadOblique(g, cx, cy, C) {
-      var _a;
-      const rowGap = ((_a = C.rowGapRatio) !== null && _a !== void 0 ? _a : 0.62) * g.tile;
+      const rowGap = (C.rowGapRatio ?? 0.62) * g.tile;
       const yTop = g.oy + cy * rowGap;
       const yBot = yTop + rowGap;
       const LRt = rowLR(g, cy, C);
@@ -7873,10 +7795,9 @@ __define('./engine.ts', (exports, module, __require) => {
       return { x, y };
   }
   function projectCellOblique(g, cx, cy, cam) {
-      var _a;
-      const C = cam !== null && cam !== void 0 ? cam : {};
+      const C = cam ?? {};
       const { x, y } = cellCenterOblique(g, cx, cy, C);
-      const k = (_a = C.depthScale) !== null && _a !== void 0 ? _a : 0.94;
+      const k = C.depthScale ?? 0.94;
       const depth = g.rows - 1 - cy;
       const scale = Math.pow(k, depth);
       return { x, y, scale };
@@ -7945,17 +7866,16 @@ __define('./engine.ts', (exports, module, __require) => {
       return normalized.join('|');
   }
   function contextSignature(g, cam) {
-      var _a, _b, _c;
-      const C = cam !== null && cam !== void 0 ? cam : {};
+      const C = cam ?? {};
       return joinSignatureParts([
           g.cols,
           g.rows,
           g.tile,
           g.ox,
           g.oy,
-          (_a = C.rowGapRatio) !== null && _a !== void 0 ? _a : 0.62,
-          (_b = C.topScale) !== null && _b !== void 0 ? _b : 0.8,
-          (_c = C.depthScale) !== null && _c !== void 0 ? _c : 0.94,
+          C.rowGapRatio ?? 0.62,
+          C.topScale ?? 0.8,
+          C.depthScale ?? 0.94,
       ]);
   }
   function warnInvalidToken(context, token) {
@@ -7990,7 +7910,6 @@ __define('./engine.ts', (exports, module, __require) => {
       return entry.projection;
   }
   function clearTokenCaches(token) {
-      var _a, _b;
       if (!token) {
           return;
       }
@@ -7999,12 +7918,11 @@ __define('./engine.ts', (exports, module, __require) => {
           return;
       }
       TOKEN_PROJECTION_CACHE.delete(token);
-      const skinKey = (_a = token.skinKey) !== null && _a !== void 0 ? _a : null;
-      const cacheKey = `${(_b = token.id) !== null && _b !== void 0 ? _b : '__anon__'}::${skinKey !== null && skinKey !== void 0 ? skinKey : ''}`;
+      const skinKey = token.skinKey ?? null;
+      const cacheKey = `${token.id ?? '__anon__'}::${skinKey ?? ''}`;
       TOKEN_VISUAL_CACHE.delete(cacheKey);
   }
   function normalizeSpriteDescriptor(sprite) {
-      var _a, _b;
       if (!sprite)
           return null;
       if (typeof sprite === 'string') {
@@ -8018,10 +7936,10 @@ __define('./engine.ts', (exports, module, __require) => {
           descriptor.cacheKey = sprite.cacheKey;
       }
       if (sprite.skinId !== undefined) {
-          descriptor.skinId = (_a = sprite.skinId) !== null && _a !== void 0 ? _a : null;
+          descriptor.skinId = sprite.skinId ?? null;
       }
       if (sprite.shadow !== undefined) {
-          descriptor.shadow = (_b = sprite.shadow) !== null && _b !== void 0 ? _b : null;
+          descriptor.shadow = sprite.shadow ?? null;
       }
       if (Number.isFinite(sprite.scale)) {
           descriptor.scale = sprite.scale;
@@ -8036,19 +7954,18 @@ __define('./engine.ts', (exports, module, __require) => {
       return descriptor;
   }
   function getTokenVisual(token, art) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j;
       if (!token) {
           return { spriteKey: null, spriteEntry: null, shadowCfg: null };
       }
-      const skinKey = (_b = (_a = art === null || art === void 0 ? void 0 : art.skinKey) !== null && _a !== void 0 ? _a : token.skinKey) !== null && _b !== void 0 ? _b : null;
-      const cacheKey = `${(_c = token.id) !== null && _c !== void 0 ? _c : '__anon__'}::${skinKey !== null && skinKey !== void 0 ? skinKey : ''}`;
-      const descriptor = normalizeSpriteDescriptor((_d = art === null || art === void 0 ? void 0 : art.sprite) !== null && _d !== void 0 ? _d : null);
-      const spriteSrc = (_e = descriptor === null || descriptor === void 0 ? void 0 : descriptor.src) !== null && _e !== void 0 ? _e : null;
-      const spriteKey = (descriptor === null || descriptor === void 0 ? void 0 : descriptor.cacheKey) || (spriteSrc ? `${spriteSrc}::${(_g = (_f = descriptor === null || descriptor === void 0 ? void 0 : descriptor.skinId) !== null && _f !== void 0 ? _f : skinKey) !== null && _g !== void 0 ? _g : ''}` : null);
+      const skinKey = art?.skinKey ?? token.skinKey ?? null;
+      const cacheKey = `${token.id ?? '__anon__'}::${skinKey ?? ''}`;
+      const descriptor = normalizeSpriteDescriptor(art?.sprite ?? null);
+      const spriteSrc = descriptor?.src ?? null;
+      const spriteKey = descriptor?.cacheKey || (spriteSrc ? `${spriteSrc}::${descriptor?.skinId ?? skinKey ?? ''}` : null);
       let entry = TOKEN_VISUAL_CACHE.get(cacheKey);
       if (!entry || entry.spriteKey !== spriteKey) {
           const spriteEntry = spriteSrc ? ensureSpriteLoaded(art) : null;
-          const shadowCfg = (_j = (_h = descriptor === null || descriptor === void 0 ? void 0 : descriptor.shadow) !== null && _h !== void 0 ? _h : art === null || art === void 0 ? void 0 : art.shadow) !== null && _j !== void 0 ? _j : null;
+          const shadowCfg = descriptor?.shadow ?? art?.shadow ?? null;
           entry = {
               spriteKey,
               spriteEntry,
@@ -8059,26 +7976,24 @@ __define('./engine.ts', (exports, module, __require) => {
       return entry;
   }
   function ensureTokenArt(token) {
-      var _a, _b, _c;
       if (!token)
           return null;
       const desiredSkin = getUnitSkin(token.id);
       if (!token.art || token.skinKey !== desiredSkin) {
           const art = getUnitArt(token.id, { skinKey: desiredSkin });
           token.art = art;
-          token.skinKey = (_b = (_a = art === null || art === void 0 ? void 0 : art.skinKey) !== null && _a !== void 0 ? _a : desiredSkin) !== null && _b !== void 0 ? _b : null;
+          token.skinKey = art?.skinKey ?? desiredSkin ?? null;
       }
-      return (_c = token.art) !== null && _c !== void 0 ? _c : null;
+      return token.art ?? null;
   }
   function ensureSpriteLoaded(art) {
-      var _a, _b;
       if (!art || !art.sprite || typeof Image === 'undefined')
           return null;
       const descriptor = normalizeSpriteDescriptor(art.sprite);
       if (!descriptor || !descriptor.src)
           return null;
-      const skinId = (_b = (_a = descriptor.skinId) !== null && _a !== void 0 ? _a : art.skinKey) !== null && _b !== void 0 ? _b : null;
-      const key = descriptor.cacheKey || `${descriptor.src}::${skinId !== null && skinId !== void 0 ? skinId : ''}`;
+      const skinId = descriptor.skinId ?? art.skinKey ?? null;
+      const key = descriptor.cacheKey || `${descriptor.src}::${skinId ?? ''}`;
       let entry = SPRITE_CACHE.get(key);
       if (!entry) {
           const img = new Image();
@@ -8105,8 +8020,7 @@ __define('./engine.ts', (exports, module, __require) => {
       return entry;
   }
   function drawStylizedShape(ctx, width, height, anchor, art) {
-      var _a, _b;
-      const paletteSource = (_a = art === null || art === void 0 ? void 0 : art.palette) !== null && _a !== void 0 ? _a : null;
+      const paletteSource = art?.palette ?? null;
       const palette = paletteSource ? { ...paletteSource } : {};
       const primary = typeof palette.primary === 'string' ? palette.primary : '#86c4ff';
       const secondary = typeof palette.secondary === 'string' ? palette.secondary : '#1f3242';
@@ -8115,7 +8029,7 @@ __define('./engine.ts', (exports, module, __require) => {
       const top = -height * anchor;
       const bottom = height - height * anchor;
       const halfW = width / 2;
-      const shape = (_b = art === null || art === void 0 ? void 0 : art.shape) !== null && _b !== void 0 ? _b : 'sentinel';
+      const shape = art?.shape ?? 'sentinel';
       const gradient = ctx.createLinearGradient(0, top, 0, bottom);
       gradient.addColorStop(0, primary);
       gradient.addColorStop(1, secondary);
@@ -8203,11 +8117,10 @@ __define('./engine.ts', (exports, module, __require) => {
   const nameplateMetricsCache = new Map();
   let nameplateCacheFontSignature = '';
   function drawNameplate(ctx, text, x, y, r, art) {
-      var _a, _b;
       if (!text)
           return;
-      const layout = (_a = art === null || art === void 0 ? void 0 : art.layout) !== null && _a !== void 0 ? _a : {};
-      const fontSize = Math.max(11, Math.floor(r * ((_b = layout.labelFont) !== null && _b !== void 0 ? _b : 0.7)));
+      const layout = art?.layout ?? {};
+      const fontSize = Math.max(11, Math.floor(r * (layout.labelFont ?? 0.7)));
       const padX = Math.max(8, Math.floor(fontSize * 0.6));
       const padY = Math.max(4, Math.floor(fontSize * 0.35));
       ctx.save();
@@ -8236,7 +8149,7 @@ __define('./engine.ts', (exports, module, __require) => {
       const boxX = Math.round(x - width / 2);
       const boxY = Math.round(y - height / 2);
       roundedRectPath(ctx, boxX, boxY, width, height, radius);
-      const label = art === null || art === void 0 ? void 0 : art.label;
+      const label = art?.label;
       const bgColor = (label && typeof label === 'object' && label.bg) || 'rgba(12,20,30,0.82)';
       ctx.fillStyle = bgColor;
       ctx.fill();
@@ -8251,13 +8164,12 @@ __define('./engine.ts', (exports, module, __require) => {
       ctx.restore();
   }
   function drawTokensOblique(ctx, g, tokens, cam, options = {}) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r;
-      const C = cam !== null && cam !== void 0 ? cam : DEFAULT_OBLIQUE_CAMERA;
+      const C = cam ?? DEFAULT_OBLIQUE_CAMERA;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       const baseR = Math.floor(g.tile * 0.36);
       const sig = contextSignature(g, C);
-      const meleeOffsets = (_a = options === null || options === void 0 ? void 0 : options.meleeOffsets) !== null && _a !== void 0 ? _a : null;
+      const meleeOffsets = options?.meleeOffsets ?? null;
       const alive = [];
       for (const token of tokens) {
           if (!token || !token.alive) {
@@ -8275,7 +8187,7 @@ __define('./engine.ts', (exports, module, __require) => {
           if (!projection)
               continue;
           const key = tokenVisualKey(token);
-          const offset = key && meleeOffsets instanceof Map ? (_b = meleeOffsets.get(key)) !== null && _b !== void 0 ? _b : null : null;
+          const offset = key && meleeOffsets instanceof Map ? meleeOffsets.get(key) ?? null : null;
           const adjusted = offset
               ? { x: projection.x + offset.x, y: projection.y + offset.y, scale: projection.scale }
               : projection;
@@ -8288,7 +8200,7 @@ __define('./engine.ts', (exports, module, __require) => {
               return a.token.cx - b.token.cx;
           return ya - yb;
       });
-      const perfCfg = (CFG === null || CFG === void 0 ? void 0 : CFG.PERFORMANCE) || {};
+      const perfCfg = CFG?.PERFORMANCE || {};
       const normalizePreset = (value, fallback = null) => {
           if (value === 'off' || value === 'soft' || value === 'medium')
               return value;
@@ -8303,7 +8215,7 @@ __define('./engine.ts', (exports, module, __require) => {
       const highDprCutoff = Number.isFinite(perfCfg.SHADOW_HIGH_DPR_CUTOFF)
           ? perfCfg.SHADOW_HIGH_DPR_CUTOFF
           : null;
-      const gridDpr = Number.isFinite(g === null || g === void 0 ? void 0 : g.dpr) ? g.dpr : null;
+      const gridDpr = Number.isFinite(g?.dpr) ? g.dpr : null;
       let shadowPreset = null;
       if (perfCfg.LOW_POWER_SHADOWS) {
           shadowPreset = normalizePreset(perfCfg.LOW_SHADOW_PRESET, 'off');
@@ -8321,34 +8233,34 @@ __define('./engine.ts', (exports, module, __require) => {
       }
       const reduceShadows = shadowPreset !== null;
       for (const { token: t, projection: p } of alive) {
-          const scale = (_c = p.scale) !== null && _c !== void 0 ? _c : 1;
+          const scale = p.scale ?? 1;
           const r = Math.max(6, Math.floor(baseR * scale));
           const facing = t.side === 'ally' ? 1 : -1;
           const art = ensureTokenArt(t);
-          const layout = (_d = art === null || art === void 0 ? void 0 : art.layout) !== null && _d !== void 0 ? _d : {};
-          const spriteCfg = (_f = normalizeSpriteDescriptor((_e = art === null || art === void 0 ? void 0 : art.sprite) !== null && _e !== void 0 ? _e : null)) !== null && _f !== void 0 ? _f : {};
-          const spriteHeightMult = (_g = layout.spriteHeight) !== null && _g !== void 0 ? _g : 2.4;
+          const layout = art?.layout ?? {};
+          const spriteCfg = normalizeSpriteDescriptor(art?.sprite ?? null) ?? {};
+          const spriteHeightMult = layout.spriteHeight ?? 2.4;
           const spriteScale = Number.isFinite(spriteCfg.scale) ? spriteCfg.scale : 1;
-          const spriteHeight = r * spriteHeightMult * ((_h = art === null || art === void 0 ? void 0 : art.size) !== null && _h !== void 0 ? _h : 1) * spriteScale;
-          const spriteAspect = (_k = (_j = (Number.isFinite(spriteCfg.aspect) ? spriteCfg.aspect : null)) !== null && _j !== void 0 ? _j : layout.spriteAspect) !== null && _k !== void 0 ? _k : 0.78;
+          const spriteHeight = r * spriteHeightMult * (art?.size ?? 1) * spriteScale;
+          const spriteAspect = (Number.isFinite(spriteCfg.aspect) ? spriteCfg.aspect : null) ?? layout.spriteAspect ?? 0.78;
           const spriteWidth = spriteHeight * spriteAspect;
-          const anchor = Number.isFinite(spriteCfg.anchor) ? spriteCfg.anchor : (_l = layout.anchor) !== null && _l !== void 0 ? _l : 0.78;
+          const anchor = Number.isFinite(spriteCfg.anchor) ? spriteCfg.anchor : layout.anchor ?? 0.78;
           const hasRichArt = !!(art && ((spriteCfg && spriteCfg.src) || art.shape));
           if (hasRichArt) {
               const { spriteEntry, shadowCfg } = getTokenVisual(t, art);
               const spriteReady = !!(spriteEntry && spriteEntry.status === 'ready' && spriteEntry.img);
               ctx.save();
               ctx.translate(p.x, p.y);
-              if (facing === -1 && (art === null || art === void 0 ? void 0 : art.mirror) !== false)
+              if (facing === -1 && art?.mirror !== false)
                   ctx.scale(-1, 1);
-              const rawShadow = (_m = shadowCfg !== null && shadowCfg !== void 0 ? shadowCfg : art === null || art === void 0 ? void 0 : art.shadow) !== null && _m !== void 0 ? _m : null;
+              const rawShadow = shadowCfg ?? art?.shadow ?? null;
               const shadowObject = rawShadow && typeof rawShadow === 'object' ? rawShadow : {};
               const shadowColorFallback = typeof rawShadow === 'string'
                   ? rawShadow
-                  : typeof (art === null || art === void 0 ? void 0 : art.shadow) === 'string'
+                  : typeof art?.shadow === 'string'
                       ? art.shadow
                       : undefined;
-              let shadowColor = (_q = (_p = (_o = shadowObject.color) !== null && _o !== void 0 ? _o : art === null || art === void 0 ? void 0 : art.glow) !== null && _p !== void 0 ? _p : shadowColorFallback) !== null && _q !== void 0 ? _q : 'rgba(0,0,0,0.35)';
+              let shadowColor = shadowObject.color ?? art?.glow ?? shadowColorFallback ?? 'rgba(0,0,0,0.35)';
               let shadowBlur = Number.isFinite(shadowObject.blur) ? shadowObject.blur : Math.max(6, r * 0.7);
               let shadowOffsetX = Number.isFinite(shadowObject.offsetX) ? shadowObject.offsetX : 0;
               let shadowOffsetY = Number.isFinite(shadowObject.offsetY) ? shadowObject.offsetY : Math.max(2, r * 0.2);
@@ -8394,27 +8306,25 @@ __define('./engine.ts', (exports, module, __require) => {
               ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
               ctx.fill();
           }
-          if ((art === null || art === void 0 ? void 0 : art.label) !== false) {
+          if (art?.label !== false) {
               const name = formatName(t.name || t.id);
-              const offset = (_r = layout.labelOffset) !== null && _r !== void 0 ? _r : 1.2;
+              const offset = layout.labelOffset ?? 1.2;
               drawNameplate(ctx, name, p.x, p.y + r * offset, r, art);
           }
       }
   }
   function drawQueuedOblique(ctx, g, queued, cam) {
-      var _a;
       if (!queued)
           return;
-      const C = cam !== null && cam !== void 0 ? cam : DEFAULT_OBLIQUE_CAMERA;
+      const C = cam ?? DEFAULT_OBLIQUE_CAMERA;
       const baseR = Math.floor(g.tile * 0.36);
-      const k = (_a = C.depthScale) !== null && _a !== void 0 ? _a : 0.94;
+      const k = C.depthScale ?? 0.94;
       const drawSide = (map, side) => {
-          var _a, _b;
           if (!isSummonMap(map))
               return;
-          if (side === 'ally' && !((_a = CFG.DEBUG) === null || _a === void 0 ? void 0 : _a.SHOW_QUEUED))
+          if (side === 'ally' && !(CFG.DEBUG?.SHOW_QUEUED))
               return;
-          if (side === 'enemy' && !((_b = CFG.DEBUG) === null || _b === void 0 ? void 0 : _b.SHOW_QUEUED_ENEMY))
+          if (side === 'enemy' && !(CFG.DEBUG?.SHOW_QUEUED_ENEMY))
               return;
           for (const p of map.values()) {
               if (!p)
@@ -8530,7 +8440,6 @@ __define('./entry.ts', (exports, module, __require) => {
       `app--${SCREEN_ARENA_HUB}`,
   ];
   async function loadBundledModule(id) {
-      var _a, _b;
       const globalRequire = typeof globalThis !== 'undefined'
           ? globalThis.__require
           : undefined;
@@ -8545,7 +8454,7 @@ __define('./entry.ts', (exports, module, __require) => {
       const resolved = await loader;
       if (resolved && typeof resolved === 'object') {
           const moduleRecord = resolved;
-          const comingSoonFlag = (_a = moduleRecord.comingSoon) !== null && _a !== void 0 ? _a : (_b = moduleRecord.COMING_SOON_MODULE) === null || _b === void 0 ? void 0 : _b.comingSoon;
+          const comingSoonFlag = moduleRecord.comingSoon ?? moduleRecord.COMING_SOON_MODULE?.comingSoon;
           if (typeof comingSoonFlag !== 'undefined' && moduleRecord.comingSoon !== comingSoonFlag) {
               return { ...moduleRecord, comingSoon: comingSoonFlag };
           }
@@ -8566,11 +8475,11 @@ __define('./entry.ts', (exports, module, __require) => {
   }
   const MODE_DEFINITIONS = MODES.reduce((acc, mode) => {
       const shell = mode.shell;
-      const screenId = (shell === null || shell === void 0 ? void 0 : shell.screenId) || SCREEN_MAIN_MENU;
-      const moduleId = mode.status === MODE_STATUS.AVAILABLE && (shell === null || shell === void 0 ? void 0 : shell.moduleId)
+      const screenId = shell?.screenId || SCREEN_MAIN_MENU;
+      const moduleId = mode.status === MODE_STATUS.AVAILABLE && shell?.moduleId
           ? shell.moduleId
-          : ((shell === null || shell === void 0 ? void 0 : shell.fallbackModuleId) || COMING_SOON_MODULE_ID);
-      const defaultParams = shell === null || shell === void 0 ? void 0 : shell.defaultParams;
+          : (shell?.fallbackModuleId || COMING_SOON_MODULE_ID);
+      const defaultParams = shell?.defaultParams;
       const params = mode.status === MODE_STATUS.AVAILABLE && isScreenParamMap(defaultParams)
           ? cloneScreenParamMap(defaultParams)
           : null;
@@ -8599,13 +8508,13 @@ __define('./entry.ts', (exports, module, __require) => {
       const definition = MODE_DEFINITIONS[mode.id];
       return {
           key: mode.id,
-          id: (definition === null || definition === void 0 ? void 0 : definition.screenId) || SCREEN_MAIN_MENU,
+          id: definition?.screenId || SCREEN_MAIN_MENU,
           title: mode.title,
           description: mode.shortDescription,
           icon: mode.icon,
           tags: Array.isArray(mode.tags) ? [...mode.tags] : [],
           status: mode.status,
-          params: (definition === null || definition === void 0 ? void 0 : definition.params) || null,
+          params: definition?.params || null,
           parentId: mode.parentId || null
       };
   });
@@ -8777,13 +8686,12 @@ __define('./entry.ts', (exports, module, __require) => {
       return /Cannot find module/i.test(message) || /module(\s|-)not(\s|-)found/i.test(message);
   }
   function isComingSoonModule(module) {
-      var _a;
       if (!module)
           return true;
       const record = module;
       if (record.comingSoon)
           return true;
-      if ((_a = record.COMING_SOON_MODULE) === null || _a === void 0 ? void 0 : _a.comingSoon)
+      if (record.COMING_SOON_MODULE?.comingSoon)
           return true;
       return false;
   }
@@ -8847,8 +8755,7 @@ __define('./entry.ts', (exports, module, __require) => {
       lineupView = null;
   }
   function mergeDefinitionParams(definition, params) {
-      var _a;
-      const baseValue = cloneScreenParams((_a = definition === null || definition === void 0 ? void 0 : definition.params) !== null && _a !== void 0 ? _a : null);
+      const baseValue = cloneScreenParams(definition?.params ?? null);
       const incomingValue = cloneScreenParams(params);
       if (!baseValue && !incomingValue) {
           return null;
@@ -8869,7 +8776,6 @@ __define('./entry.ts', (exports, module, __require) => {
       return SCREEN_DEFINITION_LOOKUP.get(screenId) || null;
   }
   async function mountModeScreen(screenId, params) {
-      var _a;
       const token = ++customScreenToken;
       destroyCustomScreen(true);
       dismissModal();
@@ -8918,13 +8824,13 @@ __define('./entry.ts', (exports, module, __require) => {
       if (typeof rootElement.innerHTML === 'string') {
           rootElement.innerHTML = '';
       }
-      const controller = (_a = renderer({
+      const controller = renderer({
           root: rootElement,
           shell: shellInstance,
           definition,
           params: mergedParams,
           screenId
-      })) !== null && _a !== void 0 ? _a : null;
+      }) ?? null;
       customScreenController = controller;
       customScreenId = screenId;
   }
@@ -9006,7 +8912,6 @@ __define('./entry.ts', (exports, module, __require) => {
       return true;
   }
   async function renderCollectionScreen(params) {
-      var _a;
       const root = rootElement;
       const shell = shellInstance;
       if (!root || !shell)
@@ -9042,16 +8947,15 @@ __define('./entry.ts', (exports, module, __require) => {
       if (!definition) {
           throw new Error('Không tìm thấy định nghĩa màn hình bộ sưu tập.');
       }
-      collectionView = ((_a = render({
+      collectionView = (render({
           root,
           shell,
           definition,
           params: params || null,
           screenId: SCREEN_COLLECTION
-      })) !== null && _a !== void 0 ? _a : null);
+      }) ?? null);
   }
   async function renderLineupScreen(params) {
-      var _a;
       const root = rootElement;
       const shell = shellInstance;
       if (!root || !shell)
@@ -9094,7 +8998,7 @@ __define('./entry.ts', (exports, module, __require) => {
           params: params || null,
           screenId: SCREEN_LINEUP
       });
-      lineupView = (_a = lineupResult) !== null && _a !== void 0 ? _a : null;
+      lineupView = lineupResult ?? null;
   }
   function renderMainMenuScreen() {
       if (!rootElement || !shellInstance)
@@ -9118,8 +9022,8 @@ __define('./entry.ts', (exports, module, __require) => {
           metadata: CARD_METADATA,
           playerGender: bootstrapOptions.playerGender || 'neutral',
           onShowComingSoon: (mode) => {
-              const def = (mode === null || mode === void 0 ? void 0 : mode.key) ? MODE_DEFINITIONS[mode.key] : null;
-              const label = (def === null || def === void 0 ? void 0 : def.label) || (mode === null || mode === void 0 ? void 0 : mode.title) || (mode === null || mode === void 0 ? void 0 : mode.label) || '';
+              const def = mode?.key ? MODE_DEFINITIONS[mode.key] : null;
+              const label = def?.label || mode?.title || mode?.label || '';
               showComingSoonModal(label);
           }
       });
@@ -9135,10 +9039,10 @@ __define('./entry.ts', (exports, module, __require) => {
       rootElement.innerHTML = '';
       const container = document.createElement('div');
       container.className = 'pve-screen';
-      container.setAttribute('data-mode', (options === null || options === void 0 ? void 0 : options.modeKey) || 'pve');
+      container.setAttribute('data-mode', options?.modeKey || 'pve');
       container.innerHTML = `
       <div class="pve-toolbar">
-        <h2 class="pve-toolbar__title">${(options === null || options === void 0 ? void 0 : options.title) || 'PvE'}</h2>
+        <h2 class="pve-toolbar__title">${options?.title || 'PvE'}</h2>
         <div class="pve-toolbar__actions">
           <button type="button" class="pve-toolbar__button" data-action="exit">Thoát</button>
         </div>
@@ -9159,16 +9063,15 @@ __define('./entry.ts', (exports, module, __require) => {
     `;
       rootElement.appendChild(container);
       const exitButton = container.querySelector('[data-action="exit"]');
-      if (exitButton instanceof HTMLElement && typeof (options === null || options === void 0 ? void 0 : options.onExit) === 'function') {
+      if (exitButton instanceof HTMLElement && typeof options?.onExit === 'function') {
           exitButton.addEventListener('click', options.onExit);
       }
       return container;
   }
   function teardownActiveSession() {
-      var _a;
       if (!shellInstance)
           return;
-      const current = (_a = shellInstance.getState()) === null || _a === void 0 ? void 0 : _a.activeSession;
+      const current = shellInstance.getState()?.activeSession;
       if (current && typeof current.stop === 'function') {
           try {
               current.stop();
@@ -9180,7 +9083,6 @@ __define('./entry.ts', (exports, module, __require) => {
       shellInstance.setActiveSession(null);
   }
   async function mountPveScreen(params) {
-      var _a, _b;
       const token = ++pveRenderToken;
       const extractStartConfig = (source) => {
           if (!source || typeof source !== 'object')
@@ -9205,15 +9107,15 @@ __define('./entry.ts', (exports, module, __require) => {
       if (!fallbackDefinition) {
           throw new Error('Thiếu định nghĩa chế độ campaign.');
       }
-      const definition = (_a = MODE_DEFINITIONS[modeKey]) !== null && _a !== void 0 ? _a : fallbackDefinition;
+      const definition = MODE_DEFINITIONS[modeKey] ?? fallbackDefinition;
       const rawParams = params && typeof params === 'object' && !Array.isArray(params)
           ? { ...params }
           : {};
-      const defaultParams = (definition === null || definition === void 0 ? void 0 : definition.params) && typeof definition.params === 'object' && !Array.isArray(definition.params)
+      const defaultParams = definition?.params && typeof definition.params === 'object' && !Array.isArray(definition.params)
           ? { ...definition.params }
           : {};
       const mergedParams = { ...defaultParams, ...rawParams };
-      const definitionConfig = extractStartConfig((_b = definition === null || definition === void 0 ? void 0 : definition.params) !== null && _b !== void 0 ? _b : null);
+      const definitionConfig = extractStartConfig(definition?.params ?? null);
       const incomingConfig = extractStartConfig(params);
       const mergedStartConfig = {
           ...(definitionConfig || {}),
@@ -9274,7 +9176,7 @@ __define('./entry.ts', (exports, module, __require) => {
           modeKey: definition.key,
           onExit: () => {
               const state = shell.getState();
-              const session = state === null || state === void 0 ? void 0 : state.activeSession;
+              const session = state?.activeSession;
               if (isStoppableSession(session)) {
                   try {
                       session.stop();
@@ -9350,9 +9252,8 @@ __define('./entry.ts', (exports, module, __require) => {
       }
   }
   (function bootstrap() {
-      var _a, _b, _c;
       const renderMessage = ensureRenderer();
-      const protocol = (_a = window === null || window === void 0 ? void 0 : window.location) === null || _a === void 0 ? void 0 : _a.protocol;
+      const protocol = window?.location?.protocol;
       const isFileProtocol = protocol === 'file:';
       try {
           if (isFileProtocol) {
@@ -9373,7 +9274,7 @@ __define('./entry.ts', (exports, module, __require) => {
           };
           shellInstance = createAppShell({ onError: handleShellError });
           if (typeof document !== 'undefined') {
-              const lowPowerEnabled = Boolean((_c = (_b = CFG === null || CFG === void 0 ? void 0 : CFG.PERFORMANCE) === null || _b === void 0 ? void 0 : _b.LOW_POWER_MODE) !== null && _c !== void 0 ? _c : false);
+              const lowPowerEnabled = Boolean(CFG?.PERFORMANCE?.LOW_POWER_MODE ?? false);
               setPowerMode(lowPowerEnabled ? 'low' : 'normal');
           }
           bootstrapOptions.isFileProtocol = isFileProtocol;
@@ -9553,14 +9454,11 @@ __define('./events.ts', (exports, module, __require) => {
       return null;
   }
   class SimpleEventTarget {
-      constructor() {
-          this.listeners = new Map();
-      }
+      listeners = new Map();
       addEventListener(type, handler) {
-          var _a;
           if (!type || typeof handler !== 'function')
               return;
-          const set = (_a = this.listeners.get(type)) !== null && _a !== void 0 ? _a : new Set();
+          const set = this.listeners.get(type) ?? new Set();
           set.add(handler);
           this.listeners.set(type, set);
       }
@@ -9816,8 +9714,7 @@ __define('./main.ts', (exports, module, __require) => {
       if (currentSession && pendingSkins.size > 0) {
           const appliedUnitIds = [];
           pendingSkins.forEach((skinKey, unitId) => {
-              var _a;
-              const applied = (_a = currentSession === null || currentSession === void 0 ? void 0 : currentSession.setUnitSkin(unitId, skinKey)) !== null && _a !== void 0 ? _a : false;
+              const applied = currentSession?.setUnitSkin(unitId, skinKey) ?? false;
               if (applied) {
                   appliedUnitIds.push(unitId);
               }
@@ -9840,13 +9737,13 @@ __define('./main.ts', (exports, module, __require) => {
   function updateGameConfig(config = {}) {
       if (!currentSession)
           return;
-      currentSession.updateConfig(config !== null && config !== void 0 ? config : {});
+      currentSession.updateConfig(config ?? {});
   }
   function getCurrentSession() {
       return currentSession;
   }
   function setUnitSkin(unitId, skinKey) {
-      const normalizedSkinKey = skinKey !== null && skinKey !== void 0 ? skinKey : null;
+      const normalizedSkinKey = skinKey ?? null;
       if (!currentSession) {
           pendingSkins.set(unitId, normalizedSkinKey);
           return true;
@@ -9858,8 +9755,7 @@ __define('./main.ts', (exports, module, __require) => {
       return applied;
   }
   function onGameEvent(type, handler) {
-      var _a;
-      const subscribe = (_a = currentSession === null || currentSession === void 0 ? void 0 : currentSession.onEvent) !== null && _a !== void 0 ? _a : addGameEventListener;
+      const subscribe = currentSession?.onEvent ?? addGameEventListener;
       return subscribe(type, handler);
   }
   //# sourceMappingURL=stdin.js.map
@@ -9896,14 +9792,12 @@ __define('./meta.ts', (exports, module, __require) => {
   const Meta = {
       get: getMetaById,
       classOf(id) {
-          var _a;
           const entry = getMetaById(id);
-          return (_a = entry === null || entry === void 0 ? void 0 : entry.class) !== null && _a !== void 0 ? _a : null;
+          return entry?.class ?? null;
       },
       rankOf(id) {
-          var _a;
           const entry = getMetaById(id);
-          return (_a = entry === null || entry === void 0 ? void 0 : entry.rank) !== null && _a !== void 0 ? _a : null;
+          return entry?.rank ?? null;
       },
       kit(id) {
           return getUnitKitById(id);
@@ -9914,10 +9808,9 @@ __define('./meta.ts', (exports, module, __require) => {
       },
   };
   const adaptMetaEntry = (entry) => {
-      var _a;
       if (!entry)
           return null;
-      const resolvedKit = (_a = entry.kit) !== null && _a !== void 0 ? _a : getUnitKitById(entry.id);
+      const resolvedKit = entry.kit ?? getUnitKitById(entry.id);
       if (!resolvedKit)
           return null;
       const roster = { ...entry, kit: resolvedKit };
@@ -9982,7 +9875,6 @@ __define('./meta.ts', (exports, module, __require) => {
       return out;
   };
   function makeInstanceStats(unitId, level = 1, stars = 0) {
-      var _a, _b, _c;
       const entry = Meta.get(unitId);
       if (!entry)
           return { ...EMPTY_INSTANCE_STATS };
@@ -9993,11 +9885,11 @@ __define('./meta.ts', (exports, module, __require) => {
       const delta = CLASS_GROWTH[className];
       // 1. TÍNH CHỈ SỐ GỐC THEO LEVEL (TIA LASER)
       const currentBase = {
-          HP: base.HP + (level - 1) * ((delta === null || delta === void 0 ? void 0 : delta.HP) || 0),
-          ATK: base.ATK + (level - 1) * ((delta === null || delta === void 0 ? void 0 : delta.ATK) || 0),
-          WIL: base.WIL + (level - 1) * ((delta === null || delta === void 0 ? void 0 : delta.WIL) || 0),
-          ARM: base.ARM + (level - 1) * ((delta === null || delta === void 0 ? void 0 : delta.ARM) || 0),
-          RES: base.RES + (level - 1) * ((delta === null || delta === void 0 ? void 0 : delta.RES) || 0)
+          HP: base.HP + (level - 1) * (delta?.HP || 0),
+          ATK: base.ATK + (level - 1) * (delta?.ATK || 0),
+          WIL: base.WIL + (level - 1) * (delta?.WIL || 0),
+          ARM: base.ARM + (level - 1) * (delta?.ARM || 0),
+          RES: base.RES + (level - 1) * (delta?.RES || 0)
       };
       // 2. TÍNH HỆ SỐ (THẤU KÍNH) = RANK + SAO
       const rankMult = RANK_MULT[rank] + (stars * 0.05);
@@ -10009,10 +9901,10 @@ __define('./meta.ts', (exports, module, __require) => {
           wil: Math.trunc(currentBase.WIL * rankMult),
           arm: Number((currentBase.ARM * rankMult).toFixed(4)),
           res: Number((currentBase.RES * rankMult).toFixed(4)),
-          agi: Math.trunc((_a = base.AGI) !== null && _a !== void 0 ? _a : 0),
-          per: Math.trunc((_b = base.PER) !== null && _b !== void 0 ? _b : 0),
+          agi: Math.trunc(base.AGI ?? 0),
+          per: Math.trunc(base.PER ?? 0),
           spd: base.SPD || 1,
-          aeMax: Math.trunc((_c = base.AEmax) !== null && _c !== void 0 ? _c : 0),
+          aeMax: Math.trunc(base.AEmax ?? 0),
           ae: 0,
           aeRegen: base.AEregen || 0,
           hpRegen: base.HPregen || 0,
@@ -10020,19 +9912,18 @@ __define('./meta.ts', (exports, module, __require) => {
   }
   // Nộ khi vào sân (trừ leader). Revive: theo spec của skill.
   function initialRageFor(unitId, opts = {}) {
-      var _a, _b, _c;
-      const onSpawn = (_a = Meta.kit(unitId)) === null || _a === void 0 ? void 0 : _a.onSpawn;
+      const onSpawn = Meta.kit(unitId)?.onSpawn;
       if (!onSpawn)
           return 0;
       if (onSpawn.exceptLeader && opts.isLeader) {
           const leaderSpecific = extractOnSpawnRage(onSpawn, { ...opts, isLeader: true });
-          return Math.max(0, leaderSpecific !== null && leaderSpecific !== void 0 ? leaderSpecific : 0);
+          return Math.max(0, leaderSpecific ?? 0);
       }
       const amount = extractOnSpawnRage(onSpawn, opts);
       if (amount != null)
           return Math.max(0, amount);
       if (opts.revive)
-          return Math.max(0, (_c = (_b = opts.reviveSpec) === null || _b === void 0 ? void 0 : _b.rage) !== null && _c !== void 0 ? _c : 0);
+          return Math.max(0, opts.reviveSpec?.rage ?? 0);
       return 0;
   }
   //# sourceMappingURL=stdin.js.map
@@ -10051,7 +9942,6 @@ __define('./modes/coming-soon.stub.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'COMING_SOON_MODULE')) exports.COMING_SOON_MODULE = COMING_SOON_MODULE;
 });
 __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => {
-  var _a, _b;
   //v0.7.7
   const __dep2 = __require('./turns.ts');
   const stepTurn = __dep2.stepTurn;
@@ -10152,7 +10042,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       }
       return null;
   };
-  const toFiniteOrZero = (value) => { var _a; return (_a = parseFiniteNumber(value)) !== null && _a !== void 0 ? _a : 0; };
+  const toFiniteOrZero = (value) => parseFiniteNumber(value) ?? 0;
   const toStartConfigOverrides = (value) => {
       if (!isPlainRecord(value))
           return {};
@@ -10197,18 +10087,16 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       return normalized;
   };
   const coerceSummonCreep = (value) => {
-      var _a;
       if (!isPlainRecord(value))
           return null;
       const record = value;
       const creep = { ...record };
-      const ttlTurns = parseFiniteNumber((_a = record.ttlTurns) !== null && _a !== void 0 ? _a : record.ttl);
+      const ttlTurns = parseFiniteNumber(record.ttlTurns ?? record.ttl);
       if (ttlTurns != null)
           creep.ttlTurns = ttlTurns;
       return creep;
   };
   const coerceSummonSpec = (value) => {
-      var _a;
       if (!value || typeof value !== 'object')
           return null;
       const spec = { ...value };
@@ -10231,13 +10119,13 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       }
       const count = parseFiniteNumber(spec.count);
       const summonCount = parseFiniteNumber(spec.summonCount);
-      const resolvedCount = count !== null && count !== void 0 ? count : summonCount;
+      const resolvedCount = count ?? summonCount;
       if (resolvedCount != null) {
           spec.count = resolvedCount;
           spec.summonCount = resolvedCount;
       }
       const ttl = parseFiniteNumber(spec.ttl);
-      const ttlTurns = parseFiniteNumber((_a = spec.ttlTurns) !== null && _a !== void 0 ? _a : ttl);
+      const ttlTurns = parseFiniteNumber(spec.ttlTurns ?? ttl);
       if (ttlTurns != null) {
           spec.ttlTurns = ttlTurns;
           if (ttl == null)
@@ -10280,7 +10168,6 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       return damage;
   };
   const coerceUlt = (value) => {
-      var _a, _b, _c, _d, _e, _f;
       if (!value || typeof value !== 'object')
           return null;
       const record = value;
@@ -10310,13 +10197,15 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       if (alliesParsed != null)
           ult.allies = alliesParsed;
       ult.runtime = coerceSkillRuntime(record.runtime);
-      const resolvedSummon = (_c = (_a = coerceSummonSpec(record.summon)) !== null && _a !== void 0 ? _a : coerceSummonSpec((_b = record.metadata) === null || _b === void 0 ? void 0 : _b.summon)) !== null && _c !== void 0 ? _c : coerceSummonSpec((_d = record.meta) === null || _d === void 0 ? void 0 : _d.summon);
+      const resolvedSummon = coerceSummonSpec(record.summon)
+          ?? coerceSummonSpec(record.metadata?.summon)
+          ?? coerceSummonSpec(record.meta?.summon);
       if (resolvedSummon)
           ult.summon = resolvedSummon;
-      if ((_e = ult.metadata) === null || _e === void 0 ? void 0 : _e.summon) {
+      if (ult.metadata?.summon) {
           ult.metadata = { ...ult.metadata, summon: coerceSummonSpec(ult.metadata.summon) };
       }
-      if ((_f = ult.meta) === null || _f === void 0 ? void 0 : _f.summon) {
+      if (ult.meta?.summon) {
           ult.meta = { ...ult.meta, summon: coerceSummonSpec(ult.meta.summon) };
       }
       ult.damage = coerceDamageSpec(record.damage);
@@ -10351,40 +10240,37 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       return fallback;
   };
   const getUltHitCount = (ult) => {
-      const runtime = ult === null || ult === void 0 ? void 0 : ult.runtime;
+      const runtime = ult?.runtime;
       const resolved = resolveCount([
-          ult === null || ult === void 0 ? void 0 : ult.hits,
-          runtime === null || runtime === void 0 ? void 0 : runtime.hits,
-          runtime === null || runtime === void 0 ? void 0 : runtime.hitCount,
-          runtime === null || runtime === void 0 ? void 0 : runtime.count,
+          ult?.hits,
+          runtime?.hits,
+          runtime?.hitCount,
+          runtime?.count,
       ], 1, { min: 1 });
       return Math.max(1, resolved);
   };
   const getUltTargetCount = (ult, fallback) => {
-      const runtime = ult === null || ult === void 0 ? void 0 : ult.runtime;
+      const runtime = ult?.runtime;
       return resolveCount([
-          ult === null || ult === void 0 ? void 0 : ult.targets,
-          runtime === null || runtime === void 0 ? void 0 : runtime.targets,
-          runtime === null || runtime === void 0 ? void 0 : runtime.targetCount,
-          runtime === null || runtime === void 0 ? void 0 : runtime.count,
+          ult?.targets,
+          runtime?.targets,
+          runtime?.targetCount,
+          runtime?.count,
       ], fallback, { min: 0 });
   };
-  const getUltAlliesCount = (ult, fallback) => {
-      var _a, _b;
-      return resolveCount([
-          ult === null || ult === void 0 ? void 0 : ult.allies,
-          (_a = ult === null || ult === void 0 ? void 0 : ult.runtime) === null || _a === void 0 ? void 0 : _a.targets,
-          (_b = ult === null || ult === void 0 ? void 0 : ult.runtime) === null || _b === void 0 ? void 0 : _b.count,
-      ], fallback, { min: 0 });
-  };
+  const getUltAlliesCount = (ult, fallback) => resolveCount([
+      ult?.allies,
+      ult?.runtime?.targets,
+      ult?.runtime?.count,
+  ], fallback, { min: 0 });
   const getUltDurationTurns = (ult, fallback) => {
-      const runtime = ult === null || ult === void 0 ? void 0 : ult.runtime;
+      const runtime = ult?.runtime;
       const resolved = resolveCount([
-          ult === null || ult === void 0 ? void 0 : ult.duration,
-          ult === null || ult === void 0 ? void 0 : ult.turns,
-          runtime === null || runtime === void 0 ? void 0 : runtime.duration,
-          runtime === null || runtime === void 0 ? void 0 : runtime.turns,
-          runtime === null || runtime === void 0 ? void 0 : runtime.durationTurns,
+          ult?.duration,
+          ult?.turns,
+          runtime?.duration,
+          runtime?.turns,
+          runtime?.durationTurns,
       ], fallback, { min: 1 });
       return Math.max(1, resolved);
   };
@@ -10460,12 +10346,11 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       return 0;
   };
   function sanitizeStartConfig(config) {
-      var _a, _b;
       if (!isPlainRecord(config)) {
           return { rest: {}, root: null };
       }
       const { root, rootEl, ...rest } = config;
-      const resolvedRoot = (_b = (_a = toRootLike(root)) !== null && _a !== void 0 ? _a : toRootLike(rootEl)) !== null && _b !== void 0 ? _b : null;
+      const resolvedRoot = toRootLike(root) ?? toRootLike(rootEl) ?? null;
       return {
           rest: toStartConfigOverrides(rest),
           root: resolvedRoot,
@@ -10478,10 +10363,9 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   let hudCleanup = null;
   const DEFAULT_CAMERA_KEY = 'landscape_oblique';
   const resolveCameraPreset = () => {
-      var _a;
-      const key = ((_a = CFG.CAMERA) !== null && _a !== void 0 ? _a : DEFAULT_CAMERA_KEY);
+      const key = (CFG.CAMERA ?? DEFAULT_CAMERA_KEY);
       const preset = CAM[key];
-      return preset !== null && preset !== void 0 ? preset : CAM[DEFAULT_CAMERA_KEY];
+      return preset ?? CAM[DEFAULT_CAMERA_KEY];
   };
   const CAM_PRESET = resolveCameraPreset();
   const getCameraPresetSignature = (preset) => {
@@ -10507,14 +10391,14 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           .join('|');
   };
   let lastCamPresetSignature = getCameraPresetSignature(CAM_PRESET);
-  const HAND_SIZE = (_a = CFG.HAND_SIZE) !== null && _a !== void 0 ? _a : 4;
+  const HAND_SIZE = CFG.HAND_SIZE ?? 4;
   ensureNestedModuleSupport();
   const getNow = () => sessionNow();
   const SUPPORTS_PERF_NOW = typeof globalThis !== 'undefined'
       && !!globalThis.performance
       && typeof globalThis.performance.now === 'function';
-  const RAF_TIMESTAMP_MAX = 2147483647; // ~24 ngày tính từ mốc điều hướng
-  const RAF_DRIFT_TOLERANCE_MS = 120000; // 2 phút – đủ rộng cho mọi sai lệch hợp lệ
+  const RAF_TIMESTAMP_MAX = 2_147_483_647; // ~24 ngày tính từ mốc điều hướng
+  const RAF_DRIFT_TOLERANCE_MS = 120_000; // 2 phút – đủ rộng cho mọi sai lệch hợp lệ
   const CLOCK_DRIFT_TOLERANCE_MS = RAF_DRIFT_TOLERANCE_MS;
   const LOGIC_MIN_INTERVAL_MS = 40;
   const MAX_TURNS_PER_TICK = 6;
@@ -10543,10 +10427,10 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   const hpBarGradientCache = new Map();
   const meleeOffsetTokenKeys = new Set();
   const makeMeleeTokenKey = (token) => {
-      if (Number.isFinite(token === null || token === void 0 ? void 0 : token.iid)) {
-          return `iid:${token === null || token === void 0 ? void 0 : token.iid}`;
+      if (Number.isFinite(token?.iid)) {
+          return `iid:${token?.iid}`;
       }
-      if (typeof (token === null || token === void 0 ? void 0 : token.id) === 'string' && token.id.length > 0) {
+      if (typeof token?.id === 'string' && token.id.length > 0) {
           return `id:${token.id}`;
       }
       return null;
@@ -10561,10 +10445,9 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       return offsets;
   };
   const renderSummonBar = () => {
-      var _a, _b;
       const game = getInitializedGame();
-      const bar = (_b = (_a = game === null || game === void 0 ? void 0 : game.ui) === null || _a === void 0 ? void 0 : _a.bar) !== null && _b !== void 0 ? _b : null;
-      if (bar === null || bar === void 0 ? void 0 : bar.render)
+      const bar = game?.ui?.bar ?? null;
+      if (bar?.render)
           bar.render();
   };
   function cleanupSummonBar() {
@@ -10576,7 +10459,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       }
       summonBarHandle = null;
       const game = getInitializedGame();
-      if (game === null || game === void 0 ? void 0 : game.ui) {
+      if (game?.ui) {
           game.ui.bar = null;
       }
   }
@@ -10591,11 +10474,10 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       invalidateSceneCache();
       meleeOffsetTokenKeys.clear();
   }
-  if ((_b = CFG === null || CFG === void 0 ? void 0 : CFG.DEBUG) === null || _b === void 0 ? void 0 : _b.LOG_EVENTS) {
+  if (CFG?.DEBUG?.LOG_EVENTS) {
       const logEvent = (type) => (event) => {
-          var _a, _b, _c, _d;
-          const detail = ((_a = event === null || event === void 0 ? void 0 : event.detail) !== null && _a !== void 0 ? _a : {});
-          const unitRaw = ((_b = detail['unit']) !== null && _b !== void 0 ? _b : null);
+          const detail = (event?.detail ?? {});
+          const unitRaw = (detail['unit'] ?? null);
           const readString = (value) => (typeof value === 'string' ? value : null);
           const readNumber = (value) => {
               if (typeof value === 'number' && Number.isFinite(value))
@@ -10613,11 +10495,11 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               orderIndex: readNumber(detail['orderIndex']),
               orderLength: readNumber(detail['orderLength']),
               phase: readString(detail['phase']),
-              unit: (_c = readString(unitRaw === null || unitRaw === void 0 ? void 0 : unitRaw.id)) !== null && _c !== void 0 ? _c : readString(unitRaw === null || unitRaw === void 0 ? void 0 : unitRaw.name),
+              unit: readString(unitRaw?.id) ?? readString(unitRaw?.name),
               action: readString(detail['action']),
               skipped: Boolean(detail['skipped']),
               reason: readString(detail['reason']),
-              processedChain: (_d = detail['processedChain']) !== null && _d !== void 0 ? _d : null,
+              processedChain: detail['processedChain'] ?? null,
           };
           console.debug(`[events] ${type}`, info);
       };
@@ -10678,7 +10560,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               catch (err) {
                   console.error('[draw]', err);
               }
-              if ((Game === null || Game === void 0 ? void 0 : Game.vfx) && Game.vfx.length)
+              if (Game?.vfx && Game.vfx.length)
                   scheduleDraw();
           });
       }
@@ -10696,7 +10578,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               catch (err) {
                   console.error('[draw]', err);
               }
-              if ((Game === null || Game === void 0 ? void 0 : Game.vfx) && Game.vfx.length)
+              if (Game?.vfx && Game.vfx.length)
                   scheduleDraw();
           }, 16);
       }
@@ -10753,7 +10635,6 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   const DEFAULT_TOKEN_COLOR = '#a9f58c';
   function refreshQueuedArtFor(unitId) {
       const apply = (map) => {
-          var _a, _b, _c, _d;
           if (!map || typeof map.values !== 'function')
               return;
           for (const pending of map.values()) {
@@ -10762,28 +10643,27 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               const updated = getUnitArt(unitId);
               const pendingExt = pending;
               if (pendingExt) {
-                  const nextColor = (_c = (_b = (_a = updated === null || updated === void 0 ? void 0 : updated.palette) === null || _a === void 0 ? void 0 : _a.primary) !== null && _b !== void 0 ? _b : pendingExt.color) !== null && _c !== void 0 ? _c : DEFAULT_TOKEN_COLOR;
-                  pendingExt.art = updated !== null && updated !== void 0 ? updated : null;
-                  pendingExt.skinKey = (_d = updated === null || updated === void 0 ? void 0 : updated.skinKey) !== null && _d !== void 0 ? _d : null;
+                  const nextColor = updated?.palette?.primary ?? pendingExt.color ?? DEFAULT_TOKEN_COLOR;
+                  pendingExt.art = updated ?? null;
+                  pendingExt.skinKey = updated?.skinKey ?? null;
                   pendingExt.color = nextColor;
               }
           }
       };
-      if (!(Game === null || Game === void 0 ? void 0 : Game.queued))
+      if (!Game?.queued)
           return;
       apply(Game.queued.ally);
       apply(Game.queued.enemy);
   }
   function setUnitSkinForSession(unitId, skinKey) {
-      var _a, _b;
       if (!Game)
           return false;
       const ok = setUnitSkin(unitId, skinKey);
       if (!ok)
           return false;
       const art = getUnitArt(unitId);
-      const resolvedSkin = (_a = art === null || art === void 0 ? void 0 : art.skinKey) !== null && _a !== void 0 ? _a : null;
-      const palettePrimary = (_b = art === null || art === void 0 ? void 0 : art.palette) === null || _b === void 0 ? void 0 : _b.primary;
+      const resolvedSkin = art?.skinKey ?? null;
+      const palettePrimary = art?.palette?.primary;
       const primaryColor = typeof palettePrimary === 'string' ? palettePrimary : null;
       const resolveColor = (current) => {
           if (typeof primaryColor === 'string' && primaryColor.length > 0) {
@@ -10799,7 +10679,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               return;
           const color = typeof entry.color === 'string' ? entry.color : null;
           const nextColor = resolveColor(color);
-          entry.art = art !== null && art !== void 0 ? art : null;
+          entry.art = art ?? null;
           entry.skinKey = resolvedSkin;
           entry.color = nextColor;
       };
@@ -10854,10 +10734,9 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   // Master clock theo timestamp – tránh drift giữa nhiều interval
   let CLOCK = null;
   function createClock() {
-      var _a;
       const safe = safeNow();
       const now = getNow();
-      const intervalCandidate = (_a = CFG === null || CFG === void 0 ? void 0 : CFG.ANIMATION) === null || _a === void 0 ? void 0 : _a.turnIntervalMs;
+      const intervalCandidate = CFG?.ANIMATION?.turnIntervalMs;
       const parsedInterval = Number(intervalCandidate);
       const turnEveryMs = Number.isFinite(parsedInterval) && parsedInterval > 0
           ? parsedInterval
@@ -10878,7 +10757,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   // Xác chết chờ vanish (để sau này thay bằng dead-animation)
   const DEATH_VANISH_MS = 900;
   function cleanupDead(now) {
-      if (!(Game === null || Game === void 0 ? void 0 : Game.tokens))
+      if (!Game?.tokens)
           return;
       const tokens = Game.tokens;
       const keep = [];
@@ -10901,19 +10780,18 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   }
   // LẤY TỪ INSTANCE đang đứng trên sân (đúng spec: thừa hưởng % chỉ số hiện tại của chủ)
   function creepStatsFromInherit(masterUnit, inherit) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
       if (!inherit || typeof inherit !== 'object')
           return {};
-      const hpRatio = (_d = parseFiniteNumber((_c = (_b = (_a = inherit.HP) !== null && _a !== void 0 ? _a : inherit.hp) !== null && _b !== void 0 ? _b : inherit.HPMax) !== null && _c !== void 0 ? _c : inherit.hpMax)) !== null && _d !== void 0 ? _d : 0;
-      const atkRatio = (_f = parseFiniteNumber((_e = inherit.ATK) !== null && _e !== void 0 ? _e : inherit.atk)) !== null && _f !== void 0 ? _f : 0;
-      const wilRatio = (_h = parseFiniteNumber((_g = inherit.WIL) !== null && _g !== void 0 ? _g : inherit.wil)) !== null && _h !== void 0 ? _h : 0;
-      const resRatio = (_k = parseFiniteNumber((_j = inherit.RES) !== null && _j !== void 0 ? _j : inherit.res)) !== null && _k !== void 0 ? _k : 0;
-      const armRatio = (_m = parseFiniteNumber((_l = inherit.ARM) !== null && _l !== void 0 ? _l : inherit.arm)) !== null && _m !== void 0 ? _m : 0;
-      const hpMaxBase = toFiniteOrZero(masterUnit === null || masterUnit === void 0 ? void 0 : masterUnit.hpMax);
-      const atkBase = toFiniteOrZero(masterUnit === null || masterUnit === void 0 ? void 0 : masterUnit.atk);
-      const wilBase = toFiniteOrZero(masterUnit === null || masterUnit === void 0 ? void 0 : masterUnit.wil);
-      const resBase = toFiniteOrZero(masterUnit === null || masterUnit === void 0 ? void 0 : masterUnit.res);
-      const armBase = toFiniteOrZero(masterUnit === null || masterUnit === void 0 ? void 0 : masterUnit.arm);
+      const hpRatio = parseFiniteNumber(inherit.HP ?? inherit.hp ?? inherit.HPMax ?? inherit.hpMax) ?? 0;
+      const atkRatio = parseFiniteNumber(inherit.ATK ?? inherit.atk) ?? 0;
+      const wilRatio = parseFiniteNumber(inherit.WIL ?? inherit.wil) ?? 0;
+      const resRatio = parseFiniteNumber(inherit.RES ?? inherit.res) ?? 0;
+      const armRatio = parseFiniteNumber(inherit.ARM ?? inherit.arm) ?? 0;
+      const hpMaxBase = toFiniteOrZero(masterUnit?.hpMax);
+      const atkBase = toFiniteOrZero(masterUnit?.atk);
+      const wilBase = toFiniteOrZero(masterUnit?.wil);
+      const resBase = toFiniteOrZero(masterUnit?.res);
+      const armBase = toFiniteOrZero(masterUnit?.arm);
       const hpMax = Math.round(hpMaxBase * hpRatio);
       const atk = Math.round(atkBase * atkRatio);
       const wil = Math.round(wilBase * wilRatio);
@@ -10935,12 +10813,12 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       return stats;
   }
   function getMinionsOf(masterIid) {
-      return ((Game === null || Game === void 0 ? void 0 : Game.tokens) || []).filter((t) => t.isMinion && t.ownerIid === masterIid && t.alive);
+      return (Game?.tokens || []).filter((t) => t.isMinion && t.ownerIid === masterIid && t.alive);
   }
   function removeOldestMinions(masterIid, count) {
       if (count <= 0)
           return;
-      const tokens = Game === null || Game === void 0 ? void 0 : Game.tokens;
+      const tokens = Game?.tokens;
       if (!tokens)
           return;
       const list = getMinionsOf(masterIid).sort((a, b) => (a.bornSerial || 0) - (b.bornSerial || 0));
@@ -10963,13 +10841,12 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   }
   // Thực thi Ult: Summoner -> Immediate Summon theo meta; class khác: trừ nộ
   function performUlt(unit) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, _23, _24, _25, _26;
       const game = getInitializedGame();
       if (!game) {
           setFury(unit, 0);
           return;
       }
-      const metaGetter = (_a = game.meta) === null || _a === void 0 ? void 0 : _a.get;
+      const metaGetter = game.meta?.get;
       const meta = typeof metaGetter === 'function' ? metaGetter.call(game.meta, unit.id) : null;
       if (!meta) {
           setFury(unit, 0);
@@ -10994,27 +10871,27 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               return !cellReserved(aliveNow, queued, cx, cy);
           })
               .sort((a, b) => a - b);
-          const desired = (_b = parseFiniteNumber(summonSpec.count)) !== null && _b !== void 0 ? _b : (patternSlots.length || 1);
+          const desired = parseFiniteNumber(summonSpec.count) ?? (patternSlots.length || 1);
           const need = Math.min(patternSlots.length, Math.max(0, desired));
           if (need > 0) {
-              const limit = (_c = parseFiniteNumber(summonSpec.limit)) !== null && _c !== void 0 ? _c : Infinity;
+              const limit = parseFiniteNumber(summonSpec.limit) ?? Infinity;
               const have = getMinionsOf(unit.iid).length;
               const over = Math.max(0, have + need - limit);
               const replacePolicy = typeof summonSpec.replace === 'string' ? summonSpec.replace.trim().toLowerCase() : null;
               if (over > 0 && replacePolicy === 'oldest')
                   removeOldestMinions(unit.iid, over);
               const inheritStats = creepStatsFromInherit(unit, summonSpec.inherit);
-              const ttlBase = parseFiniteNumber((_d = summonSpec.ttlTurns) !== null && _d !== void 0 ? _d : summonSpec.ttl);
+              const ttlBase = parseFiniteNumber(summonSpec.ttlTurns ?? summonSpec.ttl);
               for (let i = 0; i < need; i++) {
                   const s = patternSlots[i];
-                  const base = ((_e = summonSpec.creep) !== null && _e !== void 0 ? _e : {});
-                  const spawnTtl = (_g = parseFiniteNumber((_f = base.ttlTurns) !== null && _f !== void 0 ? _f : base.ttl)) !== null && _g !== void 0 ? _g : ttlBase;
+                  const base = (summonSpec.creep ?? {});
+                  const spawnTtl = parseFiniteNumber(base.ttlTurns ?? base.ttl) ?? ttlBase;
                   const creepId = typeof base.id === 'string' && base.id.trim() ? base.id : `${unit.id}_minion`;
                   const creepName = typeof base.name === 'string' && base.name.trim()
                       ? base.name
                       : (typeof base.label === 'string' && base.label.trim() ? base.label : 'Creep');
                   const creepColor = typeof base.color === 'string' && base.color.trim() ? base.color : '#ffd27d';
-                  const ttlTurns = Math.max(1, Math.round((_h = parseFiniteNumber(spawnTtl)) !== null && _h !== void 0 ? _h : 3));
+                  const ttlTurns = Math.max(1, Math.round(parseFiniteNumber(spawnTtl) ?? 3));
                   enqueueImmediate(game, {
                       by: unit.id,
                       side: unit.side,
@@ -11035,7 +10912,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           setFury(unit, 0);
           return;
       }
-      const u = coerceUlt((_j = meta.kit) === null || _j === void 0 ? void 0 : _j.ult);
+      const u = coerceUlt(meta.kit?.ult);
       if (!u) {
           spendFury(unit, resolveUltCost(unit));
           return;
@@ -11048,7 +10925,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               const foes = aliveNow.filter(t => t.side === foeSide);
               if (!foes.length)
                   break;
-              const scale = (_k = parseFiniteNumber(u.power)) !== null && _k !== void 0 ? _k : 1.2;
+              const scale = parseFiniteNumber(u.power) ?? 1.2;
               let totalDrain = 0;
               for (const tgt of foes) {
                   if (!tgt.alive)
@@ -11070,7 +10947,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               break;
           }
           case 'hpTradeBurst': {
-              const hpTradePctRaw = (_o = parseFiniteNumber((_l = u.hpTradePercent) !== null && _l !== void 0 ? _l : (_m = u.hpTrade) === null || _m === void 0 ? void 0 : _m.percentMaxHP)) !== null && _o !== void 0 ? _o : 0;
+              const hpTradePctRaw = parseFiniteNumber(u.hpTradePercent ?? u.hpTrade?.percentMaxHP) ?? 0;
               const hpTradePct = Math.max(0, Math.min(0.95, hpTradePctRaw));
               const hpMax = Number.isFinite(unit.hpMax) ? unit.hpMax : 0;
               const currentHp = Number.isFinite(unit.hp) ? unit.hp : 0;
@@ -11082,7 +10959,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   gainFury(unit, {
                       type: 'damageTaken',
                       dealt: hpPayment,
-                      selfMaxHp: Number.isFinite(unit === null || unit === void 0 ? void 0 : unit.hpMax) ? unit.hpMax : undefined,
+                      selfMaxHp: Number.isFinite(unit?.hpMax) ? unit.hpMax : undefined,
                       damageTaken: hpPayment
                   });
                   finishFuryHit(unit);
@@ -11137,24 +11014,24 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                       catch (_) { }
                   }
               }
-              const damageSpec = ((_p = u.damage) !== null && _p !== void 0 ? _p : {});
+              const damageSpec = (u.damage ?? {});
               const dtype = typeof damageSpec.type === 'string' && damageSpec.type ? damageSpec.type : 'arcane';
               const attackType = u.countsAsBasic ? 'basic' : 'skill';
-              const wilScale = (_r = parseFiniteNumber((_q = damageSpec.scaleWIL) !== null && _q !== void 0 ? _q : damageSpec.scaleWil)) !== null && _r !== void 0 ? _r : 0;
-              const flatAdd = (_t = parseFiniteNumber((_s = damageSpec.flat) !== null && _s !== void 0 ? _s : damageSpec.flatAdd)) !== null && _t !== void 0 ? _t : 0;
-              const debuffSpec = (_u = u.appliesDebuff) !== null && _u !== void 0 ? _u : null;
-              const debuffId = typeof (debuffSpec === null || debuffSpec === void 0 ? void 0 : debuffSpec.id) === 'string' && debuffSpec.id ? debuffSpec.id : 'loithienanh_spd_burn';
-              const debuffAmount = (_w = parseFiniteNumber((_v = debuffSpec === null || debuffSpec === void 0 ? void 0 : debuffSpec.amount) !== null && _v !== void 0 ? _v : debuffSpec === null || debuffSpec === void 0 ? void 0 : debuffSpec.amountPercent)) !== null && _w !== void 0 ? _w : 0;
-              const debuffMaxStacks = Math.max(1, Math.round((_x = parseFiniteNumber(debuffSpec === null || debuffSpec === void 0 ? void 0 : debuffSpec.maxStacks)) !== null && _x !== void 0 ? _x : 1));
-              const debuffDuration = Math.max(1, Math.round((_y = parseFiniteNumber(debuffSpec === null || debuffSpec === void 0 ? void 0 : debuffSpec.turns)) !== null && _y !== void 0 ? _y : getUltDurationTurns(u, (_z = parseFiniteNumber(u.turns)) !== null && _z !== void 0 ? _z : 1)));
+              const wilScale = parseFiniteNumber(damageSpec.scaleWIL ?? damageSpec.scaleWil) ?? 0;
+              const flatAdd = parseFiniteNumber(damageSpec.flat ?? damageSpec.flatAdd) ?? 0;
+              const debuffSpec = u.appliesDebuff ?? null;
+              const debuffId = typeof debuffSpec?.id === 'string' && debuffSpec.id ? debuffSpec.id : 'loithienanh_spd_burn';
+              const debuffAmount = parseFiniteNumber(debuffSpec?.amount ?? debuffSpec?.amountPercent) ?? 0;
+              const debuffMaxStacks = Math.max(1, Math.round(parseFiniteNumber(debuffSpec?.maxStacks) ?? 1));
+              const debuffDuration = Math.max(1, Math.round(parseFiniteNumber(debuffSpec?.turns) ?? getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1)));
               for (const tgt of selected) {
                   if (!tgt || !tgt.alive)
                       continue;
-                  const tgtRank = ((_1 = (_0 = game.meta) === null || _0 === void 0 ? void 0 : _0.rankOf) === null || _1 === void 0 ? void 0 : _1.call(_0, tgt.id)) || (tgt === null || tgt === void 0 ? void 0 : tgt.rank) || '';
+                  const tgtRank = game.meta?.rankOf?.(tgt.id) || tgt?.rank || '';
                   const isBoss = typeof tgtRank === 'string' && tgtRank.toLowerCase() === 'boss';
-                  const pctDefault = (_3 = parseFiniteNumber((_2 = damageSpec.percentTargetMaxHP) !== null && _2 !== void 0 ? _2 : damageSpec.basePercentMaxHPTarget)) !== null && _3 !== void 0 ? _3 : 0;
+                  const pctDefault = parseFiniteNumber(damageSpec.percentTargetMaxHP ?? damageSpec.basePercentMaxHPTarget) ?? 0;
                   const pct = isBoss
-                      ? (_4 = parseFiniteNumber(damageSpec.bossPercent)) !== null && _4 !== void 0 ? _4 : pctDefault
+                      ? parseFiniteNumber(damageSpec.bossPercent) ?? pctDefault
                       : pctDefault;
                   const baseFromPct = Math.round(Math.max(0, pct) * Math.max(0, tgt.hpMax || 0));
                   const baseFromWil = Math.round(Math.max(0, wilScale) * Math.max(0, unit.wil || 0));
@@ -11164,7 +11041,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                       base,
                       dtype,
                       attackType,
-                      defPen: (_6 = parseFiniteNumber((_5 = damageSpec.defPen) !== null && _5 !== void 0 ? _5 : damageSpec.pen)) !== null && _6 !== void 0 ? _6 : 0
+                      defPen: parseFiniteNumber(damageSpec.defPen ?? damageSpec.pen) ?? 0
                   });
                   {
                       const startedAt = getNow();
@@ -11254,7 +11131,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               }
               const reduceDmg = parseFiniteNumber(u.reduceDmg);
               if (reduceDmg && reduceDmg > 0) {
-                  const turns = getUltDurationTurns(u, (_7 = parseFiniteNumber(u.turns)) !== null && _7 !== void 0 ? _7 : 1);
+                  const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
                   const damageCut = makeStatusEffect('damageCut', { pct: reduceDmg, turns });
                   if (damageCut) {
                       Statuses.add(unit, damageCut);
@@ -11271,8 +11148,8 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               const aliveNow = tokensAlive();
               const laneTargets = aliveNow.filter(t => t.side === foeSide && t.cx === laneX);
               const hits = getUltHitCount(u);
-              const scale = (_8 = parseFiniteNumber(u.scale)) !== null && _8 !== void 0 ? _8 : 0.9;
-              const meleeDur = (_10 = parseFiniteNumber((_9 = CFG === null || CFG === void 0 ? void 0 : CFG.ANIMATION) === null || _9 === void 0 ? void 0 : _9.meleeDurationMs)) !== null && _10 !== void 0 ? _10 : 2000;
+              const scale = parseFiniteNumber(u.scale) ?? 0.9;
+              const meleeDur = parseFiniteNumber(CFG?.ANIMATION?.meleeDurationMs) ?? 2000;
               const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
               if (sessionVfx) {
                   try {
@@ -11288,7 +11165,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                       if (!enemy.alive)
                           break;
                       let base = Math.max(1, Math.round((unit.atk || 0) * scale));
-                      const bonusVsLeader = (_11 = parseFiniteNumber(u.bonusVsLeader)) !== null && _11 !== void 0 ? _11 : 0;
+                      const bonusVsLeader = parseFiniteNumber(u.bonusVsLeader) ?? 0;
                       if (bonusVsLeader && (enemy.id === 'leaderA' || enemy.id === 'leaderB')) {
                           base = Math.round(base * (1 + bonusVsLeader));
                       }
@@ -11296,14 +11173,14 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                           base,
                           dtype: 'arcane',
                           attackType: u.tagAsBasic ? 'basic' : 'skill',
-                          defPen: (_12 = parseFiniteNumber(u.penRES)) !== null && _12 !== void 0 ? _12 : 0
+                          defPen: parseFiniteNumber(u.penRES) ?? 0
                       });
                   }
               }
               break;
           }
           case 'selfBuff': {
-              const tradePct = Math.max(0, Math.min(0.9, (_13 = parseFiniteNumber(u.selfHPTrade)) !== null && _13 !== void 0 ? _13 : 0));
+              const tradePct = Math.max(0, Math.min(0.9, parseFiniteNumber(u.selfHPTrade) ?? 0));
               const pay = Math.round((unit.hpMax || 0) * tradePct);
               const maxPay = Math.max(0, Math.min(pay, Math.max(0, (unit.hp || 0) - 1)));
               if (maxPay > 0) {
@@ -11311,14 +11188,14 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   gainFury(unit, {
                       type: 'damageTaken',
                       dealt: maxPay,
-                      selfMaxHp: Number.isFinite(unit === null || unit === void 0 ? void 0 : unit.hpMax) ? unit.hpMax : undefined,
+                      selfMaxHp: Number.isFinite(unit?.hpMax) ? unit.hpMax : undefined,
                       damageTaken: maxPay
                   });
                   finishFuryHit(unit);
               }
-              const reduce = Math.max(0, (_14 = parseFiniteNumber(u.reduceDmg)) !== null && _14 !== void 0 ? _14 : 0);
+              const reduce = Math.max(0, parseFiniteNumber(u.reduceDmg) ?? 0);
               if (reduce > 0) {
-                  const turns = getUltDurationTurns(u, (_15 = parseFiniteNumber(u.turns)) !== null && _15 !== void 0 ? _15 : 1);
+                  const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
                   const damageCut = makeStatusEffect('damageCut', { pct: reduce, turns });
                   if (damageCut) {
                       Statuses.add(unit, damageCut);
@@ -11351,7 +11228,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   const tgt = foes[i];
                   if (!tgt)
                       continue;
-                  const turns = getUltDurationTurns(u, (_16 = parseFiniteNumber(u.turns)) !== null && _16 !== void 0 ? _16 : 1);
+                  const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
                   const sleep = makeStatusEffect('sleep', { turns });
                   if (sleep) {
                       Statuses.add(tgt, sleep);
@@ -11382,13 +11259,13 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   ally.deadAt = 0;
                   ally.hp = 0;
                   Statuses.purge(ally);
-                  const revivedHp = (_20 = parseFiniteNumber((_18 = (_17 = u.revived) === null || _17 === void 0 ? void 0 : _17.hpPercent) !== null && _18 !== void 0 ? _18 : (_19 = u.revived) === null || _19 === void 0 ? void 0 : _19.hpPct)) !== null && _20 !== void 0 ? _20 : 0.5;
+                  const revivedHp = parseFiniteNumber(u.revived?.hpPercent ?? u.revived?.hpPct) ?? 0.5;
                   const hpPct = Math.max(0, Math.min(1, revivedHp));
                   const healAmt = Math.max(1, Math.round((ally.hpMax || 0) * hpPct));
                   healUnit(ally, healAmt);
-                  setFury(ally, Math.max(0, (_22 = parseFiniteNumber((_21 = u.revived) === null || _21 === void 0 ? void 0 : _21.rage)) !== null && _22 !== void 0 ? _22 : 0));
-                  if ((_23 = u.revived) === null || _23 === void 0 ? void 0 : _23.lockSkillsTurns) {
-                      const silenceTurns = Math.max(1, Math.round((_24 = parseFiniteNumber(u.revived.lockSkillsTurns)) !== null && _24 !== void 0 ? _24 : 1));
+                  setFury(ally, Math.max(0, parseFiniteNumber(u.revived?.rage) ?? 0));
+                  if (u.revived?.lockSkillsTurns) {
+                      const silenceTurns = Math.max(1, Math.round(parseFiniteNumber(u.revived.lockSkillsTurns) ?? 1));
                       const silence = makeStatusEffect('silence', { turns: silenceTurns });
                       if (silence) {
                           Statuses.add(ally, silence);
@@ -11458,9 +11335,9 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                       break;
                   targets.add(ally);
               }
-              const pct = (_25 = parseFiniteNumber(u.attackSpeed)) !== null && _25 !== void 0 ? _25 : 0.1;
+              const pct = parseFiniteNumber(u.attackSpeed) ?? 0.1;
               for (const tgt of targets) {
-                  const turns = getUltDurationTurns(u, (_26 = parseFiniteNumber(u.turns)) !== null && _26 !== void 0 ? _26 : 1);
+                  const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
                   const haste = makeStatusEffect('haste', { pct, turns });
                   if (haste) {
                       Statuses.add(tgt, haste);
@@ -11482,7 +11359,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       extendBusy(busyMs);
       spendFury(unit, resolveUltCost(unit));
   }
-  const tokensAlive = () => ((Game === null || Game === void 0 ? void 0 : Game.tokens) || []).filter((t) => t.alive);
+  const tokensAlive = () => (Game?.tokens || []).filter((t) => t.alive);
   function ensureBattleState(game) {
       if (!game || typeof game !== 'object')
           return null;
@@ -11536,17 +11413,16 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       };
   }
   function isBossToken(game, token) {
-      var _a, _b;
       if (!token)
           return false;
       if (token.isBoss)
           return true;
-      const rankRaw = typeof token.rank === 'string' && token.rank ? token.rank : (((_b = (_a = game === null || game === void 0 ? void 0 : game.meta) === null || _a === void 0 ? void 0 : _a.rankOf) === null || _b === void 0 ? void 0 : _b.call(_a, token.id)) || '');
+      const rankRaw = typeof token.rank === 'string' && token.rank ? token.rank : (game?.meta?.rankOf?.(token.id) || '');
       const rank = typeof rankRaw === 'string' ? rankRaw.toLowerCase() : '';
       return rank === 'boss';
   }
   function isPvpMode(game) {
-      const key = ((game === null || game === void 0 ? void 0 : game.modeKey) || '').toString().toLowerCase();
+      const key = (game?.modeKey || '').toString().toLowerCase();
       if (!key)
           return false;
       if (key === 'ares')
@@ -11554,18 +11430,17 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       return key.includes('pvp');
   }
   function finalizeBattle(game, payload, context) {
-      var _a, _b, _c;
       const battle = ensureBattleState(game);
       if (!battle || battle.over)
-          return (battle === null || battle === void 0 ? void 0 : battle.result) || null;
-      const finishedAtRaw = payload === null || payload === void 0 ? void 0 : payload.finishedAt;
+          return battle?.result || null;
+      const finishedAtRaw = payload?.finishedAt;
       const finishedAt = typeof finishedAtRaw === 'number' && Number.isFinite(finishedAtRaw)
           ? finishedAtRaw
           : getNow();
       const result = {
-          winner: (_a = payload === null || payload === void 0 ? void 0 : payload.winner) !== null && _a !== void 0 ? _a : null,
-          reason: (_b = payload === null || payload === void 0 ? void 0 : payload.reason) !== null && _b !== void 0 ? _b : null,
-          detail: (_c = payload === null || payload === void 0 ? void 0 : payload.detail) !== null && _c !== void 0 ? _c : null,
+          winner: payload?.winner ?? null,
+          reason: payload?.reason ?? null,
+          detail: payload?.detail ?? null,
           finishedAt
       };
       battle.over = true;
@@ -11576,7 +11451,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       battle.result = result;
       if (game)
           game.result = result;
-      if (game === null || game === void 0 ? void 0 : game.turn) {
+      if (game?.turn) {
           game.turn.completed = true;
           game.turn.busyUntil = mergeBusyUntil(game.turn.busyUntil, finishedAt, 0);
       }
@@ -11671,7 +11546,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   // Giảm TTL minion của 1 phe sau khi phe đó kết thúc phase
   function tickMinionTTL(side) {
       // gom những minion hết hạn để xoá sau vòng lặp
-      if (!(Game === null || Game === void 0 ? void 0 : Game.tokens))
+      if (!Game?.tokens)
           return;
       const tokens = Game.tokens;
       const toRemove = [];
@@ -11699,15 +11574,14 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       }
   }
   function init() {
-      var _a, _b;
       if (!Game)
           return false;
       if (Game._inited)
           return true;
-      const doc = docRef !== null && docRef !== void 0 ? docRef : (typeof document !== 'undefined' ? document : null);
+      const doc = docRef ?? (typeof document !== 'undefined' ? document : null);
       if (!doc)
           return false;
-      const root = rootElement !== null && rootElement !== void 0 ? rootElement : null;
+      const root = rootElement ?? null;
       const boardFromRoot = (root && typeof root.querySelector === 'function')
           ? root.querySelector('#board')
           : null;
@@ -11716,7 +11590,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           : typeof doc.getElementById === 'function'
               ? doc.getElementById('board')
               : null;
-      const boardEl = (boardFromRoot !== null && boardFromRoot !== void 0 ? boardFromRoot : boardFromDocument);
+      const boardEl = (boardFromRoot ?? boardFromDocument);
       if (!boardEl) {
           return false;
       }
@@ -11730,7 +11604,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           hudCleanup();
           hudCleanup = null;
       }
-      hud = initHUD(doc, root !== null && root !== void 0 ? root : undefined);
+      hud = initHUD(doc, root ?? undefined);
       const currentHud = hud;
       hudCleanup = currentHud ? () => currentHud.cleanup() : null;
       const tokens = Array.isArray(Game.tokens) ? Game.tokens : [];
@@ -11738,17 +11612,17 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           Game.tokens = tokens;
       }
       resize();
-      let spawnGrid = ((_a = Game.grid) !== null && _a !== void 0 ? _a : null);
+      let spawnGrid = (Game.grid ?? null);
       if (!spawnGrid) {
-          const parsedCols = parseFiniteNumber(CFG === null || CFG === void 0 ? void 0 : CFG.GRID_COLS);
-          const parsedRows = parseFiniteNumber(CFG === null || CFG === void 0 ? void 0 : CFG.GRID_ROWS);
+          const parsedCols = parseFiniteNumber(CFG?.GRID_COLS);
+          const parsedRows = parseFiniteNumber(CFG?.GRID_ROWS);
           const fallbackCols = parsedCols !== null && parsedCols > 0
               ? Math.max(1, Math.floor(parsedCols))
               : 7;
           const fallbackRows = parsedRows !== null && parsedRows > 0
               ? Math.max(1, Math.floor(parsedRows))
               : 3;
-          spawnGrid = makeGrid(canvas !== null && canvas !== void 0 ? canvas : null, fallbackCols, fallbackRows);
+          spawnGrid = makeGrid(canvas ?? null, fallbackCols, fallbackRows);
       }
       if (spawnGrid) {
           spawnLeaders(tokens, spawnGrid);
@@ -11821,7 +11695,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               const game = getInitializedGame();
               return game ? game.selectedId : null;
           },
-      }, root !== null && root !== void 0 ? root : undefined);
+      }, root ?? undefined);
       summonBarHandle = barHandle;
       Game.ui.bar = barHandle;
       selectFirstAffordable();
@@ -11831,7 +11705,6 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           canvasClickHandler = null;
       }
       canvasClickHandler = (ev) => {
-          var _a, _b, _c;
           const game = getInitializedGame();
           if (!canvas || !game)
               return;
@@ -11846,7 +11719,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           if (cell.cx >= CFG.ALLY_COLS)
               return;
           const deck = ensureDeck();
-          const card = (_a = deck.find((u) => u.id === game.selectedId)) !== null && _a !== void 0 ? _a : null;
+          const card = deck.find((u) => u.id === game.selectedId) ?? null;
           if (!card)
               return;
           if (cellReserved(tokensAlive(), game.queued, cell.cx, cell.cy))
@@ -11870,9 +11743,9 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               slot,
               spawnCycle,
               source: 'deck',
-              color: ((_b = pendingArt === null || pendingArt === void 0 ? void 0 : pendingArt.palette) === null || _b === void 0 ? void 0 : _b.primary) || '#a9f58c',
-              art: pendingArt !== null && pendingArt !== void 0 ? pendingArt : null,
-              skinKey: (_c = pendingArt === null || pendingArt === void 0 ? void 0 : pendingArt.skinKey) !== null && _c !== void 0 ? _c : null,
+              color: pendingArt?.palette?.primary || '#a9f58c',
+              art: pendingArt ?? null,
+              skinKey: pendingArt?.skinKey ?? null,
           };
           game.queued.ally.set(slot, pending);
           game.cost = Math.max(0, game.cost - cardCost);
@@ -11898,7 +11771,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       if (winRef && typeof winRef.addEventListener === 'function' && resizeHandler) {
           winRef.addEventListener('resize', resizeHandler);
       }
-      const viewport = (_b = winRef === null || winRef === void 0 ? void 0 : winRef.visualViewport) !== null && _b !== void 0 ? _b : null;
+      const viewport = winRef?.visualViewport ?? null;
       if (viewport && typeof viewport.addEventListener === 'function') {
           if (visualViewportResizeHandler && typeof viewport.removeEventListener === 'function') {
               viewport.removeEventListener('resize', visualViewportResizeHandler);
@@ -11921,10 +11794,9 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       };
       timerElement = (queryFromRoot('#timer') || doc.getElementById('timer'));
       const updateTimerAndCost = (timestamp) => {
-          var _a, _b, _c, _d, _e, _f;
           if (!CLOCK || !Game)
               return;
-          if ((_a = Game.battle) === null || _a === void 0 ? void 0 : _a.over)
+          if (Game.battle?.over)
               return;
           const safeNowMs = safeNow();
           const sessionNowMsRaw = sessionNow();
@@ -11945,7 +11817,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   ? CLOCK.lastTurnStepMs
                   : null;
               let turnEveryMs = CLOCK.turnEveryMs;
-              const cfgTurnEvery = (_b = CFG === null || CFG === void 0 ? void 0 : CFG.ANIMATION) === null || _b === void 0 ? void 0 : _b.turnIntervalMs;
+              const cfgTurnEvery = CFG?.ANIMATION?.turnIntervalMs;
               const parsedTurnEvery = Number(cfgTurnEvery);
               if (!Number.isFinite(turnEveryMs) || turnEveryMs <= 0) {
                   turnEveryMs = Number.isFinite(parsedTurnEvery) && parsedTurnEvery > 0
@@ -11978,11 +11850,11 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               CLOCK.lastTimerRemain = previousRemain;
               const minTurnStep = Number.isFinite(sessionForRebase)
                   ? sessionForRebase - turnEveryMs
-                  : previousTurnStep !== null && previousTurnStep !== void 0 ? previousTurnStep : CLOCK.startMs - turnEveryMs;
+                  : previousTurnStep ?? CLOCK.startMs - turnEveryMs;
               const maxTurnStep = Number.isFinite(sessionForRebase)
                   ? sessionForRebase
                   : CLOCK.startMs;
-              let normalizedTurnStep = previousTurnStep !== null && previousTurnStep !== void 0 ? previousTurnStep : minTurnStep;
+              let normalizedTurnStep = previousTurnStep ?? minTurnStep;
               if (!Number.isFinite(normalizedTurnStep)) {
                   normalizedTurnStep = minTurnStep;
               }
@@ -12051,7 +11923,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           const startMs = Number.isFinite(CLOCK.startMs) ? CLOCK.startMs : CLOCK.lastFrameMs;
           let elapsedMsPrecise = Number.isFinite(startMs) ? sessionNowMs - startMs : 0;
           if (!Number.isFinite(elapsedMsPrecise)) {
-              elapsedMsPrecise = (forcedElapsedSec !== null && forcedElapsedSec !== void 0 ? forcedElapsedSec : 0) * 1000;
+              elapsedMsPrecise = (forcedElapsedSec ?? 0) * 1000;
           }
           if (elapsedMsPrecise < 0) {
               elapsedMsPrecise = 0;
@@ -12073,7 +11945,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               let tEl = timerElement;
               if (!tEl || !tEl.isConnected) {
                   const refreshed = (queryFromRoot('#timer') || doc.getElementById('timer'));
-                  timerElement = refreshed !== null && refreshed !== void 0 ? refreshed : null;
+                  timerElement = refreshed ?? null;
                   tEl = timerElement;
               }
               if (tEl)
@@ -12134,9 +12006,9 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               aiMaybeAct(Game, 'cost');
           }
           CLOCK.lastLogicMs = sessionNowMs;
-          if ((_c = Game.battle) === null || _c === void 0 ? void 0 : _c.over)
+          if (Game.battle?.over)
               return;
-          let turnState = (_d = Game.turn) !== null && _d !== void 0 ? _d : null;
+          let turnState = Game.turn ?? null;
           let busyUntil = 0;
           if (turnState) {
               const rawBusy = turnState.busyUntil;
@@ -12145,7 +12017,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   turnState.busyUntil = busyUntil;
               }
           }
-          const cfgTurnEvery = (_e = CFG === null || CFG === void 0 ? void 0 : CFG.ANIMATION) === null || _e === void 0 ? void 0 : _e.turnIntervalMs;
+          const cfgTurnEvery = CFG?.ANIMATION?.turnIntervalMs;
           const defaultTurnEveryMs = Number.isFinite(cfgTurnEvery) && cfgTurnEvery && cfgTurnEvery > 0
               ? cfgTurnEvery
               : 600;
@@ -12192,7 +12064,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                       return;
                   }
                   aiMaybeAct(Game, 'board');
-                  turnState = (_f = Game.turn) !== null && _f !== void 0 ? _f : null;
+                  turnState = Game.turn ?? null;
                   if (turnState) {
                       const rawBusyAfter = turnState.busyUntil;
                       busyUntil = isFiniteNumber(rawBusyAfter) && rawBusyAfter > 0 ? rawBusyAfter : 0;
@@ -12208,7 +12080,6 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           }
       };
       const runTickLoop = (timestamp) => {
-          var _a, _b;
           tickLoopHandle = null;
           try {
               updateTimerAndCost(timestamp);
@@ -12217,7 +12088,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               console.error('[pve] tick loop error', err);
               if (hud && typeof hud.update === 'function') {
                   try {
-                      hud.update({ cost: (_a = Game === null || Game === void 0 ? void 0 : Game.cost) !== null && _a !== void 0 ? _a : null, costCap: (_b = Game === null || Game === void 0 ? void 0 : Game.costCap) !== null && _b !== void 0 ? _b : null });
+                      hud.update({ cost: Game?.cost ?? null, costCap: Game?.costCap ?? null });
                   }
                   catch (hudErr) {
                       console.error('[pve] HUD update fallback sau lỗi tick thất bại', hudErr);
@@ -12255,7 +12126,6 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       return true;
   }
   function selectFirstAffordable() {
-      var _a;
       if (!Game)
           return;
       const deck = ensureDeck();
@@ -12282,7 +12152,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               cheapestAffordableCost = cardCost;
           }
       }
-      const chosen = (_a = (cheapestAffordable || cheapestOverall)) !== null && _a !== void 0 ? _a : null;
+      const chosen = (cheapestAffordable || cheapestOverall) ?? null;
       Game.selectedId = chosen ? chosen.id : null;
   }
   /* ---------- Deck logic ---------- */
@@ -12304,10 +12174,9 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   }
   /* ---------- Vẽ ---------- */
   function resize() {
-      var _a;
       if (!canvas || !Game)
           return; // guard
-      const prevGrid = (Game === null || Game === void 0 ? void 0 : Game.grid) ? {
+      const prevGrid = Game?.grid ? {
           w: Game.grid.w,
           h: Game.grid.h,
           dpr: Game.grid.dpr,
@@ -12323,9 +12192,9 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       } : null;
       Game.grid = makeGrid(canvas, CFG.GRID_COLS, CFG.GRID_ROWS);
       if (ctx && Game.grid) {
-          const maxDprCfg = (_a = CFG.UI) === null || _a === void 0 ? void 0 : _a.MAX_DPR;
+          const maxDprCfg = CFG.UI?.MAX_DPR;
           const maxDpr = Number.isFinite(maxDprCfg) && maxDprCfg > 0 ? maxDprCfg : 3;
-          const view = winRef !== null && winRef !== void 0 ? winRef : (typeof window !== 'undefined' ? window : null);
+          const view = winRef ?? (typeof window !== 'undefined' ? window : null);
           let viewDprRaw = 1;
           if (view && Number.isFinite(view.devicePixelRatio) && view.devicePixelRatio > 0) {
               viewDprRaw = view.devicePixelRatio;
@@ -12367,11 +12236,10 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       }
   }
   function draw() {
-      var _a, _b, _c, _d;
-      if (!ctx || !canvas || !(Game === null || Game === void 0 ? void 0 : Game.grid))
+      if (!ctx || !canvas || !Game?.grid)
           return; // guard
-      const clearW = (_b = (_a = Game.grid) === null || _a === void 0 ? void 0 : _a.w) !== null && _b !== void 0 ? _b : canvas.width;
-      const clearH = (_d = (_c = Game.grid) === null || _c === void 0 ? void 0 : _c.h) !== null && _d !== void 0 ? _d : canvas.height;
+      const clearW = Game.grid?.w ?? canvas.width;
+      const clearH = Game.grid?.h ?? canvas.height;
       ctx.clearRect(0, 0, clearW, clearH);
       const camSignature = getCameraPresetSignature(CAM_PRESET);
       if (camSignature !== lastCamPresetSignature) {
@@ -12434,10 +12302,9 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       drawHPBars();
   }
   function cellCenterObliqueLocal(g, cx, cy, C) {
-      var _a, _b, _c;
       const colsW = g.tile * g.cols;
-      const topScale = ((_a = (C === null || C === void 0 ? void 0 : C.topScale)) !== null && _a !== void 0 ? _a : 0.80);
-      const rowGap = ((_b = (C === null || C === void 0 ? void 0 : C.rowGapRatio)) !== null && _b !== void 0 ? _b : 0.62) * g.tile;
+      const topScale = ((C?.topScale) ?? 0.80);
+      const rowGap = ((C?.rowGapRatio) ?? 0.62) * g.tile;
       function rowLR(r) {
           const pinch = (1 - topScale) * colsW;
           const t = r / g.rows;
@@ -12456,7 +12323,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       const xbR = LRb.left + ((cx + 1) / g.cols) * (LRb.right - LRb.left);
       const x = (xtL + xtR + xbL + xbR) / 4;
       const y = (yTop + yBot) / 2;
-      const k = ((_c = (C === null || C === void 0 ? void 0 : C.depthScale)) !== null && _c !== void 0 ? _c : 0.94);
+      const k = ((C?.depthScale) ?? 0.94);
       const scale = Math.pow(k, g.rows - 1 - cy);
       return { x, y, scale };
   }
@@ -12492,14 +12359,13 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
   }
   function normalizeHpBarCacheKey(fillColor, innerHeight, innerRadius, startY) {
-      const color = typeof fillColor === 'string' ? fillColor.trim().toLowerCase() : String(fillColor !== null && fillColor !== void 0 ? fillColor : '');
+      const color = typeof fillColor === 'string' ? fillColor.trim().toLowerCase() : String(fillColor ?? '');
       const height = Number.isFinite(innerHeight) ? Math.max(0, Math.round(innerHeight)) : 0;
       const radius = Number.isFinite(innerRadius) ? Math.max(0, Math.round(innerRadius)) : 0;
       const start = Number.isFinite(startY) ? Math.round(startY * 100) / 100 : 0;
       return `${color}|h:${height}|r:${radius}|y:${start}`;
   }
   function ensureHpBarGradient(fillColor, innerHeight, innerRadius, startY, x) {
-      var _a;
       const key = normalizeHpBarCacheKey(fillColor, innerHeight, innerRadius, startY);
       const cached = hpBarGradientCache.get(key);
       if (cached)
@@ -12515,15 +12381,14 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           hpBarGradientCache.set(key, baseFill);
           return baseFill;
       }
-      const topFill = (_a = lightenColor(baseFill, 0.25)) !== null && _a !== void 0 ? _a : baseFill;
+      const topFill = lightenColor(baseFill, 0.25) ?? baseFill;
       gradient.addColorStop(0, topFill);
       gradient.addColorStop(1, baseFill);
       hpBarGradientCache.set(key, gradient);
       return gradient;
   }
   function drawHPBars() {
-      var _a, _b, _c, _d, _e, _f, _g;
-      if (!ctx || !(Game === null || Game === void 0 ? void 0 : Game.grid))
+      if (!ctx || !Game?.grid)
           return;
       const baseR = Math.floor(Game.grid.tile * 0.36);
       const tokens = Game.tokens || [];
@@ -12535,21 +12400,21 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               continue;
           const p = cellCenterObliqueLocal(Game.grid, t.cx, t.cy, CAM_PRESET);
           const art = t.art || getUnitArt(t.id, { skinKey: t.skinKey });
-          const layout = (_a = art === null || art === void 0 ? void 0 : art.layout) !== null && _a !== void 0 ? _a : {};
+          const layout = art?.layout ?? {};
           const layoutRecord = layout;
           const r = Math.max(6, Math.floor(baseR * (p.scale || 1)));
-          const widthRatio = (_b = parseFiniteNumber(layoutRecord.hpWidth)) !== null && _b !== void 0 ? _b : 2.4;
-          const heightRatio = (_c = parseFiniteNumber(layoutRecord.hpHeight)) !== null && _c !== void 0 ? _c : 0.42;
-          const offsetRatio = (_d = parseFiniteNumber(layoutRecord.hpOffset)) !== null && _d !== void 0 ? _d : 1.46;
+          const widthRatio = parseFiniteNumber(layoutRecord.hpWidth) ?? 2.4;
+          const heightRatio = parseFiniteNumber(layoutRecord.hpHeight) ?? 0.42;
+          const offsetRatio = parseFiniteNumber(layoutRecord.hpOffset) ?? 1.46;
           const barWidth = Math.max(28, Math.floor(r * widthRatio));
           const barHeight = Math.max(5, Math.floor(r * heightRatio));
           const offset = offsetRatio;
           const x = Math.round(p.x - barWidth / 2);
           const y = Math.round(p.y + r * offset - barHeight / 2);
           const ratio = Math.max(0, Math.min(1, (t.hp || 0) / (t.hpMax || 1)));
-          const bgColor = ((_e = art === null || art === void 0 ? void 0 : art.hpBar) === null || _e === void 0 ? void 0 : _e.bg) || 'rgba(9,14,21,0.74)';
-          const fillColor = ((_f = art === null || art === void 0 ? void 0 : art.hpBar) === null || _f === void 0 ? void 0 : _f.fill) || '#6ff0c0';
-          const borderColor = ((_g = art === null || art === void 0 ? void 0 : art.hpBar) === null || _g === void 0 ? void 0 : _g.border) || 'rgba(0,0,0,0.55)';
+          const bgColor = art?.hpBar?.bg || 'rgba(9,14,21,0.74)';
+          const fillColor = art?.hpBar?.fill || '#6ff0c0';
+          const borderColor = art?.hpBar?.border || 'rgba(0,0,0,0.55)';
           const radius = Math.max(2, Math.floor(barHeight / 2));
           ctx.save();
           ctx.shadowColor = 'transparent';
@@ -12606,8 +12471,8 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       visibilityHandlerBound = false;
   }
   function resolveTimerElement() {
-      const doc = docRef !== null && docRef !== void 0 ? docRef : (typeof document !== 'undefined' ? document : null);
-      const root = rootElement !== null && rootElement !== void 0 ? rootElement : null;
+      const doc = docRef ?? (typeof document !== 'undefined' ? document : null);
+      const root = rootElement ?? null;
       if (!doc) {
           timerElement = null;
           return;
@@ -12627,7 +12492,6 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       return value.nodeType === documentNodeType;
   }
   function configureRoot(root) {
-      var _a;
       rootElement = root || null;
       if (rootElement && rootElement.ownerDocument) {
           docRef = rootElement.ownerDocument;
@@ -12638,7 +12502,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       else {
           docRef = typeof document !== 'undefined' ? document : null;
       }
-      winRef = (_a = docRef === null || docRef === void 0 ? void 0 : docRef.defaultView) !== null && _a !== void 0 ? _a : (typeof window !== 'undefined' ? window : null);
+      winRef = docRef?.defaultView ?? (typeof window !== 'undefined' ? window : null);
       resolveTimerElement();
   }
   function clearSessionTimers() {
@@ -12673,7 +12537,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           winRef.removeEventListener('resize', resizeHandler);
       }
       resizeHandler = null;
-      const viewport = winRef === null || winRef === void 0 ? void 0 : winRef.visualViewport;
+      const viewport = winRef?.visualViewport;
       if (viewport && typeof viewport.removeEventListener === 'function') {
           if (visualViewportResizeHandler) {
               viewport.removeEventListener('resize', visualViewportResizeHandler);
@@ -12698,24 +12562,23 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       invalidateSceneCache();
   }
   function stopSession() {
-      var _a, _b, _c, _d, _e, _f;
       clearSessionTimers();
       clearSessionListeners();
       cleanupSummonBar();
       if (Game) {
-          if ((_b = (_a = Game.queued) === null || _a === void 0 ? void 0 : _a.ally) === null || _b === void 0 ? void 0 : _b.clear)
+          if (Game.queued?.ally?.clear)
               Game.queued.ally.clear();
-          if ((_d = (_c = Game.queued) === null || _c === void 0 ? void 0 : _c.enemy) === null || _d === void 0 ? void 0 : _d.clear)
+          if (Game.queued?.enemy?.clear)
               Game.queued.enemy.clear();
           if (Array.isArray(Game.tokens))
               Game.tokens.length = 0;
           if (Array.isArray(Game.deck3))
               Game.deck3.length = 0;
-          if ((_e = Game.usedUnitIds) === null || _e === void 0 ? void 0 : _e.clear)
+          if (Game.usedUnitIds?.clear)
               Game.usedUnitIds.clear();
           if (Game.ai) {
               Game.ai.deck = Array.isArray(Game.ai.deck) ? [] : Game.ai.deck;
-              if ((_f = Game.ai.usedUnitIds) === null || _f === void 0 ? void 0 : _f.clear)
+              if (Game.ai.usedUnitIds?.clear)
                   Game.ai.usedUnitIds.clear();
               Game.ai.selectedId = null;
               Game.ai.cost = 0;
@@ -12824,11 +12687,10 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       applyConfigToRunningGame(normalized);
   }
   function createPveSession(rootEl, options = null) {
-      var _a;
       const initial = sanitizeStartConfig(options);
       const normalized = normalizeConfig(initial.rest);
       storedConfig = { ...normalized };
-      configureRoot((_a = (rootEl !== null && rootEl !== void 0 ? rootEl : initial.root)) !== null && _a !== void 0 ? _a : null);
+      configureRoot((rootEl ?? initial.root) ?? null);
       const handle = {
           start(startConfig = null) {
               const { rest, root } = sanitizeStartConfig(startConfig);
@@ -12948,12 +12810,11 @@ __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
       return value.filter((wave) => Boolean(wave));
   }
   function getTurnSnapshot(session) {
-      const turn = session === null || session === void 0 ? void 0 : session.turn;
-      return turn !== null && turn !== void 0 ? turn : null;
+      const turn = session?.turn;
+      return turn ?? null;
   }
   function advanceSession(session) {
-      var _a;
-      const runtime = session === null || session === void 0 ? void 0 : session.runtime;
+      const runtime = session?.runtime;
       if (!runtime)
           return null;
       const encounter = runtime.encounter;
@@ -12965,7 +12826,7 @@ __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
       ensurePendingRewards(encounter);
       const waves = toWaveList(encounter.waves);
       const index = Math.max(0, encounter.waveIndex | 0);
-      const wave = (_a = waves[index]) !== null && _a !== void 0 ? _a : null;
+      const wave = waves[index] ?? null;
       if (!wave) {
           encounter.status = 'completed';
           runtime.wave = null;
@@ -13011,7 +12872,7 @@ __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
       return encounter;
   }
   function applyReward(session, reward) {
-      if (!(session === null || session === void 0 ? void 0 : session.runtime))
+      if (!session?.runtime)
           return null;
       if (!isReward(reward))
           return null;
@@ -13081,7 +12942,6 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
   const normalizeUnitId = __dep10.normalizeUnitId;
   void Statuses;
   const DEFAULT_UNIT_ROSTER = UNITS.map((unit) => {
-      var _a;
       const unitId = normalizeUnitId(unit.id);
       const art = getUnitArt(unitId);
       return {
@@ -13089,7 +12949,7 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
           name: unit.name,
           cost: Number.isFinite(unit.cost) ? unit.cost : null,
           art,
-          skinKey: (_a = art === null || art === void 0 ? void 0 : art.skinKey) !== null && _a !== void 0 ? _a : null,
+          skinKey: art?.skinKey ?? null,
       };
   });
   function getSceneConfig(cfg) {
@@ -13106,8 +12966,7 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
       return scene;
   }
   function getTurnOrderMode(cfg) {
-      var _a;
-      const rawMode = (_a = cfg.turnOrder.mode) !== null && _a !== void 0 ? _a : null;
+      const rawMode = cfg.turnOrder.mode ?? null;
       return typeof rawMode === 'string' ? rawMode : null;
   }
   function buildQueuedSummonState() {
@@ -13118,9 +12977,9 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
   }
   function buildAiState(params) {
       const { preset, unitsAll, defaultCostCap, defaultSummonLimit } = params;
-      const costCapCandidate = preset === null || preset === void 0 ? void 0 : preset.costCap;
-      const summonLimitCandidate = preset === null || preset === void 0 ? void 0 : preset.summonLimit;
-      const startingDeck = Array.isArray(preset === null || preset === void 0 ? void 0 : preset.startingDeck) ? preset.startingDeck : null;
+      const costCapCandidate = preset?.costCap;
+      const summonLimitCandidate = preset?.summonLimit;
+      const startingDeck = Array.isArray(preset?.startingDeck) ? preset.startingDeck : null;
       const costCap = Number.isFinite(costCapCandidate)
           ? Number(costCapCandidate)
           : typeof costCapCandidate === 'number'
@@ -13214,13 +13073,12 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
       return String(value);
   }
   function normalizeBackgroundCacheKey(backgroundKey) {
-      return `key:${backgroundKey !== null && backgroundKey !== void 0 ? backgroundKey : '__no-key__'}`;
+      return `key:${backgroundKey ?? '__no-key__'}`;
   }
   function clearBackgroundSignatureCache() {
       backgroundSignatureCache.clear();
   }
   function computeBackgroundSignature(backgroundKey) {
-      var _a, _b;
       const cacheKey = normalizeBackgroundCacheKey(backgroundKey);
       const config = getEnvironmentBackground(backgroundKey);
       if (!config) {
@@ -13236,9 +13094,9 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
           signature = `${backgroundKey || 'no-key'}:${stableStringify(config)}`;
       }
       catch (_) {
-          const keyPart = (_a = config === null || config === void 0 ? void 0 : config.key) !== null && _a !== void 0 ? _a : '';
-          const themePart = (_b = config === null || config === void 0 ? void 0 : config.theme) !== null && _b !== void 0 ? _b : '';
-          const propsLength = Array.isArray(config === null || config === void 0 ? void 0 : config.props)
+          const keyPart = config?.key ?? '';
+          const themePart = config?.theme ?? '';
+          const propsLength = Array.isArray(config?.props)
               ? (config.props.length)
               : 0;
           signature = `${backgroundKey || 'no-key'}:fallback:${String(keyPart)}:${String(themePart)}:${propsLength}`;
@@ -13249,7 +13107,7 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
   function normalizeConfig(input = {}) {
       const { scene, ...rest } = input;
       const out = { ...rest };
-      const sceneConfig = scene !== null && scene !== void 0 ? scene : {};
+      const sceneConfig = scene ?? {};
       if (typeof out.sceneTheme === 'undefined' && typeof sceneConfig.theme === 'string') {
           out.sceneTheme = sceneConfig.theme;
       }
@@ -13300,8 +13158,7 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
       return typeof candidate.side !== 'string';
   }
   function parseSlotValue(entry) {
-      var _a, _b;
-      const raw = (_b = (_a = entry.slot) !== null && _a !== void 0 ? _a : entry.s) !== null && _b !== void 0 ? _b : entry.index;
+      const raw = entry.slot ?? entry.s ?? entry.index;
       if (typeof raw === 'number' && Number.isFinite(raw))
           return raw;
       if (typeof raw === 'string') {
@@ -13386,22 +13243,33 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
       return { order, indexMap };
   }
   function createSession(options = {}) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
       const normalized = normalizeConfig(options);
       const modeKey = typeof normalized.modeKey === 'string' ? normalized.modeKey : null;
       const sceneCfg = getSceneConfig(CFG);
-      const sceneTheme = (_c = (_b = (_a = normalized.sceneTheme) !== null && _a !== void 0 ? _a : sceneCfg === null || sceneCfg === void 0 ? void 0 : sceneCfg.CURRENT_THEME) !== null && _b !== void 0 ? _b : sceneCfg === null || sceneCfg === void 0 ? void 0 : sceneCfg.DEFAULT_THEME) !== null && _c !== void 0 ? _c : null;
-      const backgroundKey = (_h = (_g = (_f = (_e = (_d = normalized.backgroundKey) !== null && _d !== void 0 ? _d : CFG.CURRENT_BACKGROUND) !== null && _e !== void 0 ? _e : sceneCfg === null || sceneCfg === void 0 ? void 0 : sceneCfg.CURRENT_BACKGROUND) !== null && _f !== void 0 ? _f : sceneCfg === null || sceneCfg === void 0 ? void 0 : sceneCfg.CURRENT_THEME) !== null && _g !== void 0 ? _g : sceneCfg === null || sceneCfg === void 0 ? void 0 : sceneCfg.DEFAULT_THEME) !== null && _h !== void 0 ? _h : null;
+      const sceneTheme = normalized.sceneTheme
+          ?? sceneCfg?.CURRENT_THEME
+          ?? sceneCfg?.DEFAULT_THEME
+          ?? null;
+      const backgroundKey = normalized.backgroundKey
+          ?? CFG.CURRENT_BACKGROUND
+          ?? sceneCfg?.CURRENT_BACKGROUND
+          ?? sceneCfg?.CURRENT_THEME
+          ?? sceneCfg?.DEFAULT_THEME
+          ?? null;
       const allyUnits = Array.isArray(normalized.deck) && normalized.deck.length
           ? Array.from(normalized.deck)
           : Array.from(DEFAULT_UNIT_ROSTER);
-      const enemyPreset = (_j = normalized.aiPreset) !== null && _j !== void 0 ? _j : null;
-      const enemyUnits = Array.isArray(enemyPreset === null || enemyPreset === void 0 ? void 0 : enemyPreset.deck) && enemyPreset.deck.length
+      const enemyPreset = normalized.aiPreset ?? null;
+      const enemyUnits = Array.isArray(enemyPreset?.deck) && enemyPreset.deck.length
           ? Array.from(enemyPreset.deck)
-          : Array.isArray(enemyPreset === null || enemyPreset === void 0 ? void 0 : enemyPreset.unitsAll) && enemyPreset.unitsAll.length
+          : Array.isArray(enemyPreset?.unitsAll) && enemyPreset.unitsAll.length
               ? Array.from(enemyPreset.unitsAll)
               : Array.from(DEFAULT_UNIT_ROSTER);
-      const requestedTurnMode = (_q = (_o = (_m = (_k = normalized.turnMode) !== null && _k !== void 0 ? _k : (_l = normalized.turn) === null || _l === void 0 ? void 0 : _l.mode) !== null && _m !== void 0 ? _m : normalized.turnOrderMode) !== null && _o !== void 0 ? _o : (_p = normalized.turnOrder) === null || _p === void 0 ? void 0 : _p.mode) !== null && _q !== void 0 ? _q : getTurnOrderMode(CFG);
+      const requestedTurnMode = normalized.turnMode
+          ?? normalized.turn?.mode
+          ?? normalized.turnOrderMode
+          ?? normalized.turnOrder?.mode
+          ?? getTurnOrderMode(CFG);
       const useInterleaved = requestedTurnMode === 'interleaved_by_position';
       const allyColsRaw = CFG.ALLY_COLS;
       const gridRowsRaw = CFG.GRID_ROWS;
@@ -13480,9 +13348,8 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
       return offscreen;
   }
   function ensureSceneCache(args) {
-      var _a, _b, _c, _d, _e, _f, _g;
       const { game, canvas, documentRef, camPreset } = args;
-      if (!(game === null || game === void 0 ? void 0 : game.grid))
+      if (!game?.grid)
           return null;
       if (typeof game.grid !== 'object')
           return null;
@@ -13497,13 +13364,13 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
       const pixelWidth = Math.max(1, Math.round(cssWidth * dprRaw));
       const pixelHeight = Math.max(1, Math.round(cssHeight * dprRaw));
       const sceneCfg = getSceneConfig(CFG);
-      const themeKey = (_c = (_b = (_a = game.sceneTheme) !== null && _a !== void 0 ? _a : sceneCfg === null || sceneCfg === void 0 ? void 0 : sceneCfg.CURRENT_THEME) !== null && _b !== void 0 ? _b : sceneCfg === null || sceneCfg === void 0 ? void 0 : sceneCfg.DEFAULT_THEME) !== null && _c !== void 0 ? _c : null;
-      const theme = themeKey ? (_e = (_d = sceneCfg === null || sceneCfg === void 0 ? void 0 : sceneCfg.THEMES) === null || _d === void 0 ? void 0 : _d[themeKey]) !== null && _e !== void 0 ? _e : null : null;
-      const backgroundKey = (_f = game.backgroundKey) !== null && _f !== void 0 ? _f : null;
+      const themeKey = game.sceneTheme ?? sceneCfg?.CURRENT_THEME ?? sceneCfg?.DEFAULT_THEME ?? null;
+      const theme = themeKey ? sceneCfg?.THEMES?.[themeKey] ?? null : null;
+      const backgroundKey = game.backgroundKey ?? null;
       const backgroundSignature = computeBackgroundSignature(backgroundKey);
-      const camPresetSignature = stableStringify(camPreset !== null && camPreset !== void 0 ? camPreset : null);
+      const camPresetSignature = stableStringify(camPreset ?? null);
       const baseScene = getCachedBattlefieldScene(grid, theme, { width: cssWidth, height: cssHeight, dpr: dprRaw });
-      const baseKey = (_g = baseScene === null || baseScene === void 0 ? void 0 : baseScene.cacheKey) !== null && _g !== void 0 ? _g : null;
+      const baseKey = baseScene?.cacheKey ?? null;
       if (!baseScene) {
           sceneCache = null;
           return null;
@@ -13555,7 +13422,7 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
       }
       const drawCtx = cacheCtx;
       try {
-          drawEnvironmentProps(drawCtx, grid, camPreset, backgroundKey !== null && backgroundKey !== void 0 ? backgroundKey : undefined);
+          drawEnvironmentProps(drawCtx, grid, camPreset, backgroundKey ?? undefined);
           drawGridOblique(drawCtx, grid, camPreset);
       }
       catch (err) {
@@ -13589,19 +13456,17 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
       return null;
   }
   function makeDeckEntrySkeleton(unitId) {
-      var _a, _b;
       const unitDef = lookupUnit(unitId);
       const art = getUnitArt(unitId);
       return {
           id: unitId,
-          cost: (_a = toFiniteCost(unitDef === null || unitDef === void 0 ? void 0 : unitDef.cost)) !== null && _a !== void 0 ? _a : null,
-          name: typeof (unitDef === null || unitDef === void 0 ? void 0 : unitDef.name) === 'string' ? unitDef.name : null,
+          cost: toFiniteCost(unitDef?.cost) ?? null,
+          name: typeof unitDef?.name === 'string' ? unitDef.name : null,
           art,
-          skinKey: (_b = art === null || art === void 0 ? void 0 : art.skinKey) !== null && _b !== void 0 ? _b : null,
+          skinKey: art?.skinKey ?? null,
       };
   }
   function normalizeDeckEntry(entry) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j;
       if (!entry)
           return null;
       if (typeof entry === 'string') {
@@ -13616,22 +13481,22 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
       const skeleton = makeDeckEntrySkeleton(idRaw);
       const merged = { ...skeleton, ...candidate, id: idRaw };
       const costOverride = toFiniteCost(candidate.cost);
-      merged.cost = (_a = costOverride !== null && costOverride !== void 0 ? costOverride : skeleton.cost) !== null && _a !== void 0 ? _a : null;
+      merged.cost = costOverride ?? skeleton.cost ?? null;
       const nameCandidate = candidate.name;
       if (typeof nameCandidate === 'string' && nameCandidate.trim() !== '') {
           merged.name = nameCandidate;
       }
       else if (merged.name == null) {
-          merged.name = (_b = skeleton.name) !== null && _b !== void 0 ? _b : null;
+          merged.name = skeleton.name ?? null;
       }
       if (merged.art == null) {
-          merged.art = (_c = skeleton.art) !== null && _c !== void 0 ? _c : null;
+          merged.art = skeleton.art ?? null;
       }
       if (typeof merged.skinKey === 'string') {
-          merged.skinKey = merged.skinKey.trim() !== '' ? merged.skinKey : (_f = (_e = (_d = merged.art) === null || _d === void 0 ? void 0 : _d.skinKey) !== null && _e !== void 0 ? _e : skeleton.skinKey) !== null && _f !== void 0 ? _f : null;
+          merged.skinKey = merged.skinKey.trim() !== '' ? merged.skinKey : merged.art?.skinKey ?? skeleton.skinKey ?? null;
       }
       else {
-          merged.skinKey = (_j = (_h = (_g = merged.art) === null || _g === void 0 ? void 0 : _g.skinKey) !== null && _h !== void 0 ? _h : skeleton.skinKey) !== null && _j !== void 0 ? _j : null;
+          merged.skinKey = merged.art?.skinKey ?? skeleton.skinKey ?? null;
       }
       return merged;
   }
@@ -13727,7 +13592,7 @@ __define('./passives.ts', (exports, module, __require) => {
       return out;
   };
   const getPassiveLog = (Game) => {
-      const logCandidate = Game === null || Game === void 0 ? void 0 : Game.passiveLog;
+      const logCandidate = Game?.passiveLog;
       if (!Array.isArray(logCandidate))
           return [];
       const result = [];
@@ -13739,8 +13604,7 @@ __define('./passives.ts', (exports, module, __require) => {
       return result;
   };
   const defaultPassive = ({ passive }) => {
-      var _a;
-      const id = (_a = passive === null || passive === void 0 ? void 0 : passive.id) !== null && _a !== void 0 ? _a : 'unknown';
+      const id = passive?.id ?? 'unknown';
       throw new Error(`Passive handler not implemented: ${id}`);
   };
   const resolvePassiveEffect = (basePassive, effect) => {
@@ -13783,7 +13647,7 @@ __define('./passives.ts', (exports, module, __require) => {
       else if (!handler && basePassive.params && (basePassive.params.stats || basePassive.params.flatStats)) {
           handler = gainStatsHandler;
       }
-      return { handler: handler !== null && handler !== void 0 ? handler : defaultPassive, passive: resolved, params, key };
+      return { handler: handler ?? defaultPassive, passive: resolved, params, key };
   };
   const STAT_ALIAS = new Map([
       ['atk', 'atk'],
@@ -13842,9 +13706,8 @@ __define('./passives.ts', (exports, module, __require) => {
           unit.statuses = [];
   };
   const stacksOf = (unit, id) => {
-      var _a;
       const status = Statuses.get(unit, id);
-      return status ? (_a = status.stacks) !== null && _a !== void 0 ? _a : 0 : 0;
+      return status ? status.stacks ?? 0 : 0;
   };
   const ensureStatBuff = (unit, id, { attr, mode = 'percent', amount = 0, purgeable = true }) => {
       ensureStatusContainer(unit);
@@ -13878,7 +13741,6 @@ __define('./passives.ts', (exports, module, __require) => {
       status.stacks = next;
   };
   const applyStatMap = (unit, passive, stats, options = {}) => {
-      var _a;
       if (!unit || !stats)
           return false;
       const mode = options.mode === 'flat' ? 'flat' : 'percent';
@@ -13886,7 +13748,7 @@ __define('./passives.ts', (exports, module, __require) => {
       const stackable = options.stack !== false;
       const stacks = Number.isFinite(options.stacks) ? Number(options.stacks) : 1;
       const maxStacks = options.maxStacks;
-      const idPrefix = options.idPrefix || (passive === null || passive === void 0 ? void 0 : passive.id) || 'stat';
+      const idPrefix = options.idPrefix || passive?.id || 'stat';
       let applied = false;
       for (const [stat, value] of Object.entries(stats)) {
           if (!Number.isFinite(value))
@@ -13895,7 +13757,7 @@ __define('./passives.ts', (exports, module, __require) => {
           if (!attr)
               continue;
           const status = ensureStatBuff(unit, `${idPrefix}_${attr}`, { attr, mode, amount: value, purgeable });
-          const nextStacks = stackable ? ((_a = status === null || status === void 0 ? void 0 : status.stacks) !== null && _a !== void 0 ? _a : 0) + stacks : stacks;
+          const nextStacks = stackable ? (status?.stacks ?? 0) + stacks : stacks;
           applyStatStacks(status, nextStacks, { maxStacks });
           applied = true;
       }
@@ -13904,7 +13766,7 @@ __define('./passives.ts', (exports, module, __require) => {
       return applied;
   };
   const captureBaseStats = (unit) => {
-      const source = unit !== null && unit !== void 0 ? unit : {};
+      const source = unit ?? {};
       const result = {};
       for (const key of BASE_STAT_KEYS) {
           const value = source[key];
@@ -13925,15 +13787,14 @@ __define('./passives.ts', (exports, module, __require) => {
    * @returns {boolean}
    */
   const evaluateConditionObject = (condition, { Game, unit, ctx, passive }) => {
-      var _a, _b, _c, _d, _e, _f;
       if (!condition || typeof condition !== 'object')
           return true;
-      const hpMax = Number.isFinite(unit === null || unit === void 0 ? void 0 : unit.hpMax)
-          ? (_a = unit === null || unit === void 0 ? void 0 : unit.hpMax) !== null && _a !== void 0 ? _a : 0
-          : Number.isFinite((_b = unit === null || unit === void 0 ? void 0 : unit.baseStats) === null || _b === void 0 ? void 0 : _b.hpMax)
-              ? (_d = (_c = unit === null || unit === void 0 ? void 0 : unit.baseStats) === null || _c === void 0 ? void 0 : _c.hpMax) !== null && _d !== void 0 ? _d : 0
+      const hpMax = Number.isFinite(unit?.hpMax)
+          ? unit?.hpMax ?? 0
+          : Number.isFinite(unit?.baseStats?.hpMax)
+              ? unit?.baseStats?.hpMax ?? 0
               : 0;
-      const hpPct = hpMax > 0 ? (((_e = unit === null || unit === void 0 ? void 0 : unit.hp) !== null && _e !== void 0 ? _e : hpMax) / hpMax) : 0;
+      const hpPct = hpMax > 0 ? ((unit?.hp ?? hpMax) / hpMax) : 0;
       if (condition.selfHPAbove != null && hpPct <= Number(condition.selfHPAbove))
           return false;
       if (condition.selfHPBelow != null && hpPct >= Number(condition.selfHPBelow))
@@ -13945,12 +13806,12 @@ __define('./passives.ts', (exports, module, __require) => {
       if ('requiresStatus' in condition && condition.requiresStatus) {
           const list = Array.isArray(condition.requiresStatus) ? condition.requiresStatus : [condition.requiresStatus];
           for (const id of list) {
-              if (typeof id !== 'string' || !Statuses.has(unit !== null && unit !== void 0 ? unit : null, id))
+              if (typeof id !== 'string' || !Statuses.has(unit ?? null, id))
                   return false;
           }
       }
       if ('targetHasStatus' in condition && condition.targetHasStatus) {
-          const target = ctx === null || ctx === void 0 ? void 0 : ctx.target;
+          const target = ctx?.target;
           if (!target)
               return false;
           const list = Array.isArray(condition.targetHasStatus) ? condition.targetHasStatus : [condition.targetHasStatus];
@@ -13960,19 +13821,19 @@ __define('./passives.ts', (exports, module, __require) => {
           }
       }
       if (condition.minMinions != null) {
-          const ownerIid = unit === null || unit === void 0 ? void 0 : unit.iid;
+          const ownerIid = unit?.iid;
           if (ownerIid == null)
               return false;
-          const tokens = (Game === null || Game === void 0 ? void 0 : Game.tokens) || [];
+          const tokens = Game?.tokens || [];
           const count = tokens.filter(t => t && t.alive && t.isMinion && t.ownerIid === ownerIid).length;
           if (count < Number(condition.minMinions))
               return false;
       }
       if (condition.maxStacks != null) {
-          const stackId = condition.stackId || (passive === null || passive === void 0 ? void 0 : passive.id);
+          const stackId = condition.stackId || passive?.id;
           if (stackId) {
-              const st = Statuses.get(unit !== null && unit !== void 0 ? unit : null, stackId);
-              const stacks = st ? (_f = st.stacks) !== null && _f !== void 0 ? _f : 0 : 0;
+              const st = Statuses.get(unit ?? null, stackId);
+              const stacks = st ? st.stacks ?? 0 : 0;
               if (stacks >= Number(condition.maxStacks))
                   return false;
           }
@@ -13982,8 +13843,7 @@ __define('./passives.ts', (exports, module, __require) => {
   const isPassiveConditionFn = (cond) => typeof cond === 'function';
   const isPassiveConditionObject = (cond) => !!cond && typeof cond === 'object' && !Array.isArray(cond);
   const passiveConditionsOk = ({ Game, unit, passive, ctx, }) => {
-      var _a;
-      const conditionsCandidate = passive ? ((_a = passive.conditions) !== null && _a !== void 0 ? _a : null) : null;
+      const conditionsCandidate = passive ? (passive.conditions ?? null) : null;
       if (!conditionsCandidate)
           return true;
       const conditions = Array.isArray(conditionsCandidate) ? conditionsCandidate : [conditionsCandidate];
@@ -14016,33 +13876,32 @@ __define('./passives.ts', (exports, module, __require) => {
       return true;
   };
   const recomputeFromStatuses = (unit) => {
-      var _a, _b, _c, _d, _e, _f, _g, _h;
       if (!unit || !unit.baseStats)
           return;
       ensureStatusContainer(unit);
       const percent = new Map();
       const flat = new Map();
-      for (const status of (_a = unit.statuses) !== null && _a !== void 0 ? _a : []) {
+      for (const status of unit.statuses ?? []) {
           if (!status || !status.attr || !status.mode)
               continue;
           const attr = normalizeStatKey(status.attr);
           if (!attr)
               continue;
           const stacks = status.stacks == null ? 1 : status.stacks;
-          const amount = ((_c = (_b = status.amount) !== null && _b !== void 0 ? _b : status.power) !== null && _c !== void 0 ? _c : 0) * stacks;
+          const amount = (status.amount ?? status.power ?? 0) * stacks;
           if (!Number.isFinite(amount))
               continue;
           const mode = status.mode === 'flat' ? 'flat' : 'percent';
           const store = mode === 'flat' ? flat : percent;
-          const prev = (_d = store.get(attr)) !== null && _d !== void 0 ? _d : 0;
+          const prev = store.get(attr) ?? 0;
           store.set(attr, prev + amount);
       }
       for (const [key, baseValue] of Object.entries(unit.baseStats)) {
           if (typeof baseValue !== 'number' || !Number.isFinite(baseValue))
               continue;
           const attr = normalizeStatKey(key) || key;
-          const pct = Number((_f = (_e = percent.get(attr)) !== null && _e !== void 0 ? _e : percent.get(key)) !== null && _f !== void 0 ? _f : 0);
-          const add = Number((_h = (_g = flat.get(attr)) !== null && _g !== void 0 ? _g : flat.get(key)) !== null && _h !== void 0 ? _h : 0);
+          const pct = Number(percent.get(attr) ?? percent.get(key) ?? 0);
+          const add = Number(flat.get(attr) ?? flat.get(key) ?? 0);
           let next = baseValue * (1 + pct) + add;
           if (attr === 'arm' || attr === 'res') {
               unit[attr] = clamp01(next);
@@ -14064,35 +13923,33 @@ __define('./passives.ts', (exports, module, __require) => {
       }
   };
   const healTeam = (Game, unit, pct, opts = {}) => {
-      var _a, _b, _c, _d, _e;
       if (!Game || !unit)
           return;
       if (!Number.isFinite(pct) || pct <= 0)
           return;
       const mode = opts.mode || 'targetMax';
-      const casterHpMax = Number.isFinite(unit.hpMax) ? (_a = unit.hpMax) !== null && _a !== void 0 ? _a : 0 : 0;
+      const casterHpMax = Number.isFinite(unit.hpMax) ? unit.hpMax ?? 0 : 0;
       const allies = (Game.tokens || []).filter(t => t && t.side === unit.side && t.alive);
       for (const ally of allies) {
           if (!Number.isFinite(ally.hpMax))
               continue;
-          const base = mode === 'casterMax' ? casterHpMax : ((_b = ally.hpMax) !== null && _b !== void 0 ? _b : 0);
+          const base = mode === 'casterMax' ? casterHpMax : (ally.hpMax ?? 0);
           if (!Number.isFinite(base) || base <= 0)
               continue;
           const healAmount = Math.max(0, Math.round(base * pct));
           if (healAmount <= 0)
               continue;
-          ally.hp = Math.min((_c = ally.hpMax) !== null && _c !== void 0 ? _c : 0, ((_e = (_d = ally.hp) !== null && _d !== void 0 ? _d : ally.hpMax) !== null && _e !== void 0 ? _e : 0) + healAmount);
+          ally.hp = Math.min(ally.hpMax ?? 0, (ally.hp ?? ally.hpMax ?? 0) + healAmount);
       }
   };
   const EFFECTS = {
       placeMark({ unit, passive, ctx }) {
-          var _a, _b;
-          const runtime = (ctx !== null && ctx !== void 0 ? ctx : {});
-          const id = passive === null || passive === void 0 ? void 0 : passive.id;
-          const target = (_a = runtime.target) !== null && _a !== void 0 ? _a : null;
+          const runtime = (ctx ?? {});
+          const id = passive?.id;
+          const target = runtime.target ?? null;
           if (!id || !target)
               return;
-          const params = ((_b = passive === null || passive === void 0 ? void 0 : passive.params) !== null && _b !== void 0 ? _b : {});
+          const params = (passive?.params ?? {});
           const ttl = Number.isFinite(params.ttlTurns) ? Number(params.ttlTurns) : 3;
           const stacksToExplode = Math.max(1, toNumber(params.stacksToExplode, 3));
           const dmgMul = toNumber(params.dmgFromWIL, 0.5);
@@ -14100,8 +13957,7 @@ __define('./passives.ts', (exports, module, __require) => {
           if (!Array.isArray(runtime.afterHit))
               runtime.afterHit = [];
           runtime.afterHit.push((afterCtx = {}) => {
-              var _a, _b, _c, _d, _e, _f;
-              const afterTarget = (_b = (_a = afterCtx.target) !== null && _a !== void 0 ? _a : runtime.target) !== null && _b !== void 0 ? _b : null;
+              const afterTarget = afterCtx.target ?? runtime.target ?? null;
               if (!afterTarget || !afterTarget.alive)
                   return;
               ensureStatusContainer(afterTarget);
@@ -14120,13 +13976,13 @@ __define('./passives.ts', (exports, module, __require) => {
               if (!status)
                   return;
               status.dur = ttl;
-              status.stacks = ((_c = status.stacks) !== null && _c !== void 0 ? _c : 0) + 1;
-              if (((_d = status.stacks) !== null && _d !== void 0 ? _d : 0) < stacksToExplode)
+              status.stacks = (status.stacks ?? 0) + 1;
+              if ((status.stacks ?? 0) < stacksToExplode)
                   return;
               Statuses.remove(afterTarget, id);
-              const amount = Math.max(1, Math.round(toNumber(unit === null || unit === void 0 ? void 0 : unit.wil, 0) * dmgMul));
-              afterTarget.hp = Math.max(0, ((_e = afterTarget.hp) !== null && _e !== void 0 ? _e : 0) - amount);
-              if (((_f = afterTarget.hp) !== null && _f !== void 0 ? _f : 0) <= 0) {
+              const amount = Math.max(1, Math.round(toNumber(unit?.wil, 0) * dmgMul));
+              afterTarget.hp = Math.max(0, (afterTarget.hp ?? 0) - amount);
+              if ((afterTarget.hp ?? 0) <= 0) {
                   if (!hookOnLethalDamage(afterTarget)) {
                       afterTarget.alive = false;
                       if (!afterTarget.deadAt)
@@ -14134,17 +13990,16 @@ __define('./passives.ts', (exports, module, __require) => {
                   }
               }
               if (Array.isArray(runtime.log)) {
-                  runtime.log.push({ t: id, source: unit === null || unit === void 0 ? void 0 : unit.name, target: afterTarget === null || afterTarget === void 0 ? void 0 : afterTarget.name, dmg: amount });
+                  runtime.log.push({ t: id, source: unit?.name, target: afterTarget?.name, dmg: amount });
               }
           });
       },
       gainATKPercent({ unit, passive }) {
-          var _a;
           if (!unit)
               return;
-          const params = ((_a = passive === null || passive === void 0 ? void 0 : passive.params) !== null && _a !== void 0 ? _a : {});
+          const params = (passive?.params ?? {});
           const amount = toNumber(params.amount, 0);
-          applyStatMap(unit, passive !== null && passive !== void 0 ? passive : null, { atk: amount }, {
+          applyStatMap(unit, passive ?? null, { atk: amount }, {
               mode: 'percent',
               stack: params.stack !== false,
               purgeable: params.purgeable !== false,
@@ -14152,12 +14007,11 @@ __define('./passives.ts', (exports, module, __require) => {
           });
       },
       gainWILPercent({ unit, passive }) {
-          var _a;
           if (!unit)
               return;
-          const params = ((_a = passive === null || passive === void 0 ? void 0 : passive.params) !== null && _a !== void 0 ? _a : {});
+          const params = (passive?.params ?? {});
           const amount = toNumber(params.amount, 0);
-          applyStatMap(unit, passive !== null && passive !== void 0 ? passive : null, { wil: amount }, {
+          applyStatMap(unit, passive ?? null, { wil: amount }, {
               mode: 'percent',
               stack: params.stack !== false,
               purgeable: params.purgeable !== false,
@@ -14165,10 +14019,9 @@ __define('./passives.ts', (exports, module, __require) => {
           });
       },
       conditionalBuff({ unit, passive }) {
-          var _a;
-          if (!unit || !(passive === null || passive === void 0 ? void 0 : passive.id))
+          if (!unit || !passive?.id)
               return;
-          const params = ((_a = passive.params) !== null && _a !== void 0 ? _a : {});
+          const params = (passive.params ?? {});
           const hpMax = toNumber(unit.hpMax, 0);
           const hpPct = hpMax > 0 ? toNumber(unit.hp, hpMax) / hpMax : 0;
           const threshold = toNumber(params.ifHPgt, 0.5);
@@ -14214,12 +14067,11 @@ __define('./passives.ts', (exports, module, __require) => {
           recomputeFromStatuses(unit);
       },
       gainRESPct({ Game, unit, passive }) {
-          var _a;
           if (!unit)
               return;
-          const params = ((_a = passive === null || passive === void 0 ? void 0 : passive.params) !== null && _a !== void 0 ? _a : {});
+          const params = (passive?.params ?? {});
           const amount = toNumber(params.amount, 0);
-          applyStatMap(unit, passive !== null && passive !== void 0 ? passive : null, { res: amount }, {
+          applyStatMap(unit, passive ?? null, { res: amount }, {
               mode: 'percent',
               stack: params.stack !== false,
               purgeable: params.purgeable !== false,
@@ -14227,39 +14079,38 @@ __define('./passives.ts', (exports, module, __require) => {
           });
       },
       gainStats({ unit, passive }) {
-          var _a, _b, _c, _d;
           if (!unit)
               return;
-          const params = ((_a = passive === null || passive === void 0 ? void 0 : passive.params) !== null && _a !== void 0 ? _a : {});
-          const modeRaw = (_c = (_b = params.mode) !== null && _b !== void 0 ? _b : params.statMode) !== null && _c !== void 0 ? _c : params.kind;
+          const params = (passive?.params ?? {});
+          const modeRaw = params.mode ?? params.statMode ?? params.kind;
           const mode = modeRaw === 'flat' ? 'flat' : 'percent';
           let applied = false;
           const stats = params.stats;
           if (stats && typeof stats === 'object') {
-              applied = applyStatMap(unit, passive !== null && passive !== void 0 ? passive : null, stats, {
+              applied = applyStatMap(unit, passive ?? null, stats, {
                   mode,
                   stack: params.stack !== false,
                   stacks: typeof params.stacks === 'number' ? params.stacks : undefined,
                   purgeable: params.purgeable !== false,
                   maxStacks: typeof params.maxStacks === 'number' ? params.maxStacks : undefined,
-                  idPrefix: typeof params.idPrefix === 'string' ? params.idPrefix : passive === null || passive === void 0 ? void 0 : passive.id,
+                  idPrefix: typeof params.idPrefix === 'string' ? params.idPrefix : passive?.id,
               }) || applied;
           }
           const flatStats = params.flatStats;
           if (flatStats && typeof flatStats === 'object') {
-              applied = applyStatMap(unit, passive !== null && passive !== void 0 ? passive : null, flatStats, {
+              applied = applyStatMap(unit, passive ?? null, flatStats, {
                   mode: 'flat',
                   stack: params.stackFlat !== false,
                   stacks: typeof params.stacksFlat === 'number' ? params.stacksFlat : typeof params.stacks === 'number' ? params.stacks : undefined,
                   purgeable: params.purgeable !== false,
                   maxStacks: typeof params.maxStacksFlat === 'number' ? params.maxStacksFlat : typeof params.maxStacks === 'number' ? params.maxStacks : undefined,
-                  idPrefix: `${(_d = passive === null || passive === void 0 ? void 0 : passive.id) !== null && _d !== void 0 ? _d : 'stat'}_flat`,
+                  idPrefix: `${passive?.id ?? 'stat'}_flat`,
               }) || applied;
           }
           if (!applied && params.attr != null && typeof params.attr === 'string' && typeof params.amount === 'number') {
               const attr = normalizeStatKey(params.attr);
               if (attr) {
-                  applyStatMap(unit, passive !== null && passive !== void 0 ? passive : null, { [attr]: params.amount }, {
+                  applyStatMap(unit, passive ?? null, { [attr]: params.amount }, {
                       mode,
                       stack: params.stack !== false,
                       stacks: typeof params.stacks === 'number' ? params.stacks : undefined,
@@ -14270,14 +14121,13 @@ __define('./passives.ts', (exports, module, __require) => {
           }
       },
       gainBonus({ Game, unit, passive, ctx }) {
-          var _a;
-          if (!unit || !ctx || !(passive === null || passive === void 0 ? void 0 : passive.id))
+          if (!unit || !ctx || !passive?.id)
               return;
           const runtime = ctx;
-          const params = ((_a = passive.params) !== null && _a !== void 0 ? _a : {});
+          const params = (passive.params ?? {});
           const perMinion = toNumber(params.perMinion, 0);
           const ownerIid = unit.iid;
-          const minions = ((Game === null || Game === void 0 ? void 0 : Game.tokens) || []).filter(token => token && token.alive && token.isMinion && token.ownerIid === ownerIid).length;
+          const minions = (Game?.tokens || []).filter(token => token && token.alive && token.isMinion && token.ownerIid === ownerIid).length;
           const status = ensureStatBuff(unit, passive.id, { attr: 'atk', mode: 'percent', amount: 0, purgeable: params.purgeable !== false });
           if (!status)
               return;
@@ -14292,10 +14142,9 @@ __define('./passives.ts', (exports, module, __require) => {
           }
       },
       resPerSleeping({ Game, unit, passive }) {
-          var _a;
-          if (!Game || !unit || !(passive === null || passive === void 0 ? void 0 : passive.id))
+          if (!Game || !unit || !passive?.id)
               return;
-          const params = ((_a = passive.params) !== null && _a !== void 0 ? _a : {});
+          const params = (passive.params ?? {});
           const foes = (Game.tokens || []).filter(token => token && token.alive && token.side !== unit.side && Statuses.has(token, 'sleep'));
           const status = ensureStatBuff(unit, passive.id, { attr: 'res', mode: 'percent', amount: toNumber(params.perTarget, 0), purgeable: params.purgeable !== false });
           applyStatStacks(status, foes.length, { maxStacks: typeof params.maxStacks === 'number' ? params.maxStacks : undefined });
@@ -14333,13 +14182,12 @@ __define('./passives.ts', (exports, module, __require) => {
    * @returns {void}
    */
   function emitPassiveEvent(Game, unit, when, ctx = {}) {
-      var _a, _b;
       if (!Game || !unit)
           return;
       const metaValue = Game.meta && typeof Game.meta.get === 'function' ? Game.meta.get(unit.id) : null;
       const metaContext = coercePassiveMeta(metaValue);
-      const kit = (_a = metaContext === null || metaContext === void 0 ? void 0 : metaContext.kit) !== null && _a !== void 0 ? _a : null;
-      ctx.meta = (_b = metaContext === null || metaContext === void 0 ? void 0 : metaContext.meta) !== null && _b !== void 0 ? _b : null;
+      const kit = metaContext?.kit ?? null;
+      ctx.meta = metaContext?.meta ?? null;
       ctx.kit = kit;
       if (!kit || !Array.isArray(kit.passives))
           return;
@@ -14362,7 +14210,7 @@ __define('./passives.ts', (exports, module, __require) => {
                   continue;
               if (!passiveConditionsOk({ Game, unit, passive: effectivePassive, ctx }))
                   continue;
-              handlerToUse({ Game: Game !== null && Game !== void 0 ? Game : null, unit: unit !== null && unit !== void 0 ? unit : null, passive: effectivePassive !== null && effectivePassive !== void 0 ? effectivePassive : null, ctx });
+              handlerToUse({ Game: Game ?? null, unit: unit ?? null, passive: effectivePassive ?? null, ctx });
           }
       }
   }
@@ -14373,7 +14221,6 @@ __define('./passives.ts', (exports, module, __require) => {
    * @returns {void}
    */
   function applyOnSpawnEffects(Game, unit, onSpawn) {
-      var _a, _b, _c, _d, _e;
       if (!Game || !unit || !onSpawn)
           return;
       const config = isRecord(onSpawn) ? onSpawn : null;
@@ -14390,7 +14237,7 @@ __define('./passives.ts', (exports, module, __require) => {
       if (Number.isFinite(config.teamHealOnEntry) && Number(config.teamHealOnEntry) > 0) {
           effects.push({ type: 'teamHeal', amount: config.teamHealOnEntry, mode: 'targetMax' });
       }
-      const casterHeal = ((_a = config.teamHealPercentMaxHPOfCaster) !== null && _a !== void 0 ? _a : config.teamHealPercentCasterMaxHP);
+      const casterHeal = (config.teamHealPercentMaxHPOfCaster ?? config.teamHealPercentCasterMaxHP);
       if (Number.isFinite(casterHeal) && Number(casterHeal) > 0) {
           effects.push({ type: 'teamHeal', amount: casterHeal, mode: 'casterMax' });
       }
@@ -14421,9 +14268,9 @@ __define('./passives.ts', (exports, module, __require) => {
       for (const effect of effects) {
           if (!effect)
               continue;
-          const type = normalizeKey((_c = (_b = effect.type) !== null && _b !== void 0 ? _b : effect.kind) !== null && _c !== void 0 ? _c : effect.effect);
+          const type = normalizeKey(effect.type ?? effect.kind ?? effect.effect);
           if (type === 'teamheal') {
-              const amount = toNumber((_e = (_d = effect.amount) !== null && _d !== void 0 ? _d : effect.value) !== null && _e !== void 0 ? _e : effect.percent, 0);
+              const amount = toNumber(effect.amount ?? effect.value ?? effect.percent, 0);
               if (amount <= 0)
                   continue;
               const mode = effect.mode === 'casterMax' ? 'casterMax' : 'targetMax';
@@ -14577,17 +14424,16 @@ __define('./scene.ts', (exports, module, __require) => {
       return normalized.join('|');
   }
   function gridSignature(g, cssWidth, cssHeight, dpr) {
-      var _a, _b, _c, _d, _e;
       if (!g)
           return 'no-grid';
       const parts = [
-          `cols:${(_a = g.cols) !== null && _a !== void 0 ? _a : 'na'}`,
-          `rows:${(_b = g.rows) !== null && _b !== void 0 ? _b : 'na'}`,
-          `tile:${Math.round((_c = g.tile) !== null && _c !== void 0 ? _c : 0)}`,
-          `ox:${Math.round((_d = g.ox) !== null && _d !== void 0 ? _d : 0)}`,
-          `oy:${Math.round((_e = g.oy) !== null && _e !== void 0 ? _e : 0)}`,
-          `w:${Math.round(cssWidth !== null && cssWidth !== void 0 ? cssWidth : 0)}`,
-          `h:${Math.round(cssHeight !== null && cssHeight !== void 0 ? cssHeight : 0)}`,
+          `cols:${g.cols ?? 'na'}`,
+          `rows:${g.rows ?? 'na'}`,
+          `tile:${Math.round(g.tile ?? 0)}`,
+          `ox:${Math.round(g.ox ?? 0)}`,
+          `oy:${Math.round(g.oy ?? 0)}`,
+          `w:${Math.round(cssWidth ?? 0)}`,
+          `h:${Math.round(cssHeight ?? 0)}`,
           `dpr:${Number.isFinite(dpr) ? dpr : 'na'}`,
       ];
       return joinSignatureParts(parts);
@@ -14596,14 +14442,13 @@ __define('./scene.ts', (exports, module, __require) => {
       battlefieldSceneCache.clear();
   }
   function getCachedBattlefieldScene(g, theme, options = {}) {
-      var _a, _b, _c, _d;
       if (!g)
           return null;
-      const cssWidth = normalizeDimension((_a = options.width) !== null && _a !== void 0 ? _a : g.w);
-      const cssHeight = normalizeDimension((_b = options.height) !== null && _b !== void 0 ? _b : g.h);
-      const dpr = Number.isFinite(options.dpr) && ((_c = options.dpr) !== null && _c !== void 0 ? _c : 0) > 0
+      const cssWidth = normalizeDimension(options.width ?? g.w);
+      const cssHeight = normalizeDimension(options.height ?? g.h);
+      const dpr = Number.isFinite(options.dpr) && (options.dpr ?? 0) > 0
           ? options.dpr
-          : (Number.isFinite(g.dpr) && ((_d = g.dpr) !== null && _d !== void 0 ? _d : 0) > 0 ? g.dpr : 1);
+          : (Number.isFinite(g.dpr) && (g.dpr ?? 0) > 0 ? g.dpr : 1);
       if (!cssWidth || !cssHeight)
           return null;
       const pixelWidth = Math.max(1, Math.round(cssWidth * dpr));
@@ -14688,12 +14533,11 @@ __define('./scene.ts', (exports, module, __require) => {
       return `rgb(${r}, ${g}, ${bVal})`;
   }
   function drawBattlefieldScene(ctx, g, theme) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
       if (!ctx || !g)
           return;
       const t = mergeTheme(theme);
-      const w = (_a = g.w) !== null && _a !== void 0 ? _a : ctx.canvas.width;
-      const h = (_b = g.h) !== null && _b !== void 0 ? _b : ctx.canvas.height;
+      const w = g.w ?? ctx.canvas.width;
+      const h = g.h ?? ctx.canvas.height;
       const boardTop = g.oy;
       const boardHeight = g.tile * g.rows;
       const boardBottom = boardTop + boardHeight;
@@ -14709,31 +14553,31 @@ __define('./scene.ts', (exports, module, __require) => {
           ctx.fillStyle = t.sky.bottom;
           ctx.fillRect(0, boardBottom, w, h - boardBottom);
       }
-      const horizonY = boardTop + Math.min(Math.max((_c = t.horizon.height) !== null && _c !== void 0 ? _c : 0, 0), 1) * boardHeight;
-      const glowHeight = Math.max(4, g.tile * ((_d = t.horizon.thickness) !== null && _d !== void 0 ? _d : 0));
+      const horizonY = boardTop + Math.min(Math.max(t.horizon.height ?? 0, 0), 1) * boardHeight;
+      const glowHeight = Math.max(4, g.tile * (t.horizon.thickness ?? 0));
       const glowGradient = ctx.createLinearGradient(0, horizonY - glowHeight, 0, horizonY + glowHeight);
       glowGradient.addColorStop(0, 'rgba(0,0,0,0)');
-      glowGradient.addColorStop(0.45, (_e = t.horizon.glow) !== null && _e !== void 0 ? _e : 'rgba(0,0,0,0)');
-      glowGradient.addColorStop(0.55, (_f = t.horizon.glow) !== null && _f !== void 0 ? _f : 'rgba(0,0,0,0)');
+      glowGradient.addColorStop(0.45, t.horizon.glow ?? 'rgba(0,0,0,0)');
+      glowGradient.addColorStop(0.55, t.horizon.glow ?? 'rgba(0,0,0,0)');
       glowGradient.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = glowGradient;
       ctx.fillRect(0, Math.max(0, horizonY - glowHeight), w, glowHeight * 2);
-      ctx.strokeStyle = (_g = t.horizon.color) !== null && _g !== void 0 ? _g : '#f4d9ad';
+      ctx.strokeStyle = t.horizon.color ?? '#f4d9ad';
       ctx.lineWidth = Math.max(1, g.tile * 0.05);
       ctx.beginPath();
       ctx.moveTo(g.ox - g.tile, horizonY);
       ctx.lineTo(g.ox + g.tile * g.cols + g.tile, horizonY);
       ctx.stroke();
-      const groundTopScale = (_h = t.ground.topScale) !== null && _h !== void 0 ? _h : 1;
-      const groundBottomScale = (_j = t.ground.bottomScale) !== null && _j !== void 0 ? _j : 1;
+      const groundTopScale = t.ground.topScale ?? 1;
+      const groundBottomScale = t.ground.bottomScale ?? 1;
       const groundTopWidth = g.tile * g.cols * groundTopScale;
       const groundBottomWidth = g.tile * g.cols * groundBottomScale;
       const groundTop = boardTop + g.tile * 0.35;
       const groundBottom = h;
       const groundGradient = ctx.createLinearGradient(0, groundTop, 0, groundBottom);
-      groundGradient.addColorStop(0, (_k = t.ground.top) !== null && _k !== void 0 ? _k : '#312724');
-      groundGradient.addColorStop(0.45, (_l = t.ground.accent) !== null && _l !== void 0 ? _l : '#3f302c');
-      groundGradient.addColorStop(1, (_m = t.ground.bottom) !== null && _m !== void 0 ? _m : '#181210');
+      groundGradient.addColorStop(0, t.ground.top ?? '#312724');
+      groundGradient.addColorStop(0.45, t.ground.accent ?? '#3f302c');
+      groundGradient.addColorStop(1, t.ground.bottom ?? '#181210');
       ctx.fillStyle = groundGradient;
       ctx.beginPath();
       ctx.moveTo(centerX - groundTopWidth / 2, groundTop);
@@ -14743,7 +14587,7 @@ __define('./scene.ts', (exports, module, __require) => {
       ctx.closePath();
       ctx.fill();
       const layerCount = Math.max(4, g.rows * 2);
-      const parallaxStrength = ((_o = t.ground.parallax) !== null && _o !== void 0 ? _o : 0) * g.tile;
+      const parallaxStrength = (t.ground.parallax ?? 0) * g.tile;
       for (let i = 0; i < layerCount; i += 1) {
           const t0 = i / layerCount;
           const t1 = (i + 1) / layerCount;
@@ -14871,21 +14715,20 @@ __define('./screens/arena-hub/index.ts', (exports, module, __require) => {
       ensureStyleTag(STYLE_ID, { css: CSS });
   }
   function toMetadata(mode) {
-      var _a, _b, _c;
-      const params = (_a = mode.shell) === null || _a === void 0 ? void 0 : _a.defaultParams;
+      const params = mode.shell?.defaultParams;
       const normalizedParams = params && typeof params === 'object' && !Array.isArray(params)
           ? { ...params }
           : null;
       return {
           key: mode.id,
-          id: ((_b = mode.shell) === null || _b === void 0 ? void 0 : _b.screenId) || mode.id,
+          id: mode.shell?.screenId || mode.id,
           title: mode.title || mode.id,
           description: mode.shortDescription,
           icon: mode.icon,
           tags: Array.isArray(mode.tags) ? [...mode.tags] : [],
           status: mode.status,
           params: normalizedParams,
-          parentId: (_c = mode.parentId) !== null && _c !== void 0 ? _c : null,
+          parentId: mode.parentId ?? null,
       };
   }
   function getChildModes() {
@@ -14931,9 +14774,9 @@ __define('./screens/arena-hub/index.ts', (exports, module, __require) => {
       titles.className = 'arena-hub__titles';
       const title = document.createElement('h1');
       title.className = 'arena-hub__title';
-      title.textContent = (definition === null || definition === void 0 ? void 0 : definition.label) || 'Arena Hub';
+      title.textContent = definition?.label || 'Arena Hub';
       titles.appendChild(title);
-      if (definition === null || definition === void 0 ? void 0 : definition.description) {
+      if (definition?.description) {
           const subtitle = document.createElement('p');
           subtitle.className = 'arena-hub__subtitle';
           subtitle.textContent = definition.description;
@@ -15023,7 +14866,6 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
   function buildRosterWithCost(rosterSource) {
       const costs = new Map(UNITS.map((unit) => [normalizeUnitId(unit.id), unit.cost]));
       return rosterSource.map((entry) => {
-          var _a;
           const entryId = normalizeUnitId(entry.id);
           return {
               ...entry,
@@ -15032,7 +14874,7 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
                   ? entry.cost
                   : entry.cost === null
                       ? null
-                      : (_a = costs.get(entryId)) !== null && _a !== void 0 ? _a : null,
+                      : costs.get(entryId) ?? null,
           };
       });
   }
@@ -15050,11 +14892,13 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
           return Number.isFinite(parsed) ? parsed : null;
       };
       const extractFromEntry = (entry) => {
-          var _a, _b, _c, _d, _e, _f, _g;
           if (!isCurrencyEntry(entry)) {
               return null;
           }
-          return ((_f = (_d = (_b = toFiniteNumber((_a = entry.balance) !== null && _a !== void 0 ? _a : null)) !== null && _b !== void 0 ? _b : toFiniteNumber((_c = entry.amount) !== null && _c !== void 0 ? _c : null)) !== null && _d !== void 0 ? _d : toFiniteNumber((_e = entry.value) !== null && _e !== void 0 ? _e : null)) !== null && _f !== void 0 ? _f : toFiniteNumber((_g = entry.total) !== null && _g !== void 0 ? _g : null));
+          return (toFiniteNumber(entry.balance ?? null)
+              ?? toFiniteNumber(entry.amount ?? null)
+              ?? toFiniteNumber(entry.value ?? null)
+              ?? toFiniteNumber(entry.total ?? null));
       };
       const tryExtract = (candidate) => {
           if (typeof candidate === 'number' || typeof candidate === 'string') {
@@ -15069,7 +14913,6 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
           && typeof value === 'object'
           && !Array.isArray(value));
       const inspectContainer = (container) => {
-          var _a;
           if (!container)
               return null;
           if (Array.isArray(container)) {
@@ -15108,11 +14951,11 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
           }
           if (isLineupCurrencyConfig(container)) {
               const directValue = container[currencyId];
-              const directExtracted = tryExtract(directValue !== null && directValue !== void 0 ? directValue : null);
+              const directExtracted = tryExtract(directValue ?? null);
               if (directExtracted != null)
                   return directExtracted;
               if (isCurrencyValueRecord(container.balances)) {
-                  const balanceExtracted = tryExtract((_a = container.balances[currencyId]) !== null && _a !== void 0 ? _a : null);
+                  const balanceExtracted = tryExtract(container.balances[currencyId] ?? null);
                   if (balanceExtracted != null)
                       return balanceExtracted;
               }
@@ -15122,13 +14965,13 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
       const fromProvided = inspectContainer(providedCurrencies);
       if (fromProvided != null)
           return fromProvided;
-      const fromState = inspectContainer(normalizeCurrencyBalances(playerState !== null && playerState !== void 0 ? playerState : null));
+      const fromState = inspectContainer(normalizeCurrencyBalances(playerState ?? null));
       if (fromState != null)
           return fromState;
       return 0;
   };
   function describeUlt(unit) {
-      return (unit === null || unit === void 0 ? void 0 : unit.name) ? `Bộ kỹ năng của ${unit.name}.` : 'Chọn nhân vật để xem mô tả chi tiết.';
+      return unit?.name ? `Bộ kỹ năng của ${unit.name}.` : 'Chọn nhân vật để xem mô tả chi tiết.';
   }
   function formatResourceCost(cost) {
       if (!cost || typeof cost !== 'object')
@@ -15182,7 +15025,6 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
       return TARGET_LABELS[key] || key;
   }
   function formatSummonSummary(summon) {
-      var _a;
       if (!summon || typeof summon !== 'object')
           return null;
       const record = summon;
@@ -15199,8 +15041,8 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
       if (record.limit != null) {
           parts.push(`giới hạn ${record.limit}`);
       }
-      const ttl = ((_a = record.ttlTurns) !== null && _a !== void 0 ? _a : record.ttl);
-      if (Number.isFinite(ttl) && (ttl !== null && ttl !== void 0 ? ttl : 0) > 0) {
+      const ttl = (record.ttlTurns ?? record.ttl);
+      if (Number.isFinite(ttl) && (ttl ?? 0) > 0) {
           parts.push(`tồn tại ${ttl} lượt`);
       }
       if (record.replace) {
@@ -15241,12 +15083,11 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
       return parts.join(' · ');
   }
   function formatLinksSummary(links) {
-      var _a;
       if (!links || typeof links !== 'object')
           return null;
       const record = links;
       const parts = [];
-      const sharePercent = (_a = record.sharePercent) !== null && _a !== void 0 ? _a : record.maxLinks;
+      const sharePercent = record.sharePercent ?? record.maxLinks;
       if (Number.isFinite(sharePercent)) {
           parts.push(`Chia ${Math.round(Number(sharePercent) * 100)}% sát thương`);
       }
@@ -15262,7 +15103,7 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
   }
   function labelForAbility(entry, fallback) {
       const record = entry;
-      if ((record === null || record === void 0 ? void 0 : record.type) && typeof record.type === 'string' && record.type in ABILITY_TYPE_LABELS) {
+      if (record?.type && typeof record.type === 'string' && record.type in ABILITY_TYPE_LABELS) {
           return ABILITY_TYPE_LABELS[record.type];
       }
       return fallback || 'Kĩ năng';
@@ -15347,40 +15188,39 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
       return getCurrencyDefinitions();
   }
   function toIntlNumberFormatter(formatter, locale, options) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
       if (HAS_INTL_NUMBER_FORMAT && formatter instanceof Intl.NumberFormat) {
           return formatter;
       }
       const fallback = typeof formatter === 'object' && formatter && 'format' in formatter
           ? formatter.format.bind(formatter)
-          : (value) => String(value !== null && value !== void 0 ? value : '');
+          : (value) => String(value ?? '');
       const formatValue = (value) => {
           const normalized = typeof value === 'bigint' ? Number(value) : value;
           try {
               return fallback(normalized);
           }
           catch (error) {
-              return String(normalized !== null && normalized !== void 0 ? normalized : '');
+              return String(normalized ?? '');
           }
       };
       const resolvedOptions = {
           locale: locale && locale.trim() ? locale : 'en',
-          numberingSystem: (_a = options === null || options === void 0 ? void 0 : options.numberingSystem) !== null && _a !== void 0 ? _a : 'latn',
-          style: (_b = options === null || options === void 0 ? void 0 : options.style) !== null && _b !== void 0 ? _b : 'decimal',
-          useGrouping: (_c = options === null || options === void 0 ? void 0 : options.useGrouping) !== null && _c !== void 0 ? _c : true,
-          minimumIntegerDigits: (_d = options === null || options === void 0 ? void 0 : options.minimumIntegerDigits) !== null && _d !== void 0 ? _d : 1,
-          minimumFractionDigits: (_e = options === null || options === void 0 ? void 0 : options.minimumFractionDigits) !== null && _e !== void 0 ? _e : 0,
-          maximumFractionDigits: (_f = options === null || options === void 0 ? void 0 : options.maximumFractionDigits) !== null && _f !== void 0 ? _f : 3,
-          minimumSignificantDigits: options === null || options === void 0 ? void 0 : options.minimumSignificantDigits,
-          maximumSignificantDigits: options === null || options === void 0 ? void 0 : options.maximumSignificantDigits,
-          notation: (_g = options === null || options === void 0 ? void 0 : options.notation) !== null && _g !== void 0 ? _g : 'standard',
-          signDisplay: (_h = options === null || options === void 0 ? void 0 : options.signDisplay) !== null && _h !== void 0 ? _h : 'auto',
-          compactDisplay: (_j = options === null || options === void 0 ? void 0 : options.compactDisplay) !== null && _j !== void 0 ? _j : 'short',
-          currency: options === null || options === void 0 ? void 0 : options.currency,
-          currencyDisplay: (_k = options === null || options === void 0 ? void 0 : options.currencyDisplay) !== null && _k !== void 0 ? _k : 'symbol',
-          currencySign: (_l = options === null || options === void 0 ? void 0 : options.currencySign) !== null && _l !== void 0 ? _l : 'standard',
-          unit: options === null || options === void 0 ? void 0 : options.unit,
-          unitDisplay: (_m = options === null || options === void 0 ? void 0 : options.unitDisplay) !== null && _m !== void 0 ? _m : 'short',
+          numberingSystem: options?.numberingSystem ?? 'latn',
+          style: options?.style ?? 'decimal',
+          useGrouping: options?.useGrouping ?? true,
+          minimumIntegerDigits: options?.minimumIntegerDigits ?? 1,
+          minimumFractionDigits: options?.minimumFractionDigits ?? 0,
+          maximumFractionDigits: options?.maximumFractionDigits ?? 3,
+          minimumSignificantDigits: options?.minimumSignificantDigits,
+          maximumSignificantDigits: options?.maximumSignificantDigits,
+          notation: options?.notation ?? 'standard',
+          signDisplay: options?.signDisplay ?? 'auto',
+          compactDisplay: options?.compactDisplay ?? 'short',
+          currency: options?.currency,
+          currencyDisplay: options?.currencyDisplay ?? 'symbol',
+          currencySign: options?.currencySign ?? 'standard',
+          unit: options?.unit,
+          unitDisplay: options?.unitDisplay ?? 'short',
       };
       const adapter = {
           format(value) {
@@ -15467,49 +15307,46 @@ __define('./screens/collection/index.ts', (exports, module, __require) => {
           if (isUnknownRecord(override)) {
               return toClonedRecord(override);
           }
-          return override !== null && override !== void 0 ? override : null;
+          return override ?? null;
       }
       if (!override) {
           if (isUnknownRecord(base)) {
               return toClonedRecord(base);
           }
-          return base !== null && base !== void 0 ? base : null;
+          return base ?? null;
       }
       if (isUnknownRecord(base) && isUnknownRecord(override)) {
           return { ...base, ...override };
       }
-      return override !== null && override !== void 0 ? override : null;
+      return override ?? null;
   }
   const toCollectionParams = (value) => (isUnknownRecord(value) ? value : null);
   function mergePlayerState(definitionParams, params) {
-      var _a, _b;
-      const merged = mergeParams((_a = definitionParams === null || definitionParams === void 0 ? void 0 : definitionParams.playerState) !== null && _a !== void 0 ? _a : null, (_b = params === null || params === void 0 ? void 0 : params.playerState) !== null && _b !== void 0 ? _b : null);
-      return merged !== null && merged !== void 0 ? merged : {};
+      const merged = mergeParams(definitionParams?.playerState ?? null, params?.playerState ?? null);
+      return merged ?? {};
   }
   function resolveRoster(definitionParams, params) {
-      var _a;
-      const override = Array.isArray(params === null || params === void 0 ? void 0 : params.roster) ? params.roster : null;
-      const base = Array.isArray(definitionParams === null || definitionParams === void 0 ? void 0 : definitionParams.roster) ? definitionParams.roster : null;
-      return (_a = override !== null && override !== void 0 ? override : base) !== null && _a !== void 0 ? _a : [];
+      const override = Array.isArray(params?.roster) ? params.roster : null;
+      const base = Array.isArray(definitionParams?.roster) ? definitionParams.roster : null;
+      return override ?? base ?? [];
   }
   function resolveCurrencies(definitionParams, params, playerState) {
-      const override = params === null || params === void 0 ? void 0 : params.currencies;
+      const override = params?.currencies;
       if (isLineupCurrencies(override)) {
-          return override !== null && override !== void 0 ? override : null;
+          return override ?? null;
       }
-      const base = definitionParams === null || definitionParams === void 0 ? void 0 : definitionParams.currencies;
+      const base = definitionParams?.currencies;
       if (isLineupCurrencies(base)) {
-          return base !== null && base !== void 0 ? base : null;
+          return base ?? null;
       }
       return normalizeCurrencyBalances(playerState);
   }
   function renderCollectionScreen(options) {
-      var _a;
       const { root, shell = null, definition = null, params = null, } = options;
       if (!root) {
           throw new Error('renderCollectionScreen cần một phần tử root hợp lệ.');
       }
-      const definitionParams = toCollectionParams((_a = definition === null || definition === void 0 ? void 0 : definition.params) !== null && _a !== void 0 ? _a : null);
+      const definitionParams = toCollectionParams(definition?.params ?? null);
       const normalizedParams = toCollectionParams(params);
       const playerState = mergePlayerState(definitionParams, normalizedParams);
       const roster = resolveRoster(definitionParams, normalizedParams);
@@ -15530,10 +15367,9 @@ __define('./screens/collection/index.ts', (exports, module, __require) => {
 });
 __define('./screens/collection/state.ts', (exports, module, __require) => {
   function createFilterState(initial) {
-      var _a, _b;
       return {
-          activeTab: (_a = initial === null || initial === void 0 ? void 0 : initial.activeTab) !== null && _a !== void 0 ? _a : 'awakening',
-          selectedUnitId: (_b = initial === null || initial === void 0 ? void 0 : initial.selectedUnitId) !== null && _b !== void 0 ? _b : null,
+          activeTab: initial?.activeTab ?? 'awakening',
+          selectedUnitId: initial?.selectedUnitId ?? null,
       };
   }
   function updateActiveTab(state, tab) {
@@ -15726,7 +15562,6 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       ensureStyleTag(STYLE_ID, { css });
   }
   function renderAbilityCard(entry, options = {}) {
-      var _a, _b, _c;
       const { typeLabel = null, unitId = null } = options;
       const card = document.createElement('article');
       card.className = 'collection-skill-card';
@@ -15734,7 +15569,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       header.className = 'collection-skill-card__header';
       const title = document.createElement('h4');
       title.className = 'collection-skill-card__title';
-      title.textContent = toSafeText((_a = entry === null || entry === void 0 ? void 0 : entry.name) !== null && _a !== void 0 ? _a : 'Kĩ năng');
+      title.textContent = toSafeText(entry?.name ?? 'Kĩ năng');
       header.appendChild(title);
       const actions = document.createElement('div');
       actions.className = 'collection-skill-card__actions';
@@ -15743,7 +15578,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       badge.className = 'collection-skill-card__badge';
       badge.textContent = toSafeText(resolvedTypeLabel);
       actions.appendChild(badge);
-      const abilityId = (_c = (_b = entry === null || entry === void 0 ? void 0 : entry.id) !== null && _b !== void 0 ? _b : entry === null || entry === void 0 ? void 0 : entry.abilityId) !== null && _c !== void 0 ? _c : null;
+      const abilityId = entry?.id ?? entry?.abilityId ?? null;
       const upgradeButton = document.createElement('button');
       upgradeButton.type = 'button';
       upgradeButton.className = 'collection-skill-card__upgrade';
@@ -15758,7 +15593,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       actions.appendChild(upgradeButton);
       header.appendChild(actions);
       card.appendChild(header);
-      const descriptionText = (entry === null || entry === void 0 ? void 0 : entry.description) && String(entry.description).trim() !== ''
+      const descriptionText = entry?.description && String(entry.description).trim() !== ''
           ? String(entry.description)
           : 'Chưa có mô tả chi tiết.';
       card.dataset.description = descriptionText;
@@ -15771,7 +15606,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       if (abilityId != null) {
           card.dataset.abilityId = String(abilityId);
       }
-      if (Array.isArray(entry === null || entry === void 0 ? void 0 : entry.notes)) {
+      if (Array.isArray(entry?.notes)) {
           const filteredNotes = entry.notes
               .map(note => (typeof note === 'string' ? note.trim() : ''))
               .filter(note => note.length > 0);
@@ -15785,7 +15620,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       }
       card.addEventListener('click', event => {
           const target = event.target;
-          if (target === null || target === void 0 ? void 0 : target.closest('.collection-skill-card__upgrade')) {
+          if (target?.closest('.collection-skill-card__upgrade')) {
               return;
           }
           const detail = {
@@ -15799,7 +15634,6 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       return card;
   }
   function renderCollectionView(options) {
-      var _a, _b, _c;
       const { root, shell = null, playerState = {}, roster = null, currencies = null, } = options;
       const host = assertElement(root, {
           guard: (node) => node instanceof HTMLElement,
@@ -15884,7 +15718,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
               }
           });
           rosterObserver.observe(rosterList, { childList: true, subtree: true });
-          addCleanup(() => rosterObserver === null || rosterObserver === void 0 ? void 0 : rosterObserver.disconnect());
+          addCleanup(() => rosterObserver?.disconnect());
       }
       for (const unit of rosterSource) {
           const unitId = normalizeUnitId(unit.id);
@@ -15913,15 +15747,15 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
                   continue;
               }
           }
-          const displayRank = (_b = (_a = normalizedRank !== null && normalizedRank !== void 0 ? normalizedRank : rawRank) !== null && _a !== void 0 ? _a : rawMetaRank) !== null && _b !== void 0 ? _b : null;
-          button.dataset.rank = displayRank !== null && displayRank !== void 0 ? displayRank : 'unknown';
+          const displayRank = normalizedRank ?? rawRank ?? rawMetaRank ?? null;
+          button.dataset.rank = displayRank ?? 'unknown';
           const avatar = document.createElement('div');
           avatar.className = 'collection-roster__avatar';
           if (normalizedRank) {
               mountRarityAura(avatar, normalizedRank, 'collection', { label: true, rounded: true });
           }
           const art = getUnitArt(unitId);
-          if ((_c = art === null || art === void 0 ? void 0 : art.sprite) === null || _c === void 0 ? void 0 : _c.src) {
+          if (art?.sprite?.src) {
               const img = document.createElement('img');
               img.src = art.sprite.src;
               img.alt = unit.name || unitId;
@@ -16085,8 +15919,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           detailEmpty.style.display = 'none';
       };
       const populateSkillDetail = (card, payload) => {
-          var _a;
-          const ability = ((_a = payload === null || payload === void 0 ? void 0 : payload.ability) !== null && _a !== void 0 ? _a : null);
+          const ability = (payload?.ability ?? null);
           if (!ability) {
               clearSkillDetail();
               return;
@@ -16100,9 +15933,9 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           }
           activeAbilityCard = card;
           activeAbilityCard.classList.add('is-expanded');
-          const abilityName = (ability === null || ability === void 0 ? void 0 : ability.name) || 'Kĩ năng';
+          const abilityName = ability?.name || 'Kĩ năng';
           detailTitle.textContent = toSafeText(abilityName);
-          const typeLabel = (payload === null || payload === void 0 ? void 0 : payload.typeLabel)
+          const typeLabel = payload?.typeLabel
               || card.dataset.typeLabel
               || labelForAbility(ability);
           if (typeLabel) {
@@ -16113,7 +15946,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
               detailBadge.textContent = '';
               detailBadge.style.display = 'none';
           }
-          const description = (ability === null || ability === void 0 ? void 0 : ability.description) && String(ability.description).trim() !== ''
+          const description = ability?.description && String(ability.description).trim() !== ''
               ? String(ability.description)
               : card.dataset.description || 'Chưa có mô tả chi tiết.';
           detailDescription.textContent = toSafeText(description);
@@ -16152,7 +15985,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           while (detailNotes.firstChild) {
               detailNotes.removeChild(detailNotes.firstChild);
           }
-          const rawNotes = Array.isArray(ability === null || ability === void 0 ? void 0 : ability.notes) ? ability.notes : [];
+          const rawNotes = Array.isArray(ability?.notes) ? ability.notes : [];
           let cardNotes = [];
           if (card.dataset.notes) {
               try {
@@ -16186,7 +16019,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       };
       const handleSkillDetailToggle = (event) => {
           const target = event.target;
-          const card = target === null || target === void 0 ? void 0 : target.closest('.collection-skill-card');
+          const card = target?.closest('.collection-skill-card');
           if (!card) {
               return;
           }
@@ -16228,7 +16061,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
               }
           }
           const definition = TAB_DEFINITIONS.find(tab => tab.key === key);
-          stageStatus.textContent = (definition === null || definition === void 0 ? void 0 : definition.hint) || 'Khung thông tin chức năng.';
+          stageStatus.textContent = definition?.hint || 'Khung thông tin chức năng.';
           if (key === 'skills') {
               overlay.classList.add('is-open');
           }
@@ -16285,13 +16118,12 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           root.appendChild(container);
       }
       const selectUnit = (unitId) => {
-          var _a, _b, _c, _d, _e;
           if (!unitId || !rosterEntries.has(unitId))
               return;
           updateSelectedUnit(filterState, unitId);
           clearSkillDetail();
           for (const [id, entry] of rosterEntries) {
-              if (!(entry === null || entry === void 0 ? void 0 : entry.button))
+              if (!entry?.button)
                   continue;
               if (id === unitId) {
                   entry.button.classList.add('is-selected');
@@ -16307,9 +16139,9 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
               }
           }
           const selectedEntry = rosterEntries.get(unitId) || null;
-          const unit = (selectedEntry === null || selectedEntry === void 0 ? void 0 : selectedEntry.meta) || null;
-          const unitRarity = (selectedEntry === null || selectedEntry === void 0 ? void 0 : selectedEntry.rarity) || null;
-          stageName.textContent = toSafeText((_a = unit === null || unit === void 0 ? void 0 : unit.name) !== null && _a !== void 0 ? _a : unitId);
+          const unit = selectedEntry?.meta || null;
+          const unitRarity = selectedEntry?.rarity || null;
+          stageName.textContent = toSafeText(unit?.name ?? unitId);
           while (stageTags.firstChild) {
               stageTags.removeChild(stageTags.firstChild);
           }
@@ -16319,13 +16151,13 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
               rankTag.textContent = toSafeText(`Rank ${unitRarity}`);
               stageTags.appendChild(rankTag);
           }
-          else if (unit === null || unit === void 0 ? void 0 : unit.rank) {
+          else if (unit?.rank) {
               const rankTag = document.createElement('span');
               rankTag.className = 'collection-stage__tag';
               rankTag.textContent = toSafeText(`Rank ${unit.rank}`);
               stageTags.appendChild(rankTag);
           }
-          if (unit === null || unit === void 0 ? void 0 : unit.class) {
+          if (unit?.class) {
               const classTag = document.createElement('span');
               classTag.className = 'collection-stage__tag';
               classTag.textContent = toSafeText(unit.class);
@@ -16334,9 +16166,9 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           const costValue = unit && Number.isFinite(unit.cost) ? unit.cost : '—';
           stageCost.textContent = `Cost ${toSafeText(costValue)}`;
           const art = getUnitArt(unitId);
-          if ((_b = art === null || art === void 0 ? void 0 : art.sprite) === null || _b === void 0 ? void 0 : _b.src) {
+          if (art?.sprite?.src) {
               stageSprite.src = art.sprite.src;
-              stageSprite.alt = toSafeText((_c = unit === null || unit === void 0 ? void 0 : unit.name) !== null && _c !== void 0 ? _c : unitId);
+              stageSprite.alt = toSafeText(unit?.name ?? unitId);
               stageSprite.style.opacity = '1';
           }
           else {
@@ -16344,16 +16176,16 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
               stageSprite.alt = '';
               stageSprite.style.opacity = '0';
           }
-          overlayTitle.textContent = toSafeText((unit === null || unit === void 0 ? void 0 : unit.name) ? `Kĩ năng · ${unit.name}` : 'Kĩ năng');
+          overlayTitle.textContent = toSafeText(unit?.name ? `Kĩ năng · ${unit.name}` : 'Kĩ năng');
           const skillSet = getSkillSet(unitId);
           overlaySubtitle.textContent = toSafeText(describeUlt(unit));
-          const summaryNote = (_e = (_d = skillSet === null || skillSet === void 0 ? void 0 : skillSet.notes) === null || _d === void 0 ? void 0 : _d[0]) !== null && _e !== void 0 ? _e : '';
+          const summaryNote = skillSet?.notes?.[0] ?? '';
           overlaySummary.textContent = toSafeText(summaryNote);
           overlaySummary.style.display = summaryNote ? '' : 'none';
           while (overlayNotesList.firstChild) {
               overlayNotesList.removeChild(overlayNotesList.firstChild);
           }
-          const extraNotes = Array.isArray(skillSet === null || skillSet === void 0 ? void 0 : skillSet.notes) ? skillSet.notes.slice(1) : [];
+          const extraNotes = Array.isArray(skillSet?.notes) ? skillSet.notes.slice(1) : [];
           if (extraNotes.length) {
               overlayNotesList.style.display = '';
               for (const note of extraNotes) {
@@ -16371,23 +16203,23 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
               overlayAbilities.removeChild(overlayAbilities.firstChild);
           }
           const abilityEntries = [];
-          if (skillSet === null || skillSet === void 0 ? void 0 : skillSet.basic) {
+          if (skillSet?.basic) {
               abilityEntries.push({ entry: skillSet.basic, label: ABILITY_TYPE_LABELS.basic });
           }
-          if (Array.isArray(skillSet === null || skillSet === void 0 ? void 0 : skillSet.skills)) {
+          if (Array.isArray(skillSet?.skills)) {
               skillSet.skills.forEach((skill, index) => {
                   if (!skill)
                       return;
                   abilityEntries.push({ entry: skill, label: `Kĩ năng ${index + 1}` });
               });
           }
-          if (skillSet === null || skillSet === void 0 ? void 0 : skillSet.ult) {
+          if (skillSet?.ult) {
               abilityEntries.push({ entry: skillSet.ult, label: ABILITY_TYPE_LABELS.ultimate });
           }
-          if (skillSet === null || skillSet === void 0 ? void 0 : skillSet.talent) {
+          if (skillSet?.talent) {
               abilityEntries.push({ entry: skillSet.talent, label: ABILITY_TYPE_LABELS.talent });
           }
-          if (skillSet === null || skillSet === void 0 ? void 0 : skillSet.technique) {
+          if (skillSet?.technique) {
               abilityEntries.push({ entry: skillSet.technique, label: ABILITY_TYPE_LABELS.technique });
           }
           if (abilityEntries.length) {
@@ -16472,18 +16304,16 @@ __define('./screens/gacha/view.ts', (exports, module, __require) => {
       ensureStyleTag(STYLE_ID, { css });
   }
   function toNormalizedCard(card, index) {
-      var _a, _b, _c, _d, _e;
       const rarity = normalizeRarity(card.rarity);
-      const idSource = (_a = card.id) !== null && _a !== void 0 ? _a : `gacha-card-${index}`;
+      const idSource = card.id ?? `gacha-card-${index}`;
       const id = String(idSource);
-      const rawName = (_c = (_b = card.name) !== null && _b !== void 0 ? _b : card.title) !== null && _c !== void 0 ? _c : card.label;
+      const rawName = card.name ?? card.title ?? card.label;
       const name = rawName && rawName.trim().length > 0 ? rawName.trim() : `Thẻ #${index + 1}`;
-      const description = ((_e = (_d = card.description) === null || _d === void 0 ? void 0 : _d.trim) === null || _e === void 0 ? void 0 : _e.call(_d)) ? card.description.trim() : null;
+      const description = card.description?.trim?.() ? card.description.trim() : null;
       const artwork = card.artwork && card.artwork.trim().length > 0 ? card.artwork.trim() : null;
       return { id, name, rarity, description, artwork };
   }
   function renderGachaView(options) {
-      var _a, _b;
       const host = assertElement(options.root, {
           guard: (node) => node instanceof HTMLElement,
           message: 'renderGachaView cần một phần tử root hợp lệ.',
@@ -16496,7 +16326,7 @@ __define('./screens/gacha/view.ts', (exports, module, __require) => {
       header.className = 'gacha-view__header';
       const title = document.createElement('h1');
       title.className = 'gacha-view__title';
-      title.textContent = ((_a = options.title) === null || _a === void 0 ? void 0 : _a.trim()) || 'Kết Quả Gacha';
+      title.textContent = options.title?.trim() || 'Kết Quả Gacha';
       header.appendChild(title);
       if (options.subtitle) {
           const subtitle = document.createElement('p');
@@ -16597,7 +16427,7 @@ __define('./screens/gacha/view.ts', (exports, module, __require) => {
       }
       revealButton.addEventListener('click', handleReveal);
       addCleanup(() => revealButton.removeEventListener('click', handleReveal));
-      renderCards((_b = options.cards) !== null && _b !== void 0 ? _b : []);
+      renderCards(options.cards ?? []);
       return {
           root: mount.root,
           section: mount.section,
@@ -16670,7 +16500,6 @@ __define('./screens/lineup/index.ts', (exports, module, __require) => {
       ]));
   };
   const cloneLineupCurrencies = (source) => {
-      var _a;
       if (Array.isArray(source)) {
           return source.map(item => cloneCurrencyValue(item));
       }
@@ -16697,7 +16526,7 @@ __define('./screens/lineup/index.ts', (exports, module, __require) => {
           clone[key] = value;
       });
       if (!('balances' in clone) && 'balances' in mapSource) {
-          clone.balances = (_a = mapSource.balances) !== null && _a !== void 0 ? _a : null;
+          clone.balances = mapSource.balances ?? null;
       }
       return clone;
   };
@@ -16713,13 +16542,13 @@ __define('./screens/lineup/index.ts', (exports, module, __require) => {
           return value;
       }
       if (value == null) {
-          return value !== null && value !== void 0 ? value : undefined;
+          return value ?? undefined;
       }
       return null;
   };
   function resolveLineups(definitionParams, params) {
-      const base = Array.isArray(definitionParams === null || definitionParams === void 0 ? void 0 : definitionParams.lineups) ? definitionParams === null || definitionParams === void 0 ? void 0 : definitionParams.lineups : null;
-      const override = Array.isArray(params === null || params === void 0 ? void 0 : params.lineups) ? params === null || params === void 0 ? void 0 : params.lineups : null;
+      const base = Array.isArray(definitionParams?.lineups) ? definitionParams?.lineups : null;
+      const override = Array.isArray(params?.lineups) ? params?.lineups : null;
       if (override)
           return override;
       if (base)
@@ -16727,19 +16556,18 @@ __define('./screens/lineup/index.ts', (exports, module, __require) => {
       return [];
   }
   function renderLineupScreen(options) {
-      var _a, _b, _c, _d, _e, _f, _g, _h;
       const { root, shell = null, definition = null, params = null } = options;
       if (!root) {
           throw new Error('renderLineupScreen cần một phần tử root hợp lệ.');
       }
-      const defParams = toLineupParams((_a = definition === null || definition === void 0 ? void 0 : definition.params) !== null && _a !== void 0 ? _a : null);
+      const defParams = toLineupParams(definition?.params ?? null);
       const normalizedParams = toLineupParams(params);
-      const mergedPlayerState = mergeParams((_b = defParams === null || defParams === void 0 ? void 0 : defParams.playerState) !== null && _b !== void 0 ? _b : null, (_c = normalizedParams === null || normalizedParams === void 0 ? void 0 : normalizedParams.playerState) !== null && _c !== void 0 ? _c : null) || {};
+      const mergedPlayerState = mergeParams(defParams?.playerState ?? null, normalizedParams?.playerState ?? null) || {};
       const lineups = resolveLineups(defParams, normalizedParams);
-      const mergedRosterSource = mergeParams(toMergeable(defParams === null || defParams === void 0 ? void 0 : defParams.roster), toMergeable(normalizedParams === null || normalizedParams === void 0 ? void 0 : normalizedParams.roster));
+      const mergedRosterSource = mergeParams(toMergeable(defParams?.roster), toMergeable(normalizedParams?.roster));
       const roster = toRosterSource(mergedRosterSource);
-      const baseCurrencies = isLineupCurrencies(defParams === null || defParams === void 0 ? void 0 : defParams.currencies) ? (_d = defParams === null || defParams === void 0 ? void 0 : defParams.currencies) !== null && _d !== void 0 ? _d : null : null;
-      const overrideCurrencies = isLineupCurrencies(normalizedParams === null || normalizedParams === void 0 ? void 0 : normalizedParams.currencies) ? (_e = normalizedParams === null || normalizedParams === void 0 ? void 0 : normalizedParams.currencies) !== null && _e !== void 0 ? _e : null : null;
+      const baseCurrencies = isLineupCurrencies(defParams?.currencies) ? defParams?.currencies ?? null : null;
+      const overrideCurrencies = isLineupCurrencies(normalizedParams?.currencies) ? normalizedParams?.currencies ?? null : null;
       const mergedCurrencySource = mergeParams(baseCurrencies, overrideCurrencies);
       const playerCurrencySource = normalizeCurrencyBalances(mergedPlayerState);
       const currencies = mergedCurrencySource
@@ -16747,7 +16575,10 @@ __define('./screens/lineup/index.ts', (exports, module, __require) => {
           : playerCurrencySource
               ? cloneLineupCurrencies(playerCurrencySource)
               : null;
-      const description = (_h = (_g = (_f = params === null || params === void 0 ? void 0 : params.shortDescription) !== null && _f !== void 0 ? _f : defParams === null || defParams === void 0 ? void 0 : defParams.shortDescription) !== null && _g !== void 0 ? _g : definition === null || definition === void 0 ? void 0 : definition.description) !== null && _h !== void 0 ? _h : '';
+      const description = params?.shortDescription
+          ?? defParams?.shortDescription
+          ?? definition?.description
+          ?? '';
       return renderLineupView({
           root,
           shell,
@@ -16810,12 +16641,11 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
       backButton.addEventListener('click', handleBack);
       cleanup.push(() => backButton.removeEventListener('click', handleBack));
       const getCellLabel = (lineup, cellIndex) => {
-          var _a, _b;
           const cell = lineup.cells[cellIndex];
           if (!cell) {
               return 'Ô đội hình';
           }
-          const firstReserveIndex = (_b = (_a = lineup.cells.find(entry => entry.section === 'reserve')) === null || _a === void 0 ? void 0 : _a.index) !== null && _b !== void 0 ? _b : lineup.cells.length;
+          const firstReserveIndex = lineup.cells.find(entry => entry.section === 'reserve')?.index ?? lineup.cells.length;
           const displayIndex = cell.section === 'formation'
               ? cell.index + 1
               : (cell.index - firstReserveIndex + 1);
@@ -16823,8 +16653,7 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
           return `${sectionName} #${Math.max(displayIndex, 1)}`;
       };
       const handleCellInteraction = (event) => {
-          var _a, _b, _c, _d, _e;
-          const cellEl = (_a = event.target) === null || _a === void 0 ? void 0 : _a.closest('.lineup-cell');
+          const cellEl = event.target?.closest('.lineup-cell');
           if (!cellEl)
               return;
           const lineup = helpers.getSelectedLineup();
@@ -16840,18 +16669,18 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
           helpers.updateActiveCellHighlight();
           helpers.renderCellDetails();
           const targetEl = event.target;
-          const actionable = targetEl === null || targetEl === void 0 ? void 0 : targetEl.closest('[data-cell-action]');
+          const actionable = targetEl?.closest('[data-cell-action]');
           const mouseEvent = event;
           const hasModifier = Boolean(mouseEvent && (mouseEvent.altKey || mouseEvent.ctrlKey || mouseEvent.metaKey));
-          let action = (_b = actionable === null || actionable === void 0 ? void 0 : actionable.dataset.cellAction) !== null && _b !== void 0 ? _b : null;
+          let action = actionable?.dataset.cellAction ?? null;
           if (!action && hasModifier) {
-              action = (_c = cellEl.dataset.cellAltAction) !== null && _c !== void 0 ? _c : (cell.unitId ? 'clear' : null);
+              action = cellEl.dataset.cellAltAction ?? (cell.unitId ? 'clear' : null);
           }
           if (!action) {
-              action = (_d = cellEl.dataset.cellAction) !== null && _d !== void 0 ? _d : null;
+              action = cellEl.dataset.cellAction ?? null;
           }
           if (!action) {
-              action = (_e = cellEl.dataset.cellDefaultAction) !== null && _e !== void 0 ? _e : null;
+              action = cellEl.dataset.cellDefaultAction ?? null;
           }
           const label = getCellLabel(lineup, cellIndex);
           if (action === 'unlock') {
@@ -16905,7 +16734,7 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
                   return;
               }
               const unit = rosterLookup.get(state.selectedUnitId);
-              helpers.setMessage(`Đã gán ${(unit === null || unit === void 0 ? void 0 : unit.name) || 'nhân vật'} vào ${label}.`, 'info');
+              helpers.setMessage(`Đã gán ${unit?.name || 'nhân vật'} vào ${label}.`, 'info');
               state.selectedUnitId = null;
               helpers.renderCells();
               helpers.renderLeader();
@@ -16920,7 +16749,7 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
                   return;
               }
               const unit = rosterLookup.get(state.selectedUnitId);
-              helpers.setMessage(`Đã gán ${(unit === null || unit === void 0 ? void 0 : unit.name) || 'nhân vật'} vào ${label}.`, 'info');
+              helpers.setMessage(`Đã gán ${unit?.name || 'nhân vật'} vào ${label}.`, 'info');
               state.selectedUnitId = null;
               helpers.renderCells();
               helpers.renderLeader();
@@ -16931,7 +16760,7 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
           if (cell.unitId) {
               state.selectedUnitId = cell.unitId;
               const unit = rosterLookup.get(cell.unitId);
-              helpers.setMessage(`Đã chọn ${(unit === null || unit === void 0 ? void 0 : unit.name) || 'nhân vật'} đang ở ${label}. Chọn ô khác để hoán đổi hoặc dùng Alt+nhấp để bỏ.`, 'info');
+              helpers.setMessage(`Đã chọn ${unit?.name || 'nhân vật'} đang ở ${label}. Chọn ô khác để hoán đổi hoặc dùng Alt+nhấp để bỏ.`, 'info');
               helpers.renderRoster();
               helpers.renderCells();
           }
@@ -16942,8 +16771,7 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
       cellsGrid.addEventListener('click', handleCellInteraction);
       cleanup.push(() => cellsGrid.removeEventListener('click', handleCellInteraction));
       const handleCellFocus = (event) => {
-          var _a;
-          const cellEl = (_a = event.target) === null || _a === void 0 ? void 0 : _a.closest('.lineup-cell');
+          const cellEl = event.target?.closest('.lineup-cell');
           if (!cellEl)
               return;
           const lineup = helpers.getSelectedLineup();
@@ -16972,12 +16800,12 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
           }
           if (cell.unitId) {
               const unit = rosterLookup.get(cell.unitId);
-              helpers.setMessage(`${label}: ${(unit === null || unit === void 0 ? void 0 : unit.name) || 'đã có nhân vật'}. Dùng Alt+nhấp để trả ô.`, 'info');
+              helpers.setMessage(`${label}: ${unit?.name || 'đã có nhân vật'}. Dùng Alt+nhấp để trả ô.`, 'info');
               return;
           }
           if (state.selectedUnitId) {
               const unit = rosterLookup.get(state.selectedUnitId);
-              helpers.setMessage(`${label} trống. Đã chọn ${(unit === null || unit === void 0 ? void 0 : unit.name) || 'nhân vật'}. Nhấp để gán.`, 'info');
+              helpers.setMessage(`${label} trống. Đã chọn ${unit?.name || 'nhân vật'}. Nhấp để gán.`, 'info');
           }
           else {
               helpers.setMessage(`${label} trống. Chọn nhân vật từ roster rồi nhấp để gán.`, 'info');
@@ -16988,8 +16816,7 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
       cellsGrid.addEventListener('mouseenter', handleCellFocus, true);
       cleanup.push(() => cellsGrid.removeEventListener('mouseenter', handleCellFocus, true));
       const handlePassiveClick = (event) => {
-          var _a;
-          const btn = (_a = event.target) === null || _a === void 0 ? void 0 : _a.closest('.lineup-passive');
+          const btn = event.target?.closest('.lineup-passive');
           if (!btn)
               return;
           const lineup = helpers.getSelectedLineup();
@@ -17006,12 +16833,11 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
       passiveGrid.addEventListener('click', handlePassiveClick);
       cleanup.push(() => passiveGrid.removeEventListener('click', handlePassiveClick));
       const handleRosterFilter = (event) => {
-          var _a, _b;
-          const button = (_a = event.target) === null || _a === void 0 ? void 0 : _a.closest('.lineup-roster__filter');
+          const button = event.target?.closest('.lineup-roster__filter');
           if (!button)
               return;
           const type = (button.dataset.filterType || 'all');
-          const value = (_b = button.dataset.filterValue) !== null && _b !== void 0 ? _b : null;
+          const value = button.dataset.filterValue ?? null;
           state.filter = { type, value };
           helpers.renderFilters();
           helpers.renderRoster();
@@ -17019,8 +16845,7 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
       rosterFilters.addEventListener('click', handleRosterFilter);
       cleanup.push(() => rosterFilters.removeEventListener('click', handleRosterFilter));
       const handleRosterSelect = (event) => {
-          var _a;
-          const entry = (_a = event.target) === null || _a === void 0 ? void 0 : _a.closest('.lineup-roster__entry');
+          const entry = event.target?.closest('.lineup-roster__entry');
           if (!entry)
               return;
           const unitId = entry.dataset.unitId || null;
@@ -17033,7 +16858,7 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
           else {
               state.selectedUnitId = unitId;
               const unit = rosterLookup.get(unitId);
-              helpers.setMessage(`Đã chọn ${(unit === null || unit === void 0 ? void 0 : unit.name) || 'nhân vật'}. Nhấn vào ô đội hình hoặc leader để gán.`, 'info');
+              helpers.setMessage(`Đã chọn ${unit?.name || 'nhân vật'}. Nhấn vào ô đội hình hoặc leader để gán.`, 'info');
           }
           helpers.renderRoster();
           helpers.renderCells();
@@ -17070,14 +16895,13 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
       leaderOverlay.addEventListener('click', handleLeaderOverlayClick);
       cleanup.push(() => leaderOverlay.removeEventListener('click', handleLeaderOverlayClick));
       const handleLeaderOption = (event) => {
-          var _a, _b;
-          const option = (_a = event.target) === null || _a === void 0 ? void 0 : _a.closest('.lineup-overlay__option');
+          const option = event.target?.closest('.lineup-overlay__option');
           if (!option)
               return;
           const lineup = helpers.getSelectedLineup();
           if (!lineup)
               return;
-          const unitId = (_b = option.dataset.unitId) !== null && _b !== void 0 ? _b : null;
+          const unitId = option.dataset.unitId ?? null;
           const result = setLeader(lineup, unitId || null, rosterLookup);
           if (!result.ok) {
               helpers.setMessage(result.message || 'Không thể đặt leader.', 'error');
@@ -17085,7 +16909,7 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
           else {
               if (unitId) {
                   const unit = rosterLookup.get(unitId);
-                  helpers.setMessage(`Đã chọn ${(unit === null || unit === void 0 ? void 0 : unit.name) || 'leader'}.`, 'info');
+                  helpers.setMessage(`Đã chọn ${unit?.name || 'leader'}.`, 'info');
               }
               else {
                   helpers.setMessage('Đã bỏ chọn leader.', 'info');
@@ -17282,14 +17106,13 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       return trimmed.normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
   }
   function extractCodeFromNormalized(normalized) {
-      var _a, _b, _c;
       if (!normalized) {
           return '';
       }
       const tokens = normalized.split(/[\s\-_/]+/).filter(Boolean);
       if (tokens.length >= 2) {
-          const firstToken = sanitizeCodeToken((_a = tokens[0]) !== null && _a !== void 0 ? _a : '');
-          const lastToken = sanitizeCodeToken((_b = tokens[tokens.length - 1]) !== null && _b !== void 0 ? _b : '');
+          const firstToken = sanitizeCodeToken(tokens[0] ?? '');
+          const lastToken = sanitizeCodeToken(tokens[tokens.length - 1] ?? '');
           let letters = '';
           if (firstToken) {
               letters += firstToken[0];
@@ -17298,7 +17121,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               letters += lastToken[0];
           }
           if (tokens.length > 2 && letters.length < 3) {
-              const extraToken = sanitizeCodeToken((_c = tokens[1]) !== null && _c !== void 0 ? _c : '');
+              const extraToken = sanitizeCodeToken(tokens[1] ?? '');
               if (extraToken) {
                   letters += extraToken[0];
               }
@@ -17312,29 +17135,28 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       return cleaned.slice(0, 3);
   }
   function getUnitCode(unit, fallbackLabel) {
-      const sourceName = (unit === null || unit === void 0 ? void 0 : unit.name) && unit.name.trim()
+      const sourceName = unit?.name && unit.name.trim()
           ? unit.name
           : (typeof fallbackLabel === 'string' ? fallbackLabel : '');
       const normalizedName = normalizeForCode(sourceName);
       let code = extractCodeFromNormalized(normalizedName);
       if (!code) {
-          const normalizedId = normalizeForCode((unit === null || unit === void 0 ? void 0 : unit.id) != null ? String(unit.id) : '');
+          const normalizedId = normalizeForCode(unit?.id != null ? String(unit.id) : '');
           code = extractCodeFromNormalized(normalizedId);
       }
       return code ? code.toLocaleUpperCase('vi-VN') : '';
   }
   function getInitials(parts) {
-      var _a, _b;
       if (!Array.isArray(parts) || parts.length === 0) {
           return '';
       }
-      const firstPart = (_a = parts[0]) !== null && _a !== void 0 ? _a : '';
-      const lastPart = (_b = parts[parts.length - 1]) !== null && _b !== void 0 ? _b : '';
+      const firstPart = parts[0] ?? '';
+      const lastPart = parts[parts.length - 1] ?? '';
       if (parts.length === 1) {
           return firstPart ? firstPart.slice(0, 2).toUpperCase() : '';
       }
-      const firstInitial = firstPart === null || firstPart === void 0 ? void 0 : firstPart[0];
-      const lastInitial = lastPart === null || lastPart === void 0 ? void 0 : lastPart[0];
+      const firstInitial = firstPart?.[0];
+      const lastInitial = lastPart?.[0];
       if (!firstInitial || !lastInitial) {
           return '';
       }
@@ -17370,15 +17192,14 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       return powerFormatter.format(Number.isFinite(power) ? Number(power) : 0);
   }
   function renderLineupView(options) {
-      var _a, _b;
       const { root, shell = null, definition = null, description = null, lineups = null, roster = null, playerState = null, currencies = null, } = options;
       const host = assertElement(root, {
           guard: (node) => node instanceof HTMLElement,
           message: 'renderLineupView cần một phần tử root hợp lệ.',
       });
       ensureStyles();
-      const normalizedRoster = normalizeRoster(roster !== null && roster !== void 0 ? roster : null);
-      const normalizedLineups = normalizeLineups(lineups !== null && lineups !== void 0 ? lineups : null, normalizedRoster);
+      const normalizedRoster = normalizeRoster(roster ?? null);
+      const normalizedLineups = normalizeLineups(lineups ?? null, normalizedRoster);
       const rosterLookup = new Map(normalizedRoster.map(unit => [normalizeUnitId(unit.id), unit]));
       const lineupState = new Map();
       normalizedLineups.forEach(lineup => {
@@ -17394,10 +17215,10 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               leaderId: lineup.leaderId || null,
           });
       });
-      const playerCurrencySource = normalizeCurrencyBalances(playerState !== null && playerState !== void 0 ? playerState : null);
+      const playerCurrencySource = normalizeCurrencyBalances(playerState ?? null);
       const currencyBalances = createCurrencyBalances(playerCurrencySource, currencies);
       const state = {
-          selectedLineupId: (_b = (_a = normalizedLineups[0]) === null || _a === void 0 ? void 0 : _a.id) !== null && _b !== void 0 ? _b : null,
+          selectedLineupId: normalizedLineups[0]?.id ?? null,
           selectedUnitId: null,
           activeCellIndex: null,
           filter: { type: 'all', value: null },
@@ -17421,7 +17242,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       titleGroup.className = 'lineup-view__title-group';
       const titleEl = document.createElement('h1');
       titleEl.className = 'lineup-view__title';
-      titleEl.textContent = (definition === null || definition === void 0 ? void 0 : definition.label) || (definition === null || definition === void 0 ? void 0 : definition.title) || 'Đội hình';
+      titleEl.textContent = definition?.label || definition?.title || 'Đội hình';
       titleGroup.appendChild(titleEl);
       if (description) {
           const subtitleEl = document.createElement('p');
@@ -17568,10 +17389,9 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           activeOverlay = target;
       }
       function getSelectedLineup() {
-          var _a;
           if (!state.selectedLineupId)
               return null;
-          return (_a = state.lineupState.get(state.selectedLineupId)) !== null && _a !== void 0 ? _a : null;
+          return state.lineupState.get(state.selectedLineupId) ?? null;
       }
       function setMessage(text, type = 'info') {
           state.message = text || '';
@@ -17601,7 +17421,6 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           }
       }
       function renderCellDetails() {
-          var _a, _b, _c, _d, _e, _f, _g;
           cellDetails.innerHTML = '';
           const lineup = getSelectedLineup();
           if (!lineup) {
@@ -17641,7 +17460,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               syncGridDetailsHeight();
               return;
           }
-          const firstReserveIndex = (_b = (_a = lineup.cells.find(entry => entry.section === 'reserve')) === null || _a === void 0 ? void 0 : _a.index) !== null && _b !== void 0 ? _b : lineup.cells.length;
+          const firstReserveIndex = lineup.cells.find(entry => entry.section === 'reserve')?.index ?? lineup.cells.length;
           const sectionName = cell.section === 'formation' ? 'Ô ra trận' : 'Ô dự phòng';
           const displayIndex = cell.section === 'formation'
               ? cell.index + 1
@@ -17695,24 +17514,24 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           interactionHint.className = 'lineup-grid__details-text';
           interactionHint.textContent = 'Nhấp trực tiếp vào ô để xem nhân vật này. Giữ Alt rồi nhấp để bỏ khỏi ô.';
           cellDetails.appendChild(interactionHint);
-          const kit = (_d = (_c = unit.raw) === null || _c === void 0 ? void 0 : _c.kit) !== null && _d !== void 0 ? _d : null;
+          const kit = unit.raw?.kit ?? null;
           const skillSetId = normalizeUnitId(unit.id);
           const skillSet = skillSetId ? getSkillSet(skillSetId) : null;
-          const skills = Array.isArray(kit === null || kit === void 0 ? void 0 : kit.skills)
-              ? ((_e = kit.skills) !== null && _e !== void 0 ? _e : [])
+          const skills = Array.isArray(kit?.skills)
+              ? (kit.skills ?? [])
                   .filter(skill => {
                   const skillRecord = skill;
-                  const skillName = typeof (skillRecord === null || skillRecord === void 0 ? void 0 : skillRecord.name) === 'string' ? skillRecord.name.trim() : '';
-                  const skillKey = typeof (skillRecord === null || skillRecord === void 0 ? void 0 : skillRecord.key) === 'string' ? skillRecord.key.trim() : '';
+                  const skillName = typeof skillRecord?.name === 'string' ? skillRecord.name.trim() : '';
+                  const skillKey = typeof skillRecord?.key === 'string' ? skillRecord.key.trim() : '';
                   return skillName !== 'Đánh Thường' && skillKey !== 'Đánh Thường';
               })
                   .slice(0, 3)
               : [];
-          const kitUlt = (_f = kit === null || kit === void 0 ? void 0 : kit.ult) !== null && _f !== void 0 ? _f : null;
-          const skillSetUlt = (_g = skillSet === null || skillSet === void 0 ? void 0 : skillSet.ult) !== null && _g !== void 0 ? _g : null;
+          const kitUlt = kit?.ult ?? null;
+          const skillSetUlt = skillSet?.ult ?? null;
           const hasUlt = Boolean(kitUlt || skillSetUlt);
           const ultName = hasUlt
-              ? ((kitUlt === null || kitUlt === void 0 ? void 0 : kitUlt.name) || (skillSetUlt === null || skillSetUlt === void 0 ? void 0 : skillSetUlt.name) || (kitUlt === null || kitUlt === void 0 ? void 0 : kitUlt.id) || 'Chưa đặt tên')
+              ? (kitUlt?.name || skillSetUlt?.name || kitUlt?.id || 'Chưa đặt tên')
               : null;
           if (!skills.length && !hasUlt) {
               const fallback = document.createElement('p');
@@ -17733,7 +17552,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
                   skills.forEach((skill, idx) => {
                       const item = document.createElement('li');
                       const skillRecord = skill;
-                      const nameText = (skillRecord === null || skillRecord === void 0 ? void 0 : skillRecord.name) || (skillRecord === null || skillRecord === void 0 ? void 0 : skillRecord.key) || `Kỹ năng #${idx + 1}`;
+                      const nameText = skillRecord?.name || skillRecord?.key || `Kỹ năng #${idx + 1}`;
                       item.textContent = nameText;
                       list.appendChild(item);
                   });
@@ -17757,7 +17576,6 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           syncGridDetailsHeight();
       }
       function renderCells() {
-          var _a, _b, _c;
           const previousAvatars = cellsGrid.querySelectorAll('.lineup-cell__avatar');
           previousAvatars.forEach(avatar => {
               unmountRarity(avatar);
@@ -17786,8 +17604,8 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               return;
           }
           gridSection.classList.remove('is-empty');
-          const firstReserveIndex = (_b = (_a = lineup.cells.find(cell => cell.section === 'reserve')) === null || _a === void 0 ? void 0 : _a.index) !== null && _b !== void 0 ? _b : lineup.cells.length;
-          if (!Number.isInteger(state.activeCellIndex) || !lineup.cells[(_c = state.activeCellIndex) !== null && _c !== void 0 ? _c : -1]) {
+          const firstReserveIndex = lineup.cells.find(cell => cell.section === 'reserve')?.index ?? lineup.cells.length;
+          if (!Number.isInteger(state.activeCellIndex) || !lineup.cells[state.activeCellIndex ?? -1]) {
               state.activeCellIndex = null;
           }
           lineup.cells.forEach(cell => {
@@ -18048,7 +17866,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               passive.requiredUnitIds.forEach(unitId => {
                   const item = document.createElement('li');
                   const unit = rosterLookup.get(unitId);
-                  item.textContent = (unit === null || unit === void 0 ? void 0 : unit.name) || unitId;
+                  item.textContent = unit?.name || unitId;
                   list.appendChild(item);
               });
               passiveOverlayBody.appendChild(list);
@@ -18207,12 +18025,11 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
       return ROSTER.map(entry => ({ ...entry }));
   }
   function normalizeRosterEntry(entry, index) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j;
-      const source = entry !== null && entry !== void 0 ? entry : {};
-      const id = (_b = (_a = source.id) !== null && _a !== void 0 ? _a : source.key) !== null && _b !== void 0 ? _b : `unit-${index}`;
-      const name = (_d = (_c = source.name) !== null && _c !== void 0 ? _c : source.title) !== null && _d !== void 0 ? _d : `Nhân vật #${index + 1}`;
-      const role = (_g = (_f = (_e = source.class) !== null && _e !== void 0 ? _e : source.role) !== null && _f !== void 0 ? _f : source.archetype) !== null && _g !== void 0 ? _g : '';
-      const rank = (_j = (_h = source.rank) !== null && _h !== void 0 ? _h : source.tier) !== null && _j !== void 0 ? _j : '';
+      const source = entry ?? {};
+      const id = source.id ?? source.key ?? `unit-${index}`;
+      const name = source.name ?? source.title ?? `Nhân vật #${index + 1}`;
+      const role = source.class ?? source.role ?? source.archetype ?? '';
+      const rank = source.rank ?? source.tier ?? '';
       const tags = Array.isArray(source.tags)
           ? source.tags.slice()
           : Array.isArray(source.labels)
@@ -18237,7 +18054,7 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
           role: typeof role === 'string' ? role : '',
           rank: typeof rank === 'string' ? rank : '',
           tags: tags.map(tag => String(tag)),
-          power: power !== null && power !== void 0 ? power : null,
+          power: power ?? null,
           avatar,
           passives,
           raw: isObjectLike(source) ? { ...source } : null,
@@ -18278,7 +18095,6 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
       return DEFAULT_RARITY;
   }
   function normalizeAssignment(input, rosterIndex) {
-      var _a, _b, _c, _d, _e, _f, _g, _h;
       if (!input) {
           return { unitId: null, label: null };
       }
@@ -18299,8 +18115,8 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
       }
       if (typeof input === 'object') {
           const record = input;
-          const candidateId = (_c = (_b = (_a = record.unitId) !== null && _a !== void 0 ? _a : record.id) !== null && _b !== void 0 ? _b : record.key) !== null && _c !== void 0 ? _c : null;
-          const label = (_h = (_g = (_f = (_e = (_d = record.name) !== null && _d !== void 0 ? _d : record.title) !== null && _e !== void 0 ? _e : record.label) !== null && _f !== void 0 ? _f : record.displayName) !== null && _g !== void 0 ? _g : record.note) !== null && _h !== void 0 ? _h : null;
+          const candidateId = record.unitId ?? record.id ?? record.key ?? null;
+          const label = record.name ?? record.title ?? record.label ?? record.displayName ?? record.note ?? null;
           if (candidateId && rosterIndex.has(String(candidateId))) {
               return { unitId: String(candidateId), label: typeof label === 'string' ? label : null };
           }
@@ -18311,7 +18127,6 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
       return { unitId: null, label: null };
   }
   function normalizeCost(cost, fallbackCurrencyId) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
       if (cost == null) {
           return null;
       }
@@ -18341,8 +18156,8 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
       }
       if (typeof cost === 'object') {
           const record = cost;
-          const currencyId = (_e = (_d = (_c = (_b = (_a = record.currencyId) !== null && _a !== void 0 ? _a : record.id) !== null && _b !== void 0 ? _b : record.type) !== null && _c !== void 0 ? _c : record.code) !== null && _d !== void 0 ? _d : fallbackCurrencyId) !== null && _e !== void 0 ? _e : 'VNT';
-          const rawAmount = (_k = (_j = (_h = (_g = (_f = record.amount) !== null && _f !== void 0 ? _f : record.value) !== null && _g !== void 0 ? _g : record.cost) !== null && _h !== void 0 ? _h : record.price) !== null && _j !== void 0 ? _j : record.count) !== null && _k !== void 0 ? _k : null;
+          const currencyId = record.currencyId ?? record.id ?? record.type ?? record.code ?? fallbackCurrencyId ?? 'VNT';
+          const rawAmount = record.amount ?? record.value ?? record.cost ?? record.price ?? record.count ?? null;
           const amount = Number(rawAmount);
           if (Number.isFinite(amount) && amount > 0) {
               return { currencyId: String(currencyId), amount };
@@ -18359,15 +18174,14 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
       return null;
   }
   function normalizeLineupEntry(entry, index, rosterIndex) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u;
       const source = entry && isLineupDefinition(entry) ? entry : {};
-      const id = (_b = (_a = source.id) !== null && _a !== void 0 ? _a : source.key) !== null && _b !== void 0 ? _b : `lineup-${index}`;
-      const name = (_d = (_c = source.name) !== null && _c !== void 0 ? _c : source.title) !== null && _d !== void 0 ? _d : `Đội hình #${index + 1}`;
-      const role = (_f = (_e = source.role) !== null && _e !== void 0 ? _e : source.type) !== null && _f !== void 0 ? _f : '';
-      const description = (_h = (_g = source.description) !== null && _g !== void 0 ? _g : source.summary) !== null && _h !== void 0 ? _h : '';
+      const id = source.id ?? source.key ?? `lineup-${index}`;
+      const name = source.name ?? source.title ?? `Đội hình #${index + 1}`;
+      const role = source.role ?? source.type ?? '';
+      const description = source.description ?? source.summary ?? '';
       const rawSlots = Array.isArray(source.slots) ? source.slots : [];
       const memberList = Array.isArray(source.members) ? source.members : [];
-      const defaultCurrencyId = (_l = (_k = (_j = source.unlockCurrency) !== null && _j !== void 0 ? _j : source.currencyId) !== null && _k !== void 0 ? _k : source.defaultCurrencyId) !== null && _l !== void 0 ? _l : null;
+      const defaultCurrencyId = source.unlockCurrency ?? source.currencyId ?? source.defaultCurrencyId ?? null;
       const slotCosts = Array.isArray(source.slotCosts) ? source.slotCosts : null;
       const unlockCosts = Array.isArray(source.unlockCosts) ? source.unlockCosts : slotCosts;
       let unlockedCount = Math.min(3, FORMATION_CELL_COUNT);
@@ -18378,15 +18192,19 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
           unlockedCount = rawSlots.filter(slot => isLineupMemberConfig(slot) && slot.unlocked !== false).length;
       }
       const formationCells = new Array(FORMATION_CELL_COUNT).fill(null).map((_, slotIndex) => {
-          var _a, _b, _c, _d, _e, _f, _g, _h;
-          const slotInput = (_b = (_a = rawSlots[slotIndex]) !== null && _a !== void 0 ? _a : memberList[slotIndex]) !== null && _b !== void 0 ? _b : null;
+          const slotInput = rawSlots[slotIndex] ?? memberList[slotIndex] ?? null;
           const { unitId, label } = normalizeAssignment(slotInput, rosterIndex);
           const record = isLineupMemberConfig(slotInput) ? slotInput : null;
-          const slotUnlock = (_c = record === null || record === void 0 ? void 0 : record.unlocked) !== null && _c !== void 0 ? _c : null;
+          const slotUnlock = record?.unlocked ?? null;
           const unlocked = slotUnlock != null ? Boolean(slotUnlock) : slotIndex < unlockedCount;
-          const costSource = (_h = (_g = (_f = (_e = (_d = record === null || record === void 0 ? void 0 : record.cost) !== null && _d !== void 0 ? _d : record === null || record === void 0 ? void 0 : record.unlockCost) !== null && _e !== void 0 ? _e : (Array.isArray(unlockCosts) ? unlockCosts[slotIndex] : null)) !== null && _f !== void 0 ? _f : source.slotCost) !== null && _g !== void 0 ? _g : source.unlockCost) !== null && _h !== void 0 ? _h : null;
+          const costSource = record?.cost
+              ?? record?.unlockCost
+              ?? (Array.isArray(unlockCosts) ? unlockCosts[slotIndex] : null)
+              ?? source.slotCost
+              ?? source.unlockCost
+              ?? null;
           const unlockCost = normalizeCost(costSource, typeof defaultCurrencyId === 'string' ? defaultCurrencyId : null);
-          const equipment = record === null || record === void 0 ? void 0 : record.equipment;
+          const equipment = record?.equipment;
           return {
               index: slotIndex,
               section: 'formation',
@@ -18394,7 +18212,7 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
               label: label || null,
               unlocked,
               unlockCost,
-              equipment: equipment !== null && equipment !== void 0 ? equipment : null,
+              equipment: equipment ?? null,
               meta: record ? { ...record } : null,
           };
       });
@@ -18406,8 +18224,7 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
                   ? source.members.slice(FORMATION_CELL_COUNT)
                   : [];
       const reserveCells = new Array(RESERVE_CELL_COUNT).fill(null).map((_, reserveIndex) => {
-          var _a;
-          const benchInput = (_a = benchSource[reserveIndex]) !== null && _a !== void 0 ? _a : null;
+          const benchInput = benchSource[reserveIndex] ?? null;
           const { unitId, label } = normalizeAssignment(benchInput, rosterIndex);
           return {
               index: FORMATION_CELL_COUNT + reserveIndex,
@@ -18427,8 +18244,7 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
               ? source.passiveSlots
               : [];
       const passives = new Array(6).fill(null).map((_, passiveIndex) => {
-          var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
-          const passiveInput = (_a = passiveSource[passiveIndex]) !== null && _a !== void 0 ? _a : null;
+          const passiveInput = passiveSource[passiveIndex] ?? null;
           if (!passiveInput) {
               return {
                   index: passiveIndex,
@@ -18444,10 +18260,10 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
               };
           }
           const passive = isLineupPassiveConfig(passiveInput) ? passiveInput : {};
-          const idValue = (_c = (_b = passive.id) !== null && _b !== void 0 ? _b : passive.key) !== null && _c !== void 0 ? _c : `passive-${passiveIndex}`;
-          const nameValue = (_e = (_d = passive.name) !== null && _d !== void 0 ? _d : passive.title) !== null && _e !== void 0 ? _e : `Passive #${passiveIndex + 1}`;
-          const descriptionValue = (_h = (_g = (_f = passive.description) !== null && _f !== void 0 ? _f : passive.effect) !== null && _g !== void 0 ? _g : passive.text) !== null && _h !== void 0 ? _h : '';
-          const requirementValue = (_l = (_k = (_j = passive.requirement) !== null && _j !== void 0 ? _j : passive.condition) !== null && _k !== void 0 ? _k : passive.prerequisite) !== null && _l !== void 0 ? _l : '';
+          const idValue = passive.id ?? passive.key ?? `passive-${passiveIndex}`;
+          const nameValue = passive.name ?? passive.title ?? `Passive #${passiveIndex + 1}`;
+          const descriptionValue = passive.description ?? passive.effect ?? passive.text ?? '';
+          const requirementValue = passive.requirement ?? passive.condition ?? passive.prerequisite ?? '';
           const requiredUnitIds = Array.isArray(passive.requiredUnitIds)
               ? passive.requiredUnitIds.map(String)
               : Array.isArray(passive.requires)
@@ -18472,9 +18288,11 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
               source: isLineupPassiveConfig(passiveInput) ? passiveInput : null,
           };
       });
-      const leaderIdValue = (_p = (_o = (_m = source.leaderId) !== null && _m !== void 0 ? _m : source.leader) !== null && _o !== void 0 ? _o : source.captainId) !== null && _p !== void 0 ? _p : null;
-      const fallbackLeader = (_t = (_r = (_q = cells.find(cell => cell.section === 'formation' && cell.unitId)) === null || _q === void 0 ? void 0 : _q.unitId) !== null && _r !== void 0 ? _r : (_s = cells.find(cell => cell.unitId)) === null || _s === void 0 ? void 0 : _s.unitId) !== null && _t !== void 0 ? _t : null;
-      const defaultCurrencyIdValue = (_u = defaultCurrencyId !== null && defaultCurrencyId !== void 0 ? defaultCurrencyId : source.currency) !== null && _u !== void 0 ? _u : null;
+      const leaderIdValue = source.leaderId ?? source.leader ?? source.captainId ?? null;
+      const fallbackLeader = cells.find(cell => cell.section === 'formation' && cell.unitId)?.unitId
+          ?? cells.find(cell => cell.unitId)?.unitId
+          ?? null;
+      const defaultCurrencyIdValue = defaultCurrencyId ?? source.currency ?? null;
       return {
           id: String(id),
           name: typeof name === 'string' ? name : `Đội hình #${index + 1}`,
@@ -18522,7 +18340,7 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
                   defaultCurrencyId: null,
               }];
       }
-      return rawLineups.map((entry, index) => normalizeLineupEntry(entry !== null && entry !== void 0 ? entry : null, index, rosterIndex));
+      return rawLineups.map((entry, index) => normalizeLineupEntry(entry ?? null, index, rosterIndex));
   }
   function extractCurrencyBalances(source) {
       const balances = new Map();
@@ -18539,7 +18357,6 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
       };
       if (Array.isArray(source)) {
           source.forEach(entry => {
-              var _a, _b, _c, _d, _e, _f, _g;
               if (!entry)
                   return;
               if (typeof entry === 'number') {
@@ -18555,8 +18372,8 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
               }
               if (typeof entry === 'object') {
                   const record = entry;
-                  const id = (_c = (_b = (_a = record.currencyId) !== null && _a !== void 0 ? _a : record.id) !== null && _b !== void 0 ? _b : record.key) !== null && _c !== void 0 ? _c : record.type;
-                  const value = (_g = (_f = (_e = (_d = record.balance) !== null && _d !== void 0 ? _d : record.amount) !== null && _e !== void 0 ? _e : record.value) !== null && _f !== void 0 ? _f : record.total) !== null && _g !== void 0 ? _g : null;
+                  const id = record.currencyId ?? record.id ?? record.key ?? record.type;
+                  const value = record.balance ?? record.amount ?? record.value ?? record.total ?? null;
                   apply(id, value);
               }
           });
@@ -18564,11 +18381,10 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
       }
       if (typeof source === 'object') {
           Object.entries(source).forEach(([key, value]) => {
-              var _a, _b, _c, _d, _e, _f;
               if (value && typeof value === 'object' && ('balance' in value || 'amount' in value || 'value' in value || 'total' in value)) {
                   const record = value;
-                  const id = (_c = (_b = (_a = record.currencyId) !== null && _a !== void 0 ? _a : record.id) !== null && _b !== void 0 ? _b : record.key) !== null && _c !== void 0 ? _c : key;
-                  apply(id, (_f = (_e = (_d = record.balance) !== null && _d !== void 0 ? _d : record.amount) !== null && _e !== void 0 ? _e : record.value) !== null && _f !== void 0 ? _f : record.total);
+                  const id = record.currencyId ?? record.id ?? record.key ?? key;
+                  apply(id, record.balance ?? record.amount ?? record.value ?? record.total);
               }
               else {
                   apply(key, value);
@@ -18649,7 +18465,6 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
       return ids;
   }
   function evaluatePassive(passive, assignedUnitIds, rosterLookup) {
-      var _a, _b;
       if (!passive || passive.isEmpty) {
           return false;
       }
@@ -18680,7 +18495,7 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
               return false;
           }
       }
-      if (!((_a = passive.requiredUnitIds) === null || _a === void 0 ? void 0 : _a.length) && !((_b = passive.requiredTags) === null || _b === void 0 ? void 0 : _b.length)) {
+      if (!passive.requiredUnitIds?.length && !passive.requiredTags?.length) {
           return assignedUnitIds.size > 0;
       }
       return true;
@@ -18727,7 +18542,6 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
       }
   }
   function unlockCell(lineup, cellIndex, balances) {
-      var _a;
       const cell = lineup.cells[cellIndex];
       if (!cell) {
           return { ok: false, message: 'Không tìm thấy ô đội hình.' };
@@ -18737,7 +18551,7 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
       }
       const cost = cell.unlockCost;
       if (cost) {
-          const current = (_a = balances.get(cost.currencyId)) !== null && _a !== void 0 ? _a : 0;
+          const current = balances.get(cost.currencyId) ?? 0;
           if (current < cost.amount) {
               return {
                   ok: false,
@@ -18748,7 +18562,7 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
       }
       cell.unlocked = true;
       cell.unlockCost = null;
-      return { ok: true, spent: cost !== null && cost !== void 0 ? cost : null };
+      return { ok: true, spent: cost ?? null };
   }
   function isUnitPlaced(lineup, unitId) {
       if (!unitId)
@@ -18760,7 +18574,6 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
       return false;
   }
   function setLeader(lineup, unitId, rosterLookup) {
-      var _a;
       if (!lineup) {
           return { ok: false, message: 'Không tìm thấy đội hình.' };
       }
@@ -18773,7 +18586,8 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
           return { ok: false, message: 'Không tìm thấy nhân vật.' };
       }
       if (!isUnitPlaced(lineup, unitId)) {
-          const primary = (_a = lineup.cells.find(entry => entry.section === 'formation' && entry.unlocked && !entry.unitId)) !== null && _a !== void 0 ? _a : lineup.cells.find(entry => entry.unlocked && !entry.unitId);
+          const primary = lineup.cells.find(entry => entry.section === 'formation' && entry.unlocked && !entry.unitId)
+              ?? lineup.cells.find(entry => entry.unlocked && !entry.unitId);
           if (primary) {
               assignUnitToCell(lineup, primary.index, unitId);
           }
@@ -19031,7 +18845,7 @@ __define('./screens/main-menu/dialogues.ts', (exports, module, __require) => {
               label: item.label || null
           };
       }
-      return { text: String(item !== null && item !== void 0 ? item : ''), tone: null, label: null };
+      return { text: String(item ?? ''), tone: null, label: null };
   }
   function inferTone(cue) {
       if (cue && cue in CUE_TONES) {
@@ -19055,12 +18869,13 @@ __define('./screens/main-menu/dialogues.ts', (exports, module, __require) => {
       return 'Tương tác';
   }
   function getHeroProfile(heroId = HERO_DEFAULT_ID) {
-      var _a, _b;
       const resolvedKey = resolveHeroKey(heroId, HERO_PROFILES);
-      const profile = (_a = HERO_PROFILES[resolvedKey]) !== null && _a !== void 0 ? _a : HERO_PROFILE_FALLBACK;
+      const profile = HERO_PROFILES[resolvedKey]
+          ?? HERO_PROFILE_FALLBACK;
       const portraitId = profile.portrait || heroId || HERO_DEFAULT_ID;
       const art = portraitId ? getUnitArt(portraitId) || null : null;
-      const hotspots = (_b = HERO_HOTSPOTS[resolvedKey]) !== null && _b !== void 0 ? _b : HERO_HOTSPOT_FALLBACK;
+      const hotspots = HERO_HOTSPOTS[resolvedKey]
+          ?? HERO_HOTSPOT_FALLBACK;
       return {
           id: profile.id,
           name: profile.name || null,
@@ -19074,27 +18889,27 @@ __define('./screens/main-menu/dialogues.ts', (exports, module, __require) => {
       };
   }
   function getHeroHotspots(heroId = HERO_DEFAULT_ID) {
-      var _a;
       const resolvedKey = resolveHeroKey(heroId, HERO_HOTSPOTS);
-      const hotspots = (_a = HERO_HOTSPOTS[resolvedKey]) !== null && _a !== void 0 ? _a : HERO_HOTSPOT_FALLBACK;
+      const hotspots = HERO_HOTSPOTS[resolvedKey]
+          ?? HERO_HOTSPOT_FALLBACK;
       return hotspots.map(item => ({ ...item }));
   }
   function getHeroDialogue(heroId, cue, options = {}) {
-      var _a, _b, _c;
       const targetCue = (cue || 'intro');
       const gender = normalizeGender(options.gender);
       const zone = options.zone || null;
       const profileKey = resolveHeroKey(heroId, HERO_PROFILES);
       const heroKey = resolveHeroKey(heroId, HERO_DIALOGUES);
-      const profile = (_a = HERO_PROFILES[profileKey]) !== null && _a !== void 0 ? _a : HERO_PROFILE_FALLBACK;
-      const dialogues = (_b = HERO_DIALOGUES[heroKey]) !== null && _b !== void 0 ? _b : HERO_DIALOGUE_FALLBACK;
+      const profile = HERO_PROFILES[profileKey]
+          ?? HERO_PROFILE_FALLBACK;
+      const dialogues = HERO_DIALOGUES[heroKey] ?? HERO_DIALOGUE_FALLBACK;
       const fallbackDialogues = HERO_DIALOGUE_FALLBACK;
       const table = dialogues[targetCue] || fallbackDialogues[targetCue] || null;
       const pool = table ? (table[gender] || table.neutral || table.default || null) : null;
       const picked = pickLine(pool);
-      const text = ((_c = picked === null || picked === void 0 ? void 0 : picked.text) === null || _c === void 0 ? void 0 : _c.trim()) ? picked.text.trim() : '...';
-      const tone = (picked === null || picked === void 0 ? void 0 : picked.tone) || inferTone(targetCue);
-      const label = (picked === null || picked === void 0 ? void 0 : picked.label) || inferLabel(targetCue);
+      const text = picked?.text?.trim() ? picked.text.trim() : '...';
+      const tone = picked?.tone || inferTone(targetCue);
+      const label = picked?.label || inferLabel(targetCue);
       return {
           heroId: profile.id,
           cue: targetCue,
@@ -19146,7 +18961,7 @@ __define('./screens/main-menu/view/events.ts', (exports, module, __require) => {
       'social'
   ]);
   function resolveDisplaySettings(mode) {
-      if ((mode === null || mode === void 0 ? void 0 : mode.key) && ECONOMY_COMPACT_KEYS.has(mode.key)) {
+      if (mode?.key && ECONOMY_COMPACT_KEYS.has(mode.key)) {
           const filteredTags = (mode.tags || []).filter(tag => tag && tag !== 'Kinh tế nguyên tinh' && tag !== 'Coming soon');
           const compactMode = {
               ...mode,
@@ -19260,7 +19075,6 @@ __define('./screens/main-menu/view/events.ts', (exports, module, __require) => {
           showStatus: options.showStatus !== false
       });
       const handleClick = (event) => {
-          var _a, _b, _c, _d;
           event.preventDefault();
           event.stopPropagation();
           if (typeof options.onPrimaryAction === 'function') {
@@ -19269,15 +19083,15 @@ __define('./screens/main-menu/view/events.ts', (exports, module, __require) => {
           }
           if (!shell || typeof shell.enterScreen !== 'function')
               return;
-          const targetScreen = (_b = (_a = mode.id) !== null && _a !== void 0 ? _a : mode.key) !== null && _b !== void 0 ? _b : 'main-menu';
+          const targetScreen = mode.id ?? mode.key ?? 'main-menu';
           if (mode.status === 'coming-soon') {
               if (typeof onShowComingSoon === 'function') {
                   onShowComingSoon(mode);
               }
-              shell.enterScreen(targetScreen, (_c = mode.params) !== null && _c !== void 0 ? _c : null);
+              shell.enterScreen(targetScreen, mode.params ?? null);
               return;
           }
-          shell.enterScreen(targetScreen, (_d = mode.params) !== null && _d !== void 0 ? _d : null);
+          shell.enterScreen(targetScreen, mode.params ?? null);
       };
       button.addEventListener('click', handleClick);
       addCleanup(() => button.removeEventListener('click', handleClick));
@@ -19441,7 +19255,6 @@ __define('./screens/main-menu/view/events.ts', (exports, module, __require) => {
           }
           item.appendChild(body);
           const handleSelect = (event) => {
-              var _a, _b, _c;
               event.preventDefault();
               event.stopPropagation();
               if (!shell || typeof shell.enterScreen !== 'function')
@@ -19449,8 +19262,8 @@ __define('./screens/main-menu/view/events.ts', (exports, module, __require) => {
               if (child.status === 'coming-soon' && typeof onShowComingSoon === 'function') {
                   onShowComingSoon(child);
               }
-              const targetScreen = (_b = (_a = child.id) !== null && _a !== void 0 ? _a : child.key) !== null && _b !== void 0 ? _b : 'main-menu';
-              shell.enterScreen(targetScreen, (_c = child.params) !== null && _c !== void 0 ? _c : null);
+              const targetScreen = child.id ?? child.key ?? 'main-menu';
+              shell.enterScreen(targetScreen, child.params ?? null);
               close();
               wrapper.focus({ preventScroll: true });
           };
@@ -19619,7 +19432,7 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
       sectionEl.appendChild(title);
       const metaByKey = new Map();
       metadata.forEach(mode => {
-          if (mode === null || mode === void 0 ? void 0 : mode.key) {
+          if (mode?.key) {
               metaByKey.set(mode.key, mode);
           }
       });
@@ -19678,8 +19491,7 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
           if (!shell || typeof shell.showTooltip !== 'function')
               return;
           const showTooltip = () => {
-              var _a;
-              (_a = shell.showTooltip) === null || _a === void 0 ? void 0 : _a.call(shell, {
+              shell.showTooltip?.({
                   id: entry.id,
                   slot: slotKey,
                   title: entry.title,
@@ -20017,8 +19829,7 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
       return toast;
   }
   async function mountGachaUI(scope = null) {
-      var _a, _b;
-      const hostElement = scope instanceof Document ? scope.body : scope !== null && scope !== void 0 ? scope : document.body;
+      const hostElement = scope instanceof Document ? scope.body : scope ?? document.body;
       if (!hostElement) {
           throw new Error('Không tìm thấy vùng mount cho gacha UI.');
       }
@@ -20063,7 +19874,7 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
       hostElement.appendChild(container);
       const state = {
           wallet: createWallet(),
-          bannerId: (_b = (_a = GACHA_CONFIG.banners[0]) === null || _a === void 0 ? void 0 : _a.id) !== null && _b !== void 0 ? _b : 'permanent',
+          bannerId: GACHA_CONFIG.banners[0]?.id ?? 'permanent',
           states: new Map(),
       };
       const currencySlot = container.querySelector('[data-slot="currencies"]');
@@ -20084,12 +19895,11 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
           throw new Error('Thiếu phần tử UI cần thiết.');
       }
       const renderBanner = () => {
-          var _a, _b;
-          const banner = (_a = getBannerById(state.bannerId)) !== null && _a !== void 0 ? _a : GACHA_CONFIG.banners[0];
+          const banner = getBannerById(state.bannerId) ?? GACHA_CONFIG.banners[0];
           if (!banner)
               return;
           titleSlot.textContent = banner.label;
-          subtitleSlot.textContent = (_b = banner.description) !== null && _b !== void 0 ? _b : '';
+          subtitleSlot.textContent = banner.description ?? '';
           timerSlot.textContent = formatRemainingTime(banner);
           artSlot.innerHTML = banner.background ? `<img src="${banner.background}" alt="${banner.label}" />` : '';
           renderRates(ratesSlot, banner);
@@ -20312,7 +20122,7 @@ __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
   }
   function getLegacyModuleAliases() {
       const legacyGlobal = getLegacyModuleGlobal();
-      const aliases = legacyGlobal === null || legacyGlobal === void 0 ? void 0 : legacyGlobal.__legacyModuleAliases;
+      const aliases = legacyGlobal?.__legacyModuleAliases;
       if (aliases && typeof aliases === 'object') {
           return aliases;
       }
@@ -20321,7 +20131,7 @@ __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
   function normalizeRuntimeModuleId(moduleId) {
       const sanitized = sanitizeModuleId(moduleId);
       const legacyGlobal = getLegacyModuleGlobal();
-      const normalizer = legacyGlobal === null || legacyGlobal === void 0 ? void 0 : legacyGlobal.__normalizeModuleId;
+      const normalizer = legacyGlobal?.__normalizeModuleId;
       if (typeof normalizer === 'function') {
           try {
               const normalized = normalizer(sanitized);
@@ -20343,8 +20153,8 @@ __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
       return sanitized;
   }
   function resolveNormalizedModuleHref(normalizedId) {
-      var _a;
-      const baseUrl = (_a = (typeof document !== 'undefined' ? document.baseURI : undefined)) !== null && _a !== void 0 ? _a : (typeof window !== 'undefined' ? window.location.href : undefined);
+      const baseUrl = (typeof document !== 'undefined' ? document.baseURI : undefined) ??
+          (typeof window !== 'undefined' ? window.location.href : undefined);
       if (!baseUrl) {
           return normalizedId;
       }
@@ -20373,7 +20183,7 @@ __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
           return __require;
       }
       const legacyGlobal = getLegacyModuleGlobal();
-      const candidate = legacyGlobal === null || legacyGlobal === void 0 ? void 0 : legacyGlobal.__require;
+      const candidate = legacyGlobal?.__require;
       if (typeof candidate === 'function') {
           return candidate;
       }
@@ -20422,7 +20232,7 @@ __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
               lastError = error;
           }
       }
-      throw lastError !== null && lastError !== void 0 ? lastError : new Error('Không thể tải module gacha.');
+      throw lastError ?? new Error('Không thể tải module gacha.');
   }
   function createContainer() {
       const wrapper = document.createElement('div');
@@ -20448,10 +20258,9 @@ __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
       const goBackButton = container.querySelector('[data-action="go-back"]');
       const hasShellNavigation = Boolean(shell && typeof shell.enterScreen === 'function');
       const handleGoBack = (event) => {
-          var _a;
           event.preventDefault();
           if (shell && typeof shell.enterScreen === 'function') {
-              (_a = shell.clearActiveSession) === null || _a === void 0 ? void 0 : _a.call(shell);
+              shell.clearActiveSession?.();
               shell.enterScreen('main-menu', null);
               return;
           }
@@ -20484,9 +20293,8 @@ __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
           return module.mountGachaUI(mountTarget);
       })
           .then((result) => {
-          var _a;
           if (disposed) {
-              (_a = result === null || result === void 0 ? void 0 : result.destroy) === null || _a === void 0 ? void 0 : _a.call(result);
+              result?.destroy?.();
               return;
           }
           handle = result;
@@ -20495,10 +20303,9 @@ __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
           console.error('[Gacha UI] Không thể khởi tạo module gacha:', error);
       });
       function cleanup() {
-          var _a;
           disposed = true;
           try {
-              (_a = handle === null || handle === void 0 ? void 0 : handle.destroy) === null || _a === void 0 ? void 0 : _a.call(handle);
+              handle?.destroy?.();
           }
           catch (error) {
               console.warn('[Gacha UI] Lỗi khi huỷ module gacha:', error);
@@ -20535,8 +20342,8 @@ __define('./screens/ui-gacha/logic/config.ts', (exports, module, __require) => {
   const __dep0 = __require('./screens/ui-gacha/logic/types.ts');
   const CURRENCY_ORDER = __dep0.CURRENCY_ORDER;
   const DEFAULT_WALLET = {
-      VNT: 125000,
-      HNT: 5200,
+      VNT: 125_000,
+      HNT: 5_200,
       TNT: 620,
       ThNT: 120,
       TT: 18,
@@ -20549,7 +20356,7 @@ __define('./screens/ui-gacha/logic/config.ts', (exports, module, __require) => {
           label: 'Triệu Hồi Chung',
           type: 'Permanent',
           description: 'Danh sách N / R / SR / SSR toàn bộ.',
-          cost: { unit: 'HNT', x1: 250, x10: 2500 },
+          cost: { unit: 'HNT', x1: 250, x10: 2_500 },
           rates: { N: 0.6, R: 0.25, SR: 0.12, SSR: 0.03 },
           pity: {
               srFloor: 10,
@@ -20567,7 +20374,7 @@ __define('./screens/ui-gacha/logic/config.ts', (exports, module, __require) => {
           label: 'Giới Hạn UR',
           type: 'LimitedUR',
           description: 'UR rate-up, pity hard bảo đảm UR featured.',
-          cost: { unit: 'TNT', x1: 250, x10: 2500 },
+          cost: { unit: 'TNT', x1: 250, x10: 2_500 },
           rates: { N: 0.586, R: 0.244, SR: 0.117, SSR: 0.03, UR: 0.015, Prime: 0.0075 },
           pity: {
               srFloor: 10,
@@ -20588,7 +20395,7 @@ __define('./screens/ui-gacha/logic/config.ts', (exports, module, __require) => {
           label: 'Giới Hạn Prime',
           type: 'LimitedPrime',
           description: 'Prime rate-up, pity bảo đảm Prime featured.',
-          cost: { unit: 'ThNT', x1: 300, x10: 3000 },
+          cost: { unit: 'ThNT', x1: 300, x10: 3_000 },
           rates: { N: 0.586, R: 0.244, SR: 0.117, SSR: 0.03, UR: 0.015, Prime: 0.0075 },
           pity: {
               srFloor: 10,
@@ -20606,9 +20413,9 @@ __define('./screens/ui-gacha/logic/config.ts', (exports, module, __require) => {
   const GACHA_CONFIG = {
       currencies: ['VNT', 'HNT', 'TNT', 'ThNT', 'TT'],
       costs: {
-          Permanent: { unit: 'HNT', x1: 250, x10: 2500 },
-          LimitedUR: { unit: 'TNT', x1: 250, x10: 2500 },
-          LimitedPrime: { unit: 'ThNT', x1: 300, x10: 3000 },
+          Permanent: { unit: 'HNT', x1: 250, x10: 2_500 },
+          LimitedUR: { unit: 'TNT', x1: 250, x10: 2_500 },
+          LimitedPrime: { unit: 'ThNT', x1: 300, x10: 3_000 },
       },
       rateUpShare: 0.7,
       banners: BANNERS,
@@ -20621,11 +20428,10 @@ __define('./screens/ui-gacha/logic/config.ts', (exports, module, __require) => {
       TT: 'Thần Tinh',
   };
   function createWallet(initial) {
-      var _a, _b, _c;
       const wallet = {};
       for (const code of CURRENCY_ORDER) {
-          const fallback = (_a = DEFAULT_WALLET[code]) !== null && _a !== void 0 ? _a : 0;
-          wallet[code] = Math.max(0, Math.trunc((_c = ((_b = initial === null || initial === void 0 ? void 0 : initial[code]) !== null && _b !== void 0 ? _b : fallback)) !== null && _c !== void 0 ? _c : 0));
+          const fallback = DEFAULT_WALLET[code] ?? 0;
+          wallet[code] = Math.max(0, Math.trunc((initial?.[code] ?? fallback) ?? 0));
       }
       return wallet;
   }
@@ -20649,10 +20455,9 @@ __define('./screens/ui-gacha/logic/currency.ts', (exports, module, __require) =>
   const WEALTH_PIVOT_TT = 100;
   const ALPHA = 2;
   function cloneWallet(wallet) {
-      var _a;
       const normalized = {};
       for (const code of CURRENCY_ORDER) {
-          normalized[code] = Math.max(0, Math.trunc((_a = wallet[code]) !== null && _a !== void 0 ? _a : 0));
+          normalized[code] = Math.max(0, Math.trunc(wallet[code] ?? 0));
       }
       return normalized;
   }
@@ -20667,19 +20472,17 @@ __define('./screens/ui-gacha/logic/currency.ts', (exports, module, __require) =>
       return getIndex(from) < getIndex(to);
   }
   function totalTTEquivalent(wallet) {
-      var _a, _b;
       const normalized = cloneWallet(wallet);
-      const highestCurrency = ((_a = CURRENCY_ORDER[CURRENCY_ORDER.length - 1]) !== null && _a !== void 0 ? _a : 'TT');
+      const highestCurrency = (CURRENCY_ORDER[CURRENCY_ORDER.length - 1] ?? 'TT');
       let total = 0;
       for (const code of CURRENCY_ORDER) {
-          const amount = (_b = normalized[code]) !== null && _b !== void 0 ? _b : 0;
+          const amount = normalized[code] ?? 0;
           total += convertCurrencyAmount(amount, code, highestCurrency);
       }
       return total;
   }
   function dynamicTaxRate(stepKey, wallet) {
-      var _a;
-      const base = (_a = BASE_TAX[stepKey]) !== null && _a !== void 0 ? _a : 0.01;
+      const base = BASE_TAX[stepKey] ?? 0.01;
       const wealthIdx = Math.min(1, totalTTEquivalent(wallet) / WEALTH_PIVOT_TT);
       const candidate = base * (1 + ALPHA * wealthIdx);
       return Math.min(TAX_CAP, candidate);
@@ -20825,14 +20628,13 @@ __define('./screens/ui-gacha/logic/currency.ts', (exports, module, __require) =>
       };
   }
   function convertStepDown(wallet, fromIndex, toIndex, units, detail) {
-      var _a, _b, _c, _d, _e;
-      const initialCode = ((_b = (_a = CURRENCY_ORDER[fromIndex]) !== null && _a !== void 0 ? _a : CURRENCY_ORDER[CURRENCY_ORDER.length - 1]) !== null && _b !== void 0 ? _b : CURRENCY_ORDER[0]);
+      const initialCode = (CURRENCY_ORDER[fromIndex] ?? CURRENCY_ORDER[CURRENCY_ORDER.length - 1] ?? CURRENCY_ORDER[0]);
       let state = cloneWallet(wallet);
       let currentIndex = fromIndex;
       let carry = Math.min(units, state[initialCode]);
       while (carry > 0 && currentIndex > toIndex) {
-          const from = (_c = CURRENCY_ORDER[currentIndex]) !== null && _c !== void 0 ? _c : initialCode;
-          const to = ((_e = (_d = CURRENCY_ORDER[currentIndex - 1]) !== null && _d !== void 0 ? _d : CURRENCY_ORDER[Math.max(currentIndex - 1, 0)]) !== null && _e !== void 0 ? _e : CURRENCY_ORDER[0]);
+          const from = CURRENCY_ORDER[currentIndex] ?? initialCode;
+          const to = (CURRENCY_ORDER[currentIndex - 1] ?? CURRENCY_ORDER[Math.max(currentIndex - 1, 0)] ?? CURRENCY_ORDER[0]);
           const usable = Math.min(carry, state[from]);
           if (usable <= 0) {
               break;
@@ -20954,9 +20756,8 @@ __define('./screens/ui-gacha/logic/gacha.ts', (exports, module, __require) => {
       return roll < share;
   }
   function rollBanner(banner, stateMap, options = {}) {
-      var _a, _b;
-      const rng = (_a = options.rng) !== null && _a !== void 0 ? _a : DEFAULT_RANDOM;
-      const featuredRng = (_b = options.featuredRng) !== null && _b !== void 0 ? _b : DEFAULT_RANDOM;
+      const rng = options.rng ?? DEFAULT_RANDOM;
+      const featuredRng = options.featuredRng ?? DEFAULT_RANDOM;
       const state = getBannerState(stateMap, banner);
       return applyRoll(banner, state, rng, (rarity, forced) => shouldHitFeatured(banner, rarity, forced, featuredRng));
   }
@@ -20968,8 +20769,7 @@ __define('./screens/ui-gacha/logic/gacha.ts', (exports, module, __require) => {
       return results;
   }
   function getBannerById(id) {
-      var _a;
-      return (_a = GACHA_CONFIG.banners.find((entry) => entry.id === id)) !== null && _a !== void 0 ? _a : null;
+      return GACHA_CONFIG.banners.find((entry) => entry.id === id) ?? null;
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'rollBanner')) exports.rollBanner = rollBanner;
@@ -20981,9 +20781,8 @@ __define('./screens/ui-gacha/logic/pity.ts', (exports, module, __require) => {
   const RARITY_ORDER = __dep0.RARITY_ORDER;
   const RARITY_INDEX = new Map(RARITY_ORDER.map((rarity, index) => [rarity, index]));
   function rarityAtLeast(rarity, threshold) {
-      var _a, _b;
-      const rarityIndex = (_a = RARITY_INDEX.get(rarity)) !== null && _a !== void 0 ? _a : 0;
-      const thresholdIndex = (_b = RARITY_INDEX.get(threshold)) !== null && _b !== void 0 ? _b : 0;
+      const rarityIndex = RARITY_INDEX.get(rarity) ?? 0;
+      const thresholdIndex = RARITY_INDEX.get(threshold) ?? 0;
       return rarityIndex >= thresholdIndex;
   }
   function createEmptyPity() {
@@ -20993,8 +20792,7 @@ __define('./screens/ui-gacha/logic/pity.ts', (exports, module, __require) => {
       return { pulls: 0, pity: createEmptyPity() };
   }
   function getStateKey(banner) {
-      var _a;
-      if (banner.type === 'Permanent' && ((_a = banner.pity.ssr) === null || _a === void 0 ? void 0 : _a.carryOver)) {
+      if (banner.type === 'Permanent' && banner.pity.ssr?.carryOver) {
           return 'Permanent';
       }
       return banner.id;
@@ -21037,7 +20835,6 @@ __define('./screens/ui-gacha/logic/pity.ts', (exports, module, __require) => {
       return extraPulls * step;
   }
   function applySoftPity(rarity, pulls, rates, soft, step) {
-      var _a;
       if (!soft || !step) {
           return;
       }
@@ -21045,22 +20842,21 @@ __define('./screens/ui-gacha/logic/pity.ts', (exports, module, __require) => {
       if (bonus <= 0) {
           return;
       }
-      const current = (_a = rates[rarity]) !== null && _a !== void 0 ? _a : 0;
+      const current = rates[rarity] ?? 0;
       const next = Math.min(1, current + bonus);
       rates[rarity] = next;
   }
   function normalizeRates(rates) {
-      var _a, _b;
       let total = 0;
       for (const rarity of RARITY_ORDER) {
-          total += (_a = rates[rarity]) !== null && _a !== void 0 ? _a : 0;
+          total += rates[rarity] ?? 0;
       }
       if (total <= 0) {
           return { ...rates };
       }
       const normalized = { ...rates };
       for (const rarity of RARITY_ORDER) {
-          normalized[rarity] = ((_b = rates[rarity]) !== null && _b !== void 0 ? _b : 0) / total;
+          normalized[rarity] = (rates[rarity] ?? 0) / total;
       }
       return normalized;
   }
@@ -21074,7 +20870,7 @@ __define('./screens/ui-gacha/logic/pity.ts', (exports, module, __require) => {
       const nextSSR = pity.ssr + 1;
       const nextUR = pity.ur + 1;
       const nextPrime = pity.prime + 1;
-      if ((primeRule === null || primeRule === void 0 ? void 0 : primeRule.hard) && nextPrime >= primeRule.hard) {
+      if (primeRule?.hard && nextPrime >= primeRule.hard) {
           return {
               forced: 'Prime',
               srFloor,
@@ -21082,7 +20878,7 @@ __define('./screens/ui-gacha/logic/pity.ts', (exports, module, __require) => {
               guaranteeFeatured: Boolean(primeRule.hardGuaranteeFeatured),
           };
       }
-      if ((urRule === null || urRule === void 0 ? void 0 : urRule.hard) && nextUR >= urRule.hard) {
+      if (urRule?.hard && nextUR >= urRule.hard) {
           return {
               forced: 'UR',
               srFloor,
@@ -21090,7 +20886,7 @@ __define('./screens/ui-gacha/logic/pity.ts', (exports, module, __require) => {
               guaranteeFeatured: Boolean(urRule.hardGuaranteeFeatured),
           };
       }
-      if ((ssrRule === null || ssrRule === void 0 ? void 0 : ssrRule.hard) && nextSSR >= ssrRule.hard) {
+      if (ssrRule?.hard && nextSSR >= ssrRule.hard) {
           return { forced: 'SSR', srFloor, rates: baseRates, guaranteeFeatured: false };
       }
       const workingRates = { ...baseRates };
@@ -21111,10 +20907,9 @@ __define('./screens/ui-gacha/logic/pity.ts', (exports, module, __require) => {
       return { forced: null, srFloor, rates: normalized, guaranteeFeatured: false };
   }
   function pickRarity(rates, random) {
-      var _a;
       let cumulative = 0;
       for (const rarity of RARITY_ORDER) {
-          const value = (_a = rates[rarity]) !== null && _a !== void 0 ? _a : 0;
+          const value = rates[rarity] ?? 0;
           cumulative += value;
           if (random <= cumulative + 1e-8) {
               return rarity;
@@ -21230,10 +21025,9 @@ __define('./statuses.ts', (exports, module, __require) => {
           && typeof candidate.side === 'string');
   };
   function findStatus(unit, id) {
-      var _a;
       const list = ensureStatusList(unit);
       const index = list.findIndex(status => status.id === id);
-      const found = index >= 0 ? (_a = list[index]) !== null && _a !== void 0 ? _a : null : null;
+      const found = index >= 0 ? list[index] ?? null : null;
       return [list, index, found];
   }
   function decrementDuration(unit, status) {
@@ -21245,66 +21039,66 @@ __define('./statuses.ts', (exports, module, __require) => {
   }
   const statusFactories = {
       stun: (spec) => {
-          const { turns = 1 } = (spec !== null && spec !== void 0 ? spec : {});
+          const { turns = 1 } = (spec ?? {});
           return { id: 'stun', kind: 'debuff', tag: 'control', dur: turns, tick: 'turn' };
       },
       sleep: (spec) => {
-          const { turns = 1 } = (spec !== null && spec !== void 0 ? spec : {});
+          const { turns = 1 } = (spec ?? {});
           return { id: 'sleep', kind: 'debuff', tag: 'control', dur: turns, tick: 'turn' };
       },
       taunt: (spec) => {
-          const { turns = 1 } = (spec !== null && spec !== void 0 ? spec : {});
+          const { turns = 1 } = (spec ?? {});
           return { id: 'taunt', kind: 'debuff', tag: 'control', dur: turns, tick: 'turn' };
       },
       reflect: (spec) => {
-          const { pct = 0.2, turns = 1 } = (spec !== null && spec !== void 0 ? spec : {});
+          const { pct = 0.2, turns = 1 } = (spec ?? {});
           return { id: 'reflect', kind: 'buff', tag: 'counter', power: pct, dur: turns, tick: 'turn' };
       },
       bleed: (spec) => {
-          const { turns = 2 } = (spec !== null && spec !== void 0 ? spec : {});
+          const { turns = 2 } = (spec ?? {});
           return { id: 'bleed', kind: 'debuff', tag: 'dot', dur: turns, tick: 'turn' };
       },
       damageCut: (spec) => {
-          const { pct = 0.2, turns = 1 } = (spec !== null && spec !== void 0 ? spec : {});
+          const { pct = 0.2, turns = 1 } = (spec ?? {});
           return { id: 'dmgCut', kind: 'buff', tag: 'mitigation', power: pct, dur: turns, tick: 'turn' };
       },
       fatigue: (spec) => {
-          const { turns = 2 } = (spec !== null && spec !== void 0 ? spec : {});
+          const { turns = 2 } = (spec ?? {});
           return { id: 'fatigue', kind: 'debuff', tag: 'output', dur: turns, tick: 'turn' };
       },
       silence: (spec) => {
-          const { turns = 1 } = (spec !== null && spec !== void 0 ? spec : {});
+          const { turns = 1 } = (spec ?? {});
           return { id: 'silence', kind: 'debuff', tag: 'silence', dur: turns, tick: 'turn' };
       },
       shield: (spec) => {
-          const { pct = 0.2, amount = 0 } = (spec !== null && spec !== void 0 ? spec : {});
+          const { pct = 0.2, amount = 0 } = (spec ?? {});
           return {
               id: 'shield',
               kind: 'buff',
               tag: 'shield',
-              amount: amount !== null && amount !== void 0 ? amount : 0,
+              amount: amount ?? 0,
               power: pct,
               tick: null,
           };
       },
       exalt: (spec) => {
-          const { turns = 2 } = (spec !== null && spec !== void 0 ? spec : {});
+          const { turns = 2 } = (spec ?? {});
           return { id: 'exalt', kind: 'buff', tag: 'output', dur: turns, tick: 'turn' };
       },
       pierce: (spec) => {
-          const { pct = 0.1, turns = 2 } = (spec !== null && spec !== void 0 ? spec : {});
+          const { pct = 0.1, turns = 2 } = (spec ?? {});
           return { id: 'pierce', kind: 'buff', tag: 'penetration', power: pct, dur: turns, tick: 'turn' };
       },
       daze: (spec) => {
-          const { turns = 1 } = (spec !== null && spec !== void 0 ? spec : {});
+          const { turns = 1 } = (spec ?? {});
           return { id: 'daze', kind: 'debuff', tag: 'stat', dur: turns, tick: 'turn' };
       },
       frenzy: (spec) => {
-          const { turns = 2 } = (spec !== null && spec !== void 0 ? spec : {});
+          const { turns = 2 } = (spec ?? {});
           return { id: 'frenzy', kind: 'buff', tag: 'basic-boost', dur: turns, tick: 'turn' };
       },
       weaken: (spec) => {
-          const { turns = 2, stacks = 1 } = (spec !== null && spec !== void 0 ? spec : {});
+          const { turns = 2, stacks = 1 } = (spec ?? {});
           return {
               id: 'weaken',
               kind: 'debuff',
@@ -21316,34 +21110,33 @@ __define('./statuses.ts', (exports, module, __require) => {
           };
       },
       fear: (spec) => {
-          const { turns = 1 } = (spec !== null && spec !== void 0 ? spec : {});
+          const { turns = 1 } = (spec ?? {});
           return { id: 'fear', kind: 'debuff', tag: 'output', dur: turns, tick: 'turn' };
       },
       stealth: (spec) => {
-          const { turns = 1 } = (spec !== null && spec !== void 0 ? spec : {});
+          const { turns = 1 } = (spec ?? {});
           return { id: 'stealth', kind: 'buff', tag: 'invuln', dur: turns, tick: 'turn' };
       },
       venom: (spec) => {
-          const { pct = 0.15, turns = 2 } = (spec !== null && spec !== void 0 ? spec : {});
+          const { pct = 0.15, turns = 2 } = (spec ?? {});
           return { id: 'venom', kind: 'buff', tag: 'on-hit', power: pct, dur: turns, tick: 'turn' };
       },
       execute: (spec) => {
-          const { turns = 2 } = (spec !== null && spec !== void 0 ? spec : {});
+          const { turns = 2 } = (spec ?? {});
           return { id: 'execute', kind: 'buff', tag: 'execute', dur: turns, tick: 'turn' };
       },
       undying: () => ({ id: 'undying', kind: 'buff', tag: 'cheat-death', once: true }),
       allure: (spec) => {
-          const { turns = 1 } = (spec !== null && spec !== void 0 ? spec : {});
+          const { turns = 1 } = (spec ?? {});
           return { id: 'allure', kind: 'buff', tag: 'avoid-basic', dur: turns, tick: 'turn' };
       },
       haste: (spec) => {
-          const { pct = 0.1, turns = 1 } = (spec !== null && spec !== void 0 ? spec : {});
+          const { pct = 0.1, turns = 1 } = (spec ?? {});
           return { id: 'haste', kind: 'buff', tag: 'stat', power: pct, dur: turns, tick: 'turn' };
       },
   };
   const Statuses = {
       add(unit, status) {
-          var _a, _b;
           const list = ensureStatusList(unit);
           const [, index, existing] = findStatus(unit, status.id);
           if (existing) {
@@ -21355,7 +21148,7 @@ __define('./statuses.ts', (exports, module, __require) => {
               if (status.power != null)
                   existing.power = status.power;
               if (status.amount != null)
-                  existing.amount = ((_a = existing.amount) !== null && _a !== void 0 ? _a : 0) + ((_b = status.amount) !== null && _b !== void 0 ? _b : 0);
+                  existing.amount = (existing.amount ?? 0) + (status.amount ?? 0);
               return existing;
           }
           const copy = { ...status };
@@ -21381,22 +21174,20 @@ __define('./statuses.ts', (exports, module, __require) => {
           unit.statuses = [];
       },
       stacks(unit, id) {
-          var _a;
           const found = this.get(unit, id);
-          return found ? (_a = found.stacks) !== null && _a !== void 0 ? _a : 0 : 0;
+          return found ? found.stacks ?? 0 : 0;
       },
       onTurnStart(_unit, _ctx) {
           // reserved
       },
       onTurnEnd(unit, ctx) {
-          var _a;
           const list = ensureStatusList(unit);
           const bleed = this.get(unit, 'bleed');
           if (bleed) {
-              const lost = Math.round(((_a = unit.hpMax) !== null && _a !== void 0 ? _a : 0) * 0.05);
+              const lost = Math.round((unit.hpMax ?? 0) * 0.05);
               applyDamage(unit, lost);
               hookOnLethalDamage(unit);
-              if ((ctx === null || ctx === void 0 ? void 0 : ctx.log) && Array.isArray(ctx.log)) {
+              if (ctx?.log && Array.isArray(ctx.log)) {
                   ctx.log.push({ t: 'bleed', who: unit.name, lost });
               }
               decrementDuration(unit, bleed);
@@ -21422,8 +21213,7 @@ __define('./statuses.ts', (exports, module, __require) => {
           return false;
       },
       resolveTarget(attacker, candidates, ctx = {}) {
-          var _a;
-          const attackType = (_a = ctx.attackType) !== null && _a !== void 0 ? _a : 'basic';
+          const attackType = ctx.attackType ?? 'basic';
           const candidatePool = Array.isArray(candidates)
               ? candidates.filter(isTokenCandidate)
               : [];
@@ -21452,27 +21242,25 @@ __define('./statuses.ts', (exports, module, __require) => {
           return null;
       },
       modifyStats(unit, base) {
-          var _a, _b, _c, _d, _e;
           const next = { ...base };
           if (this.has(unit, 'daze')) {
-              next.SPD = ((_a = next.SPD) !== null && _a !== void 0 ? _a : 0) * 0.9;
-              next.AGI = ((_b = next.AGI) !== null && _b !== void 0 ? _b : 0) * 0.9;
+              next.SPD = (next.SPD ?? 0) * 0.9;
+              next.AGI = (next.AGI ?? 0) * 0.9;
           }
           if (this.has(unit, 'fear')) {
-              next.SPD = ((_c = next.SPD) !== null && _c !== void 0 ? _c : 0) * 0.9;
+              next.SPD = (next.SPD ?? 0) * 0.9;
           }
           const haste = this.get(unit, 'haste');
           if (haste) {
-              const boost = 1 + clamp01((_d = haste.power) !== null && _d !== void 0 ? _d : 0.1);
-              next.SPD = ((_e = next.SPD) !== null && _e !== void 0 ? _e : 0) * boost;
+              const boost = 1 + clamp01(haste.power ?? 0.1);
+              next.SPD = (next.SPD ?? 0) * boost;
           }
           return next;
       },
       beforeDamage(attacker, target, ctx = {}) {
-          var _a, _b, _c, _d, _e, _f;
-          const attackType = (_a = ctx.attackType) !== null && _a !== void 0 ? _a : 'basic';
-          const dtype = (_b = ctx.dtype) !== null && _b !== void 0 ? _b : 'phys';
-          const base = (_c = ctx.base) !== null && _c !== void 0 ? _c : 0;
+          const attackType = ctx.attackType ?? 'basic';
+          const dtype = ctx.dtype ?? 'phys';
+          const base = ctx.base ?? 0;
           let outMul = 1;
           let inMul = 1;
           let defPen = 0;
@@ -21485,19 +21273,19 @@ __define('./statuses.ts', (exports, module, __require) => {
               outMul *= 1.2;
           const weak = this.get(attacker, 'weaken');
           if (weak)
-              outMul *= 1 - 0.1 * Math.min(5, (_d = weak.stacks) !== null && _d !== void 0 ? _d : 1);
+              outMul *= 1 - 0.1 * Math.min(5, weak.stacks ?? 1);
           if (this.has(attacker, 'fear'))
               outMul *= 0.9;
           const cut = this.get(target, 'dmgCut');
           if (cut)
-              inMul *= 1 - clamp01((_e = cut.power) !== null && _e !== void 0 ? _e : 0);
+              inMul *= 1 - clamp01(cut.power ?? 0);
           if (this.has(target, 'stealth')) {
               inMul = 0;
               ignoreAll = true;
           }
           const pierce = this.get(attacker, 'pierce');
           if (pierce)
-              defPen = Math.max(defPen, clamp01((_f = pierce.power) !== null && _f !== void 0 ? _f : 0.1));
+              defPen = Math.max(defPen, clamp01(pierce.power ?? 0.1));
           const context = {
               ...ctx,
               attackType,
@@ -21511,12 +21299,11 @@ __define('./statuses.ts', (exports, module, __require) => {
           return context;
       },
       absorbShield(target, dmg, _ctx = {}) {
-          var _a, _b;
           const shield = this.get(target, 'shield');
-          if (!shield || ((_a = shield.amount) !== null && _a !== void 0 ? _a : 0) <= 0) {
+          if (!shield || (shield.amount ?? 0) <= 0) {
               return { remain: dmg, absorbed: 0, broke: false };
           }
-          const current = (_b = shield.amount) !== null && _b !== void 0 ? _b : 0;
+          const current = shield.amount ?? 0;
           const absorbed = Math.min(current, dmg);
           const remain = dmg - absorbed;
           const left = current - absorbed;
@@ -21527,18 +21314,17 @@ __define('./statuses.ts', (exports, module, __require) => {
           return { remain, absorbed, broke: left <= 0 };
       },
       afterDamage(attacker, target, result = {}) {
-          var _a, _b, _c, _d, _e;
-          const dealt = (_a = result.dealt) !== null && _a !== void 0 ? _a : 0;
+          const dealt = result.dealt ?? 0;
           const reflect = this.get(target, 'reflect');
           if (reflect && dealt > 0) {
-              const back = Math.round(dealt * clamp01((_b = reflect.power) !== null && _b !== void 0 ? _b : 0));
+              const back = Math.round(dealt * clamp01(reflect.power ?? 0));
               applyDamage(attacker, back);
               hookOnLethalDamage(attacker);
               if (back > 0) {
                   gainFury(attacker, {
                       type: 'damageTaken',
                       dealt: back,
-                      selfMaxHp: Number.isFinite(attacker === null || attacker === void 0 ? void 0 : attacker.hpMax) ? attacker.hpMax : undefined,
+                      selfMaxHp: Number.isFinite(attacker?.hpMax) ? attacker.hpMax : undefined,
                       damageTaken: back,
                   });
                   finishFuryHit(attacker);
@@ -21546,21 +21332,21 @@ __define('./statuses.ts', (exports, module, __require) => {
           }
           const venom = this.get(attacker, 'venom');
           if (venom && dealt > 0) {
-              const extra = Math.round(dealt * clamp01((_c = venom.power) !== null && _c !== void 0 ? _c : 0));
+              const extra = Math.round(dealt * clamp01(venom.power ?? 0));
               applyDamage(target, extra);
               hookOnLethalDamage(target);
               if (extra > 0) {
                   gainFury(target, {
                       type: 'damageTaken',
                       dealt: extra,
-                      selfMaxHp: Number.isFinite(target === null || target === void 0 ? void 0 : target.hpMax) ? target.hpMax : undefined,
+                      selfMaxHp: Number.isFinite(target?.hpMax) ? target.hpMax : undefined,
                       damageTaken: extra,
                   });
                   finishFuryHit(target);
               }
           }
           if (this.has(attacker, 'execute')) {
-              if (((_d = target.hp) !== null && _d !== void 0 ? _d : 0) <= Math.ceil(((_e = target.hpMax) !== null && _e !== void 0 ? _e : 0) * 0.1)) {
+              if ((target.hp ?? 0) <= Math.ceil((target.hpMax ?? 0) * 0.1)) {
                   target.hp = 0;
                   const revived = hookOnLethalDamage(target);
                   if (!revived) {
@@ -21595,11 +21381,10 @@ __define('./statuses.ts', (exports, module, __require) => {
       Statuses.remove(unit, id);
   }
   function hookOnLethalDamage(target) {
-      var _a;
       const status = Statuses.get(target, 'undying');
       if (!status)
           return false;
-      if (((_a = target.hp) !== null && _a !== void 0 ? _a : 0) <= 0) {
+      if ((target.hp ?? 0) <= 0) {
           target.hp = 1;
           Statuses.remove(target, 'undying');
           target.alive = true;
@@ -21662,9 +21447,8 @@ __define('./summon.ts', (exports, module, __require) => {
   // en-queue các yêu cầu “Immediate” trong lúc 1 unit đang hành động
   // req: { by?:unitId, side:'ally'|'enemy', slot:1..9, unit:{...} }
   function enqueueImmediate(Game, req) {
-      var _a, _b;
       if (req.by) {
-          const metaEntry = typeof ((_a = Game.meta) === null || _a === void 0 ? void 0 : _a.get) === 'function' ? Game.meta.get(req.by) : null;
+          const metaEntry = typeof Game.meta?.get === 'function' ? Game.meta.get(req.by) : null;
           const record = metaEntry && typeof metaEntry === 'object' ? metaEntry : null;
           const ok = Boolean(record
               && record['class'] === 'Summoner'
@@ -21678,7 +21462,7 @@ __define('./summon.ts', (exports, module, __require) => {
       const entry = {
           side: req.side,
           slot: req.slot,
-          unit: (_b = req.unit) !== null && _b !== void 0 ? _b : DEFAULT_SUMMON_UNIT,
+          unit: req.unit ?? DEFAULT_SUMMON_UNIT,
       };
       Game.actionChain.push(entry);
       return true;
@@ -21686,22 +21470,21 @@ __define('./summon.ts', (exports, module, __require) => {
   // xử lý toàn bộ chain của 1 phe sau khi actor vừa hành động
   // trả về slot lớn nhất đã hành động trong chain để tiện logging
   function processActionChain(Game, side, baseSlot, hooks = {}) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r;
       const list = Game.actionChain.filter((x) => x.side === side);
       if (!list.length)
-          return baseSlot !== null && baseSlot !== void 0 ? baseSlot : null;
+          return baseSlot ?? null;
       list.sort((a, b) => a.slot - b.slot);
-      let maxSlot = baseSlot !== null && baseSlot !== void 0 ? baseSlot : 0;
+      let maxSlot = baseSlot ?? 0;
       for (const item of list) {
           const { cx, cy } = slotToCell(side, item.slot);
           if (cellReserved(tokensAlive(Game), Game.queued, cx, cy))
               continue;
-          const extra = (_a = item.unit) !== null && _a !== void 0 ? _a : {};
-          const art = getUnitArt((_b = extra.id) !== null && _b !== void 0 ? _b : 'minion');
+          const extra = item.unit ?? {};
+          const art = getUnitArt(extra.id ?? 'minion');
           const newToken = {
-              id: ((_c = extra.id) !== null && _c !== void 0 ? _c : 'creep'),
-              name: (_d = extra.name) !== null && _d !== void 0 ? _d : 'Creep',
-              color: (_f = (_e = extra.color) !== null && _e !== void 0 ? _e : art === null || art === void 0 ? void 0 : art.palette.primary) !== null && _f !== void 0 ? _f : '#ffd27d',
+              id: (extra.id ?? 'creep'),
+              name: extra.name ?? 'Creep',
+              color: extra.color ?? art?.palette.primary ?? '#ffd27d',
               cx,
               cy,
               side,
@@ -21714,7 +21497,7 @@ __define('./summon.ts', (exports, module, __require) => {
               hp: extra.hp,
               atk: extra.atk,
               art,
-              skinKey: (_g = art === null || art === void 0 ? void 0 : art.skinKey) !== null && _g !== void 0 ? _g : null,
+              skinKey: art?.skinKey ?? null,
               iid: extra.iid,
           };
           Game.tokens.push(newToken);
@@ -21727,28 +21510,28 @@ __define('./summon.ts', (exports, module, __require) => {
           catch (_err) {
               // bỏ qua lỗi hiệu ứng
           }
-          const spawned = (_h = Game.tokens[Game.tokens.length - 1]) !== null && _h !== void 0 ? _h : null;
+          const spawned = Game.tokens[Game.tokens.length - 1] ?? null;
           if (spawned) {
-              const metaEntry = extra.id && typeof ((_j = Game.meta) === null || _j === void 0 ? void 0 : _j.get) === 'function'
+              const metaEntry = extra.id && typeof Game.meta?.get === 'function'
                   ? Game.meta.get(extra.id)
                   : null;
               const kit = getKitDefinition(metaEntry);
-              const onSpawnConfig = (kit === null || kit === void 0 ? void 0 : kit.onSpawn) && isRecord(kit.onSpawn) ? kit.onSpawn : null;
+              const onSpawnConfig = kit?.onSpawn && isRecord(kit.onSpawn) ? kit.onSpawn : null;
               prepareUnitForPassives(spawned);
-              applyOnSpawnEffects(Game, spawned, onSpawnConfig !== null && onSpawnConfig !== void 0 ? onSpawnConfig : undefined);
-              spawned.iid = (_m = (_l = (_k = hooks.allocIid) === null || _k === void 0 ? void 0 : _k.call(hooks)) !== null && _l !== void 0 ? _l : spawned.iid) !== null && _m !== void 0 ? _m : 0;
+              applyOnSpawnEffects(Game, spawned, onSpawnConfig ?? undefined);
+              spawned.iid = hooks.allocIid?.() ?? spawned.iid ?? 0;
           }
-          const creep = (_o = Game.tokens.find((t) => t.alive && t.side === side && t.cx === cx && t.cy === cy)) !== null && _o !== void 0 ? _o : null;
+          const creep = Game.tokens.find((t) => t.alive && t.side === side && t.cx === cx && t.cy === cy) ?? null;
           if (creep) {
               const { orderLength, cycle } = getTurnSnapshotInfo(Game.turn);
               const turnContext = {
                   side,
                   slot: item.slot,
-                  orderIndex: (_q = (_p = hooks.getTurnOrderIndex) === null || _p === void 0 ? void 0 : _p.call(hooks, Game, side, item.slot)) !== null && _q !== void 0 ? _q : -1,
+                  orderIndex: hooks.getTurnOrderIndex?.(Game, side, item.slot) ?? -1,
                   orderLength,
                   cycle,
               };
-              (_r = hooks.doActionOrSkip) === null || _r === void 0 ? void 0 : _r.call(hooks, Game, creep, { performUlt: hooks.performUlt, turnContext });
+              hooks.doActionOrSkip?.(Game, creep, { performUlt: hooks.performUlt, turnContext });
           }
           if (item.slot > maxSlot)
               maxSlot = item.slot;
@@ -21918,36 +21701,35 @@ __define('./turns.ts', (exports, module, __require) => {
       return idx >= cursor ? currentCycle : currentCycle + 1;
   }
   function spawnQueuedIfDue(Game, entry, hooks) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
-      const { allocIid, performUlt } = hooks !== null && hooks !== void 0 ? hooks : {};
+      const { allocIid, performUlt } = hooks ?? {};
       if (!entry)
           return { actor: null, spawned: false };
       const slot = entry.slot;
       const sideLower = toLowerSide(entry.side);
       const active = getActiveAt(Game, sideLower, slot);
-      const queueMap = sideLower === 'ally' ? (_a = Game.queued) === null || _a === void 0 ? void 0 : _a.ally : (_b = Game.queued) === null || _b === void 0 ? void 0 : _b.enemy;
-      const p = queueMap === null || queueMap === void 0 ? void 0 : queueMap.get(slot);
+      const queueMap = sideLower === 'ally' ? Game.queued?.ally : Game.queued?.enemy;
+      const p = queueMap?.get(slot);
       if (!p) {
           return { actor: active || null, spawned: false };
       }
-      if (((_c = p.spawnCycle) !== null && _c !== void 0 ? _c : 0) > ((_e = (_d = Game === null || Game === void 0 ? void 0 : Game.turn) === null || _d === void 0 ? void 0 : _d.cycle) !== null && _e !== void 0 ? _e : 0)) {
+      if ((p.spawnCycle ?? 0) > (Game?.turn?.cycle ?? 0)) {
           return { actor: active || null, spawned: false };
       }
-      queueMap === null || queueMap === void 0 ? void 0 : queueMap.delete(slot);
+      queueMap?.delete(slot);
       const meta = Game.meta && typeof Game.meta.get === 'function' ? Game.meta.get(p.unitId) : null;
       const source = p.source || null;
       const fromDeck = source === 'deck';
-      const kit = meta === null || meta === void 0 ? void 0 : meta.kit;
+      const kit = meta?.kit;
       const initialFury = initialRageFor(p.unitId, { isLeader: false, revive: !!p.revive, reviveSpec: p.revived });
       const stats = makeInstanceStats(p.unitId);
       const baseStats = {
-          atk: (_f = stats.atk) !== null && _f !== void 0 ? _f : 0,
-          res: (_g = stats.res) !== null && _g !== void 0 ? _g : 0,
-          wil: (_h = stats.wil) !== null && _h !== void 0 ? _h : 0,
+          atk: stats.atk ?? 0,
+          res: stats.res ?? 0,
+          wil: stats.wil ?? 0,
       };
       const obj = {
           id: p.unitId,
-          name: (_j = p.name) !== null && _j !== void 0 ? _j : undefined,
+          name: p.name ?? undefined,
           color: p.color || '#a9f58c',
           cx: p.cx,
           cy: p.cy,
@@ -21959,15 +21741,15 @@ __define('./turns.ts', (exports, module, __require) => {
       };
       obj.iid = typeof allocIid === 'function' ? allocIid() : obj.iid;
       obj.art = getUnitArt(p.unitId);
-      obj.skinKey = (_k = obj.art) === null || _k === void 0 ? void 0 : _k.skinKey;
-      obj.color = obj.color || ((_m = (_l = obj.art) === null || _l === void 0 ? void 0 : _l.palette) === null || _m === void 0 ? void 0 : _m.primary) || '#a9f58c';
+      obj.skinKey = obj.art?.skinKey;
+      obj.color = obj.color || obj.art?.palette?.primary || '#a9f58c';
       initializeFury(obj, p.unitId, initialFury, CFG);
       if (fromDeck) {
           setFury(obj, obj.furyMax);
       }
       prepareUnitForPassives(obj);
       Game.tokens.push(obj);
-      applyOnSpawnEffects(Game, obj, (_o = kit === null || kit === void 0 ? void 0 : kit.onSpawn) !== null && _o !== void 0 ? _o : undefined);
+      applyOnSpawnEffects(Game, obj, kit?.onSpawn ?? undefined);
       {
           const sessionVfx = asSessionWithVfx(Game, { requireGrid: true });
           if (sessionVfx) {
@@ -21978,7 +21760,7 @@ __define('./turns.ts', (exports, module, __require) => {
           }
       }
       const actor = getActiveAt(Game, sideLower, slot);
-      const isLeader = (actor === null || actor === void 0 ? void 0 : actor.id) === 'leaderA' || (actor === null || actor === void 0 ? void 0 : actor.id) === 'leaderB';
+      const isLeader = actor?.id === 'leaderA' || actor?.id === 'leaderB';
       const canAutoUlt = fromDeck && !isLeader && actor && actor.alive && typeof performUlt === 'function';
       if (canAutoUlt && !Statuses.blocks(actor, 'ult')) {
           let ultOk = false;
@@ -22003,12 +21785,11 @@ __define('./turns.ts', (exports, module, __require) => {
    * @returns {void}
    */
   function tickMinionTTL(Game, side, options = {}) {
-      var _a, _b;
-      const consumed = (_a = options === null || options === void 0 ? void 0 : options.consumed) !== null && _a !== void 0 ? _a : true;
+      const consumed = options?.consumed ?? true;
       if (!consumed)
           return;
-      const reason = typeof (options === null || options === void 0 ? void 0 : options.reason) === 'string' ? options.reason : null;
-      const skipped = (_b = options === null || options === void 0 ? void 0 : options.skipped) !== null && _b !== void 0 ? _b : false;
+      const reason = typeof options?.reason === 'string' ? options.reason : null;
+      const skipped = options?.skipped ?? false;
       if (skipped && reason === 'systemError')
           return;
       const toRemove = [];
@@ -22080,7 +21861,6 @@ __define('./turns.ts', (exports, module, __require) => {
   };
   // hành động 1 unit (ưu tiên ult nếu đủ nộ & không bị chặn)
   function doActionOrSkip(Game, unit, { performUlt, turnContext } = {}) {
-      var _a, _b, _c, _d, _e, _f, _g, _h;
       const ensureBusyReset = () => {
           if (!Game.turn)
               return;
@@ -22089,12 +21869,12 @@ __define('./turns.ts', (exports, module, __require) => {
               Game.turn.busyUntil = now;
           }
       };
-      const slot = (_a = turnContext === null || turnContext === void 0 ? void 0 : turnContext.slot) !== null && _a !== void 0 ? _a : (unit ? slotIndex(unit.side, unit.cx, unit.cy) : null);
-      const side = (_c = (_b = turnContext === null || turnContext === void 0 ? void 0 : turnContext.side) !== null && _b !== void 0 ? _b : unit === null || unit === void 0 ? void 0 : unit.side) !== null && _c !== void 0 ? _c : null;
-      const orderIndex = typeof (turnContext === null || turnContext === void 0 ? void 0 : turnContext.orderIndex) === 'number' ? turnContext.orderIndex : null;
-      const cycle = typeof (turnContext === null || turnContext === void 0 ? void 0 : turnContext.cycle) === 'number' ? turnContext.cycle : (_e = (_d = Game.turn) === null || _d === void 0 ? void 0 : _d.cycle) !== null && _e !== void 0 ? _e : null;
+      const slot = turnContext?.slot ?? (unit ? slotIndex(unit.side, unit.cx, unit.cy) : null);
+      const side = turnContext?.side ?? unit?.side ?? null;
+      const orderIndex = typeof turnContext?.orderIndex === 'number' ? turnContext.orderIndex : null;
+      const cycle = typeof turnContext?.cycle === 'number' ? turnContext.cycle : Game.turn?.cycle ?? null;
       const sequentialSnapshot = asSequentialTurn(Game.turn);
-      const orderLength = typeof (turnContext === null || turnContext === void 0 ? void 0 : turnContext.orderLength) === 'number'
+      const orderLength = typeof turnContext?.orderLength === 'number'
           ? turnContext.orderLength
           : (sequentialSnapshot ? sequentialSnapshot.order.length : null);
       const resolution = {
@@ -22105,7 +21885,7 @@ __define('./turns.ts', (exports, module, __require) => {
       };
       const baseDetail = {
           game: Game,
-          unit: unit !== null && unit !== void 0 ? unit : null,
+          unit: unit ?? null,
           side,
           slot,
           phase: side,
@@ -22131,8 +21911,8 @@ __define('./turns.ts', (exports, module, __require) => {
       }
       const meta = Game.meta.get(unit.id);
       emitPassiveEvent(Game, unit, 'onTurnStart', { log: getPassiveLog(Game) });
-      const turnStamp = `${side !== null && side !== void 0 ? side : ''}:${slot !== null && slot !== void 0 ? slot : ''}:${cycle !== null && cycle !== void 0 ? cycle : 0}`;
-      startFuryTurn(unit, { turnStamp, startAmount: (_g = (_f = CFG === null || CFG === void 0 ? void 0 : CFG.fury) === null || _f === void 0 ? void 0 : _f.turn) === null || _g === void 0 ? void 0 : _g.startGain, grantStart: true });
+      const turnStamp = `${side ?? ''}:${slot ?? ''}:${cycle ?? 0}`;
+      startFuryTurn(unit, { turnStamp, startAmount: CFG?.fury?.turn?.startGain, grantStart: true });
       applyTurnRegen(Game, unit);
       Statuses.onTurnStart(unit, {});
       emitGameEvent(ACTION_START, baseDetail);
@@ -22147,7 +21927,7 @@ __define('./turns.ts', (exports, module, __require) => {
           return resolution;
       }
       const ultCost = resolveUltCost(unit, CFG);
-      if (meta && ((_h = unit.fury) !== null && _h !== void 0 ? _h : 0) >= ultCost && !Statuses.blocks(unit, 'ult')) {
+      if (meta && (unit.fury ?? 0) >= ultCost && !Statuses.blocks(unit, 'ult')) {
           let ultOk = false;
           try {
               performUlt(unit);
@@ -22180,7 +21960,7 @@ __define('./turns.ts', (exports, module, __require) => {
           finishAction(actionDetail);
           return resolution;
       }
-      const cap = typeof (meta === null || meta === void 0 ? void 0 : meta.followupCap) === 'number' ? (meta.followupCap | 0) : (CFG.FOLLOWUP_CAP_DEFAULT | 0);
+      const cap = typeof meta?.followupCap === 'number' ? (meta.followupCap | 0) : (CFG.FOLLOWUP_CAP_DEFAULT | 0);
       try {
           doBasicWithFollowups(Game, unit, cap);
       }
@@ -22207,11 +21987,10 @@ __define('./turns.ts', (exports, module, __require) => {
   // Bước con trỏ lượt (sparse-cursor) đúng đặc tả
   // hooks = { performUlt, processActionChain, allocIid, doActionOrSkip }
   function stepTurn(Game, hooks) {
-      var _a, _b, _c, _d, _e, _f;
       const turn = Game.turn;
       if (!turn)
           return;
-      if ((_a = Game.battle) === null || _a === void 0 ? void 0 : _a.over)
+      if (Game.battle?.over)
           return;
       const interleavedTurn = asInterleavedTurn(turn);
       if (interleavedTurn) {
@@ -22245,7 +22024,7 @@ __define('./turns.ts', (exports, module, __require) => {
               active = selection.unit;
           }
           else {
-              active = (_b = getActiveAt(Game, entry.side, entry.slot)) !== null && _b !== void 0 ? _b : null; // behavior-preserving
+              active = getActiveAt(Game, entry.side, entry.slot) ?? null; // behavior-preserving
           }
           if (!active || !active.alive) {
               return;
@@ -22279,15 +22058,15 @@ __define('./turns.ts', (exports, module, __require) => {
                   actionOutcome = normalizeActionResolution(rawOutcome);
               }
               const chainHooks = { ...hooks, getTurnOrderIndex };
-              const processed = (_c = hooks.processActionChain) === null || _c === void 0 ? void 0 : _c.call(hooks, Game, entry.side, entry.slot, chainHooks);
-              turnDetail.processedChain = processed !== null && processed !== void 0 ? processed : null;
+              const processed = hooks.processActionChain?.(Game, entry.side, entry.slot, chainHooks);
+              turnDetail.processedChain = processed ?? null;
           }
           finally {
               emitGameEvent(TURN_END, turnDetail);
           }
           const consumption = consumedTurnFromOutcome(actionOutcome, typeof actionHook === 'function');
           tickMinionTTL(Game, entry.side, consumption);
-          const ended = (_d = hooks.checkBattleEnd) === null || _d === void 0 ? void 0 : _d.call(hooks, Game, {
+          const ended = hooks.checkBattleEnd?.(Game, {
               trigger: 'interleaved',
               side: entry.side,
               slot: entry.slot,
@@ -22302,7 +22081,7 @@ __define('./turns.ts', (exports, module, __require) => {
       const sequentialTurn = asSequentialTurn(turn);
       if (!sequentialTurn)
           return;
-      const order = Array.isArray(sequentialTurn === null || sequentialTurn === void 0 ? void 0 : sequentialTurn.order) ? sequentialTurn.order : [];
+      const order = Array.isArray(sequentialTurn?.order) ? sequentialTurn.order : [];
       if (!order.length)
           return;
       const orderLength = order.length;
@@ -22358,15 +22137,15 @@ __define('./turns.ts', (exports, module, __require) => {
                   actionOutcome = normalizeActionResolution(rawOutcome);
               }
               const chainHooks = { ...hooks, getTurnOrderIndex };
-              const processed = (_e = hooks.processActionChain) === null || _e === void 0 ? void 0 : _e.call(hooks, Game, entry.side, entry.slot, chainHooks);
-              turnDetail.processedChain = processed !== null && processed !== void 0 ? processed : null;
+              const processed = hooks.processActionChain?.(Game, entry.side, entry.slot, chainHooks);
+              turnDetail.processedChain = processed ?? null;
           }
           finally {
               emitGameEvent(TURN_END, turnDetail);
           }
           const consumption = consumedTurnFromOutcome(actionOutcome, typeof actionHook === 'function');
           tickMinionTTL(Game, entry.side, consumption);
-          const ended = (_f = hooks.checkBattleEnd) === null || _f === void 0 ? void 0 : _f.call(hooks, Game, {
+          const ended = hooks.checkBattleEnd?.(Game, {
               trigger: 'sequential',
               side: entry.side,
               slot: entry.slot,
@@ -22408,10 +22187,9 @@ __define('./turns/interleaved.ts', (exports, module, __require) => {
       return LOWER_TO_UPPER[side] || 'ALLY';
   }
   function resolveSlotCount(turn) {
-      var _a;
-      const raw = Number.isFinite(turn === null || turn === void 0 ? void 0 : turn.slotCount) ? (_a = turn === null || turn === void 0 ? void 0 : turn.slotCount) !== null && _a !== void 0 ? _a : null : null;
-      if (Number.isFinite(raw) && (raw !== null && raw !== void 0 ? raw : 0) > 0) {
-          return Math.max(1, Math.min(SLOT_CAP, Math.floor(raw !== null && raw !== void 0 ? raw : SLOT_CAP)));
+      const raw = Number.isFinite(turn?.slotCount) ? turn?.slotCount ?? null : null;
+      if (Number.isFinite(raw) && (raw ?? 0) > 0) {
+          return Math.max(1, Math.min(SLOT_CAP, Math.floor(raw ?? SLOT_CAP)));
       }
       return SLOT_CAP;
   }
@@ -22453,14 +22231,13 @@ __define('./turns/interleaved.ts', (exports, module, __require) => {
       return map;
   }
   function isQueueDue(state, sideLower, slot, cycle) {
-      var _a, _b, _c;
-      const queued = sideLower === 'ally' ? (_a = state.queued) === null || _a === void 0 ? void 0 : _a.ally : (_b = state.queued) === null || _b === void 0 ? void 0 : _b.enemy;
+      const queued = sideLower === 'ally' ? state.queued?.ally : state.queued?.enemy;
       if (!queued)
           return false;
       const entry = queued.get(slot);
       if (!entry)
           return false;
-      return ((_c = entry.spawnCycle) !== null && _c !== void 0 ? _c : 0) <= cycle;
+      return (entry.spawnCycle ?? 0) <= cycle;
   }
   function makeWrappedFlag(start, pos) {
       if (!Number.isFinite(start) || start <= 0)
@@ -22468,8 +22245,7 @@ __define('./turns/interleaved.ts', (exports, module, __require) => {
       return pos <= start;
   }
   function findNextOccupiedPos(state, side, startPos = 0) {
-      var _a, _b, _c;
-      const turn = (_a = state.turn) !== null && _a !== void 0 ? _a : null;
+      const turn = state.turn ?? null;
       const sideKey = normalizeSide(side);
       const sideLower = SIDE_TO_LOWER[sideKey];
       if (!sideLower)
@@ -22477,11 +22253,11 @@ __define('./turns/interleaved.ts', (exports, module, __require) => {
       const slotCount = resolveSlotCount(turn);
       const start = Number.isFinite(startPos) ? Math.max(0, Math.min(slotCount, Math.floor(startPos))) : 0;
       const unitsBySlot = buildSlotMap(state.tokens, sideLower);
-      const cycle = Number.isFinite(turn === null || turn === void 0 ? void 0 : turn.cycle) ? turn.cycle : 0;
+      const cycle = Number.isFinite(turn?.cycle) ? turn.cycle : 0;
       for (let offset = 1; offset <= slotCount; offset += 1) {
           const pos = ((start + offset - 1) % slotCount) + 1;
           const wrapped = makeWrappedFlag(start, pos);
-          const unit = (_b = unitsBySlot.get(pos)) !== null && _b !== void 0 ? _b : null;
+          const unit = unitsBySlot.get(pos) ?? null;
           const queued = isQueueDue(state, sideLower, pos, cycle);
           if (unit && unit.alive && Statuses.canAct(unit)) {
               return {
@@ -22489,7 +22265,7 @@ __define('./turns/interleaved.ts', (exports, module, __require) => {
                   side: sideLower,
                   pos,
                   unit,
-                  unitId: (_c = unit.id) !== null && _c !== void 0 ? _c : null,
+                  unitId: unit.id ?? null,
                   queued,
                   wrapped,
                   sideKey,
@@ -22513,7 +22289,6 @@ __define('./turns/interleaved.ts', (exports, module, __require) => {
       return null;
   }
   function nextTurnInterleaved(state, turn = state.turn) {
-      var _a, _b;
       if (!state || !turn)
           return null;
       ensureTurnState(turn);
@@ -22521,15 +22296,14 @@ __define('./turns/interleaved.ts', (exports, module, __require) => {
       if (slotCount <= 0)
           return null;
       const pickSide = (sideKey) => {
-          var _a, _b;
-          const last = Number.isFinite((_a = turn.lastPos) === null || _a === void 0 ? void 0 : _a[sideKey]) ? turn.lastPos[sideKey] : 0;
+          const last = Number.isFinite(turn.lastPos?.[sideKey]) ? turn.lastPos[sideKey] : 0;
           const found = findNextOccupiedPos(state, sideKey, last);
           if (!found)
               return null;
           if (!found.spawnOnly) {
               turn.lastPos[sideKey] = found.pos;
               if (found.wrapped) {
-                  turn.wrapCount[sideKey] = ((_b = turn.wrapCount[sideKey]) !== null && _b !== void 0 ? _b : 0) + 1;
+                  turn.wrapCount[sideKey] = (turn.wrapCount[sideKey] ?? 0) + 1;
               }
           }
           return found;
@@ -22549,8 +22323,8 @@ __define('./turns/interleaved.ts', (exports, module, __require) => {
       }
       turn.nextSide = selection.sideKey === 'ALLY' ? 'ENEMY' : 'ALLY';
       turn.turnCount += 1;
-      const allyWrap = (_a = turn.wrapCount.ALLY) !== null && _a !== void 0 ? _a : 0;
-      const enemyWrap = (_b = turn.wrapCount.ENEMY) !== null && _b !== void 0 ? _b : 0;
+      const allyWrap = turn.wrapCount.ALLY ?? 0;
+      const enemyWrap = turn.wrapCount.ENEMY ?? 0;
       const maxWrap = Math.max(allyWrap, enemyWrap);
       if (!Number.isFinite(turn.cycle) || turn.cycle < maxWrap) {
           turn.cycle = maxWrap;
@@ -22602,7 +22376,7 @@ __define('./types/currency.ts', (exports, module, __require) => {
           return null;
       }
       const { currencies } = playerState;
-      return isLineupCurrencies(currencies) ? (currencies !== null && currencies !== void 0 ? currencies : null) : null;
+      return isLineupCurrencies(currencies) ? (currencies ?? null) : null;
   };
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'isCurrencyEntry')) exports.isCurrencyEntry = isCurrencyEntry;
@@ -22681,12 +22455,11 @@ __define('./ui.ts', (exports, module, __require) => {
       const costRing = queryFromRoot('costRing') || doc.getElementById('costRing');
       const costChip = queryFromRoot('costChip') || doc.getElementById('costChip');
       const update = (Game) => {
-          var _a, _b, _c;
           if (!Game)
               return;
-          const capRaw = (_b = (_a = Game.costCap) !== null && _a !== void 0 ? _a : CFG.COST_CAP) !== null && _b !== void 0 ? _b : 30;
+          const capRaw = Game.costCap ?? CFG.COST_CAP ?? 30;
           const cap = Number.isFinite(capRaw) && capRaw > 0 ? capRaw : 1;
-          const now = Math.max(0, Math.floor((_c = Game.cost) !== null && _c !== void 0 ? _c : 0));
+          const now = Math.max(0, Math.floor(Game.cost ?? 0));
           const ratio = Math.max(0, Math.min(1, now / cap));
           if (costNow)
               costNow.textContent = String(now);
@@ -22699,9 +22472,8 @@ __define('./ui.ts', (exports, module, __require) => {
           }
       };
       const handleGameEvent = (event) => {
-          var _a;
           const detail = event.detail;
-          const state = (_a = detail === null || detail === void 0 ? void 0 : detail.game) !== null && _a !== void 0 ? _a : null;
+          const state = detail?.game ?? null;
           if (state)
               update(state);
       };
@@ -22753,8 +22525,7 @@ __define('./ui.ts', (exports, module, __require) => {
       return debounced;
   }
   function startSummonBar(doc, options, root) {
-      var _a, _b, _c, _d;
-      const { onPick = () => { }, canAfford = () => true, getDeck = () => [], getSelectedId = () => null, } = options !== null && options !== void 0 ? options : {};
+      const { onPick = () => { }, canAfford = () => true, getDeck = () => [], getSelectedId = () => null, } = options ?? {};
       const queryFromRoot = (selector, id) => {
           if (canQuery(root)) {
               const el = root.querySelector(selector);
@@ -22784,7 +22555,7 @@ __define('./ui.ts', (exports, module, __require) => {
           while (cleanupFns.length > 0) {
               const dispose = cleanupFns.pop();
               try {
-                  dispose === null || dispose === void 0 ? void 0 : dispose();
+                  dispose?.();
               }
               catch { }
           }
@@ -22819,8 +22590,8 @@ __define('./ui.ts', (exports, module, __require) => {
       };
       host.addEventListener('click', handleHostClick);
       cleanupFns.push(() => host.removeEventListener('click', handleHostClick));
-      const gap = (_b = (_a = CFG.UI) === null || _a === void 0 ? void 0 : _a.CARD_GAP) !== null && _b !== void 0 ? _b : 12;
-      const minSize = (_d = (_c = CFG.UI) === null || _c === void 0 ? void 0 : _c.CARD_MIN) !== null && _d !== void 0 ? _d : 40;
+      const gap = CFG.UI?.CARD_GAP ?? 12;
+      const minSize = CFG.UI?.CARD_MIN ?? 40;
       const boardEl = queryFromRoot('#board', 'board');
       const syncCardSize = debounce(() => {
           if (!boardEl)
@@ -22877,7 +22648,7 @@ __define('./ui.ts', (exports, module, __require) => {
               });
               removalObserver.observe(observerTarget, { childList: true });
               cleanupFns.push(() => {
-                  removalObserver === null || removalObserver === void 0 ? void 0 : removalObserver.disconnect();
+                  removalObserver?.disconnect();
                   removalObserver = null;
               });
           }
@@ -22967,10 +22738,9 @@ __define('./ui.ts', (exports, module, __require) => {
 __define('./ui/dom.ts', (exports, module, __require) => {
   const DEFAULT_ASSERT_MESSAGE = 'Cần một phần tử DOM hợp lệ.';
   function assertElement(value, options) {
-      var _a;
       const message = typeof options === 'string'
           ? options
-          : (_a = options === null || options === void 0 ? void 0 : options.message) !== null && _a !== void 0 ? _a : DEFAULT_ASSERT_MESSAGE;
+          : options?.message ?? DEFAULT_ASSERT_MESSAGE;
       const guard = typeof options === 'object' && options ? options.guard : undefined;
       const ElementConstructor = typeof Element === 'undefined' ? undefined : Element;
       if (!ElementConstructor || !(value instanceof ElementConstructor)) {
@@ -22982,12 +22752,11 @@ __define('./ui/dom.ts', (exports, module, __require) => {
       return value;
   }
   function ensureStyleTag(id, options = {}) {
-      var _a, _b, _c, _d, _e;
-      const doc = (_a = options.doc) !== null && _a !== void 0 ? _a : (typeof document !== 'undefined' ? document : null);
+      const doc = options.doc ?? (typeof document !== 'undefined' ? document : null);
       if (!doc) {
           return null;
       }
-      const appendTarget = (_e = (_d = (_c = (_b = options.target) !== null && _b !== void 0 ? _b : doc.head) !== null && _c !== void 0 ? _c : doc.documentElement) !== null && _d !== void 0 ? _d : doc.body) !== null && _e !== void 0 ? _e : null;
+      const appendTarget = options.target ?? doc.head ?? doc.documentElement ?? doc.body ?? null;
       let style = doc.getElementById(id);
       if (!(style instanceof HTMLStyleElement)) {
           style = doc.createElement('style');
@@ -23009,11 +22778,11 @@ __define('./ui/dom.ts', (exports, module, __require) => {
       if (!input) {
           return [];
       }
-      return (Array.isArray(input) ? input : [input]).filter((item) => { var _a, _b; return Boolean((_b = (_a = item === null || item === void 0 ? void 0 : item.trim) === null || _a === void 0 ? void 0 : _a.call(item)) !== null && _b !== void 0 ? _b : item); });
+      return (Array.isArray(input) ? input : [input]).filter((item) => Boolean(item?.trim?.() ?? item));
   }
   function mountSection(options) {
       const { root, section, replaceChildren = true, rootClasses, removeRootClasses, onDestroy = null, assertMessage, } = options;
-      const host = assertElement(root, assertMessage !== null && assertMessage !== void 0 ? assertMessage : 'Cần một phần tử root hợp lệ.');
+      const host = assertElement(root, assertMessage ?? 'Cần một phần tử root hợp lệ.');
       const classesToAdd = normalizeClasses(rootClasses);
       const classesToRemove = normalizeClasses(removeRootClasses);
       const removedRootClasses = [];
@@ -23116,7 +22885,7 @@ __define('./ui/rarity/rarity.ts', (exports, module, __require) => {
   }
   function normalizeTokenMap(source) {
       const tokens = new Map();
-      Object.entries(source !== null && source !== void 0 ? source : {}).forEach(([rawKey, rawValue]) => {
+      Object.entries(source ?? {}).forEach(([rawKey, rawValue]) => {
           if (rawKey === 'default' || rawKey === '__esModule') {
               return;
           }
@@ -23151,10 +22920,9 @@ __define('./ui/rarity/rarity.ts', (exports, module, __require) => {
       return RARITY_TOKENS[rarity];
   }
   function normalizeOptions(variant, options) {
-      var _a;
       return {
-          label: (_a = options === null || options === void 0 ? void 0 : options.label) !== null && _a !== void 0 ? _a : variant !== 'deck',
-          rounded: Boolean(options === null || options === void 0 ? void 0 : options.rounded),
+          label: options?.label ?? variant !== 'deck',
+          rounded: Boolean(options?.rounded),
       };
   }
   function getRarityClass(rarity) {
@@ -23326,7 +23094,7 @@ __define('./ui/rarity/rarity.ts', (exports, module, __require) => {
           classObserver: null,
           classPoller: null,
       };
-      const computedPosition = typeof window !== 'undefined' && (window === null || window === void 0 ? void 0 : window.getComputedStyle)
+      const computedPosition = typeof window !== 'undefined' && window?.getComputedStyle
           ? window.getComputedStyle(host).position
           : host.style.position;
       const inlinePosition = host.style.position;
@@ -23394,14 +23162,13 @@ __define('./ui/rarity/rarity.ts', (exports, module, __require) => {
       activeStates.delete(state);
   }
   function setPowerMode(mode) {
-      var _a;
       const normalizedMode = normalizePowerMode(mode);
       if (normalizedMode === currentPowerMode) {
           return;
       }
       currentPowerMode = normalizedMode;
       const doc = typeof document !== 'undefined' ? document : null;
-      const body = (_a = doc === null || doc === void 0 ? void 0 : doc.body) !== null && _a !== void 0 ? _a : null;
+      const body = doc?.body ?? null;
       if (body) {
           body.classList.toggle('low-power', normalizedMode === 'low');
       }
@@ -23418,7 +23185,6 @@ __define('./ui/rarity/rarity.ts', (exports, module, __require) => {
       state.revealTimers.push(id);
   }
   function spawnSparks(state) {
-      var _a, _b;
       const token = state.token;
       if (currentPowerMode === 'low' || token.spark <= 0 || state.variant !== 'gacha') {
           return;
@@ -23428,7 +23194,7 @@ __define('./ui/rarity/rarity.ts', (exports, module, __require) => {
           return;
       }
       const layer = ensureSparkLayer(state);
-      const existingForLayer = (_a = sparkUsage.get(layer)) !== null && _a !== void 0 ? _a : 0;
+      const existingForLayer = sparkUsage.get(layer) ?? 0;
       const availableForLayer = Math.max(0, token.spark - existingForLayer);
       const spawnCount = Math.min(availableForLayer, availableGlobal);
       if (spawnCount <= 0) {
@@ -23447,15 +23213,14 @@ __define('./ui/rarity/rarity.ts', (exports, module, __require) => {
           spark.style.setProperty('--spark-duration', `${SPARK_DURATION + Math.random() * 300}ms`);
           layer.appendChild(spark);
           activeSparkCount += 1;
-          const currentLayerCount = ((_b = sparkUsage.get(layer)) !== null && _b !== void 0 ? _b : 0) + 1;
+          const currentLayerCount = (sparkUsage.get(layer) ?? 0) + 1;
           sparkUsage.set(layer, currentLayerCount);
           const cleanupId = setTimeout(() => {
-              var _a;
               if (spark.parentNode === layer) {
                   layer.removeChild(spark);
               }
               activeSparkCount = Math.max(0, activeSparkCount - 1);
-              const remaining = Math.max(0, ((_a = sparkUsage.get(layer)) !== null && _a !== void 0 ? _a : 0) - 1);
+              const remaining = Math.max(0, (sparkUsage.get(layer) ?? 0) - 1);
               if (remaining <= 0) {
                   sparkUsage.delete(layer);
               }
@@ -23480,17 +23245,16 @@ __define('./ui/rarity/rarity.ts', (exports, module, __require) => {
       return setTimeout(() => callback(getNow()), 16);
   }
   function playGachaReveal(cards, options) {
-      var _a, _b, _c, _d;
       if (!Array.isArray(cards) || typeof document === 'undefined') {
-          (_a = options === null || options === void 0 ? void 0 : options.onDone) === null || _a === void 0 ? void 0 : _a.call(options);
+          options?.onDone?.();
           return;
       }
-      const stagger = (_b = options === null || options === void 0 ? void 0 : options.staggerMs) !== null && _b !== void 0 ? _b : 120;
+      const stagger = options?.staggerMs ?? 120;
       const states = cards
           .map(card => ({ card, state: auraStates.get(card.el) }))
           .filter((entry) => Boolean(entry.state));
       if (states.length === 0) {
-          (_c = options === null || options === void 0 ? void 0 : options.onDone) === null || _c === void 0 ? void 0 : _c.call(options);
+          options?.onDone?.();
           return;
       }
       let completed = 0;
@@ -23512,16 +23276,15 @@ __define('./ui/rarity/rarity.ts', (exports, module, __require) => {
                   state.overlay.classList.add('is-reveal');
               });
               scheduleTimeout(state, delayBase + TIMELINE_TOTAL, () => {
-                  var _a;
                   state.overlay.classList.add('is-reveal');
                   completed += 1;
                   if (completed === total) {
-                      (_a = options === null || options === void 0 ? void 0 : options.onDone) === null || _a === void 0 ? void 0 : _a.call(options);
+                      options?.onDone?.();
                   }
               });
           });
       };
-      const stateForRaf = (_d = states[0]) === null || _d === void 0 ? void 0 : _d.state;
+      const stateForRaf = states[0]?.state;
       if (stateForRaf) {
           stateForRaf.revealRaf = requestFrame(() => {
               stateForRaf.revealRaf = null;
@@ -23536,7 +23299,6 @@ __define('./ui/rarity/rarity.ts', (exports, module, __require) => {
       }
   }
   function prepareGachaReveal(hosts, options) {
-      var _a, _b, _c;
       if (typeof document === 'undefined') {
           return {
               reveal() { },
@@ -23544,11 +23306,11 @@ __define('./ui/rarity/rarity.ts', (exports, module, __require) => {
               dispose() { },
           };
       }
-      const label = (_a = options === null || options === void 0 ? void 0 : options.label) !== null && _a !== void 0 ? _a : true;
-      const rounded = (_b = options === null || options === void 0 ? void 0 : options.rounded) !== null && _b !== void 0 ? _b : true;
-      const resolveRarity = (_c = options === null || options === void 0 ? void 0 : options.getRarity) !== null && _c !== void 0 ? _c : ((host) => host.dataset.rarity);
+      const label = options?.label ?? true;
+      const rounded = options?.rounded ?? true;
+      const resolveRarity = options?.getRarity ?? ((host) => host.dataset.rarity);
       const mounted = new Map();
-      for (const rawHost of hosts !== null && hosts !== void 0 ? hosts : []) {
+      for (const rawHost of hosts ?? []) {
           if (!(rawHost instanceof HTMLElement)) {
               continue;
           }
@@ -23559,8 +23321,8 @@ __define('./ui/rarity/rarity.ts', (exports, module, __require) => {
       }
       let disposed = false;
       const revealOptions = {
-          staggerMs: options === null || options === void 0 ? void 0 : options.staggerMs,
-          onDone: options === null || options === void 0 ? void 0 : options.onDone,
+          staggerMs: options?.staggerMs,
+          onDone: options?.onDone,
       };
       const controller = {
           reveal() {
@@ -23651,7 +23413,7 @@ __define('./units.ts', (exports, module, __require) => {
 __define('./utils/assert.ts', (exports, module, __require) => {
   function assertDefined(value, message) {
       if (value === undefined || value === null) {
-          throw new Error(message !== null && message !== void 0 ? message : 'Giá trị mong đợi phải được định nghĩa.');
+          throw new Error(message ?? 'Giá trị mong đợi phải được định nghĩa.');
       }
       return value;
   }
@@ -23717,7 +23479,7 @@ __define('./utils/format.ts', (exports, module, __require) => {
               if (value == null) {
                   return '';
               }
-              if (hasLocaleString && typeof (value === null || value === void 0 ? void 0 : value.toLocaleString) === 'function') {
+              if (hasLocaleString && typeof value?.toLocaleString === 'function') {
                   try {
                       return value.toLocaleString();
                   }
@@ -23776,7 +23538,6 @@ __define('./utils/fury.ts', (exports, module, __require) => {
       }
   }
   function ensureState(unit) {
-      var _a;
       if (!unit)
           return null;
       ensureAlias(unit);
@@ -23794,12 +23555,11 @@ __define('./utils/fury.ts', (exports, module, __require) => {
               lastStart: safeNow()
           };
       }
-      return (_a = internal._furyState) !== null && _a !== void 0 ? _a : null;
+      return internal._furyState ?? null;
   }
   function resolveMaxFury(unitId, cfg = CFG) {
-      var _a, _b;
-      const furyCfg = ((_a = cfg === null || cfg === void 0 ? void 0 : cfg.fury) !== null && _a !== void 0 ? _a : {});
-      const special = (_b = furyCfg.specialMax) !== null && _b !== void 0 ? _b : {};
+      const furyCfg = (cfg?.fury ?? {});
+      const special = furyCfg.specialMax ?? {};
       const entry = unitId ? special[unitId] : null;
       if (isFiniteNumber(entry))
           return entry;
@@ -23819,11 +23579,10 @@ __define('./utils/fury.ts', (exports, module, __require) => {
       return 100;
   }
   function resolveUltCost(unit, cfg = CFG) {
-      var _a, _b;
       if (!unit)
           return resolveMaxFury(null, cfg);
-      const furyCfg = ((_a = cfg === null || cfg === void 0 ? void 0 : cfg.fury) !== null && _a !== void 0 ? _a : {});
-      const special = (_b = furyCfg.specialMax) !== null && _b !== void 0 ? _b : {};
+      const furyCfg = (cfg?.fury ?? {});
+      const special = furyCfg.specialMax ?? {};
       const entry = special[unit.id];
       if (entry && typeof entry === 'object') {
           const entryObj = entry;
@@ -23878,8 +23637,7 @@ __define('./utils/fury.ts', (exports, module, __require) => {
       return amount;
   }
   function resolveTurnCap(cfg) {
-      var _a;
-      const furyCfg = ((_a = cfg === null || cfg === void 0 ? void 0 : cfg.fury) !== null && _a !== void 0 ? _a : {});
+      const furyCfg = (cfg?.fury ?? {});
       if (isFiniteNumber(furyCfg.turnCap))
           return Math.floor(furyCfg.turnCap);
       const caps = furyCfg.caps;
@@ -23891,8 +23649,7 @@ __define('./utils/fury.ts', (exports, module, __require) => {
       return DEFAULT_TURN_CAP;
   }
   function resolveSkillCap(cfg) {
-      var _a;
-      const furyCfg = ((_a = cfg === null || cfg === void 0 ? void 0 : cfg.fury) !== null && _a !== void 0 ? _a : {});
+      const furyCfg = (cfg?.fury ?? {});
       if (isFiniteNumber(furyCfg.skillCap))
           return Math.floor(furyCfg.skillCap);
       const caps = furyCfg.caps;
@@ -23904,8 +23661,7 @@ __define('./utils/fury.ts', (exports, module, __require) => {
       return DEFAULT_SKILL_CAP;
   }
   function resolveHitCap(cfg) {
-      var _a;
-      const furyCfg = ((_a = cfg === null || cfg === void 0 ? void 0 : cfg.fury) !== null && _a !== void 0 ? _a : {});
+      const furyCfg = (cfg?.fury ?? {});
       if (isFiniteNumber(furyCfg.hitCap))
           return Math.floor(furyCfg.hitCap);
       const caps = furyCfg.caps;
@@ -23917,16 +23673,15 @@ __define('./utils/fury.ts', (exports, module, __require) => {
       return DEFAULT_HIT_CAP;
   }
   function resolveGainAmount(spec = {}, cfg = CFG, state = null) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j;
       if (isFiniteNumber(spec.amount)) {
           return { amount: Math.floor(spec.amount), perTarget: 0 };
       }
-      const furyCfg = ((_a = cfg === null || cfg === void 0 ? void 0 : cfg.fury) !== null && _a !== void 0 ? _a : {});
-      const table = (_b = furyCfg.gain) !== null && _b !== void 0 ? _b : {};
-      const type = (_c = spec.type) !== null && _c !== void 0 ? _c : 'generic';
+      const furyCfg = (cfg?.fury ?? {});
+      const table = furyCfg.gain ?? {};
+      const type = spec.type ?? 'generic';
       if (type === 'turnStart') {
           const turnStart = table.turnStart;
-          const amount = isFiniteNumber(turnStart === null || turnStart === void 0 ? void 0 : turnStart.amount)
+          const amount = isFiniteNumber(turnStart?.amount)
               ? turnStart.amount
               : (() => {
                   const turn = furyCfg.turn;
@@ -23937,10 +23692,10 @@ __define('./utils/fury.ts', (exports, module, __require) => {
                       return Number(fallback);
                   return 0;
               })();
-          return { amount: Math.floor(Math.max(0, amount !== null && amount !== void 0 ? amount : 0)), perTarget: 0 };
+          return { amount: Math.floor(Math.max(0, amount ?? 0)), perTarget: 0 };
       }
       if (type === 'damageTaken') {
-          const mode = (_d = table.damageTaken) !== null && _d !== void 0 ? _d : {};
+          const mode = table.damageTaken ?? {};
           let total = isFiniteNumber(spec.base)
               ? spec.base
               : isFiniteNumber(mode.base)
@@ -23953,7 +23708,7 @@ __define('./utils/fury.ts', (exports, module, __require) => {
                   ? spec.dealt
                   : undefined;
           if (ratio && isFiniteNumber(taken) && isFiniteNumber(spec.selfMaxHp) && spec.selfMaxHp > 0) {
-              total += Math.round((ratio * Math.max(0, taken !== null && taken !== void 0 ? taken : 0)) / spec.selfMaxHp);
+              total += Math.round((ratio * Math.max(0, taken ?? 0)) / spec.selfMaxHp);
           }
           if (isFiniteNumber(mode.min))
               total = Math.max(Number(mode.min), total);
@@ -23965,10 +23720,10 @@ __define('./utils/fury.ts', (exports, module, __require) => {
               total *= spec.multiplier;
           return { amount: Math.floor(Math.max(0, total)), perTarget: 0 };
       }
-      const isAoE = !!spec.isAoE || (isFiniteNumber(spec.targetsHit) && ((_e = spec.targetsHit) !== null && _e !== void 0 ? _e : 0) > 1);
-      const mode = (_f = (isAoE
+      const isAoE = !!spec.isAoE || (isFiniteNumber(spec.targetsHit) && (spec.targetsHit ?? 0) > 1);
+      const mode = (isAoE
           ? table.dealAoePerTarget
-          : table.dealSingle)) !== null && _f !== void 0 ? _f : {};
+          : table.dealSingle) ?? {};
       let total = isFiniteNumber(spec.base)
           ? spec.base
           : isFiniteNumber(mode.base)
@@ -23981,7 +23736,7 @@ __define('./utils/fury.ts', (exports, module, __require) => {
       let perTargetApplied = 0;
       if (isFiniteNumber(spec.targetsHit) && spec.targetsHit > 0 && isFiniteNumber(mode.perTarget)) {
           const desired = Number(mode.perTarget) * spec.targetsHit;
-          const used = (_g = state === null || state === void 0 ? void 0 : state.skillPerTargetGain) !== null && _g !== void 0 ? _g : 0;
+          const used = state?.skillPerTargetGain ?? 0;
           const room = Math.max(0, 12 - used);
           const granted = Math.max(0, Math.min(desired, room));
           total += granted;
@@ -23991,8 +23746,8 @@ __define('./utils/fury.ts', (exports, module, __require) => {
       if (ratio &&
           isFiniteNumber(spec.dealt) &&
           isFiniteNumber(spec.targetMaxHp) &&
-          ((_h = spec.targetMaxHp) !== null && _h !== void 0 ? _h : 0) > 0) {
-          total += Math.round((ratio * Math.max(0, (_j = spec.dealt) !== null && _j !== void 0 ? _j : 0)) / spec.targetMaxHp);
+          (spec.targetMaxHp ?? 0) > 0) {
+          total += Math.round((ratio * Math.max(0, spec.dealt ?? 0)) / spec.targetMaxHp);
       }
       if (isFiniteNumber(mode.min))
           total = Math.max(Number(mode.min), total);
@@ -24005,23 +23760,21 @@ __define('./utils/fury.ts', (exports, module, __require) => {
       return { amount: Math.floor(Math.max(0, total)), perTarget: perTargetApplied };
   }
   function applyBonuses(unit, amount) {
-      var _a;
       if (!unit)
           return amount;
       const internal = unit;
-      const bonus = toNumber((_a = internal.furyGainBonus) !== null && _a !== void 0 ? _a : internal.rageGainBonus);
+      const bonus = toNumber(internal.furyGainBonus ?? internal.rageGainBonus);
       if (bonus !== 0)
           return Math.floor(Math.max(0, amount * (1 + bonus)));
       return amount;
   }
   function startFuryTurn(unit, opts = {}) {
-      var _a, _b, _c, _d;
       const state = ensureState(unit);
       if (!state)
           return;
       if (opts.clearFresh !== false)
           state.freshSummon = false;
-      const stamp = (_b = (_a = opts.turnStamp) !== null && _a !== void 0 ? _a : opts.turnKey) !== null && _b !== void 0 ? _b : TURN_GRANT_KEY;
+      const stamp = opts.turnStamp ?? opts.turnKey ?? TURN_GRANT_KEY;
       if (state.turnStamp !== stamp) {
           state.turnStamp = stamp;
           state.turnGain = 0;
@@ -24032,9 +23785,9 @@ __define('./utils/fury.ts', (exports, module, __require) => {
       state.skillPerTargetGain = 0;
       state.skillDrain = 0;
       if (opts.grantStart !== false) {
-          const furyCfg = ((_c = CFG === null || CFG === void 0 ? void 0 : CFG.fury) !== null && _c !== void 0 ? _c : {});
-          const gainCfg = (_d = furyCfg.gain) === null || _d === void 0 ? void 0 : _d.turnStart;
-          const baseStart = isFiniteNumber(gainCfg === null || gainCfg === void 0 ? void 0 : gainCfg.amount)
+          const furyCfg = (CFG?.fury ?? {});
+          const gainCfg = furyCfg.gain?.turnStart;
+          const baseStart = isFiniteNumber(gainCfg?.amount)
               ? gainCfg.amount
               : (() => {
                   const turn = furyCfg.turn;
@@ -24045,7 +23798,7 @@ __define('./utils/fury.ts', (exports, module, __require) => {
                       : 3;
               })();
           const startAmount = isFiniteNumber(opts.startAmount) ? opts.startAmount : baseStart;
-          if ((startAmount !== null && startAmount !== void 0 ? startAmount : 0) > 0) {
+          if ((startAmount ?? 0) > 0) {
               gainFury(unit, { amount: startAmount, type: 'turnStart' });
           }
       }
@@ -24070,7 +23823,6 @@ __define('./utils/fury.ts', (exports, module, __require) => {
       }
   }
   function gainFury(unit, spec = {}, cfg = CFG) {
-      var _a, _b;
       if (!unit)
           return 0;
       ensureAlias(unit);
@@ -24094,7 +23846,7 @@ __define('./utils/fury.ts', (exports, module, __require) => {
       if (amount <= 0)
           return 0;
       const max = isFiniteNumber(unit.furyMax) ? unit.furyMax : resolveMaxFury(unit.id, cfg);
-      const currentFury = Math.floor((_a = unit.fury) !== null && _a !== void 0 ? _a : 0);
+      const currentFury = Math.floor(unit.fury ?? 0);
       const next = Math.max(0, Math.min(max, currentFury + amount));
       const gained = next - currentFury;
       if (gained <= 0)
@@ -24108,33 +23860,31 @@ __define('./utils/fury.ts', (exports, module, __require) => {
           const ratio = amount > 0 ? Math.min(1, gained / amount) : 0;
           if (ratio > 0) {
               const applied = Math.min(perTarget, Math.round(perTarget * ratio));
-              state.skillPerTargetGain = Math.min(12, ((_b = state.skillPerTargetGain) !== null && _b !== void 0 ? _b : 0) + applied);
+              state.skillPerTargetGain = Math.min(12, (state.skillPerTargetGain ?? 0) + applied);
           }
       }
       return gained;
   }
   function spendFury(unit, amount, cfg = CFG) {
-      var _a;
       if (!unit)
           return 0;
       ensureAlias(unit);
       const amt = Math.max(0, Math.floor(toNumber(amount)));
-      const before = Math.floor((_a = unit.fury) !== null && _a !== void 0 ? _a : 0);
+      const before = Math.floor(unit.fury ?? 0);
       const next = Math.max(0, before - amt);
       unit.fury = next;
       unit.rage = next;
       return before - next;
   }
   function drainFury(source, target, opts = {}, cfg = CFG) {
-      var _a, _b, _c, _d, _e;
       if (!target)
           return 0;
       ensureAlias(target);
       const targetState = ensureState(target);
-      if (targetState === null || targetState === void 0 ? void 0 : targetState.freshSummon)
+      if (targetState?.freshSummon)
           return 0;
-      const furyCfg = ((_a = cfg === null || cfg === void 0 ? void 0 : cfg.fury) !== null && _a !== void 0 ? _a : {});
-      const drainCfg = (_b = furyCfg.drain) !== null && _b !== void 0 ? _b : {};
+      const furyCfg = (cfg?.fury ?? {});
+      const drainCfg = furyCfg.drain ?? {};
       const base = isFiniteNumber(opts.base)
           ? opts.base
           : isFiniteNumber(drainCfg.perTargetBase)
@@ -24150,10 +23900,10 @@ __define('./utils/fury.ts', (exports, module, __require) => {
           : isFiniteNumber(drainCfg.skillTotalCap)
               ? Number(drainCfg.skillTotalCap)
               : null;
-      const current = Math.max(0, Math.floor((_c = target.fury) !== null && _c !== void 0 ? _c : 0));
+      const current = Math.max(0, Math.floor(target.fury ?? 0));
       if (current <= 0)
           return 0;
-      let desired = Math.max(0, Math.floor(base !== null && base !== void 0 ? base : 0));
+      let desired = Math.max(0, Math.floor(base ?? 0));
       if (percent)
           desired += Math.round(current * percent);
       if (desired <= 0)
@@ -24162,7 +23912,7 @@ __define('./utils/fury.ts', (exports, module, __require) => {
       let sourceState = null;
       if (isFiniteNumber(skillCap)) {
           sourceState = ensureState(source);
-          const used = sourceState ? (_d = sourceState.skillDrain) !== null && _d !== void 0 ? _d : 0 : 0;
+          const used = sourceState ? sourceState.skillDrain ?? 0 : 0;
           capRoom = Math.max(0, Math.min(desired, skillCap - used));
       }
       const drained = Math.max(0, Math.min(current, capRoom));
@@ -24171,24 +23921,22 @@ __define('./utils/fury.ts', (exports, module, __require) => {
       target.fury = current - drained;
       target.rage = target.fury;
       if (sourceState && isFiniteNumber(skillCap)) {
-          sourceState.skillDrain = ((_e = sourceState.skillDrain) !== null && _e !== void 0 ? _e : 0) + drained;
+          sourceState.skillDrain = (sourceState.skillDrain ?? 0) + drained;
       }
       return drained;
   }
   function furyValue(unit) {
-      var _a;
       if (!unit)
           return 0;
       ensureAlias(unit);
-      return Math.floor((_a = unit.fury) !== null && _a !== void 0 ? _a : 0);
+      return Math.floor(unit.fury ?? 0);
   }
   function furyRoom(unit) {
-      var _a;
       if (!unit)
           return 0;
       ensureAlias(unit);
       const max = isFiniteNumber(unit.furyMax) ? unit.furyMax : resolveMaxFury(unit.id, CFG);
-      return Math.max(0, max - Math.floor((_a = unit.fury) !== null && _a !== void 0 ? _a : 0));
+      return Math.max(0, max - Math.floor(unit.fury ?? 0));
   }
   function furyState(unit) {
       return ensureState(unit);
@@ -24292,7 +24040,6 @@ __define('./utils/kit.ts', (exports, module, __require) => {
       return out;
   }
   function extractUltSummonFields(ult) {
-      var _a, _b, _c, _d;
       if (!ult || typeof ult !== 'object')
           return null;
       const out = {};
@@ -24308,16 +24055,16 @@ __define('./utils/kit.ts', (exports, module, __require) => {
           }
           hasValue = true;
       };
-      const pattern = (_a = ult.pattern) !== null && _a !== void 0 ? _a : ult.placement;
+      const pattern = ult.pattern ?? ult.placement;
       if (pattern !== undefined && pattern !== null)
           assign('pattern', pattern);
-      const count = (_b = ult.count) !== null && _b !== void 0 ? _b : ult.summonCount;
+      const count = ult.count ?? ult.summonCount;
       if (count !== undefined && count !== null)
           assign('count', count);
-      const ttlTurns = (_c = ult.ttlTurns) !== null && _c !== void 0 ? _c : ult.ttl;
+      const ttlTurns = ult.ttlTurns ?? ult.ttl;
       if (ttlTurns !== undefined && ttlTurns !== null)
           assign('ttlTurns', ttlTurns);
-      const ttl = (_d = ult.ttl) !== null && _d !== void 0 ? _d : ult.ttlTurns;
+      const ttl = ult.ttl ?? ult.ttlTurns;
       if (ttl !== undefined && ttl !== null)
           assign('ttl', ttl);
       assign('inherit', ult.inherit, true);
@@ -24331,8 +24078,8 @@ __define('./utils/kit.ts', (exports, module, __require) => {
   function applyUltSummonDefaults(spec, ult) {
       const fields = extractUltSummonFields(ult);
       if (!fields)
-          return spec !== null && spec !== void 0 ? spec : null;
-      const out = spec !== null && spec !== void 0 ? spec : {};
+          return spec ?? null;
+      const out = spec ?? {};
       const target = out;
       for (const [key, value] of Object.entries(fields)) {
           const current = target[key];
@@ -24343,9 +24090,8 @@ __define('./utils/kit.ts', (exports, module, __require) => {
       return out;
   }
   function collectUltTags(metaOrKit) {
-      var _a;
       const kit = coerceKit(metaOrKit);
-      const ult = kit === null || kit === void 0 ? void 0 : kit.ult;
+      const ult = kit?.ult;
       const tags = new Set();
       const add = (val) => {
           if (typeof val === 'string' && val.trim() !== '')
@@ -24374,7 +24120,7 @@ __define('./utils/kit.ts', (exports, module, __require) => {
           if (metadata.label)
               add(metadata.label);
       }
-      const traitUlt = readTrait((_a = kit === null || kit === void 0 ? void 0 : kit.traits) !== null && _a !== void 0 ? _a : null, 'ult');
+      const traitUlt = readTrait(kit?.traits ?? null, 'ult');
       if (traitUlt) {
           if (typeof traitUlt === 'string')
               add(traitUlt);
@@ -24392,13 +24138,12 @@ __define('./utils/kit.ts', (exports, module, __require) => {
       return tags;
   }
   function getSummonSpec(metaOrKit) {
-      var _a, _b, _c, _d, _e;
       const kit = coerceKit(metaOrKit);
       if (!kit)
           return null;
       let spec = null;
       for (const key of KNOWN_SUMMON_KEYS) {
-          const trait = readTrait((_a = kit.traits) !== null && _a !== void 0 ? _a : null, key);
+          const trait = readTrait(kit.traits ?? null, key);
           if (trait) {
               if (trait === true) {
                   spec = {};
@@ -24420,16 +24165,16 @@ __define('./utils/kit.ts', (exports, module, __require) => {
           if (ult.summon) {
               spec = cloneShallow(ult.summon);
           }
-          else if ((_b = ult.metadata) === null || _b === void 0 ? void 0 : _b.summon) {
+          else if (ult.metadata?.summon) {
               spec = cloneShallow(ult.metadata.summon);
           }
-          else if ((_c = ult.meta) === null || _c === void 0 ? void 0 : _c.summon) {
+          else if (ult.meta?.summon) {
               spec = cloneShallow(ult.meta.summon);
           }
       }
       const tags = collectUltTags(kit);
       if (!spec && kitUltHasTag(kit, 'summon', tags)) {
-          if (ult === null || ult === void 0 ? void 0 : ult.summon) {
+          if (ult?.summon) {
               spec = cloneShallow(ult.summon);
           }
           spec = applyUltSummonDefaults(spec, ult);
@@ -24439,7 +24184,7 @@ __define('./utils/kit.ts', (exports, module, __require) => {
       }
       if (!spec)
           return null;
-      const normalized = { ...((_e = (_d = cloneShallow(spec)) !== null && _d !== void 0 ? _d : spec) !== null && _e !== void 0 ? _e : {}) };
+      const normalized = { ...(cloneShallow(spec) ?? spec ?? {}) };
       if (!normalized.pattern && typeof normalized.placement === 'string') {
           normalized.pattern = normalized.placement;
       }
@@ -24458,12 +24203,11 @@ __define('./utils/kit.ts', (exports, module, __require) => {
       return normalized;
   }
   function getReviveSpec(metaOrKit) {
-      var _a, _b, _c;
       const kit = coerceKit(metaOrKit);
       if (!kit)
           return null;
       for (const key of KNOWN_REVIVE_KEYS) {
-          const trait = readTrait((_a = kit.traits) !== null && _a !== void 0 ? _a : null, key);
+          const trait = readTrait(kit.traits ?? null, key);
           if (trait) {
               if (trait === true)
                   return {};
@@ -24473,12 +24217,12 @@ __define('./utils/kit.ts', (exports, module, __require) => {
           }
       }
       const ult = kit.ult || null;
-      if (ult === null || ult === void 0 ? void 0 : ult.revive)
+      if (ult?.revive)
           return cloneShallow(ult.revive);
-      if ((_b = ult === null || ult === void 0 ? void 0 : ult.metadata) === null || _b === void 0 ? void 0 : _b.revive)
+      if (ult?.metadata?.revive)
           return cloneShallow(ult.metadata.revive);
       if (kitUltHasTag(kit, 'revive')) {
-          const revive = (_c = ult === null || ult === void 0 ? void 0 : ult.revive) !== null && _c !== void 0 ? _c : {};
+          const revive = ult?.revive ?? {};
           return cloneShallow(revive);
       }
       return null;
@@ -24489,7 +24233,7 @@ __define('./utils/kit.ts', (exports, module, __require) => {
   function kitUltHasTag(metaOrKit, tag, precomputedTags = null) {
       if (!tag)
           return false;
-      const tags = precomputedTags !== null && precomputedTags !== void 0 ? precomputedTags : collectUltTags(metaOrKit);
+      const tags = precomputedTags ?? collectUltTags(metaOrKit);
       const target = normalizeKey(tag);
       for (const t of tags) {
           if (normalizeKey(t) === target)
@@ -24498,12 +24242,11 @@ __define('./utils/kit.ts', (exports, module, __require) => {
       return false;
   }
   function detectUltBehavior(metaOrKit) {
-      var _a;
       const kit = coerceKit(metaOrKit);
-      const ult = kit === null || kit === void 0 ? void 0 : kit.ult;
+      const ult = kit?.ult;
       const tags = collectUltTags(kit);
-      const metadata = (ult === null || ult === void 0 ? void 0 : ult.metadata) || (ult === null || ult === void 0 ? void 0 : ult.meta) || {};
-      const traits = (_a = kit === null || kit === void 0 ? void 0 : kit.traits) !== null && _a !== void 0 ? _a : null;
+      const metadata = ult?.metadata || ult?.meta || {};
+      const traits = kit?.traits ?? null;
       const hasInstant = Boolean(metadata.instant === true ||
           metadata.instantCast === true ||
           metadata.cast === 'instant' ||
@@ -24533,7 +24276,7 @@ __define('./utils/kit.ts', (exports, module, __require) => {
       };
   }
   function extractRageFromEffects(onSpawn, opts = {}) {
-      const effects = Array.isArray(onSpawn === null || onSpawn === void 0 ? void 0 : onSpawn.effects) ? onSpawn.effects : [];
+      const effects = Array.isArray(onSpawn?.effects) ? onSpawn.effects : [];
       for (const effect of effects) {
           if (!effect)
               continue;
@@ -24726,7 +24469,7 @@ __define('./utils/time.ts', (exports, module, __require) => {
       if (typeof originRaw === 'number' && Number.isFinite(originRaw))
           return originRaw;
       const timing = perf.timing;
-      const navigationStart = timing === null || timing === void 0 ? void 0 : timing.navigationStart;
+      const navigationStart = timing?.navigationStart;
       if (typeof navigationStart === 'number' && Number.isFinite(navigationStart)) {
           return navigationStart;
       }
@@ -24745,7 +24488,7 @@ __define('./utils/time.ts', (exports, module, __require) => {
           if (origin !== null) {
               offset = origin;
           }
-          else if (typeof (Date === null || Date === void 0 ? void 0 : Date.now) === 'function') {
+          else if (typeof Date?.now === 'function') {
               offset = Date.now() - now;
           }
       }
@@ -24847,7 +24590,7 @@ __define('./vfx.ts', (exports, module, __require) => {
   const isFiniteCoord = (value) => Number.isFinite(value);
   const hasFinitePoint = (obj) => !!obj && isFiniteCoord(obj.cx) && isFiniteCoord(obj.cy);
   const warnInvalidArc = (label, data) => {
-      if (typeof console !== 'undefined' && (console === null || console === void 0 ? void 0 : console.warn)) {
+      if (typeof console !== 'undefined' && console?.warn) {
           console.warn(`[vfxDraw] Skipping ${label} arc due to invalid geometry`, data);
       }
   };
@@ -24864,30 +24607,28 @@ __define('./vfx.ts', (exports, module, __require) => {
       return null;
   };
   const findTokenByKey = (tokens, key) => {
-      var _a, _b;
       if (!key || !Array.isArray(tokens))
           return null;
       if (key.startsWith('iid:')) {
           const iid = Number.parseInt(key.slice(4), 10);
           if (Number.isFinite(iid)) {
-              return (_a = tokens.find(t => t && Number.isFinite(t.iid) && t.iid === iid)) !== null && _a !== void 0 ? _a : null;
+              return tokens.find(t => t && Number.isFinite(t.iid) && t.iid === iid) ?? null;
           }
       }
       if (key.startsWith('id:')) {
           const id = key.slice(3);
-          return (_b = tokens.find(t => t && typeof t.id === 'string' && t.id === id)) !== null && _b !== void 0 ? _b : null;
+          return tokens.find(t => t && typeof t.id === 'string' && t.id === id) ?? null;
       }
       return null;
   };
-  const resolveTokenKey = (token, fallback = {}) => { var _a, _b; return makeTokenKey({ iid: (_a = token === null || token === void 0 ? void 0 : token.iid) !== null && _a !== void 0 ? _a : fallback.iid, id: (_b = token === null || token === void 0 ? void 0 : token.id) !== null && _b !== void 0 ? _b : fallback.id }); };
+  const resolveTokenKey = (token, fallback = {}) => makeTokenKey({ iid: token?.iid ?? fallback.iid, id: token?.id ?? fallback.id });
   const resolveTokenFromEvent = (tokens, eventToken, fallback) => {
       const key = resolveTokenKey(eventToken, fallback);
       return findTokenByKey(tokens, key);
   };
   function computeMeleeOffsets(Game, cam) {
-      var _a, _b;
       const offsets = new Map();
-      if (!(Game === null || Game === void 0 ? void 0 : Game.grid))
+      if (!Game?.grid)
           return offsets;
       const tokens = Array.isArray(Game.tokens) ? Game.tokens : [];
       const events = Array.isArray(Game.vfx) ? Game.vfx : [];
@@ -24911,10 +24652,10 @@ __define('./vfx.ts', (exports, module, __require) => {
           const originCy = Number.isFinite(e.originCy) ? e.originCy : attacker.cy;
           const targetCx = Number.isFinite(e.targetCx)
               ? e.targetCx
-              : (_a = target === null || target === void 0 ? void 0 : target.cx) !== null && _a !== void 0 ? _a : attacker.cx;
+              : target?.cx ?? attacker.cx;
           const targetCy = Number.isFinite(e.targetCy)
               ? e.targetCy
-              : (_b = target === null || target === void 0 ? void 0 : target.cy) !== null && _b !== void 0 ? _b : attacker.cy;
+              : target?.cy ?? attacker.cy;
           if (!Number.isFinite(originCx) || !Number.isFinite(originCy))
               continue;
           const pa = projectCellOblique(Game.grid, originCx, originCy, cam);
@@ -24962,7 +24703,7 @@ __define('./vfx.ts', (exports, module, __require) => {
   }
   catch (error) {
       // behavior-preserving: fall back to raw dataset when validation fails.
-      if (typeof console !== 'undefined' && (console === null || console === void 0 ? void 0 : console.warn)) {
+      if (typeof console !== 'undefined' && console?.warn) {
           console.warn('[vfxDraw] Failed to parse anchor dataset', error);
       }
       registerAnchorDataset(loithienanhAnchors);
@@ -24981,7 +24722,7 @@ __define('./vfx.ts', (exports, module, __require) => {
       if (!dataset || !bindingKey)
           return [];
       const bindings = dataset[source];
-      const entry = bindings === null || bindings === void 0 ? void 0 : bindings[bindingKey];
+      const entry = bindings?.[bindingKey];
       if (!entry || !Array.isArray(entry.anchors))
           return [];
       return entry.anchors;
@@ -25022,19 +24763,18 @@ __define('./vfx.ts', (exports, module, __require) => {
       const primaryAnchors = getBindingAnchors(dataset, bindingKey);
       picked = pickAnchorFromList(primaryAnchors, anchorId, timingValue, hasTiming);
       if (!picked) {
-          const ambientAnchors = getBindingAnchors(dataset, ambientKey !== null && ambientKey !== void 0 ? ambientKey : null, 'ambientEffects');
+          const ambientAnchors = getBindingAnchors(dataset, ambientKey ?? null, 'ambientEffects');
           picked = pickAnchorFromList(ambientAnchors, anchorId, timingValue, hasTiming);
       }
-      const resolvedId = (picked === null || picked === void 0 ? void 0 : picked.id) || anchorId || DEFAULT_ANCHOR_ID;
-      const resolvedRadius = Number.isFinite(radius) ? radius : (Number.isFinite(picked === null || picked === void 0 ? void 0 : picked.radius) ? picked.radius : null);
-      return { id: resolvedId, radius: resolvedRadius !== null && resolvedRadius !== void 0 ? resolvedRadius : null };
+      const resolvedId = picked?.id || anchorId || DEFAULT_ANCHOR_ID;
+      const resolvedRadius = Number.isFinite(radius) ? radius : (Number.isFinite(picked?.radius) ? picked.radius : null);
+      return { id: resolvedId, radius: resolvedRadius ?? null };
   }
   function lookupBodyAnchor(unit, anchorId) {
-      var _a;
       const dataset = getUnitAnchorDataset(unit);
       if (!dataset)
           return null;
-      const anchor = (_a = dataset.bodyAnchors) === null || _a === void 0 ? void 0 : _a[anchorId];
+      const anchor = dataset.bodyAnchors?.[anchorId];
       if (!anchor)
           return null;
       const x = Number(anchor.x);
@@ -25051,17 +24791,16 @@ __define('./vfx.ts', (exports, module, __require) => {
       return result;
   }
   function computeAnchorCanvasPoint(Game, token, anchorId, radiusRatio, cam) {
-      var _a, _b;
-      if (!(Game === null || Game === void 0 ? void 0 : Game.grid) || !token || !hasFinitePoint(token))
+      if (!Game?.grid || !token || !hasFinitePoint(token))
           return null;
-      const projection = projectCellOblique(Game.grid, (_a = token.cx) !== null && _a !== void 0 ? _a : 0, (_b = token.cy) !== null && _b !== void 0 ? _b : 0, cam);
+      const projection = projectCellOblique(Game.grid, token.cx ?? 0, token.cy ?? 0, cam);
       if (!projection || !isFiniteCoord(projection.x) || !isFiniteCoord(projection.y) || !isFiniteCoord(projection.scale))
           return null;
-      const anchor = lookupBodyAnchor(token, anchorId !== null && anchorId !== void 0 ? anchorId : DEFAULT_ANCHOR_ID)
+      const anchor = lookupBodyAnchor(token, anchorId ?? DEFAULT_ANCHOR_ID)
           || lookupBodyAnchor(token, DEFAULT_ANCHOR_ID)
           || DEFAULT_ANCHOR_POINT;
-      const ax = Number(anchor === null || anchor === void 0 ? void 0 : anchor.x);
-      const ay = Number(anchor === null || anchor === void 0 ? void 0 : anchor.y);
+      const ax = Number(anchor?.x);
+      const ay = Number(anchor?.y);
       const validAnchor = Number.isFinite(ax) && Number.isFinite(ay);
       const xRatio = validAnchor ? (ax - 0.5) : 0;
       const yRatio = validAnchor ? (ay - 0.5) : 0;
@@ -25076,13 +24815,12 @@ __define('./vfx.ts', (exports, module, __require) => {
       return { x: px, y: py, r: rPx, scale: projection.scale };
   }
   function drawLightningArc(ctx, start, end, event, progress) {
-      var _a, _b, _c, _d, _e, _f, _g, _h;
       if (!start)
           return;
       const segments = Math.max(2, event.segments || DEFAULT_SEGMENTS);
       const color = event.color || '#7de5ff';
-      const alpha = ((_a = event.alpha) !== null && _a !== void 0 ? _a : 0.9) * (1 - progress);
-      const thickness = Math.max(1, Math.floor(((_b = event.thickness) !== null && _b !== void 0 ? _b : 2.4) * ((_c = start.scale) !== null && _c !== void 0 ? _c : 1)));
+      const alpha = (event.alpha ?? 0.9) * (1 - progress);
+      const thickness = Math.max(1, Math.floor((event.thickness ?? 2.4) * (start.scale ?? 1)));
       const pattern = Array.isArray(event.pattern) && event.pattern.length ? event.pattern : createRandomPattern(segments - 1);
       ctx.save();
       ctx.globalAlpha = alpha;
@@ -25094,7 +24832,7 @@ __define('./vfx.ts', (exports, module, __require) => {
           const dx = end.x - start.x;
           const dy = end.y - start.y;
           const dist = Math.hypot(dx, dy) || 1;
-          const jitterFactor = ((_d = event.jitter) !== null && _d !== void 0 ? _d : 0.22) * dist * (1 - progress * 0.6);
+          const jitterFactor = (event.jitter ?? 0.22) * dist * (1 - progress * 0.6);
           const nx = -dy / dist;
           const ny = dx / dist;
           ctx.beginPath();
@@ -25112,7 +24850,7 @@ __define('./vfx.ts', (exports, module, __require) => {
       }
       else {
           const rayCount = segments + 1;
-          const baseRadius = start.r * ((_e = event.rayScale) !== null && _e !== void 0 ? _e : 2.4) * (1 + 0.2 * (1 - progress));
+          const baseRadius = start.r * (event.rayScale ?? 2.4) * (1 + 0.2 * (1 - progress));
           for (let i = 0; i < rayCount; i += 1) {
               const seed = pattern[i % pattern.length] || 0;
               const angle = (i / rayCount) * Math.PI * 2 + seed * 0.5;
@@ -25129,24 +24867,23 @@ __define('./vfx.ts', (exports, module, __require) => {
           ctx.globalAlpha = alpha * 0.6;
           ctx.lineWidth = Math.max(thickness * 0.75, 1);
           ctx.beginPath();
-          ctx.arc(start.x, start.y, Math.max(1, start.r * ((_f = event.glowScale) !== null && _f !== void 0 ? _f : 1.1)), 0, Math.PI * 2);
+          ctx.arc(start.x, start.y, Math.max(1, start.r * (event.glowScale ?? 1.1)), 0, Math.PI * 2);
           ctx.stroke();
           if (end) {
               ctx.beginPath();
-              ctx.arc(end.x, end.y, Math.max(1, ((_g = end.r) !== null && _g !== void 0 ? _g : start.r) * ((_h = event.glowScale) !== null && _h !== void 0 ? _h : 1.1)), 0, Math.PI * 2);
+              ctx.arc(end.x, end.y, Math.max(1, (end.r ?? start.r) * (event.glowScale ?? 1.1)), 0, Math.PI * 2);
               ctx.stroke();
           }
       }
       ctx.restore();
   }
   function drawBloodPulse(ctx, anchor, event, progress) {
-      var _a, _b;
       if (!anchor)
           return;
       const color = event.color || '#ff6b81';
       const rings = Math.max(1, event.rings || 2);
-      const alpha = ((_a = event.alpha) !== null && _a !== void 0 ? _a : 0.75) * (1 - progress);
-      const maxScale = (_b = event.maxScale) !== null && _b !== void 0 ? _b : 3.4;
+      const alpha = (event.alpha ?? 0.75) * (1 - progress);
+      const maxScale = event.maxScale ?? 3.4;
       const growth = easeInOut(progress);
       ctx.save();
       ctx.globalAlpha = alpha;
@@ -25164,15 +24901,14 @@ __define('./vfx.ts', (exports, module, __require) => {
       ctx.restore();
   }
   function drawShieldWrap(ctx, frontAnchor, backAnchor, event, progress) {
-      var _a, _b, _c, _d, _e, _f;
       if (!frontAnchor)
           return;
       const color = event.color || '#9bd8ff';
-      const alpha = ((_a = event.alpha) !== null && _a !== void 0 ? _a : 0.6) * (1 - progress * 0.7);
-      const thickness = Math.max(2, Math.floor(((_b = event.thickness) !== null && _b !== void 0 ? _b : 2.6) * ((_c = frontAnchor.scale) !== null && _c !== void 0 ? _c : 1)));
-      const spanY = Math.max(frontAnchor.r * ((_d = event.heightScale) !== null && _d !== void 0 ? _d : 3.4), 4);
-      const spanX = Math.max(frontAnchor.r * ((_e = event.widthScale) !== null && _e !== void 0 ? _e : 2.6), 4);
-      const wobble = ((_f = event.wobble) !== null && _f !== void 0 ? _f : 0.18) * Math.sin(progress * Math.PI * 2);
+      const alpha = (event.alpha ?? 0.6) * (1 - progress * 0.7);
+      const thickness = Math.max(2, Math.floor((event.thickness ?? 2.6) * (frontAnchor.scale ?? 1)));
+      const spanY = Math.max(frontAnchor.r * (event.heightScale ?? 3.4), 4);
+      const spanX = Math.max(frontAnchor.r * (event.widthScale ?? 2.6), 4);
+      const wobble = (event.wobble ?? 0.18) * Math.sin(progress * Math.PI * 2);
       const centerX = frontAnchor.x;
       const centerY = frontAnchor.y - wobble * spanY;
       const gradientSpan = spanY * 0.35;
@@ -25203,13 +24939,12 @@ __define('./vfx.ts', (exports, module, __require) => {
       ctx.restore();
   }
   function drawGroundBurst(ctx, anchor, event, progress) {
-      var _a, _b;
       if (!anchor)
           return;
       const color = event.color || '#ffa36e';
-      const alpha = ((_a = event.alpha) !== null && _a !== void 0 ? _a : 0.7) * (1 - progress);
+      const alpha = (event.alpha ?? 0.7) * (1 - progress);
       const shards = Math.max(3, event.shards || 5);
-      const spread = anchor.r * ((_b = event.spread) !== null && _b !== void 0 ? _b : 3.2);
+      const spread = anchor.r * (event.spread ?? 3.2);
       const lift = anchor.r * 0.4;
       const growth = easeInOut(progress);
       ctx.save();
@@ -25246,21 +24981,19 @@ __define('./vfx.ts', (exports, module, __require) => {
       pool(Game).push(event);
   }
   function vfxAddTracer(Game, attacker, target, opts = {}) {
-      const dur = Number.isFinite(opts === null || opts === void 0 ? void 0 : opts.dur) ? Number(opts.dur) : 400;
+      const dur = Number.isFinite(opts?.dur) ? Number(opts.dur) : 400;
       const event = { type: 'tracer', t0: now(), dur, refA: attacker, refB: target };
       pool(Game).push(event);
   }
-  function vfxAddMelee(Game, attacker, target, _a) {
-      var _b, _c;
-      var { dur = (_c = (_b = CFG === null || CFG === void 0 ? void 0 : CFG.ANIMATION) === null || _b === void 0 ? void 0 : _b.meleeDurationMs) !== null && _c !== void 0 ? _c : 2000 } = _a === void 0 ? {} : _a;
-      const iidA = typeof (attacker === null || attacker === void 0 ? void 0 : attacker.iid) === 'number' ? attacker.iid : null;
-      const iidB = typeof (target === null || target === void 0 ? void 0 : target.iid) === 'number' ? target.iid : null;
-      const idA = typeof (attacker === null || attacker === void 0 ? void 0 : attacker.id) === 'string' ? attacker.id : null;
-      const idB = typeof (target === null || target === void 0 ? void 0 : target.id) === 'string' ? target.id : null;
-      const originCx = typeof (attacker === null || attacker === void 0 ? void 0 : attacker.cx) === 'number' ? attacker.cx : null;
-      const originCy = typeof (attacker === null || attacker === void 0 ? void 0 : attacker.cy) === 'number' ? attacker.cy : null;
-      const targetCx = typeof (target === null || target === void 0 ? void 0 : target.cx) === 'number' ? target.cx : null;
-      const targetCy = typeof (target === null || target === void 0 ? void 0 : target.cy) === 'number' ? target.cy : null;
+  function vfxAddMelee(Game, attacker, target, { dur = CFG?.ANIMATION?.meleeDurationMs ?? 2000 } = {}) {
+      const iidA = typeof attacker?.iid === 'number' ? attacker.iid : null;
+      const iidB = typeof target?.iid === 'number' ? target.iid : null;
+      const idA = typeof attacker?.id === 'string' ? attacker.id : null;
+      const idB = typeof target?.id === 'string' ? target.id : null;
+      const originCx = typeof attacker?.cx === 'number' ? attacker.cx : null;
+      const originCy = typeof attacker?.cy === 'number' ? attacker.cy : null;
+      const targetCx = typeof target?.cx === 'number' ? target.cx : null;
+      const targetCy = typeof target?.cy === 'number' ? target.cy : null;
       const event = {
           type: 'melee',
           t0: now(),
@@ -25303,9 +25036,9 @@ __define('./vfx.ts', (exports, module, __require) => {
           refA: source,
           refB: target || null,
           anchorA: anchorA.id,
-          anchorB: (anchorB === null || anchorB === void 0 ? void 0 : anchorB.id) || null,
+          anchorB: anchorB?.id || null,
           radiusA: anchorA.radius,
-          radiusB: anchorB === null || anchorB === void 0 ? void 0 : anchorB.radius,
+          radiusB: anchorB?.radius,
           color: opts.color,
           thickness: opts.thickness,
           jitter: opts.jitter,
@@ -25370,9 +25103,9 @@ __define('./vfx.ts', (exports, module, __require) => {
           dur: busyMs,
           refA: source,
           anchorA: front.id,
-          anchorB: (back === null || back === void 0 ? void 0 : back.id) || null,
+          anchorB: back?.id || null,
           radiusA: front.radius,
-          radiusB: back === null || back === void 0 ? void 0 : back.radius,
+          radiusB: back?.radius,
           color: opts.color,
           alpha: opts.alpha,
           thickness: opts.thickness,
@@ -25454,7 +25187,6 @@ __define('./vfx.ts', (exports, module, __require) => {
   }
   /* ------------------- Drawer ------------------- */
   function vfxDraw(ctx, Game, cam) {
-      var _a, _b, _c, _d, _e, _f;
       const list = pool(Game);
       if (!list.length || !Game.grid)
           return;
@@ -25481,13 +25213,13 @@ __define('./vfx.ts', (exports, module, __require) => {
                           ctx.restore();
                       }
                       else {
-                          warnInvalidArc('spawn', { x: p === null || p === void 0 ? void 0 : p.x, y: p === null || p === void 0 ? void 0 : p.y, r });
+                          warnInvalidArc('spawn', { x: p?.x, y: p?.y, r });
                       }
                   }
                   break;
               }
               case 'hit': {
-                  const tokens = Array.isArray(Game === null || Game === void 0 ? void 0 : Game.tokens) ? Game.tokens : null;
+                  const tokens = Array.isArray(Game?.tokens) ? Game.tokens : null;
                   const updateFromToken = (token) => {
                       if (!token)
                           return;
@@ -25501,18 +25233,17 @@ __define('./vfx.ts', (exports, module, __require) => {
                   const initialRef = hasFinitePoint(e.ref) ? e.ref : null;
                   updateFromToken(initialRef);
                   const lookupLiveToken = () => {
-                      var _a, _b, _c;
                       if (!tokens)
                           return null;
                       if (e.iid != null) {
-                          return (_a = tokens.find(t => t && t.iid === e.iid)) !== null && _a !== void 0 ? _a : null;
+                          return tokens.find(t => t && t.iid === e.iid) ?? null;
                       }
                       const ref = e.ref;
-                      if ((ref === null || ref === void 0 ? void 0 : ref.iid) != null) {
-                          return (_b = tokens.find(t => t && t.iid === ref.iid)) !== null && _b !== void 0 ? _b : null;
+                      if (ref?.iid != null) {
+                          return tokens.find(t => t && t.iid === ref.iid) ?? null;
                       }
-                      if (typeof (ref === null || ref === void 0 ? void 0 : ref.id) === 'string') {
-                          return (_c = tokens.find(t => t && t.id === ref.id)) !== null && _c !== void 0 ? _c : null;
+                      if (typeof ref?.id === 'string') {
+                          return tokens.find(t => t && t.id === ref.id) ?? null;
                       }
                       return null;
                   };
@@ -25538,7 +25269,7 @@ __define('./vfx.ts', (exports, module, __require) => {
                           ctx.restore();
                       }
                       else {
-                          warnInvalidArc('hit', { x: p === null || p === void 0 ? void 0 : p.x, y: p === null || p === void 0 ? void 0 : p.y, r });
+                          warnInvalidArc('hit', { x: p?.x, y: p?.y, r });
                       }
                   }
                   break;
@@ -25551,8 +25282,8 @@ __define('./vfx.ts', (exports, module, __require) => {
                   // Đã thay bằng chuyển động trực tiếp của token (không vẽ overlay riêng).
                   break;
               case 'lightning_arc': {
-                  const start = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, (_a = e.radiusA) !== null && _a !== void 0 ? _a : null, cam);
-                  const end = e.refB ? computeAnchorCanvasPoint(Game, e.refB, e.anchorB, (_b = e.radiusB) !== null && _b !== void 0 ? _b : null, cam) : null;
+                  const start = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, e.radiusA ?? null, cam);
+                  const end = e.refB ? computeAnchorCanvasPoint(Game, e.refB, e.anchorB, e.radiusB ?? null, cam) : null;
                   if (start && (!e.refB || end)) {
                       drawLightningArc(ctx, start, end, e, tt);
                   }
@@ -25562,7 +25293,7 @@ __define('./vfx.ts', (exports, module, __require) => {
                   break;
               }
               case 'blood_pulse': {
-                  const anchor = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, (_c = e.radiusA) !== null && _c !== void 0 ? _c : null, cam);
+                  const anchor = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, e.radiusA ?? null, cam);
                   if (anchor) {
                       drawBloodPulse(ctx, anchor, e, tt);
                   }
@@ -25572,8 +25303,8 @@ __define('./vfx.ts', (exports, module, __require) => {
                   break;
               }
               case 'shield_wrap': {
-                  const front = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, (_d = e.radiusA) !== null && _d !== void 0 ? _d : null, cam);
-                  const back = e.anchorB ? computeAnchorCanvasPoint(Game, e.refA, e.anchorB, (_e = e.radiusB) !== null && _e !== void 0 ? _e : null, cam) : null;
+                  const front = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, e.radiusA ?? null, cam);
+                  const back = e.anchorB ? computeAnchorCanvasPoint(Game, e.refA, e.anchorB, e.radiusB ?? null, cam) : null;
                   if (front) {
                       drawShieldWrap(ctx, front, back, e, tt);
                   }
@@ -25583,7 +25314,7 @@ __define('./vfx.ts', (exports, module, __require) => {
                   break;
               }
               case 'ground_burst': {
-                  const anchor = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, (_f = e.radiusA) !== null && _f !== void 0 ? _f : null, cam);
+                  const anchor = computeAnchorCanvasPoint(Game, e.refA, e.anchorA, e.radiusA ?? null, cam);
                   if (anchor) {
                       drawGroundBurst(ctx, anchor, e, tt);
                   }
