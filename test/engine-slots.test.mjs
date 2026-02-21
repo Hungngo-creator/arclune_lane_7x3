@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import * as engineModule from '../src/engine.js';
+import * as engineModule from '../src/engine.ts';
 import * as combatModule from '../src/combat.js';
 
 const { slotIndex, slotToCell } = engineModule;

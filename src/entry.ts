@@ -1,3 +1,4 @@
+import './aether.ts';
 import { createAppShell } from './app/shell.ts';
 import { CFG } from './config.ts';
 import { renderMainMenuView } from './screens/main-menu/view/index.ts';

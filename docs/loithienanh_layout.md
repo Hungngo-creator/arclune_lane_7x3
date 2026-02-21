@@ -1,5 +1,56 @@
 # Bản phác bố cục nhân vật Lôi Thiên Ảnh
 
+## 0. Mô tả bề ngoài & khí chất nhân vật (phiên bản chi tiết mở rộng)
+
+I. Tổng quan hình tượng
+
+Lôi Thiên Ảnh là tướng quân lôi vực – người được sinh ra từ giao thoa giữa sấm trời và khí nhân gian. Anh mang trong mình tinh thần tự do tuyệt đối, coi sấm sét không phải quyền lực để thống trị mà là sức mạnh để phá tan ràng buộc.
+
+Khác với vẻ lạnh lùng thường thấy ở các thần nhân, Lôi Thiên Ảnh mang nét hào sảng, tự tin, đôi lúc hơi bất cần. Khi đứng, anh như một luồng năng lượng sống – tĩnh mà động, khoẻ khoắn mà phóng túng.
+Nụ cười nửa miệng, ánh mắt lấp lóe tia sáng lam ẩn trong con ngươi đen, gợi cảm giác về người từng bước qua bão tố và xem sấm chớp như bạn đồng hành.
+
+Toàn bộ thiết kế hướng đến hình ảnh một võ tướng cổ trang mang hơi thở thần lôi, tối giản trong chi tiết rườm rà nhưng tinh tế trong nhịp khối – gọn, đối xứng, và dứt khoát.
+Vóc dáng thẳng, vai mở, cằm hơi ngẩng tạo thế hiên ngang, như kẻ luôn đối diện với bầu trời giông tố mà không cúi đầu.
+
+II. Chi tiết ngoại hình mở rộng
+
+Bộ phận	Mô tả chi tiết
+
+Khuôn mặt:	Gương mặt góc cạnh nhưng không thô, gò má và đường xương quai hàm rõ nét, phản ánh sự từng trải. Da sáng xanh nhạt do phản chiếu ánh điện, bề mặt da ở vùng cổ và gò má xuất hiện vệt lôi văn mờ như hình mạch điện chìm. Mắt hẹp, ánh nhìn sắc và có chiều sâu, đồng tử ánh lam chuyển sắc nhẹ khi năng lượng tăng. Khi nhìn gần, mí mắt và hốc mũi hằn ánh lam nhạt – một hiệu ứng thị giác tự nhiên do điện phát sáng từ bên trong.
+Tóc đen ngắn, sợi dày, được cắt tầng nhẹ để tạo chuyển động khi có gió. Một vài lọn bên gáy ánh bạc xanh khi ánh sáng lôi văn phản chiếu. Khi nhân vật chuyển động nhanh hoặc kích hoạt kỹ năng, phần tóc sau sẽ hắt sáng lam như sợi quang mảnh, mô phỏng cảm giác điện lan qua không khí.
+Cơ thể và dáng	Cấu trúc thể hình dựa trên cơ bắp chức năng, không đồ sộ – giống vận động viên hơn là chiến binh nặng nề. Tỷ lệ thân dài, vai rộng nhưng eo thon, chân dài và linh hoạt. Cánh tay nổi gân nhẹ, có vệt lôi văn chạy dọc từ vai đến cổ tay, hiển thị rõ khi nhân vật vận công. Tư thế chuẩn: chân trụ sau hơi gập, ngực mở, cằm nghiêng nhẹ tạo cảm giác chủ động và tự tin.
+Trang phục chính:	Áo giáp kết hợp giữa kim loại và vải cứng. Phần giáp ngực bằng hợp kim lam bạc khắc hoa văn sét hình xoắn tròn, bắt sáng rõ ở trung tâm và mờ dần ra hai bên sườn. Bên trong là áo vải cổ cao màu xanh than, chất liệu dệt mịn phản sáng nhẹ. Ống tay áo ôm gọn, có viền chỉ bạc mảnh chạy theo đường cơ tay. Vạt áo ngoài chia hai tà, để hở vùng hông và đùi trước giúp động tác chiến đấu tự nhiên.
+Áo choàng:	Choàng ngắn đến giữa bắp chân, may từ vải pha tơ ánh lam, nhẹ và đàn hồi. Bề mặt phủ lớp xử lý ánh sáng dạng satin mờ, khi nhân vật chuyển động, mép choàng tạo quầng sáng lam đậm như lôi điện lan theo gió. Phần gắn vai phải cố định bằng khóa giáp tròn chạm khắc phù sét.
+Vũ khí:	Lôi thương – cán dài khoảng bằng chiều cao thân, làm từ kim loại sẫm xanh, có vệt sét ăn dọc thân như gân mạch. Đầu thương tạc hình ba nhánh sét giao nhau, tâm giữa có lõi sáng lam trắng động, mô phỏng năng lượng ion hoá. Khi đâm, thương phát tiếng rít nhẹ và tạo vệt sáng quỹ đạo. Đốc thương khắc chữ triện cổ phát quang mờ.
+Phụ kiện:	Dây đai lưng bằng da đen thẫm, bản rộng, cố định bởi móc kim loại bạc xanh. Bên hông trái gắn phiến lôi phù hình tròn, khắc ký tự “Thiên”, tỏa quầng sáng lam dịu. Trên cổ tay phải có vòng khóa kim loại nhỏ, vừa là phụ kiện, vừa là bộ khuếch đại năng lượng.
+Giày & găng: Giày cổ cao dạng chiến ủng, làm từ da cứng phối giáp, màu xanh xám pha ánh lam. Gót và mũi bọc kim loại. Găng tay nửa bàn, khớp ngón tay có viền điện chạy mờ. Khi kích hoạt vũ kỹ, điện tích tỏa ra giữa các khe ngón tạo ánh sáng chớp nháy ngắn.
+Hiệu ứng năng lượng:	Cấp cơ bản: vệt sáng lam chạy dọc mạch tay, cổ, và lưng. Cấp trung: năng lượng dao động quanh vai và ngực, tạo hiệu ứng “halo” nhỏ mỗi nhịp hít thở. Cấp tối đa (trạng thái ult): các lôi văn phát sáng mạnh, hòa với ánh lam trắng bao quanh thân, tóc và áo choàng dạt ra do luồng khí ion. Khi đó nền da phản sáng như được chiếu đèn từ trong ra ngoài.
+Khí chất và biểu cảm:	Mỗi động tác của Lôi Thiên Ảnh đều thể hiện sự kiểm soát – không dư thừa, không cứng nhắc. Anh hành động như đã luyện cùng sấm sét cả đời, thả lỏng mà tràn năng lượng. Biểu cảm trung tính thiên về nụ cười nhạt, khi giao chiến ánh mắt chuyển sắc lam đậm, nhìn như đang hội tụ năng lượng trong con ngươi. Giọng nói (theo metadata) baritone sáng, khớp với hình tượng người trầm ổn, cương trực và quyết đoán.
+
+III. Phong cách tạo hình và phối màu
+
+Tông chủ đạo: lam sáng (#8bd1ff) và xanh trầm (#163044).
+
+Ánh sáng tổng: xuất phát từ phía phải trên (theo hướng nhìn 3/4 của nhân vật), giúp lôi văn và giáp bắt sáng mạnh ở ngực và vai trái.
+
+Màu phụ: bạc trắng và lam tím (#9acfff) cho viền điện, kết hợp đỏ cam nhạt ở hiệu ứng ult để tương phản nhiệt độ màu.
+
+Da: giảm sắc xanh, tăng tông ấm nhẹ (#eaf5ff → #d1e8ff), để trông sống động, tránh cảm giác tượng đồng.
+
+Cấu trúc thị giác: đường khối tập trung hình chữ V từ vai xuống thắt lưng – tượng trưng cho năng lượng tụ hội và bùng phát.
+
+Mỗi chi tiết đều hướng về tâm ngực, gợi ý nơi hội tụ sấm khí – trung tâm năng lượng của Lôi Thiên Ảnh.
+
+IV. Gợi ý diễn giải cho hoạ sĩ & animator
+
+Giữ độ linh hoạt trong cape và tóc khi idle, tạo chuyển động nhẹ gợi cảm giác điện lan.
+
+Khi attack_b hoặc charge, ánh sáng lôi văn nên tăng dần theo nhịp cơ, không bật toàn bộ một lúc.
+
+Trong biểu cảm idle, cho phép mắt hơi khép, ánh nhìn xa – thể hiện sự điềm tĩnh. Khi chuyển sang ultimate, mắt mở rộng, ánh lam sáng mạnh, viền mống mắt phản sáng rõ.
+
+Trong phiên bản cinematic, có thể cho giọt mưa bốc hơi khi chạm vào áo choàng – biểu tượng cho năng lượng nhiệt từ trường điện bao quanh nhân vật.
+
 ## 1. Tư thế, tỉ lệ và thứ tự lớp
 - **Tư thế tổng**: dáng đứng kiêu hãnh, hướng nhìn chếch 3/4 về bên phải màn hình; chân trái (gần người xem) bước nhẹ lên trước, chân phải trụ sau.
 - **Tỉ lệ cơ thể**: chiều cao ~7,25 đầu; đầu chiếm 1/7 tổng chiều cao (cao ~27 px), thân từ cằm tới hông ~80 px, chân ~93 px.

@@ -1,4 +1,4 @@
-import { applyDamage } from './combat.ts';
+import { applyDamage } from './combat/apply-damage.ts';
 import { gainFury, finishFuryHit } from './utils/fury.ts';
 import { safeNow } from './utils/time.ts';
 

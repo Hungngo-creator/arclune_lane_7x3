@@ -1,0 +1,221 @@
+Mục tiêu: Tạo hệ thống “aura theo bậc hiếm” cho 3 ngữ cảnh UI:
+1. Gacha Reveal (lật thẻ/hiện kết quả)
+
+
+2. Deck Frame (khung các ô tướng trong màn chọn đội)
+
+
+3. Collection Avatar (thư viện nhân vật)
+
+
+
+> Không thay đổi gameplay, không hiển thị aura trong trận, không có “state aura”.
+
+
+
+
+---
+
+0) Bậc & màu (token)
+
+Dùng bảng màu (nhất quán trước đây):
+
+N  #9AA3AF (xám thép) — glow nhẹ
+
+R  #2ED3A0 (lục ngọc)
+
+SR #00E5FF (lam neon)
+
+SSR#7C4DFF (tím)
+
+UR #FFD773 (vàng hổ phách)
+
+PRIME #FFFFFF (trắng lăng kính)
+
+
+Tạo file: /src/ui/rarity/rarity_tokens.json
+
+{
+  "N":   { "hex": "#9AA3AF", "glow": 0.6, "ring": 1.0, "spark": 0 },
+  "R":   { "hex": "#2ED3A0", "glow": 0.8, "ring": 1.0, "spark": 4 },
+  "SR":  { "hex": "#00E5FF", "glow": 1.0, "ring": 1.05, "spark": 6 },
+  "SSR": { "hex": "#7C4DFF", "glow": 1.15,"ring": 1.1, "spark": 8 },
+  "UR":  { "hex": "#FFD773", "glow": 1.25,"ring": 1.15,"spark": 12 },
+  "PRIME":{"hex":"#FFFFFF", "glow": 1.35,"ring": 1.2, "spark": 16, "prism": true }
+}
+
+
+---
+
+1) File & cấu trúc
+
+Tạo thư mục:
+
+/src/ui/rarity/
+  rarity.css
+  rarity.ts
+  rarity_tokens.json
+
+Nối rarity.css vào entry UI. rarity.ts export API ở mục 3.
+
+
+---
+
+2) Quy tắc hiển thị theo ngữ cảnh
+
+A) Gacha Reveal
+
+Mỗi card có khung phát sáng màu theo bậc + animation lộ sáng theo timeline:
+
+0–300ms: pre-glow (mờ)
+
+300–900ms: ring expand + bloom
+
+900–1300ms: title/ảnh nhân vật fade-in
+
+Nếu SSR+: bắn sparkles; UR: thêm sweep (quét ánh sáng); PRIME: rainbow prism sweep chậm 1 vòng.
+
+
+Có chế độ Low-Power: giảm cường độ glow 30%, tắt sparkles.
+
+
+B) Deck Frame
+
+Aura tĩnh: viền sáng + nền plate rất mờ; lặp shimmer 1 lần/6s (0.6s duration).
+
+Khi hover/selected: tăng opacity glow 20%.
+
+
+C) Collection Avatar
+
+Badge bậc ở góc trái-dưới (viên ngọc nhỏ + chữ rank).
+
+Viền ngoài theo màu bậc; không chạy particle; shimmer 1 lần/10s.
+
+---
+
+3) API (UI-only)
+
+/src/ui/rarity/rarity.ts
+
+export type Rarity = 'N'|'R'|'SR'|'SSR'|'UR'|'PRIME';
+export type AuraVariant = 'gacha'|'deck'|'collection';
+export type PowerMode = 'normal'|'low';
+
+export function mountRarityAura(el: HTMLElement, rarity: Rarity, variant: AuraVariant, opts?:{
+  label?: boolean;       // hiện chữ rank: N/R/...
+  rounded?: boolean;     // avatar tròn hay vuông
+}): void;
+
+export function updateRarity(el: HTMLElement, rarity: Rarity): void;
+export function unmountRarity(el: HTMLElement): void;
+
+export function setPowerMode(mode: PowerMode): void;
+
+/** trợ lý cho màn gacha nhiều thẻ */
+export function playGachaReveal(cards: Array<{el: HTMLElement, rarity: Rarity}>, opts?:{
+  staggerMs?: number;    // default 120ms
+  onDone?: ()=>void;
+}): void;
+
+Tất cả phần tử được gắn thêm node .rarity-aura (position: absolute; pointer-events: none).
+
+---
+
+4) CSS (tóm lược – Codex viết đầy đủ)
+
+/src/ui/rarity/rarity.css
+
+.rarity-aura { position:absolute; inset:0; pointer-events:none; border-radius:inherit; }
+.rarity-aura .ring   { position:absolute; inset:0; border-radius:inherit; }
+.rarity-aura .glow   { position:absolute; inset:0; border-radius:inherit; filter:blur(var(--blur,8px)); opacity:.65 }
+.rarity-aura .badge  { position:absolute; left:6px; bottom:6px; padding:2px 6px; font-weight:700; font-size:12px;
+                       border-radius:8px; background:rgba(0,0,0,.35); color:#fff; letter-spacing:.5px }
+.rarity-aura[data-variant="deck"] .badge { display:none; }
+.rarity-aura[data-variant="gacha"] .badge { font-size:14px; }
+
+.rarity-N   { --c:#9AA3AF }
+.rarity-R   { --c:#2ED3A0 }
+.rarity-SR  { --c:#00E5FF }
+.rarity-SSR { --c:#7C4DFF }
+.rarity-UR  { --c:#FFD773 }
+.rarity-PRIME{--c:#FFFFFF}
+
+.rarity-aura .ring { box-shadow:0 0 0 2px var(--c) inset, 0 0 0 1px rgba(0,0,0,.35); opacity:.8 }
+.rarity-aura .glow { background: radial-gradient(60% 60% at 50% 50%, color-mix(in srgb, var(--c), transparent 70%), transparent); }
+
+@keyframes shimmer { 0%{opacity:.2} 40%{opacity:.9} 100%{opacity:.2} }
+@keyframes sweep   { from{transform:translateX(-120%) skewX(-8deg)} to{transform:translateX(120%) skewX(-8deg)} }
+
+.rarity-aura[data-variant="deck"] .glow { animation: shimmer 0.6s ease-in-out 0s 1; animation-delay: var(--shimmerDelay,0s) }
+.rarity-aura[data-variant="collection"] .glow { animation: shimmer 0.6s ease-in-out 0s 1; animation-delay: 6s }
+
+.rarity-aura.prism::after { /* cho PRIME */
+  content:""; position:absolute; inset:-2px; border-radius:inherit; opacity:.9; mix-blend-mode:screen;
+  background: linear-gradient(90deg, #ff7ab6, #fff, #7ecbff);
+  animation: sweep 1.4s linear 1;
+}
+body.low-power .rarity-aura .glow { opacity:.4; filter:blur(6px) }
+body.low-power .rarity-aura.prism::after { display:none }
+
+---
+
+5) Tích hợp
+
+Gacha: tìm container kết quả (grid/list thẻ). Với mỗi card DOM:
+
+mountRarityAura(cardEl, card.rarity, 'gacha', {label:true});
+// Khi reveal:
+playGachaReveal(cards);
+
+Deck: tại khung mỗi slot/ô hero (thumbnail), gọi:
+
+mountRarityAura(slotEl, hero.rarity, 'deck');
+
+Collection: trong item avatar:
+
+mountRarityAura(avatarEl, hero.rarity, 'collection', {label:true});
+
+
+> Nếu el có bo tròn, set border-radius của el và để .rarity-aura kế thừa.
+
+---
+
+6) Hiệu năng
+
+Không dùng mix-blend-mode ngoại trừ PRIME sweep (đã tắt ở Low-Power).
+
+Không quá 16 “spark” đang hoạt động đồng thời (SSR+).
+
+playGachaReveal dùng requestAnimationFrame + CSS animation, stagger mặc định 120 ms để tránh spike.
+
+---
+
+7) Kiểm thử (Acceptance)
+
+[ ] Gacha: mỗi thẻ hiển thị glow đúng màu/bậc, thứ tự reveal theo staggerMs.
+
+[ ] Deck: shimmer nhẹ 1 lần mỗi 6s (không gây FPS drop).
+
+[ ] Collection: badge rank rõ ràng, tương phản đủ trên avatar sáng/tối.
+
+[ ] Low-Power: tắt sparkles/sweep, FPS ≥58 trên 1080×2400 với lưới ≥10 thẻ.
+
+[ ] API updateRarity đổi màu tại chỗ, unmountRarity gỡ sạch node.
+
+[ ] LTR/RTL & avatar tròn/vuông vẫn đúng viền.
+
+---
+
+8) Commit mẫu
+
+feat(ui-rarity): aura cho gacha/deck/collection + token màu theo rank
+
+- add /src/ui/rarity/* (tokens, css, api)
+- integrate aura vào gacha result grid, deck slots, collection avatars
+- power mode & prism sweep cho PRIME
+
+---
+
+> Ghi nhớ: Không render aura trong màn trận. Không có state aura. Chỉ dựa vào rank.
+Nếu view chưa có hook rõ ràng, tạo data-attr (data-view="gacha|deck|collection") và gắn overlay vào phần tử con chứa ảnh/thumbnail.

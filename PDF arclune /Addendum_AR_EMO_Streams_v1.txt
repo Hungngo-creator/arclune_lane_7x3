@@ -1,0 +1,26 @@
+ADDENDUM — AR_EMO (Streams & Giới hạn) • v1
+Generated: 2025-08-24T08:05:28.495854+00:00
+
+1) Định nghĩa “stream”
+• Một stream = 1 cặp (người, cảm xúc). Ví dụ: (Bà A, vui), (Anh B, chế giễu), (MC, đau).
+
+2) Tốc độ điểm trước Nhị giai
+• Mỗi stream +1 điểm/phút khi cảm xúc còn tồn tại → ~60 điểm/giờ/stream.
+• Nhiều stream chạy song song ⇒ cộng dồn bình thường (không giới hạn số stream đang chạy).
+
+3) “Diễn” vẫn tính, nếu có cảm xúc thật
+• Hệ thống đọc lớp cảm xúc thật bên trong, không ăn “mặt nạ”.
+• Ví dụ mướn 2 người “diễn nịnh”:
+  – Người A: bề ngoài nịnh, trong lòng CHẾ GIỄU ⇒ +1/phút cho stream (A, chế giễu).
+  – Người B: bề ngoài nịnh, trong lòng VUI + BIẾT ƠN ⇒ +1/phút cho (B, vui) và +1/phút cho (B, biết ơn).
+
+4) MC tự thân
+• Cảm xúc/đau của MC là 1 stream riêng, tick đồng thời với crowd.
+
+5) Mốc phá trần (Nhị giai)
+• Khi có ≥1 kỹ năng đạt NHỊ GIAI: Chỉ Lộ xóa GIỚI HẠN TỐC ĐỘ 1 điểm/phút/stream.
+• Sau mốc này, điểm có thể vượt 1 điểm/phút/stream nếu cảm xúc đủ mạnh (theo thiết kế nội bộ của m).
+
+6) Lưu ý canon
+• Không có khái niệm “staged = no harvest” nếu bên trong thực sự có cảm xúc.
+• Chỉ cảm xúc THẬT mới được tính. Nếu bên trong rỗng không cảm thấy gì ⇒ 0 điểm.

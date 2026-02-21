@@ -20,28 +20,24 @@ function __require(id){
 }
 if (typeof globalThis !== "undefined" && typeof globalThis.__require === "undefined"){ globalThis.__require = __require; }
 __define('./aether.ts', (exports, module, __require) => {
-  // FILE: src/aether.ts
-  const __dep0 = __require('./catalog.ts');
-  const AE_CLASS_COEFF = __dep0.AE_CLASS_COEFF;
+  const __dep0 = __require('./events.ts');
+  const addGameEventListener = __dep0.addGameEventListener;
+  const TURN_START = __dep0.TURN_START;
+  const BATTLE_END = __dep0.BATTLE_END;
+  const __dep1 = __require('./catalog.ts');
+  const AE_CLASS_COEFF = __dep1.AE_CLASS_COEFF;
   class SharedAetherPool {
-      max = 100;
-      current = 50;
+      max = 0;
+      current = 0;
       regenPerTurn = 0;
       uiFill = null;
+      container = null; // Biến lưu DOM để đập bỏ khi hết trận
       side;
       constructor(side) {
           this.side = side;
-          // Chờ HTML load xong mới vẽ để chống crash
-          if (typeof window !== 'undefined') {
-              if (document.readyState === 'loading') {
-                  document.addEventListener('DOMContentLoaded', () => this.initUI());
-              }
-              else {
-                  this.initUI();
-              }
-          }
+          // BỎ HẲN ĐOẠN AUTO INIT Ở ĐÂY. KHÔNG VÀO TRẬN THÌ KHÔNG VẼ!
       }
-      // --- LOGIC GAME CỦA NÍ ĐƯỢC GIỮ NGUYÊN ---
+      // --- LOGIC VÒNG ĐỜI TRẬN ĐẤU ---
       init(teamUnits) {
           this.max = 0;
           this.regenPerTurn = 0;
@@ -54,6 +50,8 @@ __define('./aether.ts', (exports, module, __require) => {
           }
           this.current = Math.floor(this.max / 2);
           this.regenPerTurn = Math.floor(this.regenPerTurn);
+          // CHỈ VẼ UI KHI HÀM INIT (VÀO TRẬN) ĐƯỢC GỌI
+          this.initUI();
           this.updateUI();
       }
       onTurnEnd() {
@@ -71,38 +69,76 @@ __define('./aether.ts', (exports, module, __require) => {
           }
           return false;
       }
-      // --- LOGIC GIAO DIỆN MỚI ---
+      // HÀM MỚI: ĐẬP BỎ TRỤ KHI HẾT TRẬN / THOÁT RA MAIN MENU
+      destroyUI() {
+          if (this.container && this.container.parentNode) {
+              this.container.parentNode.removeChild(this.container);
+          }
+          this.container = null;
+          this.uiFill = null;
+      }
+      // --- LOGIC GIAO DIỆN (NÂNG CẤP) ---
       initUI() {
-          if (typeof document === 'undefined')
+          if (this.container)
               return;
-          const containerId = `aether-pillar-${this.side}`;
-          let container = document.getElementById(containerId);
-          if (!container) {
-              container = document.createElement('div');
-              container.id = containerId;
-              const positionCss = this.side === 'ally'
-                  ? 'left: 8%; transform: translateY(-50%);'
-                  : 'right: 8%; transform: translateY(-50%);';
-              const glowColor = this.side === 'ally' ? '#00ffff' : '#ff0055';
-              const gradient = this.side === 'ally'
-                  ? 'linear-gradient(to top, #0055ff, #00ffff)'
-                  : 'linear-gradient(to top, #550000, #ff0055)';
-              // Z-INDEX LÀ 9999 ĐỂ NỔI LÊN TRÊN MỌI THỨ
-              container.style.cssText = `position: fixed; top: 50%; ${positionCss} width: 40px; height: 220px; background: rgba(10, 10, 30, 0.8); border: 2px solid ${glowColor}; border-radius: 8px; z-index: 99999; box-shadow: 0 0 15px ${glowColor}40; pointer-events: none;`;
-              this.uiFill = document.createElement('div');
-              this.uiFill.style.cssText = `position: absolute; bottom: 0; left: 0; width: 100%; background: ${gradient}; transition: height 0.4s ease-out; box-shadow: 0 0 10px ${glowColor};`;
-              container.appendChild(this.uiFill);
-              document.body.appendChild(container);
+          this.container = document.createElement('div');
+          this.container.id = `aether-pool-${this.side}`;
+          this.container.style.position = 'absolute';
+          this.container.style.width = '30px';
+          this.container.style.height = '200px';
+          this.container.style.border = '2px solid #ccc';
+          this.container.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+          this.container.style.borderRadius = '15px';
+          this.container.style.overflow = 'hidden';
+          this.container.style.display = 'flex';
+          this.container.style.flexDirection = 'column-reverse';
+          // Đẩy z-index lên để không bị sàn đấu đè
+          this.container.style.zIndex = '10';
+          // Giữ điểm neo chuẩn để zoom/out không bị lệch tâm
+          this.container.style.transformOrigin = 'bottom center';
+          if (this.side === 'ally') {
+              // Tọa độ âm để đẩy nó lùi ra mép ngoài (sau lưng leader ô 8)
+              this.container.style.bottom = '-60px';
+              this.container.style.left = '-60px';
+              this.container.style.borderColor = '#00ffff';
+              this.container.style.boxShadow = '0 0 10px #00ffff';
           }
           else {
-              this.uiFill = container.firstElementChild;
+              // Tương tự cho bên địch
+              this.container.style.top = '-60px';
+              this.container.style.right = '-60px';
+              this.container.style.borderColor = '#ff00ff';
+              this.container.style.boxShadow = '0 0 10px #ff00ff';
           }
+          // FIX CỐT LÕI: Gắn vào Sàn đấu (#battlefield) thay vì document.body
+          // Việc này ép 2 trụ Aether nằm chung chiều không gian, chịu chung Zoom/Pan với sàn.
+          const battlefield = document.getElementById('battlefield');
+          if (battlefield) {
+              battlefield.appendChild(this.container);
+          }
+          else {
+              // Fallback nhỡ sàn chưa render
+              document.body.appendChild(this.container);
+          }
+          this.uiFill = document.createElement('div');
+          this.uiFill.style.width = '100%';
+          this.uiFill.style.backgroundColor = this.side === 'ally' ? '#00ffff' : '#ff00ff';
+          this.uiFill.style.transition = 'height 0.3s ease';
+          this.uiFill.style.height = '50%';
+          this.container.appendChild(this.uiFill);
+          const label = document.createElement('div');
+          label.style.position = 'absolute';
+          label.style.width = '100%';
+          label.style.textAlign = 'center';
+          label.style.bottom = '5px';
+          label.style.color = '#fff';
+          label.style.fontWeight = 'bold';
+          label.style.textShadow = '1px 1px 2px #000';
+          label.id = `aether-label-${this.side}`;
+          this.container.appendChild(label);
       }
       updateUI() {
-          if (!document.getElementById(`aether-pillar-${this.side}`)) {
-              this.initUI();
-          }
-          if (!this.uiFill)
+          if (!this.uiFill || !this.container)
               return;
           const percent = this.max > 0 ? (this.current / this.max) * 100 : 0;
           this.uiFill.style.height = `${Math.max(0, Math.min(100, percent))}%`;
@@ -111,14 +147,23 @@ __define('./aether.ts', (exports, module, __require) => {
   // 1. Tạo 2 trụ cho 2 bên
   const allyAetherPool = new SharedAetherPool('ally');
   const enemyAetherPool = new SharedAetherPool('enemy');
-  // 2. MÁNH KHÓE: Giữ lại biến globalAetherPool cũ để các file khác gọi không bị lỗi
+  // 2. Cầu nối API cho game
   const globalAetherPool = {
       init: (units) => {
+          allyAetherPool.destroyUI();
+          enemyAetherPool.destroyUI();
           allyAetherPool.init(units);
-          // Khởi tạo tạm cho Kẻ thù để trụ Đỏ hiện lên
+          // --- CODE TEST UI: Bơm thông số giả để hiện trụ khi chưa ráp logic ---
+          if (allyAetherPool.max === 0) {
+              allyAetherPool.max = 100;
+              allyAetherPool.current = 50;
+              allyAetherPool.initUI();
+              allyAetherPool.updateUI();
+          }
           if (enemyAetherPool.max === 0) {
               enemyAetherPool.max = 100;
               enemyAetherPool.current = 50;
+              enemyAetherPool.initUI();
               enemyAetherPool.updateUI();
           }
       },
@@ -131,10 +176,32 @@ __define('./aether.ts', (exports, module, __require) => {
           allyAetherPool.updateUI();
           enemyAetherPool.updateUI();
       },
+      destroy: () => {
+          allyAetherPool.destroyUI();
+          enemyAetherPool.destroyUI();
+      },
       get current() { return allyAetherPool.current; },
       get max() { return allyAetherPool.max; },
       get regenPerTurn() { return allyAetherPool.regenPerTurn; }
   };
+  // 3. --- MÓC NỐI TỰ ĐỘNG VÀO GAME ENGINE & ERUDA ---
+  if (typeof window !== 'undefined') {
+      // Ní có thể mở Eruda gõ window.testAether() để ép nó mọc lên bất cứ lúc nào!
+      window.testAether = () => globalAetherPool.init([]);
+      let isAetherInit = false;
+      // Tự động mọc trụ khi Lượt (Turn) đầu tiên bắt đầu
+      addGameEventListener(TURN_START, () => {
+          if (!isAetherInit) {
+              globalAetherPool.init([]);
+              isAetherInit = true;
+          }
+      });
+      // Tự động đập trụ dọn dẹp khi ván đấu kết thúc
+      addGameEventListener(BATTLE_END, () => {
+          globalAetherPool.destroy();
+          isAetherInit = false;
+      });
+  }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'allyAetherPool')) exports.allyAetherPool = allyAetherPool;
   if (!Object.prototype.hasOwnProperty.call(exports, 'enemyAetherPool')) exports.enemyAetherPool = enemyAetherPool;

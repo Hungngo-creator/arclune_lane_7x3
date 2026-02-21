@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <pre id="out">loading...</pre>
+  <script>
+    (async () => {
+      const results = {
+        // ES2015
+        arrow: (() => 1)() === 1,
+        letConst: (() => { let x = 1; const y = 2; return x + y === 3; })(),
+        promise: typeof Promise !== "undefined",
+
+        // ES2017 async/await
+        asyncAwait: false,
+
+        // ES2020
+        optionalChaining: ({a:{b:1}})?.a?.b === 1,
+        nullish: (0 ?? 5) === 0 && (null ?? 5) === 5,
+        bigInt: typeof 1n === "bigint"
+      };
+
+      try {
+        const v = await (async () => 42)();
+        results.asyncAwait = (v === 42);
+      } catch (e) {
+        results.asyncAwait = "error: " + e;
+      }
+
+      document.getElementById("out").textContent =
+        JSON.stringify(results, null, 2);
+    })();
+  </script>
+</body>
+</html>

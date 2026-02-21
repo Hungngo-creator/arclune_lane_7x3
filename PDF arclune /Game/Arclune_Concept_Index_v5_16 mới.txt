@@ -1,0 +1,680 @@
+ARCLUNE — CONCEPT INDEX v5.15 (bilingual, merged/union of v5.13 + v5.14)
+Build: 2025-08-17 20:47
+
+# Scope
+# Names-first bilingual index for quick recall & consistency when writing.
+# This patch adds: Deity titles (Thần Hoàng/Tôn/Chủ/Đế), Watcher Clan & roles, Merit (Công Đức) ladder,
+# Earth Deity (Địa Thần) ranks & protocol, and a few devices/terms seen in Master.
+[CORE_TERMS — VN | EN]
+Miếu Danh | Name Shrine
+Danh Ảnh | Nameglass
+Hư Giới | HollowNet
+Giới Linh | Realm-Spirit
+Thiên Đạo | Heaven’s Dao
+Chỉ Lộ | Linebound (System)
+HNT/hạ nguyên tinh | L-stone
+VNT/vụn nguyên tinh | shardlet
+Hô Hấp | Breathwork
+Kiếm Ý | Sword Intent
+Nhất phẩm/Nhất giai | First-Tier
+KLC Linesetter | KLC Linesetter
+combat-lock | combat-lock
+wardens | wardens
+[RANKS — VN | EN]
+Khai Nguyên | Genesis Stage
+(KN1…KN9 → G1…G9 khi cần gọn)
+Trúc Cơ | Foundation-Laying
+Ngưng Đan | Core-Condensing
+Kết Đan | Core-Knotting
+Đúc Phách | Soul-Forge
+Luyện Hồn | Soul-Refining
+Thánh Nhân | Saint
+Thánh Hoàng | Saint-Emperor
+Thánh Tôn | Saint-Venerable
+Bán Thần | Demigod
+[DEITY TIERS — VN | EN (aka)]
+Hạ vị thần | Lesser Deity (aka Thần Hoàng | Divine Monarch)
+Trung vị thần | Intermediate Deity (aka Thần Tôn | Divine Venerable)
+Thượng vị thần | Greater Deity (aka Thần Chủ | Divine Lord)
+Chí cao | Supreme Deity (aka Thần Đế | Divine Emperor)
+# Note: The four 'aka' Vietnamese honorifics are interchangeable style labels for the corresponding deity tiers.
+[BÁN THẦN — VN | EN]
+PDU ban đầu | Initial PDU = 10
++2 PDU mỗi 1% thần cách | +2 PDU per 1% divinity
+Bằng (kiếm tu) sau nhiệm vụ Thiên Đạo | Binding (sword path) post Heaven-task
+[CLASSES — VN | EN]
+Kết thuật | Formation Arts
+Thể tu | Body Cultivation
+Khí tu | Qi Cultivation
+Khí tu kiếm | Qi-Sword Cultivation
+Kiếm tu | Sword Cultivation
+Cơ giới tu | Mechanist Cultivation
+Tín tu | Faith Cultivation
+Hỗn hệ | Hybrid
+[ECONOMY — VN | EN]
+HNT/VNT = 1:100 | L-stone/shardlet = 1:100
+Ngoại biên 3 HNT | Outer 3 L-stones
+Đô hội 6 HNT | Metropolis 6 L-stones
+CGQ/Thủ phủ 9 HNT | Mechanica State/Capitals 9 L-stones
+Mặc định tối đa 3 lượt/ngày | default up to 3 entries/day
+Thẻ ngày Kim Cương: tối đa 5/ngày | Diamond day pass: up to 5/day
+[EVENT LADDER — VN | EN (min scale)]
+Nhỏ — ≈100 năm | Minor — ≈100 years
+Vừa — ≥1.500 năm | Moderate — ≥1,500 years
+Lớn — ≥30.000 năm | Major — ≥30,000 years
+Kiếp Vực — ≥400.000 năm | Cataclysmic Zone — ≥400,000 years
+Đa Kiếp Vực — ≥5.000.000 năm | Multi‑Cataclysm — ≥5,000,000 years
+Đại Chu Kỳ — ≥80.000.000 năm | Great Cycle — ≥80,000,000 years
+[DCLV/ĐKTT & DEVICES — VN | EN]
+DCLV (Độ Cô Lập Lĩnh Vực): 0–100; <40 mỏng · 40–70 chuẩn · >70 đặc | Domain Isolation Degree: 0–100; <40 thin · 40–70 standard · >70 dense
+ĐKTT (Độ Kết Tủa Thánh lực): TN 20–45 · TH 45–70 · TT 70–90 | Holy Precipitation Degree: SN 20–45 · SE 45–70 · SV 70–90
+Kính Chu Thiên | Heaven-Scope (DCLV calibrator)
+Kính Aether kế | Aether meter
+Chuông Huyền Phù | Mystic bell
+Ấn Quang Rìa | Edge‑Light Seal
+Kim Châm Vi Mạch | Micro‑vein Needle
+[WATCHER CLAN — VN | EN]
+Tộc Giám Sứ | Watcher Clan
+Vị ký (Giám Sứ hiện trường) | Field Scribe
+Sử quan | Archivist
+Định luật sứ (Phán quyết) | Adjudicator
+Thủ thức | Keeper
+Gợi thoại (mẫu) | First-contact lines
+Giữ 7 ngày log hiện trường | Keep 7‑day on‑site log
+[MERIT — Công Đức ladder — VN | EN]
+Công Đức (CD) | Merit (CD)
+Vi Công | Minor Merit
+Tiểu Công | Lesser Merit
+Đại Công | Great Merit
+Thánh Công | Saintly Merit
+Hộ thể (Đức) | Merit Sheath (thin, non-invasive ward)
+Đức Tráo/Đức Ấn | Merit Plating / Merit Seal
+Khắc tà (sát hồn & tà vật) | Exorcise taints (soul & abominations)
+Đổi quyền (Đức Đổi Quyền) | Merit Exchange of Right (temporary)
+[EARTH DEITY — Địa Thần — VN | EN]
+Địa Ấn (tiếp dẫn) | Earth‑Seal (induction)
+Địa Linh | Local Sprite
+Địa Hộ | Land Warden
+Địa Quân | Regional Lord
+Giới hạn: không lập Thần Quốc | Limit: may not found a Divine Realm
+Vai trò theo thang Sự Kiện | Role scales with Event Tier
+[HOLLOWNET — VN | EN]
+Công đài — Public Bracket | Public Bracket
+Lượt/Ngày | Entries per Day
+Thẻ ngày Kim Cương | Diamond Day Pass
+Trận Võng | Battle Mesh
+Runeslate (kho) | Runeslate (ledger plate)
+Chuông Miếu (đồng) | Shrine bell
+[MAPS — VN | EN (canonised/neutral)]
+Hẻm Đèn Tím | Violet‑Lamp Alley
+Trung Châu | Zhongzhou Metropolis
+Hồ Lan Tích (TS‑4) | Lan Tich Lake (TS‑4)
+Đô hội | Metropolis
+Ngoại biên | Outer Districts
+CGQ | Mechanica State
+Thủ phủ | Capitals
+Lỗi/Lõi Châu | Core Continent
+Liên Minh Hải Miễu | Sea‑Shrine Alliance
+Sa Mạc Vô Tắc | Lawless Desert
+Trường Sinh Lâm | Everlife Forest
+Vành Nứt Thế Giới | World‑Rift Rim
+Quang Thánh Đảo | Light‑Sanct Isles
+Ám Quốc | Shadow Kingdom
+Cơ Giới Quốc | Mechanica Realm
+Huyết Quốc | Blood Realm
+Thần Tích Lưu Ảnh | Relic‑Shadow Expanse
+Băng Tây Bắc | Northwest Ice Reach
+[MAP_RULES — fields]
+Tương hợp nguyên tố | Affinity Aether
+Nhiễu Luật | Law Interference
+Path ưu tiên | Preferred Paths
+Khắc chế gợi ý | Suggested Counters
+Ghi chú | Notes
+[SYNERGY_RULES — field names]
+BuffMult · CostMult · SE_eff · ẤnLoad (TT7+) · DomainStableΔ · A · N · P
+[NAMED_SWORDS — VN | EN (sample)]
+Hồng Viêm Kiếm | Crimson‑Flame Sword
+Thanh Vũ Kiếm | Azure‑Feather Sword
+Băng Tâm Ngân | Ice‑Heart Silver
+Lôi Mệnh Nhẫn | Thunder‑Fate Ring
+Sinh Mục Kiếm | Life‑Eye Sword
+Phối Kim Kiếm | Alloy‑Gold Sword
+Tịnh Quang Kiếm | Purelight Sword
+Huyết Vũ | Blood‑Rain
+Không Vận | Void‑Motion
+Mị Ảnh | Enchanting Shade
+Ảnh Song | Twin‑Shade
+Hồng Lệ | Crimson Tear
+Tuyên Mệnh | Proclaiming Edict
+Phong Tước | Title‑Grant
+Lẫm Lôi | Dread‑Thunder
+[HERETICAL — forces/techniques — VN | EN (sample)]
+Vong Bì Hội | Skinless Society
+Huyết Ông Giáo | Blood Stag Cult
+Táng Cốt Lô | Bone Kiln
+Phạn Lục Huyết Linh | Sixfold Blood Hymn
+Thiểm Bì Hoán Hình | Skin‑Shift Shedding
+[UI — labels — VN | EN]
+Booting… | Booting…
+Điểm | Points
+Combat‑lock | Combat‑lock
+Cắt cảnh cảm ngộ (chỉ khi an toàn) | Insight cut‑scene (only when safe)
+Private transaction — no harvest | Private transaction — no harvest
+Administrative stamp | Administrative stamp
+ARCLUNE — CONCEPT INDEX v5.10 (bilingual, merged v5.8 + v5.9)
+Built: 2025-08-17 12:47:10
+ARCLUNE — CONCEPT INDEX v5.9 (bilingual, names-first)
+Built: 2025-08-17
+# Source baseline: v5.7 + v5.8 + Master highlights (A.1–A.3, B.2–B.4, D.1–D.3, F, X.1, XI.1).
+[EVENT_LADDER — VN | EN]
+Nhỏ | Minor
+Vừa | Moderate
+Lớn | Major
+Kiếp Vực | Cataclysmic Zone
+Đa Kiếp Vực | Multi-Cataclysm
+Đại Chu Kỳ | Great Cycle
+[EVENT_LADDER_TIME — VN | EN (min scale)]
+[AETHER — phases & exchange — VN | EN]
+Anima (dương) | Anima (yang)
+Umbra (âm) | Umbra (yin)
+Khí — sương — tinh | gas — mist — crystal
+Sàng Lọc Bảy Lớp | Seven‑Layer Purge
+Khoáng xúc tác pha | Phase‑catalyst ores
+[ELEMENTS — VN | EN]
+Kim | Metal
+Mộc | Wood
+Thủy | Water
+Hỏa | Fire
+Thổ | Earth
+Phong | Wind
+Lôi | Thunder
+Quang | Light
+Ám | Shadow
+[ELEMENT VARIANTS — VN | EN (examples)]
+Băng | Ice
+Dung nham | Magma
+Hồng viêm | Crimson‑flame
+Huyễn | Phantasm
+Ảnh | Shadow‑phase
+Độc | Toxin
+Kim di | Time‑shifted Metal
+[ELEMENT FUSIONS — VN | EN (examples)]
+Phong Lôi Diễm | Storm‑Flame (Wind+Thunder+Fire)
+Thủy Quang Ảnh | Water‑Light‑Shadow Mirror
+Thổ Mộc Sinh | Earth‑Wood Regrowth
+[SPACE_LAYERS — VN | EN]
+Thiên Mạc | Sky‑Veil
+Địa Mạc | Earth‑Weave
+Tâm Giới | Heart‑Realm
+Hạ Giới | Under‑World
+Vành Nứt | Rift Rim
+[SPACE_SIGNS — VN | EN (write cues)]
+Mây xé lá | Torn‑leaf clouds (sky shear)
+Bụi trườn | Crawling dust (ground slip)
+Bóng lệch | Skewed shadow (mindfield)
+Lửa xanh | Blue flame (underworld air)
+Lá treo | Hanging leaf (rift edge)
+[DCLV/ĐKTT & THIẾT BỊ — VN | EN]
+Cảnh báo: ép nhập luật sớm → rạn/vỡ/thu hẹp lĩnh vực | Warning: premature law‑merge → crack/shrink domain
+[DEITY_MECHANISMS — VN | EN]
+Lãng Quên | Forgetting
+Chỉ Dẫn | Guidance
+Chòm ký | Constellation‑Mark
+Thần quốc | Divine Realm
+Đoạt đạo | Authority‑Seizure
+[BẰNG — cơ chế “Balance/Bind” — VN | EN]
+Âm‑dương cân bằng; neo đôi | Yin‑yang balance; twin‑anchor
+Chứng giám: Thiên Đạo/thần vị cao | Witness: Heaven’s Dao/high deity
+Biến thể: Thần↔thần quốc; Thần↔pháp bảo (kiếm tu); Thần↔chứng tích | Variants: Deity↔divine realm; Deity↔artifact (sword‑cultivator); Deity↔relic
+Bằng (kiếm tu) sau nhiệm vụ Thiên Đạo | Binding (sword path) post Heaven‑task
+Khí tu kiếm | Qi‑Sword Cultivation
+HNT/VNT = 1:100 | L‑stone/shardlet = 1:100
+Ngoại biên 3 HNT | Outer 3 L‑stones
+Đô hội 6 HNT | Metropolis 6 L‑stones
+CGQ/Thủ phủ 9 HNT | Mechanica State/Capitals 9 L‑stones
+[ALCHEMY — VN | EN (names)]
+Song Tức Đan | Twin‑Breath Pill
+Ngưng Tủy Cao | Marrow‑Condense Paste
+Nguyệt Thai Tán | Moon‑Womb Powder
+Tịnh Hồn Hoàn | Soul‑Clarify Pellet
+Định Ấn Ngọc | Seal‑Fixing Jade
+Triều Tức Đan | Tide‑Breath Pill
+Kim Gân Tán | Golden‑Sinew Powder
+Pháp Kim Mộc | Law‑Gold‑Wood Elixir
+[NAMEGLASS_TIERS — VN | EN]
+Đồng | Copper
+Vàng | Gold
+Kim Cương | Diamond
+[MAP_RULES_FIELDS — VN | EN]
+[SYNERGY_RULES — fields]
+[DANH_KIẾM — schema fields]
+ID · Tên/Name · Path (nguyên lý/ấn) · Ấn/Chiêu mẫu · Ngưỡng Danh · Khí linh · Sở hữu hợp pháp · Map synergy
+[NAMED_SWORDS — VN | EN]
+Họa Bì | Painted Skin
+[HERETICAL — forces/techniques — VN | EN]
+Biến Cốt Hôi Thể | Ash‑Bone Morph
+Hắc Mộc Tật Trượng | Jetwood Scour‑Staff
+Huyền Mang Thực Huyết | Dark‑Glaze Blood‑Eater
+Thiên Phệ Cốt | Heaven‑Gnaw Bone
+Huyết Ổ Phân Tức | Blood‑Nest Split‑Breath
+Táng Cốt Viêm Lô | Bone‑Crematory Furnace
+[EYE_PATH — VN | EN]
+Nguyệt Kính Nhãn | Moon‑Mirror Eye
+Lôi Minh Nhãn | Thunder‑Clarity Eye
+Không Tước Nhãn | Void‑Raptor Eye
+Thời Lậu Nhãn | Time‑Leak Eye
+Huyết Quyết Nhãn | Blood‑Edict Eye
+Liên Sinh Nhãn | Twin‑Life Eye
+Sa Kim Nhãn | Sand‑Gold Eye
+Triều Hải Nhãn | Tide‑Sea Eye
+Huyễn Mộng Nhãn | Phantasm‑Dream Eye
+Danh Ấn Nhãn | Name‑Seal Eye
+[PHYSIQUES — VN | EN]
+Băng Hàn Cốt | Frostbone
+Liệt Viêm Tủy | Blaze‑Marrow
+Lôi Tâm Chỉ | Thunder‑Heart Digit
+Thủy Triều Mạch | Tide‑Vein
+Mộc Sinh Hồn | Woodborne Soul
+[POCKET/WILD REALMS — VN | EN]
+Bí cảnh | Secret Realm
+Tiểu thế giới | Pocket World
+[MAP‑SPECIFIC SKILLS — seed — VN | EN]
+Trường Sinh Giản Đao | Ever‑Alive Shear Blade
+Ánh Vân Phúc Ấn | Cloudlight Boon Seal
+Hoàng Sa Kim Tàng | Sands‑Gold Cache
+Thanh Vũ Kiếm Ý | Azure‑Rain Sword Intent
+[RIVALS/ANTAGONISTS — seed — VN | EN]
+Trần Quát | Tran Quat
+Hứa Dụ | Hua Du
+HollowNet entries/person/day | HollowNet entries/person/day
+# --- APPENDIX (unique lines from v5.8 not present above) ---
+Arclune — Concept Index v5.7 (bilingual, names-only, merged v5.5 + v5.6)
+Built: 2025-08-17 12:16:47
+Note: headers kept as in sources; items de-duplicated; order = v5.5 then v5.6.
+# Source banners
+# # Arclune Concept Index — v5.4 (Bilingual, meaning-based for RANKS/NAMED_SWORDS/PRIMORDIAL_ESSENCES)
+# # Built: 2025-08-17 11:57:02
+# # Arclune Concept Index — v5.1 (Bilingual, consolidated + standard VN↔EN for maps/classes)
+# # Built: 2025-08-17 11:40:15
+# # Arclune Concept Index — v5 (Bilingual, consolidated)
+# # Built: 2025-08-17 11:38:56
+# # Arclune Concept Index — v4 (Bilingual baseline)
+# # Built: 2025-08-17 11:31:07
+Nhất phẩm | First-Tier
+Nhất giai | First-Tier
+[MAPS — VN | (EN if canonised)]
+Trung Châu | Zhongzhou
+Lõi Châu | Core Continent
+[CLASSES — VN | (EN if canonised)]
+[RANKS — VN | (EN if canonised)]
+[NAMED_SWORDS — VN]
+[SYSTEM_UI — labels]
+Booting | Booting
+Host | Host
+Safety mode | Safety mode
+Insight cut-scene | Insight cut-scene
+Balance | Balance
+Entries per person — HollowNet | Entries per person — HollowNet
+Bạc | Silver
+[DEVICES — VN | EN]
+[PRIMORDIAL_ESSENCES — VN | (EN if canonised)]
+Thiên Viêm Hàn Tủy Song Thạch | Celestial Flame–Cold Marrow Twin Stones
+Hư Quang Tử Tùng | Voidlight Purple Pine
+Minh Mộc Nguyệt Thai | Luminous Wood Moon Cradle
+Hải Nhãn Triều Tinh | Sea‑Eye Tide Star
+Hoàng Sa Kim Tàng | Yellow‑Sand Gold Cache
+Song Sinh Tịnh Đế Liên | Twinborn Pure‑Emperor Lotus
+[POINTS/TOKENS — VN | EN]
+Điểm Ấn | Imprint Points
+Gacha | Gacha
+[UI.TALLY]
+Hẻm Đèn Tím | Violet-Lamp Alley
+Hồ Lan Tích | Lan Tich Lake (TS-4)
+[CLASSES — VN | EN (standardised)]
+# Arclune Concept Index — v5.5 (Bilingual, extended from v5.4; names-only)
+# Built: 2025-08-17 12:01:48
+[EVENT_LADDER_TIME — VN | EN]
+[MAP_RULES_IDS — VN | EN]
+BuffMult
+CostMult
+SE_eff
+ẤnLoad (TT7+)
+DomainStableΔ
+A (Affinity)
+N (Nhiễu Luật)
+P (Policy vùng)
+[DANH_KIEM_SCHEMA — field names]
+ID
+Tên | Name
+Path (nguyên lý/ấn)
+Ấn/Chiêu mẫu | Signature Seals/Forms
+Ngưỡng Danh | Fame Threshold
+Khí linh | Weapon‑Spirit
+Sở hữu hợp pháp | Legal Ownership
+Map synergy
+[HERETICAL_POLICY — VN | EN]
+Tịnh Danh Quy | Name‑Purification Rule
+Ấn Khóa Hồn | Soul‑Lock Seal
+Ấn Chủ Quyền | Ownership Seal
+Ấn Nhật Ký | Log Seal
+Giải Bì Ấn | Skin‑Removal Seal
+Tài sản công (nếu chưa Tịnh Danh) | Public Asset (if unpurified)
+[GLOSSARY_SIGNS — VN | EN]
+[DCLV_ĐKTT_LEVELS — VN | EN]
+Xanh | Green
+Vàng | Yellow
+Đỏ | Red
+Tím | Purple
+Arclune — Concept Index v5.6 (bilingual, names-only)
+Changelog from v5.5: +Heavenly-grade arts; +Heretical forces & techniques; +Eye Path (anchor only);
++Eight Odd-Weapon Abilities; +Organizations; +Economy & Alchemy (names);
++Underrealm/Divine Domain/Sword Heaven & Fate; +Event Scale; +Map-specific skills (seed list);
++Pocket Realms & HollowNet; +Rivals (seed list).
+[EVENT SCALE — VN | EN]
+sự kiện nhỏ | minor
+sự kiện vừa | medium
+sự kiện lớn | major
+kiếp vực | realm-cataclysm
+đa kiếp vực | multi-realm cataclysm
+đại chu kỳ | grand cycle
+Phí Hư Giới: Ngoại biên 3 HNT | HollowNet fee: Outer 3 L-stones
+Phí Hư Giới: Đô hội 6 HNT | HollowNet fee: Metropolis 6 L-stones
+Phí Hư Giới: CGQ/Thủ phủ 9 HNT | HollowNet fee: Mechanica State/Capitals 9 L-stones
+Mỗi người tối đa 3 lượt/ngày | up to 3 entries/person/day
+Thẻ ngày Kim Cương (Diamond) | Diamond day pass — up to 5/day
+[ALCHEMY — VN | EN]  (names only)
+Song Tức Đan | Twin-Breath Pill
+Ngưng Tủy Cao | Marrow-Condense Paste
+Nguyệt Thai Tán | Moon-Womb Powder
+Tịnh Hồn Hoàn | Soul-Clarify Pellet
+Định Ấn Ngọc | Seal-Fixing Jade
+Triều Tức Đan | Tide-Breath Pill
+Kim Gân Tán | Golden-Sinew Powder
+Pháp Kim Mộc | Law-Gold-Wood Elixir
+Khí tu kiếm | Sword-Qi Cultivation
+[HEAVENLY-GRADE ARTS — VN | EN]
+Thiên Mệnh Phệ Nguyên Kinh | Fate-Devour Canon
+Thiên Mệnh Lậu Khắc Ma Kinh | Fate-Leak Demon Carving Canon
+U Minh Thập Ảnh Chưởng | Ten Shades of Nether Palm
+Thần Quyết Vạn Lực Ấn | Divine Seal of Ten-Thousand Forces
+Lôi Tâm Kiếm Giáng | Thunder-Heart Sword Descent
+[UNDER/HEAVEN/SWORD — VN | EN]
+U Giới | Underrealm
+Thần Vực | Divine Domain
+Kiếm Thiên | Sword Heaven
+Thiên mệnh | Fate Edict
+[HERETICAL FORCES — VN | EN]
+[HERETICAL TECHNIQUES — VN | EN]
+Phạn Lục Huyết Linh | Sixfold-Blood Hymn
+Biến Cốt Hôi Thể | Ash-Bone Morph
+Hắc Mộc Tật Trượng | Jetwood Scour-Staff
+Huyền Mang Thực Huyết | Dark-Glaze Blood-Eater
+Thiên Phệ Cốt | Heaven-Gnaw Bone
+[ORGANISATIONS — VN | EN]
+Tuần Phủ Giám (Wardens Silver) | Silver Wardens
+Miếu Danh (Hệ thống & kỷ luật) | Name Shrine (discipline)
+Liên Minh Hải Miễu | Sea-Miao Alliance
+Băng Tây Bắc | Northern Ice Bloc
+[EYE PATH — NHÃN ĐẠO]
+(10 mẫu theo Annex; tên đầy đủ sẽ sync; ví dụ:)
+Nguyệt Kính Nhãn | Moon-Mirror Eye
+— (còn: 9 nhãn khác — see Annex NHAN.TYPES)
+[EIGHT ODD-WEAPON ABILITIES — VN | EN]
+Lôi Vân Tán Ảnh | Thunder-Cloud Scatter-Shadow
+Mộc Ảnh Triền Sam | Wood-Shadow Sleeve-Bind
+Hàn Sương Phụ Lộ | Cold-Frost Dew-Skin
+Ảnh Diên Áp Định | Swallow-Shadow Pin
+Loạn Phách Khiêu Hồn | Jolt-Soul, Shake-Phách
+Hư Ảnh Bất Độ Hành | Walk-Unweighted Phantom
+Yểm Viêm Hồi Diệm | Smother-Flame, Return-Fire
+Vân Tâm Ẩn Trảo | Cloud-Heart Hidden Talon
+Hồ Lan Tích (TS-4) | Lan Tich Lake (TS-4)
+[HOLLOWNET — UI/DEVICES — VN | EN]
+Danh Ảnh Bạc | Silver Nameglass
+Chuông Miếu (bronze) | Shrine bell
+[MAP-SPECIFIC SKILLS — seed | VN | EN]
+Trường Sinh Giản Đao | Ever-Alive Shear Blade
+Hoàng Sa Kim Tàng | Sands-Gold Cache
+Thanh Vũ Kiếm Ý | Azure-Rain Sword Intent
+[RIVALS — seed | VN | EN]
+— (bổ sung dần phản diện tuyến sau)
+[UI — LABELS | VN | EN]
+Combat-lock | Combat-lock
+Cắt cảnh cảm ngộ chỉ khi an toàn | Insight cut-scene only when safe
+[end of v5.6]
+# Arclune — Concept Index v5.8 (bilingual, names-only)
+# Built: 2025-08-17 12:30:11
+# Adds full Eye Path (10), Organizations, Physiques, Heretical forces & techniques,
+# HollowNet taxonomy (names), Map-specific skills (seed), Pocket-realms catalog (seed),
+# Heavenly-grade arts (names), Rivals/Antagonists roster (seed).
+Lôi Minh Nhãn | Thunder-Clarity Eye
+Không Tước Nhãn | Void-Raptor Eye
+Thời Lậu Nhãn | Time-Leak Eye
+Huyết Quyết Nhãn | Blood-Edict Eye
+Liên Sinh Nhãn | Twin-Life Eye
+Sa Kim Nhãn | Sand-Gold Eye
+Triều Hải Nhãn | Tide-Sea Eye
+Huyễn Mộng Nhãn | Phantasm-Dream Eye
+Danh Ấn Nhãn | Name-Seal Eye
+[ORGANIZATIONS_FULL — VN | EN]
+Miếu Danh Đăng Bộ | Name Shrine Registry
+Wardens | Wardens
+Nguyệt Tịnh Đường | Moon-Purified Hall
+Lôi Trụ Kiếm Tông | Thunder-Pillar Sword Sect
+Hội Thâu Mục | Eye-Takers Guild
+Liên Minh Hải Miễu | Sea-Shrine Alliance
+Liệt Viêm Tủy | Blaze-Marrow
+Lôi Tâm Chỉ | Thunder-Heart Digit
+Thủy Triều Mạch | Tide-Vein
+[HERETICAL_FORCES_FULL — VN | EN]
+[HERETICAL_TECHNIQUES_FULL — VN | EN]
+Thiểm Bì Hoán Hình | Skin-Shift Shedding
+Huyết Ổ Phân Tức | Blood-Nest Split-Breath
+Táng Cốt Viêm Lô | Bone-Crematory Furnace
+[HOLLOWNET_TAXONOMY — names | VN | EN]
+Phí Ngoại Biên | Outer Districts Fee
+Phí Đô Hội | Metropolis Fee
+Phí CGQ/Thủ phủ | Mechanica State/Capitals Fee
+[MAP_SPECIFIC_SKILLS — seed | VN | EN]
+Kiếm Vân Lôi Truy | Cloud-Sword Thunder Chase
+Triều Tức Thân Hành | Tide-Breath Body Step
+Sa Ẩn Kim Phách | Sand-Shroud Golden Phách
+Nguyệt Khuyết Chiếu Hồn | Crescent-Moon Soul Shine
+Mộc Tức Hấp Linh | Wood-Breath Spirit Draw
+Cơ Biểu Ứng Chấn | Mecha-Surface Resonance
+[Thang đo cấp độ Bí Cảnh — VN | EN]
+TS-1 | TS-1
+TS-2 | TS-2
+TS-3 | TS-3
+TS-5 | TS-5
+TS-6 | TS-6
+TS-7 | TS-7
+TS-8 | TS-8
+TS-9 | TS-9
+[HEAVENLY_GRADE_ARTS — VN | EN]
+Thiên Mệnh Lậu Khắc Ma Kinh | Fate-Leak Demon-Carving Canon
+[RIVALS_ANTAGONISTS — seed | VN | EN]
+[DEITY_MACRO_RANKS — VN | EN]
+Hạ Vị Thần | Lower Deity
+Trung Vị Thần | Middle Deity
+Thượng Vị Thần | High Deity
+Chí Cao | Supreme Deity
+Siêu Thoát | Transcendent
+[HOLY_SITES — VN | EN]
+Đài Liễu Bạch Minh | Lieu Bach Minh Terrace
+Liên Uyên Hắc Thủy | Black-Deep Confluence
+Song Nứt Đài | Twin-Rift Dais
+Kiếm Lâm Trì | Sword-Grove Pool
+Xương Rồng | Spineworks
+Mộc Viên Vắng Nhật | Sunless Wood Court
+Bến Sương Trì | Mist-Quay Basin
+Giếng Huyết Chuông | Blood-Bell Well
+Bậc Thiên Ấn | Heavenly-Seal Steps
+Động Bích Lâm | Beryl-Grove Grotto
+Tâm Băng Tức | Heart-Frost Pause
+Cồn Mê Linh | Melinh Shoal
+[QV_TIER_NAMES — VN | EN]
+-5 Thiên đạo ruồng bỏ | Heaven-Forsaken
+-4 Con cưng của vận rủi | Favored by Misfortune
+-3 Vận rủi | Ill-Fated
+-2 Xúi xẻo | Unlucky
+-1 Kém may mắn | Less Lucky
+0 Bình thường | Neutral
++1 Có chút may mắn | A Bit Lucky
++2 Hay gặp may mắn | Often Lucky
++3 Khí vận chiếu cố | Fortune's Notice
++4 Khí vận quấn thân | Fortune-Bound
++5 Con cưng khí vận | Fortune's Darling
++6 Thiên đạo chiếu cố | Heaven's Notice
+[DAOPSY_TERMS — VN | EN]
+Nguyên lý Ưu Tiên | Principle of Precedence
+Thiên Tính | Natural-Type
+Bản đồ Đạo↔Nhân cách | Dao–Psyche Map
+Điểm Tương Hợp (C) | Congruence Score (C)
+Hook κ | Hook kappa
+Chỉ số μ | Index mu
+Tư vấn đẳng thần (protocol) | Counsel Protocol
+Hồ sơ mẫu (archetype) | Archetype Case
+Sai pha Đạo (rủi ro) | Dao-Phase Risk
+Diff so với v1.0 | v1.0 Diff
+[DAO_ARCHETYPES — VN | EN]
+Âm/Ảnh | Shadow
+Huyết | Blood
+Sinh/Mộc | Life/Wood
+Thủy/Băng | Water/Ice
+Kim/Cơ | Metal/Mechanica
+Không/Thời | Void/Time
+Hồn | Soul
+Kiếm | Sword
+Luật | Law
+[REVIVAL_PROCESSES — VN | EN]
+Hồi sinh | Resurrection
+Tái sinh | Reincarnation
+Chuyển sinh | Transmigration
+[POWER_TITLES — VN | EN]
+Minh Đế | Underrealm Emperor
+Quỷ vương | Demon King
+Minh tướng | Underrealm General
+Quỷ hầu | Demon Marquis
+Thần Chết | Death Deity
+[POLICY_EDICT_TERMS — VN | EN]
+Ấn Trật Tự | Order Seal
+Tịnh Danh Quy | Name-Purification Rule
+[KIEM_THIEN_TERMS — VN | EN]
+Ảnh Kiếm | Shadow-Sword
+[ECONOMY_TOKENS_EXT — VN]
+TNT
+ThNT
+BTN
+ThN
+[DEITY_TITLES_ALIAS — VN | EN]
+Thần Hoàng | Lower Deity (alias of Hạ Vị Thần)
+Thần Tôn | Middle Deity (alias of Trung Vị Thần)
+Thần Chủ | High Deity (alias of Thượng Vị Thần)
+Thần Đế | Supreme Deity (alias of Chí Cao)
+
+
+=== Delta v5.16 — adds from Master v1.26 (bilingual) ===
+
+[WATCHER_EVENT_SYNONYMS]
+
+- Nhỏ → Tiểu Biến | Minor → Minor Variation
+
+- Vừa → Trung Cục | Moderate → Mid-Case
+
+- Lớn → Đại Loạn | Major → Grand Upheaval
+
+- Kiếp Vực → Cảnh Khu | Calamity‑Sector → Boundary Shock
+
+- Đa Kiếp Vực → Cảnh Trùng | Multi‑Calamity → Boundary Overlap
+
+- Đại Chu Kỳ → Cảnh Chu | Great Cycle → World Cycle
+
+
+[WATCHER_ESCALATION_TRIGGERS]
+
+- Minor→Moderate: DCLV > 45 for > 3 beats; law imprints visible (phase‑skewed shadows, concave water).
+
+- Moderate→Major: DCLV > 70; saint‑force “evaporation”; windlines bend; PDU > 10 appears.
+
+- Calamity‑tier+: leaks from constellations / divine runes; Heart‑World breach ⇒ forced push to the Rift Belt.
+
+
+[KLC_BIAS & FRAMES]
+
+- BiasIndex (KLC): 0–2 preset by map/time; B rises to 1 on ‘stamp‑collapse’ chains; default policy: apply Name‑Clearing (Tịnh Danh) and keep 49‑day audit.
+
+- Frames: ED‑Λ (Edict Lambda), NC‑OBS (Neutral‑Observation); map presets suggest THR‑Δ / NC‑Obsidian / Zephyr Matrix etc.
+
+
+[LEGAL/ADMIN SEALS] (bổ sung)
+
+- Ấn Chủ Quyền | Authority/Ownership Seal — registers domain custody & transfer.
+
+- Ấn Nhật Ký | Ledger/Log Seal — forensic trail for actions/events.
+
+(keep alongside: Ấn Trật Tự | Order Seal; Tịnh Danh Quy | Name‑Clearing Edict, …)
+
+
+[CHECKLIST — DCLV/ĐKTT field signs]
+
+- DCLV 30–40: heat/wind reversals, counter‑slope fog.
+
+- 45–55: metal groans; spider‑web cracks on glass.
+
+- 60–70: phase‑skew shadows; hair stands; water scales.
+
+- 70–80: sound cuts; colors desaturate; ‘thick’ air.
+
+- 85+: bright leyflow; cloudless lightning; objects lighten.
+
+- ĐKTT: contrail >15× height ⇒ Mach 10+; deep‑tone cloud resonance ⇒ Mach 15.
+
+
+[REGION CODES]
+
+- ALH — Atlas region IDs (e.g., ALH‑03 Thanh Vũ Châu). Keep as reference labels.
+Arclune — Term Lock (Name devices)
+• Nameglass = Danh Ảnh — handheld pane; tiers Silver/Gold/Diamond
+• Name Mirror = Danh Kính — retinal HUD/rune lens; hands‑free; locals wear; no tiers; not used for fees/quota.
+• Runeslate — administrative slate used with the Name Shrine (forms, stamps). Private transaction = no harvest.
+
+Usage triggers:
+• bulletin/fee/quota ⇒ Nameglass
+• overlay/HUD/adjusting rims ⇒ Name Mirror
+• admin/stamp/clerk ⇒ Runeslate
+
+
+=== PATCH v5.16 — Noetic Terminology (locked) ===
+• Hư Giới (EN: Noetic Realm): không gian thuần ý thức — không linh hồn, không thân xác — chỉ có Ấn Ý và luật mô phỏng.
+  EN: Noetic Realm — a pure‑intent field: no souls, no flesh; only noetic imprints rendered under system rules.
+  Note: HollowNet = nền tảng/vỏ UI vận hành giải đấu, vé, bảng điều; chạy "trên" Noetic Realm (không đồng nghĩa).
+• Noetic Field (VN: Trường Ý): lớp nền của Hư Giới; môi trường nhận‑kết xuất Ấn Ý và luật.
+• Ấn Ý (EN: noetic imprint): bản in/đại diện ý thức khi vào Hư Giới; không phải linh hồn hay thân xác.
+• HollowNet: nền tảng/stack dịch vụ của Hư Giới (quầy giải đấu, vé, UI, matchmaking). Map: Hư Giới ↔ Noetic Realm; HollowNet = platform.
+
+Bách Mạch Hoàn Chu | Hundred Meridians Full Circuit
+- Hư Giới | HollowNet
++ Hư Giới | Noetic Realm
+- HollowNet: nền tảng/stack dịch vụ của Hư Giới (…)
++ [Deprecated] HollowNet: removed from canon terminology. Use “Noetic Realm” + specific feature (e.g., Name Shrine broadcast).
+
+Hu Linh → Noetic Wraith
+
+Suong Linh → Mist Wraith (subtype of Noetic Wraith)
+
+Y-tu → ideoglyph (alt: idea-script)
+
+Vo Dai Dan Su → Civic Arena
+
+Yi Chao (quán) → Yi Congee (danh xưng địa điểm món)
+
+Bone-Eater Powder: odorless hot-liquid–soluble poison that targets bone; causes progressive dry-click joints → marrow “hollowing” → skeletal collapse. Full dose can reduce a Genesis Stage 5 skeleton to powder in ~2 hours; at Stage 1 often <1 hour.
+
+Thuc Cot Tan → Bone-Eater Powder
+
+Aliases: Bone-Eroding Powder (alt; dùng cho tài liệu/cảnh điều tra, ít dùng trong prose).
+
+Mechanics: odorless; dissolves in hot liquid; progressive joint dryness → marrow hollowing → skeletal collapse. Timings như mô tả trên.
+
+Tell-signs: dry thirst, joint clicks, strength feels “ahead of intent” but brittle under load.

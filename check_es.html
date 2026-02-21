@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Kiểm tra phiên bản ES - Arclune Lane</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; padding: 20px; background: #f4f4f9; }
+        .pass { color: #2ecc71; font-weight: bold; }
+        .fail { color: #e74c3c; font-weight: bold; }
+        .result-box { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h2 { border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h2>Kết quả kiểm tra ES trên Vivo Y04</h2>
+    <div id="results" class="result-box">Đang kiểm tra...</div>
+
+    <script>
+        const tests = [
+            { name: "ES6 (2015) - Arrow Functions", test: () => eval("() => {}") },
+            { name: "ES2020 - Optional Chaining (?.)", test: () => eval("window?.location?.href") },
+            { name: "ES2020 - Nullish Coalescing (??)", test: () => eval("null ?? 'ok'") },
+            { name: "ES2020 - BigInt", test: () => typeof 100n === 'bigint' },
+            { name: "ES2021 - replaceAll", test: () => "".replaceAll ? true : false },
+            { name: "ES2021 - Logical Assignment (||=)", test: () => { let a = 0; eval("a ||= 1"); return a === 1; } },
+            { name: "ES2022 - Array.at()", test: () => [1].at(0) === 1 },
+            { name: "ES2022 - Private Class Fields (#)", test: () => { try { eval("class A { #p = 1 }"); return true; } catch(e) { return false; } } },
+            { name: "ES2023 - Array toSorted()", test: () => [].toSorted ? true : false },
+            { name: "ES2024 - Object.groupBy()", test: () => Object.groupBy ? true : false },
+            { name: "ES2024 - Promise.withResolvers()", test: () => Promise.withResolvers ? true : false },
+            { name: "ES2025 (Dự kiến) - Set Methods (union)", test: () => new Set().union ? true : false }
+        ];
+
+        let html = "<ul>";
+        let maxES = "ES5 (Cổ đại)";
+
+        tests.forEach(t => {
+            try {
+                if (t.test()) {
+                    html += `<li>${t.name}: <span class="pass">HỖ TRỢ ✅</span></li>`;
+                    maxES = t.name.split(' - ')[0];
+                } else {
+                    html += `<li>${t.name}: <span class="fail">KHÔNG HỖ TRỢ ❌</span></li>`;
+                }
+            } catch (e) {
+                html += `<li>${t.name}: <span class="fail">KHÔNG HỖ TRỢ ❌</span></li>`;
+            }
+        });
+
+        html += "</ul>";
+        html += `<p><strong>==> Kết luận: Trình duyệt của ní đạt chuẩn tối thiểu: ${maxES}</strong></p>`;
+        document.getElementById('results').innerHTML = html;
+    </script>
+</body>
+</html>

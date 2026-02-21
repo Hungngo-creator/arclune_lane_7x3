@@ -1,0 +1,50 @@
+Arclune — Addendum: Vành Nứt Thế Giới • v3.1b
+(Trấn Vực Thảo → TRẤN VỰC ĐAN • Giới hạn theo kích cỡ khe)
+Generated: 2025-08-24T06:03:59.424142+00:00
+
+Mục tiêu bản vá
+• Sửa lại cơ chế đan kháng lực hút cho hợp lý: hiệu quả phụ thuộc **kích cỡ khe nứt** (Pull tại mép/độ sâu), không còn “tam phẩm = 700 g 5 giờ” mặc định.
+• Chốt tên đan: **TRẤN VỰC ĐAN** (luyện từ **Trấn Vực Thảo**).
+
+A) Phân hạng khe & Pull (tham chiếu v3)
+• Khe NHỎ (0,75–2,0 km): mép ≈ 20–40 g; sâu ≈ 60 g.
+• Khe VỪA (2,5–7,5 km): mép ≈ 50–90 g; sâu ≈ 150 g.
+• Khe LỚN (10–20 km): mép ≈ 120–200 g; sâu ≈ 300 g.
+• ĐOẠN ĐEN / miệng rách (25–50+ km): 300–700 g.
+
+B) Trấn Vực Đan — thang phẩm & giới hạn
+• Thời lượng ghi dưới đây là **tối đa trong vùng HALO** (2.7–3.0k km). Vào sâu hơn, thời lượng **giảm nhanh**.
+• Đan không “làm yếu Pull” mà **tạo vi-lá chắn** ổn định quanh cơ thể → vượt ngưỡng là **vỡ lá chắn** (không có “gồng thêm”).
+
+1) **Nhất phẩm** — 5 giờ ở **Khe NHỎ (mép ≤ 40 g)**. Khuyến nghị: **Khai Nguyên**.
+2) **Nhị phẩm** — 5 giờ ở **Khe NHỎ (sâu ≤ 60 g)**. Khuyến nghị: **Khai Nguyên cao / Trúc Cơ sơ**.
+3) **Tam phẩm** — 5 giờ ở **Khe VỪA (mép ≤ 90 g)**. Khuyến nghị: **Ngưng Đan**. (KHÔNG chịu nổi 120–150 g).
+4) **Tứ phẩm** — 5 giờ ở **Khe VỪA (sâu ≤ 150 g)**. Khuyến nghị: **Nguyên Anh**.
+5) **Ngũ phẩm** — 5 giờ ở **Khe LỚN (mép ≤ 200 g)**. Khuyến nghị: **Hóa Thần**.
+6) **Lục phẩm** — 5 giờ ở **Khe LỚN (sâu ≤ 300 g)**. Khuyến nghị: **Luyện Hư**.
+7) **Thất phẩm** — 4 giờ ở **ĐOẠN ĐEN (mép 300–400 g)**. Khuyến nghị: **Hợp Thể**.
+8) **Bát phẩm** — 3 giờ ở **ĐOẠN ĐEN (400–500 g)**. Khuyến nghị: **Đại Thừa**.
+9) **Cửu phẩm** — 2 giờ ở **ĐOẠN ĐEN (500–600 g)**. Khuyến nghị: **Thánh Nhân**.
+10) **Thập phẩm** — **5 giờ** ở **ĐOẠN ĐEN (tối đa 700 g)**. Khuyến nghị: **Bán Thần**.  (giữ yêu cầu cũ)
+
+C) Quy tắc dùng & giới hạn
+• **Không xếp chồng kháng lực**: uống 2 viên cùng cấp **không tăng ngưỡng g**, chỉ tăng **thời lượng** (cộng dồn **+50%** mỗi viên cùng phẩm; tối đa 2 viên). Ví dụ: 1 viên Tứ phẩm = 5h @150 g; 2 viên cách nhau ≥10p → ~7h30’ @150 g.
+• **Nếu vượt ngưỡng g**: đan **vỡ trong 1–3s** → người bị Pull kéo như thường. Không có vùng “cảnh báo” lâu.
+• **Độc tính tích lũy**: mỗi lần dùng tạo **mỏi tủy** (–STR nhẹ 24–48h). Dùng quá 2 viên/48h → **run cơ** và **choáng**.
+• **Tác dụng phụ**: la bàn/khí cụ gần cơ thể nhiễu nhẹ (0,5–1% lệch).
+
+D) Luyện đan & thu hái (tóm tắt)
+• Nguyên liệu chính: **Trấn Vực Thảo** quanh mép rãnh (có “tính thủ vực” ở **Cửu–Thập phẩm**). Phải **luyện thành đan** mới ổn định.
+• Bài lò: cần **nhân tố neo** (muối bazan vi kết tinh), **chất dẫn** (mỡ cá lưỡi đen), **mồi băng** (thạch thủy), **ấn khóa** (pháp ấn một nét).
+• Thu hoạch: ấn trấn pháp tắc + khiên cơ học; **không khai thác lõi** (lá chắn đan không hoạt động ở aether = 0).
+
+E) Thoại mẫu (đưa vào cảnh)
+• “**Trấn Vực Đan tam phẩm** chỉ giữ được **mép khe vừa**. Bước sâu thêm là **vỡ đan**.”
+• “Muốn đứng rìa **đoạn đen**, **uống bát–cửu**, tốt nhất **thập**. Không thì đừng diễn.”
+• “Đan không giảm hút—nó **bọc người một lớp**. **Vượt g** là **rơi**.”
+
+F) Đổi thuật ngữ (đồng bộ)
+• **Trấn Vực Thảo** (thảo dược) → luyện thành **Trấn Vực Đan** (đan dược).  
+• Tên dân gian giữ để thoại: **Định Trọng thảo/đan**, **Kháng Dẫn thảo/đan**, **Neo Vành**.
+
+— Hết v3.1b —

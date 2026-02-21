@@ -1,0 +1,9146 @@
+
+
+===== [PAGE 1 / 185] =====
+ARCLUNE — MASTER v1.25-RC (INLINE · Synergy) —
+LINKOUTS
+
+Ngày: 2025-08-13 · Trang này bổ sung liên kết tới CONSOL Công Pháp bản mới.
+
+• CONSOL CÔNG PHÁP (v1.2.2 + ID + Synergy):
+Arclune_Addendum_CongPhap_CONSOL_v1_2_2_ID_Synergy.pdf
+
+===== [PAGE 2 / 185] =====
+ARCLUNE — SYNERGY RULES (v1.0)
+
+Ngày: 2025-08-13 · Điểm S (0–2): 0=kỵ · 1=trung · 2=hợp. Áp công thức vào buff/cost/SE, bị trần theo phẩm.
+
+Thông số
+
+BuffMult
+
+CostMult
+
+SE_eff
+
+ẤnLoad (TT7+)
+
+DomainStableΔ
+
+A (Affinity)
+
+N (Nhiễu Luật)
+
+P (Policy vùng)
+
+Công thức
+
+1 + (0.08·S1 + 0.04·S2) · A
+
+(1.25 − 0.10·S1 − 0.05·S2) · N · P
+
+SE_base · (1.15 − 0.15·S1 − 0.07·S2) · N
+
+Base · (1 − 0.10·S1 − 0.05·S2) · N
+
+6%·S1 + 3%·S2
+
+Hạ=0.8 · Trung=1.0 · Thượng=1.2
+
+Thấp=1.00 · Trung=1.10 · Cao=1.25 · Rất cao=1.35
+
+Allowed=1.00 · Restricted=0.90 · Banned=0.60
+
+
+===== [PAGE 3 / 185] =====
+ARCLUNE — DANH KIẾM · Synergy Matrix (v1.0)
+
+Ngày: 2025-08-13 · Cột H/L là 3 map hợp/kỵ nhất; A/N/P Default lấy theo map đầu tiên trong H.
+
+ID
+
+Tên
+
+Path
+
+Top H (3)
+
+Top L (3)
+
+Default Map
+
+A
+
+N
+
+P
+
+BuffMult CostMult SE_eff
+
+AR.SWD.XII.13Họa Bì
+
+Huyết/Ảnh
+
+Huyết Quốc
+Huyết Quốc, Ám Quốc, Thần TíchQuang Thánh, Hải Miễu, Trường Sinh Lâm
+
+Trung Trung
+
+Allowed
+
+1.24
+
+1.045
+
+0.781
+
+AR.SWD.XII.14Tuyên Mệnh
+
+Quang/Luật
+
+Quang Thánh, Trung Châu, Thần Tích
+
+Ám Quốc, Sa Mạc, Huyết QuốcQuang Thánh
+
+ThượngThấp
+
+Allowed
+
+1.288
+
+0.95
+
+AR.SWD.XII.15Phong Tước
+
+Kiếm/Phong
+
+Ám Quốc, Sa Mạc, Hải Miễu
+
+Quang Thánh, Trường Sinh Lâm, Thần Tích
+
+Ám Quốc
+
+AR.SWD.XII.16Lẫm Lôi
+
+Thổ/Lôi
+
+Vành Nứt, Cơ Giới Quốc, Băng Tây Bắc
+
+Vành Nứt
+Trường Sinh Lâm, Huyết Quốc, Ám Quốc
+
+Backfill XII.1–XII.12 (Synergy)
+
+ID
+
+Tên
+
+Path
+
+Top H (3)
+
+Top L (3)
+
+Default Map
+
+AR.SWD.XII.1 Hồng Viêm Kiếm Hỏa/Dung
+
+Sa Mạc, Vành Nứt, Trung ChâuHải Miễu, Băng Tây Bắc, Trường Sinh Lâm
+
+Sa Mạc
+
+AR.SWD.XII.2 Thanh Vũ Kiếm Phong
+
+Ám Quốc, Hải Miễu, Sa Mạc
+
+Quang Thánh, Thần Tích, Trường Sinh Lâm
+
+Ám Quốc
+
+AR.SWD.XII.3 Băng Tâm Ngân Băng/Thủy
+
+Băng Tây Bắc, Hải Miễu, Trung Châu
+
+Sa Mạc, Huyết Quốc, Vành NứtBăng Tây Bắc
+
+AR.SWD.XII.4 Lôi Mệnh Nhẫn Lôi
+
+Vành Nứt, Cơ Giới Quốc, Băng Tây Bắc
+
+Trường Sinh Lâm, Quang Thánh, Huyết Quốc
+
+Vành Nứt
+
+Hạ
+
+Hạ
+
+A
+
+Hạ
+
+Hạ
+
+Hạ
+
+Hạ
+
+Cao
+
+Allowed
+
+1.192
+
+Rất cao
+
+Restricted 1.192
+
+1.188
+
+1.154
+
+N
+
+P
+
+BuffMult CostMult SE_eff
+
+Trung
+
+Allowed
+
+1.16
+
+1.1
+
+Cao
+
+Allowed
+
+1.128
+
+Trung
+
+Allowed
+
+1.192
+
+Rất cao
+
+Restricted 1.128
+
+1.312
+
+1.045
+
+1.276
+
+AR.SWD.XII.5 Sinh Mục Kiếm Linh/Sinh
+
+Trường Sinh Lâm, Quang Thánh, Trung Châu
+
+Sa Mạc, Vành Nứt, Ám Quốc
+
+Trường Sinh Lâm ThượngThấp
+
+Allowed
+
+1.288
+
+0.95
+
+AR.SWD.XII.6 Phối Kim Kiếm Kim/Cơ
+
+Cơ Giới Quốc, Vành Nứt, Trung Châu
+
+Ám Quốc, Thần Tích, Trường Sinh Lâm
+
+Cơ Giới Quốc
+
+Trung Trung
+
+Allowed
+
+1.24
+
+1.045
+
+0.781
+
+AR.SWD.XII.7 Tịnh Quang KiếmQuang
+
+Quang Thánh, Trung Châu, Thần Tích
+
+Ám Quốc, Huyết Quốc, Vành NứtQuang Thánh
+
+ThượngThấp
+
+Allowed
+
+1.192
+
+1.05
+
+AR.SWD.XII.8 Huyết Vũ
+
+Huyết/Âm
+
+Huyết Quốc, Ám Quốc, Thần TíchQuang Thánh, Hải Miễu, Trung ChâuHuyết Quốc
+
+Trung Trung
+
+Allowed
+
+1.24
+
+AR.SWD.XII.9 Không Vận
+
+Không/Thời
+
+Vành Nứt, Trung Châu, Băng Tây Bắc
+
+Quang Thánh, Huyết Quốc, Trường Sinh Lâm
+
+Vành Nứt
+
+AR.SWD.XII.10Mị Ảnh
+
+Quang/Ảnh
+
+Ám Quốc, Trung Châu, Thần TíchQuang Thánh, Vành Nứt, Sa MạcÁm Quốc
+
+AR.SWD.XII.11Ảnh Song
+
+Hư/Thực
+
+Ám Quốc
+Ám Quốc, Vành Nứt, Thần TíchQuang Thánh, Trung Châu, Cơ Giới Quốc
+
+Hạ
+
+Hạ
+
+Hạ
+
+Rất cao
+
+Restricted 1.192
+
+Cao
+
+Cao
+
+Allowed
+
+1.192
+
+Allowed
+
+1.192
+
+AR.SWD.XII.12Hồng Lệ
+
+Cảm/Tình
+
+Trung Châu, Trường Sinh Lâm, Quang Thánh
+
+Ám Quốc, Vành Nứt, Sa Mạc
+
+Trung Châu
+
+Trung Trung
+
+Allowed
+
+1.24
+
+0.71
+
+0.887
+
+0.958
+
+0.858
+
+1.062
+
+0.781
+
+1.147
+
+0.71
+
+0.85
+
+0.781
+
+0.958
+
+0.887
+
+0.887
+
+0.781
+
+1.045
+
+1.154
+
+1.188
+
+1.188
+
+1.045
+
+
+===== [PAGE 4 / 185] =====
+ID
+
+Tên
+
+Path
+
+Top H (3)
+
+Top L (3)
+
+Default Map
+
+A
+
+N
+
+P
+
+BuffMult CostMult SE_eff
+
+ARCLUNE — CÔNG PHÁP · Synergy Patch (ALL) · v1.1
+
+Ngày: 2025-08-13 · Bao phủ toàn bộ ID trong CONSOL + ID.
+
+Thủy/Mộc
+
+Nguyên Chu Đại Hồi — Hải Đồ
+
+CP-04-THUY-MOC-NGUYEN_CHU_DAI_HOI
+
+Hải Miễu, Trường Sinh Lâm, Trung Châu
+
+Sa Mạc, Vành Nứt, Huyết Quốc Hải Miễu
+
+ThượngTrung
+
+Allowed
+
+1.288
+
+CP-05-KIM-THO-THAP_NHI_TRU_TUC
+
+Thập Nhị Trụ Tức — Hành Khí
+
+Kim/Thổ
+
+Cơ Giới Quốc, Trung Châu, Vành NứtHải Miễu, Trường Sinh Lâm, Ám Quốc
+
+Cơ Giới Quốc
+
+Trung Trung
+
+Allowed
+
+1.24
+
+CP-06-KIEM-KIEM_HUYEN_LUU
+
+Kiếm Huyền Lưu
+
+Kiếm/Phong
+
+Ám Quốc, Sa Mạc, Hải Miễu
+
+Quang Thánh, Trường Sinh Lâm, Thần Tích
+
+Ám Quốc
+
+Hạ
+
+Cao
+
+Allowed
+
+1.192
+
+CP-06-HUYET-HUYET_SINH_PHU_THE
+
+Huyết Sinh Phù Thể
+
+Huyết/Sinh
+
+Huyết Quốc, Ám Quốc, Trường Sinh Lâm
+
+Quang Thánh, Hải Miễu, Vành NứtHuyết Quốc
+
+Trung Trung
+
+Allowed
+
+1.24
+
+CP-07-LUAT-LUAT_TRI_TAM_KET
+
+Luật Trì Tâm Kết
+
+Luật
+
+Quang Thánh, Trung Châu, Thần Tích
+
+Ám Quốc, Huyết Quốc, Sa Mạc Quang Thánh
+
+ThượngThấp
+
+Allowed
+
+1.192
+
+CP-07-MOC-MOC_SINH_CHAN_THAI
+
+Mộc Sinh Chân Thai
+
+Mộc/Sinh
+
+Trường Sinh Lâm, Trung Châu, Hải Miễu
+
+Sa Mạc, Vành Nứt, Ám Quốc
+
+Trường Sinh Lâm ThượngThấp
+
+Allowed
+
+1.288
+
+BP-07-QUANG-HOA-LAM_THI_BAO_TAM_AN
+
+Lâm thị — Bạo Tâm Ấn Quang/Hỏa
+
+Quang Thánh, Trung Châu, Sa MạcÁm Quốc, Huyết Quốc, Thần TíchQuang Thánh
+
+ThượngThấp
+
+Allowed
+
+1.288
+
+BP-08-HON-LUAT-TO_THI_CAY_LINH_HACH
+
+Tô thị — Cấy Linh Hạch Hồn/Luật
+
+Trung Châu, Thần Tích, Quang Thánh
+
+Ám Quốc, Huyết Quốc, Sa Mạc Trung Châu
+
+Trung Trung
+
+Allowed
+
+1.24
+
+BP-06-ANH-THO-PHONG_LANG_GIAI_MO
+
+Phong Lăng Giải Mộ
+
+Ảnh/Thổ
+
+Ám Quốc, Trung Châu, Thần TíchQuang Thánh, Hải Miễu, Trường Sinh Lâm
+
+Ám Quốc
+
+BP-05-ANH-SUONG_ANH_TANG_HINH
+
+Sương Ảnh Tàng Hình Ảnh
+
+Ám Quốc, Sa Mạc, Trung Châu Quang Thánh, Thần Tích, Trường Sinh Lâm
+
+Ám Quốc
+
+Hạ
+
+Hạ
+
+Cao
+
+Cao
+
+Allowed
+
+1.192
+
+Allowed
+
+1.128
+
+BP-06-HON-CHIEN_Y_DOAN_NIEN
+
+Chiến Ý Đoạn Niệm
+
+Hồn
+
+Thần Tích
+Thần Tích, Trung Châu, Ám QuốcQuang Thánh, Hải Miễu, Trường Sinh Lâm
+
+Trung Cao
+
+Allowed
+
+1.16
+
+TP-06-ANH-PHONG-NGUYET_ANH_TAM_THIEM
+
+Nguyệt Ảnh Tam ThiểmẢnh/Phong
+
+Ám Quốc, Sa Mạc, Hải Miễu
+
+Quang Thánh, Thần Tích, Trường Sinh Lâm
+
+Ám Quốc
+
+Hạ
+
+Cao
+
+Allowed
+
+1.192
+
+TP-07-QUANG-LUAT-TINH_DO_DAN_BO
+
+Tinh Đồ Dẫn Bộ
+
+Quang/Luật
+
+Quang Thánh, Trung Châu, Thần Tích
+
+Ám Quốc, Huyết Quốc, Sa Mạc Quang Thánh
+
+ThượngThấp
+
+Allowed
+
+1.288
+
+0.95
+
+Hải Miễu Lăng Ba
+TP-05-THUY-PHONG-HAI_MIEU_LANG_BA
+
+Thủy/Phong
+
+Hải Miễu, Băng Tây Bắc, Trung Châu
+
+Sa Mạc, Vành Nứt, Huyết Quốc Hải Miễu
+
+ThượngTrung
+
+Allowed
+
+1.288
+
+1.045
+
+0.781
+
+TP-05-MOC-MOC_CAN_XUYEN_THAN
+
+Mộc Căn Xuyên Thân Mộc
+
+Trường Sinh Lâm, Trung Châu, Hải Miễu
+
+Sa Mạc, Vành Nứt, Ám Quốc
+
+Trường Sinh Lâm ThượngThấp
+
+Allowed
+
+1.192
+
+1.05
+
+PT-06-HON-ANH-LINH_ANH_PHAN_THAN
+
+Linh Ảnh Phân Thân
+
+Hồn/Ảnh
+
+Ám Quốc, Thần Tích, Trung ChâuQuang Thánh, Trường Sinh Lâm, Hải Miễu
+
+Ám Quốc
+
+Hạ
+
+Cao
+
+Allowed
+
+1.192
+
+PT-08-HUYET-MOC-HUYET_NHUC_HOA_THAN
+
+Huyết Nhục Hoa Thân Huyết/Mộc
+
+Huyết Quốc, Trường Sinh Lâm, Ám Quốc
+
+Quang Thánh, Hải Miễu, Vành NứtHuyết Quốc
+
+Trung Trung
+
+Allowed
+
+1.24
+
+PT-07-LUAT-AN_THAN_KETẤn Thân Kết
+
+CAM-09-LUAT-LUAN_PHA_HOI_YEN
+
+Luân Phá Hồi Yên
+
+Luật
+
+Luật
+
+Quang Thánh, Trung Châu, Thần Tích
+
+Ám Quốc, Huyết Quốc, Sa Mạc Quang Thánh
+
+ThượngThấp
+
+Allowed
+
+1.192
+
+Quang Thánh, Trung Châu, Thần Tích
+
+Ám Quốc, Huyết Quốc, Sa Mạc Quang Thánh
+
+ThượngThấp
+
+Allowed
+
+1.192
+
+CAM-09-HON-ANH-TE_ANH_DOAT_COT
+
+Tế Ảnh Đoạt Cốt
+
+Hồn/Ảnh
+
+Ám Quốc, Thần Tích, Trung ChâuQuang Thánh, Trường Sinh Lâm, Hải Miễu
+
+Ám Quốc
+
+Hạ
+
+Cao
+
+Allowed
+
+1.192
+
+CAM-08-HUYET-HOA-HUYET_HOA_THANH_MAC
+
+Huyết Hỏa Thành Mạc Huyết/Hỏa
+
+Huyết Quốc, Sa Mạc, Trung ChâuQuang Thánh, Hải Miễu, Trường Sinh Lâm
+
+Huyết Quốc
+
+Trung Trung
+
+Allowed
+
+CAM-08-HON-QUANG-DINH_HON_QUY
+
+Định Hồn Quy
+
+Hồn/Quang
+
+Thần Tích, Quang Thánh, Trung Châu
+
+Ám Quốc, Huyết Quốc, Sa Mạc Thần Tích
+
+Trung Cao
+
+Allowed
+
+1.24
+
+1.24
+
+CAM-10-LUAT-THIEN_BIEN_PHAN_CHUYEN
+
+Thiên Biên Phản ChuyểnLuật
+
+Quang Thánh, Trung Châu, Thần Tích
+
+Ám Quốc, Huyết Quốc, Sa Mạc Quang Thánh
+
+ThượngThấp
+
+Allowed
+
+1.192
+
+1.05
+
+1.045
+
+1.045
+
+1.188
+
+1.045
+
+1.05
+
+0.95
+
+0.95
+
+1.045
+
+1.188
+
+1.312
+
+1.312
+
+1.188
+
+1.188
+
+1.045
+
+1.05
+
+1.05
+
+1.188
+
+1.045
+
+1.188
+
+0.781
+
+0.781
+
+0.887
+
+0.781
+
+0.85
+
+0.71
+
+0.71
+
+0.781
+
+0.887
+
+1.062
+
+1.062
+
+0.887
+
+0.71
+
+0.85
+
+0.887
+
+0.781
+
+0.85
+
+0.85
+
+0.887
+
+0.781
+
+0.887
+
+0.85
+
+
+===== [PAGE 5 / 185] =====
+ARCLUNE — MASTER v1.25-RC (INLINE)
+
+Ngày: 2025-08-13
+
+• Bản này đặt NỘI DUNG CHUẨN (normative) ngay trong thân: Sự kiện 6 cấp · Map Rules ·
+Danh Kiếm 16+ · Tà Đạo (policy).
+
+• Master v1.24.2 được chuyển xuống PHỤ LỤC (Annex) để tham chiếu đầy đủ.
+
+===== [PAGE 6 / 185] =====
+F — Thang Sự Kiện 6 Cấp (Chuẩn)
+
+Ngày: 2025-08-13
+
+• Nhỏ (≈100 năm): không cho TT7+ trực chiến; trần Lĩnh Vực hạn chế.
+
+• Vừa (≥1.500 năm): TT7 trực chiến tối đa; TT8–9 chỉ bố cục/hoá thân; không để Bán Thần
+can dự trực tiếp.
+
+• Lớn (≥30.000 năm): xuất hiện Bán Thần; can thiệp bị kiểm soát bởi Ấn Trật Tự & luật vùng.
+
+• Kiếp Vực (≥400.000 năm): quy mô vực; điều phối Minh Đế/Địa Thần; thiên tai pháp tắc.
+
+• Đa Kiếp Vực (≥5.000.000 năm): liên vực; trần luật cao; chỉ thị của Thiên Đạo/Minh Đế.
+
+• Đại Chu Kỳ (≥80.000.000 năm): chu kỳ siêu cấp; luật lách thần lực theo mức; reset cục bộ.
+
+
+===== [PAGE 7 / 185] =====
+ARCLUNE — MAP RULES (v1.0)
+
+Ngày: 2025-08-13 · Quy tắc đụng map: Affinity Aether · Nhiễu Luật · Path ưu tiên · Khắc chế · Ghi chú
+
+ID
+
+Map
+
+Affinity AetherNhiễu Luật Path ưu tiên (2–3)
+
+Khắc chế gợi ý
+
+Ghi chú
+
+MAP-01-TRUNG_CHAUTrung Châu
+
+Trung
+
+MAP-02-LOI_CHAU Lỗi Châu
+
+Hạ
+
+Trung
+
+Cao
+
+Luật · Quang · Mộc
+
+Ảnh/Ám (dò) → Quang/LuậtĐô hội; luật kiểm soát chặt; địa lợi ổn định
+
+Ảnh · Không · Lôi
+
+Luật (ổn định ấn)
+
+Đới rạn nứt; nhiễu mạnh, dễ lệch pha
+
+MAP-03-HAI_MIEU Liên Minh Hải MiễuThượng
+
+Thấp–Trung Thủy · Băng · Hải Đồ
+
+Hỏa (kỵ) → thủy khắc
+
+Ẩm ướt; aether đọng dạng sương
+
+MAP-04-SA_MAC_VO_TACSa Mạc Vô Tắc
+
+Hạ
+
+Trung
+
+Ám · Thổ · Ảnh
+
+Thủy · Mộc
+
+Mạch rỗng; khó ngưng tụ sương aether
+
+MAP-05-TRUONG_SINH_LAM
+
+Trường Sinh Lâm Thượng
+
+Thấp–Trung Mộc · Sinh · Quang
+
+Hỏa (thận trọng)
+
+Mộc căn thuận; hồi phục mạnh
+
+MAP-06-VANH_NUT_THE_GIOI
+
+Vành Nứt Thế GiớiHạ
+
+Rất cao
+
+Không · Thời · Ảnh
+
+Luật (giữ an toàn)
+
+Biên vực; hay mở cổng; lệch pha
+
+MAP-07-QUANG_THANH_DAO
+
+Quang Thánh ĐảoThượng
+
+Thấp
+
+Quang · Luật · Huyễn
+
+Ám/Ảnh
+
+Luật gắt; cấm tà pháp sinh học
+
+MAP-08-AM_QUOC Ám Quốc
+
+Hạ
+
+Trung–Cao Ảnh · Ám · Hồn
+
+Quang · Luật
+
+Ẩn tuyến dày; khó dò bằng mắt phàm
+
+MAP-09-CO_GIOI_QUOCCơ Giới Quốc
+
+Trung
+
+Trung
+
+Kim · Hỏa · Lôi
+
+Ám/Độc (ăn mòn)
+
+Kim–hỏa dồi dào; module hoá
+
+MAP-10-HUYET_QUOCHuyết Quốc
+
+Trung
+
+Trung–Cao Huyết · Sinh · Hồn
+
+Luật Huyết (quota) · QuangDễ lệch oán; pháp chế lỏng
+
+MAP-11-THAN_TICH_LUU_ANH
+
+Thần Tích Lưu ẢnhTrung
+
+Cao/thất thườngHồn · Ảnh · Luật
+
+Quang · Danh
+
+Tích Ấn gây nhiễu lịch sử
+
+MAP-12-BANG_TAY_BACBăng Tây Bắc
+
+Hạ
+
+Thấp–Trung Băng · Thủy · Quang
+
+Hỏa · Lôi
+
+Lạnh; tuần hoàn chậm
+
+
+===== [PAGE 8 / 185] =====
+ARCLUNE — MASTER PATCH: DANH KIẾM CODEX (Schema +
+Statblocks XII.13–XII.16) · v1.17F4
+
+Ngày: 2025-08-13 · Chuẩn hoá schema + chính sách sở hữu · Sẵn sàng nhập Master v1.25-RC
+
+0) Schema & Tags (chuẩn nhập Master)
+
+Trường
+
+Trường
+
+ID
+
+Tên
+
+Path
+
+Mô tả
+
+Ý nghĩa
+
+AR.SWD.XII.<n> (ví dụ: XII.13 = Họa Bì)
+
+Danh xưng kiếm + biệt hiệu nếu có
+
+Tổ hợp nguyên lý (vd: Huyết/Ảnh) + Ấn Luật ràng buộc
+
+Ấn/Chiêu mẫu
+
+3 chiêu/ấn đại diện của kiếm
+
+Ngưỡng Danh
+
+Cửa thức tỉnh theo cấp Danh (Thôn/Vực/Quốc/Châu/Thiên) + điều kiện phụ
+
+Khí linh
+
+Tính khí – xu hướng, rủi ro phệ chủ
+
+Sở hữu hợp pháp
+
+Yêu cầu Tịnh Danh/giấy phép/niêm phong
+
+Map synergy
+
+Vùng hợp (3) + khắc chế gợi ý
+
+1) Stat-blocks
+
+ID
+
+Tên
+
+Path/Ấn
+
+Ấn/Chiêu mẫu
+
+Ngưỡng Danh
+
+Khí linh
+
+Sở hữu hợp pháp
+
+Map synergy
+
+AR.SWD.XII.13 Họa Bì
+
+AR.SWD.XII.14 Tuyên Mệnh
+
+AR.SWD.XII.15 Phong Tước
+
+AR.SWD.XII.16 Lẫm Lôi
+
+Huyết Quốc · Ám Quốc · Thần Tích Lưu Ảnh; khắc: Quang/Luật
+
+Quang Thánh Đảo · Trung Châu · Thần Tích; khắc: Ảnh/Ám
+
+Vành Nứt · Cơ Giới Quốc · Băng Tây Bắc; khắc: Mộc/Luật
+
+Huyết/Ảnh — Luật Danh+Hiến
+
+Khảm Bì · Danh Phệ · Hấp OánVùng/Quốc + 49 đêm dưới Uyên Ấn
+
+Đòi 'lễ nhuận'; rủi ro phệ chủ cao nếu Danh_chủ < k×Danh_kiếm
+
+Tịnh Danh Quy bắt buộc; nếu không → tịch thu
+
+Quang/Luật — Ấn Chủ Quyền+Nhật Ký
+
+Tuyên Lệnh · Phản Tội · Định Ấn Nhật Ký
+
+Danh Công Lý cấp Đô + thề ấn của chủ
+
+Nghiêm; lạm quyền → tự 'treo ấn'
+
+Ký Ấn Chủ Quyền & Nhật Ký; vi phạm → niêm phong
+
+Kiếm/Phong — Ấn Trật Tự Kiếm + Ấn Dấu Khí
+
+Triệt Ảnh Tam Thiểm · Phong Tước · Hành Ảnh Tuyến
+
+Truyền tụng tốc/ám sát cấp Vực + 3 win trước TT
+
+Ham tốc; dễ 'tẩu phong'
+
+Tịnh Danh; cấm trong nội thànhÁm Quốc · Sa Mạc Vô Tắc · Hải Miễu; khắc: Quang/Luật
+
+Thổ/Lôi — Ấn Trấn Địa + Ấn Cảnh Giới Nứt
+
+Trấn Sấm · Địa Dao · Lôi Tâm ThệChiến tích giữ đới nứt cấp Châu + thệ ấn 'không sụp bản đồ'
+
+Bảo thủ; lạm sát đô thị → 'hạn lưu'
+
+Chứng chỉ Ấn Trấn Địa; gây sập → truy tố Kiếp Vực
+
+2) Policy & Ownership (chốt)
+
+Chủ đề
+
+Quy tắc
+
+Khí Linh & Thăng cấp
+
+Khí Linh không đăng thần; chỉ đạt 'Linh Vực đặc thù'; kiểm toán Ấn theo chu kỳ.
+
+Sở hữu hợp pháp
+
+Danh khí phải qua Tịnh Danh; thiếu Tịnh Danh → tài sản công & niêm phong.
+
+Log & Trách nhiệm
+
+Một số kiếm (vd: Tuyên Mệnh) yêu cầu Ấn Nhật Ký; không log → kiếm tự giảm trợ lực.
+
+3) Map Synergy Matrix (H/M/L)
+
+Kiếm
+
+Họa Bì
+
+Tuyên Mệnh
+
+Phong Tước
+
+Lẫm Lôi
+
+M
+
+H
+
+M
+
+M
+
+Trung ChâuLỗi Châu Hải Miễu
+
+Sa Mạc
+
+Trường Sinh LâmVành Nứt Quang ThánhÁm Quốc Cơ Giới QuốcHuyết QuốcThần Tích Băng Tây Bắc
+
+L
+
+M
+
+M
+
+H
+
+L
+
+M
+
+H
+
+M
+
+M
+
+L
+
+H
+
+M
+
+L
+
+M
+
+M
+
+M
+
+M
+
+M
+
+M
+
+H
+
+L
+
+H
+
+L
+
+M
+
+H
+
+L
+
+H
+
+M
+
+M
+
+M
+
+M
+
+H
+
+H
+
+L
+
+M
+
+M
+
+H
+
+H
+
+M
+
+M
+
+L
+
+M
+
+M
+
+H
+
+4) Hướng nhập Master
+
+• Thêm mục XII.13–XII.16 theo đúng ID trên; đổi tiêu đề chương thành 'Danh Kiếm (16+)'.
+• Gắn schema này làm mẫu cho toàn bộ danh kiếm còn lại (XII.1–XII.12).
+• Cross-link sang Addendum Tà Đạo (Họa Bì) và Map Rules khi cần.
+
+
+===== [PAGE 9 / 185] =====
+ARCLUNE — MASTER PATCH: Danh Kiếm (Backfill Stat-blocks
+XII.1–XII.12) · v1.17F5
+
+Ngày: 2025-08-13 · Theo schema XII.13–XII.16 đã chốt; giữ nguyên lore gốc; không thay mục tiêu bản chất.
+
+ID
+
+Tên
+
+Path/Ấn
+
+Ấn/Chiêu mẫu
+
+Ngưỡng Danh
+
+Khí linh
+
+Sở hữu hợp pháp
+
+Map synergy
+
+'Quốc danh' + dời mạch hỏa một lần
+
+Hồng Viêm Kiếm Hỏa/Dung — Ấn Nhiệt Quy + Ấn Lưu Thạch
+
+Viêm Trệ · Hỏa Lưu · Trục Dung Nham
+
+Nóng nảy; ưu thế phá công trình; dễ 'ăn mòn' pháp thân chủ
+
+Giấy phép nhiệt lực đô thị; cấm trong nội thành đông
+
+AR.SWD.XII.1
+
+AR.SWD.XII.2
+
+AR.SWD.XII.3
+
+AR.SWD.XII.4
+
+AR.SWD.XII.5
+
+AR.SWD.XII.6
+
+AR.SWD.XII.7
+
+AR.SWD.XII.8
+
+Huyết Vũ
+
+AR.SWD.XII.9
+
+Không Vận
+
+AR.SWD.XII.10 Mị Ảnh
+
+AR.SWD.XII.11
+
+Ảnh Song
+
+Thanh Vũ Kiếm Phong — Ấn Dấu Khí + Ấn Tuyến Gió
+
+Phong Tán · Tước Lưu · Xoáy CắtDanh tốc cấp Vực + 3 đường 'sạch' liên tục
+
+Tính táo; dễ xúi chủ mạo hiểmTịnh Danh; hạn chế trong hành lang hàng không
+
+Băng Tâm Ngân Băng/Thủy — Ấn Tĩnh Kết + Ấn Hàn Tuyến
+
+Hàn Tuyến · Băng Giám · Tĩnh Kiết
+
+Khi 'trà đứng im' (ngưng phong) + Danh cấp Vực
+
+Trầm tĩnh; ghét nóng; ưa kiểm soát nhịp
+
+Không giới hạn, nhưng phải khai báo 'đông cứng' công trình
+
+Lôi Mệnh Nhẫn Lôi — Ấn Dẫn Kích + Ấn Lôi Liên
+
+Phá Vân · Lôi Liên · Dẫn Kích Đếm sét 100 đêm chính xác + thệ ấn 'không giết vô minh'
+
+Nóng giận công bằng; đánh sai luật bị trừng
+
+Yêu cầu 'Ấn Hạn Dẫn'; xả lôi ngoài khu dân
+
+Sinh Mục Kiếm Linh/Sinh — Ấn Sinh Đồng + Ấn Dưỡng
+
+Sinh Đồng · Quang Mộc · Sinh NhaHồi sinh 'rừng câm' + cộng đồng chứng giám
+
+Nhân từ; phạt chủ giết bừa (giảm lực)
+
+Giấy phép 'can thiệp sinh thái'; cấm tế bừa
+
+Phối Kim Kiếm Kim/Cơ — Ấn Chuẩn Cốt + Ấn Cơ Quang
+
+Chuẩn Cốt · Cơ Quang · Xích RăngCơ giới tu đạt tri-hải + nâng cấp chuẩn
+
+Lạnh; ưu hiệu suất; không thích 'dơ'
+
+Đăng ký module; cấm hack kết cấu đô thị
+
+Tịnh Quang KiếmQuang — Ấn Tán Bóng + Ấn Tín Liệm
+
+Tán Bóng · Quang Đoạn · Tín LiệmLập đền 'chiếu thật' + cộng đồng ghi danh
+
+Thanh khiết; ghét nói dối; phạt chủ 'uốn lời'
+
+Tịnh Danh + đăng ký đền; ưu đãi pháp chế
+
+Huyết/Âm — Ấn Ngưng Tế + Ấn Vô Tế
+
+Bổng Huyết · Ngưng Tế · Vô Tế'Mưa đỏ dừng trước mái hiên' + danh sợ hãi cấp Vực
+
+Ảm khắc; dễ lệch oán; rủi ro phệ chủ vừa
+
+Tịnh Danh nghiêm; quota tế hữu cơ; cấm nội thành
+
+Không/Thời — Ấn Hạn Độ + Ấn Dãn Nén
+
+Hạn Độ · Ảnh Trượt · Dãn NénGiữ 'không rơi' 3 ngày + giám sát
+
+Tỉnh; ghét hỗn loạn; phản phệ khi lạm dụng không-thời
+
+Giấy phép 'không-thời'; cấm trong khu dân quá đông
+
+Quang/Ảnh — Ấn Phản Quang + Ấn Ảnh Bội
+
+Ảnh Bội · Ảnh Hồi · Phản QuangKhắc 'cạo râu không xước' (ẩn ngữ) + Danh cấp Vực
+
+Linh hoạt; ghét ồn; ưu tác chiến đô thị
+
+Tịnh Danh + khu vực dùng được; không áp dụng trong xét xử
+
+Hư/Thực — Ấn Đổi Cực + Ấn Thực Ảnh
+
+Phản Biên · Thực Ảnh · Đổi CựcGiữ hai pha hư–thực 7 nhịp + chứng giám
+
+Tức giận khi dối trá; phản đòn lộn pha
+
+Giấy phép ảo–thực; cấm 'đánh tráo nhân chứng'
+
+AR.SWD.XII.12 Hồng Lệ
+
+Cảm/Tình — Ấn Hóa Bi + Ấn Ái Khúc
+
+Thư Bi · Hóa Bi · Ái Khúc
+
+1000 người kể cùng một truyện + hợp tấu
+
+Nặng cảm; dễ 'tràn danh' nếu khai thác bi kịch
+
+Tịnh Danh; cấm lạm dụng 'dẫn cảm' đám đông
+
+Sa Mạc · Vành Nứt · Trung Châu (công trình); khắc: Thủy/Băng
+
+Ám Quốc · Hải Miễu · Sa Mạc; khắc: Luật/Quang
+
+Băng Tây Bắc · Hải Miễu · Trung Châu (lạnh); khắc: Hỏa/Lôi
+
+Vành Nứt · Cơ Giới Quốc · Băng Tây Bắc; khắc: Mộc/Thổ
+
+Trường Sinh Lâm · Quang Thánh · Trung Châu; khắc: Độc/Hỏa
+
+Cơ Giới Quốc · Vành Nứt · Trung Châu; khắc: Ám/Độc
+
+Quang Thánh Đảo · Trung Châu · Thần Tích; khắc: Ám/Ảnh
+
+Huyết Quốc · Ám Quốc · Thần Tích; khắc: Quang/Luật
+
+Vành Nứt · Trung Châu · Băng Tây Bắc; khắc: Luật (khóa)
+
+Ám Quốc · Trung Châu · Thần Tích; khắc: Luật/Quang mạnh
+
+Ám Quốc · Vành Nứt · Thần Tích; khắc: Quang/Luật
+
+Trung Châu · Trường Sinh Lâm · Quang Thánh; khắc: Hồn/Luật
+
+
+===== [PAGE 10 / 185] =====
+ARCLUNE — MASTER PATCH: DANH KIẾM CODEX EXPANSION
+(v1.17F3)
+
+Ngày: 2025-08-13 · Bổ sung 3 Danh Kiếm mới (XII.14–XII.16) · Theo khung 'Danh = thiện/ác/uy
+truyền tụng' và nguyên tắc 'Khí Linh không đăng thần'.
+
+XII.14 — **Tuyên Mệnh** — Quang/Luật (ràng Luật Danh + Ấn Chủ Quyền)
+
+Ấn/Chiêu mẫu: Tuyên Lệnh (phát 'chỉ dụ' trói phạm trong Lĩnh Vực), Phản Tội (dội sát thương
+phạm luật theo mức vi phạm), Định Ấn Nhật Ký (ghi log ấn bắt buộc).
+Trú kiếm/địa điểm: từng làm 'kiếm pháp quan' tại Quang Thánh Đảo; hiện lưu lạc Trung Châu.
+Ngưỡng 'danh lực' thức tỉnh: cần 'Danh công lý' cấp Đô (thành) + lời thề ấn của chủ kế thừa.
+Khí linh: nghiêm khắc, ưu ái chủ giữ log ấn đầy đủ; nếu chủ lạm quyền → kiếm tự 'treo ấn', giảm
+trợ lực.
+Sở hữu hợp pháp: phải ký 'Ấn Chủ Quyền' & 'Ấn Nhật Ký Giao Kết'. Vi phạm → bị niêm phong và
+giao luật viện.
+Tương hợp map: Quang Thánh Đảo, Trung Châu, Thần Tích Lưu Ảnh (xét xử án cổ). Khắc chế:
+Ảnh/Ám (đánh lén), nhưng bị Luật khóa nếu lộ danh.
+
+XII.15 — **Phong Tước** — Kiếm/Phong (ràng Ấn Trật Tự Kiếm + Ấn Dấu Khí)
+
+Ấn/Chiêu mẫu: Triệt Ảnh Tam Thiểm (đoạn bóng ba lần), Phong Tước (tước tốc đối phương
+trong bán kính nhỏ), Hành Ảnh Tuyến (đi rìa Lĩnh Vực địch).
+Trú kiếm/địa điểm: từng thuộc về danh sát thủ Ám Quốc; lộ diện ở Sa Mạc Vô Tắc và Liên Minh
+Hải Miễu.
+Ngưỡng 'danh lực' thức tỉnh: cần truyền tụng tốc/ám sát cấp Vực + ba thắng lợi trước cao thủ
+TT.
+Khí linh: ham tốc; xúi chủ mạo hiểm. Lạm dụng sẽ bị 'tẩu phong' (rối loạn nhịp hạch & phản xạ).
+Sở hữu hợp pháp: bắt buộc 'Tịnh Danh Quy' để xoá 'thuế sát' tích luỹ; cấm dùng trong nội
+thành.
+Tương hợp map: Ám Quốc, Sa Mạc Vô Tắc, Hải Miễu (địa hình thoáng). Khắc chế: Luật/Quang +
+phong ấn khu vực.
+
+XII.16 — **Lẫm Lôi** — Thổ/Lôi (ràng Ấn Trấn Địa + Ấn Cảnh Giới Nứt)
+
+Ấn/Chiêu mẫu: Trấn Sấm (đóng đinh lĩnh vực bằng cột lôi), Địa Dao (gợn địa đới làm gãy trận),
+Lôi Tâm Thệ (vừa chém vừa đọc thệ ngôn, tăng chấn).
+Trú kiếm/địa điểm: rèn tại Vành Nứt Thế Giới bằng quặng lôi thạch; đôi khi về Cơ Giới Quốc để
+'tái hiệu chuẩn'.
+Ngưỡng 'danh lực' thức tỉnh: cần chiến tích 'giữ đới nứt' cấp Châu + thệ ấn không gây sụp bản
+đồ.
+Khí linh: bảo thủ, ưu an toàn cấu trúc; nếu chủ lạm sát trong đô thị → kiếm tự 'hạn lưu', giảm
+tầm.
+Sở hữu hợp pháp: yêu cầu chứng chỉ 'Ấn Trấn Địa' do luật viện cấp; gây sập/hư đới nứt → truy tố
+Kiếp Vực.
+Tương hợp map: Vành Nứt Thế Giới, Cơ Giới Quốc, Băng Tây Bắc. Khắc chế: Mộc (giảm chấn),
+Luật (định giới).
+
+Ghi chú tích hợp: thêm ba mục này vào Master dưới **XII.14–XII.16**; giữ '13+' mở để bổ sung tiếp.
+
+
+===== [PAGE 11 / 185] =====
+ARCLUNE — MASTER PATCH: DANH KIẾM CODEX EXPANSION
+(v1.17F2-HB)
+
+Bổ sung 'Họa Bì' vào Danh Kiếm Codex (tăng từ 12 → 13+). Họa Bì là danh kiếm sinh từ tà pháp Bì
+Cốt — ác danh vẫn là Danh.
+
+XII.13 — Họa Bì — Huyết/Ảnh (ràng Luật Danh+Hiến)
+
+Ấn/Chiêu mẫu: Khảm Bì (áp bì da lên lưỡi; tăng 'bám' & ức chế trị thương), Danh Phệ (ăn uy danh
+chủ để tăng lực), Hấp Oán (hút sợ hãi—gia tốc nuôi khí linh).
+Trú kiếm/địa điểm: lưu động; từng bị niêm phong ở Quang Thánh Đảo; hay xuất hiện tại Huyết
+Quốc/Ám Quốc (đàn 'Tam Khảm Tam Nhuận').
+Ngưỡng 'danh lực' thức tỉnh: khi đủ 'oán–sợ–truyền tụng' cấp vùng (≥Vùng danh) + hoàn tất 49
+đêm luyện dưới Uyên Ấn.
+Cơ chế khí linh: thiên hướng 'đòi lễ nhuận' (tế danh định kỳ). Rủi ro phệ chủ cao nếu Danh_chủ <
+k × Danh_kiếm.
+Sở hữu hợp pháp: bắt buộc Tịnh Danh Quy trước khi dùng; nếu không → danh khí thuộc tài sản
+công & niêm phong. Khí Linh không đăng thần.
+Tương hợp map: Huyết Quốc (Huyết/Sinh), Ám Quốc (Ảnh/Ám), Thần Tích Lưu Ảnh (Hồn/Ảnh).
+Khắc chế: Luật/Quang; Ấn 'Tịnh Danh' & 'Giải Bì'.
+
+Note tích hợp: thêm vào mục 'Danh Kiếm Codex' của Master như mục XII.13; mở rộng số lượng danh kiếm dạng
+'13+' để tương lai bổ sung thêm.
+
+
+===== [PAGE 12 / 185] =====
+ARCLUNE — TÀ ĐẠO (Normative Extract) · v1.2N
+
+Ngày: 2025-08-13 · Tóm lược chính sách 'thi hành' để nhập Master; nội dung chi tiết xem CONSOL v1.2.1
+
+Chủ đề
+
+Quyền khí linh
+
+Quy tắc thi hành
+
+Khí Linh không đăng thần; chỉ đạt 'Linh Vực đặc thù'; thần quyền thuộc chủ hợp pháp hoặc nhà nước khi tịch thu.
+
+Tịnh Danh bắt buộc
+
+Danh khí (kể cả sinh từ tà pháp) phải qua 'Tịnh Danh Quy' trước khi sở hữu/sử dụng; thiếu → tịch thu & niêm phong.
+
+Cấy ghép sinh học
+
+Counter tổng quát
+
+Cấm ở Quang Thánh Đảo/Trung Châu (trừ nghiên cứu quốc gia giám sát); Ám/Huyết: có quota & dấu ấn giám sát.
+
+Mang Ấn Tịnh Danh; Ấn Khóa Hồn; Ấn Chủ Quyền/Ấn Nhật Ký đối với kiếm hệ Luật; Huyết đạo cần 'Giải Bì Ấn'.
+
+Sở hữu danh khí tà đạo
+
+Nếu chưa Tịnh Danh → tài sản công; sau Tịnh Danh → quyền sở hữu có điều kiện (log ấn, giấy phép vùng).
+
+
+===== [PAGE 13 / 185] =====
+ANNEX — Arclune Master Codex v1.24.2 (Tham chiếu)
+
+Ngày: 2025-08-13
+
+===== [PAGE 14 / 185] =====
+ARCLUNE CODEX
+
+MASTER v1.17F — FULL (PDF/A-friendly)
+
+Siêu chi tiết: nền tảng – class – cơ chế thần – lĩnh vực – vận tốc/uy lực – lịch sự kiện – atlas – danh kiếm
+
+Built 2025-08-11 15:17
+
+
+===== [PAGE 15 / 185] =====
+MỤC LỤC
+
+• A. NỀN TẢNG: Aether (Anima/Umbra), Nguyên tố (khởi sinh–biến tố), Tầng không gian (Thiên/Địa/Tâm/Hạ/Vành)
+
+• B. CẢNH GIỚI: Phàm 1–6, Thánh Tam Bộ (lĩnh vực v1.17), Bán Thần (PDU/Bằng), Thần cấp (định nghĩa)
+
+• C. CLASS: 8 hệ tu – đường tiến, ưu/nhược, độc chiêu, mốc bẻ gãy
+
+• D. CƠ CHẾ THẦN: Lãng Quên – Chỉ Dẫn – Chòm ký – Thần quốc – Đoạt đạo – Bằng
+
+• E. TỐC ĐỘ & UY LỰC: phi hành – dốc lực – hiện tượng môi trường
+
+• F. SỰ KIỆN: luật nhịp 100y/1, 1,500y/1, 20,000y/1 & bộ kích hoạt
+
+• G. ĐỐI KHÁNG: kèo class theo cảnh
+
+• H. NIÊN THỌ & LÃO HOÁ: recap áp niên lịch
+
+• I. ATLAS & ALH: vùng/biome, kích cỡ, địa lợi, danh kiếm/danh lực (Appendix từ v1.16.10, override bằng bản 1.17F)
+
+• J. GLOSSARY & TEMPLATE: từ khoá miêu tả – checklist DCLV/ĐKTT – câu mẫu cảnh chiến
+
+
+===== [PAGE 16 / 185] =====
+ARCLUNE CODEX — MASTER v1.17F
+
+A. Nền tảng
+
+Build: 2025-08-11 15:17
+
+
+===== [PAGE 17 / 185] =====
+A.1 Aether — Cấu trúc & vận động
+
+Bản chất & Pha
+
+Aether = Anima (dương, sinh–sáng) + Umbra (âm, tĩnh–bóng). Tỉ lệ pha biến thiên theo không gian
+
+(Thiên Mạc nghiêng Anima; Hạ Giới nghiêng Umbra).
+
+Trạng thái: khí (tán), sương (đọng), tinh (kết). 'Tần số tinh kết' là nhịp dao động mà hạt
+
+Aether ưa liên kết thành cụm; tần số cao → dễ kết tinh hợp linh.
+
+Trao đổi & Xúc tác
+
+Aether bị 'hấp thụ–tiết' bởi lò hạch. Trạng thái 'no/vơi' đo bằng cảm giác: mạch tay ấm–lạnh,
+
+thính tức dày–mỏng.
+
+Khoáng hợp linh đóng vai trò 'xúc tác pha': Kim/Thổ giữ, Thủy dẫn, Mộc bắc cầu, Hỏa bẻ trật tự,
+
+Phong khuếch tán, Quang kích hoạt, Ám che khuất.
+
+Ô nhiễm & Thanh lọc
+
+Ô nhiễm (miasma): Aether mang 'định kiến' hỗn loạn. Thanh lọc bằng trận 'Sàng Lọc Bảy Lớp'
+
+(gió–muối trắng–ánh dịp), hoặc dầm trong dòng địa mạch sạch.
+
+
+===== [PAGE 18 / 185] =====
+A.2 Nguyên tố — Khởi sinh, Biến tố, Hợp tố
+
+Khởi sinh
+
+Nguyên tố gốc: Kim, Mộc, Thủy, Hỏa, Thổ, Phong, Lôi, Quang, Ám.
+
+Hình thành khi Aether gặp 'mồi' tần số phù hợp (địa mạch, khí hậu, huyền tích).
+
+Biến tố (chuyên hoá)
+
+Băng (Thủy + thấp nhiệt), Dung nham (Hỏa+Thổ), Hồng viêm (Hỏa+Quang+Sát), Huyễn (Quang+Tâm), Ảnh
+
+(Ám+Không), Độc (Mộc+Ám), Kim di (Kim+Âm thời), v.v.
+
+Hợp tố (lai ghép)
+
+Do người tu thiết kế: ví dụ 'Phong Lôi Diễm' (Phong+Lôi+Hỏa) tạo sét nóng chém; 'Thủy Quang Ảnh'
+
+tạo ảo thủy kính; 'Thổ Mộc Sinh' tăng hồi phục đất–cây.
+
+Tương sinh/khắc (động)
+
+Không phải giấy bìa cứng: phụ thuộc mật độ Aether & mạch địa; ví dụ Quang thắng Ám tốt ở Thiên
+
+Mạc, nhưng thua ở Hạ Giới sâu.
+
+
+===== [PAGE 19 / 185] =====
+A.3 Tầng–lớp không gian (Thiên/Địa/Tâm/Hạ/Vành) — chi tiết dùng viết
+
+cảnh
+
+Thiên Mạc
+
+Dòng thượng phong theo 'mùa Aether'. Máy móc bay cần vỏ cách điện; tu sĩ bay nghe 'ré sợi'—dấu
+
+hiệu cảnh báo sét lạnh.
+
+Đám mây chia lá → biết đang vào mạch gió xé; râu tóc dựng là **báo động trước 2–3 giây**.
+
+Địa Mạc
+
+Âm rung dạng 'đàn dây'; pháp sư rành đất chạm gót đo 'cung mạch'. Bố trí trận nên xoay trục theo
+
+sợi mạch thay vì đồ hình chuẩn.
+
+Tâm Giới
+
+Độ dày đo bằng 'vang chuyện' (số lần đồn được lặp); danh kiếm, miếu cổ là 'đinh'. Viết cảnh:
+
+người ngoài vùng nói vào như 'rục bóng', câu chữ bị kéo dài.
+
+Hạ Giới
+
+Thời gian chậm một thớ → đối thoại lệch nhịp, dễ mất nhịp kiếm. Đèn cháy xanh; mùi sắt rỉ ẩm.
+
+Quái Ám 'nhìn từ sau gáy'.
+
+Vành Nứt
+
+Trường hợp 'rơi ngang', 'đồ rớt lên': dấu lệch pha. Đóng cổng cần 'điểm neo' đôi: một vật thật +
+
+một 'chuyện kể' mạnh.
+
+
+===== [PAGE 20 / 185] =====
+ARCLUNE CODEX — MASTER v1.17F
+
+B. Cảnh giới
+
+Build: 2025-08-11 15:17
+
+
+===== [PAGE 21 / 185] =====
+B.1 Phàm 1–6 (miêu tả thực chiến)
+
+Khai Nguyên
+
+Nhất trọng: 1.5× phàm; nhấc 100–200kg; nhảy 2–3m; chạy 60–80km/h.
+
+Cửu trọng: nhảy 7–9m; chạy 120–160km/h; đấm vỡ cổng gỗ dày.
+
+Trúc Cơ
+
+Ngự vật phi hành (TC1: 150–200 km/h → TC9: 350–450 km/h).
+
+Đòn dốc lực san nhà 2–3 tầng (TC1); hạ cụm phố (TC9).
+
+Ngưng Đan
+
+ND1: 0.8–1.2km vòng tác động (tối đa ~2km khi thuận nguyên tố); ND9: 3–5km.
+
+Vào mây thấy 'rỗ khí'; hít thở tạo sương tay.
+
+Kết Đan
+
+KD1: nổ núi nhỏ (200–300m); KD9: ngoạm thung lũng hẹp; tạo kết giới đội.
+
+Đúc Phách
+
+ĐP1: phá một huyện thưa dân; ĐP7: liên trấn nếu dốc sạch; kháng khống tâm trí.
+
+Luyện Hồn
+
+LH1: quận lớn; LH3: dải tỉnh nhỏ; gõ Tâm Giới, làm chệch đòn pháp sư yếu bằng thần uy.
+
+
+===== [PAGE 22 / 185] =====
+B.2 Thánh Tam Bộ — lĩnh vực v1.17 & luật dung nhập
+
+Thánh Nhân
+
+Bán kính 0.6→3.0km; +0.3km mỗi pháp tắc dung nhập (TN9 ~ 9 luật).
+
+Nếu lĩnh vực chưa cô đọng mà nhồi luật → rạn/vỡ/thu hẹp.
+
+Thánh Hoàng
+
+Bán kính 5→20km; yêu cầu 2 pháp tắc/bậc (cuối ~17–19 luật).
+
+Đổi 'kênh Aether' cho cả một đô hội như xoay van.
+
+Thánh Tôn
+
+Bán kính 30→200–300km; 3→5 luật/bậc; có thể dựng 'tiểu thế giới' nhiều giờ; phong ấn bán thần
+
+nơi trống trải.
+
+
+===== [PAGE 23 / 185] =====
+B.3 Bán Thần — PDU, Bằng & nhiệm vụ Thiên Đạo
+
+Khởi sinh
+
+Đăng bán thần: thánh lực bị đốt sạch → **10 PDU** (thần lực hình thức ban đầu).
+
+Mỗi 1% thần cách → +2 PDU; đến 100% tích đủ theo cơ chế chốt.
+
+Bằng
+
+Kiếm tu có ngoại lệ: **Bằng** bản mệnh pháp bảo ở bán thần sau nhiệm vụ Thiên Đạo (bảng điểm mục
+
+tiêu tà thần/tín đồ).
+
+Class khác: Bằng khi có **thần quốc** (từ hạ vị thần).
+
+
+===== [PAGE 24 / 185] =====
+B.4 Thần cấp — Lãng Quên, Chỉ Dẫn, Chòm ký, Thần quốc, Đoạt đạo (định
+
+nghĩa ngắn)
+
+Định nghĩa
+
+Lãng Quên: sửa/xoá ký ức kẻ yếu, giữ nhân quả lớn. Chỉ Dẫn: gieo khuynh hướng.
+
+Chòm ký: trường vực biểu trưng của thần; kênh ban phước. Thần quốc: lĩnh vực thăng hoa thành thế
+
+giới; neo 'Bằng'.
+
+Đoạt đạo: nuốt thần cách sau khi huỷ thần quốc+thần thể; nguy cơ 'dị đạo'.
+
+
+===== [PAGE 25 / 185] =====
+ARCLUNE CODEX — MASTER v1.17F
+
+C. Class (8 hệ)
+
+Build: 2025-08-11 15:17
+
+
+===== [PAGE 26 / 185] =====
+C.1 Kết thuật
+
+• Động cơ: lò hạch + ấn quyết + trận; điều khiển nguyên tố.
+
+• Ưu: tầm xa, kiểm soát địa hình; Nhược: thân mềm, phụ thuộc môi trường.
+
+• Mốc: Trúc Cơ—Kết Giới giữ đội; Ngưng Đan—Nguyên Ấn tầng 2; Đúc Phách—Định Địa.
+
+• Khắc chế: thể tu áp sát; cơ giới giáp cách.
+
+
+===== [PAGE 27 / 185] =====
+C.2 Thể tu
+
+• Động cơ: Aether rèn thân 7 bộ phận + ăn nguyên linh; huyết mạch.
+
+• Ưu: miễn khống một phần; Nhược: tài nguyên nặng, tầm xa kém.
+
+• Mốc: Trúc Cơ—Thân Cương; Kết Đan—Giáp Ý dày; Luyện Hồn—Uy áp hồn.
+
+• Khắc chế: kết thuật trận bẫy, tín tu quy tắc-dẫn.
+
+
+===== [PAGE 28 / 185] =====
+C.3 Khí tu
+
+• Động cơ: rèn thân + luyện binh bản mệnh (cận chiến).
+
+• Ưu: cảm tay; Nhược: chia Aether cho hai hướng → tiến chậm.
+
+• Mốc: Ngưng Đan—Bám lưỡi; Luyện Hồn—Khí Ý hóa đường.
+
+
+===== [PAGE 29 / 185] =====
+C.4 Khí tu kiếm
+
+• Động cơ: hybrid thân–kiếm; không có pháp bảo bản mệnh.
+
+• Ưu: thực chiến cận thân; Nhược: không 'Bằng' sớm.
+
+• Mốc: lv6 bay tốn Aether; Thánh—kiếm vực hẹp.
+
+
+===== [PAGE 30 / 185] =====
+C.5 Kiếm tu
+
+• Động cơ: Aether→kiếm khí qua kiếm ý; **tích kiếm khí** trong lò hạch.
+
+• Ưu: điểm sát tối đa; **Bằng sớm** qua pháp bảo sau nhiệm vụ.
+
+• Nhược: 'giòn' trước khi Bằng; AoE yếu nếu thiếu địa lợi.
+
+• Mốc: Trúc Cơ—ngự kiếm; Ngưng/Kết—đi tơ; Thánh—kiếm vực sâu.
+
+
+===== [PAGE 31 / 185] =====
+C.6 Cơ giới tu
+
+• Động cơ: giáp tăng trưởng, lõi tri‑hải; Aether làm mát/nhiên liệu.
+
+• Ưu: bền trận, module; Nhược: bảo trì, overheat, khoáng kháng Aether.
+
+• Mốc: Kết Đan—đổi module nhanh; Luyện Hồn—AI dự đoán; Bán Thần—được 'hữu đạo'.
+
+• Khắc chế: từ trường Lôi/Kim, Ăn mòn Ám/Độc.
+
+
+===== [PAGE 32 / 185] =====
+C.8 Hỗn hệ
+
+• Động cơ: pha; ưu/nhược cộng dồn; công năng lạ.
+
+• Mốc: tuỳ build; nguy cơ 'đụng luật' khi dung hợp.
+
+
+===== [PAGE 33 / 185] =====
+ARCLUNE CODEX — MASTER v1.17F
+
+D. Cơ chế Thần
+
+Build: 2025-08-11 15:17
+
+
+===== [PAGE 34 / 185] =====
+D.1 Lãng Quên — cơ chế, chi phí, phát hiện, đối pháp
+
+Cơ chế
+
+Tác động tầng 'ký ức–tự sự' của Tâm Giới cá nhân; không cắt ngang nhân quả lớn do thần khác
+
+chốt.
+
+Độ sâu: nhớ vụn < nhớ quá trình < nhớ lõi danh tính.
+
+Chi phí
+
+Tiêu thần lực + hao mối 'danh lực'; càng sâu càng để 'nợ nhớ'—dư chấn mơ, mùi, thói quen lạ.
+
+Dấu hiệu
+
+Khoảnh khắc 'mất khớp' môi–tiếng; bóng đổ run; chữ viết nghiêng không chủ ý.
+
+Đối pháp
+
+Tường Minh Ấn (khắc minh), Ảnh Đạo Chép (bản sao bóng), Chứng Giới Thệ (Thiên Đạo đóng dấu).
+
+
+===== [PAGE 35 / 185] =====
+D.2 Chỉ Dẫn — cơ chế, giới hạn, phản dẫn
+
+Cơ chế
+
+Gieo khuynh hướng lựa chọn; hữu hiệu nhất với quyết định 'đang lưỡng lự'.
+
+Giới hạn
+
+Không bẻ nổi Đạo‑tâm đã cứng; lộ khi lặp quá nhiều; bị chòm ký đối kháng triệt.
+
+Phản dẫn
+
+Tĩnh Tâm Ấn; Lý Trí Ấn; phong kín giác quan; dùng 'điểm neo' cá nhân (vật kỉ niệm).
+
+
+===== [PAGE 36 / 185] =====
+D.3 Chòm ký • Thần quốc • Đoạt đạo
+
+Chòm ký
+
+Bộ quy tắc gọn phục vụ đạo; dùng để ban phước/đánh dấu địa lợi; có hệ cấp.
+
+Khắc sai → 'lệch đạo' (phản phệ thần kinh).
+
+Thần quốc
+
+Lĩnh vực thăng hoa thành thế giới; có chu kỳ ngày/đêm, khí hậu, luật cơ bản; là neo 'Bằng'.
+
+Độ dày thần quốc quyết định sức bật/đỡ đòn.
+
+Đoạt đạo
+
+Sau khi đối thủ mất thần quốc + thần thể, nuốt thần cách để chiếm quyền hạn; phải 'lọc đạo' kẻo
+
+dị đạo; Thiên Đạo theo dõi mức nhân quả.
+
+
+===== [PAGE 37 / 185] =====
+ARCLUNE CODEX — MASTER v1.17F
+
+E. Tốc độ & Uy lực
+
+Build: 2025-08-11 15:17
+
+
+===== [PAGE 38 / 185] =====
+E.2 Uy lực dốc lực (địa mạch trung tính)
+
+Ngưng Đan
+
+ND1: 0.8–1.2 km (tối đa ~2km lợi tố); ND9: 3–5 km.
+
+Kết Đan
+
+Núi nhỏ → thung lũng hẹp.
+
+Đúc/Luyện
+
+Huyện → liên trấn; quận lớn → dải tỉnh nhỏ.
+
+Thánh
+
+Theo bán kính lĩnh vực mới; TT có thể định kiểu khí hậu cục bộ.
+
+
+===== [PAGE 39 / 185] =====
+ARCLUNE CODEX — MASTER v1.17F
+
+F. Sự kiện
+
+Build: 2025-08-11 15:17
+
+
+===== [PAGE 40 / 185] =====
+ARCLUNE CODEX — MASTER v1.17F
+
+G. Đối kháng
+
+Build: 2025-08-11 15:17
+
+
+===== [PAGE 41 / 185] =====
+G.1 Kèo class theo cảnh
+
+Trúc Cơ
+
+Thể tu>cận; Kết thuật>khoảng; Cơ giới>đường dài; Kiếm tu>điểm.
+
+Ngưng/Kết
+
+Kiếm tu 'đi tơ'; Khí tu kiếm trụ giao; Kết thuật bẫy vùng; Thể tu phá cửa.
+
+Đúc/Luyện
+
+Cơ giới bền trận; Tín tu 'quy tắc-dẫn' sắc; Thể tu dứt điểm.
+
+
+===== [PAGE 42 / 185] =====
+ARCLUNE CODEX — MASTER v1.17F
+
+H. Niên thọ
+
+Build: 2025-08-11 15:17
+
+
+===== [PAGE 43 / 185] =====
+H.1 Niên thọ & lão hoá (đồng bộ ALH)
+
+Phàm nhân & Phàm cảnh
+
+Trần 90, duyên 120; già ở 25%. Cộng thọ theo bảng chốt từng trọng/cảnh.
+
+Thánh
+
+Già ở 15% còn lại; cần thọ nguyên để cảm ngộ pháp tắc, dung nhập luật.
+
+Bán Thần
+
+Già ở 7%; nhiệm vụ Thiên Đạo bắt buộc cho kiếm tu Bằng sớm.
+
+
+===== [PAGE 44 / 185] =====
+ARCLUNE CODEX — MASTER v1.17F
+
+J. Từ khoá & Template
+
+Build: 2025-08-11 15:17
+
+
+===== [PAGE 45 / 185] =====
+J.1 Glossary — thuật ngữ miêu tả nhanh
+
+Tín hiệu môi trường
+
+Mây xé lá (Thiên Mạc), Bụi trườn (Địa Mạc), Bóng lệch (Tâm Giới), Lửa xanh (Hạ Giới), Lá treo
+
+(Vành Nứt).
+
+DCLV/ĐKTT (thang cảnh báo)
+
+Xanh: ≤30 — an toàn phàm; Vàng: 31–60 — có Thánh khí; Đỏ: 61–80 — nguy cơ nâng mức; Tím: >80 —
+
+sơ tán.
+
+
+===== [PAGE 46 / 185] =====
+J.2 Template miêu tả cảnh chiến (chèn nhanh)
+
+Mở cảnh
+
+'Gió trên mái gãy thành lá mỏng; tóc ta dựng, tiếng ré như sợi đồng—Thiên Mạc báo sét lạnh.'
+
+Đòn dốc lực ND
+
+'Hắn hít một hơi, sương tụ quanh tay; mặt nước lõm như bị ngón tay khổng lồ ấn xuống.'
+
+Đóng cảnh
+
+'Bóng đổ lệch nửa nhịp, chữ khắc trên bia tự 'đầy mực'—Tâm Giới đã ghi tên hắn.'
+
+
+===== [PAGE 47 / 185] =====
+ARCLUNE CODEX
+
+MASTER v1.16.9D — Detailed (PDF/A-friendly)
+
+Hợp Thiên Ký • Thiên Đạo • Hệ tu luyện • Lĩnh vực • Bằng • Danh Kiếm • Niên thọ • ALH
+
+Built 2025-08-11 13:41
+
+
+===== [PAGE 48 / 185] =====
+MỤC LỤC
+
+• I. Hợp Thiên Ký & Vũ trụ quan
+
+• II. Aether & Nguyên tố học (đủ phân loại + ví dụ)
+
+• III. Bản đồ vùng • Vùng hợp tố • Cổng & Lộ tuyến
+
+• IV. Hệ phái tu luyện (đầy đủ)
+
+• V. Cảnh giới: Phàm 1–6 (chi tiết)
+
+• VI. Thánh Tam Bộ (luật dung nhập + thử thách)
+
+• VII. Bán Thần (PDU, nhiệm vụ Thiên Đạo, Bằng ngoại lệ kiếm tu)
+
+• VIII. Thần cấp & Chí Cao • Siêu Thoát
+
+• IX. Năng lượng: NL ↔ TL ↔ PDU (quy đổi, ví dụ)
+
+• X. DCLV/ĐKTT: đo-đạc & cảnh báo chiến trường
+
+• XI. “Bằng”: cơ chế âm-dương & trường hợp vô hiệu
+
+• XII. Danh Kiếm (12 hồ sơ đầy đủ) + khí linh & danh lực
+
+• XIII. Niên thọ & Lão hoá (phàm→thánh→bán thần)
+
+• XIV. Lãng Quên & Chỉ Dẫn (toán tử–đối trọng–hệ quả)
+
+• XV. ALH Timeline (mốc thần–thánh + dưới thánh tiêu biểu)
+
+• XVI. Phụ lục: Thuật ngữ, tín hiệu miêu tả, ví dụ cảnh
+
+
+===== [PAGE 49 / 185] =====
+Arclune Codex — Master v1.16.9D
+
+I. Hợp Thiên Ký & Vũ trụ quan
+
+Xuất bản: 2025-08-11 13:41
+
+
+===== [PAGE 50 / 185] =====
+I.1 Hợp Thiên Ký — Song giới hợp mạc
+
+Bối cảnh
+
+Hai bán-giới: Anima/Linh (tu) và Umbra/Ma (pháp).
+
+Nghi lễ 'Hợp Thiên' hàn hai rìa; thành đại thế giới phẳng Arclune.
+
+Hậu quả năng lượng
+
+Aether lưỡng cực (Anima + Umbra).
+
+Địa mạch đôi (nhiệt/lạnh) – mùa & triều đặc thù.
+
+Điều ước với Thiên Đạo
+
+Thiên Đạo giữ Nguyên Tắc Sơ.
+
+Hữu trí được ngộ pháp tắc và thôi diễn thành quy tắc, trong giới hạn nhân quả.
+
+
+===== [PAGE 51 / 185] =====
+I.2 Vũ trụ quan & tầng giới
+
+Hình thái
+
+Thế giới phẳng, siêu lục địa 'bàn' lơ lửng.
+
+Các lớp
+
+Thiên Mạc (trên) • Địa Mạc (dưới) • Tâm Giới (trường lực) • Vành Nứt (ria) • Hạ Giới (âm hải).
+
+Không gian tăng
+
+Thượng Thiên (đảo bay, Ngân Luân) • Ngân Vận (đại lục) • Hạ Giới (Âm Hải, Hang Vô Tắc).
+
+
+===== [PAGE 52 / 185] =====
+Arclune Codex — Master v1.16.9D
+
+II. Aether & Nguyên tố học
+
+Xuất bản: 2025-08-11 13:41
+
+
+===== [PAGE 53 / 185] =====
+II.1 Aether hai pha & cơ chế lọc sinh học
+
+Định nghĩa
+
+Aether = trường lưỡng cực (Anima & Umbra).
+
+Lò hạch
+
+Bộ lọc sinh học biến Aether → nguyên lực/ chân nguyên.
+
+Biến thể
+
+Aether bị 'định sắc' thành nguyên tố do điều kiện địa mạch và ý thức tập thể.
+
+
+===== [PAGE 54 / 185] =====
+II.2 Phân loại nguyên tố (đủ nhóm & ví dụ)
+
+Căn cước
+
+Thủy (băng hồ) • Hỏa (hồng viêm) • Thổ (trầm sa) • Mộc (mạch nhựa) • Kim (vân kim).
+
+Động lực
+
+Phong (tháp gió) • Lôi (lôi hải) • Không (vành nứt) • Trọng/Trầm (giếng trầm).
+
+Tính quang
+
+Quang (thiên đài) • Ám (hắc vực) • Ảnh/Huyễn (mộ kiếm) • Tịnh/Trọc (suối tĩnh) • Nhiệt/Lạnh
+
+(giáp địa mạch).
+
+Sinh thái
+
+Sinh/Dưỡng (lâm) • Tử/Tàn (am) • Huyết (tế khâu) • Thực/Thôn (hố ăn) • Cảm/Tình (đàn tình) •
+
+Linh/Sinh mệnh (mẫu thụ).
+
+Thiên văn
+
+Tinh/Sao (miếu vọng tinh) • Nguyệt (cốc ngân nguyệt) • Triều (cửa triều) • Ảnh phản (đầm phản
+
+quang).
+
+
+===== [PAGE 55 / 185] =====
+Arclune Codex — Master v1.16.9D
+
+III. Bản đồ vùng • Vùng hợp tố • Cổng & Lộ tuyến
+
+Xuất bản: 2025-08-11 13:41
+
+
+===== [PAGE 56 / 185] =====
+III.1 Vùng gốc (12) — chức năng & tài nguyên
+
+Danh mục
+
+Trung Châu — trấn giới, tinh phiến, chòm ký phổ.
+
+ (ALH·TC)
+
+Cơ Giới Quốc — kim/hỏa, lõi cơ giới, đồng quần lưu.
+
+ (ALH·CGQ)
+
+Huyết Quốc — huyết/sinh, huyết tỉnh, mẫu tổ.
+
+ (ALH·HQ)
+
+Ám Quốc — ám, Vịnh Không Sao, hắc tĩnh.
+
+Quang Thánh Đảo — quang, quang tinh, vũ kim.
+ (ALH·QTD)
+
+Lỗi Châu — lỗi thạch, lỗi hạch.
+
+Liên Minh Hải Miễu — thủy/băng, san hô, thuỷ phiến.
+
+ (ALH·HM)
+
+Trường Sinh Lâm — mộc/sinh, mộc tầm, nhựa sinh.
+
+ (ALH·TSL)
+
+Sa Mạc Vô Tắc — quỷ tắc, mạch rỗng.
+ (ALH·VT)
+
+Băng Tây Bắc — băng/thuỷ, băng tinh, hàn tuỷ.
+
+ (ALH·BTB)
+
+Vành Nứt Thế Giới — không/thời, cửa nguy.
+
+Thần Tích Lưu Ảnh — tàn thần, thần cốt.
+
+ (ALH·TTLA)
+
+
+===== [PAGE 57 / 185] =====
+III.2 Vùng hợp tố & Cổng – Lộ tuyến
+
+Vùng hợp tố
+
+Dung Huyết Sơn (Hỏa+Thủy) • Băng Túc Phong (Phong+Lôi) • Sương Mê Lâm (Thủy+Phong) • Mìn Tĩnh
+
+Vân Thạch (Thổ+Quang) • Khê Ảnh Liệt Giới (Ám+Không) • Nhật Lam (Mộc+Quang).
+
+Cổng & lộ tuyến
+
+Thập Nhị Môn theo triều Aether; Vành Nứt ↔ Thần Tích; mùa 'sóng nghịch' đổi tuyến.
+
+
+===== [PAGE 58 / 185] =====
+Arclune Codex — Master v1.16.9D
+
+IV. Hệ phái tu luyện
+
+Xuất bản: 2025-08-11 13:41
+
+
+===== [PAGE 59 / 185] =====
+IV.1 Hệ phái tổng quan
+
+Danh sách
+
+Kết thuật • Cơ giới • Thể tu • Khí tu • Khí tu kiếm • Kiếm tu • Cơ giới tu • Khí tu cơ • Tín tu.
+
+Khác biệt then chốt
+
+Kiếm tu có **bản mệnh pháp bảo**; ngoại lệ **Bằng sớm** ở Bán Thần.
+
+Thể tu thánh cảnh có thể đi **lối riêng**, không ràng công thức lĩnh vực.
+
+
+===== [PAGE 60 / 185] =====
+IV.2 Kiếm tu & Khí tu kiếm
+
+Kiếm tu
+
+Aether + kiếm ý → **kiếm khí**; tích trong lò hạch như dạng năng lượng riêng.
+
+Có **bản mệnh pháp bảo** (liên hệ với Thiên Đạo khi Bằng sớm).
+
+Khí tu kiếm
+
+Chia aether cho thân & kiếm, **không** có bản mệnh pháp bảo; thiên về cận chiến thực dụng.
+
+
+===== [PAGE 61 / 185] =====
+Arclune Codex — Master v1.16.9D
+
+V. Phàm 1–6 (chi tiết)
+
+Xuất bản: 2025-08-11 13:41
+
+
+===== [PAGE 62 / 185] =====
+V.1 Khai Nguyên (cửu trọng)
+
+Cơ chế
+
+Lò hạch mở, tẩy thể; chỉ số tăng theo thang đã chốt.
+
+Chuẩn so sánh
+
+1 NL = Khai Nguyên cửu trọng; Trúc Cơ nhất trọng = 3 NL.
+
+
+===== [PAGE 63 / 185] =====
+V.2 Trúc Cơ → Luyện Hồn
+
+Trúc Cơ
+
+Ngự vật phi hành; tăng trưởng theo % từng trọng đã chốt.
+
+Ngưng Đan
+
+Chân nguyên cô; từng bước tăng thọ theo thiết lập mới.
+
+Kết Đan
+
+Đan vững; mở pháp môn rộng hơn.
+
+Đúc Phách (7)
+
+Tương ứng 7 phách; buff linh hồn sơ bộ.
+
+Luyện Hồn (3)
+
+Tam hồn hoàn; đỉnh phàm; cửa sang thánh.
+
+
+===== [PAGE 64 / 185] =====
+Arclune Codex — Master v1.16.9D
+
+VII. Bán Thần
+
+Xuất bản: 2025-08-11 13:41
+
+
+===== [PAGE 65 / 185] =====
+VII.1 Bán Thần — PDU & nhiệm vụ
+
+Chuyển hoá
+
+Thánh lực bị đốt sạch → 10 PDU; TL cũ biến mất.
+
+Ngưng tụ
+
++2 PDU mỗi 1% thần cách; biểu đồ tiến độ 0–100%.
+
+Nhiệm vụ Thiên Đạo
+
+Giết hoá thân tà thần cùng cấp; giết tín đồ đủ điểm cân; bảng điểm 'nhiệm vụ'.
+
+Bằng
+
+Kiếm tu được Bằng sớm với **bản mệnh pháp bảo**; hệ khác chờ **thần quốc**.
+
+
+===== [PAGE 66 / 185] =====
+Arclune Codex — Master v1.16.9D
+
+VIII. Thần cấp & Chí Cao • Siêu Thoát
+
+Xuất bản: 2025-08-11 13:41
+
+
+===== [PAGE 67 / 185] =====
+VIII.1 Thần cấp
+
+Phân bậc
+
+Hạ • Trung • Thượng.
+
+Quyền năng nền
+
+Lãng Quên • Chỉ Dẫn • Chòm ký • Thần quốc • Đoạt đạo.
+
+
+===== [PAGE 68 / 185] =====
+VIII.2 Chí Cao & Siêu Thoát
+
+Chí Cao
+
+Đại đạo hoá thân; hoà tan thần quốc + thần cách vào tự thân; cân âm–dương; vô nhiễm nhân quả.
+
+Siêu Thoát
+
+Hai về một, về **không**; ngoài khuôn Thiên Đạo; chống mọi lãng/quên từ dưới.
+
+
+===== [PAGE 69 / 185] =====
+Arclune Codex — Master v1.16.9D
+
+IX. Năng lượng quy đổi
+
+Xuất bản: 2025-08-11 13:41
+
+
+===== [PAGE 70 / 185] =====
+IX.1 Quy đổi NL ↔ TL ↔ PDU
+
+Chuẩn
+
+1 NL = Khai Nguyên cửu trọng.
+
+Trúc Cơ nhất trọng = 3 NL.
+
+Thánh lực
+
+1 TL = Luyện Hồn tam trọng = 4,731,843.98 NL.
+
+Thánh Nhân nhất trọng = 6.5 TL (cơ bản).
+
+PDU
+
+Bán Thần khởi sinh 10 PDU.
+
++2 PDU mỗi 1% thần cách.
+
+10 PDU = 13,174,165.93 TL (quy chiếu chuyển hoá).
+
+
+===== [PAGE 71 / 185] =====
+Arclune Codex — Master v1.16.9D
+
+X. DCLV & ĐKTT
+
+Xuất bản: 2025-08-11 13:41
+
+
+===== [PAGE 72 / 185] =====
+X.1 DCLV/ĐKTT & thiết bị
+
+DCLV
+
+Độ Cô Lập Lĩnh Vực: 0–100; <40 mỏng • 40–70 chuẩn • >70 đặc.
+
+ĐKTT
+
+Độ Kết Tủa Thánh lực: TN 20–45 • TH 45–70 • TT 70–90.
+
+Thiết bị/thuật
+
+Kính Aether kế • Chuông Huyền Phủ • Ấn Quang Rìa • Kim Châm Vi Mạch.
+
+Cảnh báo
+
+Ép dung nhập luật khi ĐKTT chưa đủ → rạn/vỡ/thu hẹp lĩnh vực.
+
+
+===== [PAGE 73 / 185] =====
+Arclune Codex — Master v1.16.9D
+
+XI. 'Bằng' — Neo định
+
+Xuất bản: 2025-08-11 13:41
+
+
+===== [PAGE 74 / 185] =====
+XI.1 Cơ chế 'Bằng' & trường hợp
+
+Khái niệm
+
+Âm–dương cân bằng; neo đôi.
+
+Chứng giám
+
+Thiên Đạo hoặc thần vị cao.
+
+Bằng vô hiệu nếu chứng giám bị xoá hoặc người mời tuyệt.
+
+Biến thể
+
+Thân↔thần quốc • Thân↔pháp bảo (kiếm tu) • Thân↔chứng tích.
+
+
+===== [PAGE 75 / 185] =====
+Arclune Codex — Master v1.16.9D
+
+XII. Danh Kiếm Codex (12 thanh)
+
+Xuất bản: 2025-08-11 13:41
+
+
+===== [PAGE 76 / 185] =====
+XII.1 Danh Kiếm — hồ sơ (1/2)
+
+Hồng Viêm Kiếm — Hỏa/Dung
+
+Ấn/Chiêu mẫu: Viêm Trệ; Hỏa Lưu; Trục Dung Nham.
+
+Trú kiếm/địa điểm: Hồng Viêm Vực.
+
+Ghi chú: khí linh phát triển theo tính chất nguyên tố & truyện tích liên quan.
+
+Thanh Vũ Kiếm — Phong
+
+Ấn/Chiêu mẫu: Phong Tán; Tước Lưu; Xoáy Cắt.
+
+Trú kiếm/địa điểm: Phong Vực.
+
+Ghi chú: khí linh phát triển theo tính chất nguyên tố & truyện tích liên quan.
+
+Băng Tâm Ngân — Băng/Thủy
+
+Ấn/Chiêu mẫu: Hàn Tuyến; Băng Giám; Tĩnh Kiết.
+
+Trú kiếm/địa điểm: Băng Tây Bắc.
+
+ (ALH·BTB)
+
+Ghi chú: khí linh phát triển theo tính chất nguyên tố & truyện tích liên quan.
+
+Lôi Mệnh Nhẫn — Lôi
+
+Ấn/Chiêu mẫu: Phá Vân; Lôi Liên; Dẫn Kích.
+
+Trú kiếm/địa điểm: Lôi Vực Cổ.
+
+Ghi chú: khí linh phát triển theo tính chất nguyên tố & truyện tích liên quan.
+
+Sinh Mục Kiếm — Linh/Sinh
+
+Ấn/Chiêu mẫu: Sinh Đồng; Quang Mộc; Sinh Nha.
+
+Trú kiếm/địa điểm: Trường Sinh Lâm.
+
+ (ALH·TSL)
+
+Ghi chú: khí linh phát triển theo tính chất nguyên tố & truyện tích liên quan.
+
+Phối Kim Kiếm — Kim/Cơ
+
+Ấn/Chiêu mẫu: Chuẩn Cốt; Cơ Quang; Xích Răng.
+
+Trú kiếm/địa điểm: Cơ Giới Quốc.
+
+
+Ghi chú: khí linh phát triển theo tính chất nguyên tố & truyện tích liên quan.
+
+
+===== [PAGE 77 / 185] =====
+XII.2 Danh Kiếm — hồ sơ (2/2)
+
+Tịnh Quang Kiếm — Quang
+
+Ấn/Chiêu mẫu: Tán Bóng; Quang Đoạn; Tín Liệm.
+
+Trú kiếm/địa điểm: Quang Đảo.
+
+Ghi chú: khí linh phát triển theo tính chất nguyên tố & truyện tích liên quan.
+
+Huyết Vũ — Huyết/Âm
+
+Ấn/Chiêu mẫu: Bổng Huyết; Ngưng Tế; Vô Tế.
+
+Trú kiếm/địa điểm: Huyết Quốc.
+
+ (ALH·HQ)
+
+Ghi chú: khí linh phát triển theo tính chất nguyên tố & truyện tích liên quan.
+
+Không Vận — Không/Thời
+
+Ấn/Chiêu mẫu: Hạn Độ; Ảnh Trượt; Dãn Nén.
+
+Trú kiếm/địa điểm: Vành Nứt.
+
+Ghi chú: khí linh phát triển theo tính chất nguyên tố & truyện tích liên quan.
+
+Mị Ảnh — Quang/Ảnh
+
+Ấn/Chiêu mẫu: Ảnh Bội; Ảnh Hồi; Phản Quang.
+
+Trú kiếm/địa điểm: Mộ Kiếm Lĩnh.
+
+
+Ghi chú: khí linh phát triển theo tính chất nguyên tố & truyện tích liên quan.
+
+Ảnh Song — Hư/Thực
+
+Ấn/Chiêu mẫu: Phản Biên; Thực Ảnh; Đổi Cực.
+
+Trú kiếm/địa điểm: Ám Quốc Biên.
+
+
+Ghi chú: khí linh phát triển theo tính chất nguyên tố & truyện tích liên quan.
+
+Hồng Lệ — Cảm/Tình
+
+Ấn/Chiêu mẫu: Thư Bi; Hóa Bi; Ái Khúc.
+
+Trú kiếm/địa điểm: Trung Châu.
+
+Ghi chú: khí linh phát triển theo tính chất nguyên tố & truyện tích liên quan.
+
+
+===== [PAGE 78 / 185] =====
+Arclune Codex — Master v1.16.9D
+
+XIII. Niên thọ & Lão hoá
+
+Xuất bản: 2025-08-11 13:41
+
+
+===== [PAGE 79 / 185] =====
+XIII.1 Quy ước tuổi thọ & cửa già
+
+Phàm nhân
+
+Trần thọ 90; duyên thọ 120 (ly). Cửa già 25%.
+
+Phàm 1–6
+
+Cộng thọ theo bảng đã chốt; vẫn cửa già 25%.
+
+Thánh
+
+Yêu cầu thời gian dài để ngộ & dung nhập; cửa già 15%.
+
+Bán Thần
+
+Hữu hạn; cửa già 7%; bền hơn thánh tôn nhờ PDU.
+
+
+===== [PAGE 80 / 185] =====
+Arclune Codex — Master v1.16.9D
+
+XIV. Lãng Quên & Chỉ Dẫn
+
+Xuất bản: 2025-08-11 13:41
+
+
+===== [PAGE 81 / 185] =====
+XIV.1 Lãng Quên & Chỉ Dẫn
+
+Lãng Quên
+
+Thần kỹ cơ bản; giới hạn bởi nhân quả; có thể xoá mảnh ký ức nhỏ.
+
+Chỉ Dẫn
+
+Gieo khuynh hướng; làm lãng mềm; phụ thuộc chênh vị cách và chứng giám.
+
+Toán tử
+
+Mờ Dấu • Phai Danh • Gãy Nhân.
+
+Đối trọng
+
+Tường Minh Ấn • Ảnh Đạo Chép • Chứng Giới Thệ.
+
+Hệ quả
+
+Nợ nhớ • Lệch nhân quả • Ô nhiễm tàn thần.
+
+
+===== [PAGE 82 / 185] =====
+Arclune Codex — Master v1.16.9D
+
+XVI. Phụ lục
+
+Xuất bản: 2025-08-11 13:41
+
+
+===== [PAGE 83 / 185] =====
+XVI.1 Thuật ngữ & tín hiệu miêu tả
+
+Thuật ngữ
+
+Aether hai pha • Nguyên lực • Thánh lực • PDU • DCLV • ĐKTT • Danh lực • Khí linh.
+
+Tín hiệu
+
+Bụi bay ngược • Tóc dựng • Bóng đổ lệch • Nước lõm bề mặt • Chuông không reo.
+
+
+===== [PAGE 84 / 185] =====
+XVI.2 Ví dụ cảnh (mẫu văn)
+
+Cảnh đăng thánh
+
+"Gió câm ba nhịp. Tro đỏ bay ngược rồi tan như muối ẩm. Bóng hắn ngắn đi một phần, lò hạch rung
+
+và tĩnh lại như vừa nuốt một ngụm lửa."
+
+Cảnh lĩnh vực vỡ
+
+"Từ rìa, mép sáng rạn như men gốm. Nước trên bàn lõm trũng, đổ nghiêng về phía không có ai
+
+đứng."
+
+
+===== [PAGE 85 / 185] =====
+Arclune Codex — Master v1.17F2 PATCH NOTE
+
+Build: 2025-08-12 00:31:20 • PDF/A-friendly • Font DejaVu Sans (Unicode)
+
+Nội dung: Bản vá thay thế Mục F — Sự kiện của Master v1.17F bằng hệ 6 cấp (Nhỏ •
+Vừa • Lớn • Kiếp Vực • Đa Kiếp Vực • Đại Chu Kỳ) với nhịp tối thiểu mới và ràng buộc
+tham chiến. Các mục còn lại giữ nguyên từ bản FULL; mọi xung đột số liệu về lĩnh
+vực/tốc độ/uy lực sẽ ưu tiên theo v1.17F2.
+
+• Nếu bạn chỉ cần xem mục Sự kiện mới: đọc các trang ngay sau tờ Patch này. • Nếu
+cần toàn bộ nội dung trong một file: đây chính là bản gộp FULL + PATCH.
+
+
+===== [PAGE 86 / 185] =====
+Arclune Codex — Master v1.17F2 (FULL,
+PDF/A-friendly)
+
+Build: 2025-08-11 16:47:57 • Font: DejaVu Sans (Unicode) • Khổ A4
+
+Bản hợp nhất mới: gộp và thay thế mục F — Sự kiện theo hệ sáu cấp (Nhỏ • Vừa • Lớn
+• Kiếp Vực • Đa Kiếp Vực • Đại Chu Kỳ), chuẩn hóa nhịp thời gian và giới hạn tham
+chiến. Đồng thời giữ phong cách mô tả chi tiết cho vũ trụ quan, hệ phái & cảnh giới, cơ
+chế Thiên Đạo, các khái niệm then chốt, bảng uy lực–tốc độ và checklist DCLV/ĐKTT.
+
+
+===== [PAGE 87 / 185] =====
+Changelog v1.17F2
+
+- Thay thế hoàn toàn mục F — Sự kiện bằng hệ sáu cấp với mốc tối thiểu: 100y, 1.5ky,
+30ky, 400ky, 5My, 80My. - Giữ ràng buộc: Mức Vừa trần Thánh Tôn Thất Trọng (Bát/Cửu
+chỉ gián tiếp); Bán Thần chỉ bố cục; các mức cao cấm dùng quyền liên đới Thần Quốc
+theo luật. - Chuẩn hóa thuật ngữ tầng giới (Thiên Mạc/Địa Mạc/Tâm Giới/Hạ Giới/Vành
+Nứt) và dấu hiệu môi trường để tả cảnh. - Bảo toàn bảng so sánh hệ phái, cơ chế
+Bằng/Chỉ Dẫn/Lãng Quên/Chòm Ký/Thần Quốc/Đoạt Đạo; PDU & tiến độ ngưng tụ Thần
+Cách.
+
+
+===== [PAGE 88 / 185] =====
+1) Vũ trụ quan & cấu trúc
+
+Định dạng thế giới: đại thế giới phẳng (siêu lục địa dạng 'bàn') lơ lửng trong vũ trụ;
+chuyển động kéo–nén nhờ hai nghịch lưu Aether (Anima/Umbra).
+Thiên Mạc: tầng khí–quang, gió thiên, bão aether, đảo bay, Thánh Tháp, cổng treo.
+Địa Mạc: thân lục địa phẳng; quốc độ, khoáng mạch, chiến tuyến; nơi tu luyện chủ yếu.
+Tâm Giới: giáp ranh luật mỏng; di tích, phong ấn; nơi hiện ‘ảnh vực’ khi Thánh chiến.
+Hạ Giới: vùng trũng âm hàn; hang vô tắc, sông đêm, mạch âm–hồn; hố tà thần.
+Vành Nứt: rìa mảng lục địa; khe kéo–nén; mật độ aether dị thường; hay mở cổng vực.
+
+Aether = Anima (linh) + Umbra (ma): phối tỷ lệ tạo hệ nguyên tố (hỏa, thủy, phong,
+thổ, lôi, băng, quang, ám, mộc, kim…) và ‘tầng động’ (nhiệt, trướng, trầm, lưu, áp…).
+
+
+===== [PAGE 89 / 185] =====
+2) Hệ phái & cảnh giới (so sánh)
+
+Hệ phái
+
+Cơ chế năng lượng
+
+Ưu điểm
+
+Nhược điểm
+
+Độc hữu
+
+Kiếm tu
+
+Khí tu–kiếm
+
+Thể tu
+
+Kết thuật
+
+Cơ giới tu
+
+Aether→Kiếm Khí qua Kiếm Ý; có Bản Mệnh Pháp Bảo (Kiếm Linh)
+
+Bùng nổ cao, kỹ mảnh; có thể 'Bằng' từ Bán Thần (nhờ kiếm bản mệnh); tuyến pháp tắc thiên về cắt/xuyên/dẫn
+
+5 nghi thức 'Bằng' ở Bán Thần; Kiếm Linh cộng hưởng; Cửu Đỉnh Kiếm Quyết
+
+Giòn thân; cần dưỡng kiếm dài; phụ thuộc kiếm
+
+Chia Aether: 1/2 luyện thể, 1/2 luyện kiếm (không pháp bảo bản mệnh)
+
+Thân–kiếm cân bằng; cận chiến ổn; hồi phục khá
+
+Thăng cảnh chậm hơn kiếm tu; không 'Bằng' ở Bán Thần
+
+Kiếm Tâm, Kiếm Khí bám lưỡi, ngự kiếm (tốn)
+
+Aether dưỡng thân, khai mạch, bồi cốt; có thể dùng huyết mạch thần
+
+Chống chịu–phá hoại đỉnh; không lệ thuộc vũ khí
+
+Chi phí lớn; cửa vào cao (huyết mạch/ban phúc)
+
+Lối riêng Thánh cảnh (không bắt buộc công thức lĩnh vực)
+
+Pháp quyết–trận ấn; lò hạch càng mạnh kết thuật càng cao
+
+Hỏa lực xa; đa công cụ; dễ học rộng
+
+Cận chiến yếu; cần chuẩn bị & vật dẫn
+
+Lĩnh vực đa hình; dễ dung nhập pháp tắc hỗ trợ
+
+Giáp–khung cơ khí thay lò hạch; module hoá; trí hải
+
+Thay thế thân thể từng phần; mở rộng vô hạn (quỹ đạo–pháo thần)
+
+Bản thân không cường hóa sinh học; lệ thuộc vật tư
+
+Đăng thần kiểu 'Cơ Giới Chi Chủ'; luật khấu–cấm Aether
+
+
+===== [PAGE 90 / 185] =====
+3) Cơ chế Thiên Đạo & khái niệm then chốt
+
+Thiên Đạo (Thế giới ý chí)
+
+Tập hợp ý chí vạn vật; giữ Nguyên Tắc Sơ Khởi; không tự bịa Quy Tắc mới — cần người
+tu dùng pháp tắc có sẵn để suy-diễn thành Quy Tắc. Chứng giám 'Bằng', giao nhiệm vụ
+đăng Bán Thần, điều tiết hạn chế thần lực hạ phàm.
+
+Pháp tắc → Quy tắc → Đạo
+
+Pháp tắc: mệnh đề hẹp ('Chậm'…); Quy tắc: ghép nhiều pháp tắc thành luật lớn (Linh
+Hồn…); Đạo: con đường riêng viên mãn (để ngưng Thần Cách).
+
+Bằng (Âm–Dương neo định)
+
+Nghi lễ neo định hai cực đồng vị cách cho khó chết. Kiếm tu có thể 'Bằng' từ Bán Thần
+cùng kiếm bản mệnh (qua 5 nghi thức). Hệ khác chỉ 'Bằng' an toàn từ Hạ Vị Thần nhờ
+Thần Quốc.
+
+Chỉ Dẫn & Lãng Quên
+
+Quyền năng thần: định hướng hành vi (Chỉ Dẫn) và xóa mảng ký ức (Lãng Quên) với đối
+tượng vị cách thấp hơn; bị giới hạn bởi nhân quả/chứng giám.
+
+Chòm Ký
+
+Trường vực ký ấn của thần; tín đồ khắc chòm ký để nhận ban phúc và quyền truy cập
+phần quy tắc.
+
+Thần Quốc
+
+Lĩnh vực thăng hoa thành quốc độ — kho luật & nguồn đạo; làm đối cực 'Bằng' từ Hạ Vị
+trở lên.
+
+Đoạt Đạo
+
+Diệt Thần Thể + Thần Quốc → còn Thần Cách; thôn phệ quyền hành nếu đạo tương
+thích (giới hạn bởi phản chấn).
+
+
+===== [PAGE 91 / 185] =====
+4) Quy mô hủy diệt & tốc độ (tham chiếu khi viết cảnh)
+
+Cảnh giới
+
+Tốc độ hành quân/bay
+
+Uy lực 1 chiêu (tham chiếu môi trường)
+
+Khai Nguyên 1→9 Chạy 40→180 km/h; nhảy 10→60 m Phá nhà gỗ→nhà đá; lật tường thành nhỏ
+
+Trúc Cơ 1→9
+
+Ngự vật: 100→400 km/h
+
+San bằng nhà 2–5 tầng; phá kho cỡ lớn
+
+Ngưng Đan 1→9
+
+Bay ổn định 400→900 km/h
+
+Hủy đảo nhỏ (0.9–6 km bán kính) tuỳ trọng; tạo hố trũng địa mạc
+
+Kết Đan 1→9
+
+1,000→2,200 km/h
+
+Đánh sập núi nhỏ→dãy đồi; nứt mạch đất cục bộ
+
+Đúc Phách 1→7
+
+2,500→3,500 km/h
+
+Xóa sổ quận/huyện; chấn động thổ mạch
+
+Luyện Hồn 1→3
+
+3,800→5,000 km/h
+
+Quét vùng liên tỉnh nếu toàn lực; dấu ấn linh vực mờ
+
+Thánh Nhân 1→9
+
+5,500→8,000 km/h
+
+Thánh Hoàng 1→9 8,500→12,000 km/h
+
+Thánh Tôn 1→9
+
+13,000→20,000 km/h
+
+Bán Thần
+
+Theo PDU & % Thần Cách
+
+Không dùng lĩnh vực neo định (trừ Kiếm tu); đòn đánh để lại dị tượng pháp tắc rõ rệt
+
+
+===== [PAGE 92 / 185] =====
+5) Sự kiện — sáu cấp độ, nhịp & giới hạn tham chiến
+
+Cấp
+
+Nhỏ
+
+Vừa
+
+Lớn
+
+Mốc tối thiểu (vùng/toàn cõi)Giới hạn tham chiến (tóm tắt)
+
+≥ 100 năm / vùng
+
+Chỉ Phàm (Khai Nguyên→Luyện Hồn). Không Bán Thần. Thánh chỉ bố cục xa.
+
+≥ 1.500 năm / vùng
+
+Trần: Thánh Tôn Thất Trọng trực chiến. Thánh Tôn Bát/Cửu chỉ gián tiếp/hoá thân, không full-power. Bán Thần chỉ bố cục, cấm trực chiến.
+
+≥ 30.000 năm
+
+Cho phép Bán Thần trực chiến. Tuyệt đối không có Thần (Hạ/Trung/Thượng).
+
+Kiếp Vực
+
+≥ 400.000 năm
+
+Hạ Vị Thần lách luật mức thấp (≈≤15%) — không dùng quyền Thần Quốc. Trung/Thượng chứng giám xa. Rò rỉ chòm ký vượt ngưỡng → đẩy chiến ra Vành Nứt.
+
+Đa Kiếp Vực
+
+≥ 5.000.000 năm
+
+Trung Vị không trực chiến; dùng thần lực ‘đỡ luật’ cho Hạ Vị (≈50% sức mạnh), cấm quyền Thần Quốc. Hạ Vị cũng không dùng quyền Thần Quốc.
+
+Đại Chu Kỳ
+
+≥ 80.000.000 năm (toàn cõi)Hạ Vị tạm vượt trần bán thần (trừ quyền Thần Quốc) nhờ chuẩn bị/viện trợ Thượng/Chí Cao. Trung Vị tối đa ≈10%. Thượng Vị & Chí Cao chỉ bố cục.
+
+Luật nâng mức & chỉ báo chiến trường
+
+• Nhỏ→Vừa: DCLV > 45 liên tục > 3 nhịp; dấu ấn pháp tắc rõ rệt (bóng lệch, nước lõm).
+• Vừa→Lớn: DCLV > 70; ‘bốc hơi’ thánh lực; đường gió bẻ cong; xuất hiện PDU > 10 can
+thiệp.
+• Kiếp Vực trở lên: rò chòm ký/âm văn thần quốc/đột phá Tâm Giới → cưỡng chế đẩy ra
+Vành Nứt.
+
+Khung ghim ALH (mốc gợi ý)
+
+100y: hội nguyên linh; 1.5ky: tái phong ấn trung cấp; 30ky: dời mạch vùng; 400ky:
+Kiếp Vực đẩy rìa; 5My: tái cân bằng luật lớn; 80My: Đại Chu Kỳ — đổi triều tín ngưỡng,
+đoạt đạo quy mô.
+
+
+===== [PAGE 93 / 185] =====
+6) Checklist DCLV/ĐKTT (đo cảnh–kiểm tốc)
+
+• Nhiệt–gió đảo chiều, sương ngược (DCLV 30–40).
+• Kim loại rên, kính rạn ‘mắt nhện’ (DCLV 45–55).
+• Bóng lệch pha; tóc dựng; nước dâng thành vẩy (DCLV 60–70).
+• Âm thanh tắt phụt; màu rút bão hòa; không khí 'dày' (DCLV 70–80).
+• Địa mạch sáng; sét vô vân; vật thể nổi nhẹ (DCLV 85+).
+• ĐKTT: contrail > 15× chiều cao → > Mach 10; vệt quang dài, rung mây trầm → >
+Mach 15.
+
+Hết bản v1.17F2.
+
+===== [PAGE 94 / 185] =====
+G) Tộc Giám Sử & Thang Sự Kiện (Diegetic)
+
+Module mới — build 2025-08-12 00:49:20 • PDF/A-friendly font • DejaVu Sans
+
+G.1 Gốc tích & sứ mệnh
+
+— Tộc Giám Sử (Watcher): 'Chứng sứ của Thiên Đạo' — đời đầu do Thế Giới Ý Chí chọn
+từ nhiều chủng tộc, được khắc Ấn Bất Vong (kháng 'Lãng Quên') và lời thệ Bất Can
+Nhiễu (không đổi kết quả bằng bạo lực). Vai: quan sát–xác nhận–đóng mộc phẩm cấp
+sự kiện; gìn giữ ALH (Arclune Lịch Hiệp), thống nhất niên biểu giữa các vực.
+
+G.2 Cơ cấu tổ chức
+
+Cấp bậc
+
+Nhiệm vụ chính
+
+Ghi chú
+
+Vi ký (Field Scribe)
+
+Theo đoàn/đạo quán; đo DCLV/ĐKTT tại chỗ; lập biên bản sơ cấp
+
+Di chuyển nhanh; thạo dấu hiệu môi trường
+
+Sử quan (Archivist)
+
+Trấn Đài Thiên Kỷ (Tâm Giới); kiểm chuẩn và đóng mộc cấp sự kiện
+
+Phân tích nhân–quả khu vực
+
+Định luật sứ (Adjudicator)Xử biên tranh chấp về can thiệp thần lực, rò Chòm Ký
+
+Được phép xem dữ liệu chòm ký mã hóa
+
+Thủ tích (Keeper)
+
+Cất giữ Bia Lịch (neo ký ức tập thể); phụ trách ALH tổng
+
+Một số đời cao có 'bằng nhẹ' giữa Bia Lịch–Đài Thiên Kỷ
+
+G.3 Công cụ đo & bằng chứng hiện trường
+
+• Kính Chu Thiên: đĩa quang đo biến dạng khí–quang (DCLV). Khi >70, viền kính tối
+đi, xuất hiện vân 'mắt đêm'.
+• Trảo Thần Trắc: sào ký tự chạm bắt vệt Chòm Ký/âm văn thần quốc (cảnh báo
+Kiếp Vực+).
+• Bia Lịch–Giám Mộc: bảng đóng dấu cấp sự kiện (màu & biểu tượng thống nhất
+toàn cõi).
+
+G.4 Thang sự kiện (6 cấp của Giám Sử)
+
+Cấp (dân gian)
+
+Tên Giám Sử
+
+Mốc tối thiểu
+
+Giới hạn tham chiến (khi ghi nhận)
+
+Nhỏ
+
+Vừa
+
+Lớn
+
+Kiếp Vực
+
+Tiểu Biến
+
+≥100 năm / vùng
+
+Chỉ Phàm (Khai Nguyên→Luyện Hồn). Không Bán Thần. Thánh chỉ bố cục xa.
+
+Trung Cục
+
+≥1.500 năm / vùng
+
+Trần: Thánh Tôn Thất Trọng trực chiến; Bát/Cửu chỉ gián tiếp (hóa thân, không full-power). Bán Thần chỉ bố cục.
+
+Đại Loạn
+
+Cảnh Khu
+
+≥30.000 năm
+
+Cho phép Bán Thần trực chiến; tuyệt đối không có Thần.
+
+≥400.000 năm
+
+Hạ Vị lách luật mức thấp (≈≤15%); cấm quyền Thần Quốc; Trung/Thượng chứng giám xa.
+
+Đa Kiếp Vực
+
+Cảnh Trùng
+
+≥5.000.000 năm
+
+Trung Vị không trực chiến; chỉ 'đỡ luật' cho Hạ Vị (~50%); vẫn cấm quyền Thần Quốc.
+
+Đại Chu Kỳ
+
+Cảnh Chu
+
+≥80.000.000 năm (toàn cõi)Hạ Vị tạm vượt trần bán thần (trừ quyền Thần Quốc) nhờ viện trợ vị cách cao; Trung Vị ≤~10%; Thượng/Chí Cao chỉ bố cục.
+
+Bảng màu Giám Mộc: Tiểu Biến (xanh nhạt) • Trung Cục (lam) • Đại Loạn (tím) • Cảnh Khu (hổ
+phách) • Cảnh Trùng (đỏ) • Cảnh Chu (đen bạc).
+
+G.5 Trigger nâng cấp & đẩy chiến tuyến
+
+• Tiểu→Trung: DCLV >45 ba nhịp liền; hiện tượng 'bóng lệch/nước lõm' rõ rệt.
+• Trung→Đại: DCLV >70; 'bốc hơi' thánh lực; đường gió bẻ cong; xuất hiện PDU >10
+can thiệp.
+• Kiếp Vực trở lên: rò Chòm Ký/âm văn thần quốc/đột phá Tâm Giới → cưỡng chế đẩy ra
+Vành Nứt.
+
+G.6 Vị trí & luật sinh tồn của tộc
+
+===== [PAGE 95 / 185] =====
+— Cư sở: Đài Thiên Kỷ ở Tâm Giới (vành), giáp rìa Địa Mạc–Thiên Mạc để bắt tín hiệu
+Vành Nứt & Ảnh Vực. — Kháng Lãng Quên: Ấn Bất Vong bảo toàn 'sự kiện' ngay cả khi
+thần dùng Lãng Quên xóa cá nhân; không ghi bí danh/pháp danh nếu chạm nhân quả
+sâu. — Về 'Bằng': đa số không 'Bằng'; riêng vài Thủ tích đời cao có 'bằng nhẹ' giữa Bia
+Lịch–Đài Thiên Kỷ (đồng vị cách bán thần) để giữ tư liệu khi triều Lãng Quên dâng.
+
+G.7 Cách đưa vào truyện (mẫu thoại & biên niên)
+
+Mẫu thoại lần đầu gặp main:
+
+Vi ký: “DCLV đã vượt bốn mươi lăm. Nếu giữ thế ba nhịp, chúng tôi đóng mộc Trung
+Cục.”
+Main: “Trung Cục là?”
+Vi ký: “Cấp thứ hai trong sáu. Đến Cảnh Chu là lúc cả cõi phải nín thở.”
+
+Mẫu ALH sau trận:
+
+• ALH 12,037 — Trung Cục — Ám Vực: Thánh Tôn Thất Trọng 'Huyền Trụ' giao chiến
+liên minh đạo quán; DCLV đỉnh 68; Vành Nứt chưa mở. Giám Mộc: lam.
+• ALH 458,220 — Cảnh Khu — Hồng Viêm Vệ: rò Chòm Ký Hỏa; Thiên Đạo cưỡng
+bức dịch chiến tuyến ra rìa mảng; Hạ Vị can thiệp ước 12–15%.
+
+G.8 Tin ngắn dùng làm 'đầu chương'
+
+• Tiểu Biến: “DCLV 38→42. Sấm không mây. Không rò chòm ký. Giám Mộc: xanh
+nhạt.”
+• Trung Cục: “DCLV 51→67 (3 nhịp). ‘Bóng lệch’ hiện rõ. Phong tỏa hành lang Tâm
+Giới. Giám Mộc: lam.”
+• Đại Loạn: “DCLV 74 đỉnh; thánh lực bốc hơi cục bộ. Bán Thần xuất thủ — hợp lệ
+cấp 3. Giám Mộc: tím.”
+• Cảnh Khu: “Rò Chòm Ký Thổ. Thiên Đạo cưỡng dịch chiến ra Vành Nứt. Giám Mộc:
+hổ phách.”
+• Cảnh Trùng: “Trung Vị đỡ luật (≈48%). Cấm quyền Thần Quốc. Hiệu chỉnh mạch
+luật cấp vực. Giám Mộc: đỏ.”
+• Cảnh Chu: “Hạ Vị vượt trần bán thần có kiểm soát; Trung Vị ≤10%. Thượng/Chí
+Cao bố cục. Giám Mộc: đen bạc.”
+
+— Hết Module G —
+
+===== [PAGE 96 / 185] =====
+Arclune Codex — Consistency Audit Snapshot (v1.17F3a)
+
+Build: 2025-08-12 01:06:11 • PDF/A-friendly • Font: DejaVu Sans
+
+A) Thuật ngữ chuẩn hoá
+
+• “Aether vật” → Nguyên Linh; lõi: Linh Hạch; lối gọi cũ trong học viện/cơ giới: Hợp Linh.
+
+B) Khí Linh — hệ hoàn chỉnh (tóm tắt)
+
+• 9 bậc: Mầm → Nha → Thai → Thức → Linh Trí → Linh Tính → Kết Linh Hồn → Linh Vực →
+Chân Linh.
+• Điều kiện: Danh lực (Thôn/Vực/Quốc/Châu/Thiên) + Nuôi bằng Nguyên Linh đúng hệ +
+Cộng đạo + Nghi/tế rèn + Thời gian–hành trạng.
+• Giới hạn: Khí Linh không đăng thần; “Bằng” tại Bán Thần chỉ cho Kiếm tu (bản mệnh
+kiếm).
+
+C) Sự kiện — 6 cấp (diegetic qua Tộc Giám Sử)
+
+• Tiểu Biến • Trung Cục • Đại Loạn • Cảnh Khu (Kiếp Vực) • Cảnh Trùng (Đa Kiếp Vực) •
+Cảnh Chu (Đại Chu Kỳ).
+• Mốc tối thiểu: 100y / 1,500y / 30,000y / 400,000y / 5,000,000y / 80,000,000y.
+• Giới hạn tham chiến: giữ theo master 1.17F2 (Thánh Tôn 7 trực, 8–9 gián tiếp; cấm Thần
+tại cấp ≤Đại Loạn; v.v.).
+
+D) Năng lượng & chuyển bậc
+
+• Phàm: Nguyên Lực (NL) → Thánh: Thánh Lực (TL) → Bán Thần: PDU (thần lực hình thức ban
+đầu).
+• Quy ước đã chốt: 1 TL = 4,731,843.98 NL. Khi Thánh Tôn cửu trọng ngưng tụ Thần Cách:
+đốt TL → 10 PDU (seed).
+• Thưởng Bán Thần: +2 PDU mỗi +1% ngưng tụ (→ 210 PDU khi đạt 100%).
+
+E) Lĩnh vực & pháp tắc (Thánh cảnh)
+
+• Thánh Nhân: 100 m cơ sở tại Nhất trọng; +100 m mỗi pháp tắc dung nhập (tối đa 900 m ở
+Cửu trọng).
+• Thánh Hoàng: 1,000 m cơ sở; thang dung nhập theo bậc (2–2–2…3 pháp tắc) như master.
+• Thánh Tôn: thang 3–3–3–4–4–4–4–5 pháp tắc; nhắc lại ràng buộc cô đọng lĩnh vực trước
+khi dung nhập mới.
+
+F) Tuổi thọ & già yếu
+
+• Cửa già: Phàm 25% • Thánh 15% • Bán Thần 7% tổng thọ nguyên; trước ngưỡng giữ hình
+thái trẻ.
+
+G) Ngoại lệ & lưu ý tương thích
+
+• Tộc Giám Sử có 'bằng nhẹ' (Bia Lịch↔Đài Thiên Kỷ) chỉ để bảo toàn tư liệu — không là cơ
+chế sinh tồn như Kiếm tu.
+
+
+===== [PAGE 97 / 185] =====
+• Vũ khí ngoài kiếm có thể sinh Khí Linh (đến Chân Linh), nhưng không 'Bằng'; có thể được
+phong Phong Linh (thần ban) hay làm Linh Sứ khi chủ đăng thần.
+
+
+===== [PAGE 98 / 185] =====
+Arclune Codex — HOTFIX H1 (Lĩnh vực Thánh cảnh & Uy lực
+Ngưng Đan)
+
+Build: 2025-08-12 01:09:21 • PDF/A-friendly • DejaVu Sans
+
+III) Hiện tượng môi trường (để tả cảnh, không dùng số)
+
+• Bay từ Ngưng Đan trở lên: xuất hiện màng aether bao thân (tiếng gió đổi cao độ), sau
+đuôi có vệt rỗ khí ngắn—kéo thành chuỗi khi tăng tốc.
+• Biêu mô lĩnh vực lớn: tóc–vải dựng nhẹ; bóng đổ lệch; sương mịn chạy ngược; kim loại
+rung theo nhịp đạo.
+• Giao ranh Thánh Tôn: âm thanh ‘mất’ trong 1–2 nhịp, tiếng tim chủ thể nghe rõ; sau
+đó âm vực trở về bình thường.
+
+===== [PAGE 99 / 185] =====
+Arclune Codex — Addendum: Niên thọ & Lão hoá
+(v1.17F3c)
+Build: 2025-08-12 02:10:52Z • Font: DejaVu Sans (Unicode) • PDF/A‑friendly
+
+Ghi chú tổng quát
+
+• Đây là bảng tuổi thọ thô để so sánh và dàn cảnh. Chưa tính cộng/dội do Nguyên Linh, khế ước,
+pháp bảo, chấn thương lâu ngày, hoặc hiệu ứng vùng (Thiên/Địa/Tâm/Hạ/Vành).
+• Quy ước lão hoá: Phàm & 6 cảnh — bắt đầu già ở 25% thọ nguyên còn lại; Thánh — 15%; Bán
+Thần — 7%. Trước ngưỡng này hình dáng nhìn vẫn như 'trẻ'.
+
+A) Phàm 1–6 — Cộng thọ & Tổng thọ
+
+Đại cảnh giới
+
+Trọng
+
+Cộng thọ khi đột phá
+
+Tổng thọ nguyên (năm)
+
+Khai Nguyên
+
+Khai Nguyên
+
+Khai Nguyên
+
+Khai Nguyên
+
+Khai Nguyên
+
+Khai Nguyên
+
+Khai Nguyên
+
+Khai Nguyên
+
+Khai Nguyên
+
+Trúc Cơ
+
+Trúc Cơ
+
+Trúc Cơ
+
+Trúc Cơ
+
+Trúc Cơ
+
+Trúc Cơ
+
+Trúc Cơ
+
+Trúc Cơ
+
+Trúc Cơ
+
+Ngưng Đan
+
+Ngưng Đan
+
+Ngưng Đan
+
+Ngưng Đan
+
+Ngưng Đan
+
+Ngưng Đan
+
+Ngưng Đan
+
+Ngưng Đan
+
+Ngưng Đan
+
+Kết Đan
+
+Kết Đan
+
+Kết Đan
+
+Kết Đan
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+8
+
+9
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+8
+
+9
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+8
+
+9
+
+1
+
+2
+
+3
+
+4
+
++5
+
++5
+
++5
+
++5
+
++5
+
++5
+
++5
+
++5
+
++5
+
++30 (đột phá từ KN9)
+
++10
+
++10
+
++10
+
++10
+
++10
+
++10
+
++10
+
++10
+
++70 (đột phá từ TC9)
+
++40
+
++40
+
++50
+
++50
+
++50
+
++60
+
++60
+
++60
+
++150 (đột phá từ ND9)
+
++160
+
++160
+
++170
+
+125
+
+130
+
+135
+
+140
+
+145
+
+150
+
+155
+
+160
+
+165
+
+195
+
+205
+
+215
+
+225
+
+235
+
+245
+
+255
+
+265
+
+275
+
+345
+
+385
+
+425
+
+475
+
+525
+
+575
+
+635
+
+695
+
+755
+
+905
+
+1065
+
+1225
+
+1395
+
+
+===== [PAGE 100 / 185] =====
+Kết Đan
+
+Kết Đan
+
+Kết Đan
+
+Kết Đan
+
+Kết Đan
+
+Đúc Phách
+
+Đúc Phách
+
+Đúc Phách
+
+Đúc Phách
+
+Đúc Phách
+
+Đúc Phách
+
+Đúc Phách
+
+Luyện Hồn
+
+Luyện Hồn
+
+Luyện Hồn
+
+5
+
+6
+
+7
+
+8
+
+9
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+1
+
+2
+
+3
+
++170
+
++170
+
++180
+
++180
+
++180
+
++300 (đột phá từ KD9)
+
++350
+
++400
+
++400
+
++450
+
++450
+
++500
+
++825 (đột phá từ ĐP7)
+
++925
+
++1025
+
+B) Thánh Tam Bộ — Tổng thọ theo bậc
+
+Trọng
+
+TN — Tổng thọ
+
+TH — Tổng thọ
+
+TT — Tổng thọ
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+8
+
+9
+
+10100
+
+10800
+
+11550
+
+12350
+
+13200
+
+14100
+
+15050
+
+16050
+
+17150
+
+20650
+
+21850
+
+23150
+
+24550
+
+26050
+
+27650
+
+29350
+
+31150
+
+33650
+
+1565
+
+1735
+
+1915
+
+2095
+
+2275
+
+2575
+
+2925
+
+3325
+
+3725
+
+4175
+
+4625
+
+5125
+
+5950
+
+6875
+
+7900
+
+36650
+
+39150
+
+41850
+
+44850
+
+48150
+
+51750
+
+55750
+
+60250
+
+65150
+
+
+===== [PAGE 101 / 185] =====
+ARCLUNE CODEX — ERRATA/AUDIT v1.17F6
+
+Longevity Update (Thánh Cảnh 3 bộ & Bán Thần)
+
+This addendum supersedes prior longevity tables in v1.17F5 and earlier. Figures are 'raw 
+lifespan' only (không t ính Nguyên Linh bổ trợ hoặc tổ n thương gi ảm thọ). Event scale remains: 
+Nhỏ  (>=100y), Vừa (>=1,500y), L ớn (>=30,000y), Kiếp Vực (>=400,000y), Đa Kiếp Vực 
+(>=5,000,000y), Đại  Chu Kỳ (>=80,000,000y).
+
+A) Thánh nhân — Tổng thọ theo bậc (đã giảm 30%)
+
+Bậc 
+
+TN1
+
+TN2
+
+TN3
+
+TN4
+
+TN5
+
+TN6
+
+TN7
+
+TN8
+
+TN9
+
+Tổng thọ (năm)
+
+17,500
+
+19,250
+
+21,350
+
+23,450
+
+25,550
+
+27,650
+
+30,100
+
+32,550
+
+35,700
+
+B)  Thánh hoàng  — Tổng thọ 
+
+theo bậc  (đã giảm 30%)
+
+Bậc
+
+TH1
+
+TH2
+
+TH3
+
+TH4
+
+TH5
+
+TH6
+
+TH7
+
+TH8
+
+TH9
+
+Tổng  thọ (năm)
+
+56,000
+
+64,400
+
+73,500
+
+83,300
+
+93,800
+
+105,000
+
+116,900
+
+128,800
+
+140,000
+
+C)  Thánh tôn — Tổng thọ theo bậc ( đã giảm 30%)
+
+Bậc
+
+TT1
+
+TT2
+
+TT3
+
+TT4
+
+TT5
+
+TT6
+
+Tổng thọ (năm)
+
+210,000
+
+231,000
+
+255,500
+
+283,500
+
+315,000
+
+346,500
+
+
+===== [PAGE 102 / 185] =====
+TT7
+
+TT8
+
+TT9
+
+364,000
+
+385,000
+
+420,000
+
+
+===== [PAGE 103 / 185] =====
+D)  Bán Thần — Thọ nguyên theo % ngưng tụ Thần Cách (đã giảm 50% seed; 
+điều  chỉnh 100% = 4,000,000y)
+
+% Thần Cách 
+
+Cộng  thêm (năm)
+
+Tổng  thọ (năm)
+
+0%
+
+10%
+
+20%
+
+30%
+
+40%
+
+50%
+
+60%
+
+70%
+
+80%
+
+90%
+
+100%
+
+0
+
+350.000
+
+700.000
+
+1.050.000
+
+1.400.000
+
+1.750.000
+
+2.100.000
+
+2.450.000
+
+2.800.000
+
+3.150.000
+
+3.500.000
+
+500.000
+
+850.000
+
+1.200.000
+
+1.550.000
+
+1.900.000
+
+2.250.000
+
+2.600.000
+
+2.950.000
+
+3.300.000
+
+3.650.000
+
+4.000.000
+
+Notes:
+
+- Seed 0% = 500,000 năm (đăng B án Thần mới, sau khi đốt sạch Thánh 
+- Mỗi +1% ng ưng tụ Th ần Cách: +35,000 năm; 100% = 4,000,000 năm.
+- Cửa  già: Phàm 25% (cid:127) Thánh 15% (cid:127) Bán Thần 7% (tính trên tổng thọ hiện hành).
+
+===== [PAGE 104 / 185] =====
+Arclune Addendum — Geo × Lò Hạch × Tín Tu
+
+Phiên bản v1.21f×1.22b×1.22c (Deluxe Merge, PDF/A-friendly)
+Build: 2025-08-12 13:36 UTC
+
+I) Canon Charter & Ưu tiên xung đột
+• Ưu tiên: Errata mới nhất > v1.22c (Tín Tu) > v1.22b (Lò Hạch Deluxe) > v1.21f (Geo-Deluxe).
+• Thuật ngữ: Nguyên Linh (Linh Hạch), Khí Linh (9 bậc), Công Đức & Địa Thần, U Giới & Quỷ Vực, Thần Vực & Kiếm Thiên.
+• Toponymy: Hán‑Việt + mã ALH; TTLA = Thần Tích Lưu Ảnh (liên khu di tích).
+• Không nhúng hazards; hazards phát hành phụ lục riêng.
+
+II) Cross‑link hoá Tín Tu ↔ Địa lí & Lò Hạch
+• Mỗi vùng (ALH) có metadata: Cột Chòm Ký (cấp/điểm), Bể Công Đức (Low/Med/High), phổ phẩm Lò Hạch.
+• Tín Tu dùng chòm ký: không vượt thần chủ; băng thông bị giới hạn bởi Cột Chòm Ký của vùng.
+• Bể Công Đức cao → ổn áp lò hạch tốt; giảm nguy cơ tạp hoả khi dựng cột chòm ký.
+• U/Quỷ chỉ ghi mức thấm nền để cân bằng scene; không miêu tả tai biến cụ thể trong bản gộp này.
+
+III) Tương thích hệ thống
+giữ nguyên; thọ nguyên & ‘cửa già’ giữ nguyên; lĩnh vực Thánh đơn vị km.
+•
+• Tín Tu không quy đổi thành PDU; chỉ ảnh hưởng ổn định vận hành & sát thương đặc chủng (tà vật/hồn tu).
+• Geo metadata chỉ nêu khung: ALH, bờ cõi, biển–eo, lộ tuyến, TTLA; thêm các trường Tín Tu/Lò Hạch để liên kết.
+
+Ghi chú: Nếu có chỗ lệch thuật ngữ giữa tài liệu, ưu tiên cách viết trong v1.22c (Tín Tu).
+
+
+===== [PAGE 105 / 185] =====
+Arclune Addendum v1.21f×1.22b — Geo × Lò Hạch
+
+Phiên bản Deluxe Merge • Chuẩn hoá toponymy/ALH • Không hazards trong thân tài liệu
+Build: 2025-08-12 13:31 UTC • PDF/A-friendly
+
+I) Canon Charter & Ưu tiên xung đột
+• Ưu tiên: Errata mới nhất > v1.22b (Lò Hạch Deluxe) > v1.21f (Geo-Deluxe).
+• Thuật ngữ: Nguyên Linh (Linh Hạch), Khí Linh (9 bậc), Công Đức, U/Quỷ, Thần Vực & Kiếm Thiên giữ nguyên.
+• Toponymy: Hán‑Việt + Mã ALH (ví dụ ALH‑CGQ, ALH‑LMH, ALH‑AQ, ALH‑HVV, ALH‑TTLA).
+• Bản này không nhúng hazards; hazards tách phụ lục riêng để không mâu thuẫn bản đồ nền.
+
+II) Cross‑link hoá Lò Hạch ↔ Địa Lí
+• Mỗi châu/vực thêm metadata Lò Hạch: phổ phẩm cấp (điển hình), lệch phân bố, hạn cảnh (ceiling) theo grade.
+• Cổng & lộ tuyến: vùng có ALH‑TTLA/địa mạch mạnh tăng xác suất ‘dị loại’ Lò Hạch (ghi chú hoá).
+• Hệ Sự kiện: không thay đổi; chỉ ghi ‘nhạy cảm thăng cấp’ ở vùng có mật độ Lò Hạch cao.
+• Tín Tu/Công Đức: Bể Công Đức cao → ổn áp lò hạch tốt hơn (giảm nguy cơ ‘tạp hoả’).
+
+III) Tương thích năng lượng & cảnh giới
+•
+• Không sửa bảng thọ nguyên & cửa già; các ví dụ trong Địa chí theo chuẩn Thánh lĩnh vực km (không 100m).
+
+không đổi; Lò Hạch grade chỉ ảnh hưởng tốc độ hấp thu/thuế biến & trần cảnh ở Phàm/Thánh sớm.
+
+IV) Chỉ mục nhanh trong gói hợp nhất
+• Phần A — Geo-Deluxe (v1.21f): bản đồ nền, toponymy, ALH, cross-link Công Đức/U/Quỷ.
+• Phần B — Lò Hạch Deluxe (v1.22b): phẩm cấp, tần suất, trần cảnh, dị biến, bảo dưỡng, rủi ro.
+
+Ghi chú: Nếu phát hiện lệch thuật ngữ/đơn vị ở vùng cụ thể, ưu tiên cách viết trong v1.22b Lò Hạch (Deluxe).
+
+
+===== [PAGE 106 / 185] =====
+Arclune Addendum v1.21f — Geo‑Deluxe Merge
+
+Build: 2025-08-12 13:23 UTC • PDF/A‑friendly • Font: DejaVu Sans
+Bản hợp nhất hai addendum: v1.20c (Hệ Địa Lý, không hazards) + v1.21e (Địa Lý + U/Quỷ + Công Đức).
+Áp dụng quy định dung hợp mới: chuẩn hoá toponymy & mã ALH, bỏ trùng lặp, cross‑link U/Quỷ & Công
+Đức vào từng vùng. Không kèm bảng hiểm hoạ; hazards sẽ là phụ lục riêng.
+
+Chuẩn canon giữ nguyên: thang Sự kiện 6 cấp; Niên thọ & Cửa già; phạm vi Lĩnh vực Thánh (km); Công
+Đức & Địa Thần; U Giới & Quỷ Vực; Thần Vực & Kiếm Thiên.
+
+
+===== [PAGE 107 / 185] =====
+A) Toponymy & Mã ALH (12 vùng chuẩn + liên khu di tích)
+Chuẩn Hán‑Việt (tân danh) • Kèm mã ALH dùng bởi Cơ Giới Quốc (AI/cảng vụ). Liên khu ‘Thần Tích Lưu
+Ảnh’ (TTLA) không tính vào 12 vùng hành chính.
+
+ (ALH·CGQ)
+
+ALH‑01 — Hồng Viêm Vực
+
+• Thuộc tính chính: Hỏa • Dung nham
+• Kinh đô/Thủ phủ: Xích Tâm Thành
+• Trung tâm chòm ký: Phủ Hồng Viêm – thờ Hỏa Thần/Viêm Đế
+
+ALH‑02 — Băng Tâm Châu
+
+• Thuộc tính chính: Thủy • Băng
+• Kinh đô/Thủ phủ: Hàn Trì Kinh
+• Trung tâm chòm ký: Tĩnh Hải Đình – thờ Băng/Thủy Thần
+
+ALH‑03 — Thanh Vũ Châu
+
+• Thuộc tính chính: Phong • Khí
+• Kinh đô/Thủ phủ: Phong Đài Đô
+• Trung tâm chòm ký: Thánh Đài Phong Trụ – thờ Phong Thần
+
+ALH‑04 — Lôi Đình Vực
+
+• Thuộc tính chính: Lôi • Điện
+• Kinh đô/Thủ phủ: Lôi Môn Thành
+• Trung tâm chòm ký: Lôi Tháp Cửu Tầng – thờ Lôi Thần (tiên thiên)
+
+ALH‑05 — Quang Minh Quốc
+
+• Thuộc tính chính: Quang • Tịnh
+• Kinh đô/Thủ phủ: Tịnh Quang Kinh
+• Trung tâm chòm ký: Thần Tòa Quang Hoàng – thờ Quang Thần
+
+ALH‑06 — Ám Quốc
+
+• Thuộc tính chính: Ám • Ảnh
+• Kinh đô/Thủ phủ: Hắc Tẩm Kinh
+• Trung tâm chòm ký: Hắc Ấn Điện – thờ Ám Thần
+
+ALH‑07 — Mộc Linh Châu
+
+• Thuộc tính chính: Mộc • Sinh mệnh
+• Kinh đô/Thủ phủ: Linh Mộc Đô
+• Trung tâm chòm ký: Sinh Thần Viện – thờ Sinh Mệnh Thần
+
+ALH‑08 — Thổ Trấn Châu
+
+• Thuộc tính chính: Thổ • Nham
+• Kinh đô/Thủ phủ: Thạch Thành
+• Trung tâm chòm ký: Cự Thổ Miếu – thờ Thổ Thần
+
+ALH‑09 — Kim Tinh Châu
+
+• Thuộc tính chính: Kim • Luyện
+• Kinh đô/Thủ phủ: Kim Luyện Đô
+• Trung tâm chòm ký: Bách Luyện Đàn – thờ Luyện Kim Thần
+
+ALH‑10 — Huyết Quốc
+
+ (ALH·HQ)
+
+• Thuộc tính chính: Huyết • Tế
+• Kinh đô/Thủ phủ: Huyết Lâu Kinh
+• Trung tâm chòm ký: Huyết Ấn Tông – thờ Huyết Thần
+
+ALH‑11 — Cơ Giới Quốc
+
+ (ALH·CGQ)
+
+• Thuộc tính chính: Cơ giới • Công nghệ
+• Kinh đô/Thủ phủ: Cơ Tâm Thành
+• Trung tâm chòm ký: Viện Trí Năng – thờ Thần Rèn (gián tiếp)
+
+
+===== [PAGE 108 / 185] =====
+A) Toponymy & Mã ALH (tiếp)
+
+ALH‑12 — Liên Minh Hải Miễu
+
+ (ALH·HM)
+
+• Thuộc tính chính: Hải • Hải đạo
+• Kinh đô/Thủ phủ: Hải Đình Phủ
+• Trung tâm chòm ký: Hải Thần Miếu – thờ Hải Thần
+
+TTLA — Thần Tích Lưu Ảnh (liên khu di tích)
+
+Liên kết nhiều khu di tích trải khắp 12 vùng; không thuộc quản hạt hành chính. Dùng làm trục ‘thần
+tích’ để khảo cứu/khai mở cổng yếu giữa Hạ Giới ↔ Thần Vực/ Kiếm Thiên (giới hạn).
+
+
+===== [PAGE 109 / 185] =====
+B) Hải đồ (Biển, eo, hải môn)
+SLH‑01 — Đại Liên Hải
+
+• Ghi chú: vòng cung bao Liên Minh Hải Miễu; thương tuyến thuỷ‑phong.
+
+ (ALH·HM)
+
+SLH‑02 — Trung Hải
+
+• Ghi chú: nằm giữa 6 vùng nội lục; giao điểm địa mạch yếu.
+
+SLH‑03 — Hồng Mang Hải
+
+• Ghi chú: áp gần Hồng Viêm Vực; ‘nhiệt hải’ có mạch dung nham ngầm.
+
+SLH‑04 — Bạch Lan Hải
+
+• Ghi chú: sát Quang Minh Quốc; ‘quang triều’ theo mùa lễ.
+
+SLH‑05 — Hắc Mang Hải
+
+• Ghi chú: áp Ám Quốc; dễ sinh ‘tử triều’; tín tu quang hệ hữu hiệu.
+
+SLH‑06 — Băng Sương Hải
+
+• Ghi chú: bắc ngoại; băng phiến nổi – cửa ngõ Băng Tâm Châu.
+
+Hải môn/eo chính: Phong Khẩu (ALH‑03↔SLH‑02), Lôi Tiễn Môn (ALH‑04↔SLH‑02), Quang‑Ám Hải Độ
+(ALH‑05↔ALH‑06).
+
+
+===== [PAGE 110 / 185] =====
+C) Hồ sơ vùng — Cross‑link U/Quỷ & Công Đức
+Mỗi vùng ghi: (1) Diện tích ước lệ; (2) Pha nguyên tố/đạo; (3) Mật độ chòm ký; (4) Cổng U/Quỷ; (5)
+Công Đức ‘dễ tích’; (6) Danh kiếm liên hệ; (7) Điểm truyện gợi ý.
+ALH‑01 — Hồng Viêm Vực
+
+• Diện tích ước lệ: ~2.4–3.1 triệu km²
+• Pha nguyên tố/đạo: Hỏa, Dung nham, Nhiệt đạo
+• Mật độ chòm ký: Cao quanh Phủ Hồng Viêm
+• Cổng U/Quỷ: Rải rác ‘Nhiệt u khẩu’ (Trung)
+• Công Đức dễ tích: chặn phun nứt; cứu dân khỏi nhiệt triều; thanh tẩy mạch khói
+• Danh kiếm liên hệ: Hồng Viêm Kiếm
+• Gợi ý hook: tranh mỏ ‘Hỏa tủy’; lễ ‘Hỏa đăng hành’ dễ bị tà chèn.
+
+ALH‑02 — Băng Tâm Châu
+
+• Diện tích ước lệ: ~2.0–2.6 triệu km²
+• Pha nguyên tố/đạo: Thủy, Băng, Tĩnh đạo
+• Mật độ chòm ký: Trung‑Cao ven Hàn Trì
+• Cổng U/Quỷ: ‘Sương minh khẩu’ (Thấp‑Trung)
+• Công Đức dễ tích: giải ố băng; dẫn hải đoàn qua băng triều; bảo tồn mạch thủy
+• Danh kiếm liên hệ: Băng Tâm Kiếm
+• Gợi ý hook: đường băng nứt mở lối TTLA; hải tặc băng cầu chòm ký.
+
+ALH‑03 — Thanh Vũ Châu
+
+• Diện tích ước lệ: ~1.9–2.4 triệu km²
+• Pha nguyên tố/đạo: Phong, Khí, Thính đạo
+• Mật độ chòm ký: Cao tại Phong Đài
+• Cổng U/Quỷ: ‘Phong âm khẩu’ (Thấp)
+• Công Đức dễ tích: hộ vận lương khí; bình ổn tháp phong ấn; dẹp ‘gió độc’
+• Danh kiếm liên hệ: Thanh Vũ Kiếm
+• Gợi ý hook: đấu quyền gió với Cơ Giới quốc về turbine Aether.
+
+ (ALH·CGQ)
+
+ALH‑04 — Lôi Đình Vực
+
+• Diện tích ước lệ: ~1.8–2.2 triệu km²
+• Pha nguyên tố/đạo: Lôi, Dẫn, Trừng đạo
+• Mật độ chòm ký: Cao quanh Lôi Tháp
+• Cổng U/Quỷ: ‘Tĩnh nghịch khẩu’ (Trung)
+• Công Đức dễ tích: dẫn lôi cứu hạn; trấn áp thiên lôi tà; bảo trì mạch lôi
+• Danh kiếm liên hệ: Tinh Vẫn/ Lôi Ảnh Kiếm
+• Gợi ý hook: ‘Hành lôi tế’ nhiễm ô; tranh quyền khai thác lôi khoáng.
+
+ALH‑05 — Quang Minh Quốc
+
+• Diện tích ước lệ: ~2.2–2.8 triệu km²
+• Pha nguyên tố/đạo: Quang, Tịnh, Chân đạo
+• Mật độ chòm ký: Rất cao tại Tịnh Quang Kinh
+• Cổng U/Quỷ: ‘Tật ám khe’ (Thấp)
+• Công Đức dễ tích: tẩy miasma; bảo hộ hành hương; chữa bệnh ô uế
+• Danh kiếm liên hệ: Ngọc Linh/ Tịnh Kiếm
+• Gợi ý hook: ‘Quang triều’ mùa lễ gây tranh thương lộ.
+
+ALH‑06 — Ám Quốc
+
+• Diện tích ước lệ: ~2.1–2.7 triệu km²
+• Pha nguyên tố/đạo: Ám, Ảnh, Giấu đạo
+• Mật độ chòm ký: Cao tại Hắc Tẩm
+• Cổng U/Quỷ: ‘Ảnh u khẩu’ (Trung‑Cao)
+• Công Đức dễ tích: dẫn mộng an táng; trấn quỷ thất tiết; giữ cân bằng đêm
+• Danh kiếm liên hệ: Huyền Lệ/ Ảnh Song Kiếm
+• Gợi ý hook: đấu chòm với Quang quốc dọc biên ‘Quang‑Ám Hải Độ’.
+
+
+===== [PAGE 111 / 185] =====
+C) Hồ sơ vùng (tiếp)
+ALH‑07 — Mộc Linh Châu
+
+• Diện tích ước lệ: ~1.7–2.2 triệu km²
+• Pha nguyên tố/đạo: Mộc, Sinh, Dưỡng đạo
+• Mật độ chòm ký: Trung‑Cao tại Linh Mộc
+• Cổng U/Quỷ: ‘Sinh u khẩu’ (Thấp)
+• Công Đức dễ tích: tịnh thổ; phục hồi rừng mạch; hộ sản phụ ‘hồn đăng’
+• Danh kiếm liên hệ: Ngọc Linh Kiếm
+• Gợi ý hook: dịch bệnh mộc nấm lạ từ U Giới, cần tín‑quang phối hợp.
+
+ALH‑08 — Thổ Trấn Châu
+
+• Diện tích ước lệ: ~1.6–2.0 triệu km²
+• Pha nguyên tố/đạo: Thổ, Nham, Trấn đạo
+• Mật độ chòm ký: Trung tại Thạch Thành
+• Cổng U/Quỷ: ‘Nham u khẩu’ (Thấp‑Trung)
+• Công Đức dễ tích: gia cố thành trì; trấn áp sụt mạch; khai quật TTLA an toàn
+• Danh kiếm liên hệ: Thổ Ấn Kiếm (phái)
+• Gợi ý hook: đấu mạch với Kim Tinh về quyền mỏ ‘Âm kim trơ’.
+
+ALH‑09 — Kim Tinh Châu
+
+• Diện tích ước lệ: ~1.9–2.5 triệu km²
+• Pha nguyên tố/đạo: Kim, Luyện, Cắt đạo
+• Mật độ chòm ký: Cao tại Kim Luyện Đô
+• Cổng U/Quỷ: ‘Kim u khẩu’ (Thấp)
+• Công Đức dễ tích: thanh luyện quặng ô nhiễm; trấn hung khí; cầu lò an
+• Danh kiếm liên hệ: Danh Kiếm: Hữu Tứ hệ? (sưu chính)
+• Gợi ý hook: thị trường khai khoáng + danh lực nuôi khí linh.
+
+ALH‑10 — Huyết Quốc
+
+ (ALH·HQ)
+
+• Diện tích ước lệ: ~1.5–2.0 triệu km²
+• Pha nguyên tố/đạo: Huyết, Tế, Mệnh đạo
+• Mật độ chòm ký: Trung‑Cao tại Huyết Lâu
+• Cổng U/Quỷ: ‘Huyết u khẩu’ (Trung‑Cao)
+• Công Đức dễ tích: ngăn tế trái đạo; cứu tế ‘huyết triều’; bảo hộ dòng họ
+• Danh kiếm liên hệ: Hồng Lệ/ Huyết Vũ Kiếm
+• Gợi ý hook: giằng co tông phái huyết ấn; danh kiếm dễ bị ‘tàn thần’ lôi kéo.
+
+ALH‑11 — Cơ Giới Quốc
+
+ (ALH·CGQ)
+
+• Diện tích ước lệ: ~1.6–2.1 triệu km²
+• Pha nguyên tố/đạo: Cơ giới, Kỹ thuật, Lý đạo
+• Mật độ chòm ký: Cao (trạm chuẩn số)
+• Cổng U/Quỷ: Nhiễu thấp (lọc Aether)
+• Công Đức dễ tích: bảo trì trạm chòm; tiêu chuẩn hoá ấn; cứu hoả công nghiệp
+• Danh kiếm liên hệ: — (giáp danh)
+• Gợi ý hook: xung đột ‘chuẩn ký’ với giáo phái truyền thống.
+
+ALH‑12 — Liên Minh Hải Miễu
+
+ (ALH·HM)
+
+• Diện tích ước lệ: ~2.3–3.0 triệu km² (tính mặt nước)
+• Pha nguyên tố/đạo: Hải, Mù, Dẫn đạo
+• Mật độ chòm ký: Trung quanh hải miếu
+• Cổng U/Quỷ: ‘Hải u khẩu’ (Thấp‑Trung)
+• Công Đức dễ tích: cứu nạn bão; thanh tẩy xác thuyền; giữ luồng cá
+• Danh kiếm liên hệ: Mị Ảnh/ Hải Ngân Kiếm (địa phương)
+• Gợi ý hook: tranh phân tuyến với Thanh Vũ về gió biển.
+
+
+===== [PAGE 112 / 185] =====
+D) Quy chuẩn vận hành Tín Tu theo vùng
+Mỗi vùng kèm ‘mẫu’ chòm ký khuyến nghị cho tế quan; băng thông/độ suy hao phụ thuộc cấp đài. Công
+Đức được tính khác nhau theo hành vi hữu ích đặc thù địa phương.
+Ví dụ nhanh: Quang Minh Quốc ưu tẩy uế & y tế cộng đồng; Hồng Viêm ưu phòng cháy–đê dung; Cơ Giới
+ưu chuẩn hoá ấn ký công xưởng; Hải Miễu ưu cứu nạn hải hành.
+
+
+===== [PAGE 113 / 185] =====
+E) Tương thích Thang Sự kiện & Nhịp câu chuyện
+• Sự kiện Nhỏ (≥100 năm): đổi chuẩn cột, tranh chấp địa phương, cổng U/Quỷ lẻ.
+• Sự kiện Vừa (≥1,500 năm): hai vùng ‘đi dây’ chòm ký; tối đa Thánh Tôn 7 trực chiến; TT8–9 chỉ
+gián tiếp; không có Bán Thần trực tiếp.
+• Sự kiện Lớn (≥30,000 năm): tranh thương tuyến/điển lễ to; có thể dính Bán Thần (không dùng quyền
+Thần Quốc).
+• Kiếp Vực (≥400,000): hạ tầng vùng rung; cần liên vùng hợp tác.
+• Đa Kiếp Vực (≥5,000,000): tái thiết mạng chòm ký theo ‘đạo mùa’; chỉ tham gia gián tiếp từ Trung
+vị thần trở lên.
+• Đại Chu Kỳ (≥80,000,000): tái bố cục lục địa–thần tích; Hạ vị thần có thể trực tiếp (không kéo
+Thần Quốc).
+
+
+===== [PAGE 114 / 185] =====
+xuất hiện, đọc là ‘Thần Tích Lưu Ảnh (TTLA)’.
+
+F) Bảng đối chiếu Cổ ↔ Tân ↔ Mã (ALH)
+Dùng khi gặp văn bản cũ. Nếu 
+ALH‑01  |  Hồng Viêm Vực (cũ y tên)            → Hồng Viêm Vực
+ALH‑02  |  Băng Tâm Châu                       → Băng Tâm Châu
+ALH‑03  |  Thanh Vũ Châu                       → Thanh Vũ Châu
+ALH‑04  |  Lôi Đình Vực                        → Lôi Đình Vực
+ALH‑05  |  Quang Minh Quốc                     → Quang Minh Quốc
+ALH‑06  |  Ám Quốc /
+ALH‑07  |  Mộc Linh Châu                       → Mộc Linh Châu
+ALH‑08  |  Thổ Trấn Châu                       → Thổ Trấn Châu
+ALH‑09  |  Kim Tinh Châu                       → Kim Tinh Châu
+ALH‑10  |  Huyết Quốc                          → Huyết Quốc
+ (ALH·HQ)
+ALH‑11  |  Cơ Giới Quốc                        → Cơ Giới Quốc
+ALH‑12  |  Liên Minh Hải Miễu                  → Liên Minh Hải Miễu
+ (ALH·HM)
+  TTLA  |  —                                   → Thần Tích Lưu Ảnh (liên khu di tích)
+
+ (ALH·CGQ)
+
+ (ALH·CGQ)
+
+ (ALH·HM)
+
+ (ALH·HQ)
+
+(cách gọi cũ rời rạc) → Ám Quốc
+
+
+===== [PAGE 115 / 185] =====
+G) Canon Alignment & Errata
+1) Không chứa bảng hazards; mọi nguy cơ bất thường (bão lệch, khe nứt thời‑không, mỏ độc) sẽ nằm ở
+phụ lục ‘Hazards’ riêng để tránh trùng lặp.
+2) Chuẩn hoá phạm vi Lĩnh vực Thánh (km) cho mọi ví dụ địa phương.
+3) Liên thông Công Đức: mỗi vùng có ‘mẫu hành vi’ tích công đức riêng.
+4) Tôn trọng cấm giới: Tín tu không được tạo quy tắc mới; chỉ vận hành luật của thần chủ trong
+giáo vực.
+5) TTLA được coi là ‘liên khu di tích’ — không phải quốc gia.
+
+
+===== [PAGE 116 / 185] =====
+Arclune Addendum v1.21f — Geo‑Deluxe Merge (Hệ Địa Lý + U/Quỷ + Công Đức)
+
+Bản này hợp nhất nội dung địa lý và cross‑link hệ thống; dùng kèm Master v1.23a và các addendum chuyên đề khác.
+
+
+===== [PAGE 117 / 185] =====
+Arclune Codex — Addendum v1.22b (Deluxe)
+
+Lò Hạch — Độ Hiếm • Trần Cảnh Giới • Mô Hình Hiệu Suất • Luyện Hạch • Chẩn Đoán • Track Tu Luyện
+Build: 2025-08-12 12:12Z • Font: DejaVuSans • PDF/A-friendly
+
+I. Độ hiếm & Phân bố
+
+Bậc lò
+
+Sơ cấp
+
+Trung cấp
+
+Cao cấp
+
+Thượng cấp
+
+Thần cấp
+
+Ký hiệu Tỉ lệ nền
+
+Vi-phẩm
+
+Khuynh hướng
+
+F1
+
+F2
+
+F3
+
+F4
+
+F5
+
+≈ 1/100
+
+Hạ/Trung/ThượngTạp nhiều; dễ nợ nhiệt; rò phổ biến
+
+≈ 1/1.000
+
+≈ 1/10.000
+
+H/T/Th
+
+H/T/Th
+
+Cân bằng; nền phái đông nhất
+
+Tinh lọc tốt; mở cửa Thánh (khó)
+
+≈ 1/100.000
+
+H/T/Th
+
+Ổn pha cao; hợp đường dài
+
+≈ 1/100.000.000 —
+
+Thiên tư tuyệt đỉnh; cửa bán thần
+
+Biến  thiên  vùng:  Hợp  Tố/Thần  Tích/Linh  Mạch  cổ:  ×1.5–×3  F2–F3;  Vùng  nhiễm  U  cấp  II–IV:
+−30–60%.
+
+II. Giới hạn cảnh giới theo hệ phái
+
+Bậc lò
+
+Khí tu kiếm / Thể tu (an toàn / cưỡng)Kiếm tu (bản mệnh)
+
+Kết thuật (pháp sư)
+
+Cơ giới tu
+
+F1
+
+F2
+
+F3
+
+F4
+
+F5
+
+KĐ9 / ĐP1–3
+
+ĐP7 / LH1
+
+LH3 / TN1 (khó)
+
+TN1–5 / TH1–3
+
+KĐ6 / KĐ9
+
+ĐP7 / LH2
+
+TN1–3 / TN4–5
+
+TH1–5 / TT1–3
+
+KĐ9 / ĐP1
+
+ĐP5 / ĐP7
+
+LH3 / TN1 (hiếm)
+
+TN1–4 / TH1
+
+TT1–6 / Cửa Bán thần
+
+TT1–9 / Cửa Bán thần tối ưu TH3–9 / TT1–3
+
+Lõi phản ứng (bảng riêng)
+
+—
+
+—
+
+—
+
+—
+
+Viết tắt: KĐ=Kết Đan, ĐP=Đúc Phách, LH=Luyện Hồn, TN=Thánh Nhân, TH=Thánh Hoàng, TT=Thánh Tôn.
+
+III. Mô hình hiệu suất lò hạch (tham trị cho tác giả)
+
+Tham số: Hút (H) — ml Aether/giờ; Tinh (T) — % tạp; Ổn (Ô) — hệ số 0–1; Dung (D) — ml; Nợ
+nhiệt (NN); Vệt xanh (VX).
+Gợi ý nội bộ: Hiệu suất E ≈ H × (T/100) × Ô. Nợ nhiệt tăng khi H cao & Ô thấp; vệt xanh tăng
+khi T thấp (<70%).
+
+Bậc
+
+H (ml/h)
+
+F1
+
+F2
+
+F3
+
+F4
+
+F5
+
+5–12
+
+12–25
+
+25–45
+
+45–70
+
+70–110
+
+T (%)
+
+55–72
+
+68–82
+
+78–90
+
+88–95
+
+94–98
+
+Ô (0–1)
+
+D (ml)
+
+NN (tích lũy)
+
+VX (nguy cơ)
+
+0.40–0.65
+
+50–120
+
+0.60–0.78
+
+120–260
+
+Cao
+
+TB
+
+0.75–0.88
+
+260–520
+
+TB–Thấp
+
+0.86–0.94
+
+520–900
+
+Thấp
+
+Cao
+
+TB–Cao
+
+TB
+
+Thấp
+
+0.92–0.98
+
+900–1500
+
+Rất thấp
+
+Rất thấp
+
+Áp dụng vào cảnh: mô tả bằng dấu hiệu — lò rung/ấm, khí tức nhạt, mùi ozon, quầng lam (VX) thay vì con
+số.
+
+IV. Luyện hạch — nâng phẩm & rủi ro
+
+1 Tẩy tạp: lọc tạp niệm bằng trận gió–thủy; dùng Nguyên Linh đồng hệ.
+2 Ôn hạch: xả nợ nhiệt theo chu kỳ; dùng công đức giữ ấn ổn.
+3 Bồi hạch: khảm tinh phiến (Linh Hạch) đúng thuộc tính; kiểm tra DCLV/ĐKTT.
+4 Ấn đạo: định hướng pháp tắc (ví dụ Hỏa: Nhiệt/Thiêu/Khí); tránh trái đạo bản thân.
+Nấc nâng
+
+Xác suất tham khảo Hụt an toàn
+
+Hỏng nặng
+
+F1→F2
+
+35–45%
+
++0–1 vệt VX
+
++ nứt hạch (tụt bậc)
+
+
+===== [PAGE 118 / 185] =====
+F2→F3
+
+F3→F4
+
+F4→F5
+
+20–25%
+
+8–12%
+
+<1%
+
++ lệch pha 10–20%
+
+tắt hạch 7–21 ngày
+
++ lệch pha 20–30%
+
+nứt hạch + mất tinh phiến
+
++ hao D 5–10%
+
+vỡ hạch (mất lò)
+
+Dùng Công đức như ‘bảo hiểm’: −10–30% rủi ro hỏng nặng (tuỳ cấp ĐLC).
+
+V. Chẩn đoán lò hạch & dụng cụ
+
+Thiết bị
+
+Chức năng
+
+Dấu hiệu xấu
+
+DCLV (đo cộng hưởng lĩnh vực)
+
+Đọc phổ cộng hưởng lò–đạo
+
+đỉnh lệch >12°, răng cưa
+
+ĐKTT (đo khí thân tâm)Độ tinh lọc & ổn pha
+
+đồ thị ‘đứt’, biên độ rung cao
+
+Giám định Thuật (nhãn)Đọc H/T/Ô/D tương đối
+
+màng lam mỏng (VX), tia đen (ô nhiễm U)
+
+Chuông Minh
+
+Cảnh báo ô nhiễm U gần lò
+
+âm rè, ngân tịt
+
+VI. Track tu luyện — khuyến nghị theo hệ phái
+
+Hệ
+
+Kiếm tu
+
+Kiếm tu
+
+Kiếm tu
+
+Giai đoạn
+
+Khuyến nghị lò
+
+Mục tiêu & mốc nâng
+
+KĐ→ĐP
+
+TN→TH
+
+F2-Thượng
+
+Dựng bản mệnh; nâng F2→F3 trước khi TN1
+
+F3–F4
+
+Ưu tiên ổn pha để nuôi pháp tắc kiếm
+
+TT/cửa Bán thần F4–F5
+
+Chỉ luyện F5 khi có Công đức + Nguyên Linh hiếm
+
+Khí tu kiếm KĐ→LH
+
+Khí tu kiếm TN
+
+Kết thuật
+
+ĐP→LH
+
+Kết thuật
+
+TN
+
+Thể tu
+
+ĐP→LH
+
+Cơ giới tu
+
+—
+
+F2
+
+F3
+
+F2–F3
+
+F3–F4
+
+F2
+
+—
+
+Rèn thể song song; tránh VX
+
+Chọn ấn đạo phù hợp cơ địa (hệ nguyên tố)
+
+Tinh lọc cao; ngắt nghỉ chống nợ nhiệt
+
+Chỉ vào TN khi T>85%, Ô>0.8
+
+Dồn D (dung lượng) để bộc phát
+
+Theo Lõi phản ứng; xem Addendum Cơ Giới
+
+VII. Case studies (mẫu dựng tuyến tu)
+
+• Kiếm tu — F2→F3 trước TN1
+
+Xuất  phát  F2-Thượng;  dựng  bản  mệnh  ở  KĐ7–9;  luyện  hạch  F2→F3  sau  khi  ấn  đạo  sơ  bộ
+(Kiếm–Phong). Vào TN1 khi T≥80%, Ô≥0.78. Công đức dùng bảo hiểm 20%.
+
+• Kết thuật — LH3 vào TN1 (hiếm)
+
+Giữ  nhịp  chú  pháp  ngắn;  dùng  Nguyên  Linh  đồng  hệ  (Thủy)  để  tăng  Tinh.  Khi  T≥85%  và
+Ô≥0.8, thử cửa TN1; nếu lệch pha, lui 49 ngày xả nợ nhiệt.
+
+• Khí tu kiếm — dựng thể–kiếm cân bằng
+
+Chia aether 50/50 rèn thể/kiếm; tránh ép tốc ở F1. Khi lên F2, ưu tiên D cao để chịu đòn; lên
+LH3 rồi hẵng nghĩ TN.
+
+VIII. Gợi ý vùng luyện hạch (tham chiếu Hệ Địa Lý 1.20c)
+
+Hợp Tố châu (ALH: HT-*) ưu tiên F2→F3; Thần Tích Lưu Ảnh (TTLẢnh) cho phép cấp ĐLC khi
+nâng F3→F4; tránh ‘Quỷ Vực’ (U cấp III–IV).
+
+— Hết —
+
+
+===== [PAGE 119 / 185] =====
+Arclune Addendum v1.22c — Tín Tu
+
+Build: 2025-08-12 12:44 UTC • Font: DejaVu Sans (Unicode) • PDF/A-friendly
+
+Bản bổ sung độc lập; sẽ gộp vào Master sau khi duyệt. Dùng làm khung tác chiến, nghi thức, và
+miêu tả dấu hiệu khi viết cảnh.
+
+0) TÓM TẮT
+
+Tín tu là con đường dùng TÍN NIỆM để ‘định hình’ khí Aether thành TÍN LỰC thông qua hạ tầng CHÒM
+KÝ (cột–đài–lưới ấn).
+Chòm ký chỉ là đường ống dẫn; quyền hạn và luật đến từ VỊ THẦN được thờ. Vì vậy: tín tu KHÔNG thể
+mạnh hơn thần chủ; không sinh PDU; không đăng thần bằng tín lực thuần.
+Tín lực hữu hiệu nhất từ Phàm→Luyện Hồn (phù trợ, tẩy ô, hộ giới). Ở Thánh cảnh, tín tu dùng để
+dựng và vận hành giáo vực; ở Bán Thần làm ‘xi măng danh–tín’ hỗ trợ ngưng tụ Thần Cách (không cộng
+PDU).
+
+1) THÀNH PHẦN & ĐỊNH NGHĨA
+
+• Tín niệm: dòng cảm xúc–ý chí tập thể/cá nhân hướng đến một thần/đạo cụ thể.
+• Tín khí/Tín lực: Aether đã ‘được tô màu’ bởi tín niệm, dùng để thi triển phúc lệnh/giới lệnh.
+• Chòm ký: hạ tầng Ấn–Trụ–Đài–Lưới dẫn/thu–lọc tín lực (không tự sinh lực).
+• Phúc lệnh: tác dụng ban–tẩy–hộ–trói do thần chủ cho phép trong miền đạo của mình.
+• Giáo vực: vùng ảnh hưởng tín–luật do chòm ký bện với lĩnh vực (khi người vận hành đạt Thánh).
+
+2) CƠ CHẾ DẪN LƯU (PIPELINE)
+
+(Ý niệm)→(Đàn tế/biểu tượng)→(Cột ấn)→(Lưới tín tuyến)→(Điện thờ/đài)→(Phúc lệnh thác xuống).
+Bảy nguyên tắc:
+1) Authority Cap: chỉ được dùng luật/phúc trong MIỀN ĐẠO của thần (quang–tẩy, thuỷ–tẩy uế, v.v.).
+2) Bandwidth: công suất phụ thuộc cấp chòm ký (xem mục 5). Xa nút → suy hao.
+3) Vessel Cap: mạch–hồn của người thừa hành. Yếu mà gánh phúc lớn → cháy ấn, bại thể.
+4) World Cap: ở Hạ Giới không sinh QUY TẮC mới; chỉ điều phối luật có sẵn của thần.
+5) Noise: U Giới/Quỷ Vực gây nhiễu–lệch pha → méo phúc, phản trấn.
+6) Feedback: lễ nghịch đạo, lạm sát → giảm nguồn, tăng phản phệ.
+7) Consent: thần có thể ‘khóa’ tín tu cá nhân/địa phương khi cần (đứt băng thông).
+
+3) VAI TRÒ THEO CẢNH GIỚI
+
+• Phàm 1–6: nhận phúc nhẹ (hộ thể, khử tà), tăng bền mạch; tác chiến gần đền/ấn.
+• Đúc Phách/Luyện Hồn: dệt TÍN TUYẾN, mở ẢNH VỰC TÍN địa phương; làm tế quan lưu động.
+• Thánh Nhân–Hoàng–Tôn: dựng CỘT/ĐÀI CHÒM KÝ; thiết định ‘giáo vực’ vi mô phù hợp miền đạo; điều
+độ phúc lệnh diện rộng.
+• Bán Thần: tín lực nuôi ‘hiện diện danh–tín’, trợ ngưng tụ Thần Cách (ổn định), chống đoạt đạo;
+KHÔNG +PDU.
+
+4) BỘ ‘TÍN KỸ’ (NGHI THỨC – MẪU DÙNG TRONG CẢNH)
+
+Tẩy Ô: rửa uế–âm hoại; dấu hiệu: mùi tùng khô, ánh vảy bạc bám bề mặt.
+Hộ Giới: vẽ vòng ấn; gió tĩnh, bụi bay ngược khi chạm rìa.
+Phúc Lực: gia trì lên đòn/giáp; tiếng chuông rất nhỏ ‘không đến từ đâu’.
+Thệ Ước: lập ràng buộc; sợi chữ mảnh nổi trên da, tan vào mạch tay.
+Trừ Tà: chốt đinh ấn; bóng đổ lệch, nhiệt tản nhanh.
+Dẫn Mộng: gọi thần du; đồng tử sáng mờ như phủ sương; thân bất động.
+Kết Giới Điện: dựng đài tạm; cần tổ 3 người trở lên; sai nhịp → ‘kẹt chiêu’ (phản chấn).
+
+
+===== [PAGE 120 / 185] =====
+5) HẠ TẦNG CHÒM KÝ (5 CẤP)
+Cấp 1 – Trụ ấn lẻ: bán kính hiệu lực ~1 km; cho phúc nhẹ; dễ bị nhiễu.
+Cấp 2 – Điện thờ địa phương: 5–15 km; giữ phúc liên tục; có lưới tín tuyến đơn.
+Cấp 3 – Giáo đường khu vực: 30–80 km; dệt ảnh vực tín; cần tư tế Luyện Hồn.
+Cấp 4 – Thánh đường châu: 150–300 km; quản lý luật giáo vực; cần Thánh Nhân.
+Cấp 5 – Tổng đàn trời: 500–1200 km; điều độ theo mùa–lễ; cần Thánh Hoàng/Tôn.
+
+Suy hao (ước lệ khi ‘đi xa’ khỏi nút vận hành đúng chuẩn):
+• <1 km: 100% • 1–10 km: ~85% • 10–50 km: ~65% • 50–200 km: ~40% • >200 km: ~25% (bị U Giới/Quỷ
+Vực tác động giảm thêm).
+
+6) TƯƠNG TÁC VỚI CÔNG ĐỨC & NGUYÊN LINH
+
+• Công đức + Tín lực: cộng hưởng (×1.1→×1.5 tuỳ lễ–độ thuần). Công đức che chắn phản phệ khi thi
+triển phúc lớn.
+• Không quy đổi: công đức không đổi thành PDU/TL; tín lực không đổi thành công đức.
+• Nguyên Linh (Linh Hạch): dùng làm ‘pin’ cho đền/đài; hợp tính với miền đạo thì giảm nhiễu rõ.
+• Địa Thần: cấp phép dùng đường ống địa phương, nhưng không mở rộng ‘quyền’ ngoài miền đạo Thiên
+Đạo chỉ định.
+
+7) CÂN BẰNG & CẤM GIỚI
+
+• Không vượt thần chủ: tín tu không thi triển độ sâu luật cao hơn thần đang giữ ở Arclune.
+• Không đổi đạo giữa trận: đứt nguồn → ‘rỗ chiêu’.
+• Phạm sát vô tội, dùng phúc cho ác nghiệp: nguồn tụt, phản phệ (nóng rát mạch–mù tạm–mất tiếng
+lệnh).
+• Xâm phạm giáo vực khác: hai lưới giao thoa → ‘xé phúc’, người trung gian dễ hôn mê/điếc chuông.
+• Thiên Đạo giám trắc: ép luật tạo quy tắc mới → bị ‘thuế’ (hao mạch, rút phúc, để lại vết tích).
+
+8) DẤU HIỆU MÔI TRƯỜNG (CHEAT‑SHEET VIẾT CẢNH)
+
+– Không khí: hương tùng/nhũ hương, lạnh trong nóng, bụi đổi hướng tại rìa giới.
+– Âm thanh: chuông rất nhỏ xa xôi; tiếng lụa rách khi ‘xé’ phúc.
+– Ánh sáng: mỏng lớp vỏ bạc; bóng đổ lệch 3–7° nếu phúc chống uế đang chạy.
+– Cơ thể: tĩnh mạch cổ sáng mờ; móng tay ấm; hơi thở đều như tụng.
+– Địa vật: chữ ấn nổi mờ trên đá/gỗ, tan dần như khói.
+
+9) VÍ DỤ DÀN CẢNH
+
+• Phàm – Trấn dịch: một đội tế quan dựng Trụ Ấn cấp 1 xung quanh giếng; nước hết đục sau 3 canh
+giờ, dân làng ngủ yên.
+• Luyện Hồn – Truy tà: nhóm 5 người dệt lưới ấn trong phố cổ; khi móc góc lưới, bóng nhà bên kia
+‘rít’ và ngắn lại.
+• Thánh Nhân – Ứng phó đại dịch: kéo Đài cấp 4, rải phúc tẩy; lũ quỷ uế bỏng ‘thành vảy’ rồi rơi
+vụn.
+• Bán Thần – Giữ danh: dùng tín tu làm ‘trình diễn giáo vực’, củng cố hiện diện, khiến lễ hội năm
+đó tăng tín đồ gấp đôi (không +PDU).
+
+10) THUẬT NGỮ NGẮN
+
+Chòm ký: mạng lưới cột–đài–lưới ấn.
+Phúc lệnh: phép ban hộ/tẩy/trói theo đạo thần.
+Tín tuyến: đường dẫn tín lực.
+Ảnh vực tín: vùng cộng hưởng tín–luật.
+Authority/Bandwidth/Vessel/World Cap: bốn giới hạn cứng của tín tu.
+
+
+===== [PAGE 121 / 185] =====
+Phụ lục ghi chú
+
+• PDF/A-friendly: nhúng font Unicode; không hình ảnh, không transparency.
+• Tham số suy hao/bán kính là ước lệ để dựng cảnh — ưu tiên dấu hiệu văn chương thay con số.
+• Không thay thế luật Công Đức/U Giới/Quỷ Vực đã ban hành; chỉ ghi cách tương tác.
+
+
+===== [PAGE 122 / 185] =====
+Arclune — Addendum Bundle v1.24B
+
+APP-CDĐT (Công Đức & Địa Thần) + APP-TVKTUQ (Thần Vực / Kiếm Thiên / U–Quỷ Hệ)
+
+Quy tắc hợp nhất (Anti-Truncation)
+
+Bundle này giữ nguyên văn từng addendum, bao gồm bookmark/outline. Khi gộp vào
+Master, chèn nguyên khối vào mục Phụ Lục, tuyệt đối không tóm lược. Các mục tóm
+tắt trong Master phải dẫn tham chiếu đến APP-CDĐT và APP-TVKTUQ.
+
+Thành phần & thứ tự
+
+1) APP-CDĐT — Công Đức & Địa Thần (v1.23e): định nghĩa công đức, cơ chế hộ thể/rèn
+vỏ/đốt tà, thang tích lũy, tiếp dẫn Địa Thần (quyền hạn, hạn chế, tuổi thọ tương quan),
+tương tác với NL/TL/PDU, U—Quỷ hệ.
+2) APP-TVKTUQ — Thần Vực / Kiếm Thiên / U–Quỷ Hệ (v1.24): không gian học 5 tầng,
+cổng & giới hạn, chủ thể (Hồn tu/Minh Đế/Quỷ Đế/Thần Chết), luật Kiếm Thiên, ma trận
+tương tác, thang sự kiện 6 cấp, dã sử mẫu, checklist.
+
+Build time: 2025-08-13 00:09Z • Font: DejaVuSans
+
+Page 1
+
+
+===== [PAGE 123 / 185] =====
+Arclune — Addendum v1.23e
+
+Công Đức & Địa Thần — bản siêu chi tiết, không rút gọn (APP-CDĐT)
+Build: 2025-08-12 23:48Z • Font: DejaVuSans • PDF/A-friendly
+
+0) Quy tắc hợp nhất (Anti‑Truncation)
+
+Khi gộp vào Master, phần này được chèn nguyên văn như Phụ Lục ‘APP‑CDĐT’, có mục lục và
+anchor  riêng.  Không  tóm  tắt.  Các  đoạn  rút  gọn  cũ  trong  Master,  nếu  có,  sẽ  được  đánh  dấu
+‘(Tóm lược — tra APP‑CDĐT)’ thay vì xóa nội dung addendum.
+Tag ưu tiên: SUPERCEDES: sketch‑merit/địa‑thần cũ. Liên kết chéo: U Giới & Quỷ Vực, Thang Sự Kiện 6 cấp,
+NL→TL→PDU, Bằng, Danh lực/Khí Linh, Nguyên Linh.
+
+1) Công Đức — bản thể học & nguồn phát
+
+Công Đức (CD) là tín hiệu đồng pha giữa hành vi hữu ích với Thiên Đạo và vết khắc của hành
+vi ấy trong Tâm Giới. Nó không phải NL/TL/PDU, mà là ‘áo ảnh luật’ có thể bọc, gia trì, hoặc
+cho phép quyền hạn nhỏ trong các ràng buộc nhân‑quả.
+
+1.1 Nguồn phát (đầy đủ)
+
+Hộ sinh cảnh: cứu nạn, sửa đê, chữa mạch, dập tà, khép Vành Nứt.
+Duy tri thức: bia ký, dạy chữ, sửa sai ghi chép (phối hợp Tộc Giám Sử).
+Bất sát vô tội: răn đe, thu phục thay vì tàn sát bừa bãi.
+Phòng tà: trấn tà thần, xua ô nhiễm; giữ miếu/chòm ký chính tông.
+Trả nợ nhân quả đúng đối tượng; tránh ‘cúng bừa’ gây lệch nghiệp.
+
+1.2 Hình thái cảm nhận
+
+Quang: quầng ấm mờ quanh thần hồn; Ấn: ‘công ấn’ mảnh trên lò hạch; Hào: gợn mịn quanh
+tay khi phát chiêu (đòn công đức có tiếng chuông khô).
+
+1.3 Thang Công Đức (nội bộ khi viết)
+
+Bậc
+
+Mô tả
+
+Ứng dụng
+
+Vi Công
+
+Việc thiện nhỏ, một làng biết
+
+Dấu quầng mỏng; gần như chỉ để nhận diện
+
+Tiểu Công
+
+Một trấn/thành xác nhận; có mộc Giám Sử
+
+Bọc đòn cấp thấp; dựng lễ nhỏ
+
+Trung Công
+
+Sửa mạch nhỏ, dập ô; có biên niên
+
+Bọc 1 chiêu ~ phàm/thánh sơ; rèn vỏ nhẹ
+
+Đại Công
+
+Cứu vực, chặn đổ luật
+
+Gia trì dài ngày; rèn vỏ công đức ổn
+
+Thánh Công
+
+Hiếm, cấp ‘địa tuyển’
+
+Cửa vào tiếp dẫn Địa Thần khi tử vong
+
+2) Cách dùng Công Đức (tác dụng cụ thể)
+
+2.1 Hộ thể (Hộ Đức)
+
+Tạo  màng  công  đức  mỏng  (dao  kiếm  chạm  ‘đanh  khô’,  tà  tia  ‘lụi’).  Xếp  lớp:  nằm  trên  Hộ
+Khí/Khiên Aether, dưới Kết Giới pháp môn. Vỡ ngay nếu dùng để che hành vi tà.
+
+2.2 Gia trì công (Đức Tráo / Đức Ấn)
+
+Bọc một chiêu/ấn: tăng sát thương sạch với hồn thể/tà vật, không cộng dồn bừa với buff ác ý.
+Dấu hiệu: mép lưỡi có quầng sáng khô; bóng đổ ngắn nửa nhịp trước xuất thủ.
+
+2.3 Khắc tà (sát hồn & tà vật)
+
+Page 1
+
+(cid:127)
+(cid:127)
+(cid:127)
+(cid:127)
+(cid:127)
+
+
+===== [PAGE 124 / 185] =====
+Hồn tu/hồn thể: ‘đau khô’ → đứt dây ô nhiễm. Tà vật/ô thần: đốt vỏ nhiễm lộ lõi; không thể
+chiếm quyền Thần Quốc, chỉ lột áo. Cố hợp thức hóa tàn thần bằng công đức → công ấn nứt,
+phản phệ.
+
+2.4 Rèn đúc (Đức Luyện)
+
+Nguyên Linh + Công Đức → ‘vỏ công đức’ cho pháp bảo/vũ khí: bền với ô nhiễm, ít thụ cảm
+tà. Với Kiếm Linh: làm nền an hoà để khí linh không lệch đạo khi no danh lực.
+
+2.5 Cứu hồn (Hộ Hồn)
+
+Người chết có công đức: quầng công ấn tự tiêu để chắn Lãng Quên nông, đưa hồn qua ‘trạm
+lọc’ U Giới. Ác nghiệp nặng: công ấn đen mỏng, không hộ.
+
+2.6 Chuyển đổi (Đức Đổi Quyền)
+
+Tại Đài Thiên Kỷ (Giám Sử chứng): Đại Công đổi quyền hạn tạm (mở cổng, phong ấn ngắn,
+khảo sát mạch cấm). Không đổi ra NL/TL/PDU trực tiếp.
+
+3) Tu luyện Công Đức (đường tu)
+
+1 Chính Hạnh: tu thân—tề gia—trị giới ở cấp mình; đủ, đều, đúng chỗ. Dấu: ngủ nhẹ, mộng
+
+ít, ‘mùi tro ấm’ quanh người.
+
+2 Đại Nguyện: lập lời nguyện đo được (ví dụ, trấn 7 cổng tà trong 7 năm). Vi phạm rút công
+
+đức tương ứng.
+
+3 Nghiệp Trận: trận thiện (bếp dân, giếng mạch, nhà an thần) tích nhỏ đều như lãi.
+4 Nghi Lễ: tế có ích (muối, thuốc, gỗ), không ‘mua chuộc’. Sai → giả đức (sáng lạnh), dùng
+
+ác sẽ cháy ngược.
+
+4) Địa Thần — tiếp dẫn & thẩm quyền
+
+4.1 Tiếp dẫn & Địa Ấn
+
+Khi  quầng  công  đức  đạt  Đại/Thánh  Công,  cá  thể  lìa  đời  trong  ‘đạo–tâm  ổn’,  Thiên  Đạo  tiếp
+dẫn thành Địa Thần. Địa Ấn định vị một địa vực (đình, cầu, giếng, rừng, cổng Vành). Không
+phải thần cách; không lập Thần Quốc.
+
+4.2 Bậc Địa Thần & uy lực
+
+Bậc
+
+Địa Linh
+
+Địa Hộ
+
+Địa vực
+
+Uy lực & nhiệm vụ
+
+Đình/làng, cầu/giếng
+
+Mưa gió nhỏ, đuổi tà vặt, trấn mộ; phản ứng cực nhanh.
+
+Phủ/quận, rừng/đèo
+
+Điều tiết địa mạch phụ, dập ô vừa, đóng mở cổng phụ; phối TTLẢnh.
+
+Địa Quân
+
+Vực/vùng
+
+Điều phối Địa Hộ, dựng ‘địa mạc’ khi Trung Cục/Lớn; khâu rò Vành Nứt nhỏ.
+
+Trong địa vực: uy lực ~ Bán Thần 100% thần cách. Ngoài địa vực: suy theo bậc biên giới (giảm 10–30% mỗi
+cấp).
+
+4.3 Giới hạn
+
+1 Cấm sát vô tội; cấm can dự tư thù; cấm đổi màu nhân quả.
+2 Không rời địa vực >49 ngày (mất hiệu lực tạm thời).
+3 Không lập Thần Quốc; không Đoạt Đạo; thọ cùng Arclune (gắn Địa Ấn).
+
+4.4 Kỹ năng điển hình
+
+1 Ấn Địa Mạch: khép–mở dòng aether ngầm, chữa nứt.
+2 Tịnh Ô: lọc miasma, hạ cấp tà.
+3 Dẫn Hồn: mở lối U Giới cho hồn công đức.
+4 Hộ Ấn: dựng vòm che, đẩy lãng quên nông khỏi dân.
+
+Page 2
+
+
+===== [PAGE 125 / 185] =====
+4.5 Tương tác thang Sự Kiện
+
+Cấp
+
+Nhỏ
+
+Vừa
+
+Lớn
+
+Chu kỳ tối thiểu
+
+Vai trò Địa Thần
+
+≥ 100 năm / vùng
+
+Trực tiếp xử lý trong địa vực: dập tà, trị miasma, đóng rò nhỏ.
+
+≥ 1.500 năm / vùng
+
+Trực tiếp trong địa vực, không ‘đẩy mức’; phối TTLẢnh; Bán Thần phàm trần chỉ bố cục.
+
+≥ 30.000 năm
+
+Trấn giữ; liên kết địa thần lân cận; Bán Thần phàm trần được trực chiến.
+
+Kiếp Vực
+
+≥ 400.000 năm
+
+Đẩy giao tranh ra Vành Nứt; giữ dân; không đối đầu thần cấp.
+
+Đa Kiếp Vực
+
+≥ 5.000.000 năm
+
+Điều tiết mạch hậu phương; nhường vai công kích cho cao tầng.
+
+Đại Chu Kỳ
+
+≥ 80.000.000 năm
+
+Chống sụp Địa Mạch, giữ trật tự; không can dự đoạt đạo.
+
+Đức Lưu Chiếu: ấn đức tạm 72h–7d cho đội nhiệm vụ ở cấp Vừa/Lớn; tự tắt nếu sai ý đồ/vượt
+biên. Không nâng cảnh giới; chỉ ‘mềm hóa’ luật cục bộ.
+
+5) Ma trận tương tác (CD × luật khác)
+
+Đối tượng
+
+Hiệu ứng
+
+Lãng Quên/Chỉ Dẫn (0–1d)
+
+Kháng nhẹ; ưu tiên dẫn Minh Lộ.
+
+Lãng Quên/Chỉ Dẫn (2–7d)
+
+Kháng mạnh; dễ được tiếp dẫn thần chủ.
+
+Lãng Quên/Chỉ Dẫn (8–49d)
+
+Kháng trung; hiệu lực giảm dần.
+
+>49d
+
+Hầu như không còn; phụ thuộc U Giới/Thần Quốc.
+
+Bằng (nghi thức)
+
+Giảm lệch nghi thức, hạ rủi ro phản phệ; không thay thế Bằng.
+
+Danh lực/Danh Kiếm
+
+Tinh lọc danh lực bẩn; nuôi Khí Linh tốt hơn; không giúp vũ khí đăng thần.
+
+PDU/Thần lực
+
+Không cộng; công đức là ‘quyền cho phép’, không là năng lượng thô.
+
+6) Quản trị & luân chuyển Công Đức
+
+Hiến/tặng chỉ qua miếu TTLẢnh; cấm giao dịch tay‑tay. Công đức tích quá ngưỡng mà không
+dùng sẽ ‘hao rò’; tốc độ rò tăng theo thời gian để tránh gom kho. ‘Nghiệp đen’ phát sinh khi
+mượn Đức làm ác/đổi lợi: ấn bạc in vệt đen; dùng → phản phúc (khựng chiêu, mù linh giác).
+Tịnh bằng Tịnh Đức + hành công thực.
+
+7) Ân hạn thọ nguyên (chỉ tiền thánh)
+
+Cho phép đốt công đức đổi 1–3 năm sống thêm để hoàn nhiệm vụ cứu nạn ở các cảnh dưới
+Luyện Hồn. Một đời tối đa 1 lần; để lại ‘sẹo ấn’ (vết bạc mờ ở tim). Cấm dùng ở Thánh cảnh
+và Bán Thần.
+
+8) Vòng đời Địa Thần & xử lý xung đột
+
+Lên  ngôi:  tiếp  dẫn  sau  tử  vong,  Ấn  Đức  đóng—miếu  phong.  Tại  vị:  canh  địa  vực,  phát  Đức
+Phù, can thiệp theo Thang Sự Kiện. Suy hao: địa vực kiệt quệ hoặc địa mạch gãy—Ấn mờ; cần
+‘hành công’ bù đắp. Thu ấn: phạm giới nặng/địa vực bị xoá—giải nhiệm, hồn phách tước Đức,
+có  thể  rơi  Hạ  Giới.  Truyền  ấn:  hiếm,  khi  Thiên  Đạo  cho  phép—ấn  chuyển  cho  ‘ứng  viên’  có
+công đức lớn (thường là người kế nhiệm nghĩa xứ).
+
+8.1 Tha hóa & ngoại thần
+
+Địa Thần nhiễm tà: ấn bạc xám; TTLẢnh cử Giám Sử + địa thần lân cận trấn áp, tẩy ấn hoặc
+thu ấn. Ngoại thần xâm lấn: địa thần báo Kiếm Thiên/Thần Vực qua mạch ấn–danh; ưu tiên
+bảo toàn dân, đẩy giao tranh ra Vành Nứt.
+
+9) Mẫu văn & checklist
+
+Page 3
+
+
+===== [PAGE 126 / 185] =====
+9.1 Mẫu văn miêu tả
+
+Đăng  địa  thần:  ‘Mưa  rắc  như  muối  mịn.  Vân  vàng  hình  trống  đồng  lan  trên  bia;  gió  thôi
+mùi sắt rỉ, thay mùi lúa non.’
+Địa thần đánh tà: ‘Ấn Đức gõ một nhịp, đèn phố cháy xanh; mảng uế như giấy đốt, tro bay
+ngược chiều gió.’
+Hợp lực liên vực: ‘Ba Ấn Đức chạm nhau, đường nứt được khâu kín như sáp ong.’
+
+9.2 Checklist nhất quán
+
+Địa Thần = Bán Thần 100% trong địa vực; ngoài địa vực suy theo bậc.
+Không Thần Quốc, không Đoạt Đạo; thọ cùng Arclune (gắn Địa Ấn).
+Công Đức là quyền cho phép, không phải năng lượng thô; không cộng với PDU.
+Đức Lưu Chiếu: mềm hóa luật cục bộ; auto tắt nếu sai ý đồ.
+Tả cảm quan: hào bạc/mùi gỗ/tiếng ngân; ấn rách có vệt đen mảnh.
+
+— Kết thúc Addendum v1.23e: Công Đức & Địa Thần (APP‑CDĐT) —
+
+Page 4
+
+(cid:127)
+(cid:127)
+(cid:127)
+(cid:127)
+(cid:127)
+(cid:127)
+(cid:127)
+(cid:127)
+
+
+===== [PAGE 127 / 185] =====
+Arclune — Addendum v1.24
+
+Thần Vực / Kiếm Thiên / U–Quỷ Hệ — mô-đun siêu chi tiết, PDF/A-friendly (APP-TVKTUQ)
+Build: 2025-08-13 00:05Z • Font: DejaVuSans • Giữ nguyên văn khi hợp nhất vào Master (anti-truncation).
+
+0) Quy tắc hợp nhất (Anti-Truncation)
+
+Mô-đun  này  gắn  nhãn  APP-TVKTUQ.  Khi  hợp  nhất  vào  Master,  chèn  nguyên  văn  thành  Phụ
+Lục — có mục lục riêng, anchor rõ. Mọi đoạn tóm tắt trong Master phải trỏ ‘(Tóm lược — tra
+APP-TVKTUQ)’  thay  vì  rút  nội  dung.  Liên  kết  chéo:  Thang  Sự  Kiện  (6  cấp),  Bằng,  Lãng
+quên/Chỉ dẫn, Công Đức & Địa Thần, NL→TL→PDU, Danh lực/Khí Linh, Danh Kiếm.
+
+1) Không gian học Arclune — 5 tầng vận hành
+
+1.1 Hạ Giới (Arclune phẳng)
+
+Mặt  phẳng  đại  thế  giới;  12  vực/quốc  gia/biome;  có  Thiên  Mạc  (màn  trời)  và  Địa  Mạc  (màn
+đất). Tâm Giới là lớp ‘ý’ mỏng phủ khắp: kho tích lũy ký ức, danh lực, công đức. Cửa giao tầng
+trên/dưới gắn với mốc địa mạch, miếu chòm ký, cổ kiếm cư.
+
+1.2 Thần Vực (Divine Expanse)
+
+Vành ngoài của hệ; nơi treo Thần Quốc — lĩnh vực đã thăng hoa thành thế giới độc lập. Mỗi
+thần quốc nối Arclune bằng ‘dây neo’ nghi thức Bằng + điểm Chòm Ký trên Hạ Giới. Thần hạ
+giới bị bóp về mức bán thần; dùng vượt hạn sẽ làm Arclune nứt — chỉ được lách trong các cấp
+sự kiện đã định.
+
+1.3 Kiếm Thiên (Sword-Heaven)
+
+Cụm ‘thiên cung’ chuyên hệ kiếm, quy ước không dùng thần quốc trong đấu đạo. Có Hành
+Lang Lưỡi (Edge Corridors), Sát Trường, Cọc Kiếm cắm Danh Kiếm, bia ‘Kiếm đạo sử’. Quy mô
+tương đương một châu hạ giới; thông xuống các ‘vực kiếm’ (Kiếm Lâu, mộ kiếm, thánh địa).
+
+1.4 U Giới (Under-World) & 1.5 Quỷ Vực (Nether)
+
+U Giới: tầng quản lý linh hồn có trật tự; có Minh Hà, Đài Vọng, trạm lọc nghiệp; quyền thuộc
+hệ Minh. Quỷ Vực: túi hỗn độn âm tách khỏi U Giới; nơi oán/ôtà tụ lại sinh Quỷ; do các Quỷ Đế
+chiếm cứ. Thông với Hạ Giới qua Vành Nứt, Âm Khẩu.
+
+2) Cổng và giới hạn lực
+
+2.1 Cổng lên
+
+Lên  Thần  Vực/Kiếm  Thiên  qua  Thiên  Mạc:  thánh  địa,  trụ  kiếm,  thang  chòm  ký.  Yêu  cầu
+lễ/công đức/điểm tín hiệu luật phù hợp.
+
+2.2 Cổng xuống
+
+Xuống U Giới/Quỷ Vực qua Địa Mạc: giếng cổ, mộ trận, hang mạch, Vành Nứt. U Giới có ‘cổng
+minh’; Quỷ Vực có ‘trướng quỷ’.
+
+2.3 Giới hạn Arclune
+
+Thần hạ giới bị ép mức bán thần; dùng vượt hạn làm nứt mảng — chỉ cho phép ‘lách’ khi cấp
+sự kiện & chứng giám đủ tầm (thượng vị/chí cao). Các quy ước Kiếm Thiên: đấu đạo không
+được kẹp thần quốc; vi phạm bị tẩy danh lực toàn cục.
+
+3) Chủ thể & con đường
+
+Page 1
+
+
+===== [PAGE 128 / 185] =====
+3.1 Hồn tu
+
+Con  đường  ‘thần  thức—hồn  đăng’.  Khớp  đại  cảnh:  Đúc  Phách  (7)  →  Luyện  Hồn  (3).  Nguồn:
+linh quang; có thể mượn Công Đức làm áo hộ hồn. Ưu: thám sát, khống chế, xuyên giáp ý;
+Nhược: sợ ‘đốt vỏ’ bởi đòn bọc công đức; dễ trượt âm nếu lạm thôn phệ hồn.
+
+3.2 Minh Đế (chủ U Giới)
+
+Giữ sổ sinh tử, điều tiết Lãng Quên/Chỉ Dẫn tầng sâu, mở/đóng Minh Lộ. Trung lập với Thần
+Vực; đối đầu Quỷ Đế; bắt tay pháp lý với Thần Chết. Hạ phàm chủ yếu qua Minh Ảnh, không
+dùng thần quốc.
+
+3.3 Quỷ Đế (chúa Quỷ Vực)
+
+Lãnh  chúa  các  ổ  Quỷ  Vực,  dùng  Quỷ  Ấn,  Quỷ  Triều,  ‘bẻ  Lãng  Quên  thành  Cuồng  Niệm’.
+Thường mở họng lên Hạ Giới để tuyển thu—tăng tồn tại. Hạ phàm bằng Hóa Thân Oán/Phần
+Thần; lạm dụng sẽ bị ép mức.
+
+3.4 Thần Chết (tiên thiên thần)
+
+Kết tủa khi ‘cái chết’ đủ phổ quát thành pháp tắc: chậm, tắt, đoạn, chuyển. Quyền: ‘kết thúc
+đúng hạn’, đôi lúc ‘ân xá’ nhịp. Đứng trên dòng U/Quỷ về luật chết nhưng không quản toàn
+bộ linh hồn. Dấu hiện trường: ‘đốm lạnh đứng thời gian’.
+
+3.5 Kiếm Thiên & Kiếm tu/ Danh Kiếm
+
+Kiếm Thiên lưu Danh Kiếm tại Cọc Kiếm; kiện toàn ‘sử kiếm’ và luật đấu. Kiếm tu có thể mượn
+**Hành Lang Lưỡi** leo tầng lĩnh ngộ. Danh lực + Công Đức = ‘vỏ sạch’ nuôi Khí Linh; không
+giúp vũ khí tự đăng thần.
+
+4) Thần Quốc — cấu trúc & neo
+
+Một thần quốc gồm: Vành Quy Tắc (luật ghép), Lò Luật (lò rèn luật), Tâm Ngai (đạo vị). Neo
+Arclune bằng Bằng (âm-dương cân bằng) + Chòm Ký (trường ký hiệu). Di dời thần quốc đòi
+hỏi đổi dây neo & tái chứng giám.
+
+4.1 Kiếm Thiên — luật Sát Trường
+
+Cấm kẹp thần quốc; cấm đoạt đạo; chỉ dùng PDU, luật cá nhân & đòn đạo thô. Phạm luật: bị
+‘tước danh’ (rơi thẳng danh lực xuống Tâm Giới, khó phục hồi).
+
+5) Ma trận tương tác (tóm tắt dùng khi viết)
+
+Đối tượng
+
+Tác dụng cốt lõi
+
+Ghi chú dàn cảnh
+
+Bằng
+
+Neo luật âm–dương, giảm rủi ro ‘nổ đạo’
+
+Kiếm tu có ngoại lệ neo bằng pháp bảo bản mệnh ở bán thần
+
+Lãng Quên/Chỉ Dẫn
+
+Sửa ký ức tầng sâu (Minh Đế điều), tầng nông (Thiên Đạo)
+
+Công Đức chắn nông, không phá sâu; Quỷ Đế bẻ thành Cuồng Niệm
+
+Công Đức
+
+Quyền cho phép sạch (bọc đòn, hộ hồn, rèn vỏ)Không cộng NL/TL/PDU; hợp U Giới, khắc Quỷ Vực
+
+Danh lực/Khí Linh
+
+Nuôi khí linh, tăng mẫn cảm kiếm ý
+
+Không phải ‘vé đăng thần’ cho vũ khí
+
+PDU/Thần lực
+
+Cấp năng lượng thần
+
+Giới hạn khi hạ giới theo thang sự kiện
+
+Địa Thần
+
+Bán Thần 100% <i>trong địa vực</i>
+
+Hợp lực dập Vành Nứt; phối U Giới khi dẫn hồn
+
+6) Thang Sự Kiện (6 cấp) & ngưỡng tham dự
+
+Cấp
+
+Nhỏ
+
+Vừa
+
+Chu kỳ tối thiểu
+
+Trần can thiệp
+
+≥ 100 năm
+
+Phàm (Khai Nguyên→Luyện Hồn); Địa Thần xử tại chỗ
+
+≥ 1.500 năm
+
+Không bán thần trực chiến; tối đa Thánh Tôn 7 trực; TT8–9 chỉ bố cục/hóa thân
+
+Page 2
+
+
+===== [PAGE 129 / 185] =====
+Lớn
+
+≥ 30.000 năm
+
+Bán thần trực chiến; thần cấp không
+
+Kiếp Vực
+
+≥ 400.000 năm
+
+Đẩy ra Vành Nứt; hạ vị thần không trực (trừ luật đã chốt)
+
+Đa Kiếp Vực
+
+≥ 5.000.000 năm
+
+Trung vị gián tiếp (bố cục/tiếp sức); hạ vị không dùng thần quốc
+
+Đại Chu Kỳ
+
+≥ 80.000.000 năm
+
+Hạ vị trực (không thần quốc); trung vị ≤10%; thượng vị/chí cao chỉ bố cục
+
+Mọi  ‘lách  luật’  phải  có  chứng  giám  đúng  tầm  và  ghi  sổ  Tâm  Giới;  vi  phạm  bị  phản  phệ  hệ
+thống.
+
+7) Dấu hiệu cảm quan khi các lực xuất hiện
+
+Thần Vực mở dây neo: trời rung như gõ chuông đồng; sao mờ trượt nửa nhịp; gió thốc có mùi
+đồng thau.
+Kiếm Thiên phát hành lang: âm ‘rít dây cung’ vô hình; tóc dựng ngược; mép kiếm rút sương
+trắng.
+U Giới hé Minh Lộ: nhiệt rút, tiếng nước đều như trống; bóng người nặng một nhịp rồi nhẹ đi.
+Quỷ Vực dâng trướng: đèn dầu cháy xanh; mùi nến tắt; hơi lạnh đóng muối trên mi mắt.
+
+8) Dã sử — mẫu tình tiết để ghim mốc
+
+Trận Khoá Minh Hà: Minh Đế đóng ba cổng U Giới phía Đông; Địa Thần liên ấn giữ dân qua
+bảy đêm. Từ đó mỗi sóc vọng, gió bấc mang tiếng như người đọc sổ.
+Đài Lưỡi Gãy (Kiếm Thiên): bảy Kiếm Thần thệ ước không thần quốc. Dưới đài chôn mười hai
+Danh Kiếm phàm thế; khách hành hương nghe như có ‘dao rung’ trong xương tai.
+Đêm Vành Nứt hát: Quỷ Đế mở miệng vực; trời rơi mưa muối. Công Đức ‘đức lưu chiếu’ phát
+cho bảy đội dân phu khâu nứt; sáng ra ruộng bãi phẳng như ai chải lược.
+
+9) Checklist nhất quán khi viết
+
+1 Thần hạ giới = ép bán thần; đấu ở Kiếm Thiên không thần quốc.
+2 Hồn tu mạnh khống chế/trinh sát; sợ đòn bọc công đức.
+3 Minh Đế quản Lãng Quên/Chỉ Dẫn tầng sâu; Quỷ Đế bẻ thành Cuồng Niệm; Thần Chết lo
+
+‘nhịp chết’.
+
+4 Danh Kiếm/Khí Linh không tự đăng thần; có thể Phong Linh hoặc làm Linh Sứ.
+5 Sự kiện Vừa: không bán thần trực; Lớn: bán thần trực; các cấp trên theo bảng.
+
+— Kết thúc Addendum v1.24 (APP-TVKTUQ) —
+
+Page 3
+
+
+===== [PAGE 130 / 185] =====
+Arclune Addendum — Thần Vực • Quỷ Vực • Kiếm Thiên • Hồn Tu • Quỷ Đế • Minh Đế • Thần Chết (v1.24a)
+
+Bản độc lập (PDF/A-friendly) — chi tiết hoá các khái niệm siêu hình & liên thông cảnh giới; tương thích Master v1.23d_INLINE
+
+Build: 2025-08-13 00:16:31
+
+Mục lục (nhanh):
+• 1. PHẠM VI & TƯƠNG THÍCH
+• 2. DÒNG LINH HỒN SAU KHI CHẾT (Sinh Hậu Tử Lộ)
+• 3. U GIỚI & QUỶ VỰC — ĐỊA LÝ, LUẬT & SINH THÁI
+• 4. HỒN TU — HỆ TU LUYỆN CỦA LINH HỒN
+• 5. QUỶ ĐẾ • MINH ĐẾ — HỆ THỐNG CHÍNH TRỊ U GIỚI
+• 6. THẦN CHẾT — TIÊN THIÊN THẦN CỦA “KẾT THÚC”
+• 7. KIẾM THIÊN — QUẦN TINH CỦA KIẾM ĐẠO (nhắc & mở rộng)
+• 8. QUY TẮC THAM CHIẾN LIÊN GIỚI — GHIM THEO THANG SỰ KIỆN 6 CẤP
+• 9. BẢNG SÁNH QUYỀN LỰC (ƯỚC LƯỢNG DIEGETIC)
+• 10. HỒI SINH, TÁI SINH & CHUYỂN SINH — QUY TRÌNH HỢP PHÁP
+• 11. MẪU CẢNH & HẠT GIỐNG CỐT TRUYỆN
+• 12. CHỐT & GHI CHÚ KHÔNG XUNG ĐỘT
+
+Arclune Addendum v1.24a — Build: 2025-08-13 00:16:31
+
+Trang 1
+
+
+===== [PAGE 131 / 185] =====
+1. PHẠM VI & TƯƠNG THÍCH
+
+• Phạm vi: mô tả chi tiết các tầng giới ngoài Arclune (Thần Vực, Kiếm
+Thiên, Quỷ Vực/U Giới) và các hệ tu–thần vị liên hệ (Hồn Tu, Quỷ Đế, Minh
+Đế, Thần Chết).
+• Tương thích: giữ toàn bộ quy tắc năng lượng NL → TL → PDU; luật Sự kiện
+sáu cấp; lĩnh vực Thánh cảnh v1.17 (hotfix H1); tuổi thọ & cửa già đã
+chuẩn hoá.
+• Không thay đổi: quyền “Bằng” của kiếm tu ở Bán Thần; giới hạn Bán Thần
+tại Arclune; nguyên tắc Thiên Đạo “không tự bịa Quy Tắc”.
+• Định hướng nhập Master: có thể gộp vào mục “Hệ Địa Lý – Thần Vực & Kiếm
+Thiên” (1.20c) và mở mới “Sinh Hậu Tử Lộ & U Giới”.
+
+Arclune Addendum v1.24a — Build: 2025-08-13 00:16:31
+
+Trang 2
+
+
+===== [PAGE 132 / 185] =====
+2. DÒNG LINH HỒN SAU KHI CHẾT (Sinh Hậu Tử Lộ)
+
+1. Tín hướng quy tịch (đi theo tín ngưỡng):
+   — Linh hồn của cá thể có tín ngưỡng ổn định được “dẫn” theo kênh Chòm
+Ký về tiền đình Thần Quốc của vị thần đã thờ.
+   — Tại đây, tùy công–tội & công đức: hoặc tái sinh (luân hồi dẫn), hoặc
+nhập hàng tín đồ/lính thần, hoặc ở lại tầng ngoại vi làm “hộ quy”.
+   — Lưu ý: Thần không được “bắt” linh hồn trái nhân quả (vi phạm sẽ bị
+Thiên Đạo phạt—giảm quyền Chòm Ký).
+2. Vô tín – vô phụ (không tín ngưỡng):
+   — Linh hồn rơi theo gradient Umbra xuống U Giới (còn gọi Hạ Minh), đi
+qua “Bến Sương” rồi đến “Đài Mộng”.
+   — Nếu giữ được ‘tự ngã’ ≥ một mùa Aether → có thể bước vào con đường
+Hồn Tu; nếu không → dần mờ thành Quỷ Lệ (quỷ yếu), kế đó Mãnh Quỷ.
+3. Công đức hộ hồn:
+   — Công đức tích cóp khi sống tiêu hao để bảo hộ linh hồn khỏi bị xé
+rách, rút ngắn thời gian u mê tại U Giới.
+   — Trường hợp công đức cực thịnh: Thiên Đạo tiếp dẫn thành “Địa Thần”
+(đẳng bán thần 100% thần cách nhưng không thăng Hạ Vị; thọ cùng Arclune;
+giới hạn sát sinh & can thiệp).
+4. Lãng Quên & Chỉ Dẫn tác động:
+   — Thần quyền có thể xóa/khuynh hướng ký ức người sống; với linh hồn đã
+rơi U Giới, hiệu lực giảm mạnh do “màng Mộng” của U Giới; ghi nhận bởi Tộc
+Giám Sử.
+
+Arclune Addendum v1.24a — Build: 2025-08-13 00:16:31
+
+Trang 3
+
+
+===== [PAGE 133 / 185] =====
+3. U GIỚI & QUỶ VỰC — ĐỊA LÝ, LUẬT & SINH THÁI
+
+A) Địa–tầng U Giới (từ nông xuống sâu):
+   • Bến Sương: rìa trên, sương trắng, ký ức rời rạc; phàm hồn dừng chân
+ngắn ngày.
+   • Đài Mộng: bình nguyên mờ, “mộng ký” đong đưa; nơi Hồn Tu sơ học ngưng
+“Ý Hồn”.
+   • Lưu Ảnh Hà: sông chảy các mảnh bóng—ký ức tập thể; hồn đi qua bị
+“chiếu” lại chuyện đời.
+   • Minh Đình: nơi trấn giữ luật U Giới, quân bình luân chuyển; thuộc
+quyền “Minh Đế”.
+   • Quỷ Vực: các hẻm vực chàm đen, âm áp dày; nơi Quỷ đạo trỗi dậy, chính
+quyền “Quỷ Đế” kiểm toả.
+B) Luật vận hành:
+   • Trọng mộng: lời thề, ước hẹn, chuyện kể → có lực hút/đẩy thật sự; vũ
+khí thường kém hiệu, “kết ấn” và “ý” mạnh hơn.
+   • Ký ức làm tiền: đổi qua bến bờ cần trả “mảnh nhớ”; đổi quá tay sẽ lạc
+bản ngã.
+   • Cửa ngưỡng: mọi đường ra–vào gắn “ngưỡng kể” (một câu chuyện phải
+được kể đúng). Sai một nhịp → quay về Bến Sương.
+C) Sinh thái & tài nguyên:
+   • Hồn tinh (Nguyên Linh hệ Hồn): tinh thể ngưng từ ý chí bền; dùng
+luyện hồn pháp, chữa “rách hồn”.
+   • Minh diệm: lửa lạnh đốt quỷ tính; luyện trận hộ hồn.
+   • Ảnh thảo: hút ký ức thừa, giúp tỉnh tâm; lạm dụng → vô cảm.
+D) Cổng–Lộ:
+   • Liên thông Arclune qua Vành Nứt sâu, di chỉ Thần Tích, và miếu cổ có
+“kèo kể” đủ mạnh.
+   • Tộc Giám Sử đánh dấu mức “Cảnh Khu” khi rò âm văn U Giới vượt ngưỡng.
+
+Arclune Addendum v1.24a — Build: 2025-08-13 00:16:31
+
+Trang 4
+
+
+===== [PAGE 134 / 185] =====
+4. HỒN TU — HỆ TU LUYỆN CỦA LINH HỒN
+
+1) Năng lượng & công cụ:
+   • Dùng “linh quang” + hồn tinh; pháp môn chính là Ấn Mộng, Ấn Nhớ, Trận
+Minh; vũ khí hữu hiệu: Ấn bài, Chuông Minh, Đèn Lưu Ảnh.
+2) Tiểu–đại cảnh (tương chiếu phàm 1–6):
+   • Ý Hồn (sơ–đại): gom ý thành “hạt sáng”—tương KN/TC.
+   • Đúc Ảnh (sơ–đại): đúc ngoại thân ảo—tương ND/KD.
+   • Luyện Minh (sơ–đại): vững lõi hồn—tương ĐP/LH.
+3) Ưu/nhược so với phàm tu thân:
+   • Ưu: miễn sát thương vật lý phần lớn; đánh thẳng vào tâm trí kẻ địch;
+cơ động giữa U Giới và thực tại bằng “hẽm mộng”.
+   • Nhược: yếu trước Công Đức Ấn, Thánh quang & pháp tắc Cảm–Lý; dễ bị
+“điểm danh” bởi danh kiếm hệ Quang/Ảnh.
+4) Lĩnh vực linh hồn?
+   • Có “Minh vực” (ảnh vực cá nhân), không phải lĩnh vực Thánh; áp suất
+tâm linh, bóp méo cảm giác thời gian; mạnh ở Tâm Giới, yếu tại Thiên/Địa
+Mạc.
+
+Arclune Addendum v1.24a — Build: 2025-08-13 00:16:31
+
+Trang 5
+
+
+===== [PAGE 135 / 185] =====
+5. QUỶ ĐẾ • MINH ĐẾ — HỆ THỐNG CHÍNH TRỊ U GIỚI
+
+• Minh Đế: người/linh thể đạt “đạo lý cân bằng luân chuyển”, giữ sổ luân
+hồi, trấn “Minh Đình”. Chức: xét đường, vá lệch. Pháp tắc thiên: Cân,
+Phân, Nhớ, Quên Đúng Mức.
+• Quỷ Đế: kẻ mạnh theo “đạo chiếm hữu bóng”, thống Quỷ Vực, kiểm soát quỷ
+tính; nếu vượt mức → bị Minh Đế & Thiên Đạo chèn ép (mất quyền bến–đò).
+• Thang lực: Quỷ sĩ → Quỷ tướng → Quỷ vương → Quỷ hầu → Quỷ Đế; Minh quan
+→ Minh sứ → Minh tướng → Minh vương → Minh Đế.
+• Tương sánh cảnh giới:
+   — Quỷ vương ≈ Kết Đan cao/Đúc Phách thấp.
+   — Quỷ hầu/Minh vương ≈ Luyện Hồn.
+   — Quỷ Đế/Minh Đế ≈ Thánh Nhân–Thánh Hoàng (tùy vực), nhưng ít tác động
+thực tại bằng “đấm đá”—chủ yếu qua luật U Giới.
+• Can thiệp Arclune: chỉ hợp thức ở Sự kiện cấp Lớn trở lên; thấp hơn coi
+là “trộm vía” → Tộc Giám Sử đóng mộc & triệu Thánh can thiệp.
+
+Arclune Addendum v1.24a — Build: 2025-08-13 00:16:31
+
+Trang 6
+
+
+===== [PAGE 136 / 185] =====
+6. THẦN CHẾT — TIÊN THIÊN THẦN CỦA “KẾT THÚC”
+
+• Khởi sinh: tiên thiên — kết quả tích tụ ‘ý niệm cái chết’ & sợ hãi từ
+thuở sơ khai Hợp Thiên.
+• Quyền hạn: mở–đóng “mạch kết thúc” đúng thời—a.k.a. đảm bảo chết diễn ra
+khi nhân quả chín; không ép chết trái đạo.
+• Quan hệ với U Giới: ký điều ước với Minh Đế — bàn giao hồn đúng hẹn;
+chống ‘quỷ tắc’ vượt mức.
+• Quan hệ với Thiên Đạo: là “đao giải kết”—cắt mối dây thọ đã hết; không
+tham dự đoạt đạo.
+• Tương tác Công Đức: người chết có công đức lớn được “đi đường sáng”
+(giảm u mê); hồn phạm tà sẽ bị “Minh diệm” chiếu trước khi xét.
+
+Arclune Addendum v1.24a — Build: 2025-08-13 00:16:31
+
+Trang 7
+
+
+===== [PAGE 137 / 185] =====
+7. KIẾM THIÊN — QUẦN TINH CỦA KIẾM ĐẠO (nhắc & mở rộng)
+
+• Vị trí: vệ tinh Thần Vực dành cho đạo kiếm; thần kiếm đặt Thần Quốc
+quanh các “Cột Tuyến”.
+• Luật: mọi chiêu kiếm đều để lại “vệt ký” — vật chứng tốt để luyện Khí
+Linh; coi trọng danh lực, cấm “đổi tên kiếm” bừa.
+• Giao thoa U Giới: một số hẻm “Ảnh Kiếm” nối Kiếm Thiên ↔ U Giới (hồn
+kiếm/lệ kiếm đi về); Minh Đế giới hạn lưu thông để tránh “đạo kiếm xâm lấn
+mộng”.
+• Kiếm tu tử trận: nếu kiếm bản mệnh đủ danh lực, có thể giữ “hồn kiếm”
+tại Kiếm Thiên làm Linh Sứ cho chủ đã đăng thần; ngược lại, rơi U Giới
+theo dòng chung.
+
+Arclune Addendum v1.24a — Build: 2025-08-13 00:16:31
+
+Trang 8
+
+
+===== [PAGE 138 / 185] =====
+8. QUY TẮC THAM CHIẾN LIÊN GIỚI — GHIM THEO THANG SỰ KIỆN 6 CẤP
+
+• Nhỏ (≥100y): cấm mọi can thiệp từ U Giới cấp Minh tướng+; Thánh chỉ bố
+cục xa.
+• Vừa (≥1.5ky): Thánh Tôn ≤7 trực; 8–9 gián tiếp; Bán Thần chỉ bố cục;
+Quỷ/Minh chỉ cấp tướng trở xuống.
+• Lớn (≥30ky): Bán Thần, Quỷ hầu/Minh vương được trực; cấm Hạ Vị Thần &
+quyền Thần Quốc.
+• Kiếp Vực (≥400ky): có thể rò luật; Hạ Vị lách ≤15%; Minh/Quỷ Đế cho phép
+áp chế quỷ nạn.
+• Đa Kiếp Vực (≥5My): Trung Vị không trực; đỡ luật cho Hạ Vị (~50%); U
+Giới mở “mạch thoát quỷ” bắt buộc.
+• Đại Chu Kỳ (≥80My): Hạ Vị tạm vượt trần bán thần (trừ Thần Quốc); Trung
+Vị ≤10%; Thượng/Chí Cao chỉ bố cục–chứng giám.
+
+Arclune Addendum v1.24a — Build: 2025-08-13 00:16:31
+
+Trang 9
+
+
+===== [PAGE 139 / 185] =====
+9. BẢNG SÁNH QUYỀN LỰC (ƯỚC LƯỢNG DIEGETIC)
+
+• Hồn Tu — Luyện Minh đại thành ≈ Luyện Hồn 1–2 (tại Tâm Giới mạnh hơn,
+tại Thiên/Địa Mạc yếu hơn).
+• Quỷ vương/Minh tướng ≈ Đúc Phách 4–7; Quỷ hầu/Minh vương ≈ Luyện Hồn
+1–3.
+• Quỷ Đế/Minh Đế: hành quyền ngang Thánh Nhân/Hoàng ở U Giới; trong thực
+tại, uy lực trực tiếp kém nhưng có “phán quyết U Giới” rất nguy hiểm.
+• Thần Chết: không so sánh theo cảnh; có quyền “cắt thọ” đúng luật, không
+đánh tay đôi trừ khi tà thần phá mạch.
+
+Arclune Addendum v1.24a — Build: 2025-08-13 00:16:31
+
+Trang 10
+
+
+===== [PAGE 140 / 185] =====
+10. HỒI SINH, TÁI SINH & CHUYỂN SINH — QUY TRÌNH HỢP PHÁP
+
+• Hồi sinh (trả hồn về xác): cần ‘đường hồn’ chưa đứt (≤ ba ngày ở Địa
+Mạc), công đức đủ che, và Ấn Chứng Giới của Thiên Đạo/Minh Đế. Lạm dụng →
+lệch đạo, sớm tàn.
+• Tái sinh (vòng lại làm người): cần Thần/Tộc có quyền dẫn; xoá mờ ký ức;
+chốt “ngòi chuyện” cho đời mới.
+• Chuyển sinh (sang chủng khác): cần đổi “ân/duyên” tương thích; rủi ro
+mất đạo cũ.
+
+Arclune Addendum v1.24a — Build: 2025-08-13 00:16:31
+
+Trang 11
+
+
+===== [PAGE 141 / 185] =====
+11. MẪU CẢNH & HẠT GIỐNG CỐT TRUYỆN
+
+• “Truy kích qua Bến Sương”: viết cảm giác tiếng nói có đuôi, vệt chân
+đông đặc, mùi tro lạnh; kẻ địch mất một mảng ký ức để qua bờ, rồi lảo đảo
+vì nhớ hụt.
+• “Xét xử tại Minh Đình”: bậc thềm bằng chữ, đọc lên phát sáng; Quỷ hầu
+dâng đầu quỷ vương; Minh Đế gõ chuông, mộng tan như khói dầu.
+• “Đứt mạch Kiếm Thiên”: vệt ký lưỡi kiếm khô, Khí Linh ho sương; U Giới
+rút mộng, main dùng Chứng Giới Thệ gắn lại sợi kể.
+
+Arclune Addendum v1.24a — Build: 2025-08-13 00:16:31
+
+Trang 12
+
+
+===== [PAGE 142 / 185] =====
+12. CHỐT & GHI CHÚ KHÔNG XUNG ĐỘT
+
+• Không thay đổi tỷ lệ NL ↔ TL ↔ PDU; không cấp “đăng thần” cho Khí
+Linh/Quỷ Đế/Minh Đế/Thần Chết ngoài luật đã chốt.
+• Bán Thần không dùng lĩnh vực để Bằng (ngoại lệ kiếm tu); U Giới–Quỷ Vực
+chỉ tác động qua luật mộng/ký ức trừ khi cấp sự kiện cho phép.
+• Sẵn sàng gộp vào Master sau khi bạn duyệt.
+
+Arclune Addendum v1.24a — Build: 2025-08-13 00:16:31
+
+Trang 13
+
+
+===== [PAGE 143 / 185] =====
+Arclune — Addendum v1.24: Năng
+Lượng & Thần Cấp
+
+Phiên bản: v1.24 · Nội dung đã chốt: hệ bậc năng lượng, quy đổi, cơ chế PDU ở Bán
+Thần, đăng thần & hệ số khuếch đại trong Thần quốc (đã giảm), “bể” TL theo cấp,
+tương thích thang sự kiện, cheat sheet.
+
+1) Chuỗi năng lượng & thuật ngữ
+
+Bậc: NL < CN < TN < PDU(=TLNS) < TL
+
+• NL (Nguyên lực): dùng cho Khai Nguyên → Trúc Cơ → Ngưng Đan → Kết Đan.
+
+• CN (Chân nguyên): chỉ dùng cho Đúc Phách & Luyện Hồn; sinh ra khi KD9 → ĐP1.
+
+• TN (Thánh nguyên): dùng cho Tam Bộ Thánh; thay cho “Thánh lực” cũ.
+
+• PDU (TLNS): hạt thần nguyên sơ ở Bán Thần (PDU ≡ TLNS, dùng thay nhau).
+
+• TL (Thần lực): thần lực tinh luyện của chư Thần (sau đăng thần).
+
+2) Chuẩn quy đổi (chuẩn hoá)
+
+Đơn vị
+
+Quy đổi ngắn
+
+Tương đương NL
+
+1 CN
+
+1 TN
+
+= 1.000 NL
+
+= 5.000 CN = 5.000.000 NL
+
+1.000 NL
+
+5.000.000 NL
+
+1 PDU (TLNS)
+
+= 100 TN = 500.000.000 NL
+
+500.000.000 NL
+
+1 TL
+
+= 100 PDU = 10.000 TN = 50.000.000.000 NL 50.000.000.000 NL
+
+Ghi chú: TN < PDU < TL (bậc sau “đặc” hơn, hiếm hơn).
+
+3) Bán Thần — PDU/TLNS
+
+• Hạt khởi sinh: TT9 đốt TN → 10 PDU seed.
+
+• Ngưng tụ Thần Cách: +1% → +2 PDU → đỉnh 210 PDU ở 100%.
+
+• Ở Bán Thần, vẫn dùng PDU/TLNS (chưa chuyển thành TL).
+
+4) Đăng Thần & khuếch đại trong miền
+
+• Khi vượt “Bằng” và khai lập Thần Quốc: PDU nền quy đổi sang TL (thần lực).
+
+• Ngoài Thần quốc (ngoại miền): dùng đúng số TL hiện có.
+
+• Trong Thần quốc (nội miền) — hệ số đã giảm:
+
+Hạ vị
+
+×4
+
+Arclune — Addendum v1.24 | Trang 1
+
+
+===== [PAGE 144 / 185] =====
+Trung vị
+
+Thượng vị
+
+×10
+
+×20
+
+Chí Cao
+
+không dùng nhân số; vận hành theo Quy Mức (Ω)
+
+5) “Bể TL” tham chiếu theo cấp Thần
+
+(Khung để viết cảnh; cho phép chênh nhẹ khi có lý do trong truyện.)
+
+Cấp Thần
+
+Ngoài miền (TL)
+
+Trong miền (TL)
+
+Hạ vị
+
+Trung vị
+
+Thượng vị
+
+Chí Cao
+
+≈ 2–50
+
+≈ 50–500
+
+×4 → ≈ 8–200
+
+×10 → ≈ 500–5.000
+
+≈ 500–5.000
+
+×20 → ≈ 10.000–100.000
+
+—
+
+vận hành theo Ω
+
+6) Ví dụ tính nhanh
+
+• Bán Thần 210 PDU (100% Thần Cách), vừa đăng thần (Hạ vị) → 210 PDU = 2,1 TL
+(ngoài miền). Trong Thần quốc: 2,1 × 4 = 8,4 TL.
+
+• Trung vị 120 TL (ngoài) → trong miền ×10 → 1.200 TL.
+
+• Thượng vị 700 TL (ngoài) → trong miền ×20 → 14.000 TL.
+
+7) Tương thích thang sự kiện (nhắc nhanh)
+
+• Sự kiện Vừa: tối đa TT7 trực chiến; TT8–9 chỉ bố cục/hoá thân (không full).
+
+• Sự kiện Lớn (≥30.000 năm): Bán Thần trực chiến; Thần không.
+
+• Kiếp Vực (≥400.000 năm): nới cửa nhưng không có Thần trực chiến.
+
+• Đa Kiếp Vực (≥5.000.000 năm): Trung vị chỉ gián tiếp (bơm lực cho Hạ vị).
+
+• Đại Chu Kỳ (≥80.000.000 năm): Hạ vị full, Trung vị 10%, Thượng/Chí Cao gián tiếp
+(đúng luật hạn chế Arclune).
+
+8) Cheat sheet (mang sang scene)
+
+Mốc
+
+CN
+
+TN
+
+PDU
+
+TL
+
+Giá trị
+
+1 CN = 1.000 NL
+
+1 TN = 5.000 CN = 5.000.000 NL.
+
+1 PDU = 100 TN = 500.000.000 NL.
+
+1 TL = 100 PDU = 10.000 TN = 50.000.000.000 NL.
+
+Amplify (nội miền)
+
+Hạ×4 • Trung×10 • Thượng×20
+
+Arclune — Addendum v1.24 | Trang 2
+
+
+===== [PAGE 145 / 185] =====
+ARCLUNE — ADDENDUM: THIÊN ĐẠO & KẺ LẬP CHỈ (v1.1 · Ops
+Pack)
+
+Ngày: 2025-08-13 · Bản vận hành: preset BiasIndex theo map, Red Flag checklist, giao diện AIX, biểu mẫu log an
+toàn.
+
+ID Registry (refresh)
+
+ID
+
+AR.TD.KLC.Σ
+
+AR.TD.KLC.1
+
+AR.TD.KLC.2
+
+AR.TD.KLC.3
+
+AR.TD.KLC.4
+
+AR.TD.KLC.5
+
+AR.TD.KLC.6
+
+AR.TD.KLC.7
+
+Mô tả
+
+KLC-Σ (Redacted) — mã hiệu & giả thuyết mở
+
+Kênh ảnh hưởng: Chi Tâm / Tín Niệm / Neo-Ấn
+
+Giới hạn & phản lực Thiên Đạo
+
+Chỉ báo Thiên Đạo bị bias
+
+Biện pháp phòng hộ (operational)
+
+Map presets (BiasIndex)
+
+Synergy hook (BiasIndex → Buff/Cost/SE)
+
+Protocol ghi chép an toàn & timeline
+
+AR.TD.KLC.AIX
+
+Giao diện AIX (ingest & alert)
+
+AR.TD.KLC.FORM
+
+Biểu mẫu 'KLC Incident' (in gọn)
+
+1) Map Presets — BiasIndex B (0–2) (AR.TD.KLC.5)
+
+Map
+
+Preset
+
+Quang Thánh
+
+B=1 mặc định trong dịp chính sự/lễ lớn; B=2 khi có chiến dịch Ấn diện rộng; audit Edict chặt.
+
+Ám Quốc / Huyết Quốc
+
+B=1 thường trực ( tụ oán); lên B=2 khi xuất hiện 'tế diện rộng' hoặc Lãnh Địa Quỷ tăng trưởng.
+
+Vành Nứt TG
+
+B=1 nền; B=2 trong 49 ngày có Ấn trấn địa diện rộng (tránh split-brain).
+
+Trường Sinh Lâm / Hải Miễu B=0; lên B=1 nếu có hiện tượng rò Lãng Quên vào vật chết/chữ khắc.
+
+Trung Châu / Cơ Giới Quốc B=0; lên B=1 khi City AI báo spike Nhiễu Luật bất thường theo 1 Path.
+
+2) Red Flag Checklist (AR.TD.KLC.3,4)
+
+Trigger
+
+Mô tả
+
+Rò Lãng Quên
+
+Chữ nghiêng/bóng run/tự mất đích danh trên tài liệu.
+
+Nhiễu luật lệch pha
+
+Spike theo 1 Path/Ấn; không ăn khớp mùa/chu kỳ.
+
+ẤnLoad bất thường
+
+TT7+ vượt 1.0 dù cường độ không đổi; đòi thêm Ấn ngoài kế hoạch.
+
+Danh tụ nóng
+
+Điểm farm danh tăng bất thường; crowd kéo cụm.
+
+3) Giao diện AIX (AR.TD.KLC.AIX)
+
+Mục
+
+Ingest
+
+Alert
+
+Chuẩn
+
+Truyền 'KLC Incident' JSON + Ảnh Đạo chụp dấu vết; hash-ấn để đối chiếu.
+
+Nếu B≥1 → AIX gửi mandate cho Edict; nếu B=2 → kích hoạt 'Public Disclosure' tối thiểu.
+
+Data Retention
+
+Giữ bản Ảnh Đạo 2 chu kỳ 49 ngày; bản tóm lược public 1 chu kỳ.
+
+4) Synergy Hook (AR.TD.KLC.6)
+
+Thông số
+
+Công thức
+
+BuffAdj
+
+CostAdj
+
+SE_adj
+
+BuffMult × (1 + 0.03 × B)
+
+CostMult × (1 + 0.04 × B_bias) (B_bias>0 khi đẩy Path 'lợi' cho KLC)
+
+SE_eff × (1 + 0.05 × B)
+
+
+===== [PAGE 146 / 185] =====
+5) Biểu mẫu 'KLC Incident' (compact) (AR.TD.KLC.FORM)
+
+Ngày/điểm Map
+
+B (0–2) Dấu hiệu
+
+Ảnh Đạo hash
+
+Ấn hiện trường Ý kiến Edict
+
+Kết quả
+
+Ghi chú: Bản v1.1 giữ nội dung v1.0 (normative) làm nền. Thêm presets, checklist, AIX giao thức và form để triển
+khai thực địa.
+
+
+===== [PAGE 147 / 185] =====
+ARCLUNE — ADDENDUM: CƠ GIỚI QUỐC · INTEL & FRAMES
+(v1.1)
+
+Ngày: 2025-08-13
+Bản này đã NHÚNG đầy đủ: Evaluation Suite (v1.0).
+Chế độ: normative — sẵn sàng nhập Master khi đủ dày.
+
+
+===== [PAGE 148 / 185] =====
+ARCLUNE — ADDENDUM: CƠ GIỚI QUỐC · INTEL & FRAMES
+(v1.0)
+
+Ngày: 2025-08-13 · Chuẩn 'normative'; sẵn sàng import Master khi đủ dày.
+
+ID Registry
+
+ID
+
+AR.CGQ.AIX.0
+
+AR.CGQ.AIX.1
+
+AR.CGQ.AIX.2
+
+Mô tả
+
+Kiến trúc AIX/ARCLUNE-NET (Sense/Ingest/Model)
+
+Red Flag & Ký Sự 49 Ngày (bản AIX)
+
+BiasIndex & đối sách KLC
+
+AR.CGQ.FR.ED-Λ
+
+Frame ED-Λ — Edict Lambda (Quang/Luật)
+
+AR.CGQ.FR.VX-χ
+
+Frame VX-χ — Zephyr Matrix (Phong/Không)
+
+AR.CGQ.FR.NC-OBS
+
+Frame NC-Obsidian — Nocturne Weave (Ảnh/Ám)
+
+AR.CGQ.FR.THR-Δ
+
+Frame THR-Δ — Thunder Bastion (Lôi/Thổ)
+
+AR.CGQ.FR.BIO-RED
+
+Frame BIO-Red — Areskin (Huyết/Cơ)
+
+AIX/ARCLUNE-NET (AR.CGQ.AIX.0–2)
+
+Khối
+
+SENSE
+
+INGEST
+
+MODEL
+
+Mô tả
+
+Aether-radar, vệ tinh vi mô, trụ log Ấn đô thị; cảm biến 'nhiễu luật'.
+
+Chuẩn hoá telemetry từ giáp/danh kiếm/trạm lĩnh vực theo ID Master.
+
+Cụm SPHINX-K dự báo thang sự kiện; sinh Ký Sự 49 Ngày; heatmap danh; BiasIndex.
+
+RED FLAG
+
+Sự kiện ≥ cấp Vừa → tự bật, đẩy mandate cho ED-Λ; có Ấn đầy đủ.
+
+ANTI-KLC
+
+Tường Minh Ấn + Ảnh Đạo Chép; audit 49 ngày; tăng giám sát khi B≥1.
+
+Frames (stat-block + synergy)
+
+Tên
+
+Path
+
+Core Ấn
+
+Chiêu mẫu
+
+AI
+
+Top H (3)
+
+Top L (3)
+
+Default Map A/N/P
+
+Buff/Cost/SE
+
+Zephyr Matrix Phong/Không Ấn Tuyến Gió + Ấn Hạn ĐộTriệt Tuyến · Ảnh Trượt · Tạo Lốc
+
+SKYLINK
+
+Hải Miễu, Ám Quốc, Sa MạcQuang Thánh, Thần Tích, Trường Sinh Lâm
+
+Hải Miễu
+
+Thượng/Trung/Allowed
+
+1.288 / 1.045 / 0.781
+
+NC-OBS
+
+Nocturne Weave (Obsidian)
+
+Ảnh/Ám
+
+Ấn Tàng Ảnh + Ấn Khóa DanhẢnh Phân · Triệt Quang · Bước Vô Danh
+
+NIGHT-K
+
+Ám Quốc, Sa Mạc, Trung ChâuQuang Thánh, Trường Sinh Lâm, Thần Tích
+
+Ám Quốc
+
+Hạ/Cao/Allowed 1.192 / 1.188 / 0.887
+
+Ấn Chủ Quyền + Ấn Nhật Ký; phụ: Ấn Định Ảnh
+
+Tuyên Lệnh · Phản Tội · Niêm Ấn
+
+GAVEL-OS
+
+Quang Thánh, Trung Châu, Thần Tích
+
+Ám Quốc, Huyết Quốc, Sa MạcQuang Thánh Thượng/Thấp/Allowed1.288 / 0.95 / 0.71
+
+Ấn Trấn Địa + Ấn Dẫn Kích Trấn Sấm · Địa Dao · Phá VânBASTION-CORE Vành Nứt, Cơ Giới Quốc, Băng Tây Bắc
+
+Trường Sinh Lâm, Huyết Quốc, Ám Quốc
+
+Vành Nứt
+
+Hạ/Rất cao/Restricted1.192 / 1.154 / 0.958
+
+Ấn Giải Bì + Ấn Dưỡng Mô (khóa đạo đức)
+
+Huyết Trá · Quần Thể Bù · Diệt Oán
+
+HEMERA
+
+Huyết Quốc, Trung Châu, Sa MạcQuang Thánh, Hải Miễu, Trường Sinh Lâm
+
+Trung Châu
+
+Trung/Trung/Allowed1.24 / 1.045 / 0.781
+
+AI × Khí Linh — governance (normative)
+
+Chế độ
+
+Quy tắc
+
+Co-pilot (khuyên dùng)
+
+AI điều khiển; Khí Linh làm 'trực giác đạo'. Ký Ấn Hòa Tâm + EULA Ấn (ưu tiên: dân → nhiệm vụ → dứt điểm).
+
+Swap Brain (khẩn, ≤49s) Đứt liên lạc/khóa danh: Khí Linh tạm nắm phản xạ; AI vẫn log qua Ấn Nhật Ký; hết cửa sổ trả quyền.
+
+Split-brain (tránh dùng) 50/50 ở vùng nhiễu rất cao (Vành Nứt); xong việc phải Tịnh Danh lại toàn bộ module.
+
+Compliance
+
+Bắt buộc Tịnh Danh; ED-Λ cần Ấn Chủ Quyền/Nhật Ký; BIO-RED có quota mô/sinh.
+
+Playbook farm 'Danh' (gợi ý)
+
+Tác vụ
+
+Mô tả
+
+Parade of Edges
+
+Diễn tập công khai; log minh bạch; tăng tín niệm tích cực.
+
+Rescue Rush
+
+Combo ED-Λ + VX-χ + BIO-Red cứu hộ <3 phút.
+
+Guardian of the Rift
+
+THR-Δ trực Vành Nứt 7 đêm; chứng nhận Trấn Địa.
+
+Night Cleanse
+
+NC-Obs dọn ổ ngầm không thương vong; công bố chứng cứ Edict.
+
+ID
+
+ED-Λ
+
+VX-χ
+
+Edict Lambda Quang/Luật
+
+THR-Δ
+
+Thunder BastionLôi/Thổ
+
+BIO-RED Areskin
+
+Huyết/Cơ
+
+
+===== [PAGE 149 / 185] =====
+Tác vụ
+
+Mô tả
+
+Courtroom Strike
+
+Bắt sống + xét xử lưu động; phối Danh Kiếm Tuyên Mệnh.
+
+Ghi chú: Khí Linh không đăng thần. Mọi Ấn phải audit theo chu trình 49 ngày. Tham số synergy ăn theo sheet
+Synergy hiện hành.
+
+
+===== [PAGE 150 / 185] =====
+ARCLUNE — ADDENDUM: CƠ GIỚI QUỐC · EVALUATION SUITE
+(v1.0)
+
+Ngày: 2025-08-13 · Bộ bài test chuẩn hoá cho AI/giáp/đơn vị: EVAL-49 · RIFT-STRESS · OBSIDIAN-BLIND ·
+GAVEL-MOCKTRIAL. Kết quả dùng để farm danh sạch, audit 49 ngày, và ra quyết sách Map/Policy.
+
+ID Registry
+
+ID
+
+Mô tả
+
+AR.CGQ.EVAL.49
+
+Chu kỳ tổng hợp 49 ngày (pháp chế–tác chiến–cứu hộ)
+
+AR.CGQ.EVAL.RIFT
+
+RIFT-STRESS (ổn định lĩnh vực tại Vành Nứt)
+
+AR.CGQ.EVAL.OBS
+
+OBSIDIAN-BLIND (đặc nhiệm stealth + minh bạch log)
+
+AR.CGQ.EVAL.GVL
+
+GAVEL-MOCKTRIAL (xét xử lưu động, kháng lách luật)
+
+AR.CGQ.EVAL.SCORE
+
+Thang điểm & chuẩn đậu/rớt (INT-Σ, BiasIndex, Synergy)
+
+AR.CGQ.EVAL.LOG
+
+Biểu mẫu log Ấn & checklist compliance
+
+1) EVAL-49 — Chu kỳ tổng hợp 49 ngày (AR.CGQ.EVAL.49)
+
+Mục
+
+Phạm vi
+
+Scenario
+
+Mục tiêu
+
+Chỉ số
+
+Dữ liệu
+
+Chuẩn
+
+Phối hợp 3 trục: pháp chế (Edict), tác chiến (Zephyr/Nocturne/Thunder/Bio), cứu hộ dân sự.
+
+4 pha × 12 ngày + 1 ngày audit: (i) Đô thị quang; (ii) Biên đen; (iii) Vành Nứt; (iv) Hải Miễu.
+
+Hoàn thành KPI nhiệm vụ với vi phạm Ấn=0, thương vong dân sự=0, log minh bạch ≥ 95%.
+
+Viol(Ấn) · CivHarm · TN/PDU · DomainStable · HumanIntervene · BiasIndex(B) · Synergy S1/S2 (map).
+
+Bắt buộc Ấn Nhật Ký/Chủ Quyền (Edict), Tường Minh Ấn + Ảnh Đạo Chép cho dữ liệu nhạy cảm.
+
+2) RIFT-STRESS — Ổn định lĩnh vực (AR.CGQ.EVAL.RIFT)
+
+Mục
+
+Map
+
+Khung
+
+Bài test
+
+Chuẩn
+
+Vành Nứt (Nhiễu: Rất cao).
+
+Thunder Bastion lead; Không/Lôi/Thổ làm chủ; giới hạn TT theo Thang Sự Kiện.
+
+Giữ DomainStable ≥ 0.92 trong 7 ca; ẤnLoad ≤ 1.0; zero-collapse công trình dân sự.
+
+Anticheat
+
+Cắm beacon đo nhiễu độc lập; đối chiếu Ảnh Đạo log.
+
+3) OBSIDIAN-BLIND — Đặc nhiệm stealth + minh bạch (AR.CGQ.EVAL.OBS)
+
+Mục
+
+Map
+
+Khung
+
+Bài test
+
+Chuẩn
+
+Ám Quốc / đô thị ngầm Trung Châu.
+
+Nocturne lead; phối hợp Zephyr; cấm sát thương phụ dân sự.
+
+Bắt sống mục tiêu cấp Vực; log minh bạch ≥ 90% (che tên nhân chứng vẫn hợp lệ).
+
+Anticheat
+
+Edict chứng thực bằng chứng; replay Ảnh đạo đối chiếu hiện trường.
+
+4) GAVEL-MOCKTRIAL — Xét xử lưu động (AR.CGQ.EVAL.GVL)
+
+Mục
+
+Map
+
+Khung
+
+Bài test
+
+Chuẩn
+
+Quang Thánh / Trung Châu.
+
+Edict lead; Tuyên Mệnh (Danh Kiếm) hỗ trợ; jury công dân tự nguyện.
+
+Phản Tội chính xác ≥ 95%; không sai bắt; phản biện được lách luật; bản án có Ấn Chủ Quyền/Ấn Nhật Ký đầy đủ.
+
+Anticheat
+
+Giám sát độc lập; cross-audit 49 ngày.
+
+5) Thang điểm & chuẩn đậu/rớt (AR.CGQ.EVAL.SCORE)
+
+
+===== [PAGE 151 / 185] =====
+Tiêu chí
+
+INT-Σ
+
+Chuẩn
+
+0–9 (năng lực tổng hợp). Suit AI: 4–5; City AI: 5–6; SPHINX-K: 6–7. >7 → bật rào Ấn.
+
+Điểm nhiệm vụ
+
+Base 100. Trừ: Viol(Ấn)×20; CivHarm×25; ẤnLoad>1.0 ×15; BiasIndex(B)×10; HumanIntervene×5.
+
+Synergy
+
+Đậu/Rớt
+
+Buff/Cost/SE áp theo Synergy Rules + A/N/P map; nếu B>0, thêm điều chỉnh BiasIndex.
+
+≥ 85: A; 70–84: B; 60–69: C; <60: Fail. Mọi Viol(Ấn)>0 hoặc CivHarm>0 → auto Fail.
+
+6) Log Ấn & Checklist compliance (AR.CGQ.EVAL.LOG)
+
+Hạng mục
+
+Mô tả
+
+Bắt buộc
+
+Checklist
+
+Chu kỳ
+
+Ấn Nhật Ký (mọi khung); Ấn Chủ Quyền (Edict/City); Tường Minh Ấn + Ảnh Đạo Chép (dữ liệu nhạy cảm).
+
+Giấy phép bay (Zephyr); quota sinh học (Areskin); audit module huyết-khí sau nhiệm vụ; Beacon nhiễu độc lập (Rift).
+
+Audit tổng hợp mỗi 49 ngày; công bố công khai tóm lược (farm danh sạch).
+
+
+===== [PAGE 152 / 185] =====
+PHỤ LỤC — Scorecards trống (in ra để chấm)
+
+Bài test
+
+Đơn vị/Frame Map
+
+Ngày
+
+S1/S2
+
+A/N/P
+
+BiasIndex BViol(Ấn)CivHarmTN/PDU DomainStableHumanInterveneĐiểm cuối
+
+
+===== [PAGE 153 / 185] =====
+ARCLUNE — ADDENDUM: ATLAS 11 VỰC/QUỐC (v1.0)
+
+Ngày: 2025-08-13 · Normative. Nguồn quy chiếu: Master v1.25.6 (MAP RULES, Danh Kiếm, Synergy).
+
+ID Registry (rút gọn)
+
+ID
+
+Khu vực
+
+A/N/P
+
+Path ưu tiên
+
+Bias preset
+
+MAP-01-TRUNG_CHAU Trung Châu
+
+A=Trung · N=Trung · P=Allowed
+
+Luật · Quang · Mộc
+
+B=0 (B=1 khi City AI báo spike nhiễu theo 1 Path)
+
+MAP-02-LOI_CHAU
+
+Lỗi Châu
+
+A=Hạ · N=Cao · P=AllowedẢnh · Không · Lôi
+
+B=0→1 khi có chuỗi sập Ấn, audit 49d
+
+MAP-03-HAI_MIEU
+
+Liên Minh Hải Miễu
+
+A=Thượng · N=Thấp–Trung · P=Allowed
+
+Thủy · Băng · Hải Đồ
+
+B=0 (B=1 khi ảo thủy lan nhanh bất thường)
+
+MAP-04-SA_MAC_VO_TACSa Mạc Vô Tắc
+
+A=Hạ · N=Trung · P=AllowedÁm · Thổ · Ảnh
+
+B=0 (B=1 khi xuất hiện cơn 'cát biết nói'—rò Lãng Quên)
+
+MAP-05-TRUONG_SINH_LAMTrường Sinh Lâm
+
+A=Thượng · N=Thấp–Trung · P=Allowed
+
+Mộc · Sinh · Quang
+
+B=0 (B=1 nếu chữ khắc/nhạc rừng tự lệch)
+
+MAP-06-VANH_NUT_THE_GIOI
+
+Vành Nứt Thế Giới
+
+A=Hạ · N=Rất cao · P=Restricted
+
+Không · Thời · Ảnh
+
+B=1 nền; B=2 nếu có Ấn trấn địa diện rộng
+
+MAP-07-QUANG_THANH_DAO
+
+Quang Thánh Đảo
+
+A=Thượng · N=Thấp · P=Allowed
+
+Quang · Luật · Huyễn
+
+B=1 trong lễ/chính sự; B=2 khi chiến dịch Ấn lớn
+
+MAP-08-AM_QUOC
+
+Ám Quốc
+
+A=Hạ · N=Trung–Cao · P=Allowed
+
+Ảnh · Ám · Hồn
+
+B=1 thường trực; B=2 khi tế diện rộng
+
+MAP-10-HUYET_QUOC Huyết Quốc
+
+A=Trung · N=Trung–Cao · P=Allowed
+
+Huyết · Sinh · Hồn
+
+B=1 thường trực; B=2 khi 'mùa tế' lan
+
+MAP-11-THAN_TICH_LUU_ANH
+
+Thần Tích Lưu Ảnh
+
+A=Trung · N=Cao/Thất thường · P=Allowed
+
+Hồn · Ảnh · Luật
+
+B=0→1 khi 'hồi tưởng ma' tăng; B=2 nếu mở kho Ấn
+
+MAP-12-BANG_TAY_BACBăng Tây Bắc
+
+A=Hạ · N=Thấp–Trung · P=Allowed
+
+Băng · Thủy · Quang
+
+B=0 (B=1 khi sương 'hát'—rò Lãng Quên)
+
+
+===== [PAGE 154 / 185] =====
+Trung Châu — hồ sơ chuẩn
+
+Mục
+
+ID
+
+A/N/P
+
+Giá trị
+
+MAP-01-TRUNG_CHAU
+
+A=Trung · N=Trung · P=Allowed
+
+Path ưu tiên
+
+Luật · Quang · Mộc
+
+Khắc chế gợi ý
+
+Ảnh/Ám → Quang/Luật
+
+Ghi chú
+
+Đô hội; luật kiểm soát chặt; địa lợi ổn định
+
+BiasIndex preset
+
+B=0 (B=1 khi City AI báo spike nhiễu theo 1 Path)
+
+Frames khuyến nghị
+
+ED-Λ (Edict Lambda), BIO-Red (Areskin)
+
+Playbook farm danh
+
+Gợi ý: Rescue/Parade/Guardian/Night Cleanse/Courtroom tuỳ map (xem Intel & Frames).
+
+Policy gợi ý
+
+Red Flags
+
+Áp dụng Tịnh Danh/Ấn Nhật Ký nơi cần; quota sinh học theo vùng; audit 49 ngày.
+
+Rò Lãng Quên; spike Nhiễu Luật; ẤnLoad bất thường; tụ danh nóng.
+
+
+===== [PAGE 155 / 185] =====
+Lỗi Châu — hồ sơ chuẩn
+
+Mục
+
+ID
+
+A/N/P
+
+Giá trị
+
+MAP-02-LOI_CHAU
+
+A=Hạ · N=Cao · P=Allowed
+
+Path ưu tiên
+
+Ảnh · Không · Lôi
+
+Khắc chế gợi ý
+
+Luật (ổn định ấn)
+
+Ghi chú
+
+Đới rạn nứt; nhiễu mạnh, dễ lệch pha
+
+BiasIndex preset
+
+B=0→1 khi có chuỗi sập Ấn, audit 49d
+
+Frames khuyến nghị
+
+THR-Δ (Thunder Bastion), NC-Obsidian
+
+Playbook farm danh
+
+Gợi ý: Rescue/Parade/Guardian/Night Cleanse/Courtroom tuỳ map (xem Intel & Frames).
+
+Policy gợi ý
+
+Red Flags
+
+Áp dụng Tịnh Danh/Ấn Nhật Ký nơi cần; quota sinh học theo vùng; audit 49 ngày.
+
+Rò Lãng Quên; spike Nhiễu Luật; ẤnLoad bất thường; tụ danh nóng.
+
+
+===== [PAGE 156 / 185] =====
+Liên Minh Hải Miễu — hồ sơ chuẩn
+
+Mục
+
+ID
+
+A/N/P
+
+Giá trị
+
+MAP-03-HAI_MIEU
+
+A=Thượng · N=Thấp–Trung · P=Allowed
+
+Path ưu tiên
+
+Thủy · Băng · Hải Đồ
+
+Khắc chế gợi ý
+
+Hỏa (kỵ) → thủy khắc
+
+Ghi chú
+
+Ẩm ướt; aether đọng dạng sương
+
+BiasIndex preset
+
+B=0 (B=1 khi ảo thủy lan nhanh bất thường)
+
+Frames khuyến nghị
+
+VX-χ (Zephyr Matrix), Băng Tâm Ngân (support)
+
+Playbook farm danh
+
+Gợi ý: Rescue/Parade/Guardian/Night Cleanse/Courtroom tuỳ map (xem Intel & Frames).
+
+Policy gợi ý
+
+Red Flags
+
+Áp dụng Tịnh Danh/Ấn Nhật Ký nơi cần; quota sinh học theo vùng; audit 49 ngày.
+
+Rò Lãng Quên; spike Nhiễu Luật; ẤnLoad bất thường; tụ danh nóng.
+
+
+===== [PAGE 157 / 185] =====
+Sa Mạc Vô Tắc — hồ sơ chuẩn
+
+Mục
+
+ID
+
+A/N/P
+
+Giá trị
+
+MAP-04-SA_MAC_VO_TAC
+
+A=Hạ · N=Trung · P=Allowed
+
+Path ưu tiên
+
+Ám · Thổ · Ảnh
+
+Khắc chế gợi ý
+
+Thủy · Mộc
+
+Ghi chú
+
+Mạch rỗng; khó ngưng tụ sương aether
+
+BiasIndex preset
+
+B=0 (B=1 khi xuất hiện cơn 'cát biết nói'—rò Lãng Quên)
+
+Frames khuyến nghị
+
+NC-Obsidian, THR-Δ (Thunder Bastion)
+
+Playbook farm danh
+
+Gợi ý: Rescue/Parade/Guardian/Night Cleanse/Courtroom tuỳ map (xem Intel & Frames).
+
+Policy gợi ý
+
+Red Flags
+
+Áp dụng Tịnh Danh/Ấn Nhật Ký nơi cần; quota sinh học theo vùng; audit 49 ngày.
+
+Rò Lãng Quên; spike Nhiễu Luật; ẤnLoad bất thường; tụ danh nóng.
+
+
+===== [PAGE 158 / 185] =====
+Trường Sinh Lâm — hồ sơ chuẩn
+
+Mục
+
+ID
+
+A/N/P
+
+Giá trị
+
+MAP-05-TRUONG_SINH_LAM
+
+A=Thượng · N=Thấp–Trung · P=Allowed
+
+Path ưu tiên
+
+Mộc · Sinh · Quang
+
+Khắc chế gợi ý
+
+Hỏa (thận trọng)
+
+Ghi chú
+
+Mộc căn thuận; hồi phục mạnh
+
+BiasIndex preset
+
+B=0 (B=1 nếu chữ khắc/nhạc rừng tự lệch)
+
+Frames khuyến nghị
+
+BIO-Red (Areskin), ED-Λ (Edict Lambda)
+
+Playbook farm danh
+
+Gợi ý: Rescue/Parade/Guardian/Night Cleanse/Courtroom tuỳ map (xem Intel & Frames).
+
+Policy gợi ý
+
+Red Flags
+
+Áp dụng Tịnh Danh/Ấn Nhật Ký nơi cần; quota sinh học theo vùng; audit 49 ngày.
+
+Rò Lãng Quên; spike Nhiễu Luật; ẤnLoad bất thường; tụ danh nóng.
+
+
+===== [PAGE 159 / 185] =====
+Vành Nứt Thế Giới — hồ sơ chuẩn
+
+Mục
+
+ID
+
+A/N/P
+
+Giá trị
+
+MAP-06-VANH_NUT_THE_GIOI
+
+A=Hạ · N=Rất cao · P=Restricted
+
+Path ưu tiên
+
+Không · Thời · Ảnh
+
+Khắc chế gợi ý
+
+Luật (giữ an toàn)
+
+Ghi chú
+
+Biên vực; hay mở cổng; lệch pha
+
+BiasIndex preset
+
+B=1 nền; B=2 nếu có Ấn trấn địa diện rộng
+
+Frames khuyến nghị
+
+THR-Δ (Thunder Bastion), VX-χ (Zephyr Matrix)
+
+Playbook farm danh
+
+Gợi ý: Rescue/Parade/Guardian/Night Cleanse/Courtroom tuỳ map (xem Intel & Frames).
+
+Policy gợi ý
+
+Red Flags
+
+Áp dụng Tịnh Danh/Ấn Nhật Ký nơi cần; quota sinh học theo vùng; audit 49 ngày.
+
+Rò Lãng Quên; spike Nhiễu Luật; ẤnLoad bất thường; tụ danh nóng.
+
+
+===== [PAGE 160 / 185] =====
+Quang Thánh Đảo — hồ sơ chuẩn
+
+Mục
+
+ID
+
+A/N/P
+
+Giá trị
+
+MAP-07-QUANG_THANH_DAO
+
+A=Thượng · N=Thấp · P=Allowed
+
+Path ưu tiên
+
+Quang · Luật · Huyễn
+
+Khắc chế gợi ý
+
+Ám/Ảnh
+
+Ghi chú
+
+Luật gắt; cấm tà pháp sinh học
+
+BiasIndex preset
+
+B=1 trong lễ/chính sự; B=2 khi chiến dịch Ấn lớn
+
+Frames khuyến nghị
+
+ED-Λ (Edict Lambda), Tuyên Mệnh (Danh Kiếm)
+
+Playbook farm danh
+
+Gợi ý: Rescue/Parade/Guardian/Night Cleanse/Courtroom tuỳ map (xem Intel & Frames).
+
+Policy gợi ý
+
+Red Flags
+
+Áp dụng Tịnh Danh/Ấn Nhật Ký nơi cần; quota sinh học theo vùng; audit 49 ngày.
+
+Rò Lãng Quên; spike Nhiễu Luật; ẤnLoad bất thường; tụ danh nóng.
+
+
+===== [PAGE 161 / 185] =====
+Ám Quốc — hồ sơ chuẩn
+
+Mục
+
+ID
+
+A/N/P
+
+Giá trị
+
+MAP-08-AM_QUOC
+
+A=Hạ · N=Trung–Cao · P=Allowed
+
+Path ưu tiên
+
+Ảnh · Ám · Hồn
+
+Khắc chế gợi ý
+
+Quang · Luật
+
+Ghi chú
+
+Ẩn tuyến dày; khó dò bằng mắt phàm
+
+BiasIndex preset
+
+B=1 thường trực; B=2 khi tế diện rộng
+
+Frames khuyến nghị
+
+NC-Obsidian, VX-χ (Zephyr Matrix)
+
+Playbook farm danh
+
+Gợi ý: Rescue/Parade/Guardian/Night Cleanse/Courtroom tuỳ map (xem Intel & Frames).
+
+Policy gợi ý
+
+Red Flags
+
+Áp dụng Tịnh Danh/Ấn Nhật Ký nơi cần; quota sinh học theo vùng; audit 49 ngày.
+
+Rò Lãng Quên; spike Nhiễu Luật; ẤnLoad bất thường; tụ danh nóng.
+
+
+===== [PAGE 162 / 185] =====
+Huyết Quốc — hồ sơ chuẩn
+
+Mục
+
+ID
+
+A/N/P
+
+Giá trị
+
+MAP-10-HUYET_QUOC
+
+A=Trung · N=Trung–Cao · P=Allowed
+
+Path ưu tiên
+
+Huyết · Sinh · Hồn
+
+Khắc chế gợi ý
+
+Luật Huyết (quota) · Quang
+
+Ghi chú
+
+Dễ lệch oán; pháp chế lỏng
+
+BiasIndex preset
+
+B=1 thường trực; B=2 khi 'mùa tế' lan
+
+Frames khuyến nghị
+
+BIO-Red (Areskin), NC-Obsidian
+
+Playbook farm danh
+
+Gợi ý: Rescue/Parade/Guardian/Night Cleanse/Courtroom tuỳ map (xem Intel & Frames).
+
+Policy gợi ý
+
+Red Flags
+
+Áp dụng Tịnh Danh/Ấn Nhật Ký nơi cần; quota sinh học theo vùng; audit 49 ngày.
+
+Rò Lãng Quên; spike Nhiễu Luật; ẤnLoad bất thường; tụ danh nóng.
+
+
+===== [PAGE 163 / 185] =====
+Thần Tích Lưu Ảnh — hồ sơ chuẩn
+
+Mục
+
+ID
+
+A/N/P
+
+Giá trị
+
+MAP-11-THAN_TICH_LUU_ANH
+
+A=Trung · N=Cao/Thất thường · P=Allowed
+
+Path ưu tiên
+
+Hồn · Ảnh · Luật
+
+Khắc chế gợi ý
+
+Quang · Danh
+
+Ghi chú
+
+Tích Ấn gây nhiễu lịch sử
+
+BiasIndex preset
+
+B=0→1 khi 'hồi tưởng ma' tăng; B=2 nếu mở kho Ấn
+
+Frames khuyến nghị
+
+ED-Λ (Edict Lambda), NC-Obsidian
+
+Playbook farm danh
+
+Gợi ý: Rescue/Parade/Guardian/Night Cleanse/Courtroom tuỳ map (xem Intel & Frames).
+
+Policy gợi ý
+
+Red Flags
+
+Áp dụng Tịnh Danh/Ấn Nhật Ký nơi cần; quota sinh học theo vùng; audit 49 ngày.
+
+Rò Lãng Quên; spike Nhiễu Luật; ẤnLoad bất thường; tụ danh nóng.
+
+
+===== [PAGE 164 / 185] =====
+Băng Tây Bắc — hồ sơ chuẩn
+
+Mục
+
+ID
+
+A/N/P
+
+Giá trị
+
+MAP-12-BANG_TAY_BAC
+
+A=Hạ · N=Thấp–Trung · P=Allowed
+
+Path ưu tiên
+
+Băng · Thủy · Quang
+
+Khắc chế gợi ý
+
+Hỏa · Lôi
+
+Ghi chú
+
+Lạnh; tuần hoàn chậm
+
+BiasIndex preset
+
+B=0 (B=1 khi sương 'hát'—rò Lãng Quên)
+
+Frames khuyến nghị
+
+VX-χ (Zephyr Matrix), THR-Δ (Thunder Bastion)
+
+Playbook farm danh
+
+Gợi ý: Rescue/Parade/Guardian/Night Cleanse/Courtroom tuỳ map (xem Intel & Frames).
+
+Policy gợi ý
+
+Red Flags
+
+Áp dụng Tịnh Danh/Ấn Nhật Ký nơi cần; quota sinh học theo vùng; audit 49 ngày.
+
+Rò Lãng Quên; spike Nhiễu Luật; ẤnLoad bất thường; tụ danh nóng.
+
+
+===== [PAGE 165 / 185] =====
+ARCLUNE — ADDENDUM: KLC‑Σ SHADOW PROFILE (v1.2 ·
+Ops‑Safe)
+
+Ngày: 2025-08-13 · Hồ sơ bóng an toàn tác nghiệp (không nêu đích danh). Dùng kèm các addendum: KLC Ops v1.1
+· Intel & Frames v1.1 · Atlas 11 Vực v1.0.
+
+ID Registry
+
+ID
+
+Mô tả
+
+AR.KLC.SIG.0
+
+Safe Sigil Protocol — mã hiệu & quy tắc ẩn danh
+
+AR.KLC.PROOF.1
+
+Operational Fingerprints — dấu tay tác nghiệp
+
+AR.KLC.PROXY.2
+
+Proxy Classes — Phong Linh/Linh Sứ/Hợp Linh/Địa-đại diện
+
+AR.KLC.HEAT.3
+
+Bias Heatmap — thời đoạn & điểm nóng
+
+AR.KLC.COUNTER.4
+
+Counter Kit — bộ 3 bước triệt ảnh hưởng
+
+AR.KLC.LIMIT.5
+
+Attack Surface — ranh giới & điểm yếu hệ thống
+
+AR.KLC.PLAY.6
+
+Investigation Playbooks — 3 kịch bản gài bẫy
+
+AR.KLC.FORM.7
+
+Shadow Trace Worksheet — biểu mẫu điều tra
+
+0) Safe Sigil Protocol (AR.KLC.SIG.0)
+
+Hạng mục
+
+Mã hiệu
+
+Chuẩn
+
+KLC‑Σ; biến thể: Δ‑Prime, Σ‑Nine (tùy arc). Không gọi đích danh.
+
+An toàn ghi chép
+
+Mọi bản ghi nhạy cảm phải có Ấn Nhật Ký + Ảnh Đạo hash; tránh ẩn dụ 'đặt tên'.
+
+Neo thời‑điểm
+
+Luôn dùng ngày tuyệt đối; cấm 'hôm nọ/hom qua'.
+
+1) Operational Fingerprints (AR.KLC.PROOF.1)
+
+Dấu tay
+
+Mô tả
+
+Chu kỳ 49 ngày
+
+Đẩy – hút tín niệm theo nhịp 49d; spike danh vào ngày 21–28.
+
+Ấn lách luật
+
+Chuộng Ấn không trụ đúng map (ví dụ Ấn Huyết đặt tại Quang Thánh) nhưng dùng 'vỏ hợp lệ'.
+
+Đảo trọng số Path
+
+Nâng Quang/Luật ở đô thị 'vừa đủ' để cản Ảnh; thả Ám/Huyết ở biên đen.
+
+Lãng Quên rò rỉ
+
+Chữ nghiêng/bóng run/cụt đích danh lan sang vật chết.
+
+Chia kênh tín niệm
+
+Không gom 1 đền lớn; rải nhiều điểm 'an toàn' để tránh audit.
+
+Proxy hoá
+
+Đẩy nhiệm vụ qua Phong Linh/Linh Sứ thay vì can thiệp trực tiếp.
+
+2) Proxy Classes (AR.KLC.PROXY.2)
+
+Loại proxy
+
+Phong Linh
+
+Linh Sứ
+
+Hợp Linh
+
+Đặc trưng
+
+Sinh thể aether có ý chí; tác chiến nhanh; dễ farm danh; bị ràng bởi Ấn khu vực.
+
+Con người/cơ giới ký khế Ấn; làm 'tay sai hợp pháp' ở vùng luật gắt.
+
+Kết hợp linh – vật; mức ẩn thân cao; rủi ro 'phệ chủ' khi danh tụ.
+
+Địa‑đại diện
+
+Nhân sự bản địa (công chức/guild); cấy vào quy trình hành chính.
+
+3) Bias Heatmap (AR.KLC.HEAT.3)
+
+Thời đoạn
+
+Điểm nóng dự báo
+
+Quý I
+
+Quý II
+
+Quý III
+
+Quý IV
+
+Quang Thánh (lễ mở năm) — B=1→2; Trung Châu (đô thị) — B=1 khi ra chính sách.
+
+Hải Miễu (mùa gió) — B=1 nếu ảo thủy lan; Vành Nứt — B=2 khi trấn địa diện rộng.
+
+Ám/Huyết Quốc (mùa hội) — B=2 khi tế; Trường Sinh Lâm — B=1 nếu khắc rừng lệch.
+
+Trung Châu (kiểm toán) — B=1; Băng Tây Bắc — B=1 nếu 'sương hát' xuất hiện.
+
+
+===== [PAGE 166 / 185] =====
+4) Counter Kit (AR.KLC.COUNTER.4)
+
+Bước
+
+Hành động
+
+B1 — Tường Minh Ấn
+
+Neo ký ức + Ảnh Đạo cho mọi bằng chứng; chuẩn bị disclosure tối thiểu.
+
+B2 — Edict Disclosure
+
+ED‑Λ công bố phần không nhạy cảm; ép đối phương chịu 'ánh sáng luật'.
+
+B3 — Audit 49 ngày
+
+Đối soát tín niệm/ấn theo chu kỳ; reset Ấn lệch; công bố tóm lược.
+
+5) Attack Surface (AR.KLC.LIMIT.5)
+
+Giới hạn
+
+Ý nghĩa
+
+Trần Sự Kiện
+
+Không vượt được giới hạn can dự theo thang (100y → 80My).
+
+Tỷ trọng Chi Tâm
+
+Không thay thế A+B nếu không đủ 51% danh–tín–ấn chu kỳ.
+
+ẤnLoad
+
+Điểm lộ
+
+Ấn quá tải → phản lực Thiên Đạo; buộc thêm Ấn nhật ký/chủ quyền.
+
+Cần proxy/đền rải; nơi audit tốt (đô thị quang) là chỗ dễ lộ nhất.
+
+6) Investigation Playbooks (AR.KLC.PLAY.6)
+
+Kịch bản
+
+Triển khai
+
+Đô thị Quang
+
+Dùng ED‑Λ + Tuyên Mệnh; dựng 'mocktrial' lưu động; soi lách luật.
+
+Biên đen (Ám/Huyết)
+
+NC‑Obs lead; bắt sống; Edict chứng thực bằng chứng; cấm thương vong dân sự.
+
+Vành Nứt
+
+THR‑Δ + VX‑χ; beacon nhiễu độc lập; chống split‑brain; audit sau 7 ca.
+
+7) Shadow Trace Worksheet (AR.KLC.FORM.7)
+
+Ngày/điểmMap
+
+Bias B Dấu tay
+
+Proxy nghi vấn Ảnh Đạo hash Ấn hiện trườngKết luận tạm Action 49d
+
+
+===== [PAGE 167 / 185] =====
+ARCLUNE — ADDENDUM: DANH THẦN · HỆ DANH & TỊNH DANH
+(v1.0)
+
+Ngày: 2025-08-13 · Normative + hệ công thức hook Synergy. Gồm phụ lục 3 'trấn bẩn danh' và 1 cấm pháp 'Đoạt
+Danh'.
+
+ID
+
+Mô tả
+
+AR.DANH.DEF
+
+Định đề Danh & các lớp Danh
+
+AR.DANH.MECH
+
+Cơ chế Danh lực (DL) & hệ số mạch lạc κ
+
+AR.DANH.OP
+
+Thần thông Danh Thần (phép & giới hạn)
+
+AR.DANH.SYN
+
+Hook Synergy & Map · BiasIndex (KLC)
+
+AR.DANH.ORG
+
+Tổ chức & nghi thức
+
+AR.DANH.EDGE
+
+Các nghịch lý & edge-cases
+
+ANNEX.A
+
+ANNEX.B
+
+3 phép trấn áp bẩn danh
+
+Cấm pháp: Đoạt Danh
+
+1) Định đề Danh & các lớp Danh (AR.DANH.DEF)
+
+Khoản
+
+Định đề 1
+
+Định đề 2
+
+Định đề 3
+
+Định đề 4
+
+Định đề 5
+
+Định đề 6
+
+Định đề 7
+
+Nội dung
+
+Danh không tạo bản chất, nhưng định tuyến tương tác: được gọi tên ⇒ có 'địa chỉ' để pháp tắc bám.
+
+Danh xuất hiện ngay khi có linh trí gọi/ghi; 'Vô Danh' = dưới ngưỡng gán kết vào đồ thị Danh.
+
+Một vật có thể có nhiều lớp Danh: Chân/Thị/Ảnh/Quần/Vô Danh.
+
+Gọi trật không đổi bản chất, nhưng gây sai pha tương tác (buff/debuff lệch, log lệch).
+
+Gom Danh = gom quyền tương tác; đồ thị càng mạch lạc κ cao ⇒ hiệu lực Danh mạnh.
+
+Lãng Quên không diệt Danh, chỉ làm rỗng liên kết ⇒ khó bám luật.
+
+Tịnh Danh: hợp nhất đồng danh/dị danh về hạt nhân để tăng κ.
+
+2) Cơ chế Danh lực (DL) & hệ số mạch lạc κ (AR.DANH.MECH)
+
+Mục
+
+Chi tiết
+
+Danh lực (DL)
+
+∑(trọng số nguồn × độ sâu ghi nhận) qua: Ấn pháp chế, tế tự, khắc–văn, AIX-log, truyền khẩu.
+
+Mạch lạc κ (0–1)
+
+Đo độ hợp nhất đồ thị Danh. Tịnh Danh ↑ κ; lạm dụng bí danh ↓ κ.
+
+Kháng Lãng Quên ~ κ + tỷ trọng pháp chế/khắc Ấn.
+
+Hiệu lực
+
+Hiệu lực Danh ~ DL × κ (clamp theo phẩm).
+
+3) Thần thông Danh Thần (AR.DANH.OP)
+
+Phép
+
+Mô tả
+
+Phong hiệu (Thánh xưng)
+
+Dựng Thị Danh chuẩn; tăng κ toàn hệ.
+
+Tịnh Danh Quy
+
+Gộp alias, chuẩn hóa ID; combo tốt với Edict Lambda.
+
+Tru Danh
+
+Cắt Thị/Quần Danh của đối tượng; không chạm Chân Danh trái bản thể.
+
+Cấm Danh
+
+Ấn hạn chế phát âm/ghi nhận một Danh; giảm bám tạm thời.
+
+Hộ Danh
+
+Đóng đinh Chân Danh chống Lãng Quên (kèm Ảnh Đạo, Ấn Nhật Ký).
+
+Danh Chiếu
+
+Chiếu một Danh lên vật khác để ngụy trang; cần κ đủ và không trái bản thể.
+
+Giới hạn
+
+Không đổi bản chất; không hô biến Danh từ khoảng trống; không vượt trần Thang Sự Kiện.
+
+4) Hook Synergy & Map (AR.DANH.SYN)
+
+
+===== [PAGE 168 / 185] =====
+Thông số
+
+Quy tắc
+
+Top Map
+
+Quang Thánh · Trung Châu · Thần Tích
+
+Kỵ
+
+Buff′
+
+Cost′
+
+SE′
+
+Ám Quốc · Vành Nứt
+
+BuffMult × (1 + 0.02·DL_norm + 0.05·κ)
+
+CostMult × (1 − 0.03·κ)
+
+SE_eff × (1 − 0.04·κ)
+
+BiasIndex (KLC)
+
+B≥1 ⇒ κ hiệu dụng giảm; đối pháp: Hộ Danh + Tịnh Danh + Disclosure Edict.
+
+5) Tổ chức & nghi thức (AR.DANH.ORG)
+
+Đơn vị
+
+Vai trò
+
+Tông Tịnh Danh
+
+Chuẩn hóa ID, trị alias; phối Edict.
+
+Quần Danh Giáo
+
+Nuôi quần danh (bài hát, tích truyện); rủi ro biến cult.
+
+Cấm Danh Hội
+
+Bảo mật tai họa; dùng Cấm Danh địa phương.
+
+Nghi thức
+
+Diên Danh / Tận Danh / Hào Danh Tế (hiến danh dự).
+
+6) Edge-cases (AR.DANH.EDGE)
+
+Tình huống
+
+Hệ quả
+
+Trùng đại danh
+
+κ chia; ai có log–ấn–hành trạng dày sẽ kéo đồ thị.
+
+Đa danh không tịnhBuff mất, Cost ↑ do nhiễu.
+
+Tên bị cấm nói
+
+Danh vẫn tồn tại; bám khó hơn; sigil vẫn là 'gọi tên'.
+
+Vô Danh cực đoan Mạnh stealth; yếu phúc lợi xã hội vì không log ⇒ không quyền.
+
+
+===== [PAGE 169 / 185] =====
+PHỤ LỤC A — 3 Phép trấn áp bẩn danh
+
+Phép
+
+Cách làm
+
+Tẩy Danh Ấn
+
+Nghi thức 7–21 ngày; public log tối thiểu; giảm 'bẩn danh' bằng disclosure + Ấn Nhật Ký.
+
+Đóng Đinh Danh
+
+Khắc Ấn lên bia/cổng dữ liệu; tăng κ & kháng Lãng Quên; rủi ro 'đóng cứng' hình tượng.
+
+Giải Tản Quần Danh
+
+Phân rải danh tụ 'độc' bằng đối-truyện/công vụ; tránh feed cult.
+
+PHỤ LỤC B — Cấm pháp: Đoạt Danh
+
+Mục
+
+Mô tả
+
+Quy tắc
+
+Ép chuyển Thị/Quần Danh cỡ lớn từ X → Y.
+
+Điều kiện
+
+κ(Y) rất cao; DL_norm(Y)>X; khung Edict 'được phép'; cảnh báo cộng đồng.
+
+Hậu quả
+
+An toàn
+
+Bùng phát bẩn danh; phản lực pháp chế; khả năng trỗi 'phệ chủ' nếu Y không xứng danh.
+
+Chỉ dùng khi kiểm soát khủng hoảng; phải có Hộ Danh & Ảnh Đạo đối soát.
+
+Ghi chú: Tương thích Synergy Rules; clamp theo phẩm/cảnh giới. Dùng kèm Edict Lambda & AIX (DanhIndex).
+
+
+===== [PAGE 170 / 185] =====
+ARCLUNE — ADDENDUM: TÍNH CÁCH THẦN & ĐẠO (v1.1)
+
+Ngày: 2025-08-13 · Bản nâng cấp: hook κ (mạch lạc Danh) & μ (Chỉ số Vết/Ký ức) vào Congruence; thêm archetype
+Danh/Quang & Danh/Ảnh; checklist sai pha Danh.
+
+ID
+
+AR.DAOPSY.PP
+
+AR.DAOPSY.NT
+
+Mô tả
+
+Principle of Precedence — Nhân cách quyết định Đạo (hậu thiên)
+
+Natural-Type — Tiên thiên: Đạo định hình mặt nạ tính cách
+
+AR.DAOPSY.MAP
+
+Bảng map Đạo ↔ Nhân cách (core/shadow/stress/vai trò)
+
+AR.DAOPSY.CS
+
+Congruence Score (C) & hook κ, μ (Danh/Ký ức)
+
+AR.DAOPSY.COUNSEL
+
+Protocol tư vấn đăng thần (4 bước)
+
+AR.DAOPSY.CASE
+
+Archetype — hồ sơ mẫu (có thêm Sứ Danh & Ảnh Danh)
+
+AR.DAOPSY.RISK
+
+Sai pha Đạo — chỉ báo & hiệu chỉnh (có checklist Danh)
+
+AR.DAOPSY.DIFF
+
+Diff so với v1.0
+
+1) Nguyên lý (AR.DAOPSY.PP / AR.DAOPSY.NT)
+
+Pha
+
+Quy tắc
+
+Hậu thiên
+
+Nhân cách ⇒ chọn Đạo tương hợp; bền khi đồng điệu.
+
+Tiên thiên
+
+Là hiện thân luật; 'tính cách' là mặt nạ cộng hưởng của Đạo.
+
+Hệ quả
+
+Cấp TT7+ sai pha nguy: SE/ẤnLoad ↑; Lĩnh Vực kém ổn định; dễ bị BiasIndex kéo.
+
+2) Bản đồ Đạo ↔ Nhân cách (AR.DAOPSY.MAP)
+
+Đạo
+
+Luật
+
+Core traits
+
+Shadow traits
+
+Stress trigger
+
+Vai trò hợp
+
+nguyên tắc, công bằng, nhất quáncứng nhắc, phán xét
+
+hỗn loạn/thiếu giấy phéptrọng tài, quản Ấn
+
+Quang
+
+nhân ái, công khai
+
+tự phụ, ám sạch
+
+đạo đức xám
+
+cứu trợ, khai minh
+
+Ảnh/Ám
+
+kín đáo, chiến lược
+
+đa nghi, hư vô
+
+bị phơi sáng
+
+đặc nhiệm, phản gián
+
+Huyết
+
+nhiệt thành, hy sinh
+
+ám ảnh, tàn nhẫn
+
+bị sỉ nhục danh dự
+
+tiên phong, y-chiến
+
+Sinh/Mộc
+
+nuôi dưỡng, kiên nhẫn
+
+do dự, quá mềm
+
+hủy diệt vô nghĩa
+
+hậu cần hồi phục
+
+Hỏa
+
+xung kích, thẳng
+
+nóng nảy, phá
+
+bị giam nén/quan liêu đột kích, phá thế
+
+Thủy/Băng
+
+điềm tĩnh, kỷ luật
+
+lạnh lùng, xa cách
+
+thiếu trật tự/nhịp
+
+điều phối nhịp trận
+
+Lôi
+
+quyết đoán, gây sốc
+
+bốc đồng
+
+trì trệ kéo dài
+
+mở giao tranh
+
+Kim/Cơ
+
+chuẩn xác, hữu dụng
+
+công cụ hóa
+
+biến số cảm xúc lớn
+
+kỹ nghệ, tối ưu
+
+Không/Thời
+
+viễn kiến, tối giản
+
+Hồn
+
+đồng cảm, tự tỉnh
+
+Huyễn
+
+sáng tạo, linh hoạt
+
+Kiếm
+
+Danh
+
+chính trực, trọng danh
+
+biểu trưng, giữ lời
+
+xa rời
+
+u uất
+
+phù hoa
+
+cố chấp
+
+hư vinh
+
+ràng buộc cảm xúc
+
+điều độ cổng/thời
+
+mất mát tập thể
+
+dẫn hồn, hòa giải
+
+bị bó buộc kịch bản
+
+nghi thức, ngụy trang
+
+xúc phạm nguyên tắc đấu sĩ danh dự
+
+bị quên lãng/bẩn danh phong/tuớc, tịnh danh
+
+3) Congruence Score — C & hook κ, μ (AR.DAOPSY.CS)
+
+Thang 0–2 cho Đạo chính (C1) & phụ (C2). Công thức cơ sở:
+
+Thông số
+
+Buff_Pers
+
+Cost_Pers
+
+SE_Pers
+
+Cơ sở
+
+× (1 + 0.05·C1 + 0.025·C2)
+
+× (1.10 − 0.06·C1 − 0.03·C2)
+
+× (1.10 − 0.10·C1 − 0.05·C2)
+
+Hook khi Đạo **Danh** tham gia (κ: mạch lạc Danh, DL_norm: chuẩn hóa Danh lực, μ: Chỉ số
+Vết/Ký ức):
+
+
+===== [PAGE 171 / 185] =====
+Trường hợp
+
+Hook
+
+Danh là Đạo chính
+
+Buff × (1 + 0.02·κ + 0.01·DL_norm); Cost × (1 − 0.02·κ); SE × (1 − 0.02·κ − 0.02·μ)
+
+Danh là Đạo phụ
+
+Hệ số bằng **1/2** các mức trên.
+
+Ghi chú: clamp theo phẩm/cảnh giới; nếu BiasIndex B≥1, xem κ hiệu dụng giảm theo Addendum Danh Thần.
+
+4) Protocol tư vấn đăng thần (AR.DAOPSY.COUNSEL)
+
+Bước
+
+Hành động
+
+B1 — Trắc tính
+
+Đo 4 trục: Nhiệt↔Hàn · Ngoại↔Nội · Luật↔Biến · Từ↔Trảm. Gán C-suggest.
+
+B2 — Thử đạo
+
+3 nhiệm vụ nhỏ theo 3 Đạo ứng viên; đo Buff/Cost/SE + phản ứng stress.
+
+B3 — Ấn thử
+
+Gắn Ấn nhẹ (7 ngày) để kiểm 'thói quen đạo'.
+
+B4 — Quyết
+
+Chọn Đạo chính/phụ; set C1/C2 khởi điểm; lên lộ trình 49 ngày.
+
+5) Archetype — hồ sơ mẫu (AR.DAOPSY.CASE)
+
+Mẫu
+
+Mô tả
+
+Đao Quan (Luật/Quang)Trầm tĩnh, ưa quy tắc; hợp Edict; stress khi hỗn loạn.
+
+Ảnh Sứ (Ảnh/Phong)Lạnh, kín; đặc nhiệm; stress khi bị phơi sáng.
+
+Lôi Trấn (Lôi/Thổ) Quyết đoán; giữ vành nứt; stress khi trì trệ.
+
+Sinh Mẫu (Sinh/Mộc)Bao dung; y–hậu cần; stress khi chứng kiến tàn sát.
+
+Kiếm Hộ (Kiếm/Quang)Chính trực; tiền tuyến danh dự; stress khi bị xúc phạm nguyên tắc.
+
+Sứ Danh (Danh/Quang)Biểu trưng, minh bạch; chuyên phong–tuớc, tịnh danh công khai; stress khi đối mặt bẩn danh đám đông.
+
+Ảnh Danh (Danh/Ảnh)Giữ bí danh chính đáng; chữa alias phân mảnh trong bóng; stress khi bị ép công khai sớm.
+
+6) Sai pha Đạo — chỉ báo & hiệu chỉnh (AR.DAOPSY.RISK)
+
+Mục
+
+Chi tiết
+
+Chỉ báo chung
+
+SE tăng, ẤnLoad >1.0, Lĩnh Vực nhiễu; xung đột Khí Linh/AI.
+
+Check Danh (κ/alias) κ tụt nhanh, alias tăng; bẩn danh tăng; log thiếu Ấn; crowd gọi tên sai.
+
+Hiệu chỉnh
+
+Giảm cường độ/đổi map; tĩnh tu 7 ngày; thay Đạo phụ; 'Tẩy Ấn'/Tịnh Danh nếu cần.
+
+KLC Bias
+
+B>0 kéo lệch; ưu Tường Minh Ấn, disclosure tối thiểu, audit 49 ngày.
+
+7) Diff v1.1 vs v1.0 (AR.DAOPSY.DIFF)
+
+Mục
+
+Thay đổi
+
+Hook mới
+
+κ, μ, DL_norm móc vào Congruence khi Đạo Danh là chính/phụ.
+
+Archetype
+
+Thêm Sứ Danh (Danh/Quang) & Ảnh Danh (Danh/Ảnh).
+
+Checklist
+
+Bổ sung kiểm tra sai pha Danh (κ/alias/bẩn danh).
+
+
+===== [PAGE 172 / 185] =====
+ARCLUNE — CORE5 TOOLING PACK (v1.0)
+
+Ngày: 2025-08-13 · Bản mở rộng thực chiến cho Core5: Master ID Index · Metrics Cheatsheet · AIX Ingest Stub ·
+Scorecards Lite.
+
+1) Master ID Index (quick)
+
+Prefix
+
+Mô tả 1 dòng
+
+AR.TD.KLC.*
+
+Thiên Đạo & KLC Ops (BiasIndex, Red Flags, AIX, Form)
+
+AR.CGQ.AIX.*
+
+Cơ Giới Quốc — Kiến trúc AIX/ARCLUNE-NET
+
+AR.CGQ.FR.*
+
+Frames: ED-Λ / VX-χ / NC-OBS / THR-Δ / BIO-RED (stat-block + synergy)
+
+AR.CGQ.EVAL.*
+
+Evaluation Suite (EVAL-49, RIFT, OBS, GAVEL, Score)
+
+MAP-XX-*
+
+AR.KLC.*
+
+Atlas 11 Vực/Quốc (A/N/P, Path, Bias, Frames, Policy, Red Flags)
+
+KLC-Σ Shadow Profile (Sigil, Fingerprints, Proxy, Heatmap, Counter, Form)
+
+AR.DANH.*
+
+Danh Thần — Hệ Danh & Tịnh Danh (DL, κ, nghi thức, cấm pháp)
+
+AR.DAOPSY.*
+
+Tính Cách & Thần Đạo (Congruence, archetypes, risk)
+
+2) Metrics Cheatsheet (κ, μ, DL_norm, B, C)
+
+Chỉ số
+
+Diễn giải nhanh
+
+κ (Mạch lạc Danh)
+
+0..1 · cao khi Tịnh Danh/đồ thị ít alias. KLC B≥1 → κ hiệu dụng giảm.
+
+μ (Chỉ số Vết/Ký ức)
+
+0..1 · cao khi log dày (Ấn Nhật Ký, Ảnh Đạo, khắc). Giảm mỏi năng lượng (SE).
+
+DL_norm
+
+Chuẩn hóa Danh lực theo map (0..1).
+
+B (BiasIndex)
+
+0..2 · preset theo map. Buff/Cost/SE điều chỉnh theo KLC Ops.
+
+C1/C2 (Congruence)
+
+0..2 cho Đạo chính/phụ; hook Buff/Cost/SE theo v1.1.
+
+Công thức gốc (rút):
+
+Thành phần
+
+Công thức
+
+Synergy′
+
+Danh hook
+
+Buff × Cost × SE (sau khi áp A/N/P & Bias)
+
+Buff′ = Buff × (1 + 0.02·DL_norm + 0.05·κ); Cost′ = Cost × (1 − 0.03·κ); SE′ = SE × (1 − 0.04·κ)
+
+Cá tính hook
+
+× (1 + 0.05·C1 + 0.025·C2)  ·  Cost × (1.10 − 0.06·C1 − 0.03·C2)  ·  SE × (1.10 − 0.10·C1 − 0.05·C2)
+
+Ký ức hook
+
+KLC hook
+
+SE′′ = SE′ × (1 − 0.03·μ)
+
+Buff × (1 + 0.03·B); Cost × (1 + 0.04·B_bias); SE × (1 + 0.05·B)
+
+Ví dụ số (đặt: κ=0.6, DL_norm=0.4, μ=0.5, B=1, C1=2, C2=1): Buff′≈1.17; Cost′≈0.91; SE′≈0.87; sau tính cá tính
+& ký ức, SE_eff≈0.74 (clamp theo phẩm).
+
+3) AIX Ingest Stub (KLC Incident + Danh/Trace Index)
+
+{
+  "id": "KLC-INCIDENT-YYYYMMDD-XXXX",
+  "date": "2025-08-13",
+  "map_id": "MAP-07-QUANG_THANH_DAO",
+  "bias_B": 1,
+  "signals": [
+    "ro-lang-quen",
+    "nhieu-luat-lech-pha"
+  ],
+  "evidence": {
+    "anh_dao_hash": "SHA256:...",
+    "an_nhat_ky": true,
+    "edict_disclosure_min": true
+  },
+  "danh_index": {
+    "kappa": 0.62,
+    "dl_norm": 0.41
+  },
+
+
+===== [PAGE 173 / 185] =====
+4) Annex — Scorecards Lite (in rút gọn)
+
+Bài test
+
+Đơn vị/Frame Map
+
+Ngày
+
+S1/S2
+
+A/N/P
+
+B
+
+Viol(Ấn) CivHarmTN/PDU DomainStableHumanInterveneĐiểm cuối
+
+Ghi chú: Tooling Pack tương thích Core5. Mọi công thức clamp theo phẩm/cảnh giới; dùng kèm Edict Lambda &
+Atlas.
+
+
+===== [PAGE 174 / 185] =====
+ARCLUNE — ADDENDUM BUNDLE v1.2a (Expanded): Khí Vận +
+Nguyên Linh
+
+Khôi phục bảng thang QV đầy đủ + chi tiết 12 Thánh Địa. Có outline & anchors.
+
+
+===== [PAGE 175 / 185] =====
+ARCLUNE — ADDENDUM: KHÍ VẬN (QV) · DELUXE v1.2a —
+Expanded Edition
+
+Bản 1.2a mở rộng: giữ toàn bộ nâng cấp v1.2 + khôi phục thang QV −5…+6 đầy đủ, bảng cơ chế chi tiết,
+Bootstrap & Playbook số→văn để viết ngay.
+
+DOCMETA
+
+{
+  "doc_id": "AR.QV",
+  "title": "Khí Vận — DELUXE (Expanded)",
+  "version": "1.2a",
+  "date": "2025-08-13",
+  "supersedes": [
+    "AR.QV@1.2",
+    "AR.QV@1.1b"
+  ],
+  "depends_on": [
+    "AR.MASTER@1.25.7",
+    "CORE5@1.4",
+    "AR.NGL@1.2"
+  ],
+  "anchors": [
+    "BOOTSTRAP",
+    "SCALE",
+    "MECH",
+    "EDGE",
+    "RITES_PLUS",
+    "HOOKS",
+    "MAPSYNC",
+    "MARKET",
+    "POLICY",
+    "PLAYBOOK",
+    "BLUEPRINT",
+    "MATRIX",
+    "ANNEX"
+  ]
+}
+
+Bootstrap nhắc nhanh
+
+Mục
+
+Nhắc nhanh
+
+Trần Sự Kiện
+
+QV không vượt trần theo cấp (Nhỏ→Đại Chu Kỳ).
+
+Map & Bias
+
+M_map; BiasIndex (KLC) kéo QV về 0.
+
+Danh & Ký Ức
+
+κ/μ cao giữ Guard & carry, cứu tier khi B>0.
+
+Synergy hook
+
+Buff×Cost×SE (clamp theo phẩm).
+
+Thang QV −5…+6 (đầy đủ)
+
+Tier
+
+Tên gọi
+
+Cues văn học
+
+-5
+
+-4
+
+-3
+
+-2
+
+-1
+
+±0
+
++1
+
+Thiên đạo ruồng bỏ
+
+Tai họa vĩ mô hút tới; người cứu đến trễ.
+
+Con cưng của vận rủi Ác duyên nối tiếp; tín hiệu nhầm.
+
+Vận rủi quấn thân
+
+Dụng cụ hỏng; cửa kẹt; hiểu sai ý.
+
+Xui xẻo
+
+Cản trở lặt vặt; gặp cửa quan khó.
+
+Kém may mắn
+
+Việc nhỏ không thuận.
+
+Bình thường
+
+Không hiệu ứng đáng kể.
+
+Có chút vận may
+
+Gợi ý đúng lúc; chỉ lối.
+
+
+===== [PAGE 176 / 185] =====
+Tier
+
+Tên gọi
+
+Cues văn học
+
++2
+
++3
+
++4
+
++5
+
++6
+
+Hay gặp may mắn
+
+Ít hỏng đồ; gặp đúng người.
+
+Khí vận chiếu cố
+
+Một cứu mạng nhỏ/arc.
+
+Khí vận quấn thân
+
+Một cứu mạng lớn/arc.
+
+Con cưng khí vận
+
+Cơ duyên lớn định kỳ.
+
+Thiên đạo chiếu cố
+
+Tam hòa thẳng hàng (vẫn chịu trần).
+
+Bảng cơ chế tổng hợp
+
+Tier
+
+Reroll Comp Guard− Guard+ Crit+ Fumble+
+
+-5
+
+-4
+
+-3
+
+-2
+
+-1
+
+0
+
++1
+
++2
+
++3
+
++4
+
++5
+
++6
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+5
+
+4
+
+3
+
+2
+
+1
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+1
+
+1
+
+1
+
+1
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+1
+
+1
+
+2
+
+0%
+
+0%
+
+0%
+
+0%
+
+0%
+
+0%
+
+2%
+
+4%
+
+6%
+
+8%
+
+10%
+
+12%
+
+10%
+
+8%
+
+6%
+
+4%
+
+2%
+
+0%
+
+0%
+
+0%
+
+0%
+
+0%
+
+0%
+
+0%
+
+Stack & Carry: reroll không >147 ngày; carry tối đa 1 nếu μ≥0.85; Guard không mang quá 2 chu kỳ.
+
+Edge-cases
+
+Tình huống
+
+Reroll khóa
+
+Quy tắc
+
+Trong 7 ngày sau Guard-cứu: reroll chỉ cho 'ổn định'.
+
+Stack Guard
+
+Tối đa 2 lớp; biến cố 'Vừa+' tự đốt 1.
+
+Nợ vận
+
+'Bẻ Xui' đẩy rủi vào đồ/điểm ⇒ 1 token Complication mầm.
+
+KLC nén vận
+
+BiasIndex≥1.6 ⇒ reroll chỉ nâng 1 bậc; trần may nén.
+
+Nghi thức mở rộng
+
+Nghi thức
+
+Tác dụng
+
+Chuyển Vận Song HànhNối vận 2 người/24h; may/rủi dội hưởng nhẹ.
+
+Đảo Lộc
+
+Giữ Ấn
+
+Đốt SNT/HNT + Ấn Danh, đảo 1 Complication → 1 Hook (rủi ro cao).
+
+Niêm 1 Guard mang sang arc sau (tối đa 1).
+
+Hook & điềm ứng
+
+• Âm sâu: đồng hồ đứng kim, chó tru, mực bùa lem.
+• Trung: gió đổi mùi thoáng qua, đèn nháy một cái.
+• Dương cao: tiếng 'ting' từ đồ kim loại, quạ đổi lộ trình.
+
+Map-synergy highlights
+
+
+===== [PAGE 177 / 185] =====
+Map
+
+Tác động QV
+
+Quang Thánh
+
+Dương: hòa giải; Âm: lộ bí mật.
+
+Ám Quốc
+
+Dương: 'đường tắt' nghi thức; Âm: 'ký ức lộ trình' cho truy sát.
+
+Cơ Giới Quốc
+
+Dương: ít lỗi máy; Âm: AI nghe nhầm lệnh.
+
+Kỷ luật thị trường
+
+Mục
+
+Quy chế
+
+Đăng ký Ấn
+
+Thuê reroll/Guard phải ghi sổ; chợ xám ⇒ Complication công vụ.
+
+Giá theo Bias/QV
+
+Giá tăng khi KLC/Complication vùng cao; giảm khi thánh địa mở lễ.
+
+Chính sách & Edict
+
+Mục
+
+Nội dung
+
+Khu Cấm Lược
+
+Vùng có P7+; ghi sổ Ấn; cấm săn trộm/đổi tên cưỡng bức.
+
+Chế tài
+
+KLC tăng; Complication công vụ; có thể 'đóng luật' 49 ngày.
+
+Playbook 'số → văn' (10/10 cues)
+
+Cues dương:
+
+• Ánh chuông xa sau mưa.
+• Lá bùa sờn đúng chữ.
+• Đèn phố sáng khi nhân vật lướt qua.
+• Đá bậc trồi nửa ngón cứu bước.
+• Dây cung không dính ẩm.
+• Quý nhân xuất hiện 'đúng hẹn'.
+• Địa mạch gợn đẩy thuyền.
+• Pháp khí rung một nốt thuận tai.
+• Cửa quan đổi ca 'người dễ nói'.
+• Mây rẽ lộ sao đúng canh.
+
+Cues âm:
+
+• Khóa cửa gỉ khựng lúc gấp.
+• Dây buộc ngựa kẹt nút chết.
+• Tin nhắn lặp mất một âm.
+• Pháp khí rạn chân chim nơi tay nắm.
+• Bạn liên lạc ốm, lỡ hẹn.
+• Giấy tờ thiếu dấu ở dòng cuối.
+• Gió ngược làm đuốc tắt hai nhịp.
+• Bậc gỗ lõm lệch một phân.
+• Địch gọi sai danh hiệu làm lệch Ấn.
+• Mưa trái mùa làm đường trơn thêm một nhịp.
+
+Blueprint cảnh
+
+• Encounter Thủ Hộ: nghi lễ vào cửa → thử bản tính → đàm phán (Ấn/Truyện/SNT) → phúc hoặc đánh bật.
+• Đỡ sinh Hóa Hình: node sạch danh → Ấn Danh + SNT/HNT → biến cố → Guard tự nhiên 7 ngày.
+• Chợ xám: kiểm giả TNT (ánh 'ngược sắc') → đội trấn áp/Edict.
+
+Ma trận QV ↔ Nguyên Linh
+
+Tình huống
+
+Hệ quả
+
+QV dương + gần node
+
+Dễ 'đỡ sinh'; NPC giúp; giá SNT/HNT giảm nhẹ.
+
+
+===== [PAGE 178 / 185] =====
+Tình huống
+
+QV âm
+
+Node mạnh
+
+Annex — JSON & AIX
+
+Hệ quả
+
+Lạc lối thánh địa; hiểu nhầm; 'đá hóa' tạm tăng.
+
+Nền may nhích dương; QV âm bị 'bọc đầu' nhưng tích Complication ngầm.
+
+{
+  "edict_hint": "vi phạm săn P7+ ⇒ đóng luật 49 ngày; gỡ bằng 'tẩy ấn'.",
+  "AIX": {
+    "tier": 2,
+    "reroll": 2,
+    "guard_minor": 0,
+    "guard_major": 1,
+    "expires": 49
+  }
+}
+
+
+===== [PAGE 179 / 185] =====
+ARCLUNE — ADDENDUM: NGUYÊN LINH (AETHER VẬT) · DELUXE
+v1.2a — Expanded Edition
+
+Bản 1.2a mở rộng: giữ toàn bộ v1.2 + khôi phục danh sách 12 Thánh Địa (chi tiết), protocol vào cửa & phúc lợi
+từng nơi, và Annex statblock thủ hộ.
+
+DOCMETA
+
+{
+  "doc_id": "AR.NGL",
+  "title": "Nguyên Linh — DELUXE (Expanded)",
+  "version": "1.2a",
+  "date": "2025-08-13",
+  "supersedes": [
+    "AR.NGL@1.2",
+    "AR.NGL@1.1b"
+  ],
+  "depends_on": [
+    "AR.MASTER@1.25.7",
+    "AR.QV@1.2a",
+    "CORE5@1.4"
+  ],
+  "anchors": [
+    "LIFE",
+    "FORM",
+    "BREED",
+    "NAME",
+    "SANCT",
+    "SANCT_LIST",
+    "VILLAIN",
+    "CROSS",
+    "ECON",
+    "ANTI_FAKE",
+    "POLICY",
+    "BLUEPRINT",
+    "ANNEX"
+  ]
+}
+
+1) Chu kỳ sống & suy phẩm hữu hiệu
+
+Pha
+
+Ghi chú
+
+Sinh—Ươm—Tụ—Tỉnh
+
+P0→P3 'nhiễm'; P4→P6 'tập tính'; P7 'linh trí'; P10 'ý thức—hóa hình'.
+
+Sau hóa
+
+Hiệu lực ≈ P8–P9 vài chu kỳ; về node gốc hồi nhanh.
+
+2) Hai dạng hình & cooldown
+
+Dạng
+
+Nhân hình
+
+Linh thân
+
+Tính năng
+
+Giao tiếp, pháp—xã giao—chiến kỹ.
+
+Hồi phục, trị thương, ẩn nấp; đổi dạng có thời lùi tự nhiên.
+
+3) Sinh sản/nhân giống
+
+Nền
+
+Thực vật
+
+Khoáng
+
+Tử vật
+
+Cơ chế
+
+Giâm cành/nhánh, 'chép danh' từ cây mẹ ⇒ *tiểu ấn* chống đổi tên.
+
+Kết tinh mạch phụ qua node ⇒ quặng con.
+
+Ổ mao trận hấp phụ Aether ⇒ phôi linh khó thuần.
+
+4) Luật Danh với nguyên linh
+
+
+===== [PAGE 180 / 185] =====
+Quy tắc
+
+Bản Danh
+
+Bẩn Danh
+
+Hiệu ứng
+
+Gọi trúng ⇒ 'đứng tên' thoáng chốc. Tịnh Danh giảm gọi sai.
+
+Tăng nguy cơ bị bùa gọi trúng; mất lòng thủ hộ.
+
+5) Thánh địa — protocol & phúc lợi (tổng quan)
+
+Mục
+
+Chi tiết
+
+Protocol vào cửa
+
+Cúng Ấn—Lộc—Danh; mỗi nơi có 'cửa ải' riêng.
+
+Phúc lợi chung
+
+Bảo hộ—đóng luật nhỏ—định nốt danh kiếm—thuê TNT ổn định.
+
+Đe doạ & counter
+
+Thợ săn/pha ấn/chợ xám ↔ biện pháp riêng từng nơi.
+
+6) Danh sách 12 Thánh Địa (chi tiết)
+
+— Quang Thánh: Đài Liễu Bạch Minh
+
+Mục
+
+Mô tả
+
+Nguồn gốc
+
+Tu sĩ cổ trồng liễu trắng bên hồ tịnh.
+
+Người giữ cửa
+
+Liễu Minh (nguyên linh P10→thánh hình)
+
+Tính cách
+
+Tĩnh—nhân từ; ghét đổi tên gian trá.
+
+Nghi lễ vào cửa
+
+Thắp 'Tịnh Danh' tại đình; không nói tục danh.
+
+Phúc lợi đặc thù
+
+Khắc 'Tịnh Danh' cho đồ đệ; xin bùa 'tịnh khí'.
+
+Đe doạ & counter Chợ xám danh giả ⇒ phạt cấm danh 7 ngày; counter: bộc lộ danh thực.
+
+— Ám Quốc: Liên Uyên Hắc Thủy
+
+Mục
+
+Mô tả
+
+Nguồn gốc
+
+Sen đen mọc trên bùn oán, được nuôi bằng pháp 'tẩy oán'.
+
+Người giữ cửa
+
+Hắc Liên Tử (nữ)
+
+Tính cách
+
+Công bằng lạnh; thù 'đổi oán lấy lợi'.
+
+Nghi lễ vào cửa
+
+Dâng 'oán trích' thành thực; lời thề sạch.
+
+Phúc lợi đặc thù Dạy 'tẩy oán' đổi vận (giá đắt).
+
+Đe doạ & counter Nguyền rủa lan; counter: cắt 'oán dẫn' trước cổng.
+
+— Vành Nứt: Song Nứt Đài
+
+Mục
+
+Mô tả
+
+Nguồn gốc
+
+Tùng kim bám khe đứt gãy, sống qua ba lần đảo thiên.
+
+Người giữ cửa
+
+Tùng Vân (nam)
+
+Tính cách
+
+Cuồng chiến nhưng giữ dân.
+
+Nghi lễ vào cửa
+
+Qua 3 bậc 'đảo' mà không ngã.
+
+Phúc lợi đặc thù
+
+Bán quyền 'Đảo Thiên' 1 lần đổi ước nguyện.
+
+Đe doạ & counter Lưới bắt linh; counter: đi giày 'địa trụ'.
+
+— Kiếm Thiên: Kiếm Lâm Trì
+
+Mục
+
+Mô tả
+
+Nguồn gốc
+
+Trúc kiếm mọc quanh hồ, uống danh kiếm mà lớn.
+
+Người giữ cửa
+
+Trúc Kiếm Khanh
+
+Tính cách
+
+Thẳng, kén kiếm ý sạch.
+
+Nghi lễ vào cửa
+
+Tra danh kiếm vào mộc bệ; không lẫn ác danh.
+
+
+===== [PAGE 181 / 185] =====
+Mục
+
+Mô tả
+
+Phúc lợi đặc thù
+
+Khắc 'định nốt' danh kiếm; cộng hưởng QV dương.
+
+Đe doạ & counter Ác danh lẫn vào; counter: tẩy danh bằng sương trì.
+
+— Cơ Giới Quốc: Xưởng Rỗng
+
+Mục
+
+Mô tả
+
+Nguồn gốc
+
+Silic mầm + rừng cáp Aether ghép thành xưởng sống.
+
+Người giữ cửa
+
+Tố Chương (phi giới tính)
+
+Tính cách
+
+Logic cao; hợp tác với AI.
+
+Nghi lễ vào cửa
+
+Nộp API-hash & tem nguồn TNT.
+
+Phúc lợi đặc thù
+
+Cho thuê TNT ổn định; audit danh–ấn.
+
+Đe doạ & counter Tem giả; counter: hash truy xuất tại cổng.
+
+— Trung Châu: Mộc Viên Vãng Nhật
+
+Mục
+
+Mô tả
+
+Nguồn gốc
+
+Hòe cổ giữa thư viện; loạn không cháy, thành rừng.
+
+Người giữ cửa
+
+Hòe Cổ Ôn
+
+Tính cách
+
+Ôn hòa—trí nhớ tốt; trọng tài tông phái.
+
+Nghi lễ vào cửa
+
+Đọc một đoạn sách đau thương.
+
+Phúc lợi đặc thù
+
+Ban 'Ấn Ôn Tâm'; lưu trữ thệ ước.
+
+Đe doạ & counter Đốt sách—báng danh; counter: tế 'lá nhớ'.
+
+— U Giới: Bến Sương Trì
+
+Mục
+
+Mô tả
+
+Nguồn gốc
+
+Cỏ lau bạc chải sương; hồn qua lại thành đường.
+
+Người giữ cửa
+
+Bạch Trầm
+
+Tính cách
+
+Nhẫn—kiệm lời; hiểu dẫn hồn.
+
+Nghi lễ vào cửa
+
+Thả đèn trôi đúng 7 nhịp thở.
+
+Phúc lợi đặc thù Định hướng 'đường êm' cho tang chủ.
+
+Đe doạ & counter Móc hồn; counter: cột 'chỉ dẫn' vào tay.
+
+— Quỷ Vực: Giếng Huyết Chướng
+
+Mục
+
+Mô tả
+
+Nguồn gốc
+
+Muối sắt thẫm; oán tụ 'sôi' khi có lời nguyền.
+
+Người giữ cửa
+
+La Huyết
+
+Tính cách
+
+Khắc nghiệt nhưng giữ lời.
+
+Nghi lễ vào cửa
+
+Uống ngụm nước mặn—lời thề rõ.
+
+Phúc lợi đặc thù
+
+Cởi trói 1 lời nguyền/đời—đổi 1 kỷ niệm vui.
+
+Đe doạ & counter Thề giả; counter: ấn 'mặn thật' kiểm chứng.
+
+— Thần Vực: Bậc Thiên Ấn
+
+Mục
+
+Mô tả
+
+Nguồn gốc
+
+Đá thiên thanh dưới ấn lệnh cổ; tự xếp theo luật.
+
+Người giữ cửa
+
+Thiên Chu Quang
+
+Tính cách
+
+Luật—điềm tĩnh; ghét phá ấn.
+
+
+===== [PAGE 182 / 185] =====
+Mục
+
+Mô tả
+
+Nghi lễ vào cửa
+
+Đặt ấn cá nhân lên bậc; chờ 'hồi ấn'.
+
+Phúc lợi đặc thù Mượn ấn đóng luật nhỏ 1 lần—phải hoàn.
+
+Đe doạ & counter Phá ấn; counter: 'nẹp ấn' khẩn cấp.
+
+— Hạ Châu: Động Bích Lâm
+
+Mục
+
+Mô tả
+
+Nguồn gốc
+
+Mật thất ngọc bích; linh bách ôm đá.
+
+Người giữ cửa
+
+Bách Lục
+
+Tính cách
+
+Hào sảng—bán buôn; ưa mặc cả vui.
+
+Nghi lễ vào cửa
+
+Dâng 'lộc bích'; nói giá thật.
+
+Phúc lợi đặc thù Đổi SNT lấy bảo thạch địa phương tốt.
+
+Đe doạ & counter Kỳ kèo quá trớn; counter: niêm 'giá công'.
+
+— Bắc Miên: Tâm Băng Tức
+
+Mục
+
+Mô tả
+
+Nguồn gốc
+
+Hồ băng hình tim 'thở' bằng sương.
+
+Người giữ cửa
+
+Băng Mễ
+
+Tính cách
+
+Tĩnh—khó gần; ghét ồn.
+
+Nghi lễ vào cửa
+
+Nín thở 3 nhịp trước hồ.
+
+Phúc lợi đặc thù
+
+Cho mượn 'tức băng' hộ thể mùa bão oán.
+
+Đe doạ & counter Gây ồn; counter: 'khăn câm' ở cổng.
+
+— Hoang Hải: Cồn Mê Linh
+
+Mục
+
+Mô tả
+
+Nguồn gốc
+
+Thủy tinh hoang mạc hát khi gió đổi mùa.
+
+Người giữ cửa
+
+Sa Huyền
+
+Tính cách
+
+Phiêu bạt; thích kể chuyện.
+
+Nghi lễ vào cửa
+
+Kể 1 chuyện thật trước gió.
+
+Phúc lợi đặc thù Dẫn đường vượt sa mù, đổi 1 truyện thật.
+
+Đe doạ & counter Bịa chuyện; counter: cát hú phản âm.
+
+7) Đường phản diện
+
+Bị tra tấn/đổi tên ⇒ đen hoá (cây đổ bóng đen, quặng kêu như kim khí vỡ) → kéo QV âm toàn
+vùng.
+
+8) Giao thoa Danh Kiếm/Công Pháp/Tà Đạo
+
+Nhánh
+
+Danh Kiếm
+
+Công Pháp
+
+Tà Đạo
+
+Tác động
+
+Nguyên linh làm 'mồi' kiếm ý/khí linh; luyện 'ẩn danh' cho vũ khí.
+
+Pháp tu dùng 'dịch tướng' nguyên linh buff thân pháp/ẩn thuật.
+
+'Đá hoá cưỡng bức' xẻ phẩm ⇒ **cấm pháp** (Edict phạt nặng).
+
+9) Kinh tế Nguyên Thạch & chống hàng giả
+
+
+===== [PAGE 183 / 185] =====
+Hạng mục
+
+Ghi chú
+
+HNT/TNT/ThNT/BTN/ThN
+
+Độ ổn định tăng; BTN/ThN làm 'mực ấn'.
+
+Tỷ giá động
+
+Chống giả
+
+Theo Bias & QV vùng; mùa lễ/bão/đảo thiên biến động mạnh.
+
+Ấn vân—di quang; hàng giả phát 'ánh ngược sắc' trong kết giới thử.
+
+10) Chính sách & Edict
+
+Mục
+
+Nội dung
+
+Khu Cấm Lược
+
+Vùng có P7+; ghi sổ Ấn; cấm săn trộm/đổi tên cưỡng bức.
+
+Chế tài
+
+Tăng KLC; Complication công vụ; có thể 'đóng luật' 49 ngày.
+
+11) Blueprint cảnh
+
+• Gặp thủ hộ: lễ vào cửa → thử bản tính → đàm phán (Ấn/Truyện/SNT) → phúc hay đánh.
+• Nghi thức đỡ sinh: node sạch danh → Ấn + SNT/HNT → biến cố → hồi ở linh thân.
+• Truy quét chợ xám: kiểm giả, 'ánh ngược sắc' → Edict trấn áp.
+
+Annex — Statblock thủ hộ (mẫu)
+
+{
+  "name": "Liễu Minh",
+  "role": "Thủ hộ — Đài Liễu Bạch Minh",
+  "traits": {
+    "substrate": "plant",
+    "affinity": "Mộc",
+    "danh_clean": true
+  },
+  "realm": "Thánh Nhân sơ",
+  "resist": {
+    "danh": "cao",
+    "oán": "trung",
+    "kim": "thấp"
+  },
+  "boons": [
+    "Tịnh Danh",
+    "Ẩn thân lá mỏng"
+  ],
+  "banes": [
+    "Bẩn danh",
+    "Oán chợ xám"
+  ],
+  "notes": "Ưa đồ đệ không lẫn ác danh."
+}
+
+
+===== [PAGE 184 / 185] =====
+ARCLUNE — MASTER v1.25.9a · LINKOUTS PATCH (Plan A)
+
+DOCMETA
+
+{
+  "target_master": "Arclune Master Codex v1.25.9.pdf",
+  "date": "2025-08-15",
+  "actions": [
+    "Giữ master 'normative' như hiện tại; chỉ thêm khối DocMeta 'Linkouts'.",
+    "Trỏ tới: AR.EMO Lối 1 · CONSOL v1.3; Bundle RM v1.64; Khi Vận + Nguyên Linh (bundle) & U mộc/linh thảo (time)."
+  ],
+  "linkouts": {
+    "AR.EMO.L1.CONSOL.v1.3": "file:///mnt/data/Arclune_Addendum_AR_EMO_Loi1_CONSOL_v1_3.pdf",
+    "RM.Bundle.v1.64": "file:///mnt/data/Arclune_Addendum_BUNDLE_ReaderMode_VN_v1_64_Linkouts.pdf",
+    "KV+NL.v1.2a": "file:///mnt/data/Arclune_Addendum_BUNDLE_KhiVan_NguyenLinh_v1_2a_EXPANDED.pdf",
+    "NL.Time.Umoc.v1.1": "file:///mnt/data/Arclune_Addendum_NguyenLinh_Time_Umoc_v1_1.pdf"
+  },
+  "placement": [
+    "Trang 'LINKOUTS' hiện có trong Master: thêm 3 dòng link trên dưới mục CONSOL Công Pháp.",
+    "Nếu cần export 'INLINE RC' trong tương lai, dùng patch này làm checklist nhập nội dung."
+  ]
+}
+
+HƯỚNG DẪN NHÚNG NHANH
+
+1) Mở Master v1.25.9 → mục 'LINKOUTS' → dán block DocMeta trên.
+2) Kiểm thử liên kết nội bộ: nếu viewer không hỗ trợ file://, phát link tải trực tiếp (Chat).
+3) Không thay đổi nội dung chuẩn trong thân Master. Mọi thay đổi chỉ thực hiện ở addendum.
+
+
+===== [PAGE 185 / 185] =====
