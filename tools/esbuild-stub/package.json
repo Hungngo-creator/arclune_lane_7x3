@@ -1,8 +1,1 @@
-//home (termux)/arclune_lane_7x3/tools/esbuild-stub/package.json
-
-{
-  "name": "esbuild",
-  "version": "0.0.0-stub",
-  "main": "index.js",
-  "type": "commonjs"
-}
+{"name": "esbuild-stub", "version": "1.0.0", "main": "index.js"}
