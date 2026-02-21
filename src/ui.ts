@@ -1,4 +1,4 @@
-// v0.7.1
+//home (termux)/arclune_lane_7x3/src/ui.ts
 import { CFG } from './config.ts';
 import {
   ACTION_END,

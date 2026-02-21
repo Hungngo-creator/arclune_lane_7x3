@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/tsconfig.base.json
+
 {
   "compilerOptions": {
     "target": "ES2023",

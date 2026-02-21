@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/tools/esbuild-stub/index.js
+
 const path = require('path');
 let ts;
 

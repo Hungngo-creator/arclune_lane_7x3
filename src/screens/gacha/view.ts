@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/screens/gacha/view.ts
+
 import { assertElement, ensureStyleTag, mountSection } from '../../ui/dom.ts';
 import {
   mountRarityAura,

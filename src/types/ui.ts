@@ -1,3 +1,4 @@
+//home (termux)/arclune_lane_7x3/src/types/ui.ts
 import type { SessionState } from './combat';
 
 export interface HudHandles {

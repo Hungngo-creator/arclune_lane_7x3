@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/tools/typescript-transpiller/runtime.js
+
 const ts = require('./vendor/typescript.js');
 
 const fallbackImportsNotUsedAsValues = {

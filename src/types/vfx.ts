@@ -1,3 +1,4 @@
+//home (termux)/arclune_lane_7x3/src/types/vfx.ts
 export type VfxAnchor = {
   id: string;
   timing?: string;

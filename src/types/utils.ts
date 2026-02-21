@@ -1,3 +1,4 @@
+//home (termux)/arclune_lane_7x3/src/types/utils.ts
 type Primitive = string | number | boolean | bigint | symbol | null | undefined;
 
 type Builtin = Primitive | Date | RegExp | Function | Error | Promise<unknown>;

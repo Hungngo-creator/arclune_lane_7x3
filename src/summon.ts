@@ -1,4 +1,4 @@
-// v0.7.3
+//home (termux)/arclune_lane_7x3/src/summon.ts
 import { slotToCell, cellReserved } from './engine.ts';
 import { asSessionWithVfx, vfxAddSpawn } from './vfx.ts';
 import { getUnitArt } from './art.ts';

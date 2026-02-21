@@ -1,3 +1,4 @@
+//home (termux)/arclune_lane_7x3/src/utils/currency.ts
 import type { CurrencyDefinition } from '@shared-types/config';
 
 import {

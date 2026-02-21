@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/types/turns-env.d.ts
+
 declare module './engine.ts' {
 import type { Side } from '@shared-types/units';
 

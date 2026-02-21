@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/tools/zod-stub/index.js
+
 const objectProto = Object.prototype;
 
 const ZodIssueCode = Object.freeze({

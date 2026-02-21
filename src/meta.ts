@@ -1,5 +1,4 @@
-//v0.8
-// meta.ts — gom lookup + stat khởi tạo + nộ khởi điểm
+//home (termux)/arclune_lane_7x3/src/meta.ts — gom lookup + stat khởi tạo + nộ khởi điểm
 import {
   CLASS_BASE,
   RANK_MULT,

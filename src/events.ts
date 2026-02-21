@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/events.ts
+
 import type { BattleDetail, BattleResult, SessionState } from '@shared-types/combat';
 import type { ActionChainProcessedResult, Side, UnitToken } from '@shared-types/units';
 

@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/main.ts
+
 import { globalAetherPool } from './aether.ts';
 import type { CreateSessionOptions, SessionState } from '@shared-types/pve';
 import type { GameConfig } from '@shared-types/config';

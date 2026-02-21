@@ -1,3 +1,4 @@
+//home (termux)/arclune_lane_7x3/src/ai.ts
 import { pickRandom, slotToCell, cellReserved } from './engine.ts';
 import { predictSpawnCycle } from './turns.ts';
 import { CFG } from './config.ts';

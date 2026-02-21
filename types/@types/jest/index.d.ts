@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/types/@types/jest/index.d.ts
+
 // Minimal Jest type declarations for local type checking.
 declare namespace jest {
   type AnyFunction = (...args: any[]) => any;

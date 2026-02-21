@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/screens/ui-gacha/gacha.ts
+
 import { CURRENCY_LABELS, createWallet, GACHA_CONFIG } from './logic/config.ts';
 import { payForRoll } from './logic/currency.ts';
 import { getBannerById, multiRoll, rollBanner } from './logic/gacha.ts';

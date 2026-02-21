@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/data/skills.ts
+
 import { z } from 'zod';
 
 import { ROSTER } from '../catalog.ts';

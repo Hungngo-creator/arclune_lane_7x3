@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/screens/lineup/view/stage.ts
+
 import { ROSTER } from '../../../catalog.ts';
 import { createNumberFormatter } from '../../../utils/format.ts';
 import {

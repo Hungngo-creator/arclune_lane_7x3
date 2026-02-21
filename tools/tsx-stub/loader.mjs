@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/tools/tsx-stub/loader.mjs
+
 import { readFile } from 'fs/promises';
 import { fileURLToPath } from 'url';
 import path from 'path';

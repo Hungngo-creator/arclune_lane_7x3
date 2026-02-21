@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/jest.config.cjs
+
 const { pathsToModuleNameMapper } = require('ts-jest');
 const { compilerOptions } = require('./tsconfig.base.json');
 

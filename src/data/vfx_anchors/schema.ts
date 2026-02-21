@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/data/vfx_anchors/schema.ts
+
 import { z } from 'zod';
 
 import type { VfxAnchorDataset } from '@shared-types/vfx';

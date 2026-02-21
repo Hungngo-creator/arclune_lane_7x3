@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/tsconfig.all.json
+
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {

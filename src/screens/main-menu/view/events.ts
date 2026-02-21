@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/screens/main-menu/view/events.ts
+
 import type {
   CleanupRegistrar,
   ComingSoonHandler,

@@ -1,4 +1,4 @@
-// v0.7.4
+//home (termux)/arclune_lane_7x3/src/turn.ts
 import { slotToCell, slotIndex } from './engine.ts';
 import { Statuses } from './statuses.ts';
 

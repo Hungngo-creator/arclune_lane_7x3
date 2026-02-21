@@ -1,4 +1,4 @@
-Ghi chú quan trọng: 1) Mọi ult của tất cả nhân vật gacha lẫn npc pve đều là auto cast khi đầy nộ của nhân vật đó.
+Ghi chú quan trọng: 1) Mọi ult của tất cả nhân vật gacha lẫn npc pve đều là auto cast khi đầy nộ của nhân vật đó. (trừ leader)
 2) Mọi phần "ghi chú kỹ thuật cho coder/ghi chú cho coder/Ghi chú triển khai cho Codex" của các nhân vật chỉ mang tính tham khảo vì chúng được viết bởi chat gpt 5 thingking, gpt này không tham gia dự án nên code của nó chỉ mang tính tham khảo.
 Tuyệt kỹ = Ult = Ultimate
 CLASS_BASE[class][stat]   # base theo class

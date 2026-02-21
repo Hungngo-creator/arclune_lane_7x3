@@ -1,3 +1,4 @@
+//home (termux)/arclune_lane_7x3/src/ui/dom.ts
 const DEFAULT_ASSERT_MESSAGE = 'Cần một phần tử DOM hợp lệ.';
 
 export type ElementGuard<TElement extends Element> = (node: Element) => node is TElement;

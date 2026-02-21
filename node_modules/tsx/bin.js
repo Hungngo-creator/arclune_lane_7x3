@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/tools/tsx-stub/bin.js
+
 #!/usr/bin/env node
 /**
  * Minimal offline-friendly replacement for the `tsx` CLI.

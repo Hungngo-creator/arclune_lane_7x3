@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/screens/main-menu/view/index.ts
+
 import type { CleanupFn, CleanupRegistrar, MainMenuState, RenderedMainMenu } from '../types.ts';
 import { mountSection } from '../../../ui/dom.ts';
 import { ensureStyles, createHeader, createModesSection, createSidebar } from './layout.ts';

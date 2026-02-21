@@ -1,3 +1,4 @@
+//home (termux)/arclune_lane_7x3/src/types/currency.ts
 import type { UnknownRecord } from './common.ts';
 
 export interface LineupCurrencyEntry extends UnknownRecord {

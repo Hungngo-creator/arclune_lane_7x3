@@ -1,3 +1,4 @@
+//home (termux)/arclune_lane_7x3/src/utils/time.ts
 const perf = typeof globalThis !== 'undefined' ? globalThis.performance : undefined;
 const hasPerfNow = !!(perf && typeof perf.now === 'function');
 let lastFallbackNow = 0;

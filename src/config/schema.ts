@@ -1,3 +1,4 @@
+//home (termux)/arclune_lane_7x3/src/config/schema.ts
 import { z } from 'zod';
 
 const SideSchema = z.enum(['ally', 'enemy']);

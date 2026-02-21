@@ -1,3 +1,4 @@
+//home (termux)/arclune_lane_7x3/src/utils/format.ts
 const HAS_INTL_NUMBER_FORMAT = typeof Intl === 'object' && typeof Intl.NumberFormat === 'function';
 
 export type LocaleValue = string | string[];

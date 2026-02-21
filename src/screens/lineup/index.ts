@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/screens/lineup/index.ts
+
 import { renderLineupView } from './view/index.ts';
 import type { LineupViewHandle } from './view/index.ts';
 import type { UnknownRecord } from '@shared-types/common';

@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/modes/coming-soon.stub.ts
+
 export type ComingSoonModule = {
   comingSoon: true;
 };

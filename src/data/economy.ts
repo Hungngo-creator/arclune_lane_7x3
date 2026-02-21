@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/data/economy.ts
+
 import { z } from 'zod';
 
 import { HAS_INTL_NUMBER_FORMAT, createNumberFormatter } from '../utils/format.ts';

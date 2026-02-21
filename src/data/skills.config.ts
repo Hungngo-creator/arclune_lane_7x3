@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/data/skills.config.ts
+
 const skillsConfig = [
   {
     unitId: 'diep_minh',

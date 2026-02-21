@@ -1,3 +1,4 @@
+//home (termux)/arclune_lane_7x3/src/types/config.ts
 import type { PassiveSpec, SkillDefinition } from './combat';
 import type { UnitId } from './units';
 import type { BackgroundDefinition, BackgroundProp, TurnOrderConfig as TurnOrderConfigSchema } from '../config/schema';

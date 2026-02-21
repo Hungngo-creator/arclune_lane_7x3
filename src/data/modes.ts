@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/data/mode.ts
+
 import { getLotterySplit, getPityConfig, getShopTaxRate } from './economy.ts';
 
 import type {

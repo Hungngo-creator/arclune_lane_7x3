@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/screens/ui-gacha/index.ts
+
 import gachaStyles from './gacha.css';
 import { ensureStyleTag } from '../../ui/dom.ts';
 

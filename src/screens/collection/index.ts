@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/screens/collection/index.ts
+
 import { renderCollectionView } from './view.ts';
 import type { CollectionViewHandle } from './view.ts';
 import type {

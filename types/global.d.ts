@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/types/global.d.ts
+
 declare module "*.png";
 declare module "*.jpg";
 declare module "*.jpeg";

@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/data/economy.config.ts
+
 const economyConfig = {
   currencies: [
     {

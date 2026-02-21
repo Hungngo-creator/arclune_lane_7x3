@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/data/announcements.ts
+
 import { z } from 'zod';
 
 import { CURRENCY_IDS, convertCurrency, formatBalance, getLotterySplit } from './economy.ts';

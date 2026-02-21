@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/screens/ui-gacha/logic/types.ts
+
 import { getCurrencyOrder, type CurrencyId } from '../../../utils/currency.ts';
 
 export type CurrencyCode = CurrencyId;

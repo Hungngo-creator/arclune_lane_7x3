@@ -1,3 +1,4 @@
+//home (termux)/arclune_lane_7x3/src/scene.ts
 import type { SceneTheme } from '@shared-types/config';
 
 type SceneGrid = {

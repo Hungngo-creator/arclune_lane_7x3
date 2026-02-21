@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/types/arclune-types.d.ts
+
 declare module '@shared-types/vfx' {
   export type {
     VfxAnchor,

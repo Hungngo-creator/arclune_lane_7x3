@@ -1,3 +1,4 @@
+//home (termux)/arclune_lane_7x3/src/app/shell.ts
 export type ScreenParams = Record<string, unknown>;
 
 export interface AppShellState {

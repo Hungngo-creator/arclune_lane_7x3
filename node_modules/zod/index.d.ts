@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/tools/zod-stub/index.d.ts
+
 export type ZodTypeAny = ZodType<any>;
 export type ZodRawShape = { [key: string]: ZodTypeAny };
 

@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/screens/main-menu/view/layout.ts
+
 import { getAllSidebarAnnouncements } from '../../../data/announcements.ts';
 import { ensureStyleTag } from '../../../ui/dom.ts';
 import type { AnnouncementEntry } from '@shared-types/config';

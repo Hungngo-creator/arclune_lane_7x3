@@ -1,3 +1,4 @@
+//home (termux)/arclune_lane_7x3/src/utils/fury.ts
 import { CFG } from '../config.ts';
 import { safeNow } from './time.ts';
 

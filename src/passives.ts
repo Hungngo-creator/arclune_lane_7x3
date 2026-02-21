@@ -1,4 +1,4 @@
-// passives.ts — passive event dispatch & helpers v0.7
+//home (termux)/arclune_lane_7x3/src/passives.ts — passive event dispatch & helpers
 import { Statuses, hookOnLethalDamage } from './statuses.ts';
 import { safeNow } from './utils/time.ts';
 

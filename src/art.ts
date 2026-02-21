@@ -1,4 +1,4 @@
-// v0.7.7 – Unit art catalog
+//home (termux)/arclune_lane_7x3/src/art.ts
 
 import type {
   GetUnitArtOptions,

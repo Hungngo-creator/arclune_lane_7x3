@@ -1,3 +1,162 @@
+0) Tác dụng của các hàm (Quy hoạch chuẩn 125 tệp):
+
+[PHẦN I: CORE ENGINE & LOGIC - HỆ THỐNG CỐT LÕI]
+Nhóm 1: Khởi tạo, Vòng lặp & Điều hướng (App Flow & Routing)
+- entry.ts: Điểm neo đầu vào (Entry point) của UI. Tệp này khởi tạo App Shell, quản lý việc load các module màn hình (Main Menu, Lineup), và làm nhiệm vụ điều hướng (router) giữa các trạng thái của game.
+- main.ts: Điểm vào thực sự của game loop khi vào trận. Nó quản lý trạng thái phiên chơi qua các hàm cốt lõi như startGame, stopGame và getCurrentSession. Thằng này sẽ phối hợp chặt chẽ với entry.ts để quyết định khi nào người chơi chuyển từ Menu vào sàn đấu thực sự.
+- shell.ts (src/app/): Đây là "khung xương" của toàn bộ UI (App Shell). Hàm createAppShell chịu trách nhiệm điều hướng giữa các màn hình (Main Menu, Lineup, Gacha, v.v.), quản lý lịch sử (navigation), và lắng nghe các sự kiện hệ thống. Thằng này là "sếp trực tiếp" của entry.ts.
+- time.ts (src/utils/): Quản lý dòng thời gian của trận đấu. Các hàm safeNow, sessionNow và mergeBusyUntil giúp đồng bộ hóa các chuỗi hành động, đảm bảo hiệu ứng VFX (vfx.ts) hay lượt đánh (turns.ts) không bị đè lên nhau.
+- module-resolution.ts (src/utils/): Hỗ trợ việc load các module linh động (dynamic loading) qua hàm resolveModuleFunction.
+- dummy.ts (src/utils/): Một file chứa hàm ensureNestedModuleSupport để polyfill/chữa cháy cho các môi trường chạy JS cũ.
+
+Nhóm 2: Logic Trận đấu & Cơ chế Lượt (Combat Engine & Turn Flow)
+- turns.ts: "Kẻ cầm cân nảy mực" quyết định ai được đi trước đi sau. Nó lo toàn bộ flow lượt đánh: tính toán chỉ số tốc độ qua getTurnOrderIndex, xử lý vòng lặp hành động (doActionOrSkip, stepTurn), và canh thời gian rớt đệ (tickMinionTTL, predictSpawnCycle). Tệp này bám chặt vào events.ts để trigger sự kiện.
+- interleaved.ts (src/turns/): Chứa logic tính toán xen kẽ lượt đi. Chứa hàm nextTurnInterleaved giúp xác định ai hành động tiếp theo trên Time-bar. Bổ trợ mạnh mẽ cho turns.ts.
+- engine.ts: Đóng vai trò là Game Engine vật lý và lưới (grid). Nó quản lý toạ độ (makeGrid, slotToCell), kiểm tra ô trống (cellOccupied), và lo luôn việc vẽ các token/tướng lên màn hình theo góc nhìn nghiêng (drawTokensOblique, drawGridOblique).
+- events.ts: Hệ thống thần kinh trung ương của game, được viết theo mô hình EventEmitter. Nó định nghĩa và phát sóng (dispatch) các sự kiện cốt lõi như bắt đầu/kết thúc lượt (TURN_START, TURN_END), thực hiện hành động, và kết thúc trận (BATTLE_END).
+- apply-damage.ts (src/combat/): Logic tính toán mất máu và tạo khiên được tách hẳn ra đây. Có hàm applyDamage và grantShield, giúp combat.ts đỡ phình to, giữ code tuân thủ Clean Code cực tốt.
+
+Nhóm 3: Hành vi Kỹ năng & Tương tác Thực thể (Skills & Interactions)
+- combat.ts: Tệp chứa logic chiến đấu nặng đô nhất. Quản lý việc tính toán sát thương kỹ năng (dealAbilityDamage), cơ chế đánh thường (basicAttack, doBasicWithFollowups), và hồi máu (healUnit).
+- passives.ts: Quản lý riêng hệ thống nội tại (Passive) phức tạp của game. Bắt các sự kiện khi ra sân (applyOnSpawnEffects, prepareUnitForPassives) và phát sóng các log nội tại (emitPassiveEvent, getPassiveLog).
+- statuses.ts: Chuyên quản lý trạng thái/buff/debuff (Status Effect). Nó có các hàm gắn/xoá trạng thái (applyStatus, clearStatus) và các hook can thiệp khi nhận sát thương chí mạng (hookOnLethalDamage).
+- summon.ts: Đảm nhiệm logic đưa thêm đệ/summon ra bàn cờ (enqueueImmediate), và xử lý chuỗi hành động (processActionChain) khi các đơn vị này xuất hiện.
+- ai.ts: Bộ não của kẻ địch. Các hàm trong này như refillDeckEnemy hay aiMaybeAct giúp hệ thống tự động tính toán nước đi, xếp hàng xuất quân và quyết định lúc nào thì tung chiêu.
+- aether.ts: Quản lý hệ thống tài nguyên/năng lượng (Aether Pool). Có các biến chia rạch ròi năng lượng của phe ta (allyAetherPool), phe địch (enemyAetherPool) và toàn cục (globalAetherPool).
+- fury.ts (src/utils/): Tách logic thanh nộ (Rage/Fury) ra quản lý riêng. Quản lý việc tích nộ (gainFury), hao nộ khi dùng skill (startFurySkill, finishFuryHit) và khởi tạo nộ (initializeFury).
+
+Nhóm 4: Quản lý Trạng thái Phiên chơi PvE (PvE Session Mode)
+- session-state.ts (src/modes/pve/): Quản lý rập khuôn (Schema) và dữ liệu tĩnh của một trận đấu. Nó khởi tạo danh sách đội hình chuẩn bị đánh (normalizeDeckEntries), khởi tạo nền (getEnvironmentBackground), và cache khung cảnh bằng hàm computeBackgroundSignature.
+- session-runtime-impl.ts (src/modes/pve/): Nơi thực thi logic hạng nặng. Tệp này import hàng tá hàm từ Core Engine (như stepTurn, applyDamage, vfxDraw) và gói gọn chúng vào một Object tên là Game (đại diện cho SessionState). Chứa vòng lặp chính (game loop).
+- session-runtime.ts (src/modes/pve/): Lớp vỏ bọc (Wrapper) mỏng bên ngoài thằng impl. Bổ sung logic quản lý phần thưởng (applyReward) và gắn bộ lắng nghe sự kiện (onSessionEvent) để bắn ra UI HUD.
+- session.ts (src/modes/pve/): Tệp Barrel gom nhóm session-state.ts và session-runtime.ts lại xuất ra một đầu mối duy nhất, giúp code bên ngoài import dễ thở hơn.
+- coming-soon.stub.ts: Một file "chim mồi" (stub) đơn giản dùng để hiển thị cho các chế độ chưa ra mắt.
+
+
+[PHẦN II: DATA & TYPES - DỮ LIỆU & ĐỊNH NGHĨA]
+Nhóm 5: Dữ liệu Cơ sở & Siêu dữ liệu (Base Data & Meta)
+- units.ts (src/): Nơi chứa dữ liệu/thông tin khởi tạo gốc của các tướng (Unit). File này expose ra mảng UNITS và hàm lookupUnit.
+- meta.ts: Quản lý các chỉ số khởi tạo (như makeInstanceStats) và thanh nộ đầu trận (initialRageFor) cho từng thực thể. Nó giống như một cầu nối giữa dữ liệu thô và thực thể sống trên bàn cờ.
+- catalog.ts: Trái tim của hệ thống chỉ số. Chứa RANK_MULT, lưu trữ danh sách tướng (ROSTER), chỉ số cơ bản theo class (CLASS_BASE), và các hàm tính toán chỉ số cuối cùng (applyRankAndMods).
+- config.ts: Nơi chứa các hằng số cấu hình toàn cục quan trọng của game. Trong này có CFG (config chung), CAM (camera), và các tinh chỉnh hiển thị như TOKEN_STYLE hay CHIBI.
+- schema.ts (src/config/): Tệp chứa các định nghĩa Schema (có thể xài Zod) để validate các thông số cấu hình của hệ thống như Nộ (FuryConfig), AI (AiConfig), hoặc tốc độ chạy (TurnOrderConfig).
+- kit.ts (src/utils/): Công cụ giải mã "bộ kỹ năng" của tướng. Nó bóc tách các chỉ số sâu hơn như thông số triệu hồi (getSummonSpec), nhận diện hành vi nộ (detectUltBehavior). Kết hợp rất chặt với ai.ts và summon.ts.
+- unit-id.ts (src/utils/): Hàm normalizeUnitId để chuẩn hóa tên định danh của tướng (tránh lỗi viết hoa/viết thường/dấu cách).
+- units.ts (src/shared-types/): File trung gian chỉ làm nhiệm vụ export * from '../types/units'. Giải quyết triệt để vấn đề Circular Dependency (phụ thuộc vòng).
+
+Nhóm 6: Trung tâm Dữ liệu Cấu hình (Data Hub - src/data/)
+- economy.config.ts & economy.ts: Khai báo 5 loại tiền tệ (Vụn/Hạ/Trung/Thượng Nguyên Tinh và Thần Tinh), kèm theo tỷ lệ quy đổi (ratioToBase). Lưu trữ luật bảo hiểm Gacha và cấu trúc thuế (Tax).
+- skills.config.ts & skills.ts: "Bách khoa toàn thư" chứa toàn bộ chiêu thức của các tướng. Dùng hàm deepFreeze để đóng băng object dữ liệu, ngăn code logic vô tình thay đổi chỉ số.
+- roster-preview.config.ts & roster-preview.ts: Quy định các hằng số tăng trưởng (Talent Point - TP Delta) và độ chính xác (precision) khi làm tròn số.
+- announcements.config.ts & announcements.ts: Chứa nội dung hiển thị ở thanh Sidebar Main Menu (Sự kiện Vé số, Đấu trường). Tự check thời gian (startAt, endAt).
+- modes.ts: Danh sách các nút tính năng trên giao diện (PvE, PvP, Kinh tế). Đóng vai trò bảng định tuyến (Router Table) để shell.ts biết load module nào.
+- load-config.ts: Helper function nhỏ gọn dùng Zod schema để parse dữ liệu an toàn.
+- vfx_anchors/ (loithienanh.json, schema.ts): Dữ liệu toạ độ khung xương để Engine biết đường vẽ sấm sét hay nổ tung đúng vị trí chân, tay của tướng.
+- gacha_config_v1.3.0.json: Bản lưu meta-config cực kỳ chi tiết cho hệ thống Gacha (Performance, Dynamic Scaling, Input mapping).
+
+Nhóm 7: Hợp đồng Kiểu Dữ liệu (Type Contracts - src/types/)
+- index.ts: Tệp Barrel. Gom tất cả các type từ các file con lại và export ra một lượt để các file logic import cho lẹ.
+- combat.ts: Định nghĩa các kiểu cấu trúc chiến đấu cốt lõi như StatusEffect, SkillDefinition, BattleDetail.
+- art.ts: Định nghĩa layout, bóng (shadow), thanh HP (UnitArtHpBar), nhãn (UnitArtLabel).
+- config.ts: Định nghĩa chi tiết các cấu hình lượt (TurnOrderConfig), tỉ lệ pity trong gacha (PityRule).
+- pve.ts: Quy định khung cấu trúc cho chế độ PvE như đợt quái (WaveState), lính (SummonSpec), phần thưởng (RewardRoll).
+- currency.ts & lineup.ts: Cấu hình tài nguyên (LineupCurrencyConfig) và chỉ số xếp đội hình (RosterEntryLite).
+- common.ts, rng.ts, telemetry.ts: Kiểu dữ liệu phụ trợ (UnknownRecord, RngState, TelemetryEvent).
+- vfx.ts: Định nghĩa mỏ neo (VfxAnchor), chuỗi sự kiện (VfxEventList) cho kỹ xảo.
+- turn-order.ts: Hợp đồng cho hệ thống lượt (InterleavedTurnState, TurnContext).
+- units.ts: Type cốt lõi định nghĩa một thực thể trên bàn cờ (UnitToken, StatBlock, SummonQueue).
+- ui.ts: Type cho thanh HUD (HudHandles) và thanh máu/năng lượng (SummonBarCard).
+- utils.ts: Các type tiện ích chung như Nullable, ReadonlyDeep.
+
+Nhóm 8: Tiện Ích Chung & Format (Generic Utilities)
+- assert.ts (src/utils/): Cung cấp hàm assertDefined để bẫy lỗi null/undefined.
+- format.ts (src/utils/): Hàm createNumberFormatter định dạng số liệu (thêm dấu phẩy, làm tròn) để hiển thị lên UI.
+- currency.ts (src/utils/): Quản lý tính toán tiền tệ (Vàng, Kim Cương, Năng lượng). Các hàm convertCurrencyAmount hay formatCurrencyAmount phục vụ cho Economy và Gacha.
+
+
+[PHẦN III: UI & RENDERING - GIAO DIỆN & ĐỒ HOẠ]
+Nhóm 9: Đồ hoạ, Hiển thị & VFX (Rendering & VFX)
+- scene.ts: Tệp đóng gói toàn bộ cảnh chiến đấu. Dùng bộ nhớ đệm (cache) cực xịn qua getCachedBattlefieldScene để tối ưu FPS.
+- background.ts: Chuyên xử lý việc render hình nền và các chi tiết môi trường (cảnh quan) cho sàn đấu.
+- vfx.ts: "Giám đốc kỹ xảo" của game. Quản lý các hiệu ứng (VfxEventList) như tia chớp, nổ dưới đất hay vòng khiên.
+- ui.ts: Vẽ giao diện người dùng nổi trên màn hình (HUD) in-game, initHUD và vẽ thanh thời gian triệu hồi startSummonBar.
+- art.ts: Quản lý tài nguyên hình ảnh của các Unit. Lưu trữ hàm để gọi/set skin và lấy thông tin đồ hoạ.
+- dom.ts (src/ui/): Thao tác trực tiếp lên DOM HTML (mountSection, ensureStyleTag, assertElement). Nền tảng để entry.ts vẽ giao diện.
+- rarity.ts & rarity.css (src/ui/rarity/): Chuyên trị việc render hiệu ứng viền/hào quang (Aura/Glow) tương ứng với phẩm chất của tướng.
+- rarity_tokens.json: Tệp data cấu hình màu HEX và cường độ sáng cho từng bậc (N, R, SR, SSR, UR, PRIME).
+
+Nhóm 10: Giao diện Sảnh Chính (Main Menu View)
+(Nằm tại src/screens/main-menu/)
+- dialogues.ts: Quản lý hội thoại và tương tác của Hero ngoài sảnh chính (có các tone greeting, focus, calm).
+- types.ts: Định nghĩa cấu trúc dữ liệu riêng cho Main Menu (như MenuSection, HeroProfile).
+- view/layout.ts & view/events.ts: Hai "thợ xây" DOM. layout.ts chuyên dựng bộ khung, còn events.ts chuyên render các thẻ bài chế độ chơi.
+- view/index.ts: Tệp gom (Entry view). Dùng hàm renderMainMenuView gọi các thợ xây ở trên để lắp ráp Main Menu.
+
+Nhóm 11: "Trái tim" Hệ thống Quay Tướng (Gacha Core Logic)
+(Nằm tại src/screens/ui-gacha/)
+- logic/config.ts: Thông số cấu hình của các Banner. Quy định giá tiền và tỉ lệ rớt (Rates: N, R, SR, SSR, UR, Prime).
+- logic/pity.ts: Bộ đếm bảo hiểm (Pity System). Quản lý soft pity, hard pity, và bảo hiểm quay x10 (srFloor).
+- logic/currency.ts: Máy đếm tiền. Xử lý logic trừ tiền (payForRoll), tự động quy đổi (Auto Convert) tiền và tính Thuế (TAX).
+- logic/gacha.ts: Hàm thực thi RNG (Random Number Generator). Chứa logic rollBanner và multiRoll.
+- logic/types.ts: Bản hợp đồng dữ liệu cho core Gacha (Quy định Ví, Banner, Lịch sử quay).
+- index.html, gacha.css, view.ts: Nơi xử lý trực tiếp hiệu ứng hiển thị kết quả quay, playGachaReveal lật thẻ bài giật gân, vòng hào quang.
+
+Nhóm 12: Giao diện Xếp Đội Hình (Lineup Screen)
+(Nằm tại src/screens/lineup/)
+- index.ts: Tệp Container. Thu thập toàn bộ dữ liệu (Tiền tệ, Danh sách tướng, Passives) rồi trộn lại (mergeParams) trước khi ném cho View.
+- view/state.ts: Não bộ của màn hình Lineup. Quản lý trạng thái các ô (Cell), tính chi phí tiền tệ (unlockCell), và kiểm tra hiệu ứng nội tại.
+- view/events.ts: "Người gác cổng" DOM. Xử lý mọi cú click: chọn thẻ bài, thay Leader (setLeader), lọc tướng.
+- view/render.ts: Thợ xây DOM chính. Nhận dữ liệu từ state.ts vẽ nên sa bàn lưới tướng, danh sách nhân vật.
+
+Nhóm 13: Giao diện Bộ Sưu Tập (Collection Screen)
+(Nằm tại src/screens/collection/)
+- index.ts: Tệp "chào sân". Thu thập dữ liệu cấu hình, hợp nhất với người chơi, lấy danh sách tướng ném vào view.
+- types.ts: Định nghĩa cấu trúc dữ liệu riêng (CollectionTabKey phân ra 5 tab: awakening, skills, arts, skins, voice).
+- state.ts: Giữ trạng thái của màn hình: đang xem tướng nào (selectedUnitId), và đang xem tab nào (activeTab).
+- helpers.ts: Chứa hàm định dạng hiển thị, dịch thuật (ultimate thành 'Tuyệt kỹ'), và polyfill cho Intl.NumberFormat.
+- view.ts: Lắng nghe dữ liệu và vẽ chi tiết từng thẻ thông tin kỹ năng (renderAbilityCard), thay đổi tab.
+
+Nhóm 14: Giao diện Sảnh Đấu Trường (Arena Hub Screen)
+(Nằm tại src/screens/arena-hub/)
+- index.ts: Dựng lên một màn hình danh sách các chế độ chơi con như: 'arena' (PvP), 'beast-arena' (Đấu thú), 'ares', 'challenge'. Tái sử dụng lại hàm createModeCard từ Main Menu.
+
+
+[PHẦN IV: ENVIRONMENT & TOOLING - MÔI TRƯỜNG & ĐÓNG GÓI]
+Nhóm 15: Cấu hình Dự án, Build Toolchain & Môi trường
+- package.json, package-lock.json, .gitignore, .npmrc: Tệp cấu hình của Node.js/NPM và Git.
+- tsconfig.*.json (base, all, build, turns): Tệp gốc chứa định nghĩa Path Aliases (@combat/*, @ui/*) và rules biên dịch.
+- build.mjs: Script build custom viết bằng Node.js, sử dụng esbuild để gom (bundle) mã nguồn thành JavaScript tốc độ cao.
+- index.html (Root): File gốc chèn UI của game vào <div id="appRoot">. Cắm sẵn Eruda (devtools cho mobile).
+- jest.config.cjs: Cấu hình Jest để chạy Unit Test.
+- tools/install-stubs.mjs: Script tự động chép các gói "giả cầy" (stubs) vào node_modules/.
+- tools/esbuild-stub/: Fallback nhận lệnh khi máy không chạy được esbuild xịn.
+- tools/typescript-transpiler/: Wrapper bao bọc module typescript gốc. Cạo type TS (strip-typescript.js) hoặc tự tải runtime về để biên dịch trên Termux.
+- tools/tsx-stub/: Lệnh giả lập (loader.mjs, bin.js) dùng Custom ESM Hooks biến TS thành JS trực tiếp không cần cài gói tsx xịn.
+- tools/zod-stub/superRefine.test.js: Bản tự code lại thư viện Zod siêu nhẹ và Unit test của nó.
+- types/ (global.d.ts, node-globals.d.ts, turns-env.d.ts...): Khai báo ambient types để TS không báo lỗi ảo với các file css, svg, hoặc API của Node.
+- types/test.html: Script test tính năng của trình duyệt (ES2020, Optional Chaining).
+[CHI TIẾT: HỆ SINH THÁI BUILD FALLBACK BẰNG TAY (11 Tệp)]
+Đây là cụm module tự chế để lách giới hạn của Termux (Android). Khi thiết bị không thể cài esbuild hay tsx (do lỗi C++ binary), các stub này sẽ hoạt động như "hàng giả cầy" nhưng chạy thật.
+
+1. Cụm Zod-stub (Giả lập thư viện Zod) - Thư mục: tools/zod-stub/
+- index.js: Lõi logic tự code lại Zod bằng JS thuần (chứa ZodObject, ZodString, parse, superRefine, ZodError) để không cần tải package nặng.
+- index.d.ts: Khai báo Type (ZodTypeAny, ZodRawShape...) đánh lừa TypeScript/IDE rằng đây là Zod thật để giữ nguyên autocomplete.
+- superRefine.test.js: File Unit test dùng Jest để đảm bảo hàm superRefine tự chế chạy đúng chuẩn.
+
+2. Cụm Tsx-stub (Giả lập trình chạy TS trực tiếp) - Thư mục: tools/tsx-stub/
+- bin.js: Giao diện dòng lệnh (CLI). Bắt lệnh `tsx watch <file>` và chạy Node bằng luồng theo dõi thủ công.
+- loader.mjs: NodeJS Custom ESM Loader. Chặn luồng nạp file (.ts/.tsx), gọi trình dịch JS thuần để chuyển code rồi mới đưa lại cho Node chạy. Đỉnh cao hack Node.js.
+- package.json: Khai báo định danh package `tsx` (phiên bản 4.7.1 giả) và trỏ lệnh bin vào bin.js.
+
+3. Cụm TypeScript-Transpiler (Biên dịch TS siêu nhẹ) - Thư mục: tools/typescript-transpiler/
+- strip-typescript.js: Công cụ "cạo lông". Dùng Regex cắt bỏ toàn bộ từ khóa TypeScript (type, interface, as, <T>) để biến file TS thành JS ngay lập tức.
+- download-runtime.mjs: Script tự động gọi mạng tải file `typescript.js` thật từ CDN (unpkg) về lưu offline nếu Regex không đủ xài.
+- index.js & package.json: Gói gọn cụm này thành một module hợp lệ tên là `typescript-transpiler`.
+
+4. Cụm Types Node - Thư mục: types/@types/node/
+- index.d.ts: Trỏ đến `node-globals.d.ts` để TypeScript không báo lỗi khi các script trên gọi thư viện hệ thống của NodeJS (như fs, path, child_process).
+
+
 1) Hệ chỉ số
 Cơ bản (8 cái):
 HP - máu.

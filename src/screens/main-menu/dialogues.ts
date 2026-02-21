@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/screens/main-menu/dialogues.ts
+
 import { getUnitArt } from '../../art.ts';
 import type {
   HeroCue,

@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/data/roster-preview.ts
+
 import { z } from 'zod';
 
 import { CLASS_BASE, RANK_MULT, ROSTER } from '../catalog.ts';

@@ -1,3 +1,4 @@
+//home (termux)/arclune_lane_7x3/src/statuses.ts
 import { applyDamage } from './combat/apply-damage.ts';
 import { gainFury, finishFuryHit } from './utils/fury.ts';
 import { safeNow } from './utils/time.ts';

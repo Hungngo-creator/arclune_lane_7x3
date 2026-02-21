@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/screens/lineup/view/render.ts
+
 import { getSkillSet } from '../../../data/skills.ts';
 import { createNumberFormatter } from '../../../utils/format.ts';
 import { normalizeUnitId } from '../../../utils/unit-id.ts';

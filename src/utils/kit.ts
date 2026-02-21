@@ -1,3 +1,4 @@
+//home (termux)/arclune_lane_7x3/src/utils/kit.ts
 import type { UltMetadata, UltSkillConfig, UnitKitConfig } from '../types/config.ts';
 
 interface KitTraitObject extends Record<string, unknown> {

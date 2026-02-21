@@ -1,3 +1,4 @@
+//home (termux)/arclune_lane_7x3/src/ui/rarity/rarity_tokens.json
 {
   "N":   { "hex": "#9AA3AF", "glow": 0.6, "ring": 1.0, "spark": 0 },
   "R":   { "hex": "#2ED3A0", "glow": 0.8, "ring": 1.0, "spark": 4 },

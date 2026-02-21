@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/screens/main-menu/types.ts
+
 import type { UnitArt } from '@shared-types/art';
 
 export type HeroCue = 'intro' | 'hover' | 'tap' | 'sensitive' | 'idle';

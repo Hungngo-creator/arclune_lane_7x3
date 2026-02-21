@@ -1,5 +1,5 @@
 // @ts-check
-//v0.8
+//home (termux)/arclune_lane_7x3/src/catalog.ts
 // 1) Rank multiplier (đơn giản) — áp lên TẤT CẢ stat trừ SPD
 import { kitSupportsSummon } from './utils/kit.ts';
 
@@ -45,11 +45,11 @@ const asUnitKitConfig = (value: unknown): UnitKitConfig | null => (
 
 export const RANK_MULT = {
   N: 0.80,
-  R: 0.90,
-  SR: 1.05,
-  SSR: 1.25,
-  UR: 1.50,
-  Prime: 1.80,
+  R: 0.85,
+  SR: 1.95,
+  SSR: 1.1,
+  UR: 1.3,
+  Prime: 1.55,
 } satisfies Readonly<Record<'N' | 'R' | 'SR' | 'SSR' | 'UR' | 'Prime', number>>;
 
 export type RankName = keyof typeof RANK_MULT;

@@ -1,3 +1,4 @@
+//home (termux)/arclune_lane_7x3/src/types/art.ts
 export interface UnitArtPalette {
   primary: string;
   secondary: string;

@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/screens/collection/types.ts
+
 import type { CurrencyDefinition } from '@shared-types/config';
 import type { UnknownRecord } from '@shared-types/common';
 import type { LineupCurrencies } from '@shared-types/currency';

@@ -1,3 +1,4 @@
+//home (termux)/arclune_lane_7x3/src/screens/ui-gacha/logic/gacha.ts
 import { GACHA_CONFIG } from './config.ts';
 import { applyRoll, getBannerState } from './pity.ts';
 import {

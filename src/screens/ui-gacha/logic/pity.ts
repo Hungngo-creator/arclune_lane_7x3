@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/screens/ui-gacha/logic/pity.ts
+
 import { RARITY_ORDER } from './types.ts';
 import type {
   BannerDefinition,

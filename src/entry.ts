@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/entry.ts
+
 import './aether.ts';
 import { createAppShell } from './app/shell.ts';
 import { CFG } from './config.ts';

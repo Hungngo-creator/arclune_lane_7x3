@@ -1,3 +1,4 @@
+//home (termux)/arclune_lane_7x3/src/ui/rarity/rarity.ts
 import rarityTokensSource from './rarity_tokens.json';
 import rarityCss from './rarity.css';
 import { ensureStyleTag } from '../dom.ts';

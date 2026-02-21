@@ -1,4 +1,3 @@
-
 1) 
 Nội tại: mỗi khi gây sát thương tăng vĩnh viễn 1% atk và wil, res và arm giảm 0,5%, khi chết và được hồi sinh hiệu ứng từ nội tại này giảm 50%, bất kể gây bao nhiêu sát thương hoặc nhiều lần lên mục tiêu lên 1 turn nội tại này đều chỉ tính 1 lần/turn/mục tiêu. hiệu ứng từ nội tại này mang tag tuyệt đối, bản thân, đơn mục tiêu cố định. Số lần kích hoạt / turn tối đa là 9 lần, số lần kích hoạt trên 1 mục tiêu/ turn là 1 lần, không có cap max stack, tức là giới hạn kích hoạt/ 1 turn là 9 lần nhưng có thể lặp lại nhiều lần nhiều turn. 
 Nhân vật này không thể được hồi sinh từ bất kỳ kỹ năng, ultimate hay nội tại nào trừ kỹ năng, nội tại hoặc ultimate có tag Quy Tắc hoặc từ kỹ năng 2 của bản thân. 

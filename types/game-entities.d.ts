@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/types/game-entities.d.ts
+
 // Type declarations cho các entity game cốt lõi
 // File này được import thông qua JSDoc (@typedef {import('types/game-entities').Foo})
 

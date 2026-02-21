@@ -1,3 +1,4 @@
+//home (termux)/arclune_lane_7x3/src/screens/ui-gacha/logic/currency.ts
 import {
   type AutoConvertDetail,
   type ConversionResult,

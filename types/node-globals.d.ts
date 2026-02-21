@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/types/node-globals.d.ts
+
 interface DirentLike {
   name: string;
   isDirectory(): boolean;

@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/background.ts
+
 import { CFG } from './config.ts';
 import { ensureSpriteLoaded, projectCellOblique } from './engine.ts';
 

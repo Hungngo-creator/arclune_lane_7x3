@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/types/@shared-types/config.d.ts
+
 export type {
   TurnOrderSide,
   TurnOrderPairScanSlotFields,

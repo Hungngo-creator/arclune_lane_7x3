@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/screens/ui-gacha/logic/config.ts
+
 import type { BannerDefinition, CurrencyCode, GachaConfig, Wallet } from './types.ts';
 import { CURRENCY_ORDER } from './types.ts';
 

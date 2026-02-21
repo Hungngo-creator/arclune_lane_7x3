@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/tools/typescript-transpiller/strip-typescript.js
+
 "use strict";
 
 const TYPE_IMPORT_EXPORT_RE = /\bimport\s+type\s+[^;]+;?/g;

@@ -1,3 +1,4 @@
+//home (termux)/arclune_lane_7x3/src/types/lineup.ts
 import type { UnknownRecord } from './common.ts';
 import type { LineupCurrencyValue } from './currency.ts';
 

@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/data/announcements.config.ts
+
 const announcementsConfig = [
   {
     key: 'event',

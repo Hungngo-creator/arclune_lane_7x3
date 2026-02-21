@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/data/load-config.ts
+
 export function loadConfig<T>(rawConfig: unknown, schema: { parse(input: unknown): T }): T {
   try {
     return schema.parse(rawConfig);

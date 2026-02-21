@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/.gitignore
+
 node_modules/*
 !node_modules/.bin/
 node_modules/.bin/*

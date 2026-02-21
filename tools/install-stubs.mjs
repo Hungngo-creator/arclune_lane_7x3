@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/tools/install-stubs.mjs
+
 import { cpSync, existsSync, mkdirSync, rmSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';

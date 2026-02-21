@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/data/roster-preview.config.ts
+
 const rosterPreviewConfig = {
   tpDelta: {
     HP: 20,

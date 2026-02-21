@@ -1,3 +1,4 @@
+//home (termux)/arclune_lane_7x3/src/utils/module-resolution.ts
 export type AnyFunction = (...args: any[]) => unknown;
 
 export function pickFunctionFromSource<TFn extends AnyFunction>(

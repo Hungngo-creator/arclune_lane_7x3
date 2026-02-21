@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/screens/arena-hub/index.ts
+
 import { ensureStyleTag, mountSection } from '../../ui/dom.ts';
 import { createModeCard } from '../main-menu/view/events.ts';
 import type { CleanupFn, CleanupRegistrar, MainMenuShell, MenuCardMetadata } from '../main-menu/types.ts';

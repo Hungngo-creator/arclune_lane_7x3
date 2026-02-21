@@ -1,4 +1,4 @@
-// config.ts v0.7.5
+//home (termux)/arclune_lane_7x3/src/config.ts
 import { parseGameConfig } from './config/schema';
 import type {
   BackgroundDefinitionConfig,

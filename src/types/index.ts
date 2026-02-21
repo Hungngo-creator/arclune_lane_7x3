@@ -1,3 +1,4 @@
+//home (termux)/arclune_lane_7x3/src/types/index.ts
 export type * from './units';
 export type * from './art';
 export type * from './lineup';

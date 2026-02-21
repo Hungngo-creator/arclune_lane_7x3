@@ -1,7 +1,4 @@
-// 0.7 vfx.js
-// VFX layer: spawn pop, hit ring, ranged tracer, melee step-in/out
-// Không thay đổi logic combat/turn — chỉ vẽ đè.
-// Durations: spawn 500ms, hit 380ms, tracer 400ms, melee 2000ms.
+//home (termux)/arclune_lane_7x3/src/vfx.ts
 
 import { projectCellOblique } from './engine.ts';
 import { CFG, CHIBI } from './config.ts';

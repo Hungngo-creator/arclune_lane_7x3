@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/modes/pve/session-state.ts
+
 import type { CreateSessionOptions, SessionState } from '@shared-types/pve';
 import type {
   CameraPreset,

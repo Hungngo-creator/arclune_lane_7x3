@@ -1,3 +1,4 @@
+//home (termux)/arclune_lane_7x3/src/combat/apply-damage.ts
 import { sessionNow } from '../utils/time.ts';
 
 import type { StatusEffect } from '@shared-types/combat';

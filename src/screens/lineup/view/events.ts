@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/screens/lineup/view/event.ts
+
 import type { LineupViewState, LineupMessageType, LineupPassive, RosterUnit } from './state.ts';
 import {
   assignUnitToCell,

@@ -1,3 +1,5 @@
+//home (termux)/arclune_lane_7x3/src/aether.ts
+
 import { addGameEventListener, TURN_START, BATTLE_END } from './events.ts';
 import { AE_CLASS_COEFF } from './catalog.ts';
 
