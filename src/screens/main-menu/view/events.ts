@@ -376,11 +376,13 @@ export function createModeGroupCard(
     title.textContent = child.title || child.label || child.key || '';
     body.appendChild(title);
 
+    if (child.status === 'coming-soon') {
     const status = document.createElement('span');
-    status.className = 'mode-card__child-status';
-    status.textContent = child.status === 'coming-soon' ? 'Coming soon' : 'Sẵn sàng';
+    status.className = 'mode-card_child-status';
+    status.textContent = 'Coming soon';
     body.appendChild(status);
-
+     }
+ 
     if (child.description){
       const desc = document.createElement('span');
       desc.className = 'mode-card__child-desc';

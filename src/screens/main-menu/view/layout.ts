@@ -100,11 +100,6 @@ export function createModesSection(options: ModesSectionOptions): HTMLElement {
   const sectionEl = document.createElement('section');
   sectionEl.className = 'main-menu-modes';
 
-  const title = document.createElement('h2');
-  title.className = 'main-menu-modes__title';
-  title.textContent = '';
-  sectionEl.appendChild(title);
-
   const metaByKey = new Map<string, MenuCardMetadata>();
   metadata.forEach(mode => {
     if (mode?.key){
@@ -117,10 +112,11 @@ export function createModesSection(options: ModesSectionOptions): HTMLElement {
     const sectionGroup = document.createElement('div');
     sectionGroup.className = 'mode-section';
 
-    const heading = document.createElement('h3');
-    heading.className = 'mode-section__name';
-    heading.textContent = section.title || 'Danh mục';
-    sectionGroup.appendChild(heading);
+    if (section.title) { const heading = document.createElement('h3');
+  heading.className = 'mode-section_name';
+  heading.textContent = section.title;
+  sectionGroup.appendChild(heading);
+     }
 
     const grid = document.createElement('div');
     grid.className = 'mode-grid';

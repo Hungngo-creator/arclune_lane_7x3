@@ -19383,10 +19383,12 @@ __define('./screens/main-menu/view/events.ts', (exports, module, __require) => {
           title.className = 'mode-card__child-title';
           title.textContent = child.title || child.label || child.key || '';
           body.appendChild(title);
-          const status = document.createElement('span');
-          status.className = 'mode-card__child-status';
-          status.textContent = child.status === 'coming-soon' ? 'Coming soon' : 'Sẵn sàng';
-          body.appendChild(status);
+          if (child.status === 'coming-soon') {
+              const status = document.createElement('span');
+              status.className = 'mode-card_child-status';
+              status.textContent = 'Coming soon';
+              body.appendChild(status);
+          }
           if (child.description) {
               const desc = document.createElement('span');
               desc.className = 'mode-card__child-desc';
@@ -19566,10 +19568,6 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
       const { sections = [], metadata = [], shell, onShowComingSoon, addCleanup } = options;
       const sectionEl = document.createElement('section');
       sectionEl.className = 'main-menu-modes';
-      const title = document.createElement('h2');
-      title.className = 'main-menu-modes__title';
-      title.textContent = '';
-      sectionEl.appendChild(title);
       const metaByKey = new Map();
       metadata.forEach(mode => {
           if (mode?.key) {
@@ -19581,10 +19579,12 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
               return;
           const sectionGroup = document.createElement('div');
           sectionGroup.className = 'mode-section';
-          const heading = document.createElement('h3');
-          heading.className = 'mode-section__name';
-          heading.textContent = section.title || 'Danh mục';
-          sectionGroup.appendChild(heading);
+          if (section.title) {
+              const heading = document.createElement('h3');
+              heading.className = 'mode-section_name';
+              heading.textContent = section.title;
+              sectionGroup.appendChild(heading);
+          }
           const grid = document.createElement('div');
           grid.className = 'mode-grid';
           if (section.id === 'economy') {
