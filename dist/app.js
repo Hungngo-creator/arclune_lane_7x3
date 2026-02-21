@@ -20,6 +20,7 @@ function __require(id){
 }
 if (typeof globalThis !== "undefined" && typeof globalThis.__require === "undefined"){ globalThis.__require = __require; }
 __define('./aether.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/aether.ts
   const __dep0 = __require('./events.ts');
   const addGameEventListener = __dep0.addGameEventListener;
   const TURN_START = __dep0.TURN_START;
@@ -209,6 +210,7 @@ __define('./aether.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'SharedAetherPool')) exports.SharedAetherPool = SharedAetherPool;
 });
 __define('./ai.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/ai.ts
   const __dep0 = __require('./engine.ts');
   const pickRandom = __dep0.pickRandom;
   const slotToCell = __dep0.slotToCell;
@@ -875,7 +877,7 @@ __define('./app/shell.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'createAppShell')) exports.createAppShell = createAppShell;
 });
 __define('./art.ts', (exports, module, __require) => {
-  // v0.7.7 – Unit art catalog
+  //home (termux)/arclune_lane_7x3/src/art.ts
   function svgData(width, height, body) {
       const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet">${body}</svg>`;
       return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
@@ -1585,6 +1587,7 @@ __define('./art.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'getUnitArt')) exports.getUnitArt = getUnitArt;
 });
 __define('./background.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/background.ts
   const __dep0 = __require('./config.ts');
   const CFG = __dep0.CFG;
   const __dep1 = __require('./engine.ts');
@@ -2092,7 +2095,7 @@ __define('./background.ts', (exports, module, __require) => {
 });
 __define('./catalog.ts', (exports, module, __require) => {
   // @ts-check
-  //v0.8
+  //home (termux)/arclune_lane_7x3/src/catalog.ts
   // 1) Rank multiplier (đơn giản) — áp lên TẤT CẢ stat trừ SPD
   const __dep0 = __require('./utils/kit.ts');
   const kitSupportsSummon = __dep0.kitSupportsSummon;
@@ -2102,11 +2105,11 @@ __define('./catalog.ts', (exports, module, __require) => {
   const asUnitKitConfig = (value) => (isObjectLike(value) ? value : null);
   const RANK_MULT = {
       N: 0.80,
-      R: 0.90,
-      SR: 1.05,
-      SSR: 1.25,
-      UR: 1.50,
-      Prime: 1.80,
+      R: 0.85,
+      SR: 1.95,
+      SSR: 1.1,
+      UR: 1.3,
+      Prime: 1.55,
   };
   // 2) Class base (mốc lv1 để test). SPD không chịu rank multiplier.
   const CLASS_BASE = {
@@ -4078,6 +4081,7 @@ __define('./catalog.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyRankAndMods')) exports.applyRankAndMods = applyRankAndMods;
 });
 __define('./combat.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/combat.ts
   const __dep0 = __require('./statuses.ts');
   const Statuses = __dep0.Statuses;
   const hookOnLethalDamage = __dep0.hookOnLethalDamage;
@@ -4346,6 +4350,7 @@ __define('./combat.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'doBasicWithFollowups')) exports.doBasicWithFollowups = doBasicWithFollowups;
 });
 __define('./combat/apply-damage.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/combat/apply-damage.ts
   const __dep0 = __require('./utils/time.ts');
   const sessionNow = __dep0.sessionNow;
   const ensureStatusList = (unit) => {
@@ -4391,7 +4396,7 @@ __define('./combat/apply-damage.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'grantShield')) exports.grantShield = grantShield;
 });
 __define('./config.ts', (exports, module, __require) => {
-  // config.ts v0.7.5
+  //home (termux)/arclune_lane_7x3/src/config.ts
   const __dep0 = __require('./config/schema.ts');
   const parseGameConfig = __dep0.parseGameConfig;
   const daylightTheme = {
@@ -4603,6 +4608,7 @@ __define('./config/package.json', (exports, module, __require) => {
   module.exports.default = data;
 });
 __define('./config/schema.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/config/schema.ts
   const __dep0 = __require('./../tools/zod-stub/index.js');
   const z = __dep0.z;
   const SideSchema = z.enum(['ally', 'enemy']);
@@ -4819,6 +4825,7 @@ __define('./config/schema.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'parseGameConfig')) exports.parseGameConfig = parseGameConfig;
 });
 __define('./data/announcements.config.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/data/announcements.config.ts
   const announcementsConfig = [
       {
           key: 'event',
@@ -4912,6 +4919,7 @@ __define('./data/announcements.config.ts', (exports, module, __require) => {
   module.exports.default = exports.default;
 });
 __define('./data/announcements.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/data/announcements.ts
   const __dep0 = __require('./../tools/zod-stub/index.js');
   const z = __dep0.z;
   const __dep1 = __require('./data/economy.ts');
@@ -5023,6 +5031,7 @@ __define('./data/announcements.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'getAllSidebarAnnouncements')) exports.getAllSidebarAnnouncements = getAllSidebarAnnouncements;
 });
 __define('./data/economy.config.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/data/economy.config.ts
   const economyConfig = {
       currencies: [
           {
@@ -5107,6 +5116,7 @@ __define('./data/economy.config.ts', (exports, module, __require) => {
   module.exports.default = exports.default;
 });
 __define('./data/economy.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/data/economy.ts
   const __dep0 = __require('./../tools/zod-stub/index.js');
   const z = __dep0.z;
   const __dep1 = __require('./utils/format.ts');
@@ -5295,6 +5305,7 @@ __define('./data/economy.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'CURRENCY_ORDER')) exports.CURRENCY_ORDER = CURRENCY_ORDER;
 });
 __define('./data/load-config.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/data/load-config.ts
   function loadConfig(rawConfig, schema) {
       try {
           return schema.parse(rawConfig);
@@ -5310,6 +5321,7 @@ __define('./data/load-config.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'loadConfig')) exports.loadConfig = loadConfig;
 });
 __define('./data/modes.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/data/mode.ts
   const __dep0 = __require('./data/economy.ts');
   const getLotterySplit = __dep0.getLotterySplit;
   const getPityConfig = __dep0.getPityConfig;
@@ -5630,6 +5642,7 @@ __define('./data/modes.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
 });
 __define('./data/roster-preview.config.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/data/roster-preview.config.ts
   const rosterPreviewConfig = {
       tpDelta: {
           HP: 20,
@@ -5669,6 +5682,7 @@ __define('./data/roster-preview.config.ts', (exports, module, __require) => {
   module.exports.default = exports.default;
 });
 __define('./data/roster-preview.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/data/roster-preview.ts
   const __dep0 = __require('./../tools/zod-stub/index.js');
   const z = __dep0.z;
   const __dep1 = __require('./catalog.ts');
@@ -5838,6 +5852,7 @@ __define('./data/roster-preview.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'buildPreviewRows')) exports.buildPreviewRows = buildPreviewRows;
 });
 __define('./data/skills.config.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/data/skills.config.ts
   const skillsConfig = [
       {
           unitId: 'diep_minh',
@@ -7411,6 +7426,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
   module.exports.default = exports.default;
 });
 __define('./data/skills.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/data/skills.ts
   const __dep0 = __require('./../tools/zod-stub/index.js');
   const z = __dep0.z;
   const __dep1 = __require('./catalog.ts');
@@ -7542,6 +7558,7 @@ __define('./data/vfx_anchors/loithienanh.json', (exports, module, __require) => 
   module.exports.default = data;
 });
 __define('./data/vfx_anchors/schema.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/data/vfx_anchors/schema.ts
   const __dep0 = __require('./../tools/zod-stub/index.js');
   const z = __dep0.z;
   const AnchorPointSchema = z.object({
@@ -7577,6 +7594,7 @@ __define('./data/vfx_anchors/schema.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'parseVfxAnchorDataset')) exports.parseVfxAnchorDataset = parseVfxAnchorDataset;
 });
 __define('./engine.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/engine.ts
   const __dep0 = __require('./config.ts');
   const TOKEN_STYLE = __dep0.TOKEN_STYLE;
   const CHIBI = __dep0.CHIBI;
@@ -8542,6 +8560,7 @@ __define('./engine.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'zoneCode')) exports.zoneCode = zoneCode;
 });
 __define('./entry.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/entry.ts
   __require('./aether.ts');
   const __dep0 = __require('./app/shell.ts');
   const createAppShell = __dep0.createAppShell;
@@ -9538,6 +9557,7 @@ __define('./entry.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
 });
 __define('./events.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/events.ts
   const TURN_START = 'turn:start';
   const TURN_END = 'turn:end';
   const ACTION_START = 'action:start';
@@ -9794,6 +9814,7 @@ __define('./events.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'addGameEventListener')) exports.addGameEventListener = addGameEventListener;
 });
 __define('./main.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/main.ts
   const __dep1 = __require('./events.ts');
   const addGameEventListener = __dep1.addGameEventListener;
   const __dep2 = __require('./modes/pve/session.ts');
@@ -9917,8 +9938,7 @@ __define('./main.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'onGameEvent')) exports.onGameEvent = onGameEvent;
 });
 __define('./meta.ts', (exports, module, __require) => {
-  //v0.8
-  // meta.ts — gom lookup + stat khởi tạo + nộ khởi điểm
+  //home (termux)/arclune_lane_7x3/src/meta.ts — gom lookup + stat khởi tạo + nộ khởi điểm
   const __dep0 = __require('./catalog.ts');
   const CLASS_BASE = __dep0.CLASS_BASE;
   const RANK_MULT = __dep0.RANK_MULT;
@@ -10073,6 +10093,7 @@ __define('./meta.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'initialRageFor')) exports.initialRageFor = initialRageFor;
 });
 __define('./modes/coming-soon.stub.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/modes/coming-soon.stub.ts
   const comingSoon = true;
   const COMING_SOON_MODULE = {
       comingSoon,
@@ -10082,7 +10103,7 @@ __define('./modes/coming-soon.stub.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'COMING_SOON_MODULE')) exports.COMING_SOON_MODULE = COMING_SOON_MODULE;
 });
 __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => {
-  //v0.7.7
+  //home (termux)/arclune_lane_7x3/src/modes/pve/session-runtime-impl.ts
   const __dep2 = __require('./turns.ts');
   const stepTurn = __dep2.stepTurn;
   const doActionOrSkip = __dep2.doActionOrSkip;
@@ -12875,6 +12896,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   if (!Object.prototype.hasOwnProperty.call(exports, '__getActiveGame')) exports.__getActiveGame = __getActiveGame;
 });
 __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/modes/pve/session-runtime.ts
   const __dep0 = __require('./events.ts');
   const gameEvents = __dep0.gameEvents;
   const emitGameEvent = __dep0.emitGameEvent;
@@ -13056,6 +13078,7 @@ __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'createPveSession')) exports.createPveSession = createPveSession;
 });
 __define('./modes/pve/session-state.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/modes/pve/session-state.ts
   const __dep0 = __require('./shared-types/units.ts');
   const createSummonQueue = __dep0.createSummonQueue;
   const __dep1 = __require('./config.ts');
@@ -13663,6 +13686,7 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeDeckEntries')) exports.normalizeDeckEntries = normalizeDeckEntries;
 });
 __define('./modes/pve/session.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/modes/pve/session.ts
   const __reexport0 = __require('./modes/pve/session-state.ts');
   for (const key of Object.keys(__reexport0)) {
     if (key === 'default') continue;
@@ -13678,7 +13702,7 @@ __define('./modes/pve/session.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
 });
 __define('./passives.ts', (exports, module, __require) => {
-  // passives.ts — passive event dispatch & helpers v0.7
+  //home (termux)/arclune_lane_7x3/src/passives.ts — passive event dispatch & helpers
   const __dep0 = __require('./statuses.ts');
   const Statuses = __dep0.Statuses;
   const hookOnLethalDamage = __dep0.hookOnLethalDamage;
@@ -14769,6 +14793,7 @@ __define('./scene.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'drawBattlefieldScene')) exports.drawBattlefieldScene = drawBattlefieldScene;
 });
 __define('./screens/arena-hub/index.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/screens/arena-hub/index.ts
   const __dep0 = __require('./ui/dom.ts');
   const ensureStyleTag = __dep0.ensureStyleTag;
   const mountSection = __dep0.mountSection;
@@ -14955,6 +14980,7 @@ __define('./screens/arena-hub/index.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
 });
 __define('./screens/collection/helpers.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/screens/collection/helpers.ts
   const __dep0 = __require('./catalog.ts');
   const ROSTER = __dep0.ROSTER;
   const __dep1 = __require('./units.ts');
@@ -15433,6 +15459,7 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureNumberFormatter')) exports.ensureNumberFormatter = ensureNumberFormatter;
 });
 __define('./screens/collection/index.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/screens/collection/index.ts
   const __dep1 = __require('./screens/collection/view.ts');
   const renderCollectionView = __dep1.renderCollectionView;
   const __dep2 = __require('./types/currency.ts');
@@ -15506,6 +15533,7 @@ __define('./screens/collection/index.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderCollectionScreen')) exports.renderCollectionScreen = renderCollectionScreen;
 });
 __define('./screens/collection/state.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/screens/collection/state.ts
   function createFilterState(initial) {
       return {
           activeTab: initial?.activeTab ?? 'awakening',
@@ -15524,10 +15552,12 @@ __define('./screens/collection/state.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'updateSelectedUnit')) exports.updateSelectedUnit = updateSelectedUnit;
 });
 __define('./screens/collection/types.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/screens/collection/types.ts
 
   //# sourceMappingURL=stdin.js.map
 });
 __define('./screens/collection/view.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/screens/collection/view.ts
   const __dep0 = __require('./art.ts');
   const getUnitArt = __dep0.getUnitArt;
   const __dep1 = __require('./utils/unit-id.ts');
@@ -16407,6 +16437,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderCollectionView')) exports.renderCollectionView = renderCollectionView;
 });
 __define('./screens/gacha/view.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/screens/gacha/view.ts
   const __dep0 = __require('./ui/dom.ts');
   const assertElement = __dep0.assertElement;
   const ensureStyleTag = __dep0.ensureStyleTag;
@@ -16590,6 +16621,7 @@ __define('./screens/gacha/view.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderGachaView')) exports.renderGachaView = renderGachaView;
 });
 __define('./screens/lineup/index.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/screens/lineup/index.ts
   const __dep1 = __require('./screens/lineup/view/index.ts');
   const renderLineupView = __dep1.renderLineupView;
   const __dep2 = __require('./types/currency.ts');
@@ -16736,6 +16768,7 @@ __define('./screens/lineup/index.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderLineupScreen')) exports.renderLineupScreen = renderLineupScreen;
 });
 __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/screens/lineup/view/event.ts
   const __dep0 = __require('./screens/lineup/view/state.ts');
   const assignUnitToCell = __dep0.assignUnitToCell;
   const removeUnitFromCell = __dep0.removeUnitFromCell;
@@ -17079,11 +17112,13 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'bindLineupEvents')) exports.bindLineupEvents = bindLineupEvents;
 });
 __define('./screens/lineup/view/index.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/screens/lineup/view/index.ts
   const __reexport0 = __require('./screens/lineup/view/render.ts');
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderLineupView')) exports.renderLineupView = __reexport0.renderLineupView;
 });
 __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/screens/lineup/view/render.ts
   const __dep0 = __require('./data/skills.ts');
   const getSkillSet = __dep0.getSkillSet;
   const __dep1 = __require('./utils/format.ts');
@@ -18135,6 +18170,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderLineupView')) exports.renderLineupView = renderLineupView;
 });
 __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/screens/lineup/view/stage.ts
   const __dep0 = __require('./catalog.ts');
   const ROSTER = __dep0.ROSTER;
   const __dep1 = __require('./utils/format.ts');
@@ -18756,6 +18792,7 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'setLeader')) exports.setLeader = setLeader;
 });
 __define('./screens/main-menu/dialogues.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/screens/main-menu/dialogues.ts
   const __dep0 = __require('./art.ts');
   const getUnitArt = __dep0.getUnitArt;
   const HERO_DEFAULT_ID = 'leaderA';
@@ -19073,10 +19110,12 @@ __define('./screens/main-menu/dialogues.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'listAvailableHeroes')) exports.listAvailableHeroes = listAvailableHeroes;
 });
 __define('./screens/main-menu/types.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/screens/main-menu/types.ts
 
   //# sourceMappingURL=stdin.js.map
 });
 __define('./screens/main-menu/view/events.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/screens/main-menu/view/events.ts
   const TONE_ICONS = {
       greeting: '✨',
       focus: '🎯',
@@ -19421,6 +19460,7 @@ __define('./screens/main-menu/view/events.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'createModeGroupCard')) exports.createModeGroupCard = createModeGroupCard;
 });
 __define('./screens/main-menu/view/index.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/screens/main-menu/view/index.ts
   const __dep1 = __require('./ui/dom.ts');
   const mountSection = __dep1.mountSection;
   const __dep2 = __require('./screens/main-menu/view/layout.ts');
@@ -19483,6 +19523,7 @@ __define('./screens/main-menu/view/index.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderMainMenuView')) exports.renderMainMenuView = renderMainMenuView;
 });
 __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/screens/main-menu/view/layout.ts
   const __dep0 = __require('./data/announcements.ts');
   const getAllSidebarAnnouncements = __dep0.getAllSidebarAnnouncements;
   const __dep1 = __require('./ui/dom.ts');
@@ -19715,11 +19756,12 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'createHeader')) exports.createHeader = createHeader;
 });
 __define('./screens/ui-gacha/gacha.css', (exports, module, __require) => {
-  const css = ":root {\n  color-scheme: dark;\n  font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;\n  --bg-page: #05090f;\n  --bg-panel: rgba(12, 18, 28, 0.88);\n  --bg-accent: rgba(16, 28, 42, 0.74);\n  --border-accent: rgba(120, 196, 255, 0.28);\n  --text-main: #e9f2ff;\n  --text-muted: rgba(192, 220, 244, 0.8);\n  --primary: #76d4ff;\n  --highlight: linear-gradient(135deg, rgba(118, 212, 255, 0.45), rgba(255, 154, 255, 0.4));\n  --rarity-n: #7b869a;\n  --rarity-r: #57a8ff;\n  --rarity-sr: #a47dff;\n  --rarity-ssr: #ffc866;\n  --rarity-ur: #ff6a9f;\n  --rarity-prime: #6cffeb;\n}\n\n* {\n  box-sizing: border-box;\n}\n\nbody.gacha-ui {\n  margin: 0;\n  min-height: 100vh;\n  background: radial-gradient(circle at top left, rgba(118, 212, 255, 0.18), transparent 45%),\n    radial-gradient(circle at bottom right, rgba(255, 154, 255, 0.2), transparent 50%), var(--bg-page);\n  color: var(--text-main);\n  display: flex;\n  justify-content: center;\n  padding: 32px;\n}\n\nbutton {\n  font-family: inherit;\n  color: inherit;\n}\n\n.gacha-topbar {\n  display: grid;\n  grid-template-columns: auto auto 1fr auto;\n  align-items: center;\n  gap: 16px;\n  padding: 16px 20px;\n  border-radius: 24px;\n  border: 1px solid var(--border-accent);\n  background: var(--bg-panel);\n  box-shadow: 0 18px 48px rgba(5, 12, 20, 0.45);\n}\n\n.gacha-topbar__back-button {\n  display: inline-flex;\n  align-items: center;\n  gap: 8px;\n  padding: 10px 18px;\n  border-radius: 999px;\n  border: 1px solid rgba(118, 212, 255, 0.32);\n  background: rgba(12, 18, 28, 0.78);\n  color: var(--text-main);\n  font-size: 14px;\n  font-weight: 600;\n  letter-spacing: 0.02em;\n  cursor: pointer;\n  text-decoration: none;\n  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease,\n    box-shadow 0.18s ease;\n}\n\n.gacha-topbar__back-button:hover,\n.gacha-topbar__back-button:focus-visible {\n  background: rgba(18, 28, 42, 0.92);\n  border-color: rgba(118, 212, 255, 0.68);\n  transform: translateY(-1px);\n  box-shadow: 0 0 0 3px rgba(118, 212, 255, 0.24);\n  outline: none;\n}\n\n.gacha-topbar__back-button:active {\n  background: rgba(10, 18, 30, 0.95);\n  border-color: rgba(118, 212, 255, 0.8);\n  transform: translateY(0);\n  box-shadow: 0 0 0 2px rgba(118, 212, 255, 0.18);\n}\n\n.gacha-ui-root {\n  width: min(1280px, 100%);\n  display: flex;\n  flex-direction: column;\n  gap: 24px;\n}\n\n.gacha-header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 16px;\n}\n\n.currency-bar {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));\n  gap: 12px;\n  background: var(--bg-panel);\n  padding: 14px 18px;\n  border-radius: 20px;\n  border: 1px solid var(--border-accent);\n  box-shadow: 0 18px 48px rgba(5, 12, 20, 0.45);\n}\n\n.currency-chip {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 12px;\n  padding: 10px 14px;\n  border-radius: 16px;\n  border: 1px solid transparent;\n  background: var(--bg-accent);\n  cursor: pointer;\n  transition: transform 0.16s ease, border-color 0.16s ease;\n}\n\n.currency-chip:hover,\n.currency-chip:focus-visible {\n  transform: translateY(-3px);\n  border-color: rgba(118, 212, 255, 0.65);\n  outline: none;\n}\n\n.currency-chip__icon {\n  width: 36px;\n  height: 36px;\n  border-radius: 50%;\n  background: rgba(118, 212, 255, 0.18);\n  display: grid;\n  place-items: center;\n}\n\n.currency-chip__icon img {\n  width: 24px;\n  height: 24px;\n}\n\n.currency-chip__info {\n  display: flex;\n  flex-direction: column;\n  align-items: flex-start;\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n  color: var(--text-muted);\n}\n\n.currency-chip__code {\n  font-weight: 600;\n  color: var(--text-main);\n}\n\n.currency-chip__value {\n  font-weight: 600;\n  font-variant-numeric: tabular-nums;\n}\n\n.rules-button {\n  padding: 12px 18px;\n  border-radius: 16px;\n  border: 1px solid rgba(118, 212, 255, 0.5);\n  background: rgba(10, 16, 24, 0.86);\n  cursor: pointer;\n  text-transform: uppercase;\n  letter-spacing: 0.12em;\n  font-size: 12px;\n}\n\n.gacha-body {\n  display: grid;\n  grid-template-columns: 280px 1fr;\n  gap: 24px;\n}\n\n.banner-sidebar {\n  background: var(--bg-panel);\n  border-radius: 24px;\n  border: 1px solid var(--border-accent);\n  padding: 18px;\n  display: flex;\n  flex-direction: column;\n  gap: 12px;\n  overflow-y: auto;\n  max-height: calc(100vh - 220px);\n}\n\n.banner-entry {\n  width: 100%;\n  text-align: left;\n  padding: 14px 16px;\n  border-radius: 18px;\n  border: 1px solid transparent;\n  background: rgba(16, 26, 40, 0.88);\n  cursor: pointer;\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n  transition: transform 0.18s ease, border-color 0.18s ease;\n}\n\n.banner-entry__title {;\n  font-weight: 600;\n}\n\n.banner-entry__timer {\n  font-size: 12px;\n  color: var(--text-muted);\n}\n\n.banner-entry:hover,\n.banner-entry:focus-visible {\n  transform: translateX(6px);\n  border-color: rgba(118, 212, 255, 0.6);\n  outline: none;\n}\n\n.banner-entry.is-active {\n  border-color: rgba(255, 154, 255, 0.65);\n  background: linear-gradient(135deg, rgba(118, 212, 255, 0.22), rgba(255, 154, 255, 0.16));\n}\n\n.banner-panel {\n  background: var(--bg-panel);\n  border-radius: 28px;\n  border: 1px solid var(--border-accent);\n  padding: 24px;\n  display: grid;\n  gap: 18px;\n  position: relative;\n  overflow: hidden;\n}\n\n.banner-panel__header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n}\n\n.banner-title {\n  margin: 0;\n  font-size: 26px;\n  letter-spacing: 0.04em;\n  text-transform: uppercase;\n}\n\n.banner-desc {\n  margin: 6px 0 0;\n  color: var(--text-muted);\n}\n\n.banner-timer {\n  font-size: 13px;\n  color: var(--primary);\n}\n\n.banner-panel__art {\n  border-radius: 22px;\n  background: rgba(10, 16, 24, 0.7);\n  overflow: hidden;\n  min-height: 180px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.banner-panel__art img {\n  width: 100%;\n  height: 100%;\n  object-fit: cover;\n  filter: saturate(120%);\n}\n\n.rate-list {\n  display: grid;\n  grid-template-columns: repeat(3, minmax(0, 1fr));\n  gap: 8px 16px;\n  margin: 0;\n}\n\n.hrate-list dt {\n  font-weight: 600;\n}\n\n.rate-list dd {\n  margin: 0;\n  color: var(--text-muted);\n}\n\n.banner-panel__pity {\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n}\n\n.pity-meter {\n  display: grid;\n  grid-template-columns: 80px 1fr 80px;\n  align-items: center;\n  gap: 12px;\n}\n\n.pity-meter__label {\n  font-size: 12px;\n  text-transform: uppercase;\n  color: var(--text-muted);\n}\n\n.pity-meter__bar {\n  position: relative;\n  height: 8px;\n  border-radius: 999px;\n  background: rgba(118, 212, 255, 0.15);\n  overflow: hidden;\n}\n\n.pity-meter__progress {\n  position: absolute;\n  inset: 0;\n  border-radius: 999px;\n  background: var(--highlight);\n}\n\n.pity-meter__value {\n  font-variant-numeric: tabular-nums;\n  justify-self: end;\n}\n\n.featured__heading {\n  margin: 0;\n  font-size: 16px;\n  letter-spacing: 0.08em;\n  text-transform: uppercase;\n}\n\n.featured__note {\n  margin: 2px 0 12px;\n  color: var(--text-muted);\n  font-size: 12px;\n}\n\n.featured-card {\n  display: flex;\n  gap: 10px;\n  align-items: center;\n  padding: 10px 14px;\n  border-radius: 16px;\n  background: rgba(20, 32, 48, 0.9);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n  font-weight: 600;\n}\n\n.featured-card + .featured-card {\n  margin-top: 8px;\n}\n\n.featured-card__rarity {\n  font-size: 13px;\n  padding: 4px 8px;\n  border-radius: 999px;\n  background: rgba(118, 212, 255, 0.18);\n}\n\n.featured-card__name {\n  font-size: 15px;\n}\n\n.banner-panel__cost {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));\n  gap: 12px;\n}\n\n.cost-entry {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding: 12px 14px;\n  border-radius: 16px;\n  background: rgba(20, 32, 48, 0.86);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n}\n\n.cost-entry__value {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  font-weight: 600;\n}\n\n.cost-entry__value img {\n  width: 18px;\n  height: 18px;\n}\n\n.banner-panel__actions {\n  display: flex;\n  gap: 12px;\n}\n\n.banner-panel__actions button {\n  flex: 1;\n  padding: 14px 18px;\n  border-radius: 18px;\n  border: 1px solid rgba(118, 212, 255, 0.45);\n  background: rgba(16, 28, 42, 0.9);\n  text-transform: uppercase;\n  letter-spacing: 0.12em;\n  cursor: pointer;\n  transition: transform 0.16s ease, border-color 0.16s ease;\n}\n\n.banner-panel__actions button:hover,\n.banner-panel__actions button:focus-visible {\n  transform: translateY(-2px);\n  border-color: rgba(255, 154, 255, 0.6);\n  outline: none;\n}\n\n.banner-panel__results {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));\n  gap: 10px;\n}\n\n.result-entry {\n  padding: 12px 14px;\n  border-radius: 16px;\n  background: rgba(16, 28, 42, 0.82);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n  display: grid;\n  gap: 6px;\n}\n\n.result-entry__rarity {\n  font-weight: 700;\n  text-transform: uppercase;\n}\n\n.result-entry__name {\n  color: var(--text-muted);\n}\n\n.result-entry__pity {\n  font-size: 12px;\n  color: var(--primary);\n}\n\n.modal-overlay {\n  position: fixed;\n  inset: 0;\n  backdrop-filter: blur(12px);\n  background: rgba(5, 10, 18, 0.68);\n  display: grid;\n  place-items: center;\n  z-index: 2000;\n}\n\n.modal-content {\n  width: min(420px, 92vw);\n  background: rgba(10, 16, 24, 0.92);\n  border-radius: 20px;\n  border: 1px solid rgba(118, 212, 255, 0.3);\n  padding: 24px;\n  color: var(--text-main);\n  box-shadow: 0 24px 64px rgba(5, 12, 20, 0.55);\n}\n\n.modal-content h2 {\n  margin-top: 0;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n}\n\n.modal-content ul {\n  margin: 12px 0 0;\n  padding-left: 20px;\n  color: var(--text-muted);\n}\n\n.gacha-toast {\n  position: fixed;\n  right: 24px;\n  bottom: 24px;\n  background: rgba(16, 28, 42, 0.92);\n  border-radius: 16px;\n  padding: 12px 18px;\n  border: 1px solid rgba(118, 212, 255, 0.35);\n  opacity: 0;\n  transform: translateY(12px);\n  transition: opacity 0.2s ease, transform 0.2s ease;\n  pointer-events: none;\n}\n\ngacha-toast.is-visible {\n  opacity: 1;\n  transform: translateY(0);\n}\n\n@media (max-width: 960px) {\n  .gacha-body {\n    grid-template-columns: 1fr;\n  }\n\n  .banner-sidebar {\n    flex-direction: row;\n    overflow-x: auto;\n    max-height: none;\n  }\n\n  .banner-entry {\n    min-width: 220px;\n  }\n}\n\n@media (max-width: 720px) {\n  body.gacha-ui {\n    padding: 24px 16px;\n}\n\n.currency-bar {\n    grid-template-columns: repeat(2, minmax(0, 1fr));\n  }\n}";
+  const css = "//home (termux)/arclune_lane_7x3/src/screens/ui-gacha/gacha.css\n\n:root {\n  color-scheme: dark;\n  font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;\n  --bg-page: #05090f;\n  --bg-panel: rgba(12, 18, 28, 0.88);\n  --bg-accent: rgba(16, 28, 42, 0.74);\n  --border-accent: rgba(120, 196, 255, 0.28);\n  --text-main: #e9f2ff;\n  --text-muted: rgba(192, 220, 244, 0.8);\n  --primary: #76d4ff;\n  --highlight: linear-gradient(135deg, rgba(118, 212, 255, 0.45), rgba(255, 154, 255, 0.4));\n  --rarity-n: #7b869a;\n  --rarity-r: #57a8ff;\n  --rarity-sr: #a47dff;\n  --rarity-ssr: #ffc866;\n  --rarity-ur: #ff6a9f;\n  --rarity-prime: #6cffeb;\n}\n\n* {\n  box-sizing: border-box;\n}\n\nbody.gacha-ui {\n  margin: 0;\n  min-height: 100vh;\n  background: radial-gradient(circle at top left, rgba(118, 212, 255, 0.18), transparent 45%),\n    radial-gradient(circle at bottom right, rgba(255, 154, 255, 0.2), transparent 50%), var(--bg-page);\n  color: var(--text-main);\n  display: flex;\n  justify-content: center;\n  padding: 32px;\n}\n\nbutton {\n  font-family: inherit;\n  color: inherit;\n}\n\n.gacha-topbar {\n  display: grid;\n  grid-template-columns: auto auto 1fr auto;\n  align-items: center;\n  gap: 16px;\n  padding: 16px 20px;\n  border-radius: 24px;\n  border: 1px solid var(--border-accent);\n  background: var(--bg-panel);\n  box-shadow: 0 18px 48px rgba(5, 12, 20, 0.45);\n}\n\n.gacha-topbar__back-button {\n  display: inline-flex;\n  align-items: center;\n  gap: 8px;\n  padding: 10px 18px;\n  border-radius: 999px;\n  border: 1px solid rgba(118, 212, 255, 0.32);\n  background: rgba(12, 18, 28, 0.78);\n  color: var(--text-main);\n  font-size: 14px;\n  font-weight: 600;\n  letter-spacing: 0.02em;\n  cursor: pointer;\n  text-decoration: none;\n  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease,\n    box-shadow 0.18s ease;\n}\n\n.gacha-topbar__back-button:hover,\n.gacha-topbar__back-button:focus-visible {\n  background: rgba(18, 28, 42, 0.92);\n  border-color: rgba(118, 212, 255, 0.68);\n  transform: translateY(-1px);\n  box-shadow: 0 0 0 3px rgba(118, 212, 255, 0.24);\n  outline: none;\n}\n\n.gacha-topbar__back-button:active {\n  background: rgba(10, 18, 30, 0.95);\n  border-color: rgba(118, 212, 255, 0.8);\n  transform: translateY(0);\n  box-shadow: 0 0 0 2px rgba(118, 212, 255, 0.18);\n}\n\n.gacha-ui-root {\n  width: min(1280px, 100%);\n  display: flex;\n  flex-direction: column;\n  gap: 24px;\n}\n\n.gacha-header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 16px;\n}\n\n.currency-bar {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));\n  gap: 12px;\n  background: var(--bg-panel);\n  padding: 14px 18px;\n  border-radius: 20px;\n  border: 1px solid var(--border-accent);\n  box-shadow: 0 18px 48px rgba(5, 12, 20, 0.45);\n}\n\n.currency-chip {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 12px;\n  padding: 10px 14px;\n  border-radius: 16px;\n  border: 1px solid transparent;\n  background: var(--bg-accent);\n  cursor: pointer;\n  transition: transform 0.16s ease, border-color 0.16s ease;\n}\n\n.currency-chip:hover,\n.currency-chip:focus-visible {\n  transform: translateY(-3px);\n  border-color: rgba(118, 212, 255, 0.65);\n  outline: none;\n}\n\n.currency-chip__icon {\n  width: 36px;\n  height: 36px;\n  border-radius: 50%;\n  background: rgba(118, 212, 255, 0.18);\n  display: grid;\n  place-items: center;\n}\n\n.currency-chip__icon img {\n  width: 24px;\n  height: 24px;\n}\n\n.currency-chip__info {\n  display: flex;\n  flex-direction: column;\n  align-items: flex-start;\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n  color: var(--text-muted);\n}\n\n.currency-chip__code {\n  font-weight: 600;\n  color: var(--text-main);\n}\n\n.currency-chip__value {\n  font-weight: 600;\n  font-variant-numeric: tabular-nums;\n}\n\n.rules-button {\n  padding: 12px 18px;\n  border-radius: 16px;\n  border: 1px solid rgba(118, 212, 255, 0.5);\n  background: rgba(10, 16, 24, 0.86);\n  cursor: pointer;\n  text-transform: uppercase;\n  letter-spacing: 0.12em;\n  font-size: 12px;\n}\n\n.gacha-body {\n  display: grid;\n  grid-template-columns: 280px 1fr;\n  gap: 24px;\n}\n\n.banner-sidebar {\n  background: var(--bg-panel);\n  border-radius: 24px;\n  border: 1px solid var(--border-accent);\n  padding: 18px;\n  display: flex;\n  flex-direction: column;\n  gap: 12px;\n  overflow-y: auto;\n  max-height: calc(100vh - 220px);\n}\n\n.banner-entry {\n  width: 100%;\n  text-align: left;\n  padding: 14px 16px;\n  border-radius: 18px;\n  border: 1px solid transparent;\n  background: rgba(16, 26, 40, 0.88);\n  cursor: pointer;\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n  transition: transform 0.18s ease, border-color 0.18s ease;\n}\n\n.banner-entry__title {;\n  font-weight: 600;\n}\n\n.banner-entry__timer {\n  font-size: 12px;\n  color: var(--text-muted);\n}\n\n.banner-entry:hover,\n.banner-entry:focus-visible {\n  transform: translateX(6px);\n  border-color: rgba(118, 212, 255, 0.6);\n  outline: none;\n}\n\n.banner-entry.is-active {\n  border-color: rgba(255, 154, 255, 0.65);\n  background: linear-gradient(135deg, rgba(118, 212, 255, 0.22), rgba(255, 154, 255, 0.16));\n}\n\n.banner-panel {\n  background: var(--bg-panel);\n  border-radius: 28px;\n  border: 1px solid var(--border-accent);\n  padding: 24px;\n  display: grid;\n  gap: 18px;\n  position: relative;\n  overflow: hidden;\n}\n\n.banner-panel__header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n}\n\n.banner-title {\n  margin: 0;\n  font-size: 26px;\n  letter-spacing: 0.04em;\n  text-transform: uppercase;\n}\n\n.banner-desc {\n  margin: 6px 0 0;\n  color: var(--text-muted);\n}\n\n.banner-timer {\n  font-size: 13px;\n  color: var(--primary);\n}\n\n.banner-panel__art {\n  border-radius: 22px;\n  background: rgba(10, 16, 24, 0.7);\n  overflow: hidden;\n  min-height: 180px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.banner-panel__art img {\n  width: 100%;\n  height: 100%;\n  object-fit: cover;\n  filter: saturate(120%);\n}\n\n.rate-list {\n  display: grid;\n  grid-template-columns: repeat(3, minmax(0, 1fr));\n  gap: 8px 16px;\n  margin: 0;\n}\n\n.hrate-list dt {\n  font-weight: 600;\n}\n\n.rate-list dd {\n  margin: 0;\n  color: var(--text-muted);\n}\n\n.banner-panel__pity {\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n}\n\n.pity-meter {\n  display: grid;\n  grid-template-columns: 80px 1fr 80px;\n  align-items: center;\n  gap: 12px;\n}\n\n.pity-meter__label {\n  font-size: 12px;\n  text-transform: uppercase;\n  color: var(--text-muted);\n}\n\n.pity-meter__bar {\n  position: relative;\n  height: 8px;\n  border-radius: 999px;\n  background: rgba(118, 212, 255, 0.15);\n  overflow: hidden;\n}\n\n.pity-meter__progress {\n  position: absolute;\n  inset: 0;\n  border-radius: 999px;\n  background: var(--highlight);\n}\n\n.pity-meter__value {\n  font-variant-numeric: tabular-nums;\n  justify-self: end;\n}\n\n.featured__heading {\n  margin: 0;\n  font-size: 16px;\n  letter-spacing: 0.08em;\n  text-transform: uppercase;\n}\n\n.featured__note {\n  margin: 2px 0 12px;\n  color: var(--text-muted);\n  font-size: 12px;\n}\n\n.featured-card {\n  display: flex;\n  gap: 10px;\n  align-items: center;\n  padding: 10px 14px;\n  border-radius: 16px;\n  background: rgba(20, 32, 48, 0.9);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n  font-weight: 600;\n}\n\n.featured-card + .featured-card {\n  margin-top: 8px;\n}\n\n.featured-card__rarity {\n  font-size: 13px;\n  padding: 4px 8px;\n  border-radius: 999px;\n  background: rgba(118, 212, 255, 0.18);\n}\n\n.featured-card__name {\n  font-size: 15px;\n}\n\n.banner-panel__cost {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));\n  gap: 12px;\n}\n\n.cost-entry {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding: 12px 14px;\n  border-radius: 16px;\n  background: rgba(20, 32, 48, 0.86);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n}\n\n.cost-entry__value {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  font-weight: 600;\n}\n\n.cost-entry__value img {\n  width: 18px;\n  height: 18px;\n}\n\n.banner-panel__actions {\n  display: flex;\n  gap: 12px;\n}\n\n.banner-panel__actions button {\n  flex: 1;\n  padding: 14px 18px;\n  border-radius: 18px;\n  border: 1px solid rgba(118, 212, 255, 0.45);\n  background: rgba(16, 28, 42, 0.9);\n  text-transform: uppercase;\n  letter-spacing: 0.12em;\n  cursor: pointer;\n  transition: transform 0.16s ease, border-color 0.16s ease;\n}\n\n.banner-panel__actions button:hover,\n.banner-panel__actions button:focus-visible {\n  transform: translateY(-2px);\n  border-color: rgba(255, 154, 255, 0.6);\n  outline: none;\n}\n\n.banner-panel__results {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));\n  gap: 10px;\n}\n\n.result-entry {\n  padding: 12px 14px;\n  border-radius: 16px;\n  background: rgba(16, 28, 42, 0.82);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n  display: grid;\n  gap: 6px;\n}\n\n.result-entry__rarity {\n  font-weight: 700;\n  text-transform: uppercase;\n}\n\n.result-entry__name {\n  color: var(--text-muted);\n}\n\n.result-entry__pity {\n  font-size: 12px;\n  color: var(--primary);\n}\n\n.modal-overlay {\n  position: fixed;\n  inset: 0;\n  backdrop-filter: blur(12px);\n  background: rgba(5, 10, 18, 0.68);\n  display: grid;\n  place-items: center;\n  z-index: 2000;\n}\n\n.modal-content {\n  width: min(420px, 92vw);\n  background: rgba(10, 16, 24, 0.92);\n  border-radius: 20px;\n  border: 1px solid rgba(118, 212, 255, 0.3);\n  padding: 24px;\n  color: var(--text-main);\n  box-shadow: 0 24px 64px rgba(5, 12, 20, 0.55);\n}\n\n.modal-content h2 {\n  margin-top: 0;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n}\n\n.modal-content ul {\n  margin: 12px 0 0;\n  padding-left: 20px;\n  color: var(--text-muted);\n}\n\n.gacha-toast {\n  position: fixed;\n  right: 24px;\n  bottom: 24px;\n  background: rgba(16, 28, 42, 0.92);\n  border-radius: 16px;\n  padding: 12px 18px;\n  border: 1px solid rgba(118, 212, 255, 0.35);\n  opacity: 0;\n  transform: translateY(12px);\n  transition: opacity 0.2s ease, transform 0.2s ease;\n  pointer-events: none;\n}\n\ngacha-toast.is-visible {\n  opacity: 1;\n  transform: translateY(0);\n}\n\n@media (max-width: 960px) {\n  .gacha-body {\n    grid-template-columns: 1fr;\n  }\n\n  .banner-sidebar {\n    flex-direction: row;\n    overflow-x: auto;\n    max-height: none;\n  }\n\n  .banner-entry {\n    min-width: 220px;\n  }\n}\n\n@media (max-width: 720px) {\n  body.gacha-ui {\n    padding: 24px 16px;\n}\n\n.currency-bar {\n    grid-template-columns: repeat(2, minmax(0, 1fr));\n  }\n}";
   module.exports = css;
   module.exports.default = css;
 });
 __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/screens/ui-gacha/gacha.ts
   const __dep0 = __require('./screens/ui-gacha/logic/config.ts');
   const CURRENCY_LABELS = __dep0.CURRENCY_LABELS;
   const createWallet = __dep0.createWallet;
@@ -20124,6 +20166,7 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'mountGachaUI')) exports.mountGachaUI = mountGachaUI;
 });
 __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/screens/ui-gacha/index.ts
   const __dep0 = __require('./screens/ui-gacha/gacha.css');
   const gachaStyles = __dep0.default ?? __dep0;
   const __dep1 = __require('./ui/dom.ts');
@@ -20479,6 +20522,7 @@ __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
 });
 __define('./screens/ui-gacha/logic/config.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/screens/ui-gacha/logic/config.ts
   const __dep0 = __require('./screens/ui-gacha/logic/types.ts');
   const CURRENCY_ORDER = __dep0.CURRENCY_ORDER;
   const DEFAULT_WALLET = {
@@ -20582,6 +20626,7 @@ __define('./screens/ui-gacha/logic/config.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'createWallet')) exports.createWallet = createWallet;
 });
 __define('./screens/ui-gacha/logic/currency.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/screens/ui-gacha/logic/currency.ts
   const __dep0 = __require('./screens/ui-gacha/logic/types.ts');
   const CURRENCY_ORDER = __dep0.CURRENCY_ORDER;
   const __dep1 = __require('./utils/currency.ts');
@@ -20877,6 +20922,7 @@ __define('./screens/ui-gacha/logic/currency.ts', (exports, module, __require) =>
   if (!Object.prototype.hasOwnProperty.call(exports, 'payForRoll')) exports.payForRoll = payForRoll;
 });
 __define('./screens/ui-gacha/logic/gacha.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/screens/ui-gacha/logic/gacha.ts
   const __dep0 = __require('./screens/ui-gacha/logic/config.ts');
   const GACHA_CONFIG = __dep0.GACHA_CONFIG;
   const __dep1 = __require('./screens/ui-gacha/logic/pity.ts');
@@ -20917,6 +20963,7 @@ __define('./screens/ui-gacha/logic/gacha.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'getBannerById')) exports.getBannerById = getBannerById;
 });
 __define('./screens/ui-gacha/logic/pity.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/screens/ui-gacha/logic/pity.ts
   const __dep0 = __require('./screens/ui-gacha/logic/types.ts');
   const RARITY_ORDER = __dep0.RARITY_ORDER;
   const RARITY_INDEX = new Map(RARITY_ORDER.map((rarity, index) => [rarity, index]));
@@ -21122,6 +21169,7 @@ __define('./screens/ui-gacha/logic/pity.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyRoll')) exports.applyRoll = applyRoll;
 });
 __define('./screens/ui-gacha/logic/types.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/screens/ui-gacha/logic/types.ts
   const __dep0 = __require('./utils/currency.ts');
   const getCurrencyOrder = __dep0.getCurrencyOrder;
   const CURRENCY_ORDER = getCurrencyOrder();
@@ -21131,6 +21179,7 @@ __define('./screens/ui-gacha/logic/types.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'RARITY_ORDER')) exports.RARITY_ORDER = RARITY_ORDER;
 });
 __define('./shared-types/units.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/shared-types/units.ts
   const __reexport0 = __require('./types/units.ts');
   for (const key of Object.keys(__reexport0)) {
     if (key === 'default') continue;
@@ -21140,6 +21189,7 @@ __define('./shared-types/units.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
 });
 __define('./statuses.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/statuses.ts
   const __dep0 = __require('./combat/apply-damage.ts');
   const applyDamage = __dep0.applyDamage;
   const __dep1 = __require('./utils/fury.ts');
@@ -21541,7 +21591,7 @@ __define('./statuses.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'hookOnLethalDamage')) exports.hookOnLethalDamage = hookOnLethalDamage;
 });
 __define('./summon.ts', (exports, module, __require) => {
-  // v0.7.3
+  //home (termux)/arclune_lane_7x3/src/summon.ts
   const __dep0 = __require('./engine.ts');
   const slotToCell = __dep0.slotToCell;
   const cellReserved = __dep0.cellReserved;
@@ -21684,7 +21734,7 @@ __define('./summon.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'processActionChain')) exports.processActionChain = processActionChain;
 });
 __define('./turns.ts', (exports, module, __require) => {
-  // v0.7.4
+  //home (termux)/arclune_lane_7x3/src/turn.ts
   const __dep0 = __require('./engine.ts');
   const slotToCell = __dep0.slotToCell;
   const slotIndex = __dep0.slotIndex;
@@ -22309,7 +22359,7 @@ __define('./turns.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'stepTurn')) exports.stepTurn = stepTurn;
 });
 __define('./turns/interleaved.ts', (exports, module, __require) => {
-  // v0.7.7 interleaved helpers
+  //home (termux)/arclune_lane_7x3/src/turns/interleaved.ts
   const __dep0 = __require('./engine.ts');
   const slotIndex = __dep0.slotIndex;
   const __dep1 = __require('./statuses.ts');
@@ -22568,7 +22618,7 @@ __define('./types/vfx.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
 });
 __define('./ui.ts', (exports, module, __require) => {
-  // v0.7.1
+  //home (termux)/arclune_lane_7x3/src/ui.ts
   const __dep0 = __require('./config.ts');
   const CFG = __dep0.CFG;
   const __dep1 = __require('./events.ts');
@@ -22876,6 +22926,7 @@ __define('./ui.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'startSummonBar')) exports.startSummonBar = startSummonBar;
 });
 __define('./ui/dom.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/ui/dom.ts
   const DEFAULT_ASSERT_MESSAGE = 'Cần một phần tử DOM hợp lệ.';
   function assertElement(value, options) {
       const message = typeof options === 'string'
@@ -22978,11 +23029,12 @@ __define('./ui/dom.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'mountSection')) exports.mountSection = mountSection;
 });
 __define('./ui/rarity/rarity.css', (exports, module, __require) => {
-  const css = ".rarity-aura {\n  position: absolute;\n  inset: 0;\n  pointer-events: none;\n  border-radius: inherit;\n  contain: layout style paint;\n  display: block;\n  z-index: 1;\n  --rarity-color: #ffffff;\n  --rarity-ring-scale: 1;\n  --rarity-glow-base: 1;\n  --rarity-glow-low: calc(var(--rarity-glow-base) * 0.7);\n  --rarity-glow-active: var(--rarity-glow-base);\n  --rarity-spark-count: 0;\n  --rarity-ring-opacity: 0.85;\n  --rarity-glow-opacity: 0.65;\n  --rarity-glow-scale: 1;\n  --rarity-glow-blur: calc(9px * var(--rarity-glow-active));\n  --rarity-shimmer-period: 6s;\n  --rarity-shimmer-delay: 0s;\n  --rarity-sweep-opacity: 0.65;\n}\n\nbody.low-power .rarity-aura {\n  --rarity-glow-active: var(--rarity-glow-low);\n  --rarity-spark-count: 0;\n  --rarity-sweep-opacity: 0;\n}\n\n.rarity-aura.is-rounded {\n  border-radius: 9999px;\n}\n\n.rarity-aura .ring,\n.rarity-aura .glow,\n.rarity-aura .sweep,\n.rarity-aura .spark-layer,\n.rarity-aura .badge {\n  position: absolute;\n  inset: 0;\n  border-radius: inherit;\n  pointer-events: none;\n}\n\n.rarity-aura .ring {\n  box-shadow: 0 0 0 2px var(--rarity-color) inset, 0 0 0 1px rgba(0, 0, 0, 0.35);\n  opacity: var(--rarity-ring-opacity);\n  transform: scale(var(--rarity-ring-scale));\n  transition: transform 0.3s ease, opacity 0.3s ease;\n}\n\n.rarity-aura .glow {\n  background: radial-gradient(62% 62% at 50% 50%, color-mix(in srgb, var(--rarity-color) 65%, transparent), transparent 72%);\n  filter: blur(var(--rarity-glow-blur));\n  opacity: var(--rarity-glow-opacity);\n  transform: scale(var(--rarity-glow-scale));\n  transition: opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease;\n}\n\n.rarity-aura .badge {\n  inset: auto auto 6px 6px;\n  width: auto;\n  padding: 2px 6px;\n  font-weight: 700;\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.5px;\n  border-radius: 8px;\n  background: rgba(0, 0, 0, 0.35);\n  color: #fff;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  min-width: 36px;\n  pointer-events: none;\n}\n\n.rarity-aura[data-variant=\"deck\"] .badge {\n  display: none;\n}\n\n.rarity-aura[data-variant=\"gacha\"] .badge {\n  font-size: 14px;\n}\n\n.rarity-aura .spark-layer {\n  display: none;\n  overflow: visible;\n}\n\n.rarity-aura .spark {\n  position: absolute;\n  width: 6px;\n  height: 18px;\n  border-radius: 999px;\n  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0));\n  opacity: 0;\n  transform-origin: center;\n  animation: spark-flare var(--spark-duration, 900ms) ease-out var(--spark-delay, 0ms) forwards;\n}\n\n.rarity-aura.has-spark .spark-layer {\n  display: block;\n}\n\n@keyframes spark-flare {\n  0% {\n    opacity: 0;\n    transform: translate(var(--spark-x, 0), var(--spark-y, 0)) scale(0.6) rotate(0deg);\n  }\n  10% {\n    opacity: 1;\n  }\n  50% {\n    opacity: 0.75;\n  }\n  100% {\n    opacity: 0;\n    transform: translate(var(--spark-x, 0), var(--spark-y, 0)) scale(1.2) rotate(12deg);\n  }\n}\n\n.rarity-aura .sweep {\n  display: none;\n  overflow: hidden;\n  opacity: var(--rarity-sweep-opacity);\n}\n\n.rarity-aura.prism .sweep {\n  mix-blend-mode: screen;\n}\n\n.rarity-aura .sweep::before {\n  content: \"\";\n  position: absolute;\n  inset: -12%;\n  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0));\n  transform: translateX(-120%) skewX(-10deg);\n  filter: blur(2px);\n  animation: sweep 1.4s ease-in-out var(--sweep-delay, 0ms) 1;\n}\n\n.rarity-aura.has-sweep .sweep {\n  display: block;\n}\n\n.rarity-aura.prism::after {\n  content: \"\";\n  position: absolute;\n  inset: -3px;\n  border-radius: inherit;\n  mix-blend-mode: screen;\n  opacity: 0.9;\n  background: linear-gradient(90deg, #ff7ab6, #ffffff, #7ecbff, #f8d66d, #ff7ab6);\n  animation: prism-cycle 2.4s linear infinite;\n}\n\nbody.low-power .rarity-aura.prism::after {\n  display: none;\n}\n\n@keyframes sweep {\n  from {\n    transform: translateX(-120%) skewX(-8deg);\n  }\n  to {\n    transform: translateX(120%) skewX(-8deg);\n  }\n}\n\n@keyframes prism-cycle {\n  0% {\n    transform: rotate(0deg);\n  }\n  100% {\n    transform: rotate(360deg);\n  }\n}\n\n@keyframes shimmer-cycle {\n  0% {\n    opacity: var(--rarity-glow-opacity);\n  }\n  6% {\n    opacity: calc(var(--rarity-glow-opacity) + 0.2);\n  }\n  12% {\n    opacity: var(--rarity-glow-opacity);\n  }\n  100% {\n    opacity: var(--rarity-glow-opacity);\n  }\n}\n\n.rarity-aura[data-variant=\"deck\"] .glow {\n  --rarity-shimmer-period: 6s;\n  animation: shimmer-cycle var(--rarity-shimmer-period) ease-in-out infinite;\n}\n\n.rarity-aura[data-variant=\"collection\"] .glow {\n  --rarity-shimmer-period: 10s;\n  animation: shimmer-cycle var(--rarity-shimmer-period) ease-in-out infinite;\n}\n\n.rarity-aura[data-variant=\"gacha\"] .glow {\n  animation: none;\n}\n\n.rarity-aura.is-pre .ring {\n  opacity: 0.4;\n}\n\n.rarity-aura.is-pre .glow {\n  opacity: calc(var(--rarity-glow-opacity) * 0.5);\n  transform: scale(0.92);\n}\n\n.rarity-aura.is-bloom .ring {\n  transform: scale(calc(var(--rarity-ring-scale) * 1.08));\n}\n\n.rarity-aura.is-bloom .glow {\n  opacity: min(1, calc(var(--rarity-glow-opacity) * 1.2));\n  transform: scale(1.08);\n}\n\n.rarity-aura.is-reveal .ring {\n  transform: scale(var(--rarity-ring-scale));\n  opacity: var(--rarity-ring-opacity);\n}\n\n.rarity-aura.is-reveal .glow {\n  opacity: var(--rarity-glow-opacity);\n  transform: scale(1);\n}\n\n.rarity-aura.has-sweep.is-reveal .sweep::before {\n  animation-play-state: running;\n}\n\nbody.low-power .rarity-aura.has-sweep .sweep::before {\n  display: none;\n}\n\nbody.low-power .rarity-aura.has-spark .spark-layer {\n  display: none;\n}\n\n.rarity-N {\n  --rarity-color: #9AA3AF;\n}\n\n.rarity-R {\n  --rarity-color: #2ED3A0;\n}\n\n.rarity-SR {\n  --rarity-color: #00E5FF;\n}\n\n.rarity-SSR {\n  --rarity-color: #7C4DFF;\n}\n\n.rarity-UR {\n  --rarity-color: #FFD773;\n}\n\n.rarity-PRIME {\n  --rarity-color: #FFFFFF;\n}\n\n.rarity-aura[data-variant=\"deck\"],\n.rarity-aura[data-variant=\"collection\"] {\n  mix-blend-mode: normal;\n}\n\n.rarity-aura[data-variant=\"gacha\"] {\n  mix-blend-mode: normal;\n}\n\n.rarity-aura.is-muted .ring,\n.rarity-aura.is-muted .glow {\n  opacity: 0;\n}\n\n.rarity-aura.has-sweep .sweep::before {\n  animation-duration: 1.6s;\n}\n\n.rarity-aura[data-variant=\"gacha\"].has-sweep .sweep::before {\n  animation-duration: 1.8s;\n}\n\n.rarity-aura[data-variant=\"gacha\"].prism.has-sweep .sweep::before {\n  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0));\n}\n\n.rarity-aura[data-variant=\"collection\"] .ring {\n  opacity: 0.7;\n}\n\n.rarity-aura[data-variant=\"collection\"] .glow {\n  filter: blur(calc(8px * var(--rarity-glow-active)));\n}\n\n.rarity-aura[data-variant=\"deck\"] .ring {\n  opacity: 0.75;\n}\n\n.rarity-aura[data-variant=\"deck\"] .glow {\n  filter: blur(calc(7px * var(--rarity-glow-active)));\n}\n\n.rarity-aura[data-variant=\"deck\"].is-hovered .glow,\n.rarity-aura[data-variant=\"deck\"].is-selected .glow {\n  opacity: min(1, calc(var(--rarity-glow-opacity) * 1.2));\n}\n\n.rarity-aura[data-variant=\"collection\"].has-sweep .sweep,\n.rarity-aura[data-variant=\"deck\"].has-sweep .sweep {\n  display: none;\n}\n\nbody.low-power .rarity-aura.is-bloom .glow {\n  transform: scale(1.02);\n}";
+  const css = "//home (termux)/arclune_lane_7x3/src/ui/rarity/rarity.css\n\n.rarity-aura {\n  position: absolute;\n  inset: 0;\n  pointer-events: none;\n  border-radius: inherit;\n  contain: layout style paint;\n  display: block;\n  z-index: 1;\n  --rarity-color: #ffffff;\n  --rarity-ring-scale: 1;\n  --rarity-glow-base: 1;\n  --rarity-glow-low: calc(var(--rarity-glow-base) * 0.7);\n  --rarity-glow-active: var(--rarity-glow-base);\n  --rarity-spark-count: 0;\n  --rarity-ring-opacity: 0.85;\n  --rarity-glow-opacity: 0.65;\n  --rarity-glow-scale: 1;\n  --rarity-glow-blur: calc(9px * var(--rarity-glow-active));\n  --rarity-shimmer-period: 6s;\n  --rarity-shimmer-delay: 0s;\n  --rarity-sweep-opacity: 0.65;\n}\n\nbody.low-power .rarity-aura {\n  --rarity-glow-active: var(--rarity-glow-low);\n  --rarity-spark-count: 0;\n  --rarity-sweep-opacity: 0;\n}\n\n.rarity-aura.is-rounded {\n  border-radius: 9999px;\n}\n\n.rarity-aura .ring,\n.rarity-aura .glow,\n.rarity-aura .sweep,\n.rarity-aura .spark-layer,\n.rarity-aura .badge {\n  position: absolute;\n  inset: 0;\n  border-radius: inherit;\n  pointer-events: none;\n}\n\n.rarity-aura .ring {\n  box-shadow: 0 0 0 2px var(--rarity-color) inset, 0 0 0 1px rgba(0, 0, 0, 0.35);\n  opacity: var(--rarity-ring-opacity);\n  transform: scale(var(--rarity-ring-scale));\n  transition: transform 0.3s ease, opacity 0.3s ease;\n}\n\n.rarity-aura .glow {\n  background: radial-gradient(62% 62% at 50% 50%, color-mix(in srgb, var(--rarity-color) 65%, transparent), transparent 72%);\n  filter: blur(var(--rarity-glow-blur));\n  opacity: var(--rarity-glow-opacity);\n  transform: scale(var(--rarity-glow-scale));\n  transition: opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease;\n}\n\n.rarity-aura .badge {\n  inset: auto auto 6px 6px;\n  width: auto;\n  padding: 2px 6px;\n  font-weight: 700;\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.5px;\n  border-radius: 8px;\n  background: rgba(0, 0, 0, 0.35);\n  color: #fff;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  min-width: 36px;\n  pointer-events: none;\n}\n\n.rarity-aura[data-variant=\"deck\"] .badge {\n  display: none;\n}\n\n.rarity-aura[data-variant=\"gacha\"] .badge {\n  font-size: 14px;\n}\n\n.rarity-aura .spark-layer {\n  display: none;\n  overflow: visible;\n}\n\n.rarity-aura .spark {\n  position: absolute;\n  width: 6px;\n  height: 18px;\n  border-radius: 999px;\n  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0));\n  opacity: 0;\n  transform-origin: center;\n  animation: spark-flare var(--spark-duration, 900ms) ease-out var(--spark-delay, 0ms) forwards;\n}\n\n.rarity-aura.has-spark .spark-layer {\n  display: block;\n}\n\n@keyframes spark-flare {\n  0% {\n    opacity: 0;\n    transform: translate(var(--spark-x, 0), var(--spark-y, 0)) scale(0.6) rotate(0deg);\n  }\n  10% {\n    opacity: 1;\n  }\n  50% {\n    opacity: 0.75;\n  }\n  100% {\n    opacity: 0;\n    transform: translate(var(--spark-x, 0), var(--spark-y, 0)) scale(1.2) rotate(12deg);\n  }\n}\n\n.rarity-aura .sweep {\n  display: none;\n  overflow: hidden;\n  opacity: var(--rarity-sweep-opacity);\n}\n\n.rarity-aura.prism .sweep {\n  mix-blend-mode: screen;\n}\n\n.rarity-aura .sweep::before {\n  content: \"\";\n  position: absolute;\n  inset: -12%;\n  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0));\n  transform: translateX(-120%) skewX(-10deg);\n  filter: blur(2px);\n  animation: sweep 1.4s ease-in-out var(--sweep-delay, 0ms) 1;\n}\n\n.rarity-aura.has-sweep .sweep {\n  display: block;\n}\n\n.rarity-aura.prism::after {\n  content: \"\";\n  position: absolute;\n  inset: -3px;\n  border-radius: inherit;\n  mix-blend-mode: screen;\n  opacity: 0.9;\n  background: linear-gradient(90deg, #ff7ab6, #ffffff, #7ecbff, #f8d66d, #ff7ab6);\n  animation: prism-cycle 2.4s linear infinite;\n}\n\nbody.low-power .rarity-aura.prism::after {\n  display: none;\n}\n\n@keyframes sweep {\n  from {\n    transform: translateX(-120%) skewX(-8deg);\n  }\n  to {\n    transform: translateX(120%) skewX(-8deg);\n  }\n}\n\n@keyframes prism-cycle {\n  0% {\n    transform: rotate(0deg);\n  }\n  100% {\n    transform: rotate(360deg);\n  }\n}\n\n@keyframes shimmer-cycle {\n  0% {\n    opacity: var(--rarity-glow-opacity);\n  }\n  6% {\n    opacity: calc(var(--rarity-glow-opacity) + 0.2);\n  }\n  12% {\n    opacity: var(--rarity-glow-opacity);\n  }\n  100% {\n    opacity: var(--rarity-glow-opacity);\n  }\n}\n\n.rarity-aura[data-variant=\"deck\"] .glow {\n  --rarity-shimmer-period: 6s;\n  animation: shimmer-cycle var(--rarity-shimmer-period) ease-in-out infinite;\n}\n\n.rarity-aura[data-variant=\"collection\"] .glow {\n  --rarity-shimmer-period: 10s;\n  animation: shimmer-cycle var(--rarity-shimmer-period) ease-in-out infinite;\n}\n\n.rarity-aura[data-variant=\"gacha\"] .glow {\n  animation: none;\n}\n\n.rarity-aura.is-pre .ring {\n  opacity: 0.4;\n}\n\n.rarity-aura.is-pre .glow {\n  opacity: calc(var(--rarity-glow-opacity) * 0.5);\n  transform: scale(0.92);\n}\n\n.rarity-aura.is-bloom .ring {\n  transform: scale(calc(var(--rarity-ring-scale) * 1.08));\n}\n\n.rarity-aura.is-bloom .glow {\n  opacity: min(1, calc(var(--rarity-glow-opacity) * 1.2));\n  transform: scale(1.08);\n}\n\n.rarity-aura.is-reveal .ring {\n  transform: scale(var(--rarity-ring-scale));\n  opacity: var(--rarity-ring-opacity);\n}\n\n.rarity-aura.is-reveal .glow {\n  opacity: var(--rarity-glow-opacity);\n  transform: scale(1);\n}\n\n.rarity-aura.has-sweep.is-reveal .sweep::before {\n  animation-play-state: running;\n}\n\nbody.low-power .rarity-aura.has-sweep .sweep::before {\n  display: none;\n}\n\nbody.low-power .rarity-aura.has-spark .spark-layer {\n  display: none;\n}\n\n.rarity-N {\n  --rarity-color: #9AA3AF;\n}\n\n.rarity-R {\n  --rarity-color: #2ED3A0;\n}\n\n.rarity-SR {\n  --rarity-color: #00E5FF;\n}\n\n.rarity-SSR {\n  --rarity-color: #7C4DFF;\n}\n\n.rarity-UR {\n  --rarity-color: #FFD773;\n}\n\n.rarity-PRIME {\n  --rarity-color: #FFFFFF;\n}\n\n.rarity-aura[data-variant=\"deck\"],\n.rarity-aura[data-variant=\"collection\"] {\n  mix-blend-mode: normal;\n}\n\n.rarity-aura[data-variant=\"gacha\"] {\n  mix-blend-mode: normal;\n}\n\n.rarity-aura.is-muted .ring,\n.rarity-aura.is-muted .glow {\n  opacity: 0;\n}\n\n.rarity-aura.has-sweep .sweep::before {\n  animation-duration: 1.6s;\n}\n\n.rarity-aura[data-variant=\"gacha\"].has-sweep .sweep::before {\n  animation-duration: 1.8s;\n}\n\n.rarity-aura[data-variant=\"gacha\"].prism.has-sweep .sweep::before {\n  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0));\n}\n\n.rarity-aura[data-variant=\"collection\"] .ring {\n  opacity: 0.7;\n}\n\n.rarity-aura[data-variant=\"collection\"] .glow {\n  filter: blur(calc(8px * var(--rarity-glow-active)));\n}\n\n.rarity-aura[data-variant=\"deck\"] .ring {\n  opacity: 0.75;\n}\n\n.rarity-aura[data-variant=\"deck\"] .glow {\n  filter: blur(calc(7px * var(--rarity-glow-active)));\n}\n\n.rarity-aura[data-variant=\"deck\"].is-hovered .glow,\n.rarity-aura[data-variant=\"deck\"].is-selected .glow {\n  opacity: min(1, calc(var(--rarity-glow-opacity) * 1.2));\n}\n\n.rarity-aura[data-variant=\"collection\"].has-sweep .sweep,\n.rarity-aura[data-variant=\"deck\"].has-sweep .sweep {\n  display: none;\n}\n\nbody.low-power .rarity-aura.is-bloom .glow {\n  transform: scale(1.02);\n}";
   module.exports = css;
   module.exports.default = css;
 });
 __define('./ui/rarity/rarity.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/ui/rarity/rarity.ts
   const __dep0 = __require('./ui/rarity/rarity_tokens.json');
   const rarityTokensSource = __dep0.default ?? __dep0;
   const __dep1 = __require('./ui/rarity/rarity.css');
@@ -23551,6 +23603,7 @@ __define('./units.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'lookupUnit')) exports.lookupUnit = lookupUnit;
 });
 __define('./utils/assert.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/utils/assert.ts
   function assertDefined(value, message) {
       if (value === undefined || value === null) {
           throw new Error(message ?? 'Giá trị mong đợi phải được định nghĩa.');
@@ -23590,6 +23643,7 @@ __define('./utils/currency.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'formatCurrencyAmount')) exports.formatCurrencyAmount = formatCurrencyAmount;
 });
 __define('./utils/dummy.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/utils/dummy.ts
   function ensureNestedModuleSupport() {
       return true;
   }
@@ -23597,6 +23651,7 @@ __define('./utils/dummy.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureNestedModuleSupport')) exports.ensureNestedModuleSupport = ensureNestedModuleSupport;
 });
 __define('./utils/format.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/utils/format.ts
   const HAS_INTL_NUMBER_FORMAT = typeof Intl === 'object' && typeof Intl.NumberFormat === 'function';
   function createNumberFormatter(locale, options) {
       if (HAS_INTL_NUMBER_FORMAT) {
@@ -23636,6 +23691,7 @@ __define('./utils/format.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'createNumberFormatter')) exports.createNumberFormatter = createNumberFormatter;
 });
 __define('./utils/fury.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/utils/fury.ts
   const __dep0 = __require('./config.ts');
   const CFG = __dep0.CFG;
   const __dep1 = __require('./utils/time.ts');
@@ -24596,6 +24652,7 @@ __define('./utils/module-resolution.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveModuleFunction')) exports.resolveModuleFunction = resolveModuleFunction;
 });
 __define('./utils/time.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/utils/time.ts
   const perf = typeof globalThis !== 'undefined' ? globalThis.performance : undefined;
   const hasPerfNow = !!(perf && typeof perf.now === 'function');
   let lastFallbackNow = 0;
@@ -24702,10 +24759,7 @@ __define('./utils/unit-id.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeUnitId')) exports.normalizeUnitId = normalizeUnitId;
 });
 __define('./vfx.ts', (exports, module, __require) => {
-  // 0.7 vfx.js
-  // VFX layer: spawn pop, hit ring, ranged tracer, melee step-in/out
-  // Không thay đổi logic combat/turn — chỉ vẽ đè.
-  // Durations: spawn 500ms, hit 380ms, tracer 400ms, melee 2000ms.
+  //home (termux)/arclune_lane_7x3/src/vfx.ts
   const __dep0 = __require('./engine.ts');
   const projectCellOblique = __dep0.projectCellOblique;
   const __dep1 = __require('./config.ts');
@@ -25485,6 +25539,8 @@ __define('./vfx.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'vfxDraw')) exports.vfxDraw = vfxDraw;
 });
 __define('./../tools/zod-stub/index.js', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/tools/zod-stub/index.js
+
   const objectProto = Object.prototype;
 
   const ZodIssueCode = Object.freeze({

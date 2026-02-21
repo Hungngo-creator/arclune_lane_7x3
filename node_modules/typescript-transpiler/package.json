@@ -1,8 +1,5 @@
-//home (termux)/arclune_lane_7x3/tools/typescript-transpiller/package.json
-
 {
   "name": "typescript-transpiler",
-  "version": "0.0.0-stub",
-  "main": "index.js",
-  "type": "commonjs"
+  "version": "1.0.0",
+  "main": "index.js"
 }

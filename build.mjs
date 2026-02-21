@@ -1,4 +1,3 @@
-//home (termux)/arclune_lane_7x3/build.mja
 
 import fs from 'fs/promises';
 import fsSync from 'fs';
