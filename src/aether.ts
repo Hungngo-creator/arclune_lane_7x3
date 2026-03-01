@@ -40,7 +40,11 @@ export class SharedAetherPool {
       for (const unit of teamUnits) {
           if (!unit || unit.side !== this.side || !unit.alive) continue; // Chỉ tính unit đang sống của phe mình
           nextMax += (unit.aeMax || 0);
+<<<<<<< ours
           
+=======
+
+>>>>>>> theirs
           // Lấy hệ số class, fallback về 0.55 nếu không có
           const className = (unit as any).class || 'Warrior';
           const coeff = AE_CLASS_COEFF[className as keyof typeof AE_CLASS_COEFF] ?? 0.55;
@@ -70,7 +74,11 @@ export class SharedAetherPool {
       this.updateUI();
   }
 
+<<<<<<< ours
 public reconcile(teamUnits: UnitToken[]) {
+=======
+  public reconcile(teamUnits: UnitToken[]) {
+>>>>>>> theirs
       const prevMax = this.max;
       const prevRegen = this.regenPerTurn;
       const prevCurrent = this.current;
@@ -259,7 +267,8 @@ export const globalAetherPool = {
   syncAllVisuals: (
     allyPos: {x:number, y:number, s:number},
     enemyPos: {x:number, y:number, s:number},
-    units?: UnitToken[]
+    units?: UnitToken[],
+    options?: AetherVisualPairOptions
   ) => {
     if (Array.isArray(units)) {
       allyAetherPool.reconcile(units);
