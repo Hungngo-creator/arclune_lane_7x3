@@ -12472,19 +12472,6 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           else {
               drawTokensOblique(ctx, Game.grid, tokens, CAM_PRESET);
           }
-          // Lấy rect tươi ngay trong khung hình draw
-          const canvasEl = canvas;
-          const rect = canvasEl.getBoundingClientRect();
-          const scaleX = rect.width / canvasEl.width;
-          const scaleY = rect.height / canvasEl.height;
-          const getScreenPos = (cx, cy) => {
-              const local = cellCenterObliqueLocal(Game.grid, cx, cy, CAM_PRESET);
-              return {
-                  x: rect.left + (local.x * scaleX),
-                  y: rect.top + (local.y * scaleY),
-                  s: local.scale * Math.min(scaleX, scaleY)
-              };
-          };
           // 1. Lấy kích thước thật của Canvas trên màn hình
           const canvasEl = canvas;
           const rect = canvasEl.getBoundingClientRect();
