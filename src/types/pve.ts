@@ -1,6 +1,6 @@
 //home (termux)/arclune_lane_7x3/src/types/pve.ts
 import type { PassiveKitDefinition, PveDeckEntry, SessionState as CoreSessionState } from './combat';
-import type { UnitToken } from './units';
+import type { UnitId, UnitToken } from './units';
 import type { RosterUnitDefinition } from './config';
 
 export type MetaEntry = Omit<RosterUnitDefinition, 'kit'> & {
@@ -78,12 +78,48 @@ export interface SessionRuntimeState {
   encounter: EncounterState | null;
   wave: WaveState | null;
   rewardQueue: RewardRoll[];
+  unitProgressById?: Map<UnitId, RuntimeUnitProgress>;
+}
+
+export interface CollectionProgressUnitInput extends Record<string, unknown> {
+  unitId?: string | null;
+  id?: string | null;
+  
+  key?: string | null;
+  realm?: number | string | null;
+  subRealm?: number | string | null;
+  level?: number | string | null;
+  stars?: number | string | null;
+  owned?: boolean | number | string | null;
+  unlocked?: boolean | number | string | null;
+  awakened?: boolean | number | string | null;
+  inLineup?: boolean | number | string | null;
+}
+
+export interface CollectionStateInput extends Record<string, unknown> {
+  units?: ReadonlyArray<CollectionProgressUnitInput> | null;
+  ownedUnits?: ReadonlyArray<CollectionProgressUnitInput> | null;
+  roster?: ReadonlyArray<CollectionProgressUnitInput> | null;
+  collection?: ReadonlyArray<CollectionProgressUnitInput> | null;
+}
+
+export interface RuntimeUnitProgress {
+  unitId: UnitId;
+  realm?: number;
+  subRealm?: number;
+  level?: number;
+  stars?: number;
+  owned?: boolean;
+  awakened?: boolean;
+  inLineup?: boolean;
 }
 
 export interface CreateSessionOptions {
   modeKey?: string;
   sceneTheme?: string;
   backgroundKey?: string;
+  lineupDeck?: ReadonlyArray<PveDeckEntry>;
+  playerDeck?: ReadonlyArray<PveDeckEntry>;
   deck?: ReadonlyArray<PveDeckEntry>;
   aiPreset?: {
     deck?: ReadonlyArray<PveDeckEntry>;
@@ -98,6 +134,7 @@ export interface CreateSessionOptions {
   turn?: { mode?: string };
   turnOrderMode?: string;
   turnOrder?: { mode?: string };
+  collectionState?: CollectionStateInput | null;
 }
 
 export type SessionState = CoreSessionState & {

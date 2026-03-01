@@ -1,7 +1,7 @@
 // Bundled by build.mjs
 const __modules = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }
 function __define(id, factory){ __modules[id] = { factory, exports: null, initialized: false }; }
@@ -10171,6 +10171,100 @@ __define('./modes/coming-soon.stub.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'comingSoon')) exports.comingSoon = comingSoon;
   if (!Object.prototype.hasOwnProperty.call(exports, 'COMING_SOON_MODULE')) exports.COMING_SOON_MODULE = COMING_SOON_MODULE;
 });
+__define('./modes/pve/collection-mapper.ts', (exports, module, __require) => {
+  const __dep0 = __require('./meta.ts');
+  const Meta = __dep0.Meta;
+  const makeInstanceStats = __dep0.makeInstanceStats;
+  const asFinite = (value) => {
+      if (typeof value === 'number' && Number.isFinite(value))
+          return value;
+      if (typeof value === 'string' && value.trim() !== '') {
+          const parsed = Number(value);
+          return Number.isFinite(parsed) ? parsed : null;
+      }
+      return null;
+  };
+  const asBoolean = (value) => {
+      if (typeof value === 'boolean')
+          return value;
+      if (typeof value === 'number')
+          return value !== 0;
+      if (typeof value === 'string') {
+          const normalized = value.trim().toLowerCase();
+          if (normalized === 'true' || normalized === '1' || normalized === 'yes')
+              return true;
+          if (normalized === 'false' || normalized === '0' || normalized === 'no')
+              return false;
+      }
+      return null;
+  };
+  const readUnitId = (entry) => {
+      const raw = entry.unitId ?? entry.id ?? entry.key;
+      return typeof raw === 'string' && raw.trim() ? raw.trim() : null;
+  };
+  const getCollectionEntries = (collectionState) => {
+      if (!collectionState || typeof collectionState !== 'object')
+          return [];
+      const source = collectionState;
+      const list = source.units ?? source.ownedUnits ?? source.roster ?? source.collection;
+      if (!Array.isArray(list))
+          return [];
+      return list.filter((item) => Boolean(item && typeof item === 'object'));
+  };
+  const normalizeProgress = (entry) => {
+      const unitId = readUnitId(entry);
+      if (!unitId)
+          return null;
+      const level = asFinite(entry.level ?? entry.lv);
+      const realm = asFinite(entry.realm);
+      const subRealm = asFinite(entry.subRealm ?? entry.sub_realm);
+      const stars = asFinite(entry.stars ?? entry.star);
+      const owned = asBoolean(entry.owned ?? entry.unlocked ?? entry.isOwned);
+      const awakened = asBoolean(entry.awakened ?? entry.isAwakened);
+      const inLineup = asBoolean(entry.inLineup ?? entry.isInLineup);
+      const progress = {
+          unitId,
+          ...(level != null ? { level: Math.max(1, Math.floor(level)) } : {}),
+          ...(realm != null ? { realm: Math.max(0, Math.floor(realm)) } : {}),
+          ...(subRealm != null ? { subRealm: Math.max(0, Math.floor(subRealm)) } : {}),
+          ...(stars != null ? { stars: Math.max(0, Math.floor(stars)) } : {}),
+          ...(owned != null ? { owned } : {}),
+          ...(awakened != null ? { awakened } : {}),
+          ...(inLineup != null ? { inLineup } : {}),
+      };
+      return progress;
+  };
+  function mapUnitProgressById(collectionState) {
+      const out = new Map();
+      const entries = getCollectionEntries(collectionState);
+      for (const entry of entries) {
+          const normalized = normalizeProgress(entry);
+          if (!normalized)
+              continue;
+          out.set(normalized.unitId, normalized);
+      }
+      return out;
+  }
+  function resolveRuntimeUnitStats(unitId, progressMap) {
+      const meta = Meta.get(unitId);
+      const progress = progressMap?.get(unitId);
+      const level = Math.max(1, Math.floor(progress?.level ?? 1));
+      const realm = Math.max(0, Math.floor(progress?.realm ?? 0));
+      const subRealm = Math.max(0, Math.floor(progress?.subRealm ?? 0));
+      const stars = Math.max(0, Math.floor(progress?.stars ?? 0));
+      const stats = meta ? makeInstanceStats(unitId, level, stars) : makeInstanceStats(unitId);
+      return {
+          ...stats,
+          level,
+          realm,
+          subRealm,
+          stars,
+      };
+  }
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'mapUnitProgressById')) exports.mapUnitProgressById = mapUnitProgressById;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resolveRuntimeUnitStats')) exports.resolveRuntimeUnitStats = resolveRuntimeUnitStats;
+});
 __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/modes/pve/session-runtime-impl.ts
   const __dep2 = __require('./aether.ts');
@@ -10263,6 +10357,8 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   const ensureSceneCache = __dep20.ensureSceneCache;
   const clearBackgroundSignatureCache = __dep20.clearBackgroundSignatureCache;
   const normalizeDeckEntries = __dep20.normalizeDeckEntries;
+  const __dep21 = __require('./modes/pve/collection-mapper.ts');
+  const mapUnitProgressById = __dep21.mapUnitProgressById;
   const isPlainRecord = (value) => (!!value && typeof value === 'object');
   const isFiniteNumber = (value) => (typeof value === 'number' && Number.isFinite(value));
   const parseFiniteNumber = (value) => {
@@ -10550,20 +10646,32 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       if (!game)
           return [];
       const deck = sanitizeDeckEntries(game.deck3);
-      if (deck !== game.deck3) {
-          game.deck3 = deck;
+      const lockedDeck = ensureLockedPlayerDeck();
+      const lockedIds = new Set(lockedDeck.map((entry) => entry.id));
+      const filteredDeck = deck.filter((entry) => lockedIds.has(entry.id));
+      if (filteredDeck !== game.deck3) {
+          game.deck3 = filteredDeck;
       }
-      return deck;
+      return filteredDeck;
   }
-  function ensureRoster() {
+  function ensureLockedPlayerDeck() {
       const game = getInitializedGame();
       if (!game)
           return [];
-      const roster = sanitizeDeckEntries(game.unitsAll);
-      if (roster !== game.unitsAll) {
-          game.unitsAll = roster;
+      const lockedSource = Array.isArray(game.playerDeckLocked) && game.playerDeckLocked.length
+          ? game.playerDeckLocked
+          : game.unitsAll;
+      const lockedDeck = sanitizeDeckEntries(lockedSource);
+      if (lockedDeck !== game.playerDeckLocked) {
+          game.playerDeckLocked = lockedDeck;
       }
-      return game.unitsAll;
+      return lockedDeck;
+  }
+  function isCardInLockedDeck(cardId, game = Game) {
+      if (!game)
+          return false;
+      const lockedDeck = ensureLockedPlayerDeck();
+      return lockedDeck.some((entry) => entry.id === cardId);
   }
   const getCardCost = (card) => {
       if (!card)
@@ -10700,6 +10808,9 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       storedConfig = normalizeConfig({ ...storedConfig, ...overrides });
       resetSessionTimeBase();
       Game = createSession(storedConfig);
+      if (Game?.runtime) {
+          Game.runtime.unitProgressById = mapUnitProgressById(storedConfig.collectionState ?? null);
+      }
       _IID = 1;
       _BORN = 1;
       CLOCK = createClock();
@@ -11913,6 +12024,8 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               if (!game)
                   return;
               const entry = asDeckEntry(card);
+              if (!isCardInLockedDeck(entry.id, game))
+                  return;
               game.selectedId = entry.id;
               renderSummonBar();
           },
@@ -11959,6 +12072,8 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           const deck = ensureDeck();
           const card = deck.find((u) => u.id === game.selectedId) ?? null;
           if (!card)
+              return;
+          if (!isCardInLockedDeck(card.id, game))
               return;
           if (cellReserved(tokensAlive(), game.queued, cell.cx, cell.cy))
               return;
@@ -12405,8 +12520,8 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           ...Game.usedUnitIds,
           ...deck.map((u) => u.id)
       ]);
-      const roster = ensureRoster();
-      const more = pickRandom(roster, exclude).slice(0, need);
+      const lockedDeck = ensureLockedPlayerDeck();
+      const more = pickRandom(lockedDeck, exclude).slice(0, need);
       deck.push(...more);
       Game.deck3 = deck;
   }
@@ -12614,7 +12729,6 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                       minY: rect.top + clampMargin,
                       maxY: rect.bottom - clampMargin,
                   },
-                  anchorLiftY: Number.isFinite(allyPos.anchor) ? Math.max(0, (1 - allyPos.anchor) * 10 * allyPos.s) : 0,
               },
               enemy: {
                   facing: -1,
@@ -12628,7 +12742,6 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                       minY: rect.top + clampMargin,
                       maxY: rect.bottom - clampMargin,
                   },
-                  anchorLiftY: Number.isFinite(enemyPos.anchor) ? Math.max(0, (1 - enemyPos.anchor) * 10 * enemyPos.s) : 0,
               },
           });
       }
@@ -12974,45 +13087,56 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   function applyConfigToRunningGame(cfg) {
       if (!Game)
           return;
+      const game = Game;
       let sceneChanged = false;
       if (typeof cfg.sceneTheme !== 'undefined') {
-          if (Game.sceneTheme !== cfg.sceneTheme)
+          if (game.sceneTheme !== cfg.sceneTheme)
               sceneChanged = true;
-          Game.sceneTheme = cfg.sceneTheme;
+          game.sceneTheme = cfg.sceneTheme;
       }
       if (typeof cfg.backgroundKey !== 'undefined') {
-          if (Game.backgroundKey !== cfg.backgroundKey) {
+          if (game.backgroundKey !== cfg.backgroundKey) {
               sceneChanged = true;
               clearBackgroundSignatureCache();
           }
-          Game.backgroundKey = cfg.backgroundKey;
+          game.backgroundKey = cfg.backgroundKey;
       }
       if (typeof cfg.modeKey !== 'undefined') {
-          Game.modeKey = typeof cfg.modeKey === 'string' ? cfg.modeKey : (cfg.modeKey || null);
+          game.modeKey = typeof cfg.modeKey === 'string' ? cfg.modeKey : (cfg.modeKey || null);
       }
-      if (Array.isArray(cfg.deck) && cfg.deck.length) {
-          const deck = normalizeDeckEntries(cfg.deck);
-          if (deck.length)
-              Game.unitsAll = deck;
+      const preferredDeckInput = (Array.isArray(cfg.lineupDeck) && cfg.lineupDeck.length ? cfg.lineupDeck : null)
+          ?? (Array.isArray(cfg.playerDeck) && cfg.playerDeck.length ? cfg.playerDeck : null)
+          ?? (Array.isArray(cfg.deck) && cfg.deck.length ? cfg.deck : null);
+      if (preferredDeckInput) {
+          const deck = normalizeDeckEntries(preferredDeckInput);
+          if (deck.length) {
+              game.unitsAll = deck;
+              game.playerDeckLocked = Array.from(deck);
+              game.deck3 = ensureDeck().filter((card) => deck.some((entry) => entry.id === card.id));
+              if (game.selectedId && !deck.some((entry) => entry.id === game.selectedId)) {
+                  game.selectedId = null;
+              }
+              refillDeck();
+          }
       }
       if (cfg.aiPreset) {
           const preset = cfg.aiPreset || {};
           if (Array.isArray(preset.deck) && preset.deck.length) {
               const enemyDeck = normalizeDeckEntries(preset.deck);
               if (enemyDeck.length)
-                  Game.ai.unitsAll = enemyDeck;
+                  game.ai.unitsAll = enemyDeck;
           }
           else if (Array.isArray(preset.unitsAll) && preset.unitsAll.length) {
               const enemyPool = normalizeDeckEntries(preset.unitsAll);
               if (enemyPool.length)
-                  Game.ai.unitsAll = enemyPool;
+                  game.ai.unitsAll = enemyPool;
           }
           const parsedCostCap = parseFiniteNumber(preset.costCap);
           if (parsedCostCap !== null)
-              Game.ai.costCap = parsedCostCap;
+              game.ai.costCap = parsedCostCap;
           const parsedSummonLimit = parseFiniteNumber(preset.summonLimit);
           if (parsedSummonLimit !== null)
-              Game.ai.summonLimit = parsedSummonLimit;
+              game.ai.summonLimit = parsedSummonLimit;
       }
       if (sceneChanged) {
           invalidateSceneCache();
@@ -13280,6 +13404,8 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
   const getUnitArt = __dep9.getUnitArt;
   const __dep10 = __require('./utils/unit-id.ts');
   const normalizeUnitId = __dep10.normalizeUnitId;
+  const __dep11 = __require('./modes/pve/collection-mapper.ts');
+  const mapUnitProgressById = __dep11.mapUnitProgressById;
   void Statuses;
   const DEFAULT_UNIT_ROSTER = UNITS.map((unit) => {
       const unitId = normalizeUnitId(unit.id);
@@ -13353,6 +13479,7 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
           summoned: 0,
           summonLimit: params.summonLimit,
           unitsAll: params.allyUnits,
+          playerDeckLocked: params.lockedPlayerDeck,
           usedUnitIds: new Set(),
           deck3: [],
           selectedId: null,
@@ -13378,6 +13505,7 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
               encounter: null,
               wave: null,
               rewardQueue: [],
+              unitProgressById: mapUnitProgressById(params.collectionState ?? null),
           },
       };
   }
@@ -13457,8 +13585,17 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
           else if (typeof sceneConfig.background === 'string')
               out.backgroundKey = sceneConfig.background;
       }
+      if (Array.isArray(out.lineupDeck)) {
+          out.lineupDeck = normalizeDeckEntries(out.lineupDeck);
+      }
+      if (Array.isArray(out.playerDeck)) {
+          out.playerDeck = normalizeDeckEntries(out.playerDeck);
+      }
       if (Array.isArray(out.deck)) {
           out.deck = normalizeDeckEntries(out.deck);
+      }
+      if (typeof out.collectionState === 'undefined') {
+          out.collectionState = null;
       }
       if (out.aiPreset) {
           const preset = { ...out.aiPreset };
@@ -13596,8 +13733,19 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
           ?? sceneCfg?.CURRENT_THEME
           ?? sceneCfg?.DEFAULT_THEME
           ?? null;
-      const allyUnits = Array.isArray(normalized.deck) && normalized.deck.length
-          ? Array.from(normalized.deck)
+      const preferredPlayerDeck = (Array.isArray(normalized.lineupDeck) && normalized.lineupDeck.length
+          ? normalized.lineupDeck
+          : null)
+          ?? (Array.isArray(normalized.playerDeck) && normalized.playerDeck.length
+              ? normalized.playerDeck
+              : null);
+      const modeDeck = Array.isArray(normalized.deck) && normalized.deck.length
+          ? normalized.deck
+          : null;
+      const lockedPlayerDeckSource = preferredPlayerDeck ?? modeDeck ?? DEFAULT_UNIT_ROSTER;
+      const lockedPlayerDeck = normalizeDeckEntries(lockedPlayerDeckSource);
+      const allyUnits = lockedPlayerDeck.length
+          ? Array.from(lockedPlayerDeck)
           : Array.from(DEFAULT_UNIT_ROSTER);
       const enemyPreset = normalized.aiPreset ?? null;
       const enemyUnits = Array.isArray(enemyPreset?.deck) && enemyPreset.deck.length
@@ -13654,12 +13802,14 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
       return buildBaseState({
           modeKey,
           allyUnits,
+          lockedPlayerDeck,
           costCap,
           summonLimit,
           sceneTheme,
           backgroundKey,
           turn: buildTurnState(),
           ai: aiState,
+          collectionState: normalized.collectionState ?? null,
       });
   }
   function invalidateSceneCache() {
@@ -13843,11 +13993,20 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
   function normalizeDeckEntries(value) {
       if (!Array.isArray(value))
           return [];
+      const MAX_PLAYER_DECK_SIZE = 10;
       const normalized = [];
+      const seenIds = new Set();
       for (const item of value) {
+          if (normalized.length >= MAX_PLAYER_DECK_SIZE)
+              break;
           const entry = normalizeDeckEntry(item);
-          if (entry)
-              normalized.push(entry);
+          if (!entry)
+              continue;
+          const unitId = normalizeUnitId(entry.id);
+          if (seenIds.has(unitId))
+              continue;
+          seenIds.add(unitId);
+          normalized.push({ ...entry, id: unitId });
       }
       return normalized;
   }
@@ -21925,7 +22084,6 @@ __define('./turns.ts', (exports, module, __require) => {
   const __dep4 = __require('./config.ts');
   const CFG = __dep4.CFG;
   const __dep5 = __require('./meta.ts');
-  const makeInstanceStats = __dep5.makeInstanceStats;
   const initialRageFor = __dep5.initialRageFor;
   const __dep6 = __require('./vfx.ts');
   const vfxAddSpawn = __dep6.vfxAddSpawn;
@@ -21957,6 +22115,8 @@ __define('./turns.ts', (exports, module, __require) => {
   const clearFreshSummon = __dep11.clearFreshSummon;
   const __dep12 = __require('./turns/interleaved.ts');
   const nextTurnInterleaved = __dep12.nextTurnInterleaved;
+  const __dep13 = __require('./modes/pve/collection-mapper.ts');
+  const resolveRuntimeUnitStats = __dep13.resolveRuntimeUnitStats;
   const toLowerSide = (side) => {
       if (side === 'ALLY')
           return 'ally';
@@ -22101,7 +22261,8 @@ __define('./turns.ts', (exports, module, __require) => {
       const fromDeck = source === 'deck';
       const kit = meta?.kit;
       const initialFury = initialRageFor(p.unitId, { isLeader: false, revive: !!p.revive, reviveSpec: p.revived });
-      const stats = makeInstanceStats(p.unitId);
+      const progressMap = Game.runtime?.unitProgressById;
+      const stats = resolveRuntimeUnitStats(p.unitId, progressMap);
       const baseStats = {
           atk: stats.atk ?? 0,
           res: stats.res ?? 0,

@@ -213,6 +213,7 @@ export interface SessionState {
   summoned: number;
   summonLimit: number;
   unitsAll: PveDeckEntry[];
+  playerDeckLocked?: PveDeckEntry[];
   usedUnitIds: Set<UnitId>;
   deck3: PveDeckEntry[];
   selectedId: UnitId | null;

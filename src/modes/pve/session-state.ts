@@ -24,6 +24,7 @@ import { drawGridOblique } from '../../engine.ts';
 import { Statuses } from '../../statuses.ts';
 import { getUnitArt } from '../../art.ts';
 import { normalizeUnitId } from '../../utils/unit-id.ts';
+import { mapUnitProgressById } from './collection-mapper.ts';
 
 void Statuses;
 
@@ -125,12 +126,14 @@ function buildAiState(params: BuildAiStateParams): SessionState['ai'] {
 interface BuildBaseStateParams {
   modeKey: string | null;
   allyUnits: SessionState['unitsAll'];
+  lockedPlayerDeck: SessionState['unitsAll'];
   costCap: number;
   summonLimit: number;
   sceneTheme: string | null;
   backgroundKey: string | null;
   turn: TurnSnapshot;
   ai: SessionState['ai'];
+  collectionState?: CreateSessionOptions['collectionState'];
 }
 
 function buildBaseState(params: BuildBaseStateParams): SessionState {
@@ -143,6 +146,7 @@ function buildBaseState(params: BuildBaseStateParams): SessionState {
     summoned: 0,
     summonLimit: params.summonLimit,
     unitsAll: params.allyUnits,
+    playerDeckLocked: params.lockedPlayerDeck,
     usedUnitIds: new Set<UnitId>(),
     deck3: [],
     selectedId: null,
@@ -168,6 +172,7 @@ function buildBaseState(params: BuildBaseStateParams): SessionState {
       encounter: null,
       wave: null,
       rewardQueue: [],
+      unitProgressById: mapUnitProgressById(params.collectionState ?? null),
     },
   };
 }
@@ -265,8 +270,17 @@ export function normalizeConfig(input: SessionConfigInput = {}): NormalizedSessi
     if (typeof sceneConfig.backgroundKey === 'string') out.backgroundKey = sceneConfig.backgroundKey;
     else if (typeof sceneConfig.background === 'string') out.backgroundKey = sceneConfig.background;
   }
+  if (Array.isArray(out.lineupDeck)) {
+    out.lineupDeck = normalizeDeckEntries(out.lineupDeck);
+  }
+  if (Array.isArray(out.playerDeck)) {
+    out.playerDeck = normalizeDeckEntries(out.playerDeck);
+  }
   if (Array.isArray(out.deck)) {
     out.deck = normalizeDeckEntries(out.deck);
+  }
+  if (typeof out.collectionState === 'undefined') {
+    out.collectionState = null;
   }
   if (out.aiPreset) {
     const preset = { ...out.aiPreset };
@@ -417,10 +431,22 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
     ?? sceneCfg?.DEFAULT_THEME
     ?? null;
 
-  const allyUnits: SessionState['unitsAll'] =
-    Array.isArray(normalized.deck) && normalized.deck.length
-      ? Array.from(normalized.deck)
-      : Array.from(DEFAULT_UNIT_ROSTER);
+  const preferredPlayerDeck =
+    (Array.isArray(normalized.lineupDeck) && normalized.lineupDeck.length
+      ? normalized.lineupDeck
+      : null)
+    ?? (Array.isArray(normalized.playerDeck) && normalized.playerDeck.length
+      ? normalized.playerDeck
+      : null);
+  const modeDeck = Array.isArray(normalized.deck) && normalized.deck.length
+    ? normalized.deck
+    : null;
+  const lockedPlayerDeckSource = preferredPlayerDeck ?? modeDeck ?? DEFAULT_UNIT_ROSTER;
+  const lockedPlayerDeck = normalizeDeckEntries(lockedPlayerDeckSource);
+
+  const allyUnits: SessionState['unitsAll'] = lockedPlayerDeck.length
+    ? Array.from(lockedPlayerDeck)
+    : Array.from(DEFAULT_UNIT_ROSTER);
 
   const enemyPreset = normalized.aiPreset ?? null;
   const enemyUnits: SessionState['ai']['unitsAll'] =
@@ -483,12 +509,14 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
   return buildBaseState({
     modeKey,
     allyUnits,
+    lockedPlayerDeck,
     costCap,
     summonLimit,
     sceneTheme,
     backgroundKey,
     turn: buildTurnState(),
     ai: aiState,
+    collectionState: normalized.collectionState ?? null,
   });
 }
 
@@ -669,10 +697,17 @@ function normalizeDeckEntry(entry: unknown): SessionState['unitsAll'][number] | 
 
 export function normalizeDeckEntries(value: unknown): SessionState['unitsAll'] {
   if (!Array.isArray(value)) return [];
+  const MAX_PLAYER_DECK_SIZE = 10;
   const normalized: SessionState['unitsAll'][number][] = [];
+  const seenIds = new Set<string>();
   for (const item of value) {
+    if (normalized.length >= MAX_PLAYER_DECK_SIZE) break;
     const entry = normalizeDeckEntry(item);
-    if (entry) normalized.push(entry);
+    if (!entry) continue;
+    const unitId = normalizeUnitId(entry.id);
+    if (seenIds.has(unitId)) continue;
+    seenIds.add(unitId);
+    normalized.push({ ...entry, id: unitId });
   }
   return normalized as SessionState['unitsAll'];
 }

@@ -65,6 +65,7 @@ import {
   clearBackgroundSignatureCache,
   normalizeDeckEntries,
 } from './session-state';
+import { mapUnitProgressById } from './collection-mapper.ts';
 
 import type {
   BattleDetail,
@@ -507,20 +508,32 @@ function ensureDeck(): DeckEntry[] {
   const game = getInitializedGame();
   if (!game) return [];
   const deck = sanitizeDeckEntries(game.deck3);
-  if (deck !== game.deck3) {
-    game.deck3 = deck;
+  const lockedDeck = ensureLockedPlayerDeck();
+  const lockedIds = new Set(lockedDeck.map((entry) => entry.id));
+  const filteredDeck = deck.filter((entry) => lockedIds.has(entry.id));
+  if (filteredDeck !== game.deck3) {
+    game.deck3 = filteredDeck;
   }
-  return deck;
+  return filteredDeck;
 }
 
-function ensureRoster(): ReadonlyArray<DeckEntry> {
+function ensureLockedPlayerDeck(): ReadonlyArray<DeckEntry> {
   const game = getInitializedGame();
   if (!game) return [];
-  const roster = sanitizeDeckEntries(game.unitsAll);
-  if (roster !== game.unitsAll) {
-    game.unitsAll = roster;
+  const lockedSource = Array.isArray(game.playerDeckLocked) && game.playerDeckLocked.length
+    ? game.playerDeckLocked
+    : game.unitsAll;
+  const lockedDeck = sanitizeDeckEntries(lockedSource);
+  if (lockedDeck !== game.playerDeckLocked) {
+    game.playerDeckLocked = lockedDeck;
   }
-  return game.unitsAll;
+  return lockedDeck;
+}
+
+function isCardInLockedDeck(cardId: string, game: SessionState | null | undefined = Game): boolean {
+  if (!game) return false;
+  const lockedDeck = ensureLockedPlayerDeck();
+  return lockedDeck.some((entry) => entry.id === cardId);
 }
 
 const getCardCost = (card: DeckEntry | null | undefined): number => {
@@ -684,6 +697,9 @@ function resetSessionState(options: StartConfigOverrides | null | undefined = {}
   storedConfig = normalizeConfig({ ...storedConfig, ...overrides });
   resetSessionTimeBase();
   Game = createSession(storedConfig);
+  if (Game?.runtime) {
+    Game.runtime.unitProgressById = mapUnitProgressById(storedConfig.collectionState ?? null);
+  }
   _IID = 1;
   _BORN = 1;
   CLOCK = createClock();
@@ -1844,6 +1860,7 @@ function init(): boolean {
       const game = getInitializedGame();
       if (!game) return;
       const entry = asDeckEntry(card);
+      if (!isCardInLockedDeck(entry.id, game)) return;
       game.selectedId = entry.id;
       renderSummonBar();
     },
@@ -1888,6 +1905,7 @@ function init(): boolean {
     const deck = ensureDeck();
     const card = deck.find((u) => u.id === game.selectedId) ?? null;
     if (!card) return;
+    if (!isCardInLockedDeck(card.id, game)) return;
 
     if (cellReserved(tokensAlive(), game.queued, cell.cx, cell.cy)) return;
     const cardCost = getCardCost(card);
@@ -2365,8 +2383,8 @@ function refillDeck(): void {
     ...Game.usedUnitIds,
     ...deck.map((u) => u.id)
   ]);
-  const roster = ensureRoster();
-  const more = pickRandom(roster, exclude).slice(0, need);
+  const lockedDeck = ensureLockedPlayerDeck();
+  const more = pickRandom(lockedDeck, exclude).slice(0, need);
   deck.push(...more);
   Game.deck3 = deck;
 }
@@ -2583,7 +2601,6 @@ function draw(): void {
              minY: rect.top + clampMargin,
              maxY: rect.bottom - clampMargin,
            },
-           anchorLiftY: Number.isFinite(allyPos.anchor) ? Math.max(0, (1 - allyPos.anchor!) * 10 * allyPos.s) : 0,
          },
          enemy: {
            facing: -1,
@@ -2597,7 +2614,6 @@ function draw(): void {
              minY: rect.top + clampMargin,
              maxY: rect.bottom - clampMargin,
            },
-           anchorLiftY: Number.isFinite(enemyPos.anchor) ? Math.max(0, (1 - enemyPos.anchor!) * 10 * enemyPos.s) : 0,
          },
        }
    );
@@ -2951,38 +2967,51 @@ function startSession(config: StartConfigOverrides | null | undefined = {}): Ses
 
 function applyConfigToRunningGame(cfg: NormalizedSessionConfig): void {
   if (!Game) return;
+  const game = Game;
   let sceneChanged = false;
   if (typeof cfg.sceneTheme !== 'undefined'){
-    if (Game.sceneTheme !== cfg.sceneTheme) sceneChanged = true;
-    Game.sceneTheme = cfg.sceneTheme;
+    if (game.sceneTheme !== cfg.sceneTheme) sceneChanged = true;
+    game.sceneTheme = cfg.sceneTheme;
   }
   if (typeof cfg.backgroundKey !== 'undefined'){
-    if (Game.backgroundKey !== cfg.backgroundKey){
+    if (game.backgroundKey !== cfg.backgroundKey){
       sceneChanged = true;
       clearBackgroundSignatureCache();
     }
-    Game.backgroundKey = cfg.backgroundKey;
+    game.backgroundKey = cfg.backgroundKey;
   }
   if (typeof cfg.modeKey !== 'undefined'){
-    Game.modeKey = typeof cfg.modeKey === 'string' ? cfg.modeKey : (cfg.modeKey || null);
+    game.modeKey = typeof cfg.modeKey === 'string' ? cfg.modeKey : (cfg.modeKey || null);
   }
-  if (Array.isArray(cfg.deck) && cfg.deck.length) {
-    const deck = normalizeDeckEntries(cfg.deck);
-    if (deck.length) Game.unitsAll = deck;
+  const preferredDeckInput =
+    (Array.isArray(cfg.lineupDeck) && cfg.lineupDeck.length ? cfg.lineupDeck : null)
+    ?? (Array.isArray(cfg.playerDeck) && cfg.playerDeck.length ? cfg.playerDeck : null)
+    ?? (Array.isArray(cfg.deck) && cfg.deck.length ? cfg.deck : null);
+  if (preferredDeckInput) {
+    const deck = normalizeDeckEntries(preferredDeckInput);
+    if (deck.length) {
+      game.unitsAll = deck;
+      game.playerDeckLocked = Array.from(deck);
+      game.deck3 = ensureDeck().filter((card) => deck.some((entry) => entry.id === card.id));
+      if (game.selectedId && !deck.some((entry) => entry.id === game.selectedId)) {
+        game.selectedId = null;
+      }
+      refillDeck();
+    }
   }
   if (cfg.aiPreset){
     const preset: EnemyAIPreset = cfg.aiPreset || {};
     if (Array.isArray(preset.deck) && preset.deck.length){
       const enemyDeck = normalizeDeckEntries(preset.deck);
-      if (enemyDeck.length) Game.ai.unitsAll = enemyDeck;
+      if (enemyDeck.length) game.ai.unitsAll = enemyDeck;
     } else if (Array.isArray(preset.unitsAll) && preset.unitsAll.length){
       const enemyPool = normalizeDeckEntries(preset.unitsAll);
-      if (enemyPool.length) Game.ai.unitsAll = enemyPool;
+      if (enemyPool.length) game.ai.unitsAll = enemyPool;
     }
     const parsedCostCap = parseFiniteNumber(preset.costCap);
-    if (parsedCostCap !== null) Game.ai.costCap = parsedCostCap;
+    if (parsedCostCap !== null) game.ai.costCap = parsedCostCap;
     const parsedSummonLimit = parseFiniteNumber(preset.summonLimit);
-    if (parsedSummonLimit !== null) Game.ai.summonLimit = parsedSummonLimit;
+    if (parsedSummonLimit !== null) game.ai.summonLimit = parsedSummonLimit;
   }
   if (sceneChanged){
     invalidateSceneCache();

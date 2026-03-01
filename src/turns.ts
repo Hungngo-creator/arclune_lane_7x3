@@ -6,7 +6,7 @@ import { Statuses } from './statuses.ts';
 
 import { doBasicWithFollowups } from './combat.ts';
 import { CFG } from './config.ts';
-import { makeInstanceStats, initialRageFor } from './meta.ts';
+import { initialRageFor } from './meta.ts';
 import { vfxAddSpawn, vfxAddBloodPulse, asSessionWithVfx } from './vfx.ts';
 import { getUnitArt } from './art.ts';
 import { emitPassiveEvent, applyOnSpawnEffects, getPassiveLog, prepareUnitForPassives } from './passives.ts';
@@ -14,8 +14,10 @@ import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REG
 import { safeNow, sessionNow } from './utils/time.ts';
 import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } from './utils/fury.ts';
 import { nextTurnInterleaved } from './turns/interleaved.ts';
+import { resolveRuntimeUnitStats } from './modes/pve/collection-mapper.ts';
 
 import type { SessionState } from '@shared-types/combat';
+import type { RuntimeUnitProgress } from '@shared-types/pve';
 import type { ActionChainProcessedResult, Side, UnitToken } from '@shared-types/units';
 import type { ActionResolution, InterleavedState, InterleavedTurnState, QueuedSummonEntry, SequentialTurnState, TurnContext, TurnHooks } from '@shared-types/turn-order';
 
@@ -191,7 +193,8 @@ export function spawnQueuedIfDue(
   const fromDeck = source === 'deck';
   const kit = meta?.kit;
   const initialFury = initialRageFor(p.unitId, { isLeader:false, revive: !!p.revive, reviveSpec: p.revived });
-  const stats = makeInstanceStats(p.unitId);
+  const progressMap = Game.runtime?.unitProgressById as ReadonlyMap<string, RuntimeUnitProgress> | undefined;
+  const stats = resolveRuntimeUnitStats(p.unitId, progressMap);
   const baseStats = {
     atk: stats.atk ?? 0,
     res: stats.res ?? 0,
