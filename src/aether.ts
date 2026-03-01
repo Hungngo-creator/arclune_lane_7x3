@@ -82,20 +82,21 @@ export class SharedAetherPool {
     // Style động, sẽ được update vị trí bởi engine
     Object.assign(this.container.style, {
         position: 'fixed', 
-        width: '14px', 
+        width: '12px',
         height: '0px',
-        border: '1px solid rgba(255,255,255,0.5)',
-        backgroundColor: 'rgba(9, 14, 21, 0.85)', // Màu nền tối hơn để nổi bật
-        borderRadius: '3px',
-        overflow: 'hidden',
+        border: '1px solid rgba(255,255,255,0.6)',
+        backgroundColor: 'rgba(10, 16, 26, 0.9)', 
+        borderRadius: '2px',
+        overflow: 'visible',
         display: 'flex',
         flexDirection: 'column-reverse',
-        zIndex: '9999', // Đẩy lên trên cùng mọi lớp Canvas/UI
+        zIndex: '100', // Đủ cao để đè lên nền, nhưng thấp hơn UI chính
         pointerEvents: 'none',
-        transition: 'opacity 0.1s',
-        transformOrigin: 'bottom center',
-        boxShadow: `0 0 15px ${this.side === 'ally' ? '#00ffff' : '#ff3366'}` 
-    });
+        transition: 'height 0.1s linear', 
+        // QUAN TRỌNG: Dịch điểm neo về giữa chân đáy
+        transform: 'translate(-50%, -100%)',
+        boxShadow: `0 0 10px ${this.side === 'ally' ? '#00ffff' : '#ff3366'}` 
+  });
 
     const color = this.side === 'ally' ? '#00ffff' : '#ff3366';
     this.container.style.boxShadow = `0 0 6px ${color}`;
@@ -139,38 +140,40 @@ export class SharedAetherPool {
   }
 
   // Hàm này được gọi từ Game Loop (draw) để bám theo nhân vật/vị trí
-    public syncVisuals(screenX: number, screenY: number, scale: number) {
+public syncVisuals(screenX: number, screenY: number, scale: number) {
     if (!this.container) return;
     
-    // Bỏ qua điều kiện ẩn âm toạ độ, chỉ ẩn khi zoom quá bé
     if (scale < 0.1) {
-        this.container.style.display = 'none';
+        this.container.style.opacity = '0';
         return;
     }
-    this.container.style.display = 'flex';
     this.container.style.opacity = '1';
 
-    const w = Math.max(8, 16 * scale); 
-    const h = Math.max(40, 120 * scale);
+    // Tính kích thước theo scale
+    const currentW = Math.max(10, 14 * scale);
+    const currentH = Math.max(40, 130 * scale);
 
-    this.container.style.width = `${w}px`;
-    this.container.style.height = `${h}px`;
+    this.container.style.width = `${currentW}px`;
+    this.container.style.height = `${currentH}px`;
     
+    // Scale chữ số
     if (this.label) {
-        this.label.style.fontSize = `${Math.max(9, 12 * scale)}px`;
-        this.label.style.bottom = `${-22 * scale}px`;
+        const fontSize = Math.max(10, 14 * scale);
+        this.label.style.fontSize = `${fontSize}px`;
+        this.label.style.bottom = `${-fontSize * 1.5}px`;
     }
 
-    // Offset để lùi về phía sau và sang hai bên
-    const sideOffset = this.side === 'ally' ? -35 : 35; 
-    const heightOffset = -20; 
+    // Offset giả lập 3D: Đẩy trụ ra sau lưng Leader
+    // Ally (Trái): Lùi thêm sang trái (-X)
+    // Enemy (Phải): Tiến thêm sang phải (+X)
+    // Cả 2 đều nhích lên trên (-Y) để khớp chân
+    const xOffset = this.side === 'ally' ? -40 * scale : 40 * scale; 
+    const yOffset = -15 * scale; 
 
-    const finalX = screenX + (sideOffset * scale) - (w / 2);
-    const finalY = screenY + (heightOffset * scale) - h;
-
-    this.container.style.left = `${finalX}px`;
-    this.container.style.top = `${finalY}px`; 
-  }
+    // Áp dụng toạ độ (đã có transform handle việc căn giữa)
+    this.container.style.left = `${screenX + xOffset}px`;
+    this.container.style.top = `${screenY + yOffset}px`; 
+ }
 }
 
 export const allyAetherPool = new SharedAetherPool('ally');

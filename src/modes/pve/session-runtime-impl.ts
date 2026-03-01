@@ -2497,14 +2497,39 @@ function draw(): void {
       };
     };
 
-    // Ally: ô 0,1 (hàng giữa bên trái). Enemy: ô 6,1 (hàng giữa bên phải)
+// 1. Lấy kích thước thật của Canvas trên màn hình
+    const canvasEl = canvas as HTMLCanvasElement;
+    const rect = canvasEl.getBoundingClientRect();
+    
+    // 2. Tính tỷ lệ (Ratio) giữa Pixel màn hình và Pixel nội tại của Canvas
+    const ratioX = rect.width / canvasEl.width;
+    const ratioY = rect.height / canvasEl.height;
+
+    // 3. Hàm chuyển đổi toạ độ Game -> Màn hình
+    const getScreenPos = (cx: number, cy: number) => {
+      // cellCenterObliqueLocal trả về toạ độ pixel trong Canvas (ví dụ: 100, 200)
+      const local = cellCenterObliqueLocal(Game.grid!, cx, cy, CAM_PRESET);
+      
+      return {
+        // Cộng rect.left/top để ra toạ độ tuyệt đối trên màn hình
+        x: rect.left + (local.x * ratioX),
+        y: rect.top + (local.y * ratioY),
+        // Scale vật thể cũng phải nhân theo tỷ lệ màn hình
+        s: local.scale * ratioX
+      };
+    };
+
+    // 4. Lấy toạ độ Leader (Slot 8)
+    // Ally Leader: Cột 0, Hàng 1
     const allyPos = getScreenPos(0, 1); 
+    // Enemy Leader: Cột 6, Hàng 1
     const enemyPos = getScreenPos(6, 1); 
     
+    // 5. Đồng bộ
     globalAetherPool.syncAllVisuals(
        { x: allyPos.x, y: allyPos.y, s: allyPos.s },
        { x: enemyPos.x, y: enemyPos.y, s: enemyPos.s }
-    );
+   );
   }
   if (sessionVfx){
     vfxDraw(ctx, sessionVfx, CAM_PRESET);
