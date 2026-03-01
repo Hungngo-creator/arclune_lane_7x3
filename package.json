@@ -12,7 +12,8 @@
     "ci": "npm run typecheck && npm test && npm run build",
     "typecheck": "tsc --noEmit",
     "postinstall": "node tools/install-stubs.mjs",
-    "typecheck:all": "tsc --noEmit -p tsconfig.all.json"
+    "typecheck:all": "tsc --noEmit -p tsconfig.all.json",
+    "verify:aether-bundle": "node tools/verify-aether-bundle.mjs"
   },
   "keywords": [],
   "author": "",

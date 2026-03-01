@@ -42,7 +42,6 @@ __define('./aether.ts', (exports, module, __require) => {
               if (!unit || unit.side !== this.side || !unit.alive)
                   continue; // Chỉ tính unit đang sống của phe mình
               nextMax += (unit.aeMax || 0);
-              // Lấy hệ số class, fallback về 0.55 nếu không có
               const className = unit.class || 'Warrior';
               const coeff = AE_CLASS_COEFF[className] ?? 0.55;
               nextRegen += ((unit.wil || 0) * coeff);
@@ -229,7 +228,7 @@ __define('./aether.ts', (exports, module, __require) => {
           return enemyAetherPool.consume(cost);
       },
       // API cho Engine update vị trí
-      syncAllVisuals: (allyPos, enemyPos, units) => {
+      syncAllVisuals: (allyPos, enemyPos, units, options) => {
           if (Array.isArray(units)) {
               allyAetherPool.reconcile(units);
               enemyAetherPool.reconcile(units);
