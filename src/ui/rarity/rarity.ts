@@ -26,6 +26,10 @@ export type Rarity = 'N' | 'R' | 'SR' | 'SSR' | 'UR' | 'PRIME';
 export type AuraVariant = 'gacha' | 'deck' | 'collection';
 export type PowerMode = 'normal' | 'low';
 
+type TimeoutHandle = ReturnType<typeof setTimeout>;
+type IntervalHandle = number | ReturnType<typeof setInterval>;
+type FrameHandle = number | TimeoutHandle;
+
 interface MountOptions {
   label?: boolean;
   rounded?: boolean;
@@ -51,11 +55,11 @@ interface AuraState {
   token: TokenConfig;
   originalPosition: string | null;
   didSetPosition: boolean;
-  revealTimers: number[];
-  revealRaf: number | null;
-  sparkTimers: number[];
+  revealTimers: TimeoutHandle[];
+  revealRaf: FrameHandle | null;
+  sparkTimers: TimeoutHandle[];
   classObserver: MutationObserver | null;
-  classPoller: number | null;
+  classPoller: IntervalHandle | null;
 }
 
 const RARITY_SEQUENCE: Rarity[] = ['N', 'R', 'SR', 'SSR', 'UR', 'PRIME'];
@@ -149,12 +153,12 @@ function getRarityClass(rarity: Rarity): string {
   return `rarity-${rarity}`;
 }
 
-function clearTimers(ids: number[], clearFn: (id: number) => void): void {
+function clearTimers<T>(ids: T[], clearFn: (id: T) => void): void {
   ids.splice(0, ids.length).forEach(id => clearFn(id));
 }
 
 function clearReveal(state: AuraState): void {
-  if (typeof cancelAnimationFrame === 'function' && state.revealRaf !== null){
+  if (typeof cancelAnimationFrame === 'function' && typeof state.revealRaf === 'number'){
     cancelAnimationFrame(state.revealRaf);
   } else if (state.revealRaf !== null){
     clearTimeout(state.revealRaf);
@@ -501,7 +505,7 @@ function spawnSparks(state: AuraState): void {
   }
 }
 
-function requestFrame(callback: FrameRequestCallback): number {
+function requestFrame(callback: FrameRequestCallback): FrameHandle {
   if (typeof requestAnimationFrame === 'function'){
     return requestAnimationFrame(callback);
   }

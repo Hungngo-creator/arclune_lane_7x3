@@ -729,6 +729,10 @@ if (CFG?.DEBUG?.LOG_EVENTS) {
   }
 }
 
+const toAnimationFrameHandle = (handle: FrameHandle): number | null => (
+  typeof handle === 'number' ? handle : null
+);
+
 let drawFrameHandle: FrameHandle | null = null;
 let drawFrameUsesTimeout = false;
 let drawPending = false;
@@ -742,8 +746,9 @@ function cancelScheduledDraw(): void {
       const cancel = (winRef && typeof winRef.cancelAnimationFrame === 'function')
         ? winRef.cancelAnimationFrame.bind(winRef)
         : (typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : null);
-      if (typeof cancel === 'function'){
-        cancel(drawFrameHandle);
+      const frameHandle = toAnimationFrameHandle(drawFrameHandle);
+      if (typeof cancel === 'function' && frameHandle !== null){
+        cancel(frameHandle);
       }
     }
     drawFrameHandle = null;
@@ -799,8 +804,9 @@ function cancelScheduledResize(): void {
       const cancel = (winRef && typeof winRef.cancelAnimationFrame === 'function')
         ? winRef.cancelAnimationFrame.bind(winRef)
         : (typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : null);
-      if (typeof cancel === 'function'){
-        cancel(resizeSchedulerHandle);
+      const frameHandle = toAnimationFrameHandle(resizeSchedulerHandle);
+      if (typeof cancel === 'function' && frameHandle !== null){
+        cancel(frameHandle);
       }
     }
     resizeSchedulerHandle = null;
@@ -2810,8 +2816,9 @@ function clearSessionTimers(): void {
       const cancel = (winRef && typeof winRef.cancelAnimationFrame === 'function')
         ? winRef.cancelAnimationFrame.bind(winRef)
         : (typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : null);
-      if (cancel){
-        cancel(tickLoopHandle);
+      const frameHandle = toAnimationFrameHandle(tickLoopHandle);
+      if (cancel && frameHandle !== null){
+        cancel(frameHandle);
       }
     }
     tickLoopHandle = null;

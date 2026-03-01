@@ -10723,6 +10723,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           }
       }
   }
+  const toAnimationFrameHandle = (handle) => (typeof handle === 'number' ? handle : null);
   let drawFrameHandle = null;
   let drawFrameUsesTimeout = false;
   let drawPending = false;
@@ -10736,8 +10737,9 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               const cancel = (winRef && typeof winRef.cancelAnimationFrame === 'function')
                   ? winRef.cancelAnimationFrame.bind(winRef)
                   : (typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : null);
-              if (typeof cancel === 'function') {
-                  cancel(drawFrameHandle);
+              const frameHandle = toAnimationFrameHandle(drawFrameHandle);
+              if (typeof cancel === 'function' && frameHandle !== null) {
+                  cancel(frameHandle);
               }
           }
           drawFrameHandle = null;
@@ -10802,8 +10804,9 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               const cancel = (winRef && typeof winRef.cancelAnimationFrame === 'function')
                   ? winRef.cancelAnimationFrame.bind(winRef)
                   : (typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : null);
-              if (typeof cancel === 'function') {
-                  cancel(resizeSchedulerHandle);
+              const frameHandle = toAnimationFrameHandle(resizeSchedulerHandle);
+              if (typeof cancel === 'function' && frameHandle !== null) {
+                  cancel(frameHandle);
               }
           }
           resizeSchedulerHandle = null;
@@ -12810,8 +12813,9 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               const cancel = (winRef && typeof winRef.cancelAnimationFrame === 'function')
                   ? winRef.cancelAnimationFrame.bind(winRef)
                   : (typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : null);
-              if (cancel) {
-                  cancel(tickLoopHandle);
+              const frameHandle = toAnimationFrameHandle(tickLoopHandle);
+              if (cancel && frameHandle !== null) {
+                  cancel(frameHandle);
               }
           }
           tickLoopHandle = null;
@@ -23263,7 +23267,7 @@ __define('./ui/rarity/rarity.ts', (exports, module, __require) => {
       ids.splice(0, ids.length).forEach(id => clearFn(id));
   }
   function clearReveal(state) {
-      if (typeof cancelAnimationFrame === 'function' && state.revealRaf !== null) {
+      if (typeof cancelAnimationFrame === 'function' && typeof state.revealRaf === 'number') {
           cancelAnimationFrame(state.revealRaf);
       }
       else if (state.revealRaf !== null) {
