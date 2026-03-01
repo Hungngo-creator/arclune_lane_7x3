@@ -4,6 +4,21 @@ import { addGameEventListener, TURN_START, BATTLE_END } from './events.ts';
 import { AE_CLASS_COEFF } from './catalog.ts';
 import type { UnitToken, Side } from './types/units'; // Import type chuẩn
 
+type AetherViewport = 'mobile' | 'desktop';
+
+export interface AetherVisualOptions {
+  facing?: 1 | -1;
+  viewport?: AetherViewport;
+  backOffsetX?: number;
+  backOffsetY?: number;
+  anchorLiftY?: number;
+}
+
+export interface AetherVisualPairOptions {
+  ally?: AetherVisualOptions;
+  enemy?: AetherVisualOptions;
+}
+
 export class SharedAetherPool {
   public max: number = 0;
   public current: number = 0;
@@ -164,7 +179,7 @@ public reconcile(teamUnits: UnitToken[]) {
   }
 
   // Hàm này được gọi từ Game Loop (draw) để bám theo nhân vật/vị trí
-public syncVisuals(screenX: number, screenY: number, scale: number) {
+public syncVisuals(screenX: number, screenY: number, scale: number, options: AetherVisualOptions = {}) {
     if (!this.container) return;
     
     if (scale < 0.1) {
@@ -187,12 +202,26 @@ public syncVisuals(screenX: number, screenY: number, scale: number) {
         this.label.style.bottom = `${-fontSize * 1.5}px`;
     }
 
-    // Offset giả lập 3D: Đẩy trụ ra sau lưng Leader
-    // Ally (Trái): Lùi thêm sang trái (-X)
-    // Enemy (Phải): Tiến thêm sang phải (+X)
-    // Cả 2 đều nhích lên trên (-Y) để khớp chân
-    const xOffset = this.side === 'ally' ? -18 * scale : 18 * scale; 
-    const yOffset = -34 * scale;
+  const viewport: AetherViewport = options.viewport
+      ?? ((typeof window !== 'undefined' && window.innerWidth <= 820) ? 'mobile' : 'desktop');
+    const facing = options.facing ?? (this.side === 'ally' ? 1 : -1);
+
+    const defaultBackX = (viewport === 'mobile' ? 16 : 24) * scale;
+    const defaultBackY = (viewport === 'mobile' ? 28 : 36) * scale;
+    const extraAnchorLift = Number.isFinite(options.anchorLiftY)
+      ? (options.anchorLiftY as number)
+      : 0;
+
+    const backOffsetX = Number.isFinite(options.backOffsetX)
+      ? (options.backOffsetX as number)
+      : defaultBackX;
+    const backOffsetY = Number.isFinite(options.backOffsetY)
+      ? (options.backOffsetY as number)
+      : defaultBackY;
+
+    // Đẩy trụ về phía sau lưng leader theo hướng quay của leader.
+    const xOffset = -facing * backOffsetX;
+    const yOffset = -(backOffsetY + extraAnchorLift);
 
     // Áp dụng toạ độ (đã có transform handle việc căn giữa)
     this.container.style.left = `${screenX + xOffset}px`;
@@ -245,4 +274,3 @@ export const globalAetherPool = {
     enemyAetherPool.destroyUI();
   }
 };
-

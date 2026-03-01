@@ -163,7 +163,7 @@ __define('./aether.ts', (exports, module, __require) => {
           }
       }
       // Hàm này được gọi từ Game Loop (draw) để bám theo nhân vật/vị trí
-      syncVisuals(screenX, screenY, scale) {
+      syncVisuals(screenX, screenY, scale, options = {}) {
           if (!this.container)
               return;
           if (scale < 0.1) {
@@ -182,12 +182,23 @@ __define('./aether.ts', (exports, module, __require) => {
               this.label.style.fontSize = `${fontSize}px`;
               this.label.style.bottom = `${-fontSize * 1.5}px`;
           }
-          // Offset giả lập 3D: Đẩy trụ ra sau lưng Leader
-          // Ally (Trái): Lùi thêm sang trái (-X)
-          // Enemy (Phải): Tiến thêm sang phải (+X)
-          // Cả 2 đều nhích lên trên (-Y) để khớp chân
-          const xOffset = this.side === 'ally' ? -18 * scale : 18 * scale;
-          const yOffset = -34 * scale;
+          const viewport = options.viewport
+              ?? ((typeof window !== 'undefined' && window.innerWidth <= 820) ? 'mobile' : 'desktop');
+          const facing = options.facing ?? (this.side === 'ally' ? 1 : -1);
+          const defaultBackX = (viewport === 'mobile' ? 16 : 24) * scale;
+          const defaultBackY = (viewport === 'mobile' ? 28 : 36) * scale;
+          const extraAnchorLift = Number.isFinite(options.anchorLiftY)
+              ? options.anchorLiftY
+              : 0;
+          const backOffsetX = Number.isFinite(options.backOffsetX)
+              ? options.backOffsetX
+              : defaultBackX;
+          const backOffsetY = Number.isFinite(options.backOffsetY)
+              ? options.backOffsetY
+              : defaultBackY;
+          // Đẩy trụ về phía sau lưng leader theo hướng quay của leader.
+          const xOffset = -facing * backOffsetX;
+          const yOffset = -(backOffsetY + extraAnchorLift);
           // Áp dụng toạ độ (đã có transform handle việc căn giữa)
           this.container.style.left = `${screenX + xOffset}px`;
           this.container.style.top = `${screenY + yOffset}px`;
@@ -12518,6 +12529,41 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   s: local.scale * ratioX
               };
           };
+          const resolveLeaderPivotAnchor = (token) => {
+              if (!token)
+                  return null;
+              const spriteAnchor = Number(token.art?.sprite?.anchor);
+              if (Number.isFinite(spriteAnchor))
+                  return Math.max(0, Math.min(1, spriteAnchor));
+              const layoutAnchor = Number(token.art?.layout?.anchor);
+              if (Number.isFinite(layoutAnchor))
+                  return Math.max(0, Math.min(1, layoutAnchor));
+              return null;
+          };
+          const projectLeaderGroundPos = (token, fallbackCx, fallbackCy) => {
+              const projected = token ? getScreenPos(token.cx, token.cy) : getScreenPos(fallbackCx, fallbackCy);
+              if (!token)
+                  return { ...projected, anchor: null };
+              const pivotAnchor = resolveLeaderPivotAnchor(token);
+              if (!Number.isFinite(pivotAnchor)) {
+                  return { ...projected, anchor: null };
+              }
+              const layout = token.art?.layout ?? null;
+              const sprite = token.art?.sprite ?? null;
+              const spriteHeightMult = Number.isFinite(Number(layout?.spriteHeight)) ? Number(layout?.spriteHeight) : 2.4;
+              const spriteScale = Number.isFinite(Number(sprite?.scale)) ? Number(sprite?.scale) : 1;
+              const artSize = Number.isFinite(Number(token.art?.size)) ? Number(token.art?.size) : 1;
+              const radiusPx = Math.max(6, Math.floor(grid.tile * 0.36 * projected.s));
+              const spriteHeightPx = radiusPx * spriteHeightMult * spriteScale * artSize;
+              const anchorValue = pivotAnchor;
+              const footShiftY = spriteHeightPx * (1 - anchorValue);
+              return {
+                  x: projected.x,
+                  y: projected.y + footShiftY,
+                  s: projected.s,
+                  anchor: anchorValue,
+              };
+          };
           // 4. Lấy toạ độ trực tiếp từ token leader đang hiện diện trên sân
           const allyLeader = tokens.find((t) => t.id === 'leaderA' && t.alive)
               ?? tokens.find((t) => t.id === 'leaderA')
@@ -12525,10 +12571,22 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           const enemyLeader = tokens.find((t) => t.id === 'leaderB' && t.alive)
               ?? tokens.find((t) => t.id === 'leaderB')
               ?? null;
-          const allyPos = allyLeader ? getScreenPos(allyLeader.cx, allyLeader.cy) : getScreenPos(0, 1);
-          const enemyPos = enemyLeader ? getScreenPos(enemyLeader.cx, enemyLeader.cy) : getScreenPos(6, 1);
+          const allyPos = projectLeaderGroundPos(allyLeader, 0, 1);
+          const enemyPos = projectLeaderGroundPos(enemyLeader, 6, 1);
+          const viewport = rect.width <= 820 ? 'mobile' : 'desktop';
           // 5. Đồng bộ vị trí + đồng bộ bể AE chung theo đội hình sống
-          globalAetherPool.syncAllVisuals({ x: allyPos.x, y: allyPos.y, s: allyPos.s }, { x: enemyPos.x, y: enemyPos.y, s: enemyPos.s }, tokens);
+          globalAetherPool.syncAllVisuals({ x: allyPos.x, y: allyPos.y, s: allyPos.s }, { x: enemyPos.x, y: enemyPos.y, s: enemyPos.s }, tokens, {
+              ally: {
+                  facing: 1,
+                  viewport,
+                  anchorLiftY: Number.isFinite(allyPos.anchor) ? Math.max(0, (1 - allyPos.anchor) * 10 * allyPos.s) : 0,
+              },
+              enemy: {
+                  facing: -1,
+                  viewport,
+                  anchorLiftY: Number.isFinite(enemyPos.anchor) ? Math.max(0, (1 - enemyPos.anchor) * 10 * enemyPos.s) : 0,
+              },
+          });
       }
       if (sessionVfx) {
           vfxDraw(ctx, sessionVfx, CAM_PRESET);

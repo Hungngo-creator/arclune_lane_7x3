@@ -2506,7 +2506,47 @@ function draw(): void {
       };
     };
 
-// 4. Lấy toạ độ trực tiếp từ token leader đang hiện diện trên sân
+    const resolveLeaderPivotAnchor = (token: UnitToken | null): number | null => {
+      if (!token) return null;
+      const spriteAnchor = Number((token.art?.sprite as { anchor?: unknown } | null | undefined)?.anchor);
+      if (Number.isFinite(spriteAnchor)) return Math.max(0, Math.min(1, spriteAnchor));
+      const layoutAnchor = Number((token.art?.layout as { anchor?: unknown } | null | undefined)?.anchor);
+      if (Number.isFinite(layoutAnchor)) return Math.max(0, Math.min(1, layoutAnchor));
+      return null;
+    };
+
+    const projectLeaderGroundPos = (
+      token: UnitToken | null,
+      fallbackCx: number,
+      fallbackCy: number,
+    ): { x: number; y: number; s: number; anchor: number | null } => {
+      const projected = token ? getScreenPos(token.cx, token.cy) : getScreenPos(fallbackCx, fallbackCy);
+      if (!token) return { ...projected, anchor: null };
+
+      const pivotAnchor = resolveLeaderPivotAnchor(token);
+      if (!Number.isFinite(pivotAnchor)) {
+        return { ...projected, anchor: null };
+      }
+
+      const layout = (token.art?.layout as { spriteHeight?: unknown } | null | undefined) ?? null;
+      const sprite = (token.art?.sprite as { scale?: unknown } | null | undefined) ?? null;
+      const spriteHeightMult = Number.isFinite(Number(layout?.spriteHeight)) ? Number(layout?.spriteHeight) : 2.4;
+      const spriteScale = Number.isFinite(Number(sprite?.scale)) ? Number(sprite?.scale) : 1;
+      const artSize = Number.isFinite(Number(token.art?.size)) ? Number(token.art?.size) : 1;
+      const radiusPx = Math.max(6, Math.floor(grid.tile * 0.36 * projected.s));
+      const spriteHeightPx = radiusPx * spriteHeightMult * spriteScale * artSize;
+      const anchorValue = pivotAnchor as number;
+      const footShiftY = spriteHeightPx * (1 - anchorValue);
+
+      return {
+        x: projected.x,
+        y: projected.y + footShiftY,
+        s: projected.s,
+        anchor: anchorValue,
+      };
+    };
+
+    // 4. Lấy toạ độ trực tiếp từ token leader đang hiện diện trên sân
     const allyLeader = tokens.find((t) => t.id === 'leaderA' && t.alive)
       ?? tokens.find((t) => t.id === 'leaderA')
       ?? null;
@@ -2514,14 +2554,27 @@ function draw(): void {
       ?? tokens.find((t) => t.id === 'leaderB')
       ?? null;
 
-    const allyPos = allyLeader ? getScreenPos(allyLeader.cx, allyLeader.cy) : getScreenPos(0, 1);
-    const enemyPos = enemyLeader ? getScreenPos(enemyLeader.cx, enemyLeader.cy) : getScreenPos(6, 1);
+    const allyPos = projectLeaderGroundPos(allyLeader, 0, 1);
+    const enemyPos = projectLeaderGroundPos(enemyLeader, 6, 1);
+    const viewport = rect.width <= 820 ? 'mobile' : 'desktop';
 
     // 5. Đồng bộ vị trí + đồng bộ bể AE chung theo đội hình sống
     globalAetherPool.syncAllVisuals(
        { x: allyPos.x, y: allyPos.y, s: allyPos.s },
        { x: enemyPos.x, y: enemyPos.y, s: enemyPos.s },
-       tokens
+       tokens,
+       {
+         ally: {
+           facing: 1,
+           viewport,
+           anchorLiftY: Number.isFinite(allyPos.anchor) ? Math.max(0, (1 - allyPos.anchor!) * 10 * allyPos.s) : 0,
+         },
+         enemy: {
+           facing: -1,
+           viewport,
+           anchorLiftY: Number.isFinite(enemyPos.anchor) ? Math.max(0, (1 - enemyPos.anchor!) * 10 * enemyPos.s) : 0,
+         },
+       }
    );
   }
   if (sessionVfx){
