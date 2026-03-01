@@ -42,6 +42,7 @@ __define('./aether.ts', (exports, module, __require) => {
               if (!unit || unit.side !== this.side || !unit.alive)
                   continue; // Chỉ tính unit đang sống của phe mình
               nextMax += (unit.aeMax || 0);
+              // Lấy hệ số class, fallback về 0.55 nếu không có
               const className = unit.class || 'Warrior';
               const coeff = AE_CLASS_COEFF[className] ?? 0.55;
               nextRegen += ((unit.wil || 0) * coeff);
@@ -233,8 +234,8 @@ __define('./aether.ts', (exports, module, __require) => {
               allyAetherPool.reconcile(units);
               enemyAetherPool.reconcile(units);
           }
-          allyAetherPool.syncVisuals(allyPos.x, allyPos.y, allyPos.s);
-          enemyAetherPool.syncVisuals(enemyPos.x, enemyPos.y, enemyPos.s);
+          allyAetherPool.syncVisuals(allyPos.x, allyPos.y, allyPos.s, options?.ally);
+          enemyAetherPool.syncVisuals(enemyPos.x, enemyPos.y, enemyPos.s, options?.enemy);
       },
       destroy: () => {
           allyAetherPool.destroyUI();
@@ -12578,11 +12579,15 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               ally: {
                   facing: 1,
                   viewport,
+                  backOffsetX: viewport === 'mobile' ? 24 * allyPos.s : 32 * allyPos.s,
+                  backOffsetY: viewport === 'mobile' ? 42 * allyPos.s : 50 * allyPos.s,
                   anchorLiftY: Number.isFinite(allyPos.anchor) ? Math.max(0, (1 - allyPos.anchor) * 10 * allyPos.s) : 0,
               },
               enemy: {
                   facing: -1,
                   viewport,
+                  backOffsetX: viewport === 'mobile' ? 24 * enemyPos.s : 32 * enemyPos.s,
+                  backOffsetY: viewport === 'mobile' ? 42 * enemyPos.s : 50 * enemyPos.s,
                   anchorLiftY: Number.isFinite(enemyPos.anchor) ? Math.max(0, (1 - enemyPos.anchor) * 10 * enemyPos.s) : 0,
               },
           });

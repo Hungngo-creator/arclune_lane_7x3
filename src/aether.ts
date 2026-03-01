@@ -1,6 +1,5 @@
 //home (termux)/arclune_lane_7x3/src/aether.ts
 
-import { addGameEventListener, TURN_START, BATTLE_END } from './events.ts';
 import { AE_CLASS_COEFF } from './catalog.ts';
 import type { UnitToken, Side } from './types/units'; // Import type chuẩn
 
@@ -40,11 +39,7 @@ export class SharedAetherPool {
       for (const unit of teamUnits) {
           if (!unit || unit.side !== this.side || !unit.alive) continue; // Chỉ tính unit đang sống của phe mình
           nextMax += (unit.aeMax || 0);
-<<<<<<< ours
-          
-=======
 
->>>>>>> theirs
           // Lấy hệ số class, fallback về 0.55 nếu không có
           const className = (unit as any).class || 'Warrior';
           const coeff = AE_CLASS_COEFF[className as keyof typeof AE_CLASS_COEFF] ?? 0.55;
@@ -74,11 +69,7 @@ export class SharedAetherPool {
       this.updateUI();
   }
 
-<<<<<<< ours
-public reconcile(teamUnits: UnitToken[]) {
-=======
-  public reconcile(teamUnits: UnitToken[]) {
->>>>>>> theirs
+ public reconcile(teamUnits: UnitToken[]) {
       const prevMax = this.max;
       const prevRegen = this.regenPerTurn;
       const prevCurrent = this.current;
@@ -187,7 +178,7 @@ public reconcile(teamUnits: UnitToken[]) {
   }
 
   // Hàm này được gọi từ Game Loop (draw) để bám theo nhân vật/vị trí
-public syncVisuals(screenX: number, screenY: number, scale: number, options: AetherVisualOptions = {}) {
+ public syncVisuals(screenX: number, screenY: number, scale: number, options: AetherVisualOptions = {}) {
     if (!this.container) return;
     
     if (scale < 0.1) {
@@ -210,7 +201,7 @@ public syncVisuals(screenX: number, screenY: number, scale: number, options: Aet
         this.label.style.bottom = `${-fontSize * 1.5}px`;
     }
 
-  const viewport: AetherViewport = options.viewport
+   const viewport: AetherViewport = options.viewport
       ?? ((typeof window !== 'undefined' && window.innerWidth <= 820) ? 'mobile' : 'desktop');
     const facing = options.facing ?? (this.side === 'ally' ? 1 : -1);
 
@@ -233,8 +224,8 @@ public syncVisuals(screenX: number, screenY: number, scale: number, options: Aet
 
     // Áp dụng toạ độ (đã có transform handle việc căn giữa)
     this.container.style.left = `${screenX + xOffset}px`;
-    this.container.style.top = `${screenY + yOffset}px`; 
- }
+    this.container.style.top = `${screenY + yOffset}px`;
+   }
 }
 
 export const allyAetherPool = new SharedAetherPool('ally');
@@ -274,8 +265,8 @@ export const globalAetherPool = {
       allyAetherPool.reconcile(units);
       enemyAetherPool.reconcile(units);
     }
-    allyAetherPool.syncVisuals(allyPos.x, allyPos.y, allyPos.s);
-    enemyAetherPool.syncVisuals(enemyPos.x, enemyPos.y, enemyPos.s);
+    allyAetherPool.syncVisuals(allyPos.x, allyPos.y, allyPos.s, options?.ally);
+    enemyAetherPool.syncVisuals(enemyPos.x, enemyPos.y, enemyPos.s, options?.enemy);
   },
 
   destroy: () => {

@@ -2567,11 +2567,15 @@ function draw(): void {
          ally: {
            facing: 1,
            viewport,
+           backOffsetX: viewport === 'mobile' ? 24 * allyPos.s : 32 * allyPos.s,
+           backOffsetY: viewport === 'mobile' ? 42 * allyPos.s : 50 * allyPos.s,
            anchorLiftY: Number.isFinite(allyPos.anchor) ? Math.max(0, (1 - allyPos.anchor!) * 10 * allyPos.s) : 0,
          },
          enemy: {
            facing: -1,
            viewport,
+           backOffsetX: viewport === 'mobile' ? 24 * enemyPos.s : 32 * enemyPos.s,
+           backOffsetY: viewport === 'mobile' ? 42 * enemyPos.s : 50 * enemyPos.s,
            anchorLiftY: Number.isFinite(enemyPos.anchor) ? Math.max(0, (1 - enemyPos.anchor!) * 10 * enemyPos.s) : 0,
          },
        }
