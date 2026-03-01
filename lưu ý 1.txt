@@ -264,11 +264,7 @@ Các chỉ số của 7 class đã cân bằng chưa?
 
 Multiplier theo bậc (giữ như đã chốt): SPD không nhân. Summoner cộng thêm giá trị quân gọi → cost cao hơn 1 nấc nếu ult/skill sinh 2+ đơn vị.
 
-4) Nhân vật: mọi nhân vật trừ những nhân vật đặc biệt từ quà tặng, đánh cốt truyện mở khoá nhân vật, gift code game, mua trực tiếp từ cửa hàng game đều cần gacha, nếu là phiên bản test pve thì chưa cần áp dụng.
-
-Đã dời sang "ý tưởng nhân vật.txt"
-
-5) Ghi nhớ rule đã chốt:
+4) Ghi nhớ rule đã chốt:
 
 Chiến trường 7×3 ngang, đồng minh trái, địch phải.
 
@@ -278,13 +274,9 @@ Cost: +1/s, cap 30, phải triệu hồi để tiếp tục tích; không có gi
 
 Auto-đánh theo hàng, chọn skill thì thi triển, không chọn thì normal attack, tích nộ và auto dùng ult khi đầy (trừ leader vì có 3 lựa chọn).
 
-Class base + rarity multiplier như đã thống nhất; Summoner tính thêm “giá trị quân” → cost nhỉnh hơn.
+Class base + rarity multiplier như đã thống nhất. Khí Aether hồi theo WIL; Nộ lên theo gây/nhận dmg + rule riêng (leader Uyên +5 nộ khi triệu hồi/hồi sinh 1 đồng minh ra sân).
 
-Khí Aether hồi theo WIL; Nộ lên theo gây/nhận dmg + rule riêng (leader Uyên +5 nộ khi triệu hồi/hồi sinh 1 đồng minh ra sân).
-
-VFX placeholder: chibi có quần áo/vũ khí; nền sân có texture.
-
-6) Leader:
+5) Leader:
 Mặc định: luôn có trên sân, không tốn cost, có thanh Nộ riêng.
 PvE boss có thể gọi là “Leader”, nhưng không có 3 ult lựa chọn như player (chỉ có 1 ult riêng của boss).
 Cơ chế “Ult chọn 1 trong 3": khi đầy nộ (≥ RageMax hoặc đủ nộ để dùng ult), sáng 3 nút; bấm 1 cái thì 2 cái tắt cho tới khi nộ lại đầy. Mọi ultimate chủ động của leader muốn dùng cần tích tổi thiểu 100 nộ để sử dụng, 1 turn chỉ được dùng 1 ult. Vào trận với 0 nộ/rage base.
@@ -474,7 +466,7 @@ onUyensBasicHit():
   if state.A1_stacks_HuyetKhi > 0:
      Uyen.rage += 3
 
-7) Giải thích về góc nhìn và lượt đánh trong trận đấu:
+6) Giải thích về góc nhìn và lượt đánh trong trận đấu:
 
 Kĩ năng không phải tính theo giây mà theo turn, mỗi turn là 1 lần đánh của nhân vật đó, trong ảnh tao có đánh dấu đó, phe đồng minh là số màu đỏ còn số xanh là lượt đánh của kẻ địch ở góc nhìn của đồng minh. Tao là A, B là kẻ thù, A có lượt đánh như số đỏ trong ảnh, A thấy B có lượt đánh như số xanh trong ảnh. Nếu B là người chơi thì B sẽ có góc nhìn từ bên trái nên sẽ có lượt đánh như số đỏ, B sẽ thấy A có lượt đánh như số xanh, nếu nhìn vào game A đang chơi thì B sẽ thấy A ở bên trái và mình ở bên phải, A nhìn vào màn hình game của B thì A sẽ thấy bản thân ở bên phải và B ở bên trái. Đây là góc nhìn của người chơi nếu chơi online pvp realtime và nhìn vào màn hình của player khác đang đánh với mình. 
 
@@ -482,10 +474,10 @@ Kĩ năng không phải tính theo giây mà theo turn, mỗi turn là 1 lần �
 
 Ảnh trong đoạn văn trên nhắc đến tao không thể đính kèm trong tệp này vì đây là txt nhưng ảnh đó có đánh dấu từ 1 đến 9 bằng "mực" xanh và đỏ nên hẳn mày sẽ nhớ, cần thì tao gửi ảnh.
 
-8) Trích lời từ Gemini (mang tính tham khảo vì chưa hoàn thiện) 
+7) Trích lời từ Gemini (mang tính tham khảo vì chưa hoàn thiện) 
 Nơi chứa những phân tích làm tao hài lòng từ Gemini:
 
-Cách tính Cap (Giới hạn) và Regen (Hồi năng lượng)
+A. Cách tính Cap (Giới hạn) và Regen (Hồi năng lượng)
 ​Để Bể AE chung có ý nghĩa, các chỉ số cá nhân của nhân vật phải đóng góp trực tiếp vào đó:
 ​Max AE Bể Chung = \sum (AE_Max của từng nhân vật đang đứng trên sân).
 ​Tại sao? Vì hệ số nhân của mày (N: 0.8 -> Prime: 1.55) sẽ tác động lên AE_max cá nhân. Khi mày mang nhiều nhân vật bậc cao (UR, Prime), Bể AE của mày sẽ "to" hơn, cho phép tích trữ nhiều "đạn" hơn để combo.
@@ -508,7 +500,7 @@ Giải quyết vấn đề Rank thấp qua AE khởi đầu
 ​Rank thấp (N, R): Có kỹ năng rẻ (15-20 AE). Nhờ có 50% AE ban đầu, chúng có thể tung chiêu khống chế/buff ngay ở Slot 1, 2, 3 để phá rối quân Prime của địch.
 ​Rank cao (Prime): Kỹ năng đắt (40-50 AE). Chúng phải đợi đến cuối vòng SSIT (khi các quân trước đã đánh thường tích thêm AE) hoặc đợi sang vòng 2 mới đủ AE để xả "siêu phẩm".
 
-Quy tắc ưu tiên mục tiêu (Targeting Priority):
+B. Quy tắc ưu tiên mục tiêu (Targeting Priority):
 1. Lane Priority: Ưu tiên tấn công mục tiêu gần nhất ở hàng ngang đối diện.
 2. Blocking: Không thể tấn công ô 5 nếu ô 2 còn quân. Không thể tấn công Leader (ô 8) nếu ô 2 hoặc ô 5 còn quân.
 3. Class Priority: 
@@ -524,7 +516,7 @@ Bàn về vật phẩm "Thần Tính" (Market Item)
 ​Không thể hồi sinh.
 ​Tăng mạnh sát thương cá nhân nhưng tiêu tốn AE bể chung nhiều hơn 20\%.
 
-[BỔ SUNG: HỆ THỐNG TU VI - ARCLUNE SIMULATION]
+C. [BỔ SUNG: HỆ THỐNG TU VI - ARCLUNE SIMULATION]
 - Cấp độ tối đa hiện tại: 73 (Hết Thánh Tôn).
 - Phân tầng năng lượng:
   + Lv 1-36 (Nguyên Lực): Đóng góp 100% chỉ số WIL vào AE Regen.
@@ -538,9 +530,7 @@ Triển khai Hệ thống Level (Tia Laser 73 Cấp)
 
 Base\_Stat(Lv) = Class\_Base\_Lv1 + [(Level - 1) \times \Delta\_Stat]
 
-
-
-9) CƠ CHẾ BỂ AETHER CHUNG (SHARED AE POOL) - Version 0.4.1
+D. CƠ CHẾ BỂ AETHER CHUNG (SHARED AE POOL) - Version 0.4.1
 1. Công thức Hồi AE mỗi Turn lớn (Sau Slot 9):
    Regen_Total = Sum(WIL_cá_nhân * Hệ_số_Class)
 2. Hệ số Hiệu suất AE theo Class:
@@ -555,4 +545,61 @@ Base\_Stat(Lv) = Class\_Base\_Lv1 + [(Level - 1) \times \Delta\_Stat]
 4. Quy tắc "Kiệt quệ":
    - Nếu AE bể = 0, toàn đội bị giảm 15% ARM và RES trong vòng SSIT tiếp theo.
 
+Quy Tắc (Rules/Absolute): "Admin lệnh". Không thể kháng, không thể né, đè lên mọi thứ. (Ví dụ: Chết tức thì, Xóa sổ khỏi trận đấu).
+Pháp Tắc (Laws):Thay đổi cách thế giới vận hành trong một phạm vi. Nó đè lên chỉ số và buff thường, nhưng bị Quy Tắc đè bẹp. (Ví dụ: Trong vùng này không ai được hồi máu -> Hồi máu thường sẽ = 0, nhưng nếu dùng Quy Tắc Hồi Sinh thì vẫn sống).
+Cơ chế thường (Normal): Sát thương, Buff, Debuff, Chỉ số cơ bản.
 
+E. Hệ thống Tag, phân loại kit và tránh xung đột logic.
+I. NHÓM 1: ĐỘ ƯU TIÊN & HỆ THỐNG (HIERARCHY TAGS)
+Đây là nhóm quan trọng nhất để xác định "Ai thắng" khi hai kỹ năng va chạm nhau.
+ * [Quy Tắc] (Rule): Cấp độ cao nhất (Admin Level). Thay đổi thực tại của game (Ví dụ: Cấm hồi sinh, Thay đổi lượt, Bất tử).
+   * Logic: Đè bẹp mọi chỉ số và hiệu ứng thông thường.
+ * [Pháp Tắc] (Law): Cấp độ thứ hai (System Level). Thay đổi môi trường hoặc cách tính toán chỉ số (Ví dụ: Đảo ngược hồi máu thành sát thương, Vùng cấm bay).
+   * Logic: Đè lên chỉ số, nhưng thua Quy Tắc.
+ * [Tuyệt Đối] (Absolute/Sure-hit): Cấp độ thứ ba (Interaction Level). Bỏ qua các check thông thường như Né tránh (AGI), Chặn đòn (Block) hoặc Giáp (ARM).
+   * Logic: Đánh là trúng, trúng là thấm (True Damage thường nằm ở đây).
+ * [Độc Nhất] (Unique): Chỉ được tồn tại 1 bản thể/hiệu ứng này trên sân. (Đã bàn ở trên).
+ * [Thường] (Normal): Các kỹ năng mặc định, chịu ảnh hưởng của DEF, RES, AGI...
+II. NHÓM 2: CƠ CHẾ SO SÁNH (CLASH RESOLUTION TAGS)
+Khi 2 [Quy Tắc] va nhau (ví dụ: "Bắt buộc chết" vs "Cấm tử vong"), hệ thống sẽ nhìn vào các tag này để quyết định bên nào thắng.
+ * [So Sánh: Cảnh Giới] (Check: Level): So sánh Level (Tu vi) của hai nhân vật. Bên nào cao hơn thì hiệu ứng bên đó có tác dụng.
+ * [So Sánh: Tinh Cấp] (Check: Star/Awaken): So sánh số Sao (Đột phá/Thăng thiên). Dùng để phân định thắng thua giữa 2 char cùng Rank.
+ * [So Sánh: Chiến Lực] (Check: CP): So sánh tổng lực chiến (Combat Power) hoặc một chỉ số cụ thể (ATK vs DEF, WIL vs WIL). "Mạnh được yếu thua".
+ * [So Sánh: Phẩm Bậc] (Check: Rank): Prime > UR > SSR > SR... (Mặc định ngầm, nhưng có thể gắn tag nếu cần skill khắc chế rank thấp).
+III. NHÓM 3: PHẠM VI & MỤC TIÊU (TARGETING TAGS)
+Quy định skill đánh vào đâu và trúng ai.
+ * [Đơn Mục Tiêu] (Single): Chọn 1 đối tượng cụ thể.
+ * [AOE: Toàn Sân] (Global): Trúng tất cả mọi người trên sân (có thể lọc theo phe).
+ * [AOE: Hàng Ngang/Dọc] (Row/Column): Theo lưới 3x3.
+ * [AOE: Vùng] (Area): Trúng mục tiêu chính và các ô lân cận (Splash).
+ * [Ngẫu Nhiên] (Random): Hệ thống tự chọn mục tiêu (Không thể target thủ công).
+ * [Bản Thân] (Self): Chỉ tác dụng lên người thi triển.
+ * [Phe Ta] (Ally) / [Phe Địch] (Enemy): Xác định luồng tác dụng.
+IV. NHÓM 4: LOẠI HIỆU ỨNG (EFFECT TYPE TAGS)
+Quy định skill làm cái gì.
+ * [Sát Thương Vật Lý] (Phys Dmg): Tính theo ATK vs ARM.
+ * [Sát Thương Phép] (Magic Dmg): Tính theo WIL vs RES.
+ * [Sát Thương Chuẩn] (True Dmg): Bỏ qua ARM/RES.
+ * [Hồi Phục] (Heal): Tăng HP.
+ * [Tạo Khiên] (Shield): Tạo HP ảo.
+ * [Buff]: Hiệu ứng có lợi (Tăng stat, miễn nhiễm...).
+ * [Debuff]: Hiệu ứng bất lợi (Giảm stat, DOT, dấu ấn...).
+ * [Khống Chế] (Control): Choáng, Ngủ, Câm lặng, Trói chân.
+ * [Triệu Hồi] (Summon): Gọi đệ tử ra ô trống.
+ * [Biến Hình] (Transform): Thay đổi bộ skill/chỉ số tạm thời.
+ * [Địa Hình] (Terrain/Field): Tạo hiệu ứng lên ô đất (Ví dụ: Ô lửa, Ô độc).
+V. NHÓM 5: TÀI NGUYÊN & ĐIỀU KIỆN (COST & TRIGGER TAGS)
+Cái giá phải trả và thời điểm kích hoạt.
+ * [Tiêu Hao: Aether] (Cost: AE): Tốn năng lượng chung.
+ * [Tiêu Hao: HP] (Cost: HP): Tốn máu bản thân.
+ * [Tiêu Hao: Cost] (Cost: DP): Tốn điểm triệu hồi trên thanh Cost Bar.
+ * [Lập Tức] (Instant): Tác dụng ngay khi bấm nút.
+ * [Nội Tại] (Passive): Luôn hoạt động hoặc tự kích hoạt khi đủ điều kiện.
+ * [Tự Động] (Auto-cast): Dùng cho Ult hoặc Skill tự kích hoạt khi đầy thanh nộ/điều kiện.
+ * [Hồi Chiêu] (Cooldown): Số turn phải chờ để dùng lại.
+PHÂN TÍCH XUNG ĐỘT (CONFLICT RESOLUTION FLOW)
+Ví dụ: Nhân vật A có "Quy Tắc: Đánh là chết" đánh vào Nhân vật B có "Quy Tắc: Bất tử":
+ * Check 1: Phẩm Bậc (Rank Priority):
+   * Prime > UR > SSR > SR...
+   * Lý do: Rank cao hơn đại diện cho Vị Cách cao hơn.
+ * Check 2 (Nếu cùng Rank): Game Tự so sánh Level (tu vi) > So Sánh sao, Tinh Cấp (tối đa 5*) nếu cả 2 bên có 1 char chưa đạt awaken > So số sao Awaken (tối đa awa 2) nếu 2 bên đều có char awaken > so sánh điểm chiến lực nếu 2 bên có lv bằng nhau, đã awaken + 2(awaken + 2 thì cần full * trước nên không đề cập), chiến lực chắc chắn sẽ khác nhau và không thể giống nhau đến từng con số vì build còn quyết định bởi trang bị.
