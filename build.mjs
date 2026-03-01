@@ -3,6 +3,7 @@ import fs from 'fs/promises';
 import fsSync from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { verifyAetherBundle } from './tools/verify-aether-bundle.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 let esbuild;
 try {
@@ -112,6 +113,7 @@ const LEGACY_MODULE_ID_ALIASES = new Map(
 );
 
 const args = process.argv.slice(2);
+const skipBundleVerify = args.includes('--skip-bundle-verify');
 const modeArg = args.find((arg) => arg.startsWith('--mode='));
 const argMode = modeArg ? modeArg.split('=')[1] : undefined;
 const normalizedMode = argMode && argMode.toLowerCase() === 'production' ? 'production' : argMode && argMode.toLowerCase() === 'development' ? 'development' : undefined;
@@ -715,6 +717,19 @@ for (const [, stubPath] of STUB_MODULE_SPECIFIERS){
     const reportPath = path.join(DIST_DIR, 'build-report.json');
     await fs.writeFile(reportPath, JSON.stringify(result.metafile, null, 2), 'utf8');
     logTopBundleSizes(result.metafile);
+  }
+
+  if (!skipBundleVerify){
+    const verifyResult = verifyAetherBundle(path.join(DIST_DIR, 'app.js'));
+    if (!verifyResult.ok){
+      const missing = verifyResult.missing.length
+        ? ` | thiếu marker: ${verifyResult.missing.join(', ')}`
+        : '';
+      const stale = verifyResult.stale.length
+        ? ` | còn marker cũ: ${verifyResult.stale.join(', ')}`
+        : '';
+      throw new Error(`[build.mjs] ${verifyResult.message}${missing}${stale}`);
+    }
   }
 }
 
