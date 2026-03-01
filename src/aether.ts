@@ -19,26 +19,50 @@ export class SharedAetherPool {
   }
 
   // --- LOGIC VÒNG ĐỜI TRẬN ĐẤU ---
-  public init(teamUnits: UnitToken[]) {
-      this.max = 0;
-      this.regenPerTurn = 0;
+  private recalculateFromUnits(teamUnits: UnitToken[], resetCurrent: boolean = false): void {
+      let nextMax = 0;
+      let nextRegen = 0;
       for (const unit of teamUnits) {
-          if (!unit || unit.side !== this.side) continue; // Chỉ tính unit phe mình
-          this.max += (unit.aeMax || 0);
+          if (!unit || unit.side !== this.side || !unit.alive) continue; // Chỉ tính unit đang sống của phe mình
+          nextMax += (unit.aeMax || 0);
           
           // Lấy hệ số class, fallback về 0.55 nếu không có
-          const className = (unit as any).class || 'Warrior'; 
+          const className = (unit as any).class || 'Warrior';
           const coeff = AE_CLASS_COEFF[className as keyof typeof AE_CLASS_COEFF] ?? 0.55;
-          
-          this.regenPerTurn += ((unit.wil || 0) * coeff);
+
+          nextRegen += ((unit.wil || 0) * coeff);
       }
-      this.max = Math.floor(this.max);
-      this.regenPerTurn = Math.floor(this.regenPerTurn);
-      
-      this.current = Math.floor(this.max / 2); // Khởi đầu 50%
-      
+
+      this.max = Math.floor(nextMax);
+      this.regenPerTurn = Math.floor(nextRegen);
+
+      if (resetCurrent) {
+        this.current = Math.floor(this.max / 2); // Khởi đầu 50%
+        return;
+      }
+
+      if (this.current > this.max) {
+        this.current = this.max;
+      }
+      if (this.current < 0) {
+        this.current = 0;
+      }
+  }
+
+  public init(teamUnits: UnitToken[]) {
+      this.recalculateFromUnits(teamUnits, true);
       this.initUI();
       this.updateUI();
+  }
+
+public reconcile(teamUnits: UnitToken[]) {
+      const prevMax = this.max;
+      const prevRegen = this.regenPerTurn;
+      const prevCurrent = this.current;
+      this.recalculateFromUnits(teamUnits, false);
+      if (prevMax !== this.max || prevRegen !== this.regenPerTurn || prevCurrent !== this.current) {
+        this.updateUI();
+      }
   }
 
   // Gọi khi kết thúc 1 Turn Lớn (Cycle)
@@ -167,8 +191,8 @@ public syncVisuals(screenX: number, screenY: number, scale: number) {
     // Ally (Trái): Lùi thêm sang trái (-X)
     // Enemy (Phải): Tiến thêm sang phải (+X)
     // Cả 2 đều nhích lên trên (-Y) để khớp chân
-    const xOffset = this.side === 'ally' ? -40 * scale : 40 * scale; 
-    const yOffset = -15 * scale; 
+    const xOffset = this.side === 'ally' ? -18 * scale : 18 * scale; 
+    const yOffset = -34 * scale;
 
     // Áp dụng toạ độ (đã có transform handle việc căn giữa)
     this.container.style.left = `${screenX + xOffset}px`;
@@ -203,7 +227,15 @@ export const globalAetherPool = {
   },
 
   // API cho Engine update vị trí
-  syncAllVisuals: (allyPos: {x:number, y:number, s:number}, enemyPos: {x:number, y:number, s:number}) => {
+  syncAllVisuals: (
+    allyPos: {x:number, y:number, s:number},
+    enemyPos: {x:number, y:number, s:number},
+    units?: UnitToken[]
+  ) => {
+    if (Array.isArray(units)) {
+      allyAetherPool.reconcile(units);
+      enemyAetherPool.reconcile(units);
+    }
     allyAetherPool.syncVisuals(allyPos.x, allyPos.y, allyPos.s);
     enemyAetherPool.syncVisuals(enemyPos.x, enemyPos.y, enemyPos.s);
   },

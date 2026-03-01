@@ -35,23 +35,44 @@ __define('./aether.ts', (exports, module, __require) => {
           this.side = side;
       }
       // --- LOGIC VÒNG ĐỜI TRẬN ĐẤU ---
-      init(teamUnits) {
-          this.max = 0;
-          this.regenPerTurn = 0;
+      recalculateFromUnits(teamUnits, resetCurrent = false) {
+          let nextMax = 0;
+          let nextRegen = 0;
           for (const unit of teamUnits) {
-              if (!unit || unit.side !== this.side)
-                  continue; // Chỉ tính unit phe mình
-              this.max += (unit.aeMax || 0);
+              if (!unit || unit.side !== this.side || !unit.alive)
+                  continue; // Chỉ tính unit đang sống của phe mình
+              nextMax += (unit.aeMax || 0);
               // Lấy hệ số class, fallback về 0.55 nếu không có
               const className = unit.class || 'Warrior';
               const coeff = AE_CLASS_COEFF[className] ?? 0.55;
-              this.regenPerTurn += ((unit.wil || 0) * coeff);
+              nextRegen += ((unit.wil || 0) * coeff);
           }
-          this.max = Math.floor(this.max);
-          this.regenPerTurn = Math.floor(this.regenPerTurn);
-          this.current = Math.floor(this.max / 2); // Khởi đầu 50%
+          this.max = Math.floor(nextMax);
+          this.regenPerTurn = Math.floor(nextRegen);
+          if (resetCurrent) {
+              this.current = Math.floor(this.max / 2); // Khởi đầu 50%
+              return;
+          }
+          if (this.current > this.max) {
+              this.current = this.max;
+          }
+          if (this.current < 0) {
+              this.current = 0;
+          }
+      }
+      init(teamUnits) {
+          this.recalculateFromUnits(teamUnits, true);
           this.initUI();
           this.updateUI();
+      }
+      reconcile(teamUnits) {
+          const prevMax = this.max;
+          const prevRegen = this.regenPerTurn;
+          const prevCurrent = this.current;
+          this.recalculateFromUnits(teamUnits, false);
+          if (prevMax !== this.max || prevRegen !== this.regenPerTurn || prevCurrent !== this.current) {
+              this.updateUI();
+          }
       }
       // Gọi khi kết thúc 1 Turn Lớn (Cycle)
       onTurnCycleEnd() {
@@ -165,8 +186,8 @@ __define('./aether.ts', (exports, module, __require) => {
           // Ally (Trái): Lùi thêm sang trái (-X)
           // Enemy (Phải): Tiến thêm sang phải (+X)
           // Cả 2 đều nhích lên trên (-Y) để khớp chân
-          const xOffset = this.side === 'ally' ? -40 * scale : 40 * scale;
-          const yOffset = -15 * scale;
+          const xOffset = this.side === 'ally' ? -18 * scale : 18 * scale;
+          const yOffset = -34 * scale;
           // Áp dụng toạ độ (đã có transform handle việc căn giữa)
           this.container.style.left = `${screenX + xOffset}px`;
           this.container.style.top = `${screenY + yOffset}px`;
@@ -197,7 +218,11 @@ __define('./aether.ts', (exports, module, __require) => {
           return enemyAetherPool.consume(cost);
       },
       // API cho Engine update vị trí
-      syncAllVisuals: (allyPos, enemyPos) => {
+      syncAllVisuals: (allyPos, enemyPos, units) => {
+          if (Array.isArray(units)) {
+              allyAetherPool.reconcile(units);
+              enemyAetherPool.reconcile(units);
+          }
           allyAetherPool.syncVisuals(allyPos.x, allyPos.y, allyPos.s);
           enemyAetherPool.syncVisuals(enemyPos.x, enemyPos.y, enemyPos.s);
       },
@@ -12478,10 +12503,13 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           // 2. Tính tỷ lệ (Ratio) giữa Pixel màn hình và Pixel nội tại của Canvas
           const ratioX = rect.width / canvasEl.width;
           const ratioY = rect.height / canvasEl.height;
+          const grid = Game?.grid;
+          if (!grid)
+              return;
           // 3. Hàm chuyển đổi toạ độ Game -> Màn hình
           const getScreenPos = (cx, cy) => {
               // cellCenterObliqueLocal trả về toạ độ pixel trong Canvas (ví dụ: 100, 200)
-              const local = cellCenterObliqueLocal(Game.grid, cx, cy, CAM_PRESET);
+              const local = cellCenterObliqueLocal(grid, cx, cy, CAM_PRESET);
               return {
                   // Cộng rect.left/top để ra toạ độ tuyệt đối trên màn hình
                   x: rect.left + (local.x * ratioX),
@@ -12490,13 +12518,17 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   s: local.scale * ratioX
               };
           };
-          // 4. Lấy toạ độ Leader (Slot 8)
-          // Ally Leader: Cột 0, Hàng 1
-          const allyPos = getScreenPos(0, 1);
-          // Enemy Leader: Cột 6, Hàng 1
-          const enemyPos = getScreenPos(6, 1);
-          // 5. Đồng bộ
-          globalAetherPool.syncAllVisuals({ x: allyPos.x, y: allyPos.y, s: allyPos.s }, { x: enemyPos.x, y: enemyPos.y, s: enemyPos.s });
+          // 4. Lấy toạ độ trực tiếp từ token leader đang hiện diện trên sân
+          const allyLeader = tokens.find((t) => t.id === 'leaderA' && t.alive)
+              ?? tokens.find((t) => t.id === 'leaderA')
+              ?? null;
+          const enemyLeader = tokens.find((t) => t.id === 'leaderB' && t.alive)
+              ?? tokens.find((t) => t.id === 'leaderB')
+              ?? null;
+          const allyPos = allyLeader ? getScreenPos(allyLeader.cx, allyLeader.cy) : getScreenPos(0, 1);
+          const enemyPos = enemyLeader ? getScreenPos(enemyLeader.cx, enemyLeader.cy) : getScreenPos(6, 1);
+          // 5. Đồng bộ vị trí + đồng bộ bể AE chung theo đội hình sống
+          globalAetherPool.syncAllVisuals({ x: allyPos.x, y: allyPos.y, s: allyPos.s }, { x: enemyPos.x, y: enemyPos.y, s: enemyPos.s }, tokens);
       }
       if (sessionVfx) {
           vfxDraw(ctx, sessionVfx, CAM_PRESET);

@@ -2489,11 +2489,13 @@ function draw(): void {
     // 2. Tính tỷ lệ (Ratio) giữa Pixel màn hình và Pixel nội tại của Canvas
     const ratioX = rect.width / canvasEl.width;
     const ratioY = rect.height / canvasEl.height;
+    const grid = Game?.grid;
+    if (!grid) return;
 
     // 3. Hàm chuyển đổi toạ độ Game -> Màn hình
     const getScreenPos = (cx: number, cy: number) => {
       // cellCenterObliqueLocal trả về toạ độ pixel trong Canvas (ví dụ: 100, 200)
-      const local = cellCenterObliqueLocal(Game.grid!, cx, cy, CAM_PRESET);
+      const local = cellCenterObliqueLocal(grid, cx, cy, CAM_PRESET);
       
       return {
         // Cộng rect.left/top để ra toạ độ tuyệt đối trên màn hình
@@ -2504,16 +2506,22 @@ function draw(): void {
       };
     };
 
-    // 4. Lấy toạ độ Leader (Slot 8)
-    // Ally Leader: Cột 0, Hàng 1
-    const allyPos = getScreenPos(0, 1); 
-    // Enemy Leader: Cột 6, Hàng 1
-    const enemyPos = getScreenPos(6, 1); 
-    
-    // 5. Đồng bộ
+// 4. Lấy toạ độ trực tiếp từ token leader đang hiện diện trên sân
+    const allyLeader = tokens.find((t) => t.id === 'leaderA' && t.alive)
+      ?? tokens.find((t) => t.id === 'leaderA')
+      ?? null;
+    const enemyLeader = tokens.find((t) => t.id === 'leaderB' && t.alive)
+      ?? tokens.find((t) => t.id === 'leaderB')
+      ?? null;
+
+    const allyPos = allyLeader ? getScreenPos(allyLeader.cx, allyLeader.cy) : getScreenPos(0, 1);
+    const enemyPos = enemyLeader ? getScreenPos(enemyLeader.cx, enemyLeader.cy) : getScreenPos(6, 1);
+
+    // 5. Đồng bộ vị trí + đồng bộ bể AE chung theo đội hình sống
     globalAetherPool.syncAllVisuals(
        { x: allyPos.x, y: allyPos.y, s: allyPos.s },
-       { x: enemyPos.x, y: enemyPos.y, s: enemyPos.s }
+       { x: enemyPos.x, y: enemyPos.y, s: enemyPos.s },
+       tokens
    );
   }
   if (sessionVfx){
