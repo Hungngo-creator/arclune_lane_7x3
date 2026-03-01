@@ -4,14 +4,14 @@ import { getBannerById, rollBanner } from '../../src/screens/ui-gacha/logic/gach
 import type { BannerStateMap } from '../../src/screens/ui-gacha/logic/types.ts';
 
 describe('Hệ tiền tệ', () => {
-  test('100 VNT đổi 1 HNT không thuế', () => {
+  test('100 VNT đổi lên HNT bị thuế tối thiểu nên không đủ 1 HNT', () => {
     const wallet = createWallet({ VNT: 100, HNT: 0, TNT: 0, ThNT: 0, TT: 0 });
     const result = convertCurrency(wallet, 'VNT', 'HNT', 100, { allowTax: true });
-    expect(result.ok).toBe(true);
-    expect(result.received).toBe(1);
-    expect(result.tax).toBe(0);
-    expect(result.wallet.HNT).toBe(1);
-    expect(result.wallet.VNT).toBe(0);
+    expect(result.ok).toBe(false);
+    expect(result.received).toBe(0);
+    expect(result.tax).toBe(1);
+    expect(result.wallet.HNT).toBe(0);
+    expect(result.wallet.VNT).toBe(100);
   });
 
   test('101 VNT đổi lên HNT có thuế tối thiểu 1', () => {
@@ -21,6 +21,16 @@ describe('Hệ tiền tệ', () => {
     expect(result.received).toBeGreaterThanOrEqual(1);
     expect(result.tax).toBeGreaterThanOrEqual(1);
     expect(result.tax).toBeLessThanOrEqual(11);
+  });
+
+test('Quy đổi 1 TT xuống TNT theo cấp số nhân 100', () => {
+    const wallet = createWallet({ VNT: 0, HNT: 0, TNT: 0, ThNT: 0, TT: 1 });
+    const result = convertCurrency(wallet, 'TT', 'TNT', 1, { allowTax: true });
+    expect(result.ok).toBe(true);
+    expect(result.tax).toBe(0);
+    expect(result.received).toBe(10_000);
+    expect(result.wallet.TT).toBe(0);
+    expect(result.wallet.TNT).toBe(10_000);
   });
 
   test('500 HNT đổi lên TNT có thuế không vượt 10%', () => {

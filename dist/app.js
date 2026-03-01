@@ -5230,7 +5230,7 @@ __define('./data/economy.config.ts', (exports, module, __require) => {
               name: 'Trung Nguyên Tinh',
               shortName: 'Trung',
               suffix: 'TNT',
-              ratioToBase: 1000,
+              ratioToBase: 10000,
               description: 'Kho dự trữ cho các kiến trúc tông môn, chế tác pháp khí và banner cao cấp.'
           },
           {
@@ -5238,7 +5238,7 @@ __define('./data/economy.config.ts', (exports, module, __require) => {
               name: 'Thượng Nguyên Tinh',
               shortName: 'Thượng',
               suffix: 'ThNT',
-              ratioToBase: 10000,
+              ratioToBase: 1000000,
               description: 'Đơn vị luân chuyển giữa các tông môn, đổi thưởng cao cấp và sự kiện giới hạn.'
           },
           {
@@ -5246,7 +5246,7 @@ __define('./data/economy.config.ts', (exports, module, __require) => {
               name: 'Thần Tinh',
               shortName: 'Thần',
               suffix: 'TT',
-              ratioToBase: 100000,
+              ratioToBase: 100000000,
               description: 'Đơn vị tối thượng cho các giao dịch Prime và quỹ dự trữ chiến lược.'
           }
       ],
