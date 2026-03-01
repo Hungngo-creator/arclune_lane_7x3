@@ -15,6 +15,7 @@ import { safeNow, sessionNow } from './utils/time.ts';
 import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } from './utils/fury.ts';
 import { nextTurnInterleaved } from './turns/interleaved.ts';
 import { resolveRuntimeUnitStats } from './modes/pve/collection-mapper.ts';
+import { applyCultivationBonus } from './cultivation.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { RuntimeUnitProgress } from '@shared-types/pve';
@@ -194,7 +195,16 @@ export function spawnQueuedIfDue(
   const kit = meta?.kit;
   const initialFury = initialRageFor(p.unitId, { isLeader:false, revive: !!p.revive, reviveSpec: p.revived });
   const progressMap = Game.runtime?.unitProgressById as ReadonlyMap<string, RuntimeUnitProgress> | undefined;
-  const stats = resolveRuntimeUnitStats(p.unitId, progressMap);
+  const progress = progressMap?.get(p.unitId);
+  const baseStatsResolved = resolveRuntimeUnitStats(p.unitId, progressMap);
+  const stats = applyCultivationBonus({
+    ...baseStatsResolved,
+    id: p.unitId,
+    hasCultivationData: progressMap?.has(p.unitId) ?? false,
+    realm: progress?.realm,
+    subRealm: progress?.subRealm,
+  });
+  const { id: _statsId, ...resolvedStats } = stats;
   const baseStats = {
     atk: stats.atk ?? 0,
     res: stats.res ?? 0,
@@ -208,7 +218,7 @@ export function spawnQueuedIfDue(
     cy: p.cy,
     side: p.side,
     alive: true,
-    ...stats,
+    ...resolvedStats,
     statuses: [],
     baseStats,
   };

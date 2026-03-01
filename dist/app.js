@@ -1,7 +1,7 @@
 // Bundled by build.mjs
 const __modules = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }
 function __define(id, factory){ __modules[id] = { factory, exports: null, initialized: false }; }
@@ -4892,6 +4892,112 @@ __define('./config/schema.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'parseSceneConfig')) exports.parseSceneConfig = parseSceneConfig;
   if (!Object.prototype.hasOwnProperty.call(exports, 'parseWorldMapConfig')) exports.parseWorldMapConfig = parseWorldMapConfig;
   if (!Object.prototype.hasOwnProperty.call(exports, 'parseGameConfig')) exports.parseGameConfig = parseGameConfig;
+});
+__define('./cultivation.ts', (exports, module, __require) => {
+  const REALM_CONFIGS = {
+      // Realm 1: Đúc Phách (7 tiểu cấp)
+      1: {
+          maxSubRealm: 7,
+          perSubRealm: {
+              hpMax: 0.03,
+              atk: 0.02,
+              wil: 0.02,
+              arm: 0.015,
+              res: 0.015,
+              aeMax: 0.01,
+              aeRegen: 0.005,
+          },
+      },
+      // Realm 2: Luyện Hồn (3 tiểu cấp)
+      2: {
+          maxSubRealm: 3,
+          perSubRealm: {
+              hpMax: 0.06,
+              atk: 0.04,
+              wil: 0.05,
+              arm: 0.03,
+              res: 0.03,
+              aeMax: 0.02,
+              aeRegen: 0.01,
+          },
+      },
+  };
+  const ZERO_BONUS = {
+      hpMax: 0,
+      atk: 0,
+      wil: 0,
+      arm: 0,
+      res: 0,
+      aeMax: 0,
+      aeRegen: 0,
+  };
+  const asNonNegativeInt = (value, fallback = 0) => {
+      const parsed = typeof value === 'number' ? value : Number(value);
+      if (!Number.isFinite(parsed))
+          return fallback;
+      return Math.max(0, Math.floor(parsed));
+  };
+  const roundStat = (value) => Math.round(value * 10000) / 10000;
+  const getRealmConfig = (realm) => REALM_CONFIGS[realm] ?? null;
+  const getTotalBonus = (realm, subRealm) => {
+      const config = getRealmConfig(realm);
+      if (!config)
+          return ZERO_BONUS;
+      const appliedSubRealm = Math.max(0, Math.min(config.maxSubRealm, subRealm));
+      return {
+          hpMax: config.perSubRealm.hpMax * appliedSubRealm,
+          atk: config.perSubRealm.atk * appliedSubRealm,
+          wil: config.perSubRealm.wil * appliedSubRealm,
+          arm: config.perSubRealm.arm * appliedSubRealm,
+          res: config.perSubRealm.res * appliedSubRealm,
+          aeMax: config.perSubRealm.aeMax * appliedSubRealm,
+          aeRegen: config.perSubRealm.aeRegen * appliedSubRealm,
+      };
+  };
+  const scaleStat = (rawValue, ratio) => {
+      if (typeof rawValue !== 'number' || !Number.isFinite(rawValue))
+          return undefined;
+      return roundStat(rawValue * (1 + ratio));
+  };
+  function applyCultivationBonus(unit) {
+      if (!unit || typeof unit !== 'object')
+          return unit;
+      const hasCultivationData = unit.hasCultivationData ?? false;
+      const isSystemLeader = unit.id === 'leaderA' || unit.id === 'leaderB';
+      if (isSystemLeader && !hasCultivationData) {
+          return unit;
+      }
+      const realm = asNonNegativeInt(unit.realm);
+      const subRealm = asNonNegativeInt(unit.subRealm);
+      if (realm <= 0 || subRealm <= 0) {
+          return unit;
+      }
+      const totalBonus = getTotalBonus(realm, subRealm);
+      if (totalBonus === ZERO_BONUS) {
+          return unit;
+      }
+      const hpMax = scaleStat(unit.hpMax, totalBonus.hpMax);
+      const nextHp = scaleStat(unit.hp, totalBonus.hpMax);
+      const atk = scaleStat(unit.atk, totalBonus.atk);
+      const wil = scaleStat(unit.wil, totalBonus.wil);
+      const arm = scaleStat(unit.arm, totalBonus.arm);
+      const res = scaleStat(unit.res, totalBonus.res);
+      const aeMax = scaleStat(unit.aeMax, totalBonus.aeMax);
+      const aeRegen = scaleStat(unit.aeRegen, totalBonus.aeRegen);
+      return {
+          ...unit,
+          ...(hpMax !== undefined ? { hpMax } : {}),
+          ...(nextHp !== undefined ? { hp: hpMax !== undefined ? Math.min(nextHp, hpMax) : nextHp } : {}),
+          ...(atk !== undefined ? { atk } : {}),
+          ...(wil !== undefined ? { wil } : {}),
+          ...(arm !== undefined ? { arm } : {}),
+          ...(res !== undefined ? { res } : {}),
+          ...(aeMax !== undefined ? { aeMax } : {}),
+          ...(aeRegen !== undefined ? { aeRegen } : {}),
+      };
+  }
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'applyCultivationBonus')) exports.applyCultivationBonus = applyCultivationBonus;
 });
 __define('./data/announcements.config.ts', (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/data/announcements.config.ts
@@ -22117,6 +22223,8 @@ __define('./turns.ts', (exports, module, __require) => {
   const nextTurnInterleaved = __dep12.nextTurnInterleaved;
   const __dep13 = __require('./modes/pve/collection-mapper.ts');
   const resolveRuntimeUnitStats = __dep13.resolveRuntimeUnitStats;
+  const __dep14 = __require('./cultivation.ts');
+  const applyCultivationBonus = __dep14.applyCultivationBonus;
   const toLowerSide = (side) => {
       if (side === 'ALLY')
           return 'ally';
@@ -22262,7 +22370,16 @@ __define('./turns.ts', (exports, module, __require) => {
       const kit = meta?.kit;
       const initialFury = initialRageFor(p.unitId, { isLeader: false, revive: !!p.revive, reviveSpec: p.revived });
       const progressMap = Game.runtime?.unitProgressById;
-      const stats = resolveRuntimeUnitStats(p.unitId, progressMap);
+      const progress = progressMap?.get(p.unitId);
+      const baseStatsResolved = resolveRuntimeUnitStats(p.unitId, progressMap);
+      const stats = applyCultivationBonus({
+          ...baseStatsResolved,
+          id: p.unitId,
+          hasCultivationData: progressMap?.has(p.unitId) ?? false,
+          realm: progress?.realm,
+          subRealm: progress?.subRealm,
+      });
+      const { id: _statsId, ...resolvedStats } = stats;
       const baseStats = {
           atk: stats.atk ?? 0,
           res: stats.res ?? 0,
@@ -22276,7 +22393,7 @@ __define('./turns.ts', (exports, module, __require) => {
           cy: p.cy,
           side: p.side,
           alive: true,
-          ...stats,
+          ...resolvedStats,
           statuses: [],
           baseStats,
       };
