@@ -185,8 +185,8 @@ __define('./aether.ts', (exports, module, __require) => {
           const viewport = options.viewport
               ?? ((typeof window !== 'undefined' && window.innerWidth <= 820) ? 'mobile' : 'desktop');
           const facing = options.facing ?? (this.side === 'ally' ? 1 : -1);
-          const defaultBackX = (viewport === 'mobile' ? 16 : 24) * scale;
-          const defaultBackY = (viewport === 'mobile' ? 28 : 36) * scale;
+          const defaultBackX = (viewport === 'mobile' ? 18 : 24) * scale;
+          const defaultBackY = (viewport === 'mobile' ? 24 : 30) * scale;
           const extraAnchorLift = Number.isFinite(options.anchorLiftY)
               ? options.anchorLiftY
               : 0;
@@ -197,11 +197,26 @@ __define('./aether.ts', (exports, module, __require) => {
               ? options.backOffsetY
               : defaultBackY;
           // Đẩy trụ về phía sau lưng leader theo hướng quay của leader.
-          const xOffset = -facing * backOffsetX;
+          const viewportCenterX = (typeof window !== 'undefined' ? window.innerWidth / 2 : screenX);
+          const sideSign = Math.sign(screenX - viewportCenterX) || facing;
+          const xOffset = sideSign * backOffsetX;
           const yOffset = -(backOffsetY + extraAnchorLift);
+          let nextLeft = screenX + xOffset;
+          let nextTop = screenY + yOffset;
+          const clamp = options.clamp;
+          if (clamp) {
+              if (Number.isFinite(clamp.minX))
+                  nextLeft = Math.max(nextLeft, clamp.minX);
+              if (Number.isFinite(clamp.maxX))
+                  nextLeft = Math.min(nextLeft, clamp.maxX);
+              if (Number.isFinite(clamp.minY))
+                  nextTop = Math.max(nextTop, clamp.minY);
+              if (Number.isFinite(clamp.maxY))
+                  nextTop = Math.min(nextTop, clamp.maxY);
+          }
           // Áp dụng toạ độ (đã có transform handle việc căn giữa)
-          this.container.style.left = `${screenX + xOffset}px`;
-          this.container.style.top = `${screenY + yOffset}px`;
+          this.container.style.left = `${nextLeft}px`;
+          this.container.style.top = `${nextTop}px`;
       }
   }
   const allyAetherPool = new SharedAetherPool('ally');
@@ -12577,20 +12592,35 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           const allyPos = projectLeaderGroundPos(allyLeader, 0, 1);
           const enemyPos = projectLeaderGroundPos(enemyLeader, 6, 1);
           const viewport = rect.width <= 820 ? 'mobile' : 'desktop';
+          const clampMargin = Math.max(12, Math.round(rect.width * 0.02));
           // 5. Đồng bộ vị trí + đồng bộ bể AE chung theo đội hình sống
           globalAetherPool.syncAllVisuals({ x: allyPos.x, y: allyPos.y, s: allyPos.s }, { x: enemyPos.x, y: enemyPos.y, s: enemyPos.s }, tokens, {
               ally: {
                   facing: 1,
                   viewport,
-                  backOffsetX: viewport === 'mobile' ? 24 * allyPos.s : 32 * allyPos.s,
-                  backOffsetY: viewport === 'mobile' ? 42 * allyPos.s : 50 * allyPos.s,
+                  backOffsetX: viewport === 'mobile' ? 18 * allyPos.s : 24 * allyPos.s,
+                  backOffsetY: viewport === 'mobile' ? 24 * allyPos.s : 30 * allyPos.s,
+                  anchorLiftY: Number.isFinite(allyPos.anchor) ? Math.max(0, (1 - allyPos.anchor) * 10 * allyPos.s) : 0,
+                  clamp: {
+                      minX: rect.left + clampMargin,
+                      maxX: rect.right - clampMargin,
+                      minY: rect.top + clampMargin,
+                      maxY: rect.bottom - clampMargin,
+                  },
                   anchorLiftY: Number.isFinite(allyPos.anchor) ? Math.max(0, (1 - allyPos.anchor) * 10 * allyPos.s) : 0,
               },
               enemy: {
                   facing: -1,
                   viewport,
-                  backOffsetX: viewport === 'mobile' ? 24 * enemyPos.s : 32 * enemyPos.s,
-                  backOffsetY: viewport === 'mobile' ? 42 * enemyPos.s : 50 * enemyPos.s,
+                  backOffsetX: viewport === 'mobile' ? 18 * enemyPos.s : 24 * enemyPos.s,
+                  backOffsetY: viewport === 'mobile' ? 24 * enemyPos.s : 30 * enemyPos.s,
+                  anchorLiftY: Number.isFinite(enemyPos.anchor) ? Math.max(0, (1 - enemyPos.anchor) * 10 * enemyPos.s) : 0,
+                  clamp: {
+                      minX: rect.left + clampMargin,
+                      maxX: rect.right - clampMargin,
+                      minY: rect.top + clampMargin,
+                      maxY: rect.bottom - clampMargin,
+                  },
                   anchorLiftY: Number.isFinite(enemyPos.anchor) ? Math.max(0, (1 - enemyPos.anchor) * 10 * enemyPos.s) : 0,
               },
           });

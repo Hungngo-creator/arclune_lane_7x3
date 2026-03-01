@@ -2563,6 +2563,7 @@ function draw(): void {
     const allyPos = projectLeaderGroundPos(allyLeader, 0, 1);
     const enemyPos = projectLeaderGroundPos(enemyLeader, 6, 1);
     const viewport = rect.width <= 820 ? 'mobile' : 'desktop';
+    const clampMargin = Math.max(12, Math.round(rect.width * 0.02));
 
     // 5. Đồng bộ vị trí + đồng bộ bể AE chung theo đội hình sống
     globalAetherPool.syncAllVisuals(
@@ -2573,15 +2574,29 @@ function draw(): void {
          ally: {
            facing: 1,
            viewport,
-           backOffsetX: viewport === 'mobile' ? 24 * allyPos.s : 32 * allyPos.s,
-           backOffsetY: viewport === 'mobile' ? 42 * allyPos.s : 50 * allyPos.s,
+           backOffsetX: viewport === 'mobile' ? 18 * allyPos.s : 24 * allyPos.s,
+            backOffsetY: viewport === 'mobile' ? 24 * allyPos.s : 30 * allyPos.s,
+            anchorLiftY: Number.isFinite(allyPos.anchor) ? Math.max(0, (1 - allyPos.anchor!) * 10 * allyPos.s) : 0,
+           clamp: {
+             minX: rect.left + clampMargin,
+             maxX: rect.right - clampMargin,
+             minY: rect.top + clampMargin,
+             maxY: rect.bottom - clampMargin,
+           },
            anchorLiftY: Number.isFinite(allyPos.anchor) ? Math.max(0, (1 - allyPos.anchor!) * 10 * allyPos.s) : 0,
          },
          enemy: {
            facing: -1,
            viewport,
-           backOffsetX: viewport === 'mobile' ? 24 * enemyPos.s : 32 * enemyPos.s,
-           backOffsetY: viewport === 'mobile' ? 42 * enemyPos.s : 50 * enemyPos.s,
+           backOffsetX: viewport === 'mobile' ? 18 * enemyPos.s : 24 * enemyPos.s,
+           backOffsetY: viewport === 'mobile' ? 24 * enemyPos.s : 30 * enemyPos.s,
+            anchorLiftY: Number.isFinite(enemyPos.anchor) ? Math.max(0, (1 - enemyPos.anchor!) * 10 * enemyPos.s) : 0,
+           clamp: {
+             minX: rect.left + clampMargin,
+             maxX: rect.right - clampMargin,
+             minY: rect.top + clampMargin,
+             maxY: rect.bottom - clampMargin,
+           },
            anchorLiftY: Number.isFinite(enemyPos.anchor) ? Math.max(0, (1 - enemyPos.anchor!) * 10 * enemyPos.s) : 0,
          },
        }

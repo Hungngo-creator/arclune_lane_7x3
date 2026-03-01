@@ -11,6 +11,12 @@ export interface AetherVisualOptions {
   backOffsetX?: number;
   backOffsetY?: number;
   anchorLiftY?: number;
+  clamp?: {
+    minX?: number;
+    maxX?: number;
+    minY?: number;
+    maxY?: number;
+  };
 }
 
 export interface AetherVisualPairOptions {
@@ -205,8 +211,8 @@ export class SharedAetherPool {
       ?? ((typeof window !== 'undefined' && window.innerWidth <= 820) ? 'mobile' : 'desktop');
     const facing = options.facing ?? (this.side === 'ally' ? 1 : -1);
 
-    const defaultBackX = (viewport === 'mobile' ? 16 : 24) * scale;
-    const defaultBackY = (viewport === 'mobile' ? 28 : 36) * scale;
+    const defaultBackX = (viewport === 'mobile' ? 18 : 24) * scale;
+    const defaultBackY = (viewport === 'mobile' ? 24 : 30) * scale;
     const extraAnchorLift = Number.isFinite(options.anchorLiftY)
       ? (options.anchorLiftY as number)
       : 0;
@@ -219,12 +225,25 @@ export class SharedAetherPool {
       : defaultBackY;
 
     // Đẩy trụ về phía sau lưng leader theo hướng quay của leader.
-    const xOffset = -facing * backOffsetX;
-    const yOffset = -(backOffsetY + extraAnchorLift);
+    const viewportCenterX = (typeof window !== 'undefined' ? window.innerWidth / 2 : screenX);
+    const sideSign = Math.sign(screenX - viewportCenterX) || facing;
+    const xOffset = sideSign * backOffsetX;
+     const yOffset = -(backOffsetY + extraAnchorLift);
+
+    let nextLeft = screenX + xOffset;
+    let nextTop = screenY + yOffset;
+
+    const clamp = options.clamp;
+      if (clamp) {
+      if (Number.isFinite(clamp.minX)) nextLeft = Math.max(nextLeft, clamp.minX as number);
+      if (Number.isFinite(clamp.maxX)) nextLeft = Math.min(nextLeft, clamp.maxX as number);
+      if (Number.isFinite(clamp.minY)) nextTop = Math.max(nextTop, clamp.minY as number);
+      if (Number.isFinite(clamp.maxY)) nextTop = Math.min(nextTop, clamp.maxY as number);
+    }
 
     // Áp dụng toạ độ (đã có transform handle việc căn giữa)
-    this.container.style.left = `${screenX + xOffset}px`;
-    this.container.style.top = `${screenY + yOffset}px`;
+    this.container.style.left = `${nextLeft}px`;
+    this.container.style.top = `${nextTop}px`;
    }
 }
 
