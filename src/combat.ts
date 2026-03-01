@@ -1,12 +1,10 @@
 //home (termux)/arclune_lane_7x3/src/combat.ts
 
-import { globalAetherPool } from './aether.ts';
 import { getMetaById } from './catalog.ts';
-import { SharedAetherPool } from './aether.ts'
 import { Statuses, hookOnLethalDamage } from './statuses.ts';
 import { applyDamage, grantShield } from './combat/apply-damage.ts';
 import { asSessionWithVfx, vfxAddHit, vfxAddMelee, vfxAddLightningArc } from './vfx.ts';
-import { slotToCell } from './engine.ts';
+import { slotIndex, slotToCell } from './engine.ts';
 import { emitPassiveEvent, getPassiveLog, type AfterHitHandler } from './passives.ts';
 import { CFG } from './config.ts';
 import { gainFury, startFurySkill, finishFuryHit } from './utils/fury.ts';
@@ -79,12 +77,35 @@ export function pickTarget(Game: TargetableGameState, attacker: UnitToken): Unit
   const pool = Game.tokens.filter((t): t is UnitToken => t.side === foeSide && t.alive);
   if (pool.length === 0) return null;
 
+  const meta = getMetaById(attacker.id);
+  const className = meta?.class ?? null;
+  const isAssassin = className === 'Assassin';
+
+  const slotOf = (token: UnitToken): number => slotIndex(token.side, token.cx, token.cy);
+  const occupiedSlots = new Set<number>(pool.map(slotOf));
+  const isBlockedLeader = (slot: number): boolean => (
+    slot === 8 && (occupiedSlots.has(2) || occupiedSlots.has(5))
+  );
+
+  if (isAssassin) {
+    const backline = pool.filter((target) => slotOf(target) >= 7);
+    if (backline.length > 0) {
+      backline.sort((a, b) => {
+        const distanceA = Math.abs(a.cx - attacker.cx) + Math.abs(a.cy - attacker.cy);
+        const distanceB = Math.abs(b.cx - attacker.cx) + Math.abs(b.cy - attacker.cy);
+        return distanceA - distanceB;
+      });
+      return backline[0] ?? null;
+    }
+  }
+
   const attackerRow = attacker.cy;
   const targetSide = foeSide;
   const primarySlot = Math.max(1, Math.min(3, (attackerRow | 0) + 1));
   const slotPriority: ReadonlyArray<number> = [primarySlot, primarySlot + 3, primarySlot + 6];
 
   for (const slot of slotPriority) {
+    if (isBlockedLeader(slot)) continue;
     const cell = slotToCell(targetSide, slot);
     const { cx, cy } = cell;
     const found = pool.find(t => t.cx === cx && t.cy === cy);
@@ -97,7 +118,12 @@ export function pickTarget(Game: TargetableGameState, attacker: UnitToken): Unit
     return distanceA - distanceB;
   });
 
-  return sorted[0] ?? null;
+  for (const target of sorted) {
+    if (isBlockedLeader(slotOf(target))) continue;
+    return target;
+  }
+
+  return null;
 }
 
 export function dealAbilityDamage(
@@ -212,9 +238,6 @@ export function basicAttack(Game: SessionState, unit: UnitToken): void {
   if (pool.length === 0) return;
 
   startFurySkill(unit, { tag: 'basic' });
-  const meta = getMetaById(unit.id);
-  const isSupport = meta?.class === 'Support';
-  const aeGain = isSupport ? 10 : 5; globalAetherPool.gain(unit.side, aeGain);
 
   const fallback = pickTarget(Game, unit);
   const resolved = Statuses.resolveTarget(unit, pool, { attackType: 'basic' }) ?? fallback;

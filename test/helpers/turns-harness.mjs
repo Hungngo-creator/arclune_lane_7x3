@@ -12,6 +12,8 @@ export async function loadTurnsHarness(overrides = {}){
 
   const replacements = new Map([
     ["import { slotToCell, slotIndex } from './engine.ts';", "const { slotToCell, slotIndex } = __deps['./engine.js'];"],
+    ["import { globalAetherPool, resolveActionAetherRegen } from './aether.ts';", "const { globalAetherPool, resolveActionAetherRegen } = __deps['./aether.ts'];"],
+    ["import { globalAetherPool } from './aether.ts';", "const { globalAetherPool } = __deps['./aether.ts'];"],
     ["import { Statuses } from './statuses.ts';", "const { Statuses } = __deps['./statuses.ts'];"],
     ["import { Statuses } from './statuses.js';", "const { Statuses } = __deps['./statuses.ts'];"],
     ["import { doBasicWithFollowups } from './combat.ts';", "const { doBasicWithFollowups } = __deps['./combat.js'];"],
@@ -79,6 +81,12 @@ export async function loadTurnsHarness(overrides = {}){
     },
     './combat.js': {
       doBasicWithFollowups(){ }
+    },
+    './aether.ts': {
+      globalAetherPool: {
+        gain(){},
+      },
+      resolveActionAetherRegen(){ return 5; },
     },
     './config.ts': {
       CFG: {

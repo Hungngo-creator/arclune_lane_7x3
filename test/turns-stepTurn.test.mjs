@@ -887,3 +887,50 @@ test('queued spawn is processed even when existing units cannot act', async () =
   assert.strictEqual(Game.tokens.length, 2);
   assert.strictEqual(Game.turn.lastPos.ENEMY, enemySlot);
 });
+test('stepTurn cộng AE theo class sau khi nhân vật hành động', async () => {
+  const gains = [];
+  const harness = await loadTurnsHarness({
+    './aether.ts': {
+      globalAetherPool: {
+        gain(side, amount){
+          gains.push({ side, amount });
+        }
+      },
+      resolveActionAetherRegen(className){
+        if (className === 'Support') return 10;
+        return 5;
+      }
+    }
+  });
+
+  const { stepTurn, doActionOrSkip, deps } = harness;
+  const allyPos = deps['./engine.js'].slotToCell('ally', 1);
+  const enemyPos = deps['./engine.js'].slotToCell('enemy', 1);
+  const Game = {
+    tokens: [
+      { id: 'healer', side: 'ally', alive: true, hp: 100, hpMax: 100, ...allyPos },
+      { id: 'enemy', side: 'enemy', alive: true, hp: 100, hpMax: 100, ...enemyPos }
+    ],
+    meta: new Map([
+      ['healer', { class: 'Support' }],
+      ['enemy', { class: 'Warrior' }]
+    ]),
+    queued: { ally: new Map(), enemy: new Map() },
+    turn: {
+      order: [
+        { side: 'ally', slot: 1 },
+        { side: 'enemy', slot: 1 }
+      ],
+      cursor: 0,
+      cycle: 0,
+      orderIndex: new Map()
+    }
+  };
+
+  stepTurn(Game, {
+    doActionOrSkip: (game, unit, ctx) => doActionOrSkip(game, unit, ctx),
+    processActionChain(){ return null; }
+  });
+
+  assert.deepStrictEqual(gains, [{ side: 'ally', amount: 10 }]);
+});

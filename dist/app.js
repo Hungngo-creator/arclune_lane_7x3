@@ -21,12 +21,9 @@ function __require(id){
 if (typeof globalThis !== "undefined" && typeof globalThis.__require === "undefined"){ globalThis.__require = __require; }
 __define('./aether.ts', (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/aether.ts
-  const __dep0 = __require('./catalog.ts');
-  const AE_CLASS_COEFF = __dep0.AE_CLASS_COEFF;
   class SharedAetherPool {
       max = 0;
       current = 0;
-      regenPerTurn = 0;
       uiFill = null;
       container = null;
       label = null; // Thêm label hiển thị số
@@ -37,18 +34,12 @@ __define('./aether.ts', (exports, module, __require) => {
       // --- LOGIC VÒNG ĐỜI TRẬN ĐẤU ---
       recalculateFromUnits(teamUnits, resetCurrent = false) {
           let nextMax = 0;
-          let nextRegen = 0;
           for (const unit of teamUnits) {
               if (!unit || unit.side !== this.side || !unit.alive)
                   continue; // Chỉ tính unit đang sống của phe mình
               nextMax += (unit.aeMax || 0);
-              // Lấy hệ số class, fallback về 0.55 nếu không có
-              const className = unit.class || 'Warrior';
-              const coeff = AE_CLASS_COEFF[className] ?? 0.55;
-              nextRegen += ((unit.wil || 0) * coeff);
           }
           this.max = Math.floor(nextMax);
-          this.regenPerTurn = Math.floor(nextRegen);
           if (resetCurrent) {
               this.current = Math.floor(this.max / 2); // Khởi đầu 50%
               return;
@@ -67,16 +58,11 @@ __define('./aether.ts', (exports, module, __require) => {
       }
       reconcile(teamUnits) {
           const prevMax = this.max;
-          const prevRegen = this.regenPerTurn;
           const prevCurrent = this.current;
           this.recalculateFromUnits(teamUnits, false);
-          if (prevMax !== this.max || prevRegen !== this.regenPerTurn || prevCurrent !== this.current) {
+          if (prevMax !== this.max || prevCurrent !== this.current) {
               this.updateUI();
           }
-      }
-      // Gọi khi kết thúc 1 Turn Lớn (Cycle)
-      onTurnCycleEnd() {
-          this.gain(this.regenPerTurn);
       }
       gain(amount) {
           this.current += amount;
@@ -221,16 +207,27 @@ __define('./aether.ts', (exports, module, __require) => {
   }
   const allyAetherPool = new SharedAetherPool('ally');
   const enemyAetherPool = new SharedAetherPool('enemy');
+  const AE_ACTION_REGEN_BY_CLASS = {
+      Support: 10,
+      Mage: 7,
+      Summoner: 7,
+      Warrior: 5,
+      Tanker: 5,
+      Ranger: 5,
+      Assassin: 3,
+  };
+  function resolveActionAetherRegen(className) {
+      if (!className)
+          return AE_ACTION_REGEN_BY_CLASS.Warrior;
+      return AE_ACTION_REGEN_BY_CLASS[className]
+          ?? AE_ACTION_REGEN_BY_CLASS.Warrior;
+  }
   const globalAetherPool = {
       init: (units) => {
           allyAetherPool.destroyUI();
           enemyAetherPool.destroyUI();
           allyAetherPool.init(units);
           enemyAetherPool.init(units);
-      },
-      onTurnCycleEnd: () => {
-          allyAetherPool.onTurnCycleEnd();
-          enemyAetherPool.onTurnCycleEnd();
       },
       gain: (side, amount) => {
           if (side === 'ally')
@@ -260,7 +257,9 @@ __define('./aether.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'allyAetherPool')) exports.allyAetherPool = allyAetherPool;
   if (!Object.prototype.hasOwnProperty.call(exports, 'enemyAetherPool')) exports.enemyAetherPool = enemyAetherPool;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'AE_ACTION_REGEN_BY_CLASS')) exports.AE_ACTION_REGEN_BY_CLASS = AE_ACTION_REGEN_BY_CLASS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'globalAetherPool')) exports.globalAetherPool = globalAetherPool;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resolveActionAetherRegen')) exports.resolveActionAetherRegen = resolveActionAetherRegen;
   if (!Object.prototype.hasOwnProperty.call(exports, 'SharedAetherPool')) exports.SharedAetherPool = SharedAetherPool;
 });
 __define('./ai.ts', (exports, module, __require) => {
@@ -2160,30 +2159,20 @@ __define('./catalog.ts', (exports, module, __require) => {
   const RANK_MULT = {
       N: 0.80,
       R: 0.85,
-      SR: 1.95,
+      SR: 0.95,
       SSR: 1.1,
       UR: 1.3,
       Prime: 1.55,
   };
   // 2) Class base (mốc lv1 để test). SPD không chịu rank multiplier.
   const CLASS_BASE = {
-      Mage: { HP: 360, ATK: 28, WIL: 30, ARM: 0.08, RES: 0.12, AGI: 10, PER: 12, SPD: 1.00, AEmax: 110, AEregen: 8.0, HPregen: 14 },
-      Tanker: { HP: 500, ATK: 22, WIL: 20, ARM: 0.18, RES: 0.14, AGI: 9, PER: 10, SPD: 0.95, AEmax: 60, AEregen: 4.0, HPregen: 22 },
-      Ranger: { HP: 360, ATK: 35, WIL: 16, ARM: 0.08, RES: 0.08, AGI: 12, PER: 14, SPD: 1.20, AEmax: 75, AEregen: 7.0, HPregen: 12 },
-      Warrior: { HP: 400, ATK: 30, WIL: 18, ARM: 0.14, RES: 0.08, AGI: 11, PER: 11, SPD: 1.10, AEmax: 70, AEregen: 6.0, HPregen: 16 },
-      Summoner: { HP: 330, ATK: 22, WIL: 26, ARM: 0.08, RES: 0.14, AGI: 10, PER: 10, SPD: 1.05, AEmax: 90, AEregen: 8.5, HPregen: 18 },
-      Support: { HP: 380, ATK: 24, WIL: 24, ARM: 0.10, RES: 0.13, AGI: 10, PER: 11, SPD: 1.00, AEmax: 100, AEregen: 7.5, HPregen: 20 },
-      Assassin: { HP: 320, ATK: 36, WIL: 16, ARM: 0.06, RES: 0.08, AGI: 14, PER: 16, SPD: 1.25, AEmax: 65, AEregen: 6.0, HPregen: 10 }
-  };
-  // src/catalog.ts
-  const AE_CLASS_COEFF = {
-      Support: 1.5,
-      Summoner: 1.3,
-      Mage: 1.2,
-      Tanker: 0.55,
-      Warrior: 0.55,
-      Ranger: 0.55,
-      Assassin: 0.22
+      Mage: { HP: 720, ATK: 28, WIL: 30, ARM: 0.08, RES: 0.12, AGI: 10, PER: 12, SPD: 1.00, AEmax: 110, AEregen: 8.0, HPregen: 14 },
+      Tanker: { HP: 1000, ATK: 22, WIL: 20, ARM: 0.18, RES: 0.14, AGI: 9, PER: 10, SPD: 0.95, AEmax: 60, AEregen: 4.0, HPregen: 22 },
+      Ranger: { HP: 720, ATK: 35, WIL: 16, ARM: 0.08, RES: 0.08, AGI: 12, PER: 14, SPD: 1.20, AEmax: 75, AEregen: 7.0, HPregen: 12 },
+      Warrior: { HP: 800, ATK: 30, WIL: 18, ARM: 0.14, RES: 0.08, AGI: 11, PER: 11, SPD: 1.10, AEmax: 70, AEregen: 6.0, HPregen: 16 },
+      Summoner: { HP: 660, ATK: 22, WIL: 26, ARM: 0.08, RES: 0.14, AGI: 10, PER: 10, SPD: 1.05, AEmax: 90, AEregen: 8.5, HPregen: 18 },
+      Support: { HP: 760, ATK: 24, WIL: 24, ARM: 0.10, RES: 0.13, AGI: 10, PER: 11, SPD: 1.00, AEmax: 100, AEregen: 7.5, HPregen: 20 },
+      Assassin: { HP: 640, ATK: 36, WIL: 16, ARM: 0.06, RES: 0.08, AGI: 14, PER: 16, SPD: 1.25, AEmax: 65, AEregen: 6.0, HPregen: 10 }
   };
   const isRankName = (value) => value in RANK_MULT;
   const isClassName = (value) => value in CLASS_BASE;
@@ -4123,7 +4112,6 @@ __define('./catalog.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'RANK_MULT')) exports.RANK_MULT = RANK_MULT;
   if (!Object.prototype.hasOwnProperty.call(exports, 'CLASS_BASE')) exports.CLASS_BASE = CLASS_BASE;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'AE_CLASS_COEFF')) exports.AE_CLASS_COEFF = AE_CLASS_COEFF;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ROSTER')) exports.ROSTER = ROSTER;
   if (!Object.prototype.hasOwnProperty.call(exports, 'UNIT_BASE')) exports.UNIT_BASE = UNIT_BASE;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ROSTER_MAP')) exports.ROSTER_MAP = ROSTER_MAP;
@@ -4136,35 +4124,34 @@ __define('./catalog.ts', (exports, module, __require) => {
 });
 __define('./combat.ts', (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/combat.ts
-  const __dep0 = __require('./aether.ts');
-  const globalAetherPool = __dep0.globalAetherPool;
-  const __dep1 = __require('./catalog.ts');
-  const getMetaById = __dep1.getMetaById;
-  const __dep2 = __require('./statuses.ts');
-  const Statuses = __dep2.Statuses;
-  const hookOnLethalDamage = __dep2.hookOnLethalDamage;
-  const __dep3 = __require('./combat/apply-damage.ts');
-  const applyDamage = __dep3.applyDamage;
-  const grantShield = __dep3.grantShield;
-  const __dep4 = __require('./vfx.ts');
-  const asSessionWithVfx = __dep4.asSessionWithVfx;
-  const vfxAddHit = __dep4.vfxAddHit;
-  const vfxAddMelee = __dep4.vfxAddMelee;
-  const vfxAddLightningArc = __dep4.vfxAddLightningArc;
-  const __dep5 = __require('./engine.ts');
-  const slotToCell = __dep5.slotToCell;
-  const __dep6 = __require('./passives.ts');
-  const emitPassiveEvent = __dep6.emitPassiveEvent;
-  const getPassiveLog = __dep6.getPassiveLog;
-  const __dep7 = __require('./config.ts');
-  const CFG = __dep7.CFG;
-  const __dep8 = __require('./utils/fury.ts');
-  const gainFury = __dep8.gainFury;
-  const startFurySkill = __dep8.startFurySkill;
-  const finishFuryHit = __dep8.finishFuryHit;
-  const __dep9 = __require('./utils/time.ts');
-  const mergeBusyUntil = __dep9.mergeBusyUntil;
-  const sessionNow = __dep9.sessionNow;
+  const __dep0 = __require('./catalog.ts');
+  const getMetaById = __dep0.getMetaById;
+  const __dep1 = __require('./statuses.ts');
+  const Statuses = __dep1.Statuses;
+  const hookOnLethalDamage = __dep1.hookOnLethalDamage;
+  const __dep2 = __require('./combat/apply-damage.ts');
+  const applyDamage = __dep2.applyDamage;
+  const grantShield = __dep2.grantShield;
+  const __dep3 = __require('./vfx.ts');
+  const asSessionWithVfx = __dep3.asSessionWithVfx;
+  const vfxAddHit = __dep3.vfxAddHit;
+  const vfxAddMelee = __dep3.vfxAddMelee;
+  const vfxAddLightningArc = __dep3.vfxAddLightningArc;
+  const __dep4 = __require('./engine.ts');
+  const slotIndex = __dep4.slotIndex;
+  const slotToCell = __dep4.slotToCell;
+  const __dep5 = __require('./passives.ts');
+  const emitPassiveEvent = __dep5.emitPassiveEvent;
+  const getPassiveLog = __dep5.getPassiveLog;
+  const __dep6 = __require('./config.ts');
+  const CFG = __dep6.CFG;
+  const __dep7 = __require('./utils/fury.ts');
+  const gainFury = __dep7.gainFury;
+  const startFurySkill = __dep7.startFurySkill;
+  const finishFuryHit = __dep7.finishFuryHit;
+  const __dep8 = __require('./utils/time.ts');
+  const mergeBusyUntil = __dep8.mergeBusyUntil;
+  const sessionNow = __dep8.sessionNow;
   exports.applyDamage = applyDamage;
   exports.grantShield = grantShield;
   const isBasicAttackAfterHitHandler = (handler) => typeof handler === 'function';
@@ -4174,11 +4161,30 @@ __define('./combat.ts', (exports, module, __require) => {
       const pool = Game.tokens.filter((t) => t.side === foeSide && t.alive);
       if (pool.length === 0)
           return null;
+      const meta = getMetaById(attacker.id);
+      const className = meta?.class ?? null;
+      const isAssassin = className === 'Assassin';
+      const slotOf = (token) => slotIndex(token.side, token.cx, token.cy);
+      const occupiedSlots = new Set(pool.map(slotOf));
+      const isBlockedLeader = (slot) => (slot === 8 && (occupiedSlots.has(2) || occupiedSlots.has(5)));
+      if (isAssassin) {
+          const backline = pool.filter((target) => slotOf(target) >= 7);
+          if (backline.length > 0) {
+              backline.sort((a, b) => {
+                  const distanceA = Math.abs(a.cx - attacker.cx) + Math.abs(a.cy - attacker.cy);
+                  const distanceB = Math.abs(b.cx - attacker.cx) + Math.abs(b.cy - attacker.cy);
+                  return distanceA - distanceB;
+              });
+              return backline[0] ?? null;
+          }
+      }
       const attackerRow = attacker.cy;
       const targetSide = foeSide;
       const primarySlot = Math.max(1, Math.min(3, (attackerRow | 0) + 1));
       const slotPriority = [primarySlot, primarySlot + 3, primarySlot + 6];
       for (const slot of slotPriority) {
+          if (isBlockedLeader(slot))
+              continue;
           const cell = slotToCell(targetSide, slot);
           const { cx, cy } = cell;
           const found = pool.find(t => t.cx === cx && t.cy === cy);
@@ -4190,7 +4196,12 @@ __define('./combat.ts', (exports, module, __require) => {
           const distanceB = Math.abs(b.cx - attacker.cx) + Math.abs(b.cy - attacker.cy);
           return distanceA - distanceB;
       });
-      return sorted[0] ?? null;
+      for (const target of sorted) {
+          if (isBlockedLeader(slotOf(target)))
+              continue;
+          return target;
+      }
+      return null;
   }
   function dealAbilityDamage(Game, attacker, target, opts = {}) {
       if (!attacker || !target || !target.alive) {
@@ -4276,10 +4287,6 @@ __define('./combat.ts', (exports, module, __require) => {
       if (pool.length === 0)
           return;
       startFurySkill(unit, { tag: 'basic' });
-      const meta = getMetaById(unit.id);
-      const isSupport = meta?.class === 'Support';
-      const aeGain = isSupport ? 10 : 5;
-      globalAetherPool.gain(unit.side, aeGain);
       const fallback = pickTarget(Game, unit);
       const resolved = Statuses.resolveTarget(unit, pool, { attackType: 'basic' }) ?? fallback;
       if (!resolved)
@@ -21907,6 +21914,7 @@ __define('./turns.ts', (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/turn.ts
   const __dep0 = __require('./aether.ts');
   const globalAetherPool = __dep0.globalAetherPool;
+  const resolveActionAetherRegen = __dep0.resolveActionAetherRegen;
   const __dep1 = __require('./engine.ts');
   const slotToCell = __dep1.slotToCell;
   const slotIndex = __dep1.slotIndex;
@@ -21969,6 +21977,16 @@ __define('./turns.ts', (exports, module, __require) => {
       return candidate.mode === 'interleaved_by_position' ? candidate : null;
   };
   const tokensAlive = (Game) => Game.tokens.filter((t) => t.alive);
+  function grantActionAether(Game, unit, acted) {
+      if (!unit || !unit.alive || !acted)
+          return 0;
+      const className = Game.meta?.get(unit.id)?.class ?? null;
+      const amount = resolveActionAetherRegen(className);
+      if (amount > 0) {
+          globalAetherPool.gain(unit.side, amount);
+      }
+      return amount;
+  }
   function applyTurnRegen(Game, unit) {
       if (!unit || !unit.alive)
           return { hpDelta: 0, aeDelta: 0 };
@@ -22427,6 +22445,7 @@ __define('./turns.ts', (exports, module, __require) => {
               emitGameEvent(TURN_END, turnDetail);
           }
           const consumption = consumedTurnFromOutcome(actionOutcome, typeof actionHook === 'function');
+          grantActionAether(Game, active, !!actionOutcome?.acted);
           tickMinionTTL(Game, entry.side, consumption);
           const ended = hooks.checkBattleEnd?.(Game, {
               trigger: 'interleaved',
@@ -22454,7 +22473,6 @@ __define('./turns.ts', (exports, module, __require) => {
           sequentialTurn.cursor = nextCursor;
           if (nextCursor === 0) {
               cycle += 1;
-              globalAetherPool.onTurnCycleEnd();
           }
           sequentialTurn.cycle = cycle;
           cursor = nextCursor;
@@ -22507,6 +22525,7 @@ __define('./turns.ts', (exports, module, __require) => {
               emitGameEvent(TURN_END, turnDetail);
           }
           const consumption = consumedTurnFromOutcome(actionOutcome, typeof actionHook === 'function');
+          grantActionAether(Game, active, !!actionOutcome?.acted);
           tickMinionTTL(Game, entry.side, consumption);
           const ended = hooks.checkBattleEnd?.(Game, {
               trigger: 'sequential',

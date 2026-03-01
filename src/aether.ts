@@ -1,6 +1,5 @@
 //home (termux)/arclune_lane_7x3/src/aether.ts
 
-import { AE_CLASS_COEFF } from './catalog.ts';
 import type { UnitToken, Side } from './types/units'; // Import type chuẩn
 
 type AetherViewport = 'mobile' | 'desktop';
@@ -27,7 +26,6 @@ export interface AetherVisualPairOptions {
 export class SharedAetherPool {
   public max: number = 0;
   public current: number = 0;
-  public regenPerTurn: number = 0;
 
   private uiFill: HTMLElement | null = null;
   private container: HTMLElement | null = null;
@@ -41,20 +39,12 @@ export class SharedAetherPool {
   // --- LOGIC VÒNG ĐỜI TRẬN ĐẤU ---
   private recalculateFromUnits(teamUnits: UnitToken[], resetCurrent: boolean = false): void {
       let nextMax = 0;
-      let nextRegen = 0;
       for (const unit of teamUnits) {
           if (!unit || unit.side !== this.side || !unit.alive) continue; // Chỉ tính unit đang sống của phe mình
           nextMax += (unit.aeMax || 0);
-
-          // Lấy hệ số class, fallback về 0.55 nếu không có
-          const className = (unit as any).class || 'Warrior';
-          const coeff = AE_CLASS_COEFF[className as keyof typeof AE_CLASS_COEFF] ?? 0.55;
-
-          nextRegen += ((unit.wil || 0) * coeff);
       }
 
       this.max = Math.floor(nextMax);
-      this.regenPerTurn = Math.floor(nextRegen);
 
       if (resetCurrent) {
         this.current = Math.floor(this.max / 2); // Khởi đầu 50%
@@ -77,17 +67,11 @@ export class SharedAetherPool {
 
  public reconcile(teamUnits: UnitToken[]) {
       const prevMax = this.max;
-      const prevRegen = this.regenPerTurn;
       const prevCurrent = this.current;
       this.recalculateFromUnits(teamUnits, false);
-      if (prevMax !== this.max || prevRegen !== this.regenPerTurn || prevCurrent !== this.current) {
+      if (prevMax !== this.max || prevCurrent !== this.current) {
         this.updateUI();
       }
-  }
-
-  // Gọi khi kết thúc 1 Turn Lớn (Cycle)
-  public onTurnCycleEnd() {
-      this.gain(this.regenPerTurn);
   }
 
   public gain(amount: number) {
@@ -250,17 +234,28 @@ export class SharedAetherPool {
 export const allyAetherPool = new SharedAetherPool('ally');
 export const enemyAetherPool = new SharedAetherPool('enemy');
 
+export const AE_ACTION_REGEN_BY_CLASS = {
+  Support: 10,
+  Mage: 7,
+  Summoner: 7,
+  Warrior: 5,
+  Tanker: 5,
+  Ranger: 5,
+  Assassin: 3,
+} as const;
+
+export function resolveActionAetherRegen(className: string | null | undefined): number {
+  if (!className) return AE_ACTION_REGEN_BY_CLASS.Warrior;
+  return AE_ACTION_REGEN_BY_CLASS[className as keyof typeof AE_ACTION_REGEN_BY_CLASS]
+    ?? AE_ACTION_REGEN_BY_CLASS.Warrior;
+}
+
 export const globalAetherPool = {
   init: (units: UnitToken[]) => {
     allyAetherPool.destroyUI();
     enemyAetherPool.destroyUI();
     allyAetherPool.init(units);
     enemyAetherPool.init(units);
-  },
-  
-  onTurnCycleEnd: () => {
-    allyAetherPool.onTurnCycleEnd();
-    enemyAetherPool.onTurnCycleEnd();
   },
 
   gain: (side: Side, amount: number) => {

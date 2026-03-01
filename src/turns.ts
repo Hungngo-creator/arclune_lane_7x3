@@ -1,6 +1,6 @@
 //home (termux)/arclune_lane_7x3/src/turn.ts
 
-import { globalAetherPool } from './aether.ts';
+import { globalAetherPool, resolveActionAetherRegen } from './aether.ts';
 import { slotToCell, slotIndex } from './engine.ts';
 import { Statuses } from './statuses.ts';
 
@@ -50,6 +50,16 @@ const asInterleavedTurn = (
 
 const tokensAlive = (Game: SessionState): UnitToken[] =>
   Game.tokens.filter((t): t is UnitToken => t.alive);
+
+function grantActionAether(Game: SessionState, unit: UnitToken | null | undefined, acted: boolean): number {
+  if (!unit || !unit.alive || !acted) return 0;
+  const className = Game.meta?.get(unit.id)?.class ?? null;
+  const amount = resolveActionAetherRegen(className);
+  if (amount > 0){
+    globalAetherPool.gain(unit.side, amount);
+  }
+  return amount;
+}
 
 function applyTurnRegen(
   Game: SessionState,
@@ -542,6 +552,7 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
     }
 
     const consumption = consumedTurnFromOutcome(actionOutcome, typeof actionHook === 'function');
+    grantActionAether(Game, active, !!actionOutcome?.acted);
     tickMinionTTL(Game, entry.side, consumption);
     const ended = hooks.checkBattleEnd?.(Game, {
       trigger: 'interleaved',
@@ -569,7 +580,6 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
     sequentialTurn.cursor = nextCursor;
     if (nextCursor === 0){
       cycle += 1;
-      globalAetherPool.onTurnCycleEnd();
     }
     sequentialTurn.cycle = cycle;
     cursor = nextCursor;
@@ -629,6 +639,7 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
     }
 
     const consumption = consumedTurnFromOutcome(actionOutcome, typeof actionHook === 'function');
+    grantActionAether(Game, active, !!actionOutcome?.acted);
     tickMinionTTL(Game, entry.side, consumption);
 
     const ended = hooks.checkBattleEnd?.(Game, {
