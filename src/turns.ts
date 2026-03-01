@@ -1,4 +1,6 @@
 //home (termux)/arclune_lane_7x3/src/turn.ts
+
+import { globalAetherPool } from './aether.ts';
 import { slotToCell, slotIndex } from './engine.ts';
 import { Statuses } from './statuses.ts';
 
@@ -567,6 +569,7 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
     sequentialTurn.cursor = nextCursor;
     if (nextCursor === 0){
       cycle += 1;
+      globalAetherPool.onTurnCycleEnd();
     }
     sequentialTurn.cycle = cycle;
     cursor = nextCursor;

@@ -21,42 +21,44 @@ function __require(id){
 if (typeof globalThis !== "undefined" && typeof globalThis.__require === "undefined"){ globalThis.__require = __require; }
 __define('./aether.ts', (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/aether.ts
-  const __dep0 = __require('./events.ts');
-  const addGameEventListener = __dep0.addGameEventListener;
-  const TURN_START = __dep0.TURN_START;
-  const BATTLE_END = __dep0.BATTLE_END;
-  const __dep1 = __require('./catalog.ts');
-  const AE_CLASS_COEFF = __dep1.AE_CLASS_COEFF;
+  const __dep0 = __require('./catalog.ts');
+  const AE_CLASS_COEFF = __dep0.AE_CLASS_COEFF;
   class SharedAetherPool {
       max = 0;
       current = 0;
       regenPerTurn = 0;
       uiFill = null;
-      container = null; // Biến lưu DOM để đập bỏ khi hết trận
+      container = null;
+      label = null; // Thêm label hiển thị số
       side;
       constructor(side) {
           this.side = side;
-          // BỎ HẲN ĐOẠN AUTO INIT Ở ĐÂY. KHÔNG VÀO TRẬN THÌ KHÔNG VẼ!
       }
       // --- LOGIC VÒNG ĐỜI TRẬN ĐẤU ---
       init(teamUnits) {
           this.max = 0;
           this.regenPerTurn = 0;
           for (const unit of teamUnits) {
-              if (!unit)
-                  continue;
+              if (!unit || unit.side !== this.side)
+                  continue; // Chỉ tính unit phe mình
               this.max += (unit.aeMax || 0);
-              const coeff = AE_CLASS_COEFF[unit.className] || 0.55;
+              // Lấy hệ số class, fallback về 0.55 nếu không có
+              const className = unit.class || 'Warrior';
+              const coeff = AE_CLASS_COEFF[className] ?? 0.55;
               this.regenPerTurn += ((unit.wil || 0) * coeff);
           }
-          this.current = Math.floor(this.max / 2);
+          this.max = Math.floor(this.max);
           this.regenPerTurn = Math.floor(this.regenPerTurn);
-          // CHỈ VẼ UI KHI HÀM INIT (VÀO TRẬN) ĐƯỢC GỌI
+          this.current = Math.floor(this.max / 2); // Khởi đầu 50%
           this.initUI();
           this.updateUI();
       }
-      onTurnEnd() {
-          this.current += this.regenPerTurn;
+      // Gọi khi kết thúc 1 Turn Lớn (Cycle)
+      onTurnCycleEnd() {
+          this.gain(this.regenPerTurn);
+      }
+      gain(amount) {
+          this.current += amount;
           if (this.current > this.max) {
               this.current = this.max;
           }
@@ -70,139 +72,127 @@ __define('./aether.ts', (exports, module, __require) => {
           }
           return false;
       }
-      // HÀM MỚI: ĐẬP BỎ TRỤ KHI HẾT TRẬN / THOÁT RA MAIN MENU
       destroyUI() {
           if (this.container && this.container.parentNode) {
               this.container.parentNode.removeChild(this.container);
           }
           this.container = null;
           this.uiFill = null;
+          this.label = null;
       }
-      // --- LOGIC GIAO DIỆN (NÂNG CẤP) ---
+      // --- LOGIC GIAO DIỆN ---
       initUI() {
           if (this.container)
               return;
           this.container = document.createElement('div');
           this.container.id = `aether-pool-${this.side}`;
-          this.container.style.position = 'absolute';
-          this.container.style.width = '30px';
-          this.container.style.height = '200px';
-          this.container.style.border = '2px solid #ccc';
-          this.container.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-          this.container.style.borderRadius = '15px';
-          this.container.style.overflow = 'hidden';
-          this.container.style.display = 'flex';
-          this.container.style.flexDirection = 'column-reverse';
-          // Đẩy z-index lên để không bị sàn đấu đè
-          this.container.style.zIndex = '10';
-          // Giữ điểm neo chuẩn để zoom/out không bị lệch tâm
-          this.container.style.transformOrigin = 'bottom center';
-          if (this.side === 'ally') {
-              // Tọa độ âm để đẩy nó lùi ra mép ngoài (sau lưng leader ô 8)
-              this.container.style.bottom = '-60px';
-              this.container.style.left = '-60px';
-              this.container.style.borderColor = '#00ffff';
-              this.container.style.boxShadow = '0 0 10px #00ffff';
-          }
-          else {
-              // Tương tự cho bên địch
-              this.container.style.top = '-60px';
-              this.container.style.right = '-60px';
-              this.container.style.borderColor = '#ff00ff';
-              this.container.style.boxShadow = '0 0 10px #ff00ff';
-          }
-          // FIX CỐT LÕI: Gắn vào Sàn đấu (#battlefield) thay vì document.body
-          // Việc này ép 2 trụ Aether nằm chung chiều không gian, chịu chung Zoom/Pan với sàn.
-          const battlefield = document.getElementById('battlefield');
-          if (battlefield) {
-              battlefield.appendChild(this.container);
-          }
-          else {
-              // Fallback nhỡ sàn chưa render
-              document.body.appendChild(this.container);
-          }
+          // Style động, sẽ được update vị trí bởi engine
+          Object.assign(this.container.style, {
+              position: 'absolute',
+              width: '14px',
+              height: '0px', // Chiều cao sẽ set dynamic
+              border: '1px solid rgba(255,255,255,0.4)',
+              backgroundColor: 'rgba(0, 0, 0, 0.6)',
+              borderRadius: '4px',
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column-reverse',
+              zIndex: '5',
+              pointerEvents: 'none',
+              transition: 'opacity 0.2s',
+              transformOrigin: 'bottom center',
+          });
+          const color = this.side === 'ally' ? '#00ffff' : '#ff3366';
+          this.container.style.boxShadow = `0 0 6px ${color}`;
+          this.container.style.borderColor = color;
+          // Gắn vào body (Overlay lên trên Canvas)
+          document.body.appendChild(this.container);
           this.uiFill = document.createElement('div');
-          this.uiFill.style.width = '100%';
-          this.uiFill.style.backgroundColor = this.side === 'ally' ? '#00ffff' : '#ff00ff';
-          this.uiFill.style.transition = 'height 0.3s ease';
-          this.uiFill.style.height = '50%';
+          Object.assign(this.uiFill.style, {
+              width: '100%',
+              height: '50%',
+              backgroundColor: color,
+              transition: 'height 0.2s ease-out',
+              opacity: '0.9'
+          });
           this.container.appendChild(this.uiFill);
-          const label = document.createElement('div');
-          label.style.position = 'absolute';
-          label.style.width = '100%';
-          label.style.textAlign = 'center';
-          label.style.bottom = '5px';
-          label.style.color = '#fff';
-          label.style.fontWeight = 'bold';
-          label.style.textShadow = '1px 1px 2px #000';
-          label.id = `aether-label-${this.side}`;
-          this.container.appendChild(label);
+          this.label = document.createElement('div');
+          Object.assign(this.label.style, {
+              position: 'absolute',
+              width: '100%',
+              textAlign: 'center',
+              bottom: '-20px',
+              color: '#fff',
+              fontSize: '10px',
+              fontWeight: 'bold',
+              textShadow: '1px 1px 2px #000',
+              pointerEvents: 'none'
+          });
+          this.container.appendChild(this.label);
       }
       updateUI() {
           if (!this.uiFill || !this.container)
               return;
           const percent = this.max > 0 ? (this.current / this.max) * 100 : 0;
           this.uiFill.style.height = `${Math.max(0, Math.min(100, percent))}%`;
+          if (this.label) {
+              this.label.textContent = `${Math.floor(this.current)}`;
+          }
+      }
+      // Hàm này được gọi từ Game Loop (draw) để bám theo nhân vật/vị trí
+      syncVisuals(screenX, screenY, scale) {
+          if (!this.container)
+              return;
+          if (scale < 0.2) {
+              this.container.style.opacity = '0';
+              return;
+          }
+          this.container.style.opacity = '1';
+          const w = Math.max(8, 12 * scale);
+          const h = Math.max(30, 100 * scale);
+          this.container.style.width = `${w}px`;
+          this.container.style.height = `${h}px`;
+          // Offset để không che mặt Leader
+          const offsetX = this.side === 'ally' ? -25 * scale : 25 * scale;
+          const offsetY = -10 * scale;
+          this.container.style.left = `${screenX + offsetX - (w / 2)}px`;
+          this.container.style.top = `${screenY + offsetY - h}px`;
       }
   }
-  // 1. Tạo 2 trụ cho 2 bên
   const allyAetherPool = new SharedAetherPool('ally');
   const enemyAetherPool = new SharedAetherPool('enemy');
-  // 2. Cầu nối API cho game
   const globalAetherPool = {
       init: (units) => {
           allyAetherPool.destroyUI();
           enemyAetherPool.destroyUI();
           allyAetherPool.init(units);
-          // --- CODE TEST UI: Bơm thông số giả để hiện trụ khi chưa ráp logic ---
-          if (allyAetherPool.max === 0) {
-              allyAetherPool.max = 100;
-              allyAetherPool.current = 50;
-              allyAetherPool.initUI();
-              allyAetherPool.updateUI();
-          }
-          if (enemyAetherPool.max === 0) {
-              enemyAetherPool.max = 100;
-              enemyAetherPool.current = 50;
-              enemyAetherPool.initUI();
-              enemyAetherPool.updateUI();
-          }
+          enemyAetherPool.init(units);
       },
-      onTurnEnd: () => {
-          allyAetherPool.onTurnEnd();
-          enemyAetherPool.onTurnEnd();
+      onTurnCycleEnd: () => {
+          allyAetherPool.onTurnCycleEnd();
+          enemyAetherPool.onTurnCycleEnd();
       },
-      consume: (cost) => allyAetherPool.consume(cost),
-      updateUI: () => {
-          allyAetherPool.updateUI();
-          enemyAetherPool.updateUI();
+      gain: (side, amount) => {
+          if (side === 'ally')
+              allyAetherPool.gain(amount);
+          else if (side === 'enemy')
+              enemyAetherPool.gain(amount);
+      },
+      consume: (side, cost) => {
+          if (side === 'ally')
+              return allyAetherPool.consume(cost);
+          return enemyAetherPool.consume(cost);
+      },
+      // API cho Engine update vị trí
+      syncAllVisuals: (allyPos, enemyPos) => {
+          allyAetherPool.syncVisuals(allyPos.x, allyPos.y, allyPos.s);
+          enemyAetherPool.syncVisuals(enemyPos.x, enemyPos.y, enemyPos.s);
       },
       destroy: () => {
           allyAetherPool.destroyUI();
           enemyAetherPool.destroyUI();
-      },
-      get current() { return allyAetherPool.current; },
-      get max() { return allyAetherPool.max; },
-      get regenPerTurn() { return allyAetherPool.regenPerTurn; }
+      }
   };
-  // 3. --- MÓC NỐI TỰ ĐỘNG VÀO GAME ENGINE & ERUDA ---
-  if (typeof window !== 'undefined') {
-      // Ní có thể mở Eruda gõ window.testAether() để ép nó mọc lên bất cứ lúc nào!
-      window.testAether = () => globalAetherPool.init([]);
-      let isAetherInit = false;
-      // Tự động mọc trụ khi Lượt (Turn) đầu tiên bắt đầu
-      addGameEventListener(TURN_START, () => {
-          if (!isAetherInit) {
-              globalAetherPool.init([]);
-              isAetherInit = true;
-          }
-      });
-      // Tự động đập trụ dọn dẹp khi ván đấu kết thúc
-      addGameEventListener(BATTLE_END, () => {
-          globalAetherPool.destroy();
-          isAetherInit = false;
-      });
-  }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'allyAetherPool')) exports.allyAetherPool = allyAetherPool;
   if (!Object.prototype.hasOwnProperty.call(exports, 'enemyAetherPool')) exports.enemyAetherPool = enemyAetherPool;
@@ -4082,31 +4072,35 @@ __define('./catalog.ts', (exports, module, __require) => {
 });
 __define('./combat.ts', (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/combat.ts
-  const __dep0 = __require('./statuses.ts');
-  const Statuses = __dep0.Statuses;
-  const hookOnLethalDamage = __dep0.hookOnLethalDamage;
-  const __dep1 = __require('./combat/apply-damage.ts');
-  const applyDamage = __dep1.applyDamage;
-  const grantShield = __dep1.grantShield;
-  const __dep2 = __require('./vfx.ts');
-  const asSessionWithVfx = __dep2.asSessionWithVfx;
-  const vfxAddHit = __dep2.vfxAddHit;
-  const vfxAddMelee = __dep2.vfxAddMelee;
-  const vfxAddLightningArc = __dep2.vfxAddLightningArc;
-  const __dep3 = __require('./engine.ts');
-  const slotToCell = __dep3.slotToCell;
-  const __dep4 = __require('./passives.ts');
-  const emitPassiveEvent = __dep4.emitPassiveEvent;
-  const getPassiveLog = __dep4.getPassiveLog;
-  const __dep5 = __require('./config.ts');
-  const CFG = __dep5.CFG;
-  const __dep6 = __require('./utils/fury.ts');
-  const gainFury = __dep6.gainFury;
-  const startFurySkill = __dep6.startFurySkill;
-  const finishFuryHit = __dep6.finishFuryHit;
-  const __dep7 = __require('./utils/time.ts');
-  const mergeBusyUntil = __dep7.mergeBusyUntil;
-  const sessionNow = __dep7.sessionNow;
+  const __dep0 = __require('./aether.ts');
+  const globalAetherPool = __dep0.globalAetherPool;
+  const __dep1 = __require('./catalog.ts');
+  const getMetaById = __dep1.getMetaById;
+  const __dep2 = __require('./statuses.ts');
+  const Statuses = __dep2.Statuses;
+  const hookOnLethalDamage = __dep2.hookOnLethalDamage;
+  const __dep3 = __require('./combat/apply-damage.ts');
+  const applyDamage = __dep3.applyDamage;
+  const grantShield = __dep3.grantShield;
+  const __dep4 = __require('./vfx.ts');
+  const asSessionWithVfx = __dep4.asSessionWithVfx;
+  const vfxAddHit = __dep4.vfxAddHit;
+  const vfxAddMelee = __dep4.vfxAddMelee;
+  const vfxAddLightningArc = __dep4.vfxAddLightningArc;
+  const __dep5 = __require('./engine.ts');
+  const slotToCell = __dep5.slotToCell;
+  const __dep6 = __require('./passives.ts');
+  const emitPassiveEvent = __dep6.emitPassiveEvent;
+  const getPassiveLog = __dep6.getPassiveLog;
+  const __dep7 = __require('./config.ts');
+  const CFG = __dep7.CFG;
+  const __dep8 = __require('./utils/fury.ts');
+  const gainFury = __dep8.gainFury;
+  const startFurySkill = __dep8.startFurySkill;
+  const finishFuryHit = __dep8.finishFuryHit;
+  const __dep9 = __require('./utils/time.ts');
+  const mergeBusyUntil = __dep9.mergeBusyUntil;
+  const sessionNow = __dep9.sessionNow;
   exports.applyDamage = applyDamage;
   exports.grantShield = grantShield;
   const isBasicAttackAfterHitHandler = (handler) => typeof handler === 'function';
@@ -4218,6 +4212,10 @@ __define('./combat.ts', (exports, module, __require) => {
       if (pool.length === 0)
           return;
       startFurySkill(unit, { tag: 'basic' });
+      const meta = getMetaById(unit.id);
+      const isSupport = meta?.class === 'Support';
+      const aeGain = isSupport ? 10 : 5;
+      globalAetherPool.gain(unit.side, aeGain);
       const fallback = pickTarget(Game, unit);
       const resolved = Statuses.resolveTarget(unit, pool, { attackType: 'basic' }) ?? fallback;
       if (!resolved)
@@ -10104,94 +10102,96 @@ __define('./modes/coming-soon.stub.ts', (exports, module, __require) => {
 });
 __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/modes/pve/session-runtime-impl.ts
-  const __dep2 = __require('./turns.ts');
-  const stepTurn = __dep2.stepTurn;
-  const doActionOrSkip = __dep2.doActionOrSkip;
-  const predictSpawnCycle = __dep2.predictSpawnCycle;
-  const __dep3 = __require('./summon.ts');
-  const enqueueImmediate = __dep3.enqueueImmediate;
-  const processActionChain = __dep3.processActionChain;
-  const __dep4 = __require('./ai.ts');
-  const refillDeckEnemy = __dep4.refillDeckEnemy;
-  const aiMaybeAct = __dep4.aiMaybeAct;
-  const __dep5 = __require('./statuses.ts');
-  const Statuses = __dep5.Statuses;
-  const makeStatusEffect = __dep5.makeStatusEffect;
-  const __dep6 = __require('./config.ts');
-  const CFG = __dep6.CFG;
-  const CAM = __dep6.CAM;
-  const __dep7 = __require('./combat.ts');
-  const pickTarget = __dep7.pickTarget;
-  const dealAbilityDamage = __dep7.dealAbilityDamage;
-  const healUnit = __dep7.healUnit;
-  const grantShield = __dep7.grantShield;
-  const applyDamage = __dep7.applyDamage;
-  const __dep8 = __require('./utils/fury.ts');
-  const initializeFury = __dep8.initializeFury;
-  const setFury = __dep8.setFury;
-  const spendFury = __dep8.spendFury;
-  const resolveUltCost = __dep8.resolveUltCost;
-  const gainFury = __dep8.gainFury;
-  const finishFuryHit = __dep8.finishFuryHit;
-  const __dep9 = __require('./engine.ts');
-  const makeGrid = __dep9.makeGrid;
-  const drawGridOblique = __dep9.drawGridOblique;
-  const drawTokensOblique = __dep9.drawTokensOblique;
-  const drawQueuedOblique = __dep9.drawQueuedOblique;
-  const hitToCellOblique = __dep9.hitToCellOblique;
-  const spawnLeaders = __dep9.spawnLeaders;
-  const pickRandom = __dep9.pickRandom;
-  const slotIndex = __dep9.slotIndex;
-  const slotToCell = __dep9.slotToCell;
-  const cellReserved = __dep9.cellReserved;
-  const ART_SPRITE_EVENT = __dep9.ART_SPRITE_EVENT;
-  const __dep10 = __require('./background.ts');
-  const drawEnvironmentProps = __dep10.drawEnvironmentProps;
-  const __dep11 = __require('./art.ts');
-  const getUnitArt = __dep11.getUnitArt;
-  const setUnitSkin = __dep11.setUnitSkin;
-  const __dep12 = __require('./ui.ts');
-  const initHUD = __dep12.initHUD;
-  const startSummonBar = __dep12.startSummonBar;
-  const __dep13 = __require('./vfx.ts');
-  const vfxDraw = __dep13.vfxDraw;
-  const vfxAddSpawn = __dep13.vfxAddSpawn;
-  const vfxAddHit = __dep13.vfxAddHit;
-  const vfxAddMelee = __dep13.vfxAddMelee;
-  const vfxAddLightningArc = __dep13.vfxAddLightningArc;
-  const vfxAddBloodPulse = __dep13.vfxAddBloodPulse;
-  const vfxAddGroundBurst = __dep13.vfxAddGroundBurst;
-  const vfxAddShieldWrap = __dep13.vfxAddShieldWrap;
-  const computeMeleeOffsets = __dep13.computeMeleeOffsets;
-  const baseAsSessionWithVfx = __dep13.asSessionWithVfx;
-  const __dep14 = __require('./scene.ts');
-  const drawBattlefieldScene = __dep14.drawBattlefieldScene;
-  const __dep15 = __require('./events.ts');
-  const TURN_START = __dep15.TURN_START;
-  const TURN_END = __dep15.TURN_END;
-  const ACTION_START = __dep15.ACTION_START;
-  const ACTION_END = __dep15.ACTION_END;
-  const BATTLE_END = __dep15.BATTLE_END;
-  const emitGameEvent = __dep15.emitGameEvent;
-  const addGameEventListener = __dep15.addGameEventListener;
-  const __dep16 = __require('./utils/dummy.ts');
-  const ensureNestedModuleSupport = __dep16.ensureNestedModuleSupport;
-  const __dep17 = __require('./utils/time.ts');
-  const mergeBusyUntil = __dep17.mergeBusyUntil;
-  const normalizeAnimationFrameTimestamp = __dep17.normalizeAnimationFrameTimestamp;
-  const resetSessionTimeBase = __dep17.resetSessionTimeBase;
-  const safeNow = __dep17.safeNow;
-  const sessionNow = __dep17.sessionNow;
-  const __dep18 = __require('./utils/kit.ts');
-  const getSummonSpec = __dep18.getSummonSpec;
-  const resolveSummonSlots = __dep18.resolveSummonSlots;
-  const __dep19 = __require('./modes/pve/session-state.ts');
-  const normalizeConfig = __dep19.normalizeConfig;
-  const createSession = __dep19.createSession;
-  const invalidateSceneCache = __dep19.invalidateSceneCache;
-  const ensureSceneCache = __dep19.ensureSceneCache;
-  const clearBackgroundSignatureCache = __dep19.clearBackgroundSignatureCache;
-  const normalizeDeckEntries = __dep19.normalizeDeckEntries;
+  const __dep2 = __require('./aether.ts');
+  const globalAetherPool = __dep2.globalAetherPool;
+  const __dep3 = __require('./turns.ts');
+  const stepTurn = __dep3.stepTurn;
+  const doActionOrSkip = __dep3.doActionOrSkip;
+  const predictSpawnCycle = __dep3.predictSpawnCycle;
+  const __dep4 = __require('./summon.ts');
+  const enqueueImmediate = __dep4.enqueueImmediate;
+  const processActionChain = __dep4.processActionChain;
+  const __dep5 = __require('./ai.ts');
+  const refillDeckEnemy = __dep5.refillDeckEnemy;
+  const aiMaybeAct = __dep5.aiMaybeAct;
+  const __dep6 = __require('./statuses.ts');
+  const Statuses = __dep6.Statuses;
+  const makeStatusEffect = __dep6.makeStatusEffect;
+  const __dep7 = __require('./config.ts');
+  const CFG = __dep7.CFG;
+  const CAM = __dep7.CAM;
+  const __dep8 = __require('./combat.ts');
+  const pickTarget = __dep8.pickTarget;
+  const dealAbilityDamage = __dep8.dealAbilityDamage;
+  const healUnit = __dep8.healUnit;
+  const grantShield = __dep8.grantShield;
+  const applyDamage = __dep8.applyDamage;
+  const __dep9 = __require('./utils/fury.ts');
+  const initializeFury = __dep9.initializeFury;
+  const setFury = __dep9.setFury;
+  const spendFury = __dep9.spendFury;
+  const resolveUltCost = __dep9.resolveUltCost;
+  const gainFury = __dep9.gainFury;
+  const finishFuryHit = __dep9.finishFuryHit;
+  const __dep10 = __require('./engine.ts');
+  const makeGrid = __dep10.makeGrid;
+  const drawGridOblique = __dep10.drawGridOblique;
+  const drawTokensOblique = __dep10.drawTokensOblique;
+  const drawQueuedOblique = __dep10.drawQueuedOblique;
+  const hitToCellOblique = __dep10.hitToCellOblique;
+  const spawnLeaders = __dep10.spawnLeaders;
+  const pickRandom = __dep10.pickRandom;
+  const slotIndex = __dep10.slotIndex;
+  const slotToCell = __dep10.slotToCell;
+  const cellReserved = __dep10.cellReserved;
+  const ART_SPRITE_EVENT = __dep10.ART_SPRITE_EVENT;
+  const __dep11 = __require('./background.ts');
+  const drawEnvironmentProps = __dep11.drawEnvironmentProps;
+  const __dep12 = __require('./art.ts');
+  const getUnitArt = __dep12.getUnitArt;
+  const setUnitSkin = __dep12.setUnitSkin;
+  const __dep13 = __require('./ui.ts');
+  const initHUD = __dep13.initHUD;
+  const startSummonBar = __dep13.startSummonBar;
+  const __dep14 = __require('./vfx.ts');
+  const vfxDraw = __dep14.vfxDraw;
+  const vfxAddSpawn = __dep14.vfxAddSpawn;
+  const vfxAddHit = __dep14.vfxAddHit;
+  const vfxAddMelee = __dep14.vfxAddMelee;
+  const vfxAddLightningArc = __dep14.vfxAddLightningArc;
+  const vfxAddBloodPulse = __dep14.vfxAddBloodPulse;
+  const vfxAddGroundBurst = __dep14.vfxAddGroundBurst;
+  const vfxAddShieldWrap = __dep14.vfxAddShieldWrap;
+  const computeMeleeOffsets = __dep14.computeMeleeOffsets;
+  const baseAsSessionWithVfx = __dep14.asSessionWithVfx;
+  const __dep15 = __require('./scene.ts');
+  const drawBattlefieldScene = __dep15.drawBattlefieldScene;
+  const __dep16 = __require('./events.ts');
+  const TURN_START = __dep16.TURN_START;
+  const TURN_END = __dep16.TURN_END;
+  const ACTION_START = __dep16.ACTION_START;
+  const ACTION_END = __dep16.ACTION_END;
+  const BATTLE_END = __dep16.BATTLE_END;
+  const emitGameEvent = __dep16.emitGameEvent;
+  const addGameEventListener = __dep16.addGameEventListener;
+  const __dep17 = __require('./utils/dummy.ts');
+  const ensureNestedModuleSupport = __dep17.ensureNestedModuleSupport;
+  const __dep18 = __require('./utils/time.ts');
+  const mergeBusyUntil = __dep18.mergeBusyUntil;
+  const normalizeAnimationFrameTimestamp = __dep18.normalizeAnimationFrameTimestamp;
+  const resetSessionTimeBase = __dep18.resetSessionTimeBase;
+  const safeNow = __dep18.safeNow;
+  const sessionNow = __dep18.sessionNow;
+  const __dep19 = __require('./utils/kit.ts');
+  const getSummonSpec = __dep19.getSummonSpec;
+  const resolveSummonSlots = __dep19.resolveSummonSlots;
+  const __dep20 = __require('./modes/pve/session-state.ts');
+  const normalizeConfig = __dep20.normalizeConfig;
+  const createSession = __dep20.createSession;
+  const invalidateSceneCache = __dep20.invalidateSceneCache;
+  const ensureSceneCache = __dep20.ensureSceneCache;
+  const clearBackgroundSignatureCache = __dep20.clearBackgroundSignatureCache;
+  const normalizeDeckEntries = __dep20.normalizeDeckEntries;
   const isPlainRecord = (value) => (!!value && typeof value === 'object');
   const isFiniteNumber = (value) => (typeof value === 'number' && Number.isFinite(value));
   const parseFiniteNumber = (value) => {
@@ -11823,6 +11823,9 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           if (!t.iid)
               t.iid = nextIid();
       }
+      if (Game.tokens) {
+          globalAetherPool.init(Game.tokens);
+      }
       if (hud && Game)
           hud.update(Game);
       scheduleDraw();
@@ -12456,6 +12459,12 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           else {
               drawTokensOblique(ctx, Game.grid, tokens, CAM_PRESET);
           }
+          const getPos = (cx, cy) => cellCenterObliqueLocal(Game.grid, cx, cy, CAM_PRESET);
+          // Lấy toạ độ màn hình của 2 ô đặt trụ
+          const allyPos = getPos(0, 1);
+          const enemyPos = getPos(6, 1);
+          // Update vị trí DOM
+          globalAetherPool.syncAllVisuals({ x: allyPos.x, y: allyPos.y, s: allyPos.scale }, { x: enemyPos.x, y: enemyPos.y, s: enemyPos.scale });
       }
       if (sessionVfx) {
           vfxDraw(ctx, sessionVfx, CAM_PRESET);
@@ -12726,6 +12735,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       clearSessionTimers();
       clearSessionListeners();
       cleanupSummonBar();
+      globalAetherPool.destroy();
       if (Game) {
           if (Game.queued?.ally?.clear)
               Game.queued.ally.clear();
@@ -21735,48 +21745,50 @@ __define('./summon.ts', (exports, module, __require) => {
 });
 __define('./turns.ts', (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/turn.ts
-  const __dep0 = __require('./engine.ts');
-  const slotToCell = __dep0.slotToCell;
-  const slotIndex = __dep0.slotIndex;
-  const __dep1 = __require('./statuses.ts');
-  const Statuses = __dep1.Statuses;
-  const __dep2 = __require('./combat.ts');
-  const doBasicWithFollowups = __dep2.doBasicWithFollowups;
-  const __dep3 = __require('./config.ts');
-  const CFG = __dep3.CFG;
-  const __dep4 = __require('./meta.ts');
-  const makeInstanceStats = __dep4.makeInstanceStats;
-  const initialRageFor = __dep4.initialRageFor;
-  const __dep5 = __require('./vfx.ts');
-  const vfxAddSpawn = __dep5.vfxAddSpawn;
-  const vfxAddBloodPulse = __dep5.vfxAddBloodPulse;
-  const asSessionWithVfx = __dep5.asSessionWithVfx;
-  const __dep6 = __require('./art.ts');
-  const getUnitArt = __dep6.getUnitArt;
-  const __dep7 = __require('./passives.ts');
-  const emitPassiveEvent = __dep7.emitPassiveEvent;
-  const applyOnSpawnEffects = __dep7.applyOnSpawnEffects;
-  const getPassiveLog = __dep7.getPassiveLog;
-  const prepareUnitForPassives = __dep7.prepareUnitForPassives;
-  const __dep8 = __require('./events.ts');
-  const emitGameEvent = __dep8.emitGameEvent;
-  const TURN_START = __dep8.TURN_START;
-  const TURN_END = __dep8.TURN_END;
-  const ACTION_START = __dep8.ACTION_START;
-  const ACTION_END = __dep8.ACTION_END;
-  const TURN_REGEN = __dep8.TURN_REGEN;
-  const __dep9 = __require('./utils/time.ts');
-  const safeNow = __dep9.safeNow;
-  const sessionNow = __dep9.sessionNow;
-  const __dep10 = __require('./utils/fury.ts');
-  const initializeFury = __dep10.initializeFury;
-  const startFuryTurn = __dep10.startFuryTurn;
-  const spendFury = __dep10.spendFury;
-  const resolveUltCost = __dep10.resolveUltCost;
-  const setFury = __dep10.setFury;
-  const clearFreshSummon = __dep10.clearFreshSummon;
-  const __dep11 = __require('./turns/interleaved.ts');
-  const nextTurnInterleaved = __dep11.nextTurnInterleaved;
+  const __dep0 = __require('./aether.ts');
+  const globalAetherPool = __dep0.globalAetherPool;
+  const __dep1 = __require('./engine.ts');
+  const slotToCell = __dep1.slotToCell;
+  const slotIndex = __dep1.slotIndex;
+  const __dep2 = __require('./statuses.ts');
+  const Statuses = __dep2.Statuses;
+  const __dep3 = __require('./combat.ts');
+  const doBasicWithFollowups = __dep3.doBasicWithFollowups;
+  const __dep4 = __require('./config.ts');
+  const CFG = __dep4.CFG;
+  const __dep5 = __require('./meta.ts');
+  const makeInstanceStats = __dep5.makeInstanceStats;
+  const initialRageFor = __dep5.initialRageFor;
+  const __dep6 = __require('./vfx.ts');
+  const vfxAddSpawn = __dep6.vfxAddSpawn;
+  const vfxAddBloodPulse = __dep6.vfxAddBloodPulse;
+  const asSessionWithVfx = __dep6.asSessionWithVfx;
+  const __dep7 = __require('./art.ts');
+  const getUnitArt = __dep7.getUnitArt;
+  const __dep8 = __require('./passives.ts');
+  const emitPassiveEvent = __dep8.emitPassiveEvent;
+  const applyOnSpawnEffects = __dep8.applyOnSpawnEffects;
+  const getPassiveLog = __dep8.getPassiveLog;
+  const prepareUnitForPassives = __dep8.prepareUnitForPassives;
+  const __dep9 = __require('./events.ts');
+  const emitGameEvent = __dep9.emitGameEvent;
+  const TURN_START = __dep9.TURN_START;
+  const TURN_END = __dep9.TURN_END;
+  const ACTION_START = __dep9.ACTION_START;
+  const ACTION_END = __dep9.ACTION_END;
+  const TURN_REGEN = __dep9.TURN_REGEN;
+  const __dep10 = __require('./utils/time.ts');
+  const safeNow = __dep10.safeNow;
+  const sessionNow = __dep10.sessionNow;
+  const __dep11 = __require('./utils/fury.ts');
+  const initializeFury = __dep11.initializeFury;
+  const startFuryTurn = __dep11.startFuryTurn;
+  const spendFury = __dep11.spendFury;
+  const resolveUltCost = __dep11.resolveUltCost;
+  const setFury = __dep11.setFury;
+  const clearFreshSummon = __dep11.clearFreshSummon;
+  const __dep12 = __require('./turns/interleaved.ts');
+  const nextTurnInterleaved = __dep12.nextTurnInterleaved;
   const toLowerSide = (side) => {
       if (side === 'ALLY')
           return 'ally';
@@ -22282,6 +22294,7 @@ __define('./turns.ts', (exports, module, __require) => {
           sequentialTurn.cursor = nextCursor;
           if (nextCursor === 0) {
               cycle += 1;
+              globalAetherPool.onTurnCycleEnd();
           }
           sequentialTurn.cycle = cycle;
           cursor = nextCursor;

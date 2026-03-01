@@ -1,4 +1,6 @@
 //home (termux)/arclune_lane_7x3/src/modes/pve/session-runtime-impl.ts
+
+import { globalAetherPool } from '../../aether';
 import { stepTurn, doActionOrSkip, predictSpawnCycle } from '../../turns';
 import { enqueueImmediate, processActionChain } from '../../summon';
 import { refillDeckEnemy, aiMaybeAct } from '../../ai';
@@ -1820,6 +1822,8 @@ function init(): boolean {
   for (const t of tokens){
     if (!t.iid) t.iid = nextIid();
   }
+  if (Game.tokens) { globalAetherPool.init(Game.tokens);
+  }
 
   if (hud && Game) hud.update(Game);
   scheduleDraw();
@@ -2477,6 +2481,19 @@ function draw(): void {
     } else {
       drawTokensOblique(ctx, Game.grid, tokens, CAM_PRESET);
     }
+    const getPos = (cx: number, cy: number) => 
+      cellCenterObliqueLocal(Game.grid!, cx, cy, CAM_PRESET);
+
+   // Lấy toạ độ màn hình của 2 ô đặt trụ
+   const allyPos = getPos(0, 1); 
+   const enemyPos = getPos(6, 1); 
+  
+   // Update vị trí DOM
+   globalAetherPool.syncAllVisuals(
+     { x: allyPos.x, y: allyPos.y, s: allyPos.scale },
+     { x: enemyPos.x, y: enemyPos.y, s: enemyPos.scale }
+  );
+
   }
   if (sessionVfx){
     vfxDraw(ctx, sessionVfx, CAM_PRESET);
@@ -2761,6 +2778,7 @@ function stopSession(): void {
   clearSessionTimers();
   clearSessionListeners();
   cleanupSummonBar();
+  globalAetherPool.destroy();
   if (Game){
     if (Game.queued?.ally?.clear) Game.queued.ally.clear();
     if (Game.queued?.enemy?.clear) Game.queued.enemy.clear();

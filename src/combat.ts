@@ -1,5 +1,7 @@
 //home (termux)/arclune_lane_7x3/src/combat.ts
 
+import { globalAetherPool } from './aether.ts';
+import { getMetaById } from './catalog.ts';
 import { SharedAetherPool } from './aether.ts'
 import { Statuses, hookOnLethalDamage } from './statuses.ts';
 import { applyDamage, grantShield } from './combat/apply-damage.ts';
@@ -210,6 +212,9 @@ export function basicAttack(Game: SessionState, unit: UnitToken): void {
   if (pool.length === 0) return;
 
   startFurySkill(unit, { tag: 'basic' });
+  const meta = getMetaById(unit.id);
+  const isSupport = meta?.class === 'Support';
+  const aeGain = isSupport ? 10 : 5; globalAetherPool.gain(unit.side, aeGain);
 
   const fallback = pickTarget(Game, unit);
   const resolved = Statuses.resolveTarget(unit, pool, { attackType: 'basic' }) ?? fallback;

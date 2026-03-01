@@ -1628,430 +1628,985 @@ def onFusionEnd(owner):
 
 Chú thích: Các nhân vật thuộc bậc Prime nếu là hoá thân của thần nên có thần tính: thần tính: không thể hồi sinh, không nhận bất kỳ buff hay debuff, kĩ năng/đánh thường/nội tại/ult đều không thể cướp, xoá bỏ, lãng quên hay sao chép.
 
-22) 
-
-
-23) Hoá thân của Nữ Thần Sinh Mệnh, Prime.
-Cost: 22, chỉ ra sân được 1 lần, sau khi chết không thể hồi sinh 
-Mô tả: một hoá thân của hậu thiên thần Nữ Thần Sinh Mệnh, không có mặt cụ thể mà là 1 đoàn mê vụ mơ hồ.
-
-Nội tại – Hộ Ấn Bất Khuất
-Khi ra sân: ban 1 hiệu ứng Bất Khuất cho Leader đồng minh và bản thân. (Bất Khuất: khi nhận sát thương vượt HP hiện có, HP còn 1; tồn tại vô hạn đến khi kích hoặc bị kỹ năng khác loại bỏ already in game.)
-Nội tại 2 – Sinh Quyển Trao Hoán
-Mỗi đơn vị địch nhận sát thương do Hoá Thân gây ra sẽ mất 1% MaxHP (vĩnh viễn trong trận), và Hoá Thân nhận +1% MaxHP tương ứng.
-Cân bằng: Mỗi mục tiêu tối đa −12% MaxHP từ nguồn này trong một trận. Hoá Thân tối đa +100% MaxHP cộng dồn từ nguồn này trong một trận. Không nhận buff/debuff từ bên ngoài; các hiệu ứng tự áp của chính bộ chiêu vẫn hoạt động.
-
-Kỹ năng 1 – Sinh Mệnh Hiến Tế (30 aether, CD 2): Giảm 7% MaxHP (bản thân) → gây AOE toàn sân = 100% (ATK+WIL). Áp Sinh Quyển Trao Hoán lên từng kẻ trúng.
-Kỹ năng 2 – Quang Ấn Dưỡng Sinh (25 aether, CD 4): Giảm 10% MaxHP (bản thân) → trong 3 lượt, mọi hiệu quả hồi máu của đồng minh đang đứng trên sân được x3 (+200%) khi HOÁ THÂN kích hoạt chiêu này. Overheal → Khiên cho chính đơn vị được hồi, trần = 100% MaxHP của đơn vị đó. Lưu ý: hiệu ứng là trường-ảnh hưởng, không phải buff đặt lên Hoá Thân; không cộng dồn với hiệu ứng “tăng hồi khác” – lấy giá trị cao nhất.
-Kỹ năng 3 – Kết Mệnh Chuyển Dung (30 aether, mỗi trận 1 lần): Leader đồng minh nhận +MaxHP = 50% MaxHP hiện tại của Hoá Thân (snapshot tại thời điểm dùng). Hoá Thân đồng thời −50% MaxHP hiện tại. Không thể bị giải, không cộng dồn; dùng thêm lần nữa trong trận: không khả dụng.
-
-Đánh thường: gây sát thương = 100% wil và atk lên 1 mục tiêu
-
-Tuyệt kỹ – Sinh Luân Phán Quyết (auto-cast khi đầy nộ): Giảm 5% MaxHP (bản thân) → gây AOE toàn sân = 200% (ATK+WIL), áp Sinh Quyển Trao Hoán lên từng kẻ trúng.
-Cân bằng & quy tắc then chốt
-1. Nội tại “Trao Hoán” có trần
-Mỗi địch: tối đa −12% MaxHP bị “rút”.
-Hoá Thân: tối đa +100% MaxHP nhận về từ cơ chế này.
-→ Tránh snowball vô hạn với chuỗi AOE.
-2. Tự giảm MaxHP là “cái giá” thật
-K1/K2/Ult lần lượt −7% / −10% / −5% MaxHP của Hoá Thân, là vĩnh viễn trong trận (không thể hồi trần) Đương nhiên nội tại 2 vẫn hoạt động bình thường.
-Giúp tạo bài toán: bơm đội vs tiêu hao bản thân.
-3. Quang Ấn Dưỡng Sinh (K2)
-Là trường-ảnh hưởng tức thời do Hoá Thân tạo, nên không vi phạm miễn nhiễm buff của chính Hoá Thân.
-Overheal → Khiên có trần 100% MaxHP trên từng ally để không “tường bất tử”.
-CD 4 để ngăn combo heal-bomb quá dày.
-4. Kết Mệnh Chuyển Dung (K3)
-Một lần mỗi trận (onetime) để tránh chuyển tải nhiều đợt kết hợp “Trao Hoán” → Leader phình quá lớn.
-Lấy snapshot MaxHP hiện tại của Hoá Thân (đã cộng trừ bởi Trao Hoán/các hiến tế trước đó).
-5. Miễn nhiễm / cờ hệ thống
-UNREVIVABLE, NO_EXTERNAL_BUFFS/DEBUFFS, UNCOPYABLE, UNCLEANSABLE.
-Bất Khuất cho bản thân & Leader được áp khi vào sân, và có thể bị loại bỏ bởi kỹ năng đối phương.
-Ghi chú triển khai cho coder
-Trao Hoán (per-hit):
-onDamageDealtByAvatar(target):
-    if target.exchangeLost < 0.12 * target.baseMaxHp:
-        loss = min(0.01 * target.baseMaxHp, 0.12*base - exchangeLostSoFar)
-        target.maxHp -= loss; target.hp = min(target.hp, target.maxHp)
-        avatar.maxHpGainFromExchange = min(avatar.maxHpGainFromExchange + loss, 1.00 * avatar.baseMaxHp)
-        avatar.maxHp = avatar.baseMaxHp + avatar.maxHpGainFromExchange
-
-K2 (trường hiệu lực 3 lượt): khi ally nhận heal H, set H' = H * 3.0; overshield += max(0, H' - missingHp), clamp overshield ≤ ally.baseMaxHp. Không stack nhiều nguồn tăng hồi – lấy max multiplier.
-K3 (once per battle): leader.maxHp += 0.5 * avatar.maxHp_current (snapshot), avatar.maxHp -= 0.5 * avatar.maxHp_current; flag usedOnce=true.
-HP/MaxHP giảm từ K1/K2/Ult là permanent-this-match; không thể dispel.
-
-
-24) Hoá thân của Thần Chết, Prime.
-Cost: 22, chỉ ra sân được 1 lần, sau khi chết không thể hồi sinh 
-Mô tả: một hoá thân của tiên thiên thần-Thần Chết, không có mặt cụ thể mà là 1 đoàn mê vụ mơ hồ.
-
-Nội tại 1 – Vô Thể U Minh
-Nhận kháng 80% sát thương có thành phần ATK (tính sau ARM/RES). Phần sát thương từ WIL/hybrid vẫn tính bình thường.
-Nội tại 2 – Thẩm Quyết Tàn Sát
-Luôn sở hữu hiệu ứng Tàn Sát (execute) từ lúc vào trận đến hết trận.
-
-Kỹ năng 1 – U Khiếu Tuyệt Vọng (25 aether)
-Gầm thét làm toàn bộ kẻ địch đang đứng sân dính Sợ Hãi 1 lượt.  (đứng hàng chờ không tính)
-Kỹ năng 2 – Hiến Tế Mệnh Số (30 aether, chỉ dùng khi có linh hồn)
-Hiến tế 1 Linh Hồn Âm Giới (từ K3) → nhận 2 “Lưỡi Hái Phán Quyết” (charges, tồn tại 3 lượt). Trong thời gian hiệu lực, mỗi khi bất kỳ kẻ địch nào rơi xuống ≤10% MaxHP, tự động xử tử ngay và tiêu hao 1 charge. Nếu nhiều mục tiêu cùng chạm ngưỡng trong một khoảnh khắc, ưu tiên mục tiêu có HP % thấp nhất trước. (Giới hạn: tối đa 2 lần xử tử cho mỗi lần dùng chiêu.).
-Kỹ năng 3 – Triệu Hồn Từ Vực (20 aether, CD 3)
-Gọi tối đa 3 Linh Hồn Âm Giới (chiếm ô), mỗi linh hồn chỉ đánh thường, sát thương = 50% ATK+WIL của Thần Chết. Tồn tại 3 lượt. Nếu không đủ ô, chỉ gọi vừa số ô trống.
-
-Tuyệt kỹ – Phán Quyết Vô Thường (auto-cast)
-Chém 3 kẻ địch ngẫu nhiên, mỗi kẻ 1 hit = 200% đòn đánh thường. (Mỗi hit là on-hit riêng; sau hit nếu mục tiêu ≤10% MaxHP → Tàn Sát kích hoạt.)
-Cân bằng & lý do
-Vô Thể U Minh = “kháng 80% phần ATK” để không vô hiệu hóa hoàn toàn các team dựa ATK; hybrid vẫn dọa được Thần Chết.
-Hiến Tế Mệnh Số chuyển từ “global execute không giới hạn” → cơ chế charge gắn với nguồn hiến tế, vừa thematic vừa kiểm soát bùng nổ:
-1 linh hồn → 2 charges → tối đa 2 lần xử tử/3 lượt. Rất mạnh khi phối với AOE đồng đội nhưng không phá meta.
-Triệu Hồn giới hạn 3 linh hồn / tồn tại 3 lượt / CD 3 để không chiếm sân vĩnh viễn; vẫn đủ làm “nhiên liệu” cho K2.
-Ult 200% ×3 giữ nguyên (đã có execute nội tại), vì unit không nhận buff nên khả năng snowball thấp hơn các Prime khác.
-
-Đánh thường: gây sát thương = 100% wil và atk lên 1 mục tiêu
-Ghi chú triển khai cho coder:
-1) Phân biệt cơ chế
-Nội tại: Thẩm Quyết Tàn Sát
-Dạng buff luôn-bật trên chính Thần Chết. Chỉ kích hoạt khi chính Thần Chết gây sát thương: nếu sau hit của hắn, mục tiêu ≤10% MaxHP → xử tử ngay.
-Kỹ năng 2: Hiến Tế Mệnh Số
-Dạng aura toàn sân có số lần kích hoạt (charges), tồn tại 3 lượt. Không cần Thần Chết là người gây đòn; bất kỳ kẻ địch nào rơi xuống ≤10% MaxHP trong thời gian hiệu lực → bị xử tử và trừ 1 charge (tối đa 2 lần cho mỗi lần dùng).
-Cách đặt tên/flag để Codex không nhầm
-
-Status nội tại: execute_always_on (ownerOnly=true, source=Self, duration=∞).
-
-Aura K2: death_judgement_charges (isAura=true, stacksAsCharges=2, duration=3T, globalCheck=true).
-Lưu ý: unit này “không nhận buff/debuff từ bên ngoài”, nên death_judgement_charges là state nội bộ (nonBuff:true) chứ không phải buff thường.
-
-Trigger rõ ràng
-
-onOwnerDealDamage -> tryExecute(execute_always_on)
-
-onAnyUnitHpChanged(enemy) -> if has(death_judgement_charges) and enemy.hp<=0.10*maxHp: kill(enemy); charges--
-
-2) Kháng ATK: tách sát thương vào d_atk và d_wil; áp d_atk *= 0.2 sau ARM/RES, rồi cộng lại.
-Charges K2:
-onCast_K2:
-  require souls_on_board >= 1
-  consume 1 soul
-  death_scythe_charges = 2
-  expire_in = 3 turns
-
-onAnyUnitHpChanged(enemy):
-  if death_scythe_charges > 0 and enemy.hp <= 0.10 * enemy.maxHp:
-     kill(enemy); death_scythe_charges -= 1
-
-Linh Hồn Âm Giới: đơn vị triệu hồi, không ult/skill, chỉ normal; tồn tại 3 lượt; chết/hiến tế đều rời sân.
-Auto-ult: vẫn theo hệ thống nộ toàn game; unit này không thể nhận bất kỳ buff/debuff bên ngoài (fear áp lên địch nên hợp lệ).
-
-25) Vũ Mặc
-Nội tại — Xúc Xắc
-Cơ chế chu kỳ: nhận 1 buff ngẫu nhiên trong 1 lượt, sau đó chờ 2 lượt, rồi lặp lại.
-Pool: exalt (+10% dmg), pierce (xuyên % ARM/RES), frenzy (+20% dmg đánh thường), dmgCut (giảm dmg nhận), reflect, haste (+10% SPD). Loại khỏi pool: allure, undying, execute, stealth, shield (quá swing hoặc phá meta).
-Buff cộng dồn theo stack riêng của từng loại nếu logic engine cho phép (vd: 2 lần haste không cộng dồn → kéo dài thời gian).
-
-Đánh thường: gây sát thương = x% wil và atk lên 1 mục tiêu
-
-Kỹ năng 1 — Đổ Trúng Rồi Nảy – 25 AE
-Gây 130% đòn đánh thường lên 1 mục tiêu.
-30% cơ hội nảy sang một kẻ địch khác: gây 50% sát thương của hit 1.
-Nếu có nảy 1: 20% cơ hội nảy tiếp sang một kẻ khác nữa: gây 50% sát thương của hit 1.
-(Phân phối kỳ vọng: luôn 1 hit; 30% có 2 hit; 6% có 3 hit. Không đánh lại cùng mục tiêu trong cùng kỹ năng.) Không tính là đòn đánh thường, nhưng áp dụng hiệu ứng mũi tên/venom… nếu được gắn từ buff nội tại.
-
-Kỹ năng 2 — Xúc Xắc Khiên Trận – 25 AE
-Triển “Khối Xúc Xắc” vào ô trống phía trước (nếu trống; nếu không → ô trống gần nhất về phía trước). Khối là đơn vị triệu hồi phòng thủ, tồn tại 3 lượt, Taunt trong 3 lượt.
-Thừa hưởng 50% MaxHP của Vũ Mặc, 40% ARM/RES, 0% ATK/WIL/AGI/SPD, không có nộ/kỹ năng/ult, không hồi sinh, không nhận buff/debuff. Giới hạn: tối đa 1 khối trên sân; dùng lại khi còn khối → làm mới thời gian & hồi đầy HP khối.
-
-Kỹ năng 3 — Điềm Trời Chiếu Mệnh – 25 AE, CD 3. Nhận ngẫu nhiên 1 trong 3 hiệu ứng:
-1. Hăng Hái Sinh Lực: +200% HP regen & hiệu ứng hồi phục nhận vào (3 lượt).
-2. Thép Vận Mệnh: +17% ARM/RES (3 lượt).
-3. Vận Chiến Bừng Cháy: +20% ATK/WIL (2 lượt).
-> Dùng kỹ năng không reset chu kỳ Nội tại (hai nguồn buff hoạt động độc lập). được tính 1 turn trong cooldown này.
-
-Ultimate — Phán Mệnh Xúc Sắc
-Tự chọn 1 kẻ địch ngẫu nhiên đang trên sân, lắc xúc xắc:
-Số lẻ → Sleep 1 lượt trên mục tiêu (không gây dmg).
-Số chẵn → Vũ Mặc +10% MaxHP (kèm Heal 10% MaxHP gốc) và cộng dồn tới tối đa +30% trong cả trận. Nếu không có kẻ địch trên sân, hiệu ứng chẵn vẫn áp dụng cho bản thân. Ult không tính là đòn đánh thường.
-
-Cân bằng
-Passive: chu kỳ 1-buff-mỗi-3-lượt giúp “đỏ đen” nhưng không quá RNG-burst; loại undying/stealth/execute khỏi pool để tránh outplay khó kiểm soát.
-K1: 25 AE ok (kỳ vọng ~1.36 hit). Không cho tính “đòn thường” để né combo on-hit quá tải.
-K2: thêm 40% ARM/RES inherit để Khối không bị thổi bay tức thì; giới hạn 1 khối để tránh stall.
-K3: 25 AE + CD 3 giữ nhịp; các chỉ số hiện tại hợp lý.
-Ult: Sleep 1T random là kiểm soát nhẹ; +MaxHP 10% stack cap 30% tránh snowball vô hạn, cộng heal nhỏ để “chẵn” không quá nhạt.
-Ghi chú cho coder:
-passive_fate_dice: onTurnStart(owner) → nếu internal_cd==0 thì grantRandomBuff(pool, duration=1) rồi internal_cd=2; mỗi lượt internal_cd=max(0,cd-1).
-
-skill_die: summon entity {hp=0.5*owner.maxHp, arm=0.4*owner.arm, res=0.4*owner.res, taunt=3, noActions=true, noNerf/Buff=true, noRevive=true}; enforce maxAlive=1.
-
-skill_ricochet: pick target; deal 130%; roll 30% → chain #2 (50% dmg) to other enemy; if success roll 20% → chain #3 (50%) to third enemy; tag as “not_basic”.
-
-skill_favor: uniform random among 3 options; apply durations như trên; independent of passive cycle.
-
-ult_judgement_dice: auto-cast; choose enemy on-field random; roll 1..6; odd→apply sleep(1); even→owner.maxHpBonus += 0.10 (cap 0.30) & heal(0.10*owner.baseMaxHp); not_basic.
-
-Random buff pool cho Passive: ["exalt","pierce","frenzy","dmgCut","reflect","shield","haste","allure"] (explicit whitelist).
-
-26) Ma Đế Hắc Long
-Nội tại — Hắc Long Tâm Ấn
-Vào trận: +5% RES, +5% ARM, +5% WIL; +35% HP Regen.
-Tâm Ma: mọi sát thương do Ma Đế gây ra áp 1 cộng dồn “Tâm Ma” lên mục tiêu.
-Tự tịnh trọc: mỗi 2 lượt, tự xóa ngẫu nhiên 1 debuff trên bản thân. Không thể bị lãng quên/sao chép (nội tại).
-Debuff “Tâm Ma” (chuẩn hóa)
-Hiệu ứng: -5% RES và -5% PER trên mục tiêu.
-Thời lượng mặc định 2 lượt, cộng dồn; làm mới thời gian khi nhận thêm.
-Giới hạn: PvP tối đa 5 cộng dồn/đơn vị; PvE/boss tối đa 8–10 (khuyến nghị 8).
-Flag: thuộc nhóm “curse/debuff” ⇒ có thể bị thanh tẩy bình thường (để skill 2 có đất diễn)
-
-Đánh thường: gây sát thương = 100% wil và atk lên 1 mục tiêu
-
-Kỹ năng 1 — Long Dực Tán Diệt (30 AE)
-Gây 130% đòn đánh thường lên 3 kẻ địch ngẫu nhiên, mỗi mục tiêu trúng đòn đều bị áp Tâm Ma. (Không tính là đòn đánh thường để tránh nổ on-hit quá dày.)
-
-Kỹ năng 2 — Thôn Tâm Phệ Ấn 30 aether
-Hấp thụ tất cả các cộng dồn Tâm Ma hiện có trên toàn bộ kẻ địch → nhận +5% RES và +5% PER cho mỗi cộng dồn đã hấp thụ.
-Buff nhận được là vĩnh viễn trong trận (duy trì khi chết/ hồi sinh).
-An toàn meta: đặt trần tổng từ kỹ năng này ở +60% RES, +60% PER; vượt trần thì bỏ.
-
-Kỹ năng 3 — Long Huyết Sôi Trào (25 AE, CD 3)
-Tăng HP Regen +400% (tức gấp 5× tổng regen hiện tại sau khi đã cộng +35% từ nội tại) trong 2 lượt.
-
-Ult — Long Hống: gầm thét, gây sát thương AOE lên 3 kẻ địch ngẫu nhiên = 230% sát thương từ đòn đánh thường lên mỗi kẻ địch, áp dụng Tâm Ma.
-
-27) Tịch Diệt Long Hoàng, SSR
-Mô tả: một con rồng được tạo ra và cuồng tín tín ngưỡng Tịch Diệt Chi Chủ, cho rằng Tịch Diệt là vĩ đại, hắn muốn Tịch Diệt mọi thứ.
-Nội tại
-Sát Lệnh Tịch Diệt: khi ra sân nhận tàn sát (execute). Khi kết liễu thành công, buff bị tiêu hao và hoàn +20 Aether (thưởng kích hoạt, 1 lần/trận). Buff có thể bị thanh tẩy để tạo đối trọng.
-Tịch Diệt Ban Ân: +10% ATK/WIL; tất cả đòn đánh/kỹ năng/ult xuyên 10% RES & ARM. Nếu đồng minh là Tịch Diệt Chi Chủ hiện diện: thêm +10% ATK/WIL (tổng +20%). Hiệu lực bền vững.
-
-Đánh thường: gây sát thương = 100% wil và atk lên 1 mục tiêu
-
-Kỹ năng
-1. Long Hộ Diệt Trì (25 AE, CD 3): tăng +180% hiệu ứng hồi phục nhận vào trong 3 lượt. (Có CD để tránh vòng lặp hồi–trụ quá lì.)
-2. Diệt Linh Khải Thể (25 AE, 1 lần/trận): +25% Max HP vĩnh viễn trong trận; giữ nguyên sau khi hồi sinh.
-3. Diệt Vũ Long Nộ (25 AE): đánh 3 mục tiêu ngẫu nhiên, mỗi mục tiêu 130% đòn đánh thường.
-
-Ult — Tịch Diệt Thiên Trảm
-Gây AOE lên 3 kẻ địch ngẫu nhiên, mỗi kẻ 230% đòn đánh thường (được hưởng xuyên 10% từ nội tại).
-Ghi chú cho coder
-execute từ Sát Lệnh Tịch Diệt: buff tiêu hao khi target ≤10% MaxHP sau khi nhận sát thương; onConsume => owner.aether += 20.
-
-pierce10 (Tịch Diệt Ban Ân): áp dụng như modifier multiplicative lên tính toán kháng (RES/ARM).
-K1: status healTakenMult = +1.8 trong 3T, cooldown=3.
-K2: maxHp += 0.25 * baseMaxHp, persistOnRevive=true, uses<=1.
-K3/Ult: chọn ngẫu nhiên 3 mục tiêu còn sống; mỗi hit dùng công thức basicDamage × 1.3 / × 2.3 tương ứng.
-
-28) Hư Vô Ma Chủ, UR
-Nội tại — Hư Ảnh Luật
-Hư Hóa: khi bị tấn công, có 20% tỉ lệ trở thành hư vô trong đòn đó (né hoàn toàn).
-Tăng trưởng Hư Hóa: cứ 5 lần Hư Hóa thành công ⇒ +10% tỉ lệ (không cộng dồn theo lượt trượt). Tối đa 100%.
-Khi đạt 100%, đếm ngược 3 lượt rồi vào trạng thái Hư Vô Đồng Hóa.
-Hư Vô Đồng Hóa: vẫn có thể tấn công nhưng không gây sát thương (hoặc 1 sát thương chuẩn), không thể bị chỉ định, không nhận buff/debuff.
-
-Đánh thường: gây sát thương = 100% wil và atk lên 1 mục tiêu.
-
-Kỹ năng
-1. Vô Tướng Dẫn Chiến (25 AE): –10% tỉ lệ Hư Hóa hiện tại; tự khiêu khích 3 lượt. (Vừa “gọi đòn” lấy nộ, vừa hãm tốc tăng trưởng Hư Hóa để khỏi sớm vào Đồng Hóa.)
-2. Trật Không Lưỡng Trảm (15 AE): –10% tỉ lệ Hư Hóa hiện tại; gây 230% đòn đánh thường random theo cột dọc 2 ô (1–4, 2–5, 3–6, 4–7, 5–8, 6–9).
-3. Hoàn Trần Tái Ảnh (20 AE, chỉ dùng khi đang Hư Vô Đồng Hóa, CD 2): biến mất, trở về deck. Khi được triệu hồi lại: reset bộ đếm Hư Hóa và tỉ lệ về 20%.
-
-Ult — Vô Diệt Nhất Kích
-Gây 300% đòn đánh thường lên 1 mục tiêu.
-
-ghi chú cho coder:
-Trạng thái phase (Hư Hóa) là proc theo hit trước khi tính sát thương.
-Bộ đếm phaseSuccess: mỗi 5 → phaseRate += 0.10 (clamp 1.00).
-Khi phaseRate==1.00 → đặt assimCountdown=3. Khi đếm về 0 → áp assimilation:
-
-canBeTargeted=false, damageOut=0, immuneBuffDebuff=true.
-
-K1/K2: phaseRate = max(0, phaseRate - 0.10).
-K3: removeFromField(); toDeck=true; phaseRate=0.20; phaseSuccess=0.
-Ult/skill dmg dùng công thức chuẩn; K2 chọn “cột dọc 2 ô” theo vị trí người dùng.
-
-29) Hỗn Độn Ma Long, UR
-Mô tả: sinh vật cao quý sinh ra từ hỗn độn.
-Nội tại – Hỗn Mang Tuyệt Cách
-Mọi sát thương do chính Hỗn Độn Ma Long gây ra (đánh thường/kỹ năng/ult/follow-up của nó) bỏ qua 50% RES & ARM của mục tiêu.
-• Không thể sao chép, lãng quên, cướp đoạt hay xóa bỏ.
-• Không áp cho sát thương phản đòn/reflect/DoT.
-• Tổng ignore kháng (nội tại + hiệu ứng khác) không vượt 90%.
-
-Kĩ năng 1, Loạn Vũ Long Tức (30 AE, không tính đòn thường): Gây sát thương lên 3 kẻ địch ngẫu nhiên, mỗi kẻ = 95% sát thương đòn đánh thường (hưởng nội tại 50% ignore).
-Kĩ năng 2, Hỗn Mang Ấn (30 AE, Aura 2 lượt): Trong thời gian aura hoạt động, mỗi lượt đánh dấu tối đa 3 kẻ địch đầu tiên đã gây sát thương lên Hỗn Độn Ma Long. Kẻ bị đánh dấu nhận debuff Phá Giáp trong 1 lượt:
-→ Mọi sát thương chúng nhận trong lượt đó bỏ qua 40% RES & ARM (cộng với nội tại của Long nhưng cap 90%).
-• Thứ tự xử lý: Địch gây sát thương → bị đánh dấu ngay → phần sát thương phản đòn/reflect (nếu có) vào địch được tính với debuff này.
-Kỹ năng 3 – Trấn Kiếp Khiêu Dẫn (20 AE)
-–20% sát thương gây ra của bản thân trong 3 lượt, đồng thời Khiêu khích trong 3 lượt.
-
-Tối thượng – Hạo Kiếp Hỗn Không (auto-cast khi đầy nộ)
-Tấn công 4 kẻ địch ngẫu nhiên; mỗi mục tiêu nhận = 130% sát thương đòn đánh thường (hưởng nội tại 50% ignore).
-• Ưu tiên chọn 4 mục tiêu khác nhau; nếu còn <4 mục tiêu sống → có thể trúng lặp.
-
-Đánh thường: gây sát thương = 100% wil và atk lên 1 mục tiêu.
-
-ghi chú cho coder:
-Quy tắc nguồn sát thương (để coder implement)
-1. Nội tại “bỏ qua 50% RES/ARM” của Hỗn Độn Ma Long chỉ áp dụng cho sát thương do chính nó gây: đánh thường, kỹ năng, ult, follow-up của nó (và chỉ của nó).
-KHÔNG áp dụng cho sát thương phản xạ/phản sát thương (reflect/thorns), DoT/tick từ hiệu ứng độc/chảy máu, hay các hiệu ứng phản kích của người khác.
-2. Phản sát thương được quy về loại sát thương phản hồi, nguồn gây sát thương là buff reflect, không phải “Hỗn Độn Ma Long”. → Vì vậy phản sát thương không hưởng nội tại 50% ignore.
-3. Kỹ năng 2 (debuff bỏ qua 40% RES/ARM khi bị đánh) là hiệu ứng lên kẻ tấn công, tức mọi sát thương nó nhận trong thời gian debuff (kể cả từ phản sát thương) đều bỏ qua 50% RES/ARM theo debuff.
-Thứ tự sự kiện:
-a) Kẻ địch gây sát thương lên Long →
-b) Áp debuff K2 lên kẻ đó (1 lượt) →
-c) Tính sát thương phản xạ vào kẻ đó (lúc này đã bị debuff).
-Như vậy combo K2 + khiêu khích + reflect đúng là mạnh, nhưng vẫn không dùng “nội tại 50%” cho phần reflect (chỉ dùng debuff K2).
-Nội tại 50% ignore chỉ áp cho damage do Hỗn Độn Ma Long gây. Reflect/Thorns/DoT: không áp nội tại.
-K2 – Phá Giáp Hỗn Mang là debuff trên kẻ tấn công → mọi sát thương chúng nhận (kể cả reflect) trong 1 lượt bỏ qua 40% kháng.
-Tổng ignore kháng = min(0.5 (nội tại) + 0.4 (K2 nếu có) + các nguồn khác, 0.9).
-Chỉ mang tính tham khảo: Gợi ý triển khai ngắn gọn
-
-passive.IgnoreOwnDamage = 0.50
-capTotalIgnore = 0.90
-
-onCalculateDamage(source, target, ctx):
-  ignore = 0
-  if source == ChaosDragon: ignore += 0.50
-  if target.hasDebuff(PháGiápHỗnMang): ignore += 0.50
-  ignore = min(ignore + otherIgnores(ctx), 0.90)
-  applyArmorResWithIgnore(ignore)
-
-Skill1:
-  hitRandomEnemies(3, dmg = 0.95 * basic, tag=not_basic)
-
-Skill2 (once per battle):
-  aura.active = 2 turns
-  perTurnMarked = 0
-  onEnemyDealsDamageToSelf(enemy):
-    if aura.active && perTurnMarked < 3:
-      enemy.applyDebuff(PháGiápHỗnMang, 1 turn)
-      perTurnMarked += 1
-
-Skill3:
-  self.damageOutMult -= 0.20 for 3 turns
-  self.applyTaunt(3)
-
-Ult:
-  hitUpToUnique(4, dmg = 1.30 * basic, tag=not_basic)
-
-30) Hoá thân của Hư Chủ, Prime
-Mô tả: Hư Vô Đồng Hoá không làm khó được hắn. Sinh ra từ Hư Vô, ý thức của Hư Vô.
-Luật Chu Kỳ Hư Vô
-Khi vào sân, nhận Giảm sát thương 70% trong 1 lượt, sau đó hồi 1 lượt rồi tự kích lại, lặp vô hạn. (Giảm sau ARM/RES; là trạng thái nội bộ, không phải buff, không thể bị xóa/ăn cắp.)
-Bất tương hợp
-Không thể hồi sinh; không nhận buff/debuff; bộ chiêu không thể bị cướp, xoá, lãng quên hay sao chép.
-Từ khóa trạng thái — Hư Vô Chúc Phúc (HVCP)
-Tác dụng: không thể bị chỉ định; không nhận bất kỳ sát thương nào trong thời gian hiệu lực; khi tấn công, mọi đòn (basic/skill/ult) chỉ gây 1 sát thương chuẩn (không tạo nộ từ gây sát thương).
-Mục tiêu là địch: coi là debuff; không thể refresh khi đang hiệu lực; chỉ có thể gỡ bằng tự-thanh tẩy hoặc thanh tẩy toàn sân (do không thể target).
-Mục tiêu là đồng minh: coi là buff; hết hạn tự xóa. Không chặn hành động (vẫn đi lượt, vẫn cast, nhưng sát thương nổ ra = 1).
-
-Kỹ năng 1 — Phúc Ấn Hư Vô (0 AE)
-Ban HVCP 1 lượt cho Leader đồng minh, rồi Hư Chủ rời sân về deck (reset trạng thái như mới khi được triệu hồi lại).
-Reset tăng trưởng từ Ult (xem dưới).
-
-Kỹ năng 2 — Hư Tịch Phong Ấn (20 AE, CD 2 — khuyến nghị cân bằng)
-Gắn HVCP 2 lượt cho 2 kẻ địch (ưu tiên HP cao nhất và ATK/WIL cao nhất); nếu mục tiêu đang có khiêu khích → xóa khiêu khích trước khi áp HVCP.
-Không làm mới HVCP trên mục tiêu đang dính; nếu thiếu mục tiêu hợp lệ thì áp ít hơn.
-
-Kỹ năng 3 — Vô Hình Tam Phạt (25 AE)
-Gây 200% đòn đánh thường lên tối đa 3 kẻ địch ngẫu nhiên không có HVCP.
-Nếu số mục tiêu hợp lệ < số hit còn lại → bỏ phần dư (không chuyển hit sang mục tiêu có HVCP).
-
-Ult, Hư Vực Phủ Ấn
-Khi auto-cast thành công: +5% ATK và +5% WIL (stack).
-PvE: stack không giới hạn.
-PvP: trần +100% Atk/wil = Ult tổng cộng để tránh vỡ meta.
-Áp HVCP 1 lượt lên toàn bộ kẻ địch trên sân ( Không bao gồm leader kẻ thù). Đây không phải ult gây sát thương nên sẽ không thể né, chặn, phản đòn, miễn dịch, đây không tính là kỹ năng aoe ngẫu nhiên mà là kỹ năng aoe cố định từ ô 1 đến ô 9 trừ ô 8.
-Dùng Kỹ năng 1 sẽ reset toàn bộ stack này về 0.
-
-Đánh thường: gây sát thương = 100% wil và atk lên 1 mục tiêu
-
-HVCP là miễn sát thương + không thể target nhưng không khóa lượt → kẻ địch vẫn có thể “đi nhưng vô hại”.
-K2: không refresh mục tiêu.
-Ult mass-HVCP 1T là “khóa mềm” toàn sân trong 1 nhịp — ok với Prime vì auto-nộ vẫn cần thời gian và Hư Chủ không nhận buff.
-K3 chỉ đánh vào mục tiêu “có thể bị tổn thương” → tránh lãng phí đòn khi sân bị trải HVCP.
-K1 zero-cost rất mạnh: để đối trọng, reset stack từ Ult là bắt buộc (đã chốt).
-
-31) Số 7
-Nội tại
-Tái Tạo
-Khi vào trận: +50% HP Regen.
-Chu Trình Tiến Hoá:
-Bật/tắt bằng Kỹ năng 2 (mặc định TẮT). Khi đang bật, Số 7 có thể “tiến hoá miễn nhiễm” với một trong 9 debuff cố định: stun, sleep, bleed, fatigue, silence, daze, weaken, fear, venom.
-Cách kích hoạt: nếu Số 7 bị dính một debuff trong danh sách, rồi trong 2 lượt kế lại nhận đúng debuff đó lần nữa, lần thứ hai không áp dụng và Số 7 tiến hoá miễn nhiễm vĩnh viễn với debuff đó (hiệu lực tới hết trận, kể cả chết–hồi sinh).
-Không kích hoạt từ các “dấu/ấn” hay cơ chế đánh dấu đặc thù (ví dụ: Phệ Ấn, Sa Ấn, HVCP…).
-Tối đa 10 lần tiến hoá (đếm theo số loại đã miễn nhiễm).
-Ký Sinh & Đoạt Xá
-Không thể ký sinh vào Leader hoặc đơn vị Prime.
-Ký Sinh: Số 7 nhảy vào đồng minh hợp lệ gần nhất, bản thân tạm biến mất; vật chủ nhận +70% tất cả 10 chỉ số hiện có của Số 7 trong thời gian ký sinh.
-Đoạt Xá: Khi kích hoạt, Số 7 “giết” vật chủ về mặt logic (không thể hồi sinh), thừa hưởng 50% mọi chỉ số gốc của vật chủ tại thời điểm trước khi bị ký sinh, và thay thế bộ đánh thường/kỹ năng/ult của vật chủ bằng bộ của Số 7.
-Giữ tối đa 3 nội tại cùng lúc (tính cả nội tại của Số 7). Nếu vật chủ không phải Prime, Số 7 giữ lại nội tại của vật chủ.
-Nội tại/skill/ult của Số 7 không thể bị cướp, sao chép, lãng quên.
-
-Đánh thường: gây sát thương = 100% wil và atk lên 1 mục tiêu.
-
-Kỹ năng 1 — Dẫn Chủ Ký Ấn (25 Aether)
-Nếu Số 7 chưa đạt 9 tiến hoá: Ký Sinh 2 lượt vào đồng minh hợp lệ gần nhất (không phải Leader/Prime). Hết 2 lượt:
-Nếu phe mình còn ô trống → Số 7 thoát ra, xuất hiện ngẫu nhiên ở ô trống phe mình.
-Nếu đầy sân → Đoạt Xá vật chủ ngay.
-Nếu Số 7 đã đạt ≥9 tiến hoá: Không ký sinh; thay vào đó tự nhận +30% tất cả 10 chỉ số trong 2 lượt.
-
-Kỹ năng 2 — Kích Hoạt Tiến Hoá (0 Aether)
-Bật cơ chế Chu Trình Tiến Hoá (không tự gán debuff). Nếu Số 7 chết rồi hồi sinh, cần cast lại để bật.
-
-Kỹ năng 3 — Đoạt Thai Quy Hồn
-Khi đang ký sinh: (35 Aether) Cưỡng chế Đoạt Xá ngay lập tức.
-Khi không ký sinh: (25 Aether) gây 180% đòn đánh thường lên 1 mục tiêu; nếu kết liễu mục tiêu, hoàn 20 Aether.
-
-Ultimate — Ký Chủ Tối Hậu (tự kích hoạt khi đầy Nộ)
-Nếu số tiến hoá < 9:
-Ký Sinh 3 lượt vào đồng minh hợp lệ gần nhất (không phải Leader/Prime).
-Thời gian 3 lượt bắt đầu tính khi vật chủ thực thi lượt đầu tiên sau khi bị ký sinh.
-Trong thời gian ký sinh: Số 7 không thể tấn công/dùng kỹ năng/ult; chỉ Nội tại Chu Trình Tiến Hoá còn hoạt động (nếu đã bật Kỹ năng 2).
-Kết thúc 3 lượt: nếu có ô trống → thoát ra; nếu đầy sân → Đoạt Xá vật chủ.
-Nếu số tiến hoá ≥ 9:
-Không ký sinh; Số 7 +100% tất cả 10 chỉ số hiện có trong 2 lượt.
-Xử lý mục tiêu hợp lệ của Ult/Ký Sinh
-“Đồng minh hợp lệ gần nhất” xét theo khoảng cách lưới (Manhattan); nếu hoà, ưu tiên theo thứ tự đọc (trên→dưới, trái→phải).
-Nếu không có mục tiêu hợp lệ tại thời điểm auto-cast: Ult không kích hoạt, không tiêu Nộ, và sẽ tự thử lại ở lượt kế tiếp.
-
-Gợi ý hiển thị: gắn icon “Ký Sinh/Đoạt Xá” lên khung chân dung vật chủ; đếm lượt ký sinh theo hostTurnCounter (0→3) để người chơi dễ theo dõi.
+22) [PRIME] HÓA THÂN: KÝ ỨC CHI CHỦ
+ * Class: 
+ * Role: Ruleset Manipulator (Thao túng quy tắc), Skill Denier (Cấm chiêu), Self-Sustain (Tự duy trì qua Time-loop).
+ * Cost: 22 (1 lần duy nhất). Flag: UNREVIVABLE.
+1. NỘI TẠI: Quy Tắc – Quên Lãng Vô Hình
+ * Tags: [Nội Tại], [Quy Tắc: Quên Lãng], [Quy Tắc: Chân Ngã], [Miễn Nhiễm Tuyệt Đối].
+ * Logic:
+   * Quên Lãng (Forget): Khi gây sát thương, có 75% tỷ lệ áp dụng:
+     * 15%: [Quên Ultimate] (Khóa Auto-cast Nộ lượt sau).
+     * 60%: [Quên Kỹ Năng] (Khóa 1 Slot kỹ năng ngẫu nhiên lượt sau).
+   * Chân Ngã (True Self):
+     * Không thể bị hồi sinh, không nhận Buff/Debuff/Heal từ nguồn ngoài.
+     * Không thể bị Cướp/Xóa/Sao chép.
+   * Ký Ức Vĩnh Cửu: Mỗi khi kết thúc lượt hành động của bản thân, tự động Truy Hồi (Hồi phục) 5% Max HP. (Thay thế cho regen từ đồng đội).
+2. ĐÁNH THƯỜNG: Trích Ảnh Trảm
+ * Tags: [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp], [Tầm Xa].
+ * Logic: Gây sát thương 100% (WIL + ATK) lên 1 kẻ địch ngẫu nhiên. Kích hoạt Nội tại Quên Lãng.
+3. KỸ NĂNG 1: Pháp Tắc – Bản Tôn Giáng Ảnh
+ * Tags: [Chủ Động], [Cường Hóa Ult], [Phạt: Max Aether].
+ * Logic:
+   * Cost: 0 Aether.
+   * Hiệu ứng: Ult tiếp theo tăng sát thương lên 150% – 270%.
+   * Cái giá: Giảm vĩnh viễn 20% Max Aether (Không hoàn lại).
+   * Cơ chế: Hiệu ứng cường hóa mất sau khi tung Ult thành công.
+4. KỸ NĂNG 2: Vô Danh Chi Thân
+ * Tags: [Chủ Động], [Trạng Thái: Ẩn Ảnh], [RNG], [Kích Hoạt Đánh Thường].
+ * Logic:
+   * Cost: 30 Aether. Cooldown: 3 Lượt.
+   * Roll 50/50:
+     * Ẩn Ảnh Đơn: Miễn nhiễm đòn đơn mục tiêu (2 Lượt).
+     * Ẩn Ảnh Quần: Miễn nhiễm đòn AOE (2 Lượt).
+   * Hành động: Đánh thường 1 cái ngay lập tức.
+5. KỸ NĂNG 3: Quy Tắc – Phủ Nhận Thương Tổn (Thay cho Ô Nhiễm Ký Ức)
+ * Tags: [Chủ Động], [Khiêu Khích], [Quy Tắc: Truy Hồi Ký Ức], [Hồi Phục].
+ * Mô tả Lore: Hắn xóa bỏ ký ức về việc mình bị thương khỏi tâm trí của thực tại. Nếu không ai nhớ hắn bị thương, nghĩa là hắn chưa từng bị thương.
+ * Logic:
+   * Cost: 25 Aether. Cooldown: 4 Lượt.
+   * Hiệu ứng 1 (Khiêu Khích): Áp dụng [Khiêu Khích] lên bản thân trong 2 Lượt.
+   * Hiệu ứng 2 (Truy Hồi Ký Ức - Heal):
+     * Ghi đè HP hiện tại bằng ký ức cũ.
+     * Hồi phục ngay lập tức 30% Max HP. (Không cần điều kiện máu thấp, vì Prime cần chủ động).
+     * Nếu đang có [Bản Tôn Giáng Ảnh] (Skill 1 active), lượng hồi phục tăng lên 50% Max HP.
+6. ULTIMATE: Vô Tự Minh Quyển
+ * Tags: [Tự Động], [AOE], [Sát Thương Biến Thiên], [Trigger Passive].
+ * Logic:
+   * Tự động cast khi đầy Nộ.
+   * Sát thương ngẫu nhiên 100% – 180% (WIL + ATK) lên mỗi kẻ địch.
+   * Kích hoạt Nội tại Quên Lãng (75%) trên từng kẻ địch.
+GIẢI THÍCH SỰ THAY ĐỔI & CÂN BẰNG
+ * Skill 3 (Phủ Nhận Thương Tổn):
+   * Tại sao đổi? Skill cũ (Khiêu khích + Heal khi máu \le 40%) quá bị động và rủi ro cho một unit không được đồng đội buff.
+   * Cơ chế mới: Luôn hồi 30% HP khi bấm. Tăng lên 50% nếu đã hy sinh Max Aether (Skill 1). Điều này tạo ra combo chiến thuật: Bật Skill 1 (Chấp nhận mất Aether) \rightarrow Bật Skill 3 (Hồi máu cực mạnh để tank) \rightarrow Đợi Nộ để Ult.
+   * Lore: Hợp lý hóa việc "Hồi máu" bằng khái niệm "Ghi đè ký ức".
+ * Nội tại (Ký Ức Vĩnh Cửu):
+   * Thêm dòng hồi 5% HP mỗi lượt. Đây là tiêu chuẩn cho các unit "Solo" (như Prime/Boss) để chúng không bị cấu rỉa chết dần mòn bởi lính lác.
+ * Loại bỏ Skill 4:
+   * Giữ bộ kit ở mức 3 Skill + 1 Ult giúp nhân vật dễ làm quen, dễ code và đồng bộ với hệ thống chung của game hơn.
+ * Cân bằng Combo K2 + K3:
+   * K2 (Ẩn mình) chỉ kéo dài 2 lượt.
+   * K3 (Khiêu khích) cooldown 4 lượt.
+   * \rightarrow Sẽ có khoảng hở 2 lượt mà Hóa Thân không có bảo vệ. Đây là lúc đối thủ có thể dồn sát thương giết hắn. Rất công bằng.
+
+
+23) [PRIME] Hoá Thân của SINH MỆNH CHI MẪU (Avatar of Life), Class: Support.
+ * Role: Max HP Manipulator (Thao túng giới hạn máu), Leader Buffer, Field Enchanter.
+ * Cost: 22 (1 lần duy nhất). Flag: UNREVIVABLE (Không thể hồi sinh).
+1. NỘI TẠI: Quy Tắc – Mẫu Thần Bất Diệt
+ * Tags: [Nội Tại], [Buff: Bất Khuất], [Quy Tắc: Chân Ngã], [Quy Tắc: Trao Hoán].
+ * Logic:
+   * Hộ Ấn Bất Khuất:
+     * Trigger: Ngay khi vào sân.
+     * Effect: Ban hiệu ứng [Bất Khuất] (Indomitable) cho Bản thân và Leader.
+     * Cơ chế: HP không thể về dưới 1. Tồn tại vô hạn đến khi bị kỹ năng xóa buff (Dispel) loại bỏ.
+   * Sinh Quyển Trao Hoán (Life Exchange Rule):
+     * Trigger: Khi Hóa Thân gây sát thương (Đánh thường/Skill/Ult).
+     * Effect (Kẻ địch): Mất vĩnh viễn 1% Max HP (Trừ thẳng vào giới hạn máu). Tối đa -12% Max HP mỗi kẻ địch.
+     * Effect (Hóa Thân): Nhận vĩnh viễn +1% Max HP tương ứng. Tối đa +100% Max HP (Gấp đôi lượng máu gốc).
+   * Chân Ngã (True Self):
+     * Không nhận Buff/Debuff từ nguồn ngoài. Không thể bị Hồi sinh/Sao chép.
+2. ĐÁNH THƯỜNG: Sinh Tức
+ * Tags: [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp], [Kích Hoạt: Trao Hoán].
+ * Logic:
+   * Gây sát thương 100% (WIL + ATK) lên 1 mục tiêu.
+   * Kích hoạt Nội tại: Hút 1% Max HP của mục tiêu.
+3. KỸ NĂNG 1: Hiến Tế – Vạn Vật Sinh Sôi
+ * Tags: [Chủ Động], [AOE: Toàn Sân], [Hy Sinh: Max HP], [Kích Hoạt: Trao Hoán].
+ * Logic:
+   * Cost: 30 Aether. Cooldown: 2 Lượt.
+   * Hy Sinh: Giảm vĩnh viễn 7% Max HP Hiện Tại của bản thân.
+   * Hành động: Gây sát thương 100% (WIL + ATK) lên Toàn Bộ Kẻ Địch.
+   * Lợi tức: Kích hoạt Nội tại Trao Hoán lên tất cả kẻ trúng đòn.
+     * Ví dụ: Trúng 5 địch \rightarrow Mất 7% Max HP nhưng Hút lại 5% Max HP (Lỗ thực tế 2%, nhưng địch bị yếu đi vĩnh viễn).
+4. KỸ NĂNG 2: Lĩnh Vực – Quang Ấn Dưỡng Sinh
+ * Tags: [Chủ Động], [Trường Ảnh Hưởng], [Hy Sinh: Max HP], [Cường Hóa Hồi Máu], [Tạo Khiên: Overheal].
+ * Logic:
+   * Cost: 25 Aether. Cooldown: 4 Lượt.
+   * Hy Sinh: Giảm vĩnh viễn 10% Max HP Hiện Tại của bản thân.
+   * Hiệu ứng Trường (Field Effect - 3 Lượt):
+     * Tạo ra một hào quang (không phải buff lên từng người nên không bị chặn).
+     * Tất cả hiệu quả hồi máu của đồng minh được nhân x3 (300%).
+     * Cơ chế Overheal: Nếu lượng máu hồi vượt quá Max HP \rightarrow Chuyển phần dư thành Khiên.
+     * Giới hạn Khiên: Tối đa 100% Max HP của người được hồi.
+   * Lưu ý: Hiệu ứng này không tác dụng lên Hóa Thân (do Chân Ngã), nhưng giúp team trở nên bất tử.
+5. KỸ NĂNG 3: Quy Tắc – Kết Mệnh Chuyển Dung
+ * Tags: [Chủ Động], [Leader Chỉ Định], [Chuyển Giao Chỉ Số], [Hy Sinh Cực Đại], [Một Lần Duy Nhất].
+ * Logic:
+   * Cost: 30 Aether. Cooldown: N/A (1 Lần/Trận).
+   * Hy Sinh: Giảm ngay lập tức 50% Max HP Hiện Tại của Hóa Thân.
+   * Hiệu ứng (Leader):
+     * Leader nhận thêm lượng Max HP = Giá trị vừa mất của Hóa Thân (tức là 50% Max HP của bà ta).
+     * Snapshot: Tính theo chỉ số tại thời điểm bấm skill.
+     * Đặc tính: Đây là cộng chỉ số vĩnh viễn, không phải Buff, không thể xóa.
+   * Hạn chế: Chỉ dùng được 1 lần duy nhất trong cả trận đấu. Dùng xong skill bị vô hiệu hóa (Greyed out).
+6. ULTIMATE: Sinh Luân Phán Quyết
+ * Tags: [Tự Động], [AOE: Toàn Sân], [Hy Sinh: Max HP], [Sát Thương Lớn], [Kích Hoạt: Trao Hoán].
+ * Logic:
+   * Trigger: Đầy Nộ (Auto-cast).
+   * Hy Sinh: Giảm vĩnh viễn 5% Max HP Hiện Tại.
+   * Hành động: Gây sát thương 200% (WIL + ATK) lên Toàn Bộ Kẻ Địch.
+   * Lợi tức: Kích hoạt Nội tại Trao Hoán (Hút 1% Max HP mỗi địch).
+     * Chiến thuật: Nếu địch đông (5 người), dùng Ult là "hòa vốn" hoặc "lãi" về Max HP (Mất 5%, Hút 5%).
+CÂN BẰNG & GHI CHÚ KỸ THUẬT:
+ * Toán Học Của Sự Hy Sinh (Sacrifice Math):
+   * Các kỹ năng K1, K2, Ult, K3 đều trừ vào Max HP Hiện Tại.
+   * Công thức: Current_Max_HP = Current_Max_HP * (1 - Sacrifice_Percent).
+   * Điều này có nghĩa là càng về sau, lượng máu mất đi (giá trị tuyệt đối) càng ít, nhưng tổng lượng máu tối đa của bà ta sẽ giảm dần nếu không Hút lại kịp từ kẻ địch.
+   * Ví dụ: Max HP 10,000. Dùng K1 (-7%) \rightarrow Còn 9,300. Hút được 500 từ 5 địch \rightarrow Lên 9,800.
+ * Cơ Chế Trao Hoán (Exchange Cap):
+   * Cần 2 biến đếm riêng biệt:
+     * Enemy.LostHP_Counter: Giới hạn 12% Base Max HP.
+     * Avatar.GainedHP_Counter: Giới hạn 100% Base Max HP của Avatar.
+   * Code Logic:
+     def applyExchange(avatar, target):
+    max_steal = target.baseMaxHp * 0.12
+    current_stolen = target.exchangeLost
+
+    if current_stolen < max_steal:
+        steal_amount = target.baseMaxHp * 0.01
+        # Clamp steal amount
+        steal_amount = min(steal_amount, max_steal - current_stolen)
+
+        # Apply damage to target MaxHP
+        target.maxHp -= steal_amount
+        target.exchangeLost += steal_amount
+
+        # Apply gain to Avatar (Check own cap)
+        max_gain = avatar.baseMaxHp * 1.0
+        if avatar.exchangeGained < max_gain:
+            gain_amount = min(steal_amount, max_gain - avatar.exchangeGained)
+            avatar.maxHp += gain_amount
+            avatar.exchangeGained += gain_amount
+
+ * Skill 3 (Thời Điểm Vàng):
+   * Người chơi phải chọn thời điểm dùng K3.
+   * Nếu dùng sớm (khi chưa hút được nhiều máu): Leader nhận ít máu.
+   * Nếu dùng muộn (khi đã +100% Max HP): Leader nhận lượng máu khổng lồ (thậm chí gấp đôi máu gốc của Leader), biến Leader thành Boss Raid thực thụ. Nhưng rủi ro là Hóa Thân có thể chết trước khi kịp dùng.
+
+
+24) 
+* GIẢI ĐÁP: CƠ CHẾ MAX HP & THẦN TÍNH
+ * Tăng Max HP có hồi HP không?
+   * CÓ, khi MaxHP tăng, CurrentHP (Máu hiện tại) cũng sẽ tăng tương ứng để giữ nguyên tỷ lệ % hoặc cộng thêm giá trị tuyệt đối.
+   * Ví dụ: Đang 50/100 máu. Tăng 100 Max HP \rightarrow Máu mới là 150/200. (Cộng thẳng). 
+[PRIME] HÓA THÂN của THẦN CHẾT – TỬ (Death)
+ * Class: Specialist / Executioner.
+ * Role: Finisher (Kết liễu), Summoner (Triệu hồi làm nguyên liệu), Disabler (Khống chế).
+ * Cost: 22 (1 lần duy nhất). Flag: UNREVIVABLE (Không thể hồi sinh).
+ * Hình thái: Một khối sương mù đen đặc, không có hình thù cố định, chỉ có đôi mắt rực đỏ và lưỡi hái ẩn hiện.
+1. NỘI TẠI 1: Vô Thể U Minh
+ * Tags: [Nội Tại], [Giảm Sát Thương: Cơ Chế], [Quy Tắc: Chân Ngã].
+ * Logic:
+   * Kháng Vật Lý (Physical Mitigation): Giảm 80% lượng sát thương có nguồn gốc từ ATK. (Tính toán: Damage = Raw_Dmg * (1 - ARM_Mitigation) * 0.2).
+   * Yếu điểm: Sát thương từ WIL (Phép thuật) hoặc Sát thương Chuẩn (True Dmg) vẫn nhận 100%.
+   * Chân Ngã: Không nhận Buff/Debuff/Heal ngoại giới. Không thể hồi sinh.
+2. NỘI TẠI 2: Quy Tắc – Thẩm Quyết Tàn Sát
+ * Tags: [Nội Tại], [Tàn Sát: Bản Thân], [Ngưỡng: 10%].
+ * Logic:
+   * Trigger: Khi chính Thần Chết gây sát thương (Đánh thường/Skill/Ult).
+   * Effect: Nếu sau đòn đánh, HP mục tiêu \le 10% Max HP \rightarrow Xử Tử (Giết ngay lập tức, bỏ qua mọi khiên/giảm thương/bất khuất cấp thấp).
+3. ĐÁNH THƯỜNG: Lưỡi Hái Vô Hình
+ * Tags: [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp], [Kích Hoạt: Tàn Sát].
+ * Logic:
+   * Gây sát thương 100% (WIL + ATK) lên 1 mục tiêu.
+4. KỸ NĂNG 1: U Khiếu Tuyệt Vọng
+ * Tags: [Chủ Động], [AOE: Toàn Sân], [Khống Chế: Sợ Hãi], [Tiêu Hao: Aether].
+ * Logic:
+   * Cost: 25 Aether. Cooldown: 4 Lượt.
+   * Hành động: Gầm thét toàn sân.
+   * Hiệu ứng: Áp dụng [Sợ Hãi] (Fear) lên 3 Kẻ Địch Ngẫu Nhiên trong 1 Lượt.
+     * Tại sao Nerf từ "Toàn bộ" xuống "3 kẻ"?: Vì "Sợ Hãi" (Bỏ lượt) lên toàn team địch với cost 25 là quá lỗi game (Permastun). 3 kẻ là con số cân bằng cho Prime.
+     * Hiệu ứng Sợ Hãi: Không thể hành động, không thể Né/Đỡ.
+5. KỸ NĂNG 2: Hiến Tế Mệnh Số
+ * Tags: [Chủ Động], [Hy Sinh: Linh Hồn], [Aura: Tàn Sát Toàn Cục], [Charge System].
+ * Logic:
+   * Điều kiện: Phải có ít nhất 1 [Linh Hồn Âm Giới] (từ Skill 3) trên sân.
+   * Cost: 30 Aether. Cooldown: 3 Lượt.
+   * Hành động:
+     * Tiêu diệt 1 Linh Hồn (Hy sinh).
+     * Thần Chết nhận 2 [Lưỡi Hái Phán Quyết] (Charges). Tồn tại 3 lượt.
+   * Cơ chế Aura (Charge):
+     * Trigger: Bất kỳ kẻ địch nào trên sân (do ai đánh cũng được) có HP rớt xuống \le 10% Max HP.
+     * Action: Tiêu hao 1 Charge \rightarrow Xử Tử mục tiêu đó ngay lập tức.
+     * Giới hạn: Tối đa 2 lần xử tử/lần dùng chiêu.
+     * Ưu tiên: Nếu nhiều kẻ cùng thấp máu, chém kẻ có % HP thấp nhất trước.
+6. KỸ NĂNG 3: Triệu Hồn Từ Vực
+ * Tags: [Chủ Động], [Triệu Hồi: Linh Hồn], [Fodder].
+ * Logic:
+   * Cost: 20 Aether. Cooldown: 3 Lượt.
+   * Hành động: Triệu hồi 3 Linh Hồn Âm Giới vào các ô trống. (Nếu ít ô hơn thì gọi tối đa số ô).
+   * Thuộc tính Linh Hồn:
+     * Chỉ đánh thường.
+     * Sát thương: 50% (WIL + ATK) của Thần Chết.
+     * Tồn tại: 3 Lượt.
+     * Tác dụng: Chắn sát thương và làm nguyên liệu cho Skill 2.
+7. ULTIMATE: Phán Quyết Vô Thường
+ * Tags: [Tự Động], [Đa Mục Tiêu: Ngẫu Nhiên], [Sát Thương Lớn], [Kích Hoạt: Tàn Sát].
+ * Logic:
+   * Trigger: Đầy Nộ (Auto-cast).
+   * Hành động: Chém 3 nhát vào 3 kẻ địch ngẫu nhiên.
+   * Sát thương: Mỗi hit gây 200% Sát Thương Đánh Thường.
+   * Kích hoạt:
+     * Mỗi hit tính là đánh thường (isBasic = true).
+     * Kiểm tra ngưỡng máu \le 10% sau mỗi hit để kích hoạt Nội tại 2 (Tự xử tử).
+GHI CHÚ TRIỂN KHAI CHO CODER:
+ * Phân Biệt 2 Loại Execute:
+   * Passive_Execute: Gắn trên bản thân Thần Chết (Source == Self). Luôn bật. Chỉ kích hoạt khi Attacker == DeathGod.
+   * Aura_Execute (Skill 2): Gắn trên môi trường (Global Listener). Kích hoạt khi Target.HP <= 10% bất kể ai đánh. Check biến Charges > 0. Nếu kích hoạt \rightarrow Kill(Target), Charges--, PlayFX(ReaperScythe).
+ * Kháng Sát Thương (Passive 1):
+   * Công thức:
+     def calculateIncomingDamage(incomingDmg, type):
+    damage = incomingDmg.value
+    if type == "ATK" or type == "PHYSICAL":
+        damage = damage * 0.2  # Giảm 80%
+    # WIL damage giữ nguyên
+    return damage
+
+ * Linh Hồn (Summon):
+   * Cần gắn cờ IS_SACRIFICE_VALID = true để Skill 2 nhận diện đúng mục tiêu hiến tế.
+   * Nếu không có Linh Hồn trên sân, Skill 2 phải bị khóa (Disable/Greyed out).
+ * Cân Bằng Skill 1 (Fear):
+   * Tôi đã giới hạn xuống 3 Mục Tiêu. Nếu để "Toàn Bộ" với Cost 25, Thần Chết sẽ trở thành một con "Stun Bot" vô hạn (Cứ 4 turn thì team địch nghỉ chơi 1 turn), điều này quá mạnh kể cả với Prime. 3 mục tiêu vẫn đủ gây loạn đội hình nhưng cho phép 1-2 kẻ địch còn lại (thường là hàng sau) có cơ hội phản kháng.
+Tổng kết: Đây là một Prime thiên về Kiểm Soát Bàn Cờ và Kết Liễu. Hắn không sốc sát thương chết ngay (như Huyết Chủ), nhưng hắn đảm bảo kẻ nào yếu máu là "đi" luôn, không cho cơ hội hồi phục hay lật kèo.
+
+25) [SSR] THẦY BÓI MÙ – VŨ MẶC (Wu Mo)
+ * Class: Summoner
+ * Role: RNG Buffer, Off-Tank Summoner, Crowd Control (Sleep).
+ * Vũ khí: Xúc Xắc Khổng Lồ.
+1. NỘI TẠI: Vận Số Xoay Vần
+ * Tags: [Nội Tại], [RNG: Chu Kỳ], [Buff Tự Thân].
+ * Logic:
+   * Cơ chế Chu Kỳ (Cycle):
+     * Hoạt động theo nhịp: 1 Turn Buff \rightarrow 2 Turn Nghỉ \rightarrow Lặp lại.
+   * Hồ Buff (Pool): Khi kích hoạt, nhận ngẫu nhiên 1 trong các buff sau (Duy trì 1 lượt):
+     * [Exalt]: +10% Final Damage.
+     * [Pierce]: Xuyên 15% ARM/RES.
+     * [Frenzy]: +20% Sát thương đánh thường.
+     * [DmgCut]: Giảm 15% Sát thương nhận vào.
+     * [Reflect]: Phản 20% Sát thương nhận vào.
+     * [Haste]: +10% SPD.
+   * Loại trừ: Không bao gồm Allure (Mê hoặc), Undying (Bất tử), Execute (Xử tử), Stealth (Tàng hình).
+2. ĐÁNH THƯỜNG: Gieo Quẻ
+ * Tags: [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp], [Thường].
+ * Logic:
+   * Gây sát thương = 100% (WIL + ATK) lên 1 mục tiêu.
+3. KỸ NĂNG 1: Ngọc Toái Liên Hoàn
+ * Tags: [Chủ Động], [Đơn Mục Tiêu], [RNG: Nảy Bật], [Sát Thương Kỹ Năng], [Tiêu Hao: Aether].
+ * Logic:
+   * Cost: 25 Aether.
+   * Hit 1 (Gốc): Gây 130% Sát Thương Đánh Thường lên mục tiêu chỉ định.
+   * Hit 2 (RNG 30%): Nếu trúng Hit 1 \rightarrow Có 30% tỷ lệ nảy sang 1 kẻ địch khác. Gây 50% Sát Thương.
+   * Hit 3 (RNG 20%): Nếu trúng Hit 2 \rightarrow Có 20% tỷ lệ nảy sang 1 kẻ địch thứ 3. Gây 50% Sát Thương.
+   * Quy tắc: Không nảy lại mục tiêu vừa bị đánh.
+   * Đặc tính: isBasic = false (Không tính là đánh thường).
+4. KỸ NĂNG 2: Kỳ Môn Hộ Trận
+ * Tags: [Chủ Động], [Triệu Hồi: Xúc Xắc], [Khiêu Khích], [Tanker].
+ * Logic:
+   * Cost: 25 Aether. Cooldown: 3 Lượt.
+   * Hành động: Triệu hồi [Khối Xúc Xắc] vào ô trống phía trước mặt (Ưu tiên hàng đầu).
+   * Thuộc tính Xúc Xắc:
+     * HP: 80% Max HP của Vũ Mặc.
+     * ARM/RES: 40% Chỉ số của Vũ Mặc.
+     * ATK/WIL/SPD: 0 (Không tấn công).
+     * Kỹ năng: [Khiêu Khích] (Taunt) liên tục trong 3 lượt.
+     * Hạn chế: Không nhận Buff/Debuff. Không thể hồi sinh.
+   * Giới hạn: Tối đa 1 Khối trên sân. Dùng lại sẽ làm mới HP và thời gian tồn tại của khối cũ.
+5. KỸ NĂNG 3: Tam Tài Chiêm Bốc
+ * Tags: [Chủ Động], [Bản Thân], [RNG: Buff], [Hồi Phục/Phòng Thủ/Tấn Công].
+ * Logic:
+   * Cost: 25 Aether. Cooldown: 3 Lượt.
+   * Hành động: Nhận ngẫu nhiên 1 trong 3 hiệu ứng:
+     * [Nhân - Sinh Lực]: Tăng +200% Hiệu quả hồi phục nhận vào (3 Lượt).
+     * [Địa - Thép Vận]: Tăng +17% ARM và +17% RES (3 Lượt).
+     * [Thiên - Chiến Hỏa]: Tăng +20% ATK và +20% WIL (2 Lượt).
+   * Lưu ý: Skill này hoạt động độc lập với Nội tại (có thể stack buff nếu may mắn).
+6. ULTIMATE: Sinh Tử Đổ Bàn
+ * Tags: [Tự Động], [RNG: 50/50], [Khống Chế: Ngủ], [Buff Vĩnh Viễn: Max HP].
+ * Logic:
+   * Trigger: Đầy Nộ (Auto-cast).
+   * Hành động: Chọn ngẫu nhiên 1 kẻ địch. Gieo xúc xắc (1-6).
+   * Kết quả Lẻ (1, 3, 5) - [Tử]:
+     * Tấn công mục tiêu đó (Sát thương cơ bản).
+     * Áp dụng [Ngủ] (Sleep) trong 1 Lượt. (Không thể hành động/né/đỡ).
+   * Kết quả Chẵn (2, 4, 6) - [Sinh]:
+     * Vũ Mặc tự hồi 10% Max HP.
+     * Tăng vĩnh viễn +10% Max HP (Cộng dồn tối đa +50%).
+     * Fallback: Nếu không có kẻ địch (trận đấu kết thúc/chuyển màn), luôn ra Chẵn để buff bản thân.
+GHI CHÚ KỸ THUẬT (CODER NOTES):
+ * Passive Cycle Logic:
+   def onTurnStart(owner):
+    owner.internal_cd = max(0, owner.internal_cd - 1)
+    if owner.internal_cd == 0:
+        buff = RandomPick(["exalt","pierce","frenzy","dmgCut","reflect","haste"])
+        ApplyBuff(owner, buff, duration=1)
+        owner.internal_cd = 3 # Reset cycle (1 active + 2 cooldown)
+
+ * Skill 1 (Ricochet):
+   * Cần danh sách AvailableTargets loại trừ mục tiêu vừa bị đánh.
+   * Hit 1 Success -> Roll(30) -> Hit 2 Success -> Roll(20) -> Hit 3.
+ * Skill 2 (Summon Stats):
+   * Chỉ số của Xúc Xắc là Snapshot tại thời điểm triệu hồi.
+   * Nếu Vũ Mặc được buff Max HP từ Ult, Xúc Xắc triệu hồi sau đó sẽ trâu hơn.
+   * Flag NO_ACTION: Unit này bỏ qua lượt hành động (Skip turn automatically).
+ * Cân bằng Ult:
+   * Lẻ (Ngủ): Là hiệu ứng khống chế cứng rất mạnh. 1 Lượt là đủ để ngắt nhịp đối thủ.
+   * Chẵn (Max HP): Giúp Vũ Mặc trâu hơn về late game, đồng nghĩa với việc con Xúc Xắc (Skill 2) cũng trâu hơn.
+Tổng kết: Vũ Mặc là một SSR thú vị. Hắn không mạnh về sát thương dồn (Burst) nhưng cực kỳ khó chịu với khả năng thả Tank (Skill 2) và Khống chế/Hồi phục (Ult). Tính ngẫu nhiên cao khiến hắn không bị "một màu".
+
+
+26) [SSR] MA ĐẾ HẮC LONG – U MINH (You Ming), Class: Tank.
+ * Role: Debuff Spreader (Gieo Debuff), Infinite Scaler (Tăng chỉ số vĩnh viễn), Drain Tank (Hồi phục).
+ * Vũ khí: Long Trảo / Hắc Khí.
+1. NỘI TẠI: Hắc Long Tâm Ấn
+ * Tags: [Nội Tại], [Debuff: Tâm Ma], [Tự Thanh Tẩy], [Buff Vĩnh Viễn: Chỉ Số].
+ * Logic:
+   * Thống Ngự (Base Stats): Vào trận tăng vĩnh viễn +5% RES, +5% ARM, +5% WIL. Tăng +35% Hiệu quả Hồi Phục (Healing Received/Regen Rate).
+   * Cơ chế Tâm Ma (Heart Demon):
+     * Trigger: Mọi sát thương do Ma Đế gây ra (Đánh thường/Skill/Ult).
+     * Effect: Áp dụng 1 Stack [Tâm Ma] lên mục tiêu.
+     * Debuff Tâm Ma: Giảm 5% RES và 5% ATK (Thay PER bằng ATK để giảm sát thương địch đánh vào, hợp với Tank hơn).
+     * Stack: Tối đa 5 Stack (PvP) / 8 Stack (PvE). Thời gian 2 lượt, làm mới khi nhận stack mới. Loại: [Curse] (Có thể bị tẩy).
+   * Long Huyết Tự Tịnh:
+     * Trigger: Mỗi 2 Lượt (vào cuối lượt của bản thân).
+     * Effect: Tự xóa bỏ ngẫu nhiên 1 Debuff trên bản thân. (Không thể bị ngăn cản).
+2. ĐÁNH THƯỜNG: Hắc Trảo
+ * Tags: [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp], [Gắn Debuff].
+ * Logic:
+   * Gây sát thương 100% (WIL + ATK) lên 1 mục tiêu.
+   * Gắn +1 Stack Tâm Ma.
+3. KỸ NĂNG 1: Long Dực Tán Diệt
+ * Tags: [Chủ Động], [Đa Mục Tiêu: Ngẫu Nhiên], [Sát Thương Kỹ Năng], [Gắn Debuff], [Tiêu Hao: Aether].
+ * Logic:
+   * Cost: 30 Aether.
+   * Hành động: Quạt cánh tạo gió lốc đen.
+   * Mục tiêu: 3 Kẻ địch ngẫu nhiên.
+   * Sát thương: Mỗi kẻ nhận 130% Sát Thương Đánh Thường.
+   * Hiệu ứng: Áp dụng +1 Stack Tâm Ma cho mỗi kẻ trúng đòn.
+   * Đặc tính: isBasic = false (Không kích hoạt hiệu ứng đòn đánh thường).
+4. KỸ NĂNG 2: Thôn Phệ Tâm Ma
+ * Tags: [Chủ Động], [Hấp Thụ Debuff], [Buff Vĩnh Viễn: Phòng Thủ], [Tiêu Hao: Aether], [Cộng Dồn Giới Hạn].
+ * Logic:
+   * Cost: 30 Aether.
+   * Hành động (Harvest):
+     * Quét toàn bộ kẻ địch trên sân.
+     * Thu hồi (Xóa) tất cả stack [Tâm Ma] đang có trên người chúng.
+     * Tổng kết số lượng stack thu được = Total_Stacks.
+   * Lợi tức (Permanent Buff):
+     * Mỗi stack thu được \rightarrow Tăng vĩnh viễn +5% RES và +5% ARM cho Ma Đế.
+     * Giới hạn (Cap): Tổng cộng dồn tối đa +80% (Tức là ăn max 16 stack trong cả trận). Sau khi đạt trần, kỹ năng vẫn xóa debuff địch nhưng không tăng chỉ số nữa.
+   * Chiến thuật: Đây là con dao hai lưỡi. Bạn xóa debuff làm địch yếu đi để đổi lấy sức mạnh vĩnh cửu cho bản thân. Cần cân nhắc thời điểm "gặt".
+5. KỸ NĂNG 3: Long Huyết Sôi Trào
+ * Tags: [Chủ Động], [Bản Thân], [Buff: Hồi Phục], [Hồi Máu Theo Thời Gian], [Tiêu Hao: Aether].
+ * Logic:
+   * Cost: 25 Aether. Cooldown: 3 Lượt.
+   * Hiệu ứng: Kích hoạt trạng thái [Sôi Trào] trong 2 lượt.
+   * Buff Regen: Tăng +400% Chỉ Số HP Regen cơ bản.
+     * Giải thích: Nếu Ma Đế có chỉ số hồi phục tự nhiên là 1% Max HP/turn. Nội tại +35% \rightarrow 1.35%. Skill này +400% \rightarrow Tổng khoảng 5.35% Max HP/turn.
+     * Bổ sung (Balance): Để skill này thực sự hữu dụng (vì Regen cơ bản thường thấp), ta thêm hiệu ứng: Hồi ngay lập tức 15% Max HP khi kích hoạt.
+6. ULTIMATE: Long Ngâm Chấn Thế
+ * Tags: [Tự Động], [Đa Mục Tiêu: Ngẫu Nhiên], [Sát Thương Lớn], [Gắn Debuff Diện Rộng].
+ * Logic:
+   * Trigger: Đầy Nộ (Auto-cast).
+   * Hành động: Gầm thét gây sát thương diện rộng.
+   * Mục tiêu: 3 Kẻ địch ngẫu nhiên.
+   * Sát thương: Mỗi kẻ nhận 230% Sát Thương Đánh Thường (230% WIL + 230% ATK).
+   * Hiệu ứng: Áp dụng +2 Stack Tâm Ma lên mỗi kẻ trúng đòn. (Tăng tốc độ tích stack để dùng Skill 2).
+GHI CHÚ HỆ THỐNG & CÂN BẰNG:
+ * Cơ chế Thôn Phệ (Skill 2):
+   * Logic code:
+     total_stacks = 0
+for enemy in all_enemies:
+    stacks = enemy.getStackCount("TamMa")
+    if stacks > 0:
+        total_stacks += stacks
+        enemy.removeBuff("TamMa") # Xóa sạch
+
+# Tính toán Buff
+current_bonus = self.getPermanentBuffValue("DevouredPower")
+new_bonus = total_stacks * 0.05
+
+# Apply cap 80%
+if current_bonus + new_bonus > 0.80:
+    new_bonus = 0.80 - current_bonus
+
+if new_bonus > 0:
+    self.addPermanentBuff("DevouredPower", new_bonus) # Buff ARM/RES
+
+ * Debuff Tâm Ma:
+   * Việc giảm RES/ATK giúp Ma Đế trâu hơn theo 2 cách: Địch đánh yếu đi (giảm ATK) và Địch chịu phép đau hơn (giảm RES - Ma Đế gây dmg mix WIL).
+ * Hồi Phục (Regen):
+   * Trong các game gacha, chỉ số HP Regen thường rất thấp (chỉ hồi vài trăm máu). Việc +400% có thể vẫn không thấm vào đâu so với máu Tanker (hàng chục nghìn).
+   * Khuyến nghị: Nên code Skill 3 là "Áp dụng buff HoT (Heal over Time) hồi 15% Max HP mỗi lượt trong 2 lượt" thay vì dựa vào chỉ số Regen cơ bản. Nhưng nếu giữ nguyên theo yêu cầu của ông, hãy đảm bảo Base Regen của Ma Đế cao hơn các char khác.
+Đánh giá: Ma Đế Hắc Long là một "Late Game Tank". Đầu game hắn khá bình thường, nhưng sau khi "ăn" đủ 60% chỉ số từ Skill 2, hắn sẽ trở thành một bức tường không thể phá hủy.
+
+
+27) [SSR] TỊCH DIỆT LONG HOÀNG – DRAGON EMPEROR
+ * Class: Warrior / Destroyer.
+ * Role: Executioner (Kết liễu), Stat Scaler (Tăng tiến chỉ số), Shield Tank.
+ * Phe phái: Tịch Diệt (Extinction).
+1. NỘI TẠI 1: Sát Lệnh Tịch Diệt
+ * Tags: [Nội Tại], [Buff: Tàn Sát], [Hồi Năng Lượng], [Có Thể Thanh Tẩy].
+ * Logic:
+   * Trigger: Khi nhân vật xuất hiện trên sân (Vào trận hoặc Hồi sinh).
+   * Hiệu ứng: Nhận buff [Tàn Sát] (Executioner).
+     * Cơ chế: Khi gây sát thương, nếu máu mục tiêu \le 10% Max HP \rightarrow Kết liễu ngay lập tức.
+   * Tiêu hao: Sau khi kết liễu thành công 1 mục tiêu, buff [Tàn Sát] biến mất.
+   * Thưởng: Khi buff biến mất (do kết liễu), hồi ngay 20 Aether.
+   * Điểm yếu: Buff này thuộc loại [Thường], có thể bị đối thủ dùng kỹ năng Xóa Buff (Dispel) làm mất trước khi kịp kết liễu ai.
+2. NỘI TẠI 2: Tịch Diệt Ban Ân
+ * Tags: [Nội Tại], [Buff Vĩnh Viễn], [Cộng Hưởng: Đồng Minh].
+ * Logic:
+   * Cơ bản: Tăng +10% ATK, +10% WIL và Xuyên 10% ARM/RES.
+   * Cộng Hưởng (Synergy): Nếu trong đội hình đồng minh có mặt [Tịch Diệt Chi Chủ] (Unit cụ thể).
+     * Effect: Tăng gấp đôi chỉ số (Tổng +20% ATK/WIL, Xuyên 20% ARM/RES).
+     * Lưu ý: Hiệu ứng xuyên (Penetration) tính theo cấp số nhân (Multiplicative) với các nguồn khác.
+3. ĐÁNH THƯỜNG: Long Trảo Kích
+ * Tags: [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp], [Thường].
+ * Logic:
+   * Gây sát thương 100% (WIL + ATK) lên 1 mục tiêu.
+4. KỸ NĂNG 1: Long Hộ Diệt Trì
+ * Tags: [Chủ Động], [Bản Thân], [Buff: Hồi Phục], [Cơ Chế: Khiên Overheal], [Tiêu Hao: Aether].
+ * Logic:
+   * Cost: 25 Aether. Cooldown: 3 Lượt.
+   * Hiệu ứng:
+     * Tăng +200% Hiệu quả Hồi Phục nhận vào (Healing Received) trong 3 lượt.
+     * Chuyển hóa Overheal: Trong thời gian hiệu lực, nếu lượng máu hồi phục vượt quá Max HP \rightarrow Chuyển phần dư thành [Khiên].
+     * Giới hạn Khiên: Tối đa 70% Max HP của bản thân.
+   * Chiến thuật: Skill này biến Long Hoàng thành một "Bị thịt" siêu cứng nếu đi cùng Healer mạnh.
+5. KỸ NĂNG 2: Diệt Linh Khải Thể
+ * Tags: [Chủ Động], [Bản Thân], [Buff Vĩnh Viễn: Max HP], [Giới Hạn Số Lần], [Tiêu Hao: Aether].
+ * Logic:
+   * Cost: 25 Aether. Cooldown: 2 Lượt.
+   * Hiệu ứng: Tăng vĩnh viễn +20% Max HP (Dựa trên Base HP).
+   * Giới hạn: Chỉ dùng tối đa 2 Lần/Trận (Tổng +40% Max HP).
+   * Đặc tính: Chỉ số cộng thêm này giữ nguyên sau khi Hồi sinh.
+6. KỸ NĂNG 3: Diệt Vũ Long Nộ
+ * Tags: [Chủ Động], [Đa Mục Tiêu: Ngẫu Nhiên], [Sát Thương Kỹ Năng], [Tiêu Hao: Aether].
+ * Logic:
+   * Cost: 25 Aether.
+   * Hành động: Tấn công 3 Kẻ địch ngẫu nhiên.
+   * Sát thương: Mỗi kẻ nhận 130% Sát Thương Đánh Thường.
+   * Đặc tính: isBasic = false (Không kích hoạt hiệu ứng đánh thường, nhưng vẫn kích hoạt Nội tại Tàn Sát nếu địch thấp máu).
+7. ULTIMATE: Tịch Diệt Thiên Trảm
+ * Tags: [Tự Động], [Đa Mục Tiêu: Ngẫu Nhiên], [Sát Thương Lớn], [Xuyên Phá].
+ * Logic:
+   * Trigger: Đầy Nộ (Auto-cast).
+   * Hành động: Gây sát thương diện rộng lên 3 Kẻ địch ngẫu nhiên.
+   * Sát thương: Mỗi kẻ nhận 230% Sát Thương Đánh Thường.
+   * Xuyên Phá: Hưởng trọn vẹn chỉ số Xuyên từ Nội tại 2 (10% hoặc 20%).
+GHI CHÚ KỸ THUẬT (CODER NOTES):
+ * Nội tại Sát Lệnh (Buff Tiêu Hao):
+   * Flag: BUFF_EXECUTE_ONE_SHOT.
+   * OnDamageDealt(attacker, target, damage):
+     if attacker.hasBuff("BUFF_EXECUTE_ONE_SHOT"):
+    if target.hp <= target.maxHp * 0.10:
+        Kill(target)
+        attacker.removeBuff("BUFF_EXECUTE_ONE_SHOT")
+        attacker.addAether(20) # Refund
+
+ * Cơ chế Khiên Overheal (Skill 1):
+   * Cần hook vào hệ thống Hồi máu (OnHeal).
+   * If target.hasBuff("LONG_HO_DIET_TRI"):
+     * Tính lượng Overheal = (CurrentHP + HealAmount) - MaxHP.
+     * Nếu Overheal > 0: AddShield(target, value = Min(Overheal, MaxHP * 0.70)).
+ * Skill 2 (Max HP Stack):
+   * Biến đếm: Skill2_Uses. Max = 2.
+   * Nếu Skill2_Uses >= 2: Disable Skill.
+   * Stat Modifier: PERSIST_ON_DEATH = true. (Chết đi sống lại vẫn còn máu trâu).
+Đánh giá: Bộ kit này rất "lực". Hắn không có cơ chế phức tạp (như Time-loop hay Copy), chỉ đơn giản là chỉ số to, máu nhiều, và có khả năng "đấm phát chết luôn" kẻ yếu máu. Một Tanker-DPS kiểu mẫu.
+
+28) [SSR] HƯ VÔ MA CHỦ – NIHIL
+ * Class: Tank
+ * Role: Dodge Tank, Time Bomb (Bom nổ chậm), Self-Debuff Management.
+ * Đặc tính: Không có Thần Tính (Nhận buff/debuff/hồi sinh bình thường).
+1. NỘI TẠI: Hư Ảnh Biến Dị
+ * Tags: [Nội Tại], [Cơ Chế: Né Tránh], [Tích Lũy: Biến Mất], [Trạng Thái: Phế].
+ * Logic:
+   * Hư Hóa (Void Form):
+     * Khởi điểm: 20% Tỷ lệ Né Tránh (Evasion) mọi đòn tấn công.
+     * Tăng trưởng: Cứ mỗi 5 lần Né thành công \rightarrow Tăng thêm +10% Tỷ lệ Né.
+     * Giới hạn: Tối đa 100% (Né tuyệt đối).
+   * Đếm Ngược Diệt Vong:
+     * Khi đạt 100% Né \rightarrow Kích hoạt đếm ngược 3 Lượt.
+     * Sau 3 lượt, nếu tỷ lệ không bị giảm xuống dưới 100% \rightarrow Vào trạng thái [Hư Vô Đồng Hóa].
+   * Trạng Thái [Hư Vô Đồng Hóa] (Assimilation):
+     * Vô Dụng: Không thể tấn công (hoặc gây 1 sát thương chuẩn trêu ngươi).
+     * Vô Ảnh: Không thể bị chỉ định (Untargetable), Không nhận Buff/Debuff.
+     * Vô Diệt: Không thể chết.
+     * Hậu quả: Chiếm 1 ô trên sân vĩnh viễn như một vật cản vô tri, trừ khi dùng Skill 3.
+2. ĐÁNH THƯỜNG: Hư Xúc
+ * Tags: [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp], [Thường].
+ * Logic:
+   * Gây sát thương 100% (WIL + ATK) lên 1 mục tiêu.
+3. KỸ NĂNG 1: Vô Tướng Dẫn Chiến
+ * Tags: [Chủ Động], [Khiêu Khích], [Giảm Tỷ Lệ Né], [Quản Lý Nội Tại].
+ * Logic:
+   * Cost: 25 Aether.
+   * Hành động: Tự áp dụng [Khiêu Khích] (Taunt) trong 3 Lượt.
+   * Quản lý (Key Mechanic): Giảm ngay -10% Tỷ lệ Hư Hóa hiện tại.
+     * Tác dụng: Vừa hút sát thương để kích hoạt né, vừa giảm tỷ lệ né để tránh bị chạm trần 100% quá sớm.
+4. KỸ NĂNG 2: Trật Không Lưỡng Trảm
+ * Tags: [Chủ Động], [AOE: Cột Dọc], [Sát Thương Kỹ Năng], [Giảm Tỷ Lệ Né].
+ * Logic:
+   * Cost: 15 Aether. (Rẻ để spam giảm tỷ lệ).
+   * Hành động: Chém 1 nhát vào không gian.
+   * Phạm vi: Chọn 1 cột dọc (2 ô). (Ví dụ: Đứng ô 2 đánh cột 2-5).
+   * Sát thương: Mỗi ô nhận 230% Sát Thương Đánh Thường.
+   * Quản lý: Giảm ngay -10% Tỷ lệ Hư Hóa hiện tại.
+5. KỸ NĂNG 3: Hoàn Trần Tái Ảnh
+ * Tags: [Chủ Động], [Thu Hồi], [Điều Kiện: Đồng Hóa], [Tiêu Hao: Cost Tổng], [Reset].
+ * Logic:
+   * Điều kiện: Chỉ kích hoạt được khi đang ở trạng thái [Hư Vô Đồng Hóa] (Lúc đã bị phế).
+   * Cost Kỹ Năng: 20 Aether. Cooldown: 2 Lượt.
+   * Cost Tài Nguyên (Phạt): Trừ 3 Cost từ thanh năng lượng tổng của người chơi (Penalty).
+   * Hành động:
+     * Nihil biến mất khỏi sân đấu.
+     * Quay trở lại Bộ bài/Hàng chờ (Deck/Hand).
+   * Reset: Khi được triệu hồi lại, hắn sẽ ở trạng thái gốc (Né 20%, Bộ đếm reset).
+6. ULTIMATE: Vô Diệt Nhất Kích
+ * Tags: [Tự Động], [Đơn Mục Tiêu], [Sát Thương Lớn], [Không Phải Đánh Thường].
+ * Logic:
+   * Trigger: Đầy Nộ (Auto-cast).
+   * Sát thương: Gây 300% Sát Thương Đánh Thường lên 1 mục tiêu.
+   * Đặc tính: Đòn đơn, 1 Hit, isBasic = false (Không kích hoạt các hiệu ứng on-hit, thuần sát thương).
+   * Lưu ý: Ult không làm giảm tỷ lệ Né, nên cẩn thận khi dùng lúc sắp chạm trần 100%.
+GHI CHÚ KỸ THUẬT (CODER NOTES):
+ * Biến số Nội Tại:
+   * currentPhaseRate: Float (0.20 đến 1.00).
+   * successDodgeCount: Int (0 đến 5). Reset về 0 mỗi khi currentPhaseRate tăng.
+   * assimilationTimer: Int (3 đến 0). Kích hoạt khi Rate = 1.00.
+ * Logic Xử Lý Hit (OnHitCheck):
+   def onIncomingAttack(attacker, target, damageInfo):
+    if target.id == "Nihil":
+        # Check Né
+        if Random() < target.currentPhaseRate:
+            Dodge()
+            target.successDodgeCount += 1
+
+            # Check Tăng Trưởng
+            if target.successDodgeCount >= 5:
+                target.currentPhaseRate = min(1.0, target.currentPhaseRate + 0.10)
+                target.successDodgeCount = 0
+
+                # Check Đồng Hóa Trigger
+                if target.currentPhaseRate == 1.0:
+                    target.assimilationTimer = 3
+            return # Kết thúc xử lý hit (Né hoàn toàn)
+
+ * Trạng Thái Đồng Hóa (State Machine):
+   * Tại OnTurnStart: Nếu currentPhaseRate == 1.0, giảm assimilationTimer.
+   * Nếu assimilationTimer == 0:
+     * Set Flag IS_ASSIMILATED = true.
+     * Targetable = false.
+     * DamageOutput = 0 (hoặc 1 True Dmg).
+     * ImmuneAll = true.
+     * Unlock Skill 3 usage.
+ * Kỹ Năng Giảm Tỷ Lệ (S1, S2):
+   * Hàm ReducePhaseRate(amount):
+     * currentPhaseRate = max(0.20, currentPhaseRate - amount).
+     * Nếu đang đếm ngược (assimilationTimer > 0) và Rate giảm xuống dưới 1.0 \rightarrow Hủy đếm ngược (assimilationTimer = null).
+Tổng kết: Nihil là một bài toán quản lý rủi ro. Bạn muốn hắn né nhiều để tank (nên dùng S1), nhưng né nhiều quá hắn sẽ biến mất. Bạn phải dùng S2 (tốn Aether) để kìm hãm sức mạnh của hắn lại. Một thiết kế rất cân não!.
+Chỉnh Sửa Hư Vô Ma Chủ (Nihil)
+State: ASSIMILATED.
+Logic:
+IsTargetable = true (Vẫn bị chọn làm mục tiêu).
+OnTakeDamage: Luôn trả về Damage = 1 (True Dmg) hoặc 0 (Block/Immune).
+OnDealDamage: Luôn trả về Damage = 1 (True Dmg) hoặc 0.
+Điều này giúp AI của địch không bị lỗi "đứng hình" khi không tìm thấy mục tiêu, chúng vẫn đánh vào Nihil nhưng không gây được sát thương.
+
+
+29) [UR] HỖN ĐỘN MA LONG – NGHỊCH LOẠN (Ni Luan), Class: Tanker.
+ * Role: Armor Breaker (Phá Giáp), Reflect Tank (Phản đòn), Taunter.
+ * Đặc tính: Sát thương xuyên thấu cao, trừng phạt kẻ địch tấn công mình.
+1. NỘI TẠI: Hỗn Mang Tuyệt Cách
+ * Tags: [Nội Tại], [Xuyên Giáp Cố Định], [Quy Tắc: Giới Hạn], [Không Thể Xóa Bỏ].
+ * Logic:
+   * Xuyên Phá Chủ Động: Mọi sát thương do chính bản thân Ma Long gây ra (Đánh thường, Skill 1, Ult, Follow-up) sẽ bỏ qua 50% ARM và 50% RES của mục tiêu.
+   * Loại trừ: KHÔNG áp dụng cho sát thương Phản đòn (Reflect), DoT (Đốt/Độc) hoặc các nguồn sát thương gián tiếp khác.
+   * Giới hạn (Cap): Tổng chỉ số xuyên giáp (cộng dồn từ mọi nguồn: Nội tại + Debuff + Trang bị) không vượt quá 90%. (Tránh True Damage 100% gây lỗi cân bằng).
+   * Bảo hộ: Nội tại này là Quy Tắc, không thể bị xóa/cướp/lãng quên.
+2. ĐÁNH THƯỜNG: Hỗn Trảo
+ * Tags: [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp], [Thường].
+ * Logic:
+   * Gây sát thương 100% (WIL + ATK) lên 1 mục tiêu.
+   * Lưu ý: Hưởng trọn 50% Xuyên giáp từ nội tại.
+3. KỸ NĂNG 1: Loạn Vũ Long Tức
+ * Tags: [Chủ Động], [AOE: Ngẫu Nhiên], [Sát Thương Xuyên], [Tiêu Hao: Aether].
+ * Logic:
+   * Cost: 30 Aether.
+   * Mục tiêu: 3 Kẻ địch ngẫu nhiên.
+   * Sát thương: Mỗi kẻ nhận 130% Sát Thương Đánh Thường.
+   * Đặc tính: isBasic = false (Không kích hoạt hiệu ứng đánh thường). Hưởng trọn 50% Xuyên giáp.
+4. KỸ NĂNG 2: Hỗn Mang Ấn
+ * Tags: [Chủ Động], [Aura: Phản Kích], [Debuff: Phá Giáp], [Hỗ Trợ Phản Đòn].
+ * Logic:
+   * Cost: 30 Aether. Thời gian: Aura tồn tại 2 Lượt.
+   * Cơ chế Phản Kích (Counter-Mark):
+     * Trigger: Khi Ma Long nhận sát thương từ địch.
+     * Giới hạn: Chỉ đánh dấu tối đa 3 kẻ địch đầu tiên tấn công mình trong mỗi lượt.
+     * Effect: Áp dụng Debuff [Phá Giáp Hỗn Mang] lên kẻ tấn công trong 1 Lượt.
+   * Debuff [Phá Giáp Hỗn Mang]:
+     * Mục tiêu bị giảm khả năng phòng ngự trước mọi nguồn sát thương.
+     * Mọi sát thương chúng nhận vào (Bao gồm cả sát thương Phản đòn/Reflect ngay sau đó) sẽ bỏ qua 40% ARM/RES của chúng.
+   * Combo: Địch đánh Long \rightarrow Dính Debuff Phá Giáp \rightarrow Long phản đòn (nếu có giáp gai/buff phản) \rightarrow Sát thương phản đòn xuyên 40% giáp nhờ debuff.
+5. KỸ NĂNG 3: Trấn Kiếp Khiêu Dẫn
+ * Tags: [Chủ Động], [Khiêu Khích], [Debuff Tự Thân], [Buff: Giảm Thương].
+ * Logic:
+   * Cost: 20 Aether.
+   * Hiệu ứng:
+     * [Khiêu Khích] (Taunt) toàn bộ địch trong 3 Lượt.
+     * [Tự Suy Yếu]: Giảm 20% Sát thương gây ra của bản thân trong 3 Lượt.
+     * [Cân Bằng - Buff Thêm]: Để skill này xứng đáng UR và bù lại việc giảm dmg, Ma Long nhận thêm +25% Giảm Sát Thương Nhận Vào (Damage Reduction) trong 3 lượt. (Nếu không có cái này, việc Khiêu khích mà giảm dmg bản thân là tự sát).
+6. ULTIMATE: Hạo Kiếp Hỗn Không
+ * Tags: [Tự Động], [AOE: Diện Rộng], [Sát Thương Xuyên], [Ưu Tiên: Mục Tiêu Khác Nhau].
+ * Logic:
+   * Trigger: Đầy Nộ (Auto-cast).
+   * Mục tiêu: 4 Kẻ địch ngẫu nhiên.
+     * Logic chọn: Ưu tiên chọn 4 mục tiêu khác nhau (Unique). Nếu địch còn ít hơn 4, mới được phép chọn trùng lặp.
+   * Sát thương: Mỗi hit gây 130% Sát Thương Đánh Thường.
+   * Đặc tính: Hưởng trọn 50% Xuyên giáp từ nội tại.
+GHI CHÚ KỸ THUẬT & LOGIC TOÁN HỌC (CODER NOTES):
+1. Công Thức Tính Xuyên Giáp (Penetration Math)
+Cần tách biệt nguồn xuyên để tránh lỗi logic:
+ * Passive_Ignore: 0.50 (Chỉ áp dụng khi Source == ChaosDragon).
+ * Debuff_Ignore: 0.40 (Áp dụng lên Target có debuff, bất kể Source là ai).
+ * Công thức Damage Calculation:
+   def CalculateDamage(source, target, rawDamage):
+    ignore_percent = 0.0
+
+    # 1. Check Nội tại Ma Long
+    if source.id == "ChaosDragon" and source.damageType != "REFLECT" and source.damageType != "DOT":
+        ignore_percent += 0.50
+
+    # 2. Check Debuff trên mục tiêu (Skill 2)
+    if target.hasDebuff("CHAOS_ARMOR_BREAK"):
+        ignore_percent += 0.40
+
+    # 3. Check các nguồn khác (Trang bị, Buff team...)
+    ignore_percent += source.otherPenetration
+
+    # 4. Cap trần 90%
+    ignore_percent = min(ignore_percent, 0.90)
+
+    # 5. Tính sát thương cuối
+    final_arm = target.ARM * (1.0 - ignore_percent)
+    damage = rawDamage * (100 / (100 + final_arm))
+    return damage
+
+2. Thứ Tự Xử Lý Skill 2 (Timing)
+Rất quan trọng để Phản đòn (Reflect) được hưởng lợi:
+ * Bước 1: Enemy đánh Ma Long.
+ * Bước 2: Ma Long nhận sát thương (Tính toán xong).
+ * Bước 3 (Trigger Skill 2):
+   * Check: MarkedCount < 3?
+   * Nếu đúng: Áp dụng Debuff CHAOS_ARMOR_BREAK (40% Ignore) lên Enemy ngay lập tức. MarkedCount++.
+ * Bước 4 (Trigger Phản Đòn):
+   * Hệ thống tính sát thương phản đòn (Reflect Damage).
+   * Lúc này Enemy ĐÃ CÓ Debuff \rightarrow Reflect Damage được bỏ qua 40% giáp.
+ * Kết quả: Phản đòn đau hơn rất nhiều.
+Tổng kết: Hỗn Độn Ma Long là một thiết kế Tanker tấn công (Bruiser) rất mạnh. Hắn khắc chế cứng các đội hình trâu bò nhờ khả năng xuyên giáp, và trừng phạt các đội hình tốc độ cao (đánh nhiều hit) nhờ combo Aura + Phản đòn.
+
+
+30) [PRIME] Hoá Thân của HƯ CHỦ – ZERO (The Nullity)
+ * Class: Specialist / Controller.
+ * Role: Game Master (Điều phối trận đấu), Disabler (Phế võ công), Leader Protector (Bảo kê chủ tướng).
+ * Cost: 22 (1 lần duy nhất). Flag: UNREVIVABLE.
+1. NỘI TẠI: Quy Tắc – Hư Vô Chu Kỳ
+ * Tags: [Nội Tại], [Giảm Thương Theo Chu Kỳ], [Quy Tắc: Chân Ngã].
+ * Logic:
+   * Chu Kỳ Hư Vô (Void Cycle):
+     * Cơ chế: Vào sân \rightarrow [Bật] Giảm 70% Sát thương nhận vào (1 Lượt) \rightarrow [Tắt] (1 Lượt) \rightarrow Lặp lại vô hạn.
+     * Tính chất: Giảm sau ARM/RES. Là trạng thái nội tại, không thể xóa/cướp.
+   * Chân Ngã (True Self):
+     * Không thể hồi sinh.
+     * Không nhận Buff/Debuff ngoại giới.
+     * Không thể bị Cướp/Xóa/Sao chép/Lãng quên.
+2. TRẠNG THÁI ĐẶC BIỆT: Hư Vô Chúc Phúc (HVCP)
+ * Tags: [Trạng Thái: Quy Tắc], [Khóa Sát Thương], [Bất Tử Giả].
+ * Logic Vận Hành:
+   * Phòng Thủ: Đối tượng Không thể bị chỉ định (Untargetable) và Miễn nhiễm 100% sát thương (Damage = 0).
+   * Tấn Công: Đối tượng vẫn có thể hành động (Cast skill/Ult/Đánh thường) NHƯNG mọi đòn đánh chỉ gây 1 Sát Thương Chuẩn và Không tạo Nộ từ việc gây sát thương.
+   * Phân Loại:
+     * Lên Địch: Coi là Debuff. Không thể Refresh (Phải hết mới được áp lại). Chỉ gỡ được bằng thanh tẩy cấp "Quy Tắc" (So sánh lực chiến/sao/thức tỉnh).
+     * Lên Đồng Minh: Coi là Buff. Hết hạn tự xóa.
+3. ĐÁNH THƯỜNG: Hư Ảnh Kích
+ * Tags: [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp].
+ * Logic:
+   * Gây sát thương 100% (WIL + ATK) lên 1 mục tiêu.
+4. KỸ NĂNG 1: Phúc Ấn Hư Vô
+ * Tags: [Chủ Động], [Bảo Kê: Leader], [Rời Sân], [Reset Sức Mạnh].
+ * Logic:
+   * Cost: 0 Aether.
+   * Hành động:
+     * Áp dụng [HVCP] trong 1 Lượt lên Leader Đồng Minh. (Leader bất tử nhưng cũng chỉ gây 1 dmg).
+     * Hư Chủ Rời Sân quay về Bộ Bài (Deck).
+     * Reset: Xóa toàn bộ Stack ATK/WIL tích lũy từ Ult. Khi được triệu hồi lại, Hư Chủ là một unit mới hoàn toàn.
+   * Chiến thuật: Dùng để cứu Leader khỏi đòn kết liễu hoặc reset lại vị trí/máu của Hư Chủ.
+5. KỸ NĂNG 2: Hư Tịch Phong Ấn
+ * Tags: [Chủ Động], [Khống Chế: Phế Võ Công], [Xóa Khiêu Khích], [Ưu Tiên: Chỉ Số Cao].
+ * Logic:
+   * Cost: 20 Aether. Cooldown: 2 Lượt.
+   * Mục tiêu: Chọn 2 kẻ địch theo thứ tự ưu tiên:
+     * HP Cao Nhất.
+     * Tổng (ATK + WIL) Cao Nhất.
+   * Hành động:
+     * Nếu mục tiêu có [Khiêu Khích] \rightarrow Xóa bỏ Khiêu Khích.
+     * Áp dụng [HVCP] trong 2 Lượt.
+   * Hạn chế: Nếu mục tiêu ĐÃ CÓ HVCP \rightarrow Bỏ qua (Không làm mới thời gian). Nếu không đủ mục tiêu hợp lệ (đều đang dính HVCP) \rightarrow Chỉ áp lên những kẻ chưa dính.
+6. KỸ NĂNG 3: Vô Hình Tam Phạt
+ * Tags: [Chủ Động], [Đa Mục Tiêu: Chọn Lọc], [Sát Thương Lớn].
+ * Logic:
+   * Cost: 25 Aether.
+   * Mục tiêu: 3 Kẻ địch ngẫu nhiên KHÔNG CÓ [HVCP].
+   * Sát thương: Mỗi hit gây 200% Sát Thương Đánh Thường.
+   * Xử lý: Nếu số kẻ địch hợp lệ < 3 (ví dụ chỉ còn 1 kẻ không dính HVCP) \rightarrow Chỉ đánh kẻ đó 1 hit, 2 hit kia mất (Không dồn damage, không đánh vào kẻ đang bất tử).
+7. ULTIMATE: Hư Vực Phủ Ấn
+ * Tags: [Tự Động], [AOE: Cố Định], [Khống Chế Diện Rộng], [Tăng Trưởng Vô Hạn].
+ * Logic:
+   * Trigger: Đầy Nộ (Auto-cast).
+   * Giai đoạn 1 (Tăng Trưởng):
+     * Tăng +5% ATK và +5% WIL (Stack vĩnh viễn trong trận).
+     * PvP Cap: Tối đa +100%. PvE: Vô hạn.
+     * Lưu ý: Bị Reset về 0 nếu dùng Skill 1.
+   * Giai đoạn 2 (Phủ Ấn):
+     * Áp dụng [HVCP] trong 1 Lượt lên toàn bộ kẻ địch ở các ô 1, 2, 3, 4, 5, 6, 7, 9 (Trừ ô số 8 - Vị trí mặc định của Leader địch).
+     * Loại kỹ năng: Quy Tắc/Thần Tính. Không gây sát thương, không thể Né/Chặn/Phản đòn/Miễn dịch.
+   * Tác dụng: Biến toàn bộ lính lác và tướng phụ của địch thành "Phế vật" trong 1 lượt (chỉ gây 1 dmg), cô lập Leader địch để team ta dồn sát thương (hoặc ngược lại, bảo vệ team ta khỏi sát thương khủng từ địch).
+GHI CHÚ KỸ THUẬT (CODER NOTES):
+ * Trạng Thái HVCP (Void Blessing):
+   * Flag: IS_VOID_BLESSED = true.
+   * OnGetIncomingDamage: Return 0 (Immune).
+   * OnGetTargetable: Return false (Untargetable).
+   * OnDealDamage: Return 1 (True Damage).
+   * OnGenerateRageFromDamage: Return 0.
+   * Xử lý Logic Địch/Ta:
+     * Nếu Target.Team != Caster.Team (Địch): Gán tag DEBUFF. Check kháng RULE_PRIORITY khi bị Cleanse.
+     * Nếu Target.Team == Caster.Team (Ta): Gán tag BUFF.
+ * Ult Targeting (Trừ ô 8):
+   * Sử dụng Grid Targeting (Hệ thống ô cờ).
+   * TargetList = AllEnemies.Where(unit => unit.GridPosition != 8).
+   * Không quan tâm Unit đó là ai, miễn không đứng ô 8 là dính.
+ * Skill 3 Targeting:
+   * ValidTargets = AllEnemies.Where(unit => !unit.HasBuff("HVCP")).
+   * Selected = RandomPick(ValidTargets, 3).
+ * Nội Tại Chu Kỳ:
+   * OnTurnStart: ReductionActive = !ReductionActive.
+   * Nếu ReductionActive: IncomingDmg *= 0.3.
+Đánh giá: Bộ kit này cực kỳ độc đáo ("Gọn gàng mà chi tiết"). Hư Chủ không giết người bằng sát thương trực tiếp (trừ Skill 3), mà giết người bằng cách cô lập và phế bỏ khả năng tấn công của đối phương. Việc biến kẻ địch thành "bất tử nhưng vô hại" là một cơ chế câu giờ siêu hạng.
+
+
+31) Chào người anh em. Đây là bản hoàn thiện cho Số 7 (Subject 7).
+Đây là một nhân vật có cơ chế "Ký Sinh Trùng" (Parasite) cực kỳ độc đáo và phức tạp. Lối chơi xoay quanh việc mượn xác đồng minh để nuôi dưỡng bản thân, sau đó "lột xác" thành một sinh vật hoàn hảo miễn nhiễm mọi thứ.
+Tôi đã điều chỉnh lại Kỹ năng 2 để nó không phải là một nút bấm "phế" (chỉ bật/tắt) mà có tác dụng thực tế ngay khi dùng, đồng thời làm rõ logic Đoạt Xá.
+[SSR] VẬT CHỦ HOÀN HẢO – SỐ 7 (Subject 7)
+ * Class: Specialist / Shapeshifter.
+ * Role: Survivalist (Sinh tồn), Buffer (Khi ký sinh), Hyper-Carry (Sau khi đoạt xá).
+ * Đặc tính: Không thể Ký sinh/Đoạt xá lên Leader hoặc Prime.
+1. NỘI TẠI 1: Gen Tái Tạo & Tiến Hóa
+ * Tags: [Nội Tại], [Hồi Phục], [Tiến Hóa: Miễn Nhiễm], [Cơ Chế: Học Tập].
+ * Logic:
+   * Tái Tạo: Vào trận nhận vĩnh viễn +150% HP Regen.
+   * Chu Trình Tiến Hóa (Adaptive Evolution):
+     * Danh sách Debuff (9 loại): Stun (Choáng), Sleep (Ngủ), Bleed (Chảy máu), Fatigue (Kiệt sức), Silence (Câm lặng), Daze (Choáng váng), Weaken (Suy yếu), Fear (Sợ hãi), Venom (Độc).
+     * Cơ chế:
+       * Khi Số 7 dính 1 debuff trong danh sách \rightarrow Gán dấu ấn [Thích Nghi] của loại đó.
+       * Trong 2 lượt kế, nếu dính lại đúng loại debuff đó \rightarrow Tiêu hao dấu ấn, kích hoạt [Tiến Hóa].
+       * [Tiến Hóa]: Số 7 trở nên Miễn Nhiễm Vĩnh Viễn với loại debuff đó (Không thể bị xóa).
+     * Giới hạn: Tối đa 9 lần tiến hóa. Khi đạt mốc 6 Tiến Hóa, Số 7 coi như đạt trạng thái "Hoàn Hảo" (để kích hoạt Ult/Skill 1). (Giảm từ 9 xuống 6 để thực tế hơn trong PvP).
+2. NỘI TẠI 2: Quy Tắc Ký Sinh & Đoạt Xá
+ * Tags: [Nội Tại], [Cơ Chế: Nhập Xác], [Cơ Chế: Thay Thế], [Buff Vật Chủ].
+ * Logic:
+   * Ký Sinh (Parasitize):
+     * Số 7 biến mất khỏi bàn cờ (Trạng thái Hidden).
+     * Vật chủ nhận Buff: +70% Tất cả chỉ số hiện có của Số 7 (Cộng dồn vào chỉ số vật chủ).
+     * Trong lúc ký sinh, Số 7 hồi máu theo nội tại, không thể bị tấn công.
+   * Đoạt Xá (Possess - Body Snatch):
+     * Trigger: Hết thời gian ký sinh mà sân đầy, hoặc dùng Skill 3.
+     * Hành động:
+       * Giết Vật Chủ: Vật chủ chết ngay lập tức (HP về 0, trạng thái Permadeath - Không thể hồi sinh).
+       * Thừa Kế: Số 7 xuất hiện tại vị trí vật chủ. Nhận vĩnh viễn +50% Mọi chỉ số gốc của vật chủ.
+       * Thay Thế: Số 7 giữ nguyên bộ kỹ năng của mình, nhưng giữ lại tối đa 3 Nội tại của vật chủ (nếu hệ thống cho phép, hoặc đơn giản là lấy chỉ số).
+3. ĐÁNH THƯỜNG: Xúc Tu Ăn Mòn
+ * Tags: [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp].
+ * Logic:
+   * Gây sát thương 100% (WIL + ATK) lên 1 mục tiêu.
+4. KỸ NĂNG 1: Dẫn Chủ Ký Ấn
+ * Tags: [Chủ Động], [Ký Sinh], [Buff Tự Thân], [Tiêu Hao: Aether].
+ * Logic:
+   * Cost: 25 Aether.
+   * Trường hợp A (Chưa Hoàn Hảo - < 6 Tiến Hóa):
+     * Ký sinh vào đồng minh hợp lệ gần nhất trong 2 Lượt.
+     * Kết thúc:
+       * Nếu có ô trống \rightarrow Số 7 thoát ra ô trống.
+       * Nếu Full Sân \rightarrow Kích hoạt Đoạt Xá.
+   * Trường hợp B (Hoàn Hảo - \ge 6 Tiến Hóa):
+     * Không ký sinh.
+     * Tự nhận Buff +30% Toàn Bộ Chỉ Số trong 2 lượt.
+5. KỸ NĂNG 2: Kích Hoạt Tiến Hóa
+ * Tags: [Chủ Động], [Thanh Tẩy & Miễn Dịch], [Kích Hoạt Nội Tại], [0 Cost].
+ * Logic:
+   * Cost: 0 Aether. Cooldown: 3 Lượt.
+   * Hành động (Sửa lại để hữu dụng hơn):
+     * Ngay lập tức Bật cơ chế Chu Trình Tiến Hóa (nếu đang tắt).
+     * Thanh Tẩy Chủ Động: Xóa bỏ toàn bộ Debuff (trong danh sách 9 loại) đang có trên người.
+     * Tiến Hóa Tức Thì: Với mỗi Debuff bị xóa bởi kỹ năng này \rightarrow Tính là đã "Thích Nghi" và cấp Miễn Nhiễm Vĩnh Viễn ngay lập tức.
+   * Mục đích: Biến skill này thành công cụ "Outplay" debuff và tăng tốc độ tiến hóa.
+6. KỸ NĂNG 3: Đoạt Thai Quy Hồn
+ * Tags: [Chủ Động], [Sát Thương/Đoạt Xá], [Tiêu Hao: Aether].
+ * Logic:
+   * Trạng thái Ký Sinh (Đang trốn):
+     * Cost: 35 Aether.
+     * Hành động: Cưỡng chế Đoạt Xá vật chủ ngay lập tức (Giết chủ, hiện hình, lấy chỉ số).
+   * Trạng thái Thường:
+     * Cost: 25 Aether.
+     * Hành động: Tấn công 1 mục tiêu gây 180% Sát Thương Đánh Thường.
+     * Thưởng: Nếu kết liễu mục tiêu \rightarrow Hồi 20 Aether.
+7. ULTIMATE: Ký Chủ Tối Hậu
+ * Tags: [Tự Động], [Ký Sinh Dài Hạn], [Buff Cực Đại].
+ * Logic:
+   * Trigger: Đầy Nộ (Auto-cast).
+   * Logic Chọn Mục Tiêu: Đồng minh hợp lệ gần nhất (Manhattan Distance). Nếu không có \rightarrow Hủy cast, giữ Nộ, thử lại lượt sau.
+   * Trường hợp A (< 6 Tiến Hóa):
+     * Ký sinh trong 3 Lượt (Tính theo lượt hành động của Vật chủ).
+     * Trong thời gian này: Số 7 hồi máu, không làm gì cả (trừ phi dùng Skill 3 để phá kén).
+     * Kết thúc: Nếu sân Full \rightarrow Đoạt Xá. Nếu còn chỗ \rightarrow Thoát ra.
+   * Trường hợp B (\ge 6 Tiến Hóa):
+     * Số 7 gầm thét, nhận +65% Toàn Bộ Chỉ Số trong 3 lượt.
+GHI CHÚ KỸ THUẬT (CODER NOTES):
+ * State Machine (Quan Trọng):
+   * State_Normal: Có mặt trên sân, đánh/nhận đòn bình thường.
+   * State_Parasitic:
+     * IsVisible = false, IsTargetable = false.
+     * Vị trí trên Grid: Gắn kèm vào HostUnit.
+     * Stats_Host += Stats_7 * 0.7.
+     * OnTurnStart: Chỉ hồi máu/Nộ, không giảm CD skill active (trừ khi quy định khác).
+   * State_Possessing (Transition):
+     * HostUnit.Kill(Unrevivable).
+     * Subject7.BaseStats += HostUnit.BaseStats * 0.5.
+     * Subject7.Position = HostUnit.Position.
+     * Subject7.Appear().
+ * Cơ chế Tiến Hóa (Debuff Listener):
+   * Cần một Dictionary<DebuffType, int> để đếm số lần dính.
+   * OnApplyDebuff(target, type):
+     * Nếu type nằm trong list 9 loại:
+       * Nếu ImmuneList chứa type \rightarrow Block Debuff.
+       * Nếu chưa Immune \rightarrow DebuffCounter[type]++.
+       * Nếu DebuffCounter[type] >= 2 (hoặc dùng S2) \rightarrow Add ImmuneList, Clear DebuffCounter, EvolutionCount++.
+ * Logic "Full Sân" (Full Board Check):
+   * Khi thời gian Ký sinh kết thúc (End of Duration):
+     * Kiểm tra Board.GetEmptyTiles().
+     * Nếu Count > 0 \rightarrow ExitParasite(RandomEmptyTile).
+     * Nếu Count == 0 \rightarrow TriggerPossession().
+Tổng kết: Số 7 là một con quái vật về Late game. Nếu bạn để hắn "ăn" được một con Tanker máu trâu của phe mình, hắn sẽ trở thành Boss Raid với chỉ số khổng lồ và khả năng miễn nhiễm khống chế.
+
 
 B. Char pve: Các char dùng trong pve vẫn áp dụng rank như những char dành cho player nhưng vào pve +10% 10 chỉ số trước mới áp dụng nội tại nếu là char boss. Chúng sẽ dùng hệ thống AI tự sum và deck/cost như player chứ không có cố định như pve trong các game khác. Các char pve không sẽ không có kĩ năng để dễ phân biệt đâu là char pve cốt truyện không dành cho player đâu là char dành cho player gacha, vì không có kĩ năng nên đánh thường, nội tại và ult của chúng sẽ mạnh hơn char cho player gacha 1 chút, chúng không có rank cố định mà rank sẽ linh hoạt tùy theo màn pve:
 
-1) Boss: Matthew:
-Mô tả: Một nhà khoa học điên thích thí nghiệm trên người, hắn có những khối cơ bắp phình to trông phi nhân loại và hắn cho rằng đây là thí nghiệm thành công.
+1) [BOSS PvE] QUÁI VẬT SINH HÓA – MATTHEW
+ * Class: Tanker.
+ * Role: Stat Check (Kiểm tra chỉ số), Debuff Spreader (Gieo rắc hiệu ứng), Self-Sustain (Tự hồi phục).
+ * Đặc điểm: Càng đông kẻ địch càng mạnh, càng nhiều hiệu ứng xấu càng trâu.
+1. NỘI TẠI 1: Dữ Liệu Sinh Học (Hệ Số Mẫu Vật)
+ * Tags: [Nội Tại], [Scaling: Số Lượng Địch], [Chống Triệu Hồi].
+ * Logic:
+   * Cơ chế: Quét số lượng đơn vị địch đang đứng trên sân (Bao gồm Tướng và Lính triệu hồi, Trừ Leader/Chủ tướng).
+   * Hiệu ứng: Với mỗi đơn vị \rightarrow Tăng +7% Toàn Bộ 10 Chỉ Số cơ bản.
+   * Giới hạn: Tối đa +56% (Tương đương 8 unit).
+   * Tính động: Cập nhật Real-time. Nếu lính triệu hồi chết, chỉ số của Matthew giảm xuống ngay lập tức.
+2. NỘI TẠI 2: Cơ Thể Siêu Phàm
+ * Tags: [Nội Tại], [Hồi Phục Theo Lượt], [Trạng Thái: Cuồng Hóa].
+ * Logic:
+   * Tái Tạo: Sau mỗi lần Matthew hành động (Kết thúc lượt), hồi 3% Max HP.
+   * Ngưỡng Cuồng Hóa (Enrage):
+     * Trigger: Khi HP giảm xuống dưới 30%.
+     * Effect: Nhận thêm +15% Toàn Bộ Chỉ Số (Buff từ 10% lên 15% cho giai đoạn cuối kịch tính hơn).
+     * Đặc tính: Cộng dồn với Nội tại 1. Tồn tại đến hết trận (kể cả khi được hồi máu lên trên 30%).
+3. ĐÁNH THƯỜNG: Cú Đấm Biến Dị
+ * Tags: [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp], [RNG: Debuff].
+ * Logic:
+   * Gây sát thương 100% (WIL + ATK) lên 1 mục tiêu.
+   * Hiệu ứng: Áp dụng ngẫu nhiên 1 Debuff từ Pool 9 loại (Stun, Sleep, Bleed, Fatigue, Silence, Daze, Weaken, Fear, Venom).
+   * Thời gian Debuff: 1 Lượt (cho Hard CC: Stun/Sleep/Fear) hoặc 2 Lượt (cho Soft CC/DoT).
+4. KỸ NĂNG 1: Kích Thích Tố – Bạo Tẩu (Overdrive)
+ * Tags: [Chủ Động], [Buff Tự Thân], [Debuff Tự Thân: Điểm Yếu], [Tiêu Hao: Aether].
+ * Logic:
+   * Cost: 25 Aether.
+   * Buff:
+     * Tăng +20% ATK và +20% WIL (2 Lượt).
+     * Nhận trạng thái [Frenzy] (Cuồng Bạo): Đòn đánh thường gây thêm +20% sát thương (2 Lượt).
+   * Debuff (Cơ hội cho người chơi): Matthew nhận thêm +15% Sát Thương Nhận Vào trong 1 lượt kế tiếp. (Tăng từ 10% lên 15% để thưởng cho người chơi biết canh thời điểm dồn damage).
+5. KỸ NĂNG 2: Màn Sương Độc Tố
+ * Tags: [Chủ Động], [Đa Mục Tiêu: Ngẫu Nhiên], [Sát Thương Điều Kiện], [Gắn Debuff].
+ * Logic:
+   * Cost: 20 Aether.
+   * Mục tiêu: 3 Kẻ địch ngẫu nhiên.
+   * Sát thương Cơ Bản: 130% Sát Thương Đánh Thường.
+   * Sát thương Cường Hóa: Nếu mục tiêu đang có \ge 1 Debuff \rightarrow Sát thương tăng lên 160%.
+   * Hiệu ứng: Gán thêm 1 Debuff ngẫu nhiên (Pool 9) cho mỗi mục tiêu trúng đòn.
+6. KỸ NĂNG 3: Thu Hồi Mẫu Thất Bại
+ * Tags: [Chủ Động], [Hấp Thụ Debuff], [Thanh Tẩy Địch], [Scaling Vĩnh Viễn], [Hồi Phục].
+ * Logic:
+   * Cost: 30 Aether.
+   * Hành động: Chọn tối đa 3 kẻ địch đang có Debuff.
+   * Cơ chế Hấp Thụ (Absorb):
+     * Gỡ bỏ (Cleanse) toàn bộ Debuff trên các mục tiêu đó.
+     * Với mỗi 1 Debuff gỡ được:
+       * Hồi phục 4% Max HP.
+       * Tăng vĩnh viễn +4% Max HP, +4% ATK, +4% WIL.
+   * Giới hạn (Cap):
+     * Chỉ số cộng thêm tối đa +100% trong cả trận.
+     * Lưu ý: Skill này khiến Matthew mạnh lên khủng khiếp nếu người chơi để Debuff stack quá nhiều. Hắn "ăn" bệnh của người chơi để nuôi cơ bắp.
+7. ULTIMATE: Cực Hạn – Bùng Nổ Gen
+ * Tags: [Tự Động], [AOE: Toàn Sân], [Sát Thương Điều Kiện], [Tạo Khiên], [Gắn Debuff].
+ * Logic:
+   * Trigger: Đầy Nộ (Auto-cast).
+   * Sát thương: Gây 140% Sát Thương Đánh Thường lên toàn bộ kẻ địch.
+   * Điều kiện: Nếu mục tiêu có \ge 1 Debuff trước khi trúng đòn \rightarrow Sát thương là 200%.
+   * Hiệu ứng: Áp dụng 1 Debuff ngẫu nhiên cho mỗi kẻ địch.
+   * Phòng thủ: Sau khi gây sát thương, tạo lớp [Khiên Máu] = 10% Tổng sát thương đã gây ra. (Tối đa Shield = 100% Max HP).
+GHI CHÚ KỸ THUẬT (CODER NOTES):
+ * Pool Debuff (9 Loại):
+   * Cần hàm ApplyRandomDebuff(Target):
+     * Type = RandomPick([Stun, Sleep, Bleed, Fatigue, Silence, Daze, Weaken, Fear, Venom]).
+     * Lưu ý: Nếu Boss đánh thường liên tục, tỷ lệ ra Hard CC (Stun/Sleep) nên được Weight (Trọng số) thấp hơn một chút để tránh việc người chơi bị khóa chết không được chơi game (trừ khi game Hardcore).
+     * Gợi ý Weight: HardCC (Stun/Sleep/Fear): 10% each, SoftCC/DoT: ~11.6% each.
+ * Skill 3 (Hấp Thụ):
+   * Logic:
+     total_debuffs_removed = 0
+targets = GetEnemiesWithDebuffs(limit=3)
+for t in targets:
+    count = t.DebuffCount
+    t.CleanseAllDebuffs() # Gỡ debuff cho địch (Boss buff cho mình)
+    total_debuffs_removed += count
 
-Hệ Số Mẫu Vật: +5% cho 10 chỉ số của bản thân mỗi đơn vị đối địch đang đứng sân (không tính Leader). Tối đa +40%. Tính động theo số lượng hiện diện.
-Tái Tạo Cơ Bắp: sau mỗi lượt hành động, hồi HP = 2% Max HP.
-Ngưỡng Cuồng Hóa: khi HP <30%, nhận thêm +10% 10 chỉ số (stack với trên) đến hết trận.
+# Apply Buff to Boss
+stat_bonus = total_debuffs_removed * 0.04
+boss.AddPermanentStats(stat_bonus, cap=1.0) # Cap 100%
+boss.Heal(boss.MaxHP * stat_bonus)
 
-Đánh thường: Gây 100% ATK + 100% WIL lên 1 mục tiêu và áp 1 debuff ngẫu nhiên trong pool 9 loại (stun, sleep, bleed, fatigue, silence, daze, weaken, fear, venom).
+ * Chiến Thuật Counter:
+   * Người chơi cần mang theo tướng có khả năng Thanh Tẩy (Cleanse) hoặc Miễn Nhiễm Khống Chế để ngăn Matthew dùng Skill 3 tích stack.
+   * Hạn chế dùng đội hình Summoner (Triệu hồi) để tránh buff Nội tại 1 của hắn lên quá cao (+56%).
+Tổng kết: Matthew là một Boss dạng "Stat-check". Nếu đội hình bạn không đủ sát thương để giết hắn trước khi hắn tích đủ 100% stack (từ Skill 3) hoặc không tẩy được Debuff, hắn sẽ trở thành một con quái vật bất tử một đấm chết luôn.
 
-Kỹ năng 1 — Huyết Thanh Overdrive (25 aether)
-Tự +20% ATK/WIL trong 2 lượt, nhận frenzy (đánh thường +20% dmg) 2 lượt. Nhược điểm: nhận +10% dmg trong 1 lượt kế tiếp (có counterplay).
-
-Kỹ năng 2 — Khí Độc Phòng Mổ (20 aether)
-Phun mây hóa chất, chọn 3 kẻ địch ngẫu nhiên: mỗi mục tiêu nhận 130% đòn đánh thường và bị gán 1 debuff ngẫu nhiên (từ pool 9). Nếu mục tiêu đã có ≥1 debuff sẵn, sát thương tăng lên 160%.
-
-Kỹ năng 3 — Thu Hoạch Mẫu Vật (30 aether)
-Hấp thụ “bệnh trạng”: với tối đa 3 kẻ địch đang có debuff, Mỗi 1 debuff đã gỡ sẽ tăng 4% max hp (hồi luôn 4% Max HP đó) + 4% wil và atk của Matthew/trên mỗi debuff đã gỡ, + tối đa 100%. (tính riêng từng mục tiêu).
-
-Ultimate (auto-cast khi đầy nộ)
-Cấm Nghiệm: Bùng Nổ Hormon
-Gây 140% đòn đánh thường lên toàn bộ kẻ địch và áp 1 debuff ngẫu nhiên cho từng mục tiêu. Với mục tiêu đã có sẵn ≥1 debuff trước khi chém, sát thương trên mục tiêu đó nâng lên 200%. Sau cùng, Matthew nhận giáp máu bằng 10% tổng sát thương đã gây (overshield tối đa = 100% Max HP).
 
 2) Creep #1 (không cần quyết định rank cụ thể mà rank của creep #1, #2 và #3 sẽ linh hoạt theo cấp độ pve)
 Mô tả: creep pvp thường dùng, không phải boss
-Nội tại: +2% tất cả chỉ số khi vào trận, khi hp về 0 thì các creep khác còn sống sẽ được hồi hp = 3% hp max của creep này.
+Nội tại: +5% tất cả chỉ số khi vào trận, khi hp về 0 thì các creep khác còn sống sẽ được hồi hp = 3% hp max của creep này.
 Đánh thường: gây sát thương = 100% atk và wil
 Không có ult, chỉ đánh thường.
 
 3) creep #2
 Mô tả: như creep 1# nhưng ngoại hình sẽ khác creep 1 để dễ phân biệt.
-Nội tại: +3% tất cả chỉ số khi vào trận, khi hp về 0 thì các creep khác còn sống sẽ được hồi hp = 4% hp max của creep này. (Miễn là creep thì sẽ áp dụng).
+Nội tại: +7% tất cả chỉ số khi vào trận, khi hp về 0 thì các creep khác còn sống sẽ được hồi hp = 4% hp max của creep này. (Miễn là creep thì sẽ áp dụng).
 Đánh thường: gây sát thương = 100% atk và wil
 Không có ult, chỉ đánh thường.
 
 4) creep #3
 Mô tả: như creep 1# nhưng ngoại hình sẽ khác creep #1 và #2 để dễ phân biệt.
-Nội tại: +4% tất cả chỉ số khi vào trận, khi hp về 0 thì các creep khác còn sống sẽ được hồi hp = 5% hp max của creep này. (Miễn là creep thì sẽ áp dụng).
+Nội tại: +10% tất cả chỉ số khi vào trận, khi hp về 0 thì các creep khác còn sống sẽ được hồi hp = 5% hp max của creep này. (Miễn là creep thì sẽ áp dụng).
 Đánh thường: gây sát thương = 100% atk và wil
 Không có ult, chỉ đánh thường.
 
@@ -2173,11 +2728,143 @@ onKidnap(target):
       if (variant==HapHuyet) boss.heal(0.15 * boss.maxHp)
   }
 
+9) BOSS PVE: VẠN ĐỘC CỔ VƯƠNG - NAGARI
+Biệt danh: Kẻ Gieo Rắc Tai Ương, Chúa Tể Đầm Lầy.
+Role: BOSS (World/Stage Boss)
+Vị trí: Trung tâm lưới 3x3 (Chiếm 1 ô, nhưng hitbox coi như trùm sò).
+1. CHỈ SỐ CƠ BẢN (BOSS SCALING)
+Ghi chú: Boss có chỉ số vượt trội so với nhân vật Gacha cùng cấp độ.
+ * HP: S (Cực cao - "Bao cát thịt").
+ * ATK/WIL: A (Khá - Chủ yếu gây dmg qua Độc).
+ * Arm/RES: A (Trâu bò).
+ * SPD: B (Trung bình - Để player có lượt thở).
+ * Miễn Nhiễm (Passive ẩn): Miễn dịch [Choáng], [Ngủ], [Mê Hoặc], [Tử Vong Tức Thì]. Kháng 80% sát thương theo %HP (như Đốt cháy chuẩn).
+2. BỘ KỸ NĂNG (SKILL SET)
+Nội Tại 1: Độc Vụ Di Thiên (Toxic Domain)
+ * Tags: [Nội Tại], [Địa Hình], [DOT], [Không Thể Xóa].
+ * Mô tả:
+   * Ngay khi vào trận, phủ "Độc Vụ" lên toàn bộ 9 ô của phe người chơi.
+   * Hiệu ứng: Kết thúc mỗi lượt của nhân vật người chơi, nhân vật đó chịu sát thương Chuẩn (True Damage) = 3% Max HP của bản thân + 1 Stack "Trúng Độc".
+   * Trúng Độc (Debuff): Giảm 5% Hồi máu nhận được (Stack tối đa 10 tầng = Giảm 50% hồi máu). Kéo dài 3 lượt.
+Nội Tại 2: Huyết Tế Cuồng Lan (Berserker's Blood)
+ * Tags: [Nội Tại], [Buff Chỉ Số], [Điều Kiện: HP Thấp].
+ * Mô tả:
+   * Sức mạnh của Nagari tỉ lệ nghịch với lượng máu hiện tại.
+   * Ngưỡng 70% HP: Tăng 20% ATK & WIL.
+   * Ngưỡng 40% HP: Tăng thêm 20% Giảm Sát Thương (Damage Reduction) và Kháng Hiệu Ứng (RES).
+   * Ngưỡng 10% HP (Hấp Hối): Tăng 50% SPD và đòn đánh thường trở thành AOE (Đánh lan 3 mục tiêu).
+Nội Tại 3: Độc Giáp Phản Phệ (Poison Armor)
+Tags: [Nội Tại], [Phản Đòn], [Tương Tác: Sát Thủ].
+Logic (Chống Sát Thủ/Sniper):
+Vì đứng ô 8, kẻ nào muốn đánh Boss phải dùng Skill tầm xa hoặc Sát thủ nhảy cầu.
+Hiệu ứng: Khi Nagari chịu sát thương trực tiếp (không phải DOT/Phản đòn):
+Gây sát thương Chuẩn = 30% ATK của Nagari ngược lại kẻ tấn công.
+Nếu kẻ tấn công thuộc lớp Sát Thủ (Assassin) hoặc đang đứng ở Hàng Sau (7, 8, 9) phe địch: Gây thêm Choáng (Stun) 1 lượt (Do hít phải độc đậm đặc quanh người Boss).
+Kỹ Năng 1 (Active): Triệu Hồi - Bức Tường Thịt (Summon: Meat Wall)
+Tags: [Chủ Động], [Triệu Hồi], [Chiến Thuật: Blocking].
+Tiêu Hao: Cost Bar (AI tự tính).
+Mô tả:
+Nagari triệu hồi Thi Độc Cổ (Creep).
+Quy tắc chọn ô (Priority):
+Ưu tiên tuyệt đối Ô 5 (Che mặt trực tiếp).
+Nếu Ô 5 có người -> Ô 2 (Che lớp 2).
+Nếu 2, 5 đầy -> Random các ô 4, 6 (Bảo vệ cánh).
+Logic Creep: Creep này có chỉ số DEF/HP rất cao nhưng ATK thấp (Chuyên để làm bao cát kích hoạt Blocking rule). Khi chết nổ độc như cũ.
+Kỹ Năng 2 (Passive): Hơi Thở Của Đất (Late Turn Scaling)
+Tags: [Nội Tại], [Cuối Lượt], [AOE].
+Mô tả:
+Do Boss đánh gần cuối (Ô 8), hắn tận dụng việc các nhân vật khác đã hành động xong.
+Hiệu ứng: Đến lượt hành động của Boss (Turn 8B):
+Kích nổ toàn bộ các stack "Trúng Độc" trên người kẻ địch.
+Mỗi stack gây 50% ATK sát thương phép. (Sau khi nổ, stack không mất đi mà chỉ reset thời gian hiệu lực).
+Lý do: Để trừng phạt team địch đã dính độc từ Creep/Môi trường trong suốt các lượt 1->7 trước đó.
+Kỹ Năng 3: Triệu Hồi - Thi Độc Cổ (Summon: Corpse Gu)
+ * Tags: [Chủ Động], [Triệu Hồi], [Tiêu Hao: 20 AE].
+ * Mô tả:
+   * Triệu hồi 2 con Thi Độc Cổ (Rank Elite - Creep) vào các ô trống ngẫu nhiên bên phe Boss.
+   * Thuộc tính Creep: Máu giấy, nhưng có nội tại "Cảm Tử". Khi chết (bị giết hoặc tự nổ), gây sát thương Độc = 100% ATK Boss lên 1 kẻ địch ngẫu nhiên và gán 2 Stack "Trúng Độc".
+Tuyệt Kỹ (Ultimate): Thôn Phệ Bát Hoang (Devour)
+ * Tags: [Tự Động], [Hồi Phục], [Sát Thương Hỗn Hợp], [Pháp Tắc].
+ * Mô tả: (Tự kích hoạt khi đầy Nộ hoặc khi HP dưới 30% mà skill chưa hồi chiêu).
+   * Giai đoạn 1 (Hấp Thụ): Nagari lập tức Ăn sống toàn bộ "Thi Độc Cổ" đang có trên sân.
+     * Mỗi con Cổ Trùng bị ăn hồi phục cho Boss 10% Max HP.
+   * Giai đoạn 2 (Phun Độc): Sau khi ăn (hoặc nếu không có gì để ăn), Boss phun một luồng độc cực mạnh vào toàn bộ đội hình người chơi.
+     * Gây 250% (ATK + WIL) sát thương.
+     * Nếu mục tiêu đang có trên 3 Stack "Trúng Độc", sát thương tăng thêm 50% (Thành 375%).
+     Nếu trên sân phe Boss không còn Creep nào (Tức là Boss đang bị hở sườn, mất Blocking), Ult sẽ lập tức triệu hồi 2 con Thi Độc Cổ vào ô 2 và 5 ngay sau khi gây sát thương (Cấp cứu khẩn cấp).
+3. GHI CHÚ KỸ THUẬT CHO CODER (LOGIC TRIỂN KHAI)
+A. Logic Nội Tại Scaling (Berserker)
+Dùng hàm check mỗi khi Boss nhận sát thương (OnTakeDamage):
+// Pseudo-code logic
+function updateBossStats(boss: Unit) {
+  let hpPercent = boss.currentHP / boss.maxHP;
+  
+  // Reset bonus trước khi tính lại để tránh cộng dồn sai
+  boss.bonusATK = 0;
+  boss.damageReduction = 0;
+  boss.bonusSPD = 0;
+  boss.isAOEAttack = false;
+
+  if (hpPercent <= 0.70) {
+    boss.bonusATK += 0.20; // +20%
+    boss.bonusWIL += 0.20; 
+  }
+  if (hpPercent <= 0.40) {
+    boss.damageReduction += 0.20; // Giảm 20% dmg nhận vào
+    boss.bonusRES += 0.20;
+  }
+  if (hpPercent <= 0.10) {
+    boss.bonusSPD += 0.50; // Tăng tốc
+    boss.isAOEAttack = true; // Flag đổi mode đánh thường
+    // VFX: Boss chuyển sang màu đỏ rực
+  }
+}
+
+B. Logic Ultimate (Ăn Creep Hồi Máu)
+Xử lý thứ tự ưu tiên trong hàm CastUltimate:
+function castDevour(boss: Unit, battleField: Grid) {
+  let minions = battleField.getUnitsByTag("Thi Độc Cổ");
+  let totalHeal = 0;
+
+  // Giai đoạn 1: Ăn đệ
+  for (let minion of minions) {
+    // Boss ăn đệ -> Đệ chết không kích hoạt nội tại nổ damage (Silent Kill)
+    minion.die(silent = true); 
+    totalHeal += boss.maxHP * 0.10;
+  }
+  
+  // Heal cho Boss
+  boss.heal(totalHeal);
+  triggerVFX("Boss_Eat_Animation");
+
+  // Giai đoạn 2: Nuke Damage
+  let enemies = battleField.getEnemiesOf(boss);
+  for (let enemy of enemies) {
+    let damage = (boss.ATK + boss.WIL) * 2.5;
+    
+    // Check stack độc
+    let poisonStacks = enemy.getBuffStack("Trúng Độc");
+    if (poisonStacks >= 3) {
+      damage *= 1.5; // Bonus damage
+    }
+    
+    enemy.takeDamage(damage);
+  }
+}
+
+4. ĐÁNH GIÁ SỨC MẠNH & CÁCH KHẮC CHẾ
+ * Độ khó: Rất cao nếu đánh lâu dài (Stall team sẽ thua vì Độc tích stack giảm hồi máu).
+ * Điểm yếu:
+   * Dồn sát thương (Burst): Cần giết Boss nhanh trước khi nó xuống mốc 10% HP hoặc trước khi nó kịp hồi máu bằng cách ăn đệ.
+   * Kiểm soát Creep: Giết "Thi Độc Cổ" ngay khi nó vừa ra (chấp nhận chịu dmg nổ) để Boss không có gì để ăn hồi máu (Denied Heal).
+   * Debuff Cấm Hồi Máu: Dùng nhân vật có skill [Cấm Hồi Máu] (như Tu La trong file ý tưởng) là khắc tinh cứng.
+
+
 C. Leader
-0) Uyên: hiện có trong tệp "các lưu ý...txt"
+0) Uyên:
 1) Linesetter
 2) Sinh Mệnh Chi Chủ (khác với Nữ Thần Sinh Mệnh), nam
-Nội tại: Sinh Mệnh Cội Nguồn: mỗi đồng minh đứng trên sân sau khi thực thi turn được hồi hp = 2% max hp của leader này (áp dụng với leader này luôn), luôn hoạt động, không thể cướp, xoá bỏ, lãng quên hay sao chép.
+Nội tại: Sinh Mệnh Cội Nguồn: mỗi đồng minh đứng trên sân sau khi thực thi turn được hồi hp = 4% max hp của leader này (áp dụng với leader này luôn), luôn hoạt động, không thể cướp, xoá bỏ, lãng quên hay sao chép.
 
 3) Nguyền Rủa Chi Chủ, nam
 Nội tại: hiệu quả hồi phục (hồi hp và aether) của kẻ địch trên sân giảm 40%.
@@ -2187,19 +2874,105 @@ Nguyền Rủa: kẻ thù nhận sát thương bởi leader này nhận 1 debuff
 Nội tại: mọi sát thương gây ra gây hiệu ứng sợ hãi và mù lên kẻ địch và hồi hp cho bản thân = 10% mọi sát thương bản thân gây ra.
 Bóng Tối Vĩnh Hằng: gây sát thương aoe toàn sân = 250% sát thương đòn đánh thường, áp dụng nội tại.
 
-5) Song Sinh Tịnh Đế Liên, nữ. Leader. Tuân theo hệ thống rank và lv như những nhân vật khác trong mục A.
-Mô tả: một đoá sen hoá hình, đánh từ xa.
+5) Chào người anh em. Đây là một bài toán thiết kế rất thú vị và đậm chất RPG cổ điển: Leader (Chủ Tướng) thăng tiến sức mạnh theo cốt truyện.
+Việc thiết kế Leader có khả năng phân thân (Summoner) là một con dao hai lưỡi:
+ * Mạnh: Kiểm soát bàn cờ, sát thương đa điểm, buff chỉ số khủng.
+ * Yếu: Leader chết là thua. Nếu cơ chế "Chia sẻ HP" không làm khéo, một cú AOE của địch sẽ khiến Leader đột tử vì nhận 9 lần sát thương cùng lúc.
+Dưới đây là thiết kế chi tiết cho Song Sinh Tịnh Đế Liên ở trạng thái Hoàn Chỉnh (UR), kèm theo Lộ Trình Thăng Hạng (Evolution Path) từ R lên Prime để giải quyết vấn đề "biến động bộ kit" mà ông lo ngại.
+[LEADER - UR] SONG SINH TỊNH ĐẾ LIÊN
+ * Class: Leader / Summoner.
+ * Role: Field Marshall (Kiểm soát sân), Stat Stacker (Tích chỉ số), Flexible (Đa dụng).
+ * Đặc tính: Leader (Chết = Thua).
+1. NỘI TẠI: Liên Hoa Tịnh Thế (Lotus World)
+ * Tags: [Nội Tại], [Triệu Hồi: Phân Thân], [Chia Sẻ Sát Thương], [Cơ Chế: Hợp Nhất].
+ * Logic Hoạt Động:
+   * Sinh Sôi: Mỗi 3 Lượt, triệu hồi 1 [Phân Thân Liên Hoa] tại ô trống ngẫu nhiên.
+     * Tối đa 8 Phân Thân (Tổng 9 đơn vị tính cả Chân Thân).
+     * Thừa hưởng: 100% Chỉ số, Buff/Debuff của Chân Thân.
+   * Cộng Hưởng Sức Mạnh: Với mỗi Phân Thân trên sân, tất cả (bao gồm Chân Thân) nhận +10% Toàn Bộ Chỉ Số. (Max +80%).
+   * Liên Kết Sinh Mệnh (Quan Trọng):
+     * Tất cả HP được liên kết thành một bể chung ảo hoặc chia sẻ sát thương.
+     * Quy tắc Chia Sẻ: Khi 1 đơn vị bị tấn công, sát thương được chia đều cho tất cả các đơn vị đang sống.
+     * Giảm Thương AOE: Để tránh đột tử, sát thương diện rộng (AOE) nhận vào bị giảm 40% trước khi chia sẻ.
+   * Hợp Nhất (Fusion):
+     * Nếu sân Đầy (Full 9 ô): Tất cả Phân Thân biến mất, nhập vào Chân Thân.
+     * Chân Thân hồi phục 100% HP, Xóa sạch Debuff.
+     * Nhận Buff vĩnh viễn: +50% Toàn Bộ Chỉ Số (Thay thế cho lượng +% từ các phân thân đã mất). Reset chu kỳ triệu hồi.
+2. ĐÁNH THƯỜNG: Tịnh Tâm Kích
+ * Tags: [Đơn Mục Tiêu], [Tầm Xa].
+ * Logic:
+   * Chân Thân bắn đạn sen gây 100% (WIL + ATK).
+   * Đặc biệt: Khi tấn công, tất cả Phân Thân trên sân cũng thực hiện đòn đánh thường vào cùng mục tiêu đó (hoặc mục tiêu gần chúng nhất nếu tầm xa không tới).
+3. ULTIMATE (Chọn 1 trong 3 trước trận hoặc trong trận)
+Người chơi phải chọn chiến thuật (Aggro/Defense/Snipe) thông qua việc chọn Ult.
+ * Lựa chọn A: Liên Hoa Bạo (Nuke/AoE)
+   * Cơ chế: Chọn 1 Phân Thân để Tự Hủy.
+   * Sát thương: Gây 200% (ATK + WIL) lên Toàn Bộ Kẻ Địch.
+   * Giới hạn: Tối đa 8 lần/trận (tương ứng số phân thân tối đa). Không thể dùng nếu không có phân thân.
+   * Hậu quả: Mất 1 phân thân \rightarrow Giảm 10% chỉ số cộng thêm từ nội tại.
+ * Lựa chọn B: Tịnh Độ Nở Rộ (Defense/Scaling)
+   * Cơ chế: Tất cả Phân Thân và Chân Thân tiến vào trạng thái [Nở Hoa].
+   * Thời gian: 3 Lượt (Hạt sen chín).
+   * Hiệu ứng:
+     * Trong 3 lượt này, mỗi lượt trôi qua, toàn bộ phe ta nhận +10% ARM/RES (Cộng dồn).
+     * Kết thúc 3 lượt: Hồi phục 30% Max HP cho toàn đội.
+     * Lưu ý: Nếu Phân thân bị diệt trong quá trình này, hiệu quả buff giảm tương ứng.
+ * Lựa chọn C: Nhất Niệm Khai Thiên (Snipe/Single Line)
+   * Cơ chế: Chân Thân tụ lực bắn chưởng năng lượng cực mạnh.
+   * Phạm vi: Cột dọc trước mặt (Ví dụ đứng ô 5 bắn cột 2-5-8).
+   * Sát thương: Gây 230% Sát Thương Đánh Thường xuyên thấu mọi mục tiêu trên đường thẳng.
+   * Tương tác: Mỗi Phân Thân trên sân cũng bắn 1 tia nhỏ gây 50% sát thương hỗ trợ vào cột dọc của riêng chúng.
+LỘ TRÌNH THĂNG HẠNG (EVOLUTION PATH)
+Để giải quyết vấn đề "Leader từ phế vật thành thần", bộ kit sẽ mở khóa dần các tính năng:
+1. Giai Đoạn RANK R (Khởi Nguyên - Song Sinh)
+ * Nội tại: Chỉ triệu hồi được 1 Phân Thân (Tổng 2 unit). Chỉ số cộng thêm +5%. Chia sẻ sát thương (Chưa có giảm AOE).
+ * Ult: Chỉ có Lựa chọn C (Bắn chưởng) nhưng sát thương thấp (150%). Chưa có cơ chế bắn hỗ trợ từ phân thân.
+ * Lore: Đoá sen mới chớm nở, chỉ có một cái bóng song sinh bảo vệ.
+2. Giai Đoạn RANK SR (Trưởng Thành - Tịnh Đế)
+ * Nội tại: Triệu hồi tối đa 3 Phân Thân. Chỉ số cộng thêm +8%/bé. Có giảm 20% sát thương AOE.
+ * Ult: Mở khóa Lựa chọn A (Tự Hủy). Sát thương 150%.
+ * Lore: Sen bắt đầu mọc rễ sâu, lan ra xung quanh.
+3. Giai Đoạn RANK SSR (Giác Ngộ - Thiên Diệp)
+ * Nội tại: Triệu hồi tối đa 6 Phân Thân. Chỉ số +10%/bé. Giảm 30% AOE. Bắt đầu có cơ chế Hợp Nhất (Nhưng chỉ hồi máu, chưa cộng chỉ số vĩnh viễn).
+ * Ult: Mở khóa Lựa chọn B (Nở Hoa).
+ * Lore: Cả đầm sen nở rộ, bảo vệ chủ nhân.
+4. Giai Đoạn RANK UR (Như bộ kit trên)
+ * Nội tại: Max 8 Phân Thân. Hợp Nhất cộng chỉ số vĩnh viễn. Giảm 40% AOE.
+ * Ult: Full 3 lựa chọn với sức mạnh tối đa.
+5. Giai Đoạn PRIME (Chân Thần - Liên Hoa Chi Chủ)
+ * Thần Tính: Phân thân trở thành "Hư Ảnh" (Không thể bị chọn làm mục tiêu, không nhận sát thương, nhưng vẫn gây damage).
+ * Nội tại: Leader miễn nhiễm sát thương nếu còn ít nhất 1 Phân Thân (Sát thương chuyển hết sang phân thân và phân thân biến mất thay cho chủ).
+ * Ult: Có thể kích hoạt cả 3 hiệu ứng cùng lúc hoặc 1 hiệu ứng cấp Thần (Ví dụ: Tự hủy phân thân nhưng phân thân... hồi sinh lại ngay sau đó).
+CÂN BẰNG & GHI CHÚ KỸ THUẬT (CODER NOTES)
+ * Cơ chế Chia Sẻ Sát Thương (Shared HP Logic):
+   * Đây là phần khó nhất. Nếu code đơn giản Damage / Count, Leader sẽ chết rất nhanh khi gặp Cleave/AOE.
+   * Giải pháp:
+     def OnTakeDamage(target, damageInfo):
+    if target.isLotusEntity:
+        all_lotuses = GetAllLivingLotuses()
+        count = len(all_lotuses)
 
-Nội tại: Sau 3 turn triệu hồi một bản thân khác, cùng hưởng mọi chỉ số, debuff/buff, mỗi lần triệu hồi bản thân mới, tất cả bản thân sẽ được +10% mọi chỉ số, triệu hồi tối đa 9 bản thân trong trận. Hp của tất cả bản thân liên kết với nhau, khi 1 bản thân nhận sát thương thì sẽ chia đều sát thương đó cho tất cả bản thân. Khi trong sân đầy ô thì tất cả bản thân cũ sẽ hợp nhất, cộng dồn tất cả chỉ số của các bản thân chưa hợp nhất vào bản thân đã hợp nhất, xoá mọi buff và debuff. Nếu 1 bản thân chết thì trừ hiệu ứng +10% mọi chỉ số từ nội tại.
+        # Giảm AOE nếu đòn đánh trúng nhiều mục tiêu
+        if damageInfo.isAOE:
+            damageInfo.value *= 0.6 # Giảm 40% (UR)
 
-Ult: player cần chọn thủ công 1 trong 3, 3 ult này cần được đặt tên.
-1. Tự bạo 1 Bản Thân, gây sát thương= 300% atk/wil lên toàn bộ kẻ thù có mặt trên sân, giới hạn dùng tối đa 8 lần/trận.
+        # Chia đều sát thương
+        split_damage = damageInfo.value / count
 
-2. Tất cả Bản Thân sẽ bắt đầu nở hoa sen, hạt sen sẽ chín trong 3 turn, khi hạt sen chín, tất cả bản thân tăng 10% res và arm/mỗi hạt sen chín. Nếu trong quá trình này có Bản Thân chết thì lượng hạt sen nở sẽ giảm. Trong quá trình nở sen vẫn tấn công, dùng kĩ năng, đánh thường, né/chặn/phản đòn như bình thường.
+        for lotus in all_lotuses:
+            lotus.ApplyDirectDamage(split_damage)
 
-3. Chưởng 1 chưởng, Gây sát thương hàng dọc (ô 2/5/8, xem ảnh giải thích về lượt đánh trong repo để hiểu rõ) mỗi kẻ địch đứng trên hàng dọc này nhận sát thương = 230% đánh thường của bản thân nhân vật này.
+        return 0 # Hủy damage gốc vào target ban đầu để tránh tính 2 lần
 
-Đánh thường: gây sát thương = 100% wil và atk lên 1 mục tiêu
+ * Cơ chế Hợp Nhất (Fusion):
+   * Kiểm tra Board.IsFull() vào cuối lượt.
+   * Nếu Full \rightarrow Trigger Animation thu hồi.
+   * Lưu biến FusedStack để cộng chỉ số vĩnh viễn cho Leader.
+ * Tương tác Đánh Thường (Assist Attack):
+   * Khi Leader đánh thường, Phân thân cũng đánh. Cần set DamageCoefficient cho phân thân thấp hơn (ví dụ 50%) nếu không DPS sẽ quá lỗi (9 unit cùng bắn 100% dmg = 900% dmg mỗi lượt free).
+   * Khuyến nghị: Phân thân chỉ gây 30-40% sát thương đòn đánh thường của Leader.
+Tổng kết: Với thiết kế này, Leader của bạn sẽ có cảm giác "mạnh dần lên" theo cốt truyện. Từ việc phải dè dặt bảo vệ 1 cái bóng (Rank R) đến việc điều khiển cả một quân đoàn cảm tử (Rank UR).
+
 
 ------
 
