@@ -88,20 +88,20 @@ __define('./aether.ts', (exports, module, __require) => {
           this.container.id = `aether-pool-${this.side}`;
           // Style động, sẽ được update vị trí bởi engine
           Object.assign(this.container.style, {
-              position: 'fixed', // QUAN TRỌNG: Fixed để bám theo toạ độ màn hình
+              position: 'fixed',
               width: '14px',
               height: '0px',
-              border: '1px solid rgba(255,255,255,0.3)',
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              borderRadius: '2px',
+              border: '1px solid rgba(255,255,255,0.5)',
+              backgroundColor: 'rgba(9, 14, 21, 0.85)', // Màu nền tối hơn để nổi bật
+              borderRadius: '3px',
               overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column-reverse',
-              zIndex: '1', // Z-index thấp để không che các UI quan trọng khác
+              zIndex: '9999', // Đẩy lên trên cùng mọi lớp Canvas/UI
               pointerEvents: 'none',
-              transition: 'opacity 0.1s', // Giảm thời gian để mượt hơn khi zoom nhanh
+              transition: 'opacity 0.1s',
               transformOrigin: 'bottom center',
-              boxShadow: '0 0 8px rgba(0,0,0,0.5)'
+              boxShadow: `0 0 15px ${this.side === 'ally' ? '#00ffff' : '#ff3366'}`
           });
           const color = this.side === 'ally' ? '#00ffff' : '#ff3366';
           this.container.style.boxShadow = `0 0 6px ${color}`;
@@ -144,29 +144,24 @@ __define('./aether.ts', (exports, module, __require) => {
       syncVisuals(screenX, screenY, scale) {
           if (!this.container)
               return;
-          // Ẩn nếu zoom quá nhỏ (scale < 0.2) hoặc toạ độ âm (ra ngoài màn hình)
-          // Giúp tối ưu hiệu năng và tránh lỗi hiển thị lạ
-          if (scale < 0.2 || screenX < -50 || screenY < -50) {
-              this.container.style.opacity = '0';
+          // Bỏ qua điều kiện ẩn âm toạ độ, chỉ ẩn khi zoom quá bé
+          if (scale < 0.1) {
+              this.container.style.display = 'none';
               return;
           }
+          this.container.style.display = 'flex';
           this.container.style.opacity = '1';
-          // Điều chỉnh kích thước trụ theo Scale màn hình
-          const w = Math.max(6, 14 * scale); // Độ rộng
-          const h = Math.max(20, 90 * scale); // Độ cao
+          const w = Math.max(8, 16 * scale);
+          const h = Math.max(40, 120 * scale);
           this.container.style.width = `${w}px`;
           this.container.style.height = `${h}px`;
-          // Scale chữ label theo zoom luôn
           if (this.label) {
-              this.label.style.fontSize = `${Math.max(8, 11 * scale)}px`;
-              this.label.style.bottom = `${-20 * scale}px`;
+              this.label.style.fontSize = `${Math.max(9, 12 * scale)}px`;
+              this.label.style.bottom = `${-22 * scale}px`;
           }
-          // [TINH CHỈNH VỊ TRÍ 3D]
-          // Offset X: Dịch sang trái (Ally) hoặc phải (Enemy) để đứng cạnh Leader
-          const sideOffset = this.side === 'ally' ? -25 : 25;
-          // Offset Y: Dịch lên trên một chút (-15) để chân trụ khớp với sàn đấu
-          const heightOffset = -15;
-          // Tính toán vị trí cuối cùng (Screen Space)
+          // Offset để lùi về phía sau và sang hai bên
+          const sideOffset = this.side === 'ally' ? -35 : 35;
+          const heightOffset = -20;
           const finalX = screenX + (sideOffset * scale) - (w / 2);
           const finalY = screenY + (heightOffset * scale) - h;
           this.container.style.left = `${finalX}px`;
@@ -12473,28 +12468,23 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           else {
               drawTokensOblique(ctx, Game.grid, tokens, CAM_PRESET);
           }
-          const rect = canvas.getBoundingClientRect();
-          // 2. Tính tỷ lệ chênh lệch giữa Độ phân giải game và Kích thước hiển thị
-          // (Ví dụ: Game vẽ 1920px nhưng hiển thị trên điện thoại chỉ 400px -> scale ~0.2)
-          const scaleX = rect.width / canvas.width;
-          const scaleY = rect.height / canvas.height;
-          // 3. Hàm chuyển đổi: Toạ độ Game (Canvas) -> Toạ độ Màn hình (Screen/CSS)
+          // Lấy rect tươi ngay trong khung hình draw
+          const canvasEl = canvas;
+          const rect = canvasEl.getBoundingClientRect();
+          const scaleX = rect.width / canvasEl.width;
+          const scaleY = rect.height / canvasEl.height;
           const getScreenPos = (cx, cy) => {
-              // Lấy toạ độ gốc trong Canvas
               const local = cellCenterObliqueLocal(Game.grid, cx, cy, CAM_PRESET);
-              // Quy đổi: Vị trí Canvas trên web + (Toạ độ game * Tỷ lệ co giãn)
               return {
                   x: rect.left + (local.x * scaleX),
                   y: rect.top + (local.y * scaleY),
-                  s: local.scale * scaleX // Scale kích thước trụ theo độ zoom màn hình
+                  s: local.scale * Math.min(scaleX, scaleY)
               };
           };
-          // 4. Lấy toạ độ Leader (Ally: 0,1 | Enemy: 6,1)
-          // Lưu ý: Đạo hữu có thể chỉnh (0,1) thành (1,1) nếu muốn trụ lùi vào trong
+          // Ally: ô 0,1 (hàng giữa bên trái). Enemy: ô 6,1 (hàng giữa bên phải)
           const allyPos = getScreenPos(0, 1);
           const enemyPos = getScreenPos(6, 1);
-          // 5. Đồng bộ sang module Aether
-          globalAetherPool.syncAllVisuals({ x: allyPos.x, y: allyPos.y, s: allyPos.scale }, { x: enemyPos.x, y: enemyPos.y, s: enemyPos.scale });
+          globalAetherPool.syncAllVisuals({ x: allyPos.x, y: allyPos.y, s: allyPos.s }, { x: enemyPos.x, y: enemyPos.y, s: enemyPos.s });
       }
       if (sessionVfx) {
           vfxDraw(ctx, sessionVfx, CAM_PRESET);
