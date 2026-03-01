@@ -2481,19 +2481,36 @@ function draw(): void {
     } else {
       drawTokensOblique(ctx, Game.grid, tokens, CAM_PRESET);
     }
-    const getPos = (cx: number, cy: number) => 
-      cellCenterObliqueLocal(Game.grid!, cx, cy, CAM_PRESET);
+    const rect = canvas.getBoundingClientRect();
+    
+    // 2. Tính tỷ lệ chênh lệch giữa Độ phân giải game và Kích thước hiển thị
+    // (Ví dụ: Game vẽ 1920px nhưng hiển thị trên điện thoại chỉ 400px -> scale ~0.2)
+    const scaleX = rect.width / canvas.width;
+    const scaleY = rect.height / canvas.height;
 
-   // Lấy toạ độ màn hình của 2 ô đặt trụ
-   const allyPos = getPos(0, 1); 
-   const enemyPos = getPos(6, 1); 
-  
-   // Update vị trí DOM
-   globalAetherPool.syncAllVisuals(
-     { x: allyPos.x, y: allyPos.y, s: allyPos.scale },
-     { x: enemyPos.x, y: enemyPos.y, s: enemyPos.scale }
-  );
+    // 3. Hàm chuyển đổi: Toạ độ Game (Canvas) -> Toạ độ Màn hình (Screen/CSS)
+    const getScreenPos = (cx: number, cy: number) => {
+      // Lấy toạ độ gốc trong Canvas
+      const local = cellCenterObliqueLocal(Game.grid!, cx, cy, CAM_PRESET);
+      
+      // Quy đổi: Vị trí Canvas trên web + (Toạ độ game * Tỷ lệ co giãn)
+      return {
+        x: rect.left + (local.x * scaleX),
+        y: rect.top + (local.y * scaleY),
+        s: local.scale * scaleX // Scale kích thước trụ theo độ zoom màn hình
+      };
+    };
 
+    // 4. Lấy toạ độ Leader (Ally: 0,1 | Enemy: 6,1)
+    // Lưu ý: Đạo hữu có thể chỉnh (0,1) thành (1,1) nếu muốn trụ lùi vào trong
+    const allyPos = getScreenPos(0, 1); 
+    const enemyPos = getScreenPos(6, 1); 
+    
+    // 5. Đồng bộ sang module Aether
+    globalAetherPool.syncAllVisuals(
+       { x: allyPos.x, y: allyPos.y, s: allyPos.scale },
+       { x: enemyPos.x, y: enemyPos.y, s: enemyPos.scale }
+    );
   }
   if (sessionVfx){
     vfxDraw(ctx, sessionVfx, CAM_PRESET);

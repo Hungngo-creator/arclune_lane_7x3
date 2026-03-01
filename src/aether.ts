@@ -81,19 +81,20 @@ export class SharedAetherPool {
     
     // Style động, sẽ được update vị trí bởi engine
     Object.assign(this.container.style, {
-        position: 'absolute',
+        position: 'fixed', // QUAN TRỌNG: Fixed để bám theo toạ độ màn hình
         width: '14px', 
-        height: '0px', // Chiều cao sẽ set dynamic
-        border: '1px solid rgba(255,255,255,0.4)',
-        backgroundColor: 'rgba(0, 0, 0, 0.6)',
-        borderRadius: '4px',
+        height: '0px',
+        border: '1px solid rgba(255,255,255,0.3)',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+        borderRadius: '2px',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column-reverse',
-        zIndex: '5',
+        zIndex: '1', // Z-index thấp để không che các UI quan trọng khác
         pointerEvents: 'none',
-        transition: 'opacity 0.2s',
+        transition: 'opacity 0.1s', // Giảm thời gian để mượt hơn khi zoom nhanh
         transformOrigin: 'bottom center',
+        boxShadow: '0 0 8px rgba(0,0,0,0.5)' 
     });
 
     const color = this.side === 'ally' ? '#00ffff' : '#ff3366';
@@ -141,24 +142,40 @@ export class SharedAetherPool {
   public syncVisuals(screenX: number, screenY: number, scale: number) {
     if (!this.container) return;
     
-    if (scale < 0.2) {
+    // Ẩn nếu zoom quá nhỏ (scale < 0.2) hoặc toạ độ âm (ra ngoài màn hình)
+    // Giúp tối ưu hiệu năng và tránh lỗi hiển thị lạ
+    if (scale < 0.2 || screenX < -50 || screenY < -50) {
         this.container.style.opacity = '0';
         return;
     }
     this.container.style.opacity = '1';
 
-    const w = Math.max(8, 12 * scale);
-    const h = Math.max(30, 100 * scale);
+    // Điều chỉnh kích thước trụ theo Scale màn hình
+    const w = Math.max(6, 14 * scale);  // Độ rộng
+    const h = Math.max(20, 90 * scale); // Độ cao
 
     this.container.style.width = `${w}px`;
     this.container.style.height = `${h}px`;
+    
+    // Scale chữ label theo zoom luôn
+    if (this.label) {
+        this.label.style.fontSize = `${Math.max(8, 11 * scale)}px`;
+        this.label.style.bottom = `${-20 * scale}px`;
+    }
 
-    // Offset để không che mặt Leader
-    const offsetX = this.side === 'ally' ? -25 * scale : 25 * scale;
-    const offsetY = -10 * scale;
+    // [TINH CHỈNH VỊ TRÍ 3D]
+    // Offset X: Dịch sang trái (Ally) hoặc phải (Enemy) để đứng cạnh Leader
+    const sideOffset = this.side === 'ally' ? -25 : 25; 
+    
+    // Offset Y: Dịch lên trên một chút (-15) để chân trụ khớp với sàn đấu
+    const heightOffset = -15; 
 
-    this.container.style.left = `${screenX + offsetX - (w/2)}px`;
-    this.container.style.top = `${screenY + offsetY - h}px`; 
+    // Tính toán vị trí cuối cùng (Screen Space)
+    const finalX = screenX + (sideOffset * scale) - (w / 2);
+    const finalY = screenY + (heightOffset * scale) - h;
+
+    this.container.style.left = `${finalX}px`;
+    this.container.style.top = `${finalY}px`; 
   }
 }
 
