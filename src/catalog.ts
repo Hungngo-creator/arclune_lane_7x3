@@ -451,8 +451,8 @@ export const ROSTER = [
         {
           key: 'skill3',
           name: 'Huyễn Thuật Đa Tầng',
-          cost: { aether: 35 },
-          duration: 3,
+          cost: { aether: 30 },
+          duration: 99,
           stackingBuffs: [{ stats: { WIL: 0.08 }, trigger: 'turnEnd', maxStacks: 3 }],
           cooldown: 3,
           notes: 'Thi triển tầng phép liên hoàn: mỗi lượt cuối tăng 8% WIL (tối đa 3 tầng), tái sử dụng làm mới thời gian nhưng không vượt quá giới hạn.'
@@ -573,7 +573,7 @@ export const ROSTER = [
     }
   },
   {
-    id: 'mong_yem', name: 'Mộng Yểm', class: 'Support', rank: 'UR',
+    id: 'mong_yem', name: 'Mộng Yểm', class: 'Mage', rank: 'SSR',
     mods: { WIL: 0.12, AEregen: 0.08 },
     kit: {
       onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
@@ -594,13 +594,13 @@ export const ROSTER = [
         {
           key: 'skill2',
           name: 'Thụy Ca Tự Miên',
-          cost: { aether: 35 },
-          duration: 3,
+          cost: { aether: 30 },
+          duration: 99,
           delayTurns: 0,
           selfSleep: true,
           reduceDamage: 0.50,
           perTurnBuffStats: { ATK: 0.07, WIL: 0.07 },
-          notes: 'Trong thời gian ngủ không thể hành động; mỗi lượt đang ngủ cộng 7% ATK/WIL. Tự thức khi HP ≤ 30% hoặc người chơi huỷ thủ công.'
+          notes: 'Trong thời gian ngủ không thể hành động; mỗi lượt đang ngủ cộng 7% ATK/WIL. Tự thức khi HP ≤ 35% hoặc người chơi huỷ thủ công.'
         },
         {
           key: 'skill3',
@@ -648,7 +648,7 @@ export const ROSTER = [
       ]),
       traits: asUnknownRecordArray([
         { id: 'sleep_reset', text: 'Khi đạt 3 tầng Mê Hoặc, mục tiêu ngủ 1 lượt rồi đặt lại về 0 tầng.' },
-        { id: 'self_sleep_control', text: 'Thụy Ca Tự Miên có thể được hủy sớm bằng thao tác thủ công; tự thức khi HP ≤ 30%.' }
+        { id: 'self_sleep_control', text: 'Thụy Ca Tự Miên có thể được hủy sớm bằng thao tác thủ công; tự thức khi HP ≤ 35%.' }
       ])
     }
   },

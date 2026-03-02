@@ -292,8 +292,8 @@ const skillsConfig = [
         key: 'skill3',
         name: 'Huyễn Thuật Đa Tầng',
         type: 'active',
-        cost: { aether: 35 },
-        duration: { turns: 3 },
+        cost: { aether: 30 },
+        duration: { turns: 99 },
         stackingBuffs: [{ stats: { WIL: 0.08 }, trigger: 'turnEnd', maxStacks: 3 }],
         cooldown: 3,
         description: 'Duy trì vòng phép 3 lượt: mỗi lượt cuối tăng 8% WIL (tối đa 3 tầng). Tái sử dụng làm mới thời gian chứ không vượt mức cộng dồn.'
@@ -405,12 +405,12 @@ const skillsConfig = [
         key: 'skill2',
         name: 'Thụy Ca Tự Miên',
         type: 'active',
-        cost: { aether: 35 },
-        duration: { turns: 3 },
+        cost: { aether: 30 },
+        duration: { turns: 99 },
         selfStatus: { id: 'tu_mien', kind: 'sleep', cannotAct: true },
         buffs: [{ effect: 'damageTaken', amount: -0.50 }],
         stackingBuffs: [{ stats: { ATK: 0.07, WIL: 0.07 }, trigger: 'turnEnd' }],
-        description: 'Ru mình vào giấc ngủ trong tối đa 3 lượt: không thể hành động khi ngủ, sát thương nhận vào giảm 50% và mỗi lượt đang ngủ cộng 7% ATK/WIL. Tự thức khi HP ≤ 30% hoặc người chơi hủy thủ công.'
+        description: 'Ru mình vào giấc ngủ cho đến khi được đánh thức: không thể hành động khi ngủ, sát thương nhận vào giảm 50% và mỗi lượt đang ngủ cộng 7% ATK/WIL. Tự thức khi HP ≤ 35% hoặc người chơi hủy thủ công.'
       },
       {
         key: 'skill3',
@@ -767,8 +767,8 @@ const skillsConfig = [
         cost: { aether: 25 },
         tags: ['counts-as-basic', 'multi-hit'],
         hits: 2,
-        targets: 'randomEnemies',
-        description: 'Phóng hai huyết cầu vào hai kẻ địch ngẫu nhiên. Mỗi hit gây 130% sát thương đòn đánh thường, được tính như đòn đánh thường để kích hoạt hút máu và Phệ Ấn, đồng thời làm mới thời hạn dấu ấn trên mục tiêu trúng đòn nhưng vẫn tôn trọng giới hạn 2 Phệ Ấn mỗi lượt.'
+        targets: 'singleEnemy',
+        description: 'Phóng hai huyết cầu vào một kẻ địch. Mỗi hit gây 130% sát thương đòn đánh thường, được tính như đòn đánh thường để kích hoạt hút máu và Phệ Ấn, đồng thời làm mới thời hạn dấu ấn trên mục tiêu trúng đòn nhưng vẫn tôn trọng giới hạn 2 Phệ Ấn mỗi lượt.'
       },
       {
         key: 'skill2',
@@ -798,19 +798,19 @@ const skillsConfig = [
       hpDrain: { percentCurrentHP: 0.08, perBoss: 0.08 },
       damage: { scaleWIL: 0.65, type: 'arcane', unavoidable: true },
       heals: { selfPercentTotalDamage: 0.35, allies: { targets: 2, percentTotalDamage: 0.25 } },
-      overhealToShield: { capPercentMaxHP: 0.6 },
-      postBuff: { stat: 'WIL', percent: 0.20, turns: 2 },
+      overhealToShield: { capPercentMaxHP: 0.3 },
+      postBuff: { stat: 'WIL', percent: 0.30, turns: 2 },
       marksApplied: { stacks: 1, maxPerTarget: 3 },
-      description: 'Hút máu toàn bộ kẻ địch: mỗi mục tiêu mất 8% HP hiện tại + 65% WIL của Phệ (Thuật, không thể né tránh, vẫn chịu kháng). Phần sát thương gây ra hồi cho Phệ 35% và hồi cho hai đồng minh ngẫu nhiên mỗi người 25%; phần vượt trần chuyển thành Giáp Máu tới tối đa +60% Máu tối đa. Sau khi thi triển nhận thêm 20% WIL trong 2 lượt và đặt 1 tầng Phệ Ấn lên các mục tiêu bị hút (giới hạn 2 Phệ Ấn mỗi lượt mỗi mục tiêu).'
+      description: 'Hút máu toàn bộ kẻ địch: mỗi mục tiêu mất 8% HP hiện tại + 65% WIL của Phệ (Thuật, không thể né tránh, vẫn chịu kháng). Phần sát thương gây ra hồi cho Phệ 35% và hồi cho hai đồng minh ngẫu nhiên mỗi người 25%; phần vượt trần chuyển thành Giáp Máu tới tối đa +30% Máu tối đa. Sau khi thi triển nhận thêm 30% WIL trong 2 lượt và đặt 1 tầng Phệ Ấn lên các mục tiêu bị hút (giới hạn 2 Phệ Ấn mỗi lượt mỗi mục tiêu).'
     },
     talent: {
       name: 'Phệ Ấn',
       type: 'talent',
       maxStacks: 3,
-      explosion: { damageScaleWIL: 0.50, trigger: 'onTurnStartTarget' },
+      explosion: { damageScaleWIL: 0.90, trigger: 'onTurnStartTarget' },
       ttl: { turns: 3, refreshOnApply: true },
       purgeable: false,
-      description: 'Mỗi đòn đánh thường/kỹ năng/tuyệt kỹ trúng mục tiêu đặt 1 Phệ Ấn (tối đa 3 cộng dồn, mỗi mục tiêu chỉ nhận 2 Ấn trong một lượt). Khi đạt 3 cộng dồn, Phệ Ấn tự kích nổ ở đầu lượt của mục tiêu, gây sát thương bằng 50% WIL của Phệ. Dấu ấn tồn tại tối đa 3 lượt nếu không được làm mới và không thể bị xoá bỏ, lãng quên hoặc cướp. Chúc Phúc Của Huyết Chủ: khi vào trận nhận thêm 15% Máu tối đa và +50% hồi HP.'
+      description: 'Mỗi đòn đánh thường/kỹ năng/tuyệt kỹ trúng mục tiêu đặt 1 Phệ Ấn (tối đa 3 cộng dồn, mỗi mục tiêu chỉ nhận 2 Ấn trong một lượt). Khi đạt 3 cộng dồn, Phệ Ấn tự kích nổ ở đầu lượt của mục tiêu, gây sát thương bằng 90% WIL của Phệ. Dấu ấn tồn tại tối đa 3 lượt nếu không được làm mới và không thể bị xoá bỏ, lãng quên hoặc cướp. Chúc Phúc Của Huyết Chủ: khi vào trận nhận thêm 15% Máu tối đa và +50% hồi HP.'
     },
     technique: null,
     notes: [

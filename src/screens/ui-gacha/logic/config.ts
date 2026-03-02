@@ -49,7 +49,7 @@ const BANNERS: BannerDefinition[] = [
       { id: 'limited-ur-01', name: 'Nguyệt San', rarity: 'UR', portrait: 'assets/u_nguyet_san.svg' },
       { id: 'limited-ur-02', name: 'Huyết Tịch', rarity: 'UR', portrait: 'assets/u_huyet_tich.svg' },
       { id: 'limited-ur-03', name: 'Khai Nguyên Tử', rarity: 'UR', portrait: 'assets/u_khai_nguyen_tu.svg' },
-      { id: 'limited-ur-04', name: 'Mộng Yểm', rarity: 'UR', portrait: 'assets/u_mong_yem.svg' },
+      { id: 'limited-ssr-04', name: 'Mộng Yểm', rarity: 'SSR', portrait: 'assets/u_mong_yem.svg' },
     ],
     expiresAt: now + 7 * day,
     background: 'assets/banner_dragon.svg',

@@ -54,7 +54,6 @@ function normalizeSection(section: SkillSection | string | null | undefined): Sk
   }
   const normalized: SkillSection = { ...section };
   normalized.tags = ensureDomainTags(section.tags ?? [], fallbackKitTag(section.type ?? null));
-  }
   if (Array.isArray(section.notes)){
     normalized.notes = [...section.notes];
   } else if (typeof section.notes === 'string'){
@@ -68,7 +67,6 @@ function normalizeSkillEntry(entry: SkillSection | null | undefined): SkillSecti
   if (!entry) return null;
   const normalized: SkillSection = { ...entry };
   normalized.tags = ensureDomainTags(entry.tags ?? [], fallbackKitTag(entry.type ?? null));
-  }
   if (entry.cost && typeof entry.cost === 'object'){
     normalized.cost = { ...entry.cost };
   }

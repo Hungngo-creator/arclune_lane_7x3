@@ -176,12 +176,6 @@ export function getTagDefinition(tag: string | null | undefined): TagDefinition 
   return TAG_BY_ID.get(normalized) ?? null;
 }
 
-export function getTagDefinition(tag: string | null | undefined): TagDefinition | null{
-  const normalized = normalizeTagId(tag);
-  if (!normalized) return null;
-  return TAG_BY_ID.get(normalized) ?? null;
-}
-
 export function listUnknownTags(tags: ReadonlyArray<string> | null | undefined): string[]{
   if (!Array.isArray(tags)) return [];
   const unknown = new Set<string>();
