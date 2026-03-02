@@ -282,6 +282,26 @@ export interface LineupViewHandle {
   destroy(): void;
 }
 
+function hasPositiveWalletValue(source: unknown): boolean {
+  if (!source || typeof source !== 'object'){
+    return false;
+  }
+  const entries = Object.values(source as Record<string, unknown>);
+  for (const entry of entries){
+    if (typeof entry === 'number' && Number.isFinite(entry) && entry > 0){
+      return true;
+    }
+    if (entry && typeof entry === 'object'){
+      const record = entry as Record<string, unknown>;
+      const value = Number(record.balance ?? record.amount ?? record.value ?? record.total ?? 0);
+      if (Number.isFinite(value) && value > 0){
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   const {
     root,
@@ -322,7 +342,10 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
     });
   });
 
-  const playerCurrencySource = normalizeCurrencyBalances(playerState ?? null);
+  const playerCurrencySourceRaw = normalizeCurrencyBalances(playerState ?? null);
+  const playerCurrencySource = hasPositiveWalletValue(playerCurrencySourceRaw)
+    ? playerCurrencySourceRaw
+    : null;
   const currencyBalances = createCurrencyBalances(
     createCurrencyBalances(getSharedCurrencyWallet(), playerCurrencySource),
     currencies,

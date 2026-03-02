@@ -334,15 +334,17 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
     ...(playerState as CultivationPlayerState),
     currencies: { ...((playerState as CultivationPlayerState)?.currencies ?? {}) },
   };
+  let hasPositiveCurrencyOverride = false;
   for (const currency of currencyCatalog){
     const resolved = resolveCurrencyBalance(currency.id, currencies, playerState);
-    if (Number.isFinite(resolved)){
+    if (Number.isFinite(resolved) && resolved > 0){
+      hasPositiveCurrencyOverride = true;
       mutablePlayerState.currencies![currency.id] = resolved;
     }
   }
   mutablePlayerState.currencies = createNormalizedWallet(
+    hasPositiveCurrencyOverride ? mutablePlayerState.currencies : null,
     getSharedCurrencyWallet(),
-    mutablePlayerState.currencies,
   );
   syncSharedCurrencyWallet(mutablePlayerState.currencies, { merge: true });
 
