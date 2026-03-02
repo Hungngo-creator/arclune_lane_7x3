@@ -11,6 +11,7 @@ import type { UnknownRecord } from '@shared-types/common';
 import type { MenuCardMetadata, MenuSection } from './screens/main-menu/types.ts';
 import type { LineupViewHandle } from './screens/lineup/view/index.ts';
 import { setPowerMode } from './ui/rarity/rarity.ts';
+import { loadPlayerProfile } from './utils/player-profile.ts';
 
 export interface ScreenParamMap {
   readonly [key: string]: unknown;
@@ -999,6 +1000,15 @@ async function mountPveScreen(params: ScreenParams): Promise<void>{
     ...restMergedParams,
     ...mergedStartConfig
   };
+  const profile = loadPlayerProfile();
+  const storedLineupDeck = Array.isArray(profile.lineupDeck)
+    ? profile.lineupDeck.filter((id): id is string => typeof id === 'string' && id.trim() !== '').slice(0, 10)
+    : [];
+  if (storedLineupDeck.length > 0){
+    const lineupDeckEntries = storedLineupDeck.map(id => ({ id }));
+    createSessionOptions.lineupDeck = lineupDeckEntries;
+    startSessionOptions.lineupDeck = lineupDeckEntries;
+  }
   if (rootElement){
     clearAppScreenClasses();
     if (rootElement.classList){

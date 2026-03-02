@@ -1,7 +1,7 @@
 // Bundled by build.mjs
 const __modules = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }
 function __define(id, factory){ __modules[id] = { factory, exports: null, initialized: false }; }
@@ -8966,6 +8966,8 @@ __define('./entry.ts', (exports, module, __require) => {
   const resolveModuleFunction = __dep4.resolveModuleFunction;
   const __dep5 = __require('./ui/rarity/rarity.ts');
   const setPowerMode = __dep5.setPowerMode;
+  const __dep6 = __require('./utils/player-profile.ts');
+  const loadPlayerProfile = __dep6.loadPlayerProfile;
   const isStoppableSession = (value) => (Boolean(value) && typeof value.stop === 'function');
   const isStartableSession = (value) => (Boolean(value) && typeof value.start === 'function');
   const SUCCESS_EVENT = 'arclune:loaded';
@@ -9791,6 +9793,15 @@ __define('./entry.ts', (exports, module, __require) => {
           ...restMergedParams,
           ...mergedStartConfig
       };
+      const profile = loadPlayerProfile();
+      const storedLineupDeck = Array.isArray(profile.lineupDeck)
+          ? profile.lineupDeck.filter((id) => typeof id === 'string' && id.trim() !== '').slice(0, 10)
+          : [];
+      if (storedLineupDeck.length > 0) {
+          const lineupDeckEntries = storedLineupDeck.map(id => ({ id }));
+          createSessionOptions.lineupDeck = lineupDeckEntries;
+          startSessionOptions.lineupDeck = lineupDeckEntries;
+      }
       if (rootElement) {
           clearAppScreenClasses();
           if (rootElement.classList) {
@@ -16402,6 +16413,9 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
   const createFilterState = __dep9.createFilterState;
   const updateActiveTab = __dep9.updateActiveTab;
   const updateSelectedUnit = __dep9.updateSelectedUnit;
+  const __dep10 = __require('./utils/player-profile.ts');
+  const loadPlayerProfile = __dep10.loadPlayerProfile;
+  const patchPlayerProfile = __dep10.patchPlayerProfile;
   const STYLE_ID = 'collection-view-style-v2';
   const TAB_DEFINITIONS = [
       { key: 'awakening', label: 'Thức Tỉnh', hint: 'Theo dõi mốc thức tỉnh, sao và điểm đột phá của nhân vật đã sở hữu.' },
@@ -16642,6 +16656,11 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
               cleanups.push(fn);
       };
       const filterState = createFilterState();
+      const savedProfile = loadPlayerProfile();
+      const savedCultivationByUnit = {
+          ...(savedProfile.cultivationByUnit ?? {}),
+      };
+      let activeUnitId = null;
       const mutablePlayerState = {
           ...playerState,
           currencies: { ...(playerState?.currencies ?? {}) },
@@ -17172,7 +17191,8 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           root.appendChild(container);
       }
       const resolveCurrentCultivation = () => {
-          const cultivation = mutablePlayerState.cultivation ?? {};
+          const unitCultivation = activeUnitId ? savedCultivationByUnit[activeUnitId] : null;
+          const cultivation = unitCultivation ?? mutablePlayerState.cultivation ?? {};
           const realm = Number.isFinite(cultivation.realm) ? Number(cultivation.realm) : 1;
           const subRealm = Number.isFinite(cultivation.subRealm) ? Number(cultivation.subRealm) : 0;
           return {
@@ -17204,6 +17224,10 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
               : 'Chi phí kế tiếp: Đã đạt giới hạn';
       };
       const handleCultivationUpgrade = () => {
+          if (!activeUnitId) {
+              stageStatus.textContent = 'Hãy chọn một nhân vật trước khi tăng tu vi.';
+              return;
+          }
           const { realm, subRealm } = resolveCurrentCultivation();
           const upgraded = upgradeCultivation(mutablePlayerState, realm, subRealm);
           if (!upgraded.ok) {
@@ -17214,7 +17238,13 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           }
           mutablePlayerState.currencies = { ...(upgraded.playerState.currencies ?? {}) };
           syncSharedCurrencyWallet(mutablePlayerState.currencies);
-          mutablePlayerState.cultivation = { ...(upgraded.playerState.cultivation ?? {}) };
+          const nextCultivation = { ...(upgraded.playerState.cultivation ?? {}) };
+          mutablePlayerState.cultivation = nextCultivation;
+          savedCultivationByUnit[activeUnitId] = {
+              realm: Number(nextCultivation.realm ?? upgraded.newRealm),
+              subRealm: Number(nextCultivation.subRealm ?? upgraded.newSubRealm),
+          };
+          patchPlayerProfile({ cultivationByUnit: savedCultivationByUnit });
           refreshWallet();
           refreshTuViPanel();
           stageStatus.textContent = `Đã nâng lên Cảnh giới ${upgraded.newRealm} · Tiểu cảnh giới ${upgraded.newSubRealm}.`;
@@ -17226,6 +17256,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       const selectUnit = (unitId) => {
           if (!unitId || !rosterEntries.has(unitId))
               return;
+          activeUnitId = unitId;
           updateSelectedUnit(filterState, unitId);
           clearSkillDetail();
           for (const [id, entry] of rosterEntries) {
@@ -17342,6 +17373,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           if (filterState.activeTab === 'skills') {
               overlay.classList.add('is-open');
           }
+          refreshTuViPanel();
       };
       const observer = new MutationObserver(() => {
           // placeholder to keep overlay in DOM order if needed
@@ -17349,9 +17381,9 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       observer.observe(stage, { childList: true });
       addCleanup(() => observer.disconnect());
       if (rosterEntries.size > 0) {
-          const [firstId] = rosterEntries.keys();
-          if (firstId) {
-              selectUnit(firstId);
+          const preferredId = Array.from(rosterEntries.keys())[0];
+          if (preferredId) {
+              selectUnit(preferredId);
           }
       }
       setActiveTab(filterState.activeTab);
@@ -17739,6 +17771,7 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
           });
       }
       const handleBack = () => {
+          helpers.persistLineupSelection();
           if (shell && typeof shell.enterScreen === 'function') {
               shell.enterScreen('main-menu');
           }
@@ -18068,34 +18101,36 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
   const createNumberFormatter = __dep1.createNumberFormatter;
   const __dep2 = __require('./utils/unit-id.ts');
   const normalizeUnitId = __dep2.normalizeUnitId;
-  const __dep3 = __require('./utils/currency.ts');
-  const createNormalizedWallet = __dep3.createNormalizedWallet;
-  const getCurrencyOrder = __dep3.getCurrencyOrder;
-  const getSharedCurrencyWallet = __dep3.getSharedCurrencyWallet;
-  const subscribeSharedCurrencyWallet = __dep3.subscribeSharedCurrencyWallet;
-  const syncSharedCurrencyWallet = __dep3.syncSharedCurrencyWallet;
-  const __dep4 = __require('./ui/dom.ts');
-  const assertElement = __dep4.assertElement;
-  const ensureStyleTag = __dep4.ensureStyleTag;
-  const mountSection = __dep4.mountSection;
-  const __dep5 = __require('./types/currency.ts');
-  const normalizeCurrencyBalances = __dep5.normalizeCurrencyBalances;
-  const __dep6 = __require('./ui/rarity/rarity.ts');
-  const mountRarityAura = __dep6.mountRarityAura;
-  const updateRarity = __dep6.updateRarity;
-  const unmountRarity = __dep6.unmountRarity;
-  const __dep7 = __require('./screens/lineup/view/state.ts');
-  const normalizeRoster = __dep7.normalizeRoster;
-  const normalizeLineups = __dep7.normalizeLineups;
-  const createCurrencyBalances = __dep7.createCurrencyBalances;
-  const createFilterOptions = __dep7.createFilterOptions;
-  const formatCurrencyBalance = __dep7.formatCurrencyBalance;
-  const collectAssignedUnitIds = __dep7.collectAssignedUnitIds;
-  const evaluatePassive = __dep7.evaluatePassive;
-  const filterRoster = __dep7.filterRoster;
-  const getUnitRarity = __dep7.getUnitRarity;
-  const __dep8 = __require('./screens/lineup/view/events.ts');
-  const bindLineupEvents = __dep8.bindLineupEvents;
+  const __dep3 = __require('./utils/player-profile.ts');
+  const patchPlayerProfile = __dep3.patchPlayerProfile;
+  const __dep4 = __require('./utils/currency.ts');
+  const createNormalizedWallet = __dep4.createNormalizedWallet;
+  const getCurrencyOrder = __dep4.getCurrencyOrder;
+  const getSharedCurrencyWallet = __dep4.getSharedCurrencyWallet;
+  const subscribeSharedCurrencyWallet = __dep4.subscribeSharedCurrencyWallet;
+  const syncSharedCurrencyWallet = __dep4.syncSharedCurrencyWallet;
+  const __dep5 = __require('./ui/dom.ts');
+  const assertElement = __dep5.assertElement;
+  const ensureStyleTag = __dep5.ensureStyleTag;
+  const mountSection = __dep5.mountSection;
+  const __dep6 = __require('./types/currency.ts');
+  const normalizeCurrencyBalances = __dep6.normalizeCurrencyBalances;
+  const __dep7 = __require('./ui/rarity/rarity.ts');
+  const mountRarityAura = __dep7.mountRarityAura;
+  const updateRarity = __dep7.updateRarity;
+  const unmountRarity = __dep7.unmountRarity;
+  const __dep8 = __require('./screens/lineup/view/state.ts');
+  const normalizeRoster = __dep8.normalizeRoster;
+  const normalizeLineups = __dep8.normalizeLineups;
+  const createCurrencyBalances = __dep8.createCurrencyBalances;
+  const createFilterOptions = __dep8.createFilterOptions;
+  const formatCurrencyBalance = __dep8.formatCurrencyBalance;
+  const collectAssignedUnitIds = __dep8.collectAssignedUnitIds;
+  const evaluatePassive = __dep8.evaluatePassive;
+  const filterRoster = __dep8.filterRoster;
+  const getUnitRarity = __dep8.getUnitRarity;
+  const __dep9 = __require('./screens/lineup/view/events.ts');
+  const bindLineupEvents = __dep9.bindLineupEvents;
   const STYLE_ID = 'lineup-view-style-v1';
   const powerFormatter = createNumberFormatter('vi-VN');
   function ensureStyles() {
@@ -18314,6 +18349,19 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
   }
   function formatUnitPower(power) {
       return powerFormatter.format(Number.isFinite(power) ? Number(power) : 0);
+  }
+  function serializeSelectedLineup(lineup) {
+      if (!lineup)
+          return { unitIds: [] };
+      const formationIds = lineup.cells
+          .filter(cell => cell.section === 'formation' && cell.unlocked && typeof cell.unitId === 'string' && cell.unitId.trim())
+          .map(cell => normalizeUnitId(cell.unitId));
+      const reserveIds = lineup.cells
+          .filter(cell => cell.section === 'reserve' && cell.unlocked && typeof cell.unitId === 'string' && cell.unitId.trim())
+          .map(cell => normalizeUnitId(cell.unitId));
+      return {
+          unitIds: Array.from(new Set([...formationIds, ...reserveIds])).slice(0, 10),
+      };
   }
   function hasPositiveWalletValue(source) {
       if (!source || typeof source !== 'object') {
@@ -18553,6 +18601,10 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           if (!state.selectedLineupId)
               return null;
           return state.lineupState.get(state.selectedLineupId) ?? null;
+      }
+      function persistLineupSelection() {
+          const selected = serializeSelectedLineup(getSelectedLineup());
+          patchPlayerProfile({ lineupDeck: selected.unitIds });
       }
       function setMessage(text, type = 'info') {
           state.message = text || '';
@@ -19122,6 +19174,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               openPassiveDetails,
               openLeaderPicker,
               refreshWallet,
+              persistLineupSelection,
           },
           rosterLookup,
       });
@@ -19160,6 +19213,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       };
   }
   //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'serializeSelectedLineup')) exports.serializeSelectedLineup = serializeSelectedLineup;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderLineupView')) exports.renderLineupView = renderLineupView;
 });
 __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
@@ -25837,6 +25891,54 @@ __define('./utils/module-resolution.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'pickFunctionFromSource')) exports.pickFunctionFromSource = pickFunctionFromSource;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveModuleFunction')) exports.resolveModuleFunction = resolveModuleFunction;
+});
+__define('./utils/player-profile.ts', (exports, module, __require) => {
+  const STORAGE_KEY = 'arclune.playerProfile.v1';
+  const isObject = (value) => (typeof value === 'object' && value !== null && !Array.isArray(value));
+  function loadPlayerProfile() {
+      if (typeof window === 'undefined' || !window.localStorage)
+          return {};
+      try {
+          const raw = window.localStorage.getItem(STORAGE_KEY);
+          if (!raw)
+              return {};
+          const parsed = JSON.parse(raw);
+          if (!isObject(parsed))
+              return {};
+          return parsed;
+      }
+      catch (error) {
+          console.warn('[profile] Không thể đọc player profile.', error);
+          return {};
+      }
+  }
+  function savePlayerProfile(next) {
+      if (typeof window === 'undefined' || !window.localStorage)
+          return;
+      try {
+          window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      }
+      catch (error) {
+          console.warn('[profile] Không thể lưu player profile.', error);
+      }
+  }
+  function patchPlayerProfile(patch) {
+      const current = loadPlayerProfile();
+      const merged = {
+          ...current,
+          ...patch,
+          cultivationByUnit: {
+              ...(current.cultivationByUnit ?? {}),
+              ...(patch.cultivationByUnit ?? {}),
+          },
+      };
+      savePlayerProfile(merged);
+      return merged;
+  }
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'loadPlayerProfile')) exports.loadPlayerProfile = loadPlayerProfile;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'savePlayerProfile')) exports.savePlayerProfile = savePlayerProfile;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'patchPlayerProfile')) exports.patchPlayerProfile = patchPlayerProfile;
 });
 __define('./utils/time.ts', (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/utils/time.ts

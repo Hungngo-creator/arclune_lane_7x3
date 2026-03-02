@@ -3,6 +3,7 @@
 import { getSkillSet } from '../../../data/skills.ts';
 import { createNumberFormatter } from '../../../utils/format.ts';
 import { normalizeUnitId } from '../../../utils/unit-id.ts';
+import { patchPlayerProfile } from '../../../utils/player-profile.ts';
 import {
   createNormalizedWallet,
   getCurrencyOrder,
@@ -280,6 +281,23 @@ export interface LineupViewOptions {
 
 export interface LineupViewHandle {
   destroy(): void;
+}
+
+export interface SerializedLineupSelection {
+  unitIds: string[];
+}
+
+export function serializeSelectedLineup(lineup: LineupState | null): SerializedLineupSelection {
+  if (!lineup) return { unitIds: [] };
+  const formationIds = lineup.cells
+    .filter(cell => cell.section === 'formation' && cell.unlocked && typeof cell.unitId === 'string' && cell.unitId.trim())
+    .map(cell => normalizeUnitId(cell.unitId as string));
+  const reserveIds = lineup.cells
+    .filter(cell => cell.section === 'reserve' && cell.unlocked && typeof cell.unitId === 'string' && cell.unitId.trim())
+    .map(cell => normalizeUnitId(cell.unitId as string));
+  return {
+    unitIds: Array.from(new Set([...formationIds, ...reserveIds])).slice(0, 10),
+  };
 }
 
 function hasPositiveWalletValue(source: unknown): boolean {
@@ -566,6 +584,11 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   function getSelectedLineup(): LineupState | null{
     if (!state.selectedLineupId) return null;
     return state.lineupState.get(state.selectedLineupId) ?? null;
+  }
+
+  function persistLineupSelection(): void {
+    const selected = serializeSelectedLineup(getSelectedLineup());
+    patchPlayerProfile({ lineupDeck: selected.unitIds });
   }
 
   function setMessage(text: string, type: LineupMessageType = 'info'): void{
@@ -1161,6 +1184,7 @@ const eventCleanup = bindLineupEvents({
       openPassiveDetails,
       openLeaderPicker,
       refreshWallet,
+      persistLineupSelection,
     },
     rosterLookup,
   });

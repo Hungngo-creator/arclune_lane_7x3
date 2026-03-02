@@ -48,6 +48,7 @@ export interface LineupEventHelpers {
   openPassiveDetails: (passive: LineupPassive) => void;
   openLeaderPicker: () => void;
   refreshWallet: () => void;
+  persistLineupSelection: () => void;
 }
 
 export interface LineupEventContext {
@@ -101,6 +102,7 @@ export function bindLineupEvents(context: LineupEventContext): CleanupCallback[]
   }
 
   const handleBack = () => {
+    helpers.persistLineupSelection();
     if (shell && typeof shell.enterScreen === 'function'){
       shell.enterScreen('main-menu');
     } else if (typeof window !== 'undefined'){

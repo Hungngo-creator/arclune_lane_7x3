@@ -27,6 +27,7 @@ import {
   ensureNumberFormatter,
 } from './helpers.ts';
 import { createFilterState, updateActiveTab, updateSelectedUnit } from './state.ts';
+import { loadPlayerProfile, patchPlayerProfile } from '../../utils/player-profile.ts';
 import type { AbilityFact } from './helpers.ts';
 import type {
   CollectionEntry,
@@ -330,6 +331,11 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
   };
 
   const filterState: FilterState = createFilterState();
+  const savedProfile = loadPlayerProfile();
+  const savedCultivationByUnit: Record<string, { realm: number; subRealm: number }> = {
+    ...(savedProfile.cultivationByUnit ?? {}),
+  };
+  let activeUnitId: string | null = null;
   const mutablePlayerState: CultivationPlayerState = {
     ...(playerState as CultivationPlayerState),
     currencies: { ...((playerState as CultivationPlayerState)?.currencies ?? {}) },
@@ -974,7 +980,8 @@ const overlayDetailPanel = document.createElement('aside');
   }
 
 const resolveCurrentCultivation = () => {
-    const cultivation = mutablePlayerState.cultivation ?? {};
+    const unitCultivation = activeUnitId ? savedCultivationByUnit[activeUnitId] : null;
+    const cultivation = unitCultivation ?? mutablePlayerState.cultivation ?? {};
     const realm = Number.isFinite(cultivation.realm) ? Number(cultivation.realm) : 1;
     const subRealm = Number.isFinite(cultivation.subRealm) ? Number(cultivation.subRealm) : 0;
     return {
@@ -1009,6 +1016,10 @@ const resolveCurrentCultivation = () => {
   };
 
   const handleCultivationUpgrade = () => {
+    if (!activeUnitId){
+      stageStatus.textContent = 'Hãy chọn một nhân vật trước khi tăng tu vi.';
+      return;
+    }
     const { realm, subRealm } = resolveCurrentCultivation();
     const upgraded = upgradeCultivation(mutablePlayerState, realm, subRealm);
     if (!upgraded.ok){
@@ -1019,7 +1030,13 @@ const resolveCurrentCultivation = () => {
     }
     mutablePlayerState.currencies = { ...(upgraded.playerState.currencies ?? {}) };
     syncSharedCurrencyWallet(mutablePlayerState.currencies);
-    mutablePlayerState.cultivation = { ...(upgraded.playerState.cultivation ?? {}) };
+    const nextCultivation = { ...(upgraded.playerState.cultivation ?? {}) };
+    mutablePlayerState.cultivation = nextCultivation;
+    savedCultivationByUnit[activeUnitId] = {
+      realm: Number(nextCultivation.realm ?? upgraded.newRealm),
+      subRealm: Number(nextCultivation.subRealm ?? upgraded.newSubRealm),
+    };
+    patchPlayerProfile({ cultivationByUnit: savedCultivationByUnit });
     refreshWallet();
     refreshTuViPanel();
     stageStatus.textContent = `Đã nâng lên Cảnh giới ${upgraded.newRealm} · Tiểu cảnh giới ${upgraded.newSubRealm}.`;
@@ -1032,6 +1049,7 @@ const resolveCurrentCultivation = () => {
 
   const selectUnit = (unitId: string | null) => {
     if (!unitId || !rosterEntries.has(unitId)) return;
+    activeUnitId = unitId;
     updateSelectedUnit(filterState, unitId);
     clearSkillDetail();
     for (const [id, entry] of rosterEntries){
@@ -1150,6 +1168,7 @@ const resolveCurrentCultivation = () => {
     if (filterState.activeTab === 'skills'){
       overlay.classList.add('is-open');
     }
+    refreshTuViPanel();
   };
 
   const observer = new MutationObserver(() => {
@@ -1159,9 +1178,9 @@ const resolveCurrentCultivation = () => {
   addCleanup(() => observer.disconnect());
 
   if (rosterEntries.size > 0){
-    const [firstId] = rosterEntries.keys();
-    if (firstId){
-      selectUnit(firstId);
+    const preferredId = Array.from(rosterEntries.keys())[0];
+    if (preferredId){
+      selectUnit(preferredId);
     }
   }
 
