@@ -16208,28 +16208,33 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
   const __dep4 = __require('./cultivation.ts');
   const upgradeCultivation = __dep4.upgradeCultivation;
   const getCultivationCost = __dep4.getCultivationCost;
-  const __dep5 = __require('./ui/dom.ts');
-  const assertElement = __dep5.assertElement;
-  const ensureStyleTag = __dep5.ensureStyleTag;
-  const mountSection = __dep5.mountSection;
-  const __dep6 = __require('./ui/rarity/rarity.ts');
-  const mountRarityAura = __dep6.mountRarityAura;
-  const unmountRarity = __dep6.unmountRarity;
-  const normalizeRarity = __dep6.normalizeRarity;
-  const __dep7 = __require('./screens/collection/helpers.ts');
-  const ABILITY_TYPE_LABELS = __dep7.ABILITY_TYPE_LABELS;
-  const buildRosterWithCost = __dep7.buildRosterWithCost;
-  const cloneRoster = __dep7.cloneRoster;
-  const collectAbilityFacts = __dep7.collectAbilityFacts;
-  const describeUlt = __dep7.describeUlt;
-  const labelForAbility = __dep7.labelForAbility;
-  const resolveCurrencyBalance = __dep7.resolveCurrencyBalance;
-  const getCurrencyCatalog = __dep7.getCurrencyCatalog;
-  const ensureNumberFormatter = __dep7.ensureNumberFormatter;
-  const __dep8 = __require('./screens/collection/state.ts');
-  const createFilterState = __dep8.createFilterState;
-  const updateActiveTab = __dep8.updateActiveTab;
-  const updateSelectedUnit = __dep8.updateSelectedUnit;
+  const __dep5 = __require('./utils/currency.ts');
+  const createNormalizedWallet = __dep5.createNormalizedWallet;
+  const getSharedCurrencyWallet = __dep5.getSharedCurrencyWallet;
+  const subscribeSharedCurrencyWallet = __dep5.subscribeSharedCurrencyWallet;
+  const syncSharedCurrencyWallet = __dep5.syncSharedCurrencyWallet;
+  const __dep6 = __require('./ui/dom.ts');
+  const assertElement = __dep6.assertElement;
+  const ensureStyleTag = __dep6.ensureStyleTag;
+  const mountSection = __dep6.mountSection;
+  const __dep7 = __require('./ui/rarity/rarity.ts');
+  const mountRarityAura = __dep7.mountRarityAura;
+  const unmountRarity = __dep7.unmountRarity;
+  const normalizeRarity = __dep7.normalizeRarity;
+  const __dep8 = __require('./screens/collection/helpers.ts');
+  const ABILITY_TYPE_LABELS = __dep8.ABILITY_TYPE_LABELS;
+  const buildRosterWithCost = __dep8.buildRosterWithCost;
+  const cloneRoster = __dep8.cloneRoster;
+  const collectAbilityFacts = __dep8.collectAbilityFacts;
+  const describeUlt = __dep8.describeUlt;
+  const labelForAbility = __dep8.labelForAbility;
+  const resolveCurrencyBalance = __dep8.resolveCurrencyBalance;
+  const getCurrencyCatalog = __dep8.getCurrencyCatalog;
+  const ensureNumberFormatter = __dep8.ensureNumberFormatter;
+  const __dep9 = __require('./screens/collection/state.ts');
+  const createFilterState = __dep9.createFilterState;
+  const updateActiveTab = __dep9.updateActiveTab;
+  const updateSelectedUnit = __dep9.updateSelectedUnit;
   const STYLE_ID = 'collection-view-style-v2';
   const TAB_DEFINITIONS = [
       { key: 'awakening', label: 'Thức Tỉnh', hint: 'Theo dõi mốc thức tỉnh, sao và điểm đột phá của nhân vật đã sở hữu.' },
@@ -16478,6 +16483,8 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           const resolved = resolveCurrencyBalance(currency.id, currencies, playerState);
           mutablePlayerState.currencies[currency.id] = Number.isFinite(resolved) ? resolved : 0;
       }
+      mutablePlayerState.currencies = createNormalizedWallet(getSharedCurrencyWallet(), mutablePlayerState.currencies);
+      syncSharedCurrencyWallet(mutablePlayerState.currencies, { merge: true });
       const container = document.createElement('div');
       container.className = 'collection-view';
       const mount = mountSection({
@@ -17008,6 +17015,11 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
               balance.textContent = `${currencyFormatter.format(Number.isFinite(value) ? value : 0)} ${currency.suffix || currency.id}`;
           }
       };
+      const unsubscribeSharedWallet = subscribeSharedCurrencyWallet((walletSnapshot) => {
+          mutablePlayerState.currencies = createNormalizedWallet(walletSnapshot);
+          refreshWallet();
+      });
+      addCleanup(unsubscribeSharedWallet);
       const refreshTuViPanel = () => {
           const { realm, subRealm } = resolveCurrentCultivation();
           tuViRealm.textContent = `Cảnh giới ${realm}`;
@@ -17027,6 +17039,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
               return;
           }
           mutablePlayerState.currencies = { ...(upgraded.playerState.currencies ?? {}) };
+          syncSharedCurrencyWallet(mutablePlayerState.currencies);
           mutablePlayerState.cultivation = { ...(upgraded.playerState.cultivation ?? {}) };
           refreshWallet();
           refreshTuViPanel();
@@ -17524,6 +17537,10 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
   const setLeader = __dep0.setLeader;
   const unlockCell = __dep0.unlockCell;
   const formatCurrencyBalance = __dep0.formatCurrencyBalance;
+  const __dep1 = __require('./utils/currency.ts');
+  const createNormalizedWallet = __dep1.createNormalizedWallet;
+  const getCurrencyOrder = __dep1.getCurrencyOrder;
+  const syncSharedCurrencyWallet = __dep1.syncSharedCurrencyWallet;
   function bindLineupEvents(context) {
       const { state, elements, helpers, overlays, rosterLookup, shell } = context;
       const { backButton, cellsGrid, cellDetails: _cellDetails, passiveGrid, rosterFilters, rosterList, leaderAvatar, leaderSection, passiveOverlay, passiveClose, leaderOverlay, leaderOverlayBody, leaderClose, } = elements;
@@ -17622,6 +17639,9 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
               helpers.renderPassives();
               helpers.renderRoster();
               helpers.refreshWallet();
+              const order = getCurrencyOrder();
+              const wallet = createNormalizedWallet(Object.fromEntries(order.map((id) => [id, state.currencyBalances.get(id) ?? 0])));
+              syncSharedCurrencyWallet(wallet);
               return;
           }
           if (!cell.unlocked) {
@@ -17874,28 +17894,34 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
   const createNumberFormatter = __dep1.createNumberFormatter;
   const __dep2 = __require('./utils/unit-id.ts');
   const normalizeUnitId = __dep2.normalizeUnitId;
-  const __dep3 = __require('./ui/dom.ts');
-  const assertElement = __dep3.assertElement;
-  const ensureStyleTag = __dep3.ensureStyleTag;
-  const mountSection = __dep3.mountSection;
-  const __dep4 = __require('./types/currency.ts');
-  const normalizeCurrencyBalances = __dep4.normalizeCurrencyBalances;
-  const __dep5 = __require('./ui/rarity/rarity.ts');
-  const mountRarityAura = __dep5.mountRarityAura;
-  const updateRarity = __dep5.updateRarity;
-  const unmountRarity = __dep5.unmountRarity;
-  const __dep6 = __require('./screens/lineup/view/state.ts');
-  const normalizeRoster = __dep6.normalizeRoster;
-  const normalizeLineups = __dep6.normalizeLineups;
-  const createCurrencyBalances = __dep6.createCurrencyBalances;
-  const createFilterOptions = __dep6.createFilterOptions;
-  const formatCurrencyBalance = __dep6.formatCurrencyBalance;
-  const collectAssignedUnitIds = __dep6.collectAssignedUnitIds;
-  const evaluatePassive = __dep6.evaluatePassive;
-  const filterRoster = __dep6.filterRoster;
-  const getUnitRarity = __dep6.getUnitRarity;
-  const __dep7 = __require('./screens/lineup/view/events.ts');
-  const bindLineupEvents = __dep7.bindLineupEvents;
+  const __dep3 = __require('./utils/currency.ts');
+  const createNormalizedWallet = __dep3.createNormalizedWallet;
+  const getCurrencyOrder = __dep3.getCurrencyOrder;
+  const getSharedCurrencyWallet = __dep3.getSharedCurrencyWallet;
+  const subscribeSharedCurrencyWallet = __dep3.subscribeSharedCurrencyWallet;
+  const syncSharedCurrencyWallet = __dep3.syncSharedCurrencyWallet;
+  const __dep4 = __require('./ui/dom.ts');
+  const assertElement = __dep4.assertElement;
+  const ensureStyleTag = __dep4.ensureStyleTag;
+  const mountSection = __dep4.mountSection;
+  const __dep5 = __require('./types/currency.ts');
+  const normalizeCurrencyBalances = __dep5.normalizeCurrencyBalances;
+  const __dep6 = __require('./ui/rarity/rarity.ts');
+  const mountRarityAura = __dep6.mountRarityAura;
+  const updateRarity = __dep6.updateRarity;
+  const unmountRarity = __dep6.unmountRarity;
+  const __dep7 = __require('./screens/lineup/view/state.ts');
+  const normalizeRoster = __dep7.normalizeRoster;
+  const normalizeLineups = __dep7.normalizeLineups;
+  const createCurrencyBalances = __dep7.createCurrencyBalances;
+  const createFilterOptions = __dep7.createFilterOptions;
+  const formatCurrencyBalance = __dep7.formatCurrencyBalance;
+  const collectAssignedUnitIds = __dep7.collectAssignedUnitIds;
+  const evaluatePassive = __dep7.evaluatePassive;
+  const filterRoster = __dep7.filterRoster;
+  const getUnitRarity = __dep7.getUnitRarity;
+  const __dep8 = __require('./screens/lineup/view/events.ts');
+  const bindLineupEvents = __dep8.bindLineupEvents;
   const STYLE_ID = 'lineup-view-style-v1';
   const powerFormatter = createNumberFormatter('vi-VN');
   function ensureStyles() {
@@ -18141,6 +18167,21 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       });
       const playerCurrencySource = normalizeCurrencyBalances(playerState ?? null);
       const currencyBalances = createCurrencyBalances(playerCurrencySource, currencies);
+      const currencyOrder = getCurrencyOrder();
+      const mapToWallet = () => {
+          const wallet = {};
+          for (const id of currencyOrder) {
+              wallet[id] = Number(currencyBalances.get(id) ?? 0);
+          }
+          return createNormalizedWallet(wallet);
+      };
+      const applyWalletToBalances = (wallet) => {
+          for (const id of currencyOrder) {
+              currencyBalances.set(id, Number(wallet[id] ?? 0));
+          }
+      };
+      applyWalletToBalances(createNormalizedWallet(getSharedCurrencyWallet(), mapToWallet()));
+      syncSharedCurrencyWallet(mapToWallet(), { merge: true });
       const state = {
           selectedLineupId: normalizedLineups[0]?.id ?? null,
           selectedUnitId: null,
@@ -18889,6 +18930,12 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           rosterLookup,
       });
       cleanup.push(...eventCleanup);
+      const unsubscribeSharedWallet = subscribeSharedCurrencyWallet((walletSnapshot) => {
+          applyWalletToBalances(walletSnapshot);
+          refreshWallet();
+          renderCellDetails();
+      });
+      cleanup.push(unsubscribeSharedWallet);
       refreshWallet();
       renderCells();
       renderLeader();
@@ -18911,6 +18958,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
                       console.error('[lineup] destroy error', error);
                   }
               }
+              syncSharedCurrencyWallet(mapToWallet());
               mount.destroy();
           },
       };
@@ -20515,16 +20563,21 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
   const CURRENCY_LABELS = __dep0.CURRENCY_LABELS;
   const createWallet = __dep0.createWallet;
   const GACHA_CONFIG = __dep0.GACHA_CONFIG;
-  const __dep1 = __require('./screens/ui-gacha/logic/currency.ts');
-  const payForRoll = __dep1.payForRoll;
-  const __dep2 = __require('./screens/ui-gacha/logic/gacha.ts');
-  const getBannerById = __dep2.getBannerById;
-  const multiRoll = __dep2.multiRoll;
-  const rollBanner = __dep2.rollBanner;
-  const __dep3 = __require('./screens/ui-gacha/logic/pity.ts');
-  const getBannerState = __dep3.getBannerState;
-  const __dep4 = __require('./screens/ui-gacha/logic/types.ts');
-  const CURRENCY_ORDER = __dep4.CURRENCY_ORDER;
+  const __dep1 = __require('./utils/currency.ts');
+  const createNormalizedWallet = __dep1.createNormalizedWallet;
+  const getSharedCurrencyWallet = __dep1.getSharedCurrencyWallet;
+  const subscribeSharedCurrencyWallet = __dep1.subscribeSharedCurrencyWallet;
+  const syncSharedCurrencyWallet = __dep1.syncSharedCurrencyWallet;
+  const __dep2 = __require('./screens/ui-gacha/logic/currency.ts');
+  const payForRoll = __dep2.payForRoll;
+  const __dep3 = __require('./screens/ui-gacha/logic/gacha.ts');
+  const getBannerById = __dep3.getBannerById;
+  const multiRoll = __dep3.multiRoll;
+  const rollBanner = __dep3.rollBanner;
+  const __dep4 = __require('./screens/ui-gacha/logic/pity.ts');
+  const getBannerState = __dep4.getBannerState;
+  const __dep5 = __require('./screens/ui-gacha/logic/types.ts');
+  const CURRENCY_ORDER = __dep5.CURRENCY_ORDER;
   const NUMBER_FORMAT = new Intl.NumberFormat('vi-VN');
   const TIME_FORMAT = new Intl.RelativeTimeFormat('vi', { style: 'short', numeric: 'auto' });
   const CURRENCY_ICONS = {
@@ -20804,10 +20857,11 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
     `;
       hostElement.appendChild(container);
       const state = {
-          wallet: createWallet(),
+          wallet: createWallet(createNormalizedWallet(getSharedCurrencyWallet())),
           bannerId: GACHA_CONFIG.banners[0]?.id ?? 'permanent',
           states: new Map(),
       };
+      syncSharedCurrencyWallet(state.wallet, { merge: true });
       const currencySlot = container.querySelector('[data-slot="currencies"]');
       const bannerList = container.querySelector('[data-slot="banner-list"]');
       const titleSlot = container.querySelector('[data-slot="hero-title"]');
@@ -20857,6 +20911,10 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
           updateBannerList();
           renderBanner();
       };
+      const unsubscribeSharedWallet = subscribeSharedCurrencyWallet((walletSnapshot) => {
+          state.wallet = createWallet(walletSnapshot);
+          renderWallet();
+      });
       const performSummon = (count) => {
           const banner = getBannerById(state.bannerId);
           if (!banner) {
@@ -20870,6 +20928,7 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
               return;
           }
           state.wallet = payment.wallet;
+          syncSharedCurrencyWallet(state.wallet);
           renderWallet();
           const results = [];
           const rolls = count === 10 ? multiRoll(banner, state.states, 10) : [rollBanner(banner, state.states)];
@@ -20896,6 +20955,7 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
                   return;
               }
               destroyed = true;
+              unsubscribeSharedWallet();
               if (isBodyHost) {
                   document.body.classList.remove('gacha-ui');
               }
@@ -24398,6 +24458,8 @@ __define('./utils/currency.ts', (exports, module, __require) => {
   const getCurrency = __dep0.getCurrency;
   const listCurrencies = __dep0.listCurrencies;
   const CULTIVATION_SPEND_ORDER = ['VNT', 'HNT', 'TNT', 'ThNT'];
+  let sharedCurrencyWallet = null;
+  const sharedWalletListeners = new Set();
   const asNonNegativeInt = (value) => {
       if (typeof value !== 'number' || !Number.isFinite(value))
           return 0;
@@ -24498,6 +24560,56 @@ __define('./utils/currency.ts', (exports, module, __require) => {
   function formatCurrencyAmount(value, currencyId, options = {}) {
       return formatBalance(value, currencyId, options);
   }
+  function normalizeWalletValue(value) {
+      if (typeof value !== 'number' || !Number.isFinite(value))
+          return 0;
+      return Math.max(0, Math.floor(value));
+  }
+  function cloneWalletByOrder(source) {
+      const next = {};
+      for (const id of CURRENCY_ORDER) {
+          next[id] = normalizeWalletValue(source?.[id]);
+      }
+      return next;
+  }
+  function emitSharedWallet() {
+      const snapshot = cloneWalletByOrder(sharedCurrencyWallet);
+      for (const listener of sharedWalletListeners) {
+          listener(snapshot);
+      }
+  }
+  function createNormalizedWallet(...sources) {
+      const merged = {};
+      for (const source of sources) {
+          for (const id of CURRENCY_ORDER) {
+              if (!source || source[id] == null)
+                  continue;
+              merged[id] = normalizeWalletValue(source[id]);
+          }
+      }
+      return cloneWalletByOrder(merged);
+  }
+  function getSharedCurrencyWallet() {
+      if (!sharedCurrencyWallet) {
+          sharedCurrencyWallet = createNormalizedWallet();
+      }
+      return cloneWalletByOrder(sharedCurrencyWallet);
+  }
+  function syncSharedCurrencyWallet(wallet, options = {}) {
+      const current = getSharedCurrencyWallet();
+      sharedCurrencyWallet = options.merge
+          ? createNormalizedWallet(current, wallet)
+          : createNormalizedWallet(wallet);
+      emitSharedWallet();
+      return cloneWalletByOrder(sharedCurrencyWallet);
+  }
+  function subscribeSharedCurrencyWallet(listener) {
+      sharedWalletListeners.add(listener);
+      listener(getSharedCurrencyWallet());
+      return () => {
+          sharedWalletListeners.delete(listener);
+      };
+  }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'spendAetherWithPriority')) exports.spendAetherWithPriority = spendAetherWithPriority;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getCurrencyDefinitions')) exports.getCurrencyDefinitions = getCurrencyDefinitions;
@@ -24505,6 +24617,10 @@ __define('./utils/currency.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'getCurrencyOrder')) exports.getCurrencyOrder = getCurrencyOrder;
   if (!Object.prototype.hasOwnProperty.call(exports, 'convertCurrencyAmount')) exports.convertCurrencyAmount = convertCurrencyAmount;
   if (!Object.prototype.hasOwnProperty.call(exports, 'formatCurrencyAmount')) exports.formatCurrencyAmount = formatCurrencyAmount;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'createNormalizedWallet')) exports.createNormalizedWallet = createNormalizedWallet;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getSharedCurrencyWallet')) exports.getSharedCurrencyWallet = getSharedCurrencyWallet;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'syncSharedCurrencyWallet')) exports.syncSharedCurrencyWallet = syncSharedCurrencyWallet;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'subscribeSharedCurrencyWallet')) exports.subscribeSharedCurrencyWallet = subscribeSharedCurrencyWallet;
 });
 __define('./utils/dummy.ts', (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/utils/dummy.ts

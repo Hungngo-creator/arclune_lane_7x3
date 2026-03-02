@@ -5,6 +5,12 @@ import { normalizeUnitId } from '../../utils/unit-id.ts';
 import { getSkillSet } from '../../data/skills.ts';
 import { createNumberFormatter } from '../../utils/format.ts';
 import { upgradeCultivation, getCultivationCost, type CultivationPlayerState } from '../../cultivation.ts';
+import {
+  createNormalizedWallet,
+  getSharedCurrencyWallet,
+  subscribeSharedCurrencyWallet,
+  syncSharedCurrencyWallet,
+} from '../../utils/currency.ts';
 import { assertElement, ensureStyleTag, mountSection } from '../../ui/dom.ts';
 import { mountRarityAura, unmountRarity, normalizeRarity } from '@ui/rarity/rarity.ts';
 
@@ -332,6 +338,11 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
     const resolved = resolveCurrencyBalance(currency.id, currencies, playerState);
     mutablePlayerState.currencies![currency.id] = Number.isFinite(resolved) ? resolved : 0;
   }
+  mutablePlayerState.currencies = createNormalizedWallet(
+    getSharedCurrencyWallet(),
+    mutablePlayerState.currencies,
+  );
+  syncSharedCurrencyWallet(mutablePlayerState.currencies, { merge: true });
 
   const container = document.createElement('div');
   container.className = 'collection-view';
@@ -974,6 +985,12 @@ const resolveCurrentCultivation = () => {
     }
   };
 
+  const unsubscribeSharedWallet = subscribeSharedCurrencyWallet((walletSnapshot) => {
+    mutablePlayerState.currencies = createNormalizedWallet(walletSnapshot);
+    refreshWallet();
+  });
+  addCleanup(unsubscribeSharedWallet);
+
   const refreshTuViPanel = () => {
     const { realm, subRealm } = resolveCurrentCultivation();
     tuViRealm.textContent = `Cảnh giới ${realm}`;
@@ -994,6 +1011,7 @@ const resolveCurrentCultivation = () => {
       return;
     }
     mutablePlayerState.currencies = { ...(upgraded.playerState.currencies ?? {}) };
+    syncSharedCurrencyWallet(mutablePlayerState.currencies);
     mutablePlayerState.cultivation = { ...(upgraded.playerState.cultivation ?? {}) };
     refreshWallet();
     refreshTuViPanel();

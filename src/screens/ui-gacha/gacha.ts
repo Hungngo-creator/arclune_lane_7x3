@@ -1,6 +1,12 @@
 //home (termux)/arclune_lane_7x3/src/screens/ui-gacha/gacha.ts
 
 import { CURRENCY_LABELS, createWallet, GACHA_CONFIG } from './logic/config.ts';
+import {
+  createNormalizedWallet,
+  getSharedCurrencyWallet,
+  subscribeSharedCurrencyWallet,
+  syncSharedCurrencyWallet,
+} from '../../utils/currency.ts';
 import { payForRoll } from './logic/currency.ts';
 import { getBannerById, multiRoll, rollBanner } from './logic/gacha.ts';
 import { getBannerState } from './logic/pity.ts';
@@ -335,10 +341,11 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
   hostElement.appendChild(container);
 
   const state: GachaUIState = {
-    wallet: createWallet(),
+    wallet: createWallet(createNormalizedWallet(getSharedCurrencyWallet())),
     bannerId: GACHA_CONFIG.banners[0]?.id ?? 'permanent',
     states: new Map(),
   };
+  syncSharedCurrencyWallet(state.wallet, { merge: true });
 
   const currencySlot = container.querySelector<HTMLElement>('[data-slot="currencies"]');
   const bannerList = container.querySelector<HTMLElement>('[data-slot="banner-list"]');
@@ -394,6 +401,10 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
     updateBannerList();
     renderBanner();
   };
+  const unsubscribeSharedWallet = subscribeSharedCurrencyWallet((walletSnapshot) => {
+    state.wallet = createWallet(walletSnapshot);
+    renderWallet();
+  });
 
   const performSummon = (count: number) => {
     const banner = getBannerById(state.bannerId);
@@ -408,6 +419,7 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
       return;
     }
     state.wallet = payment.wallet;
+    syncSharedCurrencyWallet(state.wallet);
     renderWallet();
     const results: SummonResultEntry[] = [];
     const rolls = count === 10 ? multiRoll(banner, state.states, 10) : [rollBanner(banner, state.states)];
@@ -438,6 +450,7 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
         return;
       }
       destroyed = true;
+      unsubscribeSharedWallet();
       if (isBodyHost) {
         document.body.classList.remove('gacha-ui');
       }

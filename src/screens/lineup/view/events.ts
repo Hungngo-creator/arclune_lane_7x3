@@ -9,6 +9,7 @@ import {
   formatCurrencyBalance,
 } from './state.ts';
 import type { LineupState } from '@shared-types/ui';
+import { createNormalizedWallet, getCurrencyOrder, syncSharedCurrencyWallet } from '../../../utils/currency.ts';
 
 export type CleanupCallback = () => void;
 
@@ -180,6 +181,9 @@ const targetEl = event.target as HTMLElement | null;
       helpers.renderPassives();
       helpers.renderRoster();
       helpers.refreshWallet();
+      const order = getCurrencyOrder();
+      const wallet = createNormalizedWallet(Object.fromEntries(order.map((id) => [id, state.currencyBalances.get(id) ?? 0])));
+      syncSharedCurrencyWallet(wallet);
       return;
     }
 

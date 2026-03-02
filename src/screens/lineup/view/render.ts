@@ -3,6 +3,14 @@
 import { getSkillSet } from '../../../data/skills.ts';
 import { createNumberFormatter } from '../../../utils/format.ts';
 import { normalizeUnitId } from '../../../utils/unit-id.ts';
+import {
+  createNormalizedWallet,
+  getCurrencyOrder,
+  getSharedCurrencyWallet,
+  subscribeSharedCurrencyWallet,
+  syncSharedCurrencyWallet,
+  type CurrencyWallet,
+} from '../../../utils/currency.ts';
 import { assertElement, ensureStyleTag, mountSection } from '../../../ui/dom.ts';
 import { normalizeCurrencyBalances } from '@shared-types/currency';
 import { mountRarityAura, updateRarity, unmountRarity } from '../../../ui/rarity/rarity.ts';
@@ -316,6 +324,24 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
 
   const playerCurrencySource = normalizeCurrencyBalances(playerState ?? null);
   const currencyBalances = createCurrencyBalances(playerCurrencySource, currencies);
+  const currencyOrder = getCurrencyOrder();
+
+  const mapToWallet = (): CurrencyWallet => {
+    const wallet: CurrencyWallet = {};
+    for (const id of currencyOrder){
+      wallet[id] = Number(currencyBalances.get(id) ?? 0);
+    }
+    return createNormalizedWallet(wallet);
+  };
+
+  const applyWalletToBalances = (wallet: CurrencyWallet): void => {
+    for (const id of currencyOrder){
+      currencyBalances.set(id, Number(wallet[id] ?? 0));
+    }
+  };
+
+  applyWalletToBalances(createNormalizedWallet(getSharedCurrencyWallet(), mapToWallet()));
+  syncSharedCurrencyWallet(mapToWallet(), { merge: true });
 
   const state: LineupViewState = {
     selectedLineupId: normalizedLineups[0]?.id ?? null,
@@ -1114,6 +1140,13 @@ const eventCleanup = bindLineupEvents({
   });
   cleanup.push(...eventCleanup);
 
+  const unsubscribeSharedWallet = subscribeSharedCurrencyWallet((walletSnapshot) => {
+    applyWalletToBalances(walletSnapshot);
+    refreshWallet();
+    renderCellDetails();
+  });
+  cleanup.push(unsubscribeSharedWallet);
+
   refreshWallet();
   renderCells();
   renderLeader();
@@ -1136,6 +1169,7 @@ const eventCleanup = bindLineupEvents({
           console.error('[lineup] destroy error', error);
         }
       }
+      syncSharedCurrencyWallet(mapToWallet());
       mount.destroy();
     },
   };

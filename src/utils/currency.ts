@@ -17,6 +17,8 @@ export interface CurrencyWallet {
   [currencyId: string]: number | undefined;
 }
 
+type CurrencyWalletListener = (wallet: CurrencyWallet) => void;
+
 export interface SpendAetherResult {
   ok: boolean;
   wallet: CurrencyWallet;
@@ -26,6 +28,8 @@ export interface SpendAetherResult {
 }
 
 const CULTIVATION_SPEND_ORDER: ReadonlyArray<CurrencyId> = ['VNT', 'HNT', 'TNT', 'ThNT'];
+let sharedCurrencyWallet: CurrencyWallet | null = null;
+const sharedWalletListeners = new Set<CurrencyWalletListener>();
 
 const asNonNegativeInt = (value: unknown): number => {
   if (typeof value !== 'number' || !Number.isFinite(value)) return 0;
@@ -145,4 +149,64 @@ export function formatCurrencyAmount(
   options: FormatBalanceOptions = {},
 ): string {
   return formatBalance(value, currencyId, options);
+}
+
+function normalizeWalletValue(value: unknown): number {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return 0;
+  return Math.max(0, Math.floor(value));
+}
+
+function cloneWalletByOrder(source: CurrencyWallet | null | undefined): CurrencyWallet {
+  const next: CurrencyWallet = {};
+  for (const id of CURRENCY_ORDER){
+    next[id] = normalizeWalletValue(source?.[id]);
+  }
+  return next;
+}
+
+function emitSharedWallet(): void {
+  const snapshot = cloneWalletByOrder(sharedCurrencyWallet);
+  for (const listener of sharedWalletListeners){
+    listener(snapshot);
+  }
+}
+
+export function createNormalizedWallet(
+  ...sources: Array<CurrencyWallet | null | undefined>
+): CurrencyWallet {
+  const merged: CurrencyWallet = {};
+  for (const source of sources){
+    for (const id of CURRENCY_ORDER){
+      if (!source || source[id] == null) continue;
+      merged[id] = normalizeWalletValue(source[id]);
+    }
+  }
+  return cloneWalletByOrder(merged);
+}
+
+export function getSharedCurrencyWallet(): CurrencyWallet {
+  if (!sharedCurrencyWallet){
+    sharedCurrencyWallet = createNormalizedWallet();
+  }
+  return cloneWalletByOrder(sharedCurrencyWallet);
+}
+
+export function syncSharedCurrencyWallet(
+  wallet: CurrencyWallet,
+  options: { merge?: boolean } = {},
+): CurrencyWallet {
+  const current = getSharedCurrencyWallet();
+  sharedCurrencyWallet = options.merge
+    ? createNormalizedWallet(current, wallet)
+    : createNormalizedWallet(wallet);
+  emitSharedWallet();
+  return cloneWalletByOrder(sharedCurrencyWallet);
+}
+
+export function subscribeSharedCurrencyWallet(listener: CurrencyWalletListener): () => void {
+  sharedWalletListeners.add(listener);
+  listener(getSharedCurrencyWallet());
+  return () => {
+    sharedWalletListeners.delete(listener);
+  };
 }
