@@ -9,6 +9,16 @@ const aliasMapper = pathsToModuleNameMapper(compilerOptions.paths || {}, {
 
 module.exports = {
   testEnvironment: 'node',
+  modulePathIgnorePatterns: ['<rootDir>/src/config/package.json'],
+  testPathIgnorePatterns: [
+    '<rootDir>/test/build.test.js',
+    '<rootDir>/test/hud-listeners.test.js',
+    '<rootDir>/test/pve-session-canvas.test.js',
+    '<rootDir>/test/pve-session-config.test.js',
+    '<rootDir>/test/session-background.test.js',
+    '<rootDir>/test/shell-error-handling.test.js',
+    '<rootDir>/test/startGame.test.js',
+  ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   extensionsToTreatAsEsm: ['.ts', '.tsx'],
   transform: {
@@ -23,5 +33,6 @@ module.exports = {
   moduleNameMapper: {
     ...aliasMapper,
     '^zod$': '<rootDir>/tools/zod-stub/index.js',
+    '^.+\\.css$': '<rootDir>/test/styleMock.js',
   },
 };

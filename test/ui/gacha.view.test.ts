@@ -1,5 +1,5 @@
 /**
- * @jest-environment jsdom
+ * @jest-environment node
  */
 
 import { renderGachaView } from '../../src/screens/gacha/view.ts';

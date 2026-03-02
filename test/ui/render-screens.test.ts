@@ -1,5 +1,5 @@
 /**
- * @jest-environment jsdom
+ * @jest-environment node
  */
 
 import * as artModule from '../../src/art.ts';
