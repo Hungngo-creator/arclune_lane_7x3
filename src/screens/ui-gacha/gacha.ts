@@ -310,10 +310,6 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
   const container = document.createElement('div');
   container.className = 'gacha-ui-root';
   container.innerHTML = `
-    <div class="gacha-header">
-      <div class="currency-bar" data-slot="currencies"></div>
-      <button class="rules-button" type="button">Quy tắc &amp; Thuế</button>
-    </div>
     <div class="gacha-body">
       <aside class="banner-sidebar" data-slot="banner-list"></aside>
       <main class="banner-panel">
@@ -324,6 +320,10 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
           </div>
           <span class="banner-timer" data-slot="hero-timer"></span>
         </header>
+        <section class="banner-panel__toolbar" aria-label="Ví tiền tệ gacha">
+          <div class="currency-bar" data-slot="currencies"></div>
+          <button class="rules-button" type="button">Quy tắc &amp; Thuế</button>
+        </section>
         <section class="banner-panel__art" data-slot="hero-art"></section>
         <section class="banner-panel__rates" data-slot="rates"></section>
         <section class="banner-panel__pity" data-slot="pity"></section>

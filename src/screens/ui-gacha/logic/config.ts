@@ -8,7 +8,7 @@ export const DEFAULT_WALLET: Wallet = {
   HNT: 5_200,
   TNT: 620,
   ThNT: 120,
-  TT: 18,
+  TT: 68,
 };
 
 const now = Date.now();
