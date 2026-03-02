@@ -173,10 +173,10 @@ function computeEffectiveRates(
 
 function pickRarity(rates: Record<Rarity, number>, random: number): Rarity {
   let cumulative = 0;
-  for (const rarity of RARITY_ORDER) {
+  for (const rarity of [...RARITY_ORDER].reverse()) {
     const value = rates[rarity] ?? 0;
     cumulative += value;
-    if (random <= cumulative + 1e-8) {
+    if (random >= 1 - cumulative - 1e-8) {
       return rarity;
     }
   }

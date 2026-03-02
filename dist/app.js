@@ -4225,7 +4225,7 @@ __define('./combat.ts', (exports, module, __require) => {
           return 0;
       const base = Math.max(0, Math.floor((unit.atk ?? 0) + (unit.wil ?? 0)));
       const ratio = Math.min(0.6, realm * 0.02 + subRealm * 0.005);
-      const className = getMetaById(unit.id)?.class ?? '';
+      const className = String(getMetaById(unit.id)?.class ?? '');
       const roleScale = REALM_ROLE_SCALE[className] ?? 1;
       return Math.round(base * ratio * roleScale);
   };
@@ -22011,7 +22011,7 @@ __define('./screens/ui-gacha/logic/config.ts', (exports, module, __require) => {
           label: 'Triệu Hồi Chung',
           type: 'Permanent',
           description: 'Danh sách N / R / SR / SSR toàn bộ.',
-          cost: { unit: 'VNT', x1: 250, x10: 2_500 },
+          cost: { unit: 'HNT', x1: 250, x10: 2_500 },
           rates: { N: 0.6, R: 0.25, SR: 0.12, SSR: 0.03 },
           pity: {
               srFloor: 10,
@@ -22029,8 +22029,8 @@ __define('./screens/ui-gacha/logic/config.ts', (exports, module, __require) => {
           label: 'Giới Hạn UR',
           type: 'LimitedUR',
           description: 'UR rate-up, pity hard bảo đảm UR featured.',
-          cost: { unit: 'VNT', x1: 250, x10: 2_500 },
-          rates: { N: 0.586, R: 0.244, SR: 0.117, SSR: 0.03, UR: 0.015, Prime: 0.0075 },
+          cost: { unit: 'TNT', x1: 250, x10: 2_500 },
+          rates: { N: 0.5935, R: 0.245, SR: 0.117, SSR: 0.0295, UR: 0.015, Prime: 0.0 },
           pity: {
               srFloor: 10,
               ur: { soft: 70, softStep: 0.003, hard: 90, hardGuaranteeFeatured: true },
@@ -22050,7 +22050,7 @@ __define('./screens/ui-gacha/logic/config.ts', (exports, module, __require) => {
           label: 'Giới Hạn Prime',
           type: 'LimitedPrime',
           description: 'Prime rate-up, pity bảo đảm Prime featured.',
-          cost: { unit: 'VNT', x1: 300, x10: 3_000 },
+          cost: { unit: 'ThNT', x1: 300, x10: 3_000 },
           rates: { N: 0.586, R: 0.244, SR: 0.117, SSR: 0.03, UR: 0.015, Prime: 0.0075 },
           pity: {
               srFloor: 10,
@@ -22084,8 +22084,9 @@ __define('./screens/ui-gacha/logic/config.ts', (exports, module, __require) => {
   };
   function createWallet(initial) {
       const wallet = {};
+      const useDefaults = typeof initial === 'undefined';
       for (const code of CURRENCY_ORDER) {
-          const fallback = DEFAULT_WALLET[code] ?? 0;
+          const fallback = useDefaults ? (DEFAULT_WALLET[code] ?? 0) : 0;
           wallet[code] = Math.max(0, Math.trunc((initial?.[code] ?? fallback) ?? 0));
       }
       return wallet;
@@ -22566,10 +22567,10 @@ __define('./screens/ui-gacha/logic/pity.ts', (exports, module, __require) => {
   }
   function pickRarity(rates, random) {
       let cumulative = 0;
-      for (const rarity of RARITY_ORDER) {
+      for (const rarity of [...RARITY_ORDER].reverse()) {
           const value = rates[rarity] ?? 0;
           cumulative += value;
-          if (random <= cumulative + 1e-8) {
+          if (random >= 1 - cumulative - 1e-8) {
               return rarity;
           }
       }
@@ -24542,6 +24543,10 @@ __define('./ui/rarity/rarity.ts', (exports, module, __require) => {
   const ensureStyleTag = __dep2.ensureStyleTag;
   const STYLE_ID = 'ui-rarity-style';
   const RARITY_SEQUENCE = ['N', 'R', 'SR', 'SSR', 'UR', 'PRIME'];
+  const RARITY_ALIASES = {
+      PRIME: 'PRIME',
+      Prime: 'PRIME',
+  };
   function normalizePowerMode(input) {
       return input === 'low' ? 'low' : 'normal';
   }
@@ -24549,6 +24554,10 @@ __define('./ui/rarity/rarity.ts', (exports, module, __require) => {
       const key = String(input).trim().toUpperCase();
       if (RARITY_SEQUENCE.includes(key)) {
           return key;
+      }
+      const alias = RARITY_ALIASES[key];
+      if (alias) {
+          return alias;
       }
       throw new Error(`Rarity không hợp lệ: ${input}`);
   }
@@ -24574,9 +24583,20 @@ __define('./ui/rarity/rarity.ts', (exports, module, __require) => {
           prism,
       });
   }
+  const DEFAULT_TOKEN_SOURCE = {
+      N: { hex: '#9AA3AF', glow: 0.6, ring: 1.0, spark: 0 },
+      R: { hex: '#2ED3A0', glow: 0.8, ring: 1.0, spark: 4 },
+      SR: { hex: '#00E5FF', glow: 1.0, ring: 1.05, spark: 6 },
+      SSR: { hex: '#7C4DFF', glow: 1.15, ring: 1.1, spark: 8 },
+      UR: { hex: '#FFD773', glow: 1.25, ring: 1.15, spark: 12 },
+      PRIME: { hex: '#FFFFFF', glow: 1.35, ring: 1.2, spark: 16, prism: true },
+  };
   function normalizeTokenMap(source) {
+      const rawSource = source && typeof source === 'object' && typeof source.default === 'object'
+          ? source.default
+          : source;
       const tokens = new Map();
-      Object.entries(source ?? {}).forEach(([rawKey, rawValue]) => {
+      Object.entries(rawSource ?? {}).forEach(([rawKey, rawValue]) => {
           if (rawKey === 'default' || rawKey === '__esModule') {
               return;
           }
@@ -24590,7 +24610,7 @@ __define('./ui/rarity/rarity.ts', (exports, module, __require) => {
       });
       RARITY_SEQUENCE.forEach(key => {
           if (!tokens.has(key)) {
-              throw new Error(`Thiếu token cho bậc ${key}`);
+              tokens.set(key, createTokenConfig(DEFAULT_TOKEN_SOURCE[key]));
           }
       });
       return Object.freeze(Object.fromEntries(tokens));

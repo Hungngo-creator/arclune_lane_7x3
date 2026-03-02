@@ -20,7 +20,7 @@ const BANNERS: BannerDefinition[] = [
     label: 'Triệu Hồi Chung',
     type: 'Permanent',
     description: 'Danh sách N / R / SR / SSR toàn bộ.',
-    cost: { unit: 'VNT', x1: 250, x10: 2_500 },
+    cost: { unit: 'HNT', x1: 250, x10: 2_500 },
     rates: { N: 0.6, R: 0.25, SR: 0.12, SSR: 0.03 },
     pity: {
       srFloor: 10,
@@ -38,8 +38,8 @@ const BANNERS: BannerDefinition[] = [
     label: 'Giới Hạn UR',
     type: 'LimitedUR',
     description: 'UR rate-up, pity hard bảo đảm UR featured.',
-    cost: { unit: 'VNT', x1: 250, x10: 2_500 },
-    rates: { N: 0.586, R: 0.244, SR: 0.117, SSR: 0.03, UR: 0.015, Prime: 0.0075 },
+    cost: { unit: 'TNT', x1: 250, x10: 2_500 },
+    rates: { N: 0.5935, R: 0.245, SR: 0.117, SSR: 0.0295, UR: 0.015, Prime: 0.0 },
     pity: {
       srFloor: 10,
       ur: { soft: 70, softStep: 0.003, hard: 90, hardGuaranteeFeatured: true },
@@ -59,7 +59,7 @@ const BANNERS: BannerDefinition[] = [
     label: 'Giới Hạn Prime',
     type: 'LimitedPrime',
     description: 'Prime rate-up, pity bảo đảm Prime featured.',
-    cost: { unit: 'VNT', x1: 300, x10: 3_000 },
+    cost: { unit: 'ThNT', x1: 300, x10: 3_000 },
     rates: { N: 0.586, R: 0.244, SR: 0.117, SSR: 0.03, UR: 0.015, Prime: 0.0075 },
     pity: {
       srFloor: 10,
@@ -96,8 +96,9 @@ export const CURRENCY_LABELS: Record<CurrencyCode, string> = {
 
 export function createWallet(initial?: Partial<Wallet>): Wallet {
   const wallet: Partial<Wallet> = {};
+  const useDefaults = typeof initial === 'undefined';
   for (const code of CURRENCY_ORDER){
-    const fallback = DEFAULT_WALLET[code] ?? 0;
+    const fallback = useDefaults ? (DEFAULT_WALLET[code] ?? 0) : 0;
     wallet[code] = Math.max(0, Math.trunc((initial?.[code] ?? fallback) ?? 0));
   }
   return wallet as Wallet;

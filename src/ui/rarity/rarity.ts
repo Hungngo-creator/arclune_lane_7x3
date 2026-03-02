@@ -64,6 +64,11 @@ interface AuraState {
 
 const RARITY_SEQUENCE: Rarity[] = ['N', 'R', 'SR', 'SSR', 'UR', 'PRIME'];
 
+const RARITY_ALIASES: Readonly<Record<string, Rarity>> = {
+  PRIME: 'PRIME',
+  Prime: 'PRIME',
+};
+
 function normalizePowerMode(input: unknown): PowerMode {
   return input === 'low' ? 'low' : 'normal';
 }
@@ -72,6 +77,10 @@ function normalizeRarityInput(input: string | Rarity): Rarity {
   const key = String(input).trim().toUpperCase();
   if (RARITY_SEQUENCE.includes(key as Rarity)){
     return key as Rarity;
+  }
+  const alias = RARITY_ALIASES[key];
+  if (alias){
+    return alias;
   }
   throw new Error(`Rarity không hợp lệ: ${input}`);
 }
@@ -100,9 +109,21 @@ function createTokenConfig(input: TokenConfigInput): TokenConfig {
   });
 }
 
+const DEFAULT_TOKEN_SOURCE: Readonly<Record<Rarity, TokenConfigInput>> = {
+  N: { hex: '#9AA3AF', glow: 0.6, ring: 1.0, spark: 0 },
+  R: { hex: '#2ED3A0', glow: 0.8, ring: 1.0, spark: 4 },
+  SR: { hex: '#00E5FF', glow: 1.0, ring: 1.05, spark: 6 },
+  SSR: { hex: '#7C4DFF', glow: 1.15, ring: 1.1, spark: 8 },
+  UR: { hex: '#FFD773', glow: 1.25, ring: 1.15, spark: 12 },
+  PRIME: { hex: '#FFFFFF', glow: 1.35, ring: 1.2, spark: 16, prism: true },
+};
+
 function normalizeTokenMap(source: Record<string, TokenConfigInput>): Record<Rarity, TokenConfig> {
+  const rawSource = source && typeof source === 'object' && typeof (source as { default?: unknown }).default === 'object'
+    ? ((source as unknown) as { default: Record<string, TokenConfigInput> }).default
+    : source;
   const tokens = new Map<Rarity, TokenConfig>();
-  Object.entries(source ?? {}).forEach(([rawKey, rawValue]) => {
+  Object.entries(rawSource ?? {}).forEach(([rawKey, rawValue]) => {
     if (rawKey === 'default' || rawKey === '__esModule'){
       return;
     }
@@ -115,7 +136,7 @@ function normalizeTokenMap(source: Record<string, TokenConfigInput>): Record<Rar
   });
   RARITY_SEQUENCE.forEach(key => {
     if (!tokens.has(key)){
-      throw new Error(`Thiếu token cho bậc ${key}`);
+      tokens.set(key, createTokenConfig(DEFAULT_TOKEN_SOURCE[key]));
     }
   });
   return Object.freeze(Object.fromEntries(tokens) as Record<Rarity, TokenConfig>);

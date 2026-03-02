@@ -102,7 +102,7 @@ const realmBonusFromUnit = (unit: UnitToken): number => {
   if (realm <= 0 && subRealm <= 0) return 0;
   const base = Math.max(0, Math.floor((unit.atk ?? 0) + (unit.wil ?? 0)));
   const ratio = Math.min(0.6, realm * 0.02 + subRealm * 0.005);
-  const className = getMetaById(unit.id)?.class ?? '';
+  const className = String(getMetaById(unit.id)?.class ?? '');
   const roleScale = REALM_ROLE_SCALE[className] ?? 1;
   return Math.round(base * ratio * roleScale);
 };
@@ -119,7 +119,7 @@ const hasAbsoluteLawTag = (unit: UnitToken | null | undefined, mode: 'attack' | 
   const modeNeedles = mode === 'attack'
     ? ['absolute_attack', 'tuyetdoi_cong']
     : ['absolute_shield', 'tuyetdoi_khien'];
-  return statuses.some((status) => {
+  return statuses.some((status: { id?: string; tag?: string }) => {
     const haystack = `${status.id ?? ''}|${status.tag ?? ''}`.toLowerCase();
     if (haystack.includes('absolute') || haystack.includes('tuyetdoi')) return true;
     return modeNeedles.some((needle) => haystack.includes(needle));
