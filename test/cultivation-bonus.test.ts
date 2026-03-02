@@ -9,7 +9,7 @@ import {
 import { spendAetherWithPriority } from '../src/utils/currency.ts';
 
 describe('applyCultivationBonus', () => {
-  test('Đúc Phách tăng tuyến tính và chặn tối đa ở tiểu cấp 7', () => {
+  test('Khai Nguyên tăng tuyến tính và chặn tối đa ở tiểu cấp 9', () => {
     const boosted = applyCultivationBonus({
       id: 'linhgac',
       hpMax: 1000,
@@ -24,17 +24,17 @@ describe('applyCultivationBonus', () => {
       subRealm: 9,
       hasCultivationData: true,
     });
-
-    assert.strictEqual(boosted.hpMax, 1210);
-    assert.strictEqual(boosted.atk, 228);
-    assert.strictEqual(boosted.wil, 171);
-    assert.strictEqual(boosted.arm, 99.45);
-    assert.strictEqual(boosted.res, 88.4);
-    assert.strictEqual(boosted.aeMax, 321);
-    assert.strictEqual(boosted.aeRegen, 20.7);
+    
+    assert.strictEqual(boosted.hpMax, 1180);
+    assert.strictEqual(boosted.atk, 227);
+    assert.strictEqual(boosted.wil, 170.25);
+    assert.strictEqual(boosted.arm, 98.1);
+    assert.strictEqual(boosted.res, 87.2);
+    assert.strictEqual(boosted.aeMax, 321.6);
+    assert.strictEqual(boosted.aeRegen, 20.54);
   });
 
-  test('Luyện Hồn tăng tuyến tính và chặn tối đa ở tiểu cấp 3', () => {
+  test('Trúc Cơ tăng tuyến tính và chặn tối đa ở tiểu cấp 9', () => {
     const boosted = applyCultivationBonus({
       id: 'linhgac',
       hpMax: 1000,
@@ -46,17 +46,17 @@ describe('applyCultivationBonus', () => {
       aeMax: 300,
       aeRegen: 20,
       realm: 2,
-      subRealm: 5,
+      subRealm: 12,
       hasCultivationData: true,
     });
 
-    assert.strictEqual(boosted.hpMax, 1180);
-    assert.strictEqual(boosted.atk, 224);
-    assert.strictEqual(boosted.wil, 172.5);
-    assert.strictEqual(boosted.arm, 98.1);
-    assert.strictEqual(boosted.res, 87.2);
-    assert.strictEqual(boosted.aeMax, 318);
-    assert.strictEqual(boosted.aeRegen, 20.6);
+    assert.strictEqual(boosted.hpMax, 1225);
+    assert.strictEqual(boosted.atk, 232.4);
+    assert.strictEqual(boosted.wil, 174.3);
+    assert.strictEqual(boosted.arm, 99.72);
+    assert.strictEqual(boosted.res, 88.64);
+    assert.strictEqual(boosted.aeMax, 324.3);
+    assert.strictEqual(boosted.aeRegen, 20.63);
   });
 
   test('leader hệ thống không nhận bonus nếu thiếu dữ liệu tu vi', () => {
@@ -86,7 +86,7 @@ describe('applyCultivationBonus', () => {
 describe('cultivation economy helpers', () => {
   test('trả về chi phí tiểu cấp và chi phí đột phá', () => {
     const subRealmCost = getCultivationCost(1, 0);
-    const breakthroughCost = getCultivationCost(1, 7);
+    const breakthroughCost = getCultivationCost(1, 9);
 
     assert.deepStrictEqual(subRealmCost, {
       realm: 1,
@@ -94,29 +94,29 @@ describe('cultivation economy helpers', () => {
       nextRealm: 1,
       nextSubRealm: 1,
       isBreakthrough: false,
-      aetherCost: 300,
-      specialSubRealmCount: 7,
+      aetherCost: 200,
+      specialSubRealmCount: 9,
     });
 
     assert.deepStrictEqual(breakthroughCost, {
       realm: 1,
-      currentSubRealm: 7,
+      currentSubRealm: 9,
       nextRealm: 2,
       nextSubRealm: 1,
       isBreakthrough: true,
-      aetherCost: 5000,
-      specialSubRealmCount: 7,
+      aetherCost: 2200,
+      specialSubRealmCount: 9,
     });
   });
 
   test('canBreakthrough phản ánh đúng trạng thái', () => {
-    assert.deepStrictEqual(canBreakthrough(1, 6), {
+    assert.deepStrictEqual(canBreakthrough(1, 8), {
       canBreakthrough: false,
       nextRealm: null,
       reason: 'need_more_subrealm',
     });
 
-    assert.deepStrictEqual(canBreakthrough(1, 7), {
+    assert.deepStrictEqual(canBreakthrough(1, 9), {
       canBreakthrough: true,
       nextRealm: 2,
       reason: 'ready',
@@ -151,6 +151,6 @@ describe('cultivation economy helpers', () => {
     assert.strictEqual(result.isBreakthrough, false);
     assert.strictEqual(result.playerState.cultivation?.realm, 1);
     assert.strictEqual(result.playerState.cultivation?.subRealm, 1);
-    assert.strictEqual(result.spent.spentAether, 300);
+    assert.strictEqual(result.spent.spentAether, 200);
   });
 });

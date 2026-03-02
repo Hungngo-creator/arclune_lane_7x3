@@ -5,6 +5,7 @@ import { normalizeUnitId } from '../../utils/unit-id.ts';
 import { getSkillSet } from '../../data/skills.ts';
 import { createNumberFormatter } from '../../utils/format.ts';
 import { upgradeCultivation, getCultivationCost, type CultivationPlayerState } from '../../cultivation.ts';
+import { getCultivationRealmEconomy } from '../../data/economy.ts';
 import {
   createNormalizedWallet,
   getSharedCurrencyWallet,
@@ -1007,12 +1008,22 @@ const resolveCurrentCultivation = () => {
 
   const refreshTuViPanel = () => {
     const { realm, subRealm } = resolveCurrentCultivation();
-    tuViRealm.textContent = `Cảnh giới ${realm}`;
-    tuViSubRealm.textContent = `Tiểu cảnh giới ${subRealm}`;
+    const realmEconomy = getCultivationRealmEconomy(realm);
+    const realmName = realmEconomy?.name ?? `Cảnh giới ${realm}`;
+    const maxSubRealm = realmEconomy?.subRealmCosts.length ?? 0;
+
+    tuViRealm.textContent = `${realmName} (${realm})`;
+    tuViSubRealm.textContent = `Tiểu cảnh giới ${subRealm}/${maxSubRealm}`;
+
     const costInfo = getCultivationCost(realm, subRealm);
-    tuViCost.textContent = costInfo
-      ? `Chi phí kế tiếp: ${currencyFormatter.format(costInfo.aetherCost)} VNT`
-      : 'Chi phí kế tiếp: Đã đạt giới hạn';
+    if (!costInfo){
+      tuViCost.textContent = 'Chi phí kế tiếp: Đã đạt giới hạn';
+      return;
+    }
+
+    tuViCost.textContent = costInfo.isBreakthrough
+      ? `Đột phá lên ${getCultivationRealmEconomy(costInfo.nextRealm)?.name ?? `Cảnh giới ${costInfo.nextRealm}`}: ${currencyFormatter.format(costInfo.aetherCost)} VNT`
+      : `Chi phí kế tiếp: ${currencyFormatter.format(costInfo.aetherCost)} VNT`;
   };
 
   const handleCultivationUpgrade = () => {
@@ -1039,7 +1050,8 @@ const resolveCurrentCultivation = () => {
     patchPlayerProfile({ cultivationByUnit: savedCultivationByUnit });
     refreshWallet();
     refreshTuViPanel();
-    stageStatus.textContent = `Đã nâng lên Cảnh giới ${upgraded.newRealm} · Tiểu cảnh giới ${upgraded.newSubRealm}.`;
+    const upgradedRealmName = getCultivationRealmEconomy(upgraded.newRealm)?.name ?? `Cảnh giới ${upgraded.newRealm}`;
+    stageStatus.textContent = `Đã nâng lên ${upgradedRealmName} · Tiểu cảnh giới ${upgraded.newSubRealm}.`;
   };
   tuViUpgrade.addEventListener('click', handleCultivationUpgrade);
   addCleanup(() => tuViUpgrade.removeEventListener('click', handleCultivationUpgrade));

@@ -46,28 +46,140 @@ const economyConfig = {
   cultivation: {
     realms: {
       1: {
-        name: 'Đúc Phách',
-        specialSubRealmCount: 7,
+        name: 'Khai Nguyên',
+        specialSubRealmCount: 9,
+        subRealmCosts: [
+          200,
+          280,
+          380,
+          500,
+          650,
+          830,
+          1040,
+          1280,
+          1550
+        ],
+        breakthroughCost: 2200
+      },
+      2: {
+        name: 'Trúc Cơ',
+        specialSubRealmCount: 9,
         subRealmCosts: [
           300,
           450,
           700,
-          1100,
-          1600,
-          2300,
-          3200
+          1050,
+          1450,
+          1900,
+          2400,
+          2950,
+          3550
         ],
-        breakthroughCost: 5000
+        breakthroughCost: 4800
       },
-      2: {
+      3: {
+        name: 'Kết Đan',
+        specialSubRealmCount: 9,
+        subRealmCosts: [
+          4200,
+          5000,
+          5900,
+          6900,
+          8000,
+          9200,
+          10500,
+          11900,
+          13400
+        ],
+        breakthroughCost: 16800
+      },
+      4: {
+        name: 'Ngưng Đan',
+        specialSubRealmCount: 9,
+        subRealmCosts: [
+          15000,
+          16800,
+          18700,
+          20700,
+          22800,
+          25000,
+          27300,
+          29700,
+          32200
+        ],
+        breakthroughCost: 42000
+      },
+      5: {
+        name: 'Đúc Phách',
+        specialSubRealmCount: 7,
+        subRealmCosts: [
+          36000,
+          40500,
+          45500,
+          51000,
+          57000,
+          63500,
+          70500
+        ],
+        breakthroughCost: 92000
+      },
+      6: {
         name: 'Luyện Hồn',
         specialSubRealmCount: 3,
         subRealmCosts: [
-          7000,
-          9200,
-          12000
+          98000,
+          122000,
+          151000
         ],
-        breakthroughCost: 18000
+        breakthroughCost: 210000
+      },
+      7: {
+        name: 'Thánh Nhân',
+        specialSubRealmCount: 9,
+        subRealmCosts: [
+          165000,
+          182000,
+          200000,
+          219000,
+          239000,
+          260000,
+          282000,
+          305000,
+          329000
+        ],
+        breakthroughCost: 420000
+      },
+      8: {
+        name: 'Thánh Hoàng',
+        specialSubRealmCount: 9,
+        subRealmCosts: [
+          360000,
+          388000,
+          417000,
+          447000,
+          478000,
+          510000,
+          543000,
+          577000,
+          612000
+        ],
+        breakthroughCost: 760000
+      },
+      9: {
+        name: 'Thánh Tôn',
+        specialSubRealmCount: 9,
+        subRealmCosts: [
+          650000,
+          690000,
+          731000,
+          773000,
+          816000,
+          860000,
+          905000,
+          951000,
+          998000
+        ],
+        breakthroughCost: 1200000
       }
     }
   },

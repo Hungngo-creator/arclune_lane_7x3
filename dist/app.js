@@ -4899,29 +4899,111 @@ __define('./cultivation.ts', (exports, module, __require) => {
   const __dep1 = __require('./utils/currency.ts');
   const spendAetherWithPriority = __dep1.spendAetherWithPriority;
   const REALM_CONFIGS = {
-      // Realm 1: Đúc Phách (7 tiểu cấp)
       1: {
-          maxSubRealm: 7,
+          maxSubRealm: 9,
           perSubRealm: {
-              hpMax: 0.03,
-              atk: 0.02,
-              wil: 0.02,
-              arm: 0.015,
-              res: 0.015,
-              aeMax: 0.01,
-              aeRegen: 0.005,
+              hpMax: 0.02,
+              atk: 0.015,
+              wil: 0.015,
+              arm: 0.01,
+              res: 0.01,
+              aeMax: 0.008,
+              aeRegen: 0.003,
           },
       },
-      // Realm 2: Luyện Hồn (3 tiểu cấp)
       2: {
+          maxSubRealm: 9,
+          perSubRealm: {
+              hpMax: 0.025,
+              atk: 0.018,
+              wil: 0.018,
+              arm: 0.012,
+              res: 0.012,
+              aeMax: 0.009,
+              aeRegen: 0.0035,
+          },
+      },
+      3: {
+          maxSubRealm: 9,
+          perSubRealm: {
+              hpMax: 0.03,
+              atk: 0.022,
+              wil: 0.024,
+              arm: 0.014,
+              res: 0.014,
+              aeMax: 0.01,
+              aeRegen: 0.004,
+          },
+      },
+      4: {
+          maxSubRealm: 9,
+          perSubRealm: {
+              hpMax: 0.035,
+              atk: 0.027,
+              wil: 0.03,
+              arm: 0.017,
+              res: 0.017,
+              aeMax: 0.011,
+              aeRegen: 0.0045,
+          },
+      },
+      5: {
+          maxSubRealm: 7,
+          perSubRealm: {
+              hpMax: 0.055,
+              atk: 0.04,
+              wil: 0.043,
+              arm: 0.028,
+              res: 0.028,
+              aeMax: 0.016,
+              aeRegen: 0.007,
+          },
+      },
+      6: {
           maxSubRealm: 3,
           perSubRealm: {
-              hpMax: 0.06,
-              atk: 0.04,
-              wil: 0.05,
-              arm: 0.03,
-              res: 0.03,
+              hpMax: 0.09,
+              atk: 0.07,
+              wil: 0.075,
+              arm: 0.05,
+              res: 0.05,
+              aeMax: 0.024,
+              aeRegen: 0.011,
+          },
+      },
+      7: {
+          maxSubRealm: 9,
+          perSubRealm: {
+              hpMax: 0.07,
+              atk: 0.05,
+              wil: 0.055,
+              arm: 0.036,
+              res: 0.036,
               aeMax: 0.02,
+              aeRegen: 0.008,
+          },
+      },
+      8: {
+          maxSubRealm: 9,
+          perSubRealm: {
+              hpMax: 0.08,
+              atk: 0.06,
+              wil: 0.065,
+              arm: 0.042,
+              res: 0.042,
+              aeMax: 0.022,
+              aeRegen: 0.009,
+          },
+      },
+      9: {
+          maxSubRealm: 9,
+          perSubRealm: {
+              hpMax: 0.09,
+              atk: 0.07,
+              wil: 0.075,
+              arm: 0.05,
+              res: 0.05,
+              aeMax: 0.024,
               aeRegen: 0.01,
           },
       },
@@ -5387,28 +5469,140 @@ __define('./data/economy.config.ts', (exports, module, __require) => {
       cultivation: {
           realms: {
               1: {
-                  name: 'Đúc Phách',
-                  specialSubRealmCount: 7,
+                  name: 'Khai Nguyên',
+                  specialSubRealmCount: 9,
+                  subRealmCosts: [
+                      200,
+                      280,
+                      380,
+                      500,
+                      650,
+                      830,
+                      1040,
+                      1280,
+                      1550
+                  ],
+                  breakthroughCost: 2200
+              },
+              2: {
+                  name: 'Trúc Cơ',
+                  specialSubRealmCount: 9,
                   subRealmCosts: [
                       300,
                       450,
                       700,
-                      1100,
-                      1600,
-                      2300,
-                      3200
+                      1050,
+                      1450,
+                      1900,
+                      2400,
+                      2950,
+                      3550
                   ],
-                  breakthroughCost: 5000
+                  breakthroughCost: 4800
               },
-              2: {
+              3: {
+                  name: 'Kết Đan',
+                  specialSubRealmCount: 9,
+                  subRealmCosts: [
+                      4200,
+                      5000,
+                      5900,
+                      6900,
+                      8000,
+                      9200,
+                      10500,
+                      11900,
+                      13400
+                  ],
+                  breakthroughCost: 16800
+              },
+              4: {
+                  name: 'Ngưng Đan',
+                  specialSubRealmCount: 9,
+                  subRealmCosts: [
+                      15000,
+                      16800,
+                      18700,
+                      20700,
+                      22800,
+                      25000,
+                      27300,
+                      29700,
+                      32200
+                  ],
+                  breakthroughCost: 42000
+              },
+              5: {
+                  name: 'Đúc Phách',
+                  specialSubRealmCount: 7,
+                  subRealmCosts: [
+                      36000,
+                      40500,
+                      45500,
+                      51000,
+                      57000,
+                      63500,
+                      70500
+                  ],
+                  breakthroughCost: 92000
+              },
+              6: {
                   name: 'Luyện Hồn',
                   specialSubRealmCount: 3,
                   subRealmCosts: [
-                      7000,
-                      9200,
-                      12000
+                      98000,
+                      122000,
+                      151000
                   ],
-                  breakthroughCost: 18000
+                  breakthroughCost: 210000
+              },
+              7: {
+                  name: 'Thánh Nhân',
+                  specialSubRealmCount: 9,
+                  subRealmCosts: [
+                      165000,
+                      182000,
+                      200000,
+                      219000,
+                      239000,
+                      260000,
+                      282000,
+                      305000,
+                      329000
+                  ],
+                  breakthroughCost: 420000
+              },
+              8: {
+                  name: 'Thánh Hoàng',
+                  specialSubRealmCount: 9,
+                  subRealmCosts: [
+                      360000,
+                      388000,
+                      417000,
+                      447000,
+                      478000,
+                      510000,
+                      543000,
+                      577000,
+                      612000
+                  ],
+                  breakthroughCost: 760000
+              },
+              9: {
+                  name: 'Thánh Tôn',
+                  specialSubRealmCount: 9,
+                  subRealmCosts: [
+                      650000,
+                      690000,
+                      731000,
+                      773000,
+                      816000,
+                      860000,
+                      905000,
+                      951000,
+                      998000
+                  ],
+                  breakthroughCost: 1200000
               }
           }
       },
@@ -16386,36 +16580,38 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
   const __dep4 = __require('./cultivation.ts');
   const upgradeCultivation = __dep4.upgradeCultivation;
   const getCultivationCost = __dep4.getCultivationCost;
-  const __dep5 = __require('./utils/currency.ts');
-  const createNormalizedWallet = __dep5.createNormalizedWallet;
-  const getSharedCurrencyWallet = __dep5.getSharedCurrencyWallet;
-  const subscribeSharedCurrencyWallet = __dep5.subscribeSharedCurrencyWallet;
-  const syncSharedCurrencyWallet = __dep5.syncSharedCurrencyWallet;
-  const __dep6 = __require('./ui/dom.ts');
-  const assertElement = __dep6.assertElement;
-  const ensureStyleTag = __dep6.ensureStyleTag;
-  const mountSection = __dep6.mountSection;
-  const __dep7 = __require('./ui/rarity/rarity.ts');
-  const mountRarityAura = __dep7.mountRarityAura;
-  const unmountRarity = __dep7.unmountRarity;
-  const normalizeRarity = __dep7.normalizeRarity;
-  const __dep8 = __require('./screens/collection/helpers.ts');
-  const ABILITY_TYPE_LABELS = __dep8.ABILITY_TYPE_LABELS;
-  const buildRosterWithCost = __dep8.buildRosterWithCost;
-  const cloneRoster = __dep8.cloneRoster;
-  const collectAbilityFacts = __dep8.collectAbilityFacts;
-  const describeUlt = __dep8.describeUlt;
-  const labelForAbility = __dep8.labelForAbility;
-  const resolveCurrencyBalance = __dep8.resolveCurrencyBalance;
-  const getCurrencyCatalog = __dep8.getCurrencyCatalog;
-  const ensureNumberFormatter = __dep8.ensureNumberFormatter;
-  const __dep9 = __require('./screens/collection/state.ts');
-  const createFilterState = __dep9.createFilterState;
-  const updateActiveTab = __dep9.updateActiveTab;
-  const updateSelectedUnit = __dep9.updateSelectedUnit;
-  const __dep10 = __require('./utils/player-profile.ts');
-  const loadPlayerProfile = __dep10.loadPlayerProfile;
-  const patchPlayerProfile = __dep10.patchPlayerProfile;
+  const __dep5 = __require('./data/economy.ts');
+  const getCultivationRealmEconomy = __dep5.getCultivationRealmEconomy;
+  const __dep6 = __require('./utils/currency.ts');
+  const createNormalizedWallet = __dep6.createNormalizedWallet;
+  const getSharedCurrencyWallet = __dep6.getSharedCurrencyWallet;
+  const subscribeSharedCurrencyWallet = __dep6.subscribeSharedCurrencyWallet;
+  const syncSharedCurrencyWallet = __dep6.syncSharedCurrencyWallet;
+  const __dep7 = __require('./ui/dom.ts');
+  const assertElement = __dep7.assertElement;
+  const ensureStyleTag = __dep7.ensureStyleTag;
+  const mountSection = __dep7.mountSection;
+  const __dep8 = __require('./ui/rarity/rarity.ts');
+  const mountRarityAura = __dep8.mountRarityAura;
+  const unmountRarity = __dep8.unmountRarity;
+  const normalizeRarity = __dep8.normalizeRarity;
+  const __dep9 = __require('./screens/collection/helpers.ts');
+  const ABILITY_TYPE_LABELS = __dep9.ABILITY_TYPE_LABELS;
+  const buildRosterWithCost = __dep9.buildRosterWithCost;
+  const cloneRoster = __dep9.cloneRoster;
+  const collectAbilityFacts = __dep9.collectAbilityFacts;
+  const describeUlt = __dep9.describeUlt;
+  const labelForAbility = __dep9.labelForAbility;
+  const resolveCurrencyBalance = __dep9.resolveCurrencyBalance;
+  const getCurrencyCatalog = __dep9.getCurrencyCatalog;
+  const ensureNumberFormatter = __dep9.ensureNumberFormatter;
+  const __dep10 = __require('./screens/collection/state.ts');
+  const createFilterState = __dep10.createFilterState;
+  const updateActiveTab = __dep10.updateActiveTab;
+  const updateSelectedUnit = __dep10.updateSelectedUnit;
+  const __dep11 = __require('./utils/player-profile.ts');
+  const loadPlayerProfile = __dep11.loadPlayerProfile;
+  const patchPlayerProfile = __dep11.patchPlayerProfile;
   const STYLE_ID = 'collection-view-style-v2';
   const TAB_DEFINITIONS = [
       { key: 'awakening', label: 'Thức Tỉnh', hint: 'Theo dõi mốc thức tỉnh, sao và điểm đột phá của nhân vật đã sở hữu.' },
@@ -17216,12 +17412,19 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       addCleanup(unsubscribeSharedWallet);
       const refreshTuViPanel = () => {
           const { realm, subRealm } = resolveCurrentCultivation();
-          tuViRealm.textContent = `Cảnh giới ${realm}`;
-          tuViSubRealm.textContent = `Tiểu cảnh giới ${subRealm}`;
+          const realmEconomy = getCultivationRealmEconomy(realm);
+          const realmName = realmEconomy?.name ?? `Cảnh giới ${realm}`;
+          const maxSubRealm = realmEconomy?.subRealmCosts.length ?? 0;
+          tuViRealm.textContent = `${realmName} (${realm})`;
+          tuViSubRealm.textContent = `Tiểu cảnh giới ${subRealm}/${maxSubRealm}`;
           const costInfo = getCultivationCost(realm, subRealm);
-          tuViCost.textContent = costInfo
-              ? `Chi phí kế tiếp: ${currencyFormatter.format(costInfo.aetherCost)} VNT`
-              : 'Chi phí kế tiếp: Đã đạt giới hạn';
+          if (!costInfo) {
+              tuViCost.textContent = 'Chi phí kế tiếp: Đã đạt giới hạn';
+              return;
+          }
+          tuViCost.textContent = costInfo.isBreakthrough
+              ? `Đột phá lên ${getCultivationRealmEconomy(costInfo.nextRealm)?.name ?? `Cảnh giới ${costInfo.nextRealm}`}: ${currencyFormatter.format(costInfo.aetherCost)} VNT`
+              : `Chi phí kế tiếp: ${currencyFormatter.format(costInfo.aetherCost)} VNT`;
       };
       const handleCultivationUpgrade = () => {
           if (!activeUnitId) {
@@ -17247,7 +17450,8 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           patchPlayerProfile({ cultivationByUnit: savedCultivationByUnit });
           refreshWallet();
           refreshTuViPanel();
-          stageStatus.textContent = `Đã nâng lên Cảnh giới ${upgraded.newRealm} · Tiểu cảnh giới ${upgraded.newSubRealm}.`;
+          const upgradedRealmName = getCultivationRealmEconomy(upgraded.newRealm)?.name ?? `Cảnh giới ${upgraded.newRealm}`;
+          stageStatus.textContent = `Đã nâng lên ${upgradedRealmName} · Tiểu cảnh giới ${upgraded.newSubRealm}.`;
       };
       tuViUpgrade.addEventListener('click', handleCultivationUpgrade);
       addCleanup(() => tuViUpgrade.removeEventListener('click', handleCultivationUpgrade));
