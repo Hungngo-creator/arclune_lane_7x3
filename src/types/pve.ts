@@ -94,6 +94,10 @@ export interface CollectionProgressUnitInput extends Record<string, unknown> {
   unlocked?: boolean | number | string | null;
   awakened?: boolean | number | string | null;
   inLineup?: boolean | number | string | null;
+  skinKey?: string | null;
+  skin?: string | null;
+  avatarSkin?: string | null;
+  selectedSkin?: string | null;
 }
 
 export interface CollectionStateInput extends Record<string, unknown> {
@@ -112,6 +116,7 @@ export interface RuntimeUnitProgress {
   owned?: boolean;
   awakened?: boolean;
   inLineup?: boolean;
+  skinKey?: string;
 }
 
 export interface CreateSessionOptions {

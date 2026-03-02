@@ -11023,6 +11023,7 @@ __define('./modes/pve/collection-mapper.ts', (exports, module, __require) => {
   const __dep0 = __require('./meta.ts');
   const Meta = __dep0.Meta;
   const makeInstanceStats = __dep0.makeInstanceStats;
+  const SKIN_FIELD_KEYS = ['skinKey', 'skin', 'avatarSkin', 'selectedSkin'];
   const asFinite = (value) => {
       if (typeof value === 'number' && Number.isFinite(value))
           return value;
@@ -11070,6 +11071,10 @@ __define('./modes/pve/collection-mapper.ts', (exports, module, __require) => {
       const owned = asBoolean(entry.owned ?? entry.unlocked ?? entry.isOwned);
       const awakened = asBoolean(entry.awakened ?? entry.isAwakened);
       const inLineup = asBoolean(entry.inLineup ?? entry.isInLineup);
+      const rawSkin = SKIN_FIELD_KEYS
+          .map((key) => entry[key])
+          .find((value) => typeof value === 'string' && value.trim() !== '');
+      const skinKey = typeof rawSkin === 'string' ? rawSkin.trim() : null;
       const progress = {
           unitId,
           ...(level != null ? { level: Math.max(1, Math.floor(level)) } : {}),
@@ -11079,6 +11084,7 @@ __define('./modes/pve/collection-mapper.ts', (exports, module, __require) => {
           ...(owned != null ? { owned } : {}),
           ...(awakened != null ? { awakened } : {}),
           ...(inLineup != null ? { inLineup } : {}),
+          ...(skinKey ? { skinKey } : {}),
       };
       return progress;
   };
@@ -11672,6 +11678,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       if (Game?.runtime) {
           Game.runtime.unitProgressById = mapUnitProgressById(storedConfig.collectionState ?? null);
       }
+      applyCollectionSkinsToSession(Game);
       _IID = 1;
       _BORN = 1;
       CLOCK = createClock();
@@ -11840,6 +11847,21 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           return;
       apply(Game.queued.ally);
       apply(Game.queued.enemy);
+  }
+  function applyCollectionSkinsToSession(game = Game) {
+      if (!game)
+          return;
+      const progressById = game.runtime?.unitProgressById;
+      if (!progressById || typeof progressById.forEach !== 'function')
+          return;
+      for (const [unitId, progress] of progressById.entries()) {
+          const skinKey = typeof progress?.skinKey === 'string' && progress.skinKey.trim()
+              ? progress.skinKey.trim()
+              : null;
+          if (!skinKey)
+              continue;
+          setUnitSkinForSession(unitId, skinKey);
+      }
   }
   function setUnitSkinForSession(unitId, skinKey) {
       if (!Game)
@@ -13975,6 +13997,10 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               }
               refillDeck();
           }
+      }
+      if (typeof cfg.collectionState !== 'undefined') {
+          game.runtime.unitProgressById = mapUnitProgressById(cfg.collectionState ?? null);
+          applyCollectionSkinsToSession(game);
       }
       if (cfg.aiPreset) {
           const preset = cfg.aiPreset || {};

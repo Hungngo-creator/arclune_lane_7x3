@@ -5,6 +5,8 @@ import type { CollectionStateInput, RuntimeUnitProgress } from '@shared-types/pv
 
 type CollectionItemCandidate = Record<string, unknown>;
 
+const SKIN_FIELD_KEYS = ['skinKey', 'skin', 'avatarSkin', 'selectedSkin'] as const;
+
 const asFinite = (value: unknown): number | null => {
   if (typeof value === 'number' && Number.isFinite(value)) return value;
   if (typeof value === 'string' && value.trim() !== '') {
@@ -49,6 +51,10 @@ const normalizeProgress = (entry: CollectionItemCandidate): RuntimeUnitProgress 
   const owned = asBoolean(entry.owned ?? entry.unlocked ?? entry.isOwned);
   const awakened = asBoolean(entry.awakened ?? entry.isAwakened);
   const inLineup = asBoolean(entry.inLineup ?? entry.isInLineup);
+  const rawSkin = SKIN_FIELD_KEYS
+    .map((key) => entry[key])
+    .find((value) => typeof value === 'string' && value.trim() !== '');
+  const skinKey = typeof rawSkin === 'string' ? rawSkin.trim() : null;
 
   const progress: RuntimeUnitProgress = {
     unitId,
@@ -59,6 +65,7 @@ const normalizeProgress = (entry: CollectionItemCandidate): RuntimeUnitProgress 
     ...(owned != null ? { owned } : {}),
     ...(awakened != null ? { awakened } : {}),
     ...(inLineup != null ? { inLineup } : {}),
+    ...(skinKey ? { skinKey } : {}),
   };
 
   return progress;

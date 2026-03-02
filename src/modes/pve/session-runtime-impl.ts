@@ -718,6 +718,7 @@ function resetSessionState(options: StartConfigOverrides | null | undefined = {}
   if (Game?.runtime) {
     Game.runtime.unitProgressById = mapUnitProgressById(storedConfig.collectionState ?? null);
   }
+  applyCollectionSkinsToSession(Game);
   _IID = 1;
   _BORN = 1;
   CLOCK = createClock();
@@ -881,6 +882,19 @@ function refreshQueuedArtFor(unitId: string): void {
   if (!Game?.queued) return;
   apply(Game.queued.ally);
   apply(Game.queued.enemy);
+}
+
+function applyCollectionSkinsToSession(game: SessionState | null | undefined = Game): void {
+  if (!game) return;
+  const progressById = game.runtime?.unitProgressById;
+  if (!progressById || typeof progressById.forEach !== 'function') return;
+  for (const [unitId, progress] of progressById.entries()){
+    const skinKey = typeof progress?.skinKey === 'string' && progress.skinKey.trim()
+      ? progress.skinKey.trim()
+      : null;
+    if (!skinKey) continue;
+    setUnitSkinForSession(unitId, skinKey);
+  }
 }
 
 function setUnitSkinForSession(unitId: string, skinKey: string | null | undefined): boolean {
@@ -3017,6 +3031,10 @@ function applyConfigToRunningGame(cfg: NormalizedSessionConfig): void {
       }
       refillDeck();
     }
+  }
+  if (typeof cfg.collectionState !== 'undefined'){
+    game.runtime.unitProgressById = mapUnitProgressById(cfg.collectionState ?? null);
+    applyCollectionSkinsToSession(game);
   }
   if (cfg.aiPreset){
     const preset: EnemyAIPreset = cfg.aiPreset || {};
