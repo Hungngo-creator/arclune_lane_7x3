@@ -1,7 +1,7 @@
 // Bundled by build.mjs
 const __modules = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }
 function __define(id, factory){ __modules[id] = { factory, exports: null, initialized: false }; }
@@ -4193,6 +4193,9 @@ __define('./combat.ts', (exports, module, __require) => {
   const __dep8 = __require('./utils/time.ts');
   const mergeBusyUntil = __dep8.mergeBusyUntil;
   const sessionNow = __dep8.sessionNow;
+  const __dep9 = __require('./data/tags.ts');
+  const ABSOLUTE_ATTACK_TAG_IDS = __dep9.ABSOLUTE_ATTACK_TAG_IDS;
+  const ABSOLUTE_SHIELD_TAG_IDS = __dep9.ABSOLUTE_SHIELD_TAG_IDS;
   exports.applyDamage = applyDamage;
   exports.grantShield = grantShield;
   const isBasicAttackAfterHitHandler = (handler) => typeof handler === 'function';
@@ -4240,8 +4243,8 @@ __define('./combat.ts', (exports, module, __require) => {
           return false;
       const statuses = Array.isArray(unit.statuses) ? unit.statuses : [];
       const modeNeedles = mode === 'attack'
-          ? ['absolute_attack', 'tuyetdoi_cong']
-          : ['absolute_shield', 'tuyetdoi_khien'];
+          ? ABSOLUTE_ATTACK_TAG_IDS
+          : ABSOLUTE_SHIELD_TAG_IDS;
       return statuses.some((status) => {
           const haystack = `${status.id ?? ''}|${status.tag ?? ''}`.toLowerCase();
           if (haystack.includes('absolute') || haystack.includes('tuyetdoi'))
@@ -8201,6 +8204,8 @@ __define('./data/skills.ts', (exports, module, __require) => {
   const ROSTER = __dep1.ROSTER;
   const __dep2 = __require('./data/skills.config.ts');
   const rawSkillSetsConfig = __dep2.default ?? __dep2;
+  const __dep3 = __require('./data/tags.ts');
+  const normalizeTagList = __dep3.normalizeTagList;
   function deepFreeze(value) {
       if (Array.isArray(value)) {
           value.forEach(deepFreeze);
@@ -8220,7 +8225,7 @@ __define('./data/skills.ts', (exports, module, __require) => {
       }
       const normalized = { ...section };
       if (Array.isArray(section.tags)) {
-          normalized.tags = [...section.tags];
+          normalized.tags = normalizeTagList(section.tags);
       }
       if (Array.isArray(section.notes)) {
           normalized.notes = [...section.notes];
@@ -8236,7 +8241,7 @@ __define('./data/skills.ts', (exports, module, __require) => {
           return null;
       const normalized = { ...entry };
       if (Array.isArray(entry.tags)) {
-          normalized.tags = [...entry.tags];
+          normalized.tags = normalizeTagList(entry.tags);
       }
       if (entry.cost && typeof entry.cost === 'object') {
           normalized.cost = { ...entry.cost };
@@ -8319,6 +8324,98 @@ __define('./data/skills.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'listSkillSets')) exports.listSkillSets = listSkillSets;
   if (!Object.prototype.hasOwnProperty.call(exports, 'hasSkillSet')) exports.hasSkillSet = hasSkillSet;
   if (!Object.prototype.hasOwnProperty.call(exports, 'validateSkillSetStructure')) exports.validateSkillSetStructure = validateSkillSetStructure;
+});
+__define('./data/tags.ts', (exports, module, __require) => {
+  const TAG_DEFINITIONS = [
+      { id: 'instant', label: 'Lập tức', domain: 'timing', aliases: ['instant-cast', 'instantCast', 'lap_tuc'] },
+      { id: 'passive', label: 'Nội tại', domain: 'kit', aliases: ['noi_tai', 'passive-trigger'] },
+      { id: 'active', label: 'Chủ động', domain: 'kit', aliases: ['chu_dong'] },
+      { id: 'single-target', label: 'Đơn mục tiêu', domain: 'targeting', aliases: ['don_muc_tieu'] },
+      { id: 'multi-target', label: 'Đa mục tiêu', domain: 'targeting', aliases: ['da_muc_tieu'] },
+      { id: 'aoe', label: 'Aoe cố định', domain: 'targeting', aliases: ['area', 'aoe-fixed'] },
+      { id: 'random-target', label: 'Mục tiêu ngẫu nhiên', domain: 'targeting', aliases: ['random-single'] },
+      { id: 'random-aoe', label: 'Aoe ngẫu nhiên', domain: 'targeting', aliases: ['aoe-random'] },
+      { id: 'self', label: 'Bản thân', domain: 'targeting', aliases: ['ban_than'] },
+      { id: 'ally', label: 'Đồng minh', domain: 'targeting', aliases: ['dong_minh'] },
+      { id: 'enemy', label: 'Kẻ địch', domain: 'targeting', aliases: ['ke_dich'] },
+      { id: 'global-rule', label: 'Toàn sân/Quy tắc', domain: 'rule', aliases: ['quy_tac', 'all-board'] },
+      { id: 'heal', label: 'Hồi phục', domain: 'effect', aliases: ['hoi_phuc'] },
+      { id: 'non-heal-hp-change', label: 'Không phải hồi phục', domain: 'effect', aliases: ['khong_phai_hoi_phuc'] },
+      { id: 'shield', label: 'Tạo khiên', domain: 'effect', aliases: ['barrier'] },
+      { id: 'support', label: 'Hỗ trợ', domain: 'effect', aliases: ['buff-support'] },
+      { id: 'control', label: 'Khống chế', domain: 'effect' },
+      { id: 'defense', label: 'Phòng thủ', domain: 'effect', aliases: ['defensive', 'protection'] },
+      { id: 'absolute-attack', label: 'Tuyệt đối công', domain: 'rule', aliases: ['absolute_attack', 'tuyetdoi_cong'] },
+      { id: 'absolute-shield', label: 'Tuyệt đối khiên', domain: 'rule', aliases: ['absolute_shield', 'tuyetdoi_khien'] },
+      { id: 'unique-global', label: 'Độc Nhất toàn chiến trường', domain: 'rule', aliases: ['doc_nhat'] },
+      { id: 'aether-cost', label: 'Tiêu hao Aether', domain: 'resource', aliases: ['cost-aether'] },
+      { id: 'revive', label: 'Hồi sinh', domain: 'effect' },
+      { id: 'summon', label: 'Triệu hồi', domain: 'effect' },
+      { id: 'basic-attack', label: 'Đánh thường', domain: 'delivery', aliases: ['counts-as-basic', 'basic'] },
+      { id: 'burst', label: 'Dồn sát thương', domain: 'delivery' },
+      { id: 'line', label: 'Đường thẳng', domain: 'targeting', aliases: ['line-target'] },
+      { id: 'field', label: 'Hiệu ứng sân', domain: 'targeting' },
+      { id: 'blink', label: 'Dịch chuyển', domain: 'delivery' },
+      { id: 'execute', label: 'Kết liễu', domain: 'delivery', aliases: ['finisher'] },
+      { id: 'pierce', label: 'Xuyên giáp/kháng', domain: 'effect', aliases: ['armor-pierce', 'armor_pierce'] },
+      { id: 'mark', label: 'Đánh dấu', domain: 'effect', aliases: ['mark-builder', 'mark-detonation'] },
+      { id: 'stance', label: 'Chuyển dạng', domain: 'kit', aliases: ['form-scaling'] },
+      { id: 'team-heal', label: 'Hồi phục đội', domain: 'effect' },
+      { id: 'self-buff', label: 'Tự cường hóa', domain: 'effect', aliases: ['buff'] },
+      { id: 'chain', label: 'Liên kích/chuỗi', domain: 'delivery' },
+      { id: 'poison', label: 'Độc', domain: 'effect' },
+      { id: 'silence', label: 'Câm lặng', domain: 'effect' },
+      { id: 'sleep', label: 'Ngủ', domain: 'effect', aliases: ['sleep-setup'] },
+      { id: 'taunt', label: 'Khiêu khích', domain: 'effect' },
+  ];
+  const normalizeKey = (value) => value.trim().toLowerCase();
+  const TAG_BY_ID = new Map();
+  for (const definition of TAG_DEFINITIONS) {
+      TAG_BY_ID.set(normalizeKey(definition.id), definition);
+      const aliases = 'aliases' in definition && Array.isArray(definition.aliases) ? definition.aliases : [];
+      for (const alias of aliases) {
+          TAG_BY_ID.set(normalizeKey(alias), definition);
+      }
+  }
+  const GAME_TAGS = Object.freeze(TAG_DEFINITIONS);
+  const TAG_IDS = Object.freeze(Array.from(new Set(TAG_DEFINITIONS.map((definition) => definition.id))));
+  const INSTANT_TAG_IDS = Object.freeze(['instant']);
+  const DEFENSIVE_TAG_IDS = Object.freeze(['defense', 'shield', 'support']);
+  const ABSOLUTE_ATTACK_TAG_IDS = Object.freeze(['absolute-attack']);
+  const ABSOLUTE_SHIELD_TAG_IDS = Object.freeze(['absolute-shield']);
+  function normalizeTagId(tag) {
+      if (typeof tag !== 'string')
+          return null;
+      const normalized = normalizeKey(tag);
+      if (!normalized)
+          return null;
+      return TAG_BY_ID.get(normalized)?.id ?? normalized;
+  }
+  function normalizeTagList(tags) {
+      if (!Array.isArray(tags))
+          return [];
+      const unique = new Set();
+      for (const tag of tags) {
+          const normalized = normalizeTagId(tag);
+          if (normalized)
+              unique.add(normalized);
+      }
+      return [...unique];
+  }
+  function hasAnyTag(haystack, needles) {
+      const normalizedHaystack = new Set(normalizeTagList(haystack));
+      return needles.some((needle) => normalizedHaystack.has(needle));
+  }
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'GAME_TAGS')) exports.GAME_TAGS = GAME_TAGS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'TAG_IDS')) exports.TAG_IDS = TAG_IDS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'INSTANT_TAG_IDS')) exports.INSTANT_TAG_IDS = INSTANT_TAG_IDS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'DEFENSIVE_TAG_IDS')) exports.DEFENSIVE_TAG_IDS = DEFENSIVE_TAG_IDS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'ABSOLUTE_ATTACK_TAG_IDS')) exports.ABSOLUTE_ATTACK_TAG_IDS = ABSOLUTE_ATTACK_TAG_IDS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'ABSOLUTE_SHIELD_TAG_IDS')) exports.ABSOLUTE_SHIELD_TAG_IDS = ABSOLUTE_SHIELD_TAG_IDS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeTagId')) exports.normalizeTagId = normalizeTagId;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeTagList')) exports.normalizeTagList = normalizeTagList;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'hasAnyTag')) exports.hasAnyTag = hasAnyTag;
 });
 __define('./data/vfx_anchors/loithienanh.json', (exports, module, __require) => {
   const data = JSON.parse('{"unitId":"loithienanh","bodyAnchors":{"root":{"x":0.5,"y":0.5},"head":{"x":0.5,"y":0.86},"chest":{"x":0.5,"y":0.68},"pelvis":{"x":0.5,"y":0.44},"right_fist":{"x":0.66,"y":0.58},"left_fist":{"x":0.34,"y":0.58},"right_elbow":{"x":0.63,"y":0.66},"left_elbow":{"x":0.37,"y":0.66},"right_foot":{"x":0.6,"y":0.1},"left_foot":{"x":0.4,"y":0.1},"back_core":{"x":0.5,"y":0.64}},"vfxBindings":{"basic_combo":{"description":"Đòn đấm thường hai hit, ưu tiên tay phải sau đó tay trái.","anchors":[{"id":"right_fist","timing":"hit1","radius":0.12},{"id":"left_fist","timing":"hit2","radius":0.11}]},"loi_anh_tam_kich":{"description":"Skill1 tung ba cú đấm lôi, tái sử dụng anchor tay phải cho tia hồ quang và tay trái khi chuyển mục tiêu.","anchors":[{"id":"right_fist","timing":"arc_spawn","radius":0.14},{"id":"left_fist","timing":"follow_through","radius":0.12}]},"ngu_loi_phe_than":{"description":"Skill2 đốt máu phát lôi cầu quanh thân, xuất phát từ ngực lan ra 5 hướng.","anchors":[{"id":"chest","timing":"charge","radius":0.18},{"id":"right_fist","timing":"launch_major","radius":0.14},{"id":"left_fist","timing":"launch_minor","radius":0.13}]},"loi_the_bach_chien":{"description":"Skill3 dựng lớp bảo hộ bằng trường điện quấn quanh thân.","anchors":[{"id":"chest","timing":"shield_core","radius":0.22},{"id":"back_core","timing":"shield_back","radius":0.24}]},"huyet_hon_loi_quyet":{"description":"Tuyệt kỹ bùng nổ lôi huyết: hút năng lượng ở ngực, nổ ra trước bụng và chân.","anchors":[{"id":"chest","timing":"charge_up","radius":0.2},{"id":"root","timing":"burst_core","radius":0.26},{"id":"right_foot","timing":"ground_crack","radius":0.15},{"id":"left_foot","timing":"ground_crack","radius":0.15}]}},"ambientEffects":{"lightning_scars":{"description":"Hoa văn lôi văn chạy trên tay và ngực, phát sáng nhịp tim.","anchors":[{"id":"right_elbow","timing":"pulse","radius":0.1},{"id":"left_elbow","timing":"pulse","radius":0.1},{"id":"chest","timing":"pulse","radius":0.12}]},"thermal_noise":{"description":"Nhiễu nhiệt nhẹ trên toàn thân khi đứng yên.","anchors":[{"id":"chest","timing":"idle","radius":0.3}]},"storm_backdrop":{"description":"Hiệu ứng hậu cảnh vòng ấn lôi huyết và mây dông trong các cảnh ult.","anchors":[{"id":"back_core","timing":"ult_only","radius":0.35}]}}}');
@@ -25828,10 +25925,12 @@ __define('./utils/fury.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'furyState')) exports.furyState = furyState;
 });
 __define('./utils/kit.ts', (exports, module, __require) => {
+  const __dep0 = __require('./data/tags.ts');
+  const DEFENSIVE_TAG_IDS = __dep0.DEFENSIVE_TAG_IDS;
+  const INSTANT_TAG_IDS = __dep0.INSTANT_TAG_IDS;
+  const normalizeTagList = __dep0.normalizeTagList;
   const KNOWN_SUMMON_KEYS = ['summon', 'summoner', 'immediateSummon'];
   const KNOWN_REVIVE_KEYS = ['revive', 'reviver'];
-  const DEFENSIVE_TAGS = ['defense', 'defensive', 'protection', 'shield', 'barrier', 'support'];
-  const INSTANT_TAGS = ['instant', 'instant-cast', 'instantCast'];
   function isPlainRecord(value) {
       if (!value || typeof value !== 'object')
           return false;
@@ -25978,7 +26077,7 @@ __define('./utils/kit.ts', (exports, module, __require) => {
       add(ult.type);
       add(ult.kind);
       add(ult.category);
-      addMany(ult.tags);
+      addMany(normalizeTagList(ult.tags));
       const metadata = ult.metadata || ult.meta || null;
       if (metadata) {
           add(metadata.type);
@@ -26120,12 +26219,12 @@ __define('./utils/kit.ts', (exports, module, __require) => {
           metadata.instantCast === true ||
           metadata.cast === 'instant' ||
           (ult && (ult.instant || ult.cast === 'instant' || ult.immediate === true)) ||
-          INSTANT_TAGS.some((instantTag) => kitUltHasTag(kit, instantTag)) ||
+          INSTANT_TAG_IDS.some((instantTag) => kitUltHasTag(kit, instantTag)) ||
           readTrait(traits, 'instantUlt') === true ||
           readTrait(traits, 'instantUltimate') === true);
       const hasDefensive = Boolean(metadata.defensive === true ||
           metadata.role === 'defensive' ||
-          DEFENSIVE_TAGS.some((defTag) => kitUltHasTag(kit, defTag)) ||
+          DEFENSIVE_TAG_IDS.some((defTag) => kitUltHasTag(kit, defTag)) ||
           (ult && (typeof ult.reduceDamage === 'number' ||
               typeof ult.shield === 'number' ||
               typeof ult.barrier === 'number' ||

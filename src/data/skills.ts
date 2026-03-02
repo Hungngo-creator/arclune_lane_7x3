@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { ROSTER } from '../catalog.ts';
 import rawSkillSetsConfig from './skills.config.ts';
+import { normalizeTagList } from './tags.ts';
 
 import type { UnknownRecord } from '@shared-types/common';
 import type { UnitId } from '@shared-types/units';
@@ -28,7 +29,7 @@ function normalizeSection(section: SkillSection | string | null | undefined): Sk
   }
   const normalized: SkillSection = { ...section };
   if (Array.isArray(section.tags)){
-    normalized.tags = [...section.tags];
+    normalized.tags = normalizeTagList(section.tags);
   }
   if (Array.isArray(section.notes)){
     normalized.notes = [...section.notes];
@@ -43,7 +44,7 @@ function normalizeSkillEntry(entry: SkillSection | null | undefined): SkillSecti
   if (!entry) return null;
   const normalized: SkillSection = { ...entry };
   if (Array.isArray(entry.tags)){
-    normalized.tags = [...entry.tags];
+    normalized.tags = normalizeTagList(entry.tags);
   }
   if (entry.cost && typeof entry.cost === 'object'){
     normalized.cost = { ...entry.cost };

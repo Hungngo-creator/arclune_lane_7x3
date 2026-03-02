@@ -10,6 +10,7 @@ import { emitPassiveEvent, getPassiveLog, type AfterHitHandler } from './passive
 import { CFG } from './config.ts';
 import { gainFury, startFurySkill, finishFuryHit } from './utils/fury.ts';
 import { mergeBusyUntil, sessionNow } from './utils/time.ts';
+import { ABSOLUTE_ATTACK_TAG_IDS, ABSOLUTE_SHIELD_TAG_IDS } from './data/tags.ts';
 
 export { applyDamage, grantShield };
 
@@ -117,8 +118,8 @@ const hasAbsoluteLawTag = (unit: UnitToken | null | undefined, mode: 'attack' | 
   if (!unit) return false;
   const statuses = Array.isArray(unit.statuses) ? unit.statuses : [];
   const modeNeedles = mode === 'attack'
-    ? ['absolute_attack', 'tuyetdoi_cong']
-    : ['absolute_shield', 'tuyetdoi_khien'];
+   ? ABSOLUTE_ATTACK_TAG_IDS
+    : ABSOLUTE_SHIELD_TAG_IDS;
   return statuses.some((status: { id?: string; tag?: string }) => {
     const haystack = `${status.id ?? ''}|${status.tag ?? ''}`.toLowerCase();
     if (haystack.includes('absolute') || haystack.includes('tuyetdoi')) return true;

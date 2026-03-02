@@ -1,5 +1,6 @@
 //home (termux)/arclune_lane_7x3/src/utils/kit.ts
 import type { UltMetadata, UltSkillConfig, UnitKitConfig } from '../types/config.ts';
+import { DEFENSIVE_TAG_IDS, INSTANT_TAG_IDS, hasAnyTag, normalizeTagList } from '../data/tags.ts';
 
 interface KitTraitObject extends Record<string, unknown> {
   id?: string;
@@ -113,8 +114,6 @@ interface ExtractOnSpawnRageOptions {
 
 const KNOWN_SUMMON_KEYS = ['summon', 'summoner', 'immediateSummon'] satisfies ReadonlyArray<string>;
 const KNOWN_REVIVE_KEYS = ['revive', 'reviver'] satisfies ReadonlyArray<string>;
-const DEFENSIVE_TAGS = ['defense', 'defensive', 'protection', 'shield', 'barrier', 'support'] satisfies ReadonlyArray<string>;
-const INSTANT_TAGS = ['instant', 'instant-cast', 'instantCast'] satisfies ReadonlyArray<string>;
 
 type CloneableArray = ReadonlyArray<unknown>;
 type CloneableRecord = Record<string, unknown>;
@@ -260,7 +259,7 @@ export function collectUltTags(metaOrKit: KitMeta | KitData | null | undefined):
   add(ult.type);
   add(ult.kind);
   add(ult.category);
-  addMany(ult.tags);
+  addMany(normalizeTagList(ult.tags));
 
   const metadata = ult.metadata || ult.meta || null;
   if (metadata){
@@ -403,7 +402,7 @@ export function detectUltBehavior(metaOrKit: KitMeta | KitData | null | undefine
       metadata.instantCast === true ||
       metadata.cast === 'instant' ||
       (ult && (ult.instant || ult.cast === 'instant' || ult.immediate === true)) ||
-      INSTANT_TAGS.some((instantTag) => kitUltHasTag(kit, instantTag)) ||
+      INSTANT_TAG_IDS.some((instantTag) => kitUltHasTag(kit, instantTag)) ||
       readTrait(traits, 'instantUlt') === true ||
       readTrait(traits, 'instantUltimate') === true
   );
@@ -411,7 +410,7 @@ export function detectUltBehavior(metaOrKit: KitMeta | KitData | null | undefine
   const hasDefensive = Boolean(
     metadata.defensive === true ||
       metadata.role === 'defensive' ||
-      DEFENSIVE_TAGS.some((defTag) => kitUltHasTag(kit, defTag)) ||
+      DEFENSIVE_TAG_IDS.some((defTag) => kitUltHasTag(kit, defTag)) ||
       (ult && (
         typeof ult.reduceDamage === 'number' ||
         typeof ult.shield === 'number' ||

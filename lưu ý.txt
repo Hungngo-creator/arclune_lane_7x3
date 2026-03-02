@@ -1,3 +1,32 @@
+[CẬP NHẬT 2026-03 - LOGIC CÔNG THỨC HIỆN HÀNH (ưu tiên theo source code)]
+1) Sát thương nền của đòn đánh thường / kỹ năng hiện tại:
+- baseDefault = floor(ATK + WIL).
+- skillMul mặc định = 1 nếu không khai báo.
+- realmBonus cộng thêm theo realm/subRealm và class scale.
+- Công thức trước giảm thủ: dmgRaw = floor((pre.base * skillMul + realmBonus) * pre.outMul).
+
+2) Giảm sát thương theo giáp/kháng:
+- Physical: nhân hệ số 100/(100+ARM_effective).
+- Arcane: nhân hệ số 100/(100+RES_effective).
+- Mixed: trộn theo trọng số phys/arc (mặc định 50/50 nếu không truyền).
+- ARM/RES_effective sau xuyên thủ = stat * (1 - combinedPen), trong đó combinedPen bị chặn [0..1].
+
+3) Lá chắn và luật tuyệt đối:
+- Sát thương đi qua lớp absorbShield trước khi trừ HP.
+- Nếu cả công và khiên đều có luật tuyệt đối, so rank:
+  + Rank tấn công >= rank phòng thủ: tấn công bỏ qua khiên tuyệt đối.
+  + Rank phòng thủ > rank tấn công: đòn đánh bị chặn theo hard-rule.
+
+4) Hồi phục (heal):
+- healUnit chỉ hồi đến hpMax, phần dư là overheal.
+- Mọi cơ chế “tăng HP/maxHP nhưng không tính hồi phục” phải tách tag riêng (non-heal-hp-change), không đi qua healUnit.
+
+5) Quy ước tag chuẩn hóa (để code bền):
+- Dữ liệu kỹ năng đi qua normalizeTagList để tránh alias/typo.
+- Ưu tiên id chuẩn: single-target, multi-target, aoe, random-target, heal, shield, instant, aether-cost, absolute-attack, absolute-shield, unique-global...
+
+Ghi chú: Các công thức cũ ghi theo dạng 100% ATK + 100% WIL vẫn giữ ý nghĩa thiết kế; khi implement runtime cần map về baseDefault + skillMul + dtype/pen theo engine hiện tại.
+
 0) Tác dụng của các hàm (Quy hoạch chuẩn 125 tệp):
 
 [PHẦN I: CORE ENGINE & LOGIC - HỆ THỐNG CỐT LÕI]
