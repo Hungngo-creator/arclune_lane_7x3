@@ -844,11 +844,12 @@ export const ROSTER = [
           key: 'skill3',
           name: 'Triều Ảnh Hồi Kích',
           cost: { aether: 30 },
-          duration: 1,
+          immediate: true,
+          persistsUntilDeath: true,
           counterChance: 0.25,
           dodgeBasicChance: 0.25,
           counterType: 'basic',
-          notes: 'Kích hoạt trạng thái phản công: trong 1 lượt, mỗi lần bị đánh có 25% né và phản đòn cơ bản. Nếu ngã gục phải kích lại.'
+          notes: 'Kích hoạt trạng thái phản công dạng stance tồn tại đến khi Vũ Thiên gục ngã: mỗi lần bị đánh có 25% né và phản đòn cơ bản. Đây là free action, không tiêu tốn lượt hành động.'
         }
       ]),
       ult: asUnknownRecord({
@@ -871,7 +872,8 @@ export const ROSTER = [
         }
       ]),
       traits: asUnknownRecordArray([
-        { id: 'counter_mode', text: 'Triều Ảnh Hồi Kích là hiệu ứng duy trì 1 lượt, mất khi bị hạ gục.' },
+        { id: 'counter_mode', text: 'Triều Ảnh Hồi Kích là stance duy trì đến khi bị hạ gục; cần tái kích hoạt sau khi hồi sinh hoặc vào lượt mới.' },
+        { id: 'counter_free_action', text: 'Triều Ảnh Hồi Kích là kỹ năng kích hoạt tức thời (free action), không tiêu tốn lượt đánh.' },
         { id: 'adaptive_buff', text: 'Thích Ứng dùng thông số phòng thủ chuẩn của hệ thống.' }
       ])
     }
@@ -1014,7 +1016,7 @@ export const ROSTER = [
     }
   },
   {
-    id: 'ai_lan', name: 'Ái Lân', class: 'Support', rank: 'UR',
+    id: 'ai_lan', name: 'Ái Lân', class: 'Support', rank: 'SSR',
     mods: { WIL: 0.12, AEregen: 0.10, HP: 0.06 },
     kit: {
       onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, startingStance: 'light' }),
@@ -1189,7 +1191,7 @@ export const ROSTER = [
     }
   },
   {
-    id: 'basil_thorne', name: 'Basil Thorne', class: 'Tanker', rank: 'SR',
+    id: 'basil_thorne', name: 'Basil Thorne', class: 'Tanker', rank: 'SSR',
     mods: { HP: 0.08, ARM: 0.08, RES: 0.06 },
     kit: {
       onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
@@ -1511,7 +1513,7 @@ export const ROSTER = [
     }
   },
   {
-    id: 'phe', name: 'Phệ', class: 'Mage', rank: 'Prime',
+    id: 'phe', name: 'Phệ', class: 'Mage', rank: 'UR',
     mods: { WIL: 0.10, AEregen: 0.10 }, // 20% tổng
     kit: {
       onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
@@ -1606,7 +1608,7 @@ export const ROSTER = [
     }
   },
   {
-    id: 'kiemtruongda', name: 'Kiếm Trường Dạ', class: 'Warrior', rank: 'Prime',
+    id: 'kiemtruongda', name: 'Kiếm Trường Dạ', class: 'Warrior', rank: 'UR',
     mods: { ATK: 0.12, PER: 0.08 },
     kit: {
       onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),

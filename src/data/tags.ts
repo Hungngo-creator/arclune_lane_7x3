@@ -183,7 +183,8 @@ export function listUnknownTags(tags: ReadonlyArray<string> | null | undefined):
     if (typeof rawTag !== 'string') continue;
     const normalizedRaw = normalizeKey(rawTag);
     if (!normalizedRaw) continue;
-    if (!TAG_BY_ID.has(normalizedRaw)){
+    const normalized = normalizeTagId(rawTag);
+    if (!normalized || !TAG_BY_ID.has(normalizedRaw) && !TAG_BY_ID.has(normalized)){
       unknown.add(rawTag.trim());
     }
   }

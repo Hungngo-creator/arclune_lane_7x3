@@ -1262,10 +1262,11 @@ const skillsConfig = [
         name: 'Triều Ảnh Hồi Kích',
         type: 'active',
         cost: { aether: 30 },
-        duration: { turns: 1 },
-        buffs: [{ effect: 'dodgeBasic', amount: 0.25 }],
+        tags: ['stance', 'instant'],
+        duration: { until: 'death' },
+        buffs: [{ effect: 'dodgeBasic', amount: 0.25, persistUntilDeath: true }],
         counters: [{ chance: 0.25, type: 'basic' }],
-        description: 'Kích hoạt trạng thái phản công 1 lượt: mỗi khi bị tấn công có 25% né và phản đòn đánh thường. Nếu Vũ Thiên bị hạ gục, hiệu ứng kết thúc và phải tái kích hoạt.'
+        description: 'Kích hoạt trạng thái phản công dạng stance đến khi Vũ Thiên bị hạ gục: mỗi khi bị tấn công có 25% né và phản đòn đánh thường. Đây là free action, không tiêu lượt hành động.'
       }
     ],
     ult: {
@@ -1285,6 +1286,7 @@ const skillsConfig = [
     },
     technique: null,
     notes: [
+      'Triều Ảnh Hồi Kích là kỹ năng tức thời (free action), bật xong vẫn có thể đánh thường/dùng kỹ năng khác nếu đủ tài nguyên.',
       'Triều Ảnh Hồi Kích chỉ phản công khi né thành công hoặc khi bị đánh thường trúng nhưng hệ thống cho phép phản kích (tùy vào thiết lập combat).',
       'VFX đề xuất: dòng nước bao lấy thân thể khi bật phản kích.'
     ]
@@ -1418,9 +1420,9 @@ const skillsConfig = [
         name: 'Song Cực Hiến Phúc',
         type: 'active',
         cost: { aether: 25 },
-        tags: ['support'],
+        tags: ['support', 'hp-trade'],
         usableIn: ['light', 'dark'],
-        description: 'Chuyển 20% Max HP cho Leader và 10% Max HP cho một đồng minh ngẫu nhiên (Ái Lân không mất Max HP). Cả hai mục tiêu nhận thêm khiên =10% Max HP của Ái Lân trong 2 lượt.'
+        description: 'Tiêu hao 30% HP hiện tại của Ái Lân (không giảm Max HP), hồi cho Leader lượng máu bằng 20% Max HP của Ái Lân và cho một đồng minh ngẫu nhiên 10% Max HP của Ái Lân. Cả hai mục tiêu nhận thêm khiên bằng 10% Max HP của Ái Lân trong 2 lượt.'
       },
       {
         key: 'skill2',

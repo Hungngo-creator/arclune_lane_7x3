@@ -2985,11 +2985,12 @@ __define('./catalog.ts', (exports, module, __require) => {
                       key: 'skill3',
                       name: 'Triều Ảnh Hồi Kích',
                       cost: { aether: 30 },
-                      duration: 1,
+                      immediate: true,
+                      persistsUntilDeath: true,
                       counterChance: 0.25,
                       dodgeBasicChance: 0.25,
                       counterType: 'basic',
-                      notes: 'Kích hoạt trạng thái phản công: trong 1 lượt, mỗi lần bị đánh có 25% né và phản đòn cơ bản. Nếu ngã gục phải kích lại.'
+                      notes: 'Kích hoạt trạng thái phản công dạng stance tồn tại đến khi Vũ Thiên gục ngã: mỗi lần bị đánh có 25% né và phản đòn cơ bản. Đây là free action, không tiêu tốn lượt hành động.'
                   }
               ]),
               ult: asUnknownRecord({
@@ -3012,7 +3013,8 @@ __define('./catalog.ts', (exports, module, __require) => {
                   }
               ]),
               traits: asUnknownRecordArray([
-                  { id: 'counter_mode', text: 'Triều Ảnh Hồi Kích là hiệu ứng duy trì 1 lượt, mất khi bị hạ gục.' },
+                  { id: 'counter_mode', text: 'Triều Ảnh Hồi Kích là stance duy trì đến khi bị hạ gục; cần tái kích hoạt sau khi hồi sinh hoặc vào lượt mới.' },
+                  { id: 'counter_free_action', text: 'Triều Ảnh Hồi Kích là kỹ năng kích hoạt tức thời (free action), không tiêu tốn lượt đánh.' },
                   { id: 'adaptive_buff', text: 'Thích Ứng dùng thông số phòng thủ chuẩn của hệ thống.' }
               ])
           }
@@ -3155,7 +3157,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           }
       },
       {
-          id: 'ai_lan', name: 'Ái Lân', class: 'Support', rank: 'UR',
+          id: 'ai_lan', name: 'Ái Lân', class: 'Support', rank: 'SSR',
           mods: { WIL: 0.12, AEregen: 0.10, HP: 0.06 },
           kit: {
               onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, startingStance: 'light' }),
@@ -3330,7 +3332,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           }
       },
       {
-          id: 'basil_thorne', name: 'Basil Thorne', class: 'Tanker', rank: 'SR',
+          id: 'basil_thorne', name: 'Basil Thorne', class: 'Tanker', rank: 'SSR',
           mods: { HP: 0.08, ARM: 0.08, RES: 0.06 },
           kit: {
               onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
@@ -3652,7 +3654,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           }
       },
       {
-          id: 'phe', name: 'Phệ', class: 'Mage', rank: 'Prime',
+          id: 'phe', name: 'Phệ', class: 'Mage', rank: 'UR',
           mods: { WIL: 0.10, AEregen: 0.10 }, // 20% tổng
           kit: {
               onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
@@ -3747,7 +3749,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           }
       },
       {
-          id: 'kiemtruongda', name: 'Kiếm Trường Dạ', class: 'Warrior', rank: 'Prime',
+          id: 'kiemtruongda', name: 'Kiếm Trường Dạ', class: 'Warrior', rank: 'UR',
           mods: { ATK: 0.12, PER: 0.08 },
           kit: {
               onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
@@ -7886,10 +7888,11 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   name: 'Triều Ảnh Hồi Kích',
                   type: 'active',
                   cost: { aether: 30 },
-                  duration: { turns: 1 },
-                  buffs: [{ effect: 'dodgeBasic', amount: 0.25 }],
+                  tags: ['stance', 'instant'],
+                  duration: { until: 'death' },
+                  buffs: [{ effect: 'dodgeBasic', amount: 0.25, persistUntilDeath: true }],
                   counters: [{ chance: 0.25, type: 'basic' }],
-                  description: 'Kích hoạt trạng thái phản công 1 lượt: mỗi khi bị tấn công có 25% né và phản đòn đánh thường. Nếu Vũ Thiên bị hạ gục, hiệu ứng kết thúc và phải tái kích hoạt.'
+                  description: 'Kích hoạt trạng thái phản công dạng stance đến khi Vũ Thiên bị hạ gục: mỗi khi bị tấn công có 25% né và phản đòn đánh thường. Đây là free action, không tiêu lượt hành động.'
               }
           ],
           ult: {
@@ -7909,6 +7912,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
           },
           technique: null,
           notes: [
+              'Triều Ảnh Hồi Kích là kỹ năng tức thời (free action), bật xong vẫn có thể đánh thường/dùng kỹ năng khác nếu đủ tài nguyên.',
               'Triều Ảnh Hồi Kích chỉ phản công khi né thành công hoặc khi bị đánh thường trúng nhưng hệ thống cho phép phản kích (tùy vào thiết lập combat).',
               'VFX đề xuất: dòng nước bao lấy thân thể khi bật phản kích.'
           ]
@@ -8042,9 +8046,9 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   name: 'Song Cực Hiến Phúc',
                   type: 'active',
                   cost: { aether: 25 },
-                  tags: ['support'],
+                  tags: ['support', 'hp-trade'],
                   usableIn: ['light', 'dark'],
-                  description: 'Chuyển 20% Max HP cho Leader và 10% Max HP cho một đồng minh ngẫu nhiên (Ái Lân không mất Max HP). Cả hai mục tiêu nhận thêm khiên =10% Max HP của Ái Lân trong 2 lượt.'
+                  description: 'Tiêu hao 30% HP hiện tại của Ái Lân (không giảm Max HP), hồi cho Leader lượng máu bằng 20% Max HP của Ái Lân và cho một đồng minh ngẫu nhiên 10% Max HP của Ái Lân. Cả hai mục tiêu nhận thêm khiên bằng 10% Max HP của Ái Lân trong 2 lượt.'
               },
               {
                   key: 'skill2',
@@ -8539,7 +8543,8 @@ __define('./data/tags.ts', (exports, module, __require) => {
           const normalizedRaw = normalizeKey(rawTag);
           if (!normalizedRaw)
               continue;
-          if (!TAG_BY_ID.has(normalizedRaw)) {
+          const normalized = normalizeTagId(rawTag);
+          if (!normalized || !TAG_BY_ID.has(normalizedRaw) && !TAG_BY_ID.has(normalized)) {
               unknown.add(rawTag.trim());
           }
       }
@@ -25337,23 +25342,21 @@ __define('./units.ts', (exports, module, __require) => {
       { id: 'vu_thien', name: 'Vũ Thiên', cost: 17, rank: 'SSR', role: 'Warrior' },
       { id: 'anna', name: 'Anna', cost: 17, rank: 'SSR', role: 'Support' },
       { id: 'lao_khat_cai', name: 'Lão Khất Cái', cost: 12, rank: 'SR', role: 'Warrior' },
-      { id: 'ai_lan', name: 'Ái Lân', cost: 20, rank: 'UR', role: 'Support' },
+      { id: 'ai_lan', name: 'Ái Lân', cost: 20, rank: 'SSR', role: 'Support' },
       { id: 'faun', name: 'Faun', cost: 18, rank: 'SSR', role: 'Summoner' },
       { id: 'basil_thorne', name: 'Basil Thorne', cost: 13, rank: 'SSR', role: 'Tanker' },
-      { id: 'mong_yem', name: 'Mộng Yểm', cost: 18, rank: 'SSR', role: 'Mage' },
-      { id: 'chan_nga', name: 'Chân Ngã', cost: 18 },
-      { id: 'ma_ton_diep_lam', name: 'Ma Tôn - Diệp Lâm', cost: 19 },
-      { id: 'mo_da', name: 'Mộ Dạ', cost: 15 },
-      { id: 'ngao_binh', name: 'Ngao Bính', cost: 18 },
-      { id: 'lau_khac_ma_chu', name: 'Lậu Khắc Ma Chủ', cost: 21 },
+      { id: 'mong_yem', name: 'Mộng Yểm', cost: 18, rank: 'SSR', role: 'Mage' }, { id: 'chan_nga', name: 'Chân Ngã', cost: 18, rank: 'UR', role: 'Summoner' },
+      { id: 'ma_ton_diep_lam', name: 'Ma Tôn - Diệp Lâm', cost: 19, rank: 'UR', role: 'Mage' },
+      { id: 'mo_da', name: 'Mộ Dạ', cost: 15, rank: 'SSR', role: 'Warrior' },
+      { id: 'ngao_binh', name: 'Ngao Bính', cost: 18, rank: 'UR', role: 'Warrior' },
+      { id: 'lau_khac_ma_chu', name: 'Lậu Khắc Ma Chủ', cost: 21, rank: 'Prime', role: 'Mage' },
       { id: 'phe', name: 'Phệ', cost: 20, rank: 'UR', role: 'Mage' },
       { id: 'kiemtruongda', name: 'Kiếm Trường Dạ', cost: 16, rank: 'UR', role: 'Warrior' },
-      { id: 'loithienanh', name: 'Lôi Thiên Ảnh', cost: 18, rank: 'SSR', role: 'Tanker' },
-      { id: 'laky', name: 'La Kỳ', cost: 14 },
-      { id: 'kydieu', name: 'Kỳ Diêu', cost: 12 },
-      { id: 'doanminh', name: 'Doãn Minh', cost: 12 },
-      { id: 'tranquat', name: 'Trần Quát', cost: 10 },
-      { id: 'linhgac', name: 'Lính Gác', cost: 8 },
+      { id: 'loithienanh', name: 'Lôi Thiên Ảnh', cost: 18, rank: 'SSR', role: 'Tanker' }, { id: 'laky', name: 'La Kỳ', cost: 14, rank: 'SSR', role: 'Support' },
+      { id: 'kydieu', name: 'Kỳ Diêu', cost: 12, rank: 'SR', role: 'Support' },
+      { id: 'doanminh', name: 'Doãn Minh', cost: 12, rank: 'SR', role: 'Support' },
+      { id: 'tranquat', name: 'Trần Quát', cost: 10, rank: 'R', role: 'Summoner' },
+      { id: 'linhgac', name: 'Lính Gác', cost: 8, rank: 'N', role: 'Warrior' },
   ];
   const UNITS = UNIT_LIST;
   const UNIT_INDEX_INTERNAL = new Map(UNIT_LIST.map((unit) => [unit.id, unit]));

@@ -798,10 +798,10 @@ GHI CHÚ HỆ THỐNG & CHIẾN THUẬT:
  * Logic:
    * Cơ chế: Kiểm tra % HP hiện tại của bản thân tại mọi thời điểm (Real-time check).
    * Trạng Thái 1 (Thủ - Kim Lôi):
-     * Điều kiện: HP \ge 50%.
+     * Điều kiện: HP >= 50%.
      * Hiệu ứng: Tăng +20% ARM và +20% RES. (Trâu bò khi còn khỏe).
    * Trạng Thái 2 (Công - Huyết Lôi):
-     * Điều kiện: HP \le 49%.
+     * Điều kiện: HP bé hơn hoặc = 49%.
      * Hiệu ứng: Tăng +20% WIL và +20% ATK. (Khô máu khi bị thương).
    * Pháp Tắc (Law): Hiệu ứng chuyển đổi này là cơ chế gốc của nhân vật, Không Thể Bị Xóa Bỏ, Lãng Quên hay Cấm Buff.
 2. ĐÁNH THƯỜNG: Lôi Quyền Song Sát
@@ -845,7 +845,7 @@ GHI CHÚ HỆ THỐNG & CHIẾN THUẬT:
  * Tags: [Tự Động], [Đa Mục Tiêu: Ngẫu Nhiên], [Sát Thương Arcane], [Sát Thương Theo % Máu Địch], [Tính Là Đánh Thường], [Buff: Giảm Thương].
  * Logic:
    * Trigger: Đầy Nộ (Auto-cast).
-   * Cost: Tự đốt 15% Max HP hiện tại.
+   * Cost: Tự đốt hp = 15% Max HP hiện tại.
      * An toàn: Nếu HP hiện tại < 15% Max HP \rightarrow Giữ lại 1 HP (Không tự sát).
    * Mục tiêu: 3 Kẻ địch ngẫu nhiên.
    * Sát thương (Arcane - Bỏ qua Né Tránh):
