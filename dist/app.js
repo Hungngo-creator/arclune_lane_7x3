@@ -9599,6 +9599,110 @@ __define('./entry.ts', (exports, module, __require) => {
       }
       return container;
   }
+  function isPvpLikeMode(modeKey) {
+      const key = (modeKey || '').toLowerCase();
+      return key === 'ares' || key.includes('pvp');
+  }
+  function resolveBattleOverlayLabels(winner, modeKey) {
+      if (winner === 'draw') {
+          return { primary: 'Hòa', secondary: null };
+      }
+      if (isPvpLikeMode(modeKey)) {
+          if (winner === 'ally') {
+              return { primary: 'Chiến thắng', secondary: 'Thua cuộc' };
+          }
+          if (winner === 'enemy') {
+              return { primary: 'Thua cuộc', secondary: 'Chiến thắng' };
+          }
+      }
+      if (winner === 'ally')
+          return { primary: 'Chiến thắng', secondary: null };
+      if (winner === 'enemy')
+          return { primary: 'Thua cuộc', secondary: null };
+      return { primary: 'Kết thúc trận', secondary: null };
+  }
+  function removeBattleResultOverlay(container) {
+      if (!container)
+          return;
+      const existing = container.querySelector('[data-role="battle-result-overlay"]');
+      if (existing && existing.parentNode) {
+          existing.parentNode.removeChild(existing);
+      }
+  }
+  function showBattleResultOverlay(container, params) {
+      removeBattleResultOverlay(container);
+      const labels = resolveBattleOverlayLabels(params.winner, params.modeKey);
+      const overlay = document.createElement('div');
+      overlay.setAttribute('data-role', 'battle-result-overlay');
+      overlay.style.cssText = [
+          'position:absolute',
+          'inset:0',
+          'display:flex',
+          'align-items:center',
+          'justify-content:center',
+          'background:rgba(2,6,12,.72)',
+          'backdrop-filter:blur(2px)',
+          'z-index:30',
+      ].join(';');
+      const panel = document.createElement('div');
+      panel.style.cssText = [
+          'min-width:220px',
+          'max-width:min(92vw,420px)',
+          'border-radius:16px',
+          'border:1px solid rgba(125,211,252,.4)',
+          'background:rgba(10,18,28,.95)',
+          'box-shadow:0 20px 44px rgba(0,0,0,.45)',
+          'padding:20px 18px',
+          'text-align:center',
+          'display:flex',
+          'flex-direction:column',
+          'gap:12px',
+          'color:#d8f4ff',
+      ].join(';');
+      const title = document.createElement('h3');
+      title.textContent = labels.primary;
+      title.style.cssText = 'margin:0;font-size:28px;line-height:1.2;text-transform:uppercase;letter-spacing:.04em;';
+      panel.appendChild(title);
+      if (labels.secondary) {
+          const secondary = document.createElement('div');
+          secondary.textContent = `Đối thủ: ${labels.secondary}`;
+          secondary.style.cssText = 'font-size:14px;opacity:.86;';
+          panel.appendChild(secondary);
+      }
+      const countdown = document.createElement('div');
+      countdown.textContent = 'Tự động cho phép thoát sau 3s';
+      countdown.style.cssText = 'font-size:13px;opacity:.72;';
+      panel.appendChild(countdown);
+      const exitButton = document.createElement('button');
+      exitButton.type = 'button';
+      exitButton.textContent = 'Thoát';
+      exitButton.disabled = true;
+      exitButton.style.cssText = [
+          'padding:10px 16px',
+          'border-radius:12px',
+          'border:1px solid rgba(125,211,252,.35)',
+          'background:rgba(14,26,38,.9)',
+          'color:#d8f4ff',
+          'font-weight:700',
+          'cursor:pointer',
+          'opacity:.65',
+      ].join(';');
+      panel.appendChild(exitButton);
+      overlay.appendChild(panel);
+      if (getComputedStyle(container).position === 'static') {
+          container.style.position = 'relative';
+      }
+      container.appendChild(overlay);
+      const allowExit = window.setTimeout(() => {
+          exitButton.disabled = false;
+          exitButton.style.opacity = '1';
+          countdown.textContent = 'Bạn có thể thoát trận đấu';
+      }, 3000);
+      exitButton.addEventListener('click', () => {
+          window.clearTimeout(allowExit);
+          params.onExit();
+      }, { once: true });
+  }
   function teardownActiveSession() {
       if (!shellInstance)
           return;
@@ -9702,29 +9806,58 @@ __define('./entry.ts', (exports, module, __require) => {
       if (typeof createPveSession !== 'function') {
           throw new Error('PvE module missing createPveSession().');
       }
-      const container = renderPveLayout({
+      let container = null;
+      let unsubscribeBattleEnd = null;
+      const exitToMainMenu = () => {
+          if (typeof unsubscribeBattleEnd === 'function')
+              unsubscribeBattleEnd();
+          if (container)
+              removeBattleResultOverlay(container);
+          const state = shell.getState();
+          const session = state?.activeSession;
+          if (isStoppableSession(session)) {
+              try {
+                  session.stop();
+              }
+              catch (err) {
+                  console.warn('[pve] stop session failed', err);
+              }
+          }
+          shell.setActiveSession(null);
+          shell.enterScreen(SCREEN_MAIN_MENU);
+      };
+      container = renderPveLayout({
           title: definition.label,
           modeKey: definition.key,
-          onExit: () => {
-              const state = shell.getState();
-              const session = state?.activeSession;
-              if (isStoppableSession(session)) {
-                  try {
-                      session.stop();
-                  }
-                  catch (err) {
-                      console.warn('[pve] stop session failed', err);
-                  }
-              }
-              shell.setActiveSession(null);
-              shell.enterScreen(SCREEN_MAIN_MENU);
-          }
+          onExit: exitToMainMenu,
       });
       if (!container) {
           throw new Error('Không thể dựng giao diện PvE.');
       }
       const session = createPveSession(container, createSessionOptions);
       shell.setActiveSession(session);
+      if (typeof session.onEvent === 'function') {
+          const unsubscribe = session.onEvent('battle:end', (event) => {
+              const detailSource = event && typeof event === 'object' && 'detail' in event
+                  ? event.detail
+                  : event;
+              const result = detailSource && typeof detailSource === 'object'
+                  ? detailSource.result
+                  : null;
+              const winner = result && typeof result === 'object'
+                  ? result.winner
+                  : null;
+              showBattleResultOverlay(container, {
+                  winner,
+                  modeKey: definition.key,
+                  onExit: exitToMainMenu,
+              });
+          });
+          unsubscribeBattleEnd = typeof unsubscribe === 'function' ? unsubscribe : null;
+      }
+      else {
+          unsubscribeBattleEnd = null;
+      }
       if (isStartableSession(session)) {
           const scheduleRetry = (callback) => {
               if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
@@ -9736,8 +9869,11 @@ __define('./entry.ts', (exports, module, __require) => {
           };
           const MAX_BOARD_RETRIES = 30;
           const startSessionSafely = () => {
-              if (token !== pveRenderToken)
+              if (token !== pveRenderToken) {
+                  if (typeof unsubscribeBattleEnd === 'function')
+                      unsubscribeBattleEnd();
                   return;
+              }
               const startConfig = { ...startSessionOptions, root: container };
               try {
                   const result = session.start(startConfig);
@@ -9752,6 +9888,8 @@ __define('./entry.ts', (exports, module, __require) => {
           };
           const handleMissingBoard = () => {
               const message = 'Không thể tải bàn chơi PvE. Đang quay lại menu chính.';
+              if (typeof unsubscribeBattleEnd === 'function')
+                  unsubscribeBattleEnd();
               const displayed = showPveBoardMissingNotice(message);
               if (!displayed) {
                   console.warn(message);
@@ -11067,6 +11205,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   let timerElement = null;
   let storedConfig = normalizeConfig();
   let running = false;
+  let leaderEndCheckFlags = { ally: false, enemy: false };
   const hpBarGradientCache = new Map();
   const meleeOffsetTokenKeys = new Set();
   const makeMeleeTokenKey = (token) => {
@@ -12135,6 +12274,16 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       const contextDetail = context && typeof context === 'object' ? { ...context } : {};
       const triggerValue = contextDetail['trigger'];
       const trigger = typeof triggerValue === 'string' ? triggerValue : null;
+      const leaderAHpRatio = getHpRatio(leaderA);
+      const leaderBHpRatio = getHpRatio(leaderB);
+      const threshold = 0.3;
+      const shouldCheckAlly = !leaderAAlive || leaderAHpRatio <= threshold;
+      const shouldCheckEnemy = !leaderBAlive || leaderBHpRatio <= threshold;
+      leaderEndCheckFlags = {
+          ally: shouldCheckAlly,
+          enemy: shouldCheckEnemy,
+      };
+      contextDetail['leaderCheckFlags'] = { ...leaderEndCheckFlags };
       const detail = {
           context: contextDetail,
           leaders: {
@@ -12317,6 +12466,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       if (hud && Game)
           hud.update(Game);
       scheduleDraw();
+      leaderEndCheckFlags = { ally: false, enemy: false };
       Game._inited = true;
       refillDeck();
       refillDeckEnemy(Game);

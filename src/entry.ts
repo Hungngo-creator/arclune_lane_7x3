@@ -89,6 +89,7 @@ interface RenderPveLayoutOptions {
 interface PveSession {
   start?: (config: UnknownRecord) => unknown;
   stop?: () => void;
+  onEvent?: (type: string, handler: (event: { detail?: Record<string, unknown> } | Record<string, unknown>) => void) => (() => void) | void;
 }
 
 const isStoppableSession = (value: unknown): value is { stop: () => void } => (
@@ -807,6 +808,129 @@ function renderPveLayout(options: RenderPveLayoutOptions): HTMLElement | null{
   return container;
 }
 
+function isPvpLikeMode(modeKey: string | null | undefined): boolean {
+  const key = (modeKey || '').toLowerCase();
+  return key === 'ares' || key.includes('pvp');
+}
+
+function resolveBattleOverlayLabels(
+  winner: string | null | undefined,
+  modeKey: string | null | undefined,
+): { primary: string; secondary: string | null } {
+  if (winner === 'draw') {
+    return { primary: 'Hòa', secondary: null };
+  }
+  if (isPvpLikeMode(modeKey)) {
+    if (winner === 'ally') {
+      return { primary: 'Chiến thắng', secondary: 'Thua cuộc' };
+    }
+    if (winner === 'enemy') {
+      return { primary: 'Thua cuộc', secondary: 'Chiến thắng' };
+    }
+  }
+  if (winner === 'ally') return { primary: 'Chiến thắng', secondary: null };
+  if (winner === 'enemy') return { primary: 'Thua cuộc', secondary: null };
+  return { primary: 'Kết thúc trận', secondary: null };
+}
+
+function removeBattleResultOverlay(container: HTMLElement | null | undefined): void {
+  if (!container) return;
+  const existing = container.querySelector('[data-role="battle-result-overlay"]');
+  if (existing && existing.parentNode) {
+    existing.parentNode.removeChild(existing);
+  }
+}
+
+function showBattleResultOverlay(
+  container: HTMLElement,
+  params: {
+    winner: string | null | undefined;
+    modeKey: string | null | undefined;
+    onExit: () => void;
+  },
+): void {
+  removeBattleResultOverlay(container);
+  const labels = resolveBattleOverlayLabels(params.winner, params.modeKey);
+  const overlay = document.createElement('div');
+  overlay.setAttribute('data-role', 'battle-result-overlay');
+  overlay.style.cssText = [
+    'position:absolute',
+    'inset:0',
+    'display:flex',
+    'align-items:center',
+    'justify-content:center',
+    'background:rgba(2,6,12,.72)',
+    'backdrop-filter:blur(2px)',
+    'z-index:30',
+  ].join(';');
+
+  const panel = document.createElement('div');
+  panel.style.cssText = [
+    'min-width:220px',
+    'max-width:min(92vw,420px)',
+    'border-radius:16px',
+    'border:1px solid rgba(125,211,252,.4)',
+    'background:rgba(10,18,28,.95)',
+    'box-shadow:0 20px 44px rgba(0,0,0,.45)',
+    'padding:20px 18px',
+    'text-align:center',
+    'display:flex',
+    'flex-direction:column',
+    'gap:12px',
+    'color:#d8f4ff',
+  ].join(';');
+
+  const title = document.createElement('h3');
+  title.textContent = labels.primary;
+  title.style.cssText = 'margin:0;font-size:28px;line-height:1.2;text-transform:uppercase;letter-spacing:.04em;';
+  panel.appendChild(title);
+
+  if (labels.secondary) {
+    const secondary = document.createElement('div');
+    secondary.textContent = `Đối thủ: ${labels.secondary}`;
+    secondary.style.cssText = 'font-size:14px;opacity:.86;';
+    panel.appendChild(secondary);
+  }
+
+  const countdown = document.createElement('div');
+  countdown.textContent = 'Tự động cho phép thoát sau 3s';
+  countdown.style.cssText = 'font-size:13px;opacity:.72;';
+  panel.appendChild(countdown);
+
+  const exitButton = document.createElement('button');
+  exitButton.type = 'button';
+  exitButton.textContent = 'Thoát';
+  exitButton.disabled = true;
+  exitButton.style.cssText = [
+    'padding:10px 16px',
+    'border-radius:12px',
+    'border:1px solid rgba(125,211,252,.35)',
+    'background:rgba(14,26,38,.9)',
+    'color:#d8f4ff',
+    'font-weight:700',
+    'cursor:pointer',
+    'opacity:.65',
+  ].join(';');
+  panel.appendChild(exitButton);
+
+  overlay.appendChild(panel);
+  if (getComputedStyle(container).position === 'static') {
+    container.style.position = 'relative';
+  }
+  container.appendChild(overlay);
+
+  const allowExit = window.setTimeout(() => {
+    exitButton.disabled = false;
+    exitButton.style.opacity = '1';
+    countdown.textContent = 'Bạn có thể thoát trận đấu';
+  }, 3000);
+
+  exitButton.addEventListener('click', () => {
+    window.clearTimeout(allowExit);
+    params.onExit();
+  }, { once: true });
+}
+
 function teardownActiveSession(): void{
   if (!shellInstance) return;
   const current = shellInstance.getState()?.activeSession as { stop?: () => void } | null;
@@ -907,28 +1031,57 @@ async function mountPveScreen(params: ScreenParams): Promise<void>{
   if (typeof createPveSession !== 'function'){
     throw new Error('PvE module missing createPveSession().');
   }
-  const container = renderPveLayout({
+  let container: HTMLElement | null = null;
+  let unsubscribeBattleEnd: (() => void) | null = null;
+
+  const exitToMainMenu = (): void => {
+    if (typeof unsubscribeBattleEnd === 'function') unsubscribeBattleEnd();
+    if (container) removeBattleResultOverlay(container);
+    const state = shell.getState();
+    const session = state?.activeSession;
+    if (isStoppableSession(session)){
+      try {
+        session.stop();
+      } catch (err) {
+        console.warn('[pve] stop session failed', err);
+      }
+    }
+    shell.setActiveSession(null);
+    shell.enterScreen(SCREEN_MAIN_MENU);
+  };
+
+  container = renderPveLayout({
     title: definition.label,
     modeKey: definition.key,
-    onExit: ()=>{
-      const state = shell.getState();
-      const session = state?.activeSession;
-      if (isStoppableSession(session)){
-        try {
-          session.stop();
-        } catch (err) {
-          console.warn('[pve] stop session failed', err);
-        }
-      }
-      shell.setActiveSession(null);
-      shell.enterScreen(SCREEN_MAIN_MENU);
-    }
+    onExit: exitToMainMenu,
   });
   if (!container){
     throw new Error('Không thể dựng giao diện PvE.');
   }
   const session = createPveSession(container, createSessionOptions) as PveSession;
   shell.setActiveSession(session);
+  if (typeof session.onEvent === 'function') {
+    const unsubscribe = session.onEvent('battle:end', (event) => {
+      const detailSource = event && typeof event === 'object' && 'detail' in event
+        ? (event as { detail?: Record<string, unknown> }).detail
+        : event as Record<string, unknown> | undefined;
+      const result = detailSource && typeof detailSource === 'object'
+        ? detailSource.result as Record<string, unknown> | null | undefined
+        : null;
+      const winner = result && typeof result === 'object'
+        ? result.winner as string | null | undefined
+        : null;
+      showBattleResultOverlay(container, {
+        winner,
+        modeKey: definition.key,
+        onExit: exitToMainMenu,
+      });
+    });
+    unsubscribeBattleEnd = typeof unsubscribe === 'function' ? unsubscribe : null;
+  } else {
+    unsubscribeBattleEnd = null;
+  }
+
   if (isStartableSession(session)){
     const scheduleRetry = (callback: () => void) => {
       if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function'){
@@ -939,7 +1092,10 @@ async function mountPveScreen(params: ScreenParams): Promise<void>{
     };
     const MAX_BOARD_RETRIES = 30;
     const startSessionSafely = () => {
-      if (token !== pveRenderToken) return;
+      if (token !== pveRenderToken) {
+        if (typeof unsubscribeBattleEnd === 'function') unsubscribeBattleEnd();
+        return;
+      }
       const startConfig = { ...startSessionOptions, root: container };
       try {
         const result = session.start(startConfig);
@@ -953,6 +1109,7 @@ async function mountPveScreen(params: ScreenParams): Promise<void>{
     };
     const handleMissingBoard = () => {
       const message = 'Không thể tải bàn chơi PvE. Đang quay lại menu chính.';
+      if (typeof unsubscribeBattleEnd === 'function') unsubscribeBattleEnd();
       const displayed = showPveBoardMissingNotice(message);
       if (!displayed){
         console.warn(message);

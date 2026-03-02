@@ -649,6 +649,7 @@ let rootElement: Element | Document | null = null;
 let timerElement: HTMLElement | null = null;
 let storedConfig: NormalizedSessionConfig = normalizeConfig();
 let running = false;
+let leaderEndCheckFlags: { ally: boolean; enemy: boolean } = { ally: false, enemy: false };
 const hpBarGradientCache = new Map<string, GradientValue>();
 const meleeOffsetTokenKeys = new Set<string>();
 
@@ -1681,6 +1682,17 @@ function checkBattleEndResult(
     context && typeof context === 'object' ? { ...context } : {};
   const triggerValue = contextDetail['trigger'];
   const trigger = typeof triggerValue === 'string' ? triggerValue : null;
+  const leaderAHpRatio = getHpRatio(leaderA);
+  const leaderBHpRatio = getHpRatio(leaderB);
+  const threshold = 0.3;
+  const shouldCheckAlly = !leaderAAlive || leaderAHpRatio <= threshold;
+  const shouldCheckEnemy = !leaderBAlive || leaderBHpRatio <= threshold;
+  leaderEndCheckFlags = {
+    ally: shouldCheckAlly,
+    enemy: shouldCheckEnemy,
+  };
+  contextDetail['leaderCheckFlags'] = { ...leaderEndCheckFlags };
+
   const detail: BattleDetail = {
     context: contextDetail,
     leaders: {
@@ -1849,6 +1861,7 @@ function init(): boolean {
 
   if (hud && Game) hud.update(Game);
   scheduleDraw();
+  leaderEndCheckFlags = { ally: false, enemy: false };
   Game._inited = true;
 
   refillDeck();
