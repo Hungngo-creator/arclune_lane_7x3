@@ -103,6 +103,42 @@ describe('dealAbilityDamage SSI formula extensions', () => {
     expect(b.hp).toBe(850);
   });
 
+  
+  test('realm bonus scales by class profile when not explicitly provided', () => {
+    const attacker = mkUnit({ id: 'huyet_tich', side: 'ally', atk: 200, wil: 100, realm: 2, subRealm: 5, arm: 0, res: 0 });
+    const target = mkUnit({ id: 'leaderB', side: 'enemy', hp: 1000, hpMax: 1000, arm: 0, res: 0 });
+    const game = mkGame([attacker, target]);
+
+    const result = dealAbilityDamage(game, attacker, target, {
+      base: 300,
+      dtype: 'physical',
+      skillMul: 1,
+    });
+
+    expect(result.dealt).toBe(320);
+    expect(target.hp).toBe(680);
+  });
+
+  test('shared HP supports weight and cap ratio metadata', () => {
+    const attacker = mkUnit({ side: 'ally', id: 'leaderA' });
+    const anchor = mkUnit({ side: 'enemy', id: 'leaderB', hp: 1000, hpMax: 1000, arm: 0, res: 0, sharedHpGroup: 'lotus' });
+    const heavy = mkUnit({ side: 'enemy', id: 'linhgac', hp: 1000, hpMax: 1000, arm: 0, res: 0, sharedHpGroup: 'lotus', sharedHpWeight: 3 });
+    const capped = mkUnit({ side: 'enemy', id: 'phe', hp: 1000, hpMax: 1000, arm: 0, res: 0, sharedHpGroup: 'lotus', sharedHpWeight: 1, sharedHpCapRatio: 0.02 });
+    const game = mkGame([attacker, anchor, heavy, capped]);
+
+    const result = dealAbilityDamage(game, attacker, anchor, {
+      base: 400,
+      dtype: 'physical',
+      skillMul: 1,
+      realmBonus: 0,
+    });
+
+    expect(result.dealt).toBe(340);
+    expect(anchor.hp).toBe(920);
+    expect(heavy.hp).toBe(760);
+    expect(capped.hp).toBe(980);
+  });
+
   test('law resolution: higher rank absolute shield blocks lower rank absolute attack', () => {
     const attacker = mkUnit({ side: 'ally', id: 'linhgac', rank: 'SSR', statuses: [{ id: 'absolute_attack' }] });
     const target = mkUnit({ side: 'enemy', id: 'leaderB', rank: 'Prime', statuses: [{ id: 'absolute_shield' }] });

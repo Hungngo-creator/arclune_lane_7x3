@@ -428,7 +428,11 @@ export function queueEnemyAt(
 
 export function aiMaybeAct(Game: SessionState, reason: AI_REASON): void {
   const now = safeNow();
-  if (now - (Game.ai.lastThinkMs || 0) < 120) return;
+  const cfgInterval = Number(CFG.AI?.THINK_INTERVAL_MS);
+  const minThinkInterval = Number.isFinite(cfgInterval)
+    ? Math.max(60, Math.floor(cfgInterval))
+    : (reason === 'board' ? 220 : 140);
+  if (now - (Game.ai.lastThinkMs || 0) < minThinkInterval) return;
   const weights = mergedWeights();
   const dbgCfg = debugConfig();
 

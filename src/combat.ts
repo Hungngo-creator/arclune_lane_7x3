@@ -2,6 +2,7 @@
 
 import { getMetaById } from './catalog.ts';
 import { Statuses, hookOnLethalDamage } from './statuses.ts';
+import type { DamageResult } from './statuses.ts';
 import { applyDamage, grantShield } from './combat/apply-damage.ts';
 import { asSessionWithVfx, vfxAddHit, vfxAddMelee, vfxAddLightningArc } from './vfx.ts';
 import { slotIndex, slotToCell } from './engine.ts';
@@ -85,13 +86,25 @@ const toFinite = (value: unknown, fallback = 0): number => {
 
 const normalizeWeight = (value: unknown): number => Math.max(0, toFinite(value, 0));
 
+const REALM_ROLE_SCALE: Readonly<Record<string, number>> = {
+  Tanker: 0.9,
+  Warrior: 1,
+  Assassin: 1.02,
+  Ranger: 1.03,
+  Mage: 1.05,
+  Support: 0.95,
+  Summoner: 0.97,
+};
+
 const realmBonusFromUnit = (unit: UnitToken): number => {
   const realm = Math.max(0, Math.floor(toFinite(unit.realm, 0)));
   const subRealm = Math.max(0, Math.floor(toFinite(unit.subRealm, 0)));
   if (realm <= 0 && subRealm <= 0) return 0;
   const base = Math.max(0, Math.floor((unit.atk ?? 0) + (unit.wil ?? 0)));
   const ratio = Math.min(0.6, realm * 0.02 + subRealm * 0.005);
-  return Math.round(base * ratio);
+  const className = getMetaById(unit.id)?.class ?? '';
+  const roleScale = REALM_ROLE_SCALE[className] ?? 1;
+  return Math.round(base * ratio * roleScale);
 };
 
 const getRankPriority = (unit: UnitToken | null | undefined): number => {
@@ -127,6 +140,33 @@ const getSharedHpGroup = (target: UnitToken): string | null => {
   }
   return null;
 };
+
+const getSharedHpRules = (target: UnitToken): { group: string | null; weight: number; capRatio: number | null } => {
+  const group = getSharedHpGroup(target);
+  if (!group) return { group: null, weight: 1, capRatio: null };
+  const statuses = Array.isArray(target.statuses) ? target.statuses : [];
+  const weighted = toFinite(target.sharedHpWeight ?? target.shareWeight, Number.NaN);
+  const capped = toFinite(target.sharedHpCapRatio ?? target.shareCapRatio, Number.NaN);
+  let weight = Number.isFinite(weighted) ? Math.max(0.05, weighted) : 1;
+  let capRatio = Number.isFinite(capped) ? Math.max(0, capped) : null;
+  for (const status of statuses) {
+    const idTag = `${status.id ?? ''}|${status.tag ?? ''}`.toLowerCase();
+    if (!idTag.includes('share')) continue;
+    const statusWeight = toFinite((status as Record<string, unknown>).weight, Number.NaN);
+    if (Number.isFinite(statusWeight)) weight = Math.max(0.05, statusWeight);
+    const statusCap = toFinite((status as Record<string, unknown>).capRatio, Number.NaN);
+    if (Number.isFinite(statusCap)) capRatio = Math.max(0, statusCap);
+  }
+  return { group, weight, capRatio };
+};
+
+const applyMitigationLayer = (damage: number, factor: number): number => (
+  Math.max(0, Math.floor(Math.max(0, damage) * Math.max(0, factor)))
+);
+
+const applyHardRuleLayer = (damage: number, blocked: boolean): number => (
+  blocked ? 0 : Math.max(0, damage)
+);
 
 const GAME_CONFIG = CFG as Readonly<GameConfig>;
 
@@ -225,39 +265,47 @@ export function dealAbilityDamage(
   const bypassShieldByLaw = atkAbsolute && shieldAbsolute && attackerRank >= targetRank;
 
   let dmg = Math.max(0, Math.floor((pre.base * skillMulti + realmBonus) * pre.outMul));
-  if (pre.ignoreAll) {
-    dmg = 0;
-  } else if (shieldWinsLaw) {
-    dmg = 0;
-  } else {
-    dmg = Math.max(0, Math.floor(dmg * defMultiplier));
-    dmg = Math.max(0, Math.floor(dmg * pre.inMul));
-  }
+  dmg = applyHardRuleLayer(dmg, pre.ignoreAll || shieldWinsLaw);
+  dmg = applyMitigationLayer(dmg, defMultiplier);
+  dmg = applyMitigationLayer(dmg, pre.inMul);
 
   const abs = bypassShieldByLaw
     ? { remain: dmg, absorbed: 0, broke: false }
     : (Statuses.absorbShield(target, dmg, { dtype }) as ShieldAbsorptionResult);
   const remain = Math.max(0, Math.floor(abs.remain));
-
   let dealtTotal = 0;
-  const sharedGroup = getSharedHpGroup(target);
-  const sharedTargets = sharedGroup && Game
-    ? Game.tokens.filter((token) => token.alive && token.side === target.side && getSharedHpGroup(token) === sharedGroup)
+  const sharedRules = getSharedHpRules(target);
+  const sharedTargets = sharedRules.group && Game
+    ? Game.tokens.filter((token) => token.alive && token.side === target.side && getSharedHpGroup(token) === sharedRules.group)
     : [];
 
   if (remain > 0 && sharedTargets.length > 1) {
-    const split = Math.floor(remain / sharedTargets.length);
-    let carry = remain - split * sharedTargets.length;
+    const weightedTargets = [] as Array<{ token: UnitToken; weight: number; capRatio: number | null }>;
     for (const token of sharedTargets) {
-      const payload = split + (carry > 0 ? 1 : 0);
-      if (carry > 0) carry -= 1;
+      const rules = token === target ? sharedRules : getSharedHpRules(token);
+      weightedTargets.push({ token, weight: Math.max(0.05, rules.weight), capRatio: rules.capRatio });
+    }
+    const totalWeight = weightedTargets.reduce((acc, entry) => acc + entry.weight, 0) || 1;
+    let assigned = 0;
+    for (let i = 0; i < weightedTargets.length; i += 1) {
+      const entry = weightedTargets[i];
+      if (!entry) continue;
+      const isLast = i === weightedTargets.length - 1;
+      let payload = isLast
+        ? Math.max(0, remain - assigned)
+        : Math.max(0, Math.floor(remain * (entry.weight / totalWeight)));
+      if (entry.capRatio != null && Number.isFinite(entry.token.hpMax)) {
+        const capValue = Math.max(0, Math.floor((entry.token.hpMax ?? 0) * entry.capRatio));
+        payload = Math.min(payload, capValue);
+      }
+      assigned += payload;
       if (payload <= 0) continue;
-      const beforeHp = Math.max(0, Math.floor(token.hp ?? 0));
-      applyDamage(token, payload);
-      const afterHp = Math.max(0, Math.floor(token.hp ?? 0));
+      const beforeHp = Math.max(0, Math.floor(entry.token.hp ?? 0));
+      applyDamage(entry.token, payload);
+      const afterHp = Math.max(0, Math.floor(entry.token.hp ?? 0));
       dealtTotal += Math.max(0, beforeHp - afterHp);
-      if (token.hp <= 0) {
-        hookOnLethalDamage(token);
+      if (entry.token.hp <= 0) {
+        hookOnLethalDamage(entry.token);
       }
     }
   } else if (remain > 0) {

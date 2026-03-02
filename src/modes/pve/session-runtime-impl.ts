@@ -2297,10 +2297,10 @@ function init(): boolean {
           cleanupDead(sessionNowMs);
           const postTurnResult = checkBattleEndResult(Game, { trigger: 'post-turn', timestamp: sessionNowMs });
           scheduleDraw();
-          if (postTurnResult){
+          aiMaybeAct(Game, 'board');
+          if (Game.battle?.over) {
             return;
           }
-          aiMaybeAct(Game, 'board');
           turnState = Game.turn ?? null;
           if (turnState){
             const rawBusyAfter = turnState.busyUntil;
