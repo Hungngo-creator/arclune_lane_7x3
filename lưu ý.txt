@@ -27,7 +27,7 @@
 
 Ghi chú: Các công thức cũ ghi theo dạng 100% ATK + 100% WIL vẫn giữ ý nghĩa thiết kế; khi implement runtime cần map về baseDefault + skillMul + dtype/pen theo engine hiện tại.
 
-0) Tác dụng của các hàm (Quy hoạch chuẩn 125 tệp):
+0) Tác dụng của các hàm:
 
 [PHẦN I: CORE ENGINE & LOGIC - HỆ THỐNG CỐT LÕI]
 Nhóm 1: Khởi tạo, Vòng lặp & Điều hướng (App Flow & Routing)

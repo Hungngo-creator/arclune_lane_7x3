@@ -15,6 +15,10 @@ export interface TagDefinition {
   note?: string;
 }
 
+export type TagAliasVersion = 'v1';
+
+export const CURRENT_TAG_ALIAS_VERSION: TagAliasVersion = 'v1';
+
 const TAG_DEFINITIONS = [
   { id: 'instant', label: 'Lập tức', domain: 'timing', aliases: ['instant-cast', 'instantCast', 'lap_tuc'] },
   { id: 'passive', label: 'Nội tại', domain: 'kit', aliases: ['noi_tai', 'passive-trigger'] },
@@ -69,10 +73,58 @@ for (const definition of TAG_DEFINITIONS){
   }
 }
 
+export const tagAliasesByVersion: Readonly<Record<TagAliasVersion, Readonly<Record<string, string>>>> = Object.freeze({
+  v1: Object.freeze({
+    cone: 'multi-target',
+    drain: 'non-heal-hp-change',
+    beast: 'active',
+    seed: 'mark',
+    arcane: 'support',
+    flying: 'blink',
+    weather: 'field',
+    clone: 'summon',
+    splash: 'aoe',
+    evolution: 'stance',
+    'multi-hit': 'chain',
+    time: 'control',
+    lifesteal: 'non-heal-hp-change',
+    'hp-drain': 'non-heal-hp-change',
+    column: 'line',
+    'spd-debuff': 'control',
+    'hp-trade': 'non-heal-hp-change',
+    'hp-redistribute': 'non-heal-hp-change',
+    haste: 'support',
+    reflect: 'defense',
+  }),
+});
+
+const TAG_ALIAS_BY_VERSION_KEY = new Map<string, string>();
+for (const [version, aliases] of Object.entries(tagAliasesByVersion)){
+  for (const [from, to] of Object.entries(aliases)){
+    TAG_ALIAS_BY_VERSION_KEY.set(`${version}:${normalizeKey(from)}`, to);
+  }
+}
+
 export const GAME_TAGS = Object.freeze(TAG_DEFINITIONS);
 
 export const TAG_IDS = Object.freeze(
   Array.from(new Set(TAG_DEFINITIONS.map((definition) => definition.id)))
+);
+
+export const TAG_IDS_BY_DOMAIN = Object.freeze(
+  TAG_DEFINITIONS.reduce<Record<TagDomain, ReadonlyArray<string>>>((acc, definition) => {
+    const current = acc[definition.domain] ?? [];
+    acc[definition.domain] = Object.freeze([...current, definition.id]);
+    return acc;
+  }, {
+    timing: [],
+    targeting: [],
+    delivery: [],
+    effect: [],
+    resource: [],
+    rule: [],
+    kit: [],
+  })
 );
 
 export const INSTANT_TAG_IDS = Object.freeze(['instant']);
@@ -80,21 +132,68 @@ export const DEFENSIVE_TAG_IDS = Object.freeze(['defense', 'shield', 'support'])
 export const ABSOLUTE_ATTACK_TAG_IDS = Object.freeze(['absolute-attack']);
 export const ABSOLUTE_SHIELD_TAG_IDS = Object.freeze(['absolute-shield']);
 
-export function normalizeTagId(tag: string | null | undefined): string | null{
+function resolveVersionAlias(
+  tag: string,
+  version: TagAliasVersion = CURRENT_TAG_ALIAS_VERSION,
+): string {
+  return TAG_ALIAS_BY_VERSION_KEY.get(`${version}:${normalizeKey(tag)}`) ?? tag;
+}
+
+export function normalizeTagId(
+  tag: string | null | undefined,
+  version: TagAliasVersion = CURRENT_TAG_ALIAS_VERSION,
+): string | null{
   if (typeof tag !== 'string') return null;
-  const normalized = normalizeKey(tag);
+  const normalized = normalizeKey(resolveVersionAlias(tag, version));
   if (!normalized) return null;
   return TAG_BY_ID.get(normalized)?.id ?? normalized;
 }
 
-export function normalizeTagList(tags: ReadonlyArray<string> | null | undefined): string[]{
+export function normalizeTagList(
+  tags: ReadonlyArray<string> | null | undefined,
+  version: TagAliasVersion = CURRENT_TAG_ALIAS_VERSION,
+): string[]{
   if (!Array.isArray(tags)) return [];
   const unique = new Set<string>();
   for (const tag of tags){
-    const normalized = normalizeTagId(tag);
+    const normalized = normalizeTagId(tag, version);
     if (normalized) unique.add(normalized);
   }
   return [...unique];
+}
+
+export function resolveTagVersionAliases(
+  tags: ReadonlyArray<string> | null | undefined,
+  version: TagAliasVersion = CURRENT_TAG_ALIAS_VERSION,
+): string[] {
+  if (!Array.isArray(tags)) return [];
+  return tags.map((tag) => resolveVersionAlias(tag, version));
+}
+
+export function getTagDefinition(tag: string | null | undefined): TagDefinition | null {
+  const normalized = normalizeTagId(tag);
+  if (!normalized) return null;
+  return TAG_BY_ID.get(normalized) ?? null;
+}
+
+export function getTagDefinition(tag: string | null | undefined): TagDefinition | null{
+  const normalized = normalizeTagId(tag);
+  if (!normalized) return null;
+  return TAG_BY_ID.get(normalized) ?? null;
+}
+
+export function listUnknownTags(tags: ReadonlyArray<string> | null | undefined): string[]{
+  if (!Array.isArray(tags)) return [];
+  const unknown = new Set<string>();
+  for (const rawTag of tags){
+    if (typeof rawTag !== 'string') continue;
+    const normalizedRaw = normalizeKey(rawTag);
+    if (!normalizedRaw) continue;
+    if (!TAG_BY_ID.has(normalizedRaw)){
+      unknown.add(rawTag.trim());
+    }
+  }
+  return [...unknown];
 }
 
 export function hasAnyTag(haystack: ReadonlyArray<string>, needles: ReadonlyArray<string>): boolean{

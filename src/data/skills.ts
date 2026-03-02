@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 import { ROSTER } from '../catalog.ts';
 import rawSkillSetsConfig from './skills.config.ts';
-import { normalizeTagList } from './tags.ts';
+import { getTagDefinition, listUnknownTags, normalizeTagList } from './tags.ts';
 
 import type { UnknownRecord } from '@shared-types/common';
 import type { UnitId } from '@shared-types/units';
@@ -22,14 +22,38 @@ function deepFreeze<T>(value: T): T{
   return value;
 }
 
+function ensureDomainTags(tags: ReadonlyArray<string>, fallbackKit: string): string[]{
+  const normalized = normalizeTagList(tags);
+  const definitions = normalized
+    .map((tag) => getTagDefinition(tag))
+    .filter((definition): definition is NonNullable<ReturnType<typeof getTagDefinition>> => Boolean(definition));
+
+  const next = [...normalized];
+  const hasKit = definitions.some((definition) => definition.domain === 'kit');
+  const hasEffectOrTargeting = definitions.some((definition) => definition.domain === 'effect' || definition.domain === 'targeting');
+
+  if (!hasKit){
+    next.push(fallbackKit);
+  }
+  if (!hasEffectOrTargeting){
+    next.push('single-target');
+  }
+
+  return normalizeTagList(next);
+}
+
+function fallbackKitTag(sectionType: string | null | undefined): string {
+  if (sectionType === 'talent') return 'passive';
+  return 'active';
+}
+
 function normalizeSection(section: SkillSection | string | null | undefined): SkillSection | null{
   if (!section) return null;
   if (typeof section === 'string'){
     return { name: '', description: section } as SkillSection;
   }
   const normalized: SkillSection = { ...section };
-  if (Array.isArray(section.tags)){
-    normalized.tags = normalizeTagList(section.tags);
+  normalized.tags = ensureDomainTags(section.tags ?? [], fallbackKitTag(section.type ?? null));
   }
   if (Array.isArray(section.notes)){
     normalized.notes = [...section.notes];
@@ -43,8 +67,7 @@ function normalizeSection(section: SkillSection | string | null | undefined): Sk
 function normalizeSkillEntry(entry: SkillSection | null | undefined): SkillSection | null{
   if (!entry) return null;
   const normalized: SkillSection = { ...entry };
-  if (Array.isArray(entry.tags)){
-    normalized.tags = normalizeTagList(entry.tags);
+  normalized.tags = ensureDomainTags(entry.tags ?? [], fallbackKitTag(entry.type ?? null));
   }
   if (entry.cost && typeof entry.cost === 'object'){
     normalized.cost = { ...entry.cost };
@@ -79,6 +102,11 @@ const RawSkillSetSchema = z.object({
 const RawSkillSetListSchema = z.array(RawSkillSetSchema);
 const rawSkillSets = RawSkillSetListSchema.parse(rawSkillSetsConfig) as ReadonlyArray<RawSkillSet>;
 
+function collectUnknownSkillTags(skill: SkillSection | null | undefined): string[]{
+  if (!skill || !Array.isArray(skill.tags)) return [];
+  return listUnknownTags(skill.tags);
+}
+
 const SKILL_KEYS = ['basic', 'skill', 'skills', 'ult', 'talent', 'technique', 'notes'] as const satisfies ReadonlyArray<keyof SkillEntry | 'skill'>;
 
 const skillSets: Readonly<Record<UnitId, SkillEntry>> = rawSkillSets.reduce<Record<UnitId, SkillEntry>>((acc, entry) => {
@@ -97,6 +125,18 @@ const skillSets: Readonly<Record<UnitId, SkillEntry>> = rawSkillSets.reduce<Reco
     notes: Array.isArray(entry.notes) ? [...entry.notes] : (entry.notes ? [entry.notes] : [])
   };
   deepFreeze(normalized);
+  const unknownTags = [
+    ...collectUnknownSkillTags(normalized.basic),
+    ...collectUnknownSkillTags(normalized.skill),
+    ...collectUnknownSkillTags(normalized.ult),
+    ...collectUnknownSkillTags(normalized.talent),
+    ...collectUnknownSkillTags(normalized.technique),
+    ...normalized.skills.flatMap(collectUnknownSkillTags),
+  ];
+  if (unknownTags.length){
+    const uniqueUnknown = Array.from(new Set(unknownTags));
+    console.warn(`[skills] Unknown tag(s) for ${entry.unitId}: ${uniqueUnknown.join(', ')}`);
+  }
   acc[entry.unitId] = normalized;
   return acc;
 }, {});
@@ -142,4 +182,45 @@ export function validateSkillSetStructure(entry: unknown): boolean{
     if (skillsValue && !Array.isArray(skillsValue)) return false;
   }
   return true;
+}
+
+export interface SkillTagValidationIssue {
+  unitId: UnitId;
+  section: string;
+  unknownTags: ReadonlyArray<string>;
+  missingKitDomain: boolean;
+  missingEffectOrTargetingDomain: boolean;
+}
+
+function collectValidationIssues(): SkillTagValidationIssue[]{
+  const issues: SkillTagValidationIssue[] = [];
+  const pushIssue = (unitId: UnitId, section: string, tags: ReadonlyArray<string>): void => {
+    const normalized = normalizeTagList(tags);
+    const definitions = normalized.map((tag) => getTagDefinition(tag));
+    const unknownTags = normalized.filter((_, index) => !definitions[index]);
+    const known = definitions.filter((definition): definition is NonNullable<typeof definition> => Boolean(definition));
+    const missingKitDomain = !known.some((definition) => definition.domain === 'kit');
+    const missingEffectOrTargetingDomain = !known.some((definition) => definition.domain === 'effect' || definition.domain === 'targeting');
+    if (unknownTags.length > 0 || missingKitDomain || missingEffectOrTargetingDomain){
+      issues.push({ unitId, section, unknownTags, missingKitDomain, missingEffectOrTargetingDomain });
+    }
+  };
+
+  for (const entry of Object.values(skillSets)){
+    if (entry.basic) pushIssue(entry.unitId, 'basic', entry.basic.tags ?? []);
+    if (entry.skill) pushIssue(entry.unitId, 'skill', entry.skill.tags ?? []);
+    if (entry.ult) pushIssue(entry.unitId, 'ult', entry.ult.tags ?? []);
+    if (entry.talent) pushIssue(entry.unitId, 'talent', entry.talent.tags ?? []);
+    if (Array.isArray(entry.skills)){
+      entry.skills.forEach((skill: SkillSection, index: number) => pushIssue(entry.unitId, `skills[${index}]`, skill.tags ?? []));
+    }
+  }
+
+  return issues;
+}
+
+export const SKILL_TAG_VALIDATION_ISSUES = Object.freeze(collectValidationIssues());
+
+if (SKILL_TAG_VALIDATION_ISSUES.length > 0){
+  console.warn('[skills] tag validation issues detected:', SKILL_TAG_VALIDATION_ISSUES);
 }

@@ -8205,6 +8205,8 @@ __define('./data/skills.ts', (exports, module, __require) => {
   const __dep2 = __require('./data/skills.config.ts');
   const rawSkillSetsConfig = __dep2.default ?? __dep2;
   const __dep3 = __require('./data/tags.ts');
+  const getTagDefinition = __dep3.getTagDefinition;
+  const listUnknownTags = __dep3.listUnknownTags;
   const normalizeTagList = __dep3.normalizeTagList;
   function deepFreeze(value) {
       if (Array.isArray(value)) {
@@ -8217,6 +8219,27 @@ __define('./data/skills.ts', (exports, module, __require) => {
       }
       return value;
   }
+  function ensureDomainTags(tags, fallbackKit) {
+      const normalized = normalizeTagList(tags);
+      const definitions = normalized
+          .map((tag) => getTagDefinition(tag))
+          .filter((definition) => Boolean(definition));
+      const next = [...normalized];
+      const hasKit = definitions.some((definition) => definition.domain === 'kit');
+      const hasEffectOrTargeting = definitions.some((definition) => definition.domain === 'effect' || definition.domain === 'targeting');
+      if (!hasKit) {
+          next.push(fallbackKit);
+      }
+      if (!hasEffectOrTargeting) {
+          next.push('single-target');
+      }
+      return normalizeTagList(next);
+  }
+  function fallbackKitTag(sectionType) {
+      if (sectionType === 'talent')
+          return 'passive';
+      return 'active';
+  }
   function normalizeSection(section) {
       if (!section)
           return null;
@@ -8224,42 +8247,43 @@ __define('./data/skills.ts', (exports, module, __require) => {
           return { name: '', description: section };
       }
       const normalized = { ...section };
-      if (Array.isArray(section.tags)) {
-          normalized.tags = normalizeTagList(section.tags);
-      }
-      if (Array.isArray(section.notes)) {
-          normalized.notes = [...section.notes];
-      }
-      else if (typeof section.notes === 'string') {
-          const note = section.notes;
-          normalized.notes = [note];
-      }
-      return normalized;
+      normalized.tags = ensureDomainTags(section.tags ?? [], fallbackKitTag(section.type ?? null));
   }
+  if (Array.isArray(section.notes)) {
+      normalized.notes = [...section.notes];
+  }
+  else if (typeof section.notes === 'string') {
+      const note = section.notes;
+      normalized.notes = [note];
+  }
+  return normalized;
   function normalizeSkillEntry(entry) {
       if (!entry)
           return null;
       const normalized = { ...entry };
-      if (Array.isArray(entry.tags)) {
-          normalized.tags = normalizeTagList(entry.tags);
-      }
-      if (entry.cost && typeof entry.cost === 'object') {
-          normalized.cost = { ...entry.cost };
-      }
-      if (Array.isArray(entry.notes)) {
-          normalized.notes = [...entry.notes];
-      }
-      if (entry.notes && !Array.isArray(entry.notes)) {
-          const note = entry.notes;
-          normalized.notes = [note];
-      }
-      return normalized;
+      normalized.tags = ensureDomainTags(entry.tags ?? [], fallbackKitTag(entry.type ?? null));
   }
+  if (entry.cost && typeof entry.cost === 'object') {
+      normalized.cost = { ...entry.cost };
+  }
+  if (Array.isArray(entry.notes)) {
+      normalized.notes = [...entry.notes];
+  }
+  if (entry.notes && !Array.isArray(entry.notes)) {
+      const note = entry.notes;
+      normalized.notes = [note];
+  }
+  return normalized;
   const RawSkillSetSchema = z.object({
       unitId: z.string()
   });
   const RawSkillSetListSchema = z.array(RawSkillSetSchema);
   const rawSkillSets = RawSkillSetListSchema.parse(rawSkillSetsConfig);
+  function collectUnknownSkillTags(skill) {
+      if (!skill || !Array.isArray(skill.tags))
+          return [];
+      return listUnknownTags(skill.tags);
+  }
   const SKILL_KEYS = ['basic', 'skill', 'skills', 'ult', 'talent', 'technique', 'notes'];
   const skillSets = rawSkillSets.reduce((acc, entry) => {
       const skills = Array.isArray(entry.skills)
@@ -8277,6 +8301,18 @@ __define('./data/skills.ts', (exports, module, __require) => {
           notes: Array.isArray(entry.notes) ? [...entry.notes] : (entry.notes ? [entry.notes] : [])
       };
       deepFreeze(normalized);
+      const unknownTags = [
+          ...collectUnknownSkillTags(normalized.basic),
+          ...collectUnknownSkillTags(normalized.skill),
+          ...collectUnknownSkillTags(normalized.ult),
+          ...collectUnknownSkillTags(normalized.talent),
+          ...collectUnknownSkillTags(normalized.technique),
+          ...normalized.skills.flatMap(collectUnknownSkillTags),
+      ];
+      if (unknownTags.length) {
+          const uniqueUnknown = Array.from(new Set(unknownTags));
+          console.warn(`[skills] Unknown tag(s) for ${entry.unitId}: ${uniqueUnknown.join(', ')}`);
+      }
       acc[entry.unitId] = normalized;
       return acc;
   }, {});
@@ -8319,13 +8355,47 @@ __define('./data/skills.ts', (exports, module, __require) => {
       }
       return true;
   }
+  function collectValidationIssues() {
+      const issues = [];
+      const pushIssue = (unitId, section, tags) => {
+          const normalized = normalizeTagList(tags);
+          const definitions = normalized.map((tag) => getTagDefinition(tag));
+          const unknownTags = normalized.filter((_, index) => !definitions[index]);
+          const known = definitions.filter((definition) => Boolean(definition));
+          const missingKitDomain = !known.some((definition) => definition.domain === 'kit');
+          const missingEffectOrTargetingDomain = !known.some((definition) => definition.domain === 'effect' || definition.domain === 'targeting');
+          if (unknownTags.length > 0 || missingKitDomain || missingEffectOrTargetingDomain) {
+              issues.push({ unitId, section, unknownTags, missingKitDomain, missingEffectOrTargetingDomain });
+          }
+      };
+      for (const entry of Object.values(skillSets)) {
+          if (entry.basic)
+              pushIssue(entry.unitId, 'basic', entry.basic.tags ?? []);
+          if (entry.skill)
+              pushIssue(entry.unitId, 'skill', entry.skill.tags ?? []);
+          if (entry.ult)
+              pushIssue(entry.unitId, 'ult', entry.ult.tags ?? []);
+          if (entry.talent)
+              pushIssue(entry.unitId, 'talent', entry.talent.tags ?? []);
+          if (Array.isArray(entry.skills)) {
+              entry.skills.forEach((skill, index) => pushIssue(entry.unitId, `skills[${index}]`, skill.tags ?? []));
+          }
+      }
+      return issues;
+  }
+  const SKILL_TAG_VALIDATION_ISSUES = Object.freeze(collectValidationIssues());
+  if (SKILL_TAG_VALIDATION_ISSUES.length > 0) {
+      console.warn('[skills] tag validation issues detected:', SKILL_TAG_VALIDATION_ISSUES);
+  }
   //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'SKILL_TAG_VALIDATION_ISSUES')) exports.SKILL_TAG_VALIDATION_ISSUES = SKILL_TAG_VALIDATION_ISSUES;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getSkillSet')) exports.getSkillSet = getSkillSet;
   if (!Object.prototype.hasOwnProperty.call(exports, 'listSkillSets')) exports.listSkillSets = listSkillSets;
   if (!Object.prototype.hasOwnProperty.call(exports, 'hasSkillSet')) exports.hasSkillSet = hasSkillSet;
   if (!Object.prototype.hasOwnProperty.call(exports, 'validateSkillSetStructure')) exports.validateSkillSetStructure = validateSkillSetStructure;
 });
 __define('./data/tags.ts', (exports, module, __require) => {
+  const CURRENT_TAG_ALIAS_VERSION = 'v1';
   const TAG_DEFINITIONS = [
       { id: 'instant', label: 'Lập tức', domain: 'timing', aliases: ['instant-cast', 'instantCast', 'lap_tuc'] },
       { id: 'passive', label: 'Nội tại', domain: 'kit', aliases: ['noi_tai', 'passive-trigger'] },
@@ -8377,44 +8447,129 @@ __define('./data/tags.ts', (exports, module, __require) => {
           TAG_BY_ID.set(normalizeKey(alias), definition);
       }
   }
+  const tagAliasesByVersion = Object.freeze({
+      v1: Object.freeze({
+          cone: 'multi-target',
+          drain: 'non-heal-hp-change',
+          beast: 'active',
+          seed: 'mark',
+          arcane: 'support',
+          flying: 'blink',
+          weather: 'field',
+          clone: 'summon',
+          splash: 'aoe',
+          evolution: 'stance',
+          'multi-hit': 'chain',
+          time: 'control',
+          lifesteal: 'non-heal-hp-change',
+          'hp-drain': 'non-heal-hp-change',
+          column: 'line',
+          'spd-debuff': 'control',
+          'hp-trade': 'non-heal-hp-change',
+          'hp-redistribute': 'non-heal-hp-change',
+          haste: 'support',
+          reflect: 'defense',
+      }),
+  });
+  const TAG_ALIAS_BY_VERSION_KEY = new Map();
+  for (const [version, aliases] of Object.entries(tagAliasesByVersion)) {
+      for (const [from, to] of Object.entries(aliases)) {
+          TAG_ALIAS_BY_VERSION_KEY.set(`${version}:${normalizeKey(from)}`, to);
+      }
+  }
   const GAME_TAGS = Object.freeze(TAG_DEFINITIONS);
   const TAG_IDS = Object.freeze(Array.from(new Set(TAG_DEFINITIONS.map((definition) => definition.id))));
+  const TAG_IDS_BY_DOMAIN = Object.freeze(TAG_DEFINITIONS.reduce((acc, definition) => {
+      const current = acc[definition.domain] ?? [];
+      acc[definition.domain] = Object.freeze([...current, definition.id]);
+      return acc;
+  }, {
+      timing: [],
+      targeting: [],
+      delivery: [],
+      effect: [],
+      resource: [],
+      rule: [],
+      kit: [],
+  }));
   const INSTANT_TAG_IDS = Object.freeze(['instant']);
   const DEFENSIVE_TAG_IDS = Object.freeze(['defense', 'shield', 'support']);
   const ABSOLUTE_ATTACK_TAG_IDS = Object.freeze(['absolute-attack']);
   const ABSOLUTE_SHIELD_TAG_IDS = Object.freeze(['absolute-shield']);
-  function normalizeTagId(tag) {
+  function resolveVersionAlias(tag, version = CURRENT_TAG_ALIAS_VERSION) {
+      return TAG_ALIAS_BY_VERSION_KEY.get(`${version}:${normalizeKey(tag)}`) ?? tag;
+  }
+  function normalizeTagId(tag, version = CURRENT_TAG_ALIAS_VERSION) {
       if (typeof tag !== 'string')
           return null;
-      const normalized = normalizeKey(tag);
+      const normalized = normalizeKey(resolveVersionAlias(tag, version));
       if (!normalized)
           return null;
       return TAG_BY_ID.get(normalized)?.id ?? normalized;
   }
-  function normalizeTagList(tags) {
+  function normalizeTagList(tags, version = CURRENT_TAG_ALIAS_VERSION) {
       if (!Array.isArray(tags))
           return [];
       const unique = new Set();
       for (const tag of tags) {
-          const normalized = normalizeTagId(tag);
+          const normalized = normalizeTagId(tag, version);
           if (normalized)
               unique.add(normalized);
       }
       return [...unique];
+  }
+  function resolveTagVersionAliases(tags, version = CURRENT_TAG_ALIAS_VERSION) {
+      if (!Array.isArray(tags))
+          return [];
+      return tags.map((tag) => resolveVersionAlias(tag, version));
+  }
+  function getTagDefinition(tag) {
+      const normalized = normalizeTagId(tag);
+      if (!normalized)
+          return null;
+      return TAG_BY_ID.get(normalized) ?? null;
+  }
+  function getTagDefinition(tag) {
+      const normalized = normalizeTagId(tag);
+      if (!normalized)
+          return null;
+      return TAG_BY_ID.get(normalized) ?? null;
+  }
+  function listUnknownTags(tags) {
+      if (!Array.isArray(tags))
+          return [];
+      const unknown = new Set();
+      for (const rawTag of tags) {
+          if (typeof rawTag !== 'string')
+              continue;
+          const normalizedRaw = normalizeKey(rawTag);
+          if (!normalizedRaw)
+              continue;
+          if (!TAG_BY_ID.has(normalizedRaw)) {
+              unknown.add(rawTag.trim());
+          }
+      }
+      return [...unknown];
   }
   function hasAnyTag(haystack, needles) {
       const normalizedHaystack = new Set(normalizeTagList(haystack));
       return needles.some((needle) => normalizedHaystack.has(needle));
   }
   //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'CURRENT_TAG_ALIAS_VERSION')) exports.CURRENT_TAG_ALIAS_VERSION = CURRENT_TAG_ALIAS_VERSION;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'tagAliasesByVersion')) exports.tagAliasesByVersion = tagAliasesByVersion;
   if (!Object.prototype.hasOwnProperty.call(exports, 'GAME_TAGS')) exports.GAME_TAGS = GAME_TAGS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'TAG_IDS')) exports.TAG_IDS = TAG_IDS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'TAG_IDS_BY_DOMAIN')) exports.TAG_IDS_BY_DOMAIN = TAG_IDS_BY_DOMAIN;
   if (!Object.prototype.hasOwnProperty.call(exports, 'INSTANT_TAG_IDS')) exports.INSTANT_TAG_IDS = INSTANT_TAG_IDS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'DEFENSIVE_TAG_IDS')) exports.DEFENSIVE_TAG_IDS = DEFENSIVE_TAG_IDS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ABSOLUTE_ATTACK_TAG_IDS')) exports.ABSOLUTE_ATTACK_TAG_IDS = ABSOLUTE_ATTACK_TAG_IDS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ABSOLUTE_SHIELD_TAG_IDS')) exports.ABSOLUTE_SHIELD_TAG_IDS = ABSOLUTE_SHIELD_TAG_IDS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeTagId')) exports.normalizeTagId = normalizeTagId;
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeTagList')) exports.normalizeTagList = normalizeTagList;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resolveTagVersionAliases')) exports.resolveTagVersionAliases = resolveTagVersionAliases;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getTagDefinition')) exports.getTagDefinition = getTagDefinition;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'listUnknownTags')) exports.listUnknownTags = listUnknownTags;
   if (!Object.prototype.hasOwnProperty.call(exports, 'hasAnyTag')) exports.hasAnyTag = hasAnyTag;
 });
 __define('./data/vfx_anchors/loithienanh.json', (exports, module, __require) => {

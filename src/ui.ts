@@ -7,6 +7,8 @@ import {
   addGameEventListener,
   gameEvents,
 } from './events.ts';
+
+import type { GameEventDetail } from './events.ts';
 import { assertElement } from './ui/dom.ts';
 
 import type { HudHandles, SummonBarCard, SummonBarHandles, SummonBarOptions } from '@shared-types/ui';
@@ -50,7 +52,7 @@ export function initHUD(doc: Document, root?: QueryableRoot | null): HudHandles 
     }
   };
 
-  const handleGameEvent = (event: CustomEvent<{ game?: HudGameLike }>) => {
+  const handleGameEvent = (event: GameEventDetail<typeof TURN_START | typeof TURN_END | typeof ACTION_END>) => {
     const detail = event.detail as { game?: HudGameLike } | undefined;
     const state = detail?.game ?? null;
     if (state) update(state);
