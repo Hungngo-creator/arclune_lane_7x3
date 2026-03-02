@@ -1,5 +1,15 @@
 import type { StatBlock } from './types/units';
 
+import {
+  getCultivationRealmEconomy,
+  type CultivationRealmEconomy,
+} from './data/economy.ts';
+import {
+  spendAetherWithPriority,
+  type CurrencyWallet,
+  type SpendAetherResult,
+} from './utils/currency.ts';
+
 export interface CultivationProgress {
   realm?: number | null;
   subRealm?: number | null;
@@ -23,6 +33,43 @@ interface CultivationStepBonus {
 interface RealmConfig {
   maxSubRealm: number;
   perSubRealm: CultivationStepBonus;
+}
+
+export interface CultivationCostInfo {
+  realm: number;
+  currentSubRealm: number;
+  nextRealm: number;
+  nextSubRealm: number;
+  isBreakthrough: boolean;
+  aetherCost: number;
+  specialSubRealmCount: number;
+}
+
+export interface CanBreakthroughResult {
+  canBreakthrough: boolean;
+  nextRealm: number | null;
+  reason: 'realm_not_found' | 'need_more_subrealm' | 'no_next_realm' | 'ready';
+}
+
+export interface CultivationPlayerState extends Record<string, unknown> {
+  currencies?: CurrencyWallet;
+  cultivation?: {
+    realm?: number;
+    subRealm?: number;
+  };
+}
+
+export interface CultivationUpgradePayload {
+  ok: boolean;
+  reason: 'upgraded' | 'insufficient_currency' | 'invalid_realm' | 'invalid_cost';
+  spent: SpendAetherResult;
+  costAether: number;
+  previousRealm: number;
+  previousSubRealm: number;
+  newRealm: number;
+  newSubRealm: number;
+  isBreakthrough: boolean;
+  playerState: CultivationPlayerState;
 }
 
 const REALM_CONFIGS: Record<number, RealmConfig> = {
@@ -94,6 +141,150 @@ const scaleStat = (rawValue: unknown, ratio: number): number | undefined => {
   if (typeof rawValue !== 'number' || !Number.isFinite(rawValue)) return undefined;
   return roundStat(rawValue * (1 + ratio));
 };
+
+const resolveRealmEconomy = (realm: number): CultivationRealmEconomy | null => getCultivationRealmEconomy(realm);
+
+export function getCultivationCost(realm: number, subRealm: number): CultivationCostInfo | null {
+  const realmNo = asNonNegativeInt(realm);
+  const subNo = asNonNegativeInt(subRealm);
+  const realmEconomy = resolveRealmEconomy(realmNo);
+  if (!realmEconomy) return null;
+
+  const targetSubRealm = subNo + 1;
+  const perSubRealmCost = realmEconomy.subRealmCosts[targetSubRealm - 1] ?? null;
+  if (perSubRealmCost != null){
+    return {
+      realm: realmNo,
+      currentSubRealm: subNo,
+      nextRealm: realmNo,
+      nextSubRealm: targetSubRealm,
+      isBreakthrough: false,
+      aetherCost: perSubRealmCost,
+      specialSubRealmCount: realmEconomy.specialSubRealmCount,
+    };
+  }
+
+  const nextRealmEconomy = resolveRealmEconomy(realmNo + 1);
+  if (!nextRealmEconomy) return null;
+
+  return {
+    realm: realmNo,
+    currentSubRealm: subNo,
+    nextRealm: realmNo + 1,
+    nextSubRealm: 1,
+    isBreakthrough: true,
+    aetherCost: realmEconomy.breakthroughCost,
+    specialSubRealmCount: realmEconomy.specialSubRealmCount,
+  };
+}
+
+export function canBreakthrough(realm: number, subRealm: number): CanBreakthroughResult {
+  const realmNo = asNonNegativeInt(realm);
+  const subNo = asNonNegativeInt(subRealm);
+  const realmEconomy = resolveRealmEconomy(realmNo);
+  if (!realmEconomy){
+    return { canBreakthrough: false, nextRealm: null, reason: 'realm_not_found' };
+  }
+
+  if (subNo < realmEconomy.subRealmCosts.length){
+    return { canBreakthrough: false, nextRealm: null, reason: 'need_more_subrealm' };
+  }
+
+  const nextRealm = resolveRealmEconomy(realmNo + 1);
+  if (!nextRealm){
+    return { canBreakthrough: false, nextRealm: null, reason: 'no_next_realm' };
+  }
+
+  return { canBreakthrough: true, nextRealm: realmNo + 1, reason: 'ready' };
+}
+
+export function upgradeCultivation(
+  playerStateInput: CultivationPlayerState,
+  realm: number,
+  subRealm: number,
+): CultivationUpgradePayload {
+  const currentRealm = asNonNegativeInt(realm);
+  const currentSubRealm = asNonNegativeInt(subRealm);
+  const playerState: CultivationPlayerState = { ...playerStateInput };
+  const costInfo = getCultivationCost(currentRealm, currentSubRealm);
+
+  if (!costInfo){
+    return {
+      ok: false,
+      reason: 'invalid_realm',
+      spent: {
+        ok: false,
+        wallet: { ...(playerState.currencies ?? {}) },
+        deducted: {},
+        spentAether: 0,
+        missingAether: 0,
+      },
+      costAether: 0,
+      previousRealm: currentRealm,
+      previousSubRealm: currentSubRealm,
+      newRealm: currentRealm,
+      newSubRealm: currentSubRealm,
+      isBreakthrough: false,
+      playerState,
+    };
+  }
+
+  if (costInfo.aetherCost <= 0){
+    return {
+      ok: false,
+      reason: 'invalid_cost',
+      spent: {
+        ok: false,
+        wallet: { ...(playerState.currencies ?? {}) },
+        deducted: {},
+        spentAether: 0,
+        missingAether: 0,
+      },
+      costAether: costInfo.aetherCost,
+      previousRealm: currentRealm,
+      previousSubRealm: currentSubRealm,
+      newRealm: currentRealm,
+      newSubRealm: currentSubRealm,
+      isBreakthrough: false,
+      playerState,
+    };
+  }
+
+  const spent = spendAetherWithPriority(playerState.currencies ?? {}, costInfo.aetherCost);
+  if (!spent.ok){
+    return {
+      ok: false,
+      reason: 'insufficient_currency',
+      spent,
+      costAether: costInfo.aetherCost,
+      previousRealm: currentRealm,
+      previousSubRealm: currentSubRealm,
+      newRealm: currentRealm,
+      newSubRealm: currentSubRealm,
+      isBreakthrough: costInfo.isBreakthrough,
+      playerState,
+    };
+  }
+
+  playerState.currencies = spent.wallet;
+  playerState.cultivation = {
+    realm: costInfo.nextRealm,
+    subRealm: costInfo.nextSubRealm,
+  };
+
+  return {
+    ok: true,
+    reason: 'upgraded',
+    spent,
+    costAether: costInfo.aetherCost,
+    previousRealm: currentRealm,
+    previousSubRealm: currentSubRealm,
+    newRealm: costInfo.nextRealm,
+    newSubRealm: costInfo.nextSubRealm,
+    isBreakthrough: costInfo.isBreakthrough,
+    playerState,
+  };
+}
 
 export function applyCultivationBonus<T extends CultivationUnitInput>(unit: T): T {
   if (!unit || typeof unit !== 'object') return unit;

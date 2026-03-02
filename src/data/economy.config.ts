@@ -43,6 +43,34 @@ const economyConfig = {
       description: 'Đơn vị tối thượng cho các giao dịch Prime và quỹ dự trữ chiến lược.'
     }
   ],
+  cultivation: {
+    realms: {
+      1: {
+        name: 'Đúc Phách',
+        specialSubRealmCount: 7,
+        subRealmCosts: [
+          300,
+          450,
+          700,
+          1100,
+          1600,
+          2300,
+          3200
+        ],
+        breakthroughCost: 5000
+      },
+      2: {
+        name: 'Luyện Hồn',
+        specialSubRealmCount: 3,
+        subRealmCosts: [
+          7000,
+          9200,
+          12000
+        ],
+        breakthroughCost: 18000
+      }
+    }
+  },
   pityConfig: {
     SSR: {
       tier: 'SSR',

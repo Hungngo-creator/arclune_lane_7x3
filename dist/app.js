@@ -4894,6 +4894,10 @@ __define('./config/schema.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'parseGameConfig')) exports.parseGameConfig = parseGameConfig;
 });
 __define('./cultivation.ts', (exports, module, __require) => {
+  const __dep0 = __require('./data/economy.ts');
+  const getCultivationRealmEconomy = __dep0.getCultivationRealmEconomy;
+  const __dep1 = __require('./utils/currency.ts');
+  const spendAetherWithPriority = __dep1.spendAetherWithPriority;
   const REALM_CONFIGS = {
       // Realm 1: Đúc Phách (7 tiểu cấp)
       1: {
@@ -4959,6 +4963,133 @@ __define('./cultivation.ts', (exports, module, __require) => {
           return undefined;
       return roundStat(rawValue * (1 + ratio));
   };
+  const resolveRealmEconomy = (realm) => getCultivationRealmEconomy(realm);
+  function getCultivationCost(realm, subRealm) {
+      const realmNo = asNonNegativeInt(realm);
+      const subNo = asNonNegativeInt(subRealm);
+      const realmEconomy = resolveRealmEconomy(realmNo);
+      if (!realmEconomy)
+          return null;
+      const targetSubRealm = subNo + 1;
+      const perSubRealmCost = realmEconomy.subRealmCosts[targetSubRealm - 1] ?? null;
+      if (perSubRealmCost != null) {
+          return {
+              realm: realmNo,
+              currentSubRealm: subNo,
+              nextRealm: realmNo,
+              nextSubRealm: targetSubRealm,
+              isBreakthrough: false,
+              aetherCost: perSubRealmCost,
+              specialSubRealmCount: realmEconomy.specialSubRealmCount,
+          };
+      }
+      const nextRealmEconomy = resolveRealmEconomy(realmNo + 1);
+      if (!nextRealmEconomy)
+          return null;
+      return {
+          realm: realmNo,
+          currentSubRealm: subNo,
+          nextRealm: realmNo + 1,
+          nextSubRealm: 1,
+          isBreakthrough: true,
+          aetherCost: realmEconomy.breakthroughCost,
+          specialSubRealmCount: realmEconomy.specialSubRealmCount,
+      };
+  }
+  function canBreakthrough(realm, subRealm) {
+      const realmNo = asNonNegativeInt(realm);
+      const subNo = asNonNegativeInt(subRealm);
+      const realmEconomy = resolveRealmEconomy(realmNo);
+      if (!realmEconomy) {
+          return { canBreakthrough: false, nextRealm: null, reason: 'realm_not_found' };
+      }
+      if (subNo < realmEconomy.subRealmCosts.length) {
+          return { canBreakthrough: false, nextRealm: null, reason: 'need_more_subrealm' };
+      }
+      const nextRealm = resolveRealmEconomy(realmNo + 1);
+      if (!nextRealm) {
+          return { canBreakthrough: false, nextRealm: null, reason: 'no_next_realm' };
+      }
+      return { canBreakthrough: true, nextRealm: realmNo + 1, reason: 'ready' };
+  }
+  function upgradeCultivation(playerStateInput, realm, subRealm) {
+      const currentRealm = asNonNegativeInt(realm);
+      const currentSubRealm = asNonNegativeInt(subRealm);
+      const playerState = { ...playerStateInput };
+      const costInfo = getCultivationCost(currentRealm, currentSubRealm);
+      if (!costInfo) {
+          return {
+              ok: false,
+              reason: 'invalid_realm',
+              spent: {
+                  ok: false,
+                  wallet: { ...(playerState.currencies ?? {}) },
+                  deducted: {},
+                  spentAether: 0,
+                  missingAether: 0,
+              },
+              costAether: 0,
+              previousRealm: currentRealm,
+              previousSubRealm: currentSubRealm,
+              newRealm: currentRealm,
+              newSubRealm: currentSubRealm,
+              isBreakthrough: false,
+              playerState,
+          };
+      }
+      if (costInfo.aetherCost <= 0) {
+          return {
+              ok: false,
+              reason: 'invalid_cost',
+              spent: {
+                  ok: false,
+                  wallet: { ...(playerState.currencies ?? {}) },
+                  deducted: {},
+                  spentAether: 0,
+                  missingAether: 0,
+              },
+              costAether: costInfo.aetherCost,
+              previousRealm: currentRealm,
+              previousSubRealm: currentSubRealm,
+              newRealm: currentRealm,
+              newSubRealm: currentSubRealm,
+              isBreakthrough: false,
+              playerState,
+          };
+      }
+      const spent = spendAetherWithPriority(playerState.currencies ?? {}, costInfo.aetherCost);
+      if (!spent.ok) {
+          return {
+              ok: false,
+              reason: 'insufficient_currency',
+              spent,
+              costAether: costInfo.aetherCost,
+              previousRealm: currentRealm,
+              previousSubRealm: currentSubRealm,
+              newRealm: currentRealm,
+              newSubRealm: currentSubRealm,
+              isBreakthrough: costInfo.isBreakthrough,
+              playerState,
+          };
+      }
+      playerState.currencies = spent.wallet;
+      playerState.cultivation = {
+          realm: costInfo.nextRealm,
+          subRealm: costInfo.nextSubRealm,
+      };
+      return {
+          ok: true,
+          reason: 'upgraded',
+          spent,
+          costAether: costInfo.aetherCost,
+          previousRealm: currentRealm,
+          previousSubRealm: currentSubRealm,
+          newRealm: costInfo.nextRealm,
+          newSubRealm: costInfo.nextSubRealm,
+          isBreakthrough: costInfo.isBreakthrough,
+          playerState,
+      };
+  }
   function applyCultivationBonus(unit) {
       if (!unit || typeof unit !== 'object')
           return unit;
@@ -4997,6 +5128,9 @@ __define('./cultivation.ts', (exports, module, __require) => {
       };
   }
   //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getCultivationCost')) exports.getCultivationCost = getCultivationCost;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'canBreakthrough')) exports.canBreakthrough = canBreakthrough;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'upgradeCultivation')) exports.upgradeCultivation = upgradeCultivation;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyCultivationBonus')) exports.applyCultivationBonus = applyCultivationBonus;
 });
 __define('./data/announcements.config.ts', (exports, module, __require) => {
@@ -5250,6 +5384,34 @@ __define('./data/economy.config.ts', (exports, module, __require) => {
               description: 'Đơn vị tối thượng cho các giao dịch Prime và quỹ dự trữ chiến lược.'
           }
       ],
+      cultivation: {
+          realms: {
+              1: {
+                  name: 'Đúc Phách',
+                  specialSubRealmCount: 7,
+                  subRealmCosts: [
+                      300,
+                      450,
+                      700,
+                      1100,
+                      1600,
+                      2300,
+                      3200
+                  ],
+                  breakthroughCost: 5000
+              },
+              2: {
+                  name: 'Luyện Hồn',
+                  specialSubRealmCount: 3,
+                  subRealmCosts: [
+                      7000,
+                      9200,
+                      12000
+                  ],
+                  breakthroughCost: 18000
+              }
+          }
+      },
       pityConfig: {
           SSR: {
               tier: 'SSR',
@@ -5312,6 +5474,15 @@ __define('./data/economy.ts', (exports, module, __require) => {
       description: z.string().optional()
   });
   const PityRuleSchema = z.object({ tier: z.string(), pull: z.number() });
+  const CultivationRealmSchema = z.object({
+      name: z.string(),
+      specialSubRealmCount: z.number(),
+      subRealmCosts: z.array(z.number()),
+      breakthroughCost: z.number()
+  });
+  const CultivationSchema = z.object({
+      realms: z.record(CultivationRealmSchema)
+  });
   const PityEntrySchema = z.object({
       tier: z.string(),
       hardPity: z.number(),
@@ -5335,6 +5506,7 @@ __define('./data/economy.ts', (exports, module, __require) => {
   });
   const EconomyConfigSchema = z.object({
       currencies: z.array(CurrencySchema),
+      cultivation: CultivationSchema,
       pityConfig: PityConfigSchema,
       shopTaxBrackets: z.array(ShopTaxBracketSchema),
       lotterySplit: LotterySplitSchema
@@ -5426,6 +5598,28 @@ __define('./data/economy.ts', (exports, module, __require) => {
       const formatted = formatter.format(amount);
       return includeSuffix ? `${formatted} ${suffix}` : formatted;
   }
+  const CULTIVATION_REALM_ECONOMY = Object.freeze(Object.fromEntries(Object.entries(economyConfig.cultivation.realms).map(([realmKey, realmConfig]) => {
+      const realm = Number(realmKey);
+      return [
+          realm,
+          Object.freeze({
+              realm,
+              name: realmConfig.name,
+              specialSubRealmCount: realmConfig.specialSubRealmCount,
+              subRealmCosts: Object.freeze([...realmConfig.subRealmCosts]),
+              breakthroughCost: realmConfig.breakthroughCost
+          })
+      ];
+  })));
+  function getCultivationRealmEconomy(realm) {
+      return CULTIVATION_REALM_ECONOMY[realm] ?? null;
+  }
+  function listCultivationRealmsEconomy() {
+      return Object.values(CULTIVATION_REALM_ECONOMY).map((entry) => ({
+          ...entry,
+          subRealmCosts: [...entry.subRealmCosts]
+      }));
+  }
   const PITY_CONFIG = Object.freeze(Object.fromEntries(pityEntries.map(([tier, config]) => [
       tier,
       {
@@ -5476,6 +5670,9 @@ __define('./data/economy.ts', (exports, module, __require) => {
   exports.getShopTaxRate = getShopTaxRate;
   exports.LOTTERY_SPLIT = LOTTERY_SPLIT;
   exports.getLotterySplit = getLotterySplit;
+  exports.CULTIVATION_REALM_ECONOMY = CULTIVATION_REALM_ECONOMY;
+  exports.getCultivationRealmEconomy = getCultivationRealmEconomy;
+  exports.listCultivationRealmsEconomy = listCultivationRealmsEconomy;
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'CURRENCY_ORDER')) exports.CURRENCY_ORDER = CURRENCY_ORDER;
 });
@@ -24090,6 +24287,92 @@ __define('./utils/currency.ts', (exports, module, __require) => {
   const formatBalance = __dep0.formatBalance;
   const getCurrency = __dep0.getCurrency;
   const listCurrencies = __dep0.listCurrencies;
+  const CULTIVATION_SPEND_ORDER = ['VNT', 'HNT', 'TNT', 'ThNT'];
+  const asNonNegativeInt = (value) => {
+      if (typeof value !== 'number' || !Number.isFinite(value))
+          return 0;
+      return Math.max(0, Math.floor(value));
+  };
+  const getCurrencyRatio = (currencyId) => {
+      const currency = getCurrency(currencyId);
+      if (!currency)
+          return 0;
+      return Math.max(0, Math.floor(currency.ratioToBase));
+  };
+  const distributeAetherToLower = (wallet, amountAether, maxIndex, order) => {
+      let remaining = amountAether;
+      for (let idx = maxIndex; idx >= 0; idx -= 1) {
+          const currencyId = order[idx];
+          if (!currencyId)
+              continue;
+          const ratio = getCurrencyRatio(currencyId);
+          if (ratio <= 0)
+              continue;
+          const units = Math.floor(remaining / ratio);
+          if (units <= 0)
+              continue;
+          wallet[currencyId] = asNonNegativeInt(wallet[currencyId]) + units;
+          remaining -= units * ratio;
+      }
+  };
+  function spendAetherWithPriority(walletInput, costAether, order = CULTIVATION_SPEND_ORDER) {
+      const required = Math.max(0, Math.floor(costAether));
+      const wallet = { ...walletInput };
+      const deducted = {};
+      let totalAether = 0;
+      for (const currencyId of order) {
+          const ratio = getCurrencyRatio(currencyId);
+          if (ratio <= 0)
+              continue;
+          totalAether += asNonNegativeInt(wallet[currencyId]) * ratio;
+          deducted[currencyId] = 0;
+      }
+      if (totalAether < required) {
+          return {
+              ok: false,
+              wallet,
+              deducted,
+              spentAether: 0,
+              missingAether: required - totalAether,
+          };
+      }
+      let remaining = required;
+      for (let idx = 0; idx < order.length && remaining > 0; idx += 1) {
+          const currencyId = order[idx];
+          if (!currencyId)
+              continue;
+          const ratio = getCurrencyRatio(currencyId);
+          if (ratio <= 0)
+              continue;
+          let available = asNonNegativeInt(wallet[currencyId]);
+          if (available <= 0)
+              continue;
+          const directUnits = Math.min(Math.floor(remaining / ratio), available);
+          if (directUnits > 0) {
+              wallet[currencyId] = available - directUnits;
+              deducted[currencyId] = (deducted[currencyId] ?? 0) + directUnits;
+              remaining -= directUnits * ratio;
+              available = asNonNegativeInt(wallet[currencyId]);
+          }
+          if (remaining > 0 && available > 0) {
+              wallet[currencyId] = available - 1;
+              deducted[currencyId] = (deducted[currencyId] ?? 0) + 1;
+              const overpay = ratio - remaining;
+              remaining = 0;
+              if (overpay > 0 && idx > 0) {
+                  distributeAetherToLower(wallet, overpay, idx - 1, order);
+              }
+          }
+      }
+      const spentAether = required - remaining;
+      return {
+          ok: remaining === 0,
+          wallet,
+          deducted,
+          spentAether,
+          missingAether: remaining,
+      };
+  }
   function getCurrencyDefinitions() {
       return listCurrencies();
   }
@@ -24106,6 +24389,7 @@ __define('./utils/currency.ts', (exports, module, __require) => {
       return formatBalance(value, currencyId, options);
   }
   //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'spendAetherWithPriority')) exports.spendAetherWithPriority = spendAetherWithPriority;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getCurrencyDefinitions')) exports.getCurrencyDefinitions = getCurrencyDefinitions;
   if (!Object.prototype.hasOwnProperty.call(exports, 'findCurrencyDefinition')) exports.findCurrencyDefinition = findCurrencyDefinition;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getCurrencyOrder')) exports.getCurrencyOrder = getCurrencyOrder;

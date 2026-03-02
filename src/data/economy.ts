@@ -28,6 +28,17 @@ const CurrencySchema = z.object({
 
 const PityRuleSchema = z.object({ tier: z.string(), pull: z.number() });
 
+const CultivationRealmSchema = z.object({
+  name: z.string(),
+  specialSubRealmCount: z.number(),
+  subRealmCosts: z.array(z.number()),
+  breakthroughCost: z.number()
+});
+
+const CultivationSchema = z.object({
+  realms: z.record(CultivationRealmSchema)
+});
+
 const PityEntrySchema = z.object({
   tier: z.string(),
   hardPity: z.number(),
@@ -58,6 +69,7 @@ const LotterySplitSchema = z.object({
 
 const EconomyConfigSchema = z.object({
   currencies: z.array(CurrencySchema),
+  cultivation: CultivationSchema,
   pityConfig: PityConfigSchema,
   shopTaxBrackets: z.array(ShopTaxBracketSchema),
   lotterySplit: LotterySplitSchema
@@ -189,6 +201,43 @@ function formatBalance(value: number, currencyId: string, options: FormatBalance
   return includeSuffix ? `${formatted} ${suffix}` : formatted;
 }
 
+export interface CultivationRealmEconomy {
+  realm: number;
+  name: string;
+  specialSubRealmCount: number;
+  subRealmCosts: ReadonlyArray<number>;
+  breakthroughCost: number;
+}
+
+const CULTIVATION_REALM_ECONOMY: Readonly<Record<number, CultivationRealmEconomy>> = Object.freeze(
+  Object.fromEntries(
+    Object.entries(economyConfig.cultivation.realms).map(([realmKey, realmConfig]) => {
+      const realm = Number(realmKey);
+      return [
+        realm,
+        Object.freeze({
+          realm,
+          name: realmConfig.name,
+          specialSubRealmCount: realmConfig.specialSubRealmCount,
+          subRealmCosts: Object.freeze([...realmConfig.subRealmCosts]),
+          breakthroughCost: realmConfig.breakthroughCost
+        })
+      ];
+    })
+  )
+);
+
+function getCultivationRealmEconomy(realm: number): CultivationRealmEconomy | null {
+  return CULTIVATION_REALM_ECONOMY[realm] ?? null;
+}
+
+function listCultivationRealmsEconomy(): CultivationRealmEconomy[] {
+  return Object.values(CULTIVATION_REALM_ECONOMY).map((entry) => ({
+    ...entry,
+    subRealmCosts: [...entry.subRealmCosts]
+  }));
+}
+
 const PITY_CONFIG: Readonly<Record<PityTier, PityConfiguration>> = Object.freeze(
   Object.fromEntries(
     pityEntries.map(([tier, config]) => [
@@ -255,5 +304,8 @@ export {
   getShopTaxBracket,
   getShopTaxRate,
   LOTTERY_SPLIT,
-  getLotterySplit
+    getLotterySplit,
+  CULTIVATION_REALM_ECONOMY,
+  getCultivationRealmEconomy,
+  listCultivationRealmsEconomy
 };

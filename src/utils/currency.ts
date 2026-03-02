@@ -13,6 +13,116 @@ import {
 
 export type { CurrencyId, FormatBalanceOptions };
 
+export interface CurrencyWallet {
+  [currencyId: string]: number | undefined;
+}
+
+export interface SpendAetherResult {
+  ok: boolean;
+  wallet: CurrencyWallet;
+  deducted: Partial<Record<CurrencyId, number>>;
+  spentAether: number;
+  missingAether: number;
+}
+
+const CULTIVATION_SPEND_ORDER: ReadonlyArray<CurrencyId> = ['VNT', 'HNT', 'TNT', 'ThNT'];
+
+const asNonNegativeInt = (value: unknown): number => {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return 0;
+  return Math.max(0, Math.floor(value));
+};
+
+const getCurrencyRatio = (currencyId: CurrencyId): number => {
+  const currency = getCurrency(currencyId);
+  if (!currency) return 0;
+  return Math.max(0, Math.floor(currency.ratioToBase));
+};
+
+const distributeAetherToLower = (
+  wallet: CurrencyWallet,
+  amountAether: number,
+  maxIndex: number,
+  order: ReadonlyArray<CurrencyId>,
+): void => {
+  let remaining = amountAether;
+  for (let idx = maxIndex; idx >= 0; idx -= 1){
+    const currencyId = order[idx];
+    if (!currencyId) continue;
+    const ratio = getCurrencyRatio(currencyId);
+    if (ratio <= 0) continue;
+    const units = Math.floor(remaining / ratio);
+    if (units <= 0) continue;
+    wallet[currencyId] = asNonNegativeInt(wallet[currencyId]) + units;
+    remaining -= units * ratio;
+  }
+};
+
+export function spendAetherWithPriority(
+  walletInput: CurrencyWallet,
+  costAether: number,
+  order: ReadonlyArray<CurrencyId> = CULTIVATION_SPEND_ORDER,
+): SpendAetherResult {
+  const required = Math.max(0, Math.floor(costAether));
+  const wallet: CurrencyWallet = { ...walletInput };
+  const deducted: Partial<Record<CurrencyId, number>> = {};
+
+  let totalAether = 0;
+  for (const currencyId of order){
+    const ratio = getCurrencyRatio(currencyId);
+    if (ratio <= 0) continue;
+    totalAether += asNonNegativeInt(wallet[currencyId]) * ratio;
+    deducted[currencyId] = 0;
+  }
+
+  if (totalAether < required){
+    return {
+      ok: false,
+      wallet,
+      deducted,
+      spentAether: 0,
+      missingAether: required - totalAether,
+    };
+  }
+
+  let remaining = required;
+  for (let idx = 0; idx < order.length && remaining > 0; idx += 1){
+    const currencyId = order[idx];
+    if (!currencyId) continue;
+    const ratio = getCurrencyRatio(currencyId);
+    if (ratio <= 0) continue;
+
+    let available = asNonNegativeInt(wallet[currencyId]);
+    if (available <= 0) continue;
+
+    const directUnits = Math.min(Math.floor(remaining / ratio), available);
+    if (directUnits > 0){
+      wallet[currencyId] = available - directUnits;
+      deducted[currencyId] = (deducted[currencyId] ?? 0) + directUnits;
+      remaining -= directUnits * ratio;
+      available = asNonNegativeInt(wallet[currencyId]);
+    }
+
+    if (remaining > 0 && available > 0){
+      wallet[currencyId] = available - 1;
+      deducted[currencyId] = (deducted[currencyId] ?? 0) + 1;
+      const overpay = ratio - remaining;
+      remaining = 0;
+      if (overpay > 0 && idx > 0){
+        distributeAetherToLower(wallet, overpay, idx - 1, order);
+      }
+    }
+  }
+
+  const spentAether = required - remaining;
+  return {
+    ok: remaining === 0,
+    wallet,
+    deducted,
+    spentAether,
+    missingAether: remaining,
+  };
+}
+
 export function getCurrencyDefinitions(): ReadonlyArray<CurrencyDefinition> {
   return listCurrencies();
 }
