@@ -21545,7 +21545,7 @@ __define('./screens/ui-gacha/logic/config.ts', (exports, module, __require) => {
           label: 'Triệu Hồi Chung',
           type: 'Permanent',
           description: 'Danh sách N / R / SR / SSR toàn bộ.',
-          cost: { unit: 'HNT', x1: 250, x10: 2_500 },
+          cost: { unit: 'VNT', x1: 250, x10: 2_500 },
           rates: { N: 0.6, R: 0.25, SR: 0.12, SSR: 0.03 },
           pity: {
               srFloor: 10,
@@ -21563,7 +21563,7 @@ __define('./screens/ui-gacha/logic/config.ts', (exports, module, __require) => {
           label: 'Giới Hạn UR',
           type: 'LimitedUR',
           description: 'UR rate-up, pity hard bảo đảm UR featured.',
-          cost: { unit: 'TNT', x1: 250, x10: 2_500 },
+          cost: { unit: 'VNT', x1: 250, x10: 2_500 },
           rates: { N: 0.586, R: 0.244, SR: 0.117, SSR: 0.03, UR: 0.015, Prime: 0.0075 },
           pity: {
               srFloor: 10,
@@ -21584,7 +21584,7 @@ __define('./screens/ui-gacha/logic/config.ts', (exports, module, __require) => {
           label: 'Giới Hạn Prime',
           type: 'LimitedPrime',
           description: 'Prime rate-up, pity bảo đảm Prime featured.',
-          cost: { unit: 'ThNT', x1: 300, x10: 3_000 },
+          cost: { unit: 'VNT', x1: 300, x10: 3_000 },
           rates: { N: 0.586, R: 0.244, SR: 0.117, SSR: 0.03, UR: 0.015, Prime: 0.0075 },
           pity: {
               srFloor: 10,
@@ -24769,6 +24769,16 @@ __define('./utils/currency.ts', (exports, module, __require) => {
       }
       return next;
   }
+  function createMergeWallet(source) {
+      const next = {};
+      for (const id of CURRENCY_ORDER) {
+          const normalized = normalizeWalletValue(source?.[id]);
+          if (normalized > 0) {
+              next[id] = normalized;
+          }
+      }
+      return next;
+  }
   function emitSharedWallet() {
       const snapshot = cloneWalletByOrder(sharedCurrencyWallet);
       for (const listener of sharedWalletListeners) {
@@ -24795,7 +24805,7 @@ __define('./utils/currency.ts', (exports, module, __require) => {
   function syncSharedCurrencyWallet(wallet, options = {}) {
       const current = getSharedCurrencyWallet();
       sharedCurrencyWallet = options.merge
-          ? createNormalizedWallet(current, wallet)
+          ? createNormalizedWallet(current, createMergeWallet(wallet))
           : createNormalizedWallet(wallet);
       emitSharedWallet();
       return cloneWalletByOrder(sharedCurrencyWallet);

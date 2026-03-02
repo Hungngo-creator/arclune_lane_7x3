@@ -165,6 +165,17 @@ function cloneWalletByOrder(source: CurrencyWallet | null | undefined): Currency
   return next;
 }
 
+function createMergeWallet(source: CurrencyWallet | null | undefined): CurrencyWallet {
+  const next: CurrencyWallet = {};
+  for (const id of CURRENCY_ORDER){
+    const normalized = normalizeWalletValue(source?.[id]);
+    if (normalized > 0){
+      next[id] = normalized;
+    }
+  }
+  return next;
+}
+
 function emitSharedWallet(): void {
   const snapshot = cloneWalletByOrder(sharedCurrencyWallet);
   for (const listener of sharedWalletListeners){
@@ -198,7 +209,7 @@ export function syncSharedCurrencyWallet(
 ): CurrencyWallet {
   const current = getSharedCurrencyWallet();
   sharedCurrencyWallet = options.merge
-    ? createNormalizedWallet(current, wallet)
+    ? createNormalizedWallet(current, createMergeWallet(wallet))
     : createNormalizedWallet(wallet);
   emitSharedWallet();
   return cloneWalletByOrder(sharedCurrencyWallet);
