@@ -4155,6 +4155,65 @@ __define('./combat.ts', (exports, module, __require) => {
   exports.applyDamage = applyDamage;
   exports.grantShield = grantShield;
   const isBasicAttackAfterHitHandler = (handler) => typeof handler === 'function';
+  const RANK_PRIORITY = {
+      N: 1,
+      R: 2,
+      SR: 3,
+      SSR: 4,
+      UR: 5,
+      Prime: 6,
+  };
+  const toFinite = (value, fallback = 0) => {
+      const parsed = typeof value === 'number' ? value : Number(value);
+      return Number.isFinite(parsed) ? parsed : fallback;
+  };
+  const normalizeWeight = (value) => Math.max(0, toFinite(value, 0));
+  const realmBonusFromUnit = (unit) => {
+      const realm = Math.max(0, Math.floor(toFinite(unit.realm, 0)));
+      const subRealm = Math.max(0, Math.floor(toFinite(unit.subRealm, 0)));
+      if (realm <= 0 && subRealm <= 0)
+          return 0;
+      const base = Math.max(0, Math.floor((unit.atk ?? 0) + (unit.wil ?? 0)));
+      const ratio = Math.min(0.6, realm * 0.02 + subRealm * 0.005);
+      return Math.round(base * ratio);
+  };
+  const getRankPriority = (unit) => {
+      if (!unit)
+          return 0;
+      const rank = typeof unit.rank === 'string' ? unit.rank : (getMetaById(unit.id)?.rank ?? '');
+      return RANK_PRIORITY[rank] ?? 0;
+  };
+  const hasAbsoluteLawTag = (unit, mode) => {
+      if (!unit)
+          return false;
+      const statuses = Array.isArray(unit.statuses) ? unit.statuses : [];
+      const modeNeedles = mode === 'attack'
+          ? ['absolute_attack', 'tuyetdoi_cong']
+          : ['absolute_shield', 'tuyetdoi_khien'];
+      return statuses.some((status) => {
+          const haystack = `${status.id ?? ''}|${status.tag ?? ''}`.toLowerCase();
+          if (haystack.includes('absolute') || haystack.includes('tuyetdoi'))
+              return true;
+          return modeNeedles.some((needle) => haystack.includes(needle));
+      });
+  };
+  const getSharedHpGroup = (target) => {
+      const ownKey = [target.sharedHpGroup, target.sharedDamageGroup, target.linkGroup]
+          .find((value) => typeof value === 'string' && value.trim());
+      if (typeof ownKey === 'string')
+          return ownKey;
+      const statuses = Array.isArray(target.statuses) ? target.statuses : [];
+      for (const status of statuses) {
+          const idTag = `${status.id ?? ''}|${status.tag ?? ''}`.toLowerCase();
+          if (!idTag.includes('share'))
+              continue;
+          const linked = [status.group, status.link, status.key]
+              .find((value) => typeof value === 'string' && value.trim());
+          if (typeof linked === 'string')
+              return linked;
+      }
+      return null;
+  };
   const GAME_CONFIG = CFG;
   function pickTarget(Game, attacker) {
       const foeSide = attacker.side === 'ally' ? 'enemy' : 'ally';
@@ -4210,31 +4269,76 @@ __define('./combat.ts', (exports, module, __require) => {
       startFurySkill(attacker, { tag: String(opts.furyTag || opts.attackType || 'ability') });
       const dtype = typeof opts.dtype === 'string' ? opts.dtype : 'physical';
       const attackType = typeof opts.attackType === 'string' ? opts.attackType : 'skill';
-      const baseDefault = dtype === 'arcane'
-          ? Math.max(0, Math.floor(attacker.wil ?? 0))
-          : Math.max(0, Math.floor(attacker.atk ?? 0));
+      const baseDefault = Math.max(0, Math.floor((attacker.atk ?? 0) + (attacker.wil ?? 0)));
       const base = Math.max(0, opts.base != null ? Math.floor(Number(opts.base)) : baseDefault);
+      const skillMulti = Math.max(0, toFinite(opts.skillMul ?? opts.skillMultiplier ?? 1, 1));
+      const realmBonus = Number.isFinite(toFinite(opts.realmBonus, Number.NaN))
+          ? Math.floor(toFinite(opts.realmBonus, 0))
+          : realmBonusFromUnit(attacker);
       const pre = Statuses.beforeDamage(attacker, target, { dtype, base, attackType });
       const combinedPen = Math.max(0, Math.min(1, Math.max(pre.defPen ?? 0, opts.defPen ?? 0)));
-      const defenseStat = dtype === 'arcane' ? target.res ?? 0 : target.arm ?? 0;
-      let dmg = Math.max(0, Math.floor(pre.base * pre.outMul));
+      const physWeightRaw = normalizeWeight(opts.physicalRatio ?? opts.physRatio ?? (dtype === 'mixed' ? 0.5 : 0));
+      const arcWeightRaw = normalizeWeight(opts.arcaneRatio ?? opts.magicRatio ?? (dtype === 'mixed' ? 0.5 : 0));
+      const splitTotal = physWeightRaw + arcWeightRaw;
+      const physWeight = dtype === 'mixed' ? (splitTotal > 0 ? physWeightRaw / splitTotal : 0.5) : (dtype === 'arcane' ? 0 : 1);
+      const arcWeight = dtype === 'mixed' ? (splitTotal > 0 ? arcWeightRaw / splitTotal : 0.5) : (dtype === 'arcane' ? 1 : 0);
+      const effectiveArm = Math.max(0, (target.arm ?? 0) * (1 - combinedPen));
+      const effectiveRes = Math.max(0, (target.res ?? 0) * (1 - combinedPen));
+      const defMultiplier = (physWeight * (100 / (100 + effectiveArm))) + (arcWeight * (100 / (100 + effectiveRes)));
+      const atkAbsolute = hasAbsoluteLawTag(attacker, 'attack');
+      const shieldAbsolute = hasAbsoluteLawTag(target, 'shield');
+      const attackerRank = getRankPriority(attacker);
+      const targetRank = getRankPriority(target);
+      const shieldWinsLaw = atkAbsolute && shieldAbsolute && targetRank > attackerRank;
+      const bypassShieldByLaw = atkAbsolute && shieldAbsolute && attackerRank >= targetRank;
+      let dmg = Math.max(0, Math.floor((pre.base * skillMulti + realmBonus) * pre.outMul));
       if (pre.ignoreAll) {
           dmg = 0;
       }
+      else if (shieldWinsLaw) {
+          dmg = 0;
+      }
       else {
-          const effectiveDef = Math.max(0, defenseStat * (1 - combinedPen));
-          dmg = Math.max(0, Math.floor(dmg * (1 - effectiveDef)));
+          dmg = Math.max(0, Math.floor(dmg * defMultiplier));
           dmg = Math.max(0, Math.floor(dmg * pre.inMul));
       }
-      const abs = Statuses.absorbShield(target, dmg, { dtype });
+      const abs = bypassShieldByLaw
+          ? { remain: dmg, absorbed: 0, broke: false }
+          : Statuses.absorbShield(target, dmg, { dtype });
       const remain = Math.max(0, Math.floor(abs.remain));
-      if (remain > 0) {
+      let dealtTotal = 0;
+      const sharedGroup = getSharedHpGroup(target);
+      const sharedTargets = sharedGroup && Game
+          ? Game.tokens.filter((token) => token.alive && token.side === target.side && getSharedHpGroup(token) === sharedGroup)
+          : [];
+      if (remain > 0 && sharedTargets.length > 1) {
+          const split = Math.floor(remain / sharedTargets.length);
+          let carry = remain - split * sharedTargets.length;
+          for (const token of sharedTargets) {
+              const payload = split + (carry > 0 ? 1 : 0);
+              if (carry > 0)
+                  carry -= 1;
+              if (payload <= 0)
+                  continue;
+              const beforeHp = Math.max(0, Math.floor(token.hp ?? 0));
+              applyDamage(token, payload);
+              const afterHp = Math.max(0, Math.floor(token.hp ?? 0));
+              dealtTotal += Math.max(0, beforeHp - afterHp);
+              if (token.hp <= 0) {
+                  hookOnLethalDamage(token);
+              }
+          }
+      }
+      else if (remain > 0) {
+          const beforeHp = Math.max(0, Math.floor(target.hp ?? 0));
           applyDamage(target, remain);
+          const afterHp = Math.max(0, Math.floor(target.hp ?? 0));
+          dealtTotal += Math.max(0, beforeHp - afterHp);
       }
       if (target.hp <= 0) {
           hookOnLethalDamage(target);
       }
-      const damageResult = { dealt: remain, absorbed: abs.absorbed, dtype };
+      const damageResult = { dealt: dealtTotal, absorbed: abs.absorbed, dtype };
       Statuses.afterDamage(attacker, target, damageResult);
       const sessionVfx = asSessionWithVfx(Game);
       if (sessionVfx) {
@@ -4245,7 +4349,7 @@ __define('./combat.ts', (exports, module, __require) => {
               // bỏ qua lỗi VFX runtime
           }
       }
-      const dealt = Math.max(0, remain);
+      const dealt = Math.max(0, dealtTotal);
       const isKill = target.hp <= 0;
       gainFury(attacker, {
           type: attackType === 'basic' ? 'basic' : 'ability',
@@ -4265,7 +4369,7 @@ __define('./combat.ts', (exports, module, __require) => {
       });
       finishFuryHit(target);
       finishFuryHit(attacker);
-      return { dealt: remain, absorbed: abs.absorbed, total: dmg };
+      return { dealt, absorbed: abs.absorbed, total: dmg };
   }
   function healUnit(target, amount) {
       if (!target || !Number.isFinite(target.hpMax)) {
@@ -4337,18 +4441,15 @@ __define('./combat.ts', (exports, module, __require) => {
       if (meleeTriggered && Game.turn) {
           Game.turn.busyUntil = mergeBusyUntil(Game.turn.busyUntil, meleeStartMs, meleeDur);
       }
-      const dtype = 'physical';
       const rawBase = Math.max(1, Math.floor((unit.atk ?? 0) + (unit.wil ?? 0)));
       const modBase = Math.max(1, Math.floor(rawBase * (passiveCtx.damage?.baseMul ?? 1) + (passiveCtx.damage?.flatAdd ?? 0)));
-      const pre = Statuses.beforeDamage(unit, resolved, { dtype, base: modBase, attackType: 'basic' });
-      let dmg = Math.max(1, Math.floor(pre.base * pre.outMul));
-      const def = Math.max(0, (resolved.arm ?? 0) * (1 - (pre.defPen ?? 0)));
-      dmg = Math.max(0, Math.floor(dmg * (1 - def)));
-      dmg = Math.max(0, Math.floor(dmg * pre.inMul));
       triggerLightningArc('hit1');
-      const abs = Statuses.absorbShield(resolved, dmg, { dtype });
       triggerLightningArc('hit2');
-      applyDamage(resolved, abs.remain);
+      const hitResult = dealAbilityDamage(Game, unit, resolved, {
+          base: modBase,
+          dtype: 'physical',
+          attackType: 'basic',
+      });
       if (sessionVfx) {
           try {
               vfxAddHit(sessionVfx, resolved);
@@ -4357,34 +4458,13 @@ __define('./combat.ts', (exports, module, __require) => {
               // bỏ qua lỗi VFX runtime
           }
       }
-      if (resolved.hp <= 0) {
-          hookOnLethalDamage(resolved);
-      }
-      const dealt = Math.max(0, Math.min(dmg, abs.remain ?? 0));
-      const damageResult = { dealt, absorbed: abs.absorbed, dtype };
-      Statuses.afterDamage(unit, resolved, damageResult);
-      const isKill = resolved.hp <= 0;
-      gainFury(unit, {
-          type: 'basic',
-          dealt,
-          isKill,
-          targetsHit: 1,
-          targetMaxHp: Number.isFinite(resolved.hpMax) ? resolved.hpMax : undefined,
-      });
-      gainFury(resolved, {
-          type: 'damageTaken',
-          dealt,
-          selfMaxHp: Number.isFinite(resolved.hpMax) ? resolved.hpMax : undefined,
-          damageTaken: dealt,
-      });
-      finishFuryHit(resolved);
-      finishFuryHit(unit);
+      const dealt = hitResult.dealt;
       const afterHitHandlers = passiveCtx.afterHit.filter(isBasicAttackAfterHitHandler);
       if (afterHitHandlers.length > 0) {
           const afterCtx = {
               target: resolved,
               owner: unit,
-              result: { dealt, absorbed: abs.absorbed },
+              result: { dealt, absorbed: hitResult.absorbed },
           };
           for (const fn of afterHitHandlers) {
               try {
@@ -12489,8 +12569,8 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       if (battle.over)
           return battle.result || null;
       const tokens = Array.isArray(game.tokens) ? game.tokens : [];
-      const leaderA = tokens.find(t => t && t.id === 'leaderA');
-      const leaderB = tokens.find(t => t && t.id === 'leaderB');
+      const leaderA = tokens.find((t) => t && (t.id === 'leaderA' || slotIndex('ally', t.cx, t.cy) === 8));
+      const leaderB = tokens.find((t) => t && (t.id === 'leaderB' || slotIndex('enemy', t.cx, t.cy) === 8));
       const leaderAAlive = isUnitAlive(leaderA);
       const leaderBAlive = isUnitAlive(leaderB);
       const contextDetail = context && typeof context === 'object' ? { ...context } : {};
@@ -12562,6 +12642,10 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           ? normalizeAnimationFrameTimestamp(timestampCandidate)
           : undefined;
       return finalizeBattle(game, { winner, reason, detail, finishedAt }, contextDetail);
+  }
+  function finalizeBattleIfLeaderDown(game, trigger, timestamp) {
+      const result = checkBattleEndResult(game, { trigger, timestamp });
+      return Boolean(result);
   }
   // Giảm TTL minion của 1 phe sau khi phe đó kết thúc phase
   function tickMinionTTL(side) {
@@ -13036,6 +13120,9 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           CLOCK.lastLogicMs = sessionNowMs;
           if (Game.battle?.over)
               return;
+          if (finalizeBattleIfLeaderDown(Game, 'leader-immediate', sessionNowMs)) {
+              return;
+          }
           let turnState = Game.turn ?? null;
           let busyUntil = 0;
           if (turnState) {
@@ -13085,6 +13172,9 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                           return Boolean(checkBattleEndResult(gameState, info));
                       },
                   });
+                  if (finalizeBattleIfLeaderDown(Game, 'leader-immediate', sessionNowMs)) {
+                      return;
+                  }
                   cleanupDead(sessionNowMs);
                   const postTurnResult = checkBattleEndResult(Game, { trigger: 'post-turn', timestamp: sessionNowMs });
                   scheduleDraw();

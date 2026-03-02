@@ -1673,8 +1673,8 @@ function checkBattleEndResult(
   if (battle.over) return battle.result || null;
 
   const tokens = Array.isArray(game.tokens) ? game.tokens : [];
-  const leaderA = tokens.find(t => t && t.id === 'leaderA');
-  const leaderB = tokens.find(t => t && t.id === 'leaderB');
+  const leaderA = tokens.find((t) => t && (t.id === 'leaderA' || slotIndex('ally', t.cx, t.cy) === 8));
+  const leaderB = tokens.find((t) => t && (t.id === 'leaderB' || slotIndex('enemy', t.cx, t.cy) === 8));
   const leaderAAlive = isUnitAlive(leaderA);
   const leaderBAlive = isUnitAlive(leaderB);
 
@@ -1744,6 +1744,11 @@ function checkBattleEndResult(
     ? normalizeAnimationFrameTimestamp(timestampCandidate)
     : undefined;
   return finalizeBattle(game, { winner, reason, detail, finishedAt }, contextDetail);
+}
+
+function finalizeBattleIfLeaderDown(game: (SessionState | CombatSessionState) | null, trigger: string, timestamp: number): boolean {
+  const result = checkBattleEndResult(game, { trigger, timestamp });
+  return Boolean(result);
 }
 // Giảm TTL minion của 1 phe sau khi phe đó kết thúc phase
 function tickMinionTTL(side: Side): void {
@@ -2229,6 +2234,9 @@ function init(): boolean {
       CLOCK.lastLogicMs = sessionNowMs;
 
       if (Game.battle?.over) return;
+      if (finalizeBattleIfLeaderDown(Game, 'leader-immediate', sessionNowMs)) {
+        return;
+      }
 
       let turnState = Game.turn ?? null;
       let busyUntil = 0;
@@ -2283,6 +2291,9 @@ function init(): boolean {
               return Boolean(checkBattleEndResult(gameState, info));
             },
           });
+          if (finalizeBattleIfLeaderDown(Game, 'leader-immediate', sessionNowMs)) {
+            return;
+          }
           cleanupDead(sessionNowMs);
           const postTurnResult = checkBattleEndResult(Game, { trigger: 'post-turn', timestamp: sessionNowMs });
           scheduleDraw();
