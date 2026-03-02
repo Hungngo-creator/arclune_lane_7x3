@@ -4,6 +4,7 @@ import { getUnitArt } from '../../art.ts';
 import { normalizeUnitId } from '../../utils/unit-id.ts';
 import { getSkillSet } from '../../data/skills.ts';
 import { createNumberFormatter } from '../../utils/format.ts';
+import { upgradeCultivation, getCultivationCost, type CultivationPlayerState } from '../../cultivation.ts';
 import { assertElement, ensureStyleTag, mountSection } from '../../ui/dom.ts';
 import { mountRarityAura, unmountRarity, normalizeRarity } from '@ui/rarity/rarity.ts';
 
@@ -40,7 +41,8 @@ const TAB_DEFINITIONS = [
   { key: 'skills', label: 'Kĩ Năng', hint: 'Mở lớp phủ mô tả kỹ năng, chuỗi nâng cấp và yêu cầu nguyên liệu.' },
   { key: 'arts', label: 'Công Pháp & Trang Bị', hint: 'Liệt kê công pháp, pháp khí và trang bị đang trang bị cho nhân vật.' },
   { key: 'skins', label: 'Skin', hint: 'Quản lý skin đã mở khóa và áp dụng bảng phối màu yêu thích.' },
-  { key: 'voice', label: 'Giọng Nói', hint: 'Nghe thử voice line, thiết lập voice pack và gợi ý mở khóa.' }
+  { key: 'voice', label: 'Giọng Nói', hint: 'Nghe thử voice line, thiết lập voice pack và gợi ý mở khóa.' },
+  { key: 'tuvi', label: 'Tu Vi', hint: 'Nâng cấp tiểu cảnh giới và tiêu hao VNT theo độ khó bậc tu luyện.' }
 ] satisfies ReadonlyArray<{ key: CollectionTabKey; label: string; hint: string }>;
 
 const currencyCatalog: CurrencyCatalog = getCurrencyCatalog();
@@ -92,6 +94,17 @@ function ensureStyles(){
     .collection-stage{position:relative;border-radius:28px;border:1px solid rgba(125,211,252,.24);background:linear-gradient(150deg,rgba(16,24,34,.92),rgba(10,16,26,.72));padding:28px;display:flex;flex-direction:column;gap:18px;overflow:visible;min-height:420px;}
     .collection-stage__art{flex:1;display:flex;align-items:flex-end;justify-content:center;position:relative;}
     .collection-stage__sprite{width:82%;max-width:420px;height:auto;filter:drop-shadow(0 32px 60px rgba(0,0,0,.6));transition:transform .3s ease,filter .3s ease;}
+    .collection-stage__tuvi{position:absolute;left:50%;top:55%;transform:translate(-50%,-50%);width:50%;aspect-ratio:1/1;border-radius:50%;border:2px solid rgba(52,211,153,.72);box-shadow:0 0 0 4px rgba(16,185,129,.15),inset 0 0 56px rgba(5,46,22,.42);background:radial-gradient(circle at 35% 35%,rgba(52,211,153,.24),rgba(5,46,22,.78));display:none;flex-direction:column;align-items:center;justify-content:center;z-index:2;pointer-events:none;}
+    .collection-stage__tuvi.is-open{display:flex;}
+    .collection-stage__tuvi-realm{margin:0;color:#bbf7d0;font-size:22px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-align:center;}
+    .collection-stage__tuvi-subrealm{margin:6px 0 0;color:#dcfce7;font-size:14px;letter-spacing:.08em;text-transform:uppercase;text-align:center;}
+    .collection-stage__tuvi-cost{margin:8px 0 0;color:#86efac;font-size:12px;letter-spacing:.06em;text-transform:uppercase;text-align:center;}
+    .collection-stage__tuvi-actions{display:none;position:absolute;left:50%;bottom:24px;transform:translateX(-50%);z-index:3;gap:10px;}
+    .collection-stage__tuvi-actions.is-open{display:flex;}
+    .collection-stage__tuvi-btn{width:44px;height:44px;border-radius:50%;border:1px solid rgba(110,231,183,.6);background:linear-gradient(160deg,rgba(16,185,129,.35),rgba(5,46,22,.88));color:#dcfce7;font-size:24px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .18s ease,filter .18s ease;}
+    .collection-stage__tuvi-btn:hover{transform:translateY(-2px);filter:brightness(1.08);}
+    .collection-stage__tuvi-btn:focus-visible{outline:2px solid rgba(110,231,183,.82);outline-offset:2px;}
+    .collection-stage__tuvi-btn:disabled{cursor:not-allowed;background:linear-gradient(160deg,rgba(40,40,40,.6),rgba(12,12,12,.95));border-color:rgba(115,115,115,.65);color:#737373;filter:none;}
     .collection-stage__info{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;}
     .collection-stage__identity{display:flex;flex-direction:column;gap:6px;}
     .collection-stage__name{margin:0;font-size:26px;letter-spacing:.06em;}
@@ -311,6 +324,14 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
   };
 
   const filterState: FilterState = createFilterState();
+  const mutablePlayerState: CultivationPlayerState = {
+    ...(playerState as CultivationPlayerState),
+    currencies: { ...((playerState as CultivationPlayerState)?.currencies ?? {}) },
+  };
+  for (const currency of currencyCatalog){
+    const resolved = resolveCurrencyBalance(currency.id, currencies, playerState);
+    mutablePlayerState.currencies![currency.id] = Number.isFinite(resolved) ? resolved : 0;
+  }
 
   const container = document.createElement('div');
   container.className = 'collection-view';
@@ -347,6 +368,7 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
 
   const wallet = document.createElement('div');
   wallet.className = 'collection-view__wallet';
+  const walletBalances = new Map<string, HTMLElement>();
 
   for (const currency of currencyCatalog){
     const item = document.createElement('article');
@@ -359,9 +381,10 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
 
     const balance = document.createElement('p');
     balance.className = 'collection-wallet__balance';
-    const value = resolveCurrencyBalance(currency.id, currencies, playerState);
+    const value = resolveCurrencyBalance(currency.id, currencies, mutablePlayerState);
     balance.textContent = `${currencyFormatter.format(value)} ${currency.suffix || currency.id}`;
     item.appendChild(balance);
+    walletBalances.set(currency.id, balance);
 
     wallet.appendChild(item);
   }
@@ -529,6 +552,49 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
   stageSprite.style.opacity = '0';
 
   stageArt.appendChild(stageSprite);
+  const tuViPanel = document.createElement('section');
+  tuViPanel.className = 'collection-stage__tuvi';
+
+  const tuViRealm = document.createElement('h3');
+  tuViRealm.className = 'collection-stage__tuvi-realm';
+  tuViRealm.textContent = 'Cảnh giới 1';
+
+  const tuViSubRealm = document.createElement('p');
+  tuViSubRealm.className = 'collection-stage__tuvi-subrealm';
+  tuViSubRealm.textContent = 'Tiểu cảnh giới 0';
+
+  const tuViCost = document.createElement('p');
+  tuViCost.className = 'collection-stage__tuvi-cost';
+  tuViCost.textContent = 'Chi phí kế tiếp: —';
+
+  tuViPanel.appendChild(tuViRealm);
+  tuViPanel.appendChild(tuViSubRealm);
+  tuViPanel.appendChild(tuViCost);
+
+  const tuViActions = document.createElement('div');
+  tuViActions.className = 'collection-stage__tuvi-actions';
+
+  const tuViUpgrade = document.createElement('button');
+  tuViUpgrade.type = 'button';
+  tuViUpgrade.className = 'collection-stage__tuvi-btn';
+  tuViUpgrade.textContent = '+';
+  tuViUpgrade.setAttribute('aria-label', 'Nâng một tiểu cảnh giới');
+
+  const tuViDisabled1 = document.createElement('button');
+  tuViDisabled1.type = 'button';
+  tuViDisabled1.className = 'collection-stage__tuvi-btn';
+  tuViDisabled1.textContent = '+';
+  tuViDisabled1.disabled = true;
+
+  const tuViDisabled2 = document.createElement('button');
+  tuViDisabled2.type = 'button';
+  tuViDisabled2.className = 'collection-stage__tuvi-btn';
+  tuViDisabled2.textContent = '+';
+  tuViDisabled2.disabled = true;
+
+  tuViActions.appendChild(tuViUpgrade);
+  tuViActions.appendChild(tuViDisabled1);
+  tuViActions.appendChild(tuViDisabled2);
 
   const stageStatus = document.createElement('p');
   stageStatus.className = 'collection-stage__status';
@@ -632,6 +698,8 @@ const overlayDetailPanel = document.createElement('aside');
 
   stage.appendChild(stageInfo);
   stage.appendChild(stageArt);
+  stage.appendChild(tuViPanel);
+  stage.appendChild(tuViActions);
   stage.appendChild(stageStatus);
   stage.appendChild(overlay);
 
@@ -825,6 +893,9 @@ const overlayDetailPanel = document.createElement('aside');
       overlay.classList.remove('is-open');
       clearSkillDetail();
     }
+    const isTuViTab = key === 'tuvi';
+    tuViPanel.classList.toggle('is-open', isTuViTab);
+    tuViActions.classList.toggle('is-open', isTuViTab);
   };
 
   const handleTabClick = (key: CollectionTabKey | 'close') => {
@@ -883,6 +954,56 @@ const overlayDetailPanel = document.createElement('aside');
   if (root.appendChild){
     root.appendChild(container);
   }
+
+const resolveCurrentCultivation = () => {
+    const cultivation = mutablePlayerState.cultivation ?? {};
+    const realm = Number.isFinite(cultivation.realm) ? Number(cultivation.realm) : 1;
+    const subRealm = Number.isFinite(cultivation.subRealm) ? Number(cultivation.subRealm) : 0;
+    return {
+      realm: Math.max(1, Math.floor(realm)),
+      subRealm: Math.max(0, Math.floor(subRealm)),
+    };
+  };
+
+  const refreshWallet = () => {
+    for (const currency of currencyCatalog){
+      const balance = walletBalances.get(currency.id);
+      if (!balance) continue;
+      const value = Number(mutablePlayerState.currencies?.[currency.id] ?? 0);
+      balance.textContent = `${currencyFormatter.format(Number.isFinite(value) ? value : 0)} ${currency.suffix || currency.id}`;
+    }
+  };
+
+  const refreshTuViPanel = () => {
+    const { realm, subRealm } = resolveCurrentCultivation();
+    tuViRealm.textContent = `Cảnh giới ${realm}`;
+    tuViSubRealm.textContent = `Tiểu cảnh giới ${subRealm}`;
+    const costInfo = getCultivationCost(realm, subRealm);
+    tuViCost.textContent = costInfo
+      ? `Chi phí kế tiếp: ${currencyFormatter.format(costInfo.aetherCost)} VNT`
+      : 'Chi phí kế tiếp: Đã đạt giới hạn';
+  };
+
+  const handleCultivationUpgrade = () => {
+    const { realm, subRealm } = resolveCurrentCultivation();
+    const upgraded = upgradeCultivation(mutablePlayerState, realm, subRealm);
+    if (!upgraded.ok){
+      stageStatus.textContent = upgraded.reason === 'insufficient_currency'
+        ? 'Không đủ VNT để nâng tiểu cảnh giới.'
+        : 'Không thể nâng cấp tu vi ở trạng thái hiện tại.';
+      return;
+    }
+    mutablePlayerState.currencies = { ...(upgraded.playerState.currencies ?? {}) };
+    mutablePlayerState.cultivation = { ...(upgraded.playerState.cultivation ?? {}) };
+    refreshWallet();
+    refreshTuViPanel();
+    stageStatus.textContent = `Đã nâng lên Cảnh giới ${upgraded.newRealm} · Tiểu cảnh giới ${upgraded.newSubRealm}.`;
+  };
+  tuViUpgrade.addEventListener('click', handleCultivationUpgrade);
+  addCleanup(() => tuViUpgrade.removeEventListener('click', handleCultivationUpgrade));
+
+  refreshWallet();
+  refreshTuViPanel();
 
   const selectUnit = (unitId: string | null) => {
     if (!unitId || !rosterEntries.has(unitId)) return;

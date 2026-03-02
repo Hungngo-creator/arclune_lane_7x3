@@ -7,7 +7,7 @@ import type { RosterEntryLite } from '@shared-types/lineup';
 
 export type { UnknownRecord } from '@shared-types/common';
 
-export type CollectionTabKey = 'awakening' | 'skills' | 'arts' | 'skins' | 'voice';
+export type CollectionTabKey = 'awakening' | 'skills' | 'arts' | 'skins' | 'voice' | 'tuvi';
 
 export interface FilterState {
   activeTab: CollectionTabKey;
