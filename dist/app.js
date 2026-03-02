@@ -5445,6 +5445,13 @@ __define('./data/economy.config.ts', (exports, module, __require) => {
       lotterySplit: {
           devVault: 0.5,
           prizePool: 0.5
+      },
+      initialWallet: {
+          VNT: 125_000,
+          HNT: 5_200,
+          TNT: 620,
+          ThNT: 120,
+          TT: 68
       }
   };
 
@@ -5509,7 +5516,8 @@ __define('./data/economy.ts', (exports, module, __require) => {
       cultivation: CultivationSchema,
       pityConfig: PityConfigSchema,
       shopTaxBrackets: z.array(ShopTaxBracketSchema),
-      lotterySplit: LotterySplitSchema
+      lotterySplit: LotterySplitSchema,
+      initialWallet: z.record(z.number()).optional()
   });
   const economyConfig = EconomyConfigSchema.parse(rawEconomyConfig);
   const pityEntries = Object.entries(economyConfig.pityConfig);
@@ -5652,6 +5660,13 @@ __define('./data/economy.ts', (exports, module, __require) => {
       const bracket = getShopTaxBracket(rank);
       return bracket ? bracket.rate : null;
   }
+  const INITIAL_WALLET = Object.freeze(Object.fromEntries(CURRENCY_ORDER.map((currencyId) => [
+      currencyId,
+      Math.max(0, Math.floor(Number(economyConfig.initialWallet?.[currencyId] ?? 0))),
+  ])));
+  function getInitialWallet() {
+      return { ...INITIAL_WALLET };
+  }
   const LOTTERY_SPLIT = Object.freeze({ ...economyConfig.lotterySplit });
   function getLotterySplit() {
       return LOTTERY_SPLIT;
@@ -5669,7 +5684,9 @@ __define('./data/economy.ts', (exports, module, __require) => {
   exports.getShopTaxBracket = getShopTaxBracket;
   exports.getShopTaxRate = getShopTaxRate;
   exports.LOTTERY_SPLIT = LOTTERY_SPLIT;
+  exports.INITIAL_WALLET = INITIAL_WALLET;
   exports.getLotterySplit = getLotterySplit;
+  exports.getInitialWallet = getInitialWallet;
   exports.CULTIVATION_REALM_ECONOMY = CULTIVATION_REALM_ECONOMY;
   exports.getCultivationRealmEconomy = getCultivationRealmEconomy;
   exports.listCultivationRealmsEconomy = listCultivationRealmsEconomy;
@@ -15923,7 +15940,7 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
       const fromState = inspectContainer(normalizeCurrencyBalances(playerState ?? null));
       if (fromState != null)
           return fromState;
-      return 0;
+      return Number.NaN;
   };
   function describeUlt(unit) {
       return unit?.name ? `Bộ kỹ năng của ${unit.name}.` : 'Chọn nhân vật để xem mô tả chi tiết.';
@@ -16631,7 +16648,9 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       };
       for (const currency of currencyCatalog) {
           const resolved = resolveCurrencyBalance(currency.id, currencies, playerState);
-          mutablePlayerState.currencies[currency.id] = Number.isFinite(resolved) ? resolved : 0;
+          if (Number.isFinite(resolved)) {
+              mutablePlayerState.currencies[currency.id] = resolved;
+          }
       }
       mutablePlayerState.currencies = createNormalizedWallet(getSharedCurrencyWallet(), mutablePlayerState.currencies);
       syncSharedCurrencyWallet(mutablePlayerState.currencies, { merge: true });
@@ -16675,7 +16694,10 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           const balance = document.createElement('p');
           balance.className = 'collection-wallet__balance';
           const value = resolveCurrencyBalance(currency.id, currencies, mutablePlayerState);
-          balance.textContent = `${currencyFormatter.format(value)} ${currency.suffix || currency.id}`;
+          const displayValue = Number.isFinite(value)
+              ? value
+              : Number(mutablePlayerState.currencies?.[currency.id] ?? 0);
+          balance.textContent = `${currencyFormatter.format(displayValue)} ${currency.suffix || currency.id}`;
           item.appendChild(balance);
           walletBalances.set(currency.id, balance);
           wallet.appendChild(item);
@@ -18316,7 +18338,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           });
       });
       const playerCurrencySource = normalizeCurrencyBalances(playerState ?? null);
-      const currencyBalances = createCurrencyBalances(playerCurrencySource, currencies);
+      const currencyBalances = createCurrencyBalances(createCurrencyBalances(getSharedCurrencyWallet(), playerCurrencySource), currencies);
       const currencyOrder = getCurrencyOrder();
       const mapToWallet = () => {
           const wallet = {};
@@ -24607,6 +24629,7 @@ __define('./utils/currency.ts', (exports, module, __require) => {
   const formatBalance = __dep0.formatBalance;
   const getCurrency = __dep0.getCurrency;
   const listCurrencies = __dep0.listCurrencies;
+  const getInitialWallet = __dep0.getInitialWallet;
   const CULTIVATION_SPEND_ORDER = ['VNT', 'HNT', 'TNT', 'ThNT'];
   let sharedCurrencyWallet = null;
   const sharedWalletListeners = new Set();
@@ -24741,7 +24764,7 @@ __define('./utils/currency.ts', (exports, module, __require) => {
   }
   function getSharedCurrencyWallet() {
       if (!sharedCurrencyWallet) {
-          sharedCurrencyWallet = createNormalizedWallet();
+          sharedCurrencyWallet = createNormalizedWallet(getInitialWallet());
       }
       return cloneWalletByOrder(sharedCurrencyWallet);
   }

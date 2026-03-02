@@ -171,7 +171,7 @@ export const resolveCurrencyBalance: CurrencyBalanceProvider = (currencyId, prov
   if (fromProvided != null) return fromProvided;
   const fromState = inspectContainer(normalizeCurrencyBalances(playerState ?? null));
   if (fromState != null) return fromState;
-  return 0;
+  return Number.NaN;
 };
 
 export function describeUlt(unit: CollectionEntry | null | undefined): string{

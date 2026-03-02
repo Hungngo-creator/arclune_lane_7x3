@@ -323,7 +323,10 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   });
 
   const playerCurrencySource = normalizeCurrencyBalances(playerState ?? null);
-  const currencyBalances = createCurrencyBalances(playerCurrencySource, currencies);
+  const currencyBalances = createCurrencyBalances(
+    createCurrencyBalances(getSharedCurrencyWallet(), playerCurrencySource),
+    currencies,
+  );
   const currencyOrder = getCurrencyOrder();
 
   const mapToWallet = (): CurrencyWallet => {

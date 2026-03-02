@@ -9,6 +9,7 @@ import {
   listCurrencies,
   type CurrencyId,
   type FormatBalanceOptions,
+  getInitialWallet,
 } from '../data/economy.ts';
 
 export type { CurrencyId, FormatBalanceOptions };
@@ -186,7 +187,7 @@ export function createNormalizedWallet(
 
 export function getSharedCurrencyWallet(): CurrencyWallet {
   if (!sharedCurrencyWallet){
-    sharedCurrencyWallet = createNormalizedWallet();
+    sharedCurrencyWallet = createNormalizedWallet(getInitialWallet());
   }
   return cloneWalletByOrder(sharedCurrencyWallet);
 }

@@ -104,6 +104,13 @@ const economyConfig = {
   lotterySplit: {
     devVault: 0.5,
     prizePool: 0.5
+  },
+  initialWallet: {
+    VNT: 125_000,
+    HNT: 5_200,
+    TNT: 620,
+    ThNT: 120,
+    TT: 68
   }
 } as const;
 

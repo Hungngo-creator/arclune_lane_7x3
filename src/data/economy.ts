@@ -72,7 +72,8 @@ const EconomyConfigSchema = z.object({
   cultivation: CultivationSchema,
   pityConfig: PityConfigSchema,
   shopTaxBrackets: z.array(ShopTaxBracketSchema),
-  lotterySplit: LotterySplitSchema
+  lotterySplit: LotterySplitSchema,
+  initialWallet: z.record(z.number()).optional()
 });
 
 const economyConfig = EconomyConfigSchema.parse(rawEconomyConfig);
@@ -284,6 +285,19 @@ function getShopTaxRate(rank: string): number | null {
   return bracket ? bracket.rate : null;
 }
 
+const INITIAL_WALLET: Readonly<Partial<Record<CurrencyId, number>>> = Object.freeze(
+  Object.fromEntries(
+    CURRENCY_ORDER.map((currencyId) => [
+      currencyId,
+      Math.max(0, Math.floor(Number(economyConfig.initialWallet?.[currencyId] ?? 0))),
+    ])
+  ) as Partial<Record<CurrencyId, number>>
+);
+
+function getInitialWallet(): Readonly<Partial<Record<CurrencyId, number>>> {
+  return { ...INITIAL_WALLET };
+}
+
 const LOTTERY_SPLIT: LotterySplit = Object.freeze({ ...economyConfig.lotterySplit });
 
 function getLotterySplit(): LotterySplit {
@@ -304,7 +318,9 @@ export {
   getShopTaxBracket,
   getShopTaxRate,
   LOTTERY_SPLIT,
-    getLotterySplit,
+  INITIAL_WALLET,
+  getLotterySplit,
+  getInitialWallet,
   CULTIVATION_REALM_ECONOMY,
   getCultivationRealmEconomy,
   listCultivationRealmsEconomy

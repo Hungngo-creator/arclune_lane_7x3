@@ -336,7 +336,9 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
   };
   for (const currency of currencyCatalog){
     const resolved = resolveCurrencyBalance(currency.id, currencies, playerState);
-    mutablePlayerState.currencies![currency.id] = Number.isFinite(resolved) ? resolved : 0;
+    if (Number.isFinite(resolved)){
+      mutablePlayerState.currencies![currency.id] = resolved;
+    }
   }
   mutablePlayerState.currencies = createNormalizedWallet(
     getSharedCurrencyWallet(),
@@ -393,7 +395,10 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
     const balance = document.createElement('p');
     balance.className = 'collection-wallet__balance';
     const value = resolveCurrencyBalance(currency.id, currencies, mutablePlayerState);
-    balance.textContent = `${currencyFormatter.format(value)} ${currency.suffix || currency.id}`;
+    const displayValue = Number.isFinite(value)
+      ? value
+      : Number(mutablePlayerState.currencies?.[currency.id] ?? 0);
+    balance.textContent = `${currencyFormatter.format(displayValue)} ${currency.suffix || currency.id}`;
     item.appendChild(balance);
     walletBalances.set(currency.id, balance);
 
