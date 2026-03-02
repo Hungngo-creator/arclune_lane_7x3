@@ -434,11 +434,30 @@ __define('./ai.ts', (exports, module, __require) => {
       const dist = Math.abs(cx - 0) + Math.abs(cy - 1);
       return 1 - Math.min(1, dist / 7);
   }
-  function safetyScore(Game, cx, cy, allyTokens) {
-      const foesSource = Array.isArray(allyTokens) ? allyTokens : tokensAlive(Game).filter((t) => t.side === 'ally');
-      const sameRow = foesSource.filter((t) => t.cy === cy);
-      const near = sameRow.filter((t) => Math.abs(t.cx - cx) <= 1).length;
-      const far = sameRow.length - near;
+  function buildAllyRowPressure(allyTokens) {
+      const rows = new Map();
+      for (const token of allyTokens) {
+          const row = token.cy;
+          const col = token.cx;
+          let info = rows.get(row);
+          if (!info) {
+              info = { total: 0, nearByCol: new Map() };
+              rows.set(row, info);
+          }
+          info.total += 1;
+          for (let delta = -1; delta <= 1; delta += 1) {
+              const key = col - delta;
+              info.nearByCol.set(key, (info.nearByCol.get(key) ?? 0) + 1);
+          }
+      }
+      return rows;
+  }
+  function safetyScoreFast(cx, cy, allyPressure) {
+      const info = allyPressure.get(cy);
+      if (!info)
+          return 1;
+      const near = info.nearByCol.get(cx) ?? 0;
+      const far = info.total - near;
       return Math.max(0, Math.min(1, 1 - ((near * 0.6 + far * 0.2) / 3)));
   }
   function summonerFeasibility(Game, unitId, baseSlot, aliveTokens) {
@@ -492,20 +511,26 @@ __define('./ai.ts', (exports, module, __require) => {
       }
       return null;
   }
-  function rowCrowdingFactor(Game, cy, enemyTokens) {
-      const ours = (Array.isArray(enemyTokens) ? enemyTokens : tokensAlive(Game).filter((t) => t.side === 'enemy')).filter((t) => t.cy === cy).length;
-      let queued = 0;
-      const queue = Game.queued.enemy;
-      for (const request of queue.values()) {
-          if (request && request.cy === cy)
-              queued += 1;
+  function buildEnemyRowCrowding(Game, enemyTokens) {
+      const rowCounts = new Map();
+      for (const token of enemyTokens) {
+          rowCounts.set(token.cy, (rowCounts.get(token.cy) ?? 0) + 1);
       }
-      const n = ours + queued;
-      if (n >= 3)
-          return 0.7;
-      if (n === 2)
-          return CFG.AI?.ROW_CROWDING_PENALTY ?? 0.85;
-      return 1;
+      for (const request of Game.queued.enemy.values()) {
+          if (request && Number.isFinite(request.cy)) {
+              rowCounts.set(request.cy, (rowCounts.get(request.cy) ?? 0) + 1);
+          }
+      }
+      const factorByRow = new Map();
+      for (const [row, count] of rowCounts.entries()) {
+          if (count >= 3)
+              factorByRow.set(row, 0.7);
+          else if (count === 2)
+              factorByRow.set(row, CFG.AI?.ROW_CROWDING_PENALTY ?? 0.85);
+          else
+              factorByRow.set(row, 1);
+      }
+      return factorByRow;
   }
   function roleBias(className, cx) {
       const front = cx <= CFG.GRID_COLS - CFG.ENEMY_COLS;
@@ -626,6 +651,8 @@ __define('./ai.ts', (exports, module, __require) => {
       const alive = tokensAlive(Game);
       const aliveAllies = alive.filter((t) => t.side === 'ally');
       const aliveEnemies = alive.filter((t) => t.side === 'enemy');
+      const allyPressure = buildAllyRowPressure(aliveAllies);
+      const rowFactorByCy = buildEnemyRowCrowding(Game, aliveEnemies);
       const cells = listEmptyEnemySlots(Game, alive);
       if (!cells.length) {
           const decision = {
@@ -645,6 +672,8 @@ __define('./ai.ts', (exports, module, __require) => {
       const keepTop = dbgCfg.keepTop;
       const trackTopCandidates = keepTop > 0;
       const topCandidates = [];
+      const etaBySlot = new Map();
+      const summonerFeasibilityByCardSlot = new Map();
       const insertTopCandidate = trackTopCandidates
           ? (entry) => {
               let inserted = false;
@@ -670,9 +699,18 @@ __define('./ai.ts', (exports, module, __require) => {
           const kitTraits = detectKitTraits(meta);
           for (const cell of cells) {
               const p = pressureScore(cell.cx, cell.cy);
-              const s = safetyScore(Game, cell.cx, cell.cy, aliveAllies);
-              const e = etaScoreEnemy(Game, cell.s);
-              const sf = summonerFeasibility(Game, card.id, cell.s, alive);
+              const s = safetyScoreFast(cell.cx, cell.cy, allyPressure);
+              const e = etaBySlot.get(cell.s) ?? (() => {
+                  const eta = etaScoreEnemy(Game, cell.s);
+                  etaBySlot.set(cell.s, eta);
+                  return eta;
+              })();
+              const summonKey = `${card.id}:${cell.s}`;
+              const sf = summonerFeasibilityByCardSlot.get(summonKey) ?? (() => {
+                  const summonValue = summonerFeasibility(Game, card.id, cell.s, alive);
+                  summonerFeasibilityByCardSlot.set(summonKey, summonValue);
+                  return summonValue;
+              })();
               const kitInstantScore = kitTraits.hasInstant ? e : 0;
               const kitDefenseScore = kitTraits.hasDefBuff ? 1 - s : 0;
               const kitReviveScore = kitTraits.hasRevive ? s : 0;
@@ -686,7 +724,7 @@ __define('./ai.ts', (exports, module, __require) => {
                   kitRevive: (weights.kitRevive ?? 0) * kitReviveScore,
               };
               const baseScore = Object.values(contributions).reduce((acc, val) => acc + val, 0);
-              const rowFactor = rowCrowdingFactor(Game, cell.cy, aliveEnemies);
+              const rowFactor = rowFactorByCy.get(cell.cy) ?? 1;
               const roleFactor = roleBias(meta?.class, cell.cx);
               const finalScore = baseScore * rowFactor * roleFactor;
               const evaluation = {
@@ -4143,7 +4181,6 @@ __define('./combat.ts', (exports, module, __require) => {
   const vfxAddLightningArc = __dep3.vfxAddLightningArc;
   const __dep4 = __require('./engine.ts');
   const slotIndex = __dep4.slotIndex;
-  const slotToCell = __dep4.slotToCell;
   const __dep5 = __require('./passives.ts');
   const emitPassiveEvent = __dep5.emitPassiveEvent;
   const getPassiveLog = __dep5.getPassiveLog;
@@ -4256,25 +4293,51 @@ __define('./combat.ts', (exports, module, __require) => {
   const GAME_CONFIG = CFG;
   function pickTarget(Game, attacker) {
       const foeSide = attacker.side === 'ally' ? 'enemy' : 'ally';
-      const pool = Game.tokens.filter((t) => t.side === foeSide && t.alive);
+      const pool = [];
+      const bySlot = new Map();
+      const occupiedSlots = new Set();
+      let nearestOverall = null;
+      let nearestOverallDistance = Number.POSITIVE_INFINITY;
+      const distanceToAttacker = (token) => (Math.abs(token.cx - attacker.cx) + Math.abs(token.cy - attacker.cy));
+      for (const token of Game.tokens) {
+          if (token.side !== foeSide || !token.alive)
+              continue;
+          pool.push(token);
+          const slot = slotIndex(token.side, token.cx, token.cy);
+          bySlot.set(slot, token);
+          occupiedSlots.add(slot);
+          const distance = distanceToAttacker(token);
+          if (!nearestOverall
+              || distance < nearestOverallDistance
+              || (distance === nearestOverallDistance && slot < slotIndex(nearestOverall.side, nearestOverall.cx, nearestOverall.cy))) {
+              nearestOverall = token;
+              nearestOverallDistance = distance;
+          }
+      }
       if (pool.length === 0)
           return null;
       const meta = getMetaById(attacker.id);
       const className = meta?.class ?? null;
       const isAssassin = className === 'Assassin';
       const slotOf = (token) => slotIndex(token.side, token.cx, token.cy);
-      const occupiedSlots = new Set(pool.map(slotOf));
       const isBlockedLeader = (slot) => (slot === 8 && (occupiedSlots.has(2) || occupiedSlots.has(5)));
       if (isAssassin) {
-          const backline = pool.filter((target) => slotOf(target) >= 7);
-          if (backline.length > 0) {
-              backline.sort((a, b) => {
-                  const distanceA = Math.abs(a.cx - attacker.cx) + Math.abs(a.cy - attacker.cy);
-                  const distanceB = Math.abs(b.cx - attacker.cx) + Math.abs(b.cy - attacker.cy);
-                  return distanceA - distanceB;
-              });
-              return backline[0] ?? null;
+          let nearestBackline = null;
+          let nearestBacklineDistance = Number.POSITIVE_INFINITY;
+          for (const target of pool) {
+              const slot = slotOf(target);
+              if (slot < 7)
+                  continue;
+              const distance = distanceToAttacker(target);
+              if (!nearestBackline
+                  || distance < nearestBacklineDistance
+                  || (distance === nearestBacklineDistance && slot < slotOf(nearestBackline))) {
+                  nearestBackline = target;
+                  nearestBacklineDistance = distance;
+              }
           }
+          if (nearestBackline)
+              return nearestBackline;
       }
       const attackerRow = attacker.cy;
       const targetSide = foeSide;
@@ -4283,18 +4346,14 @@ __define('./combat.ts', (exports, module, __require) => {
       for (const slot of slotPriority) {
           if (isBlockedLeader(slot))
               continue;
-          const cell = slotToCell(targetSide, slot);
-          const { cx, cy } = cell;
-          const found = pool.find(t => t.cx === cx && t.cy === cy);
+          const found = bySlot.get(slot);
           if (found)
               return found;
       }
-      const sorted = [...pool].sort((a, b) => {
-          const distanceA = Math.abs(a.cx - attacker.cx) + Math.abs(a.cy - attacker.cy);
-          const distanceB = Math.abs(b.cx - attacker.cx) + Math.abs(b.cy - attacker.cy);
-          return distanceA - distanceB;
-      });
-      for (const target of sorted) {
+      if (nearestOverall && !isBlockedLeader(slotOf(nearestOverall))) {
+          return nearestOverall;
+      }
+      for (const target of pool) {
           if (isBlockedLeader(slotOf(target)))
               continue;
           return target;
@@ -11556,6 +11615,18 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   let leaderEndCheckFlags = { ally: false, enemy: false };
   const hpBarGradientCache = new Map();
   const meleeOffsetTokenKeys = new Set();
+  const getRequestAnimationFrame = () => {
+      if (winRef && typeof winRef.requestAnimationFrame === 'function') {
+          return winRef.requestAnimationFrame.bind(winRef);
+      }
+      return typeof requestAnimationFrame === 'function' ? requestAnimationFrame : null;
+  };
+  const getCancelAnimationFrame = () => {
+      if (winRef && typeof winRef.cancelAnimationFrame === 'function') {
+          return winRef.cancelAnimationFrame.bind(winRef);
+      }
+      return typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : null;
+  };
   const makeMeleeTokenKey = (token) => {
       if (Number.isFinite(token?.iid)) {
           return `iid:${token?.iid}`;
@@ -11657,9 +11728,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               clearTimeout(drawFrameHandle);
           }
           else {
-              const cancel = (winRef && typeof winRef.cancelAnimationFrame === 'function')
-                  ? winRef.cancelAnimationFrame.bind(winRef)
-                  : (typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : null);
+              const cancel = getCancelAnimationFrame();
               const frameHandle = toAnimationFrameHandle(drawFrameHandle);
               if (typeof cancel === 'function' && frameHandle !== null) {
                   cancel(frameHandle);
@@ -11678,44 +11747,29 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       if (!canvas || !ctx)
           return;
       drawPending = true;
-      const raf = (winRef && typeof winRef.requestAnimationFrame === 'function')
-          ? winRef.requestAnimationFrame.bind(winRef)
-          : (typeof requestAnimationFrame === 'function' ? requestAnimationFrame : null);
+      const raf = getRequestAnimationFrame();
+      const runDrawFrame = () => {
+          drawFrameHandle = null;
+          drawFrameUsesTimeout = false;
+          drawPending = false;
+          if (drawPaused)
+              return;
+          try {
+              draw();
+          }
+          catch (err) {
+              console.error('[draw]', err);
+          }
+          if (Game?.vfx && Game.vfx.length)
+              scheduleDraw();
+      };
       if (raf) {
           drawFrameUsesTimeout = false;
-          drawFrameHandle = raf(() => {
-              drawFrameHandle = null;
-              drawFrameUsesTimeout = false;
-              drawPending = false;
-              if (drawPaused)
-                  return;
-              try {
-                  draw();
-              }
-              catch (err) {
-                  console.error('[draw]', err);
-              }
-              if (Game?.vfx && Game.vfx.length)
-                  scheduleDraw();
-          });
+          drawFrameHandle = raf(runDrawFrame);
       }
       else {
           drawFrameUsesTimeout = true;
-          drawFrameHandle = setTimeout(() => {
-              drawFrameHandle = null;
-              drawFrameUsesTimeout = false;
-              drawPending = false;
-              if (drawPaused)
-                  return;
-              try {
-                  draw();
-              }
-              catch (err) {
-                  console.error('[draw]', err);
-              }
-              if (Game?.vfx && Game.vfx.length)
-                  scheduleDraw();
-          }, 16);
+          drawFrameHandle = setTimeout(runDrawFrame, 16);
       }
   }
   function cancelScheduledResize() {
@@ -11724,9 +11778,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               clearTimeout(resizeSchedulerHandle);
           }
           else {
-              const cancel = (winRef && typeof winRef.cancelAnimationFrame === 'function')
-                  ? winRef.cancelAnimationFrame.bind(winRef)
-                  : (typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : null);
+              const cancel = getCancelAnimationFrame();
               const frameHandle = toAnimationFrameHandle(resizeSchedulerHandle);
               if (typeof cancel === 'function' && frameHandle !== null) {
                   cancel(frameHandle);
@@ -11756,9 +11808,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       if (pendingResize)
           return;
       pendingResize = true;
-      const raf = (winRef && typeof winRef.requestAnimationFrame === 'function')
-          ? winRef.requestAnimationFrame.bind(winRef)
-          : (typeof requestAnimationFrame === 'function' ? requestAnimationFrame : null);
+      const raf = getRequestAnimationFrame();
       if (raf) {
           resizeSchedulerUsesTimeout = false;
           resizeSchedulerHandle = raf(flushScheduledResize);
@@ -11770,16 +11820,16 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   }
   const DEFAULT_TOKEN_COLOR = '#a9f58c';
   function refreshQueuedArtFor(unitId) {
+      const updated = getUnitArt(unitId);
+      const nextColor = updated?.palette?.primary ?? DEFAULT_TOKEN_COLOR;
       const apply = (map) => {
           if (!map || typeof map.values !== 'function')
               return;
           for (const pending of map.values()) {
               if (!pending || pending.unitId !== unitId)
                   continue;
-              const updated = getUnitArt(unitId);
               const pendingExt = pending;
               if (pendingExt) {
-                  const nextColor = updated?.palette?.primary ?? pendingExt.color ?? DEFAULT_TOKEN_COLOR;
                   pendingExt.art = updated ?? null;
                   pendingExt.skinKey = updated?.skinKey ?? null;
                   pendingExt.color = nextColor;
@@ -13268,9 +13318,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               return;
           if (tickLoopHandle !== null)
               return;
-          const raf = (winRef && typeof winRef.requestAnimationFrame === 'function')
-              ? winRef.requestAnimationFrame.bind(winRef)
-              : (typeof requestAnimationFrame === 'function' ? requestAnimationFrame : null);
+          const raf = getRequestAnimationFrame();
           if (raf) {
               tickLoopUsesTimeout = false;
               tickLoopHandle = raf(runTickLoop);
@@ -13771,9 +13819,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               clearTimeout(tickLoopHandle);
           }
           else {
-              const cancel = (winRef && typeof winRef.cancelAnimationFrame === 'function')
-                  ? winRef.cancelAnimationFrame.bind(winRef)
-                  : (typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : null);
+              const cancel = getCancelAnimationFrame();
               const frameHandle = toAnimationFrameHandle(tickLoopHandle);
               if (cancel && frameHandle !== null) {
                   cancel(frameHandle);

@@ -653,6 +653,23 @@ let leaderEndCheckFlags: { ally: boolean; enemy: boolean } = { ally: false, enem
 const hpBarGradientCache = new Map<string, GradientValue>();
 const meleeOffsetTokenKeys = new Set<string>();
 
+type RequestAnimationFrameFn = (callback: FrameRequestCallback) => number;
+type CancelAnimationFrameFn = (handle: number) => void;
+
+const getRequestAnimationFrame = (): RequestAnimationFrameFn | null => {
+  if (winRef && typeof winRef.requestAnimationFrame === 'function'){
+    return winRef.requestAnimationFrame.bind(winRef);
+  }
+  return typeof requestAnimationFrame === 'function' ? requestAnimationFrame : null;
+};
+
+const getCancelAnimationFrame = (): CancelAnimationFrameFn | null => {
+  if (winRef && typeof winRef.cancelAnimationFrame === 'function'){
+    return winRef.cancelAnimationFrame.bind(winRef);
+  }
+  return typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : null;
+};
+
 const makeMeleeTokenKey = (token: Partial<UnitToken> | null | undefined): string | null => {
   if (Number.isFinite(token?.iid)){
     return `iid:${token?.iid}`;
@@ -760,9 +777,7 @@ function cancelScheduledDraw(): void {
     if (drawFrameUsesTimeout){
       clearTimeout(drawFrameHandle);
     } else {
-      const cancel = (winRef && typeof winRef.cancelAnimationFrame === 'function')
-        ? winRef.cancelAnimationFrame.bind(winRef)
-        : (typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : null);
+      const cancel = getCancelAnimationFrame();
       const frameHandle = toAnimationFrameHandle(drawFrameHandle);
       if (typeof cancel === 'function' && frameHandle !== null){
         cancel(frameHandle);
@@ -779,37 +794,25 @@ function scheduleDraw(): void {
   if (drawPending) return;
   if (!canvas || !ctx) return;
   drawPending = true;
-  const raf = (winRef && typeof winRef.requestAnimationFrame === 'function')
-    ? winRef.requestAnimationFrame.bind(winRef)
-    : (typeof requestAnimationFrame === 'function' ? requestAnimationFrame : null);
+  const raf = getRequestAnimationFrame();
+  const runDrawFrame = (): void => {
+    drawFrameHandle = null;
+    drawFrameUsesTimeout = false;
+    drawPending = false;
+    if (drawPaused) return;
+    try {
+      draw();
+    } catch (err) {
+      console.error('[draw]', err);
+    }
+    if (Game?.vfx && Game.vfx.length) scheduleDraw();
+  };
   if (raf){
     drawFrameUsesTimeout = false;
-    drawFrameHandle = raf(()=>{
-      drawFrameHandle = null;
-      drawFrameUsesTimeout = false;
-      drawPending = false;
-      if (drawPaused) return;
-      try {
-        draw();
-      } catch (err) {
-        console.error('[draw]', err);
-      }
-      if (Game?.vfx && Game.vfx.length) scheduleDraw();
-    });
+    drawFrameHandle = raf(runDrawFrame);
   } else {
     drawFrameUsesTimeout = true;
-    drawFrameHandle = setTimeout(()=>{
-      drawFrameHandle = null;
-      drawFrameUsesTimeout = false;
-      drawPending = false;
-      if (drawPaused) return;
-      try {
-        draw();
-      } catch (err) {
-        console.error('[draw]', err);
-      }
-      if (Game?.vfx && Game.vfx.length) scheduleDraw();
-    }, 16);
+    drawFrameHandle = setTimeout(runDrawFrame, 16);
   }
 }
 
@@ -818,9 +821,7 @@ function cancelScheduledResize(): void {
     if (resizeSchedulerUsesTimeout){
       clearTimeout(resizeSchedulerHandle);
     } else {
-      const cancel = (winRef && typeof winRef.cancelAnimationFrame === 'function')
-        ? winRef.cancelAnimationFrame.bind(winRef)
-        : (typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : null);
+      const cancel = getCancelAnimationFrame();
       const frameHandle = toAnimationFrameHandle(resizeSchedulerHandle);
       if (typeof cancel === 'function' && frameHandle !== null){
         cancel(frameHandle);
@@ -850,9 +851,7 @@ function flushScheduledResize(): void {
 function scheduleResize(): void {
   if (pendingResize) return;
   pendingResize = true;
-  const raf = (winRef && typeof winRef.requestAnimationFrame === 'function')
-    ? winRef.requestAnimationFrame.bind(winRef)
-    : (typeof requestAnimationFrame === 'function' ? requestAnimationFrame : null);
+  const raf = getRequestAnimationFrame();
   if (raf){
     resizeSchedulerUsesTimeout = false;
     resizeSchedulerHandle = raf(flushScheduledResize);
@@ -865,14 +864,14 @@ function scheduleResize(): void {
 const DEFAULT_TOKEN_COLOR = '#a9f58c';
 
 function refreshQueuedArtFor(unitId: string): void {
+  const updated = getUnitArt(unitId);
+  const nextColor = updated?.palette?.primary ?? DEFAULT_TOKEN_COLOR;
   const apply = (map: Map<number, QueuedSummonRequest> | null | undefined): void => {
     if (!map || typeof map.values !== 'function') return;
     for (const pending of map.values()){
       if (!pending || pending.unitId !== unitId) continue;
-      const updated = getUnitArt(unitId);
       const pendingExt = pending as ExtendedQueuedSummon;
       if (pendingExt){
-        const nextColor = updated?.palette?.primary ?? pendingExt.color ?? DEFAULT_TOKEN_COLOR;
         pendingExt.art = updated ?? null;
         pendingExt.skinKey = updated?.skinKey ?? null;
         pendingExt.color = nextColor;
@@ -2337,9 +2336,7 @@ function init(): boolean {
   function scheduleTickLoop(): void {
     if (!running || !CLOCK) return;
     if (tickLoopHandle !== null) return;
-    const raf = (winRef && typeof winRef.requestAnimationFrame === 'function')
-      ? winRef.requestAnimationFrame.bind(winRef)
-      : (typeof requestAnimationFrame === 'function' ? requestAnimationFrame : null);
+    const raf = getRequestAnimationFrame();
     if (raf){
       tickLoopUsesTimeout = false;
       tickLoopHandle = raf(runTickLoop);
@@ -2868,9 +2865,7 @@ function clearSessionTimers(): void {
     if (tickLoopUsesTimeout){
       clearTimeout(tickLoopHandle);
     } else {
-      const cancel = (winRef && typeof winRef.cancelAnimationFrame === 'function')
-        ? winRef.cancelAnimationFrame.bind(winRef)
-        : (typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : null);
+      const cancel = getCancelAnimationFrame();
       const frameHandle = toAnimationFrameHandle(tickLoopHandle);
       if (cancel && frameHandle !== null){
         cancel(frameHandle);

@@ -31,6 +31,8 @@ type CandidateMultipliers = {
   role: number;
 };
 
+type AllyRowPressure = Map<number, { total: number; nearByCol: Map<number, number> }>;
+
 type CandidateMeta = RosterUnitDefinition | null | undefined;
 
 interface DeckEntryCandidate {
@@ -243,11 +245,30 @@ function pressureScore(cx: number, cy: number): number {
   return 1 - Math.min(1, dist / 7);
 }
 
-function safetyScore(Game: SessionState, cx: number, cy: number, allyTokens?: readonly UnitToken[] | null): number {
-  const foesSource = Array.isArray(allyTokens) ? allyTokens : tokensAlive(Game).filter((t) => t.side === 'ally');
-  const sameRow = foesSource.filter((t) => t.cy === cy);
-  const near = sameRow.filter((t) => Math.abs(t.cx - cx) <= 1).length;
-  const far = sameRow.length - near;
+function buildAllyRowPressure(allyTokens: readonly UnitToken[]): AllyRowPressure {
+  const rows: AllyRowPressure = new Map();
+  for (const token of allyTokens) {
+    const row = token.cy;
+    const col = token.cx;
+    let info = rows.get(row);
+    if (!info) {
+      info = { total: 0, nearByCol: new Map<number, number>() };
+      rows.set(row, info);
+    }
+    info.total += 1;
+    for (let delta = -1; delta <= 1; delta += 1) {
+      const key = col - delta;
+      info.nearByCol.set(key, (info.nearByCol.get(key) ?? 0) + 1);
+    }
+  }
+  return rows;
+}
+
+function safetyScoreFast(cx: number, cy: number, allyPressure: AllyRowPressure): number {
+  const info = allyPressure.get(cy);
+  if (!info) return 1;
+  const near = info.nearByCol.get(cx) ?? 0;
+  const far = info.total - near;
   return Math.max(0, Math.min(1, 1 - ((near * 0.6 + far * 0.2) / 3)));
 }
 
@@ -309,23 +330,23 @@ function candidateBlocked(
   return null;
 }
 
-function rowCrowdingFactor(
-  Game: SessionState,
-  cy: number,
-  enemyTokens?: readonly UnitToken[] | null,
-): number {
-  const ours = (Array.isArray(enemyTokens) ? enemyTokens : tokensAlive(Game).filter((t) => t.side === 'enemy')).filter(
-    (t) => t.cy === cy,
-  ).length;
-  let queued = 0;
-  const queue = Game.queued.enemy;
-  for (const request of queue.values()) {
-  if (request && request.cy === cy) queued += 1;
+function buildEnemyRowCrowding(Game: SessionState, enemyTokens: readonly UnitToken[]): Map<number, number> {
+  const rowCounts = new Map<number, number>();
+  for (const token of enemyTokens) {
+    rowCounts.set(token.cy, (rowCounts.get(token.cy) ?? 0) + 1);
   }
-  const n = ours + queued;
-  if (n >= 3) return 0.7;
-  if (n === 2) return CFG.AI?.ROW_CROWDING_PENALTY ?? 0.85;
-  return 1;
+  for (const request of Game.queued.enemy.values()) {
+    if (request && Number.isFinite(request.cy)) {
+      rowCounts.set(request.cy, (rowCounts.get(request.cy) ?? 0) + 1);
+    }
+  }
+  const factorByRow = new Map<number, number>();
+  for (const [row, count] of rowCounts.entries()) {
+    if (count >= 3) factorByRow.set(row, 0.7);
+    else if (count === 2) factorByRow.set(row, CFG.AI?.ROW_CROWDING_PENALTY ?? 0.85);
+    else factorByRow.set(row, 1);
+  }
+  return factorByRow;
 }
 
 function roleBias(className: unknown, cx: number): number {
@@ -455,6 +476,8 @@ export function aiMaybeAct(Game: SessionState, reason: AI_REASON): void {
   const alive = tokensAlive(Game);
   const aliveAllies = alive.filter((t) => t.side === 'ally');
   const aliveEnemies = alive.filter((t) => t.side === 'enemy');
+  const allyPressure = buildAllyRowPressure(aliveAllies);
+  const rowFactorByCy = buildEnemyRowCrowding(Game, aliveEnemies);
 
   const cells = listEmptyEnemySlots(Game, alive);
   if (!cells.length) {
@@ -476,6 +499,8 @@ export function aiMaybeAct(Game: SessionState, reason: AI_REASON): void {
   const keepTop = dbgCfg.keepTop;
   const trackTopCandidates = keepTop > 0;
   const topCandidates: CandidateEvaluation[] = [];
+  const etaBySlot = new Map<number, number>();
+  const summonerFeasibilityByCardSlot = new Map<string, number>();
 
   const insertTopCandidate = trackTopCandidates
     ? (entry: CandidateEvaluation): void => {
@@ -500,9 +525,18 @@ export function aiMaybeAct(Game: SessionState, reason: AI_REASON): void {
     const kitTraits = detectKitTraits(meta);
     for (const cell of cells) {
       const p = pressureScore(cell.cx, cell.cy);
-      const s = safetyScore(Game, cell.cx, cell.cy, aliveAllies);
-      const e = etaScoreEnemy(Game, cell.s);
-      const sf = summonerFeasibility(Game, card.id, cell.s, alive);
+      const s = safetyScoreFast(cell.cx, cell.cy, allyPressure);
+      const e = etaBySlot.get(cell.s) ?? (() => {
+        const eta = etaScoreEnemy(Game, cell.s);
+        etaBySlot.set(cell.s, eta);
+        return eta;
+      })();
+      const summonKey = `${card.id}:${cell.s}`;
+      const sf = summonerFeasibilityByCardSlot.get(summonKey) ?? (() => {
+        const summonValue = summonerFeasibility(Game, card.id, cell.s, alive);
+        summonerFeasibilityByCardSlot.set(summonKey, summonValue);
+        return summonValue;
+      })();
 
       const kitInstantScore = kitTraits.hasInstant ? e : 0;
       const kitDefenseScore = kitTraits.hasDefBuff ? 1 - s : 0;
@@ -519,7 +553,7 @@ export function aiMaybeAct(Game: SessionState, reason: AI_REASON): void {
       };
 
       const baseScore = Object.values(contributions).reduce((acc, val) => acc + val, 0);
-      const rowFactor = rowCrowdingFactor(Game, cell.cy, aliveEnemies);
+      const rowFactor = rowFactorByCy.get(cell.cy) ?? 1;
       const roleFactor = roleBias(meta?.class, cell.cx);
       const finalScore = baseScore * rowFactor * roleFactor;
 
