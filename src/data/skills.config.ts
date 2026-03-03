@@ -3,63 +3,6 @@
 const skillsConfig = [
   {
     unitId: 'thien_luu',
-    basic: {
-      name: 'Thiên Kiếm Thuần Quang',
-      type: 'basic',
-      tags: ['single-target', 'flying'],
-      damage: { multiplier: 1.05 },
-      description: 'Phóng kiếm khí tinh khiết từ trên cao, gây 105% sát thương. Nếu mục tiêu chịu ảnh hưởng thời tiết, cộng thêm 15% chính xác.'
-    },
-    skills: [
-      {
-        key: 'skill1',
-        name: 'Phong Vũ Dẫn Hướng',
-        type: 'active',
-        cost: { aether: 20 },
-        duration: { turns: 2 },
-        weather: 'storm',
-        buffs: [{ stats: { SPD: 0.12 } }],
-        description: 'Điều chỉnh khí tượng sang trạng thái Bão trong 2 lượt và tăng 12% SPD cho Thiên Lưu.'
-      },
-      {
-        key: 'skill2',
-        name: 'Thiên Quang Liên Xạ',
-        type: 'active',
-        cost: { aether: 25 },
-        hits: 3,
-        targets: 'randomEnemies',
-        damage: { multiplier: 0.75 },
-        bonusDamage: { condition: 'storm', amount: 0.20 },
-        description: 'Bắn ba tia kiếm quang ngẫu nhiên, mỗi tia 75% sát thương; khi trời Bão, mỗi tia cộng thêm 20% sát thương.'
-      },
-      {
-        key: 'skill3',
-        name: 'Tinh Không Phi Hành',
-        type: 'active',
-        cost: { aether: 30 },
-        duration: { turns: 2 },
-        flying: true,
-        buffs: [{ effect: 'dodgeRanged', amount: 0.35 }],
-        shields: [{ target: 'ally', percentMaxHP: 0.18 }],
-        description: 'Bay lên không trung 2 lượt, tăng 35% né đòn tầm xa và cấp lá chắn 18% Max HP cho một đồng minh bất kỳ.'
-      }
-    ],
-    ult: {
-      name: 'Thiên Lưu Tụ Quang',
-      type: 'ultimate',
-      tags: ['aoe', 'weather'],
-      damage: { multiplier: 2.60 },
-      weather: 'aurora',
-      debuffs: [{ id: 'accuracy_down', amount: 0.20, turns: 2 }],
-      buffs: [{ target: 'allies', effect: 'critRate', amount: 0.20, duration: { turns: 2 } }],
-      description: 'Gọi cực quang phủ chiến trường: gây 260% sát thương toàn địch, giảm 20% chính xác của chúng 2 lượt và ban +20% tỉ lệ chí mạng cho đồng minh.'
-    },
-    talent: {
-      name: 'Sứ Mệnh Khí Tượng',
-      type: 'talent',
-      description: 'Thiên Lưu xoay vòng thời tiết giữa Quang Đãng → Bão → Cực Quang; mỗi trạng thái cấp lần lượt +5% ATK, +8% SPD, +20% chí mạng cộng thêm.'
-    },
-    technique: null,
     notes: [
       'Ult tự chuyển thời tiết sang Cực Quang dù đang trạng thái khác.',
       'Theo vòng khí tượng, nếu bị tái thiết lập sẽ bắt đầu từ Quang Đãng.'
@@ -67,64 +10,6 @@ const skillsConfig = [
   },
   {
     unitId: 'mong_yem',
-    basic: {
-      name: 'Mộng Phệ',
-      type: 'basic',
-      tags: ['single-target', 'sleep-setup'],
-      debuffs: [{ id: 'me_hoac', stacks: 1, maxStacks: 3, purgeable: false }],
-      description: 'Tấn công một mục tiêu bằng 100% WIL + ATK và đặt 1 tầng Mê Hoặc (tối đa 3, không thể bị thanh tẩy). Đạt 3 tầng khiến mục tiêu ngủ 1 lượt và đặt lại số tầng.'
-    },
-    skills: [
-      {
-        key: 'skill1',
-        name: 'Huyễn Ảnh Che Màn',
-        type: 'active',
-        cost: { aether: 30 },
-        duration: { turns: 3 },
-        buffs: [{ effect: 'dodgeBasic', amount: 0.50 }],
-        description: 'Bao phủ bản thân bằng ảo ảnh trong 3 lượt: giảm 50% tỉ lệ bị trúng bởi đòn đánh thường. Không ảnh hưởng tới kỹ năng hay tuyệt kỹ của địch.'
-      },
-      {
-        key: 'skill2',
-        name: 'Thụy Ca Tự Miên',
-        type: 'active',
-        cost: { aether: 30 },
-        duration: { turns: 99 },
-        selfStatus: { id: 'tu_mien', kind: 'sleep', cannotAct: true },
-        buffs: [{ effect: 'damageTaken', amount: -0.50 }],
-        stackingBuffs: [{ stats: { ATK: 0.07, WIL: 0.07 }, trigger: 'turnEnd' }],
-        description: 'Ru mình vào giấc ngủ cho đến khi được đánh thức: không thể hành động khi ngủ, sát thương nhận vào giảm 50% và mỗi lượt đang ngủ cộng 7% ATK/WIL. Tự thức khi HP ≤ 35% hoặc người chơi hủy thủ công.'
-      },
-      {
-        key: 'skill3',
-        name: 'Phá Mộng Tàn Ca',
-        type: 'active',
-        cost: { aether: 25 },
-        tags: ['burst'],
-        damage: { multiplier: 1.80 },
-        bonusDamage: { perMark: { id: 'me_hoac', amount: 0.20, maxStacks: 3 } },
-        pierce: { whenTargetSleeping: { arm: 0.30, res: 0.30 } },
-        marks: [{ id: 'me_hoac', stacks: 1, targets: 2, transfer: true }],
-        description: 'Gây 180% sát thương đòn đánh thường lên một mục tiêu. Mỗi tầng Mê Hoặc trên mục tiêu tăng 20% sát thương (tối đa +60%). Nếu mục tiêu đang ngủ, bỏ qua 30% ARM/RES và lan 1 tầng Mê Hoặc sang tối đa 2 kẻ địch khác.'
-      }
-    ],
-    ult: {
-      name: 'Thế Giới Thứ Hai',
-      type: 'ultimate',
-      tags: ['field', 'support'],
-      duration: { turns: 3 },
-      randomBuffs: { allies: 1, enemies: 1 },
-      description: 'Kéo toàn bộ chiến trường vào “Thế Giới Thứ Hai” trong 3 lượt: mỗi đồng minh hiện tại và đồng minh vào sân trong thời gian này nhận một buff ngẫu nhiên; mỗi kẻ địch nhận một debuff ngẫu nhiên. Không gây sát thương trực tiếp.'
-    },
-    talent: {
-      name: 'Mê Ca Dẫn Thụy',
-      type: 'talent',
-      maxStacks: 3,
-      sleepOnCap: { turns: 1 },
-      purgeable: false,
-      description: 'Mọi nguồn sát thương của Mộng Yểm đặt 1 tầng Mê Hoặc (tối đa 3). Đạt 3 tầng khiến mục tiêu ngủ 1 lượt rồi đặt lại về 0 tầng; tầng Mê Hoặc không thể bị thanh tẩy bởi cơ chế thanh tẩy thông thường.'
-    },
-    technique: null,
     notes: [
       'Mê Hoặc không tự rơi theo thời gian nhưng bị reset mỗi khi ngủ kích hoạt.',
       'Thụy Ca Tự Miên cho phép người chơi chạm hai lần vào thẻ nhân vật ở lượt địch để đánh thức sớm.'

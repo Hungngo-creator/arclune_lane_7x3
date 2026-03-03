@@ -94,6 +94,59 @@ type RawSkillSet = Readonly<
     UnknownRecord
 >;
 
+function isUnknownRecord(value: unknown): value is UnknownRecord{
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
+function toSkillSection(value: unknown, fallbackType: SkillSection['type'] = 'active'): SkillSection | null{
+  if (!isUnknownRecord(value)) return null;
+  const name = typeof value.name === 'string' ? value.name : '';
+  const type = typeof value.type === 'string' ? value.type : fallbackType;
+  const description = typeof value.description === 'string'
+    ? value.description
+    : (typeof value.notes === 'string' ? value.notes : '');
+  const tags = Array.isArray(value.tags) ? value.tags.filter((tag): tag is string => typeof tag === 'string') : [];
+  const section: SkillSection = {
+    ...value,
+    name,
+    type,
+    description,
+    tags: ensureDomainTags(tags, fallbackKitTag(type))
+  } as SkillSection;
+  if (isUnknownRecord(value.cost)){
+    section.cost = { ...value.cost };
+  }
+  if (Array.isArray(value.notes)){
+    section.notes = value.notes.filter((note): note is string => typeof note === 'string');
+  } else if (typeof value.notes === 'string'){
+    section.notes = [value.notes];
+  }
+  return section;
+}
+
+function buildBaseSkillSetsFromRoster(): Record<UnitId, SkillEntry>{
+  return ROSTER.reduce<Record<UnitId, SkillEntry>>((acc, unit) => {
+    const unitId = unit.id as UnitId;
+    const kitRecord: Record<string, unknown> = isUnknownRecord(unit.kit) ? unit.kit : {};
+    const skills = Array.isArray(kitRecord.skills)
+      ? kitRecord.skills.map((skill: unknown) => toSkillSection(skill)).filter(isSkillSection)
+      : [];
+    const normalized: SkillEntry = {
+      unitId,
+      basic: toSkillSection(kitRecord.basic, 'basic'),
+      skill: skills[0] ?? null,
+      skills,
+      ult: toSkillSection(kitRecord.ult, 'ultimate'),
+      talent: toSkillSection(kitRecord.talent, 'talent'),
+      technique: toSkillSection(kitRecord.technique, 'technique'),
+      notes: []
+    };
+    deepFreeze(normalized);
+    acc[unitId] = normalized;
+    return acc;
+  }, {});
+}
+
 const RawSkillSetSchema = z.object({
   unitId: z.string()
 });
@@ -108,19 +161,33 @@ function collectUnknownSkillTags(skill: SkillSection | null | undefined): string
 const SKILL_KEYS = ['basic', 'skill', 'skills', 'ult', 'talent', 'technique', 'notes'] as const satisfies ReadonlyArray<keyof SkillEntry | 'skill'>;
 
 const skillSets: Readonly<Record<UnitId, SkillEntry>> = rawSkillSets.reduce<Record<UnitId, SkillEntry>>((acc, entry) => {
+  const current = acc[entry.unitId] ?? {
+    unitId: entry.unitId,
+    basic: null,
+    skill: null,
+    skills: [],
+    ult: null,
+    talent: null,
+    technique: null,
+    notes: [],
+  };
   const skills = Array.isArray(entry.skills)
     ? entry.skills.map(normalizeSkillEntry).filter(isSkillSection)
-    : [];
-  const skill = entry.skill ? normalizeSkillEntry(entry.skill) : (skills[0] ?? null);
+  : current.skills;
+  const skill = entry.skill
+    ? normalizeSkillEntry(entry.skill)
+    : (('skills' in entry) ? (skills[0] ?? null) : (current.skill ?? skills[0] ?? null));
   const normalized: SkillEntry = {
     unitId: entry.unitId,
-    basic: normalizeSection(entry.basic),
+    basic: ('basic' in entry) ? normalizeSection(entry.basic) : current.basic,
     skill,
     skills,
-    ult: normalizeSection(entry.ult),
-    talent: normalizeSection(entry.talent),
-    technique: normalizeSection(entry.technique),
-    notes: Array.isArray(entry.notes) ? [...entry.notes] : (entry.notes ? [entry.notes] : [])
+    ult: ('ult' in entry) ? normalizeSection(entry.ult) : current.ult,
+    talent: ('talent' in entry) ? normalizeSection(entry.talent) : current.talent,
+    technique: ('technique' in entry) ? normalizeSection(entry.technique) : current.technique,
+    notes: ('notes' in entry)
+      ? (Array.isArray(entry.notes) ? [...entry.notes] : (entry.notes ? [entry.notes] : []))
+      : current.notes
   };
   deepFreeze(normalized);
   const unknownTags = [
@@ -137,7 +204,7 @@ const skillSets: Readonly<Record<UnitId, SkillEntry>> = rawSkillSets.reduce<Reco
   }
   acc[entry.unitId] = normalized;
   return acc;
-}, {});
+}, buildBaseSkillSetsFromRoster());
 
 deepFreeze(skillSets);
 
