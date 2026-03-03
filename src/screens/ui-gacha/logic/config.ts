@@ -27,7 +27,6 @@ const BANNERS: BannerDefinition[] = [
       ssr: { soft: 60, softStep: 0.005, hard: 80, hardGuaranteeFeatured: false, carryOver: true },
     },
     featured: [
-      { id: 'permanent-01', name: 'Diệp Minh', rarity: 'SSR', portrait: 'assets/u_diep_minh.svg' },
       { id: 'permanent-02', name: 'Thiên Lưu', rarity: 'SSR', portrait: 'assets/u_thien_luu.svg' },
       { id: 'permanent-03', name: 'Mộ Dạ', rarity: 'SSR', portrait: 'assets/u_mo_da.svg' },
     ],
@@ -46,9 +45,6 @@ const BANNERS: BannerDefinition[] = [
       ssr: { soft: 60, softStep: 0.005, hard: 80, hardGuaranteeFeatured: false },
     },
     featured: [
-      { id: 'limited-ur-01', name: 'Nguyệt San', rarity: 'UR', portrait: 'assets/u_nguyet_san.svg' },
-      { id: 'limited-ur-02', name: 'Huyết Tịch', rarity: 'UR', portrait: 'assets/u_huyet_tich.svg' },
-      { id: 'limited-ur-03', name: 'Khai Nguyên Tử', rarity: 'UR', portrait: 'assets/u_khai_nguyen_tu.svg' },
       { id: 'limited-ssr-04', name: 'Mộng Yểm', rarity: 'SSR', portrait: 'assets/u_mong_yem.svg' },
     ],
     expiresAt: now + 7 * day,

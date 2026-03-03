@@ -1,6 +1,7 @@
 export interface SavedPlayerProfile {
   lineupDeck?: string[];
   cultivationByUnit?: Record<string, { realm: number; subRealm: number }>;
+  sectName?: string;
 }
 
 const STORAGE_KEY = 'arclune.playerProfile.v1';

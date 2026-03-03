@@ -22,6 +22,7 @@ const LINEUP_SCREEN_MODULE_ID = '@screens/lineup/index.ts' as const;
 const COLLECTION_SCREEN_MODULE_ID = '@screens/collection/index.ts' as const;
 const GACHA_SCREEN_MODULE_ID = '@screens/ui-gacha/index.ts' as const;
 const ARENA_HUB_SCREEN_MODULE_ID = '@screens/arena-hub/index.ts' as const;
+const SECT_SCREEN_MODULE_ID = './screens/sect/index.ts' as const;
 
 const MODE_TYPES = {
   PVE: '',
@@ -127,15 +128,15 @@ const MODES = [
     id: 'tongmon',
     title: 'Tông Môn',
     type: MODE_TYPES.ECONOMY,
-    status: MODE_STATUS.COMING_SOON,
+    status: MODE_STATUS.AVAILABLE,
     icon: '🏯',
     shortDescription: 'Quản lý Trấn Yêu Tháp, Tàng Kinh Các, Đan Phong và Tu Luyện Phòng gắn với kinh tế nguyên tinh.',
     unlockNotes: 'Mở khi người chơi tái thiết tông môn tàn tạ, liên kết tiến trình PvE và dòng nguyên tinh.',
-    tags: ['Kinh tế nguyên tinh', 'Coming soon'],
+    tags: ['Kinh tế nguyên tinh'],
     menuSections: ['economy'],
     shell: {
-      screenId: 'main-menu',
-      fallbackModuleId: COMING_SOON_MODULE_ID
+      screenId: 'sect',
+      moduleId: SECT_SCREEN_MODULE_ID
     }
   },
   {

@@ -105,7 +105,7 @@ describe('dealAbilityDamage SSI formula extensions', () => {
 
   
   test('realm bonus scales by class profile when not explicitly provided', () => {
-    const attacker = mkUnit({ id: 'huyet_tich', side: 'ally', atk: 200, wil: 100, realm: 2, subRealm: 5, arm: 0, res: 0 });
+    const attacker = mkUnit({ id: 'phe', side: 'ally', atk: 200, wil: 100, realm: 2, subRealm: 5, arm: 0, res: 0 });
     const target = mkUnit({ id: 'leaderB', side: 'enemy', hp: 1000, hpMax: 1000, arm: 0, res: 0 });
     const game = mkGame([attacker, target]);
 

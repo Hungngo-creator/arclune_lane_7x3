@@ -25,7 +25,7 @@ describe('pickTarget blocking rules', () => {
   });
 
   it('assassin được phép ưu tiên đánh hàng sau', () => {
-    const assassin = makeToken('nguyet_san', 'ally', 1);
+    const assassin = makeToken('mo_da', 'ally', 1);
     const frontline = makeToken('enemy-front', 'enemy', 1);
     const backline = makeToken('enemy-back', 'enemy', 7);
 

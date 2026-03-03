@@ -118,9 +118,11 @@ const SCREEN_COLLECTION = 'collection';
 const SCREEN_LINEUP = 'lineup';
 const SCREEN_GACHA = 'gacha';
 const SCREEN_ARENA_HUB = 'arena-hub';
+const SCREEN_SECT = 'sect';
 const COMING_SOON_MODULE_ID = '@modes/coming-soon.stub.ts' as const;
 const COLLECTION_SCREEN_MODULE_ID = '@screens/collection/index.ts' as const;
 const LINEUP_SCREEN_MODULE_ID = '@screens/lineup/index.ts' as const;
+const SECT_SCREEN_MODULE_ID = './screens/sect/index.ts' as const;
 const APP_SCREEN_CLASSES = [
   `app--${SCREEN_MAIN_MENU}`,
   `app--${SCREEN_PVE}`,
@@ -129,6 +131,7 @@ const APP_SCREEN_CLASSES = [
   `app--${SCREEN_LINEUP}`,
   `app--${SCREEN_GACHA}`,
   `app--${SCREEN_ARENA_HUB}`,
+  `app--${SCREEN_SECT}`,
 ];
 
 async function loadBundledModule<TModule = unknown>(id: string): Promise<TModule>{
@@ -208,7 +211,9 @@ const MODE_METADATA = (MODES as ReadonlyArray<ModeConfig>).map(mode => {
   const definition = MODE_DEFINITIONS[mode.id];
   return {
     key: mode.id,
-    id: definition?.screenId || SCREEN_MAIN_MENU,
+    id: mode.id === 'tongmon'
+      ? SCREEN_SECT
+      : (definition?.screenId || SCREEN_MAIN_MENU),
     title: mode.title,
     description: mode.shortDescription,
     icon: mode.icon,
@@ -290,6 +295,8 @@ let collectionView: MaybeViewController = null;
 let collectionRenderToken = 0;
 let lineupView: LineupViewHandle | null = null;
 let lineupRenderToken = 0;
+let sectView: MaybeViewController = null;
+let sectRenderToken = 0;
 
 function areScreenParamsEqual(current: ScreenParams, next: ScreenParams): boolean{
   if (current === next){
@@ -463,6 +470,17 @@ function destroyLineupView(): void{
     }
   }
   lineupView = null;
+}
+
+function destroySectView(): void{
+  if (sectView && typeof sectView.destroy === 'function'){
+    try {
+      sectView.destroy();
+    } catch (err) {
+      console.error('[sect] cleanup error', err);
+    }
+  }
+  sectView = null;
 }
 
 function mergeDefinitionParams(definition: ModeDefinition | null, params: ScreenParams): ScreenParams{
@@ -737,6 +755,58 @@ async function renderLineupScreen(params: ScreenParams): Promise<void>{
     screenId: SCREEN_LINEUP
   });
   lineupView = (lineupResult as LineupViewHandle | void) ?? null;
+}
+
+async function renderSectScreen(params: ScreenParams): Promise<void>{
+  const root = rootElement;
+  const shell = shellInstance;
+  if (!root || !shell) return;
+  const token = ++sectRenderToken;
+  dismissModal();
+  clearAppScreenClasses();
+  destroySectView();
+  collectionRenderToken += 1;
+  destroyCollectionView();
+  lineupRenderToken += 1;
+  destroyLineupView();
+  if (root.classList){
+    root.classList.add('app--sect');
+  }
+  if (typeof root.innerHTML === 'string'){
+    root.innerHTML = '<div class="app-loading">Đang tải tông môn...</div>';
+  }
+
+  let module: unknown;
+  try {
+    module = await loadBundledModule(SECT_SCREEN_MODULE_ID);
+  } catch (error) {
+    if (token !== sectRenderToken) return;
+    throw error;
+  }
+
+  if (token !== sectRenderToken) return;
+
+  const render = resolveModuleFunction(
+    module,
+    ['renderScreen'],
+    ['render']
+  ) as ScreenRenderer | null;
+  if (typeof render !== 'function'){
+    throw new Error('Module tông môn không cung cấp hàm render hợp lệ.');
+  }
+
+  const definition = getDefinitionByScreen(SCREEN_SECT);
+  if (!definition){
+    throw new Error('Không tìm thấy định nghĩa màn hình tông môn.');
+  }
+
+  sectView = (render({
+    root,
+    shell,
+    definition,
+    params: params || null,
+    screenId: SCREEN_SECT
+  }) ?? null);
 }
 
 function renderMainMenuScreen(): void{
@@ -1225,6 +1295,8 @@ async function mountPveScreen(params: ScreenParams): Promise<void>{
         destroyCollectionView();
         lineupRenderToken += 1;
         destroyLineupView();
+        sectRenderToken += 1;
+        destroySectView();
         lastScreen = SCREEN_MAIN_MENU;
         lastParams = nextParams;
         pveRenderToken += 1;
@@ -1239,6 +1311,8 @@ async function mountPveScreen(params: ScreenParams): Promise<void>{
         destroyCollectionView();
         lineupRenderToken += 1;
         destroyLineupView();
+        sectRenderToken += 1;
+        destroySectView();
         if (mainMenuView && typeof mainMenuView.destroy === 'function'){
           mainMenuView.destroy();
           mainMenuView = null;
@@ -1264,6 +1338,8 @@ async function mountPveScreen(params: ScreenParams): Promise<void>{
         destroyLineupView();
         if (mainMenuView && typeof mainMenuView.destroy === 'function'){
           mainMenuView.destroy();
+          sectRenderToken += 1;
+        destroySectView();
           mainMenuView = null;
         }
         lastScreen = SCREEN_LINEUP;
@@ -1287,12 +1363,39 @@ async function mountPveScreen(params: ScreenParams): Promise<void>{
         destroyLineupView();
         if (mainMenuView && typeof mainMenuView.destroy === 'function'){
           mainMenuView.destroy();
+          sectRenderToken += 1;
+        destroySectView();
           mainMenuView = null;
         }
         lastScreen = SCREEN_PVE;
         lastParams = nextParams;
         mountPveScreen(nextParams || {}).catch((error: unknown) => {
           console.error('Arclune failed to start PvE session', error);
+          if (renderMessageRef){
+            showFatalError(error, renderMessageRef, bootstrapOptions);
+          }
+        });
+        return;
+      }
+
+      if (nextScreen === SCREEN_SECT){
+        customScreenToken += 1;
+        destroyCustomScreen();
+        collectionRenderToken += 1;
+        destroyCollectionView();
+        lineupRenderToken += 1;
+        destroyLineupView();
+        sectRenderToken += 1;
+        destroySectView();
+        if (mainMenuView && typeof mainMenuView.destroy === 'function'){
+          mainMenuView.destroy();
+          mainMenuView = null;
+        }
+        lastScreen = SCREEN_SECT;
+        lastParams = nextParams;
+        pveRenderToken += 1;
+        renderSectScreen(nextParams || null).catch((error: unknown) => {
+          console.error('Arclune failed to load sect screen', error);
           if (renderMessageRef){
             showFatalError(error, renderMessageRef, bootstrapOptions);
           }
@@ -1309,6 +1412,8 @@ async function mountPveScreen(params: ScreenParams): Promise<void>{
       destroyCollectionView();
       lineupRenderToken += 1;
       destroyLineupView();
+      sectRenderToken += 1;
+      destroySectView();
 
       lastScreen = nextScreen;
       lastParams = nextParams;

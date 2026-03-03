@@ -186,6 +186,11 @@ export function createModeCard(
     showStatus: options.showStatus !== false
   });
 
+const resolvedTargetScreen = mode.key === 'tongmon'
+    ? 'sect'
+    : (mode.id ?? mode.key ?? 'main-menu');
+  button.dataset.targetScreen = resolvedTargetScreen;
+
   const handleClick = (event: MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
@@ -194,7 +199,7 @@ export function createModeCard(
       return;
     }
     if (!shell || typeof shell.enterScreen !== 'function') return;
-    const targetScreen = mode.id ?? mode.key ?? 'main-menu';
+    const targetScreen = resolvedTargetScreen;
     if (mode.status === 'coming-soon'){
       if (typeof onShowComingSoon === 'function'){
         onShowComingSoon(mode);
