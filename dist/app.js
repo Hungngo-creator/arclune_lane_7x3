@@ -8457,10 +8457,8 @@ __define('./engine.ts', (exports, module, __require) => {
           }
       }
       if (typeof window !== 'undefined') {
-          const { innerWidth, visualViewport } = window;
+          const { innerWidth } = window;
           viewportW = Math.min(viewportW, coerceFinite(innerWidth, viewportW));
-          const vvWidth = visualViewport ? coerceFinite(visualViewport.width, viewportW) : viewportW;
-          viewportW = Math.min(viewportW, vvWidth);
       }
       if (typeof document !== 'undefined') {
           const docWidth = coerceFinite(document.documentElement?.clientWidth, viewportW);
@@ -8501,18 +8499,6 @@ __define('./engine.ts', (exports, module, __require) => {
       }
       if (!Number.isFinite(dpr) || dpr <= 0) {
           dpr = 1;
-      }
-      if (typeof window !== 'undefined') {
-          const visualViewport = window.visualViewport;
-          if (visualViewport) {
-              const vvScale = coerceFinite(visualViewport.scale, 1);
-              if (vvScale > 0) {
-                  const scaledDpr = dpr * vvScale;
-                  if (Number.isFinite(scaledDpr) && scaledDpr > 0) {
-                      dpr = Math.min(dpr, scaledDpr);
-                  }
-              }
-          }
       }
       const pixelW = Math.max(1, Math.round(displayW * dpr));
       const pixelH = Math.max(1, Math.round(displayH * dpr));
@@ -10145,6 +10131,36 @@ __define('./entry.ts', (exports, module, __require) => {
           window.clearTimeout(allowExit);
           params.onExit();
       }, { once: true });
+  }
+  async function requestLandscapeForGameplay() {
+      if (typeof window === 'undefined')
+          return;
+      const screenApi = window.screen;
+      const orientationApi = screenApi && 'orientation' in screenApi
+          ? screenApi.orientation
+          : null;
+      if (!orientationApi || typeof orientationApi.lock !== 'function')
+          return;
+      try {
+          await orientationApi.lock('landscape');
+          return;
+      }
+      catch (_error) {
+          // Một số trình duyệt yêu cầu fullscreen trước khi lock orientation.
+      }
+      const doc = typeof document !== 'undefined' ? document : null;
+      const root = doc?.documentElement;
+      if (!root || typeof root.requestFullscreen !== 'function')
+          return;
+      try {
+          if (!doc?.fullscreenElement) {
+              await root.requestFullscreen();
+          }
+          await orientationApi.lock('landscape');
+      }
+      catch (_error) {
+          // Best effort: không chặn người chơi nếu thiết bị không hỗ trợ.
+      }
   }
   function teardownActiveSession() {
       if (!shellInstance)
@@ -17641,7 +17657,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       }
       const resolveCurrentCultivation = () => {
           const unitCultivation = activeUnitId ? savedCultivationByUnit[activeUnitId] : null;
-          const cultivation = unitCultivation ?? mutablePlayerState.cultivation ?? {};
+          const cultivation = unitCultivation ?? { realm: 1, subRealm: 0 };
           const realm = Number.isFinite(cultivation.realm) ? Number(cultivation.realm) : 1;
           const subRealm = Number.isFinite(cultivation.subRealm) ? Number(cultivation.subRealm) : 0;
           return {
@@ -17695,7 +17711,6 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           mutablePlayerState.currencies = { ...(upgraded.playerState.currencies ?? {}) };
           syncSharedCurrencyWallet(mutablePlayerState.currencies);
           const nextCultivation = { ...(upgraded.playerState.cultivation ?? {}) };
-          mutablePlayerState.cultivation = nextCultivation;
           savedCultivationByUnit[activeUnitId] = {
               realm: Number(nextCultivation.realm ?? upgraded.newRealm),
               subRealm: Number(nextCultivation.subRealm ?? upgraded.newSubRealm),

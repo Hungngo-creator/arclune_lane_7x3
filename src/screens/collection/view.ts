@@ -982,7 +982,7 @@ const overlayDetailPanel = document.createElement('aside');
 
 const resolveCurrentCultivation = () => {
     const unitCultivation = activeUnitId ? savedCultivationByUnit[activeUnitId] : null;
-    const cultivation = unitCultivation ?? mutablePlayerState.cultivation ?? {};
+    const cultivation = unitCultivation ?? { realm: 1, subRealm: 0 };
     const realm = Number.isFinite(cultivation.realm) ? Number(cultivation.realm) : 1;
     const subRealm = Number.isFinite(cultivation.subRealm) ? Number(cultivation.subRealm) : 0;
     return {
@@ -1042,7 +1042,6 @@ const resolveCurrentCultivation = () => {
     mutablePlayerState.currencies = { ...(upgraded.playerState.currencies ?? {}) };
     syncSharedCurrencyWallet(mutablePlayerState.currencies);
     const nextCultivation = { ...(upgraded.playerState.cultivation ?? {}) };
-    mutablePlayerState.cultivation = nextCultivation;
     savedCultivationByUnit[activeUnitId] = {
       realm: Number(nextCultivation.realm ?? upgraded.newRealm),
       subRealm: Number(nextCultivation.subRealm ?? upgraded.newSubRealm),

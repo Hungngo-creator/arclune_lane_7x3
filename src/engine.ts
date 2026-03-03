@@ -169,10 +169,8 @@ export function makeGrid(canvas: HTMLCanvasElement | null | undefined, cols: num
   }
 
   if (typeof window !== 'undefined') {
-    const { innerWidth, visualViewport } = window;
+    const { innerWidth } = window;
     viewportW = Math.min(viewportW, coerceFinite(innerWidth, viewportW));
-    const vvWidth = visualViewport ? coerceFinite(visualViewport.width, viewportW) : viewportW;
-    viewportW = Math.min(viewportW, vvWidth);
   }
   if (typeof document !== 'undefined') {
     const docWidth = coerceFinite(document.documentElement?.clientWidth, viewportW);
@@ -218,19 +216,6 @@ export function makeGrid(canvas: HTMLCanvasElement | null | undefined, cols: num
 
   if (!Number.isFinite(dpr) || dpr <= 0) {
     dpr = 1;
-  }
-
-  if (typeof window !== 'undefined') {
-    const visualViewport = window.visualViewport;
-    if (visualViewport) {
-      const vvScale = coerceFinite(visualViewport.scale, 1);
-      if (vvScale > 0) {
-        const scaledDpr = dpr * vvScale;
-        if (Number.isFinite(scaledDpr) && scaledDpr > 0) {
-          dpr = Math.min(dpr, scaledDpr);
-        }
-      }
-    }
   }
 
   const pixelW = Math.max(1, Math.round(displayW * dpr));

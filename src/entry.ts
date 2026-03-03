@@ -932,6 +932,35 @@ function showBattleResultOverlay(
   }, { once: true });
 }
 
+async function requestLandscapeForGameplay(): Promise<void>{
+  if (typeof window === 'undefined') return;
+  const screenApi = window.screen;
+  const orientationApi = screenApi && 'orientation' in screenApi
+    ? (screenApi.orientation as (ScreenOrientation & { lock?: (orientation: string) => Promise<void> }) | null)
+    : null;
+  if (!orientationApi || typeof orientationApi.lock !== 'function') return;
+
+  try {
+    await orientationApi.lock('landscape');
+    return;
+  } catch (_error) {
+    // Một số trình duyệt yêu cầu fullscreen trước khi lock orientation.
+  }
+
+  const doc = typeof document !== 'undefined' ? document : null;
+  const root = doc?.documentElement as (HTMLElement & { requestFullscreen?: () => Promise<void> }) | null;
+  if (!root || typeof root.requestFullscreen !== 'function') return;
+
+  try {
+    if (!doc?.fullscreenElement) {
+      await root.requestFullscreen();
+    }
+    await orientationApi.lock('landscape');
+  } catch (_error) {
+    // Best effort: không chặn người chơi nếu thiết bị không hỗ trợ.
+  }
+}
+
 function teardownActiveSession(): void{
   if (!shellInstance) return;
   const current = shellInstance.getState()?.activeSession as { stop?: () => void } | null;
