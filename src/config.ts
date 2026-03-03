@@ -37,15 +37,15 @@ const backgroundDefinitions = {
     props: [
       {
         type: 'stone-obelisk',
-        cell: { cx: -0.8, cy: -0.2 },
-        offset: { x: -0.35, y: -0.08 },
+        cell: { cx: -0.5, cy: 1 },
+        offset: { x: 0, y: -0.06 },
         scale: 1.02,
         alpha: 0.94,
       },
       {
         type: 'stone-obelisk',
-        cell: { cx: 6.8, cy: -0.25 },
-        offset: { x: 0.32, y: -0.1 },
+        cell: { cx: 6.5, cy: 1 },
+        offset: { x: 0, y: -0.06 },
         scale: 1.02,
         alpha: 0.94,
         flip: -1,

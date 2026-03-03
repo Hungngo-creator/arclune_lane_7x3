@@ -637,6 +637,13 @@ let tickLoopUsesTimeout = false;
 let resizeHandler: (() => void) | null = null;
 let visualViewportResizeHandler: (() => void) | null = null;
 let visualViewportScrollHandler: (() => void) | null = null;
+let viewportResizeDebugState: {
+  width: number;
+  height: number;
+  scale: number;
+  offsetTop: number;
+  offsetLeft: number;
+} | null = null;
 let resizeSchedulerHandle: FrameHandle | null = null;
 let resizeSchedulerUsesTimeout = false;
 let pendingResize = false;
@@ -859,6 +866,49 @@ function scheduleResize(): void {
   } else {
     resizeSchedulerUsesTimeout = true;
     resizeSchedulerHandle = setTimeout(flushScheduledResize, 32);
+  }
+}
+
+function scheduleViewportResizeIfChanged(reason: 'resize' | 'scroll'): void {
+  const viewport = winRef?.visualViewport;
+  if (!viewport) {
+    scheduleResize();
+    return;
+  }
+  const nextState = {
+    width: Number.isFinite(viewport.width) ? viewport.width : 0,
+    height: Number.isFinite(viewport.height) ? viewport.height : 0,
+    scale: Number.isFinite(viewport.scale) ? viewport.scale : 1,
+    offsetTop: Number.isFinite(viewport.offsetTop) ? viewport.offsetTop : 0,
+    offsetLeft: Number.isFinite(viewport.offsetLeft) ? viewport.offsetLeft : 0,
+  };
+
+  const prev = viewportResizeDebugState;
+  viewportResizeDebugState = nextState;
+  if (!prev) {
+    scheduleResize();
+    return;
+  }
+
+  const widthChanged = Math.abs(nextState.width - prev.width) >= 1;
+  const heightChanged = Math.abs(nextState.height - prev.height) >= 1;
+  const scaleChanged = Math.abs(nextState.scale - prev.scale) >= 0.01;
+
+  if (widthChanged || heightChanged || scaleChanged || reason === 'resize') {
+    scheduleResize();
+    return;
+  }
+
+  // Debug nguyên nhân lag: khi lướt dọc ở landscape, visualViewport.scroll bắn liên tục
+  // dù kích thước viewport không đổi => resize/draw bị gọi lại không cần thiết.
+  if (reason === 'scroll' && typeof console !== 'undefined' && typeof console.debug === 'function'){
+    console.debug('[pve][viewport-scroll] skip resize: size unchanged', {
+      width: nextState.width,
+      height: nextState.height,
+      scale: nextState.scale,
+      offsetTop: nextState.offsetTop,
+      offsetLeft: nextState.offsetLeft,
+    });
   }
 }
 
@@ -1996,13 +2046,13 @@ function init(): boolean {
     if (visualViewportResizeHandler && typeof viewport.removeEventListener === 'function'){
       viewport.removeEventListener('resize', visualViewportResizeHandler);
     }
-    visualViewportResizeHandler = (): void => { scheduleResize(); };
+    visualViewportResizeHandler = (): void => { scheduleViewportResizeIfChanged('resize'); };
     viewport.addEventListener('resize', visualViewportResizeHandler);
 
     if (visualViewportScrollHandler && typeof viewport.removeEventListener === 'function'){
       viewport.removeEventListener('scroll', visualViewportScrollHandler);
     }
-    visualViewportScrollHandler = (): void => { scheduleResize(); };
+    visualViewportScrollHandler = (): void => { scheduleViewportResizeIfChanged('scroll'); };
     viewport.addEventListener('scroll', visualViewportScrollHandler);
   }
 
@@ -2921,6 +2971,7 @@ function clearSessionListeners(): void {
   }
   visualViewportResizeHandler = null;
   visualViewportScrollHandler = null;
+  viewportResizeDebugState = null;
   cancelScheduledResize();
   unbindArtSpriteListener();
   unbindVisibility();

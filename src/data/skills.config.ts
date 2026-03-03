@@ -1086,9 +1086,9 @@ const skillsConfig = [
         type: 'active',
         cost: { aether: 15 },
         hpTrade: { sacrificeSelf: true },
-        reviveDelay: { turns: 4, ragePercent: 0.5, hpPercent: 0.5, aether: 0 },
+        reviveDelay: { turns: 3, ragePercent: 0.5, hpPercent: 0.5, aether: 0 },
         buffs: [{ target: 'leader', effect: 'indomitability', stacks: 1 }],
-        description: 'Hy sinh bản thân (HP về 0) để ban cho Leader 1 tầng Bất Khuất. Sau 4 lượt, Kỳ Diêu hồi sinh ngẫu nhiên trên sân với 0 Aether, 50% nộ tối đa và 50% HP tối đa; nếu sân kín cô biến mất vĩnh viễn.'
+        description: 'Hy sinh bản thân (HP về 0) để ban cho Leader 1 tầng Bất Khuất trong 2 lượt. Sau 3 lượt, Kỳ Diêu hồi sinh ngẫu nhiên trên sân với 0 Aether, 50% nộ tối đa và 50% HP tối đa; nếu sân kín cô biến mất vĩnh viễn.'
       },
       {
         key: 'skill3',
@@ -1105,7 +1105,8 @@ const skillsConfig = [
       type: 'ultimate',
       tags: ['revive'],
       revive: { targets: 1, priority: 'recent', hpPercent: 0.15, ragePercent: 0, lockSkillsTurns: 1 },
-      description: 'Hồi sinh một đồng minh ngẫu nhiên (ưu tiên người vừa ngã xuống gần nhất). Khi sống lại, mục tiêu nhận tối đa 15% Máu tối đa của chính họ, nộ về 0 và bị khoá kỹ năng trong 1 lượt.'
+      buffs: [{ target: 'revived', stat: 'damageTaken', percent: -0.50, duration: { turns: 1 } }],
+      description: 'Hồi sinh một đồng minh ngẫu nhiên (ưu tiên người vừa ngã xuống gần nhất). Khi sống lại, mục tiêu nhận 15% Máu tối đa, nộ về 0, bị khoá kỹ năng trong 1 lượt và giảm 50% sát thương nhận vào trong 1 lượt.'
     },
     talent: {
       name: 'Phục Tế Khôi Minh',

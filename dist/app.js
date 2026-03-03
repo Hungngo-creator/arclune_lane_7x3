@@ -2717,7 +2717,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           kit: {
               onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
               basic: asUnknownRecord({
-                  name: 'Đánh Thường',
+                  name: 'Mộng Phệ',
                   tags: ['single-target', 'sleep-setup'],
                   debuff: { id: 'me_hoac', stacks: 1, maxStacks: 3, purgeable: false }
               }),
@@ -2797,7 +2797,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           kit: {
               onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, bonusMaxHPPercent: 0.10 }),
               basic: asUnknownRecord({
-                  name: 'Đánh Thường',
+                  name: 'Ảnh Kích',
                   tags: ['single-target']
               }),
               skills: asUnknownRecordArray([
@@ -2877,7 +2877,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           kit: {
               onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, bonusSPDPercent: 0.10 }),
               basic: asUnknownRecord({
-                  name: 'Đánh Thường',
+                  name: 'Ma Chưởng',
                   tags: ['single-target', 'mark-builder'],
                   debuff: { id: 'ma_chung', stacks: 1, purgeable: false }
               }),
@@ -2888,7 +2888,7 @@ __define('./catalog.ts', (exports, module, __require) => {
                       cost: { aether: 30 },
                       consumeMarks: { id: 'ma_chung', scope: 'all' },
                       bonusPerMark: { stat: 'HP', amount: 0.05 },
-                      notes: 'Thu hồi toàn bộ Ma Chủng trên chiến trường, mỗi tầng chuyển thành +5% Max HP tạm thời.'
+                      notes: 'Thu hồi toàn bộ Ma Chủng trên chiến trường, mỗi tầng chuyển thành +5% Max HP vĩnh viễn (tối đa +100% Max HP), đồng thời hồi lượng HP tương ứng.'
                   },
                   {
                       key: 'skill2',
@@ -2896,7 +2896,7 @@ __define('./catalog.ts', (exports, module, __require) => {
                       cost: { aether: 25 },
                       requiresTotalMarks: { id: 'ma_chung', amount: 12 },
                       stance: 'ma_chu',
-                      notes: 'Khi tổng Ma Chủng ≥ 12, thu hồi Ma Chủng trên một mục tiêu để hoá Ma Chủ: mất quyền dùng Ultimate và mọi Ma Chủng cấy tiếp gây thêm +2% sát thương cuối dạng Thuật.'
+                      notes: 'Khi tổng Ma Chủng ≥ 12, thu hồi Ma Chủng trên một mục tiêu để hoá Ma Chủ. Từ đây mở khóa Ultimate dạng Ma Chủ (Thiên Ma Độc Tôn) và mọi Ma Chủng cấy tiếp gây thêm +2% sát thương cuối dạng Thuật.'
                   },
                   {
                       key: 'skill3',
@@ -2911,7 +2911,21 @@ __define('./catalog.ts', (exports, module, __require) => {
                   }
               ]),
               ult: asUnknownRecord({
-                  type: 'mark-detonation',
+                  type: 'dual-form',
+                  forms: {
+                      normal: {
+                          name: 'Ma Chủng Phán Quyết',
+                          type: 'mark-detonation',
+                          consumesMarks: true
+                      },
+                      maChu: {
+                          name: 'Thiên Ma Độc Tôn',
+                          type: 'single-target-burst',
+                          damageMultiplier: 3.00,
+                          consumesMarks: false,
+                          benefitsFromMarkConversion: true
+                      }
+                  },
                   aoe: 'allEnemies',
                   markId: 'ma_chung',
                   damagePerMark: { percentTargetMaxHP: 0.05, scaleWIL: 0.00 },
@@ -2947,7 +2961,7 @@ __define('./catalog.ts', (exports, module, __require) => {
               ]),
               traits: asUnknownRecordArray([
                   { id: 'ma_chung_decay', text: 'Ma Chủng mất sau 3 lượt không được cấy thêm; không có trần cộng dồn.' },
-                  { id: 'ma_chu_lock', text: 'Ở trạng thái Ma Chủ, Diệp Lâm không thể dùng Tuyệt kỹ.' }
+                  { id: 'ma_chu_ult_swap', text: 'Ở trạng thái Ma Chủ, Tuyệt kỹ được đổi sang Thiên Ma Độc Tôn và không tiêu hao Ma Chủng.' }
               ])
           }
       },
@@ -2957,7 +2971,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           kit: {
               onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
               basic: asUnknownRecord({
-                  name: 'Đánh Thường',
+                  name: 'Thủy Kích',
                   tags: ['single-target'],
                   damageMultiplier: 1.00,
                   notes: 'Vung đinh ba gây 100% ATK + 100% WIL. Ở trạng thái Ánh Sáng, đòn đánh thường hồi 10% sát thương gây ra.'
@@ -2994,10 +3008,10 @@ __define('./catalog.ts', (exports, module, __require) => {
               ult: asUnknownRecord({
                   type: 'burst',
                   tags: ['single-target'],
-                  damageMultiplier: 3.00,
+                  damageMultiplier: 2.50,
                   debuffs: [{ id: 'tram_mac', turns: 1 }],
                   selfBuff: { adaptive: true, turns: 1 },
-                  notes: 'Hải Uy Trảm Ngôn gây 300% sát thương, đặt Trầm Mặc 1 lượt và cấp "Thích Ứng" cho bản thân.'
+                  notes: 'Hải Uy Trảm Ngôn gây 250% sát thương, đặt Trầm Mặc 1 lượt và cấp 1 tầng Thích Ứng (+10% RES vĩnh viễn) cho bản thân.'
               }),
               talent: null,
               technique: null,
@@ -3023,7 +3037,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           kit: {
               onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
               basic: asUnknownRecord({
-                  name: 'Đánh Thường',
+                  name: 'Nguyện Cầu',
                   tags: ['single-target', 'heal'],
                   damageMultiplier: 1.00,
                   healRandomAllyPercentMaxHP: 0.03,
@@ -3093,7 +3107,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           kit: {
               onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
               basic: asUnknownRecord({
-                  name: 'Đánh Thường',
+                  name: 'Bổ Củi',
                   tags: ['single-target'],
                   damageMultiplier: 1.00,
                   notes: 'Đánh gậy gây 100% ATK + WIL lên 1 mục tiêu.'
@@ -3954,7 +3968,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           }
       },
       {
-          id: 'kydieu', name: 'Kỳ Diêu', class: 'Support', rank: 'SR',
+          id: 'kydieu', name: 'Kỳ Diêu', class: 'Support', rank: 'SSR',
           mods: { WIL: 0.10, RES: 0.10 },
           kit: {
               onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
@@ -3969,13 +3983,17 @@ __define('./catalog.ts', (exports, module, __require) => {
                       name: 'Thí Thân Hộ Chủ',
                       cost: { aether: 15 },
                       sacrifice: true,
-                      reviveDelayTurns: 4,
+                      reviveDelayTurns: 3,
                       reviveReturn: { hpPercent: 0.5, ragePercent: 0.5, aether: 0 },
                       grantLeader: { buff: 'indomitability', stacks: 1 }
                   },
                   { key: 'skill3', name: 'Tế Vũ Tăng Bão', cost: { aether: 20 }, duration: 4, rageGainBonus: 0.50 }
               ]),
-              ult: asUnknownRecord({ type: 'revive', targets: 1, revived: { rage: 0, lockSkillsTurns: 1, hpPercent: 0.15 } }),
+              ult: asUnknownRecord({
+                  type: 'revive',
+                  targets: 1,
+                  revived: { rage: 0, lockSkillsTurns: 1, hpPercent: 0.15, damageTakenReduction: 0.50, damageTakenReductionTurns: 1 }
+              }),
               talent: asUnknownRecord({
                   name: 'Phục Tế Khôi Minh',
                   perActionStacks: { ARM: 0.03, RES: 0.03 }
@@ -3991,7 +4009,7 @@ __define('./catalog.ts', (exports, module, __require) => {
                   }
               ]),
               traits: asUnknownRecordArray([
-                  { id: 'self_sacrifice_return', text: 'Sau 4 lượt tự hiến, Kỳ Diêu hồi sinh với 50% HP, 50% nộ và 0 Aether; sân kín thì biến mất.' },
+                  { id: 'self_sacrifice_return', text: 'Sau 3 lượt tự hiến, Kỳ Diêu hồi sinh với 50% HP, 50% nộ và 0 Aether; sân kín thì biến mất.' },
                   { id: 'revive_lock', text: 'Đồng minh do tuyệt kỹ hồi sinh bị khoá kỹ năng 1 lượt và nộ về 0.' }
               ])
           }
@@ -4684,15 +4702,15 @@ __define('./config.ts', (exports, module, __require) => {
           props: [
               {
                   type: 'stone-obelisk',
-                  cell: { cx: -0.8, cy: -0.2 },
-                  offset: { x: -0.35, y: -0.08 },
+                  cell: { cx: -0.5, cy: 1 },
+                  offset: { x: 0, y: -0.06 },
                   scale: 1.02,
                   alpha: 0.94,
               },
               {
                   type: 'stone-obelisk',
-                  cell: { cx: 6.8, cy: -0.25 },
-                  offset: { x: 0.32, y: -0.1 },
+                  cell: { cx: 6.5, cy: 1 },
+                  offset: { x: 0, y: -0.06 },
                   scale: 1.02,
                   alpha: 0.94,
                   flip: -1,
@@ -7504,9 +7522,9 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   type: 'active',
                   cost: { aether: 15 },
                   hpTrade: { sacrificeSelf: true },
-                  reviveDelay: { turns: 4, ragePercent: 0.5, hpPercent: 0.5, aether: 0 },
+                  reviveDelay: { turns: 3, ragePercent: 0.5, hpPercent: 0.5, aether: 0 },
                   buffs: [{ target: 'leader', effect: 'indomitability', stacks: 1 }],
-                  description: 'Hy sinh bản thân (HP về 0) để ban cho Leader 1 tầng Bất Khuất. Sau 4 lượt, Kỳ Diêu hồi sinh ngẫu nhiên trên sân với 0 Aether, 50% nộ tối đa và 50% HP tối đa; nếu sân kín cô biến mất vĩnh viễn.'
+                  description: 'Hy sinh bản thân (HP về 0) để ban cho Leader 1 tầng Bất Khuất trong 2 lượt. Sau 3 lượt, Kỳ Diêu hồi sinh ngẫu nhiên trên sân với 0 Aether, 50% nộ tối đa và 50% HP tối đa; nếu sân kín cô biến mất vĩnh viễn.'
               },
               {
                   key: 'skill3',
@@ -7523,7 +7541,8 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
               type: 'ultimate',
               tags: ['revive'],
               revive: { targets: 1, priority: 'recent', hpPercent: 0.15, ragePercent: 0, lockSkillsTurns: 1 },
-              description: 'Hồi sinh một đồng minh ngẫu nhiên (ưu tiên người vừa ngã xuống gần nhất). Khi sống lại, mục tiêu nhận tối đa 15% Máu tối đa của chính họ, nộ về 0 và bị khoá kỹ năng trong 1 lượt.'
+              buffs: [{ target: 'revived', stat: 'damageTaken', percent: -0.50, duration: { turns: 1 } }],
+              description: 'Hồi sinh một đồng minh ngẫu nhiên (ưu tiên người vừa ngã xuống gần nhất). Khi sống lại, mục tiêu nhận 15% Máu tối đa, nộ về 0, bị khoá kỹ năng trong 1 lượt và giảm 50% sát thương nhận vào trong 1 lượt.'
           },
           talent: {
               name: 'Phục Tế Khôi Minh',
@@ -11665,6 +11684,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   let resizeHandler = null;
   let visualViewportResizeHandler = null;
   let visualViewportScrollHandler = null;
+  let viewportResizeDebugState = null;
   let resizeSchedulerHandle = null;
   let resizeSchedulerUsesTimeout = false;
   let pendingResize = false;
@@ -11882,6 +11902,44 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       else {
           resizeSchedulerUsesTimeout = true;
           resizeSchedulerHandle = setTimeout(flushScheduledResize, 32);
+      }
+  }
+  function scheduleViewportResizeIfChanged(reason) {
+      const viewport = winRef?.visualViewport;
+      if (!viewport) {
+          scheduleResize();
+          return;
+      }
+      const nextState = {
+          width: Number.isFinite(viewport.width) ? viewport.width : 0,
+          height: Number.isFinite(viewport.height) ? viewport.height : 0,
+          scale: Number.isFinite(viewport.scale) ? viewport.scale : 1,
+          offsetTop: Number.isFinite(viewport.offsetTop) ? viewport.offsetTop : 0,
+          offsetLeft: Number.isFinite(viewport.offsetLeft) ? viewport.offsetLeft : 0,
+      };
+      const prev = viewportResizeDebugState;
+      viewportResizeDebugState = nextState;
+      if (!prev) {
+          scheduleResize();
+          return;
+      }
+      const widthChanged = Math.abs(nextState.width - prev.width) >= 1;
+      const heightChanged = Math.abs(nextState.height - prev.height) >= 1;
+      const scaleChanged = Math.abs(nextState.scale - prev.scale) >= 0.01;
+      if (widthChanged || heightChanged || scaleChanged || reason === 'resize') {
+          scheduleResize();
+          return;
+      }
+      // Debug nguyên nhân lag: khi lướt dọc ở landscape, visualViewport.scroll bắn liên tục
+      // dù kích thước viewport không đổi => resize/draw bị gọi lại không cần thiết.
+      if (reason === 'scroll' && typeof console !== 'undefined' && typeof console.debug === 'function') {
+          console.debug('[pve][viewport-scroll] skip resize: size unchanged', {
+              width: nextState.width,
+              height: nextState.height,
+              scale: nextState.scale,
+              offsetTop: nextState.offsetTop,
+              offsetLeft: nextState.offsetLeft,
+          });
       }
   }
   const DEFAULT_TOKEN_COLOR = '#a9f58c';
@@ -13065,12 +13123,12 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           if (visualViewportResizeHandler && typeof viewport.removeEventListener === 'function') {
               viewport.removeEventListener('resize', visualViewportResizeHandler);
           }
-          visualViewportResizeHandler = () => { scheduleResize(); };
+          visualViewportResizeHandler = () => { scheduleViewportResizeIfChanged('resize'); };
           viewport.addEventListener('resize', visualViewportResizeHandler);
           if (visualViewportScrollHandler && typeof viewport.removeEventListener === 'function') {
               viewport.removeEventListener('scroll', visualViewportScrollHandler);
           }
-          visualViewportScrollHandler = () => { scheduleResize(); };
+          visualViewportScrollHandler = () => { scheduleViewportResizeIfChanged('scroll'); };
           viewport.addEventListener('scroll', visualViewportScrollHandler);
       }
       const queryFromRoot = (selector) => {
@@ -13941,6 +13999,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       }
       visualViewportResizeHandler = null;
       visualViewportScrollHandler = null;
+      viewportResizeDebugState = null;
       cancelScheduledResize();
       unbindArtSpriteListener();
       unbindVisibility();
@@ -25064,7 +25123,7 @@ __define('./units.ts', (exports, module, __require) => {
       { id: 'phe', name: 'Phệ', cost: 20, rank: 'UR', role: 'Mage' },
       { id: 'kiemtruongda', name: 'Kiếm Trường Dạ', cost: 16, rank: 'UR', role: 'Warrior' },
       { id: 'loithienanh', name: 'Lôi Thiên Ảnh', cost: 18, rank: 'SSR', role: 'Tanker' }, { id: 'laky', name: 'La Kỳ', cost: 14, rank: 'SSR', role: 'Support' },
-      { id: 'kydieu', name: 'Kỳ Diêu', cost: 12, rank: 'SR', role: 'Support' },
+      { id: 'kydieu', name: 'Kỳ Diêu', cost: 12, rank: 'SSR', role: 'Support' },
       { id: 'doanminh', name: 'Doãn Minh', cost: 12, rank: 'SR', role: 'Support' },
       { id: 'tranquat', name: 'Trần Quát', cost: 10, rank: 'R', role: 'Summoner' },
       { id: 'linhgac', name: 'Lính Gác', cost: 8, rank: 'N', role: 'Warrior' },

@@ -30,7 +30,7 @@ const UNIT_LIST = [
   { id: 'phe', name: 'Phệ', cost: 20, rank: 'UR', role: 'Mage' },
   { id: 'kiemtruongda', name: 'Kiếm Trường Dạ', cost: 16, rank: 'UR', role: 'Warrior' },
   { id: 'loithienanh', name: 'Lôi Thiên Ảnh', cost: 18, rank: 'SSR', role: 'Tanker' },{ id: 'laky', name: 'La Kỳ', cost: 14, rank: 'SSR', role: 'Support' },
-  { id: 'kydieu', name: 'Kỳ Diêu', cost: 12, rank: 'SR', role: 'Support' },
+  { id: 'kydieu', name: 'Kỳ Diêu', cost: 12, rank: 'SSR', role: 'Support' },
   { id: 'doanminh', name: 'Doãn Minh', cost: 12, rank: 'SR', role: 'Support' },
   { id: 'tranquat', name: 'Trần Quát', cost: 10, rank: 'R', role: 'Summoner' },
   { id: 'linhgac', name: 'Lính Gác', cost: 8, rank: 'N', role: 'Warrior' },

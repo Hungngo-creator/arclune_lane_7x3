@@ -578,7 +578,7 @@ export const ROSTER = [
     kit: {
       onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
       basic: asUnknownRecord({
-        name: 'Đánh Thường',
+        name: 'Mộng Phệ',
         tags: ['single-target', 'sleep-setup'],
         debuff: { id: 'me_hoac', stacks: 1, maxStacks: 3, purgeable: false }
       }),
@@ -658,7 +658,7 @@ export const ROSTER = [
     kit: {
       onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, bonusMaxHPPercent: 0.10 }),
       basic: asUnknownRecord({
-        name: 'Đánh Thường',
+        name: 'Ảnh Kích',
         tags: ['single-target']
       }),
       skills: asUnknownRecordArray([
@@ -738,7 +738,7 @@ export const ROSTER = [
     kit: {
       onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, bonusSPDPercent: 0.10 }),
       basic: asUnknownRecord({
-        name: 'Đánh Thường',
+        name: 'Ma Chưởng',
         tags: ['single-target', 'mark-builder'],
         debuff: { id: 'ma_chung', stacks: 1, purgeable: false }
       }),
@@ -749,7 +749,7 @@ export const ROSTER = [
           cost: { aether: 30 },
           consumeMarks: { id: 'ma_chung', scope: 'all' },
           bonusPerMark: { stat: 'HP', amount: 0.05 },
-          notes: 'Thu hồi toàn bộ Ma Chủng trên chiến trường, mỗi tầng chuyển thành +5% Max HP tạm thời.'
+          notes: 'Thu hồi toàn bộ Ma Chủng trên chiến trường, mỗi tầng chuyển thành +5% Max HP vĩnh viễn (tối đa +100% Max HP), đồng thời hồi lượng HP tương ứng.'
         },
         {
           key: 'skill2',
@@ -757,7 +757,7 @@ export const ROSTER = [
           cost: { aether: 25 },
           requiresTotalMarks: { id: 'ma_chung', amount: 12 },
           stance: 'ma_chu',
-          notes: 'Khi tổng Ma Chủng ≥ 12, thu hồi Ma Chủng trên một mục tiêu để hoá Ma Chủ: mất quyền dùng Ultimate và mọi Ma Chủng cấy tiếp gây thêm +2% sát thương cuối dạng Thuật.'
+          notes: 'Khi tổng Ma Chủng ≥ 12, thu hồi Ma Chủng trên một mục tiêu để hoá Ma Chủ. Từ đây mở khóa Ultimate dạng Ma Chủ (Thiên Ma Độc Tôn) và mọi Ma Chủng cấy tiếp gây thêm +2% sát thương cuối dạng Thuật.'
         },
         {
           key: 'skill3',
@@ -772,7 +772,21 @@ export const ROSTER = [
         }
       ]),
       ult: asUnknownRecord({
-        type: 'mark-detonation',
+        type: 'dual-form',
+        forms: {
+          normal: {
+            name: 'Ma Chủng Phán Quyết',
+            type: 'mark-detonation',
+            consumesMarks: true
+          },
+          maChu: {
+            name: 'Thiên Ma Độc Tôn',
+            type: 'single-target-burst',
+            damageMultiplier: 3.00,
+            consumesMarks: false,
+            benefitsFromMarkConversion: true
+          }
+        },
         aoe: 'allEnemies',
         markId: 'ma_chung',
         damagePerMark: { percentTargetMaxHP: 0.05, scaleWIL: 0.00 },
@@ -808,7 +822,7 @@ export const ROSTER = [
       ]),
       traits: asUnknownRecordArray([
         { id: 'ma_chung_decay', text: 'Ma Chủng mất sau 3 lượt không được cấy thêm; không có trần cộng dồn.' },
-        { id: 'ma_chu_lock', text: 'Ở trạng thái Ma Chủ, Diệp Lâm không thể dùng Tuyệt kỹ.' }
+        { id: 'ma_chu_ult_swap', text: 'Ở trạng thái Ma Chủ, Tuyệt kỹ được đổi sang Thiên Ma Độc Tôn và không tiêu hao Ma Chủng.' }
       ])
     }
   },
@@ -818,7 +832,7 @@ export const ROSTER = [
     kit: {
       onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
       basic: asUnknownRecord({
-        name: 'Đánh Thường',
+        name: 'Thủy Kích',
         tags: ['single-target'],
         damageMultiplier: 1.00,
         notes: 'Vung đinh ba gây 100% ATK + 100% WIL. Ở trạng thái Ánh Sáng, đòn đánh thường hồi 10% sát thương gây ra.'
@@ -855,10 +869,10 @@ export const ROSTER = [
       ult: asUnknownRecord({
         type: 'burst',
         tags: ['single-target'],
-        damageMultiplier: 3.00,
+        damageMultiplier: 2.50,
         debuffs: [{ id: 'tram_mac', turns: 1 }],
         selfBuff: { adaptive: true, turns: 1 },
-        notes: 'Hải Uy Trảm Ngôn gây 300% sát thương, đặt Trầm Mặc 1 lượt và cấp "Thích Ứng" cho bản thân.'
+        notes: 'Hải Uy Trảm Ngôn gây 250% sát thương, đặt Trầm Mặc 1 lượt và cấp 1 tầng Thích Ứng (+10% RES vĩnh viễn) cho bản thân.'
       }),
       talent: null,
       technique: null,
@@ -884,7 +898,7 @@ export const ROSTER = [
     kit: {
       onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
       basic: asUnknownRecord({
-        name: 'Đánh Thường',
+        name: 'Nguyện Cầu',
         tags: ['single-target', 'heal'],
         damageMultiplier: 1.00,
         healRandomAllyPercentMaxHP: 0.03,
@@ -954,7 +968,7 @@ export const ROSTER = [
     kit: {
       onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
       basic: asUnknownRecord({
-        name: 'Đánh Thường',
+        name: 'Bổ Củi',
         tags: ['single-target'],
         damageMultiplier: 1.00,
         notes: 'Đánh gậy gây 100% ATK + WIL lên 1 mục tiêu.'
@@ -1815,7 +1829,7 @@ export const ROSTER = [
     }
   },
   {
-    id: 'kydieu', name: 'Kỳ Diêu', class: 'Support', rank: 'SR',
+    id: 'kydieu', name: 'Kỳ Diêu', class: 'Support', rank: 'SSR',
     mods: { WIL: 0.10, RES: 0.10 },
     kit: {
       onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
@@ -1830,13 +1844,17 @@ export const ROSTER = [
           name: 'Thí Thân Hộ Chủ',
           cost: { aether: 15 },
           sacrifice: true,
-          reviveDelayTurns: 4,
+          reviveDelayTurns: 3,
           reviveReturn: { hpPercent: 0.5, ragePercent: 0.5, aether: 0 },
           grantLeader: { buff: 'indomitability', stacks: 1 }
         },
         { key: 'skill3', name: 'Tế Vũ Tăng Bão', cost: { aether: 20 }, duration: 4, rageGainBonus: 0.50 }
       ]),
-      ult: asUnknownRecord({ type: 'revive', targets: 1, revived: { rage: 0, lockSkillsTurns: 1, hpPercent: 0.15 } }),
+      ult: asUnknownRecord({
+        type: 'revive',
+        targets: 1,
+        revived: { rage: 0, lockSkillsTurns: 1, hpPercent: 0.15, damageTakenReduction: 0.50, damageTakenReductionTurns: 1 }
+      }),
       talent: asUnknownRecord({
         name: 'Phục Tế Khôi Minh',
         perActionStacks: { ARM: 0.03, RES: 0.03 }
@@ -1852,7 +1870,7 @@ export const ROSTER = [
         }
       ]),
       traits: asUnknownRecordArray([
-        { id: 'self_sacrifice_return', text: 'Sau 4 lượt tự hiến, Kỳ Diêu hồi sinh với 50% HP, 50% nộ và 0 Aether; sân kín thì biến mất.' },
+        { id: 'self_sacrifice_return', text: 'Sau 3 lượt tự hiến, Kỳ Diêu hồi sinh với 50% HP, 50% nộ và 0 Aether; sân kín thì biến mất.' },
         { id: 'revive_lock', text: 'Đồng minh do tuyệt kỹ hồi sinh bị khoá kỹ năng 1 lượt và nộ về 0.' }
       ])
     }
