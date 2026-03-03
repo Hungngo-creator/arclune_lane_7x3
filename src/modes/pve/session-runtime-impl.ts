@@ -595,6 +595,53 @@ const resolveCameraPreset = (): CameraPreset => {
   return preset ?? CAM[DEFAULT_CAMERA_KEY];
 };
 const CAM_PRESET = resolveCameraPreset();
+const AETHER_DEBUG_FLAG = typeof window !== 'undefined'
+  && (((window as unknown as { __ARCLUNE_DEBUG_AETHER?: boolean }).__ARCLUNE_DEBUG_AETHER) === true
+    || new URLSearchParams(window.location.search).get('debugAether') === '1');
+
+const aetherDebugState = {
+  frames: 0,
+  totalMs: 0,
+  maxMs: 0,
+  lastRectTop: Number.NaN,
+  lastRectLeft: Number.NaN,
+};
+
+function emitAetherDebug(rect: DOMRect, elapsedMs: number): void {
+  if (!AETHER_DEBUG_FLAG) return;
+  aetherDebugState.frames += 1;
+  aetherDebugState.totalMs += elapsedMs;
+  aetherDebugState.maxMs = Math.max(aetherDebugState.maxMs, elapsedMs);
+
+  if (aetherDebugState.frames < 60) return;
+  const snapshot = globalAetherPool.debugSnapshot();
+  const avgMs = aetherDebugState.totalMs / aetherDebugState.frames;
+  const rectMoved = rect.top !== aetherDebugState.lastRectTop || rect.left !== aetherDebugState.lastRectLeft;
+
+  console.debug('[aether-debug] frame-window', {
+    frames: aetherDebugState.frames,
+    avgMs: Number(avgMs.toFixed(3)),
+    maxMs: Number(aetherDebugState.maxMs.toFixed(3)),
+    rectMoved,
+    rectTop: Number(rect.top.toFixed(2)),
+    rectLeft: Number(rect.left.toFixed(2)),
+    styleWrites: {
+      ally: snapshot.ally.styleWrites,
+      enemy: snapshot.enemy.styleWrites,
+    },
+    syncCalls: {
+      ally: snapshot.ally.syncCalls,
+      enemy: snapshot.enemy.syncCalls,
+    },
+  });
+
+  aetherDebugState.frames = 0;
+  aetherDebugState.totalMs = 0;
+  aetherDebugState.maxMs = 0;
+  aetherDebugState.lastRectTop = rect.top;
+  aetherDebugState.lastRectLeft = rect.left;
+  globalAetherPool.resetDebugSnapshot();
+}
 const getCameraPresetSignature = (preset: CameraPreset | null | undefined): string => {
   if (!preset) return 'null';
   const record = preset as Record<string, unknown>;
@@ -893,6 +940,19 @@ function scheduleViewportResizeIfChanged(reason: 'resize' | 'scroll'): void {
   const widthChanged = Math.abs(nextState.width - prev.width) >= 1;
   const heightChanged = Math.abs(nextState.height - prev.height) >= 1;
   const scaleChanged = Math.abs(nextState.scale - prev.scale) >= 0.01;
+  const offsetChanged = Math.abs(nextState.offsetTop - prev.offsetTop) >= 1
+    || Math.abs(nextState.offsetLeft - prev.offsetLeft) >= 1;
+
+  if (AETHER_DEBUG_FLAG && reason === 'scroll' && (heightChanged || scaleChanged || offsetChanged)) {
+    console.debug('[aether-debug][viewport-scroll]', {
+      widthChanged,
+      heightChanged,
+      scaleChanged,
+      offsetChanged,
+      prev,
+      next: nextState,
+    });
+  }
 
   if (widthChanged || heightChanged || scaleChanged || reason === 'resize') {
     scheduleResize();
@@ -2590,6 +2650,8 @@ function draw(): void {
       drawTokensOblique(ctx, Game.grid, tokens, CAM_PRESET);
     }
 
+const aetherSyncStart = SUPPORTS_PERF_NOW ? performance.now() : Date.now();
+
 // 1. Lấy kích thước thật của Canvas trên màn hình
     const canvasEl = canvas as HTMLCanvasElement;
     const rect = canvasEl.getBoundingClientRect();
@@ -2664,14 +2726,14 @@ function draw(): void {
 
     const allyPos = projectLeaderGroundPos(allyLeader, 0, 1);
     const enemyPos = projectLeaderGroundPos(enemyLeader, 6, 1);
-    const viewport = rect.width <= 820 ? 'mobile' : 'desktop';
     const clampMargin = Math.max(12, Math.round(rect.width * 0.02));
     const halfTileAnchor = 0.5;
     const tilePxX = grid.tile * ratioX;
+    const tilePxY = grid.tile * ratioY;
     const allyBackOffsetX = tilePxX * halfTileAnchor;
     const enemyBackOffsetX = tilePxX * halfTileAnchor;
-    const allyBackOffsetY = (viewport === 'mobile' ? 24 : 30) * allyPos.s;
-    const enemyBackOffsetY = (viewport === 'mobile' ? 24 : 30) * enemyPos.s;
+    const allyBackOffsetY = tilePxY * 0.24;
+    const enemyBackOffsetY = tilePxY * 0.24;
 
     // 5. Đồng bộ vị trí + đồng bộ bể AE chung theo đội hình sống
     globalAetherPool.syncAllVisuals(
@@ -2681,7 +2743,6 @@ function draw(): void {
        {
          ally: {
            facing: 1,
-           viewport,
             backOffsetX: allyBackOffsetX,
             backOffsetY: allyBackOffsetY,
             anchorLiftY: Number.isFinite(allyPos.anchor) ? Math.max(0, (1 - allyPos.anchor!) * 10 * allyPos.s) : 0,
@@ -2694,7 +2755,6 @@ function draw(): void {
          },
          enemy: {
            facing: -1,
-           viewport,
            backOffsetX: enemyBackOffsetX,
            backOffsetY: enemyBackOffsetY,
             anchorLiftY: Number.isFinite(enemyPos.anchor) ? Math.max(0, (1 - enemyPos.anchor!) * 10 * enemyPos.s) : 0,
@@ -2704,9 +2764,12 @@ function draw(): void {
              minY: rect.top + clampMargin,
              maxY: rect.bottom - clampMargin,
            },
-         },
-       }
+        },
+      }
    );
+
+   const aetherSyncEnd = SUPPORTS_PERF_NOW ? performance.now() : Date.now();
+    emitAetherDebug(rect, aetherSyncEnd - aetherSyncStart);
   }
   if (sessionVfx){
     vfxDraw(ctx, sessionVfx, CAM_PRESET);

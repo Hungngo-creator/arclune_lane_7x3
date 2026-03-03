@@ -29,6 +29,8 @@ __define('./aether.ts', (exports, module, __require) => {
       label = null; // Thêm label hiển thị số
       side;
       lastVisualState = null;
+      debugStyleWrites = 0;
+      debugSyncCalls = 0;
       constructor(side) {
           this.side = side;
       }
@@ -154,6 +156,7 @@ __define('./aether.ts', (exports, module, __require) => {
       syncVisuals(screenX, screenY, scale, options = {}) {
           if (!this.container)
               return;
+          this.debugSyncCalls += 1;
           if (scale < 0.1) {
               if (this.lastVisualState?.opacity !== '0')
                   this.container.style.opacity = '0';
@@ -200,7 +203,7 @@ __define('./aether.ts', (exports, module, __require) => {
               ? options.backOffsetY
               : defaultBackY;
           const facingSign = Math.sign(facing) || (this.side === 'ally' ? 1 : -1);
-          const xOffset = facingSign * backOffsetX;
+          const xOffset = -facingSign * backOffsetX;
           const yOffset = -(backOffsetY + extraAnchorLift);
           let nextLeft = screenX + xOffset;
           let nextTop = screenY + yOffset;
@@ -218,9 +221,11 @@ __define('./aether.ts', (exports, module, __require) => {
           // Áp dụng toạ độ (đã có transform handle việc căn giữa)
           if (!this.lastVisualState || Math.abs(this.lastVisualState.left - nextLeft) >= 0.25) {
               this.container.style.left = `${nextLeft}px`;
+              this.debugStyleWrites += 1;
           }
           if (!this.lastVisualState || Math.abs(this.lastVisualState.top - nextTop) >= 0.25) {
               this.container.style.top = `${nextTop}px`;
+              this.debugStyleWrites += 1;
           }
           this.lastVisualState = {
               width: currentW,
@@ -231,6 +236,17 @@ __define('./aether.ts', (exports, module, __require) => {
               top: nextTop,
               opacity: '1',
           };
+      }
+      getDebugSnapshot() {
+          return {
+              side: this.side,
+              syncCalls: this.debugSyncCalls,
+              styleWrites: this.debugStyleWrites,
+          };
+      }
+      resetDebugSnapshot() {
+          this.debugSyncCalls = 0;
+          this.debugStyleWrites = 0;
       }
   }
   const allyAetherPool = new SharedAetherPool('ally');
@@ -280,6 +296,14 @@ __define('./aether.ts', (exports, module, __require) => {
       destroy: () => {
           allyAetherPool.destroyUI();
           enemyAetherPool.destroyUI();
+      },
+      debugSnapshot: () => ({
+          ally: allyAetherPool.getDebugSnapshot(),
+          enemy: enemyAetherPool.getDebugSnapshot(),
+      }),
+      resetDebugSnapshot: () => {
+          allyAetherPool.resetDebugSnapshot();
+          enemyAetherPool.resetDebugSnapshot();
       }
   };
   //# sourceMappingURL=stdin.js.map
@@ -3443,32 +3467,32 @@ __define('./catalog.ts', (exports, module, __require) => {
           }
       },
       {
-          id: 'mo_da', name: 'Mộ Dạ', class: 'Warrior', rank: 'SSR',
+          id: 'mo_da', name: 'Mộ Dạ', class: 'Assassin', rank: 'SSR',
           mods: { ATK: 0.10, WIL: 0.10 },
           kit: {
               onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
               basic: asUnknownRecord({
-                  name: 'Đánh Thường',
+                  name: 'Ám Trảm',
                   tags: ['single-target']
               }),
               skills: asUnknownRecordArray([
                   {
                       key: 'skill1',
                       name: 'U Trào Tụ Lực',
-                      cost: { aether: 20 },
+                      cost: { aether: 25 },
                       duration: 3,
-                      buffStats: { ATK: 0.10, WIL: 0.10 },
+                      buffStats: { ATK: 0.15, WIL: 0.15 },
                       maxStacks: 3
                   },
                   {
                       key: 'skill2',
                       name: 'Huyết Tế Cuồng Khí',
                       cost: { aether: 15 },
-                      hpTradePercentCurrent: 0.35,
+                      hpTradePercentCurrent: 0.30,
                       duration: 3,
                       buffStats: { ATK: 0.25, WIL: 0.25 },
                       maxStacks: 2,
-                      notes: 'Hiến 35% HP hiện có (không giảm trần), cộng dồn tối đa 2 lần nếu tái kích hoạt khi hiệu ứng còn.'
+                      notes: 'Hiến 30% HP hiện có (không giảm trần), cộng dồn tối đa 2 lần nếu tái kích hoạt khi hiệu ứng còn.'
                   },
                   {
                       key: 'skill3',
@@ -3485,8 +3509,9 @@ __define('./catalog.ts', (exports, module, __require) => {
                   pierce: { ARM: 0.30, RES: 0.30 },
                   damageMultiplier: 2.00,
                   target: 'single',
-                  buffs: [{ id: 'bat_khuat', turns: 1 }, { id: 'tan_sat', turns: 2 }],
-                  notes: 'Gây 200% sát thương hỗn hợp lên một mục tiêu, bỏ qua 30% ARM/RES và nhận hiệu ứng Bất Khuất + Tàn Sát; miễn bị chỉ định bởi đòn đơn trong 2 lượt.'
+                  executeBelowPercentHP: 0.10,
+                  buffs: [{ id: 'bat_khuat', turns: 2 }, { id: 'tan_sat', turns: 2 }],
+                  notes: 'Gây 200% sát thương hỗn hợp lên một mục tiêu, bỏ qua 30% ARM/RES, kết liễu mục tiêu dưới 10% HP và nhận hiệu ứng Bất Khuất + Tàn Sát trong 2 lượt; miễn bị chỉ định bởi đòn đơn trong 2 lượt.'
               }),
               talent: asUnknownRecord({
                   name: 'Dạ Mộ Nhị Cực',
@@ -3580,7 +3605,9 @@ __define('./catalog.ts', (exports, module, __require) => {
                       }
                   ],
                   rageBonusPerBreak: 15,
-                  notes: 'Mỗi lần dùng Tuyệt kỹ, Ngao Bính hóa trứng 1 lượt (không thể tấn công, giảm sát thương nhận theo cấp) rồi phá xác nâng trạng thái. Sau khi phá xác nhận thêm nộ để duy trì nhịp tiến hóa.'
+                  primeAwakenAtCast: 4,
+                  longUyAura: { enemyATKDown: 0.10, activeFromForm: 'long_than' },
+                  notes: 'Mỗi lần dùng Tuyệt kỹ, Ngao Bính hóa trứng 1 lượt (không thể tấn công, giảm sát thương nhận theo cấp) rồi phá xác nâng trạng thái. Sau 3 lần tiến hóa thành Long Thần sẽ nhận aura Long Uy giảm 10% ATK kẻ địch đánh vào mình; từ lần cast thứ 4 bỏ qua trạng thái trứng, phun lửa toàn sân và thức tỉnh Prime.'
               }),
               talent: asUnknownRecord({
                   name: 'Long Cốt Bất Diệt',
@@ -7041,7 +7068,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
       {
           unitId: 'mo_da',
           basic: {
-              name: 'Đánh Thường',
+              name: 'Ám Trảm',
               type: 'basic',
               tags: ['single-target'],
               description: 'Gây 100% ATK + WIL lên một mục tiêu.'
@@ -7051,20 +7078,20 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   key: 'skill1',
                   name: 'U Trào Tụ Lực',
                   type: 'active',
-                  cost: { aether: 20 },
+                  cost: { aether: 25 },
                   duration: { turns: 3 },
-                  buffs: [{ stats: { ATK: 0.10, WIL: 0.10 }, stackLimit: 3 }],
-                  description: 'Tăng 10% ATK/WIL trong 3 lượt. Có thể cộng dồn tối đa 3 tầng.'
+                  buffs: [{ stats: { ATK: 0.15, WIL: 0.15 }, stackLimit: 3 }],
+                  description: 'Tăng 15% ATK/WIL trong 3 lượt. Có thể cộng dồn tối đa 3 tầng.'
               },
               {
                   key: 'skill2',
                   name: 'Huyết Tế Cuồng Khí',
                   type: 'active',
                   cost: { aether: 15 },
-                  hpTrade: { percentCurrentHP: 0.35, lethal: false },
+                  hpTrade: { percentCurrentHP: 0.30, lethal: false },
                   duration: { turns: 3 },
                   buffs: [{ stats: { ATK: 0.25, WIL: 0.25 }, stackLimit: 2 }],
-                  description: 'Hiến 35% HP hiện có (không thể tự sát) để nhận +25% ATK/WIL trong 3 lượt. Có thể cộng dồn tối đa 2 lần nếu dùng khi hiệu ứng còn.'
+                  description: 'Hiến 30% HP hiện có (không thể tự sát) để nhận +25% ATK/WIL trong 3 lượt. Có thể cộng dồn tối đa 2 lần nếu dùng khi hiệu ứng còn.'
               },
               {
                   key: 'skill3',
@@ -7082,11 +7109,12 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
               tags: ['single-target', 'counts-as-basic'],
               damage: { multiplier: 2.00, piercePercent: { arm: 0.30, res: 0.30 } },
               buffs: [
-                  { id: 'bat_khuat', turns: 1 },
+                  { id: 'bat_khuat', turns: 2 },
                   { id: 'tan_sat', turns: 2 },
                   { effect: 'untargetable', turns: 2, scope: 'singleTarget' }
               ],
-              description: 'Gây 200% sát thương hỗn hợp lên một mục tiêu, bỏ qua 30% ARM/RES. Nhận hiệu ứng Bất Khuất + Tàn Sát và không thể bị chỉ định bởi đòn đơn trong 2 lượt kế tiếp.'
+              execute: { belowPercentHP: 0.10 },
+              description: 'Gây 200% sát thương hỗn hợp lên một mục tiêu, bỏ qua 30% ARM/RES, kết liễu mục tiêu dưới 10% HP. Nhận hiệu ứng Bất Khuất + Tàn Sát và không thể bị chỉ định bởi đòn đơn trong 2 lượt kế tiếp.'
           },
           talent: {
               name: 'Dạ Mộ Nhị Cực',
@@ -7142,7 +7170,9 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
               name: 'Tam Chuyển Long Thai',
               type: 'ultimate',
               tags: ['evolution'],
-              description: 'Mỗi lần thi triển, Ngao Bính hóa trứng 1 lượt (không thể tấn công, giảm sát thương nhận 40%/50%/60% tùy lần) rồi phá xác nâng trạng thái: Thành Niên → Trưởng Thành → Long Thần. Sau phá xác, đòn đánh thường mạnh hơn, tăng xuyên giáp, giảm sát thương nhận và tăng hồi phục mỗi lượt. Mỗi lần chuyển hóa hoàn tất nhận thêm 15 nộ.'
+              primeAwakenAtCast: 4,
+              longUyAura: { enemyATKDown: 0.10, activeFromForm: 'long_than' },
+              description: 'Mỗi lần thi triển, Ngao Bính hóa trứng 1 lượt (không thể tấn công, giảm sát thương nhận 40%/50%/60% tùy lần) rồi phá xác nâng trạng thái: Thành Niên → Trưởng Thành → Long Thần. Từ Long Thần nhận Long Uy giảm 10% ATK của kẻ địch tấn công mình; từ lần cast thứ 4 trở đi bỏ qua trạng thái trứng và thức tỉnh Prime.'
           },
           talent: {
               name: 'Long Cốt Bất Diệt',
@@ -11671,6 +11701,50 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       return preset ?? CAM[DEFAULT_CAMERA_KEY];
   };
   const CAM_PRESET = resolveCameraPreset();
+  const AETHER_DEBUG_FLAG = typeof window !== 'undefined'
+      && ((window.__ARCLUNE_DEBUG_AETHER) === true
+          || new URLSearchParams(window.location.search).get('debugAether') === '1');
+  const aetherDebugState = {
+      frames: 0,
+      totalMs: 0,
+      maxMs: 0,
+      lastRectTop: Number.NaN,
+      lastRectLeft: Number.NaN,
+  };
+  function emitAetherDebug(rect, elapsedMs) {
+      if (!AETHER_DEBUG_FLAG)
+          return;
+      aetherDebugState.frames += 1;
+      aetherDebugState.totalMs += elapsedMs;
+      aetherDebugState.maxMs = Math.max(aetherDebugState.maxMs, elapsedMs);
+      if (aetherDebugState.frames < 60)
+          return;
+      const snapshot = globalAetherPool.debugSnapshot();
+      const avgMs = aetherDebugState.totalMs / aetherDebugState.frames;
+      const rectMoved = rect.top !== aetherDebugState.lastRectTop || rect.left !== aetherDebugState.lastRectLeft;
+      console.debug('[aether-debug] frame-window', {
+          frames: aetherDebugState.frames,
+          avgMs: Number(avgMs.toFixed(3)),
+          maxMs: Number(aetherDebugState.maxMs.toFixed(3)),
+          rectMoved,
+          rectTop: Number(rect.top.toFixed(2)),
+          rectLeft: Number(rect.left.toFixed(2)),
+          styleWrites: {
+              ally: snapshot.ally.styleWrites,
+              enemy: snapshot.enemy.styleWrites,
+          },
+          syncCalls: {
+              ally: snapshot.ally.syncCalls,
+              enemy: snapshot.enemy.syncCalls,
+          },
+      });
+      aetherDebugState.frames = 0;
+      aetherDebugState.totalMs = 0;
+      aetherDebugState.maxMs = 0;
+      aetherDebugState.lastRectTop = rect.top;
+      aetherDebugState.lastRectLeft = rect.left;
+      globalAetherPool.resetDebugSnapshot();
+  }
   const getCameraPresetSignature = (preset) => {
       if (!preset)
           return 'null';
@@ -11957,6 +12031,18 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       const widthChanged = Math.abs(nextState.width - prev.width) >= 1;
       const heightChanged = Math.abs(nextState.height - prev.height) >= 1;
       const scaleChanged = Math.abs(nextState.scale - prev.scale) >= 0.01;
+      const offsetChanged = Math.abs(nextState.offsetTop - prev.offsetTop) >= 1
+          || Math.abs(nextState.offsetLeft - prev.offsetLeft) >= 1;
+      if (AETHER_DEBUG_FLAG && reason === 'scroll' && (heightChanged || scaleChanged || offsetChanged)) {
+          console.debug('[aether-debug][viewport-scroll]', {
+              widthChanged,
+              heightChanged,
+              scaleChanged,
+              offsetChanged,
+              prev,
+              next: nextState,
+          });
+      }
       if (widthChanged || heightChanged || scaleChanged || reason === 'resize') {
           scheduleResize();
           return;
@@ -13676,6 +13762,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           else {
               drawTokensOblique(ctx, Game.grid, tokens, CAM_PRESET);
           }
+          const aetherSyncStart = SUPPORTS_PERF_NOW ? performance.now() : Date.now();
           // 1. Lấy kích thước thật của Canvas trên màn hình
           const canvasEl = canvas;
           const rect = canvasEl.getBoundingClientRect();
@@ -13741,19 +13828,18 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               ?? null;
           const allyPos = projectLeaderGroundPos(allyLeader, 0, 1);
           const enemyPos = projectLeaderGroundPos(enemyLeader, 6, 1);
-          const viewport = rect.width <= 820 ? 'mobile' : 'desktop';
           const clampMargin = Math.max(12, Math.round(rect.width * 0.02));
           const halfTileAnchor = 0.5;
           const tilePxX = grid.tile * ratioX;
+          const tilePxY = grid.tile * ratioY;
           const allyBackOffsetX = tilePxX * halfTileAnchor;
           const enemyBackOffsetX = tilePxX * halfTileAnchor;
-          const allyBackOffsetY = (viewport === 'mobile' ? 24 : 30) * allyPos.s;
-          const enemyBackOffsetY = (viewport === 'mobile' ? 24 : 30) * enemyPos.s;
+          const allyBackOffsetY = tilePxY * 0.24;
+          const enemyBackOffsetY = tilePxY * 0.24;
           // 5. Đồng bộ vị trí + đồng bộ bể AE chung theo đội hình sống
           globalAetherPool.syncAllVisuals({ x: allyPos.x, y: allyPos.y, s: allyPos.s }, { x: enemyPos.x, y: enemyPos.y, s: enemyPos.s }, tokens, {
               ally: {
                   facing: 1,
-                  viewport,
                   backOffsetX: allyBackOffsetX,
                   backOffsetY: allyBackOffsetY,
                   anchorLiftY: Number.isFinite(allyPos.anchor) ? Math.max(0, (1 - allyPos.anchor) * 10 * allyPos.s) : 0,
@@ -13766,7 +13852,6 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               },
               enemy: {
                   facing: -1,
-                  viewport,
                   backOffsetX: enemyBackOffsetX,
                   backOffsetY: enemyBackOffsetY,
                   anchorLiftY: Number.isFinite(enemyPos.anchor) ? Math.max(0, (1 - enemyPos.anchor) * 10 * enemyPos.s) : 0,
@@ -13778,6 +13863,8 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   },
               },
           });
+          const aetherSyncEnd = SUPPORTS_PERF_NOW ? performance.now() : Date.now();
+          emitAetherDebug(rect, aetherSyncEnd - aetherSyncStart);
       }
       if (sessionVfx) {
           vfxDraw(ctx, sessionVfx, CAM_PRESET);
@@ -25148,7 +25235,7 @@ __define('./units.ts', (exports, module, __require) => {
       { id: 'basil_thorne', name: 'Basil Thorne', cost: 13, rank: 'SSR', role: 'Tanker' },
       { id: 'mong_yem', name: 'Mộng Yểm', cost: 18, rank: 'SSR', role: 'Mage' }, { id: 'chan_nga', name: 'Chân Ngã', cost: 18, rank: 'UR', role: 'Summoner' },
       { id: 'ma_ton_diep_lam', name: 'Ma Tôn - Diệp Lâm', cost: 19, rank: 'UR', role: 'Mage' },
-      { id: 'mo_da', name: 'Mộ Dạ', cost: 15, rank: 'SSR', role: 'Warrior' },
+      { id: 'mo_da', name: 'Mộ Dạ', cost: 15, rank: 'SSR', role: 'Assassin' },
       { id: 'ngao_binh', name: 'Ngao Bính', cost: 18, rank: 'UR', role: 'Warrior' },
       { id: 'lau_khac_ma_chu', name: 'Lậu Khắc Ma Chủ', cost: 21, rank: 'Prime', role: 'Mage' },
       { id: 'phe', name: 'Phệ', cost: 20, rank: 'UR', role: 'Mage' },

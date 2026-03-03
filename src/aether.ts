@@ -40,6 +40,8 @@ export class SharedAetherPool {
     top: number;
     opacity: string;
   } | null = null;
+  private debugStyleWrites: number = 0;
+  private debugSyncCalls: number = 0;
 
   constructor(side: Side) {
     this.side = side;
@@ -180,6 +182,7 @@ export class SharedAetherPool {
   // Hàm này được gọi từ Game Loop (draw) để bám theo nhân vật/vị trí
  public syncVisuals(screenX: number, screenY: number, scale: number, options: AetherVisualOptions = {}) {
     if (!this.container) return;
+    this.debugSyncCalls += 1;
     
     if (scale < 0.1) {
         if (this.lastVisualState?.opacity !== '0') this.container.style.opacity = '0';
@@ -232,7 +235,7 @@ export class SharedAetherPool {
       : defaultBackY;
 
      const facingSign = Math.sign(facing) || (this.side === 'ally' ? 1 : -1);
-     const xOffset = facingSign * backOffsetX;
+     const xOffset = -facingSign * backOffsetX;
      const yOffset = -(backOffsetY + extraAnchorLift);
 
     let nextLeft = screenX + xOffset;
@@ -249,9 +252,11 @@ export class SharedAetherPool {
     // Áp dụng toạ độ (đã có transform handle việc căn giữa)
     if (!this.lastVisualState || Math.abs(this.lastVisualState.left - nextLeft) >= 0.25) {
       this.container.style.left = `${nextLeft}px`;
+      this.debugStyleWrites += 1;
     }
     if (!this.lastVisualState || Math.abs(this.lastVisualState.top - nextTop) >= 0.25) {
       this.container.style.top = `${nextTop}px`;
+      this.debugStyleWrites += 1;
     }
 
     this.lastVisualState = {
@@ -262,8 +267,21 @@ export class SharedAetherPool {
       left: nextLeft,
       top: nextTop,
       opacity: '1',
+   };
+  }
+
+   public getDebugSnapshot() {
+    return {
+      side: this.side,
+      syncCalls: this.debugSyncCalls,
+      styleWrites: this.debugStyleWrites,
     };
-   }
+  }
+
+  public resetDebugSnapshot() {
+    this.debugSyncCalls = 0;
+    this.debugStyleWrites = 0;
+  }
 }
 
 export const allyAetherPool = new SharedAetherPool('ally');
@@ -321,5 +339,15 @@ export const globalAetherPool = {
   destroy: () => {
     allyAetherPool.destroyUI();
     enemyAetherPool.destroyUI();
+  },
+
+  debugSnapshot: () => ({
+    ally: allyAetherPool.getDebugSnapshot(),
+    enemy: enemyAetherPool.getDebugSnapshot(),
+  }),
+
+  resetDebugSnapshot: () => {
+    allyAetherPool.resetDebugSnapshot();
+    enemyAetherPool.resetDebugSnapshot();
   }
 };

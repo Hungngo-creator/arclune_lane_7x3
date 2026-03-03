@@ -1274,32 +1274,32 @@ export const ROSTER = [
     }
   },
   {
-    id: 'mo_da', name: 'Mộ Dạ', class: 'Warrior', rank: 'SSR',
+    id: 'mo_da', name: 'Mộ Dạ', class: 'Assassin', rank: 'SSR',
     mods: { ATK: 0.10, WIL: 0.10 },
     kit: {
       onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
       basic: asUnknownRecord({
-        name: 'Đánh Thường',
+        name: 'Ám Trảm',
         tags: ['single-target']
       }),
       skills: asUnknownRecordArray([
         {
           key: 'skill1',
           name: 'U Trào Tụ Lực',
-          cost: { aether: 20 },
+          cost: { aether: 25 },
           duration: 3,
-          buffStats: { ATK: 0.10, WIL: 0.10 },
+          buffStats: { ATK: 0.15, WIL: 0.15 },
           maxStacks: 3
         },
         {
           key: 'skill2',
           name: 'Huyết Tế Cuồng Khí',
           cost: { aether: 15 },
-          hpTradePercentCurrent: 0.35,
+          hpTradePercentCurrent: 0.30,
           duration: 3,
           buffStats: { ATK: 0.25, WIL: 0.25 },
           maxStacks: 2,
-          notes: 'Hiến 35% HP hiện có (không giảm trần), cộng dồn tối đa 2 lần nếu tái kích hoạt khi hiệu ứng còn.'
+          notes: 'Hiến 30% HP hiện có (không giảm trần), cộng dồn tối đa 2 lần nếu tái kích hoạt khi hiệu ứng còn.'
         },
         {
           key: 'skill3',
@@ -1316,8 +1316,9 @@ export const ROSTER = [
         pierce: { ARM: 0.30, RES: 0.30 },
         damageMultiplier: 2.00,
         target: 'single',
-        buffs: [{ id: 'bat_khuat', turns: 1 }, { id: 'tan_sat', turns: 2 }],
-        notes: 'Gây 200% sát thương hỗn hợp lên một mục tiêu, bỏ qua 30% ARM/RES và nhận hiệu ứng Bất Khuất + Tàn Sát; miễn bị chỉ định bởi đòn đơn trong 2 lượt.'
+        executeBelowPercentHP: 0.10,
+        buffs: [{ id: 'bat_khuat', turns: 2 }, { id: 'tan_sat', turns: 2 }],
+        notes: 'Gây 200% sát thương hỗn hợp lên một mục tiêu, bỏ qua 30% ARM/RES, kết liễu mục tiêu dưới 10% HP và nhận hiệu ứng Bất Khuất + Tàn Sát trong 2 lượt; miễn bị chỉ định bởi đòn đơn trong 2 lượt.'
       }),
       talent: asUnknownRecord({
         name: 'Dạ Mộ Nhị Cực',
@@ -1411,7 +1412,9 @@ export const ROSTER = [
           }
         ],
         rageBonusPerBreak: 15,
-        notes: 'Mỗi lần dùng Tuyệt kỹ, Ngao Bính hóa trứng 1 lượt (không thể tấn công, giảm sát thương nhận theo cấp) rồi phá xác nâng trạng thái. Sau khi phá xác nhận thêm nộ để duy trì nhịp tiến hóa.'
+        primeAwakenAtCast: 4,
+        longUyAura: { enemyATKDown: 0.10, activeFromForm: 'long_than' },
+        notes: 'Mỗi lần dùng Tuyệt kỹ, Ngao Bính hóa trứng 1 lượt (không thể tấn công, giảm sát thương nhận theo cấp) rồi phá xác nâng trạng thái. Sau 3 lần tiến hóa thành Long Thần sẽ nhận aura Long Uy giảm 10% ATK kẻ địch đánh vào mình; từ lần cast thứ 4 bỏ qua trạng thái trứng, phun lửa toàn sân và thức tỉnh Prime.'
       }),
       talent: asUnknownRecord({
         name: 'Long Cốt Bất Diệt',

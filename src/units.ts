@@ -24,7 +24,7 @@ const UNIT_LIST = [
   { id: 'basil_thorne', name: 'Basil Thorne', cost: 13, rank: 'SSR', role: 'Tanker' },
   { id: 'mong_yem', name: 'Mộng Yểm', cost: 18, rank: 'SSR', role: 'Mage' },{ id: 'chan_nga', name: 'Chân Ngã', cost: 18, rank: 'UR', role: 'Summoner' },
   { id: 'ma_ton_diep_lam', name: 'Ma Tôn - Diệp Lâm', cost: 19, rank: 'UR', role: 'Mage' },
-  { id: 'mo_da', name: 'Mộ Dạ', cost: 15, rank: 'SSR', role: 'Warrior' },
+  { id: 'mo_da', name: 'Mộ Dạ', cost: 15, rank: 'SSR', role: 'Assassin' },
   { id: 'ngao_binh', name: 'Ngao Bính', cost: 18, rank: 'UR', role: 'Warrior' },
   { id: 'lau_khac_ma_chu', name: 'Lậu Khắc Ma Chủ', cost: 21, rank: 'Prime', role: 'Mage' },
   { id: 'phe', name: 'Phệ', cost: 20, rank: 'UR', role: 'Mage' },

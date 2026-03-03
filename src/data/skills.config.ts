@@ -574,7 +574,7 @@ const skillsConfig = [
   {
     unitId: 'mo_da',
     basic: {
-      name: 'Đánh Thường',
+      name: 'Ám Trảm',
       type: 'basic',
       tags: ['single-target'],
       description: 'Gây 100% ATK + WIL lên một mục tiêu.'
@@ -584,20 +584,20 @@ const skillsConfig = [
         key: 'skill1',
         name: 'U Trào Tụ Lực',
         type: 'active',
-        cost: { aether: 20 },
+        cost: { aether: 25 },
         duration: { turns: 3 },
-        buffs: [{ stats: { ATK: 0.10, WIL: 0.10 }, stackLimit: 3 }],
-        description: 'Tăng 10% ATK/WIL trong 3 lượt. Có thể cộng dồn tối đa 3 tầng.'
+        buffs: [{ stats: { ATK: 0.15, WIL: 0.15 }, stackLimit: 3 }],
+        description: 'Tăng 15% ATK/WIL trong 3 lượt. Có thể cộng dồn tối đa 3 tầng.'
       },
       {
         key: 'skill2',
         name: 'Huyết Tế Cuồng Khí',
         type: 'active',
         cost: { aether: 15 },
-        hpTrade: { percentCurrentHP: 0.35, lethal: false },
+        hpTrade: { percentCurrentHP: 0.30, lethal: false },
         duration: { turns: 3 },
         buffs: [{ stats: { ATK: 0.25, WIL: 0.25 }, stackLimit: 2 }],
-        description: 'Hiến 35% HP hiện có (không thể tự sát) để nhận +25% ATK/WIL trong 3 lượt. Có thể cộng dồn tối đa 2 lần nếu dùng khi hiệu ứng còn.'
+        description: 'Hiến 30% HP hiện có (không thể tự sát) để nhận +25% ATK/WIL trong 3 lượt. Có thể cộng dồn tối đa 2 lần nếu dùng khi hiệu ứng còn.'
       },
       {
         key: 'skill3',
@@ -615,11 +615,12 @@ const skillsConfig = [
       tags: ['single-target', 'counts-as-basic'],
       damage: { multiplier: 2.00, piercePercent: { arm: 0.30, res: 0.30 } },
       buffs: [
-        { id: 'bat_khuat', turns: 1 },
+        { id: 'bat_khuat', turns: 2 },
         { id: 'tan_sat', turns: 2 },
         { effect: 'untargetable', turns: 2, scope: 'singleTarget' }
       ],
-      description: 'Gây 200% sát thương hỗn hợp lên một mục tiêu, bỏ qua 30% ARM/RES. Nhận hiệu ứng Bất Khuất + Tàn Sát và không thể bị chỉ định bởi đòn đơn trong 2 lượt kế tiếp.'
+      execute: { belowPercentHP: 0.10 },
+      description: 'Gây 200% sát thương hỗn hợp lên một mục tiêu, bỏ qua 30% ARM/RES, kết liễu mục tiêu dưới 10% HP. Nhận hiệu ứng Bất Khuất + Tàn Sát và không thể bị chỉ định bởi đòn đơn trong 2 lượt kế tiếp.'
     },
     talent: {
       name: 'Dạ Mộ Nhị Cực',
@@ -675,7 +676,9 @@ const skillsConfig = [
       name: 'Tam Chuyển Long Thai',
       type: 'ultimate',
       tags: ['evolution'],
-      description: 'Mỗi lần thi triển, Ngao Bính hóa trứng 1 lượt (không thể tấn công, giảm sát thương nhận 40%/50%/60% tùy lần) rồi phá xác nâng trạng thái: Thành Niên → Trưởng Thành → Long Thần. Sau phá xác, đòn đánh thường mạnh hơn, tăng xuyên giáp, giảm sát thương nhận và tăng hồi phục mỗi lượt. Mỗi lần chuyển hóa hoàn tất nhận thêm 15 nộ.'
+      primeAwakenAtCast: 4,
+      longUyAura: { enemyATKDown: 0.10, activeFromForm: 'long_than' },
+      description: 'Mỗi lần thi triển, Ngao Bính hóa trứng 1 lượt (không thể tấn công, giảm sát thương nhận 40%/50%/60% tùy lần) rồi phá xác nâng trạng thái: Thành Niên → Trưởng Thành → Long Thần. Từ Long Thần nhận Long Uy giảm 10% ATK của kẻ địch tấn công mình; từ lần cast thứ 4 trở đi bỏ qua trạng thái trứng và thức tỉnh Prime.'
     },
     talent: {
       name: 'Long Cốt Bất Diệt',
