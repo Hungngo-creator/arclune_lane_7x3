@@ -28,6 +28,7 @@ __define('./aether.ts', (exports, module, __require) => {
       container = null;
       label = null; // Thêm label hiển thị số
       side;
+      lastVisualState = null;
       constructor(side) {
           this.side = side;
       }
@@ -86,6 +87,7 @@ __define('./aether.ts', (exports, module, __require) => {
           this.container = null;
           this.uiFill = null;
           this.label = null;
+          this.lastVisualState = null;
       }
       // --- LOGIC GIAO DIỆN ---
       initUI() {
@@ -153,20 +155,35 @@ __define('./aether.ts', (exports, module, __require) => {
           if (!this.container)
               return;
           if (scale < 0.1) {
-              this.container.style.opacity = '0';
+              if (this.lastVisualState?.opacity !== '0')
+                  this.container.style.opacity = '0';
+              this.lastVisualState = {
+                  ...(this.lastVisualState || { width: 0, height: 0, fontSize: 0, labelBottom: 0, left: 0, top: 0 }),
+                  opacity: '0'
+              };
               return;
           }
-          this.container.style.opacity = '1';
+          if (this.lastVisualState?.opacity !== '1')
+              this.container.style.opacity = '1';
           // Tính kích thước theo scale
           const currentW = Math.max(10, 14 * scale);
           const currentH = Math.max(40, 130 * scale);
-          this.container.style.width = `${currentW}px`;
-          this.container.style.height = `${currentH}px`;
+          if (!this.lastVisualState || Math.abs(this.lastVisualState.width - currentW) >= 0.25) {
+              this.container.style.width = `${currentW}px`;
+          }
+          if (!this.lastVisualState || Math.abs(this.lastVisualState.height - currentH) >= 0.25) {
+              this.container.style.height = `${currentH}px`;
+          }
           // Scale chữ số
           if (this.label) {
               const fontSize = Math.max(10, 14 * scale);
-              this.label.style.fontSize = `${fontSize}px`;
-              this.label.style.bottom = `${-fontSize * 1.5}px`;
+              const labelBottom = -fontSize * 1.5;
+              if (!this.lastVisualState || Math.abs(this.lastVisualState.fontSize - fontSize) >= 0.25) {
+                  this.label.style.fontSize = `${fontSize}px`;
+              }
+              if (!this.lastVisualState || Math.abs(this.lastVisualState.labelBottom - labelBottom) >= 0.25) {
+                  this.label.style.bottom = `${labelBottom}px`;
+              }
           }
           const viewport = options.viewport
               ?? ((typeof window !== 'undefined' && window.innerWidth <= 820) ? 'mobile' : 'desktop');
@@ -199,8 +216,21 @@ __define('./aether.ts', (exports, module, __require) => {
                   nextTop = Math.min(nextTop, clamp.maxY);
           }
           // Áp dụng toạ độ (đã có transform handle việc căn giữa)
-          this.container.style.left = `${nextLeft}px`;
-          this.container.style.top = `${nextTop}px`;
+          if (!this.lastVisualState || Math.abs(this.lastVisualState.left - nextLeft) >= 0.25) {
+              this.container.style.left = `${nextLeft}px`;
+          }
+          if (!this.lastVisualState || Math.abs(this.lastVisualState.top - nextTop) >= 0.25) {
+              this.container.style.top = `${nextTop}px`;
+          }
+          this.lastVisualState = {
+              width: currentW,
+              height: currentH,
+              fontSize: Math.max(10, 14 * scale),
+              labelBottom: -Math.max(10, 14 * scale) * 1.5,
+              left: nextLeft,
+              top: nextTop,
+              opacity: '1',
+          };
       }
   }
   const allyAetherPool = new SharedAetherPool('ally');
@@ -2787,6 +2817,7 @@ __define('./catalog.ts', (exports, module, __require) => {
               ]),
               traits: asUnknownRecordArray([
                   { id: 'sleep_reset', text: 'Khi đạt 3 tầng Mê Hoặc, mục tiêu ngủ 1 lượt rồi đặt lại về 0 tầng.' },
+                  { id: 'uncleansable_marks', text: 'Mê Hoặc không bị xóa bởi các kỹ năng thanh tẩy thông thường.' },
                   { id: 'self_sleep_control', text: 'Thụy Ca Tự Miên có thể được hủy sớm bằng thao tác thủ công; tự thức khi HP ≤ 35%.' }
               ])
           }
@@ -4018,20 +4049,20 @@ __define('./catalog.ts', (exports, module, __require) => {
           id: 'doanminh', name: 'Doãn Minh', class: 'Support', rank: 'SR',
           mods: { WIL: 0.10, AEmax: 0.10 },
           kit: {
-              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, teamHealOnEntry: 0.05 }),
+              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, teamHealOnEntry: 0.08 }),
               basic: asUnknownRecord({
                   name: 'Đánh Thường',
                   tags: ['single-target']
               }),
               skills: asUnknownRecordArray([
                   { key: 'skill1', name: 'Cán Cân Giáng Phạt', cost: { aether: 20 }, countsAsBasic: true, damageMultiplier: 1.50 },
-                  { key: 'skill2', name: 'Phán Xét Cứu Rỗi', cost: { aether: 15 }, healPercentCasterMaxHP: 0.10, targets: 3 },
+                  { key: 'skill2', name: 'Phán Xét Cứu Rỗi', cost: { aether: 15 }, healPercentCasterMaxHP: 0.12, targets: 3 },
                   { key: 'skill3', name: 'Cân Bằng Sinh Mệnh', cost: { aether: 15 }, bonusMaxHPBase: 0.10, limitUses: 5 }
               ]),
-              ult: asUnknownRecord({ type: 'equalizeHP', allies: 3, healLeader: true, leaderHealPercentCasterMaxHP: 0.10 }),
+              ult: asUnknownRecord({ type: 'equalizeHP', allies: 3, healLeader: true, leaderHealPercentCasterMaxHP: 0.15 }),
               talent: asUnknownRecord({
                   name: 'Thăng Bình Pháp Lực',
-                  onSpawnHealPercent: 0.05
+                  onSpawnHealPercent: 0.08
               }),
               technique: null,
               passives: asUnknownRecordArray([]),
@@ -6821,7 +6852,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
       {
           unitId: 'mong_yem',
           basic: {
-              name: 'Đánh Thường',
+              name: 'Mộng Phệ',
               type: 'basic',
               tags: ['single-target', 'sleep-setup'],
               debuffs: [{ id: 'me_hoac', stacks: 1, maxStacks: 3, purgeable: false }],
@@ -6875,7 +6906,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
               maxStacks: 3,
               sleepOnCap: { turns: 1 },
               purgeable: false,
-              description: 'Mọi nguồn sát thương của Mộng Yểm đặt 1 tầng Mê Hoặc (tối đa 3). Đạt 3 tầng khiến mục tiêu ngủ 1 lượt rồi đặt lại về 0 tầng; Mê Hoặc chỉ mất khi ngủ kích hoạt hoặc bị thanh tẩy.'
+              description: 'Mọi nguồn sát thương của Mộng Yểm đặt 1 tầng Mê Hoặc (tối đa 3). Đạt 3 tầng khiến mục tiêu ngủ 1 lượt rồi đặt lại về 0 tầng; tầng Mê Hoặc không thể bị thanh tẩy bởi cơ chế thanh tẩy thông thường.'
           },
           technique: null,
           notes: [
@@ -7449,7 +7480,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
               name: 'Đánh Thường',
               type: 'basic',
               tags: ['single-target'],
-              description: 'Gây sát thương bằng n% WIL + x% ATK lên một mục tiêu.'
+              description: 'Gây sát thương 100% WIL + 100% ATK lên một mục tiêu.'
           },
           skills: [
               {
@@ -7504,7 +7535,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
               name: 'Đánh Thường',
               type: 'basic',
               tags: ['single-target'],
-              description: 'Gây sát thương bằng n% ATK + x% WIL lên một mục tiêu.'
+              description: 'Gây sát thương 100% ATK + 100% WIL lên một mục tiêu.'
           },
           skills: [
               {
@@ -7562,7 +7593,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
               name: 'Đánh Thường',
               type: 'basic',
               tags: ['single-target'],
-              description: 'Gây sát thương bằng n% ATK + x% WIL lên một mục tiêu.'
+              description: 'Gây sát thương 100% ATK + 100% WIL lên một mục tiêu.'
           },
           skills: [
               {
@@ -7617,7 +7648,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
               name: 'Đánh Thường',
               type: 'basic',
               tags: ['single-target'],
-              description: 'Gây sát thương bằng n% ATK + x% WIL lên một mục tiêu.'
+              description: 'Gây sát thương 100% ATK + 100% WIL lên một mục tiêu.'
           },
           skills: [
               {
@@ -11930,9 +11961,8 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           scheduleResize();
           return;
       }
-      // Debug nguyên nhân lag: khi lướt dọc ở landscape, visualViewport.scroll bắn liên tục
-      // dù kích thước viewport không đổi => resize/draw bị gọi lại không cần thiết.
-      if (reason === 'scroll' && typeof console !== 'undefined' && typeof console.debug === 'function') {
+      const debugEnabled = !!(winRef && winRef.__ARC_DEBUG_VIEWPORT__);
+      if (debugEnabled && reason === 'scroll' && typeof console !== 'undefined' && typeof console.debug === 'function') {
           console.debug('[pve][viewport-scroll] skip resize: size unchanged', {
               width: nextState.width,
               height: nextState.height,
@@ -13714,8 +13744,9 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           const viewport = rect.width <= 820 ? 'mobile' : 'desktop';
           const clampMargin = Math.max(12, Math.round(rect.width * 0.02));
           const halfTileAnchor = 0.5;
-          const allyBackOffsetX = grid.tile * halfTileAnchor * allyPos.s;
-          const enemyBackOffsetX = grid.tile * halfTileAnchor * enemyPos.s;
+          const tilePxX = grid.tile * ratioX;
+          const allyBackOffsetX = tilePxX * halfTileAnchor;
+          const enemyBackOffsetX = tilePxX * halfTileAnchor;
           const allyBackOffsetY = (viewport === 'mobile' ? 24 : 30) * allyPos.s;
           const enemyBackOffsetY = (viewport === 'mobile' ? 24 : 30) * enemyPos.s;
           // 5. Đồng bộ vị trí + đồng bộ bể AE chung theo đội hình sống

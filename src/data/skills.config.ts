@@ -385,7 +385,7 @@ const skillsConfig = [
   {
     unitId: 'mong_yem',
     basic: {
-      name: 'Đánh Thường',
+      name: 'Mộng Phệ',
       type: 'basic',
       tags: ['single-target', 'sleep-setup'],
       debuffs: [{ id: 'me_hoac', stacks: 1, maxStacks: 3, purgeable: false }],
@@ -439,7 +439,7 @@ const skillsConfig = [
       maxStacks: 3,
       sleepOnCap: { turns: 1 },
       purgeable: false,
-      description: 'Mọi nguồn sát thương của Mộng Yểm đặt 1 tầng Mê Hoặc (tối đa 3). Đạt 3 tầng khiến mục tiêu ngủ 1 lượt rồi đặt lại về 0 tầng; Mê Hoặc chỉ mất khi ngủ kích hoạt hoặc bị thanh tẩy.'
+      description: 'Mọi nguồn sát thương của Mộng Yểm đặt 1 tầng Mê Hoặc (tối đa 3). Đạt 3 tầng khiến mục tiêu ngủ 1 lượt rồi đặt lại về 0 tầng; tầng Mê Hoặc không thể bị thanh tẩy bởi cơ chế thanh tẩy thông thường.'
     },
     technique: null,
     notes: [
@@ -1013,7 +1013,7 @@ const skillsConfig = [
       name: 'Đánh Thường',
       type: 'basic',
       tags: ['single-target'],
-      description: 'Gây sát thương bằng n% WIL + x% ATK lên một mục tiêu.'
+      description: 'Gây sát thương 100% WIL + 100% ATK lên một mục tiêu.'
     },
     skills: [
       {
@@ -1068,7 +1068,7 @@ const skillsConfig = [
       name: 'Đánh Thường',
       type: 'basic',
       tags: ['single-target'],
-      description: 'Gây sát thương bằng n% ATK + x% WIL lên một mục tiêu.'
+      description: 'Gây sát thương 100% ATK + 100% WIL lên một mục tiêu.'
     },
     skills: [
       {
@@ -1126,7 +1126,7 @@ const skillsConfig = [
       name: 'Đánh Thường',
       type: 'basic',
       tags: ['single-target'],
-      description: 'Gây sát thương bằng n% ATK + x% WIL lên một mục tiêu.'
+      description: 'Gây sát thương 100% ATK + 100% WIL lên một mục tiêu.'
     },
     skills: [
       {
@@ -1181,7 +1181,7 @@ const skillsConfig = [
       name: 'Đánh Thường',
       type: 'basic',
       tags: ['single-target'],
-      description: 'Gây sát thương bằng n% ATK + x% WIL lên một mục tiêu.'
+      description: 'Gây sát thương 100% ATK + 100% WIL lên một mục tiêu.'
     },
     skills: [
       {

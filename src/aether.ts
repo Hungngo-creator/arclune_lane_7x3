@@ -31,6 +31,15 @@ export class SharedAetherPool {
   private container: HTMLElement | null = null;
   private label: HTMLElement | null = null; // Thêm label hiển thị số
   private side: Side;
+  private lastVisualState: {
+    width: number;
+    height: number;
+    fontSize: number;
+    labelBottom: number;
+    left: number;
+    top: number;
+    opacity: string;
+  } | null = null;
 
   constructor(side: Side) {
     this.side = side;
@@ -93,11 +102,12 @@ export class SharedAetherPool {
 
   public destroyUI() {
       if (this.container && this.container.parentNode) {
-          this.container.parentNode.removeChild(this.container);
+      this.container.parentNode.removeChild(this.container);
       }
       this.container = null;
       this.uiFill = null;
       this.label = null;
+      this.lastVisualState = null;
   }
 
   // --- LOGIC GIAO DIỆN ---
@@ -172,23 +182,36 @@ export class SharedAetherPool {
     if (!this.container) return;
     
     if (scale < 0.1) {
-        this.container.style.opacity = '0';
+        if (this.lastVisualState?.opacity !== '0') this.container.style.opacity = '0';
+        this.lastVisualState = {
+          ...(this.lastVisualState || { width: 0, height: 0, fontSize: 0, labelBottom: 0, left: 0, top: 0 }),
+          opacity: '0'
+        };
         return;
     }
-    this.container.style.opacity = '1';
+    if (this.lastVisualState?.opacity !== '1') this.container.style.opacity = '1';
 
     // Tính kích thước theo scale
     const currentW = Math.max(10, 14 * scale);
     const currentH = Math.max(40, 130 * scale);
 
-    this.container.style.width = `${currentW}px`;
-    this.container.style.height = `${currentH}px`;
+    if (!this.lastVisualState || Math.abs(this.lastVisualState.width - currentW) >= 0.25) {
+      this.container.style.width = `${currentW}px`;
+    }
+    if (!this.lastVisualState || Math.abs(this.lastVisualState.height - currentH) >= 0.25) {
+      this.container.style.height = `${currentH}px`;
+    }
     
     // Scale chữ số
     if (this.label) {
         const fontSize = Math.max(10, 14 * scale);
-        this.label.style.fontSize = `${fontSize}px`;
-        this.label.style.bottom = `${-fontSize * 1.5}px`;
+        const labelBottom = -fontSize * 1.5;
+        if (!this.lastVisualState || Math.abs(this.lastVisualState.fontSize - fontSize) >= 0.25) {
+          this.label.style.fontSize = `${fontSize}px`;
+        }
+        if (!this.lastVisualState || Math.abs(this.lastVisualState.labelBottom - labelBottom) >= 0.25) {
+          this.label.style.bottom = `${labelBottom}px`;
+        }
     }
 
    const viewport: AetherViewport = options.viewport
@@ -224,8 +247,22 @@ export class SharedAetherPool {
     }
 
     // Áp dụng toạ độ (đã có transform handle việc căn giữa)
-    this.container.style.left = `${nextLeft}px`;
-    this.container.style.top = `${nextTop}px`;
+    if (!this.lastVisualState || Math.abs(this.lastVisualState.left - nextLeft) >= 0.25) {
+      this.container.style.left = `${nextLeft}px`;
+    }
+    if (!this.lastVisualState || Math.abs(this.lastVisualState.top - nextTop) >= 0.25) {
+      this.container.style.top = `${nextTop}px`;
+    }
+
+    this.lastVisualState = {
+      width: currentW,
+      height: currentH,
+      fontSize: Math.max(10, 14 * scale),
+      labelBottom: -Math.max(10, 14 * scale) * 1.5,
+      left: nextLeft,
+      top: nextTop,
+      opacity: '1',
+    };
    }
 }
 

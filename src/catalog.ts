@@ -648,6 +648,7 @@ export const ROSTER = [
       ]),
       traits: asUnknownRecordArray([
         { id: 'sleep_reset', text: 'Khi đạt 3 tầng Mê Hoặc, mục tiêu ngủ 1 lượt rồi đặt lại về 0 tầng.' },
+        { id: 'uncleansable_marks', text: 'Mê Hoặc không bị xóa bởi các kỹ năng thanh tẩy thông thường.' },
         { id: 'self_sleep_control', text: 'Thụy Ca Tự Miên có thể được hủy sớm bằng thao tác thủ công; tự thức khi HP ≤ 35%.' }
       ])
     }
@@ -1879,20 +1880,20 @@ export const ROSTER = [
     id: 'doanminh', name: 'Doãn Minh', class: 'Support', rank: 'SR',
     mods: { WIL: 0.10, AEmax: 0.10 },
     kit: {
-      onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, teamHealOnEntry: 0.05 }),
+      onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, teamHealOnEntry: 0.08 }),
       basic: asUnknownRecord({
         name: 'Đánh Thường',
         tags: ['single-target']
       }),
       skills: asUnknownRecordArray([
         { key: 'skill1', name: 'Cán Cân Giáng Phạt', cost: { aether: 20 }, countsAsBasic: true, damageMultiplier: 1.50 },
-        { key: 'skill2', name: 'Phán Xét Cứu Rỗi', cost: { aether: 15 }, healPercentCasterMaxHP: 0.10, targets: 3 },
+        { key: 'skill2', name: 'Phán Xét Cứu Rỗi', cost: { aether: 15 }, healPercentCasterMaxHP: 0.12, targets: 3 },
         { key: 'skill3', name: 'Cân Bằng Sinh Mệnh', cost: { aether: 15 }, bonusMaxHPBase: 0.10, limitUses: 5 }
       ]),
-      ult: asUnknownRecord({ type: 'equalizeHP', allies: 3, healLeader: true, leaderHealPercentCasterMaxHP: 0.10 }),
+      ult: asUnknownRecord({ type: 'equalizeHP', allies: 3, healLeader: true, leaderHealPercentCasterMaxHP: 0.15 }),
       talent: asUnknownRecord({
         name: 'Thăng Bình Pháp Lực',
-        onSpawnHealPercent: 0.05
+        onSpawnHealPercent: 0.08
       }),
       technique: null,
       passives: asUnknownRecordArray([]),

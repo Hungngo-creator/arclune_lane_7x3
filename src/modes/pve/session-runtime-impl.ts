@@ -899,9 +899,8 @@ function scheduleViewportResizeIfChanged(reason: 'resize' | 'scroll'): void {
     return;
   }
 
-  // Debug nguyên nhân lag: khi lướt dọc ở landscape, visualViewport.scroll bắn liên tục
-  // dù kích thước viewport không đổi => resize/draw bị gọi lại không cần thiết.
-  if (reason === 'scroll' && typeof console !== 'undefined' && typeof console.debug === 'function'){
+  const debugEnabled = !!(winRef && (winRef as unknown as { __ARC_DEBUG_VIEWPORT__?: boolean }).__ARC_DEBUG_VIEWPORT__);
+  if (debugEnabled && reason === 'scroll' && typeof console !== 'undefined' && typeof console.debug === 'function'){
     console.debug('[pve][viewport-scroll] skip resize: size unchanged', {
       width: nextState.width,
       height: nextState.height,
@@ -2668,8 +2667,9 @@ function draw(): void {
     const viewport = rect.width <= 820 ? 'mobile' : 'desktop';
     const clampMargin = Math.max(12, Math.round(rect.width * 0.02));
     const halfTileAnchor = 0.5;
-    const allyBackOffsetX = grid.tile * halfTileAnchor * allyPos.s;
-    const enemyBackOffsetX = grid.tile * halfTileAnchor * enemyPos.s;
+    const tilePxX = grid.tile * ratioX;
+    const allyBackOffsetX = tilePxX * halfTileAnchor;
+    const enemyBackOffsetX = tilePxX * halfTileAnchor;
     const allyBackOffsetY = (viewport === 'mobile' ? 24 : 30) * allyPos.s;
     const enemyBackOffsetY = (viewport === 'mobile' ? 24 : 30) * enemyPos.s;
 
