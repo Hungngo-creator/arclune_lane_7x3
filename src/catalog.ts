@@ -503,16 +503,17 @@ export const ROSTER = [
       onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
       basic: asUnknownRecord({
         name: 'Nguyện Cầu',
-        tags: ['single-target', 'heal'],
+        tags: ['single-target', 'basic-attack', 'heal', 'random-target'],
         damageMultiplier: 1.00,
         healRandomAllyPercentMaxHP: 0.03,
-        notes: 'Gây sát thương 100% ATK + WIL và hồi 3% Max HP của Anna cho 1 đồng minh ngẫu nhiên.'
+        notes: 'Gây sát thương 100% ATK + WIL và hồi 3% Max HP của Anna cho 1 đồng minh ngẫu nhiên (ưu tiên người thấp máu nếu hệ thống hỗ trợ).'
       }),
       skills: asUnknownRecordArray([
         {
           key: 'skill1',
           name: 'Aegis Tụ Linh',
           cost: { aether: 20 },
+          tags: ['self', 'defense', 'aether-cost'],
           duration: 2,
           buffStats: { ARM: 0.20, RES: 0.20 },
           notes: 'Tăng 20% ARM/RES trong 2 lượt.'
@@ -521,6 +522,7 @@ export const ROSTER = [
           key: 'skill2',
           name: 'Huyết Tế Vương Tọa',
           cost: { aether: 25 },
+          tags: ['ally', 'aether-cost', 'non-heal-hp-change'],
           hpSacrificePercentMax: 0.50,
           transferToLeader: true,
           minHpPercentToCast: 0.70,
@@ -532,22 +534,23 @@ export const ROSTER = [
           cost: { aether: 20 },
           targets: 2,
           damageMultiplier: 1.40,
-          tags: ['multi-target'],
+          tags: ['multi-target', 'random-target', 'aether-cost'],
           notes: 'Đánh ngẫu nhiên 2 kẻ địch, mỗi mục tiêu nhận 140% đòn đánh thường.'
         }
       ]),
       ult: asUnknownRecord({
         type: 'heal',
-        tags: ['team-heal'],
+        tags: ['team-heal', 'global-rule'],
         healPercentMaxHP: 0.50,
         healScale: { ATK: 0.20, WIL: 0.20 },
         affects: 'allAllies',
-        notes: 'Thánh Lễ Tái Sinh hồi 50% Max HP + 20% ATK/WIL cho toàn bộ đồng minh.'
+        notes: 'Thánh Lễ Tái Sinh hồi 50% Max HP + 20% ATK/WIL cho toàn bộ đồng minh, sau đó kích hoạt nội tại Ấn Chú Thăng Hoa.'
       }),
       talent: asUnknownRecord({
         name: 'Ấn Chú Thăng Hoa',
+        tags: ['passive', 'self', 'support'],
         stacks: 5,
-        perStack: { HP: 0.05, ATK: 0.05, WIL: 0.05 },
+        perStack: { hpMax: 0.05, atk: 0.05, wil: 0.05 },
         trigger: 'onUltCast'
       }),
       technique: null,
@@ -557,7 +560,7 @@ export const ROSTER = [
           name: 'Ấn Chú Thăng Hoa',
           when: 'onUltCast',
           effect: 'stackBuff',
-          params: { stats: { HP: 0.05, ATK: 0.05, WIL: 0.05 }, maxStacks: 5 }
+          params: { stats: { hpMax: 0.05, atk: 0.05, wil: 0.05 }, maxStacks: 5 }
         }
       ]),
       traits: asUnknownRecordArray([

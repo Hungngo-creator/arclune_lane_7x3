@@ -2798,16 +2798,17 @@ __define('./catalog.ts', (exports, module, __require) => {
               onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
               basic: asUnknownRecord({
                   name: 'Nguyện Cầu',
-                  tags: ['single-target', 'heal'],
+                  tags: ['single-target', 'basic-attack', 'heal', 'random-target'],
                   damageMultiplier: 1.00,
                   healRandomAllyPercentMaxHP: 0.03,
-                  notes: 'Gây sát thương 100% ATK + WIL và hồi 3% Max HP của Anna cho 1 đồng minh ngẫu nhiên.'
+                  notes: 'Gây sát thương 100% ATK + WIL và hồi 3% Max HP của Anna cho 1 đồng minh ngẫu nhiên (ưu tiên người thấp máu nếu hệ thống hỗ trợ).'
               }),
               skills: asUnknownRecordArray([
                   {
                       key: 'skill1',
                       name: 'Aegis Tụ Linh',
                       cost: { aether: 20 },
+                      tags: ['self', 'defense', 'aether-cost'],
                       duration: 2,
                       buffStats: { ARM: 0.20, RES: 0.20 },
                       notes: 'Tăng 20% ARM/RES trong 2 lượt.'
@@ -2816,6 +2817,7 @@ __define('./catalog.ts', (exports, module, __require) => {
                       key: 'skill2',
                       name: 'Huyết Tế Vương Tọa',
                       cost: { aether: 25 },
+                      tags: ['ally', 'aether-cost', 'non-heal-hp-change'],
                       hpSacrificePercentMax: 0.50,
                       transferToLeader: true,
                       minHpPercentToCast: 0.70,
@@ -2827,22 +2829,23 @@ __define('./catalog.ts', (exports, module, __require) => {
                       cost: { aether: 20 },
                       targets: 2,
                       damageMultiplier: 1.40,
-                      tags: ['multi-target'],
+                      tags: ['multi-target', 'random-target', 'aether-cost'],
                       notes: 'Đánh ngẫu nhiên 2 kẻ địch, mỗi mục tiêu nhận 140% đòn đánh thường.'
                   }
               ]),
               ult: asUnknownRecord({
                   type: 'heal',
-                  tags: ['team-heal'],
+                  tags: ['team-heal', 'global-rule'],
                   healPercentMaxHP: 0.50,
                   healScale: { ATK: 0.20, WIL: 0.20 },
                   affects: 'allAllies',
-                  notes: 'Thánh Lễ Tái Sinh hồi 50% Max HP + 20% ATK/WIL cho toàn bộ đồng minh.'
+                  notes: 'Thánh Lễ Tái Sinh hồi 50% Max HP + 20% ATK/WIL cho toàn bộ đồng minh, sau đó kích hoạt nội tại Ấn Chú Thăng Hoa.'
               }),
               talent: asUnknownRecord({
                   name: 'Ấn Chú Thăng Hoa',
+                  tags: ['passive', 'self', 'support'],
                   stacks: 5,
-                  perStack: { HP: 0.05, ATK: 0.05, WIL: 0.05 },
+                  perStack: { hpMax: 0.05, atk: 0.05, wil: 0.05 },
                   trigger: 'onUltCast'
               }),
               technique: null,
@@ -2852,7 +2855,7 @@ __define('./catalog.ts', (exports, module, __require) => {
                       name: 'Ấn Chú Thăng Hoa',
                       when: 'onUltCast',
                       effect: 'stackBuff',
-                      params: { stats: { HP: 0.05, ATK: 0.05, WIL: 0.05 }, maxStacks: 5 }
+                      params: { stats: { hpMax: 0.05, atk: 0.05, wil: 0.05 }, maxStacks: 5 }
                   }
               ]),
               traits: asUnknownRecordArray([
@@ -7181,10 +7184,10 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
       {
           unitId: 'anna',
           basic: {
-              name: 'Đánh Thường',
+              name: 'Nguyện Cầu',
               type: 'basic',
-              tags: ['single-target', 'heal'],
-              description: 'Tấn công một mục tiêu gây 100% ATK + 100% WIL, đồng thời hồi 3% Max HP của Anna cho một đồng minh ngẫu nhiên.'
+              tags: ['single-target', 'basic-attack', 'heal', 'random-target'],
+              description: 'Tấn công một mục tiêu gây 100% ATK + 100% WIL, đồng thời hồi 3% Max HP của Anna cho một đồng minh ngẫu nhiên (ưu tiên mục tiêu thấp HP nếu hệ thống hỗ trợ).'
           },
           skills: [
               {
@@ -7192,6 +7195,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   name: 'Aegis Tụ Linh',
                   type: 'active',
                   cost: { aether: 20 },
+                  tags: ['self', 'defense', 'aether-cost'],
                   duration: { turns: 2 },
                   buffs: [{ stats: { ARM: 0.20, RES: 0.20 } }],
                   description: 'Gây dựng áo giáp linh lực, tăng 20% ARM/RES cho bản thân trong 2 lượt.'
@@ -7201,6 +7205,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   name: 'Huyết Tế Vương Tọa',
                   type: 'active',
                   cost: { aether: 25 },
+                  tags: ['ally', 'aether-cost', 'non-heal-hp-change'],
                   requirements: { casterHpPercentMin: 0.70 },
                   sacrifices: [{ percentMaxHP: 0.50, target: 'self', transferTo: 'leader' }],
                   description: 'Hiến 50% Max HP hiện tại (không giảm Max HP) cho Leader đồng minh. Chỉ thi triển khi HP ≥ 70% Max HP, không chịu ảnh hưởng bởi buff hồi máu của Anna nhưng chịu modifier của người nhận.'
@@ -7210,7 +7215,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   name: 'Hỗn Linh Trường Ca',
                   type: 'active',
                   cost: { aether: 20 },
-                  tags: ['multi-target'],
+                  tags: ['multi-target', 'random-target', 'aether-cost'],
                   damage: { multiplier: 1.4, targets: 2 },
                   description: 'Ngân trường ca hỗn linh, gây sát thương 140% đánh thường lên 2 kẻ địch ngẫu nhiên.'
               }
@@ -7218,15 +7223,16 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
           ult: {
               name: 'Thánh Lễ Tái Sinh',
               type: 'ultimate',
-              tags: ['team-heal'],
+              tags: ['team-heal', 'global-rule'],
               heals: { percentMaxHP: 0.50, scale: { ATK: 0.20, WIL: 0.20 }, targets: 'allAllies' },
-              description: 'Thực hiện nghi thức tái sinh, hồi 50% Max HP cộng thêm 20% ATK/WIL của Anna cho toàn bộ đồng minh.'
+              description: 'Thực hiện nghi thức tái sinh, hồi 50% Max HP cộng thêm 20% ATK/WIL của Anna cho toàn bộ đồng minh. Sau khi thi triển, kích hoạt nội tại Ấn Chú Thăng Hoa.'
           },
           talent: {
               name: 'Ấn Chú Thăng Hoa',
               type: 'talent',
+              tags: ['passive', 'self', 'support'],
               stacks: 5,
-              description: 'Mỗi lần thi triển Ultimate cộng dồn +5% ATK/WIL/Max HP (tối đa 5 tầng). Tầng không tự mất trong trận.'
+              description: 'Mỗi lần thi triển Ultimate cộng dồn +5% ATK/WIL/Max HP (tối đa 5 tầng). Tầng không tự mất trong trận và có thể biểu diễn VFX theo cấp sáng 1→5.'
           },
           technique: null,
           notes: [
