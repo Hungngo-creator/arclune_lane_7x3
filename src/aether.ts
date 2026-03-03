@@ -208,10 +208,8 @@ export class SharedAetherPool {
       ? (options.backOffsetY as number)
       : defaultBackY;
 
-    // Đẩy trụ về phía sau lưng leader theo hướng quay của leader.
-    const viewportCenterX = (typeof window !== 'undefined' ? window.innerWidth / 2 : screenX);
-    const sideSign = Math.sign(screenX - viewportCenterX) || facing;
-    const xOffset = sideSign * backOffsetX;
+     const facingSign = Math.sign(facing) || (this.side === 'ally' ? 1 : -1);
+     const xOffset = facingSign * backOffsetX;
      const yOffset = -(backOffsetY + extraAnchorLift);
 
     let nextLeft = screenX + xOffset;

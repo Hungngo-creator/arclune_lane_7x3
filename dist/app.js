@@ -182,10 +182,8 @@ __define('./aether.ts', (exports, module, __require) => {
           const backOffsetY = Number.isFinite(options.backOffsetY)
               ? options.backOffsetY
               : defaultBackY;
-          // Đẩy trụ về phía sau lưng leader theo hướng quay của leader.
-          const viewportCenterX = (typeof window !== 'undefined' ? window.innerWidth / 2 : screenX);
-          const sideSign = Math.sign(screenX - viewportCenterX) || facing;
-          const xOffset = sideSign * backOffsetX;
+          const facingSign = Math.sign(facing) || (this.side === 'ally' ? 1 : -1);
+          const xOffset = facingSign * backOffsetX;
           const yOffset = -(backOffsetY + extraAnchorLift);
           let nextLeft = screenX + xOffset;
           let nextTop = screenY + yOffset;
@@ -13657,13 +13655,18 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           const enemyPos = projectLeaderGroundPos(enemyLeader, 6, 1);
           const viewport = rect.width <= 820 ? 'mobile' : 'desktop';
           const clampMargin = Math.max(12, Math.round(rect.width * 0.02));
+          const halfTileAnchor = 0.5;
+          const allyBackOffsetX = grid.tile * halfTileAnchor * allyPos.s;
+          const enemyBackOffsetX = grid.tile * halfTileAnchor * enemyPos.s;
+          const allyBackOffsetY = (viewport === 'mobile' ? 24 : 30) * allyPos.s;
+          const enemyBackOffsetY = (viewport === 'mobile' ? 24 : 30) * enemyPos.s;
           // 5. Đồng bộ vị trí + đồng bộ bể AE chung theo đội hình sống
           globalAetherPool.syncAllVisuals({ x: allyPos.x, y: allyPos.y, s: allyPos.s }, { x: enemyPos.x, y: enemyPos.y, s: enemyPos.s }, tokens, {
               ally: {
                   facing: 1,
                   viewport,
-                  backOffsetX: viewport === 'mobile' ? 18 * allyPos.s : 24 * allyPos.s,
-                  backOffsetY: viewport === 'mobile' ? 24 * allyPos.s : 30 * allyPos.s,
+                  backOffsetX: allyBackOffsetX,
+                  backOffsetY: allyBackOffsetY,
                   anchorLiftY: Number.isFinite(allyPos.anchor) ? Math.max(0, (1 - allyPos.anchor) * 10 * allyPos.s) : 0,
                   clamp: {
                       minX: rect.left + clampMargin,
@@ -13675,8 +13678,8 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               enemy: {
                   facing: -1,
                   viewport,
-                  backOffsetX: viewport === 'mobile' ? 18 * enemyPos.s : 24 * enemyPos.s,
-                  backOffsetY: viewport === 'mobile' ? 24 * enemyPos.s : 30 * enemyPos.s,
+                  backOffsetX: enemyBackOffsetX,
+                  backOffsetY: enemyBackOffsetY,
                   anchorLiftY: Number.isFinite(enemyPos.anchor) ? Math.max(0, (1 - enemyPos.anchor) * 10 * enemyPos.s) : 0,
                   clamp: {
                       minX: rect.left + clampMargin,
