@@ -1,7 +1,7 @@
 // Bundled by build.mjs
 const __modules = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/announcements.config.js":"./data/announcements.config.ts","./data/announcements.js":"./data/announcements.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }
 function __define(id, factory){ __modules[id] = { factory, exports: null, initialized: false }; }
@@ -5404,212 +5404,6 @@ __define('./cultivation.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'canBreakthrough')) exports.canBreakthrough = canBreakthrough;
   if (!Object.prototype.hasOwnProperty.call(exports, 'upgradeCultivation')) exports.upgradeCultivation = upgradeCultivation;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyCultivationBonus')) exports.applyCultivationBonus = applyCultivationBonus;
-});
-__define('./data/announcements.config.ts', (exports, module, __require) => {
-  //home (termux)/arclune_lane_7x3/src/data/announcements.config.ts
-  const announcementsConfig = [
-      {
-          key: 'event',
-          label: 'Sự kiện giới hạn',
-          entries: [
-              {
-                  id: 'primal-lottery',
-                  title: 'Chiến dịch Vé số Nguyên Tinh',
-                  shortDescription: 'Mở lại vé số tuần, chia {{LOTTERY_PRIZE_PERCENT}}% quỹ thưởng và {{LOTTERY_DEV_PERCENT}}% vận hành.',
-                  tooltip: 'Hoạt động vé số giới hạn thời gian: người chơi dùng tiền tệ trong game để mua vé; 50% doanh thu quay về ví dev để ổn định kinh tế, 50% tích vào giải thưởng cho cộng đồng.',
-                  rewardCallout: 'Chuỗi quy đổi tham chiếu: {{TT_CONVERSION_CHAIN}}.',
-                  translationKey: 'sidebar.events.primalLottery'
-              },
-              {
-                  id: 'arena-season',
-                  title: 'Đấu Trường — Mùa 7 ngày',
-                  shortDescription: 'Deck vs deck do AI điều khiển, vận hành theo mùa 7 ngày với bảng xếp hạng riêng.',
-                  tooltip: 'Đấu Trường (PvE deck vs deck) chạy theo chu kỳ 7 ngày: dùng lại logic combat, bổ sung hệ thống phần thưởng và bảng xếp hạng để người chơi tranh hạng.',
-                  rewardCallout: 'Phần thưởng mùa làm mới mỗi tuần.',
-                  startAt: '2025-09-08T00:00:00+07:00',
-                  endAt: '2025-09-14T23:59:59+07:00',
-                  translationKey: 'sidebar.events.arenaSeason'
-              }
-          ]
-      },
-      {
-          key: 'achievement',
-          label: 'Thành tựu nổi bật',
-          entries: [
-              {
-                  id: 'beast-kings',
-                  title: 'Danh hiệu Thú Vương',
-                  shortDescription: 'Đạt 500/1000/10000 trận thắng trong một mùa đấu thú trường để nhận Thú Vương, Bách Thú Vương, Vạn Thú Vương.',
-                  tooltip: 'Chuỗi thành tựu đấu thú trường: Thú Vương (500 trận thắng), Bách Thú Vương (1000 trận), Vạn Thú Vương (10000 trận) trong cùng một mùa.',
-                  rewardCallout: 'Phần thưởng thành tựu sẽ cập nhật sau bản cân bằng tiền tệ.',
-                  translationKey: 'sidebar.achievements.beastKings'
-              },
-              {
-                  id: 'gacha-legends',
-                  title: 'Huyền thoại Gacha',
-                  shortDescription: 'Kẻ May Mắn và Cha của Kẻ May Mắn yêu cầu chuỗi SSR/UR hi hữu trong 10 lần triệu hồi.',
-                  tooltip: 'Thành tựu gacha: Kẻ May Mắn nhận 3 SSR trong một lần gacha 10; Cha của Kẻ May Mắn nhận 4 SSR hoặc 2 UR trong một lần gacha 10.',
-                  rewardCallout: 'Thành tựu tôn vinh vận may tuyệt đối trong banner trạm tiếp tế.',
-                  startAt: '2025-09-15T00:00:00+07:00',
-                  endAt: '2025-09-30T23:59:59+07:00',
-                  translationKey: 'sidebar.achievements.gachaLegends'
-              }
-          ]
-      },
-      {
-          key: 'ladder',
-          label: 'Đấu thú trường',
-          entries: [
-              {
-                  id: 'ladder-progress',
-                  title: 'Thang bậc đấu thú',
-                  shortDescription: 'Chuỗi thắng 1→186 trận đưa bạn từ Đồng đến Tối Cao; giữ top sẽ chạm Đấu Thần & Đấu Vương.',
-                  tooltip: 'Thắng liên tục mở khoá bậc: 1/3/6 trận đạt Đồng 1/2/3; 10/14/18 cho Bạc; 23→33 cho Vàng; 39→51 cho Bạch Kim; 58→72 cho Kim Cương; 80→96 cho Bậc Thầy; 105→123 cho Bá Chủ; 133→153 cho Thách Đấu; 164→186 cho Tối Cao. Top 1 giữ mùa đạt Đấu Thần, Top 2-4 đạt Đấu Vương.',
-                  rewardCallout: 'Mọi bậc đều có thưởng; phần thưởng đặc biệt cho Đấu Thần và Đấu Vương cuối mùa.',
-                  translationKey: 'sidebar.ladder.progress'
-              },
-              {
-                  id: 'defense-record',
-                  title: 'Giữ vững Đấu Thần',
-                  shortDescription: 'Đạt Đấu Thần và phòng thủ 300 lượt tấn công mà không thất bại để ghi dấu “Ngươi thật là ích kỷ a”.',
-                  tooltip: 'Thành tựu phòng thủ đấu thú trường: chịu 300 lần công kích khi ở rank Đấu Thần nhưng không bị đánh bại để nhận danh hiệu “Ngươi thật là ích kỷ a”.',
-                  rewardCallout: 'Kể cả phòng thủ cũng được ghi nhận trên bảng danh dự đấu thú.',
-                  startAt: '2025-10-01T00:00:00+07:00',
-                  translationKey: 'sidebar.ladder.defenseRecord'
-              }
-          ]
-      },
-      {
-          key: 'community',
-          label: 'Chat & xã hội',
-          entries: [
-              {
-                  id: 'community-channel',
-                  title: 'Kênh quân đoàn',
-                  shortDescription: 'Khung chat realtime + thông báo cộng đồng giúp bạn theo dõi đội hình và lịch sự kiện.',
-                  tooltip: 'Chat & Xã hội: khung chat realtime kết nối quân đoàn, kết hợp thông báo cộng đồng để hội viên bắt kịp hoạt động.',
-                  rewardCallout: 'Nhận ping khi đội mở lobby hoặc khi sự kiện đấu thú sắp khóa sổ.',
-                  translationKey: 'sidebar.community.channel'
-              }
-          ]
-      }
-  ];
-
-  //# sourceMappingURL=stdin.js.map
-  if (!Object.prototype.hasOwnProperty.call(exports, 'default')) exports.default = announcementsConfig;
-  module.exports.default = exports.default;
-});
-__define('./data/announcements.ts', (exports, module, __require) => {
-  //home (termux)/arclune_lane_7x3/src/data/announcements.ts
-  const __dep0 = __require('./../tools/zod-stub/index.js');
-  const z = __dep0.z;
-  const __dep1 = __require('./data/economy.ts');
-  const CURRENCY_IDS = __dep1.CURRENCY_IDS;
-  const convertCurrency = __dep1.convertCurrency;
-  const formatBalance = __dep1.formatBalance;
-  const getLotterySplit = __dep1.getLotterySplit;
-  const __dep2 = __require('./data/announcements.config.ts');
-  const rawAnnouncementsConfig = __dep2.default ?? __dep2;
-  const AnnouncementEntryConfigSchema = z.object({
-      id: z.string(),
-      title: z.string(),
-      shortDescription: z.string(),
-      tooltip: z.string().optional(),
-      rewardCallout: z.string().optional(),
-      startAt: z.string().optional(),
-      endAt: z.string().optional(),
-      translationKey: z.string().optional()
-  });
-  const AnnouncementSlotConfigSchema = z.object({
-      key: z.string(),
-      label: z.string(),
-      entries: z.array(AnnouncementEntryConfigSchema)
-  });
-  const AnnouncementsConfigSchema = z.array(AnnouncementSlotConfigSchema);
-  const LOTTERY_SPLIT = getLotterySplit();
-  const LOTTERY_DEV_PERCENT = Math.round((LOTTERY_SPLIT.devVault || 0) * 100);
-  const LOTTERY_PRIZE_PERCENT = Math.round((LOTTERY_SPLIT.prizePool || 0) * 100);
-  const TT_CONVERSION_CHAIN = [
-      formatBalance(1, CURRENCY_IDS.TT),
-      formatBalance(convertCurrency(1, CURRENCY_IDS.TT, CURRENCY_IDS.ThNT), CURRENCY_IDS.ThNT),
-      formatBalance(convertCurrency(1, CURRENCY_IDS.TT, CURRENCY_IDS.TNT), CURRENCY_IDS.TNT),
-      formatBalance(convertCurrency(1, CURRENCY_IDS.TT, CURRENCY_IDS.HNT), CURRENCY_IDS.HNT),
-      formatBalance(convertCurrency(1, CURRENCY_IDS.TT, CURRENCY_IDS.VNT), CURRENCY_IDS.VNT)
-  ].join(' = ');
-  const announcementConfig = AnnouncementsConfigSchema.parse(rawAnnouncementsConfig);
-  const MACROS = Object.freeze({
-      LOTTERY_PRIZE_PERCENT: `${LOTTERY_PRIZE_PERCENT}`,
-      LOTTERY_DEV_PERCENT: `${LOTTERY_DEV_PERCENT}`,
-      TT_CONVERSION_CHAIN
-  });
-  function applyMacros(value) {
-      if (value === undefined || value === null)
-          return value;
-      let result = value;
-      for (const [token, replacement] of Object.entries(MACROS)) {
-          result = result.replaceAll(`{{${token}}}`, replacement);
-      }
-      return result;
-  }
-  function isEntryActive(entry, now) {
-      if (!entry)
-          return false;
-      if (!entry.startAt && !entry.endAt)
-          return true;
-      const start = entry.startAt ? new Date(entry.startAt) : null;
-      const end = entry.endAt ? new Date(entry.endAt) : null;
-      if (start && Number.isFinite(start.getTime()) && now < start)
-          return false;
-      if (end && Number.isFinite(end.getTime()) && now > end)
-          return false;
-      return true;
-  }
-  const SIDE_SLOT_ANNOUNCEMENTS = Object.freeze(announcementConfig.map((slot) => ({
-      key: slot.key,
-      label: slot.label,
-      entries: Object.freeze(slot.entries.map((entry) => Object.freeze({
-          ...entry,
-          shortDescription: applyMacros(entry.shortDescription) ?? entry.shortDescription,
-          tooltip: applyMacros(entry.tooltip) ?? undefined,
-          rewardCallout: applyMacros(entry.rewardCallout) ?? undefined,
-          startAt: entry.startAt ?? null,
-          endAt: entry.endAt ?? null
-      })))
-  })));
-  /**
-   * @param {string} slotKey
-   * @param {{ now?: Date }} [options]
-   * @returns {{ slot: AnnouncementSlot; entry: AnnouncementEntry } | null}
-   */
-  function selectAnnouncementEntry(slotKey, options = {}) {
-      const now = options.now instanceof Date ? options.now : new Date();
-      const slot = SIDE_SLOT_ANNOUNCEMENTS.find(item => item.key === slotKey);
-      if (!slot)
-          return null;
-      const entry = slot.entries.find((item) => isEntryActive(item, now))
-          ?? slot.entries.at(0)
-          ?? null;
-      if (!entry)
-          return null;
-      return { slot, entry };
-  }
-  function getAllSidebarAnnouncements(options = {}) {
-      const now = options.now instanceof Date ? options.now : new Date();
-      return SIDE_SLOT_ANNOUNCEMENTS.map(slot => {
-          const entry = slot.entries.find((item) => isEntryActive(item, now))
-              ?? slot.entries.at(0)
-              ?? null;
-          return {
-              key: slot.key,
-              label: slot.label,
-              entry
-          };
-      }).filter((item) => Boolean(item.entry));
-  }
-  //# sourceMappingURL=stdin.js.map
-  if (!Object.prototype.hasOwnProperty.call(exports, 'SIDE_SLOT_ANNOUNCEMENTS')) exports.SIDE_SLOT_ANNOUNCEMENTS = SIDE_SLOT_ANNOUNCEMENTS;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'selectAnnouncementEntry')) exports.selectAnnouncementEntry = selectAnnouncementEntry;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'getAllSidebarAnnouncements')) exports.getAllSidebarAnnouncements = getAllSidebarAnnouncements;
 });
 __define('./data/economy.config.ts', (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/data/economy.config.ts
@@ -21177,7 +20971,6 @@ __define('./screens/main-menu/view/index.ts', (exports, module, __require) => {
   const ensureStyles = __dep2.ensureStyles;
   const createHeader = __dep2.createHeader;
   const createModesSection = __dep2.createModesSection;
-  const createSidebar = __dep2.createSidebar;
   function renderMainMenuView(state) {
       const { root, shell = null, sections = [], metadata = [], onShowComingSoon } = state;
       if (!root)
@@ -21206,9 +20999,7 @@ __define('./screens/main-menu/view/index.ts', (exports, module, __require) => {
       primary.className = 'main-menu-v2__primary';
       const modes = createModesSection({ sections, metadata, shell, onShowComingSoon, addCleanup });
       primary.appendChild(modes);
-      const sidebar = createSidebar({ shell, addCleanup });
       layout.appendChild(primary);
-      layout.appendChild(sidebar);
       return {
           destroy() {
               cleanups.forEach(fn => {
@@ -21229,18 +21020,15 @@ __define('./screens/main-menu/view/index.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureStyles')) exports.ensureStyles = __reexport0.ensureStyles;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createHeader')) exports.createHeader = __reexport0.createHeader;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createModesSection')) exports.createModesSection = __reexport0.createModesSection;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'createSidebar')) exports.createSidebar = __reexport0.createSidebar;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderMainMenuView')) exports.renderMainMenuView = renderMainMenuView;
 });
 __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/main-menu/view/layout.ts
-  const __dep0 = __require('./data/announcements.ts');
-  const getAllSidebarAnnouncements = __dep0.getAllSidebarAnnouncements;
-  const __dep1 = __require('./ui/dom.ts');
-  const ensureStyleTag = __dep1.ensureStyleTag;
-  const __dep2 = __require('./screens/main-menu/view/events.ts');
-  const createModeCard = __dep2.createModeCard;
-  const createModeGroupCard = __dep2.createModeGroupCard;
+  const __dep0 = __require('./ui/dom.ts');
+  const ensureStyleTag = __dep0.ensureStyleTag;
+  const __dep1 = __require('./screens/main-menu/view/events.ts');
+  const createModeCard = __dep1.createModeCard;
+  const createModeGroupCard = __dep1.createModeGroupCard;
   const STYLE_ID = 'main-menu-view-style';
   function ensureStyles() {
       const css = `
@@ -21252,7 +21040,7 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
       .main-menu-v2__subtitle{margin:0;color:#9cbcd9;line-height:1.6;font-size:17px;}
       .main-menu-v2__meta{display:flex;gap:12px;flex-wrap:wrap;}
       .main-menu-v2__meta-chip{padding:8px 16px;border-radius:999px;border:1px solid rgba(125,211,252,.32);background:rgba(18,28,38,.68);letter-spacing:.12em;font-size:12px;text-transform:uppercase;color:#aee4ff;}
-      .main-menu-v2__layout{display:grid;grid-template-columns:minmax(0,3fr) minmax(240px,1fr);gap:32px;align-items:start;}
+      .main-menu-v2__layout{display:grid;grid-template-columns:minmax(0,1fr);gap:32px;align-items:start;}
       .main-menu-v2__primary{display:flex;flex-direction:column;gap:32px;}
       .main-menu-modes{display:flex;flex-direction:column;gap:24px;}
       .main-menu-modes__title{margin:0;font-size:24px;letter-spacing:.1em;text-transform:uppercase;color:#aee4ff;}
@@ -21302,15 +21090,7 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
       .mode-card__child-desc{font-size:12px;color:#9cbcd9;line-height:1.4;}
       .mode-card__child--coming{opacity:.9;}
       .mode-card__child--coming .mode-card__child-status{color:#ffe066;}
-      .main-menu-sidebar{display:flex;flex-direction:column;gap:16px;}
-      .sidebar-slot{position:relative;padding:20px 22px;border-radius:18px;border:1px solid rgba(125,211,252,.18);background:rgba(12,20,28,.82);overflow:hidden;display:flex;flex-direction:column;gap:8px;min-height:104px;}
-      .sidebar-slot::after{content:'';position:absolute;inset:auto -40% -60% 50%;transform:translateX(-50%);width:140%;height:120%;background:radial-gradient(circle,rgba(125,211,252,.18),transparent 70%);opacity:.4;pointer-events:none;}
-      .sidebar-slot__label{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#7da0c7;}
-      .sidebar-slot__title{margin:0;font-size:16px;letter-spacing:.04em;}
-      .sidebar-slot__desc{margin:0;font-size:13px;color:#9cbcd9;line-height:1.5;}
-      .sidebar-slot__reward{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#ffe066;}
-      .sidebar-slot:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:4px;}
-      @media(max-width:960px){.main-menu-v2__layout{grid-template-columns:1fr;}.main-menu-sidebar{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;}}
+      @media(max-width:960px){.main-menu-v2__layout{grid-template-columns:1fr;}}
       @media(max-width:640px){.main-menu-v2{gap:24px;}.main-menu-v2__title{font-size:36px;}.mode-card{padding:20px;}}
     `;
       ensureStyleTag(STYLE_ID, { css });
@@ -21368,92 +21148,6 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
       });
       return sectionEl;
   }
-  function createSidebar(options) {
-      const { shell, addCleanup } = options;
-      const aside = document.createElement('aside');
-      aside.className = 'main-menu-sidebar';
-      const announcements = getAllSidebarAnnouncements();
-      const attachTooltipHandlers = (element, info) => {
-          if (!element || !info)
-              return;
-          const { slotKey, entry } = info;
-          if (!slotKey)
-              return;
-          if (!shell || typeof shell.showTooltip !== 'function')
-              return;
-          const showTooltip = () => {
-              shell.showTooltip?.({
-                  id: entry.id,
-                  slot: slotKey,
-                  title: entry.title,
-                  description: entry.tooltip,
-                  reward: entry.rewardCallout,
-                  translationKey: entry.translationKey || null,
-                  startAt: entry.startAt || null,
-                  endAt: entry.endAt || null
-              });
-          };
-          const hideTooltip = () => {
-              if (typeof shell.hideTooltip === 'function') {
-                  shell.hideTooltip({ id: entry.id || null, slot: slotKey });
-              }
-          };
-          element.addEventListener('mouseenter', showTooltip);
-          element.addEventListener('mouseleave', hideTooltip);
-          element.addEventListener('focus', showTooltip);
-          element.addEventListener('blur', hideTooltip);
-          addCleanup(() => {
-              element.removeEventListener('mouseenter', showTooltip);
-              element.removeEventListener('mouseleave', hideTooltip);
-              element.removeEventListener('focus', showTooltip);
-              element.removeEventListener('blur', hideTooltip);
-          });
-      };
-      announcements.forEach(item => {
-          const { key, label, entry } = item;
-          const card = document.createElement('div');
-          card.className = 'sidebar-slot';
-          card.dataset.slot = key;
-          if (entry.id)
-              card.dataset.entryId = entry.id;
-          if (entry.translationKey)
-              card.dataset.translationKey = entry.translationKey;
-          if (entry.startAt)
-              card.dataset.startAt = entry.startAt;
-          if (entry.endAt)
-              card.dataset.endAt = entry.endAt;
-          card.tabIndex = 0;
-          const labelEl = document.createElement('span');
-          labelEl.className = 'sidebar-slot__label';
-          labelEl.textContent = label;
-          const titleEl = document.createElement('h4');
-          titleEl.className = 'sidebar-slot__title';
-          titleEl.textContent = entry.title || '';
-          const descEl = document.createElement('p');
-          descEl.className = 'sidebar-slot__desc';
-          descEl.textContent = entry.shortDescription || '';
-          card.appendChild(labelEl);
-          card.appendChild(titleEl);
-          card.appendChild(descEl);
-          if (entry.rewardCallout) {
-              const rewardEl = document.createElement('span');
-              rewardEl.className = 'sidebar-slot__reward';
-              rewardEl.textContent = entry.rewardCallout;
-              card.appendChild(rewardEl);
-          }
-          const tooltipText = [entry.tooltip, entry.rewardCallout].filter(Boolean).join('\n\n');
-          const hasCustomTooltip = Boolean(shell && typeof shell.showTooltip === 'function');
-          if (tooltipText && !hasCustomTooltip) {
-              card.setAttribute('title', tooltipText);
-          }
-          else {
-              card.removeAttribute('title');
-          }
-          attachTooltipHandlers(card, { slotKey: key, entry });
-          aside.appendChild(card);
-      });
-      return aside;
-  }
   function createHeader() {
       const header = document.createElement('header');
       header.className = 'main-menu-v2__header';
@@ -21462,7 +21156,6 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureStyles')) exports.ensureStyles = ensureStyles;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createModesSection')) exports.createModesSection = createModesSection;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'createSidebar')) exports.createSidebar = createSidebar;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createHeader')) exports.createHeader = createHeader;
 });
 __define('./screens/ui-gacha/gacha.css', (exports, module, __require) => {

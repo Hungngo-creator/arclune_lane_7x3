@@ -1,8 +1,6 @@
 //home (termux)/arclune_lane_7x3/src/screens/main-menu/view/layout.ts
 
-import { getAllSidebarAnnouncements } from '../../../data/announcements.ts';
 import { ensureStyleTag } from '../../../ui/dom.ts';
-import type { AnnouncementEntry } from '@shared-types/config';
 import type {
   CleanupRegistrar,
   ComingSoonHandler,
@@ -24,7 +22,7 @@ export function ensureStyles(): void {
     .main-menu-v2__subtitle{margin:0;color:#9cbcd9;line-height:1.6;font-size:17px;}
     .main-menu-v2__meta{display:flex;gap:12px;flex-wrap:wrap;}
     .main-menu-v2__meta-chip{padding:8px 16px;border-radius:999px;border:1px solid rgba(125,211,252,.32);background:rgba(18,28,38,.68);letter-spacing:.12em;font-size:12px;text-transform:uppercase;color:#aee4ff;}
-    .main-menu-v2__layout{display:grid;grid-template-columns:minmax(0,3fr) minmax(240px,1fr);gap:32px;align-items:start;}
+    .main-menu-v2__layout{display:grid;grid-template-columns:minmax(0,1fr);gap:32px;align-items:start;}
     .main-menu-v2__primary{display:flex;flex-direction:column;gap:32px;}
     .main-menu-modes{display:flex;flex-direction:column;gap:24px;}
     .main-menu-modes__title{margin:0;font-size:24px;letter-spacing:.1em;text-transform:uppercase;color:#aee4ff;}
@@ -74,15 +72,7 @@ export function ensureStyles(): void {
     .mode-card__child-desc{font-size:12px;color:#9cbcd9;line-height:1.4;}
     .mode-card__child--coming{opacity:.9;}
     .mode-card__child--coming .mode-card__child-status{color:#ffe066;}
-    .main-menu-sidebar{display:flex;flex-direction:column;gap:16px;}
-    .sidebar-slot{position:relative;padding:20px 22px;border-radius:18px;border:1px solid rgba(125,211,252,.18);background:rgba(12,20,28,.82);overflow:hidden;display:flex;flex-direction:column;gap:8px;min-height:104px;}
-    .sidebar-slot::after{content:'';position:absolute;inset:auto -40% -60% 50%;transform:translateX(-50%);width:140%;height:120%;background:radial-gradient(circle,rgba(125,211,252,.18),transparent 70%);opacity:.4;pointer-events:none;}
-    .sidebar-slot__label{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#7da0c7;}
-    .sidebar-slot__title{margin:0;font-size:16px;letter-spacing:.04em;}
-    .sidebar-slot__desc{margin:0;font-size:13px;color:#9cbcd9;line-height:1.5;}
-    .sidebar-slot__reward{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#ffe066;}
-    .sidebar-slot:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:4px;}
-    @media(max-width:960px){.main-menu-v2__layout{grid-template-columns:1fr;}.main-menu-sidebar{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;}}
+    @media(max-width:960px){.main-menu-v2__layout{grid-template-columns:1fr;}}
     @media(max-width:640px){.main-menu-v2{gap:24px;}.main-menu-v2__title{font-size:36px;}.mode-card{padding:20px;}}
   `;
 
@@ -152,109 +142,6 @@ export function createModesSection(options: ModesSectionOptions): HTMLElement {
   });
 
   return sectionEl;
-}
-
-interface SidebarOptions {
-  shell: MainMenuShell | null | undefined;
-  addCleanup: CleanupRegistrar;
-}
-
-type SidebarAnnouncement = {
-  key: string;
-  label: string;
-  entry: AnnouncementEntry;
-};
-
-export function createSidebar(options: SidebarOptions): HTMLElement {
-  const { shell, addCleanup } = options;
-  const aside = document.createElement('aside');
-  aside.className = 'main-menu-sidebar';
-  const announcements: ReadonlyArray<SidebarAnnouncement> = getAllSidebarAnnouncements();
-
-  const attachTooltipHandlers = (element: HTMLElement | null, info: { slotKey: string; entry: AnnouncementEntry } | null) => {
-    if (!element || !info) return;
-    const { slotKey, entry } = info;
-    if (!slotKey) return;
-    if (!shell || typeof shell.showTooltip !== 'function') return;
-
-    const showTooltip = () => {
-      shell.showTooltip?.({
-        id: entry.id,
-        slot: slotKey,
-        title: entry.title,
-        description: entry.tooltip,
-        reward: entry.rewardCallout,
-        translationKey: entry.translationKey || null,
-        startAt: entry.startAt || null,
-        endAt: entry.endAt || null
-      });
-    };
-    const hideTooltip = () => {
-      if (typeof shell.hideTooltip === 'function'){
-        shell.hideTooltip({ id: entry.id || null, slot: slotKey });
-      }
-    };
-
-    element.addEventListener('mouseenter', showTooltip);
-    element.addEventListener('mouseleave', hideTooltip);
-    element.addEventListener('focus', showTooltip);
-    element.addEventListener('blur', hideTooltip);
-
-    addCleanup(() => {
-      element.removeEventListener('mouseenter', showTooltip);
-      element.removeEventListener('mouseleave', hideTooltip);
-      element.removeEventListener('focus', showTooltip);
-      element.removeEventListener('blur', hideTooltip);
-    });
-  };
-
-  announcements.forEach(item => {
-    const { key, label, entry } = item;
-    const card = document.createElement('div');
-    card.className = 'sidebar-slot';
-    card.dataset.slot = key;
-    if (entry.id) card.dataset.entryId = entry.id;
-    if (entry.translationKey) card.dataset.translationKey = entry.translationKey;
-    if (entry.startAt) card.dataset.startAt = entry.startAt;
-    if (entry.endAt) card.dataset.endAt = entry.endAt;
-    card.tabIndex = 0;
-
-    const labelEl = document.createElement('span');
-    labelEl.className = 'sidebar-slot__label';
-    labelEl.textContent = label;
-
-    const titleEl = document.createElement('h4');
-    titleEl.className = 'sidebar-slot__title';
-    titleEl.textContent = entry.title || '';
-
-    const descEl = document.createElement('p');
-    descEl.className = 'sidebar-slot__desc';
-    descEl.textContent = entry.shortDescription || '';
-
-    card.appendChild(labelEl);
-    card.appendChild(titleEl);
-    card.appendChild(descEl);
-
-    if (entry.rewardCallout){
-      const rewardEl = document.createElement('span');
-      rewardEl.className = 'sidebar-slot__reward';
-      rewardEl.textContent = entry.rewardCallout;
-      card.appendChild(rewardEl);
-    }
-
-    const tooltipText = [entry.tooltip, entry.rewardCallout].filter(Boolean).join('\n\n');
-    const hasCustomTooltip = Boolean(shell && typeof shell.showTooltip === 'function');
-    if (tooltipText && !hasCustomTooltip){
-      card.setAttribute('title', tooltipText);
-    } else {
-      card.removeAttribute('title');
-    }
-
-    attachTooltipHandlers(card, { slotKey: key, entry });
-    aside.appendChild(card);
-  });
-
-  return aside;
 }
 
 export function createHeader(): HTMLElement {

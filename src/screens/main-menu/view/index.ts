@@ -2,7 +2,7 @@
 
 import type { CleanupFn, CleanupRegistrar, MainMenuState, RenderedMainMenu } from '../types.ts';
 import { mountSection } from '../../../ui/dom.ts';
-import { ensureStyles, createHeader, createModesSection, createSidebar } from './layout.ts';
+import { ensureStyles, createHeader, createModesSection } from './layout.ts';
 
 export function renderMainMenuView(state: MainMenuState): RenderedMainMenu | null {
   const {
@@ -45,10 +45,7 @@ export function renderMainMenuView(state: MainMenuState): RenderedMainMenu | nul
   const modes = createModesSection({ sections, metadata, shell, onShowComingSoon, addCleanup });
   primary.appendChild(modes);
 
-  const sidebar = createSidebar({ shell, addCleanup });
-
   layout.appendChild(primary);
-  layout.appendChild(sidebar);
 
   return {
     destroy(){
@@ -69,5 +66,4 @@ export {
   ensureStyles,
   createHeader,
   createModesSection,
-  createSidebar
 } from './layout.ts';
