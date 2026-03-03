@@ -11,6 +11,14 @@ export async function loadTurnsHarness(overrides = {}){
   let code = await fs.readFile(filePath, 'utf8');
 
   const replacements = new Map([
+    ["import { initialRageFor } from './meta.ts';", "const { initialRageFor } = __deps['./meta.ts'];"],
+    ["import { vfxAddSpawn, vfxAddBloodPulse, asSessionWithVfx } from './vfx.ts';", "const { vfxAddSpawn, vfxAddBloodPulse, asSessionWithVfx } = __deps['./vfx.ts'];"],
+    ["import { emitPassiveEvent, applyOnSpawnEffects, getPassiveLog, prepareUnitForPassives } from './passives.ts';", "const { emitPassiveEvent, applyOnSpawnEffects, getPassiveLog, prepareUnitForPassives } = __deps['./passives.ts'];"],
+    ["import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } from './events.ts';", "const { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } = __deps['./events.ts'];"],
+    ["import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } from './utils/fury.ts';", "const { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } = __deps['./utils/fury.js'];"],
+    ["import { resolveRuntimeUnitStats } from './modes/pve/collection-mapper.ts';", "const { resolveRuntimeUnitStats } = __deps['./modes/pve/collection-mapper.ts'];"],
+    ["import { applyCultivationBonus } from './cultivation.ts';", "const { applyCultivationBonus } = __deps['./cultivation.ts'];"],
+    ["import { evaluateGambitLogic } from './ai.ts';", "const { evaluateGambitLogic } = __deps['./ai.ts'];"],
     ["import { slotToCell, slotIndex } from './engine.ts';", "const { slotToCell, slotIndex } = __deps['./engine.js'];"],
     ["import { globalAetherPool, resolveActionAetherRegen } from './aether.ts';", "const { globalAetherPool, resolveActionAetherRegen } = __deps['./aether.ts'];"],
     ["import { globalAetherPool } from './aether.ts';", "const { globalAetherPool } = __deps['./aether.ts'];"],
@@ -85,8 +93,13 @@ export async function loadTurnsHarness(overrides = {}){
     './aether.ts': {
       globalAetherPool: {
         gain(){},
+        consume(){ return true; },
+        current(){ return 0; },
       },
       resolveActionAetherRegen(){ return 5; },
+    },
+    './ai.ts': {
+      evaluateGambitLogic(){ return { action: null, slotIndex: -1, reason: 'noMatch' }; }
     },
     './config.ts': {
       CFG: {

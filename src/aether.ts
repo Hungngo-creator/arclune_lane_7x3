@@ -321,6 +321,8 @@ export const globalAetherPool = {
     return enemyAetherPool.consume(cost);
   },
 
+current: (side: Side) => (side === 'ally' ? allyAetherPool.current : enemyAetherPool.current),
+
   // API cho Engine update vị trí
   syncAllVisuals: (
     allyPos: {x:number, y:number, s:number},

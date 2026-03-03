@@ -16,6 +16,7 @@ import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clea
 import { nextTurnInterleaved } from './turns/interleaved.ts';
 import { resolveRuntimeUnitStats } from './modes/pve/collection-mapper.ts';
 import { applyCultivationBonus } from './cultivation.ts';
+import { evaluateGambitLogic } from './ai.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { RuntimeUnitProgress } from '@shared-types/pve';
@@ -427,7 +428,8 @@ export function doActionOrSkip(
   }
 
   const ultCost = resolveUltCost(unit, CFG);
-  if (meta && (unit.fury ?? 0) >= ultCost && !Statuses.blocks(unit, 'ult')){
+  const runUlt = (): boolean => {
+    if (!(meta && (unit.fury ?? 0) >= ultCost) || Statuses.blocks(unit, 'ult')) return false;
     let ultOk = false;
     try {
       performUlt!(unit);
@@ -456,6 +458,32 @@ export function doActionOrSkip(
       actionDetail.reason = 'ultFailed';
     }
     finishAction(actionDetail);
+    return true;
+  };
+
+  let gambitIndex = 0;
+  while (gambitIndex < 5) {
+    const decision = evaluateGambitLogic(Game, unit, { startIndex: gambitIndex });
+    if (decision.slotIndex < 0 || !decision.action) break;
+    gambitIndex = decision.slotIndex + 1;
+
+    if (decision.action === 'ult') {
+      if (!globalAetherPool.consume(unit.side, ultCost)) {
+        continue;
+      }
+      if (runUlt()) {
+        return resolution;
+      }
+      continue;
+    }
+
+    if (decision.action === 'basic') {
+      break;
+    }
+  }
+
+  if (meta && (unit.fury ?? 0) >= ultCost && !Statuses.blocks(unit, 'ult')){
+    runUlt();
     return resolution;
   }
 

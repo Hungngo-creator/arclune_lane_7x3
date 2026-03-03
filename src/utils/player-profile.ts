@@ -2,6 +2,7 @@ export interface SavedPlayerProfile {
   lineupDeck?: string[];
   cultivationByUnit?: Record<string, { realm: number; subRealm: number }>;
   sectName?: string;
+  tacticalAiByUnit?: Record<string, unknown>;
 }
 
 const STORAGE_KEY = 'arclune.playerProfile.v1';
@@ -41,6 +42,10 @@ export function patchPlayerProfile(patch: SavedPlayerProfile): SavedPlayerProfil
     cultivationByUnit: {
       ...(current.cultivationByUnit ?? {}),
       ...(patch.cultivationByUnit ?? {}),
+    },
+    tacticalAiByUnit: {
+      ...(current.tacticalAiByUnit ?? {}),
+      ...(patch.tacticalAiByUnit ?? {}),
     },
   };
   savePlayerProfile(merged);

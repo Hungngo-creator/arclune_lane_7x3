@@ -81,11 +81,19 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
 
   const left = document.createElement('aside');
   left.className = 'sect-screen__left';
-  SECT_OPTIONS.forEach(label => {
+  const optionHandlers: Array<() => void> = [];
+  SECT_OPTIONS.forEach((label, index) => {
     const option = document.createElement('button');
     option.type = 'button';
     option.className = 'sect-screen__hub-button';
     option.textContent = label;
+    const onSelect = () => {
+      if (index === 0) {
+        shell?.enterScreen?.('sect-tactical-ai');
+      }
+    };
+    option.addEventListener('click', onSelect);
+    optionHandlers.push(() => option.removeEventListener('click', onSelect));
     left.appendChild(option);
   });
 
@@ -152,6 +160,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   return {
     destroy() {
       backButton.removeEventListener('click', onBack);
+      optionHandlers.forEach((dispose) => dispose());
       closeOverlay();
       mount.destroy();
     }

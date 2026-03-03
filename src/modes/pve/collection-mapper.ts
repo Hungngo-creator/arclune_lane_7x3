@@ -1,11 +1,57 @@
 import { Meta, makeInstanceStats } from '../../meta.ts';
 
 import type { InstanceStats } from '../../meta.ts';
-import type { CollectionStateInput, RuntimeUnitProgress } from '@shared-types/pve';
+import type { CollectionStateInput, GambitActionType, GambitConditionType, GambitSlotInput, RuntimeGambitSlot, RuntimeUnitProgress } from '@shared-types/pve';
 
 type CollectionItemCandidate = Record<string, unknown>;
 
 const SKIN_FIELD_KEYS = ['skinKey', 'skin', 'avatarSkin', 'selectedSkin'] as const;
+
+const GAMBITS_MAX_SLOTS = 5;
+const GAMBITS_CONDITIONS = new Set<GambitConditionType>([
+  'self_hp_below',
+  'self_has_debuff',
+  'self_full_fury',
+  'ally_lowest_hp',
+  'ally_controlled',
+  'pool_aether_above',
+  'enemy_lowest_hp',
+  'enemy_is_boss',
+  'enemy_role_is',
+  'enemy_has_shield',
+  'always',
+]);
+const GAMBITS_ACTIONS = new Set<GambitActionType>(['ult', 'basic']);
+
+const normalizeGambitSlots = (value: unknown): RuntimeGambitSlot[] | undefined => {
+  if (!Array.isArray(value)) return undefined;
+  const normalized: RuntimeGambitSlot[] = [];
+  for (const raw of value.slice(0, GAMBITS_MAX_SLOTS)) {
+    if (!raw || typeof raw !== 'object') continue;
+    const slot = raw as GambitSlotInput;
+    const condition = typeof slot.condition === 'string' && GAMBITS_CONDITIONS.has(slot.condition as GambitConditionType)
+      ? (slot.condition as GambitConditionType)
+      : null;
+    const action = typeof slot.action === 'string' && GAMBITS_ACTIONS.has(slot.action as GambitActionType)
+      ? (slot.action as GambitActionType)
+      : null;
+    if (!condition || !action) continue;
+
+    const threshold = asFinite(slot.threshold);
+    const targetRole = typeof slot.targetRole === 'string' && slot.targetRole.trim() ? slot.targetRole.trim() : undefined;
+    const enabled = asBoolean(slot.enabled);
+
+    normalized.push({
+      condition,
+      action,
+      ...(threshold != null ? { threshold } : {}),
+      ...(targetRole ? { targetRole } : {}),
+      enabled: enabled ?? true,
+    });
+  }
+
+  return normalized.length > 0 ? normalized : undefined;
+};
 
 const asFinite = (value: unknown): number | null => {
   if (typeof value === 'number' && Number.isFinite(value)) return value;
@@ -56,6 +102,8 @@ const normalizeProgress = (entry: CollectionItemCandidate): RuntimeUnitProgress 
     .find((value) => typeof value === 'string' && value.trim() !== '');
   const skinKey = typeof rawSkin === 'string' ? rawSkin.trim() : null;
 
+  const gambit = normalizeGambitSlots(entry.gambit ?? entry.tacticalAi);
+
   const progress: RuntimeUnitProgress = {
     unitId,
     ...(level != null ? { level: Math.max(1, Math.floor(level)) } : {}),
@@ -66,6 +114,7 @@ const normalizeProgress = (entry: CollectionItemCandidate): RuntimeUnitProgress 
     ...(awakened != null ? { awakened } : {}),
     ...(inLineup != null ? { inLineup } : {}),
     ...(skinKey ? { skinKey } : {}),
+    ...(gambit ? { gambit } : {}),
   };
 
   return progress;

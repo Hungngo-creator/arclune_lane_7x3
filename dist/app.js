@@ -1,7 +1,7 @@
 // Bundled by build.mjs
 const __modules = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }
 function __define(id, factory){ __modules[id] = { factory, exports: null, initialized: false }; }
@@ -284,6 +284,7 @@ __define('./aether.ts', (exports, module, __require) => {
               return allyAetherPool.consume(cost);
           return enemyAetherPool.consume(cost);
       },
+      current: (side) => (side === 'ally' ? allyAetherPool.current : enemyAetherPool.current),
       // API cho Engine update vị trí
       syncAllVisuals: (allyPos, enemyPos, units, options) => {
           if (Array.isArray(units)) {
@@ -332,8 +333,10 @@ __define('./ai.ts', (exports, module, __require) => {
   const resolveSummonSlots = __dep4.resolveSummonSlots;
   const __dep5 = __require('./units.ts');
   const lookupUnit = __dep5.lookupUnit;
-  const __dep6 = __require('./shared-types/units.ts');
-  const createSummonQueue = __dep6.createSummonQueue;
+  const __dep6 = __require('./aether.ts');
+  const globalAetherPool = __dep6.globalAetherPool;
+  const __dep7 = __require('./shared-types/units.ts');
+  const createSummonQueue = __dep7.createSummonQueue;
   function toMetaEntry(value) {
       if (!value || typeof value !== 'object')
           return null;
@@ -855,10 +858,109 @@ __define('./ai.ts', (exports, module, __require) => {
       Game.ai.lastDecision = decision;
       Game.ai.lastThinkMs = now;
   }
+  function getUnitClassName(Game, unit) {
+      const className = Game.meta?.get(unit.id)?.class;
+      return typeof className === 'string' ? className : '';
+  }
+  function findLowestHpUnit(units) {
+      let best = null;
+      let bestRatio = Number.POSITIVE_INFINITY;
+      for (const token of units) {
+          if (!token || !token.alive)
+              continue;
+          const hp = Number.isFinite(token.hp) ? Number(token.hp) : 0;
+          const hpMax = Math.max(1, Number.isFinite(token.hpMax) ? Number(token.hpMax) : 1);
+          const ratio = hp / hpMax;
+          if (ratio < bestRatio) {
+              bestRatio = ratio;
+              best = token;
+          }
+      }
+      return best;
+  }
+  function evaluateGambitLogic(Game, unit, options = {}) {
+      const progressMap = Game.runtime?.unitProgressById;
+      const profile = progressMap?.get(unit.id);
+      const slots = Array.isArray(profile?.gambit) ? profile.gambit : [];
+      const enemySide = unit.side === 'ally' ? 'enemy' : 'ally';
+      const allies = Game.tokens.filter((token) => token.alive && token.side === unit.side);
+      const enemies = Game.tokens.filter((token) => token.alive && token.side === enemySide);
+      const startIndex = Math.max(0, Math.floor(options.startIndex ?? 0));
+      for (let index = startIndex; index < Math.min(5, slots.length); index += 1) {
+          const slot = slots[index];
+          if (!slot || slot.enabled === false)
+              continue;
+          const threshold = Number.isFinite(slot.threshold) ? Number(slot.threshold) : 0;
+          let conditionOk = false;
+          switch (slot.condition) {
+              case 'self_hp_below': {
+                  const hp = Number.isFinite(unit.hp) ? Number(unit.hp) : 0;
+                  const hpMax = Math.max(1, Number.isFinite(unit.hpMax) ? Number(unit.hpMax) : 1);
+                  conditionOk = (hp / hpMax) * 100 < threshold;
+                  break;
+              }
+              case 'self_has_debuff':
+                  conditionOk = Array.isArray(unit.statuses) && unit.statuses.some((status) => status && status.kind === 'debuff');
+                  break;
+              case 'self_full_fury': {
+                  const fury = Number.isFinite(unit.fury) ? Number(unit.fury) : 0;
+                  const furyMax = Math.max(1, Number.isFinite(unit.furyMax) ? Number(unit.furyMax) : 100);
+                  conditionOk = fury >= furyMax;
+                  break;
+              }
+              case 'ally_lowest_hp':
+                  conditionOk = findLowestHpUnit(allies)?.iid === unit.iid;
+                  break;
+              case 'ally_controlled':
+                  conditionOk = allies.some((ally) => Array.isArray(ally.statuses)
+                      && ally.statuses.some((s) => s && (String(s.kind).toLowerCase() === 'control' || String(s.tag ?? '').toLowerCase().includes('stun'))));
+                  break;
+              case 'pool_aether_above':
+                  conditionOk = globalAetherPool.current(unit.side) > threshold;
+                  break;
+              case 'enemy_lowest_hp':
+                  conditionOk = Boolean(findLowestHpUnit(enemies));
+                  break;
+              case 'enemy_is_boss':
+                  conditionOk = enemies.some((enemy) => enemy.id === 'leaderB' || enemy.id === 'boss' || enemy.isBoss === true);
+                  break;
+              case 'enemy_role_is': {
+                  const role = (slot.targetRole ?? '').trim().toLowerCase();
+                  conditionOk = enemies.some((enemy) => {
+                      const className = String(Game.meta?.get(enemy.id)?.class ?? '').toLowerCase();
+                      return className === role;
+                  });
+                  break;
+              }
+              case 'enemy_has_shield':
+                  conditionOk = enemies.some((enemy) => Number(enemy.shield ?? 0) > 0);
+                  break;
+              case 'always':
+                  conditionOk = true;
+                  break;
+              default:
+                  conditionOk = false;
+                  break;
+          }
+          if (!conditionOk)
+              continue;
+          return {
+              action: slot.action,
+              slotIndex: index,
+              reason: 'matched',
+          };
+      }
+      return {
+          action: null,
+          slotIndex: -1,
+          reason: 'noMatch',
+      };
+  }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'refillDeckEnemy')) exports.refillDeckEnemy = refillDeckEnemy;
   if (!Object.prototype.hasOwnProperty.call(exports, 'queueEnemyAt')) exports.queueEnemyAt = queueEnemyAt;
   if (!Object.prototype.hasOwnProperty.call(exports, 'aiMaybeAct')) exports.aiMaybeAct = aiMaybeAct;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'evaluateGambitLogic')) exports.evaluateGambitLogic = evaluateGambitLogic;
 });
 __define('./app/shell.ts', (exports, module, __require) => {
   const DEFAULT_SCREEN = 'main-menu';
@@ -8753,10 +8855,12 @@ __define('./entry.ts', (exports, module, __require) => {
   const SCREEN_GACHA = 'gacha';
   const SCREEN_ARENA_HUB = 'arena-hub';
   const SCREEN_SECT = 'sect';
+  const SCREEN_SECT_TACTICAL_AI = 'sect-tactical-ai';
   const COMING_SOON_MODULE_ID = '@modes/coming-soon.stub.ts';
   const COLLECTION_SCREEN_MODULE_ID = '@screens/collection/index.ts';
   const LINEUP_SCREEN_MODULE_ID = '@screens/lineup/index.ts';
   const SECT_SCREEN_MODULE_ID = './screens/sect/index.ts';
+  const SECT_TACTICAL_AI_SCREEN_MODULE_ID = './screens/sect/tactical-ai.ts';
   const APP_SCREEN_CLASSES = [
       `app--${SCREEN_MAIN_MENU}`,
       `app--${SCREEN_PVE}`,
@@ -8766,6 +8870,7 @@ __define('./entry.ts', (exports, module, __require) => {
       `app--${SCREEN_GACHA}`,
       `app--${SCREEN_ARENA_HUB}`,
       `app--${SCREEN_SECT}`,
+      `app--${SCREEN_SECT_TACTICAL_AI}`,
   ];
   async function loadBundledModule(id) {
       const globalRequire = typeof globalThis !== 'undefined'
@@ -9389,6 +9494,52 @@ __define('./entry.ts', (exports, module, __require) => {
           screenId: SCREEN_SECT
       }) ?? null);
   }
+  async function renderSectTacticalAiScreen(params) {
+      const root = rootElement;
+      const shell = shellInstance;
+      if (!root || !shell)
+          return;
+      const token = ++sectRenderToken;
+      dismissModal();
+      clearAppScreenClasses();
+      destroySectView();
+      collectionRenderToken += 1;
+      destroyCollectionView();
+      lineupRenderToken += 1;
+      destroyLineupView();
+      if (root.classList) {
+          root.classList.add('app--sect-tactical-ai');
+      }
+      if (typeof root.innerHTML === 'string') {
+          root.innerHTML = '<div class="app-loading">Đang tải Thiên Cơ Các...</div>';
+      }
+      let module;
+      try {
+          module = await loadBundledModule(SECT_TACTICAL_AI_SCREEN_MODULE_ID);
+      }
+      catch (error) {
+          if (token !== sectRenderToken)
+              return;
+          throw error;
+      }
+      if (token !== sectRenderToken)
+          return;
+      const render = resolveModuleFunction(module, ['renderScreen'], ['render']);
+      if (typeof render !== 'function') {
+          throw new Error('Module Thiên Cơ Các không cung cấp hàm render hợp lệ.');
+      }
+      const definition = getDefinitionByScreen(SCREEN_SECT) ?? getDefinitionByScreen(SCREEN_MAIN_MENU);
+      if (!definition) {
+          throw new Error('Không tìm thấy định nghĩa màn hình Thiên Cơ Các.');
+      }
+      sectView = (render({
+          root,
+          shell,
+          definition,
+          params: params || null,
+          screenId: SCREEN_SECT_TACTICAL_AI
+      }) ?? null);
+  }
   function renderMainMenuScreen() {
       if (!rootElement || !shellInstance)
           return;
@@ -9671,6 +9822,15 @@ __define('./entry.ts', (exports, module, __require) => {
           createSessionOptions.lineupDeck = lineupDeckEntries;
           startSessionOptions.lineupDeck = lineupDeckEntries;
       }
+      if (profile.tacticalAiByUnit && typeof profile.tacticalAiByUnit === 'object') {
+          const units = Object.entries(profile.tacticalAiByUnit)
+              .filter(([unitId, rows]) => typeof unitId === 'string' && unitId.trim() && Array.isArray(rows))
+              .map(([unitId, gambit]) => ({ unitId, gambit }));
+          if (units.length > 0) {
+              createSessionOptions.collectionState = { units };
+              startSessionOptions.collectionState = { units };
+          }
+      }
       if (rootElement) {
           clearAppScreenClasses();
           if (rootElement.classList) {
@@ -9934,6 +10094,30 @@ __define('./entry.ts', (exports, module, __require) => {
                   lastParams = nextParams;
                   mountPveScreen(nextParams || {}).catch((error) => {
                       console.error('Arclune failed to start PvE session', error);
+                      if (renderMessageRef) {
+                          showFatalError(error, renderMessageRef, bootstrapOptions);
+                      }
+                  });
+                  return;
+              }
+              if (nextScreen === SCREEN_SECT_TACTICAL_AI) {
+                  customScreenToken += 1;
+                  destroyCustomScreen();
+                  collectionRenderToken += 1;
+                  destroyCollectionView();
+                  lineupRenderToken += 1;
+                  destroyLineupView();
+                  sectRenderToken += 1;
+                  destroySectView();
+                  if (mainMenuView && typeof mainMenuView.destroy === 'function') {
+                      mainMenuView.destroy();
+                      mainMenuView = null;
+                  }
+                  lastScreen = SCREEN_SECT_TACTICAL_AI;
+                  lastParams = nextParams;
+                  pveRenderToken += 1;
+                  renderSectTacticalAiScreen(nextParams || null).catch((error) => {
+                      console.error('Arclune failed to load tactical ai screen', error);
                       if (renderMessageRef) {
                           showFatalError(error, renderMessageRef, bootstrapOptions);
                       }
@@ -10548,6 +10732,50 @@ __define('./modes/pve/collection-mapper.ts', (exports, module, __require) => {
   const Meta = __dep0.Meta;
   const makeInstanceStats = __dep0.makeInstanceStats;
   const SKIN_FIELD_KEYS = ['skinKey', 'skin', 'avatarSkin', 'selectedSkin'];
+  const GAMBITS_MAX_SLOTS = 5;
+  const GAMBITS_CONDITIONS = new Set([
+      'self_hp_below',
+      'self_has_debuff',
+      'self_full_fury',
+      'ally_lowest_hp',
+      'ally_controlled',
+      'pool_aether_above',
+      'enemy_lowest_hp',
+      'enemy_is_boss',
+      'enemy_role_is',
+      'enemy_has_shield',
+      'always',
+  ]);
+  const GAMBITS_ACTIONS = new Set(['ult', 'basic']);
+  const normalizeGambitSlots = (value) => {
+      if (!Array.isArray(value))
+          return undefined;
+      const normalized = [];
+      for (const raw of value.slice(0, GAMBITS_MAX_SLOTS)) {
+          if (!raw || typeof raw !== 'object')
+              continue;
+          const slot = raw;
+          const condition = typeof slot.condition === 'string' && GAMBITS_CONDITIONS.has(slot.condition)
+              ? slot.condition
+              : null;
+          const action = typeof slot.action === 'string' && GAMBITS_ACTIONS.has(slot.action)
+              ? slot.action
+              : null;
+          if (!condition || !action)
+              continue;
+          const threshold = asFinite(slot.threshold);
+          const targetRole = typeof slot.targetRole === 'string' && slot.targetRole.trim() ? slot.targetRole.trim() : undefined;
+          const enabled = asBoolean(slot.enabled);
+          normalized.push({
+              condition,
+              action,
+              ...(threshold != null ? { threshold } : {}),
+              ...(targetRole ? { targetRole } : {}),
+              enabled: enabled ?? true,
+          });
+      }
+      return normalized.length > 0 ? normalized : undefined;
+  };
   const asFinite = (value) => {
       if (typeof value === 'number' && Number.isFinite(value))
           return value;
@@ -10599,6 +10827,7 @@ __define('./modes/pve/collection-mapper.ts', (exports, module, __require) => {
           .map((key) => entry[key])
           .find((value) => typeof value === 'string' && value.trim() !== '');
       const skinKey = typeof rawSkin === 'string' ? rawSkin.trim() : null;
+      const gambit = normalizeGambitSlots(entry.gambit ?? entry.tacticalAi);
       const progress = {
           unitId,
           ...(level != null ? { level: Math.max(1, Math.floor(level)) } : {}),
@@ -10609,6 +10838,7 @@ __define('./modes/pve/collection-mapper.ts', (exports, module, __require) => {
           ...(awakened != null ? { awakened } : {}),
           ...(inLineup != null ? { inLineup } : {}),
           ...(skinKey ? { skinKey } : {}),
+          ...(gambit ? { gambit } : {}),
       };
       return progress;
   };
@@ -20812,11 +21042,19 @@ __define('./screens/sect/index.ts', (exports, module, __require) => {
       layout.className = 'sect-screen__layout';
       const left = document.createElement('aside');
       left.className = 'sect-screen__left';
-      SECT_OPTIONS.forEach(label => {
+      const optionHandlers = [];
+      SECT_OPTIONS.forEach((label, index) => {
           const option = document.createElement('button');
           option.type = 'button';
           option.className = 'sect-screen__hub-button';
           option.textContent = label;
+          const onSelect = () => {
+              if (index === 0) {
+                  shell?.enterScreen?.('sect-tactical-ai');
+              }
+          };
+          option.addEventListener('click', onSelect);
+          optionHandlers.push(() => option.removeEventListener('click', onSelect));
           left.appendChild(option);
       });
       const center = document.createElement('section');
@@ -20875,10 +21113,156 @@ __define('./screens/sect/index.ts', (exports, module, __require) => {
       return {
           destroy() {
               backButton.removeEventListener('click', onBack);
+              optionHandlers.forEach((dispose) => dispose());
               closeOverlay();
               mount.destroy();
           }
       };
+  }
+  const render = renderScreen;
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
+});
+__define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
+  const __dep0 = __require('./ui/dom.ts');
+  const ensureStyleTag = __dep0.ensureStyleTag;
+  const mountSection = __dep0.mountSection;
+  const __dep1 = __require('./units.ts');
+  const UNITS = __dep1.UNITS;
+  const __dep2 = __require('./utils/player-profile.ts');
+  const loadPlayerProfile = __dep2.loadPlayerProfile;
+  const patchPlayerProfile = __dep2.patchPlayerProfile;
+  const STYLE_ID = 'sect-tactical-ai-style-v1';
+  const SLOT_COUNT = 5;
+  const CONDITION_OPTIONS = [
+      { value: 'always', label: 'Luôn luôn' },
+      { value: 'self_hp_below', label: 'Tự thân HP < X%' },
+      { value: 'self_has_debuff', label: 'Tự thân có Debuff' },
+      { value: 'self_full_fury', label: 'Tự thân đầy nộ' },
+      { value: 'ally_lowest_hp', label: 'Đồng minh thấp HP nhất' },
+      { value: 'ally_controlled', label: 'Đồng minh bị khống chế' },
+      { value: 'pool_aether_above', label: 'Bể AE chung > X' },
+      { value: 'enemy_lowest_hp', label: 'Địch thấp HP nhất' },
+      { value: 'enemy_is_boss', label: 'Mục tiêu là Boss' },
+      { value: 'enemy_role_is', label: 'Mục tiêu vai trò chỉ định' },
+      { value: 'enemy_has_shield', label: 'Địch đang có Shield' },
+  ];
+  const ACTION_OPTIONS = [
+      { value: 'ult', label: 'Kỹ năng (ULT)' },
+      { value: 'basic', label: 'Đánh thường' },
+  ];
+  const CSS = `
+  .app--sect-tactical-ai{padding:20px 16px 48px;}
+  .tactical-ai{max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:16px;color:#e9f2ff;}
+  .tactical-ai__layout{display:grid;grid-template-columns:280px 1fr;gap:16px;min-height:560px;}
+  .tactical-ai__left,.tactical-ai__right{border:1px solid rgba(125,211,252,.28);border-radius:14px;background:rgba(10,18,28,.75);padding:14px;}
+  .tactical-ai__left-list{display:flex;flex-direction:column;gap:8px;max-height:520px;overflow:auto;}
+  .tactical-ai__unit{display:flex;gap:10px;align-items:center;border:1px solid rgba(125,211,252,.2);background:rgba(15,25,38,.7);border-radius:10px;padding:8px;cursor:pointer}
+  .tactical-ai__unit.is-active{border-color:#67e8f9;box-shadow:0 0 0 1px rgba(103,232,249,.3) inset;}
+  .tactical-ai__avatar{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:rgba(125,211,252,.22)}
+  .tactical-ai__slot{display:grid;grid-template-columns:2fr 2fr 90px;gap:10px;align-items:center;margin-bottom:10px;}
+  .tactical-ai__toolbar{display:flex;justify-content:space-between;align-items:center;}
+  .tactical-ai select,.tactical-ai input{width:100%;padding:9px;border-radius:8px;background:#0f1a28;color:#e9f2ff;border:1px solid rgba(125,211,252,.25)}
+  `;
+  function ensureStyles() { ensureStyleTag(STYLE_ID, { css: CSS }); }
+  function loadConfig() {
+      return loadPlayerProfile().tacticalAiByUnit ?? {};
+  }
+  function renderScreen({ root, shell = null }) {
+      ensureStyles();
+      const container = document.createElement('div');
+      container.className = 'tactical-ai';
+      const mount = mountSection({ root, section: container, rootClasses: ['app--sect-tactical-ai'] });
+      const toolbar = document.createElement('div');
+      toolbar.className = 'tactical-ai__toolbar';
+      const back = document.createElement('button');
+      back.textContent = '← Trở về Tông Môn';
+      back.onclick = () => shell?.enterScreen?.('sect');
+      const title = document.createElement('h2');
+      title.textContent = 'Thiên Cơ Các (Tactical AI)';
+      toolbar.append(back, title);
+      const layout = document.createElement('div');
+      layout.className = 'tactical-ai__layout';
+      const left = document.createElement('section');
+      left.className = 'tactical-ai__left';
+      const right = document.createElement('section');
+      right.className = 'tactical-ai__right';
+      const list = document.createElement('div');
+      list.className = 'tactical-ai__left-list';
+      left.appendChild(list);
+      layout.append(left, right);
+      container.append(toolbar, layout);
+      const allUnits = [...UNITS];
+      let activeUnitId = allUnits[0]?.id ?? '';
+      const save = () => {
+          patchPlayerProfile({ tacticalAiByUnit: loadConfig() });
+      };
+      const renderEditor = () => {
+          right.innerHTML = '';
+          const config = loadConfig();
+          const unitRows = Array.isArray(config[activeUnitId]) ? config[activeUnitId] : [];
+          for (let i = 0; i < SLOT_COUNT; i += 1) {
+              const row = document.createElement('div');
+              row.className = 'tactical-ai__slot';
+              const slot = unitRows[i] ?? {};
+              const condition = document.createElement('select');
+              CONDITION_OPTIONS.forEach((opt) => {
+                  const op = document.createElement('option');
+                  op.value = opt.value;
+                  op.textContent = opt.label;
+                  condition.appendChild(op);
+              });
+              condition.value = String(slot.condition ?? 'always');
+              const action = document.createElement('select');
+              ACTION_OPTIONS.forEach((opt) => {
+                  const op = document.createElement('option');
+                  op.value = opt.value;
+                  op.textContent = opt.label;
+                  action.appendChild(op);
+              });
+              action.value = String(slot.action ?? 'basic');
+              const threshold = document.createElement('input');
+              threshold.type = 'number';
+              threshold.value = String(slot.threshold ?? 30);
+              const onChange = () => {
+                  const next = loadConfig();
+                  const rows = Array.isArray(next[activeUnitId]) ? [...next[activeUnitId]] : [];
+                  rows[i] = {
+                      condition: condition.value,
+                      action: action.value,
+                      threshold: Number(threshold.value || 0),
+                      enabled: true,
+                  };
+                  next[activeUnitId] = rows;
+                  patchPlayerProfile({ tacticalAiByUnit: next });
+              };
+              condition.onchange = onChange;
+              action.onchange = onChange;
+              threshold.onchange = onChange;
+              row.append(condition, action, threshold);
+              right.appendChild(row);
+          }
+      };
+      const renderUnits = () => {
+          list.innerHTML = '';
+          allUnits.forEach((unit) => {
+              const btn = document.createElement('button');
+              btn.className = `tactical-ai__unit${unit.id === activeUnitId ? ' is-active' : ''}`;
+              btn.innerHTML = `<span class="tactical-ai__avatar">${unit.name.slice(0, 1)}</span><span>${unit.name}</span>`;
+              btn.onclick = () => {
+                  activeUnitId = unit.id;
+                  renderUnits();
+                  renderEditor();
+              };
+              list.appendChild(btn);
+          });
+      };
+      renderUnits();
+      renderEditor();
+      const onUnload = () => save();
+      window.addEventListener('beforeunload', onUnload);
+      return { destroy() { window.removeEventListener('beforeunload', onUnload); save(); mount.destroy(); } };
   }
   const render = renderScreen;
   //# sourceMappingURL=stdin.js.map
@@ -22922,6 +23306,8 @@ __define('./turns.ts', (exports, module, __require) => {
   const resolveRuntimeUnitStats = __dep13.resolveRuntimeUnitStats;
   const __dep14 = __require('./cultivation.ts');
   const applyCultivationBonus = __dep14.applyCultivationBonus;
+  const __dep15 = __require('./ai.ts');
+  const evaluateGambitLogic = __dep15.evaluateGambitLogic;
   const toLowerSide = (side) => {
       if (side === 'ALLY')
           return 'ally';
@@ -23282,7 +23668,9 @@ __define('./turns.ts', (exports, module, __require) => {
           return resolution;
       }
       const ultCost = resolveUltCost(unit, CFG);
-      if (meta && (unit.fury ?? 0) >= ultCost && !Statuses.blocks(unit, 'ult')) {
+      const runUlt = () => {
+          if (!(meta && (unit.fury ?? 0) >= ultCost) || Statuses.blocks(unit, 'ult'))
+              return false;
           let ultOk = false;
           try {
               performUlt(unit);
@@ -23313,6 +23701,29 @@ __define('./turns.ts', (exports, module, __require) => {
               actionDetail.reason = 'ultFailed';
           }
           finishAction(actionDetail);
+          return true;
+      };
+      let gambitIndex = 0;
+      while (gambitIndex < 5) {
+          const decision = evaluateGambitLogic(Game, unit, { startIndex: gambitIndex });
+          if (decision.slotIndex < 0 || !decision.action)
+              break;
+          gambitIndex = decision.slotIndex + 1;
+          if (decision.action === 'ult') {
+              if (!globalAetherPool.consume(unit.side, ultCost)) {
+                  continue;
+              }
+              if (runUlt()) {
+                  return resolution;
+              }
+              continue;
+          }
+          if (decision.action === 'basic') {
+              break;
+          }
+      }
+      if (meta && (unit.fury ?? 0) >= ultCost && !Statuses.blocks(unit, 'ult')) {
+          runUlt();
           return resolution;
       }
       const cap = typeof meta?.followupCap === 'number' ? (meta.followupCap | 0) : (CFG.FOLLOWUP_CAP_DEFAULT | 0);
@@ -26026,6 +26437,10 @@ __define('./utils/player-profile.ts', (exports, module, __require) => {
           cultivationByUnit: {
               ...(current.cultivationByUnit ?? {}),
               ...(patch.cultivationByUnit ?? {}),
+          },
+          tacticalAiByUnit: {
+              ...(current.tacticalAiByUnit ?? {}),
+              ...(patch.tacticalAiByUnit ?? {}),
           },
       };
       savePlayerProfile(merged);

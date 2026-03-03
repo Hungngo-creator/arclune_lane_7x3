@@ -98,6 +98,39 @@ export interface CollectionProgressUnitInput extends Record<string, unknown> {
   skin?: string | null;
   avatarSkin?: string | null;
   selectedSkin?: string | null;
+  gambit?: ReadonlyArray<GambitSlotInput> | null;
+  tacticalAi?: ReadonlyArray<GambitSlotInput> | null;
+}
+
+export type GambitActionType = 'ult' | 'basic';
+
+export type GambitConditionType =
+  | 'self_hp_below'
+  | 'self_has_debuff'
+  | 'self_full_fury'
+  | 'ally_lowest_hp'
+  | 'ally_controlled'
+  | 'pool_aether_above'
+  | 'enemy_lowest_hp'
+  | 'enemy_is_boss'
+  | 'enemy_role_is'
+  | 'enemy_has_shield'
+  | 'always';
+
+export interface GambitSlotInput extends Record<string, unknown> {
+  condition?: GambitConditionType | string | null;
+  action?: GambitActionType | string | null;
+  threshold?: number | string | null;
+  targetRole?: string | null;
+  enabled?: boolean | null;
+}
+
+export interface RuntimeGambitSlot {
+  condition: GambitConditionType;
+  action: GambitActionType;
+  threshold?: number;
+  targetRole?: string;
+  enabled: boolean;
 }
 
 export interface CollectionStateInput extends Record<string, unknown> {
@@ -117,6 +150,7 @@ export interface RuntimeUnitProgress {
   awakened?: boolean;
   inLineup?: boolean;
   skinKey?: string;
+  gambit?: RuntimeGambitSlot[];
 }
 
 export interface CreateSessionOptions {

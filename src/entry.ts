@@ -119,10 +119,12 @@ const SCREEN_LINEUP = 'lineup';
 const SCREEN_GACHA = 'gacha';
 const SCREEN_ARENA_HUB = 'arena-hub';
 const SCREEN_SECT = 'sect';
+const SCREEN_SECT_TACTICAL_AI = 'sect-tactical-ai';
 const COMING_SOON_MODULE_ID = '@modes/coming-soon.stub.ts' as const;
 const COLLECTION_SCREEN_MODULE_ID = '@screens/collection/index.ts' as const;
 const LINEUP_SCREEN_MODULE_ID = '@screens/lineup/index.ts' as const;
 const SECT_SCREEN_MODULE_ID = './screens/sect/index.ts' as const;
+const SECT_TACTICAL_AI_SCREEN_MODULE_ID = './screens/sect/tactical-ai.ts' as const;
 const APP_SCREEN_CLASSES = [
   `app--${SCREEN_MAIN_MENU}`,
   `app--${SCREEN_PVE}`,
@@ -132,6 +134,7 @@ const APP_SCREEN_CLASSES = [
   `app--${SCREEN_GACHA}`,
   `app--${SCREEN_ARENA_HUB}`,
   `app--${SCREEN_SECT}`,
+  `app--${SCREEN_SECT_TACTICAL_AI}`,
 ];
 
 async function loadBundledModule<TModule = unknown>(id: string): Promise<TModule>{
@@ -809,6 +812,58 @@ async function renderSectScreen(params: ScreenParams): Promise<void>{
   }) ?? null);
 }
 
+async function renderSectTacticalAiScreen(params: ScreenParams): Promise<void>{
+  const root = rootElement;
+  const shell = shellInstance;
+  if (!root || !shell) return;
+  const token = ++sectRenderToken;
+  dismissModal();
+  clearAppScreenClasses();
+  destroySectView();
+  collectionRenderToken += 1;
+  destroyCollectionView();
+  lineupRenderToken += 1;
+  destroyLineupView();
+  if (root.classList){
+    root.classList.add('app--sect-tactical-ai');
+  }
+  if (typeof root.innerHTML === 'string'){
+    root.innerHTML = '<div class="app-loading">Đang tải Thiên Cơ Các...</div>';
+  }
+
+  let module: unknown;
+  try {
+    module = await loadBundledModule(SECT_TACTICAL_AI_SCREEN_MODULE_ID);
+  } catch (error) {
+    if (token !== sectRenderToken) return;
+    throw error;
+  }
+
+  if (token !== sectRenderToken) return;
+
+  const render = resolveModuleFunction(
+    module,
+    ['renderScreen'],
+    ['render']
+  ) as ScreenRenderer | null;
+  if (typeof render !== 'function'){
+    throw new Error('Module Thiên Cơ Các không cung cấp hàm render hợp lệ.');
+  }
+
+  const definition = getDefinitionByScreen(SCREEN_SECT) ?? getDefinitionByScreen(SCREEN_MAIN_MENU);
+  if (!definition){
+    throw new Error('Không tìm thấy định nghĩa màn hình Thiên Cơ Các.');
+  }
+
+  sectView = (render({
+    root,
+    shell,
+    definition,
+    params: params || null,
+    screenId: SCREEN_SECT_TACTICAL_AI
+  }) ?? null);
+}
+
 function renderMainMenuScreen(): void{
   if (!rootElement || !shellInstance) return;
   dismissModal();
@@ -1108,6 +1163,15 @@ async function mountPveScreen(params: ScreenParams): Promise<void>{
     createSessionOptions.lineupDeck = lineupDeckEntries;
     startSessionOptions.lineupDeck = lineupDeckEntries;
   }
+  if (profile.tacticalAiByUnit && typeof profile.tacticalAiByUnit === 'object') {
+    const units = Object.entries(profile.tacticalAiByUnit)
+      .filter(([unitId, rows]) => typeof unitId === 'string' && unitId.trim() && Array.isArray(rows))
+      .map(([unitId, gambit]) => ({ unitId, gambit }));
+    if (units.length > 0) {
+      createSessionOptions.collectionState = { units };
+      startSessionOptions.collectionState = { units };
+    }
+  }
   if (rootElement){
     clearAppScreenClasses();
     if (rootElement.classList){
@@ -1371,6 +1435,31 @@ async function mountPveScreen(params: ScreenParams): Promise<void>{
         lastParams = nextParams;
         mountPveScreen(nextParams || {}).catch((error: unknown) => {
           console.error('Arclune failed to start PvE session', error);
+          if (renderMessageRef){
+            showFatalError(error, renderMessageRef, bootstrapOptions);
+          }
+        });
+        return;
+      }
+
+      if (nextScreen === SCREEN_SECT_TACTICAL_AI){
+        customScreenToken += 1;
+        destroyCustomScreen();
+        collectionRenderToken += 1;
+        destroyCollectionView();
+        lineupRenderToken += 1;
+        destroyLineupView();
+        sectRenderToken += 1;
+        destroySectView();
+        if (mainMenuView && typeof mainMenuView.destroy === 'function'){
+          mainMenuView.destroy();
+          mainMenuView = null;
+        }
+        lastScreen = SCREEN_SECT_TACTICAL_AI;
+        lastParams = nextParams;
+        pveRenderToken += 1;
+        renderSectTacticalAiScreen(nextParams || null).catch((error: unknown) => {
+          console.error('Arclune failed to load tactical ai screen', error);
           if (renderMessageRef){
             showFatalError(error, renderMessageRef, bootstrapOptions);
           }
