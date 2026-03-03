@@ -2878,59 +2878,151 @@ function ensureHpBarGradient(
   return gradient;
 }
 
+function collectActiveAttackTokenKeys(): Set<string> {
+  const active = new Set<string>();
+  for (const key of meleeOffsetTokenKeys){
+    active.add(key);
+  }
+  const events = Array.isArray(Game?.vfx) ? Game.vfx : [];
+  if (!events.length) return active;
+  const attackEventTypes = new Set(['melee', 'tracer', 'lightning_arc', 'blood_pulse', 'ground_burst']);
+  const nowMs = safeNow();
+  for (const event of events){
+    if (!event || typeof event !== 'object') continue;
+    const rec = event as Record<string, unknown>;
+    const type = typeof rec.type === 'string' ? rec.type : '';
+    if (!attackEventTypes.has(type)) continue;
+    const dur = parseFiniteNumber(rec.dur) ?? 0;
+    if (dur <= 0) continue;
+    const t0 = parseFiniteNumber(rec.t0) ?? 0;
+    const tt = (nowMs - t0) / dur;
+    if (!(tt > 0 && tt < 1)) continue;
+    const refA = rec.refA as Partial<UnitToken> | null | undefined;
+    const fallback = {
+      iid: parseFiniteNumber(rec.iidA),
+      id: typeof rec.idA === 'string' ? rec.idA : null,
+    };
+    const key = makeMeleeTokenKey({ iid: refA?.iid ?? fallback.iid ?? undefined, id: refA?.id ?? fallback.id ?? undefined });
+    if (key) active.add(key);
+  }
+  return active;
+}
+
+function getShieldRatio(unit: UnitToken): number {
+  const shield = Statuses.get(unit, 'shield');
+  const shieldAmount = Math.max(0, toFiniteOrZero((shield as { amount?: unknown } | null)?.amount));
+  const hpMax = Math.max(1, toFiniteOrZero(unit.hpMax));
+  return Math.max(0, Math.min(1, shieldAmount / hpMax));
+}
+
 function drawHPBars(): void {
   if (!ctx || !Game?.grid) return;
   const baseR = Math.floor(Game.grid.tile * 0.36);
   const tokens = Game.tokens || [];
+  const activeAttackKeys = collectActiveAttackTokenKeys();
+
   for (const t of tokens){
     if (!t.alive || !Number.isFinite(t.hpMax)) continue;
     const meleeKey = makeMeleeTokenKey(t);
-    if (meleeKey && meleeOffsetTokenKeys.has(meleeKey)) continue;
+    if (meleeKey && activeAttackKeys.has(meleeKey)) continue;
+
     const p = cellCenterObliqueLocal(Game.grid, t.cx, t.cy, CAM_PRESET);
     const art = t.art || getUnitArt(t.id, { skinKey: t.skinKey });
     const layout = (art?.layout as UnitArtLayout | Record<string, unknown>) ?? {};
     const layoutRecord = layout as Record<string, unknown>;
+    const spriteRecord = (art?.sprite as Record<string, unknown> | null | undefined) ?? null;
+
     const r = Math.max(6, Math.floor(baseR * (p.scale || 1)));
-    const widthRatio = parseFiniteNumber(layoutRecord.hpWidth) ?? 2.4;
-    const heightRatio = parseFiniteNumber(layoutRecord.hpHeight) ?? 0.42;
-    const offsetRatio = parseFiniteNumber(layoutRecord.hpOffset) ?? 1.46;
-    const barWidth = Math.max(28, Math.floor(r * widthRatio));
-    const barHeight = Math.max(5, Math.floor(r * heightRatio));
-    const offset = offsetRatio;
-    const x = Math.round(p.x - barWidth / 2);
-    const y = Math.round(p.y + r * offset - barHeight / 2);
-    const ratio = Math.max(0, Math.min(1, (t.hp || 0) / (t.hpMax || 1)));
-    const bgColor = art?.hpBar?.bg || 'rgba(9,14,21,0.74)';
-    const fillColor = art?.hpBar?.fill || '#6ff0c0';
-    const borderColor = art?.hpBar?.border || 'rgba(0,0,0,0.55)';
+    const spriteHeightMult = parseFiniteNumber(layoutRecord.spriteHeight) ?? 2.4;
+    const spriteScale = parseFiniteNumber(spriteRecord?.scale) ?? 1;
+    const artSize = parseFiniteNumber(art?.size) ?? 1;
+    const anchor = parseFiniteNumber(spriteRecord?.anchor) ?? parseFiniteNumber(layoutRecord.anchor) ?? 0.78;
+    const spriteHeight = r * spriteHeightMult * artSize * spriteScale;
+
+    const widthRatio = parseFiniteNumber(layoutRecord.hpWidth) ?? 1.55;
+    const heightRatio = parseFiniteNumber(layoutRecord.hpHeight) ?? 0.22;
+    const barWidth = Math.max(24, Math.floor(r * widthRatio));
+    const barHeight = Math.max(4, Math.floor(r * heightRatio));
+    const headY = p.y - spriteHeight * anchor;
+    const hpY = Math.round(headY - Math.max(6, Math.floor(r * 0.34)) - barHeight);
+    const hpX = Math.round(p.x - barWidth / 2);
+
+    const hpRatio = Math.max(0, Math.min(1, (t.hp || 0) / (t.hpMax || 1)));
+    const shieldRatio = getShieldRatio(t);
+
+    const bgColor = art?.hpBar?.bg || 'rgba(9,14,21,0.86)';
+    const fillColor = art?.hpBar?.fill || '#48d267';
+    const borderColor = art?.hpBar?.border || 'rgba(0,0,0,0.62)';
     const radius = Math.max(2, Math.floor(barHeight / 2));
+
     ctx.save();
     ctx.shadowColor = 'transparent';
     ctx.shadowBlur = 0;
-    roundedRectPathUI(ctx, x, y, barWidth, barHeight, radius);
+
+    roundedRectPathUI(ctx, hpX, hpY, barWidth, barHeight, radius);
     ctx.fillStyle = bgColor;
     ctx.fill();
     if (borderColor && borderColor !== 'none'){
       ctx.strokeStyle = borderColor;
-      ctx.lineWidth = Math.max(1, Math.floor(barHeight * 0.18));
+      ctx.lineWidth = 1;
       ctx.stroke();
     }
-    const inset = Math.max(1, Math.floor(barHeight * 0.25));
+
+    const inset = 1;
     const innerHeight = Math.max(1, barHeight - inset * 2);
     const innerRadius = Math.max(1, radius - inset);
-    const innerWidth = Math.max(0, barWidth - inset * 2);
-    const filledWidth = Math.round(innerWidth * ratio);
+    const innerWidth = Math.max(1, barWidth - inset * 2);
+    const filledWidth = Math.round(innerWidth * hpRatio);
     if (filledWidth > 0){
-      const gradientY = y + inset;
-      const gradientX = x + inset;
-      const fillStyle = ensureHpBarGradient(fillColor, innerHeight, innerRadius, gradientY, gradientX);
+      const fillStyle = ensureHpBarGradient(fillColor, innerHeight, innerRadius, hpY + inset, hpX + inset);
       ctx.save();
-      ctx.translate(gradientX, gradientY);
+      ctx.translate(hpX + inset, hpY + inset);
       roundedRectPathUI(ctx, 0, 0, filledWidth, innerHeight, innerRadius);
       ctx.fillStyle = fillStyle;
       ctx.fill();
       ctx.restore();
     }
+
+    if (shieldRatio > 0){
+      const dimWidth = Math.max(1, Math.round(innerWidth * shieldRatio));
+      ctx.save();
+      ctx.beginPath();
+      roundedRectPathUI(ctx, hpX + inset, hpY + inset, dimWidth, innerHeight, innerRadius);
+      ctx.fillStyle = 'rgba(190, 210, 205, 0.32)';
+      ctx.fill();
+      ctx.restore();
+    }
+
+    const ticks = 10;
+    ctx.save();
+    ctx.strokeStyle = 'rgba(0,0,0,0.45)';
+    ctx.lineWidth = 1;
+    for (let i = 1; i < ticks; i += 1){
+      const tx = hpX + inset + Math.round((innerWidth * i) / ticks) + 0.5;
+      ctx.beginPath();
+      ctx.moveTo(tx, hpY + inset + 0.5);
+      ctx.lineTo(tx, hpY + inset + innerHeight - 0.5);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    const furyMax = Math.max(1, parseFiniteNumber(t.furyMax) ?? 100);
+    const furyNow = Math.max(0, parseFiniteNumber(t.fury) ?? parseFiniteNumber(t.rage) ?? 0);
+    const furyRatio = Math.max(0, Math.min(1, furyNow / furyMax));
+    const rageHeight = Math.max(2, Math.floor(barHeight * 0.55));
+    const rageY = hpY + barHeight + 2;
+    const rageRadius = Math.max(1, Math.floor(rageHeight / 2));
+
+    roundedRectPathUI(ctx, hpX, rageY, barWidth, rageHeight, rageRadius);
+    ctx.fillStyle = 'rgba(9,14,21,0.72)';
+    ctx.fill();
+    const rageFilledWidth = Math.round((barWidth - 2) * furyRatio);
+    if (rageFilledWidth > 0){
+      roundedRectPathUI(ctx, hpX + 1, rageY + 1, rageFilledWidth, Math.max(1, rageHeight - 2), Math.max(1, rageRadius - 1));
+      ctx.fillStyle = '#7b5cff';
+      ctx.fill();
+    }
+
     ctx.restore();
   }
 }

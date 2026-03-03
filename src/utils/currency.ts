@@ -32,11 +32,6 @@ const CULTIVATION_SPEND_ORDER: ReadonlyArray<CurrencyId> = ['VNT', 'HNT', 'TNT',
 let sharedCurrencyWallet: CurrencyWallet | null = null;
 const sharedWalletListeners = new Set<CurrencyWalletListener>();
 
-const asNonNegativeInt = (value: unknown): number => {
-  if (typeof value !== 'number' || !Number.isFinite(value)) return 0;
-  return Math.max(0, Math.floor(value));
-};
-
 const getCurrencyRatio = (currencyId: CurrencyId): number => {
   const currency = getCurrency(currencyId);
   if (!currency) return 0;
@@ -57,7 +52,7 @@ const distributeAetherToLower = (
     if (ratio <= 0) continue;
     const units = Math.floor(remaining / ratio);
     if (units <= 0) continue;
-    wallet[currencyId] = asNonNegativeInt(wallet[currencyId]) + units;
+    wallet[currencyId] = normalizeWalletValue(wallet[currencyId]) + units;
     remaining -= units * ratio;
   }
 };
@@ -75,7 +70,7 @@ export function spendAetherWithPriority(
   for (const currencyId of order){
     const ratio = getCurrencyRatio(currencyId);
     if (ratio <= 0) continue;
-    totalAether += asNonNegativeInt(wallet[currencyId]) * ratio;
+    totalAether += normalizeWalletValue(wallet[currencyId]) * ratio;
     deducted[currencyId] = 0;
   }
 
@@ -96,7 +91,7 @@ export function spendAetherWithPriority(
     const ratio = getCurrencyRatio(currencyId);
     if (ratio <= 0) continue;
 
-    let available = asNonNegativeInt(wallet[currencyId]);
+    let available = normalizeWalletValue(wallet[currencyId]);
     if (available <= 0) continue;
 
     const directUnits = Math.min(Math.floor(remaining / ratio), available);
@@ -104,7 +99,7 @@ export function spendAetherWithPriority(
       wallet[currencyId] = available - directUnits;
       deducted[currencyId] = (deducted[currencyId] ?? 0) + directUnits;
       remaining -= directUnits * ratio;
-      available = asNonNegativeInt(wallet[currencyId]);
+      available = normalizeWalletValue(wallet[currencyId]);
     }
 
     if (remaining > 0 && available > 0){

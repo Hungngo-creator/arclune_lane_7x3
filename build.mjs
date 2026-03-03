@@ -114,6 +114,7 @@ const LEGACY_MODULE_ID_ALIASES = new Map(
 
 const args = process.argv.slice(2);
 const skipBundleVerify = args.includes('--skip-bundle-verify');
+const pruneUnreachableModules = args.includes('--prune-unreachable');
 const modeArg = args.find((arg) => arg.startsWith('--mode='));
 const argMode = modeArg ? modeArg.split('=')[1] : undefined;
 const normalizedMode = argMode && argMode.toLowerCase() === 'production' ? 'production' : argMode && argMode.toLowerCase() === 'development' ? 'development' : undefined;
@@ -260,6 +261,62 @@ async function listSourceFiles(){
   }
   await walk(SRC_DIR);
   return files.sort();
+}
+
+function extractRuntimeSpecifiers(sourceCode){
+  const specifiers = [];
+  const importFromRegex = /import\s+(?!type\b)[\s\S]*?\s+from\s*['\"](.+?)['\"]/g;
+  const exportFromRegex = /export\s+(?:\*|{[\s\S]*?})\s+from\s*['\"](.+?)['\"]/g;
+  const importSideEffectRegex = /import\s*['\"](.+?)['\"]/g;
+  const dynamicImportRegex = /import\(\s*['\"](.+?)['\"]\s*\)/g;
+
+  for (const regex of [importFromRegex, exportFromRegex, importSideEffectRegex, dynamicImportRegex]){
+    let match;
+    while ((match = regex.exec(sourceCode)) !== null){
+      specifiers.push(match[1]);
+    }
+  }
+
+  return specifiers;
+}
+
+function collectReachableModuleIds(entryModuleId, sourceFiles){
+  const fileByModuleId = new Map(sourceFiles.map((file) => [toModuleId(file), file]));
+  const visited = new Set();
+  const queue = [entryModuleId];
+
+  for (const [, stubPath] of STUB_MODULE_SPECIFIERS){
+    const stubModuleId = toModuleId(stubPath);
+    fileByModuleId.set(stubModuleId, stubPath);
+  }
+
+  while (queue.length > 0){
+    const currentId = applyLegacyModuleAlias(queue.shift());
+    if (!currentId || visited.has(currentId)){
+      continue;
+    }
+    visited.add(currentId);
+    const filePath = fileByModuleId.get(currentId);
+    if (!filePath || !fsSync.existsSync(filePath)){
+      continue;
+    }
+
+    const ext = path.extname(filePath);
+    if (!SCRIPT_EXTENSIONS.has(ext)){
+      continue;
+    }
+
+    const sourceCode = fsSync.readFileSync(filePath, 'utf8');
+    const specifiers = extractRuntimeSpecifiers(sourceCode);
+    for (const specifier of specifiers){
+      const resolvedModuleId = resolveImport(currentId, specifier);
+      if (resolvedModuleId && !visited.has(resolvedModuleId)){
+        queue.push(resolvedModuleId);
+      }
+    }
+  }
+
+  return visited;
 }
 
 function syncLegacyModuleAliases(files){
@@ -589,9 +646,18 @@ function logTopBundleSizes(metafile, limit = 5){
 async function build(){
   const files = await listSourceFiles();
   syncLegacyModuleAliases(files);
+  const reachableModuleIds = pruneUnreachableModules
+    ? collectReachableModuleIds(ENTRY_ID, files)
+    : null;
+  if (reachableModuleIds){
+    console.log(`[build.mjs] Chế độ prune-unreachable bật: đóng gói ${reachableModuleIds.size}/${files.length} module từ điểm vào ${ENTRY_ID}.`);
+  }
   const modules = [];
   for (const file of files){
     const id = toModuleId(file);
+    if (reachableModuleIds && !reachableModuleIds.has(id)){
+      continue;
+    }
     const raw = await fs.readFile(file, 'utf8');
     const ext = path.extname(file);
     if (ext === '.json'){
@@ -637,6 +703,9 @@ async function build(){
 
 for (const [, stubPath] of STUB_MODULE_SPECIFIERS){
     const moduleId = toModuleId(stubPath);
+    if (reachableModuleIds && !reachableModuleIds.has(moduleId)){
+      continue;
+    }
     if (modules.some((mod) => mod.id === moduleId)){
       continue;
     }
