@@ -637,7 +637,7 @@ export function aiMaybeAct(Game: SessionState, reason: AI_REASON): void {
   Game.ai.lastThinkMs = now;
 }
 export interface GambitEvaluation {
-  action: 'ult' | 'basic' | null;
+  action: 'ult' | 'skill1' | 'skill2' | 'skill3' | 'basic' | null;
   slotIndex: number;
   reason: string;
 }
@@ -663,7 +663,7 @@ function findLowestHpUnit(units: ReadonlyArray<UnitToken>): UnitToken | null {
   return best;
 }
 
-export function evaluateGambitLogic(Game: SessionState, unit: UnitToken, options: { startIndex?: number } = {}): GambitEvaluation {
+const progressMap = Game.runtime?.unitProgressById as ReadonlyMap<string, { gambit?: Array<{ condition: string; action: 'ult' | 'skill1' | 'skill2' | 'skill3' | 'basic'; threshold?: number; targetRole?: string; enabled?: boolean }> }> | undefined;
   const progressMap = Game.runtime?.unitProgressById as ReadonlyMap<string, { gambit?: Array<{ condition: string; action: 'ult' | 'basic'; threshold?: number; targetRole?: string; enabled?: boolean }> }> | undefined;
   const profile = progressMap?.get(unit.id);
   const slots = Array.isArray(profile?.gambit) ? profile.gambit : [];

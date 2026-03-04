@@ -102,7 +102,7 @@ export interface CollectionProgressUnitInput extends Record<string, unknown> {
   tacticalAi?: ReadonlyArray<GambitSlotInput> | null;
 }
 
-export type GambitActionType = 'ult' | 'basic';
+export type GambitActionType = 'ult' | 'skill1' | 'skill2' | 'skill3' | 'basic';
 
 export type GambitConditionType =
   | 'self_hp_below'

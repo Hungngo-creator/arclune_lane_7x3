@@ -24,6 +24,9 @@ const CONDITION_OPTIONS: GambitOption[] = [
 
 const ACTION_OPTIONS: GambitOption[] = [
   { value: 'ult', label: 'Kỹ năng (ULT)' },
+  { value: 'skill1', label: 'Kỹ năng 1' },
+  { value: 'skill2', label: 'Kỹ năng 2' },
+  { value: 'skill3', label: 'Kỹ năng 3' },
   { value: 'basic', label: 'Đánh thường' },
 ];
 

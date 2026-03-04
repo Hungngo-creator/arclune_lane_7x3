@@ -21,7 +21,7 @@ const GAMBITS_CONDITIONS = new Set<GambitConditionType>([
   'enemy_has_shield',
   'always',
 ]);
-const GAMBITS_ACTIONS = new Set<GambitActionType>(['ult', 'basic']);
+const GAMBITS_ACTIONS = new Set<GambitActionType>(['ult', 'skill1', 'skill2', 'skill3', 'basic']);
 
 const normalizeGambitSlots = (value: unknown): RuntimeGambitSlot[] | undefined => {
   if (!Array.isArray(value)) return undefined;
