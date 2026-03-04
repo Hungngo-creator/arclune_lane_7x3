@@ -16,6 +16,7 @@ export interface TagDispatchContext {
   turn?: number | null;
   payload?: Record<string, unknown> | null;
   onAetherCost?: (amount: number, side: Side) => boolean;
+  deferEffects?: boolean;
   onSummon?: () => void;
 }
 
@@ -37,6 +38,7 @@ type NormalizedContext = {
   payload: Record<string, unknown> | null;
   onAetherCost: (amount: number, side: Side) => boolean;
   onSummon: () => void;
+  deferEffects: boolean;
 };
 
 type TagHandler = (ctx: NormalizedContext, result: TagDispatchResult) => void;
@@ -140,6 +142,7 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
     result.targets = sortByBoardOrder(ctx.game.tokens.filter((token) => token.alive && token.side === foeSide));
   },
   heal: (ctx, result) => {
+    if (ctx.deferEffects) return;
     const amount = Math.max(0, Math.round(asFinite(ctx.payload?.healAmount ?? ctx.payload?.heal, 0)));
     if (amount <= 0) return;
     const targets = result.targets.length > 0 ? result.targets : (ctx.attacker ? [ctx.attacker] : []);
@@ -149,6 +152,7 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
     result.sideEffects.push(`heal:${amount}`);
   },
   'team-heal': (ctx, result) => {
+    if (ctx.deferEffects) return;
     const amount = Math.max(0, Math.round(asFinite(ctx.payload?.healAmount ?? ctx.payload?.heal, 0)));
     if (amount <= 0 || !ctx.game || !ctx.attacker) return;
     const allies = ctx.game.tokens.filter((token) => token.alive && token.side === ctx.attacker?.side);
@@ -156,6 +160,7 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
     result.sideEffects.push(`team-heal:${amount}`);
   },
   shield: (ctx, result) => {
+    if (ctx.deferEffects) return;
     const amount = Math.max(0, Math.round(asFinite(ctx.payload?.shieldAmount ?? ctx.payload?.shield, 0)));
     if (amount <= 0) return;
     const targets = result.targets.length > 0 ? result.targets : (ctx.attacker ? [ctx.attacker] : []);
@@ -163,33 +168,39 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
     result.sideEffects.push(`shield:${amount}`);
   },
   silence: (ctx, result) => {
+    if (ctx.deferEffects) return;
     const turns = readTurns(ctx.payload, 'silenceTurns', 'turns', 'duration');
     for (const token of result.targets) addStatus(token, 'silence', turns);
     if (result.targets.length > 0) result.sideEffects.push(`silence:${turns}`);
   },
   sleep: (ctx, result) => {
+    if (ctx.deferEffects) return;
     const turns = readTurns(ctx.payload, 'sleepTurns', 'turns', 'duration');
     for (const token of result.targets) addStatus(token, 'sleep', turns);
     if (result.targets.length > 0) result.sideEffects.push(`sleep:${turns}`);
   },
   mark: (ctx, result) => {
+    if (ctx.deferEffects) return;
     const turns = readTurns(ctx.payload, 'markTurns', 'turns', 'duration');
     for (const token of result.targets) addStatus(token, 'mark', turns);
     if (result.targets.length > 0) result.sideEffects.push(`mark:${turns}`);
   },
   control: (ctx, result) => {
+    if (ctx.deferEffects) return;
     const turns = readTurns(ctx.payload, 'controlTurns', 'turns', 'duration');
     const statusId = String(ctx.payload?.controlStatus ?? 'control');
     for (const token of result.targets) addStatus(token, statusId, turns);
     if (result.targets.length > 0) result.sideEffects.push(`${statusId}:${turns}`);
   },
   summon: (ctx, result) => {
+    if (ctx.deferEffects) return;
     if (typeof ctx.onSummon === 'function') {
       ctx.onSummon();
       result.sideEffects.push('summon');
     }
   },
   'non-heal-hp-change': (ctx, result) => {
+    if (ctx.deferEffects) return;
     const amount = Math.max(0, Math.round(asFinite(ctx.payload?.hpDelta ?? ctx.payload?.damage, 0)));
     if (amount <= 0) return;
     for (const token of result.targets) {
@@ -220,6 +231,7 @@ export function dispatchGameplayTags(
     payload: context.payload ?? null,
     onAetherCost: context.onAetherCost ?? (() => false),
     onSummon: context.onSummon ?? (() => undefined),
+    deferEffects: Boolean(context.deferEffects),
   };
 
   const result: TagDispatchResult = {

@@ -4427,6 +4427,7 @@ __define('./combat/apply-damage.ts', (exports, module, __require) => {
 __define('./combat/perform-active-skill.ts', (exports, module, __require) => {
   const __dep0 = __require('./combat.ts');
   const dealAbilityDamage = __dep0.dealAbilityDamage;
+  const healUnit = __dep0.healUnit;
   const pickTarget = __dep0.pickTarget;
   const __dep1 = __require('./combat/tag-dispatch.ts');
   const dispatchGameplayTags = __dep1.dispatchGameplayTags;
@@ -4441,6 +4442,10 @@ __define('./combat/perform-active-skill.ts', (exports, module, __require) => {
   const slotToCell = __dep5.slotToCell;
   const __dep6 = __require('./aether.ts');
   const globalAetherPool = __dep6.globalAetherPool;
+  const __dep7 = __require('./statuses.ts');
+  const Statuses = __dep7.Statuses;
+  const __dep8 = __require('./combat/apply-damage.ts');
+  const grantShield = __dep8.grantShield;
   function resolveActiveSkill(caster, skillKey) {
       const set = skillSets[caster.id];
       if (!set)
@@ -4453,6 +4458,23 @@ __define('./combat/perform-active-skill.ts', (exports, module, __require) => {
   function readNumberish(value, fallback = 0) {
       const n = typeof value === 'number' ? value : Number(value);
       return Number.isFinite(n) ? n : fallback;
+  }
+  function resolvePayload(skill) {
+      const nested = [skill.payload, skill.metadata?.payload, skill.meta?.payload]
+          .find((value) => value && typeof value === 'object' && !Array.isArray(value));
+      return {
+          ...nested,
+          ...skill,
+      };
+  }
+  function addTaggedStatus(target, id, turns) {
+      Statuses.add(target, {
+          id,
+          kind: 'debuff',
+          tag: id,
+          dur: Math.max(1, turns),
+          tick: 'turn',
+      });
   }
   function firstOpenSlot(game, side) {
       const alive = game.tokens.filter((token) => token.alive);
@@ -4469,7 +4491,19 @@ __define('./combat/perform-active-skill.ts', (exports, module, __require) => {
           return { ok: false, skillKey, skill: null, tags: [], appliedTags: [], targetCount: 0, reason: 'missing-skill' };
       }
       const tags = normalizeTagList(skill.tags ?? []);
+      const payload = resolvePayload(skill);
       const skillCost = Math.max(0, Math.round(readNumberish(skill.cost?.aether, 0)));
+      if (skillCost > 0 && tags.includes('aether-cost') && globalAetherPool.current(caster.side) < skillCost) {
+          return {
+              ok: false,
+              skillKey,
+              skill,
+              tags,
+              appliedTags: [],
+              targetCount: 0,
+              reason: 'insufficient-aether',
+          };
+      }
       let consumedAether = skillCost <= 0;
       const dispatch = dispatchGameplayTags(tags, {
           game,
@@ -4477,7 +4511,8 @@ __define('./combat/perform-active-skill.ts', (exports, module, __require) => {
           target: pickTarget(game, caster),
           side: caster.side,
           cost: skillCost,
-          payload: skill,
+          payload,
+          deferEffects: true,
           onAetherCost: (amount, side) => {
               if (amount <= 0) {
                   consumedAether = true;
@@ -4487,23 +4522,7 @@ __define('./combat/perform-active-skill.ts', (exports, module, __require) => {
               consumedAether = ok;
               return ok;
           },
-          onSummon: () => {
-              const openSlot = firstOpenSlot(game, caster.side);
-              if (!openSlot)
-                  return;
-              const summon = (skill.summon ?? skill.metadata?.summon ?? skill.meta?.summon ?? {});
-              enqueueImmediate(game, {
-                  side: caster.side,
-                  slot: openSlot,
-                  unit: {
-                      id: typeof summon.id === 'string' ? summon.id : `${caster.id}_minion`,
-                      name: typeof summon.name === 'string' ? summon.name : 'Creep',
-                      ownerIid: caster.iid,
-                      isMinion: true,
-                      ttlTurns: Math.max(1, Math.round(readNumberish(summon.ttlTurns ?? summon.ttl, 3))),
-                  },
-              });
-          },
+          onSummon: () => undefined,
       });
       if (skillCost > 0 && tags.includes('aether-cost') && !consumedAether) {
           return {
@@ -4517,7 +4536,58 @@ __define('./combat/perform-active-skill.ts', (exports, module, __require) => {
           };
       }
       const targets = dispatch.targets.length > 0 ? dispatch.targets : (dispatch.targets.length === 0 && caster.alive ? [caster] : []);
-      if (tags.includes('single-target') || tags.includes('multi-target') || tags.includes('aoe') || skill.damage) {
+      const turns = Math.max(1, Math.round(readNumberish(payload.turns ?? payload.duration, 1)));
+      if (tags.includes('summon')) {
+          const openSlot = firstOpenSlot(game, caster.side);
+          if (openSlot) {
+              const summon = (payload.summon ?? skill.summon ?? {});
+              enqueueImmediate(game, {
+                  side: caster.side,
+                  slot: openSlot,
+                  unit: {
+                      id: typeof summon.id === 'string' ? summon.id : `${caster.id}_minion`,
+                      name: typeof summon.name === 'string' ? summon.name : 'Creep',
+                      ownerIid: caster.iid,
+                      isMinion: true,
+                      ttlTurns: Math.max(1, Math.round(readNumberish(summon.ttlTurns ?? summon.ttl, 3))),
+                  },
+              });
+          }
+      }
+      if (tags.includes('heal')) {
+          const amount = Math.max(0, Math.round(readNumberish(payload.healAmount ?? payload.heal, 0)));
+          for (const target of targets)
+              healUnit(target, amount);
+      }
+      if (tags.includes('team-heal')) {
+          const amount = Math.max(0, Math.round(readNumberish(payload.healAmount ?? payload.heal, 0)));
+          const allies = game.tokens.filter((token) => token.alive && token.side === caster.side);
+          for (const ally of allies)
+              healUnit(ally, amount);
+      }
+      if (tags.includes('shield')) {
+          const amount = Math.max(0, Math.round(readNumberish(payload.shieldAmount ?? payload.shield, 0)));
+          for (const target of targets)
+              grantShield(target, amount);
+      }
+      if (tags.includes('silence')) {
+          for (const target of targets)
+              addTaggedStatus(target, 'silence', turns);
+      }
+      if (tags.includes('sleep')) {
+          for (const target of targets)
+              addTaggedStatus(target, 'sleep', turns);
+      }
+      if (tags.includes('mark')) {
+          for (const target of targets)
+              addTaggedStatus(target, 'mark', turns);
+      }
+      if (tags.includes('control')) {
+          const statusId = typeof payload.controlStatus === 'string' ? payload.controlStatus : 'control';
+          for (const target of targets)
+              addTaggedStatus(target, statusId, turns);
+      }
+      if (tags.includes('single-target') || tags.includes('multi-target') || tags.includes('aoe') || tags.includes('non-heal-hp-change') || skill.damage) {
           const multiplier = Math.max(0, readNumberish(skill.damage?.multiplier ?? skill.damageMultiplier ?? 1, 1));
           const base = Math.max(1, Math.round(((caster.atk ?? 0) + (caster.wil ?? 0)) * multiplier));
           for (const target of targets) {
@@ -4654,6 +4724,8 @@ __define('./combat/tag-dispatch.ts', (exports, module, __require) => {
           result.targets = sortByBoardOrder(ctx.game.tokens.filter((token) => token.alive && token.side === foeSide));
       },
       heal: (ctx, result) => {
+          if (ctx.deferEffects)
+              return;
           const amount = Math.max(0, Math.round(asFinite(ctx.payload?.healAmount ?? ctx.payload?.heal, 0)));
           if (amount <= 0)
               return;
@@ -4664,6 +4736,8 @@ __define('./combat/tag-dispatch.ts', (exports, module, __require) => {
           result.sideEffects.push(`heal:${amount}`);
       },
       'team-heal': (ctx, result) => {
+          if (ctx.deferEffects)
+              return;
           const amount = Math.max(0, Math.round(asFinite(ctx.payload?.healAmount ?? ctx.payload?.heal, 0)));
           if (amount <= 0 || !ctx.game || !ctx.attacker)
               return;
@@ -4673,6 +4747,8 @@ __define('./combat/tag-dispatch.ts', (exports, module, __require) => {
           result.sideEffects.push(`team-heal:${amount}`);
       },
       shield: (ctx, result) => {
+          if (ctx.deferEffects)
+              return;
           const amount = Math.max(0, Math.round(asFinite(ctx.payload?.shieldAmount ?? ctx.payload?.shield, 0)));
           if (amount <= 0)
               return;
@@ -4682,6 +4758,8 @@ __define('./combat/tag-dispatch.ts', (exports, module, __require) => {
           result.sideEffects.push(`shield:${amount}`);
       },
       silence: (ctx, result) => {
+          if (ctx.deferEffects)
+              return;
           const turns = readTurns(ctx.payload, 'silenceTurns', 'turns', 'duration');
           for (const token of result.targets)
               addStatus(token, 'silence', turns);
@@ -4689,6 +4767,8 @@ __define('./combat/tag-dispatch.ts', (exports, module, __require) => {
               result.sideEffects.push(`silence:${turns}`);
       },
       sleep: (ctx, result) => {
+          if (ctx.deferEffects)
+              return;
           const turns = readTurns(ctx.payload, 'sleepTurns', 'turns', 'duration');
           for (const token of result.targets)
               addStatus(token, 'sleep', turns);
@@ -4696,6 +4776,8 @@ __define('./combat/tag-dispatch.ts', (exports, module, __require) => {
               result.sideEffects.push(`sleep:${turns}`);
       },
       mark: (ctx, result) => {
+          if (ctx.deferEffects)
+              return;
           const turns = readTurns(ctx.payload, 'markTurns', 'turns', 'duration');
           for (const token of result.targets)
               addStatus(token, 'mark', turns);
@@ -4703,6 +4785,8 @@ __define('./combat/tag-dispatch.ts', (exports, module, __require) => {
               result.sideEffects.push(`mark:${turns}`);
       },
       control: (ctx, result) => {
+          if (ctx.deferEffects)
+              return;
           const turns = readTurns(ctx.payload, 'controlTurns', 'turns', 'duration');
           const statusId = String(ctx.payload?.controlStatus ?? 'control');
           for (const token of result.targets)
@@ -4711,12 +4795,16 @@ __define('./combat/tag-dispatch.ts', (exports, module, __require) => {
               result.sideEffects.push(`${statusId}:${turns}`);
       },
       summon: (ctx, result) => {
+          if (ctx.deferEffects)
+              return;
           if (typeof ctx.onSummon === 'function') {
               ctx.onSummon();
               result.sideEffects.push('summon');
           }
       },
       'non-heal-hp-change': (ctx, result) => {
+          if (ctx.deferEffects)
+              return;
           const amount = Math.max(0, Math.round(asFinite(ctx.payload?.hpDelta ?? ctx.payload?.damage, 0)));
           if (amount <= 0)
               return;
@@ -4746,6 +4834,7 @@ __define('./combat/tag-dispatch.ts', (exports, module, __require) => {
           payload: context.payload ?? null,
           onAetherCost: context.onAetherCost ?? (() => false),
           onSummon: context.onSummon ?? (() => undefined),
+          deferEffects: Boolean(context.deferEffects),
       };
       const result = {
           tags,
@@ -24554,6 +24643,9 @@ __define('./turns.ts', (exports, module, __require) => {
           }
           if (decision.action === 'basic') {
               break;
+          }
+          if (!GAMBIT_SKILL_ACTIONS.includes(decision.action)) {
+              continue;
           }
           try {
               const cast = performActiveSkill(Game, unit, decision.action);

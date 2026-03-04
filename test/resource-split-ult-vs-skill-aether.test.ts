@@ -72,4 +72,60 @@ describe('resource split: ult-fury vs skill-aether', () => {
     expect(spendFurySpy).not.toHaveBeenCalled();
     expect(basicSpy).toHaveBeenCalledTimes(1);
   });
+  it('falls back to basic when skill lacks enough aether', () => {
+    jest
+      .spyOn(ai, 'evaluateGambitLogic')
+      .mockImplementation((_game, _unit, ctx) => ((ctx?.startIndex ?? 0) === 0
+        ? ({ slotIndex: 0, action: 'skill1' } as never)
+        : ({ slotIndex: -1, action: null } as never)));
+
+    const currentSpy = jest.spyOn(globalAetherPool, 'current').mockReturnValue(0);
+    const consumeSpy = jest.spyOn(globalAetherPool, 'consume').mockReturnValue(false);
+    const basicSpy = jest.spyOn(combat, 'doBasicWithFollowups').mockImplementation(() => undefined as never);
+
+    const caster = {
+      id: 'mong_yem',
+      side: 'ally',
+      alive: true,
+      cx: 0,
+      cy: 0,
+      hp: 100,
+      hpMax: 100,
+      atk: 50,
+      wil: 30,
+      fury: 0,
+      furyMax: 100,
+      statuses: [],
+    };
+    const enemy = {
+      id: 'dummy_enemy',
+      side: 'enemy',
+      alive: true,
+      cx: 3,
+      cy: 0,
+      hp: 100,
+      hpMax: 100,
+      atk: 20,
+      wil: 10,
+      statuses: [],
+    };
+
+    const Game = {
+      tokens: [caster, enemy],
+      meta: new Map([[caster.id, {}], [enemy.id, {}]]),
+      turn: { busyUntil: 0, cycle: 0 },
+      queued: { ally: new Map(), enemy: new Map() },
+      actionChain: [],
+      battle: { over: false, winner: null },
+    };
+
+    const result = doActionOrSkip(Game as never, caster as never, { performUlt: jest.fn() });
+
+    expect(result.acted).toBe(true);
+    expect(result.reason).toBe(null);
+    expect(currentSpy).toHaveBeenCalledWith('ally');
+    expect(consumeSpy).not.toHaveBeenCalled();
+    expect(basicSpy).toHaveBeenCalledTimes(1);
+  });
+
 });

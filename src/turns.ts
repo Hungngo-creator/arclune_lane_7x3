@@ -480,6 +480,10 @@ export function doActionOrSkip(
       break;
     }
 
+    if (!GAMBIT_SKILL_ACTIONS.includes(decision.action)) {
+      continue;
+    }
+
     try {
       const cast = performActiveSkill(Game, unit, decision.action);
       if (!cast.ok) {
