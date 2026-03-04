@@ -6542,6 +6542,8 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
       },
       {
           unitId: 'mong_yem',
+          importBatch: 'ideas-matrix-batch-02',
+          sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
           basic: {
               name: 'Mộng Phệ',
               type: 'basic',
@@ -6608,6 +6610,8 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
       },
       {
           unitId: 'chan_nga',
+          importBatch: 'ideas-matrix-batch-02',
+          sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
           basic: {
               name: 'Đánh Thường',
               type: 'basic',
@@ -6654,6 +6658,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
               name: 'Thứ Hai Chân Thân',
               type: 'ultimate',
               tags: ['aoe', 'mark'],
+              variant: { kind: 'transformation', runtimeMapping: 'chan_nga_clone_link' },
               hpTrade: { percentCurrentHP: 0.50 },
               summon: {
                   id: 'chan_nga_clone',
@@ -6661,6 +6666,11 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   ttl: 6,
                   forbiddenSkills: ['Quy Nhất Bản Ảnh'],
                   rageLocked: true
+              },
+              runtimeRules: {
+                  canCastWhen: { hasNoExistingClone: true, minPercentCurrentHP: 0.60 },
+                  clonePlacement: { priority: 'adjacent-empty-slot', fallback: 'first-empty-ally-slot' },
+                  possessionOnMainBodyDeath: { enabled: true, applyDebuff: 'linh_met', turns: 3 }
               },
               description: 'Chỉ thi triển khi không có clone và HP ≥ 60%. Giảm 50% HP hiện có để triệu hồi “Thứ Hai Chân Thân” với 85% chỉ số hiện tại. Clone tồn tại tối đa 6 lượt, không thể dùng Quy Nhất Bản Ảnh và không tích nộ.'
           },
@@ -6677,6 +6687,8 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
       },
       {
           unitId: 'ma_ton_diep_lam',
+          importBatch: 'ideas-matrix-batch-02',
+          sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
           basic: {
               name: 'Đánh Thường',
               type: 'basic',
@@ -6738,6 +6750,8 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
       },
       {
           unitId: 'mo_da',
+          importBatch: 'ideas-matrix-batch-02',
+          sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
           basic: {
               name: 'Ám Trảm',
               type: 'basic',
@@ -6804,6 +6818,8 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
       },
       {
           unitId: 'ngao_binh',
+          importBatch: 'ideas-matrix-batch-02',
+          sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
           basic: {
               name: 'Đánh Thường',
               type: 'basic',
@@ -6846,6 +6862,16 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
               type: 'ultimate',
               tags: ['stance'],
               variant: { kind: 'transformation', runtimeMapping: 'ngao_binh_form_stage' },
+              runtimeRules: {
+                  eggPhaseOnCast: {
+                      enabledUntilCastCount: 3,
+                      selfActionLocked: true,
+                      damageTakenReductionByCastCount: [0.40, 0.50, 0.60]
+                  },
+                  formSequence: ['au_long', 'thanh_nien', 'truong_thanh', 'long_than', 'prime'],
+                  primeAwakenAtCast: 4,
+                  lockFormSnapshotAtSkillResolution: true
+              },
               primeAwakenAtCast: 4,
               longUyAura: { enemyATKDown: 0.10, activeFromForm: 'long_than' },
               description: 'Mỗi lần thi triển, Ngao Bính hóa trứng 1 lượt (không thể tấn công, giảm sát thương nhận 40%/50%/60% tùy lần) rồi phá xác nâng trạng thái: Thành Niên → Trưởng Thành → Long Thần. Từ Long Thần nhận Long Uy giảm 10% ATK của kẻ địch tấn công mình; từ lần cast thứ 4 trở đi bỏ qua trạng thái trứng và thức tỉnh Prime.'
@@ -6863,6 +6889,8 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
       },
       {
           unitId: 'lau_khac_ma_chu',
+          importBatch: 'ideas-matrix-batch-02',
+          sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
           basic: {
               name: 'Đánh Thường',
               type: 'basic',
@@ -6905,6 +6933,11 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
               type: 'ultimate',
               tags: ['control'],
               variant: { kind: 'dual-outcome', runtimeMapping: 'lau_khac_ma_kinh_coinflip' },
+              runtimeRules: {
+                  coinflip: { nghichLuu: 0.5, thuanLuu: 0.5 },
+                  nghichLuu: { rewindTeamStateByTurns: 1, revertSummonsCreatedThisTurn: true, refundSummonCost: true },
+                  thuanLuu: { triggerImmediateBasicAttackForAllies: true, ignoreSilenceCheck: false }
+              },
               description: 'Vận hành Lậu Khắc Ma Sa, thời sa chảy ngẫu nhiên 50% giữa hai kết quả: Nghịch Lưu – đưa toàn bộ phe đồng minh về trạng thái của 1 lượt trước (vị trí, HP, buff/debuff; đơn vị mới triệu hồi trong lượt hiện tại trở về deck và hoàn cost); Thuận Lưu – sau khi ult hoàn tất, mọi đồng minh ngay lập tức thực thi 1 đòn đánh thường.'
           },
           talent: {
@@ -6923,6 +6956,8 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
       },
       {
           unitId: 'phe',
+          importBatch: 'ideas-matrix-batch-02',
+          sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
           basic: {
               name: 'Đánh Thường',
               type: 'basic',
@@ -6994,6 +7029,8 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
       },
       {
           unitId: 'kiemtruongda',
+          importBatch: 'ideas-matrix-batch-02',
+          sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
           basic: {
               name: 'Đánh Thường',
               type: 'basic',
@@ -7060,6 +7097,8 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
       },
       {
           unitId: 'loithienanh',
+          importBatch: 'ideas-matrix-batch-02',
+          sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
           basic: {
               name: 'Đánh Thường',
               type: 'basic',
@@ -8089,7 +8128,7 @@ __define('./data/tags.ts', (exports, module, __require) => {
       { id: 'execute', label: 'Kết liễu', domain: 'delivery', aliases: ['finisher'] },
       { id: 'pierce', label: 'Xuyên giáp/kháng', domain: 'effect', aliases: ['armor-pierce', 'armor_pierce'] },
       { id: 'mark', label: 'Đánh dấu', domain: 'effect', aliases: ['mark-builder', 'mark-detonation'] },
-      { id: 'stance', label: 'Chuyển dạng', domain: 'kit', aliases: ['form-scaling'] },
+      { id: 'stance', label: 'Chuyển dạng', domain: 'kit', aliases: ['form-scaling', 'transformation', 'chuyen_dang'] },
       { id: 'team-heal', label: 'Hồi phục đội', domain: 'effect' },
       { id: 'self-buff', label: 'Tự cường hóa', domain: 'effect', aliases: ['buff'] },
       { id: 'chain', label: 'Liên kích/chuỗi', domain: 'delivery' },
@@ -8129,6 +8168,11 @@ __define('./data/tags.ts', (exports, module, __require) => {
           'hp-redistribute': 'non-heal-hp-change',
           haste: 'support',
           reflect: 'defense',
+          transform: 'stance',
+          'dual-form': 'stance',
+          'coin-flip': 'control',
+          clone_body: 'summon',
+          'heal-share': 'non-heal-hp-change',
       }),
   });
   const TAG_ALIAS_BY_VERSION_KEY = new Map();

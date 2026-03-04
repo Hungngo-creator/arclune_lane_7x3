@@ -52,7 +52,7 @@ const TAG_DEFINITIONS = [
   { id: 'execute', label: 'Kết liễu', domain: 'delivery', aliases: ['finisher'] },
   { id: 'pierce', label: 'Xuyên giáp/kháng', domain: 'effect', aliases: ['armor-pierce', 'armor_pierce'] },
   { id: 'mark', label: 'Đánh dấu', domain: 'effect', aliases: ['mark-builder', 'mark-detonation'] },
-  { id: 'stance', label: 'Chuyển dạng', domain: 'kit', aliases: ['form-scaling'] },
+  { id: 'stance', label: 'Chuyển dạng', domain: 'kit', aliases: ['form-scaling', 'transformation', 'chuyen_dang'] },
   { id: 'team-heal', label: 'Hồi phục đội', domain: 'effect' },
   { id: 'self-buff', label: 'Tự cường hóa', domain: 'effect', aliases: ['buff'] },
   { id: 'chain', label: 'Liên kích/chuỗi', domain: 'delivery' },
@@ -95,6 +95,11 @@ export const tagAliasesByVersion: Readonly<Record<TagAliasVersion, Readonly<Reco
     'hp-redistribute': 'non-heal-hp-change',
     haste: 'support',
     reflect: 'defense',
+    transform: 'stance',
+    'dual-form': 'stance',
+    'coin-flip': 'control',
+    clone_body: 'summon',
+    'heal-share': 'non-heal-hp-change',
   }),
 });
 
