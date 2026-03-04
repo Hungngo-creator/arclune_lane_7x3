@@ -11217,11 +11217,21 @@ __define('./modes/pve/collection-mapper.ts', (exports, module, __require) => {
       'always',
   ]);
   const GAMBITS_ACTIONS = new Set(['basic', 'ult', 'skill1', 'skill2', 'skill3']);
+  const extractGambitSlots = (value) => {
+      if (Array.isArray(value))
+          return value;
+      if (!value || typeof value !== 'object')
+          return null;
+      const container = value;
+      const candidates = [container.slots, container.rows, container.gambit, container.tacticalAi];
+      return candidates.find((entry) => Array.isArray(entry)) ?? null;
+  };
   const normalizeGambitSlots = (value) => {
-      if (!Array.isArray(value))
+      const slots = extractGambitSlots(value);
+      if (!slots)
           return undefined;
       const normalized = [];
-      for (const raw of value.slice(0, GAMBITS_MAX_SLOTS)) {
+      for (const raw of slots.slice(0, GAMBITS_MAX_SLOTS)) {
           if (!raw || typeof raw !== 'object')
               continue;
           const slot = raw;
@@ -14695,7 +14705,6 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           if (parsedCostCap !== null)
               game.ai.costCap = parsedCostCap;
           const parsedSummonLimit = toPositiveOrNull(preset.summonLimit);
-          t;
           if (parsedSummonLimit !== null)
               game.ai.summonLimit = parsedSummonLimit;
       }

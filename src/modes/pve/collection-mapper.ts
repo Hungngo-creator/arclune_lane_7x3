@@ -1,7 +1,15 @@
 import { Meta, makeInstanceStats } from '../../meta.ts';
 
 import type { InstanceStats } from '../../meta.ts';
-import type { CollectionStateInput, GambitActionType, GambitConditionType, GambitSlotInput, RuntimeGambitSlot, RuntimeUnitProgress } from '@shared-types/pve';
+import type {
+  CollectionStateInput,
+  GambitActionType,
+  GambitConditionType,
+  GambitSlotInput,
+  GambitSlotsContainerInput,
+  RuntimeGambitSlot,
+  RuntimeUnitProgress,
+} from '@shared-types/pve';
 
 type CollectionItemCandidate = Record<string, unknown>;
 
@@ -23,10 +31,19 @@ const GAMBITS_CONDITIONS = new Set<GambitConditionType>([
 ]);
 const GAMBITS_ACTIONS = new Set<GambitActionType>(['basic', 'ult', 'skill1', 'skill2', 'skill3']);
 
+const extractGambitSlots = (value: unknown): ReadonlyArray<GambitSlotInput> | null => {
+  if (Array.isArray(value)) return value as ReadonlyArray<GambitSlotInput>;
+  if (!value || typeof value !== 'object') return null;
+  const container = value as GambitSlotsContainerInput;
+  const candidates = [container.slots, container.rows, container.gambit, container.tacticalAi];
+  return candidates.find((entry): entry is ReadonlyArray<GambitSlotInput> => Array.isArray(entry)) ?? null;
+};
+
 const normalizeGambitSlots = (value: unknown): RuntimeGambitSlot[] | undefined => {
-  if (!Array.isArray(value)) return undefined;
+  const slots = extractGambitSlots(value);
+  if (!slots) return undefined;
   const normalized: RuntimeGambitSlot[] = [];
-  for (const raw of value.slice(0, GAMBITS_MAX_SLOTS)) {
+  for (const raw of slots.slice(0, GAMBITS_MAX_SLOTS)) {
     if (!raw || typeof raw !== 'object') continue;
     const slot = raw as GambitSlotInput;
     const condition = typeof slot.condition === 'string' && GAMBITS_CONDITIONS.has(slot.condition as GambitConditionType)
@@ -151,4 +168,3 @@ export function resolveRuntimeUnitStats(
     stars,
   };
 }
-

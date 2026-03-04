@@ -637,8 +637,10 @@ export function aiMaybeAct(Game: SessionState, reason: AI_REASON): void {
   Game.ai.lastDecision = decision;
   Game.ai.lastThinkMs = now;
 }
+export type GambitDecisionAction = GambitActionType | null;
+
 export interface GambitEvaluation {
-  action: GambitActionType | null;
+  action: GambitDecisionAction;
   slotIndex: number;
   reason: string;
 }

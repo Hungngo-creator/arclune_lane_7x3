@@ -3547,7 +3547,7 @@ function applyConfigToRunningGame(cfg: NormalizedSessionConfig): void {
     }
     const parsedCostCap = toPositiveOrNull(preset.costCap);
     if (parsedCostCap !== null) game.ai.costCap = parsedCostCap;
-    const parsedSummonLimit = toPositiveOrNull(preset.summonLimit);t
+    const parsedSummonLimit = toPositiveOrNull(preset.summonLimit);
     if (parsedSummonLimit !== null) game.ai.summonLimit = parsedSummonLimit;
   }
   if (sceneChanged){

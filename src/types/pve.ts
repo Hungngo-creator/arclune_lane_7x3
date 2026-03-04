@@ -98,6 +98,13 @@ export interface CollectionProgressUnitInput extends Record<string, unknown> {
   skin?: string | null;
   avatarSkin?: string | null;
   selectedSkin?: string | null;
+  gambit?: ReadonlyArray<GambitSlotInput> | GambitSlotsContainerInput | null;
+  tacticalAi?: ReadonlyArray<GambitSlotInput> | GambitSlotsContainerInput | null;
+}
+
+export interface GambitSlotsContainerInput extends Record<string, unknown> {
+  slots?: ReadonlyArray<GambitSlotInput> | null;
+  rows?: ReadonlyArray<GambitSlotInput> | null;
   gambit?: ReadonlyArray<GambitSlotInput> | null;
   tacticalAi?: ReadonlyArray<GambitSlotInput> | null;
 }
