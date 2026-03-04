@@ -57,6 +57,8 @@ import {
   sessionNow,
 } from '../../utils/time';
 import { getSummonSpec, resolveSummonSlots } from '../../utils/kit';
+import { normalizeTagList } from '../../data/tags.ts';
+import { dispatchGameplayTags } from '../../combat/tag-dispatch.ts';
 import {
   normalizeConfig,
   createSession,
@@ -197,8 +199,9 @@ interface UltSpec extends Record<string, unknown> {
   healLeader?: boolean | null;
   attackSpeed?: number | string | null;
   runtime?: SkillRuntime | null;
-  metadata?: { summon?: SummonSpec | null } | null;
-  meta?: { summon?: SummonSpec | null } | null;
+  tags?: ReadonlyArray<string> | null;
+  metadata?: { summon?: SummonSpec | null; tags?: ReadonlyArray<string> | null } | null;
+  meta?: { summon?: SummonSpec | null; tags?: ReadonlyArray<string> | null } | null;
   summon?: SummonSpec | null;
 }
 
@@ -1267,6 +1270,21 @@ function performUlt(unit: UnitToken): void {
   if (!u){ spendFury(unit, resolveUltCost(unit)); return; }
 
   const foeSide = unit.side === 'ally' ? 'enemy' : 'ally';
+  const rawUltTags = [
+    ...(Array.isArray(u.tags) ? u.tags : []),
+    ...(Array.isArray(u.meta?.tags) ? u.meta.tags : []),
+    ...(Array.isArray(u.metadata?.tags) ? u.metadata.tags : []),
+  ].filter((tag): tag is string => typeof tag === 'string' && tag.trim().length > 0);
+  const normalizedUltTags = normalizeTagList(rawUltTags);
+  dispatchGameplayTags(normalizedUltTags, {
+    game,
+    attacker: unit,
+    target: pickTarget(game, unit),
+    cost: resolveUltCost(unit, CFG),
+    side: unit.side,
+    turn: game.turn?.cycle ?? null,
+    payload: u,
+  });
   let busyMs = 900;
 
   switch(u.type){

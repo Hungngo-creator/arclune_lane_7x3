@@ -4,12 +4,67 @@ const skillsConfig = [
   {
     unitId: 'thien_luu',
     notes: [
-      'Ult tự chuyển thời tiết sang Cực Quang dù đang trạng thái khác.',
-      'Theo vòng khí tượng, nếu bị tái thiết lập sẽ bắt đầu từ Quang Đãng.'
+      'missing design source: chưa tìm thấy mô tả kit của Thiên Lưu trong bộ tài liệu v1/v2.3/3.2.',
+      'Giữ record tạm để tránh trống dữ liệu im lặng; cần bổ sung basic/skills/ult/talent khi có nguồn thiết kế chính thức.'
     ]
   },
   {
     unitId: 'mong_yem',
+    basic: {
+      name: 'Mộng Phệ',
+      type: 'basic',
+      tags: ['single-target', 'mark-builder'],
+      description: 'Gây 100% ATK + WIL lên 1 mục tiêu và gắn 1 stack Mê Hoặc (không thể thanh tẩy). Đủ 3 stack khiến mục tiêu Ngủ Say 1 lượt.'
+    },
+    skills: [
+      {
+        key: 'skill1',
+        name: 'Huyễn Ảnh Che Màn',
+        type: 'active',
+        cost: { aether: 30 },
+        tags: ['self-buff', 'defense'],
+        duration: { turns: 3 },
+        buffs: [{ effect: 'evasion-single-target', amount: 0.50 }],
+        description: 'Trong 3 lượt giảm 50% tỉ lệ bị đánh trúng từ đòn đánh thường đơn mục tiêu; không né được kỹ năng/AOE.'
+      },
+      {
+        key: 'skill2',
+        name: 'Thụy Ca Tự Miên',
+        type: 'active',
+        cost: { aether: 30 },
+        tags: ['sleep', 'support', 'defense'],
+        buffs: [{ effect: 'damageTaken', amount: -0.50 }],
+        growth: { stats: { ATK: 0.07, WIL: 0.07 }, cadence: 'per-sleep-turn', stackLimit: null },
+        wakeRules: { hpThreshold: 0.35, manualTapCount: 2, manualTiming: 'enemy-turn-or-own-turn-start' },
+        description: 'Tự ngủ (skip turn), giảm 50% sát thương nhận vào. Mỗi lượt ngủ tăng vĩnh viễn +7% ATK/WIL cho đến khi thức dậy do HP ≤ 35% hoặc người chơi chạm 2 lần.'
+      },
+      {
+        key: 'skill3',
+        name: 'Phá Mộng Tàn Ca',
+        type: 'active',
+        cost: { aether: 25 },
+        tags: ['single-target', 'mark', 'control'],
+        damage: { multiplier: 1.8, bonusPerMark: 0.2, maxMarks: 3, maxMultiplier: 2.4 },
+        piercePercent: { arm: 0.30, res: 0.30, whenTargetAsleep: true },
+        spreadDebuff: { id: 'me_hoac', consumeFromTarget: 1, toRandomTargets: 2, maxStacksPerTarget: 3 },
+        description: 'Gây 180% sát thương hỗn hợp, tăng thêm 20% mỗi stack Mê Hoặc (tối đa 240%). Khi mục tiêu đang ngủ/đủ 3 stack, đòn đánh bỏ qua 30% ARM/RES và lan 1 stack Mê Hoặc sang tối đa 2 địch ngẫu nhiên.'
+      }
+    ],
+    ult: {
+      name: 'Thế Giới Thứ Hai',
+      type: 'ultimate',
+      tags: ['field', 'support'],
+      duration: { turns: 3 },
+      field: { id: 'the_gioi_mo', persistsOnCasterDeath: true },
+      description: 'Tạo sân “Thế Giới Mơ” trong 3 lượt: đồng minh nhận ngẫu nhiên 1 buff từ pool, kẻ địch nhận ngẫu nhiên 1 debuff từ pool. Không gây sát thương trực tiếp.'
+    },
+    talent: {
+      name: 'Mê Ca Dẫn Thụy',
+      type: 'talent',
+      tags: ['passive', 'mark', 'control'],
+      description: 'Mỗi lần Mộng Yểm gây sát thương bằng đánh thường/Skill 1/Skill 3 sẽ gắn 1 stack Mê Hoặc lên mục tiêu. Stack không thể thanh tẩy và kích hoạt Ngủ Say 1 lượt khi đủ 3 tầng.'
+    },
+    technique: null,
     notes: [
       'Mê Hoặc không tự rơi theo thời gian nhưng bị reset mỗi khi ngủ kích hoạt.',
       'Thụy Ca Tự Miên cho phép người chơi chạm hai lần vào thẻ nhân vật ở lượt địch để đánh thức sớm.'
