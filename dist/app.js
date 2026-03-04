@@ -1,7 +1,7 @@
 // Bundled by build.mjs
 const __modules = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }
 function __define(id, factory){ __modules[id] = { factory, exports: null, initialized: false }; }
@@ -4434,6 +4434,125 @@ __define('./combat/apply-damage.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyDamage')) exports.applyDamage = applyDamage;
   if (!Object.prototype.hasOwnProperty.call(exports, 'grantShield')) exports.grantShield = grantShield;
 });
+__define('./combat/perform-active-skill.ts', (exports, module, __require) => {
+  const __dep0 = __require('./combat.ts');
+  const dealAbilityDamage = __dep0.dealAbilityDamage;
+  const healUnit = __dep0.healUnit;
+  const grantShield = __dep0.grantShield;
+  const pickTarget = __dep0.pickTarget;
+  const __dep1 = __require('./combat/tag-dispatch.ts');
+  const dispatchGameplayTags = __dep1.dispatchGameplayTags;
+  const __dep2 = __require('./data/skills.ts');
+  const skillSets = __dep2.skillSets;
+  const __dep3 = __require('./data/tags.ts');
+  const normalizeTagList = __dep3.normalizeTagList;
+  const __dep4 = __require('./statuses.ts');
+  const Statuses = __dep4.Statuses;
+  const __dep5 = __require('./summon.ts');
+  const enqueueImmediate = __dep5.enqueueImmediate;
+  const __dep6 = __require('./engine.ts');
+  const cellReserved = __dep6.cellReserved;
+  const slotToCell = __dep6.slotToCell;
+  function resolveActiveSkill(caster, skillKey) {
+      const set = skillSets[caster.id];
+      if (!set)
+          return null;
+      const idx = Number(skillKey.replace('skill', '')) - 1;
+      if (!Number.isFinite(idx) || idx < 0)
+          return null;
+      return set.skills[idx] ?? (idx === 0 ? set.skill : null) ?? null;
+  }
+  function readNumberish(value, fallback = 0) {
+      const n = typeof value === 'number' ? value : Number(value);
+      return Number.isFinite(n) ? n : fallback;
+  }
+  function firstOpenSlot(game, side) {
+      const alive = game.tokens.filter((token) => token.alive);
+      for (let slot = 1; slot <= 9; slot += 1) {
+          const { cx, cy } = slotToCell(side, slot);
+          if (!cellReserved(alive, game.queued, cx, cy))
+              return slot;
+      }
+      return null;
+  }
+  function performActiveSkill(game, caster, skillKey) {
+      const skill = resolveActiveSkill(caster, skillKey);
+      if (!skill) {
+          return { ok: false, skillKey, skill: null, tags: [], appliedTags: [], targetCount: 0 };
+      }
+      const tags = normalizeTagList(skill.tags ?? []);
+      const dispatch = dispatchGameplayTags(tags, {
+          game,
+          attacker: caster,
+          target: pickTarget(game, caster),
+          side: caster.side,
+          cost: readNumberish(skill.cost?.aether, 0),
+          payload: skill,
+          onSummon: () => {
+              const openSlot = firstOpenSlot(game, caster.side);
+              if (!openSlot)
+                  return;
+              const summon = (skill.summon ?? skill.metadata?.summon ?? skill.meta?.summon ?? {});
+              enqueueImmediate(game, {
+                  side: caster.side,
+                  slot: openSlot,
+                  unit: {
+                      id: typeof summon.id === 'string' ? summon.id : `${caster.id}_minion`,
+                      name: typeof summon.name === 'string' ? summon.name : 'Creep',
+                      ownerIid: caster.iid,
+                      isMinion: true,
+                      ttlTurns: Math.max(1, Math.round(readNumberish(summon.ttlTurns ?? summon.ttl, 3))),
+                  },
+              });
+          },
+      });
+      const targets = dispatch.targets.length > 0 ? dispatch.targets : (dispatch.targets.length === 0 && caster.alive ? [caster] : []);
+      if (tags.includes('single-target') || tags.includes('multi-target') || tags.includes('aoe') || skill.damage) {
+          const multiplier = Math.max(0, readNumberish(skill.damage?.multiplier ?? skill.damageMultiplier ?? 1, 1));
+          const base = Math.max(1, Math.round(((caster.atk ?? 0) + (caster.wil ?? 0)) * multiplier));
+          for (const target of targets) {
+              if (target.side === caster.side)
+                  continue;
+              dealAbilityDamage(game, caster, target, { base, attackType: 'skill' });
+          }
+      }
+      if (tags.includes('heal')) {
+          const amount = Math.max(0, Math.round(readNumberish(skill.healAmount ?? skill.heal, 0)));
+          if (amount > 0) {
+              for (const target of targets)
+                  healUnit(target, amount);
+          }
+      }
+      if (tags.includes('shield')) {
+          const amount = Math.max(0, Math.round(readNumberish(skill.shieldAmount ?? skill.shield, 0)));
+          if (amount > 0) {
+              for (const target of targets)
+                  grantShield(target, amount);
+          }
+      }
+      if (tags.includes('silence') || tags.includes('sleep') || tags.includes('mark')) {
+          const turns = Math.max(1, Math.round(readNumberish(skill.turns ?? 1, 1)));
+          for (const target of targets) {
+              if (tags.includes('silence'))
+                  Statuses.add(target, { id: 'silence', kind: 'debuff', tag: 'silence', dur: turns, tick: 'turn' });
+              if (tags.includes('sleep'))
+                  Statuses.add(target, { id: 'sleep', kind: 'debuff', tag: 'sleep', dur: turns, tick: 'turn' });
+              if (tags.includes('mark'))
+                  Statuses.add(target, { id: 'mark', kind: 'debuff', tag: 'mark', dur: turns, tick: 'turn' });
+          }
+      }
+      return {
+          ok: true,
+          skillKey,
+          skill,
+          tags,
+          appliedTags: dispatch.applied,
+          targetCount: dispatch.targets.length,
+      };
+  }
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'performActiveSkill')) exports.performActiveSkill = performActiveSkill;
+});
 __define('./combat/tag-dispatch.ts', (exports, module, __require) => {
   const __dep0 = __require('./combat/apply-damage.ts');
   const applyDamage = __dep0.applyDamage;
@@ -4442,6 +4561,9 @@ __define('./combat/tag-dispatch.ts', (exports, module, __require) => {
   const Statuses = __dep1.Statuses;
   const __dep2 = __require('./data/tags.ts');
   const normalizeTagList = __dep2.normalizeTagList;
+  const __dep3 = __require('./combat.ts');
+  const dealAbilityDamage = __dep3.dealAbilityDamage;
+  const healUnit = __dep3.healUnit;
   const asFinite = (value, fallback = 0) => {
       const parsed = typeof value === 'number' ? value : Number(value);
       return Number.isFinite(parsed) ? parsed : fallback;
@@ -4454,6 +4576,7 @@ __define('./combat/tag-dispatch.ts', (exports, module, __require) => {
           return [target];
       return [];
   };
+  const sortByBoardOrder = (tokens) => ([...tokens].sort((a, b) => (a.cy - b.cy) || (a.cx - b.cx)));
   const addStatus = (target, id, turns) => {
       Statuses.add(target, {
           id,
@@ -4478,6 +4601,44 @@ __define('./combat/tag-dispatch.ts', (exports, module, __require) => {
           if (ctx.target?.alive)
               result.targets = [ctx.target];
       },
+      self: (ctx, result) => {
+          if (ctx.attacker?.alive)
+              result.targets = [ctx.attacker];
+      },
+      ally: (ctx, result) => {
+          if (!ctx.game || !ctx.attacker)
+              return;
+          if (result.targets.length > 0)
+              return;
+          const limit = Math.max(1, Math.round(asFinite(ctx.payload?.targetCount ?? ctx.payload?.targets, 1)));
+          result.targets = sortByBoardOrder(ctx.game.tokens.filter((token) => token.alive && token.side === ctx.attacker?.side)).slice(0, limit);
+      },
+      enemy: (ctx, result) => {
+          if (!ctx.game || !ctx.attacker)
+              return;
+          if (result.targets.length > 0)
+              return;
+          const foeSide = ctx.attacker.side === 'ally' ? 'enemy' : 'ally';
+          const limit = Math.max(1, Math.round(asFinite(ctx.payload?.targetCount ?? ctx.payload?.targets, 1)));
+          result.targets = sortByBoardOrder(ctx.game.tokens.filter((token) => token.alive && token.side === foeSide)).slice(0, limit);
+      },
+      'random-target': (ctx, result) => {
+          if (!ctx.game || !ctx.attacker)
+              return;
+          if (result.targets.length > 0)
+              return;
+          const foeSide = ctx.attacker.side === 'ally' ? 'enemy' : 'ally';
+          const candidates = sortByBoardOrder(ctx.game.tokens.filter((token) => token.alive && token.side === foeSide));
+          if (candidates.length > 0)
+              result.targets = [candidates[0]];
+      },
+      'random-aoe': (ctx, result) => {
+          if (!ctx.game || !ctx.attacker)
+              return;
+          const foeSide = ctx.attacker.side === 'ally' ? 'enemy' : 'ally';
+          const limit = Math.max(1, Math.round(asFinite(ctx.payload?.targetCount ?? ctx.payload?.targets, 2)));
+          result.targets = sortByBoardOrder(ctx.game.tokens.filter((token) => token.alive && token.side === foeSide)).slice(0, limit);
+      },
       'multi-target': (ctx, result) => {
           if (!ctx.game || !ctx.attacker)
               return;
@@ -4499,11 +4660,18 @@ __define('./combat/tag-dispatch.ts', (exports, module, __require) => {
               return;
           const targets = result.targets.length > 0 ? result.targets : (ctx.attacker ? [ctx.attacker] : []);
           for (const token of targets) {
-              const hpMax = Number.isFinite(token.hpMax) ? Number(token.hpMax) : Number.POSITIVE_INFINITY;
-              const current = Number.isFinite(token.hp) ? Number(token.hp) : 0;
-              token.hp = Math.max(0, Math.min(hpMax, current + amount));
+              healUnit(token, amount);
           }
           result.sideEffects.push(`heal:${amount}`);
+      },
+      'team-heal': (ctx, result) => {
+          const amount = Math.max(0, Math.round(asFinite(ctx.payload?.healAmount ?? ctx.payload?.heal, 0)));
+          if (amount <= 0 || !ctx.game || !ctx.attacker)
+              return;
+          const allies = ctx.game.tokens.filter((token) => token.alive && token.side === ctx.attacker?.side);
+          for (const token of allies)
+              healUnit(token, amount);
+          result.sideEffects.push(`team-heal:${amount}`);
       },
       shield: (ctx, result) => {
           const amount = Math.max(0, Math.round(asFinite(ctx.payload?.shieldAmount ?? ctx.payload?.shield, 0)));
@@ -4535,6 +4703,14 @@ __define('./combat/tag-dispatch.ts', (exports, module, __require) => {
           if (result.targets.length > 0)
               result.sideEffects.push(`mark:${turns}`);
       },
+      control: (ctx, result) => {
+          const turns = Math.max(1, Math.round(asFinite(ctx.payload?.controlTurns ?? ctx.payload?.turns, 1)));
+          const statusId = String(ctx.payload?.controlStatus ?? 'control');
+          for (const token of result.targets)
+              addStatus(token, statusId, turns);
+          if (result.targets.length > 0)
+              result.sideEffects.push(`${statusId}:${turns}`);
+      },
       summon: (ctx, result) => {
           if (typeof ctx.onSummon === 'function') {
               ctx.onSummon();
@@ -4545,8 +4721,14 @@ __define('./combat/tag-dispatch.ts', (exports, module, __require) => {
           const amount = Math.max(0, Math.round(asFinite(ctx.payload?.hpDelta ?? ctx.payload?.damage, 0)));
           if (amount <= 0)
               return;
-          for (const token of result.targets)
-              applyDamage(token, amount);
+          for (const token of result.targets) {
+              if (ctx.game && ctx.attacker) {
+                  dealAbilityDamage(ctx.game, ctx.attacker, token, { base: amount, attackType: 'skill' });
+              }
+              else {
+                  applyDamage(token, amount);
+              }
+          }
           if (result.targets.length > 0)
               result.sideEffects.push(`hp-change:${amount}`);
       },

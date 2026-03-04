@@ -1,6 +1,7 @@
 import { applyDamage, grantShield } from './apply-damage.ts';
 import { Statuses } from '../statuses.ts';
 import { normalizeTagList } from '../data/tags.ts';
+import { dealAbilityDamage, healUnit } from '../combat.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { Side, UnitToken } from '@shared-types/units';
@@ -53,6 +54,10 @@ const resolveTargets = (targets: UnitToken[] | undefined, target: UnitToken | nu
   return [];
 };
 
+const sortByBoardOrder = (tokens: UnitToken[]): UnitToken[] => (
+  [...tokens].sort((a, b) => (a.cy - b.cy) || (a.cx - b.cx))
+);
+
 const addStatus = (target: UnitToken, id: string, turns: number): void => {
   Statuses.add(target, {
     id,
@@ -74,6 +79,41 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
     if (result.targets.length > 0) return;
     if (ctx.target?.alive) result.targets = [ctx.target];
   },
+  self: (ctx, result) => {
+    if (ctx.attacker?.alive) result.targets = [ctx.attacker];
+  },
+  ally: (ctx, result) => {
+    if (!ctx.game || !ctx.attacker) return;
+    if (result.targets.length > 0) return;
+    const limit = Math.max(1, Math.round(asFinite(ctx.payload?.targetCount ?? ctx.payload?.targets, 1)));
+    result.targets = sortByBoardOrder(
+      ctx.game.tokens.filter((token) => token.alive && token.side === ctx.attacker?.side)
+    ).slice(0, limit);
+  },
+  enemy: (ctx, result) => {
+    if (!ctx.game || !ctx.attacker) return;
+    if (result.targets.length > 0) return;
+    const foeSide = ctx.attacker.side === 'ally' ? 'enemy' : 'ally';
+    const limit = Math.max(1, Math.round(asFinite(ctx.payload?.targetCount ?? ctx.payload?.targets, 1)));
+    result.targets = sortByBoardOrder(
+      ctx.game.tokens.filter((token) => token.alive && token.side === foeSide)
+    ).slice(0, limit);
+  },
+  'random-target': (ctx, result) => {
+    if (!ctx.game || !ctx.attacker) return;
+    if (result.targets.length > 0) return;
+    const foeSide = ctx.attacker.side === 'ally' ? 'enemy' : 'ally';
+    const candidates = sortByBoardOrder(ctx.game.tokens.filter((token) => token.alive && token.side === foeSide));
+    if (candidates.length > 0) result.targets = [candidates[0]];
+  },
+  'random-aoe': (ctx, result) => {
+    if (!ctx.game || !ctx.attacker) return;
+    const foeSide = ctx.attacker.side === 'ally' ? 'enemy' : 'ally';
+    const limit = Math.max(1, Math.round(asFinite(ctx.payload?.targetCount ?? ctx.payload?.targets, 2)));
+    result.targets = sortByBoardOrder(
+      ctx.game.tokens.filter((token) => token.alive && token.side === foeSide)
+    ).slice(0, limit);
+  },
   'multi-target': (ctx, result) => {
     if (!ctx.game || !ctx.attacker) return;
     if (result.targets.length > 0) return;
@@ -91,11 +131,16 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
     if (amount <= 0) return;
     const targets = result.targets.length > 0 ? result.targets : (ctx.attacker ? [ctx.attacker] : []);
     for (const token of targets) {
-      const hpMax = Number.isFinite(token.hpMax) ? Number(token.hpMax) : Number.POSITIVE_INFINITY;
-      const current = Number.isFinite(token.hp) ? Number(token.hp) : 0;
-      token.hp = Math.max(0, Math.min(hpMax, current + amount));
+      healUnit(token, amount);
     }
     result.sideEffects.push(`heal:${amount}`);
+  },
+  'team-heal': (ctx, result) => {
+    const amount = Math.max(0, Math.round(asFinite(ctx.payload?.healAmount ?? ctx.payload?.heal, 0)));
+    if (amount <= 0 || !ctx.game || !ctx.attacker) return;
+    const allies = ctx.game.tokens.filter((token) => token.alive && token.side === ctx.attacker?.side);
+    for (const token of allies) healUnit(token, amount);
+    result.sideEffects.push(`team-heal:${amount}`);
   },
   shield: (ctx, result) => {
     const amount = Math.max(0, Math.round(asFinite(ctx.payload?.shieldAmount ?? ctx.payload?.shield, 0)));
@@ -119,6 +164,12 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
     for (const token of result.targets) addStatus(token, 'mark', turns);
     if (result.targets.length > 0) result.sideEffects.push(`mark:${turns}`);
   },
+  control: (ctx, result) => {
+    const turns = Math.max(1, Math.round(asFinite(ctx.payload?.controlTurns ?? ctx.payload?.turns, 1)));
+    const statusId = String(ctx.payload?.controlStatus ?? 'control');
+    for (const token of result.targets) addStatus(token, statusId, turns);
+    if (result.targets.length > 0) result.sideEffects.push(`${statusId}:${turns}`);
+  },
   summon: (ctx, result) => {
     if (typeof ctx.onSummon === 'function') {
       ctx.onSummon();
@@ -128,7 +179,13 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
   'non-heal-hp-change': (ctx, result) => {
     const amount = Math.max(0, Math.round(asFinite(ctx.payload?.hpDelta ?? ctx.payload?.damage, 0)));
     if (amount <= 0) return;
-    for (const token of result.targets) applyDamage(token, amount);
+    for (const token of result.targets) {
+      if (ctx.game && ctx.attacker) {
+        dealAbilityDamage(ctx.game, ctx.attacker, token, { base: amount, attackType: 'skill' });
+      } else {
+        applyDamage(token, amount);
+      }
+    }
     if (result.targets.length > 0) result.sideEffects.push(`hp-change:${amount}`);
   },
 });
