@@ -3098,7 +3098,7 @@ function collectStatusIcons(unit: UnitToken): StatusIconEntry[] {
     const statusId = typeof statusRecord.id === 'string' ? statusRecord.id : null;
     if (!statusId || seen.has(statusId)) continue;
     const meta = getStatusMeta(statusRecord);
-    const icon = ensureStatusIconLoaded(meta.id, meta.icon); ensureStatusIconLoaded(statusId);
+    const icon = ensureStatusIconLoaded(meta.id, meta.icon);
     if (!icon || icon.status !== 'ready' || !icon.image) continue;
     const tag = typeof statusRecord.tag === 'string' ? statusRecord.tag : '';
     const kind = typeof statusRecord.kind === 'string' ? statusRecord.kind : '';

@@ -879,8 +879,8 @@ __define('./ai.ts', (exports, module, __require) => {
       return best;
   }
   function evaluateGambitLogic(Game, unit, options = {}) {
-      const progressMap = Game.runtime?.unitProgressById;
-      const profile = progressMap?.get(unit.id);
+      const unitProgressMap = Game.runtime?.unitProgressById;
+      const profile = unitProgressMap?.get(unit.id);
       const slots = Array.isArray(profile?.gambit) ? profile.gambit : [];
       const enemySide = unit.side === 'ally' ? 'enemy' : 'ally';
       const allies = Game.tokens.filter((token) => token.alive && token.side === unit.side);
@@ -14126,7 +14126,6 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               continue;
           const meta = getStatusMeta(statusRecord);
           const icon = ensureStatusIconLoaded(meta.id, meta.icon);
-          ensureStatusIconLoaded(statusId);
           if (!icon || icon.status !== 'ready' || !icon.image)
               continue;
           const tag = typeof statusRecord.tag === 'string' ? statusRecord.tag : '';
@@ -24164,13 +24163,13 @@ __define('./turns.ts', (exports, module, __require) => {
       const fromDeck = source === 'deck';
       const kit = meta?.kit;
       const initialFury = initialRageFor(p.unitId, { isLeader: false, revive: !!p.revive, reviveSpec: p.revived });
-      const progressMap = Game.runtime?.unitProgressById;
-      const progress = progressMap?.get(p.unitId);
-      const baseStatsResolved = resolveRuntimeUnitStats(p.unitId, progressMap);
+      const unitProgressMap = Game.runtime?.unitProgressById;
+      const progress = unitProgressMap?.get(p.unitId);
+      const baseStatsResolved = resolveRuntimeUnitStats(p.unitId, unitProgressMap);
       const stats = applyCultivationBonus({
           ...baseStatsResolved,
           id: p.unitId,
-          hasCultivationData: progressMap?.has(p.unitId) ?? false,
+          hasCultivationData: unitProgressMap?.has(p.unitId) ?? false,
           realm: progress?.realm,
           subRealm: progress?.subRealm,
       });

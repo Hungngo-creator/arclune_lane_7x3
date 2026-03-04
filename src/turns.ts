@@ -210,13 +210,13 @@ export function spawnQueuedIfDue(
   const fromDeck = source === 'deck';
   const kit = meta?.kit;
   const initialFury = initialRageFor(p.unitId, { isLeader:false, revive: !!p.revive, reviveSpec: p.revived });
-  const progressMap = Game.runtime?.unitProgressById as ReadonlyMap<string, RuntimeUnitProgress> | undefined;
-  const progress = progressMap?.get(p.unitId);
-  const baseStatsResolved = resolveRuntimeUnitStats(p.unitId, progressMap);
+  const unitProgressMap = Game.runtime?.unitProgressById as ReadonlyMap<string, RuntimeUnitProgress> | undefined;
+  const progress = unitProgressMap?.get(p.unitId);
+  const baseStatsResolved = resolveRuntimeUnitStats(p.unitId, unitProgressMap);
   const stats = applyCultivationBonus({
     ...baseStatsResolved,
     id: p.unitId,
-    hasCultivationData: progressMap?.has(p.unitId) ?? false,
+    hasCultivationData: unitProgressMap?.has(p.unitId) ?? false,
     realm: progress?.realm,
     subRealm: progress?.subRealm,
   });
