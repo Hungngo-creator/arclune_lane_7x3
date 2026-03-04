@@ -394,7 +394,7 @@ const skillsConfig = [
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
-      tags: ['single-target', 'lifesteal', 'mark'],
+      tags: ['single-target', 'non-heal-hp-change', 'mark'],
       effects: {
         lifesteal: { percentOfDamage: 0.10 },
         applyMark: { id: 'mark_devour', stacks: 1, maxStacks: 3, ttlTurns: 3, refreshOnHit: true }
@@ -465,7 +465,7 @@ const skillsConfig = [
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
-      tags: ['single-target', 'armor-pierce'],
+      tags: ['single-target', 'pierce'],
       piercePercent: 0.05,
       description: 'Chém một mục tiêu bằng n% ATK + x% WIL và bỏ qua 5% ARM/RES của mục tiêu. Mỗi nguồn xuyên giáp khác từ bộ kỹ năng sẽ cộng dồn trực tiếp với hiệu ứng này.'
     },
@@ -487,7 +487,7 @@ const skillsConfig = [
         cost: { aether: 20 },
         duration: { turns: 'battle' },
         buffs: [
-          { id: 'kiem_sinh', effect: 'lifesteal', amountPercentDamage: 0.05 },
+          { id: 'kiem_sinh', effect: 'non-heal-hp-change', amountPercentDamage: 0.05 },
           { id: 'kiem_ma', effect: 'pierce', amount: 0.10 },
           { id: 'kiem_tho', effect: 'selfBuff', stats: { ARM: 0.05, RES: 0.05 } },
           { id: 'kiem_hoa', effect: 'damageBonus', amount: 0.05 },
@@ -596,7 +596,7 @@ const skillsConfig = [
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
-      tags: ['single-target', 'sleep-setup'],
+      tags: ['single-target', 'sleep'],
       debuffs: [{ id: 'me_hoac', stacks: 1, maxStacks: 4, effect: 'sleepTrigger' }],
       description: 'Gây sát thương bằng n% WIL + x% ATK lên một mục tiêu và cộng 1 tầng “Mê Hoặc”. Đạt 4 tầng khiến mục tiêu ngủ trong 1 lượt rồi đặt lại; các tầng không thể bị xoá trước khi kích hoạt.'
     },
@@ -687,7 +687,7 @@ const skillsConfig = [
     ult: {
       name: 'Cán Cân Công Lý',
       type: 'ultimate',
-      tags: ['support', 'hp-redistribute'],
+      tags: ['support', 'non-heal-hp-change'],
       targets: { allies: 3, excludeLeader: true },
       heals: { leaderPercentMaxHPOfCaster: 0.10 },
       description: 'Chọn ngẫu nhiên ba đồng minh (trừ Leader) còn sống và cân bằng lượng HP của họ về cùng một mức trung bình (không vượt quá Máu tối đa). Đồng thời hồi cho Leader 10% Máu tối đa của Doãn Minh.'
@@ -875,6 +875,8 @@ const skillsConfig = [
   },
   {
     unitId: 'vu_thien',
+    importBatch: 'ideas-matrix-batch-01',
+    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
@@ -907,6 +909,11 @@ const skillsConfig = [
         cost: { aether: 30 },
         tags: ['stance', 'instant'],
         duration: { until: 'death' },
+        runtimeRules: {
+          appliesAs: 'free-action',
+          counterTrigger: 'when-targeted-or-hit-by-basic',
+          counterCadence: 'max-1-per-incoming-hit'
+        },
         buffs: [{ effect: 'dodgeBasic', amount: 0.25, persistUntilDeath: true }],
         counters: [{ chance: 0.25, type: 'basic' }],
         description: 'Kích hoạt trạng thái phản công dạng stance đến khi Vũ Thiên bị hạ gục: mỗi khi bị tấn công có 25% né và phản đòn đánh thường. Đây là free action, không tiêu lượt hành động.'
@@ -936,6 +943,8 @@ const skillsConfig = [
   },
   {
     unitId: 'anna',
+    importBatch: 'ideas-matrix-batch-01',
+    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
     basic: {
       name: 'Nguyện Cầu',
       type: 'basic',
@@ -977,6 +986,10 @@ const skillsConfig = [
       name: 'Thánh Lễ Tái Sinh',
       type: 'ultimate',
       tags: ['team-heal', 'global-rule'],
+      runtimeRules: {
+        formMode: 'single-form',
+        castGate: 'always-available'
+      },
       heals: { percentMaxHP: 0.50, scale: { ATK: 0.20, WIL: 0.20 }, targets: 'allAllies' },
       description: 'Thực hiện nghi thức tái sinh, hồi 50% Max HP cộng thêm 20% ATK/WIL của Anna cho toàn bộ đồng minh. Sau khi thi triển, kích hoạt nội tại Ấn Chú Thăng Hoa.'
     },
@@ -990,11 +1003,14 @@ const skillsConfig = [
     technique: null,
     notes: [
       'Huyết Tế Vương Tọa không kích hoạt hiệu ứng “giảm sát thương tự gây” vì được tính như chuyển HP.',
-      'Nội tại Ấn Chú Thăng Hoa nên hiển thị số tầng ngay trên khung buff của Anna để tiện theo dõi.'
+      'Nội tại Ấn Chú Thăng Hoa nên hiển thị số tầng ngay trên khung buff của Anna để tiện theo dõi.',
+      'Runtime: không có nhánh ult theo trạng thái; bộ kỹ năng của Anna vận hành theo 1 form cố định trong batch hiện tại.'
     ]
   },
   {
     unitId: 'lao_khat_cai',
+    importBatch: 'ideas-matrix-batch-01',
+    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
@@ -1036,7 +1052,7 @@ const skillsConfig = [
     ult: {
       name: 'Nhất Côn Đoạt Mệnh',
       type: 'ultimate',
-      tags: ['finisher'],
+      tags: ['execute'],
       damage: { multiplier: 2.5 },
       pierce: { arm: 0.10, res: 0.10 },
       description: 'Dồn lực đánh chí mạng 250% sát thương, xuyên 10% phòng thủ của mục tiêu.'
@@ -1054,6 +1070,8 @@ const skillsConfig = [
   },
   {
     unitId: 'ai_lan',
+    importBatch: 'ideas-matrix-batch-01',
+    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
@@ -1095,6 +1113,13 @@ const skillsConfig = [
       name: 'Khải Minh / Đọa Ảnh',
       type: 'ultimate',
       tags: ['stance'],
+      variant: { kind: 'dual-outcome', runtimeMapping: 'ai_lan_light_dark_ult' },
+      runtimeRules: {
+        formSource: 'thanh_am_luan_chuyen',
+        lockFormAtCast: true,
+        lightOutcome: { healPercentMaxHP: 0.30, buff: { ATK: 0.05, WIL: 0.05 }, randomAllies: 3 },
+        darkOutcome: { randomEnemies: 4, basicDamageMultiplier: 0.75, countsAsBasic: false }
+      },
       description: 'Nếu thi triển trong Ánh Sáng: “Khải Minh Thánh Lễ” hồi 30% Max HP + 5% ATK/WIL cho 3 đồng minh ngẫu nhiên. Nếu thi triển trong Bóng Tối: “Đọa Ảnh Tứ Hình” gây 75% sát thương đánh thường lên 4 kẻ địch ngẫu nhiên (không tính là đòn đánh thường).'
     },
     talent: {
@@ -1105,11 +1130,14 @@ const skillsConfig = [
     technique: null,
     notes: [
       'UI cần hiển thị biểu tượng trạng thái hiện tại để người chơi biết kỹ năng nào khả dụng.',
-      'Các kỹ năng kiểm tra stance; nếu điều kiện không đạt cần xám nút và hiện tooltip.'
+      'Các kỹ năng kiểm tra stance; nếu điều kiện không đạt cần xám nút và hiện tooltip.',
+      'Runtime: tại thời điểm nhấn ult phải lock trạng thái Ánh Sáng/Bóng Tối trước khi resolve để tránh đổi form giữa animation và apply effect.'
     ]
   },
   {
     unitId: 'faun',
+    importBatch: 'ideas-matrix-batch-01',
+    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
@@ -1130,7 +1158,7 @@ const skillsConfig = [
         name: 'Ấn Khế Cường Thừa',
         type: 'active',
         cost: { aether: 25 },
-        tags: ['buff'],
+        tags: ['self-buff'],
         description: 'Đánh dấu 5 lần triệu hồi tiếp theo từ Ultimate để mỗi thú nhận 80% chỉ số của Faun (thay vì 50%).'
       },
       {
@@ -1147,6 +1175,13 @@ const skillsConfig = [
       name: 'Lâm Uyên Triệu Dã',
       type: 'ultimate',
       tags: ['summon'],
+      variant: { kind: 'random-pool', runtimeMapping: 'faun_beast_pool_unique' },
+      runtimeRules: {
+        summonPool: ['tieu_hac', 'tieu_bach', 'tieu_hoang', 'tieu_bat_diem', 'nhi_cau'],
+        noDuplicateWhileAlive: true,
+        ttlTurns: 5,
+        fallbackWhenPoolExhausted: 'refund-50-percent-fury'
+      },
       description: 'Triệu hồi ngẫu nhiên 1 trong 5 thú (Tiểu Hắc, Tiểu Bạch, Tiểu Hoàng, Tiểu Bất Điểm, Nhị Cẩu). Mỗi thú tồn tại tối đa 5 lượt, không trùng lặp, với hiệu ứng riêng: xuyên giáp, tăng sát thương, chết hồi máu cho Faun, hồi máu cho thú khác, hoặc hỗ trợ khiêu khích + hồi máu định kỳ.'
     },
     talent: {
@@ -1157,11 +1192,14 @@ const skillsConfig = [
     technique: null,
     notes: [
       'Thanh nộ tối đa chỉ 85; nhớ cập nhật UI fury bar.',
-      'Khi hy sinh thú bởi Thú Tế Hộ Mệnh, cần thông báo trong log để người chơi hiểu vì sao thú biến mất.'
+      'Khi hy sinh thú bởi Thú Tế Hộ Mệnh, cần thông báo trong log để người chơi hiểu vì sao thú biến mất.',
+      'Runtime: nếu toàn bộ thú trong pool đang sống, ult fail-safe theo rule hoàn 50% nộ thay vì mất lượt vô nghĩa.'
     ]
   },
   {
     unitId: 'basil_thorne',
+    importBatch: 'ideas-matrix-batch-01',
+    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
