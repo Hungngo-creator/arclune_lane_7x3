@@ -100,6 +100,13 @@ export const tagAliasesByVersion: Readonly<Record<TagAliasVersion, Readonly<Reco
     'coin-flip': 'control',
     clone_body: 'summon',
     'heal-share': 'non-heal-hp-change',
+    minion: 'summon',
+    minions: 'summon',
+    'sleep-trigger': 'sleep',
+    'rage-boost': 'support',
+    'rage-gain': 'support',
+    'hp-balance': 'non-heal-hp-change',
+    'formation-haste': 'support',
   }),
 });
 

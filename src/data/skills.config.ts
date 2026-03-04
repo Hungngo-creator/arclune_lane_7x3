@@ -632,6 +632,8 @@ const skillsConfig = [
   },
   {
     unitId: 'laky',
+    importBatch: 'ideas-matrix-batch-03',
+    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
@@ -685,11 +687,14 @@ const skillsConfig = [
     technique: null,
     notes: [
       'Hiệu ứng Mê Hoặc không tự biến mất; sau khi kích hoạt ngủ sẽ đặt lại số tầng về 0.',
-      'Có thể hỗ trợ đồng đội khống chế bằng cách chuẩn bị sẵn tầng Mê Hoặc trước khi dùng tuyệt kỹ.'
+      'Có thể hỗ trợ đồng đội khống chế bằng cách chuẩn bị sẵn tầng Mê Hoặc trước khi dùng tuyệt kỹ.',
+      'Runtime rule: nếu một hit trong skill1/skill2 đẩy stack Mê Hoặc lên 4 thì ngủ kích hoạt ngay tại hit đó, reset stack rồi mới xử lý hit kế tiếp.'
     ]
   },
   {
     unitId: 'doanminh',
+    importBatch: 'ideas-matrix-batch-03',
+    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
@@ -745,6 +750,8 @@ const skillsConfig = [
   },
   {
     unitId: 'kydieu',
+    importBatch: 'ideas-matrix-batch-03',
+    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
@@ -766,6 +773,7 @@ const skillsConfig = [
         name: 'Thí Thân Hộ Chủ',
         type: 'active',
         cost: { aether: 15 },
+        tags: ['self', 'revive', 'aether-cost', 'active'],
         hpTrade: { sacrificeSelf: true },
         reviveDelay: { turns: 3, ragePercent: 0.5, hpPercent: 0.5, aether: 0 },
         buffs: [{ target: 'leader', effect: 'indomitability', stacks: 1 }],
@@ -786,6 +794,11 @@ const skillsConfig = [
       type: 'ultimate',
       tags: ['revive'],
       revive: { targets: 1, priority: 'recent', hpPercent: 0.15, ragePercent: 0, lockSkillsTurns: 1 },
+      runtimeRules: {
+        reviveResolution: 'queue-end-of-current-action',
+        fallbackWhenNoCorpse: 'refund-50-rage',
+        revivedUnitActionLockTurns: 1
+      },
       buffs: [{ target: 'revived', stat: 'damageTaken', percent: -0.50, duration: { turns: 1 } }],
       description: 'Hồi sinh một đồng minh ngẫu nhiên (ưu tiên người vừa ngã xuống gần nhất). Khi sống lại, mục tiêu nhận 15% Máu tối đa, nộ về 0, bị khoá kỹ năng trong 1 lượt và giảm 50% sát thương nhận vào trong 1 lượt.'
     },
@@ -798,11 +811,14 @@ const skillsConfig = [
     technique: null,
     notes: [
       'Thí Thân Hộ Chủ có thể kết hợp với nội tại để tích phòng thủ trước khi tự hiến.',
-      'Khi hồi sinh do tuyệt kỹ, đồng minh sẽ không được nhận lại Aether và phải chờ 1 lượt mới có thể dùng kỹ năng.'
+      'Khi hồi sinh do tuyệt kỹ, đồng minh sẽ không được nhận lại Aether và phải chờ 1 lượt mới có thể dùng kỹ năng.',
+      'Runtime rule: nếu không còn xác đồng minh hợp lệ tại thời điểm resolve ult thì không hồi sinh ai và hoàn lại 50% nộ.'
     ]
   },
   {
     unitId: 'tranquat',
+    importBatch: 'ideas-matrix-batch-03',
+    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
@@ -842,6 +858,11 @@ const skillsConfig = [
       type: 'ultimate',
       tags: ['summon'],
       summon: { count: 2, placement: 'adjacentRow', inherit: { HP: 0.5, ATK: 0.5, WIL: 0.5 }, ttlTurns: 4, limit: 2, replace: 'oldest' },
+      runtimeRules: {
+        summonCap: 2,
+        replacementPolicy: 'oldest-alive-minion',
+        overflowOrder: 'summon-new-then-despawn-oldest'
+      },
       description: 'Triệu hồi 2 tiểu đệ vào các ô trống lân cận cùng hàng. Mỗi tiểu đệ kế thừa 50% HP/ATK/WIL của Trần Quát (có thể tăng thêm nhờ Tăng Cường Tòng Bộc), tồn tại tối đa 4 lượt hoặc tới khi bị tiêu diệt. Chỉ duy trì tối đa 2 tiểu đệ cùng lúc; triệu hồi mới thay thế tiểu đệ tồn tại lâu nhất. Tiểu đệ không thể hồi sinh.'
     },
     talent: {
@@ -853,11 +874,14 @@ const skillsConfig = [
     technique: null,
     notes: [
       'Các tiểu đệ được gọi bằng kỹ năng vẫn tuân theo giới hạn 2 đơn vị như trong tuyệt kỹ.',
-      'Khi sử dụng Sai Khiển Tiểu Đệ, nếu không còn tiểu đệ nào trên sân thì kỹ năng sẽ không gây hiệu ứng.'
+      'Khi sử dụng Sai Khiển Tiểu Đệ, nếu không còn tiểu đệ nào trên sân thì kỹ năng sẽ không gây hiệu ứng.',
+      'Runtime rule: tiểu đệ hết TTL bị huỷ trước bước hành động; nếu bị thay thế do vượt cap thì không kích hoạt hiệu ứng on-death của đồng minh.'
     ]
   },
   {
     unitId: 'linhgac',
+    importBatch: 'ideas-matrix-batch-03',
+    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
