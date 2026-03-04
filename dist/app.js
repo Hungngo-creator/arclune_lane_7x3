@@ -6546,7 +6546,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
           basic: {
               name: 'Mộng Phệ',
               type: 'basic',
-              tags: ['single-target', 'mark-builder'],
+              tags: ['single-target', 'mark'],
               description: 'Gây 100% ATK + WIL lên 1 mục tiêu và gắn 1 stack Mê Hoặc (không thể thanh tẩy). Đủ 3 stack khiến mục tiêu Ngủ Say 1 lượt.'
           },
           skills: [
@@ -6671,7 +6671,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
           basic: {
               name: 'Đánh Thường',
               type: 'basic',
-              tags: ['single-target', 'mark-builder'],
+              tags: ['single-target', 'mark'],
               debuffs: [{ id: 'ma_chung', stacks: 1, purgeable: false }],
               description: 'Gây 100% ATK + WIL lên một mục tiêu và cấy 1 Ma Chủng (không thể bị thanh tẩy, mất sau 3 lượt không được làm mới). Vào trận +10% SPD.'
           },
@@ -6700,7 +6700,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   type: 'active',
                   cost: { aether: 25 },
                   hits: 2,
-                  tags: ['counts-as-basic', 'splash'],
+                  tags: ['basic-attack', 'splash'],
                   targets: 'markPriority',
                   splash: { ratio: 0.70, maxTargets: 2 },
                   description: 'Lao đến kẻ địch có Ma Chủng gần nhất và tung hai chưởng liên tiếp, mỗi hit 100% sát thương đòn đánh thường và lan 70% sang tối đa hai kẻ địch lân cận.'
@@ -6709,7 +6709,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
           ult: {
               name: 'Ma Chủng Phán Quyết',
               type: 'ultimate',
-              tags: ['aoe', 'mark-detonation'],
+              tags: ['aoe', 'mark'],
               damage: { percentTargetMaxHPPerStack: 0.05, scaleWIL: 0 },
               debuffs: [{ id: 'fear', turns: 1, thresholdStacks: 2 }, { id: 'bleed', turns: 1, thresholdStacks: 2 }],
               description: 'Kích hoạt toàn bộ Ma Chủng trên kẻ địch, mỗi tầng gây 5% Max HP của mục tiêu dưới dạng sát thương WIL. Với mỗi 2 tầng trên cùng mục tiêu, áp Sợ Hãi và Chảy Máu 1 lượt. Các Ma Chủng được kích hoạt sẽ bị tiêu hao.'
@@ -6760,7 +6760,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   name: 'Mộ Vực Trảm',
                   type: 'active',
                   cost: { aether: 15 },
-                  tags: ['counts-as-basic'],
+                  tags: ['basic-attack'],
                   damage: { multiplier: 1.50 },
                   description: 'Chém một mục tiêu gây 150% sát thương đòn đánh thường. Được tính như đòn đánh thường.'
               }
@@ -6768,7 +6768,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
           ult: {
               name: 'Hồn Về Mộ',
               type: 'ultimate',
-              tags: ['single-target', 'counts-as-basic'],
+              tags: ['single-target', 'basic-attack'],
               damage: { multiplier: 2.00, piercePercent: { arm: 0.30, res: 0.30 } },
               buffs: [
                   { id: 'bat_khuat', turns: 2 },
@@ -6794,7 +6794,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
           basic: {
               name: 'Đánh Thường',
               type: 'basic',
-              tags: ['single-target', 'form-scaling'],
+              tags: ['single-target', 'stance'],
               description: 'Tấn công 1 mục tiêu với sát thương lai. Phụ thuộc trạng thái: Ấu Long (cơ bản), Thành Niên +20% sát thương, Trưởng Thành +30% sát thương, Long Thần +40% sát thương và lan thêm 40% lên mục tiêu phụ.'
           },
           skills: [
@@ -6803,7 +6803,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   name: 'Long Trảo Song Trảm',
                   type: 'active',
                   cost: { aether: 25 },
-                  tags: ['counts-as-basic', 'multi-hit'],
+                  tags: ['basic-attack', 'chain'],
                   hits: 2,
                   description: 'Tung hai đòn chém liên tiếp, mỗi hit gây 100% sát thương đòn đánh thường dựa trên trạng thái hiện tại.'
               },
@@ -6831,7 +6831,8 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
           ult: {
               name: 'Tam Chuyển Long Thai',
               type: 'ultimate',
-              tags: ['evolution'],
+              tags: ['stance'],
+              variant: { kind: 'transformation', runtimeMapping: 'ngao_binh_form_stage' },
               primeAwakenAtCast: 4,
               longUyAura: { enemyATKDown: 0.10, activeFromForm: 'long_than' },
               description: 'Mỗi lần thi triển, Ngao Bính hóa trứng 1 lượt (không thể tấn công, giảm sát thương nhận 40%/50%/60% tùy lần) rồi phá xác nâng trạng thái: Thành Niên → Trưởng Thành → Long Thần. Từ Long Thần nhận Long Uy giảm 10% ATK của kẻ địch tấn công mình; từ lần cast thứ 4 trở đi bỏ qua trạng thái trứng và thức tỉnh Prime.'
@@ -6852,7 +6853,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
           basic: {
               name: 'Đánh Thường',
               type: 'basic',
-              tags: ['single-target', 'mark-builder'],
+              tags: ['single-target', 'mark'],
               debuffs: [{ id: 'sa_an', stacks: 1, maxStacks: 5, purgeable: false }],
               description: 'Gây 100% ATK + WIL lên một mục tiêu và đặt 1 Sa Ấn (tối đa 5). Đạt 5 tầng khiến mục tiêu bỏ qua lượt kế tiếp rồi đặt lại số tầng.'
           },
@@ -6862,7 +6863,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   name: 'Hắc Sa Song Chưởng',
                   type: 'active',
                   cost: { aether: 25 },
-                  tags: ['counts-as-basic', 'multi-hit'],
+                  tags: ['basic-attack', 'chain'],
                   hits: 2,
                   targets: 'randomEnemies',
                   description: 'Tung hai chưởng vào hai mục tiêu ngẫu nhiên, mỗi hit gây 100% sát thương đòn đánh thường và đặt Sa Ấn.'
@@ -6889,7 +6890,8 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
           ult: {
               name: 'Thiên Mệnh Lậu Khắc Ma Kinh',
               type: 'ultimate',
-              tags: ['time'],
+              tags: ['control'],
+              variant: { kind: 'dual-outcome', runtimeMapping: 'lau_khac_ma_kinh_coinflip' },
               description: 'Vận hành Lậu Khắc Ma Sa, thời sa chảy ngẫu nhiên 50% giữa hai kết quả: Nghịch Lưu – đưa toàn bộ phe đồng minh về trạng thái của 1 lượt trước (vị trí, HP, buff/debuff; đơn vị mới triệu hồi trong lượt hiện tại trở về deck và hoàn cost); Thuận Lưu – sau khi ult hoàn tất, mọi đồng minh ngay lập tức thực thi 1 đòn đánh thường.'
           },
           talent: {
@@ -6924,7 +6926,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   name: 'Song Huyết Cầu',
                   type: 'active',
                   cost: { aether: 25 },
-                  tags: ['counts-as-basic', 'multi-hit'],
+                  tags: ['basic-attack', 'chain'],
                   hits: 2,
                   targets: 'singleEnemy',
                   description: 'Phóng hai huyết cầu vào một kẻ địch. Mỗi hit gây 130% sát thương đòn đánh thường, được tính như đòn đánh thường để kích hoạt hút máu và Phệ Ấn, đồng thời làm mới thời hạn dấu ấn trên mục tiêu trúng đòn nhưng vẫn tôn trọng giới hạn 2 Phệ Ấn mỗi lượt.'
@@ -6952,7 +6954,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
           ult: {
               name: 'Thiên Mệnh Phệ Nguyên Kinh',
               type: 'ultimate',
-              tags: ['aoe', 'hp-drain', 'counts-as-basic'],
+              tags: ['aoe', 'non-heal-hp-change', 'basic-attack'],
               duration: { turns: 2, affectedStat: 'WIL' },
               hpDrain: { percentCurrentHP: 0.08, perBoss: 0.08 },
               damage: { scaleWIL: 0.65, type: 'arcane', unavoidable: true },
@@ -6993,7 +6995,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   type: 'active',
                   cost: { aether: 25 },
                   hits: 1,
-                  tags: ['counts-as-basic', 'line-target'],
+                  tags: ['basic-attack', 'line'],
                   targets: 'randomRow',
                   description: 'Gây sát thương bằng 150% đòn đánh thường lên một hàng ngang ngẫu nhiên (1-2-3, 4-5-6 hoặc 7-8-9). Được tính là đòn đánh thường, giữ nguyên khả năng xuyên giáp hiện có của Kiếm Trường Dạ.'
               },
@@ -7025,7 +7027,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
           ult: {
               name: 'Vạn Kiếm Quy Tông',
               type: 'ultimate',
-              tags: ['counts-as-basic', 'column'],
+              tags: ['basic-attack', 'line'],
               hits: 4,
               piercePercent: 0.30,
               targets: 'columnMid',
@@ -7049,7 +7051,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
               name: 'Đánh Thường',
               type: 'basic',
               hits: 2,
-              tags: ['multi-hit', 'spd-debuff'],
+              tags: ['chain', 'control'],
               debuffs: [{ stat: 'SPD', amountPercent: -0.02, maxStacks: 5 }],
               description: 'Ra hai cú đấm liên tiếp vào một mục tiêu: hit đầu gây sát thương bằng n% ATK + x% WIL, hit thứ hai gây thêm 50% sát thương của hit đầu. Mỗi hit giảm 2% SPD của mục tiêu (tối đa 5 cộng dồn) cho tới khi bị xoá.'
           },
@@ -7060,7 +7062,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   type: 'active',
                   cost: { aether: 25 },
                   hits: 3,
-                  tags: ['counts-as-basic', 'random-target'],
+                  tags: ['basic-attack', 'random-target'],
                   bonusDamage: { condition: 'targetsAdjacent', amount: 0.10 },
                   description: 'Giương tay thu lôi đánh ngẫu nhiên ba kẻ địch, mỗi mục tiêu nhận 110% sát thương đòn đánh thường và được tính như đòn đánh thường. Nếu cả ba mục tiêu đứng liền kề nhau, toàn bộ nhận thêm 10% sát thương.'
               },
@@ -7088,7 +7090,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
           ult: {
               name: 'Huyết Hồn Lôi Quyết',
               type: 'ultimate',
-              tags: ['hp-trade', 'multi-hit', 'counts-as-basic'],
+              tags: ['non-heal-hp-change', 'chain', 'basic-attack'],
               hits: 3,
               hpTrade: { percentMaxHP: 0.15, lethal: false, minHP: 1 },
               damage: { basePercentMaxHPTarget: 0.07, bossPercent: 0.04, scaleWIL: 0.50, type: 'arcane' },
@@ -7124,7 +7126,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   type: 'active',
                   cost: { aether: 25 },
                   hits: 3,
-                  tags: ['counts-as-basic', 'random-aoe'],
+                  tags: ['basic-attack', 'random-aoe'],
                   description: 'Gây ba đòn tấn công diện rộng ngẫu nhiên, mỗi đòn gây 130% sát thương đòn đánh thường, cộng tầng Mê Hoặc cho các mục tiêu trúng hit.'
               },
               {
@@ -7133,7 +7135,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   type: 'active',
                   cost: { aether: 35 },
                   hits: 5,
-                  tags: ['counts-as-basic', 'random-aoe'],
+                  tags: ['basic-attack', 'random-aoe'],
                   description: 'Gây năm đòn diện rộng ngẫu nhiên, mỗi đòn gây 100% sát thương đòn đánh thường và cộng tầng Mê Hoặc cho từng mục tiêu trúng hit.'
               },
               {
@@ -7180,7 +7182,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   name: 'Cán Cân Giáng Phạt',
                   type: 'active',
                   cost: { aether: 20 },
-                  tags: ['counts-as-basic'],
+                  tags: ['basic-attack'],
                   description: 'Dùng cán cân nện vào một kẻ địch, gây 150% sát thương đòn đánh thường và được tính như đòn đánh thường.'
               },
               {
@@ -7348,7 +7350,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   name: 'Trảm Cảnh Giới',
                   type: 'active',
                   cost: { aether: 20 },
-                  tags: ['counts-as-basic'],
+                  tags: ['basic-attack'],
                   description: 'Gây sát thương bằng 150% đòn đánh thường lên một mục tiêu và được tính như đòn đánh thường.'
               },
               {
@@ -7583,7 +7585,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   name: 'Song Cực Hiến Phúc',
                   type: 'active',
                   cost: { aether: 25 },
-                  tags: ['support', 'hp-trade'],
+                  tags: ['support', 'non-heal-hp-change'],
                   usableIn: ['light', 'dark'],
                   description: 'Tiêu hao 30% HP hiện tại của Ái Lân (không giảm Max HP), hồi cho Leader lượng máu bằng 20% Max HP của Ái Lân và cho một đồng minh ngẫu nhiên 10% Max HP của Ái Lân. Cả hai mục tiêu nhận thêm khiên bằng 10% Max HP của Ái Lân trong 2 lượt.'
               },
@@ -7708,7 +7710,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   name: 'Song Tiêm Trảm',
                   type: 'active',
                   cost: { aether: 20 },
-                  tags: ['multi-hit'],
+                  tags: ['chain'],
                   damage: { multiplier: 1.0, hits: 2 },
                   description: 'Đâm hai lần liên tiếp vào một mục tiêu, mỗi hit là đòn đánh thường.'
               }
@@ -11766,17 +11768,48 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   let leaderEndCheckFlags = { ally: false, enemy: false };
   const hpBarGradientCache = new Map();
   const meleeOffsetTokenKeys = new Set();
-  const STATUS_ICON_PATHS = {
-      blind: 'assets/blind.svg',
-      dmgCut: 'assets/damageCut.svg',
-      exalt: 'assets/exalt.svg',
-      weaken: 'assets/weaken.svg',
-      reflect: 'assets/reflect.svg',
-      haste: 'assets/haste.svg',
-      silence: 'assets/silence.svg',
-      pierce: 'assets/pierce.svg',
+  const DEFAULT_STATUS_ICON_PATH = 'assets/weaken.svg';
+  const MAX_STATUS_ICONS_PER_TOKEN = 5;
+  const CONTROL_TAGS = new Set(['control', 'silence', 'taunt', 'stun', 'sleep', 'fear']);
+  const STATUS_META_BY_ID = {
+      blind: { id: 'blind', label: 'Blind', icon: 'assets/blind.svg' },
+      dmgCut: { id: 'dmgCut', label: 'Damage Cut', icon: 'assets/damageCut.svg' },
+      exalt: { id: 'exalt', label: 'Exalt', icon: 'assets/exalt.svg' },
+      weaken: { id: 'weaken', label: 'Weaken', icon: 'assets/weaken.svg' },
+      reflect: { id: 'reflect', label: 'Reflect', icon: 'assets/reflect.svg' },
+      haste: { id: 'haste', label: 'Haste', icon: 'assets/haste.svg' },
+      silence: { id: 'silence', label: 'Silence', icon: 'assets/silence.svg' },
+      pierce: { id: 'pierce', label: 'Pierce', icon: 'assets/pierce.svg' },
+      stun: { id: 'stun', label: 'Stun', icon: 'assets/silence.svg' },
+      sleep: { id: 'sleep', label: 'Sleep', icon: 'assets/silence.svg' },
+      taunt: { id: 'taunt', label: 'Taunt', icon: 'assets/silence.svg' },
+      bleed: { id: 'bleed', label: 'Bleed', icon: 'assets/weaken.svg' },
+      fatigue: { id: 'fatigue', label: 'Fatigue', icon: 'assets/weaken.svg' },
+      daze: { id: 'daze', label: 'Daze', icon: 'assets/weaken.svg' },
+      fear: { id: 'fear', label: 'Fear', icon: 'assets/silence.svg' },
+      shield: { id: 'shield', label: 'Shield', icon: 'assets/reflect.svg' },
+      stealth: { id: 'stealth', label: 'Stealth', icon: 'assets/haste.svg' },
+      frenzy: { id: 'frenzy', label: 'Frenzy', icon: 'assets/exalt.svg' },
+      allure: { id: 'allure', label: 'Allure', icon: 'assets/haste.svg' },
+      execute: { id: 'execute', label: 'Execute', icon: 'assets/pierce.svg' },
+      venom: { id: 'venom', label: 'Venom', icon: 'assets/pierce.svg' },
+      undying: { id: 'undying', label: 'Undying', icon: 'assets/reflect.svg' },
+  };
+  const STATUS_META_BY_TAG = {
+      control: { id: 'control', label: 'Control', icon: 'assets/silence.svg' },
+      silence: { id: 'silence', label: 'Silence', icon: 'assets/silence.svg' },
+      shield: { id: 'shield', label: 'Shield', icon: 'assets/reflect.svg' },
+      mitigation: { id: 'mitigation', label: 'Mitigation', icon: 'assets/damageCut.svg' },
+      output: { id: 'output', label: 'Output Down', icon: 'assets/weaken.svg' },
+      stat: { id: 'stat', label: 'Stat', icon: 'assets/haste.svg' },
+      penetration: { id: 'penetration', label: 'Penetration', icon: 'assets/pierce.svg' },
+      dot: { id: 'dot', label: 'Damage over Time', icon: 'assets/weaken.svg' },
+      counter: { id: 'counter', label: 'Counter', icon: 'assets/reflect.svg' },
   };
   const statusIconCache = new Map();
+  const statusIconHitboxes = [];
+  let statusIconHoverTooltip = '';
+  let canvasMouseMoveHandler = null;
   const getRequestAnimationFrame = () => {
       if (winRef && typeof winRef.requestAnimationFrame === 'function') {
           return winRef.requestAnimationFrame.bind(winRef);
@@ -11880,6 +11913,20 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           }
       }
   }
+  [TURN_START, TURN_END].forEach((eventType) => {
+      try {
+          addGameEventListener(eventType, () => {
+              statusIconHitboxes.length = 0;
+              statusIconHoverTooltip = '';
+              if (canvas)
+                  canvas.title = '';
+              scheduleDraw();
+          });
+      }
+      catch (err) {
+          console.error('[events] status icon refresh listener', err);
+      }
+  });
   const toAnimationFrameHandle = (handle) => (typeof handle === 'number' ? handle : null);
   let drawFrameHandle = null;
   let drawFrameUsesTimeout = false;
@@ -13152,6 +13199,10 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           canvas.removeEventListener('click', canvasClickHandler);
           canvasClickHandler = null;
       }
+      if (canvasMouseMoveHandler && canvas) {
+          canvas.removeEventListener('mousemove', canvasMouseMoveHandler);
+          canvasMouseMoveHandler = null;
+      }
       canvasClickHandler = (ev) => {
           const game = getInitializedGame();
           if (!canvas || !game)
@@ -13212,6 +13263,12 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       };
       if (canvas && canvasClickHandler) {
           canvas.addEventListener('click', canvasClickHandler);
+      }
+      canvasMouseMoveHandler = (ev) => {
+          updateStatusIconHoverTooltip(ev.clientX, ev.clientY);
+      };
+      if (canvas && canvasMouseMoveHandler) {
+          canvas.addEventListener('mousemove', canvasMouseMoveHandler);
       }
       if (resizeHandler && winRef && typeof winRef.removeEventListener === 'function') {
           winRef.removeEventListener('resize', resizeHandler);
@@ -13985,18 +14042,55 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       const hpMax = Math.max(1, toFiniteOrZero(unit.hpMax));
       return Math.max(0, Math.min(1, shieldAmount / hpMax));
   }
-  function ensureStatusIconLoaded(statusId) {
-      const iconPath = STATUS_ICON_PATHS[statusId];
-      if (!iconPath || typeof Image === 'undefined')
+  function getStatusMeta(status) {
+      const id = typeof status?.id === 'string' ? status.id : '';
+      const tag = typeof status?.tag === 'string' ? status.tag : '';
+      const byId = id ? STATUS_META_BY_ID[id] : null;
+      const byTag = tag ? STATUS_META_BY_TAG[tag] : null;
+      if (byId)
+          return byId;
+      if (byTag)
+          return byTag;
+      const fallbackLabel = id || tag || 'Effect';
+      return { id: id || tag || 'default', label: fallbackLabel, icon: DEFAULT_STATUS_ICON_PATH };
+  }
+  function computeStatusTurnsLeft(status) {
+      const candidates = [status?.dur, status?.ttlTurns, status?.turns, status?.ttl];
+      for (const value of candidates) {
+          const parsed = parseFiniteNumber(value);
+          if (parsed !== null) {
+              return Math.max(0, Math.round(parsed));
+          }
+      }
+      return null;
+  }
+  function buildStatusTooltip(label, stacks, turnsLeft) {
+      const stacksText = `x${Math.max(1, stacks)}`;
+      const turnsText = turnsLeft === null ? '∞ turn' : `${turnsLeft} turn`;
+      return `${label} ${stacksText} · ${turnsText}`;
+  }
+  function ensureStatusIconLoaded(iconId, iconPath) {
+      if (typeof Image === 'undefined')
           return null;
-      let cache = statusIconCache.get(statusId);
+      let cache = statusIconCache.get(iconId);
       if (!cache) {
           cache = {
+              statusId: iconId,
+              statusName: iconId,
+              tooltip: iconId,
+              priority: 0,
+              stacks: 1,
+              turnsLeft: null,
               path: iconPath,
               image: null,
               status: 'idle',
           };
-          statusIconCache.set(statusId, cache);
+          statusIconCache.set(iconId, cache);
+      }
+      if (cache.path !== iconPath) {
+          cache.path = iconPath;
+          cache.status = 'idle';
+          cache.image = null;
       }
       if (cache.status !== 'idle')
           return cache;
@@ -14022,20 +14116,92 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       const icons = [];
       const seen = new Set();
       for (const status of statuses) {
-          const statusId = typeof status?.id === 'string' ? status.id : null;
+          if (!status || typeof status !== 'object')
+              continue;
+          const statusRecord = status;
+          const statusId = typeof statusRecord.id === 'string' ? statusRecord.id : null;
           if (!statusId || seen.has(statusId))
               continue;
-          const icon = ensureStatusIconLoaded(statusId);
+          const meta = getStatusMeta(statusRecord);
+          const icon = ensureStatusIconLoaded(meta.id, meta.icon);
+          ensureStatusIconLoaded(statusId);
           if (!icon || icon.status !== 'ready' || !icon.image)
               continue;
+          const tag = typeof statusRecord.tag === 'string' ? statusRecord.tag : '';
+          const kind = typeof statusRecord.kind === 'string' ? statusRecord.kind : '';
+          const stacks = Math.max(1, Math.round(parseFiniteNumber(statusRecord.stacks) ?? 1));
+          const turnsLeft = computeStatusTurnsLeft(statusRecord);
+          const isControl = CONTROL_TAGS.has(tag) || CONTROL_TAGS.has(statusId);
+          const isDebuff = kind === 'debuff';
+          const priority = isControl ? 0 : (isDebuff ? 1 : 2);
           seen.add(statusId);
-          icons.push(icon);
+          icons.push({
+              ...icon,
+              statusId,
+              statusName: meta.label,
+              tooltip: buildStatusTooltip(meta.label, stacks, turnsLeft),
+              priority,
+              stacks,
+              turnsLeft,
+          });
       }
-      return icons;
+      icons.sort((a, b) => (a.priority - b.priority
+          || ((b.turnsLeft ?? Number.MAX_SAFE_INTEGER) - (a.turnsLeft ?? Number.MAX_SAFE_INTEGER))
+          || a.statusName.localeCompare(b.statusName)));
+      return icons.slice(0, MAX_STATUS_ICONS_PER_TOKEN);
+  }
+  function __resolveStatusIconPreview(statusesInput) {
+      const statuses = Array.isArray(statusesInput) ? statusesInput : [];
+      const preview = [];
+      const seen = new Set();
+      for (const status of statuses) {
+          if (!status || typeof status !== 'object')
+              continue;
+          const statusId = typeof status.id === 'string' ? status.id : null;
+          if (!statusId || seen.has(statusId))
+              continue;
+          seen.add(statusId);
+          const meta = getStatusMeta(status);
+          const tag = typeof status.tag === 'string' ? status.tag : '';
+          const kind = typeof status.kind === 'string' ? status.kind : '';
+          const isControl = CONTROL_TAGS.has(tag) || CONTROL_TAGS.has(statusId);
+          const isDebuff = kind === 'debuff';
+          const priority = isControl ? 0 : (isDebuff ? 1 : 2);
+          const stacks = Math.max(1, Math.round(parseFiniteNumber(status.stacks) ?? 1));
+          const turnsLeft = computeStatusTurnsLeft(status);
+          preview.push({
+              id: statusId,
+              tooltip: buildStatusTooltip(meta.label, stacks, turnsLeft),
+              priority,
+          });
+      }
+      preview.sort((a, b) => a.priority - b.priority || a.id.localeCompare(b.id));
+      return preview.slice(0, MAX_STATUS_ICONS_PER_TOKEN);
+  }
+  function updateStatusIconHoverTooltip(clientX, clientY) {
+      if (!canvas)
+          return;
+      const rect = canvas.getBoundingClientRect();
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+      let nextTooltip = '';
+      for (const hitbox of statusIconHitboxes) {
+          const withinX = x >= hitbox.x && x <= hitbox.x + hitbox.size;
+          const withinY = y >= hitbox.y && y <= hitbox.y + hitbox.size;
+          if (withinX && withinY) {
+              nextTooltip = hitbox.tooltip;
+              break;
+          }
+      }
+      if (statusIconHoverTooltip === nextTooltip)
+          return;
+      statusIconHoverTooltip = nextTooltip;
+      canvas.title = nextTooltip;
   }
   function drawHPBars() {
       if (!ctx || !Game?.grid)
           return;
+      statusIconHitboxes.length = 0;
       const drawCtx = ctx;
       const baseR = Math.floor(Game.grid.tile * 0.36);
       const tokens = Game.tokens || [];
@@ -14116,6 +14282,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               statusIcons.forEach((icon, index) => {
                   const iconX = statusStartX + index * (statusIconSize + statusIconGap);
                   drawCtx.drawImage(icon.image, iconX, statusY, statusIconSize, statusIconSize);
+                  statusIconHitboxes.push({ x: iconX, y: statusY, size: statusIconSize, tooltip: icon.tooltip });
               });
           }
           const ticks = 10;
@@ -14229,7 +14396,11 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       if (canvas && canvasClickHandler && typeof canvas.removeEventListener === 'function') {
           canvas.removeEventListener('click', canvasClickHandler);
       }
+      if (canvas && canvasMouseMoveHandler && typeof canvas.removeEventListener === 'function') {
+          canvas.removeEventListener('mousemove', canvasMouseMoveHandler);
+      }
       canvasClickHandler = null;
+      canvasMouseMoveHandler = null;
       if (typeof hudCleanup === 'function') {
           hudCleanup();
       }
@@ -14260,6 +14431,8 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       hud = null;
       hudCleanup = null;
       timerElement = null;
+      statusIconHoverTooltip = '';
+      statusIconHitboxes.length = 0;
       hpBarGradientCache.clear();
       invalidateSceneCache();
   }
@@ -14448,6 +14621,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   if (!Object.prototype.hasOwnProperty.call(exports, 'clearBackgroundSignatureCache')) exports.clearBackgroundSignatureCache = __reexport1.clearBackgroundSignatureCache;
   if (!Object.prototype.hasOwnProperty.call(exports, 'computeBackgroundSignature')) exports.computeBackgroundSignature = __reexport1.computeBackgroundSignature;
   if (!Object.prototype.hasOwnProperty.call(exports, '__backgroundSignatureCache')) exports.__backgroundSignatureCache = __reexport1.__backgroundSignatureCache;
+  if (!Object.prototype.hasOwnProperty.call(exports, '__resolveStatusIconPreview')) exports.__resolveStatusIconPreview = __resolveStatusIconPreview;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createPveSession')) exports.createPveSession = createPveSession;
   if (!Object.prototype.hasOwnProperty.call(exports, '__getStoredConfig')) exports.__getStoredConfig = __getStoredConfig;
   if (!Object.prototype.hasOwnProperty.call(exports, '__getActiveGame')) exports.__getActiveGame = __getActiveGame;
@@ -14468,6 +14642,7 @@ __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
   const createPveSessionImpl = __dep1.createPveSession;
   const __getStoredConfig = __dep1.__getStoredConfig;
   const __getActiveGame = __dep1.__getActiveGame;
+  const __resolveStatusIconPreview = __dep1.__resolveStatusIconPreview;
   function isReward(entry) {
       return Boolean(entry && typeof entry.id === 'string');
   }
@@ -14628,6 +14803,7 @@ __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
   exports.ACTION_END = ACTION_END;
   exports.TURN_REGEN = TURN_REGEN;
   exports.BATTLE_END = BATTLE_END;
+  exports.__resolveStatusIconPreview = __resolveStatusIconPreview;
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'advanceSession')) exports.advanceSession = advanceSession;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyReward')) exports.applyReward = applyReward;

@@ -25,6 +25,7 @@ import {
   createPveSession as createPveSessionImpl,
   __getStoredConfig,
   __getActiveGame,
+  __resolveStatusIconPreview,
 } from './session-runtime-impl.ts';
 
 type RewardList = ReadonlyArray<RewardRoll>;
@@ -220,3 +221,4 @@ export {
   TURN_REGEN,
   BATTLE_END,
 };
+export { __resolveStatusIconPreview };

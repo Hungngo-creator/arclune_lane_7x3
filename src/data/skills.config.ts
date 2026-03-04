@@ -13,7 +13,7 @@ const skillsConfig = [
     basic: {
       name: 'Mộng Phệ',
       type: 'basic',
-      tags: ['single-target', 'mark-builder'],
+      tags: ['single-target', 'mark'],
       description: 'Gây 100% ATK + WIL lên 1 mục tiêu và gắn 1 stack Mê Hoặc (không thể thanh tẩy). Đủ 3 stack khiến mục tiêu Ngủ Say 1 lượt.'
     },
     skills: [
@@ -138,7 +138,7 @@ const skillsConfig = [
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
-      tags: ['single-target', 'mark-builder'],
+      tags: ['single-target', 'mark'],
       debuffs: [{ id: 'ma_chung', stacks: 1, purgeable: false }],
       description: 'Gây 100% ATK + WIL lên một mục tiêu và cấy 1 Ma Chủng (không thể bị thanh tẩy, mất sau 3 lượt không được làm mới). Vào trận +10% SPD.'
     },
@@ -167,7 +167,7 @@ const skillsConfig = [
         type: 'active',
         cost: { aether: 25 },
         hits: 2,
-        tags: ['counts-as-basic', 'splash'],
+        tags: ['basic-attack', 'splash'],
         targets: 'markPriority',
         splash: { ratio: 0.70, maxTargets: 2 },
         description: 'Lao đến kẻ địch có Ma Chủng gần nhất và tung hai chưởng liên tiếp, mỗi hit 100% sát thương đòn đánh thường và lan 70% sang tối đa hai kẻ địch lân cận.'
@@ -176,7 +176,7 @@ const skillsConfig = [
     ult: {
       name: 'Ma Chủng Phán Quyết',
       type: 'ultimate',
-      tags: ['aoe', 'mark-detonation'],
+      tags: ['aoe', 'mark'],
       damage: { percentTargetMaxHPPerStack: 0.05, scaleWIL: 0 },
       debuffs: [{ id: 'fear', turns: 1, thresholdStacks: 2 }, { id: 'bleed', turns: 1, thresholdStacks: 2 }],
       description: 'Kích hoạt toàn bộ Ma Chủng trên kẻ địch, mỗi tầng gây 5% Max HP của mục tiêu dưới dạng sát thương WIL. Với mỗi 2 tầng trên cùng mục tiêu, áp Sợ Hãi và Chảy Máu 1 lượt. Các Ma Chủng được kích hoạt sẽ bị tiêu hao.'
@@ -227,7 +227,7 @@ const skillsConfig = [
         name: 'Mộ Vực Trảm',
         type: 'active',
         cost: { aether: 15 },
-        tags: ['counts-as-basic'],
+        tags: ['basic-attack'],
         damage: { multiplier: 1.50 },
         description: 'Chém một mục tiêu gây 150% sát thương đòn đánh thường. Được tính như đòn đánh thường.'
       }
@@ -235,7 +235,7 @@ const skillsConfig = [
     ult: {
       name: 'Hồn Về Mộ',
       type: 'ultimate',
-      tags: ['single-target', 'counts-as-basic'],
+      tags: ['single-target', 'basic-attack'],
       damage: { multiplier: 2.00, piercePercent: { arm: 0.30, res: 0.30 } },
       buffs: [
         { id: 'bat_khuat', turns: 2 },
@@ -261,7 +261,7 @@ const skillsConfig = [
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
-      tags: ['single-target', 'form-scaling'],
+      tags: ['single-target', 'stance'],
       description: 'Tấn công 1 mục tiêu với sát thương lai. Phụ thuộc trạng thái: Ấu Long (cơ bản), Thành Niên +20% sát thương, Trưởng Thành +30% sát thương, Long Thần +40% sát thương và lan thêm 40% lên mục tiêu phụ.'
     },
     skills: [
@@ -270,7 +270,7 @@ const skillsConfig = [
         name: 'Long Trảo Song Trảm',
         type: 'active',
         cost: { aether: 25 },
-        tags: ['counts-as-basic', 'multi-hit'],
+        tags: ['basic-attack', 'chain'],
         hits: 2,
         description: 'Tung hai đòn chém liên tiếp, mỗi hit gây 100% sát thương đòn đánh thường dựa trên trạng thái hiện tại.'
       },
@@ -298,7 +298,8 @@ const skillsConfig = [
     ult: {
       name: 'Tam Chuyển Long Thai',
       type: 'ultimate',
-      tags: ['evolution'],
+      tags: ['stance'],
+      variant: { kind: 'transformation', runtimeMapping: 'ngao_binh_form_stage' },
       primeAwakenAtCast: 4,
       longUyAura: { enemyATKDown: 0.10, activeFromForm: 'long_than' },
       description: 'Mỗi lần thi triển, Ngao Bính hóa trứng 1 lượt (không thể tấn công, giảm sát thương nhận 40%/50%/60% tùy lần) rồi phá xác nâng trạng thái: Thành Niên → Trưởng Thành → Long Thần. Từ Long Thần nhận Long Uy giảm 10% ATK của kẻ địch tấn công mình; từ lần cast thứ 4 trở đi bỏ qua trạng thái trứng và thức tỉnh Prime.'
@@ -319,7 +320,7 @@ const skillsConfig = [
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
-      tags: ['single-target', 'mark-builder'],
+      tags: ['single-target', 'mark'],
       debuffs: [{ id: 'sa_an', stacks: 1, maxStacks: 5, purgeable: false }],
       description: 'Gây 100% ATK + WIL lên một mục tiêu và đặt 1 Sa Ấn (tối đa 5). Đạt 5 tầng khiến mục tiêu bỏ qua lượt kế tiếp rồi đặt lại số tầng.'
     },
@@ -329,7 +330,7 @@ const skillsConfig = [
         name: 'Hắc Sa Song Chưởng',
         type: 'active',
         cost: { aether: 25 },
-        tags: ['counts-as-basic', 'multi-hit'],
+        tags: ['basic-attack', 'chain'],
         hits: 2,
         targets: 'randomEnemies',
         description: 'Tung hai chưởng vào hai mục tiêu ngẫu nhiên, mỗi hit gây 100% sát thương đòn đánh thường và đặt Sa Ấn.'
@@ -356,7 +357,8 @@ const skillsConfig = [
     ult: {
       name: 'Thiên Mệnh Lậu Khắc Ma Kinh',
       type: 'ultimate',
-      tags: ['time'],
+      tags: ['control'],
+      variant: { kind: 'dual-outcome', runtimeMapping: 'lau_khac_ma_kinh_coinflip' },
       description: 'Vận hành Lậu Khắc Ma Sa, thời sa chảy ngẫu nhiên 50% giữa hai kết quả: Nghịch Lưu – đưa toàn bộ phe đồng minh về trạng thái của 1 lượt trước (vị trí, HP, buff/debuff; đơn vị mới triệu hồi trong lượt hiện tại trở về deck và hoàn cost); Thuận Lưu – sau khi ult hoàn tất, mọi đồng minh ngay lập tức thực thi 1 đòn đánh thường.'
     },
     talent: {
@@ -391,7 +393,7 @@ const skillsConfig = [
         name: 'Song Huyết Cầu',
         type: 'active',
         cost: { aether: 25 },
-        tags: ['counts-as-basic', 'multi-hit'],
+        tags: ['basic-attack', 'chain'],
         hits: 2,
         targets: 'singleEnemy',
         description: 'Phóng hai huyết cầu vào một kẻ địch. Mỗi hit gây 130% sát thương đòn đánh thường, được tính như đòn đánh thường để kích hoạt hút máu và Phệ Ấn, đồng thời làm mới thời hạn dấu ấn trên mục tiêu trúng đòn nhưng vẫn tôn trọng giới hạn 2 Phệ Ấn mỗi lượt.'
@@ -419,7 +421,7 @@ const skillsConfig = [
     ult: {
       name: 'Thiên Mệnh Phệ Nguyên Kinh',
       type: 'ultimate',
-      tags: ['aoe', 'hp-drain', 'counts-as-basic'],
+      tags: ['aoe', 'non-heal-hp-change', 'basic-attack'],
       duration: { turns: 2, affectedStat: 'WIL' },
       hpDrain: { percentCurrentHP: 0.08, perBoss: 0.08 },
       damage: { scaleWIL: 0.65, type: 'arcane', unavoidable: true },
@@ -460,7 +462,7 @@ const skillsConfig = [
         type: 'active',
         cost: { aether: 25 },
         hits: 1,
-        tags: ['counts-as-basic', 'line-target'],
+        tags: ['basic-attack', 'line'],
         targets: 'randomRow',
         description: 'Gây sát thương bằng 150% đòn đánh thường lên một hàng ngang ngẫu nhiên (1-2-3, 4-5-6 hoặc 7-8-9). Được tính là đòn đánh thường, giữ nguyên khả năng xuyên giáp hiện có của Kiếm Trường Dạ.'
       },
@@ -492,7 +494,7 @@ const skillsConfig = [
     ult: {
       name: 'Vạn Kiếm Quy Tông',
       type: 'ultimate',
-      tags: ['counts-as-basic', 'column'],
+      tags: ['basic-attack', 'line'],
       hits: 4,
       piercePercent: 0.30,
       targets: 'columnMid',
@@ -516,7 +518,7 @@ const skillsConfig = [
       name: 'Đánh Thường',
       type: 'basic',
       hits: 2,
-      tags: ['multi-hit', 'spd-debuff'],
+      tags: ['chain', 'control'],
       debuffs: [{ stat: 'SPD', amountPercent: -0.02, maxStacks: 5 }],
       description: 'Ra hai cú đấm liên tiếp vào một mục tiêu: hit đầu gây sát thương bằng n% ATK + x% WIL, hit thứ hai gây thêm 50% sát thương của hit đầu. Mỗi hit giảm 2% SPD của mục tiêu (tối đa 5 cộng dồn) cho tới khi bị xoá.'
     },
@@ -527,7 +529,7 @@ const skillsConfig = [
         type: 'active',
         cost: { aether: 25 },
         hits: 3,
-        tags: ['counts-as-basic', 'random-target'],
+        tags: ['basic-attack', 'random-target'],
         bonusDamage: { condition: 'targetsAdjacent', amount: 0.10 },
         description: 'Giương tay thu lôi đánh ngẫu nhiên ba kẻ địch, mỗi mục tiêu nhận 110% sát thương đòn đánh thường và được tính như đòn đánh thường. Nếu cả ba mục tiêu đứng liền kề nhau, toàn bộ nhận thêm 10% sát thương.'
       },
@@ -555,7 +557,7 @@ const skillsConfig = [
     ult: {
       name: 'Huyết Hồn Lôi Quyết',
       type: 'ultimate',
-      tags: ['hp-trade', 'multi-hit', 'counts-as-basic'],
+      tags: ['non-heal-hp-change', 'chain', 'basic-attack'],
       hits: 3,
       hpTrade: { percentMaxHP: 0.15, lethal: false, minHP: 1 },
       damage: { basePercentMaxHPTarget: 0.07, bossPercent: 0.04, scaleWIL: 0.50, type: 'arcane' },
@@ -591,7 +593,7 @@ const skillsConfig = [
         type: 'active',
         cost: { aether: 25 },
         hits: 3,
-        tags: ['counts-as-basic', 'random-aoe'],
+        tags: ['basic-attack', 'random-aoe'],
         description: 'Gây ba đòn tấn công diện rộng ngẫu nhiên, mỗi đòn gây 130% sát thương đòn đánh thường, cộng tầng Mê Hoặc cho các mục tiêu trúng hit.'
       },
       {
@@ -600,7 +602,7 @@ const skillsConfig = [
         type: 'active',
         cost: { aether: 35 },
         hits: 5,
-        tags: ['counts-as-basic', 'random-aoe'],
+        tags: ['basic-attack', 'random-aoe'],
         description: 'Gây năm đòn diện rộng ngẫu nhiên, mỗi đòn gây 100% sát thương đòn đánh thường và cộng tầng Mê Hoặc cho từng mục tiêu trúng hit.'
       },
       {
@@ -647,7 +649,7 @@ const skillsConfig = [
         name: 'Cán Cân Giáng Phạt',
         type: 'active',
         cost: { aether: 20 },
-        tags: ['counts-as-basic'],
+        tags: ['basic-attack'],
         description: 'Dùng cán cân nện vào một kẻ địch, gây 150% sát thương đòn đánh thường và được tính như đòn đánh thường.'
       },
       {
@@ -815,7 +817,7 @@ const skillsConfig = [
         name: 'Trảm Cảnh Giới',
         type: 'active',
         cost: { aether: 20 },
-        tags: ['counts-as-basic'],
+        tags: ['basic-attack'],
         description: 'Gây sát thương bằng 150% đòn đánh thường lên một mục tiêu và được tính như đòn đánh thường.'
       },
       {
@@ -1050,7 +1052,7 @@ const skillsConfig = [
         name: 'Song Cực Hiến Phúc',
         type: 'active',
         cost: { aether: 25 },
-        tags: ['support', 'hp-trade'],
+        tags: ['support', 'non-heal-hp-change'],
         usableIn: ['light', 'dark'],
         description: 'Tiêu hao 30% HP hiện tại của Ái Lân (không giảm Max HP), hồi cho Leader lượng máu bằng 20% Max HP của Ái Lân và cho một đồng minh ngẫu nhiên 10% Max HP của Ái Lân. Cả hai mục tiêu nhận thêm khiên bằng 10% Max HP của Ái Lân trong 2 lượt.'
       },
@@ -1175,7 +1177,7 @@ const skillsConfig = [
         name: 'Song Tiêm Trảm',
         type: 'active',
         cost: { aether: 20 },
-        tags: ['multi-hit'],
+        tags: ['chain'],
         damage: { multiplier: 1.0, hits: 2 },
         description: 'Đâm hai lần liên tiếp vào một mục tiêu, mỗi hit là đòn đánh thường.'
       }

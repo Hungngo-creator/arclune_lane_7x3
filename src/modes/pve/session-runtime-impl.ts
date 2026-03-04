@@ -710,21 +710,69 @@ let leaderEndCheckFlags: { ally: boolean; enemy: boolean } = { ally: false, enem
 const hpBarGradientCache = new Map<string, GradientValue>();
 const meleeOffsetTokenKeys = new Set<string>();
 type StatusIconEntry = {
+  statusId: string;
+  statusName: string;
+  tooltip: string;
+  priority: number;
+  stacks: number;
+  turnsLeft: number | null;
   path: string;
   image: HTMLImageElement | null;
   status: 'idle' | 'loading' | 'ready' | 'error';
 };
-const STATUS_ICON_PATHS: Record<string, string> = {
-  blind: 'assets/blind.svg',
-  dmgCut: 'assets/damageCut.svg',
-  exalt: 'assets/exalt.svg',
-  weaken: 'assets/weaken.svg',
-  reflect: 'assets/reflect.svg',
-  haste: 'assets/haste.svg',
-  silence: 'assets/silence.svg',
-  pierce: 'assets/pierce.svg',
+type StatusIconHitbox = {
+  x: number;
+  y: number;
+  size: number;
+  tooltip: string;
+};
+type StatusMeta = {
+  id: string;
+  label: string;
+  icon: string;
+};
+const DEFAULT_STATUS_ICON_PATH = 'assets/weaken.svg';
+const MAX_STATUS_ICONS_PER_TOKEN = 5;
+const CONTROL_TAGS = new Set(['control', 'silence', 'taunt', 'stun', 'sleep', 'fear']);
+const STATUS_META_BY_ID: Record<string, StatusMeta> = {
+  blind: { id: 'blind', label: 'Blind', icon: 'assets/blind.svg' },
+  dmgCut: { id: 'dmgCut', label: 'Damage Cut', icon: 'assets/damageCut.svg' },
+  exalt: { id: 'exalt', label: 'Exalt', icon: 'assets/exalt.svg' },
+  weaken: { id: 'weaken', label: 'Weaken', icon: 'assets/weaken.svg' },
+  reflect: { id: 'reflect', label: 'Reflect', icon: 'assets/reflect.svg' },
+  haste: { id: 'haste', label: 'Haste', icon: 'assets/haste.svg' },
+  silence: { id: 'silence', label: 'Silence', icon: 'assets/silence.svg' },
+  pierce: { id: 'pierce', label: 'Pierce', icon: 'assets/pierce.svg' },
+  stun: { id: 'stun', label: 'Stun', icon: 'assets/silence.svg' },
+  sleep: { id: 'sleep', label: 'Sleep', icon: 'assets/silence.svg' },
+  taunt: { id: 'taunt', label: 'Taunt', icon: 'assets/silence.svg' },
+  bleed: { id: 'bleed', label: 'Bleed', icon: 'assets/weaken.svg' },
+  fatigue: { id: 'fatigue', label: 'Fatigue', icon: 'assets/weaken.svg' },
+  daze: { id: 'daze', label: 'Daze', icon: 'assets/weaken.svg' },
+  fear: { id: 'fear', label: 'Fear', icon: 'assets/silence.svg' },
+  shield: { id: 'shield', label: 'Shield', icon: 'assets/reflect.svg' },
+  stealth: { id: 'stealth', label: 'Stealth', icon: 'assets/haste.svg' },
+  frenzy: { id: 'frenzy', label: 'Frenzy', icon: 'assets/exalt.svg' },
+  allure: { id: 'allure', label: 'Allure', icon: 'assets/haste.svg' },
+  execute: { id: 'execute', label: 'Execute', icon: 'assets/pierce.svg' },
+  venom: { id: 'venom', label: 'Venom', icon: 'assets/pierce.svg' },
+  undying: { id: 'undying', label: 'Undying', icon: 'assets/reflect.svg' },
+};
+const STATUS_META_BY_TAG: Record<string, StatusMeta> = {
+  control: { id: 'control', label: 'Control', icon: 'assets/silence.svg' },
+  silence: { id: 'silence', label: 'Silence', icon: 'assets/silence.svg' },
+  shield: { id: 'shield', label: 'Shield', icon: 'assets/reflect.svg' },
+  mitigation: { id: 'mitigation', label: 'Mitigation', icon: 'assets/damageCut.svg' },
+  output: { id: 'output', label: 'Output Down', icon: 'assets/weaken.svg' },
+  stat: { id: 'stat', label: 'Stat', icon: 'assets/haste.svg' },
+  penetration: { id: 'penetration', label: 'Penetration', icon: 'assets/pierce.svg' },
+  dot: { id: 'dot', label: 'Damage over Time', icon: 'assets/weaken.svg' },
+  counter: { id: 'counter', label: 'Counter', icon: 'assets/reflect.svg' },
 };
 const statusIconCache = new Map<string, StatusIconEntry>();
+const statusIconHitboxes: StatusIconHitbox[] = [];
+let statusIconHoverTooltip = '';
+let canvasMouseMoveHandler: ((event: MouseEvent) => void) | null = null;
 
 type RequestAnimationFrameFn = (callback: FrameRequestCallback) => number;
 type CancelAnimationFrameFn = (handle: number) => void;
@@ -836,6 +884,19 @@ if (CFG?.DEBUG?.LOG_EVENTS) {
     }
   }
 }
+
+[TURN_START, TURN_END].forEach((eventType) => {
+  try {
+    addGameEventListener(eventType, () => {
+      statusIconHitboxes.length = 0;
+      statusIconHoverTooltip = '';
+      if (canvas) canvas.title = '';
+      scheduleDraw();
+    });
+  } catch (err) {
+    console.error('[events] status icon refresh listener', err);
+  }
+});
 
 const toAnimationFrameHandle = (handle: FrameHandle): number | null => (
   typeof handle === 'number' ? handle : null
@@ -2064,6 +2125,10 @@ function init(): boolean {
     canvas.removeEventListener('click', canvasClickHandler);
     canvasClickHandler = null;
   }
+  if (canvasMouseMoveHandler && canvas){
+    canvas.removeEventListener('mousemove', canvasMouseMoveHandler);
+    canvasMouseMoveHandler = null;
+  }
   canvasClickHandler = (ev: MouseEvent): void => {
     const game = getInitializedGame();
     if (!canvas || !game) return;
@@ -2123,6 +2188,12 @@ function init(): boolean {
   };
   if (canvas && canvasClickHandler){
     canvas.addEventListener('click', canvasClickHandler);
+  }
+  canvasMouseMoveHandler = (ev: MouseEvent): void => {
+    updateStatusIconHoverTooltip(ev.clientX, ev.clientY);
+  };
+  if (canvas && canvasMouseMoveHandler){
+    canvas.addEventListener('mousemove', canvasMouseMoveHandler);
   }
 
   if (resizeHandler && winRef && typeof winRef.removeEventListener === 'function'){
@@ -2949,17 +3020,55 @@ function getShieldRatio(unit: UnitToken): number {
   return Math.max(0, Math.min(1, shieldAmount / hpMax));
 }
 
-function ensureStatusIconLoaded(statusId: string): StatusIconEntry | null {
-  const iconPath = STATUS_ICON_PATHS[statusId];
-  if (!iconPath || typeof Image === 'undefined') return null;
-  let cache = statusIconCache.get(statusId);
+function getStatusMeta(status: Record<string, unknown> | null | undefined): StatusMeta {
+  const id = typeof status?.id === 'string' ? status.id : '';
+  const tag = typeof status?.tag === 'string' ? status.tag : '';
+  const byId = id ? STATUS_META_BY_ID[id] : null;
+  const byTag = tag ? STATUS_META_BY_TAG[tag] : null;
+  if (byId) return byId;
+  if (byTag) return byTag;
+  const fallbackLabel = id || tag || 'Effect';
+  return { id: id || tag || 'default', label: fallbackLabel, icon: DEFAULT_STATUS_ICON_PATH };
+}
+
+function computeStatusTurnsLeft(status: Record<string, unknown> | null | undefined): number | null {
+  const candidates = [status?.dur, status?.ttlTurns, status?.turns, status?.ttl];
+  for (const value of candidates){
+    const parsed = parseFiniteNumber(value);
+    if (parsed !== null){
+      return Math.max(0, Math.round(parsed));
+    }
+  }
+  return null;
+}
+
+function buildStatusTooltip(label: string, stacks: number, turnsLeft: number | null): string {
+  const stacksText = `x${Math.max(1, stacks)}`;
+  const turnsText = turnsLeft === null ? '∞ turn' : `${turnsLeft} turn`;
+  return `${label} ${stacksText} · ${turnsText}`;
+}
+
+function ensureStatusIconLoaded(iconId: string, iconPath: string): StatusIconEntry | null {
+  if (typeof Image === 'undefined') return null;
+  let cache = statusIconCache.get(iconId);
   if (!cache) {
     cache = {
+      statusId: iconId,
+      statusName: iconId,
+      tooltip: iconId,
+      priority: 0,
+      stacks: 1,
+      turnsLeft: null,
       path: iconPath,
       image: null,
       status: 'idle',
     };
-    statusIconCache.set(statusId, cache);
+    statusIconCache.set(iconId, cache);
+  }
+  if (cache.path !== iconPath){
+    cache.path = iconPath;
+    cache.status = 'idle';
+    cache.image = null;
   }
   if (cache.status !== 'idle') return cache;
   const image = new Image();
@@ -2984,18 +3093,91 @@ function collectStatusIcons(unit: UnitToken): StatusIconEntry[] {
   const icons: StatusIconEntry[] = [];
   const seen = new Set<string>();
   for (const status of statuses) {
-    const statusId = typeof status?.id === 'string' ? status.id : null;
+    if (!status || typeof status !== 'object') continue;
+    const statusRecord = status as Record<string, unknown>;
+    const statusId = typeof statusRecord.id === 'string' ? statusRecord.id : null;
     if (!statusId || seen.has(statusId)) continue;
-    const icon = ensureStatusIconLoaded(statusId);
+    const meta = getStatusMeta(statusRecord);
+    const icon = ensureStatusIconLoaded(meta.id, meta.icon); ensureStatusIconLoaded(statusId);
     if (!icon || icon.status !== 'ready' || !icon.image) continue;
+    const tag = typeof statusRecord.tag === 'string' ? statusRecord.tag : '';
+    const kind = typeof statusRecord.kind === 'string' ? statusRecord.kind : '';
+    const stacks = Math.max(1, Math.round(parseFiniteNumber(statusRecord.stacks) ?? 1));
+    const turnsLeft = computeStatusTurnsLeft(statusRecord);
+    const isControl = CONTROL_TAGS.has(tag) || CONTROL_TAGS.has(statusId);
+    const isDebuff = kind === 'debuff';
+    const priority = isControl ? 0 : (isDebuff ? 1 : 2);
     seen.add(statusId);
-    icons.push(icon);
+    icons.push({
+      ...icon,
+      statusId,
+      statusName: meta.label,
+      tooltip: buildStatusTooltip(meta.label, stacks, turnsLeft),
+      priority,
+      stacks,
+      turnsLeft,
+    });
   }
-  return icons;
+
+  icons.sort((a, b) => (
+    a.priority - b.priority
+    || ((b.turnsLeft ?? Number.MAX_SAFE_INTEGER) - (a.turnsLeft ?? Number.MAX_SAFE_INTEGER))
+    || a.statusName.localeCompare(b.statusName)
+  ));
+
+  return icons.slice(0, MAX_STATUS_ICONS_PER_TOKEN);
+}
+
+
+export function __resolveStatusIconPreview(statusesInput: ReadonlyArray<Record<string, unknown> | null | undefined>): Array<{ id: string; tooltip: string; priority: number }> {
+  const statuses = Array.isArray(statusesInput) ? statusesInput : [];
+  const preview: Array<{ id: string; tooltip: string; priority: number }> = [];
+  const seen = new Set<string>();
+  for (const status of statuses){
+    if (!status || typeof status !== 'object') continue;
+    const statusId = typeof status.id === 'string' ? status.id : null;
+    if (!statusId || seen.has(statusId)) continue;
+    seen.add(statusId);
+    const meta = getStatusMeta(status);
+    const tag = typeof status.tag === 'string' ? status.tag : '';
+    const kind = typeof status.kind === 'string' ? status.kind : '';
+    const isControl = CONTROL_TAGS.has(tag) || CONTROL_TAGS.has(statusId);
+    const isDebuff = kind === 'debuff';
+    const priority = isControl ? 0 : (isDebuff ? 1 : 2);
+    const stacks = Math.max(1, Math.round(parseFiniteNumber(status.stacks) ?? 1));
+    const turnsLeft = computeStatusTurnsLeft(status);
+    preview.push({
+      id: statusId,
+      tooltip: buildStatusTooltip(meta.label, stacks, turnsLeft),
+      priority,
+    });
+  }
+  preview.sort((a, b) => a.priority - b.priority || a.id.localeCompare(b.id));
+  return preview.slice(0, MAX_STATUS_ICONS_PER_TOKEN);
+}
+
+function updateStatusIconHoverTooltip(clientX: number, clientY: number): void {
+  if (!canvas) return;
+  const rect = canvas.getBoundingClientRect();
+  const x = clientX - rect.left;
+  const y = clientY - rect.top;
+  let nextTooltip = '';
+  for (const hitbox of statusIconHitboxes){
+    const withinX = x >= hitbox.x && x <= hitbox.x + hitbox.size;
+    const withinY = y >= hitbox.y && y <= hitbox.y + hitbox.size;
+    if (withinX && withinY){
+      nextTooltip = hitbox.tooltip;
+      break;
+    }
+  }
+  if (statusIconHoverTooltip === nextTooltip) return;
+  statusIconHoverTooltip = nextTooltip;
+  canvas.title = nextTooltip;
 }
 
 function drawHPBars(): void {
   if (!ctx || !Game?.grid) return;
+  statusIconHitboxes.length = 0;
   const drawCtx = ctx;
   const baseR = Math.floor(Game.grid.tile * 0.36);
   const tokens = Game.tokens || [];
@@ -3085,6 +3267,7 @@ function drawHPBars(): void {
       statusIcons.forEach((icon, index) => {
         const iconX = statusStartX + index * (statusIconSize + statusIconGap);
         drawCtx.drawImage(icon.image as CanvasImageSource, iconX, statusY, statusIconSize, statusIconSize);
+        statusIconHitboxes.push({ x: iconX, y: statusY, size: statusIconSize, tooltip: icon.tooltip });
       });
     }
 
@@ -3201,7 +3384,11 @@ function clearSessionListeners(): void {
   if (canvas && canvasClickHandler && typeof canvas.removeEventListener === 'function'){
     canvas.removeEventListener('click', canvasClickHandler);
   }
+  if (canvas && canvasMouseMoveHandler && typeof canvas.removeEventListener === 'function'){
+    canvas.removeEventListener('mousemove', canvasMouseMoveHandler);
+  }
   canvasClickHandler = null;
+  canvasMouseMoveHandler = null;
   if (typeof hudCleanup === 'function'){
     hudCleanup();
   }
@@ -3233,6 +3420,8 @@ function resetDomRefs(): void {
   hud = null;
   hudCleanup = null;
   timerElement = null;
+  statusIconHoverTooltip = '';
+  statusIconHitboxes.length = 0;
   hpBarGradientCache.clear();
   invalidateSceneCache();
 }
