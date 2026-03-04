@@ -13,7 +13,9 @@
     "typecheck": "tsc --noEmit",
     "postinstall": "node tools/install-stubs.mjs",
     "typecheck:all": "tsc --noEmit -p tsconfig.all.json",
-    "verify:aether-bundle": "node tools/verify-aether-bundle.mjs"
+    "verify:aether-bundle": "node tools/verify-aether-bundle.mjs",
+    "smoke:long-battle": "node simulations/long-battle-smoke.mjs",
+    "release:gate": "npm test && npm run smoke:long-battle"
   },
   "keywords": [],
   "author": "",

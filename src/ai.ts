@@ -663,8 +663,16 @@ function findLowestHpUnit(units: ReadonlyArray<UnitToken>): UnitToken | null {
   return best;
 }
 
-const progressMap = Game.runtime?.unitProgressById as ReadonlyMap<string, { gambit?: Array<{ condition: string; action: 'ult' | 'skill1' | 'skill2' | 'skill3' | 'basic'; threshold?: number; targetRole?: string; enabled?: boolean }> }> | undefined;
-  const progressMap = Game.runtime?.unitProgressById as ReadonlyMap<string, { gambit?: Array<{ condition: string; action: 'ult' | 'basic'; threshold?: number; targetRole?: string; enabled?: boolean }> }> | undefined;
+export function evaluateGambitLogic(Game: SessionState, unit: UnitToken, options: { startIndex?: number } = {}): GambitDecision {
+  const progressMap = Game.runtime?.unitProgressById as ReadonlyMap<string, {
+    gambit?: Array<{
+      condition: string;
+      action: 'ult' | 'skill1' | 'skill2' | 'skill3' | 'basic';
+      threshold?: number;
+      targetRole?: string;
+      enabled?: boolean;
+    }>;
+  }> | undefined;
   const profile = progressMap?.get(unit.id);
   const slots = Array.isArray(profile?.gambit) ? profile.gambit : [];
   const enemySide = unit.side === 'ally' ? 'enemy' : 'ally';

@@ -878,87 +878,89 @@ __define('./ai.ts', (exports, module, __require) => {
       }
       return best;
   }
-  const progressMap = Game.runtime?.unitProgressById;
-  const progressMap = Game.runtime?.unitProgressById;
-  const profile = progressMap?.get(unit.id);
-  const slots = Array.isArray(profile?.gambit) ? profile.gambit : [];
-  const enemySide = unit.side === 'ally' ? 'enemy' : 'ally';
-  const allies = Game.tokens.filter((token) => token.alive && token.side === unit.side);
-  const enemies = Game.tokens.filter((token) => token.alive && token.side === enemySide);
-  const startIndex = Math.max(0, Math.floor(options.startIndex ?? 0));
-  for (let index = startIndex; index < Math.min(5, slots.length); index += 1) {
-      const slot = slots[index];
-      if (!slot || slot.enabled === false)
-          continue;
-      const threshold = Number.isFinite(slot.threshold) ? Number(slot.threshold) : 0;
-      let conditionOk = false;
-      switch (slot.condition) {
-          case 'self_hp_below': {
-              const hp = Number.isFinite(unit.hp) ? Number(unit.hp) : 0;
-              const hpMax = Math.max(1, Number.isFinite(unit.hpMax) ? Number(unit.hpMax) : 1);
-              conditionOk = (hp / hpMax) * 100 < threshold;
-              break;
+  function evaluateGambitLogic(Game, unit, options = {}) {
+      const progressMap = Game.runtime?.unitProgressById;
+      const profile = progressMap?.get(unit.id);
+      const slots = Array.isArray(profile?.gambit) ? profile.gambit : [];
+      const enemySide = unit.side === 'ally' ? 'enemy' : 'ally';
+      const allies = Game.tokens.filter((token) => token.alive && token.side === unit.side);
+      const enemies = Game.tokens.filter((token) => token.alive && token.side === enemySide);
+      const startIndex = Math.max(0, Math.floor(options.startIndex ?? 0));
+      for (let index = startIndex; index < Math.min(5, slots.length); index += 1) {
+          const slot = slots[index];
+          if (!slot || slot.enabled === false)
+              continue;
+          const threshold = Number.isFinite(slot.threshold) ? Number(slot.threshold) : 0;
+          let conditionOk = false;
+          switch (slot.condition) {
+              case 'self_hp_below': {
+                  const hp = Number.isFinite(unit.hp) ? Number(unit.hp) : 0;
+                  const hpMax = Math.max(1, Number.isFinite(unit.hpMax) ? Number(unit.hpMax) : 1);
+                  conditionOk = (hp / hpMax) * 100 < threshold;
+                  break;
+              }
+              case 'self_has_debuff':
+                  conditionOk = Array.isArray(unit.statuses) && unit.statuses.some((status) => status && status.kind === 'debuff');
+                  break;
+              case 'self_full_fury': {
+                  const fury = Number.isFinite(unit.fury) ? Number(unit.fury) : 0;
+                  const furyMax = Math.max(1, Number.isFinite(unit.furyMax) ? Number(unit.furyMax) : 100);
+                  conditionOk = fury >= furyMax;
+                  break;
+              }
+              case 'ally_lowest_hp':
+                  conditionOk = findLowestHpUnit(allies)?.iid === unit.iid;
+                  break;
+              case 'ally_controlled':
+                  conditionOk = allies.some((ally) => Array.isArray(ally.statuses)
+                      && ally.statuses.some((s) => s && (String(s.kind).toLowerCase() === 'control' || String(s.tag ?? '').toLowerCase().includes('stun'))));
+                  break;
+              case 'pool_aether_above':
+                  conditionOk = globalAetherPool.current(unit.side) > threshold;
+                  break;
+              case 'enemy_lowest_hp':
+                  conditionOk = Boolean(findLowestHpUnit(enemies));
+                  break;
+              case 'enemy_is_boss':
+                  conditionOk = enemies.some((enemy) => enemy.id === 'leaderB' || enemy.id === 'boss' || enemy.isBoss === true);
+                  break;
+              case 'enemy_role_is': {
+                  const role = (slot.targetRole ?? '').trim().toLowerCase();
+                  conditionOk = enemies.some((enemy) => {
+                      const className = String(Game.meta?.get(enemy.id)?.class ?? '').toLowerCase();
+                      return className === role;
+                  });
+                  break;
+              }
+              case 'enemy_has_shield':
+                  conditionOk = enemies.some((enemy) => Number(enemy.shield ?? 0) > 0);
+                  break;
+              case 'always':
+                  conditionOk = true;
+                  break;
+              default:
+                  conditionOk = false;
+                  break;
           }
-          case 'self_has_debuff':
-              conditionOk = Array.isArray(unit.statuses) && unit.statuses.some((status) => status && status.kind === 'debuff');
-              break;
-          case 'self_full_fury': {
-              const fury = Number.isFinite(unit.fury) ? Number(unit.fury) : 0;
-              const furyMax = Math.max(1, Number.isFinite(unit.furyMax) ? Number(unit.furyMax) : 100);
-              conditionOk = fury >= furyMax;
-              break;
-          }
-          case 'ally_lowest_hp':
-              conditionOk = findLowestHpUnit(allies)?.iid === unit.iid;
-              break;
-          case 'ally_controlled':
-              conditionOk = allies.some((ally) => Array.isArray(ally.statuses)
-                  && ally.statuses.some((s) => s && (String(s.kind).toLowerCase() === 'control' || String(s.tag ?? '').toLowerCase().includes('stun'))));
-              break;
-          case 'pool_aether_above':
-              conditionOk = globalAetherPool.current(unit.side) > threshold;
-              break;
-          case 'enemy_lowest_hp':
-              conditionOk = Boolean(findLowestHpUnit(enemies));
-              break;
-          case 'enemy_is_boss':
-              conditionOk = enemies.some((enemy) => enemy.id === 'leaderB' || enemy.id === 'boss' || enemy.isBoss === true);
-              break;
-          case 'enemy_role_is': {
-              const role = (slot.targetRole ?? '').trim().toLowerCase();
-              conditionOk = enemies.some((enemy) => {
-                  const className = String(Game.meta?.get(enemy.id)?.class ?? '').toLowerCase();
-                  return className === role;
-              });
-              break;
-          }
-          case 'enemy_has_shield':
-              conditionOk = enemies.some((enemy) => Number(enemy.shield ?? 0) > 0);
-              break;
-          case 'always':
-              conditionOk = true;
-              break;
-          default:
-              conditionOk = false;
-              break;
+          if (!conditionOk)
+              continue;
+          return {
+              action: slot.action,
+              slotIndex: index,
+              reason: 'matched',
+          };
       }
-      if (!conditionOk)
-          continue;
       return {
-          action: slot.action,
-          slotIndex: index,
-          reason: 'matched',
+          action: null,
+          slotIndex: -1,
+          reason: 'noMatch',
       };
   }
-  return {
-      action: null,
-      slotIndex: -1,
-      reason: 'noMatch',
-  };
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'refillDeckEnemy')) exports.refillDeckEnemy = refillDeckEnemy;
   if (!Object.prototype.hasOwnProperty.call(exports, 'queueEnemyAt')) exports.queueEnemyAt = queueEnemyAt;
   if (!Object.prototype.hasOwnProperty.call(exports, 'aiMaybeAct')) exports.aiMaybeAct = aiMaybeAct;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'evaluateGambitLogic')) exports.evaluateGambitLogic = evaluateGambitLogic;
 });
 __define('./app/shell.ts', (exports, module, __require) => {
   const DEFAULT_SCREEN = 'main-menu';
