@@ -878,6 +878,45 @@ __define('./ai.ts', (exports, module, __require) => {
       }
       return best;
   }
+  function evaluateGambitCondition(condition, Game, unit, slot, allies, enemies) {
+      const threshold = Number.isFinite(slot.threshold) ? Number(slot.threshold) : 0;
+      switch (condition) {
+          case 'self_hp_below': {
+              const hp = Number.isFinite(unit.hp) ? Number(unit.hp) : 0;
+              const hpMax = Math.max(1, Number.isFinite(unit.hpMax) ? Number(unit.hpMax) : 1);
+              return (hp / hpMax) * 100 < threshold;
+          }
+          case 'self_has_debuff':
+              return Array.isArray(unit.statuses)
+                  && unit.statuses.some((status) => status && status.kind === 'debuff');
+          case 'self_full_fury': {
+              const fury = Number.isFinite(unit.fury) ? Number(unit.fury) : 0;
+              const furyMax = Math.max(1, Number.isFinite(unit.furyMax) ? Number(unit.furyMax) : 100);
+              return fury >= furyMax;
+          }
+          case 'ally_lowest_hp':
+              return findLowestHpUnit(allies)?.iid === unit.iid;
+          case 'ally_controlled':
+              return allies.some((ally) => Array.isArray(ally.statuses)
+                  && ally.statuses.some((s) => s && (String(s.kind).toLowerCase() === 'control' || String(s.tag ?? '').toLowerCase().includes('stun'))));
+          case 'pool_aether_above':
+              return globalAetherPool.current(unit.side) > threshold;
+          case 'enemy_lowest_hp':
+              return Boolean(findLowestHpUnit(enemies));
+          case 'enemy_is_boss':
+              return enemies.some((enemy) => enemy.id === 'leaderB' || enemy.id === 'boss' || enemy.isBoss === true);
+          case 'enemy_role_is': {
+              const role = (slot.targetRole ?? '').trim().toLowerCase();
+              return enemies.some((enemy) => String(Game.meta?.get(enemy.id)?.class ?? '').toLowerCase() === role);
+          }
+          case 'enemy_has_shield':
+              return enemies.some((enemy) => Number(enemy.shield ?? 0) > 0);
+          case 'always':
+              return true;
+          default:
+              return false;
+      }
+  }
   function evaluateGambitLogic(Game, unit, options = {}) {
       const unitProgressMap = Game.runtime?.unitProgressById;
       const profile = unitProgressMap?.get(unit.id);
@@ -890,58 +929,7 @@ __define('./ai.ts', (exports, module, __require) => {
           const slot = slots[index];
           if (!slot || slot.enabled === false)
               continue;
-          const threshold = Number.isFinite(slot.threshold) ? Number(slot.threshold) : 0;
-          let conditionOk = false;
-          switch (slot.condition) {
-              case 'self_hp_below': {
-                  const hp = Number.isFinite(unit.hp) ? Number(unit.hp) : 0;
-                  const hpMax = Math.max(1, Number.isFinite(unit.hpMax) ? Number(unit.hpMax) : 1);
-                  conditionOk = (hp / hpMax) * 100 < threshold;
-                  break;
-              }
-              case 'self_has_debuff':
-                  conditionOk = Array.isArray(unit.statuses) && unit.statuses.some((status) => status && status.kind === 'debuff');
-                  break;
-              case 'self_full_fury': {
-                  const fury = Number.isFinite(unit.fury) ? Number(unit.fury) : 0;
-                  const furyMax = Math.max(1, Number.isFinite(unit.furyMax) ? Number(unit.furyMax) : 100);
-                  conditionOk = fury >= furyMax;
-                  break;
-              }
-              case 'ally_lowest_hp':
-                  conditionOk = findLowestHpUnit(allies)?.iid === unit.iid;
-                  break;
-              case 'ally_controlled':
-                  conditionOk = allies.some((ally) => Array.isArray(ally.statuses)
-                      && ally.statuses.some((s) => s && (String(s.kind).toLowerCase() === 'control' || String(s.tag ?? '').toLowerCase().includes('stun'))));
-                  break;
-              case 'pool_aether_above':
-                  conditionOk = globalAetherPool.current(unit.side) > threshold;
-                  break;
-              case 'enemy_lowest_hp':
-                  conditionOk = Boolean(findLowestHpUnit(enemies));
-                  break;
-              case 'enemy_is_boss':
-                  conditionOk = enemies.some((enemy) => enemy.id === 'leaderB' || enemy.id === 'boss' || enemy.isBoss === true);
-                  break;
-              case 'enemy_role_is': {
-                  const role = (slot.targetRole ?? '').trim().toLowerCase();
-                  conditionOk = enemies.some((enemy) => {
-                      const className = String(Game.meta?.get(enemy.id)?.class ?? '').toLowerCase();
-                      return className === role;
-                  });
-                  break;
-              }
-              case 'enemy_has_shield':
-                  conditionOk = enemies.some((enemy) => Number(enemy.shield ?? 0) > 0);
-                  break;
-              case 'always':
-                  conditionOk = true;
-                  break;
-              default:
-                  conditionOk = false;
-                  break;
-          }
+          const conditionOk = evaluateGambitCondition(slot.condition, Game, unit, slot, allies, enemies);
           if (!conditionOk)
               continue;
           return {
@@ -11092,7 +11080,7 @@ __define('./modes/pve/collection-mapper.ts', (exports, module, __require) => {
       'enemy_has_shield',
       'always',
   ]);
-  const GAMBITS_ACTIONS = new Set(['ult', 'skill1', 'skill2', 'skill3', 'basic']);
+  const GAMBITS_ACTIONS = new Set(['basic', 'ult', 'skill1', 'skill2', 'skill3']);
   const normalizeGambitSlots = (value) => {
       if (!Array.isArray(value))
           return undefined;
@@ -21843,11 +21831,11 @@ __define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
       { value: 'enemy_has_shield', label: 'Địch đang có Shield' },
   ];
   const ACTION_OPTIONS = [
+      { value: 'basic', label: 'Đánh thường' },
       { value: 'ult', label: 'Kỹ năng (ULT)' },
       { value: 'skill1', label: 'Kỹ năng 1' },
       { value: 'skill2', label: 'Kỹ năng 2' },
       { value: 'skill3', label: 'Kỹ năng 3' },
-      { value: 'basic', label: 'Đánh thường' },
   ];
   const CSS = `
   .app--sect-tactical-ai{padding:20px 16px 48px;}

@@ -2,11 +2,13 @@ import { ensureStyleTag, mountSection } from '../../ui/dom.ts';
 import { UNITS } from '../../units.ts';
 import { loadPlayerProfile, patchPlayerProfile } from '../../utils/player-profile.ts';
 import type { MainMenuShell } from '../main-menu/types.ts';
+import type { GambitActionType } from '../../types/pve.ts';
 
 const STYLE_ID = 'sect-tactical-ai-style-v1';
 const SLOT_COUNT = 5;
 
 type GambitOption = { value: string; label: string };
+type GambitActionOption = { value: GambitActionType; label: string };
 
 const CONDITION_OPTIONS: GambitOption[] = [
   { value: 'always', label: 'Luôn luôn' },
@@ -22,12 +24,12 @@ const CONDITION_OPTIONS: GambitOption[] = [
   { value: 'enemy_has_shield', label: 'Địch đang có Shield' },
 ];
 
-const ACTION_OPTIONS: GambitOption[] = [
+const ACTION_OPTIONS: GambitActionOption[] = [
+  { value: 'basic', label: 'Đánh thường' },
   { value: 'ult', label: 'Kỹ năng (ULT)' },
   { value: 'skill1', label: 'Kỹ năng 1' },
   { value: 'skill2', label: 'Kỹ năng 2' },
   { value: 'skill3', label: 'Kỹ năng 3' },
-  { value: 'basic', label: 'Đánh thường' },
 ];
 
 const CSS = `
