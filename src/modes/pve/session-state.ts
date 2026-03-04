@@ -94,21 +94,19 @@ interface BuildAiStateParams {
   defaultSummonLimit: number;
 }
 
+function normalizePositiveLimit(value: unknown, fallback: number): number {
+  if (Number.isFinite(value)) {
+    const numeric = Number(value);
+    if (numeric > 0) return numeric;
+  }
+  return fallback;
+}
+
 function buildAiState(params: BuildAiStateParams): SessionState['ai'] {
   const { preset, unitsAll, defaultCostCap, defaultSummonLimit } = params;
-  const costCapCandidate = preset?.costCap;
-  const summonLimitCandidate = preset?.summonLimit;
   const startingDeck = Array.isArray(preset?.startingDeck) ? preset.startingDeck : null;
-  const costCap = Number.isFinite(costCapCandidate)
-    ? Number(costCapCandidate)
-    : typeof costCapCandidate === 'number'
-      ? costCapCandidate
-      : defaultCostCap;
-  const summonLimit = Number.isFinite(summonLimitCandidate)
-    ? Number(summonLimitCandidate)
-    : typeof summonLimitCandidate === 'number'
-      ? summonLimitCandidate
-      : defaultSummonLimit;
+  const costCap = normalizePositiveLimit(preset?.costCap, defaultCostCap);
+  const summonLimit = normalizePositiveLimit(preset?.summonLimit, defaultSummonLimit);
   return {
     cost: 0,
     costCap,

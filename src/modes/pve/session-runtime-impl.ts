@@ -223,6 +223,11 @@ const parseFiniteNumber = (value: unknown): number | null => {
 };
 
 const toFiniteOrZero = (value: unknown): number => parseFiniteNumber(value) ?? 0;
+const toPositiveOrNull = (value: unknown): number | null => {
+  const parsed = parseFiniteNumber(value);
+  if (parsed === null) return null;
+  return parsed > 0 ? parsed : null;
+};
 
 const toStartConfigOverrides = (value: unknown): StartConfigOverrides => {
   if (!isPlainRecord(value)) return {};
@@ -3540,9 +3545,9 @@ function applyConfigToRunningGame(cfg: NormalizedSessionConfig): void {
       const enemyPool = normalizeDeckEntries(preset.unitsAll);
       if (enemyPool.length) game.ai.unitsAll = enemyPool;
     }
-    const parsedCostCap = parseFiniteNumber(preset.costCap);
+    const parsedCostCap = toPositiveOrNull(preset.costCap);
     if (parsedCostCap !== null) game.ai.costCap = parsedCostCap;
-    const parsedSummonLimit = parseFiniteNumber(preset.summonLimit);
+    const parsedSummonLimit = toPositiveOrNull(preset.summonLimit);t
     if (parsedSummonLimit !== null) game.ai.summonLimit = parsedSummonLimit;
   }
   if (sceneChanged){

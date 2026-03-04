@@ -432,7 +432,7 @@ export function doActionOrSkip(
 
   const ultCost = resolveUltCost(unit, CFG);
   const runUlt = (): boolean => {
-    if (!(meta && (unit.fury ?? 0) >= ultCost) || Statuses.blocks(unit, 'ult')) return false;
+    if ((unit.fury ?? 0) < ultCost || Statuses.blocks(unit, 'ult')) return false;
     let ultOk = false;
     try {
       performUlt!(unit);
@@ -499,7 +499,7 @@ export function doActionOrSkip(
     }
   }
 
-  if (meta && (unit.fury ?? 0) >= ultCost && !Statuses.blocks(unit, 'ult')){
+  if ((unit.fury ?? 0) >= ultCost && !Statuses.blocks(unit, 'ult')){
     runUlt();
     return resolution;
   }

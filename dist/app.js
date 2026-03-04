@@ -11453,6 +11453,12 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       return null;
   };
   const toFiniteOrZero = (value) => parseFiniteNumber(value) ?? 0;
+  const toPositiveOrNull = (value) => {
+      const parsed = parseFiniteNumber(value);
+      if (parsed === null)
+          return null;
+      return parsed > 0 ? parsed : null;
+  };
   const toStartConfigOverrides = (value) => {
       if (!isPlainRecord(value))
           return {};
@@ -14685,10 +14691,11 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               if (enemyPool.length)
                   game.ai.unitsAll = enemyPool;
           }
-          const parsedCostCap = parseFiniteNumber(preset.costCap);
+          const parsedCostCap = toPositiveOrNull(preset.costCap);
           if (parsedCostCap !== null)
               game.ai.costCap = parsedCostCap;
-          const parsedSummonLimit = parseFiniteNumber(preset.summonLimit);
+          const parsedSummonLimit = toPositiveOrNull(preset.summonLimit);
+          t;
           if (parsedSummonLimit !== null)
               game.ai.summonLimit = parsedSummonLimit;
       }
@@ -14998,21 +15005,19 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
           enemy: createSummonQueue(),
       };
   }
+  function normalizePositiveLimit(value, fallback) {
+      if (Number.isFinite(value)) {
+          const numeric = Number(value);
+          if (numeric > 0)
+              return numeric;
+      }
+      return fallback;
+  }
   function buildAiState(params) {
       const { preset, unitsAll, defaultCostCap, defaultSummonLimit } = params;
-      const costCapCandidate = preset?.costCap;
-      const summonLimitCandidate = preset?.summonLimit;
       const startingDeck = Array.isArray(preset?.startingDeck) ? preset.startingDeck : null;
-      const costCap = Number.isFinite(costCapCandidate)
-          ? Number(costCapCandidate)
-          : typeof costCapCandidate === 'number'
-              ? costCapCandidate
-              : defaultCostCap;
-      const summonLimit = Number.isFinite(summonLimitCandidate)
-          ? Number(summonLimitCandidate)
-          : typeof summonLimitCandidate === 'number'
-              ? summonLimitCandidate
-              : defaultSummonLimit;
+      const costCap = normalizePositiveLimit(preset?.costCap, defaultCostCap);
+      const summonLimit = normalizePositiveLimit(preset?.summonLimit, defaultSummonLimit);
       return {
           cost: 0,
           costCap,
@@ -24493,7 +24498,7 @@ __define('./turns.ts', (exports, module, __require) => {
       }
       const ultCost = resolveUltCost(unit, CFG);
       const runUlt = () => {
-          if (!(meta && (unit.fury ?? 0) >= ultCost) || Statuses.blocks(unit, 'ult'))
+          if ((unit.fury ?? 0) < ultCost || Statuses.blocks(unit, 'ult'))
               return false;
           let ultOk = false;
           try {
@@ -24560,7 +24565,7 @@ __define('./turns.ts', (exports, module, __require) => {
               continue;
           }
       }
-      if (meta && (unit.fury ?? 0) >= ultCost && !Statuses.blocks(unit, 'ult')) {
+      if ((unit.fury ?? 0) >= ultCost && !Statuses.blocks(unit, 'ult')) {
           runUlt();
           return resolution;
       }
