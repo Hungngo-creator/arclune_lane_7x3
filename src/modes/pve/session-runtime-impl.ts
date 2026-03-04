@@ -706,6 +706,22 @@ let running = false;
 let leaderEndCheckFlags: { ally: boolean; enemy: boolean } = { ally: false, enemy: false };
 const hpBarGradientCache = new Map<string, GradientValue>();
 const meleeOffsetTokenKeys = new Set<string>();
+type StatusIconEntry = {
+  path: string;
+  image: HTMLImageElement | null;
+  status: 'idle' | 'loading' | 'ready' | 'error';
+};
+const STATUS_ICON_PATHS: Record<string, string> = {
+  blind: 'assets/blind.svg',
+  dmgCut: 'assets/damageCut.svg',
+  exalt: 'assets/exalt.svg',
+  weaken: 'assets/weaken.svg',
+  reflect: 'assets/reflect.svg',
+  haste: 'assets/haste.svg',
+  silence: 'assets/silence.svg',
+  pierce: 'assets/pierce.svg',
+};
+const statusIconCache = new Map<string, StatusIconEntry>();
 
 type RequestAnimationFrameFn = (callback: FrameRequestCallback) => number;
 type CancelAnimationFrameFn = (handle: number) => void;
@@ -2915,8 +2931,54 @@ function getShieldRatio(unit: UnitToken): number {
   return Math.max(0, Math.min(1, shieldAmount / hpMax));
 }
 
+function ensureStatusIconLoaded(statusId: string): StatusIconEntry | null {
+  const iconPath = STATUS_ICON_PATHS[statusId];
+  if (!iconPath || typeof Image === 'undefined') return null;
+  let cache = statusIconCache.get(statusId);
+  if (!cache) {
+    cache = {
+      path: iconPath,
+      image: null,
+      status: 'idle',
+    };
+    statusIconCache.set(statusId, cache);
+  }
+  if (cache.status !== 'idle') return cache;
+  const image = new Image();
+  cache.image = image;
+  cache.status = 'loading';
+  if ('decoding' in image) {
+    (image as HTMLImageElement & { decoding?: string }).decoding = 'async';
+  }
+  image.onload = () => {
+    cache!.status = 'ready';
+  };
+  image.onerror = () => {
+    cache!.status = 'error';
+  };
+  image.src = iconPath;
+  return cache;
+}
+
+function collectStatusIcons(unit: UnitToken): StatusIconEntry[] {
+  const statuses = Array.isArray(unit.statuses) ? unit.statuses : [];
+  if (!statuses.length) return [];
+  const icons: StatusIconEntry[] = [];
+  const seen = new Set<string>();
+  for (const status of statuses) {
+    const statusId = typeof status?.id === 'string' ? status.id : null;
+    if (!statusId || seen.has(statusId)) continue;
+    const icon = ensureStatusIconLoaded(statusId);
+    if (!icon || icon.status !== 'ready' || !icon.image) continue;
+    seen.add(statusId);
+    icons.push(icon);
+  }
+  return icons;
+}
+
 function drawHPBars(): void {
   if (!ctx || !Game?.grid) return;
+  const drawCtx = ctx;
   const baseR = Math.floor(Game.grid.tile * 0.36);
   const tokens = Game.tokens || [];
   const activeAttackKeys = collectActiveAttackTokenKeys();
@@ -2946,6 +3008,14 @@ function drawHPBars(): void {
     const headY = p.y - spriteHeight * anchor;
     const hpY = Math.round(headY - Math.max(6, Math.floor(r * 0.34)) - barHeight);
     const hpX = Math.round(p.x - barWidth / 2);
+    const statusIcons = collectStatusIcons(t);
+    const statusIconSize = Math.max(2, Math.floor(barHeight * 0.9));
+    const statusIconGap = Math.max(1, Math.floor(statusIconSize * 0.2));
+    const statusRowWidth = statusIcons.length > 0
+      ? (statusIcons.length * statusIconSize) + ((statusIcons.length - 1) * statusIconGap)
+      : 0;
+    const statusY = hpY - statusIconSize - 2;
+    const statusStartX = Math.round(hpX + (barWidth - statusRowWidth) / 2);
 
     const hpRatio = Math.max(0, Math.min(1, (t.hp || 0) / (t.hpMax || 1)));
     const shieldRatio = getShieldRatio(t);
@@ -2955,17 +3025,17 @@ function drawHPBars(): void {
     const borderColor = art?.hpBar?.border || 'rgba(0,0,0,0.62)';
     const radius = Math.max(2, Math.floor(barHeight / 2));
 
-    ctx.save();
-    ctx.shadowColor = 'transparent';
-    ctx.shadowBlur = 0;
+    drawCtx.save();
+    drawCtx.shadowColor = 'transparent';
+    drawCtx.shadowBlur = 0;
 
-    roundedRectPathUI(ctx, hpX, hpY, barWidth, barHeight, radius);
-    ctx.fillStyle = bgColor;
-    ctx.fill();
+    roundedRectPathUI(drawCtx, hpX, hpY, barWidth, barHeight, radius);
+    drawCtx.fillStyle = bgColor;
+    drawCtx.fill();
     if (borderColor && borderColor !== 'none'){
-      ctx.strokeStyle = borderColor;
-      ctx.lineWidth = 1;
-      ctx.stroke();
+      drawCtx.strokeStyle = borderColor;
+      drawCtx.lineWidth = 1;
+      drawCtx.stroke();
     }
 
     const inset = 1;
@@ -2975,36 +3045,43 @@ function drawHPBars(): void {
     const filledWidth = Math.round(innerWidth * hpRatio);
     if (filledWidth > 0){
       const fillStyle = ensureHpBarGradient(fillColor, innerHeight, innerRadius, hpY + inset, hpX + inset);
-      ctx.save();
-      ctx.translate(hpX + inset, hpY + inset);
-      roundedRectPathUI(ctx, 0, 0, filledWidth, innerHeight, innerRadius);
-      ctx.fillStyle = fillStyle;
-      ctx.fill();
-      ctx.restore();
+      drawCtx.save();
+      drawCtx.translate(hpX + inset, hpY + inset);
+      roundedRectPathUI(drawCtx, 0, 0, filledWidth, innerHeight, innerRadius);
+      drawCtx.fillStyle = fillStyle;
+      drawCtx.fill();
+      drawCtx.restore();
     }
 
     if (shieldRatio > 0){
       const dimWidth = Math.max(1, Math.round(innerWidth * shieldRatio));
-      ctx.save();
-      ctx.beginPath();
-      roundedRectPathUI(ctx, hpX + inset, hpY + inset, dimWidth, innerHeight, innerRadius);
-      ctx.fillStyle = 'rgba(190, 210, 205, 0.32)';
-      ctx.fill();
-      ctx.restore();
+      drawCtx.save();
+      drawCtx.beginPath();
+      roundedRectPathUI(drawCtx, hpX + inset, hpY + inset, dimWidth, innerHeight, innerRadius);
+      drawCtx.fillStyle = 'rgba(190, 210, 205, 0.32)';
+      drawCtx.fill();
+      drawCtx.restore();
+    }
+
+    if (statusIcons.length > 0){
+      statusIcons.forEach((icon, index) => {
+        const iconX = statusStartX + index * (statusIconSize + statusIconGap);
+        drawCtx.drawImage(icon.image as CanvasImageSource, iconX, statusY, statusIconSize, statusIconSize);
+      });
     }
 
     const ticks = 10;
-    ctx.save();
-    ctx.strokeStyle = 'rgba(0,0,0,0.45)';
-    ctx.lineWidth = 1;
+    drawCtx.save();
+    drawCtx.strokeStyle = 'rgba(0,0,0,0.45)';
+    drawCtx.lineWidth = 1;
     for (let i = 1; i < ticks; i += 1){
       const tx = hpX + inset + Math.round((innerWidth * i) / ticks) + 0.5;
-      ctx.beginPath();
-      ctx.moveTo(tx, hpY + inset + 0.5);
-      ctx.lineTo(tx, hpY + inset + innerHeight - 0.5);
-      ctx.stroke();
+      drawCtx.beginPath();
+      drawCtx.moveTo(tx, hpY + inset + 0.5);
+      drawCtx.lineTo(tx, hpY + inset + innerHeight - 0.5);
+      drawCtx.stroke();
     }
-    ctx.restore();
+    drawCtx.restore();
 
     const furyMax = Math.max(1, parseFiniteNumber(t.furyMax) ?? 100);
     const furyNow = Math.max(0, parseFiniteNumber(t.fury) ?? parseFiniteNumber(t.rage) ?? 0);
@@ -3013,17 +3090,17 @@ function drawHPBars(): void {
     const rageY = hpY + barHeight + 2;
     const rageRadius = Math.max(1, Math.floor(rageHeight / 2));
 
-    roundedRectPathUI(ctx, hpX, rageY, barWidth, rageHeight, rageRadius);
-    ctx.fillStyle = 'rgba(9,14,21,0.72)';
-    ctx.fill();
+    roundedRectPathUI(drawCtx, hpX, rageY, barWidth, rageHeight, rageRadius);
+    drawCtx.fillStyle = 'rgba(9,14,21,0.72)';
+    drawCtx.fill();
     const rageFilledWidth = Math.round((barWidth - 2) * furyRatio);
     if (rageFilledWidth > 0){
-      roundedRectPathUI(ctx, hpX + 1, rageY + 1, rageFilledWidth, Math.max(1, rageHeight - 2), Math.max(1, rageRadius - 1));
-      ctx.fillStyle = '#7b5cff';
-      ctx.fill();
+      roundedRectPathUI(drawCtx, hpX + 1, rageY + 1, rageFilledWidth, Math.max(1, rageHeight - 2), Math.max(1, rageRadius - 1));
+      drawCtx.fillStyle = '#7b5cff';
+      drawCtx.fill();
     }
 
-    ctx.restore();
+    drawCtx.restore();
   }
 }
 /* ---------- Chạy ---------- */
