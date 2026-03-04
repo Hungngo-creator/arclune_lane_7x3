@@ -58,6 +58,19 @@ const sortByBoardOrder = (tokens: UnitToken[]): UnitToken[] => (
   [...tokens].sort((a, b) => (a.cy - b.cy) || (a.cx - b.cx))
 );
 
+const readTurns = (payload: Record<string, unknown> | null, ...keys: string[]): number => {
+  for (const key of keys){
+    const raw = (payload?.[key] ?? null) as unknown;
+    const direct = asFinite(raw, NaN);
+    if (Number.isFinite(direct) && direct > 0) return Math.max(1, Math.round(direct));
+    if (raw && typeof raw === 'object'){
+      const nestedTurns = asFinite((raw as Record<string, unknown>).turns, NaN);
+      if (Number.isFinite(nestedTurns) && nestedTurns > 0) return Math.max(1, Math.round(nestedTurns));
+    }
+  }
+  return 1;
+};
+
 const addStatus = (target: UnitToken, id: string, turns: number): void => {
   Statuses.add(target, {
     id,
@@ -124,7 +137,7 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
   aoe: (ctx, result) => {
     if (!ctx.game || !ctx.attacker) return;
     const foeSide = ctx.attacker.side === 'ally' ? 'enemy' : 'ally';
-    result.targets = ctx.game.tokens.filter((token) => token.alive && token.side === foeSide);
+    result.targets = sortByBoardOrder(ctx.game.tokens.filter((token) => token.alive && token.side === foeSide));
   },
   heal: (ctx, result) => {
     const amount = Math.max(0, Math.round(asFinite(ctx.payload?.healAmount ?? ctx.payload?.heal, 0)));
@@ -150,22 +163,22 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
     result.sideEffects.push(`shield:${amount}`);
   },
   silence: (ctx, result) => {
-    const turns = Math.max(1, Math.round(asFinite(ctx.payload?.silenceTurns ?? ctx.payload?.turns, 1)));
+    const turns = readTurns(ctx.payload, 'silenceTurns', 'turns', 'duration');
     for (const token of result.targets) addStatus(token, 'silence', turns);
     if (result.targets.length > 0) result.sideEffects.push(`silence:${turns}`);
   },
   sleep: (ctx, result) => {
-    const turns = Math.max(1, Math.round(asFinite(ctx.payload?.sleepTurns ?? ctx.payload?.turns, 1)));
+    const turns = readTurns(ctx.payload, 'sleepTurns', 'turns', 'duration');
     for (const token of result.targets) addStatus(token, 'sleep', turns);
     if (result.targets.length > 0) result.sideEffects.push(`sleep:${turns}`);
   },
   mark: (ctx, result) => {
-    const turns = Math.max(1, Math.round(asFinite(ctx.payload?.markTurns ?? ctx.payload?.turns, 2)));
+    const turns = readTurns(ctx.payload, 'markTurns', 'turns', 'duration');
     for (const token of result.targets) addStatus(token, 'mark', turns);
     if (result.targets.length > 0) result.sideEffects.push(`mark:${turns}`);
   },
   control: (ctx, result) => {
-    const turns = Math.max(1, Math.round(asFinite(ctx.payload?.controlTurns ?? ctx.payload?.turns, 1)));
+    const turns = readTurns(ctx.payload, 'controlTurns', 'turns', 'duration');
     const statusId = String(ctx.payload?.controlStatus ?? 'control');
     for (const token of result.targets) addStatus(token, statusId, turns);
     if (result.targets.length > 0) result.sideEffects.push(`${statusId}:${turns}`);

@@ -25,6 +25,7 @@ export async function loadTurnsHarness(overrides = {}){
     ["import { Statuses } from './statuses.ts';", "const { Statuses } = __deps['./statuses.ts'];"],
     ["import { Statuses } from './statuses.js';", "const { Statuses } = __deps['./statuses.ts'];"],
     ["import { doBasicWithFollowups } from './combat.ts';", "const { doBasicWithFollowups } = __deps['./combat.js'];"],
+    ["import { performActiveSkill } from './combat/perform-active-skill.ts';", "const { performActiveSkill } = __deps['./combat/perform-active-skill.ts'];"],
     ["import { CFG } from './config.ts';", "const { CFG } = __deps['./config.ts'];"],
     ["import { makeInstanceStats, initialRageFor } from './meta.ts';", "const { makeInstanceStats, initialRageFor } = __deps['./meta.ts'];"],
     ["import { vfxAddSpawn, vfxAddBloodPulse } from './vfx.ts';", "const { vfxAddSpawn, vfxAddBloodPulse } = __deps['./vfx.ts'];"],
@@ -90,6 +91,9 @@ export async function loadTurnsHarness(overrides = {}){
     './combat.js': {
       doBasicWithFollowups(){ }
     },
+    './combat/perform-active-skill.ts': {
+      performActiveSkill(){ return { ok: false, appliedTags: [], targetCount: 0 }; }
+    },
     './aether.ts': {
       globalAetherPool: {
         gain(){},
@@ -101,6 +105,12 @@ export async function loadTurnsHarness(overrides = {}){
     './ai.ts': {
       evaluateGambitLogic(){ return { action: null, slotIndex: -1, reason: 'noMatch' }; }
     },
+    './modes/pve/collection-mapper.ts': {
+      resolveRuntimeUnitStats(){ return {}; }
+    },
+    './cultivation.ts': {
+      applyCultivationBonus(stats){ return stats; }
+    },
     './config.ts': {
       CFG: {
         fury: { turn: { startGain: 0 } },
@@ -110,6 +120,11 @@ export async function loadTurnsHarness(overrides = {}){
     './meta.ts': {
       makeInstanceStats(){ return {}; },
       initialRageFor(){ return 0; }
+    },
+    './vfx.ts': {
+      vfxAddSpawn(){ },
+      vfxAddBloodPulse(){ },
+      asSessionWithVfx(){ return null; }
     },
     './vfx.js': {
       vfxAddSpawn(){ },
@@ -121,7 +136,8 @@ export async function loadTurnsHarness(overrides = {}){
     './passives.ts': {
       emitPassiveEvent(){ },
       applyOnSpawnEffects(){ },
-      prepareUnitForPassives(){ }
+      prepareUnitForPassives(){ },
+      getPassiveLog(){ return []; }
     },
     './events.ts': {
       emitGameEvent(type, detail){
@@ -151,6 +167,14 @@ export async function loadTurnsHarness(overrides = {}){
   const deps = { ...defaultDeps, ...overrides };
   deps['../engine.js'] = deps['../engine.js'] || deps['./engine.js'];
   deps['../statuses.ts'] = deps['../statuses.ts'] || deps['./statuses.ts'];
+  deps['../vfx.ts'] = deps['../vfx.ts'] || deps['./vfx.ts'] || deps['./vfx.js'];
+  deps['../passives.ts'] = deps['../passives.ts'] || deps['./passives.ts'];
+  deps['../events.ts'] = deps['../events.ts'] || deps['./events.ts'];
+  deps['../meta.ts'] = deps['../meta.ts'] || deps['./meta.ts'];
+  deps['../modes/pve/collection-mapper.ts'] = deps['../modes/pve/collection-mapper.ts'] || deps['./modes/pve/collection-mapper.ts'];
+  deps['../cultivation.ts'] = deps['../cultivation.ts'] || deps['./cultivation.ts'];
+  deps['../ai.ts'] = deps['../ai.ts'] || deps['./ai.ts'];
+  deps['../combat/perform-active-skill.ts'] = deps['../combat/perform-active-skill.ts'] || deps['./combat/perform-active-skill.ts'];
 
   const interleavedKey = './turns/interleaved.js';
   const interleavedAltKey = '../turns/interleaved.js';

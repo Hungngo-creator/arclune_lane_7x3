@@ -1,8 +1,9 @@
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it, jest } from '@jest/globals';
 
 import { dispatchGameplayTags } from '../src/combat/tag-dispatch.ts';
 import { performActiveSkill } from '../src/combat/perform-active-skill.ts';
 import { normalizeTagList } from '../src/data/tags.ts';
+import { globalAetherPool } from '../src/aether.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';
@@ -77,6 +78,7 @@ describe('skill runtime tag contract', () => {
   });
 
   it('resolves skill1..3 from skillSets and performs active damage path', () => {
+    const consumeSpy = jest.spyOn(globalAetherPool, 'consume').mockReturnValue(true);
     const caster = makeToken({ id: 'mong_yem', side: 'ally', cx: 0, cy: 0 });
     const enemy = makeToken({ id: 'enemy', side: 'enemy', iid: 5, cx: 1, cy: 1, hp: 200, hpMax: 200 });
     const game = makeGame([caster, enemy]);
@@ -84,6 +86,8 @@ describe('skill runtime tag contract', () => {
     const one = performActiveSkill(game, caster, 'skill1');
     const two = performActiveSkill(game, caster, 'skill2');
     const three = performActiveSkill(game, caster, 'skill3');
+
+consumeSpy.mockRestore();
 
     expect(one.ok).toBe(true);
     expect(two.ok).toBe(true);

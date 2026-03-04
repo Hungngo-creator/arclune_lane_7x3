@@ -22,8 +22,9 @@ const skillsConfig = [
         name: 'Huyễn Ảnh Che Màn',
         type: 'active',
         cost: { aether: 30 },
-        tags: ['self-buff', 'defense'],
+        tags: ['self', 'shield', 'aether-cost', 'active'],
         duration: { turns: 3 },
+        shieldAmount: 20,
         buffs: [{ effect: 'evasion-single-target', amount: 0.50 }],
         description: 'Trong 3 lượt giảm 50% tỉ lệ bị đánh trúng từ đòn đánh thường đơn mục tiêu; không né được kỹ năng/AOE.'
       },
@@ -32,9 +33,10 @@ const skillsConfig = [
         name: 'Thụy Ca Tự Miên',
         type: 'active',
         cost: { aether: 30 },
-        tags: ['sleep', 'support', 'defense'],
+        tags: ['single-target', 'sleep', 'aether-cost', 'active'],
         buffs: [{ effect: 'damageTaken', amount: -0.50 }],
         growth: { stats: { ATK: 0.07, WIL: 0.07 }, cadence: 'per-sleep-turn', stackLimit: null },
+        sleepTurns: 1,
         wakeRules: { hpThreshold: 0.35, manualTapCount: 2, manualTiming: 'enemy-turn-or-own-turn-start' },
         description: 'Tự ngủ (skip turn), giảm 50% sát thương nhận vào. Mỗi lượt ngủ tăng vĩnh viễn +7% ATK/WIL cho đến khi thức dậy do HP ≤ 35% hoặc người chơi chạm 2 lần.'
       },
@@ -43,9 +45,11 @@ const skillsConfig = [
         name: 'Phá Mộng Tàn Ca',
         type: 'active',
         cost: { aether: 25 },
-        tags: ['single-target', 'mark', 'control'],
+        tags: ['single-target', 'silence', 'mark', 'aether-cost', 'active'],
         damage: { multiplier: 1.8, bonusPerMark: 0.2, maxMarks: 3, maxMultiplier: 2.4 },
         piercePercent: { arm: 0.30, res: 0.30, whenTargetAsleep: true },
+        silenceTurns: 1,
+        markTurns: 2,
         spreadDebuff: { id: 'me_hoac', consumeFromTarget: 1, toRandomTargets: 2, maxStacksPerTarget: 3 },
         description: 'Gây 180% sát thương hỗn hợp, tăng thêm 20% mỗi stack Mê Hoặc (tối đa 240%). Khi mục tiêu đang ngủ/đủ 3 stack, đòn đánh bỏ qua 30% ARM/RES và lan 1 stack Mê Hoặc sang tối đa 2 địch ngẫu nhiên.'
       }
@@ -84,6 +88,9 @@ const skillsConfig = [
         name: 'Liên Ảnh Hồi Tức',
         type: 'active',
         cost: { aether: 30 },
+        tags: ['ally', 'heal', 'aether-cost', 'active'],
+        healAmount: 18,
+        turns: 1,
         heals: { selfPercentMaxHP: 0.06, clonePercentMaxHP: 0.04 },
         description: 'Hồi phục 10% Max HP chia làm hai phần: bản thể nhận 6%, clone nhận 4%. Nếu không có clone, chỉ hồi cho bản thể.'
       },
@@ -92,6 +99,8 @@ const skillsConfig = [
         name: 'Cộng Lực Ảnh Thân',
         type: 'active',
         cost: { aether: 25 },
+        tags: ['ally', 'shield', 'aether-cost', 'active'],
+        shieldAmount: 22,
         duration: { turns: 3 },
         buffs: [{ stats: { ATK: 0.10, WIL: 0.10 }, targets: 'self+clone' }],
         description: 'Tăng 10% ATK/WIL cho bản thể và clone trong 3 lượt. Tái kích hoạt chỉ làm mới thời gian.'
@@ -101,6 +110,7 @@ const skillsConfig = [
         name: 'Quy Nhất Bản Ảnh',
         type: 'active',
         cost: { aether: 40 },
+        tags: ['aoe', 'aether-cost', 'active'],
         cooldown: 3,
         requirements: { adjacentClone: true },
         shields: [{ percentMaxHP: 0.50, duration: { turns: 3 } }],
@@ -111,7 +121,7 @@ const skillsConfig = [
     ult: {
       name: 'Thứ Hai Chân Thân',
       type: 'ultimate',
-      tags: ['summon', 'clone'],
+      tags: ['aoe', 'mark'],
       hpTrade: { percentCurrentHP: 0.50 },
       summon: {
         id: 'chan_nga_clone',
@@ -167,7 +177,7 @@ const skillsConfig = [
         type: 'active',
         cost: { aether: 25 },
         hits: 2,
-        tags: ['basic-attack', 'splash'],
+        tags: ['aoe', 'mark', 'aether-cost', 'active'],
         targets: 'markPriority',
         splash: { ratio: 0.70, maxTargets: 2 },
         description: 'Lao đến kẻ địch có Ma Chủng gần nhất và tung hai chưởng liên tiếp, mỗi hit 100% sát thương đòn đánh thường và lan 70% sang tối đa hai kẻ địch lân cận.'
@@ -208,6 +218,8 @@ const skillsConfig = [
         name: 'U Trào Tụ Lực',
         type: 'active',
         cost: { aether: 25 },
+        tags: ['self', 'shield', 'aether-cost', 'active'],
+        shieldAmount: 16,
         duration: { turns: 3 },
         buffs: [{ stats: { ATK: 0.15, WIL: 0.15 }, stackLimit: 3 }],
         description: 'Tăng 15% ATK/WIL trong 3 lượt. Có thể cộng dồn tối đa 3 tầng.'
@@ -217,6 +229,8 @@ const skillsConfig = [
         name: 'Huyết Tế Cuồng Khí',
         type: 'active',
         cost: { aether: 15 },
+        tags: ['self', 'heal', 'aether-cost', 'active'],
+        healAmount: 24,
         hpTrade: { percentCurrentHP: 0.30, lethal: false },
         duration: { turns: 3 },
         buffs: [{ stats: { ATK: 0.25, WIL: 0.25 }, stackLimit: 2 }],

@@ -5,6 +5,7 @@ import { slotToCell, slotIndex } from './engine.ts';
 import { Statuses } from './statuses.ts';
 
 import { doBasicWithFollowups } from './combat.ts';
+import { performActiveSkill } from './combat/perform-active-skill.ts';
 import { CFG } from './config.ts';
 import { initialRageFor } from './meta.ts';
 import { vfxAddSpawn, vfxAddBloodPulse, asSessionWithVfx } from './vfx.ts';
@@ -56,19 +57,6 @@ const tokensAlive = (Game: SessionState): UnitToken[] =>
   Game.tokens.filter((t): t is UnitToken => t.alive);
 
 const GAMBIT_SKILL_ACTIONS: GambitActionType[] = ['skill1', 'skill2', 'skill3'];
-
-function readSkillAetherCost(meta: Record<string, unknown> | null | undefined, action: GambitActionType): number | null {
-  if (!GAMBIT_SKILL_ACTIONS.includes(action)) return null;
-  const skills = Array.isArray(meta?.skills) ? meta.skills : [];
-  const skill = skills.find((entry) => entry && typeof entry === 'object' && (entry as { key?: unknown }).key === action) as
-    | { cost?: { aether?: unknown } }
-    | undefined;
-  if (!skill || typeof skill !== 'object') return null;
-  const aetherRaw = skill.cost?.aether;
-  const aetherCost = Number(aetherRaw);
-  if (!Number.isFinite(aetherCost) || aetherCost < 0) return null;
-  return aetherCost;
-}
 
 function grantActionAether(Game: SessionState, unit: UnitToken | null | undefined, acted: boolean): number {
   if (!unit || !unit.alive || !acted) return 0;
@@ -491,25 +479,19 @@ export function doActionOrSkip(
     if (decision.action === 'basic') {
       break;
     }
- 
-    const skillCost = readSkillAetherCost(meta as Record<string, unknown> | null | undefined, decision.action);
-    if (skillCost == null) {
-      continue;
-    }
-    if (!globalAetherPool.consume(unit.side, skillCost)) {
-      continue;
-    }
 
     try {
-      const cap = typeof meta?.followupCap === 'number' ? (meta.followupCap | 0) : (CFG.FOLLOWUP_CAP_DEFAULT | 0);
-      doBasicWithFollowups(Game, unit, cap);
+      const cast = performActiveSkill(Game, unit, decision.action);
+      if (!cast.ok) {
+        continue;
+      }
       emitPassiveEvent(Game, unit, 'onActionEnd', { log: getPassiveLog(Game) });
       Statuses.onTurnEnd(unit, {});
       ensureBusyReset();
       resolution.acted = true;
       resolution.skipped = false;
       resolution.reason = null;
-      finishAction({ action: decision.action });
+      finishAction({ action: decision.action, skillOk: cast.ok, skillTargets: cast.targetCount, skillTags: cast.appliedTags });
       return resolution;
     } catch (err) {
       console.error('[doActionOrSkip.skill]', err);

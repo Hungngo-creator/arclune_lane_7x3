@@ -1,10 +1,10 @@
-import { dealAbilityDamage, healUnit, grantShield, pickTarget } from '../combat.ts';
+import { dealAbilityDamage, pickTarget } from '../combat.ts';
 import { dispatchGameplayTags } from './tag-dispatch.ts';
 import { skillSets } from '../data/skills.ts';
 import { normalizeTagList } from '../data/tags.ts';
-import { Statuses } from '../statuses.ts';
 import { enqueueImmediate } from '../summon.ts';
 import { cellReserved, slotToCell } from '../engine.ts';
+import { globalAetherPool } from '../aether.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { SkillSection } from '@shared-types/config';
@@ -19,6 +19,7 @@ export interface PerformActiveSkillResult {
   tags: string[];
   appliedTags: string[];
   targetCount: number;
+  reason?: 'missing-skill' | 'insufficient-aether' | 'blocked';
 }
 
 function resolveActiveSkill(caster: UnitToken, skillKey: ActiveSkillKey): SkillSection | null {
@@ -46,17 +47,29 @@ function firstOpenSlot(game: SessionState, side: UnitToken['side']): number | nu
 export function performActiveSkill(game: SessionState, caster: UnitToken, skillKey: ActiveSkillKey): PerformActiveSkillResult {
   const skill = resolveActiveSkill(caster, skillKey);
   if (!skill) {
-    return { ok: false, skillKey, skill: null, tags: [], appliedTags: [], targetCount: 0 };
+    return { ok: false, skillKey, skill: null, tags: [], appliedTags: [], targetCount: 0, reason: 'missing-skill' };
   }
 
   const tags = normalizeTagList(skill.tags ?? []);
+  const skillCost = Math.max(0, Math.round(readNumberish(skill.cost?.aether, 0)));
+  let consumedAether = skillCost <= 0;
+
   const dispatch = dispatchGameplayTags(tags, {
     game,
     attacker: caster,
     target: pickTarget(game, caster),
     side: caster.side,
-    cost: readNumberish(skill.cost?.aether, 0),
+    cost: skillCost,
     payload: skill,
+    onAetherCost: (amount, side) => {
+      if (amount <= 0) {
+        consumedAether = true;
+        return true;
+      }
+      const ok = globalAetherPool.consume(side, amount);
+      consumedAether = ok;
+      return ok;
+    },
     onSummon: () => {
       const openSlot = firstOpenSlot(game, caster.side);
       if (!openSlot) return;
@@ -75,6 +88,18 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     },
   });
 
+if (skillCost > 0 && tags.includes('aether-cost') && !consumedAether) {
+    return {
+      ok: false,
+      skillKey,
+      skill,
+      tags,
+      appliedTags: dispatch.applied,
+      targetCount: dispatch.targets.length,
+      reason: 'insufficient-aether',
+    };
+  }
+
   const targets = dispatch.targets.length > 0 ? dispatch.targets : (dispatch.targets.length === 0 && caster.alive ? [caster] : []);
 
   if (tags.includes('single-target') || tags.includes('multi-target') || tags.includes('aoe') || skill.damage) {
@@ -83,29 +108,6 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     for (const target of targets) {
       if (target.side === caster.side) continue;
       dealAbilityDamage(game, caster, target, { base, attackType: 'skill' });
-    }
-  }
-
-  if (tags.includes('heal')) {
-    const amount = Math.max(0, Math.round(readNumberish((skill as Record<string, unknown>).healAmount ?? (skill as Record<string, unknown>).heal, 0)));
-    if (amount > 0) {
-      for (const target of targets) healUnit(target, amount);
-    }
-  }
-
-  if (tags.includes('shield')) {
-    const amount = Math.max(0, Math.round(readNumberish((skill as Record<string, unknown>).shieldAmount ?? (skill as Record<string, unknown>).shield, 0)));
-    if (amount > 0) {
-      for (const target of targets) grantShield(target, amount);
-    }
-  }
-
-  if (tags.includes('silence') || tags.includes('sleep') || tags.includes('mark')) {
-    const turns = Math.max(1, Math.round(readNumberish((skill as Record<string, unknown>).turns ?? 1, 1)));
-    for (const target of targets) {
-      if (tags.includes('silence')) Statuses.add(target, { id: 'silence', kind: 'debuff', tag: 'silence', dur: turns, tick: 'turn' });
-      if (tags.includes('sleep')) Statuses.add(target, { id: 'sleep', kind: 'debuff', tag: 'sleep', dur: turns, tick: 'turn' });
-      if (tags.includes('mark')) Statuses.add(target, { id: 'mark', kind: 'debuff', tag: 'mark', dur: turns, tick: 'turn' });
     }
   }
 

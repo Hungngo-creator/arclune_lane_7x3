@@ -4427,8 +4427,6 @@ __define('./combat/apply-damage.ts', (exports, module, __require) => {
 __define('./combat/perform-active-skill.ts', (exports, module, __require) => {
   const __dep0 = __require('./combat.ts');
   const dealAbilityDamage = __dep0.dealAbilityDamage;
-  const healUnit = __dep0.healUnit;
-  const grantShield = __dep0.grantShield;
   const pickTarget = __dep0.pickTarget;
   const __dep1 = __require('./combat/tag-dispatch.ts');
   const dispatchGameplayTags = __dep1.dispatchGameplayTags;
@@ -4436,13 +4434,13 @@ __define('./combat/perform-active-skill.ts', (exports, module, __require) => {
   const skillSets = __dep2.skillSets;
   const __dep3 = __require('./data/tags.ts');
   const normalizeTagList = __dep3.normalizeTagList;
-  const __dep4 = __require('./statuses.ts');
-  const Statuses = __dep4.Statuses;
-  const __dep5 = __require('./summon.ts');
-  const enqueueImmediate = __dep5.enqueueImmediate;
-  const __dep6 = __require('./engine.ts');
-  const cellReserved = __dep6.cellReserved;
-  const slotToCell = __dep6.slotToCell;
+  const __dep4 = __require('./summon.ts');
+  const enqueueImmediate = __dep4.enqueueImmediate;
+  const __dep5 = __require('./engine.ts');
+  const cellReserved = __dep5.cellReserved;
+  const slotToCell = __dep5.slotToCell;
+  const __dep6 = __require('./aether.ts');
+  const globalAetherPool = __dep6.globalAetherPool;
   function resolveActiveSkill(caster, skillKey) {
       const set = skillSets[caster.id];
       if (!set)
@@ -4468,16 +4466,27 @@ __define('./combat/perform-active-skill.ts', (exports, module, __require) => {
   function performActiveSkill(game, caster, skillKey) {
       const skill = resolveActiveSkill(caster, skillKey);
       if (!skill) {
-          return { ok: false, skillKey, skill: null, tags: [], appliedTags: [], targetCount: 0 };
+          return { ok: false, skillKey, skill: null, tags: [], appliedTags: [], targetCount: 0, reason: 'missing-skill' };
       }
       const tags = normalizeTagList(skill.tags ?? []);
+      const skillCost = Math.max(0, Math.round(readNumberish(skill.cost?.aether, 0)));
+      let consumedAether = skillCost <= 0;
       const dispatch = dispatchGameplayTags(tags, {
           game,
           attacker: caster,
           target: pickTarget(game, caster),
           side: caster.side,
-          cost: readNumberish(skill.cost?.aether, 0),
+          cost: skillCost,
           payload: skill,
+          onAetherCost: (amount, side) => {
+              if (amount <= 0) {
+                  consumedAether = true;
+                  return true;
+              }
+              const ok = globalAetherPool.consume(side, amount);
+              consumedAether = ok;
+              return ok;
+          },
           onSummon: () => {
               const openSlot = firstOpenSlot(game, caster.side);
               if (!openSlot)
@@ -4496,6 +4505,17 @@ __define('./combat/perform-active-skill.ts', (exports, module, __require) => {
               });
           },
       });
+      if (skillCost > 0 && tags.includes('aether-cost') && !consumedAether) {
+          return {
+              ok: false,
+              skillKey,
+              skill,
+              tags,
+              appliedTags: dispatch.applied,
+              targetCount: dispatch.targets.length,
+              reason: 'insufficient-aether',
+          };
+      }
       const targets = dispatch.targets.length > 0 ? dispatch.targets : (dispatch.targets.length === 0 && caster.alive ? [caster] : []);
       if (tags.includes('single-target') || tags.includes('multi-target') || tags.includes('aoe') || skill.damage) {
           const multiplier = Math.max(0, readNumberish(skill.damage?.multiplier ?? skill.damageMultiplier ?? 1, 1));
@@ -4504,31 +4524,6 @@ __define('./combat/perform-active-skill.ts', (exports, module, __require) => {
               if (target.side === caster.side)
                   continue;
               dealAbilityDamage(game, caster, target, { base, attackType: 'skill' });
-          }
-      }
-      if (tags.includes('heal')) {
-          const amount = Math.max(0, Math.round(readNumberish(skill.healAmount ?? skill.heal, 0)));
-          if (amount > 0) {
-              for (const target of targets)
-                  healUnit(target, amount);
-          }
-      }
-      if (tags.includes('shield')) {
-          const amount = Math.max(0, Math.round(readNumberish(skill.shieldAmount ?? skill.shield, 0)));
-          if (amount > 0) {
-              for (const target of targets)
-                  grantShield(target, amount);
-          }
-      }
-      if (tags.includes('silence') || tags.includes('sleep') || tags.includes('mark')) {
-          const turns = Math.max(1, Math.round(readNumberish(skill.turns ?? 1, 1)));
-          for (const target of targets) {
-              if (tags.includes('silence'))
-                  Statuses.add(target, { id: 'silence', kind: 'debuff', tag: 'silence', dur: turns, tick: 'turn' });
-              if (tags.includes('sleep'))
-                  Statuses.add(target, { id: 'sleep', kind: 'debuff', tag: 'sleep', dur: turns, tick: 'turn' });
-              if (tags.includes('mark'))
-                  Statuses.add(target, { id: 'mark', kind: 'debuff', tag: 'mark', dur: turns, tick: 'turn' });
           }
       }
       return {
@@ -4567,6 +4562,20 @@ __define('./combat/tag-dispatch.ts', (exports, module, __require) => {
       return [];
   };
   const sortByBoardOrder = (tokens) => ([...tokens].sort((a, b) => (a.cy - b.cy) || (a.cx - b.cx)));
+  const readTurns = (payload, ...keys) => {
+      for (const key of keys) {
+          const raw = (payload?.[key] ?? null);
+          const direct = asFinite(raw, NaN);
+          if (Number.isFinite(direct) && direct > 0)
+              return Math.max(1, Math.round(direct));
+          if (raw && typeof raw === 'object') {
+              const nestedTurns = asFinite(raw.turns, NaN);
+              if (Number.isFinite(nestedTurns) && nestedTurns > 0)
+                  return Math.max(1, Math.round(nestedTurns));
+          }
+      }
+      return 1;
+  };
   const addStatus = (target, id, turns) => {
       Statuses.add(target, {
           id,
@@ -4642,7 +4651,7 @@ __define('./combat/tag-dispatch.ts', (exports, module, __require) => {
           if (!ctx.game || !ctx.attacker)
               return;
           const foeSide = ctx.attacker.side === 'ally' ? 'enemy' : 'ally';
-          result.targets = ctx.game.tokens.filter((token) => token.alive && token.side === foeSide);
+          result.targets = sortByBoardOrder(ctx.game.tokens.filter((token) => token.alive && token.side === foeSide));
       },
       heal: (ctx, result) => {
           const amount = Math.max(0, Math.round(asFinite(ctx.payload?.healAmount ?? ctx.payload?.heal, 0)));
@@ -4673,28 +4682,28 @@ __define('./combat/tag-dispatch.ts', (exports, module, __require) => {
           result.sideEffects.push(`shield:${amount}`);
       },
       silence: (ctx, result) => {
-          const turns = Math.max(1, Math.round(asFinite(ctx.payload?.silenceTurns ?? ctx.payload?.turns, 1)));
+          const turns = readTurns(ctx.payload, 'silenceTurns', 'turns', 'duration');
           for (const token of result.targets)
               addStatus(token, 'silence', turns);
           if (result.targets.length > 0)
               result.sideEffects.push(`silence:${turns}`);
       },
       sleep: (ctx, result) => {
-          const turns = Math.max(1, Math.round(asFinite(ctx.payload?.sleepTurns ?? ctx.payload?.turns, 1)));
+          const turns = readTurns(ctx.payload, 'sleepTurns', 'turns', 'duration');
           for (const token of result.targets)
               addStatus(token, 'sleep', turns);
           if (result.targets.length > 0)
               result.sideEffects.push(`sleep:${turns}`);
       },
       mark: (ctx, result) => {
-          const turns = Math.max(1, Math.round(asFinite(ctx.payload?.markTurns ?? ctx.payload?.turns, 2)));
+          const turns = readTurns(ctx.payload, 'markTurns', 'turns', 'duration');
           for (const token of result.targets)
               addStatus(token, 'mark', turns);
           if (result.targets.length > 0)
               result.sideEffects.push(`mark:${turns}`);
       },
       control: (ctx, result) => {
-          const turns = Math.max(1, Math.round(asFinite(ctx.payload?.controlTurns ?? ctx.payload?.turns, 1)));
+          const turns = readTurns(ctx.payload, 'controlTurns', 'turns', 'duration');
           const statusId = String(ctx.payload?.controlStatus ?? 'control');
           for (const token of result.targets)
               addStatus(token, statusId, turns);
@@ -6545,8 +6554,9 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   name: 'Huyễn Ảnh Che Màn',
                   type: 'active',
                   cost: { aether: 30 },
-                  tags: ['self-buff', 'defense'],
+                  tags: ['self', 'shield', 'aether-cost', 'active'],
                   duration: { turns: 3 },
+                  shieldAmount: 20,
                   buffs: [{ effect: 'evasion-single-target', amount: 0.50 }],
                   description: 'Trong 3 lượt giảm 50% tỉ lệ bị đánh trúng từ đòn đánh thường đơn mục tiêu; không né được kỹ năng/AOE.'
               },
@@ -6555,9 +6565,10 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   name: 'Thụy Ca Tự Miên',
                   type: 'active',
                   cost: { aether: 30 },
-                  tags: ['sleep', 'support', 'defense'],
+                  tags: ['single-target', 'sleep', 'aether-cost', 'active'],
                   buffs: [{ effect: 'damageTaken', amount: -0.50 }],
                   growth: { stats: { ATK: 0.07, WIL: 0.07 }, cadence: 'per-sleep-turn', stackLimit: null },
+                  sleepTurns: 1,
                   wakeRules: { hpThreshold: 0.35, manualTapCount: 2, manualTiming: 'enemy-turn-or-own-turn-start' },
                   description: 'Tự ngủ (skip turn), giảm 50% sát thương nhận vào. Mỗi lượt ngủ tăng vĩnh viễn +7% ATK/WIL cho đến khi thức dậy do HP ≤ 35% hoặc người chơi chạm 2 lần.'
               },
@@ -6566,9 +6577,11 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   name: 'Phá Mộng Tàn Ca',
                   type: 'active',
                   cost: { aether: 25 },
-                  tags: ['single-target', 'mark', 'control'],
+                  tags: ['single-target', 'silence', 'mark', 'aether-cost', 'active'],
                   damage: { multiplier: 1.8, bonusPerMark: 0.2, maxMarks: 3, maxMultiplier: 2.4 },
                   piercePercent: { arm: 0.30, res: 0.30, whenTargetAsleep: true },
+                  silenceTurns: 1,
+                  markTurns: 2,
                   spreadDebuff: { id: 'me_hoac', consumeFromTarget: 1, toRandomTargets: 2, maxStacksPerTarget: 3 },
                   description: 'Gây 180% sát thương hỗn hợp, tăng thêm 20% mỗi stack Mê Hoặc (tối đa 240%). Khi mục tiêu đang ngủ/đủ 3 stack, đòn đánh bỏ qua 30% ARM/RES và lan 1 stack Mê Hoặc sang tối đa 2 địch ngẫu nhiên.'
               }
@@ -6607,6 +6620,9 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   name: 'Liên Ảnh Hồi Tức',
                   type: 'active',
                   cost: { aether: 30 },
+                  tags: ['ally', 'heal', 'aether-cost', 'active'],
+                  healAmount: 18,
+                  turns: 1,
                   heals: { selfPercentMaxHP: 0.06, clonePercentMaxHP: 0.04 },
                   description: 'Hồi phục 10% Max HP chia làm hai phần: bản thể nhận 6%, clone nhận 4%. Nếu không có clone, chỉ hồi cho bản thể.'
               },
@@ -6615,6 +6631,8 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   name: 'Cộng Lực Ảnh Thân',
                   type: 'active',
                   cost: { aether: 25 },
+                  tags: ['ally', 'shield', 'aether-cost', 'active'],
+                  shieldAmount: 22,
                   duration: { turns: 3 },
                   buffs: [{ stats: { ATK: 0.10, WIL: 0.10 }, targets: 'self+clone' }],
                   description: 'Tăng 10% ATK/WIL cho bản thể và clone trong 3 lượt. Tái kích hoạt chỉ làm mới thời gian.'
@@ -6624,6 +6642,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   name: 'Quy Nhất Bản Ảnh',
                   type: 'active',
                   cost: { aether: 40 },
+                  tags: ['aoe', 'aether-cost', 'active'],
                   cooldown: 3,
                   requirements: { adjacentClone: true },
                   shields: [{ percentMaxHP: 0.50, duration: { turns: 3 } }],
@@ -6634,7 +6653,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
           ult: {
               name: 'Thứ Hai Chân Thân',
               type: 'ultimate',
-              tags: ['summon', 'clone'],
+              tags: ['aoe', 'mark'],
               hpTrade: { percentCurrentHP: 0.50 },
               summon: {
                   id: 'chan_nga_clone',
@@ -6690,7 +6709,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   type: 'active',
                   cost: { aether: 25 },
                   hits: 2,
-                  tags: ['basic-attack', 'splash'],
+                  tags: ['aoe', 'mark', 'aether-cost', 'active'],
                   targets: 'markPriority',
                   splash: { ratio: 0.70, maxTargets: 2 },
                   description: 'Lao đến kẻ địch có Ma Chủng gần nhất và tung hai chưởng liên tiếp, mỗi hit 100% sát thương đòn đánh thường và lan 70% sang tối đa hai kẻ địch lân cận.'
@@ -6731,6 +6750,8 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   name: 'U Trào Tụ Lực',
                   type: 'active',
                   cost: { aether: 25 },
+                  tags: ['self', 'shield', 'aether-cost', 'active'],
+                  shieldAmount: 16,
                   duration: { turns: 3 },
                   buffs: [{ stats: { ATK: 0.15, WIL: 0.15 }, stackLimit: 3 }],
                   description: 'Tăng 15% ATK/WIL trong 3 lượt. Có thể cộng dồn tối đa 3 tầng.'
@@ -6740,6 +6761,8 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   name: 'Huyết Tế Cuồng Khí',
                   type: 'active',
                   cost: { aether: 15 },
+                  tags: ['self', 'heal', 'aether-cost', 'active'],
+                  healAmount: 24,
                   hpTrade: { percentCurrentHP: 0.30, lethal: false },
                   duration: { turns: 3 },
                   buffs: [{ stats: { ATK: 0.25, WIL: 0.25 }, stackLimit: 2 }],
@@ -23953,46 +23976,48 @@ __define('./turns.ts', (exports, module, __require) => {
   const Statuses = __dep2.Statuses;
   const __dep3 = __require('./combat.ts');
   const doBasicWithFollowups = __dep3.doBasicWithFollowups;
-  const __dep4 = __require('./config.ts');
-  const CFG = __dep4.CFG;
-  const __dep5 = __require('./meta.ts');
-  const initialRageFor = __dep5.initialRageFor;
-  const __dep6 = __require('./vfx.ts');
-  const vfxAddSpawn = __dep6.vfxAddSpawn;
-  const vfxAddBloodPulse = __dep6.vfxAddBloodPulse;
-  const asSessionWithVfx = __dep6.asSessionWithVfx;
-  const __dep7 = __require('./art.ts');
-  const getUnitArt = __dep7.getUnitArt;
-  const __dep8 = __require('./passives.ts');
-  const emitPassiveEvent = __dep8.emitPassiveEvent;
-  const applyOnSpawnEffects = __dep8.applyOnSpawnEffects;
-  const getPassiveLog = __dep8.getPassiveLog;
-  const prepareUnitForPassives = __dep8.prepareUnitForPassives;
-  const __dep9 = __require('./events.ts');
-  const emitGameEvent = __dep9.emitGameEvent;
-  const TURN_START = __dep9.TURN_START;
-  const TURN_END = __dep9.TURN_END;
-  const ACTION_START = __dep9.ACTION_START;
-  const ACTION_END = __dep9.ACTION_END;
-  const TURN_REGEN = __dep9.TURN_REGEN;
-  const __dep10 = __require('./utils/time.ts');
-  const safeNow = __dep10.safeNow;
-  const sessionNow = __dep10.sessionNow;
-  const __dep11 = __require('./utils/fury.ts');
-  const initializeFury = __dep11.initializeFury;
-  const startFuryTurn = __dep11.startFuryTurn;
-  const spendFury = __dep11.spendFury;
-  const resolveUltCost = __dep11.resolveUltCost;
-  const setFury = __dep11.setFury;
-  const clearFreshSummon = __dep11.clearFreshSummon;
-  const __dep12 = __require('./turns/interleaved.ts');
-  const nextTurnInterleaved = __dep12.nextTurnInterleaved;
-  const __dep13 = __require('./modes/pve/collection-mapper.ts');
-  const resolveRuntimeUnitStats = __dep13.resolveRuntimeUnitStats;
-  const __dep14 = __require('./cultivation.ts');
-  const applyCultivationBonus = __dep14.applyCultivationBonus;
-  const __dep15 = __require('./ai.ts');
-  const evaluateGambitLogic = __dep15.evaluateGambitLogic;
+  const __dep4 = __require('./combat/perform-active-skill.ts');
+  const performActiveSkill = __dep4.performActiveSkill;
+  const __dep5 = __require('./config.ts');
+  const CFG = __dep5.CFG;
+  const __dep6 = __require('./meta.ts');
+  const initialRageFor = __dep6.initialRageFor;
+  const __dep7 = __require('./vfx.ts');
+  const vfxAddSpawn = __dep7.vfxAddSpawn;
+  const vfxAddBloodPulse = __dep7.vfxAddBloodPulse;
+  const asSessionWithVfx = __dep7.asSessionWithVfx;
+  const __dep8 = __require('./art.ts');
+  const getUnitArt = __dep8.getUnitArt;
+  const __dep9 = __require('./passives.ts');
+  const emitPassiveEvent = __dep9.emitPassiveEvent;
+  const applyOnSpawnEffects = __dep9.applyOnSpawnEffects;
+  const getPassiveLog = __dep9.getPassiveLog;
+  const prepareUnitForPassives = __dep9.prepareUnitForPassives;
+  const __dep10 = __require('./events.ts');
+  const emitGameEvent = __dep10.emitGameEvent;
+  const TURN_START = __dep10.TURN_START;
+  const TURN_END = __dep10.TURN_END;
+  const ACTION_START = __dep10.ACTION_START;
+  const ACTION_END = __dep10.ACTION_END;
+  const TURN_REGEN = __dep10.TURN_REGEN;
+  const __dep11 = __require('./utils/time.ts');
+  const safeNow = __dep11.safeNow;
+  const sessionNow = __dep11.sessionNow;
+  const __dep12 = __require('./utils/fury.ts');
+  const initializeFury = __dep12.initializeFury;
+  const startFuryTurn = __dep12.startFuryTurn;
+  const spendFury = __dep12.spendFury;
+  const resolveUltCost = __dep12.resolveUltCost;
+  const setFury = __dep12.setFury;
+  const clearFreshSummon = __dep12.clearFreshSummon;
+  const __dep13 = __require('./turns/interleaved.ts');
+  const nextTurnInterleaved = __dep13.nextTurnInterleaved;
+  const __dep14 = __require('./modes/pve/collection-mapper.ts');
+  const resolveRuntimeUnitStats = __dep14.resolveRuntimeUnitStats;
+  const __dep15 = __require('./cultivation.ts');
+  const applyCultivationBonus = __dep15.applyCultivationBonus;
+  const __dep16 = __require('./ai.ts');
+  const evaluateGambitLogic = __dep16.evaluateGambitLogic;
   const toLowerSide = (side) => {
       if (side === 'ALLY')
           return 'ally';
@@ -24014,19 +24039,6 @@ __define('./turns.ts', (exports, module, __require) => {
   };
   const tokensAlive = (Game) => Game.tokens.filter((t) => t.alive);
   const GAMBIT_SKILL_ACTIONS = ['skill1', 'skill2', 'skill3'];
-  function readSkillAetherCost(meta, action) {
-      if (!GAMBIT_SKILL_ACTIONS.includes(action))
-          return null;
-      const skills = Array.isArray(meta?.skills) ? meta.skills : [];
-      const skill = skills.find((entry) => entry && typeof entry === 'object' && entry.key === action);
-      if (!skill || typeof skill !== 'object')
-          return null;
-      const aetherRaw = skill.cost?.aether;
-      const aetherCost = Number(aetherRaw);
-      if (!Number.isFinite(aetherCost) || aetherCost < 0)
-          return null;
-      return aetherCost;
-  }
   function grantActionAether(Game, unit, acted) {
       if (!unit || !unit.alive || !acted)
           return 0;
@@ -24416,23 +24428,18 @@ __define('./turns.ts', (exports, module, __require) => {
           if (decision.action === 'basic') {
               break;
           }
-          const skillCost = readSkillAetherCost(meta, decision.action);
-          if (skillCost == null) {
-              continue;
-          }
-          if (!globalAetherPool.consume(unit.side, skillCost)) {
-              continue;
-          }
           try {
-              const cap = typeof meta?.followupCap === 'number' ? (meta.followupCap | 0) : (CFG.FOLLOWUP_CAP_DEFAULT | 0);
-              doBasicWithFollowups(Game, unit, cap);
+              const cast = performActiveSkill(Game, unit, decision.action);
+              if (!cast.ok) {
+                  continue;
+              }
               emitPassiveEvent(Game, unit, 'onActionEnd', { log: getPassiveLog(Game) });
               Statuses.onTurnEnd(unit, {});
               ensureBusyReset();
               resolution.acted = true;
               resolution.skipped = false;
               resolution.reason = null;
-              finishAction({ action: decision.action });
+              finishAction({ action: decision.action, skillOk: cast.ok, skillTargets: cast.targetCount, skillTags: cast.appliedTags });
               return resolution;
           }
           catch (err) {
