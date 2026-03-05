@@ -126,6 +126,7 @@ const COLLECTION_SCREEN_MODULE_ID = '@screens/collection/index.ts' as const;
 const LINEUP_SCREEN_MODULE_ID = '@screens/lineup/index.ts' as const;
 const SECT_SCREEN_MODULE_ID = './screens/sect/index.ts' as const;
 const SECT_TACTICAL_AI_SCREEN_MODULE_ID = './screens/sect/tactical-ai.ts' as const;
+const PVE_SESSION_MODULE_ID = '@modes/pve/session.ts' as const;
 const APP_SCREEN_CLASSES = [
   `app--${SCREEN_MAIN_MENU}`,
   `app--${SCREEN_PVE}`,
@@ -1199,10 +1200,18 @@ async function mountPveScreen(params: ScreenParams): Promise<void>{
     shell.enterScreen(SCREEN_MAIN_MENU);
     return;
   }
-  const createPveSession = resolveModuleFunction(
+  let createPveSession = resolveModuleFunction(
     module,
     ['createPveSession']
   ) as ((container: HTMLElement, options: UnknownRecord) => PveSession) | null;
+  if (typeof createPveSession !== 'function'){
+    const fallbackPveModule = await loadBundledModule(PVE_SESSION_MODULE_ID);
+    if (token !== pveRenderToken) return;
+    createPveSession = resolveModuleFunction(
+      fallbackPveModule,
+      ['createPveSession']
+    ) as ((container: HTMLElement, options: UnknownRecord) => PveSession) | null;
+  }
   if (typeof createPveSession !== 'function'){
     throw new Error('PvE module missing createPveSession().');
   }

@@ -9523,6 +9523,7 @@ __define('./entry.ts', (exports, module, __require) => {
   const LINEUP_SCREEN_MODULE_ID = '@screens/lineup/index.ts';
   const SECT_SCREEN_MODULE_ID = './screens/sect/index.ts';
   const SECT_TACTICAL_AI_SCREEN_MODULE_ID = './screens/sect/tactical-ai.ts';
+  const PVE_SESSION_MODULE_ID = '@modes/pve/session.ts';
   const APP_SCREEN_CLASSES = [
       `app--${SCREEN_MAIN_MENU}`,
       `app--${SCREEN_PVE}`,
@@ -10522,7 +10523,13 @@ __define('./entry.ts', (exports, module, __require) => {
           shell.enterScreen(SCREEN_MAIN_MENU);
           return;
       }
-      const createPveSession = resolveModuleFunction(module, ['createPveSession']);
+      let createPveSession = resolveModuleFunction(module, ['createPveSession']);
+      if (typeof createPveSession !== 'function') {
+          const fallbackPveModule = await loadBundledModule(PVE_SESSION_MODULE_ID);
+          if (token !== pveRenderToken)
+              return;
+          createPveSession = resolveModuleFunction(fallbackPveModule, ['createPveSession']);
+      }
       if (typeof createPveSession !== 'function') {
           throw new Error('PvE module missing createPveSession().');
       }
