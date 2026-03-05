@@ -2347,6 +2347,11 @@ __define('./catalog.ts', (exports, module, __require) => {
   const kitSupportsSummon = __dep0.kitSupportsSummon;
   const asUnknownRecord = (value) => value;
   const asUnknownRecordArray = (value) => value;
+  const DEFAULT_ON_SPAWN = Object.freeze({
+      rage: 100,
+      exceptLeader: true,
+  });
+  const createOnSpawn = (overrides = {}) => (asUnknownRecord({ ...DEFAULT_ON_SPAWN, ...overrides }));
   const isObjectLike = (value) => (!!value && typeof value === 'object' && !Array.isArray(value));
   const asUnitKitConfig = (value) => (isObjectLike(value) ? value : null);
   const RANK_MULT = {
@@ -2394,7 +2399,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           id: 'thien_luu', name: 'Thiên Lưu', class: 'Ranger', rank: 'SSR',
           mods: { ATK: 0.08, PER: 0.08, SPD: 0.08 },
           kit: {
-              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, weatherState: 'clear' }),
+              onSpawn: createOnSpawn({ weatherState: 'clear' }),
               basic: asUnknownRecord({
                   name: 'Thiên Kiếm Thuần Quang',
                   tags: ['single-target', 'flying'],
@@ -2471,7 +2476,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           id: 'mong_yem', name: 'Mộng Yểm', class: 'Mage', rank: 'SSR',
           mods: { WIL: 0.12, AEregen: 0.08 },
           kit: {
-              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+              onSpawn: createOnSpawn(),
               basic: asUnknownRecord({
                   name: 'Mộng Phệ',
                   tags: ['single-target', 'sleep-setup'],
@@ -2552,7 +2557,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           id: 'chan_nga', name: 'Chân Ngã', class: 'Summoner', rank: 'UR',
           mods: { HP: 0.10, WIL: 0.10 },
           kit: {
-              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, bonusMaxHPPercent: 0.10 }),
+              onSpawn: createOnSpawn({ bonusMaxHPPercent: 0.10 }),
               basic: asUnknownRecord({
                   name: 'Ảnh Kích',
                   tags: ['single-target']
@@ -2632,7 +2637,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           id: 'ma_ton_diep_lam', name: 'Ma Tôn - Diệp Lâm', class: 'Mage', rank: 'UR',
           mods: { WIL: 0.12, AEmax: 0.08 },
           kit: {
-              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, bonusSPDPercent: 0.10 }),
+              onSpawn: createOnSpawn({ bonusSPDPercent: 0.10 }),
               basic: asUnknownRecord({
                   name: 'Ma Chưởng',
                   tags: ['single-target', 'mark-builder'],
@@ -2726,7 +2731,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           id: 'vu_thien', name: 'Vũ Thiên', class: 'Warrior', rank: 'SSR',
           mods: { HP: 0.05, ATK: 0.08, WIL: 0.06 },
           kit: {
-              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+              onSpawn: createOnSpawn(),
               basic: asUnknownRecord({
                   name: 'Thủy Kích',
                   tags: ['single-target'],
@@ -2792,7 +2797,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           id: 'anna', name: 'Anna', class: 'Support', rank: 'SSR',
           mods: { HP: 0.08, WIL: 0.06, AEmax: 0.05 },
           kit: {
-              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+              onSpawn: createOnSpawn(),
               basic: asUnknownRecord({
                   name: 'Nguyện Cầu',
                   tags: ['single-target', 'basic-attack', 'heal', 'random-target'],
@@ -2865,7 +2870,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           id: 'lao_khat_cai', name: 'Lão Khất Cái', class: 'Warrior', rank: 'SR',
           mods: { ATK: 0.06, AGI: 0.05 },
           kit: {
-              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+              onSpawn: createOnSpawn(),
               basic: asUnknownRecord({
                   name: 'Bổ Củi',
                   tags: ['single-target'],
@@ -2932,7 +2937,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           id: 'ai_lan', name: 'Ái Lân', class: 'Support', rank: 'SSR',
           mods: { WIL: 0.12, AEregen: 0.10, HP: 0.06 },
           kit: {
-              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, startingStance: 'light' }),
+              onSpawn: createOnSpawn({ startingStance: 'light' }),
               basic: asUnknownRecord({
                   name: 'Đánh Thường',
                   tags: ['single-target'],
@@ -3018,7 +3023,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           id: 'faun', name: 'Faun', class: 'Summoner', rank: 'SSR',
           mods: { WIL: 0.08, AEregen: 0.08, HP: 0.04 },
           kit: {
-              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, furyMax: 85 }),
+              onSpawn: createOnSpawn({ furyMax: 85 }),
               basic: asUnknownRecord({
                   name: 'Đánh Thường',
                   tags: ['single-target'],
@@ -3107,7 +3112,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           id: 'basil_thorne', name: 'Basil Thorne', class: 'Tanker', rank: 'SSR',
           mods: { HP: 0.08, ARM: 0.08, RES: 0.06 },
           kit: {
-              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+              onSpawn: createOnSpawn(),
               basic: asUnknownRecord({
                   name: 'Đánh Thường',
                   tags: ['single-target'],
@@ -3175,7 +3180,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           id: 'mo_da', name: 'Mộ Dạ', class: 'Assassin', rank: 'SSR',
           mods: { ATK: 0.10, WIL: 0.10 },
           kit: {
-              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+              onSpawn: createOnSpawn(),
               basic: asUnknownRecord({
                   name: 'Ám Trảm',
                   tags: ['single-target']
@@ -3246,7 +3251,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           id: 'ngao_binh', name: 'Ngao Bính', class: 'Warrior', rank: 'UR',
           mods: { HP: 0.10, ATK: 0.10 },
           kit: {
-              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, form: 'au_long' }),
+              onSpawn: createOnSpawn({ form: 'au_long' }),
               basic: asUnknownRecord({
                   name: 'Đánh Thường',
                   tags: ['single-target', 'form-scaling'],
@@ -3350,7 +3355,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           id: 'lau_khac_ma_chu', name: 'Lậu Khắc Ma Chủ', class: 'Mage', rank: 'Prime',
           mods: { WIL: 0.12, AEregen: 0.08 },
           kit: {
-              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+              onSpawn: createOnSpawn(),
               basic: asUnknownRecord({
                   name: 'Đánh Thường',
                   tags: ['single-target', 'mark-builder'],
@@ -3432,7 +3437,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           id: 'phe', name: 'Phệ', class: 'Mage', rank: 'UR',
           mods: { WIL: 0.10, AEregen: 0.10 }, // 20% tổng
           kit: {
-              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+              onSpawn: createOnSpawn(),
               basic: asUnknownRecord({
                   name: 'Đánh Thường',
                   tags: ['single-target', 'lifesteal', 'mark'],
@@ -3527,7 +3532,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           id: 'kiemtruongda', name: 'Kiếm Trường Dạ', class: 'Warrior', rank: 'UR',
           mods: { ATK: 0.12, PER: 0.08 },
           kit: {
-              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+              onSpawn: createOnSpawn(),
               basic: asUnknownRecord({
                   name: 'Đánh Thường',
                   tags: ['single-target', 'armor-pierce'],
@@ -3599,7 +3604,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           id: 'loithienanh', name: 'Lôi Thiên Ảnh', class: 'Tanker', rank: 'SSR',
           mods: { RES: 0.10, WIL: 0.10 },
           kit: {
-              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+              onSpawn: createOnSpawn(),
               basic: asUnknownRecord({
                   name: 'Đánh Thường',
                   hits: 2,
@@ -3676,7 +3681,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           id: 'laky', name: 'La Kỳ', class: 'Support', rank: 'SSR',
           mods: { WIL: 0.10, PER: 0.10 },
           kit: {
-              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+              onSpawn: createOnSpawn(),
               basic: asUnknownRecord({
                   name: 'Đánh Thường',
                   tags: ['single-target', 'sleep-setup'],
@@ -3734,7 +3739,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           id: 'kydieu', name: 'Kỳ Diêu', class: 'Support', rank: 'SSR',
           mods: { WIL: 0.10, RES: 0.10 },
           kit: {
-              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+              onSpawn: createOnSpawn(),
               basic: asUnknownRecord({
                   name: 'Đánh Thường',
                   tags: ['single-target']
@@ -3781,7 +3786,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           id: 'doanminh', name: 'Doãn Minh', class: 'Support', rank: 'SR',
           mods: { WIL: 0.10, AEmax: 0.10 },
           kit: {
-              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true, teamHealOnEntry: 0.08 }),
+              onSpawn: createOnSpawn({ teamHealOnEntry: 0.08 }),
               basic: asUnknownRecord({
                   name: 'Đánh Thường',
                   tags: ['single-target']
@@ -3808,7 +3813,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           id: 'tranquat', name: 'Trần Quát', class: 'Summoner', rank: 'R',
           mods: { ATK: 0.10, PER: 0.10 },
           kit: {
-              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+              onSpawn: createOnSpawn(),
               basic: asUnknownRecord({
                   name: 'Đánh Thường',
                   tags: ['single-target']
@@ -3860,7 +3865,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           id: 'linhgac', name: 'Lính Gác', class: 'Warrior', rank: 'N',
           mods: { ARM: 0.10, ATK: 0.10 },
           kit: {
-              onSpawn: asUnknownRecord({ rage: 100, exceptLeader: true }),
+              onSpawn: createOnSpawn(),
               basic: asUnknownRecord({
                   name: 'Đánh Thường',
                   tags: ['single-target']
