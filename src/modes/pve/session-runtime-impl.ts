@@ -68,6 +68,7 @@ import {
   normalizeDeckEntries,
 } from './session-state';
 import { mapUnitProgressById } from './collection-mapper.ts';
+import { buildAICreepDeckFromLineup } from './creep-builder.ts';
 import {
   ensureUyenState,
   getUyenUltChoice,
@@ -3759,6 +3760,17 @@ function applyConfigToRunningGame(cfg: NormalizedSessionConfig): void {
     } else if (Array.isArray(preset.unitsAll) && preset.unitsAll.length){
       const enemyPool = normalizeDeckEntries(preset.unitsAll);
       if (enemyPool.length) game.ai.unitsAll = enemyPool;
+    } else {
+      const lineupInput =
+        (Array.isArray(cfg.lineupDeck) && cfg.lineupDeck.length ? cfg.lineupDeck : null)
+        ?? (Array.isArray(cfg.playerDeck) && cfg.playerDeck.length ? cfg.playerDeck : null)
+        ?? (Array.isArray(cfg.deck) && cfg.deck.length ? cfg.deck : null);
+      const lineupDeck = normalizeDeckEntries(lineupInput ?? game.playerDeckLocked ?? game.unitsAll ?? []);
+      const creeps = buildAICreepDeckFromLineup({
+        lineup: lineupDeck,
+        collectionState: cfg.collectionState ?? null,
+      });
+      if (creeps.length) game.ai.unitsAll = creeps;
     }
     const parsedCostCap = toPositiveOrNull(preset.costCap);
     if (parsedCostCap !== null) game.ai.costCap = parsedCostCap;

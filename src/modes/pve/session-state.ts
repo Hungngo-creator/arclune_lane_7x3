@@ -25,6 +25,7 @@ import { Statuses } from '../../statuses.ts';
 import { getUnitArt } from '../../art.ts';
 import { normalizeUnitId } from '../../utils/unit-id.ts';
 import { mapUnitProgressById } from './collection-mapper.ts';
+import { buildAICreepDeckFromLineup } from './creep-builder.ts';
 
 void Statuses;
 
@@ -447,12 +448,17 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
     : Array.from(DEFAULT_UNIT_ROSTER);
 
   const enemyPreset = normalized.aiPreset ?? null;
+  const lineupSource = preferredPlayerDeck ?? modeDeck ?? [];
+  const lineupForAICreeps = normalizeDeckEntries(lineupSource);
   const enemyUnits: SessionState['ai']['unitsAll'] =
     Array.isArray(enemyPreset?.deck) && enemyPreset.deck.length
       ? Array.from(enemyPreset.deck)
       : Array.isArray(enemyPreset?.unitsAll) && enemyPreset.unitsAll.length
         ? Array.from(enemyPreset.unitsAll)
-        : Array.from(DEFAULT_UNIT_ROSTER);
+        : buildAICreepDeckFromLineup({
+          lineup: lineupForAICreeps,
+          collectionState: normalized.collectionState ?? null,
+        });
 
   const requestedTurnMode = normalized.turnMode
     ?? normalized.turn?.mode
