@@ -3885,6 +3885,111 @@ __define('./catalog.ts', (exports, module, __require) => {
                   { id: 'ult_damage_bonus', text: 'Trong thời gian Còi Tăng Tốc, đòn đánh thường gây thêm 5% sát thương.' }
               ])
           }
+      },
+      {
+          id: 'creep_1', name: 'Creep #1', class: 'Warrior', rank: 'N',
+          isNpc: true,
+          tags: ['npc', 'pve', 'creep'],
+          mods: {},
+          kit: {
+              onSpawn: asUnknownRecord({
+                  stats: { ATK: 0.05, WIL: 0.05, ARM: 0.05, RES: 0.05, AGI: 0.05, PER: 0.05, HPmax: 0.05, AEmax: 0.05, AEregen: 0.05, HPregen: 0.05, SPD: 0.05 },
+                  purgeable: false,
+              }),
+              basic: asUnknownRecord({
+                  name: 'Đánh Thường',
+                  tags: ['single-target', 'creep'],
+                  damageMultiplier: 1.00,
+                  useAtkWilBase: true,
+                  notes: 'Sát thương cơ bản = 100% ATK + 100% WIL.'
+              }),
+              skills: asUnknownRecordArray([]),
+              ult: null,
+              talent: null,
+              technique: null,
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'creep_1_death_heal',
+                      name: 'Hấp Thụ Sinh Khí',
+                      when: 'onDeath',
+                      effect: 'teamHeal',
+                      params: { amount: 0.03, mode: 'casterMax' }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
+                  { id: 'pve_only', text: 'NPC creep PvE, không tham gia pipeline gacha.' }
+              ])
+          }
+      },
+      {
+          id: 'creep_2', name: 'Creep #2', class: 'Warrior', rank: 'N',
+          isNpc: true,
+          tags: ['npc', 'pve', 'creep'],
+          mods: {},
+          kit: {
+              onSpawn: asUnknownRecord({
+                  stats: { ATK: 0.07, WIL: 0.07, ARM: 0.07, RES: 0.07, AGI: 0.07, PER: 0.07, HPmax: 0.07, AEmax: 0.07, AEregen: 0.07, HPregen: 0.07, SPD: 0.07 },
+                  purgeable: false,
+              }),
+              basic: asUnknownRecord({
+                  name: 'Đánh Thường',
+                  tags: ['single-target', 'creep'],
+                  damageMultiplier: 1.00,
+                  useAtkWilBase: true,
+                  notes: 'Sát thương cơ bản = 100% ATK + 100% WIL.'
+              }),
+              skills: asUnknownRecordArray([]),
+              ult: null,
+              talent: null,
+              technique: null,
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'creep_2_death_heal',
+                      name: 'Hấp Thụ Sinh Khí',
+                      when: 'onDeath',
+                      effect: 'teamHeal',
+                      params: { amount: 0.04, mode: 'casterMax' }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
+                  { id: 'pve_only', text: 'NPC creep PvE, không tham gia pipeline gacha.' }
+              ])
+          }
+      },
+      {
+          id: 'creep_3', name: 'Creep #3', class: 'Warrior', rank: 'N',
+          isNpc: true,
+          tags: ['npc', 'pve', 'creep'],
+          mods: {},
+          kit: {
+              onSpawn: asUnknownRecord({
+                  stats: { ATK: 0.10, WIL: 0.10, ARM: 0.10, RES: 0.10, AGI: 0.10, PER: 0.10, HPmax: 0.10, AEmax: 0.10, AEregen: 0.10, HPregen: 0.10, SPD: 0.10 },
+                  purgeable: false,
+              }),
+              basic: asUnknownRecord({
+                  name: 'Đánh Thường',
+                  tags: ['single-target', 'creep'],
+                  damageMultiplier: 1.00,
+                  useAtkWilBase: true,
+                  notes: 'Sát thương cơ bản = 100% ATK + 100% WIL.'
+              }),
+              skills: asUnknownRecordArray([]),
+              ult: null,
+              talent: null,
+              technique: null,
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'creep_3_death_heal',
+                      name: 'Hấp Thụ Sinh Khí',
+                      when: 'onDeath',
+                      effect: 'teamHeal',
+                      params: { amount: 0.05, mode: 'casterMax' }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
+                  { id: 'pve_only', text: 'NPC creep PvE, không tham gia pipeline gacha.' }
+              ])
+          }
       }
   ];
   const unitBaseEntries = ROSTER
@@ -4180,6 +4285,16 @@ __define('./combat.ts', (exports, module, __require) => {
           : Statuses.absorbShield(target, dmg, { dtype });
       const remain = Math.max(0, Math.floor(abs.remain));
       let dealtTotal = 0;
+      const emitOnDeathPassive = (unit) => {
+          if (!Game || unit.alive)
+              return;
+          const deadAt = Number(unit.deadAt ?? 0);
+          const marker = Number(unit._passiveDeathAt ?? Number.NaN);
+          if (Number.isFinite(marker) && marker === deadAt)
+              return;
+          unit._passiveDeathAt = deadAt;
+          emitPassiveEvent(Game, unit, 'onDeath', { log: getPassiveLog(Game) });
+      };
       const sharedRules = getSharedHpRules(target);
       const sharedTargets = sharedRules.group && Game
           ? Game.tokens.filter((token) => token.alive && token.side === target.side && getSharedHpGroup(token) === sharedRules.group)
@@ -4213,6 +4328,7 @@ __define('./combat.ts', (exports, module, __require) => {
               dealtTotal += Math.max(0, beforeHp - afterHp);
               if (entry.token.hp <= 0) {
                   hookOnLethalDamage(entry.token);
+                  emitOnDeathPassive(entry.token);
               }
           }
       }

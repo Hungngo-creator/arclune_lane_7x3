@@ -305,6 +305,15 @@ export function dealAbilityDamage(
     : (Statuses.absorbShield(target, dmg, { dtype }) as ShieldAbsorptionResult);
   const remain = Math.max(0, Math.floor(abs.remain));
   let dealtTotal = 0;
+
+  const emitOnDeathPassive = (unit: UnitToken): void => {
+    if (!Game || unit.alive) return;
+    const deadAt = Number(unit.deadAt ?? 0);
+    const marker = Number((unit as UnitToken & { _passiveDeathAt?: number })._passiveDeathAt ?? Number.NaN);
+    if (Number.isFinite(marker) && marker === deadAt) return;
+    (unit as UnitToken & { _passiveDeathAt?: number })._passiveDeathAt = deadAt;
+    emitPassiveEvent(Game, unit, 'onDeath', { log: getPassiveLog(Game) });
+  };
   const sharedRules = getSharedHpRules(target);
   const sharedTargets = sharedRules.group && Game
     ? Game.tokens.filter((token) => token.alive && token.side === target.side && getSharedHpGroup(token) === sharedRules.group)
@@ -337,6 +346,7 @@ export function dealAbilityDamage(
       dealtTotal += Math.max(0, beforeHp - afterHp);
       if (entry.token.hp <= 0) {
         hookOnLethalDamage(entry.token);
+        emitOnDeathPassive(entry.token);
       }
     }
   } else if (remain > 0) {
