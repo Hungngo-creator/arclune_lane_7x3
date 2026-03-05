@@ -1,7 +1,7 @@
 // Bundled by build.mjs
 const __modules = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }
 function __define(id, factory){ __modules[id] = { factory, exports: null, initialized: false }; }
@@ -5605,6 +5605,102 @@ __define('./cultivation.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'upgradeCultivation')) exports.upgradeCultivation = upgradeCultivation;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyCultivationBonus')) exports.applyCultivationBonus = applyCultivationBonus;
 });
+__define('./data/campaign-stages.ts', (exports, module, __require) => {
+  const __dep0 = __require('./catalog.ts');
+  const ROSTER = __dep0.ROSTER;
+  const __dep1 = __require('./data/skills.ts');
+  const getSkillSet = __dep1.getSkillSet;
+  const PASSIVE_ICON_MAP = {
+      bleed: 'assets/weaken.svg',
+      reflect: 'assets/reflect.svg',
+      damagecut: 'assets/damageCut.svg',
+      damage_cut: 'assets/damageCut.svg',
+      pierce: 'assets/pierce.svg',
+      haste: 'assets/haste.svg',
+      weaken: 'assets/weaken.svg',
+      silence: 'assets/silence.svg',
+      exalt: 'assets/exalt.svg',
+  };
+  const STAGE_BLUEPRINT = [
+      {
+          id: '1-1',
+          nodeId: 'n-1-1',
+          title: 'Khởi Phong Sơn Lộ',
+          chapter: 'The Fool\'s Journey',
+          bossId: 'mong_yem',
+          recommendedPower: '12.000',
+          bossQuote: '“Giấc mộng không phải nơi để ngươi tỉnh dậy.”',
+          status: 'cleared',
+          stars: 3,
+          passiveIds: ['weaken', 'silence'],
+      },
+      {
+          id: '1-2',
+          nodeId: 'n-1-2',
+          title: 'Tàn Ảnh Ma Cốc',
+          chapter: 'The Fool\'s Journey',
+          bossId: 'chan_nga',
+          recommendedPower: '14.500',
+          bossQuote: '“Bản ngã thật sự luôn xuất hiện ở lần triệu hồi cuối.”',
+          status: 'open',
+          stars: 1,
+          passiveIds: ['reflect', 'pierce'],
+      },
+      {
+          id: '1-3',
+          nodeId: 'n-1-3',
+          title: 'Phong Cấm Cổ Đàn',
+          chapter: 'The Fool\'s Journey',
+          bossId: 'loithienanh',
+          recommendedPower: '18.200',
+          bossQuote: '“Nhập trận nếu đạo tâm ngươi đủ cứng.”',
+          status: 'locked',
+          stars: 0,
+          passiveIds: ['damageCut', 'bleed', 'reflect'],
+      },
+  ];
+  const rosterNameById = new Map(ROSTER.map((unit) => [unit.id, unit.name]));
+  function resolveIcon(passiveId) {
+      const key = passiveId.replace(/[^a-zA-Z]/g, '').toLowerCase();
+      return PASSIVE_ICON_MAP[key] ?? 'assets/exalt.svg';
+  }
+  function toPassive(passiveId) {
+      return {
+          id: passiveId,
+          name: passiveId,
+          icon: resolveIcon(passiveId),
+          description: `Hiệu ứng ${passiveId} có thể thay đổi nhịp chiến đấu.`,
+      };
+  }
+  const CAMPAIGN_STAGE_DATA = STAGE_BLUEPRINT.map((stage) => {
+      const skillSet = getSkillSet(stage.bossId);
+      const stageSkills = [skillSet?.basic, ...(skillSet?.skills ?? []), skillSet?.ult]
+          .filter((entry) => Boolean(entry))
+          .slice(0, 4)
+          .map((skill, index) => ({
+          id: `${stage.id}-skill-${index + 1}`,
+          name: skill.name || `Kỹ năng ${index + 1}`,
+      }));
+      return {
+          ...stage,
+          bossId: stage.bossId,
+          title: `${stage.id} · ${stage.title}`,
+          passives: stage.passiveIds.map(toPassive),
+          skills: stageSkills,
+          bossQuote: stage.bossQuote,
+          chapter: stage.chapter,
+          recommendedPower: stage.recommendedPower,
+          status: stage.status,
+          stars: stage.stars,
+      };
+  });
+  function resolveBossName(unitId) {
+      return rosterNameById.get(unitId) || unitId;
+  }
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'CAMPAIGN_STAGE_DATA')) exports.CAMPAIGN_STAGE_DATA = CAMPAIGN_STAGE_DATA;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resolveBossName')) exports.resolveBossName = resolveBossName;
+});
 __define('./data/economy.config.ts', (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/data/economy.config.ts
   const economyConfig = {
@@ -6105,6 +6201,7 @@ __define('./data/modes.ts', (exports, module, __require) => {
   const COLLECTION_SCREEN_MODULE_ID = '@screens/collection/index.ts';
   const GACHA_SCREEN_MODULE_ID = '@screens/ui-gacha/index.ts';
   const ARENA_HUB_SCREEN_MODULE_ID = '@screens/arena-hub/index.ts';
+  const CAMPAIGN_WORLD_MAP_SCREEN_MODULE_ID = '@screens/campaign-world-map/index.ts';
   const SECT_SCREEN_MODULE_ID = './screens/sect/index.ts';
   const MODE_TYPES = {
       PVE: '',
@@ -6148,8 +6245,8 @@ __define('./data/modes.ts', (exports, module, __require) => {
           menuSections: ['core-pve'],
           parentId: 'arena-hub',
           shell: {
-              screenId: 'pve-session',
-              moduleId: PVE_SESSION_MODULE_ID,
+              screenId: 'campaign-world-map',
+              moduleId: CAMPAIGN_WORLD_MAP_SCREEN_MODULE_ID,
               defaultParams: { modeKey: 'campaign' }
           }
       },
@@ -17012,6 +17109,198 @@ __define('./screens/arena-hub/index.ts', (exports, module, __require) => {
                   }
               });
               cleanups.length = 0;
+              mount.destroy();
+          }
+      };
+  }
+  const render = renderScreen;
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
+});
+__define('./screens/campaign-world-map/index.ts', (exports, module, __require) => {
+  const __dep0 = __require('./ui/dom.ts');
+  const ensureStyleTag = __dep0.ensureStyleTag;
+  const mountSection = __dep0.mountSection;
+  const __dep1 = __require('./data/campaign-stages.ts');
+  const CAMPAIGN_STAGE_DATA = __dep1.CAMPAIGN_STAGE_DATA;
+  const resolveBossName = __dep1.resolveBossName;
+  const STYLE_ID = 'campaign-world-map-style';
+  const CSS = /* css */ `
+    .app--campaign-world-map{padding:18px 16px 28px;color:#ecf6f4;}
+    .campaign-world-map{position:relative;max-width:1240px;min-height:76vh;margin:0 auto;border-radius:20px;overflow:hidden;border:1px solid rgba(128,220,201,.25);background:radial-gradient(circle at 15% 10%,rgba(87,149,145,.35),rgba(8,20,28,.94));box-shadow:0 18px 48px rgba(0,0,0,.35);}
+    .campaign-world-map__bg{position:absolute;inset:0;background:linear-gradient(160deg,rgba(69,108,128,.45),rgba(15,27,37,.82));filter:saturate(1.05);}
+    .campaign-world-map__hud{position:relative;z-index:2;padding:18px 20px 8px;display:flex;justify-content:space-between;align-items:flex-start;}
+    .campaign-world-map__title{margin:0;font-size:28px;letter-spacing:.06em;text-transform:uppercase;}
+    .campaign-world-map__subtitle{margin:6px 0 0;color:#b6d8d4;font-size:13px;letter-spacing:.03em;}
+    .campaign-world-map__back{border:none;width:44px;height:44px;border-radius:999px;background:rgba(239,254,250,.92);color:#1f3342;cursor:pointer;font-size:24px;line-height:1;}
+    .campaign-world-map__nodes{position:relative;z-index:2;height:260px;margin:6px 26px 0;}
+    .campaign-world-map__path{position:absolute;left:10%;right:12%;top:58%;height:2px;background:linear-gradient(90deg,rgba(255,227,176,.2),rgba(255,227,176,.95),rgba(255,227,176,.2));}
+    .campaign-node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:8px;background:none;border:none;color:#f8f8de;cursor:pointer;}
+    .campaign-node__badge{min-width:88px;padding:8px 10px;border-radius:12px;border:1px solid rgba(255,225,176,.6);background:rgba(44,56,74,.75);font-weight:700;letter-spacing:.05em;}
+    .campaign-node__dot{width:20px;height:20px;border-radius:50%;background:#f6ddb6;border:2px solid #fff3d2;box-shadow:0 0 0 4px rgba(255,237,194,.25);}
+    .campaign-world-map__overlay{position:absolute;inset:0;display:flex;opacity:0;pointer-events:none;transition:opacity .26s ease;}
+    .campaign-world-map--overlay-visible .campaign-world-map__overlay{opacity:1;pointer-events:auto;}
+    .campaign-panel{height:100%;padding:18px 16px 16px;backdrop-filter:blur(4px);background:linear-gradient(180deg,rgba(16,36,40,.84),rgba(14,28,34,.9));border-left:1px solid rgba(145,223,205,.16);border-right:1px solid rgba(145,223,205,.16);transform:translateY(14px);transition:transform .26s ease;}
+    .campaign-world-map--overlay-visible .campaign-panel{transform:translateY(0);}
+    .campaign-panel--left{width:30%;border-left:none;}
+    .campaign-panel--middle{width:40%;background:linear-gradient(180deg,rgba(6,16,22,.1),rgba(6,16,22,.35));border:none;}
+    .campaign-panel--right{width:30%;border-right:none;display:flex;flex-direction:column;}
+    .campaign-stage-list{margin-top:10px;max-height:calc(100% - 30px);overflow:auto;display:flex;flex-direction:column;gap:10px;padding-right:4px;}
+    .stage-card{width:100%;text-align:left;border-radius:12px;border:1px solid rgba(176,226,215,.28);background:rgba(25,45,52,.82);color:#ecfffb;padding:10px 12px;cursor:pointer;}
+    .stage-card--active{border-color:#f2d4a7;background:rgba(46,74,79,.88);}
+    .stage-card__top{display:flex;justify-content:space-between;font-size:13px;}
+    .stage-card__title{margin-top:6px;font-size:14px;}
+    .stage-card__status{margin-top:8px;color:#afddd4;font-size:12px;}
+    .campaign-boss{display:grid;grid-template-columns:72px 1fr;gap:12px;align-items:center;padding-bottom:10px;border-bottom:1px solid rgba(149,208,196,.2);}
+    .campaign-boss__portrait{width:72px;height:72px;border-radius:12px;border:1px solid rgba(188,235,222,.38);background:rgba(16,31,40,.7);object-fit:cover;}
+    .campaign-boss__title{margin:0;font-size:18px;}
+    .campaign-boss__name{font-size:13px;color:#9fd0c7;}
+    .campaign-info{display:flex;flex-direction:column;gap:10px;margin-top:12px;font-size:13px;}
+    .campaign-info__quote{margin:0;padding:10px;border-left:3px solid rgba(244,189,166,.65);background:rgba(58,41,52,.3);font-style:italic;color:#ffd3cf;}
+    .icon-row{display:flex;gap:8px;flex-wrap:wrap;}
+    .icon-chip{width:34px;height:34px;border-radius:10px;border:1px solid rgba(172,226,210,.34);background:rgba(21,40,47,.82);display:grid;place-items:center;position:relative;}
+    .icon-chip img{width:18px;height:18px;}
+    .icon-chip::after{content:attr(data-tip);position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);padding:6px 8px;border-radius:8px;background:rgba(5,12,18,.95);color:#eafff9;font-size:11px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .18s ease;}
+    .icon-chip:hover::after,.icon-chip:focus-visible::after{opacity:1;}
+    .campaign-enter{margin-top:auto;align-self:flex-end;padding:12px 16px;border-radius:12px;border:1px solid rgba(255,222,168,.8);background:linear-gradient(135deg,#ffd08e,#f7a9a1);color:#2a1b1b;font-weight:800;letter-spacing:.06em;cursor:pointer;}
+  `;
+  function bossPortraitPath(unitId) {
+      return `assets/units/${unitId}/default.svg`;
+  }
+  function statusLabel(stage) {
+      if (stage.status === 'locked')
+          return '🔒 Chưa mở';
+      if (stage.status === 'cleared')
+          return `★`.repeat(Math.max(stage.stars, 1));
+      return 'Đang mở';
+  }
+  function renderScreen(context) {
+      const { root, shell = null } = context;
+      ensureStyleTag(STYLE_ID, { css: CSS });
+      let selected = CAMPAIGN_STAGE_DATA[0] ?? null;
+      let overlayVisible = false;
+      const container = document.createElement('section');
+      container.className = 'campaign-world-map';
+      const mount = mountSection({ root, section: container, rootClasses: 'app--campaign-world-map' });
+      container.innerHTML = `
+      <div class="campaign-world-map__bg"></div>
+      <header class="campaign-world-map__hud">
+        <div>
+          <h1 class="campaign-world-map__title">Campaign · World Map</h1>
+          <p class="campaign-world-map__subtitle">Chọn điểm đến để mở Stage Selection Hub.</p>
+        </div>
+        <button class="campaign-world-map__back" type="button" aria-label="Trở về menu chính">↩</button>
+      </header>
+      <div class="campaign-world-map__nodes">
+        <div class="campaign-world-map__path"></div>
+      </div>
+      <div class="campaign-world-map__overlay">
+        <aside class="campaign-panel campaign-panel--left">
+          <h3>Danh sách ải</h3>
+          <div class="campaign-stage-list" data-role="stage-list"></div>
+        </aside>
+        <div class="campaign-panel campaign-panel--middle"></div>
+        <aside class="campaign-panel campaign-panel--right" data-role="stage-info"></aside>
+      </div>
+    `;
+      const stageList = container.querySelector('[data-role="stage-list"]');
+      const stageInfo = container.querySelector('[data-role="stage-info"]');
+      const nodesWrap = container.querySelector('.campaign-world-map__nodes');
+      const backButton = container.querySelector('.campaign-world-map__back');
+      const nodePositions = ['15% 68%', '42% 60%', '72% 43%'];
+      function setOverlayVisible(next) {
+          overlayVisible = next;
+          container.classList.toggle('campaign-world-map--overlay-visible', overlayVisible);
+      }
+      function renderInfo() {
+          if (!(stageInfo instanceof HTMLElement) || !selected)
+              return;
+          const bossName = resolveBossName(selected.bossId);
+          stageInfo.innerHTML = `
+        <div class="campaign-boss">
+          <img class="campaign-boss__portrait" src="${bossPortraitPath(selected.bossId)}" alt="${bossName}"/>
+          <div>
+            <h2 class="campaign-boss__title">${selected.title}</h2>
+            <div class="campaign-boss__name">Boss: ${bossName}</div>
+          </div>
+        </div>
+        <div class="campaign-info">
+          <div><strong>Lực chiến đề cử:</strong> ${selected.recommendedPower}</div>
+          <p class="campaign-info__quote">${selected.bossQuote}</p>
+          <div><strong>Passive:</strong></div>
+          <div class="icon-row">
+            ${selected.passives.map((passive) => `<button class="icon-chip" data-tip="${passive.name}: ${passive.description}" type="button" aria-label="${passive.name}"><img src="${passive.icon}" alt="${passive.name}"/></button>`).join('')}
+          </div>
+          <div><strong>Boss Skills:</strong></div>
+          <div class="icon-row">
+            ${selected.skills.map((skill, index) => `<button class="icon-chip" data-tip="${skill.name}" type="button" aria-label="${skill.name}"><span>${index + 1}</span></button>`).join('')}
+          </div>
+        </div>
+        <button class="campaign-enter" type="button" data-role="attack">ATTACK · NHẬP TRẬN</button>
+      `;
+          const attackButton = stageInfo.querySelector('[data-role="attack"]');
+          if (attackButton instanceof HTMLButtonElement) {
+              attackButton.disabled = selected.status === 'locked';
+              attackButton.addEventListener('click', () => {
+                  if (!shell || typeof shell.enterScreen !== 'function')
+                      return;
+                  shell.enterScreen('pve-session', {
+                      modeKey: 'campaign',
+                      stageId: selected?.id,
+                      bossId: selected?.bossId,
+                  });
+              });
+          }
+      }
+      function renderList() {
+          if (!(stageList instanceof HTMLElement))
+              return;
+          stageList.innerHTML = '';
+          CAMPAIGN_STAGE_DATA.forEach((stage) => {
+              const card = document.createElement('button');
+              card.type = 'button';
+              card.className = `stage-card${selected?.id === stage.id ? ' stage-card--active' : ''}`;
+              card.innerHTML = `
+          <div class="stage-card__top"><strong>${stage.id}</strong><span>${stage.chapter}</span></div>
+          <div class="stage-card__title">${stage.title.replace(`${stage.id} · `, '')}</div>
+          <div class="stage-card__status">${statusLabel(stage)}</div>
+        `;
+              card.addEventListener('click', () => {
+                  selected = stage;
+                  renderList();
+                  renderInfo();
+              });
+              stageList.appendChild(card);
+          });
+      }
+      CAMPAIGN_STAGE_DATA.forEach((stage, index) => {
+          if (!(nodesWrap instanceof HTMLElement))
+              return;
+          const node = document.createElement('button');
+          node.type = 'button';
+          node.className = 'campaign-node';
+          node.style.left = nodePositions[index]?.split(' ')[0] ?? '50%';
+          node.style.top = nodePositions[index]?.split(' ')[1] ?? '50%';
+          node.innerHTML = `<span class="campaign-node__badge">${stage.id}</span><span class="campaign-node__dot"></span>`;
+          node.addEventListener('click', () => {
+              selected = stage;
+              setOverlayVisible(true);
+              renderList();
+              renderInfo();
+          });
+          nodesWrap.appendChild(node);
+      });
+      if (backButton instanceof HTMLButtonElement) {
+          backButton.addEventListener('click', () => {
+              if (shell && typeof shell.enterScreen === 'function')
+                  shell.enterScreen('main-menu');
+          });
+      }
+      renderList();
+      renderInfo();
+      return {
+          destroy() {
               mount.destroy();
           }
       };

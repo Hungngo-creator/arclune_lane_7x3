@@ -22,6 +22,7 @@ const LINEUP_SCREEN_MODULE_ID = '@screens/lineup/index.ts' as const;
 const COLLECTION_SCREEN_MODULE_ID = '@screens/collection/index.ts' as const;
 const GACHA_SCREEN_MODULE_ID = '@screens/ui-gacha/index.ts' as const;
 const ARENA_HUB_SCREEN_MODULE_ID = '@screens/arena-hub/index.ts' as const;
+const CAMPAIGN_WORLD_MAP_SCREEN_MODULE_ID = '@screens/campaign-world-map/index.ts' as const;
 const SECT_SCREEN_MODULE_ID = './screens/sect/index.ts' as const;
 
 const MODE_TYPES = {
@@ -72,8 +73,8 @@ const MODES = [
     menuSections: ['core-pve'],
     parentId: 'arena-hub',
     shell: {
-      screenId: 'pve-session',
-      moduleId: PVE_SESSION_MODULE_ID,
+      screenId: 'campaign-world-map',
+      moduleId: CAMPAIGN_WORLD_MAP_SCREEN_MODULE_ID,
       defaultParams: { modeKey: 'campaign' }
     }
   },
