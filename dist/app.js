@@ -321,25 +321,23 @@ __define('./ai.ts', (exports, module, __require) => {
   const pickRandom = __dep0.pickRandom;
   const slotToCell = __dep0.slotToCell;
   const cellReserved = __dep0.cellReserved;
-  const __dep1 = __require('./turns.ts');
-  const predictSpawnCycle = __dep1.predictSpawnCycle;
-  const __dep2 = __require('./config.ts');
-  const CFG = __dep2.CFG;
-  const __dep3 = __require('./utils/time.ts');
-  const sharedSafeNow = __dep3.safeNow;
-  const __dep4 = __require('./utils/kit.ts');
-  const detectUltBehavior = __dep4.detectUltBehavior;
-  const getSummonSpec = __dep4.getSummonSpec;
-  const resolveSummonSlots = __dep4.resolveSummonSlots;
-  const __dep5 = __require('./units.ts');
-  const lookupUnit = __dep5.lookupUnit;
-  const __dep6 = __require('./aether.ts');
-  const globalAetherPool = __dep6.globalAetherPool;
-  const __dep7 = __require('./leader-uyen.ts');
-  const isUyenLeader = __dep7.isUyenLeader;
-  const isLeaderUltReady = __dep7.isLeaderUltReady;
-  const __dep8 = __require('./shared-types/units.ts');
-  const createSummonQueue = __dep8.createSummonQueue;
+  const __dep1 = __require('./config.ts');
+  const CFG = __dep1.CFG;
+  const __dep2 = __require('./utils/time.ts');
+  const sharedSafeNow = __dep2.safeNow;
+  const __dep3 = __require('./utils/kit.ts');
+  const detectUltBehavior = __dep3.detectUltBehavior;
+  const getSummonSpec = __dep3.getSummonSpec;
+  const resolveSummonSlots = __dep3.resolveSummonSlots;
+  const __dep4 = __require('./units.ts');
+  const lookupUnit = __dep4.lookupUnit;
+  const __dep5 = __require('./aether.ts');
+  const globalAetherPool = __dep5.globalAetherPool;
+  const __dep6 = __require('./leader-uyen.ts');
+  const isUyenLeader = __dep6.isUyenLeader;
+  const isLeaderUltReady = __dep6.isLeaderUltReady;
+  const __dep7 = __require('./shared-types/units.ts');
+  const createSummonQueue = __dep7.createSummonQueue;
   function toMetaEntry(value) {
       if (!value || typeof value !== 'object')
           return null;
@@ -366,6 +364,27 @@ __define('./ai.ts', (exports, module, __require) => {
   });
   const DEFAULT_DEBUG_KEEP = 6;
   const tokensAlive = (Game) => Game.tokens.filter((t) => t.alive);
+  function predictSpawnCycleLocal(Game, side, slot) {
+      const turn = Game.turn;
+      if (!turn)
+          return 0;
+      const cycle = Math.max(0, Number.isFinite(turn.cycle) ? turn.cycle : 0);
+      const maybeSequential = turn;
+      const order = Array.isArray(maybeSequential.order) ? maybeSequential.order : null;
+      if (!order) {
+          return turn.mode === 'interleaved_by_position' ? cycle : cycle + 1;
+      }
+      if (order.length === 0) {
+          return cycle + 1;
+      }
+      const idx = order.findIndex((entry) => entry?.side === side && entry?.slot === slot);
+      if (idx < 0) {
+          return cycle + 1;
+      }
+      const cursorRaw = Number.isFinite(maybeSequential.cursor) ? Number(maybeSequential.cursor) : 0;
+      const cursor = Math.max(0, Math.min(order.length - 1, cursorRaw));
+      return idx >= cursor ? cycle : cycle + 1;
+  }
   function mergedWeights() {
       const cfg = CFG.AI?.WEIGHTS ?? {};
       const out = { ...DEFAULT_WEIGHTS };
@@ -486,7 +505,7 @@ __define('./ai.ts', (exports, module, __require) => {
       return out;
   }
   function etaScoreEnemy(Game, slot) {
-      return predictSpawnCycle(Game, 'enemy', slot) === (Game.turn?.cycle ?? 0) ? 1 : 0.5;
+      return predictSpawnCycleLocal(Game, 'enemy', slot) === (Game.turn?.cycle ?? 0) ? 1 : 0.5;
   }
   function pressureScore(cx, cy) {
       const dist = Math.abs(cx - 0) + Math.abs(cy - 1);
@@ -659,7 +678,7 @@ __define('./ai.ts', (exports, module, __require) => {
       const queue = ensureEnemyQueue(Game);
       if (queue.has(slot))
           return false;
-      const spawnCycle = predictSpawnCycle(Game, 'enemy', slot);
+      const spawnCycle = predictSpawnCycleLocal(Game, 'enemy', slot);
       queue.set(slot, {
           unitId: card.id,
           name: typeof card.name === 'string' ? card.name : undefined,

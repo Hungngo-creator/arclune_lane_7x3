@@ -1,6 +1,5 @@
 //home (termux)/arclune_lane_7x3/src/ai.ts
 import { pickRandom, slotToCell, cellReserved } from './engine.ts';
-import { predictSpawnCycle } from './turns.ts';
 import { CFG } from './config.ts';
 import { safeNow as sharedSafeNow } from './utils/time.ts';
 import { detectUltBehavior, getSummonSpec, resolveSummonSlots } from './utils/kit.ts';
@@ -115,6 +114,32 @@ const DEFAULT_WEIGHTS = Object.freeze({
 const DEFAULT_DEBUG_KEEP = 6;
 
 const tokensAlive = (Game: SessionState): ReadonlyArray<UnitToken> => Game.tokens.filter((t) => t.alive);
+
+function predictSpawnCycleLocal(Game: SessionState, side: 'ally' | 'enemy', slot: number): number {
+  const turn = Game.turn;
+  if (!turn) return 0;
+
+  const cycle = Math.max(0, Number.isFinite(turn.cycle) ? turn.cycle : 0);
+  const maybeSequential = turn as { order?: Array<{ side?: string; slot?: number }>; cursor?: number };
+  const order = Array.isArray(maybeSequential.order) ? maybeSequential.order : null;
+
+  if (!order) {
+    return turn.mode === 'interleaved_by_position' ? cycle : cycle + 1;
+  }
+
+  if (order.length === 0) {
+    return cycle + 1;
+  }
+
+  const idx = order.findIndex((entry) => entry?.side === side && entry?.slot === slot);
+  if (idx < 0) {
+    return cycle + 1;
+  }
+
+  const cursorRaw = Number.isFinite(maybeSequential.cursor) ? Number(maybeSequential.cursor) : 0;
+  const cursor = Math.max(0, Math.min(order.length - 1, cursorRaw));
+  return idx >= cursor ? cycle : cycle + 1;
+}
 
 function mergedWeights(): Record<string, number> {
   const cfg = CFG.AI?.WEIGHTS ?? {};
@@ -240,7 +265,7 @@ function listEmptyEnemySlots(Game: SessionState, aliveTokens?: readonly UnitToke
 }
 
 function etaScoreEnemy(Game: SessionState, slot: number): number {
-  return predictSpawnCycle(Game, 'enemy', slot) === (Game.turn?.cycle ?? 0) ? 1 : 0.5;
+  return predictSpawnCycleLocal(Game, 'enemy', slot) === (Game.turn?.cycle ?? 0) ? 1 : 0.5;
 }
 
 function pressureScore(cx: number, cy: number): number {
@@ -425,7 +450,7 @@ export function queueEnemyAt(
   const queue = ensureEnemyQueue(Game);
   if (queue.has(slot)) return false;
 
-  const spawnCycle = predictSpawnCycle(Game, 'enemy', slot);
+  const spawnCycle = predictSpawnCycleLocal(Game, 'enemy', slot);
 
   queue.set(slot, {
     unitId: card.id,
