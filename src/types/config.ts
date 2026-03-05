@@ -312,6 +312,13 @@ export interface RosterUnitDefinition {
   rank: string;
   mods?: Partial<Record<keyof CatalogStatBlock, number>>;
   kit: UnitKitConfig;
+  isNpc?: boolean;
+  tags?: ReadonlyArray<string>;
+  dynamicRankSource?: 'lineup';
+  dynamicLevelSource?: 'lineup';
+  mutated?: boolean;
+  mutationBonusPct?: number;
+  mutationDebuffPool?: ReadonlyArray<'bleed' | 'stun' | 'poison'>;
   [extra: string]: unknown;
 }
 

@@ -2596,19 +2596,19 @@ Tổng kết: Matthew là một Boss dạng "Stat-check". Nếu đội hình b�
 Mô tả: creep pvp thường dùng, không phải boss
 Nội tại: +5% tất cả chỉ số khi vào trận, khi hp về 0 thì các creep khác còn sống sẽ được hồi hp = 3% hp max của creep này.
 Đánh thường: gây sát thương = 100% atk và wil
-Không có ult, chỉ đánh thường.
+Không có ult, không nộ, chỉ đánh thường.
 
 3) creep #2
 Mô tả: như creep 1# nhưng ngoại hình sẽ khác creep 1 để dễ phân biệt.
 Nội tại: +7% tất cả chỉ số khi vào trận, khi hp về 0 thì các creep khác còn sống sẽ được hồi hp = 4% hp max của creep này. (Miễn là creep thì sẽ áp dụng).
 Đánh thường: gây sát thương = 100% atk và wil
-Không có ult, chỉ đánh thường.
+Không có ult, không nộ, chỉ đánh thường.
 
 4) creep #3
 Mô tả: như creep 1# nhưng ngoại hình sẽ khác creep #1 và #2 để dễ phân biệt.
 Nội tại: +10% tất cả chỉ số khi vào trận, khi hp về 0 thì các creep khác còn sống sẽ được hồi hp = 5% hp max của creep này. (Miễn là creep thì sẽ áp dụng).
 Đánh thường: gây sát thương = 100% atk và wil
-Không có ult, chỉ đánh thường.
+Không có ult, không nộ, chỉ đánh thường.
 
 5) golem #1 tanker.
 Mô tả: một golem hệ sinh mệnh, chuyên phòng thủ hp cao chậm chạm atk/wil thấp so với rank của bản thân.

@@ -79,6 +79,18 @@ export interface SessionRuntimeState {
   wave: WaveState | null;
   rewardQueue: RewardRoll[];
   unitProgressById?: Map<UnitId, RuntimeUnitProgress>;
+  pveRosterMeta?: ReadonlyArray<PveRuntimeRosterMeta>;
+}
+
+export interface PveRuntimeRosterMeta {
+  unitId: UnitId;
+  isNpc?: boolean;
+  tags?: string[];
+  dynamicRankSource?: 'lineup';
+  dynamicLevelSource?: 'lineup';
+  mutated?: boolean;
+  mutationBonusPct?: number;
+  mutationDebuffPool?: Array<'bleed' | 'stun' | 'poison'>;
 }
 
 export interface CollectionProgressUnitInput extends Record<string, unknown> {

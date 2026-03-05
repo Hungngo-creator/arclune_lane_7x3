@@ -154,6 +154,13 @@ export interface PveDeckEntry {
   name?: string | null;
   art?: UnitArt | null;
   skinKey?: string | null;
+  isNpc?: boolean;
+  tags?: string[];
+  dynamicRankSource?: 'lineup';
+  dynamicLevelSource?: 'lineup';
+  mutated?: boolean;
+  mutationBonusPct?: number;
+  mutationDebuffPool?: Array<'bleed' | 'stun' | 'poison'>;
   [extra: string]: unknown;
 }
 
