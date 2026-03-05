@@ -11,6 +11,7 @@ import { CFG } from './config.ts';
 import { gainFury, startFurySkill, finishFuryHit } from './utils/fury.ts';
 import { mergeBusyUntil, sessionNow } from './utils/time.ts';
 import { ABSOLUTE_ATTACK_TAG_IDS, ABSOLUTE_SHIELD_TAG_IDS } from './data/tags.ts';
+import { applyUyenBasicExtras } from './leader-uyen.ts';
 
 export { applyDamage, grantShield };
 
@@ -490,6 +491,11 @@ export function basicAttack(Game: SessionState, unit: UnitToken): void {
     }
   }
   const dealt = hitResult.dealt;
+  const turnStamp = `${Game.turn?.cycle ?? 0}:${unit.iid ?? 0}`;
+  applyUyenBasicExtras(unit, resolved, {
+    wasKill: !resolved.alive,
+    turnStamp,
+  });
 
   const afterHitHandlers = passiveCtx.afterHit.filter(isBasicAttackAfterHitHandler);
 

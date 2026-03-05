@@ -1,7 +1,7 @@
 // Bundled by build.mjs
 const __modules = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }
 function __define(id, factory){ __modules[id] = { factory, exports: null, initialized: false }; }
@@ -335,8 +335,11 @@ __define('./ai.ts', (exports, module, __require) => {
   const lookupUnit = __dep5.lookupUnit;
   const __dep6 = __require('./aether.ts');
   const globalAetherPool = __dep6.globalAetherPool;
-  const __dep7 = __require('./shared-types/units.ts');
-  const createSummonQueue = __dep7.createSummonQueue;
+  const __dep7 = __require('./leader-uyen.ts');
+  const isUyenLeader = __dep7.isUyenLeader;
+  const isLeaderUltReady = __dep7.isLeaderUltReady;
+  const __dep8 = __require('./shared-types/units.ts');
+  const createSummonQueue = __dep8.createSummonQueue;
   function toMetaEntry(value) {
       if (!value || typeof value !== 'object')
           return null;
@@ -890,6 +893,8 @@ __define('./ai.ts', (exports, module, __require) => {
               return Array.isArray(unit.statuses)
                   && unit.statuses.some((status) => status && status.kind === 'debuff');
           case 'self_full_fury': {
+              if (isUyenLeader(unit))
+                  return isLeaderUltReady(unit);
               const fury = Number.isFinite(unit.fury) ? Number(unit.fury) : 0;
               const furyMax = Math.max(1, Number.isFinite(unit.furyMax) ? Number(unit.furyMax) : 100);
               return fury >= furyMax;
@@ -3968,6 +3973,8 @@ __define('./combat.ts', (exports, module, __require) => {
   const __dep9 = __require('./data/tags.ts');
   const ABSOLUTE_ATTACK_TAG_IDS = __dep9.ABSOLUTE_ATTACK_TAG_IDS;
   const ABSOLUTE_SHIELD_TAG_IDS = __dep9.ABSOLUTE_SHIELD_TAG_IDS;
+  const __dep10 = __require('./leader-uyen.ts');
+  const applyUyenBasicExtras = __dep10.applyUyenBasicExtras;
   exports.applyDamage = applyDamage;
   exports.grantShield = grantShield;
   const isBasicAttackAfterHitHandler = (handler) => typeof handler === 'function';
@@ -4339,6 +4346,11 @@ __define('./combat.ts', (exports, module, __require) => {
           }
       }
       const dealt = hitResult.dealt;
+      const turnStamp = `${Game.turn?.cycle ?? 0}:${unit.iid ?? 0}`;
+      applyUyenBasicExtras(unit, resolved, {
+          wasKill: !resolved.alive,
+          turnStamp,
+      });
       const afterHitHandlers = passiveCtx.afterHit.filter(isBasicAttackAfterHitHandler);
       if (afterHitHandlers.length > 0) {
           const afterCtx = {
@@ -11108,6 +11120,98 @@ __define('./events.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'emitGameEvent')) exports.emitGameEvent = emitGameEvent;
   if (!Object.prototype.hasOwnProperty.call(exports, 'addGameEventListener')) exports.addGameEventListener = addGameEventListener;
 });
+__define('./leader-uyen.ts', (exports, module, __require) => {
+  const stateMap = new WeakMap();
+  function isUyenLeader(unit) {
+      return !!unit && (unit.id === 'leaderA' || unit.id === 'leaderB');
+  }
+  function ensureUyenState(unit) {
+      if (!isUyenLeader(unit))
+          return null;
+      const existing = stateMap.get(unit);
+      if (existing)
+          return existing;
+      const created = {
+          reviveRageCount: 0,
+          a1Stacks: 0,
+          a3Stacks: 0,
+          bUses: 0,
+          basicTurnStamp: null,
+      };
+      stateMap.set(unit, created);
+      return created;
+  }
+  function isLeaderUltReady(unit) {
+      if (!unit)
+          return false;
+      const fury = Number.isFinite(unit.fury) ? Number(unit.fury) : 0;
+      const furyMax = Math.max(1, Number.isFinite(unit.furyMax) ? Number(unit.furyMax) : 100);
+      return fury >= furyMax || fury >= 100;
+  }
+  function grantUyenSummonRage(unit, options = {}) {
+      if (!isUyenLeader(unit))
+          return;
+      if (options.isMinion)
+          return;
+      const state = ensureUyenState(unit);
+      if (!state)
+          return;
+      if (options.revived) {
+          if (state.reviveRageCount >= 5)
+              return;
+          state.reviveRageCount += 1;
+      }
+      const current = Number.isFinite(unit.fury) ? Number(unit.fury) : 0;
+      const cap = Math.max(1, Number.isFinite(unit.furyMax) ? Number(unit.furyMax) : 100);
+      unit.fury = Math.min(cap, current + 5);
+      unit.rage = unit.fury;
+  }
+  function applyUyenBasicExtras(attacker, target, options = {}) {
+      if (!isUyenLeader(attacker) || !target)
+          return;
+      const state = ensureUyenState(attacker);
+      if (!state)
+          return;
+      if (state.a1Stacks > 0) {
+          const fury = Number.isFinite(attacker.fury) ? Number(attacker.fury) : 0;
+          const cap = Math.max(1, Number.isFinite(attacker.furyMax) ? Number(attacker.furyMax) : 100);
+          attacker.fury = Math.min(cap, fury + 3);
+          attacker.rage = attacker.fury;
+      }
+      const turnStamp = options.turnStamp ?? null;
+      const targetHp = Number.isFinite(target.hp) ? Number(target.hp) : 0;
+      const targetHpMax = Math.max(1, Number.isFinite(target.hpMax) ? Number(target.hpMax) : 1);
+      if (targetHp / targetHpMax < 0.3 && state.basicTurnStamp !== turnStamp) {
+          const fury = Number.isFinite(attacker.fury) ? Number(attacker.fury) : 0;
+          const cap = Math.max(1, Number.isFinite(attacker.furyMax) ? Number(attacker.furyMax) : 100);
+          attacker.fury = Math.min(cap, fury + 5);
+          attacker.rage = attacker.fury;
+          state.basicTurnStamp = turnStamp;
+      }
+      if (options.wasKill) {
+          const hp = Number.isFinite(attacker.hp) ? Number(attacker.hp) : 0;
+          const hpMax = Math.max(1, Number.isFinite(attacker.hpMax) ? Number(attacker.hpMax) : 1);
+          attacker.hp = Math.min(hpMax, hp + Math.round(hpMax * 0.05));
+      }
+  }
+  function getUyenUltState(unit) {
+      return ensureUyenState(unit);
+  }
+  function getUyenUltChoice(unit) {
+      const choice = unit?.leaderUltChoice;
+      if (choice === 'A' || choice === 'B' || choice === 'C')
+          return choice;
+      return 'C';
+  }
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'isUyenLeader')) exports.isUyenLeader = isUyenLeader;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'ensureUyenState')) exports.ensureUyenState = ensureUyenState;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'isLeaderUltReady')) exports.isLeaderUltReady = isLeaderUltReady;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'grantUyenSummonRage')) exports.grantUyenSummonRage = grantUyenSummonRage;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'applyUyenBasicExtras')) exports.applyUyenBasicExtras = applyUyenBasicExtras;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getUyenUltState')) exports.getUyenUltState = getUyenUltState;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getUyenUltChoice')) exports.getUyenUltChoice = getUyenUltChoice;
+});
 __define('./main.ts', (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/main.ts
   const __dep1 = __require('./events.ts');
@@ -11651,6 +11755,11 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   const normalizeDeckEntries = __dep22.normalizeDeckEntries;
   const __dep23 = __require('./modes/pve/collection-mapper.ts');
   const mapUnitProgressById = __dep23.mapUnitProgressById;
+  const __dep24 = __require('./leader-uyen.ts');
+  const ensureUyenState = __dep24.ensureUyenState;
+  const getUyenUltChoice = __dep24.getUyenUltChoice;
+  const grantUyenSummonRage = __dep24.grantUyenSummonRage;
+  const isUyenLeader = __dep24.isUyenLeader;
   const isPlainRecord = (value) => (!!value && typeof value === 'object');
   const isFiniteNumber = (value) => (typeof value === 'number' && Number.isFinite(value));
   const parseFiniteNumber = (value) => {
@@ -12673,11 +12782,94 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       const dur = Math.max(0, duration | 0);
       game.turn.busyUntil = mergeBusyUntil(game.turn.busyUntil, now, dur);
   }
+  function performUyenLeaderUlt(game, unit) {
+      const state = ensureUyenState(unit);
+      if (!state)
+          return false;
+      const furyNow = Math.max(0, Math.floor(parseFiniteNumber(unit.fury) ?? 0));
+      const choice = getUyenUltChoice(unit);
+      if (choice === 'A') {
+          if (furyNow < 100)
+              return false;
+          spendFury(unit, 100);
+          const candidates = [];
+          if (state.a1Stacks < 10)
+              candidates.push('A1');
+          candidates.push('A2');
+          if (state.a3Stacks < 3)
+              candidates.push('A3');
+          const roll = candidates[Math.floor(Math.random() * Math.max(1, candidates.length))] ?? 'A2';
+          if (roll === 'A1') {
+              state.a1Stacks += 1;
+          }
+          else if (roll === 'A2') {
+              const allies = (game.tokens || []).filter((token) => token.alive && token.side === unit.side);
+              for (const ally of allies) {
+                  const haste = makeStatusEffect('haste', { pct: 0.25, turns: 3 });
+                  if (haste)
+                      Statuses.add(ally, haste);
+              }
+          }
+          else {
+              state.a3Stacks += 1;
+              unit.hpMax = Math.max(1, Math.round((parseFiniteNumber(unit.hpMax) ?? 1) * 1.1));
+              unit.hp = Math.min(unit.hpMax, Math.round((parseFiniteNumber(unit.hp) ?? 0) * 1.1));
+          }
+          return true;
+      }
+      if (choice === 'B') {
+          if (state.bUses >= 10 || furyNow <= 0)
+              return false;
+          const cost = Math.max(1, Math.floor(furyNow * 0.4));
+          spendFury(unit, cost);
+          unit.furyMax = Math.max(1, Math.round((parseFiniteNumber(unit.furyMax) ?? 100) * 1.3));
+          unit.rage = unit.fury;
+          healUnit(unit, Math.round((parseFiniteNumber(unit.hpMax) ?? 0) * 0.05));
+          state.bUses += 1;
+          if (state.bUses === 3 || state.bUses === 6 || state.bUses === 10) {
+              unit.hpMax = Math.max(1, Math.round((parseFiniteNumber(unit.hpMax) ?? 1) * 1.05));
+              unit.hp = Math.min(unit.hpMax, parseFiniteNumber(unit.hp) ?? unit.hpMax);
+          }
+          return true;
+      }
+      if (furyNow < 100)
+          return false;
+      spendFury(unit, 100);
+      const enemySide = unit.side === 'ally' ? 'enemy' : 'ally';
+      const enemies = (game.tokens || []).filter((token) => token.alive && token.side === enemySide);
+      const bonus = Math.min(state.bUses * 0.05, 0.35);
+      for (const enemy of enemies) {
+          const hpBase = 0.5 * (parseFiniteNumber(unit.hpMax) ?? 0);
+          const hpComp = isUyenLeader(enemy) ? Math.min(hpBase, 0.1 * (parseFiniteNumber(unit.hpMax) ?? 0)) : hpBase;
+          const base = hpComp + 0.6 * (parseFiniteNumber(unit.atk) ?? 0) + 0.6 * (parseFiniteNumber(unit.wil) ?? 0);
+          const scaled = Math.max(1, Math.round(base * (1 + bonus)));
+          dealAbilityDamage(game, unit, enemy, {
+              base: Math.round(scaled * 0.5),
+              dtype: 'physical',
+              attackType: 'skill',
+              defPen: 0.1,
+          });
+          dealAbilityDamage(game, unit, enemy, {
+              base: Math.round(scaled * 0.5),
+              dtype: 'arcane',
+              attackType: 'skill',
+              defPen: 0.1,
+          });
+      }
+      return true;
+  }
   // Thực thi Ult: Summoner -> Immediate Summon theo meta; class khác: trừ nộ
   function performUlt(unit) {
       const game = getInitializedGame();
       if (!game) {
           setFury(unit, 0);
+          return;
+      }
+      if (isUyenLeader(unit)) {
+          const casted = performUyenLeaderUlt(game, unit);
+          if (casted) {
+              extendBusy(900);
+          }
           return;
       }
       const metaGetter = game.meta?.get;
@@ -13100,6 +13292,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   break;
               fallen.sort((a, b) => (b.deadAt || 0) - (a.deadAt || 0));
               const take = Math.max(1, Math.min(fallen.length, getUltTargetCount(u, 1)));
+              const sideLeader = (game.tokens || []).find((token) => token.alive && token.side === unit.side && isUyenLeader(token));
               for (let i = 0; i < take; i++) {
                   const ally = fallen[i];
                   if (!ally)
@@ -13127,6 +13320,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                       }
                       catch (_) { }
                   }
+                  grantUyenSummonRage(sideLeader, { revived: true, isMinion: !!ally.isMinion });
               }
               busyMs = 1500;
               break;
@@ -19663,6 +19857,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
   const evaluatePassive = __dep8.evaluatePassive;
   const filterRoster = __dep8.filterRoster;
   const getUnitRarity = __dep8.getUnitRarity;
+  const LINEUP_ALLOWED_LEADER_IDS = __dep8.LINEUP_ALLOWED_LEADER_IDS;
   const __dep9 = __require('./screens/lineup/view/events.ts');
   const bindLineupEvents = __dep9.bindLineupEvents;
   const STYLE_ID = 'lineup-view-style-v1';
@@ -20476,9 +20671,12 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
                   leaderName.textContent = unit.name;
               }
               else {
+                  const fallbackName = lineup.leaderId === 'leaderA'
+                      ? 'Uyên'
+                      : (lineup.leaderId === 'leaderB' ? 'Địch' : 'Leader');
                   unmountRarity(leaderAvatar);
-                  renderAvatar(leaderAvatar, null, '');
-                  leaderName.textContent = 'Leader';
+                  renderAvatar(leaderAvatar, null, fallbackName);
+                  leaderName.textContent = fallbackName;
               }
           }
           else {
@@ -20642,27 +20840,32 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           clearOption.textContent = 'Bỏ chọn leader';
           clearOption.dataset.unitId = '';
           list.appendChild(clearOption);
-          state.roster.forEach(unit => {
-              const unitId = normalizeUnitId(unit.id);
+          const fixedLeaders = [
+              { id: 'leaderA', name: 'Uyên', role: 'Leader', rank: 'SSR', avatar: null },
+              { id: 'leaderB', name: 'Địch', role: 'Leader', rank: 'SSR', avatar: null },
+          ];
+          fixedLeaders
+              .filter((leader) => LINEUP_ALLOWED_LEADER_IDS.has(leader.id))
+              .forEach((leader) => {
               const option = document.createElement('button');
               option.type = 'button';
               option.className = 'lineup-overlay__option';
-              option.dataset.unitId = unitId;
+              option.dataset.unitId = leader.id;
               const avatar = document.createElement('div');
               avatar.className = 'lineup-overlay__option-avatar';
-              renderAvatar(avatar, unit.avatar || null, unit.name);
+              renderAvatar(avatar, leader.avatar, leader.name);
               option.appendChild(avatar);
               const text = document.createElement('div');
               const nameEl = document.createElement('p');
               nameEl.className = 'lineup-overlay__option-name';
-              nameEl.textContent = unit.name;
+              nameEl.textContent = leader.name;
               text.appendChild(nameEl);
               const meta = document.createElement('p');
               meta.className = 'lineup-overlay__option-meta';
-              meta.textContent = [unit.role, unit.rank].filter(Boolean).join(' · ');
+              meta.textContent = [leader.role, leader.rank].filter(Boolean).join(' · ');
               text.appendChild(meta);
               option.appendChild(text);
-              if (lineup.leaderId === unitId) {
+              if (lineup.leaderId === leader.id) {
                   option.classList.add('is-active');
               }
               list.appendChild(option);
@@ -21046,9 +21249,7 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
           };
       });
       const leaderIdValue = source.leaderId ?? source.leader ?? source.captainId ?? null;
-      const fallbackLeader = cells.find(cell => cell.section === 'formation' && cell.unitId)?.unitId
-          ?? cells.find(cell => cell.unitId)?.unitId
-          ?? null;
+      const fallbackLeader = 'leaderA';
       const defaultCurrencyIdValue = defaultCurrencyId ?? source.currency ?? null;
       return {
           id: String(id),
@@ -21057,7 +21258,7 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
           description: typeof description === 'string' ? description : '',
           cells,
           passives,
-          leaderId: (typeof leaderIdValue === 'string' && rosterIndex.has(leaderIdValue)) ? leaderIdValue : fallbackLeader,
+          leaderId: (typeof leaderIdValue === 'string' && LINEUP_ALLOWED_LEADER_IDS.has(leaderIdValue)) ? leaderIdValue : fallbackLeader,
           defaultCurrencyId: typeof defaultCurrencyIdValue === 'string' ? defaultCurrencyIdValue : null,
       };
   }
@@ -21321,6 +21522,7 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
       cell.unlockCost = null;
       return { ok: true, spent: cost ?? null };
   }
+  const LINEUP_ALLOWED_LEADER_IDS = new Set(['leaderA', 'leaderB']);
   function isUnitPlaced(lineup, unitId) {
       if (!unitId)
           return false;
@@ -21338,24 +21540,18 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
           lineup.leaderId = null;
           return { ok: true };
       }
-      const unit = rosterLookup.get(unitId);
-      if (!unit) {
-          return { ok: false, message: 'Không tìm thấy nhân vật.' };
+      if (!LINEUP_ALLOWED_LEADER_IDS.has(unitId)) {
+          return { ok: false, message: 'Leader chỉ có thể là Uyên hoặc Địch.' };
       }
-      if (!isUnitPlaced(lineup, unitId)) {
-          const primary = lineup.cells.find(entry => entry.section === 'formation' && entry.unlocked && !entry.unitId)
-              ?? lineup.cells.find(entry => entry.unlocked && !entry.unitId);
-          if (primary) {
-              assignUnitToCell(lineup, primary.index, unitId);
-          }
-          else {
-              return { ok: false, message: 'Không còn ô trống để gán leader.' };
-          }
+      const unit = rosterLookup.get(unitId);
+      if (!unit && unitId !== 'leaderA' && unitId !== 'leaderB') {
+          return { ok: false, message: 'Không tìm thấy nhân vật.' };
       }
       lineup.leaderId = unitId;
       return { ok: true };
   }
   //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'LINEUP_ALLOWED_LEADER_IDS')) exports.LINEUP_ALLOWED_LEADER_IDS = LINEUP_ALLOWED_LEADER_IDS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeRoster')) exports.normalizeRoster = normalizeRoster;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getUnitRarity')) exports.getUnitRarity = getUnitRarity;
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeLineups')) exports.normalizeLineups = normalizeLineups;
@@ -24580,6 +24776,10 @@ __define('./turns.ts', (exports, module, __require) => {
   const applyCultivationBonus = __dep15.applyCultivationBonus;
   const __dep16 = __require('./ai.ts');
   const evaluateGambitLogic = __dep16.evaluateGambitLogic;
+  const __dep17 = __require('./leader-uyen.ts');
+  const isLeaderUltReady = __dep17.isLeaderUltReady;
+  const isUyenLeader = __dep17.isUyenLeader;
+  const grantUyenSummonRage = __dep17.grantUyenSummonRage;
   const toLowerSide = (side) => {
       if (side === 'ALLY')
           return 'ally';
@@ -24764,6 +24964,8 @@ __define('./turns.ts', (exports, module, __require) => {
       prepareUnitForPassives(obj);
       Game.tokens.push(obj);
       applyOnSpawnEffects(Game, obj, kit?.onSpawn ?? undefined);
+      const allyLeader = Game.tokens.find((token) => token.alive && token.side === obj.side && isUyenLeader(token));
+      grantUyenSummonRage(allyLeader, { revived: !!p.revive, isMinion: !!obj.isMinion });
       {
           const sessionVfx = asSessionWithVfx(Game, { requireGrid: true });
           if (sessionVfx) {
@@ -24942,7 +25144,10 @@ __define('./turns.ts', (exports, module, __require) => {
       }
       const ultCost = resolveUltCost(unit, CFG);
       const runUlt = () => {
-          if ((unit.fury ?? 0) < ultCost || Statuses.blocks(unit, 'ult'))
+          const ready = isUyenLeader(unit)
+              ? isLeaderUltReady(unit)
+              : (unit.fury ?? 0) >= ultCost;
+          if (!ready || Statuses.blocks(unit, 'ult'))
               return false;
           let ultOk = false;
           try {
@@ -24952,8 +25157,11 @@ __define('./turns.ts', (exports, module, __require) => {
           catch (e) {
               console.error('[performUlt]', e);
           }
-          if (ultOk) {
+          if (ultOk && !isUyenLeader(unit)) {
               spendFury(unit, ultCost, CFG);
+              emitPassiveEvent(Game, unit, 'onUltCast', { log: getPassiveLog(Game) });
+          }
+          if (ultOk && isUyenLeader(unit)) {
               emitPassiveEvent(Game, unit, 'onUltCast', { log: getPassiveLog(Game) });
           }
           Statuses.onTurnEnd(unit, {});
@@ -25012,7 +25220,10 @@ __define('./turns.ts', (exports, module, __require) => {
               continue;
           }
       }
-      if ((unit.fury ?? 0) >= ultCost && !Statuses.blocks(unit, 'ult')) {
+      const autoUltReady = isUyenLeader(unit)
+          ? isLeaderUltReady(unit)
+          : (unit.fury ?? 0) >= ultCost;
+      if (autoUltReady && !Statuses.blocks(unit, 'ult')) {
           runUlt();
           return resolution;
       }

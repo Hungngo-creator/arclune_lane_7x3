@@ -68,6 +68,7 @@ import {
   normalizeDeckEntries,
 } from './session-state';
 import { mapUnitProgressById } from './collection-mapper.ts';
+import { ensureUyenState, getUyenUltChoice, grantUyenSummonRage, isUyenLeader } from '../../leader-uyen.ts';
 
 import type {
   BattleDetail,
@@ -1316,6 +1317,77 @@ function extendBusy(duration: number): void {
   game.turn.busyUntil = mergeBusyUntil(game.turn.busyUntil, now, dur);
 }
 
+function performUyenLeaderUlt(game: SessionState, unit: UnitToken): boolean {
+  const state = ensureUyenState(unit);
+  if (!state) return false;
+  const furyNow = Math.max(0, Math.floor(parseFiniteNumber(unit.fury) ?? 0));
+  const choice = getUyenUltChoice(unit);
+
+  if (choice === 'A') {
+    if (furyNow < 100) return false;
+    spendFury(unit, 100);
+    const candidates: Array<'A1' | 'A2' | 'A3'> = [];
+    if (state.a1Stacks < 10) candidates.push('A1');
+    candidates.push('A2');
+    if (state.a3Stacks < 3) candidates.push('A3');
+    const roll = candidates[Math.floor(Math.random() * Math.max(1, candidates.length))] ?? 'A2';
+    if (roll === 'A1') {
+      state.a1Stacks += 1;
+    } else if (roll === 'A2') {
+      const allies = (game.tokens || []).filter((token) => token.alive && token.side === unit.side);
+      for (const ally of allies) {
+        const haste = makeStatusEffect('haste', { pct: 0.25, turns: 3 });
+        if (haste) Statuses.add(ally, haste);
+      }
+    } else {
+      state.a3Stacks += 1;
+      unit.hpMax = Math.max(1, Math.round((parseFiniteNumber(unit.hpMax) ?? 1) * 1.1));
+      unit.hp = Math.min(unit.hpMax, Math.round((parseFiniteNumber(unit.hp) ?? 0) * 1.1));
+    }
+    return true;
+  }
+
+  if (choice === 'B') {
+    if (state.bUses >= 10 || furyNow <= 0) return false;
+    const cost = Math.max(1, Math.floor(furyNow * 0.4));
+    spendFury(unit, cost);
+    unit.furyMax = Math.max(1, Math.round((parseFiniteNumber(unit.furyMax) ?? 100) * 1.3));
+    unit.rage = unit.fury;
+    healUnit(unit, Math.round((parseFiniteNumber(unit.hpMax) ?? 0) * 0.05));
+    state.bUses += 1;
+    if (state.bUses === 3 || state.bUses === 6 || state.bUses === 10) {
+      unit.hpMax = Math.max(1, Math.round((parseFiniteNumber(unit.hpMax) ?? 1) * 1.05));
+      unit.hp = Math.min(unit.hpMax, parseFiniteNumber(unit.hp) ?? unit.hpMax);
+    }
+    return true;
+  }
+
+  if (furyNow < 100) return false;
+  spendFury(unit, 100);
+  const enemySide = unit.side === 'ally' ? 'enemy' : 'ally';
+  const enemies = (game.tokens || []).filter((token) => token.alive && token.side === enemySide);
+  const bonus = Math.min(state.bUses * 0.05, 0.35);
+  for (const enemy of enemies) {
+    const hpBase = 0.5 * (parseFiniteNumber(unit.hpMax) ?? 0);
+    const hpComp = isUyenLeader(enemy) ? Math.min(hpBase, 0.1 * (parseFiniteNumber(unit.hpMax) ?? 0)) : hpBase;
+    const base = hpComp + 0.6 * (parseFiniteNumber(unit.atk) ?? 0) + 0.6 * (parseFiniteNumber(unit.wil) ?? 0);
+    const scaled = Math.max(1, Math.round(base * (1 + bonus)));
+    dealAbilityDamage(game, unit, enemy, {
+      base: Math.round(scaled * 0.5),
+      dtype: 'physical',
+      attackType: 'skill',
+      defPen: 0.1,
+    });
+    dealAbilityDamage(game, unit, enemy, {
+      base: Math.round(scaled * 0.5),
+      dtype: 'arcane',
+      attackType: 'skill',
+      defPen: 0.1,
+    });
+  }
+  return true;
+}
+
 // Thực thi Ult: Summoner -> Immediate Summon theo meta; class khác: trừ nộ
 function performUlt(unit: UnitToken): void {
   const game = getInitializedGame();
@@ -1323,6 +1395,15 @@ function performUlt(unit: UnitToken): void {
     setFury(unit, 0);
     return;
   }
+
+  if (isUyenLeader(unit)) {
+    const casted = performUyenLeaderUlt(game, unit);
+    if (casted) {
+      extendBusy(900);
+    }
+    return;
+  }
+
   const metaGetter = game.meta?.get;
   const meta = typeof metaGetter === 'function' ? metaGetter.call(game.meta, unit.id) : null;
   if (!meta) { setFury(unit, 0); return; }
@@ -1734,6 +1815,7 @@ function performUlt(unit: UnitToken): void {
       if (!fallen.length) break;
       fallen.sort((a,b)=> (b.deadAt||0) - (a.deadAt||0));
       const take = Math.max(1, Math.min(fallen.length, getUltTargetCount(u, 1)));
+      const sideLeader = (game.tokens || []).find((token) => token.alive && token.side === unit.side && isUyenLeader(token));
       for (let i=0; i<take; i++){
         const ally = fallen[i];
         if (!ally) continue;
@@ -1757,6 +1839,7 @@ function performUlt(unit: UnitToken): void {
         if (sessionVfx) {
           try { vfxAddSpawn(sessionVfx, ally.cx, ally.cy, ally.side); } catch(_){}
         }
+        grantUyenSummonRage(sideLeader, { revived: true, isMinion: !!ally.isMinion });
       }
       busyMs = 1500;
       break;

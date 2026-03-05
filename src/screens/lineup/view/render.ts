@@ -25,6 +25,7 @@ import {
   evaluatePassive,
   filterRoster,
   getUnitRarity,
+  LINEUP_ALLOWED_LEADER_IDS,
 } from './state.ts';
 import type {
   LineupViewState,
@@ -942,9 +943,12 @@ function updateActiveCellHighlight(): void{
         }
         leaderName.textContent = unit.name;
       } else {
+        const fallbackName = lineup.leaderId === 'leaderA'
+          ? 'Uyên'
+          : (lineup.leaderId === 'leaderB' ? 'Địch' : 'Leader');
         unmountRarity(leaderAvatar);
-        renderAvatar(leaderAvatar, null, '');
-        leaderName.textContent = 'Leader';
+        renderAvatar(leaderAvatar, null, fallbackName);
+        leaderName.textContent = fallbackName;
       }
     } else {
       unmountRarity(leaderAvatar);
@@ -1115,31 +1119,37 @@ function updateActiveCellHighlight(): void{
     clearOption.dataset.unitId = '';
     list.appendChild(clearOption);
 
-    state.roster.forEach(unit => {
-      const unitId = normalizeUnitId(unit.id);
-      const option = document.createElement('button');
-      option.type = 'button';
-      option.className = 'lineup-overlay__option';
-      option.dataset.unitId = unitId;
-      const avatar = document.createElement('div');
-      avatar.className = 'lineup-overlay__option-avatar';
-      renderAvatar(avatar, unit.avatar || null, unit.name);
-      option.appendChild(avatar);
-      const text = document.createElement('div');
-      const nameEl = document.createElement('p');
-      nameEl.className = 'lineup-overlay__option-name';
-      nameEl.textContent = unit.name;
-      text.appendChild(nameEl);
-      const meta = document.createElement('p');
-      meta.className = 'lineup-overlay__option-meta';
-      meta.textContent = [unit.role, unit.rank].filter(Boolean).join(' · ');
-      text.appendChild(meta);
-      option.appendChild(text);
-      if (lineup.leaderId === unitId){
-        option.classList.add('is-active');
-      }
-      list.appendChild(option);
-    });
+    const fixedLeaders = [
+      { id: 'leaderA', name: 'Uyên', role: 'Leader', rank: 'SSR', avatar: null },
+      { id: 'leaderB', name: 'Địch', role: 'Leader', rank: 'SSR', avatar: null },
+    ];
+
+    fixedLeaders
+      .filter((leader) => LINEUP_ALLOWED_LEADER_IDS.has(leader.id))
+      .forEach((leader) => {
+        const option = document.createElement('button');
+        option.type = 'button';
+        option.className = 'lineup-overlay__option';
+        option.dataset.unitId = leader.id;
+        const avatar = document.createElement('div');
+        avatar.className = 'lineup-overlay__option-avatar';
+        renderAvatar(avatar, leader.avatar, leader.name);
+        option.appendChild(avatar);
+        const text = document.createElement('div');
+        const nameEl = document.createElement('p');
+        nameEl.className = 'lineup-overlay__option-name';
+        nameEl.textContent = leader.name;
+        text.appendChild(nameEl);
+        const meta = document.createElement('p');
+        meta.className = 'lineup-overlay__option-meta';
+        meta.textContent = [leader.role, leader.rank].filter(Boolean).join(' · ');
+        text.appendChild(meta);
+        option.appendChild(text);
+        if (lineup.leaderId === leader.id){
+          option.classList.add('is-active');
+        }
+        list.appendChild(option);
+      });
 
     leaderOverlayBody.appendChild(list);
     openOverlay(leaderOverlay);

@@ -382,9 +382,7 @@ function normalizeLineupEntry(entry: LineupDefinition | null | undefined, index:
   });
 
   const leaderIdValue = source.leaderId ?? source.leader ?? source.captainId ?? null;
-  const fallbackLeader = cells.find(cell => cell.section === 'formation' && cell.unitId)?.unitId
-    ?? cells.find(cell => cell.unitId)?.unitId
-    ?? null;
+  const fallbackLeader = 'leaderA';
   const defaultCurrencyIdValue = defaultCurrencyId ?? source.currency ?? null;
 
   return {
@@ -394,7 +392,7 @@ function normalizeLineupEntry(entry: LineupDefinition | null | undefined, index:
     description: typeof description === 'string' ? description : '',
     cells,
     passives,
-    leaderId: (typeof leaderIdValue === 'string' && rosterIndex.has(leaderIdValue)) ? leaderIdValue : fallbackLeader,
+    leaderId: (typeof leaderIdValue === 'string' && LINEUP_ALLOWED_LEADER_IDS.has(leaderIdValue)) ? leaderIdValue : fallbackLeader,
     defaultCurrencyId: typeof defaultCurrencyIdValue === 'string' ? defaultCurrencyIdValue : null,
   };
 }
@@ -680,6 +678,8 @@ export function unlockCell(
   return { ok: true, spent: cost ?? null };
 }
 
+export const LINEUP_ALLOWED_LEADER_IDS = new Set(['leaderA', 'leaderB']);
+
 export function isUnitPlaced(lineup: LineupState, unitId: string | null): boolean {
   if (!unitId) return false;
   if (lineup.leaderId === unitId) return true;
@@ -699,18 +699,12 @@ export function setLeader(
     lineup.leaderId = null;
     return { ok: true };
   }
-  const unit = rosterLookup.get(unitId);
-  if (!unit){
-    return { ok: false, message: 'Không tìm thấy nhân vật.' };
+  if (!LINEUP_ALLOWED_LEADER_IDS.has(unitId)) {
+    return { ok: false, message: 'Leader chỉ có thể là Uyên hoặc Địch.' };
   }
-  if (!isUnitPlaced(lineup, unitId)){
-    const primary = lineup.cells.find(entry => entry.section === 'formation' && entry.unlocked && !entry.unitId)
-      ?? lineup.cells.find(entry => entry.unlocked && !entry.unitId);
-    if (primary){
-      assignUnitToCell(lineup, primary.index, unitId);
-    } else {
-      return { ok: false, message: 'Không còn ô trống để gán leader.' };
-    }
+  const unit = rosterLookup.get(unitId);
+  if (!unit && unitId !== 'leaderA' && unitId !== 'leaderB'){
+    return { ok: false, message: 'Không tìm thấy nhân vật.' };
   }
   lineup.leaderId = unitId;
   return { ok: true };

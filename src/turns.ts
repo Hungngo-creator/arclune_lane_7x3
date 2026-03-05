@@ -18,6 +18,7 @@ import { nextTurnInterleaved } from './turns/interleaved.ts';
 import { resolveRuntimeUnitStats } from './modes/pve/collection-mapper.ts';
 import { applyCultivationBonus } from './cultivation.ts';
 import { evaluateGambitLogic } from './ai.ts';
+import { isLeaderUltReady, isUyenLeader, grantUyenSummonRage } from './leader-uyen.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { GambitActionType, RuntimeUnitProgress } from '@shared-types/pve';
@@ -237,6 +238,8 @@ export function spawnQueuedIfDue(
   prepareUnitForPassives(obj);
   Game.tokens.push(obj);
   applyOnSpawnEffects(Game, obj, kit?.onSpawn ?? undefined);
+  const allyLeader = Game.tokens.find((token) => token.alive && token.side === obj.side && isUyenLeader(token));
+  grantUyenSummonRage(allyLeader, { revived: !!p.revive, isMinion: !!obj.isMinion });
   {
     const sessionVfx = asSessionWithVfx(Game, { requireGrid: true });
     if (sessionVfx){
@@ -432,7 +435,10 @@ export function doActionOrSkip(
 
   const ultCost = resolveUltCost(unit, CFG);
   const runUlt = (): boolean => {
-    if ((unit.fury ?? 0) < ultCost || Statuses.blocks(unit, 'ult')) return false;
+    const ready = isUyenLeader(unit)
+      ? isLeaderUltReady(unit)
+      : (unit.fury ?? 0) >= ultCost;
+    if (!ready || Statuses.blocks(unit, 'ult')) return false;
     let ultOk = false;
     try {
       performUlt!(unit);
@@ -440,8 +446,11 @@ export function doActionOrSkip(
     } catch (e){
       console.error('[performUlt]', e);
     }
-    if (ultOk) {
+    if (ultOk && !isUyenLeader(unit)) {
       spendFury(unit, ultCost, CFG);
+      emitPassiveEvent(Game, unit, 'onUltCast', { log: getPassiveLog(Game) });
+    }
+    if (ultOk && isUyenLeader(unit)) {
       emitPassiveEvent(Game, unit, 'onUltCast', { log: getPassiveLog(Game) });
     }
     Statuses.onTurnEnd(unit, {});
@@ -503,7 +512,10 @@ export function doActionOrSkip(
     }
   }
 
-  if ((unit.fury ?? 0) >= ultCost && !Statuses.blocks(unit, 'ult')){
+  const autoUltReady = isUyenLeader(unit)
+    ? isLeaderUltReady(unit)
+    : (unit.fury ?? 0) >= ultCost;
+  if (autoUltReady && !Statuses.blocks(unit, 'ult')){
     runUlt();
     return resolution;
   }
