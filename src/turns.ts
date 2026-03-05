@@ -18,7 +18,13 @@ import { nextTurnInterleaved } from './turns/interleaved.ts';
 import { resolveRuntimeUnitStats } from './modes/pve/collection-mapper.ts';
 import { applyCultivationBonus } from './cultivation.ts';
 import { evaluateGambitLogic } from './ai.ts';
-import { isLeaderUltReady, isUyenLeader, grantUyenSummonRage } from './leader-uyen.ts';
+import {
+  clearQueuedUyenUlt,
+  hasQueuedUyenUlt,
+  isLeaderUltReady,
+  isUyenLeader,
+  grantUyenSummonRage,
+} from './leader-uyen.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { GambitActionType, RuntimeUnitProgress } from '@shared-types/pve';
@@ -512,11 +518,13 @@ export function doActionOrSkip(
     }
   }
 
+  const queuedLeaderUlt = isUyenLeader(unit) && hasQueuedUyenUlt(unit);
   const autoUltReady = isUyenLeader(unit)
-    ? isLeaderUltReady(unit)
+    ? queuedLeaderUlt(unit)
     : (unit.fury ?? 0) >= ultCost;
   if (autoUltReady && !Statuses.blocks(unit, 'ult')){
     runUlt();
+    if (queuedLeaderUlt) clearQueuedUyenUlt(unit);
     return resolution;
   }
 

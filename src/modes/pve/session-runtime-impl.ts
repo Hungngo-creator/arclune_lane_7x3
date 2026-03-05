@@ -68,7 +68,14 @@ import {
   normalizeDeckEntries,
 } from './session-state';
 import { mapUnitProgressById } from './collection-mapper.ts';
-import { ensureUyenState, getUyenUltChoice, grantUyenSummonRage, isUyenLeader } from '../../leader-uyen.ts';
+import {
+  ensureUyenState,
+  getUyenUltChoice,
+  grantUyenSummonRage,
+  isLeaderUltReady,
+  isUyenLeader,
+  queueUyenUltCast,
+} from '../../leader-uyen.ts';
 
 import type {
   BattleDetail,
@@ -710,6 +717,8 @@ let winRef: (Window & typeof globalThis) | null = null;
 let docRef: Document | null = null;
 let rootElement: Element | Document | null = null;
 let timerElement: HTMLElement | null = null;
+let leaderUltControlsEl: HTMLElement | null = null;
+let leaderUltButtons: HTMLButtonElement[] = [];
 let storedConfig: NormalizedSessionConfig = normalizeConfig();
 let running = false;
 let leaderEndCheckFlags: { ally: boolean; enemy: boolean } = { ally: false, enemy: false };
@@ -2140,6 +2149,27 @@ function tickMinionTTL(side: Side): void {
   }
 }
 
+function resolveAllyLeaderForControl(): UnitToken | null {
+  if (!Game || !Array.isArray(Game.tokens)) return null;
+  const alive = Game.tokens.find((token) => token.alive && token.side === 'ally' && isUyenLeader(token));
+  if (alive) return alive;
+  return Game.tokens.find((token) => token.side === 'ally' && isUyenLeader(token)) ?? null;
+}
+
+function syncLeaderUltControls(): void {
+  if (!leaderUltControlsEl) return;
+  const leader = resolveAllyLeaderForControl();
+  const show = Boolean(leader && leader.alive && isLeaderUltReady(leader));
+  leaderUltControlsEl.hidden = !show;
+  if (!show || !leader) return;
+  const selected = getUyenUltChoice(leader);
+  for (const button of leaderUltButtons){
+    if (!button) continue;
+    const choice = button.dataset.ultChoice;
+    button.classList.toggle('is-selected', choice === selected);
+  }
+}
+
 function init(): boolean {
   if (!Game) return false;
   if (Game._inited) return true;
@@ -2172,6 +2202,28 @@ function init(): boolean {
   hud = initHUD(doc, root ?? undefined);
   const currentHud = hud;
   hudCleanup = currentHud ? () => currentHud.cleanup() : null;
+
+  const controlsFromRoot = (root && typeof (root as ParentNode).querySelector === 'function')
+    ? (root as ParentNode).querySelector('[data-role="leader-ult-controls"]')
+    : null;
+  const controlsFromDocument = typeof doc.querySelector === 'function'
+    ? doc.querySelector('[data-role="leader-ult-controls"]')
+    : null;
+  leaderUltControlsEl = (controlsFromRoot ?? controlsFromDocument) as HTMLElement | null;
+  leaderUltButtons = leaderUltControlsEl
+    ? Array.from(leaderUltControlsEl.querySelectorAll<HTMLButtonElement>('button[data-ult-choice]'))
+    : [];
+  for (const button of leaderUltButtons){
+    button.onclick = () => {
+      const choice = button.dataset.ultChoice;
+      if (choice !== 'A' && choice !== 'B' && choice !== 'C') return;
+      const leader = resolveAllyLeaderForControl();
+      if (!leader || !leader.alive || !isLeaderUltReady(leader)) return;
+      queueUyenUltCast(leader, choice);
+      syncLeaderUltControls();
+    };
+  }
+  syncLeaderUltControls();
   const tokens = Array.isArray(Game.tokens) ? Game.tokens : [];
   if (!Array.isArray(Game.tokens)){
     Game.tokens = tokens;
@@ -2605,6 +2657,7 @@ function init(): boolean {
         renderSummonBar();
         aiMaybeAct(Game, 'cost');
       }
+      syncLeaderUltControls();
 
       CLOCK.lastLogicMs = sessionNowMs;
 
@@ -3578,6 +3631,14 @@ function resetDomRefs(): void {
   ctx = null;
   hud = null;
   hudCleanup = null;
+  if (leaderUltControlsEl){
+    leaderUltControlsEl.hidden = true;
+  }
+  for (const button of leaderUltButtons){
+    button.onclick = null;
+  }
+  leaderUltButtons = [];
+  leaderUltControlsEl = null;
   timerElement = null;
   statusIconHoverTooltip = '';
   statusIconHitboxes.length = 0;

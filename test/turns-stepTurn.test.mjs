@@ -223,6 +223,37 @@ test('leader trao đổi đòn đánh thường khi stepTurn chạy nhiều lư�
   );
 });
 
+test('leader Uyên chỉ tung ult khi có queue từ nút chọn', async () => {
+  const harness = await loadTurnsHarness({
+    './leader-uyen.ts': {
+      isUyenLeader(unit){ return unit?.id === 'leaderA' || unit?.id === 'leaderB'; },
+      isLeaderUltReady(){ return true; },
+      grantUyenSummonRage(){},
+      hasQueuedUyenUlt(unit){ return unit?.leaderUltQueued === true; },
+      clearQueuedUyenUlt(unit){ if (unit) unit.leaderUltQueued = false; }
+    }
+  });
+
+  const { doActionOrSkip } = harness;
+  const unit = { id: 'leaderA', side: 'ally', alive: true, fury: 100, furyMax: 100, hp: 100, hpMax: 100 };
+  const Game = { tokens: [unit], meta: new Map(), queued: { ally: new Map(), enemy: new Map() } };
+
+  let ultCasts = 0;
+  doActionOrSkip(Game, unit, {
+    performUlt(){ ultCasts += 1; },
+    turnContext: { side: 'ally', slot: 8, cycle: 0, orderIndex: 0, orderLength: 1 }
+  });
+  assert.equal(ultCasts, 0, 'leader không được tự động cast ult nếu chưa queue');
+
+  unit.leaderUltQueued = true;
+  doActionOrSkip(Game, unit, {
+    performUlt(){ ultCasts += 1; },
+    turnContext: { side: 'ally', slot: 8, cycle: 1, orderIndex: 0, orderLength: 1 }
+  });
+  assert.equal(ultCasts, 1, 'leader phải cast ult khi đã queue từ UI');
+  assert.equal(unit.leaderUltQueued, false, 'cờ queue phải bị clear sau khi cast');
+});
+
 test('creep triệu hồi hành động trước khi TTL bị trừ', async () => {
   const turnsHarness = await loadTurnsHarness();
   const { stepTurn, doActionOrSkip, deps } = turnsHarness;

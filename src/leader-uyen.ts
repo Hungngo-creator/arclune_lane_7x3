@@ -2,6 +2,11 @@ import type { UnitToken } from '@shared-types/units';
 
 export type UyenUltChoice = 'A' | 'B' | 'C';
 
+type UyenControlState = UnitToken & {
+  leaderUltChoice?: UyenUltChoice;
+  leaderUltQueued?: boolean;
+};
+
 interface UyenState {
   reviveRageCount: number;
   a1Stacks: number;
@@ -92,7 +97,29 @@ export function getUyenUltState(unit: UnitToken | null | undefined): UyenState |
 }
 
 export function getUyenUltChoice(unit: UnitToken | null | undefined): UyenUltChoice {
-  const choice = (unit as (UnitToken & { leaderUltChoice?: unknown }) | null)?.leaderUltChoice;
+  const choice = (unit as UyenControlState | null)?.leaderUltChoice;
   if (choice === 'A' || choice === 'B' || choice === 'C') return choice;
   return 'C';
+}
+
+export function setUyenUltChoice(unit: UnitToken | null | undefined, choice: UyenUltChoice): void {
+  if (!isUyenLeader(unit)) return;
+  (unit as UyenControlState).leaderUltChoice = choice;
+}
+
+export function queueUyenUltCast(unit: UnitToken | null | undefined, choice?: UyenUltChoice): void {
+  if (!isUyenLeader(unit)) return;
+  if (choice) {
+    setUyenUltChoice(unit, choice);
+  }
+  (unit as UyenControlState).leaderUltQueued = true;
+}
+
+export function hasQueuedUyenUlt(unit: UnitToken | null | undefined): boolean {
+  return Boolean((unit as UyenControlState | null)?.leaderUltQueued);
+}
+
+export function clearQueuedUyenUlt(unit: UnitToken | null | undefined): void {
+  if (!unit) return;
+  (unit as UyenControlState).leaderUltQueued = false;
 }

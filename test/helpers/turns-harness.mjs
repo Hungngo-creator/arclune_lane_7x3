@@ -19,6 +19,8 @@ export async function loadTurnsHarness(overrides = {}){
     ["import { resolveRuntimeUnitStats } from './modes/pve/collection-mapper.ts';", "const { resolveRuntimeUnitStats } = __deps['./modes/pve/collection-mapper.ts'];"],
     ["import { applyCultivationBonus } from './cultivation.ts';", "const { applyCultivationBonus } = __deps['./cultivation.ts'];"],
     ["import { evaluateGambitLogic } from './ai.ts';", "const { evaluateGambitLogic } = __deps['./ai.ts'];"],
+    ["import { isLeaderUltReady, isUyenLeader, grantUyenSummonRage } from './leader-uyen.ts';", "const { isLeaderUltReady, isUyenLeader, grantUyenSummonRage, hasQueuedUyenUlt, clearQueuedUyenUlt } = __deps['./leader-uyen.ts'];"],
+    ["import {\n  clearQueuedUyenUlt,\n  hasQueuedUyenUlt,\n  isLeaderUltReady,\n  isUyenLeader,\n  grantUyenSummonRage,\n} from './leader-uyen.ts';", "const { isLeaderUltReady, isUyenLeader, grantUyenSummonRage, hasQueuedUyenUlt, clearQueuedUyenUlt } = __deps['./leader-uyen.ts'];"],
     ["import { slotToCell, slotIndex } from './engine.ts';", "const { slotToCell, slotIndex } = __deps['./engine.js'];"],
     ["import { globalAetherPool, resolveActionAetherRegen } from './aether.ts';", "const { globalAetherPool, resolveActionAetherRegen } = __deps['./aether.ts'];"],
     ["import { globalAetherPool } from './aether.ts';", "const { globalAetherPool } = __deps['./aether.ts'];"],
@@ -105,6 +107,13 @@ export async function loadTurnsHarness(overrides = {}){
     './ai.ts': {
       evaluateGambitLogic(){ return { action: null, slotIndex: -1, reason: 'noMatch' }; }
     },
+    './leader-uyen.ts': {
+      isLeaderUltReady(){ return false; },
+      isUyenLeader(){ return false; },
+      grantUyenSummonRage(){},
+      hasQueuedUyenUlt(){ return false; },
+      clearQueuedUyenUlt(){},
+    },
     './modes/pve/collection-mapper.ts': {
       resolveRuntimeUnitStats(){ return {}; }
     },
@@ -174,6 +183,7 @@ export async function loadTurnsHarness(overrides = {}){
   deps['../modes/pve/collection-mapper.ts'] = deps['../modes/pve/collection-mapper.ts'] || deps['./modes/pve/collection-mapper.ts'];
   deps['../cultivation.ts'] = deps['../cultivation.ts'] || deps['./cultivation.ts'];
   deps['../ai.ts'] = deps['../ai.ts'] || deps['./ai.ts'];
+  deps['../leader-uyen.ts'] = deps['../leader-uyen.ts'] || deps['./leader-uyen.ts'];
   deps['../combat/perform-active-skill.ts'] = deps['../combat/perform-active-skill.ts'] || deps['./combat/perform-active-skill.ts'];
 
   const interleavedKey = './turns/interleaved.js';

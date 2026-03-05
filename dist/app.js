@@ -10274,6 +10274,11 @@ __define('./entry.ts', (exports, module, __require) => {
             <div id="costNow">0</div>
           </div>
         </div>
+        <div class="leader-ult-controls" data-role="leader-ult-controls" hidden>
+          <button type="button" class="leader-ult-controls__btn" data-ult-choice="A">Ult A</button>
+          <button type="button" class="leader-ult-controls__btn" data-ult-choice="B">Ult B</button>
+          <button type="button" class="leader-ult-controls__btn" data-ult-choice="C">Ult C</button>
+        </div>
         <div id="cards"></div>
       </div>
     `;
@@ -11203,6 +11208,27 @@ __define('./leader-uyen.ts', (exports, module, __require) => {
           return choice;
       return 'C';
   }
+  function setUyenUltChoice(unit, choice) {
+      if (!isUyenLeader(unit))
+          return;
+      unit.leaderUltChoice = choice;
+  }
+  function queueUyenUltCast(unit, choice) {
+      if (!isUyenLeader(unit))
+          return;
+      if (choice) {
+          setUyenUltChoice(unit, choice);
+      }
+      unit.leaderUltQueued = true;
+  }
+  function hasQueuedUyenUlt(unit) {
+      return Boolean(unit?.leaderUltQueued);
+  }
+  function clearQueuedUyenUlt(unit) {
+      if (!unit)
+          return;
+      unit.leaderUltQueued = false;
+  }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'isUyenLeader')) exports.isUyenLeader = isUyenLeader;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureUyenState')) exports.ensureUyenState = ensureUyenState;
@@ -11211,6 +11237,10 @@ __define('./leader-uyen.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyUyenBasicExtras')) exports.applyUyenBasicExtras = applyUyenBasicExtras;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getUyenUltState')) exports.getUyenUltState = getUyenUltState;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getUyenUltChoice')) exports.getUyenUltChoice = getUyenUltChoice;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'setUyenUltChoice')) exports.setUyenUltChoice = setUyenUltChoice;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'queueUyenUltCast')) exports.queueUyenUltCast = queueUyenUltCast;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'hasQueuedUyenUlt')) exports.hasQueuedUyenUlt = hasQueuedUyenUlt;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'clearQueuedUyenUlt')) exports.clearQueuedUyenUlt = clearQueuedUyenUlt;
 });
 __define('./main.ts', (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/main.ts
@@ -11759,7 +11789,9 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   const ensureUyenState = __dep24.ensureUyenState;
   const getUyenUltChoice = __dep24.getUyenUltChoice;
   const grantUyenSummonRage = __dep24.grantUyenSummonRage;
+  const isLeaderUltReady = __dep24.isLeaderUltReady;
   const isUyenLeader = __dep24.isUyenLeader;
+  const queueUyenUltCast = __dep24.queueUyenUltCast;
   const isPlainRecord = (value) => (!!value && typeof value === 'object');
   const isFiniteNumber = (value) => (typeof value === 'number' && Number.isFinite(value));
   const parseFiniteNumber = (value) => {
@@ -12214,6 +12246,8 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   let docRef = null;
   let rootElement = null;
   let timerElement = null;
+  let leaderUltControlsEl = null;
+  let leaderUltButtons = [];
   let storedConfig = normalizeConfig();
   let running = false;
   let leaderEndCheckFlags = { ally: false, enemy: false };
@@ -13630,6 +13664,30 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               tokens.splice(idx, 1);
       }
   }
+  function resolveAllyLeaderForControl() {
+      if (!Game || !Array.isArray(Game.tokens))
+          return null;
+      const alive = Game.tokens.find((token) => token.alive && token.side === 'ally' && isUyenLeader(token));
+      if (alive)
+          return alive;
+      return Game.tokens.find((token) => token.side === 'ally' && isUyenLeader(token)) ?? null;
+  }
+  function syncLeaderUltControls() {
+      if (!leaderUltControlsEl)
+          return;
+      const leader = resolveAllyLeaderForControl();
+      const show = Boolean(leader && leader.alive && isLeaderUltReady(leader));
+      leaderUltControlsEl.hidden = !show;
+      if (!show || !leader)
+          return;
+      const selected = getUyenUltChoice(leader);
+      for (const button of leaderUltButtons) {
+          if (!button)
+              continue;
+          const choice = button.dataset.ultChoice;
+          button.classList.toggle('is-selected', choice === selected);
+      }
+  }
   function init() {
       if (!Game)
           return false;
@@ -13664,6 +13722,29 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       hud = initHUD(doc, root ?? undefined);
       const currentHud = hud;
       hudCleanup = currentHud ? () => currentHud.cleanup() : null;
+      const controlsFromRoot = (root && typeof root.querySelector === 'function')
+          ? root.querySelector('[data-role="leader-ult-controls"]')
+          : null;
+      const controlsFromDocument = typeof doc.querySelector === 'function'
+          ? doc.querySelector('[data-role="leader-ult-controls"]')
+          : null;
+      leaderUltControlsEl = (controlsFromRoot ?? controlsFromDocument);
+      leaderUltButtons = leaderUltControlsEl
+          ? Array.from(leaderUltControlsEl.querySelectorAll('button[data-ult-choice]'))
+          : [];
+      for (const button of leaderUltButtons) {
+          button.onclick = () => {
+              const choice = button.dataset.ultChoice;
+              if (choice !== 'A' && choice !== 'B' && choice !== 'C')
+                  return;
+              const leader = resolveAllyLeaderForControl();
+              if (!leader || !leader.alive || !isLeaderUltReady(leader))
+                  return;
+              queueUyenUltCast(leader, choice);
+              syncLeaderUltControls();
+          };
+      }
+      syncLeaderUltControls();
       const tokens = Array.isArray(Game.tokens) ? Game.tokens : [];
       if (!Array.isArray(Game.tokens)) {
           Game.tokens = tokens;
@@ -14080,6 +14161,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               renderSummonBar();
               aiMaybeAct(Game, 'cost');
           }
+          syncLeaderUltControls();
           CLOCK.lastLogicMs = sessionNowMs;
           if (Game.battle?.over)
               return;
@@ -15008,6 +15090,14 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       ctx = null;
       hud = null;
       hudCleanup = null;
+      if (leaderUltControlsEl) {
+          leaderUltControlsEl.hidden = true;
+      }
+      for (const button of leaderUltButtons) {
+          button.onclick = null;
+      }
+      leaderUltButtons = [];
+      leaderUltControlsEl = null;
       timerElement = null;
       statusIconHoverTooltip = '';
       statusIconHitboxes.length = 0;
@@ -24777,6 +24867,8 @@ __define('./turns.ts', (exports, module, __require) => {
   const __dep16 = __require('./ai.ts');
   const evaluateGambitLogic = __dep16.evaluateGambitLogic;
   const __dep17 = __require('./leader-uyen.ts');
+  const clearQueuedUyenUlt = __dep17.clearQueuedUyenUlt;
+  const hasQueuedUyenUlt = __dep17.hasQueuedUyenUlt;
   const isLeaderUltReady = __dep17.isLeaderUltReady;
   const isUyenLeader = __dep17.isUyenLeader;
   const grantUyenSummonRage = __dep17.grantUyenSummonRage;
@@ -25220,11 +25312,14 @@ __define('./turns.ts', (exports, module, __require) => {
               continue;
           }
       }
+      const queuedLeaderUlt = isUyenLeader(unit) && hasQueuedUyenUlt(unit);
       const autoUltReady = isUyenLeader(unit)
-          ? isLeaderUltReady(unit)
+          ? queuedLeaderUlt(unit)
           : (unit.fury ?? 0) >= ultCost;
       if (autoUltReady && !Statuses.blocks(unit, 'ult')) {
           runUlt();
+          if (queuedLeaderUlt)
+              clearQueuedUyenUlt(unit);
           return resolution;
       }
       const cap = typeof meta?.followupCap === 'number' ? (meta.followupCap | 0) : (CFG.FOLLOWUP_CAP_DEFAULT | 0);

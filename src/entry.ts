@@ -926,6 +926,11 @@ function renderPveLayout(options: RenderPveLayoutOptions): HTMLElement | null{
           <div id="costNow">0</div>
         </div>
       </div>
+      <div class="leader-ult-controls" data-role="leader-ult-controls" hidden>
+        <button type="button" class="leader-ult-controls__btn" data-ult-choice="A">Ult A</button>
+        <button type="button" class="leader-ult-controls__btn" data-ult-choice="B">Ult B</button>
+        <button type="button" class="leader-ult-controls__btn" data-ult-choice="C">Ult C</button>
+      </div>
       <div id="cards"></div>
     </div>
   `;
