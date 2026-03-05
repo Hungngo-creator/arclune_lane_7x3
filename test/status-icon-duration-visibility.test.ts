@@ -23,4 +23,26 @@ describe('status icon duration visibility', () => {
     const after = __resolveStatusIconPreview(unit.statuses as never);
     expect(after.some((entry) => entry.id === 'silence')).toBe(false);
   });
+  
+  it('hides icon after explicit status removal', () => {
+    const unit = {
+      id: 'status_unit_removed',
+      iid: 2,
+      side: 'ally',
+      cx: 0,
+      cy: 0,
+      alive: true,
+      hp: 100,
+      hpMax: 100,
+      statuses: [],
+    };
+
+    Statuses.add(unit as never, Statuses.make.stun({ turns: 2 }));
+    const before = __resolveStatusIconPreview(unit.statuses as never);
+    expect(before.some((entry) => entry.id === 'stun')).toBe(true);
+
+    Statuses.remove(unit as never, 'stun');
+    const after = __resolveStatusIconPreview(unit.statuses as never);
+    expect(after.some((entry) => entry.id === 'stun')).toBe(false);
+  });
 });

@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`pve HUD status icon render rules giới hạn icon, ưu tiên control/debuff và tooltip ngắn 1`] = `
+[
+  {
+    "id": "me_hoac",
+    "priority": 0,
+    "tooltip": "Mê Hoặc x1 · 2T",
+  },
+  {
+    "id": "stun",
+    "priority": 0,
+    "tooltip": "Stun x1 · 1T",
+  },
+  {
+    "id": "accuracy_down",
+    "priority": 1,
+    "tooltip": "Accuracy Down x1 · 2T",
+  },
+  {
+    "id": "bleed",
+    "priority": 1,
+    "tooltip": "Bleed x2 · 3T",
+  },
+  {
+    "id": "loithienanh_spd_burn",
+    "priority": 1,
+    "tooltip": "SPD Burn x1 · 4T",
+  },
+]
+`;

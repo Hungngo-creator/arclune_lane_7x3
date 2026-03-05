@@ -737,31 +737,63 @@ type StatusMeta = {
   icon: string;
 };
 const DEFAULT_STATUS_ICON_PATH = 'assets/weaken.svg';
+const STATUS_ICON_PATHS: Record<string, string> = {
+  blind: 'assets/blind.svg',
+  dmgCut: 'assets/damageCut.svg',
+  damageCut: 'assets/damageCut.svg',
+  exalt: 'assets/exalt.svg',
+  weaken: 'assets/weaken.svg',
+  reflect: 'assets/reflect.svg',
+  haste: 'assets/haste.svg',
+  silence: 'assets/silence.svg',
+  pierce: 'assets/pierce.svg',
+  stun: 'assets/silence.svg',
+  sleep: 'assets/silence.svg',
+  taunt: 'assets/silence.svg',
+  bleed: 'assets/weaken.svg',
+  fatigue: 'assets/weaken.svg',
+  daze: 'assets/weaken.svg',
+  fear: 'assets/silence.svg',
+  shield: 'assets/reflect.svg',
+  stealth: 'assets/haste.svg',
+  frenzy: 'assets/exalt.svg',
+  allure: 'assets/haste.svg',
+  execute: 'assets/pierce.svg',
+  venom: 'assets/pierce.svg',
+  undying: 'assets/reflect.svg',
+  me_hoac: 'assets/silence.svg',
+  loithienanh_spd_burn: 'assets/weaken.svg',
+  accuracy_down: 'assets/weaken.svg',
+};
 const MAX_STATUS_ICONS_PER_TOKEN = 5;
 const CONTROL_TAGS = new Set(['control', 'silence', 'taunt', 'stun', 'sleep', 'fear']);
 const STATUS_META_BY_ID: Record<string, StatusMeta> = {
-  blind: { id: 'blind', label: 'Blind', icon: 'assets/blind.svg' },
-  dmgCut: { id: 'dmgCut', label: 'Damage Cut', icon: 'assets/damageCut.svg' },
-  exalt: { id: 'exalt', label: 'Exalt', icon: 'assets/exalt.svg' },
-  weaken: { id: 'weaken', label: 'Weaken', icon: 'assets/weaken.svg' },
-  reflect: { id: 'reflect', label: 'Reflect', icon: 'assets/reflect.svg' },
-  haste: { id: 'haste', label: 'Haste', icon: 'assets/haste.svg' },
-  silence: { id: 'silence', label: 'Silence', icon: 'assets/silence.svg' },
-  pierce: { id: 'pierce', label: 'Pierce', icon: 'assets/pierce.svg' },
-  stun: { id: 'stun', label: 'Stun', icon: 'assets/silence.svg' },
-  sleep: { id: 'sleep', label: 'Sleep', icon: 'assets/silence.svg' },
-  taunt: { id: 'taunt', label: 'Taunt', icon: 'assets/silence.svg' },
-  bleed: { id: 'bleed', label: 'Bleed', icon: 'assets/weaken.svg' },
-  fatigue: { id: 'fatigue', label: 'Fatigue', icon: 'assets/weaken.svg' },
-  daze: { id: 'daze', label: 'Daze', icon: 'assets/weaken.svg' },
-  fear: { id: 'fear', label: 'Fear', icon: 'assets/silence.svg' },
-  shield: { id: 'shield', label: 'Shield', icon: 'assets/reflect.svg' },
-  stealth: { id: 'stealth', label: 'Stealth', icon: 'assets/haste.svg' },
-  frenzy: { id: 'frenzy', label: 'Frenzy', icon: 'assets/exalt.svg' },
-  allure: { id: 'allure', label: 'Allure', icon: 'assets/haste.svg' },
-  execute: { id: 'execute', label: 'Execute', icon: 'assets/pierce.svg' },
-  venom: { id: 'venom', label: 'Venom', icon: 'assets/pierce.svg' },
-  undying: { id: 'undying', label: 'Undying', icon: 'assets/reflect.svg' },
+  blind: { id: 'blind', label: 'Blind', icon: STATUS_ICON_PATHS.blind },
+  dmgCut: { id: 'dmgCut', label: 'Damage Cut', icon: STATUS_ICON_PATHS.dmgCut },
+  damageCut: { id: 'damageCut', label: 'Damage Cut', icon: STATUS_ICON_PATHS.damageCut },
+  exalt: { id: 'exalt', label: 'Exalt', icon: STATUS_ICON_PATHS.exalt },
+  weaken: { id: 'weaken', label: 'Weaken', icon: STATUS_ICON_PATHS.weaken },
+  reflect: { id: 'reflect', label: 'Reflect', icon: STATUS_ICON_PATHS.reflect },
+  haste: { id: 'haste', label: 'Haste', icon: STATUS_ICON_PATHS.haste },
+  silence: { id: 'silence', label: 'Silence', icon: STATUS_ICON_PATHS.silence },
+  pierce: { id: 'pierce', label: 'Pierce', icon: STATUS_ICON_PATHS.pierce },
+  stun: { id: 'stun', label: 'Stun', icon: STATUS_ICON_PATHS.stun },
+  sleep: { id: 'sleep', label: 'Sleep', icon: STATUS_ICON_PATHS.sleep },
+  taunt: { id: 'taunt', label: 'Taunt', icon: STATUS_ICON_PATHS.taunt },
+  bleed: { id: 'bleed', label: 'Bleed', icon: STATUS_ICON_PATHS.bleed },
+  fatigue: { id: 'fatigue', label: 'Fatigue', icon: STATUS_ICON_PATHS.fatigue },
+  daze: { id: 'daze', label: 'Daze', icon: STATUS_ICON_PATHS.daze },
+  fear: { id: 'fear', label: 'Fear', icon: STATUS_ICON_PATHS.fear },
+  shield: { id: 'shield', label: 'Shield', icon: STATUS_ICON_PATHS.shield },
+  stealth: { id: 'stealth', label: 'Stealth', icon: STATUS_ICON_PATHS.stealth },
+  frenzy: { id: 'frenzy', label: 'Frenzy', icon: STATUS_ICON_PATHS.frenzy },
+  allure: { id: 'allure', label: 'Allure', icon: STATUS_ICON_PATHS.allure },
+  execute: { id: 'execute', label: 'Execute', icon: STATUS_ICON_PATHS.execute },
+  venom: { id: 'venom', label: 'Venom', icon: STATUS_ICON_PATHS.venom },
+  undying: { id: 'undying', label: 'Undying', icon: STATUS_ICON_PATHS.undying },
+  me_hoac: { id: 'me_hoac', label: 'Mê Hoặc', icon: STATUS_ICON_PATHS.me_hoac },
+  loithienanh_spd_burn: { id: 'loithienanh_spd_burn', label: 'SPD Burn', icon: STATUS_ICON_PATHS.loithienanh_spd_burn },
+  accuracy_down: { id: 'accuracy_down', label: 'Accuracy Down', icon: STATUS_ICON_PATHS.accuracy_down },
 };
 const STATUS_META_BY_TAG: Record<string, StatusMeta> = {
   control: { id: 'control', label: 'Control', icon: 'assets/silence.svg' },
@@ -3032,8 +3064,10 @@ function getStatusMeta(status: Record<string, unknown> | null | undefined): Stat
   const byTag = tag ? STATUS_META_BY_TAG[tag] : null;
   if (byId) return byId;
   if (byTag) return byTag;
+  const fallbackId = id || tag || 'default';
   const fallbackLabel = id || tag || 'Effect';
-  return { id: id || tag || 'default', label: fallbackLabel, icon: DEFAULT_STATUS_ICON_PATH };
+  const fallbackIcon = STATUS_ICON_PATHS[fallbackId] || DEFAULT_STATUS_ICON_PATH;
+  return { id: fallbackId, label: fallbackLabel, icon: fallbackIcon };
 }
 
 function computeStatusTurnsLeft(status: Record<string, unknown> | null | undefined): number | null {
@@ -3049,7 +3083,7 @@ function computeStatusTurnsLeft(status: Record<string, unknown> | null | undefin
 
 function buildStatusTooltip(label: string, stacks: number, turnsLeft: number | null): string {
   const stacksText = `x${Math.max(1, stacks)}`;
-  const turnsText = turnsLeft === null ? '∞ turn' : `${turnsLeft} turn`;
+  const turnsText = turnsLeft === null ? '∞T' : `${turnsLeft}T`;
   return `${label} ${stacksText} · ${turnsText}`;
 }
 
@@ -3086,6 +3120,13 @@ function ensureStatusIconLoaded(iconId: string, iconPath: string): StatusIconEnt
     cache!.status = 'ready';
   };
   image.onerror = () => {
+    if (cache!.path !== DEFAULT_STATUS_ICON_PATH) {
+      cache!.status = 'idle';
+      cache!.image = null;
+      cache!.path = DEFAULT_STATUS_ICON_PATH;
+      ensureStatusIconLoaded(iconId, DEFAULT_STATUS_ICON_PATH);
+      return;
+    }
     cache!.status = 'error';
   };
   image.src = iconPath;

@@ -13,6 +13,8 @@ describe('tag registry', () => {
     expect(normalizeTagId('instant-cast')).toBe('instant');
     expect(normalizeTagId('armor-pierce')).toBe('pierce');
     expect(normalizeTagId('tuyetdoi_khien')).toBe('absolute-shield');
+    expect(normalizeTagId('haste')).toBe('support');
+    expect(normalizeTagId('reflect')).toBe('defense');
   });
 
   test('deduplicates and canonicalizes list', () => {

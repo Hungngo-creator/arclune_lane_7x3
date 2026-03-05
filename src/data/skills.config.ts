@@ -3,6 +3,11 @@
 const skillsConfig = [
   {
     unitId: 'thien_luu',
+    designStatus: 'placeholder',
+    placeholderControl: {
+      allowSyntheticFill: false,
+      requiredSourceFiles: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt']
+    },
     notes: [
       'missing design source: chưa tìm thấy mô tả kit của Thiên Lưu trong bộ tài liệu v1/v2.3/3.2.',
       'Giữ record tạm để tránh trống dữ liệu im lặng; cần bổ sung basic/skills/ult/talent khi có nguồn thiết kế chính thức.'
@@ -918,7 +923,7 @@ const skillsConfig = [
     ult: {
       name: 'Còi Tăng Tốc',
       type: 'ultimate',
-      tags: ['support', 'haste'],
+      tags: ['support'],
       duration: { turns: 2 },
       buffs: [{ targets: 'self+2allies', stat: 'attackSpeed', percent: 0.20 }],
       bonuses: { selfBasicDamagePercent: 0.05 },
@@ -1284,7 +1289,7 @@ const skillsConfig = [
         type: 'active',
         cost: { aether: 25 },
         duration: { turns: 2 },
-        tags: ['reflect'],
+        tags: ['defense'],
         description: 'Giảm 10% Max HP (thật) để nhận hiệu ứng phản sát thương trong 2 lượt. Lượng HP mất không được khiên ngăn chặn.'
       },
       {

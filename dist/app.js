@@ -6624,6 +6624,11 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
   const skillsConfig = [
       {
           unitId: 'thien_luu',
+          designStatus: 'placeholder',
+          placeholderControl: {
+              allowSyntheticFill: false,
+              requiredSourceFiles: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt']
+          },
           notes: [
               'missing design source: chưa tìm thấy mô tả kit của Thiên Lưu trong bộ tài liệu v1/v2.3/3.2.',
               'Giữ record tạm để tránh trống dữ liệu im lặng; cần bổ sung basic/skills/ult/talent khi có nguồn thiết kế chính thức.'
@@ -7539,7 +7544,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
           ult: {
               name: 'Còi Tăng Tốc',
               type: 'ultimate',
-              tags: ['support', 'haste'],
+              tags: ['support'],
               duration: { turns: 2 },
               buffs: [{ targets: 'self+2allies', stat: 'attackSpeed', percent: 0.20 }],
               bonuses: { selfBasicDamagePercent: 0.05 },
@@ -7905,7 +7910,7 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
                   type: 'active',
                   cost: { aether: 25 },
                   duration: { turns: 2 },
-                  tags: ['reflect'],
+                  tags: ['defense'],
                   description: 'Giảm 10% Max HP (thật) để nhận hiệu ứng phản sát thương trong 2 lượt. Lượng HP mất không được khiên ngăn chặn.'
               },
               {
@@ -8224,9 +8229,9 @@ __define('./data/tags.ts', (exports, module, __require) => {
       { id: 'heal', label: 'Hồi phục', domain: 'effect', aliases: ['hoi_phuc'] },
       { id: 'non-heal-hp-change', label: 'Không phải hồi phục', domain: 'effect', aliases: ['khong_phai_hoi_phuc'] },
       { id: 'shield', label: 'Tạo khiên', domain: 'effect', aliases: ['barrier'] },
-      { id: 'support', label: 'Hỗ trợ', domain: 'effect', aliases: ['buff-support'] },
+      { id: 'support', label: 'Hỗ trợ', domain: 'effect', aliases: ['buff-support', 'haste', 'rage-boost', 'rage-gain', 'formation-haste'] },
       { id: 'control', label: 'Khống chế', domain: 'effect' },
-      { id: 'defense', label: 'Phòng thủ', domain: 'effect', aliases: ['defensive', 'protection'] },
+      { id: 'defense', label: 'Phòng thủ', domain: 'effect', aliases: ['defensive', 'protection', 'reflect'] },
       { id: 'absolute-attack', label: 'Tuyệt đối công', domain: 'rule', aliases: ['absolute_attack', 'tuyetdoi_cong'] },
       { id: 'absolute-shield', label: 'Tuyệt đối khiên', domain: 'rule', aliases: ['absolute_shield', 'tuyetdoi_khien'] },
       { id: 'unique-global', label: 'Độc Nhất toàn chiến trường', domain: 'rule', aliases: ['doc_nhat'] },
@@ -12000,31 +12005,63 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   const hpBarGradientCache = new Map();
   const meleeOffsetTokenKeys = new Set();
   const DEFAULT_STATUS_ICON_PATH = 'assets/weaken.svg';
+  const STATUS_ICON_PATHS = {
+      blind: 'assets/blind.svg',
+      dmgCut: 'assets/damageCut.svg',
+      damageCut: 'assets/damageCut.svg',
+      exalt: 'assets/exalt.svg',
+      weaken: 'assets/weaken.svg',
+      reflect: 'assets/reflect.svg',
+      haste: 'assets/haste.svg',
+      silence: 'assets/silence.svg',
+      pierce: 'assets/pierce.svg',
+      stun: 'assets/silence.svg',
+      sleep: 'assets/silence.svg',
+      taunt: 'assets/silence.svg',
+      bleed: 'assets/weaken.svg',
+      fatigue: 'assets/weaken.svg',
+      daze: 'assets/weaken.svg',
+      fear: 'assets/silence.svg',
+      shield: 'assets/reflect.svg',
+      stealth: 'assets/haste.svg',
+      frenzy: 'assets/exalt.svg',
+      allure: 'assets/haste.svg',
+      execute: 'assets/pierce.svg',
+      venom: 'assets/pierce.svg',
+      undying: 'assets/reflect.svg',
+      me_hoac: 'assets/silence.svg',
+      loithienanh_spd_burn: 'assets/weaken.svg',
+      accuracy_down: 'assets/weaken.svg',
+  };
   const MAX_STATUS_ICONS_PER_TOKEN = 5;
   const CONTROL_TAGS = new Set(['control', 'silence', 'taunt', 'stun', 'sleep', 'fear']);
   const STATUS_META_BY_ID = {
-      blind: { id: 'blind', label: 'Blind', icon: 'assets/blind.svg' },
-      dmgCut: { id: 'dmgCut', label: 'Damage Cut', icon: 'assets/damageCut.svg' },
-      exalt: { id: 'exalt', label: 'Exalt', icon: 'assets/exalt.svg' },
-      weaken: { id: 'weaken', label: 'Weaken', icon: 'assets/weaken.svg' },
-      reflect: { id: 'reflect', label: 'Reflect', icon: 'assets/reflect.svg' },
-      haste: { id: 'haste', label: 'Haste', icon: 'assets/haste.svg' },
-      silence: { id: 'silence', label: 'Silence', icon: 'assets/silence.svg' },
-      pierce: { id: 'pierce', label: 'Pierce', icon: 'assets/pierce.svg' },
-      stun: { id: 'stun', label: 'Stun', icon: 'assets/silence.svg' },
-      sleep: { id: 'sleep', label: 'Sleep', icon: 'assets/silence.svg' },
-      taunt: { id: 'taunt', label: 'Taunt', icon: 'assets/silence.svg' },
-      bleed: { id: 'bleed', label: 'Bleed', icon: 'assets/weaken.svg' },
-      fatigue: { id: 'fatigue', label: 'Fatigue', icon: 'assets/weaken.svg' },
-      daze: { id: 'daze', label: 'Daze', icon: 'assets/weaken.svg' },
-      fear: { id: 'fear', label: 'Fear', icon: 'assets/silence.svg' },
-      shield: { id: 'shield', label: 'Shield', icon: 'assets/reflect.svg' },
-      stealth: { id: 'stealth', label: 'Stealth', icon: 'assets/haste.svg' },
-      frenzy: { id: 'frenzy', label: 'Frenzy', icon: 'assets/exalt.svg' },
-      allure: { id: 'allure', label: 'Allure', icon: 'assets/haste.svg' },
-      execute: { id: 'execute', label: 'Execute', icon: 'assets/pierce.svg' },
-      venom: { id: 'venom', label: 'Venom', icon: 'assets/pierce.svg' },
-      undying: { id: 'undying', label: 'Undying', icon: 'assets/reflect.svg' },
+      blind: { id: 'blind', label: 'Blind', icon: STATUS_ICON_PATHS.blind },
+      dmgCut: { id: 'dmgCut', label: 'Damage Cut', icon: STATUS_ICON_PATHS.dmgCut },
+      damageCut: { id: 'damageCut', label: 'Damage Cut', icon: STATUS_ICON_PATHS.damageCut },
+      exalt: { id: 'exalt', label: 'Exalt', icon: STATUS_ICON_PATHS.exalt },
+      weaken: { id: 'weaken', label: 'Weaken', icon: STATUS_ICON_PATHS.weaken },
+      reflect: { id: 'reflect', label: 'Reflect', icon: STATUS_ICON_PATHS.reflect },
+      haste: { id: 'haste', label: 'Haste', icon: STATUS_ICON_PATHS.haste },
+      silence: { id: 'silence', label: 'Silence', icon: STATUS_ICON_PATHS.silence },
+      pierce: { id: 'pierce', label: 'Pierce', icon: STATUS_ICON_PATHS.pierce },
+      stun: { id: 'stun', label: 'Stun', icon: STATUS_ICON_PATHS.stun },
+      sleep: { id: 'sleep', label: 'Sleep', icon: STATUS_ICON_PATHS.sleep },
+      taunt: { id: 'taunt', label: 'Taunt', icon: STATUS_ICON_PATHS.taunt },
+      bleed: { id: 'bleed', label: 'Bleed', icon: STATUS_ICON_PATHS.bleed },
+      fatigue: { id: 'fatigue', label: 'Fatigue', icon: STATUS_ICON_PATHS.fatigue },
+      daze: { id: 'daze', label: 'Daze', icon: STATUS_ICON_PATHS.daze },
+      fear: { id: 'fear', label: 'Fear', icon: STATUS_ICON_PATHS.fear },
+      shield: { id: 'shield', label: 'Shield', icon: STATUS_ICON_PATHS.shield },
+      stealth: { id: 'stealth', label: 'Stealth', icon: STATUS_ICON_PATHS.stealth },
+      frenzy: { id: 'frenzy', label: 'Frenzy', icon: STATUS_ICON_PATHS.frenzy },
+      allure: { id: 'allure', label: 'Allure', icon: STATUS_ICON_PATHS.allure },
+      execute: { id: 'execute', label: 'Execute', icon: STATUS_ICON_PATHS.execute },
+      venom: { id: 'venom', label: 'Venom', icon: STATUS_ICON_PATHS.venom },
+      undying: { id: 'undying', label: 'Undying', icon: STATUS_ICON_PATHS.undying },
+      me_hoac: { id: 'me_hoac', label: 'Mê Hoặc', icon: STATUS_ICON_PATHS.me_hoac },
+      loithienanh_spd_burn: { id: 'loithienanh_spd_burn', label: 'SPD Burn', icon: STATUS_ICON_PATHS.loithienanh_spd_burn },
+      accuracy_down: { id: 'accuracy_down', label: 'Accuracy Down', icon: STATUS_ICON_PATHS.accuracy_down },
   };
   const STATUS_META_BY_TAG = {
       control: { id: 'control', label: 'Control', icon: 'assets/silence.svg' },
@@ -14282,8 +14319,10 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           return byId;
       if (byTag)
           return byTag;
+      const fallbackId = id || tag || 'default';
       const fallbackLabel = id || tag || 'Effect';
-      return { id: id || tag || 'default', label: fallbackLabel, icon: DEFAULT_STATUS_ICON_PATH };
+      const fallbackIcon = STATUS_ICON_PATHS[fallbackId] || DEFAULT_STATUS_ICON_PATH;
+      return { id: fallbackId, label: fallbackLabel, icon: fallbackIcon };
   }
   function computeStatusTurnsLeft(status) {
       const candidates = [status?.dur, status?.ttlTurns, status?.turns, status?.ttl];
@@ -14297,7 +14336,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   }
   function buildStatusTooltip(label, stacks, turnsLeft) {
       const stacksText = `x${Math.max(1, stacks)}`;
-      const turnsText = turnsLeft === null ? '∞ turn' : `${turnsLeft} turn`;
+      const turnsText = turnsLeft === null ? '∞T' : `${turnsLeft}T`;
       return `${label} ${stacksText} · ${turnsText}`;
   }
   function ensureStatusIconLoaded(iconId, iconPath) {
@@ -14335,6 +14374,13 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           cache.status = 'ready';
       };
       image.onerror = () => {
+          if (cache.path !== DEFAULT_STATUS_ICON_PATH) {
+              cache.status = 'idle';
+              cache.image = null;
+              cache.path = DEFAULT_STATUS_ICON_PATH;
+              ensureStatusIconLoaded(iconId, DEFAULT_STATUS_ICON_PATH);
+              return;
+          }
           cache.status = 'error';
       };
       image.src = iconPath;
