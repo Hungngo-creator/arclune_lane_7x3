@@ -193,6 +193,7 @@ export interface CreateSessionOptions {
   turnOrderMode?: string;
   turnOrder?: { mode?: string };
   collectionState?: CollectionStateInput | null;
+  rngSeed?: number;
 }
 
 export type SessionState = CoreSessionState & {

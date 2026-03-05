@@ -437,6 +437,10 @@ export function queueEnemyAt(
     spawnCycle,
     color: '#ed9dad',
     source: 'deck',
+    mutationBonusPct: Number.isFinite(card.mutationBonusPct) ? Number(card.mutationBonusPct) : undefined,
+    mutationDebuffPool: Array.isArray(card.mutationDebuffPool)
+      ? card.mutationDebuffPool.filter((id): id is 'bleed' | 'stun' | 'poison' => id === 'bleed' || id === 'stun' || id === 'poison')
+      : undefined,
   });
 
   Game.ai.cost = Math.max(0, Game.ai.cost - cost);

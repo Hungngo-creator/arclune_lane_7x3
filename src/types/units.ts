@@ -82,6 +82,9 @@ export interface QueuedSummonRequest {
   revive?: boolean;
   revived?: Partial<UnitToken> | null;
   source?: string;
+  mutated?: boolean;
+  mutationBonusPct?: number;
+  mutationDebuffPool?: Array<'bleed' | 'stun' | 'poison'>;
 }
 
 export type SummonQueue = Map<number, QueuedSummonRequest>;

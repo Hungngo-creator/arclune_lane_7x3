@@ -24,6 +24,7 @@ import { drawGridOblique } from '../../engine.ts';
 import { Statuses } from '../../statuses.ts';
 import { getUnitArt } from '../../art.ts';
 import { normalizeUnitId } from '../../utils/unit-id.ts';
+import { createRngState } from '../../utils/rng.ts';
 import { mapUnitProgressById } from './collection-mapper.ts';
 import { buildAICreepDeckFromLineup } from './creep-builder.ts';
 
@@ -133,6 +134,7 @@ interface BuildBaseStateParams {
   turn: TurnSnapshot;
   ai: SessionState['ai'];
   collectionState?: CreateSessionOptions['collectionState'];
+  rngSeed?: number;
 }
 
 function buildBaseState(params: BuildBaseStateParams): SessionState {
@@ -167,6 +169,7 @@ function buildBaseState(params: BuildBaseStateParams): SessionState {
     result: null,
     ai: params.ai,
     meta: metaServiceAdapter,
+    rng: createRngState(params.rngSeed),
     runtime: {
       encounter: null,
       wave: null,
@@ -509,6 +512,7 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
   const summonLimit = Number.isFinite(normalized.summonLimit)
     ? Number(normalized.summonLimit)
     : CFG.SUMMON_LIMIT;
+    const rngSeed = Number.isFinite(normalized.rngSeed) ? Number(normalized.rngSeed) : undefined;
 
   return buildBaseState({
     modeKey,
@@ -521,6 +525,7 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
     turn: buildTurnState(),
     ai: aiState,
     collectionState: normalized.collectionState ?? null,
+    rngSeed,
   });
 }
 

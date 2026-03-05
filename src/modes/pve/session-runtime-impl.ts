@@ -57,6 +57,7 @@ import {
   sessionNow,
 } from '../../utils/time';
 import { getSummonSpec, resolveSummonSlots } from '../../utils/kit';
+import { nextRngValue } from '../../utils/rng.ts';
 import { normalizeTagList } from '../../data/tags.ts';
 import { dispatchGameplayTags } from '../../combat/tag-dispatch.ts';
 import {
@@ -259,6 +260,10 @@ const isInitializedGame = (
 
 const getInitializedGame = (): InitializedSessionState | null => (
   isInitializedGame() ? (Game as InitializedSessionState) : null
+);
+
+const nextSessionRandom = (game: SessionState | null | undefined = Game): number => (
+  nextRngValue(game?.rng)
 );
 
 const coerceSkillRuntime = (value: unknown): SkillRuntime | null => {
@@ -1340,7 +1345,7 @@ function performUyenLeaderUlt(game: SessionState, unit: UnitToken): boolean {
     if (state.a1Stacks < 10) candidates.push('A1');
     candidates.push('A2');
     if (state.a3Stacks < 3) candidates.push('A3');
-    const roll = candidates[Math.floor(Math.random() * Math.max(1, candidates.length))] ?? 'A2';
+    const roll = candidates[Math.floor(nextSessionRandom(game) * Math.max(1, candidates.length))] ?? 'A2';
     if (roll === 'A1') {
       state.a1Stacks += 1;
     } else if (roll === 'A2') {

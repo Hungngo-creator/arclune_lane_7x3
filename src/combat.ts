@@ -12,6 +12,7 @@ import { gainFury, startFurySkill, finishFuryHit } from './utils/fury.ts';
 import { mergeBusyUntil, sessionNow } from './utils/time.ts';
 import { ABSOLUTE_ATTACK_TAG_IDS, ABSOLUTE_SHIELD_TAG_IDS } from './data/tags.ts';
 import { applyUyenBasicExtras } from './leader-uyen.ts';
+import { nextRngValue } from './utils/rng.ts';
 
 export { applyDamage, grantShield };
 
@@ -501,6 +502,19 @@ export function basicAttack(Game: SessionState, unit: UnitToken): void {
     }
   }
   const dealt = hitResult.dealt;
+  if (unit.mutated === true && resolved.alive) {
+    const pool = Array.isArray(unit.mutationDebuffPool)
+      ? unit.mutationDebuffPool.filter((id: unknown): id is 'bleed' | 'stun' | 'poison' => id === 'bleed' || id === 'stun' || id === 'poison')
+      : ['bleed', 'stun', 'poison'];
+    const debuffPool = pool.length > 0 ? pool : ['bleed', 'stun', 'poison'];
+    const roll = nextRngValue(Game.rng);
+    const idx = Math.floor(roll * debuffPool.length) % debuffPool.length;
+    const debuffId = debuffPool[idx] ?? 'bleed';
+    const status = Statuses.make[debuffId]?.({ turns: debuffId === 'stun' ? 1 : 2 });
+    if (status) {
+      Statuses.add(resolved, status);
+    }
+  }
   const turnStamp = `${Game.turn?.cycle ?? 0}:${unit.iid ?? 0}`;
   applyUyenBasicExtras(unit, resolved, {
     wasKill: !resolved.alive,

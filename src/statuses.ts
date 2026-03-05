@@ -109,6 +109,10 @@ const statusFactories = {
     const { turns = 2 } = (spec ?? {}) as { turns?: number };
     return { id: 'bleed', kind: 'debuff', tag: 'dot', dur: turns, tick: 'turn' };
   },
+  poison: (spec?: Record<string, unknown>) => {
+    const { turns = 2 } = (spec ?? {}) as { turns?: number };
+    return { id: 'poison', kind: 'debuff', tag: 'dot', dur: turns, tick: 'turn' };
+  },
   damageCut: (spec?: Record<string, unknown>) => {
     const { pct = 0.2, turns = 1 } = (spec ?? {}) as { pct?: number; turns?: number };
     return { id: 'dmgCut', kind: 'buff', tag: 'mitigation', power: pct, dur: turns, tick: 'turn' };
@@ -239,8 +243,18 @@ export const Statuses: StatusService = {
       }
       decrementDuration(unit, bleed);
     }
+    const poison = this.get(unit, 'poison');
+    if (poison) {
+      const lost = Math.round((unit.hpMax ?? 0) * 0.03);
+      applyDamage(unit, lost);
+      hookOnLethalDamage(unit);
+      if (ctx?.log && Array.isArray(ctx.log)) {
+        ctx.log.push({ t: 'poison', who: unit.name, lost });
+      }
+      decrementDuration(unit, poison);
+    }
     for (const status of [...list]) {
-      if (status.id !== 'bleed' && status.tick === 'turn') {
+      if (status.id !== 'bleed' && status.id !== 'poison' && status.tick === 'turn') {
         decrementDuration(unit, status);
       }
     }

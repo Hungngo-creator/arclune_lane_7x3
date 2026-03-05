@@ -18,6 +18,7 @@ import { nextTurnInterleaved } from './turns/interleaved.ts';
 import { resolveRuntimeUnitStats } from './modes/pve/collection-mapper.ts';
 import { applyCultivationBonus } from './cultivation.ts';
 import { evaluateGambitLogic } from './ai.ts';
+import { nextRngValue } from './utils/rng.ts';
 import {
   clearQueuedUyenUlt,
   hasQueuedUyenUlt,
@@ -64,6 +65,33 @@ const tokensAlive = (Game: SessionState): UnitToken[] =>
   Game.tokens.filter((t): t is UnitToken => t.alive);
 
 const GAMBIT_SKILL_ACTIONS: GambitActionType[] = ['skill1', 'skill2', 'skill3'];
+const DEFAULT_MUTATION_DEBUFF_POOL: Array<'bleed' | 'stun' | 'poison'> = ['bleed', 'stun', 'poison'];
+
+const isPveCreepId = (unitId: unknown): boolean => (
+  typeof unitId === 'string' && /^creep_\d+$/i.test(unitId)
+);
+
+const sanitizeMutationDebuffPool = (pool: unknown): Array<'bleed' | 'stun' | 'poison'> => {
+  if (!Array.isArray(pool)) return [...DEFAULT_MUTATION_DEBUFF_POOL];
+  const filtered = pool.filter((id): id is 'bleed' | 'stun' | 'poison' => id === 'bleed' || id === 'stun' || id === 'poison');
+  return filtered.length > 0 ? filtered : [...DEFAULT_MUTATION_DEBUFF_POOL];
+};
+
+const applyMutationStatBonus = (unit: UnitToken, bonusPctRaw: unknown): void => {
+  const bonusPct = Number.isFinite(bonusPctRaw) ? Number(bonusPctRaw) : 0.1;
+  const keys: Array<'hpMax' | 'atk' | 'wil' | 'res' | 'arm'> = ['hpMax', 'atk', 'wil', 'res', 'arm'];
+  for (const key of keys) {
+    const base = unit[key];
+    if (!Number.isFinite(base)) continue;
+    const scaled = Number(base) * (1 + bonusPct);
+    unit[key] = key === 'arm'
+      ? Math.max(0, Math.min(1, Math.round(scaled * 1000) / 1000))
+      : Math.max(1, Math.round(scaled));
+  }
+  if (Number.isFinite(unit.hp) && Number.isFinite(unit.hpMax)) {
+    unit.hp = Math.max(1, Math.min(Number(unit.hpMax), Math.round(Number(unit.hp) * (1 + bonusPct))));
+  }
+};
 
 function grantActionAether(Game: SessionState, unit: UnitToken | null | undefined, acted: boolean): number {
   if (!unit || !unit.alive || !acted) return 0;
@@ -233,6 +261,20 @@ export function spawnQueuedIfDue(
     statuses: [],
     baseStats,
   };
+
+  if (sideLower === 'enemy' && fromDeck && isPveCreepId(p.unitId)) {
+    const mutationRoll = nextRngValue(Game.rng);
+    const mutated = mutationRoll < 0.3;
+    const mutationBonusPct = Number.isFinite(p.mutationBonusPct) ? Number(p.mutationBonusPct) : 0.1;
+    const mutationDebuffPool = sanitizeMutationDebuffPool(p.mutationDebuffPool);
+    obj.mutated = mutated;
+    obj.mutationBonusPct = mutationBonusPct;
+    obj.mutationDebuffPool = mutationDebuffPool;
+    if (mutated) {
+      applyMutationStatBonus(obj, mutationBonusPct);
+    }
+  }
+
   obj.iid = typeof allocIid === 'function' ? allocIid() : obj.iid;
   obj.art = getUnitArt(p.unitId);
   obj.skinKey = obj.art?.skinKey;
