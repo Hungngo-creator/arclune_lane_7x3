@@ -47,20 +47,18 @@ function fallbackKitTag(sectionType: string | null | undefined): string {
   return 'active';
 }
 
+function normalizeNotes(notes: SkillSection['notes'] | string | null | undefined): ReadonlyArray<string> | undefined {
+  if (Array.isArray(notes)) return [...notes];
+  if (typeof notes === 'string') return [notes];
+  return undefined;
+}
+
 function normalizeSection(section: SkillSection | string | null | undefined): SkillSection | null{
   if (!section) return null;
   if (typeof section === 'string'){
-    return { name: '', description: section } as SkillSection;
+    return normalizeSkillEntry({ name: '', description: section, type: 'active' } as SkillSection);
   }
-  const normalized: SkillSection = { ...section };
-  normalized.tags = ensureDomainTags(section.tags ?? [], fallbackKitTag(section.type ?? null));
-  if (Array.isArray(section.notes)){
-    normalized.notes = [...section.notes];
-  } else if (typeof section.notes === 'string'){
-    const note = section.notes;
-    normalized.notes = [note];
-  }
-  return normalized;
+  return normalizeSkillEntry(section);
 }
 
 function normalizeSkillEntry(entry: SkillSection | null | undefined): SkillSection | null{
@@ -70,13 +68,7 @@ function normalizeSkillEntry(entry: SkillSection | null | undefined): SkillSecti
   if (entry.cost && typeof entry.cost === 'object'){
     normalized.cost = { ...entry.cost };
   }
-  if (Array.isArray(entry.notes)){
-    normalized.notes = [...entry.notes];
-  }
-  if (entry.notes && !Array.isArray(entry.notes)){
-    const note = entry.notes as string;
-    normalized.notes = [note];
-  }
+  normalized.notes = normalizeNotes(entry.notes);
   return normalized;
 }
 
@@ -116,11 +108,9 @@ function toSkillSection(value: unknown, fallbackType: SkillSection['type'] = 'ac
   if (isUnknownRecord(value.cost)){
     section.cost = { ...value.cost };
   }
-  if (Array.isArray(value.notes)){
-    section.notes = value.notes.filter((note): note is string => typeof note === 'string');
-  } else if (typeof value.notes === 'string'){
-    section.notes = [value.notes];
-  }
+  section.notes = Array.isArray(value.notes)
+    ? value.notes.filter((note): note is string => typeof note === 'string')
+    : normalizeNotes(typeof value.notes === 'string' ? value.notes : undefined);
   return section;
 }
 

@@ -926,6 +926,7 @@ function resetSessionState(options: StartConfigOverrides | null | undefined = {}
   CLOCK = createClock();
   invalidateSceneCache();
   meleeOffsetTokenKeys.clear();
+  creepDeathHealProcessed.clear();
 }
 
 if (CFG?.DEBUG?.LOG_EVENTS) {
@@ -1239,6 +1240,8 @@ function unbindArtSpriteListener(): void {
 }
 // Master clock theo timestamp – tránh drift giữa nhiều interval
 let CLOCK: ClockState | null = null;
+const creepDeathHealProcessed = new Set<string>();
+const CREEP_DEATH_HEAL_DEBUG_KEY = 'pve.creepDeathHeal';
 
 function createClock(): ClockState {
   const safe = safeNow();
@@ -1260,6 +1263,104 @@ function createClock(): ClockState {
     costAccumulator: 0,
     lastTimerText: null,
   };
+}
+
+const readTokenTags = (token: UnitToken | null | undefined): string[] => {
+  if (!token) return [];
+  const directTagsRaw = Array.isArray(token.tags) ? token.tags : [];
+  const directTags = directTagsRaw
+    .filter((tag: unknown): tag is string => typeof tag === 'string');
+  const metaTagsRaw = getMetaById(token.id)?.tags;
+  const metaTags = Array.isArray(metaTagsRaw)
+    ? metaTagsRaw.filter((tag: unknown): tag is string => typeof tag === 'string')
+    : [];
+  return normalizeTagList([...directTags, ...metaTags]);
+};
+
+const isCreepGroupToken = (token: UnitToken | null | undefined): boolean => {
+  const tags = readTokenTags(token);
+  if (tags.includes('creep')) return true;
+  return tags.includes('npc') && tags.includes('pve');
+};
+
+const resolveCreepDeathHealPct = (token: UnitToken | null | undefined): number => {
+  if (!token) return 0;
+  const passives = getMetaById(token.id)?.kit?.passives;
+  if (Array.isArray(passives)){
+    for (const passive of passives){
+      if (!passive || typeof passive !== 'object') continue;
+      const whenRaw = (passive as { when?: unknown }).when;
+      const when = typeof whenRaw === 'string' ? whenRaw.trim().toLowerCase() : '';
+      if (when !== 'ondeath') continue;
+      const params = (passive as { params?: Record<string, unknown> }).params;
+      const mode = typeof params?.mode === 'string' ? params.mode.trim().toLowerCase() : '';
+      if (mode && mode !== 'castermax') continue;
+      const amount = parseFiniteNumber(params?.amount);
+      if (amount && amount > 0) return Math.max(0, Math.min(1, amount));
+    }
+  }
+  if (token.id === 'creep_1') return 0.03;
+  if (token.id === 'creep_2') return 0.04;
+  if (token.id === 'creep_3') return 0.05;
+  return 0;
+};
+
+function processCreepDeathHealing(now: number): void {
+  if (!Game?.tokens?.length) return;
+  const passiveLog = Array.isArray(Game.passiveLog) ? Game.passiveLog : [];
+  if (!Array.isArray(Game.passiveLog)) Game.passiveLog = passiveLog;
+  for (const deadToken of Game.tokens){
+    if (!deadToken || deadToken.alive) continue;
+    if (!isCreepGroupToken(deadToken)) continue;
+    const deadAt = parseFiniteNumber(deadToken.deadAt);
+    if (!deadAt || deadAt <= 0) continue;
+    const deathKey = `${deadToken.iid ?? deadToken.id}:${deadAt}`;
+    if (creepDeathHealProcessed.has(deathKey)) continue;
+    creepDeathHealProcessed.add(deathKey);
+
+    const healPct = resolveCreepDeathHealPct(deadToken);
+    const deadHpMax = Math.max(0, Math.round(parseFiniteNumber(deadToken.hpMax) ?? 0));
+    const healAmount = Math.max(0, Math.round(deadHpMax * healPct));
+    if (healAmount <= 0) continue;
+
+    let healedTargets = 0;
+    for (const ally of Game.tokens){
+      if (!ally || !ally.alive) continue;
+      if (ally.side !== deadToken.side) continue;
+      if (!isCreepGroupToken(ally)) continue;
+      const hpMax = Math.max(0, Math.round(parseFiniteNumber(ally.hpMax) ?? 0));
+      if (hpMax <= 0) continue;
+      const before = Math.max(0, Math.round(parseFiniteNumber(ally.hp) ?? 0));
+      if (before >= hpMax) continue;
+      healUnit(ally, healAmount);
+      const after = Math.max(0, Math.round(parseFiniteNumber(ally.hp) ?? 0));
+      if (after > before) healedTargets += 1;
+    }
+
+    passiveLog.push({
+      key: CREEP_DEATH_HEAL_DEBUG_KEY,
+      type: CREEP_DEATH_HEAL_DEBUG_KEY,
+      timestamp: now,
+      sourceIid: deadToken.iid ?? null,
+      sourceId: deadToken.id,
+      side: deadToken.side,
+      healPct,
+      healAmount,
+      healedTargets,
+      deadAt,
+    });
+
+    if (CFG?.DEBUG?.LOG_EVENTS && typeof console !== 'undefined' && typeof console.debug === 'function'){
+      console.debug(`[${CREEP_DEATH_HEAL_DEBUG_KEY}]`, {
+        sourceId: deadToken.id,
+        sourceIid: deadToken.iid ?? null,
+        side: deadToken.side,
+        healPct,
+        healAmount,
+        healedTargets,
+      });
+    }
+  }
 }
 
 // Xác chết chờ vanish (để sau này thay bằng dead-animation)
@@ -2728,6 +2829,7 @@ function init(): boolean {
           if (finalizeBattleIfLeaderDown(Game, 'leader-immediate', sessionNowMs)) {
             return;
           }
+          processCreepDeathHealing(sessionNowMs);
           cleanupDead(sessionNowMs);
           const postTurnResult = checkBattleEndResult(Game, { trigger: 'post-turn', timestamp: sessionNowMs });
           scheduleDraw();

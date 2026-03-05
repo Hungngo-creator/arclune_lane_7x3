@@ -8266,22 +8266,20 @@ __define('./data/skills.ts', (exports, module, __require) => {
           return 'passive';
       return 'active';
   }
+  function normalizeNotes(notes) {
+      if (Array.isArray(notes))
+          return [...notes];
+      if (typeof notes === 'string')
+          return [notes];
+      return undefined;
+  }
   function normalizeSection(section) {
       if (!section)
           return null;
       if (typeof section === 'string') {
-          return { name: '', description: section };
+          return normalizeSkillEntry({ name: '', description: section, type: 'active' });
       }
-      const normalized = { ...section };
-      normalized.tags = ensureDomainTags(section.tags ?? [], fallbackKitTag(section.type ?? null));
-      if (Array.isArray(section.notes)) {
-          normalized.notes = [...section.notes];
-      }
-      else if (typeof section.notes === 'string') {
-          const note = section.notes;
-          normalized.notes = [note];
-      }
-      return normalized;
+      return normalizeSkillEntry(section);
   }
   function normalizeSkillEntry(entry) {
       if (!entry)
@@ -8291,13 +8289,7 @@ __define('./data/skills.ts', (exports, module, __require) => {
       if (entry.cost && typeof entry.cost === 'object') {
           normalized.cost = { ...entry.cost };
       }
-      if (Array.isArray(entry.notes)) {
-          normalized.notes = [...entry.notes];
-      }
-      if (entry.notes && !Array.isArray(entry.notes)) {
-          const note = entry.notes;
-          normalized.notes = [note];
-      }
+      normalized.notes = normalizeNotes(entry.notes);
       return normalized;
   }
   function isUnknownRecord(value) {
@@ -8322,12 +8314,9 @@ __define('./data/skills.ts', (exports, module, __require) => {
       if (isUnknownRecord(value.cost)) {
           section.cost = { ...value.cost };
       }
-      if (Array.isArray(value.notes)) {
-          section.notes = value.notes.filter((note) => typeof note === 'string');
-      }
-      else if (typeof value.notes === 'string') {
-          section.notes = [value.notes];
-      }
+      section.notes = Array.isArray(value.notes)
+          ? value.notes.filter((note) => typeof note === 'string')
+          : normalizeNotes(typeof value.notes === 'string' ? value.notes : undefined);
       return section;
   }
   function buildBaseSkillSetsFromRoster() {
@@ -12033,82 +12022,84 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   const resolveUltCost = __dep9.resolveUltCost;
   const gainFury = __dep9.gainFury;
   const finishFuryHit = __dep9.finishFuryHit;
-  const __dep10 = __require('./engine.ts');
-  const makeGrid = __dep10.makeGrid;
-  const drawGridOblique = __dep10.drawGridOblique;
-  const drawTokensOblique = __dep10.drawTokensOblique;
-  const drawQueuedOblique = __dep10.drawQueuedOblique;
-  const hitToCellOblique = __dep10.hitToCellOblique;
-  const spawnLeaders = __dep10.spawnLeaders;
-  const pickRandom = __dep10.pickRandom;
-  const slotIndex = __dep10.slotIndex;
-  const slotToCell = __dep10.slotToCell;
-  const cellReserved = __dep10.cellReserved;
-  const ART_SPRITE_EVENT = __dep10.ART_SPRITE_EVENT;
-  const __dep11 = __require('./background.ts');
-  const drawEnvironmentProps = __dep11.drawEnvironmentProps;
-  const __dep12 = __require('./art.ts');
-  const getUnitArt = __dep12.getUnitArt;
-  const setUnitSkin = __dep12.setUnitSkin;
-  const __dep13 = __require('./ui.ts');
-  const initHUD = __dep13.initHUD;
-  const startSummonBar = __dep13.startSummonBar;
-  const __dep14 = __require('./vfx.ts');
-  const vfxDraw = __dep14.vfxDraw;
-  const vfxAddSpawn = __dep14.vfxAddSpawn;
-  const vfxAddHit = __dep14.vfxAddHit;
-  const vfxAddMelee = __dep14.vfxAddMelee;
-  const vfxAddLightningArc = __dep14.vfxAddLightningArc;
-  const vfxAddBloodPulse = __dep14.vfxAddBloodPulse;
-  const vfxAddGroundBurst = __dep14.vfxAddGroundBurst;
-  const vfxAddShieldWrap = __dep14.vfxAddShieldWrap;
-  const computeMeleeOffsets = __dep14.computeMeleeOffsets;
-  const baseAsSessionWithVfx = __dep14.asSessionWithVfx;
-  const __dep15 = __require('./scene.ts');
-  const drawBattlefieldScene = __dep15.drawBattlefieldScene;
-  const __dep16 = __require('./events.ts');
-  const TURN_START = __dep16.TURN_START;
-  const TURN_END = __dep16.TURN_END;
-  const ACTION_START = __dep16.ACTION_START;
-  const ACTION_END = __dep16.ACTION_END;
-  const BATTLE_END = __dep16.BATTLE_END;
-  const emitGameEvent = __dep16.emitGameEvent;
-  const addGameEventListener = __dep16.addGameEventListener;
-  const __dep17 = __require('./utils/dummy.ts');
-  const ensureNestedModuleSupport = __dep17.ensureNestedModuleSupport;
-  const __dep18 = __require('./utils/time.ts');
-  const mergeBusyUntil = __dep18.mergeBusyUntil;
-  const normalizeAnimationFrameTimestamp = __dep18.normalizeAnimationFrameTimestamp;
-  const resetSessionTimeBase = __dep18.resetSessionTimeBase;
-  const safeNow = __dep18.safeNow;
-  const sessionNow = __dep18.sessionNow;
-  const __dep19 = __require('./utils/kit.ts');
-  const getSummonSpec = __dep19.getSummonSpec;
-  const resolveSummonSlots = __dep19.resolveSummonSlots;
-  const __dep20 = __require('./utils/rng.ts');
-  const nextRngValue = __dep20.nextRngValue;
-  const __dep21 = __require('./data/tags.ts');
-  const normalizeTagList = __dep21.normalizeTagList;
-  const __dep22 = __require('./combat/tag-dispatch.ts');
-  const dispatchGameplayTags = __dep22.dispatchGameplayTags;
-  const __dep23 = __require('./modes/pve/session-state.ts');
-  const normalizeConfig = __dep23.normalizeConfig;
-  const createSession = __dep23.createSession;
-  const invalidateSceneCache = __dep23.invalidateSceneCache;
-  const ensureSceneCache = __dep23.ensureSceneCache;
-  const clearBackgroundSignatureCache = __dep23.clearBackgroundSignatureCache;
-  const normalizeDeckEntries = __dep23.normalizeDeckEntries;
-  const __dep24 = __require('./modes/pve/collection-mapper.ts');
-  const mapUnitProgressById = __dep24.mapUnitProgressById;
-  const __dep25 = __require('./modes/pve/creep-builder.ts');
-  const buildAICreepDeckFromLineup = __dep25.buildAICreepDeckFromLineup;
-  const __dep26 = __require('./leader-uyen.ts');
-  const ensureUyenState = __dep26.ensureUyenState;
-  const getUyenUltChoice = __dep26.getUyenUltChoice;
-  const grantUyenSummonRage = __dep26.grantUyenSummonRage;
-  const isLeaderUltReady = __dep26.isLeaderUltReady;
-  const isUyenLeader = __dep26.isUyenLeader;
-  const queueUyenUltCast = __dep26.queueUyenUltCast;
+  const __dep10 = __require('./catalog.ts');
+  const getMetaById = __dep10.getMetaById;
+  const __dep11 = __require('./engine.ts');
+  const makeGrid = __dep11.makeGrid;
+  const drawGridOblique = __dep11.drawGridOblique;
+  const drawTokensOblique = __dep11.drawTokensOblique;
+  const drawQueuedOblique = __dep11.drawQueuedOblique;
+  const hitToCellOblique = __dep11.hitToCellOblique;
+  const spawnLeaders = __dep11.spawnLeaders;
+  const pickRandom = __dep11.pickRandom;
+  const slotIndex = __dep11.slotIndex;
+  const slotToCell = __dep11.slotToCell;
+  const cellReserved = __dep11.cellReserved;
+  const ART_SPRITE_EVENT = __dep11.ART_SPRITE_EVENT;
+  const __dep12 = __require('./background.ts');
+  const drawEnvironmentProps = __dep12.drawEnvironmentProps;
+  const __dep13 = __require('./art.ts');
+  const getUnitArt = __dep13.getUnitArt;
+  const setUnitSkin = __dep13.setUnitSkin;
+  const __dep14 = __require('./ui.ts');
+  const initHUD = __dep14.initHUD;
+  const startSummonBar = __dep14.startSummonBar;
+  const __dep15 = __require('./vfx.ts');
+  const vfxDraw = __dep15.vfxDraw;
+  const vfxAddSpawn = __dep15.vfxAddSpawn;
+  const vfxAddHit = __dep15.vfxAddHit;
+  const vfxAddMelee = __dep15.vfxAddMelee;
+  const vfxAddLightningArc = __dep15.vfxAddLightningArc;
+  const vfxAddBloodPulse = __dep15.vfxAddBloodPulse;
+  const vfxAddGroundBurst = __dep15.vfxAddGroundBurst;
+  const vfxAddShieldWrap = __dep15.vfxAddShieldWrap;
+  const computeMeleeOffsets = __dep15.computeMeleeOffsets;
+  const baseAsSessionWithVfx = __dep15.asSessionWithVfx;
+  const __dep16 = __require('./scene.ts');
+  const drawBattlefieldScene = __dep16.drawBattlefieldScene;
+  const __dep17 = __require('./events.ts');
+  const TURN_START = __dep17.TURN_START;
+  const TURN_END = __dep17.TURN_END;
+  const ACTION_START = __dep17.ACTION_START;
+  const ACTION_END = __dep17.ACTION_END;
+  const BATTLE_END = __dep17.BATTLE_END;
+  const emitGameEvent = __dep17.emitGameEvent;
+  const addGameEventListener = __dep17.addGameEventListener;
+  const __dep18 = __require('./utils/dummy.ts');
+  const ensureNestedModuleSupport = __dep18.ensureNestedModuleSupport;
+  const __dep19 = __require('./utils/time.ts');
+  const mergeBusyUntil = __dep19.mergeBusyUntil;
+  const normalizeAnimationFrameTimestamp = __dep19.normalizeAnimationFrameTimestamp;
+  const resetSessionTimeBase = __dep19.resetSessionTimeBase;
+  const safeNow = __dep19.safeNow;
+  const sessionNow = __dep19.sessionNow;
+  const __dep20 = __require('./utils/kit.ts');
+  const getSummonSpec = __dep20.getSummonSpec;
+  const resolveSummonSlots = __dep20.resolveSummonSlots;
+  const __dep21 = __require('./utils/rng.ts');
+  const nextRngValue = __dep21.nextRngValue;
+  const __dep22 = __require('./data/tags.ts');
+  const normalizeTagList = __dep22.normalizeTagList;
+  const __dep23 = __require('./combat/tag-dispatch.ts');
+  const dispatchGameplayTags = __dep23.dispatchGameplayTags;
+  const __dep24 = __require('./modes/pve/session-state.ts');
+  const normalizeConfig = __dep24.normalizeConfig;
+  const createSession = __dep24.createSession;
+  const invalidateSceneCache = __dep24.invalidateSceneCache;
+  const ensureSceneCache = __dep24.ensureSceneCache;
+  const clearBackgroundSignatureCache = __dep24.clearBackgroundSignatureCache;
+  const normalizeDeckEntries = __dep24.normalizeDeckEntries;
+  const __dep25 = __require('./modes/pve/collection-mapper.ts');
+  const mapUnitProgressById = __dep25.mapUnitProgressById;
+  const __dep26 = __require('./modes/pve/creep-builder.ts');
+  const buildAICreepDeckFromLineup = __dep26.buildAICreepDeckFromLineup;
+  const __dep27 = __require('./leader-uyen.ts');
+  const ensureUyenState = __dep27.ensureUyenState;
+  const getUyenUltChoice = __dep27.getUyenUltChoice;
+  const grantUyenSummonRage = __dep27.grantUyenSummonRage;
+  const isLeaderUltReady = __dep27.isLeaderUltReady;
+  const isUyenLeader = __dep27.isUyenLeader;
+  const queueUyenUltCast = __dep27.queueUyenUltCast;
   const isPlainRecord = (value) => (!!value && typeof value === 'object');
   const isFiniteNumber = (value) => (typeof value === 'number' && Number.isFinite(value));
   const parseFiniteNumber = (value) => {
@@ -12708,6 +12699,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       CLOCK = createClock();
       invalidateSceneCache();
       meleeOffsetTokenKeys.clear();
+      creepDeathHealProcessed.clear();
   }
   if (CFG?.DEBUG?.LOG_EVENTS) {
       const logEvent = (type) => (event) => {
@@ -13028,6 +13020,8 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   }
   // Master clock theo timestamp – tránh drift giữa nhiều interval
   let CLOCK = null;
+  const creepDeathHealProcessed = new Set();
+  const CREEP_DEATH_HEAL_DEBUG_KEY = 'pve.creepDeathHeal';
   function createClock() {
       const safe = safeNow();
       const now = getNow();
@@ -13048,6 +13042,119 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           costAccumulator: 0,
           lastTimerText: null,
       };
+  }
+  const readTokenTags = (token) => {
+      if (!token)
+          return [];
+      const directTagsRaw = Array.isArray(token.tags) ? token.tags : [];
+      const directTags = directTagsRaw
+          .filter((tag) => typeof tag === 'string');
+      const metaTagsRaw = getMetaById(token.id)?.tags;
+      const metaTags = Array.isArray(metaTagsRaw)
+          ? metaTagsRaw.filter((tag) => typeof tag === 'string')
+          : [];
+      return normalizeTagList([...directTags, ...metaTags]);
+  };
+  const isCreepGroupToken = (token) => {
+      const tags = readTokenTags(token);
+      if (tags.includes('creep'))
+          return true;
+      return tags.includes('npc') && tags.includes('pve');
+  };
+  const resolveCreepDeathHealPct = (token) => {
+      if (!token)
+          return 0;
+      const passives = getMetaById(token.id)?.kit?.passives;
+      if (Array.isArray(passives)) {
+          for (const passive of passives) {
+              if (!passive || typeof passive !== 'object')
+                  continue;
+              const whenRaw = passive.when;
+              const when = typeof whenRaw === 'string' ? whenRaw.trim().toLowerCase() : '';
+              if (when !== 'ondeath')
+                  continue;
+              const params = passive.params;
+              const mode = typeof params?.mode === 'string' ? params.mode.trim().toLowerCase() : '';
+              if (mode && mode !== 'castermax')
+                  continue;
+              const amount = parseFiniteNumber(params?.amount);
+              if (amount && amount > 0)
+                  return Math.max(0, Math.min(1, amount));
+          }
+      }
+      if (token.id === 'creep_1')
+          return 0.03;
+      if (token.id === 'creep_2')
+          return 0.04;
+      if (token.id === 'creep_3')
+          return 0.05;
+      return 0;
+  };
+  function processCreepDeathHealing(now) {
+      if (!Game?.tokens?.length)
+          return;
+      const passiveLog = Array.isArray(Game.passiveLog) ? Game.passiveLog : [];
+      if (!Array.isArray(Game.passiveLog))
+          Game.passiveLog = passiveLog;
+      for (const deadToken of Game.tokens) {
+          if (!deadToken || deadToken.alive)
+              continue;
+          if (!isCreepGroupToken(deadToken))
+              continue;
+          const deadAt = parseFiniteNumber(deadToken.deadAt);
+          if (!deadAt || deadAt <= 0)
+              continue;
+          const deathKey = `${deadToken.iid ?? deadToken.id}:${deadAt}`;
+          if (creepDeathHealProcessed.has(deathKey))
+              continue;
+          creepDeathHealProcessed.add(deathKey);
+          const healPct = resolveCreepDeathHealPct(deadToken);
+          const deadHpMax = Math.max(0, Math.round(parseFiniteNumber(deadToken.hpMax) ?? 0));
+          const healAmount = Math.max(0, Math.round(deadHpMax * healPct));
+          if (healAmount <= 0)
+              continue;
+          let healedTargets = 0;
+          for (const ally of Game.tokens) {
+              if (!ally || !ally.alive)
+                  continue;
+              if (ally.side !== deadToken.side)
+                  continue;
+              if (!isCreepGroupToken(ally))
+                  continue;
+              const hpMax = Math.max(0, Math.round(parseFiniteNumber(ally.hpMax) ?? 0));
+              if (hpMax <= 0)
+                  continue;
+              const before = Math.max(0, Math.round(parseFiniteNumber(ally.hp) ?? 0));
+              if (before >= hpMax)
+                  continue;
+              healUnit(ally, healAmount);
+              const after = Math.max(0, Math.round(parseFiniteNumber(ally.hp) ?? 0));
+              if (after > before)
+                  healedTargets += 1;
+          }
+          passiveLog.push({
+              key: CREEP_DEATH_HEAL_DEBUG_KEY,
+              type: CREEP_DEATH_HEAL_DEBUG_KEY,
+              timestamp: now,
+              sourceIid: deadToken.iid ?? null,
+              sourceId: deadToken.id,
+              side: deadToken.side,
+              healPct,
+              healAmount,
+              healedTargets,
+              deadAt,
+          });
+          if (CFG?.DEBUG?.LOG_EVENTS && typeof console !== 'undefined' && typeof console.debug === 'function') {
+              console.debug(`[${CREEP_DEATH_HEAL_DEBUG_KEY}]`, {
+                  sourceId: deadToken.id,
+                  sourceIid: deadToken.iid ?? null,
+                  side: deadToken.side,
+                  healPct,
+                  healAmount,
+                  healedTargets,
+              });
+          }
+      }
   }
   // Xác chết chờ vanish (để sau này thay bằng dead-animation)
   const DEATH_VANISH_MS = 900;
@@ -14538,6 +14645,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   if (finalizeBattleIfLeaderDown(Game, 'leader-immediate', sessionNowMs)) {
                       return;
                   }
+                  processCreepDeathHealing(sessionNowMs);
                   cleanupDead(sessionNowMs);
                   const postTurnResult = checkBattleEndResult(Game, { trigger: 'post-turn', timestamp: sessionNowMs });
                   scheduleDraw();
