@@ -5,7 +5,10 @@ import type { UnitId } from '@shared-types/units';
 
 export interface CampaignStageDefinition {
   id: string;
-  nodeId: string;
+  locationId: string;
+  locationName: string;
+  locationLore: string;
+  terrainHint: string;
   title: string;
   chapter: string;
   bossId: UnitId;
@@ -29,44 +32,68 @@ const PASSIVE_ICON_MAP: Readonly<Record<string, string>> = {
   exalt: 'assets/exalt.svg',
 };
 
-const STAGE_BLUEPRINT = [
-  {
-    id: '1-1',
-    nodeId: 'n-1-1',
-    title: 'Khởi Phong Sơn Lộ',
+type StageSeed = Omit<CampaignStageDefinition, 'passives' | 'skills'> & { passiveIds: string[] };
+
+const makeStage = (stage: StageSeed): StageSeed => stage;
+
+const STAGE_BLUEPRINT: StageSeed[] = [
+  ...Array.from({ length: 10 }, (_, index) => makeStage({
+    id: `1-${index + 1}`,
+    locationId: 'jade-forest',
+    locationName: 'Jade Forest',
+    locationLore: 'Rừng ngọc phủ sương, nơi linh khí vận hành theo nhịp triều gió và các trận pháp cổ.',
+    terrainHint: 'Thảm rừng rậm, suối ngầm và ngọn núi thấp bao quanh thánh địa cổ.',
+    title: [
+      'Khởi Phong Sơn Lộ',
+      'Tàn Ảnh Ma Cốc',
+      'Phong Cấm Cổ Đàn',
+      'Lưu Hà Cổ Trấn',
+      'Thiền Lâm Huyết Kính',
+      'Cửu Bộc Hạ Lưu',
+      'Yên Phong Mê Cung',
+      'Thụ Tâm Linh Đàn',
+      'Bích Ảnh Động Môn',
+      'Mộc Thần Tế Đài',
+    ][index] ?? `Stage ${index + 1}`,
     chapter: 'The Fool\'s Journey',
-    bossId: 'mong_yem',
-    recommendedPower: '12.000',
-    bossQuote: '“Giấc mộng không phải nơi để ngươi tỉnh dậy.”',
-    status: 'cleared',
-    stars: 3,
-    passiveIds: ['weaken', 'silence'],
-  },
-  {
-    id: '1-2',
-    nodeId: 'n-1-2',
-    title: 'Tàn Ảnh Ma Cốc',
-    chapter: 'The Fool\'s Journey',
-    bossId: 'chan_nga',
-    recommendedPower: '14.500',
-    bossQuote: '“Bản ngã thật sự luôn xuất hiện ở lần triệu hồi cuối.”',
-    status: 'open',
-    stars: 1,
-    passiveIds: ['reflect', 'pierce'],
-  },
-  {
-    id: '1-3',
-    nodeId: 'n-1-3',
-    title: 'Phong Cấm Cổ Đàn',
-    chapter: 'The Fool\'s Journey',
-    bossId: 'loithienanh',
-    recommendedPower: '18.200',
-    bossQuote: '“Nhập trận nếu đạo tâm ngươi đủ cứng.”',
-    status: 'locked',
+    bossId: (['mong_yem', 'chan_nga', 'loithienanh'] as const)[index % 3] ?? 'mong_yem',
+    recommendedPower: `${12 + index * 2}.${(index % 3) * 2}00`,
+    bossQuote: '“Giữ vững đạo tâm, nếu không ngươi sẽ lạc giữa tầng tầng mộng ảnh.”',
+    status: (index < 4 ? 'cleared' : index === 4 ? 'open' : 'locked') as CampaignStageDefinition['status'],
+    stars: index < 3 ? 3 : index < 5 ? 2 : 0,
+    passiveIds: index % 2 === 0 ? ['weaken', 'silence'] : ['reflect', 'pierce'],
+  })),
+  ...Array.from({ length: 6 }, (_, index) => makeStage({
+    id: `2-${index + 1}`,
+    locationId: 'dragon-spine',
+    locationName: 'Dragon Spine',
+    locationLore: 'Sống lưng long mạch băng hỏa giao tranh, sấm tuyết và mảnh vảy cổ phủ khắp triền núi.',
+    terrainHint: 'Dãy núi hiểm trở cắt ngang dòng sông băng, vách đá phủ tuyết mù quanh năm.',
+    title: ['Tuyết Liệt Sơn Môn', 'Long Tích Băng Động', 'Phong Hồn Trường Cốc', 'Đoạn Long Vực', 'Lôi Vũ Thiên Quan', 'Tọa Tinh Tuyệt Lĩnh'][index] ?? `Stage ${index + 1}`,
+    chapter: 'Spiral of Oaths',
+    bossId: (['loithienanh', 'chan_nga', 'mong_yem'] as const)[index % 3] ?? 'loithienanh',
+    recommendedPower: `${34 + index * 3}.500`,
+    bossQuote: '“Long cốt không tha kẻ do dự.”',
+    status: (index === 0 ? 'open' : 'locked') as CampaignStageDefinition['status'],
     stars: 0,
     passiveIds: ['damageCut', 'bleed', 'reflect'],
-  },
-] as const;
+  })),
+  ...Array.from({ length: 5 }, (_, index) => makeStage({
+    id: `3-${index + 1}`,
+    locationId: 'ember-delta',
+    locationName: 'Ember Delta',
+    locationLore: 'Vùng châu thổ dung nham cổ, sông đỏ phân nhánh quanh tàn tích vương triều hỏa luyện.',
+    terrainHint: 'Địa hình đầm lầy tro, sông dung nham và các ngọn tháp đổ nát len giữa khe núi.',
+    title: ['Huyết Hà Tiền Đồn', 'Thạch Hỏa Tế Tràng', 'Tàn Thành Dạ Triều', 'Ma Nham Cổ Mộ', 'Liệt Nhật Thần Đài'][index] ?? `Stage ${index + 1}`,
+    chapter: 'Ashen Covenant',
+    bossId: (['chan_nga', 'mong_yem', 'loithienanh'] as const)[index % 3] ?? 'chan_nga',
+    recommendedPower: `${56 + index * 4}.800`,
+    bossQuote: '“Mỗi bước chân là một lời thề bằng tro tàn.”',
+    status: 'locked',
+    stars: 0,
+    passiveIds: ['exalt', 'pierce', 'weaken'],
+  })),
+];
 
 const rosterNameById = new Map(ROSTER.map((unit) => [unit.id, unit.name]));
 
@@ -97,7 +124,7 @@ export const CAMPAIGN_STAGE_DATA: ReadonlyArray<CampaignStageDefinition> = STAGE
   return {
     ...stage,
     bossId: stage.bossId as UnitId,
-    title: `${stage.id} · ${stage.title}`,
+    title: stage.title,
     passives: stage.passiveIds.map(toPassive),
     skills: stageSkills,
     bossQuote: stage.bossQuote,
