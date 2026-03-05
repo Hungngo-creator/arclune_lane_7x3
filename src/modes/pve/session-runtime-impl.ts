@@ -737,7 +737,35 @@ type StatusMeta = {
   icon: string;
 };
 const DEFAULT_STATUS_ICON_PATH = 'assets/weaken.svg';
-const STATUS_ICON_PATHS: Record<string, string> = {
+type StatusIconId =
+  | 'blind'
+  | 'dmgCut'
+  | 'damageCut'
+  | 'exalt'
+  | 'weaken'
+  | 'reflect'
+  | 'haste'
+  | 'silence'
+  | 'pierce'
+  | 'stun'
+  | 'sleep'
+  | 'taunt'
+  | 'bleed'
+  | 'fatigue'
+  | 'daze'
+  | 'fear'
+  | 'shield'
+  | 'stealth'
+  | 'frenzy'
+  | 'allure'
+  | 'execute'
+  | 'venom'
+  | 'undying'
+  | 'me_hoac'
+  | 'loithienanh_spd_burn'
+  | 'accuracy_down';
+
+const STATUS_ICON_PATHS: Record<StatusIconId, string> = {
   blind: 'assets/blind.svg',
   dmgCut: 'assets/damageCut.svg',
   damageCut: 'assets/damageCut.svg',
@@ -3066,7 +3094,9 @@ function getStatusMeta(status: Record<string, unknown> | null | undefined): Stat
   if (byTag) return byTag;
   const fallbackId = id || tag || 'default';
   const fallbackLabel = id || tag || 'Effect';
-  const fallbackIcon = STATUS_ICON_PATHS[fallbackId] || DEFAULT_STATUS_ICON_PATH;
+  const fallbackIcon = fallbackId in STATUS_ICON_PATHS
+    ? STATUS_ICON_PATHS[fallbackId as StatusIconId]
+    : DEFAULT_STATUS_ICON_PATH;
   return { id: fallbackId, label: fallbackLabel, icon: fallbackIcon };
 }
 

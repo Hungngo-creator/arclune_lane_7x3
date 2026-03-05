@@ -14418,7 +14418,9 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           return byTag;
       const fallbackId = id || tag || 'default';
       const fallbackLabel = id || tag || 'Effect';
-      const fallbackIcon = STATUS_ICON_PATHS[fallbackId] || DEFAULT_STATUS_ICON_PATH;
+      const fallbackIcon = fallbackId in STATUS_ICON_PATHS
+          ? STATUS_ICON_PATHS[fallbackId]
+          : DEFAULT_STATUS_ICON_PATH;
       return { id: fallbackId, label: fallbackLabel, icon: fallbackIcon };
   }
   function computeStatusTurnsLeft(status) {
