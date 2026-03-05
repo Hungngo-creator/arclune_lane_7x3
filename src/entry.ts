@@ -118,6 +118,7 @@ const SCREEN_COLLECTION = 'collection';
 const SCREEN_LINEUP = 'lineup';
 const SCREEN_GACHA = 'gacha';
 const SCREEN_ARENA_HUB = 'arena-hub';
+const SCREEN_CAMPAIGN_WORLD_MAP = 'campaign-world-map';
 const SCREEN_SECT = 'sect';
 const SCREEN_SECT_TACTICAL_AI = 'sect-tactical-ai';
 const COMING_SOON_MODULE_ID = '@modes/coming-soon.stub.ts' as const;
@@ -133,6 +134,7 @@ const APP_SCREEN_CLASSES = [
   `app--${SCREEN_LINEUP}`,
   `app--${SCREEN_GACHA}`,
   `app--${SCREEN_ARENA_HUB}`,
+  `app--${SCREEN_CAMPAIGN_WORLD_MAP}`,
   `app--${SCREEN_SECT}`,
   `app--${SCREEN_SECT_TACTICAL_AI}`,
 ];
