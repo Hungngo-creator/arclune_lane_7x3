@@ -15171,6 +15171,52 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       const turnsText = turnsLeft === null ? '∞T' : `${turnsLeft}T`;
       return `${label} ${stacksText} · ${turnsText}`;
   }
+  function aggregateStatuses(statusesInput) {
+      const statuses = Array.isArray(statusesInput) ? statusesInput : [];
+      if (!statuses.length)
+          return [];
+      const byStatusId = new Map();
+      for (const rawStatus of statuses) {
+          if (!rawStatus || typeof rawStatus !== 'object')
+              continue;
+          const statusRecord = rawStatus;
+          const statusId = typeof statusRecord.id === 'string' ? statusRecord.id : null;
+          if (!statusId)
+              continue;
+          const tag = typeof statusRecord.tag === 'string' ? statusRecord.tag : '';
+          const kind = typeof statusRecord.kind === 'string' ? statusRecord.kind : '';
+          const isControl = CONTROL_TAGS.has(tag) || CONTROL_TAGS.has(statusId);
+          const isDebuff = kind === 'debuff';
+          const priority = isControl ? 0 : (isDebuff ? 1 : 2);
+          const turnsLeft = computeStatusTurnsLeft(statusRecord);
+          const stacks = Math.max(1, Math.round(parseFiniteNumber(statusRecord.stacks) ?? 1));
+          const existing = byStatusId.get(statusId);
+          if (!existing) {
+              byStatusId.set(statusId, {
+                  statusId,
+                  meta: getStatusMeta(statusRecord),
+                  priority,
+                  stacks,
+                  turnsLeft,
+                  duplicateCount: 1,
+              });
+              continue;
+          }
+          existing.stacks += stacks;
+          existing.duplicateCount += 1;
+          if (turnsLeft !== null) {
+              existing.turnsLeft = existing.turnsLeft === null
+                  ? turnsLeft
+                  : Math.max(existing.turnsLeft, turnsLeft);
+          }
+          existing.priority = Math.min(existing.priority, priority);
+      }
+      const aggregates = Array.from(byStatusId.values());
+      aggregates.sort((a, b) => (a.priority - b.priority
+          || ((b.turnsLeft ?? Number.MAX_SAFE_INTEGER) - (a.turnsLeft ?? Number.MAX_SAFE_INTEGER))
+          || a.meta.label.localeCompare(b.meta.label)));
+      return aggregates;
+  }
   function ensureStatusIconLoaded(iconId, iconPath) {
       if (typeof Image === 'undefined')
           return null;
@@ -15223,67 +15269,33 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       if (!statuses.length)
           return [];
       const icons = [];
-      const seen = new Set();
-      for (const status of statuses) {
-          if (!status || typeof status !== 'object')
-              continue;
-          const statusRecord = status;
-          const statusId = typeof statusRecord.id === 'string' ? statusRecord.id : null;
-          if (!statusId || seen.has(statusId))
-              continue;
-          const meta = getStatusMeta(statusRecord);
-          const icon = ensureStatusIconLoaded(meta.id, meta.icon);
+      const aggregates = aggregateStatuses(statuses);
+      for (const aggregate of aggregates) {
+          const icon = ensureStatusIconLoaded(aggregate.meta.id, aggregate.meta.icon);
           if (!icon || icon.status !== 'ready' || !icon.image)
               continue;
-          const tag = typeof statusRecord.tag === 'string' ? statusRecord.tag : '';
-          const kind = typeof statusRecord.kind === 'string' ? statusRecord.kind : '';
-          const stacks = Math.max(1, Math.round(parseFiniteNumber(statusRecord.stacks) ?? 1));
-          const turnsLeft = computeStatusTurnsLeft(statusRecord);
-          const isControl = CONTROL_TAGS.has(tag) || CONTROL_TAGS.has(statusId);
-          const isDebuff = kind === 'debuff';
-          const priority = isControl ? 0 : (isDebuff ? 1 : 2);
-          seen.add(statusId);
           icons.push({
               ...icon,
-              statusId,
-              statusName: meta.label,
-              tooltip: buildStatusTooltip(meta.label, stacks, turnsLeft),
-              priority,
-              stacks,
-              turnsLeft,
+              statusId: aggregate.statusId,
+              statusName: aggregate.meta.label,
+              tooltip: buildStatusTooltip(aggregate.meta.label, aggregate.stacks, aggregate.turnsLeft),
+              priority: aggregate.priority,
+              stacks: aggregate.stacks,
+              turnsLeft: aggregate.turnsLeft,
           });
       }
-      icons.sort((a, b) => (a.priority - b.priority
-          || ((b.turnsLeft ?? Number.MAX_SAFE_INTEGER) - (a.turnsLeft ?? Number.MAX_SAFE_INTEGER))
-          || a.statusName.localeCompare(b.statusName)));
       return icons.slice(0, MAX_STATUS_ICONS_PER_TOKEN);
   }
   function __resolveStatusIconPreview(statusesInput) {
-      const statuses = Array.isArray(statusesInput) ? statusesInput : [];
       const preview = [];
-      const seen = new Set();
-      for (const status of statuses) {
-          if (!status || typeof status !== 'object')
-              continue;
-          const statusId = typeof status.id === 'string' ? status.id : null;
-          if (!statusId || seen.has(statusId))
-              continue;
-          seen.add(statusId);
-          const meta = getStatusMeta(status);
-          const tag = typeof status.tag === 'string' ? status.tag : '';
-          const kind = typeof status.kind === 'string' ? status.kind : '';
-          const isControl = CONTROL_TAGS.has(tag) || CONTROL_TAGS.has(statusId);
-          const isDebuff = kind === 'debuff';
-          const priority = isControl ? 0 : (isDebuff ? 1 : 2);
-          const stacks = Math.max(1, Math.round(parseFiniteNumber(status.stacks) ?? 1));
-          const turnsLeft = computeStatusTurnsLeft(status);
+      const aggregates = aggregateStatuses(statusesInput);
+      for (const aggregate of aggregates) {
           preview.push({
-              id: statusId,
-              tooltip: buildStatusTooltip(meta.label, stacks, turnsLeft),
-              priority,
+              id: aggregate.statusId,
+              tooltip: buildStatusTooltip(aggregate.meta.label, aggregate.stacks, aggregate.turnsLeft),
+              priority: aggregate.priority,
           });
       }
-      preview.sort((a, b) => a.priority - b.priority || a.id.localeCompare(b.id));
       return preview.slice(0, MAX_STATUS_ICONS_PER_TOKEN);
   }
   function updateStatusIconHoverTooltip(clientX, clientY) {
@@ -15390,6 +15402,25 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               statusIcons.forEach((icon, index) => {
                   const iconX = statusStartX + index * (statusIconSize + statusIconGap);
                   drawCtx.drawImage(icon.image, iconX, statusY, statusIconSize, statusIconSize);
+                  if (icon.stacks > 1) {
+                      const stackText = icon.stacks > 99 ? '99+' : `${icon.stacks}`;
+                      const badgeSize = Math.max(7, Math.round(statusIconSize * 0.62));
+                      const badgeX = iconX + statusIconSize - badgeSize;
+                      const badgeY = statusY + statusIconSize - badgeSize;
+                      drawCtx.save();
+                      drawCtx.fillStyle = 'rgba(8, 12, 22, 0.92)';
+                      drawCtx.strokeStyle = 'rgba(255,255,255,0.82)';
+                      drawCtx.lineWidth = 1;
+                      roundedRectPathUI(drawCtx, badgeX, badgeY, badgeSize, badgeSize, Math.max(2, Math.floor(badgeSize / 3)));
+                      drawCtx.fill();
+                      drawCtx.stroke();
+                      drawCtx.fillStyle = '#f3f8ff';
+                      drawCtx.font = `${Math.max(6, Math.floor(badgeSize * 0.58))}px system-ui, sans-serif`;
+                      drawCtx.textAlign = 'center';
+                      drawCtx.textBaseline = 'middle';
+                      drawCtx.fillText(stackText, badgeX + (badgeSize / 2), badgeY + (badgeSize / 2) + 0.5);
+                      drawCtx.restore();
+                  }
                   statusIconHitboxes.push({ x: iconX, y: statusY, size: statusIconSize, tooltip: icon.tooltip });
               });
           }

@@ -13,9 +13,9 @@ exports[`pve HUD status icon render rules giới hạn icon, ưu tiên control/d
     "tooltip": "Stun x1 · 1T",
   },
   {
-    "id": "accuracy_down",
+    "id": "loithienanh_spd_burn",
     "priority": 1,
-    "tooltip": "Accuracy Down x1 · 2T",
+    "tooltip": "SPD Burn x1 · 4T",
   },
   {
     "id": "bleed",
@@ -23,9 +23,9 @@ exports[`pve HUD status icon render rules giới hạn icon, ưu tiên control/d
     "tooltip": "Bleed x2 · 3T",
   },
   {
-    "id": "loithienanh_spd_burn",
+    "id": "accuracy_down",
     "priority": 1,
-    "tooltip": "SPD Burn x1 · 4T",
+    "tooltip": "Accuracy Down x1 · 2T",
   },
 ]
 `;

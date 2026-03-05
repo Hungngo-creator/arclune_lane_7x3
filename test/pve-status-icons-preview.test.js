@@ -19,4 +19,17 @@ describe('pve HUD status icon render rules', () => {
     expect(preview.some((entry) => entry.tooltip.includes('T'))).toBe(true);
     expect(preview).toMatchSnapshot();
   });
+
+  it('gộp status trùng id và cộng dồn stack trên tooltip', () => {
+    const preview = __resolveStatusIconPreview([
+      { id: 'bleed', kind: 'debuff', tag: 'dot', dur: 2, stacks: 2 },
+      { id: 'bleed', kind: 'debuff', tag: 'dot', dur: 5, stacks: 3 },
+      { id: 'shield', kind: 'buff', tag: 'shield', stacks: 1 },
+    ]);
+
+    expect(preview.filter((entry) => entry.id === 'bleed')).toHaveLength(1);
+    const bleed = preview.find((entry) => entry.id === 'bleed');
+    expect(bleed?.tooltip).toContain('x5');
+    expect(bleed?.tooltip).toContain('5T');
+  });
 });
