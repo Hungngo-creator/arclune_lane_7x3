@@ -8,7 +8,7 @@ import {
   syncSharedCurrencyWallet,
 } from '../../utils/currency.ts';
 import { payForRoll } from './logic/currency.ts';
-import { getBannerById, multiRoll, rollBanner } from './logic/gacha.ts';
+import { getBannerById, getSummonableFeaturedUnits, multiRoll, rollBanner } from './logic/gacha.ts';
 import { getBannerState } from './logic/pity.ts';
 import {
   type BannerDefinition,
@@ -190,7 +190,7 @@ function renderFeatured(container: HTMLElement, banner: BannerDefinition): void 
   note.className = 'featured__note';
   note.textContent = '70% tỷ lệ nếu trúng hạng tương ứng.';
   container.appendChild(note);
-  for (const unit of banner.featured) {
+  for (const unit of getSummonableFeaturedUnits(banner)) {
     const card = document.createElement('article');
     card.className = 'featured-card';
     card.innerHTML = `

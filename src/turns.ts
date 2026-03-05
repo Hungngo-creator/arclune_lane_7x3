@@ -260,6 +260,7 @@ export function spawnQueuedIfDue(
     ...resolvedStats,
     statuses: [],
     baseStats,
+    class: typeof p.class === 'string' && p.class.trim() ? p.class : (typeof meta?.class === 'string' ? meta.class : undefined),
   };
 
   if (sideLower === 'enemy' && fromDeck && isPveCreepId(p.unitId)) {

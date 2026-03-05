@@ -4,6 +4,7 @@ import { applyRoll, getBannerState } from './pity.ts';
 import {
   type BannerDefinition,
   type BannerStateMap,
+  type FeaturedUnit,
   type RandomSource,
   type RollResult,
   type Rarity,
@@ -11,13 +12,26 @@ import {
 
 const DEFAULT_RANDOM: RandomSource = () => Math.random();
 
+const EXCLUDED_GACHA_TAGS = new Set(['npc', 'pve']);
+
+export function isGachaSummonableFeaturedUnit(entry: FeaturedUnit): boolean {
+  if (!entry || typeof entry !== 'object') return false;
+  if (entry.isNpc === true) return false;
+  if (!Array.isArray(entry.tags)) return true;
+  return !entry.tags.some((tag) => typeof tag === 'string' && EXCLUDED_GACHA_TAGS.has(tag.trim().toLowerCase()));
+}
+
+export function getSummonableFeaturedUnits(banner: BannerDefinition): FeaturedUnit[] {
+  return banner.featured.filter(isGachaSummonableFeaturedUnit);
+}
+
 function shouldHitFeatured(
   banner: BannerDefinition,
   rarity: Rarity,
   forced: boolean,
   rng: RandomSource,
 ): boolean {
-  const featured = banner.featured.filter((entry) => entry.rarity === rarity);
+  const featured = getSummonableFeaturedUnits(banner).filter((entry) => entry.rarity === rarity);
   if (featured.length === 0) {
     return false;
   }

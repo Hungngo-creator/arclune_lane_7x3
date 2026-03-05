@@ -669,6 +669,7 @@ __define('./ai.ts', (exports, module, __require) => {
           slot,
           spawnCycle,
           color: '#ed9dad',
+          class: typeof card.class === 'string' && card.class.trim() ? card.class : undefined,
           source: 'deck',
           mutationBonusPct: Number.isFinite(card.mutationBonusPct) ? Number(card.mutationBonusPct) : undefined,
           mutationDebuffPool: Array.isArray(card.mutationDebuffPool)
@@ -11938,6 +11939,7 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
               level: typeof progress.level === 'number' ? progress.level : undefined,
               realm: typeof progress.realm === 'number' ? progress.realm : undefined,
               subRealm: typeof progress.subRealm === 'number' ? progress.subRealm : undefined,
+              className: typeof entry.class === 'string' && entry.class.trim() ? entry.class : undefined,
           });
       }
       return profiles;
@@ -11983,6 +11985,7 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
               ...(typeof profile.level === 'number' ? { level: Math.max(1, Math.floor(profile.level)) } : {}),
               ...(typeof profile.realm === 'number' ? { realm: Math.max(0, Math.floor(profile.realm)) } : {}),
               ...(typeof profile.subRealm === 'number' ? { subRealm: Math.max(0, Math.floor(profile.subRealm)) } : {}),
+              ...(typeof profile.className === 'string' && profile.className.trim() ? { class: profile.className } : {}),
           };
       });
   }
@@ -18149,6 +18152,24 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
   const isRosterEntryLite = (value) => (typeof value === 'object'
       && value !== null
       && !Array.isArray(value));
+  const EXCLUDED_COLLECTION_TAGS = new Set(['npc', 'pve']);
+  function hasExcludedCollectionTags(tags) {
+      if (!Array.isArray(tags))
+          return false;
+      for (const value of tags) {
+          if (typeof value !== 'string')
+              continue;
+          if (EXCLUDED_COLLECTION_TAGS.has(value.trim().toLowerCase())) {
+              return true;
+          }
+      }
+      return false;
+  }
+  function isCollectionPlayableUnit(entry) {
+      if (!isRosterEntryLite(entry))
+          return false;
+      return !hasExcludedCollectionTags(entry.tags);
+  }
   const ABILITY_TYPE_LABELS = Object.freeze({
       basic: 'Đánh thường',
       active: 'Kĩ năng',
@@ -18172,13 +18193,15 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
   function cloneRoster(input) {
       if (Array.isArray(input)) {
           const clones = input
-              .filter(isRosterEntryLite)
+              .filter(isCollectionPlayableUnit)
               .map((entry) => ({ ...entry }));
           if (clones.length > 0) {
               return clones;
           }
       }
-      return ROSTER.map((unit) => ({ ...unit }));
+      return ROSTER
+          .filter(isCollectionPlayableUnit)
+          .map((unit) => ({ ...unit }));
   }
   function buildRosterWithCost(rosterSource) {
       const costs = new Map(UNITS.map((unit) => [normalizeUnitId(unit.id), unit.cost]));
@@ -18593,6 +18616,7 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'ABILITY_TYPE_LABELS')) exports.ABILITY_TYPE_LABELS = ABILITY_TYPE_LABELS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveCurrencyBalance')) exports.resolveCurrencyBalance = resolveCurrencyBalance;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'isCollectionPlayableUnit')) exports.isCollectionPlayableUnit = isCollectionPlayableUnit;
   if (!Object.prototype.hasOwnProperty.call(exports, 'cloneRoster')) exports.cloneRoster = cloneRoster;
   if (!Object.prototype.hasOwnProperty.call(exports, 'buildRosterWithCost')) exports.buildRosterWithCost = buildRosterWithCost;
   if (!Object.prototype.hasOwnProperty.call(exports, 'describeUlt')) exports.describeUlt = describeUlt;
@@ -23370,6 +23394,7 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
   const payForRoll = __dep2.payForRoll;
   const __dep3 = __require('./screens/ui-gacha/logic/gacha.ts');
   const getBannerById = __dep3.getBannerById;
+  const getSummonableFeaturedUnits = __dep3.getSummonableFeaturedUnits;
   const multiRoll = __dep3.multiRoll;
   const rollBanner = __dep3.rollBanner;
   const __dep4 = __require('./screens/ui-gacha/logic/pity.ts');
@@ -23519,7 +23544,7 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
       note.className = 'featured__note';
       note.textContent = '70% tỷ lệ nếu trúng hạng tương ứng.';
       container.appendChild(note);
-      for (const unit of banner.featured) {
+      for (const unit of getSummonableFeaturedUnits(banner)) {
           const card = document.createElement('article');
           card.className = 'featured-card';
           card.innerHTML = `
@@ -24533,8 +24558,21 @@ __define('./screens/ui-gacha/logic/gacha.ts', (exports, module, __require) => {
   const applyRoll = __dep1.applyRoll;
   const getBannerState = __dep1.getBannerState;
   const DEFAULT_RANDOM = () => Math.random();
+  const EXCLUDED_GACHA_TAGS = new Set(['npc', 'pve']);
+  function isGachaSummonableFeaturedUnit(entry) {
+      if (!entry || typeof entry !== 'object')
+          return false;
+      if (entry.isNpc === true)
+          return false;
+      if (!Array.isArray(entry.tags))
+          return true;
+      return !entry.tags.some((tag) => typeof tag === 'string' && EXCLUDED_GACHA_TAGS.has(tag.trim().toLowerCase()));
+  }
+  function getSummonableFeaturedUnits(banner) {
+      return banner.featured.filter(isGachaSummonableFeaturedUnit);
+  }
   function shouldHitFeatured(banner, rarity, forced, rng) {
-      const featured = banner.featured.filter((entry) => entry.rarity === rarity);
+      const featured = getSummonableFeaturedUnits(banner).filter((entry) => entry.rarity === rarity);
       if (featured.length === 0) {
           return false;
       }
@@ -24562,6 +24600,8 @@ __define('./screens/ui-gacha/logic/gacha.ts', (exports, module, __require) => {
       return GACHA_CONFIG.banners.find((entry) => entry.id === id) ?? null;
   }
   //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'isGachaSummonableFeaturedUnit')) exports.isGachaSummonableFeaturedUnit = isGachaSummonableFeaturedUnit;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getSummonableFeaturedUnits')) exports.getSummonableFeaturedUnits = getSummonableFeaturedUnits;
   if (!Object.prototype.hasOwnProperty.call(exports, 'rollBanner')) exports.rollBanner = rollBanner;
   if (!Object.prototype.hasOwnProperty.call(exports, 'multiRoll')) exports.multiRoll = multiRoll;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getBannerById')) exports.getBannerById = getBannerById;
@@ -25609,6 +25649,7 @@ __define('./turns.ts', (exports, module, __require) => {
           ...resolvedStats,
           statuses: [],
           baseStats,
+          class: typeof p.class === 'string' && p.class.trim() ? p.class : (typeof meta?.class === 'string' ? meta.class : undefined),
       };
       if (sideLower === 'enemy' && fromDeck && isPveCreepId(p.unitId)) {
           const mutationRoll = nextRngValue(Game.rng);

@@ -17,6 +17,8 @@ export interface FeaturedUnit {
   readonly name: string;
   readonly rarity: Rarity;
   readonly portrait?: string | null;
+  readonly isNpc?: boolean;
+  readonly tags?: readonly string[];
 }
 
 export interface BannerRates {

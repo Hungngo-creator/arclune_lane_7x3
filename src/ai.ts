@@ -436,6 +436,7 @@ export function queueEnemyAt(
     slot,
     spawnCycle,
     color: '#ed9dad',
+    class: typeof card.class === 'string' && card.class.trim() ? card.class : undefined,
     source: 'deck',
     mutationBonusPct: Number.isFinite(card.mutationBonusPct) ? Number(card.mutationBonusPct) : undefined,
     mutationDebuffPool: Array.isArray(card.mutationDebuffPool)

@@ -54,6 +54,7 @@ export interface UnitToken extends StatBlock {
   ttlTurns?: number;
   statuses?: StatusEffect[];
   color?: string;
+  class?: string;
   art?: UnitArt | null;
   skinKey?: string | null;
   furyMax?: number;
@@ -79,6 +80,7 @@ export interface QueuedSummonRequest {
   spawnCycle: number;
   name?: string;
   color?: string;
+  class?: string;
   revive?: boolean;
   revived?: Partial<UnitToken> | null;
   source?: string;

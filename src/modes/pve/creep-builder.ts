@@ -13,6 +13,7 @@ type ProgressProfile = {
   level?: number;
   realm?: number;
   subRealm?: number;
+  className?: string;
 };
 
 const CREEP_KIT_ORDER = ['creep_1', 'creep_2', 'creep_3'] as const;
@@ -112,6 +113,7 @@ function mapLineupProgress(
       level: typeof progress.level === 'number' ? progress.level : undefined,
       realm: typeof progress.realm === 'number' ? progress.realm : undefined,
       subRealm: typeof progress.subRealm === 'number' ? progress.subRealm : undefined,
+      className: typeof entry.class === 'string' && entry.class.trim() ? entry.class : undefined,
     });
   }
   return profiles;
@@ -165,6 +167,7 @@ export function buildAICreepDeckFromLineup(params: {
       ...(typeof profile.level === 'number' ? { level: Math.max(1, Math.floor(profile.level)) } : {}),
       ...(typeof profile.realm === 'number' ? { realm: Math.max(0, Math.floor(profile.realm)) } : {}),
       ...(typeof profile.subRealm === 'number' ? { subRealm: Math.max(0, Math.floor(profile.subRealm)) } : {}),
+      ...(typeof profile.className === 'string' && profile.className.trim() ? { class: profile.className } : {}),
     } satisfies PveDeckEntry;
   });
 }

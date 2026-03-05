@@ -26,6 +26,24 @@ const isRosterEntryLite = (value: unknown): value is RosterEntryLite => (
   && !Array.isArray(value)
 );
 
+const EXCLUDED_COLLECTION_TAGS = new Set(['npc', 'pve']);
+
+function hasExcludedCollectionTags(tags: unknown): boolean {
+  if (!Array.isArray(tags)) return false;
+  for (const value of tags) {
+    if (typeof value !== 'string') continue;
+    if (EXCLUDED_COLLECTION_TAGS.has(value.trim().toLowerCase())) {
+      return true;
+    }
+  }
+  return false;
+}
+
+export function isCollectionPlayableUnit(entry: unknown): entry is RosterEntryLite {
+  if (!isRosterEntryLite(entry)) return false;
+  return !hasExcludedCollectionTags((entry as { tags?: unknown }).tags);
+}
+
 export const ABILITY_TYPE_LABELS = Object.freeze({
   basic: 'Đánh thường',
   active: 'Kĩ năng',
@@ -58,13 +76,15 @@ export interface AbilityFact {
 export function cloneRoster(input: ReadonlyArray<RosterEntryLite> | null | undefined): CollectionEntry[]{
   if (Array.isArray(input)){
     const clones = input
-      .filter(isRosterEntryLite)
+      .filter(isCollectionPlayableUnit)
       .map((entry) => ({ ...entry } as CollectionEntry));
     if (clones.length > 0){
       return clones;
     }
   }
-  return ROSTER.map((unit): CollectionEntry => ({ ...unit }));
+  return ROSTER
+    .filter(isCollectionPlayableUnit)
+    .map((unit): CollectionEntry => ({ ...unit }));
 }
 
 export function buildRosterWithCost(rosterSource: ReadonlyArray<CollectionEntry>): CollectionEntry[]{
