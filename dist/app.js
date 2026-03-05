@@ -25314,7 +25314,7 @@ __define('./turns.ts', (exports, module, __require) => {
       }
       const queuedLeaderUlt = isUyenLeader(unit) && hasQueuedUyenUlt(unit);
       const autoUltReady = isUyenLeader(unit)
-          ? queuedLeaderUlt(unit)
+          ? queuedLeaderUlt
           : (unit.fury ?? 0) >= ultCost;
       if (autoUltReady && !Statuses.blocks(unit, 'ult')) {
           runUlt();
