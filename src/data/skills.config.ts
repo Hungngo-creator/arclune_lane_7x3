@@ -1,12 +1,18 @@
 //home (termux)/arclune_lane_7x3/src/data/skills.config.ts
 
+const IDEA_SOURCE_REFS = [
+  'ý tưởng nhân vật v1.txt',
+  'ý tưởng nhân vật v2.3.txt',
+  'ý tưởng nhân vật 3.2.txt'
+] as const;
+
 const skillsConfig = [
   {
     unitId: 'thien_luu',
     designStatus: 'placeholder',
     placeholderControl: {
       allowSyntheticFill: false,
-      requiredSourceFiles: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt']
+      requiredSourceFiles: IDEA_SOURCE_REFS
     },
     notes: [
       'missing design source: chưa tìm thấy mô tả kit của Thiên Lưu trong bộ tài liệu v1/v2.3/3.2.',
@@ -16,7 +22,7 @@ const skillsConfig = [
   {
     unitId: 'mong_yem',
     importBatch: 'ideas-matrix-batch-02',
-    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
+    sourceRefs: IDEA_SOURCE_REFS,
     basic: {
       name: 'Mộng Phệ',
       type: 'basic',
@@ -84,7 +90,7 @@ const skillsConfig = [
   {
     unitId: 'chan_nga',
     importBatch: 'ideas-matrix-batch-02',
-    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
+    sourceRefs: IDEA_SOURCE_REFS,
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
@@ -161,7 +167,7 @@ const skillsConfig = [
   {
     unitId: 'ma_ton_diep_lam',
     importBatch: 'ideas-matrix-batch-02',
-    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
+    sourceRefs: IDEA_SOURCE_REFS,
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
@@ -224,7 +230,7 @@ const skillsConfig = [
   {
     unitId: 'mo_da',
     importBatch: 'ideas-matrix-batch-02',
-    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
+    sourceRefs: IDEA_SOURCE_REFS,
     basic: {
       name: 'Ám Trảm',
       type: 'basic',
@@ -292,7 +298,7 @@ const skillsConfig = [
   {
     unitId: 'ngao_binh',
     importBatch: 'ideas-matrix-batch-02',
-    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
+    sourceRefs: IDEA_SOURCE_REFS,
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
@@ -363,7 +369,7 @@ const skillsConfig = [
   {
     unitId: 'lau_khac_ma_chu',
     importBatch: 'ideas-matrix-batch-02',
-    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
+    sourceRefs: IDEA_SOURCE_REFS,
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
@@ -430,7 +436,7 @@ const skillsConfig = [
   {
     unitId: 'phe',
     importBatch: 'ideas-matrix-batch-02',
-    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
+    sourceRefs: IDEA_SOURCE_REFS,
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
@@ -503,7 +509,7 @@ const skillsConfig = [
   {
     unitId: 'kiemtruongda',
     importBatch: 'ideas-matrix-batch-02',
-    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
+    sourceRefs: IDEA_SOURCE_REFS,
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
@@ -571,7 +577,7 @@ const skillsConfig = [
   {
     unitId: 'loithienanh',
     importBatch: 'ideas-matrix-batch-02',
-    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
+    sourceRefs: IDEA_SOURCE_REFS,
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
@@ -638,7 +644,7 @@ const skillsConfig = [
   {
     unitId: 'laky',
     importBatch: 'ideas-matrix-batch-03',
-    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
+    sourceRefs: IDEA_SOURCE_REFS,
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
@@ -699,7 +705,7 @@ const skillsConfig = [
   {
     unitId: 'doanminh',
     importBatch: 'ideas-matrix-batch-03',
-    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
+    sourceRefs: IDEA_SOURCE_REFS,
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
@@ -756,7 +762,7 @@ const skillsConfig = [
   {
     unitId: 'kydieu',
     importBatch: 'ideas-matrix-batch-03',
-    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
+    sourceRefs: IDEA_SOURCE_REFS,
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
@@ -823,7 +829,7 @@ const skillsConfig = [
   {
     unitId: 'tranquat',
     importBatch: 'ideas-matrix-batch-03',
-    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
+    sourceRefs: IDEA_SOURCE_REFS,
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
@@ -886,7 +892,7 @@ const skillsConfig = [
   {
     unitId: 'linhgac',
     importBatch: 'ideas-matrix-batch-03',
-    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
+    sourceRefs: IDEA_SOURCE_REFS,
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
@@ -944,7 +950,7 @@ const skillsConfig = [
   {
     unitId: 'vu_thien',
     importBatch: 'ideas-matrix-batch-01',
-    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
+    sourceRefs: IDEA_SOURCE_REFS,
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
@@ -1012,7 +1018,7 @@ const skillsConfig = [
   {
     unitId: 'anna',
     importBatch: 'ideas-matrix-batch-01',
-    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
+    sourceRefs: IDEA_SOURCE_REFS,
     basic: {
       name: 'Nguyện Cầu',
       type: 'basic',
@@ -1078,7 +1084,7 @@ const skillsConfig = [
   {
     unitId: 'lao_khat_cai',
     importBatch: 'ideas-matrix-batch-01',
-    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
+    sourceRefs: IDEA_SOURCE_REFS,
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
@@ -1139,7 +1145,7 @@ const skillsConfig = [
   {
     unitId: 'ai_lan',
     importBatch: 'ideas-matrix-batch-01',
-    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
+    sourceRefs: IDEA_SOURCE_REFS,
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
@@ -1205,7 +1211,7 @@ const skillsConfig = [
   {
     unitId: 'faun',
     importBatch: 'ideas-matrix-batch-01',
-    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
+    sourceRefs: IDEA_SOURCE_REFS,
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
@@ -1267,7 +1273,7 @@ const skillsConfig = [
   {
     unitId: 'basil_thorne',
     importBatch: 'ideas-matrix-batch-01',
-    sourceRefs: ['ý tưởng nhân vật v1.txt', 'ý tưởng nhân vật v2.3.txt', 'ý tưởng nhân vật 3.2.txt'],
+    sourceRefs: IDEA_SOURCE_REFS,
     basic: {
       name: 'Đánh Thường',
       type: 'basic',
