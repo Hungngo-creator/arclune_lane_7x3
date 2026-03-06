@@ -5870,7 +5870,7 @@ __define('./data/campaign-stages.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveBossName')) exports.resolveBossName = resolveBossName;
 });
 __define('./data/cost-budget.ts', (exports, module, __require) => {
-  const COST_MIN = 8;
+  const COST_MIN = 7;
   const COST_MAX = 22;
   const RANK_MULTIPLIER = Object.freeze({
       N: 0.8,
@@ -5881,12 +5881,12 @@ __define('./data/cost-budget.ts', (exports, module, __require) => {
       PRIME: 1.55,
   });
   const RANK_COST_ANCHOR = Object.freeze({
-      N: 6,
-      R: 7,
-      SR: 9,
-      SSR: 12,
-      UR: 16,
-      PRIME: 0,
+      N: 7,
+      R: 9,
+      SR: 11,
+      SSR: 14,
+      UR: 18,
+      PRIME: 21,
   });
   const SCORE_RANGES = {
       tagComplexity: [0, 6],
@@ -5916,6 +5916,14 @@ __define('./data/cost-budget.ts', (exports, module, __require) => {
       support: { tacticalFlexibility: 1, economyPressure: 1, setupPenalty: 1 },
       summoner: { tacticalFlexibility: 2, setupPenalty: 2, vanishRiskPenalty: 1 },
       ranger: { consistencyPenalty: 1, scalingCeiling: 1 },
+  });
+  const RANK_IDEAL_COST_RANGE = Object.freeze({
+      N: [7, 9],
+      R: [9, 10],
+      SR: [11, 13],
+      SSR: [14, 17],
+      UR: [18, 20],
+      PRIME: [21, 22],
   });
   function clamp(value, min, max) {
       if (!Number.isFinite(value)) {
@@ -5952,8 +5960,8 @@ __define('./data/cost-budget.ts', (exports, module, __require) => {
       const powerPoint = (input.hasRuleTag ? 1 : 0)
           + (input.hasLawTag ? 1 : 0)
           + (input.hasAbsoluteTag ? 0.5 : 0)
-          + (input.supportsAllyResource ? 0.75 : 0);
-      +(input.hasAoeFieldTag ? 1 : 0);
+          + (input.supportsAllyResource ? 0.75 : 0)
+          + (input.hasAoeFieldTag ? 1 : 0);
       const riskPoint = (input.hasDivineNature ? 1 : 0)
           + (input.hasSelfHarmRisk ? 1 : 0)
           + (input.longSetup ? 1 : 0)
@@ -6045,6 +6053,9 @@ __define('./data/cost-budget.ts', (exports, module, __require) => {
           if (typeof input.rankAnchorCost === 'number' && Number.isFinite(input.rankAnchorCost)) {
               merged.rankAnchorCost = input.rankAnchorCost;
           }
+          if (typeof input.rank === 'string' && input.rank.trim()) {
+              merged.rank = normalizeRankKey(input.rank);
+          }
           if (typeof input.rankMultiplier === 'number' && Number.isFinite(input.rankMultiplier)) {
               merged.rankMultiplier = input.rankMultiplier;
           }
@@ -6068,6 +6079,7 @@ __define('./data/cost-budget.ts', (exports, module, __require) => {
       const rankKey = normalizeRankKey(rank);
       const roleKey = String(role ?? '').trim().toLowerCase();
       return mergeBudgetInputs({
+          rank: rankKey,
           rankAnchorCost: resolveRankAnchor(rankKey),
           rankMultiplier: resolveRankMultiplier(rankKey),
       }, { battlefieldInfluence: 1, tacticalFlexibility: 1 }, RANK_BUDGET_BASE[rankKey], ROLE_BUDGET_MOD[roleKey], rankKey === 'PRIME' ? { hasDivineNature: true } : null);
@@ -6102,7 +6114,16 @@ __define('./data/cost-budget.ts', (exports, module, __require) => {
           ? (0.95 - rankMultiplier) * 6
           : 0;
       const rawCost = rankAnchorCost + netScore * netScale - lowRankRelief;
-      const cost = Math.round(clamp(rawCost, COST_MIN, COST_MAX));
+      const rankKey = normalizeRankKey(input.rank);
+      const idealRange = RANK_IDEAL_COST_RANGE[rankKey];
+      const rankBoundMin = idealRange?.[0] ?? COST_MIN;
+      let rankBoundMax = idealRange?.[1] ?? COST_MAX;
+      if (rankKey === 'PRIME' && powerScore >= 26 && netScore >= 22) {
+          rankBoundMax = 23;
+      }
+      const boundedMin = Math.max(COST_MIN, rankBoundMin);
+      const boundedMax = Math.max(boundedMin, rankBoundMax);
+      const cost = Math.round(clamp(rawCost, boundedMin, boundedMax));
       return {
           powerScore,
           riskScore,

@@ -1,4 +1,4 @@
-export const COST_MIN = 8;
+export const COST_MIN = 7;
 export const COST_MAX = 22;
 
 export const RANK_MULTIPLIER: Readonly<Record<string, number>> = Object.freeze({
@@ -11,12 +11,12 @@ export const RANK_MULTIPLIER: Readonly<Record<string, number>> = Object.freeze({
 });
 
 export const RANK_COST_ANCHOR: Readonly<Record<string, number>> = Object.freeze({
-  N: 6,
-  R: 7,
-  SR: 9,
-  SSR: 12,
-  UR: 16,
-  PRIME: 0,
+  N: 7,
+  R: 9,
+  SR: 11,
+  SSR: 14,
+  UR: 18,
+  PRIME: 21,
 });
 
 export interface SummonCostTagInput {
@@ -66,6 +66,7 @@ export interface CostBudgetBreakdown {
 }
 
 export interface CostBudgetInput {
+  rank?: string;
   rankAnchorCost?: number;
   rankMultiplier?: number;
   tagComplexity?: number;
@@ -121,6 +122,15 @@ const ROLE_BUDGET_MOD: Readonly<Record<string, CostBudgetInput>> = Object.freeze
   ranger: { consistencyPenalty: 1, scalingCeiling: 1 },
 });
 
+const RANK_IDEAL_COST_RANGE: Readonly<Record<string, readonly [number, number]>> = Object.freeze({
+  N: [7, 9],
+  R: [9, 10],
+  SR: [11, 13],
+  SSR: [14, 17],
+  UR: [18, 20],
+  PRIME: [21, 22],
+});
+
 function clamp(value: number, min: number, max: number): number {
   if (!Number.isFinite(value)){
     return min;
@@ -159,10 +169,10 @@ export function evaluateSummonCost(input: SummonCostInput): SummonCostResult {
   const anchorCost = resolveRankAnchor(rank);
   const multiplier = resolveRankMultiplier(rank);
 
-   const powerPoint = (input.hasRuleTag ? 1 : 0)
+  const powerPoint = (input.hasRuleTag ? 1 : 0)
     + (input.hasLawTag ? 1 : 0)
     + (input.hasAbsoluteTag ? 0.5 : 0)
-    + (input.supportsAllyResource ? 0.75 : 0);
+    + (input.supportsAllyResource ? 0.75 : 0)
     + (input.hasAoeFieldTag ? 1 : 0);
   const riskPoint = (input.hasDivineNature ? 1 : 0)
     + (input.hasSelfHarmRisk ? 1 : 0)
@@ -273,6 +283,9 @@ export function mergeBudgetInputs(...inputs: Array<CostBudgetInput | null | unde
     if (typeof input.rankAnchorCost === 'number' && Number.isFinite(input.rankAnchorCost)) {
       merged.rankAnchorCost = input.rankAnchorCost;
     }
+    if (typeof input.rank === 'string' && input.rank.trim()) {
+      merged.rank = normalizeRankKey(input.rank);
+    }
     if (typeof input.rankMultiplier === 'number' && Number.isFinite(input.rankMultiplier)) {
       merged.rankMultiplier = input.rankMultiplier;
     }
@@ -298,6 +311,7 @@ export function deriveBudgetFromRankRole(rank?: string | null, role?: string | n
   const roleKey = String(role ?? '').trim().toLowerCase();
   return mergeBudgetInputs(
     {
+      rank: rankKey,
       rankAnchorCost: resolveRankAnchor(rankKey),
       rankMultiplier: resolveRankMultiplier(rankKey),
     },
@@ -338,7 +352,16 @@ export function evaluateCostBudget(input: CostBudgetInput): CostBudgetResult {
     ? (0.95 - rankMultiplier) * 6
     : 0;
   const rawCost = rankAnchorCost + netScore * netScale - lowRankRelief;
-  const cost = Math.round(clamp(rawCost, COST_MIN, COST_MAX));
+  const rankKey = normalizeRankKey(input.rank);
+  const idealRange = RANK_IDEAL_COST_RANGE[rankKey];
+  const rankBoundMin = idealRange?.[0] ?? COST_MIN;
+  let rankBoundMax = idealRange?.[1] ?? COST_MAX;
+  if (rankKey === 'PRIME' && powerScore >= 26 && netScore >= 22) {
+    rankBoundMax = 23;
+  }
+  const boundedMin = Math.max(COST_MIN, rankBoundMin);
+  const boundedMax = Math.max(boundedMin, rankBoundMax);
+  const cost = Math.round(clamp(rawCost, boundedMin, boundedMax));
 
   return {
     powerScore,

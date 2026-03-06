@@ -11,7 +11,7 @@ import {
 import { UNITS, resolveUnitCost } from '../src/units.ts';
 
 describe('cost budget evaluator', () => {
-  test('giữ trần cost trong [8..22]', () => {
+  test('giữ trần cost trong [7..22]', () => {
     const low = evaluateCostBudget({});
     const high = evaluateCostBudget({
       tagComplexity: 6,
@@ -83,6 +83,26 @@ describe('budget derivation defaults', () => {
     expect(merged.setupPenalty).toBe(1);
     expect(merged.hasDivineNature).toBe(true);
   });
+
+  test('khung rank theo tiêu chí mới nằm trong dải lý tưởng', () => {
+    const ranges = {
+      N: [7, 9],
+      R: [9, 10],
+      SR: [11, 13],
+      SSR: [14, 17],
+      UR: [18, 20],
+      PRIME: [21, 22],
+    } as const;
+    const roles = ['Warrior', 'Support', 'Summoner', 'Mage', 'Assassin', 'Tanker', 'Ranger'] as const;
+
+    for (const [rank, [minCost, maxCost]] of Object.entries(ranges)) {
+      for (const role of roles) {
+        const cost = evaluateCostBudget(deriveBudgetFromRankRole(rank, role)).cost;
+        expect(cost).toBeGreaterThanOrEqual(minCost);
+        expect(cost).toBeLessThanOrEqual(maxCost);
+      }
+    }
+  });
 });
 
 describe('resolveUnitCost and roster auto-cost', () => {
@@ -118,8 +138,8 @@ describe('summon cost neo logic', () => {
   test('SR Doãn Minh và Prime Thần Tính tạo chênh lệch cost hợp lý', () => {
     const comparison = simulateSummonCostComparison();
 
-    expect(comparison.doanMinh.finalCost).toBe(12);
-    expect(comparison.primeDivine.finalCost).toBe(21);
+    expect(comparison.doanMinh.finalCost).toBe(11);
+    expect(comparison.primeDivine.finalCost).toBe(20);
     expect(comparison.costDelta).toBe(9);
     expect(comparison.multiplierDelta).toBeCloseTo(0.6, 2);
   });
@@ -133,7 +153,7 @@ describe('summon cost neo logic', () => {
       supportsAllyResource: true,
     });
 
-    expect(result.preClampCost).toBe(15.75);
+    expect(result.preClampCost).toBe(15.875);
     expect(result.finalCost).toBe(16);
     expect(result.needsSrRecheck).toBe(false);
   });

@@ -384,7 +384,7 @@ Nội tại, Huyết Ấn Tịnh Dưỡng: ra sân tăng hp regen 120% và aethe
 
 Kĩ năng 1, Huyết Tiễn Tam Liên: mất 3% hp hiện có, ngưng tụ 3 mũi tên máu tấn công 1 mục tiêu, mỗi mũi tên gây 50% đánh thường, không tính là đánh thường, 20 aether.
 Kĩ năng 2, Huyết Ảnh Phân Thân: mất hp = 20% max hp, ngưng tụ ra 1 huyết phân thân kế thừa 20% mọi chỉ số hiện tại của Charles, tồn tại trong 3 turn, huyết phân thân chỉ có thể đánh thường, không thể hồi sinh, ra sân ngẫu nhiên ở vị trí trống trên sân đồng minh, 20 aether.
-Kĩ năng 3 — Tước Lệnh: Huyết Quy Phục: đối với kẻ thù thuộc Huyết Tộc dưới bậc Bá Tước hút hp = 20% max hp của mục tiêu, không thể hút chết đối phương, lượng hp hút được sẽ chuyển thành khiên cho Charles, tối đa = 100% max hp. 25 aether.
+Kĩ năng 3 — Tước Lệnh: Huyết Quy Phục: đối với kẻ thù thuộc Huyết Tộc dưới bậc Bá Tước hút hp = 20% max hp của mục tiêu (không - max hp), không thể hút chết đối phương, lượng hp hút được sẽ chuyển thành khiên cho Charles, tối đa = 100% max hp. 25 aether.
 
 Ultimate, Tước Lệnh • Huyết Tế Phong Thân: gây sát thương lên 1 mục tiêu = 250% đánh thường, tăng max hp = 6% sát thương gây ra sau đó hồi hp cho bản thân = 20% sát thương gây ra.
 
