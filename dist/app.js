@@ -15677,10 +15677,11 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       if (preferredDeckInput) {
           const deck = normalizeDeckEntries(preferredDeckInput);
           if (deck.length) {
+              const deckUnitIds = new Set(deck.map((entry) => entry.id));
               game.unitsAll = deck;
               game.playerDeckLocked = Array.from(deck);
-              game.deck3 = ensureDeck().filter((card) => deck.some((entry) => entry.id === card.id));
-              if (game.selectedId && !deck.some((entry) => entry.id === game.selectedId)) {
+              game.deck3 = ensureDeck().filter((card) => deckUnitIds.has(card.id));
+              if (game.selectedId && !deckUnitIds.has(game.selectedId)) {
                   game.selectedId = null;
               }
               refillDeck();
