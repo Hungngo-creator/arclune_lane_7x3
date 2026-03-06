@@ -5929,6 +5929,14 @@ __define('./data/cost-budget.ts', (exports, module, __require) => {
   function clampCost(cost) {
       return clamp(cost, COST_MIN, COST_MAX);
   }
+  function resolveRankAnchor(rank) {
+      const key = normalizeRankKey(rank);
+      return RANK_COST_ANCHOR[key] ?? 12;
+  }
+  function resolveRankMultiplier(rank) {
+      const key = normalizeRankKey(rank);
+      return RANK_MULTIPLIER[key] ?? 0.95;
+  }
   /**
    * V2 Summon Cost logic for manual balancing:
    * Cost = CostNeo(rank) + Σ(điểm cộng) - Σ(điểm trừ)
@@ -5939,8 +5947,8 @@ __define('./data/cost-budget.ts', (exports, module, __require) => {
    */
   function evaluateSummonCost(input) {
       const rank = normalizeRankKey(input.rank);
-      const anchorCost = RANK_COST_ANCHOR[rank] ?? RANK_COST_ANCHOR.SR;
-      const multiplier = RANK_MULTIPLIER[rank] ?? RANK_MULTIPLIER.SR;
+      const anchorCost = resolveRankAnchor(rank);
+      const multiplier = resolveRankMultiplier(rank);
       const plusScore = (input.hasRuleTag ? 3 : 0)
           + (input.hasLawTag ? 2 : 0)
           + (input.hasAbsoluteTag ? 1 : 0)
@@ -6026,6 +6034,12 @@ __define('./data/cost-budget.ts', (exports, module, __require) => {
           if (!input) {
               continue;
           }
+          if (typeof input.rankAnchorCost === 'number' && Number.isFinite(input.rankAnchorCost)) {
+              merged.rankAnchorCost = input.rankAnchorCost;
+          }
+          if (typeof input.rankMultiplier === 'number' && Number.isFinite(input.rankMultiplier)) {
+              merged.rankMultiplier = input.rankMultiplier;
+          }
           merged.tagComplexity = addMetric(merged.tagComplexity, input.tagComplexity);
           merged.battlefieldInfluence = addMetric(merged.battlefieldInfluence, input.battlefieldInfluence);
           merged.economyPressure = addMetric(merged.economyPressure, input.economyPressure);
@@ -6045,7 +6059,10 @@ __define('./data/cost-budget.ts', (exports, module, __require) => {
   function deriveBudgetFromRankRole(rank, role) {
       const rankKey = normalizeRankKey(rank);
       const roleKey = String(role ?? '').trim().toLowerCase();
-      return mergeBudgetInputs({ battlefieldInfluence: 1, tacticalFlexibility: 1 }, RANK_BUDGET_BASE[rankKey], ROLE_BUDGET_MOD[roleKey], rankKey === 'PRIME' ? { hasDivineNature: true } : null);
+      return mergeBudgetInputs({
+          rankAnchorCost: resolveRankAnchor(rankKey),
+          rankMultiplier: resolveRankMultiplier(rankKey),
+      }, { battlefieldInfluence: 1, tacticalFlexibility: 1 }, RANK_BUDGET_BASE[rankKey], ROLE_BUDGET_MOD[roleKey], rankKey === 'PRIME' ? { hasDivineNature: true } : null);
   }
   /**
    * Cost budget core:
@@ -6068,7 +6085,11 @@ __define('./data/cost-budget.ts', (exports, module, __require) => {
           + breakdown.consistencyPenalty
           + breakdown.divinePenalty;
       const netScore = powerScore - riskScore;
-      const rawCost = 14 + netScore * 0.4;
+      const rankAnchorCost = clamp(input.rankAnchorCost ?? 14, COST_MIN, COST_MAX);
+      const rankMultiplier = clamp(input.rankMultiplier ?? 0.95, 0.8, 1.55);
+      const rankScale = rankMultiplier / 0.95;
+      const netScale = 0.3 * (0.7 + rankScale * 0.3);
+      const rawCost = rankAnchorCost + netScore * netScale;
       const cost = Math.round(clamp(rawCost, COST_MIN, COST_MAX));
       return {
           powerScore,

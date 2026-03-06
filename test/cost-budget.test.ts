@@ -104,6 +104,13 @@ describe('resolveUnitCost and roster auto-cost', () => {
       expect(unit.cost).toBeLessThanOrEqual(COST_MAX);
     }
   });
+
+  test('Doãn Minh (SR Support) không vượt xa khung SR mặc định', () => {
+    const doanMinh = UNITS.find((unit) => unit.id === 'doanminh');
+    expect(doanMinh).toBeTruthy();
+    expect(doanMinh?.cost ?? COST_MAX).toBeLessThanOrEqual(16);
+  });
+
 });
 
 describe('summon cost neo logic', () => {
