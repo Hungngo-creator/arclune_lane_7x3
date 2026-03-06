@@ -537,11 +537,9 @@ __define('./ai.ts', (exports, module, __require) => {
       const far = info.total - near;
       return Math.max(0, Math.min(1, 1 - ((near * 0.6 + far * 0.2) / 3)));
   }
-  function summonerFeasibility(Game, unitId, baseSlot, aliveTokens) {
-      const meta = toMetaEntry(Game.meta.get(unitId));
+  function summonerFeasibility(Game, meta, summonSpec, baseSlot, aliveTokens) {
       if (!meta || meta.class !== 'Summoner')
           return 1;
-      const summonSpec = getSummonSpec(meta);
       if (!summonSpec)
           return 1;
       const alive = Array.isArray(aliveTokens) ? aliveTokens : tokensAlive(Game);
@@ -568,22 +566,19 @@ __define('./ai.ts', (exports, module, __require) => {
       if (cellReserved(alive, Game.queued, cx, cy))
           return 'cellReserved';
       const meta = entry.meta;
-      if (meta && meta.class === 'Summoner') {
-          const summonSpec = getSummonSpec(meta);
-          if (summonSpec) {
-              const patternSlots = resolveSummonSlots(summonSpec, slot);
-              if (patternSlots.length) {
-                  let available = 0;
-                  for (const s of patternSlots) {
-                      const { cx: scx, cy: scy } = slotToCell('enemy', s);
-                      if (!cellReserved(alive, Game.queued, scx, scy))
-                          available += 1;
-                  }
-                  const countRaw = Number(summonSpec.count);
-                  const need = Math.min(patternSlots.length, Math.max(1, Number.isFinite(countRaw) ? countRaw : 1));
-                  if (available < need)
-                      return 'summonBlocked';
+      if (meta && meta.class === 'Summoner' && entry.summonSpec) {
+          const patternSlots = resolveSummonSlots(entry.summonSpec, slot);
+          if (patternSlots.length) {
+              let available = 0;
+              for (const s of patternSlots) {
+                  const { cx: scx, cy: scy } = slotToCell('enemy', s);
+                  if (!cellReserved(alive, Game.queued, scx, scy))
+                      available += 1;
               }
+              const countRaw = Number(entry.summonSpec.count);
+              const need = Math.min(patternSlots.length, Math.max(1, Number.isFinite(countRaw) ? countRaw : 1));
+              if (available < need)
+                  return 'summonBlocked';
           }
       }
       return null;
@@ -756,6 +751,7 @@ __define('./ai.ts', (exports, module, __require) => {
       const topCandidates = [];
       const etaBySlot = new Map();
       const summonerFeasibilityByCardSlot = new Map();
+      const summonSpecByCard = new Map();
       const insertTopCandidate = trackTopCandidates
           ? (entry) => {
               let inserted = false;
@@ -778,6 +774,13 @@ __define('./ai.ts', (exports, module, __require) => {
           : null;
       for (const card of hand) {
           const meta = toMetaEntry(Game.meta.get(card.id));
+          const summonSpec = meta?.class === 'Summoner'
+              ? (summonSpecByCard.get(card.id) ?? (() => {
+                  const next = getSummonSpec(meta);
+                  summonSpecByCard.set(card.id, next);
+                  return next;
+              })())
+              : null;
           const kitTraits = detectKitTraits(meta);
           for (const cell of cells) {
               const p = pressureScore(cell.cx, cell.cy);
@@ -789,7 +792,7 @@ __define('./ai.ts', (exports, module, __require) => {
               })();
               const summonKey = `${card.id}:${cell.s}`;
               const sf = summonerFeasibilityByCardSlot.get(summonKey) ?? (() => {
-                  const summonValue = summonerFeasibility(Game, card.id, cell.s, alive);
+                  const summonValue = summonerFeasibility(Game, meta, summonSpec, cell.s, alive);
                   summonerFeasibilityByCardSlot.set(summonKey, summonValue);
                   return summonValue;
               })();
@@ -812,6 +815,7 @@ __define('./ai.ts', (exports, module, __require) => {
               const evaluation = {
                   card,
                   meta,
+                  summonSpec,
                   cell,
                   score: finalScore,
                   baseScore,

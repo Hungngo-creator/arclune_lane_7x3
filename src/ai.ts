@@ -36,6 +36,7 @@ type CandidateMultipliers = {
 type AllyRowPressure = Map<number, { total: number; nearByCol: Map<number, number> }>;
 
 type CandidateMeta = RosterUnitDefinition | null | undefined;
+type ResolvedSummonSpec = ReturnType<typeof getSummonSpec>;
 
 interface DeckEntryCandidate {
   id?: unknown;
@@ -60,6 +61,7 @@ function toMetaEntry(value: unknown): RosterUnitDefinition | null {
 interface CandidateEvaluation {
   card: AiCard;
   meta: CandidateMeta;
+  summonSpec: ResolvedSummonSpec;
   cell: CandidateCell;
   score: number;
   baseScore: number;
@@ -302,13 +304,12 @@ function safetyScoreFast(cx: number, cy: number, allyPressure: AllyRowPressure):
 
 function summonerFeasibility(
   Game: SessionState,
-  unitId: UnitId,
+  meta: CandidateMeta,
+  summonSpec: ResolvedSummonSpec,
   baseSlot: number,
   aliveTokens?: readonly UnitToken[] | null,
 ): number {
-  const meta = toMetaEntry(Game.meta.get(unitId));
   if (!meta || meta.class !== 'Summoner') return 1;
-  const summonSpec = getSummonSpec(meta);
   if (!summonSpec) return 1;
   const alive = Array.isArray(aliveTokens) ? aliveTokens : tokensAlive(Game);
   const candidateSlots = resolveSummonSlots(summonSpec, baseSlot).filter((slot) => {
@@ -336,23 +337,20 @@ function candidateBlocked(
   if (cellReserved(alive, Game.queued, cx, cy)) return 'cellReserved';
 
   const meta = entry.meta;
-  if (meta && meta.class === 'Summoner') {
-    const summonSpec = getSummonSpec(meta);
-    if (summonSpec) {
-      const patternSlots = resolveSummonSlots(summonSpec, slot);
-      if (patternSlots.length) {
-        let available = 0;
-        for (const s of patternSlots) {
-          const { cx: scx, cy: scy } = slotToCell('enemy', s);
-          if (!cellReserved(alive, Game.queued, scx, scy)) available += 1;
-        }
-        const countRaw = Number(summonSpec.count);
-        const need = Math.min(
-          patternSlots.length,
-          Math.max(1, Number.isFinite(countRaw) ? countRaw : 1),
-        );
-        if (available < need) return 'summonBlocked';
+  if (meta && meta.class === 'Summoner' && entry.summonSpec) {
+    const patternSlots = resolveSummonSlots(entry.summonSpec, slot);
+    if (patternSlots.length) {
+      let available = 0;
+      for (const s of patternSlots) {
+        const { cx: scx, cy: scy } = slotToCell('enemy', s);
+        if (!cellReserved(alive, Game.queued, scx, scy)) available += 1;
       }
+      const countRaw = Number(entry.summonSpec.count);
+      const need = Math.min(
+        patternSlots.length,
+        Math.max(1, Number.isFinite(countRaw) ? countRaw : 1),
+      );
+      if (available < need) return 'summonBlocked';
     }
   }
   return null;
@@ -534,6 +532,7 @@ export function aiMaybeAct(Game: SessionState, reason: AI_REASON): void {
   const topCandidates: CandidateEvaluation[] = [];
   const etaBySlot = new Map<number, number>();
   const summonerFeasibilityByCardSlot = new Map<string, number>();
+  const summonSpecByCard = new Map<string, ResolvedSummonSpec>();
 
   const insertTopCandidate = trackTopCandidates
     ? (entry: CandidateEvaluation): void => {
@@ -555,6 +554,13 @@ export function aiMaybeAct(Game: SessionState, reason: AI_REASON): void {
     : null;
   for (const card of hand) {
     const meta = toMetaEntry(Game.meta.get(card.id));
+    const summonSpec = meta?.class === 'Summoner'
+      ? (summonSpecByCard.get(card.id) ?? (() => {
+          const next = getSummonSpec(meta);
+          summonSpecByCard.set(card.id, next);
+          return next;
+        })())
+      : null;
     const kitTraits = detectKitTraits(meta);
     for (const cell of cells) {
       const p = pressureScore(cell.cx, cell.cy);
@@ -566,7 +572,7 @@ export function aiMaybeAct(Game: SessionState, reason: AI_REASON): void {
       })();
       const summonKey = `${card.id}:${cell.s}`;
       const sf = summonerFeasibilityByCardSlot.get(summonKey) ?? (() => {
-        const summonValue = summonerFeasibility(Game, card.id, cell.s, alive);
+        const summonValue = summonerFeasibility(Game, meta, summonSpec, cell.s, alive);
         summonerFeasibilityByCardSlot.set(summonKey, summonValue);
         return summonValue;
       })();
@@ -593,6 +599,7 @@ export function aiMaybeAct(Game: SessionState, reason: AI_REASON): void {
       const evaluation: CandidateEvaluation = {
         card,
         meta,
+        summonSpec,
         cell,
         score: finalScore,
         baseScore,
