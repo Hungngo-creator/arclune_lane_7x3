@@ -26,7 +26,7 @@ type WeightKey =
 type DeckState = AiCardDeck;
 export type AI_REASON = 'cost' | 'board' | (string & {});
 
-type CandidateContributions = Record<string, number>;
+type CandidateContributions = Record<WeightKey, number>;
 
 type CandidateMultipliers = {
   row: number;
@@ -69,7 +69,7 @@ interface CandidateEvaluation {
   raw: CandidateContributions;
   multipliers: CandidateMultipliers;
   blockedReason?: string | null;
-  summonPatternSlots?: number[] | null;
+  summonPatternSlots?: readonly number[] | null;
 }
 
 interface CandidateDebug {
@@ -532,7 +532,7 @@ export function aiMaybeAct(Game: SessionState, reason: AI_REASON): void {
   const topCandidates: CandidateEvaluation[] = [];
   const etaBySlot = new Map<number, number>();
   const summonerFeasibilityByCardSlot = new Map<string, number>();
-  const summonPatternSlotsByCardSlot = new Map<string, number[]>();
+  const summonPatternSlotsByCardSlot = new Map<string, readonly number[]>();
   const summonSpecByCard = new Map<string, ResolvedSummonSpec>();
 
   const insertTopCandidate = trackTopCandidates

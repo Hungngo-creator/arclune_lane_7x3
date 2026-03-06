@@ -941,7 +941,7 @@ function updateActiveCellHighlight(): void{
         if (leaderAvatar.querySelector(':scope > .rarity-aura')){
           updateRarity(leaderAvatar, rarity);
         } else {
-          mountRarityAura(leaderAvatar, rarity, 'deck', { label: false, rounded: true });
+          mountRarityAura(leaderAvatar, rarity, 'deck', { label: false });
         }
         leaderName.textContent = unit.name;
       } else {

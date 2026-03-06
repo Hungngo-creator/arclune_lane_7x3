@@ -494,7 +494,7 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
     const avatar = document.createElement('div');
     avatar.className = 'collection-roster__avatar';
     if (normalizedRank){
-      mountRarityAura(avatar, normalizedRank, 'collection', { label: true, rounded: true });
+      mountRarityAura(avatar, normalizedRank, 'collection', { label: true });
     }
     const art = getUnitArt(unitId);
     if (art?.sprite?.src){
