@@ -59,34 +59,34 @@ function ensurePendingRewards(encounter: EncounterState): MutableRewardList {
   return sanitizeRewardList(encounter, 'pendingRewards');
 }
 
-function mergeRewards(existing: RewardList, additions: RewardList): RewardRoll[] {
-  if (!existing.length && !additions.length) return [];
-  if (!additions.length) return existing.slice();
-  const map = new Map<string, RewardRoll>();
-  for (const reward of existing) {
-    map.set(reward.id, reward);
+function mergeRewardsInPlace(list: MutableRewardList, additions: RewardList): MutableRewardList {
+  if (!additions.length) return list;
+  const indexById = new Map<string, number>();
+  for (let index = 0; index < list.length; index += 1) {
+    const entry = list[index];
+    if (!entry) continue;
+    indexById.set(entry.id, index);
   }
   for (const reward of additions) {
-    if (map.has(reward.id)) {
-      map.delete(reward.id);
+    const index = indexById.get(reward.id);
+    if (index == null) {
+      indexById.set(reward.id, list.length);
+      list.push(reward);
+      continue;
     }
-    map.set(reward.id, reward);
+    list[index] = reward;
   }
-  return Array.from(map.values());
+  return list;
 }
 
 function updateRuntimeRewards(runtime: SessionRuntimeState, additions: RewardList): RewardRoll[] {
   const queue = ensureRewardQueue(runtime);
-  const merged = mergeRewards(queue, additions);
-  runtime.rewardQueue = merged;
-  return merged;
+  return mergeRewardsInPlace(queue, additions);
 }
 
 function updateEncounterRewards(encounter: EncounterState, additions: RewardList): RewardRoll[] {
   const pending = ensurePendingRewards(encounter);
-  const merged = mergeRewards(pending, additions);
-  encounter.pendingRewards = merged;
-  return merged;
+  return mergeRewardsInPlace(pending, additions);
 }
 
 function removeRewardById(list: MutableRewardList, rewardId: string): MutableRewardList {
@@ -102,9 +102,10 @@ function removeRewardById(list: MutableRewardList, rewardId: string): MutableRew
   return list;
 }
 
-function toWaveList(value: unknown): ReadonlyArray<WaveState> {
-  if (!Array.isArray(value)) return [];
-  return value.filter((wave): wave is WaveState => Boolean(wave));
+function getWaveAt(value: unknown, index: number): WaveState | null {
+  if (!Array.isArray(value)) return null;
+  const wave = value[index];
+  return wave ? (wave as WaveState) : null;
 }
 
 function getTurnSnapshot(session: SessionState | null | undefined): TurnSnapshot | null {
@@ -124,9 +125,10 @@ export function advanceSession(session: SessionState | null | undefined): Encoun
   ensureRewardQueue(runtime);
   ensurePendingRewards(encounter);
 
-  const waves = toWaveList(encounter.waves);
+  const waves = encounter.waves;
+  const waveCount = Array.isArray(waves) ? waves.length : 0;
   const index = Math.max(0, encounter.waveIndex | 0);
-  const wave = waves[index] ?? null;
+  const wave = getWaveAt(waves, index);
 
   if (!wave) {
     encounter.status = 'completed';
@@ -165,7 +167,7 @@ export function advanceSession(session: SessionState | null | undefined): Encoun
       break;
   }
 
-  if (encounter.waveIndex >= waves.length) {
+  if (encounter.waveIndex >= waveCount) {
     encounter.status = 'completed';
     runtime.wave = null;
   }

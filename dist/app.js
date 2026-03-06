@@ -15816,34 +15816,34 @@ __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
   function ensurePendingRewards(encounter) {
       return sanitizeRewardList(encounter, 'pendingRewards');
   }
-  function mergeRewards(existing, additions) {
-      if (!existing.length && !additions.length)
-          return [];
+  function mergeRewardsInPlace(list, additions) {
       if (!additions.length)
-          return existing.slice();
-      const map = new Map();
-      for (const reward of existing) {
-          map.set(reward.id, reward);
+          return list;
+      const indexById = new Map();
+      for (let index = 0; index < list.length; index += 1) {
+          const entry = list[index];
+          if (!entry)
+              continue;
+          indexById.set(entry.id, index);
       }
       for (const reward of additions) {
-          if (map.has(reward.id)) {
-              map.delete(reward.id);
+          const index = indexById.get(reward.id);
+          if (index == null) {
+              indexById.set(reward.id, list.length);
+              list.push(reward);
+              continue;
           }
-          map.set(reward.id, reward);
+          list[index] = reward;
       }
-      return Array.from(map.values());
+      return list;
   }
   function updateRuntimeRewards(runtime, additions) {
       const queue = ensureRewardQueue(runtime);
-      const merged = mergeRewards(queue, additions);
-      runtime.rewardQueue = merged;
-      return merged;
+      return mergeRewardsInPlace(queue, additions);
   }
   function updateEncounterRewards(encounter, additions) {
       const pending = ensurePendingRewards(encounter);
-      const merged = mergeRewards(pending, additions);
-      encounter.pendingRewards = merged;
-      return merged;
+      return mergeRewardsInPlace(pending, additions);
   }
   function removeRewardById(list, rewardId) {
       if (!list.length)
@@ -15861,10 +15861,11 @@ __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
           list.length = writeIndex;
       return list;
   }
-  function toWaveList(value) {
+  function getWaveAt(value, index) {
       if (!Array.isArray(value))
-          return [];
-      return value.filter((wave) => Boolean(wave));
+          return null;
+      const wave = value[index];
+      return wave ? wave : null;
   }
   function getTurnSnapshot(session) {
       const turn = session?.turn;
@@ -15881,9 +15882,10 @@ __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
       }
       ensureRewardQueue(runtime);
       ensurePendingRewards(encounter);
-      const waves = toWaveList(encounter.waves);
+      const waves = encounter.waves;
+      const waveCount = Array.isArray(waves) ? waves.length : 0;
       const index = Math.max(0, encounter.waveIndex | 0);
-      const wave = waves[index] ?? null;
+      const wave = getWaveAt(waves, index);
       if (!wave) {
           encounter.status = 'completed';
           runtime.wave = null;
@@ -15920,7 +15922,7 @@ __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
               runtime.wave = null;
               break;
       }
-      if (encounter.waveIndex >= waves.length) {
+      if (encounter.waveIndex >= waveCount) {
           encounter.status = 'completed';
           runtime.wave = null;
       }
