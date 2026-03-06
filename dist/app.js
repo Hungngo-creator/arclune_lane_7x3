@@ -5956,7 +5956,7 @@ __define('./data/cost-budget.ts', (exports, module, __require) => {
           + (input.hasAbsoluteTag ? 0.5 : 0)
           + (input.supportsAllyResource ? 0.75 : 0);
       const minusScore = (input.hasDivineNature ? 2 : 0)
-          + (input.longSetup ? 1 : 0)
+          + (input.longSetup ? 1.5 : 0)
           + (input.hasFriendlyFireRisk ? 1.5 : 0)
           + (input.hasRemovedRisk ? 2 : 0);
       const preClampCost = anchorCost + plusScore - minusScore;
@@ -6086,7 +6086,8 @@ __define('./data/cost-budget.ts', (exports, module, __require) => {
           + breakdown.vanishRiskPenalty
           + breakdown.consistencyPenalty
           + breakdown.divinePenalty;
-      const netScore = powerScore - riskScore;
+      const adjustedRiskScore = riskScore * 1.15;
+      const netScore = powerScore - adjustedRiskScore;
       const rankAnchorCost = clamp(input.rankAnchorCost ?? 14, COST_MIN, COST_MAX);
       const rankMultiplier = clamp(input.rankMultiplier ?? 0.95, 0.8, 1.55);
       const rankScale = rankMultiplier / 0.95;

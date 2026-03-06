@@ -43,7 +43,8 @@ describe('cost budget evaluator', () => {
 
     expect(withDivine.breakdown.divineBonus).toBe(3);
     expect(withDivine.breakdown.divinePenalty).toBe(3);
-    expect(withDivine.netScore).toBe(withoutDivine.netScore);
+    expect(withDivine.netScore).toBeLessThan(withoutDivine.netScore);
+    expect(withoutDivine.netScore - withDivine.netScore).toBeCloseTo(0.45, 2);
   });
 
   test('phân tích tag hỗ trợ suy ra cost cho kit phức tạp', () => {
@@ -117,9 +118,9 @@ describe('summon cost neo logic', () => {
   test('SR Doãn Minh và Prime Thần Tính tạo chênh lệch cost hợp lý', () => {
     const comparison = simulateSummonCostComparison();
 
-    expect(comparison.doanMinh.finalCost).toBe(13);
+    expect(comparison.doanMinh.finalCost).toBe(12);
     expect(comparison.primeDivine.finalCost).toBe(21);
-    expect(comparison.costDelta).toBe(8);
+    expect(comparison.costDelta).toBe(9);
     expect(comparison.multiplierDelta).toBeCloseTo(0.6, 2);
   });
 
