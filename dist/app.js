@@ -5872,6 +5872,22 @@ __define('./data/campaign-stages.ts', (exports, module, __require) => {
 __define('./data/cost-budget.ts', (exports, module, __require) => {
   const COST_MIN = 8;
   const COST_MAX = 22;
+  const RANK_MULTIPLIER = Object.freeze({
+      N: 0.8,
+      R: 0.85,
+      SR: 0.95,
+      SSR: 1.1,
+      UR: 1.3,
+      PRIME: 1.55,
+  });
+  const RANK_COST_ANCHOR = Object.freeze({
+      N: 8,
+      R: 10,
+      SR: 12,
+      SSR: 15,
+      UR: 18,
+      PRIME: 21,
+  });
   const SCORE_RANGES = {
       tagComplexity: [0, 6],
       battlefieldInfluence: [0, 6],
@@ -5906,6 +5922,77 @@ __define('./data/cost-budget.ts', (exports, module, __require) => {
           return min;
       }
       return Math.max(min, Math.min(max, value));
+  }
+  function normalizeRankKey(rank) {
+      return String(rank ?? '').trim().toUpperCase();
+  }
+  function clampCost(cost) {
+      return clamp(cost, COST_MIN, COST_MAX);
+  }
+  /**
+   * V2 Summon Cost logic for manual balancing:
+   * Cost = CostNeo(rank) + Σ(điểm cộng) - Σ(điểm trừ)
+   * Sau đó clamp vào [8..22].
+   *
+   * Rank multiplier giữ vai trò hệ số tham chiếu khi so với hệ cũ,
+   * không nhân trực tiếp vào cost neo để tránh làm loãng lợi thế kinh tế của bậc thấp.
+   */
+  function evaluateSummonCost(input) {
+      const rank = normalizeRankKey(input.rank);
+      const anchorCost = RANK_COST_ANCHOR[rank] ?? RANK_COST_ANCHOR.SR;
+      const multiplier = RANK_MULTIPLIER[rank] ?? RANK_MULTIPLIER.SR;
+      const plusScore = (input.hasRuleTag ? 3 : 0)
+          + (input.hasLawTag ? 2 : 0)
+          + (input.hasAbsoluteTag ? 1 : 0)
+          + (input.supportsAllyResource ? 1.5 : 0);
+      const minusScore = (input.hasDivineNature ? 2 : 0)
+          + (input.longSetup ? 1 : 0)
+          + (input.hasFriendlyFireRisk ? 1.5 : 0)
+          + (input.hasRemovedRisk ? 2 : 0);
+      const preClampCost = anchorCost + plusScore - minusScore;
+      let finalCost = Math.round(clampCost(preClampCost));
+      // Rule bảo vệ giá trị SR: nếu vượt ngưỡng SSR mà không đủ trần tag lõi, ép hạ cost.
+      let needsSrRecheck = false;
+      if (rank === 'SR' && finalCost > 15) {
+          const hasCoreTopTags = Boolean(input.hasRuleTag && input.hasLawTag);
+          if (!hasCoreTopTags) {
+              finalCost = 15;
+              needsSrRecheck = true;
+          }
+      }
+      return {
+          rank,
+          multiplier,
+          anchorCost,
+          plusScore,
+          minusScore,
+          preClampCost,
+          finalCost,
+          needsSrRecheck,
+      };
+  }
+  function simulateSummonCostComparison() {
+      const doanMinh = evaluateSummonCost({
+          rank: 'SR',
+          hasLawTag: true,
+          supportsAllyResource: true,
+          longSetup: true,
+      });
+      const primeDivine = evaluateSummonCost({
+          rank: 'Prime',
+          hasRuleTag: true,
+          hasLawTag: true,
+          hasAbsoluteTag: true,
+          supportsAllyResource: true,
+          hasDivineNature: true,
+          hasRemovedRisk: true,
+      });
+      return {
+          doanMinh,
+          primeDivine,
+          costDelta: primeDivine.finalCost - doanMinh.finalCost,
+          multiplierDelta: Number((primeDivine.multiplier - doanMinh.multiplier).toFixed(2)),
+      };
   }
   function normalizeMetric(value, min, max) {
       return Math.round(clamp(value ?? 0, min, max));
@@ -5956,7 +6043,7 @@ __define('./data/cost-budget.ts', (exports, module, __require) => {
       return merged;
   }
   function deriveBudgetFromRankRole(rank, role) {
-      const rankKey = String(rank ?? '').trim().toUpperCase();
+      const rankKey = normalizeRankKey(rank);
       const roleKey = String(role ?? '').trim().toLowerCase();
       return mergeBudgetInputs({ battlefieldInfluence: 1, tacticalFlexibility: 1 }, RANK_BUDGET_BASE[rankKey], ROLE_BUDGET_MOD[roleKey], rankKey === 'PRIME' ? { hasDivineNature: true } : null);
   }
@@ -6048,6 +6135,10 @@ __define('./data/cost-budget.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'COST_MIN')) exports.COST_MIN = COST_MIN;
   if (!Object.prototype.hasOwnProperty.call(exports, 'COST_MAX')) exports.COST_MAX = COST_MAX;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'RANK_MULTIPLIER')) exports.RANK_MULTIPLIER = RANK_MULTIPLIER;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'RANK_COST_ANCHOR')) exports.RANK_COST_ANCHOR = RANK_COST_ANCHOR;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'evaluateSummonCost')) exports.evaluateSummonCost = evaluateSummonCost;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'simulateSummonCostComparison')) exports.simulateSummonCostComparison = simulateSummonCostComparison;
   if (!Object.prototype.hasOwnProperty.call(exports, 'mergeBudgetInputs')) exports.mergeBudgetInputs = mergeBudgetInputs;
   if (!Object.prototype.hasOwnProperty.call(exports, 'deriveBudgetFromRankRole')) exports.deriveBudgetFromRankRole = deriveBudgetFromRankRole;
   if (!Object.prototype.hasOwnProperty.call(exports, 'evaluateCostBudget')) exports.evaluateCostBudget = evaluateCostBudget;
@@ -27764,6 +27855,7 @@ __define('./units.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'UNITS')) exports.UNITS = UNITS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'UNIT_INDEX')) exports.UNIT_INDEX = UNIT_INDEX;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resolveUnitCost')) exports.resolveUnitCost = resolveUnitCost;
   if (!Object.prototype.hasOwnProperty.call(exports, 'lookupUnit')) exports.lookupUnit = lookupUnit;
 });
 __define('./utils/assert.ts', (exports, module, __require) => {

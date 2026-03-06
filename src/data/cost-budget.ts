@@ -1,6 +1,50 @@
 export const COST_MIN = 8;
 export const COST_MAX = 22;
 
+export const RANK_MULTIPLIER: Readonly<Record<string, number>> = Object.freeze({
+  N: 0.8,
+  R: 0.85,
+  SR: 0.95,
+  SSR: 1.1,
+  UR: 1.3,
+  PRIME: 1.55,
+});
+
+export const RANK_COST_ANCHOR: Readonly<Record<string, number>> = Object.freeze({
+  N: 8,
+  R: 10,
+  SR: 12,
+  SSR: 15,
+  UR: 18,
+  PRIME: 21,
+});
+
+export interface SummonCostTagInput {
+  hasRuleTag?: boolean;
+  hasLawTag?: boolean;
+  hasAbsoluteTag?: boolean;
+  supportsAllyResource?: boolean;
+  hasDivineNature?: boolean;
+  longSetup?: boolean;
+  hasFriendlyFireRisk?: boolean;
+  hasRemovedRisk?: boolean;
+}
+
+export interface SummonCostInput extends SummonCostTagInput {
+  rank: string;
+}
+
+export interface SummonCostResult {
+  rank: string;
+  multiplier: number;
+  anchorCost: number;
+  plusScore: number;
+  minusScore: number;
+  preClampCost: number;
+  finalCost: number;
+  needsSrRecheck: boolean;
+}
+
 export interface CostBudgetBreakdown {
   tagComplexity: number;
   battlefieldInfluence: number;
@@ -76,6 +120,94 @@ function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
+function normalizeRankKey(rank: string | null | undefined): string {
+  return String(rank ?? '').trim().toUpperCase();
+}
+
+function clampCost(cost: number): number {
+  return clamp(cost, COST_MIN, COST_MAX);
+}
+
+/**
+ * V2 Summon Cost logic for manual balancing:
+ * Cost = CostNeo(rank) + Σ(điểm cộng) - Σ(điểm trừ)
+ * Sau đó clamp vào [8..22].
+ *
+ * Rank multiplier giữ vai trò hệ số tham chiếu khi so với hệ cũ,
+ * không nhân trực tiếp vào cost neo để tránh làm loãng lợi thế kinh tế của bậc thấp.
+ */
+export function evaluateSummonCost(input: SummonCostInput): SummonCostResult {
+  const rank = normalizeRankKey(input.rank);
+  const anchorCost = RANK_COST_ANCHOR[rank] ?? RANK_COST_ANCHOR.SR;
+  const multiplier = RANK_MULTIPLIER[rank] ?? RANK_MULTIPLIER.SR;
+
+  const plusScore = (input.hasRuleTag ? 3 : 0)
+    + (input.hasLawTag ? 2 : 0)
+    + (input.hasAbsoluteTag ? 1 : 0)
+    + (input.supportsAllyResource ? 1.5 : 0);
+
+  const minusScore = (input.hasDivineNature ? 2 : 0)
+    + (input.longSetup ? 1 : 0)
+    + (input.hasFriendlyFireRisk ? 1.5 : 0)
+    + (input.hasRemovedRisk ? 2 : 0);
+
+  const preClampCost = anchorCost + plusScore - minusScore;
+  let finalCost = Math.round(clampCost(preClampCost));
+
+  // Rule bảo vệ giá trị SR: nếu vượt ngưỡng SSR mà không đủ trần tag lõi, ép hạ cost.
+  let needsSrRecheck = false;
+  if (rank === 'SR' && finalCost > 15) {
+    const hasCoreTopTags = Boolean(input.hasRuleTag && input.hasLawTag);
+    if (!hasCoreTopTags) {
+      finalCost = 15;
+      needsSrRecheck = true;
+    }
+  }
+
+  return {
+    rank,
+    multiplier,
+    anchorCost,
+    plusScore,
+    minusScore,
+    preClampCost,
+    finalCost,
+    needsSrRecheck,
+  };
+}
+
+export interface SummonCostComparison {
+  doanMinh: SummonCostResult;
+  primeDivine: SummonCostResult;
+  costDelta: number;
+  multiplierDelta: number;
+}
+
+export function simulateSummonCostComparison(): SummonCostComparison {
+  const doanMinh = evaluateSummonCost({
+    rank: 'SR',
+    hasLawTag: true,
+    supportsAllyResource: true,
+    longSetup: true,
+  });
+  const primeDivine = evaluateSummonCost({
+    rank: 'Prime',
+    hasRuleTag: true,
+    hasLawTag: true,
+    hasAbsoluteTag: true,
+    supportsAllyResource: true,
+    hasDivineNature: true,
+    hasRemovedRisk: true,
+  });
+
+  return {
+    doanMinh,
+    primeDivine,
+    costDelta: primeDivine.finalCost - doanMinh.finalCost,
+    multiplierDelta: Number((primeDivine.multiplier - doanMinh.multiplier).toFixed(2)),
+  };
+}
+
 function normalizeMetric(value: number | undefined, min: number, max: number): number {
   return Math.round(clamp(value ?? 0, min, max));
 }
@@ -130,7 +262,7 @@ export function mergeBudgetInputs(...inputs: Array<CostBudgetInput | null | unde
 }
 
 export function deriveBudgetFromRankRole(rank?: string | null, role?: string | null): CostBudgetInput {
-  const rankKey = String(rank ?? '').trim().toUpperCase();
+  const rankKey = normalizeRankKey(rank);
   const roleKey = String(role ?? '').trim().toLowerCase();
   return mergeBudgetInputs(
     { battlefieldInfluence: 1, tacticalFlexibility: 1 },

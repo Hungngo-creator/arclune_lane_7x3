@@ -1,6 +1,8 @@
 import {
   COST_MAX,
   COST_MIN,
+  evaluateSummonCost,
+  simulateSummonCostComparison,
   deriveBudgetFromRankRole,
   evaluateCostBudget,
   estimateCostFromTags,
@@ -101,5 +103,29 @@ describe('resolveUnitCost and roster auto-cost', () => {
       expect(unit.cost).toBeGreaterThanOrEqual(COST_MIN);
       expect(unit.cost).toBeLessThanOrEqual(COST_MAX);
     }
+  });
+});
+
+describe('summon cost neo logic', () => {
+  test('SR Doãn Minh và Prime Thần Tính tạo chênh lệch cost hợp lý', () => {
+    const comparison = simulateSummonCostComparison();
+
+    expect(comparison.doanMinh.finalCost).toBe(15);
+    expect(comparison.primeDivine.finalCost).toBe(22);
+    expect(comparison.costDelta).toBe(7);
+    expect(comparison.multiplierDelta).toBeCloseTo(0.6, 2);
+  });
+
+  test('SR vượt 15 nhưng không có lõi Quy Tắc + Pháp Tắc thì bị ép về 15', () => {
+    const result = evaluateSummonCost({
+      rank: 'SR',
+      hasRuleTag: true,
+      hasAbsoluteTag: true,
+      supportsAllyResource: true,
+    });
+
+    expect(result.preClampCost).toBe(17.5);
+    expect(result.finalCost).toBe(15);
+    expect(result.needsSrRecheck).toBe(true);
   });
 });

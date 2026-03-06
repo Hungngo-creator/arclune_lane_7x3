@@ -19,7 +19,7 @@ interface UnitSeedDefinition extends Omit<UnitDefinition, 'cost'> {
   budget?: CostBudgetInput;
 }
 
-function resolveUnitCost(seed: UnitSeedDefinition): number {
+export function resolveUnitCost(seed: UnitSeedDefinition): number {
   const baseline = deriveBudgetFromRankRole(seed.rank, seed.role);
   const mergedBudget = mergeBudgetInputs(baseline, seed.budget);
   return evaluateCostBudget(mergedBudget).cost;
