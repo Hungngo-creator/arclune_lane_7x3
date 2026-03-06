@@ -48,7 +48,7 @@ describe('rarity aura', () => {
     expect(overlay).not.toBeNull();
     expect(overlay?.dataset.variant).toBe('collection');
     expect(overlay?.classList.contains('rarity-SR')).toBe(true);
-    expect(overlay?.style.getPropertyValue('--rarity-color')).toBe('#00E5FF');
+    expect(overlay?.style.getPropertyValue('--rarity-color')).toBe('#9966cc');
 
     const badge = overlay?.querySelector('.badge');
     expect(badge?.textContent).toBe('SR');
@@ -93,7 +93,7 @@ test('deck variant không bật spark và sweep', () => {
     mountRarityAura(host, 'UR', 'gacha');
 
     const overlay = host.querySelector('.rarity-aura') as HTMLElement;
-    expect(overlay.style.getPropertyValue('--rarity-spark-count')).toBe('12');
+    expect(overlay.style.getPropertyValue('--rarity-spark-count')).toBe('5');
     expect(overlay.style.getPropertyValue('--rarity-sweep-opacity')).toBe('0.65');
 
     setPowerMode('low');
@@ -181,7 +181,7 @@ test('overlay phản ánh lớp tương tác của host', async () => {
     expect(document.body.classList.contains('low-power')).toBe(true);
     expect(overlay.classList.contains('has-spark')).toBe(false);
     expect(overlay.classList.contains('has-sweep')).toBe(false);
-    expect(overlay.style.getPropertyValue('--rarity-glow-active')).toBe('0.875');
+    expect(overlay.style.getPropertyValue('--rarity-glow-active')).toBe('1.015');
   });
 
   test('setPowerMode bỏ qua mode trùng lặp và chuẩn hóa giá trị', () => {
@@ -201,7 +201,7 @@ test('overlay phản ánh lớp tương tác của host', async () => {
 
     setPowerMode('invalid' as PowerMode);
     expect(document.body.classList.contains('low-power')).toBe(false);
-    expect(overlay.style.getPropertyValue('--rarity-spark-count')).toBe('12');
+    expect(overlay.style.getPropertyValue('--rarity-spark-count')).toBe('5');
   });
 
   test('collection badge giữ tương phản cao với nền', () => {

@@ -69,6 +69,8 @@ const RARITY_ALIASES: Readonly<Record<string, Rarity>> = {
   Prime: 'PRIME',
 };
 
+const PARTICLE_RARITIES = new Set<Rarity>(['SSR', 'UR', 'PRIME']);
+
 function normalizePowerMode(input: unknown): PowerMode {
   return input === 'low' ? 'low' : 'normal';
 }
@@ -110,12 +112,12 @@ function createTokenConfig(input: TokenConfigInput): TokenConfig {
 }
 
 const DEFAULT_TOKEN_SOURCE: Readonly<Record<Rarity, TokenConfigInput>> = {
-  N: { hex: '#9AA3AF', glow: 0.6, ring: 1.0, spark: 0 },
-  R: { hex: '#2ED3A0', glow: 0.8, ring: 1.0, spark: 4 },
-  SR: { hex: '#00E5FF', glow: 1.0, ring: 1.05, spark: 6 },
-  SSR: { hex: '#7C4DFF', glow: 1.15, ring: 1.1, spark: 8 },
-  UR: { hex: '#FFD773', glow: 1.25, ring: 1.15, spark: 12 },
-  PRIME: { hex: '#FFFFFF', glow: 1.35, ring: 1.2, spark: 16, prism: true },
+  N: { hex: '#808080', glow: 0.05, ring: 1.0, spark: 0 },
+  R: { hex: '#00008b', glow: 0.75, ring: 1.02, spark: 0 },
+  SR: { hex: '#9966cc', glow: 1.0, ring: 1.05, spark: 0 },
+  SSR: { hex: '#ffbf00', glow: 1.25, ring: 1.1, spark: 4 },
+  UR: { hex: '#dc143c', glow: 1.45, ring: 1.14, spark: 5 },
+  PRIME: { hex: '#ffffff', glow: 1.65, ring: 1.2, spark: 5, prism: true },
 };
 
 function normalizeTokenMap(source: Record<string, TokenConfigInput>): Record<Rarity, TokenConfig> {
@@ -174,6 +176,10 @@ function getRarityClass(rarity: Rarity): string {
   return `rarity-${rarity}`;
 }
 
+function getRankClass(rarity: Rarity): string {
+  return `rank-${rarity.toLowerCase()}`;
+}
+
 function clearTimers<T>(ids: T[], clearFn: (id: T) => void): void {
   ids.splice(0, ids.length).forEach(id => clearFn(id));
 }
@@ -202,13 +208,15 @@ function clearSparks(state: AuraState): void {
 }
 
 function applyCssVariables(state: AuraState): void {
-  const { overlay, token, variant } = state;
+  const { overlay, token, rarity, variant } = state;
   overlay.style.setProperty('--rarity-color', token.hex);
   overlay.style.setProperty('--rarity-ring-scale', token.ring.toString());
   overlay.style.setProperty('--rarity-glow-base', token.glow.toString());
   overlay.style.setProperty('--rarity-glow-low', token.glowLow.toString());
   overlay.style.setProperty('--rarity-glow-active', currentPowerMode === 'low' ? token.glowLow.toString() : token.glow.toString());
-  const sparkCount = variant === 'gacha' && currentPowerMode !== 'low' ? token.spark : 0;
+  const sparkCount = variant === 'gacha' && currentPowerMode !== 'low' && PARTICLE_RARITIES.has(rarity)
+    ? token.spark
+    : 0;
   overlay.style.setProperty('--rarity-spark-count', sparkCount.toString());
   const sweepOpacity = variant === 'gacha'
     ? (token.prism ? '0.75' : '0.65')
@@ -250,17 +258,20 @@ function applyClasses(state: AuraState): void {
   const { overlay, rarity, variant, token } = state;
   RARITY_SEQUENCE.forEach(key => {
     const className = getRarityClass(key);
+    const rankClassName = getRankClass(key);
     if (key === rarity){
       overlay.classList.add(className);
+      overlay.classList.add(rankClassName);
     } else {
       overlay.classList.remove(className);
+      overlay.classList.remove(rankClassName);
     }
   });
   overlay.dataset.variant = variant;
   overlay.classList.toggle('prism', token.prism);
   overlay.classList.toggle('is-rounded', state.rounded);
   const wantsSweep = variant === 'gacha' && (rarity === 'UR' || rarity === 'PRIME');
-  const wantsSpark = variant === 'gacha' && token.spark > 0 && currentPowerMode !== 'low';
+  const wantsSpark = variant === 'gacha' && token.spark > 0 && PARTICLE_RARITIES.has(rarity) && currentPowerMode !== 'low';
   overlay.classList.toggle('has-sweep', wantsSweep && currentPowerMode !== 'low');
   overlay.classList.toggle('has-spark', wantsSpark);
   if (!overlay.classList.contains('has-spark')){
@@ -364,7 +375,7 @@ function setupOverlay(host: HTMLElement, variant: AuraVariant): AuraState {
   }
   state.originalPosition = inlinePosition || null;
 
-  host.appendChild(overlay);
+  host.insertBefore(overlay, host.firstChild);
   auraStates.set(host, state);
   activeStates.add(state);
   return state;
