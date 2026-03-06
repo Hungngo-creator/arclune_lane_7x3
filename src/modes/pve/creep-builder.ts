@@ -16,8 +16,11 @@ type ProgressProfile = {
   className?: string;
 };
 
-const CREEP_KIT_ORDER = ['creep_1', 'creep_2', 'creep_3'] as const;
-const CREEP_POWER_ORDER = ['creep_3', 'creep_2', 'creep_1'] as const;
+const CREEP_SLOT_ORDER = [
+  { id: 'creep_1', powerSlot: 2 },
+  { id: 'creep_2', powerSlot: 1 },
+  { id: 'creep_3', powerSlot: 0 },
+] as const;
 const RANK_PRIORITY = ['N', 'R', 'SR', 'SSR', 'UR', 'PRIME'] as const;
 const RANK_SET = new Set<string>(RANK_PRIORITY);
 const RANK_PRIORITY_SCORE = new Map<string, number>(
@@ -38,12 +41,13 @@ function readEntryRank(entry: PveDeckEntry): string | null {
 
 function collectRankStats(lineup: ReadonlyArray<PveDeckEntry>): RankStats {
   const rankCounts = new Map<string, number>();
+  let totalRanked = 0;
   for (const entry of lineup) {
     const rank = readEntryRank(entry);
     if (!rank) continue;
     rankCounts.set(rank, (rankCounts.get(rank) ?? 0) + 1);
+    totalRanked += 1;
   }
-  const totalRanked = Array.from(rankCounts.values()).reduce((sum, count) => sum + count, 0);
   return { rankCounts, totalRanked };
 }
 
@@ -141,23 +145,17 @@ export function buildAICreepDeckFromLineup(params: {
   collectionState?: CollectionStateInput | null;
 }): PveDeckEntry[] {
   const lineup = Array.isArray(params.lineup) ? params.lineup : [];
-  const creepCount = CREEP_KIT_ORDER.length;
+  const creepCount = CREEP_SLOT_ORDER.length;
   const allocatedRanks = allocateRanksForCreeps(collectRankStats(lineup), creepCount);
 
   const progressById = mapUnitProgressById(params.collectionState ?? null);
   const allocatedProgress = allocateProgressForCreeps(mapLineupProgress(lineup, progressById), creepCount);
 
-  const rankByCreepId = new Map<string, string | null>();
-  CREEP_POWER_ORDER.forEach((creepId, index) => {
-    rankByCreepId.set(creepId, allocatedRanks[index] ?? null);
-  });
-
-  return CREEP_KIT_ORDER.map((creepId) => {
+  return CREEP_SLOT_ORDER.map((creep) => {
+    const creepId = creep.id;
     const unitDef = lookupUnit(creepId);
-    const powerIndex = CREEP_POWER_ORDER.indexOf(creepId);
-    const profile = allocatedProgress[powerIndex] ?? {};
-    const rank = rankByCreepId.get(creepId);
-    return {
+    const profile = allocatedProgress[creep.powerSlot] ?? {};
+    const rank = allocatedRanks[creep.powerSlot] ?? null;
       id: creepId,
       name: unitDef?.name ?? creepId,
       cost: Number.isFinite(unitDef?.cost) ? Number(unitDef?.cost) : 0,

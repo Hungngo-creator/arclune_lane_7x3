@@ -11867,8 +11867,11 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
   const lookupUnit = __dep0.lookupUnit;
   const __dep1 = __require('./modes/pve/collection-mapper.ts');
   const mapUnitProgressById = __dep1.mapUnitProgressById;
-  const CREEP_KIT_ORDER = ['creep_1', 'creep_2', 'creep_3'];
-  const CREEP_POWER_ORDER = ['creep_3', 'creep_2', 'creep_1'];
+  const CREEP_SLOT_ORDER = [
+      { id: 'creep_1', powerSlot: 2 },
+      { id: 'creep_2', powerSlot: 1 },
+      { id: 'creep_3', powerSlot: 0 },
+  ];
   const RANK_PRIORITY = ['N', 'R', 'SR', 'SSR', 'UR', 'PRIME'];
   const RANK_SET = new Set(RANK_PRIORITY);
   const RANK_PRIORITY_SCORE = new Map(RANK_PRIORITY.map((rank, index) => [rank, index + 1]));
@@ -11886,13 +11889,14 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
   }
   function collectRankStats(lineup) {
       const rankCounts = new Map();
+      let totalRanked = 0;
       for (const entry of lineup) {
           const rank = readEntryRank(entry);
           if (!rank)
               continue;
           rankCounts.set(rank, (rankCounts.get(rank) ?? 0) + 1);
+          totalRanked += 1;
       }
-      const totalRanked = Array.from(rankCounts.values()).reduce((sum, count) => sum + count, 0);
       return { rankCounts, totalRanked };
   }
   function compareRankDesc(left, right) {
@@ -11981,33 +11985,30 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
   }
   function buildAICreepDeckFromLineup(params) {
       const lineup = Array.isArray(params.lineup) ? params.lineup : [];
-      const creepCount = CREEP_KIT_ORDER.length;
+      const creepCount = CREEP_SLOT_ORDER.length;
       const allocatedRanks = allocateRanksForCreeps(collectRankStats(lineup), creepCount);
       const progressById = mapUnitProgressById(params.collectionState ?? null);
       const allocatedProgress = allocateProgressForCreeps(mapLineupProgress(lineup, progressById), creepCount);
-      const rankByCreepId = new Map();
-      CREEP_POWER_ORDER.forEach((creepId, index) => {
-          rankByCreepId.set(creepId, allocatedRanks[index] ?? null);
-      });
-      return CREEP_KIT_ORDER.map((creepId) => {
+      return CREEP_SLOT_ORDER.map((creep) => {
+          const creepId = creep.id;
           const unitDef = lookupUnit(creepId);
-          const powerIndex = CREEP_POWER_ORDER.indexOf(creepId);
-          const profile = allocatedProgress[powerIndex] ?? {};
-          const rank = rankByCreepId.get(creepId);
-          return {
-              id: creepId,
-              name: unitDef?.name ?? creepId,
-              cost: Number.isFinite(unitDef?.cost) ? Number(unitDef?.cost) : 0,
-              dynamicRankSource: 'lineup',
-              dynamicLevelSource: 'lineup',
-              ...(rank ? { rank } : {}),
-              ...(typeof profile.level === 'number' ? { level: Math.max(1, Math.floor(profile.level)) } : {}),
-              ...(typeof profile.realm === 'number' ? { realm: Math.max(0, Math.floor(profile.realm)) } : {}),
-              ...(typeof profile.subRealm === 'number' ? { subRealm: Math.max(0, Math.floor(profile.subRealm)) } : {}),
-              ...(typeof profile.className === 'string' && profile.className.trim() ? { class: profile.className } : {}),
-          };
-      });
+          const profile = allocatedProgress[creep.powerSlot] ?? {};
+          const rank = allocatedRanks[creep.powerSlot] ?? null;
+          id: creepId,
+              name;
+          unitDef?.name ?? creepId,
+              cost;
+          Number.isFinite(unitDef?.cost) ? Number(unitDef?.cost) : 0,
+              dynamicRankSource;
+          'lineup',
+              dynamicLevelSource;
+          'lineup',
+          ;
+      }, ...(rank ? { rank } : {}), ...(typeof profile.level === 'number' ? { level: Math.max(1, Math.floor(profile.level)) } : {}), ...(typeof profile.realm === 'number' ? { realm: Math.max(0, Math.floor(profile.realm)) } : {}), ...(typeof profile.subRealm === 'number' ? { subRealm: Math.max(0, Math.floor(profile.subRealm)) } : {}), ...(typeof profile.className === 'string' && profile.className.trim() ? { class: profile.className } : {}));
   }
+  satisfies;
+  PveDeckEntry;
+  ;
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'buildAICreepDeckFromLineup')) exports.buildAICreepDeckFromLineup = buildAICreepDeckFromLineup;
 });
