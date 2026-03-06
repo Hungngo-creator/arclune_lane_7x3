@@ -140,6 +140,39 @@ function allocateProgressForCreeps(profiles: ReadonlyArray<ProgressProfile>, cre
   return output;
 }
 
+function clampInteger(value: unknown, min: number): number | null {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return null;
+  return Math.max(min, Math.floor(value));
+}
+
+function toCreepDeckEntry(params: {
+  creepId: string;
+  profile: ProgressProfile;
+  rank: string | null;
+}): PveDeckEntry {
+  const { creepId, profile, rank } = params;
+  const unitDef = lookupUnit(creepId);
+  const level = clampInteger(profile.level, 1);
+  const realm = clampInteger(profile.realm, 0);
+  const subRealm = clampInteger(profile.subRealm, 0);
+  const className = typeof profile.className === 'string' && profile.className.trim()
+    ? profile.className
+    : null;
+
+  return {
+    id: creepId,
+    name: unitDef?.name ?? creepId,
+    cost: Number.isFinite(unitDef?.cost) ? Number(unitDef?.cost) : 0,
+    dynamicRankSource: 'lineup',
+    dynamicLevelSource: 'lineup',
+    ...(rank ? { rank } : {}),
+    ...(level != null ? { level } : {}),
+    ...(realm != null ? { realm } : {}),
+    ...(subRealm != null ? { subRealm } : {}),
+    ...(className ? { class: className } : {}),
+  } satisfies PveDeckEntry;
+}
+
 export function buildAICreepDeckFromLineup(params: {
   lineup: ReadonlyArray<PveDeckEntry>;
   collectionState?: CollectionStateInput | null;
@@ -153,19 +186,8 @@ export function buildAICreepDeckFromLineup(params: {
 
   return CREEP_SLOT_ORDER.map((creep) => {
     const creepId = creep.id;
-    const unitDef = lookupUnit(creepId);
     const profile = allocatedProgress[creep.powerSlot] ?? {};
     const rank = allocatedRanks[creep.powerSlot] ?? null;
-      id: creepId,
-      name: unitDef?.name ?? creepId,
-      cost: Number.isFinite(unitDef?.cost) ? Number(unitDef?.cost) : 0,
-      dynamicRankSource: 'lineup',
-      dynamicLevelSource: 'lineup',
-      ...(rank ? { rank } : {}),
-      ...(typeof profile.level === 'number' ? { level: Math.max(1, Math.floor(profile.level)) } : {}),
-      ...(typeof profile.realm === 'number' ? { realm: Math.max(0, Math.floor(profile.realm)) } : {}),
-      ...(typeof profile.subRealm === 'number' ? { subRealm: Math.max(0, Math.floor(profile.subRealm)) } : {}),
-      ...(typeof profile.className === 'string' && profile.className.trim() ? { class: profile.className } : {}),
-    } satisfies PveDeckEntry;
+      return toCreepDeckEntry({ creepId, profile, rank });
   });
 }
