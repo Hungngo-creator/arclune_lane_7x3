@@ -11,23 +11,27 @@ export const RANK_MULTIPLIER: Readonly<Record<string, number>> = Object.freeze({
 });
 
 export const RANK_COST_ANCHOR: Readonly<Record<string, number>> = Object.freeze({
-  N: 8,
-  R: 10,
-  SR: 12,
-  SSR: 15,
-  UR: 18,
-  PRIME: 21,
+  N: 6,
+  R: 7,
+  SR: 9,
+  SSR: 12,
+  UR: 16,
+  PRIME: 0,
 });
 
 export interface SummonCostTagInput {
   hasRuleTag?: boolean;
   hasLawTag?: boolean;
+  hasAoeFieldTag?: boolean;
   hasAbsoluteTag?: boolean;
   supportsAllyResource?: boolean;
   hasDivineNature?: boolean;
   longSetup?: boolean;
   hasFriendlyFireRisk?: boolean;
   hasRemovedRisk?: boolean;
+  hasSelfHarmRisk?: boolean;
+  hasVanishRisk?: boolean;
+  isSupremePrime?: boolean;
 }
 
 export interface SummonCostInput extends SummonCostTagInput {
@@ -38,8 +42,10 @@ export interface SummonCostResult {
   rank: string;
   multiplier: number;
   anchorCost: number;
-  plusScore: number;
-  minusScore: number;
+  powerPoint: number;
+  riskPoint: number;
+  powerScore: number;
+  riskScore: number;
   preClampCost: number;
   finalCost: number;
   needsSrRecheck: boolean;
@@ -153,20 +159,23 @@ export function evaluateSummonCost(input: SummonCostInput): SummonCostResult {
   const anchorCost = resolveRankAnchor(rank);
   const multiplier = resolveRankMultiplier(rank);
 
-  // Giảm 50% trọng số điểm cộng để hạ mặt bằng chung cost,
-  // giữ nguyên điểm trừ nhằm phản ánh rủi ro/điều kiện vận hành.
-  const plusScore = (input.hasRuleTag ? 1.5 : 0)
+   const powerPoint = (input.hasRuleTag ? 1 : 0)
     + (input.hasLawTag ? 1 : 0)
     + (input.hasAbsoluteTag ? 0.5 : 0)
     + (input.supportsAllyResource ? 0.75 : 0);
+    + (input.hasAoeFieldTag ? 1 : 0);
+  const riskPoint = (input.hasDivineNature ? 1 : 0)
+    + (input.hasSelfHarmRisk ? 1 : 0)
+    + (input.longSetup ? 1 : 0)
+    + (input.hasVanishRisk ? 1 : 0);
 
-  const minusScore = (input.hasDivineNature ? 2 : 0)
-    + (input.longSetup ? 1.5 : 0)
-    + (input.hasFriendlyFireRisk ? 1.5 : 0)
-    + (input.hasRemovedRisk ? 2 : 0);
+  const powerScore = powerPoint * 1.5;
+  const riskScore = riskPoint * 3;
+  const primeDivineAdjustment = rank === 'PRIME' && input.hasDivineNature ? 1 : 0;
+  const preClampCost = anchorCost + powerScore - riskScore - primeDivineAdjustment;
 
-  const preClampCost = anchorCost + plusScore - minusScore;
-  let finalCost = Math.round(clampCost(preClampCost));
+  const hardCap = rank === 'PRIME' && input.isSupremePrime ? 30 : 22;
+  let finalCost = Math.round(clamp(preClampCost, COST_MIN, hardCap));
 
   // Rule bảo vệ giá trị SR: nếu vượt ngưỡng SSR mà không đủ trần tag lõi, ép hạ cost.
   let needsSrRecheck = false;
@@ -182,8 +191,10 @@ export function evaluateSummonCost(input: SummonCostInput): SummonCostResult {
     rank,
     multiplier,
     anchorCost,
-    plusScore,
-    minusScore,
+    powerPoint,
+    riskPoint,
+    powerScore,
+    riskScore,
     preClampCost,
     finalCost,
     needsSrRecheck,
@@ -208,10 +219,11 @@ export function simulateSummonCostComparison(): SummonCostComparison {
     rank: 'Prime',
     hasRuleTag: true,
     hasLawTag: true,
+    hasAoeFieldTag: true,
     hasAbsoluteTag: true,
     supportsAllyResource: true,
     hasDivineNature: true,
-    hasRemovedRisk: true,
+    hasVanishRisk: true,
   });
 
   return {
