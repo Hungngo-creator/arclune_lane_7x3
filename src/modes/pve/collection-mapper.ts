@@ -14,6 +14,7 @@ import type {
 type CollectionItemCandidate = Record<string, unknown>;
 
 const SKIN_FIELD_KEYS = ['skinKey', 'skin', 'avatarSkin', 'selectedSkin'] as const;
+const PROGRESS_MAP_CACHE = new WeakMap<object, Map<string, RuntimeUnitProgress>>();
 
 const GAMBITS_MAX_SLOTS = 5;
 const GAMBITS_CONDITIONS = new Set<GambitConditionType>([
@@ -138,6 +139,11 @@ const normalizeProgress = (entry: CollectionItemCandidate): RuntimeUnitProgress 
 };
 
 export function mapUnitProgressById(collectionState: CollectionStateInput | null | undefined): Map<string, RuntimeUnitProgress> {
+  if (collectionState && typeof collectionState === 'object') {
+    const cached = PROGRESS_MAP_CACHE.get(collectionState as object);
+    if (cached) return cached;
+  }
+
   const out = new Map<string, RuntimeUnitProgress>();
   const entries = getCollectionEntries(collectionState);
   for (const entry of entries) {
@@ -145,6 +151,11 @@ export function mapUnitProgressById(collectionState: CollectionStateInput | null
     if (!normalized) continue;
     out.set(normalized.unitId, normalized);
   }
+
+  if (collectionState && typeof collectionState === 'object') {
+    PROGRESS_MAP_CACHE.set(collectionState as object, out);
+  }
+
   return out;
 }
 

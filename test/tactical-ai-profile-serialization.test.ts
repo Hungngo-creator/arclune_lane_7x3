@@ -80,4 +80,18 @@ describe('tacticalAiByUnit serialization/deserialization', () => {
       { condition: 'pool_aether_above', action: 'skill3', threshold: 35, enabled: true },
     ]);
   });
+  
+  it('reuses cached collection mapping for same collection object', () => {
+    const collectionState = {
+      units: [
+        { unitId: 'hero_legacy', level: 40, realm: 2, subRealm: 1 },
+      ],
+    };
+
+    const first = mapUnitProgressById(collectionState);
+    const second = mapUnitProgressById(collectionState);
+
+    expect(second).toBe(first);
+    expect(second.get('hero_legacy')?.level).toBe(40);
+  });
 });

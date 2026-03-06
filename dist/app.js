@@ -11682,6 +11682,7 @@ __define('./modes/pve/collection-mapper.ts', (exports, module, __require) => {
   const Meta = __dep0.Meta;
   const makeInstanceStats = __dep0.makeInstanceStats;
   const SKIN_FIELD_KEYS = ['skinKey', 'skin', 'avatarSkin', 'selectedSkin'];
+  const PROGRESS_MAP_CACHE = new WeakMap();
   const GAMBITS_MAX_SLOTS = 5;
   const GAMBITS_CONDITIONS = new Set([
       'self_hp_below',
@@ -11803,6 +11804,11 @@ __define('./modes/pve/collection-mapper.ts', (exports, module, __require) => {
       return progress;
   };
   function mapUnitProgressById(collectionState) {
+      if (collectionState && typeof collectionState === 'object') {
+          const cached = PROGRESS_MAP_CACHE.get(collectionState);
+          if (cached)
+              return cached;
+      }
       const out = new Map();
       const entries = getCollectionEntries(collectionState);
       for (const entry of entries) {
@@ -11810,6 +11816,9 @@ __define('./modes/pve/collection-mapper.ts', (exports, module, __require) => {
           if (!normalized)
               continue;
           out.set(normalized.unitId, normalized);
+      }
+      if (collectionState && typeof collectionState === 'object') {
+          PROGRESS_MAP_CACHE.set(collectionState, out);
       }
       return out;
   }
