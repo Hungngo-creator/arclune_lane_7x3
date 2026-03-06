@@ -26383,41 +26383,92 @@ __define('./turns/interleaved.ts', (exports, module, __require) => {
       if (slotCount <= 0)
           return null;
       const slotMaps = buildSlotMaps(state.tokens);
-      const pickSide = (sideKey) => {
-          const last = Number.isFinite(turn.lastPos?.[sideKey]) ? turn.lastPos[sideKey] : 0;
-          const found = findNextOccupiedPos(state, sideKey, last, slotMaps);
-          if (!found)
-              return null;
-          if (!found.spawnOnly) {
-              turn.lastPos[sideKey] = found.pos;
-              if (found.wrapped) {
-                  turn.wrapCount[sideKey] = (turn.wrapCount[sideKey] ?? 0) + 1;
-              }
+      const startSide = normalizeSide(turn.nextSide);
+      const prevAllyPos = Number.isFinite(turn.lastPos?.ALLY) ? Math.floor(turn.lastPos.ALLY) : 0;
+      let cursorSide = startSide;
+      let cursorPos = cursorSide === 'ALLY'
+          ? ((Math.max(0, prevAllyPos) % slotCount) + 1)
+          : Math.max(1, Math.min(slotCount, prevAllyPos || 1));
+      const setCursorToCandidate = (sideKey, pos) => {
+          if (sideKey === 'ALLY') {
+              turn.nextSide = 'ALLY';
+              turn.lastPos.ALLY = pos > 1 ? pos - 1 : 0;
+              return;
           }
-          return found;
+          turn.nextSide = 'ENEMY';
+          turn.lastPos.ALLY = pos;
       };
-      const primarySide = normalizeSide(turn.nextSide);
-      const fallbackSide = primarySide === 'ALLY' ? 'ENEMY' : 'ALLY';
-      let selection = pickSide(primarySide);
-      if (!selection) {
-          selection = pickSide(fallbackSide);
-          if (!selection) {
-              turn.nextSide = fallbackSide;
-              return null;
+      const setCursorAfterConsumed = (sideKey, pos) => {
+          if (sideKey === 'ALLY') {
+              turn.lastPos.ALLY = pos;
+              turn.nextSide = 'ENEMY';
+              return;
           }
+          turn.lastPos.ALLY = pos;
+          turn.lastPos.ENEMY = pos;
+          turn.nextSide = 'ALLY';
+      };
+      const advanceCursor = () => {
+          if (cursorSide === 'ALLY') {
+              cursorSide = 'ENEMY';
+              return;
+          }
+          cursorSide = 'ALLY';
+          cursorPos = (cursorPos % slotCount) + 1;
+      };
+      const maxChecks = slotCount * 2;
+      for (let checks = 0; checks < maxChecks; checks += 1) {
+          const sideLower = SIDE_TO_LOWER[cursorSide];
+          const unit = slotMaps[cursorSide].get(cursorPos) ?? null;
+          const cycle = Number.isFinite(turn.cycle) ? turn.cycle : 0;
+          const queued = isQueueDue(state, sideLower, cursorPos, cycle);
+          if (unit && unit.alive && Statuses.canAct(unit)) {
+              const wrapped = cursorSide === 'ALLY' ? makeWrappedFlag(prevAllyPos, cursorPos) : false;
+              setCursorAfterConsumed(cursorSide, cursorPos);
+              if (wrapped) {
+                  turn.wrapCount.ALLY = (turn.wrapCount.ALLY ?? 0) + 1;
+              }
+              turn.turnCount += 1;
+              const allyWrap = turn.wrapCount.ALLY ?? 0;
+              const enemyWrap = turn.wrapCount.ENEMY ?? 0;
+              const maxWrap = Math.max(allyWrap, enemyWrap);
+              if (!Number.isFinite(turn.cycle) || turn.cycle < maxWrap) {
+                  turn.cycle = maxWrap;
+              }
+              return {
+                  mode: 'interleaved_by_position',
+                  side: sideLower,
+                  pos: cursorPos,
+                  unit,
+                  unitId: unit.id ?? null,
+                  queued,
+                  wrapped,
+                  sideKey: cursorSide,
+                  spawnOnly: false
+              };
+          }
+          if (queued) {
+              const wrapped = cursorSide === 'ALLY' ? makeWrappedFlag(prevAllyPos, cursorPos) : false;
+              setCursorToCandidate(cursorSide, cursorPos);
+              return {
+                  mode: 'interleaved_by_position',
+                  side: sideLower,
+                  pos: cursorPos,
+                  unit: null,
+                  unitId: null,
+                  queued: true,
+                  wrapped,
+                  sideKey: cursorSide,
+                  spawnOnly: true
+              };
+          }
+          advanceCursor();
       }
-      if (selection.spawnOnly) {
-          return selection;
+      turn.nextSide = cursorSide;
+      if (cursorSide === 'ENEMY') {
+          turn.lastPos.ALLY = cursorPos;
       }
-      turn.nextSide = selection.sideKey === 'ALLY' ? 'ENEMY' : 'ALLY';
-      turn.turnCount += 1;
-      const allyWrap = turn.wrapCount.ALLY ?? 0;
-      const enemyWrap = turn.wrapCount.ENEMY ?? 0;
-      const maxWrap = Math.max(allyWrap, enemyWrap);
-      if (!Number.isFinite(turn.cycle) || turn.cycle < maxWrap) {
-          turn.cycle = maxWrap;
-      }
-      return selection;
+      return null;
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'findNextOccupiedPos')) exports.findNextOccupiedPos = findNextOccupiedPos;
