@@ -567,7 +567,7 @@ __define('./ai.ts', (exports, module, __require) => {
           return 'cellReserved';
       const meta = entry.meta;
       if (meta && meta.class === 'Summoner' && entry.summonSpec) {
-          const patternSlots = resolveSummonSlots(entry.summonSpec, slot);
+          const patternSlots = entry.summonPatternSlots ?? resolveSummonSlots(entry.summonSpec, slot);
           if (patternSlots.length) {
               let available = 0;
               for (const s of patternSlots) {
@@ -745,12 +745,12 @@ __define('./ai.ts', (exports, module, __require) => {
           return;
       }
       const evaluations = [];
-      let bestEvaluation = null;
       const keepTop = dbgCfg.keepTop;
       const trackTopCandidates = keepTop > 0;
       const topCandidates = [];
       const etaBySlot = new Map();
       const summonerFeasibilityByCardSlot = new Map();
+      const summonPatternSlotsByCardSlot = new Map();
       const summonSpecByCard = new Map();
       const insertTopCandidate = trackTopCandidates
           ? (entry) => {
@@ -796,6 +796,13 @@ __define('./ai.ts', (exports, module, __require) => {
                   summonerFeasibilityByCardSlot.set(summonKey, summonValue);
                   return summonValue;
               })();
+              const summonPatternSlots = summonSpec
+                  ? (summonPatternSlotsByCardSlot.get(summonKey) ?? (() => {
+                      const pattern = resolveSummonSlots(summonSpec, cell.s);
+                      summonPatternSlotsByCardSlot.set(summonKey, pattern);
+                      return pattern;
+                  })())
+                  : null;
               const kitInstantScore = kitTraits.hasInstant ? e : 0;
               const kitDefenseScore = kitTraits.hasDefBuff ? 1 - s : 0;
               const kitReviveScore = kitTraits.hasRevive ? s : 0;
@@ -808,7 +815,13 @@ __define('./ai.ts', (exports, module, __require) => {
                   kitDefense: (weights.kitDefense ?? 0) * kitDefenseScore,
                   kitRevive: (weights.kitRevive ?? 0) * kitReviveScore,
               };
-              const baseScore = Object.values(contributions).reduce((acc, val) => acc + val, 0);
+              const baseScore = contributions.pressure +
+                  contributions.safety +
+                  contributions.eta +
+                  contributions.summon +
+                  contributions.kitInstant +
+                  contributions.kitDefense +
+                  contributions.kitRevive;
               const rowFactor = rowFactorByCy.get(cell.cy) ?? 1;
               const roleFactor = roleBias(meta?.class, cell.cx);
               const finalScore = baseScore * rowFactor * roleFactor;
@@ -830,10 +843,9 @@ __define('./ai.ts', (exports, module, __require) => {
                       kitRevive: kitReviveScore,
                   },
                   multipliers: { row: rowFactor, role: roleFactor },
+                  summonPatternSlots,
               };
               evaluations.push(evaluation);
-              if (!bestEvaluation || evaluation.score > bestEvaluation.score)
-                  bestEvaluation = evaluation;
               insertTopCandidate?.(evaluation);
           }
       }
@@ -850,32 +862,20 @@ __define('./ai.ts', (exports, module, __require) => {
           Game.ai.lastThinkMs = now;
           return;
       }
+      evaluations.sort((left, right) => right.score - left.score);
       let chosen = null;
-      const findNextCandidate = () => {
-          let next = null;
-          for (const entry of evaluations) {
-              if (entry.blockedReason)
-                  continue;
-              if (!next || entry.score > next.score)
-                  next = entry;
-          }
-          return next;
-      };
-      let current = bestEvaluation ?? findNextCandidate();
-      while (!chosen && current) {
+      for (const current of evaluations) {
           const blocked = candidateBlocked(Game, current, alive);
           if (blocked) {
               current.blockedReason = blocked;
+              continue;
           }
-          else {
-              const ok = queueEnemyAt(Game, current.card, current.cell.s, current.cell.cx, current.cell.cy, alive);
-              if (ok) {
-                  chosen = current;
-                  break;
-              }
-              current.blockedReason = 'queueFailed';
+          const ok = queueEnemyAt(Game, current.card, current.cell.s, current.cell.cx, current.cell.cy, alive);
+          if (ok) {
+              chosen = current;
+              break;
           }
-          current = findNextCandidate();
+          current.blockedReason = 'queueFailed';
       }
       const considered = trackTopCandidates ? topCandidates.map(exportCandidateDebug).filter(Boolean) : [];
       const decision = {

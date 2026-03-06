@@ -69,6 +69,7 @@ interface CandidateEvaluation {
   raw: CandidateContributions;
   multipliers: CandidateMultipliers;
   blockedReason?: string | null;
+  summonPatternSlots?: number[] | null;
 }
 
 interface CandidateDebug {
@@ -338,7 +339,7 @@ function candidateBlocked(
 
   const meta = entry.meta;
   if (meta && meta.class === 'Summoner' && entry.summonSpec) {
-    const patternSlots = resolveSummonSlots(entry.summonSpec, slot);
+    const patternSlots = entry.summonPatternSlots ?? resolveSummonSlots(entry.summonSpec, slot);
     if (patternSlots.length) {
       let available = 0;
       for (const s of patternSlots) {
@@ -526,12 +527,12 @@ export function aiMaybeAct(Game: SessionState, reason: AI_REASON): void {
   }
 
   const evaluations: CandidateEvaluation[] = [];
-  let bestEvaluation: CandidateEvaluation | null = null;
   const keepTop = dbgCfg.keepTop;
   const trackTopCandidates = keepTop > 0;
   const topCandidates: CandidateEvaluation[] = [];
   const etaBySlot = new Map<number, number>();
   const summonerFeasibilityByCardSlot = new Map<string, number>();
+  const summonPatternSlotsByCardSlot = new Map<string, number[]>();
   const summonSpecByCard = new Map<string, ResolvedSummonSpec>();
 
   const insertTopCandidate = trackTopCandidates
@@ -576,6 +577,13 @@ export function aiMaybeAct(Game: SessionState, reason: AI_REASON): void {
         summonerFeasibilityByCardSlot.set(summonKey, summonValue);
         return summonValue;
       })();
+      const summonPatternSlots = summonSpec
+        ? (summonPatternSlotsByCardSlot.get(summonKey) ?? (() => {
+            const pattern = resolveSummonSlots(summonSpec, cell.s);
+            summonPatternSlotsByCardSlot.set(summonKey, pattern);
+            return pattern;
+          })())
+        : null;
 
       const kitInstantScore = kitTraits.hasInstant ? e : 0;
       const kitDefenseScore = kitTraits.hasDefBuff ? 1 - s : 0;
@@ -591,7 +599,14 @@ export function aiMaybeAct(Game: SessionState, reason: AI_REASON): void {
         kitRevive: (weights.kitRevive ?? 0) * kitReviveScore,
       };
 
-      const baseScore = Object.values(contributions).reduce((acc, val) => acc + val, 0);
+      const baseScore =
+        contributions.pressure +
+        contributions.safety +
+        contributions.eta +
+        contributions.summon +
+        contributions.kitInstant +
+        contributions.kitDefense +
+        contributions.kitRevive;
       const rowFactor = rowFactorByCy.get(cell.cy) ?? 1;
       const roleFactor = roleBias(meta?.class, cell.cx);
       const finalScore = baseScore * rowFactor * roleFactor;
@@ -614,10 +629,10 @@ export function aiMaybeAct(Game: SessionState, reason: AI_REASON): void {
           kitRevive: kitReviveScore,
         },
         multipliers: { row: rowFactor, role: roleFactor },
+        summonPatternSlots,
       };
 
       evaluations.push(evaluation);
-      if (!bestEvaluation || evaluation.score > bestEvaluation.score) bestEvaluation = evaluation;
       insertTopCandidate?.(evaluation);
     }
   }
@@ -636,30 +651,22 @@ export function aiMaybeAct(Game: SessionState, reason: AI_REASON): void {
     return;
   }
 
-  let chosen: CandidateEvaluation | null = null;
-  const findNextCandidate = (): CandidateEvaluation | null => {
-    let next: CandidateEvaluation | null = null;
-    for (const entry of evaluations) {
-      if (entry.blockedReason) continue;
-      if (!next || entry.score > next.score) next = entry;
-    }
-    return next;
-  };
+  evaluations.sort((left, right) => right.score - left.score);
 
-  let current = bestEvaluation ?? findNextCandidate();
-  while (!chosen && current) {
+  let chosen: CandidateEvaluation | null = null;
+  for (const current of evaluations) {
     const blocked = candidateBlocked(Game, current, alive);
     if (blocked) {
       current.blockedReason = blocked;
-    } else {
-      const ok = queueEnemyAt(Game, current.card, current.cell.s, current.cell.cx, current.cell.cy, alive);
-      if (ok) {
-        chosen = current;
-        break;
-      }
-      current.blockedReason = 'queueFailed';
+    continue;
     }
-    current = findNextCandidate();
+
+    const ok = queueEnemyAt(Game, current.card, current.cell.s, current.cell.cx, current.cell.cy, alive);
+    if (ok) {
+      chosen = current;
+      break;
+    }
+    current.blockedReason = 'queueFailed';
   }
 
   const considered = trackTopCandidates ? topCandidates.map(exportCandidateDebug).filter(Boolean) : [];
