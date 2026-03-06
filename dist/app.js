@@ -26231,6 +26231,28 @@ __define('./turns/interleaved.ts', (exports, module, __require) => {
       }
       return map;
   }
+  function buildSlotMaps(tokens) {
+      const ally = new Map();
+      const enemy = new Map();
+      if (!Array.isArray(tokens)) {
+          return { ALLY: ally, ENEMY: enemy };
+      }
+      for (const unit of tokens) {
+          if (!unit || !unit.alive)
+              continue;
+          if (unit.side !== 'ally' && unit.side !== 'enemy')
+              continue;
+          const sideKey = LOWER_TO_UPPER[unit.side];
+          const map = sideKey === 'ALLY' ? ally : enemy;
+          const slot = slotIndex(unit.side, unit.cx, unit.cy);
+          if (!Number.isFinite(slot))
+              continue;
+          if (!map.has(slot)) {
+              map.set(slot, unit);
+          }
+      }
+      return { ALLY: ally, ENEMY: enemy };
+  }
   function isQueueDue(state, sideLower, slot, cycle) {
       const queued = sideLower === 'ally' ? state.queued?.ally : state.queued?.enemy;
       if (!queued)
@@ -26245,7 +26267,7 @@ __define('./turns/interleaved.ts', (exports, module, __require) => {
           return false;
       return pos <= start;
   }
-  function findNextOccupiedPos(state, side, startPos = 0) {
+  function findNextOccupiedPos(state, side, startPos = 0, slotMaps) {
       const turn = state.turn ?? null;
       const sideKey = normalizeSide(side);
       const sideLower = SIDE_TO_LOWER[sideKey];
@@ -26253,7 +26275,7 @@ __define('./turns/interleaved.ts', (exports, module, __require) => {
           return null;
       const slotCount = resolveSlotCount(turn);
       const start = Number.isFinite(startPos) ? Math.max(0, Math.min(slotCount, Math.floor(startPos))) : 0;
-      const unitsBySlot = buildSlotMap(state.tokens, sideLower);
+      const unitsBySlot = slotMaps?.[sideKey] ?? buildSlotMap(state.tokens, sideLower);
       const cycle = Number.isFinite(turn?.cycle) ? turn.cycle : 0;
       for (let offset = 1; offset <= slotCount; offset += 1) {
           const pos = ((start + offset - 1) % slotCount) + 1;
@@ -26296,9 +26318,10 @@ __define('./turns/interleaved.ts', (exports, module, __require) => {
       const slotCount = resolveSlotCount(turn);
       if (slotCount <= 0)
           return null;
+      const slotMaps = buildSlotMaps(state.tokens);
       const pickSide = (sideKey) => {
           const last = Number.isFinite(turn.lastPos?.[sideKey]) ? turn.lastPos[sideKey] : 0;
-          const found = findNextOccupiedPos(state, sideKey, last);
+          const found = findNextOccupiedPos(state, sideKey, last, slotMaps);
           if (!found)
               return null;
           if (!found.spawnOnly) {

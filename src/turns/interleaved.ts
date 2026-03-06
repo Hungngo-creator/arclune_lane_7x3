@@ -11,6 +11,7 @@ const LOWER_TO_UPPER: Record<Side, TurnSideKey> = { ally: 'ALLY', enemy: 'ENEMY'
 const DEFAULT_LAST_POS: Record<TurnSideKey, number> = { ALLY: 0, ENEMY: 0 };
 const DEFAULT_WRAP_COUNT: Record<TurnSideKey, number> = { ALLY: 0, ENEMY: 0 };
 const SLOT_CAP = 9;
+type SlotMapBySide = Record<TurnSideKey, Map<number, UnitToken>>;
 
 function normalizeSide(side: Side | TurnSideKey | string): TurnSideKey {
   if (side === 'ENEMY') return 'ENEMY';
@@ -59,6 +60,26 @@ function buildSlotMap(tokens: ReadonlyArray<UnitToken> | null | undefined, sideL
   return map;
 }
 
+function buildSlotMaps(tokens: ReadonlyArray<UnitToken> | null | undefined): SlotMapBySide {
+  const ally = new Map<number, UnitToken>();
+  const enemy = new Map<number, UnitToken>();
+  if (!Array.isArray(tokens)) {
+    return { ALLY: ally, ENEMY: enemy };
+  }
+  for (const unit of tokens){
+    if (!unit || !unit.alive) continue;
+    if (unit.side !== 'ally' && unit.side !== 'enemy') continue;
+    const sideKey = LOWER_TO_UPPER[unit.side];
+    const map = sideKey === 'ALLY' ? ally : enemy;
+    const slot = slotIndex(unit.side, unit.cx, unit.cy);
+    if (!Number.isFinite(slot)) continue;
+    if (!map.has(slot)) {
+      map.set(slot, unit);
+    }
+  }
+  return { ALLY: ally, ENEMY: enemy };
+}
+
 function isQueueDue(state: SessionState, sideLower: Side, slot: number, cycle: number): boolean {
   const queued = sideLower === 'ally' ? state.queued?.ally : state.queued?.enemy;
   if (!queued) return false;
@@ -75,7 +96,8 @@ function makeWrappedFlag(start: number, pos: number): boolean {
 export function findNextOccupiedPos(
   state: SessionState,
   side: Side | TurnSideKey,
-  startPos = 0
+  startPos = 0,
+  slotMaps?: SlotMapBySide,
 ): InterleavedState | null {
   const turn = (state.turn as InterleavedTurnState | null) ?? null;
   const sideKey = normalizeSide(side);
@@ -84,7 +106,7 @@ export function findNextOccupiedPos(
 
   const slotCount = resolveSlotCount(turn);
   const start = Number.isFinite(startPos) ? Math.max(0, Math.min(slotCount, Math.floor(startPos))) : 0;
-  const unitsBySlot = buildSlotMap(state.tokens, sideLower);
+  const unitsBySlot = slotMaps?.[sideKey] ?? buildSlotMap(state.tokens, sideLower);
   const cycle = Number.isFinite(turn?.cycle) ? turn!.cycle : 0;
 
   for (let offset = 1; offset <= slotCount; offset += 1){
@@ -132,10 +154,11 @@ export function nextTurnInterleaved(
   ensureTurnState(turn);
   const slotCount = resolveSlotCount(turn);
   if (slotCount <= 0) return null;
+  const slotMaps = buildSlotMaps(state.tokens);
 
   const pickSide = (sideKey: TurnSideKey): InterleavedState | null => {
     const last = Number.isFinite(turn.lastPos?.[sideKey]) ? turn.lastPos[sideKey] : 0;
-    const found = findNextOccupiedPos(state, sideKey, last);
+    const found = findNextOccupiedPos(state, sideKey, last, slotMaps);
     if (!found) return null;
     if (!found.spawnOnly){
       turn.lastPos[sideKey] = found.pos;
