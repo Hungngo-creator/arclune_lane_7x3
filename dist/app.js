@@ -13434,10 +13434,18 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           turn: game.turn?.cycle ?? null,
           payload: u,
       });
+      const allTokens = game.tokens || [];
+      let aliveTokenCache = null;
+      const getAliveTokens = () => {
+          if (aliveTokenCache)
+              return aliveTokenCache;
+          aliveTokenCache = allTokens.filter((token) => token.alive);
+          return aliveTokenCache;
+      };
       let busyMs = 900;
       switch (u.type) {
           case 'drain': {
-              const aliveNow = tokensAlive();
+              const aliveNow = getAliveTokens();
               const foes = aliveNow.filter(t => t.side === foeSide);
               if (!foes.length)
                   break;
@@ -13480,7 +13488,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   });
                   finishFuryHit(unit);
               }
-              const aliveNow = tokensAlive();
+              const aliveNow = getAliveTokens();
               const foes = aliveNow.filter((t) => t.side === foeSide && t.alive);
               const hits = getUltHitCount(u);
               const selected = [];
@@ -13661,7 +13669,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               if (!primary)
                   break;
               const laneX = primary.cx;
-              const aliveNow = tokensAlive();
+              const aliveNow = getAliveTokens();
               const laneTargets = aliveNow.filter(t => t.side === foeSide && t.cx === laneX);
               const hits = getUltHitCount(u);
               const scale = parseFiniteNumber(u.scale) ?? 0.9;
@@ -13730,7 +13738,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               break;
           }
           case 'sleep': {
-              const aliveNow = tokensAlive();
+              const aliveNow = getAliveTokens();
               const foes = aliveNow.filter(t => t.side === foeSide);
               if (!foes.length)
                   break;
@@ -13761,13 +13769,12 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               break;
           }
           case 'revive': {
-              const tokens = game.tokens || [];
-              const fallen = tokens.filter(t => t.side === unit.side && !t.alive);
+              const fallen = allTokens.filter(t => t.side === unit.side && !t.alive);
               if (!fallen.length)
                   break;
               fallen.sort((a, b) => (b.deadAt || 0) - (a.deadAt || 0));
               const take = Math.max(1, Math.min(fallen.length, getUltTargetCount(u, 1)));
-              const sideLeader = (game.tokens || []).find((token) => token.alive && token.side === unit.side && isUyenLeader(token));
+              const sideLeader = getAliveTokens().find((token) => token.side === unit.side && isUyenLeader(token));
               for (let i = 0; i < take; i++) {
                   const ally = fallen[i];
                   if (!ally)
@@ -13801,7 +13808,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               break;
           }
           case 'equalizeHP': {
-              const aliveNow = tokensAlive();
+              const aliveNow = getAliveTokens();
               let allies = aliveNow.filter(t => t.side === unit.side);
               if (!allies.length)
                   break;
@@ -13814,8 +13821,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               const selected = allies.slice(0, count);
               if (u.healLeader) {
                   const leaderId = unit.side === 'ally' ? 'leaderA' : 'leaderB';
-                  const tokens = game.tokens || [];
-                  const leader = tokens.find(t => t.id === leaderId && t.alive);
+                  const leader = getAliveTokens().find(t => t.id === leaderId);
                   if (leader && !selected.includes(leader))
                       selected.push(leader);
               }
@@ -13845,7 +13851,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               const targets = new Set();
               targets.add(unit);
               const extraAllies = Math.max(0, getUltTargetCount(u, 1) - 1);
-              const aliveNow = tokensAlive();
+              const aliveNow = getAliveTokens();
               const others = aliveNow.filter(t => t.side === unit.side && t !== unit);
               others.sort((a, b) => (a.spd || 0) - (b.spd || 0));
               for (const ally of others) {
