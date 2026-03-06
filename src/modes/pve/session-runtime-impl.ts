@@ -101,6 +101,7 @@ import type {
   SessionRuntimeState,
   CreateSessionOptions,
   SessionState,
+  RuntimeUnitProgress,
   SummonSpec,
   SummonCreepSpec,
   SummonInheritSpec,
@@ -925,9 +926,6 @@ function resetSessionState(options: StartConfigOverrides | null | undefined = {}
   storedConfig = normalizeConfig({ ...storedConfig, ...overrides });
   resetSessionTimeBase();
   Game = createSession(storedConfig);
-  if (Game?.runtime) {
-    Game.runtime.unitProgressById = mapUnitProgressById(storedConfig.collectionState ?? null);
-  }
   applyCollectionSkinsToSession(Game);
   _IID = 1;
   _BORN = 1;
@@ -3899,8 +3897,10 @@ function applyConfigToRunningGame(cfg: NormalizedSessionConfig): void {
       refillDeck();
     }
   }
+  let collectionProgressById: Map<string, RuntimeUnitProgress> | null = null;
   if (typeof cfg.collectionState !== 'undefined'){
-    game.runtime.unitProgressById = mapUnitProgressById(cfg.collectionState ?? null);
+    collectionProgressById = mapUnitProgressById(cfg.collectionState ?? null);
+    game.runtime.unitProgressById = collectionProgressById;
     applyCollectionSkinsToSession(game);
   }
   if (cfg.aiPreset){
@@ -3919,7 +3919,7 @@ function applyConfigToRunningGame(cfg: NormalizedSessionConfig): void {
       const lineupDeck = normalizeDeckEntries(lineupInput ?? game.playerDeckLocked ?? game.unitsAll ?? []);
       const creeps = buildAICreepDeckFromLineup({
         lineup: lineupDeck,
-        collectionState: cfg.collectionState ?? null,
+        ...(collectionProgressById ? { progressById: collectionProgressById } : { collectionState: cfg.collectionState ?? null }),
       });
       if (creeps.length) game.ai.unitsAll = creeps;
     }

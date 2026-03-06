@@ -11844,13 +11844,12 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
       { id: 'creep_3', powerSlot: 0 },
   ];
   const RANK_PRIORITY = ['N', 'R', 'SR', 'SSR', 'UR', 'PRIME'];
-  const RANK_SET = new Set(RANK_PRIORITY);
   const RANK_PRIORITY_SCORE = new Map(RANK_PRIORITY.map((rank, index) => [rank, index + 1]));
   function normalizeRank(value) {
       if (typeof value !== 'string' || !value.trim())
           return null;
       const normalized = value.trim().toUpperCase();
-      return RANK_SET.has(normalized) ? normalized : normalized;
+      return normalized;
   }
   function readEntryRank(entry) {
       const explicitRank = normalizeRank(entry.rank);
@@ -11985,7 +11984,7 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
       const lineup = Array.isArray(params.lineup) ? params.lineup : [];
       const creepCount = CREEP_SLOT_ORDER.length;
       const allocatedRanks = allocateRanksForCreeps(collectRankStats(lineup), creepCount);
-      const progressById = mapUnitProgressById(params.collectionState ?? null);
+      const progressById = params.progressById ?? mapUnitProgressById(params.collectionState ?? null);
       const allocatedProgress = allocateProgressForCreeps(mapLineupProgress(lineup, progressById), creepCount);
       return CREEP_SLOT_ORDER.map((creep) => {
           const creepId = creep.id;
@@ -12698,9 +12697,6 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       storedConfig = normalizeConfig({ ...storedConfig, ...overrides });
       resetSessionTimeBase();
       Game = createSession(storedConfig);
-      if (Game?.runtime) {
-          Game.runtime.unitProgressById = mapUnitProgressById(storedConfig.collectionState ?? null);
-      }
       applyCollectionSkinsToSession(Game);
       _IID = 1;
       _BORN = 1;
@@ -15677,8 +15673,10 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               refillDeck();
           }
       }
+      let collectionProgressById = null;
       if (typeof cfg.collectionState !== 'undefined') {
-          game.runtime.unitProgressById = mapUnitProgressById(cfg.collectionState ?? null);
+          collectionProgressById = mapUnitProgressById(cfg.collectionState ?? null);
+          game.runtime.unitProgressById = collectionProgressById;
           applyCollectionSkinsToSession(game);
       }
       if (cfg.aiPreset) {
@@ -15700,7 +15698,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               const lineupDeck = normalizeDeckEntries(lineupInput ?? game.playerDeckLocked ?? game.unitsAll ?? []);
               const creeps = buildAICreepDeckFromLineup({
                   lineup: lineupDeck,
-                  collectionState: cfg.collectionState ?? null,
+                  ...(collectionProgressById ? { progressById: collectionProgressById } : { collectionState: cfg.collectionState ?? null }),
               });
               if (creeps.length)
                   game.ai.unitsAll = creeps;
@@ -16087,7 +16085,7 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
               encounter: null,
               wave: null,
               rewardQueue: [],
-              unitProgressById: mapUnitProgressById(params.collectionState ?? null),
+              unitProgressById: params.unitProgressById,
           },
       };
   }
@@ -16300,6 +16298,7 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
       const allyUnits = lockedPlayerDeck.length
           ? Array.from(lockedPlayerDeck)
           : Array.from(DEFAULT_UNIT_ROSTER);
+      const unitProgressById = mapUnitProgressById(normalized.collectionState ?? null);
       const enemyPreset = normalized.aiPreset ?? null;
       const lineupSource = preferredPlayerDeck ?? modeDeck ?? [];
       const lineupForAICreeps = normalizeDeckEntries(lineupSource);
@@ -16309,7 +16308,7 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
               ? Array.from(enemyPreset.unitsAll)
               : buildAICreepDeckFromLineup({
                   lineup: lineupForAICreeps,
-                  collectionState: normalized.collectionState ?? null,
+                  progressById: unitProgressById,
               });
       const requestedTurnMode = normalized.turnMode
           ?? normalized.turn?.mode
@@ -16368,7 +16367,7 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
           backgroundKey,
           turn: buildTurnState(),
           ai: aiState,
-          collectionState: normalized.collectionState ?? null,
+          unitProgressById,
           rngSeed,
       });
   }

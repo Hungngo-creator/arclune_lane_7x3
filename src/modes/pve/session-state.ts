@@ -1,6 +1,6 @@
 //home (termux)/arclune_lane_7x3/src/modes/pve/session-state.ts
 
-import type { CreateSessionOptions, SessionState } from '@shared-types/pve';
+import type { CreateSessionOptions, RuntimeUnitProgress, SessionState } from '@shared-types/pve';
 import type {
   CameraPreset,
   GameConfig,
@@ -134,7 +134,7 @@ interface BuildBaseStateParams {
   backgroundKey: string | null;
   turn: TurnSnapshot;
   ai: SessionState['ai'];
-  collectionState?: CreateSessionOptions['collectionState'];
+  unitProgressById: Map<string, RuntimeUnitProgress>;
   rngSeed?: number;
 }
 
@@ -175,7 +175,7 @@ function buildBaseState(params: BuildBaseStateParams): SessionState {
       encounter: null,
       wave: null,
       rewardQueue: [],
-      unitProgressById: mapUnitProgressById(params.collectionState ?? null),
+      unitProgressById: params.unitProgressById,
     },
   };
 }
@@ -428,6 +428,7 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
     ? Array.from(lockedPlayerDeck)
     : Array.from(DEFAULT_UNIT_ROSTER);
 
+  const unitProgressById = mapUnitProgressById(normalized.collectionState ?? null);
   const enemyPreset = normalized.aiPreset ?? null;
   const lineupSource = preferredPlayerDeck ?? modeDeck ?? [];
   const lineupForAICreeps = normalizeDeckEntries(lineupSource);
@@ -438,7 +439,7 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
         ? Array.from(enemyPreset.unitsAll)
         : buildAICreepDeckFromLineup({
           lineup: lineupForAICreeps,
-          collectionState: normalized.collectionState ?? null,
+          progressById: unitProgressById,
         });
 
   const requestedTurnMode = normalized.turnMode
@@ -502,7 +503,7 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
     backgroundKey,
     turn: buildTurnState(),
     ai: aiState,
-    collectionState: normalized.collectionState ?? null,
+    unitProgressById,
     rngSeed,
   });
 }

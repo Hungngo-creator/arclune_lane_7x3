@@ -22,7 +22,6 @@ const CREEP_SLOT_ORDER = [
   { id: 'creep_3', powerSlot: 0 },
 ] as const;
 const RANK_PRIORITY = ['N', 'R', 'SR', 'SSR', 'UR', 'PRIME'] as const;
-const RANK_SET = new Set<string>(RANK_PRIORITY);
 const RANK_PRIORITY_SCORE = new Map<string, number>(
   RANK_PRIORITY.map((rank, index) => [rank, index + 1]),
 );
@@ -30,7 +29,7 @@ const RANK_PRIORITY_SCORE = new Map<string, number>(
 function normalizeRank(value: unknown): string | null {
   if (typeof value !== 'string' || !value.trim()) return null;
   const normalized = value.trim().toUpperCase();
-  return RANK_SET.has(normalized) ? normalized : normalized;
+  return normalized;
 }
 
 function readEntryRank(entry: PveDeckEntry): string | null {
@@ -176,12 +175,13 @@ function toCreepDeckEntry(params: {
 export function buildAICreepDeckFromLineup(params: {
   lineup: ReadonlyArray<PveDeckEntry>;
   collectionState?: CollectionStateInput | null;
+  progressById?: ReadonlyMap<string, RuntimeUnitProgress> | null;
 }): PveDeckEntry[] {
   const lineup = Array.isArray(params.lineup) ? params.lineup : [];
   const creepCount = CREEP_SLOT_ORDER.length;
   const allocatedRanks = allocateRanksForCreeps(collectRankStats(lineup), creepCount);
 
-  const progressById = mapUnitProgressById(params.collectionState ?? null);
+  const progressById = params.progressById ?? mapUnitProgressById(params.collectionState ?? null);
   const allocatedProgress = allocateProgressForCreeps(mapLineupProgress(lineup, progressById), creepCount);
 
   return CREEP_SLOT_ORDER.map((creep) => {
