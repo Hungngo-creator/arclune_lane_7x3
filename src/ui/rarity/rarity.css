@@ -2,15 +2,17 @@
 
 .rarity-aura {
   position: absolute;
-  inset: 0;
+  inset: calc(-1 * var(--rarity-aura-outset, 5px));
   pointer-events: none;
   border-radius: inherit;
   contain: layout style paint;
   display: block;
-  z-index: 0;
+  z-index: 3;
   transform: translateZ(0);
   will-change: transform, opacity, filter;
   --rarity-color: #ffffff;
+  --rarity-aura-outset: 5px;
+  --rarity-aura-thickness: 2px;
   --rarity-ring-scale: 1;
   --rarity-glow-base: 1;
   --rarity-glow-low: calc(var(--rarity-glow-base) * 0.7);
@@ -26,11 +28,6 @@
   --metal-dark: color-mix(in srgb, var(--rarity-color) 22%, #0e1218);
   --metal-mid: color-mix(in srgb, var(--rarity-color) 58%, #3f4b58);
   --metal-hi: color-mix(in srgb, var(--rarity-color) 80%, #ffffff);
-}
-
-.rarity-aura ~ * {
-  position: relative;
-  z-index: 1;
 }
 
 body.low-power .rarity-aura {
@@ -56,13 +53,18 @@ body.low-power .rarity-aura {
 }
 
 .rarity-aura .ring {
-  border: 1px solid transparent;
+  padding: var(--rarity-aura-thickness);
   background:
-    linear-gradient(140deg, var(--metal-dark), var(--metal-mid) 45%, var(--metal-hi) 55%, var(--metal-dark)) border-box;
+    linear-gradient(140deg, var(--metal-dark), var(--metal-mid) 45%, var(--metal-hi) 55%, var(--metal-dark));
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
   box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--rarity-color) 45%, transparent) inset,
-    0 1px 1px rgba(255, 255, 255, 0.12) inset,
-    0 -1px 1px rgba(0, 0, 0, 0.42) inset;
+    0 0 0 1px color-mix(in srgb, var(--rarity-color) 45%, transparent),
+    0 1px 1px rgba(255, 255, 255, 0.2),
+    0 -1px 1px rgba(0, 0, 0, 0.46);
   opacity: var(--rarity-ring-opacity);
   transform: scale(var(--rarity-ring-scale)) translateZ(0);
   transition: transform 0.3s ease, opacity 0.3s ease;
@@ -79,8 +81,15 @@ body.low-power .rarity-aura {
 }
 
 .rarity-aura .glow {
-  background: radial-gradient(68% 68% at 50% 50%, color-mix(in srgb, var(--rarity-color) 72%, transparent), transparent 72%);
+  inset: calc(-1 * var(--rarity-aura-outset));
+  background: radial-gradient(90% 90% at 50% 50%, color-mix(in srgb, var(--rarity-color) 74%, transparent) 45%, transparent 74%);
   filter: blur(var(--rarity-glow-blur));
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  padding: calc(var(--rarity-aura-thickness) + var(--rarity-aura-outset));
   opacity: var(--rarity-glow-opacity);
   transform: scale(var(--rarity-glow-scale)) translateZ(0);
   transition: opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease;
@@ -142,6 +151,7 @@ body.low-power .rarity-aura {
 /* Rank tuning */
 .rarity-N, .rank-n {
   --rarity-color: #808080;
+  --rarity-aura-thickness: 1px;
   --rarity-ring-opacity: 0.9;
   --rarity-glow-opacity: 0;
   --rarity-glow-blur: 0px;
@@ -150,6 +160,7 @@ body.low-power .rarity-aura {
 
 .rarity-R, .rank-r {
   --rarity-color: #00008b;
+  --rarity-aura-outset: 5px;
   --rarity-glow-opacity: 0.55;
   --rarity-glow-blur: calc(9px * var(--rarity-glow-active));
 }
@@ -162,6 +173,7 @@ body.low-power .rarity-aura {
 
 .rarity-SR, .rank-sr {
   --rarity-color: #9966cc;
+  --rarity-aura-outset: 6px;
   --rarity-glow-opacity: 0.72;
 }
 .rarity-SR .glow::before, .rank-sr .glow::before {
@@ -176,8 +188,10 @@ body.low-power .rarity-aura {
 
 .rarity-SSR, .rank-ssr {
   --rarity-color: #ffbf00;
+  --rarity-aura-outset: 8px;
   --rarity-glow-opacity: 0.8;
-  
+}
+
 .rarity-SSR .ring::after, .rank-ssr .ring::after {
   content: "";
   position: absolute;
@@ -195,6 +209,8 @@ body.low-power .rarity-aura {
 
 .rarity-UR, .rank-ur {
   --rarity-color: #dc143c;
+  --rarity-aura-outset: 10px;
+  --rarity-aura-thickness: 3px;
   --rarity-glow-opacity: 0.86;
   --rarity-glow-blur: calc(12px * var(--rarity-glow-active));
 }
@@ -220,6 +236,8 @@ body.low-power .rarity-aura {
 
 .rarity-PRIME, .rank-prime {
   --rarity-color: #ffffff;
+  --rarity-aura-outset: 12px;
+  --rarity-aura-thickness: 3px;
   --rarity-glow-opacity: 0.95;
   --rarity-glow-blur: calc(13px * var(--rarity-glow-active));
 }

@@ -6,12 +6,14 @@
   <title>Arclune Lane - Aura Card Sample</title>
   <style>
     body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b1020;color:#eaf3ff;font-family:Inter,system-ui,sans-serif}
-    .character-card{position:relative;width:220px;height:320px;border-radius:20px;overflow:hidden;background:linear-gradient(160deg,#141a2f,#090e1f)}
+    .character-card{position:relative;width:220px;height:320px;border-radius:20px;overflow:visible;background:linear-gradient(160deg,#141a2f,#090e1f);transform:translateZ(0)}
     .character-card .portrait{position:absolute;inset:10px;border-radius:16px;overflow:hidden;z-index:1}
     .character-card .portrait img{width:100%;height:100%;object-fit:cover;display:block}
     .character-card .meta{position:absolute;left:12px;right:12px;bottom:12px;z-index:2;background:rgba(8,12,24,.65);backdrop-filter:blur(4px);padding:8px 10px;border-radius:12px}
     .character-card .meta h3{margin:0;font-size:14px;letter-spacing:.04em}
     .character-card .meta p{margin:2px 0 0;font-size:12px;color:#b7c6e3}
+    /* Copy core classes from src/ui/rarity/rarity.css in production */
+    @import url('../src/ui/rarity/rarity.css');
   </style>
 </head>
 <body>
