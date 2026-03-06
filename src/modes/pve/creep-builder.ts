@@ -32,17 +32,11 @@ function normalizeRank(value: unknown): string | null {
   return normalized;
 }
 
-function readEntryRank(entry: PveDeckEntry): string | null {
-  const explicitRank = normalizeRank(entry.rank);
-  if (explicitRank) return explicitRank;
-  return normalizeRank(lookupUnit(entry.id)?.rank);
-}
-
 function collectRankStats(lineup: ReadonlyArray<PveDeckEntry>): RankStats {
   const rankCounts = new Map<string, number>();
   let totalRanked = 0;
   for (const entry of lineup) {
-    const rank = readEntryRank(entry);
+    const rank = normalizeRank(entry.rank) ?? normalizeRank(lookupUnit(entry.id)?.rank);
     if (!rank) continue;
     rankCounts.set(rank, (rankCounts.get(rank) ?? 0) + 1);
     totalRanked += 1;
@@ -139,6 +133,16 @@ function allocateProgressForCreeps(profiles: ReadonlyArray<ProgressProfile>, cre
   return output;
 }
 
+function collectLineupSignals(params: {
+  lineup: ReadonlyArray<PveDeckEntry>;
+  progressById: ReadonlyMap<string, RuntimeUnitProgress>;
+}): { rankStats: RankStats; progressProfiles: ProgressProfile[] } {
+  return {
+    rankStats: collectRankStats(params.lineup),
+    progressProfiles: mapLineupProgress(params.lineup, params.progressById),
+  };
+}
+
 function clampInteger(value: unknown, min: number): number | null {
   if (typeof value !== 'number' || !Number.isFinite(value)) return null;
   return Math.max(min, Math.floor(value));
@@ -179,10 +183,10 @@ export function buildAICreepDeckFromLineup(params: {
 }): PveDeckEntry[] {
   const lineup = Array.isArray(params.lineup) ? params.lineup : [];
   const creepCount = CREEP_SLOT_ORDER.length;
-  const allocatedRanks = allocateRanksForCreeps(collectRankStats(lineup), creepCount);
-
   const progressById = params.progressById ?? mapUnitProgressById(params.collectionState ?? null);
-  const allocatedProgress = allocateProgressForCreeps(mapLineupProgress(lineup, progressById), creepCount);
+  const lineupSignals = collectLineupSignals({ lineup, progressById });
+  const allocatedRanks = allocateRanksForCreeps(lineupSignals.rankStats, creepCount);
+  const allocatedProgress = allocateProgressForCreeps(lineupSignals.progressProfiles, creepCount);
 
   return CREEP_SLOT_ORDER.map((creep) => {
     const creepId = creep.id;
