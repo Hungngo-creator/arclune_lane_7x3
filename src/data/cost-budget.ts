@@ -321,7 +321,10 @@ export function evaluateCostBudget(input: CostBudgetInput): CostBudgetResult {
   const rankMultiplier = clamp(input.rankMultiplier ?? 0.95, 0.8, 1.55);
   const rankScale = rankMultiplier / 0.95;
   const netScale = 0.3 * (0.7 + rankScale * 0.3);
-  const rawCost = rankAnchorCost + netScore * netScale;
+  const lowRankRelief = rankMultiplier < 0.95
+    ? (0.95 - rankMultiplier) * 6
+    : 0;
+  const rawCost = rankAnchorCost + netScore * netScale - lowRankRelief;
   const cost = Math.round(clamp(rawCost, COST_MIN, COST_MAX));
 
   return {
