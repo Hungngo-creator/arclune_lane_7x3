@@ -1,7 +1,7 @@
 // Bundled by build.mjs
 const __modules = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }
 function __define(id, factory){ __modules[id] = { factory, exports: null, initialized: false }; }
@@ -5868,6 +5868,190 @@ __define('./data/campaign-stages.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'CAMPAIGN_STAGE_DATA')) exports.CAMPAIGN_STAGE_DATA = CAMPAIGN_STAGE_DATA;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveBossName')) exports.resolveBossName = resolveBossName;
+});
+__define('./data/cost-budget.ts', (exports, module, __require) => {
+  const COST_MIN = 8;
+  const COST_MAX = 22;
+  const SCORE_RANGES = {
+      tagComplexity: [0, 6],
+      battlefieldInfluence: [0, 6],
+      economyPressure: [0, 4],
+      scalingCeiling: [0, 4],
+      tacticalFlexibility: [0, 4],
+      setupPenalty: [0, 4],
+      selfRiskPenalty: [0, 4],
+      vanishRiskPenalty: [0, 4],
+      consistencyPenalty: [0, 3],
+      divineSelfSustainBonus: [0, 2],
+  };
+  const RANK_BUDGET_BASE = Object.freeze({
+      N: { tagComplexity: 0, battlefieldInfluence: 1, economyPressure: 0, scalingCeiling: 0, tacticalFlexibility: 1 },
+      R: { tagComplexity: 1, battlefieldInfluence: 1, economyPressure: 0, scalingCeiling: 1, tacticalFlexibility: 1 },
+      SR: { tagComplexity: 2, battlefieldInfluence: 2, economyPressure: 1, scalingCeiling: 2, tacticalFlexibility: 2 },
+      SSR: { tagComplexity: 3, battlefieldInfluence: 3, economyPressure: 1, scalingCeiling: 2, tacticalFlexibility: 2 },
+      UR: { tagComplexity: 4, battlefieldInfluence: 4, economyPressure: 2, scalingCeiling: 3, tacticalFlexibility: 3 },
+      PRIME: { tagComplexity: 5, battlefieldInfluence: 5, economyPressure: 2, scalingCeiling: 4, tacticalFlexibility: 3 },
+  });
+  const ROLE_BUDGET_MOD = Object.freeze({
+      tanker: { setupPenalty: 1, tacticalFlexibility: 1 },
+      warrior: { battlefieldInfluence: 1 },
+      assassin: { scalingCeiling: 1, consistencyPenalty: 1 },
+      mage: { battlefieldInfluence: 1, economyPressure: 1 },
+      support: { tacticalFlexibility: 1, economyPressure: 1, setupPenalty: 1 },
+      summoner: { tacticalFlexibility: 2, setupPenalty: 2, vanishRiskPenalty: 1 },
+      ranger: { consistencyPenalty: 1, scalingCeiling: 1 },
+  });
+  function clamp(value, min, max) {
+      if (!Number.isFinite(value)) {
+          return min;
+      }
+      return Math.max(min, Math.min(max, value));
+  }
+  function normalizeMetric(value, min, max) {
+      return Math.round(clamp(value ?? 0, min, max));
+  }
+  function normalizeBreakdown(input) {
+      const hasDivineNature = Boolean(input.hasDivineNature);
+      const divineBonus = hasDivineNature
+          ? 3 + normalizeMetric(input.divineSelfSustainBonus, SCORE_RANGES.divineSelfSustainBonus[0], SCORE_RANGES.divineSelfSustainBonus[1])
+          : 0;
+      const divinePenalty = hasDivineNature ? 3 : 0;
+      return {
+          tagComplexity: normalizeMetric(input.tagComplexity, SCORE_RANGES.tagComplexity[0], SCORE_RANGES.tagComplexity[1]),
+          battlefieldInfluence: normalizeMetric(input.battlefieldInfluence, SCORE_RANGES.battlefieldInfluence[0], SCORE_RANGES.battlefieldInfluence[1]),
+          economyPressure: normalizeMetric(input.economyPressure, SCORE_RANGES.economyPressure[0], SCORE_RANGES.economyPressure[1]),
+          scalingCeiling: normalizeMetric(input.scalingCeiling, SCORE_RANGES.scalingCeiling[0], SCORE_RANGES.scalingCeiling[1]),
+          tacticalFlexibility: normalizeMetric(input.tacticalFlexibility, SCORE_RANGES.tacticalFlexibility[0], SCORE_RANGES.tacticalFlexibility[1]),
+          setupPenalty: normalizeMetric(input.setupPenalty, SCORE_RANGES.setupPenalty[0], SCORE_RANGES.setupPenalty[1]),
+          selfRiskPenalty: normalizeMetric(input.selfRiskPenalty, SCORE_RANGES.selfRiskPenalty[0], SCORE_RANGES.selfRiskPenalty[1]),
+          vanishRiskPenalty: normalizeMetric(input.vanishRiskPenalty, SCORE_RANGES.vanishRiskPenalty[0], SCORE_RANGES.vanishRiskPenalty[1]),
+          consistencyPenalty: normalizeMetric(input.consistencyPenalty, SCORE_RANGES.consistencyPenalty[0], SCORE_RANGES.consistencyPenalty[1]),
+          divineBonus,
+          divinePenalty,
+      };
+  }
+  function addMetric(base, delta) {
+      return (base ?? 0) + (delta ?? 0);
+  }
+  function mergeBudgetInputs(...inputs) {
+      const merged = {};
+      for (const input of inputs) {
+          if (!input) {
+              continue;
+          }
+          merged.tagComplexity = addMetric(merged.tagComplexity, input.tagComplexity);
+          merged.battlefieldInfluence = addMetric(merged.battlefieldInfluence, input.battlefieldInfluence);
+          merged.economyPressure = addMetric(merged.economyPressure, input.economyPressure);
+          merged.scalingCeiling = addMetric(merged.scalingCeiling, input.scalingCeiling);
+          merged.tacticalFlexibility = addMetric(merged.tacticalFlexibility, input.tacticalFlexibility);
+          merged.setupPenalty = addMetric(merged.setupPenalty, input.setupPenalty);
+          merged.selfRiskPenalty = addMetric(merged.selfRiskPenalty, input.selfRiskPenalty);
+          merged.vanishRiskPenalty = addMetric(merged.vanishRiskPenalty, input.vanishRiskPenalty);
+          merged.consistencyPenalty = addMetric(merged.consistencyPenalty, input.consistencyPenalty);
+          if (input.hasDivineNature) {
+              merged.hasDivineNature = true;
+          }
+          merged.divineSelfSustainBonus = addMetric(merged.divineSelfSustainBonus, input.divineSelfSustainBonus);
+      }
+      return merged;
+  }
+  function deriveBudgetFromRankRole(rank, role) {
+      const rankKey = String(rank ?? '').trim().toUpperCase();
+      const roleKey = String(role ?? '').trim().toLowerCase();
+      return mergeBudgetInputs({ battlefieldInfluence: 1, tacticalFlexibility: 1 }, RANK_BUDGET_BASE[rankKey], ROLE_BUDGET_MOD[roleKey], rankKey === 'PRIME' ? { hasDivineNature: true } : null);
+  }
+  /**
+   * Cost budget core:
+   * - PowerScore = tổng nhóm điểm cộng.
+   * - RiskScore = tổng nhóm điểm trừ.
+   * - NetScore = PowerScore - RiskScore.
+   * - Cost = clamp(8, 22, round(14 + NetScore * 0.4)).
+   */
+  function evaluateCostBudget(input) {
+      const breakdown = normalizeBreakdown(input);
+      const powerScore = breakdown.tagComplexity
+          + breakdown.battlefieldInfluence
+          + breakdown.economyPressure
+          + breakdown.scalingCeiling
+          + breakdown.tacticalFlexibility
+          + breakdown.divineBonus;
+      const riskScore = breakdown.setupPenalty
+          + breakdown.selfRiskPenalty
+          + breakdown.vanishRiskPenalty
+          + breakdown.consistencyPenalty
+          + breakdown.divinePenalty;
+      const netScore = powerScore - riskScore;
+      const rawCost = 14 + netScore * 0.4;
+      const cost = Math.round(clamp(rawCost, COST_MIN, COST_MAX));
+      return {
+          powerScore,
+          riskScore,
+          netScore,
+          cost,
+          breakdown,
+      };
+  }
+  function estimateCostFromTags(tags) {
+      const normalizedTags = tags.map((tag) => String(tag).trim().toLowerCase());
+      const has = (...needles) => needles.some((needle) => normalizedTags.includes(needle));
+      const containsAny = (...needles) => needles.some((needle) => normalizedTags.some((tag) => tag.includes(needle)));
+      const input = {
+          tagComplexity: 0,
+          battlefieldInfluence: 1,
+          economyPressure: 0,
+          scalingCeiling: 0,
+          tacticalFlexibility: 1,
+          setupPenalty: 0,
+          selfRiskPenalty: 0,
+          vanishRiskPenalty: 0,
+          consistencyPenalty: 0,
+          hasDivineNature: containsAny('thần tính', 'divine'),
+      };
+      if (has('quy-tac') || containsAny('quy tắc')) {
+          input.tagComplexity = (input.tagComplexity ?? 0) + 3;
+          input.battlefieldInfluence = (input.battlefieldInfluence ?? 0) + 2;
+      }
+      if (has('phap-tac') || containsAny('pháp tắc')) {
+          input.tagComplexity = (input.tagComplexity ?? 0) + 2;
+          input.battlefieldInfluence = (input.battlefieldInfluence ?? 0) + 1;
+      }
+      if (has('tuyet-doi') || containsAny('tuyệt đối', 'absolute')) {
+          input.tagComplexity = (input.tagComplexity ?? 0) + 1;
+      }
+      if (containsAny('aoe', 'toàn sân', 'global')) {
+          input.battlefieldInfluence = (input.battlefieldInfluence ?? 0) + 2;
+      }
+      if (containsAny('buff', 'debuff', 'heal', 'shield', 'hồi')) {
+          input.tacticalFlexibility = (input.tacticalFlexibility ?? 0) + 1;
+      }
+      if (containsAny('summon', 'triệu hồi')) {
+          input.tacticalFlexibility = (input.tacticalFlexibility ?? 0) + 1;
+          input.setupPenalty = (input.setupPenalty ?? 0) + 1;
+      }
+      if (containsAny('cost', 'aether', 'nộ', 'energy', 'resource')) {
+          input.economyPressure = (input.economyPressure ?? 0) + 1;
+      }
+      if (containsAny('vĩnh viễn', 'stack', 'tiến hóa', 'evolve', 'evolution')) {
+          input.scalingCeiling = (input.scalingCeiling ?? 0) + 2;
+      }
+      if (containsAny('friendly fire', 'không phân địch ta', 'toàn bộ sinh vật', 'tự tổn thương', 'self-debuff', 'self debuff')) {
+          input.selfRiskPenalty = (input.selfRiskPenalty ?? 0) + 2;
+      }
+      if (containsAny('biến mất', 'removed', 'vanish', 'out trận')) {
+          input.vanishRiskPenalty = (input.vanishRiskPenalty ?? 0) + 2;
+      }
+      if (containsAny('ngẫu nhiên', 'random')) {
+          input.consistencyPenalty = (input.consistencyPenalty ?? 0) + 1;
+      }
+      return evaluateCostBudget(input);
+  }
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'COST_MIN')) exports.COST_MIN = COST_MIN;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'COST_MAX')) exports.COST_MAX = COST_MAX;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'mergeBudgetInputs')) exports.mergeBudgetInputs = mergeBudgetInputs;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'deriveBudgetFromRankRole')) exports.deriveBudgetFromRankRole = deriveBudgetFromRankRole;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'evaluateCostBudget')) exports.evaluateCostBudget = evaluateCostBudget;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'estimateCostFromTags')) exports.estimateCostFromTags = estimateCostFromTags;
 });
 __define('./data/economy.config.ts', (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/data/economy.config.ts
@@ -27530,31 +27714,48 @@ __define('./ui/rarity/rarity_tokens.json', (exports, module, __require) => {
   module.exports.default = data;
 });
 __define('./units.ts', (exports, module, __require) => {
+  //home (termux)/arclune_lane_7x3/src/units.ts
+  const __dep0 = __require('./data/cost-budget.ts');
+  const deriveBudgetFromRankRole = __dep0.deriveBudgetFromRankRole;
+  const evaluateCostBudget = __dep0.evaluateCostBudget;
+  const mergeBudgetInputs = __dep0.mergeBudgetInputs;
+  function resolveUnitCost(seed) {
+      const baseline = deriveBudgetFromRankRole(seed.rank, seed.role);
+      const mergedBudget = mergeBudgetInputs(baseline, seed.budget);
+      return evaluateCostBudget(mergedBudget).cost;
+  }
   const UNIT_LIST = [
-      { id: 'thien_luu', name: 'Thiên Lưu', cost: 17, rank: 'SSR', role: 'Ranger' },
-      { id: 'vu_thien', name: 'Vũ Thiên', cost: 17, rank: 'SSR', role: 'Warrior' },
-      { id: 'anna', name: 'Anna', cost: 17, rank: 'SSR', role: 'Support' },
-      { id: 'lao_khat_cai', name: 'Lão Khất Cái', cost: 12, rank: 'SR', role: 'Warrior' },
-      { id: 'ai_lan', name: 'Ái Lân', cost: 20, rank: 'SSR', role: 'Support' },
-      { id: 'faun', name: 'Faun', cost: 18, rank: 'SSR', role: 'Summoner' },
-      { id: 'basil_thorne', name: 'Basil Thorne', cost: 13, rank: 'SSR', role: 'Tanker' },
-      { id: 'mong_yem', name: 'Mộng Yểm', cost: 18, rank: 'SSR', role: 'Mage' },
-      { id: 'chan_nga', name: 'Chân Ngã', cost: 18, rank: 'UR', role: 'Summoner' },
-      { id: 'ma_ton_diep_lam', name: 'Ma Tôn - Diệp Lâm', cost: 19, rank: 'UR', role: 'Mage' },
-      { id: 'mo_da', name: 'Mộ Dạ', cost: 15, rank: 'SSR', role: 'Assassin' },
-      { id: 'ngao_binh', name: 'Ngao Bính', cost: 18, rank: 'UR', role: 'Warrior' },
-      { id: 'lau_khac_ma_chu', name: 'Lậu Khắc Ma Chủ', cost: 21, rank: 'Prime', role: 'Mage' },
-      { id: 'phe', name: 'Phệ', cost: 20, rank: 'UR', role: 'Mage' },
-      { id: 'kiemtruongda', name: 'Kiếm Trường Dạ', cost: 16, rank: 'UR', role: 'Warrior' },
-      { id: 'loithienanh', name: 'Lôi Thiên Ảnh', cost: 18, rank: 'SSR', role: 'Tanker' },
-      { id: 'laky', name: 'La Kỳ', cost: 14, rank: 'SSR', role: 'Support' },
-      { id: 'kydieu', name: 'Kỳ Diêu', cost: 12, rank: 'SSR', role: 'Support' },
-      { id: 'doanminh', name: 'Doãn Minh', cost: 12, rank: 'SR', role: 'Support' },
-      { id: 'tranquat', name: 'Trần Quát', cost: 10, rank: 'R', role: 'Summoner' },
-      { id: 'linhgac', name: 'Lính Gác', cost: 8, rank: 'N', role: 'Warrior' },
+      { id: 'thien_luu', name: 'Thiên Lưu', rank: 'SSR', role: 'Ranger' },
+      { id: 'vu_thien', name: 'Vũ Thiên', rank: 'SSR', role: 'Warrior' },
+      { id: 'anna', name: 'Anna', rank: 'SSR', role: 'Support' },
+      { id: 'lao_khat_cai', name: 'Lão Khất Cái', rank: 'SR', role: 'Warrior' },
+      { id: 'ai_lan', name: 'Ái Lân', rank: 'SSR', role: 'Support' },
+      { id: 'faun', name: 'Faun', rank: 'SSR', role: 'Summoner' },
+      { id: 'basil_thorne', name: 'Basil Thorne', rank: 'SSR', role: 'Tanker' },
+      { id: 'mong_yem', name: 'Mộng Yểm', rank: 'SSR', role: 'Mage' },
+      { id: 'chan_nga', name: 'Chân Ngã', rank: 'UR', role: 'Summoner' },
+      { id: 'ma_ton_diep_lam', name: 'Ma Tôn - Diệp Lâm', rank: 'UR', role: 'Mage' },
+      { id: 'mo_da', name: 'Mộ Dạ', rank: 'SSR', role: 'Assassin' },
+      { id: 'ngao_binh', name: 'Ngao Bính', rank: 'UR', role: 'Warrior' },
+      { id: 'lau_khac_ma_chu', name: 'Lậu Khắc Ma Chủ', rank: 'Prime', role: 'Mage' },
+      { id: 'phe', name: 'Phệ', rank: 'UR', role: 'Mage' },
+      { id: 'kiemtruongda', name: 'Kiếm Trường Dạ', rank: 'UR', role: 'Warrior' },
+      { id: 'loithienanh', name: 'Lôi Thiên Ảnh', rank: 'SSR', role: 'Tanker' },
+      { id: 'laky', name: 'La Kỳ', rank: 'SSR', role: 'Support' },
+      { id: 'kydieu', name: 'Kỳ Diêu', rank: 'SSR', role: 'Support' },
+      { id: 'doanminh', name: 'Doãn Minh', rank: 'SR', role: 'Support' },
+      { id: 'tranquat', name: 'Trần Quát', rank: 'R', role: 'Summoner' },
+      { id: 'linhgac', name: 'Lính Gác', rank: 'N', role: 'Warrior' },
   ];
-  const UNITS = UNIT_LIST;
-  const UNIT_INDEX_INTERNAL = new Map(UNIT_LIST.map((unit) => [unit.id, unit]));
+  const RESOLVED_UNIT_LIST = UNIT_LIST.map((unit) => ({
+      id: unit.id,
+      name: unit.name,
+      rank: unit.rank ?? null,
+      role: unit.role ?? null,
+      cost: resolveUnitCost(unit),
+  }));
+  const UNITS = RESOLVED_UNIT_LIST;
+  const UNIT_INDEX_INTERNAL = new Map(RESOLVED_UNIT_LIST.map((unit) => [unit.id, unit]));
   const UNIT_INDEX = UNIT_INDEX_INTERNAL;
   function lookupUnit(unitId) {
       const unit = UNIT_INDEX_INTERNAL.get(unitId);

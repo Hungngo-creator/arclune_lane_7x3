@@ -1,4 +1,10 @@
 //home (termux)/arclune_lane_7x3/src/units.ts
+import {
+  deriveBudgetFromRankRole,
+  evaluateCostBudget,
+  mergeBudgetInputs,
+  type CostBudgetInput,
+} from './data/cost-budget';
 import type { UnitId } from '@shared-types/units';
 
 export interface UnitDefinition {
@@ -9,34 +15,52 @@ export interface UnitDefinition {
   role?: string | null;
 }
 
-const UNIT_LIST = [
-  { id: 'thien_luu', name: 'Thiên Lưu', cost: 17, rank: 'SSR', role: 'Ranger' },
-  { id: 'vu_thien', name: 'Vũ Thiên', cost: 17, rank: 'SSR', role: 'Warrior' },
-  { id: 'anna', name: 'Anna', cost: 17, rank: 'SSR', role: 'Support' },
-  { id: 'lao_khat_cai', name: 'Lão Khất Cái', cost: 12, rank: 'SR', role: 'Warrior' },
-  { id: 'ai_lan', name: 'Ái Lân', cost: 20, rank: 'SSR', role: 'Support' },
-  { id: 'faun', name: 'Faun', cost: 18, rank: 'SSR', role: 'Summoner' },
-  { id: 'basil_thorne', name: 'Basil Thorne', cost: 13, rank: 'SSR', role: 'Tanker' },
-  { id: 'mong_yem', name: 'Mộng Yểm', cost: 18, rank: 'SSR', role: 'Mage' },
-  { id: 'chan_nga', name: 'Chân Ngã', cost: 18, rank: 'UR', role: 'Summoner' },
-  { id: 'ma_ton_diep_lam', name: 'Ma Tôn - Diệp Lâm', cost: 19, rank: 'UR', role: 'Mage' },
-  { id: 'mo_da', name: 'Mộ Dạ', cost: 15, rank: 'SSR', role: 'Assassin' },
-  { id: 'ngao_binh', name: 'Ngao Bính', cost: 18, rank: 'UR', role: 'Warrior' },
-  { id: 'lau_khac_ma_chu', name: 'Lậu Khắc Ma Chủ', cost: 21, rank: 'Prime', role: 'Mage' },
-  { id: 'phe', name: 'Phệ', cost: 20, rank: 'UR', role: 'Mage' },
-  { id: 'kiemtruongda', name: 'Kiếm Trường Dạ', cost: 16, rank: 'UR', role: 'Warrior' },
-  { id: 'loithienanh', name: 'Lôi Thiên Ảnh', cost: 18, rank: 'SSR', role: 'Tanker' },
-  { id: 'laky', name: 'La Kỳ', cost: 14, rank: 'SSR', role: 'Support' },
-  { id: 'kydieu', name: 'Kỳ Diêu', cost: 12, rank: 'SSR', role: 'Support' },
-  { id: 'doanminh', name: 'Doãn Minh', cost: 12, rank: 'SR', role: 'Support' },
-  { id: 'tranquat', name: 'Trần Quát', cost: 10, rank: 'R', role: 'Summoner' },
-  { id: 'linhgac', name: 'Lính Gác', cost: 8, rank: 'N', role: 'Warrior' },
-] satisfies ReadonlyArray<UnitDefinition>;
+interface UnitSeedDefinition extends Omit<UnitDefinition, 'cost'> {
+  budget?: CostBudgetInput;
+}
 
-export const UNITS: ReadonlyArray<UnitDefinition> = UNIT_LIST;
+function resolveUnitCost(seed: UnitSeedDefinition): number {
+  const baseline = deriveBudgetFromRankRole(seed.rank, seed.role);
+  const mergedBudget = mergeBudgetInputs(baseline, seed.budget);
+  return evaluateCostBudget(mergedBudget).cost;
+}
+
+const UNIT_LIST = [
+{ id: 'thien_luu', name: 'Thiên Lưu', rank: 'SSR', role: 'Ranger' },
+  { id: 'vu_thien', name: 'Vũ Thiên', rank: 'SSR', role: 'Warrior' },
+  { id: 'anna', name: 'Anna', rank: 'SSR', role: 'Support' },
+  { id: 'lao_khat_cai', name: 'Lão Khất Cái', rank: 'SR', role: 'Warrior' },
+  { id: 'ai_lan', name: 'Ái Lân', rank: 'SSR', role: 'Support' },
+  { id: 'faun', name: 'Faun', rank: 'SSR', role: 'Summoner' },
+  { id: 'basil_thorne', name: 'Basil Thorne', rank: 'SSR', role: 'Tanker' },
+  { id: 'mong_yem', name: 'Mộng Yểm', rank: 'SSR', role: 'Mage' },
+  { id: 'chan_nga', name: 'Chân Ngã', rank: 'UR', role: 'Summoner' },
+  { id: 'ma_ton_diep_lam', name: 'Ma Tôn - Diệp Lâm', rank: 'UR', role: 'Mage' },
+  { id: 'mo_da', name: 'Mộ Dạ', rank: 'SSR', role: 'Assassin' },
+  { id: 'ngao_binh', name: 'Ngao Bính', rank: 'UR', role: 'Warrior' },
+  { id: 'lau_khac_ma_chu', name: 'Lậu Khắc Ma Chủ', rank: 'Prime', role: 'Mage' },
+  { id: 'phe', name: 'Phệ', rank: 'UR', role: 'Mage' },
+  { id: 'kiemtruongda', name: 'Kiếm Trường Dạ', rank: 'UR', role: 'Warrior' },
+  { id: 'loithienanh', name: 'Lôi Thiên Ảnh', rank: 'SSR', role: 'Tanker' },
+  { id: 'laky', name: 'La Kỳ', rank: 'SSR', role: 'Support' },
+  { id: 'kydieu', name: 'Kỳ Diêu', rank: 'SSR', role: 'Support' },
+  { id: 'doanminh', name: 'Doãn Minh', rank: 'SR', role: 'Support' },
+  { id: 'tranquat', name: 'Trần Quát', rank: 'R', role: 'Summoner' },
+  { id: 'linhgac', name: 'Lính Gác', rank: 'N', role: 'Warrior' },
+] satisfies ReadonlyArray<UnitSeedDefinition>;
+
+const RESOLVED_UNIT_LIST = UNIT_LIST.map((unit) => ({
+  id: unit.id,
+  name: unit.name,
+  rank: unit.rank ?? null,
+  role: unit.role ?? null,
+  cost: resolveUnitCost(unit),
+})) satisfies ReadonlyArray<UnitDefinition>;
+
+export const UNITS: ReadonlyArray<UnitDefinition> = RESOLVED_UNIT_LIST;
 
 const UNIT_INDEX_INTERNAL = new Map<UnitId, UnitDefinition>(
-  UNIT_LIST.map((unit) => [unit.id, unit] as const),
+  RESOLVED_UNIT_LIST.map((unit) => [unit.id, unit] as const),
 );
 
 export const UNIT_INDEX: ReadonlyMap<UnitId, UnitDefinition> = UNIT_INDEX_INTERNAL;

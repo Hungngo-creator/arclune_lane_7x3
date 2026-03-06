@@ -1,0 +1,105 @@
+import {
+  COST_MAX,
+  COST_MIN,
+  deriveBudgetFromRankRole,
+  evaluateCostBudget,
+  estimateCostFromTags,
+  mergeBudgetInputs,
+} from '../src/data/cost-budget.ts';
+import { UNITS, resolveUnitCost } from '../src/units.ts';
+
+describe('cost budget evaluator', () => {
+  test('giữ trần cost trong [8..22]', () => {
+    const low = evaluateCostBudget({});
+    const high = evaluateCostBudget({
+      tagComplexity: 6,
+      battlefieldInfluence: 6,
+      economyPressure: 4,
+      scalingCeiling: 4,
+      tacticalFlexibility: 4,
+      hasDivineNature: true,
+      divineSelfSustainBonus: 2,
+    });
+
+    expect(low.cost).toBeGreaterThanOrEqual(COST_MIN);
+    expect(low.cost).toBeLessThanOrEqual(COST_MAX);
+    expect(high.cost).toBe(COST_MAX);
+  });
+
+  test('thần tính là dao 2 lưỡi: cộng ổn định và trừ hỗ trợ', () => {
+    const withoutDivine = evaluateCostBudget({
+      tagComplexity: 4,
+      battlefieldInfluence: 4,
+      tacticalFlexibility: 3,
+    });
+    const withDivine = evaluateCostBudget({
+      tagComplexity: 4,
+      battlefieldInfluence: 4,
+      tacticalFlexibility: 3,
+      hasDivineNature: true,
+    });
+
+    expect(withDivine.breakdown.divineBonus).toBe(3);
+    expect(withDivine.breakdown.divinePenalty).toBe(3);
+    expect(withDivine.netScore).toBe(withoutDivine.netScore);
+  });
+
+  test('phân tích tag hỗ trợ suy ra cost cho kit phức tạp', () => {
+    const result = estimateCostFromTags([
+      'Pháp Tắc',
+      'Quy Tắc',
+      'AOE',
+      'Buff/Debuff',
+      'Vĩnh viễn',
+      'Friendly Fire',
+      'Triệu hồi',
+    ]);
+
+    expect(result.cost).toBeGreaterThanOrEqual(16);
+    expect(result.netScore).toBeGreaterThanOrEqual(4);
+  });
+});
+
+describe('budget derivation defaults', () => {
+  test('rank/role cao cho cost cao hơn rank/role thấp', () => {
+    const nWarrior = evaluateCostBudget(deriveBudgetFromRankRole('N', 'Warrior'));
+    const urMage = evaluateCostBudget(deriveBudgetFromRankRole('UR', 'Mage'));
+
+    expect(urMage.cost).toBeGreaterThan(nWarrior.cost);
+  });
+
+  test('mergeBudgetInputs cộng dồn metric hợp lệ', () => {
+    const merged = mergeBudgetInputs(
+      { tagComplexity: 2, battlefieldInfluence: 2 },
+      { tagComplexity: 1, setupPenalty: 1 },
+      { hasDivineNature: true },
+    );
+
+    expect(merged.tagComplexity).toBe(3);
+    expect(merged.battlefieldInfluence).toBe(2);
+    expect(merged.setupPenalty).toBe(1);
+    expect(merged.hasDivineNature).toBe(true);
+  });
+});
+
+describe('resolveUnitCost and roster auto-cost', () => {
+  test('tự chấm cost dù unit không khai báo cost trực tiếp', () => {
+    const resolved = resolveUnitCost({
+      id: 'linhgac',
+      name: 'Lính Gác',
+      rank: 'N',
+      role: 'Warrior',
+    });
+
+    expect(resolved).toBeGreaterThanOrEqual(COST_MIN);
+    expect(resolved).toBeLessThanOrEqual(COST_MAX);
+  });
+
+  test('21 unit hiện có đều được auto-cost hợp lệ', () => {
+    expect(UNITS).toHaveLength(21);
+    for (const unit of UNITS) {
+      expect(unit.cost).toBeGreaterThanOrEqual(COST_MIN);
+      expect(unit.cost).toBeLessThanOrEqual(COST_MAX);
+    }
+  });
+});
