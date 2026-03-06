@@ -7,7 +7,6 @@ import type {
   SessionState,
   WaveState,
 } from '@shared-types/pve';
-import type { TurnSnapshot } from '@shared-types/turn-order';
 import type { GameEventHandler, GameEventType } from '../../events.ts';
 
 import {
@@ -30,7 +29,6 @@ import {
 
 type RewardList = ReadonlyArray<RewardRoll>;
 type MutableRewardList = RewardRoll[];
-type SessionWithTurn = SessionState & { turn?: TurnSnapshot | null | undefined };
 
 function isReward(entry: RewardRoll | null | undefined): entry is RewardRoll {
   return Boolean(entry && typeof entry.id === 'string');
@@ -68,7 +66,24 @@ function ensurePendingRewards(encounter: EncounterState): MutableRewardList {
   return sanitizeRewardList(encounter, 'pendingRewards');
 }
 
-function mergeRewardsInPlace(list: MutableRewardList, additions: RewardList): MutableRewardList {
+const SMALL_REWARD_MERGE_SIZE = 6;
+
+function mergeRewardsInPlaceLinear(list: MutableRewardList, additions: RewardList): MutableRewardList {
+  for (const reward of additions) {
+    let replaced = false;
+    for (let index = 0; index < list.length; index += 1) {
+      const existing = list[index];
+      if (!existing || existing.id !== reward.id) continue;
+      list[index] = reward;
+      replaced = true;
+      break;
+    }
+    if (!replaced) list.push(reward);
+  }
+  return list;
+}
+
+function mergeRewardsInPlaceIndexed(list: MutableRewardList, additions: RewardList): MutableRewardList {
   if (!additions.length) return list;
   const indexById = new Map<string, number>();
   for (let index = 0; index < list.length; index += 1) {
@@ -86,6 +101,13 @@ function mergeRewardsInPlace(list: MutableRewardList, additions: RewardList): Mu
     list[index] = reward;
   }
   return list;
+}
+
+function mergeRewardsInPlace(list: MutableRewardList, additions: RewardList): MutableRewardList {
+  if (!additions.length) return list;
+  const useLinearMerge = list.length <= SMALL_REWARD_MERGE_SIZE && additions.length <= SMALL_REWARD_MERGE_SIZE;
+  if (useLinearMerge) return mergeRewardsInPlaceLinear(list, additions);
+  return mergeRewardsInPlaceIndexed(list, additions);
 }
 
 function updateRuntimeRewards(runtime: SessionRuntimeState, additions: RewardList): RewardRoll[] {
@@ -115,11 +137,6 @@ function getWaveAt(value: unknown, index: number): WaveState | null {
   if (!Array.isArray(value)) return null;
   const wave = value[index];
   return wave ? (wave as WaveState) : null;
-}
-
-function getTurnSnapshot(session: SessionState | null | undefined): TurnSnapshot | null {
-  const turn = (session as SessionWithTurn | null | undefined)?.turn;
-  return turn ?? null;
 }
 
 export function advanceSession(session: SessionState | null | undefined): EncounterState | null {
@@ -177,9 +194,6 @@ export function advanceSession(session: SessionState | null | undefined): Encoun
     encounter.status = 'completed';
     runtime.wave = null;
   }
-
-  const currentTurn: TurnSnapshot | null = getTurnSnapshot(session);
-  void currentTurn;
 
   return encounter;
 }

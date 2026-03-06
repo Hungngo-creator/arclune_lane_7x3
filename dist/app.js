@@ -15815,7 +15815,24 @@ __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
   function ensurePendingRewards(encounter) {
       return sanitizeRewardList(encounter, 'pendingRewards');
   }
-  function mergeRewardsInPlace(list, additions) {
+  const SMALL_REWARD_MERGE_SIZE = 6;
+  function mergeRewardsInPlaceLinear(list, additions) {
+      for (const reward of additions) {
+          let replaced = false;
+          for (let index = 0; index < list.length; index += 1) {
+              const existing = list[index];
+              if (!existing || existing.id !== reward.id)
+                  continue;
+              list[index] = reward;
+              replaced = true;
+              break;
+          }
+          if (!replaced)
+              list.push(reward);
+      }
+      return list;
+  }
+  function mergeRewardsInPlaceIndexed(list, additions) {
       if (!additions.length)
           return list;
       const indexById = new Map();
@@ -15835,6 +15852,14 @@ __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
           list[index] = reward;
       }
       return list;
+  }
+  function mergeRewardsInPlace(list, additions) {
+      if (!additions.length)
+          return list;
+      const useLinearMerge = list.length <= SMALL_REWARD_MERGE_SIZE && additions.length <= SMALL_REWARD_MERGE_SIZE;
+      if (useLinearMerge)
+          return mergeRewardsInPlaceLinear(list, additions);
+      return mergeRewardsInPlaceIndexed(list, additions);
   }
   function updateRuntimeRewards(runtime, additions) {
       const queue = ensureRewardQueue(runtime);
@@ -15865,10 +15890,6 @@ __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
           return null;
       const wave = value[index];
       return wave ? wave : null;
-  }
-  function getTurnSnapshot(session) {
-      const turn = session?.turn;
-      return turn ?? null;
   }
   function advanceSession(session) {
       const runtime = session?.runtime;
@@ -15923,8 +15944,6 @@ __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
           encounter.status = 'completed';
           runtime.wave = null;
       }
-      const currentTurn = getTurnSnapshot(session);
-      void currentTurn;
       return encounter;
   }
   function applyReward(session, reward) {
