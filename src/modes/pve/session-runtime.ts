@@ -36,7 +36,12 @@ function isReward(entry: RewardRoll | null | undefined): entry is RewardRoll {
   return Boolean(entry && typeof entry.id === 'string');
 }
 
+function isRewardArray(value: unknown): value is MutableRewardList {
+  return Array.isArray(value) && value.every(isReward);
+}
+
 function normalizeRewardList(value: unknown): RewardList {
+  if (isRewardArray(value)) return value;
   if (!Array.isArray(value)) return [];
   return value.filter(isReward);
 }
@@ -46,7 +51,11 @@ function sanitizeRewardList<T extends SessionRuntimeState | EncounterState>(
   key: T extends SessionRuntimeState ? 'rewardQueue' : 'pendingRewards',
 ): MutableRewardList {
   const source = container[key as keyof T] as unknown;
-  const next = Array.isArray(source) ? source.filter(isReward) : [];
+  const next = isRewardArray(source)
+    ? source
+    : Array.isArray(source)
+      ? source.filter(isReward)
+      : [];
   (container as unknown as Record<string, unknown>)[key] = next;
   return next;
 }
@@ -121,9 +130,6 @@ export function advanceSession(session: SessionState | null | undefined): Encoun
     runtime.wave = null;
     return null;
   }
-
-  ensureRewardQueue(runtime);
-  ensurePendingRewards(encounter);
 
   const waves = encounter.waves;
   const waveCount = Array.isArray(waves) ? waves.length : 0;

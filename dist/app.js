@@ -15799,14 +15799,23 @@ __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
   function isReward(entry) {
       return Boolean(entry && typeof entry.id === 'string');
   }
+  function isRewardArray(value) {
+      return Array.isArray(value) && value.every(isReward);
+  }
   function normalizeRewardList(value) {
+      if (isRewardArray(value))
+          return value;
       if (!Array.isArray(value))
           return [];
       return value.filter(isReward);
   }
   function sanitizeRewardList(container, key) {
       const source = container[key];
-      const next = Array.isArray(source) ? source.filter(isReward) : [];
+      const next = isRewardArray(source)
+          ? source
+          : Array.isArray(source)
+              ? source.filter(isReward)
+              : [];
       container[key] = next;
       return next;
   }
@@ -15880,8 +15889,6 @@ __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
           runtime.wave = null;
           return null;
       }
-      ensureRewardQueue(runtime);
-      ensurePendingRewards(encounter);
       const waves = encounter.waves;
       const waveCount = Array.isArray(waves) ? waves.length : 0;
       const index = Math.max(0, encounter.waveIndex | 0);
