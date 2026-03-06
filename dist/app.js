@@ -5949,10 +5949,12 @@ __define('./data/cost-budget.ts', (exports, module, __require) => {
       const rank = normalizeRankKey(input.rank);
       const anchorCost = resolveRankAnchor(rank);
       const multiplier = resolveRankMultiplier(rank);
-      const plusScore = (input.hasRuleTag ? 3 : 0)
-          + (input.hasLawTag ? 2 : 0)
-          + (input.hasAbsoluteTag ? 1 : 0)
-          + (input.supportsAllyResource ? 1.5 : 0);
+      // Giảm 50% trọng số điểm cộng để hạ mặt bằng chung cost,
+      // giữ nguyên điểm trừ nhằm phản ánh rủi ro/điều kiện vận hành.
+      const plusScore = (input.hasRuleTag ? 1.5 : 0)
+          + (input.hasLawTag ? 1 : 0)
+          + (input.hasAbsoluteTag ? 0.5 : 0)
+          + (input.supportsAllyResource ? 0.75 : 0);
       const minusScore = (input.hasDivineNature ? 2 : 0)
           + (input.longSetup ? 1 : 0)
           + (input.hasFriendlyFireRisk ? 1.5 : 0)

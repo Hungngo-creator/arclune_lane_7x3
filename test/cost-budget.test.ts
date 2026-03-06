@@ -117,22 +117,23 @@ describe('summon cost neo logic', () => {
   test('SR Doãn Minh và Prime Thần Tính tạo chênh lệch cost hợp lý', () => {
     const comparison = simulateSummonCostComparison();
 
-    expect(comparison.doanMinh.finalCost).toBe(15);
-    expect(comparison.primeDivine.finalCost).toBe(22);
-    expect(comparison.costDelta).toBe(7);
+    expect(comparison.doanMinh.finalCost).toBe(13);
+    expect(comparison.primeDivine.finalCost).toBe(21);
+    expect(comparison.costDelta).toBe(8);
     expect(comparison.multiplierDelta).toBeCloseTo(0.6, 2);
   });
 
-  test('SR vượt 15 nhưng không có lõi Quy Tắc + Pháp Tắc thì bị ép về 15', () => {
+  test('SR chỉ vượt 15 khi có đủ lõi Quy Tắc + Pháp Tắc', () => {
     const result = evaluateSummonCost({
       rank: 'SR',
       hasRuleTag: true,
+      hasLawTag: true,
       hasAbsoluteTag: true,
       supportsAllyResource: true,
     });
 
-    expect(result.preClampCost).toBe(17.5);
-    expect(result.finalCost).toBe(15);
-    expect(result.needsSrRecheck).toBe(true);
+    expect(result.preClampCost).toBe(15.75);
+    expect(result.finalCost).toBe(16);
+    expect(result.needsSrRecheck).toBe(false);
   });
 });
