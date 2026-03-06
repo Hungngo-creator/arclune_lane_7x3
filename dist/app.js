@@ -12096,6 +12096,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   const ensureSceneCache = __dep24.ensureSceneCache;
   const clearBackgroundSignatureCache = __dep24.clearBackgroundSignatureCache;
   const normalizeDeckEntries = __dep24.normalizeDeckEntries;
+  const getPreferredDeckInput = __dep24.getPreferredDeckInput;
   const __dep25 = __require('./modes/pve/collection-mapper.ts');
   const mapUnitProgressById = __dep25.mapUnitProgressById;
   const __dep26 = __require('./modes/pve/creep-builder.ts');
@@ -15658,9 +15659,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       if (typeof cfg.modeKey !== 'undefined') {
           game.modeKey = typeof cfg.modeKey === 'string' ? cfg.modeKey : (cfg.modeKey || null);
       }
-      const preferredDeckInput = (Array.isArray(cfg.lineupDeck) && cfg.lineupDeck.length ? cfg.lineupDeck : null)
-          ?? (Array.isArray(cfg.playerDeck) && cfg.playerDeck.length ? cfg.playerDeck : null)
-          ?? (Array.isArray(cfg.deck) && cfg.deck.length ? cfg.deck : null);
+      const preferredDeckInput = getPreferredDeckInput(cfg);
       if (preferredDeckInput) {
           const deck = normalizeDeckEntries(preferredDeckInput);
           if (deck.length) {
@@ -15692,9 +15691,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   game.ai.unitsAll = enemyPool;
           }
           else {
-              const lineupInput = (Array.isArray(cfg.lineupDeck) && cfg.lineupDeck.length ? cfg.lineupDeck : null)
-                  ?? (Array.isArray(cfg.playerDeck) && cfg.playerDeck.length ? cfg.playerDeck : null)
-                  ?? (Array.isArray(cfg.deck) && cfg.deck.length ? cfg.deck : null);
+              const lineupInput = getPreferredDeckInput(cfg);
               const lineupDeck = normalizeDeckEntries(lineupInput ?? game.playerDeckLocked ?? game.unitsAll ?? []);
               const creeps = buildAICreepDeckFromLineup({
                   lineup: lineupDeck,
@@ -15999,6 +15996,18 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
           skinKey: art?.skinKey ?? null,
       };
   });
+  function hasDeckEntries(value) {
+      return Array.isArray(value) && value.length > 0;
+  }
+  function getPreferredDeckInput(config) {
+      if (hasDeckEntries(config.lineupDeck))
+          return config.lineupDeck;
+      if (hasDeckEntries(config.playerDeck))
+          return config.playerDeck;
+      if (hasDeckEntries(config.deck))
+          return config.deck;
+      return null;
+  }
   function getSceneConfig(cfg) {
       if (!cfg || typeof cfg !== 'object')
           return null;
@@ -16284,23 +16293,15 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
           ?? sceneCfg?.CURRENT_THEME
           ?? sceneCfg?.DEFAULT_THEME
           ?? null;
-      const preferredPlayerDeck = (Array.isArray(normalized.lineupDeck) && normalized.lineupDeck.length
-          ? normalized.lineupDeck
-          : null)
-          ?? (Array.isArray(normalized.playerDeck) && normalized.playerDeck.length
-              ? normalized.playerDeck
-              : null);
-      const modeDeck = Array.isArray(normalized.deck) && normalized.deck.length
-          ? normalized.deck
-          : null;
-      const lockedPlayerDeckSource = preferredPlayerDeck ?? modeDeck ?? DEFAULT_UNIT_ROSTER;
+      const preferredPlayerDeck = getPreferredDeckInput(normalized);
+      const lockedPlayerDeckSource = preferredPlayerDeck ?? DEFAULT_UNIT_ROSTER;
       const lockedPlayerDeck = normalizeDeckEntries(lockedPlayerDeckSource);
       const allyUnits = lockedPlayerDeck.length
           ? Array.from(lockedPlayerDeck)
           : Array.from(DEFAULT_UNIT_ROSTER);
       const unitProgressById = mapUnitProgressById(normalized.collectionState ?? null);
       const enemyPreset = normalized.aiPreset ?? null;
-      const lineupSource = preferredPlayerDeck ?? modeDeck ?? [];
+      const lineupSource = preferredPlayerDeck ?? [];
       const lineupForAICreeps = normalizeDeckEntries(lineupSource);
       const enemyUnits = Array.isArray(enemyPreset?.deck) && enemyPreset.deck.length
           ? Array.from(enemyPreset.deck)
@@ -16570,6 +16571,7 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
       return normalized;
   }
   //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getPreferredDeckInput')) exports.getPreferredDeckInput = getPreferredDeckInput;
   if (!Object.prototype.hasOwnProperty.call(exports, 'clearBackgroundSignatureCache')) exports.clearBackgroundSignatureCache = clearBackgroundSignatureCache;
   if (!Object.prototype.hasOwnProperty.call(exports, 'computeBackgroundSignature')) exports.computeBackgroundSignature = computeBackgroundSignature;
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeConfig')) exports.normalizeConfig = normalizeConfig;

@@ -67,6 +67,7 @@ import {
   ensureSceneCache,
   clearBackgroundSignatureCache,
   normalizeDeckEntries,
+  getPreferredDeckInput,
 } from './session-state';
 import { mapUnitProgressById } from './collection-mapper.ts';
 import { buildAICreepDeckFromLineup } from './creep-builder.ts';
@@ -3881,10 +3882,7 @@ function applyConfigToRunningGame(cfg: NormalizedSessionConfig): void {
   if (typeof cfg.modeKey !== 'undefined'){
     game.modeKey = typeof cfg.modeKey === 'string' ? cfg.modeKey : (cfg.modeKey || null);
   }
-  const preferredDeckInput =
-    (Array.isArray(cfg.lineupDeck) && cfg.lineupDeck.length ? cfg.lineupDeck : null)
-    ?? (Array.isArray(cfg.playerDeck) && cfg.playerDeck.length ? cfg.playerDeck : null)
-    ?? (Array.isArray(cfg.deck) && cfg.deck.length ? cfg.deck : null);
+  const preferredDeckInput = getPreferredDeckInput(cfg);
   if (preferredDeckInput) {
     const deck = normalizeDeckEntries(preferredDeckInput);
     if (deck.length) {
@@ -3912,10 +3910,7 @@ function applyConfigToRunningGame(cfg: NormalizedSessionConfig): void {
       const enemyPool = normalizeDeckEntries(preset.unitsAll);
       if (enemyPool.length) game.ai.unitsAll = enemyPool;
     } else {
-      const lineupInput =
-        (Array.isArray(cfg.lineupDeck) && cfg.lineupDeck.length ? cfg.lineupDeck : null)
-        ?? (Array.isArray(cfg.playerDeck) && cfg.playerDeck.length ? cfg.playerDeck : null)
-        ?? (Array.isArray(cfg.deck) && cfg.deck.length ? cfg.deck : null);
+      const lineupInput = getPreferredDeckInput(cfg);
       const lineupDeck = normalizeDeckEntries(lineupInput ?? game.playerDeckLocked ?? game.unitsAll ?? []);
       const creeps = buildAICreepDeckFromLineup({
         lineup: lineupDeck,

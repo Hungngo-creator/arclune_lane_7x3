@@ -59,6 +59,21 @@ export type NormalizedSessionConfig = (CreateSessionOptions & {
   backgroundKey?: string;
 }) & Record<string, unknown>;
 
+function hasDeckEntries(value: unknown): value is ReadonlyArray<unknown> {
+  return Array.isArray(value) && value.length > 0;
+}
+
+export function getPreferredDeckInput(config: {
+  lineupDeck?: unknown;
+  playerDeck?: unknown;
+  deck?: unknown;
+}): ReadonlyArray<unknown> | null {
+  if (hasDeckEntries(config.lineupDeck)) return config.lineupDeck;
+  if (hasDeckEntries(config.playerDeck)) return config.playerDeck;
+  if (hasDeckEntries(config.deck)) return config.deck;
+  return null;
+}
+
 type TurnOrderEntry = { side: Side; slot: number };
 
 type BackgroundConfig = ReturnType<typeof getEnvironmentBackground>;
@@ -411,17 +426,8 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
     ?? sceneCfg?.DEFAULT_THEME
     ?? null;
 
-  const preferredPlayerDeck =
-    (Array.isArray(normalized.lineupDeck) && normalized.lineupDeck.length
-      ? normalized.lineupDeck
-      : null)
-    ?? (Array.isArray(normalized.playerDeck) && normalized.playerDeck.length
-      ? normalized.playerDeck
-      : null);
-  const modeDeck = Array.isArray(normalized.deck) && normalized.deck.length
-    ? normalized.deck
-    : null;
-  const lockedPlayerDeckSource = preferredPlayerDeck ?? modeDeck ?? DEFAULT_UNIT_ROSTER;
+  const preferredPlayerDeck = getPreferredDeckInput(normalized);
+  const lockedPlayerDeckSource = preferredPlayerDeck ?? DEFAULT_UNIT_ROSTER;
   const lockedPlayerDeck = normalizeDeckEntries(lockedPlayerDeckSource);
 
   const allyUnits: SessionState['unitsAll'] = lockedPlayerDeck.length
@@ -430,7 +436,7 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
 
   const unitProgressById = mapUnitProgressById(normalized.collectionState ?? null);
   const enemyPreset = normalized.aiPreset ?? null;
-  const lineupSource = preferredPlayerDeck ?? modeDeck ?? [];
+  const lineupSource = preferredPlayerDeck ?? [];
   const lineupForAICreeps = normalizeDeckEntries(lineupSource);
   const enemyUnits: SessionState['ai']['unitsAll'] =
     Array.isArray(enemyPreset?.deck) && enemyPreset.deck.length
