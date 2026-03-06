@@ -11861,9 +11861,10 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
       const normalized = value.trim().toUpperCase();
       return normalized;
   }
-  function collectRankStats(lineup) {
+  function sampleLineup(lineup, progressById) {
       const rankCounts = new Map();
       const rankByUnitId = new Map();
+      const progressProfiles = [];
       let totalRanked = 0;
       for (const entry of lineup) {
           const directRank = normalizeRank(entry.rank);
@@ -11878,8 +11879,17 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
               continue;
           rankCounts.set(rank, (rankCounts.get(rank) ?? 0) + 1);
           totalRanked += 1;
+          const progress = progressById.get(entry.id);
+          if (!progress)
+              continue;
+          progressProfiles.push({
+              level: typeof progress.level === 'number' ? progress.level : undefined,
+              realm: typeof progress.realm === 'number' ? progress.realm : undefined,
+              subRealm: typeof progress.subRealm === 'number' ? progress.subRealm : undefined,
+              className: typeof entry.class === 'string' && entry.class.trim() ? entry.class : undefined,
+          });
       }
-      return { rankCounts, totalRanked };
+      return { rankCounts, totalRanked, progressProfiles };
   }
   function compareRankDesc(left, right) {
       const leftScore = RANK_PRIORITY_SCORE.get(left) ?? 0;
@@ -11934,21 +11944,6 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
       ranked.sort(compareRankDesc);
       return ranked.slice(0, creepCount);
   }
-  function mapLineupProgress(lineup, progressById) {
-      const profiles = [];
-      for (const entry of lineup) {
-          const progress = progressById.get(entry.id);
-          if (!progress)
-              continue;
-          profiles.push({
-              level: typeof progress.level === 'number' ? progress.level : undefined,
-              realm: typeof progress.realm === 'number' ? progress.realm : undefined,
-              subRealm: typeof progress.subRealm === 'number' ? progress.subRealm : undefined,
-              className: typeof entry.class === 'string' && entry.class.trim() ? entry.class : undefined,
-          });
-      }
-      return profiles;
-  }
   function progressScore(profile) {
       const level = typeof profile.level === 'number' ? profile.level : 0;
       const realm = typeof profile.realm === 'number' ? profile.realm : 0;
@@ -11996,10 +11991,13 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
       const lineup = Array.isArray(params.lineup) ? params.lineup : [];
       const creepCount = CREEP_SLOT_ORDER.length;
       const progressById = params.progressById ?? mapUnitProgressById(params.collectionState ?? null);
-      const rankStats = collectRankStats(lineup);
-      const progressProfiles = mapLineupProgress(lineup, progressById);
+      const lineupSampling = sampleLineup(lineup, progressById);
+      const rankStats = {
+          rankCounts: lineupSampling.rankCounts,
+          totalRanked: lineupSampling.totalRanked,
+      };
       const allocatedRanks = allocateRanksForCreeps(rankStats, creepCount);
-      const allocatedProgress = allocateProgressForCreeps(progressProfiles, creepCount);
+      const allocatedProgress = allocateProgressForCreeps(lineupSampling.progressProfiles, creepCount);
       return CREEP_SLOT_ORDER.map((creep) => {
           const creepId = creep.id;
           const profile = allocatedProgress[creep.powerSlot] ?? {};

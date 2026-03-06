@@ -4,16 +4,17 @@ import { mapUnitProgressById } from './collection-mapper.ts';
 import type { PveDeckEntry } from '@shared-types/combat';
 import type { CollectionStateInput, RuntimeUnitProgress } from '@shared-types/pve';
 
-type RankStats = {
-  rankCounts: Map<string, number>;
-  totalRanked: number;
-};
-
 type ProgressProfile = {
   level?: number;
   realm?: number;
   subRealm?: number;
   className?: string;
+};
+
+type LineupSampling = {
+  rankCounts: Map<string, number>;
+  totalRanked: number;
+  progressProfiles: ProgressProfile[];
 };
 
 type CreepUnitBase = {
@@ -49,10 +50,15 @@ function normalizeRank(value: unknown): string | null {
   return normalized;
 }
 
-function collectRankStats(lineup: ReadonlyArray<PveDeckEntry>): RankStats {
+function sampleLineup(
+  lineup: ReadonlyArray<PveDeckEntry>,
+  progressById: ReadonlyMap<string, RuntimeUnitProgress>,
+): LineupSampling {
   const rankCounts = new Map<string, number>();
   const rankByUnitId = new Map<string, string | null>();
+  const progressProfiles: ProgressProfile[] = [];
   let totalRanked = 0;
+
   for (const entry of lineup) {
     const directRank = normalizeRank(entry.rank);
     const fallbackRank = rankByUnitId.has(entry.id)
@@ -65,8 +71,17 @@ function collectRankStats(lineup: ReadonlyArray<PveDeckEntry>): RankStats {
     if (!rank) continue;
     rankCounts.set(rank, (rankCounts.get(rank) ?? 0) + 1);
     totalRanked += 1;
+
+    const progress = progressById.get(entry.id);
+    if (!progress) continue;
+    progressProfiles.push({
+      level: typeof progress.level === 'number' ? progress.level : undefined,
+      realm: typeof progress.realm === 'number' ? progress.realm : undefined,
+      subRealm: typeof progress.subRealm === 'number' ? progress.subRealm : undefined,
+      className: typeof entry.class === 'string' && entry.class.trim() ? entry.class : undefined,
+    });
   }
-  return { rankCounts, totalRanked };
+  return { rankCounts, totalRanked, progressProfiles };
 }
 
 function compareRankDesc(left: string, right: string): number {
@@ -76,7 +91,7 @@ function compareRankDesc(left: string, right: string): number {
   return left.localeCompare(right);
 }
 
-function allocateRanksForCreeps(rankStats: RankStats, creepCount: number): string[] {
+function allocateRanksForCreeps(rankStats: Pick<LineupSampling, 'rankCounts' | 'totalRanked'>, creepCount: number): string[] {
   const entries = Array.from(rankStats.rankCounts.entries());
   if (!entries.length || rankStats.totalRanked <= 0) return [];
 
@@ -121,24 +136,6 @@ function allocateRanksForCreeps(rankStats: RankStats, creepCount: number): strin
   }
   ranked.sort(compareRankDesc);
   return ranked.slice(0, creepCount);
-}
-
-function mapLineupProgress(
-  lineup: ReadonlyArray<PveDeckEntry>,
-  progressById: ReadonlyMap<string, RuntimeUnitProgress>,
-): ProgressProfile[] {
-  const profiles: ProgressProfile[] = [];
-  for (const entry of lineup) {
-    const progress = progressById.get(entry.id);
-    if (!progress) continue;
-    profiles.push({
-      level: typeof progress.level === 'number' ? progress.level : undefined,
-      realm: typeof progress.realm === 'number' ? progress.realm : undefined,
-      subRealm: typeof progress.subRealm === 'number' ? progress.subRealm : undefined,
-      className: typeof entry.class === 'string' && entry.class.trim() ? entry.class : undefined,
-    });
-  }
-  return profiles;
 }
 
 function progressScore(profile: ProgressProfile): number {
@@ -199,15 +196,18 @@ export function buildAICreepDeckFromLineup(params: {
   const lineup = Array.isArray(params.lineup) ? params.lineup : [];
   const creepCount = CREEP_SLOT_ORDER.length;
   const progressById = params.progressById ?? mapUnitProgressById(params.collectionState ?? null);
-  const rankStats = collectRankStats(lineup);
-  const progressProfiles = mapLineupProgress(lineup, progressById);
+  const lineupSampling = sampleLineup(lineup, progressById);
+  const rankStats = {
+    rankCounts: lineupSampling.rankCounts,
+    totalRanked: lineupSampling.totalRanked,
+  };
   const allocatedRanks = allocateRanksForCreeps(rankStats, creepCount);
-  const allocatedProgress = allocateProgressForCreeps(progressProfiles, creepCount);
+  const allocatedProgress = allocateProgressForCreeps(lineupSampling.progressProfiles, creepCount);
 
   return CREEP_SLOT_ORDER.map((creep) => {
     const creepId = creep.id;
     const profile = allocatedProgress[creep.powerSlot] ?? {};
     const rank = allocatedRanks[creep.powerSlot] ?? null;
-      return toCreepDeckEntry({ creepId, profile, rank });
+    return toCreepDeckEntry({ creepId, profile, rank });
   });
 }
