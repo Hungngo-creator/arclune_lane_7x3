@@ -41,22 +41,22 @@ function normalizeRewardList(value: unknown): RewardList {
   return value.filter(isReward);
 }
 
+function sanitizeRewardList<T extends SessionRuntimeState | EncounterState>(
+  container: T,
+  key: T extends SessionRuntimeState ? 'rewardQueue' : 'pendingRewards',
+): MutableRewardList {
+  const source = container[key as keyof T] as unknown;
+  const next = Array.isArray(source) ? source.filter(isReward) : [];
+  (container as unknown as Record<string, unknown>)[key] = next;
+  return next;
+}
+
 function ensureRewardQueue(runtime: SessionRuntimeState): MutableRewardList {
-  if (Array.isArray(runtime.rewardQueue)) {
-    runtime.rewardQueue = runtime.rewardQueue.filter(isReward);
-  } else {
-    runtime.rewardQueue = [];
-  }
-  return runtime.rewardQueue;
+  return sanitizeRewardList(runtime, 'rewardQueue');
 }
 
 function ensurePendingRewards(encounter: EncounterState): MutableRewardList {
-  if (Array.isArray(encounter.pendingRewards)) {
-    encounter.pendingRewards = encounter.pendingRewards.filter(isReward);
-  } else {
-    encounter.pendingRewards = [];
-  }
-  return encounter.pendingRewards;
+  return sanitizeRewardList(encounter, 'pendingRewards');
 }
 
 function mergeRewards(existing: RewardList, additions: RewardList): RewardRoll[] {
@@ -87,6 +87,19 @@ function updateEncounterRewards(encounter: EncounterState, additions: RewardList
   const merged = mergeRewards(pending, additions);
   encounter.pendingRewards = merged;
   return merged;
+}
+
+function removeRewardById(list: MutableRewardList, rewardId: string): MutableRewardList {
+  if (!list.length) return list;
+  let writeIndex = 0;
+  for (let readIndex = 0; readIndex < list.length; readIndex += 1) {
+    const entry = list[readIndex];
+    if (!entry || entry.id === rewardId) continue;
+    if (writeIndex !== readIndex) list[writeIndex] = entry;
+    writeIndex += 1;
+  }
+  if (writeIndex < list.length) list.length = writeIndex;
+  return list;
 }
 
 function toWaveList(value: unknown): ReadonlyArray<WaveState> {
@@ -170,12 +183,10 @@ export function applyReward(
   if (!session?.runtime) return null;
   if (!isReward(reward)) return null;
   const runtime = session.runtime;
-  const queue = ensureRewardQueue(runtime);
-  runtime.rewardQueue = queue.filter((entry) => entry.id !== reward.id);
+  removeRewardById(ensureRewardQueue(runtime), reward.id);
   const encounter = runtime.encounter;
   if (encounter) {
-    const pending = ensurePendingRewards(encounter);
-    encounter.pendingRewards = pending.filter((entry) => entry.id !== reward.id);
+    removeRewardById(ensurePendingRewards(encounter), reward.id);
   }
   return reward;
 }

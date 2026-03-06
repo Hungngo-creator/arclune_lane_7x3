@@ -15792,23 +15792,17 @@ __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
           return [];
       return value.filter(isReward);
   }
+  function sanitizeRewardList(container, key) {
+      const source = container[key];
+      const next = Array.isArray(source) ? source.filter(isReward) : [];
+      container[key] = next;
+      return next;
+  }
   function ensureRewardQueue(runtime) {
-      if (Array.isArray(runtime.rewardQueue)) {
-          runtime.rewardQueue = runtime.rewardQueue.filter(isReward);
-      }
-      else {
-          runtime.rewardQueue = [];
-      }
-      return runtime.rewardQueue;
+      return sanitizeRewardList(runtime, 'rewardQueue');
   }
   function ensurePendingRewards(encounter) {
-      if (Array.isArray(encounter.pendingRewards)) {
-          encounter.pendingRewards = encounter.pendingRewards.filter(isReward);
-      }
-      else {
-          encounter.pendingRewards = [];
-      }
-      return encounter.pendingRewards;
+      return sanitizeRewardList(encounter, 'pendingRewards');
   }
   function mergeRewards(existing, additions) {
       if (!existing.length && !additions.length)
@@ -15838,6 +15832,22 @@ __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
       const merged = mergeRewards(pending, additions);
       encounter.pendingRewards = merged;
       return merged;
+  }
+  function removeRewardById(list, rewardId) {
+      if (!list.length)
+          return list;
+      let writeIndex = 0;
+      for (let readIndex = 0; readIndex < list.length; readIndex += 1) {
+          const entry = list[readIndex];
+          if (!entry || entry.id === rewardId)
+              continue;
+          if (writeIndex !== readIndex)
+              list[writeIndex] = entry;
+          writeIndex += 1;
+      }
+      if (writeIndex < list.length)
+          list.length = writeIndex;
+      return list;
   }
   function toWaveList(value) {
       if (!Array.isArray(value))
@@ -15912,12 +15922,10 @@ __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
       if (!isReward(reward))
           return null;
       const runtime = session.runtime;
-      const queue = ensureRewardQueue(runtime);
-      runtime.rewardQueue = queue.filter((entry) => entry.id !== reward.id);
+      removeRewardById(ensureRewardQueue(runtime), reward.id);
       const encounter = runtime.encounter;
       if (encounter) {
-          const pending = ensurePendingRewards(encounter);
-          encounter.pendingRewards = pending.filter((entry) => entry.id !== reward.id);
+          removeRewardById(ensurePendingRewards(encounter), reward.id);
       }
       return reward;
   }
