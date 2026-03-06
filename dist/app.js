@@ -11845,6 +11845,16 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
   ];
   const RANK_PRIORITY = ['N', 'R', 'SR', 'SSR', 'UR', 'PRIME'];
   const RANK_PRIORITY_SCORE = new Map(RANK_PRIORITY.map((rank, index) => [rank, index + 1]));
+  const CREEP_UNIT_BASE = new Map(CREEP_SLOT_ORDER.map(({ id }) => {
+      const unitDef = lookupUnit(id);
+      return [
+          id,
+          {
+              name: unitDef?.name ?? id,
+              cost: Number.isFinite(unitDef?.cost) ? Number(unitDef?.cost) : 0,
+          },
+      ];
+  }));
   function normalizeRank(value) {
       if (typeof value !== 'string' || !value.trim())
           return null;
@@ -11853,9 +11863,17 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
   }
   function collectRankStats(lineup) {
       const rankCounts = new Map();
+      const rankByUnitId = new Map();
       let totalRanked = 0;
       for (const entry of lineup) {
-          const rank = normalizeRank(entry.rank) ?? normalizeRank(lookupUnit(entry.id)?.rank);
+          const directRank = normalizeRank(entry.rank);
+          const fallbackRank = rankByUnitId.has(entry.id)
+              ? rankByUnitId.get(entry.id) ?? null
+              : normalizeRank(lookupUnit(entry.id)?.rank);
+          if (!rankByUnitId.has(entry.id)) {
+              rankByUnitId.set(entry.id, fallbackRank);
+          }
+          const rank = directRank ?? fallbackRank;
           if (!rank)
               continue;
           rankCounts.set(rank, (rankCounts.get(rank) ?? 0) + 1);
@@ -11947,12 +11965,6 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
       }
       return output;
   }
-  function collectLineupSignals(params) {
-      return {
-          rankStats: collectRankStats(params.lineup),
-          progressProfiles: mapLineupProgress(params.lineup, params.progressById),
-      };
-  }
   function clampInteger(value, min) {
       if (typeof value !== 'number' || !Number.isFinite(value))
           return null;
@@ -11960,7 +11972,7 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
   }
   function toCreepDeckEntry(params) {
       const { creepId, profile, rank } = params;
-      const unitDef = lookupUnit(creepId);
+      const unitBase = CREEP_UNIT_BASE.get(creepId) ?? { name: creepId, cost: 0 };
       const level = clampInteger(profile.level, 1);
       const realm = clampInteger(profile.realm, 0);
       const subRealm = clampInteger(profile.subRealm, 0);
@@ -11969,8 +11981,8 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
           : null;
       return {
           id: creepId,
-          name: unitDef?.name ?? creepId,
-          cost: Number.isFinite(unitDef?.cost) ? Number(unitDef?.cost) : 0,
+          name: unitBase.name,
+          cost: unitBase.cost,
           dynamicRankSource: 'lineup',
           dynamicLevelSource: 'lineup',
           ...(rank ? { rank } : {}),
@@ -11984,9 +11996,10 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
       const lineup = Array.isArray(params.lineup) ? params.lineup : [];
       const creepCount = CREEP_SLOT_ORDER.length;
       const progressById = params.progressById ?? mapUnitProgressById(params.collectionState ?? null);
-      const lineupSignals = collectLineupSignals({ lineup, progressById });
-      const allocatedRanks = allocateRanksForCreeps(lineupSignals.rankStats, creepCount);
-      const allocatedProgress = allocateProgressForCreeps(lineupSignals.progressProfiles, creepCount);
+      const rankStats = collectRankStats(lineup);
+      const progressProfiles = mapLineupProgress(lineup, progressById);
+      const allocatedRanks = allocateRanksForCreeps(rankStats, creepCount);
+      const allocatedProgress = allocateProgressForCreeps(progressProfiles, creepCount);
       return CREEP_SLOT_ORDER.map((creep) => {
           const creepId = creep.id;
           const profile = allocatedProgress[creep.powerSlot] ?? {};
