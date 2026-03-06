@@ -2,6 +2,7 @@
 
 import { CFG } from './config.ts';
 import { ensureSpriteLoaded, projectCellOblique } from './engine.ts';
+import { stableStringify } from './utils/format.ts';
 
 import type {
   BackgroundConfig,
@@ -247,32 +248,6 @@ function getBackgroundConfigMap(): Map<string, BackgroundDefinitionConfig> {
   }
   BACKGROUND_CONFIG_MAP = map;
   return map;
-}
-
-function stableStringify(value: unknown, seen: WeakSet<object> = new WeakSet()): string {
-  if (value === null) return 'null';
-  const type = typeof value;
-  if (type === 'undefined') return 'undefined';
-  if (type === 'number' || type === 'boolean' || type === 'bigint') return String(value);
-  if (type === 'string') return JSON.stringify(value);
-  if (type === 'symbol') return value?.toString() ?? '[symbol]';
-  if (type === 'function') {
-    const func = value as { name?: string };
-    return `[Function:${func.name || 'anonymous'}]`;
-  }
-  if (Array.isArray(value)) {
-    return `[${value.map((entry) => stableStringify(entry, seen)).join(',')}]`;
-  }
-  if (type === 'object') {
-    const objectValue = value as Record<string | number | symbol, unknown>;
-    if (seen.has(objectValue)) return '"[Circular]"';
-    seen.add(objectValue);
-    const keys = Object.keys(objectValue).sort();
-    const entries = keys.map((key) => `${JSON.stringify(key)}:${stableStringify(objectValue[key], seen)}`);
-    seen.delete(objectValue);
-    return `{${entries.join(',')}}`;
-  }
-  return String(value);
 }
 
 function computePropsSignature(props: ReadonlyArray<BackgroundPropConfig> | null | undefined): string {

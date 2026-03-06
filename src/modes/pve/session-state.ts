@@ -25,6 +25,7 @@ import { Statuses } from '../../statuses.ts';
 import { getUnitArt } from '../../art.ts';
 import { normalizeUnitId } from '../../utils/unit-id.ts';
 import { createRngState } from '../../utils/rng.ts';
+import { stableStringify } from '../../utils/format.ts';
 import { mapUnitProgressById } from './collection-mapper.ts';
 import { buildAICreepDeckFromLineup } from './creep-builder.ts';
 
@@ -203,29 +204,6 @@ export interface EnsureSceneCacheArgs {
 
 const backgroundSignatureCache = new Map<string, BackgroundCacheEntry>();
 let sceneCache: SceneCacheEntry | null = null;
-
-function stableStringify(value: unknown, seen: WeakSet<object> = new WeakSet()): string {
-  if (value === null) return 'null';
-  const type = typeof value;
-  if (type === 'undefined') return 'undefined';
-  if (type === 'number' || type === 'boolean' || type === 'bigint') return String(value);
-  if (type === 'string') return JSON.stringify(value);
-  if (type === 'symbol') return (value as symbol).toString();
-  if (type === 'function') return `[Function:${(value as { name?: string }).name || 'anonymous'}]`;
-  if (Array.isArray(value)) {
-    return `[${value.map((entry) => stableStringify(entry, seen)).join(',')}]`;
-  }
-  if (type === 'object') {
-    const objectValue = value as Record<string | number | symbol, unknown>;
-    if (seen.has(objectValue)) return '"[Circular]"';
-    seen.add(objectValue);
-    const keys = Object.keys(objectValue).sort();
-    const entries = keys.map((key) => `${JSON.stringify(key)}:${stableStringify(objectValue[key], seen)}`);
-    seen.delete(objectValue);
-    return `{${entries.join(',')}}`;
-  }
-  return String(value);
-}
 
 function normalizeBackgroundCacheKey(backgroundKey: string | null | undefined): string {
   return `key:${backgroundKey ?? '__no-key__'}`;

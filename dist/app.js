@@ -1859,6 +1859,8 @@ __define('./background.ts', (exports, module, __require) => {
   const __dep1 = __require('./engine.ts');
   const ensureSpriteLoaded = __dep1.ensureSpriteLoaded;
   const projectCellOblique = __dep1.projectCellOblique;
+  const __dep2 = __require('./utils/format.ts');
+  const stableStringify = __dep2.stableStringify;
   const ENVIRONMENT_SPRITE_CACHE = new Map();
   function ensureEnvironmentSprite(asset) {
       if (!asset)
@@ -2014,37 +2016,6 @@ __define('./background.ts', (exports, module, __require) => {
       }
       BACKGROUND_CONFIG_MAP = map;
       return map;
-  }
-  function stableStringify(value, seen = new WeakSet()) {
-      if (value === null)
-          return 'null';
-      const type = typeof value;
-      if (type === 'undefined')
-          return 'undefined';
-      if (type === 'number' || type === 'boolean' || type === 'bigint')
-          return String(value);
-      if (type === 'string')
-          return JSON.stringify(value);
-      if (type === 'symbol')
-          return value?.toString() ?? '[symbol]';
-      if (type === 'function') {
-          const func = value;
-          return `[Function:${func.name || 'anonymous'}]`;
-      }
-      if (Array.isArray(value)) {
-          return `[${value.map((entry) => stableStringify(entry, seen)).join(',')}]`;
-      }
-      if (type === 'object') {
-          const objectValue = value;
-          if (seen.has(objectValue))
-              return '"[Circular]"';
-          seen.add(objectValue);
-          const keys = Object.keys(objectValue).sort();
-          const entries = keys.map((key) => `${JSON.stringify(key)}:${stableStringify(objectValue[key], seen)}`);
-          seen.delete(objectValue);
-          return `{${entries.join(',')}}`;
-      }
-      return String(value);
   }
   function computePropsSignature(props) {
       if (!props || !props.length)
@@ -15998,10 +15969,12 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
   const normalizeUnitId = __dep10.normalizeUnitId;
   const __dep11 = __require('./utils/rng.ts');
   const createRngState = __dep11.createRngState;
-  const __dep12 = __require('./modes/pve/collection-mapper.ts');
-  const mapUnitProgressById = __dep12.mapUnitProgressById;
-  const __dep13 = __require('./modes/pve/creep-builder.ts');
-  const buildAICreepDeckFromLineup = __dep13.buildAICreepDeckFromLineup;
+  const __dep12 = __require('./utils/format.ts');
+  const stableStringify = __dep12.stableStringify;
+  const __dep13 = __require('./modes/pve/collection-mapper.ts');
+  const mapUnitProgressById = __dep13.mapUnitProgressById;
+  const __dep14 = __require('./modes/pve/creep-builder.ts');
+  const buildAICreepDeckFromLineup = __dep14.buildAICreepDeckFromLineup;
   void Statuses;
   const DEFAULT_UNIT_ROSTER = UNITS.map((unit) => {
       const unitId = normalizeUnitId(unit.id);
@@ -16106,35 +16079,6 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
   }
   const backgroundSignatureCache = new Map();
   let sceneCache = null;
-  function stableStringify(value, seen = new WeakSet()) {
-      if (value === null)
-          return 'null';
-      const type = typeof value;
-      if (type === 'undefined')
-          return 'undefined';
-      if (type === 'number' || type === 'boolean' || type === 'bigint')
-          return String(value);
-      if (type === 'string')
-          return JSON.stringify(value);
-      if (type === 'symbol')
-          return value.toString();
-      if (type === 'function')
-          return `[Function:${value.name || 'anonymous'}]`;
-      if (Array.isArray(value)) {
-          return `[${value.map((entry) => stableStringify(entry, seen)).join(',')}]`;
-      }
-      if (type === 'object') {
-          const objectValue = value;
-          if (seen.has(objectValue))
-              return '"[Circular]"';
-          seen.add(objectValue);
-          const keys = Object.keys(objectValue).sort();
-          const entries = keys.map((key) => `${JSON.stringify(key)}:${stableStringify(objectValue[key], seen)}`);
-          seen.delete(objectValue);
-          return `{${entries.join(',')}}`;
-      }
-      return String(value);
-  }
   function normalizeBackgroundCacheKey(backgroundKey) {
       return `key:${backgroundKey ?? '__no-key__'}`;
   }
@@ -27659,6 +27603,35 @@ __define('./utils/dummy.ts', (exports, module, __require) => {
 __define('./utils/format.ts', (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/utils/format.ts
   const HAS_INTL_NUMBER_FORMAT = typeof Intl === 'object' && typeof Intl.NumberFormat === 'function';
+  function stableStringify(value, seen = new WeakSet()) {
+      if (value === null)
+          return 'null';
+      const type = typeof value;
+      if (type === 'undefined')
+          return 'undefined';
+      if (type === 'number' || type === 'boolean' || type === 'bigint')
+          return String(value);
+      if (type === 'string')
+          return JSON.stringify(value);
+      if (type === 'symbol')
+          return value.toString();
+      if (type === 'function')
+          return `[Function:${value.name || 'anonymous'}]`;
+      if (Array.isArray(value)) {
+          return `[${value.map((entry) => stableStringify(entry, seen)).join(',')}]`;
+      }
+      if (type === 'object') {
+          const objectValue = value;
+          if (seen.has(objectValue))
+              return '"[Circular]"';
+          seen.add(objectValue);
+          const keys = Object.keys(objectValue).sort();
+          const entries = keys.map((key) => `${JSON.stringify(key)}:${stableStringify(objectValue[key], seen)}`);
+          seen.delete(objectValue);
+          return `{${entries.join(',')}}`;
+      }
+      return String(value);
+  }
   function createNumberFormatter(locale, options) {
       if (HAS_INTL_NUMBER_FORMAT) {
           return new Intl.NumberFormat(locale, options);
@@ -27694,6 +27667,7 @@ __define('./utils/format.ts', (exports, module, __require) => {
   }
   exports.HAS_INTL_NUMBER_FORMAT = HAS_INTL_NUMBER_FORMAT;
   //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'stableStringify')) exports.stableStringify = stableStringify;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createNumberFormatter')) exports.createNumberFormatter = createNumberFormatter;
 });
 __define('./utils/fury.ts', (exports, module, __require) => {
