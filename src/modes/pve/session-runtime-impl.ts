@@ -68,9 +68,9 @@ import {
   clearBackgroundSignatureCache,
   normalizeDeckEntries,
   getPreferredDeckInput,
+  resolveEnemyUnits,
 } from './session-state';
 import { mapUnitProgressById } from './collection-mapper.ts';
-import { buildAICreepDeckFromLineup } from './creep-builder.ts';
 import {
   ensureUyenState,
   getUyenUltChoice,
@@ -3904,21 +3904,16 @@ function applyConfigToRunningGame(cfg: NormalizedSessionConfig): void {
   }
   if (cfg.aiPreset){
     const preset: EnemyAIPreset = cfg.aiPreset || {};
-    if (Array.isArray(preset.deck) && preset.deck.length){
-      const enemyDeck = normalizeDeckEntries(preset.deck);
-      if (enemyDeck.length) game.ai.unitsAll = enemyDeck;
-    } else if (Array.isArray(preset.unitsAll) && preset.unitsAll.length){
-      const enemyPool = normalizeDeckEntries(preset.unitsAll);
-      if (enemyPool.length) game.ai.unitsAll = enemyPool;
-    } else {
-      const lineupInput = getPreferredDeckInput(cfg);
-      const lineupDeck = normalizeDeckEntries(lineupInput ?? game.playerDeckLocked ?? game.unitsAll ?? []);
-      const creeps = buildAICreepDeckFromLineup({
-        lineup: lineupDeck,
-        ...(collectionProgressById ? { progressById: collectionProgressById } : { collectionState: cfg.collectionState ?? null }),
-      });
-      if (creeps.length) game.ai.unitsAll = creeps;
-    }
+    const lineupInput = getPreferredDeckInput(cfg);
+    const enemyUnits = resolveEnemyUnits({
+      aiPreset: preset,
+      preferredDeck: lineupInput,
+      fallbackDeck: game.playerDeckLocked ?? game.unitsAll ?? [],
+      ...(collectionProgressById
+        ? { unitProgressById: collectionProgressById }
+        : { collectionState: cfg.collectionState ?? null }),
+    });
+    if (enemyUnits.length) game.ai.unitsAll = enemyUnits;
     const parsedCostCap = toPositiveOrNull(preset.costCap);
     if (parsedCostCap !== null) game.ai.costCap = parsedCostCap;
     const parsedSummonLimit = toPositiveOrNull(preset.summonLimit);

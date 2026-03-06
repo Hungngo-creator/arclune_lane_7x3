@@ -12109,17 +12109,16 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   const clearBackgroundSignatureCache = __dep24.clearBackgroundSignatureCache;
   const normalizeDeckEntries = __dep24.normalizeDeckEntries;
   const getPreferredDeckInput = __dep24.getPreferredDeckInput;
+  const resolveEnemyUnits = __dep24.resolveEnemyUnits;
   const __dep25 = __require('./modes/pve/collection-mapper.ts');
   const mapUnitProgressById = __dep25.mapUnitProgressById;
-  const __dep26 = __require('./modes/pve/creep-builder.ts');
-  const buildAICreepDeckFromLineup = __dep26.buildAICreepDeckFromLineup;
-  const __dep27 = __require('./leader-uyen.ts');
-  const ensureUyenState = __dep27.ensureUyenState;
-  const getUyenUltChoice = __dep27.getUyenUltChoice;
-  const grantUyenSummonRage = __dep27.grantUyenSummonRage;
-  const isLeaderUltReady = __dep27.isLeaderUltReady;
-  const isUyenLeader = __dep27.isUyenLeader;
-  const queueUyenUltCast = __dep27.queueUyenUltCast;
+  const __dep26 = __require('./leader-uyen.ts');
+  const ensureUyenState = __dep26.ensureUyenState;
+  const getUyenUltChoice = __dep26.getUyenUltChoice;
+  const grantUyenSummonRage = __dep26.grantUyenSummonRage;
+  const isLeaderUltReady = __dep26.isLeaderUltReady;
+  const isUyenLeader = __dep26.isUyenLeader;
+  const queueUyenUltCast = __dep26.queueUyenUltCast;
   const isPlainRecord = (value) => (!!value && typeof value === 'object');
   const isFiniteNumber = (value) => (typeof value === 'number' && Number.isFinite(value));
   const parseFiniteNumber = (value) => {
@@ -15693,26 +15692,17 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       }
       if (cfg.aiPreset) {
           const preset = cfg.aiPreset || {};
-          if (Array.isArray(preset.deck) && preset.deck.length) {
-              const enemyDeck = normalizeDeckEntries(preset.deck);
-              if (enemyDeck.length)
-                  game.ai.unitsAll = enemyDeck;
-          }
-          else if (Array.isArray(preset.unitsAll) && preset.unitsAll.length) {
-              const enemyPool = normalizeDeckEntries(preset.unitsAll);
-              if (enemyPool.length)
-                  game.ai.unitsAll = enemyPool;
-          }
-          else {
-              const lineupInput = getPreferredDeckInput(cfg);
-              const lineupDeck = normalizeDeckEntries(lineupInput ?? game.playerDeckLocked ?? game.unitsAll ?? []);
-              const creeps = buildAICreepDeckFromLineup({
-                  lineup: lineupDeck,
-                  ...(collectionProgressById ? { progressById: collectionProgressById } : { collectionState: cfg.collectionState ?? null }),
-              });
-              if (creeps.length)
-                  game.ai.unitsAll = creeps;
-          }
+          const lineupInput = getPreferredDeckInput(cfg);
+          const enemyUnits = resolveEnemyUnits({
+              aiPreset: preset,
+              preferredDeck: lineupInput,
+              fallbackDeck: game.playerDeckLocked ?? game.unitsAll ?? [],
+              ...(collectionProgressById
+                  ? { unitProgressById: collectionProgressById }
+                  : { collectionState: cfg.collectionState ?? null }),
+          });
+          if (enemyUnits.length)
+              game.ai.unitsAll = enemyUnits;
           const parsedCostCap = toPositiveOrNull(preset.costCap);
           if (parsedCostCap !== null)
               game.ai.costCap = parsedCostCap;
@@ -16087,6 +16077,24 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
           lastDecision: null,
       };
   }
+  function resolveEnemyUnits(options) {
+      const preset = options.aiPreset ?? null;
+      if (Array.isArray(preset?.deck) && preset.deck.length) {
+          return normalizeDeckEntries(preset.deck);
+      }
+      if (Array.isArray(preset?.unitsAll) && preset.unitsAll.length) {
+          return normalizeDeckEntries(preset.unitsAll);
+      }
+      const lineupDeck = normalizeDeckEntries(options.preferredDeck
+          ?? options.fallbackDeck
+          ?? []);
+      const progressById = options.unitProgressById
+          ?? mapUnitProgressById(options.collectionState ?? null);
+      return buildAICreepDeckFromLineup({
+          lineup: lineupDeck,
+          progressById,
+      });
+  }
   function buildBaseState(params) {
       return {
           modeKey: params.modeKey,
@@ -16331,16 +16339,12 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
           : Array.from(DEFAULT_UNIT_ROSTER);
       const unitProgressById = mapUnitProgressById(normalized.collectionState ?? null);
       const enemyPreset = normalized.aiPreset ?? null;
-      const lineupSource = preferredPlayerDeck ?? [];
-      const lineupForAICreeps = normalizeDeckEntries(lineupSource);
-      const enemyUnits = Array.isArray(enemyPreset?.deck) && enemyPreset.deck.length
-          ? Array.from(enemyPreset.deck)
-          : Array.isArray(enemyPreset?.unitsAll) && enemyPreset.unitsAll.length
-              ? Array.from(enemyPreset.unitsAll)
-              : buildAICreepDeckFromLineup({
-                  lineup: lineupForAICreeps,
-                  progressById: unitProgressById,
-              });
+      const enemyUnits = resolveEnemyUnits({
+          aiPreset: enemyPreset,
+          preferredDeck: preferredPlayerDeck,
+          unitProgressById,
+          collectionState: normalized.collectionState ?? null,
+      });
       const requestedTurnMode = normalized.turnMode
           ?? normalized.turn?.mode
           ?? normalized.turnOrderMode
@@ -16602,6 +16606,7 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'getPreferredDeckInput')) exports.getPreferredDeckInput = getPreferredDeckInput;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resolveEnemyUnits')) exports.resolveEnemyUnits = resolveEnemyUnits;
   if (!Object.prototype.hasOwnProperty.call(exports, 'clearBackgroundSignatureCache')) exports.clearBackgroundSignatureCache = clearBackgroundSignatureCache;
   if (!Object.prototype.hasOwnProperty.call(exports, 'computeBackgroundSignature')) exports.computeBackgroundSignature = computeBackgroundSignature;
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeConfig')) exports.normalizeConfig = normalizeConfig;

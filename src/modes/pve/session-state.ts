@@ -112,6 +112,14 @@ interface BuildAiStateParams {
   defaultSummonLimit: number;
 }
 
+interface ResolveEnemyUnitsOptions {
+  aiPreset?: CreateSessionOptions['aiPreset'] | null;
+  preferredDeck?: ReadonlyArray<unknown> | null;
+  fallbackDeck?: ReadonlyArray<unknown> | null;
+  unitProgressById?: ReadonlyMap<string, RuntimeUnitProgress> | null;
+  collectionState?: CreateSessionOptions['collectionState'] | null;
+}
+
 function normalizePositiveLimit(value: unknown, fallback: number): number {
   if (Number.isFinite(value)) {
     const numeric = Number(value);
@@ -137,6 +145,29 @@ function buildAiState(params: BuildAiStateParams): SessionState['ai'] {
     lastThinkMs: 0,
     lastDecision: null,
   };
+}
+
+export function resolveEnemyUnits(options: ResolveEnemyUnitsOptions): SessionState['ai']['unitsAll'] {
+  const preset = options.aiPreset ?? null;
+  if (Array.isArray(preset?.deck) && preset.deck.length) {
+    return normalizeDeckEntries(preset.deck);
+  }
+  if (Array.isArray(preset?.unitsAll) && preset.unitsAll.length) {
+    return normalizeDeckEntries(preset.unitsAll);
+  }
+
+  const lineupDeck = normalizeDeckEntries(
+    options.preferredDeck
+    ?? options.fallbackDeck
+    ?? [],
+  );
+  const progressById = options.unitProgressById
+    ?? mapUnitProgressById(options.collectionState ?? null);
+
+  return buildAICreepDeckFromLineup({
+    lineup: lineupDeck,
+    progressById,
+  });
 }
 
 interface BuildBaseStateParams {
@@ -436,17 +467,12 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
 
   const unitProgressById = mapUnitProgressById(normalized.collectionState ?? null);
   const enemyPreset = normalized.aiPreset ?? null;
-  const lineupSource = preferredPlayerDeck ?? [];
-  const lineupForAICreeps = normalizeDeckEntries(lineupSource);
-  const enemyUnits: SessionState['ai']['unitsAll'] =
-    Array.isArray(enemyPreset?.deck) && enemyPreset.deck.length
-      ? Array.from(enemyPreset.deck)
-      : Array.isArray(enemyPreset?.unitsAll) && enemyPreset.unitsAll.length
-        ? Array.from(enemyPreset.unitsAll)
-        : buildAICreepDeckFromLineup({
-          lineup: lineupForAICreeps,
-          progressById: unitProgressById,
-        });
+  const enemyUnits = resolveEnemyUnits({
+    aiPreset: enemyPreset,
+    preferredDeck: preferredPlayerDeck,
+    unitProgressById,
+    collectionState: normalized.collectionState ?? null,
+  });
 
   const requestedTurnMode = normalized.turnMode
     ?? normalized.turn?.mode
