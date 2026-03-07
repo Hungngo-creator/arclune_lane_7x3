@@ -3,6 +3,7 @@
 import { getSkillSet } from '../../../data/skills.ts';
 import { createNumberFormatter } from '../../../utils/format.ts';
 import { normalizeUnitId } from '../../../utils/unit-id.ts';
+import { normalizeElementKey } from '../../../utils/domain-normalization.ts';
 import { patchPlayerProfile } from '../../../utils/player-profile.ts';
 import {
   createNormalizedWallet,
@@ -41,6 +42,19 @@ import type { LineupDefinition, RosterEntryLite } from '@shared-types/lineup';
 
 const STYLE_ID = 'lineup-view-style-v1';
 const powerFormatter = createNumberFormatter('vi-VN');
+
+const ELEMENT_ICON: Readonly<Record<string, string>> = {
+  fire: '🔥', metal: '⚙️', wood: '🌿', earth: '⛰️', lightning: '⚡', blood: '🩸', water: '💧',
+  light: '✨', dark: '🌑', wind: '🌪️', neutral: '⚪',
+};
+
+function renderRoleElementIcons(unit: RosterUnit): string {
+  const raw = unit.raw as Record<string, unknown> | null;
+  const element = normalizeElementKey(raw?.base_element ?? raw?.element) ?? 'neutral';
+  const classIcon = unit.role ? '🏷️' : '';
+  const elementIcon = ELEMENT_ICON[element] ?? '⚪';
+  return [classIcon, elementIcon].filter(Boolean).join(' ');
+}
 
 function ensureStyles(): void{
   const css = `
@@ -1052,7 +1066,8 @@ function updateActiveCellHighlight(): void{
       if (unit.role || unit.rank){
         const tag = document.createElement('p');
         tag.className = 'lineup-roster__tag';
-        tag.textContent = [unit.role, unit.rank].filter(Boolean).join(' · ');
+        const marker = renderRoleElementIcons(unit);
+        tag.textContent = [marker, unit.role, unit.rank].filter(Boolean).join(' · ');
         meta.appendChild(tag);
       }
       if (unit.power != null){

@@ -254,8 +254,10 @@ export function spawnQueuedIfDue(
     ?? normalizeClassName(meta?.class)
     ?? undefined;
   const normalizedElement = normalizeElementKey((p as unknown as Record<string, unknown>).element)
+  ?? normalizeElementKey((p as unknown as Record<string, unknown>).base_element)
+    ?? normalizeElementKey((meta as Record<string, unknown> | null)?.base_element)
     ?? normalizeElementKey((meta as Record<string, unknown> | null)?.element)
-    ?? undefined;
+    ?? 'neutral';
   const obj: UnitToken = {
     id: p.unitId,
     name: p.name ?? undefined,
@@ -268,7 +270,7 @@ export function spawnQueuedIfDue(
     statuses: [],
     baseStats,
     class: normalizedClass,
-    ...(normalizedElement ? { element: normalizedElement } : {}),
+    element: normalizedElement,
   };
 
   if (sideLower === 'enemy' && fromDeck && isPveCreepId(p.unitId)) {

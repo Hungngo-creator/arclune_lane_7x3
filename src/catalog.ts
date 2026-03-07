@@ -109,7 +109,7 @@ export function applyRankAndMods(
 //  - kit.traits.summon / kit.ult.summon đánh dấu Summoner -> kích hoạt Immediate Summon (action-chain).
 export const ROSTER = [
   {
-    id: 'thien_luu', name: 'Thiên Lưu', class: 'Ranger', rank: 'SSR',
+    id: 'thien_luu', name: 'Thiên Lưu', class: 'Ranger', rank: 'SSR',  base_element: 'wind',
     mods: { ATK: 0.08, PER: 0.08, SPD: 0.08 },
     kit: {
       onSpawn: createOnSpawn({ weatherState: 'clear' }),
@@ -347,7 +347,7 @@ export const ROSTER = [
     }
   },
   {
-    id: 'ma_ton_diep_lam', name: 'Ma Tôn - Diệp Lâm', class: 'Mage', rank: 'UR',
+    id: 'ma_ton_diep_lam', name: 'Ma Tôn - Diệp Lâm', class: 'Mage', rank: 'UR',  base_element: 'blood',
     mods: { WIL: 0.12, AEmax: 0.08 },
     kit: {
       onSpawn: createOnSpawn({ bonusSPDPercent: 0.10 }),
@@ -507,7 +507,7 @@ export const ROSTER = [
     }
   },
   {
-    id: 'anna', name: 'Anna', class: 'Support', rank: 'SSR',
+    id: 'anna', name: 'Anna', class: 'Support', rank: 'SSR',  base_element: 'light',
     mods: { HP: 0.08, WIL: 0.06, AEmax: 0.05 },
     kit: {
       onSpawn: createOnSpawn(),
@@ -1314,7 +1314,7 @@ export const ROSTER = [
     }
   },
   {
-    id: 'loithienanh', name: 'Lôi Thiên Ảnh', class: 'Tanker', rank: 'SSR',
+    id: 'loithienanh', name: 'Lôi Thiên Ảnh', class: 'Tanker', rank: 'SSR',  base_element: 'lightning',
     mods: { RES: 0.10, WIL: 0.10 },
     kit: {
       onSpawn: createOnSpawn(),

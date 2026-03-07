@@ -9,6 +9,7 @@ const ELEMENT_KEYS = [
   'light',
   'dark',
   'wind',
+  'neutral',
 ] as const;
 
 export type ElementKey = typeof ELEMENT_KEYS[number];
@@ -44,6 +45,11 @@ const ELEMENT_ALIAS_MAP: Readonly<Record<string, ElementKey>> = {
   ám: 'dark',
   wind: 'wind',
   phong: 'wind',
+  neutral: 'neutral',
+  vohe: 'neutral',
+  'vo-he': 'neutral',
+  vo: 'neutral',
+  none: 'neutral',
 };
 
 const CLASS_NAME_MAP = {

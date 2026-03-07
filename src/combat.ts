@@ -15,6 +15,7 @@ import { ABSOLUTE_ATTACK_TAG_IDS, ABSOLUTE_SHIELD_TAG_IDS } from './data/tags.ts
 import { applyUyenBasicExtras } from './leader-uyen.ts';
 import { nextRngValue } from './utils/rng.ts';
 import { normalizeClassName } from './utils/domain-normalization.ts';
+import { getCounterBonusMetadata } from './combat/counter-matrix.ts';
 
 export { applyDamage, grantShield };
 
@@ -37,6 +38,7 @@ export interface AbilityDamageOptions {
   elementBonus?: number;
   synergyBonus?: number;
   damageBreakdown?: Partial<DamageBreakdownMetadata>;
+  skill?: unknown;
   [extra: string]: unknown;
 }
 
@@ -330,6 +332,8 @@ export function dealAbilityDamage(
   const effectiveArm = Math.max(0, (target.arm ?? 0) * (1 - combinedPen));
   const effectiveRes = Math.max(0, (target.res ?? 0) * (1 - combinedPen));
   const defMultiplier = (physWeight * (100 / (100 + effectiveArm))) + (arcWeight * (100 / (100 + effectiveRes)));
+  const sideUnits = Game?.tokens?.filter((token) => token.side === attacker.side && token.alive) ?? [];
+  const counterMetadata = getCounterBonusMetadata(attacker, target, sideUnits, { skill: opts.skill });
 
   const atkAbsolute = hasAbsoluteLawTag(attacker, 'attack');
   const shieldAbsolute = hasAbsoluteLawTag(target, 'shield');
@@ -340,11 +344,11 @@ export function dealAbilityDamage(
 
   const rawDamage = Math.max(0, Math.floor((pre.base * skillMulti + realmBonus) * pre.outMul));
   const bonusBreakdown = {
-    classBonus: toFinite(opts.classBonus ?? opts.damageBreakdown?.classBonus, 0),
-    elementBonus: toFinite(opts.elementBonus ?? opts.damageBreakdown?.elementBonus, 0),
-    synergyBonus: toFinite(opts.synergyBonus ?? opts.damageBreakdown?.synergyBonus, 0),
+    classBonus: toFinite(opts.classBonus ?? opts.damageBreakdown?.classBonus, counterMetadata.classBonus),
+    elementBonus: toFinite(opts.elementBonus ?? opts.damageBreakdown?.elementBonus, counterMetadata.elementBonus),
+    synergyBonus: toFinite(opts.synergyBonus ?? opts.damageBreakdown?.synergyBonus, counterMetadata.synergyBonus),
   };
-  const finalDamage = calculateFinalDamage(attacker, target, rawDamage, {
+  const finalDamage = calculateFinalDamage(attacker, target, opts.skill, rawDamage, {
     ignoreAll: pre.ignoreAll || shieldWinsLaw,
     defenseMultiplier: defMultiplier,
     reductionMultiplier: pre.inMul,
@@ -423,7 +427,8 @@ export function dealAbilityDamage(
 
   if (sessionVfx) {
     try {
-      vfxAddHit(sessionVfx, target);
+      const hasAdvantage = (finalDamage.breakdown.classBonus + finalDamage.breakdown.elementBonus + finalDamage.breakdown.synergyBonus) > 0;
+      vfxAddHit(sessionVfx, target, { isCrit: !!opts.isCrit, advantage: hasAdvantage });
     } catch {
       // bỏ qua lỗi VFX runtime
     }

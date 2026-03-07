@@ -1,4 +1,4 @@
-import { normalizeClassName, normalizeElementKey } from '../utils/domain-normalization.ts';
+import { normalizeClassName, normalizeElementKey, type ElementKey } from '../utils/domain-normalization.ts';
 
 const ELEMENT_CYCLE = ['fire', 'metal', 'wood', 'earth', 'lightning', 'blood', 'water'] as const;
 const ELEMENT_BONUS = 0.1;
@@ -21,16 +21,59 @@ const asRecord = (value: unknown): Record<string, unknown> | null => {
   return value as Record<string, unknown>;
 };
 
-const readElement = (value: unknown): ReturnType<typeof normalizeElementKey> => {
-  const direct = normalizeElementKey(value);
-  if (direct) return direct;
-  const record = asRecord(value);
+const readRecordElement = (record: Record<string, unknown> | null): ElementKey | null => {
   if (!record) return null;
   return (
-    normalizeElementKey(record.element)
+    normalizeElementKey(record.base_element)
+    ?? normalizeElementKey(record.baseElement)
+    ?? normalizeElementKey(record.element)
+    ?? normalizeElementKey(record.nguyen_to)
+    ?? normalizeElementKey(record.nguyenTo)
+    ?? normalizeElementKey(record.he)
+    ?? normalizeElementKey(asRecord(record.metadata)?.base_element)
+    ?? normalizeElementKey(asRecord(record.metadata)?.baseElement)
     ?? normalizeElementKey(asRecord(record.metadata)?.element)
+    ?? normalizeElementKey(asRecord(record.meta)?.base_element)
+    ?? normalizeElementKey(asRecord(record.meta)?.baseElement)
+    ?? normalizeElementKey(asRecord(record.meta)?.element)
     ?? null
   );
+};
+
+const readBaseElement = (value: unknown): ElementKey => {
+  const direct = normalizeElementKey(value);
+  if (direct) return direct;
+  return readRecordElement(asRecord(value)) ?? 'neutral';
+};
+
+const readSkillElement = (skill: unknown): ElementKey | null => {
+  const record = asRecord(skill);
+  if (!record) return normalizeElementKey(skill);
+
+  const fromField = (
+    normalizeElementKey(record.element)
+    ?? normalizeElementKey(record.skill_element)
+    ?? normalizeElementKey(record.skillElement)
+    ?? normalizeElementKey(asRecord(record.metadata)?.element)
+    ?? normalizeElementKey(asRecord(record.meta)?.element)
+    ?? normalizeElementKey(asRecord(record.payload)?.element)
+  );
+  if (fromField) return fromField;
+
+  const tags = [record.tags, asRecord(record.metadata)?.tags, asRecord(record.meta)?.tags]
+    .find((entry) => Array.isArray(entry));
+  if (!Array.isArray(tags)) return null;
+
+  for (const tag of tags) {
+    if (typeof tag !== 'string') continue;
+    const trimmed = tag.trim().toLowerCase();
+    const direct = normalizeElementKey(trimmed);
+    if (direct) return direct;
+    const prefixed = normalizeElementKey(trimmed.replace(/^element[:_-]/, ''));
+    if (prefixed) return prefixed;
+  }
+
+  return null;
 };
 
 const readClass = (value: unknown): ReturnType<typeof normalizeClassName> => {
@@ -47,10 +90,18 @@ const readClass = (value: unknown): ReturnType<typeof normalizeClassName> => {
   );
 };
 
+export function resolveAttackerElement(attacker: unknown, skill?: unknown): ElementKey {
+  return readSkillElement(skill) ?? readBaseElement(attacker);
+}
+
+export function resolveDefenderElement(defender: unknown): ElementKey {
+  return readBaseElement(defender);
+}
+
 export function getElementBonus(attackerElement: unknown, defenderElement: unknown): number {
-  const attacker = readElement(attackerElement);
-  const defender = readElement(defenderElement);
-  if (!attacker || !defender) return 0;
+  const attacker = readBaseElement(attackerElement);
+  const defender = readBaseElement(defenderElement);
+  if (attacker === 'neutral' || defender === 'neutral') return 0;
 
   if ((attacker === 'light' && defender === 'dark') || (attacker === 'dark' && defender === 'light')) {
     return ELEMENT_BONUS;
@@ -74,12 +125,13 @@ export function getClassBonus(attackerClass: unknown, defenderClass: unknown): n
 }
 
 export type SynergyContext = {
+  skill?: unknown;
   canApplyBurn?: boolean | null;
   synergyMode?: 'damage' | 'burn' | 'auto' | null;
 };
 
-export function getSynergyBonus(attacker: unknown, sideUnits: unknown, _context?: SynergyContext | null): number {
-  const attackerElement = readElement(attacker);
+export function getSynergyBonus(attacker: unknown, sideUnits: unknown, context?: SynergyContext | null): number {
+  const attackerElement = resolveAttackerElement(attacker, context?.skill);
   if (attackerElement !== 'fire') return 0;
 
   const lineup = Array.isArray(sideUnits) ? sideUnits : [];
@@ -88,7 +140,10 @@ export function getSynergyBonus(attacker: unknown, sideUnits: unknown, _context?
   let hasWind = false;
   let hasFire = false;
   for (const unit of lineup) {
-    const element = readElement(unit);
+    const unitRecord = asRecord(unit);
+    const alive = unitRecord?.alive;
+    if (alive === false) continue;
+    const element = readBaseElement(unit);
     if (element === 'wind') hasWind = true;
     if (element === 'fire') hasFire = true;
     if (hasWind && hasFire) return SYNERGY_BONUS;
@@ -111,7 +166,9 @@ export function getCounterBonusMetadata(
   context?: SynergyContext | null,
 ): CounterBonusMetadata {
   const classBonus = getClassBonus(attacker, defender);
-  const elementBonus = getElementBonus(attacker, defender);
+  const attackerElement = resolveAttackerElement(attacker, context?.skill);
+  const defenderElement = resolveDefenderElement(defender);
+  const elementBonus = getElementBonus(attackerElement, defenderElement);
   const synergyBonus = getSynergyBonus(attacker, sideUnits, context);
 
   return {

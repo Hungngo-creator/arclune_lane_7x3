@@ -34,6 +34,31 @@ describe('counter matrix', () => {
     expect(getElementBonus('wind', 'dark')).toBe(0);
   });
 
+  test('neutral never triggers elemental advantage on either side', () => {
+    expect(getElementBonus('neutral', 'fire')).toBe(0);
+    expect(getElementBonus('fire', 'neutral')).toBe(0);
+    expect(getElementBonus({ element: 'neutral' }, { element: 'metal' })).toBe(0);
+  });
+
+  test('attacker uses skill element first, then base element fallback', () => {
+    const attacker = { element: 'water' };
+    const defender = { element: 'metal' };
+    const sideUnits = [{ element: 'wind', alive: true }, { element: 'fire', alive: true }];
+
+    const withSkill = getCounterBonusMetadata(attacker, defender, sideUnits, { skill: { tags: ['element:fire'] } });
+    expect(withSkill.classBonus).toBe(0);
+    expect(withSkill.elementBonus).toBeCloseTo(0.1, 8);
+    expect(withSkill.synergyBonus).toBeCloseTo(0.05, 8);
+    expect(withSkill.totalBonus).toBeCloseTo(0.15, 8);
+
+    expect(getCounterBonusMetadata(attacker, defender, sideUnits, { skill: { tags: ['unknown-tag'] } })).toEqual({
+      classBonus: 0,
+      elementBonus: 0,
+      synergyBonus: 0,
+      totalBonus: 0,
+    });
+  });
+
   test('class matrix applies +10% and +5% correctly', () => {
     const topTier: Array<[string, string]> = [
       ['Assassin', 'Mage'],

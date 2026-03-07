@@ -1,5 +1,7 @@
 import { ensureStyleTag, mountSection } from '../../ui/dom.ts';
 import { CAMPAIGN_STAGE_DATA, resolveBossName } from '../../data/campaign-stages.ts';
+import { getMetaById } from '../../catalog.ts';
+import { normalizeElementKey } from '../../utils/domain-normalization.ts';
 
 import type { MainMenuShell } from '../main-menu/types.ts';
 import type { CampaignStageDefinition } from '../../data/campaign-stages.ts';
@@ -75,6 +77,25 @@ interface CampaignLocation {
   lore: string;
   terrainHint: string;
   stages: CampaignStageDefinition[];
+}
+
+const ELEMENT_ICON: Readonly<Record<string, string>> = {
+  fire: '🔥', metal: '⚙️', wood: '🌿', earth: '⛰️', lightning: '⚡', blood: '🩸', water: '💧',
+  light: '✨', dark: '🌑', wind: '🌪️', neutral: '⚪',
+};
+
+const CLASS_ICON: Readonly<Record<string, string>> = {
+  Assassin: '🗡️', Mage: '🪄', Tanker: '🛡️', Warrior: '⚔️', Ranger: '🏹', Summoner: '📜', Support: '💠',
+};
+
+function bossInfoChips(bossId: string): string {
+  const meta = getMetaById(bossId);
+  const className = typeof meta?.class === 'string' ? meta.class : 'Unknown';
+  const elementKey = normalizeElementKey((meta as Record<string, unknown> | null)?.base_element ?? (meta as Record<string, unknown> | null)?.element) ?? 'neutral';
+  const elementLabel = elementKey.charAt(0).toUpperCase() + elementKey.slice(1);
+  const classIcon = CLASS_ICON[className] ?? '❔';
+  const elementIcon = ELEMENT_ICON[elementKey] ?? '⚪';
+  return `<div class="icon-row"><span class="icon-chip" data-tip="Class: ${className}">${classIcon}</span><span class="icon-chip" data-tip="Lò Hạch: ${elementLabel}">${elementIcon}</span></div>`;
 }
 
 function bossPortraitPath(unitId: string): string {
@@ -182,6 +203,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
         <div>
           <h2 class="campaign-boss__title">${selectedStage.id} · ${selectedStage.title}</h2>
           <div class="campaign-boss__name">Boss: ${bossName}</div>
+          ${bossInfoChips(selectedStage.bossId)}
         </div>
       </div>
       <div class="campaign-info">

@@ -176,7 +176,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     const base = Math.max(1, Math.round(((caster.atk ?? 0) + (caster.wil ?? 0)) * multiplier));
     for (const target of targets) {
       if (target.side === caster.side) continue;
-      dealAbilityDamage(game, caster, target, { base, attackType: 'skill' });
+      dealAbilityDamage(game, caster, target, { base, attackType: 'skill', skill });
     }
   }
 

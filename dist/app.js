@@ -2403,7 +2403,7 @@ __define('./catalog.ts', (exports, module, __require) => {
   //  - kit.traits.summon / kit.ult.summon đánh dấu Summoner -> kích hoạt Immediate Summon (action-chain).
   const ROSTER = [
       {
-          id: 'thien_luu', name: 'Thiên Lưu', class: 'Ranger', rank: 'SSR',
+          id: 'thien_luu', name: 'Thiên Lưu', class: 'Ranger', rank: 'SSR', base_element: 'wind',
           mods: { ATK: 0.08, PER: 0.08, SPD: 0.08 },
           kit: {
               onSpawn: createOnSpawn({ weatherState: 'clear' }),
@@ -2641,7 +2641,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           }
       },
       {
-          id: 'ma_ton_diep_lam', name: 'Ma Tôn - Diệp Lâm', class: 'Mage', rank: 'UR',
+          id: 'ma_ton_diep_lam', name: 'Ma Tôn - Diệp Lâm', class: 'Mage', rank: 'UR', base_element: 'blood',
           mods: { WIL: 0.12, AEmax: 0.08 },
           kit: {
               onSpawn: createOnSpawn({ bonusSPDPercent: 0.10 }),
@@ -2801,7 +2801,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           }
       },
       {
-          id: 'anna', name: 'Anna', class: 'Support', rank: 'SSR',
+          id: 'anna', name: 'Anna', class: 'Support', rank: 'SSR', base_element: 'light',
           mods: { HP: 0.08, WIL: 0.06, AEmax: 0.05 },
           kit: {
               onSpawn: createOnSpawn(),
@@ -3608,7 +3608,7 @@ __define('./catalog.ts', (exports, module, __require) => {
           }
       },
       {
-          id: 'loithienanh', name: 'Lôi Thiên Ảnh', class: 'Tanker', rank: 'SSR',
+          id: 'loithienanh', name: 'Lôi Thiên Ảnh', class: 'Tanker', rank: 'SSR', base_element: 'lightning',
           mods: { RES: 0.10, WIL: 0.10 },
           kit: {
               onSpawn: createOnSpawn(),
@@ -4102,6 +4102,8 @@ __define('./combat.ts', (exports, module, __require) => {
   const nextRngValue = __dep12.nextRngValue;
   const __dep13 = __require('./utils/domain-normalization.ts');
   const normalizeClassName = __dep13.normalizeClassName;
+  const __dep14 = __require('./combat/counter-matrix.ts');
+  const getCounterBonusMetadata = __dep14.getCounterBonusMetadata;
   exports.applyDamage = applyDamage;
   exports.grantShield = grantShield;
   const isBasicAttackAfterHitHandler = (handler) => typeof handler === 'function';
@@ -4310,6 +4312,8 @@ __define('./combat.ts', (exports, module, __require) => {
       const effectiveArm = Math.max(0, (target.arm ?? 0) * (1 - combinedPen));
       const effectiveRes = Math.max(0, (target.res ?? 0) * (1 - combinedPen));
       const defMultiplier = (physWeight * (100 / (100 + effectiveArm))) + (arcWeight * (100 / (100 + effectiveRes)));
+      const sideUnits = Game?.tokens?.filter((token) => token.side === attacker.side && token.alive) ?? [];
+      const counterMetadata = getCounterBonusMetadata(attacker, target, sideUnits, { skill: opts.skill });
       const atkAbsolute = hasAbsoluteLawTag(attacker, 'attack');
       const shieldAbsolute = hasAbsoluteLawTag(target, 'shield');
       const attackerRank = getRankPriority(attacker);
@@ -4318,11 +4322,11 @@ __define('./combat.ts', (exports, module, __require) => {
       const bypassShieldByLaw = atkAbsolute && shieldAbsolute && attackerRank >= targetRank;
       const rawDamage = Math.max(0, Math.floor((pre.base * skillMulti + realmBonus) * pre.outMul));
       const bonusBreakdown = {
-          classBonus: toFinite(opts.classBonus ?? opts.damageBreakdown?.classBonus, 0),
-          elementBonus: toFinite(opts.elementBonus ?? opts.damageBreakdown?.elementBonus, 0),
-          synergyBonus: toFinite(opts.synergyBonus ?? opts.damageBreakdown?.synergyBonus, 0),
+          classBonus: toFinite(opts.classBonus ?? opts.damageBreakdown?.classBonus, counterMetadata.classBonus),
+          elementBonus: toFinite(opts.elementBonus ?? opts.damageBreakdown?.elementBonus, counterMetadata.elementBonus),
+          synergyBonus: toFinite(opts.synergyBonus ?? opts.damageBreakdown?.synergyBonus, counterMetadata.synergyBonus),
       };
-      const finalDamage = calculateFinalDamage(attacker, target, rawDamage, {
+      const finalDamage = calculateFinalDamage(attacker, target, opts.skill, rawDamage, {
           ignoreAll: pre.ignoreAll || shieldWinsLaw,
           defenseMultiplier: defMultiplier,
           reductionMultiplier: pre.inMul,
@@ -4400,7 +4404,8 @@ __define('./combat.ts', (exports, module, __require) => {
       const sessionVfx = asSessionWithVfx(Game);
       if (sessionVfx) {
           try {
-              vfxAddHit(sessionVfx, target);
+              const hasAdvantage = (finalDamage.breakdown.classBonus + finalDamage.breakdown.elementBonus + finalDamage.breakdown.synergyBonus) > 0;
+              vfxAddHit(sessionVfx, target, { isCrit: !!opts.isCrit, advantage: hasAdvantage });
           }
           catch {
               // bỏ qua lỗi VFX runtime
@@ -4658,6 +4663,12 @@ __define('./combat/calculate-final-damage.ts', (exports, module, __require) => {
   };
   const applyMitigationLayer = (damage, factor) => (Math.max(0, Math.floor(Math.max(0, damage) * Math.max(0, factor))));
   const applyHardRuleLayer = (damage, blocked) => (blocked ? 0 : Math.max(0, damage));
+  const toNonNegativeFactor = (value, fallback = 1) => {
+      const parsed = typeof value === 'number' ? value : Number(value);
+      if (!Number.isFinite(parsed))
+          return Math.max(0, fallback);
+      return Math.max(0, parsed);
+  };
   const resolveBreakdown = (context) => {
       const raw = context?.breakdown ?? null;
       return {
@@ -4666,15 +4677,13 @@ __define('./combat/calculate-final-damage.ts', (exports, module, __require) => {
           synergyBonus: normalizeBonus(raw?.synergyBonus),
       };
   };
-  const resolveCounterMultiplier = (breakdown) => {
-      const toMul = (bonus) => Math.max(0, 1 + bonus);
-      return toMul(breakdown.classBonus) * toMul(breakdown.elementBonus) * toMul(breakdown.synergyBonus);
-  };
-  function calculateFinalDamage(_attacker, _defender, rawDamage, context = {}) {
+  const resolveCounterMultiplier = (breakdown) => (Math.max(0, 1 + breakdown.classBonus + breakdown.elementBonus + breakdown.synergyBonus));
+  ;
+  function calculateFinalDamage(_attacker, _defender, _skill, rawDamage, context = {}) {
       const breakdown = resolveBreakdown(context);
       const counterMultiplier = resolveCounterMultiplier(breakdown);
-      const defenseMultiplier = Math.max(0, Number(context.defenseMultiplier ?? 1));
-      const reductionMultiplier = Math.max(0, Number(context.reductionMultiplier ?? 1));
+      const defenseMultiplier = toNonNegativeFactor(context.defenseMultiplier, 1);
+      const reductionMultiplier = toNonNegativeFactor(context.reductionMultiplier, 1);
       let total = clampDamage(rawDamage);
       total = applyMitigationLayer(total, counterMultiplier);
       total = applyHardRuleLayer(total, !!context.ignoreAll);
@@ -4706,16 +4715,57 @@ __define('./combat/counter-matrix.ts', (exports, module, __require) => {
           return null;
       return value;
   };
-  const readElement = (value) => {
+  const readRecordElement = (record) => {
+      if (!record)
+          return null;
+      return (normalizeElementKey(record.base_element)
+          ?? normalizeElementKey(record.baseElement)
+          ?? normalizeElementKey(record.element)
+          ?? normalizeElementKey(record.nguyen_to)
+          ?? normalizeElementKey(record.nguyenTo)
+          ?? normalizeElementKey(record.he)
+          ?? normalizeElementKey(asRecord(record.metadata)?.base_element)
+          ?? normalizeElementKey(asRecord(record.metadata)?.baseElement)
+          ?? normalizeElementKey(asRecord(record.metadata)?.element)
+          ?? normalizeElementKey(asRecord(record.meta)?.base_element)
+          ?? normalizeElementKey(asRecord(record.meta)?.baseElement)
+          ?? normalizeElementKey(asRecord(record.meta)?.element)
+          ?? null);
+  };
+  const readBaseElement = (value) => {
       const direct = normalizeElementKey(value);
       if (direct)
           return direct;
-      const record = asRecord(value);
+      return readRecordElement(asRecord(value)) ?? 'neutral';
+  };
+  const readSkillElement = (skill) => {
+      const record = asRecord(skill);
       if (!record)
-          return null;
-      return (normalizeElementKey(record.element)
+          return normalizeElementKey(skill);
+      const fromField = (normalizeElementKey(record.element)
+          ?? normalizeElementKey(record.skill_element)
+          ?? normalizeElementKey(record.skillElement)
           ?? normalizeElementKey(asRecord(record.metadata)?.element)
-          ?? null);
+          ?? normalizeElementKey(asRecord(record.meta)?.element)
+          ?? normalizeElementKey(asRecord(record.payload)?.element));
+      if (fromField)
+          return fromField;
+      const tags = [record.tags, asRecord(record.metadata)?.tags, asRecord(record.meta)?.tags]
+          .find((entry) => Array.isArray(entry));
+      if (!Array.isArray(tags))
+          return null;
+      for (const tag of tags) {
+          if (typeof tag !== 'string')
+              continue;
+          const trimmed = tag.trim().toLowerCase();
+          const direct = normalizeElementKey(trimmed);
+          if (direct)
+              return direct;
+          const prefixed = normalizeElementKey(trimmed.replace(/^element[:_-]/, ''));
+          if (prefixed)
+              return prefixed;
+      }
+      return null;
   };
   const readClass = (value) => {
       const direct = normalizeClassName(value);
@@ -4730,10 +4780,16 @@ __define('./combat/counter-matrix.ts', (exports, module, __require) => {
           ?? normalizeClassName(asRecord(record.metadata)?.className)
           ?? null);
   };
+  function resolveAttackerElement(attacker, skill) {
+      return readSkillElement(skill) ?? readBaseElement(attacker);
+  }
+  function resolveDefenderElement(defender) {
+      return readBaseElement(defender);
+  }
   function getElementBonus(attackerElement, defenderElement) {
-      const attacker = readElement(attackerElement);
-      const defender = readElement(defenderElement);
-      if (!attacker || !defender)
+      const attacker = readBaseElement(attackerElement);
+      const defender = readBaseElement(defenderElement);
+      if (attacker === 'neutral' || defender === 'neutral')
           return 0;
       if ((attacker === 'light' && defender === 'dark') || (attacker === 'dark' && defender === 'light')) {
           return ELEMENT_BONUS;
@@ -4754,8 +4810,8 @@ __define('./combat/counter-matrix.ts', (exports, module, __require) => {
           return 0;
       return CLASS_BONUS_MAP[attacker]?.[defender] ?? 0;
   }
-  function getSynergyBonus(attacker, sideUnits, _context) {
-      const attackerElement = readElement(attacker);
+  function getSynergyBonus(attacker, sideUnits, context) {
+      const attackerElement = resolveAttackerElement(attacker, context?.skill);
       if (attackerElement !== 'fire')
           return 0;
       const lineup = Array.isArray(sideUnits) ? sideUnits : [];
@@ -4764,7 +4820,11 @@ __define('./combat/counter-matrix.ts', (exports, module, __require) => {
       let hasWind = false;
       let hasFire = false;
       for (const unit of lineup) {
-          const element = readElement(unit);
+          const unitRecord = asRecord(unit);
+          const alive = unitRecord?.alive;
+          if (alive === false)
+              continue;
+          const element = readBaseElement(unit);
           if (element === 'wind')
               hasWind = true;
           if (element === 'fire')
@@ -4776,7 +4836,9 @@ __define('./combat/counter-matrix.ts', (exports, module, __require) => {
   }
   function getCounterBonusMetadata(attacker, defender, sideUnits, context) {
       const classBonus = getClassBonus(attacker, defender);
-      const elementBonus = getElementBonus(attacker, defender);
+      const attackerElement = resolveAttackerElement(attacker, context?.skill);
+      const defenderElement = resolveDefenderElement(defender);
+      const elementBonus = getElementBonus(attackerElement, defenderElement);
       const synergyBonus = getSynergyBonus(attacker, sideUnits, context);
       return {
           classBonus,
@@ -4786,6 +4848,8 @@ __define('./combat/counter-matrix.ts', (exports, module, __require) => {
       };
   }
   //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resolveAttackerElement')) exports.resolveAttackerElement = resolveAttackerElement;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resolveDefenderElement')) exports.resolveDefenderElement = resolveDefenderElement;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getElementBonus')) exports.getElementBonus = getElementBonus;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getClassBonus')) exports.getClassBonus = getClassBonus;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getSynergyBonus')) exports.getSynergyBonus = getSynergyBonus;
@@ -4960,7 +5024,7 @@ __define('./combat/perform-active-skill.ts', (exports, module, __require) => {
           for (const target of targets) {
               if (target.side === caster.side)
                   continue;
-              dealAbilityDamage(game, caster, target, { base, attackType: 'skill' });
+              dealAbilityDamage(game, caster, target, { base, attackType: 'skill', skill });
           }
       }
       return {
@@ -17224,21 +17288,23 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
           merged.class = normalizedClass;
       }
       const normalizedElement = normalizeElementKey(candidate.element
+          ?? candidate.base_element
+          ?? candidate.baseElement
           ?? candidate.nguyenTo
           ?? candidate.nguyen_to
-          ?? candidate.he);
-      if (normalizedElement) {
-          merged.element = normalizedElement;
-      }
+          ?? candidate.he) ?? 'neutral';
+      merged.element = normalizedElement;
+      merged.base_element = normalizedElement;
       const metadataRaw = candidate.metadata;
       if (metadataRaw && typeof metadataRaw === 'object' && !Array.isArray(metadataRaw)) {
           const metadata = { ...metadataRaw };
           const metadataElement = normalizeElementKey(metadata.element
+              ?? metadata.base_element
+              ?? metadata.baseElement
               ?? metadata.nguyenTo
               ?? metadata.nguyen_to
               ?? metadata.he);
-          if (metadataElement)
-              metadata.element = metadataElement;
+          metadata.element = metadataElement ?? 'neutral';
           if (metadata.elements != null) {
               metadata.elements = normalizeElementList(metadata.elements);
           }
@@ -18586,6 +18652,10 @@ __define('./screens/campaign-world-map/index.ts', (exports, module, __require) =
   const __dep1 = __require('./data/campaign-stages.ts');
   const CAMPAIGN_STAGE_DATA = __dep1.CAMPAIGN_STAGE_DATA;
   const resolveBossName = __dep1.resolveBossName;
+  const __dep2 = __require('./catalog.ts');
+  const getMetaById = __dep2.getMetaById;
+  const __dep3 = __require('./utils/domain-normalization.ts');
+  const normalizeElementKey = __dep3.normalizeElementKey;
   const STYLE_ID = 'campaign-world-map-style';
   const CSS = /* css */ `
     .app--campaign-world-map{padding:18px 16px 28px;color:#ecf6f4;}
@@ -18644,6 +18714,22 @@ __define('./screens/campaign-world-map/index.ts', (exports, module, __require) =
     .icon-chip:hover::after,.icon-chip:focus-visible::after{opacity:1;}
     .campaign-enter{margin-top:auto;align-self:flex-end;padding:12px 16px;border-radius:12px;border:1px solid rgba(255,222,168,.8);background:linear-gradient(135deg,#ffd08e,#f7a9a1);color:#2a1b1b;font-weight:800;letter-spacing:.06em;cursor:pointer;}
   `;
+  const ELEMENT_ICON = {
+      fire: '🔥', metal: '⚙️', wood: '🌿', earth: '⛰️', lightning: '⚡', blood: '🩸', water: '💧',
+      light: '✨', dark: '🌑', wind: '🌪️', neutral: '⚪',
+  };
+  const CLASS_ICON = {
+      Assassin: '🗡️', Mage: '🪄', Tanker: '🛡️', Warrior: '⚔️', Ranger: '🏹', Summoner: '📜', Support: '💠',
+  };
+  function bossInfoChips(bossId) {
+      const meta = getMetaById(bossId);
+      const className = typeof meta?.class === 'string' ? meta.class : 'Unknown';
+      const elementKey = normalizeElementKey(meta?.base_element ?? meta?.element) ?? 'neutral';
+      const elementLabel = elementKey.charAt(0).toUpperCase() + elementKey.slice(1);
+      const classIcon = CLASS_ICON[className] ?? '❔';
+      const elementIcon = ELEMENT_ICON[elementKey] ?? '⚪';
+      return `<div class="icon-row"><span class="icon-chip" data-tip="Class: ${className}">${classIcon}</span><span class="icon-chip" data-tip="Lò Hạch: ${elementLabel}">${elementIcon}</span></div>`;
+  }
   function bossPortraitPath(unitId) {
       return `assets/units/${unitId}/default.svg`;
   }
@@ -18743,6 +18829,7 @@ __define('./screens/campaign-world-map/index.ts', (exports, module, __require) =
           <div>
             <h2 class="campaign-boss__title">${selectedStage.id} · ${selectedStage.title}</h2>
             <div class="campaign-boss__name">Boss: ${bossName}</div>
+            ${bossInfoChips(selectedStage.bossId)}
           </div>
         </div>
         <div class="campaign-info">
@@ -21181,39 +21268,52 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
   const createNumberFormatter = __dep1.createNumberFormatter;
   const __dep2 = __require('./utils/unit-id.ts');
   const normalizeUnitId = __dep2.normalizeUnitId;
-  const __dep3 = __require('./utils/player-profile.ts');
-  const patchPlayerProfile = __dep3.patchPlayerProfile;
-  const __dep4 = __require('./utils/currency.ts');
-  const createNormalizedWallet = __dep4.createNormalizedWallet;
-  const getCurrencyOrder = __dep4.getCurrencyOrder;
-  const getSharedCurrencyWallet = __dep4.getSharedCurrencyWallet;
-  const subscribeSharedCurrencyWallet = __dep4.subscribeSharedCurrencyWallet;
-  const syncSharedCurrencyWallet = __dep4.syncSharedCurrencyWallet;
-  const __dep5 = __require('./ui/dom.ts');
-  const assertElement = __dep5.assertElement;
-  const ensureStyleTag = __dep5.ensureStyleTag;
-  const mountSection = __dep5.mountSection;
-  const __dep6 = __require('./types/currency.ts');
-  const normalizeCurrencyBalances = __dep6.normalizeCurrencyBalances;
-  const __dep7 = __require('./ui/rarity/rarity.ts');
-  const mountRarityAura = __dep7.mountRarityAura;
-  const updateRarity = __dep7.updateRarity;
-  const unmountRarity = __dep7.unmountRarity;
-  const __dep8 = __require('./screens/lineup/view/state.ts');
-  const normalizeRoster = __dep8.normalizeRoster;
-  const normalizeLineups = __dep8.normalizeLineups;
-  const createCurrencyBalances = __dep8.createCurrencyBalances;
-  const createFilterOptions = __dep8.createFilterOptions;
-  const formatCurrencyBalance = __dep8.formatCurrencyBalance;
-  const collectAssignedUnitIds = __dep8.collectAssignedUnitIds;
-  const evaluatePassive = __dep8.evaluatePassive;
-  const filterRoster = __dep8.filterRoster;
-  const getUnitRarity = __dep8.getUnitRarity;
-  const LINEUP_ALLOWED_LEADER_IDS = __dep8.LINEUP_ALLOWED_LEADER_IDS;
-  const __dep9 = __require('./screens/lineup/view/events.ts');
-  const bindLineupEvents = __dep9.bindLineupEvents;
+  const __dep3 = __require('./utils/domain-normalization.ts');
+  const normalizeElementKey = __dep3.normalizeElementKey;
+  const __dep4 = __require('./utils/player-profile.ts');
+  const patchPlayerProfile = __dep4.patchPlayerProfile;
+  const __dep5 = __require('./utils/currency.ts');
+  const createNormalizedWallet = __dep5.createNormalizedWallet;
+  const getCurrencyOrder = __dep5.getCurrencyOrder;
+  const getSharedCurrencyWallet = __dep5.getSharedCurrencyWallet;
+  const subscribeSharedCurrencyWallet = __dep5.subscribeSharedCurrencyWallet;
+  const syncSharedCurrencyWallet = __dep5.syncSharedCurrencyWallet;
+  const __dep6 = __require('./ui/dom.ts');
+  const assertElement = __dep6.assertElement;
+  const ensureStyleTag = __dep6.ensureStyleTag;
+  const mountSection = __dep6.mountSection;
+  const __dep7 = __require('./types/currency.ts');
+  const normalizeCurrencyBalances = __dep7.normalizeCurrencyBalances;
+  const __dep8 = __require('./ui/rarity/rarity.ts');
+  const mountRarityAura = __dep8.mountRarityAura;
+  const updateRarity = __dep8.updateRarity;
+  const unmountRarity = __dep8.unmountRarity;
+  const __dep9 = __require('./screens/lineup/view/state.ts');
+  const normalizeRoster = __dep9.normalizeRoster;
+  const normalizeLineups = __dep9.normalizeLineups;
+  const createCurrencyBalances = __dep9.createCurrencyBalances;
+  const createFilterOptions = __dep9.createFilterOptions;
+  const formatCurrencyBalance = __dep9.formatCurrencyBalance;
+  const collectAssignedUnitIds = __dep9.collectAssignedUnitIds;
+  const evaluatePassive = __dep9.evaluatePassive;
+  const filterRoster = __dep9.filterRoster;
+  const getUnitRarity = __dep9.getUnitRarity;
+  const LINEUP_ALLOWED_LEADER_IDS = __dep9.LINEUP_ALLOWED_LEADER_IDS;
+  const __dep10 = __require('./screens/lineup/view/events.ts');
+  const bindLineupEvents = __dep10.bindLineupEvents;
   const STYLE_ID = 'lineup-view-style-v1';
   const powerFormatter = createNumberFormatter('vi-VN');
+  const ELEMENT_ICON = {
+      fire: '🔥', metal: '⚙️', wood: '🌿', earth: '⛰️', lightning: '⚡', blood: '🩸', water: '💧',
+      light: '✨', dark: '🌑', wind: '🌪️', neutral: '⚪',
+  };
+  function renderRoleElementIcons(unit) {
+      const raw = unit.raw;
+      const element = normalizeElementKey(raw?.base_element ?? raw?.element) ?? 'neutral';
+      const classIcon = unit.role ? '🏷️' : '';
+      const elementIcon = ELEMENT_ICON[element] ?? '⚪';
+      return [classIcon, elementIcon].filter(Boolean).join(' ');
+  }
   function ensureStyles() {
       const css = `
       .app--lineup{padding:32px 16px 72px;}
@@ -22128,7 +22228,8 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               if (unit.role || unit.rank) {
                   const tag = document.createElement('p');
                   tag.className = 'lineup-roster__tag';
-                  tag.textContent = [unit.role, unit.rank].filter(Boolean).join(' · ');
+                  const marker = renderRoleElementIcons(unit);
+                  tag.textContent = [marker, unit.role, unit.rank].filter(Boolean).join(' · ');
                   meta.appendChild(tag);
               }
               if (unit.power != null) {
@@ -26361,8 +26462,10 @@ __define('./turns.ts', (exports, module, __require) => {
           ?? normalizeClassName(meta?.class)
           ?? undefined;
       const normalizedElement = normalizeElementKey(p.element)
+          ?? normalizeElementKey(p.base_element)
+          ?? normalizeElementKey(meta?.base_element)
           ?? normalizeElementKey(meta?.element)
-          ?? undefined;
+          ?? 'neutral';
       const obj = {
           id: p.unitId,
           name: p.name ?? undefined,
@@ -26375,7 +26478,7 @@ __define('./turns.ts', (exports, module, __require) => {
           statuses: [],
           baseStats,
           class: normalizedClass,
-          ...(normalizedElement ? { element: normalizedElement } : {}),
+          element: normalizedElement,
       };
       if (sideLower === 'enemy' && fromDeck && isPveCreepId(p.unitId)) {
           const mutationRoll = nextRngValue(Game.rng);
@@ -28483,6 +28586,7 @@ __define('./utils/domain-normalization.ts', (exports, module, __require) => {
       'light',
       'dark',
       'wind',
+      'neutral',
   ];
   const ELEMENT_KEY_SET = new Set(ELEMENT_KEYS);
   const ELEMENT_ALIAS_MAP = {
@@ -28514,6 +28618,11 @@ __define('./utils/domain-normalization.ts', (exports, module, __require) => {
       ám: 'dark',
       wind: 'wind',
       phong: 'wind',
+      neutral: 'neutral',
+      vohe: 'neutral',
+      'vo-he': 'neutral',
+      vo: 'neutral',
+      none: 'neutral',
   };
   const CLASS_NAME_MAP = {
       mage: 'Mage',

@@ -55,6 +55,8 @@ export interface UnitToken extends StatBlock {
   statuses?: StatusEffect[];
   color?: string;
   class?: string;
+  element?: string;
+  base_element?: string;
   art?: UnitArt | null;
   skinKey?: string | null;
   furyMax?: number;
@@ -81,6 +83,8 @@ export interface QueuedSummonRequest {
   name?: string;
   color?: string;
   class?: string;
+  element?: string;
+  base_element?: string;
   revive?: boolean;
   revived?: Partial<UnitToken> | null;
   source?: string;

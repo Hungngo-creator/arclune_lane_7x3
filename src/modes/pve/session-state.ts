@@ -719,24 +719,27 @@ function normalizeDeckEntry(entry: unknown): SessionState['unitsAll'][number] | 
 
   const normalizedElement = normalizeElementKey(
     candidate.element
+    ?? candidate.base_element
+    ?? candidate.baseElement
     ?? candidate.nguyenTo
     ?? candidate.nguyen_to
     ?? candidate.he,
-  );
-  if (normalizedElement) {
-    merged.element = normalizedElement;
-  }
+  ) ?? 'neutral';
+  merged.element = normalizedElement;
+  merged.base_element = normalizedElement;
 
   const metadataRaw = candidate.metadata;
   if (metadataRaw && typeof metadataRaw === 'object' && !Array.isArray(metadataRaw)) {
     const metadata = { ...(metadataRaw as Record<string, unknown>) };
     const metadataElement = normalizeElementKey(
       metadata.element
+      ?? metadata.base_element
+      ?? metadata.baseElement
       ?? metadata.nguyenTo
       ?? metadata.nguyen_to
       ?? metadata.he,
     );
-    if (metadataElement) metadata.element = metadataElement;
+    metadata.element = metadataElement ?? 'neutral';
 
     if (metadata.elements != null) {
       metadata.elements = normalizeElementList(metadata.elements);

@@ -38,6 +38,12 @@ const applyHardRuleLayer = (damage: number, blocked: boolean): number => (
   blocked ? 0 : Math.max(0, damage)
 );
 
+const toNonNegativeFactor = (value: unknown, fallback = 1): number => {
+  const parsed = typeof value === 'number' ? value : Number(value);
+  if (!Number.isFinite(parsed)) return Math.max(0, fallback);
+  return Math.max(0, parsed);
+};
+
 const resolveBreakdown = (context?: CalculateFinalDamageContext | null): DamageBreakdownMetadata => {
   const raw = context?.breakdown ?? null;
   return {
@@ -47,21 +53,21 @@ const resolveBreakdown = (context?: CalculateFinalDamageContext | null): DamageB
   };
 };
 
-const resolveCounterMultiplier = (breakdown: DamageBreakdownMetadata): number => {
-  const toMul = (bonus: number): number => Math.max(0, 1 + bonus);
-  return toMul(breakdown.classBonus) * toMul(breakdown.elementBonus) * toMul(breakdown.synergyBonus);
+const resolveCounterMultiplier = (breakdown: DamageBreakdownMetadata): number => (
+  Math.max(0, 1 + breakdown.classBonus + breakdown.elementBonus + breakdown.synergyBonus)
 };
 
 export function calculateFinalDamage(
   _attacker: UnitToken,
   _defender: UnitToken,
+  _skill: unknown,
   rawDamage: number,
   context: CalculateFinalDamageContext = {}
 ): CalculateFinalDamageResult {
   const breakdown = resolveBreakdown(context);
   const counterMultiplier = resolveCounterMultiplier(breakdown);
-  const defenseMultiplier = Math.max(0, Number(context.defenseMultiplier ?? 1));
-  const reductionMultiplier = Math.max(0, Number(context.reductionMultiplier ?? 1));
+  const defenseMultiplier = toNonNegativeFactor(context.defenseMultiplier, 1);
+  const reductionMultiplier = toNonNegativeFactor(context.reductionMultiplier, 1);
 
   let total = clampDamage(rawDamage);
   total = applyMitigationLayer(total, counterMultiplier);
