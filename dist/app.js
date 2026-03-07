@@ -744,10 +744,10 @@ __define('./ai.ts', (exports, module, __require) => {
           Game.ai.lastThinkMs = now;
           return;
       }
-      const evaluations = [];
       const keepTop = dbgCfg.keepTop;
       const trackTopCandidates = keepTop > 0;
       const topCandidates = [];
+      let bestCandidate = null;
       const etaBySlot = new Map();
       const summonerFeasibilityByCardSlot = new Map();
       const summonPatternSlotsByCardSlot = new Map();
@@ -845,37 +845,34 @@ __define('./ai.ts', (exports, module, __require) => {
                   multipliers: { row: rowFactor, role: roleFactor },
                   summonPatternSlots,
               };
-              evaluations.push(evaluation);
+              const blocked = candidateBlocked(Game, evaluation, alive);
+              if (blocked) {
+                  evaluation.blockedReason = blocked;
+              }
+              else if (!bestCandidate || evaluation.score > bestCandidate.score) {
+                  bestCandidate = evaluation;
+              }
               insertTopCandidate?.(evaluation);
           }
       }
-      if (!evaluations.length) {
+      if (!bestCandidateg) {
           const decision = {
               reason,
               at: now,
               weights,
               chosen: null,
               considered: [],
-              skipped: 'noEvaluation',
+              skipped: 'allBlocked',
           };
           Game.ai.lastDecision = decision;
           Game.ai.lastThinkMs = now;
           return;
       }
-      evaluations.sort((left, right) => right.score - left.score);
-      let chosen = null;
-      for (const current of evaluations) {
-          const blocked = candidateBlocked(Game, current, alive);
-          if (blocked) {
-              current.blockedReason = blocked;
-              continue;
-          }
-          const ok = queueEnemyAt(Game, current.card, current.cell.s, current.cell.cx, current.cell.cy, alive);
-          if (ok) {
-              chosen = current;
-              break;
-          }
-          current.blockedReason = 'queueFailed';
+      let chosen = bestCandidate;
+      const ok = queueEnemyAt(Game, bestCandidate.card, bestCandidate.cell.s, bestCandidate.cell.cx, bestCandidate.cell.cy, alive);
+      if (!ok) {
+          bestCandidate.blockedReason = 'queueFailed';
+          chosen = null;
       }
       const considered = trackTopCandidates ? topCandidates.map(exportCandidateDebug).filter(Boolean) : [];
       const decision = {

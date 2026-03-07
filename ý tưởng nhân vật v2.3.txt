@@ -25,7 +25,7 @@ miễn nhân vật nào có skill/ult/đánh thường/nội tại có tag này 
 
 
 A. Nhân vật gacha
-32) [SSR] HẢI VƯƠNG – VŨ THIÊN, Chiến Sĩ
+32) [SSR] HẢI VƯƠNG – VŨ THIÊN, Chiến Sĩ, element tag: water.
 NỘI TẠI: Hải Triều Khai Trận
 Tags: [Nội Tại], [Bản Thân], [Buff Vĩnh Viễn], [Lập Tức].
 Logic:
@@ -45,7 +45,8 @@ Logic:
 Cost: 25 Aether.
 Công thức sát thương: Gây sát thương = 150% Sát Thương Đánh Thường.
 Quy đổi chỉ số: = 150% * (100% WIL + 100% ATK) = 150% WIL + 150% ATK.
-Mô tả: Phóng đinh ba đi gây sát thương cực lớn, sau đó vũ khí tự quay về tay.
+Mô tả vfx: Phóng đinh ba đi gây sát thương lớn, sau đó vũ khí tự quay về tay.
+element tag: water.
 4. KỸ NĂNG 3: Triều Ảnh Hồi Kích
 Tags: [Chủ Động], [Nội Tại: Kích Hoạt], [Bản Thân], [Buff Vĩnh Viễn], [Cơ Chế: Né & Phản], [Tiêu Hao: Aether].
 Logic:
@@ -58,7 +59,7 @@ Lưu ý: Nếu nhân vật chết và được hồi sinh, trạng thái này bi
 5. ĐÁNH THƯỜNG: Thủy Kích
 Tags: [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp], [Thường].
 Logic:
-Gây sát thương = 100% WIL + 100% ATK lên 1 mục tiêu.
+Gây sát thương = 100% WIL + 100% ATK lên 1 mục tiêu. Element tag: water
 6. ULTIMATE: Hải Uy Trảm Ngôn
 Tags: [Tự Động], [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp], [Khống Chế: Câm Lặng], [Buff: Thích Ứng].
 Logic:
@@ -67,6 +68,7 @@ Hiệu ứng 1: Nhận 1 tầng [Thích Ứng].
 Hiệu ứng 2 (Sát thương): Gây sát thương = 250% Sát Thương Đánh Thường.
 Quy đổi chỉ số: = 250% * (100% WIL + 100% ATK) = 250% WIL + 300% ATK. (Hệ số tổng 500% - Cực kỳ bạo lực).
 Hiệu ứng 3 (Khống chế): Áp dụng [Trầm Mặc] (Silence) lên mục tiêu trong 1 Turn (Không thể dùng Skill/Ult).
+element tag: water.
 GHI CHÚ CHIẾN THUẬT:
 Combo Số To: Kích hoạt Skill 1 (Free Action, +40% Stats) \rightarrow Dùng ngay Ult hoặc Skill 2. Lúc này lượng sát thương đầu ra sẽ được nhân thêm với cái buff 40% kia, tạo ra cú one-shot cực mạnh.
 Lối chơi: Vũ Thiên là dạng đấu sĩ "khô máu". Hắn cần kích hoạt Skill 3 sớm để lấy khả năng né và phản đòn, sau đó dồn Aether để spam Skill 1 + Skill 2.
@@ -118,7 +120,7 @@ GHI CHÚ CHIẾN THUẬT:
  * Build đồ: Anna cần Max HP cực lớn. HP càng to thì Ult hồi càng khủng và Skill 2 bơm máu cho Leader càng nhiều.
  * Combo: Skill 1 (Tăng thủ) \rightarrow Skill 2 (Hiến máu). Vì hiến máu xong Anna sẽ rất yếu (mất 50% máu), nên cần Skill 1 bật trước để tránh bị sốc sát thương chết ngay turn sau.
 
-34) [SR] CÁI BANG – LÃO KHẤT CÁI, Class: Warrior.
+34) [SR] CÁI BANG – LÃO KHẤT CÁI, Class: Warrior. không có element tag
 1. NỘI TẠI: Tạp Dân Tụ Lực
  * Tags: [Nội Tại], [Bản Thân], [Buff Vĩnh Viễn], [Kháng Hiệu Ứng: Khiêu Khích], [Scaling: Đồng Minh].
  * Logic:
@@ -166,20 +168,18 @@ GHI CHÚ CHIẾN THUẬT:
  * Vị trí: Lão Khất Cái nên được xếp ở các ô rìa hoặc hàng đầu để tận dụng Skill 2 (Né AOE). Khả năng nhảy cóc của hắn có thể làm rối loạn đội hình địch hoặc né các chiêu Ult diện rộng nguy hiểm.
  * Sức mạnh: Tuy là Rank SR nhưng khả năng xuyên giáp (Penetration) ở cả 3 kỹ năng khiến hắn gây sát thương rất ổn định lên các Tanker trâu bò về cuối game.
 
-35) Hoa Vị Ương
+35) Hoa Vị Ương, Chiến Sĩ, element tag: mộc
 
 Nội tại: mỗi khi nhận hồi phục từ nguồn không phải từ bản thân, tăng 30% hiệu ứng hồi phục đó, lượng hồi phục vượt max hp sẽ tạo khiên tối đa 100% max hp. 
 
 Kĩ năng 1: giảm 20% sát thương nhận vào trong 3 turn, 25 Aether. 
-Kĩ năng 2: tăng 50% max hp đến hết trận đổi lại mọi hiệu ứng hồi phục nhận vào từ mọi nguồn sau khi được tăng từ nội tại sẽ bị giảm 50%. Có thể dùng 2 lần/trận, 5 Aether. 
-Kĩ năng 3: khi nhận sát thương vượt ngưỡng 15% max hp/ lần sẽ tăng hp và max hp lên 5%, kĩ năng nội tại, sau khi thanh toán 15 Aether thì kĩ năng này sẽ áp dụng ngay lập tức và mỗi turn chỉ có thể kích hoạt 1 lần, sau tử vong cần kích hoạt lần nữa. Hiệu ứng tăng hp và max hp từ kĩ năng này không tính là hồi phục. 
+Kĩ năng 2: tăng 32% max hp đến hết trận đổi lại mọi hiệu ứng hồi phục nhận vào từ mọi nguồn sau khi được tăng từ nội tại sẽ bị giảm 50%. Có thể dùng 2 lần/trận, 15 Aether. 
+Kĩ năng 3: khi nhận sát thương vượt ngưỡng 15% max hp/ lần/turn sẽ tăng hp và max hp lên 5%, kĩ năng nội tại, sau khi thanh toán 15 Aether thì kĩ năng này sẽ áp dụng ngay lập tức và mỗi turn chỉ có thể kích hoạt 1 lần, sau tử vong cần kích hoạt lần nữa. Hiệu ứng tăng hp và max hp từ kĩ năng này không tính là hồi phục. 25 Aether.
 
-Ultimate: gây sát thương = 200% đánh thường lên toàn sân kẻ địch, áp dụng hiệu ứng Phản Hồi Phục lên kẻ chịu sát thương từ ultimate trong 1 turn kể từ lúc kẻ thù dính debuff này.
+Ultimate: gây sát thương = 200% đánh thường lên toàn sân kẻ địch, áp dụng hiệu ứng Phản Hồi Phục lên kẻ chịu sát thương từ ultimate trong 1 turn kể từ lúc kẻ thù dính debuff này. element tag: mộc
 
-36) Chào người anh em. Tôi rất cảm kích lời khen của ông. Việc duy trì sự gọn gàng và logic chặt chẽ (Clean & Strict Logic) là ưu tiên hàng đầu để hệ thống hàng trăm nhân vật của Arclune không bị vỡ trận.
-Dưới đây là bản phân tích Tag và Logic chi tiết cho Ái Lân, một nhân vật có cơ chế "Chuyển Dạng" (Stance Switching) theo lượt cực kỳ thú vị. Việc quản lý Turn Chẵn/Lẻ sẽ là chìa khóa để chơi con này.
-[SSR] THÁNH NỮ SA ĐỌA – ÁI LÂN (Ai Lin)
- * Class: Priest / Mage (Hybrid).
+36) [SSR] THÁNH NỮ SA ĐỌA – ÁI LÂN (Ai Lin)
+ * Class: Mage (Hybrid). element tag: light và dark tùy trạng thái của nội tại, base element tag của nhân vật này thay đổi theo nội tại
  * Role: Dual-Phase (Hồi phục/Sát thương), Buffer/Debuffer.
 1. NỘI TẠI: Thánh Ám Luân Chuyển
  * Tags: [Nội Tại], [Bản Thân], [Cơ Chế: Chuyển Dạng], [Lượt Chẵn/Lẻ], [Buff/Debuff Tự Động].
@@ -189,9 +189,9 @@ Dưới đây là bản phân tích Tag và Logic chi tiết cho Ái Lân, một
      * Turn Chẵn (2, 4, 6...): Trạng thái [Bóng Tối].
    * Hiệu ứng [Ánh Sáng]:
      * Mọi sát thương gây ra lên kẻ địch sẽ áp dụng Debuff: Giảm 5% AGI (1 Turn).
-     * Hồi phục cho bản thân = 10% Tổng sát thương gây ra trong Turn đó (Cơ chế Hút máu phép).
+     * Hồi phục cho bản thân = 10% Tổng sát thương gây ra trong Turn đó (Cơ chế Hút máu phép). element tag: light.
    * Hiệu ứng [Bóng Tối]:
-     * Mọi sát thương gây ra sẽ Bỏ qua 10% (RES + ARM) của mục tiêu (Xuyên giáp/kháng).
+     * Mọi sát thương gây ra sẽ Bỏ qua 10% (RES + ARM) của mục tiêu (Xuyên giáp/kháng). element tag: dark.
 2. ĐÁNH THƯỜNG: Trượng Kích
  * Tags: [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp], [Khống Chế: Choáng], [Tác Động Vật Lý].
  * Logic:
@@ -216,6 +216,7 @@ Dưới đây là bản phân tích Tag và Logic chi tiết cho Ái Lân, một
    * Sát thương: Mỗi kẻ nhận 70% Sát Thương Đánh Thường.
      * Quy đổi: = 70% * (100% WIL + 100% ATK) = 70% WIL + 70% ATK.
    * Tương tác: Được hưởng lợi từ Nội tại Bóng Tối (Xuyên 10% RES/ARM).
+   element tag: dark.
 5. KỸ NĂNG 3: Thánh Minh Trùng Tụ
  * Tags: [Chủ Động], [Điều Kiện: Ánh Sáng], [Đa Mục Tiêu: Đồng Minh], [Hồi Phục].
  * Logic:
@@ -232,8 +233,8 @@ Dưới đây là bản phân tích Tag và Logic chi tiết cho Ái Lân, một
      * Hiệu quả: Hồi máu = 30% Max HP (của Ái Lân) + 5% (WIL + ATK).
    * Trường hợp 2: Bóng Tối (Đọa Ảnh Tứ Hình):
      * Mục tiêu: 4 Kẻ địch ngẫu nhiên.
-     * Hiệu quả: Gây sát thương = 75% Sát Thương Đánh Thường (75% WIL + 75% ATK).
-     * Tương tác: Hưởng xuyên giáp từ Nội tại Bóng Tối.
+     * Hiệu quả: Gây sát thương = 150% Sát Thương Đánh Thường (150% WIL + 150% ATK)/ mỗi kẻ địch.
+     * Tương tác: Hưởng xuyên giáp từ Nội tại Bóng Tối. element tag: dark.
 GHI CHÚ CHIẾN THUẬT:
  * Quản lý HP: Skill 1 tiêu tốn lượng máu khổng lồ (30% Max HP), nên Ái Lân cần chỉ số HP rất cao. May mắn là Turn Ánh Sáng cô ta có thể tự hút máu (Nội tại) và tự hồi máu (Skill 3) để bù đắp.
  * Timing:
