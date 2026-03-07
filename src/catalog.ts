@@ -2,6 +2,7 @@
 //home (termux)/arclune_lane_7x3/src/catalog.ts
 // 1) Rank multiplier (đơn giản) — áp lên TẤT CẢ stat trừ SPD
 import { kitSupportsSummon } from './utils/kit.ts';
+import { normalizeClassName } from './utils/domain-normalization.ts';
 
 import type {
   CatalogStatBlock,
@@ -77,7 +78,7 @@ export const CLASS_BASE = {
 export type ClassName = keyof typeof CLASS_BASE;
 
 const isRankName = (value: string): value is RankName => value in RANK_MULT;
-const isClassName = (value: string): value is ClassName => value in CLASS_BASE;
+const isClassName = (value: string): value is ClassName => normalizeClassName(value) !== null;
 
 type MaybeUnitId = UnitId | string | null | undefined;
 
@@ -1717,8 +1718,8 @@ export const ROSTER = [
 const unitBaseEntries = ROSTER
   .map((entry) => {
     const rank = entry.rank;
-    const className = entry.class;
-    if (!isRankName(rank) || !isClassName(className)) {
+    const className = normalizeClassName(entry.class);
+    if (!isRankName(rank) || !className || !isClassName(className)) {
       return null;
     }
     const base = CLASS_BASE[className];
@@ -1755,7 +1756,7 @@ export const getUnitKitById = (id: MaybeUnitId): UnitKitConfig | null => {
 
 export const isSummoner = (id: MaybeUnitId): boolean => {
   const m = getMetaById(id);
-  return !!(m && m.class === 'Summoner' && kitSupportsSummon(m));
+  return !!(m && normalizeClassName(m.class) === 'Summoner' && kitSupportsSummon(m));
 };
 
 export const CLASS_GROWTH = {

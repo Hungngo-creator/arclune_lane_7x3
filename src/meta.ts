@@ -8,6 +8,7 @@ import {
   getUnitKitById,
 } from './catalog.ts';
 import { extractOnSpawnRage, kitSupportsSummon } from './utils/kit.ts';
+import { normalizeClassName } from './utils/domain-normalization.ts';
 
 import type { CatalogStatBlock, RosterUnitDefinition, UnitKitConfig } from './types/config.ts';
 import type { MetaEntry } from '@shared-types/pve';
@@ -55,7 +56,7 @@ export const Meta = {
   get: getMetaById as MetaLookupService['get'],
   classOf(id: MetaId) {
     const entry = getMetaById(id);
-    return entry?.class ?? null;
+    return normalizeClassName(entry?.class) ?? null;
   },
   rankOf(id: MetaId) {
     const entry = getMetaById(id);
@@ -66,7 +67,7 @@ export const Meta = {
   },
   isSummoner(id: MetaId) {
     const entry = getMetaById(id);
-    return !!(entry && entry.class === 'Summoner' && kitSupportsSummon(entry));
+    return !!(entry && normalizeClassName(entry.class) === 'Summoner' && kitSupportsSummon(entry));
   },
 } satisfies MetaLookupService;
 
@@ -88,7 +89,7 @@ export const metaServiceAdapter: SessionMetaService = {
   classOf(id: UnitId | null | undefined): string | null {
     if (!id) return null;
     const value = Meta.classOf(id);
-    return typeof value === 'string' ? value : null;
+    return normalizeClassName(value);
   },
   rankOf(id: UnitId | null | undefined): string | null {
     if (!id) return null;
@@ -126,9 +127,7 @@ const isRankName = (value: unknown): value is RankName => (
   typeof value === 'string' && value in RANK_MULT
 );
 
-const isClassName = (value: unknown): value is ClassName => (
-  typeof value === 'string' && value in CLASS_BASE
-);
+const isClassName = (value: unknown): value is ClassName => normalizeClassName(value) !== null;
 
 const coerceStatMods = (
   mods: MetaEntry['mods'],
@@ -146,9 +145,10 @@ export function makeInstanceStats(unitId: MetaId, level: number = 1, stars: numb
   const entry = Meta.get(unitId);
   if (!entry) return { ...EMPTY_INSTANCE_STATS };
 
-  const className = entry.class as ClassName;
+  const className = normalizeClassName(entry.class);
   const rank = entry.rank as RankName;
 
+  if (!className || !isClassName(className) || !isRankName(rank)) return { ...EMPTY_INSTANCE_STATS };
   const base = CLASS_BASE[className];
   // Delta tăng trưởng (Laser)
   const delta = (CLASS_GROWTH as any)[className];

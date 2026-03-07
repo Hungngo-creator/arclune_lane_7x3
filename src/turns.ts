@@ -19,6 +19,7 @@ import { resolveRuntimeUnitStats } from './modes/pve/collection-mapper.ts';
 import { applyCultivationBonus } from './cultivation.ts';
 import { evaluateGambitLogic } from './ai.ts';
 import { nextRngValue } from './utils/rng.ts';
+import { normalizeClassName, normalizeElementKey } from './utils/domain-normalization.ts';
 import {
   clearQueuedUyenUlt,
   hasQueuedUyenUlt,
@@ -95,7 +96,7 @@ const applyMutationStatBonus = (unit: UnitToken, bonusPctRaw: unknown): void => 
 
 function grantActionAether(Game: SessionState, unit: UnitToken | null | undefined, acted: boolean): number {
   if (!unit || !unit.alive || !acted) return 0;
-  const className = Game.meta?.get(unit.id)?.class ?? null;
+  const className = normalizeClassName(Game.meta?.get(unit.id)?.class) ?? null;
   const amount = resolveActionAetherRegen(className);
   if (amount > 0){
     globalAetherPool.gain(unit.side, amount);
@@ -249,6 +250,12 @@ export function spawnQueuedIfDue(
     res: stats.res ?? 0,
     wil: stats.wil ?? 0,
   };
+  const normalizedClass = normalizeClassName(p.class)
+    ?? normalizeClassName(meta?.class)
+    ?? undefined;
+  const normalizedElement = normalizeElementKey((p as Record<string, unknown>).element)
+    ?? normalizeElementKey((meta as Record<string, unknown> | null)?.element)
+    ?? undefined;
   const obj: UnitToken = {
     id: p.unitId,
     name: p.name ?? undefined,
@@ -260,7 +267,8 @@ export function spawnQueuedIfDue(
     ...resolvedStats,
     statuses: [],
     baseStats,
-    class: typeof p.class === 'string' && p.class.trim() ? p.class : (typeof meta?.class === 'string' ? meta.class : undefined),
+    class: normalizedClass,
+    ...(normalizedElement ? { element: normalizedElement } : {}),
   };
 
   if (sideLower === 'enemy' && fromDeck && isPveCreepId(p.unitId)) {

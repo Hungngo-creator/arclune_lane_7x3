@@ -1,5 +1,6 @@
 import { lookupUnit } from '../../units.ts';
 import { mapUnitProgressById } from './collection-mapper.ts';
+import { normalizeClassName } from '../../utils/domain-normalization.ts';
 
 import type { PveDeckEntry } from '@shared-types/combat';
 import type { CollectionStateInput, RuntimeUnitProgress } from '@shared-types/pve';
@@ -78,7 +79,7 @@ function sampleLineup(
       level: typeof progress.level === 'number' ? progress.level : undefined,
       realm: typeof progress.realm === 'number' ? progress.realm : undefined,
       subRealm: typeof progress.subRealm === 'number' ? progress.subRealm : undefined,
-      className: typeof entry.class === 'string' && entry.class.trim() ? entry.class : undefined,
+      className: normalizeClassName(entry.class) ?? undefined,
     });
   }
   return { rankCounts, totalRanked, progressProfiles };
@@ -170,9 +171,7 @@ function toCreepDeckEntry(params: {
   const level = clampInteger(profile.level, 1);
   const realm = clampInteger(profile.realm, 0);
   const subRealm = clampInteger(profile.subRealm, 0);
-  const className = typeof profile.className === 'string' && profile.className.trim()
-    ? profile.className
-    : null;
+  const className = normalizeClassName(profile.className);
 
   return {
     id: creepId,

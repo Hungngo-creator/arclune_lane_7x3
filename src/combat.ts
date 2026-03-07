@@ -13,6 +13,7 @@ import { mergeBusyUntil, sessionNow } from './utils/time.ts';
 import { ABSOLUTE_ATTACK_TAG_IDS, ABSOLUTE_SHIELD_TAG_IDS } from './data/tags.ts';
 import { applyUyenBasicExtras } from './leader-uyen.ts';
 import { nextRngValue } from './utils/rng.ts';
+import { normalizeClassName } from './utils/domain-normalization.ts';
 
 export { applyDamage, grantShield };
 
@@ -105,8 +106,8 @@ const realmBonusFromUnit = (unit: UnitToken): number => {
   if (realm <= 0 && subRealm <= 0) return 0;
   const base = Math.max(0, Math.floor((unit.atk ?? 0) + (unit.wil ?? 0)));
   const ratio = Math.min(0.6, realm * 0.02 + subRealm * 0.005);
-  const className = String(getMetaById(unit.id)?.class ?? '');
-  const roleScale = REALM_ROLE_SCALE[className] ?? 1;
+  const className = normalizeClassName(getMetaById(unit.id)?.class);
+  const roleScale = className ? (REALM_ROLE_SCALE[className] ?? 1) : 1;
   return Math.round(base * ratio * roleScale);
 };
 
@@ -205,7 +206,7 @@ export function pickTarget(Game: TargetableGameState, attacker: UnitToken): Unit
   if (pool.length === 0) return null;
 
   const meta = getMetaById(attacker.id);
-  const className = meta?.class ?? null;
+  const className = normalizeClassName(meta?.class);
   const isAssassin = className === 'Assassin';
 
   const slotOf = (token: UnitToken): number => slotIndex(token.side, token.cx, token.cy);

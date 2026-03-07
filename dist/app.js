@@ -1,7 +1,7 @@
 // Bundled by build.mjs
 const __modules = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }
 function __define(id, factory){ __modules[id] = { factory, exports: null, initialized: false }; }
@@ -2340,6 +2340,8 @@ __define('./catalog.ts', (exports, module, __require) => {
   // 1) Rank multiplier (đơn giản) — áp lên TẤT CẢ stat trừ SPD
   const __dep0 = __require('./utils/kit.ts');
   const kitSupportsSummon = __dep0.kitSupportsSummon;
+  const __dep1 = __require('./utils/domain-normalization.ts');
+  const normalizeClassName = __dep1.normalizeClassName;
   const asUnknownRecord = (value) => value;
   const asUnknownRecordArray = (value) => value;
   const DEFAULT_ON_SPAWN = Object.freeze({
@@ -2368,7 +2370,7 @@ __define('./catalog.ts', (exports, module, __require) => {
       Assassin: { HP: 640, ATK: 36, WIL: 16, ARM: 0.06, RES: 0.08, AGI: 14, PER: 16, SPD: 1.25, AEmax: 65, AEregen: 6.0, HPregen: 10 }
   };
   const isRankName = (value) => value in RANK_MULT;
-  const isClassName = (value) => value in CLASS_BASE;
+  const isClassName = (value) => normalizeClassName(value) !== null;
   // 3) Helper: áp rank & mod (mods không áp vào SPD)
   function applyRankAndMods(base, rank, mods = {}) {
       const multiplier = RANK_MULT[rank] ?? 1;
@@ -3999,8 +4001,8 @@ __define('./catalog.ts', (exports, module, __require) => {
   const unitBaseEntries = ROSTER
       .map((entry) => {
       const rank = entry.rank;
-      const className = entry.class;
-      if (!isRankName(rank) || !isClassName(className)) {
+      const className = normalizeClassName(entry.class);
+      if (!isRankName(rank) || !className || !isClassName(className)) {
           return null;
       }
       const base = CLASS_BASE[className];
@@ -4026,7 +4028,7 @@ __define('./catalog.ts', (exports, module, __require) => {
   };
   const isSummoner = (id) => {
       const m = getMetaById(id);
-      return !!(m && m.class === 'Summoner' && kitSupportsSummon(m));
+      return !!(m && normalizeClassName(m.class) === 'Summoner' && kitSupportsSummon(m));
   };
   const CLASS_GROWTH = {
       Tanker: { HP: 25, ATK: 0.5, WIL: 0.5, ARM: 0.01, RES: 0.005 },
@@ -4086,6 +4088,8 @@ __define('./combat.ts', (exports, module, __require) => {
   const applyUyenBasicExtras = __dep10.applyUyenBasicExtras;
   const __dep11 = __require('./utils/rng.ts');
   const nextRngValue = __dep11.nextRngValue;
+  const __dep12 = __require('./utils/domain-normalization.ts');
+  const normalizeClassName = __dep12.normalizeClassName;
   exports.applyDamage = applyDamage;
   exports.grantShield = grantShield;
   const isBasicAttackAfterHitHandler = (handler) => typeof handler === 'function';
@@ -4118,8 +4122,8 @@ __define('./combat.ts', (exports, module, __require) => {
           return 0;
       const base = Math.max(0, Math.floor((unit.atk ?? 0) + (unit.wil ?? 0)));
       const ratio = Math.min(0.6, realm * 0.02 + subRealm * 0.005);
-      const className = String(getMetaById(unit.id)?.class ?? '');
-      const roleScale = REALM_ROLE_SCALE[className] ?? 1;
+      const className = normalizeClassName(getMetaById(unit.id)?.class);
+      const roleScale = className ? (REALM_ROLE_SCALE[className] ?? 1) : 1;
       return Math.round(base * ratio * roleScale);
   };
   const getRankPriority = (unit) => {
@@ -4210,7 +4214,7 @@ __define('./combat.ts', (exports, module, __require) => {
       if (pool.length === 0)
           return null;
       const meta = getMetaById(attacker.id);
-      const className = meta?.class ?? null;
+      const className = normalizeClassName(meta?.class);
       const isAssassin = className === 'Assassin';
       const slotOf = (token) => slotIndex(token.side, token.cx, token.cy);
       const isBlockedLeader = (slot) => (slot === 8 && (occupiedSlots.has(2) || occupiedSlots.has(5)));
@@ -11856,12 +11860,14 @@ __define('./meta.ts', (exports, module, __require) => {
   const __dep1 = __require('./utils/kit.ts');
   const extractOnSpawnRage = __dep1.extractOnSpawnRage;
   const kitSupportsSummon = __dep1.kitSupportsSummon;
+  const __dep2 = __require('./utils/domain-normalization.ts');
+  const normalizeClassName = __dep2.normalizeClassName;
   // Dùng trực tiếp catalog cho tra cứu
   const Meta = {
       get: getMetaById,
       classOf(id) {
           const entry = getMetaById(id);
-          return entry?.class ?? null;
+          return normalizeClassName(entry?.class) ?? null;
       },
       rankOf(id) {
           const entry = getMetaById(id);
@@ -11872,7 +11878,7 @@ __define('./meta.ts', (exports, module, __require) => {
       },
       isSummoner(id) {
           const entry = getMetaById(id);
-          return !!(entry && entry.class === 'Summoner' && kitSupportsSummon(entry));
+          return !!(entry && normalizeClassName(entry.class) === 'Summoner' && kitSupportsSummon(entry));
       },
   };
   const adaptMetaEntry = (entry) => {
@@ -11894,7 +11900,7 @@ __define('./meta.ts', (exports, module, __require) => {
           if (!id)
               return null;
           const value = Meta.classOf(id);
-          return typeof value === 'string' ? value : null;
+          return normalizeClassName(value);
       },
       rankOf(id) {
           if (!id)
@@ -11930,7 +11936,7 @@ __define('./meta.ts', (exports, module, __require) => {
       hpRegen: 0,
   };
   const isRankName = (value) => (typeof value === 'string' && value in RANK_MULT);
-  const isClassName = (value) => (typeof value === 'string' && value in CLASS_BASE);
+  const isClassName = (value) => normalizeClassName(value) !== null;
   const coerceStatMods = (mods) => {
       if (!mods || typeof mods !== 'object')
           return undefined;
@@ -11946,8 +11952,10 @@ __define('./meta.ts', (exports, module, __require) => {
       const entry = Meta.get(unitId);
       if (!entry)
           return { ...EMPTY_INSTANCE_STATS };
-      const className = entry.class;
+      const className = normalizeClassName(entry.class);
       const rank = entry.rank;
+      if (!className || !isClassName(className) || !isRankName(rank))
+          return { ...EMPTY_INSTANCE_STATS };
       const base = CLASS_BASE[className];
       // Delta tăng trưởng (Laser)
       const delta = CLASS_GROWTH[className];
@@ -12180,6 +12188,8 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
   const lookupUnit = __dep0.lookupUnit;
   const __dep1 = __require('./modes/pve/collection-mapper.ts');
   const mapUnitProgressById = __dep1.mapUnitProgressById;
+  const __dep2 = __require('./utils/domain-normalization.ts');
+  const normalizeClassName = __dep2.normalizeClassName;
   const CREEP_SLOT_ORDER = [
       { id: 'creep_1', powerSlot: 2 },
       { id: 'creep_2', powerSlot: 1 },
@@ -12228,7 +12238,7 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
               level: typeof progress.level === 'number' ? progress.level : undefined,
               realm: typeof progress.realm === 'number' ? progress.realm : undefined,
               subRealm: typeof progress.subRealm === 'number' ? progress.subRealm : undefined,
-              className: typeof entry.class === 'string' && entry.class.trim() ? entry.class : undefined,
+              className: normalizeClassName(entry.class) ?? undefined,
           });
       }
       return { rankCounts, totalRanked, progressProfiles };
@@ -12313,9 +12323,7 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
       const level = clampInteger(profile.level, 1);
       const realm = clampInteger(profile.realm, 0);
       const subRealm = clampInteger(profile.subRealm, 0);
-      const className = typeof profile.className === 'string' && profile.className.trim()
-          ? profile.className
-          : null;
+      const className = normalizeClassName(profile.className);
       return {
           id: creepId,
           name: unitBase.name,
@@ -16367,10 +16375,14 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
   const createRngState = __dep11.createRngState;
   const __dep12 = __require('./utils/format.ts');
   const stableStringify = __dep12.stableStringify;
-  const __dep13 = __require('./modes/pve/collection-mapper.ts');
-  const mapUnitProgressById = __dep13.mapUnitProgressById;
-  const __dep14 = __require('./modes/pve/creep-builder.ts');
-  const buildAICreepDeckFromLineup = __dep14.buildAICreepDeckFromLineup;
+  const __dep13 = __require('./utils/domain-normalization.ts');
+  const normalizeClassName = __dep13.normalizeClassName;
+  const normalizeElementKey = __dep13.normalizeElementKey;
+  const normalizeElementList = __dep13.normalizeElementList;
+  const __dep14 = __require('./modes/pve/collection-mapper.ts');
+  const mapUnitProgressById = __dep14.mapUnitProgressById;
+  const __dep15 = __require('./modes/pve/creep-builder.ts');
+  const buildAICreepDeckFromLineup = __dep15.buildAICreepDeckFromLineup;
   void Statuses;
   const DEFAULT_UNIT_ROSTER = UNITS.map((unit) => {
       const unitId = normalizeUnitId(unit.id);
@@ -16942,6 +16954,31 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
       }
       if (merged.art == null) {
           merged.art = skeleton.art ?? null;
+      }
+      const normalizedClass = normalizeClassName(candidate.class);
+      if (normalizedClass) {
+          merged.class = normalizedClass;
+      }
+      const normalizedElement = normalizeElementKey(candidate.element
+          ?? candidate.nguyenTo
+          ?? candidate.nguyen_to
+          ?? candidate.he);
+      if (normalizedElement) {
+          merged.element = normalizedElement;
+      }
+      const metadataRaw = candidate.metadata;
+      if (metadataRaw && typeof metadataRaw === 'object' && !Array.isArray(metadataRaw)) {
+          const metadata = { ...metadataRaw };
+          const metadataElement = normalizeElementKey(metadata.element
+              ?? metadata.nguyenTo
+              ?? metadata.nguyen_to
+              ?? metadata.he);
+          if (metadataElement)
+              metadata.element = metadataElement;
+          if (metadata.elements != null) {
+              metadata.elements = normalizeElementList(metadata.elements);
+          }
+          merged.metadata = metadata;
       }
       if (typeof merged.skinKey === 'string') {
           merged.skinKey = merged.skinKey.trim() !== '' ? merged.skinKey : merged.art?.skinKey ?? skeleton.skinKey ?? null;
@@ -25861,12 +25898,15 @@ __define('./turns.ts', (exports, module, __require) => {
   const evaluateGambitLogic = __dep16.evaluateGambitLogic;
   const __dep17 = __require('./utils/rng.ts');
   const nextRngValue = __dep17.nextRngValue;
-  const __dep18 = __require('./leader-uyen.ts');
-  const clearQueuedUyenUlt = __dep18.clearQueuedUyenUlt;
-  const hasQueuedUyenUlt = __dep18.hasQueuedUyenUlt;
-  const isLeaderUltReady = __dep18.isLeaderUltReady;
-  const isUyenLeader = __dep18.isUyenLeader;
-  const grantUyenSummonRage = __dep18.grantUyenSummonRage;
+  const __dep18 = __require('./utils/domain-normalization.ts');
+  const normalizeClassName = __dep18.normalizeClassName;
+  const normalizeElementKey = __dep18.normalizeElementKey;
+  const __dep19 = __require('./leader-uyen.ts');
+  const clearQueuedUyenUlt = __dep19.clearQueuedUyenUlt;
+  const hasQueuedUyenUlt = __dep19.hasQueuedUyenUlt;
+  const isLeaderUltReady = __dep19.isLeaderUltReady;
+  const isUyenLeader = __dep19.isUyenLeader;
+  const grantUyenSummonRage = __dep19.grantUyenSummonRage;
   const toLowerSide = (side) => {
       if (side === 'ALLY')
           return 'ally';
@@ -25915,7 +25955,7 @@ __define('./turns.ts', (exports, module, __require) => {
   function grantActionAether(Game, unit, acted) {
       if (!unit || !unit.alive || !acted)
           return 0;
-      const className = Game.meta?.get(unit.id)?.class ?? null;
+      const className = normalizeClassName(Game.meta?.get(unit.id)?.class) ?? null;
       const amount = resolveActionAetherRegen(className);
       if (amount > 0) {
           globalAetherPool.gain(unit.side, amount);
@@ -26052,6 +26092,12 @@ __define('./turns.ts', (exports, module, __require) => {
           res: stats.res ?? 0,
           wil: stats.wil ?? 0,
       };
+      const normalizedClass = normalizeClassName(p.class)
+          ?? normalizeClassName(meta?.class)
+          ?? undefined;
+      const normalizedElement = normalizeElementKey(p.element)
+          ?? normalizeElementKey(meta?.element)
+          ?? undefined;
       const obj = {
           id: p.unitId,
           name: p.name ?? undefined,
@@ -26063,7 +26109,8 @@ __define('./turns.ts', (exports, module, __require) => {
           ...resolvedStats,
           statuses: [],
           baseStats,
-          class: typeof p.class === 'string' && p.class.trim() ? p.class : (typeof meta?.class === 'string' ? meta.class : undefined),
+          class: normalizedClass,
+          ...(normalizedElement ? { element: normalizedElement } : {}),
       };
       if (sideLower === 'enemy' && fromDeck && isPveCreepId(p.unitId)) {
           const mutationRoll = nextRngValue(Game.rng);
@@ -28111,6 +28158,103 @@ __define('./utils/currency.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'getSharedCurrencyWallet')) exports.getSharedCurrencyWallet = getSharedCurrencyWallet;
   if (!Object.prototype.hasOwnProperty.call(exports, 'syncSharedCurrencyWallet')) exports.syncSharedCurrencyWallet = syncSharedCurrencyWallet;
   if (!Object.prototype.hasOwnProperty.call(exports, 'subscribeSharedCurrencyWallet')) exports.subscribeSharedCurrencyWallet = subscribeSharedCurrencyWallet;
+});
+__define('./utils/domain-normalization.ts', (exports, module, __require) => {
+  const ELEMENT_KEYS = [
+      'fire',
+      'metal',
+      'wood',
+      'earth',
+      'lightning',
+      'blood',
+      'water',
+      'light',
+      'dark',
+      'wind',
+  ];
+  const ELEMENT_KEY_SET = new Set(ELEMENT_KEYS);
+  const ELEMENT_ALIAS_MAP = {
+      fire: 'fire',
+      hoa: 'fire',
+      hoả: 'fire',
+      hỏa: 'fire',
+      metal: 'metal',
+      kim: 'metal',
+      wood: 'wood',
+      moc: 'wood',
+      mộc: 'wood',
+      earth: 'earth',
+      tho: 'earth',
+      thổ: 'earth',
+      lightning: 'lightning',
+      loi: 'lightning',
+      lôi: 'lightning',
+      blood: 'blood',
+      huyet: 'blood',
+      huyết: 'blood',
+      water: 'water',
+      thuy: 'water',
+      thủy: 'water',
+      light: 'light',
+      quang: 'light',
+      dark: 'dark',
+      am: 'dark',
+      ám: 'dark',
+      wind: 'wind',
+      phong: 'wind',
+  };
+  const CLASS_NAME_MAP = {
+      mage: 'Mage',
+      tanker: 'Tanker',
+      ranger: 'Ranger',
+      archer: 'Ranger',
+      warrior: 'Warrior',
+      summoner: 'Summoner',
+      support: 'Support',
+      assassin: 'Assassin',
+  };
+  const normalizeText = (value) => {
+      if (typeof value !== 'string')
+          return null;
+      const trimmed = value.trim();
+      if (!trimmed)
+          return null;
+      return trimmed
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase();
+  };
+  function normalizeElementKey(value) {
+      const normalized = normalizeText(value);
+      if (!normalized)
+          return null;
+      const alias = ELEMENT_ALIAS_MAP[normalized];
+      if (alias)
+          return alias;
+      return ELEMENT_KEY_SET.has(normalized) ? normalized : null;
+  }
+  function normalizeElementList(values) {
+      if (!Array.isArray(values))
+          return [];
+      const out = [];
+      for (const item of values) {
+          const key = normalizeElementKey(item);
+          if (!key || out.includes(key))
+              continue;
+          out.push(key);
+      }
+      return out;
+  }
+  function normalizeClassName(value) {
+      const normalized = normalizeText(value);
+      if (!normalized)
+          return null;
+      return CLASS_NAME_MAP[normalized] ?? null;
+  }
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeElementKey')) exports.normalizeElementKey = normalizeElementKey;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeElementList')) exports.normalizeElementList = normalizeElementList;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeClassName')) exports.normalizeClassName = normalizeClassName;
 });
 __define('./utils/dummy.ts', (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/utils/dummy.ts

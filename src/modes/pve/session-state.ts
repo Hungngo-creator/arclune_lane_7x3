@@ -26,6 +26,7 @@ import { getUnitArt } from '../../art.ts';
 import { normalizeUnitId } from '../../utils/unit-id.ts';
 import { createRngState } from '../../utils/rng.ts';
 import { stableStringify } from '../../utils/format.ts';
+import { normalizeClassName, normalizeElementKey, normalizeElementList } from '../../utils/domain-normalization.ts';
 import { mapUnitProgressById } from './collection-mapper.ts';
 import { buildAICreepDeckFromLineup } from './creep-builder.ts';
 
@@ -706,6 +707,37 @@ function normalizeDeckEntry(entry: unknown): SessionState['unitsAll'][number] | 
   }
   if (merged.art == null) {
     merged.art = skeleton.art ?? null;
+  }
+  const normalizedClass = normalizeClassName(candidate.class);
+  if (normalizedClass) {
+    merged.class = normalizedClass;
+  }
+
+  const normalizedElement = normalizeElementKey(
+    candidate.element
+    ?? candidate.nguyenTo
+    ?? candidate.nguyen_to
+    ?? candidate.he,
+  );
+  if (normalizedElement) {
+    merged.element = normalizedElement;
+  }
+
+  const metadataRaw = candidate.metadata;
+  if (metadataRaw && typeof metadataRaw === 'object' && !Array.isArray(metadataRaw)) {
+    const metadata = { ...(metadataRaw as Record<string, unknown>) };
+    const metadataElement = normalizeElementKey(
+      metadata.element
+      ?? metadata.nguyenTo
+      ?? metadata.nguyen_to
+      ?? metadata.he,
+    );
+    if (metadataElement) metadata.element = metadataElement;
+
+    if (metadata.elements != null) {
+      metadata.elements = normalizeElementList(metadata.elements);
+    }
+    merged.metadata = metadata;
   }
   if (typeof merged.skinKey === 'string') {
     merged.skinKey = merged.skinKey.trim() !== '' ? merged.skinKey : merged.art?.skinKey ?? skeleton.skinKey ?? null;
