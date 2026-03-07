@@ -14002,17 +14002,25 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       });
       const allTokens = game.tokens || [];
       let aliveTokenCache = null;
+      const aliveBySideCache = new Map();
       const getAliveTokens = () => {
           if (aliveTokenCache)
               return aliveTokenCache;
           aliveTokenCache = allTokens.filter((token) => token.alive);
           return aliveTokenCache;
       };
+      const getAliveBySide = (side) => {
+          const cached = aliveBySideCache.get(side);
+          if (cached)
+              return cached;
+          const filtered = getAliveTokens().filter((token) => token.side === side);
+          aliveBySideCache.set(side, filtered);
+          return filtered;
+      };
       let busyMs = 900;
       switch (u.type) {
           case 'drain': {
-              const aliveNow = getAliveTokens();
-              const foes = aliveNow.filter(t => t.side === foeSide);
+              const foes = getAliveBySide(foeSide);
               if (!foes.length)
                   break;
               const scale = parseFiniteNumber(u.power) ?? 1.2;
@@ -14054,16 +14062,17 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   });
                   finishFuryHit(unit);
               }
-              const aliveNow = getAliveTokens();
-              const foes = aliveNow.filter((t) => t.side === foeSide && t.alive);
+              const foes = getAliveBySide(foeSide);
               const hits = getUltHitCount(u);
               const selected = [];
+              const selectedSet = new Set();
               if (foes.length) {
                   const primary = pickTarget(game, unit);
                   if (primary) {
                       selected.push(primary);
+                      selectedSet.add(primary);
                   }
-                  const pool = foes.filter((t) => !selected.includes(t));
+                  const pool = foes.filter((t) => !selectedSet.has(t));
                   pool.sort((a, b) => {
                       const da = Math.abs(a.cx - unit.cx) + Math.abs(a.cy - unit.cy);
                       const db = Math.abs(b.cx - unit.cx) + Math.abs(b.cy - unit.cy);
@@ -14073,6 +14082,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                       if (selected.length >= hits)
                           break;
                       selected.push(enemy);
+                      selectedSet.add(enemy);
                   }
                   if (selected.length > hits)
                       selected.length = hits;
@@ -14080,6 +14090,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                       selected.push(foes[0]);
                   }
               }
+              const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
               const applyBusyFromVfx = (startedAt, duration) => {
                   if (!Number.isFinite(startedAt) || !Number.isFinite(duration))
                       return;
@@ -14092,7 +14103,6 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               const bindingKey = 'huyet_hon_loi_quyet';
               {
                   const startedAt = getNow();
-                  const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
                   if (sessionVfx) {
                       try {
                           const dur = vfxAddBloodPulse(sessionVfx, unit, {
@@ -14135,7 +14145,6 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   });
                   {
                       const startedAt = getNow();
-                      const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
                       if (sessionVfx) {
                           try {
                               const dur = vfxAddLightningArc(sessionVfx, unit, tgt, {
@@ -14176,7 +14185,6 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               }
               {
                   const startedAt = getNow();
-                  const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
                   if (sessionVfx) {
                       try {
                           const dur = vfxAddGroundBurst(sessionVfx, unit, {
@@ -14191,7 +14199,6 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               }
               {
                   const startedAt = getNow();
-                  const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
                   if (sessionVfx) {
                       try {
                           const dur = vfxAddGroundBurst(sessionVfx, unit, {
@@ -14304,11 +14311,11 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               break;
           }
           case 'sleep': {
-              const aliveNow = getAliveTokens();
-              const foes = aliveNow.filter(t => t.side === foeSide);
+              const foes = getAliveBySide(foeSide);
               if (!foes.length)
                   break;
               const take = Math.max(1, Math.min(foes.length, getUltTargetCount(u, foes.length)));
+              const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
               foes.sort((a, b) => {
                   const da = Math.abs(a.cx - unit.cx) + Math.abs(a.cy - unit.cy);
                   const db = Math.abs(b.cx - unit.cx) + Math.abs(b.cy - unit.cy);
@@ -14323,7 +14330,6 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   if (sleep) {
                       Statuses.add(tgt, sleep);
                   }
-                  const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
                   if (sessionVfx) {
                       try {
                           vfxAddHit(sessionVfx, tgt);
@@ -14340,7 +14346,9 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   break;
               fallen.sort((a, b) => (b.deadAt || 0) - (a.deadAt || 0));
               const take = Math.max(1, Math.min(fallen.length, getUltTargetCount(u, 1)));
-              const sideLeader = getAliveTokens().find((token) => token.side === unit.side && isUyenLeader(token));
+              const allies = getAliveBySide(unit.side);
+              const sideLeader = allies.find((token) => isUyenLeader(token));
+              const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
               for (let i = 0; i < take; i++) {
                   const ally = fallen[i];
                   if (!ally)
@@ -14361,7 +14369,6 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                           Statuses.add(ally, silence);
                       }
                   }
-                  const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
                   if (sessionVfx) {
                       try {
                           vfxAddSpawn(sessionVfx, ally.cx, ally.cy, ally.side);
@@ -14374,10 +14381,10 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               break;
           }
           case 'equalizeHP': {
-              const aliveNow = getAliveTokens();
-              let allies = aliveNow.filter(t => t.side === unit.side);
+              let allies = getAliveBySide(unit.side);
               if (!allies.length)
                   break;
+              const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
               allies.sort((a, b) => {
                   const ra = (a.hpMax || 1) ? (a.hp || 0) / a.hpMax : 0;
                   const rb = (b.hpMax || 1) ? (b.hp || 0) / b.hpMax : 0;
@@ -14387,7 +14394,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               const selected = allies.slice(0, count);
               if (u.healLeader) {
                   const leaderId = unit.side === 'ally' ? 'leaderA' : 'leaderB';
-                  const leader = getAliveTokens().find(t => t.id === leaderId);
+                  const leader = allies.find(t => t.id === leaderId);
                   if (leader && !selected.includes(leader))
                       selected.push(leader);
               }
@@ -14401,7 +14408,6 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   const goal = Math.min(tgt.hpMax || 0, Math.round((tgt.hpMax || 0) * ratio));
                   if (goal > (tgt.hp || 0)) {
                       healUnit(tgt, goal - (tgt.hp || 0));
-                      const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
                       if (sessionVfx) {
                           try {
                               vfxAddHit(sessionVfx, tgt);
@@ -14417,8 +14423,9 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               const targets = new Set();
               targets.add(unit);
               const extraAllies = Math.max(0, getUltTargetCount(u, 1) - 1);
-              const aliveNow = getAliveTokens();
-              const others = aliveNow.filter(t => t.side === unit.side && t !== unit);
+              const allies = getAliveBySide(unit.side);
+              const others = allies.filter(t => t !== unit);
+              const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
               others.sort((a, b) => (a.spd || 0) - (b.spd || 0));
               for (const ally of others) {
                   if (targets.size >= extraAllies + 1)
@@ -14432,7 +14439,6 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   if (haste) {
                       Statuses.add(tgt, haste);
                   }
-                  const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
                   if (sessionVfx) {
                       try {
                           vfxAddHit(sessionVfx, tgt);

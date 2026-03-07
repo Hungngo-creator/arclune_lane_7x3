@@ -1618,18 +1618,25 @@ function performUlt(unit: UnitToken): void {
   
   const allTokens = game.tokens || [];
   let aliveTokenCache: UnitToken[] | null = null;
+  const aliveBySideCache = new Map<Side, UnitToken[]>();
   const getAliveTokens = (): UnitToken[] => {
     if (aliveTokenCache) return aliveTokenCache;
     aliveTokenCache = allTokens.filter((token) => token.alive);
     return aliveTokenCache;
+  };
+  const getAliveBySide = (side: Side): UnitToken[] => {
+    const cached = aliveBySideCache.get(side);
+    if (cached) return cached;
+    const filtered = getAliveTokens().filter((token) => token.side === side);
+    aliveBySideCache.set(side, filtered);
+    return filtered;
   };
 
   let busyMs = 900;
 
   switch(u.type){
     case 'drain': {
-      const aliveNow = getAliveTokens();
-      const foes = aliveNow.filter(t => t.side === foeSide);
+      const foes = getAliveBySide(foeSide);
       if (!foes.length) break;
       const scale = parseFiniteNumber(u.power) ?? 1.2;
       let totalDrain = 0;
@@ -1670,17 +1677,18 @@ function performUlt(unit: UnitToken): void {
         finishFuryHit(unit);
       }
 
-      const aliveNow = getAliveTokens();
-      const foes = aliveNow.filter((t) => t.side === foeSide && t.alive);
+      const foes = getAliveBySide(foeSide);
 
       const hits = getUltHitCount(u);
       const selected: UnitToken[] = [];
+      const selectedSet = new Set<UnitToken>();
       if (foes.length){
         const primary = pickTarget(game, unit);
         if (primary){
           selected.push(primary);
+          selectedSet.add(primary);
         }
-        const pool = foes.filter((t) => !selected.includes(t));
+        const pool = foes.filter((t) => !selectedSet.has(t));
         pool.sort((a, b) => {
           const da = Math.abs(a.cx - unit.cx) + Math.abs(a.cy - unit.cy);
           const db = Math.abs(b.cx - unit.cx) + Math.abs(b.cy - unit.cy);
@@ -1689,12 +1697,14 @@ function performUlt(unit: UnitToken): void {
         for (const enemy of pool){
           if (selected.length >= hits) break;
           selected.push(enemy);
+          selectedSet.add(enemy);
         }
         if (selected.length > hits) selected.length = hits;
         if (!selected.length && foes.length){
           selected.push(foes[0]);
         }
       }
+      const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
 
       const applyBusyFromVfx = (startedAt: number, duration: number | null | undefined): void => {
         if (!Number.isFinite(startedAt) || !Number.isFinite(duration)) return;
@@ -1709,7 +1719,6 @@ function performUlt(unit: UnitToken): void {
 
       {
         const startedAt = getNow();
-        const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
         if (sessionVfx) {
           try {
             const dur = vfxAddBloodPulse(sessionVfx, unit, {
@@ -1753,7 +1762,6 @@ function performUlt(unit: UnitToken): void {
 
         {
           const startedAt = getNow();
-        const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
           if (sessionVfx) {
             try {
               const dur = vfxAddLightningArc(sessionVfx, unit, tgt, {
@@ -1792,7 +1800,6 @@ function performUlt(unit: UnitToken): void {
 
       {
         const startedAt = getNow();
-        const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
         if (sessionVfx) {
           try {
             const dur = vfxAddGroundBurst(sessionVfx, unit, {
@@ -1807,7 +1814,6 @@ function performUlt(unit: UnitToken): void {
 
       {
         const startedAt = getNow();
-        const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
         if (sessionVfx) {
           try {
             const dur = vfxAddGroundBurst(sessionVfx, unit, {
@@ -1915,10 +1921,10 @@ function performUlt(unit: UnitToken): void {
     }
 
     case 'sleep': {
-      const aliveNow = getAliveTokens();
-      const foes = aliveNow.filter(t => t.side === foeSide);
+      const foes = getAliveBySide(foeSide);
       if (!foes.length) break;
       const take = Math.max(1, Math.min(foes.length, getUltTargetCount(u, foes.length)));
+      const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
       foes.sort((a,b)=>{
         const da = Math.abs(a.cx - unit.cx) + Math.abs(a.cy - unit.cy);
         const db = Math.abs(b.cx - unit.cx) + Math.abs(b.cy - unit.cy);
@@ -1932,7 +1938,6 @@ function performUlt(unit: UnitToken): void {
         if (sleep) {
           Statuses.add(tgt, sleep);
         }
-        const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
         if (sessionVfx) {
           try { vfxAddHit(sessionVfx, tgt); } catch(_){}
         }
@@ -1946,7 +1951,9 @@ function performUlt(unit: UnitToken): void {
       if (!fallen.length) break;
       fallen.sort((a,b)=> (b.deadAt||0) - (a.deadAt||0));
       const take = Math.max(1, Math.min(fallen.length, getUltTargetCount(u, 1)));
-      const sideLeader = getAliveTokens().find((token) => token.side === unit.side && isUyenLeader(token));
+      const allies = getAliveBySide(unit.side);
+      const sideLeader = allies.find((token) => isUyenLeader(token));
+      const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
       for (let i=0; i<take; i++){
         const ally = fallen[i];
         if (!ally) continue;
@@ -1966,7 +1973,6 @@ function performUlt(unit: UnitToken): void {
             Statuses.add(ally, silence);
           }
         }
-        const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
         if (sessionVfx) {
           try { vfxAddSpawn(sessionVfx, ally.cx, ally.cy, ally.side); } catch(_){}
         }
@@ -1977,9 +1983,9 @@ function performUlt(unit: UnitToken): void {
     }
 
     case 'equalizeHP': {
-      const aliveNow = getAliveTokens();
-      let allies = aliveNow.filter(t => t.side === unit.side);
+      let allies = getAliveBySide(unit.side);
       if (!allies.length) break;
+      const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
       allies.sort((a,b)=>{
         const ra = (a.hpMax || 1) ? (a.hp || 0) / a.hpMax : 0;
         const rb = (b.hpMax || 1) ? (b.hp || 0) / b.hpMax : 0;
@@ -1989,7 +1995,7 @@ function performUlt(unit: UnitToken): void {
       const selected = allies.slice(0, count);
       if (u.healLeader){
         const leaderId = unit.side === 'ally' ? 'leaderA' : 'leaderB';
-        const leader = getAliveTokens().find(t => t.id === leaderId);
+        const leader = allies.find(t => t.id === leaderId);
         if (leader && !selected.includes(leader)) selected.push(leader);
       }
       if (!selected.length) break;
@@ -2001,9 +2007,8 @@ function performUlt(unit: UnitToken): void {
         const goal = Math.min(tgt.hpMax || 0, Math.round((tgt.hpMax || 0) * ratio));
         if (goal > (tgt.hp || 0)){
           healUnit(tgt, goal - (tgt.hp || 0));
-          const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
           if (sessionVfx) {
-            try { vfxAddHit(sessionVfx, tgt); } catch(_){}
+            try { vfxAddHit(sessionVfx, tgt); } catch(_){ }
           }
         }
       }
@@ -2015,8 +2020,9 @@ function performUlt(unit: UnitToken): void {
       const targets = new Set();
       targets.add(unit);
       const extraAllies = Math.max(0, getUltTargetCount(u, 1) - 1);
-      const aliveNow = getAliveTokens();
-      const others = aliveNow.filter(t => t.side === unit.side && t !== unit);
+      const allies = getAliveBySide(unit.side);
+      const others = allies.filter(t => t !== unit);
+      const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
       others.sort((a,b)=> (a.spd||0) - (b.spd||0));
       for (const ally of others){
         if (targets.size >= extraAllies + 1) break;
@@ -2029,7 +2035,6 @@ function performUlt(unit: UnitToken): void {
         if (haste) {
           Statuses.add(tgt, haste);
         }
-        const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
         if (sessionVfx) {
           try { vfxAddHit(sessionVfx, tgt); } catch(_){}
         }
