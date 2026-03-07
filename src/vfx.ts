@@ -56,6 +56,13 @@ type HitVfxEvent = BaseVfxEvent & {
   [extra: string]: unknown;
 };
 
+type HitStatusTextStyle = {
+  text: string;
+  fill: string;
+  stroke: string;
+  shadow: string;
+};
+
 type TracerVfxEvent = BaseVfxEvent & {
   type: 'tracer';
   refA: TokenRef;
@@ -237,6 +244,80 @@ const warnInvalidArc = (label: string, data: unknown): void => {
 };
 
 const clamp01 = (value: number): number => Math.max(0, Math.min(1, value));
+
+const readBooleanFlag = (event: HitVfxEvent, keys: ReadonlyArray<string>): boolean => {
+  for (const key of keys) {
+    if (!(key in event)) continue;
+    if (Boolean(event[key])) return true;
+  }
+  return false;
+};
+
+const resolveHitStatusTextStyle = (event: HitVfxEvent): HitStatusTextStyle | null => {
+  const isCritical = readBooleanFlag(event, ['isCrit', 'crit', 'critical']);
+  const hasAdvantage = readBooleanFlag(event, ['isAdvantage', 'advantage', 'hasAdvantage']);
+
+  if (isCritical && hasAdvantage) {
+    return {
+      text: 'CRITICAL · ADVANTAGE',
+      fill: '#ffd447',
+      stroke: '#4b2f00',
+      shadow: 'rgba(255, 208, 84, 0.95)',
+    };
+  }
+
+  if (isCritical) {
+    return {
+      text: 'CRITICAL',
+      fill: '#ffb8b8',
+      stroke: '#4a0f0f',
+      shadow: 'rgba(255, 106, 106, 0.8)',
+    };
+  }
+
+  if (hasAdvantage) {
+    return {
+      text: 'ADVANTAGE',
+      fill: '#9befff',
+      stroke: '#0f2e40',
+      shadow: 'rgba(119, 224, 255, 0.75)',
+    };
+  }
+
+  return null;
+};
+
+const drawHitStatusText = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  radius: number,
+  progress: number,
+  style: HitStatusTextStyle,
+): void => {
+  if (!style.text) return;
+  const alpha = 0.95 * (1 - progress);
+  if (alpha <= 0) return;
+
+  const fontSize = Math.max(12, Math.round(Math.max(18, radius) * 0.62));
+  const textY = y - Math.max(20, radius * 1.35);
+
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.font = `900 ${fontSize}px system-ui, -apple-system, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.lineJoin = 'round';
+  ctx.miterLimit = 2;
+  ctx.lineWidth = Math.max(2.5, Math.round(fontSize * 0.2));
+  ctx.strokeStyle = style.stroke;
+  ctx.fillStyle = style.fill;
+  ctx.shadowColor = style.shadow;
+  ctx.shadowBlur = Math.max(8, Math.round(fontSize * 0.5));
+  ctx.strokeText(style.text, x, textY);
+  ctx.fillText(style.text, x, textY);
+  ctx.restore();
+};
 
 const makeTokenKey = (parts: { iid?: number | null; id?: string | null } | null | undefined): string | null => {
   if (!parts) return null;
@@ -1021,6 +1102,11 @@ export function vfxDraw(
             ctx.lineWidth = 2;
             ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.stroke();
             ctx.restore();
+
+            const hitStatusText = resolveHitStatusTextStyle(e);
+            if (hitStatusText) {
+              drawHitStatusText(ctx, p.x, p.y, r, tt, hitStatusText);
+            }
           } else {
             warnInvalidArc('hit', { x: p?.x, y: p?.y, r });
           }

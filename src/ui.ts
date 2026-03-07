@@ -33,6 +33,19 @@ export function initHUD(doc: Document, root?: QueryableRoot | null): HudHandles 
   const costNow = queryFromRoot<HTMLElement>('costNow') || doc.getElementById('costNow');
   const costRing = queryFromRoot<HTMLElement>('costRing') || doc.getElementById('costRing');
   const costChip = queryFromRoot<HTMLElement>('costChip') || doc.getElementById('costChip');
+  const bottomHud = queryFromRoot<HTMLElement>('bottomHUD') || doc.getElementById('bottomHUD');
+  let combatReason = queryFromRoot<HTMLElement>('combatReason') || doc.getElementById('combatReason');
+
+  if (!combatReason && bottomHud) {
+    const node = doc.createElement('div');
+    node.id = 'combatReason';
+    node.className = 'chip chip-combat-reason';
+    node.textContent = '';
+    node.title = '';
+    node.setAttribute('aria-live', 'polite');
+    bottomHud.appendChild(node);
+    combatReason = node;
+  }
 
   const update = (Game: HudGameLike): void => {
     if (!Game) return;
@@ -53,9 +66,34 @@ export function initHUD(doc: Document, root?: QueryableRoot | null): HudHandles 
   };
 
   const handleGameEvent = (event: GameEventDetail<typeof TURN_START | typeof TURN_END | typeof ACTION_END>) => {
-    const detail = event.detail as { game?: HudGameLike } | undefined;
+    const detail = event.detail as {
+      game?: HudGameLike;
+      damageSummary?: string | null;
+      damageContext?: {
+        finalDamage?: number;
+        classBonus?: number;
+        elementBonus?: number;
+        synergyBonus?: number;
+        defenderKey?: string | null;
+      } | null;
+    } | undefined;
     const state = detail?.game ?? null;
     if (state) update(state);
+
+    if (event.type === ACTION_END && combatReason) {
+      const summary = typeof detail?.damageSummary === 'string' ? detail.damageSummary : '';
+      if (summary) {
+        combatReason.textContent = summary;
+        combatReason.title = summary;
+      } else {
+        const ctx = detail?.damageContext;
+        if (ctx && Number.isFinite(ctx.finalDamage)) {
+          const fallback = `Hit ${ctx.defenderKey ?? 'target'} ${Math.floor(Number(ctx.finalDamage))} dmg`;
+          combatReason.textContent = fallback;
+          combatReason.title = fallback;
+        }
+      }
+    }
   };
 
   let cleanedUp = false;

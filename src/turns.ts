@@ -12,6 +12,7 @@ import { vfxAddSpawn, vfxAddBloodPulse, asSessionWithVfx } from './vfx.ts';
 import { getUnitArt } from './art.ts';
 import { emitPassiveEvent, applyOnSpawnEffects, getPassiveLog, prepareUnitForPassives } from './passives.ts';
 import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } from './events.ts';
+import type { DamageCounterBreakdown, DamageEventContext } from './events.ts';
 import { safeNow, sessionNow } from './utils/time.ts';
 import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } from './utils/fury.ts';
 import { nextTurnInterleaved } from './turns/interleaved.ts';
@@ -253,7 +254,7 @@ export function spawnQueuedIfDue(
   const normalizedClass = normalizeClassName(p.class)
     ?? normalizeClassName(meta?.class)
     ?? undefined;
-  const normalizedElement = normalizeElementKey((p as Record<string, unknown>).element)
+  const normalizedElement = normalizeElementKey((p as unknown as Record<string, unknown>).element)
     ?? normalizeElementKey((meta as Record<string, unknown> | null)?.element)
     ?? undefined;
   const obj: UnitToken = {
@@ -394,6 +395,12 @@ const normalizeActionResolution = (outcome: unknown): StrictActionResolution | n
   };
 };
 
+interface DamageContextCarrier extends UnitToken {
+  _lastDamageContext?: DamageEventContext | null;
+  _lastCounterBreakdown?: DamageCounterBreakdown | null;
+  _lastDamageSummary?: string | null;
+}
+
 const consumedTurnFromOutcome = (outcome: StrictActionResolution | null, hadHook: boolean): TickMinionTtlOptions => {
   if (!hadHook){
     return { consumed: false, skipped: false, reason: null };
@@ -455,8 +462,29 @@ export function doActionOrSkip(
     reason: null as string | null
   };
 
+  const damageCarrier = unit as DamageContextCarrier | null | undefined;
+  if (damageCarrier) {
+    damageCarrier._lastDamageContext = null;
+    damageCarrier._lastCounterBreakdown = null;
+    damageCarrier._lastDamageSummary = null;
+  }
+
   const finishAction = (extra: Record<string, unknown>): void => {
-    emitGameEvent(ACTION_END, { ...baseDetail, ...extra });
+    const damageContext = damageCarrier?._lastDamageContext ?? null;
+    const counterBreakdown = damageCarrier?._lastCounterBreakdown ?? null;
+    const damageSummary = damageCarrier?._lastDamageSummary ?? null;
+    emitGameEvent(ACTION_END, {
+      ...baseDetail,
+      ...extra,
+      damageContext,
+      counterBreakdown,
+      damageSummary,
+    });
+    if (damageCarrier) {
+      damageCarrier._lastDamageContext = null;
+      damageCarrier._lastCounterBreakdown = null;
+      damageCarrier._lastDamageSummary = null;
+    }
   };
 
   if (!unit || !unit.alive) {

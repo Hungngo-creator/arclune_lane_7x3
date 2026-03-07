@@ -4107,6 +4107,21 @@ __define('./combat.ts', (exports, module, __require) => {
       const parsed = typeof value === 'number' ? value : Number(value);
       return Number.isFinite(parsed) ? parsed : fallback;
   };
+  const unitEventKey = (unit) => {
+      if (!unit)
+          return null;
+      const iid = Number.isFinite(unit.iid) ? String(unit.iid) : null;
+      return iid ? `${unit.id}#${iid}` : unit.id;
+  };
+  const pctLabel = (bonus) => `${bonus >= 0 ? '+' : ''}${Math.round(bonus * 100)}%`;
+  const buildDamageSummary = (ctx) => {
+      const source = ctx.actionType ?? 'attack';
+      const target = ctx.defenderKey ?? 'target';
+      return [
+          `${source} hit ${target}: ${ctx.finalDamage} dmg`,
+          `(class ${pctLabel(ctx.classBonus)}, element ${pctLabel(ctx.elementBonus)}, synergy ${pctLabel(ctx.synergyBonus)})`,
+      ].join(' ');
+  };
   const normalizeWeight = (value) => Math.max(0, toFinite(value, 0));
   const REALM_ROLE_SCALE = {
       Tanker: 0.9,
@@ -4401,6 +4416,30 @@ __define('./combat.ts', (exports, module, __require) => {
       });
       finishFuryHit(target);
       finishFuryHit(attacker);
+      const attackerCarrier = attacker;
+      const metadataBase = {
+          attackerKey: unitEventKey(attacker),
+          defenderKey: unitEventKey(target),
+          actionType: attackType || null,
+          damageType: dtype || null,
+          rawDamage: rawDamage,
+          finalDamage: dmg,
+          dealtDamage: dealt,
+          absorbedDamage: abs.absorbed,
+          classBonus: finalDamage.breakdown.classBonus,
+          elementBonus: finalDamage.breakdown.elementBonus,
+          synergyBonus: finalDamage.breakdown.synergyBonus,
+      };
+      const snapshot = {
+          ...metadataBase,
+          summary: buildDamageSummary(metadataBase),
+      };
+      const previous = attackerCarrier._lastDamageContext;
+      if (!previous || snapshot.finalDamage >= previous.finalDamage) {
+          attackerCarrier._lastDamageContext = snapshot;
+          attackerCarrier._lastCounterBreakdown = { ...finalDamage.breakdown };
+          attackerCarrier._lastDamageSummary = snapshot.summary;
+      }
       return { dealt, absorbed: abs.absorbed, total: dmg, breakdown: finalDamage.breakdown };
   }
   function healUnit(target, amount) {
@@ -26450,8 +26489,28 @@ __define('./turns.ts', (exports, module, __require) => {
           skipped: false,
           reason: null
       };
+      const damageCarrier = unit;
+      if (damageCarrier) {
+          damageCarrier._lastDamageContext = null;
+          damageCarrier._lastCounterBreakdown = null;
+          damageCarrier._lastDamageSummary = null;
+      }
       const finishAction = (extra) => {
-          emitGameEvent(ACTION_END, { ...baseDetail, ...extra });
+          const damageContext = damageCarrier?._lastDamageContext ?? null;
+          const counterBreakdown = damageCarrier?._lastCounterBreakdown ?? null;
+          const damageSummary = damageCarrier?._lastDamageSummary ?? null;
+          emitGameEvent(ACTION_END, {
+              ...baseDetail,
+              ...extra,
+              damageContext,
+              counterBreakdown,
+              damageSummary,
+          });
+          if (damageCarrier) {
+              damageCarrier._lastDamageContext = null;
+              damageCarrier._lastCounterBreakdown = null;
+              damageCarrier._lastDamageSummary = null;
+          }
       };
       if (!unit || !unit.alive) {
           emitGameEvent(ACTION_START, baseDetail);
@@ -27138,6 +27197,18 @@ __define('./ui.ts', (exports, module, __require) => {
       const costNow = queryFromRoot('costNow') || doc.getElementById('costNow');
       const costRing = queryFromRoot('costRing') || doc.getElementById('costRing');
       const costChip = queryFromRoot('costChip') || doc.getElementById('costChip');
+      const bottomHud = queryFromRoot('bottomHUD') || doc.getElementById('bottomHUD');
+      let combatReason = queryFromRoot('combatReason') || doc.getElementById('combatReason');
+      if (!combatReason && bottomHud) {
+          const node = doc.createElement('div');
+          node.id = 'combatReason';
+          node.className = 'chip chip-combat-reason';
+          node.textContent = '';
+          node.title = '';
+          node.setAttribute('aria-live', 'polite');
+          bottomHud.appendChild(node);
+          combatReason = node;
+      }
       const update = (Game) => {
           if (!Game)
               return;
@@ -27160,6 +27231,21 @@ __define('./ui.ts', (exports, module, __require) => {
           const state = detail?.game ?? null;
           if (state)
               update(state);
+          if (event.type === ACTION_END && combatReason) {
+              const summary = typeof detail?.damageSummary === 'string' ? detail.damageSummary : '';
+              if (summary) {
+                  combatReason.textContent = summary;
+                  combatReason.title = summary;
+              }
+              else {
+                  const ctx = detail?.damageContext;
+                  if (ctx && Number.isFinite(ctx.finalDamage)) {
+                      const fallback = `Hit ${ctx.defenderKey ?? 'target'} ${Math.floor(Number(ctx.finalDamage))} dmg`;
+                      combatReason.textContent = fallback;
+                      combatReason.title = fallback;
+                  }
+              }
+          }
       };
       let cleanedUp = false;
       const disposers = [];
@@ -29681,6 +29767,68 @@ __define('./vfx.ts', (exports, module, __require) => {
       }
   };
   const clamp01 = (value) => Math.max(0, Math.min(1, value));
+  const readBooleanFlag = (event, keys) => {
+      for (const key of keys) {
+          if (!(key in event))
+              continue;
+          if (Boolean(event[key]))
+              return true;
+      }
+      return false;
+  };
+  const resolveHitStatusTextStyle = (event) => {
+      const isCritical = readBooleanFlag(event, ['isCrit', 'crit', 'critical']);
+      const hasAdvantage = readBooleanFlag(event, ['isAdvantage', 'advantage', 'hasAdvantage']);
+      if (isCritical && hasAdvantage) {
+          return {
+              text: 'CRITICAL · ADVANTAGE',
+              fill: '#ffd447',
+              stroke: '#4b2f00',
+              shadow: 'rgba(255, 208, 84, 0.95)',
+          };
+      }
+      if (isCritical) {
+          return {
+              text: 'CRITICAL',
+              fill: '#ffb8b8',
+              stroke: '#4a0f0f',
+              shadow: 'rgba(255, 106, 106, 0.8)',
+          };
+      }
+      if (hasAdvantage) {
+          return {
+              text: 'ADVANTAGE',
+              fill: '#9befff',
+              stroke: '#0f2e40',
+              shadow: 'rgba(119, 224, 255, 0.75)',
+          };
+      }
+      return null;
+  };
+  const drawHitStatusText = (ctx, x, y, radius, progress, style) => {
+      if (!style.text)
+          return;
+      const alpha = 0.95 * (1 - progress);
+      if (alpha <= 0)
+          return;
+      const fontSize = Math.max(12, Math.round(Math.max(18, radius) * 0.62));
+      const textY = y - Math.max(20, radius * 1.35);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.font = `900 ${fontSize}px system-ui, -apple-system, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.lineJoin = 'round';
+      ctx.miterLimit = 2;
+      ctx.lineWidth = Math.max(2.5, Math.round(fontSize * 0.2));
+      ctx.strokeStyle = style.stroke;
+      ctx.fillStyle = style.fill;
+      ctx.shadowColor = style.shadow;
+      ctx.shadowBlur = Math.max(8, Math.round(fontSize * 0.5));
+      ctx.strokeText(style.text, x, textY);
+      ctx.fillText(style.text, x, textY);
+      ctx.restore();
+  };
   const makeTokenKey = (parts) => {
       if (!parts)
           return null;
@@ -30353,6 +30501,10 @@ __define('./vfx.ts', (exports, module, __require) => {
                           ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
                           ctx.stroke();
                           ctx.restore();
+                          const hitStatusText = resolveHitStatusTextStyle(e);
+                          if (hitStatusText) {
+                              drawHitStatusText(ctx, p.x, p.y, r, tt, hitStatusText);
+                          }
                       }
                       else {
                           warnInvalidArc('hit', { x: p?.x, y: p?.y, r });

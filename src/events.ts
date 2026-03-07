@@ -29,6 +29,30 @@ export interface ActionEventDetail {
   skipped: boolean;
   reason: string | null;
   ultOk?: boolean | null;
+  damageContext?: DamageEventContext | null;
+  counterBreakdown?: DamageCounterBreakdown | null;
+  damageSummary?: string | null;
+}
+
+export interface DamageCounterBreakdown {
+  classBonus: number;
+  elementBonus: number;
+  synergyBonus: number;
+}
+
+export interface DamageEventContext {
+  attackerKey: string | null;
+  defenderKey: string | null;
+  actionType: string | null;
+  damageType: string | null;
+  rawDamage: number;
+  finalDamage: number;
+  dealtDamage: number;
+  absorbedDamage: number;
+  classBonus: number;
+  elementBonus: number;
+  synergyBonus: number;
+  summary: string;
 }
 
 export interface TurnRegenDetail {

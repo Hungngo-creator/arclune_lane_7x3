@@ -965,3 +965,45 @@ test('stepTurn cộng AE theo class sau khi nhân vật hành động', async ()
 
   assert.deepStrictEqual(gains, [{ side: 'ally', amount: 10 }]);
 });
+
+test('ACTION_END mang metadata damageContext/counterBreakdown cho HUD/combat log', async () => {
+  const harness = await loadTurnsHarness({
+    './combat.js': {
+      doBasicWithFollowups(_game, unit){
+        unit._lastDamageContext = {
+          attackerKey: 'leaderA#1',
+          defenderKey: 'leaderB#2',
+          actionType: 'basic',
+          damageType: 'physical',
+          rawDamage: 100,
+          finalDamage: 150,
+          dealtDamage: 120,
+          absorbedDamage: 30,
+          classBonus: 0.2,
+          elementBonus: 0.1,
+          synergyBonus: 0.2,
+          summary: 'basic hit leaderB#2: 150 dmg (class +20%, element +10%, synergy +20%)',
+        };
+        unit._lastCounterBreakdown = { classBonus: 0.2, elementBonus: 0.1, synergyBonus: 0.2 };
+        unit._lastDamageSummary = unit._lastDamageContext.summary;
+      }
+    }
+  });
+
+  const { doActionOrSkip, eventLog } = harness;
+  const unit = { id: 'leaderA', side: 'ally', alive: true, hp: 100, hpMax: 100, iid: 1 };
+  const Game = { tokens: [unit], meta: new Map(), queued: { ally: new Map(), enemy: new Map() } };
+
+  doActionOrSkip(Game, unit, {
+    performUlt(){},
+    turnContext: { side: 'ally', slot: 8, cycle: 0, orderIndex: 0, orderLength: 1 }
+  });
+
+  const actionEnd = eventLog.find((ev) => ev.type === 'ACTION_END');
+  assert.ok(actionEnd, 'phải phát ACTION_END');
+  assert.equal(actionEnd.detail?.damageContext?.attackerKey, 'leaderA#1');
+  assert.equal(actionEnd.detail?.damageContext?.defenderKey, 'leaderB#2');
+  assert.equal(actionEnd.detail?.counterBreakdown?.classBonus, 0.2);
+  assert.equal(typeof actionEnd.detail?.damageSummary, 'string');
+  assert.equal(unit._lastDamageContext, null, 'metadata tạm phải được clear sau khi emit');
+});

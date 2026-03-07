@@ -72,6 +72,7 @@ Combo Số To: Kích hoạt Skill 1 (Free Action, +40% Stats) \rightarrow Dùng 
 Lối chơi: Vũ Thiên là dạng đấu sĩ "khô máu". Hắn cần kích hoạt Skill 3 sớm để lấy khả năng né và phản đòn, sau đó dồn Aether để spam Skill 1 + Skill 2.
 
 33) [SSR] THÁNH NỮ – ANNA Class: Support
+base element tag: light
 1. NỘI TẠI: Ấn Chú Thăng Hoa
  * Tags: [Nội Tại], [Bản Thân], [Buff Vĩnh Viễn], [Cộng Dồn], [Kích Hoạt: Khi Dùng Ult].
  * Logic:

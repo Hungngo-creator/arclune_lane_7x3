@@ -94,6 +94,44 @@ const toFinite = (value: unknown, fallback = 0): number => {
   return Number.isFinite(parsed) ? parsed : fallback;
 };
 
+interface DamageEventContextSnapshot {
+  attackerKey: string | null;
+  defenderKey: string | null;
+  actionType: string | null;
+  damageType: string | null;
+  rawDamage: number;
+  finalDamage: number;
+  dealtDamage: number;
+  absorbedDamage: number;
+  classBonus: number;
+  elementBonus: number;
+  synergyBonus: number;
+  summary: string;
+}
+
+interface DamageMetadataCarrier extends UnitToken {
+  _lastDamageContext?: DamageEventContextSnapshot | null;
+  _lastCounterBreakdown?: DamageBreakdownMetadata | null;
+  _lastDamageSummary?: string | null;
+}
+
+const unitEventKey = (unit: UnitToken | null | undefined): string | null => {
+  if (!unit) return null;
+  const iid = Number.isFinite(unit.iid) ? String(unit.iid) : null;
+  return iid ? `${unit.id}#${iid}` : unit.id;
+};
+
+const pctLabel = (bonus: number): string => `${bonus >= 0 ? '+' : ''}${Math.round(bonus * 100)}%`;
+
+const buildDamageSummary = (ctx: Omit<DamageEventContextSnapshot, 'summary'>): string => {
+  const source = ctx.actionType ?? 'attack';
+  const target = ctx.defenderKey ?? 'target';
+  return [
+    `${source} hit ${target}: ${ctx.finalDamage} dmg`,
+    `(class ${pctLabel(ctx.classBonus)}, element ${pctLabel(ctx.elementBonus)}, synergy ${pctLabel(ctx.synergyBonus)})`,
+  ].join(' ');
+};
+
 const normalizeWeight = (value: unknown): number => Math.max(0, toFinite(value, 0));
 
 const REALM_ROLE_SCALE: Readonly<Record<string, number>> = {
@@ -414,6 +452,31 @@ export function dealAbilityDamage(
 
   finishFuryHit(target);
   finishFuryHit(attacker);
+
+  const attackerCarrier = attacker as DamageMetadataCarrier;
+  const metadataBase = {
+    attackerKey: unitEventKey(attacker),
+    defenderKey: unitEventKey(target),
+    actionType: attackType || null,
+    damageType: dtype || null,
+    rawDamage: rawDamage,
+    finalDamage: dmg,
+    dealtDamage: dealt,
+    absorbedDamage: abs.absorbed,
+    classBonus: finalDamage.breakdown.classBonus,
+    elementBonus: finalDamage.breakdown.elementBonus,
+    synergyBonus: finalDamage.breakdown.synergyBonus,
+  };
+  const snapshot: DamageEventContextSnapshot = {
+    ...metadataBase,
+    summary: buildDamageSummary(metadataBase),
+  };
+  const previous = attackerCarrier._lastDamageContext;
+  if (!previous || snapshot.finalDamage >= previous.finalDamage) {
+    attackerCarrier._lastDamageContext = snapshot;
+    attackerCarrier._lastCounterBreakdown = { ...finalDamage.breakdown };
+    attackerCarrier._lastDamageSummary = snapshot.summary;
+  }
 
   return { dealt, absorbed: abs.absorbed, total: dmg, breakdown: finalDamage.breakdown };
 }
