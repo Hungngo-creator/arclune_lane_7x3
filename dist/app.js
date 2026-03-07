@@ -26190,7 +26190,6 @@ __define('./turns.ts', (exports, module, __require) => {
       const candidate = turn;
       return candidate.mode === 'interleaved_by_position' ? candidate : null;
   };
-  const tokensAlive = (Game) => Game.tokens.filter((t) => t.alive);
   const GAMBIT_SKILL_ACTIONS = ['skill1', 'skill2', 'skill3'];
   const DEFAULT_MUTATION_DEBUFF_POOL = ['bleed', 'stun', 'poison'];
   const isPveCreepId = (unitId) => (typeof unitId === 'string' && /^creep_\d+$/i.test(unitId));
@@ -26269,8 +26268,9 @@ __define('./turns.ts', (exports, module, __require) => {
   // --- Active/Spawn helpers (từ main.js) ---
   const keyOf = (side, slot) => `${side}:${slot}`;
   function getActiveAt(Game, side, slot) {
-      const { cx, cy } = slotToCell(side, slot);
-      return Game.tokens.find(t => t.side === side && t.cx === cx && t.cy === cy && t.alive);
+      const normalizedSide = toLowerSide(side);
+      const { cx, cy } = slotToCell(normalizedSide, slot);
+      return Game.tokens.find(t => t.side === normalizedSide && t.cx === cx && t.cy === cy && t.alive);
   }
   /**
    * @param {SessionState} Game
@@ -26285,13 +26285,14 @@ __define('./turns.ts', (exports, module, __require) => {
       if (!('order' in turn))
           return -1; // behavior-preserving
       const sequential = turn;
-      const key = keyOf(side, slot);
+      const normalizedSide = toLowerSide(side);
+      const key = keyOf(normalizedSide, slot);
       if (sequential.orderIndex instanceof Map && sequential.orderIndex.has(key)) {
           const v = sequential.orderIndex.get(key);
           return typeof v === 'number' ? v : -1;
       }
       const order = Array.isArray(sequential.order) ? sequential.order : [];
-      const idx = order.findIndex(entry => entry && entry.side === side && entry.slot === slot);
+      const idx = order.findIndex(entry => entry && entry.side === normalizedSide && entry.slot === slot);
       if (sequential.orderIndex instanceof Map && !sequential.orderIndex.has(key) && idx >= 0) {
           sequential.orderIndex.set(key, idx);
       }

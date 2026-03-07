@@ -63,9 +63,6 @@ const asInterleavedTurn = (
   return candidate.mode === 'interleaved_by_position' ? candidate : null;
 };
 
-const tokensAlive = (Game: SessionState): UnitToken[] =>
-  Game.tokens.filter((t): t is UnitToken => t.alive);
-
 const GAMBIT_SKILL_ACTIONS: GambitActionType[] = ['skill1', 'skill2', 'skill3'];
 const DEFAULT_MUTATION_DEBUFF_POOL: Array<'bleed' | 'stun' | 'poison'> = ['bleed', 'stun', 'poison'];
 
@@ -160,8 +157,9 @@ export function getActiveAt(
   side: TurnOrderSide,
   slot: number
 ): UnitToken | undefined {
-  const { cx, cy } = slotToCell(side, slot);
-  return Game.tokens.find(t => t.side === side && t.cx === cx && t.cy === cy && t.alive);
+  const normalizedSide = toLowerSide(side);
+  const { cx, cy } = slotToCell(normalizedSide, slot);
+  return Game.tokens.find(t => t.side === normalizedSide && t.cx === cx && t.cy === cy && t.alive);
 }
 
 /**
@@ -175,13 +173,14 @@ export function getTurnOrderIndex(Game: SessionState, side: TurnOrderSide, slot:
   if (!turn) return -1;
   if (!('order' in turn)) return -1; // behavior-preserving
   const sequential = turn as SequentialTurnState;
-  const key = keyOf(side, slot);
+  const normalizedSide = toLowerSide(side);
+  const key = keyOf(normalizedSide, slot);
   if (sequential.orderIndex instanceof Map && sequential.orderIndex.has(key)){
     const v = sequential.orderIndex.get(key);
     return typeof v === 'number' ? v : -1;
   }
   const order = Array.isArray(sequential.order) ? sequential.order : [];
-  const idx = order.findIndex(entry => entry && entry.side === side && entry.slot === slot);
+  const idx = order.findIndex(entry => entry && entry.side === normalizedSide && entry.slot === slot);
   if (sequential.orderIndex instanceof Map && !sequential.orderIndex.has(key) && idx >= 0){
     sequential.orderIndex.set(key, idx);
   }
