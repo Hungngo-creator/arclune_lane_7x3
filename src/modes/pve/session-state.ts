@@ -696,7 +696,11 @@ function normalizeDeckEntry(entry: unknown): SessionState['unitsAll'][number] | 
   const idRaw = candidate.id;
   if (typeof idRaw !== 'string' || idRaw.trim() === '') return null;
   const skeleton = makeDeckEntrySkeleton(idRaw);
-  const merged = { ...skeleton, ...(candidate as SessionState['unitsAll'][number]), id: idRaw };
+  const merged: SessionState['unitsAll'][number] & Record<string, unknown> = {
+    ...skeleton,
+    ...(candidate as SessionState['unitsAll'][number]),
+    id: idRaw,
+  };
   const costOverride = toFiniteCost(candidate.cost);
   merged.cost = costOverride ?? skeleton.cost ?? null;
   const nameCandidate = candidate.name;

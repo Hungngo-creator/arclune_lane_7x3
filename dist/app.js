@@ -749,9 +749,11 @@ __define('./ai.ts', (exports, module, __require) => {
       const topCandidates = [];
       let bestCandidate = null;
       const etaBySlot = new Map();
+      const cellBaseScoreBySlot = new Map();
       const summonerFeasibilityByCardSlot = new Map();
       const summonPatternSlotsByCardSlot = new Map();
       const summonSpecByCard = new Map();
+      const roleFactorByClassAndX = new Map();
       const insertTopCandidate = trackTopCandidates
           ? (entry) => {
               let inserted = false;
@@ -783,12 +785,18 @@ __define('./ai.ts', (exports, module, __require) => {
               : null;
           const kitTraits = detectKitTraits(meta);
           for (const cell of cells) {
-              const p = pressureScore(cell.cx, cell.cy);
-              const s = safetyScoreFast(cell.cx, cell.cy, allyPressure);
-              const e = etaBySlot.get(cell.s) ?? (() => {
-                  const eta = etaScoreEnemy(Game, cell.s);
-                  etaBySlot.set(cell.s, eta);
-                  return eta;
+              const base = cellBaseScoreBySlot.get(cell.s) ?? (() => {
+                  const pressure = pressureScore(cell.cx, cell.cy);
+                  const safety = safetyScoreFast(cell.cx, cell.cy, allyPressure);
+                  const eta = etaBySlot.get(cell.s) ?? (() => {
+                      const score = etaScoreEnemy(Game, cell.s);
+                      etaBySlot.set(cell.s, score);
+                      return score;
+                  })();
+                  const rowFactor = rowFactorByCy.get(cell.cy) ?? 1;
+                  const next = { pressure, safety, eta, rowFactor };
+                  cellBaseScoreBySlot.set(cell.s, next);
+                  return next;
               })();
               const summonKey = `${card.id}:${cell.s}`;
               const sf = summonerFeasibilityByCardSlot.get(summonKey) ?? (() => {
@@ -803,13 +811,13 @@ __define('./ai.ts', (exports, module, __require) => {
                       return pattern;
                   })())
                   : null;
-              const kitInstantScore = kitTraits.hasInstant ? e : 0;
-              const kitDefenseScore = kitTraits.hasDefBuff ? 1 - s : 0;
-              const kitReviveScore = kitTraits.hasRevive ? s : 0;
+              const kitInstantScore = kitTraits.hasInstant ? base.eta : 0;
+              const kitDefenseScore = kitTraits.hasDefBuff ? 1 - base.safety : 0;
+              const kitReviveScore = kitTraits.hasRevive ? base.safety : 0;
               const contributions = {
-                  pressure: (weights.pressure ?? 0) * p,
-                  safety: (weights.safety ?? 0) * s,
-                  eta: (weights.eta ?? 0) * e,
+                  pressure: (weights.pressure ?? 0) * base.pressure,
+                  safety: (weights.safety ?? 0) * base.safety,
+                  eta: (weights.eta ?? 0) * base.eta,
                   summon: (weights.summon ?? 0) * sf,
                   kitInstant: (weights.kitInstant ?? 0) * kitInstantScore,
                   kitDefense: (weights.kitDefense ?? 0) * kitDefenseScore,
@@ -822,9 +830,13 @@ __define('./ai.ts', (exports, module, __require) => {
                   contributions.kitInstant +
                   contributions.kitDefense +
                   contributions.kitRevive;
-              const rowFactor = rowFactorByCy.get(cell.cy) ?? 1;
-              const roleFactor = roleBias(meta?.class, cell.cx);
-              const finalScore = baseScore * rowFactor * roleFactor;
+              const roleFactorKey = `${meta?.class ?? ''}:${cell.cx}`;
+              const roleFactor = roleFactorByClassAndX.get(roleFactorKey) ?? (() => {
+                  const next = roleBias(meta?.class, cell.cx);
+                  roleFactorByClassAndX.set(roleFactorKey, next);
+                  return next;
+              })();
+              const finalScore = baseScore * base.rowFactor * roleFactor;
               const evaluation = {
                   card,
                   meta,
@@ -834,15 +846,15 @@ __define('./ai.ts', (exports, module, __require) => {
                   baseScore,
                   contributions,
                   raw: {
-                      pressure: p,
-                      safety: s,
-                      eta: e,
+                      pressure: base.pressure,
+                      safety: base.safety,
+                      eta: base.eta,
                       summon: sf,
                       kitInstant: kitInstantScore,
                       kitDefense: kitDefenseScore,
                       kitRevive: kitReviveScore,
                   },
-                  multipliers: { row: rowFactor, role: roleFactor },
+                  multipliers: { row: base.rowFactor, role: roleFactor },
                   summonPatternSlots,
               };
               const blocked = candidateBlocked(Game, evaluation, alive);
@@ -855,7 +867,7 @@ __define('./ai.ts', (exports, module, __require) => {
               insertTopCandidate?.(evaluation);
           }
       }
-      if (!bestCandidateg) {
+      if (!bestCandidate) {
           const decision = {
               reason,
               at: now,
@@ -868,10 +880,11 @@ __define('./ai.ts', (exports, module, __require) => {
           Game.ai.lastThinkMs = now;
           return;
       }
-      let chosen = bestCandidate;
-      const ok = queueEnemyAt(Game, bestCandidate.card, bestCandidate.cell.s, bestCandidate.cell.cx, bestCandidate.cell.cy, alive);
+      const selectedCandidate = bestCandidate;
+      let chosen = selectedCandidate;
+      const ok = queueEnemyAt(Game, selectedCandidate.card, selectedCandidate.cell.s, selectedCandidate.cell.cx, selectedCandidate.cell.cy, alive);
       if (!ok) {
-          bestCandidate.blockedReason = 'queueFailed';
+          selectedCandidate.blockedReason = 'queueFailed';
           chosen = null;
       }
       const considered = trackTopCandidates ? topCandidates.map(exportCandidateDebug).filter(Boolean) : [];
@@ -17145,7 +17158,11 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
       if (typeof idRaw !== 'string' || idRaw.trim() === '')
           return null;
       const skeleton = makeDeckEntrySkeleton(idRaw);
-      const merged = { ...skeleton, ...candidate, id: idRaw };
+      const merged = {
+          ...skeleton,
+          ...candidate,
+          id: idRaw,
+      };
       const costOverride = toFiniteCost(candidate.cost);
       merged.cost = costOverride ?? skeleton.cost ?? null;
       const nameCandidate = candidate.name;
