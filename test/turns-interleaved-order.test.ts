@@ -70,11 +70,11 @@ describe('interleaved by position order', () => {
 
     expect(order).toEqual([
       'ally:1:ally1',
-      'ally:2:ally2',
       'enemy:2:enemy2',
+      'ally:2:ally2',
       'enemy:3:enemy3',
       'ally:1:ally1',
-      'ally:2:ally2'
+      'enemy:2:enemy2'
     ]);
   });
 });

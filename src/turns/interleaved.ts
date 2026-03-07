@@ -154,100 +154,26 @@ export function nextTurnInterleaved(
   ensureTurnState(turn);
   const slotCount = resolveSlotCount(turn);
   if (slotCount <= 0) return null;
-  const slotMaps = buildSlotMaps(state.tokens);
+  const sideKey = normalizeSide(turn.nextSide);
+  const sideLower = SIDE_TO_LOWER[sideKey];
+  const startPosRaw = Number.isFinite(turn.lastPos?.[sideKey]) ? turn.lastPos[sideKey] : 0;
+  const startPos = Math.max(0, Math.min(slotCount, Math.floor(startPosRaw)));
+  const picked = findNextOccupiedPos(state, sideKey, startPos, buildSlotMaps(state.tokens));
+  if (!picked) return null;
 
-  const startSide = normalizeSide(turn.nextSide);
-  const prevAllyPos = Number.isFinite(turn.lastPos?.ALLY) ? Math.floor(turn.lastPos.ALLY) : 0;
-  let cursorSide: TurnSideKey = startSide;
-  let cursorPos = cursorSide === 'ALLY'
-    ? ((Math.max(0, prevAllyPos) % slotCount) + 1)
-    : Math.max(1, Math.min(slotCount, prevAllyPos || 1));
+  turn.lastPos[sideKey] = picked.pos;
+  turn.nextSide = sideKey === 'ALLY' ? 'ENEMY' : 'ALLY';
 
-  const setCursorToCandidate = (sideKey: TurnSideKey, pos: number): void => {
-    if (sideKey === 'ALLY'){
-      turn.nextSide = 'ALLY';
-      turn.lastPos.ALLY = pos > 1 ? pos - 1 : 0;
-      return;
-    }
-    turn.nextSide = 'ENEMY';
-    turn.lastPos.ALLY = pos;
-  };
-
-  const setCursorAfterConsumed = (sideKey: TurnSideKey, pos: number): void => {
-    if (sideKey === 'ALLY'){
-      turn.lastPos.ALLY = pos;
-      turn.nextSide = 'ENEMY';
-      return;
-    }
-    turn.lastPos.ALLY = pos;
-    turn.lastPos.ENEMY = pos;
-    turn.nextSide = 'ALLY';
-  };
-
-  const advanceCursor = (): void => {
-    if (cursorSide === 'ALLY'){
-      cursorSide = 'ENEMY';
-      return;
-  }
-  cursorSide = 'ALLY';
-    cursorPos = (cursorPos % slotCount) + 1;
-  };
-
-  const maxChecks = slotCount * 2;
-  for (let checks = 0; checks < maxChecks; checks += 1){
-    const sideLower = SIDE_TO_LOWER[cursorSide];
-    const unit = slotMaps[cursorSide].get(cursorPos) ?? null;
-    const cycle = Number.isFinite(turn.cycle) ? turn.cycle : 0;
-    const queued = isQueueDue(state, sideLower, cursorPos, cycle);
-
-  if (unit && unit.alive && Statuses.canAct(unit)){
-      const wrapped = cursorSide === 'ALLY' ? makeWrappedFlag(prevAllyPos, cursorPos) : false;
-      setCursorAfterConsumed(cursorSide, cursorPos);
-      if (wrapped){
-        turn.wrapCount.ALLY = (turn.wrapCount.ALLY ?? 0) + 1;
-      }
-      turn.turnCount += 1;
-      const allyWrap = turn.wrapCount.ALLY ?? 0;
-      const enemyWrap = turn.wrapCount.ENEMY ?? 0;
-      const maxWrap = Math.max(allyWrap, enemyWrap);
-      if (!Number.isFinite(turn.cycle) || turn.cycle < maxWrap){
-        turn.cycle = maxWrap;
-      }
-      return {
-        mode: 'interleaved_by_position',
-        side: sideLower,
-        pos: cursorPos,
-        unit,
-        unitId: unit.id ?? null,
-        queued,
-        wrapped,
-        sideKey: cursorSide,
-        spawnOnly: false
-      };
-    }
-
-    if (queued){
-      const wrapped = cursorSide === 'ALLY' ? makeWrappedFlag(prevAllyPos, cursorPos) : false;
-      setCursorToCandidate(cursorSide, cursorPos);
-      return {
-        mode: 'interleaved_by_position',
-        side: sideLower,
-        pos: cursorPos,
-        unit: null,
-        unitId: null,
-        queued: true,
-        wrapped,
-        sideKey: cursorSide,
-        spawnOnly: true
-      };
-    }
-
-    advanceCursor();
+  if (picked.wrapped){
+    turn.wrapCount[sideKey] = (turn.wrapCount[sideKey] ?? 0) + 1;
   }
 
-  turn.nextSide = cursorSide;
-  if (cursorSide === 'ENEMY'){
-    turn.lastPos.ALLY = cursorPos;
+  turn.turnCount += 1;
+  const allyWrap = turn.wrapCount.ALLY ?? 0;
+  const enemyWrap = turn.wrapCount.ENEMY ?? 0;
+  const maxWrap = Math.max(allyWrap, enemyWrap);
+  if (!Number.isFinite(turn.cycle) || turn.cycle < maxWrap){
+    turn.cycle = maxWrap;
   }
-  return null;
+  return picked;
 }

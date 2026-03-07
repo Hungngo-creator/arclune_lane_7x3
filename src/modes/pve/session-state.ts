@@ -24,7 +24,7 @@ import { drawGridOblique } from '../../engine.ts';
 import { Statuses } from '../../statuses.ts';
 import { getUnitArt } from '../../art.ts';
 import { normalizeUnitId } from '../../utils/unit-id.ts';
-import { createRngState } from '../../utils/rng.ts';
+import { createRngState, nextRngValue } from '../../utils/rng.ts';
 import { stableStringify } from '../../utils/format.ts';
 import { normalizeClassName, normalizeElementKey, normalizeElementList } from '../../utils/domain-normalization.ts';
 import { mapUnitProgressById } from './collection-mapper.ts';
@@ -486,12 +486,14 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
   const allyCols = Number.isFinite(allyColsRaw) ? Math.max(1, Math.floor(allyColsRaw)) : 3;
   const gridRows = Number.isFinite(gridRowsRaw) ? Math.max(1, Math.floor(gridRowsRaw)) : 3;
   const slotsPerSide = Math.max(1, allyCols * gridRows);
+  const initialTurnRng = createRngState(normalized.rngSeed);
+  const randomStartSide = nextRngValue(initialTurnRng) < 0.5 ? 'ALLY' : 'ENEMY';
 
   const buildTurnState = (): TurnSnapshot => {
     if (useInterleaved) {
       return {
         mode: 'interleaved_by_position',
-        nextSide: 'ALLY',
+        nextSide: 'randomStartSide',
         lastPos: { ALLY: 0, ENEMY: 0 },
         wrapCount: { ALLY: 0, ENEMY: 0 },
         turnCount: 0,

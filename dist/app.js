@@ -5424,7 +5424,7 @@ __define('./config.ts', (exports, module, __require) => {
       },
       ANIMATION: {
           turnIntervalMs: 480,
-          meleeDurationMs: 2000
+          meleeDurationMs: 2200
       },
       // === Debug flags (W0-J1) ===
       DEBUG: {
@@ -16697,6 +16697,7 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
   const normalizeUnitId = __dep10.normalizeUnitId;
   const __dep11 = __require('./utils/rng.ts');
   const createRngState = __dep11.createRngState;
+  const nextRngValue = __dep11.nextRngValue;
   const __dep12 = __require('./utils/format.ts');
   const stableStringify = __dep12.stableStringify;
   const __dep13 = __require('./utils/domain-normalization.ts');
@@ -17059,11 +17060,13 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
       const allyCols = Number.isFinite(allyColsRaw) ? Math.max(1, Math.floor(allyColsRaw)) : 3;
       const gridRows = Number.isFinite(gridRowsRaw) ? Math.max(1, Math.floor(gridRowsRaw)) : 3;
       const slotsPerSide = Math.max(1, allyCols * gridRows);
+      const initialTurnRng = createRngState(normalized.rngSeed);
+      const randomStartSide = nextRngValue(initialTurnRng) < 0.5 ? 'ALLY' : 'ENEMY';
       const buildTurnState = () => {
           if (useInterleaved) {
               return {
                   mode: 'interleaved_by_position',
-                  nextSide: 'ALLY',
+                  nextSide: 'randomStartSide',
                   lastPos: { ALLY: 0, ENEMY: 0 },
                   wrapCount: { ALLY: 0, ENEMY: 0 },
                   turnCount: 0,
@@ -27148,93 +27151,26 @@ __define('./turns/interleaved.ts', (exports, module, __require) => {
       const slotCount = resolveSlotCount(turn);
       if (slotCount <= 0)
           return null;
-      const slotMaps = buildSlotMaps(state.tokens);
-      const startSide = normalizeSide(turn.nextSide);
-      const prevAllyPos = Number.isFinite(turn.lastPos?.ALLY) ? Math.floor(turn.lastPos.ALLY) : 0;
-      let cursorSide = startSide;
-      let cursorPos = cursorSide === 'ALLY'
-          ? ((Math.max(0, prevAllyPos) % slotCount) + 1)
-          : Math.max(1, Math.min(slotCount, prevAllyPos || 1));
-      const setCursorToCandidate = (sideKey, pos) => {
-          if (sideKey === 'ALLY') {
-              turn.nextSide = 'ALLY';
-              turn.lastPos.ALLY = pos > 1 ? pos - 1 : 0;
-              return;
-          }
-          turn.nextSide = 'ENEMY';
-          turn.lastPos.ALLY = pos;
-      };
-      const setCursorAfterConsumed = (sideKey, pos) => {
-          if (sideKey === 'ALLY') {
-              turn.lastPos.ALLY = pos;
-              turn.nextSide = 'ENEMY';
-              return;
-          }
-          turn.lastPos.ALLY = pos;
-          turn.lastPos.ENEMY = pos;
-          turn.nextSide = 'ALLY';
-      };
-      const advanceCursor = () => {
-          if (cursorSide === 'ALLY') {
-              cursorSide = 'ENEMY';
-              return;
-          }
-          cursorSide = 'ALLY';
-          cursorPos = (cursorPos % slotCount) + 1;
-      };
-      const maxChecks = slotCount * 2;
-      for (let checks = 0; checks < maxChecks; checks += 1) {
-          const sideLower = SIDE_TO_LOWER[cursorSide];
-          const unit = slotMaps[cursorSide].get(cursorPos) ?? null;
-          const cycle = Number.isFinite(turn.cycle) ? turn.cycle : 0;
-          const queued = isQueueDue(state, sideLower, cursorPos, cycle);
-          if (unit && unit.alive && Statuses.canAct(unit)) {
-              const wrapped = cursorSide === 'ALLY' ? makeWrappedFlag(prevAllyPos, cursorPos) : false;
-              setCursorAfterConsumed(cursorSide, cursorPos);
-              if (wrapped) {
-                  turn.wrapCount.ALLY = (turn.wrapCount.ALLY ?? 0) + 1;
-              }
-              turn.turnCount += 1;
-              const allyWrap = turn.wrapCount.ALLY ?? 0;
-              const enemyWrap = turn.wrapCount.ENEMY ?? 0;
-              const maxWrap = Math.max(allyWrap, enemyWrap);
-              if (!Number.isFinite(turn.cycle) || turn.cycle < maxWrap) {
-                  turn.cycle = maxWrap;
-              }
-              return {
-                  mode: 'interleaved_by_position',
-                  side: sideLower,
-                  pos: cursorPos,
-                  unit,
-                  unitId: unit.id ?? null,
-                  queued,
-                  wrapped,
-                  sideKey: cursorSide,
-                  spawnOnly: false
-              };
-          }
-          if (queued) {
-              const wrapped = cursorSide === 'ALLY' ? makeWrappedFlag(prevAllyPos, cursorPos) : false;
-              setCursorToCandidate(cursorSide, cursorPos);
-              return {
-                  mode: 'interleaved_by_position',
-                  side: sideLower,
-                  pos: cursorPos,
-                  unit: null,
-                  unitId: null,
-                  queued: true,
-                  wrapped,
-                  sideKey: cursorSide,
-                  spawnOnly: true
-              };
-          }
-          advanceCursor();
+      const sideKey = normalizeSide(turn.nextSide);
+      const sideLower = SIDE_TO_LOWER[sideKey];
+      const startPosRaw = Number.isFinite(turn.lastPos?.[sideKey]) ? turn.lastPos[sideKey] : 0;
+      const startPos = Math.max(0, Math.min(slotCount, Math.floor(startPosRaw)));
+      const picked = findNextOccupiedPos(state, sideKey, startPos, buildSlotMaps(state.tokens));
+      if (!picked)
+          return null;
+      turn.lastPos[sideKey] = picked.pos;
+      turn.nextSide = sideKey === 'ALLY' ? 'ENEMY' : 'ALLY';
+      if (picked.wrapped) {
+          turn.wrapCount[sideKey] = (turn.wrapCount[sideKey] ?? 0) + 1;
       }
-      turn.nextSide = cursorSide;
-      if (cursorSide === 'ENEMY') {
-          turn.lastPos.ALLY = cursorPos;
+      turn.turnCount += 1;
+      const allyWrap = turn.wrapCount.ALLY ?? 0;
+      const enemyWrap = turn.wrapCount.ENEMY ?? 0;
+      const maxWrap = Math.max(allyWrap, enemyWrap);
+      if (!Number.isFinite(turn.cycle) || turn.cycle < maxWrap) {
+          turn.cycle = maxWrap;
       }
-      return null;
+      return picked;
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'findNextOccupiedPos')) exports.findNextOccupiedPos = findNextOccupiedPos;
