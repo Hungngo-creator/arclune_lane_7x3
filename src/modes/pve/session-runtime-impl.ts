@@ -1249,6 +1249,8 @@ function unbindArtSpriteListener(): void {
 let CLOCK: ClockState | null = null;
 const creepDeathHealProcessed = new Set<string>();
 const CREEP_DEATH_HEAL_DEBUG_KEY = 'pve.creepDeathHeal';
+const normalizedTagsByUnitId = new Map<string, string[]>();
+const creepDeathHealPctByUnitId = new Map<string, number>();
 
 function createClock(): ClockState {
   const safe = safeNow();
@@ -1274,6 +1276,10 @@ function createClock(): ClockState {
 
 const readTokenTags = (token: UnitToken | null | undefined): string[] => {
   if (!token) return [];
+  if (typeof token.id === 'string' && token.id) {
+    const cached = normalizedTagsByUnitId.get(token.id);
+    if (cached) return cached;
+  }
   const directTagsRaw = Array.isArray(token.tags) ? token.tags : [];
   const directTags = directTagsRaw
     .filter((tag: unknown): tag is string => typeof tag === 'string');
@@ -1281,7 +1287,11 @@ const readTokenTags = (token: UnitToken | null | undefined): string[] => {
   const metaTags = Array.isArray(metaTagsRaw)
     ? metaTagsRaw.filter((tag: unknown): tag is string => typeof tag === 'string')
     : [];
-  return normalizeTagList([...directTags, ...metaTags]);
+  const normalized = normalizeTagList([...directTags, ...metaTags]);
+  if (typeof token.id === 'string' && token.id) {
+    normalizedTagsByUnitId.set(token.id, normalized);
+  }
+  return normalized;
 };
 
 const isCreepGroupToken = (token: UnitToken | null | undefined): boolean => {
@@ -1292,6 +1302,10 @@ const isCreepGroupToken = (token: UnitToken | null | undefined): boolean => {
 
 const resolveCreepDeathHealPct = (token: UnitToken | null | undefined): number => {
   if (!token) return 0;
+  if (typeof token.id === 'string' && token.id) {
+    const cached = creepDeathHealPctByUnitId.get(token.id);
+    if (cached != null) return cached;
+  }
   const passives = getMetaById(token.id)?.kit?.passives;
   if (Array.isArray(passives)){
     for (const passive of passives){
@@ -1303,20 +1317,49 @@ const resolveCreepDeathHealPct = (token: UnitToken | null | undefined): number =
       const mode = typeof params?.mode === 'string' ? params.mode.trim().toLowerCase() : '';
       if (mode && mode !== 'castermax') continue;
       const amount = parseFiniteNumber(params?.amount);
-      if (amount && amount > 0) return Math.max(0, Math.min(1, amount));
+      if (amount && amount > 0) {
+        const resolved = Math.max(0, Math.min(1, amount));
+        if (typeof token.id === 'string' && token.id) {
+          creepDeathHealPctByUnitId.set(token.id, resolved);
+        }
+        return resolved;
+      }
     }
   }
-  if (token.id === 'creep_1') return 0.03;
-  if (token.id === 'creep_2') return 0.04;
-  if (token.id === 'creep_3') return 0.05;
-  return 0;
+  const fallback = token.id === 'creep_1'
+    ? 0.03
+    : token.id === 'creep_2'
+      ? 0.04
+      : token.id === 'creep_3'
+        ? 0.05
+        : 0;
+  if (typeof token.id === 'string' && token.id) {
+    creepDeathHealPctByUnitId.set(token.id, fallback);
+  }
+  return fallback;
 };
 
 function processCreepDeathHealing(now: number): void {
   if (!Game?.tokens?.length) return;
+  const tokens = Game.tokens;
   const passiveLog = Array.isArray(Game.passiveLog) ? Game.passiveLog : [];
   if (!Array.isArray(Game.passiveLog)) Game.passiveLog = passiveLog;
-  for (const deadToken of Game.tokens){
+  const creepAlliesBySide = new Map<Side, UnitToken[]>();
+  const getCreepAlliesBySide = (side: Side): UnitToken[] => {
+    const cached = creepAlliesBySide.get(side);
+    if (cached) return cached;
+    const allies: UnitToken[] = [];
+    for (const token of tokens) {
+      if (!token || !token.alive) continue;
+      if (token.side !== side) continue;
+      if (!isCreepGroupToken(token)) continue;
+      allies.push(token);
+    }
+    creepAlliesBySide.set(side, allies);
+    return allies;
+  };
+
+  for (const deadToken of tokens){
     if (!deadToken || deadToken.alive) continue;
     if (!isCreepGroupToken(deadToken)) continue;
     const deadAt = parseFiniteNumber(deadToken.deadAt);
@@ -1331,10 +1374,7 @@ function processCreepDeathHealing(now: number): void {
     if (healAmount <= 0) continue;
 
     let healedTargets = 0;
-    for (const ally of Game.tokens){
-      if (!ally || !ally.alive) continue;
-      if (ally.side !== deadToken.side) continue;
-      if (!isCreepGroupToken(ally)) continue;
+    for (const ally of getCreepAlliesBySide(deadToken.side)){
       const hpMax = Math.max(0, Math.round(parseFiniteNumber(ally.hpMax) ?? 0));
       if (hpMax <= 0) continue;
       const before = Math.max(0, Math.round(parseFiniteNumber(ally.hp) ?? 0));

@@ -13604,6 +13604,8 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   let CLOCK = null;
   const creepDeathHealProcessed = new Set();
   const CREEP_DEATH_HEAL_DEBUG_KEY = 'pve.creepDeathHeal';
+  const normalizedTagsByUnitId = new Map();
+  const creepDeathHealPctByUnitId = new Map();
   function createClock() {
       const safe = safeNow();
       const now = getNow();
@@ -13628,6 +13630,11 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   const readTokenTags = (token) => {
       if (!token)
           return [];
+      if (typeof token.id === 'string' && token.id) {
+          const cached = normalizedTagsByUnitId.get(token.id);
+          if (cached)
+              return cached;
+      }
       const directTagsRaw = Array.isArray(token.tags) ? token.tags : [];
       const directTags = directTagsRaw
           .filter((tag) => typeof tag === 'string');
@@ -13635,7 +13642,11 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       const metaTags = Array.isArray(metaTagsRaw)
           ? metaTagsRaw.filter((tag) => typeof tag === 'string')
           : [];
-      return normalizeTagList([...directTags, ...metaTags]);
+      const normalized = normalizeTagList([...directTags, ...metaTags]);
+      if (typeof token.id === 'string' && token.id) {
+          normalizedTagsByUnitId.set(token.id, normalized);
+      }
+      return normalized;
   };
   const isCreepGroupToken = (token) => {
       const tags = readTokenTags(token);
@@ -13646,6 +13657,11 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   const resolveCreepDeathHealPct = (token) => {
       if (!token)
           return 0;
+      if (typeof token.id === 'string' && token.id) {
+          const cached = creepDeathHealPctByUnitId.get(token.id);
+          if (cached != null)
+              return cached;
+      }
       const passives = getMetaById(token.id)?.kit?.passives;
       if (Array.isArray(passives)) {
           for (const passive of passives) {
@@ -13660,25 +13676,53 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               if (mode && mode !== 'castermax')
                   continue;
               const amount = parseFiniteNumber(params?.amount);
-              if (amount && amount > 0)
-                  return Math.max(0, Math.min(1, amount));
+              if (amount && amount > 0) {
+                  const resolved = Math.max(0, Math.min(1, amount));
+                  if (typeof token.id === 'string' && token.id) {
+                      creepDeathHealPctByUnitId.set(token.id, resolved);
+                  }
+                  return resolved;
+              }
           }
       }
-      if (token.id === 'creep_1')
-          return 0.03;
-      if (token.id === 'creep_2')
-          return 0.04;
-      if (token.id === 'creep_3')
-          return 0.05;
-      return 0;
+      const fallback = token.id === 'creep_1'
+          ? 0.03
+          : token.id === 'creep_2'
+              ? 0.04
+              : token.id === 'creep_3'
+                  ? 0.05
+                  : 0;
+      if (typeof token.id === 'string' && token.id) {
+          creepDeathHealPctByUnitId.set(token.id, fallback);
+      }
+      return fallback;
   };
   function processCreepDeathHealing(now) {
       if (!Game?.tokens?.length)
           return;
+      const tokens = Game.tokens;
       const passiveLog = Array.isArray(Game.passiveLog) ? Game.passiveLog : [];
       if (!Array.isArray(Game.passiveLog))
           Game.passiveLog = passiveLog;
-      for (const deadToken of Game.tokens) {
+      const creepAlliesBySide = new Map();
+      const getCreepAlliesBySide = (side) => {
+          const cached = creepAlliesBySide.get(side);
+          if (cached)
+              return cached;
+          const allies = [];
+          for (const token of tokens) {
+              if (!token || !token.alive)
+                  continue;
+              if (token.side !== side)
+                  continue;
+              if (!isCreepGroupToken(token))
+                  continue;
+              allies.push(token);
+          }
+          creepAlliesBySide.set(side, allies);
+          return allies;
+      };
+      for (const deadToken of tokens) {
           if (!deadToken || deadToken.alive)
               continue;
           if (!isCreepGroupToken(deadToken))
@@ -13696,13 +13740,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           if (healAmount <= 0)
               continue;
           let healedTargets = 0;
-          for (const ally of Game.tokens) {
-              if (!ally || !ally.alive)
-                  continue;
-              if (ally.side !== deadToken.side)
-                  continue;
-              if (!isCreepGroupToken(ally))
-                  continue;
+          for (const ally of getCreepAlliesBySide(deadToken.side)) {
               const hpMax = Math.max(0, Math.round(parseFiniteNumber(ally.hpMax) ?? 0));
               if (hpMax <= 0)
                   continue;
