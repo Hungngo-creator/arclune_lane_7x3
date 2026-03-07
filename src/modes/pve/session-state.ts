@@ -493,7 +493,7 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
     if (useInterleaved) {
       return {
         mode: 'interleaved_by_position',
-        nextSide: 'randomStartSide',
+        nextSide: randomStartSide,
         lastPos: { ALLY: 0, ENEMY: 0 },
         wrapCount: { ALLY: 0, ENEMY: 0 },
         turnCount: 0,

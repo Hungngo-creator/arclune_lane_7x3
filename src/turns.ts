@@ -13,7 +13,7 @@ import { getUnitArt } from './art.ts';
 import { emitPassiveEvent, applyOnSpawnEffects, getPassiveLog, prepareUnitForPassives } from './passives.ts';
 import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } from './events.ts';
 import type { DamageCounterBreakdown, DamageEventContext } from './events.ts';
-import { safeNow, sessionNow } from './utils/time.ts';
+import { mergeBusyUntil, safeNow, sessionNow } from './utils/time.ts';
 import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } from './utils/fury.ts';
 import { nextTurnInterleaved } from './turns/interleaved.ts';
 import { resolveRuntimeUnitStats } from './modes/pve/collection-mapper.ts';
@@ -64,6 +64,8 @@ const asInterleavedTurn = (
 };
 
 const GAMBIT_SKILL_ACTIONS: GambitActionType[] = ['skill1', 'skill2', 'skill3'];
+const INTERLEAVED_ACTION_DELAY_MS = 2200;
+
 const DEFAULT_MUTATION_DEBUFF_POOL: Array<'bleed' | 'stun' | 'poison'> = ['bleed', 'stun', 'poison'];
 
 const isPveCreepId = (unitId: unknown): boolean => (
@@ -724,6 +726,14 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
       cycle,
       timestamp: safeNow()
     });
+    if (!ended && Game.turn){
+      const actionDelayRaw = Number(CFG?.ANIMATION?.interleavedActionDelayMs);
+      const actionDelayMs = Number.isFinite(actionDelayRaw) && actionDelayRaw > 0
+        ? actionDelayRaw
+        : INTERLEAVED_ACTION_DELAY_MS;
+      const now = sessionNow();
+      Game.turn.busyUntil = mergeBusyUntil(Game.turn.busyUntil, now, actionDelayMs);
+    }
     if (ended) return;
     return;
   }

@@ -17066,7 +17066,7 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
           if (useInterleaved) {
               return {
                   mode: 'interleaved_by_position',
-                  nextSide: 'randomStartSide',
+                  nextSide: randomStartSide,
                   lastPos: { ALLY: 0, ENEMY: 0 },
                   wrapCount: { ALLY: 0, ENEMY: 0 },
                   turnCount: 0,
@@ -26247,6 +26247,7 @@ __define('./turns.ts', (exports, module, __require) => {
   const ACTION_END = __dep10.ACTION_END;
   const TURN_REGEN = __dep10.TURN_REGEN;
   const __dep11 = __require('./utils/time.ts');
+  const mergeBusyUntil = __dep11.mergeBusyUntil;
   const safeNow = __dep11.safeNow;
   const sessionNow = __dep11.sessionNow;
   const __dep12 = __require('./utils/fury.ts');
@@ -26295,6 +26296,7 @@ __define('./turns.ts', (exports, module, __require) => {
       return candidate.mode === 'interleaved_by_position' ? candidate : null;
   };
   const GAMBIT_SKILL_ACTIONS = ['skill1', 'skill2', 'skill3'];
+  const INTERLEAVED_ACTION_DELAY_MS = 2200;
   const DEFAULT_MUTATION_DEBUFF_POOL = ['bleed', 'stun', 'poison'];
   const isPveCreepId = (unitId) => (typeof unitId === 'string' && /^creep_\d+$/i.test(unitId));
   const sanitizeMutationDebuffPool = (pool) => {
@@ -26907,6 +26909,14 @@ __define('./turns.ts', (exports, module, __require) => {
               cycle,
               timestamp: safeNow()
           });
+          if (!ended && Game.turn) {
+              const actionDelayRaw = Number(CFG?.ANIMATION?.interleavedActionDelayMs);
+              const actionDelayMs = Number.isFinite(actionDelayRaw) && actionDelayRaw > 0
+                  ? actionDelayRaw
+                  : INTERLEAVED_ACTION_DELAY_MS;
+              const now = sessionNow();
+              Game.turn.busyUntil = mergeBusyUntil(Game.turn.busyUntil, now, actionDelayMs);
+          }
           if (ended)
               return;
           return;

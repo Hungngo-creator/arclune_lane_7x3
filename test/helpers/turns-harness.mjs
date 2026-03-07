@@ -38,6 +38,8 @@ export async function loadTurnsHarness(overrides = {}){
     ["import { safeNow } from './utils/time.js';", "const { safeNow } = __deps['./utils/time.js'];"],
     ["import { safeNow } from './utils/time.ts';", "const { safeNow } = __deps['./utils/time.js'];"],
     ["import { safeNow, sessionNow } from './utils/time.js';", "const { safeNow, sessionNow } = __deps['./utils/time.js'];"],
+    ["import { mergeBusyUntil, safeNow, sessionNow } from './utils/time.ts';", "const { mergeBusyUntil, safeNow, sessionNow } = __deps['./utils/time.js'];"],
+    ["import { mergeBusyUntil, safeNow, sessionNow } from './utils/time.js';", "const { mergeBusyUntil, safeNow, sessionNow } = __deps['./utils/time.js'];"],
     ["import { safeNow, sessionNow } from './utils/time.ts';", "const { safeNow, sessionNow } = __deps['./utils/time.js'];"],
     ["import { sessionNow } from './utils/time.ts';", "const { sessionNow } = __deps['./utils/time.js'];"],
     ["import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } from './utils/fury.js';", "const { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } = __deps['./utils/fury.js'];"],
@@ -160,7 +162,13 @@ export async function loadTurnsHarness(overrides = {}){
     },
     './utils/time.js': {
       safeNow(){ return 0; },
-      sessionNow(){ return 0; }
+      sessionNow(){ return 0; },
+      mergeBusyUntil(previous, startedAt, duration){
+        const prev = Number.isFinite(previous) ? Number(previous) : 0;
+        const start = Number.isFinite(startedAt) ? Number(startedAt) : 0;
+        const dur = Number.isFinite(duration) ? Math.max(0, Number(duration)) : 0;
+        return Math.max(prev, start + dur);
+      }
     },
     './utils/fury.js': {
       initializeFury(){ },
