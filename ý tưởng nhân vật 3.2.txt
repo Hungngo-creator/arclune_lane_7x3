@@ -1,4 +1,4 @@
-1) [SSR] TU LA – ĐỘC CÔ HUYẾT, Class: Chiến Sĩ
+1) [SSR] TU LA – ĐỘC CÔ HUYẾT, Class: Chiến Sĩ, thuộc element Huyết
 1. ĐÁNH THƯỜNG: Huyết Trảm, Tags: [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp], [Thường].
 Logic: Gây sát thương = 100% (ATK + WIL) lên 1 kẻ địch. Kích hoạt 1 lần stack cho Nội tại Huyết Chiến.
 2. NỘI TẠI: Huyết Chiến Tu La, Tags: [Nội Tại], [Bản Thân], [Tuyệt Đối], [Buff/Debuff Vĩnh Viễn], [Quy Tắc: Cấm Hồi Sinh]. Logic: Cơ chế Scaling: Mỗi lần gây sát thương lên 1 mục tiêu (bất kể nguồn nào): Tăng +1% (ATK + WIL) vĩnh viễn. Giảm -0.5% (RES + ARM) vĩnh viễn. Giới hạn: Kích hoạt tối đa 1 lần/mục tiêu/turn và 9 lần/tổng cộng/turn. Không giới hạn số tầng (No Max Stack).

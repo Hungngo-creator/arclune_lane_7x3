@@ -16,6 +16,11 @@ export interface DamageResult {
   dealt?: number;
   absorbed?: number;
   dtype?: string;
+  breakdown?: {
+    classBonus?: number;
+    elementBonus?: number;
+    synergyBonus?: number;
+  };
 }
 
 interface ResolveContext {

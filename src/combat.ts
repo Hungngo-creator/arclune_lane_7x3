@@ -4,6 +4,7 @@ import { getMetaById } from './catalog.ts';
 import { Statuses, hookOnLethalDamage } from './statuses.ts';
 import type { DamageResult } from './statuses.ts';
 import { applyDamage, grantShield } from './combat/apply-damage.ts';
+import { calculateFinalDamage, type DamageBreakdownMetadata } from './combat/calculate-final-damage.ts';
 import { asSessionWithVfx, vfxAddHit, vfxAddMelee, vfxAddLightningArc } from './vfx.ts';
 import { slotIndex } from './engine.ts';
 import { emitPassiveEvent, getPassiveLog, type AfterHitHandler } from './passives.ts';
@@ -32,6 +33,10 @@ export interface AbilityDamageOptions {
   isAoE?: boolean;
   isCrit?: boolean;
   targetsHit?: number;
+  classBonus?: number;
+  elementBonus?: number;
+  synergyBonus?: number;
+  damageBreakdown?: Partial<DamageBreakdownMetadata>;
   [extra: string]: unknown;
 }
 
@@ -39,6 +44,7 @@ export interface AbilityDamageResult {
   dealt: number;
   absorbed: number;
   total: number;
+  breakdown: DamageBreakdownMetadata;
 }
 
 export interface BasicAttackAfterHitResult extends Record<string, unknown> {
@@ -164,14 +170,6 @@ const getSharedHpRules = (target: UnitToken): { group: string | null; weight: nu
   return { group, weight, capRatio };
 };
 
-const applyMitigationLayer = (damage: number, factor: number): number => (
-  Math.max(0, Math.floor(Math.max(0, damage) * Math.max(0, factor)))
-);
-
-const applyHardRuleLayer = (damage: number, blocked: boolean): number => (
-  blocked ? 0 : Math.max(0, damage)
-);
-
 const GAME_CONFIG = CFG as Readonly<GameConfig>;
 
 export function pickTarget(Game: TargetableGameState, attacker: UnitToken): UnitToken | null {
@@ -264,7 +262,12 @@ export function dealAbilityDamage(
   opts: AbilityDamageOptions = {}
 ): AbilityDamageResult {
   if (!attacker || !target || !target.alive) {
-    return { dealt: 0, absorbed: 0, total: 0 };
+    return {
+      dealt: 0,
+      absorbed: 0,
+      total: 0,
+      breakdown: { classBonus: 0, elementBonus: 0, synergyBonus: 0 },
+    };
   }
 
   startFurySkill(attacker, { tag: String(opts.furyTag || opts.attackType || 'ability') });
@@ -297,10 +300,19 @@ export function dealAbilityDamage(
   const shieldWinsLaw = atkAbsolute && shieldAbsolute && targetRank > attackerRank;
   const bypassShieldByLaw = atkAbsolute && shieldAbsolute && attackerRank >= targetRank;
 
-  let dmg = Math.max(0, Math.floor((pre.base * skillMulti + realmBonus) * pre.outMul));
-  dmg = applyHardRuleLayer(dmg, pre.ignoreAll || shieldWinsLaw);
-  dmg = applyMitigationLayer(dmg, defMultiplier);
-  dmg = applyMitigationLayer(dmg, pre.inMul);
+  const rawDamage = Math.max(0, Math.floor((pre.base * skillMulti + realmBonus) * pre.outMul));
+  const bonusBreakdown = {
+    classBonus: toFinite(opts.classBonus ?? opts.damageBreakdown?.classBonus, 0),
+    elementBonus: toFinite(opts.elementBonus ?? opts.damageBreakdown?.elementBonus, 0),
+    synergyBonus: toFinite(opts.synergyBonus ?? opts.damageBreakdown?.synergyBonus, 0),
+  };
+  const finalDamage = calculateFinalDamage(attacker, target, rawDamage, {
+    ignoreAll: pre.ignoreAll || shieldWinsLaw,
+    defenseMultiplier: defMultiplier,
+    reductionMultiplier: pre.inMul,
+    breakdown: bonusBreakdown,
+  });
+  const dmg = finalDamage.total;
 
   const abs = bypassShieldByLaw
     ? { remain: dmg, absorbed: 0, broke: false }
@@ -361,7 +373,12 @@ export function dealAbilityDamage(
     hookOnLethalDamage(target);
   }
 
-  const damageResult: DamageResult = { dealt: dealtTotal, absorbed: abs.absorbed, dtype };
+  const damageResult: DamageResult = {
+    dealt: dealtTotal,
+    absorbed: abs.absorbed,
+    dtype,
+    breakdown: finalDamage.breakdown,
+  };
   Statuses.afterDamage(attacker, target, damageResult);
 
   const sessionVfx = asSessionWithVfx(Game);
@@ -398,7 +415,7 @@ export function dealAbilityDamage(
   finishFuryHit(target);
   finishFuryHit(attacker);
 
-  return { dealt, absorbed: abs.absorbed, total: dmg };
+  return { dealt, absorbed: abs.absorbed, total: dmg, breakdown: finalDamage.breakdown };
 }
 
 export interface HealResult {
