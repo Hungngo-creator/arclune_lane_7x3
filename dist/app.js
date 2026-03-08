@@ -27168,24 +27168,6 @@ __define('./turns/interleaved.ts', (exports, module, __require) => {
           turn.turnCount = 0;
       }
   }
-  function buildSlotMap(tokens, sideLower) {
-      const map = new Map();
-      if (!Array.isArray(tokens))
-          return map;
-      for (const unit of tokens) {
-          if (!unit || !unit.alive)
-              continue;
-          if (unit.side !== sideLower)
-              continue;
-          const slot = slotIndex(sideLower, unit.cx, unit.cy);
-          if (!Number.isFinite(slot))
-              continue;
-          if (!map.has(slot)) {
-              map.set(slot, unit);
-          }
-      }
-      return map;
-  }
   function buildSlotMaps(tokens) {
       const ally = new Map();
       const enemy = new Map();
@@ -27232,21 +27214,25 @@ __define('./turns/interleaved.ts', (exports, module, __require) => {
           return -1;
       const normalizedSide = toLowerSpawnSide(side);
       const key = `${normalizedSide}:${slot}`;
-      if (!(turn.orderIndex instanceof Map)) {
-          const orderIndex = new Map();
+      const cache = turn.orderIndexCache;
+      const needsRebuild = !cache
+          || cache.orderRef !== order
+          || cache.size !== order.length;
+      if (needsRebuild) {
+          const indexByEntry = new Map();
           for (let index = 0; index < order.length; index += 1) {
               const entry = order[index];
               const entrySide = entry?.side;
               const entrySlot = entry?.slot;
               if ((entrySide !== 'ally' && entrySide !== 'enemy') || !Number.isFinite(entrySlot))
                   continue;
-              orderIndex.set(`${entrySide}:${entrySlot}`, index);
+              indexByEntry.set(`${entrySide}:${entrySlot}`, index);
           }
-          turn.orderIndex = orderIndex;
+          turn.orderIndexCache = { orderRef: order, size: order.length, indexByEntry };
       }
-      const cached = turn.orderIndex;
-      if (cached.has(key)) {
-          const value = cached.get(key);
+      const indexByEntry = turn.orderIndexCache?.indexByEntry;
+      if (indexByEntry?.has(key)) {
+          const value = indexByEntry.get(key);
           return typeof value === 'number' ? value : -1;
       }
       return -1;
@@ -27278,7 +27264,7 @@ __define('./turns/interleaved.ts', (exports, module, __require) => {
           return null;
       const slotCount = resolveSlotCount(turn);
       const start = Number.isFinite(startPos) ? Math.max(0, Math.min(slotCount, Math.floor(startPos))) : 0;
-      const unitsBySlot = slotMaps?.[sideKey] ?? buildSlotMap(state.tokens, sideLower);
+      const unitsBySlot = slotMaps?.[sideKey] ?? buildSlotMaps(state.tokens)[sideKey];
       const cycle = Number.isFinite(turn?.cycle) ? turn.cycle : 0;
       for (let offset = 1; offset <= slotCount; offset += 1) {
           const pos = ((start + offset - 1) % slotCount) + 1;
