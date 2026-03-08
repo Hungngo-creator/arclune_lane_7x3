@@ -819,6 +819,7 @@ const STATUS_ICON_PATHS: Record<StatusIconId, string> = {
   loithienanh_spd_burn: 'assets/weaken.svg',
   accuracy_down: 'assets/weaken.svg',
 };
+const ATTACK_EVENT_TYPES = new Set(['melee', 'tracer', 'lightning_arc', 'blood_pulse', 'ground_burst']);
 const MAX_STATUS_ICONS_PER_TOKEN = 5;
 const CONTROL_TAGS = new Set(['control', 'silence', 'taunt', 'stun', 'sleep', 'fear']);
 const STATUS_META_BY_ID: Record<string, StatusMeta> = {
@@ -3416,13 +3417,12 @@ function collectActiveAttackTokenKeys(): Set<string> {
   }
   const events = Array.isArray(Game?.vfx) ? Game.vfx : [];
   if (!events.length) return active;
-  const attackEventTypes = new Set(['melee', 'tracer', 'lightning_arc', 'blood_pulse', 'ground_burst']);
   const nowMs = safeNow();
   for (const event of events){
     if (!event || typeof event !== 'object') continue;
     const rec = event as Record<string, unknown>;
     const type = typeof rec.type === 'string' ? rec.type : '';
-    if (!attackEventTypes.has(type)) continue;
+    if (!ATTACK_EVENT_TYPES.has(type)) continue;
     const dur = parseFiniteNumber(rec.dur) ?? 0;
     if (dur <= 0) continue;
     const t0 = parseFiniteNumber(rec.t0) ?? 0;
@@ -3580,6 +3580,7 @@ function collectStatusIcons(unit: UnitToken): StatusIconEntry[] {
   const icons: StatusIconEntry[] = [];
   const aggregates = aggregateStatuses(statuses);
   for (const aggregate of aggregates) {
+    if (icons.length >= MAX_STATUS_ICONS_PER_TOKEN) break;
     const icon = ensureStatusIconLoaded(aggregate.meta.id, aggregate.meta.icon);
     if (!icon || icon.status !== 'ready' || !icon.image) continue;
     icons.push({
@@ -3592,8 +3593,7 @@ function collectStatusIcons(unit: UnitToken): StatusIconEntry[] {
       turnsLeft: aggregate.turnsLeft,
     });
   }
-
-  return icons.slice(0, MAX_STATUS_ICONS_PER_TOKEN);
+  return icons;
 }
 
 
@@ -3601,13 +3601,14 @@ export function __resolveStatusIconPreview(statusesInput: ReadonlyArray<Record<s
   const preview: Array<{ id: string; tooltip: string; priority: number }> = [];
   const aggregates = aggregateStatuses(statusesInput);
   for (const aggregate of aggregates){
+    if (preview.length >= MAX_STATUS_ICONS_PER_TOKEN) break;
     preview.push({
       id: aggregate.statusId,
       tooltip: buildStatusTooltip(aggregate.meta.label, aggregate.stacks, aggregate.turnsLeft),
       priority: aggregate.priority,
     });
   }
-  return preview.slice(0, MAX_STATUS_ICONS_PER_TOKEN);
+  return preview;
 }
 
 function updateStatusIconHoverTooltip(clientX: number, clientY: number): void {
