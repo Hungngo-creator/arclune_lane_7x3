@@ -13936,8 +13936,17 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           stats.arm = Math.max(0, Math.min(1, arm));
       return stats;
   }
-  function getMinionsOf(masterIid) {
-      return (Game?.tokens || []).filter((t) => t.isMinion && t.ownerIid === masterIid && t.alive);
+  function countAliveMinionsOf(masterIid) {
+      const tokens = Game?.tokens;
+      if (!tokens?.length)
+          return 0;
+      let count = 0;
+      for (const token of tokens) {
+          if (!token?.alive || !token.isMinion || token.ownerIid !== masterIid)
+              continue;
+          count += 1;
+      }
+      return count;
   }
   function removeOldestMinions(masterIid, count) {
       if (count <= 0)
@@ -14086,21 +14095,25 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               : undefined;
       }
       if (meta.class === 'Summoner' && summonSpec) {
-          const aliveNow = tokensAlive();
+          const allTokens = game.tokens || [];
           const queued = game.queued || { ally: new Map(), enemy: new Map() };
           const slotsSource = summonSpec;
-          const patternSlots = resolveSummonSlots(slotsSource, slot)
-              .filter((s) => typeof s === 'number' && Number.isFinite(s))
-              .filter((s) => {
-              const { cx, cy } = slotToCell(unit.side, s);
-              return !cellReserved(aliveNow, queued, cx, cy);
-          })
-              .sort((a, b) => a - b);
+          const resolvedSlots = resolveSummonSlots(slotsSource, slot);
+          const patternSlots = [];
+          for (const rawSlot of resolvedSlots) {
+              if (typeof rawSlot !== 'number' || !Number.isFinite(rawSlot))
+                  continue;
+              const { cx, cy } = slotToCell(unit.side, rawSlot);
+              if (cellReserved(allTokens, queued, cx, cy))
+                  continue;
+              patternSlots.push(rawSlot);
+          }
+          patternSlots.sort((a, b) => a - b);
           const desired = parseFiniteNumber(summonSpec.count) ?? (patternSlots.length || 1);
           const need = Math.min(patternSlots.length, Math.max(0, desired));
           if (need > 0) {
               const limit = parseFiniteNumber(summonSpec.limit) ?? Infinity;
-              const have = getMinionsOf(unit.iid).length;
+              const have = countAliveMinionsOf(unit.iid);
               const over = Math.max(0, have + need - limit);
               const replacePolicy = typeof summonSpec.replace === 'string' ? summonSpec.replace.trim().toLowerCase() : null;
               if (over > 0 && replacePolicy === 'oldest')
