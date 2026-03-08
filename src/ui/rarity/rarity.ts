@@ -26,6 +26,10 @@ export type Rarity = 'N' | 'R' | 'SR' | 'SSR' | 'UR' | 'PRIME';
 export type AuraVariant = 'gacha' | 'deck' | 'collection';
 export type PowerMode = 'normal' | 'low';
 
+function isAuraDisabledVariant(variant: AuraVariant): boolean {
+  return variant === 'collection';
+}
+
 type TimeoutHandle = ReturnType<typeof setTimeout>;
 type IntervalHandle = number | ReturnType<typeof setInterval>;
 type FrameHandle = number | TimeoutHandle;
@@ -394,6 +398,10 @@ function updateState(state: AuraState, rarity: Rarity, variant: AuraVariant, opt
 
 export function mountRarityAura(host: HTMLElement, rarity: Rarity, variant: AuraVariant, options?: MountOptions): void {
   if (!host || typeof document === 'undefined'){
+    return;
+  }
+  if (isAuraDisabledVariant(variant)){
+    unmountRarity(host);
     return;
   }
   const normalizedRarity = normalizeRarityInput(rarity);

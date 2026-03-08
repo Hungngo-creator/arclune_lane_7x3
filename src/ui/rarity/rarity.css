@@ -37,6 +37,8 @@ body.low-power .rarity-aura {
   --rarity-sweep-opacity: 0;
 }
 
+.rarity-aura[data-variant="collection"] { display: none; }
+
 .rarity-aura.is-rounded {
   border-radius: 9999px;
 }
@@ -96,8 +98,7 @@ body.low-power .rarity-aura {
   transition: opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease;
 }
 
-.rarity-aura[data-variant="deck"],
-.rarity-aura[data-variant="collection"] {
+.rarity-aura[data-variant="deck"] {
   --rarity-aura-outset-scale: 1.3;
   --rarity-chamfer: 10px;
   border-radius: 0;
@@ -106,11 +107,7 @@ body.low-power .rarity-aura {
 .rarity-aura[data-variant="deck"] .ring,
 .rarity-aura[data-variant="deck"] .glow,
 .rarity-aura[data-variant="deck"] .sweep,
-.rarity-aura[data-variant="deck"] .spark-layer,
-.rarity-aura[data-variant="collection"] .ring,
-.rarity-aura[data-variant="collection"] .glow,
-.rarity-aura[data-variant="collection"] .sweep,
-.rarity-aura[data-variant="collection"] .spark-layer {
+.rarity-aura[data-variant="deck"] .spark-layer {
   border-radius: 0;
   clip-path: polygon(
     var(--rarity-chamfer) 0,
@@ -340,10 +337,6 @@ body.low-power .rarity-aura {
   --rarity-shimmer-period: 6s;
   animation: shimmer-cycle var(--rarity-shimmer-period) ease-in-out infinite;
 }
-.rarity-aura[data-variant="collection"] .glow {
-  --rarity-shimmer-period: 10s;
-  animation: shimmer-cycle var(--rarity-shimmer-period) ease-in-out infinite;
-}
 .rarity-aura[data-variant="gacha"] .glow { animation: none; }
 
 .rarity-aura.is-pre .ring { opacity: .42; }
@@ -359,14 +352,11 @@ body.low-power .rarity-aura.has-sweep .sweep::before,
 body.low-power .rarity-aura.has-spark .spark-layer { display: none; }
 
 .rarity-aura[data-variant="deck"],
-.rarity-aura[data-variant="collection"],
 .rarity-aura[data-variant="gacha"] { mix-blend-mode: normal; }
 
 .rarity-aura.is-muted .ring,
 .rarity-aura.is-muted .glow { opacity: 0; }
 
-.rarity-aura[data-variant="collection"] .ring { opacity: 0.74; }
-.rarity-aura[data-variant="collection"] .glow { filter: blur(calc(8px * var(--rarity-glow-active))); }
 .rarity-aura[data-variant="deck"] .ring { opacity: 0.78; }
 .rarity-aura[data-variant="deck"] .glow { filter: blur(calc(7px * var(--rarity-glow-active))); }
 .rarity-aura[data-variant="deck"].is-hovered .glow,
