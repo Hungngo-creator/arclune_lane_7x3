@@ -676,16 +676,32 @@ function toFiniteCost(value: unknown): number | null {
   return null;
 }
 
-function makeDeckEntrySkeleton(unitId: string): SessionState['unitsAll'][number] {
-  const unitDef = lookupUnit(unitId);
-  const art = getUnitArt(unitId);
+const deckEntrySkeletonCache = new Map<string, SessionState['unitsAll'][number]>();
+
+function cloneDeckEntrySkeleton(entry: SessionState['unitsAll'][number]): SessionState['unitsAll'][number] {
   return {
-    id: unitId,
+    ...entry,
+    art: entry.art ?? null,
+    skinKey: entry.skinKey ?? null,
+  } satisfies SessionState['unitsAll'][number];
+}
+
+function makeDeckEntrySkeleton(unitId: string): SessionState['unitsAll'][number] {
+  const normalizedId = normalizeUnitId(unitId);
+  const cached = deckEntrySkeletonCache.get(normalizedId);
+  if (cached) return cloneDeckEntrySkeleton(cached);
+
+  const unitDef = lookupUnit(normalizedId);
+  const art = getUnitArt(normalizedId);
+  const skeleton = {
+    id: normalizedId,
     cost: toFiniteCost(unitDef?.cost) ?? null,
     name: typeof unitDef?.name === 'string' ? unitDef.name : null,
     art,
     skinKey: art?.skinKey ?? null,
   } satisfies SessionState['unitsAll'][number];
+  deckEntrySkeletonCache.set(normalizedId, skeleton);
+  return cloneDeckEntrySkeleton(skeleton);
 }
 
 function normalizeDeckEntry(entry: unknown): SessionState['unitsAll'][number] | null {

@@ -55,7 +55,7 @@ const resolveBreakdown = (context?: CalculateFinalDamageContext | null): DamageB
 
 const resolveCounterMultiplier = (breakdown: DamageBreakdownMetadata): number => (
   Math.max(0, 1 + breakdown.classBonus + breakdown.elementBonus + breakdown.synergyBonus)
-};
+);
 
 export function calculateFinalDamage(
   _attacker: UnitToken,

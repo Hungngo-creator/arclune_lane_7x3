@@ -4678,7 +4678,6 @@ __define('./combat/calculate-final-damage.ts', (exports, module, __require) => {
       };
   };
   const resolveCounterMultiplier = (breakdown) => (Math.max(0, 1 + breakdown.classBonus + breakdown.elementBonus + breakdown.synergyBonus));
-  ;
   function calculateFinalDamage(_attacker, _defender, _skill, rawDamage, context = {}) {
       const breakdown = resolveBreakdown(context);
       const counterMultiplier = resolveCounterMultiplier(breakdown);
@@ -17245,16 +17244,30 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
       }
       return null;
   }
-  function makeDeckEntrySkeleton(unitId) {
-      const unitDef = lookupUnit(unitId);
-      const art = getUnitArt(unitId);
+  const deckEntrySkeletonCache = new Map();
+  function cloneDeckEntrySkeleton(entry) {
       return {
-          id: unitId,
+          ...entry,
+          art: entry.art ?? null,
+          skinKey: entry.skinKey ?? null,
+      };
+  }
+  function makeDeckEntrySkeleton(unitId) {
+      const normalizedId = normalizeUnitId(unitId);
+      const cached = deckEntrySkeletonCache.get(normalizedId);
+      if (cached)
+          return cloneDeckEntrySkeleton(cached);
+      const unitDef = lookupUnit(normalizedId);
+      const art = getUnitArt(normalizedId);
+      const skeleton = {
+          id: normalizedId,
           cost: toFiniteCost(unitDef?.cost) ?? null,
           name: typeof unitDef?.name === 'string' ? unitDef.name : null,
           art,
           skinKey: art?.skinKey ?? null,
       };
+      deckEntrySkeletonCache.set(normalizedId, skeleton);
+      return cloneDeckEntrySkeleton(skeleton);
   }
   function normalizeDeckEntry(entry) {
       if (!entry)
@@ -27016,8 +27029,6 @@ __define('./turns/interleaved.ts', (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/turns/interleaved.ts
   const __dep0 = __require('./engine.ts');
   const slotIndex = __dep0.slotIndex;
-  const __dep1 = __require('./statuses.ts');
-  const Statuses = __dep1.Statuses;
   const SIDE_TO_LOWER = { ALLY: 'ally', ENEMY: 'enemy' };
   const LOWER_TO_UPPER = { ally: 'ALLY', enemy: 'ENEMY' };
   const DEFAULT_LAST_POS = { ALLY: 0, ENEMY: 0 };
@@ -27125,7 +27136,7 @@ __define('./turns/interleaved.ts', (exports, module, __require) => {
           const wrapped = makeWrappedFlag(start, pos);
           const unit = unitsBySlot.get(pos) ?? null;
           const queued = isQueueDue(state, sideLower, pos, cycle);
-          if (unit && unit.alive && Statuses.canAct(unit)) {
+          if (unit && unit.alive) {
               return {
                   mode: 'interleaved_by_position',
                   side: sideLower,

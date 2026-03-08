@@ -1,7 +1,5 @@
 //home (termux)/arclune_lane_7x3/src/turns/interleaved.ts
 import { slotIndex } from '../engine.ts';
-import { Statuses } from '../statuses.ts';
-
 import type { SessionState } from '@shared-types/combat';
 import type { QueuedSummonRequest, Side, UnitToken } from '@shared-types/units';
 import type { InterleavedState, InterleavedTurnState, TurnSideKey } from '@shared-types/turn-order';
@@ -114,7 +112,7 @@ export function findNextOccupiedPos(
     const wrapped = makeWrappedFlag(start, pos);
     const unit = unitsBySlot.get(pos) ?? null;
     const queued = isQueueDue(state, sideLower, pos, cycle);
-    if (unit && unit.alive && Statuses.canAct(unit)){
+    if (unit && unit.alive){
       return {
         mode: 'interleaved_by_position',
         side: sideLower,
