@@ -38,10 +38,6 @@ function sanitizeSectName(value: string | null | undefined): string {
   return trimmed || DEFAULT_SECT_NAME;
 }
 
-function readSectName(): string {
-  return sanitizeSectName(loadPlayerProfile().sectName);
-}
-
 function saveSectName(name: string): string {
   const nextName = sanitizeSectName(name);
   patchPlayerProfile({ sectName: nextName });
@@ -55,6 +51,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   const container = document.createElement('div');
   container.className = 'sect-screen';
   const mount = mountSection({ root, section: container, rootClasses: ['app--sect'] });
+
+  const profile = loadPlayerProfile();
 
   const backButton = document.createElement('button');
   backButton.type = 'button';
@@ -72,7 +70,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   topRow.className = 'sect-screen__top';
   const title = document.createElement('h1');
   title.className = 'sect-screen__title';
-  title.textContent = readSectName();
+  title.textContent = sanitizeSectName(profile.sectName);
   topRow.appendChild(title);
   container.appendChild(topRow);
 
@@ -105,7 +103,6 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   layout.append(left, center, right);
   container.appendChild(layout);
 
-  const profile = loadPlayerProfile();
   const existingName = sanitizeSectName(profile.sectName);
   const shouldOpenNamingHub = !profile.sectName || !String(profile.sectName).trim();
 

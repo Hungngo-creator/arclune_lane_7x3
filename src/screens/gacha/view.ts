@@ -53,14 +53,20 @@ interface AuraEntry {
   readonly rarity: Rarity;
 }
 
-function buildCardsRenderSignature(cards: ReadonlyArray<GachaCardInput>): string {
-  if (!cards.length) return '';
-  return cards
-    .map((card, index) => {
-      const normalized = toNormalizedCard(card, index);
-      return [normalized.id, normalized.name, normalized.rarity, normalized.description ?? '', normalized.artwork ?? ''].join('|');
-    })
+interface PreparedCards {
+  readonly signature: string;
+  readonly cards: ReadonlyArray<NormalizedGachaCard>;
+}
+
+function prepareCards(cards: ReadonlyArray<GachaCardInput>): PreparedCards {
+  if (!cards.length){
+    return { signature: '', cards: [] };
+  }
+  const normalizedCards = cards.map((card, index) => toNormalizedCard(card, index));
+  const signature = normalizedCards
+    .map((card) => [card.id, card.name, card.rarity, card.description ?? '', card.artwork ?? ''].join('|'))
     .join('||');
+  return { signature, cards: normalizedCards };
 }
 
 function ensureStyles(): void {
@@ -175,7 +181,8 @@ export function renderGachaView(options: GachaViewOptions): GachaViewHandle {
   }
 
   function renderCards(cards: ReadonlyArray<GachaCardInput>): void {
-    const nextSignature = buildCardsRenderSignature(cards);
+    const prepared = prepareCards(cards);
+    const nextSignature = prepared.signature;
     if (nextSignature === cardsRenderSignature){
       updateRevealButtonState();
       return;
@@ -184,8 +191,7 @@ export function renderGachaView(options: GachaViewOptions): GachaViewHandle {
     disposeCardEntries();
     grid.replaceChildren();
     const fragment = document.createDocumentFragment();
-    cards.forEach((card, index) => {
-      const normalized = toNormalizedCard(card, index);
+    prepared.cards.forEach((normalized) => {
       const cardEl = document.createElement('article');
       cardEl.className = 'gacha-card';
       cardEl.dataset.cardId = normalized.id;

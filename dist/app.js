@@ -20181,13 +20181,17 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
               unmountRarity(node);
           }
           const avatars = node.querySelectorAll('.collection-roster__avatar');
-          avatars.forEach(avatarNode => unmountRarity(avatarNode));
+          for (const avatarNode of avatars) {
+              unmountRarity(avatarNode);
+          }
       };
       let rosterObserver = null;
       if (typeof MutationObserver === 'function') {
           rosterObserver = new MutationObserver(mutations => {
               for (const mutation of mutations) {
-                  mutation.removedNodes.forEach(teardownRarityOverlays);
+                  for (const removedNode of mutation.removedNodes) {
+                      teardownRarityOverlays(removedNode);
+                  }
               }
           });
           rosterObserver.observe(rosterList, { childList: true, subtree: true });
@@ -20857,15 +20861,15 @@ __define('./screens/gacha/view.ts', (exports, module, __require) => {
   const normalizeRarity = __dep1.normalizeRarity;
   const playGachaReveal = __dep1.playGachaReveal;
   const STYLE_ID = 'gacha-view-style';
-  function buildCardsRenderSignature(cards) {
-      if (!cards.length)
-          return '';
-      return cards
-          .map((card, index) => {
-          const normalized = toNormalizedCard(card, index);
-          return [normalized.id, normalized.name, normalized.rarity, normalized.description ?? '', normalized.artwork ?? ''].join('|');
-      })
+  function prepareCards(cards) {
+      if (!cards.length) {
+          return { signature: '', cards: [] };
+      }
+      const normalizedCards = cards.map((card, index) => toNormalizedCard(card, index));
+      const signature = normalizedCards
+          .map((card) => [card.id, card.name, card.rarity, card.description ?? '', card.artwork ?? ''].join('|'))
           .join('||');
+      return { signature, cards: normalizedCards };
   }
   function ensureStyles() {
       const css = `
@@ -20963,7 +20967,8 @@ __define('./screens/gacha/view.ts', (exports, module, __require) => {
           }
       }
       function renderCards(cards) {
-          const nextSignature = buildCardsRenderSignature(cards);
+          const prepared = prepareCards(cards);
+          const nextSignature = prepared.signature;
           if (nextSignature === cardsRenderSignature) {
               updateRevealButtonState();
               return;
@@ -20972,8 +20977,7 @@ __define('./screens/gacha/view.ts', (exports, module, __require) => {
           disposeCardEntries();
           grid.replaceChildren();
           const fragment = document.createDocumentFragment();
-          cards.forEach((card, index) => {
-              const normalized = toNormalizedCard(card, index);
+          prepared.cards.forEach((normalized) => {
               const cardEl = document.createElement('article');
               cardEl.className = 'gacha-card';
               cardEl.dataset.cardId = normalized.id;
@@ -21258,6 +21262,12 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
           const sectionName = cell.section === 'formation' ? 'Ô ra trận' : 'Ô dự phòng';
           return `${sectionName} #${Math.max(displayIndex, 1)}`;
       };
+      const refreshBattlePanels = () => {
+          helpers.renderCells();
+          helpers.renderLeader();
+          helpers.renderPassives();
+          helpers.renderRoster();
+      };
       const handleCellInteraction = (event) => {
           const cellEl = event.target?.closest('.lineup-cell');
           if (!cellEl)
@@ -21289,6 +21299,23 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
               action = cellEl.dataset.cellDefaultAction ?? null;
           }
           const label = getCellLabel(lineup, cellIndex);
+          const assignSelectedUnit = () => {
+              if (!state.selectedUnitId) {
+                  helpers.setMessage('Chọn nhân vật từ roster trước.', 'info');
+                  return false;
+              }
+              const selectedUnitId = state.selectedUnitId;
+              const result = assignUnitToCell(lineup, cellIndex, selectedUnitId);
+              if (!result.ok) {
+                  helpers.setMessage(result.message || 'Không thể gán nhân vật.', 'error');
+                  return false;
+              }
+              const unit = rosterLookup.get(selectedUnitId);
+              helpers.setMessage(`Đã gán ${unit?.name || 'nhân vật'} vào ${label}.`, 'info');
+              state.selectedUnitId = null;
+              refreshBattlePanels();
+              return true;
+          };
           if (action === 'unlock') {
               const result = unlockCell(lineup, cellIndex, state.currencyBalances);
               if (!result.ok) {
@@ -21301,10 +21328,7 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
               helpers.setMessage(spentText
                   ? `Đã mở khóa ${label} (tốn ${spentText}).`
                   : `Đã mở khóa ${label}.`, 'info');
-              helpers.renderCells();
-              helpers.renderLeader();
-              helpers.renderPassives();
-              helpers.renderRoster();
+              refreshBattlePanels();
               helpers.refreshWallet();
               const order = getCurrencyOrder();
               const wallet = createNormalizedWallet(Object.fromEntries(order.map((id) => [id, state.currencyBalances.get(id) ?? 0])));
@@ -21326,44 +21350,15 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
                   state.selectedUnitId = null;
               }
               helpers.setMessage('Đã bỏ nhân vật khỏi ô.', 'info');
-              helpers.renderCells();
-              helpers.renderLeader();
-              helpers.renderPassives();
-              helpers.renderRoster();
+              refreshBattlePanels();
               return;
           }
           if (action === 'assign') {
-              if (!state.selectedUnitId) {
-                  helpers.setMessage('Chọn nhân vật từ roster trước.', 'info');
-                  return;
-              }
-              const assignResult = assignUnitToCell(lineup, cellIndex, state.selectedUnitId);
-              if (!assignResult.ok) {
-                  helpers.setMessage(assignResult.message || 'Không thể gán nhân vật.', 'error');
-                  return;
-              }
-              const unit = rosterLookup.get(state.selectedUnitId);
-              helpers.setMessage(`Đã gán ${unit?.name || 'nhân vật'} vào ${label}.`, 'info');
-              state.selectedUnitId = null;
-              helpers.renderCells();
-              helpers.renderLeader();
-              helpers.renderPassives();
-              helpers.renderRoster();
+              assignSelectedUnit();
               return;
           }
           if (state.selectedUnitId) {
-              const result = assignUnitToCell(lineup, cellIndex, state.selectedUnitId);
-              if (!result.ok) {
-                  helpers.setMessage(result.message || 'Không thể gán nhân vật.', 'error');
-                  return;
-              }
-              const unit = rosterLookup.get(state.selectedUnitId);
-              helpers.setMessage(`Đã gán ${unit?.name || 'nhân vật'} vào ${label}.`, 'info');
-              state.selectedUnitId = null;
-              helpers.renderCells();
-              helpers.renderLeader();
-              helpers.renderPassives();
-              helpers.renderRoster();
+              assignSelectedUnit();
               return;
           }
           if (cell.unitId) {
@@ -24244,9 +24239,6 @@ __define('./screens/sect/index.ts', (exports, module, __require) => {
       const trimmed = String(value ?? '').trim().replace(/\s+/g, ' ');
       return trimmed || DEFAULT_SECT_NAME;
   }
-  function readSectName() {
-      return sanitizeSectName(loadPlayerProfile().sectName);
-  }
   function saveSectName(name) {
       const nextName = sanitizeSectName(name);
       patchPlayerProfile({ sectName: nextName });
@@ -24258,6 +24250,7 @@ __define('./screens/sect/index.ts', (exports, module, __require) => {
       const container = document.createElement('div');
       container.className = 'sect-screen';
       const mount = mountSection({ root, section: container, rootClasses: ['app--sect'] });
+      const profile = loadPlayerProfile();
       const backButton = document.createElement('button');
       backButton.type = 'button';
       backButton.className = 'sect-screen__back';
@@ -24273,7 +24266,7 @@ __define('./screens/sect/index.ts', (exports, module, __require) => {
       topRow.className = 'sect-screen__top';
       const title = document.createElement('h1');
       title.className = 'sect-screen__title';
-      title.textContent = readSectName();
+      title.textContent = sanitizeSectName(profile.sectName);
       topRow.appendChild(title);
       container.appendChild(topRow);
       const layout = document.createElement('div');
@@ -24301,7 +24294,6 @@ __define('./screens/sect/index.ts', (exports, module, __require) => {
       right.className = 'sect-screen__right';
       layout.append(left, center, right);
       container.appendChild(layout);
-      const profile = loadPlayerProfile();
       const existingName = sanitizeSectName(profile.sectName);
       const shouldOpenNamingHub = !profile.sectName || !String(profile.sectName).trim();
       let overlay = null;

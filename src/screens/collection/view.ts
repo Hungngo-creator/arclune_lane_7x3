@@ -446,14 +446,18 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
       unmountRarity(node);
     }
     const avatars = node.querySelectorAll<HTMLElement>('.collection-roster__avatar');
-    avatars.forEach(avatarNode => unmountRarity(avatarNode));
+    for (const avatarNode of avatars){
+      unmountRarity(avatarNode);
+    }
   };
 
   let rosterObserver: MutationObserver | null = null;
   if (typeof MutationObserver === 'function'){
     rosterObserver = new MutationObserver(mutations => {
       for (const mutation of mutations){
-        mutation.removedNodes.forEach(teardownRarityOverlays);
+        for (const removedNode of mutation.removedNodes){
+          teardownRarityOverlays(removedNode);
+        }
       }
     });
     rosterObserver.observe(rosterList, { childList: true, subtree: true });

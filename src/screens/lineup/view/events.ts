@@ -120,16 +120,23 @@ const getCellLabel = (lineup: LineupState, cellIndex: number): string => {
     const cell = lineup.cells[cellIndex];
     if (!cell){
       return 'Ô đội hình';
-  }
-const firstReserveIndex = lineup.cells.find(entry => entry.section === 'reserve')?.index ?? lineup.cells.length;
+   }
+    const firstReserveIndex = lineup.cells.find(entry => entry.section === 'reserve')?.index ?? lineup.cells.length;
     const displayIndex = cell.section === 'formation'
       ? cell.index + 1
       : (cell.index - firstReserveIndex + 1);
     const sectionName = cell.section === 'formation' ? 'Ô ra trận' : 'Ô dự phòng';
     return `${sectionName} #${Math.max(displayIndex, 1)}`;
-};
+  };
 
-const handleCellInteraction = (event: Event) => {
+const refreshBattlePanels = (): void => {
+    helpers.renderCells();
+    helpers.renderLeader();
+    helpers.renderPassives();
+    helpers.renderRoster();
+  };
+
+  const handleCellInteraction = (event: Event) => {
     const cellEl = (event.target as HTMLElement | null)?.closest<HTMLElement>('.lineup-cell');
     if (!cellEl) return;
     const lineup = helpers.getSelectedLineup();
@@ -138,12 +145,12 @@ const handleCellInteraction = (event: Event) => {
     if (!Number.isFinite(cellIndex)) return;
     const cell = lineup.cells[cellIndex];
     if (!cell) return;
-    
+
     state.activeCellIndex = cellIndex;
     helpers.updateActiveCellHighlight();
     helpers.renderCellDetails();
 
-const targetEl = event.target as HTMLElement | null;
+    const targetEl = event.target as HTMLElement | null;
     const actionable = targetEl?.closest<HTMLElement>('[data-cell-action]');
     const mouseEvent = event as MouseEvent | null;
     const hasModifier = Boolean(mouseEvent && (mouseEvent.altKey || mouseEvent.ctrlKey || mouseEvent.metaKey));
@@ -163,6 +170,24 @@ const targetEl = event.target as HTMLElement | null;
 
     const label = getCellLabel(lineup, cellIndex);
 
+    const assignSelectedUnit = (): boolean => {
+      if (!state.selectedUnitId){
+        helpers.setMessage('Chọn nhân vật từ roster trước.', 'info');
+        return false;
+      }
+      const selectedUnitId = state.selectedUnitId;
+      const result = assignUnitToCell(lineup, cellIndex, selectedUnitId);
+      if (!result.ok){
+        helpers.setMessage(result.message || 'Không thể gán nhân vật.', 'error');
+        return false;
+      }
+      const unit = rosterLookup.get(selectedUnitId);
+      helpers.setMessage(`Đã gán ${unit?.name || 'nhân vật'} vào ${label}.`, 'info');
+      state.selectedUnitId = null;
+      refreshBattlePanels();
+      return true;
+    };
+
     if (action === 'unlock'){
       const result = unlockCell(lineup, cellIndex, state.currencyBalances);
       if (!result.ok){
@@ -174,14 +199,11 @@ const targetEl = event.target as HTMLElement | null;
         : null;
       helpers.setMessage(
         spentText
-         ? `Đã mở khóa ${label} (tốn ${spentText}).`
+          ? `Đã mở khóa ${label} (tốn ${spentText}).`
           : `Đã mở khóa ${label}.`,
         'info',
       );
-      helpers.renderCells();
-      helpers.renderLeader();
-      helpers.renderPassives();
-      helpers.renderRoster();
+      refreshBattlePanels();
       helpers.refreshWallet();
       const order = getCurrencyOrder();
       const wallet = createNormalizedWallet(Object.fromEntries(order.map((id) => [id, state.currencyBalances.get(id) ?? 0])));
@@ -205,46 +227,17 @@ const targetEl = event.target as HTMLElement | null;
         state.selectedUnitId = null;
       }
       helpers.setMessage('Đã bỏ nhân vật khỏi ô.', 'info');
-      helpers.renderCells();
-      helpers.renderLeader();
-      helpers.renderPassives();
-      helpers.renderRoster();
+      refreshBattlePanels();
       return;
     }
 
     if (action === 'assign'){
-      if (!state.selectedUnitId){
-        helpers.setMessage('Chọn nhân vật từ roster trước.', 'info');
-        return;
-      }
-      const assignResult = assignUnitToCell(lineup, cellIndex, state.selectedUnitId);
-      if (!assignResult.ok){
-        helpers.setMessage(assignResult.message || 'Không thể gán nhân vật.', 'error');
-        return;
-      }
-      const unit = rosterLookup.get(state.selectedUnitId);
-      helpers.setMessage(`Đã gán ${unit?.name || 'nhân vật'} vào ${label}.`, 'info');
-      state.selectedUnitId = null;
-      helpers.renderCells();
-      helpers.renderLeader();
-      helpers.renderPassives();
-      helpers.renderRoster();
+      assignSelectedUnit();
       return;
     }
 
     if (state.selectedUnitId){
-      const result = assignUnitToCell(lineup, cellIndex, state.selectedUnitId);
-      if (!result.ok){
-        helpers.setMessage(result.message || 'Không thể gán nhân vật.', 'error');
-        return;
-      }
-      const unit = rosterLookup.get(state.selectedUnitId);
-      helpers.setMessage(`Đã gán ${unit?.name || 'nhân vật'} vào ${label}.`, 'info');
-      state.selectedUnitId = null;
-      helpers.renderCells();
-      helpers.renderLeader();
-      helpers.renderPassives();
-      helpers.renderRoster();
+      assignSelectedUnit();
       return;
     }
 
@@ -258,6 +251,7 @@ const targetEl = event.target as HTMLElement | null;
       helpers.setMessage('Chọn nhân vật từ roster để gán vào ô này.', 'info');
     }
   };
+
   cellsGrid.addEventListener('click', handleCellInteraction);
   cleanup.push(() => cellsGrid.removeEventListener('click', handleCellInteraction));
 
