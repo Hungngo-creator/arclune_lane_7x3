@@ -1540,16 +1540,28 @@ function removeOldestMinions(masterIid: number, count: number): void {
   const tokens = Game?.tokens;
   if (!tokens) return;
 
-  const candidates: UnitToken[] = [];
+  const limit = Math.max(1, Math.floor(count));
+  const selected: UnitToken[] = [];
+  const bornOf = (token: UnitToken): number => token.bornSerial || 0;
+
   for (const token of tokens) {
     if (!token?.alive || !token.isMinion || token.ownerIid !== masterIid) continue;
-    candidates.push(token);
-  }
-  if (!candidates.length) return;
+    if (selected.length < limit) {
+      selected.push(token);
+      continue;
+    }
 
-  candidates.sort((a, b) => (a.bornSerial || 0) - (b.bornSerial || 0));
-  const removal = new Set<UnitToken>(candidates.slice(0, Math.min(count, candidates.length)));
-  if (!removal.size) return;
+    let newestIndex = 0;
+    for (let index = 1; index < selected.length; index += 1) {
+      if (bornOf(selected[index]) > bornOf(selected[newestIndex])) newestIndex = index;
+    }
+    if (bornOf(token) < bornOf(selected[newestIndex])) {
+      selected[newestIndex] = token;
+    }
+  }
+
+  if (!selected.length) return;
+  const removal = new Set<UnitToken>(selected);
 
   let write = 0;
   for (let read = 0; read < tokens.length; read += 1) {

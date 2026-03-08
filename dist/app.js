@@ -14059,18 +14059,28 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       const tokens = Game?.tokens;
       if (!tokens)
           return;
-      const candidates = [];
+      const limit = Math.max(1, Math.floor(count));
+      const selected = [];
+      const bornOf = (token) => token.bornSerial || 0;
       for (const token of tokens) {
           if (!token?.alive || !token.isMinion || token.ownerIid !== masterIid)
               continue;
-          candidates.push(token);
+          if (selected.length < limit) {
+              selected.push(token);
+              continue;
+          }
+          let newestIndex = 0;
+          for (let index = 1; index < selected.length; index += 1) {
+              if (bornOf(selected[index]) > bornOf(selected[newestIndex]))
+                  newestIndex = index;
+          }
+          if (bornOf(token) < bornOf(selected[newestIndex])) {
+              selected[newestIndex] = token;
+          }
       }
-      if (!candidates.length)
+      if (!selected.length)
           return;
-      candidates.sort((a, b) => (a.bornSerial || 0) - (b.bornSerial || 0));
-      const removal = new Set(candidates.slice(0, Math.min(count, candidates.length)));
-      if (!removal.size)
-          return;
+      const removal = new Set(selected);
       let write = 0;
       for (let read = 0; read < tokens.length; read += 1) {
           const token = tokens[read];
