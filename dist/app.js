@@ -26502,12 +26502,35 @@ __define('./turns.ts', (exports, module, __require) => {
   const GAMBIT_SKILL_ACTION_SET = new Set(GAMBIT_SKILL_ACTIONS);
   const INTERLEAVED_ACTION_DELAY_MS = 2200;
   const DEFAULT_MUTATION_DEBUFF_POOL = ['bleed', 'stun', 'poison'];
-  const isPveCreepId = (unitId) => (typeof unitId === 'string' && /^creep_\d+$/i.test(unitId));
+  const PVE_CREEP_ID_PATTERN = /^creep_\d+$/i;
+  const MUTATION_DEBUFF_SET = new Set(DEFAULT_MUTATION_DEBUFF_POOL);
+  const isPveCreepId = (unitId) => (typeof unitId === 'string' && PVE_CREEP_ID_PATTERN.test(unitId));
   const sanitizeMutationDebuffPool = (pool) => {
       if (!Array.isArray(pool))
           return [...DEFAULT_MUTATION_DEBUFF_POOL];
-      const filtered = pool.filter((id) => id === 'bleed' || id === 'stun' || id === 'poison');
+      const filtered = [];
+      for (let i = 0; i < pool.length; i += 1) {
+          const id = pool[i];
+          if (id === 'bleed' || id === 'stun' || id === 'poison') {
+              if (!filtered.includes(id)) {
+                  filtered.push(id);
+              }
+              continue;
+          }
+          if (typeof id === 'string' && MUTATION_DEBUFF_SET.has(id)) {
+              if (!filtered.includes(id)) {
+                  filtered.push(id);
+              }
+          }
+      }
       return filtered.length > 0 ? filtered : [...DEFAULT_MUTATION_DEBUFF_POOL];
+  };
+  const clampResourceAfterRegen = (value, max) => {
+      if (typeof max !== 'number' || !Number.isFinite(max)) {
+          return Math.max(0, value);
+      }
+      const upper = Math.max(0, max);
+      return Math.max(0, Math.min(upper, value));
   };
   const applyMutationStatBonus = (unit, bonusPctRaw) => {
       const bonusPct = Number.isFinite(bonusPctRaw) ? Number(bonusPctRaw) : 0.1;
@@ -26547,18 +26570,11 @@ __define('./turns.ts', (exports, module, __require) => {
   function applyTurnRegen(Game, unit) {
       if (!unit || !unit.alive)
           return { hpDelta: 0, aeDelta: 0 };
-      const clampStat = (value, max) => {
-          if (typeof max !== 'number' || !Number.isFinite(max)) {
-              return Math.max(0, value);
-          }
-          const upper = Math.max(0, max);
-          return Math.max(0, Math.min(upper, value));
-      };
       let hpDelta = 0;
       if (Number.isFinite(unit.hp) || Number.isFinite(unit.hpMax) || Number.isFinite(unit.hpRegen)) {
           const currentHp = Number.isFinite(unit.hp) ? unit.hp : 0;
           const regenHp = Number.isFinite(unit.hpRegen) ? unit.hpRegen : 0;
-          const afterHp = clampStat(currentHp + regenHp, unit.hpMax);
+          const afterHp = clampResourceAfterRegen(currentHp + regenHp, unit.hpMax);
           hpDelta = afterHp - currentHp;
           unit.hp = afterHp;
       }
@@ -26566,7 +26582,7 @@ __define('./turns.ts', (exports, module, __require) => {
       if (Number.isFinite(unit.ae) || Number.isFinite(unit.aeMax) || Number.isFinite(unit.aeRegen)) {
           const currentAe = Number.isFinite(unit.ae) ? unit.ae : 0;
           const regenAe = Number.isFinite(unit.aeRegen) ? unit.aeRegen : 0;
-          const afterAe = clampStat(currentAe + regenAe, unit.aeMax);
+          const afterAe = clampResourceAfterRegen(currentAe + regenAe, unit.aeMax);
           aeDelta = afterAe - currentAe;
           unit.ae = afterAe;
       }
@@ -26699,7 +26715,14 @@ __define('./turns.ts', (exports, module, __require) => {
       prepareUnitForPassives(obj);
       Game.tokens.push(obj);
       applyOnSpawnEffects(Game, obj, kit?.onSpawn ?? undefined);
-      const allyLeader = Game.tokens.find((token) => token.alive && token.side === obj.side && isUyenLeader(token));
+      let allyLeader;
+      for (let idx = 0; idx < Game.tokens.length; idx += 1) {
+          const token = Game.tokens[idx];
+          if (token?.alive && token.side === obj.side && isUyenLeader(token)) {
+              allyLeader = token;
+              break;
+          }
+      }
       grantUyenSummonRage(allyLeader, { revived: !!p.revive, isMinion: !!obj.isMinion });
       {
           const sessionVfx = asSessionWithVfx(Game, { requireGrid: true });
