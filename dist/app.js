@@ -27157,21 +27157,31 @@ __define('./turns/interleaved.ts', (exports, module, __require) => {
   const toLowerSpawnSide = (side) => (side === 'ALLY' ? 'ally' : side === 'ENEMY' ? 'enemy' : side);
   function getSequentialOrderIndex(state, side, slot) {
       const turn = state.turn;
+      if (!turn)
+          return -1;
       const order = Array.isArray(turn?.order) ? turn.order : null;
       if (!order)
           return -1;
       const normalizedSide = toLowerSpawnSide(side);
       const key = `${normalizedSide}:${slot}`;
-      const cached = turn?.orderIndex;
-      if (cached instanceof Map && cached.has(key)) {
+      if (!(turn.orderIndex instanceof Map)) {
+          const orderIndex = new Map();
+          for (let index = 0; index < order.length; index += 1) {
+              const entry = order[index];
+              const entrySide = entry?.side;
+              const entrySlot = entry?.slot;
+              if ((entrySide !== 'ally' && entrySide !== 'enemy') || !Number.isFinite(entrySlot))
+                  continue;
+              orderIndex.set(`${entrySide}:${entrySlot}`, index);
+          }
+          turn.orderIndex = orderIndex;
+      }
+      const cached = turn.orderIndex;
+      if (cached.has(key)) {
           const value = cached.get(key);
           return typeof value === 'number' ? value : -1;
       }
-      const index = order.findIndex((entry) => entry?.side === normalizedSide && entry?.slot === slot);
-      if (index >= 0 && cached instanceof Map && !cached.has(key)) {
-          cached.set(key, index);
-      }
-      return index;
+      return -1;
   }
   function predictSpawnCycleByTurnOrder(state, side, slot) {
       const turn = state.turn;
