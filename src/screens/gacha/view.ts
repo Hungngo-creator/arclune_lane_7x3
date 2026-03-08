@@ -53,6 +53,16 @@ interface AuraEntry {
   readonly rarity: Rarity;
 }
 
+function buildCardsRenderSignature(cards: ReadonlyArray<GachaCardInput>): string {
+  if (!cards.length) return '';
+  return cards
+    .map((card, index) => {
+      const normalized = toNormalizedCard(card, index);
+      return [normalized.id, normalized.name, normalized.rarity, normalized.description ?? '', normalized.artwork ?? ''].join('|');
+    })
+    .join('||');
+}
+
 function ensureStyles(): void {
   const css = `
     .app--gacha{padding:32px 16px 64px;background:linear-gradient(160deg,rgba(6,10,16,.94),rgba(12,18,28,.88));min-height:100vh;box-sizing:border-box;}
@@ -142,6 +152,7 @@ export function renderGachaView(options: GachaViewOptions): GachaViewHandle {
   const auraEntries: AuraEntry[] = [];
   let revealDoneCallback = typeof options.onRevealDone === 'function' ? options.onRevealDone : null;
   let isRevealing = false;
+  let cardsRenderSignature = '';
 
   const cleanupCallbacks: Array<() => void> = [];
   const addCleanup = (fn: (() => void) | null | undefined) => {
@@ -164,8 +175,15 @@ export function renderGachaView(options: GachaViewOptions): GachaViewHandle {
   }
 
   function renderCards(cards: ReadonlyArray<GachaCardInput>): void {
+    const nextSignature = buildCardsRenderSignature(cards);
+    if (nextSignature === cardsRenderSignature){
+      updateRevealButtonState();
+      return;
+    }
+    cardsRenderSignature = nextSignature;
     disposeCardEntries();
     grid.replaceChildren();
+    const fragment = document.createDocumentFragment();
     cards.forEach((card, index) => {
       const normalized = toNormalizedCard(card, index);
       const cardEl = document.createElement('article');
@@ -203,8 +221,9 @@ export function renderGachaView(options: GachaViewOptions): GachaViewHandle {
 
       mountRarityAura(cardEl, normalized.rarity, 'gacha', { label: true });
       auraEntries.push({ id: normalized.id, el: cardEl, rarity: normalized.rarity });
-      grid.appendChild(cardEl);
+      fragment.appendChild(cardEl);
     });
+    grid.appendChild(fragment);
     updateRevealButtonState();
   }
 

@@ -20171,6 +20171,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       const rosterList = document.createElement('ul');
       rosterList.className = 'collection-roster__list';
       const rosterSource = buildRosterWithCost(cloneRoster(roster));
+      const skillSetCache = new Map();
       const rosterEntries = new Map();
       const teardownRarityOverlays = (node) => {
           if (!(node instanceof HTMLElement)) {
@@ -20724,27 +20725,26 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           const unit = selectedEntry?.meta || null;
           const unitRarity = selectedEntry?.rarity || null;
           stageName.textContent = toSafeText(unit?.name ?? unitId);
-          while (stageTags.firstChild) {
-              stageTags.removeChild(stageTags.firstChild);
-          }
+          const stageTagsFragment = document.createDocumentFragment();
           if (unitRarity) {
               const rankTag = document.createElement('span');
               rankTag.className = 'collection-stage__tag';
               rankTag.textContent = toSafeText(`Rank ${unitRarity}`);
-              stageTags.appendChild(rankTag);
+              stageTagsFragment.appendChild(rankTag);
           }
           else if (unit?.rank) {
               const rankTag = document.createElement('span');
               rankTag.className = 'collection-stage__tag';
               rankTag.textContent = toSafeText(`Rank ${unit.rank}`);
-              stageTags.appendChild(rankTag);
+              stageTagsFragment.appendChild(rankTag);
           }
           if (unit?.class) {
               const classTag = document.createElement('span');
               classTag.className = 'collection-stage__tag';
               classTag.textContent = toSafeText(unit.class);
-              stageTags.appendChild(classTag);
+              stageTagsFragment.appendChild(classTag);
           }
+          stageTags.replaceChildren(stageTagsFragment);
           const costValue = unit && Number.isFinite(unit.cost) ? unit.cost : '—';
           stageCost.textContent = `Cost ${toSafeText(costValue)}`;
           const art = getUnitArt(unitId);
@@ -20759,14 +20759,17 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
               stageSprite.style.opacity = '0';
           }
           overlayTitle.textContent = toSafeText(unit?.name ? `Kĩ năng · ${unit.name}` : 'Kĩ năng');
-          const skillSet = getSkillSet(unitId);
+          const skillSet = skillSetCache.has(unitId)
+              ? skillSetCache.get(unitId)
+              : getSkillSet(unitId);
+          if (!skillSetCache.has(unitId)) {
+              skillSetCache.set(unitId, skillSet);
+          }
           overlaySubtitle.textContent = toSafeText(describeUlt(unit));
           const summaryNote = skillSet?.notes?.[0] ?? '';
           overlaySummary.textContent = toSafeText(summaryNote);
           overlaySummary.style.display = summaryNote ? '' : 'none';
-          while (overlayNotesList.firstChild) {
-              overlayNotesList.removeChild(overlayNotesList.firstChild);
-          }
+          overlayNotesList.replaceChildren();
           const extraNotes = Array.isArray(skillSet?.notes) ? skillSet.notes.slice(1) : [];
           if (extraNotes.length) {
               overlayNotesList.style.display = '';
@@ -20781,9 +20784,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           else {
               overlayNotesList.style.display = 'none';
           }
-          while (overlayAbilities.firstChild) {
-              overlayAbilities.removeChild(overlayAbilities.firstChild);
-          }
+          overlayAbilities.replaceChildren();
           const abilityEntries = [];
           if (skillSet?.basic) {
               abilityEntries.push({ entry: skillSet.basic, label: ABILITY_TYPE_LABELS.basic });
@@ -20820,11 +20821,6 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           }
           refreshTuViPanel();
       };
-      const observer = new MutationObserver(() => {
-          // placeholder to keep overlay in DOM order if needed
-      });
-      observer.observe(stage, { childList: true });
-      addCleanup(() => observer.disconnect());
       if (rosterEntries.size > 0) {
           const preferredId = Array.from(rosterEntries.keys())[0];
           if (preferredId) {
@@ -20861,6 +20857,16 @@ __define('./screens/gacha/view.ts', (exports, module, __require) => {
   const normalizeRarity = __dep1.normalizeRarity;
   const playGachaReveal = __dep1.playGachaReveal;
   const STYLE_ID = 'gacha-view-style';
+  function buildCardsRenderSignature(cards) {
+      if (!cards.length)
+          return '';
+      return cards
+          .map((card, index) => {
+          const normalized = toNormalizedCard(card, index);
+          return [normalized.id, normalized.name, normalized.rarity, normalized.description ?? '', normalized.artwork ?? ''].join('|');
+      })
+          .join('||');
+  }
   function ensureStyles() {
       const css = `
       .app--gacha{padding:32px 16px 64px;background:linear-gradient(160deg,rgba(6,10,16,.94),rgba(12,18,28,.88));min-height:100vh;box-sizing:border-box;}
@@ -20938,6 +20944,7 @@ __define('./screens/gacha/view.ts', (exports, module, __require) => {
       const auraEntries = [];
       let revealDoneCallback = typeof options.onRevealDone === 'function' ? options.onRevealDone : null;
       let isRevealing = false;
+      let cardsRenderSignature = '';
       const cleanupCallbacks = [];
       const addCleanup = (fn) => {
           if (typeof fn === 'function') {
@@ -20956,8 +20963,15 @@ __define('./screens/gacha/view.ts', (exports, module, __require) => {
           }
       }
       function renderCards(cards) {
+          const nextSignature = buildCardsRenderSignature(cards);
+          if (nextSignature === cardsRenderSignature) {
+              updateRevealButtonState();
+              return;
+          }
+          cardsRenderSignature = nextSignature;
           disposeCardEntries();
           grid.replaceChildren();
+          const fragment = document.createDocumentFragment();
           cards.forEach((card, index) => {
               const normalized = toNormalizedCard(card, index);
               const cardEl = document.createElement('article');
@@ -20989,8 +21003,9 @@ __define('./screens/gacha/view.ts', (exports, module, __require) => {
               cardEl.appendChild(content);
               mountRarityAura(cardEl, normalized.rarity, 'gacha', { label: true });
               auraEntries.push({ id: normalized.id, el: cardEl, rarity: normalized.rarity });
-              grid.appendChild(cardEl);
+              fragment.appendChild(cardEl);
           });
+          grid.appendChild(fragment);
           updateRevealButtonState();
       }
       function handleReveal() {
@@ -21934,6 +21949,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       actions.appendChild(backButton);
       const walletEl = document.createElement('div');
       walletEl.className = 'lineup-view__wallet';
+      const walletItems = new Map();
       actions.appendChild(walletEl);
       header.appendChild(actions);
       container.appendChild(header);
@@ -22079,8 +22095,15 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           }
       }
       function refreshWallet() {
-          walletEl.innerHTML = '';
           for (const [currencyId, balance] of state.currencyBalances.entries()) {
+              const existing = walletItems.get(currencyId);
+              if (existing) {
+                  const valueNode = existing.querySelector('.lineup-wallet__balance');
+                  if (valueNode) {
+                      valueNode.textContent = formatCurrencyBalance(balance, currencyId);
+                  }
+                  continue;
+              }
               const item = document.createElement('div');
               item.className = 'lineup-wallet__item';
               const nameEl = document.createElement('p');
@@ -22089,9 +22112,15 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               const value = document.createElement('p');
               value.className = 'lineup-wallet__balance';
               value.textContent = formatCurrencyBalance(balance, currencyId);
-              item.appendChild(nameEl);
-              item.appendChild(value);
+              item.append(nameEl, value);
+              walletItems.set(currencyId, item);
               walletEl.appendChild(item);
+          }
+          for (const [currencyId, item] of walletItems) {
+              if (!state.currencyBalances.has(currencyId)) {
+                  item.remove();
+                  walletItems.delete(currencyId);
+              }
           }
       }
       function renderCellDetails() {
@@ -22282,6 +22311,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           if (!Number.isInteger(state.activeCellIndex) || !lineup.cells[state.activeCellIndex ?? -1]) {
               state.activeCellIndex = null;
           }
+          const fragment = document.createDocumentFragment();
           lineup.cells.forEach(cell => {
               const cellEl = document.createElement('div');
               cellEl.className = 'lineup-cell';
@@ -22363,8 +22393,9 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
                   ariaLabel += '. Ô trống. Chọn nhân vật trong roster rồi nhấp để gán.';
               }
               cellEl.setAttribute('aria-label', ariaLabel);
-              cellsGrid.appendChild(cellEl);
+              fragment.appendChild(cellEl);
           });
+          cellsGrid.appendChild(fragment);
           updateActiveCellHighlight();
           renderCellDetails();
       }
@@ -22477,6 +22508,18 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           rosterList.innerHTML = '';
           const lineup = getSelectedLineup();
           const filtered = filterRoster(state.roster, state.filter);
+          const assignedUnitIds = new Set();
+          if (lineup) {
+              if (lineup.leaderId) {
+                  assignedUnitIds.add(lineup.leaderId);
+              }
+              for (const cell of lineup.cells) {
+                  if (cell.unitId) {
+                      assignedUnitIds.add(cell.unitId);
+                  }
+              }
+          }
+          const fragment = document.createDocumentFragment();
           filtered.forEach(unit => {
               const unitId = normalizeUnitId(unit.id);
               const button = document.createElement('button');
@@ -22487,9 +22530,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               if (state.selectedUnitId === unitId) {
                   button.classList.add('is-selected');
               }
-              const isAssigned = Boolean(lineup
-                  && (lineup.leaderId === unitId
-                      || lineup.cells.some(cell => cell.unitId === unitId)));
+              const isAssigned = assignedUnitIds.has(unitId);
               if (isAssigned && state.selectedUnitId !== unitId) {
                   button.classList.add('is-unavailable');
               }
@@ -22517,8 +22558,9 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
                   meta.appendChild(extra);
               }
               button.appendChild(meta);
-              rosterList.appendChild(button);
+              fragment.appendChild(button);
           });
+          rosterList.appendChild(fragment);
       }
       function openPassiveDetails(passive) {
           passiveOverlayBody.innerHTML = '';

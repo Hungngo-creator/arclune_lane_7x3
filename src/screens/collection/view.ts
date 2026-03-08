@@ -429,6 +429,7 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
   rosterList.className = 'collection-roster__list';
 
   const rosterSource = buildRosterWithCost(cloneRoster(roster));
+  const skillSetCache = new Map<string, ReturnType<typeof getSkillSet>>();
   const rosterEntries = new Map<string, {
     button: HTMLButtonElement;
     costEl: HTMLElement | null;
@@ -1083,26 +1084,25 @@ const resolveCurrentCultivation = () => {
     const unitRarity = selectedEntry?.rarity || null;
     stageName.textContent = toSafeText(unit?.name ?? unitId);
 
-    while (stageTags.firstChild){
-      stageTags.removeChild(stageTags.firstChild);
-    }
+    const stageTagsFragment = document.createDocumentFragment();
     if (unitRarity){
       const rankTag = document.createElement('span');
       rankTag.className = 'collection-stage__tag';
       rankTag.textContent = toSafeText(`Rank ${unitRarity}`);
-      stageTags.appendChild(rankTag);
+      stageTagsFragment.appendChild(rankTag);
     } else if (unit?.rank){
       const rankTag = document.createElement('span');
       rankTag.className = 'collection-stage__tag';
       rankTag.textContent = toSafeText(`Rank ${unit.rank}`);
-      stageTags.appendChild(rankTag);
+      stageTagsFragment.appendChild(rankTag);
     }
     if (unit?.class){
       const classTag = document.createElement('span');
       classTag.className = 'collection-stage__tag';
       classTag.textContent = toSafeText(unit.class);
-      stageTags.appendChild(classTag);
+      stageTagsFragment.appendChild(classTag);
     }
+    stageTags.replaceChildren(stageTagsFragment);
 
     const costValue = unit && Number.isFinite(unit.cost) ? unit.cost : '—';
     stageCost.textContent = `Cost ${toSafeText(costValue)}`;
@@ -1120,15 +1120,18 @@ const resolveCurrentCultivation = () => {
 
     overlayTitle.textContent = toSafeText(unit?.name ? `Kĩ năng · ${unit.name}` : 'Kĩ năng');
     
-    const skillSet = getSkillSet(unitId);
+    const skillSet = skillSetCache.has(unitId)
+      ? skillSetCache.get(unitId)
+      : getSkillSet(unitId);
+    if (!skillSetCache.has(unitId)){
+      skillSetCache.set(unitId, skillSet);
+    }
     overlaySubtitle.textContent = toSafeText(describeUlt(unit));
     const summaryNote = skillSet?.notes?.[0] ?? '';
     overlaySummary.textContent = toSafeText(summaryNote);
     overlaySummary.style.display = summaryNote ? '' : 'none';
 
-    while (overlayNotesList.firstChild){
-      overlayNotesList.removeChild(overlayNotesList.firstChild);
-    }
+    overlayNotesList.replaceChildren();
     const extraNotes = Array.isArray(skillSet?.notes) ? skillSet.notes.slice(1) : [];
     if (extraNotes.length){
       overlayNotesList.style.display = '';
@@ -1142,9 +1145,7 @@ const resolveCurrentCultivation = () => {
       overlayNotesList.style.display = 'none';
     }
 
-    while (overlayAbilities.firstChild){
-      overlayAbilities.removeChild(overlayAbilities.firstChild);
-    }
+    overlayAbilities.replaceChildren();
     const abilityEntries: Array<{ entry: AbilityEntry | null | undefined; label: string }> = [];
     if (skillSet?.basic){
       abilityEntries.push({ entry: skillSet.basic, label: ABILITY_TYPE_LABELS.basic });
@@ -1181,12 +1182,6 @@ const resolveCurrentCultivation = () => {
     }
     refreshTuViPanel();
   };
-
-  const observer = new MutationObserver(() => {
-    // placeholder to keep overlay in DOM order if needed
-  });
-  observer.observe(stage, { childList: true });
-  addCleanup(() => observer.disconnect());
 
   if (rosterEntries.size > 0){
     const preferredId = Array.from(rosterEntries.keys())[0];

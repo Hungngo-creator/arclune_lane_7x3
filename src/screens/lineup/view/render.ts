@@ -454,6 +454,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   actions.appendChild(backButton);
   const walletEl = document.createElement('div');
   walletEl.className = 'lineup-view__wallet';
+  const walletItems = new Map<string, HTMLElement>();
   actions.appendChild(walletEl);
   header.appendChild(actions);
   container.appendChild(header);
@@ -620,8 +621,15 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   }
 
   function refreshWallet(): void{
-    walletEl.innerHTML = '';
     for (const [currencyId, balance] of state.currencyBalances.entries()){
+      const existing = walletItems.get(currencyId);
+      if (existing){
+        const valueNode = existing.querySelector<HTMLElement>('.lineup-wallet__balance');
+        if (valueNode){
+          valueNode.textContent = formatCurrencyBalance(balance, currencyId);
+        }
+        continue;
+      }
       const item = document.createElement('div');
       item.className = 'lineup-wallet__item';
       const nameEl = document.createElement('p');
@@ -630,9 +638,15 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       const value = document.createElement('p');
       value.className = 'lineup-wallet__balance';
       value.textContent = formatCurrencyBalance(balance, currencyId);
-      item.appendChild(nameEl);
-      item.appendChild(value);
+      item.append(nameEl, value);
+      walletItems.set(currencyId, item);
       walletEl.appendChild(item);
+    }
+    for (const [currencyId, item] of walletItems){
+      if (!state.currencyBalances.has(currencyId)){
+        item.remove();
+        walletItems.delete(currencyId);
+      }
     }
   }
 
@@ -843,6 +857,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       state.activeCellIndex = null;
     }
 
+    const fragment = document.createDocumentFragment();
     lineup.cells.forEach(cell => {
       const cellEl = document.createElement('div');
       cellEl.className = 'lineup-cell';
@@ -919,8 +934,10 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       }
       cellEl.setAttribute('aria-label', ariaLabel);
 
-      cellsGrid.appendChild(cellEl);
+      fragment.appendChild(cellEl);
     });
+
+cellsGrid.appendChild(fragment);
 
 updateActiveCellHighlight();
     renderCellDetails();
@@ -1035,6 +1052,18 @@ function updateActiveCellHighlight(): void{
     rosterList.innerHTML = '';
     const lineup = getSelectedLineup();
     const filtered = filterRoster(state.roster, state.filter);
+    const assignedUnitIds = new Set<string>();
+    if (lineup){
+      if (lineup.leaderId){
+        assignedUnitIds.add(lineup.leaderId);
+      }
+      for (const cell of lineup.cells){
+        if (cell.unitId){
+          assignedUnitIds.add(cell.unitId);
+        }
+      }
+    }
+    const fragment = document.createDocumentFragment();
     filtered.forEach(unit => {
       const unitId = normalizeUnitId(unit.id);
       const button = document.createElement('button');
@@ -1045,11 +1074,7 @@ function updateActiveCellHighlight(): void{
       if (state.selectedUnitId === unitId){
         button.classList.add('is-selected');
       }
-      const isAssigned = Boolean(
-        lineup
-        && (lineup.leaderId === unitId
-       || lineup.cells.some(cell => cell.unitId === unitId))
-      );
+      const isAssigned = assignedUnitIds.has(unitId);
       if (isAssigned && state.selectedUnitId !== unitId){
         button.classList.add('is-unavailable');
       }
@@ -1077,8 +1102,9 @@ function updateActiveCellHighlight(): void{
         meta.appendChild(extra);
       }
       button.appendChild(meta);
-      rosterList.appendChild(button);
+      fragment.appendChild(button);
     });
+    rosterList.appendChild(fragment);
   }
 
   function openPassiveDetails(passive: LineupPassive): void{
