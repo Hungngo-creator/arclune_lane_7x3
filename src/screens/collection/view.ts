@@ -53,6 +53,15 @@ const TAB_DEFINITIONS = [
   { key: 'tuvi', label: 'Tu Vi', hint: 'Nâng cấp tiểu cảnh giới và tiêu hao VNT theo độ khó bậc tu luyện.' }
 ] satisfies ReadonlyArray<{ key: CollectionTabKey; label: string; hint: string }>;
 
+const TAB_HINT_BY_KEY: Readonly<Record<CollectionTabKey, string>> = TAB_DEFINITIONS.reduce((acc, tab) => {
+  acc[tab.key] = tab.hint;
+  return acc;
+}, {} as Record<CollectionTabKey, string>);
+
+function clearChildren(node: HTMLElement): void {
+  node.replaceChildren();
+}
+
 const currencyCatalog: CurrencyCatalog = getCurrencyCatalog();
 const currencyFormatter = ensureNumberFormatter(createNumberFormatter, 'vi-VN');
 
@@ -726,12 +735,8 @@ const overlayDetailPanel = document.createElement('aside');
     detailBadge.style.display = 'none';
     detailBadge.textContent = '';
     detailDescription.textContent = 'Chọn một kỹ năng ở danh sách bên trái để xem mô tả chi tiết.';
-    while (detailFacts.firstChild){
-      detailFacts.removeChild(detailFacts.firstChild);
-    }
-    while (detailNotes.firstChild){
-      detailNotes.removeChild(detailNotes.firstChild);
-    }
+    clearChildren(detailFacts);
+    clearChildren(detailNotes);
     detailEmpty.style.display = 'none';
   };
 
@@ -772,9 +777,7 @@ const overlayDetailPanel = document.createElement('aside');
       : card.dataset.description || 'Chưa có mô tả chi tiết.';
     detailDescription.textContent = toSafeText(description);
 
-    while (detailFacts.firstChild){
-      detailFacts.removeChild(detailFacts.firstChild);
-    }
+    clearChildren(detailFacts);
     const facts: AbilityFact[] = collectAbilityFacts(ability);
     if (facts.length){
       for (const fact of facts){
@@ -811,9 +814,7 @@ const overlayDetailPanel = document.createElement('aside');
       }
     }
 
-    while (detailNotes.firstChild){
-      detailNotes.removeChild(detailNotes.firstChild);
-    }
+    clearChildren(detailNotes);
 
     const rawNotes = Array.isArray(ability?.notes) ? ability.notes : [];
     let cardNotes = [];
@@ -827,9 +828,16 @@ const overlayDetailPanel = document.createElement('aside');
         // bỏ qua lỗi parse và tiếp tục với danh sách rỗng
       }
     }
-    const mergedNotes = [...rawNotes, ...cardNotes]
-      .map(note => (typeof note === 'string' ? note.trim() : ''))
-      .filter((note, index, array) => note && array.indexOf(note) === index);
+    const mergedNotes: string[] = [];
+    const noteSet = new Set<string>();
+    for (const rawNote of [...rawNotes, ...cardNotes]){
+      const normalized = typeof rawNote === 'string' ? rawNote.trim() : '';
+      if (!normalized || noteSet.has(normalized)){
+        continue;
+      }
+      noteSet.add(normalized);
+      mergedNotes.push(normalized);
+    }
 
     if (mergedNotes.length){
       for (const note of mergedNotes){
@@ -893,8 +901,7 @@ const overlayDetailPanel = document.createElement('aside');
         button.classList.remove('is-active');
       }
     }
-    const definition = TAB_DEFINITIONS.find(tab => tab.key === key);
-    stageStatus.textContent = definition?.hint || 'Khung thông tin chức năng.';
+    stageStatus.textContent = TAB_HINT_BY_KEY[key] || 'Khung thông tin chức năng.';
     if (key === 'skills'){
       overlay.classList.add('is-open');
     } else {

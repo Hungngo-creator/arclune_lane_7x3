@@ -462,7 +462,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   actions.appendChild(backButton);
   const walletEl = document.createElement('div');
   walletEl.className = 'lineup-view__wallet';
-  const walletItems = new Map<string, HTMLElement>();
+  const walletItems = new Map<string, { item: HTMLElement; value: HTMLElement }>();
   actions.appendChild(walletEl);
   header.appendChild(actions);
   container.appendChild(header);
@@ -628,14 +628,35 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
     }
   }
 
+  let cachedFilterKey = '';
+  let cachedFilteredRosterSource: RosterUnit[] | null = null;
+  let cachedFilteredRoster: RosterUnit[] = [];
+
+  function getFilteredRoster(): RosterUnit[] {
+    const filterKey = `${state.filter.type}::${state.filter.value ?? ''}`;
+    if (cachedFilteredRosterSource === state.roster && cachedFilterKey === filterKey){
+      return cachedFilteredRoster;
+    }
+    cachedFilteredRosterSource = state.roster;
+    cachedFilterKey = filterKey;
+    cachedFilteredRoster = filterRoster(state.roster, state.filter);
+    return cachedFilteredRoster;
+  }
+
+  function getFirstReserveIndex(lineup: LineupState): number {
+    for (const cell of lineup.cells){
+      if (cell.section === 'reserve'){
+        return cell.index;
+      }
+    }
+    return lineup.cells.length;
+  }
+
   function refreshWallet(): void{
     for (const [currencyId, balance] of state.currencyBalances.entries()){
       const existing = walletItems.get(currencyId);
       if (existing){
-        const valueNode = existing.querySelector<HTMLElement>('.lineup-wallet__balance');
-        if (valueNode){
-          valueNode.textContent = formatCurrencyBalance(balance, currencyId);
-        }
+        existing.value.textContent = formatCurrencyBalance(balance, currencyId);
         continue;
       }
       const item = document.createElement('div');
@@ -647,12 +668,12 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       value.className = 'lineup-wallet__balance';
       value.textContent = formatCurrencyBalance(balance, currencyId);
       item.append(nameEl, value);
-      walletItems.set(currencyId, item);
+      walletItems.set(currencyId, { item, value });
       walletEl.appendChild(item);
     }
-    for (const [currencyId, item] of walletItems){
+    for (const [currencyId, entry] of walletItems){
       if (!state.currencyBalances.has(currencyId)){
-        item.remove();
+        entry.item.remove();
         walletItems.delete(currencyId);
       }
     }
@@ -701,7 +722,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       return;
     }
 
-    const firstReserveIndex = lineup.cells.find(entry => entry.section === 'reserve')?.index ?? lineup.cells.length;
+    const firstReserveIndex = getFirstReserveIndex(lineup);
     const sectionName = cell.section === 'formation' ? 'Ô ra trận' : 'Ô dự phòng';
     const displayIndex = cell.section === 'formation'
       ? cell.index + 1
@@ -859,7 +880,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
 
     gridSection.classList.remove('is-empty');
 
-    const firstReserveIndex = lineup.cells.find(cell => cell.section === 'reserve')?.index ?? lineup.cells.length;
+    const firstReserveIndex = getFirstReserveIndex(lineup);
 
     if (!Number.isInteger(state.activeCellIndex) || !lineup.cells[state.activeCellIndex ?? -1]){
       state.activeCellIndex = null;
@@ -1060,7 +1081,7 @@ function updateActiveCellHighlight(): void{
   function renderRoster(): void{
     rosterList.innerHTML = '';
     const lineup = getSelectedLineup();
-    const filtered = filterRoster(state.roster, state.filter);
+    const filtered = getFilteredRoster();
     const assignedUnitIds = getAssignedUnitIds(lineup);
     const fragment = document.createDocumentFragment();
     filtered.forEach(unit => {

@@ -19863,6 +19863,13 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       { key: 'voice', label: 'Giọng Nói', hint: 'Nghe thử voice line, thiết lập voice pack và gợi ý mở khóa.' },
       { key: 'tuvi', label: 'Tu Vi', hint: 'Nâng cấp tiểu cảnh giới và tiêu hao VNT theo độ khó bậc tu luyện.' }
   ];
+  const TAB_HINT_BY_KEY = TAB_DEFINITIONS.reduce((acc, tab) => {
+      acc[tab.key] = tab.hint;
+      return acc;
+  }, {});
+  function clearChildren(node) {
+      node.replaceChildren();
+  }
   const currencyCatalog = getCurrencyCatalog();
   const currencyFormatter = ensureNumberFormatter(createNumberFormatter, 'vi-VN');
   function toSafeText(value) {
@@ -20403,12 +20410,8 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           detailBadge.style.display = 'none';
           detailBadge.textContent = '';
           detailDescription.textContent = 'Chọn một kỹ năng ở danh sách bên trái để xem mô tả chi tiết.';
-          while (detailFacts.firstChild) {
-              detailFacts.removeChild(detailFacts.firstChild);
-          }
-          while (detailNotes.firstChild) {
-              detailNotes.removeChild(detailNotes.firstChild);
-          }
+          clearChildren(detailFacts);
+          clearChildren(detailNotes);
           detailEmpty.style.display = 'none';
       };
       const populateSkillDetail = (card, payload) => {
@@ -20443,9 +20446,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
               ? String(ability.description)
               : card.dataset.description || 'Chưa có mô tả chi tiết.';
           detailDescription.textContent = toSafeText(description);
-          while (detailFacts.firstChild) {
-              detailFacts.removeChild(detailFacts.firstChild);
-          }
+          clearChildren(detailFacts);
           const facts = collectAbilityFacts(ability);
           if (facts.length) {
               for (const fact of facts) {
@@ -20475,9 +20476,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
                   detailFacts.appendChild(item);
               }
           }
-          while (detailNotes.firstChild) {
-              detailNotes.removeChild(detailNotes.firstChild);
-          }
+          clearChildren(detailNotes);
           const rawNotes = Array.isArray(ability?.notes) ? ability.notes : [];
           let cardNotes = [];
           if (card.dataset.notes) {
@@ -20491,9 +20490,16 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
                   // bỏ qua lỗi parse và tiếp tục với danh sách rỗng
               }
           }
-          const mergedNotes = [...rawNotes, ...cardNotes]
-              .map(note => (typeof note === 'string' ? note.trim() : ''))
-              .filter((note, index, array) => note && array.indexOf(note) === index);
+          const mergedNotes = [];
+          const noteSet = new Set();
+          for (const rawNote of [...rawNotes, ...cardNotes]) {
+              const normalized = typeof rawNote === 'string' ? rawNote.trim() : '';
+              if (!normalized || noteSet.has(normalized)) {
+                  continue;
+              }
+              noteSet.add(normalized);
+              mergedNotes.push(normalized);
+          }
           if (mergedNotes.length) {
               for (const note of mergedNotes) {
                   const noteItem = document.createElement('li');
@@ -20553,8 +20559,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
                   button.classList.remove('is-active');
               }
           }
-          const definition = TAB_DEFINITIONS.find(tab => tab.key === key);
-          stageStatus.textContent = definition?.hint || 'Khung thông tin chức năng.';
+          stageStatus.textContent = TAB_HINT_BY_KEY[key] || 'Khung thông tin chức năng.';
           if (key === 'skills') {
               overlay.classList.add('is-open');
           }
@@ -22083,14 +22088,32 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               messageEl.classList.remove('is-error');
           }
       }
+      let cachedFilterKey = '';
+      let cachedFilteredRosterSource = null;
+      let cachedFilteredRoster = [];
+      function getFilteredRoster() {
+          const filterKey = `${state.filter.type}::${state.filter.value ?? ''}`;
+          if (cachedFilteredRosterSource === state.roster && cachedFilterKey === filterKey) {
+              return cachedFilteredRoster;
+          }
+          cachedFilteredRosterSource = state.roster;
+          cachedFilterKey = filterKey;
+          cachedFilteredRoster = filterRoster(state.roster, state.filter);
+          return cachedFilteredRoster;
+      }
+      function getFirstReserveIndex(lineup) {
+          for (const cell of lineup.cells) {
+              if (cell.section === 'reserve') {
+                  return cell.index;
+              }
+          }
+          return lineup.cells.length;
+      }
       function refreshWallet() {
           for (const [currencyId, balance] of state.currencyBalances.entries()) {
               const existing = walletItems.get(currencyId);
               if (existing) {
-                  const valueNode = existing.querySelector('.lineup-wallet__balance');
-                  if (valueNode) {
-                      valueNode.textContent = formatCurrencyBalance(balance, currencyId);
-                  }
+                  existing.value.textContent = formatCurrencyBalance(balance, currencyId);
                   continue;
               }
               const item = document.createElement('div');
@@ -22102,12 +22125,12 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               value.className = 'lineup-wallet__balance';
               value.textContent = formatCurrencyBalance(balance, currencyId);
               item.append(nameEl, value);
-              walletItems.set(currencyId, item);
+              walletItems.set(currencyId, { item, value });
               walletEl.appendChild(item);
           }
-          for (const [currencyId, item] of walletItems) {
+          for (const [currencyId, entry] of walletItems) {
               if (!state.currencyBalances.has(currencyId)) {
-                  item.remove();
+                  entry.item.remove();
                   walletItems.delete(currencyId);
               }
           }
@@ -22152,7 +22175,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               syncGridDetailsHeight();
               return;
           }
-          const firstReserveIndex = lineup.cells.find(entry => entry.section === 'reserve')?.index ?? lineup.cells.length;
+          const firstReserveIndex = getFirstReserveIndex(lineup);
           const sectionName = cell.section === 'formation' ? 'Ô ra trận' : 'Ô dự phòng';
           const displayIndex = cell.section === 'formation'
               ? cell.index + 1
@@ -22296,7 +22319,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               return;
           }
           gridSection.classList.remove('is-empty');
-          const firstReserveIndex = lineup.cells.find(cell => cell.section === 'reserve')?.index ?? lineup.cells.length;
+          const firstReserveIndex = getFirstReserveIndex(lineup);
           if (!Number.isInteger(state.activeCellIndex) || !lineup.cells[state.activeCellIndex ?? -1]) {
               state.activeCellIndex = null;
           }
@@ -22497,7 +22520,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       function renderRoster() {
           rosterList.innerHTML = '';
           const lineup = getSelectedLineup();
-          const filtered = filterRoster(state.roster, state.filter);
+          const filtered = getFilteredRoster();
           const assignedUnitIds = getAssignedUnitIds(lineup);
           const fragment = document.createDocumentFragment();
           filtered.forEach(unit => {
