@@ -1415,15 +1415,23 @@ const DEATH_VANISH_MS = 900;
 function cleanupDead(now: number): void {
   if (!Game?.tokens) return;
   const tokens = Game.tokens;
-  const keep = [];
-  for (const t of tokens){
-    if (t.alive) { keep.push(t); continue; }
-    const t0 = t.deadAt || 0;
-    if (!t0) { keep.push(t); continue; }                 // phòng hờ
-    if (now - t0 < DEATH_VANISH_MS) { keep.push(t); }    // còn “thây”
+  let write = 0;
+  for (let read = 0; read < tokens.length; read += 1) {
+    const token = tokens[read];
+    if (!token) continue;
+    if (token.alive) {
+      if (write !== read) tokens[write] = token;
+      write += 1;
+      continue;
+    }
+    const deadAt = parseFiniteNumber(token.deadAt) ?? 0;
+    if (!deadAt || now - deadAt < DEATH_VANISH_MS) {
+      if (write !== read) tokens[write] = token;
+      write += 1;
+    }
     // else: bỏ hẳn khỏi mảng -> không vẽ, không chặn ô
   }
-  Game.tokens = keep;
+  if (write < tokens.length) tokens.length = write;
 }
 
 // LẤY TỪ INSTANCE đang đứng trên sân (đúng spec: thừa hưởng % chỉ số hiện tại của chủ)
@@ -1463,15 +1471,32 @@ function removeOldestMinions(masterIid: number, count: number): void {
   if (count <= 0) return;
   const tokens = Game?.tokens;
   if (!tokens) return;
-  const list = getMinionsOf(masterIid).sort((a, b) => (a.bornSerial || 0) - (b.bornSerial || 0));
-  for (let i=0;i<count && i<list.length;i++){
-    const x = list[i];
-    x.alive = false;
-    // xoá khỏi mảng để khỏi vẽ/đụng lượt
-    const idx = tokens.indexOf(x);
-    if (idx >= 0) tokens.splice(idx,1);
+
+  const candidates: UnitToken[] = [];
+  for (const token of tokens) {
+    if (!token?.alive || !token.isMinion || token.ownerIid !== masterIid) continue;
+    candidates.push(token);
   }
-}
+  if (!candidates.length) return;
+
+  candidates.sort((a, b) => (a.bornSerial || 0) - (b.bornSerial || 0));
+  const removal = new Set<UnitToken>(candidates.slice(0, Math.min(count, candidates.length)));
+  if (!removal.size) return;
+
+  let write = 0;
+  for (let read = 0; read < tokens.length; read += 1) {
+    const token = tokens[read];
+    if (!token || !removal.has(token)) {
+      if (token) {
+        if (write !== read) tokens[write] = token;
+        write += 1;
+      }
+      continue;
+    }
+    token.alive = false;
+  }
+  if (write < tokens.length) tokens.length = write;
+ }
 function extendBusy(duration: number): void {
   const game = getInitializedGame();
   if (!game || !game.turn) return;
