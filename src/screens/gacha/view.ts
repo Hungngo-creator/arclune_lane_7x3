@@ -1,14 +1,9 @@
 //home (termux)/arclune_lane_7x3/src/screens/gacha/view.ts
 
 import { assertElement, ensureStyleTag, mountSection } from '../../ui/dom.ts';
-import {
-  mountRarityAura,
-  unmountRarity,
-  normalizeRarity,
-  playGachaReveal,
-} from '../../ui/rarity/rarity.ts';
+import { normalizeRarity } from '../../utils/rarity.ts';
 import type { MountedSection } from '../../ui/dom.ts';
-import type { Rarity } from '../../ui/rarity/rarity.ts';
+import type { Rarity } from '../../utils/rarity.ts';
 
 const STYLE_ID = 'gacha-view-style';
 
@@ -45,12 +40,6 @@ export interface GachaViewHandle {
   updateCards(cards: ReadonlyArray<GachaCardInput>): void;
   setRevealDoneCallback(callback: (() => void) | null | undefined): void;
   destroy(): void;
-}
-
-interface AuraEntry {
-  readonly id: string;
-  readonly el: HTMLElement;
-  readonly rarity: Rarity;
 }
 
 interface PreparedCards {
@@ -155,9 +144,7 @@ export function renderGachaView(options: GachaViewOptions): GachaViewHandle {
     rootClasses: 'app--gacha',
   });
 
-  const auraEntries: AuraEntry[] = [];
   let revealDoneCallback = typeof options.onRevealDone === 'function' ? options.onRevealDone : null;
-  let isRevealing = false;
   let cardsRenderSignature = '';
   let lastCardsRef: ReadonlyArray<GachaCardInput> | null = null;
   const cardsPreparedCache = new WeakMap<ReadonlyArray<GachaCardInput>, PreparedCards>();
@@ -170,16 +157,7 @@ export function renderGachaView(options: GachaViewOptions): GachaViewHandle {
   };
 
   function updateRevealButtonState(): void {
-    revealButton.disabled = isRevealing || auraEntries.length === 0;
-  }
-
-  function disposeCardEntries(): void {
-    while (auraEntries.length > 0){
-      const entry = auraEntries.pop();
-      if (entry){
-        unmountRarity(entry.el);
-      }
-    }
+   revealButton.disabled = true;
   }
 
   function renderCards(cards: ReadonlyArray<GachaCardInput>): void {
@@ -197,7 +175,6 @@ export function renderGachaView(options: GachaViewOptions): GachaViewHandle {
     }
     cardsRenderSignature = nextSignature;
     lastCardsRef = cards;
-    disposeCardEntries();
     grid.replaceChildren();
     const fragment = document.createDocumentFragment();
     prepared.cards.forEach((normalized) => {
@@ -234,8 +211,6 @@ export function renderGachaView(options: GachaViewOptions): GachaViewHandle {
 
       cardEl.appendChild(content);
 
-      mountRarityAura(cardEl, normalized.rarity, 'gacha', { label: true });
-      auraEntries.push({ id: normalized.id, el: cardEl, rarity: normalized.rarity });
       fragment.appendChild(cardEl);
     });
     grid.appendChild(fragment);
@@ -243,20 +218,9 @@ export function renderGachaView(options: GachaViewOptions): GachaViewHandle {
   }
 
   function handleReveal(): void {
-    if (isRevealing || auraEntries.length === 0){
-      return;
+    if (revealDoneCallback){
+      revealDoneCallback();
     }
-    isRevealing = true;
-    updateRevealButtonState();
-    const cards = auraEntries.map(entry => ({ el: entry.el, rarity: entry.rarity }));
-    const onDone = () => {
-      isRevealing = false;
-      updateRevealButtonState();
-      if (revealDoneCallback){
-        revealDoneCallback();
-      }
-    };
-    playGachaReveal(cards, { onDone });
   }
 
   revealButton.addEventListener('click', handleReveal);
@@ -277,7 +241,6 @@ export function renderGachaView(options: GachaViewOptions): GachaViewHandle {
     destroy() {
       cleanupCallbacks.forEach(fn => fn());
       cleanupCallbacks.length = 0;
-      disposeCardEntries();
       mount.destroy();
     },
   } satisfies GachaViewHandle;

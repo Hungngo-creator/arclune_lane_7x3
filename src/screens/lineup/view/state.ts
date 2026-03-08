@@ -14,8 +14,8 @@ import type {
   LineupPassiveConfig,
   RosterEntryLite,
 } from '@shared-types/lineup';
-import type { Rarity } from '../../../ui/rarity/rarity.ts';
-import { normalizeRarity } from '../../../ui/rarity/rarity.ts';
+import type { Rarity } from '../../../utils/rarity.ts';
+import { normalizeRarity } from '../../../utils/rarity.ts';
 
 export interface RosterUnit {
   id: string;

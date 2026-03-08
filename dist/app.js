@@ -1,7 +1,7 @@
 // Bundled by build.mjs
 const __modules = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./ui/rarity/rarity.js":"./ui/rarity/rarity.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }
 function __define(id, factory){ __modules[id] = { factory, exports: null, initialized: false }; }
@@ -10320,21 +10320,17 @@ __define('./entry.ts', (exports, module, __require) => {
   __require('./aether.ts');
   const __dep0 = __require('./app/shell.ts');
   const createAppShell = __dep0.createAppShell;
-  const __dep1 = __require('./config.ts');
-  const CFG = __dep1.CFG;
-  const __dep2 = __require('./screens/main-menu/view/index.ts');
-  const renderMainMenuView = __dep2.renderMainMenuView;
-  const __dep3 = __require('./data/modes.ts');
-  const MODES = __dep3.MODES;
-  const MODE_GROUPS = __dep3.MODE_GROUPS;
-  const MODE_STATUS = __dep3.MODE_STATUS;
-  const getMenuSections = __dep3.getMenuSections;
-  const __dep4 = __require('./utils/module-resolution.ts');
-  const resolveModuleFunction = __dep4.resolveModuleFunction;
-  const __dep5 = __require('./ui/rarity/rarity.ts');
-  const setPowerMode = __dep5.setPowerMode;
-  const __dep6 = __require('./utils/player-profile.ts');
-  const loadPlayerProfile = __dep6.loadPlayerProfile;
+  const __dep1 = __require('./screens/main-menu/view/index.ts');
+  const renderMainMenuView = __dep1.renderMainMenuView;
+  const __dep2 = __require('./data/modes.ts');
+  const MODES = __dep2.MODES;
+  const MODE_GROUPS = __dep2.MODE_GROUPS;
+  const MODE_STATUS = __dep2.MODE_STATUS;
+  const getMenuSections = __dep2.getMenuSections;
+  const __dep3 = __require('./utils/module-resolution.ts');
+  const resolveModuleFunction = __dep3.resolveModuleFunction;
+  const __dep4 = __require('./utils/player-profile.ts');
+  const loadPlayerProfile = __dep4.loadPlayerProfile;
   const isStoppableSession = (value) => (Boolean(value) && typeof value.stop === 'function');
   const isStartableSession = (value) => (Boolean(value) && typeof value.start === 'function');
   const SUCCESS_EVENT = 'arclune:loaded';
@@ -11503,10 +11499,6 @@ __define('./entry.ts', (exports, module, __require) => {
               }
           };
           shellInstance = createAppShell({ onError: handleShellError });
-          if (typeof document !== 'undefined') {
-              const lowPowerEnabled = Boolean(CFG?.PERFORMANCE?.LOW_POWER_MODE ?? false);
-              setPowerMode(lowPowerEnabled ? 'low' : 'normal');
-          }
           bootstrapOptions.isFileProtocol = isFileProtocol;
           let lastScreen = null;
           let lastParams = null;
@@ -19865,7 +19857,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
   const assertElement = __dep7.assertElement;
   const ensureStyleTag = __dep7.ensureStyleTag;
   const mountSection = __dep7.mountSection;
-  const __dep8 = __require('./ui/rarity/rarity.ts');
+  const __dep8 = __require('./utils/rarity.ts');
   const normalizeRarity = __dep8.normalizeRarity;
   const __dep9 = __require('./screens/collection/helpers.ts');
   const ABILITY_TYPE_LABELS = __dep9.ABILITY_TYPE_LABELS;
@@ -20924,11 +20916,8 @@ __define('./screens/gacha/view.ts', (exports, module, __require) => {
   const assertElement = __dep0.assertElement;
   const ensureStyleTag = __dep0.ensureStyleTag;
   const mountSection = __dep0.mountSection;
-  const __dep1 = __require('./ui/rarity/rarity.ts');
-  const mountRarityAura = __dep1.mountRarityAura;
-  const unmountRarity = __dep1.unmountRarity;
+  const __dep1 = __require('./utils/rarity.ts');
   const normalizeRarity = __dep1.normalizeRarity;
-  const playGachaReveal = __dep1.playGachaReveal;
   const STYLE_ID = 'gacha-view-style';
   function prepareCards(cards) {
       if (!cards.length) {
@@ -21014,9 +21003,7 @@ __define('./screens/gacha/view.ts', (exports, module, __require) => {
           section,
           rootClasses: 'app--gacha',
       });
-      const auraEntries = [];
       let revealDoneCallback = typeof options.onRevealDone === 'function' ? options.onRevealDone : null;
-      let isRevealing = false;
       let cardsRenderSignature = '';
       let lastCardsRef = null;
       const cardsPreparedCache = new WeakMap();
@@ -21027,15 +21014,7 @@ __define('./screens/gacha/view.ts', (exports, module, __require) => {
           }
       };
       function updateRevealButtonState() {
-          revealButton.disabled = isRevealing || auraEntries.length === 0;
-      }
-      function disposeCardEntries() {
-          while (auraEntries.length > 0) {
-              const entry = auraEntries.pop();
-              if (entry) {
-                  unmountRarity(entry.el);
-              }
-          }
+          revealButton.disabled = true;
       }
       function renderCards(cards) {
           if (lastCardsRef === cards) {
@@ -21052,7 +21031,6 @@ __define('./screens/gacha/view.ts', (exports, module, __require) => {
           }
           cardsRenderSignature = nextSignature;
           lastCardsRef = cards;
-          disposeCardEntries();
           grid.replaceChildren();
           const fragment = document.createDocumentFragment();
           prepared.cards.forEach((normalized) => {
@@ -21083,28 +21061,15 @@ __define('./screens/gacha/view.ts', (exports, module, __require) => {
                   content.appendChild(desc);
               }
               cardEl.appendChild(content);
-              mountRarityAura(cardEl, normalized.rarity, 'gacha', { label: true });
-              auraEntries.push({ id: normalized.id, el: cardEl, rarity: normalized.rarity });
               fragment.appendChild(cardEl);
           });
           grid.appendChild(fragment);
           updateRevealButtonState();
       }
       function handleReveal() {
-          if (isRevealing || auraEntries.length === 0) {
-              return;
+          if (revealDoneCallback) {
+              revealDoneCallback();
           }
-          isRevealing = true;
-          updateRevealButtonState();
-          const cards = auraEntries.map(entry => ({ el: entry.el, rarity: entry.rarity }));
-          const onDone = () => {
-              isRevealing = false;
-              updateRevealButtonState();
-              if (revealDoneCallback) {
-                  revealDoneCallback();
-              }
-          };
-          playGachaReveal(cards, { onDone });
       }
       revealButton.addEventListener('click', handleReveal);
       addCleanup(() => revealButton.removeEventListener('click', handleReveal));
@@ -21122,7 +21087,6 @@ __define('./screens/gacha/view.ts', (exports, module, __require) => {
           destroy() {
               cleanupCallbacks.forEach(fn => fn());
               cleanupCallbacks.length = 0;
-              disposeCardEntries();
               mount.destroy();
           },
       };
@@ -21650,24 +21614,19 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
   const mountSection = __dep6.mountSection;
   const __dep7 = __require('./types/currency.ts');
   const normalizeCurrencyBalances = __dep7.normalizeCurrencyBalances;
-  const __dep8 = __require('./ui/rarity/rarity.ts');
-  const mountRarityAura = __dep8.mountRarityAura;
-  const updateRarity = __dep8.updateRarity;
-  const unmountRarity = __dep8.unmountRarity;
-  const __dep9 = __require('./screens/lineup/view/state.ts');
-  const normalizeRoster = __dep9.normalizeRoster;
-  const normalizeLineups = __dep9.normalizeLineups;
-  const createCurrencyBalances = __dep9.createCurrencyBalances;
-  const createFilterOptions = __dep9.createFilterOptions;
-  const formatCurrencyBalance = __dep9.formatCurrencyBalance;
-  const collectAssignedUnitIds = __dep9.collectAssignedUnitIds;
-  const collectAssignedUnitTags = __dep9.collectAssignedUnitTags;
-  const evaluatePassive = __dep9.evaluatePassive;
-  const filterRoster = __dep9.filterRoster;
-  const getUnitRarity = __dep9.getUnitRarity;
-  const LINEUP_ALLOWED_LEADER_IDS = __dep9.LINEUP_ALLOWED_LEADER_IDS;
-  const __dep10 = __require('./screens/lineup/view/events.ts');
-  const bindLineupEvents = __dep10.bindLineupEvents;
+  const __dep8 = __require('./screens/lineup/view/state.ts');
+  const normalizeRoster = __dep8.normalizeRoster;
+  const normalizeLineups = __dep8.normalizeLineups;
+  const createCurrencyBalances = __dep8.createCurrencyBalances;
+  const createFilterOptions = __dep8.createFilterOptions;
+  const formatCurrencyBalance = __dep8.formatCurrencyBalance;
+  const collectAssignedUnitIds = __dep8.collectAssignedUnitIds;
+  const collectAssignedUnitTags = __dep8.collectAssignedUnitTags;
+  const evaluatePassive = __dep8.evaluatePassive;
+  const filterRoster = __dep8.filterRoster;
+  const LINEUP_ALLOWED_LEADER_IDS = __dep8.LINEUP_ALLOWED_LEADER_IDS;
+  const __dep9 = __require('./screens/lineup/view/events.ts');
+  const bindLineupEvents = __dep9.bindLineupEvents;
   const STYLE_ID = 'lineup-view-style-v1';
   const powerFormatter = createNumberFormatter('vi-VN');
   const ELEMENT_ICON = {
@@ -21879,7 +21838,6 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       return getInitials(parts);
   }
   function renderAvatar(container, avatarUrl, name) {
-      const auraOverlay = container.querySelector(':scope > .rarity-aura');
       container.replaceChildren();
       if (avatarUrl) {
           const img = document.createElement('img');
@@ -21889,9 +21847,6 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       }
       else {
           container.textContent = getNameInitials(name || '');
-      }
-      if (auraOverlay) {
-          container.appendChild(auraOverlay);
       }
   }
   function formatUnitPower(power) {
@@ -22194,7 +22149,6 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       let lastPassivesRenderSignature = '';
       let lastFiltersRenderSignature = '';
       let lastHighlightedCellIndex = null;
-      let mountedCellAvatars = [];
       const cellNodeByIndex = new Map();
       function getFilteredRoster() {
           const filterKey = `${state.filter.type}::${state.filter.value ?? ''}`;
@@ -22405,10 +22359,6 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           syncGridDetailsHeight();
       }
       function renderCells() {
-          for (const avatar of mountedCellAvatars) {
-              unmountRarity(avatar);
-          }
-          mountedCellAvatars = [];
           cellNodeByIndex.clear();
           cellsGrid.innerHTML = '';
           const lineup = getSelectedLineup();
@@ -22422,7 +22372,6 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
                   cellEl.setAttribute('role', 'button');
                   const avatar = document.createElement('div');
                   avatar.className = 'lineup-cell__avatar';
-                  unmountRarity(avatar);
                   avatar.textContent = '🔒';
                   cellEl.appendChild(avatar);
                   cellEl.setAttribute('aria-label', `Ô đội hình #${index + 1}. Chưa có dữ liệu.`);
@@ -22480,19 +22429,14 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               avatar.className = 'lineup-cell__avatar';
               if (unit) {
                   renderAvatar(avatar, unit.avatar || null, unit.name);
-                  mountRarityAura(avatar, getUnitRarity(unit), 'deck', { label: false });
-                  mountedCellAvatars.push(avatar);
               }
               else if (cell.label) {
-                  unmountRarity(avatar);
                   avatar.textContent = getNameInitials(cell.label);
               }
               else if (!cell.unlocked) {
-                  unmountRarity(avatar);
                   avatar.textContent = '🔒';
               }
               else {
-                  unmountRarity(avatar);
                   avatar.textContent = '+';
               }
               cellEl.appendChild(avatar);
@@ -22544,7 +22488,6 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       function renderLeader() {
           const lineup = getSelectedLineup();
           if (!lineup) {
-              unmountRarity(leaderAvatar);
               renderAvatar(leaderAvatar, null, '');
               leaderName.textContent = 'Chưa chọn leader';
               syncGridDetailsHeight();
@@ -22554,26 +22497,17 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               const unit = rosterLookup.get(lineup.leaderId);
               if (unit) {
                   renderAvatar(leaderAvatar, unit.avatar || null, unit.name);
-                  const rarity = getUnitRarity(unit);
-                  if (leaderAvatar.querySelector(':scope > .rarity-aura')) {
-                      updateRarity(leaderAvatar, rarity);
-                  }
-                  else {
-                      mountRarityAura(leaderAvatar, rarity, 'deck', { label: false });
-                  }
                   leaderName.textContent = unit.name;
               }
               else {
                   const fallbackName = lineup.leaderId === 'leaderA'
                       ? 'Uyên'
                       : (lineup.leaderId === 'leaderB' ? 'Địch' : 'Leader');
-                  unmountRarity(leaderAvatar);
                   renderAvatar(leaderAvatar, null, fallbackName);
                   leaderName.textContent = fallbackName;
               }
           }
           else {
-              unmountRarity(leaderAvatar);
               renderAvatar(leaderAvatar, null, '');
               leaderName.textContent = 'Chưa chọn leader';
           }
@@ -22899,7 +22833,7 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
   const __dep2 = __require('./utils/currency.ts');
   const formatCurrencyAmount = __dep2.formatCurrencyAmount;
   const getCurrencyDefinitions = __dep2.getCurrencyDefinitions;
-  const __dep3 = __require('./ui/rarity/rarity.ts');
+  const __dep3 = __require('./utils/rarity.ts');
   const normalizeRarity = __dep3.normalizeRarity;
   const currencyCatalog = getCurrencyDefinitions();
   const currencyIndex = new Map(currencyCatalog.map(currency => [currency.id, currency]));
@@ -28366,574 +28300,6 @@ __define('./ui/dom.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureStyleTag')) exports.ensureStyleTag = ensureStyleTag;
   if (!Object.prototype.hasOwnProperty.call(exports, 'mountSection')) exports.mountSection = mountSection;
 });
-__define('./ui/rarity/rarity.css', (exports, module, __require) => {
-  const css = "//home (termux)/arclune_lane_7x3/src/ui/rarity/rarity.css\n\n.rarity-aura {\n  position: absolute;\n  inset: calc(-1 * var(--rarity-aura-outset, 5px) * var(--rarity-aura-outset-scale, 1));\n  pointer-events: none;\n  border-radius: inherit;\n  contain: layout style paint;\n  display: block;\n  z-index: 3;\n  transform: translateZ(0);\n  will-change: transform, opacity, filter;\n  --rarity-color: #ffffff;\n  --rarity-aura-outset: 5px;\n  --rarity-aura-outset-scale: 1;\n  --rarity-aura-thickness: 2px;\n  --rarity-ring-scale: 1;\n  --rarity-glow-base: 1;\n  --rarity-glow-low: calc(var(--rarity-glow-base) * 0.7);\n  --rarity-glow-active: var(--rarity-glow-base);\n  --rarity-spark-count: 0;\n  --rarity-ring-opacity: 0.88;\n  --rarity-glow-opacity: 0.62;\n  --rarity-glow-scale: 1;\n  --rarity-glow-blur: calc(10px * var(--rarity-glow-active));\n  --rarity-shimmer-period: 6s;\n  --rarity-shimmer-delay: 0s;\n  --rarity-sweep-opacity: 0.65;\n  --metal-dark: color-mix(in srgb, var(--rarity-color) 22%, #0e1218);\n  --metal-mid: color-mix(in srgb, var(--rarity-color) 58%, #3f4b58);\n  --metal-hi: color-mix(in srgb, var(--rarity-color) 80%, #ffffff);\n}\n\nbody.low-power .rarity-aura {\n  --rarity-glow-active: var(--rarity-glow-low);\n  --rarity-spark-count: 0;\n  --rarity-sweep-opacity: 0;\n}\n\n.rarity-aura[data-variant=\"collection\"] { display: none; }\n\n.rarity-aura.is-rounded {\n  border-radius: 9999px;\n}\n\n.rarity-aura .ring,\n.rarity-aura .glow,\n.rarity-aura .sweep,\n.rarity-aura .spark-layer,\n.rarity-aura .badge {\n  position: absolute;\n  inset: 0;\n  border-radius: inherit;\n  pointer-events: none;\n  transform: translateZ(0);\n}\n\n.rarity-aura .ring {\n  padding: var(--rarity-aura-thickness);\n  background:\n    linear-gradient(140deg, var(--metal-dark), var(--metal-mid) 45%, var(--metal-hi) 55%, var(--metal-dark));\n  -webkit-mask:\n    linear-gradient(#000 0 0) content-box,\n    linear-gradient(#000 0 0);\n  -webkit-mask-composite: xor;\n  mask-composite: exclude;\n  box-shadow:\n    0 0 0 1px color-mix(in srgb, var(--rarity-color) 45%, transparent),\n    0 1px 1px rgba(255, 255, 255, 0.2),\n    0 -1px 1px rgba(0, 0, 0, 0.46);\n  opacity: var(--rarity-ring-opacity);\n  transform: scale(var(--rarity-ring-scale)) translateZ(0);\n  transition: transform 0.3s ease, opacity 0.3s ease;\n}\n\n.rarity-aura .ring::before {\n  content: \"\";\n  position: absolute;\n  inset: 0;\n  border-radius: inherit;\n  border: 1px solid color-mix(in srgb, var(--rarity-color) 62%, transparent);\n  mix-blend-mode: screen;\n  opacity: 0.68;\n}\n\n.rarity-aura .glow {\n  inset: calc(-1 * var(--rarity-aura-outset) * var(--rarity-aura-outset-scale, 1));\n  background: radial-gradient(90% 90% at 50% 50%, color-mix(in srgb, var(--rarity-color) 74%, transparent) 45%, transparent 74%);\n  filter: blur(var(--rarity-glow-blur));\n  -webkit-mask:\n    linear-gradient(#000 0 0) content-box,\n    linear-gradient(#000 0 0);\n  -webkit-mask-composite: xor;\n  mask-composite: exclude;\n  padding: calc(var(--rarity-aura-thickness) + (var(--rarity-aura-outset) * var(--rarity-aura-outset-scale, 1)));\n  opacity: var(--rarity-glow-opacity);\n  transform: scale(var(--rarity-glow-scale)) translateZ(0);\n  transition: opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease;\n}\n\n.rarity-aura[data-variant=\"deck\"] {\n  --rarity-aura-outset-scale: 1.3;\n  --rarity-chamfer: 10px;\n  border-radius: 0;\n}\n\n.rarity-aura[data-variant=\"deck\"] .ring,\n.rarity-aura[data-variant=\"deck\"] .glow,\n.rarity-aura[data-variant=\"deck\"] .sweep,\n.rarity-aura[data-variant=\"deck\"] .spark-layer {\n  border-radius: 0;\n  clip-path: polygon(\n    var(--rarity-chamfer) 0,\n    calc(100% - var(--rarity-chamfer)) 0,\n    100% var(--rarity-chamfer),\n    100% calc(100% - var(--rarity-chamfer)),\n    calc(100% - var(--rarity-chamfer)) 100%,\n    var(--rarity-chamfer) 100%,\n    0 calc(100% - var(--rarity-chamfer)),\n    0 var(--rarity-chamfer)\n  );\n}\n\n.rarity-aura .badge {\n  inset: auto auto 6px 6px;\n  width: auto;\n  padding: 2px 6px;\n  font-weight: 700;\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.5px;\n  border-radius: 8px;\n  background: rgba(0, 0, 0, 0.35);\n  color: #fff;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  min-width: 36px;\n}\n\n.rarity-aura[data-variant=\"deck\"] .badge { display: none; }\n.rarity-aura[data-variant=\"gacha\"] .badge { font-size: 14px; }\n\n.rarity-aura .spark-layer { display: none; overflow: visible; }\n.rarity-aura .spark {\n  position: absolute;\n  width: 7px;\n  height: 18px;\n  border-radius: 999px;\n  background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(255,255,255,0));\n  opacity: 0;\n  transform-origin: center;\n  animation: spark-flare var(--spark-duration, 900ms) ease-out var(--spark-delay, 0ms) forwards;\n}\n.rarity-aura.has-spark .spark-layer { display: block; }\n\n@keyframes spark-flare {\n  0% { opacity: 0; transform: translate(var(--spark-x, 0), var(--spark-y, 0)) scale(0.6) rotate(0deg); }\n  15% { opacity: 1; }\n  55% { opacity: 0.8; }\n  100% { opacity: 0; transform: translate(var(--spark-x, 0), var(--spark-y, 0)) scale(1.2) rotate(22deg); }\n}\n\n.rarity-aura .sweep { display: none; overflow: hidden; opacity: var(--rarity-sweep-opacity); }\n.rarity-aura.prism .sweep { mix-blend-mode: screen; }\n.rarity-aura .sweep::before {\n  content: \"\";\n  position: absolute;\n  inset: -12%;\n  background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.95), rgba(255,255,255,0));\n  transform: translateX(-120%) skewX(-10deg);\n  filter: blur(2px);\n  animation: sweep 1.6s ease-in-out var(--sweep-delay, 0ms) 1;\n}\n.rarity-aura.has-sweep .sweep { display: block; }\n\n/* Rank tuning */\n.rarity-N, .rank-n {\n  --rarity-color: #808080;\n  --rarity-aura-thickness: 1px;\n  --rarity-ring-opacity: 0.9;\n  --rarity-glow-opacity: 0;\n  --rarity-glow-blur: 0px;\n}\n.rarity-N .glow, .rank-n .glow { display: none; }\n\n.rarity-R, .rank-r {\n  --rarity-color: #00008b;\n  --rarity-aura-outset: 5px;\n  --rarity-glow-opacity: 0.55;\n  --rarity-glow-blur: calc(9px * var(--rarity-glow-active));\n}\n.rarity-R .ring, .rank-r .ring {\n  box-shadow:\n    0 0 0 1px color-mix(in srgb, #00008b 62%, transparent) inset,\n    0 0 14px color-mix(in srgb, #00008b 60%, transparent),\n    0 0 22px color-mix(in srgb, #00008b 38%, transparent);\n}\n\n.rarity-SR, .rank-sr {\n  --rarity-color: #9966cc;\n  --rarity-aura-outset: 6px;\n  --rarity-glow-opacity: 0.72;\n}\n.rarity-SR .glow::before, .rank-sr .glow::before {\n  content: \"\";\n  position: absolute;\n  inset: -10%;\n  border-radius: inherit;\n  background: radial-gradient(circle at 50% 50%, rgba(208, 174, 255, 0.58), rgba(153, 102, 204, 0.06) 72%, transparent 100%);\n  filter: blur(8px);\n  animation: sr-mist-pulse 2.8s ease-in-out infinite;\n}\n\n.rarity-SSR, .rank-ssr {\n  --rarity-color: #ffbf00;\n  --rarity-aura-outset: 8px;\n  --rarity-glow-opacity: 0.8;\n}\n\n.rarity-SSR .ring::after, .rank-ssr .ring::after {\n  content: \"\";\n  position: absolute;\n  inset: -4px;\n  border-radius: inherit;\n  background:\n    radial-gradient(circle at 20% 18%, rgba(255,255,255,.95) 0 1px, transparent 2px),\n    radial-gradient(circle at 80% 30%, rgba(255,244,191,.88) 0 1px, transparent 2px),\n    radial-gradient(circle at 38% 78%, rgba(255,255,255,.82) 0 1px, transparent 2px),\n    radial-gradient(circle at 72% 70%, rgba(255,240,160,.76) 0 1px, transparent 2px);\n  opacity: 0.78;\n  mix-blend-mode: screen;\n  animation: ssr-sparkle-spin 4.2s linear infinite;\n}\n\n.rarity-UR, .rank-ur {\n  --rarity-color: #dc143c;\n  --rarity-aura-outset: 10px;\n  --rarity-aura-thickness: 3px;\n  --rarity-glow-opacity: 0.86;\n  --rarity-glow-blur: calc(12px * var(--rarity-glow-active));\n}\n.rarity-UR .ring, .rank-ur .ring {\n  box-shadow:\n    0 0 0 1px color-mix(in srgb, #dc143c 68%, transparent) inset,\n    0 0 18px color-mix(in srgb, #dc143c 72%, transparent),\n    0 0 34px color-mix(in srgb, #ff4500 42%, transparent);\n  animation: ur-energy-pulse 2.1s ease-in-out infinite;\n}\n.rarity-UR .ring::after, .rank-ur .ring::after {\n  content: \"\";\n  position: absolute;\n  inset: 0;\n  border-radius: inherit;\n  border: 1px solid transparent;\n  background: linear-gradient(120deg, #ff4d4d, #ff7f50, #dc143c, #ff4500, #ff4d4d) border-box;\n  background-size: 220% 220%;\n  mix-blend-mode: screen;\n  opacity: 0.9;\n  animation: ur-fire-scroll 2.3s linear infinite;\n}\n\n.rarity-PRIME, .rank-prime {\n  --rarity-color: #ffffff;\n  --rarity-aura-outset: 12px;\n  --rarity-aura-thickness: 3px;\n  --rarity-glow-opacity: 0.95;\n  --rarity-glow-blur: calc(13px * var(--rarity-glow-active));\n}\n.rarity-aura.rarity-PRIME,\n.rarity-aura.rank-prime {\n  filter:\n    drop-shadow(0 0 8px rgba(255,255,255,.9))\n    drop-shadow(0 0 16px rgba(255,255,255,.75))\n    drop-shadow(0 0 28px rgba(185, 228, 255, .55));\n}\n.rarity-PRIME .ring, .rank-prime .ring {\n  background: linear-gradient(120deg, #ff8ad6, #ffffff 22%, #8fd7ff 46%, #fff4b3 70%, #ffffff 84%, #ff8ad6) border-box;\n  background-size: 220% 220%;\n  animation: prime-halo-shift 3.2s linear infinite;\n}\n.rarity-PRIME .glow::after, .rank-prime .glow::after {\n  content: \"\";\n  position: absolute;\n  inset: -14%;\n  border-radius: inherit;\n  background:\n    radial-gradient(circle at 24% 30%, rgba(193, 234, 255, .35), transparent 46%),\n    radial-gradient(circle at 78% 66%, rgba(230, 211, 255, .28), transparent 42%),\n    radial-gradient(circle at 52% 50%, rgba(255, 255, 255, .18), transparent 68%);\n  mix-blend-mode: screen;\n  opacity: .7;\n  animation: prime-nebula-drift 6.4s ease-in-out infinite alternate;\n}\n\n.rarity-aura.prism::after {\n  content: \"\";\n  position: absolute;\n  inset: -3px;\n  border-radius: inherit;\n  mix-blend-mode: screen;\n  opacity: .85;\n  background: linear-gradient(90deg, #ff7ab6, #ffffff, #7ecbff, #f8d66d, #ff7ab6);\n  animation: prism-cycle 2.4s linear infinite;\n}\n\n@keyframes sr-mist-pulse {\n  0%, 100% { opacity: .35; transform: scale(.92); }\n  45% { opacity: .8; transform: scale(1.04); }\n}\n@keyframes ssr-sparkle-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }\n@keyframes ur-energy-pulse {\n  0%,100% { transform: scale(var(--rarity-ring-scale)) translateZ(0); }\n  50% { transform: scale(calc(var(--rarity-ring-scale) * 1.05)) translateZ(0); }\n}\n@keyframes ur-fire-scroll {\n  0% { background-position: 0% 50%; }\n  100% { background-position: 200% 50%; }\n}\n@keyframes prime-halo-shift {\n  0% { background-position: 0% 50%; }\n  100% { background-position: 200% 50%; }\n}\n@keyframes prime-nebula-drift {\n  0% { transform: translate(-2%, -2%) scale(.98); }\n  100% { transform: translate(2%, 2%) scale(1.03); }\n}\n@keyframes sweep { from { transform: translateX(-120%) skewX(-8deg); } to { transform: translateX(120%) skewX(-8deg); } }\n@keyframes prism-cycle { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }\n@keyframes shimmer-cycle {\n  0% { opacity: var(--rarity-glow-opacity); }\n  8% { opacity: calc(var(--rarity-glow-opacity) + 0.16); }\n  16%,100% { opacity: var(--rarity-glow-opacity); }\n}\n\n.rarity-aura[data-variant=\"deck\"] .glow {\n  --rarity-shimmer-period: 6s;\n  animation: shimmer-cycle var(--rarity-shimmer-period) ease-in-out infinite;\n}\n.rarity-aura[data-variant=\"gacha\"] .glow { animation: none; }\n\n.rarity-aura.is-pre .ring { opacity: .42; }\n.rarity-aura.is-pre .glow { opacity: calc(var(--rarity-glow-opacity) * .5); transform: scale(.92) translateZ(0); }\n.rarity-aura.is-bloom .ring { transform: scale(calc(var(--rarity-ring-scale) * 1.08)) translateZ(0); }\n.rarity-aura.is-bloom .glow { opacity: min(1, calc(var(--rarity-glow-opacity) * 1.2)); transform: scale(1.08) translateZ(0); }\n.rarity-aura.is-reveal .ring { transform: scale(var(--rarity-ring-scale)) translateZ(0); opacity: var(--rarity-ring-opacity); }\n.rarity-aura.is-reveal .glow { opacity: var(--rarity-glow-opacity); transform: scale(1) translateZ(0); }\n\n.rarity-aura.has-sweep.is-reveal .sweep::before { animation-play-state: running; }\nbody.low-power .rarity-aura.prism::after,\nbody.low-power .rarity-aura.has-sweep .sweep::before,\nbody.low-power .rarity-aura.has-spark .spark-layer { display: none; }\n\n.rarity-aura[data-variant=\"deck\"],\n.rarity-aura[data-variant=\"gacha\"] { mix-blend-mode: normal; }\n\n.rarity-aura.is-muted .ring,\n.rarity-aura.is-muted .glow { opacity: 0; }\n\n.rarity-aura[data-variant=\"deck\"] .ring { opacity: 0.78; }\n.rarity-aura[data-variant=\"deck\"] .glow { filter: blur(calc(7px * var(--rarity-glow-active))); }\n.rarity-aura[data-variant=\"deck\"].is-hovered .glow,\n.rarity-aura[data-variant=\"deck\"].is-selected .glow { opacity: min(1, calc(var(--rarity-glow-opacity) * 1.2)); }\n\nbody.low-power .rarity-aura.is-bloom .glow { opacity: calc(var(--rarity-glow-opacity) * .8); }";
-  module.exports = css;
-  module.exports.default = css;
-});
-__define('./ui/rarity/rarity.ts', (exports, module, __require) => {
-  //home (termux)/arclune_lane_7x3/src/ui/rarity/rarity.ts
-  const __dep0 = __require('./ui/rarity/rarity_tokens.json');
-  const rarityTokensSource = __dep0.default ?? __dep0;
-  const __dep1 = __require('./ui/rarity/rarity.css');
-  const rarityCss = __dep1.default ?? __dep1;
-  const __dep2 = __require('./ui/dom.ts');
-  const ensureStyleTag = __dep2.ensureStyleTag;
-  const STYLE_ID = 'ui-rarity-style';
-  function isAuraDisabledVariant(variant) {
-      return variant === 'collection';
-  }
-  const RARITY_SEQUENCE = ['N', 'R', 'SR', 'SSR', 'UR', 'PRIME'];
-  const RARITY_ALIASES = {
-      PRIME: 'PRIME',
-      Prime: 'PRIME',
-  };
-  const PARTICLE_RARITIES = new Set(['SSR', 'UR', 'PRIME']);
-  function normalizePowerMode(input) {
-      return input === 'low' ? 'low' : 'normal';
-  }
-  function normalizeRarityInput(input) {
-      const key = String(input).trim().toUpperCase();
-      if (RARITY_SEQUENCE.includes(key)) {
-          return key;
-      }
-      const alias = RARITY_ALIASES[key];
-      if (alias) {
-          return alias;
-      }
-      throw new Error(`Rarity không hợp lệ: ${input}`);
-  }
-  function normalizeRarity(value) {
-      return normalizeRarityInput(value);
-  }
-  function coerceRarity(value, fallback = 'N') {
-      try {
-          return normalizeRarity(value);
-      }
-      catch (error) {
-          return fallback;
-      }
-  }
-  function createTokenConfig(input) {
-      const { hex, glow, ring, spark, prism = false } = input;
-      return Object.freeze({
-          hex,
-          glow,
-          glowLow: glow * 0.7,
-          ring,
-          spark,
-          prism,
-      });
-  }
-  const DEFAULT_TOKEN_SOURCE = {
-      N: { hex: '#808080', glow: 0.05, ring: 1.0, spark: 0 },
-      R: { hex: '#00008b', glow: 0.75, ring: 1.02, spark: 0 },
-      SR: { hex: '#9966cc', glow: 1.0, ring: 1.05, spark: 0 },
-      SSR: { hex: '#ffbf00', glow: 1.25, ring: 1.1, spark: 4 },
-      UR: { hex: '#dc143c', glow: 1.45, ring: 1.14, spark: 5 },
-      PRIME: { hex: '#ffffff', glow: 1.65, ring: 1.2, spark: 5, prism: true },
-  };
-  function normalizeTokenMap(source) {
-      const rawSource = source && typeof source === 'object' && typeof source.default === 'object'
-          ? source.default
-          : source;
-      const tokens = new Map();
-      Object.entries(rawSource ?? {}).forEach(([rawKey, rawValue]) => {
-          if (rawKey === 'default' || rawKey === '__esModule') {
-              return;
-          }
-          try {
-              const rarity = normalizeRarityInput(rawKey);
-              tokens.set(rarity, createTokenConfig(rawValue));
-          }
-          catch (error) {
-              console.warn('Bỏ qua token hiếm không hợp lệ:', rawKey, error);
-          }
-      });
-      RARITY_SEQUENCE.forEach(key => {
-          if (!tokens.has(key)) {
-              tokens.set(key, createTokenConfig(DEFAULT_TOKEN_SOURCE[key]));
-          }
-      });
-      return Object.freeze(Object.fromEntries(tokens));
-  }
-  const RARITY_TOKENS = normalizeTokenMap(rarityTokensSource);
-  ensureStyleTag(STYLE_ID, { css: rarityCss });
-  const auraStates = new WeakMap();
-  const activeStates = new Set();
-  const sparkUsage = new WeakMap();
-  let currentPowerMode = 'normal';
-  let activeSparkCount = 0;
-  const MAX_ACTIVE_SPARKS = 16;
-  const SPARK_DURATION = 900;
-  const BLOOM_DELAY = 300;
-  const REVEAL_DELAY = 900;
-  const TIMELINE_TOTAL = 1300;
-  function getToken(rarity) {
-      return RARITY_TOKENS[rarity];
-  }
-  function normalizeOptions(variant, options) {
-      return {
-          label: options?.label ?? variant !== 'deck',
-          rounded: Boolean(options?.rounded),
-      };
-  }
-  function getRarityClass(rarity) {
-      return `rarity-${rarity}`;
-  }
-  function getRankClass(rarity) {
-      return `rank-${rarity.toLowerCase()}`;
-  }
-  function clearTimers(ids, clearFn) {
-      ids.splice(0, ids.length).forEach(id => clearFn(id));
-  }
-  function clearReveal(state) {
-      if (typeof cancelAnimationFrame === 'function' && typeof state.revealRaf === 'number') {
-          cancelAnimationFrame(state.revealRaf);
-      }
-      else if (state.revealRaf !== null) {
-          clearTimeout(state.revealRaf);
-      }
-      state.revealRaf = null;
-      clearTimers(state.revealTimers, clearTimeout);
-      state.overlay.classList.remove('is-pre', 'is-bloom', 'is-reveal');
-  }
-  function clearSparks(state) {
-      if (state.sparkLayer) {
-          sparkUsage.delete(state.sparkLayer);
-          while (state.sparkLayer.firstChild) {
-              state.sparkLayer.removeChild(state.sparkLayer.firstChild);
-          }
-      }
-      activeSparkCount = Math.max(0, activeSparkCount - state.sparkTimers.length);
-      clearTimers(state.sparkTimers, clearTimeout);
-      state.sparkTimers.length = 0;
-  }
-  function applyCssVariables(state) {
-      const { overlay, token, rarity, variant } = state;
-      overlay.style.setProperty('--rarity-color', token.hex);
-      overlay.style.setProperty('--rarity-ring-scale', token.ring.toString());
-      overlay.style.setProperty('--rarity-glow-base', token.glow.toString());
-      overlay.style.setProperty('--rarity-glow-low', token.glowLow.toString());
-      overlay.style.setProperty('--rarity-glow-active', currentPowerMode === 'low' ? token.glowLow.toString() : token.glow.toString());
-      const sparkCount = variant === 'gacha' && currentPowerMode !== 'low' && PARTICLE_RARITIES.has(rarity)
-          ? token.spark
-          : 0;
-      overlay.style.setProperty('--rarity-spark-count', sparkCount.toString());
-      const sweepOpacity = variant === 'gacha'
-          ? (token.prism ? '0.75' : '0.65')
-          : '0';
-      overlay.style.setProperty('--rarity-sweep-opacity', sweepOpacity);
-  }
-  function ensureSparkLayer(state) {
-      if (!state.sparkLayer) {
-          const layer = document.createElement('div');
-          layer.className = 'spark-layer';
-          state.overlay.appendChild(layer);
-          state.sparkLayer = layer;
-      }
-      return state.sparkLayer;
-  }
-  function ensureBadge(state) {
-      if (!state.label) {
-          if (state.badge && state.badge.parentNode) {
-              state.badge.parentNode.removeChild(state.badge);
-          }
-          state.badge = null;
-          state.overlay.classList.remove('has-badge');
-          return null;
-      }
-      if (!state.badge) {
-          const badge = document.createElement('div');
-          badge.className = 'badge';
-          state.overlay.appendChild(badge);
-          state.badge = badge;
-      }
-      state.overlay.classList.add('has-badge');
-      state.badge.textContent = state.rarity;
-      return state.badge;
-  }
-  function applyClasses(state) {
-      const { overlay, rarity, variant, token } = state;
-      RARITY_SEQUENCE.forEach(key => {
-          const className = getRarityClass(key);
-          const rankClassName = getRankClass(key);
-          if (key === rarity) {
-              overlay.classList.add(className);
-              overlay.classList.add(rankClassName);
-          }
-          else {
-              overlay.classList.remove(className);
-              overlay.classList.remove(rankClassName);
-          }
-      });
-      overlay.dataset.variant = variant;
-      overlay.classList.toggle('prism', token.prism);
-      overlay.classList.toggle('is-rounded', state.rounded);
-      const wantsSweep = variant === 'gacha' && (rarity === 'UR' || rarity === 'PRIME');
-      const wantsSpark = variant === 'gacha' && token.spark > 0 && PARTICLE_RARITIES.has(rarity) && currentPowerMode !== 'low';
-      overlay.classList.toggle('has-sweep', wantsSweep && currentPowerMode !== 'low');
-      overlay.classList.toggle('has-spark', wantsSpark);
-      if (!overlay.classList.contains('has-spark')) {
-          clearSparks(state);
-      }
-      if (!overlay.classList.contains('has-sweep') && state.sweep.parentNode === state.overlay) {
-          state.sweep.classList.remove('active');
-      }
-  }
-  function syncInteractionClasses(state) {
-      const { host, overlay } = state;
-      overlay.classList.toggle('is-hovered', host.classList.contains('is-hovered'));
-      overlay.classList.toggle('is-selected', host.classList.contains('is-selected'));
-  }
-  function stopInteractionSync(state) {
-      if (state.classObserver) {
-          state.classObserver.disconnect();
-          state.classObserver = null;
-      }
-      if (state.classPoller !== null) {
-          clearInterval(state.classPoller);
-          state.classPoller = null;
-      }
-  }
-  function startInteractionSync(state) {
-      stopInteractionSync(state);
-      syncInteractionClasses(state);
-      if (typeof MutationObserver === 'function') {
-          const observer = new MutationObserver(mutations => {
-              for (const mutation of mutations) {
-                  if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-                      syncInteractionClasses(state);
-                      break;
-                  }
-              }
-          });
-          observer.observe(state.host, { attributes: true, attributeFilter: ['class'] });
-          state.classObserver = observer;
-          return;
-      }
-      if (typeof window !== 'undefined' && typeof window.setInterval === 'function') {
-          state.classPoller = window.setInterval(() => syncInteractionClasses(state), 250);
-      }
-  }
-  function setupOverlay(host, variant) {
-      const existing = auraStates.get(host);
-      if (existing) {
-          existing.variant = variant;
-          return existing;
-      }
-      const overlay = document.createElement('div');
-      overlay.className = 'rarity-aura';
-      overlay.dataset.variant = variant;
-      const glow = document.createElement('div');
-      glow.className = 'glow';
-      overlay.appendChild(glow);
-      const ring = document.createElement('div');
-      ring.className = 'ring';
-      overlay.appendChild(ring);
-      const sweep = document.createElement('div');
-      sweep.className = 'sweep';
-      overlay.appendChild(sweep);
-      const state = {
-          host,
-          overlay,
-          ring,
-          glow,
-          sweep,
-          sparkLayer: null,
-          badge: null,
-          rarity: 'N',
-          variant,
-          label: false,
-          rounded: false,
-          token: getToken('N'),
-          originalPosition: null,
-          didSetPosition: false,
-          revealTimers: [],
-          revealRaf: null,
-          sparkTimers: [],
-          classObserver: null,
-          classPoller: null,
-      };
-      const computedPosition = typeof window !== 'undefined' && window?.getComputedStyle
-          ? window.getComputedStyle(host).position
-          : host.style.position;
-      const inlinePosition = host.style.position;
-      if (!computedPosition || computedPosition === 'static') {
-          host.style.position = 'relative';
-          state.didSetPosition = true;
-      }
-      state.originalPosition = inlinePosition || null;
-      host.insertBefore(overlay, host.firstChild);
-      auraStates.set(host, state);
-      activeStates.add(state);
-      return state;
-  }
-  function updateState(state, rarity, variant, options) {
-      state.rarity = rarity;
-      state.variant = variant;
-      state.label = options.label;
-      state.rounded = options.rounded;
-      state.token = getToken(rarity);
-      applyCssVariables(state);
-      applyClasses(state);
-      ensureBadge(state);
-  }
-  function mountRarityAura(host, rarity, variant, options) {
-      if (!host || typeof document === 'undefined') {
-          return;
-      }
-      if (isAuraDisabledVariant(variant)) {
-          unmountRarity(host);
-          return;
-      }
-      const normalizedRarity = normalizeRarityInput(rarity);
-      const normalizedOptions = normalizeOptions(variant, options);
-      const state = setupOverlay(host, variant);
-      updateState(state, normalizedRarity, variant, normalizedOptions);
-      startInteractionSync(state);
-  }
-  function updateRarity(host, rarity) {
-      const state = auraStates.get(host);
-      if (!state) {
-          return;
-      }
-      const normalizedRarity = normalizeRarityInput(rarity);
-      updateState(state, normalizedRarity, state.variant, {
-          label: state.label,
-          rounded: state.rounded,
-      });
-  }
-  function unmountRarity(host) {
-      const state = auraStates.get(host);
-      if (!state) {
-          return;
-      }
-      clearReveal(state);
-      clearSparks(state);
-      stopInteractionSync(state);
-      if (state.overlay.parentNode === host) {
-          host.removeChild(state.overlay);
-      }
-      if (state.didSetPosition) {
-          if (state.originalPosition) {
-              host.style.position = state.originalPosition;
-          }
-          else {
-              host.style.removeProperty('position');
-          }
-      }
-      auraStates.delete(host);
-      activeStates.delete(state);
-  }
-  function setPowerMode(mode) {
-      const normalizedMode = normalizePowerMode(mode);
-      if (normalizedMode === currentPowerMode) {
-          return;
-      }
-      currentPowerMode = normalizedMode;
-      const doc = typeof document !== 'undefined' ? document : null;
-      const body = doc?.body ?? null;
-      if (body) {
-          body.classList.toggle('low-power', normalizedMode === 'low');
-      }
-      activeStates.forEach(state => {
-          applyCssVariables(state);
-          applyClasses(state);
-          if (normalizedMode === 'low') {
-              clearSparks(state);
-          }
-      });
-  }
-  function scheduleTimeout(state, delay, cb) {
-      const id = setTimeout(cb, delay);
-      state.revealTimers.push(id);
-  }
-  function spawnSparks(state) {
-      const token = state.token;
-      if (currentPowerMode === 'low' || token.spark <= 0 || state.variant !== 'gacha') {
-          return;
-      }
-      const availableGlobal = Math.max(0, MAX_ACTIVE_SPARKS - activeSparkCount);
-      if (availableGlobal <= 0) {
-          return;
-      }
-      const layer = ensureSparkLayer(state);
-      const existingForLayer = sparkUsage.get(layer) ?? 0;
-      const availableForLayer = Math.max(0, token.spark - existingForLayer);
-      const spawnCount = Math.min(availableForLayer, availableGlobal);
-      if (spawnCount <= 0) {
-          return;
-      }
-      for (let index = 0; index < spawnCount; index += 1) {
-          const spark = document.createElement('div');
-          spark.className = 'spark';
-          const angle = Math.random() * Math.PI * 2;
-          const radius = Math.random() * 45 + 10;
-          const offsetX = Math.cos(angle) * radius;
-          const offsetY = Math.sin(angle) * radius;
-          spark.style.setProperty('--spark-x', `${offsetX}px`);
-          spark.style.setProperty('--spark-y', `${offsetY}px`);
-          spark.style.setProperty('--spark-delay', `${Math.random() * 120}ms`);
-          spark.style.setProperty('--spark-duration', `${SPARK_DURATION + Math.random() * 300}ms`);
-          layer.appendChild(spark);
-          activeSparkCount += 1;
-          const currentLayerCount = (sparkUsage.get(layer) ?? 0) + 1;
-          sparkUsage.set(layer, currentLayerCount);
-          const cleanupId = setTimeout(() => {
-              if (spark.parentNode === layer) {
-                  layer.removeChild(spark);
-              }
-              activeSparkCount = Math.max(0, activeSparkCount - 1);
-              const remaining = Math.max(0, (sparkUsage.get(layer) ?? 0) - 1);
-              if (remaining <= 0) {
-                  sparkUsage.delete(layer);
-              }
-              else {
-                  sparkUsage.set(layer, remaining);
-              }
-              const timerIndex = state.sparkTimers.indexOf(cleanupId);
-              if (timerIndex >= 0) {
-                  state.sparkTimers.splice(timerIndex, 1);
-              }
-          }, SPARK_DURATION + 320);
-          state.sparkTimers.push(cleanupId);
-      }
-  }
-  function requestFrame(callback) {
-      if (typeof requestAnimationFrame === 'function') {
-          return requestAnimationFrame(callback);
-      }
-      const getNow = typeof performance !== 'undefined' && typeof performance.now === 'function'
-          ? () => performance.now()
-          : () => Date.now();
-      return setTimeout(() => callback(getNow()), 16);
-  }
-  function playGachaReveal(cards, options) {
-      if (!Array.isArray(cards) || typeof document === 'undefined') {
-          options?.onDone?.();
-          return;
-      }
-      const stagger = options?.staggerMs ?? 120;
-      const states = cards
-          .map(card => ({ card, state: auraStates.get(card.el) }))
-          .filter((entry) => Boolean(entry.state));
-      if (states.length === 0) {
-          options?.onDone?.();
-          return;
-      }
-      let completed = 0;
-      const total = states.length;
-      const startTimeline = () => {
-          states.forEach((entry, index) => {
-              const { state } = entry;
-              clearReveal(state);
-              state.overlay.classList.add('is-pre');
-              state.overlay.classList.remove('is-bloom', 'is-reveal');
-              const delayBase = index * stagger;
-              scheduleTimeout(state, delayBase + BLOOM_DELAY, () => {
-                  state.overlay.classList.remove('is-pre');
-                  state.overlay.classList.add('is-bloom');
-                  spawnSparks(state);
-              });
-              scheduleTimeout(state, delayBase + REVEAL_DELAY, () => {
-                  state.overlay.classList.remove('is-bloom');
-                  state.overlay.classList.add('is-reveal');
-              });
-              scheduleTimeout(state, delayBase + TIMELINE_TOTAL, () => {
-                  state.overlay.classList.add('is-reveal');
-                  completed += 1;
-                  if (completed === total) {
-                      options?.onDone?.();
-                  }
-              });
-          });
-      };
-      const stateForRaf = states[0]?.state;
-      if (stateForRaf) {
-          stateForRaf.revealRaf = requestFrame(() => {
-              stateForRaf.revealRaf = null;
-              states.forEach(entry => {
-                  entry.state.overlay.classList.add('is-pre');
-              });
-              startTimeline();
-          });
-      }
-      else {
-          startTimeline();
-      }
-  }
-  function prepareGachaReveal(hosts, options) {
-      if (typeof document === 'undefined') {
-          return {
-              reveal() { },
-              update() { },
-              dispose() { },
-          };
-      }
-      const label = options?.label ?? true;
-      const rounded = options?.rounded ?? true;
-      const resolveRarity = options?.getRarity ?? ((host) => host.dataset.rarity);
-      const mounted = new Map();
-      for (const rawHost of hosts ?? []) {
-          if (!(rawHost instanceof HTMLElement)) {
-              continue;
-          }
-          const rarity = coerceRarity(resolveRarity(rawHost), 'N');
-          mounted.set(rawHost, rarity);
-          rawHost.dataset.rarity = rarity;
-          mountRarityAura(rawHost, rarity, 'gacha', { label, rounded });
-      }
-      let disposed = false;
-      const revealOptions = {
-          staggerMs: options?.staggerMs,
-          onDone: options?.onDone,
-      };
-      const controller = {
-          reveal() {
-              if (disposed || mounted.size === 0) {
-                  return;
-              }
-              const cards = Array.from(mounted.entries()).map(([el, rarity]) => ({ el, rarity }));
-              playGachaReveal(cards, revealOptions);
-          },
-          update(host, rarityInput) {
-              if (disposed || !mounted.has(host)) {
-                  return;
-              }
-              const rarity = normalizeRarity(rarityInput);
-              mounted.set(host, rarity);
-              host.dataset.rarity = rarity;
-              updateRarity(host, rarity);
-          },
-          dispose() {
-              if (disposed) {
-                  return;
-              }
-              disposed = true;
-              mounted.forEach((_rarity, host) => {
-                  unmountRarity(host);
-              });
-              mounted.clear();
-          },
-      };
-      return controller;
-  }
-  //# sourceMappingURL=stdin.js.map
-  if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeRarity')) exports.normalizeRarity = normalizeRarity;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'coerceRarity')) exports.coerceRarity = coerceRarity;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'mountRarityAura')) exports.mountRarityAura = mountRarityAura;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'updateRarity')) exports.updateRarity = updateRarity;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'unmountRarity')) exports.unmountRarity = unmountRarity;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'setPowerMode')) exports.setPowerMode = setPowerMode;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'playGachaReveal')) exports.playGachaReveal = playGachaReveal;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'prepareGachaReveal')) exports.prepareGachaReveal = prepareGachaReveal;
-});
-__define('./ui/rarity/rarity_tokens.json', (exports, module, __require) => {
-  const data = JSON.parse('{"N":{"hex":"#808080","glow":0.05,"ring":1,"spark":0},"R":{"hex":"#00008b","glow":0.75,"ring":1.02,"spark":0},"SR":{"hex":"#9966cc","glow":1,"ring":1.05,"spark":0},"SSR":{"hex":"#ffbf00","glow":1.25,"ring":1.1,"spark":4},"UR":{"hex":"#dc143c","glow":1.45,"ring":1.14,"spark":5},"PRIME":{"hex":"#ffffff","glow":1.65,"ring":1.2,"spark":5,"prism":true}}');
-  module.exports = data;
-  module.exports.default = data;
-});
 __define('./units.ts', (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/units.ts
   const __dep0 = __require('./data/cost-budget.ts');
@@ -30372,6 +29738,34 @@ __define('./utils/player-profile.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'loadPlayerProfile')) exports.loadPlayerProfile = loadPlayerProfile;
   if (!Object.prototype.hasOwnProperty.call(exports, 'savePlayerProfile')) exports.savePlayerProfile = savePlayerProfile;
   if (!Object.prototype.hasOwnProperty.call(exports, 'patchPlayerProfile')) exports.patchPlayerProfile = patchPlayerProfile;
+});
+__define('./utils/rarity.ts', (exports, module, __require) => {
+  const RARITY_SEQUENCE = ['N', 'R', 'SR', 'SSR', 'UR', 'PRIME'];
+  const RARITY_ALIASES = {
+      Prime: 'PRIME',
+  };
+  function normalizeRarity(value) {
+      const key = String(value ?? '').trim().toUpperCase();
+      if (RARITY_SEQUENCE.includes(key)) {
+          return key;
+      }
+      const alias = RARITY_ALIASES[String(value ?? '').trim()];
+      if (alias) {
+          return alias;
+      }
+      throw new Error(`Rarity không hợp lệ: ${value}`);
+  }
+  function coerceRarity(value, fallback = 'N') {
+      try {
+          return normalizeRarity(value);
+      }
+      catch {
+          return fallback;
+      }
+  }
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeRarity')) exports.normalizeRarity = normalizeRarity;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'coerceRarity')) exports.coerceRarity = coerceRarity;
 });
 __define('./utils/rng.ts', (exports, module, __require) => {
   const UINT32_MAX = 0x100000000;

@@ -10,7 +10,6 @@ import type { ModeConfig, ModeGroup, ModeShellConfig } from '@shared-types/confi
 import type { UnknownRecord } from '@shared-types/common';
 import type { MenuCardMetadata, MenuSection } from './screens/main-menu/types.ts';
 import type { LineupViewHandle } from './screens/lineup/view/index.ts';
-import { setPowerMode } from './ui/rarity/rarity.ts';
 import { loadPlayerProfile } from './utils/player-profile.ts';
 
 export interface ScreenParamMap {
@@ -1350,10 +1349,6 @@ async function mountPveScreen(params: ScreenParams): Promise<void>{
       }
     };
     shellInstance = createAppShell({ onError: handleShellError });
-    if (typeof document !== 'undefined'){
-      const lowPowerEnabled = Boolean(CFG?.PERFORMANCE?.LOW_POWER_MODE ?? false);
-      setPowerMode(lowPowerEnabled ? 'low' : 'normal');
-    }
     bootstrapOptions.isFileProtocol = isFileProtocol;
     let lastScreen: string | null = null;
     let lastParams: ScreenParams = null;

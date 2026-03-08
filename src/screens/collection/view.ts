@@ -13,7 +13,7 @@ import {
   syncSharedCurrencyWallet,
 } from '../../utils/currency.ts';
 import { assertElement, ensureStyleTag, mountSection } from '../../ui/dom.ts';
-import { normalizeRarity } from '@ui/rarity/rarity.ts';
+import { normalizeRarity } from '../../utils/rarity.ts';
 
 import {
   ABILITY_TYPE_LABELS,
@@ -40,7 +40,7 @@ import type {
   UnknownRecord,
 } from './types.ts';
 import type { CurrencyDefinition } from '@shared-types/config';
-import type { Rarity } from '@ui/rarity/rarity.ts';
+import type { Rarity } from '../../utils/rarity.ts';
 
 const STYLE_ID = 'collection-view-style-v2';
 

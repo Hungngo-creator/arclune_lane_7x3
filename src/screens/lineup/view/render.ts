@@ -15,7 +15,6 @@ import {
 } from '../../../utils/currency.ts';
 import { assertElement, ensureStyleTag, mountSection } from '../../../ui/dom.ts';
 import { normalizeCurrencyBalances } from '@shared-types/currency';
-import { mountRarityAura, updateRarity, unmountRarity } from '../../../ui/rarity/rarity.ts';
 import {
   normalizeRoster,
   normalizeLineups,
@@ -26,7 +25,6 @@ import {
   collectAssignedUnitTags,
   evaluatePassive,
   filterRoster,
-  getUnitRarity,
   LINEUP_ALLOWED_LEADER_IDS,
 } from './state.ts';
 import type {
@@ -264,7 +262,6 @@ function getNameInitials(name: string): string{
 }
 
 function renderAvatar(container: HTMLElement, avatarUrl: string | null, name: string): void{
-  const auraOverlay = container.querySelector<HTMLElement>(':scope > .rarity-aura');
   container.replaceChildren();
   if (avatarUrl){
     const img = document.createElement('img');
@@ -273,9 +270,6 @@ function renderAvatar(container: HTMLElement, avatarUrl: string | null, name: st
     container.appendChild(img);
   } else {
     container.textContent = getNameInitials(name || '');
-  }
- if (auraOverlay){
-    container.appendChild(auraOverlay);
   }
 }
 
@@ -651,7 +645,6 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   let lastPassivesRenderSignature = '';
   let lastFiltersRenderSignature = '';
   let lastHighlightedCellIndex: number | null = null;
-  let mountedCellAvatars: HTMLElement[] = [];
   const cellNodeByIndex = new Map<number, HTMLElement>();
 
   function getFilteredRoster(): RosterUnit[] {
@@ -880,10 +873,6 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   }
 
   function renderCells(): void{
-    for (const avatar of mountedCellAvatars){
-      unmountRarity(avatar);
-    }
-    mountedCellAvatars = [];
     cellNodeByIndex.clear();
     cellsGrid.innerHTML = '';
     const lineup = getSelectedLineup();
@@ -897,7 +886,6 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
         cellEl.setAttribute('role', 'button');
         const avatar = document.createElement('div');
         avatar.className = 'lineup-cell__avatar';
-        unmountRarity(avatar);
         avatar.textContent = '🔒';
         cellEl.appendChild(avatar);
         cellEl.setAttribute('aria-label', `Ô đội hình #${index + 1}. Chưa có dữ liệu.`);
@@ -959,16 +947,11 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       avatar.className = 'lineup-cell__avatar';
       if (unit){
         renderAvatar(avatar, unit.avatar || null, unit.name);
-        mountRarityAura(avatar, getUnitRarity(unit), 'deck', { label: false });
-        mountedCellAvatars.push(avatar);
       } else if (cell.label){
-        unmountRarity(avatar);
         avatar.textContent = getNameInitials(cell.label);
       } else if (!cell.unlocked){
-        unmountRarity(avatar);
         avatar.textContent = '🔒';
       } else {
-        unmountRarity(avatar);
         avatar.textContent = '+';
       }
       cellEl.appendChild(avatar);
@@ -1022,7 +1005,6 @@ function updateActiveCellHighlight(): void{
   function renderLeader(): void{
     const lineup = getSelectedLineup();
     if (!lineup){
-      unmountRarity(leaderAvatar);
       renderAvatar(leaderAvatar, null, '');
       leaderName.textContent = 'Chưa chọn leader';
       syncGridDetailsHeight();
@@ -1032,23 +1014,15 @@ function updateActiveCellHighlight(): void{
       const unit = rosterLookup.get(lineup.leaderId);
       if (unit){
         renderAvatar(leaderAvatar, unit.avatar || null, unit.name);
-        const rarity = getUnitRarity(unit);
-        if (leaderAvatar.querySelector(':scope > .rarity-aura')){
-          updateRarity(leaderAvatar, rarity);
-        } else {
-          mountRarityAura(leaderAvatar, rarity, 'deck', { label: false });
-        }
         leaderName.textContent = unit.name;
       } else {
         const fallbackName = lineup.leaderId === 'leaderA'
           ? 'Uyên'
           : (lineup.leaderId === 'leaderB' ? 'Địch' : 'Leader');
-        unmountRarity(leaderAvatar);
         renderAvatar(leaderAvatar, null, fallbackName);
         leaderName.textContent = fallbackName;
       }
     } else {
-      unmountRarity(leaderAvatar);
       renderAvatar(leaderAvatar, null, '');
       leaderName.textContent = 'Chưa chọn leader';
     }
