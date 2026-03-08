@@ -366,13 +366,32 @@ __define('./ai.ts', (exports, module, __require) => {
   });
   const DEFAULT_DEBUG_KEEP = 6;
   const tokensAlive = (Game) => Game.tokens.filter((t) => t.alive);
+  const makeCellKey = (cx, cy) => `${cx}:${cy}`;
+  function collectReservedCellKeys(aliveTokens, queued) {
+      const reserved = new Set();
+      for (const token of aliveTokens) {
+          reserved.add(makeCellKey(token.cx, token.cy));
+      }
+      if (!queued)
+          return reserved;
+      const appendQueued = (queue) => {
+          if (!queue || typeof queue.values !== 'function')
+              return;
+          for (const request of queue.values()) {
+              if (!request)
+                  continue;
+              reserved.add(makeCellKey(request.cx, request.cy));
+          }
+      };
+      appendQueued(queued.ally);
+      appendQueued(queued.enemy);
+      return reserved;
+  }
   function partitionAliveTokensBySide(Game, aliveTokens) {
       const alive = Array.isArray(aliveTokens) ? aliveTokens : tokensAlive(Game);
       const allies = [];
       const enemies = [];
       for (const token of alive) {
-          if (!token?.alive)
-              continue;
           if (token.side === 'ally') {
               allies.push(token);
           }
@@ -494,10 +513,11 @@ __define('./ai.ts', (exports, module, __require) => {
   }
   function listEmptyEnemySlots(Game, aliveTokens) {
       const alive = Array.isArray(aliveTokens) ? aliveTokens : tokensAlive(Game);
+      const reserved = collectReservedCellKeys(alive, Game.queued);
       const out = [];
       for (let s = 1; s <= 9; s += 1) {
           const { cx, cy } = slotToCell('enemy', s);
-          if (!cellReserved(alive, Game.queued, cx, cy))
+          if (!reserved.has(makeCellKey(cx, cy)))
               out.push({ s, cx, cy });
       }
       return out;

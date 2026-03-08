@@ -119,6 +119,31 @@ const DEFAULT_DEBUG_KEEP = 6;
 
 const tokensAlive = (Game: SessionState): ReadonlyArray<UnitToken> => Game.tokens.filter((t) => t.alive);
 
+const makeCellKey = (cx: number, cy: number): string => `${cx}:${cy}`;
+
+function collectReservedCellKeys(
+  aliveTokens: readonly UnitToken[],
+  queued: SessionState['queued'] | null | undefined,
+): Set<string> {
+  const reserved = new Set<string>();
+  for (const token of aliveTokens) {
+    reserved.add(makeCellKey(token.cx, token.cy));
+  }
+  if (!queued) return reserved;
+
+  const appendQueued = (queue: SessionState['queued']['ally'] | SessionState['queued']['enemy']): void => {
+    if (!queue || typeof queue.values !== 'function') return;
+    for (const request of queue.values()) {
+      if (!request) continue;
+      reserved.add(makeCellKey(request.cx, request.cy));
+    }
+  };
+
+  appendQueued(queued.ally);
+  appendQueued(queued.enemy);
+  return reserved;
+}
+
 function partitionAliveTokensBySide(
   Game: SessionState,
   aliveTokens?: readonly UnitToken[] | null,
@@ -127,7 +152,6 @@ function partitionAliveTokensBySide(
   const allies: UnitToken[] = [];
   const enemies: UnitToken[] = [];
   for (const token of alive) {
-    if (!token?.alive) continue;
     if (token.side === 'ally') {
       allies.push(token);
     } else if (token.side === 'enemy') {
@@ -256,10 +280,11 @@ function getDeck(Game: SessionState): DeckState {
 
 function listEmptyEnemySlots(Game: SessionState, aliveTokens?: readonly UnitToken[] | null): CandidateCell[] {
   const alive = Array.isArray(aliveTokens) ? aliveTokens : tokensAlive(Game);
+  const reserved = collectReservedCellKeys(alive, Game.queued);
   const out: CandidateCell[] = [];
   for (let s = 1; s <= 9; s += 1) {
     const { cx, cy } = slotToCell('enemy', s);
-    if (!cellReserved(alive, Game.queued, cx, cy)) out.push({ s, cx, cy });
+    if (!reserved.has(makeCellKey(cx, cy))) out.push({ s, cx, cy });
   }
   return out;
 }

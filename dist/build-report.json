@@ -1,15 +1,15 @@
 {
   "inputs": {
     "virtual-entry.js": {
-      "bytes": 1370745
+      "bytes": 1371454
     }
   },
   "outputs": {
     "virtual-entry.js": {
-      "bytes": 1370745,
+      "bytes": 1371454,
       "inputs": {
         "virtual-entry.js": {
-          "bytesInOutput": 1370745
+          "bytesInOutput": 1371454
         }
       }
     }
