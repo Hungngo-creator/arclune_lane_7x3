@@ -3195,82 +3195,38 @@ function draw(): void {
       drawTokensOblique(ctx, Game.grid, tokens, CAM_PRESET);
     }
 
-const aetherSyncStart = SUPPORTS_PERF_NOW ? performance.now() : Date.now();
-
-// 1. Lấy kích thước thật của Canvas trên màn hình
+    const aetherSyncStart = SUPPORTS_PERF_NOW ? performance.now() : Date.now();
     const canvasEl = canvas as HTMLCanvasElement;
     const rect = canvasEl.getBoundingClientRect();
-    
-    // 2. Tính tỷ lệ (Ratio) giữa Pixel màn hình và Pixel nội tại của Canvas
     const ratioX = rect.width / canvasEl.width;
     const ratioY = rect.height / canvasEl.height;
     const grid = Game?.grid;
     if (!grid) return;
 
-    // 3. Hàm chuyển đổi toạ độ Game -> Màn hình
-    const getScreenPos = (cx: number, cy: number) => {
-      // cellCenterObliqueLocal trả về toạ độ pixel trong Canvas (ví dụ: 100, 200)
-      const local = cellCenterObliqueLocal(grid, cx, cy, CAM_PRESET);
-      
-      return {
-        // Cộng rect.left/top để ra toạ độ tuyệt đối trên màn hình
-        x: rect.left + (local.x * ratioX),
-        y: rect.top + (local.y * ratioY),
-        // Scale vật thể cũng phải nhân theo tỷ lệ màn hình
-        s: local.scale * ratioX
-      };
-    };
-
-    const resolveLeaderPivotAnchor = (token: UnitToken | null): number | null => {
-      if (!token) return null;
-      const spriteAnchor = Number((token.art?.sprite as { anchor?: unknown } | null | undefined)?.anchor);
-      if (Number.isFinite(spriteAnchor)) return Math.max(0, Math.min(1, spriteAnchor));
-      const layoutAnchor = Number((token.art?.layout as { anchor?: unknown } | null | undefined)?.anchor);
-      if (Number.isFinite(layoutAnchor)) return Math.max(0, Math.min(1, layoutAnchor));
-      return null;
-    };
-
-    const projectLeaderGroundPos = (
-      token: UnitToken | null,
-      fallbackCx: number,
-      fallbackCy: number,
-    ): { x: number; y: number; s: number; anchor: number | null } => {
-      const projected = token ? getScreenPos(token.cx, token.cy) : getScreenPos(fallbackCx, fallbackCy);
-      if (!token) return { ...projected, anchor: null };
-
-      const pivotAnchor = resolveLeaderPivotAnchor(token);
-      if (!Number.isFinite(pivotAnchor)) {
-        return { ...projected, anchor: null };
+    let allyLeaderAlive: UnitToken | null = null;
+    let allyLeaderAny: UnitToken | null = null;
+    let enemyLeaderAlive: UnitToken | null = null;
+    let enemyLeaderAny: UnitToken | null = null;
+    for (let i = 0; i < tokens.length; i += 1) {
+      const token = tokens[i];
+      if (!token) continue;
+      if (token.id === 'leaderA') {
+        if (token.alive && !allyLeaderAlive) allyLeaderAlive = token;
+        if (!allyLeaderAny) allyLeaderAny = token;
+      } else if (token.id === 'leaderB') {
+        if (token.alive && !enemyLeaderAlive) enemyLeaderAlive = token;
+        if (!enemyLeaderAny) enemyLeaderAny = token;
       }
+      if ((allyLeaderAlive || allyLeaderAny) && (enemyLeaderAlive || enemyLeaderAny)) {
+        if (allyLeaderAlive && enemyLeaderAlive) break;
+      }
+    }
 
-      const layout = (token.art?.layout as { spriteHeight?: unknown } | null | undefined) ?? null;
-      const sprite = (token.art?.sprite as { scale?: unknown } | null | undefined) ?? null;
-      const spriteHeightMult = Number.isFinite(Number(layout?.spriteHeight)) ? Number(layout?.spriteHeight) : 2.4;
-      const spriteScale = Number.isFinite(Number(sprite?.scale)) ? Number(sprite?.scale) : 1;
-      const artSize = Number.isFinite(Number(token.art?.size)) ? Number(token.art?.size) : 1;
-      const radiusPx = Math.max(6, Math.floor(grid.tile * 0.36 * projected.s));
-      const spriteHeightPx = radiusPx * spriteHeightMult * spriteScale * artSize;
-      const anchorValue = pivotAnchor as number;
-      const footShiftY = spriteHeightPx * (1 - anchorValue);
+    const allyLeader = allyLeaderAlive ?? allyLeaderAny;
+    const enemyLeader = enemyLeaderAlive ?? enemyLeaderAny;
 
-      return {
-        x: projected.x,
-        y: projected.y + footShiftY,
-        s: projected.s,
-        anchor: anchorValue,
-      };
-    };
-
-    // 4. Lấy toạ độ trực tiếp từ token leader đang hiện diện trên sân
-    const allyLeader = tokens.find((t) => t.id === 'leaderA' && t.alive)
-      ?? tokens.find((t) => t.id === 'leaderA')
-      ?? null;
-    const enemyLeader = tokens.find((t) => t.id === 'leaderB' && t.alive)
-      ?? tokens.find((t) => t.id === 'leaderB')
-      ?? null;
-
-    const allyPos = projectLeaderGroundPos(allyLeader, 0, 1);
-    const enemyPos = projectLeaderGroundPos(enemyLeader, 6, 1);
+    const allyPos = projectLeaderGroundPos(allyLeader, 0, 1, { grid, rect, ratioX, ratioY });
+    const enemyPos = projectLeaderGroundPos(enemyLeader, 6, 1, { grid, rect, ratioX, ratioY });
     const clampMargin = Math.max(12, Math.round(rect.width * 0.02));
     const halfTileAnchor = 0.5;
     const tilePxX = grid.tile * ratioX;
@@ -3321,6 +3277,71 @@ const aetherSyncStart = SUPPORTS_PERF_NOW ? performance.now() : Date.now();
   }
   drawHPBars();
 }
+
+type ScreenProjectionContext = {
+  grid: GridSpec;
+  rect: DOMRect;
+  ratioX: number;
+  ratioY: number;
+};
+
+function getScreenPos(
+  cx: number,
+  cy: number,
+  context: ScreenProjectionContext
+): { x: number; y: number; s: number } {
+  const { grid, rect, ratioX, ratioY } = context;
+  const local = cellCenterObliqueLocal(grid, cx, cy, CAM_PRESET);
+  return {
+    x: rect.left + (local.x * ratioX),
+    y: rect.top + (local.y * ratioY),
+    s: local.scale * ratioX,
+  };
+}
+
+function resolveLeaderPivotAnchor(token: UnitToken | null): number | null {
+  if (!token) return null;
+  const spriteAnchor = Number((token.art?.sprite as { anchor?: unknown } | null | undefined)?.anchor);
+  if (Number.isFinite(spriteAnchor)) return Math.max(0, Math.min(1, spriteAnchor));
+  const layoutAnchor = Number((token.art?.layout as { anchor?: unknown } | null | undefined)?.anchor);
+  if (Number.isFinite(layoutAnchor)) return Math.max(0, Math.min(1, layoutAnchor));
+  return null;
+}
+
+function projectLeaderGroundPos(
+  token: UnitToken | null,
+  fallbackCx: number,
+  fallbackCy: number,
+  context: ScreenProjectionContext,
+): { x: number; y: number; s: number; anchor: number | null } {
+  const projected = token
+    ? getScreenPos(token.cx, token.cy, context)
+    : getScreenPos(fallbackCx, fallbackCy, context);
+  if (!token) return { ...projected, anchor: null };
+
+  const pivotAnchor = resolveLeaderPivotAnchor(token);
+  if (!Number.isFinite(pivotAnchor)) {
+    return { ...projected, anchor: null };
+  }
+
+  const layout = (token.art?.layout as { spriteHeight?: unknown } | null | undefined) ?? null;
+  const sprite = (token.art?.sprite as { scale?: unknown } | null | undefined) ?? null;
+  const spriteHeightMult = Number.isFinite(Number(layout?.spriteHeight)) ? Number(layout?.spriteHeight) : 2.4;
+  const spriteScale = Number.isFinite(Number(sprite?.scale)) ? Number(sprite?.scale) : 1;
+  const artSize = Number.isFinite(Number(token.art?.size)) ? Number(token.art?.size) : 1;
+  const radiusPx = Math.max(6, Math.floor(context.grid.tile * 0.36 * projected.s));
+  const spriteHeightPx = radiusPx * spriteHeightMult * spriteScale * artSize;
+  const anchorValue = pivotAnchor as number;
+  const footShiftY = spriteHeightPx * (1 - anchorValue);
+
+  return {
+    x: projected.x,
+    y: projected.y + footShiftY,
+    s: projected.s,
+    anchor: anchorValue,
+  };
+}
+
 function cellCenterObliqueLocal(g: GridSpec, cx: number, cy: number, C: CameraPreset): { x: number; y: number; scale: number } {
   const colsW = g.tile * g.cols;
   const topScale = ((C?.topScale) ?? 0.80);
