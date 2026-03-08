@@ -366,6 +366,22 @@ __define('./ai.ts', (exports, module, __require) => {
   });
   const DEFAULT_DEBUG_KEEP = 6;
   const tokensAlive = (Game) => Game.tokens.filter((t) => t.alive);
+  function partitionAliveTokensBySide(Game, aliveTokens) {
+      const alive = Array.isArray(aliveTokens) ? aliveTokens : tokensAlive(Game);
+      const allies = [];
+      const enemies = [];
+      for (const token of alive) {
+          if (!token?.alive)
+              continue;
+          if (token.side === 'ally') {
+              allies.push(token);
+          }
+          else if (token.side === 'enemy') {
+              enemies.push(token);
+          }
+      }
+      return { alive, allies, enemies };
+  }
   const predictSpawnCycleLocal = (Game, side, slot) => (predictSpawnCycleByTurnOrder(Game, side, slot));
   function mergedWeights() {
       const cfg = CFG.AI?.WEIGHTS ?? {};
@@ -707,9 +723,7 @@ __define('./ai.ts', (exports, module, __require) => {
           Game.ai.lastThinkMs = now;
           return;
       }
-      const alive = tokensAlive(Game);
-      const aliveAllies = alive.filter((t) => t.side === 'ally');
-      const aliveEnemies = alive.filter((t) => t.side === 'enemy');
+      const { alive, allies: aliveAllies, enemies: aliveEnemies } = partitionAliveTokensBySide(Game);
       const allyPressure = buildAllyRowPressure(aliveAllies);
       const rowFactorByCy = buildEnemyRowCrowding(Game, aliveEnemies);
       const cells = listEmptyEnemySlots(Game, alive);
@@ -946,9 +960,9 @@ __define('./ai.ts', (exports, module, __require) => {
       const unitProgressMap = Game.runtime?.unitProgressById;
       const profile = unitProgressMap?.get(unit.id);
       const slots = Array.isArray(profile?.gambit) ? profile.gambit : [];
-      const enemySide = unit.side === 'ally' ? 'enemy' : 'ally';
-      const allies = Game.tokens.filter((token) => token.alive && token.side === unit.side);
-      const enemies = Game.tokens.filter((token) => token.alive && token.side === enemySide);
+      const { allies: aliveAllies, enemies: aliveEnemies } = partitionAliveTokensBySide(Game);
+      const allies = unit.side === 'ally' ? aliveAllies : aliveEnemies;
+      const enemies = unit.side === 'ally' ? aliveEnemies : aliveAllies;
       const startIndex = Math.max(0, Math.floor(options.startIndex ?? 0));
       for (let index = startIndex; index < Math.min(5, slots.length); index += 1) {
           const slot = slots[index];
