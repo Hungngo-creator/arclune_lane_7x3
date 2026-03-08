@@ -26454,6 +26454,15 @@ __define('./turns.ts', (exports, module, __require) => {
           unit.hp = Math.max(1, Math.min(Number(unit.hpMax), Math.round(Number(unit.hp) * (1 + bonusPct))));
       }
   };
+  const readFirstNormalizedElement = (...values) => {
+      for (const value of values) {
+          const normalized = normalizeElementKey(value);
+          if (normalized)
+              return normalized;
+      }
+      return null;
+  };
+  const resolveSpawnElement = (spawnEntry, meta) => (readFirstNormalizedElement(spawnEntry.element, spawnEntry.base_element, meta?.base_element, meta?.element) ?? 'neutral');
   function grantActionAether(Game, unit, acted) {
       if (!unit || !unit.alive || !acted)
           return 0;
@@ -26541,14 +26550,15 @@ __define('./turns.ts', (exports, module, __require) => {
       const slot = entry.slot;
       const sideLower = toLowerSide(entry.side);
       const queueMap = sideLower === 'ally' ? Game.queued?.ally : Game.queued?.enemy;
+      const resolveCurrentActor = () => {
+          const active = getActiveAt(Game, sideLower, slot);
+          return { actor: active || null, spawned: false };
+      };
       const p = queueMap?.get(slot);
-      if (!p) {
-          const active = getActiveAt(Game, sideLower, slot);
-          return { actor: active || null, spawned: false };
-      }
+      if (!p)
+          return resolveCurrentActor();
       if ((p.spawnCycle ?? 0) > (Game?.turn?.cycle ?? 0)) {
-          const active = getActiveAt(Game, sideLower, slot);
-          return { actor: active || null, spawned: false };
+          return resolveCurrentActor();
       }
       queueMap?.delete(slot);
       const meta = Game.meta && typeof Game.meta.get === 'function' ? Game.meta.get(p.unitId) : null;
@@ -26575,11 +26585,9 @@ __define('./turns.ts', (exports, module, __require) => {
       const normalizedClass = normalizeClassName(p.class)
           ?? normalizeClassName(meta?.class)
           ?? undefined;
-      const normalizedElement = normalizeElementKey(p.element)
-          ?? normalizeElementKey(p.base_element)
-          ?? normalizeElementKey(meta?.base_element)
-          ?? normalizeElementKey(meta?.element)
-          ?? 'neutral';
+      const pRecord = p;
+      const metaRecord = meta;
+      const normalizedElement = resolveSpawnElement(pRecord, metaRecord);
       const obj = {
           id: p.unitId,
           name: p.name ?? undefined,

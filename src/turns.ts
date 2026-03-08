@@ -95,6 +95,28 @@ const applyMutationStatBonus = (unit: UnitToken, bonusPctRaw: unknown): void => 
   }
 };
 
+const readFirstNormalizedElement = (
+  ...values: Array<unknown>
+): string | null => {
+  for (const value of values) {
+    const normalized = normalizeElementKey(value);
+    if (normalized) return normalized;
+  }
+  return null;
+};
+
+const resolveSpawnElement = (
+  spawnEntry: Record<string, unknown>,
+  meta: Record<string, unknown> | null,
+): string => (
+  readFirstNormalizedElement(
+    spawnEntry.element,
+    spawnEntry.base_element,
+    meta?.base_element,
+    meta?.element,
+  ) ?? 'neutral'
+);
+
 function grantActionAether(Game: SessionState, unit: UnitToken | null | undefined, acted: boolean): number {
   if (!unit || !unit.alive || !acted) return 0;
   const className = normalizeClassName(Game.meta?.get(unit.id)?.class) ?? null;
@@ -197,14 +219,14 @@ export function spawnQueuedIfDue(
   const slot = entry.slot;
   const sideLower = toLowerSide(entry.side);
   const queueMap = sideLower === 'ally' ? Game.queued?.ally : Game.queued?.enemy;
+  const resolveCurrentActor = (): SpawnResult => {
+    const active = getActiveAt(Game, sideLower, slot);
+    return { actor: active || null, spawned: false };
+  };
   const p = queueMap?.get(slot);
-  if (!p){
-    const active = getActiveAt(Game, sideLower, slot);
-    return { actor: active || null, spawned: false };
-  }
+  if (!p) return resolveCurrentActor();
   if ((p.spawnCycle ?? 0) > (Game?.turn?.cycle ?? 0)){
-    const active = getActiveAt(Game, sideLower, slot);
-    return { actor: active || null, spawned: false };
+    return resolveCurrentActor();
   }
 
   queueMap?.delete(slot);
@@ -233,11 +255,9 @@ export function spawnQueuedIfDue(
   const normalizedClass = normalizeClassName(p.class)
     ?? normalizeClassName(meta?.class)
     ?? undefined;
-  const normalizedElement = normalizeElementKey((p as unknown as Record<string, unknown>).element)
-  ?? normalizeElementKey((p as unknown as Record<string, unknown>).base_element)
-    ?? normalizeElementKey((meta as Record<string, unknown> | null)?.base_element)
-    ?? normalizeElementKey((meta as Record<string, unknown> | null)?.element)
-    ?? 'neutral';
+  const pRecord = p as unknown as Record<string, unknown>;
+  const metaRecord = meta as Record<string, unknown> | null;
+  const normalizedElement = resolveSpawnElement(pRecord, metaRecord);
   const obj: UnitToken = {
     id: p.unitId,
     name: p.name ?? undefined,
