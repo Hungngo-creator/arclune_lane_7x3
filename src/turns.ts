@@ -570,6 +570,32 @@ export function doActionOrSkip(
     }
   };
 
+const completeTurn = ({
+    consumedTurn,
+    acted,
+    reason,
+    actionDetail,
+    emitOnActionEnd = false,
+  }: {
+    consumedTurn: boolean;
+    acted: boolean;
+    reason: string | null;
+    actionDetail: Record<string, unknown>;
+    emitOnActionEnd?: boolean;
+  }): ActionResolution => {
+    if (emitOnActionEnd) {
+      emitPassiveEvent(Game, unit, 'onActionEnd', { log: passiveLog });
+    }
+    Statuses.onTurnEnd(unit, {});
+    ensureBusyReset();
+    resolution.consumedTurn = consumedTurn;
+    resolution.acted = acted;
+    resolution.skipped = !acted;
+    resolution.reason = acted ? null : reason;
+    finishAction(actionDetail);
+    return resolution;
+  };
+
   if (!unit || !unit.alive) {
     emitGameEvent(ACTION_START, baseDetail);
     ensureBusyReset();
@@ -592,14 +618,12 @@ export function doActionOrSkip(
   emitGameEvent(ACTION_START, baseDetail);
 
   if (!Statuses.canAct(unit)) {
-    Statuses.onTurnEnd(unit, {});
-    ensureBusyReset();
-    resolution.consumedTurn = false;
-    resolution.acted = false;
-    resolution.skipped = true;
-    resolution.reason = 'status';
-    finishAction({ skipped: true, reason: 'status' });
-    return resolution;
+    return completeTurn({
+      consumedTurn: false,
+      acted: false,
+      reason: 'status',
+      actionDetail: { skipped: true, reason: 'status' }
+    });
   }
 
   const ultCost = resolveUltCost(unit, CFG);
@@ -621,22 +645,24 @@ export function doActionOrSkip(
       }
       emitPassiveEvent(Game, unit, 'onUltCast', { log: passiveLog });
     }
-    Statuses.onTurnEnd(unit, {});
-    ensureBusyReset();
     const actionDetail: Record<string, unknown> = { action: 'ult', ultOk };
     if (ultOk){
-      resolution.acted = true;
-      resolution.skipped = false;
-      resolution.reason = null;
+      completeTurn({
+        consumedTurn: true,
+        acted: true,
+        reason: null,
+        actionDetail
+      });
     } else {
-      resolution.acted = false;
-      resolution.skipped = true;
-      resolution.reason = 'ultFailed';
-      resolution.consumedTurn = false;
       actionDetail.skipped = true;
       actionDetail.reason = 'ultFailed';
+      completeTurn({
+        consumedTurn: false,
+        acted: false,
+        reason: 'ultFailed',
+        actionDetail
+      });
     }
-    finishAction(actionDetail);
     return true;
   };
 
@@ -666,14 +692,13 @@ export function doActionOrSkip(
       if (!cast.ok) {
         continue;
       }
-      emitPassiveEvent(Game, unit, 'onActionEnd', { log: passiveLog });
-      Statuses.onTurnEnd(unit, {});
-      ensureBusyReset();
-      resolution.acted = true;
-      resolution.skipped = false;
-      resolution.reason = null;
-      finishAction({ action: decision.action, skillOk: cast.ok, skillTargets: cast.targetCount, skillTags: cast.appliedTags });
-      return resolution;
+      return completeTurn({
+        consumedTurn: true,
+        acted: true,
+        reason: null,
+        emitOnActionEnd: true,
+        actionDetail: { action: decision.action, skillOk: cast.ok, skillTargets: cast.targetCount, skillTags: cast.appliedTags }
+      });
     } catch (err) {
       console.error('[doActionOrSkip.skill]', err);
       continue;
@@ -695,23 +720,20 @@ export function doActionOrSkip(
     doBasicWithFollowups(Game, unit, cap);
   } catch (err) {
     console.error('[doActionOrSkip.basic]', err);
-    Statuses.onTurnEnd(unit, {});
-    ensureBusyReset();
-    resolution.consumedTurn = false;
-    resolution.acted = false;
-    resolution.skipped = true;
-    resolution.reason = 'systemError';
-    finishAction({ skipped: true, reason: 'systemError' });
-    return resolution;
+    return completeTurn({
+      consumedTurn: false,
+      acted: false,
+      reason: 'systemError',
+      actionDetail: { skipped: true, reason: 'systemError' }
+    });
   }
-  emitPassiveEvent(Game, unit, 'onActionEnd', { log: passiveLog });
-  Statuses.onTurnEnd(unit, {});
-  ensureBusyReset();
-  resolution.acted = true;
-  resolution.skipped = false;
-  resolution.reason = null;
-  finishAction({ action: 'basic' });
-  return resolution;
+  return completeTurn({
+    consumedTurn: true,
+    acted: true,
+    reason: null,
+    emitOnActionEnd: true,
+    actionDetail: { action: 'basic' }
+  });
 }
 
 // Bước con trỏ lượt (sparse-cursor) đúng đặc tả
