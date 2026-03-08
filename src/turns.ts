@@ -15,7 +15,7 @@ import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REG
 import type { DamageCounterBreakdown, DamageEventContext } from './events.ts';
 import { mergeBusyUntil, safeNow, sessionNow } from './utils/time.ts';
 import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } from './utils/fury.ts';
-import { nextTurnInterleaved } from './turns/interleaved.ts';
+import { nextTurnInterleaved, getSequentialOrderIndex, predictSpawnCycleByTurnOrder } from './turns/interleaved.ts';
 import { resolveRuntimeUnitStats } from './modes/pve/collection-mapper.ts';
 import { applyCultivationBonus } from './cultivation.ts';
 import { evaluateGambitLogic } from './ai.ts';
@@ -152,8 +152,6 @@ function applyTurnRegen(
 }
 
 // --- Active/Spawn helpers (từ main.js) ---
-const keyOf = (side: string, slot: number): string => `${side}:${slot}`;
-
 export function getActiveAt(
   Game: SessionState,
   side: TurnOrderSide,
@@ -180,42 +178,12 @@ export function getActiveAt(
  */
 export function getTurnOrderIndex(Game: SessionState, side: TurnOrderSide, slot: number): number {
   const turn = Game.turn;
-  if (!turn) return -1;
-  if (!('order' in turn)) return -1; // behavior-preserving
-  const sequential = turn as SequentialTurnState;
-  const normalizedSide = toLowerSide(side);
-  const key = keyOf(normalizedSide, slot);
-  if (sequential.orderIndex instanceof Map && sequential.orderIndex.has(key)){
-    const v = sequential.orderIndex.get(key);
-    return typeof v === 'number' ? v : -1;
-  }
-  const order = Array.isArray(sequential.order) ? sequential.order : [];
-  const idx = order.findIndex(entry => entry && entry.side === normalizedSide && entry.slot === slot);
-  if (sequential.orderIndex instanceof Map && !sequential.orderIndex.has(key) && idx >= 0){
-    sequential.orderIndex.set(key, idx);
-  }
-  return idx;
+  if (!turn || !('order' in turn)) return -1;
+  return getSequentialOrderIndex(Game, toLowerSide(side), slot);
 }
 
 export function predictSpawnCycle(Game: SessionState, side: TurnOrderSide, slot: number): number {
-  const turn = Game.turn;
-  if (!turn) return 0;
-  const sequential = asSequentialTurn(turn);
-  if (!sequential){
-    const cycle = Math.max(0, Number.isFinite(turn.cycle) ? turn.cycle : 0);
-    return turn.mode === 'interleaved_by_position' ? cycle : cycle + 1;
-  }
-  const order = Array.isArray(sequential.order) ? sequential.order : [];
-  const orderLen = order.length;
-   const currentCycle = Math.max(0, Number.isFinite(sequential.cycle) ? sequential.cycle : 0);
-  if (!orderLen){
-    return currentCycle + 1;
-  }
-  const idx = getTurnOrderIndex(Game, side, slot);
-  if (idx < 0) return currentCycle + 1;
-  const cursorRaw = Number.isFinite(sequential.cursor) ? sequential.cursor : 0;
-  const cursor = Math.max(0, Math.min(orderLen - 1, cursorRaw));
-  return idx >= cursor ? currentCycle : currentCycle + 1;
+  return predictSpawnCycleByTurnOrder(Game, toLowerSide(side), slot);
 }
 
 export function spawnQueuedIfDue(

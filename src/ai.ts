@@ -6,6 +6,7 @@ import { detectUltBehavior, getSummonSpec, resolveSummonSlots } from './utils/ki
 import { lookupUnit } from './units.ts';
 import { globalAetherPool } from './aether.ts';
 import { isUyenLeader, isLeaderUltReady } from './leader-uyen.ts';
+import { predictSpawnCycleByTurnOrder } from './turns/interleaved.ts';
 
 import type { AiCard, AiCardDeck, AiDeckEntry, AiDeckPool, SessionState } from '@shared-types/combat';
 import type { RosterUnitDefinition } from '@shared-types/config';
@@ -118,31 +119,9 @@ const DEFAULT_DEBUG_KEEP = 6;
 
 const tokensAlive = (Game: SessionState): ReadonlyArray<UnitToken> => Game.tokens.filter((t) => t.alive);
 
-function predictSpawnCycleLocal(Game: SessionState, side: 'ally' | 'enemy', slot: number): number {
-  const turn = Game.turn;
-  if (!turn) return 0;
-
-  const cycle = Math.max(0, Number.isFinite(turn.cycle) ? turn.cycle : 0);
-  const maybeSequential = turn as { order?: Array<{ side?: string; slot?: number }>; cursor?: number };
-  const order = Array.isArray(maybeSequential.order) ? maybeSequential.order : null;
-
-  if (!order) {
-    return turn.mode === 'interleaved_by_position' ? cycle : cycle + 1;
-  }
-
-  if (order.length === 0) {
-    return cycle + 1;
-  }
-
-  const idx = order.findIndex((entry) => entry?.side === side && entry?.slot === slot);
-  if (idx < 0) {
-    return cycle + 1;
-  }
-
-  const cursorRaw = Number.isFinite(maybeSequential.cursor) ? Number(maybeSequential.cursor) : 0;
-  const cursor = Math.max(0, Math.min(order.length - 1, cursorRaw));
-  return idx >= cursor ? cycle : cycle + 1;
-}
+const predictSpawnCycleLocal = (Game: SessionState, side: 'ally' | 'enemy', slot: number): number => (
+  predictSpawnCycleByTurnOrder(Game, side, slot)
+);
 
 function mergedWeights(): Record<string, number> {
   const cfg = CFG.AI?.WEIGHTS ?? {};

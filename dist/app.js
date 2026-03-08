@@ -336,8 +336,10 @@ __define('./ai.ts', (exports, module, __require) => {
   const __dep6 = __require('./leader-uyen.ts');
   const isUyenLeader = __dep6.isUyenLeader;
   const isLeaderUltReady = __dep6.isLeaderUltReady;
-  const __dep7 = __require('./shared-types/units.ts');
-  const createSummonQueue = __dep7.createSummonQueue;
+  const __dep7 = __require('./turns/interleaved.ts');
+  const predictSpawnCycleByTurnOrder = __dep7.predictSpawnCycleByTurnOrder;
+  const __dep8 = __require('./shared-types/units.ts');
+  const createSummonQueue = __dep8.createSummonQueue;
   function toMetaEntry(value) {
       if (!value || typeof value !== 'object')
           return null;
@@ -364,27 +366,7 @@ __define('./ai.ts', (exports, module, __require) => {
   });
   const DEFAULT_DEBUG_KEEP = 6;
   const tokensAlive = (Game) => Game.tokens.filter((t) => t.alive);
-  function predictSpawnCycleLocal(Game, side, slot) {
-      const turn = Game.turn;
-      if (!turn)
-          return 0;
-      const cycle = Math.max(0, Number.isFinite(turn.cycle) ? turn.cycle : 0);
-      const maybeSequential = turn;
-      const order = Array.isArray(maybeSequential.order) ? maybeSequential.order : null;
-      if (!order) {
-          return turn.mode === 'interleaved_by_position' ? cycle : cycle + 1;
-      }
-      if (order.length === 0) {
-          return cycle + 1;
-      }
-      const idx = order.findIndex((entry) => entry?.side === side && entry?.slot === slot);
-      if (idx < 0) {
-          return cycle + 1;
-      }
-      const cursorRaw = Number.isFinite(maybeSequential.cursor) ? Number(maybeSequential.cursor) : 0;
-      const cursor = Math.max(0, Math.min(order.length - 1, cursorRaw));
-      return idx >= cursor ? cycle : cycle + 1;
-  }
+  const predictSpawnCycleLocal = (Game, side, slot) => (predictSpawnCycleByTurnOrder(Game, side, slot));
   function mergedWeights() {
       const cfg = CFG.AI?.WEIGHTS ?? {};
       const out = { ...DEFAULT_WEIGHTS };
@@ -26356,6 +26338,8 @@ __define('./turns.ts', (exports, module, __require) => {
   const clearFreshSummon = __dep12.clearFreshSummon;
   const __dep13 = __require('./turns/interleaved.ts');
   const nextTurnInterleaved = __dep13.nextTurnInterleaved;
+  const getSequentialOrderIndex = __dep13.getSequentialOrderIndex;
+  const predictSpawnCycleByTurnOrder = __dep13.predictSpawnCycleByTurnOrder;
   const __dep14 = __require('./modes/pve/collection-mapper.ts');
   const resolveRuntimeUnitStats = __dep14.resolveRuntimeUnitStats;
   const __dep15 = __require('./cultivation.ts');
@@ -26469,7 +26453,6 @@ __define('./turns.ts', (exports, module, __require) => {
       return { hpDelta, aeDelta };
   }
   // --- Active/Spawn helpers (từ main.js) ---
-  const keyOf = (side, slot) => `${side}:${slot}`;
   function getActiveAt(Game, side, slot) {
       const normalizedSide = toLowerSide(side);
       const { cx, cy } = slotToCell(normalizedSide, slot);
@@ -26492,45 +26475,12 @@ __define('./turns.ts', (exports, module, __require) => {
    */
   function getTurnOrderIndex(Game, side, slot) {
       const turn = Game.turn;
-      if (!turn)
+      if (!turn || !('order' in turn))
           return -1;
-      if (!('order' in turn))
-          return -1; // behavior-preserving
-      const sequential = turn;
-      const normalizedSide = toLowerSide(side);
-      const key = keyOf(normalizedSide, slot);
-      if (sequential.orderIndex instanceof Map && sequential.orderIndex.has(key)) {
-          const v = sequential.orderIndex.get(key);
-          return typeof v === 'number' ? v : -1;
-      }
-      const order = Array.isArray(sequential.order) ? sequential.order : [];
-      const idx = order.findIndex(entry => entry && entry.side === normalizedSide && entry.slot === slot);
-      if (sequential.orderIndex instanceof Map && !sequential.orderIndex.has(key) && idx >= 0) {
-          sequential.orderIndex.set(key, idx);
-      }
-      return idx;
+      return getSequentialOrderIndex(Game, toLowerSide(side), slot);
   }
   function predictSpawnCycle(Game, side, slot) {
-      const turn = Game.turn;
-      if (!turn)
-          return 0;
-      const sequential = asSequentialTurn(turn);
-      if (!sequential) {
-          const cycle = Math.max(0, Number.isFinite(turn.cycle) ? turn.cycle : 0);
-          return turn.mode === 'interleaved_by_position' ? cycle : cycle + 1;
-      }
-      const order = Array.isArray(sequential.order) ? sequential.order : [];
-      const orderLen = order.length;
-      const currentCycle = Math.max(0, Number.isFinite(sequential.cycle) ? sequential.cycle : 0);
-      if (!orderLen) {
-          return currentCycle + 1;
-      }
-      const idx = getTurnOrderIndex(Game, side, slot);
-      if (idx < 0)
-          return currentCycle + 1;
-      const cursorRaw = Number.isFinite(sequential.cursor) ? sequential.cursor : 0;
-      const cursor = Math.max(0, Math.min(orderLen - 1, cursorRaw));
-      return idx >= cursor ? currentCycle : currentCycle + 1;
+      return predictSpawnCycleByTurnOrder(Game, toLowerSide(side), slot);
   }
   function spawnQueuedIfDue(Game, entry, hooks) {
       const { allocIid, performUlt } = hooks ?? {};
@@ -27204,6 +27154,44 @@ __define('./turns/interleaved.ts', (exports, module, __require) => {
           return false;
       return pos <= start;
   }
+  const toLowerSpawnSide = (side) => (side === 'ALLY' ? 'ally' : side === 'ENEMY' ? 'enemy' : side);
+  function getSequentialOrderIndex(state, side, slot) {
+      const turn = state.turn;
+      const order = Array.isArray(turn?.order) ? turn.order : null;
+      if (!order)
+          return -1;
+      const normalizedSide = toLowerSpawnSide(side);
+      const key = `${normalizedSide}:${slot}`;
+      const cached = turn?.orderIndex;
+      if (cached instanceof Map && cached.has(key)) {
+          const value = cached.get(key);
+          return typeof value === 'number' ? value : -1;
+      }
+      const index = order.findIndex((entry) => entry?.side === normalizedSide && entry?.slot === slot);
+      if (index >= 0 && cached instanceof Map && !cached.has(key)) {
+          cached.set(key, index);
+      }
+      return index;
+  }
+  function predictSpawnCycleByTurnOrder(state, side, slot) {
+      const turn = state.turn;
+      if (!turn)
+          return 0;
+      const cycle = Math.max(0, Number.isFinite(turn.cycle) ? turn.cycle : 0);
+      const maybeSequential = turn;
+      const order = Array.isArray(maybeSequential.order) ? maybeSequential.order : null;
+      if (!order) {
+          return turn.mode === 'interleaved_by_position' ? cycle : cycle + 1;
+      }
+      if (!order.length)
+          return cycle + 1;
+      const idx = getSequentialOrderIndex(state, side, slot);
+      if (idx < 0)
+          return cycle + 1;
+      const cursorRaw = Number.isFinite(maybeSequential.cursor) ? Number(maybeSequential.cursor) : 0;
+      const cursor = Math.max(0, Math.min(order.length - 1, cursorRaw));
+      return idx >= cursor ? cycle : cycle + 1;
+  }
   function findNextOccupiedPos(state, side, startPos = 0, slotMaps) {
       const turn = state.turn ?? null;
       const sideKey = normalizeSide(side);
@@ -27277,6 +27265,8 @@ __define('./turns/interleaved.ts', (exports, module, __require) => {
       return picked;
   }
   //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getSequentialOrderIndex')) exports.getSequentialOrderIndex = getSequentialOrderIndex;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'predictSpawnCycleByTurnOrder')) exports.predictSpawnCycleByTurnOrder = predictSpawnCycleByTurnOrder;
   if (!Object.prototype.hasOwnProperty.call(exports, 'findNextOccupiedPos')) exports.findNextOccupiedPos = findNextOccupiedPos;
   if (!Object.prototype.hasOwnProperty.call(exports, 'nextTurnInterleaved')) exports.nextTurnInterleaved = nextTurnInterleaved;
 });

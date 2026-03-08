@@ -91,6 +91,59 @@ function makeWrappedFlag(start: number, pos: number): boolean {
   return pos <= start;
 }
 
+export type SpawnCycleSide = Side | TurnSideKey;
+
+const toLowerSpawnSide = (side: SpawnCycleSide): Side => (
+  side === 'ALLY' ? 'ally' : side === 'ENEMY' ? 'enemy' : side
+);
+
+export function getSequentialOrderIndex(
+  state: SessionState,
+  side: SpawnCycleSide,
+  slot: number,
+): number {
+  const turn = state.turn as { order?: Array<{ side?: string; slot?: number }>; orderIndex?: Map<string, number> } | null | undefined;
+  const order = Array.isArray(turn?.order) ? turn.order : null;
+  if (!order) return -1;
+
+  const normalizedSide = toLowerSpawnSide(side);
+  const key = `${normalizedSide}:${slot}`;
+  const cached = turn?.orderIndex;
+  if (cached instanceof Map && cached.has(key)) {
+    const value = cached.get(key);
+    return typeof value === 'number' ? value : -1;
+  }
+
+  const index = order.findIndex((entry) => entry?.side === normalizedSide && entry?.slot === slot);
+  if (index >= 0 && cached instanceof Map && !cached.has(key)) {
+    cached.set(key, index);
+  }
+  return index;
+}
+
+export function predictSpawnCycleByTurnOrder(
+  state: SessionState,
+  side: SpawnCycleSide,
+  slot: number,
+): number {
+  const turn = state.turn;
+  if (!turn) return 0;
+  const cycle = Math.max(0, Number.isFinite(turn.cycle) ? turn.cycle : 0);
+  const maybeSequential = turn as { order?: Array<{ side?: string; slot?: number }>; cursor?: number };
+  const order = Array.isArray(maybeSequential.order) ? maybeSequential.order : null;
+  if (!order) {
+    return turn.mode === 'interleaved_by_position' ? cycle : cycle + 1;
+  }
+  if (!order.length) return cycle + 1;
+
+  const idx = getSequentialOrderIndex(state, side, slot);
+  if (idx < 0) return cycle + 1;
+
+  const cursorRaw = Number.isFinite(maybeSequential.cursor) ? Number(maybeSequential.cursor) : 0;
+  const cursor = Math.max(0, Math.min(order.length - 1, cursorRaw));
+  return idx >= cursor ? cycle : cycle + 1;
+}
+
 export function findNextOccupiedPos(
   state: SessionState,
   side: Side | TurnSideKey,
