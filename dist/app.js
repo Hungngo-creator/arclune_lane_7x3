@@ -17089,12 +17089,25 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
       };
   }
   const backgroundSignatureCache = new Map();
+  let camPresetSignatureCache = new WeakMap();
   let sceneCache = null;
+  function getCamPresetSignature(camPreset) {
+      if (!camPreset || typeof camPreset !== 'object') {
+          return stableStringify(camPreset ?? null);
+      }
+      const cached = camPresetSignatureCache.get(camPreset);
+      if (cached)
+          return cached;
+      const signature = stableStringify(camPreset);
+      camPresetSignatureCache.set(camPreset, signature);
+      return signature;
+  }
   function normalizeBackgroundCacheKey(backgroundKey) {
       return `key:${backgroundKey ?? '__no-key__'}`;
   }
   function clearBackgroundSignatureCache() {
       backgroundSignatureCache.clear();
+      camPresetSignatureCache = new WeakMap();
   }
   function computeBackgroundSignature(backgroundKey) {
       const cacheKey = normalizeBackgroundCacheKey(backgroundKey);
@@ -17405,14 +17418,14 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
       const themeKey = game.sceneTheme ?? sceneCfg?.CURRENT_THEME ?? sceneCfg?.DEFAULT_THEME ?? null;
       const theme = themeKey ? sceneCfg?.THEMES?.[themeKey] ?? null : null;
       const backgroundKey = game.backgroundKey ?? null;
-      const backgroundSignature = computeBackgroundSignature(backgroundKey);
-      const camPresetSignature = stableStringify(camPreset ?? null);
+      const camPresetSignature = getCamPresetSignature(camPreset);
       const baseScene = getCachedBattlefieldScene(grid, theme, { width: cssWidth, height: cssHeight, dpr: dprRaw });
       const baseKey = baseScene?.cacheKey ?? null;
       if (!baseScene) {
           sceneCache = null;
           return null;
       }
+      const backgroundSignature = computeBackgroundSignature(backgroundKey);
       let needsRebuild = false;
       if (!sceneCache)
           needsRebuild = true;

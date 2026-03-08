@@ -254,7 +254,19 @@ export interface EnsureSceneCacheArgs {
 }
 
 const backgroundSignatureCache = new Map<string, BackgroundCacheEntry>();
+let camPresetSignatureCache = new WeakMap<object, string>();
 let sceneCache: SceneCacheEntry | null = null;
+
+function getCamPresetSignature(camPreset: CameraPreset | undefined): string {
+  if (!camPreset || typeof camPreset !== 'object') {
+    return stableStringify(camPreset ?? null);
+  }
+  const cached = camPresetSignatureCache.get(camPreset);
+  if (cached) return cached;
+  const signature = stableStringify(camPreset);
+  camPresetSignatureCache.set(camPreset, signature);
+  return signature;
+}
 
 function normalizeBackgroundCacheKey(backgroundKey: string | null | undefined): string {
   return `key:${backgroundKey ?? '__no-key__'}`;
@@ -262,6 +274,7 @@ function normalizeBackgroundCacheKey(backgroundKey: string | null | undefined): 
 
 export function clearBackgroundSignatureCache(): void {
   backgroundSignatureCache.clear();
+  camPresetSignatureCache = new WeakMap<object, string>();
 }
 
 export function computeBackgroundSignature(backgroundKey: string | null | undefined): string {
@@ -593,8 +606,7 @@ export function ensureSceneCache(args: EnsureSceneCacheArgs): SceneCacheEntry | 
   const themeKey = game.sceneTheme ?? sceneCfg?.CURRENT_THEME ?? sceneCfg?.DEFAULT_THEME ?? null;
   const theme = themeKey ? sceneCfg?.THEMES?.[themeKey] ?? null : null;
   const backgroundKey = game.backgroundKey ?? null;
-  const backgroundSignature = computeBackgroundSignature(backgroundKey);
-  const camPresetSignature = stableStringify(camPreset ?? null);
+  const camPresetSignature = getCamPresetSignature(camPreset);
 
   const baseScene = getCachedBattlefieldScene(
     grid as Parameters<typeof getCachedBattlefieldScene>[0],
@@ -606,6 +618,7 @@ export function ensureSceneCache(args: EnsureSceneCacheArgs): SceneCacheEntry | 
     sceneCache = null;
     return null;
   }
+  const backgroundSignature = computeBackgroundSignature(backgroundKey);
 
   let needsRebuild = false;
   if (!sceneCache) needsRebuild = true;
