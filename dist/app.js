@@ -26427,7 +26427,16 @@ __define('./turns.ts', (exports, module, __require) => {
   function getActiveAt(Game, side, slot) {
       const normalizedSide = toLowerSide(side);
       const { cx, cy } = slotToCell(normalizedSide, slot);
-      return Game.tokens.find(t => t.side === normalizedSide && t.cx === cx && t.cy === cy && t.alive);
+      const tokens = Array.isArray(Game.tokens) ? Game.tokens : [];
+      for (let i = 0; i < tokens.length; i += 1) {
+          const token = tokens[i];
+          if (!token || !token.alive)
+              continue;
+          if (token.side === normalizedSide && token.cx === cx && token.cy === cy) {
+              return token;
+          }
+      }
+      return undefined;
   }
   /**
    * @param {SessionState} Game
@@ -26483,13 +26492,14 @@ __define('./turns.ts', (exports, module, __require) => {
           return { actor: null, spawned: false };
       const slot = entry.slot;
       const sideLower = toLowerSide(entry.side);
-      const active = getActiveAt(Game, sideLower, slot);
       const queueMap = sideLower === 'ally' ? Game.queued?.ally : Game.queued?.enemy;
       const p = queueMap?.get(slot);
       if (!p) {
+          const active = getActiveAt(Game, sideLower, slot);
           return { actor: active || null, spawned: false };
       }
       if ((p.spawnCycle ?? 0) > (Game?.turn?.cycle ?? 0)) {
+          const active = getActiveAt(Game, sideLower, slot);
           return { actor: active || null, spawned: false };
       }
       queueMap?.delete(slot);
@@ -26923,16 +26933,11 @@ __define('./turns.ts', (exports, module, __require) => {
               return;
           const entry = { side: selection.side, slot: selection.pos };
           const { actor, spawned } = spawnQueuedIfDue(Game, entry, hooks);
-          let active = null;
-          if (actor && actor.alive) {
-              active = actor;
-          }
-          else if (selection.unit && selection.unit.alive) {
-              active = selection.unit;
-          }
-          else {
-              active = getActiveAt(Game, entry.side, entry.slot) ?? null; // behavior-preserving
-          }
+          const active = actor && actor.alive
+              ? actor
+              : (selection.unit && selection.unit.alive
+                  ? selection.unit
+                  : (getActiveAt(Game, entry.side, entry.slot) ?? null));
           if (!active || !active.alive) {
               return;
           }
@@ -27011,7 +27016,9 @@ __define('./turns.ts', (exports, module, __require) => {
               cycle
           };
           const { actor, spawned } = spawnQueuedIfDue(Game, entry, hooks);
-          const active = actor && actor.alive ? actor : getActiveAt(Game, entry.side, entry.slot);
+          const active = actor && actor.alive
+              ? actor
+              : getActiveAt(Game, entry.side, entry.slot);
           const hasActive = !!(active && active.alive);
           if (!hasActive) {
               advanceCursor();
