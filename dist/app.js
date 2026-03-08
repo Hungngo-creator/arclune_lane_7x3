@@ -19987,8 +19987,8 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       .collection-roster__avatar{width:48px;height:48px;border-radius:14px;background:rgba(24,34,44,.85);overflow:visible;position:relative;display:flex;align-items:center;justify-content:center;}
       .collection-roster__avatar img{width:58px;height:58px;object-fit:contain;filter:drop-shadow(0 8px 16px rgba(0,0,0,.55));position:relative;z-index:1;border-radius:inherit;}
       .collection-roster__avatar span{position:relative;z-index:1;color:#aee4ff;font-weight:600;letter-spacing:.08em;}
-      .collection-roster__cost{margin-left:auto;padding:5px 9px;border-radius:11px;background:rgba(36,18,12,.72);color:#ffd9a1;font-size:11px;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:6px;}
-      .collection-roster__cost.is-highlighted{background:rgba(255,184,108,.9);color:#1e1206;box-shadow:0 10px 24px rgba(255,184,108,.45);}
+      .collection-roster__cost{position:absolute;top:-5px;right:-5px;min-width:28px;height:28px;padding:0 6px;border-radius:999px;background:rgba(6,12,20,.66);color:#ffd9a1;font-size:15px;font-weight:700;letter-spacing:.02em;text-transform:none;display:flex;align-items:center;justify-content:center;text-shadow:0 2px 6px rgba(0,0,0,.7);box-shadow:0 4px 12px rgba(0,0,0,.34);line-height:1;z-index:3;pointer-events:none;}
+      .collection-roster__cost.is-highlighted{background:rgba(255,184,108,.92);color:#1e1206;box-shadow:0 8px 20px rgba(255,184,108,.45);text-shadow:none;}
       .collection-stage{position:relative;border-radius:28px;border:1px solid rgba(125,211,252,.24);background:linear-gradient(150deg,rgba(16,24,34,.92),rgba(10,16,26,.72));padding:28px;display:flex;flex-direction:column;gap:18px;overflow:visible;min-height:420px;}
       .collection-stage__art{flex:1;display:flex;align-items:flex-end;justify-content:center;position:relative;}
       .collection-stage__sprite{width:82%;max-width:420px;height:auto;filter:drop-shadow(0 32px 60px rgba(0,0,0,.6));transition:transform .3s ease,filter .3s ease;}
@@ -20003,12 +20003,11 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       .collection-stage__tuvi-btn:hover{transform:translateY(-2px);filter:brightness(1.08);}
       .collection-stage__tuvi-btn:focus-visible{outline:2px solid rgba(110,231,183,.82);outline-offset:2px;}
       .collection-stage__tuvi-btn:disabled{cursor:not-allowed;background:linear-gradient(160deg,rgba(40,40,40,.6),rgba(12,12,12,.95));border-color:rgba(115,115,115,.65);color:#737373;filter:none;}
-      .collection-stage__info{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;}
+      .collection-stage__info{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:flex-start;}
       .collection-stage__identity{display:flex;flex-direction:column;gap:6px;}
       .collection-stage__name{margin:0;font-size:26px;letter-spacing:.06em;}
       .collection-stage__tags{display:flex;gap:10px;flex-wrap:wrap;}
       .collection-stage__tag{padding:6px 12px;border-radius:999px;border:1px solid rgba(125,211,252,.28);background:rgba(12,22,32,.78);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#aee4ff;}
-      .collection-stage__cost{padding:8px 16px;border-radius:999px;background:rgba(36,18,12,.82);color:#ffd9a1;font-size:13px;letter-spacing:.14em;text-transform:uppercase;border:1px solid rgba(255,184,108,.32);}
       .collection-stage__status{margin:0;color:#9cbcd9;font-size:14px;line-height:1.6;}
       .collection-tabs{border-radius:24px;border:1px solid rgba(125,211,252,.2);background:rgba(12,20,28,.9);padding:20px;display:flex;flex-direction:column;gap:12px;}
       .collection-tabs__title{margin:0 0 8px;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
@@ -20079,7 +20078,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
         .collection-roster__entry{padding:9px 11px;gap:9px;}
         .collection-roster__avatar{width:44px;height:44px;border-radius:12px;}
         .collection-roster__avatar img{width:52px;height:52px;}
-        .collection-roster__cost{font-size:10px;padding:4px 8px;}
+        .collection-roster__cost{top:-4px;right:-4px;min-width:24px;height:24px;font-size:13px;padding:0 5px;}
         .collection-skill-overlay__abilities{gap:10px;}
         .collection-skill-card{padding:8px 12px;gap:8px;flex-wrap:wrap;align-items:flex-start;}
         .collection-skill-card__header{flex-wrap:wrap;gap:8px;}
@@ -20296,7 +20295,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           const cost = document.createElement('span');
           cost.className = 'collection-roster__cost';
           const costValue = Number.isFinite(unit.cost) ? unit.cost : '—';
-          cost.textContent = `Cost ${costValue}`;
+          cost.textContent = toSafeText(costValue);
           const tooltipParts = [unit.name || unitId];
           if (displayRank) {
               tooltipParts.push(`Rank ${displayRank}`);
@@ -20306,8 +20305,8 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           }
           button.title = tooltipParts.join(' • ');
           button.setAttribute('aria-label', tooltipParts.join(' • '));
+          avatar.appendChild(cost);
           button.appendChild(avatar);
-          button.appendChild(cost);
           item.appendChild(button);
           rosterList.appendChild(item);
           rosterEntries.set(unitId, { button, costEl: cost, avatar, meta: unit, rarity: normalizedRank });
@@ -20341,13 +20340,9 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       stageName.textContent = 'Chưa chọn nhân vật';
       const stageTags = document.createElement('div');
       stageTags.className = 'collection-stage__tags';
-      const stageCost = document.createElement('div');
-      stageCost.className = 'collection-stage__cost';
-      stageCost.textContent = 'Cost —';
       identity.appendChild(stageName);
       identity.appendChild(stageTags);
       stageInfo.appendChild(identity);
-      stageInfo.appendChild(stageCost);
       const stageArt = document.createElement('div');
       stageArt.className = 'collection-stage__art';
       const stageSprite = document.createElement('img');
@@ -20820,8 +20815,6 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
               stageTagsFragment.appendChild(classTag);
           }
           stageTags.replaceChildren(stageTagsFragment);
-          const costValue = unit && Number.isFinite(unit.cost) ? unit.cost : '—';
-          stageCost.textContent = `Cost ${toSafeText(costValue)}`;
           const art = getUnitArt(unitId);
           if (art?.sprite?.src) {
               stageSprite.src = art.sprite.src;
