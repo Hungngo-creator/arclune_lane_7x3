@@ -58,11 +58,31 @@ const resolveTargets = (targets: UnitToken[] | undefined, target: UnitToken | nu
   return [];
 };
 
-const sortByBoardOrder = (tokens: UnitToken[]): UnitToken[] => (
-  [...tokens].sort((a, b) => (a.cy - b.cy) || (a.cx - b.cx))
-);
-
 const EMPTY_TOKENS: UnitToken[] = [];
+
+function splitAliveTokensBySide(
+  tokens: ReadonlyArray<UnitToken>,
+  attacker: UnitToken | null,
+): { allyTokens: UnitToken[]; enemyTokens: UnitToken[] } {
+  if (!attacker) {
+    return {
+      allyTokens: EMPTY_TOKENS,
+      enemyTokens: EMPTY_TOKENS,
+    };
+  }
+
+  const allyTokens: UnitToken[] = [];
+  const enemyTokens: UnitToken[] = [];
+  for (const token of tokens) {
+    if (!token?.alive) continue;
+    if (token.side === attacker.side) allyTokens.push(token);
+    else enemyTokens.push(token);
+  }
+
+  allyTokens.sort((a, b) => (a.cy - b.cy) || (a.cx - b.cx));
+  enemyTokens.sort((a, b) => (a.cy - b.cy) || (a.cx - b.cx));
+  return { allyTokens, enemyTokens };
+}
 
 const collectSideTokens = (ctx: Pick<NormalizedContext, 'attacker' | 'allyTokens' | 'enemyTokens'>, side: Side): UnitToken[] => {
   if (!ctx.attacker) return EMPTY_TOKENS;
@@ -228,15 +248,9 @@ export function dispatchGameplayTags(
   const tags = normalizeTagList(rawTags);
   const target = context.target ?? null;
   const attacker = context.attacker ?? null;
-  const sortedAliveTokens = context.game
-    ? sortByBoardOrder(context.game.tokens.filter((token) => token.alive))
-    : EMPTY_TOKENS;
-  const allyTokens = attacker
-    ? sortedAliveTokens.filter((token) => token.side === attacker.side)
-    : EMPTY_TOKENS;
-  const enemyTokens = attacker
-    ? sortedAliveTokens.filter((token) => token.side !== attacker.side)
-    : EMPTY_TOKENS;
+  const { allyTokens, enemyTokens } = context.game
+    ? splitAliveTokensBySide(context.game.tokens, attacker)
+    : { allyTokens: EMPTY_TOKENS, enemyTokens: EMPTY_TOKENS };
 
   const ctx: NormalizedContext = {
     game: context.game ?? null,

@@ -4923,7 +4923,11 @@ __define('./combat/perform-active-skill.ts', (exports, module, __require) => {
       });
   }
   function firstOpenSlot(game, side) {
-      const alive = game.tokens.filter((token) => token.alive);
+      const alive = [];
+      for (const token of game.tokens) {
+          if (token.alive)
+              alive.push(token);
+      }
       for (let slot = 1; slot <= 9; slot += 1) {
           const { cx, cy } = slotToCell(side, slot);
           if (!cellReserved(alive, game.queued, cx, cy))
@@ -4937,9 +4941,11 @@ __define('./combat/perform-active-skill.ts', (exports, module, __require) => {
           return { ok: false, skillKey, skill: null, tags: [], appliedTags: [], targetCount: 0, reason: 'missing-skill' };
       }
       const tags = normalizeTagList(skill.tags ?? []);
+      const tagSet = new Set(tags);
+      const hasTag = (tag) => tagSet.has(tag);
       const payload = resolvePayload(skill);
       const skillCost = Math.max(0, Math.round(readNumberish(skill.cost?.aether, 0)));
-      if (skillCost > 0 && tags.includes('aether-cost') && globalAetherPool.current(caster.side) < skillCost) {
+      if (skillCost > 0 && hasTag('aether-cost') && globalAetherPool.current(caster.side) < skillCost) {
           return {
               ok: false,
               skillKey,
@@ -4970,7 +4976,7 @@ __define('./combat/perform-active-skill.ts', (exports, module, __require) => {
           },
           onSummon: () => undefined,
       });
-      if (skillCost > 0 && tags.includes('aether-cost') && !consumedAether) {
+      if (skillCost > 0 && hasTag('aether-cost') && !consumedAether) {
           return {
               ok: false,
               skillKey,
@@ -4981,9 +4987,9 @@ __define('./combat/perform-active-skill.ts', (exports, module, __require) => {
               reason: 'insufficient-aether',
           };
       }
-      const targets = dispatch.targets.length > 0 ? dispatch.targets : (dispatch.targets.length === 0 && caster.alive ? [caster] : []);
+      const targets = dispatch.targets.length > 0 ? dispatch.targets : (caster.alive ? [caster] : []);
       const turns = Math.max(1, Math.round(readNumberish(payload.turns ?? payload.duration, 1)));
-      if (tags.includes('summon')) {
+      if (hasTag('summon')) {
           const openSlot = firstOpenSlot(game, caster.side);
           if (openSlot) {
               const summon = (payload.summon ?? skill.summon ?? {});
@@ -5000,40 +5006,40 @@ __define('./combat/perform-active-skill.ts', (exports, module, __require) => {
               });
           }
       }
-      if (tags.includes('heal')) {
+      if (hasTag('heal')) {
           const amount = Math.max(0, Math.round(readNumberish(payload.healAmount ?? payload.heal, 0)));
           for (const target of targets)
               healUnit(target, amount);
       }
-      if (tags.includes('team-heal')) {
+      if (hasTag('team-heal')) {
           const amount = Math.max(0, Math.round(readNumberish(payload.healAmount ?? payload.heal, 0)));
           const allies = game.tokens.filter((token) => token.alive && token.side === caster.side);
           for (const ally of allies)
               healUnit(ally, amount);
       }
-      if (tags.includes('shield')) {
+      if (hasTag('shield')) {
           const amount = Math.max(0, Math.round(readNumberish(payload.shieldAmount ?? payload.shield, 0)));
           for (const target of targets)
               grantShield(target, amount);
       }
-      if (tags.includes('silence')) {
+      if (hasTag('silence')) {
           for (const target of targets)
               addTaggedStatus(target, 'silence', turns);
       }
-      if (tags.includes('sleep')) {
+      if (hasTag('sleep')) {
           for (const target of targets)
               addTaggedStatus(target, 'sleep', turns);
       }
-      if (tags.includes('mark')) {
+      if (hasTag('mark')) {
           for (const target of targets)
               addTaggedStatus(target, 'mark', turns);
       }
-      if (tags.includes('control')) {
+      if (hasTag('control')) {
           const statusId = typeof payload.controlStatus === 'string' ? payload.controlStatus : 'control';
           for (const target of targets)
               addTaggedStatus(target, statusId, turns);
       }
-      if (tags.includes('single-target') || tags.includes('multi-target') || tags.includes('aoe') || tags.includes('non-heal-hp-change') || skill.damage) {
+      if (hasTag('single-target') || hasTag('multi-target') || hasTag('aoe') || hasTag('non-heal-hp-change') || skill.damage) {
           const multiplier = Math.max(0, readNumberish(skill.damage?.multiplier ?? skill.damageMultiplier ?? 1, 1));
           const base = Math.max(1, Math.round(((caster.atk ?? 0) + (caster.wil ?? 0)) * multiplier));
           for (const target of targets) {
@@ -5077,8 +5083,28 @@ __define('./combat/tag-dispatch.ts', (exports, module, __require) => {
           return [target];
       return [];
   };
-  const sortByBoardOrder = (tokens) => ([...tokens].sort((a, b) => (a.cy - b.cy) || (a.cx - b.cx)));
   const EMPTY_TOKENS = [];
+  function splitAliveTokensBySide(tokens, attacker) {
+      if (!attacker) {
+          return {
+              allyTokens: EMPTY_TOKENS,
+              enemyTokens: EMPTY_TOKENS,
+          };
+      }
+      const allyTokens = [];
+      const enemyTokens = [];
+      for (const token of tokens) {
+          if (!token?.alive)
+              continue;
+          if (token.side === attacker.side)
+              allyTokens.push(token);
+          else
+              enemyTokens.push(token);
+      }
+      allyTokens.sort((a, b) => (a.cy - b.cy) || (a.cx - b.cx));
+      enemyTokens.sort((a, b) => (a.cy - b.cy) || (a.cx - b.cx));
+      return { allyTokens, enemyTokens };
+  }
   const collectSideTokens = (ctx, side) => {
       if (!ctx.attacker)
           return EMPTY_TOKENS;
@@ -5277,15 +5303,9 @@ __define('./combat/tag-dispatch.ts', (exports, module, __require) => {
       const tags = normalizeTagList(rawTags);
       const target = context.target ?? null;
       const attacker = context.attacker ?? null;
-      const sortedAliveTokens = context.game
-          ? sortByBoardOrder(context.game.tokens.filter((token) => token.alive))
-          : EMPTY_TOKENS;
-      const allyTokens = attacker
-          ? sortedAliveTokens.filter((token) => token.side === attacker.side)
-          : EMPTY_TOKENS;
-      const enemyTokens = attacker
-          ? sortedAliveTokens.filter((token) => token.side !== attacker.side)
-          : EMPTY_TOKENS;
+      const { allyTokens, enemyTokens } = context.game
+          ? splitAliveTokensBySide(context.game.tokens, attacker)
+          : { allyTokens: EMPTY_TOKENS, enemyTokens: EMPTY_TOKENS };
       const ctx = {
           game: context.game ?? null,
           attacker,

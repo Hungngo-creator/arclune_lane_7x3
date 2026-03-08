@@ -57,7 +57,10 @@ function addTaggedStatus(target: UnitToken, id: string, turns: number): void {
 }
 
 function firstOpenSlot(game: SessionState, side: UnitToken['side']): number | null {
-  const alive = game.tokens.filter((token) => token.alive);
+  const alive: UnitToken[] = [];
+  for (const token of game.tokens) {
+    if (token.alive) alive.push(token);
+  }
   for (let slot = 1; slot <= 9; slot += 1) {
     const { cx, cy } = slotToCell(side, slot);
     if (!cellReserved(alive, game.queued, cx, cy)) return slot;
@@ -72,9 +75,11 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
   }
 
   const tags = normalizeTagList(skill.tags ?? []);
+  const tagSet = new Set(tags);
+  const hasTag = (tag: string): boolean => tagSet.has(tag);
   const payload = resolvePayload(skill);
   const skillCost = Math.max(0, Math.round(readNumberish(skill.cost?.aether, 0)));
-  if (skillCost > 0 && tags.includes('aether-cost') && globalAetherPool.current(caster.side) < skillCost) {
+  if (skillCost > 0 && hasTag('aether-cost') && globalAetherPool.current(caster.side) < skillCost) {
     return {
       ok: false,
       skillKey,
@@ -108,7 +113,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     onSummon: () => undefined,
   });
 
-  if (skillCost > 0 && tags.includes('aether-cost') && !consumedAether) {
+  if (skillCost > 0 && hasTag('aether-cost') && !consumedAether) {
     return {
       ok: false,
       skillKey,
@@ -120,10 +125,10 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     };
   }
 
-  const targets = dispatch.targets.length > 0 ? dispatch.targets : (dispatch.targets.length === 0 && caster.alive ? [caster] : []);
+  const targets = dispatch.targets.length > 0 ? dispatch.targets : (caster.alive ? [caster] : []);
   const turns = Math.max(1, Math.round(readNumberish(payload.turns ?? payload.duration, 1)));
 
-  if (tags.includes('summon')) {
+  if (hasTag('summon')) {
     const openSlot = firstOpenSlot(game, caster.side);
     if (openSlot) {
       const summon = (payload.summon ?? skill.summon ?? {}) as Record<string, unknown>;
@@ -141,37 +146,37 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     }
   }
 
-  if (tags.includes('heal')) {
+  if (hasTag('heal')) {
     const amount = Math.max(0, Math.round(readNumberish(payload.healAmount ?? payload.heal, 0)));
     for (const target of targets) healUnit(target, amount);
   }
 
-  if (tags.includes('team-heal')) {
+  if (hasTag('team-heal')) {
     const amount = Math.max(0, Math.round(readNumberish(payload.healAmount ?? payload.heal, 0)));
     const allies = game.tokens.filter((token) => token.alive && token.side === caster.side);
     for (const ally of allies) healUnit(ally, amount);
   }
 
-  if (tags.includes('shield')) {
+  if (hasTag('shield')) {
     const amount = Math.max(0, Math.round(readNumberish(payload.shieldAmount ?? payload.shield, 0)));
     for (const target of targets) grantShield(target, amount);
   }
 
-  if (tags.includes('silence')) {
+  if (hasTag('silence')) {
     for (const target of targets) addTaggedStatus(target, 'silence', turns);
   }
-  if (tags.includes('sleep')) {
+  if (hasTag('sleep')) {
     for (const target of targets) addTaggedStatus(target, 'sleep', turns);
   }
-  if (tags.includes('mark')) {
+  if (hasTag('mark')) {
     for (const target of targets) addTaggedStatus(target, 'mark', turns);
   }
-  if (tags.includes('control')) {
+  if (hasTag('control')) {
     const statusId = typeof payload.controlStatus === 'string' ? payload.controlStatus : 'control';
     for (const target of targets) addTaggedStatus(target, statusId, turns);
   }
 
-  if (tags.includes('single-target') || tags.includes('multi-target') || tags.includes('aoe') || tags.includes('non-heal-hp-change') || skill.damage) {
+  if (hasTag('single-target') || hasTag('multi-target') || hasTag('aoe') || hasTag('non-heal-hp-change') || skill.damage) {
     const multiplier = Math.max(0, readNumberish((skill.damage as Record<string, unknown> | undefined)?.multiplier ?? skill.damageMultiplier ?? 1, 1));
     const base = Math.max(1, Math.round(((caster.atk ?? 0) + (caster.wil ?? 0)) * multiplier));
     for (const target of targets) {
