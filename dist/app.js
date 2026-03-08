@@ -12512,14 +12512,14 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
   function sampleLineup(lineup, progressById) {
       const rankCounts = new Map();
       const rankByUnitId = new Map();
+      const classByUnitId = new Map();
       const progressProfiles = [];
       let totalRanked = 0;
       for (const entry of lineup) {
           const directRank = normalizeRank(entry.rank);
-          const fallbackRank = rankByUnitId.has(entry.id)
-              ? rankByUnitId.get(entry.id) ?? null
-              : normalizeRank(lookupUnit(entry.id)?.rank);
+          let fallbackRank = rankByUnitId.get(entry.id) ?? null;
           if (!rankByUnitId.has(entry.id)) {
+              fallbackRank = normalizeRank(lookupUnit(entry.id)?.rank);
               rankByUnitId.set(entry.id, fallbackRank);
           }
           const rank = directRank ?? fallbackRank;
@@ -12530,11 +12530,16 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
           const progress = progressById.get(entry.id);
           if (!progress)
               continue;
+          let className = classByUnitId.get(entry.id) ?? null;
+          if (!classByUnitId.has(entry.id)) {
+              className = normalizeClassName(entry.class);
+              classByUnitId.set(entry.id, className);
+          }
           progressProfiles.push({
               level: typeof progress.level === 'number' ? progress.level : undefined,
               realm: typeof progress.realm === 'number' ? progress.realm : undefined,
               subRealm: typeof progress.subRealm === 'number' ? progress.subRealm : undefined,
-              className: normalizeClassName(entry.class) ?? undefined,
+              className: className ?? undefined,
           });
       }
       return { rankCounts, totalRanked, progressProfiles };
