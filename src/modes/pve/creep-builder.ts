@@ -25,6 +25,12 @@ type CreepUnitBase = {
   cost: number;
 };
 
+type RankAllocation = {
+  rank: string;
+  base: number;
+  remainder: number;
+};
+
 const CREEP_SLOT_ORDER = [
   { id: 'creep_1', powerSlot: 2 },
   { id: 'creep_2', powerSlot: 1 },
@@ -93,6 +99,29 @@ function compareRankDesc(left: string, right: string): number {
   return left.localeCompare(right);
 }
 
+function pickHighestRank(ranks: ReadonlyArray<string>): string | null {
+  let highest: string | null = null;
+  for (const rank of ranks) {
+    if (!highest || compareRankDesc(rank, highest) < 0) highest = rank;
+  }
+  return highest;
+}
+
+function pickDonorBucket(buckets: ReadonlyArray<RankAllocation>, highestRank: string): RankAllocation | null {
+  let donor: RankAllocation | null = null;
+  for (const bucket of buckets) {
+    if (bucket.rank === highestRank || bucket.base <= 0) continue;
+    if (!donor) {
+      donor = bucket;
+      continue;
+    }
+    if (bucket.base > donor.base || (bucket.base === donor.base && compareRankDesc(donor.rank, bucket.rank) < 0)) {
+      donor = bucket;
+    }
+  }
+  return donor;
+}
+
 function allocateRanksForCreeps(rankStats: Pick<LineupSampling, 'rankCounts' | 'totalRanked'>, creepCount: number): string[] {
   const entries = Array.from(rankStats.rankCounts.entries());
   if (!entries.length || rankStats.totalRanked <= 0) return [];
@@ -114,35 +143,15 @@ function allocateRanksForCreeps(rankStats: Pick<LineupSampling, 'rankCounts' | '
     assigned += 1;
   }
 
-  let highestRank: string | null = null;
-  for (const [rank] of entries) {
-    if (highestRank == null || compareRankDesc(rank, highestRank) < 0) {
-      highestRank = rank;
-    }
-  }
+  const highestRank = pickHighestRank(entries.map(([rank]) => rank));
+  const highestBucket = highestRank
+    ? provisional.find((entry) => entry.rank === highestRank) ?? null
+    : null;
+  const donor = highestRank ? pickDonorBucket(provisional, highestRank) : null;
 
-  if (highestRank) {
-    let highestBucket: (typeof provisional)[number] | null = null;
-    let donor: (typeof provisional)[number] | null = null;
-    for (const entry of provisional) {
-      if (entry.rank === highestRank) {
-        highestBucket = entry;
-        continue;
-      }
-      if (entry.base <= 0) continue;
-      if (!donor) {
-        donor = entry;
-        continue;
-      }
-    if (entry.base > donor.base || (entry.base === donor.base && compareRankDesc(donor.rank, entry.rank) < 0)) {
-        donor = entry;
-      }
-    }
-
-    if (highestBucket && highestBucket.base <= 0 && donor) {
-      donor.base -= 1;
-      highestBucket.base += 1;
-    }
+  if (highestBucket && highestBucket.base <= 0 && donor) {
+    donor.base -= 1;
+    highestBucket.base += 1;
   }
 
   const ranked: string[] = [];
@@ -212,11 +221,7 @@ export function buildAICreepDeckFromLineup(params: {
   const creepCount = CREEP_SLOT_ORDER.length;
   const progressById = params.progressById ?? mapUnitProgressById(params.collectionState ?? null);
   const lineupSampling = sampleLineup(lineup, progressById);
-  const rankStats = {
-    rankCounts: lineupSampling.rankCounts,
-    totalRanked: lineupSampling.totalRanked,
-  };
-  const allocatedRanks = allocateRanksForCreeps(rankStats, creepCount);
+  const allocatedRanks = allocateRanksForCreeps(lineupSampling, creepCount);
   const allocatedProgress = allocateProgressForCreeps(lineupSampling.progressProfiles, creepCount);
 
   return CREEP_SLOT_ORDER.map((creep) => {
