@@ -40,6 +40,26 @@ interface SpawnResult {
 }
 
 type TurnOrderSide = Side | 'ALLY' | 'ENEMY';
+type ActiveUnitIndex = Map<string, UnitToken>;
+
+const toActiveUnitKey = (side: Side, slot: number): string => `${side}:${slot}`;
+
+const createActiveUnitIndex = (Game: SessionState): ActiveUnitIndex => {
+  const index: ActiveUnitIndex = new Map();
+  const tokens = Array.isArray(Game.tokens) ? Game.tokens : [];
+  for (let i = 0; i < tokens.length; i += 1) {
+    const token = tokens[i];
+    if (!token || !token.alive) continue;
+    if (token.side !== 'ally' && token.side !== 'enemy') continue;
+    const slot = slotIndex(token.side, token.cx, token.cy);
+    if (!Number.isFinite(slot)) continue;
+    const key = toActiveUnitKey(token.side, slot);
+    if (!index.has(key)) {
+      index.set(key, token);
+    }
+  }
+  return index;
+};
 
 const toLowerSide = (side: TurnOrderSide): Side => {
   if (side === 'ALLY') return 'ally';
@@ -178,9 +198,13 @@ function applyTurnRegen(
 export function getActiveAt(
   Game: SessionState,
   side: TurnOrderSide,
-  slot: number
+  slot: number,
+  activeUnitIndex?: ActiveUnitIndex
 ): UnitToken | undefined {
   const normalizedSide = toLowerSide(side);
+  if (activeUnitIndex) {
+    return activeUnitIndex.get(toActiveUnitKey(normalizedSide, slot));
+  }
   const { cx, cy } = slotToCell(normalizedSide, slot);
   const tokens = Array.isArray(Game.tokens) ? Game.tokens : [];
   for (let i = 0; i < tokens.length; i += 1){
@@ -212,7 +236,8 @@ export function predictSpawnCycle(Game: SessionState, side: TurnOrderSide, slot:
 export function spawnQueuedIfDue(
   Game: SessionState,
   entry: QueuedSummonEntry | { side: TurnOrderSide; slot: number } | null | undefined,
-  hooks?: Pick<TurnHooks, 'allocIid' | 'performUlt'>
+  hooks?: Pick<TurnHooks, 'allocIid' | 'performUlt'>,
+  activeUnitIndex?: ActiveUnitIndex
 ): SpawnResult {
   const { allocIid, performUlt } = hooks ?? {};
   if (!entry) return { actor: null, spawned: false };
@@ -220,7 +245,7 @@ export function spawnQueuedIfDue(
   const sideLower = toLowerSide(entry.side);
   const queueMap = sideLower === 'ally' ? Game.queued?.ally : Game.queued?.enemy;
   const resolveCurrentActor = (): SpawnResult => {
-    const active = getActiveAt(Game, sideLower, slot);
+    const active = getActiveAt(Game, sideLower, slot, activeUnitIndex);
     return { actor: active || null, spawned: false };
   };
   const p = queueMap?.get(slot);
@@ -307,7 +332,10 @@ export function spawnQueuedIfDue(
       } catch (_) {}
     }
   }
-  const actor = getActiveAt(Game, sideLower, slot);
+  const actor = getActiveAt(Game, sideLower, slot, activeUnitIndex);
+  if (actor && activeUnitIndex) {
+    activeUnitIndex.set(toActiveUnitKey(sideLower, slot), actor);
+  }
   const isLeader = actor?.id === 'leaderA' || actor?.id === 'leaderB';
   const canAutoUlt = fromDeck && !isLeader && actor && actor.alive && typeof performUlt === 'function';
   if (canAutoUlt && !Statuses.blocks(actor, 'ult')){
@@ -460,11 +488,12 @@ const resolveTurnActor = (
   side: Side,
   slot: number,
   actor: UnitToken | null | undefined,
-  fallback?: UnitToken | null | undefined
+  fallback?: UnitToken | null | undefined,
+  activeUnitIndex?: ActiveUnitIndex
 ): UnitToken | null => {
   if (actor?.alive) return actor;
   if (fallback?.alive) return fallback;
-  return getActiveAt(Game, side, slot) ?? null;
+  return getActiveAt(Game, side, slot, activeUnitIndex) ?? null;
 };
 
 const runTurnAndCheckEnd = (
@@ -744,6 +773,7 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
   if (Game.battle?.over) return;
 
   const interleavedTurn = asInterleavedTurn(turn);
+  const activeUnitIndex = createActiveUnitIndex(Game);
   if (interleavedTurn){
     let selection: InterleavedState | null = nextTurnInterleaved(Game, interleavedTurn);
     if (!selection) return;
@@ -755,7 +785,7 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
         return;
       }
       const spawnEntry: QueuedSummonEntry = { side: selection.side, slot: selection.pos };
-      const spawnResult = spawnQueuedIfDue(Game, spawnEntry, hooks);
+      const spawnResult = spawnQueuedIfDue(Game, spawnEntry, hooks, activeUnitIndex);
       if (!spawnResult.spawned){
         return;
       }
@@ -765,8 +795,8 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
     if (!selection) return;
 
     const entry: QueuedSummonEntry = { side: selection.side, slot: selection.pos };
-    const { actor, spawned } = spawnQueuedIfDue(Game, entry, hooks);
-    const active = resolveTurnActor(Game, entry.side, entry.slot, actor, selection.unit);
+    const { actor, spawned } = spawnQueuedIfDue(Game, entry, hooks, activeUnitIndex);
+    const active = resolveTurnActor(Game, entry.side, entry.slot, actor, selection.unit, activeUnitIndex);
 
     if (!active || !active.alive){
       return;
@@ -849,9 +879,9 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
       cycle
     };
 
-    const { actor, spawned } = spawnQueuedIfDue(Game, entry, hooks);
+    const { actor, spawned } = spawnQueuedIfDue(Game, entry, hooks, activeUnitIndex);
 
-    const active = resolveTurnActor(Game, entry.side, entry.slot, actor);
+    const active = resolveTurnActor(Game, entry.side, entry.slot, actor, undefined, activeUnitIndex);
     const hasActive = !!(active && active.alive);
 
     if (!hasActive){

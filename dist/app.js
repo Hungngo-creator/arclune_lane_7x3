@@ -26459,6 +26459,26 @@ __define('./turns.ts', (exports, module, __require) => {
   const isLeaderUltReady = __dep19.isLeaderUltReady;
   const isUyenLeader = __dep19.isUyenLeader;
   const grantUyenSummonRage = __dep19.grantUyenSummonRage;
+  const toActiveUnitKey = (side, slot) => `${side}:${slot}`;
+  const createActiveUnitIndex = (Game) => {
+      const index = new Map();
+      const tokens = Array.isArray(Game.tokens) ? Game.tokens : [];
+      for (let i = 0; i < tokens.length; i += 1) {
+          const token = tokens[i];
+          if (!token || !token.alive)
+              continue;
+          if (token.side !== 'ally' && token.side !== 'enemy')
+              continue;
+          const slot = slotIndex(token.side, token.cx, token.cy);
+          if (!Number.isFinite(slot))
+              continue;
+          const key = toActiveUnitKey(token.side, slot);
+          if (!index.has(key)) {
+              index.set(key, token);
+          }
+      }
+      return index;
+  };
   const toLowerSide = (side) => {
       if (side === 'ALLY')
           return 'ally';
@@ -26565,8 +26585,11 @@ __define('./turns.ts', (exports, module, __require) => {
       return { hpDelta, aeDelta };
   }
   // --- Active/Spawn helpers (từ main.js) ---
-  function getActiveAt(Game, side, slot) {
+  function getActiveAt(Game, side, slot, activeUnitIndex) {
       const normalizedSide = toLowerSide(side);
+      if (activeUnitIndex) {
+          return activeUnitIndex.get(toActiveUnitKey(normalizedSide, slot));
+      }
       const { cx, cy } = slotToCell(normalizedSide, slot);
       const tokens = Array.isArray(Game.tokens) ? Game.tokens : [];
       for (let i = 0; i < tokens.length; i += 1) {
@@ -26594,7 +26617,7 @@ __define('./turns.ts', (exports, module, __require) => {
   function predictSpawnCycle(Game, side, slot) {
       return predictSpawnCycleByTurnOrder(Game, toLowerSide(side), slot);
   }
-  function spawnQueuedIfDue(Game, entry, hooks) {
+  function spawnQueuedIfDue(Game, entry, hooks, activeUnitIndex) {
       const { allocIid, performUlt } = hooks ?? {};
       if (!entry)
           return { actor: null, spawned: false };
@@ -26602,7 +26625,7 @@ __define('./turns.ts', (exports, module, __require) => {
       const sideLower = toLowerSide(entry.side);
       const queueMap = sideLower === 'ally' ? Game.queued?.ally : Game.queued?.enemy;
       const resolveCurrentActor = () => {
-          const active = getActiveAt(Game, sideLower, slot);
+          const active = getActiveAt(Game, sideLower, slot, activeUnitIndex);
           return { actor: active || null, spawned: false };
       };
       const p = queueMap?.get(slot);
@@ -26687,7 +26710,10 @@ __define('./turns.ts', (exports, module, __require) => {
               catch (_) { }
           }
       }
-      const actor = getActiveAt(Game, sideLower, slot);
+      const actor = getActiveAt(Game, sideLower, slot, activeUnitIndex);
+      if (actor && activeUnitIndex) {
+          activeUnitIndex.set(toActiveUnitKey(sideLower, slot), actor);
+      }
       const isLeader = actor?.id === 'leaderA' || actor?.id === 'leaderB';
       const canAutoUlt = fromDeck && !isLeader && actor && actor.alive && typeof performUlt === 'function';
       if (canAutoUlt && !Statuses.blocks(actor, 'ult')) {
@@ -26800,12 +26826,12 @@ __define('./turns.ts', (exports, module, __require) => {
       grantActionAether(Game, active, !!actionOutcome?.acted);
       return consumedTurnFromOutcome(actionOutcome, hasActionHook);
   };
-  const resolveTurnActor = (Game, side, slot, actor, fallback) => {
+  const resolveTurnActor = (Game, side, slot, actor, fallback, activeUnitIndex) => {
       if (actor?.alive)
           return actor;
       if (fallback?.alive)
           return fallback;
-      return getActiveAt(Game, side, slot) ?? null;
+      return getActiveAt(Game, side, slot, activeUnitIndex) ?? null;
   };
   const runTurnAndCheckEnd = (Game, hooks, entry, active, turnContext, turnDetail, trigger) => {
       emitGameEvent(TURN_START, turnDetail);
@@ -27037,6 +27063,7 @@ __define('./turns.ts', (exports, module, __require) => {
       if (Game.battle?.over)
           return;
       const interleavedTurn = asInterleavedTurn(turn);
+      const activeUnitIndex = createActiveUnitIndex(Game);
       if (interleavedTurn) {
           let selection = nextTurnInterleaved(Game, interleavedTurn);
           if (!selection)
@@ -27048,7 +27075,7 @@ __define('./turns.ts', (exports, module, __require) => {
                   return;
               }
               const spawnEntry = { side: selection.side, slot: selection.pos };
-              const spawnResult = spawnQueuedIfDue(Game, spawnEntry, hooks);
+              const spawnResult = spawnQueuedIfDue(Game, spawnEntry, hooks, activeUnitIndex);
               if (!spawnResult.spawned) {
                   return;
               }
@@ -27059,8 +27086,8 @@ __define('./turns.ts', (exports, module, __require) => {
           if (!selection)
               return;
           const entry = { side: selection.side, slot: selection.pos };
-          const { actor, spawned } = spawnQueuedIfDue(Game, entry, hooks);
-          const active = resolveTurnActor(Game, entry.side, entry.slot, actor, selection.unit);
+          const { actor, spawned } = spawnQueuedIfDue(Game, entry, hooks, activeUnitIndex);
+          const active = resolveTurnActor(Game, entry.side, entry.slot, actor, selection.unit, activeUnitIndex);
           if (!active || !active.alive) {
               return;
           }
@@ -27128,8 +27155,8 @@ __define('./turns.ts', (exports, module, __require) => {
               orderLength,
               cycle
           };
-          const { actor, spawned } = spawnQueuedIfDue(Game, entry, hooks);
-          const active = resolveTurnActor(Game, entry.side, entry.slot, actor);
+          const { actor, spawned } = spawnQueuedIfDue(Game, entry, hooks, activeUnitIndex);
+          const active = resolveTurnActor(Game, entry.side, entry.slot, actor, undefined, activeUnitIndex);
           const hasActive = !!(active && active.alive);
           if (!hasActive) {
               advanceCursor();
