@@ -545,7 +545,9 @@ const getLockedDeckIdSet = (lockedDeck: ReadonlyArray<DeckEntry>): ReadonlySet<s
   }
   const ids = new Set<string>();
   for (let i = 0; i < lockedDeck.length; i += 1) {
-    ids.add(lockedDeck[i].id);
+    const entry = lockedDeck[i];
+    if (!entry?.id) continue;
+    ids.add(entry.id);
   }
   lockedDeckCache = {
     deckRef: lockedDeck,
@@ -940,10 +942,22 @@ const syncMeleeOffsetTokens = (
   return offsets;
 };
 
-const renderSummonBar = (): void => {
+let summonBarRenderPending = false;
+const flushSummonBarRender = (): void => {
+  summonBarRenderPending = false;
   const game = getInitializedGame();
   const bar = game?.ui?.bar ?? null;
   if (bar?.render) bar.render();
+};
+
+const renderSummonBar = (): void => {
+  if (summonBarRenderPending) return;
+  summonBarRenderPending = true;
+  if (typeof queueMicrotask === 'function'){
+    queueMicrotask(flushSummonBarRender);
+    return;
+  }
+  Promise.resolve().then(flushSummonBarRender);
 };
 
 function cleanupSummonBar(): void {

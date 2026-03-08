@@ -265,10 +265,7 @@ function getNameInitials(name: string): string{
 
 function renderAvatar(container: HTMLElement, avatarUrl: string | null, name: string): void{
   const auraOverlay = container.querySelector<HTMLElement>(':scope > .rarity-aura');
-  if (auraOverlay){
-    container.removeChild(auraOverlay);
-  }
-  container.innerHTML = '';
+  container.replaceChildren();
   if (avatarUrl){
     const img = document.createElement('img');
     img.src = avatarUrl;
@@ -522,17 +519,35 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   cellDetails.className = 'lineup-grid__details is-empty';
   gridContent.appendChild(cellDetails);
 
-  function syncGridDetailsHeight(): void{
+  let syncGridDetailsHandle: number | null = null;
+  let lastGridDetailsHeight = -1;
+
+  const computeGridDetailsHeight = (): void => {
+    syncGridDetailsHandle = null;
     if (!cellDetails || !leaderSection || typeof leaderSection.getBoundingClientRect !== 'function'){
       cellDetails.style.maxHeight = '';
+      lastGridDetailsHeight = -1;
       return;
     }
     const rect = leaderSection.getBoundingClientRect();
-    if (rect && Number.isFinite(rect.height)){
-      cellDetails.style.maxHeight = `${rect.height}px`;
-    } else {
+    if (!rect || !Number.isFinite(rect.height)){
       cellDetails.style.maxHeight = '';
+      lastGridDetailsHeight = -1;
+      return;
     }
+    const nextHeight = Math.max(0, Math.round(rect.height));
+    if (nextHeight === lastGridDetailsHeight){
+      return;
+    }
+    lastGridDetailsHeight = nextHeight;
+    cellDetails.style.maxHeight = `${nextHeight}px`;
+  };
+
+  function syncGridDetailsHeight(): void{
+    if (syncGridDetailsHandle !== null){
+      return;
+    }
+    syncGridDetailsHandle = window.requestAnimationFrame(computeGridDetailsHeight);
   }
   mainColumn.appendChild(gridSection);
 
@@ -1302,6 +1317,10 @@ const eventCleanup = bindLineupEvents({
 
   return {
     destroy(){
+      if (syncGridDetailsHandle !== null){
+        window.cancelAnimationFrame(syncGridDetailsHandle);
+        syncGridDetailsHandle = null;
+      }
       while (cleanup.length > 0){
         const fn = cleanup.pop();
         if (!fn) continue;

@@ -13134,7 +13134,10 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       }
       const ids = new Set();
       for (let i = 0; i < lockedDeck.length; i += 1) {
-          ids.add(lockedDeck[i].id);
+          const entry = lockedDeck[i];
+          if (!entry?.id)
+              continue;
+          ids.add(entry.id);
       }
       lockedDeckCache = {
           deckRef: lockedDeck,
@@ -13428,11 +13431,23 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       }
       return offsets;
   };
-  const renderSummonBar = () => {
+  let summonBarRenderPending = false;
+  const flushSummonBarRender = () => {
+      summonBarRenderPending = false;
       const game = getInitializedGame();
       const bar = game?.ui?.bar ?? null;
       if (bar?.render)
           bar.render();
+  };
+  const renderSummonBar = () => {
+      if (summonBarRenderPending)
+          return;
+      summonBarRenderPending = true;
+      if (typeof queueMicrotask === 'function') {
+          queueMicrotask(flushSummonBarRender);
+          return;
+      }
+      Promise.resolve().then(flushSummonBarRender);
   };
   function cleanupSummonBar() {
       if (summonBarHandle && typeof summonBarHandle.cleanup === 'function') {
@@ -19881,6 +19896,49 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       }
       return value;
   }
+  function parseJsonArrayFromDataset(value) {
+      if (!value)
+          return [];
+      try {
+          const parsed = JSON.parse(value);
+          if (!Array.isArray(parsed))
+              return [];
+          return parsed
+              .map((entry) => (typeof entry === 'string' ? entry.trim() : ''))
+              .filter((entry) => entry.length > 0);
+      }
+      catch {
+          return [];
+      }
+  }
+  function parseFactListFromDataset(value) {
+      if (!value)
+          return [];
+      try {
+          const parsed = JSON.parse(value);
+          if (!Array.isArray(parsed))
+              return [];
+          const normalizedFacts = [];
+          for (const entry of parsed) {
+              if (!entry || typeof entry !== 'object')
+                  continue;
+              const fact = entry;
+              const normalizedValue = toSafeText(fact.value ?? '');
+              if (!normalizedValue)
+                  continue;
+              normalizedFacts.push({
+                  icon: toSafeText(fact.icon ?? '') || null,
+                  label: toSafeText(fact.label ?? '') || null,
+                  value: normalizedValue,
+                  tooltip: toSafeText(fact.tooltip ?? '') || null,
+              });
+          }
+          return normalizedFacts;
+      }
+      catch {
+          return [];
+      }
+  }
   function ensureStyles() {
       const css = `
       .app--collection{padding:32px 16px 64px;}
@@ -20061,13 +20119,13 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       if (abilityId != null) {
           card.dataset.abilityId = String(abilityId);
       }
-      if (Array.isArray(entry?.notes)) {
-          const filteredNotes = entry.notes
+      const filteredNotes = Array.isArray(entry?.notes)
+          ? entry.notes
               .map(note => (typeof note === 'string' ? note.trim() : ''))
-              .filter(note => note.length > 0);
-          if (filteredNotes.length) {
-              card.dataset.notes = JSON.stringify(filteredNotes);
-          }
+              .filter(note => note.length > 0)
+          : [];
+      if (filteredNotes.length) {
+          card.dataset.notes = JSON.stringify(filteredNotes);
       }
       const facts = collectAbilityFacts(entry);
       if (facts.length) {
@@ -20447,7 +20505,8 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
               : card.dataset.description || 'Chưa có mô tả chi tiết.';
           detailDescription.textContent = toSafeText(description);
           clearChildren(detailFacts);
-          const facts = collectAbilityFacts(ability);
+          const factsFromCard = parseFactListFromDataset(card.dataset.meta);
+          const facts = factsFromCard.length ? factsFromCard : collectAbilityFacts(ability);
           if (facts.length) {
               for (const fact of facts) {
                   const item = document.createElement('div');
@@ -20478,18 +20537,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           }
           clearChildren(detailNotes);
           const rawNotes = Array.isArray(ability?.notes) ? ability.notes : [];
-          let cardNotes = [];
-          if (card.dataset.notes) {
-              try {
-                  const parsed = JSON.parse(card.dataset.notes);
-                  if (Array.isArray(parsed)) {
-                      cardNotes = parsed;
-                  }
-              }
-              catch (error) {
-                  // bỏ qua lỗi parse và tiếp tục với danh sách rỗng
-              }
-          }
+          const cardNotes = parseJsonArrayFromDataset(card.dataset.notes);
           const mergedNotes = [];
           const noteSet = new Set();
           for (const rawNote of [...rawNotes, ...cardNotes]) {
@@ -20932,6 +20980,7 @@ __define('./screens/gacha/view.ts', (exports, module, __require) => {
       let isRevealing = false;
       let cardsRenderSignature = '';
       let lastCardsRef = null;
+      const cardsPreparedCache = new WeakMap();
       const cleanupCallbacks = [];
       const addCleanup = (fn) => {
           if (typeof fn === 'function') {
@@ -20954,7 +21003,8 @@ __define('./screens/gacha/view.ts', (exports, module, __require) => {
               updateRevealButtonState();
               return;
           }
-          const prepared = prepareCards(cards);
+          const prepared = cardsPreparedCache.get(cards) ?? prepareCards(cards);
+          cardsPreparedCache.set(cards, prepared);
           const nextSignature = prepared.signature;
           if (nextSignature === cardsRenderSignature) {
               lastCardsRef = cards;
@@ -21791,10 +21841,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
   }
   function renderAvatar(container, avatarUrl, name) {
       const auraOverlay = container.querySelector(':scope > .rarity-aura');
-      if (auraOverlay) {
-          container.removeChild(auraOverlay);
-      }
-      container.innerHTML = '';
+      container.replaceChildren();
       if (avatarUrl) {
           const img = document.createElement('img');
           img.src = avatarUrl;
@@ -21994,18 +22041,33 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       const cellDetails = document.createElement('aside');
       cellDetails.className = 'lineup-grid__details is-empty';
       gridContent.appendChild(cellDetails);
-      function syncGridDetailsHeight() {
+      let syncGridDetailsHandle = null;
+      let lastGridDetailsHeight = -1;
+      const computeGridDetailsHeight = () => {
+          syncGridDetailsHandle = null;
           if (!cellDetails || !leaderSection || typeof leaderSection.getBoundingClientRect !== 'function') {
               cellDetails.style.maxHeight = '';
+              lastGridDetailsHeight = -1;
               return;
           }
           const rect = leaderSection.getBoundingClientRect();
-          if (rect && Number.isFinite(rect.height)) {
-              cellDetails.style.maxHeight = `${rect.height}px`;
-          }
-          else {
+          if (!rect || !Number.isFinite(rect.height)) {
               cellDetails.style.maxHeight = '';
+              lastGridDetailsHeight = -1;
+              return;
           }
+          const nextHeight = Math.max(0, Math.round(rect.height));
+          if (nextHeight === lastGridDetailsHeight) {
+              return;
+          }
+          lastGridDetailsHeight = nextHeight;
+          cellDetails.style.maxHeight = `${nextHeight}px`;
+      };
+      function syncGridDetailsHeight() {
+          if (syncGridDetailsHandle !== null) {
+              return;
+          }
+          syncGridDetailsHandle = window.requestAnimationFrame(computeGridDetailsHeight);
       }
       mainColumn.appendChild(gridSection);
       const rosterSection = document.createElement('section');
@@ -22727,6 +22789,10 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       cleanup.push(() => leaderOverlay.remove());
       return {
           destroy() {
+              if (syncGridDetailsHandle !== null) {
+                  window.cancelAnimationFrame(syncGridDetailsHandle);
+                  syncGridDetailsHandle = null;
+              }
               while (cleanup.length > 0) {
                   const fn = cleanup.pop();
                   if (!fn)
@@ -24308,21 +24374,24 @@ __define('./screens/sect/index.ts', (exports, module, __require) => {
       layout.className = 'sect-screen__layout';
       const left = document.createElement('aside');
       left.className = 'sect-screen__left';
-      const optionHandlers = [];
       SECT_OPTIONS.forEach((label, index) => {
           const option = document.createElement('button');
           option.type = 'button';
           option.className = 'sect-screen__hub-button';
           option.textContent = label;
-          const onSelect = () => {
-              if (index === 0) {
-                  shell?.enterScreen?.('sect-tactical-ai');
-              }
-          };
-          option.addEventListener('click', onSelect);
-          optionHandlers.push(() => option.removeEventListener('click', onSelect));
+          option.dataset.sectIndex = String(index);
           left.appendChild(option);
       });
+      const onSelectOption = (event) => {
+          const target = event.target;
+          const button = target?.closest('.sect-screen__hub-button');
+          if (!button)
+              return;
+          if (button.dataset.sectIndex === '0') {
+              shell?.enterScreen?.('sect-tactical-ai');
+          }
+      };
+      left.addEventListener('click', onSelectOption);
       const center = document.createElement('section');
       center.className = 'sect-screen__center';
       const right = document.createElement('section');
@@ -24378,7 +24447,7 @@ __define('./screens/sect/index.ts', (exports, module, __require) => {
       return {
           destroy() {
               backButton.removeEventListener('click', onBack);
-              optionHandlers.forEach((dispose) => dispose());
+              left.removeEventListener('click', onSelectOption);
               closeOverlay();
               mount.destroy();
           }

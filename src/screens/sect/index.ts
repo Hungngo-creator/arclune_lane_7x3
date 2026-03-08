@@ -79,21 +79,24 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
 
   const left = document.createElement('aside');
   left.className = 'sect-screen__left';
-  const optionHandlers: Array<() => void> = [];
   SECT_OPTIONS.forEach((label, index) => {
     const option = document.createElement('button');
     option.type = 'button';
     option.className = 'sect-screen__hub-button';
     option.textContent = label;
-    const onSelect = () => {
-      if (index === 0) {
-        shell?.enterScreen?.('sect-tactical-ai');
-      }
-    };
-    option.addEventListener('click', onSelect);
-    optionHandlers.push(() => option.removeEventListener('click', onSelect));
+    option.dataset.sectIndex = String(index);
     left.appendChild(option);
   });
+
+  const onSelectOption = (event: MouseEvent) => {
+    const target = event.target as HTMLElement | null;
+    const button = target?.closest<HTMLButtonElement>('.sect-screen__hub-button');
+    if (!button) return;
+    if (button.dataset.sectIndex === '0') {
+      shell?.enterScreen?.('sect-tactical-ai');
+    }
+  };
+  left.addEventListener('click', onSelectOption);
 
   const center = document.createElement('section');
   center.className = 'sect-screen__center';
@@ -157,7 +160,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   return {
     destroy() {
       backButton.removeEventListener('click', onBack);
-      optionHandlers.forEach((dispose) => dispose());
+      left.removeEventListener('click', onSelectOption);
       closeOverlay();
       mount.destroy();
     }

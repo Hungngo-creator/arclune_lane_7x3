@@ -75,6 +75,43 @@ function toSafeText(value: string | number | null | undefined): string{
   return value;
 }
 
+function parseJsonArrayFromDataset(value: string | undefined): string[] {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .map((entry) => (typeof entry === 'string' ? entry.trim() : ''))
+      .filter((entry) => entry.length > 0);
+  } catch {
+    return [];
+  }
+}
+
+function parseFactListFromDataset(value: string | undefined): AbilityFact[] {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    if (!Array.isArray(parsed)) return [];
+    const normalizedFacts: AbilityFact[] = [];
+    for (const entry of parsed){
+      if (!entry || typeof entry !== 'object') continue;
+      const fact = entry as Partial<AbilityFact>;
+      const normalizedValue = toSafeText(fact.value ?? '');
+      if (!normalizedValue) continue;
+      normalizedFacts.push({
+        icon: toSafeText(fact.icon ?? '') || null,
+        label: toSafeText(fact.label ?? '') || null,
+        value: normalizedValue,
+        tooltip: toSafeText(fact.tooltip ?? '') || null,
+      });
+    }
+    return normalizedFacts;
+  } catch {
+    return [];
+  }
+}
+
 function ensureStyles(){
   const css = `
     .app--collection{padding:32px 16px 64px;}
@@ -290,15 +327,15 @@ function renderAbilityCard(entry: AbilityEntry | null | undefined, options: Abil
     card.dataset.abilityId = String(abilityId);
   }
 
-  if (Array.isArray(entry?.notes)){
-    const filteredNotes = entry.notes
+  const filteredNotes = Array.isArray(entry?.notes)
+    ? entry.notes
       .map(note => (typeof note === 'string' ? note.trim() : ''))
-      .filter(note => note.length > 0);
-    if (filteredNotes.length){
-      card.dataset.notes = JSON.stringify(filteredNotes);
-    }
+      .filter(note => note.length > 0)
+    : [];
+  if (filteredNotes.length){
+    card.dataset.notes = JSON.stringify(filteredNotes);
   }
-  
+
   const facts: AbilityFact[] = collectAbilityFacts(entry);
   if (facts.length){
     card.dataset.meta = JSON.stringify(facts);
@@ -778,7 +815,8 @@ const overlayDetailPanel = document.createElement('aside');
     detailDescription.textContent = toSafeText(description);
 
     clearChildren(detailFacts);
-    const facts: AbilityFact[] = collectAbilityFacts(ability);
+    const factsFromCard = parseFactListFromDataset(card.dataset.meta);
+    const facts: AbilityFact[] = factsFromCard.length ? factsFromCard : collectAbilityFacts(ability);
     if (facts.length){
       for (const fact of facts){
         const item = document.createElement('div');
@@ -817,17 +855,7 @@ const overlayDetailPanel = document.createElement('aside');
     clearChildren(detailNotes);
 
     const rawNotes = Array.isArray(ability?.notes) ? ability.notes : [];
-    let cardNotes = [];
-    if (card.dataset.notes){
-      try {
-        const parsed = JSON.parse(card.dataset.notes);
-        if (Array.isArray(parsed)){
-          cardNotes = parsed;
-        }
-      } catch (error) {
-        // bỏ qua lỗi parse và tiếp tục với danh sách rỗng
-      }
-    }
+    const cardNotes = parseJsonArrayFromDataset(card.dataset.notes);
     const mergedNotes: string[] = [];
     const noteSet = new Set<string>();
     for (const rawNote of [...rawNotes, ...cardNotes]){

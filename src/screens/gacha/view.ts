@@ -160,6 +160,7 @@ export function renderGachaView(options: GachaViewOptions): GachaViewHandle {
   let isRevealing = false;
   let cardsRenderSignature = '';
   let lastCardsRef: ReadonlyArray<GachaCardInput> | null = null;
+  const cardsPreparedCache = new WeakMap<ReadonlyArray<GachaCardInput>, PreparedCards>();
 
   const cleanupCallbacks: Array<() => void> = [];
   const addCleanup = (fn: (() => void) | null | undefined) => {
@@ -186,7 +187,8 @@ export function renderGachaView(options: GachaViewOptions): GachaViewHandle {
       updateRevealButtonState();
       return;
     }
-    const prepared = prepareCards(cards);
+    const prepared = cardsPreparedCache.get(cards) ?? prepareCards(cards);
+    cardsPreparedCache.set(cards, prepared);
     const nextSignature = prepared.signature;
     if (nextSignature === cardsRenderSignature){
       lastCardsRef = cards;
