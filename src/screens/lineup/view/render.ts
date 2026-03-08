@@ -651,6 +651,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   let lastPassivesRenderSignature = '';
   let lastFiltersRenderSignature = '';
   let lastHighlightedCellIndex: number | null = null;
+  let mountedCellAvatars: HTMLElement[] = [];
 
   function getFilteredRoster(): RosterUnit[] {
     const filterKey = `${state.filter.type}::${state.filter.value ?? ''}`;
@@ -878,10 +879,10 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   }
 
   function renderCells(): void{
-    const previousAvatars = cellsGrid.querySelectorAll<HTMLElement>('.lineup-cell__avatar');
-    previousAvatars.forEach(avatar => {
+    for (const avatar of mountedCellAvatars){
       unmountRarity(avatar);
-    });
+    }
+    mountedCellAvatars = [];
     cellsGrid.innerHTML = '';
     const lineup = getSelectedLineup();
     if (!lineup){
@@ -956,6 +957,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       if (unit){
         renderAvatar(avatar, unit.avatar || null, unit.name);
         mountRarityAura(avatar, getUnitRarity(unit), 'deck', { label: false });
+        mountedCellAvatars.push(avatar);
       } else if (cell.label){
         unmountRarity(avatar);
         avatar.textContent = getNameInitials(cell.label);
@@ -1059,17 +1061,18 @@ function updateActiveCellHighlight(): void{
     }
     const assignedIds = collectAssignedUnitIds(lineup);
     const assignedTags = collectAssignedUnitTags(assignedIds, rosterLookup);
-    const assignedTagsSignature = Array.from(assignedTags).sort().join('|');
-    const passivesSignature = lineup.passives.map((passive) => {
-      const isActive = evaluatePassive(passive, assignedIds, rosterLookup, assignedTags);
-      return [
-        passive.index,
-        passive.name,
-        passive.requirement,
-        passive.isEmpty ? '1' : '0',
-        isActive ? '1' : '0',
-      ].join(':');
-    }).join('||');
+    const assignedTagsSignature = Array.from(assignedTags).join('|');
+    const passiveStates = lineup.passives.map((passive) => ({
+      passive,
+      isActive: evaluatePassive(passive, assignedIds, rosterLookup, assignedTags),
+    }));
+    const passivesSignature = passiveStates.map(({ passive, isActive }) => [
+      passive.index,
+      passive.name,
+      passive.requirement,
+      passive.isEmpty ? '1' : '0',
+      isActive ? '1' : '0',
+    ].join(':')).join('||');
     const nextSignature = `${lineup.id}::${assignedIds.size}::${assignedTagsSignature}::${passivesSignature}`;
     if (nextSignature === lastPassivesRenderSignature){
       return;
@@ -1077,7 +1080,7 @@ function updateActiveCellHighlight(): void{
     lastPassivesRenderSignature = nextSignature;
 
     passiveGrid.innerHTML = '';
-    lineup.passives.forEach(passive => {
+    passiveStates.forEach(({ passive, isActive }) => {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'lineup-passive';
@@ -1087,7 +1090,7 @@ function updateActiveCellHighlight(): void{
         btn.classList.add('is-empty');
         btn.disabled = true;
       }
-      if (evaluatePassive(passive, assignedIds, rosterLookup, assignedTags)){
+      if (isActive)){
         btn.classList.add('is-active');
       }
       const title = document.createElement('p');

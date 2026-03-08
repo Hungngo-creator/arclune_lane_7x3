@@ -260,6 +260,14 @@ type AbilityEntry = Record<string, unknown> & {
 
 type SkillDetailEventDetail = UnknownRecord;
 
+interface AbilityDetailRecord extends SkillDetailEventDetail {
+  ability?: AbilityEntry | null;
+  abilityId?: string | number | null;
+  typeLabel?: string | null;
+  facts?: AbilityFact[];
+  notes?: string[];
+}
+
 declare global {
   interface HTMLElementEventMap {
     'collection:toggle-skill-detail': CustomEvent<SkillDetailEventDetail>;
@@ -270,10 +278,18 @@ interface AbilityCardOptions {
   typeLabel?: string | null;
   unitId?: string | null;
   abilityKey?: string | null;
+  facts?: ReadonlyArray<AbilityFact>;
+  notes?: ReadonlyArray<string>;
 }
 
 function renderAbilityCard(entry: AbilityEntry | null | undefined, options: AbilityCardOptions = {}): HTMLElement{
-  const { typeLabel = null, unitId = null, abilityKey = null } = options;
+  const {
+    typeLabel = null,
+    unitId = null,
+    abilityKey = null,
+    facts: precomputedFacts = [],
+    notes: precomputedNotes = [],
+  } = options;
   const card = document.createElement('article');
   card.className = 'collection-skill-card';
 
@@ -330,16 +346,18 @@ function renderAbilityCard(entry: AbilityEntry | null | undefined, options: Abil
     card.dataset.abilityKey = abilityKey;
   }
 
-  const filteredNotes = Array.isArray(entry?.notes)
+  const filteredNotes = precomputedNotes.length
+    ? [...precomputedNotes]
+    : (Array.isArray(entry?.notes)
     ? entry.notes
       .map(note => (typeof note === 'string' ? note.trim() : ''))
       .filter(note => note.length > 0)
-    : [];
+    : []);
   if (filteredNotes.length){
     card.dataset.notes = JSON.stringify(filteredNotes);
   }
 
-  const facts: AbilityFact[] = collectAbilityFacts(entry);
+  const facts: AbilityFact[] = precomputedFacts.length ? [...precomputedFacts] : collectAbilityFacts(entry);
   if (facts.length){
     card.dataset.meta = JSON.stringify(facts);
   }
@@ -466,7 +484,7 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
 
   const rosterSource = buildRosterWithCost(cloneRoster(roster));
   const skillSetCache = new Map<string, ReturnType<typeof getSkillSet>>();
-  const abilityDetailCache = new Map<string, SkillDetailEventDetail>();
+  const abilityDetailCache = new Map<string, AbilityDetailRecord>();
   const rosterEntries = new Map<string, {
     button: HTMLButtonElement;
     costEl: HTMLElement | null;
@@ -773,7 +791,7 @@ const overlayDetailPanel = document.createElement('aside');
     detailEmpty.style.display = 'none';
   };
 
-  const populateSkillDetail = (card: HTMLElement, payload: UnknownRecord | null | undefined): void => {
+  const populateSkillDetail = (card: HTMLElement, payload: AbilityDetailRecord | null | undefined): void => {
     const ability = (payload?.ability ?? null) as AbilityEntry | null;
     if (!ability){
       clearSkillDetail();
@@ -811,7 +829,7 @@ const overlayDetailPanel = document.createElement('aside');
     detailDescription.textContent = toSafeText(description);
 
     clearChildren(detailFacts);
-    const factsFromCard = parseFactListFromDataset(card.dataset.meta);
+    const factsFromCard = Array.isArray(payload?.facts) ? payload.facts : parseFactListFromDataset(card.dataset.meta);
     const facts: AbilityFact[] = factsFromCard.length ? factsFromCard : collectAbilityFacts(ability);
     if (facts.length){
       for (const fact of facts){
@@ -850,8 +868,8 @@ const overlayDetailPanel = document.createElement('aside');
 
     clearChildren(detailNotes);
 
-    const rawNotes = Array.isArray(ability?.notes) ? ability.notes : [];
-    const cardNotes = parseJsonArrayFromDataset(card.dataset.notes);
+    const rawNotes = Array.isArray(payload?.notes) ? payload.notes : (Array.isArray(ability?.notes) ? ability.notes : []);
+    const cardNotes = Array.isArray(payload?.notes) ? [] : parseJsonArrayFromDataset(card.dataset.notes);
     const mergedNotes: string[] = [];
     const noteSet = new Set<string>();
     for (const rawNote of [...rawNotes, ...cardNotes]){
@@ -1199,16 +1217,26 @@ const resolveCurrentCultivation = () => {
         const abilityEntry = ability.entry;
         const abilityId = abilityEntry?.id ?? abilityEntry?.abilityId ?? null;
         const abilityKey = `${unitId}:${String(abilityId ?? index)}`;
+        const normalizedNotes = Array.isArray(abilityEntry?.notes)
+          ? abilityEntry.notes
+            .map(note => (typeof note === 'string' ? note.trim() : ''))
+            .filter(note => note.length > 0)
+          : [];
+        const facts = collectAbilityFacts(abilityEntry);
         abilityDetailCache.set(abilityKey, {
           unitId,
           abilityId,
           ability: abilityEntry,
           typeLabel: ability.label,
+          facts,
+          notes: normalizedNotes,
         });
         overlayAbilities.appendChild(renderAbilityCard(abilityEntry, {
           typeLabel: ability.label,
           unitId,
           abilityKey,
+          facts,
+          notes: normalizedNotes,
         }));
       }
     } else {
