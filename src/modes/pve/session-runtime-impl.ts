@@ -528,17 +528,48 @@ function sanitizeDeckEntries(value: unknown): DeckEntry[] {
   return changed ? normalized : (value as DeckEntry[]);
 }
 
+type LockedDeckCache = {
+  deckRef: ReadonlyArray<DeckEntry>;
+  ids: ReadonlySet<string>;
+};
+
+let lockedDeckCache: LockedDeckCache | null = null;
+
+const invalidateLockedDeckCache = (): void => {
+  lockedDeckCache = null;
+};
+
+const getLockedDeckIdSet = (lockedDeck: ReadonlyArray<DeckEntry>): ReadonlySet<string> => {
+  if (lockedDeckCache?.deckRef === lockedDeck) {
+    return lockedDeckCache.ids;
+  }
+  const ids = new Set<string>();
+  for (let i = 0; i < lockedDeck.length; i += 1) {
+    ids.add(lockedDeck[i].id);
+  }
+  lockedDeckCache = {
+    deckRef: lockedDeck,
+    ids,
+  };
+  return ids;
+};
+
 function ensureDeck(): DeckEntry[] {
   const game = getInitializedGame();
   if (!game) return [];
   const deck = sanitizeDeckEntries(game.deck3);
   const lockedDeck = ensureLockedPlayerDeck();
-  const lockedIds = new Set(lockedDeck.map((entry) => entry.id));
-  const filteredDeck = deck.filter((entry) => lockedIds.has(entry.id));
-  if (filteredDeck !== game.deck3) {
-    game.deck3 = filteredDeck;
+  const lockedIds = getLockedDeckIdSet(lockedDeck);
+  let removed = false;
+  const filteredDeck = deck.filter((entry) => {
+    const keep = lockedIds.has(entry.id);
+    if (!keep) removed = true;
+    return keep;
+  });
+  if (removed || deck !== game.deck3) {
+    game.deck3 = removed ? filteredDeck : deck;
   }
-  return filteredDeck;
+  return removed ? filteredDeck : deck;
 }
 
 function ensureLockedPlayerDeck(): ReadonlyArray<DeckEntry> {
@@ -550,6 +581,7 @@ function ensureLockedPlayerDeck(): ReadonlyArray<DeckEntry> {
   const lockedDeck = sanitizeDeckEntries(lockedSource);
   if (lockedDeck !== game.playerDeckLocked) {
     game.playerDeckLocked = lockedDeck;
+    invalidateLockedDeckCache();
   }
   return lockedDeck;
 }
@@ -557,7 +589,7 @@ function ensureLockedPlayerDeck(): ReadonlyArray<DeckEntry> {
 function isCardInLockedDeck(cardId: string, game: SessionState | null | undefined = Game): boolean {
   if (!game) return false;
   const lockedDeck = ensureLockedPlayerDeck();
-  return lockedDeck.some((entry) => entry.id === cardId);
+  return getLockedDeckIdSet(lockedDeck).has(cardId);
 }
 
 const getCardCost = (card: DeckEntry | null | undefined): number => {

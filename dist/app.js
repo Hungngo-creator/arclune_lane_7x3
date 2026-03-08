@@ -13124,18 +13124,42 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       }
       return changed ? normalized : value;
   }
+  let lockedDeckCache = null;
+  const invalidateLockedDeckCache = () => {
+      lockedDeckCache = null;
+  };
+  const getLockedDeckIdSet = (lockedDeck) => {
+      if (lockedDeckCache?.deckRef === lockedDeck) {
+          return lockedDeckCache.ids;
+      }
+      const ids = new Set();
+      for (let i = 0; i < lockedDeck.length; i += 1) {
+          ids.add(lockedDeck[i].id);
+      }
+      lockedDeckCache = {
+          deckRef: lockedDeck,
+          ids,
+      };
+      return ids;
+  };
   function ensureDeck() {
       const game = getInitializedGame();
       if (!game)
           return [];
       const deck = sanitizeDeckEntries(game.deck3);
       const lockedDeck = ensureLockedPlayerDeck();
-      const lockedIds = new Set(lockedDeck.map((entry) => entry.id));
-      const filteredDeck = deck.filter((entry) => lockedIds.has(entry.id));
-      if (filteredDeck !== game.deck3) {
-          game.deck3 = filteredDeck;
+      const lockedIds = getLockedDeckIdSet(lockedDeck);
+      let removed = false;
+      const filteredDeck = deck.filter((entry) => {
+          const keep = lockedIds.has(entry.id);
+          if (!keep)
+              removed = true;
+          return keep;
+      });
+      if (removed || deck !== game.deck3) {
+          game.deck3 = removed ? filteredDeck : deck;
       }
-      return filteredDeck;
+      return removed ? filteredDeck : deck;
   }
   function ensureLockedPlayerDeck() {
       const game = getInitializedGame();
@@ -13147,6 +13171,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       const lockedDeck = sanitizeDeckEntries(lockedSource);
       if (lockedDeck !== game.playerDeckLocked) {
           game.playerDeckLocked = lockedDeck;
+          invalidateLockedDeckCache();
       }
       return lockedDeck;
   }
@@ -13154,7 +13179,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       if (!game)
           return false;
       const lockedDeck = ensureLockedPlayerDeck();
-      return lockedDeck.some((entry) => entry.id === cardId);
+      return getLockedDeckIdSet(lockedDeck).has(cardId);
   }
   const getCardCost = (card) => {
       if (!card)
