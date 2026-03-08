@@ -21,8 +21,11 @@ export interface RosterUnit {
   id: string;
   name: string;
   role: string;
+  roleKey: string;
   rank: string;
+  rankKey: string;
   tags: string[];
+  tagKeys: string[];
   power: number | null;
   avatar: string | null;
   passives: unknown[];
@@ -131,12 +134,19 @@ function normalizeRosterEntry(entry: RosterEntryLite | null | undefined, index: 
         ? source.portrait
         : null;
   const passives = Array.isArray(source.passives) ? source.passives.slice() : [];
+  const normalizedRole = typeof role === 'string' ? role : '';
+  const normalizedRank = typeof rank === 'string' ? rank : '';
+  const normalizedTags = tags.map(tag => String(tag));
+
   return {
     id: String(id),
     name: typeof name === 'string' ? name : `Nhân vật #${index + 1}`,
-    role: typeof role === 'string' ? role : '',
-    rank: typeof rank === 'string' ? rank : '',
-    tags: tags.map(tag => String(tag)),
+    role: normalizedRole,
+    roleKey: normalizedRole.toLowerCase(),
+    rank: normalizedRank,
+    rankKey: normalizedRank.toLowerCase(),
+    tags: normalizedTags,
+    tagKeys: normalizedTags.map(tag => tag.toLowerCase()),
     power: power ?? null,
     avatar,
     passives,
@@ -522,13 +532,13 @@ export function filterRoster(roster: RosterUnit[], filter: LineupFilter): Roster
   }
   const value = String(filter.value).toLowerCase();
   if (filter.type === 'class'){
-    return roster.filter(unit => (unit.role || '').toLowerCase() === value);
+    return roster.filter(unit => unit.roleKey === value);
   }
   if (filter.type === 'rank'){
-    return roster.filter(unit => (unit.rank || '').toLowerCase() === value);
+    return roster.filter(unit => unit.rankKey === value);
   }
   if (filter.type === 'tag'){
-    return roster.filter(unit => unit.tags.some(tag => String(tag).toLowerCase() === value));
+    return roster.filter(unit => unit.tagKeys.includes(value));
   }
   return roster;
 }

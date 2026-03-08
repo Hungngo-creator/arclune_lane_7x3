@@ -159,6 +159,7 @@ export function renderGachaView(options: GachaViewOptions): GachaViewHandle {
   let revealDoneCallback = typeof options.onRevealDone === 'function' ? options.onRevealDone : null;
   let isRevealing = false;
   let cardsRenderSignature = '';
+  let lastCardsRef: ReadonlyArray<GachaCardInput> | null = null;
 
   const cleanupCallbacks: Array<() => void> = [];
   const addCleanup = (fn: (() => void) | null | undefined) => {
@@ -181,13 +182,19 @@ export function renderGachaView(options: GachaViewOptions): GachaViewHandle {
   }
 
   function renderCards(cards: ReadonlyArray<GachaCardInput>): void {
+    if (lastCardsRef === cards){
+      updateRevealButtonState();
+      return;
+    }
     const prepared = prepareCards(cards);
     const nextSignature = prepared.signature;
     if (nextSignature === cardsRenderSignature){
+      lastCardsRef = cards;
       updateRevealButtonState();
       return;
     }
     cardsRenderSignature = nextSignature;
+    lastCardsRef = cards;
     disposeCardEntries();
     grid.replaceChildren();
     const fragment = document.createDocumentFragment();

@@ -338,6 +338,13 @@ function hasPositiveWalletValue(source: unknown): boolean {
   return false;
 }
 
+function getAssignedUnitIds(lineup: LineupState | null): Set<string> {
+  if (!lineup){
+    return new Set<string>();
+  }
+  return collectAssignedUnitIds(lineup);
+}
+
 export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   const {
     root,
@@ -1054,17 +1061,7 @@ function updateActiveCellHighlight(): void{
     rosterList.innerHTML = '';
     const lineup = getSelectedLineup();
     const filtered = filterRoster(state.roster, state.filter);
-    const assignedUnitIds = new Set<string>();
-    if (lineup){
-      if (lineup.leaderId){
-        assignedUnitIds.add(lineup.leaderId);
-      }
-      for (const cell of lineup.cells){
-        if (cell.unitId){
-          assignedUnitIds.add(cell.unitId);
-        }
-      }
-    }
+    const assignedUnitIds = getAssignedUnitIds(lineup);
     const fragment = document.createDocumentFragment();
     filtered.forEach(unit => {
       const unitId = normalizeUnitId(unit.id);

@@ -20929,6 +20929,7 @@ __define('./screens/gacha/view.ts', (exports, module, __require) => {
       let revealDoneCallback = typeof options.onRevealDone === 'function' ? options.onRevealDone : null;
       let isRevealing = false;
       let cardsRenderSignature = '';
+      let lastCardsRef = null;
       const cleanupCallbacks = [];
       const addCleanup = (fn) => {
           if (typeof fn === 'function') {
@@ -20947,13 +20948,19 @@ __define('./screens/gacha/view.ts', (exports, module, __require) => {
           }
       }
       function renderCards(cards) {
+          if (lastCardsRef === cards) {
+              updateRevealButtonState();
+              return;
+          }
           const prepared = prepareCards(cards);
           const nextSignature = prepared.signature;
           if (nextSignature === cardsRenderSignature) {
+              lastCardsRef = cards;
               updateRevealButtonState();
               return;
           }
           cardsRenderSignature = nextSignature;
+          lastCardsRef = cards;
           disposeCardEntries();
           grid.replaceChildren();
           const fragment = document.createDocumentFragment();
@@ -21834,6 +21841,12 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       }
       return false;
   }
+  function getAssignedUnitIds(lineup) {
+      if (!lineup) {
+          return new Set();
+      }
+      return collectAssignedUnitIds(lineup);
+  }
   function renderLineupView(options) {
       const { root, shell = null, definition = null, description = null, lineups = null, roster = null, playerState = null, currencies = null, } = options;
       const host = assertElement(root, {
@@ -22485,17 +22498,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           rosterList.innerHTML = '';
           const lineup = getSelectedLineup();
           const filtered = filterRoster(state.roster, state.filter);
-          const assignedUnitIds = new Set();
-          if (lineup) {
-              if (lineup.leaderId) {
-                  assignedUnitIds.add(lineup.leaderId);
-              }
-              for (const cell of lineup.cells) {
-                  if (cell.unitId) {
-                      assignedUnitIds.add(cell.unitId);
-                  }
-              }
-          }
+          const assignedUnitIds = getAssignedUnitIds(lineup);
           const fragment = document.createDocumentFragment();
           filtered.forEach(unit => {
               const unitId = normalizeUnitId(unit.id);
@@ -22760,12 +22763,18 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
                   ? source.portrait
                   : null;
       const passives = Array.isArray(source.passives) ? source.passives.slice() : [];
+      const normalizedRole = typeof role === 'string' ? role : '';
+      const normalizedRank = typeof rank === 'string' ? rank : '';
+      const normalizedTags = tags.map(tag => String(tag));
       return {
           id: String(id),
           name: typeof name === 'string' ? name : `Nhân vật #${index + 1}`,
-          role: typeof role === 'string' ? role : '',
-          rank: typeof rank === 'string' ? rank : '',
-          tags: tags.map(tag => String(tag)),
+          role: normalizedRole,
+          roleKey: normalizedRole.toLowerCase(),
+          rank: normalizedRank,
+          rankKey: normalizedRank.toLowerCase(),
+          tags: normalizedTags,
+          tagKeys: normalizedTags.map(tag => tag.toLowerCase()),
           power: power ?? null,
           avatar,
           passives,
@@ -23135,13 +23144,13 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
       }
       const value = String(filter.value).toLowerCase();
       if (filter.type === 'class') {
-          return roster.filter(unit => (unit.role || '').toLowerCase() === value);
+          return roster.filter(unit => unit.roleKey === value);
       }
       if (filter.type === 'rank') {
-          return roster.filter(unit => (unit.rank || '').toLowerCase() === value);
+          return roster.filter(unit => unit.rankKey === value);
       }
       if (filter.type === 'tag') {
-          return roster.filter(unit => unit.tags.some(tag => String(tag).toLowerCase() === value));
+          return roster.filter(unit => unit.tagKeys.includes(value));
       }
       return roster;
   }
