@@ -1256,6 +1256,12 @@ const creepDeathHealProcessed = new Set<string>();
 const CREEP_DEATH_HEAL_DEBUG_KEY = 'pve.creepDeathHeal';
 const normalizedTagsByUnitId = new Map<string, string[]>();
 const creepDeathHealPctByUnitId = new Map<string, number>();
+const EMPTY_TAG_LIST: string[] = [];
+const FALLBACK_CREEP_DEATH_HEAL_BY_ID: Readonly<Record<string, number>> = {
+  creep_1: 0.03,
+  creep_2: 0.04,
+  creep_3: 0.05,
+};
 
 function createClock(): ClockState {
   const safe = safeNow();
@@ -1292,6 +1298,9 @@ const readTokenTags = (token: UnitToken | null | undefined): string[] => {
   const metaTags = Array.isArray(metaTagsRaw)
     ? metaTagsRaw.filter((tag: unknown): tag is string => typeof tag === 'string')
     : [];
+    if (directTags.length === 0 && metaTags.length === 0) {
+    return EMPTY_TAG_LIST;
+  }
   const normalized = normalizeTagList([...directTags, ...metaTags]);
   if (typeof token.id === 'string' && token.id) {
     normalizedTagsByUnitId.set(token.id, normalized);
@@ -1331,22 +1340,37 @@ const resolveCreepDeathHealPct = (token: UnitToken | null | undefined): number =
       }
     }
   }
-  const fallback = token.id === 'creep_1'
-    ? 0.03
-    : token.id === 'creep_2'
-      ? 0.04
-      : token.id === 'creep_3'
-        ? 0.05
-        : 0;
+  const fallback = FALLBACK_CREEP_DEATH_HEAL_BY_ID[token.id] ?? 0;
   if (typeof token.id === 'string' && token.id) {
     creepDeathHealPctByUnitId.set(token.id, fallback);
   }
   return fallback;
 };
 
+function maybePruneCreepDeathHealProcessed(tokens: ReadonlyArray<UnitToken>): void {
+  if (creepDeathHealProcessed.size < 2048) return;
+  const aliveDeadKeys = new Set<string>();
+  for (const token of tokens) {
+    if (!token || token.alive) continue;
+    const deadAt = parseFiniteNumber(token.deadAt);
+    if (!deadAt || deadAt <= 0) continue;
+    aliveDeadKeys.add(`${token.iid ?? token.id}:${deadAt}`);
+  }
+  if (!aliveDeadKeys.size) {
+    creepDeathHealProcessed.clear();
+    return;
+  }
+  for (const key of creepDeathHealProcessed) {
+    if (!aliveDeadKeys.has(key)) {
+      creepDeathHealProcessed.delete(key);
+    }
+  }
+}
+
 function processCreepDeathHealing(now: number): void {
   if (!Game?.tokens?.length) return;
   const tokens = Game.tokens;
+  maybePruneCreepDeathHealProcessed(tokens);
   const passiveLog = Array.isArray(Game.passiveLog) ? Game.passiveLog : [];
   if (!Array.isArray(Game.passiveLog)) Game.passiveLog = passiveLog;
   const creepAlliesBySide = new Map<Side, UnitToken[]>();
