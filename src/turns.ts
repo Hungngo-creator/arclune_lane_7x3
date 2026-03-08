@@ -439,6 +439,52 @@ const resolveTurnAction = (
   return consumedTurnFromOutcome(actionOutcome, hasActionHook);
 };
 
+const resolveTurnActor = (
+  Game: SessionState,
+  side: Side,
+  slot: number,
+  actor: UnitToken | null | undefined,
+  fallback?: UnitToken | null | undefined
+): UnitToken | null => {
+  if (actor?.alive) return actor;
+  if (fallback?.alive) return fallback;
+  return getActiveAt(Game, side, slot) ?? null;
+};
+
+const runTurnAndCheckEnd = (
+  Game: SessionState,
+  hooks: TurnHooks,
+  entry: { side: Side; slot: number },
+  active: UnitToken,
+  turnContext: TurnContext,
+  turnDetail: {
+    game: SessionState;
+    side: Side;
+    slot: number;
+    unit: UnitToken;
+    cycle: number;
+    phase: Side;
+    orderIndex: number;
+    orderLength: number | null;
+    spawned: boolean;
+    processedChain: ActionChainProcessedResult | null;
+  },
+  trigger: 'interleaved' | 'sequential'
+): boolean => {
+  emitGameEvent(TURN_START, turnDetail);
+  const consumption = resolveTurnAction(Game, hooks, entry, active, turnContext, turnDetail);
+  tickMinionTTL(Game, entry.side, consumption);
+
+  return hooks.checkBattleEnd?.(Game, {
+    trigger,
+    side: entry.side,
+    slot: entry.slot,
+    unit: active,
+    cycle: turnContext.cycle,
+    timestamp: safeNow()
+  }) ?? false;
+};
+
 // hành động 1 unit (ưu tiên ult nếu đủ nộ & không bị chặn)
 export function doActionOrSkip(
   Game: SessionState,
@@ -552,11 +598,10 @@ export function doActionOrSkip(
     } catch (e){
       console.error('[performUlt]', e);
     }
-    if (ultOk && !isUyenLeader(unit)) {
-      spendFury(unit, ultCost, CFG);
-      emitPassiveEvent(Game, unit, 'onUltCast', { log: getPassiveLog(Game) });
-    }
-    if (ultOk && isUyenLeader(unit)) {
+    if (ultOk) {
+      if (!isUyenLeader(unit)) {
+        spendFury(unit, ultCost, CFG);
+      }
       emitPassiveEvent(Game, unit, 'onUltCast', { log: getPassiveLog(Game) });
     }
     Statuses.onTurnEnd(unit, {});
@@ -682,11 +727,7 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
 
     const entry: QueuedSummonEntry = { side: selection.side, slot: selection.pos };
     const { actor, spawned } = spawnQueuedIfDue(Game, entry, hooks);
-    const active = actor && actor.alive
-      ? actor
-      : (selection.unit && selection.unit.alive
-        ? selection.unit
-        : (getActiveAt(Game, entry.side, entry.slot) ?? null));
+    const active = resolveTurnActor(Game, entry.side, entry.slot, actor, selection.unit);
 
     if (!active || !active.alive){
       return;
@@ -714,18 +755,15 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
       processedChain: null as ActionChainProcessedResult | null
     };
 
-    emitGameEvent(TURN_START, turnDetail);
-
-  const consumption = resolveTurnAction(Game, hooks, entry, active, turnContext, turnDetail);
-    tickMinionTTL(Game, entry.side, consumption);
-    const ended = hooks.checkBattleEnd?.(Game, {
-      trigger: 'interleaved',
-      side: entry.side,
-      slot: entry.slot,
-      unit: active,
-      cycle,
-      timestamp: safeNow()
-    });
+  const ended = runTurnAndCheckEnd(
+      Game,
+      hooks,
+      entry,
+      active,
+      turnContext,
+      turnDetail,
+      'interleaved'
+    );
     if (!ended && Game.turn){
       const actionDelayRaw = Number(CFG?.ANIMATION?.interleavedActionDelayMs);
       const actionDelayMs = Number.isFinite(actionDelayRaw) && actionDelayRaw > 0
@@ -774,9 +812,7 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
 
     const { actor, spawned } = spawnQueuedIfDue(Game, entry, hooks);
 
-    const active = actor && actor.alive
-      ? actor
-      : getActiveAt(Game, entry.side, entry.slot);
+    const active = resolveTurnActor(Game, entry.side, entry.slot, actor);
     const hasActive = !!(active && active.alive);
 
     if (!hasActive){
@@ -796,19 +832,15 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
       spawned: !!spawned,
       processedChain: null as ActionChainProcessedResult | null
     };
-    emitGameEvent(TURN_START, turnDetail);
-
-  const consumption = resolveTurnAction(Game, hooks, entry, active, turnContext, turnDetail);
-    tickMinionTTL(Game, entry.side, consumption);
-
-    const ended = hooks.checkBattleEnd?.(Game, {
-      trigger: 'sequential',
-      side: entry.side,
-      slot: entry.slot,
-      unit: active,
-      cycle,
-      timestamp: safeNow()
-    });
+    const ended = runTurnAndCheckEnd(
+      Game,
+      hooks,
+      entry,
+      active,
+      turnContext,
+      turnDetail,
+      'sequential'
+    );
     if (ended) return;
 
     advanceCursor();

@@ -259,8 +259,8 @@ Ultimate: nếu không có kẻ thù nào đang ở trạng thái ngủ trên s�
 
 39) [UR] HỒN KHÍ SƯ – NGỤY THIÊN SƠ, Class: Summoner.
 1. CƠ CHẾ QUẢN LÝ HỒN KHÍ (SYSTEM LOGIC)
- * Kho Chứa (Inventory): Tối đa 4 Slot Hồn Khí.
- * Khởi Đầu: Slot 1 chứa [Kiếm Gỗ].
+ * Kho Chứa (Inventory): Tối đa 4 Slot Hồn Khí. không có base element tag nhưng vũ khí có element tag.
+ * Khởi Đầu: Slot 1 chứa [Kiếm Gỗ]. element tag: mộc.
  * Cấp Độ (Tier): Mỗi Hồn Khí có 3 cấp độ (Lv1 / Lv2 / Lv3). Khi mới rèn là Lv1.
  * Chi Phí Duy Trì (Passive Cost):
    * Mỗi khi kết thúc Turn hành động thành công: Mất (1% Max HP * Số lượng Hồn Khí).
@@ -300,6 +300,7 @@ Ultimate: nếu không có kẻ thù nào đang ở trạng thái ngủ trên s�
    * Cost phụ: Tiêu hủy (Xóa bỏ) 1 Hồn Khí ngẫu nhiên trong kho.
    * Phạm vi: Ô số 2, 4, 5, 6, 8 (Hình dấu cộng + tâm).
    * Sát thương: Mỗi ô nhận 100% (WIL + ATK).
+   element tag tùy theo element tag của vũ khí phát nổ đó.
 5. KỸ NĂNG 2: Ẩm Thần Thủy
  * Tags: [Chủ Động], [Điều Kiện: Có Hồ Lô], [Hồi Phục Theo Turn], [Tiêu Hao: Hồn Khí], [Tiêu Hao: Aether].
  * Logic:
@@ -336,18 +337,21 @@ DANH SÁCH & CHỈ SỐ HỒN KHÍ (WEAPON DATABASE)
    * Lv1: Bỏ qua 5% RES, 15% ARM. Gây [Chảy Máu].
    * Lv2: Bỏ qua 10% RES, 20% ARM. Gây [Chảy Máu].
    * Lv3: Bỏ qua 15% RES, 25% ARM. Gây [Chảy Máu].
+   không element tag.
 2. [Trấn Thiên Thước] (The Ruler) - Tỷ lệ: 15%
  * Loại: Khống chế.
  * Hiệu ứng:
    * Lv1: 15% Tỷ lệ gây [Choáng].
    * Lv2: 25% Tỷ lệ gây [Choáng].
    * Lv3: 40% Tỷ lệ gây [Choáng].
+   không element tag.
 3. [Hắc Ám Ma Kiếm] (The Dark Blade) - Tỷ lệ: 15%
  * Loại: Debuff.
  * Hiệu ứng:
    * Lv1: Bỏ qua 5% (RES+ARM). Gây [Sợ Hãi].
    * Lv2: Bỏ qua 10% (RES+ARM). Gây [Sợ Hãi].
    * Lv3: Bỏ qua 15% (RES+ARM). Gây [Sợ Hãi].
+   element tag: dark.
 4. [Dưỡng Hồn Hồ] (The Gourd) - Tỷ lệ: 10%
  * Loại: Hồi phục / Nguyên liệu Skill 2.
  * Đặc tính: KHÔNG TẤN CÔNG, không tăng max hp.
@@ -355,18 +359,21 @@ DANH SÁCH & CHỈ SỐ HỒN KHÍ (WEAPON DATABASE)
    * Lv1: Hồi 3% Max HP cho chủ nhân.
    * Lv2: Hồi 3.5% Max HP.
    * Lv3: Hồi 4% Max HP.
+   Chỉ hồi hp không tăng max hp.
 5. [Huyết Ẩm Kiếm] (The Blood Sword) - Tỷ lệ: 20%
  * Loại: Tấn công / Trao đổi máu / Nguyên liệu Skill 3.
  * Hiệu ứng:
    * Đầu Turn: Trừ HP chủ nhân (2% / 3% / 4%).
    * Cuối Turn: Hồi HP cho chủ nhân dựa trên sát thương gây ra trong turn (15% / 25% / 40%).
+   Element tag: blood.
 6. [Lôi Thần Chùy] (The Hammer) - Tỷ lệ: 25%
  * Loại: Sát thương chủ lực.
  * Hiệu ứng:
-   * Lv1: +5% Dmg riêng của búa, 50% Gây Choáng.
-   * Lv2: +10% Dmg, 50% Gây Choáng.
-   * Lv3: +15% Dmg, 50% Gây Choáng.
+   * Lv1: +5% Dmg riêng của búa, 20% Gây Choáng.
+   * Lv2: +10% Dmg, 30% Gây Choáng.
+   * Lv3: +15% Dmg, 40% Gây Choáng.
      (Lưu ý: Vì yêu cầu tỷ lệ choáng 50% cố định, nên Tier sẽ tăng Dmg).
+     element tag: lightning.
 GHI CHÚ CHIẾN THUẬT:
  * RNG Management: Người chơi phải thích nghi với vũ khí rèn ra. Ra Hồ Lô thì lo thủ, ra Lôi Chùy thì khô máu.
  * Risk/Reward: Việc tích 4 Hồn Khí rất mạnh (Auto attack 4 lần), nhưng rủi ro nổ vào đồng minh khi chết là rất cao. Cần cân nhắc dùng Skill 1 để "xả bớt" vũ khí nếu máu thấp.
