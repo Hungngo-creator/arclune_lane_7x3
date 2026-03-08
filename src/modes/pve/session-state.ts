@@ -121,6 +121,8 @@ interface ResolveEnemyUnitsOptions {
   collectionState?: CreateSessionOptions['collectionState'] | null;
 }
 
+const EMPTY_UNIT_PROGRESS = new Map<string, RuntimeUnitProgress>();
+
 function normalizePositiveLimit(value: unknown, fallback: number): number {
   if (Number.isFinite(value)) {
     const numeric = Number(value);
@@ -163,7 +165,9 @@ export function resolveEnemyUnits(options: ResolveEnemyUnitsOptions): SessionSta
     ?? [],
   );
   const progressById = options.unitProgressById
-    ?? mapUnitProgressById(options.collectionState ?? null);
+    ?? (lineupDeck.length > 0
+      ? mapUnitProgressById(options.collectionState ?? null)
+      : EMPTY_UNIT_PROGRESS);
 
   return buildAICreepDeckFromLineup({
     lineup: lineupDeck,

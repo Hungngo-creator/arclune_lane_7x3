@@ -12504,6 +12504,7 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
           },
       ];
   }));
+  const EMPTY_PROGRESS_BY_ID = new Map();
   function normalizeRank(value) {
       if (typeof value !== 'string' || !value.trim())
           return null;
@@ -12652,7 +12653,10 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
   function buildAICreepDeckFromLineup(params) {
       const lineup = Array.isArray(params.lineup) ? params.lineup : [];
       const creepCount = CREEP_SLOT_ORDER.length;
-      const progressById = params.progressById ?? mapUnitProgressById(params.collectionState ?? null);
+      const progressById = params.progressById
+          ?? (lineup.length > 0
+              ? mapUnitProgressById(params.collectionState ?? null)
+              : EMPTY_PROGRESS_BY_ID);
       const lineupSampling = sampleLineup(lineup, progressById);
       const allocatedRanks = allocateRanksForCreeps(lineupSampling, creepCount);
       const allocatedProgress = allocateProgressForCreeps(lineupSampling.progressProfiles, creepCount);
@@ -16851,6 +16855,7 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
           enemy: createSummonQueue(),
       };
   }
+  const EMPTY_UNIT_PROGRESS = new Map();
   function normalizePositiveLimit(value, fallback) {
       if (Number.isFinite(value)) {
           const numeric = Number(value);
@@ -16889,7 +16894,9 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
           ?? options.fallbackDeck
           ?? []);
       const progressById = options.unitProgressById
-          ?? mapUnitProgressById(options.collectionState ?? null);
+          ?? (lineupDeck.length > 0
+              ? mapUnitProgressById(options.collectionState ?? null)
+              : EMPTY_UNIT_PROGRESS);
       return buildAICreepDeckFromLineup({
           lineup: lineupDeck,
           progressById,

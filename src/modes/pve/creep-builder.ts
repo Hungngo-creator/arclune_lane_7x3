@@ -52,6 +52,7 @@ const CREEP_UNIT_BASE = new Map<string, CreepUnitBase>(
     ] as const;
   }),
 );
+const EMPTY_PROGRESS_BY_ID = new Map<string, RuntimeUnitProgress>();
 
 function normalizeRank(value: unknown): string | null {
   if (typeof value !== 'string' || !value.trim()) return null;
@@ -219,7 +220,10 @@ export function buildAICreepDeckFromLineup(params: {
 }): PveDeckEntry[] {
   const lineup = Array.isArray(params.lineup) ? params.lineup : [];
   const creepCount = CREEP_SLOT_ORDER.length;
-  const progressById = params.progressById ?? mapUnitProgressById(params.collectionState ?? null);
+  const progressById = params.progressById
+    ?? (lineup.length > 0
+      ? mapUnitProgressById(params.collectionState ?? null)
+      : EMPTY_PROGRESS_BY_ID);
   const lineupSampling = sampleLineup(lineup, progressById);
   const allocatedRanks = allocateRanksForCreeps(lineupSampling, creepCount);
   const allocatedProgress = allocateProgressForCreeps(lineupSampling.progressProfiles, creepCount);
