@@ -85,12 +85,29 @@ function renderWalletChip(code: CurrencyCode, amount: number): HTMLElement {
 }
 
 function renderCurrencyHeader(container: HTMLElement, wallet: Wallet, onOpenRules: () => void): void {
+  const previous = container.querySelectorAll<HTMLElement>('.currency-chip');
+  if (previous.length === CURRENCY_ORDER.length) {
+    CURRENCY_ORDER.forEach((code, index) => {
+      const chip = previous[index];
+      const valueEl = chip?.querySelector<HTMLElement>('.currency-chip__value');
+      if (chip && valueEl) {
+        const nextText = formatNumber(wallet[code]);
+        if (valueEl.textContent !== nextText) {
+          valueEl.textContent = nextText;
+        }
+      }
+    });
+    return;
+  }
+
   container.replaceChildren();
+  const fragment = document.createDocumentFragment();
   for (const code of CURRENCY_ORDER) {
     const chip = renderWalletChip(code, wallet[code]);
     chip.addEventListener('click', onOpenRules);
-    container.appendChild(chip);
+    fragment.appendChild(chip);
   }
+  container.appendChild(fragment);
 }
 
 function createBannerButton(banner: BannerDefinition, isActive: boolean): HTMLButtonElement {
@@ -114,12 +131,31 @@ function renderBannerList(
   activeId: string,
   onSelect: (id: string) => void,
 ): void {
+  const previous = container.querySelectorAll<HTMLButtonElement>('.banner-entry');
+  if (previous.length === banners.length) {
+    banners.forEach((banner, index) => {
+      const button = previous[index];
+      if (!button) {
+        return;
+      }
+      const shouldBeActive = banner.id === activeId;
+      button.classList.toggle('is-active', shouldBeActive);
+      const timerEl = button.querySelector<HTMLElement>('.banner-entry__timer');
+      if (timerEl) {
+        timerEl.textContent = formatRemainingTime(banner);
+      }
+    });
+    return;
+  }
+
   container.replaceChildren();
+  const fragment = document.createDocumentFragment();
   for (const banner of banners) {
     const button = createBannerButton(banner, banner.id === activeId);
     button.addEventListener('click', () => onSelect(banner.id));
-    container.appendChild(button);
+    fragment.appendChild(button);
   }
+  container.appendChild(fragment);
 }
 
 function renderRates(container: HTMLElement, banner: BannerDefinition): void {
@@ -366,17 +402,32 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
     throw new Error('Thiếu phần tử UI cần thiết.');
   }
 
+  let lastBannerRenderId = '';
   const renderBanner = () => {
     const banner = getBannerById(state.bannerId) ?? GACHA_CONFIG.banners[0];
     if (!banner) return;
-    titleSlot.textContent = banner.label;
-    subtitleSlot.textContent = banner.description ?? '';
-    timerSlot.textContent = formatRemainingTime(banner);
-    artSlot.innerHTML = banner.background ? `<img src="${banner.background}" alt="${banner.label}" />` : '';
-    renderRates(ratesSlot, banner);
+
+    const nextTimer = formatRemainingTime(banner);
+    if (titleSlot.textContent !== banner.label) {
+      titleSlot.textContent = banner.label;
+    }
+    const nextSubtitle = banner.description ?? '';
+    if (subtitleSlot.textContent !== nextSubtitle) {
+      subtitleSlot.textContent = nextSubtitle;
+    }
+    if (timerSlot.textContent !== nextTimer) {
+      timerSlot.textContent = nextTimer;
+    }
+
+    if (lastBannerRenderId !== banner.id) {
+      artSlot.innerHTML = banner.background ? `<img src="${banner.background}" alt="${banner.label}" />` : '';
+      renderRates(ratesSlot, banner);
+      renderFeatured(featuredSlot, banner);
+      renderCosts(costSlot, banner);
+      lastBannerRenderId = banner.id;
+    }
+
     renderPity(pitySlot, banner, state.states);
-    renderFeatured(featuredSlot, banner);
-    renderCosts(costSlot, banner);
   };
 
   const openRules = () => {
@@ -390,6 +441,9 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
 
   const updateBannerList = () => {
     renderBannerList(bannerList, GACHA_CONFIG.banners, state.bannerId, (id) => {
+      if (state.bannerId === id) {
+        return;
+      }
       state.bannerId = id;
       updateBannerList();
       renderBanner();

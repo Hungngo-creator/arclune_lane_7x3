@@ -966,10 +966,6 @@ const overlayDetailPanel = document.createElement('aside');
 
   container.appendChild(layout);
 
-  if (root.appendChild){
-    root.appendChild(container);
-  }
-
 const resolveCurrentCultivation = () => {
     const unitCultivation = activeUnitId ? savedCultivationByUnit[activeUnitId] : null;
     const cultivation = unitCultivation ?? { realm: 1, subRealm: 0 };

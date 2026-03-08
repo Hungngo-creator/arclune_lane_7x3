@@ -369,6 +369,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   const rosterLookup = new Map<string, RosterUnit>(
     normalizedRoster.map(unit => [normalizeUnitId(unit.id), unit] as const),
   );
+  const skillSetCache = new Map<string, ReturnType<typeof getSkillSet> | null>();
 
   const lineupState = new Map<string, LineupState>();
   normalizedLineups.forEach(lineup => {
@@ -631,6 +632,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   let cachedFilterKey = '';
   let cachedFilteredRosterSource: RosterUnit[] | null = null;
   let cachedFilteredRoster: RosterUnit[] = [];
+  let lastRosterRenderSignature = '';
 
   function getFilteredRoster(): RosterUnit[] {
     const filterKey = `${state.filter.type}::${state.filter.value ?? ''}`;
@@ -785,7 +787,15 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
 
     const kit = (unit.raw as { kit?: unknown } | null)?.kit ?? null;
     const skillSetId = normalizeUnitId(unit.id);
-    const skillSet = skillSetId ? getSkillSet(skillSetId) : null;
+    let skillSet = null;
+    if (skillSetId){
+      if (skillSetCache.has(skillSetId)){
+        skillSet = skillSetCache.get(skillSetId) ?? null;
+      } else {
+        skillSet = getSkillSet(skillSetId);
+        skillSetCache.set(skillSetId, skillSet ?? null);
+      }
+    }
 
     const skills = Array.isArray((kit as { skills?: unknown[] } | null)?.skills)
       ? ((kit as { skills?: unknown[] }).skills ?? [])
@@ -1079,10 +1089,19 @@ function updateActiveCellHighlight(): void{
   }
 
   function renderRoster(): void{
-    rosterList.innerHTML = '';
     const lineup = getSelectedLineup();
     const filtered = getFilteredRoster();
     const assignedUnitIds = getAssignedUnitIds(lineup);
+    const assignmentSignature = Array.from(assignedUnitIds).sort().join('|');
+    const filterSignature = `${state.filter.type}:${state.filter.value ?? ''}`;
+    const filteredIdsSignature = filtered.map(unit => normalizeUnitId(unit.id)).join('|');
+    const nextSignature = `${filterSignature}::${state.selectedUnitId ?? ''}::${assignmentSignature}::${filteredIdsSignature}`;
+    if (nextSignature === lastRosterRenderSignature){
+      return;
+    }
+    lastRosterRenderSignature = nextSignature;
+
+    rosterList.innerHTML = '';
     const fragment = document.createDocumentFragment();
     filtered.forEach(unit => {
       const unitId = normalizeUnitId(unit.id);

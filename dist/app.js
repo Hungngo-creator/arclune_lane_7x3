@@ -20615,9 +20615,6 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       layout.appendChild(stage);
       layout.appendChild(tabs);
       container.appendChild(layout);
-      if (root.appendChild) {
-          root.appendChild(container);
-      }
       const resolveCurrentCultivation = () => {
           const unitCultivation = activeUnitId ? savedCultivationByUnit[activeUnitId] : null;
           const cultivation = unitCultivation ?? { realm: 1, subRealm: 0 };
@@ -21862,6 +21859,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       const normalizedRoster = normalizeRoster(roster ?? null);
       const normalizedLineups = normalizeLineups(lineups ?? null, normalizedRoster);
       const rosterLookup = new Map(normalizedRoster.map(unit => [normalizeUnitId(unit.id), unit]));
+      const skillSetCache = new Map();
       const lineupState = new Map();
       normalizedLineups.forEach(lineup => {
           lineupState.set(lineup.id, {
@@ -22091,6 +22089,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       let cachedFilterKey = '';
       let cachedFilteredRosterSource = null;
       let cachedFilteredRoster = [];
+      let lastRosterRenderSignature = '';
       function getFilteredRoster() {
           const filterKey = `${state.filter.type}::${state.filter.value ?? ''}`;
           if (cachedFilteredRosterSource === state.roster && cachedFilterKey === filterKey) {
@@ -22231,7 +22230,16 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           cellDetails.appendChild(interactionHint);
           const kit = unit.raw?.kit ?? null;
           const skillSetId = normalizeUnitId(unit.id);
-          const skillSet = skillSetId ? getSkillSet(skillSetId) : null;
+          let skillSet = null;
+          if (skillSetId) {
+              if (skillSetCache.has(skillSetId)) {
+                  skillSet = skillSetCache.get(skillSetId) ?? null;
+              }
+              else {
+                  skillSet = getSkillSet(skillSetId);
+                  skillSetCache.set(skillSetId, skillSet ?? null);
+              }
+          }
           const skills = Array.isArray(kit?.skills)
               ? (kit.skills ?? [])
                   .filter(skill => {
@@ -22518,10 +22526,18 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           });
       }
       function renderRoster() {
-          rosterList.innerHTML = '';
           const lineup = getSelectedLineup();
           const filtered = getFilteredRoster();
           const assignedUnitIds = getAssignedUnitIds(lineup);
+          const assignmentSignature = Array.from(assignedUnitIds).sort().join('|');
+          const filterSignature = `${state.filter.type}:${state.filter.value ?? ''}`;
+          const filteredIdsSignature = filtered.map(unit => normalizeUnitId(unit.id)).join('|');
+          const nextSignature = `${filterSignature}::${state.selectedUnitId ?? ''}::${assignmentSignature}::${filteredIdsSignature}`;
+          if (nextSignature === lastRosterRenderSignature) {
+              return;
+          }
+          lastRosterRenderSignature = nextSignature;
+          rosterList.innerHTML = '';
           const fragment = document.createDocumentFragment();
           filtered.forEach(unit => {
               const unitId = normalizeUnitId(unit.id);
@@ -24597,12 +24613,28 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
       return chip;
   }
   function renderCurrencyHeader(container, wallet, onOpenRules) {
+      const previous = container.querySelectorAll('.currency-chip');
+      if (previous.length === CURRENCY_ORDER.length) {
+          CURRENCY_ORDER.forEach((code, index) => {
+              const chip = previous[index];
+              const valueEl = chip?.querySelector('.currency-chip__value');
+              if (chip && valueEl) {
+                  const nextText = formatNumber(wallet[code]);
+                  if (valueEl.textContent !== nextText) {
+                      valueEl.textContent = nextText;
+                  }
+              }
+          });
+          return;
+      }
       container.replaceChildren();
+      const fragment = document.createDocumentFragment();
       for (const code of CURRENCY_ORDER) {
           const chip = renderWalletChip(code, wallet[code]);
           chip.addEventListener('click', onOpenRules);
-          container.appendChild(chip);
+          fragment.appendChild(chip);
       }
+      container.appendChild(fragment);
   }
   function createBannerButton(banner, isActive) {
       const button = document.createElement('button');
@@ -24619,12 +24651,30 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
       return button;
   }
   function renderBannerList(container, banners, activeId, onSelect) {
+      const previous = container.querySelectorAll('.banner-entry');
+      if (previous.length === banners.length) {
+          banners.forEach((banner, index) => {
+              const button = previous[index];
+              if (!button) {
+                  return;
+              }
+              const shouldBeActive = banner.id === activeId;
+              button.classList.toggle('is-active', shouldBeActive);
+              const timerEl = button.querySelector('.banner-entry__timer');
+              if (timerEl) {
+                  timerEl.textContent = formatRemainingTime(banner);
+              }
+          });
+          return;
+      }
       container.replaceChildren();
+      const fragment = document.createDocumentFragment();
       for (const banner of banners) {
           const button = createBannerButton(banner, banner.id === activeId);
           button.addEventListener('click', () => onSelect(banner.id));
-          container.appendChild(button);
+          fragment.appendChild(button);
       }
+      container.appendChild(fragment);
   }
   function renderRates(container, banner) {
       container.replaceChildren();
@@ -24849,18 +24899,30 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
       if (!currencySlot || !bannerList || !titleSlot || !subtitleSlot || !timerSlot || !artSlot || !ratesSlot || !pitySlot || !featuredSlot || !costSlot || !resultsSlot || !rulesButton || !summonOne || !summonTen) {
           throw new Error('Thiếu phần tử UI cần thiết.');
       }
+      let lastBannerRenderId = '';
       const renderBanner = () => {
           const banner = getBannerById(state.bannerId) ?? GACHA_CONFIG.banners[0];
           if (!banner)
               return;
-          titleSlot.textContent = banner.label;
-          subtitleSlot.textContent = banner.description ?? '';
-          timerSlot.textContent = formatRemainingTime(banner);
-          artSlot.innerHTML = banner.background ? `<img src="${banner.background}" alt="${banner.label}" />` : '';
-          renderRates(ratesSlot, banner);
+          const nextTimer = formatRemainingTime(banner);
+          if (titleSlot.textContent !== banner.label) {
+              titleSlot.textContent = banner.label;
+          }
+          const nextSubtitle = banner.description ?? '';
+          if (subtitleSlot.textContent !== nextSubtitle) {
+              subtitleSlot.textContent = nextSubtitle;
+          }
+          if (timerSlot.textContent !== nextTimer) {
+              timerSlot.textContent = nextTimer;
+          }
+          if (lastBannerRenderId !== banner.id) {
+              artSlot.innerHTML = banner.background ? `<img src="${banner.background}" alt="${banner.label}" />` : '';
+              renderRates(ratesSlot, banner);
+              renderFeatured(featuredSlot, banner);
+              renderCosts(costSlot, banner);
+              lastBannerRenderId = banner.id;
+          }
           renderPity(pitySlot, banner, state.states);
-          renderFeatured(featuredSlot, banner);
-          renderCosts(costSlot, banner);
       };
       const openRules = () => {
           const rulesContent = createRulesContent();
@@ -24871,6 +24933,9 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
       };
       const updateBannerList = () => {
           renderBannerList(bannerList, GACHA_CONFIG.banners, state.bannerId, (id) => {
+              if (state.bannerId === id) {
+                  return;
+              }
               state.bannerId = id;
               updateBannerList();
               renderBanner();
