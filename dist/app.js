@@ -20721,6 +20721,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           refreshWallet();
       });
       addCleanup(unsubscribeSharedWallet);
+      let selectedUnitRenderKey = '';
       const refreshTuViPanel = () => {
           const { realm, subRealm } = resolveCurrentCultivation();
           const realmEconomy = getCultivationRealmEconomy(realm);
@@ -20770,6 +20771,12 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       const selectUnit = (unitId) => {
           if (!unitId || !rosterEntries.has(unitId))
               return;
+          const nextRenderKey = `${unitId}::${filterState.activeTab}`;
+          if (selectedUnitRenderKey === nextRenderKey) {
+              refreshTuViPanel();
+              return;
+          }
+          selectedUnitRenderKey = nextRenderKey;
           activeUnitId = unitId;
           updateSelectedUnit(filterState, unitId);
           clearSkillDetail();
@@ -22217,6 +22224,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       let lastFiltersRenderSignature = '';
       let lastHighlightedCellIndex = null;
       let mountedCellAvatars = [];
+      const cellNodeByIndex = new Map();
       function getFilteredRoster() {
           const filterKey = `${state.filter.type}::${state.filter.value ?? ''}`;
           if (cachedFilteredRosterSource === state.roster && cachedFilterKey === filterKey) {
@@ -22430,6 +22438,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               unmountRarity(avatar);
           }
           mountedCellAvatars = [];
+          cellNodeByIndex.clear();
           cellsGrid.innerHTML = '';
           const lineup = getSelectedLineup();
           if (!lineup) {
@@ -22463,6 +22472,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               const cellEl = document.createElement('div');
               cellEl.className = 'lineup-cell';
               cellEl.dataset.cellIndex = String(cell.index);
+              cellNodeByIndex.set(cell.index, cellEl);
               cellEl.tabIndex = 0;
               cellEl.setAttribute('role', 'button');
               const unit = cell.unitId ? rosterLookup.get(cell.unitId) : null;
@@ -22551,11 +22561,11 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       function updateActiveCellHighlight() {
           const nextIndex = Number.isInteger(state.activeCellIndex) ? state.activeCellIndex : null;
           if (lastHighlightedCellIndex != null) {
-              const previous = cellsGrid.querySelector(`.lineup-cell[data-cell-index="${lastHighlightedCellIndex}"]`);
+              const previous = cellNodeByIndex.get(lastHighlightedCellIndex) ?? null;
               previous?.classList.remove('is-active');
           }
           if (nextIndex != null) {
-              const next = cellsGrid.querySelector(`.lineup-cell[data-cell-index="${nextIndex}"]`);
+              const next = cellNodeByIndex.get(nextIndex) ?? null;
               next?.classList.add('is-active');
           }
           lastHighlightedCellIndex = nextIndex;
@@ -22635,279 +22645,276 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
                   btn.classList.add('is-empty');
                   btn.disabled = true;
               }
-              if (isActive)
-                  ;
+              if (isActive) {
+                  btn.classList.add('is-active');
+              }
+              const title = document.createElement('p');
+              title.className = 'lineup-passive__title';
+              title.textContent = passive.name;
+              btn.appendChild(title);
+              if (!passive.isEmpty) {
+                  const condition = document.createElement('p');
+                  condition.className = 'lineup-passive__condition';
+                  condition.textContent = passive.requirement || 'Chạm để xem chi tiết.';
+                  btn.appendChild(condition);
+              }
+              passiveGrid.appendChild(btn);
           });
-          {
-              btn.classList.add('is-active');
+      }
+      function renderFilters() {
+          const nextSignature = [
+              state.filter.type,
+              state.filter.value ?? '',
+              state.filterOptions.classes.join('|'),
+              state.filterOptions.ranks.join('|'),
+          ].join('::');
+          if (nextSignature === lastFiltersRenderSignature) {
+              return;
           }
-          const title = document.createElement('p');
-          title.className = 'lineup-passive__title';
+          lastFiltersRenderSignature = nextSignature;
+          rosterFilters.innerHTML = '';
+          const filters = [
+              { type: 'all', value: null, label: 'Tất cả' },
+              ...state.filterOptions.classes.map(value => ({ type: 'class', value, label: value })),
+              ...state.filterOptions.ranks.map(value => ({ type: 'rank', value, label: value })),
+          ];
+          filters.forEach(filter => {
+              const button = document.createElement('button');
+              button.type = 'button';
+              button.className = 'lineup-roster__filter';
+              button.dataset.filterType = filter.type;
+              if (filter.value != null) {
+                  button.dataset.filterValue = filter.value;
+              }
+              button.textContent = filter.label;
+              if (state.filter.type === filter.type && (state.filter.value || null) === (filter.value || null)) {
+                  button.classList.add('is-active');
+              }
+              rosterFilters.appendChild(button);
+          });
+      }
+      function renderRoster() {
+          const lineup = getSelectedLineup();
+          const filtered = getFilteredRoster();
+          const assignedUnitIds = getAssignedUnitIds(lineup);
+          const assignmentSignature = Array.from(assignedUnitIds).sort().join('|');
+          const filterSignature = `${state.filter.type}:${state.filter.value ?? ''}`;
+          const filteredIdsSignature = filtered.map(unit => normalizeUnitId(unit.id)).join('|');
+          const nextSignature = `${filterSignature}::${state.selectedUnitId ?? ''}::${assignmentSignature}::${filteredIdsSignature}`;
+          if (nextSignature === lastRosterRenderSignature) {
+              return;
+          }
+          lastRosterRenderSignature = nextSignature;
+          rosterList.innerHTML = '';
+          const fragment = document.createDocumentFragment();
+          filtered.forEach(unit => {
+              const unitId = normalizeUnitId(unit.id);
+              const button = document.createElement('button');
+              button.type = 'button';
+              button.className = 'lineup-roster__entry';
+              button.dataset.unitId = unitId;
+              button.setAttribute('aria-label', `Chọn ${unit.name}`);
+              if (state.selectedUnitId === unitId) {
+                  button.classList.add('is-selected');
+              }
+              const isAssigned = assignedUnitIds.has(unitId);
+              if (isAssigned && state.selectedUnitId !== unitId) {
+                  button.classList.add('is-unavailable');
+              }
+              const avatar = document.createElement('div');
+              avatar.className = 'lineup-roster__avatar';
+              renderAvatar(avatar, unit.avatar || null, unit.name);
+              button.appendChild(avatar);
+              const meta = document.createElement('div');
+              meta.className = 'lineup-roster__meta';
+              const nameEl = document.createElement('p');
+              nameEl.className = 'lineup-roster__name';
+              nameEl.textContent = unit.name;
+              meta.appendChild(nameEl);
+              if (unit.role || unit.rank) {
+                  const tag = document.createElement('p');
+                  tag.className = 'lineup-roster__tag';
+                  const marker = renderRoleElementIcons(unit);
+                  tag.textContent = [marker, unit.role, unit.rank].filter(Boolean).join(' · ');
+                  meta.appendChild(tag);
+              }
+              if (unit.power != null) {
+                  const extra = document.createElement('p');
+                  extra.className = 'lineup-roster__extra';
+                  extra.textContent = `Chiến lực ${formatUnitPower(unit.power)}`;
+                  meta.appendChild(extra);
+              }
+              button.appendChild(meta);
+              fragment.appendChild(button);
+          });
+          rosterList.appendChild(fragment);
+      }
+      function openPassiveDetails(passive) {
+          passiveOverlayBody.innerHTML = '';
+          const title = document.createElement('h3');
+          title.className = 'lineup-overlay__title';
           title.textContent = passive.name;
-          btn.appendChild(title);
-          if (!passive.isEmpty) {
-              const condition = document.createElement('p');
-              condition.className = 'lineup-passive__condition';
-              condition.textContent = passive.requirement || 'Chạm để xem chi tiết.';
-              btn.appendChild(condition);
+          passiveOverlayBody.appendChild(title);
+          if (passive.requirement) {
+              const subtitle = document.createElement('p');
+              subtitle.className = 'lineup-overlay__subtitle';
+              subtitle.textContent = passive.requirement;
+              passiveOverlayBody.appendChild(subtitle);
           }
-          passiveGrid.appendChild(btn);
+          if (passive.description) {
+              const descriptionEl = document.createElement('p');
+              descriptionEl.className = 'lineup-overlay__subtitle';
+              descriptionEl.textContent = passive.description;
+              passiveOverlayBody.appendChild(descriptionEl);
+          }
+          if (passive.requiredUnitIds.length) {
+              const list = document.createElement('ul');
+              list.className = 'lineup-overlay__list';
+              passive.requiredUnitIds.forEach(unitId => {
+                  const item = document.createElement('li');
+                  const unit = rosterLookup.get(unitId);
+                  item.textContent = unit?.name || unitId;
+                  list.appendChild(item);
+              });
+              passiveOverlayBody.appendChild(list);
+          }
+          openOverlay(passiveOverlay);
+          passiveClose.focus();
       }
-      ;
-  }
-  function renderFilters() {
-      const nextSignature = [
-          state.filter.type,
-          state.filter.value ?? '',
-          state.filterOptions.classes.join('|'),
-          state.filterOptions.ranks.join('|'),
-      ].join('::');
-      if (nextSignature === lastFiltersRenderSignature) {
-          return;
-      }
-      lastFiltersRenderSignature = nextSignature;
-      rosterFilters.innerHTML = '';
-      const filters = [
-          { type: 'all', value: null, label: 'Tất cả' },
-          ...state.filterOptions.classes.map(value => ({ type: 'class', value, label: value })),
-          ...state.filterOptions.ranks.map(value => ({ type: 'rank', value, label: value })),
-      ];
-      filters.forEach(filter => {
-          const button = document.createElement('button');
-          button.type = 'button';
-          button.className = 'lineup-roster__filter';
-          button.dataset.filterType = filter.type;
-          if (filter.value != null) {
-              button.dataset.filterValue = filter.value;
-          }
-          button.textContent = filter.label;
-          if (state.filter.type === filter.type && (state.filter.value || null) === (filter.value || null)) {
-              button.classList.add('is-active');
-          }
-          rosterFilters.appendChild(button);
-      });
-  }
-  function renderRoster() {
-      const lineup = getSelectedLineup();
-      const filtered = getFilteredRoster();
-      const assignedUnitIds = getAssignedUnitIds(lineup);
-      const assignmentSignature = Array.from(assignedUnitIds).sort().join('|');
-      const filterSignature = `${state.filter.type}:${state.filter.value ?? ''}`;
-      const filteredIdsSignature = filtered.map(unit => normalizeUnitId(unit.id)).join('|');
-      const nextSignature = `${filterSignature}::${state.selectedUnitId ?? ''}::${assignmentSignature}::${filteredIdsSignature}`;
-      if (nextSignature === lastRosterRenderSignature) {
-          return;
-      }
-      lastRosterRenderSignature = nextSignature;
-      rosterList.innerHTML = '';
-      const fragment = document.createDocumentFragment();
-      filtered.forEach(unit => {
-          const unitId = normalizeUnitId(unit.id);
-          const button = document.createElement('button');
-          button.type = 'button';
-          button.className = 'lineup-roster__entry';
-          button.dataset.unitId = unitId;
-          button.setAttribute('aria-label', `Chọn ${unit.name}`);
-          if (state.selectedUnitId === unitId) {
-              button.classList.add('is-selected');
-          }
-          const isAssigned = assignedUnitIds.has(unitId);
-          if (isAssigned && state.selectedUnitId !== unitId) {
-              button.classList.add('is-unavailable');
-          }
-          const avatar = document.createElement('div');
-          avatar.className = 'lineup-roster__avatar';
-          renderAvatar(avatar, unit.avatar || null, unit.name);
-          button.appendChild(avatar);
-          const meta = document.createElement('div');
-          meta.className = 'lineup-roster__meta';
-          const nameEl = document.createElement('p');
-          nameEl.className = 'lineup-roster__name';
-          nameEl.textContent = unit.name;
-          meta.appendChild(nameEl);
-          if (unit.role || unit.rank) {
-              const tag = document.createElement('p');
-              tag.className = 'lineup-roster__tag';
-              const marker = renderRoleElementIcons(unit);
-              tag.textContent = [marker, unit.role, unit.rank].filter(Boolean).join(' · ');
-              meta.appendChild(tag);
-          }
-          if (unit.power != null) {
-              const extra = document.createElement('p');
-              extra.className = 'lineup-roster__extra';
-              extra.textContent = `Chiến lực ${formatUnitPower(unit.power)}`;
-              meta.appendChild(extra);
-          }
-          button.appendChild(meta);
-          fragment.appendChild(button);
-      });
-      rosterList.appendChild(fragment);
-  }
-  function openPassiveDetails(passive) {
-      passiveOverlayBody.innerHTML = '';
-      const title = document.createElement('h3');
-      title.className = 'lineup-overlay__title';
-      title.textContent = passive.name;
-      passiveOverlayBody.appendChild(title);
-      if (passive.requirement) {
+      function openLeaderPicker() {
+          const lineup = getSelectedLineup();
+          if (!lineup)
+              return;
+          leaderOverlayBody.innerHTML = '';
+          const title = document.createElement('h3');
+          title.className = 'lineup-overlay__title';
+          title.textContent = 'Chọn leader';
+          leaderOverlayBody.appendChild(title);
           const subtitle = document.createElement('p');
           subtitle.className = 'lineup-overlay__subtitle';
-          subtitle.textContent = passive.requirement;
-          passiveOverlayBody.appendChild(subtitle);
-      }
-      if (passive.description) {
-          const descriptionEl = document.createElement('p');
-          descriptionEl.className = 'lineup-overlay__subtitle';
-          descriptionEl.textContent = passive.description;
-          passiveOverlayBody.appendChild(descriptionEl);
-      }
-      if (passive.requiredUnitIds.length) {
-          const list = document.createElement('ul');
+          subtitle.textContent = 'Chỉ định leader sẽ kích hoạt buff đội hình và ưu tiên lượt đánh đầu.';
+          leaderOverlayBody.appendChild(subtitle);
+          const list = document.createElement('div');
           list.className = 'lineup-overlay__list';
-          passive.requiredUnitIds.forEach(unitId => {
-              const item = document.createElement('li');
-              const unit = rosterLookup.get(unitId);
-              item.textContent = unit?.name || unitId;
-              list.appendChild(item);
+          const clearOption = document.createElement('button');
+          clearOption.type = 'button';
+          clearOption.className = 'lineup-overlay__option';
+          clearOption.textContent = 'Bỏ chọn leader';
+          clearOption.dataset.unitId = '';
+          list.appendChild(clearOption);
+          const fixedLeaders = [
+              { id: 'leaderA', name: 'Uyên', role: 'Leader', rank: 'SSR', avatar: null },
+              { id: 'leaderB', name: 'Địch', role: 'Leader', rank: 'SSR', avatar: null },
+          ];
+          fixedLeaders
+              .filter((leader) => LINEUP_ALLOWED_LEADER_IDS.has(leader.id))
+              .forEach((leader) => {
+              const option = document.createElement('button');
+              option.type = 'button';
+              option.className = 'lineup-overlay__option';
+              option.dataset.unitId = leader.id;
+              const avatar = document.createElement('div');
+              avatar.className = 'lineup-overlay__option-avatar';
+              renderAvatar(avatar, leader.avatar, leader.name);
+              option.appendChild(avatar);
+              const text = document.createElement('div');
+              const nameEl = document.createElement('p');
+              nameEl.className = 'lineup-overlay__option-name';
+              nameEl.textContent = leader.name;
+              text.appendChild(nameEl);
+              const meta = document.createElement('p');
+              meta.className = 'lineup-overlay__option-meta';
+              meta.textContent = [leader.role, leader.rank].filter(Boolean).join(' · ');
+              text.appendChild(meta);
+              option.appendChild(text);
+              if (lineup.leaderId === leader.id) {
+                  option.classList.add('is-active');
+              }
+              list.appendChild(option);
           });
-          passiveOverlayBody.appendChild(list);
+          leaderOverlayBody.appendChild(list);
+          openOverlay(leaderOverlay);
+          leaderClose.focus();
       }
-      openOverlay(passiveOverlay);
-      passiveClose.focus();
-  }
-  function openLeaderPicker() {
-      const lineup = getSelectedLineup();
-      if (!lineup)
-          return;
-      leaderOverlayBody.innerHTML = '';
-      const title = document.createElement('h3');
-      title.className = 'lineup-overlay__title';
-      title.textContent = 'Chọn leader';
-      leaderOverlayBody.appendChild(title);
-      const subtitle = document.createElement('p');
-      subtitle.className = 'lineup-overlay__subtitle';
-      subtitle.textContent = 'Chỉ định leader sẽ kích hoạt buff đội hình và ưu tiên lượt đánh đầu.';
-      leaderOverlayBody.appendChild(subtitle);
-      const list = document.createElement('div');
-      list.className = 'lineup-overlay__list';
-      const clearOption = document.createElement('button');
-      clearOption.type = 'button';
-      clearOption.className = 'lineup-overlay__option';
-      clearOption.textContent = 'Bỏ chọn leader';
-      clearOption.dataset.unitId = '';
-      list.appendChild(clearOption);
-      const fixedLeaders = [
-          { id: 'leaderA', name: 'Uyên', role: 'Leader', rank: 'SSR', avatar: null },
-          { id: 'leaderB', name: 'Địch', role: 'Leader', rank: 'SSR', avatar: null },
-      ];
-      fixedLeaders
-          .filter((leader) => LINEUP_ALLOWED_LEADER_IDS.has(leader.id))
-          .forEach((leader) => {
-          const option = document.createElement('button');
-          option.type = 'button';
-          option.className = 'lineup-overlay__option';
-          option.dataset.unitId = leader.id;
-          const avatar = document.createElement('div');
-          avatar.className = 'lineup-overlay__option-avatar';
-          renderAvatar(avatar, leader.avatar, leader.name);
-          option.appendChild(avatar);
-          const text = document.createElement('div');
-          const nameEl = document.createElement('p');
-          nameEl.className = 'lineup-overlay__option-name';
-          nameEl.textContent = leader.name;
-          text.appendChild(nameEl);
-          const meta = document.createElement('p');
-          meta.className = 'lineup-overlay__option-meta';
-          meta.textContent = [leader.role, leader.rank].filter(Boolean).join(' · ');
-          text.appendChild(meta);
-          option.appendChild(text);
-          if (lineup.leaderId === leader.id) {
-              option.classList.add('is-active');
-          }
-          list.appendChild(option);
+      const cleanup = [];
+      const eventCleanup = bindLineupEvents({
+          shell,
+          state,
+          elements: {
+              backButton,
+              cellsGrid,
+              cellDetails,
+              passiveGrid,
+              rosterFilters,
+              rosterList,
+              leaderAvatar,
+              leaderSection,
+              passiveOverlay,
+              passiveClose,
+              leaderOverlay,
+              leaderOverlayBody,
+              leaderClose,
+          },
+          overlays: {
+              getActive: () => activeOverlay,
+              close: overlay => closeOverlay(overlay),
+          },
+          helpers: {
+              getSelectedLineup,
+              setMessage,
+              renderCells,
+              renderCellDetails,
+              renderLeader,
+              renderPassives,
+              renderFilters,
+              renderRoster,
+              updateActiveCellHighlight,
+              syncGridDetailsHeight,
+              openPassiveDetails,
+              openLeaderPicker,
+              refreshWallet,
+              persistLineupSelection,
+          },
+          rosterLookup,
       });
-      leaderOverlayBody.appendChild(list);
-      openOverlay(leaderOverlay);
-      leaderClose.focus();
-  }
-  const cleanup = [];
-  const eventCleanup = bindLineupEvents({
-      shell,
-      state,
-      elements: {
-          backButton,
-          cellsGrid,
-          cellDetails,
-          passiveGrid,
-          rosterFilters,
-          rosterList,
-          leaderAvatar,
-          leaderSection,
-          passiveOverlay,
-          passiveClose,
-          leaderOverlay,
-          leaderOverlayBody,
-          leaderClose,
-      },
-      overlays: {
-          getActive: () => activeOverlay,
-          close: overlay => closeOverlay(overlay),
-      },
-      helpers: {
-          getSelectedLineup,
-          setMessage,
-          renderCells,
-          renderCellDetails,
-          renderLeader,
-          renderPassives,
-          renderFilters,
-          renderRoster,
-          updateActiveCellHighlight,
-          syncGridDetailsHeight,
-          openPassiveDetails,
-          openLeaderPicker,
-          refreshWallet,
-          persistLineupSelection,
-      },
-      rosterLookup,
-  });
-  cleanup.push(...eventCleanup);
-  const unsubscribeSharedWallet = subscribeSharedCurrencyWallet((walletSnapshot) => {
-      applyWalletToBalances(walletSnapshot);
+      cleanup.push(...eventCleanup);
+      const unsubscribeSharedWallet = subscribeSharedCurrencyWallet((walletSnapshot) => {
+          applyWalletToBalances(walletSnapshot);
+          refreshWallet();
+          renderCellDetails();
+      });
+      cleanup.push(unsubscribeSharedWallet);
       refreshWallet();
-      renderCellDetails();
-  });
-  cleanup.push(unsubscribeSharedWallet);
-  refreshWallet();
-  renderCells();
-  renderLeader();
-  renderPassives();
-  renderFilters();
-  renderRoster();
-  setMessage('Chọn nhân vật rồi nhấp vào ô để gán. Giữ Alt và nhấp ô đã có nhân vật để bỏ.');
-  cleanup.push(() => passiveOverlay.remove());
-  cleanup.push(() => leaderOverlay.remove());
-  return {
-      destroy() {
-          if (syncGridDetailsHandle !== null) {
-              window.cancelAnimationFrame(syncGridDetailsHandle);
-              syncGridDetailsHandle = null;
-          }
-          while (cleanup.length > 0) {
-              const fn = cleanup.pop();
-              if (!fn)
-                  continue;
-              try {
-                  fn();
+      renderCells();
+      renderLeader();
+      renderPassives();
+      renderFilters();
+      renderRoster();
+      setMessage('Chọn nhân vật rồi nhấp vào ô để gán. Giữ Alt và nhấp ô đã có nhân vật để bỏ.');
+      cleanup.push(() => passiveOverlay.remove());
+      cleanup.push(() => leaderOverlay.remove());
+      return {
+          destroy() {
+              if (syncGridDetailsHandle !== null) {
+                  window.cancelAnimationFrame(syncGridDetailsHandle);
+                  syncGridDetailsHandle = null;
               }
-              catch (error) {
-                  console.error('[lineup] destroy error', error);
+              while (cleanup.length > 0) {
+                  const fn = cleanup.pop();
+                  if (!fn)
+                      continue;
+                  try {
+                      fn();
+                  }
+                  catch (error) {
+                      console.error('[lineup] destroy error', error);
+                  }
               }
-          }
-          syncSharedCurrencyWallet(mapToWallet());
-          mount.destroy();
-      },
-  };
+              syncSharedCurrencyWallet(mapToWallet());
+              mount.destroy();
+          },
+      };
+  }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'serializeSelectedLineup')) exports.serializeSelectedLineup = serializeSelectedLineup;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderLineupView')) exports.renderLineupView = renderLineupView;
@@ -24741,6 +24748,8 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
       ThNT: 'assets/key.svg',
       TT: 'assets/gem.svg',
   };
+  const currencyValueNodeCache = new WeakMap();
+  const bannerButtonNodeCache = new WeakMap();
   function formatNumber(value) {
       return NUMBER_FORMAT.format(Math.max(0, Math.trunc(value)));
   }
@@ -24781,28 +24790,33 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
       return chip;
   }
   function renderCurrencyHeader(container, wallet, onOpenRules) {
-      const previous = container.querySelectorAll('.currency-chip');
-      if (previous.length === CURRENCY_ORDER.length) {
-          CURRENCY_ORDER.forEach((code, index) => {
-              const chip = previous[index];
-              const valueEl = chip?.querySelector('.currency-chip__value');
-              if (chip && valueEl) {
-                  const nextText = formatNumber(wallet[code]);
-                  if (valueEl.textContent !== nextText) {
-                      valueEl.textContent = nextText;
-                  }
+      const cachedNodes = currencyValueNodeCache.get(container) ?? new Map();
+      if (cachedNodes.size === CURRENCY_ORDER.length) {
+          CURRENCY_ORDER.forEach((code) => {
+              const valueEl = cachedNodes.get(code);
+              if (!valueEl)
+                  return;
+              const nextText = formatNumber(wallet[code]);
+              if (valueEl.textContent !== nextText) {
+                  valueEl.textContent = nextText;
               }
           });
           return;
       }
       container.replaceChildren();
+      cachedNodes.clear();
       const fragment = document.createDocumentFragment();
       for (const code of CURRENCY_ORDER) {
           const chip = renderWalletChip(code, wallet[code]);
           chip.addEventListener('click', onOpenRules);
+          const valueEl = chip.querySelector('.currency-chip__value');
+          if (valueEl) {
+              cachedNodes.set(code, valueEl);
+          }
           fragment.appendChild(chip);
       }
       container.appendChild(fragment);
+      currencyValueNodeCache.set(container, cachedNodes);
   }
   function createBannerButton(banner, isActive) {
       const button = document.createElement('button');
@@ -24819,10 +24833,10 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
       return button;
   }
   function renderBannerList(container, banners, activeId, onSelect) {
-      const previous = container.querySelectorAll('.banner-entry');
-      if (previous.length === banners.length) {
-          banners.forEach((banner, index) => {
-              const button = previous[index];
+      const cachedButtons = bannerButtonNodeCache.get(container) ?? new Map();
+      if (cachedButtons.size === banners.length) {
+          banners.forEach((banner) => {
+              const button = cachedButtons.get(banner.id);
               if (!button) {
                   return;
               }
@@ -24836,13 +24850,16 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
           return;
       }
       container.replaceChildren();
+      cachedButtons.clear();
       const fragment = document.createDocumentFragment();
       for (const banner of banners) {
           const button = createBannerButton(banner, banner.id === activeId);
           button.addEventListener('click', () => onSelect(banner.id));
+          cachedButtons.set(banner.id, button);
           fragment.appendChild(button);
       }
       container.appendChild(fragment);
+      bannerButtonNodeCache.set(container, cachedButtons);
   }
   function renderRates(container, banner) {
       container.replaceChildren();

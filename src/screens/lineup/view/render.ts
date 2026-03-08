@@ -652,6 +652,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   let lastFiltersRenderSignature = '';
   let lastHighlightedCellIndex: number | null = null;
   let mountedCellAvatars: HTMLElement[] = [];
+  const cellNodeByIndex = new Map<number, HTMLElement>();
 
   function getFilteredRoster(): RosterUnit[] {
     const filterKey = `${state.filter.type}::${state.filter.value ?? ''}`;
@@ -883,6 +884,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       unmountRarity(avatar);
     }
     mountedCellAvatars = [];
+    cellNodeByIndex.clear();
     cellsGrid.innerHTML = '';
     const lineup = getSelectedLineup();
     if (!lineup){
@@ -920,6 +922,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       const cellEl = document.createElement('div');
       cellEl.className = 'lineup-cell';
       cellEl.dataset.cellIndex = String(cell.index);
+      cellNodeByIndex.set(cell.index, cellEl);
       cellEl.tabIndex = 0;
       cellEl.setAttribute('role', 'button');
       const unit = cell.unitId ? rosterLookup.get(cell.unitId) : null;
@@ -1006,11 +1009,11 @@ lastHighlightedCellIndex = null;
 function updateActiveCellHighlight(): void{
     const nextIndex = Number.isInteger(state.activeCellIndex) ? state.activeCellIndex : null;
     if (lastHighlightedCellIndex != null){
-      const previous = cellsGrid.querySelector<HTMLElement>(`.lineup-cell[data-cell-index="${lastHighlightedCellIndex}"]`);
+      const previous = cellNodeByIndex.get(lastHighlightedCellIndex) ?? null;
       previous?.classList.remove('is-active');
     }
     if (nextIndex != null){
-      const next = cellsGrid.querySelector<HTMLElement>(`.lineup-cell[data-cell-index="${nextIndex}"]`);
+      const next = cellNodeByIndex.get(nextIndex) ?? null;
       next?.classList.add('is-active');
     }
     lastHighlightedCellIndex = nextIndex;
@@ -1090,7 +1093,7 @@ function updateActiveCellHighlight(): void{
         btn.classList.add('is-empty');
         btn.disabled = true;
       }
-      if (isActive)){
+      if (isActive){
         btn.classList.add('is-active');
       }
       const title = document.createElement('p');

@@ -53,6 +53,9 @@ interface PityMeterNodes {
   value: HTMLSpanElement;
 }
 
+const currencyValueNodeCache = new WeakMap<HTMLElement, Map<CurrencyCode, HTMLElement>>();
+const bannerButtonNodeCache = new WeakMap<HTMLElement, Map<string, HTMLButtonElement>>();
+
 function formatNumber(value: number): string {
   return NUMBER_FORMAT.format(Math.max(0, Math.trunc(value)));
 }
@@ -97,29 +100,34 @@ function renderWalletChip(code: CurrencyCode, amount: number): HTMLElement {
 }
 
 function renderCurrencyHeader(container: HTMLElement, wallet: Wallet, onOpenRules: () => void): void {
-  const previous = container.querySelectorAll<HTMLElement>('.currency-chip');
-  if (previous.length === CURRENCY_ORDER.length) {
-    CURRENCY_ORDER.forEach((code, index) => {
-      const chip = previous[index];
-      const valueEl = chip?.querySelector<HTMLElement>('.currency-chip__value');
-      if (chip && valueEl) {
-        const nextText = formatNumber(wallet[code]);
-        if (valueEl.textContent !== nextText) {
-          valueEl.textContent = nextText;
-        }
+  const cachedNodes = currencyValueNodeCache.get(container) ?? new Map<CurrencyCode, HTMLElement>();
+
+  if (cachedNodes.size === CURRENCY_ORDER.length) {
+    CURRENCY_ORDER.forEach((code) => {
+      const valueEl = cachedNodes.get(code);
+      if (!valueEl) return;
+      const nextText = formatNumber(wallet[code]);
+      if (valueEl.textContent !== nextText) {
+        valueEl.textContent = nextText;
       }
     });
     return;
   }
 
   container.replaceChildren();
+  cachedNodes.clear();
   const fragment = document.createDocumentFragment();
   for (const code of CURRENCY_ORDER) {
     const chip = renderWalletChip(code, wallet[code]);
     chip.addEventListener('click', onOpenRules);
+    const valueEl = chip.querySelector<HTMLElement>('.currency-chip__value');
+    if (valueEl) {
+      cachedNodes.set(code, valueEl);
+    }
     fragment.appendChild(chip);
   }
   container.appendChild(fragment);
+  currencyValueNodeCache.set(container, cachedNodes);
 }
 
 function createBannerButton(banner: BannerDefinition, isActive: boolean): HTMLButtonElement {
@@ -143,10 +151,11 @@ function renderBannerList(
   activeId: string,
   onSelect: (id: string) => void,
 ): void {
-  const previous = container.querySelectorAll<HTMLButtonElement>('.banner-entry');
-  if (previous.length === banners.length) {
-    banners.forEach((banner, index) => {
-      const button = previous[index];
+  const cachedButtons = bannerButtonNodeCache.get(container) ?? new Map<string, HTMLButtonElement>();
+
+  if (cachedButtons.size === banners.length) {
+    banners.forEach((banner) => {
+      const button = cachedButtons.get(banner.id);
       if (!button) {
         return;
       }
@@ -161,13 +170,16 @@ function renderBannerList(
   }
 
   container.replaceChildren();
+  cachedButtons.clear();
   const fragment = document.createDocumentFragment();
   for (const banner of banners) {
     const button = createBannerButton(banner, banner.id === activeId);
     button.addEventListener('click', () => onSelect(banner.id));
+    cachedButtons.set(banner.id, button);
     fragment.appendChild(button);
   }
   container.appendChild(fragment);
+  bannerButtonNodeCache.set(container, cachedButtons);
 }
 
 function renderRates(container: HTMLElement, banner: BannerDefinition): void {

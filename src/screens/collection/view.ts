@@ -1050,6 +1050,8 @@ const resolveCurrentCultivation = () => {
   });
   addCleanup(unsubscribeSharedWallet);
 
+  let selectedUnitRenderKey = '';
+  
   const refreshTuViPanel = () => {
     const { realm, subRealm } = resolveCurrentCultivation();
     const realmEconomy = getCultivationRealmEconomy(realm);
@@ -1104,6 +1106,12 @@ const resolveCurrentCultivation = () => {
 
   const selectUnit = (unitId: string | null) => {
     if (!unitId || !rosterEntries.has(unitId)) return;
+    const nextRenderKey = `${unitId}::${filterState.activeTab}`;
+    if (selectedUnitRenderKey === nextRenderKey){
+      refreshTuViPanel();
+      return;
+    }
+    selectedUnitRenderKey = nextRenderKey;
     activeUnitId = unitId;
     updateSelectedUnit(filterState, unitId);
     clearSkillDetail();
