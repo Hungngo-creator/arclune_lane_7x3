@@ -104,6 +104,26 @@ const getCollectionEntries = (collectionState: CollectionStateInput | null | und
   return list.filter((item): item is CollectionItemCandidate => Boolean(item && typeof item === 'object'));
 };
 
+const normalizeInteger = (value: unknown, min: number): number | null => {
+  const numeric = asFinite(value);
+  if (numeric == null) return null;
+  return Math.max(min, Math.floor(numeric));
+};
+
+const normalizeIntegerWithFallback = (value: unknown, min: number, fallback: number): number => (
+  normalizeInteger(value, min) ?? fallback
+);
+
+const readSkinKey = (entry: CollectionItemCandidate): string | null => {
+  for (const key of SKIN_FIELD_KEYS) {
+    const value = entry[key];
+    if (typeof value === 'string' && value.trim() !== '') {
+      return value.trim();
+    }
+  }
+  return null;
+};
+
 const normalizeProgress = (entry: CollectionItemCandidate): RuntimeUnitProgress | null => {
   const unitId = readUnitId(entry);
   if (!unitId) return null;
@@ -115,19 +135,21 @@ const normalizeProgress = (entry: CollectionItemCandidate): RuntimeUnitProgress 
   const owned = asBoolean(entry.owned ?? entry.unlocked ?? entry.isOwned);
   const awakened = asBoolean(entry.awakened ?? entry.isAwakened);
   const inLineup = asBoolean(entry.inLineup ?? entry.isInLineup);
-  const rawSkin = SKIN_FIELD_KEYS
-    .map((key) => entry[key])
-    .find((value) => typeof value === 'string' && value.trim() !== '');
-  const skinKey = typeof rawSkin === 'string' ? rawSkin.trim() : null;
+  const skinKey = readSkinKey(entry);
 
   const gambit = normalizeGambitSlots(entry.gambit ?? entry.tacticalAi);
 
+  const normalizedLevel = normalizeInteger(level, 1);
+  const normalizedRealm = normalizeInteger(realm, 0);
+  const normalizedSubRealm = normalizeInteger(subRealm, 0);
+  const normalizedStars = normalizeInteger(stars, 0);
+
   const progress: RuntimeUnitProgress = {
     unitId,
-    ...(level != null ? { level: Math.max(1, Math.floor(level)) } : {}),
-    ...(realm != null ? { realm: Math.max(0, Math.floor(realm)) } : {}),
-    ...(subRealm != null ? { subRealm: Math.max(0, Math.floor(subRealm)) } : {}),
-    ...(stars != null ? { stars: Math.max(0, Math.floor(stars)) } : {}),
+    ...(normalizedLevel != null ? { level: normalizedLevel } : {}),
+    ...(normalizedRealm != null ? { realm: normalizedRealm } : {}),
+    ...(normalizedSubRealm != null ? { subRealm: normalizedSubRealm } : {}),
+    ...(normalizedStars != null ? { stars: normalizedStars } : {}),
     ...(owned != null ? { owned } : {}),
     ...(awakened != null ? { awakened } : {}),
     ...(inLineup != null ? { inLineup } : {}),
@@ -165,10 +187,10 @@ export function resolveRuntimeUnitStats(
 ): InstanceStats & Pick<RuntimeUnitProgress, 'level' | 'realm' | 'subRealm' | 'stars'> {
   const meta = Meta.get(unitId);
   const progress = progressMap?.get(unitId);
-  const level = Math.max(1, Math.floor(progress?.level ?? 1));
-  const realm = Math.max(0, Math.floor(progress?.realm ?? 0));
-  const subRealm = Math.max(0, Math.floor(progress?.subRealm ?? 0));
-  const stars = Math.max(0, Math.floor(progress?.stars ?? 0));
+  const level = normalizeIntegerWithFallback(progress?.level, 1, 1);
+  const realm = normalizeIntegerWithFallback(progress?.realm, 0, 0);
+  const subRealm = normalizeIntegerWithFallback(progress?.subRealm, 0, 0);
+  const stars = normalizeIntegerWithFallback(progress?.stars, 0, 0);
 
   const stats = meta ? makeInstanceStats(unitId, level, stars) : makeInstanceStats(unitId);
   return {

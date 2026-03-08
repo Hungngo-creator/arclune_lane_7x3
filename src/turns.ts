@@ -421,6 +421,47 @@ const consumedTurnFromOutcome = (outcome: StrictActionResolution | null, hadHook
   return { consumed: true, skipped, reason };
 };
 
+const resolveTurnAction = (
+  Game: SessionState,
+  hooks: TurnHooks,
+  entry: { side: Side; slot: number },
+  active: UnitToken,
+  turnContext: TurnContext,
+  turnDetail: {
+    game: SessionState;
+    side: Side;
+    slot: number;
+    unit: UnitToken;
+    cycle: number;
+    phase: Side;
+    orderIndex: number;
+    orderLength: number | null;
+    spawned: boolean;
+    processedChain: ActionChainProcessedResult | null;
+  }
+): TickMinionTtlOptions => {
+  const actionHook = hooks.doActionOrSkip;
+  let actionOutcome: StrictActionResolution | null = null;
+  const hasActionHook = typeof actionHook === 'function';
+  try {
+    if (hasActionHook){
+      const rawOutcome = actionHook(Game, active, { performUlt: hooks.performUlt, turnContext });
+      actionOutcome = normalizeActionResolution(rawOutcome);
+    }
+    const chainHooks: TurnHooks & { getTurnOrderIndex: typeof getTurnOrderIndex } = {
+      ...hooks,
+      getTurnOrderIndex: hooks.getTurnOrderIndex ?? getTurnOrderIndex,
+    };
+    const processed = hooks.processActionChain?.(Game, entry.side, entry.slot, chainHooks);
+    turnDetail.processedChain = processed ?? null;
+  } finally {
+    emitGameEvent(TURN_END, turnDetail);
+  }
+
+  grantActionAether(Game, active, !!actionOutcome?.acted);
+  return consumedTurnFromOutcome(actionOutcome, hasActionHook);
+};
+
 // hành động 1 unit (ưu tiên ult nếu đủ nộ & không bị chặn)
 export function doActionOrSkip(
   Game: SessionState,
@@ -701,22 +742,7 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
 
     emitGameEvent(TURN_START, turnDetail);
 
-  const actionHook = hooks.doActionOrSkip;
-    let actionOutcome: StrictActionResolution | null = null;
-    try {
-      if (typeof actionHook === 'function'){
-        const rawOutcome = actionHook(Game, active, { performUlt: hooks.performUlt, turnContext });
-        actionOutcome = normalizeActionResolution(rawOutcome);
-      }
-      const chainHooks = { ...hooks, getTurnOrderIndex };
-      const processed = hooks.processActionChain?.(Game, entry.side, entry.slot, chainHooks);
-      turnDetail.processedChain = processed ?? null;
-    } finally {
-      emitGameEvent(TURN_END, turnDetail);
-    }
-
-    const consumption = consumedTurnFromOutcome(actionOutcome, typeof actionHook === 'function');
-    grantActionAether(Game, active, !!actionOutcome?.acted);
+  const consumption = resolveTurnAction(Game, hooks, entry, active, turnContext, turnDetail);
     tickMinionTTL(Game, entry.side, consumption);
     const ended = hooks.checkBattleEnd?.(Game, {
       trigger: 'interleaved',
@@ -796,22 +822,7 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
     };
     emitGameEvent(TURN_START, turnDetail);
 
-  const actionHook = hooks.doActionOrSkip;
-    let actionOutcome: StrictActionResolution | null = null;
-    try {
-      if (typeof actionHook === 'function'){
-        const rawOutcome = actionHook(Game, active, { performUlt: hooks.performUlt, turnContext });
-        actionOutcome = normalizeActionResolution(rawOutcome);
-      }
-      const chainHooks = { ...hooks, getTurnOrderIndex };
-      const processed = hooks.processActionChain?.(Game, entry.side, entry.slot, chainHooks);
-      turnDetail.processedChain = processed ?? null;
-    } finally {
-      emitGameEvent(TURN_END, turnDetail);
-    }
-
-    const consumption = consumedTurnFromOutcome(actionOutcome, typeof actionHook === 'function');
-    grantActionAether(Game, active, !!actionOutcome?.acted);
+  const consumption = resolveTurnAction(Game, hooks, entry, active, turnContext, turnDetail);
     tickMinionTTL(Game, entry.side, consumption);
 
     const ended = hooks.checkBattleEnd?.(Game, {
