@@ -5062,6 +5062,14 @@ __define('./combat/tag-dispatch.ts', (exports, module, __require) => {
       return [];
   };
   const sortByBoardOrder = (tokens) => ([...tokens].sort((a, b) => (a.cy - b.cy) || (a.cx - b.cx)));
+  const EMPTY_TOKENS = [];
+  const collectSideTokens = (ctx, side) => {
+      if (!ctx.attacker)
+          return EMPTY_TOKENS;
+      const isAttackerSide = ctx.attacker.side === side;
+      return isAttackerSide ? ctx.allyTokens : ctx.enemyTokens;
+  };
+  const readTargetLimit = (ctx, fallback) => (Math.max(1, Math.round(asFinite(ctx.payload?.targetCount ?? ctx.payload?.targets, fallback))));
   const readTurns = (payload, ...keys) => {
       for (const key of keys) {
           const raw = (payload?.[key] ?? null);
@@ -5105,53 +5113,53 @@ __define('./combat/tag-dispatch.ts', (exports, module, __require) => {
               result.targets = [ctx.attacker];
       },
       ally: (ctx, result) => {
-          if (!ctx.game || !ctx.attacker)
+          if (!ctx.attacker)
               return;
           if (result.targets.length > 0)
               return;
-          const limit = Math.max(1, Math.round(asFinite(ctx.payload?.targetCount ?? ctx.payload?.targets, 1)));
-          result.targets = sortByBoardOrder(ctx.game.tokens.filter((token) => token.alive && token.side === ctx.attacker?.side)).slice(0, limit);
+          const limit = readTargetLimit(ctx, 1);
+          result.targets = collectSideTokens(ctx, 'ally').slice(0, limit);
       },
       enemy: (ctx, result) => {
-          if (!ctx.game || !ctx.attacker)
+          if (!ctx.attacker)
               return;
           if (result.targets.length > 0)
               return;
           const foeSide = ctx.attacker.side === 'ally' ? 'enemy' : 'ally';
-          const limit = Math.max(1, Math.round(asFinite(ctx.payload?.targetCount ?? ctx.payload?.targets, 1)));
-          result.targets = sortByBoardOrder(ctx.game.tokens.filter((token) => token.alive && token.side === foeSide)).slice(0, limit);
+          const limit = readTargetLimit(ctx, 1);
+          result.targets = collectSideTokens(ctx, foeSide).slice(0, limit);
       },
       'random-target': (ctx, result) => {
-          if (!ctx.game || !ctx.attacker)
+          if (!ctx.attacker)
               return;
           if (result.targets.length > 0)
               return;
           const foeSide = ctx.attacker.side === 'ally' ? 'enemy' : 'ally';
-          const candidates = sortByBoardOrder(ctx.game.tokens.filter((token) => token.alive && token.side === foeSide));
+          const candidates = collectSideTokens(ctx, foeSide);
           if (candidates.length > 0)
               result.targets = [candidates[0]];
       },
       'random-aoe': (ctx, result) => {
-          if (!ctx.game || !ctx.attacker)
+          if (!ctx.attacker)
               return;
           const foeSide = ctx.attacker.side === 'ally' ? 'enemy' : 'ally';
-          const limit = Math.max(1, Math.round(asFinite(ctx.payload?.targetCount ?? ctx.payload?.targets, 2)));
-          result.targets = sortByBoardOrder(ctx.game.tokens.filter((token) => token.alive && token.side === foeSide)).slice(0, limit);
+          const limit = readTargetLimit(ctx, 2);
+          result.targets = collectSideTokens(ctx, foeSide).slice(0, limit);
       },
       'multi-target': (ctx, result) => {
-          if (!ctx.game || !ctx.attacker)
+          if (!ctx.attacker)
               return;
           if (result.targets.length > 0)
               return;
-          const limit = Math.max(1, Math.round(asFinite(ctx.payload?.targetCount ?? ctx.payload?.targets, 2)));
+          const limit = readTargetLimit(ctx, 2);
           const foeSide = ctx.attacker.side === 'ally' ? 'enemy' : 'ally';
-          result.targets = ctx.game.tokens.filter((token) => token.alive && token.side === foeSide).slice(0, limit);
+          result.targets = collectSideTokens(ctx, foeSide).slice(0, limit);
       },
       aoe: (ctx, result) => {
-          if (!ctx.game || !ctx.attacker)
+          if (!ctx.attacker)
               return;
           const foeSide = ctx.attacker.side === 'ally' ? 'enemy' : 'ally';
-          result.targets = sortByBoardOrder(ctx.game.tokens.filter((token) => token.alive && token.side === foeSide));
+          result.targets = collectSideTokens(ctx, foeSide);
       },
       heal: (ctx, result) => {
           if (ctx.deferEffects)
@@ -5169,10 +5177,9 @@ __define('./combat/tag-dispatch.ts', (exports, module, __require) => {
           if (ctx.deferEffects)
               return;
           const amount = Math.max(0, Math.round(asFinite(ctx.payload?.healAmount ?? ctx.payload?.heal, 0)));
-          if (amount <= 0 || !ctx.game || !ctx.attacker)
+          if (amount <= 0 || !ctx.attacker)
               return;
-          const allies = ctx.game.tokens.filter((token) => token.alive && token.side === ctx.attacker?.side);
-          for (const token of allies)
+          for (const token of collectSideTokens(ctx, 'ally'))
               healUnit(token, amount);
           result.sideEffects.push(`team-heal:${amount}`);
       },
@@ -5253,9 +5260,19 @@ __define('./combat/tag-dispatch.ts', (exports, module, __require) => {
   function dispatchGameplayTags(rawTags, context) {
       const tags = normalizeTagList(rawTags);
       const target = context.target ?? null;
+      const attacker = context.attacker ?? null;
+      const sortedAliveTokens = context.game
+          ? sortByBoardOrder(context.game.tokens.filter((token) => token.alive))
+          : EMPTY_TOKENS;
+      const allyTokens = attacker
+          ? sortedAliveTokens.filter((token) => token.side === attacker.side)
+          : EMPTY_TOKENS;
+      const enemyTokens = attacker
+          ? sortedAliveTokens.filter((token) => token.side !== attacker.side)
+          : EMPTY_TOKENS;
       const ctx = {
           game: context.game ?? null,
-          attacker: context.attacker ?? null,
+          attacker,
           target,
           targets: resolveTargets(context.targets, target),
           cost: Math.max(0, Math.round(asFinite(context.cost, 0))),
@@ -5265,6 +5282,8 @@ __define('./combat/tag-dispatch.ts', (exports, module, __require) => {
           onAetherCost: context.onAetherCost ?? (() => false),
           onSummon: context.onSummon ?? (() => undefined),
           deferEffects: Boolean(context.deferEffects),
+          allyTokens,
+          enemyTokens,
       };
       const result = {
           tags,
