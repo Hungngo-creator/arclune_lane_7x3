@@ -27,6 +27,9 @@ const isRosterEntryLite = (value: unknown): value is RosterEntryLite => (
 );
 
 const EXCLUDED_COLLECTION_TAGS = new Set(['npc', 'pve']);
+const UNIT_COST_BY_ID = new Map<string, number>(
+  UNITS.map((unit: UnitDefinition) => [normalizeUnitId(unit.id), unit.cost] as const),
+);
 
 function hasExcludedCollectionTags(tags: unknown): boolean {
   if (!Array.isArray(tags)) return false;
@@ -88,9 +91,6 @@ export function cloneRoster(input: ReadonlyArray<RosterEntryLite> | null | undef
 }
 
 export function buildRosterWithCost(rosterSource: ReadonlyArray<CollectionEntry>): CollectionEntry[]{
-  const costs = new Map<string, number>(
-    UNITS.map((unit: UnitDefinition) => [normalizeUnitId(unit.id), unit.cost] as const),
-  );
   return rosterSource.map((entry) => {
     const entryId = normalizeUnitId(entry.id);
     return {
@@ -100,7 +100,7 @@ export function buildRosterWithCost(rosterSource: ReadonlyArray<CollectionEntry>
         ? entry.cost
         : entry.cost === null
           ? null
-          : costs.get(entryId) ?? null,
+          : UNIT_COST_BY_ID.get(entryId) ?? null,
     };
   });
 }

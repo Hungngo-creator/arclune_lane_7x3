@@ -648,6 +648,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   let cachedFilteredRosterSource: RosterUnit[] | null = null;
   let cachedFilteredRoster: RosterUnit[] = [];
   let lastRosterRenderSignature = '';
+  let lastHighlightedCellIndex: number | null = null;
 
   function getFilteredRoster(): RosterUnit[] {
     const filterKey = `${state.filter.type}::${state.filter.value ?? ''}`;
@@ -991,23 +992,25 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       fragment.appendChild(cellEl);
     });
 
-cellsGrid.appendChild(fragment);
+  cellsGrid.appendChild(fragment);
 
-updateActiveCellHighlight();
+lastHighlightedCellIndex = null;
+    updateActiveCellHighlight();
     renderCellDetails();
   }
 
 function updateActiveCellHighlight(): void{
-    const entries = cellsGrid.querySelectorAll<HTMLElement>('.lineup-cell');
-    entries.forEach(entry => {
-      const idx = Number(entry.dataset.cellIndex);
-      if (Number.isFinite(idx) && idx === state.activeCellIndex){
-        entry.classList.add('is-active');
-      } else {
-        entry.classList.remove('is-active');
-      }
-    });
- }
+    const nextIndex = Number.isInteger(state.activeCellIndex) ? state.activeCellIndex : null;
+    if (lastHighlightedCellIndex != null){
+      const previous = cellsGrid.querySelector<HTMLElement>(`.lineup-cell[data-cell-index="${lastHighlightedCellIndex}"]`);
+      previous?.classList.remove('is-active');
+    }
+    if (nextIndex != null){
+      const next = cellsGrid.querySelector<HTMLElement>(`.lineup-cell[data-cell-index="${nextIndex}"]`);
+      next?.classList.add('is-active');
+    }
+    lastHighlightedCellIndex = nextIndex;
+  }
 
   function renderLeader(): void{
     const lineup = getSelectedLineup();

@@ -41,6 +41,18 @@ interface SummonResultEntry {
   pity: string | null;
 }
 
+interface PitySection {
+  label: string;
+  value: number;
+  max: number | null;
+}
+
+interface PityMeterNodes {
+  root: HTMLDivElement;
+  progress: HTMLDivElement;
+  value: HTMLSpanElement;
+}
+
 function formatNumber(value: number): string {
   return NUMBER_FORMAT.format(Math.max(0, Math.trunc(value)));
 }
@@ -174,10 +186,9 @@ function renderRates(container: HTMLElement, banner: BannerDefinition): void {
   container.appendChild(list);
 }
 
-function renderPity(container: HTMLElement, banner: BannerDefinition, states: BannerStateMap): void {
-  container.replaceChildren();
+function getPitySections(banner: BannerDefinition, states: BannerStateMap): PitySection[] {
   const state = getBannerState(states, banner);
-  const sections: Array<{ label: string; value: number; max: number | null }> = [
+  const sections: PitySection[] = [
     { label: 'SR sàn', value: state.pity.sr, max: banner.pity.srFloor },
   ];
   if (banner.pity.ssr) {
@@ -189,30 +200,73 @@ function renderPity(container: HTMLElement, banner: BannerDefinition, states: Ba
   if (banner.pity.prime) {
     sections.push({ label: 'Prime', value: state.pity.prime, max: banner.pity.prime.hard });
   }
+  return sections;
+}
 
-  for (const entry of sections) {
+  function ensurePityMeterNodes(container: HTMLElement, sections: ReadonlyArray<PitySection>): Map<string, PityMeterNodes> {
+  const existing = new Map<string, PityMeterNodes>();
+  for (const child of container.querySelectorAll<HTMLDivElement>(':scope > .pity-meter')) {
+    const label = child.dataset.pityLabel;
+    const progress = child.querySelector<HTMLDivElement>('.pity-meter__progress');
+    const value = child.querySelector<HTMLSpanElement>('.pity-meter__value');
+    if (!label || !progress || !value) {
+      continue;
+    }
+    existing.set(label, { root: child, progress, value });
+  }
+
+  const fragment = document.createDocumentFragment();
+  const nextMap = new Map<string, PityMeterNodes>();
+  for (const section of sections) {
+    const current = existing.get(section.label);
+    if (current) {
+      nextMap.set(section.label, current);
+      fragment.appendChild(current.root);
+      continue;
+    }
     const item = document.createElement('div');
     item.className = 'pity-meter';
+    item.dataset.pityLabel = section.label;
     const label = document.createElement('span');
     label.className = 'pity-meter__label';
-    label.textContent = entry.label;
+    label.textContent = section.label;
     const bar = document.createElement('div');
     bar.className = 'pity-meter__bar';
     const progress = document.createElement('div');
     progress.className = 'pity-meter__progress';
+    bar.appendChild(progress);
+    const value = document.createElement('span');
+    value.className = 'pity-meter__value';
+    item.append(label, bar, value);
+    const nodes = { root: item, progress, value };
+    nextMap.set(section.label, nodes);
+    fragment.appendChild(item);
+  }
+  container.replaceChildren(fragment);
+  return nextMap;
+}
+
+function renderPity(container: HTMLElement, banner: BannerDefinition, states: BannerStateMap): void {
+  const sections = getPitySections(banner, states);
+  const pityNodes = ensurePityMeterNodes(container, sections);
+
+  for (const entry of sections) {
+    const nodes = pityNodes.get(entry.label);
+    if (!nodes) {
+      continue;
+    }
     let percent = 0;
     if (entry.max && entry.max > 0) {
       percent = Math.min(99, Math.floor((entry.value / entry.max) * 100));
     }
-    progress.style.width = `${percent}%`;
-    bar.appendChild(progress);
-    const value = document.createElement('span');
-    value.className = 'pity-meter__value';
-    value.textContent = entry.max ? `${entry.value}/${entry.max}` : `${entry.value}`;
-    item.appendChild(label);
-    item.appendChild(bar);
-    item.appendChild(value);
-    container.appendChild(item);
+    const nextWidth = `${percent}%`;
+    if (nodes.progress.style.width !== nextWidth) {
+      nodes.progress.style.width = nextWidth;
+    }
+    const nextValue = entry.max ? `${entry.value}/${entry.max}` : `${entry.value}`;
+    if (nodes.value.textContent !== nextValue) {
+      nodes.value.textContent = nextValue;
+    }
   }
 }
 
@@ -296,18 +350,31 @@ function renderCosts(container: HTMLElement, banner: BannerDefinition): void {
 }
 
 function renderResults(container: HTMLElement, results: SummonResultEntry[]): void {
-  container.replaceChildren();
+  const fragment = document.createDocumentFragment();
   for (const result of results) {
     const item = document.createElement('div');
     item.className = 'result-entry';
-    const pityLabel = result.pity ? `<span class="result-entry__pity">${result.pity}</span>` : '';
-    item.innerHTML = `
-      <span class="result-entry__rarity">${result.rarity}</span>
-      <span class="result-entry__name">${result.featured ? 'Rate-up' : 'Thường'}</span>
-      ${pityLabel}
-    `;
-    container.appendChild(item);
+
+   const rarity = document.createElement('span');
+    rarity.className = 'result-entry__rarity';
+    rarity.textContent = result.rarity;
+
+    const name = document.createElement('span');
+    name.className = 'result-entry__name';
+    name.textContent = result.featured ? 'Rate-up' : 'Thường';
+
+    item.append(rarity, name);
+
+    if (result.pity) {
+      const pity = document.createElement('span');
+      pity.className = 'result-entry__pity';
+      pity.textContent = result.pity;
+      item.appendChild(pity);
+    }
+
+    fragment.appendChild(item);
   }
+  container.replaceChildren(fragment);
 }
 
 function createToast(message: string): HTMLElement {

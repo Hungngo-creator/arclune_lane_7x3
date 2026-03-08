@@ -19246,6 +19246,7 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
       && value !== null
       && !Array.isArray(value));
   const EXCLUDED_COLLECTION_TAGS = new Set(['npc', 'pve']);
+  const UNIT_COST_BY_ID = new Map(UNITS.map((unit) => [normalizeUnitId(unit.id), unit.cost]));
   function hasExcludedCollectionTags(tags) {
       if (!Array.isArray(tags))
           return false;
@@ -19297,7 +19298,6 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
           .map((unit) => ({ ...unit }));
   }
   function buildRosterWithCost(rosterSource) {
-      const costs = new Map(UNITS.map((unit) => [normalizeUnitId(unit.id), unit.cost]));
       return rosterSource.map((entry) => {
           const entryId = normalizeUnitId(entry.id);
           return {
@@ -19307,7 +19307,7 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
                   ? entry.cost
                   : entry.cost === null
                       ? null
-                      : costs.get(entryId) ?? null,
+                      : UNIT_COST_BY_ID.get(entryId) ?? null,
           };
       });
   }
@@ -22152,6 +22152,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       let cachedFilteredRosterSource = null;
       let cachedFilteredRoster = [];
       let lastRosterRenderSignature = '';
+      let lastHighlightedCellIndex = null;
       function getFilteredRoster() {
           const filterKey = `${state.filter.type}::${state.filter.value ?? ''}`;
           if (cachedFilteredRosterSource === state.roster && cachedFilterKey === filterKey) {
@@ -22478,20 +22479,21 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               fragment.appendChild(cellEl);
           });
           cellsGrid.appendChild(fragment);
+          lastHighlightedCellIndex = null;
           updateActiveCellHighlight();
           renderCellDetails();
       }
       function updateActiveCellHighlight() {
-          const entries = cellsGrid.querySelectorAll('.lineup-cell');
-          entries.forEach(entry => {
-              const idx = Number(entry.dataset.cellIndex);
-              if (Number.isFinite(idx) && idx === state.activeCellIndex) {
-                  entry.classList.add('is-active');
-              }
-              else {
-                  entry.classList.remove('is-active');
-              }
-          });
+          const nextIndex = Number.isInteger(state.activeCellIndex) ? state.activeCellIndex : null;
+          if (lastHighlightedCellIndex != null) {
+              const previous = cellsGrid.querySelector(`.lineup-cell[data-cell-index="${lastHighlightedCellIndex}"]`);
+              previous?.classList.remove('is-active');
+          }
+          if (nextIndex != null) {
+              const next = cellsGrid.querySelector(`.lineup-cell[data-cell-index="${nextIndex}"]`);
+              next?.classList.add('is-active');
+          }
+          lastHighlightedCellIndex = nextIndex;
       }
       function renderLeader() {
           const lineup = getSelectedLineup();
@@ -24760,8 +24762,7 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
       }
       container.appendChild(list);
   }
-  function renderPity(container, banner, states) {
-      container.replaceChildren();
+  function getPitySections(banner, states) {
       const state = getBannerState(states, banner);
       const sections = [
           { label: 'SR sàn', value: state.pity.sr, max: banner.pity.srFloor },
@@ -24775,29 +24776,69 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
       if (banner.pity.prime) {
           sections.push({ label: 'Prime', value: state.pity.prime, max: banner.pity.prime.hard });
       }
-      for (const entry of sections) {
+      return sections;
+  }
+  function ensurePityMeterNodes(container, sections) {
+      const existing = new Map();
+      for (const child of container.querySelectorAll(':scope > .pity-meter')) {
+          const label = child.dataset.pityLabel;
+          const progress = child.querySelector('.pity-meter__progress');
+          const value = child.querySelector('.pity-meter__value');
+          if (!label || !progress || !value) {
+              continue;
+          }
+          existing.set(label, { root: child, progress, value });
+      }
+      const fragment = document.createDocumentFragment();
+      const nextMap = new Map();
+      for (const section of sections) {
+          const current = existing.get(section.label);
+          if (current) {
+              nextMap.set(section.label, current);
+              fragment.appendChild(current.root);
+              continue;
+          }
           const item = document.createElement('div');
           item.className = 'pity-meter';
+          item.dataset.pityLabel = section.label;
           const label = document.createElement('span');
           label.className = 'pity-meter__label';
-          label.textContent = entry.label;
+          label.textContent = section.label;
           const bar = document.createElement('div');
           bar.className = 'pity-meter__bar';
           const progress = document.createElement('div');
           progress.className = 'pity-meter__progress';
+          bar.appendChild(progress);
+          const value = document.createElement('span');
+          value.className = 'pity-meter__value';
+          item.append(label, bar, value);
+          const nodes = { root: item, progress, value };
+          nextMap.set(section.label, nodes);
+          fragment.appendChild(item);
+      }
+      container.replaceChildren(fragment);
+      return nextMap;
+  }
+  function renderPity(container, banner, states) {
+      const sections = getPitySections(banner, states);
+      const pityNodes = ensurePityMeterNodes(container, sections);
+      for (const entry of sections) {
+          const nodes = pityNodes.get(entry.label);
+          if (!nodes) {
+              continue;
+          }
           let percent = 0;
           if (entry.max && entry.max > 0) {
               percent = Math.min(99, Math.floor((entry.value / entry.max) * 100));
           }
-          progress.style.width = `${percent}%`;
-          bar.appendChild(progress);
-          const value = document.createElement('span');
-          value.className = 'pity-meter__value';
-          value.textContent = entry.max ? `${entry.value}/${entry.max}` : `${entry.value}`;
-          item.appendChild(label);
-          item.appendChild(bar);
-          item.appendChild(value);
-          container.appendChild(item);
+          const nextWidth = `${percent}%`;
+          if (nodes.progress.style.width !== nextWidth) {
+              nodes.progress.style.width = nextWidth;
+          }
+          const nextValue = entry.max ? `${entry.value}/${entry.max}` : `${entry.value}`;
+          if (nodes.value.textContent !== nextValue) {
+              nodes.value.textContent = nextValue;
+          }
       }
   }
   function renderFeatured(container, banner) {
@@ -24875,18 +24916,26 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
       container.appendChild(multiEl);
   }
   function renderResults(container, results) {
-      container.replaceChildren();
+      const fragment = document.createDocumentFragment();
       for (const result of results) {
           const item = document.createElement('div');
           item.className = 'result-entry';
-          const pityLabel = result.pity ? `<span class="result-entry__pity">${result.pity}</span>` : '';
-          item.innerHTML = `
-        <span class="result-entry__rarity">${result.rarity}</span>
-        <span class="result-entry__name">${result.featured ? 'Rate-up' : 'Thường'}</span>
-        ${pityLabel}
-      `;
-          container.appendChild(item);
+          const rarity = document.createElement('span');
+          rarity.className = 'result-entry__rarity';
+          rarity.textContent = result.rarity;
+          const name = document.createElement('span');
+          name.className = 'result-entry__name';
+          name.textContent = result.featured ? 'Rate-up' : 'Thường';
+          item.append(rarity, name);
+          if (result.pity) {
+              const pity = document.createElement('span');
+              pity.className = 'result-entry__pity';
+              pity.textContent = result.pity;
+              item.appendChild(pity);
+          }
+          fragment.appendChild(item);
       }
+      container.replaceChildren(fragment);
   }
   function createToast(message) {
       const toast = document.createElement('div');
