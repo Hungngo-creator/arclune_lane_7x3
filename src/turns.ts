@@ -324,18 +324,13 @@ export function tickMinionTTL(Game: SessionState, side: Side, options: TickMinio
   const reason = typeof options?.reason === 'string' ? options.reason : null;
   const skipped = options?.skipped ?? false;
   if (skipped && reason === 'systemError') return;
-  for (const t of Game.tokens){
-    if (!t.alive) continue;
-    if (t.side !== side) continue;
-    if (!t.isMinion) continue;
-    const ttl = t.ttlTurns;
-    if (typeof ttl !== 'number' || !Number.isFinite(ttl)) continue;
-    const nextTtl = ttl - 1;
-    t.ttlTurns = nextTtl;
-  }
   for (let idx = Game.tokens.length - 1; idx >= 0; idx -= 1){
     const token = Game.tokens[idx];
     if (!token?.alive || token.side !== side || !token.isMinion) continue;
+    const ttl = token.ttlTurns;
+    if (typeof ttl === 'number' && Number.isFinite(ttl)){
+      token.ttlTurns = ttl - 1;
+    }
     if ((token.ttlTurns ?? 0) > 0) continue;
     token.alive = false;
     Game.tokens.splice(idx, 1);
