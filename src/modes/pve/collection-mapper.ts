@@ -15,6 +15,7 @@ type CollectionItemCandidate = Record<string, unknown>;
 
 const SKIN_FIELD_KEYS = ['skinKey', 'skin', 'avatarSkin', 'selectedSkin'] as const;
 const PROGRESS_MAP_CACHE = new WeakMap<object, Map<string, RuntimeUnitProgress>>();
+const PROGRESS_LIST_CACHE = new WeakMap<object, Map<string, RuntimeUnitProgress>>();
 
 const GAMBITS_MAX_SLOTS = 5;
 const GAMBITS_CONDITIONS = new Set<GambitConditionType>([
@@ -96,12 +97,12 @@ const readUnitId = (entry: CollectionItemCandidate): string | null => {
   return typeof raw === 'string' && raw.trim() ? raw.trim() : null;
 };
 
-const getCollectionEntries = (collectionState: CollectionStateInput | null | undefined): ReadonlyArray<CollectionItemCandidate> => {
+const getCollectionEntries = (collectionState: CollectionStateInput | null | undefined): ReadonlyArray<unknown> => {
   if (!collectionState || typeof collectionState !== 'object') return [];
   const source = collectionState as Record<string, unknown>;
   const list = source.units ?? source.ownedUnits ?? source.roster ?? source.collection;
   if (!Array.isArray(list)) return [];
-  return list.filter((item): item is CollectionItemCandidate => Boolean(item && typeof item === 'object'));
+  return list;
 };
 
 const normalizeInteger = (value: unknown, min: number): number | null => {
@@ -166,12 +167,30 @@ export function mapUnitProgressById(collectionState: CollectionStateInput | null
     if (cached) return cached;
   }
 
-  const out = new Map<string, RuntimeUnitProgress>();
   const entries = getCollectionEntries(collectionState);
+  const listCacheKey = Array.isArray(entries) ? (entries as object) : null;
+  if (listCacheKey){
+    const cached = PROGRESS_LIST_CACHE.get(listCacheKey);
+    if (cached){
+      if (collectionState && typeof collectionState === 'object') {
+        PROGRESS_MAP_CACHE.set(collectionState as object, cached);
+      }
+      return cached;
+    }
+  }
+
+  const out = new Map<string, RuntimeUnitProgress>();
   for (const entry of entries) {
-    const normalized = normalizeProgress(entry);
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)){
+      continue;
+    }
+    const normalized = normalizeProgress(entry as CollectionItemCandidate);
     if (!normalized) continue;
     out.set(normalized.unitId, normalized);
+  }
+
+    if (listCacheKey){
+    PROGRESS_LIST_CACHE.set(listCacheKey, out);
   }
 
   if (collectionState && typeof collectionState === 'object') {

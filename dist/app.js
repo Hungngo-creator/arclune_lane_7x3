@@ -12358,6 +12358,7 @@ __define('./modes/pve/collection-mapper.ts', (exports, module, __require) => {
   const makeInstanceStats = __dep0.makeInstanceStats;
   const SKIN_FIELD_KEYS = ['skinKey', 'skin', 'avatarSkin', 'selectedSkin'];
   const PROGRESS_MAP_CACHE = new WeakMap();
+  const PROGRESS_LIST_CACHE = new WeakMap();
   const GAMBITS_MAX_SLOTS = 5;
   const GAMBITS_CONDITIONS = new Set([
       'self_hp_below',
@@ -12446,7 +12447,7 @@ __define('./modes/pve/collection-mapper.ts', (exports, module, __require) => {
       const list = source.units ?? source.ownedUnits ?? source.roster ?? source.collection;
       if (!Array.isArray(list))
           return [];
-      return list.filter((item) => Boolean(item && typeof item === 'object'));
+      return list;
   };
   const normalizeInteger = (value, min) => {
       const numeric = asFinite(value);
@@ -12501,13 +12502,29 @@ __define('./modes/pve/collection-mapper.ts', (exports, module, __require) => {
           if (cached)
               return cached;
       }
-      const out = new Map();
       const entries = getCollectionEntries(collectionState);
+      const listCacheKey = Array.isArray(entries) ? entries : null;
+      if (listCacheKey) {
+          const cached = PROGRESS_LIST_CACHE.get(listCacheKey);
+          if (cached) {
+              if (collectionState && typeof collectionState === 'object') {
+                  PROGRESS_MAP_CACHE.set(collectionState, cached);
+              }
+              return cached;
+          }
+      }
+      const out = new Map();
       for (const entry of entries) {
+          if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+              continue;
+          }
           const normalized = normalizeProgress(entry);
           if (!normalized)
               continue;
           out.set(normalized.unitId, normalized);
+      }
+      if (listCacheKey) {
+          PROGRESS_LIST_CACHE.set(listCacheKey, out);
       }
       if (collectionState && typeof collectionState === 'object') {
           PROGRESS_MAP_CACHE.set(collectionState, out);
@@ -20075,7 +20092,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       ensureStyleTag(STYLE_ID, { css });
   }
   function renderAbilityCard(entry, options = {}) {
-      const { typeLabel = null, unitId = null } = options;
+      const { typeLabel = null, unitId = null, abilityKey = null } = options;
       const card = document.createElement('article');
       card.className = 'collection-skill-card';
       const header = document.createElement('header');
@@ -20099,10 +20116,9 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       if (abilityId != null) {
           upgradeButton.dataset.abilityId = String(abilityId);
       }
-      upgradeButton.addEventListener('click', () => {
-          const detail = { abilityId, ability: entry };
-          card.dispatchEvent(new CustomEvent('collection:request-upgrade', { bubbles: true, detail }));
-      });
+      if (abilityKey) {
+          upgradeButton.dataset.abilityKey = abilityKey;
+      }
       actions.appendChild(upgradeButton);
       header.appendChild(actions);
       card.appendChild(header);
@@ -20119,6 +20135,9 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       if (abilityId != null) {
           card.dataset.abilityId = String(abilityId);
       }
+      if (abilityKey) {
+          card.dataset.abilityKey = abilityKey;
+      }
       const filteredNotes = Array.isArray(entry?.notes)
           ? entry.notes
               .map(note => (typeof note === 'string' ? note.trim() : ''))
@@ -20131,19 +20150,6 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       if (facts.length) {
           card.dataset.meta = JSON.stringify(facts);
       }
-      card.addEventListener('click', event => {
-          const target = event.target;
-          if (target?.closest('.collection-skill-card__upgrade')) {
-              return;
-          }
-          const detail = {
-              unitId: unitId || card.dataset.unitId || null,
-              abilityId,
-              ability: entry,
-              typeLabel: resolvedTypeLabel
-          };
-          card.dispatchEvent(new CustomEvent('collection:toggle-skill-detail', { bubbles: true, detail }));
-      });
       return card;
   }
   function renderCollectionView(options) {
@@ -20237,6 +20243,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       rosterList.className = 'collection-roster__list';
       const rosterSource = buildRosterWithCost(cloneRoster(roster));
       const skillSetCache = new Map();
+      const abilityDetailCache = new Map();
       const rosterEntries = new Map();
       for (const unit of rosterSource) {
           const unitId = normalizeUnitId(unit.id);
@@ -20299,11 +20306,6 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           button.setAttribute('aria-label', tooltipParts.join(' • '));
           button.appendChild(avatar);
           button.appendChild(cost);
-          const handleSelect = () => {
-              selectUnit(unitId);
-          };
-          button.addEventListener('click', handleSelect);
-          addCleanup(() => button.removeEventListener('click', handleSelect));
           item.appendChild(button);
           rosterList.appendChild(item);
           rosterEntries.set(unitId, { button, costEl: cost, avatar, meta: unit, rarity: normalizedRank });
@@ -20313,6 +20315,18 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
               unmountRarity(entry.avatar);
           }
       });
+      const handleRosterClick = (event) => {
+          const target = event.target;
+          const button = target?.closest('.collection-roster__entry');
+          if (!button)
+              return;
+          const unitId = button.dataset.unitId ?? null;
+          if (!unitId)
+              return;
+          selectUnit(unitId);
+      };
+      rosterList.addEventListener('click', handleRosterClick);
+      addCleanup(() => rosterList.removeEventListener('click', handleRosterClick));
       rosterPanel.appendChild(rosterList);
       const stage = document.createElement('section');
       stage.className = 'collection-stage';
@@ -20564,16 +20578,34 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           overlayDetailPanel.setAttribute('aria-hidden', 'false');
           overlayContent.classList.add('has-detail');
       };
-      const handleSkillDetailToggle = (event) => {
+      const handleAbilityInteractions = (event) => {
           const target = event.target;
-          const card = target?.closest('.collection-skill-card');
-          if (!card) {
+          if (!target)
+              return;
+          const card = target.closest('.collection-skill-card');
+          if (!card)
+              return;
+          const abilityKey = card.dataset.abilityKey ?? null;
+          if (!abilityKey)
+              return;
+          const detail = abilityDetailCache.get(abilityKey);
+          if (!detail)
+              return;
+          if (target.closest('.collection-skill-card__upgrade')) {
+              const upgradeDetail = {
+                  abilityId: detail.abilityId ?? null,
+                  ability: detail.ability ?? null,
+              };
+              card.dispatchEvent(new CustomEvent('collection:request-upgrade', {
+                  bubbles: true,
+                  detail: upgradeDetail,
+              }));
               return;
           }
-          populateSkillDetail(card, event.detail);
+          populateSkillDetail(card, detail);
       };
-      overlay.addEventListener('collection:toggle-skill-detail', handleSkillDetailToggle);
-      addCleanup(() => overlay.removeEventListener('collection:toggle-skill-detail', handleSkillDetailToggle));
+      overlayAbilities.addEventListener('click', handleAbilityInteractions);
+      addCleanup(() => overlayAbilities.removeEventListener('click', handleAbilityInteractions));
       const handleGlobalClick = (event) => {
           if (overlayDetailPanel.hidden)
               return;
@@ -20819,6 +20851,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
               overlayNotesList.style.display = 'none';
           }
           overlayAbilities.replaceChildren();
+          abilityDetailCache.clear();
           const abilityEntries = [];
           if (skillSet?.basic) {
               abilityEntries.push({ entry: skillSet.basic, label: ABILITY_TYPE_LABELS.basic });
@@ -20840,8 +20873,24 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
               abilityEntries.push({ entry: skillSet.technique, label: ABILITY_TYPE_LABELS.technique });
           }
           if (abilityEntries.length) {
-              for (const ability of abilityEntries) {
-                  overlayAbilities.appendChild(renderAbilityCard(ability.entry, { typeLabel: ability.label, unitId }));
+              for (let index = 0; index < abilityEntries.length; index += 1) {
+                  const ability = abilityEntries[index];
+                  if (!ability)
+                      continue;
+                  const abilityEntry = ability.entry;
+                  const abilityId = abilityEntry?.id ?? abilityEntry?.abilityId ?? null;
+                  const abilityKey = `${unitId}:${String(abilityId ?? index)}`;
+                  abilityDetailCache.set(abilityKey, {
+                      unitId,
+                      abilityId,
+                      ability: abilityEntry,
+                      typeLabel: ability.label,
+                  });
+                  overlayAbilities.appendChild(renderAbilityCard(abilityEntry, {
+                      typeLabel: ability.label,
+                      unitId,
+                      abilityKey,
+                  }));
               }
           }
           else {
@@ -22152,6 +22201,8 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       let cachedFilteredRosterSource = null;
       let cachedFilteredRoster = [];
       let lastRosterRenderSignature = '';
+      let lastPassivesRenderSignature = '';
+      let lastFiltersRenderSignature = '';
       let lastHighlightedCellIndex = null;
       function getFilteredRoster() {
           const filterKey = `${state.filter.type}::${state.filter.value ?? ''}`;
@@ -22535,12 +22586,30 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       }
       function renderPassives() {
           const lineup = getSelectedLineup();
-          passiveGrid.innerHTML = '';
           if (!lineup) {
+              lastPassivesRenderSignature = 'empty';
+              passiveGrid.innerHTML = '';
               return;
           }
           const assignedIds = collectAssignedUnitIds(lineup);
           const assignedTags = collectAssignedUnitTags(assignedIds, rosterLookup);
+          const assignedTagsSignature = Array.from(assignedTags).sort().join('|');
+          const passivesSignature = lineup.passives.map((passive) => {
+              const isActive = evaluatePassive(passive, assignedIds, rosterLookup, assignedTags);
+              return [
+                  passive.index,
+                  passive.name,
+                  passive.requirement,
+                  passive.isEmpty ? '1' : '0',
+                  isActive ? '1' : '0',
+              ].join(':');
+          }).join('||');
+          const nextSignature = `${lineup.id}::${assignedIds.size}::${assignedTagsSignature}::${passivesSignature}`;
+          if (nextSignature === lastPassivesRenderSignature) {
+              return;
+          }
+          lastPassivesRenderSignature = nextSignature;
+          passiveGrid.innerHTML = '';
           lineup.passives.forEach(passive => {
               const btn = document.createElement('button');
               btn.type = 'button';
@@ -22568,6 +22637,16 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           });
       }
       function renderFilters() {
+          const nextSignature = [
+              state.filter.type,
+              state.filter.value ?? '',
+              state.filterOptions.classes.join('|'),
+              state.filterOptions.ranks.join('|'),
+          ].join('::');
+          if (nextSignature === lastFiltersRenderSignature) {
+              return;
+          }
+          lastFiltersRenderSignature = nextSignature;
           rosterFilters.innerHTML = '';
           const filters = [
               { type: 'all', value: null, label: 'Tất cả' },

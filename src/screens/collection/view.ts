@@ -269,10 +269,11 @@ declare global {
 interface AbilityCardOptions {
   typeLabel?: string | null;
   unitId?: string | null;
+  abilityKey?: string | null;
 }
 
 function renderAbilityCard(entry: AbilityEntry | null | undefined, options: AbilityCardOptions = {}): HTMLElement{
-  const { typeLabel = null, unitId = null } = options;
+  const { typeLabel = null, unitId = null, abilityKey = null } = options;
   const card = document.createElement('article');
   card.className = 'collection-skill-card';
 
@@ -302,10 +303,9 @@ function renderAbilityCard(entry: AbilityEntry | null | undefined, options: Abil
   if (abilityId != null){
     upgradeButton.dataset.abilityId = String(abilityId);
   }
-  upgradeButton.addEventListener('click', () => {
-    const detail = { abilityId, ability: entry };
-    card.dispatchEvent(new CustomEvent('collection:request-upgrade', { bubbles: true, detail }));
-  });
+  if (abilityKey){
+    upgradeButton.dataset.abilityKey = abilityKey;
+  }
   actions.appendChild(upgradeButton);
 
   header.appendChild(actions);
@@ -326,6 +326,9 @@ function renderAbilityCard(entry: AbilityEntry | null | undefined, options: Abil
   if (abilityId != null){
     card.dataset.abilityId = String(abilityId);
   }
+  if (abilityKey){
+    card.dataset.abilityKey = abilityKey;
+  }
 
   const filteredNotes = Array.isArray(entry?.notes)
     ? entry.notes
@@ -341,19 +344,6 @@ function renderAbilityCard(entry: AbilityEntry | null | undefined, options: Abil
     card.dataset.meta = JSON.stringify(facts);
   }
 
-  card.addEventListener('click', event => {
-    const target = event.target as HTMLElement | null;
-    if (target?.closest('.collection-skill-card__upgrade')){
-      return;
-    }
-    const detail = {
-      unitId: unitId || card.dataset.unitId || null,
-      abilityId,
-      ability: entry,
-      typeLabel: resolvedTypeLabel
-    };
-    card.dispatchEvent(new CustomEvent('collection:toggle-skill-detail', { bubbles: true, detail }));
-  });
   return card;
 }
 
@@ -476,6 +466,7 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
 
   const rosterSource = buildRosterWithCost(cloneRoster(roster));
   const skillSetCache = new Map<string, ReturnType<typeof getSkillSet>>();
+  const abilityDetailCache = new Map<string, SkillDetailEventDetail>();
   const rosterEntries = new Map<string, {
     button: HTMLButtonElement;
     costEl: HTMLElement | null;
@@ -551,12 +542,6 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
     button.appendChild(avatar);
     button.appendChild(cost);
 
-    const handleSelect = () => {
-      selectUnit(unitId);
-    };
-    button.addEventListener('click', handleSelect);
-    addCleanup(() => button.removeEventListener('click', handleSelect));
-
     item.appendChild(button);
     rosterList.appendChild(item);
 
@@ -568,6 +553,17 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
       unmountRarity(entry.avatar);
     }
   });
+
+   const handleRosterClick = (event: Event): void => {
+    const target = event.target as HTMLElement | null;
+    const button = target?.closest<HTMLButtonElement>('.collection-roster__entry');
+    if (!button) return;
+    const unitId = button.dataset.unitId ?? null;
+    if (!unitId) return;
+    selectUnit(unitId);
+  };
+  rosterList.addEventListener('click', handleRosterClick);
+  addCleanup(() => rosterList.removeEventListener('click', handleRosterClick));
 
   rosterPanel.appendChild(rosterList);
 
@@ -884,17 +880,33 @@ const overlayDetailPanel = document.createElement('aside');
     overlayContent.classList.add('has-detail');
   };
 
-  const handleSkillDetailToggle = (event: CustomEvent<SkillDetailEventDetail>): void => {
+  const handleAbilityInteractions = (event: MouseEvent): void => {
     const target = event.target as HTMLElement | null;
-    const card = target?.closest('.collection-skill-card') as HTMLElement | null;
-    if (!card){
+    if (!target) return;
+    const card = target.closest<HTMLElement>('.collection-skill-card');
+    if (!card) return;
+    const abilityKey = card.dataset.abilityKey ?? null;
+    if (!abilityKey) return;
+    const detail = abilityDetailCache.get(abilityKey);
+    if (!detail) return;
+
+    if (target.closest('.collection-skill-card__upgrade')){
+      const upgradeDetail = {
+        abilityId: detail.abilityId ?? null,
+        ability: detail.ability ?? null,
+      };
+      card.dispatchEvent(new CustomEvent('collection:request-upgrade', {
+        bubbles: true,
+        detail: upgradeDetail,
+      }));
       return;
     }
-    populateSkillDetail(card, event.detail);
+
+    populateSkillDetail(card, detail);
   };
 
-  overlay.addEventListener('collection:toggle-skill-detail', handleSkillDetailToggle);
-  addCleanup(() => overlay.removeEventListener('collection:toggle-skill-detail', handleSkillDetailToggle));
+  overlayAbilities.addEventListener('click', handleAbilityInteractions);
+  addCleanup(() => overlayAbilities.removeEventListener('click', handleAbilityInteractions));
 
   const handleGlobalClick = (event: MouseEvent): void => {
     if (overlayDetailPanel.hidden) return;
@@ -1159,6 +1171,7 @@ const resolveCurrentCultivation = () => {
     }
 
     overlayAbilities.replaceChildren();
+    abilityDetailCache.clear();
     const abilityEntries: Array<{ entry: AbilityEntry | null | undefined; label: string }> = [];
     if (skillSet?.basic){
       abilityEntries.push({ entry: skillSet.basic, label: ABILITY_TYPE_LABELS.basic });
@@ -1180,8 +1193,23 @@ const resolveCurrentCultivation = () => {
     }
 
     if (abilityEntries.length){
-      for (const ability of abilityEntries){
-        overlayAbilities.appendChild(renderAbilityCard(ability.entry, { typeLabel: ability.label, unitId }));
+      for (let index = 0; index < abilityEntries.length; index += 1){
+        const ability = abilityEntries[index];
+        if (!ability) continue;
+        const abilityEntry = ability.entry;
+        const abilityId = abilityEntry?.id ?? abilityEntry?.abilityId ?? null;
+        const abilityKey = `${unitId}:${String(abilityId ?? index)}`;
+        abilityDetailCache.set(abilityKey, {
+          unitId,
+          abilityId,
+          ability: abilityEntry,
+          typeLabel: ability.label,
+        });
+        overlayAbilities.appendChild(renderAbilityCard(abilityEntry, {
+          typeLabel: ability.label,
+          unitId,
+          abilityKey,
+        }));
       }
     } else {
       const placeholder = document.createElement('p');

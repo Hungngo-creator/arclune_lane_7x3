@@ -648,6 +648,8 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   let cachedFilteredRosterSource: RosterUnit[] | null = null;
   let cachedFilteredRoster: RosterUnit[] = [];
   let lastRosterRenderSignature = '';
+  let lastPassivesRenderSignature = '';
+  let lastFiltersRenderSignature = '';
   let lastHighlightedCellIndex: number | null = null;
 
   function getFilteredRoster(): RosterUnit[] {
@@ -1050,12 +1052,31 @@ function updateActiveCellHighlight(): void{
 
   function renderPassives(){
     const lineup = getSelectedLineup();
-    passiveGrid.innerHTML = '';
     if (!lineup){
+      lastPassivesRenderSignature = 'empty';
+      passiveGrid.innerHTML = '';
       return;
     }
     const assignedIds = collectAssignedUnitIds(lineup);
     const assignedTags = collectAssignedUnitTags(assignedIds, rosterLookup);
+    const assignedTagsSignature = Array.from(assignedTags).sort().join('|');
+    const passivesSignature = lineup.passives.map((passive) => {
+      const isActive = evaluatePassive(passive, assignedIds, rosterLookup, assignedTags);
+      return [
+        passive.index,
+        passive.name,
+        passive.requirement,
+        passive.isEmpty ? '1' : '0',
+        isActive ? '1' : '0',
+      ].join(':');
+    }).join('||');
+    const nextSignature = `${lineup.id}::${assignedIds.size}::${assignedTagsSignature}::${passivesSignature}`;
+    if (nextSignature === lastPassivesRenderSignature){
+      return;
+    }
+    lastPassivesRenderSignature = nextSignature;
+
+    passiveGrid.innerHTML = '';
     lineup.passives.forEach(passive => {
       const btn = document.createElement('button');
       btn.type = 'button';
@@ -1084,6 +1105,17 @@ function updateActiveCellHighlight(): void{
   }
 
   function renderFilters(): void{
+    const nextSignature = [
+      state.filter.type,
+      state.filter.value ?? '',
+      state.filterOptions.classes.join('|'),
+      state.filterOptions.ranks.join('|'),
+    ].join('::');
+    if (nextSignature === lastFiltersRenderSignature){
+      return;
+    }
+    lastFiltersRenderSignature = nextSignature;
+
     rosterFilters.innerHTML = '';
     const filters = [
       { type: 'all' as const, value: null, label: 'Tất cả' },
