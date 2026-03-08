@@ -20058,7 +20058,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       .collection-skill-card__empty{margin:0;color:#9cbcd9;font-size:13px;line-height:1.6;background:rgba(12,22,32,.88);border:1px dashed rgba(125,211,252,.28);border-radius:14px;padding:16px;text-align:center;}
       .collection-skill-overlay__notes{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:12px;color:#9cbcd9;}
       .collection-skill-overlay__notes li{position:relative;padding-left:16px;}
-      .collection-skill-overlay__notes li::before{content:'•';position:absolute;left:0;color:#7da0c7;
+      .collection-skill-overlay__notes li::before{content:'•';position:absolute;left:0;color:#7da0c7;}
       @media(max-width:1200px){
         .collection-view__layout{grid-template-columns:minmax(0,1.6fr) minmax(0,3fr) minmax(0,1.2fr);}
       }
