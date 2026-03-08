@@ -12513,7 +12513,6 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
   function sampleLineup(lineup, progressById) {
       const rankCounts = new Map();
       const rankByUnitId = new Map();
-      new Map();
       const progressProfiles = [];
       let totalRanked = 0;
       for (const entry of lineup) {
@@ -12568,21 +12567,33 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
           entry.base += 1;
           assigned += 1;
       }
-      const highestRank = entries.map(([rank]) => rank).sort(compareRankDesc)[0] ?? null;
+      let highestRank = null;
+      for (const [rank] of entries) {
+          if (highestRank == null || compareRankDesc(rank, highestRank) < 0) {
+              highestRank = rank;
+          }
+      }
       if (highestRank) {
-          const highestBucket = provisional.find((entry) => entry.rank === highestRank);
-          if (highestBucket && highestBucket.base <= 0) {
-              const donor = provisional
-                  .filter((entry) => entry.rank !== highestRank && entry.base > 0)
-                  .sort((a, b) => {
-                  if (a.base !== b.base)
-                      return b.base - a.base;
-                  return compareRankDesc(b.rank, a.rank);
-              })[0];
-              if (donor) {
-                  donor.base -= 1;
-                  highestBucket.base += 1;
+          let highestBucket = null;
+          let donor = null;
+          for (const entry of provisional) {
+              if (entry.rank === highestRank) {
+                  highestBucket = entry;
+                  continue;
               }
+              if (entry.base <= 0)
+                  continue;
+              if (!donor) {
+                  donor = entry;
+                  continue;
+              }
+              if (entry.base > donor.base || (entry.base === donor.base && compareRankDesc(donor.rank, entry.rank) < 0)) {
+                  donor = entry;
+              }
+          }
+          if (highestBucket && highestBucket.base <= 0 && donor) {
+              donor.base -= 1;
+              highestBucket.base += 1;
           }
       }
       const ranked = [];

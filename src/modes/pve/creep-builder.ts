@@ -58,7 +58,7 @@ function sampleLineup(
   progressById: ReadonlyMap<string, RuntimeUnitProgress>,
 ): LineupSampling {
   const rankCounts = new Map<string, number>();
-  const rankByUnitId: UnitRankCache = new Map(); new Map<string, string | null>();
+  const rankByUnitId: UnitRankCache = new Map();
   const progressProfiles: ProgressProfile[] = [];
   let totalRanked = 0;
 
@@ -114,20 +114,34 @@ function allocateRanksForCreeps(rankStats: Pick<LineupSampling, 'rankCounts' | '
     assigned += 1;
   }
 
-  const highestRank = entries.map(([rank]) => rank).sort(compareRankDesc)[0] ?? null;
+  let highestRank: string | null = null;
+  for (const [rank] of entries) {
+    if (highestRank == null || compareRankDesc(rank, highestRank) < 0) {
+      highestRank = rank;
+    }
+  }
+
   if (highestRank) {
-    const highestBucket = provisional.find((entry) => entry.rank === highestRank);
-    if (highestBucket && highestBucket.base <= 0) {
-      const donor = provisional
-        .filter((entry) => entry.rank !== highestRank && entry.base > 0)
-        .sort((a, b) => {
-          if (a.base !== b.base) return b.base - a.base;
-          return compareRankDesc(b.rank, a.rank);
-        })[0];
-      if (donor) {
-        donor.base -= 1;
-        highestBucket.base += 1;
+    let highestBucket: (typeof provisional)[number] | null = null;
+    let donor: (typeof provisional)[number] | null = null;
+    for (const entry of provisional) {
+      if (entry.rank === highestRank) {
+        highestBucket = entry;
+        continue;
       }
+      if (entry.base <= 0) continue;
+      if (!donor) {
+        donor = entry;
+        continue;
+      }
+    if (entry.base > donor.base || (entry.base === donor.base && compareRankDesc(donor.rank, entry.rank) < 0)) {
+        donor = entry;
+      }
+    }
+
+    if (highestBucket && highestBucket.base <= 0 && donor) {
+      donor.base -= 1;
+      highestBucket.base += 1;
     }
   }
 
