@@ -26388,6 +26388,7 @@ __define('./turns.ts', (exports, module, __require) => {
       return candidate.mode === 'interleaved_by_position' ? candidate : null;
   };
   const GAMBIT_SKILL_ACTIONS = ['skill1', 'skill2', 'skill3'];
+  const GAMBIT_SKILL_ACTION_SET = new Set(GAMBIT_SKILL_ACTIONS);
   const INTERLEAVED_ACTION_DELAY_MS = 2200;
   const DEFAULT_MUTATION_DEBUFF_POOL = ['bleed', 'stun', 'poison'];
   const isPveCreepId = (unitId) => (typeof unitId === 'string' && /^creep_\d+$/i.test(unitId));
@@ -26620,7 +26621,6 @@ __define('./turns.ts', (exports, module, __require) => {
       const skipped = options?.skipped ?? false;
       if (skipped && reason === 'systemError')
           return;
-      const toRemove = [];
       for (const t of Game.tokens) {
           if (!t.alive)
               continue;
@@ -26633,14 +26633,15 @@ __define('./turns.ts', (exports, module, __require) => {
               continue;
           const nextTtl = ttl - 1;
           t.ttlTurns = nextTtl;
-          if (nextTtl <= 0)
-              toRemove.push(t);
       }
-      for (const t of toRemove) {
-          t.alive = false;
-          const idx = Game.tokens.indexOf(t);
-          if (idx >= 0)
-              Game.tokens.splice(idx, 1);
+      for (let idx = Game.tokens.length - 1; idx >= 0; idx -= 1) {
+          const token = Game.tokens[idx];
+          if (!token?.alive || token.side !== side || !token.isMinion)
+              continue;
+          if ((token.ttlTurns ?? 0) > 0)
+              continue;
+          token.alive = false;
+          Game.tokens.splice(idx, 1);
       }
   }
   const normalizeActionResolution = (outcome) => {
@@ -26800,7 +26801,8 @@ __define('./turns.ts', (exports, module, __require) => {
           return resolution;
       }
       const meta = Game.meta.get(unit.id);
-      emitPassiveEvent(Game, unit, 'onTurnStart', { log: getPassiveLog(Game) });
+      const passiveLog = getPassiveLog(Game);
+      emitPassiveEvent(Game, unit, 'onTurnStart', { log: passiveLog });
       const turnStamp = `${side ?? ''}:${slot ?? ''}:${cycle ?? 0}`;
       startFuryTurn(unit, { turnStamp, startAmount: CFG?.fury?.turn?.startGain, grantStart: true });
       applyTurnRegen(Game, unit);
@@ -26835,7 +26837,7 @@ __define('./turns.ts', (exports, module, __require) => {
               if (!isUyenLeader(unit)) {
                   spendFury(unit, ultCost, CFG);
               }
-              emitPassiveEvent(Game, unit, 'onUltCast', { log: getPassiveLog(Game) });
+              emitPassiveEvent(Game, unit, 'onUltCast', { log: passiveLog });
           }
           Statuses.onTurnEnd(unit, {});
           ensureBusyReset();
@@ -26871,7 +26873,7 @@ __define('./turns.ts', (exports, module, __require) => {
           if (decision.action === 'basic') {
               break;
           }
-          if (!GAMBIT_SKILL_ACTIONS.includes(decision.action)) {
+          if (!GAMBIT_SKILL_ACTION_SET.has(decision.action)) {
               continue;
           }
           try {
@@ -26879,7 +26881,7 @@ __define('./turns.ts', (exports, module, __require) => {
               if (!cast.ok) {
                   continue;
               }
-              emitPassiveEvent(Game, unit, 'onActionEnd', { log: getPassiveLog(Game) });
+              emitPassiveEvent(Game, unit, 'onActionEnd', { log: passiveLog });
               Statuses.onTurnEnd(unit, {});
               ensureBusyReset();
               resolution.acted = true;
@@ -26918,7 +26920,7 @@ __define('./turns.ts', (exports, module, __require) => {
           finishAction({ skipped: true, reason: 'systemError' });
           return resolution;
       }
-      emitPassiveEvent(Game, unit, 'onActionEnd', { log: getPassiveLog(Game) });
+      emitPassiveEvent(Game, unit, 'onActionEnd', { log: passiveLog });
       Statuses.onTurnEnd(unit, {});
       ensureBusyReset();
       resolution.acted = true;

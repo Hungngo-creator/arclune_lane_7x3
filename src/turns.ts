@@ -64,6 +64,7 @@ const asInterleavedTurn = (
 };
 
 const GAMBIT_SKILL_ACTIONS: GambitActionType[] = ['skill1', 'skill2', 'skill3'];
+const GAMBIT_SKILL_ACTION_SET = new Set<GambitActionType>(GAMBIT_SKILL_ACTIONS);
 const INTERLEAVED_ACTION_DELAY_MS = 2200;
 
 const DEFAULT_MUTATION_DEBUFF_POOL: Array<'bleed' | 'stun' | 'poison'> = ['bleed', 'stun', 'poison'];
@@ -323,7 +324,6 @@ export function tickMinionTTL(Game: SessionState, side: Side, options: TickMinio
   const reason = typeof options?.reason === 'string' ? options.reason : null;
   const skipped = options?.skipped ?? false;
   if (skipped && reason === 'systemError') return;
-  const toRemove: UnitToken[] = [];
   for (const t of Game.tokens){
     if (!t.alive) continue;
     if (t.side !== side) continue;
@@ -332,12 +332,13 @@ export function tickMinionTTL(Game: SessionState, side: Side, options: TickMinio
     if (typeof ttl !== 'number' || !Number.isFinite(ttl)) continue;
     const nextTtl = ttl - 1;
     t.ttlTurns = nextTtl;
-    if (nextTtl <= 0) toRemove.push(t);
   }
-  for (const t of toRemove){
-    t.alive = false;
-    const idx = Game.tokens.indexOf(t);
-    if (idx >= 0) Game.tokens.splice(idx, 1);
+  for (let idx = Game.tokens.length - 1; idx >= 0; idx -= 1){
+    const token = Game.tokens[idx];
+    if (!token?.alive || token.side !== side || !token.isMinion) continue;
+    if ((token.ttlTurns ?? 0) > 0) continue;
+    token.alive = false;
+    Game.tokens.splice(idx, 1);
   }
 }
 
@@ -566,7 +567,8 @@ export function doActionOrSkip(
   }
 
   const meta = Game.meta.get(unit.id);
-  emitPassiveEvent(Game, unit, 'onTurnStart', { log: getPassiveLog(Game) });
+  const passiveLog = getPassiveLog(Game);
+  emitPassiveEvent(Game, unit, 'onTurnStart', { log: passiveLog });
 
   const turnStamp = `${side ?? ''}:${slot ?? ''}:${cycle ?? 0}`;
   startFuryTurn(unit, { turnStamp, startAmount: CFG?.fury?.turn?.startGain, grantStart: true });
@@ -602,7 +604,7 @@ export function doActionOrSkip(
       if (!isUyenLeader(unit)) {
         spendFury(unit, ultCost, CFG);
       }
-      emitPassiveEvent(Game, unit, 'onUltCast', { log: getPassiveLog(Game) });
+      emitPassiveEvent(Game, unit, 'onUltCast', { log: passiveLog });
     }
     Statuses.onTurnEnd(unit, {});
     ensureBusyReset();
@@ -640,7 +642,7 @@ export function doActionOrSkip(
       break;
     }
 
-    if (!GAMBIT_SKILL_ACTIONS.includes(decision.action)) {
+    if (!GAMBIT_SKILL_ACTION_SET.has(decision.action)) {
       continue;
     }
 
@@ -649,7 +651,7 @@ export function doActionOrSkip(
       if (!cast.ok) {
         continue;
       }
-      emitPassiveEvent(Game, unit, 'onActionEnd', { log: getPassiveLog(Game) });
+      emitPassiveEvent(Game, unit, 'onActionEnd', { log: passiveLog });
       Statuses.onTurnEnd(unit, {});
       ensureBusyReset();
       resolution.acted = true;
@@ -687,7 +689,7 @@ export function doActionOrSkip(
     finishAction({ skipped: true, reason: 'systemError' });
     return resolution;
   }
-  emitPassiveEvent(Game, unit, 'onActionEnd', { log: getPassiveLog(Game) });
+  emitPassiveEvent(Game, unit, 'onActionEnd', { log: passiveLog });
   Statuses.onTurnEnd(unit, {});
   ensureBusyReset();
   resolution.acted = true;

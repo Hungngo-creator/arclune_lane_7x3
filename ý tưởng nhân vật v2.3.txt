@@ -411,7 +411,7 @@ Nội tại: ra sân tăng hp regen 330% và aether regen 220%
 45) Huyết Tộc Quốc Vương
 Nội tại: ra sân tăng hp regen 420% và aether regen 290%
 
-46) [SSR] SỨ GIẢ RỪNG XANH – FAUN, Class: Summoner.
+46) [SSR] SỨ GIẢ RỪNG XANH – FAUN, Class: Summoner. không có base element tag.
 1. NỘI TẠI: Vạn Thú Đồng Hưởng
  * Tags: [Nội Tại], [Bản Thân], [Buff Chỉ Số], [Cơ Chế: Năng Lượng], [Kháng Đặc Thù].
  * Logic:
@@ -431,7 +431,7 @@ Nội tại: ra sân tăng hp regen 420% và aether regen 290%
    * Cost: 25 Aether.
    * Cơ chế:
      * Faun thực hiện 1 đòn đánh thường vào mục tiêu chỉ định.
-     * TẤT CẢ Động vật do Faun triệu hồi đang có trên sân lập tức thực hiện 1 đòn đánh thường vào cùng mục tiêu đó.
+     * TẤT CẢ Động vật do Faun triệu hồi đang có trên sân lập tức thực hiện 1 đòn đánh thường vào cùng mục tiêu đó. element tag tùy theo tag của thú triệu hồi.
    * Lưu ý: Đòn đánh của đệ tử trong skill này là hành động phụ (Extra Action), không ảnh hưởng đến lượt đánh chính (Turn) của chúng.
 4. KỸ NĂNG 2: Ấn Khế Cường Thừa
  * Tags: [Chủ Động], [Bản Thân], [Buff: Triệu Hồi], [Tiêu Hao: Aether].
@@ -465,27 +465,27 @@ DANH SÁCH ĐỘNG VẬT (BESTIARY)
 1. [Tiểu Hắc] (Black Panther)
  * Vai trò: Assassin.
  * Đặc điểm: Tốc độ cao.
- * Đòn đánh: Gây 100% (WIL+ATK). Có tag [Xuyên Giáp] (Bỏ qua 10% ARM).
+ * Đòn đánh: Gây 100% (WIL+ATK). Có tag [Xuyên Giáp] (Bỏ qua 10% ARM). không element tag.
 2. [Tiểu Bạch] (White Fox)
  * Vai trò: DPS.
  * Đặc điểm: Đáng yêu (Lông trắng, 3 đuôi).
- * Đòn đánh: Gây 105% (WIL+ATK) (Mạnh hơn Báo 5% nhưng không xuyên giáp).
+ * Đòn đánh: Gây 105% (WIL+ATK) (Mạnh hơn Báo 5% nhưng không xuyên giáp). không element tag.
 3. [Tiểu Hoàng] (Golden Chicken)
  * Vai trò: Food / Emergency Heal.
  * Đặc điểm: Gà vàng.
- * Cơ chế Chết: Khi Tiểu Hoàng chết (do hết turn, bị đánh, hoặc bị Skill 3 hiến tế) \rightarrow Faun hồi phục HP = 80% Max HP của Tiểu Hoàng.
+ * Cơ chế Chết: Khi Tiểu Hoàng chết (do hết turn, bị đánh, hoặc bị Skill 3 hiến tế) \rightarrow Faun hồi phục HP = 80% Max HP của Tiểu Hoàng. không element tag.
 4. [Tiểu Bất Điểm] (Squirrel)
  * Vai trò: Healer.
  * Đặc điểm: Nhỏ, trộn màu trắng-nâu-xám.
- * Đòn đánh: Không gây sát thương. Thay vào đó Hồi Máu cho Faun hoặc Động vật khác (Ưu tiên thấp máu).
- * Lượng hồi: = 70% (WIL + ATK) của Sóc.
+ * Đòn đánh: Không gây sát thương. Thay vào đó Hồi Máu cho Faun hoặc Động vật khác (Ưu tiên thấp máu). element tag: mộc.
+ * Lượng hồi: = 70% (WIL + ATK) của Tiểu Bất Điểm.
 5. [Nhị Cẩu] (Shiba Inu)
  * Vai trò: Tanker / Taunt.
  * Đặc điểm: Mặt gợi đòn, nhìn là muốn đấm.
  * Cơ chế:
    * Không Tấn Công. Khi được Faun đồng minh triệu hồi nhận khiên = 10% max hp của nhị cẩu, khiên tồn tại tối đa 3 turn.
    * Mỗi Turn: Tự hồi 15% Max HP bản thân.
-   * Mỗi 2 Turn: Kích hoạt [Khiêu Khích] (Taunt) lên toàn bộ kẻ địch trong 1 Turn. (Bắt buộc địch phải đánh vào cái mặt gợi đòn của nó).
+   * Mỗi 2 Turn: Kích hoạt [Khiêu Khích] (Taunt) lên toàn bộ kẻ địch trong 1 Turn. (Bắt buộc địch phải đánh vào cái mặt gợi đòn của nó). không element tag
 GHI CHÚ CHIẾN THUẬT:
  * Quản lý Bất Khuất: Skill 3 là con dao hai lưỡi. Nó cứu Faun nhưng sẽ làm mất đi nguồn đệ tử vĩnh viễn. Đừng để hy sinh con Nhị Cẩu quá sớm vì nó là Tanker duy nhất. Tốt nhất là hy sinh Tiểu Hoàng (Gà) vì nó chết đằng nào cũng hồi máu cho chủ.
  * Combo Dồn Dmg: Tích 3-4 con đệ rồi dùng Skill 1 (Hiệp Kích). Một lần bấm nút là 5 đơn vị cùng đánh 1 lúc, sát thương dồn cực lớn (Burst Damage).
