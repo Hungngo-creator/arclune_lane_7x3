@@ -438,32 +438,6 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
     rarity: Rarity | null;
   }>();
 
-  const teardownRarityOverlays = (node: Node) => {
-    if (!(node instanceof HTMLElement)){
-      return;
-    }
-    if (node.classList.contains('collection-roster__avatar')){
-      unmountRarity(node);
-    }
-    const avatars = node.querySelectorAll<HTMLElement>('.collection-roster__avatar');
-    for (const avatarNode of avatars){
-      unmountRarity(avatarNode);
-    }
-  };
-
-  let rosterObserver: MutationObserver | null = null;
-  if (typeof MutationObserver === 'function'){
-    rosterObserver = new MutationObserver(mutations => {
-      for (const mutation of mutations){
-        for (const removedNode of mutation.removedNodes){
-          teardownRarityOverlays(removedNode);
-        }
-      }
-    });
-    rosterObserver.observe(rosterList, { childList: true, subtree: true });
-    addCleanup(() => rosterObserver?.disconnect());
-  }
-
   for (const unit of rosterSource){
     const unitId = normalizeUnitId(unit.id);
     const item = document.createElement('li');
@@ -540,10 +514,14 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
     item.appendChild(button);
     rosterList.appendChild(item);
 
-    addCleanup(() => unmountRarity(avatar));
-
     rosterEntries.set(unitId, { button, costEl: cost, avatar, meta: unit, rarity: normalizedRank });
   }
+
+  addCleanup(() => {
+    for (const entry of rosterEntries.values()){
+      unmountRarity(entry.avatar);
+    }
+  });
 
   rosterPanel.appendChild(rosterList);
 

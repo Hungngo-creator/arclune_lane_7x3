@@ -20173,30 +20173,6 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       const rosterSource = buildRosterWithCost(cloneRoster(roster));
       const skillSetCache = new Map();
       const rosterEntries = new Map();
-      const teardownRarityOverlays = (node) => {
-          if (!(node instanceof HTMLElement)) {
-              return;
-          }
-          if (node.classList.contains('collection-roster__avatar')) {
-              unmountRarity(node);
-          }
-          const avatars = node.querySelectorAll('.collection-roster__avatar');
-          for (const avatarNode of avatars) {
-              unmountRarity(avatarNode);
-          }
-      };
-      let rosterObserver = null;
-      if (typeof MutationObserver === 'function') {
-          rosterObserver = new MutationObserver(mutations => {
-              for (const mutation of mutations) {
-                  for (const removedNode of mutation.removedNodes) {
-                      teardownRarityOverlays(removedNode);
-                  }
-              }
-          });
-          rosterObserver.observe(rosterList, { childList: true, subtree: true });
-          addCleanup(() => rosterObserver?.disconnect());
-      }
       for (const unit of rosterSource) {
           const unitId = normalizeUnitId(unit.id);
           const item = document.createElement('li');
@@ -20265,9 +20241,13 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           addCleanup(() => button.removeEventListener('click', handleSelect));
           item.appendChild(button);
           rosterList.appendChild(item);
-          addCleanup(() => unmountRarity(avatar));
           rosterEntries.set(unitId, { button, costEl: cost, avatar, meta: unit, rarity: normalizedRank });
       }
+      addCleanup(() => {
+          for (const entry of rosterEntries.values()) {
+              unmountRarity(entry.avatar);
+          }
+      });
       rosterPanel.appendChild(rosterList);
       const stage = document.createElement('section');
       stage.className = 'collection-stage';
@@ -21583,6 +21563,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
   const createFilterOptions = __dep9.createFilterOptions;
   const formatCurrencyBalance = __dep9.formatCurrencyBalance;
   const collectAssignedUnitIds = __dep9.collectAssignedUnitIds;
+  const collectAssignedUnitTags = __dep9.collectAssignedUnitTags;
   const evaluatePassive = __dep9.evaluatePassive;
   const filterRoster = __dep9.filterRoster;
   const getUnitRarity = __dep9.getUnitRarity;
@@ -22451,6 +22432,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               return;
           }
           const assignedIds = collectAssignedUnitIds(lineup);
+          const assignedTags = collectAssignedUnitTags(assignedIds, rosterLookup);
           lineup.passives.forEach(passive => {
               const btn = document.createElement('button');
               btn.type = 'button';
@@ -22461,7 +22443,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
                   btn.classList.add('is-empty');
                   btn.disabled = true;
               }
-              if (evaluatePassive(passive, assignedIds, rosterLookup)) {
+              if (evaluatePassive(passive, assignedIds, rosterLookup, assignedTags)) {
                   btn.classList.add('is-active');
               }
               const title = document.createElement('p');
@@ -23192,7 +23174,7 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
       }
       return ids;
   }
-  function evaluatePassive(passive, assignedUnitIds, rosterLookup) {
+  function evaluatePassive(passive, assignedUnitIds, rosterLookup, availableTagsInput) {
       if (!passive || passive.isEmpty) {
           return false;
       }
@@ -23207,17 +23189,7 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
           }
       }
       if (passive.requiredTags && passive.requiredTags.length > 0) {
-          const availableTags = new Set();
-          assignedUnitIds.forEach(id => {
-              const unit = rosterLookup.get(id);
-              if (!unit)
-                  return;
-              if (unit.role)
-                  availableTags.add(unit.role);
-              if (unit.rank)
-                  availableTags.add(unit.rank);
-              (unit.tags || []).forEach(tag => availableTags.add(tag));
-          });
+          const availableTags = availableTagsInput ?? collectAssignedUnitTags(assignedUnitIds, rosterLookup);
           const hasAllTags = passive.requiredTags.every(tag => availableTags.has(tag));
           if (!hasAllTags) {
               return false;
@@ -23227,6 +23199,20 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
           return assignedUnitIds.size > 0;
       }
       return true;
+  }
+  function collectAssignedUnitTags(assignedUnitIds, rosterLookup) {
+      const availableTags = new Set();
+      assignedUnitIds.forEach(id => {
+          const unit = rosterLookup.get(id);
+          if (!unit)
+              return;
+          if (unit.role)
+              availableTags.add(unit.role);
+          if (unit.rank)
+              availableTags.add(unit.rank);
+          (unit.tags || []).forEach(tag => availableTags.add(tag));
+      });
+      return availableTags;
   }
   function removeUnitFromPlacements(lineup, unitId, options = {}) {
       if (!unitId)
@@ -23331,6 +23317,7 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'createFilterOptions')) exports.createFilterOptions = createFilterOptions;
   if (!Object.prototype.hasOwnProperty.call(exports, 'collectAssignedUnitIds')) exports.collectAssignedUnitIds = collectAssignedUnitIds;
   if (!Object.prototype.hasOwnProperty.call(exports, 'evaluatePassive')) exports.evaluatePassive = evaluatePassive;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'collectAssignedUnitTags')) exports.collectAssignedUnitTags = collectAssignedUnitTags;
   if (!Object.prototype.hasOwnProperty.call(exports, 'removeUnitFromPlacements')) exports.removeUnitFromPlacements = removeUnitFromPlacements;
   if (!Object.prototype.hasOwnProperty.call(exports, 'assignUnitToCell')) exports.assignUnitToCell = assignUnitToCell;
   if (!Object.prototype.hasOwnProperty.call(exports, 'removeUnitFromCell')) exports.removeUnitFromCell = removeUnitFromCell;

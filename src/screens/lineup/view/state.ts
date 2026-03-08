@@ -566,6 +566,7 @@ export function evaluatePassive(
   passive: LineupPassive,
   assignedUnitIds: Set<string>,
   rosterLookup: Map<string, RosterUnit>,
+  availableTagsInput?: Set<string>,
 ): boolean {
   if (!passive || passive.isEmpty){
     return false;
@@ -581,14 +582,7 @@ export function evaluatePassive(
     }
   }
   if (passive.requiredTags && passive.requiredTags.length > 0){
-    const availableTags = new Set<string>();
-    assignedUnitIds.forEach(id => {
-      const unit = rosterLookup.get(id);
-      if (!unit) return;
-      if (unit.role) availableTags.add(unit.role);
-      if (unit.rank) availableTags.add(unit.rank);
-      (unit.tags || []).forEach(tag => availableTags.add(tag));
-    });
+    const availableTags = availableTagsInput ?? collectAssignedUnitTags(assignedUnitIds, rosterLookup);
     const hasAllTags = passive.requiredTags.every(tag => availableTags.has(tag));
     if (!hasAllTags){
       return false;
@@ -598,6 +592,21 @@ export function evaluatePassive(
     return assignedUnitIds.size > 0;
   }
   return true;
+}
+
+export function collectAssignedUnitTags(
+  assignedUnitIds: Set<string>,
+  rosterLookup: Map<string, RosterUnit>,
+): Set<string> {
+  const availableTags = new Set<string>();
+  assignedUnitIds.forEach(id => {
+    const unit = rosterLookup.get(id);
+    if (!unit) return;
+    if (unit.role) availableTags.add(unit.role);
+    if (unit.rank) availableTags.add(unit.rank);
+    (unit.tags || []).forEach(tag => availableTags.add(tag));
+  });
+  return availableTags;
 }
 
 export function removeUnitFromPlacements(

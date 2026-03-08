@@ -23,6 +23,7 @@ import {
   createFilterOptions,
   formatCurrencyBalance,
   collectAssignedUnitIds,
+  collectAssignedUnitTags,
   evaluatePassive,
   filterRoster,
   getUnitRarity,
@@ -998,6 +999,7 @@ function updateActiveCellHighlight(): void{
       return;
     }
     const assignedIds = collectAssignedUnitIds(lineup);
+    const assignedTags = collectAssignedUnitTags(assignedIds, rosterLookup);
     lineup.passives.forEach(passive => {
       const btn = document.createElement('button');
       btn.type = 'button';
@@ -1008,7 +1010,7 @@ function updateActiveCellHighlight(): void{
         btn.classList.add('is-empty');
         btn.disabled = true;
       }
-      if (evaluatePassive(passive, assignedIds, rosterLookup)){
+      if (evaluatePassive(passive, assignedIds, rosterLookup, assignedTags)){
         btn.classList.add('is-active');
       }
       const title = document.createElement('p');
