@@ -760,7 +760,10 @@ type StatusAggregate = {
   priority: number;
   stacks: number;
   turnsLeft: number | null;
-  duplicateCount: number;
+};
+type StatusAggregateCacheEntry = {
+  signature: string;
+  aggregates: StatusAggregate[];
 };
 const DEFAULT_STATUS_ICON_PATH = 'assets/weaken.svg';
 type StatusIconId =
@@ -862,6 +865,7 @@ const STATUS_META_BY_TAG: Record<string, StatusMeta> = {
   counter: { id: 'counter', label: 'Counter', icon: 'assets/reflect.svg' },
 };
 const statusIconCache = new Map<string, StatusIconEntry>();
+const statusAggregateCache = new WeakMap<ReadonlyArray<Record<string, unknown> | null | undefined>, StatusAggregateCacheEntry>();
 const statusIconHitboxes: StatusIconHitbox[] = [];
 let statusIconHoverTooltip = '';
 let canvasMouseMoveHandler: ((event: MouseEvent) => void) | null = null;
@@ -3478,9 +3482,32 @@ function buildStatusTooltip(label: string, stacks: number, turnsLeft: number | n
   return `${label} ${stacksText} · ${turnsText}`;
 }
 
+function buildStatusAggregateSignature(statuses: ReadonlyArray<Record<string, unknown> | null | undefined>): string {
+  let signature = `len:${statuses.length}`;
+  for (const status of statuses){
+    if (!status || typeof status !== 'object') {
+      signature += '|_';
+      continue;
+    }
+    const id = typeof status.id === 'string' ? status.id : '';
+    const tag = typeof status.tag === 'string' ? status.tag : '';
+    const kind = typeof status.kind === 'string' ? status.kind : '';
+    const stacks = parseFiniteNumber(status.stacks) ?? 1;
+    const turnsLeft = computeStatusTurnsLeft(status);
+    signature += `|${id}:${tag}:${kind}:${stacks}:${turnsLeft ?? 'inf'}`;
+  }
+  return signature;
+}
+
 function aggregateStatuses(statusesInput: ReadonlyArray<Record<string, unknown> | null | undefined>): StatusAggregate[] {
   const statuses = Array.isArray(statusesInput) ? statusesInput : [];
   if (!statuses.length) return [];
+  const signature = buildStatusAggregateSignature(statuses);
+  const cached = statusAggregateCache.get(statuses);
+  if (cached && cached.signature === signature) {
+    return cached.aggregates;
+  }
+
   const byStatusId = new Map<string, StatusAggregate>();
   for (const rawStatus of statuses) {
     if (!rawStatus || typeof rawStatus !== 'object') continue;
@@ -3504,13 +3531,11 @@ function aggregateStatuses(statusesInput: ReadonlyArray<Record<string, unknown> 
         priority,
         stacks,
         turnsLeft,
-        duplicateCount: 1,
       });
       continue;
     }
 
     existing.stacks += stacks;
-    existing.duplicateCount += 1;
     if (turnsLeft !== null) {
       existing.turnsLeft = existing.turnsLeft === null
         ? turnsLeft
@@ -3525,6 +3550,7 @@ function aggregateStatuses(statusesInput: ReadonlyArray<Record<string, unknown> 
     || ((b.turnsLeft ?? Number.MAX_SAFE_INTEGER) - (a.turnsLeft ?? Number.MAX_SAFE_INTEGER))
     || a.meta.label.localeCompare(b.meta.label)
   ));
+  statusAggregateCache.set(statuses, { signature, aggregates });
   return aggregates;
 }
 

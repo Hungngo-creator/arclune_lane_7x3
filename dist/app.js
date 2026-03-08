@@ -13311,6 +13311,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       counter: { id: 'counter', label: 'Counter', icon: 'assets/reflect.svg' },
   };
   const statusIconCache = new Map();
+  const statusAggregateCache = new WeakMap();
   const statusIconHitboxes = [];
   let statusIconHoverTooltip = '';
   let canvasMouseMoveHandler = null;
@@ -15916,10 +15917,31 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       const turnsText = turnsLeft === null ? '∞T' : `${turnsLeft}T`;
       return `${label} ${stacksText} · ${turnsText}`;
   }
+  function buildStatusAggregateSignature(statuses) {
+      let signature = `len:${statuses.length}`;
+      for (const status of statuses) {
+          if (!status || typeof status !== 'object') {
+              signature += '|_';
+              continue;
+          }
+          const id = typeof status.id === 'string' ? status.id : '';
+          const tag = typeof status.tag === 'string' ? status.tag : '';
+          const kind = typeof status.kind === 'string' ? status.kind : '';
+          const stacks = parseFiniteNumber(status.stacks) ?? 1;
+          const turnsLeft = computeStatusTurnsLeft(status);
+          signature += `|${id}:${tag}:${kind}:${stacks}:${turnsLeft ?? 'inf'}`;
+      }
+      return signature;
+  }
   function aggregateStatuses(statusesInput) {
       const statuses = Array.isArray(statusesInput) ? statusesInput : [];
       if (!statuses.length)
           return [];
+      const signature = buildStatusAggregateSignature(statuses);
+      const cached = statusAggregateCache.get(statuses);
+      if (cached && cached.signature === signature) {
+          return cached.aggregates;
+      }
       const byStatusId = new Map();
       for (const rawStatus of statuses) {
           if (!rawStatus || typeof rawStatus !== 'object')
@@ -15943,12 +15965,10 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   priority,
                   stacks,
                   turnsLeft,
-                  duplicateCount: 1,
               });
               continue;
           }
           existing.stacks += stacks;
-          existing.duplicateCount += 1;
           if (turnsLeft !== null) {
               existing.turnsLeft = existing.turnsLeft === null
                   ? turnsLeft
@@ -15960,6 +15980,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       aggregates.sort((a, b) => (a.priority - b.priority
           || ((b.turnsLeft ?? Number.MAX_SAFE_INTEGER) - (a.turnsLeft ?? Number.MAX_SAFE_INTEGER))
           || a.meta.label.localeCompare(b.meta.label)));
+      statusAggregateCache.set(statuses, { signature, aggregates });
       return aggregates;
   }
   function ensureStatusIconLoaded(iconId, iconPath) {
