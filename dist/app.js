@@ -14615,6 +14615,28 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       }
       return hp > 0 ? 1 : 0;
   }
+  function resolveBattlefieldSnapshot(game) {
+      const tokens = Array.isArray(game.tokens) ? game.tokens : [];
+      let leaderA = null;
+      let leaderB = null;
+      let bossAlive = false;
+      for (const token of tokens) {
+          if (!token)
+              continue;
+          if (!leaderA && (token.id === 'leaderA' || slotIndex('ally', token.cx, token.cy) === 8)) {
+              leaderA = token;
+          }
+          if (!leaderB && (token.id === 'leaderB' || slotIndex('enemy', token.cx, token.cy) === 8)) {
+              leaderB = token;
+          }
+          if (!bossAlive && token.alive && token.side === 'enemy' && isBossToken(game, token)) {
+              bossAlive = true;
+          }
+          if (leaderA && leaderB && bossAlive)
+              break;
+      }
+      return { leaderA, leaderB, bossAlive };
+  }
   function snapshotLeader(unit) {
       if (!unit)
           return null;
@@ -14692,9 +14714,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           return null;
       if (battle.over)
           return battle.result || null;
-      const tokens = Array.isArray(game.tokens) ? game.tokens : [];
-      const leaderA = tokens.find((t) => t && (t.id === 'leaderA' || slotIndex('ally', t.cx, t.cy) === 8));
-      const leaderB = tokens.find((t) => t && (t.id === 'leaderB' || slotIndex('enemy', t.cx, t.cy) === 8));
+      const { leaderA, leaderB, bossAlive } = resolveBattlefieldSnapshot(game);
       const leaderAAlive = isUnitAlive(leaderA);
       const leaderBAlive = isUnitAlive(leaderB);
       const contextDetail = context && typeof context === 'object' ? { ...context } : {};
@@ -14749,7 +14769,6 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
                   winner = 'draw';
           }
           else {
-              const bossAlive = tokens.some((t) => t && t.alive && t.side === 'enemy' && isBossToken(game, t));
               detail.timeout = {
                   mode: 'pve',
                   remain,
@@ -14773,32 +14792,34 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   }
   // Giảm TTL minion của 1 phe sau khi phe đó kết thúc phase
   function tickMinionTTL(side) {
-      // gom những minion hết hạn để xoá sau vòng lặp
       if (!Game?.tokens)
           return;
       const tokens = Game.tokens;
-      const toRemove = [];
+      let writeIndex = 0;
       for (const t of tokens) {
+          if (!t)
+              continue;
+          let shouldRemove = false;
           if (!t.alive)
               continue;
-          if (t.side !== side)
-              continue;
-          if (!t.isMinion)
-              continue;
-          const ttl = t.ttlTurns;
-          if (typeof ttl !== 'number' || !Number.isFinite(ttl))
-              continue;
-          const nextTtl = ttl - 1;
-          t.ttlTurns = nextTtl;
-          if (nextTtl <= 0)
-              toRemove.push(t);
+          if (t.side === side && t.isMinion) {
+              const ttl = t.ttlTurns;
+              if (typeof ttl === 'number' && Number.isFinite(ttl)) {
+                  const nextTtl = ttl - 1;
+                  t.ttlTurns = nextTtl;
+                  if (nextTtl <= 0) {
+                      t.alive = false;
+                      shouldRemove = true;
+                  }
+              }
+          }
+          if (!shouldRemove) {
+              tokens[writeIndex] = t;
+              writeIndex += 1;
+          }
       }
-      // xoá ra khỏi tokens để không còn được vẽ/đi lượt
-      for (const t of toRemove) {
-          t.alive = false;
-          const idx = tokens.indexOf(t);
-          if (idx >= 0)
-              tokens.splice(idx, 1);
+      if (writeIndex < tokens.length) {
+          tokens.length = writeIndex;
       }
   }
   function resolveAllyLeaderForControl() {
