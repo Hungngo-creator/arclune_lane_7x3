@@ -18,6 +18,8 @@ type LineupSampling = {
   progressProfiles: ProgressProfile[];
 };
 
+type UnitRankCache = Map<string, string | null>;
+
 type CreepUnitBase = {
   name: string;
   cost: number;
@@ -56,8 +58,7 @@ function sampleLineup(
   progressById: ReadonlyMap<string, RuntimeUnitProgress>,
 ): LineupSampling {
   const rankCounts = new Map<string, number>();
-  const rankByUnitId = new Map<string, string | null>();
-  const classByUnitId = new Map<string, string | null>();
+  const rankByUnitId: UnitRankCache = new Map(); new Map<string, string | null>();
   const progressProfiles: ProgressProfile[] = [];
   let totalRanked = 0;
 
@@ -75,16 +76,11 @@ function sampleLineup(
 
     const progress = progressById.get(entry.id);
     if (!progress) continue;
-    let className = classByUnitId.get(entry.id) ?? null;
-    if (!classByUnitId.has(entry.id)) {
-      className = normalizeClassName(entry.class);
-      classByUnitId.set(entry.id, className);
-    }
     progressProfiles.push({
       level: typeof progress.level === 'number' ? progress.level : undefined,
       realm: typeof progress.realm === 'number' ? progress.realm : undefined,
       subRealm: typeof progress.subRealm === 'number' ? progress.subRealm : undefined,
-      className: className ?? undefined,
+      className: normalizeClassName(entry.class) ?? undefined,
     });
   }
   return { rankCounts, totalRanked, progressProfiles };
@@ -103,7 +99,8 @@ function allocateRanksForCreeps(rankStats: Pick<LineupSampling, 'rankCounts' | '
 
   const provisional = entries.map(([rank, count]) => {
     const exact = (count * creepCount) / rankStats.totalRanked;
-    return { rank, base: Math.floor(exact), remainder: exact - Math.floor(exact) };
+    const base = Math.floor(exact);
+    return { rank, base, remainder: exact - base };
   });
 
   let assigned = provisional.reduce((sum, entry) => sum + entry.base, 0);
