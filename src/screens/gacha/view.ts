@@ -69,8 +69,8 @@ function ensureStyles(): void {
     .gacha-view__reveal{padding:11px 22px;border-radius:999px;border:1px solid rgba(174,228,255,.38);background:rgba(16,28,42,.86);color:#aee4ff;letter-spacing:.12em;text-transform:uppercase;font-size:12px;font-weight:600;cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;}
     .gacha-view__reveal:hover:enabled{transform:translateY(-2px);border-color:rgba(174,228,255,.56);box-shadow:0 14px 32px rgba(6,12,20,.45);}
     .gacha-view__reveal:disabled{opacity:.55;cursor:not-allowed;}
-    .gacha-view__results{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:18px;}
-    .gacha-card{position:relative;min-height:220px;border-radius:22px;padding:16px;background:rgba(10,18,30,.88);border:1px solid rgba(125,211,252,.18);overflow:hidden;display:flex;flex-direction:column;gap:12px;justify-content:flex-end;box-shadow:0 18px 42px rgba(6,12,20,.4);}
+    .gacha-view__results{display:grid;grid-template-columns:repeat(auto-fit,minmax(clamp(150px,18vw,220px),1fr));gap:18px;align-items:stretch;}
+    .gacha-card{position:relative;min-height:220px;height:100%;border-radius:22px;padding:16px;background:rgba(10,18,30,.88);border:1px solid rgba(125,211,252,.18);overflow:hidden;display:flex;flex-direction:column;gap:12px;justify-content:flex-end;box-shadow:0 18px 42px rgba(6,12,20,.4);}
     .gacha-card__art{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:.18;}
     .gacha-card__art img{width:120%;height:120%;object-fit:cover;filter:blur(2px);}
     .gacha-card__content{position:relative;z-index:1;display:flex;flex-direction:column;gap:6px;}
@@ -80,6 +80,10 @@ function ensureStyles(): void {
       .app--gacha{padding:24px 12px 48px;}
       .gacha-view__title{font-size:28px;}
       .gacha-card{min-height:200px;padding:14px;}
+      .gacha-view__results{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+    }
+    @media(max-width:460px){
+      .gacha-view__results{grid-template-columns:minmax(0,1fr);}
     }
   `;
   ensureStyleTag(STYLE_ID, { css });
