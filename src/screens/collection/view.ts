@@ -43,6 +43,8 @@ import type { CurrencyDefinition } from '@shared-types/config';
 import type { Rarity } from '../../utils/rarity.ts';
 
 const STYLE_ID = 'collection-view-style-v2';
+const SSR_AURA_SRC = 'assets/rank_aura/SSR_aura.webp';
+let ssrAuraPreloadImage: HTMLImageElement | null = null;
 
 const TAB_DEFINITIONS = [
   { key: 'awakening', label: 'Thức Tỉnh', hint: 'Theo dõi mốc thức tỉnh, sao và điểm đột phá của nhân vật đã sở hữu.' },
@@ -67,6 +69,18 @@ function resolveRosterCellGap(baseGapPx: number, reductionRatio: number): string
 
 function clearChildren(node: HTMLElement): void {
   node.replaceChildren();
+}
+
+function preloadSharedSsrAura(): void {
+  if (typeof Image === 'undefined'){
+    return;
+  }
+  if (ssrAuraPreloadImage){
+    return;
+  }
+  const img = new Image();
+  img.src = SSR_AURA_SRC;
+  ssrAuraPreloadImage = img;
 }
 
 const currencyCatalog: CurrencyCatalog = getCurrencyCatalog();
@@ -120,7 +134,7 @@ function parseFactListFromDataset(value: string | undefined): AbilityFact[] {
 }
 
 function ensureStyles(){
-  const rosterCellGap = resolveRosterCellGap(39, 0);
+  const rosterCellGap = resolveRosterCellGap(78, 0);
   const css = `
     .app--collection{padding:32px 16px 64px;}
     .collection-view{max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:28px;color:inherit;}
@@ -149,9 +163,11 @@ function ensureStyles(){
     .collection-roster__entry[data-rank="D"]{--entry-bg:rgba(48,34,24,.78);--entry-bg-hover:rgba(60,42,30,.9);--entry-bg-selected:rgba(70,48,36,.95);--entry-border:rgba(255,170,108,.3);--entry-border-hover:rgba(255,188,138,.46);--entry-border-selected:rgba(255,208,170,.6);--entry-shadow:0 0 0 1px rgba(255,182,132,.14);--entry-shadow-hover:0 10px 22px rgba(168,88,42,.36);--entry-shadow-selected:0 18px 32px rgba(168,88,42,.45);}
     .collection-roster__entry[data-rank="unknown"],
     .collection-roster__entry:not([data-rank]){--entry-shadow:none;}
-    .collection-roster__avatar{width:108px;height:108px;background:none;overflow:visible;position:relative;display:flex;align-items:center;justify-content:center;}
-    .collection-roster__avatar img{width:108px;height:108px;object-fit:contain;filter:drop-shadow(0 10px 18px rgba(0,0,0,.55));position:relative;z-index:1;}
-    .collection-roster__avatar span{position:relative;z-index:1;color:#aee4ff;font-weight:600;letter-spacing:.08em;}
+    .collection-roster__avatar{--ssr-aura:url('${SSR_AURA_SRC}');width:108px;height:108px;background:none;overflow:visible;position:relative;display:flex;align-items:center;justify-content:center;}
+    .collection-roster__portrait{width:108px;height:108px;position:relative;z-index:2;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+    .collection-roster__portrait img{width:108px;height:108px;object-fit:contain;filter:drop-shadow(0 10px 18px rgba(0,0,0,.55));position:relative;z-index:1;}
+    .collection-roster__portrait span{position:relative;z-index:1;color:#aee4ff;font-weight:600;letter-spacing:.08em;}
+    .collection-roster__aura{position:absolute;inset:50% auto auto 50%;width:120%;height:120%;transform:translate(-50%,-50%);z-index:1;background-image:var(--ssr-aura);background-position:center;background-repeat:no-repeat;background-size:contain;pointer-events:none;}
     .collection-stage{position:relative;border-radius:0;border:none;background:none;padding:28px;display:flex;flex-direction:column;gap:18px;overflow:hidden;min-height:420px;z-index:1;}
     .collection-stage>*{position:relative;z-index:2;}
     .collection-stage__art{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;z-index:1;pointer-events:none;}
@@ -242,7 +258,8 @@ function ensureStyles(){
       .collection-view__title{font-size:30px;}
       .collection-roster__entry{padding:0;gap:0;}
       .collection-roster__avatar{width:96px;height:96px;}
-      .collection-roster__avatar img{width:96px;height:96px;}
+      .collection-roster__portrait{width:96px;height:96px;}
+      .collection-roster__portrait img{width:96px;height:96px;}
       .collection-skill-overlay__abilities{gap:10px;}
       .collection-skill-card{padding:8px 12px;gap:8px;flex-wrap:wrap;align-items:flex-start;}
       .collection-skill-card__header{flex-wrap:wrap;gap:8px;}
@@ -490,6 +507,7 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
   rosterList.className = 'collection-roster__list';
 
   const rosterSource = buildRosterWithCost(cloneRoster(roster));
+  preloadSharedSsrAura();
   const skillSetCache = new Map<string, ReturnType<typeof getSkillSet>>();
   const abilityDetailCache = new Map<string, AbilityDetailRecord>();
   const abilityRenderCache = new Map<string, HTMLElement[]>();
@@ -535,17 +553,29 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
 
     const avatar = document.createElement('div');
     avatar.className = 'collection-roster__avatar';
+
+    if (normalizedRank === 'SSR'){
+      const aura = document.createElement('div');
+      aura.className = 'collection-roster__aura';
+      aura.setAttribute('aria-hidden', 'true');
+      avatar.appendChild(aura);
+    }
+
+    const portrait = document.createElement('div');
+    portrait.className = 'collection-roster__portrait';
     const art = getUnitArt(unitId);
     if (art?.sprite?.src){
       const img = document.createElement('img');
       img.src = art.sprite.src;
       img.alt = unit.name || unitId;
-      avatar.appendChild(img);
+      portrait.appendChild(img);
     } else {
       const fallback = document.createElement('span');
       fallback.textContent = '—';
-      avatar.appendChild(fallback);
+      portrait.appendChild(fallback);
     }
+
+   avatar.appendChild(portrait);
 
     const tooltipParts = [unit.name || unitId];
     if (displayRank){

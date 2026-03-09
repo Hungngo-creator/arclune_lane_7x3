@@ -379,6 +379,11 @@ Hồi 100% nộ cho 1 đồng minh (Đầy nộ ngay lập tức) Tag: Đồng m
 Ultimate — Sát Chiêu: Cương Khí Hộ Thể (Auto-cast): Không gây sát thương.
 Tạo một lớp khiên cho Toàn Đội. Giá trị khiên = 250% WIL + atk của Chiến Cổ, cho phép cộng dồn khiên, cap 300% max hp của mục tiêu (tính mỗi khiên từ ult của nhân vật này, khiên từ nguồn không phải ult của nhân vật này sẽ được tính riêng theo kit nguồn của khiên đó), Tag: Đồng minh, Buff Khiên.
 
+Hoá Thân của Thời Không Chi Chủ - Không Gian Chi Chủ, Prime.
+mô tả: Thời Không nhất thể, vì sức mạnh quá lớn nên Hắn phải tách ra làm 2 để giáng lâm Arclune - Ảnh Giới.
+
+Kỹ năng 1: Xáo trộn vị trí của kẻ thù trên sân 1 cách ngẫu nhiên không cố định, trộn vĩnh viễn cho đến khi đối phương chết hoặc bị xáo trộn lần nữa bởi kỹ năng này hoặc 1 kỹ năng không gian khác. 25 aether. Quy Tắc.
+Hoá Thân của Thời Không Chi Chủ - Thời Gian Chi Chủ, Prime.
 
 
 
