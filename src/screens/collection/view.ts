@@ -58,6 +58,13 @@ const TAB_HINT_BY_KEY: Readonly<Record<CollectionTabKey, string>> = TAB_DEFINITI
   return acc;
 }, {} as Record<CollectionTabKey, string>);
 
+function resolveRosterCellGap(baseGapPx: number, reductionRatio: number): string {
+  const normalizedBase = Number.isFinite(baseGapPx) ? Math.max(0, baseGapPx) : 0;
+  const normalizedRatio = Number.isFinite(reductionRatio) ? Math.min(Math.max(reductionRatio, 0), 1) : 0;
+  const reducedGap = normalizedBase * (1 - normalizedRatio);
+  return `${Math.max(0, reducedGap).toFixed(2)}px`;
+}
+
 function clearChildren(node: HTMLElement): void {
   node.replaceChildren();
 }
@@ -113,6 +120,7 @@ function parseFactListFromDataset(value: string | undefined): AbilityFact[] {
 }
 
 function ensureStyles(){
+  const rosterCellGap = resolveRosterCellGap(6, 0.1);
   const css = `
     .app--collection{padding:32px 16px 64px;}
     .collection-view{max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:28px;color:inherit;}
@@ -128,7 +136,7 @@ function ensureStyles(){
     .collection-wallet__balance{font-size:16px;margin:0;color:#e6f2ff;}
     .collection-view__layout{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(0,3fr) minmax(0,1.2fr);gap:24px;align-items:stretch;position:relative;}
     .collection-roster{border-radius:0;border:none;background:none;padding:0;display:flex;flex-direction:column;gap:12px;overflow:visible;z-index:3;margin-right:calc(-10vw);}
-    .collection-roster__list{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;max-height:560px;overflow:auto;padding-right:4px;}
+    .collection-roster__list{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:${rosterCellGap};row-gap:${rosterCellGap};max-height:560px;overflow:auto;padding-right:4px;}
     .collection-roster__entry{display:flex;align-items:center;justify-content:center;gap:0;padding:0;border-radius:0;border:none;background:none;color:inherit;cursor:pointer;transition:transform .18s ease,filter .18s ease;width:100%;}
     .collection-roster__entry:hover{transform:translateY(-2px);filter:brightness(1.08);}
     .collection-roster__entry:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:3px;}
@@ -158,13 +166,13 @@ function ensureStyles(){
     .collection-stage__tuvi-btn:hover{transform:translateY(-2px);filter:brightness(1.08);}
     .collection-stage__tuvi-btn:focus-visible{outline:2px solid rgba(110,231,183,.82);outline-offset:2px;}
     .collection-stage__tuvi-btn:disabled{cursor:not-allowed;background:linear-gradient(160deg,rgba(40,40,40,.6),rgba(12,12,12,.95));border-color:rgba(115,115,115,.65);color:#737373;filter:none;}
-    .collection-stage__info{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:flex-start;}
+    .collection-stage__info{display:none;}
     .collection-stage__identity{display:flex;flex-direction:column;gap:6px;}
     .collection-stage__name{margin:0;font-size:26px;letter-spacing:.06em;}
     .collection-stage__tags{display:flex;gap:10px;flex-wrap:wrap;}
     .collection-stage__tag{padding:6px 12px;border-radius:999px;border:1px solid rgba(125,211,252,.28);background:rgba(12,22,32,.78);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#aee4ff;}
-    .collection-stage__status{margin:0;color:#9cbcd9;font-size:14px;line-height:1.6;}
-    .collection-tabs{border-radius:24px;border:1px solid rgba(125,211,252,.2);background:rgba(12,20,28,.9);padding:20px;display:flex;flex-direction:column;gap:12px;z-index:4;}
+    .collection-stage__status{display:none;}
+    .collection-tabs{border-radius:24px;border:none;background:rgba(12,20,28,.9);padding:20px;display:flex;flex-direction:column;gap:12px;z-index:4;}
     .collection-tabs__title{margin:0 0 8px;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
     .collection-tabs__button{width:100%;padding:12px 14px;border-radius:14px;border:1px solid rgba(125,211,252,.18);background:rgba(8,16,24,.82);color:inherit;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:14px;transition:transform .18s ease,border-color .18s ease,background .18s ease;}
     .collection-tabs__button:hover{transform:translateX(4px);border-color:rgba(125,211,252,.42);background:rgba(16,26,36,.92);}
@@ -483,6 +491,8 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
   const rosterSource = buildRosterWithCost(cloneRoster(roster));
   const skillSetCache = new Map<string, ReturnType<typeof getSkillSet>>();
   const abilityDetailCache = new Map<string, AbilityDetailRecord>();
+  const abilityRenderCache = new Map<string, HTMLElement[]>();
+  const abilityDetailByUnitCache = new Map<string, Map<string, AbilityDetailRecord>>();
   const rosterEntries = new Map<string, {
     button: HTMLButtonElement;
     avatar: HTMLElement;
@@ -936,9 +946,12 @@ const overlayDetailPanel = document.createElement('aside');
         button.classList.remove('is-active');
       }
     }
-    stageStatus.textContent = TAB_HINT_BY_KEY[key] || 'Khung thông tin chức năng.';
+    stageStatus.textContent = TAB_HINT_BY_KEY[key] || '';
     if (key === 'skills'){
       overlay.classList.add('is-open');
+      if (activeUnitId){
+        renderSkillAbilityList(activeUnitId);
+      }
     } else {
       overlay.classList.remove('is-open');
       clearSkillDetail();
@@ -1049,6 +1062,120 @@ const resolveCurrentCultivation = () => {
       : `Chi phí kế tiếp: ${currencyFormatter.format(costInfo.aetherCost)} VNT`;
   };
 
+  const renderSkillAbilityList = (unitId: string): void => {
+    const selectedEntry = rosterEntries.get(unitId) || null;
+    const unit = selectedEntry?.meta || null;
+    const skillSet = skillSetCache.has(unitId)
+      ? skillSetCache.get(unitId)
+      : getSkillSet(unitId);
+    if (!skillSetCache.has(unitId)){
+      skillSetCache.set(unitId, skillSet);
+    }
+
+    overlayTitle.textContent = toSafeText(unit?.name ? `Kĩ năng · ${unit.name}` : 'Kĩ năng');
+    overlaySubtitle.textContent = toSafeText(describeUlt(unit));
+    const summaryNote = skillSet?.notes?.[0] ?? '';
+    overlaySummary.textContent = toSafeText(summaryNote);
+    overlaySummary.style.display = summaryNote ? '' : 'none';
+
+    overlayNotesList.replaceChildren();
+    const extraNotes = Array.isArray(skillSet?.notes) ? skillSet.notes.slice(1) : [];
+    if (extraNotes.length){
+      overlayNotesList.style.display = '';
+      for (const note of extraNotes){
+        if (!note) continue;
+        const item = document.createElement('li');
+        item.textContent = toSafeText(note);
+        overlayNotesList.appendChild(item);
+      }
+    } else {
+      overlayNotesList.style.display = 'none';
+    }
+
+    overlayAbilities.replaceChildren();
+    abilityDetailCache.clear();
+    const cachedCards = abilityRenderCache.get(unitId);
+    const cachedDetails = abilityDetailByUnitCache.get(unitId);
+    if (cachedDetails){
+      for (const [abilityKey, detail] of cachedDetails){
+        abilityDetailCache.set(abilityKey, detail);
+      }
+    }
+    if (cachedCards && cachedCards.length){
+      for (const cached of cachedCards){
+        overlayAbilities.appendChild(cached.cloneNode(true));
+      }
+      return;
+    }
+
+    const abilityEntries: Array<{ entry: AbilityEntry | null | undefined; label: string }> = [];
+    if (skillSet?.basic){
+      abilityEntries.push({ entry: skillSet.basic, label: ABILITY_TYPE_LABELS.basic });
+    }
+    if (Array.isArray(skillSet?.skills)){
+      skillSet.skills.forEach((skill: AbilityEntry | null | undefined, index: number) => {
+        if (!skill) return;
+        abilityEntries.push({ entry: skill, label: `Kĩ năng ${index + 1}` });
+      });
+    }
+    if (skillSet?.ult){
+      abilityEntries.push({ entry: skillSet.ult, label: ABILITY_TYPE_LABELS.ultimate });
+    }
+    if (skillSet?.talent){
+      abilityEntries.push({ entry: skillSet.talent, label: ABILITY_TYPE_LABELS.talent });
+    }
+    if (skillSet?.technique){
+      abilityEntries.push({ entry: skillSet.technique, label: ABILITY_TYPE_LABELS.technique });
+    }
+
+    if (abilityEntries.length){
+      const renderedCards: HTMLElement[] = [];
+      const detailMap = new Map<string, AbilityDetailRecord>();
+      for (let index = 0; index < abilityEntries.length; index += 1){
+        const ability = abilityEntries[index];
+        if (!ability) continue;
+        const abilityEntry = ability.entry;
+        const abilityId = abilityEntry?.id ?? abilityEntry?.abilityId ?? null;
+        const abilityKey = `${unitId}:${String(abilityId ?? index)}`;
+        const normalizedNotes = Array.isArray(abilityEntry?.notes)
+          ? abilityEntry.notes
+            .map(note => (typeof note === 'string' ? note.trim() : ''))
+            .filter(note => note.length > 0)
+          : [];
+        const facts = collectAbilityFacts(abilityEntry);
+        const detailRecord: AbilityDetailRecord = {
+          unitId,
+          abilityId,
+          ability: abilityEntry,
+          typeLabel: ability.label,
+          facts,
+          notes: normalizedNotes,
+        };
+        abilityDetailCache.set(abilityKey, detailRecord);
+        detailMap.set(abilityKey, detailRecord);
+
+        const card = renderAbilityCard(abilityEntry, {
+          typeLabel: ability.label,
+          unitId,
+          abilityKey,
+          facts,
+          notes: normalizedNotes,
+        });
+        renderedCards.push(card.cloneNode(true) as HTMLElement);
+        overlayAbilities.appendChild(card);
+      }
+      abilityRenderCache.set(unitId, renderedCards);
+      abilityDetailByUnitCache.set(unitId, detailMap);
+    } else {
+      const placeholder = document.createElement('p');
+      placeholder.className = 'collection-skill-card__empty';
+      placeholder.textContent = 'Chưa có dữ liệu kỹ năng chi tiết cho nhân vật này.';
+      overlayAbilities.appendChild(placeholder);
+      abilityRenderCache.set(unitId, [placeholder.cloneNode(true) as HTMLElement]);
+      abilityDetailByUnitCache.set(unitId, new Map());
+    }
+  };
+
   const handleCultivationUpgrade = () => {
     if (!activeUnitId){
       stageStatus.textContent = 'Hãy chọn một nhân vật trước khi tăng tu vi.';
@@ -1103,28 +1230,8 @@ const resolveCurrentCultivation = () => {
 
     const selectedEntry = rosterEntries.get(unitId) || null;
     const unit = selectedEntry?.meta || null;
-    const unitRarity = selectedEntry?.rarity || null;
-    stageName.textContent = toSafeText(unit?.name ?? unitId);
-
-    const stageTagsFragment = document.createDocumentFragment();
-    if (unitRarity){
-      const rankTag = document.createElement('span');
-      rankTag.className = 'collection-stage__tag';
-      rankTag.textContent = toSafeText(`Rank ${unitRarity}`);
-      stageTagsFragment.appendChild(rankTag);
-    } else if (unit?.rank){
-      const rankTag = document.createElement('span');
-      rankTag.className = 'collection-stage__tag';
-      rankTag.textContent = toSafeText(`Rank ${unit.rank}`);
-      stageTagsFragment.appendChild(rankTag);
-    }
-    if (unit?.class){
-      const classTag = document.createElement('span');
-      classTag.className = 'collection-stage__tag';
-      classTag.textContent = toSafeText(unit.class);
-      stageTagsFragment.appendChild(classTag);
-    }
-    stageTags.replaceChildren(stageTagsFragment);
+    stageName.textContent = '';
+    stageTags.replaceChildren();
 
     const art = getUnitArt(unitId);
     if (art?.sprite?.src){
@@ -1137,89 +1244,8 @@ const resolveCurrentCultivation = () => {
       stageSprite.style.opacity = '0';
     }
 
-    overlayTitle.textContent = toSafeText(unit?.name ? `Kĩ năng · ${unit.name}` : 'Kĩ năng');
-    
-    const skillSet = skillSetCache.has(unitId)
-      ? skillSetCache.get(unitId)
-      : getSkillSet(unitId);
-    if (!skillSetCache.has(unitId)){
-      skillSetCache.set(unitId, skillSet);
-    }
-    overlaySubtitle.textContent = toSafeText(describeUlt(unit));
-    const summaryNote = skillSet?.notes?.[0] ?? '';
-    overlaySummary.textContent = toSafeText(summaryNote);
-    overlaySummary.style.display = summaryNote ? '' : 'none';
-
-    overlayNotesList.replaceChildren();
-    const extraNotes = Array.isArray(skillSet?.notes) ? skillSet.notes.slice(1) : [];
-    if (extraNotes.length){
-      overlayNotesList.style.display = '';
-      for (const note of extraNotes){
-        if (!note) continue;
-        const item = document.createElement('li');
-        item.textContent = toSafeText(note);
-        overlayNotesList.appendChild(item);
-      }
-    } else {
-      overlayNotesList.style.display = 'none';
-    }
-
-    overlayAbilities.replaceChildren();
-    abilityDetailCache.clear();
-    const abilityEntries: Array<{ entry: AbilityEntry | null | undefined; label: string }> = [];
-    if (skillSet?.basic){
-      abilityEntries.push({ entry: skillSet.basic, label: ABILITY_TYPE_LABELS.basic });
-    }
-    if (Array.isArray(skillSet?.skills)){
-      skillSet.skills.forEach((skill: AbilityEntry | null | undefined, index: number) => {
-        if (!skill) return;
-        abilityEntries.push({ entry: skill, label: `Kĩ năng ${index + 1}` });
-      });
-    }
-    if (skillSet?.ult){
-      abilityEntries.push({ entry: skillSet.ult, label: ABILITY_TYPE_LABELS.ultimate });
-    }
-    if (skillSet?.talent){
-      abilityEntries.push({ entry: skillSet.talent, label: ABILITY_TYPE_LABELS.talent });
-    }
-    if (skillSet?.technique){
-      abilityEntries.push({ entry: skillSet.technique, label: ABILITY_TYPE_LABELS.technique });
-    }
-
-    if (abilityEntries.length){
-      for (let index = 0; index < abilityEntries.length; index += 1){
-        const ability = abilityEntries[index];
-        if (!ability) continue;
-        const abilityEntry = ability.entry;
-        const abilityId = abilityEntry?.id ?? abilityEntry?.abilityId ?? null;
-        const abilityKey = `${unitId}:${String(abilityId ?? index)}`;
-        const normalizedNotes = Array.isArray(abilityEntry?.notes)
-          ? abilityEntry.notes
-            .map(note => (typeof note === 'string' ? note.trim() : ''))
-            .filter(note => note.length > 0)
-          : [];
-        const facts = collectAbilityFacts(abilityEntry);
-        abilityDetailCache.set(abilityKey, {
-          unitId,
-          abilityId,
-          ability: abilityEntry,
-          typeLabel: ability.label,
-          facts,
-          notes: normalizedNotes,
-        });
-        overlayAbilities.appendChild(renderAbilityCard(abilityEntry, {
-          typeLabel: ability.label,
-          unitId,
-          abilityKey,
-          facts,
-          notes: normalizedNotes,
-        }));
-      }
-    } else {
-      const placeholder = document.createElement('p');
-      placeholder.className = 'collection-skill-card__empty';
-      placeholder.textContent = 'Chưa có dữ liệu kỹ năng chi tiết cho nhân vật này.';
-      overlayAbilities.appendChild(placeholder);
+    if (filterState.activeTab === 'skills'){
+      renderSkillAbilityList(unitId);
     }
 
     if (filterState.activeTab === 'skills'){
