@@ -19953,7 +19953,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       }
   }
   function ensureStyles() {
-      const rosterCellGap = resolveRosterCellGap(6, 0.1);
+      const rosterCellGap = resolveRosterCellGap(39, 0);
       const css = `
       .app--collection{padding:32px 16px 64px;}
       .collection-view{max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:28px;color:inherit;}
