@@ -136,8 +136,9 @@ function ensureStyles(){
     .collection-wallet__balance{font-size:16px;margin:0;color:#e6f2ff;}
     .collection-view__layout{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(0,3fr) minmax(0,1.2fr);gap:24px;align-items:stretch;position:relative;}
     .collection-roster{border-radius:0;border:none;background:none;padding:0;display:flex;flex-direction:column;gap:12px;overflow:visible;z-index:3;margin-right:calc(-10vw);}
-    .collection-roster__list{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:${rosterCellGap};row-gap:${rosterCellGap};max-height:560px;overflow:auto;padding-right:4px;}
-    .collection-roster__entry{display:flex;align-items:center;justify-content:center;gap:0;padding:0;border-radius:0;border:none;background:none;color:inherit;cursor:pointer;transition:transform .18s ease,filter .18s ease;width:100%;}
+    .collection-roster__list{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(3,max-content);column-gap:${rosterCellGap};row-gap:${rosterCellGap};justify-content:start;max-height:560px;overflow:auto;padding-right:4px;}
+    .collection-roster__list > li{width:max-content;height:max-content;}
+    .collection-roster__entry{display:inline-flex;align-items:center;justify-content:center;gap:0;padding:0;border-radius:0;border:none;background:none;color:inherit;cursor:pointer;transition:transform .18s ease,filter .18s ease;width:auto;}
     .collection-roster__entry:hover{transform:translateY(-2px);filter:brightness(1.08);}
     .collection-roster__entry:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:3px;}
     .collection-roster__entry.is-selected{filter:brightness(1.15) saturate(1.05);}
@@ -228,14 +229,14 @@ function ensureStyles(){
     @media(max-width:1080px){
       .collection-view__layout{grid-template-columns:1fr;}
       .collection-roster{margin-right:0;}
-      .collection-roster__list{grid-template-columns:repeat(3,minmax(0,1fr));}
+      .collection-roster__list{grid-template-columns:repeat(3,max-content);}
       .collection-skill-overlay{position:fixed;top:50%;left:50%;transform:translate(-50%,calc(-50% + 12px));width:88vw;min-height:0;max-height:85vh;}
       .collection-skill-overlay.is-open{transform:translate(-50%,-50%);}
       .collection-skill-overlay__content{grid-template-columns:1fr;}
       .collection-skill-overlay__content.has-detail{grid-template-columns:1fr;}
     }
     @media(max-width:820px){
-      .collection-roster__list{grid-template-columns:repeat(3,minmax(0,1fr));}
+      .collection-roster__list{grid-template-columns:repeat(3,max-content);}
     }
     @media(max-width:720px){
       .collection-view__title{font-size:30px;}
