@@ -14,6 +14,7 @@ import {
 } from '../../utils/currency.ts';
 import { assertElement, ensureStyleTag, mountSection } from '../../ui/dom.ts';
 import { normalizeRarity } from '../../utils/rarity.ts';
+import { ROSTER_PREVIEWS } from '../../data/roster-preview.ts';
 
 import {
   ABILITY_TYPE_LABELS,
@@ -83,6 +84,32 @@ function preloadSharedSsrAura(): void {
 
 const currencyCatalog: CurrencyCatalog = getCurrencyCatalog();
 const currencyFormatter = ensureNumberFormatter(createNumberFormatter, 'vi-VN');
+const CORE_STAT_KEYS = ['HP', 'WIL', 'ATK', 'RES', 'ARM'] as const;
+
+function toFiniteStatValue(value: unknown): number | null {
+  if (typeof value !== 'number') return null;
+  return Number.isFinite(value) ? value : null;
+}
+
+function resolveUnitStats(unitId: string | null): Array<{ key: string; value: number }> {
+  if (!unitId) return [];
+  const preview = ROSTER_PREVIEWS[unitId];
+  const finalStats = preview?.final as Record<string, unknown> | undefined;
+  if (!finalStats) return [];
+
+  const hp = toFiniteStatValue(finalStats.HPmax ?? finalStats.HP ?? null);
+  const rows: Array<{ key: string; value: number }> = [];
+  if (hp != null){
+    rows.push({ key: 'HP', value: hp });
+  }
+  for (const [key, rawValue] of Object.entries(finalStats)){
+    if (key === 'HP' || key === 'HPmax') continue;
+    const value = toFiniteStatValue(rawValue);
+    if (value == null) continue;
+    rows.push({ key, value });
+  }
+  return rows;
+}
 
 function toSafeText(value: string | number | null | undefined): string{
   if (value == null){
@@ -185,6 +212,16 @@ function ensureStyles(){
     .collection-stage__tags{display:flex;gap:10px;flex-wrap:wrap;}
     .collection-stage__tag{padding:6px 12px;border-radius:999px;border:1px solid rgba(125,211,252,.28);background:rgba(12,22,32,.78);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#aee4ff;}
     .collection-stage__status{display:none;}
+    .collection-stage__mini-stats{position:absolute;left:12px;bottom:18px;z-index:4;min-width:170px;max-width:220px;border:1px solid rgba(125,211,252,.34);border-radius:14px;background:rgba(6,16,26,.32);backdrop-filter:blur(3px);padding:28px 10px 10px;display:flex;flex-direction:column;gap:6px;}
+    .collection-stage__mini-stats-toggle{position:absolute;top:6px;left:6px;width:20px;height:20px;border-radius:50%;border:1px solid rgba(174,228,255,.45);background:rgba(11,24,34,.7);color:#d4edff;font-size:12px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+    .collection-stage__mini-stats-toggle:focus-visible{outline:2px solid rgba(174,228,255,.8);outline-offset:2px;}
+    .collection-stage__mini-stats-list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;}
+    .collection-stage__mini-stats-item{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9fc8ea;}
+    .collection-stage__mini-stats-item b{font-size:12px;color:#e6f2ff;letter-spacing:.04em;text-transform:none;}
+    .collection-stage__mini-stats-item.is-detail{display:none;}
+    .collection-stage__mini-stats.is-detail-open .collection-stage__mini-stats-item.is-detail{display:flex;}
+    .collection-stage__mini-stats-hint{margin:2px 0 0;font-size:10px;color:#7da0c7;line-height:1.4;}
+    .collection-stage__mini-stats.is-detail-open .collection-stage__mini-stats-hint{display:none;}
     .collection-tabs{border-radius:0;border:none;background:none;padding:0;display:flex;flex-direction:column;align-items:flex-end;justify-self:end;gap:10px;z-index:4;min-width:36px;}
     .collection-tabs__button{width:36px;height:36px;padding:0;border-radius:50%;border:1px solid rgba(125,211,252,.2);background:rgba(8,16,24,.82);color:inherit;cursor:pointer;display:flex;justify-content:center;align-items:center;transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease;}
     .collection-tabs__button:hover{transform:translateY(-2px);border-color:rgba(125,211,252,.42);background:rgba(16,26,36,.92);}
@@ -680,6 +717,69 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
   const stageStatus = document.createElement('p');
   stageStatus.className = 'collection-stage__status';
   stageStatus.textContent = 'Chọn một nhân vật để xem chi tiết và tab chức năng.';
+
+const miniStats = document.createElement('section');
+  miniStats.className = 'collection-stage__mini-stats';
+
+  const miniStatsToggle = document.createElement('button');
+  miniStatsToggle.type = 'button';
+  miniStatsToggle.className = 'collection-stage__mini-stats-toggle';
+  miniStatsToggle.textContent = '?';
+  miniStatsToggle.setAttribute('aria-label', 'Mở rộng chi tiết chỉ số');
+
+  const miniStatsList = document.createElement('ul');
+  miniStatsList.className = 'collection-stage__mini-stats-list';
+
+  const miniStatsHint = document.createElement('p');
+  miniStatsHint.className = 'collection-stage__mini-stats-hint';
+  miniStatsHint.textContent = 'Bấm ? để mở Chi Tiết';
+
+  miniStats.appendChild(miniStatsToggle);
+  miniStats.appendChild(miniStatsList);
+  miniStats.appendChild(miniStatsHint);
+  stage.appendChild(miniStats);
+
+  let isMiniStatsDetailOpen = false;
+  const renderMiniStats = (unitId: string | null): void => {
+    miniStatsList.replaceChildren();
+    const stats = resolveUnitStats(unitId);
+    if (!stats.length){
+      const empty = document.createElement('li');
+      empty.className = 'collection-stage__mini-stats-item';
+      empty.textContent = 'Chưa có chỉ số';
+      miniStatsList.appendChild(empty);
+      return;
+    }
+    for (const stat of stats){
+      const item = document.createElement('li');
+      item.className = 'collection-stage__mini-stats-item';
+      if (!CORE_STAT_KEYS.includes(stat.key as (typeof CORE_STAT_KEYS)[number])){
+        item.classList.add('is-detail');
+      }
+
+      const label = document.createElement('span');
+      label.textContent = stat.key;
+      const value = document.createElement('b');
+      value.textContent = currencyFormatter.format(stat.value);
+      item.appendChild(label);
+      item.appendChild(value);
+      miniStatsList.appendChild(item);
+    }
+  };
+
+  const syncMiniStatsDetail = () => {
+    miniStats.classList.toggle('is-detail-open', isMiniStatsDetailOpen);
+    miniStatsToggle.setAttribute('aria-label', isMiniStatsDetailOpen ? 'Ẩn chi tiết chỉ số' : 'Mở rộng chi tiết chỉ số');
+    miniStatsHint.style.display = isMiniStatsDetailOpen ? 'none' : '';
+  };
+
+  const handleMiniStatsToggle = () => {
+    isMiniStatsDetailOpen = !isMiniStatsDetailOpen;
+    syncMiniStatsDetail();
+  };
+  miniStatsToggle.addEventListener('click', handleMiniStatsToggle);
+  addCleanup(() => miniStatsToggle.removeEventListener('click', handleMiniStatsToggle));
+  syncMiniStatsDetail();
 
   const overlay = document.createElement('div');
   overlay.className = 'collection-skill-overlay';
@@ -1250,6 +1350,7 @@ const resolveCurrentCultivation = () => {
     if (filterState.activeTab === 'skills'){
       overlay.classList.add('is-open');
     }
+    renderMiniStats(unitId);
     refreshTuViPanel();
   };
 
