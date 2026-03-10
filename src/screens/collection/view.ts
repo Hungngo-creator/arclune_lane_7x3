@@ -170,13 +170,11 @@ function ensureStyles(){
     .collection-stage>*{position:relative;z-index:2;}
     .collection-stage__art{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;z-index:1;pointer-events:none;}
     .collection-stage__sprite{width:100%;max-width:none;height:100%;object-fit:contain;opacity:.42;filter:drop-shadow(0 28px 56px rgba(0,0,0,.55));transition:transform .3s ease,filter .3s ease,opacity .3s ease;}
-    .collection-stage__tuvi{position:absolute;left:50%;top:55%;transform:translate(-50%,-50%);width:50%;aspect-ratio:1/1;border-radius:50%;border:2px solid rgba(52,211,153,.72);box-shadow:0 0 0 4px rgba(16,185,129,.15),inset 0 0 56px rgba(5,46,22,.42);background:radial-gradient(circle at 35% 35%,rgba(52,211,153,.24),rgba(5,46,22,.78));display:none;flex-direction:column;align-items:center;justify-content:center;z-index:2;pointer-events:none;}
-    .collection-stage__tuvi.is-open{display:flex;}
-    .collection-stage__tuvi-realm{margin:0;color:#bbf7d0;font-size:22px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-align:center;}
-    .collection-stage__tuvi-subrealm{margin:6px 0 0;color:#dcfce7;font-size:14px;letter-spacing:.08em;text-transform:uppercase;text-align:center;}
-    .collection-stage__tuvi-cost{margin:8px 0 0;color:#86efac;font-size:12px;letter-spacing:.06em;text-transform:uppercase;text-align:center;}
-    .collection-stage__tuvi-actions{display:none;position:absolute;left:50%;bottom:24px;transform:translateX(-50%);z-index:3;gap:10px;}
-    .collection-stage__tuvi-actions.is-open{display:flex;}
+    .collection-stage__tuvi{position:absolute;left:50%;bottom:84px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:3;pointer-events:none;gap:8px;padding:8px 12px;border-radius:14px;background:rgba(6,14,24,.56);backdrop-filter:blur(2px);}
+    .collection-stage__tuvi-realm{margin:0;color:#d6f1ff;font-size:20px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-align:center;}
+    .collection-stage__tuvi-subrealm{display:none;}
+    .collection-stage__tuvi-cost{margin:0;color:#9fc8ea;font-size:12px;letter-spacing:.05em;text-transform:uppercase;text-align:center;}
+    .collection-stage__tuvi-actions{display:flex;position:absolute;left:50%;bottom:28px;transform:translateX(-50%);z-index:3;gap:10px;}
     .collection-stage__tuvi-btn{width:44px;height:44px;border-radius:50%;border:1px solid rgba(110,231,183,.6);background:linear-gradient(160deg,rgba(16,185,129,.35),rgba(5,46,22,.88));color:#dcfce7;font-size:24px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .18s ease,filter .18s ease;}
     .collection-stage__tuvi-btn:hover{transform:translateY(-2px);filter:brightness(1.08);}
     .collection-stage__tuvi-btn:focus-visible{outline:2px solid rgba(110,231,183,.82);outline-offset:2px;}
@@ -979,9 +977,6 @@ const overlayDetailPanel = document.createElement('aside');
       overlay.classList.remove('is-open');
       clearSkillDetail();
     }
-    const isTuViTab = key === 'tuvi';
-    tuViPanel.classList.toggle('is-open', isTuViTab);
-    tuViActions.classList.toggle('is-open', isTuViTab);
   };
 
   const handleTabClick = (key: CollectionTabKey) => {
