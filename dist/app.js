@@ -19813,7 +19813,7 @@ __define('./screens/collection/state.ts', (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/collection/state.ts
   function createFilterState(initial) {
       return {
-          activeTab: initial?.activeTab ?? 'awakening',
+          activeTab: initial?.activeTab ?? 'arts',
           selectedUnitId: initial?.selectedUnitId ?? null,
       };
   }
@@ -19880,12 +19880,10 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
   const SSR_AURA_SRC = 'assets/rank_aura/SSR_aura.webp';
   let ssrAuraPreloadImage = null;
   const TAB_DEFINITIONS = [
-      { key: 'awakening', label: 'Thức Tỉnh', hint: 'Theo dõi mốc thức tỉnh, sao và điểm đột phá của nhân vật đã sở hữu.' },
-      { key: 'skills', label: 'Kĩ Năng', hint: 'Mở lớp phủ mô tả kỹ năng, chuỗi nâng cấp và yêu cầu nguyên liệu.' },
-      { key: 'arts', label: 'Công Pháp & Trang Bị', hint: 'Liệt kê công pháp, pháp khí và trang bị đang trang bị cho nhân vật.' },
-      { key: 'skins', label: 'Skin', hint: 'Quản lý skin đã mở khóa và áp dụng bảng phối màu yêu thích.' },
-      { key: 'voice', label: 'Giọng Nói', hint: 'Nghe thử voice line, thiết lập voice pack và gợi ý mở khóa.' },
-      { key: 'tuvi', label: 'Tu Vi', hint: 'Nâng cấp tiểu cảnh giới và tiêu hao VNT theo độ khó bậc tu luyện.' }
+      { key: 'skills', label: 'Kĩ Năng & Thức Tỉnh', hint: 'Mở lớp phủ mô tả kỹ năng, chuỗi nâng cấp và yêu cầu nguyên liệu.', icon: 'assets/collection/skill&essence.webp' },
+      { key: 'arts', label: 'Công Pháp & Trang Bị', hint: 'Liệt kê công pháp, pháp khí và trang bị đang trang bị cho nhân vật.', icon: 'assets/collection/gear&art.webp' },
+      { key: 'skins', label: 'Skin', hint: 'Quản lý skin đã mở khóa và áp dụng bảng phối màu yêu thích.', icon: 'assets/collection/skin.webp' },
+      { key: 'voice', label: 'Giọng Nói', hint: 'Nghe thử voice line, thiết lập voice pack và gợi ý mở khóa.', icon: 'assets/collection/voice.webp' }
   ];
   const TAB_HINT_BY_KEY = TAB_DEFINITIONS.reduce((acc, tab) => {
       acc[tab.key] = tab.hint;
@@ -20021,13 +20019,12 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       .collection-stage__tags{display:flex;gap:10px;flex-wrap:wrap;}
       .collection-stage__tag{padding:6px 12px;border-radius:999px;border:1px solid rgba(125,211,252,.28);background:rgba(12,22,32,.78);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#aee4ff;}
       .collection-stage__status{display:none;}
-      .collection-tabs{border-radius:24px;border:none;background:rgba(12,20,28,.9);padding:20px;display:flex;flex-direction:column;gap:12px;z-index:4;}
-      .collection-tabs__title{margin:0 0 8px;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
-      .collection-tabs__button{width:100%;padding:12px 14px;border-radius:14px;border:1px solid rgba(125,211,252,.18);background:rgba(8,16,24,.82);color:inherit;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:14px;transition:transform .18s ease,border-color .18s ease,background .18s ease;}
-      .collection-tabs__button:hover{transform:translateX(4px);border-color:rgba(125,211,252,.42);background:rgba(16,26,36,.92);}
+      .collection-tabs{border-radius:20px;border:none;background:rgba(12,20,28,.9);padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:10px;z-index:4;min-width:56px;}
+      .collection-tabs__button{width:36px;height:36px;padding:0;border-radius:50%;border:1px solid rgba(125,211,252,.2);background:rgba(8,16,24,.82);color:inherit;cursor:pointer;display:flex;justify-content:center;align-items:center;transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease;}
+      .collection-tabs__button:hover{transform:translateY(-2px);border-color:rgba(125,211,252,.42);background:rgba(16,26,36,.92);}
       .collection-tabs__button:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:3px;}
-      .collection-tabs__button.is-active{border-color:rgba(125,211,252,.55);background:rgba(18,30,42,.96);box-shadow:0 16px 36px rgba(6,12,20,.42);}
-      .collection-tabs__hint{font-size:11px;color:#7da0c7;letter-spacing:.08em;text-transform:uppercase;}
+      .collection-tabs__button.is-active{border-color:rgba(125,211,252,.55);background:rgba(18,30,42,.96);box-shadow:0 10px 24px rgba(6,12,20,.42);}
+      .collection-tabs__icon{width:78%;height:78%;display:block;object-fit:contain;filter:drop-shadow(0 1px 3px rgba(0,0,0,.45));pointer-events:none;}
       .collection-skill-overlay{position:absolute;top:15%;left:10%;width:82%;min-height:70%;padding:24px;border-radius:22px;border:1px solid rgba(125,211,252,.45);background:rgba(8,16,26,.92);box-shadow:0 42px 96px rgba(3,6,12,.75);display:flex;flex-direction:column;gap:18px;opacity:0;pointer-events:none;transition:opacity .24s ease,transform .24s ease;transform:translateY(12px);backdrop-filter:blur(6px);max-height:80vh;overflow:hidden;}
       .collection-skill-overlay.is-open{opacity:1;pointer-events:auto;transform:translateY(0);}
       .collection-skill-overlay__header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;}
@@ -20412,7 +20409,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       overlayClose.textContent = 'Đóng';
       const closeOverlay = () => {
           overlay.classList.remove('is-open');
-          setActiveTab('awakening');
+          setActiveTab('arts');
       };
       overlayClose.addEventListener('click', closeOverlay);
       addCleanup(() => overlayClose.removeEventListener('click', closeOverlay));
@@ -20631,10 +20628,6 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       addCleanup(() => document.removeEventListener('click', handleGlobalClick));
       const tabs = document.createElement('aside');
       tabs.className = 'collection-tabs';
-      const tabsTitle = document.createElement('h2');
-      tabsTitle.className = 'collection-tabs__title';
-      tabsTitle.textContent = 'Danh sách tab';
-      tabs.appendChild(tabsTitle);
       const tabButtons = new Map();
       const setActiveTab = (key) => {
           updateActiveTab(filterState, key);
@@ -20664,12 +20657,6 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           tuViActions.classList.toggle('is-open', isTuViTab);
       };
       const handleTabClick = (key) => {
-          if (key === 'close') {
-              if (shell && typeof shell.enterScreen === 'function') {
-                  shell.enterScreen('main-menu');
-              }
-              return;
-          }
           setActiveTab(key);
       };
       for (const tab of TAB_DEFINITIONS) {
@@ -20677,32 +20664,20 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           button.type = 'button';
           button.className = 'collection-tabs__button';
           button.dataset.tabKey = tab.key;
-          const label = document.createElement('span');
-          label.textContent = tab.label;
-          button.appendChild(label);
-          const hint = document.createElement('span');
-          hint.className = 'collection-tabs__hint';
-          hint.textContent = '→';
-          button.appendChild(hint);
+          button.title = tab.label;
+          button.setAttribute('aria-label', tab.label);
+          const icon = document.createElement('img');
+          icon.className = 'collection-tabs__icon';
+          icon.src = tab.icon;
+          icon.alt = '';
+          icon.loading = 'lazy';
+          button.appendChild(icon);
           const clickHandler = () => handleTabClick(tab.key);
           button.addEventListener('click', clickHandler);
           addCleanup(() => button.removeEventListener('click', clickHandler));
           tabButtons.set(tab.key, button);
           tabs.appendChild(button);
       }
-      const exitButton = document.createElement('button');
-      exitButton.type = 'button';
-      exitButton.className = 'collection-tabs__button';
-      exitButton.dataset.tabKey = 'close';
-      exitButton.innerHTML = '<span>Thoát</span><span class="collection-tabs__hint">↩</span>';
-      const handleExit = () => {
-          if (shell && typeof shell.enterScreen === 'function') {
-              shell.enterScreen('main-menu');
-          }
-      };
-      exitButton.addEventListener('click', handleExit);
-      addCleanup(() => exitButton.removeEventListener('click', handleExit));
-      tabs.appendChild(exitButton);
       layout.appendChild(rosterPanel);
       layout.appendChild(stage);
       layout.appendChild(tabs);
