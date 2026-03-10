@@ -185,6 +185,7 @@ const refreshBattlePanels = (): void => {
       helpers.setMessage(`Đã gán ${unit?.name || 'nhân vật'} vào ${label}.`, 'info');
       state.selectedUnitId = null;
       refreshBattlePanels();
+      helpers.persistLineupSelection();
       return true;
     };
 
@@ -204,6 +205,7 @@ const refreshBattlePanels = (): void => {
         'info',
       );
       refreshBattlePanels();
+      helpers.persistLineupSelection();
       helpers.refreshWallet();
       const order = getCurrencyOrder();
       const wallet = createNormalizedWallet(Object.fromEntries(order.map((id) => [id, state.currencyBalances.get(id) ?? 0])));
@@ -228,6 +230,7 @@ const refreshBattlePanels = (): void => {
       }
       helpers.setMessage('Đã bỏ nhân vật khỏi ô.', 'info');
       refreshBattlePanels();
+      helpers.persistLineupSelection();
       return;
     }
 
@@ -341,9 +344,10 @@ const refreshBattlePanels = (): void => {
     const activeCell = Number.isInteger(state.activeCellIndex)
       ? lineup.cells[state.activeCellIndex as number] ?? null
       : null;
-    const targetCell = activeCell && activeCell.unlocked
+    const nextEmptyCell = lineup.cells.find(cell => cell.unlocked && !cell.unitId) ?? null;
+    const targetCell = activeCell && activeCell.unlocked && !activeCell.unitId
       ? activeCell
-      : (lineup.cells.find(cell => cell.unlocked && !cell.unitId) ?? lineup.cells.find(cell => cell.unlocked) ?? null);
+      : (nextEmptyCell ?? activeCell ?? lineup.cells.find(cell => cell.unlocked) ?? null);
 
     if (!targetCell){
       state.selectedUnitId = unitId;
@@ -368,6 +372,7 @@ const refreshBattlePanels = (): void => {
     const label = getCellLabel(lineup, targetCell.index);
     helpers.setMessage(`Đã gán ${unit?.name || 'nhân vật'} vào ${label}.`, 'info');
     refreshBattlePanels();
+    helpers.persistLineupSelection();
     helpers.updateActiveCellHighlight();
     helpers.renderCellDetails();
   };
@@ -429,6 +434,7 @@ const refreshBattlePanels = (): void => {
     helpers.renderCells();
     helpers.renderPassives();
     helpers.renderRoster();
+    helpers.persistLineupSelection();
     overlays.close(leaderOverlay);
   };
   leaderOverlayBody.addEventListener('click', handleLeaderOption);

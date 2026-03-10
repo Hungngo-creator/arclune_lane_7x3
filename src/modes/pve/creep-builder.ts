@@ -240,6 +240,11 @@ export function buildAICreepDeckFromLineup(params: {
     const profile = allocatedProgress[creep.powerSlot] ?? {};
     const rank = allocatedRanks[creep.powerSlot] ?? null;
     const cost = allocatedCosts[creep.powerSlot] ?? 1;
-    return toCreepDeckEntry({ creepId,
+    return toCreepDeckEntry({
+      creepId,
+      profile,
+      rank,
+      cost,
+    });
   });
 }

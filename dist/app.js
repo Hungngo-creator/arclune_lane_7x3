@@ -12741,7 +12741,11 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
           const profile = allocatedProgress[creep.powerSlot] ?? {};
           const rank = allocatedRanks[creep.powerSlot] ?? null;
           const cost = allocatedCosts[creep.powerSlot] ?? 1;
-          return toCreepDeckEntry({ creepId,
+          return toCreepDeckEntry({
+              creepId,
+              profile,
+              rank,
+              cost,
           });
       });
   }
@@ -21735,6 +21739,7 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
               helpers.setMessage(`Đã gán ${unit?.name || 'nhân vật'} vào ${label}.`, 'info');
               state.selectedUnitId = null;
               refreshBattlePanels();
+              helpers.persistLineupSelection();
               return true;
           };
           if (action === 'unlock') {
@@ -21750,6 +21755,7 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
                   ? `Đã mở khóa ${label} (tốn ${spentText}).`
                   : `Đã mở khóa ${label}.`, 'info');
               refreshBattlePanels();
+              helpers.persistLineupSelection();
               helpers.refreshWallet();
               const order = getCurrencyOrder();
               const wallet = createNormalizedWallet(Object.fromEntries(order.map((id) => [id, state.currencyBalances.get(id) ?? 0])));
@@ -21772,6 +21778,7 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
               }
               helpers.setMessage('Đã bỏ nhân vật khỏi ô.', 'info');
               refreshBattlePanels();
+              helpers.persistLineupSelection();
               return;
           }
           if (action === 'assign') {
@@ -21882,9 +21889,10 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
           const activeCell = Number.isInteger(state.activeCellIndex)
               ? lineup.cells[state.activeCellIndex] ?? null
               : null;
-          const targetCell = activeCell && activeCell.unlocked
+          const nextEmptyCell = lineup.cells.find(cell => cell.unlocked && !cell.unitId) ?? null;
+          const targetCell = activeCell && activeCell.unlocked && !activeCell.unitId
               ? activeCell
-              : (lineup.cells.find(cell => cell.unlocked && !cell.unitId) ?? lineup.cells.find(cell => cell.unlocked) ?? null);
+              : (nextEmptyCell ?? activeCell ?? lineup.cells.find(cell => cell.unlocked) ?? null);
           if (!targetCell) {
               state.selectedUnitId = unitId;
               helpers.setMessage('Không có ô hợp lệ để gán ngay. Hãy chọn ô đội hình trước.', 'error');
@@ -21906,6 +21914,7 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
           const label = getCellLabel(lineup, targetCell.index);
           helpers.setMessage(`Đã gán ${unit?.name || 'nhân vật'} vào ${label}.`, 'info');
           refreshBattlePanels();
+          helpers.persistLineupSelection();
           helpers.updateActiveCellHighlight();
           helpers.renderCellDetails();
       };
@@ -21965,6 +21974,7 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
           helpers.renderCells();
           helpers.renderPassives();
           helpers.renderRoster();
+          helpers.persistLineupSelection();
           overlays.close(leaderOverlay);
       };
       leaderOverlayBody.addEventListener('click', handleLeaderOption);
