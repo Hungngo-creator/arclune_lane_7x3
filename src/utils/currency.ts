@@ -217,3 +217,8 @@ export function subscribeSharedCurrencyWallet(listener: CurrencyWalletListener):
     sharedWalletListeners.delete(listener);
   };
 }
+export function resetSharedCurrencyWallet(): CurrencyWallet {
+  sharedCurrencyWallet = createNormalizedWallet(getInitialWallet());
+  emitSharedWallet();
+  return cloneWalletByOrder(sharedCurrencyWallet);
+}

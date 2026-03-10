@@ -19941,25 +19941,25 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       { fromRealmName: 'Trúc Cơ', fromSubRealm: 6, toRealmName: 'Trúc Cơ', toSubRealm: 7, gain: 10 },
       { fromRealmName: 'Trúc Cơ', fromSubRealm: 7, toRealmName: 'Trúc Cơ', toSubRealm: 8, gain: 10 },
       { fromRealmName: 'Trúc Cơ', fromSubRealm: 8, toRealmName: 'Trúc Cơ', toSubRealm: 9, gain: 10 },
-      { fromRealmName: 'Trúc Cơ', fromSubRealm: 9, toRealmName: 'Ngưng Đan', toSubRealm: 1, gain: 70 },
-      { fromRealmName: 'Ngưng Đan', fromSubRealm: 1, toRealmName: 'Ngưng Đan', toSubRealm: 2, gain: 40 },
-      { fromRealmName: 'Ngưng Đan', fromSubRealm: 2, toRealmName: 'Ngưng Đan', toSubRealm: 3, gain: 40 },
-      { fromRealmName: 'Ngưng Đan', fromSubRealm: 3, toRealmName: 'Ngưng Đan', toSubRealm: 4, gain: 50 },
-      { fromRealmName: 'Ngưng Đan', fromSubRealm: 4, toRealmName: 'Ngưng Đan', toSubRealm: 5, gain: 50 },
-      { fromRealmName: 'Ngưng Đan', fromSubRealm: 5, toRealmName: 'Ngưng Đan', toSubRealm: 6, gain: 50 },
-      { fromRealmName: 'Ngưng Đan', fromSubRealm: 6, toRealmName: 'Ngưng Đan', toSubRealm: 7, gain: 60 },
-      { fromRealmName: 'Ngưng Đan', fromSubRealm: 7, toRealmName: 'Ngưng Đan', toSubRealm: 8, gain: 60 },
-      { fromRealmName: 'Ngưng Đan', fromSubRealm: 8, toRealmName: 'Ngưng Đan', toSubRealm: 9, gain: 60 },
-      { fromRealmName: 'Ngưng Đan', fromSubRealm: 9, toRealmName: 'Kết Đan', toSubRealm: 1, gain: 150 },
-      { fromRealmName: 'Kết Đan', fromSubRealm: 1, toRealmName: 'Kết Đan', toSubRealm: 2, gain: 160 },
-      { fromRealmName: 'Kết Đan', fromSubRealm: 2, toRealmName: 'Kết Đan', toSubRealm: 3, gain: 160 },
-      { fromRealmName: 'Kết Đan', fromSubRealm: 3, toRealmName: 'Kết Đan', toSubRealm: 4, gain: 170 },
-      { fromRealmName: 'Kết Đan', fromSubRealm: 4, toRealmName: 'Kết Đan', toSubRealm: 5, gain: 170 },
-      { fromRealmName: 'Kết Đan', fromSubRealm: 5, toRealmName: 'Kết Đan', toSubRealm: 6, gain: 170 },
-      { fromRealmName: 'Kết Đan', fromSubRealm: 6, toRealmName: 'Kết Đan', toSubRealm: 7, gain: 180 },
-      { fromRealmName: 'Kết Đan', fromSubRealm: 7, toRealmName: 'Kết Đan', toSubRealm: 8, gain: 180 },
-      { fromRealmName: 'Kết Đan', fromSubRealm: 8, toRealmName: 'Kết Đan', toSubRealm: 9, gain: 180 },
-      { fromRealmName: 'Kết Đan', fromSubRealm: 9, toRealmName: 'Đúc Phách', toSubRealm: 1, gain: 300 },
+      { fromRealmName: 'Trúc Cơ', fromSubRealm: 9, toRealmName: 'Kết Đan', toSubRealm: 1, gain: 70 },
+      { fromRealmName: 'Kết Đan', fromSubRealm: 1, toRealmName: 'Kết Đan', toSubRealm: 2, gain: 40 },
+      { fromRealmName: 'Kết Đan', fromSubRealm: 2, toRealmName: 'Kết Đan', toSubRealm: 3, gain: 40 },
+      { fromRealmName: 'Kết Đan', fromSubRealm: 3, toRealmName: 'Kết Đan', toSubRealm: 4, gain: 50 },
+      { fromRealmName: 'Kết Đan', fromSubRealm: 4, toRealmName: 'Kết Đan', toSubRealm: 5, gain: 50 },
+      { fromRealmName: 'Kết Đan', fromSubRealm: 5, toRealmName: 'Kết Đan', toSubRealm: 6, gain: 50 },
+      { fromRealmName: 'Kết Đan', fromSubRealm: 6, toRealmName: 'Kết Đan', toSubRealm: 7, gain: 60 },
+      { fromRealmName: 'Kết Đan', fromSubRealm: 7, toRealmName: 'Kết Đan', toSubRealm: 8, gain: 60 },
+      { fromRealmName: 'Kết Đan', fromSubRealm: 8, toRealmName: 'Kết Đan', toSubRealm: 9, gain: 60 },
+      { fromRealmName: 'Kết Đan', fromSubRealm: 9, toRealmName: 'Ngưng Đan', toSubRealm: 1, gain: 150 },
+      { fromRealmName: 'Ngưng Đan', fromSubRealm: 1, toRealmName: 'Ngưng Đan', toSubRealm: 2, gain: 160 },
+      { fromRealmName: 'Ngưng Đan', fromSubRealm: 2, toRealmName: 'Ngưng Đan', toSubRealm: 3, gain: 160 },
+      { fromRealmName: 'Ngưng Đan', fromSubRealm: 3, toRealmName: 'Ngưng Đan', toSubRealm: 4, gain: 170 },
+      { fromRealmName: 'Ngưng Đan', fromSubRealm: 4, toRealmName: 'Ngưng Đan', toSubRealm: 5, gain: 170 },
+      { fromRealmName: 'Ngưng Đan', fromSubRealm: 5, toRealmName: 'Ngưng Đan', toSubRealm: 6, gain: 170 },
+      { fromRealmName: 'Ngưng Đan', fromSubRealm: 6, toRealmName: 'Ngưng Đan', toSubRealm: 7, gain: 180 },
+      { fromRealmName: 'Ngưng Đan', fromSubRealm: 7, toRealmName: 'Ngưng Đan', toSubRealm: 8, gain: 180 },
+      { fromRealmName: 'Ngưng Đan', fromSubRealm: 8, toRealmName: 'Ngưng Đan', toSubRealm: 9, gain: 180 },
+      { fromRealmName: 'Ngưng Đan', fromSubRealm: 9, toRealmName: 'Đúc Phách', toSubRealm: 1, gain: 300 },
       { fromRealmName: 'Đúc Phách', fromSubRealm: 1, toRealmName: 'Đúc Phách', toSubRealm: 2, gain: 350 },
       { fromRealmName: 'Đúc Phách', fromSubRealm: 2, toRealmName: 'Đúc Phách', toSubRealm: 3, gain: 400 },
       { fromRealmName: 'Đúc Phách', fromSubRealm: 3, toRealmName: 'Đúc Phách', toSubRealm: 4, gain: 400 },
@@ -24494,6 +24494,145 @@ __define('./screens/main-menu/view/index.ts', (exports, module, __require) => {
   const ensureStyles = __dep2.ensureStyles;
   const createHeader = __dep2.createHeader;
   const createModesSection = __dep2.createModesSection;
+  const __dep3 = __require('./utils/player-profile.ts');
+  const resetPlayerProfileData = __dep3.resetPlayerProfileData;
+  const __dep4 = __require('./utils/currency.ts');
+  const resetSharedCurrencyWallet = __dep4.resetSharedCurrencyWallet;
+  function createSettingsHub(container, addCleanup) {
+      const toolbar = document.createElement('div');
+      toolbar.className = 'main-menu-v2__toolbar';
+      const trigger = document.createElement('button');
+      trigger.type = 'button';
+      trigger.className = 'main-menu-settings-btn';
+      trigger.textContent = '⚙';
+      trigger.setAttribute('aria-label', 'Mở cài đặt');
+      toolbar.appendChild(trigger);
+      container.appendChild(toolbar);
+      const overlay = document.createElement('div');
+      overlay.className = 'main-menu-settings-overlay';
+      const hub = document.createElement('section');
+      hub.className = 'main-menu-settings-hub';
+      overlay.appendChild(hub);
+      const closeBtn = document.createElement('button');
+      closeBtn.type = 'button';
+      closeBtn.className = 'main-menu-settings-close';
+      closeBtn.textContent = '✕';
+      closeBtn.setAttribute('aria-label', 'Đóng cài đặt');
+      hub.appendChild(closeBtn);
+      const nav = document.createElement('nav');
+      nav.className = 'main-menu-settings-nav';
+      const tabs = ['chung', 'đồ hoạ', 'âm thanh', 'tài khoản'];
+      const navButtons = new Map();
+      tabs.forEach((tabId) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'main-menu-settings-nav-btn';
+          btn.dataset.tab = tabId;
+          btn.textContent = tabId.charAt(0).toUpperCase() + tabId.slice(1);
+          navButtons.set(tabId, btn);
+          nav.appendChild(btn);
+      });
+      hub.appendChild(nav);
+      const content = document.createElement('div');
+      content.className = 'main-menu-settings-content';
+      hub.appendChild(content);
+      const title = document.createElement('h3');
+      title.className = 'main-menu-settings-title';
+      const description = document.createElement('p');
+      description.className = 'main-menu-settings-desc';
+      content.appendChild(title);
+      content.appendChild(description);
+      const accountActions = document.createElement('div');
+      accountActions.style.display = 'none';
+      const resetBtn = document.createElement('button');
+      resetBtn.type = 'button';
+      resetBtn.className = 'main-menu-settings-danger-btn';
+      resetBtn.textContent = 'Xoá dữ liệu';
+      const confirmWrap = document.createElement('div');
+      confirmWrap.className = 'main-menu-settings-confirm';
+      const confirmText = document.createElement('p');
+      confirmText.textContent = 'Bạn muốn xoá toàn bộ dữ liệu tài khoản?';
+      const confirmActions = document.createElement('div');
+      confirmActions.className = 'main-menu-settings-confirm-actions';
+      const confirmYes = document.createElement('button');
+      confirmYes.type = 'button';
+      confirmYes.className = 'main-menu-settings-confirm-btn main-menu-settings-confirm-btn--danger';
+      confirmYes.textContent = 'Xác nhận';
+      const confirmNo = document.createElement('button');
+      confirmNo.type = 'button';
+      confirmNo.className = 'main-menu-settings-confirm-btn';
+      confirmNo.textContent = 'Từ chối';
+      confirmActions.appendChild(confirmYes);
+      confirmActions.appendChild(confirmNo);
+      confirmWrap.appendChild(confirmText);
+      confirmWrap.appendChild(confirmActions);
+      accountActions.appendChild(resetBtn);
+      accountActions.appendChild(confirmWrap);
+      content.appendChild(accountActions);
+      container.appendChild(overlay);
+      let activeTab = 'chung';
+      const renderTab = () => {
+          navButtons.forEach((btn, tabId) => btn.classList.toggle('is-active', tabId === activeTab));
+          accountActions.style.display = activeTab === 'tài khoản' ? '' : 'none';
+          confirmWrap.classList.remove('is-open');
+          if (activeTab === 'chung') {
+              title.textContent = 'Cài đặt chung';
+              description.textContent = 'Các cấu hình chung sẽ được bổ sung sau.';
+              return;
+          }
+          if (activeTab === 'đồ hoạ') {
+              title.textContent = 'Cài đặt đồ hoạ';
+              description.textContent = 'Các cấu hình đồ hoạ sẽ được bổ sung sau.';
+              return;
+          }
+          if (activeTab === 'âm thanh') {
+              title.textContent = 'Cài đặt âm thanh';
+              description.textContent = 'Các cấu hình âm thanh sẽ được bổ sung sau.';
+              return;
+          }
+          title.textContent = 'Cài đặt tài khoản';
+          description.textContent = 'Khu vực test dữ liệu tài khoản.';
+      };
+      const openHub = () => {
+          overlay.classList.add('is-open');
+          renderTab();
+      };
+      const closeHub = () => {
+          overlay.classList.remove('is-open');
+          confirmWrap.classList.remove('is-open');
+      };
+      const onTabClick = (event) => {
+          const target = event.target;
+          const tabBtn = target?.closest('.main-menu-settings-nav-btn');
+          if (!tabBtn)
+              return;
+          const tabId = String(tabBtn.dataset.tab ?? '');
+          if (!navButtons.has(tabId))
+              return;
+          activeTab = tabId;
+          renderTab();
+      };
+      const onResetClick = () => confirmWrap.classList.add('is-open');
+      const onResetCancel = () => confirmWrap.classList.remove('is-open');
+      const onResetConfirm = () => {
+          resetPlayerProfileData();
+          resetSharedCurrencyWallet();
+          confirmWrap.classList.remove('is-open');
+          description.textContent = 'Đã xoá dữ liệu tài khoản thành công. Bạn có thể tiếp tục test.';
+      };
+      trigger.addEventListener('click', openHub);
+      closeBtn.addEventListener('click', closeHub);
+      nav.addEventListener('click', onTabClick);
+      resetBtn.addEventListener('click', onResetClick);
+      confirmNo.addEventListener('click', onResetCancel);
+      confirmYes.addEventListener('click', onResetConfirm);
+      addCleanup(() => trigger.removeEventListener('click', openHub));
+      addCleanup(() => closeBtn.removeEventListener('click', closeHub));
+      addCleanup(() => nav.removeEventListener('click', onTabClick));
+      addCleanup(() => resetBtn.removeEventListener('click', onResetClick));
+      addCleanup(() => confirmNo.removeEventListener('click', onResetCancel));
+      addCleanup(() => confirmYes.removeEventListener('click', onResetConfirm));
+  }
   function renderMainMenuView(state) {
       const { root, shell = null, sections = [], metadata = [], onShowComingSoon } = state;
       if (!root)
@@ -24515,6 +24654,7 @@ __define('./screens/main-menu/view/index.ts', (exports, module, __require) => {
       });
       const header = createHeader();
       container.appendChild(header);
+      createSettingsHub(container, addCleanup);
       const layout = document.createElement('div');
       layout.className = 'main-menu-v2__layout';
       container.appendChild(layout);
@@ -24613,6 +24753,27 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
       .mode-card__child-desc{font-size:12px;color:#9cbcd9;line-height:1.4;}
       .mode-card__child--coming{opacity:.9;}
       .mode-card__child--coming .mode-card__child-status{color:#ffe066;}
+
+      .main-menu-v2__toolbar{display:flex;justify-content:flex-end;}
+      .main-menu-settings-btn{width:44px;height:44px;border-radius:12px;border:1px solid rgba(125,211,252,.35);background:rgba(16,26,36,.9);color:#d8eeff;font-size:20px;cursor:pointer;}
+      .main-menu-settings-btn:hover{border-color:rgba(125,211,252,.6);}
+      .main-menu-settings-overlay{position:fixed;inset:0;background:rgba(4,10,16,.46);display:none;align-items:center;justify-content:center;z-index:120;padding:16px;}
+      .main-menu-settings-overlay.is-open{display:flex;}
+      .main-menu-settings-hub{width:min(820px,95vw);height:min(520px,88vh);border:1px solid rgba(125,211,252,.32);border-radius:18px;background:rgba(7,16,26,.92);display:flex;overflow:hidden;position:relative;}
+      .main-menu-settings-close{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:10px;border:1px solid rgba(125,211,252,.3);background:rgba(16,26,36,.9);color:#e6f2ff;cursor:pointer;}
+      .main-menu-settings-nav{width:190px;display:flex;flex-direction:column;padding:54px 10px 12px 12px;gap:8px;border-right:1px solid rgba(125,211,252,.2);}
+      .main-menu-settings-nav-btn{border:1px solid rgba(125,211,252,.2);background:rgba(11,22,34,.85);color:#cde7ff;border-radius:10px;padding:10px;text-align:left;cursor:pointer;}
+      .main-menu-settings-nav-btn.is-active{border-color:rgba(125,211,252,.55);background:rgba(18,34,50,.95);}
+      .main-menu-settings-content{flex:1;padding:54px 20px 20px;display:flex;flex-direction:column;gap:12px;}
+      .main-menu-settings-title{margin:0;font-size:22px;letter-spacing:.08em;text-transform:uppercase;}
+      .main-menu-settings-desc{margin:0;color:#9cbcd9;}
+      .main-menu-settings-danger-btn{align-self:flex-start;border:1px solid rgba(255,128,128,.45);background:rgba(52,14,18,.82);color:#ffd4d4;border-radius:10px;padding:10px 14px;cursor:pointer;}
+      .main-menu-settings-confirm{margin-top:8px;border:1px solid rgba(255,128,128,.45);background:rgba(52,14,18,.55);border-radius:12px;padding:12px;display:none;flex-direction:column;gap:10px;}
+      .main-menu-settings-confirm.is-open{display:flex;}
+      .main-menu-settings-confirm-actions{display:flex;gap:10px;}
+      .main-menu-settings-confirm-btn{border:1px solid rgba(125,211,252,.35);background:rgba(16,26,36,.9);color:#d8eeff;border-radius:10px;padding:8px 12px;cursor:pointer;}
+      .main-menu-settings-confirm-btn--danger{border-color:rgba(255,128,128,.45);background:rgba(80,18,24,.9);color:#ffe3e3;}
+
       @media(max-width:960px){.main-menu-v2__layout{grid-template-columns:1fr;}}
       @media(max-width:640px){.main-menu-v2{gap:24px;}.main-menu-v2__title{font-size:36px;}.mode-card{padding:20px;}}
     `;
@@ -28895,6 +29056,11 @@ __define('./utils/currency.ts', (exports, module, __require) => {
           sharedWalletListeners.delete(listener);
       };
   }
+  function resetSharedCurrencyWallet() {
+      sharedCurrencyWallet = createNormalizedWallet(getInitialWallet());
+      emitSharedWallet();
+      return cloneWalletByOrder(sharedCurrencyWallet);
+  }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'spendAetherWithPriority')) exports.spendAetherWithPriority = spendAetherWithPriority;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getCurrencyDefinitions')) exports.getCurrencyDefinitions = getCurrencyDefinitions;
@@ -28906,6 +29072,7 @@ __define('./utils/currency.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'getSharedCurrencyWallet')) exports.getSharedCurrencyWallet = getSharedCurrencyWallet;
   if (!Object.prototype.hasOwnProperty.call(exports, 'syncSharedCurrencyWallet')) exports.syncSharedCurrencyWallet = syncSharedCurrencyWallet;
   if (!Object.prototype.hasOwnProperty.call(exports, 'subscribeSharedCurrencyWallet')) exports.subscribeSharedCurrencyWallet = subscribeSharedCurrencyWallet;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resetSharedCurrencyWallet')) exports.resetSharedCurrencyWallet = resetSharedCurrencyWallet;
 });
 __define('./utils/domain-normalization.ts', (exports, module, __require) => {
   const ELEMENT_KEYS = [
@@ -30106,10 +30273,30 @@ __define('./utils/player-profile.ts', (exports, module, __require) => {
       savePlayerProfile(merged);
       return merged;
   }
+  function resetPlayerProfileData() {
+      const current = loadPlayerProfile();
+      const normalizedCultivationByUnit = {};
+      for (const unitId of Object.keys(current.cultivationByUnit ?? {})) {
+          if (!unitId || !unitId.trim())
+              continue;
+          normalizedCultivationByUnit[unitId] = { realm: 1, subRealm: 0 };
+      }
+      const resetProfile = {
+          lineupDeck: [],
+          cultivationByUnit: normalizedCultivationByUnit,
+          sectName: '',
+          tpByUnit: {},
+          tpAllocByUnit: {},
+          tacticalAiByUnit: {},
+      };
+      savePlayerProfile(resetProfile);
+      return resetProfile;
+  }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'loadPlayerProfile')) exports.loadPlayerProfile = loadPlayerProfile;
   if (!Object.prototype.hasOwnProperty.call(exports, 'savePlayerProfile')) exports.savePlayerProfile = savePlayerProfile;
   if (!Object.prototype.hasOwnProperty.call(exports, 'patchPlayerProfile')) exports.patchPlayerProfile = patchPlayerProfile;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resetPlayerProfileData')) exports.resetPlayerProfileData = resetPlayerProfileData;
 });
 __define('./utils/rarity.ts', (exports, module, __require) => {
   const RARITY_SEQUENCE = ['N', 'R', 'SR', 'SSR', 'UR', 'PRIME'];

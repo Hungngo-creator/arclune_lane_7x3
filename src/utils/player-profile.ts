@@ -61,3 +61,24 @@ export function patchPlayerProfile(patch: SavedPlayerProfile): SavedPlayerProfil
   savePlayerProfile(merged);
   return merged;
 }
+
+export function resetPlayerProfileData(): SavedPlayerProfile {
+  const current = loadPlayerProfile();
+  const normalizedCultivationByUnit: Record<string, { realm: number; subRealm: number }> = {};
+  for (const unitId of Object.keys(current.cultivationByUnit ?? {})){
+    if (!unitId || !unitId.trim()) continue;
+    normalizedCultivationByUnit[unitId] = { realm: 1, subRealm: 0 };
+  }
+
+  const resetProfile: SavedPlayerProfile = {
+    lineupDeck: [],
+    cultivationByUnit: normalizedCultivationByUnit,
+    sectName: '',
+    tpByUnit: {},
+    tpAllocByUnit: {},
+    tacticalAiByUnit: {},
+  };
+
+  savePlayerProfile(resetProfile);
+  return resetProfile;
+}

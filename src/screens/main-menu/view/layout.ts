@@ -72,6 +72,27 @@ export function ensureStyles(): void {
     .mode-card__child-desc{font-size:12px;color:#9cbcd9;line-height:1.4;}
     .mode-card__child--coming{opacity:.9;}
     .mode-card__child--coming .mode-card__child-status{color:#ffe066;}
+
+    .main-menu-v2__toolbar{display:flex;justify-content:flex-end;}
+    .main-menu-settings-btn{width:44px;height:44px;border-radius:12px;border:1px solid rgba(125,211,252,.35);background:rgba(16,26,36,.9);color:#d8eeff;font-size:20px;cursor:pointer;}
+    .main-menu-settings-btn:hover{border-color:rgba(125,211,252,.6);}
+    .main-menu-settings-overlay{position:fixed;inset:0;background:rgba(4,10,16,.46);display:none;align-items:center;justify-content:center;z-index:120;padding:16px;}
+    .main-menu-settings-overlay.is-open{display:flex;}
+    .main-menu-settings-hub{width:min(820px,95vw);height:min(520px,88vh);border:1px solid rgba(125,211,252,.32);border-radius:18px;background:rgba(7,16,26,.92);display:flex;overflow:hidden;position:relative;}
+    .main-menu-settings-close{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:10px;border:1px solid rgba(125,211,252,.3);background:rgba(16,26,36,.9);color:#e6f2ff;cursor:pointer;}
+    .main-menu-settings-nav{width:190px;display:flex;flex-direction:column;padding:54px 10px 12px 12px;gap:8px;border-right:1px solid rgba(125,211,252,.2);}
+    .main-menu-settings-nav-btn{border:1px solid rgba(125,211,252,.2);background:rgba(11,22,34,.85);color:#cde7ff;border-radius:10px;padding:10px;text-align:left;cursor:pointer;}
+    .main-menu-settings-nav-btn.is-active{border-color:rgba(125,211,252,.55);background:rgba(18,34,50,.95);}
+    .main-menu-settings-content{flex:1;padding:54px 20px 20px;display:flex;flex-direction:column;gap:12px;}
+    .main-menu-settings-title{margin:0;font-size:22px;letter-spacing:.08em;text-transform:uppercase;}
+    .main-menu-settings-desc{margin:0;color:#9cbcd9;}
+    .main-menu-settings-danger-btn{align-self:flex-start;border:1px solid rgba(255,128,128,.45);background:rgba(52,14,18,.82);color:#ffd4d4;border-radius:10px;padding:10px 14px;cursor:pointer;}
+    .main-menu-settings-confirm{margin-top:8px;border:1px solid rgba(255,128,128,.45);background:rgba(52,14,18,.55);border-radius:12px;padding:12px;display:none;flex-direction:column;gap:10px;}
+    .main-menu-settings-confirm.is-open{display:flex;}
+    .main-menu-settings-confirm-actions{display:flex;gap:10px;}
+    .main-menu-settings-confirm-btn{border:1px solid rgba(125,211,252,.35);background:rgba(16,26,36,.9);color:#d8eeff;border-radius:10px;padding:8px 12px;cursor:pointer;}
+    .main-menu-settings-confirm-btn--danger{border-color:rgba(255,128,128,.45);background:rgba(80,18,24,.9);color:#ffe3e3;}
+
     @media(max-width:960px){.main-menu-v2__layout{grid-template-columns:1fr;}}
     @media(max-width:640px){.main-menu-v2{gap:24px;}.main-menu-v2__title{font-size:36px;}.mode-card{padding:20px;}}
   `;
