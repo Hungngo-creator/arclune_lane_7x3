@@ -2,6 +2,8 @@ export interface SavedPlayerProfile {
   lineupDeck?: string[];
   cultivationByUnit?: Record<string, { realm: number; subRealm: number }>;
   sectName?: string;
+  tpByUnit?: Record<string, number>;
+  tpAllocByUnit?: Record<string, Partial<Record<'HP' | 'ATK' | 'WIL' | 'ARM' | 'RES', number>>>;
   tacticalAiByUnit?: Record<string, unknown>;
 }
 
@@ -42,6 +44,14 @@ export function patchPlayerProfile(patch: SavedPlayerProfile): SavedPlayerProfil
     cultivationByUnit: {
       ...(current.cultivationByUnit ?? {}),
       ...(patch.cultivationByUnit ?? {}),
+    },
+    tpByUnit: {
+      ...(current.tpByUnit ?? {}),
+      ...(patch.tpByUnit ?? {}),
+    },
+    tpAllocByUnit: {
+      ...(current.tpAllocByUnit ?? {}),
+      ...(patch.tpAllocByUnit ?? {}),
     },
     tacticalAiByUnit: {
       ...(current.tacticalAiByUnit ?? {}),

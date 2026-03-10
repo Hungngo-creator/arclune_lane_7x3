@@ -19914,12 +19914,103 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
   const currencyCatalog = getCurrencyCatalog();
   const currencyFormatter = ensureNumberFormatter(createNumberFormatter, 'vi-VN');
   const CORE_STAT_KEYS = ['HP', 'WIL', 'ATK', 'RES', 'ARM'];
+  const TP_ALLOCATABLE_KEYS = ['HP', 'ATK', 'WIL', 'ARM', 'RES'];
+  const TP_STAT_GAIN_PER_POINT = Object.freeze({
+      HP: 20,
+      ATK: 1,
+      WIL: 1,
+      ARM: 0.001,
+      RES: 0.001,
+  });
+  const TP_GAIN_RULES = Object.freeze([
+      { fromRealmName: 'Khai Nguyên', fromSubRealm: 0, toRealmName: 'Khai Nguyên', toSubRealm: 1, gain: 5 },
+      { fromRealmName: 'Khai Nguyên', fromSubRealm: 1, toRealmName: 'Khai Nguyên', toSubRealm: 2, gain: 5 },
+      { fromRealmName: 'Khai Nguyên', fromSubRealm: 2, toRealmName: 'Khai Nguyên', toSubRealm: 3, gain: 5 },
+      { fromRealmName: 'Khai Nguyên', fromSubRealm: 3, toRealmName: 'Khai Nguyên', toSubRealm: 4, gain: 5 },
+      { fromRealmName: 'Khai Nguyên', fromSubRealm: 4, toRealmName: 'Khai Nguyên', toSubRealm: 5, gain: 5 },
+      { fromRealmName: 'Khai Nguyên', fromSubRealm: 5, toRealmName: 'Khai Nguyên', toSubRealm: 6, gain: 5 },
+      { fromRealmName: 'Khai Nguyên', fromSubRealm: 6, toRealmName: 'Khai Nguyên', toSubRealm: 7, gain: 5 },
+      { fromRealmName: 'Khai Nguyên', fromSubRealm: 7, toRealmName: 'Khai Nguyên', toSubRealm: 8, gain: 5 },
+      { fromRealmName: 'Khai Nguyên', fromSubRealm: 8, toRealmName: 'Khai Nguyên', toSubRealm: 9, gain: 5 },
+      { fromRealmName: 'Khai Nguyên', fromSubRealm: 9, toRealmName: 'Trúc Cơ', toSubRealm: 1, gain: 30 },
+      { fromRealmName: 'Trúc Cơ', fromSubRealm: 1, toRealmName: 'Trúc Cơ', toSubRealm: 2, gain: 10 },
+      { fromRealmName: 'Trúc Cơ', fromSubRealm: 2, toRealmName: 'Trúc Cơ', toSubRealm: 3, gain: 10 },
+      { fromRealmName: 'Trúc Cơ', fromSubRealm: 3, toRealmName: 'Trúc Cơ', toSubRealm: 4, gain: 10 },
+      { fromRealmName: 'Trúc Cơ', fromSubRealm: 4, toRealmName: 'Trúc Cơ', toSubRealm: 5, gain: 10 },
+      { fromRealmName: 'Trúc Cơ', fromSubRealm: 5, toRealmName: 'Trúc Cơ', toSubRealm: 6, gain: 10 },
+      { fromRealmName: 'Trúc Cơ', fromSubRealm: 6, toRealmName: 'Trúc Cơ', toSubRealm: 7, gain: 10 },
+      { fromRealmName: 'Trúc Cơ', fromSubRealm: 7, toRealmName: 'Trúc Cơ', toSubRealm: 8, gain: 10 },
+      { fromRealmName: 'Trúc Cơ', fromSubRealm: 8, toRealmName: 'Trúc Cơ', toSubRealm: 9, gain: 10 },
+      { fromRealmName: 'Trúc Cơ', fromSubRealm: 9, toRealmName: 'Ngưng Đan', toSubRealm: 1, gain: 70 },
+      { fromRealmName: 'Ngưng Đan', fromSubRealm: 1, toRealmName: 'Ngưng Đan', toSubRealm: 2, gain: 40 },
+      { fromRealmName: 'Ngưng Đan', fromSubRealm: 2, toRealmName: 'Ngưng Đan', toSubRealm: 3, gain: 40 },
+      { fromRealmName: 'Ngưng Đan', fromSubRealm: 3, toRealmName: 'Ngưng Đan', toSubRealm: 4, gain: 50 },
+      { fromRealmName: 'Ngưng Đan', fromSubRealm: 4, toRealmName: 'Ngưng Đan', toSubRealm: 5, gain: 50 },
+      { fromRealmName: 'Ngưng Đan', fromSubRealm: 5, toRealmName: 'Ngưng Đan', toSubRealm: 6, gain: 50 },
+      { fromRealmName: 'Ngưng Đan', fromSubRealm: 6, toRealmName: 'Ngưng Đan', toSubRealm: 7, gain: 60 },
+      { fromRealmName: 'Ngưng Đan', fromSubRealm: 7, toRealmName: 'Ngưng Đan', toSubRealm: 8, gain: 60 },
+      { fromRealmName: 'Ngưng Đan', fromSubRealm: 8, toRealmName: 'Ngưng Đan', toSubRealm: 9, gain: 60 },
+      { fromRealmName: 'Ngưng Đan', fromSubRealm: 9, toRealmName: 'Kết Đan', toSubRealm: 1, gain: 150 },
+      { fromRealmName: 'Kết Đan', fromSubRealm: 1, toRealmName: 'Kết Đan', toSubRealm: 2, gain: 160 },
+      { fromRealmName: 'Kết Đan', fromSubRealm: 2, toRealmName: 'Kết Đan', toSubRealm: 3, gain: 160 },
+      { fromRealmName: 'Kết Đan', fromSubRealm: 3, toRealmName: 'Kết Đan', toSubRealm: 4, gain: 170 },
+      { fromRealmName: 'Kết Đan', fromSubRealm: 4, toRealmName: 'Kết Đan', toSubRealm: 5, gain: 170 },
+      { fromRealmName: 'Kết Đan', fromSubRealm: 5, toRealmName: 'Kết Đan', toSubRealm: 6, gain: 170 },
+      { fromRealmName: 'Kết Đan', fromSubRealm: 6, toRealmName: 'Kết Đan', toSubRealm: 7, gain: 180 },
+      { fromRealmName: 'Kết Đan', fromSubRealm: 7, toRealmName: 'Kết Đan', toSubRealm: 8, gain: 180 },
+      { fromRealmName: 'Kết Đan', fromSubRealm: 8, toRealmName: 'Kết Đan', toSubRealm: 9, gain: 180 },
+      { fromRealmName: 'Kết Đan', fromSubRealm: 9, toRealmName: 'Đúc Phách', toSubRealm: 1, gain: 300 },
+      { fromRealmName: 'Đúc Phách', fromSubRealm: 1, toRealmName: 'Đúc Phách', toSubRealm: 2, gain: 350 },
+      { fromRealmName: 'Đúc Phách', fromSubRealm: 2, toRealmName: 'Đúc Phách', toSubRealm: 3, gain: 400 },
+      { fromRealmName: 'Đúc Phách', fromSubRealm: 3, toRealmName: 'Đúc Phách', toSubRealm: 4, gain: 400 },
+      { fromRealmName: 'Đúc Phách', fromSubRealm: 4, toRealmName: 'Đúc Phách', toSubRealm: 5, gain: 450 },
+      { fromRealmName: 'Đúc Phách', fromSubRealm: 5, toRealmName: 'Đúc Phách', toSubRealm: 6, gain: 450 },
+      { fromRealmName: 'Đúc Phách', fromSubRealm: 6, toRealmName: 'Đúc Phách', toSubRealm: 7, gain: 500 },
+      { fromRealmName: 'Đúc Phách', fromSubRealm: 7, toRealmName: 'Luyện Hồn', toSubRealm: 1, gain: 825 },
+      { fromRealmName: 'Luyện Hồn', fromSubRealm: 1, toRealmName: 'Luyện Hồn', toSubRealm: 2, gain: 925 },
+      { fromRealmName: 'Luyện Hồn', fromSubRealm: 2, toRealmName: 'Luyện Hồn', toSubRealm: 3, gain: 1025 },
+  ]);
+  function toRealmLabelName(value) {
+      return typeof value === 'string' ? value.trim().toLowerCase() : '';
+  }
+  function resolveTpGainForUpgrade(params) {
+      const fromRealmName = toRealmLabelName(getCultivationRealmEconomy(params.fromRealm)?.name ?? '');
+      const toRealmName = toRealmLabelName(getCultivationRealmEconomy(params.toRealm)?.name ?? '');
+      const found = TP_GAIN_RULES.find((rule) => (toRealmLabelName(rule.fromRealmName) === fromRealmName
+          && rule.fromSubRealm === params.fromSubRealm
+          && toRealmLabelName(rule.toRealmName) === toRealmName
+          && rule.toSubRealm === params.toSubRealm));
+      return found?.gain ?? 0;
+  }
+  function normalizeTpAllocMap(value) {
+      if (!value || typeof value !== 'object' || Array.isArray(value))
+          return {};
+      const input = value;
+      const result = {};
+      for (const key of TP_ALLOCATABLE_KEYS) {
+          const raw = input[key];
+          const no = typeof raw === 'number' ? raw : Number(raw);
+          if (!Number.isFinite(no) || no <= 0)
+              continue;
+          result[key] = Math.floor(no);
+      }
+      return result;
+  }
+  function resolveTpBonusForStat(statKey, allocation) {
+      const key = statKey;
+      if (!TP_ALLOCATABLE_KEYS.includes(key))
+          return 0;
+      const points = Number(allocation[key] ?? 0);
+      if (!Number.isFinite(points) || points <= 0)
+          return 0;
+      return points * TP_STAT_GAIN_PER_POINT[key];
+  }
   function toFiniteStatValue(value) {
       if (typeof value !== 'number')
           return null;
       return Number.isFinite(value) ? value : null;
   }
-  function resolveUnitStats(unitId) {
+  function resolveUnitStats(unitId, tpAllocation = {}) {
       if (!unitId)
           return [];
       const preview = ROSTER_PREVIEWS[unitId];
@@ -19929,7 +20020,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       const hp = toFiniteStatValue(finalStats.HPmax ?? finalStats.HP ?? null);
       const rows = [];
       if (hp != null) {
-          rows.push({ key: 'HP', value: hp });
+          rows.push({ key: 'HP', value: hp + resolveTpBonusForStat('HP', tpAllocation) });
       }
       for (const [key, rawValue] of Object.entries(finalStats)) {
           if (key === 'HP' || key === 'HPmax')
@@ -19937,7 +20028,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           const value = toFiniteStatValue(rawValue);
           if (value == null)
               continue;
-          rows.push({ key, value });
+          rows.push({ key, value: value + resolveTpBonusForStat(key, tpAllocation) });
       }
       return rows;
   }
@@ -20053,6 +20144,15 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       .collection-stage__mini-stats-list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;}
       .collection-stage__mini-stats-item{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9fc8ea;}
       .collection-stage__mini-stats-item b{font-size:12px;color:#e6f2ff;letter-spacing:.04em;text-transform:none;}
+      .collection-stage__mini-stats-stat{display:flex;align-items:center;gap:6px;}
+      .collection-stage__mini-stats-plus{width:16px;height:16px;border-radius:999px;border:1px solid rgba(110,231,183,.52);background:rgba(10,42,28,.78);color:#c6ffe6;font-size:12px;line-height:1;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;}
+      .collection-stage__mini-stats-plus:disabled{cursor:not-allowed;opacity:.45;}
+      .collection-stage__tp-modal{position:fixed;inset:0;background:rgba(0,0,0,.58);display:none;align-items:center;justify-content:center;z-index:80;padding:16px;}
+      .collection-stage__tp-modal.is-open{display:flex;}
+      .collection-stage__tp-panel{width:min(320px,92vw);border:1px solid rgba(125,211,252,.4);border-radius:14px;background:rgba(7,17,28,.95);padding:14px;display:flex;flex-direction:column;gap:10px;}
+      .collection-stage__tp-range{width:100%;}
+      .collection-stage__tp-actions{display:flex;justify-content:flex-end;gap:8px;}
+      .collection-stage__tp-btn{border:1px solid rgba(174,228,255,.35);background:rgba(16,26,36,.88);color:#d8eeff;border-radius:10px;padding:6px 10px;cursor:pointer;}
       .collection-stage__mini-stats-item.is-detail{display:none;}
       .collection-stage__mini-stats.is-detail-open .collection-stage__mini-stats-item.is-detail{display:flex;}
       .collection-stage__mini-stats-hint{margin:2px 0 0;font-size:10px;color:#7da0c7;line-height:1.4;}
@@ -20218,6 +20318,8 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       const savedCultivationByUnit = {
           ...(savedProfile.cultivationByUnit ?? {}),
       };
+      const savedTpByUnit = { ...(savedProfile.tpByUnit ?? {}) };
+      const savedTpAllocByUnit = Object.fromEntries(Object.entries(savedProfile.tpAllocByUnit ?? {}).map(([unitId, alloc]) => [unitId, normalizeTpAllocMap(alloc)]));
       let activeUnitId = null;
       const mutablePlayerState = {
           ...playerState,
@@ -20451,9 +20553,66 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       miniStats.appendChild(miniStatsHint);
       stage.appendChild(miniStats);
       let isMiniStatsDetailOpen = false;
+      let pendingTpStat = null;
+      const tpModal = document.createElement('div');
+      tpModal.className = 'collection-stage__tp-modal';
+      const tpPanel = document.createElement('section');
+      tpPanel.className = 'collection-stage__tp-panel';
+      const tpTitle = document.createElement('h4');
+      tpTitle.textContent = 'Cộng TP chỉ số';
+      const tpSummary = document.createElement('p');
+      tpSummary.textContent = 'Chọn lượng TP muốn dùng.';
+      const tpRange = document.createElement('input');
+      tpRange.type = 'range';
+      tpRange.className = 'collection-stage__tp-range';
+      tpRange.min = '0';
+      tpRange.max = '0';
+      tpRange.step = '1';
+      tpRange.value = '0';
+      const tpRangeLabel = document.createElement('p');
+      tpRangeLabel.textContent = '0 / 0 TP';
+      const tpActions = document.createElement('div');
+      tpActions.className = 'collection-stage__tp-actions';
+      const tpCancel = document.createElement('button');
+      tpCancel.type = 'button';
+      tpCancel.className = 'collection-stage__tp-btn';
+      tpCancel.textContent = 'Huỷ';
+      const tpOk = document.createElement('button');
+      tpOk.type = 'button';
+      tpOk.className = 'collection-stage__tp-btn';
+      tpOk.textContent = 'OK';
+      tpActions.appendChild(tpCancel);
+      tpActions.appendChild(tpOk);
+      tpPanel.appendChild(tpTitle);
+      tpPanel.appendChild(tpSummary);
+      tpPanel.appendChild(tpRange);
+      tpPanel.appendChild(tpRangeLabel);
+      tpPanel.appendChild(tpActions);
+      tpModal.appendChild(tpPanel);
+      stage.appendChild(tpModal);
+      const getUnitTp = (unitId) => {
+          if (!unitId)
+              return 0;
+          const raw = Number(savedTpByUnit[unitId] ?? 0);
+          return Number.isFinite(raw) ? Math.max(0, Math.floor(raw)) : 0;
+      };
+      const getUnitTpAlloc = (unitId) => {
+          if (!unitId)
+              return {};
+          return normalizeTpAllocMap(savedTpAllocByUnit[unitId] ?? {});
+      };
+      const setUnitTpAlloc = (unitId, nextAlloc) => {
+          savedTpAllocByUnit[unitId] = normalizeTpAllocMap(nextAlloc);
+          patchPlayerProfile({ tpAllocByUnit: savedTpAllocByUnit });
+      };
+      const closeTpModal = () => {
+          pendingTpStat = null;
+          tpModal.classList.remove('is-open');
+      };
       const renderMiniStats = (unitId) => {
           miniStatsList.replaceChildren();
-          const stats = resolveUnitStats(unitId);
+          const tpAlloc = getUnitTpAlloc(unitId);
+          const stats = resolveUnitStats(unitId, tpAlloc);
           if (!stats.length) {
               const empty = document.createElement('li');
               empty.className = 'collection-stage__mini-stats-item';
@@ -20461,17 +20620,30 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
               miniStatsList.appendChild(empty);
               return;
           }
+          const unitTp = getUnitTp(unitId);
           for (const stat of stats) {
               const item = document.createElement('li');
               item.className = 'collection-stage__mini-stats-item';
               if (!CORE_STAT_KEYS.includes(stat.key)) {
                   item.classList.add('is-detail');
               }
+              const statWrap = document.createElement('div');
+              statWrap.className = 'collection-stage__mini-stats-stat';
               const label = document.createElement('span');
               label.textContent = stat.key;
+              statWrap.appendChild(label);
+              if (TP_ALLOCATABLE_KEYS.includes(stat.key)) {
+                  const plus = document.createElement('button');
+                  plus.type = 'button';
+                  plus.className = 'collection-stage__mini-stats-plus';
+                  plus.textContent = '+';
+                  plus.disabled = !unitId || unitTp <= 0;
+                  plus.dataset.statKey = stat.key;
+                  statWrap.appendChild(plus);
+              }
               const value = document.createElement('b');
               value.textContent = currencyFormatter.format(stat.value);
-              item.appendChild(label);
+              item.appendChild(statWrap);
               item.appendChild(value);
               miniStatsList.appendChild(item);
           }
@@ -20485,8 +20657,67 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           isMiniStatsDetailOpen = !isMiniStatsDetailOpen;
           syncMiniStatsDetail();
       };
+      const updateTpRangeLabel = () => {
+          const used = Number(tpRange.value || 0);
+          const total = Number(tpRange.max || 0);
+          tpRangeLabel.textContent = `${used} / ${total} TP`;
+      };
+      const openTpModal = (statKey) => {
+          if (!activeUnitId)
+              return;
+          const totalTp = getUnitTp(activeUnitId);
+          if (totalTp <= 0)
+              return;
+          pendingTpStat = statKey;
+          tpTitle.textContent = `Cộng TP · ${statKey}`;
+          tpSummary.textContent = `1 TP = +${TP_STAT_GAIN_PER_POINT[statKey]} ${statKey}`;
+          tpRange.max = String(totalTp);
+          tpRange.value = String(totalTp);
+          updateTpRangeLabel();
+          tpModal.classList.add('is-open');
+      };
+      const handleMiniStatsClick = (event) => {
+          const target = event.target;
+          const plus = target?.closest('.collection-stage__mini-stats-plus');
+          if (!plus)
+              return;
+          const key = String(plus.dataset.statKey ?? '');
+          if (!TP_ALLOCATABLE_KEYS.includes(key))
+              return;
+          openTpModal(key);
+      };
+      const handleTpRangeInput = () => updateTpRangeLabel();
+      const handleTpConfirm = () => {
+          if (!activeUnitId || !pendingTpStat) {
+              closeTpModal();
+              return;
+          }
+          const spendTp = Math.max(0, Math.floor(Number(tpRange.value || 0)));
+          const currentTp = getUnitTp(activeUnitId);
+          if (spendTp <= 0 || spendTp > currentTp) {
+              closeTpModal();
+              return;
+          }
+          const currentAlloc = getUnitTpAlloc(activeUnitId);
+          const key = pendingTpStat;
+          const nextAlloc = { ...currentAlloc, [key]: Number(currentAlloc[key] ?? 0) + spendTp };
+          savedTpByUnit[activeUnitId] = currentTp - spendTp;
+          setUnitTpAlloc(activeUnitId, nextAlloc);
+          patchPlayerProfile({ tpByUnit: savedTpByUnit });
+          renderMiniStats(activeUnitId);
+          stageStatus.textContent = `Đã dùng ${spendTp} TP cho ${key}.`;
+          closeTpModal();
+      };
       miniStatsToggle.addEventListener('click', handleMiniStatsToggle);
       addCleanup(() => miniStatsToggle.removeEventListener('click', handleMiniStatsToggle));
+      miniStatsList.addEventListener('click', handleMiniStatsClick);
+      addCleanup(() => miniStatsList.removeEventListener('click', handleMiniStatsClick));
+      tpCancel.addEventListener('click', closeTpModal);
+      addCleanup(() => tpCancel.removeEventListener('click', closeTpModal));
+      tpRange.addEventListener('input', handleTpRangeInput);
+      addCleanup(() => tpRange.removeEventListener('input', handleTpRangeInput));
+      tpOk.addEventListener('click', handleTpConfirm);
+      addCleanup(() => tpOk.removeEventListener('click', handleTpConfirm));
       syncMiniStatsDetail();
       const overlay = document.createElement('div');
       overlay.className = 'collection-skill-overlay';
@@ -20944,11 +21175,26 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
               realm: Number(nextCultivation.realm ?? upgraded.newRealm),
               subRealm: Number(nextCultivation.subRealm ?? upgraded.newSubRealm),
           };
-          patchPlayerProfile({ cultivationByUnit: savedCultivationByUnit });
+          const gainedTp = resolveTpGainForUpgrade({
+              fromRealm: upgraded.previousRealm,
+              fromSubRealm: upgraded.previousSubRealm,
+              toRealm: upgraded.newRealm,
+              toSubRealm: upgraded.newSubRealm,
+          });
+          if (gainedTp > 0) {
+              savedTpByUnit[activeUnitId] = getUnitTp(activeUnitId) + gainedTp;
+          }
+          patchPlayerProfile({
+              cultivationByUnit: savedCultivationByUnit,
+              tpByUnit: savedTpByUnit,
+          });
           refreshWallet();
           refreshTuViPanel();
+          renderMiniStats(activeUnitId);
           const upgradedRealmName = getCultivationRealmEconomy(upgraded.newRealm)?.name ?? `Cảnh giới ${upgraded.newRealm}`;
-          stageStatus.textContent = `Đã nâng lên ${upgradedRealmName} · Tiểu cảnh giới ${upgraded.newSubRealm}.`;
+          stageStatus.textContent = gainedTp > 0
+              ? `Đã nâng lên ${upgradedRealmName} · Tiểu cảnh giới ${upgraded.newSubRealm} (+${gainedTp} TP).`
+              : `Đã nâng lên ${upgradedRealmName} · Tiểu cảnh giới ${upgraded.newSubRealm}.`;
       };
       tuViUpgrade.addEventListener('click', handleCultivationUpgrade);
       addCleanup(() => tuViUpgrade.removeEventListener('click', handleCultivationUpgrade));
@@ -29843,6 +30089,14 @@ __define('./utils/player-profile.ts', (exports, module, __require) => {
           cultivationByUnit: {
               ...(current.cultivationByUnit ?? {}),
               ...(patch.cultivationByUnit ?? {}),
+          },
+          tpByUnit: {
+              ...(current.tpByUnit ?? {}),
+              ...(patch.tpByUnit ?? {}),
+          },
+          tpAllocByUnit: {
+              ...(current.tpAllocByUnit ?? {}),
+              ...(patch.tpAllocByUnit ?? {}),
           },
           tacticalAiByUnit: {
               ...(current.tacticalAiByUnit ?? {}),
