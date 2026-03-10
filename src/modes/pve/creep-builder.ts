@@ -10,20 +10,17 @@ type ProgressProfile = {
   realm?: number;
   subRealm?: number;
   className?: string;
+  tp?: number;
 };
 
 type LineupSampling = {
   rankCounts: Map<string, number>;
   totalRanked: number;
   progressProfiles: ProgressProfile[];
+  costs: number[];
 };
 
 type UnitRankCache = Map<string, string | null>;
-
-type CreepUnitBase = {
-  name: string;
-  cost: number;
-};
 
 type RankAllocation = {
   rank: string;
@@ -40,18 +37,6 @@ const RANK_PRIORITY = ['N', 'R', 'SR', 'SSR', 'UR', 'PRIME'] as const;
 const RANK_PRIORITY_SCORE = new Map<string, number>(
   RANK_PRIORITY.map((rank, index) => [rank, index + 1]),
 );
-const CREEP_UNIT_BASE = new Map<string, CreepUnitBase>(
-  CREEP_SLOT_ORDER.map(({ id }) => {
-    const unitDef = lookupUnit(id);
-    return [
-      id,
-      {
-        name: unitDef?.name ?? id,
-        cost: Number.isFinite(unitDef?.cost) ? Number(unitDef?.cost) : 0,
-      },
-    ] as const;
-  }),
-);
 const EMPTY_PROGRESS_BY_ID = new Map<string, RuntimeUnitProgress>();
 
 function normalizeRank(value: unknown): string | null {
@@ -67,6 +52,7 @@ function sampleLineup(
   const rankCounts = new Map<string, number>();
   const rankByUnitId: UnitRankCache = new Map();
   const progressProfiles: ProgressProfile[] = [];
+  const costs: number[] = [];
   let totalRanked = 0;
 
   for (const entry of lineup) {
@@ -81,16 +67,22 @@ function sampleLineup(
     rankCounts.set(rank, (rankCounts.get(rank) ?? 0) + 1);
     totalRanked += 1;
 
+    const cost = Number.isFinite(entry.cost) ? Number(entry.cost) : Number(lookupUnit(entry.id)?.cost);
+    if (Number.isFinite(cost) && cost > 0) costs.push(Math.floor(cost));
+
     const progress = progressById.get(entry.id);
-    if (!progress) continue;
+    const progressRecord = progress as Record<string, unknown> | undefined;
+    const rawTp = progressRecord?.tp ?? (entry as Record<string, unknown>).tp;
+    const parsedTp = Number.isFinite(rawTp) ? Number(rawTp) : undefined;
     progressProfiles.push({
-      level: typeof progress.level === 'number' ? progress.level : undefined,
-      realm: typeof progress.realm === 'number' ? progress.realm : undefined,
-      subRealm: typeof progress.subRealm === 'number' ? progress.subRealm : undefined,
+      level: typeof progress?.level === 'number' ? progress.level : undefined,
+      realm: typeof progress?.realm === 'number' ? progress.realm : undefined,
+      subRealm: typeof progress?.subRealm === 'number' ? progress.subRealm : undefined,
       className: normalizeClassName(entry.class) ?? undefined,
+      tp: parsedTp,
     });
   }
-  return { rankCounts, totalRanked, progressProfiles };
+  return { rankCounts, totalRanked, progressProfiles, costs };
 }
 
 function compareRankDesc(left: string, right: string): number {
@@ -182,6 +174,18 @@ function allocateProgressForCreeps(profiles: ReadonlyArray<ProgressProfile>, cre
   return output;
 }
 
+function allocateCostsForCreeps(costs: ReadonlyArray<number>, creepCount: number): number[] {
+  if (!costs.length) return Array.from({ length: creepCount }, () => 1);
+  const sorted = [...costs]
+    .map(value => Math.max(1, Math.floor(value)))
+    .sort((a, b) => b - a);
+  const output: number[] = [];
+  for (let i = 0; i < creepCount; i += 1) {
+    output.push(sorted[Math.min(i, sorted.length - 1)] ?? 1);
+  }
+  return output;
+}
+
 function clampInteger(value: unknown, min: number): number | null {
   if (typeof value !== 'number' || !Number.isFinite(value)) return null;
   return Math.max(min, Math.floor(value));
@@ -191,9 +195,10 @@ function toCreepDeckEntry(params: {
   creepId: string;
   profile: ProgressProfile;
   rank: string | null;
+  cost: number;
 }): PveDeckEntry {
-  const { creepId, profile, rank } = params;
-  const unitBase = CREEP_UNIT_BASE.get(creepId) ?? { name: creepId, cost: 0 };
+  const { creepId, profile, rank, cost } = params;
+  const unitName = lookupUnit(creepId)?.name ?? creepId;
   const level = clampInteger(profile.level, 1);
   const realm = clampInteger(profile.realm, 0);
   const subRealm = clampInteger(profile.subRealm, 0);
@@ -201,8 +206,8 @@ function toCreepDeckEntry(params: {
 
   return {
     id: creepId,
-    name: unitBase.name,
-    cost: unitBase.cost,
+    name: unitName,
+    cost,
     dynamicRankSource: 'lineup',
     dynamicLevelSource: 'lineup',
     ...(rank ? { rank } : {}),
@@ -210,6 +215,7 @@ function toCreepDeckEntry(params: {
     ...(realm != null ? { realm } : {}),
     ...(subRealm != null ? { subRealm } : {}),
     ...(className ? { class: className } : {}),
+    ...(typeof profile.tp === 'number' ? { tp: profile.tp } : {}),
   } satisfies PveDeckEntry;
 }
 
@@ -227,11 +233,13 @@ export function buildAICreepDeckFromLineup(params: {
   const lineupSampling = sampleLineup(lineup, progressById);
   const allocatedRanks = allocateRanksForCreeps(lineupSampling, creepCount);
   const allocatedProgress = allocateProgressForCreeps(lineupSampling.progressProfiles, creepCount);
+  const allocatedCosts = allocateCostsForCreeps(lineupSampling.costs, creepCount);
 
   return CREEP_SLOT_ORDER.map((creep) => {
     const creepId = creep.id;
     const profile = allocatedProgress[creep.powerSlot] ?? {};
     const rank = allocatedRanks[creep.powerSlot] ?? null;
-    return toCreepDeckEntry({ creepId, profile, rank });
+    const cost = allocatedCosts[creep.powerSlot] ?? 1;
+    return toCreepDeckEntry({ creepId,
   });
 }

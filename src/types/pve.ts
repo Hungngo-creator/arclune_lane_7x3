@@ -164,6 +164,7 @@ export interface RuntimeUnitProgress {
   realm?: number;
   subRealm?: number;
   level?: number;
+  tp?: number;
   stars?: number;
   owned?: boolean;
   awakened?: boolean;

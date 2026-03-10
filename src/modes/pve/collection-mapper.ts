@@ -133,6 +133,7 @@ const normalizeProgress = (entry: CollectionItemCandidate): RuntimeUnitProgress 
   const realm = asFinite(entry.realm);
   const subRealm = asFinite(entry.subRealm ?? entry.sub_realm);
   const stars = asFinite(entry.stars ?? entry.star);
+  const tp = asFinite(entry.tp ?? entry.talentPoint ?? entry.talentPoints);
   const owned = asBoolean(entry.owned ?? entry.unlocked ?? entry.isOwned);
   const awakened = asBoolean(entry.awakened ?? entry.isAwakened);
   const inLineup = asBoolean(entry.inLineup ?? entry.isInLineup);
@@ -144,6 +145,7 @@ const normalizeProgress = (entry: CollectionItemCandidate): RuntimeUnitProgress 
   const normalizedRealm = normalizeInteger(realm, 0);
   const normalizedSubRealm = normalizeInteger(subRealm, 0);
   const normalizedStars = normalizeInteger(stars, 0);
+  const normalizedTp = normalizeInteger(tp, 0);
 
   const progress: RuntimeUnitProgress = {
     unitId,
@@ -151,6 +153,7 @@ const normalizeProgress = (entry: CollectionItemCandidate): RuntimeUnitProgress 
     ...(normalizedRealm != null ? { realm: normalizedRealm } : {}),
     ...(normalizedSubRealm != null ? { subRealm: normalizedSubRealm } : {}),
     ...(normalizedStars != null ? { stars: normalizedStars } : {}),
+    ...(normalizedTp != null ? { tp: normalizedTp } : {}),
     ...(owned != null ? { owned } : {}),
     ...(awakened != null ? { awakened } : {}),
     ...(inLineup != null ? { inLineup } : {}),

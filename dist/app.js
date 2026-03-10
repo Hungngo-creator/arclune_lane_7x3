@@ -12465,6 +12465,7 @@ __define('./modes/pve/collection-mapper.ts', (exports, module, __require) => {
       const realm = asFinite(entry.realm);
       const subRealm = asFinite(entry.subRealm ?? entry.sub_realm);
       const stars = asFinite(entry.stars ?? entry.star);
+      const tp = asFinite(entry.tp ?? entry.talentPoint ?? entry.talentPoints);
       const owned = asBoolean(entry.owned ?? entry.unlocked ?? entry.isOwned);
       const awakened = asBoolean(entry.awakened ?? entry.isAwakened);
       const inLineup = asBoolean(entry.inLineup ?? entry.isInLineup);
@@ -12474,12 +12475,14 @@ __define('./modes/pve/collection-mapper.ts', (exports, module, __require) => {
       const normalizedRealm = normalizeInteger(realm, 0);
       const normalizedSubRealm = normalizeInteger(subRealm, 0);
       const normalizedStars = normalizeInteger(stars, 0);
+      const normalizedTp = normalizeInteger(tp, 0);
       const progress = {
           unitId,
           ...(normalizedLevel != null ? { level: normalizedLevel } : {}),
           ...(normalizedRealm != null ? { realm: normalizedRealm } : {}),
           ...(normalizedSubRealm != null ? { subRealm: normalizedSubRealm } : {}),
           ...(normalizedStars != null ? { stars: normalizedStars } : {}),
+          ...(normalizedTp != null ? { tp: normalizedTp } : {}),
           ...(owned != null ? { owned } : {}),
           ...(awakened != null ? { awakened } : {}),
           ...(inLineup != null ? { inLineup } : {}),
@@ -12557,16 +12560,6 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
   ];
   const RANK_PRIORITY = ['N', 'R', 'SR', 'SSR', 'UR', 'PRIME'];
   const RANK_PRIORITY_SCORE = new Map(RANK_PRIORITY.map((rank, index) => [rank, index + 1]));
-  const CREEP_UNIT_BASE = new Map(CREEP_SLOT_ORDER.map(({ id }) => {
-      const unitDef = lookupUnit(id);
-      return [
-          id,
-          {
-              name: unitDef?.name ?? id,
-              cost: Number.isFinite(unitDef?.cost) ? Number(unitDef?.cost) : 0,
-          },
-      ];
-  }));
   const EMPTY_PROGRESS_BY_ID = new Map();
   function normalizeRank(value) {
       if (typeof value !== 'string' || !value.trim())
@@ -12578,6 +12571,7 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
       const rankCounts = new Map();
       const rankByUnitId = new Map();
       const progressProfiles = [];
+      const costs = [];
       let totalRanked = 0;
       for (const entry of lineup) {
           const directRank = normalizeRank(entry.rank);
@@ -12591,17 +12585,22 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
               continue;
           rankCounts.set(rank, (rankCounts.get(rank) ?? 0) + 1);
           totalRanked += 1;
+          const cost = Number.isFinite(entry.cost) ? Number(entry.cost) : Number(lookupUnit(entry.id)?.cost);
+          if (Number.isFinite(cost) && cost > 0)
+              costs.push(Math.floor(cost));
           const progress = progressById.get(entry.id);
-          if (!progress)
-              continue;
+          const progressRecord = progress;
+          const rawTp = progressRecord?.tp ?? entry.tp;
+          const parsedTp = Number.isFinite(rawTp) ? Number(rawTp) : undefined;
           progressProfiles.push({
-              level: typeof progress.level === 'number' ? progress.level : undefined,
-              realm: typeof progress.realm === 'number' ? progress.realm : undefined,
-              subRealm: typeof progress.subRealm === 'number' ? progress.subRealm : undefined,
+              level: typeof progress?.level === 'number' ? progress.level : undefined,
+              realm: typeof progress?.realm === 'number' ? progress.realm : undefined,
+              subRealm: typeof progress?.subRealm === 'number' ? progress.subRealm : undefined,
               className: normalizeClassName(entry.class) ?? undefined,
+              tp: parsedTp,
           });
       }
-      return { rankCounts, totalRanked, progressProfiles };
+      return { rankCounts, totalRanked, progressProfiles, costs };
   }
   function compareRankDesc(left, right) {
       const leftScore = RANK_PRIORITY_SCORE.get(left) ?? 0;
@@ -12688,22 +12687,34 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
       }
       return output;
   }
+  function allocateCostsForCreeps(costs, creepCount) {
+      if (!costs.length)
+          return Array.from({ length: creepCount }, () => 1);
+      const sorted = [...costs]
+          .map(value => Math.max(1, Math.floor(value)))
+          .sort((a, b) => b - a);
+      const output = [];
+      for (let i = 0; i < creepCount; i += 1) {
+          output.push(sorted[Math.min(i, sorted.length - 1)] ?? 1);
+      }
+      return output;
+  }
   function clampInteger(value, min) {
       if (typeof value !== 'number' || !Number.isFinite(value))
           return null;
       return Math.max(min, Math.floor(value));
   }
   function toCreepDeckEntry(params) {
-      const { creepId, profile, rank } = params;
-      const unitBase = CREEP_UNIT_BASE.get(creepId) ?? { name: creepId, cost: 0 };
+      const { creepId, profile, rank, cost } = params;
+      const unitName = lookupUnit(creepId)?.name ?? creepId;
       const level = clampInteger(profile.level, 1);
       const realm = clampInteger(profile.realm, 0);
       const subRealm = clampInteger(profile.subRealm, 0);
       const className = normalizeClassName(profile.className);
       return {
           id: creepId,
-          name: unitBase.name,
-          cost: unitBase.cost,
+          name: unitName,
+          cost,
           dynamicRankSource: 'lineup',
           dynamicLevelSource: 'lineup',
           ...(rank ? { rank } : {}),
@@ -12711,6 +12722,7 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
           ...(realm != null ? { realm } : {}),
           ...(subRealm != null ? { subRealm } : {}),
           ...(className ? { class: className } : {}),
+          ...(typeof profile.tp === 'number' ? { tp: profile.tp } : {}),
       };
   }
   function buildAICreepDeckFromLineup(params) {
@@ -12723,11 +12735,14 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
       const lineupSampling = sampleLineup(lineup, progressById);
       const allocatedRanks = allocateRanksForCreeps(lineupSampling, creepCount);
       const allocatedProgress = allocateProgressForCreeps(lineupSampling.progressProfiles, creepCount);
+      const allocatedCosts = allocateCostsForCreeps(lineupSampling.costs, creepCount);
       return CREEP_SLOT_ORDER.map((creep) => {
           const creepId = creep.id;
           const profile = allocatedProgress[creep.powerSlot] ?? {};
           const rank = allocatedRanks[creep.powerSlot] ?? null;
-          return toCreepDeckEntry({ creepId, profile, rank });
+          const cost = allocatedCosts[creep.powerSlot] ?? 1;
+          return toCreepDeckEntry({ creepId,
+          });
       });
   }
   //# sourceMappingURL=stdin.js.map
@@ -21861,17 +21876,38 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
           const unitId = entry.dataset.unitId || null;
           if (!unitId)
               return;
-          if (state.selectedUnitId === unitId) {
-              state.selectedUnitId = null;
-              helpers.setMessage('Đã bỏ chọn nhân vật.', 'info');
-          }
-          else {
+          const lineup = helpers.getSelectedLineup();
+          if (!lineup)
+              return;
+          const activeCell = Number.isInteger(state.activeCellIndex)
+              ? lineup.cells[state.activeCellIndex] ?? null
+              : null;
+          const targetCell = activeCell && activeCell.unlocked
+              ? activeCell
+              : (lineup.cells.find(cell => cell.unlocked && !cell.unitId) ?? lineup.cells.find(cell => cell.unlocked) ?? null);
+          if (!targetCell) {
               state.selectedUnitId = unitId;
-              const unit = rosterLookup.get(unitId);
-              helpers.setMessage(`Đã chọn ${unit?.name || 'nhân vật'}. Nhấn vào ô đội hình hoặc leader để gán.`, 'info');
+              helpers.setMessage('Không có ô hợp lệ để gán ngay. Hãy chọn ô đội hình trước.', 'error');
+              helpers.renderRoster();
+              helpers.renderCells();
+              return;
           }
-          helpers.renderRoster();
-          helpers.renderCells();
+          const result = assignUnitToCell(lineup, targetCell.index, unitId);
+          if (!result.ok) {
+              state.selectedUnitId = unitId;
+              helpers.setMessage(result.message || 'Không thể gán nhân vật.', 'error');
+              helpers.renderRoster();
+              helpers.renderCells();
+              return;
+          }
+          state.selectedUnitId = null;
+          state.activeCellIndex = targetCell.index;
+          const unit = rosterLookup.get(unitId);
+          const label = getCellLabel(lineup, targetCell.index);
+          helpers.setMessage(`Đã gán ${unit?.name || 'nhân vật'} vào ${label}.`, 'info');
+          refreshBattlePanels();
+          helpers.updateActiveCellHighlight();
+          helpers.renderCellDetails();
       };
       rosterList.addEventListener('click', handleRosterSelect);
       cleanup.push(() => rosterList.removeEventListener('click', handleRosterSelect));
@@ -22341,7 +22377,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       const backButton = document.createElement('button');
       backButton.type = 'button';
       backButton.className = 'lineup-view__back';
-      backButton.textContent = 'Quay lại menu chính';
+      backButton.textContent = 'Thoát';
       backButton.setAttribute('aria-label', 'Quay lại Main Menu');
       actions.appendChild(backButton);
       const walletEl = document.createElement('div');
@@ -23159,7 +23195,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       renderPassives();
       renderFilters();
       renderRoster();
-      setMessage('Chọn nhân vật rồi nhấp vào ô để gán. Giữ Alt và nhấp ô đã có nhân vật để bỏ.');
+      setMessage('Nhấp vào nhân vật để gán vào lineup.');
       cleanup.push(() => passiveOverlay.remove());
       cleanup.push(() => leaderOverlay.remove());
       return {
@@ -23385,19 +23421,12 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
       const defaultCurrencyId = source.unlockCurrency ?? source.currencyId ?? source.defaultCurrencyId ?? null;
       const slotCosts = Array.isArray(source.slotCosts) ? source.slotCosts : null;
       const unlockCosts = Array.isArray(source.unlockCosts) ? source.unlockCosts : slotCosts;
-      let unlockedCount = Math.min(3, FORMATION_CELL_COUNT);
-      if (Number.isFinite(source.initialUnlockedSlots)) {
-          unlockedCount = Math.max(0, Math.min(FORMATION_CELL_COUNT, Number(source.initialUnlockedSlots)));
-      }
-      else if (rawSlots.some(slot => isLineupMemberConfig(slot) && slot.unlocked === false)) {
-          unlockedCount = rawSlots.filter(slot => isLineupMemberConfig(slot) && slot.unlocked !== false).length;
-      }
+      const unlockedCount = FORMATION_CELL_COUNT;
       const formationCells = new Array(FORMATION_CELL_COUNT).fill(null).map((_, slotIndex) => {
           const slotInput = rawSlots[slotIndex] ?? memberList[slotIndex] ?? null;
           const { unitId, label } = normalizeAssignment(slotInput, rosterIndex);
           const record = isLineupMemberConfig(slotInput) ? slotInput : null;
-          const slotUnlock = record?.unlocked ?? null;
-          const unlocked = slotUnlock != null ? Boolean(slotUnlock) : slotIndex < unlockedCount;
+          const unlocked = slotIndex < unlockedCount;
           const costSource = record?.cost
               ?? record?.unlockCost
               ?? (Array.isArray(unlockCosts) ? unlockCosts[slotIndex] : null)
@@ -23412,7 +23441,7 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
               unitId: unitId || null,
               label: label || null,
               unlocked,
-              unlockCost,
+              unlockCost: unlocked ? null : unlockCost,
               equipment: equipment ?? null,
               meta: record ? { ...record } : null,
           };

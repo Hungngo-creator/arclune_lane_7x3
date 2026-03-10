@@ -335,16 +335,41 @@ const refreshBattlePanels = (): void => {
     if (!entry) return;
     const unitId = entry.dataset.unitId || null;
     if (!unitId) return;
-    if (state.selectedUnitId === unitId){
-      state.selectedUnitId = null;
-      helpers.setMessage('Đã bỏ chọn nhân vật.', 'info');
-    } else {
+    const lineup = helpers.getSelectedLineup();
+    if (!lineup) return;
+
+    const activeCell = Number.isInteger(state.activeCellIndex)
+      ? lineup.cells[state.activeCellIndex as number] ?? null
+      : null;
+    const targetCell = activeCell && activeCell.unlocked
+      ? activeCell
+      : (lineup.cells.find(cell => cell.unlocked && !cell.unitId) ?? lineup.cells.find(cell => cell.unlocked) ?? null);
+
+    if (!targetCell){
       state.selectedUnitId = unitId;
-      const unit = rosterLookup.get(unitId);
-      helpers.setMessage(`Đã chọn ${unit?.name || 'nhân vật'}. Nhấn vào ô đội hình hoặc leader để gán.`, 'info');
+      helpers.setMessage('Không có ô hợp lệ để gán ngay. Hãy chọn ô đội hình trước.', 'error');
+      helpers.renderRoster();
+      helpers.renderCells();
+      return;
     }
-    helpers.renderRoster();
-    helpers.renderCells();
+
+    const result = assignUnitToCell(lineup, targetCell.index, unitId);
+    if (!result.ok){
+      state.selectedUnitId = unitId;
+      helpers.setMessage(result.message || 'Không thể gán nhân vật.', 'error');
+      helpers.renderRoster();
+      helpers.renderCells();
+      return;
+    }
+
+    state.selectedUnitId = null;
+    state.activeCellIndex = targetCell.index;
+    const unit = rosterLookup.get(unitId);
+    const label = getCellLabel(lineup, targetCell.index);
+    helpers.setMessage(`Đã gán ${unit?.name || 'nhân vật'} vào ${label}.`, 'info');
+    refreshBattlePanels();
+    helpers.updateActiveCellHighlight();
+    helpers.renderCellDetails();
   };
   rosterList.addEventListener('click', handleRosterSelect);
   cleanup.push(() => rosterList.removeEventListener('click', handleRosterSelect));

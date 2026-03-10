@@ -449,7 +449,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   const backButton = document.createElement('button');
   backButton.type = 'button';
   backButton.className = 'lineup-view__back';
-  backButton.textContent = 'Quay lại menu chính';
+  backButton.textContent = 'Thoát';
   backButton.setAttribute('aria-label', 'Quay lại Main Menu');
   actions.appendChild(backButton);
   const walletEl = document.createElement('div');
@@ -1325,7 +1325,7 @@ const eventCleanup = bindLineupEvents({
   renderPassives();
   renderFilters();
   renderRoster();
-  setMessage('Chọn nhân vật rồi nhấp vào ô để gán. Giữ Alt và nhấp ô đã có nhân vật để bỏ.');
+  setMessage('Nhấp vào nhân vật để gán vào lineup.');
 
   cleanup.push(() => passiveOverlay.remove());
   cleanup.push(() => leaderOverlay.remove());

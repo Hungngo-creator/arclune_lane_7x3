@@ -4,17 +4,17 @@ import { queueEnemyAt } from '../src/ai.ts';
 import { spawnQueuedIfDue } from '../src/turns.ts';
 
 describe('pve creep builder and runtime assignment', () => {
-  test('buildAICreepDeckFromLineup maps rank/tu vi/class from lineup and keeps creep_3 strongest slot', () => {
+  test('buildAICreepDeckFromLineup maps rank/tu vi/class/tp/cost from lineup and keeps creep_3 strongest slot', () => {
     const lineup = [
-      { id: 'anna', class: 'Support', rank: 'SSR' },
-      { id: 'linhgac', class: 'Warrior', rank: 'N' },
-      { id: 'phe', class: 'Mage', rank: 'UR' },
+      { id: 'anna', class: 'Support', rank: 'SSR', cost: 3 },
+      { id: 'linhgac', class: 'Warrior', rank: 'N', cost: 1 },
+      { id: 'phe', class: 'Mage', rank: 'UR', cost: 5 },
     ];
     const collectionState = {
       units: [
-        { id: 'anna', level: 55, realm: 3, subRealm: 2 },
+        { id: 'anna', level: 55, realm: 3, subRealm: 2, tp: 12 },
         { id: 'linhgac', level: 20, realm: 1, subRealm: 1 },
-        { id: 'phe', level: 88, realm: 5, subRealm: 4 },
+        { id: 'phe', level: 88, realm: 5, subRealm: 4, tp: 23 },
       ],
     };
 
@@ -26,9 +26,12 @@ describe('pve creep builder and runtime assignment', () => {
     expect(byId.get('creep_3')?.realm).toBe(5);
     expect(byId.get('creep_3')?.subRealm).toBe(4);
     expect(byId.get('creep_3')?.class).toBe('Mage');
+    expect(byId.get('creep_3')?.tp).toBe(23);
+    expect(byId.get('creep_3')?.cost).toBe(5);
 
     expect(byId.get('creep_1')?.dynamicRankSource).toBe('lineup');
     expect(byId.get('creep_1')?.dynamicLevelSource).toBe('lineup');
+    expect(byId.get('creep_1')?.cost).toBe(1);
   });
 
   test('enemy queued creep keeps copied class when spawned', () => {

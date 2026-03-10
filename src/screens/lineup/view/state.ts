@@ -285,18 +285,12 @@ function normalizeLineupEntry(entry: LineupDefinition | null | undefined, index:
   const defaultCurrencyId = source.unlockCurrency ?? source.currencyId ?? source.defaultCurrencyId ?? null;
   const slotCosts = Array.isArray(source.slotCosts) ? source.slotCosts : null;
   const unlockCosts = Array.isArray(source.unlockCosts) ? source.unlockCosts : slotCosts;
-  let unlockedCount = Math.min(3, FORMATION_CELL_COUNT);
-  if (Number.isFinite(source.initialUnlockedSlots as number)){
-    unlockedCount = Math.max(0, Math.min(FORMATION_CELL_COUNT, Number(source.initialUnlockedSlots)));
-  } else if (rawSlots.some(slot => isLineupMemberConfig(slot) && slot.unlocked === false)){
-    unlockedCount = rawSlots.filter(slot => isLineupMemberConfig(slot) && slot.unlocked !== false).length;
-  }
+  const unlockedCount = FORMATION_CELL_COUNT;
   const formationCells: LineupCell[] = new Array(FORMATION_CELL_COUNT).fill(null).map((_, slotIndex) => {
     const slotInput = rawSlots[slotIndex] ?? memberList[slotIndex] ?? null;
     const { unitId, label } = normalizeAssignment(slotInput, rosterIndex);
     const record = isLineupMemberConfig(slotInput) ? slotInput : null;
-    const slotUnlock = record?.unlocked ?? null;
-    const unlocked = slotUnlock != null ? Boolean(slotUnlock) : slotIndex < unlockedCount;
+    const unlocked = slotIndex < unlockedCount;
     const costSource = record?.cost
       ?? record?.unlockCost
       ?? (Array.isArray(unlockCosts) ? unlockCosts[slotIndex] : null)
@@ -311,7 +305,7 @@ function normalizeLineupEntry(entry: LineupDefinition | null | undefined, index:
       unitId: unitId || null,
       label: label || null,
       unlocked,
-      unlockCost,
+      unlockCost: unlocked ? null : unlockCost,
       equipment: equipment ?? null,
       meta: record ? { ...record } : null,
     } satisfies LineupCell;
