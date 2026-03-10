@@ -167,7 +167,7 @@ function ensureStyles(){
     .collection-roster__portrait{width:108px;height:108px;position:relative;z-index:2;display:flex;align-items:center;justify-content:center;overflow:hidden;}
     .collection-roster__portrait img{width:108px;height:108px;object-fit:contain;filter:drop-shadow(0 10px 18px rgba(0,0,0,.55));position:relative;z-index:1;}
     .collection-roster__portrait span{position:relative;z-index:1;color:#aee4ff;font-weight:600;letter-spacing:.08em;}
-    .collection-roster__aura{position:absolute;inset:50% auto auto 50%;width:216%;height:216%;transform:translate(-50%,-50%);z-index:1;background-image:var(--ssr-aura);background-position:center;background-repeat:no-repeat;background-size:contain;pointer-events:none;}
+    .collection-roster__aura{position:absolute;inset:50% auto auto 50%;width:183.6%;height:183.6%;transform:translate(-50%,-50%);z-index:1;background-image:var(--ssr-aura);background-position:center;background-repeat:no-repeat;background-size:contain;pointer-events:none;}
     .collection-stage{position:relative;border-radius:0;border:none;background:none;padding:28px;display:flex;flex-direction:column;gap:18px;overflow:hidden;min-height:420px;z-index:1;}
     .collection-stage>*{position:relative;z-index:2;}
     .collection-stage__art{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;z-index:1;pointer-events:none;}

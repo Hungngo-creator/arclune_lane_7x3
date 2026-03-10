@@ -379,12 +379,22 @@ Hồi 100% nộ cho 1 đồng minh (Đầy nộ ngay lập tức) Tag: Đồng m
 Ultimate — Sát Chiêu: Cương Khí Hộ Thể (Auto-cast): Không gây sát thương.
 Tạo một lớp khiên cho Toàn Đội. Giá trị khiên = 250% WIL + atk của Chiến Cổ, cho phép cộng dồn khiên, cap 300% max hp của mục tiêu (tính mỗi khiên từ ult của nhân vật này, khiên từ nguồn không phải ult của nhân vật này sẽ được tính riêng theo kit nguồn của khiên đó), Tag: Đồng minh, Buff Khiên.
 
-Hoá Thân của Thời Không Chi Chủ - Không Gian Chi Chủ, Prime.
-mô tả: Thời Không nhất thể, vì sức mạnh quá lớn nên Hắn phải tách ra làm 2 để giáng lâm Arclune - Ảnh Giới.
+33) Hoá Thân của Thời Không Chi Chủ - Không Gian Chi Chủ, Prime. mage, không element tag.
+mô tả: Thời Không nhất thể, vì sức mạnh quá lớn nên Hắn phải tách ra làm 2 để giáng lâm Arclune - Ảnh Giới, dù chỉ là 1 sợi ý niệm của hắn bị chia làm 2 nhưng vẫn có bản chất áp đảo.
 
-Kỹ năng 1: Xáo trộn vị trí của kẻ thù trên sân 1 cách ngẫu nhiên không cố định, trộn vĩnh viễn cho đến khi đối phương chết hoặc bị xáo trộn lần nữa bởi kỹ năng này hoặc 1 kỹ năng không gian khác. 25 aether. Quy Tắc.
-Hoá Thân của Thời Không Chi Chủ - Thời Gian Chi Chủ, Prime.
+nội tại: Thần Tính: không nhận buff hay debuff ngoài bản thân (trừ Thời Gian Chi Chủ), không thể hồi sinh.
+sau mỗi 2 turn tự dung nhập vào không gian, hồi hp = 20% max hp. ( nói chung sau 2 turn tự hồi 20% max hp, dung nhập vào không gian chỉ là vfx).
 
+Kỹ năng 1: Xáo trộn vị trí của 3 kẻ thù ngẫu nhiên trên sân 1 cách ngẫu nhiên không cố định (không target leader địch), trộn vĩnh viễn cho đến khi đối phương chết, về deck hoặc bị xáo trộn lần nữa bởi kỹ năng này hoặc 1 kỹ năng không gian khác. 25 aether. Quy Tắc.
+kỹ năng 2: tạo ra 'Hư Không Màn Che' ngay 3 ô giao giới giữa 2 bên sân, (ô 1/2/3 của mỗi phe có 3 ô trống, chỉ là vfx) bất kỳ đòn aoe nào gây sát thương lên đồng minh từ kẻ thù đều giảm 60% sát thương cuối, đổi lại aoe từ đồng minh tấn công lên kẻ thù + 60% sát thương cuối cùng gây ra. tác dụng trong 4 turn, 40 aether. CD 2 turn.
+kỹ năng 3: gây sát thương aoe lên 4 kẻ địch ngẫu nhiên = 1 đòn đánh thường/ mỗi kẻ địch, bỏ qua 80% res của chúng, tính là đánh thường, 20 aether.
+ultimate: cast 2 lần skill 3.
+
+34) Hoá Thân của Thời Không Chi Chủ - Thời Gian Chi Chủ, Prime.
+mô tả: 1 nửa ý niệm của Thời Không Chi Chủ giáng lâm thế gian.
+nội tại: khi có Hư Không Chi Chủ là đồng minh trên sân + 20% mọi chỉ số cho cả bản thân và Hư Không Chi Chủ.
+bất kể nhận bao nhiêu sát thương/1 lần thì hắn sẽ luôn được hồi hp = 10% max hp mỗi lần nhận sát thương, không giới hạn lần kích hoạt/turn.
+kỹ năng 1: tạo Thời Gian Màn Che giữa 2 bên sân trong 3 turn. Thời Gian Màn Che: mọi đơn vị cận chiến từ kẻ thù khi tấn công đồng minh đều sẽ giảm 30% sát thương cuối gây ra lên đồng minh, khi kết thúc lượt tấn công cận chiến đó nhận debuff chậm chạp trong 1 turn, mỗi kẻ thù chỉ nhận 1 debuff chậm chạp từ kỹ năng này/1 turn. 25 aether.
 
 
 

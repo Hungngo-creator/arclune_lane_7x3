@@ -169,11 +169,11 @@ GHI CHÚ CHIẾN THUẬT:
  * Sức mạnh: Tuy là Rank SR nhưng khả năng xuyên giáp (Penetration) ở cả 3 kỹ năng khiến hắn gây sát thương rất ổn định lên các Tanker trâu bò về cuối game.
 
 35) Hoa Vị Ương, Chiến Sĩ, element tag: mộc
-
+SSR.
 Nội tại: mỗi khi nhận hồi phục từ nguồn không phải từ bản thân, tăng 30% hiệu ứng hồi phục đó, lượng hồi phục vượt max hp sẽ tạo khiên tối đa 100% max hp. 
 
 Kĩ năng 1: giảm 20% sát thương nhận vào trong 3 turn, 25 Aether. 
-Kĩ năng 2: tăng 32% max hp đến hết trận đổi lại mọi hiệu ứng hồi phục nhận vào từ mọi nguồn sau khi được tăng từ nội tại sẽ bị giảm 50%. Có thể dùng 2 lần/trận, 15 Aether. 
+Kĩ năng 2: tăng 32% max hp đến hết trận đổi lại mọi hiệu ứng hồi phục nhận vào từ mọi nguồn (kể cả từ bản thân) sau khi được tăng từ nội tại sẽ bị giảm 50%. Có thể dùng 2 lần/trận, 15 Aether. 
 Kĩ năng 3: khi nhận sát thương vượt ngưỡng 15% max hp/ lần/turn sẽ tăng hp và max hp lên 5%, kĩ năng nội tại, sau khi thanh toán 15 Aether thì kĩ năng này sẽ áp dụng ngay lập tức và mỗi turn chỉ có thể kích hoạt 1 lần, sau tử vong cần kích hoạt lần nữa. Hiệu ứng tăng hp và max hp từ kĩ năng này không tính là hồi phục. 25 Aether.
 
 Ultimate: gây sát thương = 200% đánh thường lên toàn sân kẻ địch, áp dụng hiệu ứng Phản Hồi Phục lên kẻ chịu sát thương từ ultimate trong 1 turn kể từ lúc kẻ thù dính debuff này. element tag: mộc
