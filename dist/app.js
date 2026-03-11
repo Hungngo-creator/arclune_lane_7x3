@@ -10399,7 +10399,13 @@ __define('./entry.ts', (exports, module, __require) => {
       if (!tacticalAiByUnit || typeof tacticalAiByUnit !== 'object')
           return null;
       const tacticalRows = Object.entries(tacticalAiByUnit)
-          .filter(([unitId, rows]) => typeof unitId === 'string' && unitId.trim() !== '' && Array.isArray(rows));
+          .filter(([unitId, rows]) => {
+          if (typeof unitId !== 'string' || unitId.trim() === '')
+              return false;
+          if (Array.isArray(rows))
+              return true;
+          return Boolean(rows) && typeof rows === 'object';
+      });
       if (tacticalRows.length === 0)
           return null;
       const sourceState = currentCollectionState && typeof currentCollectionState === 'object' && !Array.isArray(currentCollectionState)

@@ -185,7 +185,11 @@ function mergeCollectionUnitsWithGambits(
   if (!tacticalAiByUnit || typeof tacticalAiByUnit !== 'object') return null;
 
   const tacticalRows = Object.entries(tacticalAiByUnit as Record<string, unknown>)
-    .filter(([unitId, rows]) => typeof unitId === 'string' && unitId.trim() !== '' && Array.isArray(rows));
+    .filter(([unitId, rows]) => {
+      if (typeof unitId !== 'string' || unitId.trim() === '') return false;
+      if (Array.isArray(rows)) return true;
+      return Boolean(rows) && typeof rows === 'object';
+    });
   if (tacticalRows.length === 0) return null;
 
   const sourceState = currentCollectionState && typeof currentCollectionState === 'object' && !Array.isArray(currentCollectionState)
@@ -206,7 +210,7 @@ function mergeCollectionUnitsWithGambits(
     const index = findUnitIndex(unitId);
     if (index >= 0) {
       const existing = mergedUnits[index];
-      const nextEntry = existing && typeof existing === 'object' && !Array.isArray(existing)
+      const nextEntry: Record<string, unknown> = existing && typeof existing === 'object' && !Array.isArray(existing)
         ? { ...(existing as Record<string, unknown>) }
         : { unitId };
       nextEntry.unitId = unitId;
