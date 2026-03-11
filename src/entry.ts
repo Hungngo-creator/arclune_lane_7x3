@@ -178,6 +178,51 @@ function cloneScreenParams(params: ScreenParams): ScreenParams {
   return cloneScreenParamMap(params);
 }
 
+function mergeCollectionUnitsWithGambits(
+  currentCollectionState: unknown,
+  tacticalAiByUnit: unknown,
+): UnknownRecord | null {
+  if (!tacticalAiByUnit || typeof tacticalAiByUnit !== 'object') return null;
+
+  const tacticalRows = Object.entries(tacticalAiByUnit as Record<string, unknown>)
+    .filter(([unitId, rows]) => typeof unitId === 'string' && unitId.trim() !== '' && Array.isArray(rows));
+  if (tacticalRows.length === 0) return null;
+
+  const sourceState = currentCollectionState && typeof currentCollectionState === 'object' && !Array.isArray(currentCollectionState)
+    ? (currentCollectionState as UnknownRecord)
+    : {};
+  const sourceUnits = Array.isArray(sourceState.units) ? sourceState.units : [];
+  const mergedUnits = [...sourceUnits];
+
+  const findUnitIndex = (unitId: string): number => mergedUnits.findIndex((entry) => (
+    entry &&
+    typeof entry === 'object' &&
+    !Array.isArray(entry) &&
+    typeof (entry as Record<string, unknown>).unitId === 'string' &&
+    ((entry as Record<string, unknown>).unitId as string).trim() === unitId
+  ));
+
+  for (const [unitId, gambit] of tacticalRows) {
+    const index = findUnitIndex(unitId);
+    if (index >= 0) {
+      const existing = mergedUnits[index];
+      const nextEntry = existing && typeof existing === 'object' && !Array.isArray(existing)
+        ? { ...(existing as Record<string, unknown>) }
+        : { unitId };
+      nextEntry.unitId = unitId;
+      nextEntry.gambit = gambit;
+      mergedUnits[index] = nextEntry;
+      continue;
+    }
+    mergedUnits.push({ unitId, gambit });
+  }
+
+  return {
+    ...sourceState,
+    units: mergedUnits,
+  };
+}
+
 const MODE_DEFINITIONS: Record<string, ModeDefinition> = (MODES as ReadonlyArray<ModeConfig>).reduce<Record<string, ModeDefinition>>((acc, mode) => {
   const shell: ModeShellConfig | undefined = mode.shell;
   const screenId = shell?.screenId || SCREEN_MAIN_MENU;
@@ -1170,14 +1215,13 @@ async function mountPveScreen(params: ScreenParams): Promise<void>{
     createSessionOptions.lineupDeck = lineupDeckEntries;
     startSessionOptions.lineupDeck = lineupDeckEntries;
   }
-  if (profile.tacticalAiByUnit && typeof profile.tacticalAiByUnit === 'object') {
-    const units = Object.entries(profile.tacticalAiByUnit)
-      .filter(([unitId, rows]) => typeof unitId === 'string' && unitId.trim() && Array.isArray(rows))
-      .map(([unitId, gambit]) => ({ unitId, gambit }));
-    if (units.length > 0) {
-      createSessionOptions.collectionState = { units };
-      startSessionOptions.collectionState = { units };
-    }
+  const mergedCollectionState = mergeCollectionUnitsWithGambits(
+    createSessionOptions.collectionState,
+    profile.tacticalAiByUnit,
+  );
+  if (mergedCollectionState) {
+    createSessionOptions.collectionState = mergedCollectionState;
+    startSessionOptions.collectionState = mergedCollectionState;
   }
   if (rootElement){
     clearAppScreenClasses();

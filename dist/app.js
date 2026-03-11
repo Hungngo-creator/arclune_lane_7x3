@@ -10395,6 +10395,42 @@ __define('./entry.ts', (exports, module, __require) => {
       }
       return cloneScreenParamMap(params);
   }
+  function mergeCollectionUnitsWithGambits(currentCollectionState, tacticalAiByUnit) {
+      if (!tacticalAiByUnit || typeof tacticalAiByUnit !== 'object')
+          return null;
+      const tacticalRows = Object.entries(tacticalAiByUnit)
+          .filter(([unitId, rows]) => typeof unitId === 'string' && unitId.trim() !== '' && Array.isArray(rows));
+      if (tacticalRows.length === 0)
+          return null;
+      const sourceState = currentCollectionState && typeof currentCollectionState === 'object' && !Array.isArray(currentCollectionState)
+          ? currentCollectionState
+          : {};
+      const sourceUnits = Array.isArray(sourceState.units) ? sourceState.units : [];
+      const mergedUnits = [...sourceUnits];
+      const findUnitIndex = (unitId) => mergedUnits.findIndex((entry) => (entry &&
+          typeof entry === 'object' &&
+          !Array.isArray(entry) &&
+          typeof entry.unitId === 'string' &&
+          entry.unitId.trim() === unitId));
+      for (const [unitId, gambit] of tacticalRows) {
+          const index = findUnitIndex(unitId);
+          if (index >= 0) {
+              const existing = mergedUnits[index];
+              const nextEntry = existing && typeof existing === 'object' && !Array.isArray(existing)
+                  ? { ...existing }
+                  : { unitId };
+              nextEntry.unitId = unitId;
+              nextEntry.gambit = gambit;
+              mergedUnits[index] = nextEntry;
+              continue;
+          }
+          mergedUnits.push({ unitId, gambit });
+      }
+      return {
+          ...sourceState,
+          units: mergedUnits,
+      };
+  }
   const MODE_DEFINITIONS = MODES.reduce((acc, mode) => {
       const shell = mode.shell;
       const screenId = shell?.screenId || SCREEN_MAIN_MENU;
@@ -11316,14 +11352,10 @@ __define('./entry.ts', (exports, module, __require) => {
           createSessionOptions.lineupDeck = lineupDeckEntries;
           startSessionOptions.lineupDeck = lineupDeckEntries;
       }
-      if (profile.tacticalAiByUnit && typeof profile.tacticalAiByUnit === 'object') {
-          const units = Object.entries(profile.tacticalAiByUnit)
-              .filter(([unitId, rows]) => typeof unitId === 'string' && unitId.trim() && Array.isArray(rows))
-              .map(([unitId, gambit]) => ({ unitId, gambit }));
-          if (units.length > 0) {
-              createSessionOptions.collectionState = { units };
-              startSessionOptions.collectionState = { units };
-          }
+      const mergedCollectionState = mergeCollectionUnitsWithGambits(createSessionOptions.collectionState, profile.tacticalAiByUnit);
+      if (mergedCollectionState) {
+          createSessionOptions.collectionState = mergedCollectionState;
+          startSessionOptions.collectionState = mergedCollectionState;
       }
       if (rootElement) {
           clearAppScreenClasses();
