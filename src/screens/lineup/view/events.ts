@@ -212,11 +212,7 @@ const refreshBattlePanels = (): void => {
       return;
     }
 
-    if (action === 'clear'){
-      if (!cell.unitId){
-        helpers.setMessage('Ô này đang trống.', 'info');
-        return;
-      }
+    if (cell.unitId){
       const removedUnitId = cell.unitId;
       removeUnitFromCell(lineup, cellIndex);
       if (state.selectedUnitId === removedUnitId){

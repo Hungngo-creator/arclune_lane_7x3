@@ -242,6 +242,48 @@ describe('renderLineupScreen', () => {
     handle.destroy();
   });
 
+  it('xóa nhanh nhân vật khi bấm trực tiếp vào ô đã có người và ẩn khỏi roster bên dưới', () => {
+    const root = document.createElement('div');
+    document.body.appendChild(root);
+
+    const roster: RosterEntryLite[] = [
+      { id: 'alpha', name: 'Alpha', class: 'Mage', rank: 'SR' },
+      { id: 'beta', name: 'Beta', class: 'Warrior', rank: 'R' },
+    ];
+    const lineups: LineupDefinition[] = [
+      {
+        id: 'lineup-1',
+        name: 'Đội hình thao tác',
+        members: [],
+        passives: [],
+      },
+    ];
+
+    const handle = renderLineupScreen({
+      root,
+      definition: {
+        label: 'Đội hình thao tác',
+        params: { roster, lineups },
+      },
+    });
+
+    const alphaEntry = root.querySelector<HTMLElement>('.lineup-roster__entry[data-unit-id="alpha"]');
+    expect(alphaEntry).not.toBeNull();
+    alphaEntry?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    const firstCell = root.querySelector<HTMLElement>('.lineup-grid__cells .lineup-cell[data-cell-index="0"]');
+    expect(firstCell?.querySelector('.lineup-cell__name')?.textContent).toContain('Alpha');
+
+    expect(root.querySelector('.lineup-roster__entry[data-unit-id="alpha"]')).toBeNull();
+
+    firstCell?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(firstCell?.querySelector('.lineup-cell__name')).toBeNull();
+    expect(root.querySelector('.lineup-roster__entry[data-unit-id="alpha"]')).not.toBeNull();
+
+    handle.destroy();
+  });
+
   it('áp dụng avatar tròn cho leader/collection và vuông cho ô lineup', () => {
     const lineupRoot = document.createElement('div');
     document.body.appendChild(lineupRoot);
