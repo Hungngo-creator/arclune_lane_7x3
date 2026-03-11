@@ -319,6 +319,33 @@ describe('renderCollectionScreen', () => {
     handle.destroy();
   });
 
+  it('nâng tu vi đúng mốc vẫn cộng TP trong collection', () => {
+    const root = document.createElement('div');
+    document.body.appendChild(root);
+
+    const roster: RosterEntryLite[] = [
+      { id: 'omega', name: 'Omega', class: 'Support', rank: 'SSR', tags: ['support'], passives: [] },
+    ];
+
+    const handle = renderCollectionScreen({
+      root,
+      params: {
+        roster,
+        playerState: { currencies: { VNT: 999_999 } },
+      },
+    });
+
+    const upgradeBtn = root.querySelector<HTMLButtonElement>('.collection-stage__tuvi-actions .collection-stage__tuvi-btn:not(:disabled)');
+    expect(upgradeBtn).not.toBeNull();
+
+    upgradeBtn?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    const stageStatus = root.querySelector<HTMLElement>('.collection-stage__status');
+    expect(stageStatus?.textContent ?? '').toContain('(+5 TP)');
+
+    handle.destroy();
+  });
+
   it('hỗ trợ truyền roster và currencies đã gõ kiểu', () => {
     const root = document.createElement('div');
     document.body.appendChild(root);

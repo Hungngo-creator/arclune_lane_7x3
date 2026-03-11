@@ -99,63 +99,59 @@ const TP_STAT_GAIN_PER_POINT: Readonly<Record<TpStatKey, number>> = Object.freez
 });
 
 const TP_GAIN_RULES: ReadonlyArray<{
-  fromRealmName: string;
+  fromRealm: number;
   fromSubRealm: number;
-  toRealmName: string;
+  toRealm: number;
   toSubRealm: number;
   gain: number;
 }> = Object.freeze([
-  { fromRealmName: 'Khai Nguyên', fromSubRealm: 0, toRealmName: 'Khai Nguyên', toSubRealm: 1, gain: 5 },
-  { fromRealmName: 'Khai Nguyên', fromSubRealm: 1, toRealmName: 'Khai Nguyên', toSubRealm: 2, gain: 5 },
-  { fromRealmName: 'Khai Nguyên', fromSubRealm: 2, toRealmName: 'Khai Nguyên', toSubRealm: 3, gain: 5 },
-  { fromRealmName: 'Khai Nguyên', fromSubRealm: 3, toRealmName: 'Khai Nguyên', toSubRealm: 4, gain: 5 },
-  { fromRealmName: 'Khai Nguyên', fromSubRealm: 4, toRealmName: 'Khai Nguyên', toSubRealm: 5, gain: 5 },
-  { fromRealmName: 'Khai Nguyên', fromSubRealm: 5, toRealmName: 'Khai Nguyên', toSubRealm: 6, gain: 5 },
-  { fromRealmName: 'Khai Nguyên', fromSubRealm: 6, toRealmName: 'Khai Nguyên', toSubRealm: 7, gain: 5 },
-  { fromRealmName: 'Khai Nguyên', fromSubRealm: 7, toRealmName: 'Khai Nguyên', toSubRealm: 8, gain: 5 },
-  { fromRealmName: 'Khai Nguyên', fromSubRealm: 8, toRealmName: 'Khai Nguyên', toSubRealm: 9, gain: 5 },
-  { fromRealmName: 'Khai Nguyên', fromSubRealm: 9, toRealmName: 'Trúc Cơ', toSubRealm: 1, gain: 30 },
-  { fromRealmName: 'Trúc Cơ', fromSubRealm: 1, toRealmName: 'Trúc Cơ', toSubRealm: 2, gain: 10 },
-  { fromRealmName: 'Trúc Cơ', fromSubRealm: 2, toRealmName: 'Trúc Cơ', toSubRealm: 3, gain: 10 },
-  { fromRealmName: 'Trúc Cơ', fromSubRealm: 3, toRealmName: 'Trúc Cơ', toSubRealm: 4, gain: 10 },
-  { fromRealmName: 'Trúc Cơ', fromSubRealm: 4, toRealmName: 'Trúc Cơ', toSubRealm: 5, gain: 10 },
-  { fromRealmName: 'Trúc Cơ', fromSubRealm: 5, toRealmName: 'Trúc Cơ', toSubRealm: 6, gain: 10 },
-  { fromRealmName: 'Trúc Cơ', fromSubRealm: 6, toRealmName: 'Trúc Cơ', toSubRealm: 7, gain: 10 },
-  { fromRealmName: 'Trúc Cơ', fromSubRealm: 7, toRealmName: 'Trúc Cơ', toSubRealm: 8, gain: 10 },
-  { fromRealmName: 'Trúc Cơ', fromSubRealm: 8, toRealmName: 'Trúc Cơ', toSubRealm: 9, gain: 10 },
-  { fromRealmName: 'Trúc Cơ', fromSubRealm: 9, toRealmName: 'Kết Đan', toSubRealm: 1, gain: 70 },
-  { fromRealmName: 'Kết Đan', fromSubRealm: 1, toRealmName: 'Kết Đan', toSubRealm: 2, gain: 40 },
-  { fromRealmName: 'Kết Đan', fromSubRealm: 2, toRealmName: 'Kết Đan', toSubRealm: 3, gain: 40 },
-  { fromRealmName: 'Kết Đan', fromSubRealm: 3, toRealmName: 'Kết Đan', toSubRealm: 4, gain: 50 },
-  { fromRealmName: 'Kết Đan', fromSubRealm: 4, toRealmName: 'Kết Đan', toSubRealm: 5, gain: 50 },
-  { fromRealmName: 'Kết Đan', fromSubRealm: 5, toRealmName: 'Kết Đan', toSubRealm: 6, gain: 50 },
-  { fromRealmName: 'Kết Đan', fromSubRealm: 6, toRealmName: 'Kết Đan', toSubRealm: 7, gain: 60 },
-  { fromRealmName: 'Kết Đan', fromSubRealm: 7, toRealmName: 'Kết Đan', toSubRealm: 8, gain: 60 },
-  { fromRealmName: 'Kết Đan', fromSubRealm: 8, toRealmName: 'Kết Đan', toSubRealm: 9, gain: 60 },
-  { fromRealmName: 'Kết Đan', fromSubRealm: 9, toRealmName: 'Ngưng Đan', toSubRealm: 1, gain: 150 },
-  { fromRealmName: 'Ngưng Đan', fromSubRealm: 1, toRealmName: 'Ngưng Đan', toSubRealm: 2, gain: 160 },
-  { fromRealmName: 'Ngưng Đan', fromSubRealm: 2, toRealmName: 'Ngưng Đan', toSubRealm: 3, gain: 160 },
-  { fromRealmName: 'Ngưng Đan', fromSubRealm: 3, toRealmName: 'Ngưng Đan', toSubRealm: 4, gain: 170 },
-  { fromRealmName: 'Ngưng Đan', fromSubRealm: 4, toRealmName: 'Ngưng Đan', toSubRealm: 5, gain: 170 },
-  { fromRealmName: 'Ngưng Đan', fromSubRealm: 5, toRealmName: 'Ngưng Đan', toSubRealm: 6, gain: 170 },
-  { fromRealmName: 'Ngưng Đan', fromSubRealm: 6, toRealmName: 'Ngưng Đan', toSubRealm: 7, gain: 180 },
-  { fromRealmName: 'Ngưng Đan', fromSubRealm: 7, toRealmName: 'Ngưng Đan', toSubRealm: 8, gain: 180 },
-  { fromRealmName: 'Ngưng Đan', fromSubRealm: 8, toRealmName: 'Ngưng Đan', toSubRealm: 9, gain: 180 },
-  { fromRealmName: 'Ngưng Đan', fromSubRealm: 9, toRealmName: 'Đúc Phách', toSubRealm: 1, gain: 300 },
-  { fromRealmName: 'Đúc Phách', fromSubRealm: 1, toRealmName: 'Đúc Phách', toSubRealm: 2, gain: 350 },
-  { fromRealmName: 'Đúc Phách', fromSubRealm: 2, toRealmName: 'Đúc Phách', toSubRealm: 3, gain: 400 },
-  { fromRealmName: 'Đúc Phách', fromSubRealm: 3, toRealmName: 'Đúc Phách', toSubRealm: 4, gain: 400 },
-  { fromRealmName: 'Đúc Phách', fromSubRealm: 4, toRealmName: 'Đúc Phách', toSubRealm: 5, gain: 450 },
-  { fromRealmName: 'Đúc Phách', fromSubRealm: 5, toRealmName: 'Đúc Phách', toSubRealm: 6, gain: 450 },
-  { fromRealmName: 'Đúc Phách', fromSubRealm: 6, toRealmName: 'Đúc Phách', toSubRealm: 7, gain: 500 },
-  { fromRealmName: 'Đúc Phách', fromSubRealm: 7, toRealmName: 'Luyện Hồn', toSubRealm: 1, gain: 825 },
-  { fromRealmName: 'Luyện Hồn', fromSubRealm: 1, toRealmName: 'Luyện Hồn', toSubRealm: 2, gain: 925 },
-  { fromRealmName: 'Luyện Hồn', fromSubRealm: 2, toRealmName: 'Luyện Hồn', toSubRealm: 3, gain: 1025 },
-]);
-
-function toRealmLabelName(value: unknown): string {
-  return typeof value === 'string' ? value.trim().toLowerCase() : '';
-}
+  { fromRealm: 1, fromSubRealm: 0, toRealm: 1, toSubRealm: 1, gain: 5 },
+  { fromRealm: 1, fromSubRealm: 1, toRealm: 1, toSubRealm: 2, gain: 5 },
+  { fromRealm: 1, fromSubRealm: 2, toRealm: 1, toSubRealm: 3, gain: 5 },
+  { fromRealm: 1, fromSubRealm: 3, toRealm: 1, toSubRealm: 4, gain: 5 },
+  { fromRealm: 1, fromSubRealm: 4, toRealm: 1, toSubRealm: 5, gain: 5 },
+  { fromRealm: 1, fromSubRealm: 5, toRealm: 1, toSubRealm: 6, gain: 5 },
+  { fromRealm: 1, fromSubRealm: 6, toRealm: 1, toSubRealm: 7, gain: 5 },
+  { fromRealm: 1, fromSubRealm: 7, toRealm: 1, toSubRealm: 8, gain: 5 },
+  { fromRealm: 1, fromSubRealm: 8, toRealm: 1, toSubRealm: 9, gain: 5 },
+  { fromRealm: 1, fromSubRealm: 9, toRealm: 2, toSubRealm: 1, gain: 30 },
+  { fromRealm: 2, fromSubRealm: 1, toRealm: 2, toSubRealm: 2, gain: 10 },
+  { fromRealm: 2, fromSubRealm: 2, toRealm: 2, toSubRealm: 3, gain: 10 },
+  { fromRealm: 2, fromSubRealm: 3, toRealm: 2, toSubRealm: 4, gain: 10 },
+  { fromRealm: 2, fromSubRealm: 4, toRealm: 2, toSubRealm: 5, gain: 10 },
+  { fromRealm: 2, fromSubRealm: 5, toRealm: 2, toSubRealm: 6, gain: 10 },
+  { fromRealm: 2, fromSubRealm: 6, toRealm: 2, toSubRealm: 7, gain: 10 },
+  { fromRealm: 2, fromSubRealm: 7, toRealm: 2, toSubRealm: 8, gain: 10 },
+  { fromRealm: 2, fromSubRealm: 8, toRealm: 2, toSubRealm: 9, gain: 10 },
+  { fromRealm: 2, fromSubRealm: 9, toRealm: 3, toSubRealm: 1, gain: 70 },
+  { fromRealm: 3, fromSubRealm: 1, toRealm: 3, toSubRealm: 2, gain: 40 },
+  { fromRealm: 3, fromSubRealm: 2, toRealm: 3, toSubRealm: 3, gain: 40 },
+  { fromRealm: 3, fromSubRealm: 3, toRealm: 3, toSubRealm: 4, gain: 50 },
+  { fromRealm: 3, fromSubRealm: 4, toRealm: 3, toSubRealm: 5, gain: 50 },
+  { fromRealm: 3, fromSubRealm: 5, toRealm: 3, toSubRealm: 6, gain: 50 },
+  { fromRealm: 3, fromSubRealm: 6, toRealm: 3, toSubRealm: 7, gain: 60 },
+  { fromRealm: 3, fromSubRealm: 7, toRealm: 3, toSubRealm: 8, gain: 60 },
+  { fromRealm: 3, fromSubRealm: 8, toRealm: 3, toSubRealm: 9, gain: 60 },
+  { fromRealm: 3, fromSubRealm: 9, toRealm: 4, toSubRealm: 1, gain: 150 },
+  { fromRealm: 4, fromSubRealm: 1, toRealm: 4, toSubRealm: 2, gain: 160 },
+  { fromRealm: 4, fromSubRealm: 2, toRealm: 4, toSubRealm: 3, gain: 160 },
+  { fromRealm: 4, fromSubRealm: 3, toRealm: 4, toSubRealm: 4, gain: 170 },
+  { fromRealm: 4, fromSubRealm: 4, toRealm: 4, toSubRealm: 5, gain: 170 },
+  { fromRealm: 4, fromSubRealm: 5, toRealm: 4, toSubRealm: 6, gain: 170 },
+  { fromRealm: 4, fromSubRealm: 6, toRealm: 4, toSubRealm: 7, gain: 180 },
+  { fromRealm: 4, fromSubRealm: 7, toRealm: 4, toSubRealm: 8, gain: 180 },
+  { fromRealm: 4, fromSubRealm: 8, toRealm: 4, toSubRealm: 9, gain: 180 },
+  { fromRealm: 4, fromSubRealm: 9, toRealm: 5, toSubRealm: 1, gain: 300 },
+  { fromRealm: 5, fromSubRealm: 1, toRealm: 5, toSubRealm: 2, gain: 350 },
+  { fromRealm: 5, fromSubRealm: 2, toRealm: 5, toSubRealm: 3, gain: 400 },
+  { fromRealm: 5, fromSubRealm: 3, toRealm: 5, toSubRealm: 4, gain: 400 },
+  { fromRealm: 5, fromSubRealm: 4, toRealm: 5, toSubRealm: 5, gain: 450 },
+  { fromRealm: 5, fromSubRealm: 5, toRealm: 5, toSubRealm: 6, gain: 450 },
+  { fromRealm: 5, fromSubRealm: 6, toRealm: 5, toSubRealm: 7, gain: 500 },
+  { fromRealm: 5, fromSubRealm: 7, toRealm: 6, toSubRealm: 1, gain: 825 },
+  { fromRealm: 6, fromSubRealm: 1, toRealm: 6, toSubRealm: 2, gain: 925 },
+  { fromRealm: 6, fromSubRealm: 2, toRealm: 6, toSubRealm: 3, gain: 1025 },
+ ]); 
 
 function resolveTpGainForUpgrade(params: {
   fromRealm: number;
@@ -163,12 +159,10 @@ function resolveTpGainForUpgrade(params: {
   toRealm: number;
   toSubRealm: number;
 }): number {
-  const fromRealmName = toRealmLabelName(getCultivationRealmEconomy(params.fromRealm)?.name ?? '');
-  const toRealmName = toRealmLabelName(getCultivationRealmEconomy(params.toRealm)?.name ?? '');
   const found = TP_GAIN_RULES.find((rule) => (
-    toRealmLabelName(rule.fromRealmName) === fromRealmName
+    rule.fromRealm === params.fromRealm
     && rule.fromSubRealm === params.fromSubRealm
-    && toRealmLabelName(rule.toRealmName) === toRealmName
+    && rule.toRealm === params.toRealm
     && rule.toSubRealm === params.toSubRealm
   ));
   return found?.gain ?? 0;
