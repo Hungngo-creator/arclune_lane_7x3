@@ -861,7 +861,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       cellDetails.appendChild(empty);
       const hint = document.createElement('p');
       hint.className = 'lineup-grid__details-empty';
-      hint.textContent = 'Chọn nhân vật từ roster rồi nhấp vào ô để gán. Giữ Alt và nhấp ô đã có nhân vật để bỏ.';
+      hint.textContent = 'Chọn nhân vật từ roster rồi nhấp vào ô để gán. Nhấp ô đã có nhân vật để bỏ.';
       cellDetails.appendChild(hint);
       syncGridDetailsHeight();
       return;
@@ -871,7 +871,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
 
     const interactionHint = document.createElement('p');
     interactionHint.className = 'lineup-grid__details-text';
-    interactionHint.textContent = 'Nhấp trực tiếp vào ô để xem nhân vật này. Giữ Alt rồi nhấp để bỏ khỏi ô.';
+    interactionHint.textContent = 'Nhấp trực tiếp vào ô này để bỏ nhân vật khỏi đội hình.';
     cellDetails.appendChild(interactionHint);
 
     const kit = (unit.raw as { kit?: unknown } | null)?.kit ?? null;
@@ -1007,11 +1007,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
           : cell.unitId
             ? 'select'
             : 'focus';
-        if (cell.unitId){
-          cellEl.dataset.cellAltAction = 'clear';
-        } else {
-          delete cellEl.dataset.cellAltAction;
-        }
+
       }
 
       const displayIndex = cell.section === 'formation'
@@ -1044,7 +1040,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
           ariaLabel += ` Chi phí: ${formatCurrencyBalance(cell.unlockCost.amount, cell.unlockCost.currencyId)}.`;
         }
       } else if (unit){
-        ariaLabel += '. Nhấp để chọn. Dùng Alt+nhấp để bỏ nhân vật.';
+        ariaLabel += '. Nhấp để bỏ nhân vật khỏi ô.';
       } else if (state.selectedUnitId){
         const selectedUnit = rosterLookup.get(state.selectedUnitId);
         ariaLabel += selectedUnit
@@ -1211,6 +1207,10 @@ function updateActiveCellHighlight(): void{
     const fragment = document.createDocumentFragment();
     filtered.forEach(unit => {
       const unitId = normalizeUnitId(unit.id);
+      const isAssigned = assignedUnitIds.has(unitId);
+      if (isAssigned && state.selectedUnitId !== unitId){
+        return;
+      }
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'lineup-roster__entry';
@@ -1218,10 +1218,6 @@ function updateActiveCellHighlight(): void{
       button.setAttribute('aria-label', `Chọn ${unit.name}`);
       if (state.selectedUnitId === unitId){
         button.classList.add('is-selected');
-      }
-      const isAssigned = assignedUnitIds.has(unitId);
-      if (isAssigned && state.selectedUnitId !== unitId){
-        button.classList.add('is-unavailable');
       }
       const avatar = document.createElement('div');
       avatar.className = 'lineup-roster__avatar';

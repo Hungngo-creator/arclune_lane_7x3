@@ -152,13 +152,7 @@ const refreshBattlePanels = (): void => {
 
     const targetEl = event.target as HTMLElement | null;
     const actionable = targetEl?.closest<HTMLElement>('[data-cell-action]');
-    const mouseEvent = event as MouseEvent | null;
-    const hasModifier = Boolean(mouseEvent && (mouseEvent.altKey || mouseEvent.ctrlKey || mouseEvent.metaKey));
     let action = actionable?.dataset.cellAction ?? null;
-
-    if (!action && hasModifier){
-      action = cellEl.dataset.cellAltAction ?? (cell.unitId ? 'clear' : null);
-    }
 
     if (!action){
       action = cellEl.dataset.cellAction ?? null;
@@ -244,15 +238,7 @@ const refreshBattlePanels = (): void => {
       return;
     }
 
-    if (cell.unitId){
-      state.selectedUnitId = cell.unitId;
-      const unit = rosterLookup.get(cell.unitId);
-      helpers.setMessage(`Đã chọn ${unit?.name || 'nhân vật'} đang ở ${label}. Chọn ô khác để hoán đổi hoặc dùng Alt+nhấp để bỏ.`, 'info');
-      helpers.renderRoster();
-      helpers.renderCells();
-    } else {
-      helpers.setMessage('Chọn nhân vật từ roster để gán vào ô này.', 'info');
-    }
+    helpers.setMessage('Chọn nhân vật từ roster để gán vào ô này.', 'info');
   };
 
   cellsGrid.addEventListener('click', handleCellInteraction);
@@ -291,7 +277,7 @@ const refreshBattlePanels = (): void => {
 
     if (cell.unitId){
       const unit = rosterLookup.get(cell.unitId);
-      helpers.setMessage(`${label}: ${unit?.name || 'đã có nhân vật'}. Dùng Alt+nhấp để trả ô.`, 'info');
+      helpers.setMessage(`${label}: ${unit?.name || 'đã có nhân vật'}. Nhấp để bỏ nhân vật khỏi ô.`, 'info');
       return;
     }
 

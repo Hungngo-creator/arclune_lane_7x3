@@ -21791,12 +21791,7 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
           helpers.renderCellDetails();
           const targetEl = event.target;
           const actionable = targetEl?.closest('[data-cell-action]');
-          const mouseEvent = event;
-          const hasModifier = Boolean(mouseEvent && (mouseEvent.altKey || mouseEvent.ctrlKey || mouseEvent.metaKey));
           let action = actionable?.dataset.cellAction ?? null;
-          if (!action && hasModifier) {
-              action = cellEl.dataset.cellAltAction ?? (cell.unitId ? 'clear' : null);
-          }
           if (!action) {
               action = cellEl.dataset.cellAction ?? null;
           }
@@ -21869,16 +21864,7 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
               assignSelectedUnit();
               return;
           }
-          if (cell.unitId) {
-              state.selectedUnitId = cell.unitId;
-              const unit = rosterLookup.get(cell.unitId);
-              helpers.setMessage(`Đã chọn ${unit?.name || 'nhân vật'} đang ở ${label}. Chọn ô khác để hoán đổi hoặc dùng Alt+nhấp để bỏ.`, 'info');
-              helpers.renderRoster();
-              helpers.renderCells();
-          }
-          else {
-              helpers.setMessage('Chọn nhân vật từ roster để gán vào ô này.', 'info');
-          }
+          helpers.setMessage('Chọn nhân vật từ roster để gán vào ô này.', 'info');
       };
       cellsGrid.addEventListener('click', handleCellInteraction);
       cleanup.push(() => cellsGrid.removeEventListener('click', handleCellInteraction));
@@ -21912,7 +21898,7 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
           }
           if (cell.unitId) {
               const unit = rosterLookup.get(cell.unitId);
-              helpers.setMessage(`${label}: ${unit?.name || 'đã có nhân vật'}. Dùng Alt+nhấp để trả ô.`, 'info');
+              helpers.setMessage(`${label}: ${unit?.name || 'đã có nhân vật'}. Nhấp để bỏ nhân vật khỏi ô.`, 'info');
               return;
           }
           if (state.selectedUnitId) {
@@ -22826,7 +22812,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               cellDetails.appendChild(empty);
               const hint = document.createElement('p');
               hint.className = 'lineup-grid__details-empty';
-              hint.textContent = 'Chọn nhân vật từ roster rồi nhấp vào ô để gán. Giữ Alt và nhấp ô đã có nhân vật để bỏ.';
+              hint.textContent = 'Chọn nhân vật từ roster rồi nhấp vào ô để gán. Nhấp ô đã có nhân vật để bỏ.';
               cellDetails.appendChild(hint);
               syncGridDetailsHeight();
               return;
@@ -22834,7 +22820,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           cellDetails.classList.remove('is-empty');
           const interactionHint = document.createElement('p');
           interactionHint.className = 'lineup-grid__details-text';
-          interactionHint.textContent = 'Nhấp trực tiếp vào ô để xem nhân vật này. Giữ Alt rồi nhấp để bỏ khỏi ô.';
+          interactionHint.textContent = 'Nhấp trực tiếp vào ô này để bỏ nhân vật khỏi đội hình.';
           cellDetails.appendChild(interactionHint);
           const kit = unit.raw?.kit ?? null;
           const skillSetId = normalizeUnitId(unit.id);
@@ -22962,12 +22948,6 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
                       : cell.unitId
                           ? 'select'
                           : 'focus';
-                  if (cell.unitId) {
-                      cellEl.dataset.cellAltAction = 'clear';
-                  }
-                  else {
-                      delete cellEl.dataset.cellAltAction;
-                  }
               }
               const displayIndex = cell.section === 'formation'
                   ? cell.index + 1
@@ -23002,7 +22982,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
                   }
               }
               else if (unit) {
-                  ariaLabel += '. Nhấp để chọn. Dùng Alt+nhấp để bỏ nhân vật.';
+                  ariaLabel += '. Nhấp để bỏ nhân vật khỏi ô.';
               }
               else if (state.selectedUnitId) {
                   const selectedUnit = rosterLookup.get(state.selectedUnitId);
@@ -23162,6 +23142,10 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           const fragment = document.createDocumentFragment();
           filtered.forEach(unit => {
               const unitId = normalizeUnitId(unit.id);
+              const isAssigned = assignedUnitIds.has(unitId);
+              if (isAssigned && state.selectedUnitId !== unitId) {
+                  return;
+              }
               const button = document.createElement('button');
               button.type = 'button';
               button.className = 'lineup-roster__entry';
@@ -23169,10 +23153,6 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               button.setAttribute('aria-label', `Chọn ${unit.name}`);
               if (state.selectedUnitId === unitId) {
                   button.classList.add('is-selected');
-              }
-              const isAssigned = assignedUnitIds.has(unitId);
-              if (isAssigned && state.selectedUnitId !== unitId) {
-                  button.classList.add('is-unavailable');
               }
               const avatar = document.createElement('div');
               avatar.className = 'lineup-roster__avatar';
