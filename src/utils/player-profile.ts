@@ -1,5 +1,14 @@
 export interface SavedPlayerProfile {
   lineupDeck?: string[];
+  lineupStateById?: Record<string, {
+    leaderId?: string | null;
+    cells?: Array<{
+      index?: number;
+      unitId?: string | null;
+      unlocked?: boolean;
+      label?: string | null;
+    }>;
+  }>;
   cultivationByUnit?: Record<string, { realm: number; subRealm: number }>;
   sectName?: string;
   tpByUnit?: Record<string, number>;
@@ -72,6 +81,7 @@ export function resetPlayerProfileData(): SavedPlayerProfile {
 
   const resetProfile: SavedPlayerProfile = {
     lineupDeck: [],
+    lineupStateById: {},
     cultivationByUnit: normalizedCultivationByUnit,
     sectName: '',
     tpByUnit: {},

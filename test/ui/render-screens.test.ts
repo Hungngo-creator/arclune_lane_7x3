@@ -121,6 +121,7 @@ describe('renderLineupScreen', () => {
     expect(backButton?.textContent).toContain('Thoát');
 
     handle.destroy();
+    window.localStorage.removeItem('arclune.playerProfile.v1');
   });
   
   it('snapshot bố cục mặc định của lưới 5x2', () => {
@@ -189,7 +190,54 @@ describe('renderLineupScreen', () => {
 
     handle.destroy();
   });
-  
+
+  it('khôi phục lineup đã lưu khi mở lại màn lineup', () => {
+    const root = document.createElement('div');
+    document.body.appendChild(root);
+
+    window.localStorage.setItem('arclune.playerProfile.v1', JSON.stringify({
+      lineupDeck: ['alpha'],
+      lineupStateById: {
+        'lineup-1': {
+          leaderId: 'alpha',
+          cells: [
+            { index: 0, unitId: 'alpha', unlocked: true, label: null },
+            { index: 1, unitId: 'beta', unlocked: true, label: null },
+          ],
+        },
+      },
+    }));
+
+    const roster: RosterEntryLite[] = [
+      { id: 'alpha', name: 'Alpha' },
+      { id: 'beta', name: 'Beta' },
+    ];
+    const lineups: LineupDefinition[] = [
+      {
+        id: 'lineup-1',
+        name: 'Đội hình lưu',
+        members: [],
+        passives: [],
+      },
+    ];
+
+    const handle = renderLineupScreen({
+      root,
+      definition: {
+        label: 'Đội hình lưu',
+        params: { roster, lineups },
+      },
+    });
+
+    const firstCell = root.querySelector<HTMLElement>('.lineup-grid__cells .lineup-cell[data-cell-index="0"]');
+    const secondCell = root.querySelector<HTMLElement>('.lineup-grid__cells .lineup-cell[data-cell-index="1"]');
+    expect(firstCell?.querySelector('.lineup-cell__name')?.textContent).toContain('Alpha');
+    expect(secondCell?.querySelector('.lineup-cell__name')?.textContent).toContain('Beta');
+    expect(root.querySelector('.lineup-leader__name')?.textContent).toContain('Alpha');
+
+    handle.destroy();
+  });
+
   it('áp dụng avatar tròn cho leader/collection và vuông cho ô lineup', () => {
     const lineupRoot = document.createElement('div');
     document.body.appendChild(lineupRoot);

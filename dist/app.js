@@ -22011,6 +22011,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
   const __dep3 = __require('./utils/domain-normalization.ts');
   const normalizeElementKey = __dep3.normalizeElementKey;
   const __dep4 = __require('./utils/player-profile.ts');
+  const loadPlayerProfile = __dep4.loadPlayerProfile;
   const patchPlayerProfile = __dep4.patchPlayerProfile;
   const __dep5 = __require('./utils/currency.ts');
   const createNormalizedWallet = __dep5.createNormalizedWallet;
@@ -22262,6 +22263,42 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
   function formatUnitPower(power) {
       return powerFormatter.format(Number.isFinite(power) ? Number(power) : 0);
   }
+  function applySavedLineupState(lineup, saved, rosterLookup) {
+      if (!saved || typeof saved !== 'object') {
+          return;
+      }
+      const placed = new Set();
+      const savedCells = Array.isArray(saved.cells) ? saved.cells : [];
+      for (const item of savedCells) {
+          if (!item || typeof item !== 'object')
+              continue;
+          const idx = Number(item.index);
+          if (!Number.isFinite(idx))
+              continue;
+          const target = lineup.cells[idx];
+          if (!target)
+              continue;
+          const unlocked = item.unlocked;
+          if (typeof unlocked === 'boolean') {
+              target.unlocked = unlocked;
+          }
+          const label = item.label;
+          if (typeof label === 'string') {
+              target.label = label || null;
+          }
+          const rawUnitId = item.unitId;
+          const normalizedUnitId = typeof rawUnitId === 'string' ? normalizeUnitId(rawUnitId) : null;
+          if (normalizedUnitId && rosterLookup.has(normalizedUnitId) && !placed.has(normalizedUnitId)) {
+              target.unitId = normalizedUnitId;
+              placed.add(normalizedUnitId);
+          }
+          else {
+              target.unitId = null;
+          }
+      }
+      const rawLeaderId = typeof saved.leaderId === 'string' ? normalizeUnitId(saved.leaderId) : null;
+      lineup.leaderId = rawLeaderId && rosterLookup.has(rawLeaderId) ? rawLeaderId : null;
+  }
   function serializeSelectedLineup(lineup) {
       if (!lineup)
           return { unitIds: [] };
@@ -22312,6 +22349,8 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       const rosterLookup = new Map(normalizedRoster.map(unit => [normalizeUnitId(unit.id), unit]));
       const skillSetCache = new Map();
       const lineupState = new Map();
+      const profile = loadPlayerProfile();
+      const savedLineupStateById = profile.lineupStateById ?? {};
       normalizedLineups.forEach(lineup => {
           lineupState.set(lineup.id, {
               ...lineup,
@@ -22324,6 +22363,9 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               passives: lineup.passives.map(passive => ({ ...passive })),
               leaderId: lineup.leaderId || null,
           });
+      });
+      lineupState.forEach((lineup, lineupId) => {
+          applySavedLineupState(lineup, savedLineupStateById[lineupId], rosterLookup);
       });
       const playerCurrencySourceRaw = normalizeCurrencyBalances(playerState ?? null);
       const playerCurrencySource = hasPositiveWalletValue(playerCurrencySourceRaw)
@@ -22538,8 +22580,24 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           return state.lineupState.get(state.selectedLineupId) ?? null;
       }
       function persistLineupSelection() {
-          const selected = serializeSelectedLineup(getSelectedLineup());
-          patchPlayerProfile({ lineupDeck: selected.unitIds });
+          const selectedLineup = getSelectedLineup();
+          const selected = serializeSelectedLineup(selectedLineup);
+          const serializedLineupState = {};
+          state.lineupState.forEach((lineup, lineupId) => {
+              serializedLineupState[lineupId] = {
+                  leaderId: lineup.leaderId ?? null,
+                  cells: lineup.cells.map(cell => ({
+                      index: cell.index,
+                      unitId: cell.unitId ?? null,
+                      unlocked: Boolean(cell.unlocked),
+                      label: cell.label ?? null,
+                  })),
+              };
+          });
+          patchPlayerProfile({
+              lineupDeck: selected.unitIds,
+              lineupStateById: serializedLineupState,
+          });
       }
       function setMessage(text, type = 'info') {
           state.message = text || '';
@@ -30322,6 +30380,7 @@ __define('./utils/player-profile.ts', (exports, module, __require) => {
       }
       const resetProfile = {
           lineupDeck: [],
+          lineupStateById: {},
           cultivationByUnit: normalizedCultivationByUnit,
           sectName: '',
           tpByUnit: {},
