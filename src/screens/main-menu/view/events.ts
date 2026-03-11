@@ -24,6 +24,7 @@ const TAG_CLASS_MAP = new Map<string, string>([
 ]);
 
 const ECONOMY_COMPACT_KEYS = new Set<string>([
+  'arena-hub',
   'tongmon',
   'gacha',
   'lineup',

@@ -8,7 +8,7 @@ import type {
   MenuCardMetadata,
   MenuSection
 } from '../types.ts';
-import { createModeCard, createModeGroupCard } from './events.ts';
+import { createModeCard } from './events.ts';
 
 const STYLE_ID = 'main-menu-view-style';
 
@@ -25,11 +25,16 @@ export function ensureStyles(): void {
     .main-menu-v2__layout{display:grid;grid-template-columns:minmax(0,1fr);gap:32px;align-items:start;}
     .main-menu-v2__primary{display:flex;flex-direction:column;gap:32px;}
     .main-menu-modes{display:flex;flex-direction:column;gap:24px;}
+    .main-menu-modes--hub-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,1fr) minmax(0,1fr);gap:16px;align-items:start;}
+    .main-menu-hub-column{display:flex;flex-direction:column;gap:12px;align-items:stretch;}
+    .main-menu-hub-column--left{justify-self:start;}
+    .main-menu-hub-column--right{justify-self:end;}
+    .main-menu-hub-spacer{min-height:420px;}
     .main-menu-modes__title{margin:0;font-size:24px;letter-spacing:.1em;text-transform:uppercase;color:#aee4ff;}
     .mode-section{display:flex;flex-direction:column;gap:18px;}
     .mode-section__name{margin:0;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
     .mode-grid{display:flex;flex-direction:column;gap:16px;}
-    .mode-card{position:relative;display:flex;flex-direction:column;gap:12px;align-items:flex-start;padding:24px;border-radius:20px;border:1px solid rgba(125,211,252,.24);background:linear-gradient(150deg,rgba(16,26,36,.92),rgba(18,30,42,.65));color:inherit;cursor:pointer;transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;}
+    .mode-card{position:relative;display:flex;flex-direction:column;gap:11px;align-items:flex-start;padding:22px;border-radius:18px;border:1px solid rgba(125,211,252,.24);background:linear-gradient(150deg,rgba(16,26,36,.92),rgba(18,30,42,.65));color:inherit;cursor:pointer;transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;}
     .mode-card:hover{transform:translateY(-4px);box-shadow:0 20px 44px rgba(6,12,18,.55);border-color:rgba(125,211,252,.46);}
     .mode-card:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:4px;}
     .mode-card__icon{font-size:28px;line-height:1;filter:drop-shadow(0 0 10px rgba(125,211,252,.26));}
@@ -42,7 +47,7 @@ export function ensureStyles(): void {
     .mode-tag--coming{color:#ffe066;border-color:rgba(255,224,102,.35);background:rgba(36,26,12,.82);}
     .mode-tag--economy{color:#ffd9a1;border-color:rgba(255,195,128,.35);background:rgba(36,24,12,.82);}
     .mode-card__status{position:absolute;top:18px;right:18px;padding:6px 12px;border-radius:999px;border:1px solid rgba(255,224,102,.42);background:rgba(36,26,12,.78);color:#ffe066;font-size:11px;letter-spacing:.16em;text-transform:uppercase;}
-    .mode-card--compact{padding:16px 14px;gap:10px;min-height:0;align-items:center;text-align:center;}
+    .mode-card--compact{padding:14px 13px;gap:9px;min-height:0;align-items:center;text-align:center;width:126px;min-height:86px;justify-content:center;}
     .mode-card--compact .mode-card__icon{font-size:24px;}
     .mode-card--compact .mode-card__title{font-size:14px;letter-spacing:.1em;}
     .mode-card--compact .mode-card__tags{display:none;}
@@ -93,7 +98,7 @@ export function ensureStyles(): void {
     .main-menu-settings-confirm-btn{border:1px solid rgba(125,211,252,.35);background:rgba(16,26,36,.9);color:#d8eeff;border-radius:10px;padding:8px 12px;cursor:pointer;}
     .main-menu-settings-confirm-btn--danger{border-color:rgba(255,128,128,.45);background:rgba(80,18,24,.9);color:#ffe3e3;}
 
-    @media(max-width:960px){.main-menu-v2__layout{grid-template-columns:1fr;}}
+    @media(max-width:960px){.main-menu-v2__layout{grid-template-columns:1fr;}.main-menu-modes--hub-layout{grid-template-columns:1fr;}.main-menu-hub-column--right{justify-self:start;}.main-menu-hub-spacer{display:none;}}
     @media(max-width:640px){.main-menu-v2{gap:24px;}.main-menu-v2__title{font-size:36px;}.mode-card{padding:20px;}}
   `;
 
@@ -120,47 +125,64 @@ export function createModesSection(options: ModesSectionOptions): HTMLElement {
     }
   });
 
+  const availableKeys = new Set<string>();
   sections.forEach(section => {
     if (!section) return;
-    const sectionGroup = document.createElement('div');
-    sectionGroup.className = 'mode-section';
-
-    if (section.title) { const heading = document.createElement('h3');
-  heading.className = 'mode-section_name';
-  heading.textContent = section.title;
-  sectionGroup.appendChild(heading);
-     }
-
-    const grid = document.createElement('div');
-    grid.className = 'mode-grid';
-    if (section.id === 'economy'){
-      grid.classList.add('mode-grid--economy');
-    }
-
     section.entries.forEach(entry => {
       if (!entry) return;
       const cardKey = entry.cardId || entry.id;
-      if (!cardKey) return;
-      const cardMeta = metaByKey.get(cardKey);
-      if (!cardMeta) return;
-
-      if (entry.type === 'group'){
-        const childMetas = entry.childModeIds
-          .map(childId => (childId ? metaByKey.get(childId) : null))
-          .filter((item): item is MenuCardMetadata => Boolean(item));
-        if (childMetas.length === 0) return;
-        const groupCard = createModeGroupCard(cardMeta, childMetas, shell, onShowComingSoon, addCleanup);
-        grid.appendChild(groupCard);
-        return;
+      if (cardKey){
+        availableKeys.add(cardKey);
       }
-
-      const card = createModeCard(cardMeta, shell, onShowComingSoon, addCleanup);
-      grid.appendChild(card);
+      if (entry.type === 'group'){
+        entry.childModeIds.forEach(childId => {
+          if (childId){
+            availableKeys.add(childId);
+          }
+        });
+      }
     });
-
-    sectionGroup.appendChild(grid);
-    sectionEl.appendChild(sectionGroup);
   });
+
+      const hubLayout = document.createElement('div');
+  hubLayout.className = 'main-menu-modes--hub-layout';
+
+  const leftColumn = document.createElement('div');
+  leftColumn.className = 'main-menu-hub-column main-menu-hub-column--left';
+  const rightColumn = document.createElement('div');
+  rightColumn.className = 'main-menu-hub-column main-menu-hub-column--right';
+  const spacer = document.createElement('div');
+  spacer.className = 'main-menu-hub-spacer';
+
+  const createHubCard = (key: string): HTMLButtonElement | null => {
+    if (!availableKeys.has(key)) return null;
+    const cardMeta = metaByKey.get(key);
+    if (!cardMeta) return null;
+    return createModeCard(cardMeta, shell, onShowComingSoon, addCleanup, {
+      extraClasses: ['mode-card--hub']
+    });
+  };
+
+    const leftOrder = ['arena-hub', 'collection', 'lineup', 'tongmon'];
+  leftOrder.forEach(key => {
+    const card = createHubCard(key);
+    if (card){
+      leftColumn.appendChild(card);
+    }
+  });
+
+  const rightOrder = ['gacha', 'market', 'events', 'social'];
+  rightOrder.forEach(key => {
+    const card = createHubCard(key);
+    if (card){
+      rightColumn.appendChild(card);
+    }
+  });
+
+  hubLayout.appendChild(leftColumn);
+  hubLayout.appendChild(spacer);
+  hubLayout.appendChild(rightColumn);
+  sectionEl.appendChild(hubLayout);
 
   return sectionEl;
 }
