@@ -19989,12 +19989,80 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       { fromRealm: 6, fromSubRealm: 1, toRealm: 6, toSubRealm: 2, gain: 925 },
       { fromRealm: 6, fromSubRealm: 2, toRealm: 6, toSubRealm: 3, gain: 1025 },
   ]);
+  const TP_GAIN_RULE_LOOKUP = Object.freeze(Object.fromEntries(TP_GAIN_RULES.map((rule) => [
+      `${rule.fromRealm}:${rule.fromSubRealm}->${rule.toRealm}:${rule.toSubRealm}`,
+      rule.gain,
+  ])));
+  const TP_FALLBACK_PER_SUBREALM_BY_REALM = Object.freeze({
+      1: 5,
+      2: 10,
+      3: 50,
+      4: 170,
+      5: 450,
+      6: 925,
+      7: 1200,
+      8: 1500,
+      9: 1800,
+  });
+  const TP_FALLBACK_BREAKTHROUGH_BY_REALM = Object.freeze({
+      1: 30,
+      2: 70,
+      3: 150,
+      4: 300,
+      5: 825,
+      6: 1200,
+      7: 1500,
+      8: 1800,
+  });
+  function resolveRealmMaxSubRealm(realm) {
+      const realmEconomy = getCultivationRealmEconomy(realm);
+      return realmEconomy?.subRealmCosts.length ?? 0;
+  }
+  function resolveNextCultivationStep(realm, subRealm) {
+      const currentMaxSubRealm = resolveRealmMaxSubRealm(realm);
+      if (currentMaxSubRealm <= 0)
+          return null;
+      if (subRealm < currentMaxSubRealm) {
+          return { realm, subRealm: subRealm + 1 };
+      }
+      if (resolveRealmMaxSubRealm(realm + 1) <= 0) {
+          return null;
+      }
+      return { realm: realm + 1, subRealm: 1 };
+  }
+  function resolveFallbackTpGain(params) {
+      if (params.toRealm === params.fromRealm) {
+          return TP_FALLBACK_PER_SUBREALM_BY_REALM[params.toRealm] ?? 0;
+      }
+      return TP_FALLBACK_BREAKTHROUGH_BY_REALM[params.fromRealm] ?? 0;
+  }
   function resolveTpGainForUpgrade(params) {
-      const found = TP_GAIN_RULES.find((rule) => (rule.fromRealm === params.fromRealm
-          && rule.fromSubRealm === params.fromSubRealm
-          && rule.toRealm === params.toRealm
-          && rule.toSubRealm === params.toSubRealm));
-      return found?.gain ?? 0;
+      const key = `${params.fromRealm}:${params.fromSubRealm}->${params.toRealm}:${params.toSubRealm}`;
+      const explicit = TP_GAIN_RULE_LOOKUP[key];
+      if (typeof explicit === 'number')
+          return explicit;
+      return resolveFallbackTpGain(params);
+  }
+  function resolveTotalEarnedTp(realm, subRealm) {
+      const normalizedRealm = Number.isFinite(realm) ? Math.max(1, Math.floor(realm)) : 1;
+      const normalizedSubRealm = Number.isFinite(subRealm) ? Math.max(0, Math.floor(subRealm)) : 0;
+      let cursorRealm = 1;
+      let cursorSubRealm = 0;
+      let total = 0;
+      while (cursorRealm < normalizedRealm || (cursorRealm === normalizedRealm && cursorSubRealm < normalizedSubRealm)) {
+          const next = resolveNextCultivationStep(cursorRealm, cursorSubRealm);
+          if (!next)
+              break;
+          total += resolveTpGainForUpgrade({
+              fromRealm: cursorRealm,
+              fromSubRealm: cursorSubRealm,
+              toRealm: next.realm,
+              toSubRealm: next.subRealm,
+          });
+          cursorRealm = next.realm;
+          cursorSubRealm = next.subRealm;
+      }
+      return Math.max(0, Math.floor(total));
   }
   function normalizeTpAllocMap(value) {
       if (!value || typeof value !== 'object' || Array.isArray(value))
@@ -20608,7 +20676,24 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           if (!unitId)
               return 0;
           const raw = Number(savedTpByUnit[unitId] ?? 0);
-          return Number.isFinite(raw) ? Math.max(0, Math.floor(raw)) : 0;
+          if (Number.isFinite(raw) && raw > 0) {
+              return Math.max(0, Math.floor(raw));
+          }
+          const cultivated = savedCultivationByUnit[unitId];
+          if (!cultivated) {
+              return 0;
+          }
+          const earnedTp = resolveTotalEarnedTp(cultivated.realm, cultivated.subRealm);
+          if (earnedTp <= 0) {
+              return 0;
+          }
+          const spentTp = Object.values(getUnitTpAlloc(unitId)).reduce((sum, value) => {
+              const numeric = Number(value ?? 0);
+              if (!Number.isFinite(numeric) || numeric <= 0)
+                  return sum;
+              return sum + Math.floor(numeric);
+          }, 0);
+          return Math.max(0, earnedTp - spentTp);
       };
       const getUnitTpAlloc = (unitId) => {
           if (!unitId)

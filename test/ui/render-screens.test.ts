@@ -10,9 +10,13 @@ import { resolveCurrencyBalance } from '../../src/screens/collection/helpers.ts'
 import type { MainMenuState, MenuCardMetadata, MenuSection } from '../../src/screens/main-menu/types.ts';
 import type { RosterEntryLite, LineupDefinition } from '@shared-types/lineup';
 import type { LineupCurrencyConfig, LineupCurrencies } from '@shared-types/currency';
+import { savePlayerProfile } from '../../src/utils/player-profile.ts';
 
 beforeEach(() => {
-  document.body.innerHTML = '';
+  if (typeof document !== 'undefined'){
+    document.body.innerHTML = '';
+  }
+  savePlayerProfile({});
 });
 
 function getAvatarText(cell: Element): string {
@@ -342,6 +346,37 @@ describe('renderCollectionScreen', () => {
 
     const stageStatus = root.querySelector<HTMLElement>('.collection-stage__status');
     expect(stageStatus?.textContent ?? '').toContain('(+5 TP)');
+
+    handle.destroy();
+  });
+
+  it('khôi phục TP khả dụng từ tu vi đã lưu khi thiếu tpByUnit', () => {
+    const root = document.createElement('div');
+    document.body.appendChild(root);
+
+    savePlayerProfile({
+      cultivationByUnit: {
+        omega: { realm: 8, subRealm: 1 },
+      },
+      tpAllocByUnit: {
+        omega: { HP: 120 },
+      },
+    });
+
+    const roster: RosterEntryLite[] = [
+      { id: 'omega', name: 'Omega', class: 'Support', rank: 'SSR', tags: ['support'], passives: [] },
+    ];
+
+    const handle = renderCollectionScreen({
+      root,
+      params: {
+        roster,
+      },
+    });
+
+    const plusBtn = root.querySelector<HTMLButtonElement>('.collection-stage__mini-stats-plus');
+    expect(plusBtn).not.toBeNull();
+    expect(plusBtn?.disabled).toBe(false);
 
     handle.destroy();
   });
