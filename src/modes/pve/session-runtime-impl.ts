@@ -217,6 +217,23 @@ interface UltSpec extends Record<string, unknown> {
   summon?: SummonSpec | null;
 }
 
+const ULT_TAG_CACHE = new WeakMap<UltSpec, ReadonlyArray<string>>();
+
+const getNormalizedUltTags = (ult: UltSpec): ReadonlyArray<string> => {
+  const cached = ULT_TAG_CACHE.get(ult);
+  if (cached) {
+    return cached;
+  }
+  const rawUltTags = [
+    ...(Array.isArray(ult.tags) ? ult.tags : []),
+    ...(Array.isArray(ult.meta?.tags) ? ult.meta.tags : []),
+    ...(Array.isArray(ult.metadata?.tags) ? ult.metadata.tags : []),
+  ].filter((tag): tag is string => typeof tag === 'string' && tag.trim().length > 0);
+  const normalized = normalizeTagList(rawUltTags);
+  ULT_TAG_CACHE.set(ult, normalized);
+  return normalized;
+};
+
 const isPlainRecord = (value: unknown): value is Record<string, unknown> => (
   !!value && typeof value === 'object'
 );
@@ -1779,12 +1796,7 @@ function performUlt(unit: UnitToken): void {
   if (!u){ spendFury(unit, resolveUltCost(unit)); return; }
 
   const foeSide = unit.side === 'ally' ? 'enemy' : 'ally';
-  const rawUltTags = [
-    ...(Array.isArray(u.tags) ? u.tags : []),
-    ...(Array.isArray(u.meta?.tags) ? u.meta.tags : []),
-    ...(Array.isArray(u.metadata?.tags) ? u.metadata.tags : []),
-  ].filter((tag): tag is string => typeof tag === 'string' && tag.trim().length > 0);
-  const normalizedUltTags = normalizeTagList(rawUltTags);
+  const normalizedUltTags = getNormalizedUltTags(u);
   dispatchGameplayTags(normalizedUltTags, {
     game,
     attacker: unit,

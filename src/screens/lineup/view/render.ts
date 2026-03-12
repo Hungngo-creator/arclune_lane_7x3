@@ -41,6 +41,8 @@ import type { LineupDefinition, RosterEntryLite } from '@shared-types/lineup';
 
 const STYLE_ID = 'lineup-view-style-v1';
 const powerFormatter = createNumberFormatter('vi-VN');
+const NAME_INITIALS_CACHE = new Map<string, string>();
+const UNIT_CODE_CACHE = new Map<string, string>();
 
 const ELEMENT_ICON: Readonly<Record<string, string>> = {
   fire: '🔥', metal: '⚙️', wood: '🌿', earth: '⛰️', lightning: '⚡', blood: '🩸', water: '💧',
@@ -224,6 +226,14 @@ function extractCodeFromNormalized(normalized: string): string{
 }
 
 function getUnitCode(unit: RosterUnit | null | undefined, fallbackLabel: string): string{
+  const unitIdKey = unit?.id ?? '';
+  const fallbackKey = typeof fallbackLabel === 'string' ? fallbackLabel : '';
+  const cacheKey = `${unitIdKey}::${fallbackKey}`;
+  const cached = UNIT_CODE_CACHE.get(cacheKey);
+  if (cached != null) {
+    return cached;
+  }
+
   const sourceName = unit?.name && unit.name.trim()
     ? unit.name
     : (typeof fallbackLabel === 'string' ? fallbackLabel : '');
@@ -233,7 +243,9 @@ function getUnitCode(unit: RosterUnit | null | undefined, fallbackLabel: string)
     const normalizedId = normalizeForCode(unit?.id != null ? String(unit.id) : '');
     code = extractCodeFromNormalized(normalizedId);
   }
-  return code ? code.toLocaleUpperCase('vi-VN') : '';
+  const resolved = code ? code.toLocaleUpperCase('vi-VN') : '';
+  UNIT_CODE_CACHE.set(cacheKey, resolved);
+  return resolved;
 }
 
 function getInitials(parts: string[]): string{
@@ -257,8 +269,14 @@ function getNameInitials(name: string): string{
   if (!name){
     return '';
   }
+  const cached = NAME_INITIALS_CACHE.get(name);
+  if (cached != null) {
+    return cached;
+  }
   const parts = name.trim().split(/\s+/);
-  return getInitials(parts);
+  const initials = getInitials(parts);
+  NAME_INITIALS_CACHE.set(name, initials);
+  return initials;
 }
 
 function renderAvatar(container: HTMLElement, avatarUrl: string | null, name: string): void{

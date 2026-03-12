@@ -26,6 +26,7 @@ export interface RosterUnit {
   rankKey: string;
   tags: string[];
   tagKeys: string[];
+  tagKeySet: Set<string>;
   power: number | null;
   avatar: string | null;
   passives: unknown[];
@@ -137,6 +138,7 @@ function normalizeRosterEntry(entry: RosterEntryLite | null | undefined, index: 
   const normalizedRole = typeof role === 'string' ? role : '';
   const normalizedRank = typeof rank === 'string' ? rank : '';
   const normalizedTags = tags.map(tag => String(tag));
+  const normalizedTagKeys = normalizedTags.map(tag => tag.toLowerCase());
 
   return {
     id: String(id),
@@ -146,7 +148,8 @@ function normalizeRosterEntry(entry: RosterEntryLite | null | undefined, index: 
     rank: normalizedRank,
     rankKey: normalizedRank.toLowerCase(),
     tags: normalizedTags,
-    tagKeys: normalizedTags.map(tag => tag.toLowerCase()),
+    tagKeys: normalizedTagKeys,
+    tagKeySet: new Set(normalizedTagKeys),
     power: power ?? null,
     avatar,
     passives,
@@ -532,7 +535,7 @@ export function filterRoster(roster: RosterUnit[], filter: LineupFilter): Roster
     return roster.filter(unit => unit.rankKey === value);
   }
   if (filter.type === 'tag'){
-    return roster.filter(unit => unit.tagKeys.includes(value));
+    return roster.filter(unit => unit.tagKeySet.has(value));
   }
   return roster;
 }

@@ -12935,6 +12935,21 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   const isLeaderUltReady = __dep26.isLeaderUltReady;
   const isUyenLeader = __dep26.isUyenLeader;
   const queueUyenUltCast = __dep26.queueUyenUltCast;
+  const ULT_TAG_CACHE = new WeakMap();
+  const getNormalizedUltTags = (ult) => {
+      const cached = ULT_TAG_CACHE.get(ult);
+      if (cached) {
+          return cached;
+      }
+      const rawUltTags = [
+          ...(Array.isArray(ult.tags) ? ult.tags : []),
+          ...(Array.isArray(ult.meta?.tags) ? ult.meta.tags : []),
+          ...(Array.isArray(ult.metadata?.tags) ? ult.metadata.tags : []),
+      ].filter((tag) => typeof tag === 'string' && tag.trim().length > 0);
+      const normalized = normalizeTagList(rawUltTags);
+      ULT_TAG_CACHE.set(ult, normalized);
+      return normalized;
+  };
   const isPlainRecord = (value) => (!!value && typeof value === 'object');
   const isFiniteNumber = (value) => (typeof value === 'number' && Number.isFinite(value));
   const parseFiniteNumber = (value) => {
@@ -14400,12 +14415,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           return;
       }
       const foeSide = unit.side === 'ally' ? 'enemy' : 'ally';
-      const rawUltTags = [
-          ...(Array.isArray(u.tags) ? u.tags : []),
-          ...(Array.isArray(u.meta?.tags) ? u.meta.tags : []),
-          ...(Array.isArray(u.metadata?.tags) ? u.metadata.tags : []),
-      ].filter((tag) => typeof tag === 'string' && tag.trim().length > 0);
-      const normalizedUltTags = normalizeTagList(rawUltTags);
+      const normalizedUltTags = getNormalizedUltTags(u);
       dispatchGameplayTags(normalizedUltTags, {
           game,
           attacker: unit,
@@ -22188,6 +22198,8 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
   const bindLineupEvents = __dep9.bindLineupEvents;
   const STYLE_ID = 'lineup-view-style-v1';
   const powerFormatter = createNumberFormatter('vi-VN');
+  const NAME_INITIALS_CACHE = new Map();
+  const UNIT_CODE_CACHE = new Map();
   const ELEMENT_ICON = {
       fire: '🔥', metal: '⚙️', wood: '🌿', earth: '⛰️', lightning: '⚡', blood: '🩸', water: '💧',
       light: '✨', dark: '🌑', wind: '🌪️', neutral: '⚪',
@@ -22362,6 +22374,13 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       return cleaned.slice(0, 3);
   }
   function getUnitCode(unit, fallbackLabel) {
+      const unitIdKey = unit?.id ?? '';
+      const fallbackKey = typeof fallbackLabel === 'string' ? fallbackLabel : '';
+      const cacheKey = `${unitIdKey}::${fallbackKey}`;
+      const cached = UNIT_CODE_CACHE.get(cacheKey);
+      if (cached != null) {
+          return cached;
+      }
       const sourceName = unit?.name && unit.name.trim()
           ? unit.name
           : (typeof fallbackLabel === 'string' ? fallbackLabel : '');
@@ -22371,7 +22390,9 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           const normalizedId = normalizeForCode(unit?.id != null ? String(unit.id) : '');
           code = extractCodeFromNormalized(normalizedId);
       }
-      return code ? code.toLocaleUpperCase('vi-VN') : '';
+      const resolved = code ? code.toLocaleUpperCase('vi-VN') : '';
+      UNIT_CODE_CACHE.set(cacheKey, resolved);
+      return resolved;
   }
   function getInitials(parts) {
       if (!Array.isArray(parts) || parts.length === 0) {
@@ -22393,8 +22414,14 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       if (!name) {
           return '';
       }
+      const cached = NAME_INITIALS_CACHE.get(name);
+      if (cached != null) {
+          return cached;
+      }
       const parts = name.trim().split(/\s+/);
-      return getInitials(parts);
+      const initials = getInitials(parts);
+      NAME_INITIALS_CACHE.set(name, initials);
+      return initials;
   }
   function renderAvatar(container, avatarUrl, name) {
       container.replaceChildren();
@@ -23492,6 +23519,7 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
       const normalizedRole = typeof role === 'string' ? role : '';
       const normalizedRank = typeof rank === 'string' ? rank : '';
       const normalizedTags = tags.map(tag => String(tag));
+      const normalizedTagKeys = normalizedTags.map(tag => tag.toLowerCase());
       return {
           id: String(id),
           name: typeof name === 'string' ? name : `Nhân vật #${index + 1}`,
@@ -23500,7 +23528,8 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
           rank: normalizedRank,
           rankKey: normalizedRank.toLowerCase(),
           tags: normalizedTags,
-          tagKeys: normalizedTags.map(tag => tag.toLowerCase()),
+          tagKeys: normalizedTagKeys,
+          tagKeySet: new Set(normalizedTagKeys),
           power: power ?? null,
           avatar,
           passives,
@@ -23869,7 +23898,7 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
           return roster.filter(unit => unit.rankKey === value);
       }
       if (filter.type === 'tag') {
-          return roster.filter(unit => unit.tagKeys.includes(value));
+          return roster.filter(unit => unit.tagKeySet.has(value));
       }
       return roster;
   }
@@ -26778,6 +26807,17 @@ __define('./screens/ui-gacha/logic/gacha.ts', (exports, module, __require) => {
   const EXCLUDED_GACHA_TAGS = new Set(['npc', 'pve']);
   const FEATURED_SUMMONABLE_CACHE = new WeakMap();
   const FEATURED_BY_RARITY_CACHE = new WeakMap();
+  let bannerLookupSource = null;
+  let bannerLookupById = new Map();
+  function getBannerLookup() {
+      const currentSource = GACHA_CONFIG.banners;
+      if (bannerLookupSource === currentSource) {
+          return bannerLookupById;
+      }
+      bannerLookupSource = currentSource;
+      bannerLookupById = new Map(currentSource.map((entry) => [entry.id, entry]));
+      return bannerLookupById;
+  }
   function isGachaSummonableFeaturedUnit(entry) {
       if (!entry || typeof entry !== 'object')
           return false;
@@ -26829,14 +26869,18 @@ __define('./screens/ui-gacha/logic/gacha.ts', (exports, module, __require) => {
       return applyRoll(banner, state, rng, (rarity, forced) => shouldHitFeatured(banner, rarity, forced, featuredRng));
   }
   function multiRoll(banner, stateMap, count, options = {}) {
-      const results = [];
-      for (let i = 0; i < count; i += 1) {
-          results.push(rollBanner(banner, stateMap, options));
+      const total = Number.isFinite(count) ? Math.max(0, Math.floor(count)) : 0;
+      if (total === 0) {
+          return [];
+      }
+      const results = new Array(total);
+      for (let i = 0; i < total; i += 1) {
+          results[i] = rollBanner(banner, stateMap, options);
       }
       return results;
   }
   function getBannerById(id) {
-      return GACHA_CONFIG.banners.find((entry) => entry.id === id) ?? null;
+      return getBannerLookup().get(id) ?? null;
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'isGachaSummonableFeaturedUnit')) exports.isGachaSummonableFeaturedUnit = isGachaSummonableFeaturedUnit;

@@ -15,6 +15,18 @@ const DEFAULT_RANDOM: RandomSource = () => Math.random();
 const EXCLUDED_GACHA_TAGS = new Set(['npc', 'pve']);
 const FEATURED_SUMMONABLE_CACHE = new WeakMap<BannerDefinition, FeaturedUnit[]>();
 const FEATURED_BY_RARITY_CACHE = new WeakMap<BannerDefinition, Map<Rarity, FeaturedUnit[]>>();
+let bannerLookupSource: ReadonlyArray<BannerDefinition> | null = null;
+let bannerLookupById = new Map<string, BannerDefinition>();
+
+function getBannerLookup(): Map<string, BannerDefinition> {
+  const currentSource = GACHA_CONFIG.banners;
+  if (bannerLookupSource === currentSource) {
+    return bannerLookupById;
+  }
+  bannerLookupSource = currentSource;
+  bannerLookupById = new Map(currentSource.map((entry) => [entry.id, entry] as const));
+  return bannerLookupById;
+}
 
 export function isGachaSummonableFeaturedUnit(entry: FeaturedUnit): boolean {
   if (!entry || typeof entry !== 'object') return false;
@@ -83,13 +95,18 @@ export function multiRoll(
   count: number,
   options: { rng?: RandomSource; featuredRng?: RandomSource } = {},
 ): RollResult[] {
-  const results: RollResult[] = [];
-  for (let i = 0; i < count; i += 1) {
-    results.push(rollBanner(banner, stateMap, options));
+  const total = Number.isFinite(count) ? Math.max(0, Math.floor(count)) : 0;
+  if (total === 0) {
+    return [];
+  }
+
+  const results = new Array<RollResult>(total);
+  for (let i = 0; i < total; i += 1) {
+    results[i] = rollBanner(banner, stateMap, options);
   }
   return results;
 }
 
 export function getBannerById(id: string): BannerDefinition | null {
-  return GACHA_CONFIG.banners.find((entry) => entry.id === id) ?? null;
+  return getBannerLookup().get(id) ?? null;
 }
