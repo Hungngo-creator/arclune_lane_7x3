@@ -1,6 +1,7 @@
 import { ensureStyleTag, mountSection } from '../../ui/dom.ts';
 import { UNITS } from '../../units.ts';
 import { loadPlayerProfile, patchPlayerProfile } from '../../utils/player-profile.ts';
+import { normalizeUnitId } from '../../utils/unit-id.ts';
 import type { MainMenuShell } from '../main-menu/types.ts';
 import type { GambitActionType } from '../../types/pve.ts';
 
@@ -52,6 +53,10 @@ function loadConfig(): Record<string, unknown> {
   return { ...((loadPlayerProfile().tacticalAiByUnit as Record<string, unknown>) ?? {}) };
 }
 
+function sanitizeUnitId(value: unknown): string {
+  return normalizeUnitId(typeof value === 'string' ? value : '');
+}
+
 export function renderScreen({ root, shell = null }: { root: HTMLElement; shell?: MainMenuShell | null }): { destroy: () => void } {
   ensureStyles();
   const container = document.createElement('div');
@@ -84,14 +89,30 @@ export function renderScreen({ root, shell = null }: { root: HTMLElement; shell?
   const allUnits = [...UNITS];
   let activeUnitId = allUnits[0]?.id ?? '';
   const tacticalConfig = loadConfig();
+  let saveTimerId: number | null = null;
 
-  const save = (): void => {
+  const flushSave = (): void => {
+    if (saveTimerId != null) {
+      window.clearTimeout(saveTimerId);
+      saveTimerId = null;
+    }
     patchPlayerProfile({ tacticalAiByUnit: tacticalConfig });
+  };
+
+  const scheduleSave = (): void => {
+    if (saveTimerId != null) {
+      window.clearTimeout(saveTimerId);
+    }
+    saveTimerId = window.setTimeout(() => {
+      saveTimerId = null;
+      patchPlayerProfile({ tacticalAiByUnit: tacticalConfig });
+    }, 120);
   };
 
   const renderEditor = (): void => {
     right.innerHTML = '';
-    const unitRows = Array.isArray(tacticalConfig[activeUnitId]) ? (tacticalConfig[activeUnitId] as Record<string, unknown>[]) : [];
+    const normalizedUnitId = sanitizeUnitId(activeUnitId);
+    const unitRows = Array.isArray(tacticalConfig[normalizedUnitId]) ? (tacticalConfig[normalizedUnitId] as Record<string, unknown>[]) : [];
 
     for (let i = 0; i < SLOT_COUNT; i += 1) {
       const row = document.createElement('div');
@@ -121,15 +142,15 @@ export function renderScreen({ root, shell = null }: { root: HTMLElement; shell?
       threshold.value = String(slot.threshold ?? 30);
 
       const onChange = () => {
-        const rows = Array.isArray(tacticalConfig[activeUnitId]) ? [...(tacticalConfig[activeUnitId] as Record<string, unknown>[])] : [];
+        const rows = Array.isArray(tacticalConfig[normalizedUnitId]) ? [...(tacticalConfig[normalizedUnitId] as Record<string, unknown>[])] : [];
         rows[i] = {
           condition: condition.value,
           action: action.value,
           threshold: Number(threshold.value || 0),
           enabled: true,
         };
-        tacticalConfig[activeUnitId] = rows;
-        save();
+        tacticalConfig[normalizedUnitId] = rows;
+        scheduleSave();
       };
 
       condition.onchange = onChange;
@@ -158,10 +179,10 @@ export function renderScreen({ root, shell = null }: { root: HTMLElement; shell?
   renderUnits();
   renderEditor();
 
-  const onUnload = () => save();
+  const onUnload = () => flushSave();
   window.addEventListener('beforeunload', onUnload);
 
-  return { destroy(){ window.removeEventListener('beforeunload', onUnload); save(); mount.destroy(); } };
+  return { destroy(){ window.removeEventListener('beforeunload', onUnload); flushSave(); mount.destroy(); } };
 }
 
 export const render = renderScreen;

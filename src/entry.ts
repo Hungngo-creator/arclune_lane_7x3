@@ -11,6 +11,7 @@ import type { UnknownRecord } from '@shared-types/common';
 import type { MenuCardMetadata, MenuSection } from './screens/main-menu/types.ts';
 import type { LineupViewHandle } from './screens/lineup/view/index.ts';
 import { loadPlayerProfile } from './utils/player-profile.ts';
+import { normalizeUnitId } from './utils/unit-id.ts';
 
 export interface ScreenParamMap {
   readonly [key: string]: unknown;
@@ -185,11 +186,14 @@ function mergeCollectionUnitsWithGambits(
   if (!tacticalAiByUnit || typeof tacticalAiByUnit !== 'object') return null;
 
   const tacticalRows = Object.entries(tacticalAiByUnit as Record<string, unknown>)
-    .filter(([unitId, rows]) => {
-      if (typeof unitId !== 'string' || unitId.trim() === '') return false;
-      if (Array.isArray(rows)) return true;
-      return Boolean(rows) && typeof rows === 'object';
-    });
+    .reduce<Array<[string, unknown]>>((acc, [unitId, rows]) => {
+      const normalizedUnitId = normalizeUnitId(unitId);
+      if (!normalizedUnitId) return acc;
+      if (Array.isArray(rows) || (rows && typeof rows === 'object')) {
+        acc.push([normalizedUnitId, rows]);
+      }
+      return acc;
+    }, []);
   if (tacticalRows.length === 0) return null;
 
   const sourceState = currentCollectionState && typeof currentCollectionState === 'object' && !Array.isArray(currentCollectionState)
@@ -197,18 +201,20 @@ function mergeCollectionUnitsWithGambits(
     : {};
   const sourceUnits = Array.isArray(sourceState.units) ? sourceState.units : [];
   const mergedUnits = [...sourceUnits];
+  const unitIndexById = new Map<string, number>();
 
-  const findUnitIndex = (unitId: string): number => mergedUnits.findIndex((entry) => (
-    entry &&
-    typeof entry === 'object' &&
-    !Array.isArray(entry) &&
-    typeof (entry as Record<string, unknown>).unitId === 'string' &&
-    ((entry as Record<string, unknown>).unitId as string).trim() === unitId
-  ));
+  for (let index = 0; index < mergedUnits.length; index += 1) {
+    const entry = mergedUnits[index];
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) continue;
+    const rawUnitId = (entry as Record<string, unknown>).unitId;
+    const normalizedUnitId = normalizeUnitId(typeof rawUnitId === 'string' ? rawUnitId : '');
+    if (!normalizedUnitId || unitIndexById.has(normalizedUnitId)) continue;
+    unitIndexById.set(normalizedUnitId, index);
+  }
 
   for (const [unitId, gambit] of tacticalRows) {
-    const index = findUnitIndex(unitId);
-    if (index >= 0) {
+    const index = unitIndexById.get(unitId);
+    if (typeof index === 'number') {
       const existing = mergedUnits[index];
       const nextEntry: Record<string, unknown> = existing && typeof existing === 'object' && !Array.isArray(existing)
         ? { ...(existing as Record<string, unknown>) }
@@ -218,6 +224,7 @@ function mergeCollectionUnitsWithGambits(
       mergedUnits[index] = nextEntry;
       continue;
     }
+    unitIndexById.set(unitId, mergedUnits.length);
     mergedUnits.push({ unitId, gambit });
   }
 

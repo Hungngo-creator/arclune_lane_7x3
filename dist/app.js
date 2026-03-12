@@ -10354,6 +10354,8 @@ __define('./entry.ts', (exports, module, __require) => {
   const resolveModuleFunction = __dep3.resolveModuleFunction;
   const __dep4 = __require('./utils/player-profile.ts');
   const loadPlayerProfile = __dep4.loadPlayerProfile;
+  const __dep5 = __require('./utils/unit-id.ts');
+  const normalizeUnitId = __dep5.normalizeUnitId;
   const isStoppableSession = (value) => (Boolean(value) && typeof value.stop === 'function');
   const isStartableSession = (value) => (Boolean(value) && typeof value.start === 'function');
   const SUCCESS_EVENT = 'arclune:loaded';
@@ -10422,13 +10424,15 @@ __define('./entry.ts', (exports, module, __require) => {
       if (!tacticalAiByUnit || typeof tacticalAiByUnit !== 'object')
           return null;
       const tacticalRows = Object.entries(tacticalAiByUnit)
-          .filter(([unitId, rows]) => {
-          if (typeof unitId !== 'string' || unitId.trim() === '')
-              return false;
-          if (Array.isArray(rows))
-              return true;
-          return Boolean(rows) && typeof rows === 'object';
-      });
+          .reduce((acc, [unitId, rows]) => {
+          const normalizedUnitId = normalizeUnitId(unitId);
+          if (!normalizedUnitId)
+              return acc;
+          if (Array.isArray(rows) || (rows && typeof rows === 'object')) {
+              acc.push([normalizedUnitId, rows]);
+          }
+          return acc;
+      }, []);
       if (tacticalRows.length === 0)
           return null;
       const sourceState = currentCollectionState && typeof currentCollectionState === 'object' && !Array.isArray(currentCollectionState)
@@ -10436,14 +10440,20 @@ __define('./entry.ts', (exports, module, __require) => {
           : {};
       const sourceUnits = Array.isArray(sourceState.units) ? sourceState.units : [];
       const mergedUnits = [...sourceUnits];
-      const findUnitIndex = (unitId) => mergedUnits.findIndex((entry) => (entry &&
-          typeof entry === 'object' &&
-          !Array.isArray(entry) &&
-          typeof entry.unitId === 'string' &&
-          entry.unitId.trim() === unitId));
+      const unitIndexById = new Map();
+      for (let index = 0; index < mergedUnits.length; index += 1) {
+          const entry = mergedUnits[index];
+          if (!entry || typeof entry !== 'object' || Array.isArray(entry))
+              continue;
+          const rawUnitId = entry.unitId;
+          const normalizedUnitId = normalizeUnitId(typeof rawUnitId === 'string' ? rawUnitId : '');
+          if (!normalizedUnitId || unitIndexById.has(normalizedUnitId))
+              continue;
+          unitIndexById.set(normalizedUnitId, index);
+      }
       for (const [unitId, gambit] of tacticalRows) {
-          const index = findUnitIndex(unitId);
-          if (index >= 0) {
+          const index = unitIndexById.get(unitId);
+          if (typeof index === 'number') {
               const existing = mergedUnits[index];
               const nextEntry = existing && typeof existing === 'object' && !Array.isArray(existing)
                   ? { ...existing }
@@ -10453,6 +10463,7 @@ __define('./entry.ts', (exports, module, __require) => {
               mergedUnits[index] = nextEntry;
               continue;
           }
+          unitIndexById.set(unitId, mergedUnits.length);
           mergedUnits.push({ unitId, gambit });
       }
       return {
@@ -25237,6 +25248,8 @@ __define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
   const __dep2 = __require('./utils/player-profile.ts');
   const loadPlayerProfile = __dep2.loadPlayerProfile;
   const patchPlayerProfile = __dep2.patchPlayerProfile;
+  const __dep3 = __require('./utils/unit-id.ts');
+  const normalizeUnitId = __dep3.normalizeUnitId;
   const STYLE_ID = 'sect-tactical-ai-style-v1';
   const SLOT_COUNT = 5;
   const CONDITION_OPTIONS = [
@@ -25276,6 +25289,9 @@ __define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
   function loadConfig() {
       return { ...(loadPlayerProfile().tacticalAiByUnit ?? {}) };
   }
+  function sanitizeUnitId(value) {
+      return normalizeUnitId(typeof value === 'string' ? value : '');
+  }
   function renderScreen({ root, shell = null }) {
       ensureStyles();
       const container = document.createElement('div');
@@ -25303,12 +25319,27 @@ __define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
       const allUnits = [...UNITS];
       let activeUnitId = allUnits[0]?.id ?? '';
       const tacticalConfig = loadConfig();
-      const save = () => {
+      let saveTimerId = null;
+      const flushSave = () => {
+          if (saveTimerId != null) {
+              window.clearTimeout(saveTimerId);
+              saveTimerId = null;
+          }
           patchPlayerProfile({ tacticalAiByUnit: tacticalConfig });
+      };
+      const scheduleSave = () => {
+          if (saveTimerId != null) {
+              window.clearTimeout(saveTimerId);
+          }
+          saveTimerId = window.setTimeout(() => {
+              saveTimerId = null;
+              patchPlayerProfile({ tacticalAiByUnit: tacticalConfig });
+          }, 120);
       };
       const renderEditor = () => {
           right.innerHTML = '';
-          const unitRows = Array.isArray(tacticalConfig[activeUnitId]) ? tacticalConfig[activeUnitId] : [];
+          const normalizedUnitId = sanitizeUnitId(activeUnitId);
+          const unitRows = Array.isArray(tacticalConfig[normalizedUnitId]) ? tacticalConfig[normalizedUnitId] : [];
           for (let i = 0; i < SLOT_COUNT; i += 1) {
               const row = document.createElement('div');
               row.className = 'tactical-ai__slot';
@@ -25333,15 +25364,15 @@ __define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
               threshold.type = 'number';
               threshold.value = String(slot.threshold ?? 30);
               const onChange = () => {
-                  const rows = Array.isArray(tacticalConfig[activeUnitId]) ? [...tacticalConfig[activeUnitId]] : [];
+                  const rows = Array.isArray(tacticalConfig[normalizedUnitId]) ? [...tacticalConfig[normalizedUnitId]] : [];
                   rows[i] = {
                       condition: condition.value,
                       action: action.value,
                       threshold: Number(threshold.value || 0),
                       enabled: true,
                   };
-                  tacticalConfig[activeUnitId] = rows;
-                  save();
+                  tacticalConfig[normalizedUnitId] = rows;
+                  scheduleSave();
               };
               condition.onchange = onChange;
               action.onchange = onChange;
@@ -25366,9 +25397,9 @@ __define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
       };
       renderUnits();
       renderEditor();
-      const onUnload = () => save();
+      const onUnload = () => flushSave();
       window.addEventListener('beforeunload', onUnload);
-      return { destroy() { window.removeEventListener('beforeunload', onUnload); save(); mount.destroy(); } };
+      return { destroy() { window.removeEventListener('beforeunload', onUnload); flushSave(); mount.destroy(); } };
   }
   const render = renderScreen;
   //# sourceMappingURL=stdin.js.map
