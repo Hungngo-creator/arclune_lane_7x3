@@ -10,6 +10,12 @@ const SLOT_COUNT = 5;
 
 type GambitOption = { value: string; label: string };
 type GambitActionOption = { value: GambitActionType; label: string };
+type TacticalAiEditorRow = {
+  readonly root: HTMLDivElement;
+  readonly condition: HTMLSelectElement;
+  readonly action: HTMLSelectElement;
+  readonly threshold: HTMLInputElement;
+};
 
 const CONDITION_OPTIONS: GambitOption[] = [
   { value: 'always', label: 'Luôn luôn' },
@@ -60,6 +66,16 @@ function sanitizeUnitId(value: unknown): string {
   return normalizeUnitId(typeof value === 'string' ? value : '');
 }
 
+function getUnitRows(config: Record<string, unknown>, unitId: string): Record<string, unknown>[] {
+  const normalizedUnitId = sanitizeUnitId(unitId);
+  if (!normalizedUnitId) return [];
+  const existing = config[normalizedUnitId];
+  if (Array.isArray(existing)) return existing as Record<string, unknown>[];
+  const nextRows: Record<string, unknown>[] = [];
+  config[normalizedUnitId] = nextRows;
+  return nextRows;
+}
+
 export function renderScreen({ root, shell = null }: { root: HTMLElement; shell?: MainMenuShell | null }): { destroy: () => void } {
   ensureStyles();
   const container = document.createElement('div');
@@ -94,7 +110,7 @@ export function renderScreen({ root, shell = null }: { root: HTMLElement; shell?
   const tacticalConfig = loadConfig();
   let saveTimerId: number | null = null;
   const unitButtons = new Map<string, HTMLButtonElement>();
-  const editorRows: Array<{ condition: HTMLSelectElement; action: HTMLSelectElement; threshold: HTMLInputElement }> = [];
+  const editorRows: TacticalAiEditorRow[] = [];
 
   const flushSave = (): void => {
     if (saveTimerId != null) {
@@ -115,8 +131,7 @@ export function renderScreen({ root, shell = null }: { root: HTMLElement; shell?
   };
 
   const hydrateEditorValues = (): void => {
-    const normalizedUnitId = sanitizeUnitId(activeUnitId);
-    const unitRows = Array.isArray(tacticalConfig[normalizedUnitId]) ? (tacticalConfig[normalizedUnitId] as Record<string, unknown>[]) : [];
+    const unitRows = getUnitRows(tacticalConfig, activeUnitId);
     for (let i = 0; i < SLOT_COUNT; i += 1) {
       const slot = unitRows[i] ?? {};
       const editor = editorRows[i];
@@ -164,7 +179,7 @@ export function renderScreen({ root, shell = null }: { root: HTMLElement; shell?
       const threshold = row.querySelector<HTMLInputElement>('.tactical-ai__threshold');
       if (!condition || !action || !threshold) continue;
 
-      editorRows.push({ condition, action, threshold });
+      editorRows.push({ root: row, condition, action, threshold });
       fragment.appendChild(row);
     }
     right.replaceChildren(fragment);
@@ -187,20 +202,16 @@ export function renderScreen({ root, shell = null }: { root: HTMLElement; shell?
     if (!row) return;
     const slotIndex = Number(row.dataset.slotIndex);
     if (!Number.isInteger(slotIndex) || slotIndex < 0 || slotIndex >= SLOT_COUNT) return;
-    const condition = row.querySelector<HTMLSelectElement>('.tactical-ai__condition');
-    const action = row.querySelector<HTMLSelectElement>('.tactical-ai__action');
-    const threshold = row.querySelector<HTMLInputElement>('.tactical-ai__threshold');
-    if (!condition || !action || !threshold) return;
+    const editor = editorRows[slotIndex];
+    if (!editor || editor.root !== row) return;
 
-    const normalizedUnitId = sanitizeUnitId(activeUnitId);
-    const rows = Array.isArray(tacticalConfig[normalizedUnitId]) ? [...(tacticalConfig[normalizedUnitId] as Record<string, unknown>[])] : [];
+    const rows = getUnitRows(tacticalConfig, activeUnitId);
     rows[slotIndex] = {
-      condition: condition.value,
-      action: action.value,
-      threshold: Number(threshold.value || 0),
+      condition: editor.condition.value,
+      action: editor.action.value,
+      threshold: Number(editor.threshold.value || 0),
       enabled: true,
     };
-    tacticalConfig[normalizedUnitId] = rows;
     scheduleSave();
   };
 
