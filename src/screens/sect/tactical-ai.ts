@@ -2,6 +2,7 @@ import { ensureStyleTag, mountSection } from '../../ui/dom.ts';
 import { UNITS } from '../../units.ts';
 import { loadPlayerProfile, patchPlayerProfile } from '../../utils/player-profile.ts';
 import { normalizeUnitId } from '../../utils/unit-id.ts';
+import { isCollectionPlayableUnit } from '../collection/helpers.ts';
 import type { MainMenuShell } from '../main-menu/types.ts';
 import type { GambitActionType } from '../../types/pve.ts';
 
@@ -107,7 +108,7 @@ export function renderScreen({ root, shell = null }: { root: HTMLElement; shell?
   layout.append(left, right);
   container.append(toolbar, layout);
 
-  const allUnits = [...UNITS];
+  const allUnits = UNITS.filter(isCollectionPlayableUnit);
   let activeUnitId = allUnits[0]?.id ?? '';
   const tacticalConfig = loadConfig();
   let saveTimerId: number | null = null;

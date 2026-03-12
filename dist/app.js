@@ -13927,23 +13927,37 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   }
   const readTokenTags = (token) => {
       if (!token)
-          return [];
+          return EMPTY_TAG_LIST;
       if (typeof token.id === 'string' && token.id) {
           const cached = normalizedTagsByUnitId.get(token.id);
           if (cached)
               return cached;
       }
-      const directTagsRaw = Array.isArray(token.tags) ? token.tags : [];
-      const directTags = directTagsRaw
-          .filter((tag) => typeof tag === 'string');
+      const directTagsRaw = Array.isArray(token.tags) ? token.tags : EMPTY_TAG_LIST;
+      const directTags = [];
+      for (const tag of directTagsRaw) {
+          if (typeof tag === 'string') {
+              directTags.push(tag);
+          }
+      }
       const metaTagsRaw = getMetaById(token.id)?.tags;
-      const metaTags = Array.isArray(metaTagsRaw)
-          ? metaTagsRaw.filter((tag) => typeof tag === 'string')
-          : [];
+      const metaTags = [];
+      if (Array.isArray(metaTagsRaw)) {
+          for (const tag of metaTagsRaw) {
+              if (typeof tag === 'string') {
+                  metaTags.push(tag);
+              }
+          }
+      }
       if (directTags.length === 0 && metaTags.length === 0) {
           return EMPTY_TAG_LIST;
       }
-      const normalized = normalizeTagList([...directTags, ...metaTags]);
+      const merged = directTags.length === 0
+          ? metaTags
+          : metaTags.length === 0
+              ? directTags
+              : [...directTags, ...metaTags];
+      const normalized = normalizeTagList(merged);
       if (typeof token.id === 'string' && token.id) {
           normalizedTagsByUnitId.set(token.id, normalized);
       }
@@ -25250,6 +25264,8 @@ __define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
   const patchPlayerProfile = __dep2.patchPlayerProfile;
   const __dep3 = __require('./utils/unit-id.ts');
   const normalizeUnitId = __dep3.normalizeUnitId;
+  const __dep4 = __require('./screens/collection/helpers.ts');
+  const isCollectionPlayableUnit = __dep4.isCollectionPlayableUnit;
   const STYLE_ID = 'sect-tactical-ai-style-v1';
   const SLOT_COUNT = 5;
   const DEFAULT_THRESHOLD = 30;
@@ -25330,7 +25346,7 @@ __define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
       left.appendChild(list);
       layout.append(left, right);
       container.append(toolbar, layout);
-      const allUnits = [...UNITS];
+      const allUnits = UNITS.filter(isCollectionPlayableUnit);
       let activeUnitId = allUnits[0]?.id ?? '';
       const tacticalConfig = loadConfig();
       let saveTimerId = null;
@@ -26760,6 +26776,7 @@ __define('./screens/ui-gacha/logic/gacha.ts', (exports, module, __require) => {
   const getBannerState = __dep1.getBannerState;
   const DEFAULT_RANDOM = () => Math.random();
   const EXCLUDED_GACHA_TAGS = new Set(['npc', 'pve']);
+  const FEATURED_SUMMONABLE_CACHE = new WeakMap();
   const FEATURED_BY_RARITY_CACHE = new WeakMap();
   function isGachaSummonableFeaturedUnit(entry) {
       if (!entry || typeof entry !== 'object')
@@ -26771,7 +26788,13 @@ __define('./screens/ui-gacha/logic/gacha.ts', (exports, module, __require) => {
       return !entry.tags.some((tag) => typeof tag === 'string' && EXCLUDED_GACHA_TAGS.has(tag.trim().toLowerCase()));
   }
   function getSummonableFeaturedUnits(banner) {
-      return banner.featured.filter(isGachaSummonableFeaturedUnit);
+      const cached = FEATURED_SUMMONABLE_CACHE.get(banner);
+      if (cached) {
+          return cached;
+      }
+      const filtered = banner.featured.filter(isGachaSummonableFeaturedUnit);
+      FEATURED_SUMMONABLE_CACHE.set(banner, filtered);
+      return filtered;
   }
   function getSummonableFeaturedByRarity(banner, rarity) {
       let rarityMap = FEATURED_BY_RARITY_CACHE.get(banner);

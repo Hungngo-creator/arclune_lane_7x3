@@ -13,6 +13,7 @@ import {
 const DEFAULT_RANDOM: RandomSource = () => Math.random();
 
 const EXCLUDED_GACHA_TAGS = new Set(['npc', 'pve']);
+const FEATURED_SUMMONABLE_CACHE = new WeakMap<BannerDefinition, FeaturedUnit[]>();
 const FEATURED_BY_RARITY_CACHE = new WeakMap<BannerDefinition, Map<Rarity, FeaturedUnit[]>>();
 
 export function isGachaSummonableFeaturedUnit(entry: FeaturedUnit): boolean {
@@ -23,7 +24,13 @@ export function isGachaSummonableFeaturedUnit(entry: FeaturedUnit): boolean {
 }
 
 export function getSummonableFeaturedUnits(banner: BannerDefinition): FeaturedUnit[] {
-  return banner.featured.filter(isGachaSummonableFeaturedUnit);
+  const cached = FEATURED_SUMMONABLE_CACHE.get(banner);
+  if (cached) {
+    return cached;
+  }
+  const filtered = banner.featured.filter(isGachaSummonableFeaturedUnit);
+  FEATURED_SUMMONABLE_CACHE.set(banner, filtered);
+  return filtered;
 }
 
 function getSummonableFeaturedByRarity(banner: BannerDefinition, rarity: Rarity): FeaturedUnit[] {

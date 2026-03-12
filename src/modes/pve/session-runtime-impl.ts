@@ -1332,22 +1332,40 @@ function createClock(): ClockState {
 }
 
 const readTokenTags = (token: UnitToken | null | undefined): string[] => {
-  if (!token) return [];
+  if (!token) return EMPTY_TAG_LIST;
   if (typeof token.id === 'string' && token.id) {
     const cached = normalizedTagsByUnitId.get(token.id);
     if (cached) return cached;
   }
-  const directTagsRaw = Array.isArray(token.tags) ? token.tags : [];
-  const directTags = directTagsRaw
-    .filter((tag: unknown): tag is string => typeof tag === 'string');
+
+  const directTagsRaw = Array.isArray(token.tags) ? token.tags : EMPTY_TAG_LIST;
+  const directTags: string[] = [];
+  for (const tag of directTagsRaw) {
+    if (typeof tag === 'string') {
+      directTags.push(tag);
+    }
+  }
+
   const metaTagsRaw = getMetaById(token.id)?.tags;
-  const metaTags = Array.isArray(metaTagsRaw)
-    ? metaTagsRaw.filter((tag: unknown): tag is string => typeof tag === 'string')
-    : [];
-    if (directTags.length === 0 && metaTags.length === 0) {
+  const metaTags: string[] = [];
+  if (Array.isArray(metaTagsRaw)) {
+    for (const tag of metaTagsRaw) {
+      if (typeof tag === 'string') {
+        metaTags.push(tag);
+      }
+    }
+  }
+
+  if (directTags.length === 0 && metaTags.length === 0) {
     return EMPTY_TAG_LIST;
   }
-  const normalized = normalizeTagList([...directTags, ...metaTags]);
+
+  const merged = directTags.length === 0
+    ? metaTags
+    : metaTags.length === 0
+      ? directTags
+      : [...directTags, ...metaTags];
+  const normalized = normalizeTagList(merged);
   if (typeof token.id === 'string' && token.id) {
     normalizedTagsByUnitId.set(token.id, normalized);
   }
