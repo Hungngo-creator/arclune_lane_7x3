@@ -33,6 +33,9 @@ const ACTION_OPTIONS: GambitActionOption[] = [
   { value: 'skill3', label: 'Kỹ năng 3' },
 ];
 
+const CONDITION_OPTIONS_HTML = CONDITION_OPTIONS.map((opt) => `<option value="${opt.value}">${opt.label}</option>`).join('');
+const ACTION_OPTIONS_HTML = ACTION_OPTIONS.map((opt) => `<option value="${opt.value}">${opt.label}</option>`).join('');
+
 const CSS = `
 .app--sect-tactical-ai{padding:20px 16px 48px;}
 .tactical-ai{max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:16px;color:#e9f2ff;}
@@ -90,6 +93,8 @@ export function renderScreen({ root, shell = null }: { root: HTMLElement; shell?
   let activeUnitId = allUnits[0]?.id ?? '';
   const tacticalConfig = loadConfig();
   let saveTimerId: number | null = null;
+  const unitButtons = new Map<string, HTMLButtonElement>();
+  const editorRows: Array<{ condition: HTMLSelectElement; action: HTMLSelectElement; threshold: HTMLInputElement }> = [];
 
   const flushSave = (): void => {
     if (saveTimerId != null) {
@@ -109,80 +114,114 @@ export function renderScreen({ root, shell = null }: { root: HTMLElement; shell?
     }, 120);
   };
 
-  const renderEditor = (): void => {
-    right.innerHTML = '';
+  const hydrateEditorValues = (): void => {
     const normalizedUnitId = sanitizeUnitId(activeUnitId);
     const unitRows = Array.isArray(tacticalConfig[normalizedUnitId]) ? (tacticalConfig[normalizedUnitId] as Record<string, unknown>[]) : [];
-
     for (let i = 0; i < SLOT_COUNT; i += 1) {
-      const row = document.createElement('div');
-      row.className = 'tactical-ai__slot';
       const slot = unitRows[i] ?? {};
-
-      const condition = document.createElement('select');
-      CONDITION_OPTIONS.forEach((opt) => {
-        const op = document.createElement('option');
-        op.value = opt.value;
-        op.textContent = opt.label;
-        condition.appendChild(op);
-      });
-      condition.value = String(slot.condition ?? 'always');
-
-      const action = document.createElement('select');
-      ACTION_OPTIONS.forEach((opt) => {
-        const op = document.createElement('option');
-        op.value = opt.value;
-        op.textContent = opt.label;
-        action.appendChild(op);
-      });
-      action.value = String(slot.action ?? 'basic');
-
-      const threshold = document.createElement('input');
-      threshold.type = 'number';
-      threshold.value = String(slot.threshold ?? 30);
-
-      const onChange = () => {
-        const rows = Array.isArray(tacticalConfig[normalizedUnitId]) ? [...(tacticalConfig[normalizedUnitId] as Record<string, unknown>[])] : [];
-        rows[i] = {
-          condition: condition.value,
-          action: action.value,
-          threshold: Number(threshold.value || 0),
-          enabled: true,
-        };
-        tacticalConfig[normalizedUnitId] = rows;
-        scheduleSave();
-      };
-
-      condition.onchange = onChange;
-      action.onchange = onChange;
-      threshold.onchange = onChange;
-      row.append(condition, action, threshold);
-      right.appendChild(row);
+      const editor = editorRows[i];
+      if (!editor) continue;
+      editor.condition.value = String(slot.condition ?? 'always');
+      editor.action.value = String(slot.action ?? 'basic');
+      editor.threshold.value = String(slot.threshold ?? 30);
     }
   };
 
-  const renderUnits = (): void => {
-    list.innerHTML = '';
-    allUnits.forEach((unit) => {
-      const btn = document.createElement('button');
-      btn.className = `tactical-ai__unit${unit.id === activeUnitId ? ' is-active' : ''}`;
-      btn.innerHTML = `<span class="tactical-ai__avatar">${unit.name.slice(0, 1)}</span><span>${unit.name}</span>`;
-      btn.onclick = () => {
-        activeUnitId = unit.id;
-        renderUnits();
-        renderEditor();
-      };
-      list.appendChild(btn);
+  const applyActiveUnitStyles = (): void => {
+    unitButtons.forEach((button, unitId) => {
+      button.classList.toggle('is-active', unitId === activeUnitId);
     });
   };
 
+  const renderUnits = (): void => {
+    const fragment = document.createDocumentFragment();
+    allUnits.forEach((unit) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `tactical-ai__unit${unit.id === activeUnitId ? ' is-active' : ''}`;
+      btn.innerHTML = `<span class="tactical-ai__avatar">${unit.name.slice(0, 1)}</span><span>${unit.name}</span>`;
+      btn.dataset.unitId = unit.id;
+      unitButtons.set(unit.id, btn);
+      fragment.appendChild(btn);
+    });
+    list.replaceChildren(fragment);
+  };
+
+  const buildEditor = (): void => {
+    const fragment = document.createDocumentFragment();
+    for (let i = 0; i < SLOT_COUNT; i += 1) {
+      const row = document.createElement('div');
+      row.className = 'tactical-ai__slot';
+      row.dataset.slotIndex = String(i);
+      row.innerHTML = `
+        <select class="tactical-ai__condition">${CONDITION_OPTIONS_HTML}</select>
+        <select class="tactical-ai__action">${ACTION_OPTIONS_HTML}</select>
+        <input class="tactical-ai__threshold" type="number" />
+      `;
+
+      const condition = row.querySelector<HTMLSelectElement>('.tactical-ai__condition');
+      const action = row.querySelector<HTMLSelectElement>('.tactical-ai__action');
+      const threshold = row.querySelector<HTMLInputElement>('.tactical-ai__threshold');
+      if (!condition || !action || !threshold) continue;
+
+      editorRows.push({ condition, action, threshold });
+      fragment.appendChild(row);
+    }
+    right.replaceChildren(fragment);
+  };
+
+  const onUnitSelect = (event: MouseEvent): void => {
+    const target = event.target as HTMLElement | null;
+    const button = target?.closest<HTMLButtonElement>('.tactical-ai__unit');
+    if (!button) return;
+    const nextUnitId = sanitizeUnitId(button.dataset.unitId);
+    if (!nextUnitId || nextUnitId === activeUnitId) return;
+    activeUnitId = nextUnitId;
+    applyActiveUnitStyles();
+    hydrateEditorValues();
+  };
+
+  const onEditorChange = (event: Event): void => {
+    const target = event.target as HTMLElement | null;
+    const row = target?.closest<HTMLElement>('.tactical-ai__slot');
+    if (!row) return;
+    const slotIndex = Number(row.dataset.slotIndex);
+    if (!Number.isInteger(slotIndex) || slotIndex < 0 || slotIndex >= SLOT_COUNT) return;
+    const condition = row.querySelector<HTMLSelectElement>('.tactical-ai__condition');
+    const action = row.querySelector<HTMLSelectElement>('.tactical-ai__action');
+    const threshold = row.querySelector<HTMLInputElement>('.tactical-ai__threshold');
+    if (!condition || !action || !threshold) return;
+
+    const normalizedUnitId = sanitizeUnitId(activeUnitId);
+    const rows = Array.isArray(tacticalConfig[normalizedUnitId]) ? [...(tacticalConfig[normalizedUnitId] as Record<string, unknown>[])] : [];
+    rows[slotIndex] = {
+      condition: condition.value,
+      action: action.value,
+      threshold: Number(threshold.value || 0),
+      enabled: true,
+    };
+    tacticalConfig[normalizedUnitId] = rows;
+    scheduleSave();
+  };
+
   renderUnits();
-  renderEditor();
+  buildEditor();
+  hydrateEditorValues();
+  list.addEventListener('click', onUnitSelect);
+  right.addEventListener('change', onEditorChange);
 
   const onUnload = () => flushSave();
   window.addEventListener('beforeunload', onUnload);
 
-  return { destroy(){ window.removeEventListener('beforeunload', onUnload); flushSave(); mount.destroy(); } };
+  return {
+    destroy(){
+      window.removeEventListener('beforeunload', onUnload);
+      list.removeEventListener('click', onUnitSelect);
+      right.removeEventListener('change', onEditorChange);
+      flushSave();
+      mount.destroy();
+    }
+  };
 }
 
 export const render = renderScreen;
