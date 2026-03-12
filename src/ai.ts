@@ -746,6 +746,13 @@ function findLowestHpUnit(units: ReadonlyArray<UnitToken>): UnitToken | null {
   return best;
 }
 
+function resolveHpPercent(unit: UnitToken | null | undefined): number {
+  if (!unit) return 0;
+  const hp = Number.isFinite(unit.hp) ? Number(unit.hp) : 0;
+  const hpMax = Math.max(1, Number.isFinite(unit.hpMax) ? Number(unit.hpMax) : 1);
+  return (hp / hpMax) * 100;
+}
+
 function evaluateGambitCondition(
   condition: GambitConditionType,
   Game: SessionState,
@@ -771,14 +778,28 @@ function evaluateGambitCondition(
       return fury >= furyMax;
     }
     case 'ally_lowest_hp':
-      return findLowestHpUnit(allies)?.iid === unit.iid;
+      {
+      const teammate = findLowestHpUnit(allies.filter((ally) => ally.iid !== unit.iid));
+      if (!teammate) return false;
+      if (threshold > 0) {
+        return resolveHpPercent(teammate) < threshold;
+      }
+      return true;
+    }
     case 'ally_controlled':
       return allies.some((ally) => Array.isArray(ally.statuses)
         && ally.statuses.some((s: { kind?: string; tag?: string } | null | undefined) => s && (String(s.kind).toLowerCase() === 'control' || String(s.tag ?? '').toLowerCase().includes('stun'))));
     case 'pool_aether_above':
       return globalAetherPool.current(unit.side) > threshold;
     case 'enemy_lowest_hp':
-      return Boolean(findLowestHpUnit(enemies));
+      {
+      const enemy = findLowestHpUnit(enemies);
+      if (!enemy) return false;
+      if (threshold > 0) {
+        return resolveHpPercent(enemy) < threshold;
+      }
+      return true;
+    }
     case 'enemy_is_boss':
       return enemies.some((enemy) => enemy.id === 'leaderB' || enemy.id === 'boss' || enemy.isBoss === true);
     case 'enemy_role_is': {

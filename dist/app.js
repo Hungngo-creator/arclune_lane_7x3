@@ -935,6 +935,13 @@ __define('./ai.ts', (exports, module, __require) => {
       }
       return best;
   }
+  function resolveHpPercent(unit) {
+      if (!unit)
+          return 0;
+      const hp = Number.isFinite(unit.hp) ? Number(unit.hp) : 0;
+      const hpMax = Math.max(1, Number.isFinite(unit.hpMax) ? Number(unit.hpMax) : 1);
+      return (hp / hpMax) * 100;
+  }
   function evaluateGambitCondition(condition, Game, unit, slot, allies, enemies) {
       const threshold = Number.isFinite(slot.threshold) ? Number(slot.threshold) : 0;
       switch (condition) {
@@ -954,14 +961,30 @@ __define('./ai.ts', (exports, module, __require) => {
               return fury >= furyMax;
           }
           case 'ally_lowest_hp':
-              return findLowestHpUnit(allies)?.iid === unit.iid;
+              {
+                  const teammate = findLowestHpUnit(allies.filter((ally) => ally.iid !== unit.iid));
+                  if (!teammate)
+                      return false;
+                  if (threshold > 0) {
+                      return resolveHpPercent(teammate) < threshold;
+                  }
+                  return true;
+              }
           case 'ally_controlled':
               return allies.some((ally) => Array.isArray(ally.statuses)
                   && ally.statuses.some((s) => s && (String(s.kind).toLowerCase() === 'control' || String(s.tag ?? '').toLowerCase().includes('stun'))));
           case 'pool_aether_above':
               return globalAetherPool.current(unit.side) > threshold;
           case 'enemy_lowest_hp':
-              return Boolean(findLowestHpUnit(enemies));
+              {
+                  const enemy = findLowestHpUnit(enemies);
+                  if (!enemy)
+                      return false;
+                  if (threshold > 0) {
+                      return resolveHpPercent(enemy) < threshold;
+                  }
+                  return true;
+              }
           case 'enemy_is_boss':
               return enemies.some((enemy) => enemy.id === 'leaderB' || enemy.id === 'boss' || enemy.isBoss === true);
           case 'enemy_role_is': {
@@ -25251,7 +25274,7 @@ __define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
   `;
   function ensureStyles() { ensureStyleTag(STYLE_ID, { css: CSS }); }
   function loadConfig() {
-      return loadPlayerProfile().tacticalAiByUnit ?? {};
+      return { ...(loadPlayerProfile().tacticalAiByUnit ?? {}) };
   }
   function renderScreen({ root, shell = null }) {
       ensureStyles();
@@ -25279,13 +25302,13 @@ __define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
       container.append(toolbar, layout);
       const allUnits = [...UNITS];
       let activeUnitId = allUnits[0]?.id ?? '';
+      const tacticalConfig = loadConfig();
       const save = () => {
-          patchPlayerProfile({ tacticalAiByUnit: loadConfig() });
+          patchPlayerProfile({ tacticalAiByUnit: tacticalConfig });
       };
       const renderEditor = () => {
           right.innerHTML = '';
-          const config = loadConfig();
-          const unitRows = Array.isArray(config[activeUnitId]) ? config[activeUnitId] : [];
+          const unitRows = Array.isArray(tacticalConfig[activeUnitId]) ? tacticalConfig[activeUnitId] : [];
           for (let i = 0; i < SLOT_COUNT; i += 1) {
               const row = document.createElement('div');
               row.className = 'tactical-ai__slot';
@@ -25310,16 +25333,15 @@ __define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
               threshold.type = 'number';
               threshold.value = String(slot.threshold ?? 30);
               const onChange = () => {
-                  const next = loadConfig();
-                  const rows = Array.isArray(next[activeUnitId]) ? [...next[activeUnitId]] : [];
+                  const rows = Array.isArray(tacticalConfig[activeUnitId]) ? [...tacticalConfig[activeUnitId]] : [];
                   rows[i] = {
                       condition: condition.value,
                       action: action.value,
                       threshold: Number(threshold.value || 0),
                       enabled: true,
                   };
-                  next[activeUnitId] = rows;
-                  patchPlayerProfile({ tacticalAiByUnit: next });
+                  tacticalConfig[activeUnitId] = rows;
+                  save();
               };
               condition.onchange = onChange;
               action.onchange = onChange;

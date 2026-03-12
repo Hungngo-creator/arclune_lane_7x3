@@ -49,7 +49,7 @@ const CSS = `
 function ensureStyles(): void { ensureStyleTag(STYLE_ID, { css: CSS }); }
 
 function loadConfig(): Record<string, unknown> {
-  return (loadPlayerProfile().tacticalAiByUnit as Record<string, unknown>) ?? {};
+  return { ...((loadPlayerProfile().tacticalAiByUnit as Record<string, unknown>) ?? {}) };
 }
 
 export function renderScreen({ root, shell = null }: { root: HTMLElement; shell?: MainMenuShell | null }): { destroy: () => void } {
@@ -83,15 +83,15 @@ export function renderScreen({ root, shell = null }: { root: HTMLElement; shell?
 
   const allUnits = [...UNITS];
   let activeUnitId = allUnits[0]?.id ?? '';
+  const tacticalConfig = loadConfig();
 
   const save = (): void => {
-    patchPlayerProfile({ tacticalAiByUnit: loadConfig() });
+    patchPlayerProfile({ tacticalAiByUnit: tacticalConfig });
   };
 
   const renderEditor = (): void => {
     right.innerHTML = '';
-    const config = loadConfig();
-    const unitRows = Array.isArray(config[activeUnitId]) ? (config[activeUnitId] as Record<string, unknown>[]) : [];
+    const unitRows = Array.isArray(tacticalConfig[activeUnitId]) ? (tacticalConfig[activeUnitId] as Record<string, unknown>[]) : [];
 
     for (let i = 0; i < SLOT_COUNT; i += 1) {
       const row = document.createElement('div');
@@ -121,16 +121,15 @@ export function renderScreen({ root, shell = null }: { root: HTMLElement; shell?
       threshold.value = String(slot.threshold ?? 30);
 
       const onChange = () => {
-        const next = loadConfig();
-        const rows = Array.isArray(next[activeUnitId]) ? [...(next[activeUnitId] as Record<string, unknown>[])] : [];
+        const rows = Array.isArray(tacticalConfig[activeUnitId]) ? [...(tacticalConfig[activeUnitId] as Record<string, unknown>[])] : [];
         rows[i] = {
           condition: condition.value,
           action: action.value,
           threshold: Number(threshold.value || 0),
           enabled: true,
         };
-        next[activeUnitId] = rows;
-        patchPlayerProfile({ tacticalAiByUnit: next });
+        tacticalConfig[activeUnitId] = rows;
+        save();
       };
 
       condition.onchange = onChange;
