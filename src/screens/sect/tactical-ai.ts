@@ -9,6 +9,7 @@ import type { GambitActionType } from '../../types/pve.ts';
 const STYLE_ID = 'sect-tactical-ai-style-v1';
 const SLOT_COUNT = 5;
 const DEFAULT_THRESHOLD = 30;
+const PLAYABLE_UNITS = UNITS.filter(isCollectionPlayableUnit);
 
 type GambitOption = { value: string; label: string };
 type GambitActionOption = { value: GambitActionType; label: string };
@@ -108,10 +109,12 @@ export function renderScreen({ root, shell = null }: { root: HTMLElement; shell?
   layout.append(left, right);
   container.append(toolbar, layout);
 
-  const allUnits = UNITS.filter(isCollectionPlayableUnit);
+  const allUnits = PLAYABLE_UNITS;
   let activeUnitId = allUnits[0]?.id ?? '';
   const tacticalConfig = loadConfig();
   let saveTimerId: number | null = null;
+  let isDirty = false;
+  let lastSerializedConfig = JSON.stringify(tacticalConfig);
   const unitButtons = new Map<string, HTMLButtonElement>();
   const editorRows: TacticalAiEditorRow[] = [];
 
@@ -124,16 +127,24 @@ export function renderScreen({ root, shell = null }: { root: HTMLElement; shell?
       window.clearTimeout(saveTimerId);
       saveTimerId = null;
     }
+    if (!isDirty) return;
+    const serialized = JSON.stringify(tacticalConfig);
+    if (serialized === lastSerializedConfig) {
+      isDirty = false;
+      return;
+    }
     patchPlayerProfile({ tacticalAiByUnit: tacticalConfig });
+    lastSerializedConfig = serialized;
+    isDirty = false;
   };
 
   const scheduleSave = (): void => {
+    isDirty = true;
     if (saveTimerId != null) {
       window.clearTimeout(saveTimerId);
     }
     saveTimerId = window.setTimeout(() => {
-      saveTimerId = null;
-      patchPlayerProfile({ tacticalAiByUnit: tacticalConfig });
+      flushSave();
     }, 120);
   };
 

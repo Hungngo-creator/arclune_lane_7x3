@@ -12639,17 +12639,30 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
       const normalized = value.trim().toUpperCase();
       return normalized;
   }
-  function sampleLineup(lineup, progressById) {
+  function sampleLineup(lineup, progressById, unitMetaById) {
       const rankCounts = new Map();
       const rankByUnitId = new Map();
       const progressProfiles = [];
       const costs = [];
       let totalRanked = 0;
+      const getUnitMeta = (unitId) => {
+          const cached = unitMetaById.get(unitId);
+          if (cached)
+              return cached;
+          const unit = lookupUnit(unitId);
+          const next = {
+              rank: normalizeRank(unit?.rank),
+              cost: Number.isFinite(unit?.cost) ? Number(unit?.cost) : null,
+              name: typeof unit?.name === 'string' && unit.name ? unit.name : null,
+          };
+          unitMetaById.set(unitId, next);
+          return next;
+      };
       for (const entry of lineup) {
           const directRank = normalizeRank(entry.rank);
           let fallbackRank = rankByUnitId.get(entry.id) ?? null;
           if (!rankByUnitId.has(entry.id)) {
-              fallbackRank = normalizeRank(lookupUnit(entry.id)?.rank);
+              fallbackRank = getUnitMeta(entry.id).rank;
               rankByUnitId.set(entry.id, fallbackRank);
           }
           const rank = directRank ?? fallbackRank;
@@ -12657,8 +12670,8 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
               continue;
           rankCounts.set(rank, (rankCounts.get(rank) ?? 0) + 1);
           totalRanked += 1;
-          const cost = Number.isFinite(entry.cost) ? Number(entry.cost) : Number(lookupUnit(entry.id)?.cost);
-          if (Number.isFinite(cost) && cost > 0)
+          const cost = Number.isFinite(entry.cost) ? Number(entry.cost) : getUnitMeta(entry.id).cost;
+          if (typeof cost === 'number' && Number.isFinite(cost) && cost > 0)
               costs.push(Math.floor(cost));
           const progress = progressById.get(entry.id);
           const progressRecord = progress;
@@ -12777,8 +12790,9 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
       return Math.max(min, Math.floor(value));
   }
   function toCreepDeckEntry(params) {
-      const { creepId, profile, rank, cost } = params;
-      const unitName = lookupUnit(creepId)?.name ?? creepId;
+      const { creepId, profile, rank, cost, unitMetaById } = params;
+      const cachedMeta = unitMetaById.get(creepId);
+      const unitName = cachedMeta?.name ?? lookupUnit(creepId)?.name ?? creepId;
       const level = clampInteger(profile.level, 1);
       const realm = clampInteger(profile.realm, 0);
       const subRealm = clampInteger(profile.subRealm, 0);
@@ -12804,7 +12818,8 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
           ?? (lineup.length > 0
               ? mapUnitProgressById(params.collectionState ?? null)
               : EMPTY_PROGRESS_BY_ID);
-      const lineupSampling = sampleLineup(lineup, progressById);
+      const unitMetaById = new Map();
+      const lineupSampling = sampleLineup(lineup, progressById, unitMetaById);
       const allocatedRanks = allocateRanksForCreeps(lineupSampling, creepCount);
       const allocatedProgress = allocateProgressForCreeps(lineupSampling.progressProfiles, creepCount);
       const allocatedCosts = allocateCostsForCreeps(lineupSampling.costs, creepCount);
@@ -12818,6 +12833,7 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
               profile,
               rank,
               cost,
+              unitMetaById,
           });
       });
   }
@@ -22200,16 +22216,24 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
   const powerFormatter = createNumberFormatter('vi-VN');
   const NAME_INITIALS_CACHE = new Map();
   const UNIT_CODE_CACHE = new Map();
+  const ROLE_ELEMENT_ICON_CACHE = new Map();
   const ELEMENT_ICON = {
       fire: '🔥', metal: '⚙️', wood: '🌿', earth: '⛰️', lightning: '⚡', blood: '🩸', water: '💧',
       light: '✨', dark: '🌑', wind: '🌪️', neutral: '⚪',
   };
   function renderRoleElementIcons(unit) {
+      const cacheKey = `${unit.id}|${unit.roleKey}`;
+      const cached = ROLE_ELEMENT_ICON_CACHE.get(cacheKey);
+      if (cached != null) {
+          return cached;
+      }
       const raw = unit.raw;
       const element = normalizeElementKey(raw?.base_element ?? raw?.element) ?? 'neutral';
       const classIcon = unit.role ? '🏷️' : '';
       const elementIcon = ELEMENT_ICON[element] ?? '⚪';
-      return [classIcon, elementIcon].filter(Boolean).join(' ');
+      const resolved = [classIcon, elementIcon].filter(Boolean).join(' ');
+      ROLE_ELEMENT_ICON_CACHE.set(cacheKey, resolved);
+      return resolved;
   }
   function ensureStyles() {
       const css = `
@@ -23483,14 +23507,13 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
   const isLineupDefinition = (value) => isObjectLike(value);
   const isLineupMemberConfig = (value) => isObjectLike(value);
   const isLineupPassiveConfig = (value) => isObjectLike(value);
-  function cloneRoster(source) {
+  function resolveRosterSource(source) {
       if (Array.isArray(source) && source.length > 0) {
-          const clones = source.filter(isRosterEntryLite).map(entry => ({ ...entry }));
-          if (clones.length > 0) {
-              return clones;
-          }
+          const hasObjectLikeEntry = source.some(isRosterEntryLite);
+          if (hasObjectLikeEntry)
+              return source;
       }
-      return ROSTER.map(entry => ({ ...entry }));
+      return ROSTER;
   }
   function normalizeRosterEntry(entry, index) {
       const source = entry ?? {};
@@ -23537,8 +23560,15 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
       };
   }
   function normalizeRoster(source) {
-      const cloned = cloneRoster(source);
-      return cloned.map((entry, index) => normalizeRosterEntry(entry, index));
+      const rosterSource = resolveRosterSource(source);
+      const normalized = [];
+      for (let index = 0; index < rosterSource.length; index += 1) {
+          const entry = rosterSource[index];
+          if (!isRosterEntryLite(entry))
+              continue;
+          normalized.push(normalizeRosterEntry(entry, normalized.length));
+      }
+      return normalized;
   }
   function getRawRarityString(raw, key) {
       if (!raw) {
@@ -25298,6 +25328,7 @@ __define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
   const STYLE_ID = 'sect-tactical-ai-style-v1';
   const SLOT_COUNT = 5;
   const DEFAULT_THRESHOLD = 30;
+  const PLAYABLE_UNITS = UNITS.filter(isCollectionPlayableUnit);
   const CONDITION_OPTIONS = [
       { value: 'always', label: 'Luôn luôn' },
       { value: 'self_hp_below', label: 'Tự thân HP < X%' },
@@ -25375,10 +25406,12 @@ __define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
       left.appendChild(list);
       layout.append(left, right);
       container.append(toolbar, layout);
-      const allUnits = UNITS.filter(isCollectionPlayableUnit);
+      const allUnits = PLAYABLE_UNITS;
       let activeUnitId = allUnits[0]?.id ?? '';
       const tacticalConfig = loadConfig();
       let saveTimerId = null;
+      let isDirty = false;
+      let lastSerializedConfig = JSON.stringify(tacticalConfig);
       const unitButtons = new Map();
       const editorRows = [];
       const readEditorSnapshot = (editor) => (`${editor.condition.value}|${editor.action.value}|${editor.threshold.value}`);
@@ -25387,15 +25420,24 @@ __define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
               window.clearTimeout(saveTimerId);
               saveTimerId = null;
           }
+          if (!isDirty)
+              return;
+          const serialized = JSON.stringify(tacticalConfig);
+          if (serialized === lastSerializedConfig) {
+              isDirty = false;
+              return;
+          }
           patchPlayerProfile({ tacticalAiByUnit: tacticalConfig });
+          lastSerializedConfig = serialized;
+          isDirty = false;
       };
       const scheduleSave = () => {
+          isDirty = true;
           if (saveTimerId != null) {
               window.clearTimeout(saveTimerId);
           }
           saveTimerId = window.setTimeout(() => {
-              saveTimerId = null;
-              patchPlayerProfile({ tacticalAiByUnit: tacticalConfig });
+              flushSave();
           }, 120);
       };
       const hydrateEditorValues = () => {

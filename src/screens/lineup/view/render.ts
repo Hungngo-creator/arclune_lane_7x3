@@ -43,6 +43,7 @@ const STYLE_ID = 'lineup-view-style-v1';
 const powerFormatter = createNumberFormatter('vi-VN');
 const NAME_INITIALS_CACHE = new Map<string, string>();
 const UNIT_CODE_CACHE = new Map<string, string>();
+const ROLE_ELEMENT_ICON_CACHE = new Map<string, string>();
 
 const ELEMENT_ICON: Readonly<Record<string, string>> = {
   fire: '🔥', metal: '⚙️', wood: '🌿', earth: '⛰️', lightning: '⚡', blood: '🩸', water: '💧',
@@ -50,11 +51,18 @@ const ELEMENT_ICON: Readonly<Record<string, string>> = {
 };
 
 function renderRoleElementIcons(unit: RosterUnit): string {
+  const cacheKey = `${unit.id}|${unit.roleKey}`;
+  const cached = ROLE_ELEMENT_ICON_CACHE.get(cacheKey);
+  if (cached != null) {
+    return cached;
+  }
   const raw = unit.raw as Record<string, unknown> | null;
   const element = normalizeElementKey(raw?.base_element ?? raw?.element) ?? 'neutral';
   const classIcon = unit.role ? '🏷️' : '';
   const elementIcon = ELEMENT_ICON[element] ?? '⚪';
-  return [classIcon, elementIcon].filter(Boolean).join(' ');
+  const resolved = [classIcon, elementIcon].filter(Boolean).join(' ');
+  ROLE_ELEMENT_ICON_CACHE.set(cacheKey, resolved);
+  return resolved;
 }
 
 function ensureStyles(): void{

@@ -101,14 +101,12 @@ const isLineupMemberConfig = (value: unknown): value is LineupMemberConfig => is
 
 const isLineupPassiveConfig = (value: unknown): value is LineupPassiveConfig => isObjectLike(value);
 
-function cloneRoster(source: ReadonlyArray<RosterEntryLite> | null | undefined): RosterEntryLite[] {
+function resolveRosterSource(source: ReadonlyArray<RosterEntryLite> | null | undefined): ReadonlyArray<RosterEntryLite> {
   if (Array.isArray(source) && source.length > 0){
-    const clones = source.filter(isRosterEntryLite).map(entry => ({ ...entry }));
-    if (clones.length > 0){
-      return clones;
-    }
+    const hasObjectLikeEntry = source.some(isRosterEntryLite);
+    if (hasObjectLikeEntry) return source;
   }
-  return ROSTER.map(entry => ({ ...entry }));
+  return ROSTER;
 }
 
 function normalizeRosterEntry(entry: RosterEntryLite | null | undefined, index: number): RosterUnit {
@@ -158,8 +156,14 @@ function normalizeRosterEntry(entry: RosterEntryLite | null | undefined, index: 
 }
 
 export function normalizeRoster(source: ReadonlyArray<RosterEntryLite> | null | undefined): RosterUnit[] {
-  const cloned = cloneRoster(source);
-  return cloned.map((entry, index) => normalizeRosterEntry(entry, index));
+  const rosterSource = resolveRosterSource(source);
+  const normalized: RosterUnit[] = [];
+  for (let index = 0; index < rosterSource.length; index += 1){
+    const entry = rosterSource[index];
+    if (!isRosterEntryLite(entry)) continue;
+    normalized.push(normalizeRosterEntry(entry, normalized.length));
+  }
+  return normalized;
 }
 
 function getRawRarityString(raw: Record<string, unknown> | null | undefined, key: string): string | null {

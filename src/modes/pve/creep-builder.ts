@@ -21,6 +21,7 @@ type LineupSampling = {
 };
 
 type UnitRankCache = Map<string, string | null>;
+type UnitMetaCache = Map<string, { rank: string | null; cost: number | null; name: string | null }>;
 
 type RankAllocation = {
   rank: string;
@@ -48,6 +49,7 @@ function normalizeRank(value: unknown): string | null {
 function sampleLineup(
   lineup: ReadonlyArray<PveDeckEntry>,
   progressById: ReadonlyMap<string, RuntimeUnitProgress>,
+  unitMetaById: UnitMetaCache,
 ): LineupSampling {
   const rankCounts = new Map<string, number>();
   const rankByUnitId: UnitRankCache = new Map();
@@ -55,11 +57,24 @@ function sampleLineup(
   const costs: number[] = [];
   let totalRanked = 0;
 
+  const getUnitMeta = (unitId: string): { rank: string | null; cost: number | null; name: string | null } => {
+    const cached = unitMetaById.get(unitId);
+    if (cached) return cached;
+    const unit = lookupUnit(unitId);
+    const next = {
+      rank: normalizeRank(unit?.rank),
+      cost: Number.isFinite(unit?.cost) ? Number(unit?.cost) : null,
+      name: typeof unit?.name === 'string' && unit.name ? unit.name : null,
+    };
+    unitMetaById.set(unitId, next);
+    return next;
+  };
+
   for (const entry of lineup) {
     const directRank = normalizeRank(entry.rank);
     let fallbackRank = rankByUnitId.get(entry.id) ?? null;
     if (!rankByUnitId.has(entry.id)) {
-      fallbackRank = normalizeRank(lookupUnit(entry.id)?.rank);
+      fallbackRank = getUnitMeta(entry.id).rank;
       rankByUnitId.set(entry.id, fallbackRank);
     }
     const rank = directRank ?? fallbackRank;
@@ -67,8 +82,8 @@ function sampleLineup(
     rankCounts.set(rank, (rankCounts.get(rank) ?? 0) + 1);
     totalRanked += 1;
 
-    const cost = Number.isFinite(entry.cost) ? Number(entry.cost) : Number(lookupUnit(entry.id)?.cost);
-    if (Number.isFinite(cost) && cost > 0) costs.push(Math.floor(cost));
+    const cost = Number.isFinite(entry.cost) ? Number(entry.cost) : getUnitMeta(entry.id).cost;
+    if (typeof cost === 'number' && Number.isFinite(cost) && cost > 0) costs.push(Math.floor(cost));
 
     const progress = progressById.get(entry.id);
     const progressRecord = progress as Record<string, unknown> | undefined;
@@ -196,9 +211,11 @@ function toCreepDeckEntry(params: {
   profile: ProgressProfile;
   rank: string | null;
   cost: number;
+  unitMetaById: UnitMetaCache;
 }): PveDeckEntry {
-  const { creepId, profile, rank, cost } = params;
-  const unitName = lookupUnit(creepId)?.name ?? creepId;
+  const { creepId, profile, rank, cost, unitMetaById } = params;
+  const cachedMeta = unitMetaById.get(creepId);
+  const unitName = cachedMeta?.name ?? lookupUnit(creepId)?.name ?? creepId;
   const level = clampInteger(profile.level, 1);
   const realm = clampInteger(profile.realm, 0);
   const subRealm = clampInteger(profile.subRealm, 0);
@@ -230,7 +247,8 @@ export function buildAICreepDeckFromLineup(params: {
     ?? (lineup.length > 0
       ? mapUnitProgressById(params.collectionState ?? null)
       : EMPTY_PROGRESS_BY_ID);
-  const lineupSampling = sampleLineup(lineup, progressById);
+  const unitMetaById: UnitMetaCache = new Map();
+  const lineupSampling = sampleLineup(lineup, progressById, unitMetaById);
   const allocatedRanks = allocateRanksForCreeps(lineupSampling, creepCount);
   const allocatedProgress = allocateProgressForCreeps(lineupSampling.progressProfiles, creepCount);
   const allocatedCosts = allocateCostsForCreeps(lineupSampling.costs, creepCount);
@@ -245,6 +263,7 @@ export function buildAICreepDeckFromLineup(params: {
       profile,
       rank,
       cost,
+      unitMetaById,
     });
   });
 }
