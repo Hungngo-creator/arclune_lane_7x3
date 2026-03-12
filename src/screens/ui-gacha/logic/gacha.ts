@@ -13,6 +13,7 @@ import {
 const DEFAULT_RANDOM: RandomSource = () => Math.random();
 
 const EXCLUDED_GACHA_TAGS = new Set(['npc', 'pve']);
+const FEATURED_BY_RARITY_CACHE = new WeakMap<BannerDefinition, Map<Rarity, FeaturedUnit[]>>();
 
 export function isGachaSummonableFeaturedUnit(entry: FeaturedUnit): boolean {
   if (!entry || typeof entry !== 'object') return false;
@@ -25,13 +26,28 @@ export function getSummonableFeaturedUnits(banner: BannerDefinition): FeaturedUn
   return banner.featured.filter(isGachaSummonableFeaturedUnit);
 }
 
+function getSummonableFeaturedByRarity(banner: BannerDefinition, rarity: Rarity): FeaturedUnit[] {
+  let rarityMap = FEATURED_BY_RARITY_CACHE.get(banner);
+  if (!rarityMap) {
+    rarityMap = new Map<Rarity, FeaturedUnit[]>();
+    FEATURED_BY_RARITY_CACHE.set(banner, rarityMap);
+  }
+  const cached = rarityMap.get(rarity);
+  if (cached) {
+    return cached;
+  }
+  const matched = getSummonableFeaturedUnits(banner).filter((entry) => entry.rarity === rarity);
+  rarityMap.set(rarity, matched);
+  return matched;
+}
+
 function shouldHitFeatured(
   banner: BannerDefinition,
   rarity: Rarity,
   forced: boolean,
   rng: RandomSource,
 ): boolean {
-  const featured = getSummonableFeaturedUnits(banner).filter((entry) => entry.rarity === rarity);
+  const featured = getSummonableFeaturedByRarity(banner, rarity);
   if (featured.length === 0) {
     return false;
   }

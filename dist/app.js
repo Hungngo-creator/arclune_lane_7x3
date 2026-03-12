@@ -25252,6 +25252,7 @@ __define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
   const normalizeUnitId = __dep3.normalizeUnitId;
   const STYLE_ID = 'sect-tactical-ai-style-v1';
   const SLOT_COUNT = 5;
+  const DEFAULT_THRESHOLD = 30;
   const CONDITION_OPTIONS = [
       { value: 'always', label: 'Luôn luôn' },
       { value: 'self_hp_below', label: 'Tự thân HP < X%' },
@@ -25335,6 +25336,7 @@ __define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
       let saveTimerId = null;
       const unitButtons = new Map();
       const editorRows = [];
+      const readEditorSnapshot = (editor) => (`${editor.condition.value}|${editor.action.value}|${editor.threshold.value}`);
       const flushSave = () => {
           if (saveTimerId != null) {
               window.clearTimeout(saveTimerId);
@@ -25360,7 +25362,8 @@ __define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
                   continue;
               editor.condition.value = String(slot.condition ?? 'always');
               editor.action.value = String(slot.action ?? 'basic');
-              editor.threshold.value = String(slot.threshold ?? 30);
+              editor.threshold.value = String(slot.threshold ?? DEFAULT_THRESHOLD);
+              editor.snapshot = readEditorSnapshot(editor);
           }
       };
       const applyActiveUnitStyles = () => {
@@ -25397,7 +25400,13 @@ __define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
               const threshold = row.querySelector('.tactical-ai__threshold');
               if (!condition || !action || !threshold)
                   continue;
-              editorRows.push({ root: row, condition, action, threshold });
+              editorRows.push({
+                  root: row,
+                  condition,
+                  action,
+                  threshold,
+                  snapshot: `${condition.value}|${action.value}|${threshold.value}`,
+              });
               fragment.appendChild(row);
           }
           right.replaceChildren(fragment);
@@ -25425,6 +25434,10 @@ __define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
           const editor = editorRows[slotIndex];
           if (!editor || editor.root !== row)
               return;
+          const nextSnapshot = readEditorSnapshot(editor);
+          if (nextSnapshot === editor.snapshot)
+              return;
+          editor.snapshot = nextSnapshot;
           const rows = getUnitRows(tacticalConfig, activeUnitId);
           rows[slotIndex] = {
               condition: editor.condition.value,
@@ -26747,6 +26760,7 @@ __define('./screens/ui-gacha/logic/gacha.ts', (exports, module, __require) => {
   const getBannerState = __dep1.getBannerState;
   const DEFAULT_RANDOM = () => Math.random();
   const EXCLUDED_GACHA_TAGS = new Set(['npc', 'pve']);
+  const FEATURED_BY_RARITY_CACHE = new WeakMap();
   function isGachaSummonableFeaturedUnit(entry) {
       if (!entry || typeof entry !== 'object')
           return false;
@@ -26759,8 +26773,22 @@ __define('./screens/ui-gacha/logic/gacha.ts', (exports, module, __require) => {
   function getSummonableFeaturedUnits(banner) {
       return banner.featured.filter(isGachaSummonableFeaturedUnit);
   }
+  function getSummonableFeaturedByRarity(banner, rarity) {
+      let rarityMap = FEATURED_BY_RARITY_CACHE.get(banner);
+      if (!rarityMap) {
+          rarityMap = new Map();
+          FEATURED_BY_RARITY_CACHE.set(banner, rarityMap);
+      }
+      const cached = rarityMap.get(rarity);
+      if (cached) {
+          return cached;
+      }
+      const matched = getSummonableFeaturedUnits(banner).filter((entry) => entry.rarity === rarity);
+      rarityMap.set(rarity, matched);
+      return matched;
+  }
   function shouldHitFeatured(banner, rarity, forced, rng) {
-      const featured = getSummonableFeaturedUnits(banner).filter((entry) => entry.rarity === rarity);
+      const featured = getSummonableFeaturedByRarity(banner, rarity);
       if (featured.length === 0) {
           return false;
       }

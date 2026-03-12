@@ -7,6 +7,7 @@ import type { GambitActionType } from '../../types/pve.ts';
 
 const STYLE_ID = 'sect-tactical-ai-style-v1';
 const SLOT_COUNT = 5;
+const DEFAULT_THRESHOLD = 30;
 
 type GambitOption = { value: string; label: string };
 type GambitActionOption = { value: GambitActionType; label: string };
@@ -15,6 +16,7 @@ type TacticalAiEditorRow = {
   readonly condition: HTMLSelectElement;
   readonly action: HTMLSelectElement;
   readonly threshold: HTMLInputElement;
+  snapshot: string;
 };
 
 const CONDITION_OPTIONS: GambitOption[] = [
@@ -112,6 +114,10 @@ export function renderScreen({ root, shell = null }: { root: HTMLElement; shell?
   const unitButtons = new Map<string, HTMLButtonElement>();
   const editorRows: TacticalAiEditorRow[] = [];
 
+  const readEditorSnapshot = (editor: TacticalAiEditorRow): string => (
+    `${editor.condition.value}|${editor.action.value}|${editor.threshold.value}`
+  );
+
   const flushSave = (): void => {
     if (saveTimerId != null) {
       window.clearTimeout(saveTimerId);
@@ -138,7 +144,8 @@ export function renderScreen({ root, shell = null }: { root: HTMLElement; shell?
       if (!editor) continue;
       editor.condition.value = String(slot.condition ?? 'always');
       editor.action.value = String(slot.action ?? 'basic');
-      editor.threshold.value = String(slot.threshold ?? 30);
+      editor.threshold.value = String(slot.threshold ?? DEFAULT_THRESHOLD);
+      editor.snapshot = readEditorSnapshot(editor);
     }
   };
 
@@ -179,7 +186,13 @@ export function renderScreen({ root, shell = null }: { root: HTMLElement; shell?
       const threshold = row.querySelector<HTMLInputElement>('.tactical-ai__threshold');
       if (!condition || !action || !threshold) continue;
 
-      editorRows.push({ root: row, condition, action, threshold });
+      editorRows.push({
+        root: row,
+        condition,
+        action,
+        threshold,
+        snapshot: `${condition.value}|${action.value}|${threshold.value}`,
+      });
       fragment.appendChild(row);
     }
     right.replaceChildren(fragment);
@@ -204,6 +217,10 @@ export function renderScreen({ root, shell = null }: { root: HTMLElement; shell?
     if (!Number.isInteger(slotIndex) || slotIndex < 0 || slotIndex >= SLOT_COUNT) return;
     const editor = editorRows[slotIndex];
     if (!editor || editor.root !== row) return;
+
+    const nextSnapshot = readEditorSnapshot(editor);
+    if (nextSnapshot === editor.snapshot) return;
+    editor.snapshot = nextSnapshot;
 
     const rows = getUnitRows(tacticalConfig, activeUnitId);
     rows[slotIndex] = {
