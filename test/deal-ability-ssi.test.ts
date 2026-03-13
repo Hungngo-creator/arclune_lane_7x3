@@ -154,4 +154,66 @@ describe('dealAbilityDamage SSI formula extensions', () => {
     expect(result.dealt).toBe(0);
     expect(target.hp).toBe(1000);
   });
+
+  test('reflect uses net difference so attacker reflect can offset defender reflect', () => {
+    const attacker = mkUnit({
+      side: 'ally',
+      id: 'leaderA',
+      arm: 0,
+      res: 0,
+      statuses: [{ id: 'reflect', kind: 'buff', tag: 'counter', power: 0.5 } as any],
+    });
+    const target = mkUnit({
+      side: 'enemy',
+      id: 'leaderB',
+      hp: 1000,
+      hpMax: 1000,
+      arm: 0,
+      res: 0,
+      statuses: [{ id: 'reflect', kind: 'buff', tag: 'counter', power: 0.3 } as any],
+    });
+    const game = mkGame([attacker, target]);
+
+    dealAbilityDamage(game, attacker, target, {
+      base: 200,
+      dtype: 'physical',
+      skillMul: 1,
+      realmBonus: 0,
+    });
+
+    expect(target.hp).toBe(800);
+    expect(attacker.hp).toBe(1000);
+  });
+
+  test('100% vs 100% reflect resolves once per side without infinite recursion', () => {
+    const attacker = mkUnit({
+      side: 'ally',
+      id: 'leaderA',
+      hp: 1000,
+      hpMax: 1000,
+      arm: 0,
+      res: 0,
+      statuses: [{ id: 'reflect', kind: 'buff', tag: 'counter', power: 1 } as any],
+    });
+    const target = mkUnit({
+      side: 'enemy',
+      id: 'leaderB',
+      hp: 1000,
+      hpMax: 1000,
+      arm: 0,
+      res: 0,
+      statuses: [{ id: 'reflect', kind: 'buff', tag: 'counter', power: 1 } as any],
+    });
+    const game = mkGame([attacker, target]);
+
+    dealAbilityDamage(game, attacker, target, {
+      base: 200,
+      dtype: 'physical',
+      skillMul: 1,
+      realmBonus: 0,
+    });
+
+    expect(attacker.hp).toBe(800);
+    expect(target.hp).toBe(600);
+  });
 });

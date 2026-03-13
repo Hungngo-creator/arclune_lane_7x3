@@ -96,6 +96,8 @@ const toFinite = (value: unknown, fallback = 0): number => {
   return Number.isFinite(parsed) ? parsed : fallback;
 };
 
+const clamp01 = (value: unknown): number => Math.max(0, Math.min(1, toFinite(value, 0)));
+
 interface DamageEventContextSnapshot {
   attackerKey: string | null;
   defenderKey: string | null;
@@ -116,6 +118,89 @@ interface DamageMetadataCarrier extends UnitToken {
   _lastCounterBreakdown?: DamageBreakdownMetadata | null;
   _lastDamageSummary?: string | null;
 }
+
+interface ReflectResolutionResult {
+  reflectedToAttacker: number;
+  reflectedToTarget: number;
+}
+
+const applyResolvedReflectDamage = (
+  source: UnitToken,
+  receiver: UnitToken,
+  incomingDamage: number,
+  dtype: string,
+): number => {
+  const normalizedIncoming = Math.max(0, Math.floor(incomingDamage));
+  if (normalizedIncoming <= 0) return 0;
+
+  const reflectCtx = Statuses.beforeDamage(source, receiver, {
+    dtype,
+    base: normalizedIncoming,
+    attackType: 'reflect',
+  });
+
+  const total = calculateFinalDamage(source, receiver, null, normalizedIncoming, {
+    ignoreAll: !!reflectCtx.ignoreAll,
+    reductionMultiplier: reflectCtx.inMul,
+    defenseMultiplier: dtype === 'arcane'
+      ? (100 / (100 + Math.max(0, receiver.res ?? 0)))
+      : (100 / (100 + Math.max(0, receiver.arm ?? 0))),
+  }).total;
+
+  const absorbed = Statuses.absorbShield(receiver, total, { dtype });
+  const beforeHp = Math.max(0, Math.floor(receiver.hp ?? 0));
+  applyDamage(receiver, absorbed.remain);
+  const afterHp = Math.max(0, Math.floor(receiver.hp ?? 0));
+  const dealt = Math.max(0, beforeHp - afterHp);
+  if (receiver.hp <= 0) {
+    hookOnLethalDamage(receiver);
+  }
+  if (dealt > 0) {
+    gainFury(receiver, {
+      type: 'damageTaken',
+      dealt,
+      selfMaxHp: Number.isFinite(receiver?.hpMax) ? receiver.hpMax : undefined,
+      damageTaken: dealt,
+    });
+    finishFuryHit(receiver);
+  }
+  return dealt;
+};
+
+const resolveReflectDamage = (
+  attacker: UnitToken,
+  target: UnitToken,
+  dealt: number,
+  dtype: string,
+): ReflectResolutionResult => {
+  const targetReflect = clamp01(Statuses.get(target, 'reflect')?.power ?? 0);
+  if (dealt <= 0 || targetReflect <= 0) {
+    return { reflectedToAttacker: 0, reflectedToTarget: 0 };
+  }
+
+  const attackerReflect = clamp01(Statuses.get(attacker, 'reflect')?.power ?? 0);
+  const fullReflectDuel = targetReflect >= 1 && attackerReflect >= 1;
+
+  if (fullReflectDuel) {
+    const mirrored = Math.max(0, Math.floor(dealt));
+    const reflectedToAttacker = applyResolvedReflectDamage(target, attacker, mirrored, dtype);
+    const reflectedToTarget = applyResolvedReflectDamage(attacker, target, mirrored, dtype);
+    return { reflectedToAttacker, reflectedToTarget };
+  }
+
+  const netReflectPct = Math.max(0, targetReflect - attackerReflect);
+  if (netReflectPct <= 0) {
+    return { reflectedToAttacker: 0, reflectedToTarget: 0 };
+  }
+
+  const reflectedToAttacker = applyResolvedReflectDamage(
+    target,
+    attacker,
+    Math.round(dealt * netReflectPct),
+    dtype,
+  );
+  return { reflectedToAttacker, reflectedToTarget: 0 };
+};
 
 const unitEventKey = (unit: UnitToken | null | undefined): string | null => {
   if (!unit) return null;
@@ -422,6 +507,8 @@ export function dealAbilityDamage(
     breakdown: finalDamage.breakdown,
   };
   Statuses.afterDamage(attacker, target, damageResult);
+  const dealt = Math.max(0, dealtTotal);
+  resolveReflectDamage(attacker, target, dealt, dtype);
 
   const sessionVfx = asSessionWithVfx(Game);
 
@@ -434,7 +521,6 @@ export function dealAbilityDamage(
     }
   }
 
-  const dealt = Math.max(0, dealtTotal);
   const isKill = target.hp <= 0;
 
   gainFury(attacker, {

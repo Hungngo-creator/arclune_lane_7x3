@@ -100,9 +100,16 @@ export function multiRoll(
     return [];
   }
 
+  const rng = options.rng ?? DEFAULT_RANDOM;
+  const featuredRng = options.featuredRng ?? DEFAULT_RANDOM;
+  const state = getBannerState(stateMap, banner);
+  const chooseFeatured = (rarity: Rarity, forced: boolean): boolean => (
+    shouldHitFeatured(banner, rarity, forced, featuredRng)
+  );
+
   const results = new Array<RollResult>(total);
   for (let i = 0; i < total; i += 1) {
-    results[i] = rollBanner(banner, stateMap, options);
+    results[i] = applyRoll(banner, state, rng, chooseFeatured);
   }
   return results;
 }

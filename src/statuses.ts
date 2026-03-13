@@ -376,22 +376,6 @@ export const Statuses: StatusService = {
   },
   afterDamage(attacker, target, result = {}) {
     const dealt = result.dealt ?? 0;
-    const reflect = this.get(target, 'reflect');
-    if (reflect && dealt > 0) {
-      const back = Math.round(dealt * clamp01(reflect.power ?? 0));
-      applyDamage(attacker, back);
-      hookOnLethalDamage(attacker);
-      if (back > 0) {
-        gainFury(attacker, {
-          type: 'damageTaken',
-          dealt: back,
-          selfMaxHp: Number.isFinite(attacker?.hpMax) ? attacker.hpMax : undefined,
-          damageTaken: back,
-        });
-        finishFuryHit(attacker);
-      }
-    }
-
     const venom = this.get(attacker, 'venom');
     if (venom && dealt > 0) {
       const extra = Math.round(dealt * clamp01(venom.power ?? 0));

@@ -4158,6 +4158,62 @@ __define('./combat.ts', (exports, module, __require) => {
       const parsed = typeof value === 'number' ? value : Number(value);
       return Number.isFinite(parsed) ? parsed : fallback;
   };
+  const clamp01 = (value) => Math.max(0, Math.min(1, toFinite(value, 0)));
+  const applyResolvedReflectDamage = (source, receiver, incomingDamage, dtype) => {
+      const normalizedIncoming = Math.max(0, Math.floor(incomingDamage));
+      if (normalizedIncoming <= 0)
+          return 0;
+      const reflectCtx = Statuses.beforeDamage(source, receiver, {
+          dtype,
+          base: normalizedIncoming,
+          attackType: 'reflect',
+      });
+      const total = calculateFinalDamage(source, receiver, null, normalizedIncoming, {
+          ignoreAll: !!reflectCtx.ignoreAll,
+          reductionMultiplier: reflectCtx.inMul,
+          defenseMultiplier: dtype === 'arcane'
+              ? (100 / (100 + Math.max(0, receiver.res ?? 0)))
+              : (100 / (100 + Math.max(0, receiver.arm ?? 0))),
+      }).total;
+      const absorbed = Statuses.absorbShield(receiver, total, { dtype });
+      const beforeHp = Math.max(0, Math.floor(receiver.hp ?? 0));
+      applyDamage(receiver, absorbed.remain);
+      const afterHp = Math.max(0, Math.floor(receiver.hp ?? 0));
+      const dealt = Math.max(0, beforeHp - afterHp);
+      if (receiver.hp <= 0) {
+          hookOnLethalDamage(receiver);
+      }
+      if (dealt > 0) {
+          gainFury(receiver, {
+              type: 'damageTaken',
+              dealt,
+              selfMaxHp: Number.isFinite(receiver?.hpMax) ? receiver.hpMax : undefined,
+              damageTaken: dealt,
+          });
+          finishFuryHit(receiver);
+      }
+      return dealt;
+  };
+  const resolveReflectDamage = (attacker, target, dealt, dtype) => {
+      const targetReflect = clamp01(Statuses.get(target, 'reflect')?.power ?? 0);
+      if (dealt <= 0 || targetReflect <= 0) {
+          return { reflectedToAttacker: 0, reflectedToTarget: 0 };
+      }
+      const attackerReflect = clamp01(Statuses.get(attacker, 'reflect')?.power ?? 0);
+      const fullReflectDuel = targetReflect >= 1 && attackerReflect >= 1;
+      if (fullReflectDuel) {
+          const mirrored = Math.max(0, Math.floor(dealt));
+          const reflectedToAttacker = applyResolvedReflectDamage(target, attacker, mirrored, dtype);
+          const reflectedToTarget = applyResolvedReflectDamage(attacker, target, mirrored, dtype);
+          return { reflectedToAttacker, reflectedToTarget };
+      }
+      const netReflectPct = Math.max(0, targetReflect - attackerReflect);
+      if (netReflectPct <= 0) {
+          return { reflectedToAttacker: 0, reflectedToTarget: 0 };
+      }
+      const reflectedToAttacker = applyResolvedReflectDamage(target, attacker, Math.round(dealt * netReflectPct), dtype);
+      return { reflectedToAttacker, reflectedToTarget: 0 };
+  };
   const unitEventKey = (unit) => {
       if (!unit)
           return null;
@@ -4440,6 +4496,8 @@ __define('./combat.ts', (exports, module, __require) => {
           breakdown: finalDamage.breakdown,
       };
       Statuses.afterDamage(attacker, target, damageResult);
+      const dealt = Math.max(0, dealtTotal);
+      resolveReflectDamage(attacker, target, dealt, dtype);
       const sessionVfx = asSessionWithVfx(Game);
       if (sessionVfx) {
           try {
@@ -4450,7 +4508,6 @@ __define('./combat.ts', (exports, module, __require) => {
               // bỏ qua lỗi VFX runtime
           }
       }
-      const dealt = Math.max(0, dealtTotal);
       const isKill = target.hp <= 0;
       gainFury(attacker, {
           type: attackType === 'basic' ? 'basic' : 'ability',
@@ -26915,9 +26972,13 @@ __define('./screens/ui-gacha/logic/gacha.ts', (exports, module, __require) => {
       if (total === 0) {
           return [];
       }
+      const rng = options.rng ?? DEFAULT_RANDOM;
+      const featuredRng = options.featuredRng ?? DEFAULT_RANDOM;
+      const state = getBannerState(stateMap, banner);
+      const chooseFeatured = (rarity, forced) => (shouldHitFeatured(banner, rarity, forced, featuredRng));
       const results = new Array(total);
       for (let i = 0; i < total; i += 1) {
-          results[i] = rollBanner(banner, stateMap, options);
+          results[i] = applyRoll(banner, state, rng, chooseFeatured);
       }
       return results;
   }
@@ -27488,21 +27549,6 @@ __define('./statuses.ts', (exports, module, __require) => {
       },
       afterDamage(attacker, target, result = {}) {
           const dealt = result.dealt ?? 0;
-          const reflect = this.get(target, 'reflect');
-          if (reflect && dealt > 0) {
-              const back = Math.round(dealt * clamp01(reflect.power ?? 0));
-              applyDamage(attacker, back);
-              hookOnLethalDamage(attacker);
-              if (back > 0) {
-                  gainFury(attacker, {
-                      type: 'damageTaken',
-                      dealt: back,
-                      selfMaxHp: Number.isFinite(attacker?.hpMax) ? attacker.hpMax : undefined,
-                      damageTaken: back,
-                  });
-                  finishFuryHit(attacker);
-              }
-          }
           const venom = this.get(attacker, 'venom');
           if (venom && dealt > 0) {
               const extra = Math.round(dealt * clamp01(venom.power ?? 0));
