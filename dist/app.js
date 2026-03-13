@@ -12690,6 +12690,14 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
   const RANK_PRIORITY = ['N', 'R', 'SR', 'SSR', 'UR', 'PRIME'];
   const RANK_PRIORITY_SCORE = new Map(RANK_PRIORITY.map((rank, index) => [rank, index + 1]));
   const EMPTY_PROGRESS_BY_ID = new Map();
+  const DEFAULT_EMPTY_PROFILE = Object.freeze({});
+  const DEFAULT_EMPTY_CREEP_DECK = Object.freeze(CREEP_SLOT_ORDER.map((creep) => ({
+      id: creep.id,
+      name: lookupUnit(creep.id)?.name ?? creep.id,
+      cost: 1,
+      dynamicRankSource: 'lineup',
+      dynamicLevelSource: 'lineup',
+  })));
   function normalizeRank(value) {
       if (typeof value !== 'string' || !value.trim())
           return null;
@@ -12821,7 +12829,7 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
   }
   function allocateProgressForCreeps(profiles, creepCount) {
       if (!profiles.length)
-          return Array.from({ length: creepCount }, () => ({}));
+          return Array.from({ length: creepCount }, () => DEFAULT_EMPTY_PROFILE);
       const sorted = [...profiles].sort((a, b) => progressScore(b) - progressScore(a));
       const output = [];
       for (let i = 0; i < creepCount; i += 1) {
@@ -12870,6 +12878,9 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
   }
   function buildAICreepDeckFromLineup(params) {
       const lineup = Array.isArray(params.lineup) ? params.lineup : [];
+      if (lineup.length === 0) {
+          return DEFAULT_EMPTY_CREEP_DECK.map(entry => ({ ...entry }));
+      }
       const creepCount = CREEP_SLOT_ORDER.length;
       const progressById = params.progressById
           ?? (lineup.length > 0
@@ -21551,10 +21562,15 @@ __define('./screens/gacha/view.ts', (exports, module, __require) => {
       if (!cards.length) {
           return { signature: '', cards: [] };
       }
-      const normalizedCards = cards.map((card, index) => toNormalizedCard(card, index));
-      const signature = normalizedCards
-          .map((card) => [card.id, card.name, card.rarity, card.description ?? '', card.artwork ?? ''].join('|'))
-          .join('||');
+      const normalizedCards = new Array(cards.length);
+      const signatureParts = new Array(cards.length);
+      for (let index = 0; index < cards.length; index += 1) {
+          const card = cards[index] ?? { rarity: 'R' };
+          const normalized = toNormalizedCard(card, index);
+          normalizedCards[index] = normalized;
+          signatureParts[index] = `${normalized.id}|${normalized.name}|${normalized.rarity}|${normalized.description ?? ''}|${normalized.artwork ?? ''}`;
+      }
+      const signature = signatureParts.join('||');
       return { signature, cards: normalizedCards };
   }
   function ensureStyles() {
@@ -27222,12 +27238,47 @@ __define('./statuses.ts', (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/statuses.ts
   const __dep0 = __require('./combat/apply-damage.ts');
   const applyDamage = __dep0.applyDamage;
-  const __dep1 = __require('./utils/fury.ts');
-  const gainFury = __dep1.gainFury;
-  const finishFuryHit = __dep1.finishFuryHit;
-  const __dep2 = __require('./utils/time.ts');
-  const safeNow = __dep2.safeNow;
+  const __dep1 = __require('./combat/calculate-final-damage.ts');
+  const calculateFinalDamage = __dep1.calculateFinalDamage;
+  const __dep2 = __require('./utils/fury.ts');
+  const gainFury = __dep2.gainFury;
+  const finishFuryHit = __dep2.finishFuryHit;
+  const __dep3 = __require('./utils/time.ts');
+  const safeNow = __dep3.safeNow;
   const clamp01 = (value) => Math.max(0, Math.min(1, value));
+  function resolveDefenseMultiplier(target, penetration = 0) {
+      const combinedPen = clamp01(penetration);
+      const effectiveArm = Math.max(0, (target.arm ?? 0) * (1 - combinedPen));
+      const effectiveRes = Math.max(0, (target.res ?? 0) * (1 - combinedPen));
+      const physMultiplier = 100 / (100 + effectiveArm);
+      const arcMultiplier = 100 / (100 + effectiveRes);
+      return Math.max(0, (physMultiplier + arcMultiplier) / 2);
+  }
+  function applyMitigatedHit(attacker, target, rawDamage, dtype = 'mixed') {
+      if (rawDamage <= 0 || !target.alive)
+          return 0;
+      const pre = Statuses.beforeDamage(attacker, target, {
+          attackType: 'reflect',
+          dtype,
+          base: rawDamage,
+      });
+      const final = calculateFinalDamage(attacker, target, null, Math.max(0, Math.floor(pre.base * pre.outMul)), {
+          ignoreAll: pre.ignoreAll,
+          defenseMultiplier: resolveDefenseMultiplier(target, pre.defPen),
+          reductionMultiplier: pre.inMul,
+      });
+      const total = Math.max(0, Math.floor(final.total));
+      if (total <= 0)
+          return 0;
+      const shielded = Statuses.absorbShield(target, total, { dtype });
+      const remain = Math.max(0, Math.floor(shielded.remain));
+      if (remain <= 0)
+          return 0;
+      const beforeHp = Math.max(0, Math.floor(target.hp ?? 0));
+      applyDamage(target, remain);
+      const afterHp = Math.max(0, Math.floor(target.hp ?? 0));
+      return Math.max(0, beforeHp - afterHp);
+  }
   const ensureStatusList = (unit) => {
       if (!unit)
           return [];

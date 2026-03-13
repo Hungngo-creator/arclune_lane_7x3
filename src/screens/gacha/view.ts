@@ -51,10 +51,15 @@ function prepareCards(cards: ReadonlyArray<GachaCardInput>): PreparedCards {
   if (!cards.length){
     return { signature: '', cards: [] };
   }
-  const normalizedCards = cards.map((card, index) => toNormalizedCard(card, index));
-  const signature = normalizedCards
-    .map((card) => [card.id, card.name, card.rarity, card.description ?? '', card.artwork ?? ''].join('|'))
-    .join('||');
+  const normalizedCards: NormalizedGachaCard[] = new Array(cards.length);
+  const signatureParts: string[] = new Array(cards.length);
+  for (let index = 0; index < cards.length; index += 1) {
+    const card = cards[index] ?? { rarity: 'R' } as GachaCardInput;
+    const normalized = toNormalizedCard(card, index);
+    normalizedCards[index] = normalized;
+    signatureParts[index] = `${normalized.id}|${normalized.name}|${normalized.rarity}|${normalized.description ?? ''}|${normalized.artwork ?? ''}`;
+  }
+  const signature = signatureParts.join('||');
   return { signature, cards: normalizedCards };
 }
 

@@ -1,5 +1,6 @@
 //home (termux)/arclune_lane_7x3/src/statuses.ts
 import { applyDamage } from './combat/apply-damage.ts';
+import { calculateFinalDamage } from './combat/calculate-final-damage.ts';
 import { gainFury, finishFuryHit } from './utils/fury.ts';
 import { safeNow } from './utils/time.ts';
 
@@ -57,6 +58,41 @@ interface StatusService {
 }
 
 const clamp01 = (value: number): number => Math.max(0, Math.min(1, value));
+
+function resolveDefenseMultiplier(target: UnitToken, penetration = 0): number {
+  const combinedPen = clamp01(penetration);
+  const effectiveArm = Math.max(0, (target.arm ?? 0) * (1 - combinedPen));
+  const effectiveRes = Math.max(0, (target.res ?? 0) * (1 - combinedPen));
+  const physMultiplier = 100 / (100 + effectiveArm);
+  const arcMultiplier = 100 / (100 + effectiveRes);
+  return Math.max(0, (physMultiplier + arcMultiplier) / 2);
+}
+
+function applyMitigatedHit(attacker: UnitToken, target: UnitToken, rawDamage: number, dtype = 'mixed'): number {
+  if (rawDamage <= 0 || !target.alive) return 0;
+
+  const pre = Statuses.beforeDamage(attacker, target, {
+    attackType: 'reflect',
+    dtype,
+    base: rawDamage,
+  });
+  const final = calculateFinalDamage(attacker, target, null, Math.max(0, Math.floor(pre.base * pre.outMul)), {
+    ignoreAll: pre.ignoreAll,
+    defenseMultiplier: resolveDefenseMultiplier(target, pre.defPen),
+    reductionMultiplier: pre.inMul,
+  });
+  const total = Math.max(0, Math.floor(final.total));
+  if (total <= 0) return 0;
+
+  const shielded = Statuses.absorbShield(target, total, { dtype });
+  const remain = Math.max(0, Math.floor(shielded.remain));
+  if (remain <= 0) return 0;
+
+  const beforeHp = Math.max(0, Math.floor(target.hp ?? 0));
+  applyDamage(target, remain);
+  const afterHp = Math.max(0, Math.floor(target.hp ?? 0));
+  return Math.max(0, beforeHp - afterHp);
+}
 
 const ensureStatusList = (unit?: UnitToken | null): StatusEffect[] => {
   if (!unit) return [];

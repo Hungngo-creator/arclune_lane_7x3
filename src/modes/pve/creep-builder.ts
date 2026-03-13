@@ -39,6 +39,16 @@ const RANK_PRIORITY_SCORE = new Map<string, number>(
   RANK_PRIORITY.map((rank, index) => [rank, index + 1]),
 );
 const EMPTY_PROGRESS_BY_ID = new Map<string, RuntimeUnitProgress>();
+const DEFAULT_EMPTY_PROFILE: Readonly<ProgressProfile> = Object.freeze({});
+const DEFAULT_EMPTY_CREEP_DECK: ReadonlyArray<PveDeckEntry> = Object.freeze(
+  CREEP_SLOT_ORDER.map((creep) => ({
+    id: creep.id,
+    name: lookupUnit(creep.id)?.name ?? creep.id,
+    cost: 1,
+    dynamicRankSource: 'lineup',
+    dynamicLevelSource: 'lineup',
+  } satisfies PveDeckEntry)),
+);
 
 function normalizeRank(value: unknown): string | null {
   if (typeof value !== 'string' || !value.trim()) return null;
@@ -180,7 +190,7 @@ function progressScore(profile: ProgressProfile): number {
 }
 
 function allocateProgressForCreeps(profiles: ReadonlyArray<ProgressProfile>, creepCount: number): ProgressProfile[] {
-  if (!profiles.length) return Array.from({ length: creepCount }, () => ({}));
+  if (!profiles.length) return Array.from({ length: creepCount }, () => DEFAULT_EMPTY_PROFILE);
   const sorted = [...profiles].sort((a, b) => progressScore(b) - progressScore(a));
   const output: ProgressProfile[] = [];
   for (let i = 0; i < creepCount; i += 1) {
@@ -242,6 +252,9 @@ export function buildAICreepDeckFromLineup(params: {
   progressById?: ReadonlyMap<string, RuntimeUnitProgress> | null;
 }): PveDeckEntry[] {
   const lineup = Array.isArray(params.lineup) ? params.lineup : [];
+  if (lineup.length === 0) {
+    return DEFAULT_EMPTY_CREEP_DECK.map(entry => ({ ...entry }));
+  }
   const creepCount = CREEP_SLOT_ORDER.length;
   const progressById = params.progressById
     ?? (lineup.length > 0
