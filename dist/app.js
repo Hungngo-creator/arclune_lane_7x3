@@ -22721,13 +22721,12 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       .lineup-wallet__name{margin:0;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
       .lineup-wallet__balance{margin:0;font-size:15px;color:#e6f2ff;}
       .lineup-view__layout{display:grid;grid-template-columns:minmax(280px,1fr) minmax(0,3fr);gap:20px;align-items:start;}
-      .lineup-main-area{display:grid;grid-template-columns:minmax(0,1fr);gap:24px;align-items:start;}
-      .lineup-main{display:flex;flex-direction:column;gap:20px;}
-      .lineup-grid{border-radius:24px;border:1px solid rgba(125,211,252,.24);background:linear-gradient(160deg,rgba(12,20,30,.92),rgba(8,16,24,.78));padding:20px;display:flex;flex-direction:column;gap:14px;}
-      .lineup-grid__title{margin:0;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
-      .lineup-grid__content{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,300px);align-items:flex-start;gap:12px;flex:1;}
-      .lineup-grid__cells{--lineup-cell-size:clamp(96px,14vw,132px);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-rows:var(--lineup-cell-size);gap:min(12px,calc(var(--lineup-cell-size)*.08));align-items:stretch;justify-items:center;}
-      .lineup-cell{position:relative;padding:12px;border-radius:16px;border:1px solid rgba(125,211,252,.22);background:rgba(8,16,26,.82);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;transition:border-color .16s ease,box-shadow .16s ease,background .16s ease;height:100%;width:100%;max-width:var(--lineup-cell-size);aspect-ratio:1/1;text-align:center;}
+      .lineup-main-area{display:grid;grid-template-columns:minmax(0,1fr);gap:0;align-items:start;}
+      .lineup-main{display:flex;flex-direction:column;gap:0;}
+      .lineup-grid{border:none;background:transparent;padding:0;margin:0;display:flex;flex-direction:column;gap:0;align-self:start;}
+      .lineup-grid__content{display:block;margin:0;padding:0;}
+      .lineup-grid__cells{--lineup-cell-size:clamp(96px,14vw,132px);--lineup-cell-gap:12px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-rows:var(--lineup-cell-size);gap:var(--lineup-cell-gap);align-items:stretch;justify-items:center;}
+      .lineup-cell{position:relative;padding:0;border:none;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;transition:filter .16s ease,transform .16s ease;height:100%;width:100%;max-width:var(--lineup-cell-size);aspect-ratio:1/1;text-align:center;}
       .lineup-cell__label{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#7da0c7;margin:0;}
       .lineup-cell__avatar{width:calc(var(--lineup-cell-size)*.62);height:calc(var(--lineup-cell-size)*.62);border-radius:16px;background:rgba(24,34,44,.85);display:flex;align-items:center;justify-content:center;font-size:clamp(18px,2.2vw,26px);font-weight:600;color:#aee4ff;overflow:visible;position:relative;}
       .lineup-cell__avatar img{width:100%;height:100%;object-fit:cover;border-radius:inherit;}
@@ -22737,11 +22736,11 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       .lineup-button{padding:8px 12px;border-radius:12px;border:1px solid rgba(125,211,252,.28);background:rgba(12,22,32,.9);color:#aee4ff;font-size:12px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;}
       .lineup-button:hover{transform:translateY(-1px);border-color:rgba(174,228,255,.5);box-shadow:0 10px 20px rgba(6,12,20,.4);}
       .lineup-button:focus-visible{outline:2px solid rgba(174,228,255,.72);outline-offset:3px;}
-      .lineup-cell.is-locked{border-style:dashed;border-color:rgba(125,211,252,.35);background:rgba(12,22,34,.6);}
-      .lineup-cell.is-selected,.lineup-cell.is-active{border-color:rgba(174,228,255,.55);box-shadow:0 14px 32px rgba(6,12,20,.45);}
+      .lineup-cell.is-locked{border:none;background:transparent;}
+      .lineup-cell.is-selected .lineup-cell__avatar,.lineup-cell.is-active .lineup-cell__avatar{box-shadow:0 14px 32px rgba(6,12,20,.45);outline:1px solid rgba(174,228,255,.55);}
       .lineup-cell__cost{margin:0;font-size:12px;color:#ffd9a1;letter-spacing:.08em;text-transform:uppercase;}
       .lineup-cell__locked-note{margin:0;font-size:12px;color:#9cbcd9;line-height:1.5;}
-      .lineup-grid__details{border-radius:18px;border:1px solid rgba(125,211,252,.18);background:rgba(12,22,32,.78);padding:12px 14px;display:flex;flex-direction:column;gap:12px;align-self:flex-start;height:fit-content;overflow:auto;}
+      .lineup-grid__details{display:none;}
       .lineup-grid__details.is-empty{opacity:0.85;}
       .lineup-grid__details-section{display:flex;flex-direction:column;gap:4px;}
       .lineup-grid__details-heading{margin:0;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#7da0c7;}
@@ -22803,9 +22802,9 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       .lineup-overlay__option-avatar img{width:100%;height:100%;object-fit:cover;border-radius:inherit;}
       .lineup-overlay__option-name{margin:0;font-size:14px;color:#e6f2ff;}
       .lineup-overlay__option-meta{margin:0;font-size:12px;color:#9cbcd9;}
-      @media(max-width:1080px){.lineup-view__layout{grid-template-columns:1fr;gap:16px;}.lineup-main-area{grid-template-columns:1fr;}.lineup-grid__content{grid-template-columns:1fr;}.lineup-grid__cells{grid-template-columns:repeat(4,minmax(0,1fr));}.lineup-leader{grid-template-columns:1fr;}.lineup-leader__badge{display:none;}}
-      @media(max-width:720px){.lineup-view__title{font-size:30px;}.lineup-view__header{flex-direction:column;align-items:flex-start;}.lineup-main-area{gap:16px;}.lineup-grid{padding:14px;}.lineup-grid__content{grid-template-columns:1fr;}.lineup-grid__cells{--lineup-cell-size:clamp(88px,28vw,112px);grid-template-columns:repeat(3,minmax(0,1fr));gap:min(10px,calc(var(--lineup-cell-size)*.08));}.lineup-cell__avatar{width:calc(var(--lineup-cell-size)*.68);height:calc(var(--lineup-cell-size)*.68);}.lineup-roster__list{grid-template-columns:repeat(auto-fill,minmax(132px,1fr));}}
-      @media(max-width:520px){.lineup-grid__cells{--lineup-cell-size:clamp(82px,38vw,108px);grid-template-columns:repeat(2,minmax(0,1fr));gap:min(8px,calc(var(--lineup-cell-size)*.08));}.lineup-cell__avatar{width:calc(var(--lineup-cell-size)*.7);height:calc(var(--lineup-cell-size)*.7);}}
+      @media(max-width:1080px){.lineup-view__layout{grid-template-columns:1fr;gap:16px;}.lineup-main-area{grid-template-columns:1fr;}.lineup-grid__cells{grid-template-columns:repeat(4,minmax(0,1fr));}.lineup-leader{grid-template-columns:1fr;}.lineup-leader__badge{display:none;}}
+      @media(max-width:720px){.lineup-view__title{font-size:30px;}.lineup-view__header{flex-direction:column;align-items:flex-start;}.lineup-main-area{gap:0;}.lineup-grid{padding:0;}.lineup-grid__cells{--lineup-cell-size:clamp(88px,28vw,112px);grid-template-columns:repeat(3,minmax(0,1fr));}.lineup-cell__avatar{width:calc(var(--lineup-cell-size)*.68);height:calc(var(--lineup-cell-size)*.68);}.lineup-roster__list{grid-template-columns:repeat(auto-fill,minmax(132px,1fr));}}
+      @media(max-width:520px){.lineup-grid__cells{--lineup-cell-size:clamp(82px,38vw,108px);grid-template-columns:repeat(2,minmax(0,1fr));}.lineup-cell__avatar{width:calc(var(--lineup-cell-size)*.7);height:calc(var(--lineup-cell-size)*.7);}}
     `;
       ensureStyleTag(STYLE_ID, { css });
   }
@@ -23140,10 +23139,6 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       mainArea.appendChild(mainColumn);
       const gridSection = document.createElement('section');
       gridSection.className = 'lineup-grid';
-      const gridTitle = document.createElement('p');
-      gridTitle.className = 'lineup-grid__title';
-      gridTitle.textContent = 'Bố cục đội hình 5x2';
-      gridSection.appendChild(gridTitle);
       const gridContent = document.createElement('div');
       gridContent.className = 'lineup-grid__content';
       gridSection.appendChild(gridContent);
@@ -23155,25 +23150,56 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       gridContent.appendChild(cellDetails);
       let syncGridDetailsHandle = null;
       let lastGridDetailsHeight = -1;
+      let lastCellGeometrySignature = '';
       const computeGridDetailsHeight = () => {
           syncGridDetailsHandle = null;
-          if (!cellDetails || !leaderSection || typeof leaderSection.getBoundingClientRect !== 'function') {
+          if (!cellDetails || !leaderSection || !cellsGrid || typeof leaderSection.getBoundingClientRect !== 'function') {
               cellDetails.style.maxHeight = '';
+              cellsGrid.style.removeProperty('--lineup-cell-size');
+              cellsGrid.style.removeProperty('--lineup-cell-gap');
               lastGridDetailsHeight = -1;
+              lastCellGeometrySignature = '';
               return;
           }
           const rect = leaderSection.getBoundingClientRect();
-          if (!rect || !Number.isFinite(rect.height)) {
+          const gridWidth = cellsGrid.getBoundingClientRect().width;
+          if (!rect || !Number.isFinite(rect.height) || !Number.isFinite(gridWidth) || gridWidth <= 0) {
               cellDetails.style.maxHeight = '';
+              cellsGrid.style.removeProperty('--lineup-cell-size');
+              cellsGrid.style.removeProperty('--lineup-cell-gap');
               lastGridDetailsHeight = -1;
+              lastCellGeometrySignature = '';
               return;
           }
-          const nextHeight = Math.max(0, Math.round(rect.height));
-          if (nextHeight === lastGridDetailsHeight) {
+          const leaderHeight = Math.max(0, Math.round(rect.height));
+          if (leaderHeight !== lastGridDetailsHeight) {
+              lastGridDetailsHeight = leaderHeight;
+              cellDetails.style.maxHeight = `${leaderHeight}px`;
+          }
+          const minGap = 8;
+          const maxGap = 28;
+          const minCell = 56;
+          const maxCell = 128;
+          let nextCellSize = Math.floor((leaderHeight - minGap) / 2);
+          nextCellSize = Math.max(minCell, Math.min(maxCell, nextCellSize));
+          let nextGap = Math.max(minGap, Math.min(maxGap, leaderHeight - (nextCellSize * 2)));
+          const maxCellByWidth = Math.floor((gridWidth - (nextGap * 4)) / 5);
+          if (Number.isFinite(maxCellByWidth) && maxCellByWidth > 0 && nextCellSize > maxCellByWidth) {
+              nextCellSize = Math.max(minCell, Math.min(nextCellSize, maxCellByWidth));
+              nextGap = Math.max(minGap, Math.min(maxGap, leaderHeight - (nextCellSize * 2)));
+          }
+          const occupiedWidth = (nextCellSize * 5) + (nextGap * 4);
+          if (occupiedWidth > gridWidth) {
+              const fallbackGap = Math.floor((gridWidth - (nextCellSize * 5)) / 4);
+              nextGap = Math.max(minGap, Math.min(maxGap, fallbackGap));
+          }
+          const geometrySignature = `${nextCellSize}:${nextGap}`;
+          if (geometrySignature === lastCellGeometrySignature) {
               return;
           }
-          lastGridDetailsHeight = nextHeight;
-          cellDetails.style.maxHeight = `${nextHeight}px`;
+          lastCellGeometrySignature = geometrySignature;
+          cellsGrid.style.setProperty('--lineup-cell-size', `${nextCellSize}px`);
+          cellsGrid.style.setProperty('--lineup-cell-gap', `${nextGap}px`);
       };
       function syncGridDetailsHeight() {
           if (syncGridDetailsHandle !== null) {
