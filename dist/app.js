@@ -4080,13 +4080,13 @@ __define('./catalog.ts', (exports, module, __require) => {
       return !!(m && normalizeClassName(m.class) === 'Summoner' && kitSupportsSummon(m));
   };
   const CLASS_GROWTH = {
-      Tanker: { HP: 22, ATK: 0.6, WIL: 0.6, ARM: 0.005, RES: 0.004 },
-      Warrior: { HP: 20, ATK: 1.15, WIL: 0.9, ARM: 0.006, RES: 0.006 },
-      Mage: { HP: 16, ATK: 0.6, WIL: 1.4, ARM: 0.0035, RES: 0.007 },
-      Support: { HP: 17, ATK: 0.6, WIL: 1.2, ARM: 0.0035, RES: 0.007 },
-      Ranger: { HP: 16, ATK: 1.45, WIL: 0.6, ARM: 0.003, RES: 0.0035 },
-      Assassin: { HP: 14, ATK: 1.65, WIL: 0.6, ARM: 0.0025, RES: 0.0025 },
-      Summoner: { HP: 18, ATK: 0.9, WIL: 1.25, ARM: 0.004, RES: 0.006 }
+      Tanker: { HP: 22, ATK: 0.6, WIL: 0.6, ARM: 0.6, RES: 0.6 },
+      Warrior: { HP: 20, ATK: 1.15, WIL: 0.9, ARM: 0.5, RES: 0.5 },
+      Mage: { HP: 16, ATK: 0.6, WIL: 1.4, ARM: 0.35, RES: 0.7 },
+      Support: { HP: 17, ATK: 0.6, WIL: 1.2, ARM: 0.35, RES: 0.7 },
+      Ranger: { HP: 16, ATK: 1.45, WIL: 0.6, ARM: 0.3, RES: 0.35 },
+      Assassin: { HP: 14, ATK: 1.65, WIL: 0.6, ARM: 0.3, RES: 0.25 },
+      Summoner: { HP: 18, ATK: 0.9, WIL: 1.25, ARM: 0.4, RES: 0.6 }
   };
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'RANK_MULT')) exports.RANK_MULT = RANK_MULT;
