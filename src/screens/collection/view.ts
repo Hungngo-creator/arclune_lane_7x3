@@ -94,8 +94,8 @@ const TP_STAT_GAIN_PER_POINT: Readonly<Record<TpStatKey, number>> = Object.freez
   HP: 20,
   ATK: 1,
   WIL: 1,
-  ARM: 0.001,
-  RES: 0.001,
+  ARM: 0.5,
+  RES: 0.5,
 });
 
 const K_TP_COMBAT_POWER = 10;

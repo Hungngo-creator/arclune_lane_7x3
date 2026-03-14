@@ -2410,13 +2410,13 @@ __define('./catalog.ts', (exports, module, __require) => {
   };
   // 2) Class base (mốc lv1 để test). SPD không chịu rank multiplier.
   const CLASS_BASE = {
-      Mage: { HP: 720, ATK: 28, WIL: 30, ARM: 0.08, RES: 0.12, AGI: 10, PER: 12, SPD: 1.00, AEmax: 110, AEregen: 8.0, HPregen: 14 },
-      Tanker: { HP: 1000, ATK: 22, WIL: 20, ARM: 0.18, RES: 0.14, AGI: 9, PER: 10, SPD: 0.95, AEmax: 60, AEregen: 4.0, HPregen: 22 },
-      Ranger: { HP: 720, ATK: 35, WIL: 16, ARM: 0.08, RES: 0.08, AGI: 12, PER: 14, SPD: 1.20, AEmax: 75, AEregen: 7.0, HPregen: 12 },
-      Warrior: { HP: 800, ATK: 30, WIL: 18, ARM: 0.14, RES: 0.08, AGI: 11, PER: 11, SPD: 1.10, AEmax: 70, AEregen: 6.0, HPregen: 16 },
-      Summoner: { HP: 660, ATK: 22, WIL: 26, ARM: 0.08, RES: 0.14, AGI: 10, PER: 10, SPD: 1.05, AEmax: 90, AEregen: 8.5, HPregen: 18 },
-      Support: { HP: 760, ATK: 24, WIL: 24, ARM: 0.10, RES: 0.13, AGI: 10, PER: 11, SPD: 1.00, AEmax: 100, AEregen: 7.5, HPregen: 20 },
-      Assassin: { HP: 640, ATK: 36, WIL: 16, ARM: 0.06, RES: 0.08, AGI: 14, PER: 16, SPD: 1.25, AEmax: 65, AEregen: 6.0, HPregen: 10 }
+      Mage: { HP: 740, ATK: 28, WIL: 31, ARM: 0.08, RES: 0.12, AGI: 10, PER: 12, SPD: 1.00, AEmax: 110, AEregen: 8.0, HPregen: 15 },
+      Tanker: { HP: 900, ATK: 23, WIL: 21, ARM: 0.15, RES: 0.12, AGI: 9, PER: 10, SPD: 0.95, AEmax: 65, AEregen: 4.5, HPregen: 19 },
+      Ranger: { HP: 740, ATK: 35, WIL: 17, ARM: 0.08, RES: 0.08, AGI: 12, PER: 14, SPD: 1.20, AEmax: 75, AEregen: 7.0, HPregen: 13 },
+      Warrior: { HP: 820, ATK: 31, WIL: 19, ARM: 0.13, RES: 0.09, AGI: 11, PER: 11, SPD: 1.10, AEmax: 72, AEregen: 6.0, HPregen: 17 },
+      Summoner: { HP: 700, ATK: 24, WIL: 27, ARM: 0.09, RES: 0.13, AGI: 10, PER: 10, SPD: 1.05, AEmax: 95, AEregen: 8.5, HPregen: 18 },
+      Support: { HP: 780, ATK: 25, WIL: 25, ARM: 0.10, RES: 0.13, AGI: 10, PER: 11, SPD: 1.00, AEmax: 102, AEregen: 7.5, HPregen: 20 },
+      Assassin: { HP: 680, ATK: 36, WIL: 17, ARM: 0.06, RES: 0.08, AGI: 14, PER: 16, SPD: 1.25, AEmax: 67, AEregen: 6.0, HPregen: 11 }
   };
   const isRankName = (value) => value in RANK_MULT;
   const isClassName = (value) => normalizeClassName(value) !== null;
@@ -4080,13 +4080,13 @@ __define('./catalog.ts', (exports, module, __require) => {
       return !!(m && normalizeClassName(m.class) === 'Summoner' && kitSupportsSummon(m));
   };
   const CLASS_GROWTH = {
-      Tanker: { HP: 25, ATK: 0.5, WIL: 0.5, ARM: 0.01, RES: 0.005 },
-      Warrior: { HP: 20, ATK: 1.2, WIL: 0.8, ARM: 0.008, RES: 0.008 },
-      Mage: { HP: 15, ATK: 0.5, WIL: 1.5, ARM: 0.005, RES: 0.01 },
-      Support: { HP: 15, ATK: 0.5, WIL: 1.2, ARM: 0.005, RES: 0.01 },
-      Ranger: { HP: 15, ATK: 1.5, WIL: 0.5, ARM: 0.005, RES: 0.005 },
-      Assassin: { HP: 12, ATK: 1.8, WIL: 0.5, ARM: 0.004, RES: 0.004 },
-      Summoner: { HP: 18, ATK: 0.8, WIL: 1.2, ARM: 0.006, RES: 0.008 }
+      Tanker: { HP: 22, ATK: 0.6, WIL: 0.6, ARM: 0.005, RES: 0.004 },
+      Warrior: { HP: 20, ATK: 1.15, WIL: 0.9, ARM: 0.006, RES: 0.006 },
+      Mage: { HP: 16, ATK: 0.6, WIL: 1.4, ARM: 0.0035, RES: 0.007 },
+      Support: { HP: 17, ATK: 0.6, WIL: 1.2, ARM: 0.0035, RES: 0.007 },
+      Ranger: { HP: 16, ATK: 1.45, WIL: 0.6, ARM: 0.003, RES: 0.0035 },
+      Assassin: { HP: 14, ATK: 1.65, WIL: 0.6, ARM: 0.0025, RES: 0.0025 },
+      Summoner: { HP: 18, ATK: 0.9, WIL: 1.25, ARM: 0.004, RES: 0.006 }
   };
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'RANK_MULT')) exports.RANK_MULT = RANK_MULT;
@@ -7430,8 +7430,8 @@ __define('./data/roster-preview.config.ts', (exports, module, __require) => {
           HP: 20,
           ATK: 1,
           WIL: 1,
-          ARM: 0.01,
-          RES: 0.01,
+          ARM: 0.5,
+          RES: 0.5,
           AGI: 1,
           PER: 1,
           AEmax: 10,
@@ -20375,8 +20375,8 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       HP: 20,
       ATK: 1,
       WIL: 1,
-      ARM: 0.001,
-      RES: 0.001,
+      ARM: 0.5,
+      RES: 0.5,
   });
   const K_TP_COMBAT_POWER = 10;
   const TP_EQUIVALENT_GAIN_BY_STAT = Object.freeze({
