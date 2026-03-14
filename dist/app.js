@@ -19182,39 +19182,42 @@ __define('./screens/campaign-world-map/index.ts', (exports, module, __require) =
   const __dep3 = __require('./utils/domain-normalization.ts');
   const normalizeElementKey = __dep3.normalizeElementKey;
   const STYLE_ID = 'campaign-world-map-style';
+  const WORLD_SIZE = 3000;
   const CSS = /* css */ `
     .app--campaign-world-map{padding:18px 16px 28px;color:#ecf6f4;}
     .campaign-world-map{position:relative;max-width:1240px;min-height:76vh;margin:0 auto;border-radius:20px;overflow:hidden;border:1px solid rgba(128,220,201,.25);background:#08141c;box-shadow:0 18px 48px rgba(0,0,0,.35);}
+    .campaign-world-map__hud{position:relative;z-index:4;padding:18px 20px 8px;display:flex;justify-content:space-between;align-items:flex-start;}
+    .campaign-world-map__title{margin:0;font-size:28px;letter-spacing:.06em;text-transform:uppercase;}
+    .campaign-world-map__subtitle{margin:6px 0 0;color:#b6d8d4;font-size:13px;letter-spacing:.03em;}
+    .campaign-world-map__back{border:none;width:44px;height:44px;border-radius:999px;background:rgba(239,254,250,.92);color:#1f3342;cursor:pointer;font-size:24px;line-height:1;}
+    .campaign-world-map__viewport{position:relative;height:420px;margin:6px 14px 16px;border-radius:16px;overflow:hidden;border:1px solid rgba(124,204,194,.3);background:#020b13;touch-action:none;cursor:grab;}
+    .campaign-world-map__viewport.is-dragging{cursor:grabbing;}
+    .campaign-world-map__canvas{position:absolute;width:${WORLD_SIZE}px;height:${WORLD_SIZE}px;transform:translate3d(0,0,0);transform-origin:0 0;}
     .campaign-world-map__bg{position:absolute;inset:0;background:
         radial-gradient(circle at 22% 28%, rgba(90,148,98,.24) 0 14%, transparent 38%),
         radial-gradient(circle at 66% 18%, rgba(117,120,146,.26) 0 12%, transparent 34%),
         radial-gradient(circle at 56% 66%, rgba(43,108,124,.3) 0 9%, transparent 30%),
         conic-gradient(from 220deg at 50% 55%, rgba(20,41,52,.95), rgba(18,51,58,.9), rgba(16,28,37,.95), rgba(20,41,52,.95));
-      filter:saturate(1.05) blur(1.5px);
-      transform:scale(1.03);
+      filter:saturate(1.05);
     }
     .campaign-world-map__terrain{position:absolute;inset:0;opacity:.45;background:
         repeating-linear-gradient(145deg, rgba(197,226,209,.08) 0 2px, transparent 2px 12px),
         radial-gradient(110% 70% at 48% 54%, transparent 0 46%, rgba(130,180,190,.14) 54% 58%, transparent 64%),
         linear-gradient(120deg, transparent 0 35%, rgba(103,162,182,.26) 40% 43%, transparent 52% 100%);
     }
-    .campaign-world-map__hud{position:relative;z-index:2;padding:18px 20px 8px;display:flex;justify-content:space-between;align-items:flex-start;}
-    .campaign-world-map__title{margin:0;font-size:28px;letter-spacing:.06em;text-transform:uppercase;}
-    .campaign-world-map__subtitle{margin:6px 0 0;color:#b6d8d4;font-size:13px;letter-spacing:.03em;}
-    .campaign-world-map__back{border:none;width:44px;height:44px;border-radius:999px;background:rgba(239,254,250,.92);color:#1f3342;cursor:pointer;font-size:24px;line-height:1;}
-    .campaign-world-map__nodes{position:relative;z-index:2;height:280px;margin:12px 26px 0;}
-    .campaign-world-map__path{position:absolute;left:9%;right:10%;top:54%;height:2px;background:linear-gradient(90deg,rgba(255,227,176,.15),rgba(255,227,176,.9),rgba(255,227,176,.15));filter:drop-shadow(0 0 8px rgba(255,230,180,.45));}
     .campaign-node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:8px;background:none;border:none;color:#f8f8de;cursor:pointer;z-index:2;}
     .campaign-node__badge{min-width:128px;padding:9px 12px;border-radius:13px;border:1px solid rgba(255,225,176,.6);background:rgba(44,56,74,.62);backdrop-filter:blur(5px);font-weight:800;letter-spacing:.03em;}
     .campaign-node__dot{width:20px;height:20px;border-radius:50%;background:#f6ddb6;border:2px solid #fff3d2;box-shadow:0 0 0 4px rgba(255,237,194,.25),0 0 16px rgba(255,219,152,.65);}
     .campaign-node--active .campaign-node__badge{border-color:#ffd9ad;background:rgba(54,72,94,.8);}
     .campaign-node--active .campaign-node__dot{box-shadow:0 0 0 6px rgba(255,237,194,.25),0 0 24px rgba(255,219,152,.8);}
-    .campaign-world-map__overlay{position:absolute;inset:0;display:flex;opacity:0;pointer-events:none;transition:opacity .26s ease;z-index:3;}
-    .campaign-world-map--overlay-visible .campaign-world-map__overlay{opacity:1;pointer-events:auto;}
+    .campaign-node--locked{opacity:.45;filter:saturate(.3);cursor:not-allowed;}
+    .campaign-node--locked .campaign-node__dot{background:#92a0ad;border-color:#cad5e4;box-shadow:0 0 0 2px rgba(202,213,228,.2);}
+    .campaign-world-map__overlay{position:absolute;inset:0;display:flex;opacity:0;pointer-events:none;transition:opacity .26s ease;z-index:5;}
+    .campaign-world-map--stage-detail .campaign-world-map__overlay{opacity:1;pointer-events:auto;}
     .campaign-panel{height:100%;padding:18px 16px 16px;backdrop-filter:blur(6px);background:linear-gradient(180deg,rgba(16,36,40,.84),rgba(14,28,34,.9));border-left:1px solid rgba(145,223,205,.16);border-right:1px solid rgba(145,223,205,.16);transform:translateY(14px);transition:transform .26s ease;}
-    .campaign-world-map--overlay-visible .campaign-panel{transform:translateY(0);}
+    .campaign-world-map--stage-detail .campaign-panel{transform:translateY(0);}
     .campaign-panel--left{width:30%;border-left:none;}
-    campaign-panel--middle{width:40%;border:none;background:linear-gradient(180deg,rgba(6,16,22,.22),rgba(6,16,22,.55));display:flex;flex-direction:column;gap:10px;}
+    .campaign-panel--middle{width:40%;border:none;background:linear-gradient(180deg,rgba(6,16,22,.22),rgba(6,16,22,.55));display:flex;flex-direction:column;gap:10px;}
     .campaign-panel--right{width:30%;border-right:none;display:flex;flex-direction:column;}
     .campaign-stage-list{margin-top:10px;max-height:calc(100% - 30px);overflow:auto;display:flex;flex-direction:column;gap:10px;padding-right:4px;}
     .stage-card{width:100%;text-align:left;border-radius:12px;border:1px solid rgba(176,226,215,.28);background:rgba(25,45,52,.82);color:#ecfffb;padding:10px 12px;cursor:pointer;}
@@ -19231,51 +19234,42 @@ __define('./screens/campaign-world-map/index.ts', (exports, module, __require) =
     .campaign-boss__name{font-size:13px;color:#9fd0c7;}
     .campaign-info{display:flex;flex-direction:column;gap:10px;margin-top:12px;font-size:13px;}
     .campaign-info__quote{margin:0;padding:10px;border-left:3px solid rgba(244,189,166,.65);background:rgba(58,41,52,.3);font-style:italic;color:#ffd3cf;}
-    .campaign-empty{margin-top:18px;padding:12px;border:1px dashed rgba(170,223,212,.3);border-radius:12px;color:#b5d8d3;font-size:13px;}
-    .icon-row{display:flex;gap:8px;flex-wrap:wrap;}
-    .icon-chip{width:34px;height:34px;border-radius:10px;border:1px solid rgba(172,226,210,.34);background:rgba(21,40,47,.82);display:grid;place-items:center;position:relative;}
-    .icon-chip img{width:18px;height:18px;}
-    .icon-chip::after{content:attr(data-tip);position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);padding:6px 8px;border-radius:8px;background:rgba(5,12,18,.95);color:#eafff9;font-size:11px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .18s ease;}
-    .icon-chip:hover::after,.icon-chip:focus-visible::after{opacity:1;}
-    .campaign-enter{margin-top:auto;align-self:flex-end;padding:12px 16px;border-radius:12px;border:1px solid rgba(255,222,168,.8);background:linear-gradient(135deg,#ffd08e,#f7a9a1);color:#2a1b1b;font-weight:800;letter-spacing:.06em;cursor:pointer;}
+    .campaign-empty{margin-top:18px;padding:12px;border:1px dashed rgba(173,216,230,.32);border-radius:12px;background:rgba(17,33,43,.48);color:#a9d0c8;}
+    .icon-row{display:flex;flex-wrap:wrap;gap:8px;}
+    .icon-chip{width:40px;height:40px;border-radius:10px;border:1px solid rgba(174,225,215,.35);background:rgba(15,31,40,.82);color:#fff;display:grid;place-items:center;cursor:help;}
+    .icon-chip img{max-width:24px;max-height:24px;}
+    .boss-chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+    .boss-chip{font-size:11px;padding:4px 8px;border-radius:999px;border:1px solid rgba(168,233,219,.4);background:rgba(18,42,53,.66);color:#c8efdf;}
+    .campaign-enter{margin-top:auto;border:none;border-radius:12px;padding:12px 14px;background:linear-gradient(135deg,#f9cb84,#f0a85e);color:#1e1d1a;font-weight:800;cursor:pointer;}
   `;
-  const ELEMENT_ICON = {
-      fire: '🔥', metal: '⚙️', wood: '🌿', earth: '⛰️', lightning: '⚡', blood: '🩸', water: '💧',
-      light: '✨', dark: '🌑', wind: '🌪️', neutral: '⚪',
-  };
-  const CLASS_ICON = {
-      Assassin: '🗡️', Mage: '🪄', Tanker: '🛡️', Warrior: '⚔️', Ranger: '🏹', Summoner: '📜', Support: '💠',
-  };
-  function bossInfoChips(bossId) {
-      const meta = getMetaById(bossId);
-      const className = typeof meta?.class === 'string' ? meta.class : 'Unknown';
-      const elementKey = normalizeElementKey(meta?.base_element ?? meta?.element) ?? 'neutral';
-      const elementLabel = elementKey.charAt(0).toUpperCase() + elementKey.slice(1);
-      const classIcon = CLASS_ICON[className] ?? '❔';
-      const elementIcon = ELEMENT_ICON[elementKey] ?? '⚪';
-      return `<div class="icon-row"><span class="icon-chip" data-tip="Class: ${className}">${classIcon}</span><span class="icon-chip" data-tip="Lò Hạch: ${elementLabel}">${elementIcon}</span></div>`;
+  function statusLabel(stage) {
+      if (stage.status === 'cleared')
+          return `⭐ ${stage.stars || 0} sao`;
+      if (stage.status === 'open')
+          return 'Đang mở';
+      return '🔒 Chưa mở';
   }
   function bossPortraitPath(unitId) {
-      return `assets/units/${unitId}/default.svg`;
+      const normalized = normalizeElementKey(unitId);
+      return `assets/units/${normalized}/default.svg`;
   }
-  function statusLabel(stage) {
-      if (stage.status === 'locked')
-          return '🔒 Chưa mở';
-      if (stage.status === 'cleared')
-          return `★`.repeat(Math.max(stage.stars, 1));
-      return 'Đang mở';
+  function bossInfoChips(unitId) {
+      const meta = getMetaById(unitId);
+      if (!meta)
+          return '';
+      const chips = [
+          meta.rarity ? `<span class="boss-chip">${meta.rarity}</span>` : '',
+          meta.classRole ? `<span class="boss-chip">${meta.classRole}</span>` : '',
+          meta.element ? `<span class="boss-chip">${meta.element}</span>` : ''
+      ].filter(Boolean).join('');
+      return chips ? `<div class="boss-chip-row">${chips}</div>` : '';
   }
-  const LOCATION_POSITIONS = {
-      'jade-forest': '17% 66%',
-      'dragon-spine': '47% 49%',
-      'ember-delta': '76% 38%',
-  };
   function buildLocations() {
       const grouped = new Map();
       CAMPAIGN_STAGE_DATA.forEach((stage) => {
-          const existing = grouped.get(stage.locationId);
-          if (existing) {
-              existing.stages.push(stage);
+          const previous = grouped.get(stage.locationId);
+          if (previous) {
+              previous.stages.push(stage);
               return;
           }
           grouped.set(stage.locationId, {
@@ -19288,28 +19282,62 @@ __define('./screens/campaign-world-map/index.ts', (exports, module, __require) =
       });
       return Array.from(grouped.values());
   }
+  function hashSeed(input) {
+      let hash = 2166136261;
+      for (let index = 0; index < input.length; index += 1) {
+          hash ^= input.charCodeAt(index);
+          hash = Math.imul(hash, 16777619);
+      }
+      return hash >>> 0;
+  }
+  function seededRandom(seed) {
+      const value = Math.sin(seed * 12.9898) * 43758.5453;
+      return value - Math.floor(value);
+  }
+  function computeWorldNodes(locations) {
+      return locations.map((location, index) => {
+          const seed = hashSeed(location.id);
+          const padding = 240;
+          const left = padding + seededRandom(seed) * (WORLD_SIZE - padding * 2);
+          const top = padding + seededRandom(seed + 101) * (WORLD_SIZE - padding * 2);
+          const hasClearedStage = location.stages.some((stage) => stage.status === 'cleared');
+          const previousCleared = index === 0 || locations[index - 1]?.stages.some((stage) => stage.status === 'cleared');
+          const isLocked = !hasClearedStage && !previousCleared;
+          return {
+              id: location.id,
+              label: location.name,
+              left,
+              top,
+              isLocked,
+          };
+      });
+  }
   function renderScreen(context) {
       const { root, shell = null } = context;
       ensureStyleTag(STYLE_ID, { css: CSS });
       const locations = buildLocations();
+      const worldNodes = computeWorldNodes(locations);
+      let currentView = 'world_map';
       let selectedLocation = locations[0] ?? null;
       let selectedStage = null;
-      let overlayVisible = false;
+      let offsetX = 0;
+      let offsetY = 0;
       const container = document.createElement('section');
       container.className = 'campaign-world-map';
       const mount = mountSection({ root, section: container, rootClasses: 'app--campaign-world-map' });
       container.innerHTML = `
-      <div class="campaign-world-map__bg"></div>
-      <div class="campaign-world-map__terrain"></div>
       <header class="campaign-world-map__hud">
         <div>
           <h1 class="campaign-world-map__title">Campaign · World Map</h1>
-          <p class="campaign-world-map__subtitle">Chọn Location để mở Hub, sau đó chọn stage ở panel trái.</p>
+          <p class="campaign-world-map__subtitle">Bấm node sáng để mở Stage Detail.</p>
         </div>
         <button class="campaign-world-map__back" type="button" aria-label="Trở về menu chính">↩</button>
       </header>
-      <div class="campaign-world-map__nodes">
-        <div class="campaign-world-map__path"></div>
+      <div class="campaign-world-map__viewport" data-role="viewport">
+        <div class="campaign-world-map__canvas" data-role="canvas">
+          <div class="campaign-world-map__bg"></div>
+          <div class="campaign-world-map__terrain"></div>
+        </div>
       </div>
       <div class="campaign-world-map__overlay">
         <aside class="campaign-panel campaign-panel--left">
@@ -19320,14 +19348,43 @@ __define('./screens/campaign-world-map/index.ts', (exports, module, __require) =
         <aside class="campaign-panel campaign-panel--right" data-role="stage-info"></aside>
       </div>
     `;
+      const viewport = container.querySelector('[data-role="viewport"]');
+      const canvas = container.querySelector('[data-role="canvas"]');
       const stageList = container.querySelector('[data-role="stage-list"]');
       const stageInfo = container.querySelector('[data-role="stage-info"]');
       const locationInfo = container.querySelector('[data-role="location-info"]');
-      const nodesWrap = container.querySelector('.campaign-world-map__nodes');
       const backButton = container.querySelector('.campaign-world-map__back');
-      function setOverlayVisible(next) {
-          overlayVisible = next;
-          container.classList.toggle('campaign-world-map--overlay-visible', overlayVisible);
+      function setCurrentView(next) {
+          currentView = next;
+          container.classList.toggle('campaign-world-map--stage-detail', currentView === 'stage_detail');
+      }
+      function clampOffset(nextX, nextY) {
+          if (!(viewport instanceof HTMLElement))
+              return { x: nextX, y: nextY };
+          const boundsX = Math.max(0, WORLD_SIZE - viewport.clientWidth);
+          const boundsY = Math.max(0, WORLD_SIZE - viewport.clientHeight);
+          return {
+              x: Math.max(-boundsX, Math.min(0, nextX)),
+              y: Math.max(-boundsY, Math.min(0, nextY)),
+          };
+      }
+      function applyCanvasTransform() {
+          if (!(canvas instanceof HTMLElement))
+              return;
+          const clamped = clampOffset(offsetX, offsetY);
+          offsetX = clamped.x;
+          offsetY = clamped.y;
+          canvas.style.transform = `translate3d(${offsetX}px, ${offsetY}px, 0)`;
+      }
+      function centerOnNode(node) {
+          if (!(viewport instanceof HTMLElement))
+              return;
+          const targetX = -(node.left - viewport.clientWidth / 2);
+          const targetY = -(node.top - viewport.clientHeight / 2);
+          const clamped = clampOffset(targetX, targetY);
+          offsetX = clamped.x;
+          offsetY = clamped.y;
+          applyCanvasTransform();
       }
       function renderLocationInfo() {
           if (!(locationInfo instanceof HTMLElement) || !selectedLocation)
@@ -19344,7 +19401,7 @@ __define('./screens/campaign-world-map/index.ts', (exports, module, __require) =
           if (!(stageInfo instanceof HTMLElement))
               return;
           if (!selectedStage) {
-              stageInfo.innerHTML = `<div class="campaign-empty">Chọn một stage ở panel trái để xem Boss info, Passive và nút Attack.</div>`;
+              stageInfo.innerHTML = '<div class="campaign-empty">Chọn một stage ở panel trái để xem Boss info, Passive và nút Attack.</div>';
               return;
           }
           const bossName = resolveBossName(selectedStage.bossId);
@@ -19369,7 +19426,7 @@ __define('./screens/campaign-world-map/index.ts', (exports, module, __require) =
             ${selectedStage.skills.map((skill, index) => `<button class="icon-chip" data-tip="${skill.name}" type="button" aria-label="${skill.name}"><span>${index + 1}</span></button>`).join('')}
           </div>
         </div>
-        <button class="campaign-enter" type="button" data-role="attack">ATTACK · NHẬP TRẬN</button>
+        <button class="campaign-enter" type="button" data-role="attack">ATTACK ·</button>
       `;
           const attackButton = stageInfo.querySelector('[data-role="attack"]');
           if (attackButton instanceof HTMLButtonElement) {
@@ -19400,49 +19457,97 @@ __define('./screens/campaign-world-map/index.ts', (exports, module, __require) =
         `;
               card.addEventListener('click', () => {
                   selectedStage = stage;
+                  setCurrentView('stage_detail');
                   renderList();
                   renderInfo();
               });
               stageList.appendChild(card);
           });
       }
-      locations.forEach((location) => {
-          if (!(nodesWrap instanceof HTMLElement))
-              return;
-          const node = document.createElement('button');
-          node.type = 'button';
-          node.className = `campaign-node${selectedLocation?.id === location.id ? ' campaign-node--active' : ''}`;
-          const [left = '50%', top = '50%'] = (LOCATION_POSITIONS[location.id] ?? '50% 50%').split(' ');
-          node.style.left = left;
-          node.style.top = top;
-          node.innerHTML = `<span class="campaign-node__badge">${location.name}</span><span class="campaign-node__dot"></span>`;
-          node.addEventListener('click', () => {
-              selectedLocation = location;
-              selectedStage = null;
-              setOverlayVisible(true);
-              renderNodes();
-              renderLocationInfo();
-              renderList();
-              renderInfo();
-          });
-          nodesWrap.appendChild(node);
-      });
       function renderNodes() {
-          if (!(nodesWrap instanceof HTMLElement))
+          if (!(canvas instanceof HTMLElement))
               return;
-          const nodes = nodesWrap.querySelectorAll('.campaign-node');
-          nodes.forEach((node, index) => {
-              const location = locations[index];
-              node.classList.toggle('campaign-node--active', Boolean(location && selectedLocation?.id === location.id));
+          canvas.querySelectorAll('.campaign-node').forEach((node) => node.remove());
+          worldNodes.forEach((nodeData) => {
+              const location = locations.find((entry) => entry.id === nodeData.id);
+              if (!location)
+                  return;
+              const node = document.createElement('button');
+              node.type = 'button';
+              node.className = [
+                  'campaign-node',
+                  selectedLocation?.id === location.id ? 'campaign-node--active' : '',
+                  nodeData.isLocked ? 'campaign-node--locked' : ''
+              ].filter(Boolean).join(' ');
+              node.style.left = `${Math.round(nodeData.left)}px`;
+              node.style.top = `${Math.round(nodeData.top)}px`;
+              node.innerHTML = `<span class="campaign-node__badge">${nodeData.label}${nodeData.isLocked ? ' · Locked' : ''}</span><span class="campaign-node__dot"></span>`;
+              if (nodeData.isLocked) {
+                  node.disabled = true;
+              }
+              else {
+                  node.addEventListener('click', () => {
+                      selectedLocation = location;
+                      selectedStage = null;
+                      setCurrentView('stage_detail');
+                      centerOnNode(nodeData);
+                      renderNodes();
+                      renderLocationInfo();
+                      renderList();
+                      renderInfo();
+                  });
+              }
+              canvas.appendChild(node);
           });
+      }
+      if (viewport instanceof HTMLElement) {
+          let pointerId = null;
+          let lastX = 0;
+          let lastY = 0;
+          viewport.addEventListener('pointerdown', (event) => {
+              pointerId = event.pointerId;
+              lastX = event.clientX;
+              lastY = event.clientY;
+              viewport.classList.add('is-dragging');
+              viewport.setPointerCapture(event.pointerId);
+          });
+          viewport.addEventListener('pointermove', (event) => {
+              if (pointerId !== event.pointerId)
+                  return;
+              const deltaX = event.clientX - lastX;
+              const deltaY = event.clientY - lastY;
+              lastX = event.clientX;
+              lastY = event.clientY;
+              offsetX += deltaX;
+              offsetY += deltaY;
+              applyCanvasTransform();
+          });
+          const releasePointer = (event) => {
+              if (pointerId !== event.pointerId)
+                  return;
+              pointerId = null;
+              viewport.classList.remove('is-dragging');
+              viewport.releasePointerCapture(event.pointerId);
+          };
+          viewport.addEventListener('pointerup', releasePointer);
+          viewport.addEventListener('pointercancel', releasePointer);
       }
       if (backButton instanceof HTMLButtonElement) {
           backButton.addEventListener('click', () => {
-              if (shell && typeof shell.enterScreen === 'function')
+              if (currentView === 'stage_detail') {
+                  setCurrentView('world_map');
+                  return;
+              }
+              if (shell && typeof shell.enterScreen === 'function') {
+                  setCurrentView('menu');
                   shell.enterScreen('main-menu');
+              }
           });
       }
-      setOverlayVisible(Boolean(selectedLocation));
+      if (worldNodes[0]) {
+          centerOnNode(worldNodes[0]);
+      }
+      setCurrentView('world_map');
       renderNodes();
       renderLocationInfo();
       renderList();
