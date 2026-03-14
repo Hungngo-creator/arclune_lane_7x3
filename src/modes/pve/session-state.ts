@@ -16,6 +16,7 @@ import { createSummonQueue } from '@shared-types/units.ts';
 
 import { CFG } from '../../config.ts';
 import { UNITS, lookupUnit } from '../../units.ts';
+import { makeInstanceStats } from '../../meta.ts';
 import { metaServiceAdapter } from '../../meta.ts';
 import { gameEvents } from '../../events.ts';
 import { getEnvironmentBackground, drawEnvironmentProps } from '../../background.ts';
@@ -122,6 +123,48 @@ interface ResolveEnemyUnitsOptions {
 }
 
 const EMPTY_UNIT_PROGRESS = new Map<string, RuntimeUnitProgress>();
+const AUTO_PLAYER_DECK_SIZE = 10;
+
+function normalizeIntegerWithFallback(value: unknown, min: number, fallback: number): number {
+  if (Number.isFinite(value)) {
+    return Math.max(min, Math.floor(Number(value)));
+  }
+  return fallback;
+}
+
+function estimateUnitStrength(unitId: string, progress: RuntimeUnitProgress | undefined): number {
+  const level = normalizeIntegerWithFallback(progress?.level, 1, 1);
+  const stars = normalizeIntegerWithFallback(progress?.stars, 0, 0);
+  const realm = normalizeIntegerWithFallback(progress?.realm, 0, 0);
+  const subRealm = normalizeIntegerWithFallback(progress?.subRealm, 0, 0);
+  const tp = normalizeIntegerWithFallback(progress?.tp, 0, 0);
+  const stats = makeInstanceStats(unitId, level, stars);
+  const weightedStats = (stats.hpMax * 0.18) + (stats.atk * 4) + (stats.wil * 3) + ((stats.arm + stats.res) * 500);
+  const weightedProgress = (level * 12) + (stars * 220) + (realm * 180) + (subRealm * 35) + (tp * 10);
+  return weightedStats + weightedProgress;
+}
+
+function buildAutoPlayerDeckFromCollection(
+  progressById: ReadonlyMap<string, RuntimeUnitProgress>,
+): SessionState['unitsAll'] {
+  if (progressById.size === 0) return [];
+  const ranked = Array.from(progressById.entries())
+    .filter(([unitId, progress]) => {
+      if (!unitId || progress?.owned === false) return false;
+      return !!lookupUnit(unitId);
+    })
+    .map(([unitId, progress]) => ({
+      unitId,
+      score: estimateUnitStrength(unitId, progress),
+    }))
+    .sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      return a.unitId.localeCompare(b.unitId);
+    })
+    .slice(0, AUTO_PLAYER_DECK_SIZE)
+    .map((entry) => entry.unitId);
+  return normalizeDeckEntries(ranked);
+}
 
 function normalizePositiveLimit(value: unknown, fallback: number): number {
   if (Number.isFinite(value)) {
@@ -462,6 +505,7 @@ export function buildTurnOrder(): { order: TurnOrderEntry[]; indexMap: Map<strin
 
 export function createSession(options: CreateSessionOptions = {}): SessionState {
   const normalized = normalizeConfig(options);
+  const unitProgressById = mapUnitProgressById(normalized.collectionState ?? null);
   const modeKey = typeof normalized.modeKey === 'string' ? normalized.modeKey : null;
   const sceneCfg = getSceneConfig(CFG);
   const sceneTheme = normalized.sceneTheme
@@ -475,19 +519,24 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
     ?? sceneCfg?.DEFAULT_THEME
     ?? null;
 
-  const preferredPlayerDeck = getPreferredDeckInput(normalized);
-  const lockedPlayerDeckSource = preferredPlayerDeck ?? DEFAULT_UNIT_ROSTER;
-  const lockedPlayerDeck = normalizeDeckEntries(lockedPlayerDeckSource);
+  const preferredPlayerDeck = normalizeDeckEntries(getPreferredDeckInput(normalized) ?? []);
+  const autoPlayerDeck = preferredPlayerDeck.length === 0
+    ? buildAutoPlayerDeckFromCollection(unitProgressById)
+    : [];
+  const fallbackDeck = normalizeDeckEntries(DEFAULT_UNIT_ROSTER).slice(0, AUTO_PLAYER_DECK_SIZE);
+  const lockedPlayerDeck = preferredPlayerDeck.length > 0
+    ? preferredPlayerDeck
+    : (autoPlayerDeck.length > 0 ? autoPlayerDeck : fallbackDeck.slice(0, 1));
 
   const allyUnits: SessionState['unitsAll'] = lockedPlayerDeck.length
     ? Array.from(lockedPlayerDeck)
     : Array.from(DEFAULT_UNIT_ROSTER);
 
-  const unitProgressById = mapUnitProgressById(normalized.collectionState ?? null);
   const enemyPreset = normalized.aiPreset ?? null;
   const enemyUnits = resolveEnemyUnits({
     aiPreset: enemyPreset,
-    preferredDeck: preferredPlayerDeck,
+    preferredDeck: preferredPlayerDeck.length > 0 ? preferredPlayerDeck : autoPlayerDeck,
+    fallbackDeck: fallbackDeck,
     unitProgressById,
     collectionState: normalized.collectionState ?? null,
   });

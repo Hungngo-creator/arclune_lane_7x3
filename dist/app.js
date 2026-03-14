@@ -17268,35 +17268,37 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
   const UNITS = __dep2.UNITS;
   const lookupUnit = __dep2.lookupUnit;
   const __dep3 = __require('./meta.ts');
-  const metaServiceAdapter = __dep3.metaServiceAdapter;
-  const __dep4 = __require('./events.ts');
-  const gameEvents = __dep4.gameEvents;
-  const __dep5 = __require('./background.ts');
-  const getEnvironmentBackground = __dep5.getEnvironmentBackground;
-  const drawEnvironmentProps = __dep5.drawEnvironmentProps;
-  const __dep6 = __require('./scene.ts');
-  const getCachedBattlefieldScene = __dep6.getCachedBattlefieldScene;
-  const __dep7 = __require('./engine.ts');
-  const drawGridOblique = __dep7.drawGridOblique;
-  const __dep8 = __require('./statuses.ts');
-  const Statuses = __dep8.Statuses;
-  const __dep9 = __require('./art.ts');
-  const getUnitArt = __dep9.getUnitArt;
-  const __dep10 = __require('./utils/unit-id.ts');
-  const normalizeUnitId = __dep10.normalizeUnitId;
-  const __dep11 = __require('./utils/rng.ts');
-  const createRngState = __dep11.createRngState;
-  const nextRngValue = __dep11.nextRngValue;
-  const __dep12 = __require('./utils/format.ts');
-  const stableStringify = __dep12.stableStringify;
-  const __dep13 = __require('./utils/domain-normalization.ts');
-  const normalizeClassName = __dep13.normalizeClassName;
-  const normalizeElementKey = __dep13.normalizeElementKey;
-  const normalizeElementList = __dep13.normalizeElementList;
-  const __dep14 = __require('./modes/pve/collection-mapper.ts');
-  const mapUnitProgressById = __dep14.mapUnitProgressById;
-  const __dep15 = __require('./modes/pve/creep-builder.ts');
-  const buildAICreepDeckFromLineup = __dep15.buildAICreepDeckFromLineup;
+  const makeInstanceStats = __dep3.makeInstanceStats;
+  const __dep4 = __require('./meta.ts');
+  const metaServiceAdapter = __dep4.metaServiceAdapter;
+  const __dep5 = __require('./events.ts');
+  const gameEvents = __dep5.gameEvents;
+  const __dep6 = __require('./background.ts');
+  const getEnvironmentBackground = __dep6.getEnvironmentBackground;
+  const drawEnvironmentProps = __dep6.drawEnvironmentProps;
+  const __dep7 = __require('./scene.ts');
+  const getCachedBattlefieldScene = __dep7.getCachedBattlefieldScene;
+  const __dep8 = __require('./engine.ts');
+  const drawGridOblique = __dep8.drawGridOblique;
+  const __dep9 = __require('./statuses.ts');
+  const Statuses = __dep9.Statuses;
+  const __dep10 = __require('./art.ts');
+  const getUnitArt = __dep10.getUnitArt;
+  const __dep11 = __require('./utils/unit-id.ts');
+  const normalizeUnitId = __dep11.normalizeUnitId;
+  const __dep12 = __require('./utils/rng.ts');
+  const createRngState = __dep12.createRngState;
+  const nextRngValue = __dep12.nextRngValue;
+  const __dep13 = __require('./utils/format.ts');
+  const stableStringify = __dep13.stableStringify;
+  const __dep14 = __require('./utils/domain-normalization.ts');
+  const normalizeClassName = __dep14.normalizeClassName;
+  const normalizeElementKey = __dep14.normalizeElementKey;
+  const normalizeElementList = __dep14.normalizeElementList;
+  const __dep15 = __require('./modes/pve/collection-mapper.ts');
+  const mapUnitProgressById = __dep15.mapUnitProgressById;
+  const __dep16 = __require('./modes/pve/creep-builder.ts');
+  const buildAICreepDeckFromLineup = __dep16.buildAICreepDeckFromLineup;
   void Statuses;
   const DEFAULT_UNIT_ROSTER = UNITS.map((unit) => {
       const unitId = normalizeUnitId(unit.id);
@@ -17345,6 +17347,46 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
       };
   }
   const EMPTY_UNIT_PROGRESS = new Map();
+  const AUTO_PLAYER_DECK_SIZE = 10;
+  function normalizeIntegerWithFallback(value, min, fallback) {
+      if (Number.isFinite(value)) {
+          return Math.max(min, Math.floor(Number(value)));
+      }
+      return fallback;
+  }
+  function estimateUnitStrength(unitId, progress) {
+      const level = normalizeIntegerWithFallback(progress?.level, 1, 1);
+      const stars = normalizeIntegerWithFallback(progress?.stars, 0, 0);
+      const realm = normalizeIntegerWithFallback(progress?.realm, 0, 0);
+      const subRealm = normalizeIntegerWithFallback(progress?.subRealm, 0, 0);
+      const tp = normalizeIntegerWithFallback(progress?.tp, 0, 0);
+      const stats = makeInstanceStats(unitId, level, stars);
+      const weightedStats = (stats.hpMax * 0.18) + (stats.atk * 4) + (stats.wil * 3) + ((stats.arm + stats.res) * 500);
+      const weightedProgress = (level * 12) + (stars * 220) + (realm * 180) + (subRealm * 35) + (tp * 10);
+      return weightedStats + weightedProgress;
+  }
+  function buildAutoPlayerDeckFromCollection(progressById) {
+      if (progressById.size === 0)
+          return [];
+      const ranked = Array.from(progressById.entries())
+          .filter(([unitId, progress]) => {
+          if (!unitId || progress?.owned === false)
+              return false;
+          return !!lookupUnit(unitId);
+      })
+          .map(([unitId, progress]) => ({
+          unitId,
+          score: estimateUnitStrength(unitId, progress),
+      }))
+          .sort((a, b) => {
+          if (b.score !== a.score)
+              return b.score - a.score;
+          return a.unitId.localeCompare(b.unitId);
+      })
+          .slice(0, AUTO_PLAYER_DECK_SIZE)
+          .map((entry) => entry.unitId);
+      return normalizeDeckEntries(ranked);
+  }
   function normalizePositiveLimit(value, fallback) {
       if (Number.isFinite(value)) {
           const numeric = Number(value);
@@ -17628,6 +17670,7 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
   }
   function createSession(options = {}) {
       const normalized = normalizeConfig(options);
+      const unitProgressById = mapUnitProgressById(normalized.collectionState ?? null);
       const modeKey = typeof normalized.modeKey === 'string' ? normalized.modeKey : null;
       const sceneCfg = getSceneConfig(CFG);
       const sceneTheme = normalized.sceneTheme
@@ -17640,17 +17683,22 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
           ?? sceneCfg?.CURRENT_THEME
           ?? sceneCfg?.DEFAULT_THEME
           ?? null;
-      const preferredPlayerDeck = getPreferredDeckInput(normalized);
-      const lockedPlayerDeckSource = preferredPlayerDeck ?? DEFAULT_UNIT_ROSTER;
-      const lockedPlayerDeck = normalizeDeckEntries(lockedPlayerDeckSource);
+      const preferredPlayerDeck = normalizeDeckEntries(getPreferredDeckInput(normalized) ?? []);
+      const autoPlayerDeck = preferredPlayerDeck.length === 0
+          ? buildAutoPlayerDeckFromCollection(unitProgressById)
+          : [];
+      const fallbackDeck = normalizeDeckEntries(DEFAULT_UNIT_ROSTER).slice(0, AUTO_PLAYER_DECK_SIZE);
+      const lockedPlayerDeck = preferredPlayerDeck.length > 0
+          ? preferredPlayerDeck
+          : (autoPlayerDeck.length > 0 ? autoPlayerDeck : fallbackDeck.slice(0, 1));
       const allyUnits = lockedPlayerDeck.length
           ? Array.from(lockedPlayerDeck)
           : Array.from(DEFAULT_UNIT_ROSTER);
-      const unitProgressById = mapUnitProgressById(normalized.collectionState ?? null);
       const enemyPreset = normalized.aiPreset ?? null;
       const enemyUnits = resolveEnemyUnits({
           aiPreset: enemyPreset,
-          preferredDeck: preferredPlayerDeck,
+          preferredDeck: preferredPlayerDeck.length > 0 ? preferredPlayerDeck : autoPlayerDeck,
+          fallbackDeck: fallbackDeck,
           unitProgressById,
           collectionState: normalized.collectionState ?? null,
       });
