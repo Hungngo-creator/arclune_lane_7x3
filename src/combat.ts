@@ -124,6 +124,8 @@ interface ReflectResolutionResult {
   reflectedToTarget: number;
 }
 
+const REFLECT_EQUAL_EPSILON = 0.0001;
+
 const applyResolvedReflectDamage = (
   source: UnitToken,
   receiver: UnitToken,
@@ -179,10 +181,11 @@ const resolveReflectDamage = (
   }
 
   const attackerReflect = clamp01(Statuses.get(attacker, 'reflect')?.power ?? 0);
+  const hasEqualReflect = Math.abs(targetReflect - attackerReflect) <= REFLECT_EQUAL_EPSILON;
   const fullReflectDuel = targetReflect >= 1 && attackerReflect >= 1;
 
-  if (fullReflectDuel) {
-    const mirrored = Math.max(0, Math.floor(dealt));
+  if (fullReflectDuel || (hasEqualReflect && targetReflect > 0)) {
+    const mirrored = Math.round(Math.max(0, dealt) * targetReflect);
     const reflectedToAttacker = applyResolvedReflectDamage(target, attacker, mirrored, dtype);
     const reflectedToTarget = applyResolvedReflectDamage(attacker, target, mirrored, dtype);
     return { reflectedToAttacker, reflectedToTarget };

@@ -216,4 +216,36 @@ describe('dealAbilityDamage SSI formula extensions', () => {
     expect(attacker.hp).toBe(800);
     expect(target.hp).toBe(600);
   });
+
+  test('equal reflect below 100% mirrors once per side instead of canceling out', () => {
+    const attacker = mkUnit({
+      side: 'ally',
+      id: 'leaderA',
+      hp: 1000,
+      hpMax: 1000,
+      arm: 0,
+      res: 0,
+      statuses: [{ id: 'reflect', kind: 'buff', tag: 'counter', power: 0.8 } as any],
+    });
+    const target = mkUnit({
+      side: 'enemy',
+      id: 'leaderB',
+      hp: 1000,
+      hpMax: 1000,
+      arm: 0,
+      res: 0,
+      statuses: [{ id: 'reflect', kind: 'buff', tag: 'counter', power: 0.8 } as any],
+    });
+    const game = mkGame([attacker, target]);
+
+    dealAbilityDamage(game, attacker, target, {
+      base: 200,
+      dtype: 'physical',
+      skillMul: 1,
+      realmBonus: 0,
+    });
+
+    expect(attacker.hp).toBe(840);
+    expect(target.hp).toBe(640);
+  });
 });

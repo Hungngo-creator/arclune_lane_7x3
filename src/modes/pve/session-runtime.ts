@@ -31,7 +31,11 @@ type RewardList = ReadonlyArray<RewardRoll>;
 type MutableRewardList = RewardRoll[];
 
 function isReward(entry: RewardRoll | null | undefined): entry is RewardRoll {
-  return Boolean(entry && typeof entry.id === 'string');
+  if (!Array.isArray(value)) return false;
+  for (let index = 0; index < value.length; index += 1) {
+    if (!isReward(value[index] as RewardRoll | null | undefined)) return false;
+  }
+  return true;
 }
 
 function isRewardArray(value: unknown): value is MutableRewardList {
@@ -41,7 +45,12 @@ function isRewardArray(value: unknown): value is MutableRewardList {
 function normalizeRewardList(value: unknown): RewardList {
   if (isRewardArray(value)) return value;
   if (!Array.isArray(value)) return [];
-  return value.filter(isReward);
+  const normalized: RewardRoll[] = [];
+  for (let index = 0; index < value.length; index += 1) {
+    const reward = value[index] as RewardRoll | null | undefined;
+    if (isReward(reward)) normalized.push(reward);
+  }
+  return normalized;
 }
 
 function sanitizeRewardList<T extends SessionRuntimeState | EncounterState>(
@@ -49,11 +58,18 @@ function sanitizeRewardList<T extends SessionRuntimeState | EncounterState>(
   key: T extends SessionRuntimeState ? 'rewardQueue' : 'pendingRewards',
 ): MutableRewardList {
   const source = container[key as keyof T] as unknown;
-  const next = isRewardArray(source)
-    ? source
-    : Array.isArray(source)
-      ? source.filter(isReward)
-      : [];
+  let next: MutableRewardList;
+  if (isRewardArray(source)) {
+    next = source;
+  } else if (Array.isArray(source)) {
+    next = [];
+    for (let index = 0; index < source.length; index += 1) {
+      const reward = source[index] as RewardRoll | null | undefined;
+      if (isReward(reward)) next.push(reward);
+    }
+  } else {
+    next = [];
+  }
   (container as unknown as Record<string, unknown>)[key] = next;
   return next;
 }

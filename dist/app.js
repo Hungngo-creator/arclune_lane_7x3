@@ -4159,6 +4159,7 @@ __define('./combat.ts', (exports, module, __require) => {
       return Number.isFinite(parsed) ? parsed : fallback;
   };
   const clamp01 = (value) => Math.max(0, Math.min(1, toFinite(value, 0)));
+  const REFLECT_EQUAL_EPSILON = 0.0001;
   const applyResolvedReflectDamage = (source, receiver, incomingDamage, dtype) => {
       const normalizedIncoming = Math.max(0, Math.floor(incomingDamage));
       if (normalizedIncoming <= 0)
@@ -4200,9 +4201,10 @@ __define('./combat.ts', (exports, module, __require) => {
           return { reflectedToAttacker: 0, reflectedToTarget: 0 };
       }
       const attackerReflect = clamp01(Statuses.get(attacker, 'reflect')?.power ?? 0);
+      const hasEqualReflect = Math.abs(targetReflect - attackerReflect) <= REFLECT_EQUAL_EPSILON;
       const fullReflectDuel = targetReflect >= 1 && attackerReflect >= 1;
-      if (fullReflectDuel) {
-          const mirrored = Math.max(0, Math.floor(dealt));
+      if (fullReflectDuel || (hasEqualReflect && targetReflect > 0)) {
+          const mirrored = Math.round(Math.max(0, dealt) * targetReflect);
           const reflectedToAttacker = applyResolvedReflectDamage(target, attacker, mirrored, dtype);
           const reflectedToTarget = applyResolvedReflectDamage(attacker, target, mirrored, dtype);
           return { reflectedToAttacker, reflectedToTarget };
@@ -16935,7 +16937,13 @@ __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
   const __getActiveGame = __dep1.__getActiveGame;
   const __resolveStatusIconPreview = __dep1.__resolveStatusIconPreview;
   function isReward(entry) {
-      return Boolean(entry && typeof entry.id === 'string');
+      if (!Array.isArray(value))
+          return false;
+      for (let index = 0; index < value.length; index += 1) {
+          if (!isReward(value[index]))
+              return false;
+      }
+      return true;
   }
   function isRewardArray(value) {
       return Array.isArray(value) && value.every(isReward);
@@ -16945,15 +16953,31 @@ __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
           return value;
       if (!Array.isArray(value))
           return [];
-      return value.filter(isReward);
+      const normalized = [];
+      for (let index = 0; index < value.length; index += 1) {
+          const reward = value[index];
+          if (isReward(reward))
+              normalized.push(reward);
+      }
+      return normalized;
   }
   function sanitizeRewardList(container, key) {
       const source = container[key];
-      const next = isRewardArray(source)
-          ? source
-          : Array.isArray(source)
-              ? source.filter(isReward)
-              : [];
+      let next;
+      if (isRewardArray(source)) {
+          next = source;
+      }
+      else if (Array.isArray(source)) {
+          next = [];
+          for (let index = 0; index < source.length; index += 1) {
+              const reward = source[index];
+              if (isReward(reward))
+                  next.push(reward);
+          }
+      }
+      else {
+          next = [];
+      }
       container[key] = next;
       return next;
   }
@@ -25533,11 +25557,17 @@ __define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
       };
       const renderUnits = () => {
           const fragment = document.createDocumentFragment();
+          unitButtons.clear();
           allUnits.forEach((unit) => {
               const btn = document.createElement('button');
               btn.type = 'button';
               btn.className = `tactical-ai__unit${unit.id === activeUnitId ? ' is-active' : ''}`;
-              btn.innerHTML = `<span class="tactical-ai__avatar">${unit.name.slice(0, 1)}</span><span>${unit.name}</span>`;
+              const avatar = document.createElement('span');
+              avatar.className = 'tactical-ai__avatar';
+              avatar.textContent = unit.name.slice(0, 1);
+              const label = document.createElement('span');
+              label.textContent = unit.name;
+              btn.append(avatar, label);
               btn.dataset.unitId = unit.id;
               unitButtons.set(unit.id, btn);
               fragment.appendChild(btn);

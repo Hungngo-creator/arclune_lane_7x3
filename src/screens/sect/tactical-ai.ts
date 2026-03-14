@@ -169,11 +169,20 @@ export function renderScreen({ root, shell = null }: { root: HTMLElement; shell?
 
   const renderUnits = (): void => {
     const fragment = document.createDocumentFragment();
+    unitButtons.clear();
     allUnits.forEach((unit) => {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = `tactical-ai__unit${unit.id === activeUnitId ? ' is-active' : ''}`;
-      btn.innerHTML = `<span class="tactical-ai__avatar">${unit.name.slice(0, 1)}</span><span>${unit.name}</span>`;
+
+      const avatar = document.createElement('span');
+      avatar.className = 'tactical-ai__avatar';
+      avatar.textContent = unit.name.slice(0, 1);
+
+      const label = document.createElement('span');
+      label.textContent = unit.name;
+
+      btn.append(avatar, label);
       btn.dataset.unitId = unit.id;
       unitButtons.set(unit.id, btn);
       fragment.appendChild(btn);
