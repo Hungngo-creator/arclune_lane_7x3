@@ -335,7 +335,7 @@ __define('./ai.ts', (exports, module, __require) => {
   const globalAetherPool = __dep5.globalAetherPool;
   const __dep6 = __require('./leader-uyen.ts');
   const isUyenLeader = __dep6.isUyenLeader;
-  const isLeaderUltReady = __dep6.isLeaderUltReady;
+  const isAnyLeaderUltReady = __dep6.isAnyLeaderUltReady;
   const __dep7 = __require('./turns/interleaved.ts');
   const predictSpawnCycleByTurnOrder = __dep7.predictSpawnCycleByTurnOrder;
   const __dep8 = __require('./shared-types/units.ts');
@@ -955,7 +955,7 @@ __define('./ai.ts', (exports, module, __require) => {
                   && unit.statuses.some((status) => status && status.kind === 'debuff');
           case 'self_full_fury': {
               if (isUyenLeader(unit))
-                  return isLeaderUltReady(unit);
+                  return isAnyLeaderUltReady(unit);
               const fury = Number.isFinite(unit.fury) ? Number(unit.fury) : 0;
               const furyMax = Math.max(1, Number.isFinite(unit.furyMax) ? Number(unit.furyMax) : 100);
               return fury >= furyMax;
@@ -12079,6 +12079,9 @@ __define('./events.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'addGameEventListener')) exports.addGameEventListener = addGameEventListener;
 });
 __define('./leader-uyen.ts', (exports, module, __require) => {
+  function isSystemLeader(unit) {
+      return !!unit && typeof unit.id === 'string' && unit.id.startsWith('leader');
+  }
   const stateMap = new WeakMap();
   function isUyenLeader(unit) {
       return !!unit && (unit.id === 'leaderA' || unit.id === 'leaderB');
@@ -12105,6 +12108,34 @@ __define('./leader-uyen.ts', (exports, module, __require) => {
       const fury = Number.isFinite(unit.fury) ? Number(unit.fury) : 0;
       const furyMax = Math.max(1, Number.isFinite(unit.furyMax) ? Number(unit.furyMax) : 100);
       return fury >= furyMax || fury >= 100;
+  }
+  function canCastLeaderUltChoice(unit, choice) {
+      if (!isSystemLeader(unit))
+          return false;
+      const fury = Math.max(0, Math.floor(Number.isFinite(unit?.fury) ? Number(unit?.fury) : 0));
+      if (unit?.id === 'leaderA' || unit?.id === 'leaderB') {
+          if (choice === 'B') {
+              const state = ensureUyenState(unit);
+              return fury > 0 && Boolean(state) && (state?.bUses ?? 0) < 10;
+          }
+          return fury >= 100;
+      }
+      return fury >= 100;
+  }
+  function isAnyLeaderUltReady(unit) {
+      return canCastLeaderUltChoice(unit, 'A')
+          || canCastLeaderUltChoice(unit, 'B')
+          || canCastLeaderUltChoice(unit, 'C');
+  }
+  function canCastUyenUltChoice(unit, choice) {
+      if (!isUyenLeader(unit))
+          return false;
+      return canCastLeaderUltChoice(unit, choice);
+  }
+  function isAnyUyenUltReady(unit) {
+      if (!isUyenLeader(unit))
+          return false;
+      return isAnyLeaderUltReady(unit);
   }
   function grantUyenSummonRage(unit, options = {}) {
       if (!isUyenLeader(unit))
@@ -12186,6 +12217,10 @@ __define('./leader-uyen.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'isUyenLeader')) exports.isUyenLeader = isUyenLeader;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureUyenState')) exports.ensureUyenState = ensureUyenState;
   if (!Object.prototype.hasOwnProperty.call(exports, 'isLeaderUltReady')) exports.isLeaderUltReady = isLeaderUltReady;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'canCastLeaderUltChoice')) exports.canCastLeaderUltChoice = canCastLeaderUltChoice;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'isAnyLeaderUltReady')) exports.isAnyLeaderUltReady = isAnyLeaderUltReady;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'canCastUyenUltChoice')) exports.canCastUyenUltChoice = canCastUyenUltChoice;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'isAnyUyenUltReady')) exports.isAnyUyenUltReady = isAnyUyenUltReady;
   if (!Object.prototype.hasOwnProperty.call(exports, 'grantUyenSummonRage')) exports.grantUyenSummonRage = grantUyenSummonRage;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyUyenBasicExtras')) exports.applyUyenBasicExtras = applyUyenBasicExtras;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getUyenUltState')) exports.getUyenUltState = getUyenUltState;
@@ -13031,7 +13066,8 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   const ensureUyenState = __dep26.ensureUyenState;
   const getUyenUltChoice = __dep26.getUyenUltChoice;
   const grantUyenSummonRage = __dep26.grantUyenSummonRage;
-  const isLeaderUltReady = __dep26.isLeaderUltReady;
+  const canCastLeaderUltChoice = __dep26.canCastLeaderUltChoice;
+  const isAnyLeaderUltReady = __dep26.isAnyLeaderUltReady;
   const isUyenLeader = __dep26.isUyenLeader;
   const queueUyenUltCast = __dep26.queueUyenUltCast;
   const ULT_TAG_CACHE = new WeakMap();
@@ -13534,6 +13570,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   let timerElement = null;
   let leaderUltControlsEl = null;
   let leaderUltButtons = [];
+  let leaderUltControlsFingerprint = null;
   let storedConfig = normalizeConfig();
   let running = false;
   let leaderEndCheckFlags = { ally: false, enemy: false };
@@ -15240,17 +15277,58 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       if (!leaderUltControlsEl)
           return;
       const leader = resolveAllyLeaderForControl();
-      const show = Boolean(leader && leader.alive && isLeaderUltReady(leader));
-      leaderUltControlsEl.hidden = !show;
-      if (!show || !leader)
+      const show = Boolean(leader && leader.alive && isAnyLeaderUltReady(leader));
+      if (!show || !leader) {
+          const hiddenFingerprint = 'hidden';
+          if (leaderUltControlsFingerprint === hiddenFingerprint)
+              return;
+          leaderUltControlsEl.hidden = true;
+          for (const button of leaderUltButtons) {
+              if (!button)
+                  continue;
+              button.disabled = true;
+              button.setAttribute('aria-disabled', 'true');
+              button.classList.remove('is-selected');
+          }
+          leaderUltControlsFingerprint = hiddenFingerprint;
           return;
+      }
       const selected = getUyenUltChoice(leader);
+      const readyA = canCastLeaderUltChoice(leader, 'A');
+      const readyB = canCastLeaderUltChoice(leader, 'B');
+      const readyC = canCastLeaderUltChoice(leader, 'C');
+      const state = ensureUyenState(leader);
+      const fury = Math.max(0, Math.floor(parseFiniteNumber(leader.fury) ?? 0));
+      const furyMax = Math.max(1, Math.floor(parseFiniteNumber(leader.furyMax) ?? 100));
+      const bUses = state?.bUses ?? 0;
+      const fingerprint = [
+          leader.iid ?? 0,
+          fury,
+          furyMax,
+          bUses,
+          selected,
+          readyA ? 1 : 0,
+          readyB ? 1 : 0,
+          readyC ? 1 : 0,
+          leaderUltButtons.length,
+      ].join('|');
+      if (leaderUltControlsFingerprint === fingerprint)
+          return;
+      leaderUltControlsEl.hidden = false;
       for (const button of leaderUltButtons) {
           if (!button)
               continue;
           const choice = button.dataset.ultChoice;
+          const ready = choice === 'A'
+              ? readyA
+              : (choice === 'B'
+                  ? readyB
+                  : (choice === 'C' ? readyC : false));
           button.classList.toggle('is-selected', choice === selected);
+          button.disabled = !ready;
+          button.setAttribute('aria-disabled', ready ? 'false' : 'true');
       }
+      leaderUltControlsFingerprint = fingerprint;
   }
   function init() {
       if (!Game)
@@ -15293,6 +15371,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           ? doc.querySelector('[data-role="leader-ult-controls"]')
           : null;
       leaderUltControlsEl = (controlsFromRoot ?? controlsFromDocument);
+      leaderUltControlsFingerprint = null;
       leaderUltButtons = leaderUltControlsEl
           ? Array.from(leaderUltControlsEl.querySelectorAll('button[data-ult-choice]'))
           : [];
@@ -15302,7 +15381,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
               if (choice !== 'A' && choice !== 'B' && choice !== 'C')
                   return;
               const leader = resolveAllyLeaderForControl();
-              if (!leader || !leader.alive || !isLeaderUltReady(leader))
+              if (!leader || !leader.alive || !canCastLeaderUltChoice(leader, choice))
                   return;
               queueUyenUltCast(leader, choice);
               syncLeaderUltControls();
@@ -16734,6 +16813,7 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       }
       leaderUltButtons = [];
       leaderUltControlsEl = null;
+      leaderUltControlsFingerprint = null;
       timerElement = null;
       statusIconHoverTooltip = '';
       statusIconHitboxes.length = 0;
@@ -20294,6 +20374,67 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       ARM: 0.001,
       RES: 0.001,
   });
+  const K_TP_COMBAT_POWER = 10;
+  const TP_EQUIVALENT_GAIN_BY_STAT = Object.freeze({
+      HP: TP_STAT_GAIN_PER_POINT.HP,
+      HPmax: TP_STAT_GAIN_PER_POINT.HP,
+      ATK: TP_STAT_GAIN_PER_POINT.ATK,
+      WIL: TP_STAT_GAIN_PER_POINT.WIL,
+      ARM: TP_STAT_GAIN_PER_POINT.ARM,
+      RES: TP_STAT_GAIN_PER_POINT.RES,
+      AGI: 1,
+      PER: 1,
+      AEmax: 10,
+      AEregen: 0.5,
+      HPregen: 2,
+      SPD: 0.01,
+  });
+  const TP_EQUIVALENT_STAT_KEYS = new Set(Object.keys(TP_EQUIVALENT_GAIN_BY_STAT));
+  function toTpEquivalentFromStat(statKey, value) {
+      const gain = TP_EQUIVALENT_GAIN_BY_STAT[statKey];
+      if (!Number.isFinite(gain) || gain <= 0)
+          return 0;
+      if (!Number.isFinite(value) || value <= 0)
+          return 0;
+      return value / gain;
+  }
+  function readCombatPowerTpBonus(raw) {
+      if (!raw || typeof raw !== 'object')
+          return 0;
+      const queue = [raw];
+      let total = 0;
+      let hops = 0;
+      while (queue.length > 0 && hops < 256) {
+          hops += 1;
+          const current = queue.shift();
+          if (!current || typeof current !== 'object')
+              continue;
+          if (Array.isArray(current)) {
+              for (const item of current)
+                  queue.push(item);
+              continue;
+          }
+          const record = current;
+          for (const [rawKey, rawValue] of Object.entries(record)) {
+              const key = rawKey.trim();
+              const keyLower = key.toLowerCase();
+              if (keyLower === 'combatpowertpbonus' || keyLower === 'powertpbonus' || keyLower === 'tpequivalent') {
+                  const numeric = typeof rawValue === 'number' ? rawValue : Number(rawValue);
+                  if (Number.isFinite(numeric) && numeric > 0)
+                      total += numeric;
+                  continue;
+              }
+              if (typeof rawValue === 'number' && Number.isFinite(rawValue) && rawValue > 0 && TP_EQUIVALENT_STAT_KEYS.has(key)) {
+                  total += toTpEquivalentFromStat(key, rawValue);
+                  continue;
+              }
+              if (rawValue && typeof rawValue === 'object') {
+                  queue.push(rawValue);
+              }
+          }
+      }
+      return Math.max(0, total);
+  }
   const TP_GAIN_RULES = Object.freeze([
       { fromRealm: 1, fromSubRealm: 0, toRealm: 1, toSubRealm: 1, gain: 5 },
       { fromRealm: 1, fromSubRealm: 1, toRealm: 1, toSubRealm: 2, gain: 5 },
@@ -21061,6 +21202,24 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           pendingTpStat = null;
           tpModal.classList.remove('is-open');
       };
+      const resolveCombatPower = (unitId, stats, tpAlloc) => {
+          if (!unitId)
+              return 0;
+          const spentTp = Object.values(tpAlloc).reduce((sum, value) => {
+              const numeric = Number(value ?? 0);
+              if (!Number.isFinite(numeric) || numeric <= 0)
+                  return sum;
+              return sum + Math.floor(numeric);
+          }, 0);
+          const availableTp = getUnitTp(unitId);
+          const totalTp = Math.max(0, spentTp + availableTp);
+          const tpScore = totalTp * K_TP_COMBAT_POWER;
+          const baseStatTpEquivalent = stats.reduce((sum, stat) => sum + toTpEquivalentFromStat(stat.key, stat.value), 0);
+          const unitEntry = rosterEntries.get(unitId)?.meta;
+          const equipmentTpEquivalent = readCombatPowerTpBonus(unitEntry ?? null);
+          const combatPower = Math.round(tpScore + baseStatTpEquivalent + equipmentTpEquivalent);
+          return Math.max(0, combatPower);
+      };
       const renderMiniStats = (unitId) => {
           miniStatsList.replaceChildren();
           const tpAlloc = getUnitTpAlloc(unitId);
@@ -21073,6 +21232,16 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
               return;
           }
           const unitTp = getUnitTp(unitId);
+          const combatPower = resolveCombatPower(unitId, stats, tpAlloc);
+          const cpItem = document.createElement('li');
+          cpItem.className = 'collection-stage__mini-stats-item';
+          const cpLabel = document.createElement('span');
+          cpLabel.textContent = 'Lực chiến';
+          const cpValue = document.createElement('b');
+          cpValue.textContent = currencyFormatter.format(combatPower);
+          cpItem.appendChild(cpLabel);
+          cpItem.appendChild(cpValue);
+          miniStatsList.appendChild(cpItem);
           for (const stat of stats) {
               const item = document.createElement('li');
               item.className = 'collection-stage__mini-stats-item';
@@ -25874,7 +26043,7 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
       chip.className = 'currency-chip';
       chip.type = 'button';
       chip.dataset.currency = code;
-      chip.title = 'Nhấn để xem quy tắc & thuế đổi';
+      chip.title = 'Quy Tắc';
       chip.innerHTML = `
       <span class="currency-chip__icon"><img src="${CURRENCY_ICONS[code]}" alt="${code}" /></span>
       <span class="currency-chip__info">
@@ -26094,9 +26263,9 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
       const dialog = document.createElement('div');
       dialog.className = 'modal-content';
       dialog.innerHTML = `
-      <h2>Quy tắc & Thuế đổi</h2>
+      <h2>Quy Tắc</h2>
       <p>100 đơn vị bậc thấp = 1 đơn vị bậc cao. Thuế tối đa 10% khi đổi lên, không thuế khi đổi xuống.</p>
-      <p>Thuế tăng dần theo bậc và độ giàu, nhưng miễn thuế nếu đổi &lt; 100 đơn vị.</p>
+      <p>Thuế tăng theo bậc, miễn thuế nếu đổi &lt; 100 đơn vị.</p>
       <ul>
         <li>VNT → HNT: thuế gốc 0.5%</li>
         <li>HNT → TNT: thuế gốc 1.0%</li>
@@ -26188,7 +26357,7 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
           </header>
           <section class="banner-panel__toolbar" aria-label="Ví tiền tệ gacha">
             <div class="currency-bar" data-slot="currencies"></div>
-            <button class="rules-button" type="button">Quy tắc &amp; Thuế</button>
+            <button class="rules-button" type="button">Quy Tắc</button>
           </section>
           <section class="banner-panel__art" data-slot="hero-art"></section>
           <section class="banner-panel__rates" data-slot="rates"></section>
@@ -28057,7 +28226,7 @@ __define('./turns.ts', (exports, module, __require) => {
   const __dep19 = __require('./leader-uyen.ts');
   const clearQueuedUyenUlt = __dep19.clearQueuedUyenUlt;
   const hasQueuedUyenUlt = __dep19.hasQueuedUyenUlt;
-  const isLeaderUltReady = __dep19.isLeaderUltReady;
+  const isAnyLeaderUltReady = __dep19.isAnyLeaderUltReady;
   const isUyenLeader = __dep19.isUyenLeader;
   const grantUyenSummonRage = __dep19.grantUyenSummonRage;
   const toActiveUnitKey = (side, slot) => `${side}:${slot}`;
@@ -28572,7 +28741,7 @@ __define('./turns.ts', (exports, module, __require) => {
       const ultCost = resolveUltCost(unit, CFG);
       const runUlt = () => {
           const ready = isUyenLeader(unit)
-              ? isLeaderUltReady(unit)
+              ? isAnyLeaderUltReady(unit)
               : (unit.fury ?? 0) >= ultCost;
           if (!ready || Statuses.blocks(unit, 'ult'))
               return false;

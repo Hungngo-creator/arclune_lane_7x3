@@ -19,8 +19,15 @@ export async function loadTurnsHarness(overrides = {}){
     ["import { resolveRuntimeUnitStats } from './modes/pve/collection-mapper.ts';", "const { resolveRuntimeUnitStats } = __deps['./modes/pve/collection-mapper.ts'];"],
     ["import { applyCultivationBonus } from './cultivation.ts';", "const { applyCultivationBonus } = __deps['./cultivation.ts'];"],
     ["import { evaluateGambitLogic } from './ai.ts';", "const { evaluateGambitLogic } = __deps['./ai.ts'];"],
-    ["import { isLeaderUltReady, isUyenLeader, grantUyenSummonRage } from './leader-uyen.ts';", "const { isLeaderUltReady, isUyenLeader, grantUyenSummonRage, hasQueuedUyenUlt, clearQueuedUyenUlt } = __deps['./leader-uyen.ts'];"],
-    ["import {\n  clearQueuedUyenUlt,\n  hasQueuedUyenUlt,\n  isLeaderUltReady,\n  isUyenLeader,\n  grantUyenSummonRage,\n} from './leader-uyen.ts';", "const { isLeaderUltReady, isUyenLeader, grantUyenSummonRage, hasQueuedUyenUlt, clearQueuedUyenUlt } = __deps['./leader-uyen.ts'];"],
+    ["import { isLeaderUltReady, isUyenLeader, grantUyenSummonRage } from './leader-uyen.ts';", "const { isAnyLeaderUltReady, isUyenLeader, grantUyenSummonRage, hasQueuedUyenUlt, clearQueuedUyenUlt } = __deps['./leader-uyen.ts'];"],
+    ["import {\n  clearQueuedUyenUlt,\n  hasQueuedUyenUlt,\n  isLeaderUltReady,\n  isUyenLeader,\n  grantUyenSummonRage,\n} from './leader-uyen.ts';", "const { isAnyLeaderUltReady, isUyenLeader, grantUyenSummonRage, hasQueuedUyenUlt, clearQueuedUyenUlt } = __deps['./leader-uyen.ts'];"],
+    ["import {
+  clearQueuedUyenUlt,
+  hasQueuedUyenUlt,
+  isAnyLeaderUltReady,
+  isUyenLeader,
+  grantUyenSummonRage,
+} from './leader-uyen.ts';", "const { isAnyLeaderUltReady, isUyenLeader, grantUyenSummonRage, hasQueuedUyenUlt, clearQueuedUyenUlt } = __deps['./leader-uyen.ts'];"],
     ["import { slotToCell, slotIndex } from './engine.ts';", "const { slotToCell, slotIndex } = __deps['./engine.js'];"],
     ["import { globalAetherPool, resolveActionAetherRegen } from './aether.ts';", "const { globalAetherPool, resolveActionAetherRegen } = __deps['./aether.ts'];"],
     ["import { globalAetherPool } from './aether.ts';", "const { globalAetherPool } = __deps['./aether.ts'];"],
@@ -110,7 +117,7 @@ export async function loadTurnsHarness(overrides = {}){
       evaluateGambitLogic(){ return { action: null, slotIndex: -1, reason: 'noMatch' }; }
     },
     './leader-uyen.ts': {
-      isLeaderUltReady(){ return false; },
+      isAnyLeaderUltReady(){ return false; },
       isUyenLeader(){ return false; },
       grantUyenSummonRage(){},
       hasQueuedUyenUlt(){ return false; },

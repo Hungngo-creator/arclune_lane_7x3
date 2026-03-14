@@ -87,7 +87,7 @@ function renderWalletChip(code: CurrencyCode, amount: number): HTMLElement {
   chip.className = 'currency-chip';
   chip.type = 'button';
   chip.dataset.currency = code;
-  chip.title = 'Nhấn để xem quy tắc & thuế đổi';
+  chip.title = 'Quy Tắc';
   chip.innerHTML = `
     <span class="currency-chip__icon"><img src="${CURRENCY_ICONS[code]}" alt="${code}" /></span>
     <span class="currency-chip__info">
@@ -328,9 +328,9 @@ function createRulesContent(): HTMLElement {
   const dialog = document.createElement('div');
   dialog.className = 'modal-content';
   dialog.innerHTML = `
-    <h2>Quy tắc & Thuế đổi</h2>
+    <h2>Quy Tắc</h2>
     <p>100 đơn vị bậc thấp = 1 đơn vị bậc cao. Thuế tối đa 10% khi đổi lên, không thuế khi đổi xuống.</p>
-    <p>Thuế tăng dần theo bậc và độ giàu, nhưng miễn thuế nếu đổi &lt; 100 đơn vị.</p>
+    <p>Thuế tăng theo bậc, miễn thuế nếu đổi &lt; 100 đơn vị.</p>
     <ul>
       <li>VNT → HNT: thuế gốc 0.5%</li>
       <li>HNT → TNT: thuế gốc 1.0%</li>
@@ -437,7 +437,7 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
         </header>
         <section class="banner-panel__toolbar" aria-label="Ví tiền tệ gacha">
           <div class="currency-bar" data-slot="currencies"></div>
-          <button class="rules-button" type="button">Quy tắc &amp; Thuế</button>
+          <button class="rules-button" type="button">Quy Tắc</button>
         </section>
         <section class="banner-panel__art" data-slot="hero-art"></section>
         <section class="banner-panel__rates" data-slot="rates"></section>

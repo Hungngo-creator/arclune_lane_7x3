@@ -98,6 +98,71 @@ const TP_STAT_GAIN_PER_POINT: Readonly<Record<TpStatKey, number>> = Object.freez
   RES: 0.001,
 });
 
+const K_TP_COMBAT_POWER = 10;
+
+const TP_EQUIVALENT_GAIN_BY_STAT: Readonly<Record<string, number>> = Object.freeze({
+  HP: TP_STAT_GAIN_PER_POINT.HP,
+  HPmax: TP_STAT_GAIN_PER_POINT.HP,
+  ATK: TP_STAT_GAIN_PER_POINT.ATK,
+  WIL: TP_STAT_GAIN_PER_POINT.WIL,
+  ARM: TP_STAT_GAIN_PER_POINT.ARM,
+  RES: TP_STAT_GAIN_PER_POINT.RES,
+  AGI: 1,
+  PER: 1,
+  AEmax: 10,
+  AEregen: 0.5,
+  HPregen: 2,
+  SPD: 0.01,
+});
+
+const TP_EQUIVALENT_STAT_KEYS = new Set<string>(Object.keys(TP_EQUIVALENT_GAIN_BY_STAT));
+
+function toTpEquivalentFromStat(statKey: string, value: number): number {
+  const gain = TP_EQUIVALENT_GAIN_BY_STAT[statKey];
+  if (!Number.isFinite(gain) || gain <= 0) return 0;
+  if (!Number.isFinite(value) || value <= 0) return 0;
+  return value / gain;
+}
+
+function readCombatPowerTpBonus(raw: unknown): number {
+  if (!raw || typeof raw !== 'object') return 0;
+  const queue: unknown[] = [raw];
+  let total = 0;
+  let hops = 0;
+  while (queue.length > 0 && hops < 256) {
+    hops += 1;
+    const current = queue.shift();
+    if (!current || typeof current !== 'object') continue;
+
+    if (Array.isArray(current)) {
+      for (const item of current) queue.push(item);
+      continue;
+    }
+
+    const record = current as Record<string, unknown>;
+    for (const [rawKey, rawValue] of Object.entries(record)) {
+      const key = rawKey.trim();
+      const keyLower = key.toLowerCase();
+
+      if (keyLower === 'combatpowertpbonus' || keyLower === 'powertpbonus' || keyLower === 'tpequivalent') {
+        const numeric = typeof rawValue === 'number' ? rawValue : Number(rawValue);
+        if (Number.isFinite(numeric) && numeric > 0) total += numeric;
+        continue;
+      }
+
+      if (typeof rawValue === 'number' && Number.isFinite(rawValue) && rawValue > 0 && TP_EQUIVALENT_STAT_KEYS.has(key)) {
+        total += toTpEquivalentFromStat(key, rawValue);
+        continue;
+      }
+
+      if (rawValue && typeof rawValue === 'object') {
+        queue.push(rawValue);
+      }
+    }
+  }
+  return Math.max(0, total);
+}
+
 const TP_GAIN_RULES: ReadonlyArray<{
   fromRealm: number;
   fromSubRealm: number;
@@ -1028,6 +1093,25 @@ const miniStats = document.createElement('section');
     tpModal.classList.remove('is-open');
   };
 
+  const resolveCombatPower = (unitId: string | null, stats: Array<{ key: string; value: number }>, tpAlloc: TpAllocMap): number => {
+    if (!unitId) return 0;
+    const spentTp = Object.values(tpAlloc).reduce((sum, value) => {
+      const numeric = Number(value ?? 0);
+      if (!Number.isFinite(numeric) || numeric <= 0) return sum;
+      return sum + Math.floor(numeric);
+    }, 0);
+    const availableTp = getUnitTp(unitId);
+    const totalTp = Math.max(0, spentTp + availableTp);
+    const tpScore = totalTp * K_TP_COMBAT_POWER;
+
+    const baseStatTpEquivalent = stats.reduce((sum, stat) => sum + toTpEquivalentFromStat(stat.key, stat.value), 0);
+    const unitEntry = rosterEntries.get(unitId)?.meta as Record<string, unknown> | undefined;
+    const equipmentTpEquivalent = readCombatPowerTpBonus(unitEntry ?? null);
+
+    const combatPower = Math.round(tpScore + baseStatTpEquivalent + equipmentTpEquivalent);
+    return Math.max(0, combatPower);
+  };
+
   const renderMiniStats = (unitId: string | null): void => {
     miniStatsList.replaceChildren();
     const tpAlloc = getUnitTpAlloc(unitId);
@@ -1040,6 +1124,18 @@ const miniStats = document.createElement('section');
       return;
     }
     const unitTp = getUnitTp(unitId);
+    const combatPower = resolveCombatPower(unitId, stats, tpAlloc);
+
+    const cpItem = document.createElement('li');
+    cpItem.className = 'collection-stage__mini-stats-item';
+    const cpLabel = document.createElement('span');
+    cpLabel.textContent = 'Lực chiến';
+    const cpValue = document.createElement('b');
+    cpValue.textContent = currencyFormatter.format(combatPower);
+    cpItem.appendChild(cpLabel);
+    cpItem.appendChild(cpValue);
+    miniStatsList.appendChild(cpItem);
+
     for (const stat of stats){
       const item = document.createElement('li');
       item.className = 'collection-stage__mini-stats-item';

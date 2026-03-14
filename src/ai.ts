@@ -5,7 +5,7 @@ import { safeNow as sharedSafeNow } from './utils/time.ts';
 import { detectUltBehavior, getSummonSpec, resolveSummonSlots } from './utils/kit.ts';
 import { lookupUnit } from './units.ts';
 import { globalAetherPool } from './aether.ts';
-import { isUyenLeader, isLeaderUltReady } from './leader-uyen.ts';
+import { isUyenLeader, isAnyLeaderUltReady } from './leader-uyen.ts';
 import { predictSpawnCycleByTurnOrder } from './turns/interleaved.ts';
 
 import type { AiCard, AiCardDeck, AiDeckEntry, AiDeckPool, SessionState } from '@shared-types/combat';
@@ -772,7 +772,7 @@ function evaluateGambitCondition(
       return Array.isArray(unit.statuses)
         && unit.statuses.some((status: { kind?: string } | null | undefined) => status && status.kind === 'debuff');
     case 'self_full_fury': {
-      if (isUyenLeader(unit)) return isLeaderUltReady(unit);
+      if (isUyenLeader(unit)) return isAnyLeaderUltReady(unit);
       const fury = Number.isFinite(unit.fury) ? Number(unit.fury) : 0;
       const furyMax = Math.max(1, Number.isFinite(unit.furyMax) ? Number(unit.furyMax) : 100);
       return fury >= furyMax;

@@ -1,6 +1,11 @@
 import type { UnitToken } from '@shared-types/units';
 
 export type UyenUltChoice = 'A' | 'B' | 'C';
+export type LeaderUltChoice = UyenUltChoice;
+
+function isSystemLeader(unit: UnitToken | null | undefined): boolean {
+  return !!unit && typeof unit.id === 'string' && unit.id.startsWith('leader');
+}
 
 type UyenControlState = UnitToken & {
   leaderUltChoice?: UyenUltChoice;
@@ -41,6 +46,43 @@ export function isLeaderUltReady(unit: UnitToken | null | undefined): boolean {
   const fury = Number.isFinite(unit.fury) ? Number(unit.fury) : 0;
   const furyMax = Math.max(1, Number.isFinite(unit.furyMax) ? Number(unit.furyMax) : 100);
   return fury >= furyMax || fury >= 100;
+}
+
+export function canCastLeaderUltChoice(
+  unit: UnitToken | null | undefined,
+  choice: LeaderUltChoice,
+): boolean {
+  if (!isSystemLeader(unit)) return false;
+  const fury = Math.max(0, Math.floor(Number.isFinite(unit?.fury) ? Number(unit?.fury) : 0));
+
+  if (unit?.id === 'leaderA' || unit?.id === 'leaderB') {
+    if (choice === 'B') {
+      const state = ensureUyenState(unit);
+      return fury > 0 && Boolean(state) && (state?.bUses ?? 0) < 10;
+    }
+    return fury >= 100;
+  }
+
+  return fury >= 100;
+}
+
+export function isAnyLeaderUltReady(unit: UnitToken | null | undefined): boolean {
+  return canCastLeaderUltChoice(unit, 'A')
+    || canCastLeaderUltChoice(unit, 'B')
+    || canCastLeaderUltChoice(unit, 'C');
+}
+
+export function canCastUyenUltChoice(
+  unit: UnitToken | null | undefined,
+  choice: UyenUltChoice,
+): boolean {
+  if (!isUyenLeader(unit)) return false;
+  return canCastLeaderUltChoice(unit, choice);
+}
+
+export function isAnyUyenUltReady(unit: UnitToken | null | undefined): boolean {
+  if (!isUyenLeader(unit)) return false;
+  return isAnyLeaderUltReady(unit);
 }
 
 export function grantUyenSummonRage(unit: UnitToken | null | undefined, options: { revived?: boolean; isMinion?: boolean } = {}): void {

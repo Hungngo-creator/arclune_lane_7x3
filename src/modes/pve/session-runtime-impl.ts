@@ -75,7 +75,8 @@ import {
   ensureUyenState,
   getUyenUltChoice,
   grantUyenSummonRage,
-  isLeaderUltReady,
+  canCastLeaderUltChoice,
+  isAnyLeaderUltReady,
   isUyenLeader,
   queueUyenUltCast,
 } from '../../leader-uyen.ts';
@@ -778,6 +779,7 @@ let rootElement: Element | Document | null = null;
 let timerElement: HTMLElement | null = null;
 let leaderUltControlsEl: HTMLElement | null = null;
 let leaderUltButtons: HTMLButtonElement[] = [];
+let leaderUltControlsFingerprint: string | null = null;
 let storedConfig: NormalizedSessionConfig = normalizeConfig();
 let running = false;
 let leaderEndCheckFlags: { ally: boolean; enemy: boolean } = { ally: false, enemy: false };
@@ -2509,15 +2511,57 @@ function resolveAllyLeaderForControl(): UnitToken | null {
 function syncLeaderUltControls(): void {
   if (!leaderUltControlsEl) return;
   const leader = resolveAllyLeaderForControl();
-  const show = Boolean(leader && leader.alive && isLeaderUltReady(leader));
-  leaderUltControlsEl.hidden = !show;
-  if (!show || !leader) return;
+  const show = Boolean(leader && leader.alive && isAnyLeaderUltReady(leader));
+
+  if (!show || !leader) {
+    const hiddenFingerprint = 'hidden';
+    if (leaderUltControlsFingerprint === hiddenFingerprint) return;
+    leaderUltControlsEl.hidden = true;
+    for (const button of leaderUltButtons){
+      if (!button) continue;
+      button.disabled = true;
+      button.setAttribute('aria-disabled', 'true');
+      button.classList.remove('is-selected');
+    }
+    leaderUltControlsFingerprint = hiddenFingerprint;
+    return;
+  }
+
   const selected = getUyenUltChoice(leader);
+  const readyA = canCastLeaderUltChoice(leader, 'A');
+  const readyB = canCastLeaderUltChoice(leader, 'B');
+  const readyC = canCastLeaderUltChoice(leader, 'C');
+  const state = ensureUyenState(leader);
+  const fury = Math.max(0, Math.floor(parseFiniteNumber(leader.fury) ?? 0));
+  const furyMax = Math.max(1, Math.floor(parseFiniteNumber(leader.furyMax) ?? 100));
+  const bUses = state?.bUses ?? 0;
+  const fingerprint = [
+    leader.iid ?? 0,
+    fury,
+    furyMax,
+    bUses,
+    selected,
+    readyA ? 1 : 0,
+    readyB ? 1 : 0,
+    readyC ? 1 : 0,
+    leaderUltButtons.length,
+  ].join('|');
+  if (leaderUltControlsFingerprint === fingerprint) return;
+
+  leaderUltControlsEl.hidden = false;
   for (const button of leaderUltButtons){
     if (!button) continue;
     const choice = button.dataset.ultChoice;
+    const ready = choice === 'A'
+      ? readyA
+      : (choice === 'B'
+        ? readyB
+        : (choice === 'C' ? readyC : false));
     button.classList.toggle('is-selected', choice === selected);
+    button.disabled = !ready;
+    button.setAttribute('aria-disabled', ready ? 'false' : 'true');
   }
+  leaderUltControlsFingerprint = fingerprint;
 }
 
 function init(): boolean {
@@ -2560,6 +2604,7 @@ function init(): boolean {
     ? doc.querySelector('[data-role="leader-ult-controls"]')
     : null;
   leaderUltControlsEl = (controlsFromRoot ?? controlsFromDocument) as HTMLElement | null;
+  leaderUltControlsFingerprint = null;
   leaderUltButtons = leaderUltControlsEl
     ? Array.from(leaderUltControlsEl.querySelectorAll<HTMLButtonElement>('button[data-ult-choice]'))
     : [];
@@ -2568,7 +2613,7 @@ function init(): boolean {
       const choice = button.dataset.ultChoice;
       if (choice !== 'A' && choice !== 'B' && choice !== 'C') return;
       const leader = resolveAllyLeaderForControl();
-      if (!leader || !leader.alive || !isLeaderUltReady(leader)) return;
+      if (!leader || !leader.alive || !canCastLeaderUltChoice(leader, choice)) return;
       queueUyenUltCast(leader, choice);
       syncLeaderUltControls();
     };
@@ -4069,6 +4114,7 @@ function resetDomRefs(): void {
   }
   leaderUltButtons = [];
   leaderUltControlsEl = null;
+  leaderUltControlsFingerprint = null;
   timerElement = null;
   statusIconHoverTooltip = '';
   statusIconHitboxes.length = 0;

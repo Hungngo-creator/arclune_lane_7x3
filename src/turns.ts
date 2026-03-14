@@ -24,7 +24,7 @@ import { normalizeClassName, normalizeElementKey } from './utils/domain-normaliz
 import {
   clearQueuedUyenUlt,
   hasQueuedUyenUlt,
-  isLeaderUltReady,
+  isAnyLeaderUltReady,
   isUyenLeader,
   grantUyenSummonRage,
 } from './leader-uyen.ts';
@@ -681,7 +681,7 @@ const completeTurn = ({
   const ultCost = resolveUltCost(unit, CFG);
   const runUlt = (): boolean => {
     const ready = isUyenLeader(unit)
-      ? isLeaderUltReady(unit)
+      ? isAnyLeaderUltReady(unit)
       : (unit.fury ?? 0) >= ultCost;
     if (!ready || Statuses.blocks(unit, 'ult')) return false;
     let ultOk = false;
