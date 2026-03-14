@@ -33,13 +33,13 @@ const STYLE_ID = 'campaign-world-map-style';
 const WORLD_SIZE = 3000;
 
 const CSS = /* css */ `
-  .app--campaign-world-map{padding:18px 16px 28px;color:#ecf6f4;}
-  .campaign-world-map{position:relative;max-width:1240px;min-height:76vh;margin:0 auto;border-radius:20px;overflow:hidden;border:1px solid rgba(128,220,201,.25);background:#08141c;box-shadow:0 18px 48px rgba(0,0,0,.35);}
+  .app--campaign-world-map{padding:14px 12px 16px;color:#ecf6f4;min-height:100dvh;box-sizing:border-box;display:flex;}
+  .campaign-world-map{position:relative;max-width:1240px;width:100%;min-height:calc(100dvh - 32px);margin:0 auto;border-radius:20px;overflow:hidden;border:1px solid rgba(128,220,201,.25);background:#08141c;box-shadow:0 18px 48px rgba(0,0,0,.35);display:flex;flex-direction:column;}
   .campaign-world-map__hud{position:relative;z-index:4;padding:18px 20px 8px;display:flex;justify-content:space-between;align-items:flex-start;}
   .campaign-world-map__title{margin:0;font-size:28px;letter-spacing:.06em;text-transform:uppercase;}
   .campaign-world-map__subtitle{margin:6px 0 0;color:#b6d8d4;font-size:13px;letter-spacing:.03em;}
   .campaign-world-map__back{border:none;width:44px;height:44px;border-radius:999px;background:rgba(239,254,250,.92);color:#1f3342;cursor:pointer;font-size:24px;line-height:1;}
-  .campaign-world-map__viewport{position:relative;height:420px;margin:6px 14px 16px;border-radius:16px;overflow:hidden;border:1px solid rgba(124,204,194,.3);background:#020b13;touch-action:none;cursor:grab;}
+  .campaign-world-map__viewport{position:relative;flex:1;min-height:360px;margin:6px 14px 16px;border-radius:16px;overflow:hidden;border:1px solid rgba(124,204,194,.3);background:#020b13;touch-action:none;cursor:grab;}
   .campaign-world-map__viewport.is-dragging{cursor:grabbing;}
   .campaign-world-map__canvas{position:absolute;width:${WORLD_SIZE}px;height:${WORLD_SIZE}px;transform:translate3d(0,0,0);transform-origin:0 0;}
   .campaign-world-map__bg{position:absolute;inset:0;background:
@@ -61,7 +61,7 @@ const CSS = /* css */ `
   .campaign-node--active .campaign-node__dot{box-shadow:0 0 0 6px rgba(255,237,194,.25),0 0 24px rgba(255,219,152,.8);}
   .campaign-node--locked{opacity:.45;filter:saturate(.3);cursor:not-allowed;}
   .campaign-node--locked .campaign-node__dot{background:#92a0ad;border-color:#cad5e4;box-shadow:0 0 0 2px rgba(202,213,228,.2);}
-  .campaign-world-map__overlay{position:absolute;inset:0;display:flex;opacity:0;pointer-events:none;transition:opacity .26s ease;z-index:5;}
+  .campaign-world-map__overlay{position:absolute;inset:0;display:flex;opacity:0;pointer-events:none;transition:opacity .26s ease;z-index:5;padding:74px 0 0;}
   .campaign-world-map--stage-detail .campaign-world-map__overlay{opacity:1;pointer-events:auto;}
   .campaign-panel{height:100%;padding:18px 16px 16px;backdrop-filter:blur(6px);background:linear-gradient(180deg,rgba(16,36,40,.84),rgba(14,28,34,.9));border-left:1px solid rgba(145,223,205,.16);border-right:1px solid rgba(145,223,205,.16);transform:translateY(14px);transition:transform .26s ease;}
   .campaign-world-map--stage-detail .campaign-panel{transform:translateY(0);}
@@ -90,6 +90,14 @@ const CSS = /* css */ `
   .boss-chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
   .boss-chip{font-size:11px;padding:4px 8px;border-radius:999px;border:1px solid rgba(168,233,219,.4);background:rgba(18,42,53,.66);color:#c8efdf;}
   .campaign-enter{margin-top:auto;border:none;border-radius:12px;padding:12px 14px;background:linear-gradient(135deg,#f9cb84,#f0a85e);color:#1e1d1a;font-weight:800;cursor:pointer;}
+  @media (max-width: 780px){
+    .app--campaign-world-map{padding:8px 6px 10px;}
+    .campaign-world-map{min-height:calc(100dvh - 18px);border-radius:14px;}
+    .campaign-world-map__hud{padding:14px 12px 6px;}
+    .campaign-world-map__title{font-size:24px;}
+    .campaign-world-map__viewport{margin:6px 8px 10px;min-height:320px;}
+    .campaign-world-map__overlay{padding:64px 0 0;}
+  }
 `;
 
 function statusLabel(stage: CampaignStageDefinition): string {
@@ -175,12 +183,16 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
 
   const locations = buildLocations();
   const worldNodes = computeWorldNodes(locations);
+  const locationById = new Map(locations.map((location) => [location.id, location]));
 
   let currentView: CampaignView = 'world_map';
   let selectedLocation = locations[0] ?? null;
   let selectedStage = null as CampaignStageDefinition | null;
   let offsetX = 0;
   let offsetY = 0;
+  let queuedPointerDeltaX = 0;
+  let queuedPointerDeltaY = 0;
+  let pointerRafId = 0;
 
   const container = document.createElement('section');
   container.className = 'campaign-world-map';
@@ -310,6 +322,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   function renderList(): void {
     if (!(stageList instanceof HTMLElement) || !selectedLocation) return;
     stageList.innerHTML = '';
+    const fragment = document.createDocumentFragment();
     selectedLocation.stages.forEach((stage) => {
       const card = document.createElement('button');
       card.type = 'button';
@@ -325,16 +338,18 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
         renderList();
         renderInfo();
       });
-      stageList.appendChild(card);
+      fragment.appendChild(card);
     });
+    stageList.appendChild(fragment);
   }
 
   function renderNodes(): void {
     if (!(canvas instanceof HTMLElement)) return;
     canvas.querySelectorAll('.campaign-node').forEach((node) => node.remove());
 
+    const fragment = document.createDocumentFragment();
     worldNodes.forEach((nodeData) => {
-      const location = locations.find((entry) => entry.id === nodeData.id);
+      const location = locationById.get(nodeData.id);
       if (!location) return;
 
       const node = document.createElement('button');
@@ -363,8 +378,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
         });
       }
 
-      canvas.appendChild(node);
+      fragment.appendChild(node);
     });
+    canvas.appendChild(fragment);
   }
 
   if (viewport instanceof HTMLElement){
@@ -386,9 +402,17 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       const deltaY = event.clientY - lastY;
       lastX = event.clientX;
       lastY = event.clientY;
-      offsetX += deltaX;
-      offsetY += deltaY;
-      applyCanvasTransform();
+      queuedPointerDeltaX += deltaX;
+      queuedPointerDeltaY += deltaY;
+      if (pointerRafId) return;
+      pointerRafId = window.requestAnimationFrame(() => {
+        pointerRafId = 0;
+        offsetX += queuedPointerDeltaX;
+        offsetY += queuedPointerDeltaY;
+        queuedPointerDeltaX = 0;
+        queuedPointerDeltaY = 0;
+        applyCanvasTransform();
+      });
     });
 
     const releasePointer = (event: PointerEvent) => {
@@ -396,6 +420,12 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       pointerId = null;
       viewport.classList.remove('is-dragging');
       viewport.releasePointerCapture(event.pointerId);
+      queuedPointerDeltaX = 0;
+      queuedPointerDeltaY = 0;
+      if (pointerRafId){
+        window.cancelAnimationFrame(pointerRafId);
+        pointerRafId = 0;
+      }
     };
 
     viewport.addEventListener('pointerup', releasePointer);

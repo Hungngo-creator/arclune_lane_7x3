@@ -138,9 +138,15 @@ const APP_SCREEN_CLASSES = [
   `app--${SCREEN_CAMPAIGN_WORLD_MAP}`,
   `app--${SCREEN_SECT}`,
   `app--${SCREEN_SECT_TACTICAL_AI}`,
+  const MODULE_PROMISE_CACHE = new Map<string, Promise<unknown>>();
 ];
 
 async function loadBundledModule<TModule = unknown>(id: string): Promise<TModule>{
+  const cached = MODULE_PROMISE_CACHE.get(id);
+  if (cached){
+    return cached as Promise<TModule>;
+  }
+
   const globalRequire = typeof globalThis !== 'undefined'
     ? (globalThis as { __require?: unknown }).__require
     : undefined;
@@ -153,15 +159,23 @@ async function loadBundledModule<TModule = unknown>(id: string): Promise<TModule
     ? Promise.resolve().then(() => runtimeRequire(id))
     : import(id);
 
-  const resolved = await loader;
-  if (resolved && typeof resolved === 'object'){
-    const moduleRecord = resolved as Record<string, unknown> & { comingSoon?: unknown; COMING_SOON_MODULE?: { comingSoon?: unknown } };
-    const comingSoonFlag = moduleRecord.comingSoon ?? moduleRecord.COMING_SOON_MODULE?.comingSoon;
-    if (typeof comingSoonFlag !== 'undefined' && moduleRecord.comingSoon !== comingSoonFlag){
-      return { ...moduleRecord, comingSoon: comingSoonFlag } as TModule;
+  const pendingModule = Promise.resolve(loader).then(async (result) => {
+    const resolved = await result;
+    if (resolved && typeof resolved === 'object'){
+      const moduleRecord = resolved as Record<string, unknown> & { comingSoon?: unknown; COMING_SOON_MODULE?: { comingSoon?: unknown } };
+      const comingSoonFlag = moduleRecord.comingSoon ?? moduleRecord.COMING_SOON_MODULE?.comingSoon;
+      if (typeof comingSoonFlag !== 'undefined' && moduleRecord.comingSoon !== comingSoonFlag){
+        return { ...moduleRecord, comingSoon: comingSoonFlag } as TModule;
+      }
     }
-  }
-  return resolved as TModule;
+    return resolved as TModule;
+  }).catch((error) => {
+    MODULE_PROMISE_CACHE.delete(id);
+    throw error;
+  });
+
+  MODULE_PROMISE_CACHE.set(id, pendingModule as Promise<unknown>);
+  return pendingModule;
 }
 
 function isScreenParamMap(value: unknown): value is ScreenParamMap {
