@@ -31,10 +31,11 @@ type RewardList = ReadonlyArray<RewardRoll>;
 type MutableRewardList = RewardRoll[];
 
 function isReward(entry: RewardRoll | null | undefined): entry is RewardRoll {
-  if (!Array.isArray(value)) return false;
-  for (let index = 0; index < value.length; index += 1) {
-    if (!isReward(value[index] as RewardRoll | null | undefined)) return false;
-  }
+  if (!entry || typeof entry !== 'object') return false;
+  if (typeof entry.id !== 'string' || !entry.id.length) return false;
+  if (typeof entry.weight !== 'number' || !Number.isFinite(entry.weight)) return false;
+  if (typeof entry.tier !== 'number' || !Number.isFinite(entry.tier)) return false;
+  if (entry.data != null && typeof entry.data !== 'object') return false;
   return true;
 }
 

@@ -119,7 +119,7 @@ const TP_EQUIVALENT_STAT_KEYS = new Set<string>(Object.keys(TP_EQUIVALENT_GAIN_B
 
 function toTpEquivalentFromStat(statKey: string, value: number): number {
   const gain = TP_EQUIVALENT_GAIN_BY_STAT[statKey];
-  if (!Number.isFinite(gain) || gain <= 0) return 0;
+  if (gain == null || !Number.isFinite(gain) || gain <= 0) return 0;
   if (!Number.isFinite(value) || value <= 0) return 0;
   return value / gain;
 }

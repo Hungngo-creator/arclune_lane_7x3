@@ -17030,12 +17030,16 @@ __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
   const __getActiveGame = __dep1.__getActiveGame;
   const __resolveStatusIconPreview = __dep1.__resolveStatusIconPreview;
   function isReward(entry) {
-      if (!Array.isArray(value))
+      if (!entry || typeof entry !== 'object')
           return false;
-      for (let index = 0; index < value.length; index += 1) {
-          if (!isReward(value[index]))
-              return false;
-      }
+      if (typeof entry.id !== 'string' || !entry.id.length)
+          return false;
+      if (typeof entry.weight !== 'number' || !Number.isFinite(entry.weight))
+          return false;
+      if (typeof entry.tier !== 'number' || !Number.isFinite(entry.tier))
+          return false;
+      if (entry.data != null && typeof entry.data !== 'object')
+          return false;
       return true;
   }
   function isRewardArray(value) {
@@ -20392,7 +20396,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
   const TP_EQUIVALENT_STAT_KEYS = new Set(Object.keys(TP_EQUIVALENT_GAIN_BY_STAT));
   function toTpEquivalentFromStat(statKey, value) {
       const gain = TP_EQUIVALENT_GAIN_BY_STAT[statKey];
-      if (!Number.isFinite(gain) || gain <= 0)
+      if (gain == null || !Number.isFinite(gain) || gain <= 0)
           return 0;
       if (!Number.isFinite(value) || value <= 0)
           return 0;
