@@ -85,9 +85,7 @@ const currencyIndex = new Map(currencyCatalog.map(currency => [currency.id, curr
 const numberFormatter = createNumberFormatter('vi-VN');
 
 const DEFAULT_RARITY: Rarity = 'N';
-
-const FORMATION_CELL_COUNT = 5;
-const RESERVE_CELL_COUNT = 5;
+const FORMATION_CELL_COUNT = 10;
 
 const isObjectLike = (value: unknown): value is Record<string, unknown> => (
   typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -318,28 +316,7 @@ function normalizeLineupEntry(entry: LineupDefinition | null | undefined, index:
     } satisfies LineupCell;
   });
 
-  const benchSource = Array.isArray(source.bench)
-    ? source.bench
-    : Array.isArray(source.reserve)
-      ? source.reserve
-      : Array.isArray(source.members)
-       ? source.members.slice(FORMATION_CELL_COUNT)
-        : [];
-  const reserveCells: LineupCell[] = new Array(RESERVE_CELL_COUNT).fill(null).map((_, reserveIndex) => {
-    const benchInput = benchSource[reserveIndex] ?? null;
-    const { unitId, label } = normalizeAssignment(benchInput, rosterIndex);
-    return {
-      index: FORMATION_CELL_COUNT + reserveIndex,
-      section: 'reserve',
-      unitId,
-      label,
-      unlocked: true,
-      unlockCost: null,
-      equipment: null,
-      meta: isLineupMemberConfig(benchInput) ? { ...benchInput } : null,
-    } satisfies LineupCell;
-  });
-  const cells: LineupCell[] = formationCells.concat(reserveCells);
+  const cells: LineupCell[] = formationCells;
 
   const passiveSource = Array.isArray(source.passives)
     ? source.passives
@@ -414,9 +391,9 @@ export function normalizeLineups(
 ): LineupState[] {
   const rosterIndex = new Set(roster.map(unit => unit.id));
   if (!Array.isArray(rawLineups) || rawLineups.length === 0){
-    const cells: LineupCell[] = new Array(FORMATION_CELL_COUNT + RESERVE_CELL_COUNT).fill(null).map((_, index) => ({
+    const cells: LineupCell[] = new Array(FORMATION_CELL_COUNT).fill(null).map((_, index) => ({
       index,
-      section: index < FORMATION_CELL_COUNT ? 'formation' : 'reserve',
+      section: 'formation',
       unitId: null,
       label: null,
       unlocked: index < 3,

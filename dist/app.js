@@ -22338,12 +22338,7 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
           if (!cell) {
               return 'Ô đội hình';
           }
-          const firstReserveIndex = lineup.cells.find(entry => entry.section === 'reserve')?.index ?? lineup.cells.length;
-          const displayIndex = cell.section === 'formation'
-              ? cell.index + 1
-              : (cell.index - firstReserveIndex + 1);
-          const sectionName = cell.section === 'formation' ? 'Ô ra trận' : 'Ô dự phòng';
-          return `${sectionName} #${Math.max(displayIndex, 1)}`;
+          return `Ô đội hình #${Math.max(cell.index + 1, 1)}`;
       };
       const refreshBattlePanels = () => {
           helpers.renderCells();
@@ -22769,7 +22764,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       .lineup-passive-picker__icon{width:42px;height:42px;border-radius:999px;border:1px solid rgba(174,228,255,.4);background:rgba(24,34,44,.85);flex:0 0 auto;}
       .lineup-passive-picker__text{margin:0;font-size:13px;color:#9cbcd9;min-height:20px;}
       .lineup-roster{border-radius:28px;border:1px solid rgba(125,211,252,.22);background:rgba(8,16,24,.92);padding:20px;display:flex;flex-direction:column;gap:12px;position:relative;}
-      .lineup-roster__total-cost{margin:0 0 0 auto;padding:8px 14px;border-radius:999px;border:1px solid rgba(255,217,161,.28);background:rgba(40,28,14,.62);font-size:12px;letter-spacing:.08em;color:#ffd9a1;font-weight:700;line-height:1;}
+      .lineup-roster__total-cost{margin:0 0 0 auto;padding:0;border:none;background:transparent;font-size:20px;letter-spacing:.04em;color:#ffd9a1;font-weight:700;line-height:1;}
       .lineup-roster__filters{display:flex;flex-wrap:wrap;gap:10px;}
       .lineup-roster__filter{padding:8px 14px;border-radius:999px;border:1px solid rgba(125,211,252,.24);background:rgba(12,22,32,.82);color:#aee4ff;font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:transform .16s ease,border-color .16s ease;}
       .lineup-roster__filter:hover{transform:translateY(-1px);border-color:rgba(125,211,252,.42);}
@@ -22969,14 +22964,11 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
   function serializeSelectedLineup(lineup) {
       if (!lineup)
           return { unitIds: [] };
-      const formationIds = lineup.cells
-          .filter(cell => cell.section === 'formation' && cell.unlocked && typeof cell.unitId === 'string' && cell.unitId.trim())
-          .map(cell => normalizeUnitId(cell.unitId));
-      const reserveIds = lineup.cells
-          .filter(cell => cell.section === 'reserve' && cell.unlocked && typeof cell.unitId === 'string' && cell.unitId.trim())
+      const unitIds = lineup.cells
+          .filter(cell => cell.unlocked && typeof cell.unitId === 'string' && cell.unitId.trim())
           .map(cell => normalizeUnitId(cell.unitId));
       return {
-          unitIds: Array.from(new Set([...formationIds, ...reserveIds])).slice(0, 10),
+          unitIds: Array.from(new Set(unitIds)).slice(0, 10),
       };
   }
   function hasPositiveWalletValue(source) {
@@ -23215,13 +23207,9 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       rosterSection.className = 'lineup-roster';
       const rosterHeader = document.createElement('div');
       rosterHeader.className = 'lineup-roster__header';
-      const rosterTitle = document.createElement('p');
-      rosterTitle.className = 'lineup-roster__tag';
-      rosterTitle.textContent = 'Danh sách nhân vật';
       const totalCostEl = document.createElement('p');
       totalCostEl.className = 'lineup-roster__total-cost';
       totalCostEl.textContent = '0';
-      rosterHeader.append(rosterTitle);
       rosterSection.appendChild(rosterHeader);
       const rosterFilters = document.createElement('div');
       rosterFilters.className = 'lineup-roster__filters';
@@ -23364,14 +23352,6 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           cachedFilteredRoster = filterRoster(state.roster, state.filter);
           return cachedFilteredRoster;
       }
-      function getFirstReserveIndex(lineup) {
-          for (const cell of lineup.cells) {
-              if (cell.section === 'reserve') {
-                  return cell.index;
-              }
-          }
-          return lineup.cells.length;
-      }
       function readNumericCost(value) {
           if (typeof value === 'number' && Number.isFinite(value) && value > 0) {
               return value;
@@ -23510,12 +23490,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               syncGridDetailsHeight();
               return;
           }
-          const firstReserveIndex = getFirstReserveIndex(lineup);
-          const sectionName = cell.section === 'formation' ? 'Ô ra trận' : 'Ô dự phòng';
-          const displayIndex = cell.section === 'formation'
-              ? cell.index + 1
-              : (cell.index - firstReserveIndex + 1);
-          const labelText = `${sectionName} #${Math.max(displayIndex, 1)}`;
+          const labelText = `Ô đội hình #${cell.index + 1}`;
           const heading = document.createElement('p');
           heading.className = 'lineup-grid__details-heading';
           heading.textContent = labelText;
@@ -23660,7 +23635,6 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               return;
           }
           gridSection.classList.remove('is-empty');
-          const firstReserveIndex = getFirstReserveIndex(lineup);
           if (!Number.isInteger(state.activeCellIndex) || !lineup.cells[state.activeCellIndex ?? -1]) {
               state.activeCellIndex = null;
           }
@@ -23692,10 +23666,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
                           ? 'select'
                           : 'focus';
               }
-              const displayIndex = cell.section === 'formation'
-                  ? cell.index + 1
-                  : (cell.index - firstReserveIndex + 1);
-              const sectionName = cell.section === 'formation' ? 'Ô ra trận' : 'Ô dự phòng';
+              const displayIndex = cell.index + 1;
               const avatar = document.createElement('div');
               avatar.className = 'lineup-cell__avatar';
               if (unit) {
@@ -23711,7 +23682,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
                   avatar.textContent = '+';
               }
               cellEl.appendChild(avatar);
-              let ariaLabel = `${sectionName} #${Math.max(displayIndex, 1)}`;
+              let ariaLabel = `Ô đội hình #${Math.max(displayIndex, 1)}`;
               if (unit) {
                   ariaLabel += `: ${unit.name}`;
               }
@@ -24136,8 +24107,7 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
   const currencyIndex = new Map(currencyCatalog.map(currency => [currency.id, currency]));
   const numberFormatter = createNumberFormatter('vi-VN');
   const DEFAULT_RARITY = 'N';
-  const FORMATION_CELL_COUNT = 5;
-  const RESERVE_CELL_COUNT = 5;
+  const FORMATION_CELL_COUNT = 10;
   const isObjectLike = (value) => (typeof value === 'object' && value !== null && !Array.isArray(value));
   const isRosterEntryLite = (value) => isObjectLike(value);
   const isLineupDefinition = (value) => isObjectLike(value);
@@ -24351,28 +24321,7 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
               meta: record ? { ...record } : null,
           };
       });
-      const benchSource = Array.isArray(source.bench)
-          ? source.bench
-          : Array.isArray(source.reserve)
-              ? source.reserve
-              : Array.isArray(source.members)
-                  ? source.members.slice(FORMATION_CELL_COUNT)
-                  : [];
-      const reserveCells = new Array(RESERVE_CELL_COUNT).fill(null).map((_, reserveIndex) => {
-          const benchInput = benchSource[reserveIndex] ?? null;
-          const { unitId, label } = normalizeAssignment(benchInput, rosterIndex);
-          return {
-              index: FORMATION_CELL_COUNT + reserveIndex,
-              section: 'reserve',
-              unitId,
-              label,
-              unlocked: true,
-              unlockCost: null,
-              equipment: null,
-              meta: isLineupMemberConfig(benchInput) ? { ...benchInput } : null,
-          };
-      });
-      const cells = formationCells.concat(reserveCells);
+      const cells = formationCells;
       const passiveSource = Array.isArray(source.passives)
           ? source.passives
           : Array.isArray(source.passiveSlots)
@@ -24440,9 +24389,9 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
   function normalizeLineups(rawLineups, roster) {
       const rosterIndex = new Set(roster.map(unit => unit.id));
       if (!Array.isArray(rawLineups) || rawLineups.length === 0) {
-          const cells = new Array(FORMATION_CELL_COUNT + RESERVE_CELL_COUNT).fill(null).map((_, index) => ({
+          const cells = new Array(FORMATION_CELL_COUNT).fill(null).map((_, index) => ({
               index,
-              section: index < FORMATION_CELL_COUNT ? 'formation' : 'reserve',
+              section: 'formation',
               unitId: null,
               label: null,
               unlocked: index < 3,

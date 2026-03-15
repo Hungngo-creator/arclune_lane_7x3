@@ -133,7 +133,7 @@ function ensureStyles(): void{
     .lineup-passive-picker__icon{width:42px;height:42px;border-radius:999px;border:1px solid rgba(174,228,255,.4);background:rgba(24,34,44,.85);flex:0 0 auto;}
     .lineup-passive-picker__text{margin:0;font-size:13px;color:#9cbcd9;min-height:20px;}
     .lineup-roster{border-radius:28px;border:1px solid rgba(125,211,252,.22);background:rgba(8,16,24,.92);padding:20px;display:flex;flex-direction:column;gap:12px;position:relative;}
-    .lineup-roster__total-cost{margin:0 0 0 auto;padding:8px 14px;border-radius:999px;border:1px solid rgba(255,217,161,.28);background:rgba(40,28,14,.62);font-size:12px;letter-spacing:.08em;color:#ffd9a1;font-weight:700;line-height:1;}
+    .lineup-roster__total-cost{margin:0 0 0 auto;padding:0;border:none;background:transparent;font-size:20px;letter-spacing:.04em;color:#ffd9a1;font-weight:700;line-height:1;}
     .lineup-roster__filters{display:flex;flex-wrap:wrap;gap:10px;}
     .lineup-roster__filter{padding:8px 14px;border-radius:999px;border:1px solid rgba(125,211,252,.24);background:rgba(12,22,32,.82);color:#aee4ff;font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:transform .16s ease,border-color .16s ease;}
     .lineup-roster__filter:hover{transform:translateY(-1px);border-color:rgba(125,211,252,.42);}
@@ -380,14 +380,11 @@ function applySavedLineupState(
 
 export function serializeSelectedLineup(lineup: LineupState | null): SerializedLineupSelection {
   if (!lineup) return { unitIds: [] };
-  const formationIds = lineup.cells
-    .filter(cell => cell.section === 'formation' && cell.unlocked && typeof cell.unitId === 'string' && cell.unitId.trim())
-    .map(cell => normalizeUnitId(cell.unitId as string));
-  const reserveIds = lineup.cells
-    .filter(cell => cell.section === 'reserve' && cell.unlocked && typeof cell.unitId === 'string' && cell.unitId.trim())
+  const unitIds = lineup.cells
+    .filter(cell => cell.unlocked && typeof cell.unitId === 'string' && cell.unitId.trim())
     .map(cell => normalizeUnitId(cell.unitId as string));
   return {
-    unitIds: Array.from(new Set([...formationIds, ...reserveIds])).slice(0, 10),
+    unitIds: Array.from(new Set(unitIds)).slice(0, 10),
   };
 }
 
@@ -672,13 +669,9 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   rosterSection.className = 'lineup-roster';
   const rosterHeader = document.createElement('div');
   rosterHeader.className = 'lineup-roster__header';
-  const rosterTitle = document.createElement('p');
-  rosterTitle.className = 'lineup-roster__tag';
-  rosterTitle.textContent = 'Danh sách nhân vật';
   const totalCostEl = document.createElement('p');
   totalCostEl.className = 'lineup-roster__total-cost';
   totalCostEl.textContent = '0';
-  rosterHeader.append(rosterTitle);
   rosterSection.appendChild(rosterHeader);
   const rosterFilters = document.createElement('div');
   rosterFilters.className = 'lineup-roster__filters';
@@ -838,15 +831,6 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
     return cachedFilteredRoster;
   }
 
-  function getFirstReserveIndex(lineup: LineupState): number {
-    for (const cell of lineup.cells){
-      if (cell.section === 'reserve'){
-        return cell.index;
-      }
-    }
-    return lineup.cells.length;
-  }
-
   function readNumericCost(value: unknown): number{
     if (typeof value === 'number' && Number.isFinite(value) && value > 0){
       return value;
@@ -992,12 +976,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       return;
     }
 
-    const firstReserveIndex = getFirstReserveIndex(lineup);
-    const sectionName = cell.section === 'formation' ? 'Ô ra trận' : 'Ô dự phòng';
-    const displayIndex = cell.section === 'formation'
-      ? cell.index + 1
-      : (cell.index - firstReserveIndex + 1);
-    const labelText = `${sectionName} #${Math.max(displayIndex, 1)}`;
+    const labelText = `Ô đội hình #${cell.index + 1}`;
 
     const heading = document.createElement('p');
     heading.className = 'lineup-grid__details-heading';
@@ -1155,8 +1134,6 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
 
     gridSection.classList.remove('is-empty');
 
-    const firstReserveIndex = getFirstReserveIndex(lineup);
-
     if (!Number.isInteger(state.activeCellIndex) || !lineup.cells[state.activeCellIndex ?? -1]){
       state.activeCellIndex = null;
     }
@@ -1190,10 +1167,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
 
       }
 
-      const displayIndex = cell.section === 'formation'
-        ? cell.index + 1
-        : (cell.index - firstReserveIndex + 1);
-      const sectionName = cell.section === 'formation' ? 'Ô ra trận' : 'Ô dự phòng';
+      const displayIndex = cell.index + 1;
 
       const avatar = document.createElement('div');
       avatar.className = 'lineup-cell__avatar';
@@ -1208,7 +1182,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       }
       cellEl.appendChild(avatar);
 
-      let ariaLabel = `${sectionName} #${Math.max(displayIndex, 1)}`;
+      let ariaLabel = `Ô đội hình #${Math.max(displayIndex, 1)}`;
       if (unit){
         ariaLabel += `: ${unit.name}`;
       } else if (cell.label){

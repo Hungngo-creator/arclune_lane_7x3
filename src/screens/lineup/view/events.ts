@@ -122,12 +122,7 @@ const getCellLabel = (lineup: LineupState, cellIndex: number): string => {
     if (!cell){
       return 'Ô đội hình';
    }
-    const firstReserveIndex = lineup.cells.find(entry => entry.section === 'reserve')?.index ?? lineup.cells.length;
-    const displayIndex = cell.section === 'formation'
-      ? cell.index + 1
-      : (cell.index - firstReserveIndex + 1);
-    const sectionName = cell.section === 'formation' ? 'Ô ra trận' : 'Ô dự phòng';
-    return `${sectionName} #${Math.max(displayIndex, 1)}`;
+    return `Ô đội hình #${Math.max(cell.index + 1, 1)}`;
   };
 
 const refreshBattlePanels = (): void => {
