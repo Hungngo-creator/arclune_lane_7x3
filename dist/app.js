@@ -23411,13 +23411,17 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           if (!lineup) {
               return 0;
           }
-          return lineup.cells.reduce((sum, cell) => {
+          const cellsCost = lineup.cells.reduce((sum, cell) => {
               if (!cell.unlocked || !cell.unitId) {
                   return sum;
               }
               const unit = rosterLookup.get(cell.unitId);
               return sum + resolveUnitLineupCost(unit);
           }, 0);
+          const leaderCost = lineup.leaderId
+              ? resolveUnitLineupCost(rosterLookup.get(lineup.leaderId))
+              : 0;
+          return cellsCost + leaderCost;
       }
       function refreshWallet() {
           for (const [currencyId, balance] of state.currencyBalances.entries()) {
@@ -23448,7 +23452,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       function refreshTotalCost() {
           const lineup = getSelectedLineup();
           const totalCost = getLineupTotalCost(lineup);
-          totalCostEl.textContent = powerFormatter.format(totalCost);
+          totalCostEl.textContent = String(totalCost);
       }
       function renderCellDetails() {
           cellDetails.innerHTML = '';
@@ -23836,6 +23840,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               }
               rosterFilters.appendChild(button);
           });
+          rosterFilters.appendChild(totalCostEl);
       }
       function renderRoster() {
           const lineup = getSelectedLineup();

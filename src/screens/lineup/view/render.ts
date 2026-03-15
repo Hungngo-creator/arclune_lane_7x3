@@ -892,13 +892,17 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
     if (!lineup){
       return 0;
     }
-    return lineup.cells.reduce((sum, cell) => {
+    const cellsCost = lineup.cells.reduce((sum, cell) => {
       if (!cell.unlocked || !cell.unitId){
         return sum;
       }
       const unit = rosterLookup.get(cell.unitId);
       return sum + resolveUnitLineupCost(unit);
     }, 0);
+    const leaderCost = lineup.leaderId
+      ? resolveUnitLineupCost(rosterLookup.get(lineup.leaderId))
+      : 0;
+    return cellsCost + leaderCost;
   }
   function refreshWallet(): void{
     for (const [currencyId, balance] of state.currencyBalances.entries()){
@@ -930,7 +934,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   function refreshTotalCost(): void{
     const lineup = getSelectedLineup();
     const totalCost = getLineupTotalCost(lineup);
-    totalCostEl.textContent = powerFormatter.format(totalCost);
+    totalCostEl.textContent = String(totalCost);
   }
 
   function renderCellDetails(): void{
@@ -1339,6 +1343,7 @@ function updateActiveCellHighlight(): void{
       }
       rosterFilters.appendChild(button);
     });
+    rosterFilters.appendChild(totalCostEl);
   }
 
   function renderRoster(): void{
