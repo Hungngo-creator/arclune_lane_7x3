@@ -22765,7 +22765,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       .lineup-passive-picker__text{margin:0;font-size:13px;color:#9cbcd9;min-height:20px;}
       .lineup-roster{border-radius:28px;border:1px solid rgba(125,211,252,.22);background:rgba(8,16,24,.92);padding:20px;display:flex;flex-direction:column;gap:12px;position:relative;}
       .lineup-roster__total-cost{margin:0 0 0 auto;padding:0;border:none;background:transparent;font-size:20px;letter-spacing:.04em;color:#ffd9a1;font-weight:700;line-height:1;}
-      .lineup-roster__filters{display:flex;flex-wrap:wrap;gap:10px;}
+      .lineup-roster__filters{display:flex;flex-wrap:wrap;align-items:center;gap:10px;}
       .lineup-roster__filter{padding:8px 14px;border-radius:999px;border:1px solid rgba(125,211,252,.24);background:rgba(12,22,32,.82);color:#aee4ff;font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:transform .16s ease,border-color .16s ease;}
       .lineup-roster__filter:hover{transform:translateY(-1px);border-color:rgba(125,211,252,.42);}
       .lineup-roster__filter:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:3px;}
