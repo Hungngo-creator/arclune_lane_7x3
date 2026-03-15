@@ -133,8 +133,7 @@ function ensureStyles(): void{
     .lineup-passive-picker__icon{width:42px;height:42px;border-radius:999px;border:1px solid rgba(174,228,255,.4);background:rgba(24,34,44,.85);flex:0 0 auto;}
     .lineup-passive-picker__text{margin:0;font-size:13px;color:#9cbcd9;min-height:20px;}
     .lineup-roster{border-radius:28px;border:1px solid rgba(125,211,252,.22);background:rgba(8,16,24,.92);padding:20px;display:flex;flex-direction:column;gap:12px;position:relative;}
-    .lineup-roster__header{display:flex;justify-content:flex-end;align-items:center;}
-    .lineup-roster__total-cost{margin:0;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#ffd9a1;font-weight:600;}
+    .lineup-roster__total-cost{margin:0 0 0 auto;padding:8px 14px;border-radius:999px;border:1px solid rgba(255,217,161,.28);background:rgba(40,28,14,.62);font-size:12px;letter-spacing:.08em;color:#ffd9a1;font-weight:700;line-height:1;}
     .lineup-roster__filters{display:flex;flex-wrap:wrap;gap:10px;}
     .lineup-roster__filter{padding:8px 14px;border-radius:999px;border:1px solid rgba(125,211,252,.24);background:rgba(12,22,32,.82);color:#aee4ff;font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:transform .16s ease,border-color .16s ease;}
     .lineup-roster__filter:hover{transform:translateY(-1px);border-color:rgba(125,211,252,.42);}
@@ -671,15 +670,12 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
 
   const rosterSection = document.createElement('section');
   rosterSection.className = 'lineup-roster';
-  const rosterHeader = document.createElement('div');
-  rosterHeader.className = 'lineup-roster__header';
   const totalCostEl = document.createElement('p');
-  totalCostEl.className = 'lineup-roster__total-cost';
-  totalCostEl.textContent = 'Tổng cost: 0';
-  rosterHeader.appendChild(totalCostEl);
+  totalCostEl.textContent = '0';
   rosterSection.appendChild(rosterHeader);
   const rosterFilters = document.createElement('div');
   rosterFilters.className = 'lineup-roster__filters';
+  rosterFilters.appendChild(totalCostEl);
   rosterSection.appendChild(rosterFilters);
   const rosterList = document.createElement('div');
   rosterList.className = 'lineup-roster__list';
@@ -943,7 +939,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   function refreshTotalCost(): void{
     const lineup = getSelectedLineup();
     const totalCost = getLineupTotalCost(lineup);
-    totalCostEl.textContent = `Tổng cost: ${powerFormatter.format(totalCost)}`;
+    totalCostEl.textContent = powerFormatter.format(totalCost);
   }
 
   function renderCellDetails(): void{
