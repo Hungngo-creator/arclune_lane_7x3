@@ -1,6 +1,6 @@
 //home (termux)/arclune_lane_7x3/src/screens/lineup/view/event.ts
 
-import type { LineupViewState, LineupMessageType, LineupPassive, RosterUnit } from './state.ts';
+import type { LineupViewState, LineupMessageType, RosterUnit } from './state.ts';
 import {
   assignUnitToCell,
   removeUnitFromCell,
@@ -45,7 +45,8 @@ export interface LineupEventHelpers {
   renderRoster: () => void;
   updateActiveCellHighlight: () => void;
   syncGridDetailsHeight: () => void;
-  openPassiveDetails: (passive: LineupPassive) => void;
+  openPassivePicker: (passiveIndex: number) => void;
+  commitPassivePickerSelection: () => void;
   openLeaderPicker: () => void;
   refreshWallet: () => void;
   persistLineupSelection: () => void;
@@ -292,13 +293,9 @@ const refreshBattlePanels = (): void => {
   const handlePassiveClick = (event: Event) => {
     const btn = (event.target as HTMLElement | null)?.closest<HTMLElement>('.lineup-passive');
     if (!btn) return;
-    const lineup = helpers.getSelectedLineup();
-    if (!lineup) return;
     const index = Number(btn.dataset.passiveIndex);
     if (!Number.isFinite(index)) return;
-    const passive = lineup.passives[index] as LineupPassive | undefined;
-    if (!passive || passive.isEmpty) return;
-    helpers.openPassiveDetails(passive);
+    helpers.openPassivePicker(index);
   };
   passiveGrid.addEventListener('click', handlePassiveClick);
   cleanup.push(() => passiveGrid.removeEventListener('click', handlePassiveClick));
@@ -368,6 +365,7 @@ const refreshBattlePanels = (): void => {
   cleanup.push(() => leaderAvatar.removeEventListener('click', handleLeaderOpen));
 
   const handlePassiveClose = () => {
+    helpers.commitPassivePickerSelection();
     overlays.close(passiveOverlay);
   };
   passiveClose.addEventListener('click', handlePassiveClose);
@@ -381,6 +379,7 @@ const refreshBattlePanels = (): void => {
 
   const handlePassiveOverlayClick = (event: Event) => {
     if (event.target === passiveOverlay){
+      helpers.commitPassivePickerSelection();
       overlays.close(passiveOverlay);
     }
   };
@@ -426,6 +425,9 @@ const refreshBattlePanels = (): void => {
     if (event.key === 'Escape'){
       const active = overlays.getActive();
       if (active){
+        if (active === passiveOverlay){
+          helpers.commitPassivePickerSelection();
+        }
         overlays.close(active);
       }
     }

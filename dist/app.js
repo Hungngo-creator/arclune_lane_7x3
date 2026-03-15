@@ -22492,16 +22492,10 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
           const btn = event.target?.closest('.lineup-passive');
           if (!btn)
               return;
-          const lineup = helpers.getSelectedLineup();
-          if (!lineup)
-              return;
           const index = Number(btn.dataset.passiveIndex);
           if (!Number.isFinite(index))
               return;
-          const passive = lineup.passives[index];
-          if (!passive || passive.isEmpty)
-              return;
-          helpers.openPassiveDetails(passive);
+          helpers.openPassivePicker(index);
       };
       passiveGrid.addEventListener('click', handlePassiveClick);
       cleanup.push(() => passiveGrid.removeEventListener('click', handlePassiveClick));
@@ -22567,6 +22561,7 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
       leaderAvatar.addEventListener('click', handleLeaderOpen);
       cleanup.push(() => leaderAvatar.removeEventListener('click', handleLeaderOpen));
       const handlePassiveClose = () => {
+          helpers.commitPassivePickerSelection();
           overlays.close(passiveOverlay);
       };
       passiveClose.addEventListener('click', handlePassiveClose);
@@ -22578,6 +22573,7 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
       cleanup.push(() => leaderClose.removeEventListener('click', handleLeaderClose));
       const handlePassiveOverlayClick = (event) => {
           if (event.target === passiveOverlay) {
+              helpers.commitPassivePickerSelection();
               overlays.close(passiveOverlay);
           }
       };
@@ -22624,6 +22620,9 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
           if (event.key === 'Escape') {
               const active = overlays.getActive();
               if (active) {
+                  if (active === passiveOverlay) {
+                      helpers.commitPassivePickerSelection();
+                  }
                   overlays.close(active);
               }
           }
@@ -22758,16 +22757,21 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       .lineup-leader__name{margin:0;font-size:16px;color:#ffe7b3;}
       .lineup-leader__note{margin:0;font-size:11px;color:#f0d9b2;line-height:1.5;}
       .lineup-passives{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:10px;}
-      .lineup-passive{padding:10px;border-radius:14px;border:1px solid rgba(255,209,132,.28);background:rgba(38,26,12,.78);display:flex;flex-direction:column;gap:6px;cursor:pointer;transition:transform .16s ease,border-color .16s ease,background .16s ease;color:#ffe7b3;height:100%;}
+      .lineup-passive{padding:10px;border-radius:14px;border:1px solid rgba(255,209,132,.28);background:rgba(38,26,12,.78);display:flex;flex-direction:column;gap:6px;cursor:pointer;transition:transform .16s ease,border-color .16s ease,background .16s ease;color:#ffe7b3;height:100%;text-align:left;}
       .lineup-passive:hover{transform:translateY(-2px);border-color:rgba(255,209,132,.45);background:rgba(46,30,14,.86);}
       .lineup-passive:focus-visible{outline:2px solid rgba(255,209,132,.75);outline-offset:3px;}
       .lineup-passive__title{margin:0;font-size:13px;letter-spacing:.04em;}
       .lineup-passive__condition{margin:0;font-size:11px;color:#f3d2a2;}
       .lineup-passive.is-active{box-shadow:0 16px 34px rgba(255,184,108,.45);border-color:rgba(255,209,132,.72);background:rgba(56,36,18,.92);}
-      .lineup-passive.is-empty{opacity:0.6;cursor:default;}
-      .lineup-passive.is-empty:hover{transform:none;}
-      .lineup-passive.is-empty:focus-visible{outline:none;}
-      .lineup-roster{border-radius:28px;border:1px solid rgba(125,211,252,.22);background:rgba(8,16,24,.92);padding:20px;display:flex;flex-direction:column;gap:12px;}
+      .lineup-passive-picker{display:flex;flex-direction:column;gap:10px;}
+      .lineup-passive-picker__option{padding:10px 12px;border-radius:12px;border:1px solid rgba(125,211,252,.2);background:rgba(12,22,32,.82);display:flex;align-items:center;gap:12px;cursor:pointer;transition:transform .16s ease,border-color .16s ease;}
+      .lineup-passive-picker__option:hover{transform:translateY(-1px);border-color:rgba(125,211,252,.42);}
+      .lineup-passive-picker__option.is-active{border-color:rgba(174,228,255,.6);background:rgba(18,30,44,.94);}
+      .lineup-passive-picker__icon{width:42px;height:42px;border-radius:999px;border:1px solid rgba(174,228,255,.4);background:rgba(24,34,44,.85);flex:0 0 auto;}
+      .lineup-passive-picker__text{margin:0;font-size:13px;color:#9cbcd9;min-height:20px;}
+      .lineup-roster{border-radius:28px;border:1px solid rgba(125,211,252,.22);background:rgba(8,16,24,.92);padding:20px;display:flex;flex-direction:column;gap:12px;position:relative;}
+      .lineup-roster__header{display:flex;justify-content:flex-end;align-items:center;}
+      .lineup-roster__total-cost{margin:0;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#ffd9a1;font-weight:600;}
       .lineup-roster__filters{display:flex;flex-wrap:wrap;gap:10px;}
       .lineup-roster__filter{padding:8px 14px;border-radius:999px;border:1px solid rgba(125,211,252,.24);background:rgba(12,22,32,.82);color:#aee4ff;font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:transform .16s ease,border-color .16s ease;}
       .lineup-roster__filter:hover{transform:translateY(-1px);border-color:rgba(125,211,252,.42);}
@@ -22788,7 +22792,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       .lineup-overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(3,8,14,.66);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:80;}
       .lineup-overlay.is-open{opacity:1;pointer-events:auto;}
       .lineup-overlay__panel{max-width:540px;width:100%;background:rgba(8,16,24,.96);border:1px solid rgba(125,211,252,.35);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:14px;color:#e6f2ff;box-shadow:0 32px 64px rgba(3,8,16,.75);}
-      .lineup-overlay__close{align-self:flex-end;padding:8px 12px;border-radius:12px;border:1px solid rgba(125,211,252,.3);background:rgba(12,22,32,.86);color:#aee4ff;font-size:12px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:transform .16s ease,border-color .16s ease;}
+      .lineup-overlay__close{align-self:flex-end;width:36px;height:36px;border-radius:999px;border:1px solid rgba(125,211,252,.3);background:rgba(12,22,32,.86);color:#aee4ff;font-size:20px;line-height:1;cursor:pointer;transition:transform .16s ease,border-color .16s ease;display:inline-flex;align-items:center;justify-content:center;padding:0;}
       .lineup-overlay__close:hover{transform:translateY(-1px);border-color:rgba(174,228,255,.5);}
       .lineup-overlay__close:focus-visible{outline:2px solid rgba(174,228,255,.7);outline-offset:3px;}
       .lineup-overlay__title{margin:0;font-size:20px;letter-spacing:.04em;}
@@ -22815,7 +22819,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       overlay.setAttribute('aria-modal', 'true');
       overlay.innerHTML = `
       <div class="lineup-overlay__panel" role="document">
-        <button type="button" class="lineup-overlay__close" aria-label="Đóng">Đóng</button>
+        <button type="button" class="lineup-overlay__close" aria-label="ĐÓNG">x</button>
         <div class="lineup-overlay__body"></div>
       </div>
     `;
@@ -23016,6 +23020,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       const lineupState = new Map();
       const profile = loadPlayerProfile();
       const savedLineupStateById = profile.lineupStateById ?? {};
+      const savedPassiveSelectionById = profile.lineupPassiveSelectionById ?? {};
       normalizedLineups.forEach(lineup => {
           lineupState.set(lineup.id, {
               ...lineup,
@@ -23210,6 +23215,13 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       mainColumn.appendChild(gridSection);
       const rosterSection = document.createElement('section');
       rosterSection.className = 'lineup-roster';
+      const rosterHeader = document.createElement('div');
+      rosterHeader.className = 'lineup-roster__header';
+      const totalCostEl = document.createElement('p');
+      totalCostEl.className = 'lineup-roster__total-cost';
+      totalCostEl.textContent = 'Tổng cost: 0';
+      rosterHeader.appendChild(totalCostEl);
+      rosterSection.appendChild(rosterHeader);
       const rosterFilters = document.createElement('div');
       rosterFilters.className = 'lineup-roster__filters';
       rosterSection.appendChild(rosterFilters);
@@ -23275,6 +23287,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           const selectedLineup = getSelectedLineup();
           const selected = serializeSelectedLineup(selectedLineup);
           const serializedLineupState = {};
+          const serializedPassiveSelection = {};
           state.lineupState.forEach((lineup, lineupId) => {
               serializedLineupState[lineupId] = {
                   leaderId: lineup.leaderId ?? null,
@@ -23286,9 +23299,19 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
                   })),
               };
           });
+          for (const [lineupId, selection] of passiveSelectionByLineup) {
+              if (!selection.size) {
+                  continue;
+              }
+              serializedPassiveSelection[lineupId] = {};
+              for (const [passiveIndex, optionIndex] of selection) {
+                  serializedPassiveSelection[lineupId][String(passiveIndex)] = optionIndex;
+              }
+          }
           patchPlayerProfile({
               lineupDeck: selected.unitIds,
               lineupStateById: serializedLineupState,
+              lineupPassiveSelectionById: serializedPassiveSelection,
           });
       }
       function setMessage(text, type = 'info') {
@@ -23310,6 +23333,25 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       let lastFiltersRenderSignature = '';
       let lastHighlightedCellIndex = null;
       const cellNodeByIndex = new Map();
+      const passiveSelectionByLineup = new Map();
+      Object.entries(savedPassiveSelectionById).forEach(([lineupId, selection]) => {
+          if (typeof lineupId !== 'string' || !lineupId) {
+              return;
+          }
+          const perLineup = new Map();
+          if (selection && typeof selection === 'object') {
+              Object.entries(selection).forEach(([passiveIndex, optionIndex]) => {
+                  const parsedPassiveIndex = Number(passiveIndex);
+                  const parsedOptionIndex = Number(optionIndex);
+                  if (Number.isInteger(parsedPassiveIndex) && Number.isInteger(parsedOptionIndex) && parsedPassiveIndex >= 0 && parsedOptionIndex >= 0) {
+                      perLineup.set(parsedPassiveIndex, parsedOptionIndex);
+                  }
+              });
+          }
+          passiveSelectionByLineup.set(lineupId, perLineup);
+      });
+      let pendingPassiveSelection = null;
+      const passivePickerOptions = new Array(6).fill(null).map((_, index) => ({ id: `option-${index + 1}`, label: '' }));
       function getFilteredRoster() {
           const filterKey = `${state.filter.type}::${state.filter.value ?? ''}`;
           if (cachedFilteredRosterSource === state.roster && cachedFilterKey === filterKey) {
@@ -23327,6 +23369,73 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               }
           }
           return lineup.cells.length;
+      }
+      function readNumericCost(value) {
+          if (typeof value === 'number' && Number.isFinite(value) && value > 0) {
+              return value;
+          }
+          if (typeof value === 'string') {
+              const parsed = Number(value);
+              if (Number.isFinite(parsed) && parsed > 0) {
+                  return parsed;
+              }
+              return 0;
+          }
+          if (Array.isArray(value)) {
+              for (const entry of value) {
+                  const resolved = readNumericCost(entry);
+                  if (resolved > 0) {
+                      return resolved;
+                  }
+              }
+              return 0;
+          }
+          if (typeof value === 'object' && value != null) {
+              const record = value;
+              const direct = readNumericCost(record.value ?? record.amount ?? record.cost ?? record.deployCost ?? record.lineupCost ?? null);
+              if (direct > 0) {
+                  return direct;
+              }
+              for (const candidate of Object.values(record)) {
+                  const resolved = readNumericCost(candidate);
+                  if (resolved > 0) {
+                      return resolved;
+                  }
+              }
+          }
+          return 0;
+      }
+      function resolveUnitLineupCost(unit) {
+          if (!unit) {
+              return 0;
+          }
+          const raw = unit.raw;
+          const sources = [
+              raw?.lineupCost,
+              raw?.deployCost,
+              raw?.cost,
+              raw?.price,
+              raw?.meta,
+          ];
+          for (const source of sources) {
+              const cost = readNumericCost(source);
+              if (cost > 0) {
+                  return cost;
+              }
+          }
+          return 0;
+      }
+      function getLineupTotalCost(lineup) {
+          if (!lineup) {
+              return 0;
+          }
+          return lineup.cells.reduce((sum, cell) => {
+              if (!cell.unlocked || !cell.unitId) {
+                  return sum;
+              }
+              const unit = rosterLookup.get(cell.unitId);
+              return sum + resolveUnitLineupCost(unit);
+          }, 0);
       }
       function refreshWallet() {
           for (const [currencyId, balance] of state.currencyBalances.entries()) {
@@ -23353,6 +23462,11 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
                   walletItems.delete(currencyId);
               }
           }
+      }
+      function refreshTotalCost() {
+          const lineup = getSelectedLineup();
+          const totalCost = getLineupTotalCost(lineup);
+          totalCostEl.textContent = `Tổng cost: ${powerFormatter.format(totalCost)}`;
       }
       function renderCellDetails() {
           cellDetails.innerHTML = '';
@@ -23539,6 +23653,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               }
               state.activeCellIndex = null;
               renderCellDetails();
+              refreshTotalCost();
               syncGridDetailsHeight();
               return;
           }
@@ -23626,6 +23741,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           lastHighlightedCellIndex = null;
           updateActiveCellHighlight();
           renderCellDetails();
+          refreshTotalCost();
       }
       function updateActiveCellHighlight() {
           const nextIndex = Number.isInteger(state.activeCellIndex) ? state.activeCellIndex : null;
@@ -23694,29 +23810,25 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           }
           lastPassivesRenderSignature = nextSignature;
           passiveGrid.innerHTML = '';
+          const lineupSelection = passiveSelectionByLineup.get(lineup.id) ?? new Map();
           passiveStates.forEach(({ passive, isActive }) => {
               const btn = document.createElement('button');
               btn.type = 'button';
               btn.className = 'lineup-passive';
               btn.dataset.passiveIndex = String(passive.index);
-              btn.setAttribute('aria-label', passive.isEmpty ? 'Ô passive trống' : `Xem passive ${passive.name}`);
-              if (passive.isEmpty) {
-                  btn.classList.add('is-empty');
-                  btn.disabled = true;
-              }
-              if (isActive) {
+              const selectedIndex = lineupSelection.get(passive.index);
+              btn.setAttribute('aria-label', `Thiết lập buff ô #${passive.index + 1}`);
+              if (isActive || selectedIndex != null) {
                   btn.classList.add('is-active');
               }
               const title = document.createElement('p');
               title.className = 'lineup-passive__title';
-              title.textContent = passive.name;
+              title.textContent = selectedIndex != null ? `Buff #${selectedIndex + 1}` : 'Chưa thiết lập';
               btn.appendChild(title);
-              if (!passive.isEmpty) {
-                  const condition = document.createElement('p');
-                  condition.className = 'lineup-passive__condition';
-                  condition.textContent = passive.requirement || 'Chạm để xem chi tiết.';
-                  btn.appendChild(condition);
-              }
+              const condition = document.createElement('p');
+              condition.className = 'lineup-passive__condition';
+              condition.textContent = '';
+              btn.appendChild(condition);
               passiveGrid.appendChild(btn);
           });
       }
@@ -23808,37 +23920,64 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           });
           rosterList.appendChild(fragment);
       }
-      function openPassiveDetails(passive) {
+      function openPassivePicker(passiveIndex) {
+          const lineup = getSelectedLineup();
+          if (!lineup) {
+              return;
+          }
+          const lineupSelection = passiveSelectionByLineup.get(lineup.id) ?? new Map();
+          passiveSelectionByLineup.set(lineup.id, lineupSelection);
+          const currentSelection = lineupSelection.get(passiveIndex) ?? 0;
+          pendingPassiveSelection = { lineupId: lineup.id, passiveIndex, optionIndex: currentSelection };
           passiveOverlayBody.innerHTML = '';
           const title = document.createElement('h3');
           title.className = 'lineup-overlay__title';
-          title.textContent = passive.name;
+          title.textContent = `Thiết lập buff ô #${passiveIndex + 1}`;
           passiveOverlayBody.appendChild(title);
-          if (passive.requirement) {
-              const subtitle = document.createElement('p');
-              subtitle.className = 'lineup-overlay__subtitle';
-              subtitle.textContent = passive.requirement;
-              passiveOverlayBody.appendChild(subtitle);
-          }
-          if (passive.description) {
-              const descriptionEl = document.createElement('p');
-              descriptionEl.className = 'lineup-overlay__subtitle';
-              descriptionEl.textContent = passive.description;
-              passiveOverlayBody.appendChild(descriptionEl);
-          }
-          if (passive.requiredUnitIds.length) {
-              const list = document.createElement('ul');
-              list.className = 'lineup-overlay__list';
-              passive.requiredUnitIds.forEach(unitId => {
-                  const item = document.createElement('li');
-                  const unit = rosterLookup.get(unitId);
-                  item.textContent = unit?.name || unitId;
-                  list.appendChild(item);
+          const subtitle = document.createElement('p');
+          subtitle.className = 'lineup-overlay__subtitle';
+          subtitle.textContent = 'Chọn một dòng buff bên dưới rồi bấm dấu X để lưu lựa chọn.';
+          passiveOverlayBody.appendChild(subtitle);
+          const list = document.createElement('div');
+          list.className = 'lineup-passive-picker';
+          passivePickerOptions.forEach((option, optionIndex) => {
+              const row = document.createElement('button');
+              row.type = 'button';
+              row.className = 'lineup-passive-picker__option';
+              row.dataset.optionIndex = String(optionIndex);
+              if (optionIndex === currentSelection) {
+                  row.classList.add('is-active');
+              }
+              const icon = document.createElement('span');
+              icon.className = 'lineup-passive-picker__icon';
+              row.appendChild(icon);
+              const text = document.createElement('p');
+              text.className = 'lineup-passive-picker__text';
+              text.textContent = option.label;
+              row.appendChild(text);
+              row.addEventListener('click', () => {
+                  pendingPassiveSelection = { lineupId: lineup.id, passiveIndex, optionIndex };
+                  list.querySelectorAll('.lineup-passive-picker__option').forEach((node, index) => {
+                      node.classList.toggle('is-active', index === optionIndex);
+                  });
               });
-              passiveOverlayBody.appendChild(list);
-          }
+              list.appendChild(row);
+          });
+          passiveOverlayBody.appendChild(list);
           openOverlay(passiveOverlay);
           passiveClose.focus();
+      }
+      function commitPassivePickerSelection() {
+          if (!pendingPassiveSelection) {
+              return;
+          }
+          const { lineupId, passiveIndex, optionIndex } = pendingPassiveSelection;
+          const lineupSelection = passiveSelectionByLineup.get(lineupId) ?? new Map();
+          lineupSelection.set(passiveIndex, optionIndex);
+          passiveSelectionByLineup.set(lineupId, lineupSelection);
+          pendingPassiveSelection = null;
+          renderPassives();
+          persistLineupSelection();
       }
       function openLeaderPicker() {
           const lineup = getSelectedLineup();
@@ -23929,7 +24068,8 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               renderRoster,
               updateActiveCellHighlight,
               syncGridDetailsHeight,
-              openPassiveDetails,
+              openPassivePicker,
+              commitPassivePickerSelection,
               openLeaderPicker,
               refreshWallet,
               persistLineupSelection,
@@ -23949,6 +24089,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       renderPassives();
       renderFilters();
       renderRoster();
+      refreshTotalCost();
       setMessage('Nhấp vào nhân vật để gán vào lineup.');
       cleanup.push(() => passiveOverlay.remove());
       cleanup.push(() => leaderOverlay.remove());

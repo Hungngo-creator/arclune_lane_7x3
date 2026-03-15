@@ -9,6 +9,7 @@ export interface SavedPlayerProfile {
       label?: string | null;
     }>;
   }>;
+  lineupPassiveSelectionById?: Record<string, Record<string, number>>;
   cultivationByUnit?: Record<string, { realm: number; subRealm: number }>;
   sectName?: string;
   tpByUnit?: Record<string, number>;
