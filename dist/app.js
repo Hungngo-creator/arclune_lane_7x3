@@ -22695,105 +22695,90 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
   const LINEUP_BUFF_OPTIONS = [
       {
           id: 'lineup-buff-1',
-          title: 'Buff #1',
           requirement: 'Yêu cầu: có ít nhất 2 Warrior/Ranger (hoặc 1+1), cost tổng ≥ 140.',
           description: 'Tăng 10% ATK cho Warrior và Ranger khi ra sân, hiệu ứng tuyệt đối.',
           isEligible: context => hasClassMix(context.classCounts, 'warrior', 'ranger', 2) && context.totalCost >= 140,
       },
       {
           id: 'lineup-buff-2',
-          title: 'Buff #2',
           requirement: 'Yêu cầu: có ít nhất 2 Mage/Summoner (hoặc 1+1), cost tổng ≥ 140.',
           description: 'Tăng 10% WIL cho Mage và Summoner trên sân.',
           isEligible: context => hasClassMix(context.classCounts, 'mage', 'summoner', 2) && context.totalCost >= 140,
       },
       {
           id: 'lineup-buff-3',
-          title: 'Buff #3',
           requirement: 'Yêu cầu: cost tổng lineup không vượt 145.',
           description: 'Mỗi 20 AE tiêu hao tăng 2% ATK/WIL cộng vào base stat, tối đa 10%.',
           isEligible: context => context.totalCost <= 145,
       },
       {
           id: 'lineup-buff-4',
-          title: 'Buff #4',
           requirement: 'Yêu cầu: có 2 Tanker, cost tổng tối thiểu 155.',
           description: 'Tăng 5% ARM và RES cho Tanker đồng minh trên sân.',
           isEligible: context => getClassCount(context.classCounts, 'tanker') >= 2 && context.totalCost >= 155,
       },
       {
           id: 'lineup-buff-5',
-          title: 'Buff #5',
           requirement: 'Yêu cầu: có ít nhất 3 Tanker, cost tổng > 165.',
           description: 'Mỗi đầu lượt nhận khiên theo HP leader cho mọi đồng minh trên sân.',
           isEligible: context => getClassCount(context.classCounts, 'tanker') >= 3 && context.totalCost > 165,
       },
       {
           id: 'lineup-buff-6',
-          title: 'Buff #6',
           requirement: 'Yêu cầu: có 2 Mage + 1 Support, cost tổng ≥ 145.',
           description: 'Giảm 2 AE cho kỹ năng đầu tiên mỗi hiệp của đồng minh (trừ leader).',
           isEligible: context => getClassCount(context.classCounts, 'mage') >= 2 && getClassCount(context.classCounts, 'support') >= 1 && context.totalCost >= 145,
       },
       {
           id: 'lineup-buff-7',
-          title: 'Buff #7',
           requirement: 'Yêu cầu: có ít nhất 2 Assassin/Ranger (hoặc 1+1), cost tổng ≤ 170.',
           description: 'Tăng 10% PER cho Assassin/Ranger, hiệu ứng tuyệt đối suốt trận.',
           isEligible: context => hasClassMix(context.classCounts, 'assassin', 'ranger', 2) && context.totalCost <= 170,
       },
       {
           id: 'lineup-buff-8',
-          title: 'Buff #8',
           requirement: 'Yêu cầu: có ít nhất 2 Assassin, cost tổng < 150.',
           description: 'Đòn chí mạng thành công sẽ hồi ngay 5 AE cho bể AE.',
           isEligible: context => getClassCount(context.classCounts, 'assassin') >= 2 && context.totalCost < 150,
       },
       {
           id: 'lineup-buff-9',
-          title: 'Buff #9',
           requirement: 'Yêu cầu: có 2 Summoner, cost tổng > 165.',
           description: 'Thực thể được gọi ra bởi Summoner nhận thêm 5% ATK/WIL.',
           isEligible: context => getClassCount(context.classCounts, 'summoner') >= 2 && context.totalCost > 165,
       },
       {
           id: 'lineup-buff-10',
-          title: 'Buff #10',
           requirement: 'Yêu cầu: có tối thiểu 2 Support (hoặc 3 Support), cost tổng ≥ 160.',
           description: 'Bể AE vào sân nhận +20 hoặc +30 AE tùy số lượng Support trong lineup.',
           isEligible: context => getClassCount(context.classCounts, 'support') >= 2 && context.totalCost >= 160,
       },
       {
           id: 'lineup-buff-11',
-          title: 'Buff #11',
           requirement: 'Yêu cầu: cost tổng lineup ≥ 175.',
           description: 'Toàn bộ nhân vật cost từ 18 trở lên được tăng 10% HP.',
           isEligible: context => context.totalCost >= 175,
       },
       {
           id: 'lineup-buff-12',
-          title: 'Buff #12',
           requirement: 'Yêu cầu: không có điều kiện kích hoạt riêng.',
           description: 'Mỗi khi đồng minh tử trận, đồng minh còn lại nhận +3% ATK/WIL cộng dồn.',
           isEligible: context => context.assignedUnits.length > 0,
       },
       {
           id: 'lineup-buff-13',
-          title: 'Buff #13',
           requirement: 'Yêu cầu: lineup có 4 class khác nhau.',
           description: 'Khi HP leader dưới 50% nhận khiên bằng 10% max HP leader.',
           isEligible: context => context.classCountSetSize >= 4,
       },
       {
           id: 'lineup-buff-14',
-          title: 'Buff #14',
           requirement: 'Yêu cầu: lineup có nhân vật thuộc 5 class khác nhau.',
           description: 'Khi địch tử trận (không tính summon/leader), toàn đội nhận +20 nộ; tối đa 5 lần.',
           isEligible: context => context.classCountSetSize >= 5,
       },
       {
           id: 'lineup-buff-15',
-          title: 'Buff #15',
           requirement: 'Yêu cầu: có 3 Ranger, cost tổng không vượt 165.',
           description: 'Tăng 15% ATK cho Ranger khi ra sân, không bị ảnh hưởng bởi hiệu ứng khác.',
           isEligible: context => getClassCount(context.classCounts, 'ranger') >= 3 && context.totalCost <= 165,
@@ -24166,14 +24151,6 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           const buffContext = getLineupBuffContext(lineup);
           const unavailableOptionIndices = getUnavailableBuffOptionIndices(lineup.id, passiveIndex);
           passiveOverlayBody.innerHTML = '';
-          const title = document.createElement('h3');
-          title.className = 'lineup-overlay__title';
-          title.textContent = `Thiết lập buff ô #${passiveIndex + 1}`;
-          passiveOverlayBody.appendChild(title);
-          const subtitle = document.createElement('p');
-          subtitle.className = 'lineup-overlay__subtitle';
-          subtitle.textContent = 'Ô sáng là đủ điều kiện, ô tối là chưa đủ điều kiện và không thể chọn.';
-          passiveOverlayBody.appendChild(subtitle);
           const list = document.createElement('div');
           list.className = 'lineup-passive-picker';
           LINEUP_BUFF_OPTIONS.forEach((option, optionIndex) => {
@@ -24198,10 +24175,6 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               row.appendChild(icon);
               const textWrap = document.createElement('div');
               textWrap.className = 'lineup-passive-picker__text-wrap';
-              const text = document.createElement('p');
-              text.className = 'lineup-passive-picker__text';
-              text.textContent = option.title;
-              textWrap.appendChild(text);
               const requirement = document.createElement('p');
               requirement.className = 'lineup-passive-picker__requirement';
               requirement.textContent = option.requirement;
@@ -24212,10 +24185,8 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
                       return;
                   }
                   pendingPassiveSelection = { lineupId: lineup.id, passiveIndex, optionIndex };
-                  list.querySelectorAll('.lineup-passive-picker__option').forEach((node) => {
-                      const originalOptionIndex = Number(node.dataset.optionIndex);
-                      node.classList.toggle('is-active', Number.isInteger(originalOptionIndex) && originalOptionIndex === optionIndex);
-                  });
+                  commitPassivePickerSelection();
+                  closeOverlay(passiveOverlay);
               });
               list.appendChild(row);
           });
