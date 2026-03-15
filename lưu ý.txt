@@ -289,6 +289,15 @@ Tổng ignore (xuyên) tuân theo trần ignore chung của game (nếu có).
 
 Synergy: mỗi stack từ ult Chủ động B +5% dmg cho ult chủ động C (tối đa +35%).
 
+lineup bbuff:
+1. Tăng 10% ATK cho mọi warrior và ranger đồng minh trên sân. (Yêu cầu: Đội hình có ít nhất 2 Warrior hoặc Ranger hoặc 1 warrior + 1 ranger, cost tổng hơn hoặc = 140).
+2. Tăng 10% WIL cho mọi mage và summoner đồng minh trên sân. (Yêu cầu: Đội hình có ít nhất 2 Mage hoặc Summoner hoặc 1 mage + 1 summoner, cost tổng hơn hoặc = 140).
+3. Mỗi khi tiêu tốn 20 AE, tăng 2% ATK/WIL cho mọi đồng minh có mặt trên sân, cộng trực tiếp vào base stat, không  bị ảnh hưởng bởi buff và debuff mà lấy chỉ số wil và atk đầu trận để +(tối đa 10%). điều kiện: cost tổng lineup không vượt 145.
+4. Tăng 5% ARM và res cho tanker đồng minh trên sân. (Yêu cầu: Có 2 Tanker và cost tổng tối thiểu 155).
+5. Nhận lớp khiên tương đương 8% HP mỗi khi bắt đầu lượt mới, áp dụng cho mọi đồng minh trên sân, khiên có giá trị = 5% max hp của leader đồng minh. Điều kiện: lineup có tối thiểu 3 tanker, cost tổng hơn 165.
+6. Giảm 2 AE tiêu tốn cho kỹ năng đầu tiên của mỗi hiệp của từng nhân vật đồng minh trừ leader. (Yêu cầu: Có 2 Mage và 1 support, cost tổng hơn hoặc = 145).
+7. Tăng 10% PER cho Assassin và Ranger đồng minh có mặt trên sân, cộng từ lúc nhân vật đó lên sân và áp dụng suốt trận đấu, không không bị ảnh hưởng bởi buff hay debuff kể cả quy tắc. (Yêu cầu: Đội hình có 2 Assassin hoặc 2 Ranger hoặc 1 Assassin + 1 Ranger, cost tổng tối đa không vượt 170).
+
 Gợi ý triển khai này chỉ mang tính tham khảo:
 // ==== LEADER UYÊN – RAGE & ULT ====
 

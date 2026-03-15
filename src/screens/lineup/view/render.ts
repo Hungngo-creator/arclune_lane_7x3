@@ -21,12 +21,18 @@ import {
   createCurrencyBalances,
   createFilterOptions,
   formatCurrencyBalance,
+  getUnitRarity,
   collectAssignedUnitIds,
   collectAssignedUnitTags,
   evaluatePassive,
   filterRoster,
   LINEUP_ALLOWED_LEADER_IDS,
 } from './state.ts';
+import {
+  deriveBudgetFromRankRole,
+  evaluateCostBudget,
+  mergeBudgetInputs,
+} from '../../../data/cost-budget.ts';
 import type {
   LineupViewState,
   LineupMessageType,
@@ -867,6 +873,87 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
     return 0;
   }
 
+  function collectUnitBudgetHints(unit: RosterUnit): {
+    tagComplexity: number;
+    battlefieldInfluence: number;
+    economyPressure: number;
+    scalingCeiling: number;
+    tacticalFlexibility: number;
+    setupPenalty: number;
+    selfRiskPenalty: number;
+    vanishRiskPenalty: number;
+    consistencyPenalty: number;
+    hasDivineNature: boolean;
+  }{
+    const tagPool = new Set<string>();
+    unit.tags.forEach((tag) => {
+      const normalized = String(tag ?? '').trim().toLowerCase();
+      if (normalized){
+        tagPool.add(normalized);
+      }
+    });
+
+    const scanQueue: unknown[] = [];
+    const raw = unit.raw as Record<string, unknown> | null;
+    if (raw){
+      scanQueue.push(raw.tags, raw.labels, raw.passives, raw.kit, raw.meta);
+    }
+
+    let depth = 0;
+    while (scanQueue.length > 0 && depth < 180){
+      depth += 1;
+      const value = scanQueue.shift();
+      if (!value){
+        continue;
+      }
+      if (typeof value === 'string'){
+        const normalized = value.trim().toLowerCase();
+        if (normalized){
+          tagPool.add(normalized);
+        }
+        continue;
+      }
+      if (Array.isArray(value)){
+        value.forEach((entry) => scanQueue.push(entry));
+        continue;
+      }
+      if (typeof value === 'object'){
+        const record = value as Record<string, unknown>;
+        Object.entries(record).forEach(([key, entry]) => {
+          if (key){
+            tagPool.add(key.trim().toLowerCase());
+          }
+          if (typeof entry === 'string'){
+            const normalized = entry.trim().toLowerCase();
+            if (normalized){
+              tagPool.add(normalized);
+            }
+          } else {
+            scanQueue.push(entry);
+          }
+        });
+      }
+    }
+
+    const tags = Array.from(tagPool);
+    const containsAny = (...needles: string[]): boolean => (
+      needles.some((needle) => tags.some((tag) => tag.includes(needle)))
+    );
+
+    return {
+      tagComplexity: containsAny('quy tắc', 'quy-tac', 'rule') ? 2 : 0,
+      battlefieldInfluence: containsAny('aoe', 'toàn sân', 'global', 'weather', 'sân') ? 2 : 0,
+      economyPressure: containsAny('aether', 'energy', 'nộ', 'rage', 'resource', 'cost') ? 1 : 0,
+      scalingCeiling: containsAny('stack', 'vĩnh viễn', 'evolve', 'tiến hóa', 'growth') ? 2 : 0,
+      tacticalFlexibility: containsAny('buff', 'debuff', 'heal', 'shield', 'summon', 'triệu hồi') ? 2 : 0,
+      setupPenalty: containsAny('delay', 'setup', 'channel', 'sleep', 'charge') ? 1 : 0,
+      selfRiskPenalty: containsAny('self', 'tự', 'friendly fire', 'không phân địch ta') ? 1 : 0,
+      vanishRiskPenalty: containsAny('vanish', 'removed', 'biến mất', 'out trận') ? 1 : 0,
+      consistencyPenalty: containsAny('random', 'ngẫu nhiên') ? 1 : 0,
+      hasDivineNature: containsAny('divine', 'thần tính'),
+    };
+  }
+
   function resolveUnitLineupCost(unit: RosterUnit | null | undefined): number{
     if (!unit){
       return 0;
@@ -884,6 +971,16 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       if (cost > 0){
         return cost;
       }
+    }
+
+    const rarity = getUnitRarity(unit);
+    const role = unit.role || (typeof raw?.class === 'string' ? raw.class : null);
+    const rankRoleBudget = deriveBudgetFromRankRole(rarity, role);
+    const tagBudgetHints = collectUnitBudgetHints(unit);
+    const mergedBudget = mergeBudgetInputs(rankRoleBudget, tagBudgetHints);
+    const evaluatedBudget = evaluateCostBudget(mergedBudget);
+    if (Number.isFinite(evaluatedBudget.cost) && evaluatedBudget.cost > 0){
+      return evaluatedBudget.cost;
     }
     return 0;
   }

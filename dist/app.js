@@ -22665,13 +22665,18 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
   const createCurrencyBalances = __dep8.createCurrencyBalances;
   const createFilterOptions = __dep8.createFilterOptions;
   const formatCurrencyBalance = __dep8.formatCurrencyBalance;
+  const getUnitRarity = __dep8.getUnitRarity;
   const collectAssignedUnitIds = __dep8.collectAssignedUnitIds;
   const collectAssignedUnitTags = __dep8.collectAssignedUnitTags;
   const evaluatePassive = __dep8.evaluatePassive;
   const filterRoster = __dep8.filterRoster;
   const LINEUP_ALLOWED_LEADER_IDS = __dep8.LINEUP_ALLOWED_LEADER_IDS;
-  const __dep9 = __require('./screens/lineup/view/events.ts');
-  const bindLineupEvents = __dep9.bindLineupEvents;
+  const __dep9 = __require('./data/cost-budget.ts');
+  const deriveBudgetFromRankRole = __dep9.deriveBudgetFromRankRole;
+  const evaluateCostBudget = __dep9.evaluateCostBudget;
+  const mergeBudgetInputs = __dep9.mergeBudgetInputs;
+  const __dep10 = __require('./screens/lineup/view/events.ts');
+  const bindLineupEvents = __dep10.bindLineupEvents;
   const STYLE_ID = 'lineup-view-style-v1';
   const powerFormatter = createNumberFormatter('vi-VN');
   const NAME_INITIALS_CACHE = new Map();
@@ -23387,6 +23392,70 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           }
           return 0;
       }
+      function collectUnitBudgetHints(unit) {
+          const tagPool = new Set();
+          unit.tags.forEach((tag) => {
+              const normalized = String(tag ?? '').trim().toLowerCase();
+              if (normalized) {
+                  tagPool.add(normalized);
+              }
+          });
+          const scanQueue = [];
+          const raw = unit.raw;
+          if (raw) {
+              scanQueue.push(raw.tags, raw.labels, raw.passives, raw.kit, raw.meta);
+          }
+          let depth = 0;
+          while (scanQueue.length > 0 && depth < 180) {
+              depth += 1;
+              const value = scanQueue.shift();
+              if (!value) {
+                  continue;
+              }
+              if (typeof value === 'string') {
+                  const normalized = value.trim().toLowerCase();
+                  if (normalized) {
+                      tagPool.add(normalized);
+                  }
+                  continue;
+              }
+              if (Array.isArray(value)) {
+                  value.forEach((entry) => scanQueue.push(entry));
+                  continue;
+              }
+              if (typeof value === 'object') {
+                  const record = value;
+                  Object.entries(record).forEach(([key, entry]) => {
+                      if (key) {
+                          tagPool.add(key.trim().toLowerCase());
+                      }
+                      if (typeof entry === 'string') {
+                          const normalized = entry.trim().toLowerCase();
+                          if (normalized) {
+                              tagPool.add(normalized);
+                          }
+                      }
+                      else {
+                          scanQueue.push(entry);
+                      }
+                  });
+              }
+          }
+          const tags = Array.from(tagPool);
+          const containsAny = (...needles) => (needles.some((needle) => tags.some((tag) => tag.includes(needle))));
+          return {
+              tagComplexity: containsAny('quy tắc', 'quy-tac', 'rule') ? 2 : 0,
+              battlefieldInfluence: containsAny('aoe', 'toàn sân', 'global', 'weather', 'sân') ? 2 : 0,
+              economyPressure: containsAny('aether', 'energy', 'nộ', 'rage', 'resource', 'cost') ? 1 : 0,
+              scalingCeiling: containsAny('stack', 'vĩnh viễn', 'evolve', 'tiến hóa', 'growth') ? 2 : 0,
+              tacticalFlexibility: containsAny('buff', 'debuff', 'heal', 'shield', 'summon', 'triệu hồi') ? 2 : 0,
+              setupPenalty: containsAny('delay', 'setup', 'channel', 'sleep', 'charge') ? 1 : 0,
+              selfRiskPenalty: containsAny('self', 'tự', 'friendly fire', 'không phân địch ta') ? 1 : 0,
+              vanishRiskPenalty: containsAny('vanish', 'removed', 'biến mất', 'out trận') ? 1 : 0,
+              consistencyPenalty: containsAny('random', 'ngẫu nhiên') ? 1 : 0,
+              hasDivineNature: containsAny('divine', 'thần tính'),
+          };
+      }
       function resolveUnitLineupCost(unit) {
           if (!unit) {
               return 0;
@@ -23404,6 +23473,15 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               if (cost > 0) {
                   return cost;
               }
+          }
+          const rarity = getUnitRarity(unit);
+          const role = unit.role || (typeof raw?.class === 'string' ? raw.class : null);
+          const rankRoleBudget = deriveBudgetFromRankRole(rarity, role);
+          const tagBudgetHints = collectUnitBudgetHints(unit);
+          const mergedBudget = mergeBudgetInputs(rankRoleBudget, tagBudgetHints);
+          const evaluatedBudget = evaluateCostBudget(mergedBudget);
+          if (Number.isFinite(evaluatedBudget.cost) && evaluatedBudget.cost > 0) {
+              return evaluatedBudget.cost;
           }
           return 0;
       }
