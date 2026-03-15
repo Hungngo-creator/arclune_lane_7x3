@@ -10446,7 +10446,6 @@ __define('./entry.ts', (exports, module, __require) => {
       `app--${SCREEN_SECT_TACTICAL_AI}`,
   ];
   const MODULE_PROMISE_CACHE = new Map();
-  ;
   async function loadBundledModule(id) {
       const cached = MODULE_PROMISE_CACHE.get(id);
       if (cached) {
@@ -23214,8 +23213,15 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       mainColumn.appendChild(gridSection);
       const rosterSection = document.createElement('section');
       rosterSection.className = 'lineup-roster';
+      const rosterHeader = document.createElement('div');
+      rosterHeader.className = 'lineup-roster__header';
+      const rosterTitle = document.createElement('p');
+      rosterTitle.className = 'lineup-roster__tag';
+      rosterTitle.textContent = 'Danh sách nhân vật';
       const totalCostEl = document.createElement('p');
+      totalCostEl.className = 'lineup-roster__total-cost';
       totalCostEl.textContent = '0';
+      rosterHeader.append(rosterTitle);
       rosterSection.appendChild(rosterHeader);
       const rosterFilters = document.createElement('div');
       rosterFilters.className = 'lineup-roster__filters';

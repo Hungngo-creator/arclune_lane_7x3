@@ -670,8 +670,15 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
 
   const rosterSection = document.createElement('section');
   rosterSection.className = 'lineup-roster';
+  const rosterHeader = document.createElement('div');
+  rosterHeader.className = 'lineup-roster__header';
+  const rosterTitle = document.createElement('p');
+  rosterTitle.className = 'lineup-roster__tag';
+  rosterTitle.textContent = 'Danh sách nhân vật';
   const totalCostEl = document.createElement('p');
+  totalCostEl.className = 'lineup-roster__total-cost';
   totalCostEl.textContent = '0';
+  rosterHeader.append(rosterTitle);
   rosterSection.appendChild(rosterHeader);
   const rosterFilters = document.createElement('div');
   rosterFilters.className = 'lineup-roster__filters';

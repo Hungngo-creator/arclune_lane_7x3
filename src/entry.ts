@@ -138,8 +138,9 @@ const APP_SCREEN_CLASSES = [
   `app--${SCREEN_CAMPAIGN_WORLD_MAP}`,
   `app--${SCREEN_SECT}`,
   `app--${SCREEN_SECT_TACTICAL_AI}`,
-  const MODULE_PROMISE_CACHE = new Map<string, Promise<unknown>>();
 ];
+
+const MODULE_PROMISE_CACHE = new Map<string, Promise<unknown>>();
 
 async function loadBundledModule<TModule = unknown>(id: string): Promise<TModule>{
   const cached = MODULE_PROMISE_CACHE.get(id);
