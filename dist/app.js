@@ -23656,6 +23656,46 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           }
           return blocked;
       }
+      function sanitizeLineupBuffSelection(lineup) {
+          if (!lineup) {
+              return false;
+          }
+          const lineupSelection = passiveSelectionByLineup.get(lineup.id);
+          if (!lineupSelection || lineupSelection.size === 0) {
+              return false;
+          }
+          const context = getLineupBuffContext(lineup);
+          const validPassiveIndexes = new Set(lineup.passives.map(passive => passive.index));
+          const selectedOptionIndexes = new Set();
+          const sortedSelections = Array.from(lineupSelection.entries()).sort((left, right) => left[0] - right[0]);
+          const sanitized = new Map();
+          let changed = false;
+          for (const [passiveIndex, optionIndex] of sortedSelections) {
+              const option = LINEUP_BUFF_OPTIONS[optionIndex] ?? null;
+              if (!validPassiveIndexes.has(passiveIndex) || !option || selectedOptionIndexes.has(optionIndex) || !option.isEligible(context)) {
+                  changed = true;
+                  continue;
+              }
+              sanitized.set(passiveIndex, optionIndex);
+              selectedOptionIndexes.add(optionIndex);
+          }
+          if (!changed && sanitized.size === lineupSelection.size) {
+              return false;
+          }
+          if (sanitized.size > 0) {
+              passiveSelectionByLineup.set(lineup.id, sanitized);
+          }
+          else {
+              passiveSelectionByLineup.delete(lineup.id);
+          }
+          if (pendingPassiveSelection && pendingPassiveSelection.lineupId === lineup.id) {
+              const keptOptionIndex = sanitized.get(pendingPassiveSelection.passiveIndex);
+              if (keptOptionIndex !== pendingPassiveSelection.optionIndex) {
+                  pendingPassiveSelection = null;
+              }
+          }
+          return true;
+      }
       function refreshWallet() {
           for (const [currencyId, balance] of state.currencyBalances.entries()) {
               const existing = walletItems.get(currencyId);
@@ -24000,6 +24040,10 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               passiveGrid.innerHTML = '';
               return;
           }
+          const selectionSanitized = sanitizeLineupBuffSelection(lineup);
+          if (selectionSanitized) {
+              persistLineupSelection();
+          }
           const assignedIds = collectAssignedUnitIds(lineup);
           const assignedTags = collectAssignedUnitTags(assignedIds, rosterLookup);
           const assignedTagsSignature = Array.from(assignedTags).join('|');
@@ -24139,6 +24183,10 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           if (!lineup) {
               return;
           }
+          const selectionSanitized = sanitizeLineupBuffSelection(lineup);
+          if (selectionSanitized) {
+              persistLineupSelection();
+          }
           const lineupSelection = passiveSelectionByLineup.get(lineup.id) ?? new Map();
           passiveSelectionByLineup.set(lineup.id, lineupSelection);
           const currentSelection = lineupSelection.get(passiveIndex);
@@ -24175,6 +24223,10 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               row.appendChild(icon);
               const textWrap = document.createElement('div');
               textWrap.className = 'lineup-passive-picker__text-wrap';
+              const description = document.createElement('p');
+              description.className = 'lineup-passive-picker__text';
+              description.textContent = option.description;
+              textWrap.appendChild(description);
               const requirement = document.createElement('p');
               requirement.className = 'lineup-passive-picker__requirement';
               requirement.textContent = option.requirement;
