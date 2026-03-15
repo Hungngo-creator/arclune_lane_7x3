@@ -55,6 +55,137 @@ const ELEMENT_ICON: Readonly<Record<string, string>> = {
   light: '✨', dark: '🌑', wind: '🌪️', neutral: '⚪',
 };
 
+interface LineupBuffContext {
+  totalCost: number;
+  classCounts: ReadonlyMap<string, number>;
+  classCountSetSize: number;
+  assignedUnits: RosterUnit[];
+}
+
+interface LineupBuffOption {
+  id: string;
+  title: string;
+  requirement: string;
+  description: string;
+  isEligible: (context: LineupBuffContext) => boolean;
+}
+
+function getClassCount(classCounts: ReadonlyMap<string, number>, className: string): number {
+  return classCounts.get(className) ?? 0;
+}
+
+function hasClassMix(classCounts: ReadonlyMap<string, number>, first: string, second: string, minimum: number): boolean {
+  return getClassCount(classCounts, first) + getClassCount(classCounts, second) >= minimum;
+}
+
+const LINEUP_BUFF_OPTIONS: ReadonlyArray<LineupBuffOption> = [
+  {
+    id: 'lineup-buff-1',
+    title: 'Buff #1',
+    requirement: 'Yêu cầu: có ít nhất 2 Warrior/Ranger (hoặc 1+1), cost tổng ≥ 140.',
+    description: 'Tăng 10% ATK cho Warrior và Ranger khi ra sân, hiệu ứng tuyệt đối.',
+    isEligible: context => hasClassMix(context.classCounts, 'warrior', 'ranger', 2) && context.totalCost >= 140,
+  },
+  {
+    id: 'lineup-buff-2',
+    title: 'Buff #2',
+    requirement: 'Yêu cầu: có ít nhất 2 Mage/Summoner (hoặc 1+1), cost tổng ≥ 140.',
+    description: 'Tăng 10% WIL cho Mage và Summoner trên sân.',
+    isEligible: context => hasClassMix(context.classCounts, 'mage', 'summoner', 2) && context.totalCost >= 140,
+  },
+  {
+    id: 'lineup-buff-3',
+    title: 'Buff #3',
+    requirement: 'Yêu cầu: cost tổng lineup không vượt 145.',
+    description: 'Mỗi 20 AE tiêu hao tăng 2% ATK/WIL cộng vào base stat, tối đa 10%.',
+    isEligible: context => context.totalCost <= 145,
+  },
+  {
+    id: 'lineup-buff-4',
+    title: 'Buff #4',
+    requirement: 'Yêu cầu: có 2 Tanker, cost tổng tối thiểu 155.',
+    description: 'Tăng 5% ARM và RES cho Tanker đồng minh trên sân.',
+    isEligible: context => getClassCount(context.classCounts, 'tanker') >= 2 && context.totalCost >= 155,
+  },
+  {
+    id: 'lineup-buff-5',
+    title: 'Buff #5',
+    requirement: 'Yêu cầu: có ít nhất 3 Tanker, cost tổng > 165.',
+    description: 'Mỗi đầu lượt nhận khiên theo HP leader cho mọi đồng minh trên sân.',
+    isEligible: context => getClassCount(context.classCounts, 'tanker') >= 3 && context.totalCost > 165,
+  },
+  {
+    id: 'lineup-buff-6',
+    title: 'Buff #6',
+    requirement: 'Yêu cầu: có 2 Mage + 1 Support, cost tổng ≥ 145.',
+    description: 'Giảm 2 AE cho kỹ năng đầu tiên mỗi hiệp của đồng minh (trừ leader).',
+    isEligible: context => getClassCount(context.classCounts, 'mage') >= 2 && getClassCount(context.classCounts, 'support') >= 1 && context.totalCost >= 145,
+  },
+  {
+    id: 'lineup-buff-7',
+    title: 'Buff #7',
+    requirement: 'Yêu cầu: có ít nhất 2 Assassin/Ranger (hoặc 1+1), cost tổng ≤ 170.',
+    description: 'Tăng 10% PER cho Assassin/Ranger, hiệu ứng tuyệt đối suốt trận.',
+    isEligible: context => hasClassMix(context.classCounts, 'assassin', 'ranger', 2) && context.totalCost <= 170,
+  },
+  {
+    id: 'lineup-buff-8',
+    title: 'Buff #8',
+    requirement: 'Yêu cầu: có ít nhất 2 Assassin, cost tổng < 150.',
+    description: 'Đòn chí mạng thành công sẽ hồi ngay 5 AE cho bể AE.',
+    isEligible: context => getClassCount(context.classCounts, 'assassin') >= 2 && context.totalCost < 150,
+  },
+  {
+    id: 'lineup-buff-9',
+    title: 'Buff #9',
+    requirement: 'Yêu cầu: có 2 Summoner, cost tổng > 165.',
+    description: 'Thực thể được gọi ra bởi Summoner nhận thêm 5% ATK/WIL.',
+    isEligible: context => getClassCount(context.classCounts, 'summoner') >= 2 && context.totalCost > 165,
+  },
+  {
+    id: 'lineup-buff-10',
+    title: 'Buff #10',
+    requirement: 'Yêu cầu: có tối thiểu 2 Support (hoặc 3 Support), cost tổng ≥ 160.',
+    description: 'Bể AE vào sân nhận +20 hoặc +30 AE tùy số lượng Support trong lineup.',
+    isEligible: context => getClassCount(context.classCounts, 'support') >= 2 && context.totalCost >= 160,
+  },
+  {
+    id: 'lineup-buff-11',
+    title: 'Buff #11',
+    requirement: 'Yêu cầu: cost tổng lineup ≥ 175.',
+    description: 'Toàn bộ nhân vật cost từ 18 trở lên được tăng 10% HP.',
+    isEligible: context => context.totalCost >= 175,
+  },
+  {
+    id: 'lineup-buff-12',
+    title: 'Buff #12',
+    requirement: 'Yêu cầu: không có điều kiện kích hoạt riêng.',
+    description: 'Mỗi khi đồng minh tử trận, đồng minh còn lại nhận +3% ATK/WIL cộng dồn.',
+    isEligible: context => context.assignedUnits.length > 0,
+  },
+  {
+    id: 'lineup-buff-13',
+    title: 'Buff #13',
+    requirement: 'Yêu cầu: lineup có 4 class khác nhau.',
+    description: 'Khi HP leader dưới 50% nhận khiên bằng 10% max HP leader.',
+    isEligible: context => context.classCountSetSize >= 4,
+  },
+  {
+    id: 'lineup-buff-14',
+    title: 'Buff #14',
+    requirement: 'Yêu cầu: lineup có nhân vật thuộc 5 class khác nhau.',
+    description: 'Khi địch tử trận (không tính summon/leader), toàn đội nhận +20 nộ; tối đa 5 lần.',
+    isEligible: context => context.classCountSetSize >= 5,
+  },
+  {
+    id: 'lineup-buff-15',
+    title: 'Buff #15',
+    requirement: 'Yêu cầu: có 3 Ranger, cost tổng không vượt 165.',
+    description: 'Tăng 15% ATK cho Ranger khi ra sân, không bị ảnh hưởng bởi hiệu ứng khác.',
+    isEligible: context => getClassCount(context.classCounts, 'ranger') >= 3 && context.totalCost <= 165,
+  },
+];
+
 function renderRoleElementIcons(unit: RosterUnit): string {
   const cacheKey = `${unit.id}|${unit.roleKey}`;
   const cached = ROLE_ELEMENT_ICON_CACHE.get(cacheKey);
@@ -133,11 +264,16 @@ function ensureStyles(): void{
     .lineup-passive__condition{margin:0;font-size:11px;color:#f3d2a2;}
     .lineup-passive.is-active{box-shadow:0 16px 34px rgba(255,184,108,.45);border-color:rgba(255,209,132,.72);background:rgba(56,36,18,.92);}
     .lineup-passive-picker{display:flex;flex-direction:column;gap:10px;}
-    .lineup-passive-picker__option{padding:10px 12px;border-radius:12px;border:1px solid rgba(125,211,252,.2);background:rgba(12,22,32,.82);display:flex;align-items:center;gap:12px;cursor:pointer;transition:transform .16s ease,border-color .16s ease;}
+    .lineup-passive-picker__option{padding:10px 12px;border-radius:12px;border:1px solid rgba(125,211,252,.2);background:rgba(12,22,32,.82);display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:transform .16s ease,border-color .16s ease,opacity .16s ease;}
     .lineup-passive-picker__option:hover{transform:translateY(-1px);border-color:rgba(125,211,252,.42);}
     .lineup-passive-picker__option.is-active{border-color:rgba(174,228,255,.6);background:rgba(18,30,44,.94);}
-    .lineup-passive-picker__icon{width:42px;height:42px;border-radius:999px;border:1px solid rgba(174,228,255,.4);background:rgba(24,34,44,.85);flex:0 0 auto;}
-    .lineup-passive-picker__text{margin:0;font-size:13px;color:#9cbcd9;min-height:20px;}
+    .lineup-passive-picker__option.is-disabled{opacity:.5;filter:saturate(.7);cursor:not-allowed;}
+    .lineup-passive-picker__option.is-disabled:hover{transform:none;border-color:rgba(125,211,252,.2);}
+    .lineup-passive-picker__icon{width:42px;height:42px;border-radius:999px;border:1px solid rgba(174,228,255,.4);background:rgba(24,34,44,.85);flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:rgba(174,228,255,.75);}
+    .lineup-passive-picker__option.is-eligible .lineup-passive-picker__icon{border-color:rgba(88,255,189,.58);background:rgba(10,36,28,.9);color:rgba(88,255,189,.95);}
+    .lineup-passive-picker__text-wrap{display:flex;flex-direction:column;gap:4px;min-width:0;}
+    .lineup-passive-picker__text{margin:0;font-size:13px;color:#dcecff;line-height:1.45;}
+    .lineup-passive-picker__requirement{margin:0;font-size:11px;color:#9cbcd9;line-height:1.5;}
     .lineup-roster{border-radius:28px;border:1px solid rgba(125,211,252,.22);background:rgba(8,16,24,.92);padding:20px;display:flex;flex-direction:column;gap:12px;position:relative;}
     .lineup-roster__total-cost{margin:0 0 0 auto;padding:0;border:none;background:transparent;font-size:20px;letter-spacing:.04em;color:#ffd9a1;font-weight:700;line-height:1;}
     .lineup-roster__filters{display:flex;flex-wrap:wrap;align-items:center;gap:10px;}
@@ -824,7 +960,6 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
     passiveSelectionByLineup.set(lineupId, perLineup);
   });
   let pendingPassiveSelection: { lineupId: string; passiveIndex: number; optionIndex: number } | null = null;
-  const passivePickerOptions = new Array(6).fill(null).map((_, index) => ({ id: `option-${index + 1}`, label: '' }));
 
   function getFilteredRoster(): RosterUnit[] {
     const filterKey = `${state.filter.type}::${state.filter.value ?? ''}`;
@@ -1000,6 +1135,65 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       ? resolveUnitLineupCost(rosterLookup.get(lineup.leaderId))
       : 0;
     return cellsCost + leaderCost;
+  }
+
+  function getLineupBuffContext(lineup: LineupState | null): LineupBuffContext{
+    if (!lineup){
+      return {
+        totalCost: 0,
+        classCounts: new Map<string, number>(),
+        classCountSetSize: 0,
+        assignedUnits: [],
+      };
+    }
+
+    const assignedUnits: RosterUnit[] = [];
+    const classCounts = new Map<string, number>();
+    const pushUnit = (unitId: string | null | undefined) => {
+      if (!unitId){
+        return;
+      }
+      const unit = rosterLookup.get(unitId);
+      if (!unit){
+        return;
+      }
+      assignedUnits.push(unit);
+      const roleKey = unit.roleKey || unit.role.toLowerCase();
+      if (!roleKey){
+        return;
+      }
+      classCounts.set(roleKey, (classCounts.get(roleKey) ?? 0) + 1);
+    };
+
+    lineup.cells.forEach((cell) => {
+      if (!cell.unlocked){
+        return;
+      }
+      pushUnit(cell.unitId);
+    });
+    pushUnit(lineup.leaderId);
+
+    return {
+      totalCost: getLineupTotalCost(lineup),
+      classCounts,
+      classCountSetSize: classCounts.size,
+      assignedUnits,
+    };
+  }
+
+  function getUnavailableBuffOptionIndices(lineupId: string, passiveIndex: number): Set<number>{
+    const blocked = new Set<number>();
+    const lineupSelection = passiveSelectionByLineup.get(lineupId);
+    if (!lineupSelection){
+      return blocked;
+    }
+    for (const [selectedPassiveIndex, optionIndex] of lineupSelection.entries()){
+      if (selectedPassiveIndex === passiveIndex){
+        continue;
+      }
+      blocked.add(optionIndex);
+    }
+    return blocked;
   }
   function refreshWallet(): void{
     for (const [currencyId, balance] of state.currencyBalances.entries()){
@@ -1367,25 +1561,30 @@ function updateActiveCellHighlight(): void{
     const assignedIds = collectAssignedUnitIds(lineup);
     const assignedTags = collectAssignedUnitTags(assignedIds, rosterLookup);
     const assignedTagsSignature = Array.from(assignedTags).join('|');
+    const totalCost = getLineupTotalCost(lineup);
     const passiveStates = lineup.passives.map((passive) => ({
       passive,
       isActive: evaluatePassive(passive, assignedIds, rosterLookup, assignedTags),
     }));
-    const passivesSignature = passiveStates.map(({ passive, isActive }) => [
-      passive.index,
-      passive.name,
-      passive.requirement,
-      passive.isEmpty ? '1' : '0',
-      isActive ? '1' : '0',
-    ].join(':')).join('||');
-    const nextSignature = `${lineup.id}::${assignedIds.size}::${assignedTagsSignature}::${passivesSignature}`;
+    const lineupSelection = passiveSelectionByLineup.get(lineup.id) ?? new Map<number, number>();
+    const passivesSignature = passiveStates.map(({ passive, isActive }) => {
+      const selectedIndex = lineupSelection.get(passive.index);
+      return [
+        passive.index,
+        passive.name,
+        passive.requirement,
+        passive.isEmpty ? '1' : '0',
+        isActive ? '1' : '0',
+        selectedIndex ?? 'none',
+      ].join(':');
+    }).join('||');
+    const nextSignature = `${lineup.id}::${assignedIds.size}::${assignedTagsSignature}::${totalCost}::${passivesSignature}`;
     if (nextSignature === lastPassivesRenderSignature){
       return;
     }
     lastPassivesRenderSignature = nextSignature;
 
     passiveGrid.innerHTML = '';
-    const lineupSelection = passiveSelectionByLineup.get(lineup.id) ?? new Map<number, number>();
     passiveStates.forEach(({ passive, isActive }) => {
       const btn = document.createElement('button');
       btn.type = 'button';
@@ -1398,11 +1597,15 @@ function updateActiveCellHighlight(): void{
       }
       const title = document.createElement('p');
       title.className = 'lineup-passive__title';
-      title.textContent = selectedIndex != null ? `Buff #${selectedIndex + 1}` : 'Chưa thiết lập';
+      title.textContent = selectedIndex != null
+        ? (LINEUP_BUFF_OPTIONS[selectedIndex]?.title ?? `Buff #${selectedIndex + 1}`)
+        : 'Chưa thiết lập';
       btn.appendChild(title);
       const condition = document.createElement('p');
       condition.className = 'lineup-passive__condition';
-      condition.textContent = '';
+      condition.textContent = selectedIndex != null
+        ? (LINEUP_BUFF_OPTIONS[selectedIndex]?.requirement ?? '')
+        : 'Bấm để chọn 1 trong 15 lineup buff.';
       btn.appendChild(condition);
       passiveGrid.appendChild(btn);
     });
@@ -1508,8 +1711,15 @@ function updateActiveCellHighlight(): void{
     }
     const lineupSelection = passiveSelectionByLineup.get(lineup.id) ?? new Map<number, number>();
     passiveSelectionByLineup.set(lineup.id, lineupSelection);
-    const currentSelection = lineupSelection.get(passiveIndex) ?? 0;
-    pendingPassiveSelection = { lineupId: lineup.id, passiveIndex, optionIndex: currentSelection };
+    const currentSelection = lineupSelection.get(passiveIndex);
+    if (currentSelection != null){
+      pendingPassiveSelection = { lineupId: lineup.id, passiveIndex, optionIndex: currentSelection };
+    } else {
+      pendingPassiveSelection = null;
+    }
+
+    const buffContext = getLineupBuffContext(lineup);
+    const unavailableOptionIndices = getUnavailableBuffOptionIndices(lineup.id, passiveIndex);
 
     passiveOverlayBody.innerHTML = '';
     const title = document.createElement('h3');
@@ -1519,13 +1729,18 @@ function updateActiveCellHighlight(): void{
 
     const subtitle = document.createElement('p');
     subtitle.className = 'lineup-overlay__subtitle';
-    subtitle.textContent = 'Chọn một dòng buff bên dưới rồi bấm dấu X để lưu lựa chọn.';
+    subtitle.textContent = 'Ô sáng là đủ điều kiện, ô tối là chưa đủ điều kiện và không thể chọn.';
     passiveOverlayBody.appendChild(subtitle);
 
     const list = document.createElement('div');
     list.className = 'lineup-passive-picker';
 
-    passivePickerOptions.forEach((option, optionIndex) => {
+    LINEUP_BUFF_OPTIONS.forEach((option, optionIndex) => {
+      if (unavailableOptionIndices.has(optionIndex)){
+        return;
+      }
+
+      const eligible = option.isEligible(buffContext);
       const row = document.createElement('button');
       row.type = 'button';
       row.className = 'lineup-passive-picker__option';
@@ -1533,24 +1748,43 @@ function updateActiveCellHighlight(): void{
       if (optionIndex === currentSelection){
         row.classList.add('is-active');
       }
+      row.classList.toggle('is-eligible', eligible);
+      row.classList.toggle('is-disabled', !eligible);
+      row.disabled = !eligible;
+      row.setAttribute('aria-disabled', eligible ? 'false' : 'true');
 
       const icon = document.createElement('span');
       icon.className = 'lineup-passive-picker__icon';
+      icon.textContent = String(optionIndex + 1);
       row.appendChild(icon);
+
+      const textWrap = document.createElement('div');
+      textWrap.className = 'lineup-passive-picker__text-wrap';
 
       const text = document.createElement('p');
       text.className = 'lineup-passive-picker__text';
-      text.textContent = option.label;
-      row.appendChild(text);
+      text.textContent = option.title;
+      textWrap.appendChild(text);
+
+      const requirement = document.createElement('p');
+      requirement.className = 'lineup-passive-picker__requirement';
+      requirement.textContent = option.requirement;
+      textWrap.appendChild(requirement);
+
+      row.appendChild(textWrap);
 
       row.addEventListener('click', () => {
+        if (!eligible){
+          return;
+        }
         pendingPassiveSelection = { lineupId: lineup.id, passiveIndex, optionIndex };
-        list.querySelectorAll('.lineup-passive-picker__option').forEach((node, index) => {
-          node.classList.toggle('is-active', index === optionIndex);
+        list.querySelectorAll<HTMLElement>('.lineup-passive-picker__option').forEach((node) => {
+          const originalOptionIndex = Number(node.dataset.optionIndex);
+          node.classList.toggle('is-active', Number.isInteger(originalOptionIndex) && originalOptionIndex === optionIndex);
         });
       });
 
-    list.appendChild(row);
+      list.appendChild(row);
     });
 
     passiveOverlayBody.appendChild(list);
@@ -1564,6 +1798,11 @@ function updateActiveCellHighlight(): void{
     }
     const { lineupId, passiveIndex, optionIndex } = pendingPassiveSelection;
     const lineupSelection = passiveSelectionByLineup.get(lineupId) ?? new Map<number, number>();
+    for (const [selectedPassiveIndex, selectedOptionIndex] of lineupSelection.entries()){
+      if (selectedPassiveIndex !== passiveIndex && selectedOptionIndex === optionIndex){
+        lineupSelection.delete(selectedPassiveIndex);
+      }
+    }
     lineupSelection.set(passiveIndex, optionIndex);
     passiveSelectionByLineup.set(lineupId, lineupSelection);
     pendingPassiveSelection = null;

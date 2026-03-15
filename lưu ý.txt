@@ -297,7 +297,14 @@ lineup bbuff:
 5. Nhận lớp khiên tương đương 8% HP mỗi khi bắt đầu lượt mới, áp dụng cho mọi đồng minh trên sân, khiên có giá trị = 5% max hp của leader đồng minh. Điều kiện: lineup có tối thiểu 3 tanker, cost tổng hơn 165.
 6. Giảm 2 AE tiêu tốn cho kỹ năng đầu tiên của mỗi hiệp của từng nhân vật đồng minh trừ leader. (Yêu cầu: Có 2 Mage và 1 support, cost tổng hơn hoặc = 145).
 7. Tăng 10% PER cho Assassin và Ranger đồng minh có mặt trên sân, cộng từ lúc nhân vật đó lên sân và áp dụng suốt trận đấu, không không bị ảnh hưởng bởi buff hay debuff kể cả quy tắc. (Yêu cầu: Đội hình có 2 Assassin hoặc 2 Ranger hoặc 1 Assassin + 1 Ranger, cost tổng tối đa không vượt 170).
-
+8. Nếu đòn đánh gây chí mạng (PER thành công), hồi ngay 5 AE cho bể ae, điều kiện: có tối thiểu 2 Assassin đồng minh trên sân, cost tổng dưới 150.
+9. Các thực thể được gọi ra bởi Summoner nhận thêm 5% ATK và wil. điều kiện: lineup có 2 Summoner ( không cần có 2 summoner đồng minh trên sân cùng lúc vẫn được), cost tổng hơn 165.
+10. Bể ae khi vào sân được + 20/30 AE thay vì 0, điều kiện: có tối thiểu 2/3 support trong lineup, cost tổng hơn hoặc = 160.
+11. Toàn bộ nhân vật có Cost từ 18 trở lên được tăng 10% HP. Điều kiện: cost tổng hơn hoặc = 175.
+12. Mỗi khi 1 nhân vật tử trận, các nhân vật còn lại nhận 3% WIL và atk (cộng dồn, dựa vào wil và atk các nhân vật còn đứng trên sân đang có, nếu atk và wil bị giảm hoặc tăng thì cái +3% này cũng sẽ bị ảnh hưởng.
+13. Khi HP leader dưới 50% hp max nhận khiên = 10% max hp của leader, điều kiện: có 4 class khác nhau trong lineup.
+14. Khi 1 nhân vật kẻ thù chết (vật triệu hồi từ summoner hay leader kẻ thù không được tính), mọi nhân vật đồng minh kể cả leader sẽ được + 20 nộ ngay lập tức. kích hoạt tối đa 5 lần/1 trận đấu/phe. điều kiện: Lineup có nhân vật thuộc 5 class khác nhau.
+15. + 15% Atk cho mọi ranger đồng minh trên sân khi họ ra sân, hiệu ứng này không thể bị ảnh hưởng bởi debuff/buff, Quy Tắc cũng không thể. Điều kiện: có 3 Ranger trong lineup. Cost tổng không thể vượt 165.
 Gợi ý triển khai này chỉ mang tính tham khảo:
 // ==== LEADER UYÊN – RAGE & ULT ====
 
