@@ -32,7 +32,7 @@ describe('tacticalAiByUnit serialization/deserialization', () => {
     savePlayerProfile({
       tacticalAiByUnit: {
         hero_legacy: [
-          { condition: 'always', action: 'ult', threshold: '70', enabled: true },
+          { condition: 'always', action: 'basic', threshold: '70', enabled: true },
           { condition: 'self_hp_below', action: 'skill1', threshold: 25, enabled: true },
           { condition: 'always', action: 'unknown_action', threshold: 10, enabled: true },
         ],
@@ -48,7 +48,7 @@ describe('tacticalAiByUnit serialization/deserialization', () => {
     const loaded = loadPlayerProfile();
     expect(loaded.tacticalAiByUnit).toEqual({
       hero_legacy: [
-        { condition: 'always', action: 'ult', threshold: '70', enabled: true },
+        { condition: 'always', action: 'basic', threshold: '70', enabled: true },
         { condition: 'self_hp_below', action: 'skill1', threshold: 25, enabled: true },
         { condition: 'always', action: 'unknown_action', threshold: 10, enabled: true },
       ],
@@ -71,7 +71,7 @@ describe('tacticalAiByUnit serialization/deserialization', () => {
     });
 
     expect(mapped.get('hero_legacy')?.gambit).toEqual([
-      { condition: 'always', action: 'ult', threshold: 70, enabled: true },
+      { condition: 'always', action: 'basic', threshold: 70, enabled: true },
       { condition: 'self_hp_below', action: 'skill1', threshold: 25, enabled: true },
     ]);
 

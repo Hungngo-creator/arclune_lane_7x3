@@ -121,12 +121,11 @@ export interface GambitSlotsContainerInput extends Record<string, unknown> {
   tacticalAi?: ReadonlyArray<GambitSlotInput> | null;
 }
 
-export type GambitActionType = 'basic' | 'ult' | 'skill1' | 'skill2' | 'skill3';
+export type GambitActionType = 'basic' | 'skill1' | 'skill2' | 'skill3';
 
 export type GambitConditionType =
   | 'self_hp_below'
   | 'self_has_debuff'
-  | 'self_full_fury'
   | 'ally_lowest_hp'
   | 'ally_controlled'
   | 'pool_aether_above'

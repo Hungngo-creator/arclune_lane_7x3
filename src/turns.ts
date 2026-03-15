@@ -724,13 +724,6 @@ const completeTurn = ({
     if (decision.slotIndex < 0 || !decision.action) break;
     gambitIndex = decision.slotIndex + 1;
 
-    if (decision.action === 'ult') {
-      if (runUlt()) {
-        return resolution;
-      }
-      continue;
-    }
-
     if (decision.action === 'basic') {
       break;
     }

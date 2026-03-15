@@ -21,7 +21,7 @@ describe('gambit skill fallback basic', () => {
           ['unit_b', {
             gambit: [
               { condition: 'self_hp_below', threshold: 10, action: 'skill1', enabled: true },
-              { condition: 'self_full_fury', action: 'skill2', enabled: true },
+              { condition: 'pool_aether_above', threshold: 999, action: 'skill2', enabled: true },
               { condition: 'always', action: 'basic', enabled: true },
             ],
           }],

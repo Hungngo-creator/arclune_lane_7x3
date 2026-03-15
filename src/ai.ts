@@ -771,12 +771,6 @@ function evaluateGambitCondition(
     case 'self_has_debuff':
       return Array.isArray(unit.statuses)
         && unit.statuses.some((status: { kind?: string } | null | undefined) => status && status.kind === 'debuff');
-    case 'self_full_fury': {
-      if (isUyenLeader(unit)) return isAnyLeaderUltReady(unit);
-      const fury = Number.isFinite(unit.fury) ? Number(unit.fury) : 0;
-      const furyMax = Math.max(1, Number.isFinite(unit.furyMax) ? Number(unit.furyMax) : 100);
-      return fury >= furyMax;
-    }
     case 'ally_lowest_hp':
       {
       const teammate = findLowestHpUnit(allies.filter((ally) => ally.iid !== unit.iid));

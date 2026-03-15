@@ -2863,9 +2863,14 @@ function castDevour(boss: Unit, battleField: Grid) {
 C. Leader
 0) Uyên:
 1) Linesetter
-2) Sinh Mệnh Chi Chủ (khác với Nữ Thần Sinh Mệnh), nam
-Nội tại: Sinh Mệnh Cội Nguồn: mỗi đồng minh đứng trên sân sau khi thực thi turn được hồi hp = 4% max hp của leader này (áp dụng với leader này luôn), luôn hoạt động, không thể cướp, xoá bỏ, lãng quên hay sao chép.
+2) Hoá Thân của Sinh Mệnh Chi Chủ (khác với Nữ Thần Sinh Mệnh), nam
+Nội tại: Sinh Mệnh Cội Nguồn: mỗi đồng minh đứng trên sân sau khi thực thi turn được hồi hp = 4% max hp của leader này (áp dụng với leader này luôn), luôn hoạt động, không thể cướp, xoá bỏ, lãng quên hay sao chép. Quy tắc.
+Thần Tính: không nhận buff và debuff từ mọi nguồn ngoài bản thân, không thể hồi sinh, Quy Tắc.
 
+Nội tại 2: Tự kích hoạt khi có 1 đồng minh dưới 10% HP, lập tức đưa HP của họ về 0, cướp số HP còn lại của họ (không tăng max hp mà chỉ hồi hp), biến họ thành 1 bù nhìn. Kẻ được chuyển hoá thành bù nhìn sẽ biến mất vĩnh viễn trong trận, không thể hồi sinh, Quy Tắc cấp. -5% max hp mỗi lần kích hoạt.
+Bù Nhìn: thừa hưởng mọi chỉ số từ kẻ bị chuyển hoá trừ HP, bù nhìn chỉ có hp = 40% max hp của kẻ được chuyển hoá, khi hp về 0 sẽ chết. Bù nhìn sẽ đánh thường và ultimate nhưng không thể dùng skill, không tăng aether, vẫn tích đầy nộ và dùng ult được.
+
+Ultimate 
 3) Nguyền Rủa Chi Chủ, nam
 Nội tại: hiệu quả hồi phục (hồi hp và aether) của kẻ địch trên sân giảm 40%.
 Nguyền Rủa: kẻ thù nhận sát thương bởi leader này nhận 1 debuff ngẫu nhiên từ bể debuff. 

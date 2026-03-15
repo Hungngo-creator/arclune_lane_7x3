@@ -924,6 +924,9 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   let lastPassivesRenderSignature = '';
   let lastFiltersRenderSignature = '';
   let lastHighlightedCellIndex: number | null = null;
+  let cachedLineupBuffContextLineupId = '';
+  let cachedLineupBuffContextSignature = '';
+  let cachedLineupBuffContext: LineupBuffContext | null = null;
   const cellNodeByIndex = new Map<number, HTMLElement>();
   const passiveSelectionByLineup = new Map<string, Map<number, number>>();
   Object.entries(savedPassiveSelectionById).forEach(([lineupId, selection]) => {
@@ -1107,6 +1110,10 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
     if (!lineup){
       return 0;
     }
+    const context = getLineupBuffContext(lineup);
+    if (context.totalCost > 0){
+      return context.totalCost;
+    }
     const cellsCost = lineup.cells.reduce((sum, cell) => {
       if (!cell.unlocked || !cell.unitId){
         return sum;
@@ -1120,6 +1127,17 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
     return cellsCost + leaderCost;
   }
 
+  function getLineupBuffContextSignature(lineup: LineupState): string{
+    const parts: string[] = [];
+    lineup.cells.forEach((cell) => {
+      if (!cell.unlocked){
+        return;
+      }
+      parts.push(`${cell.index}:${cell.unitId ?? ''}`);
+    });
+    return `${lineup.leaderId ?? ''}|${parts.join('|')}`;
+  }
+
   function getLineupBuffContext(lineup: LineupState | null): LineupBuffContext{
     if (!lineup){
       return {
@@ -1130,8 +1148,18 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       };
     }
 
+   const signature = getLineupBuffContextSignature(lineup);
+    if (
+      cachedLineupBuffContext
+      && cachedLineupBuffContextLineupId === lineup.id
+      && cachedLineupBuffContextSignature === signature
+    ){
+      return cachedLineupBuffContext;
+    }
+
     const assignedUnits: RosterUnit[] = [];
     const classCounts = new Map<string, number>();
+    let totalCost = 0;
     const pushUnit = (unitId: string | null | undefined) => {
       if (!unitId){
         return;
@@ -1141,6 +1169,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
         return;
       }
       assignedUnits.push(unit);
+      totalCost += resolveUnitLineupCost(unit);
       const roleKey = unit.roleKey || unit.role.toLowerCase();
       if (!roleKey){
         return;
@@ -1156,12 +1185,16 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
     });
     pushUnit(lineup.leaderId);
 
-    return {
-      totalCost: getLineupTotalCost(lineup),
+    const context: LineupBuffContext = {
+      totalCost,
       classCounts,
       classCountSetSize: classCounts.size,
       assignedUnits,
     };
+    cachedLineupBuffContextLineupId = lineup.id;
+    cachedLineupBuffContextSignature = signature;
+    cachedLineupBuffContext = context;
+    return context;
   }
 
   function getUnavailableBuffOptionIndices(lineupId: string, passiveIndex: number): Set<number>{

@@ -333,13 +333,10 @@ __define('./ai.ts', (exports, module, __require) => {
   const lookupUnit = __dep4.lookupUnit;
   const __dep5 = __require('./aether.ts');
   const globalAetherPool = __dep5.globalAetherPool;
-  const __dep6 = __require('./leader-uyen.ts');
-  const isUyenLeader = __dep6.isUyenLeader;
-  const isAnyLeaderUltReady = __dep6.isAnyLeaderUltReady;
-  const __dep7 = __require('./turns/interleaved.ts');
-  const predictSpawnCycleByTurnOrder = __dep7.predictSpawnCycleByTurnOrder;
-  const __dep8 = __require('./shared-types/units.ts');
-  const createSummonQueue = __dep8.createSummonQueue;
+  const __dep6 = __require('./turns/interleaved.ts');
+  const predictSpawnCycleByTurnOrder = __dep6.predictSpawnCycleByTurnOrder;
+  const __dep7 = __require('./shared-types/units.ts');
+  const createSummonQueue = __dep7.createSummonQueue;
   function toMetaEntry(value) {
       if (!value || typeof value !== 'object')
           return null;
@@ -953,13 +950,6 @@ __define('./ai.ts', (exports, module, __require) => {
           case 'self_has_debuff':
               return Array.isArray(unit.statuses)
                   && unit.statuses.some((status) => status && status.kind === 'debuff');
-          case 'self_full_fury': {
-              if (isUyenLeader(unit))
-                  return isAnyLeaderUltReady(unit);
-              const fury = Number.isFinite(unit.fury) ? Number(unit.fury) : 0;
-              const furyMax = Math.max(1, Number.isFinite(unit.furyMax) ? Number(unit.furyMax) : 100);
-              return fury >= furyMax;
-          }
           case 'ally_lowest_hp':
               {
                   const teammate = findLowestHpUnit(allies.filter((ally) => ally.iid !== unit.iid));
@@ -12533,7 +12523,6 @@ __define('./modes/pve/collection-mapper.ts', (exports, module, __require) => {
   const GAMBITS_CONDITIONS = new Set([
       'self_hp_below',
       'self_has_debuff',
-      'self_full_fury',
       'ally_lowest_hp',
       'ally_controlled',
       'pool_aether_above',
@@ -12543,7 +12532,7 @@ __define('./modes/pve/collection-mapper.ts', (exports, module, __require) => {
       'enemy_has_shield',
       'always',
   ]);
-  const GAMBITS_ACTIONS = new Set(['basic', 'ult', 'skill1', 'skill2', 'skill3']);
+  const GAMBITS_ACTIONS = new Set(['basic', 'skill1', 'skill2', 'skill3']);
   const extractGambitSlots = (value) => {
       if (Array.isArray(value))
           return value;
@@ -23429,6 +23418,9 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       let lastPassivesRenderSignature = '';
       let lastFiltersRenderSignature = '';
       let lastHighlightedCellIndex = null;
+      let cachedLineupBuffContextLineupId = '';
+      let cachedLineupBuffContextSignature = '';
+      let cachedLineupBuffContext = null;
       const cellNodeByIndex = new Map();
       const passiveSelectionByLineup = new Map();
       Object.entries(savedPassiveSelectionById).forEach(([lineupId, selection]) => {
@@ -23590,6 +23582,10 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
           if (!lineup) {
               return 0;
           }
+          const context = getLineupBuffContext(lineup);
+          if (context.totalCost > 0) {
+              return context.totalCost;
+          }
           const cellsCost = lineup.cells.reduce((sum, cell) => {
               if (!cell.unlocked || !cell.unitId) {
                   return sum;
@@ -23602,6 +23598,16 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               : 0;
           return cellsCost + leaderCost;
       }
+      function getLineupBuffContextSignature(lineup) {
+          const parts = [];
+          lineup.cells.forEach((cell) => {
+              if (!cell.unlocked) {
+                  return;
+              }
+              parts.push(`${cell.index}:${cell.unitId ?? ''}`);
+          });
+          return `${lineup.leaderId ?? ''}|${parts.join('|')}`;
+      }
       function getLineupBuffContext(lineup) {
           if (!lineup) {
               return {
@@ -23611,8 +23617,15 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
                   assignedUnits: [],
               };
           }
+          const signature = getLineupBuffContextSignature(lineup);
+          if (cachedLineupBuffContext
+              && cachedLineupBuffContextLineupId === lineup.id
+              && cachedLineupBuffContextSignature === signature) {
+              return cachedLineupBuffContext;
+          }
           const assignedUnits = [];
           const classCounts = new Map();
+          let totalCost = 0;
           const pushUnit = (unitId) => {
               if (!unitId) {
                   return;
@@ -23622,6 +23635,7 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
                   return;
               }
               assignedUnits.push(unit);
+              totalCost += resolveUnitLineupCost(unit);
               const roleKey = unit.roleKey || unit.role.toLowerCase();
               if (!roleKey) {
                   return;
@@ -23635,12 +23649,16 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               pushUnit(cell.unitId);
           });
           pushUnit(lineup.leaderId);
-          return {
-              totalCost: getLineupTotalCost(lineup),
+          const context = {
+              totalCost,
               classCounts,
               classCountSetSize: classCounts.size,
               assignedUnits,
           };
+          cachedLineupBuffContextLineupId = lineup.id;
+          cachedLineupBuffContextSignature = signature;
+          cachedLineupBuffContext = context;
+          return context;
       }
       function getUnavailableBuffOptionIndices(lineupId, passiveIndex) {
           const blocked = new Set();
@@ -26229,7 +26247,6 @@ __define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
       { value: 'always', label: 'Luôn luôn' },
       { value: 'self_hp_below', label: 'Tự thân HP < X%' },
       { value: 'self_has_debuff', label: 'Tự thân có Debuff' },
-      { value: 'self_full_fury', label: 'Tự thân đầy nộ' },
       { value: 'ally_lowest_hp', label: 'Đồng minh thấp HP nhất' },
       { value: 'ally_controlled', label: 'Đồng minh bị khống chế' },
       { value: 'pool_aether_above', label: 'Bể AE chung > X' },
@@ -26240,13 +26257,13 @@ __define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
   ];
   const ACTION_OPTIONS = [
       { value: 'basic', label: 'Đánh thường' },
-      { value: 'ult', label: 'Kỹ năng (ULT)' },
       { value: 'skill1', label: 'Kỹ năng 1' },
       { value: 'skill2', label: 'Kỹ năng 2' },
       { value: 'skill3', label: 'Kỹ năng 3' },
   ];
-  const CONDITION_OPTIONS_HTML = CONDITION_OPTIONS.map((opt) => `<option value="${opt.value}">${opt.label}</option>`).join('');
-  const ACTION_OPTIONS_HTML = ACTION_OPTIONS.map((opt) => `<option value="${opt.value}">${opt.label}</option>`).join('');
+  const CONDITION_LABEL_BY_VALUE = new Map(CONDITION_OPTIONS.map((option) => [option.value, option.label]));
+  const ACTION_LABEL_BY_VALUE = new Map(ACTION_OPTIONS.map((option) => [option.value, option.label]));
+  const THRESHOLD_ENABLED_CONDITIONS = new Set(['self_hp_below', 'pool_aether_above']);
   const CSS = `
   .app--sect-tactical-ai{padding:20px 16px 48px;}
   .tactical-ai{max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:16px;color:#e9f2ff;}
@@ -26256,9 +26273,17 @@ __define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
   .tactical-ai__unit{display:flex;gap:10px;align-items:center;border:1px solid rgba(125,211,252,.2);background:rgba(15,25,38,.7);border-radius:10px;padding:8px;cursor:pointer}
   .tactical-ai__unit.is-active{border-color:#67e8f9;box-shadow:0 0 0 1px rgba(103,232,249,.3) inset;}
   .tactical-ai__avatar{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:rgba(125,211,252,.22)}
-  .tactical-ai__slot{display:grid;grid-template-columns:2fr 2fr 90px;gap:10px;align-items:center;margin-bottom:10px;}
+  .tactical-ai__slot{display:grid;grid-template-columns:2fr 2fr 120px;gap:10px;align-items:center;margin-bottom:10px;}
   .tactical-ai__toolbar{display:flex;justify-content:space-between;align-items:center;}
-  .tactical-ai select,.tactical-ai input{width:100%;padding:9px;border-radius:8px;background:#0f1a28;color:#e9f2ff;border:1px solid rgba(125,211,252,.25)}
+  .tactical-ai input{width:100%;padding:9px;border-radius:8px;background:#0f1a28;color:#e9f2ff;border:1px solid rgba(125,211,252,.25)}
+  .tactical-ai__picker-trigger{width:100%;text-align:left;padding:9px;border-radius:8px;background:#0f1a28;color:#e9f2ff;border:1px solid rgba(125,211,252,.25)}
+  .tactical-ai__picker-overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:1000;background:rgba(2,6,15,.72);padding:16px}
+  .tactical-ai__picker-overlay.is-open{display:flex}
+  .tactical-ai__picker-panel{width:min(680px,100%);max-height:min(80vh,680px);overflow:auto;border:1px solid rgba(125,211,252,.28);border-radius:14px;background:rgba(10,18,28,.97);padding:14px;display:flex;flex-direction:column;gap:10px}
+  .tactical-ai__picker-title{margin:0;font-size:20px;font-weight:700}
+  .tactical-ai__picker-option{width:100%;display:flex;gap:10px;align-items:flex-start;padding:10px;border-radius:10px;border:1px solid rgba(125,211,252,.25);background:rgba(15,25,38,.8);color:#e9f2ff;text-align:left}
+  .tactical-ai__picker-option.is-active{border-color:#67e8f9;box-shadow:0 0 0 1px rgba(103,232,249,.3) inset}
+  .tactical-ai__picker-option-index{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:rgba(125,211,252,.2);font-size:12px;font-weight:700;flex:0 0 auto}
   `;
   function ensureStyles() { ensureStyleTag(STYLE_ID, { css: CSS }); }
   function loadConfig() {
@@ -26310,7 +26335,61 @@ __define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
       let lastSerializedConfig = JSON.stringify(tacticalConfig);
       const unitButtons = new Map();
       const editorRows = [];
-      const readEditorSnapshot = (editor) => (`${editor.condition.value}|${editor.action.value}|${editor.threshold.value}`);
+      const pickerOverlay = document.createElement('div');
+      pickerOverlay.className = 'tactical-ai__picker-overlay';
+      const pickerPanel = document.createElement('div');
+      pickerPanel.className = 'tactical-ai__picker-panel';
+      const pickerTitle = document.createElement('h3');
+      pickerTitle.className = 'tactical-ai__picker-title';
+      const pickerList = document.createElement('div');
+      pickerPanel.append(pickerTitle, pickerList);
+      pickerOverlay.appendChild(pickerPanel);
+      container.appendChild(pickerOverlay);
+      let pickerState = null;
+      const readEditorSnapshot = (editor) => (`${editor.conditionValue}|${editor.actionValue}|${editor.threshold.value}`);
+      const isConditionValue = (value) => CONDITION_LABEL_BY_VALUE.has(value);
+      const isActionValue = (value) => ACTION_LABEL_BY_VALUE.has(value);
+      const shouldEnableThreshold = (condition) => THRESHOLD_ENABLED_CONDITIONS.has(condition);
+      const syncThresholdState = (editor) => {
+          const enabled = shouldEnableThreshold(editor.conditionValue);
+          editor.threshold.disabled = !enabled;
+          editor.threshold.title = enabled ? 'Nhập giá trị ngưỡng bằng bàn phím.' : 'Điều kiện này không dùng ngưỡng.';
+      };
+      const applyEditorButtonLabels = (editor) => {
+          editor.condition.textContent = CONDITION_LABEL_BY_VALUE.get(editor.conditionValue) ?? 'Luôn luôn';
+          editor.action.textContent = ACTION_LABEL_BY_VALUE.get(editor.actionValue) ?? 'Đánh thường';
+      };
+      const closePicker = () => {
+          pickerState = null;
+          pickerOverlay.classList.remove('is-open');
+          pickerList.replaceChildren();
+      };
+      const openPicker = (rowIndex, type) => {
+          const editor = editorRows[rowIndex];
+          if (!editor)
+              return;
+          pickerState = { rowIndex, type };
+          pickerTitle.textContent = type === 'condition' ? 'Chọn điều kiện kích hoạt' : 'Chọn hành động ưu tiên';
+          pickerList.replaceChildren();
+          const options = type === 'condition' ? CONDITION_OPTIONS : ACTION_OPTIONS;
+          options.forEach((option, optionIndex) => {
+              const button = document.createElement('button');
+              button.type = 'button';
+              button.className = 'tactical-ai__picker-option';
+              button.dataset.optionValue = option.value;
+              if ((type === 'condition' && editor.conditionValue === option.value) || (type === 'action' && editor.actionValue === option.value)) {
+                  button.classList.add('is-active');
+              }
+              const index = document.createElement('span');
+              index.className = 'tactical-ai__picker-option-index';
+              index.textContent = String(optionIndex + 1);
+              const label = document.createElement('span');
+              label.textContent = option.label;
+              button.append(index, label);
+              pickerList.appendChild(button);
+          });
+          pickerOverlay.classList.add('is-open');
+      };
       const flushSave = () => {
           if (saveTimerId != null) {
               window.clearTimeout(saveTimerId);
@@ -26343,9 +26422,13 @@ __define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
               const editor = editorRows[i];
               if (!editor)
                   continue;
-              editor.condition.value = String(slot.condition ?? 'always');
-              editor.action.value = String(slot.action ?? 'basic');
+              const condition = String(slot.condition ?? 'always');
+              const action = String(slot.action ?? 'basic');
+              editor.conditionValue = isConditionValue(condition) ? condition : 'always';
+              editor.actionValue = isActionValue(action) ? action : 'basic';
               editor.threshold.value = String(slot.threshold ?? DEFAULT_THRESHOLD);
+              applyEditorButtonLabels(editor);
+              syncThresholdState(editor);
               editor.snapshot = readEditorSnapshot(editor);
           }
       };
@@ -26380,22 +26463,27 @@ __define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
               row.className = 'tactical-ai__slot';
               row.dataset.slotIndex = String(i);
               row.innerHTML = `
-          <select class="tactical-ai__condition">${CONDITION_OPTIONS_HTML}</select>
-          <select class="tactical-ai__action">${ACTION_OPTIONS_HTML}</select>
-          <input class="tactical-ai__threshold" type="number" />
+          <button class="tactical-ai__picker-trigger tactical-ai__condition" type="button"></button>
+          <button class="tactical-ai__picker-trigger tactical-ai__action" type="button"></button>
+          <input class="tactical-ai__threshold" type="number" inputmode="numeric" step="1" min="0" max="100" />
         `;
               const condition = row.querySelector('.tactical-ai__condition');
               const action = row.querySelector('.tactical-ai__action');
               const threshold = row.querySelector('.tactical-ai__threshold');
               if (!condition || !action || !threshold)
                   continue;
-              editorRows.push({
+              const editor = {
                   root: row,
                   condition,
                   action,
                   threshold,
+                  conditionValue: 'always',
+                  actionValue: 'basic',
                   snapshot: `${condition.value}|${action.value}|${threshold.value}`,
-              });
+              };
+              applyEditorButtonLabels(editor);
+              syncThresholdState(editor);
+              editorRows.push(editor);
               fragment.appendChild(row);
           }
           right.replaceChildren(fragment);
@@ -26429,25 +26517,77 @@ __define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
           editor.snapshot = nextSnapshot;
           const rows = getUnitRows(tacticalConfig, activeUnitId);
           rows[slotIndex] = {
-              condition: editor.condition.value,
-              action: editor.action.value,
+              condition: editor.conditionValue,
+              action: editor.actionValue,
               threshold: Number(editor.threshold.value || 0),
               enabled: true,
           };
           scheduleSave();
       };
+      const onEditorClick = (event) => {
+          const target = event.target;
+          const row = target?.closest('.tactical-ai__slot');
+          if (!row)
+              return;
+          const slotIndex = Number(row.dataset.slotIndex);
+          if (!Number.isInteger(slotIndex) || slotIndex < 0 || slotIndex >= SLOT_COUNT)
+              return;
+          const isConditionTrigger = !!target?.closest('.tactical-ai__condition');
+          const isActionTrigger = !!target?.closest('.tactical-ai__action');
+          if (isConditionTrigger) {
+              openPicker(slotIndex, 'condition');
+              return;
+          }
+          if (isActionTrigger) {
+              openPicker(slotIndex, 'action');
+          }
+      };
+      const onPickerClick = (event) => {
+          const target = event.target;
+          if (!target)
+              return;
+          if (!pickerState)
+              return;
+          if (target === pickerOverlay) {
+              closePicker();
+              return;
+          }
+          const option = target.closest('.tactical-ai__picker-option');
+          if (!option)
+              return;
+          const value = option.dataset.optionValue ?? '';
+          const editor = editorRows[pickerState.rowIndex];
+          if (!editor) {
+              closePicker();
+              return;
+          }
+          if (pickerState.type === 'condition' && isConditionValue(value)) {
+              editor.conditionValue = value;
+              syncThresholdState(editor);
+          }
+          if (pickerState.type === 'action' && isActionValue(value)) {
+              editor.actionValue = value;
+          }
+          applyEditorButtonLabels(editor);
+          editor.root.dispatchEvent(new Event('change', { bubbles: true }));
+          closePicker();
+      };
       renderUnits();
       buildEditor();
       hydrateEditorValues();
       list.addEventListener('click', onUnitSelect);
+      right.addEventListener('click', onEditorClick);
       right.addEventListener('change', onEditorChange);
+      pickerOverlay.addEventListener('click', onPickerClick);
       const onUnload = () => flushSave();
       window.addEventListener('beforeunload', onUnload);
       return {
           destroy() {
               window.removeEventListener('beforeunload', onUnload);
               list.removeEventListener('click', onUnitSelect);
+              right.removeEventListener('click', onEditorClick);
               right.removeEventListener('change', onEditorChange);
+              pickerOverlay.removeEventListener('click', onPickerClick);
               flushSave();
               mount.destroy();
           }
@@ -29267,12 +29407,6 @@ __define('./turns.ts', (exports, module, __require) => {
           if (decision.slotIndex < 0 || !decision.action)
               break;
           gambitIndex = decision.slotIndex + 1;
-          if (decision.action === 'ult') {
-              if (runUlt()) {
-                  return resolution;
-              }
-              continue;
-          }
           if (decision.action === 'basic') {
               break;
           }

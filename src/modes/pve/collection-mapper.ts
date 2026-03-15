@@ -21,7 +21,6 @@ const GAMBITS_MAX_SLOTS = 5;
 const GAMBITS_CONDITIONS = new Set<GambitConditionType>([
   'self_hp_below',
   'self_has_debuff',
-  'self_full_fury',
   'ally_lowest_hp',
   'ally_controlled',
   'pool_aether_above',
@@ -31,7 +30,7 @@ const GAMBITS_CONDITIONS = new Set<GambitConditionType>([
   'enemy_has_shield',
   'always',
 ]);
-const GAMBITS_ACTIONS = new Set<GambitActionType>(['basic', 'ult', 'skill1', 'skill2', 'skill3']);
+const GAMBITS_ACTIONS = new Set<GambitActionType>(['basic', 'skill1', 'skill2', 'skill3']);
 
 const extractGambitSlots = (value: unknown): ReadonlyArray<GambitSlotInput> | null => {
   if (Array.isArray(value)) return value as ReadonlyArray<GambitSlotInput>;
