@@ -8,7 +8,7 @@ import type { ModeConfig } from '@shared-types/config';
 
 const STYLE_ID = 'arena-hub-screen-style';
 const ARENA_HUB_ID = 'arena-hub';
-const CHILD_ORDER: ReadonlyArray<string> = ['arena', 'beast-arena', 'ares', 'challenge', 'campaign'];
+const CHILD_ORDER: ReadonlyArray<string> = ['arena', 'beast-arena', 'co-ty-phu', 'ares', 'challenge', 'campaign'];
 
 const CSS = /* css */ `
   .app--arena-hub{

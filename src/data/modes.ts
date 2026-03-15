@@ -257,6 +257,22 @@ const MODES = [
       screenId: 'main-menu',
       fallbackModuleId: COMING_SOON_MODULE_ID
     }
+  },
+  {
+    id: 'co-ty-phu',
+    title: 'Cờ Tỷ Phú',
+    type: MODE_TYPES.PVP,
+    status: MODE_STATUS.COMING_SOON,
+    icon: '🎲',
+    shortDescription: 'Chế độ cờ theo lượt trong cụm Chiến Trường, đang chờ mở khóa vòng gameplay chính thức.',
+    unlockNotes: 'Tạm hiển thị ở trạng thái Coming soon để người chơi theo dõi trước khi gameplay hoàn thiện.',
+    tags: ['PvP', 'Coming soon'],
+    menuSections: ['core-pve'],
+    parentId: 'arena-hub',
+    shell: {
+      screenId: 'main-menu',
+      fallbackModuleId: COMING_SOON_MODULE_ID
+    }
   }
 ] satisfies ReadonlyArray<ModeConfig>;
 

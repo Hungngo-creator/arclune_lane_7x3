@@ -7336,6 +7336,22 @@ __define('./data/modes.ts', (exports, module, __require) => {
               screenId: 'main-menu',
               fallbackModuleId: COMING_SOON_MODULE_ID
           }
+      },
+      {
+          id: 'co-ty-phu',
+          title: 'Cờ Tỷ Phú',
+          type: MODE_TYPES.PVP,
+          status: MODE_STATUS.COMING_SOON,
+          icon: '🎲',
+          shortDescription: 'Chế độ cờ theo lượt trong cụm Chiến Trường, đang chờ mở khóa vòng gameplay chính thức.',
+          unlockNotes: 'Tạm hiển thị ở trạng thái Coming soon để người chơi theo dõi trước khi gameplay hoàn thiện.',
+          tags: ['PvP', 'Coming soon'],
+          menuSections: ['core-pve'],
+          parentId: 'arena-hub',
+          shell: {
+              screenId: 'main-menu',
+              fallbackModuleId: COMING_SOON_MODULE_ID
+          }
       }
   ];
   const MODE_INDEX = MODES.reduce((acc, mode) => {
@@ -19161,7 +19177,7 @@ __define('./screens/arena-hub/index.ts', (exports, module, __require) => {
   const MODES = __dep2.MODES;
   const STYLE_ID = 'arena-hub-screen-style';
   const ARENA_HUB_ID = 'arena-hub';
-  const CHILD_ORDER = ['arena', 'beast-arena', 'ares', 'challenge', 'campaign'];
+  const CHILD_ORDER = ['arena', 'beast-arena', 'co-ty-phu', 'ares', 'challenge', 'campaign'];
   const CSS = /* css */ `
     .app--arena-hub{
       padding:32px 16px 64px;

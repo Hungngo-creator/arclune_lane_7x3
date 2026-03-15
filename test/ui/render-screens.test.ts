@@ -6,6 +6,7 @@ import * as artModule from '../../src/art.ts';
 import { renderMainMenuView } from '../../src/screens/main-menu/view/index.ts';
 import { renderLineupScreen } from '../../src/screens/lineup/index.ts';
 import { renderCollectionScreen } from '../../src/screens/collection/index.ts';
+import { renderScreen as renderArenaHubScreen } from '../../src/screens/arena-hub/index.ts';
 import { resolveCurrencyBalance } from '../../src/screens/collection/helpers.ts';
 import type { MainMenuState, MenuCardMetadata, MenuSection } from '../../src/screens/main-menu/types.ts';
 import type { RosterEntryLite, LineupDefinition } from '@shared-types/lineup';
@@ -483,6 +484,46 @@ describe('renderCollectionScreen', () => {
       handle.destroy();
       artSpy.mockRestore();
     }
+  });
+});
+
+describe('renderArenaHubScreen', () => {
+  it('hiển thị đủ 6 card trong Chiến Trường và xử lý click coming-soon cho Cờ Tỷ Phú', () => {
+    const root = document.createElement('div');
+    document.body.appendChild(root);
+
+    const enterScreen = jest.fn();
+
+    const handle = renderArenaHubScreen({
+      root,
+      shell: { enterScreen },
+      definition: {
+        label: 'Chiến Trường',
+        description: 'Các chế độ chiến đấu hiện có',
+      },
+    });
+
+    const grid = root.querySelector('.arena-hub__grid');
+    expect(grid).not.toBeNull();
+
+    const cards = root.querySelectorAll<HTMLButtonElement>('.arena-hub__grid .mode-card');
+    expect(cards).toHaveLength(6);
+
+    const monopolyCard = root.querySelector<HTMLButtonElement>('.arena-hub__grid .mode-card[data-mode="co-ty-phu"]');
+    expect(monopolyCard).not.toBeNull();
+    expect(monopolyCard?.classList.contains('mode-card--coming')).toBe(true);
+
+    const status = monopolyCard?.querySelector('.mode-card__status');
+    expect(status?.textContent).toContain('Coming soon');
+
+    monopolyCard?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(enterScreen).toHaveBeenCalledWith('main-menu', null);
+
+    const backButton = root.querySelector<HTMLButtonElement>('.arena-hub__back');
+    backButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(enterScreen).toHaveBeenCalledWith('main-menu');
+
+    handle.destroy();
   });
 });
 
