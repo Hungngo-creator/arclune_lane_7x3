@@ -22859,21 +22859,20 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
       .lineup-grid__details-list{margin:0;padding-left:18px;font-size:13px;color:#c8deff;line-height:1.5;display:flex;flex-direction:column;gap:2px;}
       .lineup-grid__details-list li{margin:0;}
       .lineup-grid__details-empty{margin:0;font-size:13px;color:#9cbcd9;line-height:1.6;}
-      .lineup-leader{border-radius:24px;border:1px solid rgba(255,209,132,.42);background:linear-gradient(150deg,rgba(36,26,12,.88),rgba(18,12,6,.92));padding:14px 16px;display:grid;grid-template-columns:minmax(0,120px) minmax(0,1fr);gap:12px;align-items:start;position:relative;overflow:hidden;}
+      .lineup-leader{border-radius:24px;border:1px solid rgba(255,209,132,.42);background:linear-gradient(150deg,rgba(36,26,12,.88),rgba(18,12,6,.92));padding:12px;display:grid;grid-template-columns:minmax(0,104px) minmax(0,1fr);gap:10px;align-items:start;position:relative;overflow:hidden;max-width:420px;}
       .lineup-leader__badge{position:absolute;top:12px;right:-18px;background:rgba(255,209,132,.16);color:#ffd184;padding:4px 26px;border-radius:999px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;transform:rotate(20deg);}
-      .lineup-leader__main{display:flex;flex-direction:column;align-items:flex-start;gap:8px;}
-      .lineup-leader__avatar{width:80px;height:80px;border-radius:20px;background:rgba(54,36,18,.9);display:flex;align-items:center;justify-content:center;font-size:26px;color:#ffd184;overflow:visible;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease;border:1px solid rgba(255,209,132,.45);}
+      .lineup-leader__main{display:flex;flex-direction:column;align-items:flex-start;gap:6px;}
+      .lineup-leader__avatar{width:72px;height:72px;border-radius:18px;background:rgba(54,36,18,.9);display:flex;align-items:center;justify-content:center;font-size:24px;color:#ffd184;overflow:visible;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease;border:1px solid rgba(255,209,132,.45);}
       .lineup-leader__avatar img{width:100%;height:100%;object-fit:cover;border-radius:inherit;}
       .lineup-leader__avatar:hover{transform:translateY(-2px);box-shadow:0 18px 32px rgba(12,6,0,.5);}
       .lineup-leader__avatar:focus-visible{outline:2px solid rgba(255,209,132,.8);outline-offset:4px;}
       .lineup-leader__name{margin:0;font-size:16px;color:#ffe7b3;}
       .lineup-leader__note{margin:0;font-size:11px;color:#f0d9b2;line-height:1.5;}
-      .lineup-passives{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:10px;}
-      .lineup-passive{padding:10px;border-radius:14px;border:1px solid rgba(255,209,132,.28);background:rgba(38,26,12,.78);display:flex;flex-direction:column;gap:6px;cursor:pointer;transition:transform .16s ease,border-color .16s ease,background .16s ease;color:#ffe7b3;height:100%;text-align:left;}
+      .lineup-passives{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:56px;gap:8px;align-content:start;}
+      .lineup-passive{padding:0;border-radius:14px;border:1px solid rgba(255,209,132,.28);background:rgba(38,26,12,.78);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .16s ease,border-color .16s ease,background .16s ease;color:#ffe7b3;height:100%;text-align:center;}
       .lineup-passive:hover{transform:translateY(-2px);border-color:rgba(255,209,132,.45);background:rgba(46,30,14,.86);}
       .lineup-passive:focus-visible{outline:2px solid rgba(255,209,132,.75);outline-offset:3px;}
-      .lineup-passive__title{margin:0;font-size:13px;letter-spacing:.04em;}
-      .lineup-passive__condition{margin:0;font-size:11px;color:#f3d2a2;}
+      .lineup-passive__title{margin:0;font-size:22px;line-height:1;font-weight:600;letter-spacing:.02em;color:#ffd184;}
       .lineup-passive.is-active{box-shadow:0 16px 34px rgba(255,184,108,.45);border-color:rgba(255,209,132,.72);background:rgba(56,36,18,.92);}
       .lineup-passive-picker{display:flex;flex-direction:column;gap:10px;}
       .lineup-passive-picker__option{padding:10px 12px;border-radius:12px;border:1px solid rgba(125,211,252,.2);background:rgba(12,22,32,.82);display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:transform .16s ease,border-color .16s ease,opacity .16s ease;}
@@ -24055,15 +24054,9 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
               const title = document.createElement('p');
               title.className = 'lineup-passive__title';
               title.textContent = selectedIndex != null
-                  ? (LINEUP_BUFF_OPTIONS[selectedIndex]?.title ?? `Buff #${selectedIndex + 1}`)
-                  : 'Chưa thiết lập';
+                  ? String(selectedIndex + 1)
+                  : '+';
               btn.appendChild(title);
-              const condition = document.createElement('p');
-              condition.className = 'lineup-passive__condition';
-              condition.textContent = selectedIndex != null
-                  ? (LINEUP_BUFF_OPTIONS[selectedIndex]?.requirement ?? '')
-                  : 'Bấm để chọn 1 trong 15 lineup buff.';
-              btn.appendChild(condition);
               passiveGrid.appendChild(btn);
           });
       }
