@@ -11373,6 +11373,38 @@ __define('./entry.ts', (exports, module, __require) => {
           // Best effort: không chặn người chơi nếu thiết bị không hỗ trợ.
       }
   }
+  function installAutoLandscapeRequest() {
+      if (typeof window === 'undefined' || typeof document === 'undefined')
+          return;
+      let hasLockedOrientation = false;
+      const tryLockLandscape = () => {
+          if (hasLockedOrientation)
+              return;
+          requestLandscapeForGameplay()
+              .then(() => {
+              hasLockedOrientation = true;
+          })
+              .catch(() => {
+              // Best effort: bỏ qua lỗi vì có thể thiếu quyền hoặc chưa có tương tác người dùng.
+          });
+      };
+      tryLockLandscape();
+      const oneShotUserGesture = () => {
+          tryLockLandscape();
+          document.removeEventListener('pointerdown', oneShotUserGesture);
+          document.removeEventListener('touchstart', oneShotUserGesture);
+          document.removeEventListener('keydown', oneShotUserGesture);
+      };
+      document.addEventListener('pointerdown', oneShotUserGesture, { passive: true });
+      document.addEventListener('touchstart', oneShotUserGesture, { passive: true });
+      document.addEventListener('keydown', oneShotUserGesture);
+      window.addEventListener('focus', tryLockLandscape);
+      document.addEventListener('visibilitychange', () => {
+          if (!document.hidden) {
+              tryLockLandscape();
+          }
+      });
+  }
   function teardownActiveSession() {
       if (!shellInstance)
           return;
@@ -11615,6 +11647,7 @@ __define('./entry.ts', (exports, module, __require) => {
       const protocol = window?.location?.protocol;
       const isFileProtocol = protocol === 'file:';
       try {
+          installAutoLandscapeRequest();
           if (isFileProtocol) {
               console.warn('Đang chạy Arclune trực tiếp từ file://. Một số trình duyệt có thể chặn tài nguyên liên quan.');
           }
