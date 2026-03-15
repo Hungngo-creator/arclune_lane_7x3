@@ -1,5 +1,3 @@
-//home (termux)/arclune_lane_7x3/index.html
-
 <!doctype html>
 <html lang="vi">
 <head>
@@ -168,6 +166,8 @@
         textAlign: 'center',
         lineHeight: '1.6'
       };
+      let hasRenderedFatal = false;
+
       window.arcluneRenderMessage = function renderMessage({ title = 'Arclune', body = '' } = {}){
         const message = document.createElement('div');
         Object.assign(message.style, baseStyles);
@@ -178,15 +178,44 @@
         document.body.innerHTML = '';
         document.body.appendChild(message);
       };
+
       window.arcluneShowFatal = function showFatal(detail){
+        if (hasRenderedFatal) return;
+        hasRenderedFatal = true;
         const text = detail && typeof detail === 'object' && 'message' in detail
           ? String(detail.message)
           : String(detail || 'Không rõ lỗi.');
         window.arcluneRenderMessage({
           title: 'Không thể tải Arclune',
-          body: `<p>${text}</p>`
+          body: `<p style="word-break:break-word">${text}</p>`
         });
       };
+
+      window.addEventListener('error', function onWindowError(event){
+        const message = event && event.message ? event.message : 'Lỗi runtime không xác định.';
+        window.arcluneShowFatal && window.arcluneShowFatal(message);
+      });
+
+      window.addEventListener('unhandledrejection', function onUnhandledRejection(event){
+        const reason = event && 'reason' in event ? event.reason : null;
+        const message = reason && typeof reason === 'object' && 'message' in reason
+          ? reason.message
+          : String(reason || 'Promise bị reject nhưng không có thông tin lỗi.');
+        window.arcluneShowFatal && window.arcluneShowFatal(message);
+      });
+
+      window.addEventListener('load', function afterLoadGuard(){
+        setTimeout(function checkAppBoot(){
+          if (hasRenderedFatal) return;
+          const appRoot = document.getElementById('appRoot');
+          const hasVisibleContent = !!(appRoot && appRoot.children.length > 0);
+          if (!hasVisibleContent){
+            window.arcluneShowFatal && window.arcluneShowFatal(
+              'App không render được giao diện. Hãy mở Console để xem lỗi JS chi tiết (thường do dist/app.js chưa build hoặc bị lỗi runtime).'
+            );
+          }
+        }, 2200);
+      });
     })();
   </script>
   <script src="./dist/app.js" defer onerror="window.arcluneShowFatal && window.arcluneShowFatal(event?.message || 'Không thể tải gói Arclune.');"></script>
