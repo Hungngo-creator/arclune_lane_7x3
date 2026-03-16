@@ -26812,7 +26812,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       }
       return lanes;
   }
-  function createMonopolyBoardCells() {
+  function buildMonopolyBoardCells() {
       const mainTrack = generateMainTrackCells();
       const innerLanes = generateInnerLanes(mainTrack.length);
       const cells = [...mainTrack, ...innerLanes];
@@ -26827,9 +26827,13 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           }
           occupied.add(key);
       }
+      cells.forEach(cell => Object.freeze(cell));
       return Object.freeze(cells);
   }
-  const BOARD_TEMPLATE = createMonopolyBoardCells();
+  const BOARD_TEMPLATE = buildMonopolyBoardCells();
+  function createMonopolyBoardCells() {
+      return BOARD_TEMPLATE;
+  }
   function ensureStyles() {
       ensureStyleTag(STYLE_ID, { css: CSS });
   }

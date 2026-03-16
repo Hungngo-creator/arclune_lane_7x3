@@ -115,7 +115,7 @@ function generateInnerLanes(startIndex: number): BoardCell[] {
   return lanes;
 }
 
-export function createMonopolyBoardCells(): ReadonlyArray<BoardCell> {
+function buildMonopolyBoardCells(): ReadonlyArray<BoardCell> {
   const mainTrack = generateMainTrackCells();
   const innerLanes = generateInnerLanes(mainTrack.length);
   const cells = [...mainTrack, ...innerLanes];
@@ -130,10 +130,15 @@ export function createMonopolyBoardCells(): ReadonlyArray<BoardCell> {
     }
     occupied.add(key);
   }
+  cells.forEach(cell => Object.freeze(cell));
   return Object.freeze(cells);
 }
 
-const BOARD_TEMPLATE = createMonopolyBoardCells();
+const BOARD_TEMPLATE = buildMonopolyBoardCells();
+
+export function createMonopolyBoardCells(): ReadonlyArray<BoardCell> {
+  return BOARD_TEMPLATE;
+}
 
 function ensureStyles(): void {
   ensureStyleTag(STYLE_ID, { css: CSS });
