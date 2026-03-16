@@ -113,7 +113,7 @@ function generateInnerLanes(startIndex: number): BoardCell[] {
   pushColumn(7, 'lane');
   pushColumn(9, 'connector');
 
-  const protrusions: Array<{ row: number; col: number; track: 'lane' | 'connector' }> = [ 
+  const protrusions: Array<{ row: number; col: number; track: 'lane' | 'connector' }> = [
     { row: 2, col: 0, track: 'connector' },
     { row: 10, col: 0, track: 'connector' },
     { row: 0, col: 2, track: 'lane' },
@@ -122,10 +122,6 @@ function generateInnerLanes(startIndex: number): BoardCell[] {
     { row: 10, col: 12, track: 'connector' },
     { row: 12, col: 10, track: 'lane' },
     { row: 12, col: 2, track: 'lane' }
-    { row: 12, col: 10, track: 'lane' },
-    { row: 12, col: 2, track: 'lane' },
-    { row: 10, col: 0, track: 'connector' },
-    { row: 2, col: 0, track: 'connector' }
   ];
   for (const protrusion of protrusions) {
     lanes.push({ index: index++, ...protrusion });

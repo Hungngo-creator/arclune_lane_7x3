@@ -26815,11 +26815,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           { row: 2, col: 12, track: 'connector' },
           { row: 10, col: 12, track: 'connector' },
           { row: 12, col: 10, track: 'lane' },
-          { row: 12, col: 2, track: 'lane' },
-          { row: 12, col: 10, track: 'lane' },
-          { row: 12, col: 2, track: 'lane' },
-          { row: 10, col: 0, track: 'connector' },
-          { row: 2, col: 0, track: 'connector' }
+          { row: 12, col: 2, track: 'lane' }
       ];
       for (const protrusion of protrusions) {
           lanes.push({ index: index++, ...protrusion });
