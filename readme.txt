@@ -83,8 +83,6 @@ Nếu đang là lượt slot 3, bạn đặt thêm unit ở slot 5,6: sau slot 3
 
 Cân bằng stat
 
-Rank Mult (áp lên mọi stat trừ SPD): N 0.8, R 0.9, SR 1.05, SSR 1.25, UR 1.5, Prime 1.8..
-
 7 class: Mage/Pháp Sư, Tanker, Ranger/Cung Thủ, Warrior/Chiến Binh, Summoner, Support/Hỗ Trợ, Assassin/Sát Thủ.
 Trong thảo luận có thể dùng en/vn đan xen.
 

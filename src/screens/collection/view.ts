@@ -439,9 +439,9 @@ function ensureStyles(){
     .collection-roster__entry[data-rank="D"]{--entry-bg:rgba(48,34,24,.78);--entry-bg-hover:rgba(60,42,30,.9);--entry-bg-selected:rgba(70,48,36,.95);--entry-border:rgba(255,170,108,.3);--entry-border-hover:rgba(255,188,138,.46);--entry-border-selected:rgba(255,208,170,.6);--entry-shadow:0 0 0 1px rgba(255,182,132,.14);--entry-shadow-hover:0 10px 22px rgba(168,88,42,.36);--entry-shadow-selected:0 18px 32px rgba(168,88,42,.45);}
     .collection-roster__entry[data-rank="unknown"],
     .collection-roster__entry:not([data-rank]){--entry-shadow:none;}
-    .collection-roster__avatar{--ssr-aura:url('${SSR_AURA_SRC}');width:108px;height:108px;background:none;overflow:visible;position:relative;display:flex;align-items:center;justify-content:center;}
-    .collection-roster__portrait{width:108px;height:108px;position:relative;z-index:2;display:flex;align-items:center;justify-content:center;overflow:hidden;}
-    .collection-roster__portrait img{width:108px;height:108px;object-fit:contain;filter:drop-shadow(0 10px 18px rgba(0,0,0,.55));position:relative;z-index:1;}
+    .collection-roster__avatar{--ssr-aura:url('${SSR_AURA_SRC}');--collection-avatar-size:108px;--collection-gear-slot-size:calc(var(--collection-avatar-size) * .8);width:var(--collection-avatar-size);height:var(--collection-avatar-size);background:none;overflow:visible;position:relative;display:flex;align-items:center;justify-content:center;}
+    .collection-roster__portrait{width:var(--collection-avatar-size);height:var(--collection-avatar-size);position:relative;z-index:2;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+    .collection-roster__portrait img{width:var(--collection-avatar-size);height:var(--collection-avatar-size);object-fit:contain;filter:drop-shadow(0 10px 18px rgba(0,0,0,.55));position:relative;z-index:1;}
     .collection-roster__portrait span{position:relative;z-index:1;color:#aee4ff;font-weight:600;letter-spacing:.08em;}
     .collection-roster__aura{position:absolute;inset:50% auto auto 50%;width:183.6%;height:183.6%;transform:translate(-50%,-50%);z-index:1;background-image:var(--ssr-aura);background-position:center;background-repeat:no-repeat;background-size:contain;pointer-events:none;}
     .collection-stage{position:relative;border-radius:0;border:none;background:none;padding:28px;display:flex;flex-direction:column;gap:18px;overflow:hidden;min-height:462px;width:110%;transform:translateX(10%);transform-origin:center;z-index:1;}
@@ -531,6 +531,20 @@ function ensureStyles(){
     .collection-skill-overlay__notes{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:12px;color:#9cbcd9;}
     .collection-skill-overlay__notes li{position:relative;padding-left:16px;}
     .collection-skill-overlay__notes li::before{content:'•';position:absolute;left:0;color:#7da0c7;}
+    .collection-arts-hubs{position:absolute;top:15%;left:10%;width:82%;min-height:70%;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:14px;opacity:0;pointer-events:none;transition:opacity .24s ease,transform .24s ease;transform:translateY(12px);z-index:6;max-height:80vh;}
+    .collection-arts-hubs.is-open{opacity:1;pointer-events:auto;transform:translateY(0);}
+    .collection-arts-hub{position:relative;border:1px solid rgba(125,211,252,.42);background:rgba(8,16,26,.92);box-shadow:0 30px 70px rgba(3,6,12,.62);backdrop-filter:blur(6px);padding:14px;display:flex;flex-direction:column;gap:12px;overflow:hidden;min-height:0;}
+    .collection-arts-hub__icon{position:absolute;top:10px;left:10px;width:28px;height:28px;object-fit:contain;filter:drop-shadow(0 2px 3px rgba(0,0,0,.45));pointer-events:none;}
+    .collection-arts-hub--gear{border:none;background:rgba(7,15,24,.78);box-shadow:0 20px 48px rgba(3,6,12,.55);display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:10px;padding:48px 12px 12px 8px;}
+    .collection-arts-hub--gear .collection-arts-hub__icon{left:8px;top:8px;}
+    .collection-arts-hub__filters{display:flex;flex-direction:column;gap:8px;}
+    .collection-arts-hub__filter{border:1px solid rgba(125,211,252,.32);background:rgba(11,24,35,.84);color:#d6eeff;font-size:10px;letter-spacing:.08em;text-transform:uppercase;writing-mode:vertical-rl;text-orientation:mixed;padding:8px 6px;border-radius:10px;cursor:pointer;min-height:52px;line-height:1.1;}
+    .collection-arts-hub__filter.is-active{background:rgba(22,42,61,.96);border-color:rgba(174,228,255,.7);color:#f2fbff;}
+    .collection-arts-hub__grid-wrap{min-height:0;max-height:calc(var(--collection-gear-slot-size) * 5 + 30px);overflow-y:auto;padding-right:4px;}
+    .collection-arts-hub__grid{display:grid;grid-template-columns:repeat(5,var(--collection-gear-slot-size));grid-template-rows:repeat(10,var(--collection-gear-slot-size));gap:6px;justify-content:start;}
+    .collection-arts-hub__slot{border:1px solid rgba(174,228,255,.4);background:rgba(10,20,30,.72);display:flex;align-items:center;justify-content:center;color:#86a8c4;font-size:11px;}
+    .collection-arts-hub--art{padding:48px 12px 12px;justify-content:flex-start;}
+    .collection-arts-hub__art-placeholder{margin:0;color:#9fc8ea;font-size:12px;letter-spacing:.04em;line-height:1.5;}
     @media(max-width:1200px){
       .collection-view__layout{grid-template-columns:minmax(0,1.6fr) minmax(0,3.3fr) max-content;}
     }
@@ -549,9 +563,7 @@ function ensureStyles(){
     @media(max-width:720px){
       .collection-view__title{font-size:30px;}
       .collection-roster__entry{padding:0;gap:0;}
-      .collection-roster__avatar{width:96px;height:96px;}
-      .collection-roster__portrait{width:96px;height:96px;}
-      .collection-roster__portrait img{width:96px;height:96px;}
+      ..collection-roster__avatar{--collection-avatar-size:96px;}
       .collection-skill-overlay__abilities{gap:10px;}
       .collection-skill-card{padding:8px 12px;gap:8px;flex-wrap:wrap;align-items:flex-start;}
       .collection-skill-card__header{flex-wrap:wrap;gap:8px;}
@@ -559,6 +571,11 @@ function ensureStyles(){
       .collection-skill-card__actions{width:100%;justify-content:flex-start;gap:8px;}
       .collection-skill-card__badge{font-size:11px;}
       .collection-skill-card__upgrade{font-size:11px;padding:6px 12px;}
+      .collection-arts-hubs{top:8%;left:4%;width:92%;grid-template-columns:1fr;gap:10px;}
+      .collection-arts-hub__grid{grid-template-columns:repeat(5,minmax(48px,var(--collection-gear-slot-size)));}
+      .collection-arts-hub__filter{writing-mode:horizontal-tb;text-orientation:mixed;min-height:auto;padding:6px 8px;}
+      .collection-arts-hub--gear{grid-template-columns:1fr;row-gap:10px;padding:46px 10px 10px;}
+      .collection-arts-hub__filters{flex-direction:row;flex-wrap:wrap;}
     }
   `;
 
@@ -1246,6 +1263,68 @@ const miniStats = document.createElement('section');
   const overlay = document.createElement('div');
   overlay.className = 'collection-skill-overlay';
 
+  const artsHubs = document.createElement('section');
+  artsHubs.className = 'collection-arts-hubs';
+
+  const gearHub = document.createElement('article');
+  gearHub.className = 'collection-arts-hub collection-arts-hub--gear';
+
+  const gearHubIcon = document.createElement('img');
+  gearHubIcon.className = 'collection-arts-hub__icon';
+  gearHubIcon.src = 'assets/collection/gear.webp';
+  gearHubIcon.alt = '';
+  gearHubIcon.loading = 'lazy';
+
+  const gearFilters = document.createElement('nav');
+  gearFilters.className = 'collection-arts-hub__filters';
+  const gearFilterItems = ['Tất Cả', 'Vũ Khí', 'Quần', 'Áo', 'Nhẫn'];
+  gearFilterItems.forEach((label, index) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'collection-arts-hub__filter';
+    button.textContent = label;
+    if (index === 0){
+      button.classList.add('is-active');
+    }
+    gearFilters.appendChild(button);
+  });
+
+  const gearGridWrap = document.createElement('div');
+  gearGridWrap.className = 'collection-arts-hub__grid-wrap';
+
+  const gearGrid = document.createElement('div');
+  gearGrid.className = 'collection-arts-hub__grid';
+  for (let i = 0; i < 50; i += 1){
+    const slot = document.createElement('div');
+    slot.className = 'collection-arts-hub__slot';
+    slot.setAttribute('aria-hidden', 'true');
+    gearGrid.appendChild(slot);
+  }
+  gearGridWrap.appendChild(gearGrid);
+
+  gearHub.appendChild(gearHubIcon);
+  gearHub.appendChild(gearFilters);
+  gearHub.appendChild(gearGridWrap);
+
+  const artHub = document.createElement('article');
+  artHub.className = 'collection-arts-hub collection-arts-hub--art';
+
+  const artHubIcon = document.createElement('img');
+  artHubIcon.className = 'collection-arts-hub__icon';
+  artHubIcon.src = 'assets/collection/art.webp';
+  artHubIcon.alt = '';
+  artHubIcon.loading = 'lazy';
+
+  const artHubPlaceholder = document.createElement('p');
+  artHubPlaceholder.className = 'collection-arts-hub__art-placeholder';
+  artHubPlaceholder.textContent = 'Hub công pháp đã sẵn sàng, dữ liệu phân loại sẽ được bổ sung ở bước tiếp theo.';
+
+  artHub.appendChild(artHubIcon);
+  artHub.appendChild(artHubPlaceholder);
+
+  artsHubs.appendChild(gearHub);
+  artsHubs.appendChild(artHub);
+
   const overlayHeader = document.createElement('div');
   overlayHeader.className = 'collection-skill-overlay__header';
 
@@ -1345,6 +1424,7 @@ const overlayDetailPanel = document.createElement('aside');
   stage.appendChild(tuViActions);
   stage.appendChild(stageStatus);
   stage.appendChild(overlay);
+  stage.appendChild(artsHubs);
 
   let activeAbilityCard: HTMLElement | null = null;
 
@@ -1530,7 +1610,10 @@ const overlayDetailPanel = document.createElement('aside');
       }
     }
     stageStatus.textContent = TAB_HINT_BY_KEY[key] || '';
-    if (key === 'skills'){
+    const isSkillTab = key === 'skills';
+    const isArtsTab = key === 'arts';
+
+    if (isSkillTab){
       overlay.classList.add('is-open');
       if (activeUnitId){
         renderSkillAbilityList(activeUnitId);
@@ -1538,6 +1621,12 @@ const overlayDetailPanel = document.createElement('aside');
     } else {
       overlay.classList.remove('is-open');
       clearSkillDetail();
+    }
+
+    if (isArtsTab){
+      artsHubs.classList.add('is-open');
+    } else {
+      artsHubs.classList.remove('is-open');
     }
   };
 

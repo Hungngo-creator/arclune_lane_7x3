@@ -509,12 +509,18 @@ describe('renderArenaHubScreen', () => {
     const cards = root.querySelectorAll<HTMLButtonElement>('.arena-hub__grid .mode-card');
     expect(cards).toHaveLength(6);
 
+    const cardOrder = Array.from(cards).map(card => card.dataset.mode ?? null);
+    expect(cardOrder).toEqual(['arena', 'beast-arena', 'co-ty-phu', 'ares', 'challenge', 'campaign']);
+
     const monopolyCard = root.querySelector<HTMLButtonElement>('.arena-hub__grid .mode-card[data-mode="co-ty-phu"]');
     expect(monopolyCard).not.toBeNull();
     expect(monopolyCard?.classList.contains('mode-card--coming')).toBe(true);
 
     const status = monopolyCard?.querySelector('.mode-card__status');
     expect(status?.textContent).toContain('Coming soon');
+
+    const tags = Array.from(monopolyCard?.querySelectorAll('.mode-tag') ?? []).map(tag => tag.textContent?.trim());
+    expect(tags).toEqual(['PvP', 'Coming soon']);
 
     monopolyCard?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(enterScreen).toHaveBeenCalledWith('main-menu', null);

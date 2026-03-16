@@ -38,8 +38,8 @@ Từ `TP_DELTA`, mỗi 1 TP cộng trực tiếp vào stat pre-rank như sau:
 - HP: +20
 - ATK: +1
 - WIL: +1
-- ARM: +0.01
-- RES: +0.01
+- ARM: +0.5
+- RES: +0.5
 - AGI: +1
 - PER: +1
 - AEmax: +10
