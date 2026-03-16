@@ -540,9 +540,9 @@ function ensureStyles(){
     .collection-arts-hub__filters{display:flex;flex-direction:column;gap:8px;}
     .collection-arts-hub__filter{border:1px solid rgba(125,211,252,.32);background:rgba(11,24,35,.84);color:#d6eeff;font-size:10px;letter-spacing:.08em;text-transform:uppercase;writing-mode:vertical-rl;text-orientation:mixed;padding:8px 6px;border-radius:10px;cursor:pointer;min-height:52px;line-height:1.1;}
     .collection-arts-hub__filter.is-active{background:rgba(22,42,61,.96);border-color:rgba(174,228,255,.7);color:#f2fbff;}
-    .collection-arts-hub__grid-wrap{min-height:0;max-height:calc(((100% - 24px) / 5) * 5 + 24px);overflow-y:auto;padding-right:4px;}
+    .collection-arts-hub__grid-wrap{min-height:0;overflow-y:auto;padding-right:4px;}
     .collection-arts-hub__grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;align-content:start;}
-    .collection-arts-hub__slot{width:100%;aspect-ratio:1 / 1;box-sizing:border-box;border:1px solid rgba(174,228,255,.58);background:rgba(10,20,30,.4);display:flex;align-items:center;justify-content:center;color:#86a8c4;font-size:11px;box-shadow:inset 0 0 0 1px rgba(12,28,40,.55);}
+    .collection-arts-hub__slot{width:100%;aspect-ratio:1 / 1;box-sizing:border-box;border:1px solid rgba(174,228,255,.58);background:rgba(10,20,30,.4);display:flex;align-items:center;justify-content:center;color:#86a8c4;font-size:11px;box-shadow:inset 0 0 0 1px rgba(12,28,40,.55);
     .collection-arts-hub--art{padding:48px 12px 12px;justify-content:flex-start;}
     .collection-arts-hub__art-placeholder{margin:0;color:#9fc8ea;font-size:12px;letter-spacing:.04em;line-height:1.5;}
     @media(max-width:1200px){
@@ -1283,12 +1283,22 @@ const miniStats = document.createElement('section');
 
   const gearFilters = document.createElement('nav');
   gearFilters.className = 'collection-arts-hub__filters';
-  const gearFilterItems = ['Tất Cả', 'Vũ Khí', 'Quần', 'Áo', 'Nhẫn'];
-  gearFilterItems.forEach((label, index) => {
+  const gearFilterItems = [
+    { key: 'all', label: 'Tất Cả' },
+    { key: 'weapon', label: 'Vũ Khí' },
+    { key: 'pants', label: 'Quần' },
+    { key: 'shirt', label: 'Áo' },
+    { key: 'ring', label: 'Nhẫn' },
+  ] as const;
+
+  let activeGearFilter: (typeof gearFilterItems)[number]['key'] = 'all';
+
+  gearFilterItems.forEach(({ key, label }, index) => {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'collection-arts-hub__filter';
     button.textContent = label;
+    button.dataset.filter = key;
     if (index === 0){
       button.classList.add('is-active');
     }
@@ -1300,13 +1310,77 @@ const miniStats = document.createElement('section');
 
   const gearGrid = document.createElement('div');
   gearGrid.className = 'collection-arts-hub__grid';
-  for (let i = 0; i < 50; i += 1){
-    const slot = document.createElement('div');
-    slot.className = 'collection-arts-hub__slot';
-    slot.setAttribute('aria-hidden', 'true');
-    gearGrid.appendChild(slot);
-  }
+
+  const gearSlotCategories = ['weapon', 'pants', 'shirt', 'ring'] as const;
+  const gearSlots = Array.from({ length: 50 }, (_, index) => ({
+    category: gearSlotCategories[index % gearSlotCategories.length],
+  }));
+
+  const renderGearGrid = (): void => {
+    const fragment = document.createDocumentFragment();
+    const visibleSlots = activeGearFilter === 'all'
+      ? gearSlots
+      : gearSlots.filter((slot) => slot.category === activeGearFilter);
+    visibleSlots.forEach(() => {
+      const slot = document.createElement('div');
+      slot.className = 'collection-arts-hub__slot';
+      slot.setAttribute('aria-hidden', 'true');
+      fragment.appendChild(slot);
+    });
+    gearGrid.replaceChildren(fragment);
+  };
+
+  const syncGearGridViewportHeight = (): void => {
+    const firstSlot = gearGrid.querySelector<HTMLElement>('.collection-arts-hub__slot');
+    if (!firstSlot){
+      return;
+    }
+    const rowHeight = firstSlot.offsetHeight;
+    if (!Number.isFinite(rowHeight) || rowHeight <= 0){
+      return;
+    }
+    const computedGridStyle = window.getComputedStyle(gearGrid);
+    const gap = Number.parseFloat(computedGridStyle.rowGap || computedGridStyle.gap || '0');
+    const safeGap = Number.isFinite(gap) ? Math.max(0, gap) : 0;
+    const visibleRows = 5;
+    const maxHeight = (rowHeight * visibleRows) + (safeGap * (visibleRows - 1));
+    gearGridWrap.style.maxHeight = `${Math.max(0, Math.round(maxHeight))}px`;
+  };
+
+  const handleGearFilterClick = (event: Event): void => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)){
+      return;
+    }
+    const button = target.closest<HTMLButtonElement>('.collection-arts-hub__filter');
+    if (!button){
+      return;
+    }
+    const filter = button.dataset.filter;
+    const filterItem = gearFilterItems.find((item) => item.key === filter);
+    if (!filterItem){
+      return;
+    }
+    if (activeGearFilter === filterItem.key){
+      return;
+    }
+    activeGearFilter = filterItem.key;
+    for (const candidate of gearFilters.querySelectorAll<HTMLButtonElement>('.collection-arts-hub__filter')){
+      candidate.classList.toggle('is-active', candidate === button);
+    }
+    renderGearGrid();
+    syncGearGridViewportHeight();
+    gearGridWrap.scrollTop = 0;
+  };
+
+  gearFilters.addEventListener('click', handleGearFilterClick);
+  addCleanup(() => gearFilters.removeEventListener('click', handleGearFilterClick));
+  window.addEventListener('resize', syncGearGridViewportHeight);
+  addCleanup(() => window.removeEventListener('resize', syncGearGridViewportHeight));
+
+  renderGearGrid();
   gearGridWrap.appendChild(gearGrid);
+  requestAnimationFrame(syncGearGridViewportHeight);
 
   gearHub.appendChild(gearHubIcon);
   gearHub.appendChild(gearFilters);
