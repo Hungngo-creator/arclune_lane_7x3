@@ -5,6 +5,8 @@ const BOARD_SIZE = 11;
 const MAIN_TRACK_CELLS = 40;
 const SIDE_TRACK_LENGTH = 10;
 const TOTAL_CELLS = MAIN_TRACK_CELLS + SIDE_TRACK_LENGTH * 4;
+const INNER_SNAKE_ROWS = 8;
+const INNER_SNAKE_COLS = 5;
 
 const CSS = /* css */ `
   .app--co-ty-phu{
@@ -73,6 +75,8 @@ export interface BoardCell {
   readonly track: 'main' | 'lane' | 'connector';
 }
 
+const CELL_KEY_MULTIPLIER = 100;
+
 function generateMainTrackCells(): BoardCell[] {
   const cells: BoardCell[] = [];
   const size = BOARD_SIZE;
@@ -93,25 +97,21 @@ function generateMainTrackCells(): BoardCell[] {
 function generateInnerLanes(startIndex: number): BoardCell[] {
   const lanes: BoardCell[] = [];
   let index = startIndex;
-
-  for (let row = 1; row <= SIDE_TRACK_LENGTH; row += 1) {
-    lanes.push({ index: index++, row, col: 2, track: row <= 2 ? 'connector' : 'lane' });
+  for (let row = 1; row <= INNER_SNAKE_ROWS; row += 1) {
+    const leftToRight = row % 2 === 1;
+    if (leftToRight) {
+      for (let col = 1; col <= INNER_SNAKE_COLS; col += 1) {
+        lanes.push({ index: index++, row, col, track: col === 1 || col === INNER_SNAKE_COLS ? 'connector' : 'lane' });
+      }
+    } else {
+      for (let col = INNER_SNAKE_COLS; col >= 1; col -= 1) {
+        lanes.push({ index: index++, row, col, track: col === 1 || col === INNER_SNAKE_COLS ? 'connector' : 'lane' });
+      }
+    }
   }
-
-  for (let col = 1; col <= SIDE_TRACK_LENGTH; col += 1) {
-    lanes.push({ index: index++, row: 2, col, track: col <= 2 ? 'connector' : 'lane' });
+  if (lanes.length !== SIDE_TRACK_LENGTH * 4) {
+    throw new Error(`Lane phụ sai số ô: ${lanes.length}/${SIDE_TRACK_LENGTH * 4}`);
   }
-
-  for (let row = BOARD_SIZE - 2; row >= BOARD_SIZE - 1 - SIDE_TRACK_LENGTH; row -= 1) {
-    const step = BOARD_SIZE - 2 - row + 1;
-    lanes.push({ index: index++, row, col: BOARD_SIZE - 3, track: step <= 2 ? 'connector' : 'lane' });
-  }
-
-  for (let col = BOARD_SIZE - 2; col >= BOARD_SIZE - 1 - SIDE_TRACK_LENGTH; col -= 1) {
-    const step = BOARD_SIZE - 2 - col + 1;
-    lanes.push({ index: index++, row: BOARD_SIZE - 3, col, track: step <= 2 ? 'connector' : 'lane' });
-  }
-
   return lanes;
 }
 
@@ -121,6 +121,14 @@ export function createMonopolyBoardCells(): ReadonlyArray<BoardCell> {
   const cells = [...mainTrack, ...innerLanes];
   if (cells.length !== TOTAL_CELLS) {
     throw new Error(`Tổng số ô bàn cờ sai: ${cells.length}/${TOTAL_CELLS}`);
+  }
+  const occupied = new Set<number>();
+  for (const cell of cells) {
+    const key = cell.row * CELL_KEY_MULTIPLIER + cell.col;
+    if (occupied.has(key)) {
+      throw new Error(`Ô bàn cờ bị trùng tọa độ tại row=${cell.row}, col=${cell.col}`);
+    }
+    occupied.add(key);
   }
   return Object.freeze(cells);
 }

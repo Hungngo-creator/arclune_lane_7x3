@@ -488,7 +488,7 @@ describe('renderCollectionScreen', () => {
 });
 
 describe('renderArenaHubScreen', () => {
-  it('hiển thị đủ 6 card trong Chiến Trường và xử lý click coming-soon cho Cờ Tỷ Phú', () => {
+  it('hiển thị đủ 6 card trong Chiến Trường và điều hướng vào Cờ Tỷ Phú', () => {
     const root = document.createElement('div');
     document.body.appendChild(root);
 
@@ -514,16 +514,13 @@ describe('renderArenaHubScreen', () => {
 
     const monopolyCard = root.querySelector<HTMLButtonElement>('.arena-hub__grid .mode-card[data-mode="co-ty-phu"]');
     expect(monopolyCard).not.toBeNull();
-    expect(monopolyCard?.classList.contains('mode-card--coming')).toBe(true);
-
-    const status = monopolyCard?.querySelector('.mode-card__status');
-    expect(status?.textContent).toContain('Coming soon');
+    expect(monopolyCard?.classList.contains('mode-card--coming')).toBe(false);
 
     const tags = Array.from(monopolyCard?.querySelectorAll('.mode-tag') ?? []).map(tag => tag.textContent?.trim());
-    expect(tags).toEqual(['PvP', 'Coming soon']);
+    expect(tags).toEqual(['PvP']);
 
     monopolyCard?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    expect(enterScreen).toHaveBeenCalledWith('main-menu', null);
+    expect(enterScreen).toHaveBeenCalledWith('co-ty-phu', null);
 
     const backButton = root.querySelector<HTMLButtonElement>('.arena-hub__back');
     backButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));

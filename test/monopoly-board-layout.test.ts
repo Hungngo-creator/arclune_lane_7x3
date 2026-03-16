@@ -7,6 +7,12 @@ describe('monopoly board layout', () => {
     expect(cells.filter(cell => cell.track === 'main')).toHaveLength(40);
   });
 
+it('does not overlap coordinates between tracks', () => {
+    const cells = createMonopolyBoardCells();
+    const coordSet = new Set(cells.map(cell => `${cell.row},${cell.col}`));
+    expect(coordSet.size).toBe(cells.length);
+  });
+
   it('keeps all cells inside 11x11 board and indexes contiguous', () => {
     const cells = createMonopolyBoardCells();
     cells.forEach((cell, idx) => {
