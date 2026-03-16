@@ -136,6 +136,7 @@ const APP_SCREEN_CLASSES = [
   `app--${SCREEN_GACHA}`,
   `app--${SCREEN_ARENA_HUB}`,
   `app--${SCREEN_CAMPAIGN_WORLD_MAP}`,
+  'app--co-ty-phu',
   `app--${SCREEN_SECT}`,
   `app--${SCREEN_SECT_TACTICAL_AI}`,
 ];

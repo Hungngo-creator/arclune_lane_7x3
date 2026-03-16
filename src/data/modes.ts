@@ -23,6 +23,7 @@ const COLLECTION_SCREEN_MODULE_ID = '@screens/collection/index.ts' as const;
 const GACHA_SCREEN_MODULE_ID = '@screens/ui-gacha/index.ts' as const;
 const ARENA_HUB_SCREEN_MODULE_ID = '@screens/arena-hub/index.ts' as const;
 const CAMPAIGN_WORLD_MAP_SCREEN_MODULE_ID = '@screens/campaign-world-map/index.ts' as const;
+const MONOPOLY_SCREEN_MODULE_ID = '@screens/monopoly/index.ts' as const;
 const SECT_SCREEN_MODULE_ID = './screens/sect/index.ts' as const;
 
 const MODE_TYPES = {
@@ -262,16 +263,16 @@ const MODES = [
     id: 'co-ty-phu',
     title: 'Cờ Tỷ Phú',
     type: MODE_TYPES.PVP,
-    status: MODE_STATUS.COMING_SOON,
+    status: MODE_STATUS.AVAILABLE,
     icon: '🎲',
-    shortDescription: 'Chế độ cờ theo lượt trong cụm Chiến Trường, đang chờ mở khóa vòng gameplay chính thức.',
-    unlockNotes: 'Tạm hiển thị ở trạng thái Coming soon để người chơi theo dõi trước khi gameplay hoàn thiện.',
-    tags: ['PvP', 'Coming soon'],
+    shortDescription: 'Chế độ cờ theo lượt trong cụm Chiến Trường với bàn 80 ô cho vòng MVP đầu tiên.',
+    unlockNotes: 'MVP hiện cho phép vào thẳng bàn cờ để kiểm tra route và bố cục bàn 80 ô.',
+    tags: ['PvP'],
     menuSections: ['core-pve'],
     parentId: 'arena-hub',
     shell: {
-      screenId: 'main-menu',
-      fallbackModuleId: COMING_SOON_MODULE_ID
+      screenId: 'co-ty-phu',
+      moduleId: MONOPOLY_SCREEN_MODULE_ID
     }
   }
 ] satisfies ReadonlyArray<ModeConfig>;
