@@ -531,8 +531,8 @@ function ensureStyles(){
     .collection-skill-overlay__notes{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:12px;color:#9cbcd9;}
     .collection-skill-overlay__notes li{position:relative;padding-left:16px;}
     .collection-skill-overlay__notes li::before{content:'•';position:absolute;left:0;color:#7da0c7;}
-    .collection-arts-hubs{position:absolute;top:15%;left:10%;width:82%;min-height:70%;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:14px;opacity:0;pointer-events:none;transition:opacity .24s ease,transform .24s ease;transform:translateY(12px);z-index:6;max-height:80vh;}
-    .collection-arts-hubs.is-open{opacity:1;pointer-events:auto;transform:translateY(0);}
+    .collection-arts-hubs{position:absolute;top:15%;left:50%;width:82%;min-height:70%;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:14px;opacity:0;pointer-events:none;transition:opacity .24s ease,transform .24s ease;transform:translate(-50%,12px);z-index:6;max-height:80vh;}
+    .collection-arts-hubs.is-open{opacity:1;pointer-events:auto;transform:translate(-50%,0);}
     .collection-arts-hub{position:relative;border:1px solid rgba(125,211,252,.42);background:rgba(8,16,26,.92);box-shadow:0 30px 70px rgba(3,6,12,.62);backdrop-filter:blur(6px);padding:14px;display:flex;flex-direction:column;gap:12px;overflow:hidden;min-height:0;}
     .collection-arts-hub__icon{position:absolute;top:10px;left:10px;width:28px;height:28px;object-fit:contain;filter:drop-shadow(0 2px 3px rgba(0,0,0,.45));pointer-events:none;}
     .collection-arts-hub--gear{border:none;background:rgba(7,15,24,.78);box-shadow:0 20px 48px rgba(3,6,12,.55);display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:10px;padding:48px 12px 12px 8px;}
@@ -541,8 +541,8 @@ function ensureStyles(){
     .collection-arts-hub__filter{border:1px solid rgba(125,211,252,.32);background:rgba(11,24,35,.84);color:#d6eeff;font-size:10px;letter-spacing:.08em;text-transform:uppercase;writing-mode:vertical-rl;text-orientation:mixed;padding:8px 6px;border-radius:10px;cursor:pointer;min-height:52px;line-height:1.1;}
     .collection-arts-hub__filter.is-active{background:rgba(22,42,61,.96);border-color:rgba(174,228,255,.7);color:#f2fbff;}
     .collection-arts-hub__grid-wrap{min-height:0;max-height:calc(var(--collection-gear-slot-size) * 5 + 30px);overflow-y:auto;padding-right:4px;}
-    .collection-arts-hub__grid{display:grid;grid-template-columns:repeat(5,var(--collection-gear-slot-size));grid-template-rows:repeat(10,var(--collection-gear-slot-size));gap:6px;justify-content:start;}
-    .collection-arts-hub__slot{border:1px solid rgba(174,228,255,.4);background:rgba(10,20,30,.72);display:flex;align-items:center;justify-content:center;color:#86a8c4;font-size:11px;}
+    .collection-arts-hub__grid{display:grid;grid-template-columns:repeat(5,var(--collection-gear-slot-size));grid-template-rows:repeat(10,var(--collection-gear-slot-size));gap:6px;justify-content:center;}
+    .collection-arts-hub__slot{width:var(--collection-gear-slot-size);height:var(--collection-gear-slot-size);box-sizing:border-box;border:1px solid rgba(174,228,255,.58);background:rgba(10,20,30,.4);display:flex;align-items:center;justify-content:center;color:#86a8c4;font-size:11px;box-shadow:inset 0 0 0 1px rgba(12,28,40,.55);}
     .collection-arts-hub--art{padding:48px 12px 12px;justify-content:flex-start;}
     .collection-arts-hub__art-placeholder{margin:0;color:#9fc8ea;font-size:12px;letter-spacing:.04em;line-height:1.5;}
     @media(max-width:1200px){
@@ -571,7 +571,7 @@ function ensureStyles(){
       .collection-skill-card__actions{width:100%;justify-content:flex-start;gap:8px;}
       .collection-skill-card__badge{font-size:11px;}
       .collection-skill-card__upgrade{font-size:11px;padding:6px 12px;}
-      .collection-arts-hubs{top:8%;left:4%;width:92%;grid-template-columns:1fr;gap:10px;}
+      .collection-arts-hubs{top:8%;left:50%;width:92%;grid-template-columns:1fr;gap:10px;}
       .collection-arts-hub__grid{grid-template-columns:repeat(5,minmax(48px,var(--collection-gear-slot-size)));}
       .collection-arts-hub__filter{writing-mode:horizontal-tb;text-orientation:mixed;min-height:auto;padding:6px 8px;}
       .collection-arts-hub--gear{grid-template-columns:1fr;row-gap:10px;padding:46px 10px 10px;}
@@ -718,8 +718,13 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
     if (typeof fn === 'function') cleanups.push(fn);
   };
 
-  const filterState: FilterState = createFilterState();
   const savedProfile = loadPlayerProfile();
+  const savedCollectionUi = savedProfile.collectionUi ?? {};
+  const initialTabCandidate = typeof savedCollectionUi.activeTab === 'string' ? savedCollectionUi.activeTab : null;
+  const initialActiveTab: CollectionTabKey = initialTabCandidate && TAB_DEFINITIONS.some((tab) => tab.key === initialTabCandidate)
+    ? initialTabCandidate as CollectionTabKey
+    : 'arts';
+  const filterState: FilterState = createFilterState({ activeTab: initialActiveTab });
   const savedCultivationByUnit: Record<string, { realm: number; subRealm: number }> = {
     ...(savedProfile.cultivationByUnit ?? {}),
   };
@@ -727,6 +732,7 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
   const savedTpAllocByUnit: Record<string, TpAllocMap> = Object.fromEntries(
     Object.entries(savedProfile.tpAllocByUnit ?? {}).map(([unitId, alloc]) => [unitId, normalizeTpAllocMap(alloc)]),
   );
+  let shouldAutoOpenArtsHubs = savedCollectionUi.artsHubAutoOpen !== false;
   let activeUnitId: string | null = null;
   const mutablePlayerState: CultivationPlayerState = {
     ...(playerState as CultivationPlayerState),
@@ -1623,7 +1629,7 @@ const overlayDetailPanel = document.createElement('aside');
       clearSkillDetail();
     }
 
-    if (isArtsTab){
+    if (isArtsTab && shouldAutoOpenArtsHubs){
       artsHubs.classList.add('is-open');
     } else {
       artsHubs.classList.remove('is-open');
@@ -1631,6 +1637,35 @@ const overlayDetailPanel = document.createElement('aside');
   };
 
   const handleTabClick = (key: CollectionTabKey) => {
+    if (key === 'arts' && filterState.activeTab === 'arts' && artsHubs.classList.contains('is-open')){
+      shouldAutoOpenArtsHubs = false;
+      patchPlayerProfile({
+        collectionUi: {
+          activeTab: 'arts',
+          artsHubAutoOpen: false,
+        },
+      });
+      setActiveTab('arts');
+      return;
+    }
+
+    if (key === 'arts'){
+      shouldAutoOpenArtsHubs = true;
+      patchPlayerProfile({
+        collectionUi: {
+          activeTab: 'arts',
+          artsHubAutoOpen: true,
+        },
+      });
+    } else {
+      patchPlayerProfile({
+        collectionUi: {
+          activeTab: key,
+          artsHubAutoOpen: shouldAutoOpenArtsHubs,
+        },
+      });
+    }
+
     setActiveTab(key);
   };
 
@@ -1928,7 +1963,11 @@ const resolveCurrentCultivation = () => {
     }
   }
 
-  setActiveTab(filterState.activeTab);
+  if (shouldAutoOpenArtsHubs){
+    setActiveTab('arts');
+  } else {
+    setActiveTab(filterState.activeTab);
+  }
 
   return {
     destroy(){

@@ -15,6 +15,10 @@ export interface SavedPlayerProfile {
   tpByUnit?: Record<string, number>;
   tpAllocByUnit?: Record<string, Partial<Record<'HP' | 'ATK' | 'WIL' | 'ARM' | 'RES', number>>>;
   tacticalAiByUnit?: Record<string, unknown>;
+  collectionUi?: {
+    activeTab?: string;
+    artsHubAutoOpen?: boolean;
+  };
 }
 
 const STORAGE_KEY = 'arclune.playerProfile.v1';
@@ -66,6 +70,10 @@ export function patchPlayerProfile(patch: SavedPlayerProfile): SavedPlayerProfil
     tacticalAiByUnit: {
       ...(current.tacticalAiByUnit ?? {}),
       ...(patch.tacticalAiByUnit ?? {}),
+    },
+    collectionUi: {
+      ...(current.collectionUi ?? {}),
+      ...(patch.collectionUi ?? {}),
     },
   };
   savePlayerProfile(merged);
