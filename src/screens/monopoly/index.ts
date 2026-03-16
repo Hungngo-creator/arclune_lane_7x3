@@ -1,12 +1,13 @@
 import { ensureStyleTag, mountSection } from '../../ui/dom.ts';
 
 const STYLE_ID = 'monopoly-screen-style';
-const BOARD_SIZE = 11;
+const BOARD_SIZE = 13;
+const MAIN_TRACK_OFFSET = 1;
+const MAIN_RING_SIZE = 11;
 const MAIN_TRACK_CELLS = 40;
 const SIDE_TRACK_LENGTH = 10;
 const TOTAL_CELLS = MAIN_TRACK_CELLS + SIDE_TRACK_LENGTH * 4;
-const INNER_SNAKE_ROWS = 8;
-const INNER_SNAKE_COLS = 5;
+const INNER_COLUMN_HEIGHT = 9;
 
 const CSS = /* css */ `
   .app--co-ty-phu{
@@ -79,13 +80,14 @@ const CELL_KEY_MULTIPLIER = 100;
 
 function generateMainTrackCells(): BoardCell[] {
   const cells: BoardCell[] = [];
-  const size = BOARD_SIZE;
+  const start = MAIN_TRACK_OFFSET;
+  const end = MAIN_TRACK_OFFSET + MAIN_RING_SIZE - 1;
   let index = 0;
 
-  for (let col = 0; col < size; col += 1) cells.push({ index: index++, row: 0, col, track: 'main' });
-  for (let row = 1; row < size; row += 1) cells.push({ index: index++, row, col: size - 1, track: 'main' });
-  for (let col = size - 2; col >= 0; col -= 1) cells.push({ index: index++, row: size - 1, col, track: 'main' });
-  for (let row = size - 2; row > 0; row -= 1) cells.push({ index: index++, row, col: 0, track: 'main' });
+  for (let col = start; col <= end; col += 1) cells.push({ index: index++, row: start, col, track: 'main' });
+  for (let row = start + 1; row <= end; row += 1) cells.push({ index: index++, row, col: end, track: 'main' });
+  for (let col = end - 1; col >= start; col -= 1) cells.push({ index: index++, row: end, col, track: 'main' });
+  for (let row = end - 1; row > start; row -= 1) cells.push({ index: index++, row, col: start, track: 'main' });
 
   if (cells.length !== MAIN_TRACK_CELLS) {
     throw new Error(`Main track sai số ô: ${cells.length}/${MAIN_TRACK_CELLS}`);
@@ -97,18 +99,30 @@ function generateMainTrackCells(): BoardCell[] {
 function generateInnerLanes(startIndex: number): BoardCell[] {
   const lanes: BoardCell[] = [];
   let index = startIndex;
-  for (let row = 1; row <= INNER_SNAKE_ROWS; row += 1) {
-    const leftToRight = row % 2 === 1;
-    if (leftToRight) {
-      for (let col = 1; col <= INNER_SNAKE_COLS; col += 1) {
-        lanes.push({ index: index++, row, col, track: col === 1 || col === INNER_SNAKE_COLS ? 'connector' : 'lane' });
-      }
-    } else {
-      for (let col = INNER_SNAKE_COLS; col >= 1; col -= 1) {
-        lanes.push({ index: index++, row, col, track: col === 1 || col === INNER_SNAKE_COLS ? 'connector' : 'lane' });
-      }
+
+  const pushColumn = (col: number, track: 'lane' | 'connector') => {
+    for (let row = MAIN_TRACK_OFFSET + 1; row <= MAIN_TRACK_OFFSET + INNER_COLUMN_HEIGHT; row += 1) {
+      lanes.push({ index: index++, row, col, track });
     }
+  };
+
+  // Giảm 1 cột tím (còn 2), tăng chiều cao mỗi cột lane/connector lên 9 ô.
+  pushColumn(3, 'connector');
+  pushColumn(5, 'lane');
+  pushColumn(7, 'lane');
+  pushColumn(9, 'connector');
+
+  // Các ô chỉa ra ngoài bàn cờ tương ứng 2-10, 12-20, 22-30 và 32-40.
+  const protrusions: Array<{ row: number; col: number; track: 'lane' | 'connector' }> = [
+    { row: 0, col: 6, track: 'lane' },
+    { row: 6, col: 12, track: 'connector' },
+    { row: 12, col: 6, track: 'lane' },
+    { row: 6, col: 0, track: 'connector' }
+  ];
+  for (const protrusion of protrusions) {
+    lanes.push({ index: index++, ...protrusion });
   }
+
   if (lanes.length !== SIDE_TRACK_LENGTH * 4) {
     throw new Error(`Lane phụ sai số ô: ${lanes.length}/${SIDE_TRACK_LENGTH * 4}`);
   }
@@ -170,7 +184,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
 
   const meta = document.createElement('div');
   meta.className = 'monopoly-screen__meta';
-  meta.innerHTML = '<span>Bàn chính: 40 ô</span><span>Lane phụ: 40 ô</span><span>Tổng: 80 ô</span>';
+  meta.innerHTML = `<span>Bàn chính: ${MAIN_TRACK_CELLS} ô</span><span>Lane phụ: ${SIDE_TRACK_LENGTH * 4} ô</span><span>Tổng: ${TOTAL_CELLS} ô</span>`;
   topbar.appendChild(meta);
 
   wrapper.appendChild(topbar);
