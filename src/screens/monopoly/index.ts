@@ -1,8 +1,8 @@
 import { ensureStyleTag, mountSection } from '../../ui/dom.ts';
 
 const STYLE_ID = 'monopoly-screen-style';
-const BOARD_SIZE = 13;
-const MAIN_TRACK_OFFSET = 1;
+const BOARD_SIZE = 15;
+const MAIN_TRACK_OFFSET = 2;
 const MAIN_RING_SIZE = 11;
 const MAIN_TRACK_CELLS = 40;
 const SIDE_TRACK_COLUMN_HEIGHT = 9;
@@ -107,21 +107,26 @@ function generateInnerLanes(startIndex: number): BoardCell[] {
     }
   };
 
-  // Giảm 1 cột tím (còn 2), tăng chiều cao mỗi cột lane/connector lên 9 ô.
-  pushColumn(3, 'connector');
-  pushColumn(5, 'lane');
-  pushColumn(7, 'lane');
-  pushColumn(9, 'connector');
+  const pushRow = (row: number, track: 'lane' | 'connector') => {
+    for (let col = MAIN_TRACK_OFFSET + 1; col <= MAIN_TRACK_OFFSET + INNER_COLUMN_HEIGHT; col += 1) {
+      lanes.push({ index: index++, row, col, track });
+    }
+  };
+
+  pushColumn(0, 'connector');
+  pushRow(0, 'lane');
+  pushRow(14, 'lane');
+  pushColumn(14, 'connector');
 
   const protrusions: Array<{ row: number; col: number; track: 'lane' | 'connector' }> = [
-    { row: 2, col: 0, track: 'connector' },
-    { row: 10, col: 0, track: 'connector' },
-    { row: 0, col: 2, track: 'lane' },
-    { row: 0, col: 10, track: 'lane' },
-    { row: 2, col: 12, track: 'connector' },
-    { row: 10, col: 12, track: 'connector' },
-    { row: 12, col: 10, track: 'lane' },
-    { row: 12, col: 2, track: 'lane' }
+   { row: 3, col: 1, track: 'connector' },
+    { row: 11, col: 1, track: 'connector' },
+    { row: 1, col: 3, track: 'lane' },
+    { row: 1, col: 11, track: 'lane' },
+    { row: 3, col: 13, track: 'connector' },
+    { row: 11, col: 13, track: 'connector' },
+    { row: 13, col: 3, track: 'lane' },
+    { row: 13, col: 11, track: 'lane' }
   ];
   for (const protrusion of protrusions) {
     lanes.push({ index: index++, ...protrusion });
