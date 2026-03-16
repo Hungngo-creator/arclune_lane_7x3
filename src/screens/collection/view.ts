@@ -98,7 +98,8 @@ interface EquipmentItem {
   id: string;
   name: string;
   slot: EquipmentSlotKey;
-  tpDelta: number;
+  quantity?: number;
+  tpAlloc?: Partial<Record<string, number>>;
   setName?: string | null;
   icon?: string | null;
   symbol?: string | null;
@@ -140,20 +141,11 @@ const EQUIPMENT_SLOT_FILTER: Readonly<Record<EquipmentSlotKey, EquipmentSlotKey>
 });
 
 const EQUIPMENT_INVENTORY: ReadonlyArray<EquipmentItem> = Object.freeze([
-  { id: 'head-aura-thietgiap', name: 'Huy Quang Thiết Giáp', slot: 'head', tpDelta: 2, setName: 'Thiết Giáp', symbol: '◉' },
-  { id: 'head-crown-thienhoa', name: 'Vương Miện Thiên Hoa', slot: 'head', tpDelta: 2, setName: 'Thiên Hoa', symbol: '◉' },
-  { id: 'shirt-thietgiap', name: 'Áo Thiết Giáp', slot: 'shirt', tpDelta: 4, setName: 'Thiết Giáp' },
-  { id: 'shirt-thienhoa', name: 'Y Phục Thiên Hoa', slot: 'shirt', tpDelta: 4, setName: 'Thiên Hoa' },
-  { id: 'weapon-thietgiap-kiem', name: 'Thiết Kiếm Trấn Tâm', slot: 'weapon', tpDelta: 3, setName: 'Thiết Giáp', symbol: '⚔' },
-  { id: 'weapon-thienhoa-sao', name: 'Thiên Hoa Sáo', slot: 'weapon', tpDelta: 3, setName: 'Thiên Hoa', symbol: '⚔' },
-  { id: 'accessory-thietgiap-ngoc', name: 'Ngọc Bội Thiết Giáp', slot: 'accessory', tpDelta: 2, setName: 'Thiết Giáp' },
-  { id: 'accessory-thienhoa-daychuyen', name: 'Dây Chuyền Thiên Hoa', slot: 'accessory', tpDelta: 2, setName: 'Thiên Hoa' },
-  { id: 'pants-thietgiap', name: 'Quần Thiết Giáp', slot: 'pants', tpDelta: 4, setName: 'Thiết Giáp' },
-  { id: 'pants-thienhoa', name: 'Quần Thiên Hoa', slot: 'pants', tpDelta: 4, setName: 'Thiên Hoa' },
-  { id: 'ring-thietgiap-1', name: 'Nhẫn Thiết Giáp I', slot: 'ring1', tpDelta: 1, setName: 'Thiết Giáp', symbol: '◌' },
-  { id: 'ring-thietgiap-2', name: 'Nhẫn Thiết Giáp II', slot: 'ring1', tpDelta: 1, setName: 'Thiết Giáp', symbol: '◌' },
-  { id: 'ring-thienhoa-1', name: 'Nhẫn Thiên Hoa I', slot: 'ring1', tpDelta: 1, setName: 'Thiên Hoa', symbol: '◌' },
-  { id: 'ring-thienhoa-2', name: 'Nhẫn Thiên Hoa II', slot: 'ring1', tpDelta: 1, setName: 'Thiên Hoa', symbol: '◌' },
+ { id: 'ao-luyen-khi-su-vo-danh', name: 'Áo của luyện khí sư vô danh', slot: 'shirt', tpAlloc: { ARM: 1, RES: 1, HP: 2 }, setName: 'Luyện khí sư vô danh' },
+  { id: 'quan-luyen-khi-su-vo-danh', name: 'Quần của luyện khí sư vô danh', slot: 'pants', tpAlloc: { AGI: 2, HP: 1 }, setName: 'Luyện khí sư vô danh' },
+  { id: 'kiem-cu-luyen-khi-su-vo-danh', name: 'Kiếm cũ của luyện khí sư vô danh', slot: 'weapon', tpAlloc: { ATK: 2, WIL: 1 }, setName: 'Luyện khí sư vô danh', symbol: '⚔' },
+  { id: 'mu-ke-hanh-khat', name: 'Mũ của kẻ hành khất', slot: 'head', tpAlloc: { HP: 1, HPregen: 1 }, symbol: '◉' },
+  { id: 'nhan-ke-hanh-khat', name: 'Nhẫn của kẻ hành khất', slot: 'ring1', tpAlloc: { ATK: 1, WIL: 1 }, quantity: 2, symbol: '◌' },
 ]);
 
 const EQUIPMENT_ITEM_BY_ID: ReadonlyMap<string, EquipmentItem> = new Map(EQUIPMENT_INVENTORY.map((item) => [item.id, item]));
@@ -170,17 +162,6 @@ function normalizeUnitEquipmentState(value: unknown): UnitEquipmentState {
   return normalized;
 }
 
-function resolveEquipmentItems(equipment: UnitEquipmentState): EquipmentItem[] {
-  const items: EquipmentItem[] = [];
-  for (const slot of EQUIPMENT_SLOT_SEQUENCE){
-    const id = equipment[slot];
-    if (!id) continue;
-    const item = EQUIPMENT_ITEM_BY_ID.get(id);
-    if (item) items.push(item);
-  }
-  return items;
-}
-
 function resolveClassGrowthByUnit(unit: CollectionEntry | null): Record<string, number> {
   const className = typeof unit?.class === 'string' ? unit.class : '';
   const growth = (CLASS_GROWTH as Record<string, Record<string, number> | undefined>)[className];
@@ -192,34 +173,77 @@ function isItemCompatibleWithSlot(item: EquipmentItem, slotKey: EquipmentSlotKey
   return item.slot === EQUIPMENT_SLOT_FILTER[slotKey];
 }
 
-function resolveEquipmentTpBonus(unit: CollectionEntry | null, equipment: UnitEquipmentState): number {
-  const growth = resolveClassGrowthByUnit(unit);
-  const items = resolveEquipmentItems(equipment);
-  let total = items.reduce((sum, item) => sum + Math.max(0, item.tpDelta), 0);
+  function sumTpAllocation(allocation: Partial<Record<string, number>> | null | undefined): number {
+  if (!allocation) return 0;
+  let total = 0;
+  for (const rawValue of Object.values(allocation)){
+    const numeric = Number(rawValue);
+    if (!Number.isFinite(numeric) || numeric <= 0) continue;
+    total += numeric;
+  }
+  return total;
+}
 
-  const equippedBySlot = new Map<EquipmentSlotKey, EquipmentItem>();
+  function mergeTpAllocation(target: Record<string, number>, source: Partial<Record<string, number>> | null | undefined): void {
+  if (!source) return;
+  for (const [key, rawValue] of Object.entries(source)){
+    const value = Number(rawValue);
+    if (!Number.isFinite(value) || value <= 0) continue;
+    target[key] = (target[key] ?? 0) + value;
+  }
+}
+
+
+function resolveEquippedItemUsage(equipment: UnitEquipmentState): Map<string, number> {
+  const usage = new Map<string, number>();
+  for (const slot of EQUIPMENT_SLOT_SEQUENCE){
+    const id = equipment[slot];
+    if (!id) continue;
+    usage.set(id, (usage.get(id) ?? 0) + 1);
+  }
+  return usage;
+}
+
+function resolveAvailableQuantityForItem(params: {
+  equipment: UnitEquipmentState;
+  itemId: string;
+  slotKey?: EquipmentSlotKey;
+}): number {
+  const item = EQUIPMENT_ITEM_BY_ID.get(params.itemId);
+  if (!item) return 0;
+  const baseQuantity = Math.max(1, Math.floor(Number(item.quantity ?? 1)));
+  const usage = resolveEquippedItemUsage(params.equipment);
+  let used = usage.get(params.itemId) ?? 0;
+  if (params.slotKey && params.equipment[params.slotKey] === params.itemId){
+    used = Math.max(0, used - 1);
+  }
+  return Math.max(0, baseQuantity - used);
+}
+
+  function resolveEquipmentTpAllocation(equipment: UnitEquipmentState): Record<string, number> {
+  const allocation: Record<string, number> = {};
+  let voDanhPieces = 0;
   for (const slot of EQUIPMENT_SLOT_SEQUENCE){
     const id = equipment[slot];
     if (!id) continue;
     const item = EQUIPMENT_ITEM_BY_ID.get(id);
     if (!item) continue;
-    equippedBySlot.set(slot, item);
-  }
-
-  const shirtSet = equippedBySlot.get('shirt')?.setName ?? null;
-  const pantsSet = equippedBySlot.get('pants')?.setName ?? null;
-  if (shirtSet && pantsSet && shirtSet === pantsSet){
-    total += 1;
-    const hasAccessoryOrRing = [
-      equippedBySlot.get('accessory'),
-      equippedBySlot.get('ring1'),
-      equippedBySlot.get('ring2'),
-      equippedBySlot.get('ring3'),
-    ].some((entry) => entry?.setName === shirtSet);
-    if (hasAccessoryOrRing){
-      total += 2;
+    mergeTpAllocation(allocation, item.tpAlloc);
+    if (item.setName === 'Luyện khí sư vô danh'){
+      voDanhPieces += 1;
     }
   }
+  if (voDanhPieces >= 3){
+    mergeTpAllocation(allocation, { HP: 1, WIL: 1, ATK: 1 });
+  } else if (voDanhPieces >= 2){
+    mergeTpAllocation(allocation, { HP: 1 });
+  }
+  return allocation;
+}
+
+function resolveEquipmentTpBonus(unit: CollectionEntry | null, equipment: UnitEquipmentState): number {
+  const growth = resolveClassGrowthByUnit(unit);
+  const total = sumTpAllocation(resolveEquipmentTpAllocation(equipment));
 
   const weighted = Object.values(growth).reduce((sum, value) => {
     const numeric = Number(value);
@@ -482,7 +506,13 @@ function toFiniteStatValue(value: unknown): number | null {
   return Number.isFinite(value) ? value : null;
 }
 
-function resolveUnitStats(unitId: string | null, tpAllocation: TpAllocMap = {}): Array<{ key: string; value: number }> {
+function resolveStatGainFromTpPoints(statKey: string, tpPoints: number): number {
+  const gain = TP_EQUIVALENT_GAIN_BY_STAT[statKey];
+  if (gain == null || !Number.isFinite(gain) || gain <= 0) return tpPoints;
+  return tpPoints * gain;
+}
+
+function resolveUnitStats(unitId: string | null, tpAllocation: TpAllocMap = {}, equipmentTpAlloc: Record<string, number> = {}): Array<{ key: string; value: number }> {
   if (!unitId) return [];
   const preview = ROSTER_PREVIEWS[unitId];
   const finalStats = preview?.final as Record<string, unknown> | undefined;
@@ -491,13 +521,17 @@ function resolveUnitStats(unitId: string | null, tpAllocation: TpAllocMap = {}):
   const hp = toFiniteStatValue(finalStats.HPmax ?? finalStats.HP ?? null);
   const rows: Array<{ key: string; value: number }> = [];
   if (hp != null){
-    rows.push({ key: 'HP', value: hp + resolveTpBonusForStat('HP', tpAllocation) });
+    const manualHpBonus = resolveTpBonusForStat('HP', tpAllocation);
+    const equipmentHpBonus = resolveStatGainFromTpPoints('HP', Number(equipmentTpAlloc.HP ?? 0));
+    rows.push({ key: 'HP', value: hp + manualHpBonus + equipmentHpBonus });
   }
   for (const [key, rawValue] of Object.entries(finalStats)){
     if (key === 'HP' || key === 'HPmax') continue;
     const value = toFiniteStatValue(rawValue);
     if (value == null) continue;
-    rows.push({ key, value: value + resolveTpBonusForStat(key, tpAllocation) });
+    const manualBonus = resolveTpBonusForStat(key, tpAllocation);
+    const equipmentBonus = resolveStatGainFromTpPoints(key, Number(equipmentTpAlloc[key] ?? 0));
+    rows.push({ key, value: value + manualBonus + equipmentBonus });
   }
   return rows;
 }
@@ -675,15 +709,16 @@ function ensureStyles(){
     .collection-arts-hubs.is-open{opacity:1;pointer-events:auto;transform:translate(calc(-50% - var(--collection-hub-left-shift)),0);}
     .collection-arts-hub{position:relative;border:1px solid rgba(125,211,252,.42);background:rgba(8,16,26,.92);box-shadow:0 30px 70px rgba(3,6,12,.62);backdrop-filter:blur(6px);padding:14px;display:flex;flex-direction:column;gap:12px;overflow:hidden;min-height:0;}
     .collection-arts-hub__icon{position:absolute;top:10px;left:10px;width:28px;height:28px;object-fit:contain;filter:drop-shadow(0 2px 3px rgba(0,0,0,.45));pointer-events:none;}
-    .collection-arts-hub--gear{border:none;background:rgba(7,15,24,.78);box-shadow:0 20px 48px rgba(3,6,12,.55);display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:10px;padding:48px 12px 12px 8px;}
+    .collection-arts-hub--gear{border:none;background:rgba(7,15,24,.78);box-shadow:0 20px 48px rgba(3,6,12,.55);display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:10px;padding:48px 12px 12px 12px;}
     .collection-arts-hub--gear .collection-arts-hub__icon{left:8px;top:8px;}
-    .collection-arts-hub__filters{display:flex;flex-direction:column;gap:8px;}
+    .collection-arts-hub__filters{display:flex;flex-direction:column;gap:8px;align-items:flex-start;}
     .collection-arts-hub__filter{border:1px solid rgba(125,211,252,.32);background:rgba(11,24,35,.84);color:#d6eeff;font-size:10px;letter-spacing:.08em;text-transform:uppercase;writing-mode:vertical-rl;text-orientation:mixed;padding:8px 6px;border-radius:10px;cursor:pointer;min-height:52px;line-height:1.1;}
     .collection-arts-hub__filter.is-active{background:rgba(22,42,61,.96);border-color:rgba(174,228,255,.7);color:#f2fbff;}
     .collection-arts-hub__grid-wrap{min-height:0;overflow-y:auto;padding-right:4px;}
     .collection-arts-hub__grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;align-content:start;}
     .collection-arts-hub__slot{width:100%;aspect-ratio:1 / 1;box-sizing:border-box;border:1px solid rgba(174,228,255,.58);background:rgba(10,20,30,.4);display:flex;align-items:center;justify-content:center;color:#86a8c4;font-size:14px;box-shadow:inset 0 0 0 1px rgba(12,28,40,.55);cursor:pointer;position:relative;}
     .collection-arts-hub__slot.is-selected{border-color:rgba(233,247,255,.95);box-shadow:0 0 0 1px rgba(174,228,255,.48),inset 0 0 0 1px rgba(12,28,40,.55);}
+    .collection-arts-hub__slot-qty{position:absolute;top:2px;left:3px;font-size:10px;font-weight:700;line-height:1;color:#f2fbff;text-shadow:0 1px 2px rgba(0,0,0,.7);}
     .collection-arts-hub__slot-label{position:absolute;left:3px;right:3px;bottom:2px;font-size:8px;line-height:1.2;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#9fc8ea;}
     .collection-arts-hub--paperdoll{border:none;background:rgba(7,15,24,.38);box-shadow:none;padding:48px 8px 12px;}
     .collection-equip-panel{display:flex;justify-content:center;align-items:flex-start;min-height:0;height:100%;}
@@ -1323,7 +1358,8 @@ const miniStats = document.createElement('section');
   const renderMiniStats = (unitId: string | null): void => {
     miniStatsList.replaceChildren();
     const tpAlloc = getUnitTpAlloc(unitId);
-    const stats = resolveUnitStats(unitId, tpAlloc);
+    const equipment = getUnitEquipment(unitId);
+    const stats = resolveUnitStats(unitId, tpAlloc, resolveEquipmentTpAllocation(equipment));
     if (!stats.length){
       const empty = document.createElement('li');
       empty.className = 'collection-stage__mini-stats-item';
@@ -1548,17 +1584,30 @@ const miniStats = document.createElement('section');
 
   const renderGearInventory = (): void => {
     gearGrid.replaceChildren();
+    const equipment = getUnitEquipment(activeUnitId);
     const visibleItems = activeGearFilter === 'all'
       ? EQUIPMENT_INVENTORY
       : EQUIPMENT_INVENTORY.filter((item) => item.slot === activeGearFilter);
+      const availableItems = visibleItems.filter((item) => resolveAvailableQuantityForItem({ equipment, itemId: item.id }) > 0);
+    if (selectedInventoryItemId && !availableItems.some((item) => item.id === selectedInventoryItemId)){
+      selectedInventoryItemId = null;
+    }
     const fragment = document.createDocumentFragment();
-    for (const item of visibleItems){
+    for (const item of availableItems){
+      const quantityLeft = resolveAvailableQuantityForItem({ equipment, itemId: item.id });
       const slot = document.createElement('button');
-      slot.type = 'button';document.createElement('div');
+      slot.type = 'button';
       slot.className = 'collection-arts-hub__slot';
       slot.dataset.itemId = item.id;
       slot.classList.toggle('is-selected', item.id === selectedInventoryItemId);
       slot.textContent = item.symbol ?? '◆';
+
+      if (quantityLeft > 1){
+        const quantity = document.createElement('span');
+        quantity.className = 'collection-arts-hub__slot-qty';
+        quantity.textContent = String(quantityLeft);
+        slot.appendChild(quantity);
+      }
 
       const label = document.createElement('span');
       label.className = 'collection-arts-hub__slot-label';
@@ -1618,7 +1667,8 @@ const miniStats = document.createElement('section');
     equipPopupActionPrimary.style.display = 'none';
     equipPopupList.replaceChildren();
 
-    const candidates = EQUIPMENT_INVENTORY.filter((item) => isItemCompatibleWithSlot(item, slotKey));
+    const equipment = getUnitEquipment(activeUnitId);
+    const candidates = EQUIPMENT_INVENTORY.filter((item) => isItemCompatibleWithSlot(item, slotKey) && resolveAvailableQuantityForItem({ equipment, itemId: item.id, slotKey }) > 0);
     if (!candidates.length){
       const empty = document.createElement('p');
       empty.className = 'collection-equip-popup__desc';
@@ -1630,7 +1680,7 @@ const miniStats = document.createElement('section');
         button.type = 'button';
         button.className = 'collection-equip-popup__item';
         button.dataset.itemId = item.id;
-        button.textContent = `${item.name} (+${item.tpDelta} TP)`;
+        button.textContent = `${item.name} (+${sumTpAllocation(item.tpAlloc)} TP)`;
         equipPopupList.appendChild(button);
       }
     }
@@ -1640,7 +1690,7 @@ const miniStats = document.createElement('section');
   const openEquippedSlotPopup = (slotKey: EquipmentSlotKey, item: EquipmentItem): void => {
     activeEquipSlot = slotKey;
     equipPopupTitle.textContent = item.name;
-    equipPopupDesc.textContent = `${EQUIPMENT_SLOT_LABEL[slotKey]} · +${item.tpDelta} TP`;
+    equipPopupDesc.textContent = `${EQUIPMENT_SLOT_LABEL[slotKey]} · +${sumTpAllocation(item.tpAlloc)} TP`;
     equipPopupList.replaceChildren();
 
     equipPopupActionPrimary.style.display = '';
@@ -1695,6 +1745,13 @@ const miniStats = document.createElement('section');
     const pendingItem = selectedInventoryItemId ? EQUIPMENT_ITEM_BY_ID.get(selectedInventoryItemId) ?? null : null;
     if (pendingItem && isItemCompatibleWithSlot(pendingItem, slotKey)){
       const equipment = getUnitEquipment(activeUnitId);
+      const quantityLeft = resolveAvailableQuantityForItem({ equipment, itemId: pendingItem.id, slotKey });
+      if (quantityLeft <= 0){
+        stageStatus.textContent = `${pendingItem.name} đã hết trong túi đồ.`;
+        selectedInventoryItemId = null;
+        renderGearInventory();
+        return;
+      }
       equipment[slotKey] = pendingItem.id;
       setUnitEquipment(activeUnitId, equipment);
       selectedInventoryItemId = null;
@@ -1723,6 +1780,13 @@ const miniStats = document.createElement('section');
       const itemId = chooseBtn.dataset.itemId;
       if (itemId){
         const equipment = getUnitEquipment(activeUnitId);
+        const quantityLeft = resolveAvailableQuantityForItem({ equipment, itemId, slotKey: activeEquipSlot });
+        if (quantityLeft <= 0){
+          stageStatus.textContent = `${EQUIPMENT_ITEM_BY_ID.get(itemId)?.name ?? 'Vật phẩm'} đã hết trong túi đồ.`;
+          closeEquipPopup();
+          renderGearInventory();
+          return;
+        }
         equipment[activeEquipSlot] = itemId;
         setUnitEquipment(activeUnitId, equipment);
         renderEquipmentSlots(activeUnitId);
