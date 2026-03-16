@@ -587,7 +587,7 @@ function ensureStyles(){
   const rosterCellGap = resolveRosterCellGap(78, 0);
   const css = `
     .app--collection{padding:32px 16px 64px;}
-    .collection-view{--collection-tab-icon-size:36px;--collection-hub-left-shift:calc(var(--collection-tab-icon-size) * 2);max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:28px;color:inherit;}
+    .collection-view{--collection-tab-icon-size:36px;--collection-hub-left-shift:calc(var(--collection-tab-icon-size) * 1.35);max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:28px;color:inherit;}
     .collection-view__header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px;}
     .collection-view__title-group{display:flex;align-items:center;gap:12px;}
     .collection-view__back{padding:10px 18px;border-radius:999px;border:1px solid rgba(125,211,252,.32);background:rgba(16,26,36,.78);color:#aee4ff;letter-spacing:.08em;text-transform:uppercase;font-size:12px;cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;}
@@ -705,7 +705,7 @@ function ensureStyles(){
     .collection-skill-overlay__notes{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:12px;color:#9cbcd9;}
     .collection-skill-overlay__notes li{position:relative;padding-left:16px;}
     .collection-skill-overlay__notes li::before{content:'•';position:absolute;left:0;color:#7da0c7;}
-    .collection-arts-hubs{position:absolute;top:15%;left:50%;width:88%;min-height:70%;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(240px,.9fr) minmax(0,1fr);gap:12px;opacity:0;pointer-events:none;transition:opacity .24s ease,transform .24s ease;transform:translate(calc(-50% - var(--collection-hub-left-shift)),12px);z-index:6;max-height:80vh;}
+    .collection-arts-hubs{position:absolute;top:15%;left:50%;width:min(1120px,calc(100% - 20px));min-height:70%;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(240px,.9fr) minmax(0,1fr);gap:12px;opacity:0;pointer-events:none;transition:opacity .24s ease,transform .24s ease;transform:translate(calc(-50% - var(--collection-hub-left-shift)),12px);z-index:6;max-height:80vh;}
     .collection-arts-hubs.is-open{opacity:1;pointer-events:auto;transform:translate(calc(-50% - var(--collection-hub-left-shift)),0);}
     .collection-arts-hub{position:relative;border:1px solid rgba(125,211,252,.42);background:rgba(8,16,26,.92);box-shadow:0 30px 70px rgba(3,6,12,.62);backdrop-filter:blur(6px);padding:14px;display:flex;flex-direction:column;gap:12px;overflow:hidden;min-height:0;}
     .collection-arts-hub__icon{position:absolute;top:10px;left:10px;width:28px;height:28px;object-fit:contain;filter:drop-shadow(0 2px 3px rgba(0,0,0,.45));pointer-events:none;}
@@ -754,6 +754,7 @@ function ensureStyles(){
       .collection-view__layout{grid-template-columns:minmax(0,1.6fr) minmax(0,3.3fr) max-content;}
     }
     @media(max-width:1080px){
+    .collection-view{--collection-hub-left-shift:0px;}
       .collection-view__layout{grid-template-columns:1fr;}
       .collection-roster{margin-right:0;}
       .collection-roster__list{grid-template-columns:repeat(3,max-content);}
@@ -766,6 +767,7 @@ function ensureStyles(){
       .collection-roster__list{grid-template-columns:repeat(3,max-content);}
     }
     @media(max-width:720px){
+    .collection-view{--collection-hub-left-shift:0px;}
       .collection-view__title{font-size:30px;}
       .collection-roster__entry{padding:0;gap:0;}
       ..collection-roster__avatar{--collection-avatar-size:96px;}
@@ -776,7 +778,7 @@ function ensureStyles(){
       .collection-skill-card__actions{width:100%;justify-content:flex-start;gap:8px;}
       .collection-skill-card__badge{font-size:11px;}
       .collection-skill-card__upgrade{font-size:11px;padding:6px 12px;}
-      .collection-arts-hubs{top:8%;left:50%;width:92%;grid-template-columns:1fr;gap:10px;}
+      .collection-arts-hubs{top:8%;left:50%;width:min(96vw,680px);grid-template-columns:1fr;gap:10px;}
       .collection-arts-hub__grid{grid-template-columns:repeat(5,minmax(48px,var(--collection-gear-slot-size)));}
       .collection-arts-hub__filter{writing-mode:horizontal-tb;text-orientation:mixed;min-height:auto;padding:6px 8px;}
       .collection-arts-hub--gear{grid-template-columns:1fr;row-gap:10px;padding:46px 10px 10px;}
@@ -1789,6 +1791,7 @@ const miniStats = document.createElement('section');
         }
         equipment[activeEquipSlot] = itemId;
         setUnitEquipment(activeUnitId, equipment);
+        renderGearInventory();
         renderEquipmentSlots(activeUnitId);
         renderMiniStats(activeUnitId);
         stageStatus.textContent = `Đã trang bị ${EQUIPMENT_ITEM_BY_ID.get(itemId)?.name ?? 'vật phẩm'}.`;
@@ -1804,6 +1807,7 @@ const miniStats = document.createElement('section');
       const equipment = getUnitEquipment(activeUnitId);
       equipment[activeEquipSlot] = null;
       setUnitEquipment(activeUnitId, equipment);
+      renderGearInventory();
       renderEquipmentSlots(activeUnitId);
       renderMiniStats(activeUnitId);
       stageStatus.textContent = `Đã tháo ${EQUIPMENT_SLOT_LABEL[activeEquipSlot]}.`;

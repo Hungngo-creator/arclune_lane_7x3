@@ -595,12 +595,12 @@ screenY += originY
 ## 11) Danh sách giả định mở cần Product Owner xác nhận
 
 1. Mức trần `P_cap` cho Good Event theo từng vùng (mặc định 85%) có chốt cố định không?
-2. Công thức CP chính thức là input trực tiếp hay suy từ Atk/Wil/gear/rank?
+2. Công thức CP chính thức là input trực tiếp, quy đổi từ TP sang như đã làm ở collection.
 3. “Mining Slave” bị khóa bao nhiêu hành động ngoài di chuyển?
 4. Forced Sleep có bỏ qua lượt hoàn toàn hay chỉ khóa một số action?
 5. Tỷ lệ teleport `Bí Cảnh`/`Quỷ Vực` có phụ thuộc năm hoặc trạng thái Soul?
-6. Phạm vi gửi item qua Express Delivery: cùng map hay xuyên map?
+6. Phạm vi gửi item qua Express Delivery: cùng map hay xuyên map?, xuyên map, trong quỷ vực sẽ xuất hiện tối thiểu 1 toà thánh tông.
 7. Boss Diêm Vương khi kế vị có reset hiệu ứng tạm thời hiện có không?
-8. Global Event theo năm áp lên toàn bộ map hay chỉ main board?
-9. Pity mechanic cho Soul có hiển thị UI cho người chơi hay ẩn?
+8. Global Event theo năm áp lên toàn bộ map hay chỉ main board?, toàn map.
+9. Pity mechanic cho Soul có hiển thị UI cho người chơi hay ẩn? không biết, theo mày hiện hay ẩn ok hơn?
 10. Mức anti-snowball (thuế mềm/trợ cấp) ưu tiên cân bằng PvP hay giữ cảm giác power fantasy?
