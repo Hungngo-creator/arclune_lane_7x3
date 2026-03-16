@@ -4,12 +4,12 @@ import type { CollectionTabKey, FilterState } from './types.ts';
 
 export function createFilterState(initial?: Partial<FilterState>): FilterState{
   return {
-    activeTab: initial?.activeTab ?? 'arts',
+    activeTab: initial?.activeTab ?? null,
     selectedUnitId: initial?.selectedUnitId ?? null,
   };
 }
 
-export function updateActiveTab(state: FilterState, tab: CollectionTabKey): void{
+export function updateActiveTab(state: FilterState, tab: CollectionTabKey | null): void{
   state.activeTab = tab;
 }
 

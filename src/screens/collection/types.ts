@@ -10,7 +10,7 @@ export type { UnknownRecord } from '@shared-types/common';
 export type CollectionTabKey = 'awakening' | 'skills' | 'arts' | 'skins' | 'voice' | 'tuvi';
 
 export interface FilterState {
-  activeTab: CollectionTabKey;
+  activeTab: CollectionTabKey | null;
   selectedUnitId: string | null;
 }
 

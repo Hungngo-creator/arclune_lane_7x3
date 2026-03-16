@@ -20354,7 +20354,7 @@ __define('./screens/collection/state.ts', (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/collection/state.ts
   function createFilterState(initial) {
       return {
-          activeTab: initial?.activeTab ?? 'arts',
+          activeTab: initial?.activeTab ?? null,
           selectedUnitId: initial?.selectedUnitId ?? null,
       };
   }
@@ -20753,7 +20753,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       const rosterCellGap = resolveRosterCellGap(78, 0);
       const css = `
       .app--collection{padding:32px 16px 64px;}
-      .collection-view{max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:28px;color:inherit;}
+      .collection-view{--collection-tab-icon-size:36px;--collection-hub-left-shift:calc(var(--collection-tab-icon-size) * 2);max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:28px;color:inherit;}
       .collection-view__header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px;}
       .collection-view__title-group{display:flex;align-items:center;gap:12px;}
       .collection-view__back{padding:10px 18px;border-radius:999px;border:1px solid rgba(125,211,252,.32);background:rgba(16,26,36,.78);color:#aee4ff;letter-spacing:.08em;text-transform:uppercase;font-size:12px;cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;}
@@ -20823,7 +20823,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       .collection-stage__mini-stats-hint{margin:2px 0 0;font-size:10px;color:#7da0c7;line-height:1.4;}
       .collection-stage__mini-stats.is-detail-open .collection-stage__mini-stats-hint{display:none;}
       .collection-tabs{border-radius:0;border:none;background:none;padding:0;display:flex;flex-direction:column;align-items:flex-end;justify-self:end;gap:10px;z-index:4;min-width:36px;}
-      .collection-tabs__button{width:36px;height:36px;padding:0;border-radius:50%;border:1px solid rgba(125,211,252,.2);background:rgba(8,16,24,.82);color:inherit;cursor:pointer;display:flex;justify-content:center;align-items:center;transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease;}
+      .collection-tabs__button{width:var(--collection-tab-icon-size);height:var(--collection-tab-icon-size);padding:0;border-radius:50%;border:1px solid rgba(125,211,252,.2);background:rgba(8,16,24,.82);color:inherit;cursor:pointer;display:flex;justify-content:center;align-items:center;transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease;}
       .collection-tabs__button:hover{transform:translateY(-2px);border-color:rgba(125,211,252,.42);background:rgba(16,26,36,.92);}
       .collection-tabs__button:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:3px;}
       .collection-tabs__button.is-active{border-color:rgba(125,211,252,.55);background:rgba(18,30,42,.96);box-shadow:0 10px 24px rgba(6,12,20,.42);}
@@ -20871,8 +20871,8 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       .collection-skill-overlay__notes{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:12px;color:#9cbcd9;}
       .collection-skill-overlay__notes li{position:relative;padding-left:16px;}
       .collection-skill-overlay__notes li::before{content:'•';position:absolute;left:0;color:#7da0c7;}
-      .collection-arts-hubs{position:absolute;top:15%;left:50%;width:82%;min-height:70%;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:14px;opacity:0;pointer-events:none;transition:opacity .24s ease,transform .24s ease;transform:translate(-50%,12px);z-index:6;max-height:80vh;}
-      .collection-arts-hubs.is-open{opacity:1;pointer-events:auto;transform:translate(-50%,0);}
+      .collection-arts-hubs{position:absolute;top:15%;left:50%;width:82%;min-height:70%;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:14px;opacity:0;pointer-events:none;transition:opacity .24s ease,transform .24s ease;transform:translate(calc(-50% - var(--collection-hub-left-shift)),12px);z-index:6;max-height:80vh;}
+      .collection-arts-hubs.is-open{opacity:1;pointer-events:auto;transform:translate(calc(-50% - var(--collection-hub-left-shift)),0);}
       .collection-arts-hub{position:relative;border:1px solid rgba(125,211,252,.42);background:rgba(8,16,26,.92);box-shadow:0 30px 70px rgba(3,6,12,.62);backdrop-filter:blur(6px);padding:14px;display:flex;flex-direction:column;gap:12px;overflow:hidden;min-height:0;}
       .collection-arts-hub__icon{position:absolute;top:10px;left:10px;width:28px;height:28px;object-fit:contain;filter:drop-shadow(0 2px 3px rgba(0,0,0,.45));pointer-events:none;}
       .collection-arts-hub--gear{border:none;background:rgba(7,15,24,.78);box-shadow:0 20px 48px rgba(3,6,12,.55);display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:10px;padding:48px 12px 12px 8px;}
@@ -21000,14 +21000,14 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       const initialTabCandidate = typeof savedCollectionUi.activeTab === 'string' ? savedCollectionUi.activeTab : null;
       const initialActiveTab = initialTabCandidate && TAB_DEFINITIONS.some((tab) => tab.key === initialTabCandidate)
           ? initialTabCandidate
-          : 'arts';
+          : null;
       const filterState = createFilterState({ activeTab: initialActiveTab });
       const savedCultivationByUnit = {
           ...(savedProfile.cultivationByUnit ?? {}),
       };
       const savedTpByUnit = { ...(savedProfile.tpByUnit ?? {}) };
       const savedTpAllocByUnit = Object.fromEntries(Object.entries(savedProfile.tpAllocByUnit ?? {}).map(([unitId, alloc]) => [unitId, normalizeTpAllocMap(alloc)]));
-      let shouldAutoOpenArtsHubs = savedCollectionUi.artsHubAutoOpen !== false;
+      let shouldAutoOpenArtsHubs = false;
       let activeUnitId = null;
       const mutablePlayerState = {
           ...playerState,
@@ -21748,7 +21748,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
                   button.classList.remove('is-active');
               }
           }
-          stageStatus.textContent = TAB_HINT_BY_KEY[key] || '';
+          stageStatus.textContent = key ? (TAB_HINT_BY_KEY[key] || '') : 'Chọn một nhân vật để xem chi tiết.';
           const isSkillTab = key === 'skills';
           const isArtsTab = key === 'arts';
           if (isSkillTab) {
@@ -21769,34 +21769,24 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
           }
       };
       const handleTabClick = (key) => {
-          if (key === 'arts' && filterState.activeTab === 'arts' && artsHubs.classList.contains('is-open')) {
+          if (filterState.activeTab === key) {
               shouldAutoOpenArtsHubs = false;
               patchPlayerProfile({
                   collectionUi: {
-                      activeTab: 'arts',
+                      activeTab: '',
                       artsHubAutoOpen: false,
                   },
               });
-              setActiveTab('arts');
+              setActiveTab(null);
               return;
           }
-          if (key === 'arts') {
-              shouldAutoOpenArtsHubs = true;
-              patchPlayerProfile({
-                  collectionUi: {
-                      activeTab: 'arts',
-                      artsHubAutoOpen: true,
-                  },
-              });
-          }
-          else {
-              patchPlayerProfile({
-                  collectionUi: {
-                      activeTab: key,
-                      artsHubAutoOpen: shouldAutoOpenArtsHubs,
-                  },
-              });
-          }
+          shouldAutoOpenArtsHubs = key === 'arts';
+          patchPlayerProfile({
+              collectionUi: {
+                  activeTab: key,
+                  artsHubAutoOpen: shouldAutoOpenArtsHubs,
+              },
+          });
           setActiveTab(key);
       };
       for (const tab of TAB_DEFINITIONS) {
@@ -22072,12 +22062,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
               selectUnit(preferredId);
           }
       }
-      if (shouldAutoOpenArtsHubs) {
-          setActiveTab('arts');
-      }
-      else {
-          setActiveTab(filterState.activeTab);
-      }
+      setActiveTab(null);
       return {
           destroy() {
               for (const fn of cleanups.splice(0, cleanups.length)) {
