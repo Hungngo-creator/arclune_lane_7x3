@@ -15,6 +15,8 @@ import {
 import { assertElement, ensureStyleTag, mountSection } from '../../ui/dom.ts';
 import { normalizeRarity } from '../../utils/rarity.ts';
 import { ROSTER_PREVIEWS } from '../../data/roster-preview.ts';
+import { TP_DELTA } from '../../data/roster-preview.ts';
+import { CLASS_GROWTH } from '../../catalog.ts';
 
 import {
   ABILITY_TYPE_LABELS,
@@ -89,6 +91,144 @@ const CORE_STAT_KEYS = ['HP', 'WIL', 'ATK', 'RES', 'ARM'] as const;
 const TP_ALLOCATABLE_KEYS = ['HP', 'ATK', 'WIL', 'ARM', 'RES'] as const;
 type TpStatKey = (typeof TP_ALLOCATABLE_KEYS)[number];
 type TpAllocMap = Partial<Record<TpStatKey, number>>;
+
+type EquipmentSlotKey = 'head' | 'shirt' | 'weapon' | 'accessory' | 'pants' | 'ring1' | 'ring2' | 'ring3';
+
+interface EquipmentItem {
+  id: string;
+  name: string;
+  slot: EquipmentSlotKey;
+  tpDelta: number;
+  setName?: string | null;
+  icon?: string | null;
+  symbol?: string | null;
+}
+
+type UnitEquipmentState = Partial<Record<EquipmentSlotKey, string | null>>;
+
+const EQUIPMENT_SLOT_SEQUENCE: ReadonlyArray<EquipmentSlotKey> = Object.freeze([
+  'head',
+  'shirt',
+  'weapon',
+  'accessory',
+  'pants',
+  'ring1',
+  'ring2',
+  'ring3',
+]);
+
+const EQUIPMENT_SLOT_LABEL: Readonly<Record<EquipmentSlotKey, string>> = Object.freeze({
+  head: 'Đầu',
+  shirt: 'Áo',
+  weapon: 'Vũ khí',
+  accessory: 'Trang sức',
+  pants: 'Quần',
+  ring1: 'Nhẫn 1',
+  ring2: 'Nhẫn 2',
+  ring3: 'Nhẫn 3',
+});
+
+const EQUIPMENT_SLOT_FILTER: Readonly<Record<EquipmentSlotKey, EquipmentSlotKey>> = Object.freeze({
+  head: 'head',
+  shirt: 'shirt',
+  weapon: 'weapon',
+  accessory: 'accessory',
+  pants: 'pants',
+  ring1: 'ring1',
+  ring2: 'ring1',
+  ring3: 'ring1',
+});
+
+const EQUIPMENT_INVENTORY: ReadonlyArray<EquipmentItem> = Object.freeze([
+  { id: 'head-aura-thietgiap', name: 'Huy Quang Thiết Giáp', slot: 'head', tpDelta: 2, setName: 'Thiết Giáp', symbol: '◉' },
+  { id: 'head-crown-thienhoa', name: 'Vương Miện Thiên Hoa', slot: 'head', tpDelta: 2, setName: 'Thiên Hoa', symbol: '◉' },
+  { id: 'shirt-thietgiap', name: 'Áo Thiết Giáp', slot: 'shirt', tpDelta: 4, setName: 'Thiết Giáp' },
+  { id: 'shirt-thienhoa', name: 'Y Phục Thiên Hoa', slot: 'shirt', tpDelta: 4, setName: 'Thiên Hoa' },
+  { id: 'weapon-thietgiap-kiem', name: 'Thiết Kiếm Trấn Tâm', slot: 'weapon', tpDelta: 3, setName: 'Thiết Giáp', symbol: '⚔' },
+  { id: 'weapon-thienhoa-sao', name: 'Thiên Hoa Sáo', slot: 'weapon', tpDelta: 3, setName: 'Thiên Hoa', symbol: '⚔' },
+  { id: 'accessory-thietgiap-ngoc', name: 'Ngọc Bội Thiết Giáp', slot: 'accessory', tpDelta: 2, setName: 'Thiết Giáp' },
+  { id: 'accessory-thienhoa-daychuyen', name: 'Dây Chuyền Thiên Hoa', slot: 'accessory', tpDelta: 2, setName: 'Thiên Hoa' },
+  { id: 'pants-thietgiap', name: 'Quần Thiết Giáp', slot: 'pants', tpDelta: 4, setName: 'Thiết Giáp' },
+  { id: 'pants-thienhoa', name: 'Quần Thiên Hoa', slot: 'pants', tpDelta: 4, setName: 'Thiên Hoa' },
+  { id: 'ring-thietgiap-1', name: 'Nhẫn Thiết Giáp I', slot: 'ring1', tpDelta: 1, setName: 'Thiết Giáp', symbol: '◌' },
+  { id: 'ring-thietgiap-2', name: 'Nhẫn Thiết Giáp II', slot: 'ring1', tpDelta: 1, setName: 'Thiết Giáp', symbol: '◌' },
+  { id: 'ring-thienhoa-1', name: 'Nhẫn Thiên Hoa I', slot: 'ring1', tpDelta: 1, setName: 'Thiên Hoa', symbol: '◌' },
+  { id: 'ring-thienhoa-2', name: 'Nhẫn Thiên Hoa II', slot: 'ring1', tpDelta: 1, setName: 'Thiên Hoa', symbol: '◌' },
+]);
+
+const EQUIPMENT_ITEM_BY_ID: ReadonlyMap<string, EquipmentItem> = new Map(EQUIPMENT_INVENTORY.map((item) => [item.id, item]));
+
+
+function normalizeUnitEquipmentState(value: unknown): UnitEquipmentState {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+  const source = value as Record<string, unknown>;
+  const normalized: UnitEquipmentState = {};
+  for (const key of EQUIPMENT_SLOT_SEQUENCE){
+    const raw = source[key];
+    normalized[key] = typeof raw === 'string' && raw.trim() ? raw : null;
+  }
+  return normalized;
+}
+
+function resolveEquipmentItems(equipment: UnitEquipmentState): EquipmentItem[] {
+  const items: EquipmentItem[] = [];
+  for (const slot of EQUIPMENT_SLOT_SEQUENCE){
+    const id = equipment[slot];
+    if (!id) continue;
+    const item = EQUIPMENT_ITEM_BY_ID.get(id);
+    if (item) items.push(item);
+  }
+  return items;
+}
+
+function resolveClassGrowthByUnit(unit: CollectionEntry | null): Record<string, number> {
+  const className = typeof unit?.class === 'string' ? unit.class : '';
+  const growth = (CLASS_GROWTH as Record<string, Record<string, number> | undefined>)[className];
+  return growth ?? Object.fromEntries(Object.keys(TP_DELTA).map((key) => [key, 1]));
+}
+
+
+function isItemCompatibleWithSlot(item: EquipmentItem, slotKey: EquipmentSlotKey): boolean {
+  return item.slot === EQUIPMENT_SLOT_FILTER[slotKey];
+}
+
+function resolveEquipmentTpBonus(unit: CollectionEntry | null, equipment: UnitEquipmentState): number {
+  const growth = resolveClassGrowthByUnit(unit);
+  const items = resolveEquipmentItems(equipment);
+  let total = items.reduce((sum, item) => sum + Math.max(0, item.tpDelta), 0);
+
+  const equippedBySlot = new Map<EquipmentSlotKey, EquipmentItem>();
+  for (const slot of EQUIPMENT_SLOT_SEQUENCE){
+    const id = equipment[slot];
+    if (!id) continue;
+    const item = EQUIPMENT_ITEM_BY_ID.get(id);
+    if (!item) continue;
+    equippedBySlot.set(slot, item);
+  }
+
+  const shirtSet = equippedBySlot.get('shirt')?.setName ?? null;
+  const pantsSet = equippedBySlot.get('pants')?.setName ?? null;
+  if (shirtSet && pantsSet && shirtSet === pantsSet){
+    total += 1;
+    const hasAccessoryOrRing = [
+      equippedBySlot.get('accessory'),
+      equippedBySlot.get('ring1'),
+      equippedBySlot.get('ring2'),
+      equippedBySlot.get('ring3'),
+    ].some((entry) => entry?.setName === shirtSet);
+    if (hasAccessoryOrRing){
+      total += 2;
+    }
+  }
+
+  const weighted = Object.values(growth).reduce((sum, value) => {
+    const numeric = Number(value);
+    return sum + (Number.isFinite(numeric) && numeric > 0 ? numeric : 0);
+  }, 0);
+  const normalizeFactor = Object.keys(TP_DELTA).length > 0 ? weighted / Object.keys(TP_DELTA).length : 1;
+  const factor = Number.isFinite(normalizeFactor) && normalizeFactor > 0 ? normalizeFactor : 1;
+  return total * factor;
+}
 
 const TP_STAT_GAIN_PER_POINT: Readonly<Record<TpStatKey, number>> = Object.freeze({
   HP: 20,
@@ -531,7 +671,7 @@ function ensureStyles(){
     .collection-skill-overlay__notes{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:12px;color:#9cbcd9;}
     .collection-skill-overlay__notes li{position:relative;padding-left:16px;}
     .collection-skill-overlay__notes li::before{content:'•';position:absolute;left:0;color:#7da0c7;}
-    .collection-arts-hubs{position:absolute;top:15%;left:50%;width:82%;min-height:70%;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:14px;opacity:0;pointer-events:none;transition:opacity .24s ease,transform .24s ease;transform:translate(calc(-50% - var(--collection-hub-left-shift)),12px);z-index:6;max-height:80vh;}
+    .collection-arts-hubs{position:absolute;top:15%;left:50%;width:88%;min-height:70%;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(240px,.9fr) minmax(0,1fr);gap:12px;opacity:0;pointer-events:none;transition:opacity .24s ease,transform .24s ease;transform:translate(calc(-50% - var(--collection-hub-left-shift)),12px);z-index:6;max-height:80vh;}
     .collection-arts-hubs.is-open{opacity:1;pointer-events:auto;transform:translate(calc(-50% - var(--collection-hub-left-shift)),0);}
     .collection-arts-hub{position:relative;border:1px solid rgba(125,211,252,.42);background:rgba(8,16,26,.92);box-shadow:0 30px 70px rgba(3,6,12,.62);backdrop-filter:blur(6px);padding:14px;display:flex;flex-direction:column;gap:12px;overflow:hidden;min-height:0;}
     .collection-arts-hub__icon{position:absolute;top:10px;left:10px;width:28px;height:28px;object-fit:contain;filter:drop-shadow(0 2px 3px rgba(0,0,0,.45));pointer-events:none;}
@@ -542,7 +682,37 @@ function ensureStyles(){
     .collection-arts-hub__filter.is-active{background:rgba(22,42,61,.96);border-color:rgba(174,228,255,.7);color:#f2fbff;}
     .collection-arts-hub__grid-wrap{min-height:0;overflow-y:auto;padding-right:4px;}
     .collection-arts-hub__grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;align-content:start;}
-    .collection-arts-hub__slot{width:100%;aspect-ratio:1 / 1;box-sizing:border-box;border:1px solid rgba(174,228,255,.58);background:rgba(10,20,30,.4);display:flex;align-items:center;justify-content:center;color:#86a8c4;font-size:11px;box-shadow:inset 0 0 0 1px rgba(12,28,40,.55);
+    .collection-arts-hub__slot{width:100%;aspect-ratio:1 / 1;box-sizing:border-box;border:1px solid rgba(174,228,255,.58);background:rgba(10,20,30,.4);display:flex;align-items:center;justify-content:center;color:#86a8c4;font-size:14px;box-shadow:inset 0 0 0 1px rgba(12,28,40,.55);cursor:pointer;position:relative;}
+    .collection-arts-hub__slot.is-selected{border-color:rgba(233,247,255,.95);box-shadow:0 0 0 1px rgba(174,228,255,.48),inset 0 0 0 1px rgba(12,28,40,.55);}
+    .collection-arts-hub__slot-label{position:absolute;left:3px;right:3px;bottom:2px;font-size:8px;line-height:1.2;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#9fc8ea;}
+    .collection-arts-hub--paperdoll{border:none;background:rgba(7,15,24,.38);box-shadow:none;padding:48px 8px 12px;}
+    .collection-equip-panel{display:flex;justify-content:center;align-items:flex-start;min-height:0;height:100%;}
+    .collection-equip-layout{width:min(260px,100%);height:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(5,minmax(48px,1fr));gap:8px;}
+    .collection-equip-slot{position:relative;border:1px solid rgba(174,228,255,.48);background:rgba(8,18,28,.55);color:#d8efff;display:flex;align-items:center;justify-content:center;font-size:19px;cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;}
+    .collection-equip-slot::before{content:'';position:absolute;inset:2px;border:2px solid rgba(174,228,255,.32);pointer-events:none;}
+    .collection-equip-slot:hover{transform:translateY(-1px);border-color:rgba(204,239,255,.88);box-shadow:0 10px 26px rgba(3,9,16,.45);}
+    .collection-equip-slot:focus-visible{outline:2px solid rgba(174,228,255,.92);outline-offset:2px;}
+    .collection-equip-slot.is-pending{border-color:rgba(255,232,166,.92);box-shadow:0 0 0 1px rgba(255,232,166,.5);}
+    .collection-equip-slot[data-slot='head']{grid-column:2;grid-row:1;}
+    .collection-equip-slot[data-slot='shirt']{grid-column:2;grid-row:2;}
+    .collection-equip-slot[data-slot='weapon']{grid-column:1;grid-row:3;}
+    .collection-equip-slot[data-slot='accessory']{grid-column:3;grid-row:3;}
+    .collection-equip-slot[data-slot='pants']{grid-column:2;grid-row:4;}
+    .collection-equip-slot[data-slot='ring1']{grid-column:1;grid-row:5;}
+    .collection-equip-slot[data-slot='ring2']{grid-column:2;grid-row:5;}
+    .collection-equip-slot[data-slot='ring3']{grid-column:3;grid-row:5;}
+    .collection-equip-slot__plus{font-size:20px;font-weight:700;line-height:1;color:#8db5d8;}
+    .collection-equip-slot__symbol{font-size:20px;line-height:1;}
+    .collection-equip-slot__name{position:absolute;bottom:4px;left:4px;right:4px;font-size:9px;letter-spacing:.04em;line-height:1.2;text-align:center;color:#aacde9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .collection-equip-slot__aura{position:absolute;width:46px;height:46px;border-radius:50%;border:1px solid rgba(170,215,255,.5);box-shadow:0 0 16px rgba(126,208,255,.35);}
+    .collection-equip-popup{position:absolute;top:54px;left:50%;transform:translateX(-50%);width:min(320px,90%);border:1px solid rgba(174,228,255,.44);background:rgba(8,16,24,.96);padding:12px;z-index:9;display:none;flex-direction:column;gap:10px;box-shadow:0 16px 44px rgba(2,8,14,.62);}
+    .collection-equip-popup.is-open{display:flex;}
+    .collection-equip-popup__title{margin:0;font-size:13px;color:#d6eeff;letter-spacing:.06em;text-transform:uppercase;}
+    .collection-equip-popup__desc{margin:0;font-size:12px;color:#99bedc;}
+    .collection-equip-popup__list{display:flex;flex-direction:column;gap:6px;max-height:190px;overflow:auto;}
+    .collection-equip-popup__item{border:1px solid rgba(125,211,252,.38);background:rgba(11,24,35,.84);color:#d6eeff;font-size:12px;padding:7px 9px;text-align:left;cursor:pointer;}
+    .collection-equip-popup__actions{display:flex;gap:8px;justify-content:flex-end;}
+    .collection-equip-popup__btn{border:1px solid rgba(125,211,252,.42);background:rgba(14,28,40,.9);color:#d6eeff;font-size:11px;padding:6px 10px;cursor:pointer;}
     .collection-arts-hub--art{padding:48px 12px 12px;justify-content:flex-start;}
     .collection-arts-hub__art-placeholder{margin:0;color:#9fc8ea;font-size:12px;letter-spacing:.04em;line-height:1.5;}
     @media(max-width:1200px){
@@ -731,6 +901,9 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
   const savedTpByUnit: Record<string, number> = { ...(savedProfile.tpByUnit ?? {}) };
   const savedTpAllocByUnit: Record<string, TpAllocMap> = Object.fromEntries(
     Object.entries(savedProfile.tpAllocByUnit ?? {}).map(([unitId, alloc]) => [unitId, normalizeTpAllocMap(alloc)]),
+  );
+  const savedEquipmentByUnit: Record<string, UnitEquipmentState> = Object.fromEntries(
+    Object.entries(savedProfile.equipmentByUnit ?? {}).map(([unitId, equipment]) => [unitId, normalizeUnitEquipmentState(equipment)]),
   );
   let shouldAutoOpenArtsHubs = false;
   let activeUnitId: string | null = null;
@@ -1111,6 +1284,16 @@ const miniStats = document.createElement('section');
     patchPlayerProfile({ tpAllocByUnit: savedTpAllocByUnit });
   };
 
+  const getUnitEquipment = (unitId: string | null): UnitEquipmentState => {
+    if (!unitId) return {};
+    return normalizeUnitEquipmentState(savedEquipmentByUnit[unitId] ?? {});
+  };
+
+  const setUnitEquipment = (unitId: string, equipment: UnitEquipmentState): void => {
+    savedEquipmentByUnit[unitId] = normalizeUnitEquipmentState(equipment);
+    patchPlayerProfile({ equipmentByUnit: savedEquipmentByUnit });
+  };
+
   const closeTpModal = (): void => {
     pendingTpStat = null;
     tpModal.classList.remove('is-open');
@@ -1128,8 +1311,10 @@ const miniStats = document.createElement('section');
     const tpScore = totalTp * K_TP_COMBAT_POWER;
 
     const baseStatTpEquivalent = stats.reduce((sum, stat) => sum + toTpEquivalentFromStat(stat.key, stat.value), 0);
-    const unitEntry = rosterEntries.get(unitId)?.meta as Record<string, unknown> | undefined;
-    const equipmentTpEquivalent = readCombatPowerTpBonus(unitEntry ?? null);
+    const unitMeta = rosterEntries.get(unitId)?.meta ?? null;
+    const unitEntry = unitMeta as Record<string, unknown> | undefined;
+    const equipment = getUnitEquipment(unitId);
+    const equipmentTpEquivalent = readCombatPowerTpBonus(unitEntry ?? null) + resolveEquipmentTpBonus(unitMeta, equipment);
 
     const combatPower = Math.round(tpScore + baseStatTpEquivalent + equipmentTpEquivalent);
     return Math.max(0, combatPower);
@@ -1285,13 +1470,16 @@ const miniStats = document.createElement('section');
   gearFilters.className = 'collection-arts-hub__filters';
   const gearFilterItems = [
     { key: 'all', label: 'Tất Cả' },
+    { key: 'head', label: 'Đầu' },
     { key: 'weapon', label: 'Vũ Khí' },
-    { key: 'pants', label: 'Quần' },
     { key: 'shirt', label: 'Áo' },
-    { key: 'ring', label: 'Nhẫn' },
+    { key: 'pants', label: 'Quần' },
+    { key: 'accessory', label: 'TSức' },
+    { key: 'ring1', label: 'Nhẫn' },
   ] as const;
 
   let activeGearFilter: (typeof gearFilterItems)[number]['key'] = 'all';
+  let selectedInventoryItemId: string | null = null;
 
   gearFilterItems.forEach(({ key, label }, index) => {
     const button = document.createElement('button');
@@ -1311,81 +1499,280 @@ const miniStats = document.createElement('section');
   const gearGrid = document.createElement('div');
   gearGrid.className = 'collection-arts-hub__grid';
 
-  const gearSlotCategories = ['weapon', 'pants', 'shirt', 'ring'] as const;
-  const gearSlots = Array.from({ length: 50 }, (_, index) => ({
-    category: gearSlotCategories[index % gearSlotCategories.length],
-  }));
+  const paperDollHub = document.createElement('article');
+  paperDollHub.className = 'collection-arts-hub collection-arts-hub--paperdoll';
 
-  const renderGearGrid = (): void => {
-    const fragment = document.createDocumentFragment();
-    const visibleSlots = activeGearFilter === 'all'
-      ? gearSlots
-      : gearSlots.filter((slot) => slot.category === activeGearFilter);
-    visibleSlots.forEach(() => {
-      const slot = document.createElement('div');
-      slot.className = 'collection-arts-hub__slot';
-      slot.setAttribute('aria-hidden', 'true');
-      fragment.appendChild(slot);
-    });
-    gearGrid.replaceChildren(fragment);
+  const equipPanel = document.createElement('section');
+  equipPanel.className = 'collection-equip-panel';
+
+  const equipLayout = document.createElement('div');
+  equipLayout.className = 'collection-equip-layout';
+
+  const equipPopup = document.createElement('section');
+  equipPopup.className = 'collection-equip-popup';
+
+  const equipPopupTitle = document.createElement('h4');
+  equipPopupTitle.className = 'collection-equip-popup__title';
+
+  const equipPopupDesc = document.createElement('p');
+  equipPopupDesc.className = 'collection-equip-popup__desc';
+
+  const equipPopupList = document.createElement('div');
+  equipPopupList.className = 'collection-equip-popup__list';
+
+  const equipPopupActions = document.createElement('div');
+  equipPopupActions.className = 'collection-equip-popup__actions';
+
+  const equipPopupActionPrimary = document.createElement('button');
+  equipPopupActionPrimary.type = 'button';
+  equipPopupActionPrimary.className = 'collection-equip-popup__btn';
+
+  const equipPopupClose = document.createElement('button');
+  equipPopupClose.type = 'button';
+  equipPopupClose.className = 'collection-equip-popup__btn';
+  equipPopupClose.textContent = 'Đóng';
+
+  equipPopupActions.appendChild(equipPopupActionPrimary);
+  equipPopupActions.appendChild(equipPopupClose);
+  equipPopup.appendChild(equipPopupTitle);
+  equipPopup.appendChild(equipPopupDesc);
+  equipPopup.appendChild(equipPopupList);
+  equipPopup.appendChild(equipPopupActions);
+
+  let activeEquipSlot: EquipmentSlotKey | null = null;
+
+  const closeEquipPopup = () => {
+    activeEquipSlot = null;
+    equipPopup.classList.remove('is-open');
   };
 
-  const syncGearGridViewportHeight = (): void => {
-    const firstSlot = gearGrid.querySelector<HTMLElement>('.collection-arts-hub__slot');
-    if (!firstSlot){
-      return;
+  const renderGearInventory = (): void => {
+    gearGrid.replaceChildren();
+    const visibleItems = activeGearFilter === 'all'
+      ? EQUIPMENT_INVENTORY
+      : EQUIPMENT_INVENTORY.filter((item) => item.slot === activeGearFilter);
+    const fragment = document.createDocumentFragment();
+    for (const item of visibleItems){
+      const slot = document.createElement('button');
+      slot.type = 'button';document.createElement('div');
+      slot.className = 'collection-arts-hub__slot';
+      slot.dataset.itemId = item.id;
+      slot.classList.toggle('is-selected', item.id === selectedInventoryItemId);
+      slot.textContent = item.symbol ?? '◆';
+
+      const label = document.createElement('span');
+      label.className = 'collection-arts-hub__slot-label';
+      label.textContent = item.name;
+      slot.appendChild(label);
+      fragment.appendChild(slot);
     }
-    const rowHeight = firstSlot.offsetHeight;
-    if (!Number.isFinite(rowHeight) || rowHeight <= 0){
-      return;
+    gearGrid.appendChild(fragment);
+  };
+
+  const renderEquipmentSlots = (unitId: string | null): void => {
+    equipLayout.replaceChildren();
+    const equipment = getUnitEquipment(unitId);
+    for (const slotKey of EQUIPMENT_SLOT_SEQUENCE){
+      const slotButton = document.createElement('button');
+      slotButton.type = 'button';
+      slotButton.className = 'collection-equip-slot';
+      slotButton.dataset.slot = slotKey;
+      slotButton.dataset.label = EQUIPMENT_SLOT_LABEL[slotKey];
+
+      const pendingItem = selectedInventoryItemId ? EQUIPMENT_ITEM_BY_ID.get(selectedInventoryItemId) ?? null : null;
+      if (pendingItem && isItemCompatibleWithSlot(pendingItem, slotKey)){
+        slotButton.classList.add('is-pending');
+      }
+
+      const itemId = equipment[slotKey];
+      const item = itemId ? EQUIPMENT_ITEM_BY_ID.get(itemId) ?? null : null;
+      if (!item){
+        const plus = document.createElement('span');
+        plus.className = 'collection-equip-slot__plus';
+        plus.textContent = '+';
+        slotButton.appendChild(plus);
+      } else {
+        if (slotKey === 'head' && item.symbol === '◉'){
+          const aura = document.createElement('span');
+          aura.className = 'collection-equip-slot__aura';
+          slotButton.appendChild(aura);
+        }
+        const symbol = document.createElement('span');
+        symbol.className = 'collection-equip-slot__symbol';
+        symbol.textContent = item.symbol ?? '◆';
+        slotButton.appendChild(symbol);
+
+        const name = document.createElement('span');
+        name.className = 'collection-equip-slot__name';
+        name.textContent = item.name;
+        slotButton.appendChild(name);
+      }
+      equipLayout.appendChild(slotButton);
     }
-    const computedGridStyle = window.getComputedStyle(gearGrid);
-    const gap = Number.parseFloat(computedGridStyle.rowGap || computedGridStyle.gap || '0');
-    const safeGap = Number.isFinite(gap) ? Math.max(0, gap) : 0;
-    const visibleRows = 5;
-    const maxHeight = (rowHeight * visibleRows) + (safeGap * (visibleRows - 1));
-    gearGridWrap.style.maxHeight = `${Math.max(0, Math.round(maxHeight))}px`;
+  };
+
+  const openEmptySlotPopup = (slotKey: EquipmentSlotKey): void => {
+    activeEquipSlot = slotKey;
+    equipPopupTitle.textContent = `Chọn trang bị · ${EQUIPMENT_SLOT_LABEL[slotKey]}`;
+    equipPopupDesc.textContent = 'Danh sách vật phẩm phù hợp từ túi đồ.';
+    equipPopupActionPrimary.style.display = 'none';
+    equipPopupList.replaceChildren();
+
+    const candidates = EQUIPMENT_INVENTORY.filter((item) => isItemCompatibleWithSlot(item, slotKey));
+    if (!candidates.length){
+      const empty = document.createElement('p');
+      empty.className = 'collection-equip-popup__desc';
+      empty.textContent = 'Không có vật phẩm phù hợp.';
+      equipPopupList.appendChild(empty);
+    } else {
+      for (const item of candidates){
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'collection-equip-popup__item';
+        button.dataset.itemId = item.id;
+        button.textContent = `${item.name} (+${item.tpDelta} TP)`;
+        equipPopupList.appendChild(button);
+      }
+    }
+    equipPopup.classList.add('is-open');
+  };
+
+  const openEquippedSlotPopup = (slotKey: EquipmentSlotKey, item: EquipmentItem): void => {
+    activeEquipSlot = slotKey;
+    equipPopupTitle.textContent = item.name;
+    equipPopupDesc.textContent = `${EQUIPMENT_SLOT_LABEL[slotKey]} · +${item.tpDelta} TP`;
+    equipPopupList.replaceChildren();
+
+    equipPopupActionPrimary.style.display = '';
+    equipPopupActionPrimary.textContent = 'Thay đổi';
+    equipPopupActionPrimary.dataset.action = 'change';
+
+    const unequipBtn = document.createElement('button');
+    unequipBtn.type = 'button';
+    unequipBtn.className = 'collection-equip-popup__item';
+    unequipBtn.dataset.action = 'unequip';
+    unequipBtn.textContent = 'Tháo';
+    equipPopupList.appendChild(unequipBtn);
+
+    equipPopup.classList.add('is-open');
   };
 
   const handleGearFilterClick = (event: Event): void => {
     const target = event.target;
-    if (!(target instanceof HTMLElement)){
-      return;
-    }
+    if (!(target instanceof HTMLElement)) return;
     const button = target.closest<HTMLButtonElement>('.collection-arts-hub__filter');
-    if (!button){
-      return;
-    }
+    if (!button) return;
     const filter = button.dataset.filter;
     const filterItem = gearFilterItems.find((item) => item.key === filter);
-    if (!filterItem){
-      return;
-    }
-    if (activeGearFilter === filterItem.key){
-      return;
-    }
+    if (!filterItem) return;
     activeGearFilter = filterItem.key;
     for (const candidate of gearFilters.querySelectorAll<HTMLButtonElement>('.collection-arts-hub__filter')){
       candidate.classList.toggle('is-active', candidate === button);
     }
-    renderGearGrid();
-    syncGearGridViewportHeight();
-    gearGridWrap.scrollTop = 0;
+    renderGearInventory();
+  };
+
+  const handleGearInventoryClick = (event: MouseEvent): void => {
+    const target = event.target as HTMLElement | null;
+    const itemButton = target?.closest<HTMLButtonElement>('.collection-arts-hub__slot[data-item-id]');
+    if (!itemButton) return;
+    const itemId = itemButton.dataset.itemId ?? null;
+    selectedInventoryItemId = selectedInventoryItemId === itemId ? null : itemId;
+    renderGearInventory();
+    renderEquipmentSlots(activeUnitId);
+    if (selectedInventoryItemId){
+      stageStatus.textContent = `Đã chọn ${EQUIPMENT_ITEM_BY_ID.get(selectedInventoryItemId)?.name ?? 'vật phẩm'} từ Hub gear.`;
+    }
+  };
+
+  const handleEquipLayoutClick = (event: MouseEvent): void => {
+    const target = event.target as HTMLElement | null;
+    const slotButton = target?.closest<HTMLButtonElement>('.collection-equip-slot');
+    if (!slotButton || !activeUnitId) return;
+    const slotKey = slotButton.dataset.slot as EquipmentSlotKey;
+    if (!slotKey || !EQUIPMENT_SLOT_SEQUENCE.includes(slotKey)) return;
+
+    const pendingItem = selectedInventoryItemId ? EQUIPMENT_ITEM_BY_ID.get(selectedInventoryItemId) ?? null : null;
+    if (pendingItem && isItemCompatibleWithSlot(pendingItem, slotKey)){
+      const equipment = getUnitEquipment(activeUnitId);
+      equipment[slotKey] = pendingItem.id;
+      setUnitEquipment(activeUnitId, equipment);
+      selectedInventoryItemId = null;
+      renderGearInventory();
+      renderEquipmentSlots(activeUnitId);
+      renderMiniStats(activeUnitId);
+      stageStatus.textContent = `Đã trang bị ${pendingItem.name} vào ${EQUIPMENT_SLOT_LABEL[slotKey]}.`;
+      closeEquipPopup();
+      return;
+    }
+
+    const equipment = getUnitEquipment(activeUnitId);
+    const itemId = equipment[slotKey];
+    const item = itemId ? EQUIPMENT_ITEM_BY_ID.get(itemId) ?? null : null;
+    if (!item){
+      openEmptySlotPopup(slotKey);
+      return;
+    }
+    openEquippedSlotPopup(slotKey, item);
+  };
+
+  const handleEquipPopupClick = (event: MouseEvent): void => {
+    const target = event.target as HTMLElement | null;
+    const chooseBtn = target?.closest<HTMLButtonElement>('.collection-equip-popup__item[data-item-id]');
+    if (chooseBtn && activeUnitId && activeEquipSlot){
+      const itemId = chooseBtn.dataset.itemId;
+      if (itemId){
+        const equipment = getUnitEquipment(activeUnitId);
+        equipment[activeEquipSlot] = itemId;
+        setUnitEquipment(activeUnitId, equipment);
+        renderEquipmentSlots(activeUnitId);
+        renderMiniStats(activeUnitId);
+        stageStatus.textContent = `Đã trang bị ${EQUIPMENT_ITEM_BY_ID.get(itemId)?.name ?? 'vật phẩm'}.`;
+      }
+      closeEquipPopup();
+      return;
+    }
+
+    const actionBtn = target?.closest<HTMLButtonElement>('.collection-equip-popup__item[data-action], .collection-equip-popup__btn[data-action]');
+    if (!actionBtn || !activeUnitId || !activeEquipSlot) return;
+    const action = actionBtn.dataset.action;
+    if (action === 'unequip'){
+      const equipment = getUnitEquipment(activeUnitId);
+      equipment[activeEquipSlot] = null;
+      setUnitEquipment(activeUnitId, equipment);
+      renderEquipmentSlots(activeUnitId);
+      renderMiniStats(activeUnitId);
+      stageStatus.textContent = `Đã tháo ${EQUIPMENT_SLOT_LABEL[activeEquipSlot]}.`;
+      closeEquipPopup();
+      return;
+    }
+    if (action === 'change'){
+      openEmptySlotPopup(activeEquipSlot);
+    }
   };
 
   gearFilters.addEventListener('click', handleGearFilterClick);
+  gearGrid.addEventListener('click', handleGearInventoryClick);
+  equipPopupActionPrimary.addEventListener('click', handleEquipPopupClick as EventListener);
+  equipPopupList.addEventListener('click', handleEquipPopupClick);
+  equipPopupClose.addEventListener('click', closeEquipPopup);
+  equipLayout.addEventListener('click', handleEquipLayoutClick);
   addCleanup(() => gearFilters.removeEventListener('click', handleGearFilterClick));
-  window.addEventListener('resize', syncGearGridViewportHeight);
-  addCleanup(() => window.removeEventListener('resize', syncGearGridViewportHeight));
+  addCleanup(() => gearGrid.removeEventListener('click', handleGearInventoryClick));
+  addCleanup(() => equipPopupActionPrimary.removeEventListener('click', handleEquipPopupClick as EventListener));
+  addCleanup(() => equipPopupList.removeEventListener('click', handleEquipPopupClick));
+  addCleanup(() => equipPopupClose.removeEventListener('click', closeEquipPopup));
+  addCleanup(() => equipLayout.removeEventListener('click', handleEquipLayoutClick));
 
-  renderGearGrid();
+  renderGearInventory();
   gearGridWrap.appendChild(gearGrid);
-  requestAnimationFrame(syncGearGridViewportHeight);
-
   gearHub.appendChild(gearHubIcon);
   gearHub.appendChild(gearFilters);
   gearHub.appendChild(gearGridWrap);
 
+  equipPanel.appendChild(equipLayout);
+  paperDollHub.appendChild(equipPanel);
+  paperDollHub.appendChild(equipPopup);
   const artHub = document.createElement('article');
   artHub.className = 'collection-arts-hub collection-arts-hub--art';
 
@@ -1403,6 +1790,7 @@ const miniStats = document.createElement('section');
   artHub.appendChild(artHubPlaceholder);
 
   artsHubs.appendChild(gearHub);
+  artsHubs.appendChild(paperDollHub);
   artsHubs.appendChild(artHub);
 
   const overlayHeader = document.createElement('div');
@@ -2017,6 +2405,9 @@ const resolveCurrentCultivation = () => {
     if (filterState.activeTab === 'skills'){
       overlay.classList.add('is-open');
     }
+    closeEquipPopup();
+    renderGearInventory();
+    renderEquipmentSlots(unitId);
     renderMiniStats(unitId);
     refreshTuViPanel();
   };

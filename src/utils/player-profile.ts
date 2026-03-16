@@ -14,6 +14,7 @@ export interface SavedPlayerProfile {
   sectName?: string;
   tpByUnit?: Record<string, number>;
   tpAllocByUnit?: Record<string, Partial<Record<'HP' | 'ATK' | 'WIL' | 'ARM' | 'RES', number>>>;
+  equipmentByUnit?: Record<string, Record<string, string | null>>;
   tacticalAiByUnit?: Record<string, unknown>;
   collectionUi?: {
     activeTab?: string;
@@ -67,6 +68,10 @@ export function patchPlayerProfile(patch: SavedPlayerProfile): SavedPlayerProfil
       ...(current.tpAllocByUnit ?? {}),
       ...(patch.tpAllocByUnit ?? {}),
     },
+    equipmentByUnit: {
+      ...(current.equipmentByUnit ?? {}),
+      ...(patch.equipmentByUnit ?? {}),
+    },
     tacticalAiByUnit: {
       ...(current.tacticalAiByUnit ?? {}),
       ...(patch.tacticalAiByUnit ?? {}),
@@ -95,6 +100,7 @@ export function resetPlayerProfileData(): SavedPlayerProfile {
     sectName: '',
     tpByUnit: {},
     tpAllocByUnit: {},
+    equipmentByUnit: {},
     tacticalAiByUnit: {},
   };
 
