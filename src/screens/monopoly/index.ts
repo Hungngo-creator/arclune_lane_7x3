@@ -5,8 +5,9 @@ const BOARD_SIZE = 13;
 const MAIN_TRACK_OFFSET = 1;
 const MAIN_RING_SIZE = 11;
 const MAIN_TRACK_CELLS = 40;
-const SIDE_TRACK_LENGTH = 10;
-const TOTAL_CELLS = MAIN_TRACK_CELLS + SIDE_TRACK_LENGTH * 4;
+const SIDE_TRACK_COLUMN_HEIGHT = 9;
+const SIDE_TRACK_PROTRUSION_CELLS = 8;
+const TOTAL_CELLS = MAIN_TRACK_CELLS + SIDE_TRACK_COLUMN_HEIGHT * 4 + SIDE_TRACK_PROTRUSION_CELLS;
 const INNER_COLUMN_HEIGHT = 9;
 
 const CSS = /* css */ `
@@ -112,19 +113,27 @@ function generateInnerLanes(startIndex: number): BoardCell[] {
   pushColumn(7, 'lane');
   pushColumn(9, 'connector');
 
-  // Các ô chỉa ra ngoài bàn cờ tương ứng 2-10, 12-20, 22-30 và 32-40.
-  const protrusions: Array<{ row: number; col: number; track: 'lane' | 'connector' }> = [
-    { row: 0, col: 6, track: 'lane' },
-    { row: 6, col: 12, track: 'connector' },
-    { row: 12, col: 6, track: 'lane' },
-    { row: 6, col: 0, track: 'connector' }
+  const protrusions: Array<{ row: number; col: number; track: 'lane' | 'connector' }> = [ 
+    { row: 2, col: 0, track: 'connector' },
+    { row: 10, col: 0, track: 'connector' },
+    { row: 0, col: 2, track: 'lane' },
+    { row: 0, col: 10, track: 'lane' },
+    { row: 2, col: 12, track: 'connector' },
+    { row: 10, col: 12, track: 'connector' },
+    { row: 12, col: 10, track: 'lane' },
+    { row: 12, col: 2, track: 'lane' }
+    { row: 12, col: 10, track: 'lane' },
+    { row: 12, col: 2, track: 'lane' },
+    { row: 10, col: 0, track: 'connector' },
+    { row: 2, col: 0, track: 'connector' }
   ];
   for (const protrusion of protrusions) {
     lanes.push({ index: index++, ...protrusion });
   }
 
-  if (lanes.length !== SIDE_TRACK_LENGTH * 4) {
-    throw new Error(`Lane phụ sai số ô: ${lanes.length}/${SIDE_TRACK_LENGTH * 4}`);
+  const expectedLaneCells = SIDE_TRACK_COLUMN_HEIGHT * 4 + SIDE_TRACK_PROTRUSION_CELLS;
+  if (lanes.length !== expectedLaneCells) {
+    throw new Error(`Lane phụ sai số ô: ${lanes.length}/${expectedLaneCells}`);
   }
   return lanes;
 }
@@ -184,7 +193,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
 
   const meta = document.createElement('div');
   meta.className = 'monopoly-screen__meta';
-  meta.innerHTML = `<span>Bàn chính: ${MAIN_TRACK_CELLS} ô</span><span>Lane phụ: ${SIDE_TRACK_LENGTH * 4} ô</span><span>Tổng: ${TOTAL_CELLS} ô</span>`;
+  meta.innerHTML = `<span>Bàn chính: ${MAIN_TRACK_CELLS} ô</span><span>Lane phụ: ${SIDE_TRACK_COLUMN_HEIGHT * 4 + SIDE_TRACK_PROTRUSION_CELLS} ô</span><span>Tổng: ${TOTAL_CELLS} ô</span>`;
   topbar.appendChild(meta);
 
   wrapper.appendChild(topbar);

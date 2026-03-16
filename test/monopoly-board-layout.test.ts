@@ -1,9 +1,9 @@
 import { createMonopolyBoardCells } from '../src/screens/monopoly/index.ts';
 
 describe('monopoly board layout', () => {
-  it('builds exactly 80 cells with 40 main-track cells', () => {
+  it('builds exactly 84 cells with 40 main-track cells', () => {
     const cells = createMonopolyBoardCells();
-    expect(cells).toHaveLength(80);
+    expect(cells).toHaveLength(84);
     expect(cells.filter(cell => cell.track === 'main')).toHaveLength(40);
   });
 
@@ -24,13 +24,17 @@ describe('monopoly board layout', () => {
     });
   });
 
-  it('adds four protrusion cells outside the main ring midpoint targets', () => {
+  it('adds eight protrusion cells at requested paired anchor targets', () => {
     const cells = createMonopolyBoardCells();
     const protrusions = [
-      [0, 6],
-      [6, 12],
-      [12, 6],
-      [6, 0]
+      [0, 2],
+      [0, 10],
+      [2, 12],
+      [10, 12],
+      [12, 10],
+      [12, 2],
+      [10, 0],
+      [2, 0]
     ];
 
     protrusions.forEach(([row, col]) => {
