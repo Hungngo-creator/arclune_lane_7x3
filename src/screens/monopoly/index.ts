@@ -55,6 +55,34 @@ const CSS = /* css */ `
     font-size:14px;
     color:#9ec3e8;
   }
+  .monopoly-screen__wallet{
+    margin-left:auto;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .monopoly-screen__wallet-slot{
+    min-width:36px;
+    height:28px;
+    border-radius:8px;
+    border:1px solid rgba(210, 226, 246, 0.4);
+    background:rgba(8, 21, 37, 0.78);
+    color:#f3f7ff;
+    font-size:13px;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:0 8px;
+  }
+  .monopoly-screen__wallet-slot--silver{
+    border-color:rgba(213, 224, 236, 0.66);
+    box-shadow:inset 0 0 0 1px rgba(228, 236, 247, 0.18);
+  }
+  .monopoly-screen__wallet-slot--gold{
+    border-color:rgba(246, 214, 123, 0.72);
+    box-shadow:inset 0 0 0 1px rgba(255, 226, 145, 0.22);
+  }
   .monopoly-screen__turn{
     display:flex;
     align-items:center;
@@ -474,6 +502,34 @@ interface MonopolyAvatar {
   detourProgress: number;
   readonly node: HTMLDivElement;
   readonly hpFillNode: HTMLSpanElement;
+  wallet: MonopolyWallet;
+}
+
+interface MonopolyWallet {
+  gold: number;
+  silver: number;
+}
+
+const MONOPOLY_CURRENCY_RATIO = 100;
+const MONOPOLY_STARTING_GOLD = 5;
+
+const normalizeWalletAmount = (value: unknown): number => {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return 0;
+  return Math.max(0, Math.floor(value));
+};
+
+export function normalizeMonopolyWallet(wallet: MonopolyWallet): MonopolyWallet {
+  const normalizedGold = normalizeWalletAmount(wallet.gold);
+  const normalizedSilver = normalizeWalletAmount(wallet.silver);
+  const carryGold = Math.floor(normalizedSilver / MONOPOLY_CURRENCY_RATIO);
+  return {
+    gold: normalizedGold + carryGold,
+    silver: normalizedSilver % MONOPOLY_CURRENCY_RATIO
+  };
+}
+
+export function createInitialMonopolyWallet(): MonopolyWallet {
+  return { gold: MONOPOLY_STARTING_GOLD, silver: 0 };
 }
 
 const TURN_INTERVAL_MS = 800;
@@ -646,6 +702,15 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   meta.innerHTML = `<span>Bàn chính: ${MAIN_TRACK_CELLS} ô</span><span>Lane phụ: ${SIDE_TRACK_COLUMN_HEIGHT * 4 + SIDE_TRACK_PROTRUSION_CELLS} ô</span><span>Bàn mini: ${MINI_RING_CELLS} ô</span><span>Bàn vi mô: ${MICRO_RING_CELLS} ô</span><span>Tổng: ${TOTAL_CELLS} ô</span>`;
   topbar.appendChild(meta);
 
+  const walletBar = document.createElement('div');
+  walletBar.className = 'monopoly-screen__wallet';
+  const silverSlot = document.createElement('span');
+  silverSlot.className = 'monopoly-screen__wallet-slot monopoly-screen__wallet-slot--silver';
+  const goldSlot = document.createElement('span');
+  goldSlot.className = 'monopoly-screen__wallet-slot monopoly-screen__wallet-slot--gold';
+  walletBar.append(silverSlot, goldSlot);
+  topbar.appendChild(walletBar);
+
   wrapper.appendChild(topbar);
 
   const turnBanner = document.createElement('div');
@@ -752,9 +817,27 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       activeDetourFrom: null,
       detourProgress: -1,
       node,
-      hpFillNode
+      hpFillNode,
+      wallet: createInitialMonopolyWallet()
     });
   }
+
+  const playerAvatar = avatars.find(avatar => avatar.role === 'player') ?? null;
+
+  const syncPlayerWalletUi = (): void => {
+    if (!playerAvatar) {
+      walletBar.hidden = true;
+      return;
+    }
+    const wallet = normalizeMonopolyWallet(playerAvatar.wallet);
+    playerAvatar.wallet = wallet;
+
+    silverSlot.hidden = wallet.silver <= 0;
+    goldSlot.hidden = wallet.gold <= 0;
+    silverSlot.textContent = String(wallet.silver);
+    goldSlot.textContent = String(wallet.gold);
+    walletBar.hidden = silverSlot.hidden && goldSlot.hidden;
+  };
 
   const syncAvatarHealthUi = (avatar: MonopolyAvatar): void => {
     const hpRatio = clampRatio(avatar.hp / avatar.stats.hpMax);
@@ -763,6 +846,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   };
 
   avatars.forEach(syncAvatarHealthUi);
+  syncPlayerWalletUi();
 
   const moveAvatarToCell = (avatar: MonopolyAvatar, indexOneBased: number): void => {
     const layout = BOARD_ISOMETRIC_LAYOUT.byIndex.get(indexOneBased - 1);
@@ -820,6 +904,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       ? ` • Giao chiến ${clashCount} mục tiêu, ${combat.events.length} đòn thường cùng lúc`
       : '';
     turnBanner.textContent = `Lượt ${avatar.unitName} (${avatar.role.toUpperCase()}) • Xúc xắc: ${dice} • Đến ô ${destination}${combatSummary}`;
+    syncPlayerWalletUi();
 
     activeTurnIndex = (activeTurnIndex + 1) % AVATAR_COUNT;
     turnTimer = window.setTimeout(runTurn, TURN_INTERVAL_MS + TURN_ADVANCE_DELAY_MS);

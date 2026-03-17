@@ -26787,6 +26787,34 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       font-size:14px;
       color:#9ec3e8;
     }
+    .monopoly-screen__wallet{
+      margin-left:auto;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .monopoly-screen__wallet-slot{
+      min-width:36px;
+      height:28px;
+      border-radius:8px;
+      border:1px solid rgba(210, 226, 246, 0.4);
+      background:rgba(8, 21, 37, 0.78);
+      color:#f3f7ff;
+      font-size:13px;
+      font-weight:700;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:0 8px;
+    }
+    .monopoly-screen__wallet-slot--silver{
+      border-color:rgba(213, 224, 236, 0.66);
+      box-shadow:inset 0 0 0 1px rgba(228, 236, 247, 0.18);
+    }
+    .monopoly-screen__wallet-slot--gold{
+      border-color:rgba(246, 214, 123, 0.72);
+      box-shadow:inset 0 0 0 1px rgba(255, 226, 145, 0.22);
+    }
     .monopoly-screen__turn{
       display:flex;
       align-items:center;
@@ -27128,6 +27156,25 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   function ensureStyles() {
       ensureStyleTag(STYLE_ID, { css: CSS });
   }
+  const MONOPOLY_CURRENCY_RATIO = 100;
+  const MONOPOLY_STARTING_GOLD = 5;
+  const normalizeWalletAmount = (value) => {
+      if (typeof value !== 'number' || !Number.isFinite(value))
+          return 0;
+      return Math.max(0, Math.floor(value));
+  };
+  function normalizeMonopolyWallet(wallet) {
+      const normalizedGold = normalizeWalletAmount(wallet.gold);
+      const normalizedSilver = normalizeWalletAmount(wallet.silver);
+      const carryGold = Math.floor(normalizedSilver / MONOPOLY_CURRENCY_RATIO);
+      return {
+          gold: normalizedGold + carryGold,
+          silver: normalizedSilver % MONOPOLY_CURRENCY_RATIO
+      };
+  }
+  function createInitialMonopolyWallet() {
+      return { gold: MONOPOLY_STARTING_GOLD, silver: 0 };
+  }
   const TURN_INTERVAL_MS = 800;
   const TURN_ADVANCE_DELAY_MS = 500;
   const START_CELL_ONE_BASED = 21;
@@ -27259,6 +27306,14 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       meta.className = 'monopoly-screen__meta';
       meta.innerHTML = `<span>Bàn chính: ${MAIN_TRACK_CELLS} ô</span><span>Lane phụ: ${SIDE_TRACK_COLUMN_HEIGHT * 4 + SIDE_TRACK_PROTRUSION_CELLS} ô</span><span>Bàn mini: ${MINI_RING_CELLS} ô</span><span>Bàn vi mô: ${MICRO_RING_CELLS} ô</span><span>Tổng: ${TOTAL_CELLS} ô</span>`;
       topbar.appendChild(meta);
+      const walletBar = document.createElement('div');
+      walletBar.className = 'monopoly-screen__wallet';
+      const silverSlot = document.createElement('span');
+      silverSlot.className = 'monopoly-screen__wallet-slot monopoly-screen__wallet-slot--silver';
+      const goldSlot = document.createElement('span');
+      goldSlot.className = 'monopoly-screen__wallet-slot monopoly-screen__wallet-slot--gold';
+      walletBar.append(silverSlot, goldSlot);
+      topbar.appendChild(walletBar);
       wrapper.appendChild(topbar);
       const turnBanner = document.createElement('div');
       turnBanner.className = 'monopoly-screen__turn';
@@ -27355,15 +27410,31 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
               activeDetourFrom: null,
               detourProgress: -1,
               node,
-              hpFillNode
+              hpFillNode,
+              wallet: createInitialMonopolyWallet()
           });
       }
+      const playerAvatar = avatars.find(avatar => avatar.role === 'player') ?? null;
+      const syncPlayerWalletUi = () => {
+          if (!playerAvatar) {
+              walletBar.hidden = true;
+              return;
+          }
+          const wallet = normalizeMonopolyWallet(playerAvatar.wallet);
+          playerAvatar.wallet = wallet;
+          silverSlot.hidden = wallet.silver <= 0;
+          goldSlot.hidden = wallet.gold <= 0;
+          silverSlot.textContent = String(wallet.silver);
+          goldSlot.textContent = String(wallet.gold);
+          walletBar.hidden = silverSlot.hidden && goldSlot.hidden;
+      };
       const syncAvatarHealthUi = (avatar) => {
           const hpRatio = clampRatio(avatar.hp / avatar.stats.hpMax);
           avatar.hpFillNode.style.transform = `scaleX(${hpRatio})`;
           avatar.node.classList.toggle('monopoly-avatar--dead', avatar.hp <= 0);
       };
       avatars.forEach(syncAvatarHealthUi);
+      syncPlayerWalletUi();
       const moveAvatarToCell = (avatar, indexOneBased) => {
           const layout = BOARD_ISOMETRIC_LAYOUT.byIndex.get(indexOneBased - 1);
           if (!layout)
@@ -27416,6 +27487,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
               ? ` • Giao chiến ${clashCount} mục tiêu, ${combat.events.length} đòn thường cùng lúc`
               : '';
           turnBanner.textContent = `Lượt ${avatar.unitName} (${avatar.role.toUpperCase()}) • Xúc xắc: ${dice} • Đến ô ${destination}${combatSummary}`;
+          syncPlayerWalletUi();
           activeTurnIndex = (activeTurnIndex + 1) % AVATAR_COUNT;
           turnTimer = window.setTimeout(runTurn, TURN_INTERVAL_MS + TURN_ADVANCE_DELAY_MS);
       };
@@ -27454,6 +27526,8 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createMonopolyBoardCells')) exports.createMonopolyBoardCells = createMonopolyBoardCells;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeMonopolyWallet')) exports.normalizeMonopolyWallet = normalizeMonopolyWallet;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'createInitialMonopolyWallet')) exports.createInitialMonopolyWallet = createInitialMonopolyWallet;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveMonopolyCollisionCombat')) exports.resolveMonopolyCollisionCombat = resolveMonopolyCollisionCombat;
   if (!Object.prototype.hasOwnProperty.call(exports, 'advanceMonopolyMovement')) exports.advanceMonopolyMovement = advanceMonopolyMovement;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;

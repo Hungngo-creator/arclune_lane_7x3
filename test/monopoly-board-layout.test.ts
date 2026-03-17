@@ -1,4 +1,10 @@
-import { advanceMonopolyMovement, createMonopolyBoardCells, resolveMonopolyCollisionCombat } from '../src/screens/monopoly/index.ts';
+import {
+  advanceMonopolyMovement,
+  createInitialMonopolyWallet,
+  createMonopolyBoardCells,
+  normalizeMonopolyWallet,
+  resolveMonopolyCollisionCombat
+} from '../src/screens/monopoly/index.ts';
 
 describe('monopoly board layout', () => {
     it('builds exactly 116 cells with 40 main-track cells, 24 mini-ring cells và 8 ô vi mô', () => {
@@ -231,5 +237,16 @@ describe('monopoly collision combat', () => {
     expect(a.hp).toBe(700);
     expect(b.hp).toBe(700);
     expect(c.hp).toBe(700);
+  });
+});
+
+describe('monopoly currency wallet', () => {
+  it('gives every avatar 5 gold at game start', () => {
+    expect(createInitialMonopolyWallet()).toEqual({ gold: 5, silver: 0 });
+  });
+
+  it('normalizes wallet with 1 gold = 100 silver conversion', () => {
+    expect(normalizeMonopolyWallet({ gold: 2, silver: 250 })).toEqual({ gold: 4, silver: 50 });
+    expect(normalizeMonopolyWallet({ gold: -1, silver: Number.NaN })).toEqual({ gold: 0, silver: 0 });
   });
 });
