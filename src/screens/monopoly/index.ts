@@ -16,6 +16,8 @@ const ISO_TILE_HEIGHT = 24;
 const ISO_HALF_WIDTH = ISO_TILE_WIDTH / 2;
 const ISO_HALF_HEIGHT = ISO_TILE_HEIGHT / 2;
 const ISO_PADDING = 28;
+const BOARD_MAX_SCALE = 2.4;
+const BOARD_MIN_SCALE = 1;
 
 const CSS = /* css */ `
   .app--co-ty-phu{
@@ -51,23 +53,27 @@ const CSS = /* css */ `
     color:#9ec3e8;
   }
   .monopoly-board{
-    width:min(92vw, 980px);
+    width:min(96vw, 1180px);
+    max-width:100%;
     height:auto;
     margin:0 auto;
     position:relative;
     overflow:visible;
+    --tile-w:${ISO_TILE_WIDTH}px;
+    --tile-h:${ISO_TILE_HEIGHT}px;
+    --tile-font:10px;
   }
   .monopoly-cell{
     position:absolute;
-    width:${ISO_TILE_WIDTH}px;
-    height:${ISO_TILE_HEIGHT}px;
+    width:var(--tile-w);
+    height:var(--tile-h);
     border:1px solid rgba(130, 168, 210, 0.4);
     background:rgba(22, 34, 49, 0.88);
     box-shadow:inset 0 0 0 1px rgba(255,255,255,0.03);
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:10px;
+    font-size:var(--tile-font);
     letter-spacing:0.02em;
     user-select:none;
     transform:translate(-50%, -50%);
@@ -389,6 +395,15 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   board.className = 'monopoly-board';
   board.style.height = `${BOARD_ISOMETRIC_LAYOUT.height}px`;
 
+  const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1280;
+  const isNarrowViewport = viewportWidth <= 900;
+  const initialScale = isNarrowViewport ? 1.5 : 1;
+  board.style.setProperty('--tile-w', `${ISO_TILE_WIDTH * initialScale}px`);
+  board.style.setProperty('--tile-h', `${ISO_TILE_HEIGHT * initialScale}px`);
+  board.style.setProperty('--tile-font', `${Math.max(10, 10 * initialScale)}px`);
+
+  const cellNodes: Array<{ node: HTMLDivElement; cell: BoardCell }> = [];
+
   const fragment = document.createDocumentFragment();
   for (const cell of BOARD_TEMPLATE) {
     const point = BOARD_ISOMETRIC_LAYOUT.byIndex.get(cell.index);
@@ -397,18 +412,49 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     }
     const node = document.createElement('div');
     node.className = `monopoly-cell monopoly-cell--${cell.track}`;
-    node.style.left = `${point.x}px`;
-    node.style.top = `${point.y}px`;
     node.textContent = String(cell.index + 1);
+    cellNodes.push({ node, cell });
     fragment.appendChild(node);
   }
+
+  const applyBoardScale = (): void => {
+    const viewportW = typeof window !== 'undefined' ? window.innerWidth : 1280;
+    const viewportH = typeof window !== 'undefined' ? window.innerHeight : 720;
+    const boardRect = board.getBoundingClientRect();
+    const topbarRect = topbar.getBoundingClientRect();
+
+    const horizontalScale = Math.max((viewportW - 24) / BOARD_ISOMETRIC_LAYOUT.width, BOARD_MIN_SCALE);
+    const verticalBudget = Math.max(viewportH - topbarRect.height - boardRect.top - 24, BOARD_ISOMETRIC_LAYOUT.height);
+    const verticalScale = Math.max(verticalBudget / BOARD_ISOMETRIC_LAYOUT.height, BOARD_MIN_SCALE);
+    const scale = Math.min(BOARD_MAX_SCALE, Math.max(BOARD_MIN_SCALE, Math.min(horizontalScale, verticalScale)));
+
+    board.style.height = `${Math.round(BOARD_ISOMETRIC_LAYOUT.height * scale)}px`;
+    board.style.setProperty('--tile-w', `${ISO_TILE_WIDTH * scale}px`);
+    board.style.setProperty('--tile-h', `${ISO_TILE_HEIGHT * scale}px`);
+    board.style.setProperty('--tile-font', `${Math.max(10, 10 * scale)}px`);
+
+    for (const { node, cell } of cellNodes) {
+      const cellPoint = BOARD_ISOMETRIC_LAYOUT.byIndex.get(cell.index);
+      if (!cellPoint) continue;
+      node.style.left = `${cellPoint.x * scale}px`;
+      node.style.top = `${cellPoint.y * scale}px`;
+    }
+  };
 
   board.appendChild(fragment);
   wrapper.appendChild(board);
 
+  applyBoardScale();
+  if (typeof window !== 'undefined') {
+    window.addEventListener('resize', applyBoardScale);
+  }
+
   return {
     destroy() {
       backButton.removeEventListener('click', onBack);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', applyBoardScale);
+      }
       mount.destroy();
     }
   };
