@@ -532,6 +532,7 @@ interface HouseStepSummary {
   paidTax: number;
   ownerCollected: number;
   purchaseLabel: string;
+  bankruptLabel: string;
 }
 
 interface MonopolyWallet {
@@ -1158,36 +1159,38 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
 
   const resolveHouseStep = (avatar: MonopolyAvatar, cellOneBased: number, isLanding: boolean): HouseStepSummary => {
     const slot = houseByCell.get(cellOneBased);
-    if (!slot) return { paidTax: 0, ownerCollected: 0, purchaseLabel: '' };
+    if (!slot) return { paidTax: 0, ownerCollected: 0, purchaseLabel: '', bankruptLabel: '' };
     if (slot.revealedTier == null || slot.ownerAvatarId == null) {
-      if (!isLanding) return { paidTax: 0, ownerCollected: 0, purchaseLabel: '' };
+      if (!isLanding) return { paidTax: 0, ownerCollected: 0, purchaseLabel: '', bankruptLabel: '' };
       const willBuy = avatar.role === 'player' || Math.random() < 0.72;
-      if (!willBuy) return { paidTax: 0, ownerCollected: 0, purchaseLabel: `${avatar.unitName} bỏ qua mua ô ?` };
+      if (!willBuy) return { paidTax: 0, ownerCollected: 0, purchaseLabel: `${avatar.unitName} bỏ qua mua ô ?`, bankruptLabel: '' };
       const purchase = revealHousePurchase(slot, avatar.id, avatar.wallet.silver, Math.random);
       if (!purchase.ok || !purchase.definition) {
-        return { paidTax: 0, ownerCollected: 0, purchaseLabel: `${avatar.unitName} không đủ bạc để mở ô ?` };
+        return { paidTax: 0, ownerCollected: 0, purchaseLabel: `${avatar.unitName} không đủ bạc để mở ô ?`, bankruptLabel: '' };
       }
       avatar.wallet = normalizeMonopolyWallet({ ...avatar.wallet, silver: purchase.nextWalletSilver });
       const node = cellNodes.find(item => item.cell.index + 1 === cellOneBased)?.node;
       if (node) node.textContent = `H${purchase.tier}`;
-      return { paidTax: 0, ownerCollected: 0, purchaseLabel: `${avatar.unitName} mua ${purchase.definition.name} cấp ${purchase.tier}` };
+      return { paidTax: 0, ownerCollected: 0, purchaseLabel: `${avatar.unitName} mua ${purchase.definition.name} cấp ${purchase.tier}`, bankruptLabel: '' };
     }
 
-    const settled = settleHouseTraverse(slot, avatar.id, isLanding);
+    const totalSilver = avatar.wallet.gold * MONOPOLY_CURRENCY_RATIO + avatar.wallet.silver;
+    const settled = settleHouseTraverse(slot, avatar.id, isLanding, totalSilver);
     if (settled.ownerCollectedSilver > 0) {
       avatar.wallet = grantMonopolySilver(avatar.wallet, settled.ownerCollectedSilver);
       applyHouseOwnerBuff(avatar, slot.definitionId ?? '', isLanding);
-      return { paidTax: 0, ownerCollected: settled.ownerCollectedSilver, purchaseLabel: '' };
+      return { paidTax: 0, ownerCollected: settled.ownerCollectedSilver, purchaseLabel: '', bankruptLabel: '' };
     }
-    if (settled.paidTaxSilver <= 0) return { paidTax: 0, ownerCollected: 0, purchaseLabel: '' };
-    const totalSilver = avatar.wallet.gold * MONOPOLY_CURRENCY_RATIO + avatar.wallet.silver;
-    const paidTax = Math.min(totalSilver, settled.paidTaxSilver);
-    const remainSilver = Math.max(0, totalSilver - paidTax);
+    if (settled.paidTaxSilver <= 0) return { paidTax: 0, ownerCollected: 0, purchaseLabel: '', bankruptLabel: '' };
+    const remainSilver = Math.max(0, totalSilver - settled.paidTaxSilver);
     avatar.wallet = normalizeMonopolyWallet({
       gold: Math.floor(remainSilver / MONOPOLY_CURRENCY_RATIO),
       silver: remainSilver % MONOPOLY_CURRENCY_RATIO
     });
-    return { paidTax, ownerCollected: 0, purchaseLabel: '' };
+    const bankruptLabel = settled.expectedTaxSilver > settled.paidTaxSilver
+      ? `${avatar.unitName} không đủ bạc để trả đủ thuế nhà (${settled.paidTaxSilver}/${settled.expectedTaxSilver})`
+      : '';
+    return { paidTax: settled.paidTaxSilver, ownerCollected: 0, purchaseLabel: '', bankruptLabel };
   };
 
   const runTurn = (): void => {
@@ -1249,12 +1252,14 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     let paidTax = 0;
     let ownerCollected = 0;
     let purchaseLabel = '';
+    let bankruptLabel = '';
     const traversed = advanced.traversedCells ?? [];
     for (let idx = 0; idx < traversed.length; idx += 1) {
       const summary = resolveHouseStep(avatar, traversed[idx] ?? avatar.currentCellOneBased, idx === traversed.length - 1);
       paidTax += summary.paidTax;
       ownerCollected += summary.ownerCollected;
       if (summary.purchaseLabel) purchaseLabel = summary.purchaseLabel;
+      if (summary.bankruptLabel) bankruptLabel = summary.bankruptLabel;
     }
 
     const destination = avatar.currentCellOneBased;
@@ -1288,9 +1293,11 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     const faintNote = avatar.skippedTurnCount > 0 ? ' • Tinh thần ≤ 20: lượt kế tiếp sẽ bị mất do ngất' : '';
     const houseSummary = purchaseLabel
       ? ` • ${purchaseLabel}`
-      : (paidTax > 0 || ownerCollected > 0)
-        ? ` • Nhà: thuế ${paidTax}, chủ thu ${ownerCollected}`
-        : '';
+      : bankruptLabel
+        ? ` • ${bankruptLabel}`
+        : (paidTax > 0 || ownerCollected > 0)
+          ? ` • Nhà: thuế ${paidTax}, chủ thu ${ownerCollected}`
+          : '';
     turnBanner.textContent = `Lượt ${avatar.unitName} (${avatar.role.toUpperCase()}) • Xúc xắc: ${dice} • Đến ô ${destination}${combatSummary}${houseSummary}${yearSummary}${spiritNote}${faintNote}`;
     syncPlayerWalletUi();
     syncPlayerStatusUi();

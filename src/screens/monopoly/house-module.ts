@@ -98,9 +98,11 @@ export interface HiddenHouseSlot {
 }
 
 export interface HouseTraverseResult {
+  readonly expectedTaxSilver: number;
   readonly paidTaxSilver: number;
   readonly ownerCollectedSilver: number;
   readonly houseTreasurySilver: number;
+  readonly ownerTriggeredHouse: boolean;
 }
 
 export function createRandomHouseSlots(cells: ReadonlyArray<BoardCell>, rng: () => number = Math.random, cap = MONOPOLY_HOUSE_SPAWN_LIMIT): HiddenHouseSlot[] {
@@ -190,21 +192,27 @@ export function collectHouseIncome(slot: HiddenHouseSlot, yearCompleted: boolean
 }
 
 /** Xử lý đi ngang / đạp trúng ô nhà. Thuế luôn cộng vào treasury để chủ thu khi đi ngang. */
-export function settleHouseTraverse(slot: HiddenHouseSlot, actorAvatarId: number, isLanding: boolean): HouseTraverseResult {
+export function settleHouseTraverse(
+  slot: HiddenHouseSlot,
+  actorAvatarId: number,
+  isLanding: boolean,
+  maxPayableSilver = Number.POSITIVE_INFINITY
+): HouseTraverseResult {
   const def = getHouseDefinitionById(slot.definitionId);
   if (!def || slot.ownerAvatarId == null) {
-    return { paidTaxSilver: 0, ownerCollectedSilver: 0, houseTreasurySilver: slot.treasurySilver };
+    return { expectedTaxSilver: 0, paidTaxSilver: 0, ownerCollectedSilver: 0, houseTreasurySilver: slot.treasurySilver, ownerTriggeredHouse: false };
   }
 
   if (actorAvatarId === slot.ownerAvatarId) {
     const ownerCollectedSilver = slot.treasurySilver;
     slot.treasurySilver = 0;
-    return { paidTaxSilver: 0, ownerCollectedSilver, houseTreasurySilver: slot.treasurySilver };
+    return { expectedTaxSilver: 0, paidTaxSilver: 0, ownerCollectedSilver, houseTreasurySilver: slot.treasurySilver, ownerTriggeredHouse: true };
   }
 
-  const paidTaxSilver = isLanding ? def.landTaxSilver : def.passTaxSilver;
+  const expectedTaxSilver = isLanding ? def.landTaxSilver : def.passTaxSilver;
+  const paidTaxSilver = Math.max(0, Math.min(expectedTaxSilver, Math.floor(maxPayableSilver)));
   slot.treasurySilver += paidTaxSilver;
-  return { paidTaxSilver, ownerCollectedSilver: 0, houseTreasurySilver: slot.treasurySilver };
+  return { expectedTaxSilver, paidTaxSilver, ownerCollectedSilver: 0, houseTreasurySilver: slot.treasurySilver, ownerTriggeredHouse: false };
 }
 
 export function upgradeHouse(slot: HiddenHouseSlot, walletSilver: number, rng: () => number = Math.random): {

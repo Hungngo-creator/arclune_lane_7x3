@@ -26846,19 +26846,20 @@ __define('./screens/monopoly/house-module.ts', (exports, module, __require) => {
       return slot.treasurySilver;
   }
   /** Xử lý đi ngang / đạp trúng ô nhà. Thuế luôn cộng vào treasury để chủ thu khi đi ngang. */
-  function settleHouseTraverse(slot, actorAvatarId, isLanding) {
+  function settleHouseTraverse(slot, actorAvatarId, isLanding, maxPayableSilver = Number.POSITIVE_INFINITY) {
       const def = getHouseDefinitionById(slot.definitionId);
       if (!def || slot.ownerAvatarId == null) {
-          return { paidTaxSilver: 0, ownerCollectedSilver: 0, houseTreasurySilver: slot.treasurySilver };
+          return { expectedTaxSilver: 0, paidTaxSilver: 0, ownerCollectedSilver: 0, houseTreasurySilver: slot.treasurySilver, ownerTriggeredHouse: false };
       }
       if (actorAvatarId === slot.ownerAvatarId) {
           const ownerCollectedSilver = slot.treasurySilver;
           slot.treasurySilver = 0;
-          return { paidTaxSilver: 0, ownerCollectedSilver, houseTreasurySilver: slot.treasurySilver };
+          return { expectedTaxSilver: 0, paidTaxSilver: 0, ownerCollectedSilver, houseTreasurySilver: slot.treasurySilver, ownerTriggeredHouse: true };
       }
-      const paidTaxSilver = isLanding ? def.landTaxSilver : def.passTaxSilver;
+      const expectedTaxSilver = isLanding ? def.landTaxSilver : def.passTaxSilver;
+      const paidTaxSilver = Math.max(0, Math.min(expectedTaxSilver, Math.floor(maxPayableSilver)));
       slot.treasurySilver += paidTaxSilver;
-      return { paidTaxSilver, ownerCollectedSilver: 0, houseTreasurySilver: slot.treasurySilver };
+      return { expectedTaxSilver, paidTaxSilver, ownerCollectedSilver: 0, houseTreasurySilver: slot.treasurySilver, ownerTriggeredHouse: false };
   }
   function upgradeHouse(slot, walletSilver, rng = Math.random) {
       const currentDef = getHouseDefinitionById(slot.definitionId);
@@ -27875,39 +27876,41 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       const resolveHouseStep = (avatar, cellOneBased, isLanding) => {
           const slot = houseByCell.get(cellOneBased);
           if (!slot)
-              return { paidTax: 0, ownerCollected: 0, purchaseLabel: '' };
+              return { paidTax: 0, ownerCollected: 0, purchaseLabel: '', bankruptLabel: '' };
           if (slot.revealedTier == null || slot.ownerAvatarId == null) {
               if (!isLanding)
-                  return { paidTax: 0, ownerCollected: 0, purchaseLabel: '' };
+                  return { paidTax: 0, ownerCollected: 0, purchaseLabel: '', bankruptLabel: '' };
               const willBuy = avatar.role === 'player' || Math.random() < 0.72;
               if (!willBuy)
-                  return { paidTax: 0, ownerCollected: 0, purchaseLabel: `${avatar.unitName} bỏ qua mua ô ?` };
+                  return { paidTax: 0, ownerCollected: 0, purchaseLabel: `${avatar.unitName} bỏ qua mua ô ?`, bankruptLabel: '' };
               const purchase = revealHousePurchase(slot, avatar.id, avatar.wallet.silver, Math.random);
               if (!purchase.ok || !purchase.definition) {
-                  return { paidTax: 0, ownerCollected: 0, purchaseLabel: `${avatar.unitName} không đủ bạc để mở ô ?` };
+                  return { paidTax: 0, ownerCollected: 0, purchaseLabel: `${avatar.unitName} không đủ bạc để mở ô ?`, bankruptLabel: '' };
               }
               avatar.wallet = normalizeMonopolyWallet({ ...avatar.wallet, silver: purchase.nextWalletSilver });
               const node = cellNodes.find(item => item.cell.index + 1 === cellOneBased)?.node;
               if (node)
                   node.textContent = `H${purchase.tier}`;
-              return { paidTax: 0, ownerCollected: 0, purchaseLabel: `${avatar.unitName} mua ${purchase.definition.name} cấp ${purchase.tier}` };
+              return { paidTax: 0, ownerCollected: 0, purchaseLabel: `${avatar.unitName} mua ${purchase.definition.name} cấp ${purchase.tier}`, bankruptLabel: '' };
           }
-          const settled = settleHouseTraverse(slot, avatar.id, isLanding);
+          const totalSilver = avatar.wallet.gold * MONOPOLY_CURRENCY_RATIO + avatar.wallet.silver;
+          const settled = settleHouseTraverse(slot, avatar.id, isLanding, totalSilver);
           if (settled.ownerCollectedSilver > 0) {
               avatar.wallet = grantMonopolySilver(avatar.wallet, settled.ownerCollectedSilver);
               applyHouseOwnerBuff(avatar, slot.definitionId ?? '', isLanding);
-              return { paidTax: 0, ownerCollected: settled.ownerCollectedSilver, purchaseLabel: '' };
+              return { paidTax: 0, ownerCollected: settled.ownerCollectedSilver, purchaseLabel: '', bankruptLabel: '' };
           }
           if (settled.paidTaxSilver <= 0)
-              return { paidTax: 0, ownerCollected: 0, purchaseLabel: '' };
-          const totalSilver = avatar.wallet.gold * MONOPOLY_CURRENCY_RATIO + avatar.wallet.silver;
-          const paidTax = Math.min(totalSilver, settled.paidTaxSilver);
-          const remainSilver = Math.max(0, totalSilver - paidTax);
+              return { paidTax: 0, ownerCollected: 0, purchaseLabel: '', bankruptLabel: '' };
+          const remainSilver = Math.max(0, totalSilver - settled.paidTaxSilver);
           avatar.wallet = normalizeMonopolyWallet({
               gold: Math.floor(remainSilver / MONOPOLY_CURRENCY_RATIO),
               silver: remainSilver % MONOPOLY_CURRENCY_RATIO
           });
-          return { paidTax, ownerCollected: 0, purchaseLabel: '' };
+          const bankruptLabel = settled.expectedTaxSilver > settled.paidTaxSilver
+              ? `${avatar.unitName} không đủ bạc để trả đủ thuế nhà (${settled.paidTaxSilver}/${settled.expectedTaxSilver})`
+              : '';
+          return { paidTax: settled.paidTaxSilver, ownerCollected: 0, purchaseLabel: '', bankruptLabel };
       };
       const runTurn = () => {
           if (destroyed)
@@ -27960,6 +27963,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           let paidTax = 0;
           let ownerCollected = 0;
           let purchaseLabel = '';
+          let bankruptLabel = '';
           const traversed = advanced.traversedCells ?? [];
           for (let idx = 0; idx < traversed.length; idx += 1) {
               const summary = resolveHouseStep(avatar, traversed[idx] ?? avatar.currentCellOneBased, idx === traversed.length - 1);
@@ -27967,6 +27971,8 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
               ownerCollected += summary.ownerCollected;
               if (summary.purchaseLabel)
                   purchaseLabel = summary.purchaseLabel;
+              if (summary.bankruptLabel)
+                  bankruptLabel = summary.bankruptLabel;
           }
           const destination = avatar.currentCellOneBased;
           const colliders = avatars.filter(item => item.hasEnteredBoard && item.currentCellOneBased === destination && item.hp > 0);
@@ -27998,9 +28004,11 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           const faintNote = avatar.skippedTurnCount > 0 ? ' • Tinh thần ≤ 20: lượt kế tiếp sẽ bị mất do ngất' : '';
           const houseSummary = purchaseLabel
               ? ` • ${purchaseLabel}`
-              : (paidTax > 0 || ownerCollected > 0)
-                  ? ` • Nhà: thuế ${paidTax}, chủ thu ${ownerCollected}`
-                  : '';
+              : bankruptLabel
+                  ? ` • ${bankruptLabel}`
+                  : (paidTax > 0 || ownerCollected > 0)
+                      ? ` • Nhà: thuế ${paidTax}, chủ thu ${ownerCollected}`
+                      : '';
           turnBanner.textContent = `Lượt ${avatar.unitName} (${avatar.role.toUpperCase()}) • Xúc xắc: ${dice} • Đến ô ${destination}${combatSummary}${houseSummary}${yearSummary}${spiritNote}${faintNote}`;
           syncPlayerWalletUi();
           syncPlayerStatusUi();

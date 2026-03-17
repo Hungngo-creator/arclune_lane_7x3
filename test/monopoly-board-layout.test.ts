@@ -394,6 +394,23 @@ describe('monopoly house module', () => {
     expect(upgraded.nextDefinition?.tier).toBe(2);
   });
 
+  it('caps tax by current wallet so house treasury does not mint money from debt', () => {
+    const slot = {
+      cellIndex: 30,
+      marker: '?' as const,
+      revealedTier: 5 as const,
+      definitionId: 'anh_sat_mon',
+      ownerAvatarId: 3,
+      treasurySilver: 0,
+      minedYears: 0
+    };
+
+    const settled = settleHouseTraverse(slot, 8, true, 420);
+    expect(settled.expectedTaxSilver).toBe(1500);
+    expect(settled.paidTaxSilver).toBe(420);
+    expect(slot.treasurySilver).toBe(420);
+  });
+
   it('supports mine-style houses with limited yearly extraction', () => {
     const mine = getHouseDefinitions().find(entry => entry.id === 'quang_nho');
     expect(mine).toBeTruthy();
