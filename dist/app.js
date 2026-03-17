@@ -26881,6 +26881,43 @@ __define('./screens/monopoly/house-module.ts', (exports, module, __require) => {
   function getHouseDefinitions() {
       return DEFINITIONS;
   }
+  /** Ba Nén Nhang: debuff riêng cho người không phải chủ khi đi ngang/đạp trúng. */
+  function getHouseVisitorPenalty(definitionId, isLanding) {
+      if (definitionId !== 'ba_nen_nhang') {
+          return { hpRatioLoss: 0, statusDelta: {} };
+      }
+      if (isLanding) {
+          return {
+              hpRatioLoss: 0.13,
+              statusDelta: { thirst: -10, hunger: -10, spirit: -13 }
+          };
+      }
+      return {
+          hpRatioLoss: 0.05,
+          statusDelta: {}
+      };
+  }
+  /** Ảnh sát môn: tinh thần dư được chuyển 50% thành max tinh thần (không hồi phần max mới tăng). */
+  function applySpiritGainWithHouseOverflow(definitionId, currentSpirit, currentSpiritCap, spiritGain) {
+      const cap = Math.max(0, Number.isFinite(currentSpiritCap) ? currentSpiritCap : 100);
+      const baseSpirit = Math.max(0, Number.isFinite(currentSpirit) ? currentSpirit : 0);
+      const gain = Math.max(0, Number.isFinite(spiritGain) ? spiritGain : 0);
+      const rawNext = baseSpirit + gain;
+      if (definitionId !== 'anh_sat_mon' || rawNext <= cap) {
+          return { nextSpirit: Math.min(cap, rawNext), nextSpiritCap: cap, overflowConvertedToCap: 0 };
+      }
+      const overflow = rawNext - cap;
+      const converted = overflow * 0.5;
+      return {
+          nextSpirit: cap,
+          nextSpiritCap: cap + converted,
+          overflowConvertedToCap: converted
+      };
+  }
+  /** Ảnh sát môn: nếu không trả đủ thuế thì nhận phạt theo HP hiện tại. */
+  function shouldTriggerAssassinTaxPunishment(definitionId, expectedTax, paidTax) {
+      return definitionId === 'anh_sat_mon' && expectedTax > paidTax;
+  }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'MONOPOLY_HOUSE_SPAWN_LIMIT')) exports.MONOPOLY_HOUSE_SPAWN_LIMIT = MONOPOLY_HOUSE_SPAWN_LIMIT;
   if (!Object.prototype.hasOwnProperty.call(exports, 'HOUSE_TIER_BUY_COST')) exports.HOUSE_TIER_BUY_COST = HOUSE_TIER_BUY_COST;
@@ -26894,6 +26931,9 @@ __define('./screens/monopoly/house-module.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'settleHouseTraverse')) exports.settleHouseTraverse = settleHouseTraverse;
   if (!Object.prototype.hasOwnProperty.call(exports, 'upgradeHouse')) exports.upgradeHouse = upgradeHouse;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getHouseDefinitions')) exports.getHouseDefinitions = getHouseDefinitions;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getHouseVisitorPenalty')) exports.getHouseVisitorPenalty = getHouseVisitorPenalty;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'applySpiritGainWithHouseOverflow')) exports.applySpiritGainWithHouseOverflow = applySpiritGainWithHouseOverflow;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'shouldTriggerAssassinTaxPunishment')) exports.shouldTriggerAssassinTaxPunishment = shouldTriggerAssassinTaxPunishment;
 });
 __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   const __dep1 = __require('./ui/dom.ts');
@@ -26907,11 +26947,14 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   const __dep4 = __require('./data/roster-preview.ts');
   const computeFinalStats = __dep4.computeFinalStats;
   const __dep5 = __require('./screens/monopoly/house-module.ts');
+  const applySpiritGainWithHouseOverflow = __dep5.applySpiritGainWithHouseOverflow;
   const collectHouseIncome = __dep5.collectHouseIncome;
   const createRandomHouseSlots = __dep5.createRandomHouseSlots;
   const getHouseDefinitionById = __dep5.getHouseDefinitionById;
+  const getHouseVisitorPenalty = __dep5.getHouseVisitorPenalty;
   const revealHousePurchase = __dep5.revealHousePurchase;
   const settleHouseTraverse = __dep5.settleHouseTraverse;
+  const shouldTriggerAssassinTaxPunishment = __dep5.shouldTriggerAssassinTaxPunishment;
   const upgradeHouse = __dep5.upgradeHouse;
   const STYLE_ID = 'monopoly-screen-style';
   const BOARD_SIZE = 15;
@@ -27743,6 +27786,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
               hpFillNode,
               wallet: createInitialMonopolyWallet(),
               status: createInitialMonopolyStatus(),
+              spiritCap: MONOPOLY_STATUS_CAP,
               skippedTurnCount: 0
           });
       }
@@ -27780,7 +27824,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           }
           const { thirst, hunger, spirit } = playerAvatar.status;
           playerStatusNode.hidden = false;
-          playerStatusNode.textContent = `Chỉ số cá nhân • Khát ${formatMetric(thirst)}/100 • Đói ${formatMetric(hunger)}/100 • Tinh thần ${formatMetric(spirit)}/100`;
+          playerStatusNode.textContent = `Chỉ số cá nhân • Khát ${formatMetric(thirst)}/100 • Đói ${formatMetric(hunger)}/100 • Tinh thần ${formatMetric(spirit)}/${formatMetric(playerAvatar.spiritCap)}`;
       };
       const syncYearUi = () => {
           yearSlot.textContent = `Năm: ${yearsElapsed}`;
@@ -27836,6 +27880,11 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
                   spirit: clampMonopolyStatus(avatar.status.spirit + (delta.spirit ?? 0))
               };
           };
+          const gainSpirit = (amount) => {
+              const spiritState = applySpiritGainWithHouseOverflow(houseId, avatar.status.spirit, avatar.spiritCap, amount);
+              avatar.status = { ...avatar.status, spirit: spiritState.nextSpirit };
+              avatar.spiritCap = spiritState.nextSpiritCap;
+          };
           if (houseId === 'tieu_diem' && isLanding)
               gainStatus({ thirst: 10, hunger: 10 });
           if (houseId === 'thon_nho' && isLanding) {
@@ -27869,9 +27918,9 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
                   avatar.hp = 0;
           }
           if (houseId === 'hop_hoan_tong')
-              gainStatus({ spirit: isLanding ? 35 : 15 });
+              gainSpirit(isLanding ? 35 : 15);
           if (houseId === 'anh_sat_mon')
-              gainStatus({ spirit: isLanding ? 65 : 30 });
+              gainSpirit(isLanding ? 65 : 30);
           if (houseId === 'tai_cac')
               gainStatus({ spirit: isLanding ? 100 : 50 });
       };
@@ -27925,6 +27974,18 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
                   }
               }
               return `${actor.unitName} bị ${owner.unitName} công kích từ ${slot.definitionId === 'anh_cung' ? 'Ảnh Cung' : 'Thí Thần Thương'} -${damage} HP`;
+          }
+          if (slot.definitionId === 'ba_nen_nhang') {
+              const penalty = getHouseVisitorPenalty(slot.definitionId, isLanding);
+              if (penalty.hpRatioLoss > 0) {
+                  actor.hp = Math.max(0, actor.hp - actor.stats.hpMax * penalty.hpRatioLoss);
+              }
+              actor.status = {
+                  thirst: clampMonopolyStatus(actor.status.thirst + (penalty.statusDelta.thirst ?? 0)),
+                  hunger: clampMonopolyStatus(actor.status.hunger + (penalty.statusDelta.hunger ?? 0)),
+                  spirit: clampMonopolyStatus(actor.status.spirit + (penalty.statusDelta.spirit ?? 0))
+              };
+              return `${actor.unitName} bị Ba Nén Nhang ám hại`;
           }
           if (slot.definitionId === 'anh_sat_mon' && isLanding && actor.wallet.gold <= 0 && actor.wallet.silver < 1) {
               if (actor.hp <= actor.stats.hpMax * 0.2) {
@@ -27989,6 +28050,14 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           const bankruptLabel = settled.expectedTaxSilver > settled.paidTaxSilver
               ? `${avatar.unitName} không đủ bạc để trả đủ thuế nhà (${settled.paidTaxSilver}/${settled.expectedTaxSilver})`
               : '';
+          if (shouldTriggerAssassinTaxPunishment(slot.definitionId, settled.expectedTaxSilver, settled.paidTaxSilver)) {
+              if (avatar.hp <= avatar.stats.hpMax * 0.2) {
+                  avatar.hp = 0;
+              }
+              else {
+                  avatar.hp = Math.max(0, avatar.hp - avatar.stats.hpMax * 0.03);
+              }
+          }
           const hazardLabel = resolveHouseCombatThreat(slot, avatar, isLanding) || resolveRangedHouseThreat(avatar, cellOneBased);
           return { paidTax: settled.paidTaxSilver, ownerCollected: 0, purchaseLabel: '', upgradeLabel: '', hazardLabel, bankruptLabel };
       };

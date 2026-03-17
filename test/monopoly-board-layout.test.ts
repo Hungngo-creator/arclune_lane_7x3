@@ -3,6 +3,7 @@ import {
   applyMonopolyStepDrain,
   applyMonopolySurvivalHpDrain,
   collectHouseIncome,
+  applySpiritGainWithHouseOverflow,
   computeMonopolyVictoryRewardByGold,
   createRandomHouseSlots,
   createInitialMonopolyStatus,
@@ -12,10 +13,12 @@ import {
   getMonopolyDiceMaxBySpirit,
   normalizeMonopolyWallet,
   pickRandomHouseDefinitionByTier,
+  getHouseVisitorPenalty,
   refillMonopolySilverIfEmpty,
   revealHousePurchase,
   rollHouseTier,
   settleHouseTraverse,
+  shouldTriggerAssassinTaxPunishment,
   upgradeHouse,
   resolveMonopolyCollisionCombat,
   shouldSkipMonopolyTurnBySpirit,
@@ -430,5 +433,35 @@ describe('monopoly house module', () => {
     }
     expect(slot.treasurySilver).toBe(750);
     expect(slot.minedYears).toBe(3);
+  });
+
+it('applies Ba Nén Nhang visitor penalties by pass/land', () => {
+    const passPenalty = getHouseVisitorPenalty('ba_nen_nhang', false);
+    const landPenalty = getHouseVisitorPenalty('ba_nen_nhang', true);
+    const neutralPenalty = getHouseVisitorPenalty('tieu_diem', true);
+
+    expect(passPenalty.hpRatioLoss).toBe(0.05);
+    expect(landPenalty.hpRatioLoss).toBe(0.13);
+    expect(landPenalty.statusDelta.thirst).toBe(-10);
+    expect(landPenalty.statusDelta.hunger).toBe(-10);
+    expect(landPenalty.statusDelta.spirit).toBe(-13);
+    expect(neutralPenalty.hpRatioLoss).toBe(0);
+  });
+
+  it('converts overflow spirit to spirit cap for Ảnh sát môn', () => {
+    const overflow = applySpiritGainWithHouseOverflow('anh_sat_mon', 90, 100, 65);
+    const normal = applySpiritGainWithHouseOverflow('hop_hoan_tong', 90, 100, 35);
+
+    expect(overflow.nextSpirit).toBe(100);
+    expect(overflow.nextSpiritCap).toBe(127.5);
+    expect(overflow.overflowConvertedToCap).toBe(27.5);
+    expect(normal.nextSpirit).toBe(100);
+    expect(normal.nextSpiritCap).toBe(100);
+  });
+
+  it('flags assassin punishment whenever Ảnh sát môn tax is underpaid', () => {
+    expect(shouldTriggerAssassinTaxPunishment('anh_sat_mon', 1500, 200)).toBe(true);
+    expect(shouldTriggerAssassinTaxPunishment('anh_sat_mon', 700, 700)).toBe(false);
+    expect(shouldTriggerAssassinTaxPunishment('tai_cac', 1700, 0)).toBe(false);
   });
 });

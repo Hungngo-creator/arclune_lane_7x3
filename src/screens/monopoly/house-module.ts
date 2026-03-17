@@ -42,6 +42,23 @@ export interface HouseDefinition {
   readonly combatRules?: HouseCombatRules;
 }
 
+export interface HouseStatusDelta {
+  readonly thirst?: number;
+  readonly hunger?: number;
+  readonly spirit?: number;
+}
+
+export interface HouseVisitorPenalty {
+  readonly hpRatioLoss: number;
+  readonly statusDelta: HouseStatusDelta;
+}
+
+export interface HouseSpiritOverflowResult {
+  readonly nextSpirit: number;
+  readonly nextSpiritCap: number;
+  readonly overflowConvertedToCap: number;
+}
+
 export const MONOPOLY_HOUSE_SPAWN_LIMIT = 16;
 
 export const HOUSE_TIER_BUY_COST: Readonly<Record<HouseTier, number>> = Object.freeze({
@@ -240,4 +257,49 @@ export function upgradeHouse(slot: HiddenHouseSlot, walletSilver: number, rng: (
 
 export function getHouseDefinitions(): ReadonlyArray<HouseDefinition> {
   return DEFINITIONS;
+}
+
+/** Ba Nén Nhang: debuff riêng cho người không phải chủ khi đi ngang/đạp trúng. */
+export function getHouseVisitorPenalty(definitionId: string | null, isLanding: boolean): HouseVisitorPenalty {
+  if (definitionId !== 'ba_nen_nhang') {
+    return { hpRatioLoss: 0, statusDelta: {} };
+  }
+  if (isLanding) {
+    return {
+      hpRatioLoss: 0.13,
+      statusDelta: { thirst: -10, hunger: -10, spirit: -13 }
+    };
+  }
+  return {
+    hpRatioLoss: 0.05,
+    statusDelta: {}
+  };
+}
+
+/** Ảnh sát môn: tinh thần dư được chuyển 50% thành max tinh thần (không hồi phần max mới tăng). */
+export function applySpiritGainWithHouseOverflow(
+  definitionId: string | null,
+  currentSpirit: number,
+  currentSpiritCap: number,
+  spiritGain: number
+): HouseSpiritOverflowResult {
+  const cap = Math.max(0, Number.isFinite(currentSpiritCap) ? currentSpiritCap : 100);
+  const baseSpirit = Math.max(0, Number.isFinite(currentSpirit) ? currentSpirit : 0);
+  const gain = Math.max(0, Number.isFinite(spiritGain) ? spiritGain : 0);
+  const rawNext = baseSpirit + gain;
+  if (definitionId !== 'anh_sat_mon' || rawNext <= cap) {
+    return { nextSpirit: Math.min(cap, rawNext), nextSpiritCap: cap, overflowConvertedToCap: 0 };
+  }
+  const overflow = rawNext - cap;
+  const converted = overflow * 0.5;
+  return {
+    nextSpirit: cap,
+    nextSpiritCap: cap + converted,
+    overflowConvertedToCap: converted
+  };
+}
+
+/** Ảnh sát môn: nếu không trả đủ thuế thì nhận phạt theo HP hiện tại. */
+export function shouldTriggerAssassinTaxPunishment(definitionId: string | null, expectedTax: number, paidTax: number): boolean {
+  return definitionId === 'anh_sat_mon' && expectedTax > paidTax;
 }
