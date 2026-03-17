@@ -107,6 +107,7 @@ const LEGACY_MODULE_ID_ALIAS_ENTRIES = [
   ['@screens/arena-hub/index.ts', './screens/arena-hub/index.ts'],
   ['@screens/campaign-world-map/index.ts', './screens/campaign-world-map/index.ts'],
   ['@screens/monopoly/index.ts', './screens/monopoly/index.ts'],
+    ['@screens/monopoly/ready.ts', './screens/monopoly/ready.ts'],
   ['@screens/collection/index.ts', './screens/collection/index.ts'],
   ['@screens/lineup/index.ts', './screens/lineup/index.ts'],
   ['@screens/ui-gacha/index.ts', './screens/ui-gacha/index.ts'],
