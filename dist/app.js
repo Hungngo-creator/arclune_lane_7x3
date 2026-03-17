@@ -26718,6 +26718,11 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   const MICRO_RING_CELLS = 8;
   const TOTAL_CELLS = MAIN_TRACK_CELLS + SIDE_TRACK_COLUMN_HEIGHT * 4 + SIDE_TRACK_PROTRUSION_CELLS + MINI_RING_CELLS + MICRO_RING_CELLS;
   const INNER_COLUMN_HEIGHT = 9;
+  const ISO_TILE_WIDTH = 48;
+  const ISO_TILE_HEIGHT = 24;
+  const ISO_HALF_WIDTH = ISO_TILE_WIDTH / 2;
+  const ISO_HALF_HEIGHT = ISO_TILE_HEIGHT / 2;
+  const ISO_PADDING = 28;
   const CSS = /* css */ `
     .app--co-ty-phu{
       padding:24px 16px 48px;
@@ -26752,26 +26757,27 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       color:#9ec3e8;
     }
     .monopoly-board{
-      width:min(92vw, 840px);
-      aspect-ratio:1/1;
+      width:min(92vw, 980px);
+      height:auto;
       margin:0 auto;
-      display:grid;
-      grid-template-columns:repeat(${BOARD_SIZE}, minmax(0,1fr));
-      grid-template-rows:repeat(${BOARD_SIZE}, minmax(0,1fr));
-      gap:6px;
+      position:relative;
+      overflow:visible;
     }
     .monopoly-cell{
-      min-height:42px;
-      border-radius:10px;
+      position:absolute;
+      width:${ISO_TILE_WIDTH}px;
+      height:${ISO_TILE_HEIGHT}px;
       border:1px solid rgba(130, 168, 210, 0.4);
       background:rgba(22, 34, 49, 0.88);
       box-shadow:inset 0 0 0 1px rgba(255,255,255,0.03);
       display:flex;
       align-items:center;
       justify-content:center;
-      font-size:11px;
+      font-size:10px;
       letter-spacing:0.02em;
       user-select:none;
+      transform:translate(-50%, -50%);
+      clip-path:polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
     }
     .monopoly-cell--main{ background:rgba(24,44,68,0.95); }
     .monopoly-cell--lane{ background:rgba(39,33,67,0.95); }
@@ -26964,6 +26970,38 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       return Object.freeze(cells);
   }
   const BOARD_TEMPLATE = buildMonopolyBoardCells();
+  function computeIsometricLayout(cells) {
+      const raw = new Map();
+      let minX = Number.POSITIVE_INFINITY;
+      let maxX = Number.NEGATIVE_INFINITY;
+      let minY = Number.POSITIVE_INFINITY;
+      let maxY = Number.NEGATIVE_INFINITY;
+      for (const cell of cells) {
+          const x = (cell.col - cell.row) * ISO_HALF_WIDTH;
+          const y = (cell.col + cell.row) * ISO_HALF_HEIGHT;
+          raw.set(cell.index, { x, y });
+          minX = Math.min(minX, x);
+          maxX = Math.max(maxX, x);
+          minY = Math.min(minY, y);
+          maxY = Math.max(maxY, y);
+      }
+      const byIndex = new Map();
+      for (const cell of cells) {
+          const point = raw.get(cell.index);
+          if (!point)
+              continue;
+          byIndex.set(cell.index, {
+              x: point.x - minX + ISO_PADDING + ISO_HALF_WIDTH,
+              y: point.y - minY + ISO_PADDING + ISO_HALF_HEIGHT
+          });
+      }
+      return {
+          width: maxX - minX + ISO_TILE_WIDTH + ISO_PADDING * 2,
+          height: maxY - minY + ISO_TILE_HEIGHT + ISO_PADDING * 2,
+          byIndex: byIndex
+      };
+  }
+  const BOARD_ISOMETRIC_LAYOUT = computeIsometricLayout(BOARD_TEMPLATE);
   function createMonopolyBoardCells() {
       return BOARD_TEMPLATE;
   }
@@ -26992,12 +27030,17 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       wrapper.appendChild(topbar);
       const board = document.createElement('div');
       board.className = 'monopoly-board';
+      board.style.height = `${BOARD_ISOMETRIC_LAYOUT.height}px`;
       const fragment = document.createDocumentFragment();
       for (const cell of BOARD_TEMPLATE) {
+          const point = BOARD_ISOMETRIC_LAYOUT.byIndex.get(cell.index);
+          if (!point) {
+              throw new Error(`Thiếu layout isometric cho ô #${cell.index + 1}`);
+          }
           const node = document.createElement('div');
           node.className = `monopoly-cell monopoly-cell--${cell.track}`;
-          node.style.gridColumn = String(cell.col + 1);
-          node.style.gridRow = String(cell.row + 1);
+          node.style.left = `${point.x}px`;
+          node.style.top = `${point.y}px`;
           node.textContent = String(cell.index + 1);
           fragment.appendChild(node);
       }
