@@ -15,6 +15,8 @@ import {
   refillMonopolySilverIfEmpty,
   revealHousePurchase,
   rollHouseTier,
+  settleHouseTraverse,
+  upgradeHouse,
   resolveMonopolyCollisionCombat,
   shouldSkipMonopolyTurnBySpirit,
   spendMonopolySilver
@@ -328,6 +330,7 @@ it('drains hp by step when thirst/hunger are critically low for any avatar', () 
     expect(applyMonopolySurvivalHpDrain(1000, 1000, { thirst: 10, hunger: 10, spirit: 80 }, 4)).toBe(1000);
   });
 });
+});
 describe('monopoly house module', () => {
   it('spawns up to 16 random house slots and keeps marker ?', () => {
     const cells = createMonopolyBoardCells();
@@ -352,6 +355,45 @@ describe('monopoly house module', () => {
     expect(res.nextWalletSilver).toBe(500);
   });
 
+  it('applies tax to non-owner traversal and owner can collect treasury when passing', () => {
+    const slot = {
+      cellIndex: 22,
+      marker: '?' as const,
+      revealedTier: 1 as const,
+      definitionId: 'tieu_diem',
+      ownerAvatarId: 2,
+      treasurySilver: 0,
+      minedYears: 0
+    };
+
+    const passTax = settleHouseTraverse(slot, 5, false);
+    const landTax = settleHouseTraverse(slot, 5, true);
+    const ownerCollect = settleHouseTraverse(slot, 2, false);
+
+    expect(passTax.paidTaxSilver).toBe(5);
+    expect(landTax.paidTaxSilver).toBe(20);
+    expect(ownerCollect.ownerCollectedSilver).toBe(25);
+    expect(slot.treasurySilver).toBe(0);
+  });
+
+  it('upgrades owned house to next tier with configured upgrade cost', () => {
+    const slot = {
+      cellIndex: 11,
+      marker: '?' as const,
+      revealedTier: 1 as const,
+      definitionId: 'tieu_diem',
+      ownerAvatarId: 9,
+      treasurySilver: 0,
+      minedYears: 0
+    };
+
+    const upgraded = upgradeHouse(slot, 500, () => 0.02);
+    expect(upgraded.ok).toBe(true);
+    expect(upgraded.nextWalletSilver).toBe(300);
+    expect(slot.revealedTier).toBe(2);
+    expect(upgraded.nextDefinition?.tier).toBe(2);
+  });
+
   it('supports mine-style houses with limited yearly extraction', () => {
     const mine = getHouseDefinitions().find(entry => entry.id === 'quang_nho');
     expect(mine).toBeTruthy();
@@ -372,5 +414,4 @@ describe('monopoly house module', () => {
     expect(slot.treasurySilver).toBe(750);
     expect(slot.minedYears).toBe(3);
   });
-});
 });

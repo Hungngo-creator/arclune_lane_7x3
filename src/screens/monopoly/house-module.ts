@@ -1,20 +1,45 @@
 import type { BoardCell } from './index.ts';
 
+/**
+ * House module = "ô nhà" trong Monopoly.
+ *
+ * Thiết kế tách riêng để nhiệm vụ sau chỉ cần đọc file này là hiểu:
+ * - Cách spawn slot nhà ngẫu nhiên (marker '?', tối đa 16).
+ * - Cách reveal tier + bất động sản khi người chơi chọn mua.
+ * - Cách tích trữ bạc từ tự sinh + thuế + mỏ.
+ * - Cách xử lý đi ngang / đạp trúng cho chủ nhà và người khác.
+ * - Cách nâng cấp nhà theo rule từng bất động sản.
+ */
+
 export type HouseTier = 1 | 2 | 3 | 4 | 5;
+
+export interface HouseCombatRules {
+  readonly passDamageByOwnerBasicHits?: number;
+  readonly landDamageByOwnerBasicHits?: number;
+  readonly range3DamageByOwnerBasicHits?: number;
+  readonly range2DamageByOwnerBasicHits?: number;
+}
 
 export interface HouseDefinition {
   readonly id: string;
   readonly name: string;
   readonly tier: HouseTier;
+  /** Thu nhập theo năm (không dùng cho mỏ, vì mỏ dùng minePerYearSilver). */
   readonly yearlySilver: number;
+    /** Thuế khi avatar không phải chủ đi ngang. */
   readonly passTaxSilver: number;
+  /** Thuế khi avatar không phải chủ đạp trúng ô nhà. */
   readonly landTaxSilver: number;
+  /** Phí nâng lên cấp kế tiếp (null = cấp 5, không nâng). */
   readonly upgradeCostSilver: number | null;
+  /** Với bất động sản dạng mỏ: bạc khai thác / năm. */
   readonly minePerYearSilver?: number;
+  /** Với bất động sản dạng mỏ: số năm khai thác tối đa. */
   readonly mineYears?: number;
   readonly ownerPassBuff?: string;
   readonly ownerLandBuff?: string;
   readonly specialRules?: ReadonlyArray<string>;
+  readonly combatRules?: HouseCombatRules;
 }
 
 export const MONOPOLY_HOUSE_SPAWN_LIMIT = 16;
@@ -51,10 +76,10 @@ const DEFINITIONS: ReadonlyArray<HouseDefinition> = Object.freeze([
   { id: 'ba_nen_nhang', name: 'Ba Nén Nhang', tier: 4, yearlySilver: 400, passTaxSilver: 300, landTaxSilver: 700, upgradeCostSilver: 1550, ownerPassBuff: '+20 tinh thần', specialRules: ['Kẻ địch đi ngang/đạp trúng mất thêm HP và chỉ số', 'Chủ đạp trúng khi HP < 8% max thì bị phản sát (HP=0)'] },
   { id: 'hop_hoan_tong', name: 'Hợp Hoan Tông', tier: 5, yearlySilver: 700, passTaxSilver: 500, landTaxSilver: 1000, upgradeCostSilver: null, ownerPassBuff: '+15 tinh thần', ownerLandBuff: '+35 tinh thần' },
   { id: 'anh_sat_mon', name: 'Ảnh sát môn', tier: 5, yearlySilver: 750, passTaxSilver: 700, landTaxSilver: 1500, upgradeCostSilver: null, ownerPassBuff: '+30 tinh thần', ownerLandBuff: '+65 tinh thần', specialRules: ['Trốn thuế có thể bị giết hoặc giảm vĩnh viễn 3% HP max', 'Tinh thần dư chuyển 50% sang max tinh thần'] },
-  { id: 'thi_than_thuong', name: 'Thí Thần Thương', tier: 5, yearlySilver: 0, passTaxSilver: 0, landTaxSilver: 0, upgradeCostSilver: null, specialRules: ['Không thuế/không tự sinh tiền', 'Kẻ địch đi ngang chịu 2 đòn thường chủ, đạp trúng chịu 4 đòn'] },
-  { id: 'anh_cung', name: 'Ảnh Cung', tier: 5, yearlySilver: 0, passTaxSilver: 0, landTaxSilver: 0, upgradeCostSilver: null, specialRules: ['Đi ngang chịu 1 đòn, đạp trúng chịu 3 đòn thường chủ', 'Đạp trúng có thể kéo chủ về ô Ảnh Cung (trừ Quỷ Vực/Bí Cảnh)'] },
+  { id: 'thi_than_thuong', name: 'Thí Thần Thương', tier: 5, yearlySilver: 0, passTaxSilver: 0, landTaxSilver: 0, upgradeCostSilver: null, combatRules: { passDamageByOwnerBasicHits: 2, landDamageByOwnerBasicHits: 4 }, specialRules: ['Không thuế/không tự sinh tiền'] },
+  { id: 'anh_cung', name: 'Ảnh Cung', tier: 5, yearlySilver: 0, passTaxSilver: 0, landTaxSilver: 0, upgradeCostSilver: null, combatRules: { passDamageByOwnerBasicHits: 1, landDamageByOwnerBasicHits: 3 }, specialRules: ['Đạp trúng có thể kéo chủ về ô Ảnh Cung (trừ Quỷ Vực/Bí Cảnh)'] },
   { id: 'tai_cac', name: 'Tài Các', tier: 5, yearlySilver: 1300, passTaxSilver: 800, landTaxSilver: 1700, upgradeCostSilver: null, ownerPassBuff: '+50 tinh thần', ownerLandBuff: '+100 tinh thần' },
-  { id: 'thi_than_cung', name: 'Thí Thần Cung', tier: 5, yearlySilver: 0, passTaxSilver: 0, landTaxSilver: 0, upgradeCostSilver: null, specialRules: ['Bắn xuyên map: bán kính 3 ô gây 2 đòn thường chủ', 'Bán kính 2 ô gây 5 đòn thường chủ'] }
+  { id: 'thi_than_cung', name: 'Thí Thần Cung', tier: 5, yearlySilver: 0, passTaxSilver: 0, landTaxSilver: 0, upgradeCostSilver: null, combatRules: { range3DamageByOwnerBasicHits: 2, range2DamageByOwnerBasicHits: 5 }, specialRules: ['Bắn xuyên map: tấn công theo bán kính'] }
 ]);
 
 const DEFINITIONS_BY_TIER = new Map<HouseTier, ReadonlyArray<HouseDefinition>>();
@@ -70,6 +95,12 @@ export interface HiddenHouseSlot {
   ownerAvatarId: number | null;
   treasurySilver: number;
   minedYears: number;
+}
+
+export interface HouseTraverseResult {
+  readonly paidTaxSilver: number;
+  readonly ownerCollectedSilver: number;
+  readonly houseTreasurySilver: number;
 }
 
 export function createRandomHouseSlots(cells: ReadonlyArray<BoardCell>, rng: () => number = Math.random, cap = MONOPOLY_HOUSE_SPAWN_LIMIT): HiddenHouseSlot[] {
@@ -112,6 +143,11 @@ export function pickRandomHouseDefinitionByTier(tier: HouseTier, rng: () => numb
   return pool[index] ?? pool[0]!;
 }
 
+export function getHouseDefinitionById(definitionId: string | null): HouseDefinition | null {
+  if (!definitionId) return null;
+  return DEFINITIONS.find(entry => entry.id === definitionId) ?? null;
+}
+
 export function revealHousePurchase(slot: HiddenHouseSlot, buyerAvatarId: number, walletSilver: number, rng: () => number = Math.random): {
   ok: boolean;
   nextWalletSilver: number;
@@ -131,9 +167,13 @@ export function revealHousePurchase(slot: HiddenHouseSlot, buyerAvatarId: number
   return { ok: true, nextWalletSilver: walletSilver - cost, tier, definition };
 }
 
+/**
+ * Tăng treasury theo năm.
+ * - yearCompleted = false: chưa qua chu kỳ năm => chỉ giữ nguyên treasury (không tự sinh thêm).
+ * - yearCompleted = true: cộng yearlySilver hoặc minePerYearSilver (nếu còn lượt khai thác).
+ */
 export function collectHouseIncome(slot: HiddenHouseSlot, yearCompleted: boolean): number {
-  if (!slot.definitionId) return 0;
-  const def = DEFINITIONS.find(entry => entry.id === slot.definitionId);
+  const def = getHouseDefinitionById(slot.definitionId);
   if (!def) return 0;
   if (def.minePerYearSilver && def.mineYears) {
     if (slot.minedYears >= def.mineYears) return slot.treasurySilver;
@@ -147,6 +187,47 @@ export function collectHouseIncome(slot: HiddenHouseSlot, yearCompleted: boolean
     slot.treasurySilver += def.yearlySilver;
   }
   return slot.treasurySilver;
+}
+
+/** Xử lý đi ngang / đạp trúng ô nhà. Thuế luôn cộng vào treasury để chủ thu khi đi ngang. */
+export function settleHouseTraverse(slot: HiddenHouseSlot, actorAvatarId: number, isLanding: boolean): HouseTraverseResult {
+  const def = getHouseDefinitionById(slot.definitionId);
+  if (!def || slot.ownerAvatarId == null) {
+    return { paidTaxSilver: 0, ownerCollectedSilver: 0, houseTreasurySilver: slot.treasurySilver };
+  }
+
+  if (actorAvatarId === slot.ownerAvatarId) {
+    const ownerCollectedSilver = slot.treasurySilver;
+    slot.treasurySilver = 0;
+    return { paidTaxSilver: 0, ownerCollectedSilver, houseTreasurySilver: slot.treasurySilver };
+  }
+
+  const paidTaxSilver = isLanding ? def.landTaxSilver : def.passTaxSilver;
+  slot.treasurySilver += paidTaxSilver;
+  return { paidTaxSilver, ownerCollectedSilver: 0, houseTreasurySilver: slot.treasurySilver };
+}
+
+export function upgradeHouse(slot: HiddenHouseSlot, walletSilver: number, rng: () => number = Math.random): {
+  ok: boolean;
+  nextWalletSilver: number;
+  nextDefinition: HouseDefinition | null;
+  reason?: string;
+} {
+  const currentDef = getHouseDefinitionById(slot.definitionId);
+  if (!currentDef || slot.revealedTier == null) {
+    return { ok: false, nextWalletSilver: walletSilver, nextDefinition: null, reason: 'house_not_owned' };
+  }
+  if (currentDef.upgradeCostSilver == null || slot.revealedTier >= 5) {
+    return { ok: false, nextWalletSilver: walletSilver, nextDefinition: null, reason: 'max_tier' };
+  }
+  if (walletSilver < currentDef.upgradeCostSilver) {
+    return { ok: false, nextWalletSilver: walletSilver, nextDefinition: null, reason: 'not_enough_silver' };
+  }
+  const nextTier = (slot.revealedTier + 1) as HouseTier;
+  const nextDefinition = pickRandomHouseDefinitionByTier(nextTier, rng);
+  slot.revealedTier = nextTier;
+  slot.definitionId = nextDefinition.id;
+  return { ok: true, nextWalletSilver: walletSilver - currentDef.upgradeCostSilver, nextDefinition };
 }
 
 export function getHouseDefinitions(): ReadonlyArray<HouseDefinition> {

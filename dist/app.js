@@ -26757,10 +26757,10 @@ __define('./screens/monopoly/house-module.ts', (exports, module, __require) => {
       { id: 'ba_nen_nhang', name: 'Ba Nén Nhang', tier: 4, yearlySilver: 400, passTaxSilver: 300, landTaxSilver: 700, upgradeCostSilver: 1550, ownerPassBuff: '+20 tinh thần', specialRules: ['Kẻ địch đi ngang/đạp trúng mất thêm HP và chỉ số', 'Chủ đạp trúng khi HP < 8% max thì bị phản sát (HP=0)'] },
       { id: 'hop_hoan_tong', name: 'Hợp Hoan Tông', tier: 5, yearlySilver: 700, passTaxSilver: 500, landTaxSilver: 1000, upgradeCostSilver: null, ownerPassBuff: '+15 tinh thần', ownerLandBuff: '+35 tinh thần' },
       { id: 'anh_sat_mon', name: 'Ảnh sát môn', tier: 5, yearlySilver: 750, passTaxSilver: 700, landTaxSilver: 1500, upgradeCostSilver: null, ownerPassBuff: '+30 tinh thần', ownerLandBuff: '+65 tinh thần', specialRules: ['Trốn thuế có thể bị giết hoặc giảm vĩnh viễn 3% HP max', 'Tinh thần dư chuyển 50% sang max tinh thần'] },
-      { id: 'thi_than_thuong', name: 'Thí Thần Thương', tier: 5, yearlySilver: 0, passTaxSilver: 0, landTaxSilver: 0, upgradeCostSilver: null, specialRules: ['Không thuế/không tự sinh tiền', 'Kẻ địch đi ngang chịu 2 đòn thường chủ, đạp trúng chịu 4 đòn'] },
-      { id: 'anh_cung', name: 'Ảnh Cung', tier: 5, yearlySilver: 0, passTaxSilver: 0, landTaxSilver: 0, upgradeCostSilver: null, specialRules: ['Đi ngang chịu 1 đòn, đạp trúng chịu 3 đòn thường chủ', 'Đạp trúng có thể kéo chủ về ô Ảnh Cung (trừ Quỷ Vực/Bí Cảnh)'] },
+      { id: 'thi_than_thuong', name: 'Thí Thần Thương', tier: 5, yearlySilver: 0, passTaxSilver: 0, landTaxSilver: 0, upgradeCostSilver: null, combatRules: { passDamageByOwnerBasicHits: 2, landDamageByOwnerBasicHits: 4 }, specialRules: ['Không thuế/không tự sinh tiền'] },
+      { id: 'anh_cung', name: 'Ảnh Cung', tier: 5, yearlySilver: 0, passTaxSilver: 0, landTaxSilver: 0, upgradeCostSilver: null, combatRules: { passDamageByOwnerBasicHits: 1, landDamageByOwnerBasicHits: 3 }, specialRules: ['Đạp trúng có thể kéo chủ về ô Ảnh Cung (trừ Quỷ Vực/Bí Cảnh)'] },
       { id: 'tai_cac', name: 'Tài Các', tier: 5, yearlySilver: 1300, passTaxSilver: 800, landTaxSilver: 1700, upgradeCostSilver: null, ownerPassBuff: '+50 tinh thần', ownerLandBuff: '+100 tinh thần' },
-      { id: 'thi_than_cung', name: 'Thí Thần Cung', tier: 5, yearlySilver: 0, passTaxSilver: 0, landTaxSilver: 0, upgradeCostSilver: null, specialRules: ['Bắn xuyên map: bán kính 3 ô gây 2 đòn thường chủ', 'Bán kính 2 ô gây 5 đòn thường chủ'] }
+      { id: 'thi_than_cung', name: 'Thí Thần Cung', tier: 5, yearlySilver: 0, passTaxSilver: 0, landTaxSilver: 0, upgradeCostSilver: null, combatRules: { range3DamageByOwnerBasicHits: 2, range2DamageByOwnerBasicHits: 5 }, specialRules: ['Bắn xuyên map: tấn công theo bán kính'] }
   ]);
   const DEFINITIONS_BY_TIER = new Map();
   for (const tier of [1, 2, 3, 4, 5]) {
@@ -26805,6 +26805,11 @@ __define('./screens/monopoly/house-module.ts', (exports, module, __require) => {
       const index = Math.floor(Math.max(0, Math.min(0.999999, rng())) * pool.length);
       return pool[index] ?? pool[0];
   }
+  function getHouseDefinitionById(definitionId) {
+      if (!definitionId)
+          return null;
+      return DEFINITIONS.find(entry => entry.id === definitionId) ?? null;
+  }
   function revealHousePurchase(slot, buyerAvatarId, walletSilver, rng = Math.random) {
       const tier = rollHouseTier(rng);
       const cost = HOUSE_TIER_BUY_COST[tier];
@@ -26817,10 +26822,13 @@ __define('./screens/monopoly/house-module.ts', (exports, module, __require) => {
       slot.ownerAvatarId = buyerAvatarId;
       return { ok: true, nextWalletSilver: walletSilver - cost, tier, definition };
   }
+  /**
+   * Tăng treasury theo năm.
+   * - yearCompleted = false: chưa qua chu kỳ năm => chỉ giữ nguyên treasury (không tự sinh thêm).
+   * - yearCompleted = true: cộng yearlySilver hoặc minePerYearSilver (nếu còn lượt khai thác).
+   */
   function collectHouseIncome(slot, yearCompleted) {
-      if (!slot.definitionId)
-          return 0;
-      const def = DEFINITIONS.find(entry => entry.id === slot.definitionId);
+      const def = getHouseDefinitionById(slot.definitionId);
       if (!def)
           return 0;
       if (def.minePerYearSilver && def.mineYears) {
@@ -26837,6 +26845,38 @@ __define('./screens/monopoly/house-module.ts', (exports, module, __require) => {
       }
       return slot.treasurySilver;
   }
+  /** Xử lý đi ngang / đạp trúng ô nhà. Thuế luôn cộng vào treasury để chủ thu khi đi ngang. */
+  function settleHouseTraverse(slot, actorAvatarId, isLanding) {
+      const def = getHouseDefinitionById(slot.definitionId);
+      if (!def || slot.ownerAvatarId == null) {
+          return { paidTaxSilver: 0, ownerCollectedSilver: 0, houseTreasurySilver: slot.treasurySilver };
+      }
+      if (actorAvatarId === slot.ownerAvatarId) {
+          const ownerCollectedSilver = slot.treasurySilver;
+          slot.treasurySilver = 0;
+          return { paidTaxSilver: 0, ownerCollectedSilver, houseTreasurySilver: slot.treasurySilver };
+      }
+      const paidTaxSilver = isLanding ? def.landTaxSilver : def.passTaxSilver;
+      slot.treasurySilver += paidTaxSilver;
+      return { paidTaxSilver, ownerCollectedSilver: 0, houseTreasurySilver: slot.treasurySilver };
+  }
+  function upgradeHouse(slot, walletSilver, rng = Math.random) {
+      const currentDef = getHouseDefinitionById(slot.definitionId);
+      if (!currentDef || slot.revealedTier == null) {
+          return { ok: false, nextWalletSilver: walletSilver, nextDefinition: null, reason: 'house_not_owned' };
+      }
+      if (currentDef.upgradeCostSilver == null || slot.revealedTier >= 5) {
+          return { ok: false, nextWalletSilver: walletSilver, nextDefinition: null, reason: 'max_tier' };
+      }
+      if (walletSilver < currentDef.upgradeCostSilver) {
+          return { ok: false, nextWalletSilver: walletSilver, nextDefinition: null, reason: 'not_enough_silver' };
+      }
+      const nextTier = (slot.revealedTier + 1);
+      const nextDefinition = pickRandomHouseDefinitionByTier(nextTier, rng);
+      slot.revealedTier = nextTier;
+      slot.definitionId = nextDefinition.id;
+      return { ok: true, nextWalletSilver: walletSilver - currentDef.upgradeCostSilver, nextDefinition };
+  }
   function getHouseDefinitions() {
       return DEFINITIONS;
   }
@@ -26847,8 +26887,11 @@ __define('./screens/monopoly/house-module.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'createRandomHouseSlots')) exports.createRandomHouseSlots = createRandomHouseSlots;
   if (!Object.prototype.hasOwnProperty.call(exports, 'rollHouseTier')) exports.rollHouseTier = rollHouseTier;
   if (!Object.prototype.hasOwnProperty.call(exports, 'pickRandomHouseDefinitionByTier')) exports.pickRandomHouseDefinitionByTier = pickRandomHouseDefinitionByTier;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getHouseDefinitionById')) exports.getHouseDefinitionById = getHouseDefinitionById;
   if (!Object.prototype.hasOwnProperty.call(exports, 'revealHousePurchase')) exports.revealHousePurchase = revealHousePurchase;
   if (!Object.prototype.hasOwnProperty.call(exports, 'collectHouseIncome')) exports.collectHouseIncome = collectHouseIncome;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'settleHouseTraverse')) exports.settleHouseTraverse = settleHouseTraverse;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'upgradeHouse')) exports.upgradeHouse = upgradeHouse;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getHouseDefinitions')) exports.getHouseDefinitions = getHouseDefinitions;
 });
 __define('./screens/monopoly/index.ts', (exports, module, __require) => {
