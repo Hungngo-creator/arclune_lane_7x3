@@ -7376,10 +7376,14 @@ __define('./data/modes.ts', (exports, module, __require) => {
       acc[mode.id] = mode;
       return acc;
   }, {});
+  function hasMenuSection(mode, sectionId) {
+      const sections = Array.isArray(mode.menuSections) ? mode.menuSections : [];
+      return sections.some(section => section === sectionId);
+  }
   function listModesForSection(sectionId, options = {}) {
       const { includeStatuses } = options;
       return MODES.filter(mode => {
-          if (!mode.menuSections || !mode.menuSections.includes(sectionId)) {
+          if (!hasMenuSection(mode, sectionId)) {
               return false;
           }
           if (Array.isArray(includeStatuses) && includeStatuses.length > 0) {
@@ -7406,7 +7410,7 @@ __define('./data/modes.ts', (exports, module, __require) => {
       return MENU_SECTION_DEFINITIONS.map(section => {
           const entries = [];
           MODE_GROUPS.forEach(group => {
-              if (!group.menuSections || !group.menuSections.includes(section.id))
+              if (!hasMenuSection(group, section.id))
                   return;
               const childModeIds = filterChildModeIds(group.childModeIds);
               if (childModeIds.length === 0)
@@ -16620,14 +16624,10 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
       const tokens = Game.tokens || [];
       const activeAttackKeys = collectActiveAttackTokenKeys();
       for (const t of tokens) {
-          if (!t.alive)
+          if (!t.alive || !Number.isFinite(t.hpMax))
               continue;
           const meleeKey = makeMeleeTokenKey(t);
           if (meleeKey && activeAttackKeys.has(meleeKey))
-              continue;
-          const hpMaxRaw = parseFiniteNumber(t.hpMax) ?? parseFiniteNumber(t.HP) ?? 0;
-          const hpRaw = parseFiniteNumber(t.hp) ?? parseFiniteNumber(t.currentHP) ?? hpMaxRaw;
-          if (!Number.isFinite(hpMaxRaw) || hpMaxRaw <= 0)
               continue;
           const p = cellCenterObliqueLocal(Game.grid, t.cx, t.cy, CAM_PRESET);
           const art = t.art || getUnitArt(t.id, { skinKey: t.skinKey });
@@ -16653,31 +16653,17 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
           const statusRowWidth = statusIcons.length > 0
               ? (statusIcons.length * statusIconSize) + ((statusIcons.length - 1) * statusIconGap)
               : 0;
-          const labelHeight = Math.max(9, Math.floor(barHeight * 2.1));
-          const labelY = hpY - labelHeight - 2;
-          const statusY = labelY - statusIconSize - 2;
+          const statusY = hpY - statusIconSize - 2;
           const statusStartX = Math.round(hpX + (barWidth - statusRowWidth) / 2);
-          const hpRatio = Math.max(0, Math.min(1, hpRaw / hpMaxRaw));
+          const hpRatio = Math.max(0, Math.min(1, (t.hp || 0) / (t.hpMax || 1)));
           const shieldRatio = getShieldRatio(t);
           const bgColor = art?.hpBar?.bg || 'rgba(9,14,21,0.86)';
           const fillColor = art?.hpBar?.fill || '#48d267';
           const borderColor = art?.hpBar?.border || 'rgba(0,0,0,0.62)';
           const radius = Math.max(2, Math.floor(barHeight / 2));
-          const roleText = t.team === 'A' ? 'Player' : 'NPC';
           drawCtx.save();
           drawCtx.shadowColor = 'transparent';
           drawCtx.shadowBlur = 0;
-          drawCtx.fillStyle = 'rgba(6, 10, 18, 0.88)';
-          drawCtx.strokeStyle = 'rgba(255,255,255,0.75)';
-          drawCtx.lineWidth = 1;
-          roundedRectPathUI(drawCtx, hpX, labelY, barWidth, labelHeight, Math.max(3, Math.floor(labelHeight / 2)));
-          drawCtx.fill();
-          drawCtx.stroke();
-          drawCtx.fillStyle = t.team === 'A' ? '#8fd7ff' : '#ffc78f';
-          drawCtx.font = `700 ${Math.max(8, Math.floor(labelHeight * 0.58))}px system-ui, sans-serif`;
-          drawCtx.textAlign = 'center';
-          drawCtx.textBaseline = 'middle';
-          drawCtx.fillText(roleText, hpX + (barWidth / 2), labelY + (labelHeight / 2));
           roundedRectPathUI(drawCtx, hpX, hpY, barWidth, barHeight, radius);
           drawCtx.fillStyle = bgColor;
           drawCtx.fill();
@@ -26857,10 +26843,16 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       display:flex;
       align-items:center;
       justify-content:center;
-      overflow:hidden;
+      overflow:visible;
       z-index:4;
       animation:avatarFloat 1.1s ease-in-out infinite alternate;
       box-shadow:0 4px 10px rgba(0,0,0,0.42);
+    }
+    .monopoly-avatar__portrait{
+      width:100%;
+      height:100%;
+      border-radius:12px;
+      overflow:hidden;
     }
     .monopoly-avatar img{
       width:100%;
@@ -27332,11 +27324,14 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           const tagNode = document.createElement('span');
           tagNode.className = 'monopoly-avatar__tag';
           tagNode.textContent = role;
+          const portraitFrame = document.createElement('span');
+          portraitFrame.className = 'monopoly-avatar__portrait';
           const portrait = document.createElement('img');
           const art = getUnitArt(imported?.unitId ?? null);
           portrait.src = art?.sprite?.src ?? './dist/assets/units/default/default.svg';
           portrait.alt = imported?.unitName ?? `Avatar ${avatarId}`;
-          node.append(tagNode, hpBarNode, portrait);
+          portraitFrame.appendChild(portrait);
+          node.append(tagNode, hpBarNode, portraitFrame);
           node.hidden = true;
           board.appendChild(node);
           avatars.push({
@@ -29405,12 +29400,12 @@ __define('./screens/ui-gacha/logic/gacha.ts', (exports, module, __require) => {
       return matched;
   }
   function shouldHitFeatured(banner, rarity, forced, rng) {
+      if (forced) {
+          return true;
+      }
       const featured = getSummonableFeaturedByRarity(banner, rarity);
       if (featured.length === 0) {
           return false;
-      }
-      if (forced) {
-          return true;
       }
       const share = GACHA_CONFIG.rateUpShare;
       const roll = rng();
@@ -29580,10 +29575,10 @@ __define('./screens/ui-gacha/logic/pity.ts', (exports, module, __require) => {
   }
   function pickRarity(rates, random) {
       let cumulative = 0;
+      const normalizedRandom = Math.max(0, Math.min(0.999999, random));
       for (const rarity of [...RARITY_ORDER].reverse()) {
-          const value = rates[rarity] ?? 0;
-          cumulative += value;
-          if (random >= 1 - cumulative - 1e-8) {
+          cumulative += rates[rarity] ?? 0;
+          if (normalizedRandom < cumulative) {
               return rarity;
           }
       }
@@ -29715,6 +29710,14 @@ __define('./statuses.ts', (exports, module, __require) => {
           return 0;
       const beforeHp = Math.max(0, Math.floor(target.hp ?? 0));
       applyDamage(target, remain);
+      if ((target.hp ?? 0) <= 0) {
+          const revived = hookOnLethalDamage(target);
+          if (!revived) {
+              target.alive = false;
+              if (!target.deadAt)
+                  target.deadAt = safeNow();
+          }
+      }
       const afterHp = Math.max(0, Math.floor(target.hp ?? 0));
       return Math.max(0, beforeHp - afterHp);
   }
@@ -30053,6 +30056,11 @@ __define('./statuses.ts', (exports, module, __require) => {
                   });
                   finishFuryHit(target);
               }
+          }
+          const reflectPower = clamp01(this.get(target, 'reflect')?.power ?? 0);
+          const shouldApplyLegacyReflect = result.dtype == null;
+          if (shouldApplyLegacyReflect && reflectPower > 0 && dealt > 0) {
+              applyMitigatedHit(target, attacker, Math.round(dealt * reflectPower), 'mixed');
           }
           if (this.has(attacker, 'execute')) {
               if ((target.hp ?? 0) <= Math.ceil((target.hpMax ?? 0) * 0.1)) {

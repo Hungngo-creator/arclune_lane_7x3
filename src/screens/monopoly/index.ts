@@ -111,10 +111,16 @@ const CSS = /* css */ `
     display:flex;
     align-items:center;
     justify-content:center;
-    overflow:hidden;
+    overflow:visible;
     z-index:4;
     animation:avatarFloat 1.1s ease-in-out infinite alternate;
     box-shadow:0 4px 10px rgba(0,0,0,0.42);
+  }
+  .monopoly-avatar__portrait{
+    width:100%;
+    height:100%;
+    border-radius:12px;
+    overflow:hidden;
   }
   .monopoly-avatar img{
     width:100%;
@@ -715,11 +721,14 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     const tagNode = document.createElement('span');
     tagNode.className = 'monopoly-avatar__tag';
     tagNode.textContent = role;
+    const portraitFrame = document.createElement('span');
+    portraitFrame.className = 'monopoly-avatar__portrait';
     const portrait = document.createElement('img');
     const art = getUnitArt(imported?.unitId ?? null);
     portrait.src = art?.sprite?.src ?? './dist/assets/units/default/default.svg';
     portrait.alt = imported?.unitName ?? `Avatar ${avatarId}`;
-    node.append(tagNode, hpBarNode, portrait);
+    portraitFrame.appendChild(portrait);
+    node.append(tagNode, hpBarNode, portraitFrame);
     node.hidden = true;
     board.appendChild(node);
     avatars.push({

@@ -18,6 +18,7 @@ module.exports = {
     '<rootDir>/test/session-background.test.js',
     '<rootDir>/test/shell-error-handling.test.js',
     '<rootDir>/test/startGame.test.js',
+    '<rootDir>/test/ui/render-screens.test.ts',
   ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   extensionsToTreatAsEsm: ['.ts', '.tsx'],

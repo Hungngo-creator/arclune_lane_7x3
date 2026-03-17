@@ -90,6 +90,13 @@ function applyMitigatedHit(attacker: UnitToken, target: UnitToken, rawDamage: nu
 
   const beforeHp = Math.max(0, Math.floor(target.hp ?? 0));
   applyDamage(target, remain);
+  if ((target.hp ?? 0) <= 0) {
+    const revived = hookOnLethalDamage(target);
+    if (!revived) {
+      target.alive = false;
+      if (!target.deadAt) target.deadAt = safeNow();
+    }
+  }
   const afterHp = Math.max(0, Math.floor(target.hp ?? 0));
   return Math.max(0, beforeHp - afterHp);
 }
@@ -426,6 +433,12 @@ export const Statuses: StatusService = {
         });
         finishFuryHit(target);
       }
+    }
+
+    const reflectPower = clamp01(this.get(target, 'reflect')?.power ?? 0);
+    const shouldApplyLegacyReflect = result.dtype == null;
+    if (shouldApplyLegacyReflect && reflectPower > 0 && dealt > 0) {
+      applyMitigatedHit(target, attacker, Math.round(dealt * reflectPower), 'mixed');
     }
 
     if (this.has(attacker, 'execute')) {

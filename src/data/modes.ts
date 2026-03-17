@@ -303,10 +303,15 @@ interface ListModesOptions {
   includeStatuses?: ReadonlyArray<ModeStatus>;
 }
 
+function hasMenuSection(mode: ModeConfig, sectionId: string): boolean {
+  const sections = Array.isArray(mode.menuSections) ? mode.menuSections as ReadonlyArray<string> : [];
+  return sections.some(section => section === sectionId);
+}
+
 function listModesForSection(sectionId: string, options: ListModesOptions = {}): ModeConfig[]{
   const { includeStatuses } = options;
   return MODES.filter(mode => {
-    if (!mode.menuSections || !mode.menuSections.includes(sectionId)){
+    if (!hasMenuSection(mode, sectionId)){
       return false;
     }
     if (Array.isArray(includeStatuses) && includeStatuses.length > 0){
@@ -341,7 +346,7 @@ function getMenuSections(options: ListModesOptions = {}){
     const entries: MenuSectionEntryDefinition[] = [];
 
     MODE_GROUPS.forEach(group => {
-      if (!group.menuSections || !group.menuSections.includes(section.id)) return;
+      if (!hasMenuSection(group, section.id)) return;
       const childModeIds = filterChildModeIds(group.childModeIds);
       if (childModeIds.length === 0) return;
       entries.push({

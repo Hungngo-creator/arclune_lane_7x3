@@ -66,12 +66,12 @@ function shouldHitFeatured(
   forced: boolean,
   rng: RandomSource,
 ): boolean {
+  if (forced) {
+    return true;
+  }
   const featured = getSummonableFeaturedByRarity(banner, rarity);
   if (featured.length === 0) {
     return false;
-  }
-  if (forced) {
-    return true;
   }
   const share = GACHA_CONFIG.rateUpShare;
   const roll = rng();
