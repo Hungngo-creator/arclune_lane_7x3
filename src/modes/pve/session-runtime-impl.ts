@@ -3852,9 +3852,13 @@ function drawHPBars(): void {
   const activeAttackKeys = collectActiveAttackTokenKeys();
 
   for (const t of tokens){
-    if (!t.alive || !Number.isFinite(t.hpMax)) continue;
+    if (!t.alive) continue;
     const meleeKey = makeMeleeTokenKey(t);
     if (meleeKey && activeAttackKeys.has(meleeKey)) continue;
+
+    const hpMaxRaw = parseFiniteNumber(t.hpMax) ?? parseFiniteNumber((t as Record<string, unknown>).HP) ?? 0;
+    const hpRaw = parseFiniteNumber(t.hp) ?? parseFiniteNumber((t as Record<string, unknown>).currentHP) ?? hpMaxRaw;
+    if (!Number.isFinite(hpMaxRaw) || hpMaxRaw <= 0) continue;
 
     const p = cellCenterObliqueLocal(Game.grid, t.cx, t.cy, CAM_PRESET);
     const art = t.art || getUnitArt(t.id, { skinKey: t.skinKey });
@@ -3882,20 +3886,35 @@ function drawHPBars(): void {
     const statusRowWidth = statusIcons.length > 0
       ? (statusIcons.length * statusIconSize) + ((statusIcons.length - 1) * statusIconGap)
       : 0;
-    const statusY = hpY - statusIconSize - 2;
+    const labelHeight = Math.max(9, Math.floor(barHeight * 2.1));
+    const labelY = hpY - labelHeight - 2;
+    const statusY = labelY - statusIconSize - 2;
     const statusStartX = Math.round(hpX + (barWidth - statusRowWidth) / 2);
 
-    const hpRatio = Math.max(0, Math.min(1, (t.hp || 0) / (t.hpMax || 1)));
+    const hpRatio = Math.max(0, Math.min(1, hpRaw / hpMaxRaw));
     const shieldRatio = getShieldRatio(t);
 
     const bgColor = art?.hpBar?.bg || 'rgba(9,14,21,0.86)';
     const fillColor = art?.hpBar?.fill || '#48d267';
     const borderColor = art?.hpBar?.border || 'rgba(0,0,0,0.62)';
     const radius = Math.max(2, Math.floor(barHeight / 2));
+    const roleText = t.team === 'A' ? 'Player' : 'NPC';
 
     drawCtx.save();
     drawCtx.shadowColor = 'transparent';
     drawCtx.shadowBlur = 0;
+
+    drawCtx.fillStyle = 'rgba(6, 10, 18, 0.88)';
+    drawCtx.strokeStyle = 'rgba(255,255,255,0.75)';
+    drawCtx.lineWidth = 1;
+    roundedRectPathUI(drawCtx, hpX, labelY, barWidth, labelHeight, Math.max(3, Math.floor(labelHeight / 2)));
+    drawCtx.fill();
+    drawCtx.stroke();
+    drawCtx.fillStyle = t.team === 'A' ? '#8fd7ff' : '#ffc78f';
+    drawCtx.font = `700 ${Math.max(8, Math.floor(labelHeight * 0.58))}px system-ui, sans-serif`;
+    drawCtx.textAlign = 'center';
+    drawCtx.textBaseline = 'middle';
+    drawCtx.fillText(roleText, hpX + (barWidth / 2), labelY + (labelHeight / 2));
 
     roundedRectPathUI(drawCtx, hpX, hpY, barWidth, barHeight, radius);
     drawCtx.fillStyle = bgColor;
