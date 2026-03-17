@@ -58,8 +58,22 @@ const CSS = /* css */ `
   .monopoly-screen__wallet{
     margin-left:auto;
     display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:8px;
+  }
+  .monopoly-screen__wallet-currency{
+    display:flex;
     align-items:center;
     gap:8px;
+  }
+  .monopoly-screen__wallet-year{
+    min-width:84px;
+    text-align:right;
+    color:#b8d8ff;
+    font-size:12px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
   }
   .monopoly-screen__wallet-slot{
     min-width:36px;
@@ -532,6 +546,40 @@ export function createInitialMonopolyWallet(): MonopolyWallet {
   return { gold: MONOPOLY_STARTING_GOLD, silver: 0 };
 }
 
+export function grantMonopolySilver(wallet: MonopolyWallet, amountSilver: number): MonopolyWallet {
+  const normalized = normalizeMonopolyWallet(wallet);
+  const bonus = normalizeWalletAmount(amountSilver);
+  return normalizeMonopolyWallet({
+    gold: normalized.gold,
+    silver: normalized.silver + bonus
+  });
+}
+
+export function spendMonopolySilver(wallet: MonopolyWallet, amountSilver: number): {
+  wallet: MonopolyWallet;
+  paid: boolean;
+} {
+  const normalized = normalizeMonopolyWallet(wallet);
+  const cost = normalizeWalletAmount(amountSilver);
+  if (cost <= 0) {
+    return { wallet: normalized, paid: true };
+  }
+
+  const totalSilver = normalized.gold * MONOPOLY_CURRENCY_RATIO + normalized.silver;
+  if (totalSilver < cost) {
+    return { wallet: normalized, paid: false };
+  }
+
+  const remainingSilver = totalSilver - cost;
+  return {
+    wallet: normalizeMonopolyWallet({
+      gold: 0,
+      silver: remainingSilver
+    }),
+    paid: true
+  };
+}
+
 const TURN_INTERVAL_MS = 800;
 const TURN_ADVANCE_DELAY_MS = 500;
 const START_CELL_ONE_BASED = 21;
@@ -551,8 +599,7 @@ interface MonopolyCombatResolution {
 
 function buildMonopolyImportPool(count: number): Array<{ unitId: string; unitName: string; rank: string; className: ClassName }> {
   const ssr = ROSTER.filter(unit => String(unit.rank).toUpperCase() === MONOPOLY_RANK);
-  const prime = ROSTER.filter(unit => String(unit.rank).toUpperCase() === 'PRIME');
-  const pool = [...ssr, ...prime];
+  const pool = [...ssr];
   if (!pool.length) {
     return Array.from({ length: count }, (_, index) => ({
       unitId: `fallback-${index + 1}`,
@@ -570,6 +617,17 @@ function buildMonopolyImportPool(count: number): Array<{ unitId: string; unitNam
       className: (picked?.class && picked.class in CLASS_BASE ? picked.class : 'Warrior') as ClassName
     };
   });
+}
+
+function shuffled<T>(items: ReadonlyArray<T>): T[] {
+  const next = [...items];
+  for (let index = next.length - 1; index > 0; index -= 1) {
+    const swapIndex = randomInt(0, index);
+    const current = next[index];
+    next[index] = next[swapIndex] as T;
+    next[swapIndex] = current as T;
+  }
+  return next;
 }
 
 const clampRatio = (value: number): number => Math.min(1, Math.max(0, value));
@@ -704,11 +762,17 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
 
   const walletBar = document.createElement('div');
   walletBar.className = 'monopoly-screen__wallet';
+  const walletCurrency = document.createElement('div');
+  walletCurrency.className = 'monopoly-screen__wallet-currency';
   const silverSlot = document.createElement('span');
   silverSlot.className = 'monopoly-screen__wallet-slot monopoly-screen__wallet-slot--silver';
   const goldSlot = document.createElement('span');
   goldSlot.className = 'monopoly-screen__wallet-slot monopoly-screen__wallet-slot--gold';
-  walletBar.append(silverSlot, goldSlot);
+  const yearSlot = document.createElement('span');
+  yearSlot.className = 'monopoly-screen__wallet-year';
+  yearSlot.textContent = 'Năm: 0';
+  walletCurrency.append(silverSlot, goldSlot);
+  walletBar.append(walletCurrency, yearSlot);
   topbar.appendChild(walletBar);
 
   wrapper.appendChild(topbar);
@@ -770,8 +834,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
 
   board.appendChild(fragment);
 
+  const importedUnits = shuffled(buildMonopolyImportPool(AVATAR_COUNT));
   const playerAvatarId = randomInt(1, AVATAR_COUNT);
-  const importedUnits = buildMonopolyImportPool(AVATAR_COUNT);
   const avatars: MonopolyAvatar[] = [];
   for (let avatarId = 1; avatarId <= AVATAR_COUNT; avatarId += 1) {
     const node = document.createElement('div');
@@ -823,6 +887,13 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   }
 
   const playerAvatar = avatars.find(avatar => avatar.role === 'player') ?? null;
+  const turnOrder = shuffled(avatars.map(avatar => avatar.id));
+  const lapProgressByAvatar = new Map<number, number>();
+  let yearsElapsed = 0;
+
+  avatars.forEach(avatar => {
+    lapProgressByAvatar.set(avatar.id, 0);
+  });
 
   const syncPlayerWalletUi = (): void => {
     if (!playerAvatar) {
@@ -839,7 +910,11 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     walletBar.hidden = silverSlot.hidden && goldSlot.hidden;
   };
 
-  const syncAvatarHealthUi = (avatar: MonopolyAvatar): void => {
+    const syncYearUi = (): void => {
+    yearSlot.textContent = `Năm: ${yearsElapsed}`;
+  };
+
+    const syncAvatarHealthUi = (avatar: MonopolyAvatar): void => {
     const hpRatio = clampRatio(avatar.hp / avatar.stats.hpMax);
     avatar.hpFillNode.style.transform = `scaleX(${hpRatio})`;
     avatar.node.classList.toggle('monopoly-avatar--dead', avatar.hp <= 0);
@@ -856,13 +931,31 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     avatar.node.style.top = `${layout.y * scale}px`;
   };
 
-  let activeTurnIndex = randomInt(0, AVATAR_COUNT - 1);
+  syncYearUi();
+
+  let activeTurnIndex = 0;
   let turnTimer: number | null = null;
   let destroyed = false;
 
+  const applyYearIncomeIfReady = (): number => {
+    const living = avatars.filter(item => item.hp > 0);
+    if (!living.length) return 0;
+    const minimumLap = Math.min(...living.map(item => lapProgressByAvatar.get(item.id) ?? 0));
+    if (minimumLap <= yearsElapsed) return 0;
+    const gainedYears = minimumLap - yearsElapsed;
+    yearsElapsed = minimumLap;
+    const yearlyIncome = gainedYears * MONOPOLY_CURRENCY_RATIO;
+    for (const avatar of living) {
+      avatar.wallet = grantMonopolySilver(avatar.wallet, yearlyIncome);
+    }
+    syncYearUi();
+    return yearlyIncome;
+  };
+
   const runTurn = (): void => {
     if (destroyed) return;
-    const avatar = avatars[activeTurnIndex];
+    const activeAvatarId = turnOrder[activeTurnIndex];
+    const avatar = avatars.find(item => item.id === activeAvatarId);
     if (!avatar) return;
     const dice = randomInt(1, 6);
 
@@ -882,11 +975,17 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       detourProgress: avatar.detourProgress
     }, dice);
 
+    const previousPathIndex = avatar.currentPathIndex;
+
     avatar.currentPathIndex = advanced.currentPathIndex;
     avatar.currentCellOneBased = advanced.currentCellOneBased;
     avatar.pendingDetourFrom = advanced.pendingDetourFrom;
     avatar.activeDetourFrom = advanced.activeDetourFrom;
     avatar.detourProgress = advanced.detourProgress;
+
+    if (advanced.activeDetourFrom == null && advanced.currentPathIndex < previousPathIndex) {
+      lapProgressByAvatar.set(avatar.id, (lapProgressByAvatar.get(avatar.id) ?? 0) + 1);
+    }
 
     moveAvatarToCell(avatar, avatar.currentCellOneBased);
 
@@ -899,11 +998,13 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       syncAvatarHealthUi(affected);
     });
 
+    const yearlyIncome = applyYearIncomeIfReady();
     const clashCount = colliders.length;
     const combatSummary = combat.events.length > 0
       ? ` • Giao chiến ${clashCount} mục tiêu, ${combat.events.length} đòn thường cùng lúc`
       : '';
-    turnBanner.textContent = `Lượt ${avatar.unitName} (${avatar.role.toUpperCase()}) • Xúc xắc: ${dice} • Đến ô ${destination}${combatSummary}`;
+    const yearSummary = yearlyIncome > 0 ? ` • +${yearlyIncome} bạc/năm cho avatar còn sống` : '';
+    turnBanner.textContent = `Lượt ${avatar.unitName} (${avatar.role.toUpperCase()}) • Xúc xắc: ${dice} • Đến ô ${destination}${combatSummary}${yearSummary}`;
     syncPlayerWalletUi();
 
     activeTurnIndex = (activeTurnIndex + 1) % AVATAR_COUNT;
