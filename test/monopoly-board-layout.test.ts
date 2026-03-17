@@ -1,10 +1,12 @@
 import { createMonopolyBoardCells } from '../src/screens/monopoly/index.ts';
 
 describe('monopoly board layout', () => {
-  it('builds exactly 84 cells with 40 main-track cells', () => {
+    it('builds exactly 116 cells with 40 main-track cells, 24 mini-ring cells và 8 ô vi mô', () => {
     const cells = createMonopolyBoardCells();
-    expect(cells).toHaveLength(84);
+    expect(cells).toHaveLength(116);
     expect(cells.filter(cell => cell.track === 'main')).toHaveLength(40);
+    expect(cells.filter(cell => cell.track === 'mini')).toHaveLength(24);
+    expect(cells.filter(cell => cell.track === 'micro')).toHaveLength(8);
   });
 
   it('does not overlap coordinates between tracks', () => {
@@ -74,5 +76,88 @@ describe('monopoly board layout', () => {
     expect(find(80)).toMatchObject({ row: 1, col: 11 });
     expect(find(83)).toMatchObject({ row: 13, col: 3 });
     expect(find(84)).toMatchObject({ row: 13, col: 11 });
+  });
+
+  it('creates an inner mini square using intersections of (3,39), (9,13), (19,23), (29,33)', () => {
+    const cells = createMonopolyBoardCells();
+    const main = cells.filter(cell => cell.track === 'main');
+    const mini = cells.filter(cell => cell.track === 'mini');
+
+    const topLeft = { row: main[39 - 1].row, col: main[3 - 1].col };
+    const topRight = { row: main[13 - 1].row, col: main[9 - 1].col };
+    const bottomRight = { row: main[19 - 1].row, col: main[23 - 1].col };
+    const bottomLeft = { row: main[33 - 1].row, col: main[29 - 1].col };
+
+    expect(topLeft).toEqual({ row: 4, col: 4 });
+    expect(topRight).toEqual({ row: 4, col: 10 });
+    expect(bottomRight).toEqual({ row: 10, col: 10 });
+    expect(bottomLeft).toEqual({ row: 10, col: 4 });
+
+    const miniSet = new Set(mini.map(cell => `${cell.row},${cell.col}`));
+    expect(miniSet.size).toBe(24);
+    expect(mini[0].index).toBe(84);
+    expect(mini.at(-1)?.index).toBe(107);
+
+    expect(miniSet.has(`${topLeft.row},${topLeft.col}`)).toBe(true);
+    expect(miniSet.has(`${topRight.row},${topRight.col}`)).toBe(true);
+    expect(miniSet.has(`${bottomRight.row},${bottomRight.col}`)).toBe(true);
+    expect(miniSet.has(`${bottomLeft.row},${bottomLeft.col}`)).toBe(true);
+  });
+
+  it('creates a second micro square (8 cells) from intersections of (99,95), (101,105), (107,87), (89,93)', () => {
+    const cells = createMonopolyBoardCells();
+    const micro = cells.filter(cell => cell.track === 'micro');
+    const mini = cells.filter(cell => cell.track === 'mini');
+
+    const byIndex = (oneBased: number) => cells[oneBased - 1];
+    const pickIntersection = (first: number, second: number) => {
+      const a = byIndex(first);
+      const b = byIndex(second);
+      const c1 = { row: a.row, col: b.col };
+      const c2 = { row: b.row, col: a.col };
+      const miniRows = mini.map(cell => cell.row);
+      const miniCols = mini.map(cell => cell.col);
+      const minRow = Math.min(...miniRows);
+      const maxRow = Math.max(...miniRows);
+      const minCol = Math.min(...miniCols);
+      const maxCol = Math.max(...miniCols);
+      return [c1, c2].find(point => (
+        point.row > minRow &&
+        point.row < maxRow &&
+        point.col > minCol &&
+        point.col < maxCol
+      ));
+    };
+
+    const corners = [
+      pickIntersection(99, 95),
+      pickIntersection(101, 105),
+      pickIntersection(107, 87),
+      pickIntersection(89, 93)
+    ];
+
+    expect(corners).toEqual([
+      { row: 8, col: 8 },
+      { row: 8, col: 6 },
+      { row: 6, col: 6 },
+      { row: 6, col: 8 }
+    ]);
+
+    const microSet = new Set(micro.map(cell => `${cell.row},${cell.col}`));
+    expect(microSet.size).toBe(8);
+    expect(micro[0].index).toBe(108);
+    expect(micro.at(-1)?.index).toBe(115);
+
+    expect(microSet.has('6,6')).toBe(true);
+    expect(microSet.has('6,8')).toBe(true);
+    expect(microSet.has('8,8')).toBe(true);
+    expect(microSet.has('8,6')).toBe(true);
+
+    const touchesMini = micro.some(microCell => mini.some(miniCell => {
+      const rowDistance = Math.abs(microCell.row - miniCell.row);
+      const colDistance = Math.abs(microCell.col - miniCell.col);
+      return rowDistance + colDistance === 1;
+    }));
+    expect(touchesMini).toBe(false);
   });
 });

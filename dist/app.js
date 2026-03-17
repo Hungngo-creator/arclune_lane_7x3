@@ -26714,7 +26714,9 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   const MAIN_TRACK_CELLS = 40;
   const SIDE_TRACK_COLUMN_HEIGHT = 9;
   const SIDE_TRACK_PROTRUSION_CELLS = 8;
-  const TOTAL_CELLS = MAIN_TRACK_CELLS + SIDE_TRACK_COLUMN_HEIGHT * 4 + SIDE_TRACK_PROTRUSION_CELLS;
+  const MINI_RING_CELLS = 24;
+  const MICRO_RING_CELLS = 8;
+  const TOTAL_CELLS = MAIN_TRACK_CELLS + SIDE_TRACK_COLUMN_HEIGHT * 4 + SIDE_TRACK_PROTRUSION_CELLS + MINI_RING_CELLS + MICRO_RING_CELLS;
   const INNER_COLUMN_HEIGHT = 9;
   const CSS = /* css */ `
     .app--co-ty-phu{
@@ -26774,6 +26776,8 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
     .monopoly-cell--main{ background:rgba(24,44,68,0.95); }
     .monopoly-cell--lane{ background:rgba(39,33,67,0.95); }
     .monopoly-cell--connector{ background:rgba(52,39,26,0.96); }
+    .monopoly-cell--mini{ background:rgba(28,78,72,0.96); }
+    .monopoly-cell--micro{ background:rgba(98,38,111,0.96); }
   `;
   const CELL_KEY_MULTIPLIER = 100;
   function generateMainTrackCells() {
@@ -26830,10 +26834,121 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       }
       return lanes;
   }
+  function generateMiniRing(mainTrack, startIndex) {
+      const getMain = (indexOneBased) => {
+          const cell = mainTrack[indexOneBased - 1];
+          if (!cell) {
+              throw new Error(`Không tìm thấy ô bàn chính #${indexOneBased} để tạo bàn mini`);
+          }
+          return cell;
+      };
+      const topLeft = { row: getMain(39).row, col: getMain(3).col };
+      const topRight = { row: getMain(13).row, col: getMain(9).col };
+      const bottomRight = { row: getMain(19).row, col: getMain(23).col };
+      const bottomLeft = { row: getMain(33).row, col: getMain(29).col };
+      if (topLeft.row !== topRight.row ||
+          bottomLeft.row !== bottomRight.row ||
+          topLeft.col !== bottomLeft.col ||
+          topRight.col !== bottomRight.col) {
+          throw new Error('Bốn góc bàn mini không tạo thành hình vuông hợp lệ');
+      }
+      const miniCells = [];
+      let index = startIndex;
+      for (let col = topLeft.col; col <= topRight.col; col += 1) {
+          miniCells.push({ index: index++, row: topLeft.row, col, track: 'mini' });
+      }
+      for (let row = topLeft.row + 1; row <= bottomRight.row; row += 1) {
+          miniCells.push({ index: index++, row, col: topRight.col, track: 'mini' });
+      }
+      for (let col = bottomRight.col - 1; col >= bottomLeft.col; col -= 1) {
+          miniCells.push({ index: index++, row: bottomRight.row, col, track: 'mini' });
+      }
+      for (let row = bottomLeft.row - 1; row > topLeft.row; row -= 1) {
+          miniCells.push({ index: index++, row, col: topLeft.col, track: 'mini' });
+      }
+      if (miniCells.length !== MINI_RING_CELLS) {
+          throw new Error(`Bàn mini sai số ô: ${miniCells.length}/${MINI_RING_CELLS}`);
+      }
+      return miniCells;
+  }
+  function generateMicroRing(cells, startIndex) {
+      const getCell = (indexOneBased) => {
+          const cell = cells[indexOneBased - 1];
+          if (!cell) {
+              throw new Error(`Không tìm thấy ô #${indexOneBased} để tạo vòng cờ vi mô`);
+          }
+          return cell;
+      };
+      const miniCells = cells.filter(cell => cell.track === 'mini');
+      const miniRows = miniCells.map(cell => cell.row);
+      const miniCols = miniCells.map(cell => cell.col);
+      const miniMinRow = Math.min(...miniRows);
+      const miniMaxRow = Math.max(...miniRows);
+      const miniMinCol = Math.min(...miniCols);
+      const miniMaxCol = Math.max(...miniCols);
+      const pickIntersection = (first, second) => {
+          const a = getCell(first);
+          const b = getCell(second);
+          const candidates = [
+              { row: a.row, col: b.col },
+              { row: b.row, col: a.col }
+          ];
+          const chosen = candidates.find(point => (point.row > miniMinRow &&
+              point.row < miniMaxRow &&
+              point.col > miniMinCol &&
+              point.col < miniMaxCol));
+          if (!chosen) {
+              throw new Error(`Không tìm được giao điểm nằm trong bàn mini cho cặp (${first}, ${second})`);
+          }
+          return chosen;
+      };
+      const anchors = [
+          pickIntersection(99, 95),
+          pickIntersection(101, 105),
+          pickIntersection(107, 87),
+          pickIntersection(89, 93)
+      ];
+      const rows = anchors.map(point => point.row);
+      const cols = anchors.map(point => point.col);
+      const top = Math.min(...rows);
+      const bottom = Math.max(...rows);
+      const left = Math.min(...cols);
+      const right = Math.max(...cols);
+      const expectedCorners = new Set([
+          `${top},${left}`,
+          `${top},${right}`,
+          `${bottom},${right}`,
+          `${bottom},${left}`
+      ]);
+      const actualCorners = new Set(anchors.map(point => `${point.row},${point.col}`));
+      if (expectedCorners.size !== actualCorners.size || [...expectedCorners].some(key => !actualCorners.has(key))) {
+          throw new Error('Bốn giao điểm yêu cầu không tạo được khung vuông cho vòng cờ vi mô');
+      }
+      const microCells = [];
+      let index = startIndex;
+      for (let col = left; col <= right; col += 1) {
+          microCells.push({ index: index++, row: top, col, track: 'micro' });
+      }
+      for (let row = top + 1; row <= bottom; row += 1) {
+          microCells.push({ index: index++, row, col: right, track: 'micro' });
+      }
+      for (let col = right - 1; col >= left; col -= 1) {
+          microCells.push({ index: index++, row: bottom, col, track: 'micro' });
+      }
+      for (let row = bottom - 1; row > top; row -= 1) {
+          microCells.push({ index: index++, row, col: left, track: 'micro' });
+      }
+      if (microCells.length !== MICRO_RING_CELLS) {
+          throw new Error(`Vòng cờ vi mô sai số ô: ${microCells.length}/${MICRO_RING_CELLS}`);
+      }
+      return microCells;
+  }
   function buildMonopolyBoardCells() {
       const mainTrack = generateMainTrackCells();
       const innerLanes = generateInnerLanes(mainTrack.length);
-      const cells = [...mainTrack, ...innerLanes];
+      const miniRing = generateMiniRing(mainTrack, mainTrack.length + innerLanes.length);
+      const microRing = generateMicroRing([...mainTrack, ...innerLanes, ...miniRing], mainTrack.length + innerLanes.length + miniRing.length);
+      const cells = [...mainTrack, ...innerLanes, ...miniRing, ...microRing];
       if (cells.length !== TOTAL_CELLS) {
           throw new Error(`Tổng số ô bàn cờ sai: ${cells.length}/${TOTAL_CELLS}`);
       }
@@ -26872,7 +26987,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       topbar.appendChild(backButton);
       const meta = document.createElement('div');
       meta.className = 'monopoly-screen__meta';
-      meta.innerHTML = `<span>Bàn chính: ${MAIN_TRACK_CELLS} ô</span><span>Lane phụ: ${SIDE_TRACK_COLUMN_HEIGHT * 4 + SIDE_TRACK_PROTRUSION_CELLS} ô</span><span>Tổng: ${TOTAL_CELLS} ô</span>`;
+      meta.innerHTML = `<span>Bàn chính: ${MAIN_TRACK_CELLS} ô</span><span>Lane phụ: ${SIDE_TRACK_COLUMN_HEIGHT * 4 + SIDE_TRACK_PROTRUSION_CELLS} ô</span><span>Bàn mini: ${MINI_RING_CELLS} ô</span><span>Bàn vi mô: ${MICRO_RING_CELLS} ô</span><span>Tổng: ${TOTAL_CELLS} ô</span>`;
       topbar.appendChild(meta);
       wrapper.appendChild(topbar);
       const board = document.createElement('div');
