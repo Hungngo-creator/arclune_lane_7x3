@@ -1,0 +1,2 @@
+Thánh Tông 1 ô/chi nhánh, 1 bàn cờ tối thiểu 3 chi nhánh: Nơi có thể rút ra buff và debuff đang có thành vật phẩm, có thể giao dịch với player/npc khác qua thánh tông, player/npc khác cần đến thánh tông để nhận chuyển phát nhanh. 
+Trúc Lâm, 2 ô, rừng trúc, nơi có nguồn nước dồi dào, khi player đạp trúng hồi giá trị khát = 10% max giá trị khát.

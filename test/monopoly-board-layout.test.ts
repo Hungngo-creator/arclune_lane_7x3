@@ -1,11 +1,15 @@
 import {
   advanceMonopolyMovement,
+  applyMonopolyStepDrain,
   computeMonopolyVictoryRewardByGold,
+  createInitialMonopolyStatus,
   createInitialMonopolyWallet,
   createMonopolyBoardCells,
+  getMonopolyDiceMaxBySpirit,
   normalizeMonopolyWallet,
   refillMonopolySilverIfEmpty,
   resolveMonopolyCollisionCombat,
+  shouldSkipMonopolyTurnBySpirit,
   spendMonopolySilver
 } from '../src/screens/monopoly/index.ts';
 
@@ -272,5 +276,41 @@ describe('monopoly currency wallet', () => {
 
   it('computes victory reward based on gold only', () => {
     expect(computeMonopolyVictoryRewardByGold({ gold: 5, silver: 999 })).toBe(500);
+  });
+
+  describe('monopoly survival metrics', () => {
+  it('resets all monopoly-only metrics to 80/100 at match start', () => {
+    expect(createInitialMonopolyStatus()).toEqual({
+      thirst: 80,
+      hunger: 80,
+      spirit: 80
+    });
+  });
+
+  it('drains thirst/hunger/spirit per moved step with cap [0,100]', () => {
+    expect(applyMonopolyStepDrain({ thirst: 80, hunger: 80, spirit: 80 }, 5)).toEqual({
+      thirst: 72,
+      hunger: 74,
+      spirit: 77.5
+    });
+
+    expect(applyMonopolyStepDrain({ thirst: 3, hunger: 3, spirit: 1 }, 5)).toEqual({
+      thirst: 0,
+      hunger: 0,
+      spirit: 0
+    });
+  });
+
+  it('limits dice to 1..3 when spirit <= 30, otherwise 1..6', () => {
+    expect(getMonopolyDiceMaxBySpirit(80)).toBe(6);
+    expect(getMonopolyDiceMaxBySpirit(31)).toBe(6);
+    expect(getMonopolyDiceMaxBySpirit(30)).toBe(3);
+    expect(getMonopolyDiceMaxBySpirit(0)).toBe(3);
+  });
+
+  it('marks skip-turn when spirit <= 20', () => {
+    expect(shouldSkipMonopolyTurnBySpirit(21)).toBe(false);
+    expect(shouldSkipMonopolyTurnBySpirit(20)).toBe(true);
+    expect(shouldSkipMonopolyTurnBySpirit(0)).toBe(true);
   });
 });

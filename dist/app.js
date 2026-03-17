@@ -27170,6 +27170,13 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   function ensureStyles() {
       ensureStyleTag(STYLE_ID, { css: CSS });
   }
+  const MONOPOLY_STATUS_CAP = 100;
+  const MONOPOLY_STATUS_START = 80;
+  const MONOPOLY_THIRST_DRAIN_PER_STEP = 1.6;
+  const MONOPOLY_HUNGER_DRAIN_PER_STEP = 1.2;
+  const MONOPOLY_SPIRIT_DRAIN_PER_STEP = 0.5;
+  const MONOPOLY_LOW_SPIRIT_DICE_THRESHOLD = 30;
+  const MONOPOLY_FAINT_SPIRIT_THRESHOLD = 20;
   const MONOPOLY_CURRENCY_RATIO = 100;
   const MONOPOLY_STARTING_GOLD = 4;
   const MONOPOLY_STARTING_SILVER = 1;
@@ -27178,6 +27185,39 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           return 0;
       return Math.max(0, Math.floor(value));
   };
+  const clampMonopolyStatus = (value) => {
+      if (!Number.isFinite(value))
+          return 0;
+      return Math.min(MONOPOLY_STATUS_CAP, Math.max(0, value));
+  };
+  function createInitialMonopolyStatus() {
+      return {
+          thirst: MONOPOLY_STATUS_START,
+          hunger: MONOPOLY_STATUS_START,
+          spirit: MONOPOLY_STATUS_START
+      };
+  }
+  function applyMonopolyStepDrain(status, steps) {
+      const safeSteps = Math.max(0, Math.floor(steps));
+      if (safeSteps <= 0) {
+          return {
+              thirst: clampMonopolyStatus(status.thirst),
+              hunger: clampMonopolyStatus(status.hunger),
+              spirit: clampMonopolyStatus(status.spirit)
+          };
+      }
+      return {
+          thirst: clampMonopolyStatus(status.thirst - safeSteps * MONOPOLY_THIRST_DRAIN_PER_STEP),
+          hunger: clampMonopolyStatus(status.hunger - safeSteps * MONOPOLY_HUNGER_DRAIN_PER_STEP),
+          spirit: clampMonopolyStatus(status.spirit - safeSteps * MONOPOLY_SPIRIT_DRAIN_PER_STEP)
+      };
+  }
+  function getMonopolyDiceMaxBySpirit(spirit) {
+      return spirit <= MONOPOLY_LOW_SPIRIT_DICE_THRESHOLD ? 3 : 6;
+  }
+  function shouldSkipMonopolyTurnBySpirit(spirit) {
+      return spirit <= MONOPOLY_FAINT_SPIRIT_THRESHOLD;
+  }
   function normalizeMonopolyWallet(wallet) {
       const normalizedGold = normalizeWalletAmount(wallet.gold);
       const normalizedSilver = normalizeWalletAmount(wallet.silver);
@@ -27402,6 +27442,9 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       turnBanner.className = 'monopoly-screen__turn';
       turnBanner.textContent = 'Đang chuẩn bị lượt chơi...';
       wrapper.appendChild(turnBanner);
+      const playerStatusNode = document.createElement('div');
+      playerStatusNode.className = 'monopoly-screen__meta';
+      wrapper.appendChild(playerStatusNode);
       const board = document.createElement('div');
       board.className = 'monopoly-board';
       board.style.height = `${BOARD_ISOMETRIC_LAYOUT.height}px`;
@@ -27494,7 +27537,9 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
               detourProgress: -1,
               node,
               hpFillNode,
-              wallet: createInitialMonopolyWallet()
+              wallet: createInitialMonopolyWallet(),
+              status: createInitialMonopolyStatus(),
+              skippedTurnCount: 0
           });
       }
       const playerAvatar = avatars.find(avatar => avatar.role === 'player') ?? null;
@@ -27517,6 +27562,16 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           goldSlot.textContent = String(wallet.gold);
           walletBar.hidden = silverSlot.hidden && goldSlot.hidden;
       };
+      const formatMetric = (value) => Math.round(clampMonopolyStatus(value)).toString();
+      const syncPlayerStatusUi = () => {
+          if (!playerAvatar) {
+              playerStatusNode.hidden = true;
+              return;
+          }
+          const { thirst, hunger, spirit } = playerAvatar.status;
+          playerStatusNode.hidden = false;
+          playerStatusNode.textContent = `Chỉ số cá nhân • Khát ${formatMetric(thirst)}/100 • Đói ${formatMetric(hunger)}/100 • Tinh thần ${formatMetric(spirit)}/100`;
+      };
       const syncYearUi = () => {
           yearSlot.textContent = `Năm: ${yearsElapsed}`;
       };
@@ -27527,6 +27582,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       };
       avatars.forEach(syncAvatarHealthUi);
       syncPlayerWalletUi();
+      syncPlayerStatusUi();
       const moveAvatarToCell = (avatar, indexOneBased) => {
           const layout = BOARD_ISOMETRIC_LAYOUT.byIndex.get(indexOneBased - 1);
           if (!layout)
@@ -27562,7 +27618,16 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           const avatar = avatars.find(item => item.id === activeAvatarId);
           if (!avatar)
               return;
-          const dice = randomInt(1, 6);
+          if (avatar.skippedTurnCount > 0) {
+              avatar.skippedTurnCount -= 1;
+              turnBanner.textContent = `Lượt ${avatar.unitName} (${avatar.role.toUpperCase()}) • Tinh thần ≤ ${MONOPOLY_FAINT_SPIRIT_THRESHOLD} nên ngất tại chỗ, mất lượt`;
+              syncPlayerStatusUi();
+              activeTurnIndex = (activeTurnIndex + 1) % AVATAR_COUNT;
+              turnTimer = window.setTimeout(runTurn, TURN_INTERVAL_MS + TURN_ADVANCE_DELAY_MS);
+              return;
+          }
+          const diceMax = getMonopolyDiceMaxBySpirit(avatar.status.spirit);
+          const dice = randomInt(1, diceMax);
           if (!avatar.hasEnteredBoard) {
               avatar.currentPathIndex = 0;
               avatar.currentCellOneBased = MAIN_TRACK_PATH_ORDER[0] ?? START_CELL_ONE_BASED;
@@ -27583,6 +27648,10 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           avatar.pendingDetourFrom = advanced.pendingDetourFrom;
           avatar.activeDetourFrom = advanced.activeDetourFrom;
           avatar.detourProgress = advanced.detourProgress;
+          avatar.status = applyMonopolyStepDrain(avatar.status, dice);
+          if (shouldSkipMonopolyTurnBySpirit(avatar.status.spirit)) {
+              avatar.skippedTurnCount = Math.max(avatar.skippedTurnCount, 1);
+          }
           if (advanced.activeDetourFrom == null && advanced.currentPathIndex < previousPathIndex) {
               lapProgressByAvatar.set(avatar.id, (lapProgressByAvatar.get(avatar.id) ?? 0) + 1);
           }
@@ -27599,9 +27668,12 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           const livingAfterCombat = avatars.filter(item => item.hp > 0);
           if (livingAfterCombat.length === 1) {
               const champion = livingAfterCombat[0];
-              const reward = computeMonopolyVictoryRewardByGold(champion.wallet);
-              turnBanner.textContent = `🏆 ${champion.unitName} (${champion.role.toUpperCase()}) thắng vì đã hạ gục toàn bộ kẻ thù • Quyết toán: ${champion.wallet.gold} vàng → thưởng ${reward}`;
+              if (champion) {
+                  const reward = computeMonopolyVictoryRewardByGold(champion.wallet);
+                  turnBanner.textContent = `🏆 ${champion.unitName} (${champion.role.toUpperCase()}) thắng vì đã hạ gục toàn bộ kẻ thù • Quyết toán: ${champion.wallet.gold} vàng → thưởng ${reward}`;
+              }
               syncPlayerWalletUi();
+              syncPlayerStatusUi();
               return;
           }
           const yearlyIncome = applyYearIncomeIfReady();
@@ -27610,8 +27682,11 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
               ? ` • Giao chiến ${clashCount} mục tiêu, ${combat.events.length} đòn thường cùng lúc`
               : '';
           const yearSummary = yearlyIncome > 0 ? ` • +${yearlyIncome} bạc/năm cho avatar còn sống` : '';
-          turnBanner.textContent = `Lượt ${avatar.unitName} (${avatar.role.toUpperCase()}) • Xúc xắc: ${dice} • Đến ô ${destination}${combatSummary}${yearSummary}`;
+          const spiritNote = diceMax === 3 ? ` • Tinh thần thấp nên xúc xắc chỉ 1-${diceMax}` : '';
+          const faintNote = avatar.skippedTurnCount > 0 ? ' • Tinh thần ≤ 20: lượt kế tiếp sẽ bị mất do ngất' : '';
+          turnBanner.textContent = `Lượt ${avatar.unitName} (${avatar.role.toUpperCase()}) • Xúc xắc: ${dice} • Đến ô ${destination}${combatSummary}${yearSummary}${spiritNote}${faintNote}`;
           syncPlayerWalletUi();
+          syncPlayerStatusUi();
           activeTurnIndex = (activeTurnIndex + 1) % AVATAR_COUNT;
           turnTimer = window.setTimeout(runTurn, TURN_INTERVAL_MS + TURN_ADVANCE_DELAY_MS);
       };
@@ -27650,6 +27725,10 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createMonopolyBoardCells')) exports.createMonopolyBoardCells = createMonopolyBoardCells;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'createInitialMonopolyStatus')) exports.createInitialMonopolyStatus = createInitialMonopolyStatus;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'applyMonopolyStepDrain')) exports.applyMonopolyStepDrain = applyMonopolyStepDrain;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getMonopolyDiceMaxBySpirit')) exports.getMonopolyDiceMaxBySpirit = getMonopolyDiceMaxBySpirit;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'shouldSkipMonopolyTurnBySpirit')) exports.shouldSkipMonopolyTurnBySpirit = shouldSkipMonopolyTurnBySpirit;
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeMonopolyWallet')) exports.normalizeMonopolyWallet = normalizeMonopolyWallet;
   if (!Object.prototype.hasOwnProperty.call(exports, 'refillMonopolySilverIfEmpty')) exports.refillMonopolySilverIfEmpty = refillMonopolySilverIfEmpty;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createInitialMonopolyWallet')) exports.createInitialMonopolyWallet = createInitialMonopolyWallet;
