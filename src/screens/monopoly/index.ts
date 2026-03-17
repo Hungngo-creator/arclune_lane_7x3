@@ -519,6 +519,7 @@ interface MonopolyAvatar {
     ARM: number;
     RES: number;
   };
+  hpMaxCurrent: number;
   hp: number;
   currentPathIndex: number;
   currentCellOneBased: number;
@@ -1020,6 +1021,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
         ARM: Math.max(0, Number(statBlock.ARM ?? 0)),
         RES: Math.max(0, Number(statBlock.RES ?? 0))
       },
+      hpMaxCurrent: Math.max(1, Math.round(statBlock.HP ?? 1)),
       hp: Math.max(1, Math.round(statBlock.HP ?? 1)),
       currentPathIndex: 0,
       currentCellOneBased: START_CELL_ONE_BASED,
@@ -1084,7 +1086,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   };
 
     const syncAvatarHealthUi = (avatar: MonopolyAvatar): void => {
-    const hpRatio = clampRatio(avatar.hp / avatar.stats.hpMax);
+    const hpRatio = clampRatio(avatar.hp / avatar.hpMaxCurrent);
     avatar.hpFillNode.style.transform = `scaleX(${hpRatio})`;
     avatar.node.classList.toggle('monopoly-avatar--dead', avatar.hp <= 0);
   };
@@ -1127,7 +1129,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
 
   const applyHouseOwnerBuff = (avatar: MonopolyAvatar, houseId: string, isLanding: boolean): void => {
     const gainHpRatio = (ratio: number): void => {
-      avatar.hp = Math.min(avatar.stats.hpMax, avatar.hp + avatar.stats.hpMax * ratio);
+      avatar.hp = Math.min(avatar.hpMaxCurrent, avatar.hp + avatar.hpMaxCurrent * ratio);
     };
     const gainStatus = (delta: Partial<MonopolyStatusMetrics>): void => {
       avatar.status = {
@@ -1164,7 +1166,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     }
     if (houseId === 'ba_nen_nhang') {
       gainStatus({ spirit: 20 });
-      if (isLanding && avatar.hp <= avatar.stats.hpMax * 0.08) avatar.hp = 0;
+      if (isLanding && avatar.hp <= avatar.hpMaxCurrent * 0.08) avatar.hp = 0;
     }
     if (houseId === 'hop_hoan_tong') gainSpirit(isLanding ? 35 : 15);
     if (houseId === 'anh_sat_mon') gainSpirit(isLanding ? 65 : 30);
@@ -1230,16 +1232,17 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       };
       return `${actor.unitName} bị Ba Nén Nhang ám hại`;
     }
-
-    if (slot.definitionId === 'anh_sat_mon' && isLanding && actor.wallet.gold <= 0 && actor.wallet.silver < 1) {
-      if (actor.hp <= actor.stats.hpMax * 0.2) {
-        actor.hp = 0;
-        return `${actor.unitName} trốn thuế Ảnh sát môn và bị ám sát`;
-      }
-      actor.hp = Math.max(0, actor.hp - actor.stats.hpMax * 0.03);
-      return `${actor.unitName} trốn thuế Ảnh sát môn: mất 3% HP max hiện tại`;
-    }
     return '';
+  };
+
+    const applyAssassinTaxPunishment = (avatar: MonopolyAvatar): string => {
+    if (avatar.hp <= avatar.hpMaxCurrent * 0.2) {
+      avatar.hp = 0;
+      return `${avatar.unitName} trốn thuế Ảnh sát môn và bị ám sát`;
+    }
+    avatar.hpMaxCurrent = Math.max(1, avatar.hpMaxCurrent * 0.97);
+    avatar.hp = Math.min(avatar.hp, avatar.hpMaxCurrent);
+    return `${avatar.unitName} trốn thuế Ảnh sát môn: giảm vĩnh viễn 3% HP tối đa`;
   };
 
   const resolveHouseStep = (avatar: MonopolyAvatar, cellOneBased: number, isLanding: boolean): HouseStepSummary => {
@@ -1288,15 +1291,11 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       gold: Math.floor(remainSilver / MONOPOLY_CURRENCY_RATIO),
       silver: remainSilver % MONOPOLY_CURRENCY_RATIO
     });
-    const bankruptLabel = settled.expectedTaxSilver > settled.paidTaxSilver
+    let bankruptLabel = settled.expectedTaxSilver > settled.paidTaxSilver
       ? `${avatar.unitName} không đủ bạc để trả đủ thuế nhà (${settled.paidTaxSilver}/${settled.expectedTaxSilver})`
       : '';
       if (shouldTriggerAssassinTaxPunishment(slot.definitionId, settled.expectedTaxSilver, settled.paidTaxSilver)) {
-      if (avatar.hp <= avatar.stats.hpMax * 0.2) {
-        avatar.hp = 0;
-      } else {
-        avatar.hp = Math.max(0, avatar.hp - avatar.stats.hpMax * 0.03);
-      }
+      bankruptLabel = `${bankruptLabel} • ${applyAssassinTaxPunishment(avatar)}`;
     }
     const hazardLabel = resolveHouseCombatThreat(slot, avatar, isLanding) || resolveRangedHouseThreat(avatar, cellOneBased);
     return { paidTax: settled.paidTaxSilver, ownerCollected: 0, purchaseLabel: '', upgradeLabel: '', hazardLabel, bankruptLabel };
@@ -1345,7 +1344,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     avatar.activeDetourFrom = advanced.activeDetourFrom;
     avatar.detourProgress = advanced.detourProgress;
     avatar.status = applyMonopolyStepDrain(avatar.status, dice);
-    avatar.hp = applyMonopolySurvivalHpDrain(avatar.hp, avatar.stats.hpMax, avatar.status, dice);
+    avatar.hp = applyMonopolySurvivalHpDrain(avatar.hp, avatar.hpMaxCurrent, avatar.status, dice);
     syncAvatarHealthUi(avatar);
 
     if (shouldSkipMonopolyTurnBySpirit(avatar.status.spirit)) {
