@@ -1212,3 +1212,5 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
 }
 
 export const render = renderScreen;
+
+export * from "./house-module.ts";

@@ -1,7 +1,7 @@
 // Bundled by build.mjs
 const __modules = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }
 function __define(id, factory){ __modules[id] = { factory, exports: null, initialized: false }; }
@@ -26725,17 +26725,143 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'createModesSection')) exports.createModesSection = createModesSection;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createHeader')) exports.createHeader = createHeader;
 });
+__define('./screens/monopoly/house-module.ts', (exports, module, __require) => {
+  const MONOPOLY_HOUSE_SPAWN_LIMIT = 16;
+  const HOUSE_TIER_BUY_COST = Object.freeze({
+      1: 50,
+      2: 300,
+      3: 600,
+      4: 900,
+      5: 1500
+  });
+  const HOUSE_TIER_ROLL_TABLE = Object.freeze([
+      Object.freeze({ tier: 5, weight: 3 }),
+      Object.freeze({ tier: 4, weight: 6 }),
+      Object.freeze({ tier: 3, weight: 9 }),
+      Object.freeze({ tier: 2, weight: 18 }),
+      Object.freeze({ tier: 1, weight: 64 })
+  ]);
+  const DEFINITIONS = Object.freeze([
+      { id: 'tieu_diem', name: 'Tiểu điếm', tier: 1, yearlySilver: 20, passTaxSilver: 5, landTaxSilver: 20, upgradeCostSilver: 200, ownerLandBuff: '+10 đói/+10 khát' },
+      { id: 'thon_nho', name: 'Thôn nhỏ', tier: 1, yearlySilver: 30, passTaxSilver: 5, landTaxSilver: 20, upgradeCostSilver: 250, ownerLandBuff: '+3% HP max, +5 đói, +10 khát' },
+      { id: 'tuu_lau', name: 'Tửu Lâu', tier: 2, yearlySilver: 80, passTaxSilver: 10, landTaxSilver: 30, upgradeCostSilver: 500, ownerLandBuff: '+20 khát, +5 tinh thần' },
+      { id: 'quang_nho', name: 'Quặng nhỏ', tier: 2, yearlySilver: 0, passTaxSilver: 0, landTaxSilver: 0, upgradeCostSilver: 450, minePerYearSilver: 250, mineYears: 3 },
+      { id: 'duoc_duong', name: 'Dược Đường', tier: 2, yearlySilver: 100, passTaxSilver: 15, landTaxSilver: 35, upgradeCostSilver: 550, ownerPassBuff: '+4% HP max', ownerLandBuff: '+10% HP max' },
+      { id: 'quang_vua', name: 'Quặng vừa', tier: 3, yearlySilver: 0, passTaxSilver: 0, landTaxSilver: 0, upgradeCostSilver: 800, minePerYearSilver: 400, mineYears: 4 },
+      { id: 'duoc_coc', name: 'Dược Cốc', tier: 3, yearlySilver: 250, passTaxSilver: 50, landTaxSilver: 120, upgradeCostSilver: 900, ownerPassBuff: '+6% HP max', ownerLandBuff: '+15% HP max, +3 tinh thần' },
+      { id: 'tan_khi_mon', name: 'Tán Khí Môn', tier: 3, yearlySilver: 230, passTaxSilver: 70, landTaxSilver: 160, upgradeCostSilver: 950, ownerPassBuff: '+5% HP max, +10 đói/khát, +5 tinh thần' },
+      { id: 'khi_cac', name: 'Khí Các', tier: 3, yearlySilver: 230, passTaxSilver: 80, landTaxSilver: 180, upgradeCostSilver: 900, ownerPassBuff: '+10 đói/khát/tinh thần' },
+      { id: 'thuong_hoi', name: 'Thương hội', tier: 4, yearlySilver: 350, passTaxSilver: 120, landTaxSilver: 250, upgradeCostSilver: 1300, ownerPassBuff: '+8% HP max, +10 đói/khát/tinh thần', ownerLandBuff: '+17% HP max, +20 đói/khát/tinh thần' },
+      { id: 'mo_khong_lo', name: 'Mỏ Khổng lồ', tier: 4, yearlySilver: 0, passTaxSilver: 0, landTaxSilver: 0, upgradeCostSilver: 1200, minePerYearSilver: 700, mineYears: 8 },
+      { id: 'tien_gia_phu_de', name: 'Tiên Gia Phủ Đệ', tier: 4, yearlySilver: 300, passTaxSilver: 180, landTaxSilver: 300, upgradeCostSilver: 1400, ownerPassBuff: '+11% HP max, +12 đói/khát/tinh thần', ownerLandBuff: '+23% HP max, +25 đói/khát/tinh thần' },
+      { id: 'ba_nen_nhang', name: 'Ba Nén Nhang', tier: 4, yearlySilver: 400, passTaxSilver: 300, landTaxSilver: 700, upgradeCostSilver: 1550, ownerPassBuff: '+20 tinh thần', specialRules: ['Kẻ địch đi ngang/đạp trúng mất thêm HP và chỉ số', 'Chủ đạp trúng khi HP < 8% max thì bị phản sát (HP=0)'] },
+      { id: 'hop_hoan_tong', name: 'Hợp Hoan Tông', tier: 5, yearlySilver: 700, passTaxSilver: 500, landTaxSilver: 1000, upgradeCostSilver: null, ownerPassBuff: '+15 tinh thần', ownerLandBuff: '+35 tinh thần' },
+      { id: 'anh_sat_mon', name: 'Ảnh sát môn', tier: 5, yearlySilver: 750, passTaxSilver: 700, landTaxSilver: 1500, upgradeCostSilver: null, ownerPassBuff: '+30 tinh thần', ownerLandBuff: '+65 tinh thần', specialRules: ['Trốn thuế có thể bị giết hoặc giảm vĩnh viễn 3% HP max', 'Tinh thần dư chuyển 50% sang max tinh thần'] },
+      { id: 'thi_than_thuong', name: 'Thí Thần Thương', tier: 5, yearlySilver: 0, passTaxSilver: 0, landTaxSilver: 0, upgradeCostSilver: null, specialRules: ['Không thuế/không tự sinh tiền', 'Kẻ địch đi ngang chịu 2 đòn thường chủ, đạp trúng chịu 4 đòn'] },
+      { id: 'anh_cung', name: 'Ảnh Cung', tier: 5, yearlySilver: 0, passTaxSilver: 0, landTaxSilver: 0, upgradeCostSilver: null, specialRules: ['Đi ngang chịu 1 đòn, đạp trúng chịu 3 đòn thường chủ', 'Đạp trúng có thể kéo chủ về ô Ảnh Cung (trừ Quỷ Vực/Bí Cảnh)'] },
+      { id: 'tai_cac', name: 'Tài Các', tier: 5, yearlySilver: 1300, passTaxSilver: 800, landTaxSilver: 1700, upgradeCostSilver: null, ownerPassBuff: '+50 tinh thần', ownerLandBuff: '+100 tinh thần' },
+      { id: 'thi_than_cung', name: 'Thí Thần Cung', tier: 5, yearlySilver: 0, passTaxSilver: 0, landTaxSilver: 0, upgradeCostSilver: null, specialRules: ['Bắn xuyên map: bán kính 3 ô gây 2 đòn thường chủ', 'Bán kính 2 ô gây 5 đòn thường chủ'] }
+  ]);
+  const DEFINITIONS_BY_TIER = new Map();
+  for (const tier of [1, 2, 3, 4, 5]) {
+      DEFINITIONS_BY_TIER.set(tier, Object.freeze(DEFINITIONS.filter(entry => entry.tier === tier)));
+  }
+  function createRandomHouseSlots(cells, rng = Math.random, cap = MONOPOLY_HOUSE_SPAWN_LIMIT) {
+      const limit = Math.max(0, Math.min(cap, MONOPOLY_HOUSE_SPAWN_LIMIT, cells.length));
+      const pool = [...cells.map(cell => cell.index + 1)];
+      const chosen = [];
+      for (let i = 0; i < limit; i += 1) {
+          const pick = Math.floor(Math.max(0, Math.min(0.999999, rng())) * pool.length);
+          const [cellIndex] = pool.splice(pick, 1);
+          if (typeof cellIndex !== 'number')
+              break;
+          chosen.push({
+              cellIndex,
+              marker: '?',
+              revealedTier: null,
+              definitionId: null,
+              ownerAvatarId: null,
+              treasurySilver: 0,
+              minedYears: 0
+          });
+      }
+      return chosen;
+  }
+  function rollHouseTier(rng = Math.random) {
+      const roll = Math.max(0, Math.min(0.999999, rng())) * 100;
+      let cursor = 0;
+      for (const entry of HOUSE_TIER_ROLL_TABLE) {
+          cursor += entry.weight;
+          if (roll < cursor)
+              return entry.tier;
+      }
+      return 1;
+  }
+  function pickRandomHouseDefinitionByTier(tier, rng = Math.random) {
+      const pool = DEFINITIONS_BY_TIER.get(tier) ?? [];
+      if (pool.length <= 0) {
+          throw new Error(`Thiếu định nghĩa nhà ở cấp ${tier}`);
+      }
+      const index = Math.floor(Math.max(0, Math.min(0.999999, rng())) * pool.length);
+      return pool[index] ?? pool[0];
+  }
+  function revealHousePurchase(slot, buyerAvatarId, walletSilver, rng = Math.random) {
+      const tier = rollHouseTier(rng);
+      const cost = HOUSE_TIER_BUY_COST[tier];
+      if (walletSilver < cost) {
+          return { ok: false, nextWalletSilver: walletSilver, tier, definition: null, reason: 'not_enough_silver' };
+      }
+      const definition = pickRandomHouseDefinitionByTier(tier, rng);
+      slot.revealedTier = tier;
+      slot.definitionId = definition.id;
+      slot.ownerAvatarId = buyerAvatarId;
+      return { ok: true, nextWalletSilver: walletSilver - cost, tier, definition };
+  }
+  function collectHouseIncome(slot, yearCompleted) {
+      if (!slot.definitionId)
+          return 0;
+      const def = DEFINITIONS.find(entry => entry.id === slot.definitionId);
+      if (!def)
+          return 0;
+      if (def.minePerYearSilver && def.mineYears) {
+          if (slot.minedYears >= def.mineYears)
+              return slot.treasurySilver;
+          if (yearCompleted) {
+              slot.treasurySilver += def.minePerYearSilver;
+              slot.minedYears += 1;
+          }
+          return slot.treasurySilver;
+      }
+      if (yearCompleted) {
+          slot.treasurySilver += def.yearlySilver;
+      }
+      return slot.treasurySilver;
+  }
+  function getHouseDefinitions() {
+      return DEFINITIONS;
+  }
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'MONOPOLY_HOUSE_SPAWN_LIMIT')) exports.MONOPOLY_HOUSE_SPAWN_LIMIT = MONOPOLY_HOUSE_SPAWN_LIMIT;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'HOUSE_TIER_BUY_COST')) exports.HOUSE_TIER_BUY_COST = HOUSE_TIER_BUY_COST;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'HOUSE_TIER_ROLL_TABLE')) exports.HOUSE_TIER_ROLL_TABLE = HOUSE_TIER_ROLL_TABLE;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'createRandomHouseSlots')) exports.createRandomHouseSlots = createRandomHouseSlots;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'rollHouseTier')) exports.rollHouseTier = rollHouseTier;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'pickRandomHouseDefinitionByTier')) exports.pickRandomHouseDefinitionByTier = pickRandomHouseDefinitionByTier;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'revealHousePurchase')) exports.revealHousePurchase = revealHousePurchase;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'collectHouseIncome')) exports.collectHouseIncome = collectHouseIncome;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getHouseDefinitions')) exports.getHouseDefinitions = getHouseDefinitions;
+});
 __define('./screens/monopoly/index.ts', (exports, module, __require) => {
-  const __dep0 = __require('./ui/dom.ts');
-  const ensureStyleTag = __dep0.ensureStyleTag;
-  const mountSection = __dep0.mountSection;
-  const __dep1 = __require('./art.ts');
-  const getUnitArt = __dep1.getUnitArt;
-  const __dep2 = __require('./catalog.ts');
-  const CLASS_BASE = __dep2.CLASS_BASE;
-  const ROSTER = __dep2.ROSTER;
-  const __dep3 = __require('./data/roster-preview.ts');
-  const computeFinalStats = __dep3.computeFinalStats;
+  const __dep1 = __require('./ui/dom.ts');
+  const ensureStyleTag = __dep1.ensureStyleTag;
+  const mountSection = __dep1.mountSection;
+  const __dep2 = __require('./art.ts');
+  const getUnitArt = __dep2.getUnitArt;
+  const __dep3 = __require('./catalog.ts');
+  const CLASS_BASE = __dep3.CLASS_BASE;
+  const ROSTER = __dep3.ROSTER;
+  const __dep4 = __require('./data/roster-preview.ts');
+  const computeFinalStats = __dep4.computeFinalStats;
   const STYLE_ID = 'monopoly-screen-style';
   const BOARD_SIZE = 15;
   const MAIN_TRACK_OFFSET = 2;
@@ -27745,6 +27871,12 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       };
   }
   const render = renderScreen;
+  const __reexport0 = __require('./screens/monopoly/house-module.ts');
+  for (const key of Object.keys(__reexport0)) {
+    if (key === 'default') continue;
+    if (Object.prototype.hasOwnProperty.call(exports, key)) continue;
+    exports[key] = __reexport0[key];
+  }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createMonopolyBoardCells')) exports.createMonopolyBoardCells = createMonopolyBoardCells;

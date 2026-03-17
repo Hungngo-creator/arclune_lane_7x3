@@ -2,13 +2,19 @@ import {
   advanceMonopolyMovement,
   applyMonopolyStepDrain,
   applyMonopolySurvivalHpDrain,
+  collectHouseIncome,
   computeMonopolyVictoryRewardByGold,
+  createRandomHouseSlots,
   createInitialMonopolyStatus,
   createInitialMonopolyWallet,
   createMonopolyBoardCells,
+  getHouseDefinitions,
   getMonopolyDiceMaxBySpirit,
   normalizeMonopolyWallet,
+  pickRandomHouseDefinitionByTier,
   refillMonopolySilverIfEmpty,
+  revealHousePurchase,
+  rollHouseTier,
   resolveMonopolyCollisionCombat,
   shouldSkipMonopolyTurnBySpirit,
   spendMonopolySilver
@@ -320,6 +326,51 @@ it('drains hp by step when thirst/hunger are critically low for any avatar', () 
     expect(applyMonopolySurvivalHpDrain(1000, 1000, { thirst: 80, hunger: 9, spirit: 80 }, 4)).toBe(980);
     expect(applyMonopolySurvivalHpDrain(1000, 1000, { thirst: 9, hunger: 9, spirit: 80 }, 4)).toBe(940);
     expect(applyMonopolySurvivalHpDrain(1000, 1000, { thirst: 10, hunger: 10, spirit: 80 }, 4)).toBe(1000);
+  });
+});
+describe('monopoly house module', () => {
+  it('spawns up to 16 random house slots and keeps marker ?', () => {
+    const cells = createMonopolyBoardCells();
+    const slots = createRandomHouseSlots(cells, () => 0.2);
+    expect(slots).toHaveLength(16);
+    expect(new Set(slots.map(slot => slot.cellIndex)).size).toBe(16);
+    expect(slots.every(slot => slot.marker === '?')).toBe(true);
+  });
+
+  it('rolls house tier using weighted table and can reveal purchase', () => {
+    expect(rollHouseTier(() => 0.01)).toBe(5);
+    expect(rollHouseTier(() => 0.05)).toBe(4);
+    expect(rollHouseTier(() => 0.10)).toBe(3);
+    expect(rollHouseTier(() => 0.20)).toBe(2);
+    expect(rollHouseTier(() => 0.80)).toBe(1);
+
+    const slot = createRandomHouseSlots(createMonopolyBoardCells(), () => 0.3, 1)[0]!;
+    const res = revealHousePurchase(slot, 7, 2_000, () => 0.01);
+    expect(res.ok).toBe(true);
+    expect(slot.ownerAvatarId).toBe(7);
+    expect(slot.revealedTier).toBe(5);
+    expect(res.nextWalletSilver).toBe(500);
+  });
+
+  it('supports mine-style houses with limited yearly extraction', () => {
+    const mine = getHouseDefinitions().find(entry => entry.id === 'quang_nho');
+    expect(mine).toBeTruthy();
+    expect(pickRandomHouseDefinitionByTier(2, () => 0.4).tier).toBe(2);
+
+    const slot = {
+      cellIndex: 22,
+      marker: '?' as const,
+      revealedTier: 2 as const,
+      definitionId: 'quang_nho',
+      ownerAvatarId: 2,
+      treasurySilver: 0,
+      minedYears: 0
+    };
+    for (let i = 0; i < 5; i += 1) {
+      collectHouseIncome(slot, true);
+    }
+    expect(slot.treasurySilver).toBe(750);
+    expect(slot.minedYears).toBe(3);
   });
 });
 });
