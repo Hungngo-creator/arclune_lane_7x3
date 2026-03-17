@@ -1,4 +1,4 @@
-import { createMonopolyBoardCells } from '../src/screens/monopoly/index.ts';
+import { advanceMonopolyMovement, createMonopolyBoardCells } from '../src/screens/monopoly/index.ts';
 
 describe('monopoly board layout', () => {
     it('builds exactly 116 cells with 40 main-track cells, 24 mini-ring cells và 8 ô vi mô', () => {
@@ -159,5 +159,45 @@ describe('monopoly board layout', () => {
       return rowDistance + colDistance === 1;
     }));
     expect(touchesMini).toBe(false);
+  });
+});
+
+describe('monopoly detour movement', () => {
+  it('queues detour on 22 and enters brown lane on next turn', () => {
+    const queued = advanceMonopolyMovement({
+      currentPathIndex: 0,
+      currentCellOneBased: 21,
+      pendingDetourFrom: null,
+      activeDetourFrom: null,
+      detourProgress: -1
+    }, 1);
+
+    expect(queued.currentCellOneBased).toBe(22);
+    expect(queued.pendingDetourFrom).toBe(22);
+    expect(queued.activeDetourFrom).toBeNull();
+
+    const entered = advanceMonopolyMovement(queued, 1);
+    expect(entered.currentCellOneBased).toBe(84);
+    expect(entered.activeDetourFrom).toBe(22);
+    expect(entered.detourProgress).toBe(0);
+  });
+
+  it('must go to the end of detour before returning to main track', () => {
+    const state = advanceMonopolyMovement({
+      currentPathIndex: 1,
+      currentCellOneBased: 22,
+      pendingDetourFrom: 22,
+      activeDetourFrom: null,
+      detourProgress: -1
+    }, 11);
+
+    expect(state.currentCellOneBased).toBe(83);
+    expect(state.activeDetourFrom).toBe(22);
+    expect(state.pendingDetourFrom).toBeNull();
+
+    const exited = advanceMonopolyMovement(state, 1);
+    expect(exited.currentCellOneBased).toBe(32);
+    expect(exited.activeDetourFrom).toBeNull();
+    expect(exited.pendingDetourFrom).toBe(32);
   });
 });

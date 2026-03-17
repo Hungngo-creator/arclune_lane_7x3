@@ -27090,6 +27090,54 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   const START_CELL_ONE_BASED = 21;
   const AVATAR_COUNT = 8;
   const MAIN_TRACK_PATH_ORDER = Array.from({ length: MAIN_TRACK_CELLS }, (_, offset) => ((START_CELL_ONE_BASED - 1 + offset) % MAIN_TRACK_CELLS) + 1);
+  const MAIN_TRACK_INDEX_BY_CELL = new Map(MAIN_TRACK_PATH_ORDER.map((cell, idx) => [cell, idx]));
+  const DETOUR_PATHS = Object.freeze({
+      2: Object.freeze({ exitCellOneBased: 12, path: Object.freeze([79, 50, 51, 52, 53, 54, 55, 56, 57, 58, 80]) }),
+      12: Object.freeze({ exitCellOneBased: 22, path: Object.freeze([81, 68, 69, 70, 71, 72, 73, 74, 75, 76, 82]) }),
+      22: Object.freeze({ exitCellOneBased: 32, path: Object.freeze([84, 67, 66, 65, 64, 63, 62, 61, 60, 59, 83]) }),
+      32: Object.freeze({ exitCellOneBased: 2, path: Object.freeze([78, 49, 48, 47, 46, 45, 44, 43, 42, 41, 77]) })
+  });
+  function advanceMonopolyMovement(state, dice) {
+      const next = { ...state };
+      if (next.pendingDetourFrom != null && next.activeDetourFrom == null) {
+          next.activeDetourFrom = next.pendingDetourFrom;
+          next.pendingDetourFrom = null;
+          next.detourProgress = -1;
+      }
+      let stepsLeft = dice;
+      while (stepsLeft > 0) {
+          if (next.activeDetourFrom != null) {
+              const detour = DETOUR_PATHS[next.activeDetourFrom];
+              if (!detour) {
+                  next.activeDetourFrom = null;
+                  next.detourProgress = -1;
+                  continue;
+              }
+              if (next.detourProgress < detour.path.length - 1) {
+                  next.detourProgress += 1;
+                  next.currentCellOneBased = detour.path[next.detourProgress] ?? next.currentCellOneBased;
+                  stepsLeft -= 1;
+                  continue;
+              }
+              next.currentCellOneBased = detour.exitCellOneBased;
+              next.activeDetourFrom = null;
+              next.detourProgress = -1;
+              const exitPathIndex = MAIN_TRACK_INDEX_BY_CELL.get(detour.exitCellOneBased);
+              if (typeof exitPathIndex === 'number') {
+                  next.currentPathIndex = exitPathIndex;
+              }
+              stepsLeft -= 1;
+              continue;
+          }
+          next.currentPathIndex = (next.currentPathIndex + 1) % MAIN_TRACK_PATH_ORDER.length;
+          next.currentCellOneBased = MAIN_TRACK_PATH_ORDER[next.currentPathIndex] ?? START_CELL_ONE_BASED;
+          stepsLeft -= 1;
+      }
+      if (next.activeDetourFrom == null && DETOUR_PATHS[next.currentCellOneBased]) {
+          next.pendingDetourFrom = next.currentCellOneBased;
+      }
+      return next;
+  }
   const randomInt = (minInclusive, maxInclusive) => {
       return Math.floor(Math.random() * (maxInclusive - minInclusive + 1)) + minInclusive;
   };
@@ -27174,12 +27222,15 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
               id: avatarId,
               role,
               currentPathIndex: 0,
+              currentCellOneBased: START_CELL_ONE_BASED,
               hasEnteredBoard: false,
+              pendingDetourFrom: null,
+              activeDetourFrom: null,
+              detourProgress: -1,
               node
           });
       }
-      const moveAvatarToPathIndex = (avatar, pathIndex) => {
-          const indexOneBased = MAIN_TRACK_PATH_ORDER[pathIndex % MAIN_TRACK_PATH_ORDER.length] ?? START_CELL_ONE_BASED;
+      const moveAvatarToCell = (avatar, indexOneBased) => {
           const layout = BOARD_ISOMETRIC_LAYOUT.byIndex.get(indexOneBased - 1);
           if (!layout)
               return;
@@ -27199,13 +27250,25 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           const dice = randomInt(1, 6);
           if (!avatar.hasEnteredBoard) {
               avatar.currentPathIndex = 0;
+              avatar.currentCellOneBased = MAIN_TRACK_PATH_ORDER[0] ?? START_CELL_ONE_BASED;
               avatar.hasEnteredBoard = true;
               avatar.node.hidden = false;
-              moveAvatarToPathIndex(avatar, avatar.currentPathIndex);
+              moveAvatarToCell(avatar, avatar.currentCellOneBased);
           }
-          avatar.currentPathIndex = (avatar.currentPathIndex + dice) % MAIN_TRACK_PATH_ORDER.length;
-          moveAvatarToPathIndex(avatar, avatar.currentPathIndex);
-          const destination = MAIN_TRACK_PATH_ORDER[avatar.currentPathIndex] ?? START_CELL_ONE_BASED;
+          const advanced = advanceMonopolyMovement({
+              currentPathIndex: avatar.currentPathIndex,
+              currentCellOneBased: avatar.currentCellOneBased,
+              pendingDetourFrom: avatar.pendingDetourFrom,
+              activeDetourFrom: avatar.activeDetourFrom,
+              detourProgress: avatar.detourProgress
+          }, dice);
+          avatar.currentPathIndex = advanced.currentPathIndex;
+          avatar.currentCellOneBased = advanced.currentCellOneBased;
+          avatar.pendingDetourFrom = advanced.pendingDetourFrom;
+          avatar.activeDetourFrom = advanced.activeDetourFrom;
+          avatar.detourProgress = advanced.detourProgress;
+          moveAvatarToCell(avatar, avatar.currentCellOneBased);
+          const destination = avatar.currentCellOneBased;
           turnBanner.textContent = `Lượt avatar ${avatar.id} (${avatar.role.toUpperCase()}) • Xúc xắc: ${dice} • Đến ô ${destination}`;
           activeTurnIndex = (activeTurnIndex + 1) % AVATAR_COUNT;
           turnTimer = window.setTimeout(runTurn, TURN_INTERVAL_MS + TURN_ADVANCE_DELAY_MS);
@@ -27216,7 +27279,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           for (const avatar of avatars) {
               if (!avatar.hasEnteredBoard)
                   continue;
-              moveAvatarToPathIndex(avatar, avatar.currentPathIndex);
+              moveAvatarToCell(avatar, avatar.currentCellOneBased);
           }
       };
       const onResize = () => {
@@ -27245,6 +27308,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createMonopolyBoardCells')) exports.createMonopolyBoardCells = createMonopolyBoardCells;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'advanceMonopolyMovement')) exports.advanceMonopolyMovement = advanceMonopolyMovement;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
 });
 __define('./screens/monopoly/ready.ts', (exports, module, __require) => {

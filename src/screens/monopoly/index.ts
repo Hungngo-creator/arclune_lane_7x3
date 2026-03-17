@@ -422,7 +422,11 @@ interface MonopolyAvatar {
   readonly id: number;
   readonly role: 'player' | 'npc';
   currentPathIndex: number;
+  currentCellOneBased: number;
   hasEnteredBoard: boolean;
+  pendingDetourFrom: number | null;
+  activeDetourFrom: number | null;
+  detourProgress: number;
   readonly node: HTMLDivElement;
 }
 
@@ -432,6 +436,71 @@ const START_CELL_ONE_BASED = 21;
 const AVATAR_COUNT = 8;
 
 const MAIN_TRACK_PATH_ORDER = Array.from({ length: MAIN_TRACK_CELLS }, (_, offset) => ((START_CELL_ONE_BASED - 1 + offset) % MAIN_TRACK_CELLS) + 1);
+const MAIN_TRACK_INDEX_BY_CELL = new Map(MAIN_TRACK_PATH_ORDER.map((cell, idx) => [cell, idx]));
+
+const DETOUR_PATHS: Readonly<Record<number, Readonly<{ exitCellOneBased: number; path: ReadonlyArray<number> }>>> = Object.freeze({
+  2: Object.freeze({ exitCellOneBased: 12, path: Object.freeze([79, 50, 51, 52, 53, 54, 55, 56, 57, 58, 80]) }),
+  12: Object.freeze({ exitCellOneBased: 22, path: Object.freeze([81, 68, 69, 70, 71, 72, 73, 74, 75, 76, 82]) }),
+  22: Object.freeze({ exitCellOneBased: 32, path: Object.freeze([84, 67, 66, 65, 64, 63, 62, 61, 60, 59, 83]) }),
+  32: Object.freeze({ exitCellOneBased: 2, path: Object.freeze([78, 49, 48, 47, 46, 45, 44, 43, 42, 41, 77]) })
+});
+
+export interface MonopolyMovementState {
+  currentPathIndex: number;
+  currentCellOneBased: number;
+  pendingDetourFrom: number | null;
+  activeDetourFrom: number | null;
+  detourProgress: number;
+}
+
+export function advanceMonopolyMovement(state: MonopolyMovementState, dice: number): MonopolyMovementState {
+  const next: MonopolyMovementState = { ...state };
+
+  if (next.pendingDetourFrom != null && next.activeDetourFrom == null) {
+    next.activeDetourFrom = next.pendingDetourFrom;
+    next.pendingDetourFrom = null;
+    next.detourProgress = -1;
+  }
+
+  let stepsLeft = dice;
+  while (stepsLeft > 0) {
+    if (next.activeDetourFrom != null) {
+      const detour = DETOUR_PATHS[next.activeDetourFrom];
+      if (!detour) {
+        next.activeDetourFrom = null;
+        next.detourProgress = -1;
+        continue;
+      }
+
+      if (next.detourProgress < detour.path.length - 1) {
+        next.detourProgress += 1;
+        next.currentCellOneBased = detour.path[next.detourProgress] ?? next.currentCellOneBased;
+        stepsLeft -= 1;
+        continue;
+      }
+
+      next.currentCellOneBased = detour.exitCellOneBased;
+      next.activeDetourFrom = null;
+      next.detourProgress = -1;
+      const exitPathIndex = MAIN_TRACK_INDEX_BY_CELL.get(detour.exitCellOneBased);
+      if (typeof exitPathIndex === 'number') {
+        next.currentPathIndex = exitPathIndex;
+      }
+      stepsLeft -= 1;
+      continue;
+    }
+
+    next.currentPathIndex = (next.currentPathIndex + 1) % MAIN_TRACK_PATH_ORDER.length;
+    next.currentCellOneBased = MAIN_TRACK_PATH_ORDER[next.currentPathIndex] ?? START_CELL_ONE_BASED;
+    stepsLeft -= 1;
+  }
+
+  if (next.activeDetourFrom == null && DETOUR_PATHS[next.currentCellOneBased]) {
+    next.pendingDetourFrom = next.currentCellOneBased;
+  }
+
+  return next;
+}
 
 const randomInt = (minInclusive: number, maxInclusive: number): number => {
   return Math.floor(Math.random() * (maxInclusive - minInclusive + 1)) + minInclusive;
@@ -533,13 +602,16 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       id: avatarId,
       role,
       currentPathIndex: 0,
+      currentCellOneBased: START_CELL_ONE_BASED,
       hasEnteredBoard: false,
+      pendingDetourFrom: null,
+      activeDetourFrom: null,
+      detourProgress: -1,
       node
     });
   }
 
-  const moveAvatarToPathIndex = (avatar: MonopolyAvatar, pathIndex: number): void => {
-    const indexOneBased = MAIN_TRACK_PATH_ORDER[pathIndex % MAIN_TRACK_PATH_ORDER.length] ?? START_CELL_ONE_BASED;
+  const moveAvatarToCell = (avatar: MonopolyAvatar, indexOneBased: number): void => {
     const layout = BOARD_ISOMETRIC_LAYOUT.byIndex.get(indexOneBased - 1);
     if (!layout) return;
     const scale = Number.parseFloat(board.style.getPropertyValue('--tile-w')) / ISO_TILE_WIDTH || 1;
@@ -559,15 +631,29 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
 
     if (!avatar.hasEnteredBoard) {
       avatar.currentPathIndex = 0;
+      avatar.currentCellOneBased = MAIN_TRACK_PATH_ORDER[0] ?? START_CELL_ONE_BASED;
       avatar.hasEnteredBoard = true;
       avatar.node.hidden = false;
-      moveAvatarToPathIndex(avatar, avatar.currentPathIndex);
+      moveAvatarToCell(avatar, avatar.currentCellOneBased);
     }
 
-    avatar.currentPathIndex = (avatar.currentPathIndex + dice) % MAIN_TRACK_PATH_ORDER.length;
-    moveAvatarToPathIndex(avatar, avatar.currentPathIndex);
+    const advanced = advanceMonopolyMovement({
+      currentPathIndex: avatar.currentPathIndex,
+      currentCellOneBased: avatar.currentCellOneBased,
+      pendingDetourFrom: avatar.pendingDetourFrom,
+      activeDetourFrom: avatar.activeDetourFrom,
+      detourProgress: avatar.detourProgress
+    }, dice);
 
-    const destination = MAIN_TRACK_PATH_ORDER[avatar.currentPathIndex] ?? START_CELL_ONE_BASED;
+    avatar.currentPathIndex = advanced.currentPathIndex;
+    avatar.currentCellOneBased = advanced.currentCellOneBased;
+    avatar.pendingDetourFrom = advanced.pendingDetourFrom;
+    avatar.activeDetourFrom = advanced.activeDetourFrom;
+    avatar.detourProgress = advanced.detourProgress;
+
+    moveAvatarToCell(avatar, avatar.currentCellOneBased);
+
+    const destination = avatar.currentCellOneBased;
     turnBanner.textContent = `Lượt avatar ${avatar.id} (${avatar.role.toUpperCase()}) • Xúc xắc: ${dice} • Đến ô ${destination}`;
 
     activeTurnIndex = (activeTurnIndex + 1) % AVATAR_COUNT;
@@ -580,7 +666,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   const syncAvatarLayout = (): void => {
     for (const avatar of avatars) {
       if (!avatar.hasEnteredBoard) continue;
-      moveAvatarToPathIndex(avatar, avatar.currentPathIndex);
+      moveAvatarToCell(avatar, avatar.currentCellOneBased);
     }
   };
   const onResize = (): void => {
