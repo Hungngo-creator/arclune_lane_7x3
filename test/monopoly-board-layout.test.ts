@@ -1,9 +1,12 @@
 import {
   advanceMonopolyMovement,
+  computeMonopolyVictoryRewardByGold,
   createInitialMonopolyWallet,
   createMonopolyBoardCells,
   normalizeMonopolyWallet,
-  resolveMonopolyCollisionCombat
+  refillMonopolySilverIfEmpty,
+  resolveMonopolyCollisionCombat,
+  spendMonopolySilver
 } from '../src/screens/monopoly/index.ts';
 
 describe('monopoly board layout', () => {
@@ -241,12 +244,33 @@ describe('monopoly collision combat', () => {
 });
 
 describe('monopoly currency wallet', () => {
-  it('gives every avatar 5 gold at game start', () => {
-    expect(createInitialMonopolyWallet()).toEqual({ gold: 5, silver: 0 });
+  it('gives every avatar 4 gold + 1 silver at game start', () => {
+    expect(createInitialMonopolyWallet()).toEqual({ gold: 4, silver: 1 });
   });
 
-  it('normalizes wallet with 1 gold = 100 silver conversion', () => {
-    expect(normalizeMonopolyWallet({ gold: 2, silver: 250 })).toEqual({ gold: 4, silver: 50 });
+  it('does not auto-convert silver into gold when normalizing wallet', () => {
+    expect(normalizeMonopolyWallet({ gold: 2, silver: 250 })).toEqual({ gold: 2, silver: 250 });
     expect(normalizeMonopolyWallet({ gold: -1, silver: Number.NaN })).toEqual({ gold: 0, silver: 0 });
+  });
+
+  it('auto-converts exactly 1 gold into 100 silver only when silver is empty', () => {
+    expect(refillMonopolySilverIfEmpty({ gold: 4, silver: 0 })).toEqual({ gold: 3, silver: 100 });
+    expect(refillMonopolySilverIfEmpty({ gold: 4, silver: 1 })).toEqual({ gold: 4, silver: 1 });
+    expect(refillMonopolySilverIfEmpty({ gold: 0, silver: 0 })).toEqual({ gold: 0, silver: 0 });
+  });
+
+  it('spends silver after single-step auto conversion and does not chain-convert extra gold', () => {
+    expect(spendMonopolySilver({ gold: 3, silver: 0 }, 80)).toEqual({
+      wallet: { gold: 2, silver: 20 },
+      paid: true
+    });
+    expect(spendMonopolySilver({ gold: 3, silver: 0 }, 101)).toEqual({
+      wallet: { gold: 2, silver: 100 },
+      paid: false
+    });
+  });
+
+  it('computes victory reward based on gold only', () => {
+    expect(computeMonopolyVictoryRewardByGold({ gold: 5, silver: 999 })).toBe(500);
   });
 });

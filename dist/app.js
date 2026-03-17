@@ -27171,7 +27171,8 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       ensureStyleTag(STYLE_ID, { css: CSS });
   }
   const MONOPOLY_CURRENCY_RATIO = 100;
-  const MONOPOLY_STARTING_GOLD = 5;
+  const MONOPOLY_STARTING_GOLD = 4;
+  const MONOPOLY_STARTING_SILVER = 1;
   const normalizeWalletAmount = (value) => {
       if (typeof value !== 'number' || !Number.isFinite(value))
           return 0;
@@ -27180,14 +27181,22 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   function normalizeMonopolyWallet(wallet) {
       const normalizedGold = normalizeWalletAmount(wallet.gold);
       const normalizedSilver = normalizeWalletAmount(wallet.silver);
-      const carryGold = Math.floor(normalizedSilver / MONOPOLY_CURRENCY_RATIO);
       return {
-          gold: normalizedGold + carryGold,
-          silver: normalizedSilver % MONOPOLY_CURRENCY_RATIO
+          gold: normalizedGold,
+          silver: normalizedSilver
+      };
+  }
+  function refillMonopolySilverIfEmpty(wallet) {
+      const normalized = normalizeMonopolyWallet(wallet);
+      if (normalized.silver > 0 || normalized.gold <= 0)
+          return normalized;
+      return {
+          gold: normalized.gold - 1,
+          silver: MONOPOLY_CURRENCY_RATIO
       };
   }
   function createInitialMonopolyWallet() {
-      return { gold: MONOPOLY_STARTING_GOLD, silver: 0 };
+      return { gold: MONOPOLY_STARTING_GOLD, silver: MONOPOLY_STARTING_SILVER };
   }
   function grantMonopolySilver(wallet, amountSilver) {
       const normalized = normalizeMonopolyWallet(wallet);
@@ -27198,23 +27207,41 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       });
   }
   function spendMonopolySilver(wallet, amountSilver) {
-      const normalized = normalizeMonopolyWallet(wallet);
+      const normalized = refillMonopolySilverIfEmpty(wallet);
       const cost = normalizeWalletAmount(amountSilver);
       if (cost <= 0) {
           return { wallet: normalized, paid: true };
       }
-      const totalSilver = normalized.gold * MONOPOLY_CURRENCY_RATIO + normalized.silver;
-      if (totalSilver < cost) {
+      if (normalized.silver < cost) {
           return { wallet: normalized, paid: false };
       }
-      const remainingSilver = totalSilver - cost;
       return {
           wallet: normalizeMonopolyWallet({
-              gold: 0,
-              silver: remainingSilver
+              gold: normalized.gold,
+              silver: normalized.silver - cost
           }),
           paid: true
       };
+  }
+  function spendMonopolyGold(wallet, amountGold) {
+      const normalized = normalizeMonopolyWallet(wallet);
+      const cost = normalizeWalletAmount(amountGold);
+      if (cost <= 0) {
+          return { wallet: normalized, paid: true };
+      }
+      if (normalized.gold < cost) {
+          return { wallet: normalized, paid: false };
+      }
+      return {
+          wallet: normalizeMonopolyWallet({
+              gold: normalized.gold - cost,
+              silver: normalized.silver + cost * MONOPOLY_CURRENCY_RATIO
+          }),
+          paid: true
+      };
+  }
+  function computeMonopolyVictoryRewardByGold(wallet) {
+      return normalizeMonopolyWallet(wallet).gold * MONOPOLY_CURRENCY_RATIO;
   }
   const TURN_INTERVAL_MS = 800;
   const TURN_ADVANCE_DELAY_MS = 500;
@@ -27482,7 +27509,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
               walletBar.hidden = true;
               return;
           }
-          const wallet = normalizeMonopolyWallet(playerAvatar.wallet);
+          const wallet = refillMonopolySilverIfEmpty(playerAvatar.wallet);
           playerAvatar.wallet = wallet;
           silverSlot.hidden = wallet.silver <= 0;
           goldSlot.hidden = wallet.gold <= 0;
@@ -27569,6 +27596,14 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
                   return;
               syncAvatarHealthUi(affected);
           });
+          const livingAfterCombat = avatars.filter(item => item.hp > 0);
+          if (livingAfterCombat.length === 1) {
+              const champion = livingAfterCombat[0];
+              const reward = computeMonopolyVictoryRewardByGold(champion.wallet);
+              turnBanner.textContent = `🏆 ${champion.unitName} (${champion.role.toUpperCase()}) thắng vì đã hạ gục toàn bộ kẻ thù • Quyết toán: ${champion.wallet.gold} vàng → thưởng ${reward}`;
+              syncPlayerWalletUi();
+              return;
+          }
           const yearlyIncome = applyYearIncomeIfReady();
           const clashCount = colliders.length;
           const combatSummary = combat.events.length > 0
@@ -27616,9 +27651,12 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createMonopolyBoardCells')) exports.createMonopolyBoardCells = createMonopolyBoardCells;
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeMonopolyWallet')) exports.normalizeMonopolyWallet = normalizeMonopolyWallet;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'refillMonopolySilverIfEmpty')) exports.refillMonopolySilverIfEmpty = refillMonopolySilverIfEmpty;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createInitialMonopolyWallet')) exports.createInitialMonopolyWallet = createInitialMonopolyWallet;
   if (!Object.prototype.hasOwnProperty.call(exports, 'grantMonopolySilver')) exports.grantMonopolySilver = grantMonopolySilver;
   if (!Object.prototype.hasOwnProperty.call(exports, 'spendMonopolySilver')) exports.spendMonopolySilver = spendMonopolySilver;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'spendMonopolyGold')) exports.spendMonopolyGold = spendMonopolyGold;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'computeMonopolyVictoryRewardByGold')) exports.computeMonopolyVictoryRewardByGold = computeMonopolyVictoryRewardByGold;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveMonopolyCollisionCombat')) exports.resolveMonopolyCollisionCombat = resolveMonopolyCollisionCombat;
   if (!Object.prototype.hasOwnProperty.call(exports, 'advanceMonopolyMovement')) exports.advanceMonopolyMovement = advanceMonopolyMovement;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
