@@ -26725,6 +26725,13 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   const __dep0 = __require('./ui/dom.ts');
   const ensureStyleTag = __dep0.ensureStyleTag;
   const mountSection = __dep0.mountSection;
+  const __dep1 = __require('./art.ts');
+  const getUnitArt = __dep1.getUnitArt;
+  const __dep2 = __require('./catalog.ts');
+  const CLASS_BASE = __dep2.CLASS_BASE;
+  const ROSTER = __dep2.ROSTER;
+  const __dep3 = __require('./data/roster-preview.ts');
+  const computeFinalStats = __dep3.computeFinalStats;
   const STYLE_ID = 'monopoly-screen-style';
   const BOARD_SIZE = 15;
   const MAIN_TRACK_OFFSET = 2;
@@ -26824,20 +26831,27 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
     .monopoly-avatar{
       position:absolute;
       transform:translate(-50%, -108%);
-      width:30px;
-      height:30px;
-      border-radius:50%;
-      border:1px solid rgba(226, 242, 255, 0.9);
-      background:rgba(6, 18, 31, 0.94);
-      color:#f4f8ff;
-      font-size:13px;
-      font-weight:700;
+      width:38px;
+      height:38px;
+      border-radius:12px;
+      border:1px solid rgba(226, 242, 255, 0.68);
+      background:rgba(6, 18, 31, 0.3);
       display:flex;
       align-items:center;
       justify-content:center;
+      overflow:hidden;
       z-index:4;
       animation:avatarFloat 1.1s ease-in-out infinite alternate;
       box-shadow:0 4px 10px rgba(0,0,0,0.42);
+    }
+    .monopoly-avatar img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+    .monopoly-avatar--dead{
+      filter:grayscale(0.9);
+      opacity:0.5;
     }
     .monopoly-avatar__tag{
       position:absolute;
@@ -26856,6 +26870,24 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
     .monopoly-avatar--player .monopoly-avatar__tag{
       background:rgba(18, 114, 66, 0.95);
       border-color:rgba(127, 255, 187, 0.56);
+    }
+    .monopoly-avatar__hp{
+      position:absolute;
+      left:50%;
+      top:-10px;
+      transform:translateX(-50%);
+      width:40px;
+      height:5px;
+      border-radius:999px;
+      background:rgba(5, 12, 21, 0.9);
+      border:1px solid rgba(160, 205, 255, 0.48);
+      overflow:hidden;
+    }
+    .monopoly-avatar__hp-fill{
+      width:100%;
+      height:100%;
+      background:linear-gradient(90deg, #f97373 0%, #f6c54b 35%, #59ffb3 100%);
+      transform-origin:left center;
     }
     @keyframes avatarFloat {
       from { transform:translate(-50%, -108%) translateY(0); }
@@ -27089,6 +27121,62 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   const TURN_ADVANCE_DELAY_MS = 500;
   const START_CELL_ONE_BASED = 21;
   const AVATAR_COUNT = 8;
+  const MONOPOLY_RANK = 'SSR';
+  function buildMonopolyImportPool(count) {
+      const ssr = ROSTER.filter(unit => String(unit.rank).toUpperCase() === MONOPOLY_RANK);
+      const prime = ROSTER.filter(unit => String(unit.rank).toUpperCase() === 'PRIME');
+      const pool = [...ssr, ...prime];
+      if (!pool.length) {
+          return Array.from({ length: count }, (_, index) => ({
+              unitId: `fallback-${index + 1}`,
+              unitName: `Avatar ${index + 1}`,
+              rank: MONOPOLY_RANK,
+              className: 'Warrior'
+          }));
+      }
+      return Array.from({ length: count }, (_, index) => {
+          const picked = pool[index % pool.length];
+          return {
+              unitId: picked?.id ?? `fallback-${index + 1}`,
+              unitName: picked?.name ?? `Avatar ${index + 1}`,
+              rank: picked?.rank ?? MONOPOLY_RANK,
+              className: (picked?.class && picked.class in CLASS_BASE ? picked.class : 'Warrior')
+          };
+      });
+  }
+  const clampRatio = (value) => Math.min(1, Math.max(0, value));
+  function computeMonopolyBasicDamage(attacker, defender) {
+      const attackPower = attacker.stats.ATK + attacker.stats.WIL;
+      const defenseRating = ((defender.stats.ARM + defender.stats.RES) / 2) * 0.6;
+      return Math.max(1, Math.round(attackPower * (1 - defenseRating)));
+  }
+  function resolveMonopolyCollisionCombat(colliders) {
+      if (colliders.length < 2)
+          return { events: [], affectedAvatars: [] };
+      const living = colliders.filter(avatar => avatar.hp > 0);
+      if (living.length < 2)
+          return { events: [], affectedAvatars: [] };
+      const events = [];
+      const incoming = new Map();
+      for (const attacker of living) {
+          for (const defender of living) {
+              if (attacker.id === defender.id)
+                  continue;
+              const damage = computeMonopolyBasicDamage(attacker, defender);
+              events.push({ attackerId: attacker.id, targetId: defender.id, damage });
+              incoming.set(defender.id, (incoming.get(defender.id) ?? 0) + damage);
+          }
+      }
+      const affectedAvatars = [];
+      for (const avatar of living) {
+          const totalIncoming = incoming.get(avatar.id) ?? 0;
+          if (totalIncoming <= 0)
+              continue;
+          avatar.hp = Math.max(0, avatar.hp - totalIncoming);
+          affectedAvatars.push(avatar.id);
+      }
+      return { events, affectedAvatars };
+  }
   const MAIN_TRACK_PATH_ORDER = Array.from({ length: MAIN_TRACK_CELLS }, (_, offset) => ((START_CELL_ONE_BASED - 1 + offset) % MAIN_TRACK_CELLS) + 1);
   const MAIN_TRACK_INDEX_BY_CELL = new Map(MAIN_TRACK_PATH_ORDER.map((cell, idx) => [cell, idx]));
   const DETOUR_PATHS = Object.freeze({
@@ -27210,26 +27298,58 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       };
       board.appendChild(fragment);
       const playerAvatarId = randomInt(1, AVATAR_COUNT);
+      const importedUnits = buildMonopolyImportPool(AVATAR_COUNT);
       const avatars = [];
       for (let avatarId = 1; avatarId <= AVATAR_COUNT; avatarId += 1) {
           const node = document.createElement('div');
           const role = avatarId === playerAvatarId ? 'player' : 'npc';
           node.className = `monopoly-avatar monopoly-avatar--${role}`;
-          node.innerHTML = `<span class="monopoly-avatar__tag">${role}</span>${avatarId}`;
+          const imported = importedUnits[avatarId - 1];
+          const statBlock = computeFinalStats(imported?.className ?? 'Warrior', MONOPOLY_RANK);
+          const hpBarNode = document.createElement('span');
+          hpBarNode.className = 'monopoly-avatar__hp';
+          const hpFillNode = document.createElement('span');
+          hpFillNode.className = 'monopoly-avatar__hp-fill';
+          hpBarNode.appendChild(hpFillNode);
+          const tagNode = document.createElement('span');
+          tagNode.className = 'monopoly-avatar__tag';
+          tagNode.textContent = role;
+          const portrait = document.createElement('img');
+          const art = getUnitArt(imported?.unitId ?? null);
+          portrait.src = art?.sprite?.src ?? './dist/assets/units/default/default.svg';
+          portrait.alt = imported?.unitName ?? `Avatar ${avatarId}`;
+          node.append(tagNode, hpBarNode, portrait);
           node.hidden = true;
           board.appendChild(node);
           avatars.push({
               id: avatarId,
               role,
+              unitId: imported?.unitId ?? `fallback-${avatarId}`,
+              unitName: imported?.unitName ?? `Avatar ${avatarId}`,
+              stats: {
+                  hpMax: Math.max(1, Math.round(statBlock.HP ?? 1)),
+                  ATK: Math.max(1, Math.round(statBlock.ATK ?? 1)),
+                  WIL: Math.max(1, Math.round(statBlock.WIL ?? 1)),
+                  ARM: Math.max(0, Number(statBlock.ARM ?? 0)),
+                  RES: Math.max(0, Number(statBlock.RES ?? 0))
+              },
+              hp: Math.max(1, Math.round(statBlock.HP ?? 1)),
               currentPathIndex: 0,
               currentCellOneBased: START_CELL_ONE_BASED,
               hasEnteredBoard: false,
               pendingDetourFrom: null,
               activeDetourFrom: null,
               detourProgress: -1,
-              node
+              node,
+              hpFillNode
           });
       }
+      const syncAvatarHealthUi = (avatar) => {
+          const hpRatio = clampRatio(avatar.hp / avatar.stats.hpMax);
+          avatar.hpFillNode.style.transform = `scaleX(${hpRatio})`;
+          avatar.node.classList.toggle('monopoly-avatar--dead', avatar.hp <= 0);
+      };
+      avatars.forEach(syncAvatarHealthUi);
       const moveAvatarToCell = (avatar, indexOneBased) => {
           const layout = BOARD_ISOMETRIC_LAYOUT.byIndex.get(indexOneBased - 1);
           if (!layout)
@@ -27269,7 +27389,19 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           avatar.detourProgress = advanced.detourProgress;
           moveAvatarToCell(avatar, avatar.currentCellOneBased);
           const destination = avatar.currentCellOneBased;
-          turnBanner.textContent = `Lượt avatar ${avatar.id} (${avatar.role.toUpperCase()}) • Xúc xắc: ${dice} • Đến ô ${destination}`;
+          const colliders = avatars.filter(item => item.hasEnteredBoard && item.currentCellOneBased === destination && item.hp > 0);
+          const combat = resolveMonopolyCollisionCombat(colliders);
+          combat.affectedAvatars.forEach(affectedId => {
+              const affected = avatars.find(item => item.id === affectedId);
+              if (!affected)
+                  return;
+              syncAvatarHealthUi(affected);
+          });
+          const clashCount = colliders.length;
+          const combatSummary = combat.events.length > 0
+              ? ` • Giao chiến ${clashCount} mục tiêu, ${combat.events.length} đòn thường cùng lúc`
+              : '';
+          turnBanner.textContent = `Lượt ${avatar.unitName} (${avatar.role.toUpperCase()}) • Xúc xắc: ${dice} • Đến ô ${destination}${combatSummary}`;
           activeTurnIndex = (activeTurnIndex + 1) % AVATAR_COUNT;
           turnTimer = window.setTimeout(runTurn, TURN_INTERVAL_MS + TURN_ADVANCE_DELAY_MS);
       };
@@ -27308,6 +27440,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createMonopolyBoardCells')) exports.createMonopolyBoardCells = createMonopolyBoardCells;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resolveMonopolyCollisionCombat')) exports.resolveMonopolyCollisionCombat = resolveMonopolyCollisionCombat;
   if (!Object.prototype.hasOwnProperty.call(exports, 'advanceMonopolyMovement')) exports.advanceMonopolyMovement = advanceMonopolyMovement;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
 });

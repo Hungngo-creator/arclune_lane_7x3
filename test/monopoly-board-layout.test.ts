@@ -1,4 +1,4 @@
-import { advanceMonopolyMovement, createMonopolyBoardCells } from '../src/screens/monopoly/index.ts';
+import { advanceMonopolyMovement, createMonopolyBoardCells, resolveMonopolyCollisionCombat } from '../src/screens/monopoly/index.ts';
 
 describe('monopoly board layout', () => {
     it('builds exactly 116 cells with 40 main-track cells, 24 mini-ring cells và 8 ô vi mô', () => {
@@ -199,5 +199,37 @@ describe('monopoly detour movement', () => {
     expect(exited.currentCellOneBased).toBe(32);
     expect(exited.activeDetourFrom).toBeNull();
     expect(exited.pendingDetourFrom).toBe(32);
+  });
+});
+
+describe('monopoly collision combat', () => {
+  const createAvatar = (id: number, hp: number) => ({
+    id,
+    hp,
+    stats: { hpMax: hp, ATK: 100, WIL: 50, ARM: 0, RES: 0 },
+  } as any);
+
+  it('2 avatars cùng ô đánh nhau 1 đòn thường mỗi bên, cùng lúc', () => {
+    const a = createAvatar(1, 1000);
+    const b = createAvatar(2, 1000);
+
+    const result = resolveMonopolyCollisionCombat([a, b]);
+
+    expect(result.events).toHaveLength(2);
+    expect(a.hp).toBe(850);
+    expect(b.hp).toBe(850);
+  });
+
+  it('3 avatars cùng ô thì mỗi avatar đánh 2 mục tiêu còn lại cùng lúc', () => {
+    const a = createAvatar(1, 1000);
+    const b = createAvatar(2, 1000);
+    const c = createAvatar(3, 1000);
+
+    const result = resolveMonopolyCollisionCombat([a, b, c]);
+
+    expect(result.events).toHaveLength(6);
+    expect(a.hp).toBe(700);
+    expect(b.hp).toBe(700);
+    expect(c.hp).toBe(700);
   });
 });
