@@ -27177,6 +27177,10 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   const MONOPOLY_SPIRIT_DRAIN_PER_STEP = 0.5;
   const MONOPOLY_LOW_SPIRIT_DICE_THRESHOLD = 30;
   const MONOPOLY_FAINT_SPIRIT_THRESHOLD = 20;
+  const MONOPOLY_THIRST_HP_THRESHOLD = 10;
+  const MONOPOLY_HUNGER_HP_THRESHOLD = 10;
+  const MONOPOLY_THIRST_HP_DRAIN_PER_STEP_RATIO = 0.01;
+  const MONOPOLY_HUNGER_HP_DRAIN_PER_STEP_RATIO = 0.005;
   const MONOPOLY_CURRENCY_RATIO = 100;
   const MONOPOLY_STARTING_GOLD = 4;
   const MONOPOLY_STARTING_SILVER = 1;
@@ -27217,6 +27221,23 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   }
   function shouldSkipMonopolyTurnBySpirit(spirit) {
       return spirit <= MONOPOLY_FAINT_SPIRIT_THRESHOLD;
+  }
+  function applyMonopolySurvivalHpDrain(hp, hpMax, status, steps) {
+      const safeSteps = Math.max(0, Math.floor(steps));
+      if (!Number.isFinite(hpMax) || hpMax <= 0 || safeSteps <= 0) {
+          return Math.max(0, hp);
+      }
+      let perStepRatio = 0;
+      if (status.thirst < MONOPOLY_THIRST_HP_THRESHOLD) {
+          perStepRatio += MONOPOLY_THIRST_HP_DRAIN_PER_STEP_RATIO;
+      }
+      if (status.hunger < MONOPOLY_HUNGER_HP_THRESHOLD) {
+          perStepRatio += MONOPOLY_HUNGER_HP_DRAIN_PER_STEP_RATIO;
+      }
+      if (perStepRatio <= 0)
+          return Math.max(0, hp);
+      const hpDrain = hpMax * perStepRatio * safeSteps;
+      return Math.max(0, hp - hpDrain);
   }
   function normalizeMonopolyWallet(wallet) {
       const normalizedGold = normalizeWalletAmount(wallet.gold);
@@ -27649,6 +27670,8 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           avatar.activeDetourFrom = advanced.activeDetourFrom;
           avatar.detourProgress = advanced.detourProgress;
           avatar.status = applyMonopolyStepDrain(avatar.status, dice);
+          avatar.hp = applyMonopolySurvivalHpDrain(avatar.hp, avatar.stats.hpMax, avatar.status, dice);
+          syncAvatarHealthUi(avatar);
           if (shouldSkipMonopolyTurnBySpirit(avatar.status.spirit)) {
               avatar.skippedTurnCount = Math.max(avatar.skippedTurnCount, 1);
           }
@@ -27729,6 +27752,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyMonopolyStepDrain')) exports.applyMonopolyStepDrain = applyMonopolyStepDrain;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getMonopolyDiceMaxBySpirit')) exports.getMonopolyDiceMaxBySpirit = getMonopolyDiceMaxBySpirit;
   if (!Object.prototype.hasOwnProperty.call(exports, 'shouldSkipMonopolyTurnBySpirit')) exports.shouldSkipMonopolyTurnBySpirit = shouldSkipMonopolyTurnBySpirit;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'applyMonopolySurvivalHpDrain')) exports.applyMonopolySurvivalHpDrain = applyMonopolySurvivalHpDrain;
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeMonopolyWallet')) exports.normalizeMonopolyWallet = normalizeMonopolyWallet;
   if (!Object.prototype.hasOwnProperty.call(exports, 'refillMonopolySilverIfEmpty')) exports.refillMonopolySilverIfEmpty = refillMonopolySilverIfEmpty;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createInitialMonopolyWallet')) exports.createInitialMonopolyWallet = createInitialMonopolyWallet;

@@ -1,6 +1,7 @@
 import {
   advanceMonopolyMovement,
   applyMonopolyStepDrain,
+  applyMonopolySurvivalHpDrain,
   computeMonopolyVictoryRewardByGold,
   createInitialMonopolyStatus,
   createInitialMonopolyWallet,
@@ -313,4 +314,12 @@ describe('monopoly currency wallet', () => {
     expect(shouldSkipMonopolyTurnBySpirit(20)).toBe(true);
     expect(shouldSkipMonopolyTurnBySpirit(0)).toBe(true);
   });
+
+it('drains hp by step when thirst/hunger are critically low for any avatar', () => {
+    expect(applyMonopolySurvivalHpDrain(1000, 1000, { thirst: 9, hunger: 80, spirit: 80 }, 4)).toBe(960);
+    expect(applyMonopolySurvivalHpDrain(1000, 1000, { thirst: 80, hunger: 9, spirit: 80 }, 4)).toBe(980);
+    expect(applyMonopolySurvivalHpDrain(1000, 1000, { thirst: 9, hunger: 9, spirit: 80 }, 4)).toBe(940);
+    expect(applyMonopolySurvivalHpDrain(1000, 1000, { thirst: 10, hunger: 10, spirit: 80 }, 4)).toBe(1000);
+  });
+});
 });

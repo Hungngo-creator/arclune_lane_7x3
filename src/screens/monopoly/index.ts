@@ -539,6 +539,10 @@ const MONOPOLY_HUNGER_DRAIN_PER_STEP = 1.2;
 const MONOPOLY_SPIRIT_DRAIN_PER_STEP = 0.5;
 const MONOPOLY_LOW_SPIRIT_DICE_THRESHOLD = 30;
 const MONOPOLY_FAINT_SPIRIT_THRESHOLD = 20;
+const MONOPOLY_THIRST_HP_THRESHOLD = 10;
+const MONOPOLY_HUNGER_HP_THRESHOLD = 10;
+const MONOPOLY_THIRST_HP_DRAIN_PER_STEP_RATIO = 0.01;
+const MONOPOLY_HUNGER_HP_DRAIN_PER_STEP_RATIO = 0.005;
 
 const MONOPOLY_CURRENCY_RATIO = 100;
 const MONOPOLY_STARTING_GOLD = 4;
@@ -585,6 +589,30 @@ export function getMonopolyDiceMaxBySpirit(spirit: number): number {
 
 export function shouldSkipMonopolyTurnBySpirit(spirit: number): boolean {
   return spirit <= MONOPOLY_FAINT_SPIRIT_THRESHOLD;
+}
+
+export function applyMonopolySurvivalHpDrain(
+  hp: number,
+  hpMax: number,
+  status: MonopolyStatusMetrics,
+  steps: number
+): number {
+  const safeSteps = Math.max(0, Math.floor(steps));
+  if (!Number.isFinite(hpMax) || hpMax <= 0 || safeSteps <= 0) {
+    return Math.max(0, hp);
+  }
+
+  let perStepRatio = 0;
+  if (status.thirst < MONOPOLY_THIRST_HP_THRESHOLD) {
+    perStepRatio += MONOPOLY_THIRST_HP_DRAIN_PER_STEP_RATIO;
+  }
+  if (status.hunger < MONOPOLY_HUNGER_HP_THRESHOLD) {
+    perStepRatio += MONOPOLY_HUNGER_HP_DRAIN_PER_STEP_RATIO;
+  }
+  if (perStepRatio <= 0) return Math.max(0, hp);
+
+  const hpDrain = hpMax * perStepRatio * safeSteps;
+  return Math.max(0, hp - hpDrain);
 }
 
 export function normalizeMonopolyWallet(wallet: MonopolyWallet): MonopolyWallet {
@@ -1099,6 +1127,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     avatar.activeDetourFrom = advanced.activeDetourFrom;
     avatar.detourProgress = advanced.detourProgress;
     avatar.status = applyMonopolyStepDrain(avatar.status, dice);
+    avatar.hp = applyMonopolySurvivalHpDrain(avatar.hp, avatar.stats.hpMax, avatar.status, dice);
+    syncAvatarHealthUi(avatar);
 
     if (shouldSkipMonopolyTurnBySpirit(avatar.status.spirit)) {
       avatar.skippedTurnCount = Math.max(avatar.skippedTurnCount, 1);
