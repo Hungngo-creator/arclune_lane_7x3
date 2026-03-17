@@ -24,6 +24,7 @@ const GACHA_SCREEN_MODULE_ID = '@screens/ui-gacha/index.ts' as const;
 const ARENA_HUB_SCREEN_MODULE_ID = '@screens/arena-hub/index.ts' as const;
 const CAMPAIGN_WORLD_MAP_SCREEN_MODULE_ID = '@screens/campaign-world-map/index.ts' as const;
 const MONOPOLY_SCREEN_MODULE_ID = '@screens/monopoly/index.ts' as const;
+const MONOPOLY_READY_SCREEN_MODULE_ID = '@screens/monopoly/ready.ts' as const;
 const SECT_SCREEN_MODULE_ID = './screens/sect/index.ts' as const;
 
 const MODE_TYPES = {
@@ -270,6 +271,22 @@ const MODES = [
     tags: ['PvP'],
     menuSections: ['core-pve'],
     parentId: 'arena-hub',
+    shell: {
+      screenId: 'co-ty-phu-ready',
+      moduleId: MONOPOLY_READY_SCREEN_MODULE_ID
+    }
+  },
+  {
+    id: 'co-ty-phu-battle',
+    title: 'Cờ Tỷ Phú · Trận Đấu',
+    type: MODE_TYPES.PVP,
+    status: MODE_STATUS.AVAILABLE,
+    icon: '🎲',
+    shortDescription: 'Màn hình bàn cờ chính cho chế độ Cờ Tỷ Phú.',
+    unlockNotes: 'Đi qua màn hình chuẩn bị và bấm Bắt đầu để vào trận.',
+    tags: ['PvP'],
+    menuSections: [],
+    parentId: 'co-ty-phu',
     shell: {
       screenId: 'co-ty-phu',
       moduleId: MONOPOLY_SCREEN_MODULE_ID
