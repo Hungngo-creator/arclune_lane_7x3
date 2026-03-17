@@ -27526,6 +27526,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   }
   const TURN_INTERVAL_MS = 800;
   const TURN_ADVANCE_DELAY_MS = 500;
+  const HOUSE_PURCHASE_PROMPT_TIMEOUT_MS = 3000;
   const START_CELL_ONE_BASED = 21;
   const AVATAR_COUNT = 8;
   const MONOPOLY_RANK = 'SSR';
@@ -27648,6 +27649,56 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   }
   const randomInt = (minInclusive, maxInclusive) => {
       return Math.floor(Math.random() * (maxInclusive - minInclusive + 1)) + minInclusive;
+  };
+  const promptHousePurchaseDecision = (root, avatar, timeoutMs = HOUSE_PURCHASE_PROMPT_TIMEOUT_MS) => {
+      return new Promise((resolve) => {
+          if (typeof window === 'undefined') {
+              resolve(false);
+              return;
+          }
+          const overlay = document.createElement('div');
+          overlay.style.cssText = 'position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;background:rgba(5,10,18,.72);padding:16px;';
+          const panel = document.createElement('div');
+          panel.style.cssText = 'max-width:420px;width:100%;border-radius:14px;border:1px solid rgba(148,199,255,.35);background:rgba(8,21,37,.96);padding:16px;color:#e8f2ff;display:flex;flex-direction:column;gap:10px;';
+          const title = document.createElement('strong');
+          title.textContent = `${avatar.unitName} muốn mua ô nhà ?`;
+          const countdown = document.createElement('span');
+          countdown.style.cssText = 'font-size:13px;color:#9ec3e8;';
+          const actions = document.createElement('div');
+          actions.style.cssText = 'display:flex;gap:10px;justify-content:flex-end;';
+          const denyButton = document.createElement('button');
+          denyButton.type = 'button';
+          denyButton.textContent = 'Bỏ qua';
+          denyButton.style.cssText = 'border:1px solid rgba(148,199,255,.35);background:rgba(18,34,52,.92);color:#d4e8ff;border-radius:10px;padding:8px 12px;cursor:pointer;';
+          const acceptButton = document.createElement('button');
+          acceptButton.type = 'button';
+          acceptButton.textContent = 'Mua';
+          acceptButton.style.cssText = 'border:1px solid rgba(127,255,187,.42);background:rgba(15,70,44,.92);color:#e9fff3;border-radius:10px;padding:8px 12px;cursor:pointer;';
+          actions.append(denyButton, acceptButton);
+          panel.append(title, countdown, actions);
+          overlay.appendChild(panel);
+          root.appendChild(overlay);
+          const startedAt = Date.now();
+          const tick = () => {
+              const remainMs = Math.max(0, timeoutMs - (Date.now() - startedAt));
+              countdown.textContent = `Tự động bỏ qua sau ${Math.ceil(remainMs / 1000)}s`;
+          };
+          tick();
+          let settled = false;
+          const interval = window.setInterval(tick, 200);
+          const timeout = window.setTimeout(() => finish(false), timeoutMs);
+          const finish = (accepted) => {
+              if (settled)
+                  return;
+              settled = true;
+              window.clearInterval(interval);
+              window.clearTimeout(timeout);
+              overlay.remove();
+              resolve(accepted);
+          };
+          denyButton.addEventListener('click', () => finish(false), { once: true });
+          acceptButton.addEventListener('click', () => finish(true), { once: true });
+      });
   };
   function renderScreen(context) {
       const { root, shell = null } = context;
@@ -27999,14 +28050,16 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           avatar.hp = Math.min(avatar.hp, avatar.hpMaxCurrent);
           return `${avatar.unitName} trốn thuế Ảnh sát môn: giảm vĩnh viễn 3% HP tối đa`;
       };
-      const resolveHouseStep = (avatar, cellOneBased, isLanding) => {
+      const resolveHouseStep = async (avatar, cellOneBased, isLanding) => {
           const slot = houseByCell.get(cellOneBased);
           if (!slot)
               return { paidTax: 0, ownerCollected: 0, purchaseLabel: '', upgradeLabel: '', hazardLabel: resolveRangedHouseThreat(avatar, cellOneBased), bankruptLabel: '' };
           if (slot.revealedTier == null || slot.ownerAvatarId == null) {
               if (!isLanding)
                   return { paidTax: 0, ownerCollected: 0, purchaseLabel: '', upgradeLabel: '', hazardLabel: resolveRangedHouseThreat(avatar, cellOneBased), bankruptLabel: '' };
-              const willBuy = avatar.role === 'player' || Math.random() < 0.72;
+              const willBuy = avatar.role === 'npc'
+                  ? true
+                  : await promptHousePurchaseDecision(root, avatar);
               if (!willBuy)
                   return { paidTax: 0, ownerCollected: 0, purchaseLabel: `${avatar.unitName} bỏ qua mua ô ?`, upgradeLabel: '', hazardLabel: resolveRangedHouseThreat(avatar, cellOneBased), bankruptLabel: '' };
               const purchase = revealHousePurchase(slot, avatar.id, avatar.wallet.silver, Math.random);
@@ -28058,7 +28111,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           const hazardLabel = resolveHouseCombatThreat(slot, avatar, isLanding) || resolveRangedHouseThreat(avatar, cellOneBased);
           return { paidTax: settled.paidTaxSilver, ownerCollected: 0, purchaseLabel: '', upgradeLabel: '', hazardLabel, bankruptLabel };
       };
-      const runTurn = () => {
+      const runTurn = async () => {
           if (destroyed)
               return;
           const activeAvatarId = turnOrder[activeTurnIndex];
@@ -28114,7 +28167,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           let bankruptLabel = '';
           const traversed = advanced.traversedCells ?? [];
           for (let idx = 0; idx < traversed.length; idx += 1) {
-              const summary = resolveHouseStep(avatar, traversed[idx] ?? avatar.currentCellOneBased, idx === traversed.length - 1);
+              const summary = await resolveHouseStep(avatar, traversed[idx] ?? avatar.currentCellOneBased, idx === traversed.length - 1);
               paidTax += summary.paidTax;
               ownerCollected += summary.ownerCollected;
               if (summary.purchaseLabel)
