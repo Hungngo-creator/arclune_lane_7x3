@@ -26865,7 +26865,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
     }
     .monopoly-avatar__tag{
       position:absolute;
-      top:-18px;
+      top:-27px;
       left:50%;
       transform:translateX(-50%);
       border-radius:999px;
@@ -26884,7 +26884,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
     .monopoly-avatar__hp{
       position:absolute;
       left:50%;
-      top:-10px;
+      top:-14px;
       transform:translateX(-50%);
       width:40px;
       height:5px;
@@ -26894,9 +26894,10 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       overflow:hidden;
     }
     .monopoly-avatar__hp-fill{
+    display:block;
       width:100%;
       height:100%;
-      background:linear-gradient(90deg, #f97373 0%, #f6c54b 35%, #59ffb3 100%);
+      background:linear-gradient(90deg, #2ddf78 0%, #21c767 48%, #13a84f 100%);
       transform-origin:left center;
     }
     @keyframes avatarFloat {
