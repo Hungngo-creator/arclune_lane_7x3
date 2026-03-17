@@ -26776,6 +26776,19 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       font-size:14px;
       color:#9ec3e8;
     }
+    .monopoly-screen__turn{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      padding:10px 14px;
+      border:1px solid rgba(148, 199, 255, 0.28);
+      border-radius:12px;
+      background:rgba(8, 21, 37, 0.78);
+      color:#d6ebff;
+      font-size:14px;
+    }
     .monopoly-board{
       width:min(96vw, 1180px);
       max-width:100%;
@@ -26808,6 +26821,46 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
     .monopoly-cell--connector{ background:rgba(52,39,26,0.96); }
     .monopoly-cell--mini{ background:rgba(28,78,72,0.96); }
     .monopoly-cell--micro{ background:rgba(98,38,111,0.96); }
+    .monopoly-avatar{
+      position:absolute;
+      transform:translate(-50%, -108%);
+      width:30px;
+      height:30px;
+      border-radius:50%;
+      border:1px solid rgba(226, 242, 255, 0.9);
+      background:rgba(6, 18, 31, 0.94);
+      color:#f4f8ff;
+      font-size:13px;
+      font-weight:700;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:4;
+      animation:avatarFloat 1.1s ease-in-out infinite alternate;
+      box-shadow:0 4px 10px rgba(0,0,0,0.42);
+    }
+    .monopoly-avatar__tag{
+      position:absolute;
+      top:-18px;
+      left:50%;
+      transform:translateX(-50%);
+      border-radius:999px;
+      padding:1px 7px;
+      font-size:9px;
+      text-transform:uppercase;
+      letter-spacing:0.06em;
+      color:#f0f7ff;
+      background:rgba(20, 68, 112, 0.92);
+      border:1px solid rgba(170, 220, 255, 0.55);
+    }
+    .monopoly-avatar--player .monopoly-avatar__tag{
+      background:rgba(18, 114, 66, 0.95);
+      border-color:rgba(127, 255, 187, 0.56);
+    }
+    @keyframes avatarFloat {
+      from { transform:translate(-50%, -108%) translateY(0); }
+      to { transform:translate(-50%, -108%) translateY(-4px); }
+    }
   `;
   const CELL_KEY_MULTIPLIER = 100;
   function generateMainTrackCells() {
@@ -27032,6 +27085,14 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   function ensureStyles() {
       ensureStyleTag(STYLE_ID, { css: CSS });
   }
+  const TURN_INTERVAL_MS = 800;
+  const TURN_ADVANCE_DELAY_MS = 500;
+  const START_CELL_ONE_BASED = 21;
+  const AVATAR_COUNT = 8;
+  const MAIN_TRACK_PATH_ORDER = Array.from({ length: MAIN_TRACK_CELLS }, (_, offset) => ((START_CELL_ONE_BASED - 1 + offset) % MAIN_TRACK_CELLS) + 1);
+  const randomInt = (minInclusive, maxInclusive) => {
+      return Math.floor(Math.random() * (maxInclusive - minInclusive + 1)) + minInclusive;
+  };
   function renderScreen(context) {
       const { root, shell = null } = context;
       ensureStyles();
@@ -27052,6 +27113,10 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       meta.innerHTML = `<span>Bàn chính: ${MAIN_TRACK_CELLS} ô</span><span>Lane phụ: ${SIDE_TRACK_COLUMN_HEIGHT * 4 + SIDE_TRACK_PROTRUSION_CELLS} ô</span><span>Bàn mini: ${MINI_RING_CELLS} ô</span><span>Bàn vi mô: ${MICRO_RING_CELLS} ô</span><span>Tổng: ${TOTAL_CELLS} ô</span>`;
       topbar.appendChild(meta);
       wrapper.appendChild(topbar);
+      const turnBanner = document.createElement('div');
+      turnBanner.className = 'monopoly-screen__turn';
+      turnBanner.textContent = 'Đang chuẩn bị lượt chơi...';
+      wrapper.appendChild(turnBanner);
       const board = document.createElement('div');
       board.className = 'monopoly-board';
       board.style.height = `${BOARD_ISOMETRIC_LAYOUT.height}px`;
@@ -27096,16 +27161,81 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           }
       };
       board.appendChild(fragment);
+      const playerAvatarId = randomInt(1, AVATAR_COUNT);
+      const avatars = [];
+      for (let avatarId = 1; avatarId <= AVATAR_COUNT; avatarId += 1) {
+          const node = document.createElement('div');
+          const role = avatarId === playerAvatarId ? 'player' : 'npc';
+          node.className = `monopoly-avatar monopoly-avatar--${role}`;
+          node.innerHTML = `<span class="monopoly-avatar__tag">${role}</span>${avatarId}`;
+          node.hidden = true;
+          board.appendChild(node);
+          avatars.push({
+              id: avatarId,
+              role,
+              currentPathIndex: 0,
+              hasEnteredBoard: false,
+              node
+          });
+      }
+      const moveAvatarToPathIndex = (avatar, pathIndex) => {
+          const indexOneBased = MAIN_TRACK_PATH_ORDER[pathIndex % MAIN_TRACK_PATH_ORDER.length] ?? START_CELL_ONE_BASED;
+          const layout = BOARD_ISOMETRIC_LAYOUT.byIndex.get(indexOneBased - 1);
+          if (!layout)
+              return;
+          const scale = Number.parseFloat(board.style.getPropertyValue('--tile-w')) / ISO_TILE_WIDTH || 1;
+          avatar.node.style.left = `${layout.x * scale}px`;
+          avatar.node.style.top = `${layout.y * scale}px`;
+      };
+      let activeTurnIndex = randomInt(0, AVATAR_COUNT - 1);
+      let turnTimer = null;
+      let destroyed = false;
+      const runTurn = () => {
+          if (destroyed)
+              return;
+          const avatar = avatars[activeTurnIndex];
+          if (!avatar)
+              return;
+          const dice = randomInt(1, 6);
+          if (!avatar.hasEnteredBoard) {
+              avatar.currentPathIndex = 0;
+              avatar.hasEnteredBoard = true;
+              avatar.node.hidden = false;
+              moveAvatarToPathIndex(avatar, avatar.currentPathIndex);
+          }
+          avatar.currentPathIndex = (avatar.currentPathIndex + dice) % MAIN_TRACK_PATH_ORDER.length;
+          moveAvatarToPathIndex(avatar, avatar.currentPathIndex);
+          const destination = MAIN_TRACK_PATH_ORDER[avatar.currentPathIndex] ?? START_CELL_ONE_BASED;
+          turnBanner.textContent = `Lượt avatar ${avatar.id} (${avatar.role.toUpperCase()}) • Xúc xắc: ${dice} • Đến ô ${destination}`;
+          activeTurnIndex = (activeTurnIndex + 1) % AVATAR_COUNT;
+          turnTimer = window.setTimeout(runTurn, TURN_INTERVAL_MS + TURN_ADVANCE_DELAY_MS);
+      };
       wrapper.appendChild(board);
       applyBoardScale();
+      const syncAvatarLayout = () => {
+          for (const avatar of avatars) {
+              if (!avatar.hasEnteredBoard)
+                  continue;
+              moveAvatarToPathIndex(avatar, avatar.currentPathIndex);
+          }
+      };
+      const onResize = () => {
+          applyBoardScale();
+          syncAvatarLayout();
+      };
       if (typeof window !== 'undefined') {
-          window.addEventListener('resize', applyBoardScale);
+          window.addEventListener('resize', onResize);
+          runTurn();
       }
       return {
           destroy() {
+              destroyed = true;
+              if (turnTimer) {
+                  window.clearTimeout(turnTimer);
+              }
               backButton.removeEventListener('click', onBack);
               if (typeof window !== 'undefined') {
-                  window.removeEventListener('resize', applyBoardScale);
+                  window.removeEventListener('resize', onResize);
               }
               mount.destroy();
           }
