@@ -27546,6 +27546,15 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   const MONOPOLY_INVENTORY_SLOT_SIZE = 48;
   const LAC_DUONG_MANTOU_COST_SILVER = 20;
   const LAC_DUONG_MANTOU_HUNGER_GAIN = 10;
+  const TRUC_LAM_CLUSTER_COUNT = 5;
+  const TRUC_LAM_CELLS_PER_CLUSTER = 2;
+  const TRUC_LAM_THIRST_RESTORE_RATIO = 0.15;
+  const TRUC_LAM_SPIRIT_TO_THIRST_RATIO = 0.05;
+  const TRUC_LAM_MODULE_TOOLTIP = [
+      'Trúc Lâm (rừng trúc, nguồn nước dồi dào).',
+      `Mỗi ô: hồi khát = ${Math.round(TRUC_LAM_THIRST_RESTORE_RATIO * 100)}% khát tối đa + ${Math.round(TRUC_LAM_SPIRIT_TO_THIRST_RATIO * 100)}% tinh thần hiện tại.`,
+      `Mỗi map random ${TRUC_LAM_CLUSTER_COUNT} cụm, mỗi cụm ${TRUC_LAM_CELLS_PER_CLUSTER} ô liền kề.`
+  ].join(' ');
   const LAC_DUONG_MODULE_TOOLTIP = [
       'Lạc Dương Trấn (chỉ kích hoạt khi đạp trúng ô, đi ngang không tính).',
       'Vào trấn: bắt buộc mua 2 màn thầu (-20 bạc, +10 đói).',
@@ -27664,6 +27673,57 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           return null;
       const picked = candidates[randomInt(0, candidates.length - 1)];
       return picked ?? null;
+  }
+  function createTrucLamClusters(cells, occupiedCellOneBased, clusterCount = TRUC_LAM_CLUSTER_COUNT, rng = Math.random) {
+      const maxClusters = Math.max(0, Math.floor(clusterCount));
+      const blocked = new Set(occupiedCellOneBased);
+      const byCell = new Map(cells.map(cell => [cell.index + 1, cell]));
+      const primaryCells = cells
+          .filter(cell => cell.track !== 'mini' && cell.track !== 'micro')
+          .map(cell => cell.index + 1);
+      const clusters = [];
+      const randomPick = (items) => {
+          if (items.length <= 0)
+              return null;
+          const pick = Math.floor(Math.max(0, Math.min(0.999999, rng())) * items.length);
+          return items[pick] ?? null;
+      };
+      const getFreeNeighbors = (cellOneBased) => {
+          const center = byCell.get(cellOneBased);
+          if (!center)
+              return [];
+          return primaryCells.filter(candidate => {
+              if (candidate === cellOneBased || blocked.has(candidate))
+                  return false;
+              const target = byCell.get(candidate);
+              if (!target)
+                  return false;
+              const rowDistance = Math.abs(center.row - target.row);
+              const colDistance = Math.abs(center.col - target.col);
+              return rowDistance + colDistance === 1;
+          });
+      };
+      for (let idx = 0; idx < maxClusters; idx += 1) {
+          const firstCandidates = primaryCells.filter(cellOneBased => !blocked.has(cellOneBased) && getFreeNeighbors(cellOneBased).length > 0);
+          const first = randomPick(firstCandidates);
+          if (first == null)
+              break;
+          const second = randomPick(getFreeNeighbors(first));
+          if (second == null)
+              continue;
+          blocked.add(first);
+          blocked.add(second);
+          clusters.push([first, second]);
+      }
+      return clusters;
+  }
+  function applyTrucLamThirstRestore(status) {
+      const thirstGain = MONOPOLY_STATUS_CAP * TRUC_LAM_THIRST_RESTORE_RATIO + clampMonopolyStatus(status.spirit) * TRUC_LAM_SPIRIT_TO_THIRST_RATIO;
+      return {
+          thirst: clampMonopolyStatus(status.thirst + thirstGain),
+          hunger: clampMonopolyStatus(status.hunger),
+          spirit: clampMonopolyStatus(status.spirit)
+      };
   }
   function grantMonopolySilver(wallet, amountSilver) {
       const normalized = normalizeMonopolyWallet(wallet);
@@ -28019,6 +28079,10 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       const houseSlots = createRandomHouseSlots(randomHouseEligibleCells);
       const houseByCell = new Map(houseSlots.map(slot => [slot.cellIndex, slot]));
       const occupiedModuleCells = new Set(houseSlots.map(slot => slot.cellIndex));
+      const trucLamClusters = createTrucLamClusters(BOARD_TEMPLATE, occupiedModuleCells);
+      const trucLamCells = new Set(trucLamClusters.flat());
+      for (const cellOneBased of trucLamCells)
+          occupiedModuleCells.add(cellOneBased);
       const lacDuongCell = pickMonopolyModuleCell(BOARD_TEMPLATE, occupiedModuleCells);
       if (lacDuongCell != null)
           occupiedModuleCells.add(lacDuongCell);
@@ -28101,6 +28165,11 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           if (houseByCell.has(cell.index + 1)) {
               node.textContent = '?';
               node.title = `Ô nhà bí ẩn #${cell.index + 1}`;
+              continue;
+          }
+          if (trucLamCells.has(cell.index + 1)) {
+              node.textContent = 'TL';
+              node.title = `${TRUC_LAM_MODULE_TOOLTIP} (Ô #${cell.index + 1})`;
               continue;
           }
           if (lacDuongCell != null && cell.index + 1 === lacDuongCell) {
@@ -28561,14 +28630,24 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
               const tierLabel = fate === 'major' ? 'lớn' : fate === 'medium' ? 'vừa' : 'nhỏ';
               return `${label} Gặp thiếu nữ tặng nhẫn đá cũ, mở cơ duyên ${tierLabel} tại ô ${targetCell}.`;
           };
+          const resolveTrucLamStep = (actor, cellOneBased) => {
+              if (actor.role !== 'player' || !trucLamCells.has(cellOneBased))
+                  return '';
+              actor.status = applyTrucLamThirstRestore(actor.status);
+              const thirstGain = Math.round(MONOPOLY_STATUS_CAP * TRUC_LAM_THIRST_RESTORE_RATIO + clampMonopolyStatus(actor.status.spirit) * TRUC_LAM_SPIRIT_TO_THIRST_RATIO);
+              return `${actor.unitName} đạp trúng Trúc Lâm ở ô ${cellOneBased}, hồi ${thirstGain} khát`;
+          };
           for (let idx = 0; idx < traversed.length; idx += 1) {
               const steppedCell = traversed[idx] ?? avatar.currentCellOneBased;
               const isLandingStep = idx === traversed.length - 1;
+              const trucLamLabel = resolveTrucLamStep(avatar, steppedCell);
               const lacDuongLabel = isLandingStep ? resolveLacDuongStep(avatar, steppedCell) : '';
               const fortuneLabel = resolveFortuneTarget(avatar, steppedCell);
               const summary = await resolveHouseStep(avatar, steppedCell, isLandingStep);
               paidTax += summary.paidTax;
               ownerCollected += summary.ownerCollected;
+              if (trucLamLabel)
+                  purchaseLabel = trucLamLabel;
               if (lacDuongLabel)
                   purchaseLabel = lacDuongLabel;
               if (fortuneLabel)
@@ -28715,6 +28794,8 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'rollLacDuongEncounter')) exports.rollLacDuongEncounter = rollLacDuongEncounter;
   if (!Object.prototype.hasOwnProperty.call(exports, 'rollLacDuongRingDestiny')) exports.rollLacDuongRingDestiny = rollLacDuongRingDestiny;
   if (!Object.prototype.hasOwnProperty.call(exports, 'pickMonopolyModuleCell')) exports.pickMonopolyModuleCell = pickMonopolyModuleCell;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'createTrucLamClusters')) exports.createTrucLamClusters = createTrucLamClusters;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'applyTrucLamThirstRestore')) exports.applyTrucLamThirstRestore = applyTrucLamThirstRestore;
   if (!Object.prototype.hasOwnProperty.call(exports, 'grantMonopolySilver')) exports.grantMonopolySilver = grantMonopolySilver;
   if (!Object.prototype.hasOwnProperty.call(exports, 'spendMonopolySilver')) exports.spendMonopolySilver = spendMonopolySilver;
   if (!Object.prototype.hasOwnProperty.call(exports, 'spendMonopolyGold')) exports.spendMonopolyGold = spendMonopolyGold;
