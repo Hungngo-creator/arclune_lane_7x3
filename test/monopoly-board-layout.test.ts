@@ -12,11 +12,13 @@ import {
   getHouseDefinitions,
   getHouseOwnerEffectSpec,
   getMonopolyDiceMaxBySpirit,
+  inheritGoldOnKill,
   normalizeMonopolyWallet,
   pickRandomHouseDefinitionByTier,
   getHouseVisitorPenalty,
   refillMonopolySilverIfEmpty,
   revealHousePurchase,
+  resetHouseSlotsByOwner,
   rollHouseTier,
   settleHouseTraverse,
   shouldTriggerAssassinTaxPunishment,
@@ -291,6 +293,13 @@ describe('monopoly currency wallet', () => {
     expect(computeMonopolyVictoryRewardByGold({ gold: 5, silver: 999 })).toBe(500);
   });
 
+  it('inherits only gold from victim wallet on kill', () => {
+    const result = inheritGoldOnKill({ gold: 3, silver: 40 }, { gold: 5, silver: 90 });
+    expect(result.inheritedGold).toBe(5);
+    expect(result.killerWallet).toEqual({ gold: 8, silver: 40 });
+    expect(result.victimWallet).toEqual({ gold: 0, silver: 90 });
+  });
+
   describe('monopoly survival metrics', () => {
   it('resets all monopoly-only metrics to 80/100 at match start', () => {
     expect(createInitialMonopolyStatus()).toEqual({
@@ -434,6 +443,44 @@ describe('monopoly house module', () => {
     }
     expect(slot.treasurySilver).toBe(750);
     expect(slot.minedYears).toBe(3);
+  });
+
+it('resets all houses of a slain owner back to hidden ?', () => {
+    const slots = [
+      {
+        cellIndex: 12,
+        marker: '?' as const,
+        revealedTier: 4 as const,
+        definitionId: 'tien_gia_phu_de',
+        ownerAvatarId: 8,
+        treasurySilver: 1234,
+        minedYears: 0
+      },
+      {
+        cellIndex: 31,
+        marker: '?' as const,
+        revealedTier: 2 as const,
+        definitionId: 'quang_nho',
+        ownerAvatarId: 8,
+        treasurySilver: 500,
+        minedYears: 2
+      },
+      {
+        cellIndex: 7,
+        marker: '?' as const,
+        revealedTier: 1 as const,
+        definitionId: 'tieu_diem',
+        ownerAvatarId: 3,
+        treasurySilver: 88,
+        minedYears: 0
+      }
+    ];
+
+    const resetCells = resetHouseSlotsByOwner(slots, 8);
+    expect(resetCells.sort((a, b) => a - b)).toEqual([12, 31]);
+    expect(slots[0]).toMatchObject({ revealedTier: null, definitionId: null, ownerAvatarId: null, treasurySilver: 0, minedYears: 0 });
+    expect(slots[1]).toMatchObject({ revealedTier: null, definitionId: null, ownerAvatarId: null, treasurySilver: 0, minedYears: 0 });
+    expect(slots[2]).toMatchObject({ revealedTier: 1, definitionId: 'tieu_diem', ownerAvatarId: 3, treasurySilver: 88 });
   });
 
 it('applies Ba Nén Nhang visitor penalties by pass/land', () => {

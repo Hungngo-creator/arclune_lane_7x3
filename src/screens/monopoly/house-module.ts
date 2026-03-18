@@ -125,6 +125,20 @@ export interface HiddenHouseSlot {
   minedYears: number;
 }
 
+export function resetHouseSlotsByOwner(slots: ReadonlyArray<HiddenHouseSlot>, ownerAvatarId: number): number[] {
+  const resetCells: number[] = [];
+  for (const slot of slots) {
+    if (slot.ownerAvatarId !== ownerAvatarId) continue;
+    slot.revealedTier = null;
+    slot.definitionId = null;
+    slot.ownerAvatarId = null;
+    slot.treasurySilver = 0;
+    slot.minedYears = 0;
+    resetCells.push(slot.cellIndex);
+  }
+  return resetCells;
+}
+
 export interface HouseTraverseResult {
   readonly expectedTaxSilver: number;
   readonly paidTaxSilver: number;

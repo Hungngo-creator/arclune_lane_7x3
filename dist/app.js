@@ -26766,6 +26766,20 @@ __define('./screens/monopoly/house-module.ts', (exports, module, __require) => {
   for (const tier of [1, 2, 3, 4, 5]) {
       DEFINITIONS_BY_TIER.set(tier, Object.freeze(DEFINITIONS.filter(entry => entry.tier === tier)));
   }
+  function resetHouseSlotsByOwner(slots, ownerAvatarId) {
+      const resetCells = [];
+      for (const slot of slots) {
+          if (slot.ownerAvatarId !== ownerAvatarId)
+              continue;
+          slot.revealedTier = null;
+          slot.definitionId = null;
+          slot.ownerAvatarId = null;
+          slot.treasurySilver = 0;
+          slot.minedYears = 0;
+          resetCells.push(slot.cellIndex);
+      }
+      return resetCells;
+  }
   function createRandomHouseSlots(cells, rng = Math.random, cap = MONOPOLY_HOUSE_SPAWN_LIMIT) {
       const limit = Math.max(0, Math.min(cap, MONOPOLY_HOUSE_SPAWN_LIMIT, cells.length));
       const pool = [...cells.map(cell => cell.index + 1)];
@@ -26988,6 +27002,7 @@ __define('./screens/monopoly/house-module.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'MONOPOLY_HOUSE_SPAWN_LIMIT')) exports.MONOPOLY_HOUSE_SPAWN_LIMIT = MONOPOLY_HOUSE_SPAWN_LIMIT;
   if (!Object.prototype.hasOwnProperty.call(exports, 'HOUSE_TIER_BUY_COST')) exports.HOUSE_TIER_BUY_COST = HOUSE_TIER_BUY_COST;
   if (!Object.prototype.hasOwnProperty.call(exports, 'HOUSE_TIER_ROLL_TABLE')) exports.HOUSE_TIER_ROLL_TABLE = HOUSE_TIER_ROLL_TABLE;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resetHouseSlotsByOwner')) exports.resetHouseSlotsByOwner = resetHouseSlotsByOwner;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createRandomHouseSlots')) exports.createRandomHouseSlots = createRandomHouseSlots;
   if (!Object.prototype.hasOwnProperty.call(exports, 'rollHouseTier')) exports.rollHouseTier = rollHouseTier;
   if (!Object.prototype.hasOwnProperty.call(exports, 'pickRandomHouseDefinitionByTier')) exports.pickRandomHouseDefinitionByTier = pickRandomHouseDefinitionByTier;
@@ -27024,6 +27039,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   const settleHouseTraverse = __dep5.settleHouseTraverse;
   const shouldTriggerAssassinTaxPunishment = __dep5.shouldTriggerAssassinTaxPunishment;
   const upgradeHouse = __dep5.upgradeHouse;
+  const resetHouseSlotsByOwner = __dep5.resetHouseSlotsByOwner;
   const STYLE_ID = 'monopoly-screen-style';
   const BOARD_SIZE = 15;
   const MAIN_TRACK_OFFSET = 2;
@@ -27192,6 +27208,11 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
     .monopoly-avatar--dead{
       filter:grayscale(0.9);
       opacity:0.5;
+    }
+    .monopoly-avatar--spirit{
+      opacity:0.45;
+      filter:grayscale(0.65) saturate(0.72) brightness(1.15);
+      box-shadow:0 0 14px rgba(186, 221, 255, 0.55);
     }
     .monopoly-avatar__tag{
       position:absolute;
@@ -27592,6 +27613,22 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   function computeMonopolyVictoryRewardByGold(wallet) {
       return normalizeMonopolyWallet(wallet).gold * MONOPOLY_CURRENCY_RATIO;
   }
+  function inheritGoldOnKill(killerWallet, victimWallet) {
+      const killer = normalizeMonopolyWallet(killerWallet);
+      const victim = normalizeMonopolyWallet(victimWallet);
+      const inheritedGold = victim.gold;
+      return {
+          killerWallet: normalizeMonopolyWallet({
+              gold: killer.gold + inheritedGold,
+              silver: killer.silver
+          }),
+          victimWallet: normalizeMonopolyWallet({
+              gold: 0,
+              silver: victim.silver
+          }),
+          inheritedGold
+      };
+  }
   const TURN_INTERVAL_MS = 800;
   const TURN_ADVANCE_DELAY_MS = 500;
   const HOUSE_PURCHASE_PROMPT_TIMEOUT_MS = 3000;
@@ -27907,7 +27944,9 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
               wallet: createInitialMonopolyWallet(),
               status: createInitialMonopolyStatus(),
               spiritCap: MONOPOLY_STATUS_CAP,
-              skippedTurnCount: 0
+              skippedTurnCount: 0,
+              soulState: 'alive',
+              soulExpiresAtYear: null,
           });
       }
       for (const { node, cell } of cellNodes) {
@@ -27953,6 +27992,8 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           const hpRatio = clampRatio(avatar.hp / avatar.hpMaxCurrent);
           avatar.hpFillNode.style.transform = `scaleX(${hpRatio})`;
           avatar.node.classList.toggle('monopoly-avatar--dead', avatar.hp <= 0);
+          avatar.node.classList.toggle('monopoly-avatar--spirit', avatar.soulState === 'spirit');
+          avatar.node.hidden = avatar.soulState === 'dispersed';
       };
       avatars.forEach(syncAvatarHealthUi);
       syncPlayerWalletUi();
@@ -27970,7 +28011,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       let turnTimer = null;
       let destroyed = false;
       const applyYearIncomeIfReady = () => {
-          const living = avatars.filter(item => item.hp > 0);
+          const living = avatars.filter(item => item.soulState === 'alive' && item.hp > 0);
           if (!living.length)
               return 0;
           const minimumLap = Math.min(...living.map(item => lapProgressByAvatar.get(item.id) ?? 0));
@@ -27983,7 +28024,9 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
                   collectHouseIncome(slot, true);
           }
           const yearlyIncome = gainedYears * MONOPOLY_CURRENCY_RATIO;
-          for (const avatar of living) {
+          for (const avatar of avatars) {
+              if (avatar.soulState === 'dispersed')
+                  continue;
               avatar.wallet = grantMonopolySilver(avatar.wallet, yearlyIncome);
           }
           syncYearUi();
@@ -28039,7 +28082,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
               if (slot.definitionId !== 'thi_than_cung')
                   continue;
               const owner = avatars.find(item => item.id === slot.ownerAvatarId);
-              if (!owner || owner.hp <= 0)
+              if (!owner || owner.soulState !== 'alive' || owner.hp <= 0)
                   continue;
               const houseLayout = BOARD_TEMPLATE[slot.cellIndex - 1];
               if (!houseLayout)
@@ -28057,7 +28100,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           if (!slot.definitionId || slot.ownerAvatarId == null || slot.ownerAvatarId === actor.id)
               return '';
           const owner = avatars.find(item => item.id === slot.ownerAvatarId);
-          if (!owner || owner.hp <= 0)
+          if (!owner || owner.soulState !== 'alive' || owner.hp <= 0)
               return '';
           if (slot.definitionId === 'thi_than_thuong' || slot.definitionId === 'anh_cung') {
               const hits = isLanding
@@ -28097,29 +28140,32 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           return `${avatar.unitName} trốn thuế Ảnh sát môn: giảm vĩnh viễn 3% HP tối đa`;
       };
       const resolveHouseStep = async (avatar, cellOneBased, isLanding) => {
+          if (avatar.soulState !== 'alive') {
+              return { paidTax: 0, ownerCollected: 0, purchaseLabel: '', upgradeLabel: '', hazardLabel: '', bankruptLabel: '', killerAvatarId: null };
+          }
           const slot = houseByCell.get(cellOneBased);
           if (!slot)
-              return { paidTax: 0, ownerCollected: 0, purchaseLabel: '', upgradeLabel: '', hazardLabel: resolveRangedHouseThreat(avatar, cellOneBased), bankruptLabel: '' };
+              return { paidTax: 0, ownerCollected: 0, purchaseLabel: '', upgradeLabel: '', hazardLabel: resolveRangedHouseThreat(avatar, cellOneBased), bankruptLabel: '', killerAvatarId: null };
           if (slot.revealedTier == null || slot.ownerAvatarId == null) {
               if (!isLanding)
-                  return { paidTax: 0, ownerCollected: 0, purchaseLabel: '', upgradeLabel: '', hazardLabel: resolveRangedHouseThreat(avatar, cellOneBased), bankruptLabel: '' };
+                  return { paidTax: 0, ownerCollected: 0, purchaseLabel: '', upgradeLabel: '', hazardLabel: resolveRangedHouseThreat(avatar, cellOneBased), bankruptLabel: '', killerAvatarId: null };
               const willBuy = avatar.role === 'npc'
                   ? true
                   : await promptHousePurchaseDecision(root, avatar);
               if (!willBuy)
-                  return { paidTax: 0, ownerCollected: 0, purchaseLabel: `${avatar.unitName} bỏ qua mua ô ?`, upgradeLabel: '', hazardLabel: resolveRangedHouseThreat(avatar, cellOneBased), bankruptLabel: '' };
+                  return { paidTax: 0, ownerCollected: 0, purchaseLabel: `${avatar.unitName} bỏ qua mua ô ?`, upgradeLabel: '', hazardLabel: resolveRangedHouseThreat(avatar, cellOneBased), bankruptLabel: '', killerAvatarId: null };
               // Giá nhà tính bằng bạc, nhưng ví trong trận là bạc + vàng.
               // Luôn quy đổi tổng tài sản về "đơn vị bạc" để mua đúng theo luật.
               const totalSilverBudget = avatar.wallet.gold * MONOPOLY_CURRENCY_RATIO + avatar.wallet.silver;
               const purchase = revealHousePurchase(slot, avatar.id, totalSilverBudget, Math.random);
               if (!purchase.ok || !purchase.definition) {
-                  return { paidTax: 0, ownerCollected: 0, purchaseLabel: `${avatar.unitName} không đủ bạc để mở ô ?`, upgradeLabel: '', hazardLabel: resolveRangedHouseThreat(avatar, cellOneBased), bankruptLabel: '' };
+                  return { paidTax: 0, ownerCollected: 0, purchaseLabel: `${avatar.unitName} không đủ bạc để mở ô ?`, upgradeLabel: '', hazardLabel: resolveRangedHouseThreat(avatar, cellOneBased), bankruptLabel: '', killerAvatarId: null };
               }
               avatar.wallet = normalizeMonopolyWallet({ ...avatar.wallet, silver: purchase.nextWalletSilver });
               const node = cellNodes.find(item => item.cell.index + 1 === cellOneBased)?.node;
               if (node)
                   node.textContent = `H${purchase.tier}`;
-              return { paidTax: 0, ownerCollected: 0, purchaseLabel: `${avatar.unitName} mua ${purchase.definition.name} cấp ${purchase.tier}`, upgradeLabel: '', hazardLabel: resolveRangedHouseThreat(avatar, cellOneBased), bankruptLabel: '' };
+              return { paidTax: 0, ownerCollected: 0, purchaseLabel: `${avatar.unitName} mua ${purchase.definition.name} cấp ${purchase.tier}`, upgradeLabel: '', hazardLabel: resolveRangedHouseThreat(avatar, cellOneBased), bankruptLabel: '', killerAvatarId: null };
           }
           const totalSilver = avatar.wallet.gold * MONOPOLY_CURRENCY_RATIO + avatar.wallet.silver;
           const settled = settleHouseTraverse(slot, avatar.id, isLanding, totalSilver);
@@ -28146,7 +28192,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
                       }
                   }
               }
-              return { paidTax: 0, ownerCollected: settled.ownerCollectedSilver, purchaseLabel: '', upgradeLabel, hazardLabel: resolveRangedHouseThreat(avatar, cellOneBased), bankruptLabel: '' };
+              return { paidTax: 0, ownerCollected: settled.ownerCollectedSilver, purchaseLabel: '', upgradeLabel, hazardLabel: resolveRangedHouseThreat(avatar, cellOneBased), bankruptLabel: '', killerAvatarId: null };
           }
           if (settled.paidTaxSilver > 0) {
               const remainSilver = Math.max(0, totalSilver - settled.paidTaxSilver);
@@ -28164,7 +28210,58 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
                   : applyAssassinTaxPunishment(avatar);
           }
           const hazardLabel = resolveHouseCombatThreat(slot, avatar, isLanding) || resolveRangedHouseThreat(avatar, cellOneBased);
-          return { paidTax: settled.paidTaxSilver, ownerCollected: 0, purchaseLabel: '', upgradeLabel: '', hazardLabel, bankruptLabel };
+          const killerAvatarId = slot.ownerAvatarId ?? null;
+          return { paidTax: settled.paidTaxSilver, ownerCollected: 0, purchaseLabel: '', upgradeLabel: '', hazardLabel, bankruptLabel, killerAvatarId };
+      };
+      const transitionToSpirit = (avatar) => {
+          if (avatar.soulState !== 'alive' || avatar.hp > 0)
+              return;
+          avatar.soulState = 'spirit';
+          avatar.soulExpiresAtYear = yearsElapsed + 2;
+          avatar.skippedTurnCount = 0;
+          syncAvatarHealthUi(avatar);
+      };
+      const processAvatarDeaths = (killerByVictimId) => {
+          const labels = [];
+          const justDied = avatars.filter(item => item.soulState === 'alive' && item.hp <= 0);
+          for (const victim of justDied) {
+              const killerId = killerByVictimId.get(victim.id) ?? null;
+              const killer = killerId == null ? null : avatars.find(item => item.id === killerId) ?? null;
+              if (killer && killer.id !== victim.id && killer.soulState !== 'dispersed') {
+                  const inherited = inheritGoldOnKill(killer.wallet, victim.wallet);
+                  killer.wallet = inherited.killerWallet;
+                  victim.wallet = inherited.victimWallet;
+                  if (inherited.inheritedGold > 0) {
+                      labels.push(`${killer.unitName} kế thừa ${inherited.inheritedGold} vàng từ ${victim.unitName}`);
+                  }
+              }
+              const resetCells = resetHouseSlotsByOwner(houseSlots, victim.id);
+              for (const cellOneBased of resetCells) {
+                  const node = cellNodes.find(item => item.cell.index + 1 === cellOneBased)?.node;
+                  if (node)
+                      node.textContent = '?';
+              }
+              if (resetCells.length > 0) {
+                  labels.push(`${victim.unitName} tử trận: ${resetCells.length} ô nhà bị xóa về '?'`);
+              }
+              transitionToSpirit(victim);
+          }
+          return labels;
+      };
+      const processSpiritExpiration = () => {
+          const labels = [];
+          for (const avatar of avatars) {
+              if (avatar.soulState !== 'spirit')
+                  continue;
+              const expiresAt = avatar.soulExpiresAtYear ?? Number.POSITIVE_INFINITY;
+              if (yearsElapsed < expiresAt)
+                  continue;
+              avatar.soulState = 'dispersed';
+              avatar.hasEnteredBoard = false;
+              avatar.node.hidden = true;
+              labels.push(`${avatar.unitName} đã hồn phi phách tán sau 2 năm ở trạng thái linh hồn`);
+          }
+          return labels;
       };
       const runTurn = async () => {
           if (destroyed)
@@ -28173,7 +28270,12 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           const avatar = avatars.find(item => item.id === activeAvatarId);
           if (!avatar)
               return;
-          if (avatar.skippedTurnCount > 0) {
+          if (avatar.soulState === 'dispersed') {
+              activeTurnIndex = (activeTurnIndex + 1) % AVATAR_COUNT;
+              turnTimer = window.setTimeout(runTurn, TURN_INTERVAL_MS + TURN_ADVANCE_DELAY_MS);
+              return;
+          }
+          if (avatar.soulState === 'alive' && avatar.skippedTurnCount > 0) {
               avatar.skippedTurnCount -= 1;
               turnBanner.textContent = `Lượt ${avatar.unitName} (${avatar.role.toUpperCase()}) • Tinh thần ≤ ${MONOPOLY_FAINT_SPIRIT_THRESHOLD} nên ngất tại chỗ, mất lượt`;
               syncPlayerStatusUi();
@@ -28204,10 +28306,12 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           avatar.pendingDetourFrom = advanced.pendingDetourFrom;
           avatar.activeDetourFrom = advanced.activeDetourFrom;
           avatar.detourProgress = advanced.detourProgress;
-          avatar.status = applyMonopolyStepDrain(avatar.status, dice);
-          avatar.hp = applyMonopolySurvivalHpDrain(avatar.hp, avatar.hpMaxCurrent, avatar.status, dice);
-          syncAvatarHealthUi(avatar);
-          if (shouldSkipMonopolyTurnBySpirit(avatar.status.spirit)) {
+          if (avatar.soulState === 'alive') {
+              avatar.status = applyMonopolyStepDrain(avatar.status, dice);
+              avatar.hp = applyMonopolySurvivalHpDrain(avatar.hp, avatar.hpMaxCurrent, avatar.status, dice);
+              syncAvatarHealthUi(avatar);
+          }
+          if (avatar.soulState === 'alive' && shouldSkipMonopolyTurnBySpirit(avatar.status.spirit)) {
               avatar.skippedTurnCount = Math.max(avatar.skippedTurnCount, 1);
           }
           if (advanced.activeDetourFrom == null && advanced.currentPathIndex < previousPathIndex) {
@@ -28220,6 +28324,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           let upgradeLabel = '';
           let hazardLabel = '';
           let bankruptLabel = '';
+          let lastHouseKillerId = null;
           const traversed = advanced.traversedCells ?? [];
           for (let idx = 0; idx < traversed.length; idx += 1) {
               const summary = await resolveHouseStep(avatar, traversed[idx] ?? avatar.currentCellOneBased, idx === traversed.length - 1);
@@ -28233,28 +28338,58 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
                   hazardLabel = summary.hazardLabel;
               if (summary.bankruptLabel)
                   bankruptLabel = summary.bankruptLabel;
+              if (summary.killerAvatarId != null)
+                  lastHouseKillerId = summary.killerAvatarId;
           }
           const destination = avatar.currentCellOneBased;
-          const colliders = avatars.filter(item => item.hasEnteredBoard && item.currentCellOneBased === destination && item.hp > 0);
+          const colliders = avatars.filter(item => item.hasEnteredBoard && item.soulState === 'alive' && item.currentCellOneBased === destination && item.hp > 0);
           const combat = resolveMonopolyCollisionCombat(colliders);
+          const killerByVictimId = new Map();
+          for (const target of colliders) {
+              const attacks = combat.events.filter(event => event.targetId === target.id);
+              if (!attacks.length)
+                  continue;
+              const top = attacks
+                  .slice()
+                  .sort((left, right) => right.damage - left.damage || left.attackerId - right.attackerId)[0];
+              if (top)
+                  killerByVictimId.set(target.id, top.attackerId);
+          }
           combat.affectedAvatars.forEach(affectedId => {
               const affected = avatars.find(item => item.id === affectedId);
               if (!affected)
                   return;
               syncAvatarHealthUi(affected);
           });
-          const livingAfterCombat = avatars.filter(item => item.hp > 0);
-          if (livingAfterCombat.length === 1) {
-              const champion = livingAfterCombat[0];
-              if (champion) {
-                  const reward = computeMonopolyVictoryRewardByGold(champion.wallet);
-                  turnBanner.textContent = `🏆 ${champion.unitName} (${champion.role.toUpperCase()}) thắng vì đã hạ gục toàn bộ kẻ thù • Quyết toán: ${champion.wallet.gold} vàng → thưởng ${reward}`;
-              }
+          if (avatar.soulState === 'alive' && avatar.hp <= 0) {
+              killerByVictimId.set(avatar.id, lastHouseKillerId);
+          }
+          const deathLabels = processAvatarDeaths(killerByVictimId);
+          const yearlyIncome = applyYearIncomeIfReady();
+          const spiritExpirationLabels = processSpiritExpiration();
+          const livingAfterCombat = avatars.filter(item => item.soulState === 'alive' && item.hp > 0);
+          const activeUndispersed = avatars.filter(item => item.soulState !== 'dispersed');
+          if (activeUndispersed.length <= 0) {
+              turnBanner.textContent = '🕯️ Toàn bộ avatar đã hồn phi phách tán. Trận đấu kết thúc.';
               syncPlayerWalletUi();
               syncPlayerStatusUi();
               return;
           }
-          const yearlyIncome = applyYearIncomeIfReady();
+          if (livingAfterCombat.length === 1) {
+              const champion = livingAfterCombat[0];
+              if (champion && activeUndispersed.length === 1) {
+                  const reward = computeMonopolyVictoryRewardByGold(champion.wallet);
+                  turnBanner.textContent = `🏆 ${champion.unitName} (${champion.role.toUpperCase()}) thắng vì đã hạ gục toàn bộ kẻ thù • Quyết toán: ${champion.wallet.gold} vàng → thưởng ${reward}`;
+              }
+              else if (champion) {
+                  turnBanner.textContent = `👻 ${champion.unitName} đang là người sống sót duy nhất, chờ linh hồn tan biến để kết thúc trận`;
+              }
+              syncPlayerWalletUi();
+              syncPlayerStatusUi();
+              activeTurnIndex = (activeTurnIndex + 1) % AVATAR_COUNT;
+              turnTimer = window.setTimeout(runTurn, TURN_INTERVAL_MS + TURN_ADVANCE_DELAY_MS);
+              return;
+          }
           const clashCount = colliders.length;
           const combatSummary = combat.events.length > 0
               ? ` • Giao chiến ${clashCount} mục tiêu, ${combat.events.length} đòn thường cùng lúc`
@@ -28262,6 +28397,9 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           const yearSummary = yearlyIncome > 0 ? ` • +${yearlyIncome} bạc/năm cho avatar còn sống` : '';
           const spiritNote = diceMax === 3 ? ` • Tinh thần thấp nên xúc xắc chỉ 1-${diceMax}` : '';
           const faintNote = avatar.skippedTurnCount > 0 ? ' • Tinh thần ≤ 20: lượt kế tiếp sẽ bị mất do ngất' : '';
+          const soulNote = avatar.soulState === 'spirit' ? ` • Linh hồn (${Math.max(0, (avatar.soulExpiresAtYear ?? yearsElapsed) - yearsElapsed)} năm còn lại)` : '';
+          const deathSummary = deathLabels.length > 0 ? ` • ${deathLabels.join(' • ')}` : '';
+          const expirationSummary = spiritExpirationLabels.length > 0 ? ` • ${spiritExpirationLabels.join(' • ')}` : '';
           const houseSummary = purchaseLabel
               ? ` • ${purchaseLabel}`
               : upgradeLabel
@@ -28273,7 +28411,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
                           : (paidTax > 0 || ownerCollected > 0)
                               ? ` • Nhà: thuế ${paidTax}, chủ thu ${ownerCollected}`
                               : '';
-          turnBanner.textContent = `Lượt ${avatar.unitName} (${avatar.role.toUpperCase()}) • Xúc xắc: ${dice} • Đến ô ${destination}${combatSummary}${houseSummary}${yearSummary}${spiritNote}${faintNote}`;
+          turnBanner.textContent = `Lượt ${avatar.unitName} (${avatar.role.toUpperCase()}) • Xúc xắc: ${dice} • Đến ô ${destination}${combatSummary}${houseSummary}${yearSummary}${spiritNote}${faintNote}${soulNote}${deathSummary}${expirationSummary}`;
           syncPlayerWalletUi();
           syncPlayerStatusUi();
           activeTurnIndex = (activeTurnIndex + 1) % AVATAR_COUNT;
@@ -28332,6 +28470,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'spendMonopolySilver')) exports.spendMonopolySilver = spendMonopolySilver;
   if (!Object.prototype.hasOwnProperty.call(exports, 'spendMonopolyGold')) exports.spendMonopolyGold = spendMonopolyGold;
   if (!Object.prototype.hasOwnProperty.call(exports, 'computeMonopolyVictoryRewardByGold')) exports.computeMonopolyVictoryRewardByGold = computeMonopolyVictoryRewardByGold;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'inheritGoldOnKill')) exports.inheritGoldOnKill = inheritGoldOnKill;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveMonopolyCollisionCombat')) exports.resolveMonopolyCollisionCombat = resolveMonopolyCollisionCombat;
   if (!Object.prototype.hasOwnProperty.call(exports, 'advanceMonopolyMovement')) exports.advanceMonopolyMovement = advanceMonopolyMovement;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
