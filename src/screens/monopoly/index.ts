@@ -4,6 +4,7 @@ import { CLASS_BASE, ROSTER, type ClassName } from '../../catalog.ts';
 import { computeFinalStats } from '../../data/roster-preview.ts';
 import {
   applySpiritGainWithHouseOverflow,
+  getHouseOwnerEffectSpec,
   collectHouseIncome,
   createRandomHouseSlots,
   getHouseDefinitionById,
@@ -1193,49 +1194,37 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   };
 
   const applyHouseOwnerBuff = (avatar: MonopolyAvatar, houseId: string, isLanding: boolean): void => {
+    const spec = getHouseOwnerEffectSpec(houseId);
     const gainHpRatio = (ratio: number): void => {
       avatar.hp = Math.min(avatar.hpMaxCurrent, avatar.hp + avatar.hpMaxCurrent * ratio);
     };
-    const gainStatus = (delta: Partial<MonopolyStatusMetrics>): void => {
+    const applyStatus = (delta: { thirst?: number; hunger?: number; spirit?: number } | undefined): void => {
+      if (!delta) return;
+      const spiritGain = delta.spirit ?? 0;
+      if (spec.overflowSpiritToCap && spiritGain > 0) {
+        const spiritState = applySpiritGainWithHouseOverflow(houseId, avatar.status.spirit, avatar.spiritCap, spiritGain);
+        avatar.status = {
+          thirst: clampMonopolyStatus(avatar.status.thirst + (delta.thirst ?? 0)),
+          hunger: clampMonopolyStatus(avatar.status.hunger + (delta.hunger ?? 0)),
+          spirit: spiritState.nextSpirit
+        };
+        avatar.spiritCap = spiritState.nextSpiritCap;
+        return;
+      }
       avatar.status = {
         thirst: clampMonopolyStatus(avatar.status.thirst + (delta.thirst ?? 0)),
         hunger: clampMonopolyStatus(avatar.status.hunger + (delta.hunger ?? 0)),
-        spirit: clampMonopolyStatus(avatar.status.spirit + (delta.spirit ?? 0))
+        spirit: clampMonopolyStatus(avatar.status.spirit + spiritGain)
       };
     };
-    const gainSpirit = (amount: number): void => {
-      const spiritState = applySpiritGainWithHouseOverflow(houseId, avatar.status.spirit, avatar.spiritCap, amount);
-      avatar.status = { ...avatar.status, spirit: spiritState.nextSpirit };
-      avatar.spiritCap = spiritState.nextSpiritCap;
-    };
-    if (houseId === 'tieu_diem' && isLanding) gainStatus({ thirst: 10, hunger: 10 });
-    if (houseId === 'thon_nho' && isLanding) {
-      gainHpRatio(0.03);
-      gainStatus({ thirst: 10, hunger: 5 });
+
+    const hpRatio = isLanding ? (spec.landHpRatio ?? 0) : (spec.passHpRatio ?? 0);
+    if (hpRatio > 0) gainHpRatio(hpRatio);
+    applyStatus(isLanding ? spec.landStatus : spec.passStatus);
+
+    if (isLanding && spec.ownerLandSelfDestructHpRatio != null && avatar.hp <= avatar.hpMaxCurrent * spec.ownerLandSelfDestructHpRatio) {
+      avatar.hp = 0;
     }
-    if (houseId === 'tuu_lau' && isLanding) gainStatus({ thirst: 20, spirit: 5 });
-    if (houseId === 'duoc_duong') gainHpRatio(isLanding ? 0.1 : 0.04);
-    if (houseId === 'duoc_coc') {
-      gainHpRatio(isLanding ? 0.15 : 0.06);
-      if (isLanding) gainStatus({ spirit: 3 });
-    }
-    if (houseId === 'tan_khi_mon') gainStatus({ thirst: 10, hunger: 10, spirit: 5 });
-    if (houseId === 'khi_cac') gainStatus({ thirst: 10, hunger: 10, spirit: 10 });
-    if (houseId === 'thuong_hoi') {
-      gainHpRatio(isLanding ? 0.17 : 0.08);
-      gainStatus({ thirst: isLanding ? 20 : 10, hunger: isLanding ? 20 : 10, spirit: isLanding ? 20 : 10 });
-    }
-    if (houseId === 'tien_gia_phu_de') {
-      gainHpRatio(isLanding ? 0.23 : 0.11);
-      gainStatus({ thirst: isLanding ? 25 : 12, hunger: isLanding ? 25 : 12, spirit: isLanding ? 25 : 12 });
-    }
-    if (houseId === 'ba_nen_nhang') {
-      gainStatus({ spirit: 20 });
-      if (isLanding && avatar.hp <= avatar.hpMaxCurrent * 0.08) avatar.hp = 0;
-    }
-    if (houseId === 'hop_hoan_tong') gainSpirit(isLanding ? 35 : 15);
-    if (houseId === 'anh_sat_mon') gainSpirit(isLanding ? 65 : 30);
-    if (houseId === 'tai_cac') gainStatus({ spirit: isLanding ? 100 : 50 });
   };
 
   const applyHouseCombatDamage = (owner: MonopolyAvatar, target: MonopolyAvatar, basicHits: number): number => {

@@ -10,6 +10,7 @@ import {
   createInitialMonopolyWallet,
   createMonopolyBoardCells,
   getHouseDefinitions,
+  getHouseOwnerEffectSpec,
   getMonopolyDiceMaxBySpirit,
   normalizeMonopolyWallet,
   pickRandomHouseDefinitionByTier,
@@ -459,6 +460,18 @@ it('applies Ba Nén Nhang visitor penalties by pass/land', () => {
     expect(normal.nextSpiritCap).toBe(100);
   });
 
+  it('exposes owner buff specs from house module for auditability', () => {
+    const tanKhiMon = getHouseOwnerEffectSpec('tan_khi_mon');
+    const anhSatMon = getHouseOwnerEffectSpec('anh_sat_mon');
+    const empty = getHouseOwnerEffectSpec('thi_than_thuong');
+
+    expect(tanKhiMon.passHpRatio).toBe(0.05);
+    expect(tanKhiMon.passStatus).toEqual({ thirst: 10, hunger: 10, spirit: 5 });
+    expect(anhSatMon.overflowSpiritToCap).toBe(true);
+    expect(anhSatMon.landStatus?.spirit).toBe(65);
+    expect(empty.passStatus).toBeUndefined();
+    expect(empty.landStatus).toBeUndefined();
+  });
   it('flags assassin punishment whenever Ảnh sát môn tax is underpaid', () => {
     expect(shouldTriggerAssassinTaxPunishment('anh_sat_mon', 1500, 200)).toBe(true);
     expect(shouldTriggerAssassinTaxPunishment('anh_sat_mon', 700, 700)).toBe(false);

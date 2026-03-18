@@ -26918,6 +26918,72 @@ __define('./screens/monopoly/house-module.ts', (exports, module, __require) => {
   function shouldTriggerAssassinTaxPunishment(definitionId, expectedTax, paidTax) {
       return definitionId === 'anh_sat_mon' && expectedTax > paidTax;
   }
+  /**
+   * Rule buff của chủ nhà khi đi ngang/đạp trúng.
+   * Tách riêng để màn Monopoly chỉ đọc dữ liệu từ module nhà,
+   * giúp nhiệm vụ sau dễ audit rule theo prompt mà không phải săn logic rải rác.
+   */
+  function getHouseOwnerEffectSpec(definitionId) {
+      switch (definitionId) {
+          case 'tieu_diem':
+              return { landStatus: { thirst: 10, hunger: 10 } };
+          case 'thon_nho':
+              return {
+                  landHpRatio: 0.03,
+                  landStatus: { thirst: 10, hunger: 5 }
+              };
+          case 'tuu_lau':
+              return { landStatus: { thirst: 20, spirit: 5 } };
+          case 'duoc_duong':
+              return { passHpRatio: 0.04, landHpRatio: 0.1 };
+          case 'duoc_coc':
+              return {
+                  passHpRatio: 0.06,
+                  landHpRatio: 0.15,
+                  landStatus: { spirit: 3 }
+              };
+          case 'tan_khi_mon':
+              return {
+                  passHpRatio: 0.05,
+                  landHpRatio: 0.05,
+                  passStatus: { thirst: 10, hunger: 10, spirit: 5 },
+                  landStatus: { thirst: 10, hunger: 10, spirit: 5 }
+              };
+          case 'khi_cac':
+              return {
+                  passStatus: { thirst: 10, hunger: 10, spirit: 10 },
+                  landStatus: { thirst: 10, hunger: 10, spirit: 10 }
+              };
+          case 'thuong_hoi':
+              return {
+                  passHpRatio: 0.08,
+                  landHpRatio: 0.17,
+                  passStatus: { thirst: 10, hunger: 10, spirit: 10 },
+                  landStatus: { thirst: 20, hunger: 20, spirit: 20 }
+              };
+          case 'tien_gia_phu_de':
+              return {
+                  passHpRatio: 0.11,
+                  landHpRatio: 0.23,
+                  passStatus: { thirst: 12, hunger: 12, spirit: 12 },
+                  landStatus: { thirst: 25, hunger: 25, spirit: 25 }
+              };
+          case 'ba_nen_nhang':
+              return {
+                  passStatus: { spirit: 20 },
+                  landStatus: { spirit: 20 },
+                  ownerLandSelfDestructHpRatio: 0.08
+              };
+          case 'hop_hoan_tong':
+              return { passStatus: { spirit: 15 }, landStatus: { spirit: 35 } };
+          case 'anh_sat_mon':
+              return { passStatus: { spirit: 30 }, landStatus: { spirit: 65 }, overflowSpiritToCap: true };
+          case 'tai_cac':
+              return { passStatus: { spirit: 50 }, landStatus: { spirit: 100 } };
+          default:
+              return {};
+      }
+  }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'MONOPOLY_HOUSE_SPAWN_LIMIT')) exports.MONOPOLY_HOUSE_SPAWN_LIMIT = MONOPOLY_HOUSE_SPAWN_LIMIT;
   if (!Object.prototype.hasOwnProperty.call(exports, 'HOUSE_TIER_BUY_COST')) exports.HOUSE_TIER_BUY_COST = HOUSE_TIER_BUY_COST;
@@ -26934,6 +27000,7 @@ __define('./screens/monopoly/house-module.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'getHouseVisitorPenalty')) exports.getHouseVisitorPenalty = getHouseVisitorPenalty;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applySpiritGainWithHouseOverflow')) exports.applySpiritGainWithHouseOverflow = applySpiritGainWithHouseOverflow;
   if (!Object.prototype.hasOwnProperty.call(exports, 'shouldTriggerAssassinTaxPunishment')) exports.shouldTriggerAssassinTaxPunishment = shouldTriggerAssassinTaxPunishment;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getHouseOwnerEffectSpec')) exports.getHouseOwnerEffectSpec = getHouseOwnerEffectSpec;
 });
 __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   const __dep1 = __require('./ui/dom.ts');
@@ -26948,6 +27015,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   const computeFinalStats = __dep4.computeFinalStats;
   const __dep5 = __require('./screens/monopoly/house-module.ts');
   const applySpiritGainWithHouseOverflow = __dep5.applySpiritGainWithHouseOverflow;
+  const getHouseOwnerEffectSpec = __dep5.getHouseOwnerEffectSpec;
   const collectHouseIncome = __dep5.collectHouseIncome;
   const createRandomHouseSlots = __dep5.createRandomHouseSlots;
   const getHouseDefinitionById = __dep5.getHouseDefinitionById;
@@ -27922,59 +27990,37 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           return yearlyIncome;
       };
       const applyHouseOwnerBuff = (avatar, houseId, isLanding) => {
+          const spec = getHouseOwnerEffectSpec(houseId);
           const gainHpRatio = (ratio) => {
               avatar.hp = Math.min(avatar.hpMaxCurrent, avatar.hp + avatar.hpMaxCurrent * ratio);
           };
-          const gainStatus = (delta) => {
+          const applyStatus = (delta) => {
+              if (!delta)
+                  return;
+              const spiritGain = delta.spirit ?? 0;
+              if (spec.overflowSpiritToCap && spiritGain > 0) {
+                  const spiritState = applySpiritGainWithHouseOverflow(houseId, avatar.status.spirit, avatar.spiritCap, spiritGain);
+                  avatar.status = {
+                      thirst: clampMonopolyStatus(avatar.status.thirst + (delta.thirst ?? 0)),
+                      hunger: clampMonopolyStatus(avatar.status.hunger + (delta.hunger ?? 0)),
+                      spirit: spiritState.nextSpirit
+                  };
+                  avatar.spiritCap = spiritState.nextSpiritCap;
+                  return;
+              }
               avatar.status = {
                   thirst: clampMonopolyStatus(avatar.status.thirst + (delta.thirst ?? 0)),
                   hunger: clampMonopolyStatus(avatar.status.hunger + (delta.hunger ?? 0)),
-                  spirit: clampMonopolyStatus(avatar.status.spirit + (delta.spirit ?? 0))
+                  spirit: clampMonopolyStatus(avatar.status.spirit + spiritGain)
               };
           };
-          const gainSpirit = (amount) => {
-              const spiritState = applySpiritGainWithHouseOverflow(houseId, avatar.status.spirit, avatar.spiritCap, amount);
-              avatar.status = { ...avatar.status, spirit: spiritState.nextSpirit };
-              avatar.spiritCap = spiritState.nextSpiritCap;
-          };
-          if (houseId === 'tieu_diem' && isLanding)
-              gainStatus({ thirst: 10, hunger: 10 });
-          if (houseId === 'thon_nho' && isLanding) {
-              gainHpRatio(0.03);
-              gainStatus({ thirst: 10, hunger: 5 });
+          const hpRatio = isLanding ? (spec.landHpRatio ?? 0) : (spec.passHpRatio ?? 0);
+          if (hpRatio > 0)
+              gainHpRatio(hpRatio);
+          applyStatus(isLanding ? spec.landStatus : spec.passStatus);
+          if (isLanding && spec.ownerLandSelfDestructHpRatio != null && avatar.hp <= avatar.hpMaxCurrent * spec.ownerLandSelfDestructHpRatio) {
+              avatar.hp = 0;
           }
-          if (houseId === 'tuu_lau' && isLanding)
-              gainStatus({ thirst: 20, spirit: 5 });
-          if (houseId === 'duoc_duong')
-              gainHpRatio(isLanding ? 0.1 : 0.04);
-          if (houseId === 'duoc_coc') {
-              gainHpRatio(isLanding ? 0.15 : 0.06);
-              if (isLanding)
-                  gainStatus({ spirit: 3 });
-          }
-          if (houseId === 'tan_khi_mon')
-              gainStatus({ thirst: 10, hunger: 10, spirit: 5 });
-          if (houseId === 'khi_cac')
-              gainStatus({ thirst: 10, hunger: 10, spirit: 10 });
-          if (houseId === 'thuong_hoi') {
-              gainHpRatio(isLanding ? 0.17 : 0.08);
-              gainStatus({ thirst: isLanding ? 20 : 10, hunger: isLanding ? 20 : 10, spirit: isLanding ? 20 : 10 });
-          }
-          if (houseId === 'tien_gia_phu_de') {
-              gainHpRatio(isLanding ? 0.23 : 0.11);
-              gainStatus({ thirst: isLanding ? 25 : 12, hunger: isLanding ? 25 : 12, spirit: isLanding ? 25 : 12 });
-          }
-          if (houseId === 'ba_nen_nhang') {
-              gainStatus({ spirit: 20 });
-              if (isLanding && avatar.hp <= avatar.hpMaxCurrent * 0.08)
-                  avatar.hp = 0;
-          }
-          if (houseId === 'hop_hoan_tong')
-              gainSpirit(isLanding ? 35 : 15);
-          if (houseId === 'anh_sat_mon')
-              gainSpirit(isLanding ? 65 : 30);
-          if (houseId === 'tai_cac')
-              gainStatus({ spirit: isLanding ? 100 : 50 });
       };
       const applyHouseCombatDamage = (owner, target, basicHits) => {
           const perHit = computeMonopolyBasicDamage(owner, target);

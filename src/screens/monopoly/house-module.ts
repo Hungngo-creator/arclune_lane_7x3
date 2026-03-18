@@ -48,6 +48,17 @@ export interface HouseStatusDelta {
   readonly spirit?: number;
 }
 
+export interface HouseOwnerEffectSpec {
+  readonly passHpRatio?: number;
+  readonly landHpRatio?: number;
+  readonly passStatus?: HouseStatusDelta;
+  readonly landStatus?: HouseStatusDelta;
+  /** Ba Nén Nhang: chủ đạp trúng khi HP <= 8% max thì tử vong. */
+  readonly ownerLandSelfDestructHpRatio?: number;
+  /** Ảnh sát môn: tinh thần dư chuyển 50% thành max tinh thần. */
+  readonly overflowSpiritToCap?: boolean;
+}
+
 export interface HouseVisitorPenalty {
   readonly hpRatioLoss: number;
   readonly statusDelta: HouseStatusDelta;
@@ -302,4 +313,71 @@ export function applySpiritGainWithHouseOverflow(
 /** Ảnh sát môn: nếu không trả đủ thuế thì nhận phạt theo HP hiện tại. */
 export function shouldTriggerAssassinTaxPunishment(definitionId: string | null, expectedTax: number, paidTax: number): boolean {
   return definitionId === 'anh_sat_mon' && expectedTax > paidTax;
+}
+
+/**
+ * Rule buff của chủ nhà khi đi ngang/đạp trúng.
+ * Tách riêng để màn Monopoly chỉ đọc dữ liệu từ module nhà,
+ * giúp nhiệm vụ sau dễ audit rule theo prompt mà không phải săn logic rải rác.
+ */
+export function getHouseOwnerEffectSpec(definitionId: string | null): HouseOwnerEffectSpec {
+  switch (definitionId) {
+    case 'tieu_diem':
+      return { landStatus: { thirst: 10, hunger: 10 } };
+    case 'thon_nho':
+      return {
+        landHpRatio: 0.03,
+        landStatus: { thirst: 10, hunger: 5 }
+      };
+    case 'tuu_lau':
+      return { landStatus: { thirst: 20, spirit: 5 } };
+    case 'duoc_duong':
+      return { passHpRatio: 0.04, landHpRatio: 0.1 };
+    case 'duoc_coc':
+      return {
+        passHpRatio: 0.06,
+        landHpRatio: 0.15,
+        landStatus: { spirit: 3 }
+      };
+    case 'tan_khi_mon':
+      return {
+        passHpRatio: 0.05,
+        landHpRatio: 0.05,
+        passStatus: { thirst: 10, hunger: 10, spirit: 5 },
+        landStatus: { thirst: 10, hunger: 10, spirit: 5 }
+      };
+    case 'khi_cac':
+      return {
+        passStatus: { thirst: 10, hunger: 10, spirit: 10 },
+        landStatus: { thirst: 10, hunger: 10, spirit: 10 }
+      };
+    case 'thuong_hoi':
+      return {
+        passHpRatio: 0.08,
+        landHpRatio: 0.17,
+        passStatus: { thirst: 10, hunger: 10, spirit: 10 },
+        landStatus: { thirst: 20, hunger: 20, spirit: 20 }
+      };
+    case 'tien_gia_phu_de':
+      return {
+        passHpRatio: 0.11,
+        landHpRatio: 0.23,
+        passStatus: { thirst: 12, hunger: 12, spirit: 12 },
+        landStatus: { thirst: 25, hunger: 25, spirit: 25 }
+      };
+    case 'ba_nen_nhang':
+      return {
+        passStatus: { spirit: 20 },
+        landStatus: { spirit: 20 },
+        ownerLandSelfDestructHpRatio: 0.08
+      };
+    case 'hop_hoan_tong':
+      return { passStatus: { spirit: 15 }, landStatus: { spirit: 35 } };
+    case 'anh_sat_mon':
+      return { passStatus: { spirit: 30 }, landStatus: { spirit: 65 }, overflowSpiritToCap: true };
+    case 'tai_cac':
+      return { passStatus: { spirit: 50 }, landStatus: { spirit: 100 } };
+    default:
+      return {};
+  }
 }
