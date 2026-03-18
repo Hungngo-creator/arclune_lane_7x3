@@ -27582,6 +27582,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   const MAJOR_FORTUNE_GOLD_REWARD = 5;
   const MEDIUM_FORTUNE_GOLD_REWARD = 3;
   const MINOR_FORTUNE_GOLD_REWARD = 1;
+  const MONOPOLY_YEAR_EVENT_RULE_SUMMARY = 'Mỗi năm mới luôn kích hoạt đúng 1 sự kiện ngẫu nhiên; không có sự kiện kép và mỗi sự kiện có hồi chiêu 2 năm tính từ lúc kết thúc.';
   const MONOPOLY_YEAR_EVENT_DEFINITIONS = Object.freeze([
       Object.freeze({ id: 'drought', name: 'Hạn hán', description: 'Tiêu hao khát mỗi bước di chuyển tăng gấp đôi trong 1 năm.', durationYears: 1, cooldownYears: 2 }),
       Object.freeze({ id: 'famine', name: 'Nạn đói', description: 'Tiêu hao đói mỗi bước di chuyển tăng gấp đôi trong 1 năm.', durationYears: 1, cooldownYears: 2 }),
@@ -27870,6 +27871,12 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       if (!eventId)
           return null;
       return MONOPOLY_YEAR_EVENT_BY_ID.get(eventId) ?? null;
+  }
+  function getMonopolyYearEventDisplayCopy() {
+      return MONOPOLY_YEAR_EVENT_DEFINITIONS.map(event => ({
+          name: event.name,
+          description: event.description
+      }));
   }
   const TURN_INTERVAL_MS = 800;
   const TURN_ADVANCE_DELAY_MS = 500;
@@ -28949,6 +28956,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
     exports[key] = __reexport0[key];
   }
   //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'MONOPOLY_YEAR_EVENT_RULE_SUMMARY')) exports.MONOPOLY_YEAR_EVENT_RULE_SUMMARY = MONOPOLY_YEAR_EVENT_RULE_SUMMARY;
   if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createMonopolyBoardCells')) exports.createMonopolyBoardCells = createMonopolyBoardCells;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createInitialMonopolyStatus')) exports.createInitialMonopolyStatus = createInitialMonopolyStatus;
@@ -28974,6 +28982,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'rollMonopolyYearEvent')) exports.rollMonopolyYearEvent = rollMonopolyYearEvent;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveMonopolyNewYearEvent')) exports.resolveMonopolyNewYearEvent = resolveMonopolyNewYearEvent;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getMonopolyYearEventDefinition')) exports.getMonopolyYearEventDefinition = getMonopolyYearEventDefinition;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getMonopolyYearEventDisplayCopy')) exports.getMonopolyYearEventDisplayCopy = getMonopolyYearEventDisplayCopy;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveMonopolyCollisionCombat')) exports.resolveMonopolyCollisionCombat = resolveMonopolyCollisionCombat;
   if (!Object.prototype.hasOwnProperty.call(exports, 'advanceMonopolyMovement')) exports.advanceMonopolyMovement = advanceMonopolyMovement;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
@@ -28982,6 +28991,9 @@ __define('./screens/monopoly/ready.ts', (exports, module, __require) => {
   const __dep0 = __require('./ui/dom.ts');
   const ensureStyleTag = __dep0.ensureStyleTag;
   const mountSection = __dep0.mountSection;
+  const __dep1 = __require('./screens/monopoly/index.ts');
+  const getMonopolyYearEventDisplayCopy = __dep1.getMonopolyYearEventDisplayCopy;
+  const MONOPOLY_YEAR_EVENT_RULE_SUMMARY = __dep1.MONOPOLY_YEAR_EVENT_RULE_SUMMARY;
   const STYLE_ID = 'monopoly-ready-style';
   const CSS = /* css */ `
     .app--co-ty-phu-ready{
@@ -29013,6 +29025,11 @@ __define('./screens/monopoly/ready.ts', (exports, module, __require) => {
     }
     .monopoly-ready__title{margin:0;font-size:30px;letter-spacing:.04em;text-transform:uppercase;}
     .monopoly-ready__desc{max-width:560px;margin:0;color:#9ec3e8;line-height:1.6;}
+    .monopoly-ready__events{display:grid;gap:10px;padding:16px 18px;border-radius:18px;border:1px solid rgba(148,199,255,.2);background:rgba(9,20,32,.72);}
+    .monopoly-ready__events-title{margin:0;font-size:16px;letter-spacing:.05em;text-transform:uppercase;color:#dff0ff;}
+    .monopoly-ready__events-desc{margin:0;color:#9ec3e8;line-height:1.6;}
+    .monopoly-ready__events-list{margin:0;padding-left:20px;display:grid;gap:8px;color:#e6f2ff;line-height:1.55;}
+    .monopoly-ready__events-list strong{color:#ffffff;}
     .monopoly-ready__footer{margin-top:auto;display:flex;justify-content:flex-end;}
     .monopoly-ready__start{
       border:1px solid rgba(110,231,183,.52);
@@ -29035,10 +29052,18 @@ __define('./screens/monopoly/ready.ts', (exports, module, __require) => {
       const section = document.createElement('section');
       section.className = 'monopoly-ready';
       const mount = mountSection({ root, section, rootClasses: 'app--co-ty-phu-ready' });
+      const eventItems = getMonopolyYearEventDisplayCopy()
+          .map(event => `<li><strong>${event.name}:</strong> ${event.description}</li>`)
+          .join('');
       section.innerHTML = `
       <button type="button" class="monopoly-ready__back">← Trở về Chiến Trường</button>
       <h1 class="monopoly-ready__title">Cờ Tỷ Phú</h1>
       <p class="monopoly-ready__desc">Màn hình chuẩn bị cho chế độ cờ tỷ phú. Bấm nút bắt đầu ở góc dưới bên phải để vào trận.</p>
+      <section class="monopoly-ready__events">
+        <h2 class="monopoly-ready__events-title">Sự kiện năm</h2>
+        <p class="monopoly-ready__events-desc">${MONOPOLY_YEAR_EVENT_RULE_SUMMARY}</p>
+        <ol class="monopoly-ready__events-list">${eventItems}</ol>
+      </section>
       <div class="monopoly-ready__footer">
         <button type="button" class="monopoly-ready__start">Bắt đầu</button>
       </div>

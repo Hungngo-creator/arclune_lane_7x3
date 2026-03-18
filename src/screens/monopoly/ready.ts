@@ -1,4 +1,5 @@
 import { ensureStyleTag, mountSection } from '../../ui/dom.ts';
+import { getMonopolyYearEventDisplayCopy, MONOPOLY_YEAR_EVENT_RULE_SUMMARY } from './index.ts';
 
 const STYLE_ID = 'monopoly-ready-style';
 
@@ -32,6 +33,11 @@ const CSS = /* css */ `
   }
   .monopoly-ready__title{margin:0;font-size:30px;letter-spacing:.04em;text-transform:uppercase;}
   .monopoly-ready__desc{max-width:560px;margin:0;color:#9ec3e8;line-height:1.6;}
+  .monopoly-ready__events{display:grid;gap:10px;padding:16px 18px;border-radius:18px;border:1px solid rgba(148,199,255,.2);background:rgba(9,20,32,.72);}
+  .monopoly-ready__events-title{margin:0;font-size:16px;letter-spacing:.05em;text-transform:uppercase;color:#dff0ff;}
+  .monopoly-ready__events-desc{margin:0;color:#9ec3e8;line-height:1.6;}
+  .monopoly-ready__events-list{margin:0;padding-left:20px;display:grid;gap:8px;color:#e6f2ff;line-height:1.55;}
+  .monopoly-ready__events-list strong{color:#ffffff;}
   .monopoly-ready__footer{margin-top:auto;display:flex;justify-content:flex-end;}
   .monopoly-ready__start{
     border:1px solid rgba(110,231,183,.52);
@@ -63,10 +69,19 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   section.className = 'monopoly-ready';
   const mount = mountSection({ root, section, rootClasses: 'app--co-ty-phu-ready' });
 
+  const eventItems = getMonopolyYearEventDisplayCopy()
+    .map(event => `<li><strong>${event.name}:</strong> ${event.description}</li>`)
+    .join('');
+
   section.innerHTML = `
     <button type="button" class="monopoly-ready__back">← Trở về Chiến Trường</button>
     <h1 class="monopoly-ready__title">Cờ Tỷ Phú</h1>
     <p class="monopoly-ready__desc">Màn hình chuẩn bị cho chế độ cờ tỷ phú. Bấm nút bắt đầu ở góc dưới bên phải để vào trận.</p>
+    <section class="monopoly-ready__events">
+      <h2 class="monopoly-ready__events-title">Sự kiện năm</h2>
+      <p class="monopoly-ready__events-desc">${MONOPOLY_YEAR_EVENT_RULE_SUMMARY}</p>
+      <ol class="monopoly-ready__events-list">${eventItems}</ol>
+    </section>
     <div class="monopoly-ready__footer">
       <button type="button" class="monopoly-ready__start">Bắt đầu</button>
     </div>

@@ -646,6 +646,11 @@ interface MonopolyYearEventDefinition {
   readonly cooldownYears: number;
 }
 
+export interface MonopolyYearEventDisplayCopy {
+  readonly name: string;
+  readonly description: string;
+}
+
 interface MonopolyYearEventState {
   activeEventId: MonopolyYearEventDefinition['id'] | null;
   activeUntilYear: number;
@@ -704,6 +709,8 @@ const LAC_DUONG_RING_ITEM: MonopolyInventoryItem = Object.freeze({
 const MAJOR_FORTUNE_GOLD_REWARD = 5;
 const MEDIUM_FORTUNE_GOLD_REWARD = 3;
 const MINOR_FORTUNE_GOLD_REWARD = 1;
+
+export const MONOPOLY_YEAR_EVENT_RULE_SUMMARY = 'Mỗi năm mới luôn kích hoạt đúng 1 sự kiện ngẫu nhiên; không có sự kiện kép và mỗi sự kiện có hồi chiêu 2 năm tính từ lúc kết thúc.';
 
 const MONOPOLY_YEAR_EVENT_DEFINITIONS: ReadonlyArray<MonopolyYearEventDefinition> = Object.freeze([
   Object.freeze({ id: 'drought', name: 'Hạn hán', description: 'Tiêu hao khát mỗi bước di chuyển tăng gấp đôi trong 1 năm.', durationYears: 1, cooldownYears: 2 }),
@@ -1043,6 +1050,13 @@ export function resolveMonopolyNewYearEvent(
 export function getMonopolyYearEventDefinition(eventId: MonopolyYearEventDefinition['id'] | null): MonopolyYearEventDefinition | null {
   if (!eventId) return null;
   return MONOPOLY_YEAR_EVENT_BY_ID.get(eventId) ?? null;
+}
+
+export function getMonopolyYearEventDisplayCopy(): ReadonlyArray<MonopolyYearEventDisplayCopy> {
+  return MONOPOLY_YEAR_EVENT_DEFINITIONS.map(event => ({
+    name: event.name,
+    description: event.description
+  }));
 }
 
 const TURN_INTERVAL_MS = 800;
