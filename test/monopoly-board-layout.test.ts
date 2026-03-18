@@ -353,6 +353,19 @@ describe('monopoly house module', () => {
     expect(slots.every(slot => slot.marker === '?')).toBe(true);
   });
 
+  it('can exclude mini (24) + micro (8) zones from random house slots', () => {
+    const cells = createMonopolyBoardCells();
+    const blockedZones = cells.filter(cell => cell.track === 'mini' || cell.track === 'micro');
+    const eligibleCells = cells.filter(cell => cell.track !== 'mini' && cell.track !== 'micro');
+    const blockedZoneCellIds = new Set(blockedZones.map(cell => cell.index + 1));
+    const slots = createRandomHouseSlots(eligibleCells, () => 0.2);
+
+    expect(blockedZones).toHaveLength(32);
+    expect(eligibleCells).toHaveLength(84);
+    expect(slots).toHaveLength(16);
+    expect(slots.every(slot => !blockedZoneCellIds.has(slot.cellIndex))).toBe(true);
+  });
+
   it('rolls house tier using weighted table and can reveal purchase', () => {
     expect(rollHouseTier(() => 0.01)).toBe(5);
     expect(rollHouseTier(() => 0.05)).toBe(4);

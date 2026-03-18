@@ -1136,7 +1136,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   board.appendChild(fragment);
 
   const importedUnits = shuffled(buildMonopolyImportPool(AVATAR_COUNT));
-  const houseSlots = createRandomHouseSlots(BOARD_TEMPLATE);
+  const randomHouseEligibleCells = BOARD_TEMPLATE.filter(cell => cell.track !== 'mini' && cell.track !== 'micro');
+  const houseSlots = createRandomHouseSlots(randomHouseEligibleCells);
   const houseByCell = new Map<number, HiddenHouseSlot>(houseSlots.map(slot => [slot.cellIndex, slot]));
   const playerAvatarId = randomInt(1, AVATAR_COUNT);
   const avatars: MonopolyAvatar[] = [];

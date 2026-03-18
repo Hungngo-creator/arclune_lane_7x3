@@ -27940,7 +27940,8 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       };
       board.appendChild(fragment);
       const importedUnits = shuffled(buildMonopolyImportPool(AVATAR_COUNT));
-      const houseSlots = createRandomHouseSlots(BOARD_TEMPLATE);
+      const randomHouseEligibleCells = BOARD_TEMPLATE.filter(cell => cell.track !== 'mini' && cell.track !== 'micro');
+      const houseSlots = createRandomHouseSlots(randomHouseEligibleCells);
       const houseByCell = new Map(houseSlots.map(slot => [slot.cellIndex, slot]));
       const playerAvatarId = randomInt(1, AVATAR_COUNT);
       const avatars = [];
