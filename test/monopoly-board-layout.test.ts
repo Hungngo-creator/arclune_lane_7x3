@@ -18,9 +18,12 @@ import {
   getHouseVisitorPenalty,
   refillMonopolySilverIfEmpty,
   revealHousePurchase,
+  rollLacDuongEncounter,
+  rollLacDuongRingDestiny,
   resetHouseSlotsByOwner,
   rollHouseTier,
   settleHouseTraverse,
+  pickMonopolyModuleCell,
   shouldTriggerAssassinTaxPunishment,
   upgradeHouse,
   resolveMonopolyCollisionCombat,
@@ -187,6 +190,40 @@ describe('monopoly board layout', () => {
       return rowDistance + colDistance === 1;
     }));
     expect(touchesMini).toBe(false);
+  });
+});
+
+describe('monopoly lạc dương trấn module', () => {
+  it('rolls encounter chance đúng mốc 20% nhỏ, 10% thiếu nữ', () => {
+    expect(rollLacDuongEncounter(0)).toBe('minor');
+    expect(rollLacDuongEncounter(0.1999)).toBe('minor');
+    expect(rollLacDuongEncounter(0.2)).toBe('maiden');
+    expect(rollLacDuongEncounter(0.2999)).toBe('maiden');
+    expect(rollLacDuongEncounter(0.3)).toBe('none');
+  });
+
+  it('rolls nhẫn đá cũ đúng mốc 15/20/25/40', () => {
+    expect(rollLacDuongRingDestiny(0.01)).toBe('major');
+    expect(rollLacDuongRingDestiny(0.2)).toBe('medium');
+    expect(rollLacDuongRingDestiny(0.55)).toBe('minor');
+    expect(rollLacDuongRingDestiny(0.9)).toBe('none');
+  });
+
+  it('never picks module cell inside mini/micro tracks và không đè ô đã chiếm', () => {
+    const cells = createMonopolyBoardCells();
+    const miniAndMicro = cells
+      .filter(cell => cell.track === 'mini' || cell.track === 'micro')
+      .map(cell => cell.index + 1);
+    const occupied = new Set<number>(miniAndMicro);
+    occupied.add(21);
+    const picked = pickMonopolyModuleCell(cells, occupied);
+    expect(picked).not.toBeNull();
+    if (picked != null) {
+      expect(occupied.has(picked)).toBe(false);
+      const cell = cells[picked - 1];
+      expect(cell.track).not.toBe('mini');
+      expect(cell.track).not.toBe('micro');
+    }
   });
 });
 
