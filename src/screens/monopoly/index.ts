@@ -1319,7 +1319,10 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
         ? true
         : await promptHousePurchaseDecision(root, avatar);
       if (!willBuy) return { paidTax: 0, ownerCollected: 0, purchaseLabel: `${avatar.unitName} bỏ qua mua ô ?`, upgradeLabel: '', hazardLabel: resolveRangedHouseThreat(avatar, cellOneBased), bankruptLabel: '' };
-      const purchase = revealHousePurchase(slot, avatar.id, avatar.wallet.silver, Math.random);
+      // Giá nhà tính bằng bạc, nhưng ví trong trận là bạc + vàng.
+      // Luôn quy đổi tổng tài sản về "đơn vị bạc" để mua đúng theo luật.
+      const totalSilverBudget = avatar.wallet.gold * MONOPOLY_CURRENCY_RATIO + avatar.wallet.silver;
+      const purchase = revealHousePurchase(slot, avatar.id, totalSilverBudget, Math.random);
       if (!purchase.ok || !purchase.definition) {
         return { paidTax: 0, ownerCollected: 0, purchaseLabel: `${avatar.unitName} không đủ bạc để mở ô ?`, upgradeLabel: '', hazardLabel: resolveRangedHouseThreat(avatar, cellOneBased), bankruptLabel: '' };
       }
@@ -1331,15 +1334,20 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
 
     const totalSilver = avatar.wallet.gold * MONOPOLY_CURRENCY_RATIO + avatar.wallet.silver;
     const settled = settleHouseTraverse(slot, avatar.id, isLanding, totalSilver);
-    if (settled.ownerCollectedSilver > 0) {
-      avatar.wallet = grantMonopolySilver(avatar.wallet, settled.ownerCollectedSilver);
+    if (settled.ownerTriggeredHouse) {
+      if (settled.ownerCollectedSilver > 0) {
+        avatar.wallet = grantMonopolySilver(avatar.wallet, settled.ownerCollectedSilver);
+      }
+      // Buff của chủ nhà vẫn được kích hoạt khi đi ngang/đạp trúng,
+      // kể cả lúc treasury đang trống.
       applyHouseOwnerBuff(avatar, slot.definitionId ?? '', isLanding);
       let upgradeLabel = '';
       if (isLanding) {
         const def = getHouseDefinitionById(slot.definitionId);
         const tryUpgrade = Boolean(def?.upgradeCostSilver != null) && (avatar.role === 'player' || Math.random() < 0.65);
         if (tryUpgrade) {
-          const upgraded = upgradeHouse(slot, avatar.wallet.silver, Math.random);
+          const totalSilverBudget = avatar.wallet.gold * MONOPOLY_CURRENCY_RATIO + avatar.wallet.silver;
+          const upgraded = upgradeHouse(slot, totalSilverBudget, Math.random);
           if (upgraded.ok && upgraded.nextDefinition) {
             avatar.wallet = normalizeMonopolyWallet({ ...avatar.wallet, silver: upgraded.nextWalletSilver });
             upgradeLabel = `${avatar.unitName} nâng cấp lên ${upgraded.nextDefinition.name}`;
