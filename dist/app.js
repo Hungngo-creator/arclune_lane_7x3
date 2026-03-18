@@ -27182,8 +27182,8 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       pointer-events:none;
     }
     .monopoly-inventory__slot{
-      width:36px;
-      height:36px;
+      width:48px;
+      height:48px;
       border-radius:10px;
       border:1px solid rgba(150, 200, 255, 0.58);
       background:rgba(8, 21, 37, 0.88);
@@ -27543,17 +27543,17 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   const MONOPOLY_STARTING_GOLD = 4;
   const MONOPOLY_STARTING_SILVER = 1;
   const MONOPOLY_INVENTORY_CAP = 5;
+  const MONOPOLY_INVENTORY_SLOT_SIZE = 48;
   const LAC_DUONG_MANTOU_COST_SILVER = 20;
   const LAC_DUONG_MANTOU_HUNGER_GAIN = 10;
-  const LAC_DUONG_HUNGER_LOSS_ON_ENTRY = 12;
   const LAC_DUONG_RING_ITEM = Object.freeze({
       id: 'old-stone-ring',
       label: 'Nhẫn đá cũ',
       icon: '💍'
   });
-  const MAJOR_FORTUNE_GOLD_REWARD = 12;
-  const MEDIUM_FORTUNE_GOLD_REWARD = 8;
-  const MINOR_FORTUNE_GOLD_REWARD = 5;
+  const MAJOR_FORTUNE_GOLD_REWARD = 5;
+  const MEDIUM_FORTUNE_GOLD_REWARD = 3;
+  const MINOR_FORTUNE_GOLD_REWARD = 1;
   const normalizeWalletAmount = (value) => {
       if (typeof value !== 'number' || !Number.isFinite(value))
           return 0;
@@ -28142,6 +28142,8 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           for (const item of visibleItems) {
               const slot = document.createElement('span');
               slot.className = 'monopoly-inventory__slot';
+              slot.style.width = `${MONOPOLY_INVENTORY_SLOT_SIZE}px`;
+              slot.style.height = `${MONOPOLY_INVENTORY_SLOT_SIZE}px`;
               slot.textContent = item.icon;
               slot.title = item.label;
               inventoryBar.appendChild(slot);
@@ -28515,12 +28517,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           const resolveLacDuongStep = (actor, cellOneBased) => {
               if (lacDuongCell == null || cellOneBased !== lacDuongCell)
                   return '';
-              actor.status = {
-                  thirst: actor.status.thirst,
-                  hunger: clampMonopolyStatus(actor.status.hunger - LAC_DUONG_HUNGER_LOSS_ON_ENTRY),
-                  spirit: actor.status.spirit
-              };
-              let label = `${actor.unitName} vào Lạc Dương Trấn, bụng đói đi (${LAC_DUONG_HUNGER_LOSS_ON_ENTRY} điểm đói).`;
+              let label = `${actor.unitName} đạp lên ô Lạc Dương Trấn và buộc phải mua 2 màn thầu.`;
               const eat = spendMonopolySilver(actor.wallet, LAC_DUONG_MANTOU_COST_SILVER);
               if (eat.paid) {
                   actor.wallet = eat.wallet;
@@ -28560,9 +28557,10 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           };
           for (let idx = 0; idx < traversed.length; idx += 1) {
               const steppedCell = traversed[idx] ?? avatar.currentCellOneBased;
-              const lacDuongLabel = resolveLacDuongStep(avatar, steppedCell);
+              const isLandingStep = idx === traversed.length - 1;
+              const lacDuongLabel = isLandingStep ? resolveLacDuongStep(avatar, steppedCell) : '';
               const fortuneLabel = resolveFortuneTarget(avatar, steppedCell);
-              const summary = await resolveHouseStep(avatar, steppedCell, idx === traversed.length - 1);
+              const summary = await resolveHouseStep(avatar, steppedCell, isLandingStep);
               paidTax += summary.paidTax;
               ownerCollected += summary.ownerCollected;
               if (lacDuongLabel)
