@@ -27546,6 +27546,12 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   const MONOPOLY_INVENTORY_SLOT_SIZE = 48;
   const LAC_DUONG_MANTOU_COST_SILVER = 20;
   const LAC_DUONG_MANTOU_HUNGER_GAIN = 10;
+  const LAC_DUONG_MODULE_TOOLTIP = [
+      'Lạc Dương Trấn (chỉ kích hoạt khi đạp trúng ô, đi ngang không tính).',
+      'Vào trấn: bắt buộc mua 2 màn thầu (-20 bạc, +10 đói).',
+      '20% cơ duyên nhỏ (+1 vàng), 10% gặp thiếu nữ tặng nhẫn đá cũ.',
+      'Nhẫn đá cũ: 15% cơ duyên lớn (+5 vàng), 20% cơ duyên vừa (+3 vàng), 25% cơ duyên nhỏ (+1 vàng), 40% không có gì.'
+  ].join(' ');
   const LAC_DUONG_RING_ITEM = Object.freeze({
       id: 'old-stone-ring',
       label: 'Nhẫn đá cũ',
@@ -28099,7 +28105,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           }
           if (lacDuongCell != null && cell.index + 1 === lacDuongCell) {
               node.textContent = 'LĐT';
-              node.title = `Lạc Dương Trấn #${cell.index + 1}`;
+              node.title = `${LAC_DUONG_MODULE_TOOLTIP} (Ô #${cell.index + 1})`;
           }
       }
       const playerAvatar = avatars.find(avatar => avatar.role === 'player') ?? null;
