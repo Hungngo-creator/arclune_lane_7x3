@@ -238,7 +238,8 @@ export function settleHouseTraverse(
   slot: HiddenHouseSlot,
   actorAvatarId: number,
   isLanding: boolean,
-  maxPayableSilver = Number.POSITIVE_INFINITY
+  maxPayableSilver = Number.POSITIVE_INFINITY,
+  hasPassedBeyondCell = true,
 ): HouseTraverseResult {
   const def = getHouseDefinitionById(slot.definitionId);
   if (!def || slot.ownerAvatarId == null) {
@@ -251,7 +252,9 @@ export function settleHouseTraverse(
     return { expectedTaxSilver: 0, paidTaxSilver: 0, ownerCollectedSilver, houseTreasurySilver: slot.treasurySilver, ownerTriggeredHouse: true };
   }
 
-  const expectedTaxSilver = isLanding ? def.landTaxSilver : def.passTaxSilver;
+  const expectedTaxSilver = isLanding
+    ? def.landTaxSilver
+    : (hasPassedBeyondCell ? def.passTaxSilver : 0);
   const paidTaxSilver = Math.max(0, Math.min(expectedTaxSilver, Math.floor(maxPayableSilver)));
   slot.treasurySilver += paidTaxSilver;
   return { expectedTaxSilver, paidTaxSilver, ownerCollectedSilver: 0, houseTreasurySilver: slot.treasurySilver, ownerTriggeredHouse: false };

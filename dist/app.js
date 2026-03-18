@@ -26860,7 +26860,7 @@ __define('./screens/monopoly/house-module.ts', (exports, module, __require) => {
       return slot.treasurySilver;
   }
   /** Xử lý đi ngang / đạp trúng ô nhà. Thuế luôn cộng vào treasury để chủ thu khi đi ngang. */
-  function settleHouseTraverse(slot, actorAvatarId, isLanding, maxPayableSilver = Number.POSITIVE_INFINITY) {
+  function settleHouseTraverse(slot, actorAvatarId, isLanding, maxPayableSilver = Number.POSITIVE_INFINITY, hasPassedBeyondCell = true) {
       const def = getHouseDefinitionById(slot.definitionId);
       if (!def || slot.ownerAvatarId == null) {
           return { expectedTaxSilver: 0, paidTaxSilver: 0, ownerCollectedSilver: 0, houseTreasurySilver: slot.treasurySilver, ownerTriggeredHouse: false };
@@ -26870,7 +26870,9 @@ __define('./screens/monopoly/house-module.ts', (exports, module, __require) => {
           slot.treasurySilver = 0;
           return { expectedTaxSilver: 0, paidTaxSilver: 0, ownerCollectedSilver, houseTreasurySilver: slot.treasurySilver, ownerTriggeredHouse: true };
       }
-      const expectedTaxSilver = isLanding ? def.landTaxSilver : def.passTaxSilver;
+      const expectedTaxSilver = isLanding
+          ? def.landTaxSilver
+          : (hasPassedBeyondCell ? def.passTaxSilver : 0);
       const paidTaxSilver = Math.max(0, Math.min(expectedTaxSilver, Math.floor(maxPayableSilver)));
       slot.treasurySilver += paidTaxSilver;
       return { expectedTaxSilver, paidTaxSilver, ownerCollectedSilver: 0, houseTreasurySilver: slot.treasurySilver, ownerTriggeredHouse: false };
@@ -27145,6 +27147,29 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       background:rgba(8, 21, 37, 0.78);
       color:#d6ebff;
       font-size:14px;
+    }
+    .monopoly-screen__automation{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      flex-wrap:wrap;
+      padding:10px 14px;
+      border:1px solid rgba(148, 199, 255, 0.2);
+      border-radius:12px;
+      background:rgba(8, 21, 37, 0.52);
+    }
+    .monopoly-screen__automation-item{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      color:#d6ebff;
+      font-size:13px;
+      cursor:pointer;
+      user-select:none;
+    }
+    .monopoly-screen__automation-item input{
+      accent-color:#73d7b2;
+      cursor:pointer;
     }
     .monopoly-board{
       width:min(96vw, 1180px);
@@ -27846,6 +27871,30 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       const playerStatusNode = document.createElement('div');
       playerStatusNode.className = 'monopoly-screen__meta';
       wrapper.appendChild(playerStatusNode);
+      const automationSettings = {
+          autoBuyHouseEnabled: false,
+          autoUpgradeHouseEnabled: false
+      };
+      const automationBar = document.createElement('div');
+      automationBar.className = 'monopoly-screen__automation';
+      const autoBuyLabel = document.createElement('label');
+      autoBuyLabel.className = 'monopoly-screen__automation-item';
+      const autoBuyInput = document.createElement('input');
+      autoBuyInput.type = 'checkbox';
+      autoBuyInput.checked = automationSettings.autoBuyHouseEnabled;
+      const autoBuyText = document.createElement('span');
+      autoBuyText.textContent = 'Tự động mua nhà';
+      autoBuyLabel.append(autoBuyInput, autoBuyText);
+      const autoUpgradeLabel = document.createElement('label');
+      autoUpgradeLabel.className = 'monopoly-screen__automation-item';
+      const autoUpgradeInput = document.createElement('input');
+      autoUpgradeInput.type = 'checkbox';
+      autoUpgradeInput.checked = automationSettings.autoUpgradeHouseEnabled;
+      const autoUpgradeText = document.createElement('span');
+      autoUpgradeText.textContent = 'Tự động nâng cấp nhà';
+      autoUpgradeLabel.append(autoUpgradeInput, autoUpgradeText);
+      automationBar.append(autoBuyLabel, autoUpgradeLabel);
+      wrapper.appendChild(automationBar);
       const board = document.createElement('div');
       board.className = 'monopoly-board';
       board.style.height = `${BOARD_ISOMETRIC_LAYOUT.height}px`;
@@ -27947,8 +27996,25 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
               skippedTurnCount: 0,
               soulState: 'alive',
               soulExpiresAtYear: null,
+              autoBuyHouseEnabled: automationSettings.autoBuyHouseEnabled,
+              autoUpgradeHouseEnabled: automationSettings.autoUpgradeHouseEnabled,
           });
       }
+      const applyAutomationForAllAvatars = () => {
+          for (const avatar of avatars) {
+              avatar.autoBuyHouseEnabled = automationSettings.autoBuyHouseEnabled;
+              avatar.autoUpgradeHouseEnabled = automationSettings.autoUpgradeHouseEnabled;
+          }
+      };
+      applyAutomationForAllAvatars();
+      autoBuyInput.addEventListener('change', () => {
+          automationSettings.autoBuyHouseEnabled = autoBuyInput.checked;
+          applyAutomationForAllAvatars();
+      });
+      autoUpgradeInput.addEventListener('change', () => {
+          automationSettings.autoUpgradeHouseEnabled = autoUpgradeInput.checked;
+          applyAutomationForAllAvatars();
+      });
       for (const { node, cell } of cellNodes) {
           if (houseByCell.has(cell.index + 1)) {
               node.textContent = '?';
@@ -28149,9 +28215,11 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           if (slot.revealedTier == null || slot.ownerAvatarId == null) {
               if (!isLanding)
                   return { paidTax: 0, ownerCollected: 0, purchaseLabel: '', upgradeLabel: '', hazardLabel: resolveRangedHouseThreat(avatar, cellOneBased), bankruptLabel: '', killerAvatarId: null };
-              const willBuy = avatar.role === 'npc'
+              const willBuy = avatar.autoBuyHouseEnabled
                   ? true
-                  : await promptHousePurchaseDecision(root, avatar);
+                  : avatar.role === 'npc'
+                      ? true
+                      : await promptHousePurchaseDecision(root, avatar);
               if (!willBuy)
                   return { paidTax: 0, ownerCollected: 0, purchaseLabel: `${avatar.unitName} bỏ qua mua ô ?`, upgradeLabel: '', hazardLabel: resolveRangedHouseThreat(avatar, cellOneBased), bankruptLabel: '', killerAvatarId: null };
               // Giá nhà tính bằng bạc, nhưng ví trong trận là bạc + vàng.
@@ -28168,7 +28236,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
               return { paidTax: 0, ownerCollected: 0, purchaseLabel: `${avatar.unitName} mua ${purchase.definition.name} cấp ${purchase.tier}`, upgradeLabel: '', hazardLabel: resolveRangedHouseThreat(avatar, cellOneBased), bankruptLabel: '', killerAvatarId: null };
           }
           const totalSilver = avatar.wallet.gold * MONOPOLY_CURRENCY_RATIO + avatar.wallet.silver;
-          const settled = settleHouseTraverse(slot, avatar.id, isLanding, totalSilver);
+          const settled = settleHouseTraverse(slot, avatar.id, isLanding, totalSilver, !isLanding);
           if (settled.ownerTriggeredHouse) {
               if (settled.ownerCollectedSilver > 0) {
                   avatar.wallet = grantMonopolySilver(avatar.wallet, settled.ownerCollectedSilver);
@@ -28179,7 +28247,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
               let upgradeLabel = '';
               if (isLanding) {
                   const def = getHouseDefinitionById(slot.definitionId);
-                  const tryUpgrade = Boolean(def?.upgradeCostSilver != null) && (avatar.role === 'player' || Math.random() < 0.65);
+                  const tryUpgrade = Boolean(def?.upgradeCostSilver != null) && (avatar.autoUpgradeHouseEnabled || avatar.role === 'player' || Math.random() < 0.65);
                   if (tryUpgrade) {
                       const totalSilverBudget = avatar.wallet.gold * MONOPOLY_CURRENCY_RATIO + avatar.wallet.silver;
                       const upgraded = upgradeHouse(slot, totalSilverBudget, Math.random);
