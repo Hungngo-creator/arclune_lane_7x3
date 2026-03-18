@@ -643,6 +643,7 @@ const MONOPOLY_THIRST_HP_DRAIN_PER_STEP_RATIO = 0.01;
 const MONOPOLY_HUNGER_HP_DRAIN_PER_STEP_RATIO = 0.005;
 
 const MONOPOLY_CURRENCY_RATIO = 100;
+const MONOPOLY_WALLET_CAP = 99_999;
 const MONOPOLY_STARTING_GOLD = 4;
 const MONOPOLY_STARTING_SILVER = 1;
 const MONOPOLY_INVENTORY_CAP = 5;
@@ -743,9 +744,13 @@ export function applyMonopolySurvivalHpDrain(
 export function normalizeMonopolyWallet(wallet: MonopolyWallet): MonopolyWallet {
   const normalizedGold = normalizeWalletAmount(wallet.gold);
   const normalizedSilver = normalizeWalletAmount(wallet.silver);
+  const totalSilver = normalizedGold * MONOPOLY_CURRENCY_RATIO + normalizedSilver;
+  const cappedTotalSilver = Math.min(totalSilver, (MONOPOLY_WALLET_CAP * MONOPOLY_CURRENCY_RATIO) + MONOPOLY_WALLET_CAP);
+  const nextGold = Math.min(MONOPOLY_WALLET_CAP, Math.floor(cappedTotalSilver / MONOPOLY_CURRENCY_RATIO));
+  const nextSilver = Math.min(MONOPOLY_WALLET_CAP, cappedTotalSilver - nextGold * MONOPOLY_CURRENCY_RATIO);
   return {
-    gold: normalizedGold,
-    silver: normalizedSilver
+    gold: nextGold,
+    silver: nextSilver
   };
 }
 
