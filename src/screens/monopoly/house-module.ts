@@ -192,7 +192,7 @@ export function getHouseDefinitionById(definitionId: string | null): HouseDefini
   return DEFINITIONS.find(entry => entry.id === definitionId) ?? null;
 }
 
-export function revealHousePurchase(slot: HiddenHouseSlot, buyerAvatarId: number, walletSilver: number, rng: () => number = Math.random): {
+export function revealHousePurchase(slot: HiddenHouseSlot, buyerAvatarId: number, walletSilver: number, rng: () => number = Math.random, costMultiplier = 1): {
   ok: boolean;
   nextWalletSilver: number;
   tier: HouseTier;
@@ -200,7 +200,8 @@ export function revealHousePurchase(slot: HiddenHouseSlot, buyerAvatarId: number
   reason?: string;
 } {
   const tier = rollHouseTier(rng);
-  const cost = HOUSE_TIER_BUY_COST[tier];
+  const normalizedCostMultiplier = Number.isFinite(costMultiplier) ? Math.max(0, costMultiplier) : 1;
+  const cost = Math.ceil(HOUSE_TIER_BUY_COST[tier] * normalizedCostMultiplier);
   if (walletSilver < cost) {
     return { ok: false, nextWalletSilver: walletSilver, tier, definition: null, reason: 'not_enough_silver' };
   }
@@ -240,6 +241,7 @@ export function settleHouseTraverse(
   isLanding: boolean,
   maxPayableSilver = Number.POSITIVE_INFINITY,
   hasPassedBeyondCell = true,
+  taxMultiplier = 1,
 ): HouseTraverseResult {
   const def = getHouseDefinitionById(slot.definitionId);
   if (!def || slot.ownerAvatarId == null) {
@@ -252,15 +254,16 @@ export function settleHouseTraverse(
     return { expectedTaxSilver: 0, paidTaxSilver: 0, ownerCollectedSilver, houseTreasurySilver: slot.treasurySilver, ownerTriggeredHouse: true };
   }
 
-  const expectedTaxSilver = isLanding
+  const normalizedTaxMultiplier = Number.isFinite(taxMultiplier) ? Math.max(0, taxMultiplier) : 1;
+  const expectedTaxSilver = Math.ceil((isLanding
     ? def.landTaxSilver
-    : (hasPassedBeyondCell ? def.passTaxSilver : 0);
+    : (hasPassedBeyondCell ? def.passTaxSilver : 0)) * normalizedTaxMultiplier);
   const paidTaxSilver = Math.max(0, Math.min(expectedTaxSilver, Math.floor(maxPayableSilver)));
   slot.treasurySilver += paidTaxSilver;
   return { expectedTaxSilver, paidTaxSilver, ownerCollectedSilver: 0, houseTreasurySilver: slot.treasurySilver, ownerTriggeredHouse: false };
 }
 
-export function upgradeHouse(slot: HiddenHouseSlot, walletSilver: number, rng: () => number = Math.random): {
+export function upgradeHouse(slot: HiddenHouseSlot, walletSilver: number, rng: () => number = Math.random, costMultiplier = 1): {
   ok: boolean;
   nextWalletSilver: number;
   nextDefinition: HouseDefinition | null;
@@ -273,14 +276,16 @@ export function upgradeHouse(slot: HiddenHouseSlot, walletSilver: number, rng: (
   if (currentDef.upgradeCostSilver == null || slot.revealedTier >= 5) {
     return { ok: false, nextWalletSilver: walletSilver, nextDefinition: null, reason: 'max_tier' };
   }
-  if (walletSilver < currentDef.upgradeCostSilver) {
+  const normalizedCostMultiplier = Number.isFinite(costMultiplier) ? Math.max(0, costMultiplier) : 1;
+  const upgradeCostSilver = Math.ceil((currentDef.upgradeCostSilver ?? 0) * normalizedCostMultiplier);
+  if (walletSilver < upgradeCostSilver) {
     return { ok: false, nextWalletSilver: walletSilver, nextDefinition: null, reason: 'not_enough_silver' };
   }
   const nextTier = (slot.revealedTier + 1) as HouseTier;
   const nextDefinition = pickRandomHouseDefinitionByTier(nextTier, rng);
   slot.revealedTier = nextTier;
   slot.definitionId = nextDefinition.id;
-  return { ok: true, nextWalletSilver: walletSilver - currentDef.upgradeCostSilver, nextDefinition };
+  return { ok: true, nextWalletSilver: walletSilver - upgradeCostSilver, nextDefinition };
 }
 
 export function getHouseDefinitions(): ReadonlyArray<HouseDefinition> {

@@ -30,7 +30,10 @@ import {
   upgradeHouse,
   resolveMonopolyCollisionCombat,
   shouldSkipMonopolyTurnBySpirit,
-  spendMonopolySilver
+  spendMonopolySilver,
+  createInitialMonopolyYearEventState,
+  getMonopolyYearRuleModifiers,
+  resolveMonopolyNewYearEvent,
 } from '../src/screens/monopoly/index.ts';
 
 describe('monopoly board layout', () => {
@@ -606,5 +609,70 @@ it('applies Ba Nén Nhang visitor penalties by pass/land', () => {
     expect(shouldTriggerAssassinTaxPunishment('anh_sat_mon', 1500, 200)).toBe(true);
     expect(shouldTriggerAssassinTaxPunishment('anh_sat_mon', 700, 700)).toBe(false);
     expect(shouldTriggerAssassinTaxPunishment('tai_cac', 1700, 0)).toBe(false);
+  });
+});
+
+describe('monopoly yearly events', () => {
+  it('applies drought and famine multipliers to step drain', () => {
+    const base = createInitialMonopolyStatus();
+    const drought = applyMonopolyStepDrain(base, 2, getMonopolyYearRuleModifiers('drought'));
+    const famine = applyMonopolyStepDrain(base, 2, getMonopolyYearRuleModifiers('famine'));
+
+    expect(drought.thirst).toBeLessThan(base.thirst - 3);
+    expect(drought.hunger).toBeCloseTo(base.hunger - 2 * 1.2, 5);
+    expect(famine.hunger).toBeLessThan(base.hunger - 4);
+    expect(famine.thirst).toBeCloseTo(base.thirst - 2 * 1.6, 5);
+  });
+
+  it('rotates yearly events with 2-year cooldown after the event ends', () => {
+    let state = createInitialMonopolyYearEventState();
+    const cells = createMonopolyBoardCells()
+      .filter(cell => cell.track !== 'mini' && cell.track !== 'micro')
+      .map(cell => cell.index + 1);
+    const seen: string[] = [];
+
+    for (let year = 1; year <= 6; year += 1) {
+      const outcome = resolveMonopolyNewYearEvent(year, state, cells, () => 0);
+      state = outcome.nextState;
+      seen.push(outcome.event.id);
+    }
+
+    expect(seen.slice(0, 4)).toEqual(['drought', 'famine', 'inflation', 'drought']);
+    expect(seen[4]).toBe('famine');
+  });
+
+  it('spawns đúng số ô cho loạn lưu và cây trái được mùa', () => {
+    const cells = createMonopolyBoardCells()
+      .filter(cell => cell.track !== 'mini' && cell.track !== 'micro')
+      .map(cell => cell.index + 1);
+    const baseState = createInitialMonopolyYearEventState();
+
+    const chaos = resolveMonopolyNewYearEvent(1, {
+      ...baseState,
+      cooldownUntilYearByEvent: {
+        drought: 99,
+        famine: 99,
+        inflation: 99,
+        fruit_bounty: 99,
+        vitality: 99
+      }
+    }, cells, () => 0.25);
+    expect(chaos.event.id).toBe('spacetime_chaos');
+    expect(chaos.nextState.chaosCells).toHaveLength(3);
+    expect(new Set(chaos.nextState.chaosCells).size).toBe(3);
+
+    const fruit = resolveMonopolyNewYearEvent(1, {
+      ...baseState,
+      cooldownUntilYearByEvent: {
+        drought: 99,
+        famine: 99,
+        inflation: 99,
+        spacetime_chaos: 99,
+        vitality: 99
+      }
+    }, cells, () => 0.8);
+    expect(fruit.event.id).toBe('fruit_bounty');
+    expect(fruit.nextState.fruitCells).toHaveLength(5);
+    expect(new Set(fruit.nextState.fruitCells).size).toBe(5);
   });
 });
