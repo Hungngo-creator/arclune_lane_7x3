@@ -1347,19 +1347,20 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       }
       return { paidTax: 0, ownerCollected: settled.ownerCollectedSilver, purchaseLabel: '', upgradeLabel, hazardLabel: resolveRangedHouseThreat(avatar, cellOneBased), bankruptLabel: '' };
     }
-    if (settled.paidTaxSilver <= 0) {
-      return { paidTax: 0, ownerCollected: 0, purchaseLabel: '', upgradeLabel: '', hazardLabel: [resolveHouseCombatThreat(slot, avatar, isLanding), resolveRangedHouseThreat(avatar, cellOneBased)].filter(Boolean).join(' • '), bankruptLabel: '' };
+    if (settled.paidTaxSilver > 0) {
+      const remainSilver = Math.max(0, totalSilver - settled.paidTaxSilver);
+      avatar.wallet = normalizeMonopolyWallet({
+        gold: Math.floor(remainSilver / MONOPOLY_CURRENCY_RATIO),
+        silver: remainSilver % MONOPOLY_CURRENCY_RATIO
+      });
     }
-    const remainSilver = Math.max(0, totalSilver - settled.paidTaxSilver);
-    avatar.wallet = normalizeMonopolyWallet({
-      gold: Math.floor(remainSilver / MONOPOLY_CURRENCY_RATIO),
-      silver: remainSilver % MONOPOLY_CURRENCY_RATIO
-    });
     let bankruptLabel = settled.expectedTaxSilver > settled.paidTaxSilver
       ? `${avatar.unitName} không đủ bạc để trả đủ thuế nhà (${settled.paidTaxSilver}/${settled.expectedTaxSilver})`
       : '';
       if (shouldTriggerAssassinTaxPunishment(slot.definitionId, settled.expectedTaxSilver, settled.paidTaxSilver)) {
-      bankruptLabel = `${bankruptLabel} • ${applyAssassinTaxPunishment(avatar)}`;
+      bankruptLabel = bankruptLabel
+        ? `${bankruptLabel} • ${applyAssassinTaxPunishment(avatar)}`
+        : applyAssassinTaxPunishment(avatar);
     }
     const hazardLabel = resolveHouseCombatThreat(slot, avatar, isLanding) || resolveRangedHouseThreat(avatar, cellOneBased);
     return { paidTax: settled.paidTaxSilver, ownerCollected: 0, purchaseLabel: '', upgradeLabel: '', hazardLabel, bankruptLabel };
