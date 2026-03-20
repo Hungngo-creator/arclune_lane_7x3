@@ -27560,12 +27560,11 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   const LAC_DUONG_MANTOU_COST_SILVER = 20;
   const LAC_DUONG_MANTOU_HUNGER_GAIN = 10;
   const TRUC_LAM_CLUSTER_COUNT = 5;
-  const TRUC_LAM_CELLS_PER_CLUSTER = 2;
-  const TRUC_LAM_THIRST_RESTORE_RATIO = 0.15;
-  const TRUC_LAM_SPIRIT_TO_THIRST_RATIO = 0.05;
+  const TRUC_LAM_CELLS_PER_CLUSTER = 1;
+  const TRUC_LAM_THIRST_RESTORE_RATIO = 0.1;
   const TRUC_LAM_MODULE_TOOLTIP = [
       'Trúc Lâm (rừng trúc, nguồn nước dồi dào).',
-      `Mỗi ô: hồi khát = ${Math.round(TRUC_LAM_THIRST_RESTORE_RATIO * 100)}% khát tối đa + ${Math.round(TRUC_LAM_SPIRIT_TO_THIRST_RATIO * 100)}% tinh thần hiện tại.`,
+      `Mỗi ô: chỉ hồi ${Math.round(TRUC_LAM_THIRST_RESTORE_RATIO * 100)}% khát tối đa cho người đạp trúng. Đi ngang không tính.`,
       `Mỗi map random ${TRUC_LAM_CLUSTER_COUNT} cụm, mỗi cụm ${TRUC_LAM_CELLS_PER_CLUSTER} ô liền kề.`
   ].join(' ');
   const LAC_DUONG_MODULE_TOOLTIP = [
@@ -27720,37 +27719,18 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           const pick = Math.floor(Math.max(0, Math.min(0.999999, rng())) * items.length);
           return items[pick] ?? null;
       };
-      const getFreeNeighbors = (cellOneBased) => {
-          const center = byCell.get(cellOneBased);
-          if (!center)
-              return [];
-          return primaryCells.filter(candidate => {
-              if (candidate === cellOneBased || blocked.has(candidate))
-                  return false;
-              const target = byCell.get(candidate);
-              if (!target)
-                  return false;
-              const rowDistance = Math.abs(center.row - target.row);
-              const colDistance = Math.abs(center.col - target.col);
-              return rowDistance + colDistance === 1;
-          });
-      };
       for (let idx = 0; idx < maxClusters; idx += 1) {
-          const firstCandidates = primaryCells.filter(cellOneBased => !blocked.has(cellOneBased) && getFreeNeighbors(cellOneBased).length > 0);
+          const firstCandidates = primaryCells.filter(cellOneBased => !blocked.has(cellOneBased));
           const first = randomPick(firstCandidates);
           if (first == null)
               break;
-          const second = randomPick(getFreeNeighbors(first));
-          if (second == null)
-              continue;
           blocked.add(first);
-          blocked.add(second);
-          clusters.push([first, second]);
+          clusters.push([first]);
       }
       return clusters;
   }
   function applyTrucLamThirstRestore(status) {
-      const thirstGain = MONOPOLY_STATUS_CAP * TRUC_LAM_THIRST_RESTORE_RATIO + clampMonopolyStatus(status.spirit) * TRUC_LAM_SPIRIT_TO_THIRST_RATIO;
+      const thirstGain = MONOPOLY_STATUS_CAP * TRUC_LAM_THIRST_RESTORE_RATIO;
       return {
           thirst: clampMonopolyStatus(status.thirst + thirstGain),
           hunger: clampMonopolyStatus(status.hunger),
@@ -28768,11 +28748,11 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
               const tierLabel = fate === 'major' ? 'lớn' : fate === 'medium' ? 'vừa' : 'nhỏ';
               return `${label} Gặp thiếu nữ tặng nhẫn đá cũ, mở cơ duyên ${tierLabel} tại ô ${targetCell}.`;
           };
-          const resolveTrucLamStep = (actor, cellOneBased) => {
-              if (actor.role !== 'player' || !trucLamCells.has(cellOneBased))
+          const resolveTrucLamStep = (actor, cellOneBased, isLanding) => {
+              if (!isLanding || !trucLamCells.has(cellOneBased))
                   return '';
               actor.status = applyTrucLamThirstRestore(actor.status);
-              const thirstGain = Math.round(MONOPOLY_STATUS_CAP * TRUC_LAM_THIRST_RESTORE_RATIO + clampMonopolyStatus(actor.status.spirit) * TRUC_LAM_SPIRIT_TO_THIRST_RATIO);
+              const thirstGain = Math.round(MONOPOLY_STATUS_CAP * TRUC_LAM_THIRST_RESTORE_RATIO);
               return `${actor.unitName} đạp trúng Trúc Lâm ở ô ${cellOneBased}, hồi ${thirstGain} khát`;
           };
           const resolveYearEventLanding = (actor, cellOneBased) => {
@@ -28812,7 +28792,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
               if (isLandingStep) {
                   avatar.currentCellOneBased = resolvedCell;
               }
-              const trucLamLabel = resolveTrucLamStep(avatar, resolvedCell);
+              const trucLamLabel = resolveTrucLamStep(avatar, resolvedCell, isLandingStep);
               const lacDuongLabel = isLandingStep ? resolveLacDuongStep(avatar, resolvedCell) : '';
               const fortuneLabel = resolveFortuneTarget(avatar, resolvedCell);
               const summary = await resolveHouseStep(avatar, resolvedCell, isLandingStep);

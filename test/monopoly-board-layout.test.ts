@@ -233,31 +233,25 @@ describe('monopoly lạc dương trấn module', () => {
 });
 
 describe('monopoly trúc lâm module', () => {
-  it('creates 5 clusters and each cluster has exactly 2 adjacent cells', () => {
+  it('creates 5 clusters and each cluster has exactly 1 cell', () => {
     const cells = createMonopolyBoardCells();
     const clusters = createTrucLamClusters(cells, new Set(), 5, () => 0.01);
     expect(clusters).toHaveLength(5);
     const allCells = clusters.flat();
-    expect(new Set(allCells).size).toBe(10);
+    expect(new Set(allCells).size).toBe(5);
 
     for (const cluster of clusters) {
-      expect(cluster).toHaveLength(2);
-      const [first, second] = cluster;
+      expect(cluster).toHaveLength(1);
+      const [first] = cluster;
       const firstCell = cells[first - 1];
-      const secondCell = cells[second - 1];
       expect(firstCell.track).not.toBe('mini');
       expect(firstCell.track).not.toBe('micro');
-      expect(secondCell.track).not.toBe('mini');
-      expect(secondCell.track).not.toBe('micro');
-      const rowDistance = Math.abs(firstCell.row - secondCell.row);
-      const colDistance = Math.abs(firstCell.col - secondCell.col);
-      expect(rowDistance + colDistance).toBe(1);
     }
   });
 
-  it('restores thirst = 15% cap + 5% spirit when stepping on one Trúc Lâm tile', () => {
+  it('restores thirst = 10% cap when stepping directly on one Trúc Lâm tile', () => {
     const status = applyTrucLamThirstRestore({ thirst: 40, hunger: 70, spirit: 80 });
-    expect(status.thirst).toBe(59);
+    expect(status.thirst).toBe(50);
     expect(status.hunger).toBe(70);
     expect(status.spirit).toBe(80);
   });
