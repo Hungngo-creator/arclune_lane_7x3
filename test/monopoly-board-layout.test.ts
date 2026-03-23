@@ -25,7 +25,9 @@ import {
   settleHouseTraverse,
   pickMonopolyModuleCell,
   createTrucLamClusters,
+  createWorldRiftClusters,
   applyTrucLamThirstRestore,
+  getWorldRiftTeleportChance,
   shouldTriggerAssassinTaxPunishment,
   upgradeHouse,
   resolveMonopolyCollisionCombat,
@@ -254,6 +256,29 @@ describe('monopoly trúc lâm module', () => {
     expect(status.thirst).toBe(50);
     expect(status.hunger).toBe(70);
     expect(status.spirit).toBe(80);
+  });
+});
+
+describe('monopoly vành nứt thế giới module', () => {
+  it('creates exactly 1 contiguous cluster with 7 non-mini/non-micro cells', () => {
+    const cells = createMonopolyBoardCells();
+    const clusters = createWorldRiftClusters(cells, new Set(), 1, 7, () => 0.01);
+    expect(clusters).toHaveLength(1);
+    const [cluster] = clusters;
+    expect(cluster).toHaveLength(7);
+    expect(new Set(cluster).size).toBe(7);
+
+    for (let idx = 1; idx < cluster.length; idx += 1) {
+      const prev = cells[cluster[idx - 1] - 1];
+      const curr = cells[cluster[idx] - 1];
+      expect(curr.track).not.toBe('mini');
+      expect(curr.track).not.toBe('micro');
+      expect(Math.abs(prev.row - curr.row) + Math.abs(prev.col - curr.col)).toBe(1);
+    }
+  });
+
+  it('uses symmetric 10/20/30/40/30/20/10 teleport odds', () => {
+    expect([0, 1, 2, 3, 4, 5, 6].map(getWorldRiftTeleportChance)).toEqual([0.1, 0.2, 0.3, 0.4, 0.3, 0.2, 0.1]);
   });
 });
 

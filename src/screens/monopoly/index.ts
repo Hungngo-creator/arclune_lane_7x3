@@ -689,10 +689,21 @@ const LAC_DUONG_MANTOU_HUNGER_GAIN = 10;
 const TRUC_LAM_CLUSTER_COUNT = 5;
 const TRUC_LAM_CELLS_PER_CLUSTER = 1;
 const TRUC_LAM_THIRST_RESTORE_RATIO = 0.1;
+const WORLD_RIFT_CLUSTER_COUNT = 1;
+const WORLD_RIFT_CLUSTER_SIZE = 7;
+const WORLD_RIFT_TELEPORT_CHANCES = Object.freeze([0.1, 0.2, 0.3, 0.4, 0.3, 0.2, 0.1] as const);
+const WORLD_RIFT_CENTER_INDEX = Math.floor(WORLD_RIFT_CLUSTER_SIZE / 2);
 const TRUC_LAM_MODULE_TOOLTIP = [
   'Trúc Lâm (rừng trúc, nguồn nước dồi dào).',
   `Mỗi ô: chỉ hồi ${Math.round(TRUC_LAM_THIRST_RESTORE_RATIO * 100)}% khát tối đa cho người đạp trúng. Đi ngang không tính.`,
   `Mỗi map random ${TRUC_LAM_CLUSTER_COUNT} cụm, mỗi cụm ${TRUC_LAM_CELLS_PER_CLUSTER} ô liền kề.`
+].join(' ');
+const WORLD_RIFT_MODULE_TOOLTIP = [
+  'Vành Nứt Thế Giới (chỉ xuất hiện 1 cụm mỗi trận, dài 7 ô liền nhau).',
+  'Tỉ lệ bị truyền tống khi đi vào từng ô lần lượt là 10/20/30/40/30/20/10.',
+  '6 ô ngoài: kích hoạt sẽ truyền tống tới Bí Cảnh ngẫu nhiên (vòng vi mô 8 ô).',
+  'Ô giữa: 40% tới Bí Cảnh, 40% tới Quỷ Vực (bàn mini 24 ô), 20% không có gì.',
+  'Linh hồn bị truyền tống vào Quỷ Vực sẽ hồi sinh ngay tại đó.'
 ].join(' ');
 const LAC_DUONG_MODULE_TOOLTIP = [
   'Lạc Dương Trấn (chỉ kích hoạt khi đạp trúng ô, đi ngang không tính).',
@@ -798,15 +809,9 @@ export function applyMonopolySurvivalHpDrain(
 }
 
 export function normalizeMonopolyWallet(wallet: MonopolyWallet): MonopolyWallet {
-  const normalizedGold = normalizeWalletAmount(wallet.gold);
-  const normalizedSilver = normalizeWalletAmount(wallet.silver);
-  const totalSilver = normalizedGold * MONOPOLY_CURRENCY_RATIO + normalizedSilver;
-  const cappedTotalSilver = Math.min(totalSilver, (MONOPOLY_WALLET_CAP * MONOPOLY_CURRENCY_RATIO) + MONOPOLY_WALLET_CAP);
-  const nextGold = Math.min(MONOPOLY_WALLET_CAP, Math.floor(cappedTotalSilver / MONOPOLY_CURRENCY_RATIO));
-  const nextSilver = Math.min(MONOPOLY_WALLET_CAP, cappedTotalSilver - nextGold * MONOPOLY_CURRENCY_RATIO);
   return {
-    gold: nextGold,
-    silver: nextSilver
+    gold: Math.min(MONOPOLY_WALLET_CAP, normalizeWalletAmount(wallet.gold)),
+    silver: Math.min(MONOPOLY_WALLET_CAP, normalizeWalletAmount(wallet.silver))
   };
 }
 
@@ -891,6 +896,78 @@ export function applyTrucLamThirstRestore(status: MonopolyStatusMetrics): Monopo
   };
 }
 
+function getOrthogonalNeighbors(cells: ReadonlyArray<BoardCell>, sourceCellOneBased: number, blocked: ReadonlySet<number>): number[] {
+  const source = cells[sourceCellOneBased - 1];
+  if (!source) return [];
+  return cells
+    .filter(cell => cell.track !== 'mini' && cell.track !== 'micro')
+    .filter(cell => !blocked.has(cell.index + 1))
+    .filter(cell => Math.abs(cell.row - source.row) + Math.abs(cell.col - source.col) === 1)
+    .map(cell => cell.index + 1);
+}
+
+export function createWorldRiftClusters(
+  cells: ReadonlyArray<BoardCell>,
+  occupiedCellOneBased: ReadonlySet<number>,
+  clusterCount = WORLD_RIFT_CLUSTER_COUNT,
+  clusterSize = WORLD_RIFT_CLUSTER_SIZE,
+  rng: () => number = Math.random
+): number[][] {
+  const maxClusters = Math.max(0, Math.floor(clusterCount));
+  const targetSize = Math.max(0, Math.floor(clusterSize));
+  if (maxClusters <= 0 || targetSize <= 0) return [];
+
+  const blocked = new Set<number>(occupiedCellOneBased);
+  const primaryCells = cells
+    .filter(cell => cell.track !== 'mini' && cell.track !== 'micro')
+    .map(cell => cell.index + 1);
+
+  const randomPick = <T,>(items: readonly T[]): T | null => {
+    if (items.length <= 0) return null;
+    const pick = Math.floor(Math.max(0, Math.min(0.999999, rng())) * items.length);
+    return items[pick] ?? null;
+  };
+
+  const growCluster = (startCell: number): number[] | null => {
+    const walk = [startCell];
+    const visited = new Set<number>([startCell]);
+    let current = startCell;
+    while (walk.length < targetSize) {
+      const candidates = getOrthogonalNeighbors(cells, current, blocked).filter(cell => !visited.has(cell));
+      if (candidates.length <= 0) return null;
+      const nextCell = randomPick(candidates);
+      if (nextCell == null) return null;
+      walk.push(nextCell);
+      visited.add(nextCell);
+      current = nextCell;
+    }
+    return walk;
+  };
+
+  const clusters: number[][] = [];
+  for (let idx = 0; idx < maxClusters; idx += 1) {
+    const starters = primaryCells.filter(cell => !blocked.has(cell));
+    const shuffledStarters = starters
+      .map(cell => ({ cell, sort: Math.max(0, Math.min(0.999999, rng())) }))
+      .sort((left, right) => left.sort - right.sort)
+      .map(entry => entry.cell);
+    let cluster: number[] | null = null;
+    for (const starter of shuffledStarters) {
+      cluster = growCluster(starter);
+      if (cluster) break;
+    }
+    if (!cluster) break;
+    cluster.forEach(cell => blocked.add(cell));
+    clusters.push(cluster);
+  }
+
+  return clusters;
+}
+
+export function getWorldRiftTeleportChance(stepIndex: number): number {
+  return WORLD_RIFT_TELEPORT_CHANCES[stepIndex] ?? 0;
+}
+
 export function grantMonopolySilver(wallet: MonopolyWallet, amountSilver: number): MonopolyWallet {
   const normalized = normalizeMonopolyWallet(wallet);
   const bonus = normalizeWalletAmount(amountSilver);
@@ -945,7 +1022,7 @@ export function spendMonopolyGold(wallet: MonopolyWallet, amountGold: number): {
 }
 
 export function computeMonopolyVictoryRewardByGold(wallet: MonopolyWallet): number {
-  return normalizeMonopolyWallet(wallet).gold * MONOPOLY_CURRENCY_RATIO;
+  return Math.min(MONOPOLY_WALLET_CAP, normalizeWalletAmount(wallet.gold)) * MONOPOLY_CURRENCY_RATIO;
 }
 
 export function inheritGoldOnKill(killerWallet: MonopolyWallet, victimWallet: MonopolyWallet): {
@@ -1407,6 +1484,10 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   const houseSlots = createRandomHouseSlots(randomHouseEligibleCells);
   const houseByCell = new Map<number, HiddenHouseSlot>(houseSlots.map(slot => [slot.cellIndex, slot]));
   const occupiedModuleCells = new Set<number>(houseSlots.map(slot => slot.cellIndex));
+  const worldRiftClusters = createWorldRiftClusters(BOARD_TEMPLATE, occupiedModuleCells);
+  const worldRiftCells = worldRiftClusters[0] ?? [];
+  const worldRiftCellIndex = new Map<number, number>(worldRiftCells.map((cellOneBased, idx) => [cellOneBased, idx]));
+  for (const cellOneBased of worldRiftCells) occupiedModuleCells.add(cellOneBased);
   const trucLamClusters = createTrucLamClusters(BOARD_TEMPLATE, occupiedModuleCells);
   const trucLamCells = new Set<number>(trucLamClusters.flat());
   for (const cellOneBased of trucLamCells) occupiedModuleCells.add(cellOneBased);
@@ -1555,6 +1636,12 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   const teleportDestinationCells = BOARD_TEMPLATE
     .filter(cell => cell.track !== 'mini')
     .map(cell => cell.index + 1);
+    const biCanhDestinationCells = BOARD_TEMPLATE
+    .filter(cell => cell.track === 'micro')
+    .map(cell => cell.index + 1);
+  const quyVucDestinationCells = BOARD_TEMPLATE
+    .filter(cell => cell.track === 'mini')
+    .map(cell => cell.index + 1);
 
   const refreshEventCellsUi = (): void => {
     for (const { node, cell } of cellNodes) {
@@ -1579,6 +1666,15 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
         node.title = `Ô nhà bí ẩn #${cellOneBased}`;
         continue;
       }
+      if (worldRiftCellIndex.has(cellOneBased)) {
+        const chance = Math.round(getWorldRiftTeleportChance(worldRiftCellIndex.get(cellOneBased) ?? 0) * 100);
+        const suffix = (worldRiftCellIndex.get(cellOneBased) ?? -1) === WORLD_RIFT_CENTER_INDEX
+          ? ' Ô giữa: 40% Bí Cảnh, 40% Quỷ Vực, 20% an toàn.'
+          : ` Ô này có ${chance}% truyền tống tới Bí Cảnh.`;
+        node.textContent = 'VNTG';
+        node.title = `${WORLD_RIFT_MODULE_TOOLTIP}${suffix} (Ô #${cellOneBased})`;
+        continue;
+      }
       if (trucLamCells.has(cellOneBased)) {
         node.textContent = 'TL';
         node.title = `${TRUC_LAM_MODULE_TOOLTIP} (Ô #${cellOneBased})`;
@@ -1592,6 +1688,48 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       node.textContent = String(cellOneBased);
       node.title = `Ô #${cellOneBased}`;
     }
+  };
+
+  const reviveAvatarFromQuyVuc = (avatar: MonopolyAvatar): string => {
+    if (avatar.soulState !== 'spirit') return '';
+    avatar.soulState = 'alive';
+    avatar.soulExpiresAtYear = null;
+    avatar.hp = Math.max(1, Math.round(avatar.hpMaxCurrent * 0.5));
+    avatar.status = {
+      thirst: Math.max(avatar.status.thirst, MONOPOLY_STATUS_START),
+      hunger: Math.max(avatar.status.hunger, MONOPOLY_STATUS_START),
+      spirit: Math.max(avatar.status.spirit, MONOPOLY_STATUS_START)
+    };
+    syncAvatarHealthUi(avatar);
+    return `${avatar.unitName} được Quỷ Vực kéo hồn về thân xác và hồi sinh với 50% HP`;
+  };
+
+  const resolveWorldRiftStep = (actor: MonopolyAvatar, cellOneBased: number): { finalCell: number; label: string } => {
+    const stepIndex = worldRiftCellIndex.get(cellOneBased);
+    if (typeof stepIndex !== 'number') return { finalCell: cellOneBased, label: '' };
+    const teleportChance = getWorldRiftTeleportChance(stepIndex);
+    const roll = Math.random();
+    if (stepIndex === WORLD_RIFT_CENTER_INDEX) {
+      if (roll < 0.4) {
+        const target = biCanhDestinationCells[randomInt(0, biCanhDestinationCells.length - 1)] ?? cellOneBased;
+        actor.currentCellOneBased = target;
+        moveAvatarToCell(actor, actor.currentCellOneBased);
+        return { finalCell: target, label: `${actor.unitName} bước vào tâm Vành Nứt Thế Giới tại ô ${cellOneBased} và bị quăng vào Bí Cảnh ô ${target}` };
+      }
+      if (roll < 0.8) {
+        const target = quyVucDestinationCells[randomInt(0, quyVucDestinationCells.length - 1)] ?? cellOneBased;
+        actor.currentCellOneBased = target;
+        moveAvatarToCell(actor, actor.currentCellOneBased);
+        const revival = reviveAvatarFromQuyVuc(actor);
+        return { finalCell: target, label: revival || `${actor.unitName} bị Vành Nứt Thế Giới kéo vào Quỷ Vực ô ${target}` };
+      }
+      return { finalCell: cellOneBased, label: `${actor.unitName} đứng vững tại tâm Vành Nứt Thế Giới ô ${cellOneBased}` };
+    }
+    if (roll >= teleportChance) return { finalCell: cellOneBased, label: '' };
+    const target = biCanhDestinationCells[randomInt(0, biCanhDestinationCells.length - 1)] ?? cellOneBased;
+    actor.currentCellOneBased = target;
+    moveAvatarToCell(actor, actor.currentCellOneBased);
+    return { finalCell: target, label: `${actor.unitName} chạm Vành Nứt Thế Giới ô ${cellOneBased} và bị truyền tống tới Bí Cảnh ô ${target}` };
   };
 
   const applyEventHealing = (baseAmount: number): number => {
@@ -2050,7 +2188,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       const steppedCell = traversed[idx] ?? avatar.currentCellOneBased;
       const isLandingStep = idx === traversed.length - 1;
       const eventLanding = isLandingStep ? resolveYearEventLanding(avatar, steppedCell) : { finalCell: steppedCell, label: '' };
-      const resolvedCell = eventLanding.finalCell;
+      const worldRiftLanding = resolveWorldRiftStep(avatar, eventLanding.finalCell);
+      const resolvedCell = worldRiftLanding.finalCell;
       if (isLandingStep) {
         avatar.currentCellOneBased = resolvedCell;
       }
@@ -2061,6 +2200,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       paidTax += summary.paidTax;
       ownerCollected += summary.ownerCollected;
       if (eventLanding.label) purchaseLabel = eventLanding.label;
+      if (worldRiftLanding.label) purchaseLabel = worldRiftLanding.label;
       if (trucLamLabel) purchaseLabel = trucLamLabel;
       if (lacDuongLabel) purchaseLabel = lacDuongLabel;
       if (fortuneLabel) purchaseLabel = fortuneLabel;
