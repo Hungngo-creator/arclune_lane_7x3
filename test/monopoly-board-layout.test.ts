@@ -26,6 +26,13 @@ import {
   pickMonopolyModuleCell,
   createTrucLamClusters,
   createWorldRiftClusters,
+  createThanhMaoSonCluster,
+  createThanhMaoSonModuleOrder,
+  getThanhMaoSonDiceRange,
+  advanceThanhMaoSonMovement,
+  applyThanhMaoTieuDiemEntry,
+  tickThanhMaoSleep,
+  rollMonopolyForgeOffers,
   applyTrucLamThirstRestore,
   getWorldRiftTeleportChance,
   shouldTriggerAssassinTaxPunishment,
@@ -693,5 +700,64 @@ describe('monopoly yearly events', () => {
     expect(fruit.event.id).toBe('fruit_bounty');
     expect(fruit.nextState.fruitCells).toHaveLength(5);
     expect(new Set(fruit.nextState.fruitCells).size).toBe(5);
+  });
+});
+
+describe('monopoly thanh mao sơn cluster module', () => {
+  it('creates exactly 3 contiguous main-track cells and never overlaps occupied cells', () => {
+    const occupied = new Set<number>([1, 2, 3, 10]);
+    const cluster = createThanhMaoSonCluster(occupied, () => 0.4);
+    expect(cluster).toHaveLength(3);
+    expect(cluster.every(cell => !occupied.has(cell))).toBe(true);
+    expect(cluster[1]).toBe(cluster[0] + 1);
+    expect(cluster[2]).toBe(cluster[1] + 1);
+  });
+
+  it('randomizes the 3 Thanh Mao Sơn submodules within the cluster', () => {
+    const order = createThanhMaoSonModuleOrder(() => 0.9);
+    expect(order).toHaveLength(3);
+    expect(new Set(order)).toEqual(new Set(['tieu_diem', 'lo_ren', 'nui']));
+  });
+
+  it('locks dice to 1 while restriction is active inside the cluster and resumes normal dice at the edge', () => {
+    expect(getThanhMaoSonDiceRange([11, 12, 13], 12, true)).toEqual({ min: 1, max: 1 });
+    expect(getThanhMaoSonDiceRange([11, 12, 13], 13, false)).toEqual({ min: 1, max: 6 });
+  });
+
+  it('moves only 1 tile per turn inside the cluster until reaching an endpoint', () => {
+    const firstStep = advanceThanhMaoSonMovement([11, 12, 13], 11, () => 0.2);
+    expect(firstStep).toEqual({ nextCellOneBased: 12, restrictionContinues: true });
+    const secondStep = advanceThanhMaoSonMovement([11, 12, 13], 12, () => 0.99);
+    expect(secondStep).toEqual({ nextCellOneBased: 13, restrictionContinues: false });
+  });
+
+  it('applies Thanh Mao Tiểu Điếm sleep branch under 60% spirit and food branch from 60% spirit', () => {
+    const sleepEntry = applyThanhMaoTieuDiemEntry(
+      { gold: 0, silver: 150 },
+      { thirst: 80, hunger: 70, spirit: 50 },
+      100,
+    );
+    expect(sleepEntry.wallet.silver).toBe(50);
+    expect(sleepEntry.sleeping).toBe(true);
+
+    const foodEntry = applyThanhMaoTieuDiemEntry(
+      { gold: 0, silver: 150 },
+      { thirst: 80, hunger: 70, spirit: 60 },
+      100,
+    );
+    expect(foodEntry.wallet.silver).toBe(50);
+    expect(foodEntry.sleeping).toBe(false);
+    expect(foodEntry.status.hunger).toBe(95);
+  });
+
+  it('restores 30% max spirit per skipped sleep turn until full', () => {
+    expect(tickThanhMaoSleep(20, 100)).toEqual({ nextSpirit: 50, sleeping: true });
+    expect(tickThanhMaoSleep(80, 100)).toEqual({ nextSpirit: 100, sleeping: false });
+  });
+
+  it('rolls up to 5 unique forge offers for Lò Rèn', () => {
+    const offers = rollMonopolyForgeOffers(() => 0.01, 5);
+    expect(offers).toHaveLength(5);
+    expect(new Set(offers.map(item => item.id)).size).toBe(5);
   });
 });

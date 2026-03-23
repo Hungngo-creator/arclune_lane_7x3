@@ -171,6 +171,93 @@ const CSS = /* css */ `
     font-size:19px;
     line-height:1;
   }
+  .monopoly-forge{
+    position:fixed;
+    top:138px;
+    right:12px;
+    width:min(320px, calc(100vw - 24px));
+    border-radius:14px;
+    border:1px solid rgba(180, 134, 76, 0.55);
+    background:rgba(28, 17, 9, 0.94);
+    box-shadow:0 18px 40px rgba(0,0,0,0.42);
+    padding:14px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    z-index:20;
+  }
+  .monopoly-forge__top{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .monopoly-forge__title{
+    margin:0;
+    font-size:14px;
+    color:#ffd8ae;
+  }
+  .monopoly-forge__copy{
+    margin:4px 0 0;
+    font-size:12px;
+    color:#dcb88e;
+    line-height:1.5;
+  }
+  .monopoly-forge__close{
+    border:1px solid rgba(255, 214, 170, 0.4);
+    background:rgba(57, 30, 11, 0.95);
+    color:#fff0dc;
+    border-radius:10px;
+    width:30px;
+    height:30px;
+    cursor:pointer;
+    font-size:16px;
+    line-height:1;
+  }
+  .monopoly-forge__list{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    max-height:260px;
+    overflow:auto;
+  }
+  .monopoly-forge__item{
+    border:1px solid rgba(255, 214, 170, 0.24);
+    background:rgba(57, 30, 11, 0.72);
+    border-radius:10px;
+    padding:10px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .monopoly-forge__meta{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    min-width:0;
+  }
+  .monopoly-forge__name{
+    font-size:13px;
+    color:#fff4e8;
+  }
+  .monopoly-forge__desc{
+    font-size:11px;
+    color:#dcb88e;
+  }
+  .monopoly-forge__buy{
+    border:1px solid rgba(247, 198, 135, 0.45);
+    background:rgba(131, 72, 26, 0.92);
+    color:#fff5eb;
+    border-radius:10px;
+    padding:8px 10px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .monopoly-forge__foot{
+    font-size:11px;
+    color:#dcb88e;
+  }
   .monopoly-board{
     width:min(96vw, 1180px);
     max-width:100%;
@@ -599,6 +686,9 @@ interface MonopolyAvatar {
   soulExpiresAtYear: number | null;
   autoBuyHouseEnabled: boolean;
   autoUpgradeHouseEnabled: boolean;
+  thanhMaoRestrictionActive: boolean;
+  forgeInventory: MonopolyForgeItem[];
+  sleepingAtThanhMao: boolean;
 }
 
 interface HouseStepSummary {
@@ -631,6 +721,24 @@ interface MonopolyInventoryItem {
   id: string;
   label: string;
   icon: string;
+}
+
+interface MonopolyForgeItem {
+  readonly id: string;
+  readonly name: string;
+  readonly icon: string;
+  readonly priceSilver: number;
+  readonly description: string;
+  readonly hpBonus: number;
+  readonly atkBonus: number;
+  readonly wilBonus: number;
+}
+
+interface MonopolyForgeShopState {
+  ownerAvatarId: number | null;
+  closesAtTurnAvatarId: number | null;
+  closedManually: boolean;
+  offers: MonopolyForgeItem[];
 }
 
 interface MonopolyFortuneTarget {
@@ -719,6 +827,21 @@ const LAC_DUONG_RING_ITEM: MonopolyInventoryItem = Object.freeze({
 const MAJOR_FORTUNE_GOLD_REWARD = 5;
 const MEDIUM_FORTUNE_GOLD_REWARD = 3;
 const MINOR_FORTUNE_GOLD_REWARD = 1;
+const THANH_MAO_SON_CLUSTER_SIZE = 3;
+const THANH_MAO_TIEU_DIEM_SLEEP_SPIRIT_RATIO = 0.3;
+const THANH_MAO_TIEU_DIEM_FOOD_SPIRIT_RATIO = 0.6;
+const THANH_MAO_TIEU_DIEM_FOOD_HUNGER_GAIN = 25;
+const THANH_MAO_TIEU_DIEM_FOOD_COST_SILVER = 100;
+const THANH_MAO_TIEU_DIEM_SLEEP_COST_SILVER = 100;
+
+const MONOPOLY_FORGE_ITEM_POOL: ReadonlyArray<MonopolyForgeItem> = Object.freeze([
+  Object.freeze({ id: 'forge-weapon-rustblade', name: 'Thiết Kiếm Cũ', icon: '⚔️', priceSilver: 120, description: '+22 ATK', hpBonus: 0, atkBonus: 22, wilBonus: 0 }),
+  Object.freeze({ id: 'forge-amulet-cloud', name: 'Vân Phù', icon: '🜂', priceSilver: 120, description: '+18 WIL', hpBonus: 0, atkBonus: 0, wilBonus: 18 }),
+  Object.freeze({ id: 'forge-armor-bark', name: 'Giáp Mộc Sơn', icon: '🛡️', priceSilver: 140, description: '+120 HP', hpBonus: 120, atkBonus: 0, wilBonus: 0 }),
+  Object.freeze({ id: 'forge-ring-flame', name: 'Hỏa Văn Giới', icon: '💍', priceSilver: 160, description: '+12 ATK, +12 WIL', hpBonus: 0, atkBonus: 12, wilBonus: 12 }),
+  Object.freeze({ id: 'forge-boots-stone', name: 'Thạch Hành Ngoa', icon: '🥾', priceSilver: 100, description: '+60 HP, +8 ATK', hpBonus: 60, atkBonus: 8, wilBonus: 0 }),
+  Object.freeze({ id: 'forge-fan-ice', name: 'Hàn Thiết Phiến', icon: '🪭', priceSilver: 130, description: '+10 ATK, +14 WIL', hpBonus: 0, atkBonus: 10, wilBonus: 14 })
+]);
 
 export const MONOPOLY_YEAR_EVENT_RULE_SUMMARY = 'Mỗi năm mới luôn kích hoạt đúng 1 sự kiện ngẫu nhiên; không có sự kiện kép và mỗi sự kiện có hồi chiêu 2 năm tính từ lúc kết thúc.';
 
@@ -841,6 +964,100 @@ export function rollLacDuongRingDestiny(randomValue: number): 'major' | 'medium'
   if (randomValue < 0.35) return 'medium';
   if (randomValue < 0.6) return 'minor';
   return 'none';
+}
+
+export function createThanhMaoSonCluster(
+  occupiedCellOneBased: ReadonlySet<number>,
+  rng: () => number = Math.random
+): number[] {
+  const candidates = MAIN_TRACK_PATH_ORDER
+    .map((_, startIndex) => [
+      MAIN_TRACK_PATH_ORDER[startIndex % MAIN_TRACK_PATH_ORDER.length],
+      MAIN_TRACK_PATH_ORDER[(startIndex + 1) % MAIN_TRACK_PATH_ORDER.length],
+      MAIN_TRACK_PATH_ORDER[(startIndex + 2) % MAIN_TRACK_PATH_ORDER.length],
+    ])
+    .filter((cluster): cluster is [number, number, number] => cluster.every((cell): cell is number => typeof cell === 'number' && !occupiedCellOneBased.has(cell)));
+  if (candidates.length <= 0) return [];
+  const picked = Math.floor(Math.max(0, Math.min(0.999999, rng())) * candidates.length);
+  return [...(candidates[picked] ?? candidates[0]!)];
+}
+
+export function createThanhMaoSonModuleOrder(rng: () => number = Math.random): Array<'tieu_diem' | 'lo_ren' | 'nui'> {
+  return shuffled(['tieu_diem', 'lo_ren', 'nui'] as Array<'tieu_diem' | 'lo_ren' | 'nui'>, rng);
+}
+
+export function getThanhMaoSonDiceRange(cluster: ReadonlyArray<number>, currentCellOneBased: number, restrictionActive: boolean): { min: number; max: number } {
+  if (!restrictionActive) return { min: 1, max: 6 };
+  return cluster.includes(currentCellOneBased) ? { min: 1, max: 1 } : { min: 1, max: 6 };
+}
+
+export function advanceThanhMaoSonMovement(
+  cluster: ReadonlyArray<number>,
+  currentCellOneBased: number,
+  rng: () => number = Math.random
+): { nextCellOneBased: number; restrictionContinues: boolean } {
+  const index = cluster.indexOf(currentCellOneBased);
+  if (index < 0) return { nextCellOneBased: currentCellOneBased, restrictionContinues: false };
+  const neighbors = [cluster[index - 1], cluster[index + 1]].filter((cell): cell is number => typeof cell === 'number');
+  if (neighbors.length <= 0) return { nextCellOneBased: currentCellOneBased, restrictionContinues: false };
+  const nextCellOneBased = neighbors.length === 1
+    ? neighbors[0]!
+    : neighbors[Math.floor(Math.max(0, Math.min(0.999999, rng())) * neighbors.length)] ?? neighbors[0]!;
+  return { nextCellOneBased, restrictionContinues: cluster.indexOf(nextCellOneBased) === 1 };
+}
+
+export function applyThanhMaoTieuDiemEntry(
+  wallet: MonopolyWallet,
+  status: MonopolyStatusMetrics,
+  spiritCap: number
+): {
+  wallet: MonopolyWallet;
+  status: MonopolyStatusMetrics;
+  sleeping: boolean;
+  label: string;
+} {
+  const spiritRatio = spiritCap > 0 ? status.spirit / spiritCap : 0;
+  if (spiritRatio >= THANH_MAO_TIEU_DIEM_FOOD_SPIRIT_RATIO) {
+    const spent = spendMonopolySilver(wallet, THANH_MAO_TIEU_DIEM_FOOD_COST_SILVER);
+    const nextStatus = {
+      thirst: clampMonopolyStatus(status.thirst),
+      hunger: clampMonopolyStatus(status.hunger + THANH_MAO_TIEU_DIEM_FOOD_HUNGER_GAIN),
+      spirit: clampMonopolyStatus(status.spirit),
+    };
+    return {
+      wallet: spent.paid ? spent.wallet : wallet,
+      status: nextStatus,
+      sleeping: false,
+      label: spent.paid
+        ? `Thanh Mao Tiểu Điếm ép mua đồ ăn (-${THANH_MAO_TIEU_DIEM_FOOD_COST_SILVER} bạc, +${THANH_MAO_TIEU_DIEM_FOOD_HUNGER_GAIN} đói).`
+        : 'Thanh Mao Tiểu Điếm ép mua đồ ăn nhưng không đủ bạc.',
+    };
+  }
+  const spent = spendMonopolySilver(wallet, THANH_MAO_TIEU_DIEM_SLEEP_COST_SILVER);
+  return {
+    wallet: spent.paid ? spent.wallet : wallet,
+    status: { ...status },
+    sleeping: true,
+    label: spent.paid
+      ? `Thanh Mao Tiểu Điếm thu ${THANH_MAO_TIEU_DIEM_SLEEP_COST_SILVER} bạc và ép ngủ hồi tinh thần.`
+      : 'Thanh Mao Tiểu Điếm ép ngủ hồi tinh thần.',
+  };
+}
+
+export function tickThanhMaoSleep(spirit: number, spiritCap: number): { nextSpirit: number; sleeping: boolean } {
+  const healed = Math.min(spiritCap, spirit + spiritCap * THANH_MAO_TIEU_DIEM_SLEEP_SPIRIT_RATIO);
+  return { nextSpirit: healed, sleeping: healed < spiritCap };
+}
+
+export function rollMonopolyForgeOffers(rng: () => number = Math.random, count = 5): MonopolyForgeItem[] {
+  const pool = [...MONOPOLY_FORGE_ITEM_POOL];
+  const picks: MonopolyForgeItem[] = [];
+  while (pool.length > 0 && picks.length < Math.max(0, Math.floor(count))) {
+    const index = Math.floor(Math.max(0, Math.min(0.999999, rng())) * pool.length);
+    const [picked] = pool.splice(index, 1);
+    if (picked) picks.push(picked);
+  }
+  return picks;
 }
 
 export function pickMonopolyModuleCell(
@@ -1159,10 +1376,10 @@ function buildMonopolyImportPool(count: number): Array<{ unitId: string; unitNam
   });
 }
 
-function shuffled<T>(items: ReadonlyArray<T>): T[] {
+function shuffled<T>(items: ReadonlyArray<T>, rng: () => number = Math.random): T[] {
   const next = [...items];
   for (let index = next.length - 1; index > 0; index -= 1) {
-    const swapIndex = randomInt(0, index);
+    const swapIndex = Math.floor(Math.max(0, Math.min(0.999999, rng())) * (index + 1));
     const current = next[index];
     next[index] = next[swapIndex] as T;
     next[swapIndex] = current as T;
@@ -1398,6 +1615,30 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   inventoryBar.className = 'monopoly-inventory';
   wrapper.appendChild(inventoryBar);
 
+  const forgePanel = document.createElement('aside');
+  forgePanel.className = 'monopoly-forge';
+  forgePanel.hidden = true;
+  const forgeTop = document.createElement('div');
+  forgeTop.className = 'monopoly-forge__top';
+  const forgeHeading = document.createElement('div');
+  const forgeTitle = document.createElement('h3');
+  forgeTitle.className = 'monopoly-forge__title';
+  forgeTitle.textContent = 'Lò Rèn';
+  const forgeCopy = document.createElement('p');
+  forgeCopy.className = 'monopoly-forge__copy';
+  const forgeClose = document.createElement('button');
+  forgeClose.type = 'button';
+  forgeClose.className = 'monopoly-forge__close';
+  forgeClose.textContent = '✕';
+  forgeHeading.append(forgeTitle, forgeCopy);
+  forgeTop.append(forgeHeading, forgeClose);
+  const forgeList = document.createElement('div');
+  forgeList.className = 'monopoly-forge__list';
+  const forgeFoot = document.createElement('div');
+  forgeFoot.className = 'monopoly-forge__foot';
+  forgePanel.append(forgeTop, forgeList, forgeFoot);
+  wrapper.appendChild(forgePanel);
+
   const automationSettings: MonopolyAutomationSettings = {
     autoBuyHouseEnabled: false,
     autoUpgradeHouseEnabled: false
@@ -1493,6 +1734,11 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   for (const cellOneBased of trucLamCells) occupiedModuleCells.add(cellOneBased);
   const lacDuongCell = pickMonopolyModuleCell(BOARD_TEMPLATE, occupiedModuleCells);
   if (lacDuongCell != null) occupiedModuleCells.add(lacDuongCell);
+  const thanhMaoSonCluster = createThanhMaoSonCluster(occupiedModuleCells);
+  const thanhMaoModuleOrder = createThanhMaoSonModuleOrder();
+  const thanhMaoModuleByCell = new Map<number, 'tieu_diem' | 'lo_ren' | 'nui'>(thanhMaoSonCluster.map((cell, index) => [cell, thanhMaoModuleOrder[index] ?? 'nui']));
+  for (const cellOneBased of thanhMaoSonCluster) occupiedModuleCells.add(cellOneBased);
+  const forgeShopState: MonopolyForgeShopState = { ownerAvatarId: null, closesAtTurnAvatarId: null, closedManually: false, offers: [] };
   const fortuneTargets: MonopolyFortuneTarget[] = [];
   const playerInventory: MonopolyInventoryItem[] = [];
   const playerAvatarId = randomInt(1, AVATAR_COUNT);
@@ -1551,6 +1797,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       soulExpiresAtYear: null,
       autoBuyHouseEnabled: automationSettings.autoBuyHouseEnabled,
       autoUpgradeHouseEnabled: automationSettings.autoUpgradeHouseEnabled,
+      thanhMaoRestrictionActive: false,
+      forgeInventory: [],
+      sleepingAtThanhMao: false,
     });
   }
 
@@ -1599,6 +1848,52 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
 
     const formatMetric = (value: number): string => Math.round(clampMonopolyStatus(value)).toString();
 
+  const syncForgeUi = (): void => {
+    const owner = forgeShopState.ownerAvatarId == null ? null : avatars.find(avatar => avatar.id === forgeShopState.ownerAvatarId) ?? null;
+    const shouldRender = playerAvatar != null && owner?.id === playerAvatar.id && forgeShopState.offers.length > 0 && !forgeShopState.closedManually;
+    forgePanel.hidden = !shouldRender;
+    if (!shouldRender || !playerAvatar) return;
+    forgeCopy.textContent = `Mua sắm từ lúc đạp ô Lò Rèn tới trước lượt kế tiếp của ${owner?.unitName ?? 'bạn'}.`;
+    forgeFoot.textContent = `Trang bị đang mang: ${playerAvatar.forgeInventory.length}/5.`;
+    forgeList.replaceChildren();
+    for (const item of forgeShopState.offers) {
+      const row = document.createElement('div');
+      row.className = 'monopoly-forge__item';
+      const meta = document.createElement('div');
+      meta.className = 'monopoly-forge__meta';
+      const name = document.createElement('strong');
+      name.className = 'monopoly-forge__name';
+      name.textContent = `${item.icon} ${item.name}`;
+      const desc = document.createElement('span');
+      desc.className = 'monopoly-forge__desc';
+      desc.textContent = `${item.description} • ${item.priceSilver} bạc`;
+      meta.append(name, desc);
+      const buy = document.createElement('button');
+      buy.type = 'button';
+      buy.className = 'monopoly-forge__buy';
+      buy.textContent = 'Mua';
+      buy.disabled = playerAvatar.forgeInventory.length >= MONOPOLY_INVENTORY_CAP;
+      buy.addEventListener('click', () => {
+        const paid = spendMonopolySilver(playerAvatar.wallet, item.priceSilver);
+        if (!paid.paid || playerAvatar.forgeInventory.length >= MONOPOLY_INVENTORY_CAP) return;
+        playerAvatar.wallet = paid.wallet;
+        playerAvatar.forgeInventory.push(item);
+        playerAvatar.stats.ATK += item.atkBonus;
+        playerAvatar.stats.WIL += item.wilBonus;
+        playerAvatar.hpMaxCurrent += item.hpBonus;
+        playerAvatar.hp = Math.min(playerAvatar.hpMaxCurrent, playerAvatar.hp + item.hpBonus);
+        forgeShopState.offers = forgeShopState.offers.filter(entry => entry.id !== item.id);
+        syncAvatarHealthUi(playerAvatar);
+        syncPlayerWalletUi();
+        syncPlayerStatusUi();
+        syncInventoryUi();
+        syncForgeUi();
+      });
+      row.append(meta, buy);
+      forgeList.appendChild(row);
+    }
+  };
+
   const syncPlayerStatusUi = (): void => {
     if (!playerAvatar) {
       playerStatusNode.hidden = true;
@@ -1615,7 +1910,12 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     yearSlot.title = activeEvent ? `${activeEvent.name}: ${activeEvent.description}` : 'Chưa có sự kiện năm đang hoạt động';
   };
 
-    const syncInventoryUi = (): void => {
+    forgeClose.addEventListener('click', () => {
+    forgeShopState.closedManually = true;
+    syncForgeUi();
+  });
+
+  const syncInventoryUi = (): void => {
     inventoryBar.replaceChildren();
     const visibleItems = playerInventory.slice(0, MONOPOLY_INVENTORY_CAP);
     inventoryBar.hidden = visibleItems.length <= 0;
@@ -1683,6 +1983,20 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       if (lacDuongCell != null && cellOneBased === lacDuongCell) {
         node.textContent = 'LĐT';
         node.title = `${LAC_DUONG_MODULE_TOOLTIP} (Ô #${cellOneBased})`;
+        continue;
+      }
+      const thanhMaoModule = thanhMaoModuleByCell.get(cellOneBased);
+      if (thanhMaoModule) {
+        if (thanhMaoModule === 'tieu_diem') {
+          node.textContent = 'TMĐ';
+          node.title = `Thanh Mao Tiểu Điếm (ô #${cellOneBased}) • -100 bạc, ngủ hồi ${Math.round(THANH_MAO_TIEU_DIEM_SLEEP_SPIRIT_RATIO * 100)}% tinh thần/turn đến khi đầy; nếu tinh thần ≥ ${Math.round(THANH_MAO_TIEU_DIEM_FOOD_SPIRIT_RATIO * 100)}% thì đổi sang ép ăn +${THANH_MAO_TIEU_DIEM_FOOD_HUNGER_GAIN} đói / ${THANH_MAO_TIEU_DIEM_FOOD_COST_SILVER} bạc.`;
+        } else if (thanhMaoModule === 'lo_ren') {
+          node.textContent = 'LR';
+          node.title = `Lò Rèn (ô #${cellOneBased}) • mở hub bán 5 trang bị tới lượt kế tiếp của người đạp.`;
+        } else {
+          node.textContent = 'N';
+          node.title = `Núi (ô #${cellOneBased}) • chỉ là núi, không có cơ duyên.`;
+        }
         continue;
       }
       node.textContent = String(cellOneBased);
@@ -1970,6 +2284,47 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     return { paidTax: settled.paidTaxSilver, ownerCollected: 0, purchaseLabel: '', upgradeLabel: '', hazardLabel, bankruptLabel, killerAvatarId };
   };
 
+  const maybeOpenForgeShop = (avatar: MonopolyAvatar): string => {
+    forgeShopState.ownerAvatarId = avatar.id;
+    forgeShopState.closesAtTurnAvatarId = avatar.id;
+    forgeShopState.closedManually = false;
+    forgeShopState.offers = rollMonopolyForgeOffers();
+    if (avatar.role === 'npc') {
+      while (forgeShopState.offers.length > 0) {
+        const offer = forgeShopState.offers[0];
+        if (!offer || avatar.forgeInventory.length >= MONOPOLY_INVENTORY_CAP) break;
+        const paid = spendMonopolySilver(avatar.wallet, offer.priceSilver);
+        if (!paid.paid) break;
+        avatar.wallet = paid.wallet;
+        avatar.forgeInventory.push(offer);
+        avatar.stats.ATK += offer.atkBonus;
+        avatar.stats.WIL += offer.wilBonus;
+        avatar.hpMaxCurrent += offer.hpBonus;
+        avatar.hp = Math.min(avatar.hpMaxCurrent, avatar.hp + offer.hpBonus);
+        forgeShopState.offers.shift();
+        if (Math.random() < 0.55) break;
+      }
+      forgeShopState.closedManually = true;
+    }
+    syncForgeUi();
+    return `${avatar.unitName} ghé Lò Rèn${avatar.role === 'player' ? ', hub mua trang bị đã mở' : ' và NPC có thể mua trang bị nếu đủ bạc'}`;
+  };
+
+  const resolveThanhMaoLanding = (actor: MonopolyAvatar, cellOneBased: number, cameFromCluster: boolean): string => {
+    const module = thanhMaoModuleByCell.get(cellOneBased);
+    if (!module) return '';
+    if (!cameFromCluster) actor.thanhMaoRestrictionActive = true;
+    if (module === 'nui') return `${actor.unitName} tiến vào núi của Thanh Mao Sơn, không có cơ duyên gì.`;
+    if (module === 'tieu_diem') {
+      const result = applyThanhMaoTieuDiemEntry(actor.wallet, actor.status, actor.spiritCap);
+      actor.wallet = result.wallet;
+      actor.status = result.status;
+      actor.sleepingAtThanhMao = result.sleeping;
+      return `${actor.unitName} vào Thanh Mao Tiểu Điếm. ${result.label}`;
+    }
+    return maybeOpenForgeShop(actor);
+  };
+
   const transitionToSpirit = (avatar: MonopolyAvatar): void => {
     if (avatar.soulState !== 'alive' || avatar.hp > 0) return;
     avatar.soulState = 'spirit';
@@ -2030,6 +2385,27 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       return;
     }
 
+    if (forgeShopState.closesAtTurnAvatarId === avatar.id) {
+      forgeShopState.ownerAvatarId = null;
+      forgeShopState.closesAtTurnAvatarId = null;
+      forgeShopState.offers = [];
+      forgeShopState.closedManually = false;
+      syncForgeUi();
+    }
+
+    if (avatar.soulState === 'alive' && avatar.sleepingAtThanhMao) {
+      const slept = tickThanhMaoSleep(avatar.status.spirit, avatar.spiritCap);
+      avatar.status = { ...avatar.status, spirit: slept.nextSpirit };
+      avatar.sleepingAtThanhMao = slept.sleeping;
+      turnBanner.textContent = `Lượt ${avatar.unitName} (${avatar.role.toUpperCase()}) • đang ngủ ở Thanh Mao Tiểu Điếm, hồi ${Math.round(THANH_MAO_TIEU_DIEM_SLEEP_SPIRIT_RATIO * 100)}% tinh thần và mất lượt`;
+      syncPlayerWalletUi();
+      syncPlayerStatusUi();
+      syncForgeUi();
+      activeTurnIndex = (activeTurnIndex + 1) % AVATAR_COUNT;
+      turnTimer = window.setTimeout(runTurn, TURN_INTERVAL_MS + TURN_ADVANCE_DELAY_MS);
+      return;
+    }
+
     if (avatar.soulState === 'alive' && avatar.skippedTurnCount > 0) {
       avatar.skippedTurnCount -= 1;
       turnBanner.textContent = `Lượt ${avatar.unitName} (${avatar.role.toUpperCase()}) • Tinh thần ≤ ${MONOPOLY_FAINT_SPIRIT_THRESHOLD} nên ngất tại chỗ, mất lượt`;
@@ -2039,8 +2415,10 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       return;
     }
 
-    const diceMax = getMonopolyDiceMaxBySpirit(avatar.status.spirit);
-    const dice = randomInt(1, diceMax);
+    const thanhMaoDiceRange = getThanhMaoSonDiceRange(thanhMaoSonCluster, avatar.currentCellOneBased, avatar.thanhMaoRestrictionActive);
+    const spiritDiceMax = getMonopolyDiceMaxBySpirit(avatar.status.spirit);
+    const diceMax = Math.min(spiritDiceMax, thanhMaoDiceRange.max);
+    const dice = randomInt(thanhMaoDiceRange.min, diceMax);
 
     if (!avatar.hasEnteredBoard) {
       avatar.currentPathIndex = 0;
@@ -2050,14 +2428,31 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       moveAvatarToCell(avatar, avatar.currentCellOneBased);
     }
 
-    const advanced = advanceMonopolyMovement({
-      currentPathIndex: avatar.currentPathIndex,
-      currentCellOneBased: avatar.currentCellOneBased,
-      pendingDetourFrom: avatar.pendingDetourFrom,
-      activeDetourFrom: avatar.activeDetourFrom,
-      detourProgress: avatar.detourProgress,
-      traversedCells: []
-    }, dice);
+    const advanced = avatar.thanhMaoRestrictionActive && thanhMaoSonCluster.includes(avatar.currentCellOneBased)
+      ? (() => {
+          const nextMove = advanceThanhMaoSonMovement(thanhMaoSonCluster, avatar.currentCellOneBased);
+          const nextPathIndex = MAIN_TRACK_INDEX_BY_CELL.get(nextMove.nextCellOneBased) ?? avatar.currentPathIndex;
+          return {
+            currentPathIndex: nextPathIndex,
+            currentCellOneBased: nextMove.nextCellOneBased,
+            pendingDetourFrom: null,
+            activeDetourFrom: null,
+            detourProgress: -1,
+            traversedCells: [nextMove.nextCellOneBased],
+            thanhMaoRestrictionContinues: nextMove.restrictionContinues,
+          };
+        })()
+      : {
+          ...advanceMonopolyMovement({
+            currentPathIndex: avatar.currentPathIndex,
+            currentCellOneBased: avatar.currentCellOneBased,
+            pendingDetourFrom: avatar.pendingDetourFrom,
+            activeDetourFrom: avatar.activeDetourFrom,
+            detourProgress: avatar.detourProgress,
+            traversedCells: []
+          }, dice),
+          thanhMaoRestrictionContinues: avatar.thanhMaoRestrictionActive,
+        };
 
     const previousPathIndex = avatar.currentPathIndex;
 
@@ -2066,6 +2461,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     avatar.pendingDetourFrom = advanced.pendingDetourFrom;
     avatar.activeDetourFrom = advanced.activeDetourFrom;
     avatar.detourProgress = advanced.detourProgress;
+    avatar.thanhMaoRestrictionActive = Boolean((advanced as { thanhMaoRestrictionContinues?: boolean }).thanhMaoRestrictionContinues);
     if (avatar.soulState === 'alive') {
       const yearModifiers = getMonopolyYearRuleModifiers(yearEventState.activeEventId);
       avatar.status = applyMonopolyStepDrain(avatar.status, dice, yearModifiers);
@@ -2193,6 +2589,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       if (isLandingStep) {
         avatar.currentCellOneBased = resolvedCell;
       }
+      const previousCell = idx > 0 ? (traversed[idx - 1] ?? avatar.currentCellOneBased) : null;
+      const cameFromCluster = previousCell != null && thanhMaoModuleByCell.has(previousCell) && thanhMaoModuleByCell.has(resolvedCell);
+      const thanhMaoLabel = isLandingStep ? resolveThanhMaoLanding(avatar, resolvedCell, cameFromCluster) : '';
       const trucLamLabel = resolveTrucLamStep(avatar, resolvedCell, isLandingStep);
       const lacDuongLabel = isLandingStep ? resolveLacDuongStep(avatar, resolvedCell) : '';
       const fortuneLabel = resolveFortuneTarget(avatar, resolvedCell);
@@ -2201,6 +2600,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       ownerCollected += summary.ownerCollected;
       if (eventLanding.label) purchaseLabel = eventLanding.label;
       if (worldRiftLanding.label) purchaseLabel = worldRiftLanding.label;
+      if (thanhMaoLabel) purchaseLabel = thanhMaoLabel;
       if (trucLamLabel) purchaseLabel = trucLamLabel;
       if (lacDuongLabel) purchaseLabel = lacDuongLabel;
       if (fortuneLabel) purchaseLabel = fortuneLabel;
@@ -2243,6 +2643,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       syncPlayerWalletUi();
       syncPlayerStatusUi();
       syncInventoryUi();
+      syncForgeUi();
       return;
     }
     if (livingAfterCombat.length === 1) {
@@ -2256,6 +2657,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       syncPlayerWalletUi();
       syncPlayerStatusUi();
       syncInventoryUi();
+      syncForgeUi();
       activeTurnIndex = (activeTurnIndex + 1) % AVATAR_COUNT;
       turnTimer = window.setTimeout(runTurn, TURN_INTERVAL_MS + TURN_ADVANCE_DELAY_MS);
       return;
@@ -2266,7 +2668,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       : '';
     const yearSummary = yearlyUpdate.silverIncome > 0 ? ` • +${yearlyUpdate.silverIncome} bạc/năm cho avatar còn sống` : '';
     const eventSummary = yearlyUpdate.eventLabel ? ` • ${yearlyUpdate.eventLabel}` : (currentYearEventLabel ? ` • ${currentYearEventLabel}` : '');
-    const spiritNote = diceMax === 3 ? ` • Tinh thần thấp nên xúc xắc chỉ 1-${diceMax}` : '';
+    const spiritNote = thanhMaoDiceRange.max === 1
+      ? ' • Trong cụm Thanh Mao Sơn nên xúc xắc bị khóa 1 ô/turn'
+      : (diceMax === 3 ? ` • Tinh thần thấp nên xúc xắc chỉ 1-${diceMax}` : '');
     const faintNote = avatar.skippedTurnCount > 0 ? ' • Tinh thần ≤ 20: lượt kế tiếp sẽ bị mất do ngất' : '';
     const soulNote = avatar.soulState === 'spirit' ? ` • Linh hồn (${Math.max(0, (avatar.soulExpiresAtYear ?? yearsElapsed) - yearsElapsed)} năm còn lại)` : '';
     const deathSummary = deathLabels.length > 0 ? ` • ${deathLabels.join(' • ')}` : '';
@@ -2286,6 +2690,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     syncPlayerWalletUi();
     syncPlayerStatusUi();
     syncInventoryUi();
+    syncForgeUi();
 
     activeTurnIndex = (activeTurnIndex + 1) % AVATAR_COUNT;
     turnTimer = window.setTimeout(runTurn, TURN_INTERVAL_MS + TURN_ADVANCE_DELAY_MS);
