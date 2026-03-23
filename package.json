@@ -16,7 +16,8 @@
     "verify:aether-bundle": "node tools/verify-aether-bundle.mjs",
     "smoke:long-battle": "node simulations/long-battle-smoke.mjs",
     "release:gate": "npm test && npm run smoke:long-battle",
-    "check:duplicate-declarations": "node tools/check-duplicate-declarations.mjs"
+    "check:duplicate-declarations": "node tools/check-duplicate-declarations.mjs",
+    "verify:tag-runtime": "jest --runInBand test/combat-tag-dispatch.test.ts test/tag-effect-e2e.test.ts"
   },
   "keywords": [],
   "author": "",

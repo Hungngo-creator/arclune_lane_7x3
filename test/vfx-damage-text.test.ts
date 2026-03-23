@@ -18,7 +18,11 @@ function createCtxRecorder(): { ctx: CanvasRenderingContext2D; drawCalls: DrawCa
     save: jest.fn(),
     restore: jest.fn(),
     beginPath: jest.fn(),
+    closePath: jest.fn(),
     arc: jest.fn(),
+    moveTo: jest.fn(),
+    lineTo: jest.fn(),
+    fill: jest.fn(),
     stroke: jest.fn(),
     strokeText: jest.fn(),
     fillText: jest.fn((text: string) => {

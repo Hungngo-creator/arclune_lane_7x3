@@ -35699,6 +35699,115 @@ __define('./vfx.ts', (exports, module, __require) => {
       ctx.fillText(style.text, x, textY);
       ctx.restore();
   };
+  const resolveHitImpactPalette = (event) => {
+      const isCritical = readBooleanFlag(event, ['isCrit', 'crit', 'critical']);
+      const hasAdvantage = readBooleanFlag(event, ['isAdvantage', 'advantage', 'hasAdvantage']);
+      if (isCritical && hasAdvantage) {
+          return {
+              core: '#ffd447',
+              shock: '#ffe28a',
+              spark: '#fff1b3',
+              smear: '#ffb347',
+          };
+      }
+      if (isCritical) {
+          return {
+              core: '#ff8f8f',
+              shock: '#ffc4c4',
+              spark: '#ffd8d8',
+              smear: '#ff6b6b',
+          };
+      }
+      if (hasAdvantage) {
+          return {
+              core: '#9befff',
+              shock: '#c4f5ff',
+              spark: '#e6fbff',
+              smear: '#62d8ff',
+          };
+      }
+      return {
+          core: '#e6f2ff',
+          shock: '#c9dcff',
+          spark: '#f4f9ff',
+          smear: '#afccff',
+      };
+  };
+  const drawHitImpactLayerA = (ctx, x, y, radius, progress, palette) => {
+      const alpha = 0.8 * (1 - progress);
+      if (alpha <= 0)
+          return;
+      const tilt = progress * Math.PI * 0.7;
+      const span = Math.max(8, radius * (1.4 - progress * 0.5));
+      const thickness = Math.max(4, radius * 0.28);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = palette.core;
+      for (let i = 0; i < 2; i += 1) {
+          const angle = tilt + (i * Math.PI * 0.5);
+          const ux = Math.cos(angle);
+          const uy = Math.sin(angle);
+          const vx = -uy;
+          const vy = ux;
+          const halfSpan = span * (1 + i * 0.15);
+          const halfThickness = thickness * (1 - i * 0.2);
+          ctx.beginPath();
+          ctx.moveTo(x - ux * halfSpan - vx * halfThickness, y - uy * halfSpan - vy * halfThickness);
+          ctx.lineTo(x + ux * halfSpan - vx * halfThickness, y + uy * halfSpan - vy * halfThickness);
+          ctx.lineTo(x + ux * halfSpan + vx * halfThickness, y + uy * halfSpan + vy * halfThickness);
+          ctx.lineTo(x - ux * halfSpan + vx * halfThickness, y - uy * halfSpan + vy * halfThickness);
+          ctx.closePath();
+          ctx.fill();
+      }
+      ctx.restore();
+  };
+  const drawHitImpactLayerB = (ctx, x, y, radius, progress, palette) => {
+      const alpha = 0.75 * (1 - progress);
+      if (alpha <= 0)
+          return;
+      const growth = 1 + progress * 1.6;
+      const smearLength = Math.max(10, radius * (1.8 - progress * 0.4));
+      const smearThickness = Math.max(2, radius * 0.2 * (1 - progress * 0.4));
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = palette.shock;
+      ctx.lineWidth = Math.max(2, radius * 0.14);
+      ctx.beginPath();
+      ctx.arc(x, y, Math.max(2, radius * growth), 0, Math.PI * 2);
+      ctx.stroke();
+      const smearAngle = -Math.PI / 6;
+      const dx = Math.cos(smearAngle);
+      const dy = Math.sin(smearAngle);
+      const nx = -dy;
+      const ny = dx;
+      ctx.strokeStyle = palette.smear;
+      ctx.lineWidth = smearThickness;
+      ctx.beginPath();
+      ctx.moveTo(x - dx * smearLength * 0.4 - nx * radius * 0.12, y - dy * smearLength * 0.4 - ny * radius * 0.12);
+      ctx.lineTo(x + dx * smearLength, y + dy * smearLength);
+      ctx.stroke();
+      ctx.restore();
+  };
+  const drawHitImpactLayerC = (ctx, x, y, radius, progress, palette) => {
+      const alpha = 0.7 * (1 - progress);
+      if (alpha <= 0)
+          return;
+      const sparkCount = 6;
+      const spread = radius * (0.7 + progress * 1.5);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = palette.spark;
+      for (let i = 0; i < sparkCount; i += 1) {
+          const angle = (i / sparkCount) * Math.PI * 2 + progress * Math.PI * 0.7;
+          const px = x + Math.cos(angle) * spread;
+          const py = y + Math.sin(angle) * spread * 0.7;
+          const dotR = Math.max(1, radius * (0.08 - progress * 0.03));
+          ctx.beginPath();
+          ctx.arc(px, py, dotR, 0, Math.PI * 2);
+          ctx.fill();
+      }
+      ctx.restore();
+  };
   const makeTokenKey = (parts) => {
       if (!parts)
           return null;
@@ -36363,14 +36472,10 @@ __define('./vfx.ts', (exports, module, __require) => {
                       const p = projectCellOblique(Game.grid, e.cx, e.cy, cam);
                       const r = Math.floor(Game.grid.tile * 0.25 * (0.6 + 1.1 * tt) * p.scale);
                       if (isFiniteCoord(p.x) && isFiniteCoord(p.y) && isFiniteCoord(r) && r > 0) {
-                          ctx.save();
-                          ctx.globalAlpha = 0.9 * (1 - tt);
-                          ctx.strokeStyle = '#e6f2ff';
-                          ctx.lineWidth = 2;
-                          ctx.beginPath();
-                          ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
-                          ctx.stroke();
-                          ctx.restore();
+                          const palette = resolveHitImpactPalette(e);
+                          drawHitImpactLayerA(ctx, p.x, p.y, r, tt, palette);
+                          drawHitImpactLayerB(ctx, p.x, p.y, r, tt, palette);
+                          drawHitImpactLayerC(ctx, p.x, p.y, r, tt, palette);
                           const hitStatusText = resolveHitStatusTextStyle(e);
                           if (hitStatusText) {
                               drawHitStatusText(ctx, p.x, p.y, r, tt, hitStatusText);
