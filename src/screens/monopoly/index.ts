@@ -689,6 +689,9 @@ interface MonopolyAvatar {
   thanhMaoRestrictionActive: boolean;
   forgeInventory: MonopolyForgeItem[];
   sleepingAtThanhMao: boolean;
+  exileTrack: 'mini' | 'micro' | null;
+  exileLapCount: number;
+  mainTrackProxyIndex: number;
 }
 
 interface HouseStepSummary {
@@ -1424,6 +1427,8 @@ export function resolveMonopolyCollisionCombat(colliders: ReadonlyArray<Monopoly
 
 const MAIN_TRACK_PATH_ORDER = Array.from({ length: MAIN_TRACK_CELLS }, (_, offset) => ((START_CELL_ONE_BASED - 1 + offset) % MAIN_TRACK_CELLS) + 1);
 const MAIN_TRACK_INDEX_BY_CELL = new Map(MAIN_TRACK_PATH_ORDER.map((cell, idx) => [cell, idx]));
+const MINI_TRACK_PATH_ORDER = BOARD_TEMPLATE.filter(cell => cell.track === 'mini').map(cell => cell.index + 1);
+const MICRO_TRACK_PATH_ORDER = BOARD_TEMPLATE.filter(cell => cell.track === 'micro').map(cell => cell.index + 1);
 
 const DETOUR_PATHS: Readonly<Record<number, Readonly<{ exitCellOneBased: number; path: ReadonlyArray<number> }>>> = Object.freeze({
   2: Object.freeze({ exitCellOneBased: 12, path: Object.freeze([79, 50, 51, 52, 53, 54, 55, 56, 57, 58, 80]) }),
@@ -1439,6 +1444,26 @@ export interface MonopolyMovementState {
   activeDetourFrom: number | null;
   detourProgress: number;
   traversedCells?: number[];
+}
+
+function advanceRingMovement(path: ReadonlyArray<number>, currentCellOneBased: number, dice: number): { nextCellOneBased: number; traversedCells: number[]; lapCount: number } {
+  if (!path.length) return { nextCellOneBased: currentCellOneBased, traversedCells: [], lapCount: 0 };
+  const startIndex = path.indexOf(currentCellOneBased);
+  let cursor = startIndex >= 0 ? startIndex : 0;
+  const traversedCells: number[] = [];
+  let lapCount = 0;
+  let stepsLeft = Math.max(0, Math.floor(dice));
+  while (stepsLeft > 0) {
+    cursor = (cursor + 1) % path.length;
+    if (cursor === 0) lapCount += 1;
+    traversedCells.push(path[cursor] ?? currentCellOneBased);
+    stepsLeft -= 1;
+  }
+  return {
+    nextCellOneBased: traversedCells[traversedCells.length - 1] ?? path[cursor] ?? currentCellOneBased,
+    traversedCells,
+    lapCount
+  };
 }
 
 export function advanceMonopolyMovement(state: MonopolyMovementState, dice: number): MonopolyMovementState {
@@ -1800,6 +1825,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       thanhMaoRestrictionActive: false,
       forgeInventory: [],
       sleepingAtThanhMao: false,
+      exileTrack: null,
+      exileLapCount: 0,
+      mainTrackProxyIndex: 0,
     });
   }
 
@@ -2022,17 +2050,24 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     const stepIndex = worldRiftCellIndex.get(cellOneBased);
     if (typeof stepIndex !== 'number') return { finalCell: cellOneBased, label: '' };
     const teleportChance = getWorldRiftTeleportChance(stepIndex);
+    const sourceMainIndex = actor.mainTrackProxyIndex;
     const roll = Math.random();
     if (stepIndex === WORLD_RIFT_CENTER_INDEX) {
       if (roll < 0.4) {
         const target = biCanhDestinationCells[randomInt(0, biCanhDestinationCells.length - 1)] ?? cellOneBased;
         actor.currentCellOneBased = target;
+        actor.exileTrack = 'micro';
+        actor.exileLapCount = 0;
+        actor.mainTrackProxyIndex = sourceMainIndex;
         moveAvatarToCell(actor, actor.currentCellOneBased);
         return { finalCell: target, label: `${actor.unitName} bước vào tâm Vành Nứt Thế Giới tại ô ${cellOneBased} và bị quăng vào Bí Cảnh ô ${target}` };
       }
       if (roll < 0.8) {
         const target = quyVucDestinationCells[randomInt(0, quyVucDestinationCells.length - 1)] ?? cellOneBased;
         actor.currentCellOneBased = target;
+        actor.exileTrack = 'mini';
+        actor.exileLapCount = 0;
+        actor.mainTrackProxyIndex = sourceMainIndex;
         moveAvatarToCell(actor, actor.currentCellOneBased);
         const revival = reviveAvatarFromQuyVuc(actor);
         return { finalCell: target, label: revival || `${actor.unitName} bị Vành Nứt Thế Giới kéo vào Quỷ Vực ô ${target}` };
@@ -2042,6 +2077,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     if (roll >= teleportChance) return { finalCell: cellOneBased, label: '' };
     const target = biCanhDestinationCells[randomInt(0, biCanhDestinationCells.length - 1)] ?? cellOneBased;
     actor.currentCellOneBased = target;
+    actor.exileTrack = 'micro';
+    actor.exileLapCount = 0;
+    actor.mainTrackProxyIndex = sourceMainIndex;
     moveAvatarToCell(actor, actor.currentCellOneBased);
     return { finalCell: target, label: `${actor.unitName} chạm Vành Nứt Thế Giới ô ${cellOneBased} và bị truyền tống tới Bí Cảnh ô ${target}` };
   };
@@ -2423,12 +2461,28 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     if (!avatar.hasEnteredBoard) {
       avatar.currentPathIndex = 0;
       avatar.currentCellOneBased = MAIN_TRACK_PATH_ORDER[0] ?? START_CELL_ONE_BASED;
+      avatar.mainTrackProxyIndex = 0;
       avatar.hasEnteredBoard = true;
       avatar.node.hidden = false;
       moveAvatarToCell(avatar, avatar.currentCellOneBased);
     }
 
-    const advanced = avatar.thanhMaoRestrictionActive && thanhMaoSonCluster.includes(avatar.currentCellOneBased)
+    const advanced = avatar.exileTrack === 'mini' || avatar.exileTrack === 'micro'
+      ? (() => {
+          const path = avatar.exileTrack === 'mini' ? MINI_TRACK_PATH_ORDER : MICRO_TRACK_PATH_ORDER;
+          const movement = advanceRingMovement(path, avatar.currentCellOneBased, dice);
+          return {
+            currentPathIndex: avatar.currentPathIndex,
+            currentCellOneBased: movement.nextCellOneBased,
+            pendingDetourFrom: null,
+            activeDetourFrom: null,
+            detourProgress: -1,
+            traversedCells: movement.traversedCells,
+            exileLapCount: avatar.exileLapCount + movement.lapCount,
+            thanhMaoRestrictionContinues: false,
+          };
+        })()
+      : avatar.thanhMaoRestrictionActive && thanhMaoSonCluster.includes(avatar.currentCellOneBased)
       ? (() => {
           const nextMove = advanceThanhMaoSonMovement(thanhMaoSonCluster, avatar.currentCellOneBased);
           const nextPathIndex = MAIN_TRACK_INDEX_BY_CELL.get(nextMove.nextCellOneBased) ?? avatar.currentPathIndex;
@@ -2462,6 +2516,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     avatar.activeDetourFrom = advanced.activeDetourFrom;
     avatar.detourProgress = advanced.detourProgress;
     avatar.thanhMaoRestrictionActive = Boolean((advanced as { thanhMaoRestrictionContinues?: boolean }).thanhMaoRestrictionContinues);
+    avatar.exileLapCount = (advanced as { exileLapCount?: number }).exileLapCount ?? avatar.exileLapCount;
+    if (avatar.exileTrack == null) avatar.mainTrackProxyIndex = avatar.currentPathIndex;
     if (avatar.soulState === 'alive') {
       const yearModifiers = getMonopolyYearRuleModifiers(yearEventState.activeEventId);
       avatar.status = applyMonopolyStepDrain(avatar.status, dice, yearModifiers);
@@ -2473,7 +2529,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       avatar.skippedTurnCount = Math.max(avatar.skippedTurnCount, 1);
     }
 
-    if (advanced.activeDetourFrom == null && advanced.currentPathIndex < previousPathIndex) {
+    if (avatar.exileTrack == null && advanced.activeDetourFrom == null && advanced.currentPathIndex < previousPathIndex) {
       lapProgressByAvatar.set(avatar.id, (lapProgressByAvatar.get(avatar.id) ?? 0) + 1);
     }
 
@@ -2487,6 +2543,35 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     let bankruptLabel = '';
     let lastHouseKillerId: number | null = null;
     const traversed = advanced.traversedCells ?? [];
+
+    if (avatar.exileTrack === 'mini' || avatar.exileTrack === 'micro') {
+      const exileTrackLabel = avatar.exileTrack === 'mini' ? 'Quỷ Vực' : 'Bí Cảnh';
+      const mainEquivalentSteps = traversed.length;
+      if (mainEquivalentSteps > 0) {
+        const previousProxyIndex = avatar.mainTrackProxyIndex;
+        avatar.mainTrackProxyIndex = (avatar.mainTrackProxyIndex + mainEquivalentSteps) % MAIN_TRACK_PATH_ORDER.length;
+        const proxyLaps = Math.floor((previousProxyIndex + mainEquivalentSteps) / MAIN_TRACK_PATH_ORDER.length);
+        if (proxyLaps > 0) {
+          lapProgressByAvatar.set(avatar.id, (lapProgressByAvatar.get(avatar.id) ?? 0) + proxyLaps);
+        }
+      }
+      if (avatar.exileLapCount >= 3) {
+        const mainTeleportCandidates = BOARD_TEMPLATE
+          .filter(cell => cell.track === 'main')
+          .map(cell => cell.index + 1)
+          .filter(cellOneBased => cellOneBased !== avatar.currentCellOneBased);
+        const target = mainTeleportCandidates[randomInt(0, mainTeleportCandidates.length - 1)] ?? (MAIN_TRACK_PATH_ORDER[avatar.mainTrackProxyIndex] ?? START_CELL_ONE_BASED);
+        avatar.currentCellOneBased = target;
+        avatar.currentPathIndex = MAIN_TRACK_INDEX_BY_CELL.get(target) ?? avatar.mainTrackProxyIndex;
+        avatar.pendingDetourFrom = null;
+        avatar.activeDetourFrom = null;
+        avatar.detourProgress = -1;
+        avatar.exileTrack = null;
+        avatar.exileLapCount = 0;
+        moveAvatarToCell(avatar, avatar.currentCellOneBased);
+        purchaseLabel = `${avatar.unitName} đã đi đủ 3 vòng trong ${exileTrackLabel} và bị đẩy ngẫu nhiên về bản đồ chính ô ${target}`;
+      }
+    }
     const rollFortuneTargetCell = (): number | null => {
       const blocked = new Set<number>(occupiedModuleCells);
       for (const target of fortuneTargets) blocked.add(target.cellOneBased);
