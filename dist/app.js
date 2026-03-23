@@ -28009,6 +28009,17 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
           paid: true
       };
   }
+  function autoExchangeGoldForForgeSilver(wallet, requiredSilver) {
+      const normalized = normalizeMonopolyWallet(wallet);
+      const shortfall = Math.max(0, normalizeWalletAmount(requiredSilver) - normalized.silver);
+      if (shortfall <= 0 || normalized.gold <= 0)
+          return normalized;
+      if (shortfall >= MONOPOLY_CURRENCY_RATIO * 3)
+          return normalized;
+      const goldToExchange = Math.min(3, Math.ceil(shortfall / MONOPOLY_CURRENCY_RATIO));
+      const exchanged = spendMonopolyGold(normalized, goldToExchange);
+      return exchanged.paid ? exchanged.wallet : normalized;
+  }
   function spendMonopolyGold(wallet, amountGold) {
       const normalized = normalizeMonopolyWallet(wallet);
       const cost = normalizeWalletAmount(amountGold);
@@ -28348,9 +28359,7 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       const inventoryBar = document.createElement('div');
       inventoryBar.className = 'monopoly-inventory';
       wrapper.appendChild(inventoryBar);
-      const forgePanel = document.createElement('aside');
-      forgePanel.className = 'monopoly-forge';
-      forgePanel.hidden = true;
+      let forgePanel = null;
       const forgeTop = document.createElement('div');
       forgeTop.className = 'monopoly-forge__top';
       const forgeHeading = document.createElement('div');
@@ -28369,8 +28378,18 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       forgeList.className = 'monopoly-forge__list';
       const forgeFoot = document.createElement('div');
       forgeFoot.className = 'monopoly-forge__foot';
-      forgePanel.append(forgeTop, forgeList, forgeFoot);
-      wrapper.appendChild(forgePanel);
+      const ensureForgePanelMounted = () => {
+          if (forgePanel != null)
+              return;
+          forgePanel = document.createElement('aside');
+          forgePanel.className = 'monopoly-forge';
+          forgePanel.append(forgeTop, forgeList, forgeFoot);
+          wrapper.appendChild(forgePanel);
+      };
+      const unmountForgePanel = () => {
+          forgePanel?.remove();
+          forgePanel = null;
+      };
       const automationSettings = {
           autoBuyHouseEnabled: false,
           autoUpgradeHouseEnabled: false
@@ -28569,9 +28588,11 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
       const syncForgeUi = () => {
           const owner = forgeShopState.ownerAvatarId == null ? null : avatars.find(avatar => avatar.id === forgeShopState.ownerAvatarId) ?? null;
           const shouldRender = playerAvatar != null && owner?.id === playerAvatar.id && forgeShopState.offers.length > 0 && !forgeShopState.closedManually;
-          forgePanel.hidden = !shouldRender;
-          if (!shouldRender || !playerAvatar)
+          if (!shouldRender || !playerAvatar) {
+              unmountForgePanel();
               return;
+          }
+          ensureForgePanelMounted();
           forgeCopy.textContent = `Mua sắm từ lúc đạp ô Lò Rèn tới trước lượt kế tiếp của ${owner?.unitName ?? 'bạn'}.`;
           forgeFoot.textContent = `Trang bị đang mang: ${playerAvatar.forgeInventory.length}/5.`;
           forgeList.replaceChildren();
@@ -28593,7 +28614,8 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
               buy.textContent = 'Mua';
               buy.disabled = playerAvatar.forgeInventory.length >= MONOPOLY_INVENTORY_CAP;
               buy.addEventListener('click', () => {
-                  const paid = spendMonopolySilver(playerAvatar.wallet, item.priceSilver);
+                  const walletWithSilver = autoExchangeGoldForForgeSilver(playerAvatar.wallet, item.priceSilver);
+                  const paid = spendMonopolySilver(walletWithSilver, item.priceSilver);
                   if (!paid.paid || playerAvatar.forgeInventory.length >= MONOPOLY_INVENTORY_CAP)
                       return;
                   playerAvatar.wallet = paid.wallet;
@@ -29024,7 +29046,8 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
                   const offer = forgeShopState.offers[0];
                   if (!offer || avatar.forgeInventory.length >= MONOPOLY_INVENTORY_CAP)
                       break;
-                  const paid = spendMonopolySilver(avatar.wallet, offer.priceSilver);
+                  const walletWithSilver = autoExchangeGoldForForgeSilver(avatar.wallet, offer.priceSilver);
+                  const paid = spendMonopolySilver(walletWithSilver, offer.priceSilver);
                   if (!paid.paid)
                       break;
                   avatar.wallet = paid.wallet;
