@@ -277,5 +277,10 @@ function collectValidationIssues(): SkillTagValidationIssue[]{
 export const SKILL_TAG_VALIDATION_ISSUES = Object.freeze(collectValidationIssues());
 
 if (SKILL_TAG_VALIDATION_ISSUES.length > 0){
-  console.warn('[skills] tag validation issues detected:', SKILL_TAG_VALIDATION_ISSUES);
+  const preview = SKILL_TAG_VALIDATION_ISSUES
+    .slice(0, 5)
+    .map((issue) => `${issue.unitId}:${issue.section}`)
+    .join(', ');
+  const suffix = SKILL_TAG_VALIDATION_ISSUES.length > 5 ? ', ...' : '';
+  console.warn(`[skills] tag validation issues detected (${SKILL_TAG_VALIDATION_ISSUES.length}): ${preview}${suffix}`);
 }

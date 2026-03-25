@@ -587,7 +587,8 @@ try {
 } catch (error) {
   // behavior-preserving: fall back to raw dataset when validation fails.
   if (typeof console !== 'undefined' && console?.warn) {
-    console.warn('[vfxDraw] Failed to parse anchor dataset', error);
+    const reason = error instanceof Error ? error.message : String(error);
+    console.warn(`[vfxDraw] Failed to parse anchor dataset: ${reason}`);
   }
   registerAnchorDataset(loithienanhAnchors);
 }

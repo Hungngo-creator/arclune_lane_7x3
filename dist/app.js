@@ -8076,7 +8076,12 @@ __define('./data/skills.ts', (exports, module, __require) => {
   }
   const SKILL_TAG_VALIDATION_ISSUES = Object.freeze(collectValidationIssues());
   if (SKILL_TAG_VALIDATION_ISSUES.length > 0) {
-      console.warn('[skills] tag validation issues detected:', SKILL_TAG_VALIDATION_ISSUES);
+      const preview = SKILL_TAG_VALIDATION_ISSUES
+          .slice(0, 5)
+          .map((issue) => `${issue.unitId}:${issue.section}`)
+          .join(', ');
+      const suffix = SKILL_TAG_VALIDATION_ISSUES.length > 5 ? ', ...' : '';
+      console.warn(`[skills] tag validation issues detected (${SKILL_TAG_VALIDATION_ISSUES.length}): ${preview}${suffix}`);
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'SKILL_TAG_VALIDATION_ISSUES')) exports.SKILL_TAG_VALIDATION_ISSUES = SKILL_TAG_VALIDATION_ISSUES;
@@ -34850,7 +34855,8 @@ __define('./vfx.ts', (exports, module, __require) => {
   catch (error) {
       // behavior-preserving: fall back to raw dataset when validation fails.
       if (typeof console !== 'undefined' && console?.warn) {
-          console.warn('[vfxDraw] Failed to parse anchor dataset', error);
+          const reason = error instanceof Error ? error.message : String(error);
+          console.warn(`[vfxDraw] Failed to parse anchor dataset: ${reason}`);
       }
       registerAnchorDataset(loithienanhAnchors);
   }

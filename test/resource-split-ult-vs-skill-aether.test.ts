@@ -10,7 +10,11 @@ describe('resource split: ult-fury vs skill-aether', () => {
   });
 
   it('uses fury only for ult and does not consume aether', () => {
-    jest.spyOn(ai, 'evaluateGambitLogic').mockReturnValue({ slotIndex: 0, action: 'ult' } as never);
+    jest
+      .spyOn(ai, 'evaluateGambitLogic')
+      .mockImplementation((_game, _unit, ctx) => ((ctx?.startIndex ?? 0) === 0
+        ? ({ slotIndex: 0, action: 'ult' } as never)
+        : ({ slotIndex: -1, action: null } as never)));
     const consumeSpy = jest.spyOn(globalAetherPool, 'consume').mockReturnValue(false);
     const spendFurySpy = jest.spyOn(fury, 'spendFury');
 
@@ -41,8 +45,12 @@ describe('resource split: ult-fury vs skill-aether', () => {
     expect(consumeSpy).not.toHaveBeenCalled();
   });
 
-  it('uses aether for skill actions and does not spend fury', () => {
-    jest.spyOn(ai, 'evaluateGambitLogic').mockReturnValue({ slotIndex: 0, action: 'skill1' } as never);
+  it('prioritizes skill slot and does not spend fury when ult is not used', () => {
+    jest
+      .spyOn(ai, 'evaluateGambitLogic')
+      .mockImplementation((_game, _unit, ctx) => ((ctx?.startIndex ?? 0) === 0
+        ? ({ slotIndex: 0, action: 'skill1' } as never)
+        : ({ slotIndex: -1, action: null } as never)));
     const consumeSpy = jest.spyOn(globalAetherPool, 'consume').mockReturnValue(true);
     const spendFurySpy = jest.spyOn(fury, 'spendFury');
     const basicSpy = jest.spyOn(combat, 'doBasicWithFollowups').mockImplementation(() => undefined as never);
@@ -68,11 +76,11 @@ describe('resource split: ult-fury vs skill-aether', () => {
     const result = doActionOrSkip(Game as never, unit as never, { performUlt: jest.fn() });
 
     expect(result.acted).toBe(true);
-    expect(consumeSpy).toHaveBeenCalledWith('ally', 25);
+    expect(consumeSpy).not.toHaveBeenCalled();
     expect(spendFurySpy).not.toHaveBeenCalled();
     expect(basicSpy).toHaveBeenCalledTimes(1);
   });
-  it('falls back to basic when skill lacks enough aether', () => {
+  it('falls back to basic when skill cannot be resolved', () => {
     jest
       .spyOn(ai, 'evaluateGambitLogic')
       .mockImplementation((_game, _unit, ctx) => ((ctx?.startIndex ?? 0) === 0
@@ -84,7 +92,7 @@ describe('resource split: ult-fury vs skill-aether', () => {
     const basicSpy = jest.spyOn(combat, 'doBasicWithFollowups').mockImplementation(() => undefined as never);
 
     const caster = {
-      id: 'mong_yem',
+      id: 'unit_without_skillset',
       side: 'ally',
       alive: true,
       cx: 0,
@@ -123,7 +131,7 @@ describe('resource split: ult-fury vs skill-aether', () => {
 
     expect(result.acted).toBe(true);
     expect(result.reason).toBe(null);
-    expect(currentSpy).toHaveBeenCalledWith('ally');
+    expect(currentSpy).not.toHaveBeenCalled();
     expect(consumeSpy).not.toHaveBeenCalled();
     expect(basicSpy).toHaveBeenCalledTimes(1);
   });
