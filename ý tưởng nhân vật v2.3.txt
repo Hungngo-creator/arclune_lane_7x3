@@ -851,8 +851,7 @@ GHI CHÚ KỸ THUẬT (Dành cho Coder):
 
 53) (Prime vs Prime): Thần Tính là [Quy Tắc Tối Thượng] (Axiom). Khi 2 Thần Tính va nhau, không ai bị áp chế bởi lực chiến cả. Đơn giản là cả hai đều miễn nhiễm hiệu ứng của nhau. Cuộc chiến giữa 2 Prime sẽ trở thành cuộc đọ sức thuần túy về Sát thương và Cơ chế (Raw Damage & Mechanics), bỏ qua mọi thủ thuật debuff. Đó là sự công bằng của các vị thần.
 [PRIME] HÓA THÂN HUYẾT CHỦ (Blood Avatar)
- * Class: Mage / Field Controller.
- * Role: Field Dominator (Kiểm soát sân), Anti-Meta (Chống Buff/Debuff), Scaling Bruiser (Tăng máu theo mạng).
+ * Class: Mage
 1. NỘI TẠI: Bất Nhiễm Huyết Chủ
  * Tags: [Nội Tại], [Bản Thân], [Quy Tắc Tối Thượng: Thần Tính], [Cơ Chế: Tăng Trưởng], [Quy Tắc: Tái Sinh].
  * Logic:

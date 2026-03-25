@@ -1148,6 +1148,138 @@ export const ROSTER = [
     }
   },
   {
+    id: 'blood_avatar', name: 'Hóa Thân Huyết Chủ', class: 'Mage', rank: 'Prime',
+    tags: ['divine-nature'],
+    mods: { HP: 0.08, WIL: 0.12 },
+    kit: {
+      onSpawn: createOnSpawn(),
+      basic: asUnknownRecord({
+        name: 'Huyết Đoạt',
+        tags: ['single-target', 'mark-builder'],
+        damageMultiplier: 1.00,
+        damageScale: ['WIL', 'ATK'],
+        debuff: { id: 'huyet_an', stacks: 1, maxStacks: 5, purgeable: false },
+        bonusIfTargetHasDebuff: { id: 'bleed', amount: 0.10 }
+      }),
+      skills: asUnknownRecordArray([
+        {
+          key: 'skill1',
+          name: 'Huyết Triều',
+          cost: { aether: 25 },
+          aoe: 'diagonal',
+          maxTargets: 6,
+          damageMultiplier: 1.40,
+          applies: [
+            { id: 'bleed', turns: 2, kind: 'debuff' },
+            { id: 'huyet_an', stacks: 1, maxStacks: 5, kind: 'mark', purgeable: false }
+          ],
+          notes: 'Quét hai đường chéo (1-4-7 và 3-6-9), mỗi mục tiêu nhận 140% sát thương đòn đánh thường, bị Chảy Máu 2 lượt và nhận 1 tầng Huyết Ấn.'
+        },
+        {
+          key: 'skill2',
+          name: 'Huyết Hải Lãnh Địa',
+          cost: { aether: 0 },
+          limit: { perBattle: 1 },
+          duration: 2,
+          field: {
+            id: 'huyet_hai_lanh_dia',
+            anchor: 'center',
+            effects: {
+              enemies: { healEfficiency: -0.25 },
+              allies: { hpRegen: 0.25, mode: 'field' }
+            }
+          },
+          punishment: {
+            trigger: 'enemyTurnStart',
+            checkMark: { id: 'huyet_an', stacksGte: 3 },
+            apply: { id: 'silence', turns: 1, oncePerTargetDuringField: true }
+          },
+          overlapRule: { allyRecast: 'overwrite-refresh', enemyField: 'coexist' }
+        },
+        {
+          key: 'skill3',
+          name: 'Huyết Tế',
+          cost: { aether: 25 },
+          trueCost: { hpPercentMax: 0.10 },
+          instant: true,
+          grantAether: { allies: 'allExceptSelf', amount: 15 },
+          notes: 'Tiêu hao 10% Max HP dạng true cost và hồi ngay 15 Aether cho toàn bộ đồng minh trừ bản thân.'
+        }
+      ]),
+      ult: asUnknownRecord({
+        type: 'auto-cast-fury',
+        trigger: 'fullRage',
+        aoe: 'allEnemies',
+        damageMultiplier: 2.20,
+        execute: {
+          requires: { debuff: 'bleed', hpPercentLte: 0.10 },
+          bypass: { blockedByImmortalityOnly: true }
+        },
+        postEffect: { applyMark: { id: 'huyet_an', stacks: 1, maxStacks: 5, to: 'survivingEnemies' } },
+        notes: 'Nếu mục tiêu đang dính Bleed và HP hiện tại ≤10% Max HP thì bị kết liễu tức thì (trừ bất tử/tái sinh đặc thù).'
+      }),
+      talent: asUnknownRecord({
+        name: 'Bất Nhiễm Huyết Chủ',
+        tags: ['divine-nature', 'revive'],
+        axiom: {
+          immuneExternalBuff: true,
+          immuneExternalDebuff: true,
+          allowDirectHealing: true,
+          allowResourceChange: true,
+          forbidExternalRevive: true,
+          divineConflict: 'coexist'
+        },
+        bloodFeast: {
+          trigger: 'enemyDeathWhileBleeding',
+          amountPercentMaxHP: 0.05,
+          capPercentMaxHP: 0.50,
+          resetOnBattleEnd: true
+        },
+        bloodCoreFailsafe: {
+          requiresOwnDirectKillsGte: 3,
+          excludesDotKills: true,
+          trigger: 'lethalDamage',
+          oncePerBattle: true,
+          setHPTo: 1,
+          consumeBonusMaxHPFrom: 'bloodFeast'
+        },
+        mark: {
+          id: 'huyet_an',
+          kind: 'mark',
+          maxStacks: 5,
+          purgeable: false,
+          threshold: {
+            stacksGte: 3,
+            amplifyDamageTakenFrom: ['bleed', 'execute'],
+            amount: 0.25,
+            enablesSkill2Silence: true
+          }
+        }
+      }),
+      technique: null,
+      passives: asUnknownRecordArray([
+        {
+          id: 'blood_feast_growth',
+          name: 'Huyết Thực',
+          when: 'onEnemyDeath',
+          effect: 'gainMaxHPPercent',
+          params: { requireBleed: true, amount: 0.05, cap: 0.50, resetOnBattleEnd: true }
+        },
+        {
+          id: 'blood_core_failsafe',
+          name: 'Hạch Huyết Tái Sinh',
+          when: 'onLethalDamage',
+          effect: 'surviveAtOneHP',
+          params: { minDirectKills: 3, excludesDotKills: true, consumeGrowthStack: 'blood_feast_growth', oncePerBattle: true }
+        }
+      ]),
+      traits: asUnknownRecordArray([
+        { id: 'divine_axiom', text: 'Miễn nhiễm tuyệt đối buff/debuff từ nguồn ngoài bản thân nhưng vẫn nhận hồi máu trực tiếp và thay đổi tài nguyên.' },
+        { id: 'mark_execute_synergy', text: 'Huyết Ấn đạt 3 tầng khiến mục tiêu nhận thêm 25% sát thương từ Bleed/Kết Liễu và có thể bị Câm Lặng bởi Lãnh Địa.' }
+      ])
+    }
+  },
+  {
     id: 'phe', name: 'Phệ', class: 'Mage', rank: 'UR',
     mods: { WIL: 0.10, AEregen: 0.10 }, // 20% tổng
     kit: {

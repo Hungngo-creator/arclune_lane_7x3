@@ -39,6 +39,7 @@ const UNIT_LIST = [
   { id: 'mo_da', name: 'Mộ Dạ', rank: 'SSR', role: 'Assassin' },
   { id: 'ngao_binh', name: 'Ngao Bính', rank: 'UR', role: 'Warrior' },
   { id: 'lau_khac_ma_chu', name: 'Lậu Khắc Ma Chủ', rank: 'Prime', role: 'Mage' },
+  { id: 'blood_avatar', name: 'Hóa Thân Huyết Chủ', rank: 'Prime', role: 'Mage' },
   { id: 'phe', name: 'Phệ', rank: 'UR', role: 'Mage' },
   { id: 'kiemtruongda', name: 'Kiếm Trường Dạ', rank: 'UR', role: 'Warrior' },
   { id: 'loithienanh', name: 'Lôi Thiên Ảnh', rank: 'SSR', role: 'Tanker' },

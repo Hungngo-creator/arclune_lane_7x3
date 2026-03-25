@@ -434,6 +434,102 @@ const skillsConfig = [
     ]
   },
   {
+    unitId: 'blood_avatar',
+    importBatch: 'ideas-matrix-batch-03',
+    sourceRefs: IDEA_SOURCE_REFS,
+    basic: {
+      name: 'Huyết Đoạt',
+      type: 'basic',
+      tags: ['single-target', 'mark'],
+      damage: { multiplier: 1.0, scale: ['ATK', 'WIL'] },
+      debuffs: [{ id: 'huyet_an', stacks: 1, maxStacks: 5, purgeable: false }],
+      conditionalBonus: { whenTargetHas: 'bleed', bonusDamage: 0.10 },
+      description: 'Gây 100% sát thương hỗn hợp (ATK + WIL), gắn 1 tầng Huyết Ấn. Nếu mục tiêu đang Chảy Máu thì tăng thêm 10% sát thương.'
+    },
+    skills: [
+      {
+        key: 'skill1',
+        name: 'Huyết Triều',
+        type: 'active',
+        cost: { aether: 25 },
+        tags: ['aoe', 'line', 'mark', 'active'],
+        damage: { multiplier: 1.4, base: 'basicAttackDamage' },
+        area: { pattern: 'double-diagonal', maxTargets: 6 },
+        debuffs: [{ id: 'bleed', duration: { turns: 2 } }, { id: 'huyet_an', stacks: 1, maxStacks: 5, purgeable: false }],
+        description: 'Quét hai đường chéo (1-4-7 và 3-6-9), mỗi mục tiêu nhận 140% sát thương đánh thường, bị Bleed 2 lượt và thêm 1 tầng Huyết Ấn.'
+      },
+      {
+        key: 'skill2',
+        name: 'Huyết Hải Lãnh Địa',
+        type: 'active',
+        cost: { aether: 0 },
+        tags: ['field', 'silence', 'active'],
+        usageLimit: { perBattle: 1 },
+        duration: { turns: 2, timeline: 'casterTurn' },
+        field: {
+          id: 'huyet_hai_lanh_dia',
+          enemy: { healEfficiency: -0.25 },
+          ally: { hpRegen: 0.25, asFieldEffect: true }
+        },
+        trigger: {
+          when: 'enemyTurnStart',
+          check: { markId: 'huyet_an', stacksGte: 3 },
+          apply: { id: 'silence', duration: { turns: 1 }, maxPerTargetDuringField: 1 }
+        },
+        description: 'Dựng Lãnh Địa tại trung tâm trong 2 lượt: phe địch giảm 25% hiệu quả hồi phục, phe ta tăng 25% HP Regen (hiệu ứng sân). Khi địch bắt đầu hành động, nếu có từ 3 tầng Huyết Ấn sẽ bị Câm Lặng 1 lượt, mỗi mục tiêu chỉ dính 1 lần trong thời gian Lãnh Địa tồn tại.'
+      },
+      {
+        key: 'skill3',
+        name: 'Huyết Tế',
+        type: 'active',
+        cost: { aether: 25 },
+        tags: ['instant', 'self', 'non-heal-hp-change', 'active'],
+        hpTrade: { percentMaxHP: 0.10, trueCost: true, reducible: false },
+        resources: { grantAetherToAllies: 15, excludeSelf: true },
+        description: 'Tiêu hao 25 Aether và 10% Max HP (true cost không thể giảm/chặn), ngay lập tức hồi 15 Aether cho toàn bộ đồng minh trừ bản thân.'
+      }
+    ],
+    ult: {
+      name: 'Huyết Hải Quy Tông',
+      type: 'ultimate',
+      tags: ['aoe', 'execute'],
+      trigger: { mode: 'auto', condition: 'fullFury' },
+      damage: { multiplier: 2.2, base: 'basicAttackDamage' },
+      execute: {
+        requires: { targetHas: 'bleed', hpPercentLte: 0.10 },
+        result: 'instantDeath',
+        exceptions: ['revive-rule', 'immortality-rule']
+      },
+      postEffect: { addMark: { id: 'huyet_an', stacks: 1, maxStacks: 5, to: 'survivingEnemies' } },
+      description: 'Tự động thi triển khi đầy nộ, gây 220% sát thương đánh thường lên toàn địch. Mục tiêu đang Bleed và còn ≤10% HP tối đa sẽ bị Kết Liễu tức thì (trừ các quy tắc bất tử/tái sinh đặc thù). Sau cùng gắn thêm 1 tầng Huyết Ấn lên các mục tiêu còn sống.'
+    },
+    talent: {
+      name: 'Bất Nhiễm Huyết Chủ',
+      type: 'talent',
+      tags: ['passive', 'divine-nature', 'mark', 'revive'],
+      mark: {
+        id: 'huyet_an',
+        maxStacks: 5,
+        threshold: { stacksGte: 3, extraDamageFrom: ['bleed', 'execute'], amount: 0.25 }
+      },
+      growth: { trigger: 'enemyDeathWithBleed', gainMaxHPPercent: 0.05, capMaxHPPercent: 0.50, reset: 'battleEnd' },
+      failsafe: { requiresDirectKillsGte: 3, excludeDotKills: true, oncePerBattle: true, lethalToOneHP: true, clearGrowthBonus: true },
+      divineAxiom: {
+        immuneExternalBuff: true,
+        immuneExternalDebuff: true,
+        allowDirectHealing: true,
+        allowResourceChange: true,
+        cannotBeRevivedByOthers: true
+      },
+      description: 'Thần Tính: miễn nhiễm buff/debuff từ mọi nguồn ngoài bản thân (vẫn nhận hồi máu trực tiếp và thay đổi Aether), không thể được hồi sinh bởi đồng đội. Huyết Thực: mỗi kẻ địch đang Bleed chết sẽ cộng +5% Max HP (tối đa +50%, reset khi rời trận). Hạch Huyết Tái Sinh: nếu tự tay hạ gục ≥3 mục tiêu (không tính kill do Bleed DOT), khi nhận sát thương chí tử sẽ giữ lại 1 HP, xóa toàn bộ Max HP cộng thêm từ Huyết Thực và chỉ kích hoạt 1 lần mỗi trận.'
+    },
+    technique: null,
+    notes: [
+      'Huyết Ấn là Mark riêng, không phải debuff thường nên chỉ bị xóa bởi cơ chế đặc thù chứ không bị cleanse phổ thông.',
+      'Trong đối đầu Prime, Thần Tính không xóa được Thần Tính của nhau; Execute vẫn là cơ chế kiểm tra HP nên chỉ khó kích hoạt do thiếu điều kiện Bleed.'
+    ]
+  },
+  {
     unitId: 'phe',
     importBatch: 'ideas-matrix-batch-02',
     sourceRefs: IDEA_SOURCE_REFS,
