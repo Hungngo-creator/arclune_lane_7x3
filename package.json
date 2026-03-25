@@ -8,7 +8,7 @@
     "build:prod": "node tools/generate-loithienanh-svg.mjs && node build.mjs --mode=production",
     "dev": "APP_ENTRY=${APP_ENTRY:-src/main.ts} node tools/tsx-stub/bin.js watch $APP_ENTRY",
     "start": "NODE_ENV=${NODE_ENV:-production} APP_ENTRY=${APP_ENTRY:-src/main.ts} node tools/tsx-stub/bin.js $APP_ENTRY",
-    "test": "jest --runInBand",
+    "test": "jest --runInBand --passWithNoTests",
     "ci": "npm run check:duplicate-declarations && npm run typecheck && npm test && npm run build",
     "typecheck": "tsc --noEmit",
     "postinstall": "node tools/install-stubs.mjs",

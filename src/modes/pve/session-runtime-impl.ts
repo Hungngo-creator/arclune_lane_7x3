@@ -57,6 +57,7 @@ import {
   sessionNow,
 } from '../../utils/time';
 import { getSummonSpec, resolveSummonSlots } from '../../utils/kit';
+import { isUniqueGlobalSummonBlocked } from '../../utils/unique-global.ts';
 import { nextRngValue } from '../../utils/rng.ts';
 import { normalizeTagList } from '../../data/tags.ts';
 import { dispatchGameplayTags } from '../../combat/tag-dispatch.ts';
@@ -1656,7 +1657,7 @@ function performUyenLeaderUlt(game: SessionState, unit: UnitToken): boolean {
       const allies = (game.tokens || []).filter((token) => token.alive && token.side === unit.side);
       for (const ally of allies) {
         const haste = makeStatusEffect('haste', { pct: 0.25, turns: 3 });
-        if (haste) Statuses.add(ally, haste);
+        if (haste) Statuses.add(ally, { ...haste, sourceUnitId: unit.id });
       }
     } else {
       state.a3Stacks += 1;
@@ -1984,7 +1985,8 @@ function performUlt(unit: UnitToken): void {
               stacks: 1,
               maxStacks: debuffMaxStacks,
               dur: Number.isFinite(debuffDuration) ? debuffDuration : undefined,
-              tick: 'turn'
+              tick: 'turn',
+              sourceUnitId: unit.id,
             });
           }
           if (typeof tgt._recalcStats === 'function') tgt._recalcStats();
@@ -2039,7 +2041,7 @@ function performUlt(unit: UnitToken): void {
         const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
         const damageCut = makeStatusEffect('damageCut', { pct: reduceDmg, turns });
         if (damageCut) {
-          Statuses.add(unit, damageCut);
+          Statuses.add(unit, { ...damageCut, sourceUnitId: unit.id });
         }
       }
 
@@ -2100,7 +2102,7 @@ function performUlt(unit: UnitToken): void {
         const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
         const damageCut = makeStatusEffect('damageCut', { pct: reduce, turns });
         if (damageCut) {
-          Statuses.add(unit, damageCut);
+          Statuses.add(unit, { ...damageCut, sourceUnitId: unit.id });
         }
       }
       {
@@ -2129,7 +2131,7 @@ function performUlt(unit: UnitToken): void {
         const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
         const sleep = makeStatusEffect('sleep', { turns });
         if (sleep) {
-          Statuses.add(tgt, sleep);
+          Statuses.add(tgt, { ...sleep, sourceUnitId: unit.id });
         }
         if (sessionVfx) {
           try { vfxAddHit(sessionVfx, tgt); } catch(_){}
@@ -2150,6 +2152,7 @@ function performUlt(unit: UnitToken): void {
       for (let i=0; i<take; i++){
         const ally = fallen[i];
         if (!ally) continue;
+        if (ally.id !== unit.id && readTokenTags(ally).includes('divine-nature')) continue;
         ally.alive = true;
         ally.deadAt = 0;
         ally.hp = 0;
@@ -2163,7 +2166,7 @@ function performUlt(unit: UnitToken): void {
           const silenceTurns = Math.max(1, Math.round(parseFiniteNumber(u.revived.lockSkillsTurns) ?? 1));
           const silence = makeStatusEffect('silence', { turns: silenceTurns });
           if (silence) {
-            Statuses.add(ally, silence);
+            Statuses.add(ally, { ...silence, sourceUnitId: unit.id });
           }
         }
         if (sessionVfx) {
@@ -2226,7 +2229,7 @@ function performUlt(unit: UnitToken): void {
         const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
         const haste = makeStatusEffect('haste', { pct, turns });
         if (haste) {
-          Statuses.add(tgt, haste);
+          Statuses.add(tgt, { ...haste, sourceUnitId: unit.id });
         }
         if (sessionVfx) {
           try { vfxAddHit(sessionVfx, tgt); } catch(_){}
@@ -2698,6 +2701,7 @@ function init(): boolean {
       const game = getInitializedGame();
       if (!game) return false;
       const entry = asDeckEntry(card);
+      if (isUniqueGlobalSummonBlocked(game, { unitId: entry.id, tags: entry.tags ?? null })) return false;
       return game.cost >= getCardCost(entry);
     },
     getDeck: (): DeckEntry[] => {
@@ -2740,6 +2744,7 @@ function init(): boolean {
     const card = deck.find((u) => u.id === game.selectedId) ?? null;
     if (!card) return;
     if (!isCardInLockedDeck(card.id, game)) return;
+    if (isUniqueGlobalSummonBlocked(game, { unitId: card.id, tags: card.tags ?? null })) return;
 
     if (cellReserved(tokensAlive(), game.queued, cell.cx, cell.cy)) return;
     const cardCost = getCardCost(card);

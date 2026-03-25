@@ -687,7 +687,10 @@ export function basicAttack(Game: SessionState, unit: UnitToken): void {
     const debuffId = debuffPool[idx] ?? 'bleed';
     const status = Statuses.make[debuffId]?.({ turns: debuffId === 'stun' ? 1 : 2 });
     if (status) {
-      Statuses.add(resolved, status);
+      Statuses.add(resolved, {
+        ...status,
+        sourceUnitId: unit.id,
+      });
     }
   }
   const turnStamp = `${Game.turn?.cycle ?? 0}:${unit.iid ?? 0}`;

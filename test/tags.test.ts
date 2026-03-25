@@ -15,6 +15,7 @@ describe('tag registry', () => {
     expect(normalizeTagId('tuyetdoi_khien')).toBe('absolute-shield');
     expect(normalizeTagId('haste')).toBe('support');
     expect(normalizeTagId('reflect')).toBe('defense');
+    expect(normalizeTagId('axiom')).toBe('divine-nature');
   });
 
   test('deduplicates and canonicalizes list', () => {
@@ -36,7 +37,7 @@ describe('tag registry', () => {
   });
 
   test('provides grouped ids by domain', () => {
-    expect(TAG_IDS_BY_DOMAIN.rule).toEqual(expect.arrayContaining(['absolute-attack', 'absolute-shield', 'unique-global']));
+    expect(TAG_IDS_BY_DOMAIN.rule).toEqual(expect.arrayContaining(['absolute-attack', 'absolute-shield', 'divine-nature', 'unique-global']));
     expect(TAG_IDS_BY_DOMAIN.effect).toEqual(expect.arrayContaining(['heal', 'shield', 'poison']));
     expect(Object.values(TAG_IDS_BY_DOMAIN).flat().length).toBe(GAME_TAGS.length);
   });

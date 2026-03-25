@@ -46,13 +46,14 @@ function resolvePayload(skill: SkillSection): Record<string, unknown> {
   };
 }
 
-function addTaggedStatus(target: UnitToken, id: string, turns: number): void {
+function addTaggedStatus(target: UnitToken, id: string, turns: number, source: UnitToken): void {
   Statuses.add(target, {
     id,
     kind: 'debuff',
     tag: id,
     dur: Math.max(1, turns),
     tick: 'turn',
+    sourceUnitId: source.id,
   });
 }
 
@@ -163,17 +164,17 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
   }
 
   if (hasTag('silence')) {
-    for (const target of targets) addTaggedStatus(target, 'silence', turns);
+    for (const target of targets) addTaggedStatus(target, 'silence', turns, caster);
   }
   if (hasTag('sleep')) {
-    for (const target of targets) addTaggedStatus(target, 'sleep', turns);
+    for (const target of targets) addTaggedStatus(target, 'sleep', turns, caster);
   }
   if (hasTag('mark')) {
-    for (const target of targets) addTaggedStatus(target, 'mark', turns);
+    for (const target of targets) addTaggedStatus(target, 'mark', turns, caster);
   }
   if (hasTag('control')) {
     const statusId = typeof payload.controlStatus === 'string' ? payload.controlStatus : 'control';
-    for (const target of targets) addTaggedStatus(target, statusId, turns);
+    for (const target of targets) addTaggedStatus(target, statusId, turns, caster);
   }
 
   if (hasTag('single-target') || hasTag('multi-target') || hasTag('aoe') || hasTag('non-heal-hp-change') || skill.damage) {

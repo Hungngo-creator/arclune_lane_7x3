@@ -191,6 +191,26 @@
         });
       };
 
+    function detectUnsupportedHost(){
+        const host = (window.location && window.location.hostname || '').toLowerCase();
+        if (host === 'github.com' || host === 'raw.githubusercontent.com') {
+          const origin = window.location.origin || 'https://<user>.github.io';
+          const pathname = window.location.pathname || '/<repo>/';
+          const parts = pathname.split('/').filter(Boolean);
+          const owner = parts[0] || '<user>';
+          const repo = parts[1] || '<repo>';
+          const ghPagesUrl = `https://${owner}.github.io/${repo}/`;
+          window.arcluneShowFatal(
+            `Trang này đang mở trên ${host}, nơi GitHub chặn hoặc đổi MIME khi chạy app tĩnh. ` +
+            `Hãy chạy bằng GitHub Pages (${ghPagesUrl}) hoặc clone repo về máy rồi mở bằng local server (ví dụ: npx serve .).`
+          );
+          return true;
+        }
+        return false;
+      }
+
+      if (detectUnsupportedHost()) return;
+
       window.addEventListener('error', function onWindowError(event){
         const message = event && event.message ? event.message : 'Lỗi runtime không xác định.';
         window.arcluneShowFatal && window.arcluneShowFatal(message);

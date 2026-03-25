@@ -1,6 +1,7 @@
 //home (termux)/arclune_lane_7x3/src/statuses.ts
 import { applyDamage } from './combat/apply-damage.ts';
 import { calculateFinalDamage } from './combat/calculate-final-damage.ts';
+import { normalizeTagList } from './data/tags.ts';
 import { gainFury, finishFuryHit } from './utils/fury.ts';
 import { safeNow } from './utils/time.ts';
 
@@ -107,6 +108,14 @@ const ensureStatusList = (unit?: UnitToken | null): StatusEffect[] => {
     unit.statuses = [];
   }
   return unit.statuses;
+};
+
+const hasDivineNatureTag = (unit: UnitToken | null | undefined): boolean => {
+  if (!unit) return false;
+  if (unit.hasDivineNature === true) return true;
+  const rawTags = Array.isArray(unit.tags) ? unit.tags : [];
+  const tags = normalizeTagList(rawTags.filter((tag): tag is string => typeof tag === 'string'));
+  return tags.includes('divine-nature');
 };
 
 const isTokenCandidate = (value: unknown): value is UnitToken => {
@@ -241,6 +250,11 @@ const statusFactories = {
 
 export const Statuses: StatusService = {
   add(unit, status) {
+    const isBuffDebuff = status.kind === 'buff' || status.kind === 'debuff';
+    const sourceUnitId = typeof status.sourceUnitId === 'string' ? status.sourceUnitId : null;
+    if (isBuffDebuff && hasDivineNatureTag(unit) && sourceUnitId && sourceUnitId !== unit.id) {
+      return status;
+    }
     const list = ensureStatusList(unit);
     const [, index, existing] = findStatus(unit, status.id);
     if (existing) {

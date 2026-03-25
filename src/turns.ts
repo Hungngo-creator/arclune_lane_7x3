@@ -21,6 +21,7 @@ import { applyCultivationBonus } from './cultivation.ts';
 import { evaluateGambitLogic } from './ai.ts';
 import { nextRngValue } from './utils/rng.ts';
 import { normalizeClassName, normalizeElementKey } from './utils/domain-normalization.ts';
+import { isUniqueGlobalSummonBlocked } from './utils/unique-global.ts';
 import {
   clearQueuedUyenUlt,
   hasQueuedUyenUlt,
@@ -271,6 +272,10 @@ export function spawnQueuedIfDue(
   }
 
   queueMap?.delete(slot);
+
+  if (isUniqueGlobalSummonBlocked(Game, { unitId: p.unitId, tags: Array.isArray((p as { tags?: unknown }).tags) ? ((p as { tags: string[] }).tags) : null })) {
+    return resolveCurrentActor();
+  }
 
   const meta = Game.meta && typeof Game.meta.get === 'function' ? Game.meta.get(p.unitId) : null;
   const source = p.source || null;

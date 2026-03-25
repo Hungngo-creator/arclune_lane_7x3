@@ -40,7 +40,14 @@ const TAG_DEFINITIONS = [
   { id: 'defense', label: 'Phòng thủ', domain: 'effect', aliases: ['defensive', 'protection', 'reflect'] },
   { id: 'absolute-attack', label: 'Tuyệt đối công', domain: 'rule', aliases: ['absolute_attack', 'tuyetdoi_cong'] },
   { id: 'absolute-shield', label: 'Tuyệt đối khiên', domain: 'rule', aliases: ['absolute_shield', 'tuyetdoi_khien'] },
-  { id: 'unique-global', label: 'Độc Nhất toàn chiến trường', domain: 'rule', aliases: ['doc_nhat'] },
+  {
+    id: 'divine-nature',
+    label: 'Thần Tính',
+    domain: 'rule',
+    aliases: ['than_tinh', 'thần_tính', 'axiom'],
+    note: 'Axiom: miễn nhiễm buff/debuff từ nguồn ngoài bản thân và chỉ có thể hồi sinh bởi kit của chính đơn vị đó.'
+  },
+  { id: 'unique-global', label: '[Độc Nhất]', domain: 'rule', aliases: ['doc_nhat'], note: 'Campaign: trên toàn chiến trường chỉ tồn tại 1 bản thể cùng unitId tại một thời điểm.' },
   { id: 'aether-cost', label: 'Tiêu hao Aether', domain: 'resource', aliases: ['cost-aether'] },
   { id: 'revive', label: 'Hồi sinh', domain: 'effect' },
   { id: 'summon', label: 'Triệu hồi', domain: 'effect' },

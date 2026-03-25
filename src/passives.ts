@@ -233,6 +233,7 @@ const ensureStatBuff = (
       amount,
       purgeable,
       stacks: 0,
+      sourceUnitId: unit.id,
     });
   }
   status.attr = statKey;
@@ -514,6 +515,7 @@ const EFFECTS: Record<string, PassiveDefinition> = {
           dur: ttl,
           tick: 'turn',
           purgeable,
+          sourceUnitId: unit?.id,
         });
       }
       if (!status) return;
@@ -820,7 +822,7 @@ export function applyOnSpawnEffects(
     if (type === 'status' || type === 'addstatus'){
       const statusEffect = effect.status;
       if (statusEffect && typeof statusEffect === 'object'){
-        Statuses.add(unit, statusEffect as StatusEffect);
+        Statuses.add(unit, { ...(statusEffect as StatusEffect), sourceUnitId: unit.id });
       }
       continue;
     }

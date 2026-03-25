@@ -1066,6 +1066,7 @@ export const ROSTER = [
   },
   {
     id: 'lau_khac_ma_chu', name: 'Lậu Khắc Ma Chủ', class: 'Mage', rank: 'Prime',
+    tags: ['divine-nature'],
     mods: { WIL: 0.12, AEregen: 0.08 },
     kit: {
       onSpawn: createOnSpawn(),
@@ -1620,7 +1621,7 @@ export const ROSTER = [
       }),
       basic: asUnknownRecord({
         name: 'Đánh Thường',
-        tags: ['single-target', 'creep'],
+        tags: ['single-target', 'basic-attack'],
         damageMultiplier: 1.00,
         useAtkWilBase: true,
         notes: 'Sát thương cơ bản = 100% ATK + 100% WIL.'
@@ -1655,7 +1656,7 @@ export const ROSTER = [
       }),
       basic: asUnknownRecord({
         name: 'Đánh Thường',
-        tags: ['single-target', 'creep'],
+        tags: ['single-target', 'basic-attack'],
         damageMultiplier: 1.00,
         useAtkWilBase: true,
         notes: 'Sát thương cơ bản = 100% ATK + 100% WIL.'
@@ -1690,7 +1691,7 @@ export const ROSTER = [
       }),
       basic: asUnknownRecord({
         name: 'Đánh Thường',
-        tags: ['single-target', 'creep'],
+        tags: ['single-target', 'basic-attack'],
         damageMultiplier: 1.00,
         useAtkWilBase: true,
         notes: 'Sát thương cơ bản = 100% ATK + 100% WIL.'

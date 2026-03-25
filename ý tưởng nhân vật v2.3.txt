@@ -1211,7 +1211,7 @@ Vũ khí: Một thanh cự kiếm đen sì, không có lưỡi sắc (Vô Phong)
 Nội tại — Nhất Lực Phá Vạn Pháp:
 Mọi sát thương gây ra bởi Cổ Nhất Phàm (từ đánh thường, kỹ năng, ult) đều được coi là Sát thương Chuẩn (True Damage) nếu mục tiêu đang có bất kỳ hiệu ứng Có Lợi (Buff) hoặc Khiên (Shield) nào trên người.
 Ngoài ra, hắn miễn nhiễm hoàn toàn với các hiệu ứng khống chế cứng (Choáng, Đóng băng) nhưng tốc độ (SPD) cơ bản giảm 10%.
-Tag: Nội tại, Bản thân.
+Tag: Nội tại, Bản thân, Pháp Tắc.
 Đánh thường:
 Vung thanh trọng kiếm đập thẳng vào đầu mục tiêu, gây sát thương = 100% WIL + 100% ATK.
 Tag: Kẻ địch, Sát thương đơn mục tiêu cố định.

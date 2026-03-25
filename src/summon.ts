@@ -4,6 +4,7 @@ import { asSessionWithVfx, vfxAddSpawn } from './vfx.ts';
 import { getUnitArt } from './art.ts';
 import { kitSupportsSummon } from './utils/kit.ts';
 import { prepareUnitForPassives, applyOnSpawnEffects } from './passives.ts';
+import { isUniqueGlobalSummonBlocked } from './utils/unique-global.ts';
 
 import type { PassiveKitDefinition, SessionState } from '@shared-types/combat';
 import type { ActionChainEntry, Side, SummonRequest, UnitToken } from '@shared-types/units';
@@ -52,6 +53,13 @@ const getTurnSnapshotInfo = (turn: TurnSnapshot | null | undefined): { orderLeng
 // en-queue các yêu cầu “Immediate” trong lúc 1 unit đang hành động
 // req: { by?:unitId, side:'ally'|'enemy', slot:1..9, unit:{...} }
 export function enqueueImmediate(Game: SessionState, req: SummonRequest): boolean {
+  if (isUniqueGlobalSummonBlocked(Game, {
+    unitId: req.unit?.id,
+    tags: Array.isArray((req.unit as Record<string, unknown> | null)?.['tags'])
+      ? ((req.unit as Record<string, unknown>)['tags'] as ReadonlyArray<string>)
+      : null,
+  })) return false;
+
   if (req.by){
     const metaEntry =
       typeof Game.meta?.get === 'function' ? Game.meta.get(req.by) : null;
