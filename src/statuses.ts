@@ -113,8 +113,8 @@ const ensureStatusList = (unit?: UnitToken | null): StatusEffect[] => {
 const hasDivineNatureTag = (unit: UnitToken | null | undefined): boolean => {
   if (!unit) return false;
   if (unit.hasDivineNature === true) return true;
-  const rawTags = Array.isArray(unit.tags) ? unit.tags : [];
-  const tags = normalizeTagList(rawTags.filter((tag): tag is string => typeof tag === 'string'));
+  const rawTags: unknown[] = Array.isArray(unit.tags) ? unit.tags : [];
+  const tags = normalizeTagList(rawTags.filter((tag: unknown): tag is string => typeof tag === 'string'));
   return tags.includes('divine-nature');
 };
 

@@ -31550,7 +31550,11 @@ __define('./turns.ts', (exports, module, __require) => {
           return resolveCurrentActor();
       }
       queueMap?.delete(slot);
-      if (isUniqueGlobalSummonBlocked(Game, { unitId: p.unitId, tags: Array.isArray(p.tags) ? (p.tags) : null })) {
+      const queuedTagsRaw = p.tags;
+      const queuedTags = Array.isArray(queuedTagsRaw)
+          ? queuedTagsRaw.filter((tag) => typeof tag === 'string')
+          : null;
+      if (isUniqueGlobalSummonBlocked(Game, { unitId: p.unitId, tags: queuedTags })) {
           return resolveCurrentActor();
       }
       const meta = Game.meta && typeof Game.meta.get === 'function' ? Game.meta.get(p.unitId) : null;

@@ -17,7 +17,7 @@ const collectSkillTags = (unitId: string): string[] => {
     ...(set.ult?.tags ?? []),
     ...(set.talent?.tags ?? []),
     ...(set.technique?.tags ?? []),
-    ...((set.skills ?? []).flatMap((section) => section?.tags ?? [])),
+    ...((set.skills ?? []).flatMap((section: { tags?: string[] } | null | undefined) => section?.tags ?? [])),
   ];
   return normalizeTagList(tags);
 };

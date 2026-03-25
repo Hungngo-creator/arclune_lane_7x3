@@ -273,7 +273,11 @@ export function spawnQueuedIfDue(
 
   queueMap?.delete(slot);
 
-  if (isUniqueGlobalSummonBlocked(Game, { unitId: p.unitId, tags: Array.isArray((p as { tags?: unknown }).tags) ? ((p as { tags: string[] }).tags) : null })) {
+  const queuedTagsRaw = (p as unknown as { tags?: unknown }).tags;
+  const queuedTags = Array.isArray(queuedTagsRaw)
+    ? queuedTagsRaw.filter((tag: unknown): tag is string => typeof tag === 'string')
+    : null;
+  if (isUniqueGlobalSummonBlocked(Game, { unitId: p.unitId, tags: queuedTags })) {
     return resolveCurrentActor();
   }
 
