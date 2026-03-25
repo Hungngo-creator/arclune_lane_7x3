@@ -731,7 +731,11 @@ const completeTurn = ({
   while (gambitIndex < 5) {
     const decision = evaluateGambitLogic(Game, unit, { startIndex: gambitIndex });
     if (decision.slotIndex < 0 || !decision.action) break;
-    gambitIndex = decision.slotIndex + 1;
+    const nextGambitIndex = decision.slotIndex + 1;
+    if (nextGambitIndex <= gambitIndex) {
+      break;
+    }
+    gambitIndex = nextGambitIndex;
 
     if (decision.action === 'basic') {
       break;
