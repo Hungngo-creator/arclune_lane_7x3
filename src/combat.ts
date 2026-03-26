@@ -449,6 +449,7 @@ export function dealAbilityDamage(
     : (Statuses.absorbShield(target, dmg, { dtype }) as ShieldAbsorptionResult);
   const remain = Math.max(0, Math.floor(abs.remain));
   let dealtTotal = 0;
+  const attackerState = attacker as UnitToken & { _directKills?: number };
 
   const emitOnDeathPassive = (unit: UnitToken): void => {
     if (!Game || unit.alive) return;
@@ -500,6 +501,9 @@ export function dealAbilityDamage(
     dealtTotal += Math.max(0, beforeHp - afterHp);
   }
   if (target.hp <= 0) {
+    emitPassiveEvent(Game, target, 'onLethalDamage', { log: getPassiveLog(Game), attacker, attackType });
+  }
+  if (target.hp <= 0) {
     hookOnLethalDamage(target);
   }
 
@@ -525,6 +529,10 @@ export function dealAbilityDamage(
   }
 
   const isKill = target.hp <= 0;
+  if (isKill) {
+    attackerState._directKills = Math.max(0, Math.floor(Number(attackerState._directKills ?? 0))) + 1;
+    emitPassiveEvent(Game, attacker, 'onEnemyDeath', { log: getPassiveLog(Game), target, attackType, isDirectKill: true });
+  }
 
   gainFury(attacker, {
     type: attackType === 'basic' ? 'basic' : 'ability',
@@ -585,7 +593,18 @@ export function healUnit(target: UnitToken | null | undefined, amount: number): 
     return { healed: 0, overheal: 0 };
   }
 
-  const amt = Math.max(0, Math.floor(amount ?? 0));
+  let efficiency = 1;
+  const statuses = Array.isArray(target?.statuses) ? target.statuses : [];
+  for (const status of statuses) {
+    if (!status) continue;
+    if (status.id === 'heal_efficiency_down') {
+      const ratio = Number((status as Record<string, unknown>).amount ?? (status as Record<string, unknown>).power ?? 0);
+      if (Number.isFinite(ratio) && ratio > 0) {
+        efficiency = Math.max(0, efficiency - ratio);
+      }
+    }
+  }
+  const amt = Math.max(0, Math.floor((amount ?? 0) * efficiency));
   if (amt <= 0) {
     return { healed: 0, overheal: 0 };
   }

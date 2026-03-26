@@ -685,6 +685,48 @@ const EFFECTS: Record<string, PassiveDefinition> = {
     applyStatStacks(status, foes.length, { maxStacks: typeof params.maxStacks === 'number' ? params.maxStacks : undefined });
     recomputeFromStatuses(unit);
   },
+  gainMaxHPPercent({ unit, passive, ctx }) {
+    if (!unit || !passive?.id) return;
+    const params = (passive.params ?? {}) as Record<string, unknown>;
+    const amount = Math.max(0, toNumber(params.amount, 0));
+    const cap = Math.max(0, toNumber(params.cap, 0));
+    if (amount <= 0 || cap <= 0) return;
+
+    const target = (ctx as Record<string, unknown> | null | undefined)?.target as UnitToken | null | undefined;
+    if (params.requireBleed === true && (!target || !Statuses.has(target, 'bleed'))) return;
+
+    const hpMax = Math.max(1, Number(unit.hpMax ?? 1));
+    const state = unit as UnitToken & { _bloodFeastBonus?: number };
+    const currentBonus = Math.max(0, Number(state._bloodFeastBonus ?? 0));
+    const addRatio = Math.max(0, Math.min(amount, cap - currentBonus));
+    if (addRatio <= 0) return;
+    const gain = Math.max(1, Math.floor(hpMax * addRatio));
+    unit.hpMax = hpMax + gain;
+    unit.hp = Math.min(unit.hpMax, Math.max(0, Number(unit.hp ?? 0) + gain));
+    state._bloodFeastBonus = currentBonus + addRatio;
+  },
+  surviveAtOneHP({ unit, passive }) {
+    if (!unit || !passive?.id) return;
+    const params = (passive.params ?? {}) as Record<string, unknown>;
+    const state = unit as UnitToken & { _bloodCoreUsed?: boolean; _directKills?: number; _bloodFeastBonus?: number };
+    if (state._bloodCoreUsed) return;
+    const minDirectKills = Math.max(0, Math.floor(toNumber(params.minDirectKills, 0)));
+    const directKills = Math.max(0, Math.floor(Number(state._directKills ?? 0)));
+    if (directKills < minDirectKills) return;
+    if ((unit.hp ?? 0) > 0) return;
+
+    const baseHpMax = Math.max(1, Number(unit.hpMax ?? 1));
+    const bonusRatio = Math.max(0, Number(state._bloodFeastBonus ?? 0));
+    if (bonusRatio > 0) {
+      const reduced = Math.max(1, Math.floor(baseHpMax / (1 + bonusRatio)));
+      unit.hpMax = reduced;
+      state._bloodFeastBonus = 0;
+    }
+    unit.hp = 1;
+    unit.alive = true;
+    unit.deadAt = undefined;
+    state._bloodCoreUsed = true;
+  },
 };
 
 /** @type {Record<string, PassiveEffectHandler>} */
@@ -699,6 +741,8 @@ const PASSIVE_ENTRIES: Record<string, PassiveDefinition | null | undefined> = {
   'gainStats%': EFFECTS.gainStats,
   statBuff: EFFECTS.gainStats,
   statGain: EFFECTS.gainStats,
+  gainMaxHPPercent: EFFECTS.gainMaxHPPercent,
+  surviveAtOneHP: EFFECTS.surviveAtOneHP,
 };
 
 const PASSIVES: PassiveRegistry = Object.freeze(

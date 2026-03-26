@@ -129,6 +129,51 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
   const targets = dispatch.targets.length > 0 ? dispatch.targets : (caster.alive ? [caster] : []);
   const turns = Math.max(1, Math.round(readNumberish(payload.turns ?? payload.duration, 1)));
 
+  if (caster.id === 'blood_avatar') {
+    const enemies = game.tokens.filter((token) => token.alive && token.side !== caster.side);
+    if (skillKey === 'skill1') {
+      if (globalAetherPool.current(caster.side) < 25) {
+        return { ok: false, skillKey, skill, tags, appliedTags: dispatch.applied, targetCount: enemies.length, reason: 'insufficient-aether' };
+      }
+      globalAetherPool.consume(caster.side, 25);
+      const base = Math.max(1, Math.round(((caster.atk ?? 0) + (caster.wil ?? 0)) * 1.4));
+      const picked = enemies.slice(0, 6);
+      for (const target of picked) {
+        dealAbilityDamage(game, caster, target, { base, attackType: 'skill', skill, isAoE: true, targetsHit: picked.length });
+        Statuses.add(target, { id: 'bleed', kind: 'debuff', tag: 'bleed', dur: 2, tick: 'turn', sourceUnitId: caster.id });
+        Statuses.add(target, { id: 'huyet_an', kind: 'mark', tag: 'mark', stacks: 1, maxStacks: 5, purgeable: false, sourceUnitId: caster.id });
+      }
+      return { ok: true, skillKey, skill, tags, appliedTags: dispatch.applied, targetCount: picked.length };
+    }
+    if (skillKey === 'skill2') {
+      const casterState = caster as UnitToken & { _bloodFieldUsed?: boolean };
+      if (casterState._bloodFieldUsed) {
+        return { ok: false, skillKey, skill, tags, appliedTags: dispatch.applied, targetCount: 0, reason: 'blocked' };
+      }
+      casterState._bloodFieldUsed = true;
+      Statuses.add(caster, { id: 'blood_field_active', kind: 'buff', tag: 'field', dur: 2, tick: 'turn', sourceUnitId: caster.id });
+      for (const token of game.tokens) {
+        if (!token.alive) continue;
+        if (token.side === caster.side) {
+          Statuses.add(token, { id: 'field_hp_regen_up', kind: 'buff', tag: 'field', dur: 2, tick: 'turn', amount: 0.25, sourceUnitId: caster.id });
+        } else {
+          Statuses.add(token, { id: 'heal_efficiency_down', kind: 'debuff', tag: 'field', dur: 2, tick: 'turn', amount: 0.25, sourceUnitId: caster.id });
+        }
+      }
+      return { ok: true, skillKey, skill, tags, appliedTags: dispatch.applied, targetCount: enemies.length };
+    }
+    if (skillKey === 'skill3') {
+      if (globalAetherPool.current(caster.side) < 25) {
+        return { ok: false, skillKey, skill, tags, appliedTags: dispatch.applied, targetCount: 0, reason: 'insufficient-aether' };
+      }
+      globalAetherPool.consume(caster.side, 25);
+      const hpCost = Math.max(1, Math.floor((caster.hpMax ?? 0) * 0.1));
+      caster.hp = Math.max(1, Math.floor((caster.hp ?? 0) - hpCost));
+      globalAetherPool.gain(caster.side, 15);
+      return { ok: true, skillKey, skill, tags, appliedTags: dispatch.applied, targetCount: 0 };
+    }
+  }
+
   if (hasTag('summon')) {
     const openSlot = firstOpenSlot(game, caster.side);
     if (openSlot) {

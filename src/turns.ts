@@ -181,7 +181,16 @@ function applyTurnRegen(
   let hpDelta = 0;
   if (Number.isFinite(unit.hp) || Number.isFinite(unit.hpMax) || Number.isFinite(unit.hpRegen)){
     const currentHp = Number.isFinite(unit.hp) ? unit.hp : 0;
-    const regenHp = Number.isFinite(unit.hpRegen) ? unit.hpRegen : 0;
+    let regenHp = Number.isFinite(unit.hpRegen) ? unit.hpRegen : 0;
+    if (Array.isArray(unit.statuses)) {
+      for (const status of unit.statuses) {
+        if (!status || status.id !== 'field_hp_regen_up') continue;
+        const amount = Number((status as Record<string, unknown>).amount ?? (status as Record<string, unknown>).power ?? 0);
+        if (Number.isFinite(amount) && amount > 0) {
+          regenHp += Math.max(0, regenHp * amount);
+        }
+      }
+    }
     const afterHp = clampResourceAfterRegen(currentHp + regenHp, unit.hpMax);
     hpDelta = afterHp - currentHp;
     unit.hp = afterHp;
@@ -676,6 +685,21 @@ const completeTurn = ({
   startFuryTurn(unit, { turnStamp, startAmount: CFG?.fury?.turn?.startGain, grantStart: true });
   applyTurnRegen(Game, unit);
   Statuses.onTurnStart(unit, {});
+  const bloodAvatarFieldOwners = Game.tokens.filter((token) =>
+    token.alive
+    && token.id === 'blood_avatar'
+    && token.side !== unit.side
+    && Statuses.has(token, 'blood_field_active')
+  );
+  if (bloodAvatarFieldOwners.length > 0) {
+    const markStacks = Statuses.stacks(unit, 'huyet_an');
+    const alreadyPunished = Statuses.has(unit, 'blood_field_silence_once');
+    if (markStacks >= 3 && !alreadyPunished) {
+      const owner = bloodAvatarFieldOwners[0];
+      Statuses.add(unit, { id: 'silence', kind: 'debuff', tag: 'silence', dur: 1, tick: 'turn', sourceUnitId: owner.id });
+      Statuses.add(unit, { id: 'blood_field_silence_once', kind: 'mark', tag: 'field', dur: 3, tick: 'turn', sourceUnitId: owner.id });
+    }
+  }
   emitGameEvent(ACTION_START, baseDetail);
 
   if (!Statuses.canAct(unit)) {

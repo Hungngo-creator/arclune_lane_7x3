@@ -3478,7 +3478,7 @@ __define('./catalog.ts', (exports, module, __require) => {
               onSpawn: createOnSpawn(),
               basic: asUnknownRecord({
                   name: 'Huyết Đoạt',
-                  tags: ['single-target', 'mark-builder'],
+                  tags: ['single-target', 'mark', 'basic-attack'],
                   damageMultiplier: 1.00,
                   damageScale: ['WIL', 'ATK'],
                   debuff: { id: 'huyet_an', stacks: 1, maxStacks: 5, purgeable: false },
@@ -3489,6 +3489,7 @@ __define('./catalog.ts', (exports, module, __require) => {
                       key: 'skill1',
                       name: 'Huyết Triều',
                       cost: { aether: 25 },
+                      tags: ['active', 'aoe', 'aether-cost', 'mark'],
                       aoe: 'diagonal',
                       maxTargets: 6,
                       damageMultiplier: 1.40,
@@ -3502,6 +3503,7 @@ __define('./catalog.ts', (exports, module, __require) => {
                       key: 'skill2',
                       name: 'Huyết Hải Lãnh Địa',
                       cost: { aether: 0 },
+                      tags: ['active', 'field', 'silence', 'global-rule'],
                       limit: { perBattle: 1 },
                       duration: 2,
                       field: {
@@ -3523,6 +3525,7 @@ __define('./catalog.ts', (exports, module, __require) => {
                       key: 'skill3',
                       name: 'Huyết Tế',
                       cost: { aether: 25 },
+                      tags: ['active', 'self', 'aether-cost', 'instant', 'support'],
                       trueCost: { hpPercentMax: 0.10 },
                       instant: true,
                       grantAether: { allies: 'allExceptSelf', amount: 15 },
@@ -3531,6 +3534,7 @@ __define('./catalog.ts', (exports, module, __require) => {
               ]),
               ult: asUnknownRecord({
                   type: 'auto-cast-fury',
+                  tags: ['active', 'aoe', 'execute', 'mark'],
                   trigger: 'fullRage',
                   aoe: 'allEnemies',
                   damageMultiplier: 2.20,
@@ -4558,6 +4562,7 @@ __define('./combat.ts', (exports, module, __require) => {
           : Statuses.absorbShield(target, dmg, { dtype });
       const remain = Math.max(0, Math.floor(abs.remain));
       let dealtTotal = 0;
+      const attackerState = attacker;
       const emitOnDeathPassive = (unit) => {
           if (!Game || unit.alive)
               return;
@@ -4612,6 +4617,9 @@ __define('./combat.ts', (exports, module, __require) => {
           dealtTotal += Math.max(0, beforeHp - afterHp);
       }
       if (target.hp <= 0) {
+          emitPassiveEvent(Game, target, 'onLethalDamage', { log: getPassiveLog(Game), attacker, attackType });
+      }
+      if (target.hp <= 0) {
           hookOnLethalDamage(target);
       }
       const damageResult = {
@@ -4634,6 +4642,10 @@ __define('./combat.ts', (exports, module, __require) => {
           }
       }
       const isKill = target.hp <= 0;
+      if (isKill) {
+          attackerState._directKills = Math.max(0, Math.floor(Number(attackerState._directKills ?? 0))) + 1;
+          emitPassiveEvent(Game, attacker, 'onEnemyDeath', { log: getPassiveLog(Game), target, attackType, isDirectKill: true });
+      }
       gainFury(attacker, {
           type: attackType === 'basic' ? 'basic' : 'ability',
           dealt,
@@ -4682,7 +4694,19 @@ __define('./combat.ts', (exports, module, __require) => {
       if (!target || !Number.isFinite(target.hpMax)) {
           return { healed: 0, overheal: 0 };
       }
-      const amt = Math.max(0, Math.floor(amount ?? 0));
+      let efficiency = 1;
+      const statuses = Array.isArray(target?.statuses) ? target.statuses : [];
+      for (const status of statuses) {
+          if (!status)
+              continue;
+          if (status.id === 'heal_efficiency_down') {
+              const ratio = Number(status.amount ?? status.power ?? 0);
+              if (Number.isFinite(ratio) && ratio > 0) {
+                  efficiency = Math.max(0, efficiency - ratio);
+              }
+          }
+      }
+      const amt = Math.max(0, Math.floor((amount ?? 0) * efficiency));
       if (amt <= 0) {
           return { healed: 0, overheal: 0 };
       }
@@ -5198,6 +5222,52 @@ __define('./combat/perform-active-skill.ts', (exports, module, __require) => {
       }
       const targets = dispatch.targets.length > 0 ? dispatch.targets : (caster.alive ? [caster] : []);
       const turns = Math.max(1, Math.round(readNumberish(payload.turns ?? payload.duration, 1)));
+      if (caster.id === 'blood_avatar') {
+          const enemies = game.tokens.filter((token) => token.alive && token.side !== caster.side);
+          if (skillKey === 'skill1') {
+              if (globalAetherPool.current(caster.side) < 25) {
+                  return { ok: false, skillKey, skill, tags, appliedTags: dispatch.applied, targetCount: enemies.length, reason: 'insufficient-aether' };
+              }
+              globalAetherPool.consume(caster.side, 25);
+              const base = Math.max(1, Math.round(((caster.atk ?? 0) + (caster.wil ?? 0)) * 1.4));
+              const picked = enemies.slice(0, 6);
+              for (const target of picked) {
+                  dealAbilityDamage(game, caster, target, { base, attackType: 'skill', skill, isAoE: true, targetsHit: picked.length });
+                  Statuses.add(target, { id: 'bleed', kind: 'debuff', tag: 'bleed', dur: 2, tick: 'turn', sourceUnitId: caster.id });
+                  Statuses.add(target, { id: 'huyet_an', kind: 'mark', tag: 'mark', stacks: 1, maxStacks: 5, purgeable: false, sourceUnitId: caster.id });
+              }
+              return { ok: true, skillKey, skill, tags, appliedTags: dispatch.applied, targetCount: picked.length };
+          }
+          if (skillKey === 'skill2') {
+              const casterState = caster;
+              if (casterState._bloodFieldUsed) {
+                  return { ok: false, skillKey, skill, tags, appliedTags: dispatch.applied, targetCount: 0, reason: 'blocked' };
+              }
+              casterState._bloodFieldUsed = true;
+              Statuses.add(caster, { id: 'blood_field_active', kind: 'buff', tag: 'field', dur: 2, tick: 'turn', sourceUnitId: caster.id });
+              for (const token of game.tokens) {
+                  if (!token.alive)
+                      continue;
+                  if (token.side === caster.side) {
+                      Statuses.add(token, { id: 'field_hp_regen_up', kind: 'buff', tag: 'field', dur: 2, tick: 'turn', amount: 0.25, sourceUnitId: caster.id });
+                  }
+                  else {
+                      Statuses.add(token, { id: 'heal_efficiency_down', kind: 'debuff', tag: 'field', dur: 2, tick: 'turn', amount: 0.25, sourceUnitId: caster.id });
+                  }
+              }
+              return { ok: true, skillKey, skill, tags, appliedTags: dispatch.applied, targetCount: enemies.length };
+          }
+          if (skillKey === 'skill3') {
+              if (globalAetherPool.current(caster.side) < 25) {
+                  return { ok: false, skillKey, skill, tags, appliedTags: dispatch.applied, targetCount: 0, reason: 'insufficient-aether' };
+              }
+              globalAetherPool.consume(caster.side, 25);
+              const hpCost = Math.max(1, Math.floor((caster.hpMax ?? 0) * 0.1));
+              caster.hp = Math.max(1, Math.floor((caster.hp ?? 0) - hpCost));
+              globalAetherPool.gain(caster.side, 15);
+              return { ok: true, skillKey, skill, tags, appliedTags: dispatch.applied, targetCount: 0 };
+          }
+      }
       if (hasTag('summon')) {
           const openSlot = firstOpenSlot(game, caster.side);
           if (openSlot) {
@@ -17572,6 +17642,53 @@ __define('./passives.ts', (exports, module, __require) => {
           applyStatStacks(status, foes.length, { maxStacks: typeof params.maxStacks === 'number' ? params.maxStacks : undefined });
           recomputeFromStatuses(unit);
       },
+      gainMaxHPPercent({ unit, passive, ctx }) {
+          if (!unit || !passive?.id)
+              return;
+          const params = (passive.params ?? {});
+          const amount = Math.max(0, toNumber(params.amount, 0));
+          const cap = Math.max(0, toNumber(params.cap, 0));
+          if (amount <= 0 || cap <= 0)
+              return;
+          const target = ctx?.target;
+          if (params.requireBleed === true && (!target || !Statuses.has(target, 'bleed')))
+              return;
+          const hpMax = Math.max(1, Number(unit.hpMax ?? 1));
+          const state = unit;
+          const currentBonus = Math.max(0, Number(state._bloodFeastBonus ?? 0));
+          const addRatio = Math.max(0, Math.min(amount, cap - currentBonus));
+          if (addRatio <= 0)
+              return;
+          const gain = Math.max(1, Math.floor(hpMax * addRatio));
+          unit.hpMax = hpMax + gain;
+          unit.hp = Math.min(unit.hpMax, Math.max(0, Number(unit.hp ?? 0) + gain));
+          state._bloodFeastBonus = currentBonus + addRatio;
+      },
+      surviveAtOneHP({ unit, passive }) {
+          if (!unit || !passive?.id)
+              return;
+          const params = (passive.params ?? {});
+          const state = unit;
+          if (state._bloodCoreUsed)
+              return;
+          const minDirectKills = Math.max(0, Math.floor(toNumber(params.minDirectKills, 0)));
+          const directKills = Math.max(0, Math.floor(Number(state._directKills ?? 0)));
+          if (directKills < minDirectKills)
+              return;
+          if ((unit.hp ?? 0) > 0)
+              return;
+          const baseHpMax = Math.max(1, Number(unit.hpMax ?? 1));
+          const bonusRatio = Math.max(0, Number(state._bloodFeastBonus ?? 0));
+          if (bonusRatio > 0) {
+              const reduced = Math.max(1, Math.floor(baseHpMax / (1 + bonusRatio)));
+              unit.hpMax = reduced;
+              state._bloodFeastBonus = 0;
+          }
+          unit.hp = 1;
+          unit.alive = true;
+          unit.deadAt = undefined;
+          state._bloodCoreUsed = true;
+      },
   };
   /** @type {Record<string, PassiveEffectHandler>} */
   const PASSIVE_ENTRIES = {
@@ -17585,6 +17702,8 @@ __define('./passives.ts', (exports, module, __require) => {
       'gainStats%': EFFECTS.gainStats,
       statBuff: EFFECTS.gainStats,
       statGain: EFFECTS.gainStats,
+      gainMaxHPPercent: EFFECTS.gainMaxHPPercent,
+      surviveAtOneHP: EFFECTS.surviveAtOneHP,
   };
   const PASSIVES = Object.freeze(Object.fromEntries(Object.entries(PASSIVE_ENTRIES).map(([key, handler]) => [
       key,
@@ -31477,7 +31596,17 @@ __define('./turns.ts', (exports, module, __require) => {
       let hpDelta = 0;
       if (Number.isFinite(unit.hp) || Number.isFinite(unit.hpMax) || Number.isFinite(unit.hpRegen)) {
           const currentHp = Number.isFinite(unit.hp) ? unit.hp : 0;
-          const regenHp = Number.isFinite(unit.hpRegen) ? unit.hpRegen : 0;
+          let regenHp = Number.isFinite(unit.hpRegen) ? unit.hpRegen : 0;
+          if (Array.isArray(unit.statuses)) {
+              for (const status of unit.statuses) {
+                  if (!status || status.id !== 'field_hp_regen_up')
+                      continue;
+                  const amount = Number(status.amount ?? status.power ?? 0);
+                  if (Number.isFinite(amount) && amount > 0) {
+                      regenHp += Math.max(0, regenHp * amount);
+                  }
+              }
+          }
           const afterHp = clampResourceAfterRegen(currentHp + regenHp, unit.hpMax);
           hpDelta = afterHp - currentHp;
           unit.hp = afterHp;
@@ -31870,6 +31999,19 @@ __define('./turns.ts', (exports, module, __require) => {
       startFuryTurn(unit, { turnStamp, startAmount: CFG?.fury?.turn?.startGain, grantStart: true });
       applyTurnRegen(Game, unit);
       Statuses.onTurnStart(unit, {});
+      const bloodAvatarFieldOwners = Game.tokens.filter((token) => token.alive
+          && token.id === 'blood_avatar'
+          && token.side !== unit.side
+          && Statuses.has(token, 'blood_field_active'));
+      if (bloodAvatarFieldOwners.length > 0) {
+          const markStacks = Statuses.stacks(unit, 'huyet_an');
+          const alreadyPunished = Statuses.has(unit, 'blood_field_silence_once');
+          if (markStacks >= 3 && !alreadyPunished) {
+              const owner = bloodAvatarFieldOwners[0];
+              Statuses.add(unit, { id: 'silence', kind: 'debuff', tag: 'silence', dur: 1, tick: 'turn', sourceUnitId: owner.id });
+              Statuses.add(unit, { id: 'blood_field_silence_once', kind: 'mark', tag: 'field', dur: 3, tick: 'turn', sourceUnitId: owner.id });
+          }
+      }
       emitGameEvent(ACTION_START, baseDetail);
       if (!Statuses.canAct(unit)) {
           return completeTurn({

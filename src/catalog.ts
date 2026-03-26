@@ -1155,7 +1155,7 @@ export const ROSTER = [
       onSpawn: createOnSpawn(),
       basic: asUnknownRecord({
         name: 'Huyết Đoạt',
-        tags: ['single-target', 'mark-builder'],
+        tags: ['single-target', 'mark', 'basic-attack'],
         damageMultiplier: 1.00,
         damageScale: ['WIL', 'ATK'],
         debuff: { id: 'huyet_an', stacks: 1, maxStacks: 5, purgeable: false },
@@ -1166,6 +1166,7 @@ export const ROSTER = [
           key: 'skill1',
           name: 'Huyết Triều',
           cost: { aether: 25 },
+          tags: ['active', 'aoe', 'aether-cost', 'mark'],
           aoe: 'diagonal',
           maxTargets: 6,
           damageMultiplier: 1.40,
@@ -1179,6 +1180,7 @@ export const ROSTER = [
           key: 'skill2',
           name: 'Huyết Hải Lãnh Địa',
           cost: { aether: 0 },
+          tags: ['active', 'field', 'silence', 'global-rule'],
           limit: { perBattle: 1 },
           duration: 2,
           field: {
@@ -1200,6 +1202,7 @@ export const ROSTER = [
           key: 'skill3',
           name: 'Huyết Tế',
           cost: { aether: 25 },
+          tags: ['active', 'self', 'aether-cost', 'instant', 'support'],
           trueCost: { hpPercentMax: 0.10 },
           instant: true,
           grantAether: { allies: 'allExceptSelf', amount: 15 },
@@ -1208,6 +1211,7 @@ export const ROSTER = [
       ]),
       ult: asUnknownRecord({
         type: 'auto-cast-fury',
+        tags: ['active', 'aoe', 'execute', 'mark'],
         trigger: 'fullRage',
         aoe: 'allEnemies',
         damageMultiplier: 2.20,
