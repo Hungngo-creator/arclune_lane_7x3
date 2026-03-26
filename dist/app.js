@@ -1,25 +1,19 @@
 // Bundled by build.mjs
 const __modules = Object.create(null);
 const __cache = Object.create(null);
-const __hasOwn = Object.prototype.hasOwnProperty;
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
 const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 const __emptyAliases = Object.keys(__legacyModuleAliases).length === 0;
 function __require(id){
   let moduleId = id;
-  let cached = __cache[moduleId];
-  if (cached) return cached.exports;
-  let factory = __modules[moduleId];
-  if (!factory && !__emptyAliases){
+  if (!__emptyAliases){
     const aliased = __legacyModuleAliases[moduleId];
-    if (aliased){
-      moduleId = aliased;
-      cached = __cache[moduleId];
-      if (cached) return cached.exports;
-      factory = __modules[moduleId];
-    }
+    if (aliased) moduleId = aliased;
   }
+  const cached = __cache[moduleId];
+  if (cached) return cached.exports;
+  const factory = __modules[moduleId];
   if (!factory) throw new Error('Module not found: ' + moduleId);
   const module = { exports: {} };
   __cache[moduleId] = module;
@@ -4401,14 +4395,18 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       const modeNeedles = mode === 'attack'
           ? ABSOLUTE_ATTACK_TAG_IDS
           : ABSOLUTE_SHIELD_TAG_IDS;
+      const includesAbsolute = (value) => (value.includes('absolute') || value.includes('tuyetdoi'));
       for (let i = 0; i < statuses.length; i += 1) {
           const status = statuses[i];
-          const haystack = `${status.id ?? ''}|${status.tag ?? ''}`.toLowerCase();
-          if (haystack.includes('absolute') || haystack.includes('tuyetdoi'))
+          const id = typeof status.id === 'string' ? status.id.toLowerCase() : '';
+          const tag = typeof status.tag === 'string' ? status.tag.toLowerCase() : '';
+          if (includesAbsolute(id) || includesAbsolute(tag))
               return true;
           for (let j = 0; j < modeNeedles.length; j += 1) {
               const needle = modeNeedles[j];
-              if (typeof needle === 'string' && haystack.includes(needle))
+              if (typeof needle !== 'string')
+                  continue;
+              if (id.includes(needle) || tag.includes(needle))
                   return true;
           }
       }
@@ -8448,8 +8446,8 @@ __modules['./engine.ts'] = (exports, module, __require) => {
   const TOKEN_STYLE_VALUE = TOKEN_STYLE;
   const TOKEN_DRAW_BUFFER = [];
   const sortByProjectionDepth = (a, b) => {
-      const ya = a.projection.y;
-      const yb = b.projection.y;
+      const ya = a.y;
+      const yb = b.y;
       if (ya === yb)
           return a.token.cx - b.token.cx;
       return ya - yb;
@@ -9182,10 +9180,9 @@ __modules['./engine.ts'] = (exports, module, __require) => {
               continue;
           const key = tokenVisualKey(token);
           const offset = key && meleeOffsetMap ? meleeOffsetMap.get(key) ?? null : null;
-          const adjusted = offset
-              ? { x: projection.x + offset.x, y: projection.y + offset.y, scale: projection.scale }
-              : projection;
-          alive.push({ token, projection: adjusted });
+          const x = offset ? projection.x + offset.x : projection.x;
+          const y = offset ? projection.y + offset.y : projection.y;
+          alive.push({ token, x, y, scale: projection.scale });
       }
       alive.sort(sortByProjectionDepth);
       const perfCfg = CFG?.PERFORMANCE || {};
@@ -9215,8 +9212,8 @@ __modules['./engine.ts'] = (exports, module, __require) => {
           }
       }
       const reduceShadows = shadowPreset !== null;
-      for (const { token: t, projection: p } of alive) {
-          const scale = p.scale ?? 1;
+      for (const { token: t, x: px, y: py, scale: projectionScale } of alive) {
+          const scale = projectionScale ?? 1;
           const r = Math.max(6, Math.floor(baseR * scale));
           const facing = t.side === 'ally' ? 1 : -1;
           const art = ensureTokenArt(t);
@@ -9233,7 +9230,7 @@ __modules['./engine.ts'] = (exports, module, __require) => {
               const { spriteEntry, shadowCfg } = getTokenVisual(t, art);
               const spriteReady = !!(spriteEntry && spriteEntry.status === 'ready' && spriteEntry.img);
               ctx.save();
-              ctx.translate(p.x, p.y);
+              ctx.translate(px, py);
               if (facing === -1 && art?.mirror !== false)
                   ctx.scale(-1, 1);
               const rawShadow = shadowCfg ?? art?.shadow ?? null;
@@ -9281,18 +9278,18 @@ __modules['./engine.ts'] = (exports, module, __require) => {
               ctx.restore();
           }
           else if (TOKEN_STYLE_VALUE === 'chibi') {
-              drawChibi(ctx, p.x, p.y, r, facing, t.color || '#9adcf0');
+              drawChibi(ctx, px, py, r, facing, t.color || '#9adcf0');
           }
           else {
               ctx.fillStyle = t.color || '#9adcf0';
               ctx.beginPath();
-              ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+              ctx.arc(px, py, r, 0, Math.PI * 2);
               ctx.fill();
           }
           if (art?.label !== false) {
               const name = formatName(t.name || t.id);
               const offset = layout.labelOffset ?? 1.2;
-              drawNameplate(ctx, name, p.x, p.y + r * offset, r, art);
+              drawNameplate(ctx, name, px, py + r * offset, r, art);
           }
       }
   }
@@ -11312,18 +11309,9 @@ __modules['./main.ts'] = (exports, module, __require) => {
           throw new Error('PvE board markup not found; render the layout before calling startGame');
       }
       if (currentSession && pendingSkins.size > 0) {
-          const appliedUnitIds = [];
           for (const [unitId, skinKey] of pendingSkins) {
               const applied = currentSession?.setUnitSkin(unitId, skinKey) ?? false;
               if (applied) {
-                  appliedUnitIds.push(unitId);
-              }
-          }
-          if (appliedUnitIds.length === pendingSkins.size) {
-              pendingSkins.clear();
-          }
-          else {
-              for (const unitId of appliedUnitIds) {
                   pendingSkins.delete(unitId);
               }
           }

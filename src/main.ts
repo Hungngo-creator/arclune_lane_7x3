@@ -98,17 +98,9 @@ export function startGame(options?: StartGameOptions | null): SessionState {
     throw new Error('PvE board markup not found; render the layout before calling startGame');
   }
   if (currentSession && pendingSkins.size > 0) {
-    const appliedUnitIds: string[] = [];
     for (const [unitId, skinKey] of pendingSkins) {
       const applied = currentSession?.setUnitSkin(unitId, skinKey) ?? false;
       if (applied) {
-        appliedUnitIds.push(unitId);
-      }
-    }
-    if (appliedUnitIds.length === pendingSkins.size) {
-      pendingSkins.clear();
-    } else {
-      for (const unitId of appliedUnitIds) {
         pendingSkins.delete(unitId);
       }
     }

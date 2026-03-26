@@ -257,13 +257,20 @@ const hasAbsoluteLawTag = (unit: UnitToken | null | undefined, mode: 'attack' | 
   const modeNeedles = mode === 'attack'
     ? ABSOLUTE_ATTACK_TAG_IDS
     : ABSOLUTE_SHIELD_TAG_IDS;
+
+  const includesAbsolute = (value: string): boolean => (
+    value.includes('absolute') || value.includes('tuyetdoi')
+  );
+
   for (let i = 0; i < statuses.length; i += 1) {
     const status = statuses[i] as { id?: string; tag?: string };
-    const haystack = `${status.id ?? ''}|${status.tag ?? ''}`.toLowerCase();
-    if (haystack.includes('absolute') || haystack.includes('tuyetdoi')) return true;
+    const id = typeof status.id === 'string' ? status.id.toLowerCase() : '';
+    const tag = typeof status.tag === 'string' ? status.tag.toLowerCase() : '';
+    if (includesAbsolute(id) || includesAbsolute(tag)) return true;
     for (let j = 0; j < modeNeedles.length; j += 1) {
       const needle = modeNeedles[j];
-      if (typeof needle === 'string' && haystack.includes(needle)) return true;
+      if (typeof needle !== 'string') continue;
+      if (id.includes(needle) || tag.includes(needle)) return true;
     }
   }
   return false;

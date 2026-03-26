@@ -147,8 +147,10 @@ const ENABLE_RUNTIME_OPTIMIZATIONS = MODE === 'production';
 const ESBUILD_TRANSFORM_MINIFY_OPTIONS = ENABLE_RUNTIME_OPTIMIZATIONS
   ? {
       minifySyntax: true,
-      minifyIdentifiers: false,
-      minifyWhitespace: false,
+      minifyIdentifiers: true,
+      minifyWhitespace: true,
+      keepNames: false,
+      drop: ['debugger'],
     }
   : {
       minifySyntax: false,
@@ -768,7 +770,6 @@ async function build(){
   parts.push('// Bundled by build.mjs');
   parts.push('const __modules = Object.create(null);');
   parts.push('const __cache = Object.create(null);');
-  parts.push('const __hasOwn = Object.prototype.hasOwnProperty;');
   parts.push('if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }');
   const legacyAliasObject = Object.fromEntries(LEGACY_MODULE_ID_ALIASES);
   parts.push(`const __legacyModuleAliases = ${JSON.stringify(legacyAliasObject)};`);
@@ -776,18 +777,13 @@ async function build(){
   parts.push('const __emptyAliases = Object.keys(__legacyModuleAliases).length === 0;');
   parts.push('function __require(id){');
   parts.push('  let moduleId = id;');
-  parts.push('  let cached = __cache[moduleId];');
-  parts.push('  if (cached) return cached.exports;');
-  parts.push('  let factory = __modules[moduleId];');
-  parts.push('  if (!factory && !__emptyAliases){');
+  parts.push('  if (!__emptyAliases){');
   parts.push('    const aliased = __legacyModuleAliases[moduleId];');
-  parts.push('    if (aliased){');
-  parts.push('      moduleId = aliased;');
-  parts.push('      cached = __cache[moduleId];');
-  parts.push('      if (cached) return cached.exports;');
-  parts.push('      factory = __modules[moduleId];');
-  parts.push('    }');
+  parts.push('    if (aliased) moduleId = aliased;');
   parts.push('  }');
+  parts.push('  const cached = __cache[moduleId];');
+  parts.push('  if (cached) return cached.exports;');
+  parts.push('  const factory = __modules[moduleId];');
   parts.push("  if (!factory) throw new Error('Module not found: ' + moduleId);");
   parts.push('  const module = { exports: {} };');
   parts.push('  __cache[moduleId] = module;');

@@ -131,13 +131,19 @@ const DEFAULT_OBLIQUE_CAMERA = {
 
 const CHIBI_PROPS: ChibiProportions = CHIBI as ChibiProportions;
 const TOKEN_STYLE_VALUE = TOKEN_STYLE as 'chibi' | 'disk';
-const TOKEN_DRAW_BUFFER: Array<{ token: TokenWithArt; projection: ProjectionState }> = [];
+type TokenDrawBufferEntry = {
+  token: TokenWithArt;
+  x: number;
+  y: number;
+  scale: number;
+};
+const TOKEN_DRAW_BUFFER: TokenDrawBufferEntry[] = [];
 const sortByProjectionDepth = (
-  a: { token: TokenWithArt; projection: ProjectionState },
-  b: { token: TokenWithArt; projection: ProjectionState },
+  a: TokenDrawBufferEntry,
+  b: TokenDrawBufferEntry,
 ): number => {
-  const ya = a.projection.y;
-  const yb = b.projection.y;
+  const ya = a.y;
+  const yb = b.y;
   if (ya === yb) return a.token.cx - b.token.cx;
   return ya - yb;
 };
@@ -951,10 +957,9 @@ export function drawTokensOblique(
     if (!projection) continue;
     const key = tokenVisualKey(token);
     const offset = key && meleeOffsetMap ? meleeOffsetMap.get(key) ?? null : null;
-    const adjusted: ProjectionState = offset
-      ? { x: projection.x + offset.x, y: projection.y + offset.y, scale: projection.scale }
-      : projection;
-    alive.push({ token, projection: adjusted });
+    const x = offset ? projection.x + offset.x : projection.x;
+    const y = offset ? projection.y + offset.y : projection.y;
+    alive.push({ token, x, y, scale: projection.scale });
   }
 
   alive.sort(sortByProjectionDepth);
@@ -990,8 +995,8 @@ export function drawTokensOblique(
   }
   const reduceShadows = shadowPreset !== null;
 
-  for (const { token: t, projection: p } of alive) {
-    const scale = p.scale ?? 1;
+  for (const { token: t, x: px, y: py, scale: projectionScale } of alive) {
+    const scale = projectionScale ?? 1;
     const r = Math.max(6, Math.floor(baseR * scale));
     const facing = t.side === 'ally' ? 1 : -1;
 
@@ -1010,7 +1015,7 @@ export function drawTokensOblique(
       const { spriteEntry, shadowCfg } = getTokenVisual(t, art);
       const spriteReady = !!(spriteEntry && spriteEntry.status === 'ready' && spriteEntry.img);
       ctx.save();
-      ctx.translate(p.x, p.y);
+      ctx.translate(px, py);
       if (facing === -1 && art?.mirror !== false) ctx.scale(-1, 1);
 
       const rawShadow = shadowCfg ?? art?.shadow ?? null;
@@ -1056,18 +1061,18 @@ export function drawTokensOblique(
       }
       ctx.restore();
     } else if (TOKEN_STYLE_VALUE === 'chibi') {
-      drawChibi(ctx, p.x, p.y, r, facing, t.color || '#9adcf0');
+      drawChibi(ctx, px, py, r, facing, t.color || '#9adcf0');
     } else {
       ctx.fillStyle = t.color || '#9adcf0';
       ctx.beginPath();
-      ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+      ctx.arc(px, py, r, 0, Math.PI * 2);
       ctx.fill();
     }
 
     if (art?.label !== false) {
       const name = formatName(t.name || t.id);
       const offset = layout.labelOffset ?? 1.2;
-      drawNameplate(ctx, name, p.x, p.y + r * offset, r, art);
+      drawNameplate(ctx, name, px, py + r * offset, r, art);
     }
   }
 }
